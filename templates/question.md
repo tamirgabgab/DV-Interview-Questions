@@ -41,3 +41,11 @@ collapsed solution.)
     - מה המראיין באמת בודק.
     - טעויות נפוצות.
     - שאלות המשך צפויות.
+
+<!--
+If the question has code, also add tests/<id>/ (copy a similar question's folder):
+  test_<id>.py  pytest tests of the page's Python blocks (load_python(<id>))
+  tb.sv         Verilator testbench; pulls page code with //@page <text>
+  demo.py       starting code of the in-browser "run" panel
+Then run: python tools/run_tests.py <id>
+-->

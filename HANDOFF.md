@@ -41,6 +41,9 @@ pushed to `main`, which publishes the site.
 | Multi-part questions  | One file, `### סעיף א/ב/ג` with a solution after each part               |
 | Owner's own code      | Kept as sent (comments added, minimal bug fixes called out to the owner) |
 | Workflow before adding | Ask the owner guiding questions first, then implement                   |
+| Tests                 | Python: full tests of the page code. SystemVerilog: Verilator 5.020 from apt; unsupported constructs are translated by intent in the testbench (with a fingerprint of the page block) |
+| Failing tests         | Block the deploy; the live site keeps its previous version              |
+| Run button            | Per question, Python only (Pyodide in a web worker); SV cannot run in a browser, the panel says it is checked in CI instead |
 
 ---
 
@@ -74,6 +77,29 @@ pushed to `main`, which publishes the site.
 | 0005 | Smallest multiple made of digits 0 and 1 | junior | medium | Python x < 2000; SV BFS on Icarus (x ≤ 300), SV enumeration on Verilator |
 | 0006 | Stock max profit, long or short | junior | medium | 3,000 random arrays, brute vs. fast, Python + Verilator |
 | 0007 | Random triangle containing the circle center | senior | medium | Python 20k triangles + Monte Carlo; SV class logic on 60k triples (solver not run, see notes) |
+
+### Session 2 — 2026-10-15
+
+1. **Questions 0006 and 0007** added (stock long/short, random triangle), with charts and
+   figures; owner's code kept, one small fix in `max_profit_fast` (no-profit return value).
+2. **README / HANDOFF** rewritten: catalog, conventions, work log, improvement ideas.
+3. **Newest Verilator tried**: v5.052 built from the official sources runs the 0007
+   class with real `randomize()` and constraints (20,000 draws, 0 violations, distribution
+   matches the uniform expectation). Not adopted: it needs a ~15 minute source build plus
+   the z3 solver, and the owner preferred the simple setup.
+4. **Automatic tests** (`tests/`, `tools/run_tests.py`): 16 pytest tests and 7 Verilator
+   testbenches; full run about 4 seconds when compiled, about 10 seconds from scratch.
+   Testbenches pull the code straight from the pages (`//@page`). Translations for
+   simulator limits (0003 inlining pragma, 0005 queue reset, 0007 constraints) carry a
+   fingerprint of the page block and fail if the page changes. Mutation check done:
+   breaking the 0006 code fails both Python and SV tests; editing the 0007 class fails
+   the fingerprint check.
+5. **CI**: new `test` job (pytest + Verilator from apt, compiled testbenches cached);
+   `build` and `deploy` depend on it.
+6. **Run panel** on every question with code (0002–0007): editable starting code from
+   `tests/<id>/demo.py`, Run / Stop / Reset, output and clean tracebacks. Pyodide 0.26.4
+   from jsdelivr runs in a web worker; first run about 3 seconds (loading Python),
+   later runs well under a second. Stop terminates the worker (endless loops are safe).
 
 ## In progress
 
@@ -117,8 +143,10 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 
 | # | Idea | Effort | Notes |
 |---|------|--------|-------|
-| 8 | **Keep the test harnesses in the repo** (`tests/<id>/`) and run them in CI: Python with `pytest`, SystemVerilog with `verilator --lint-only` / `--binary` | M | Today the tests live only in the session scratchpad and are lost; this is the most valuable quality item |
-| 9 | **Extract code from the pages for testing** (a script that pulls the tabbed code blocks) so the published code and the tested code can never drift | M | Pairs with #8 |
+| 8 | ~~Keep the test harnesses in the repo and run them in CI~~ | M | **Done** in session 2 |
+| 9 | ~~Extract code from the pages for testing~~ | M | **Done** in session 2 (`tools/extract_code.py`) |
+| 9a | Show a "tested ✓" badge per question on the tables, from the last CI run | S–M | The run panel already states that the SV code is checked |
+| 9b | Adopt Verilator 5.052+ in CI (cached source build + z3) to run constraints natively and drop translations | M | Proven to work on 0007 in session 2 |
 | 10 | **Keep the figure generators in the repo** (`tools/figures/`) instead of throw-away scripts | S | Makes charts reproducible when numbers change |
 | 11 | **Broken link / image check** in CI | S | e.g. a small script over `site/` after the build |
 | 12 | **Repository `CLAUDE.md`** with the conventions in this file (Hebrew RTL rules, tabs, testing, figures) | S | Lets every future AI session follow the same rules without re-discovery |
@@ -169,5 +197,15 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   - Icarus does not support `ref` ports or `break`.
   - In a module `initial` block, `string y = f(x);` inside a loop is a **static**
     initialiser that runs once — declare first, assign inside the loop.
+  - Verilator 5.020 `sort()` on a queue of signed `int` sorts as unsigned (found in the
+    0003 testbench); the testbench checks order pairwise instead.
+  - A comment that starts with the word `Verilator` (`// Verilator ...`) is parsed as a
+    `/*verilator*/` pragma and fails the build. Start such comments with other words.
+  - Assignment patterns in comparisons (`if (q != '{1, 2})`) are unsupported in 5.020;
+    compare against a variable.
   - Cross-check SystemVerilog answers on more than one simulator.
+- Run panel: `hooks/questions.py` embeds the page's Python blocks as JSON and the demo as
+  the editor content; `docs/javascripts/run-python.js` + `py-worker.js` run them. The
+  page code runs as `solution.py`, the editor as `your_code.py` (tracebacks show those
+  names). Local screenshot tests route the Pyodide CDN to an `npm pack pyodide@0.26.4` copy.
 - Update the **Work log / Open items** sections of this file at the end of every session.

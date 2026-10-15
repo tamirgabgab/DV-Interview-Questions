@@ -5,17 +5,23 @@ Responsibilities:
 - Build the navigation: one section per position level, questions sorted by id.
 - Turn level / difficulty / topic fields into Material tags and a badge line.
 - Replace the ``<!-- questions-table -->`` placeholder with a filterable table.
+- Append an in-browser "run" panel to questions that have ``tests/<id>/demo.py``.
 """
 
 from __future__ import annotations
 
 import html
+import json
 import posixpath
 import re
+import sys
 from pathlib import Path
 
 from mkdocs.exceptions import PluginError
 from mkdocs.utils.meta import get_data
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+import extract_code  # noqa: E402
 
 LEVELS = {
     "student": "סטודנט",
@@ -163,11 +169,51 @@ def _table(level: str | None, page_url: str) -> str:
     return "\n".join(out)
 
 
+def _run_panel(q: dict, markdown: str) -> str:
+    """HTML for the in-browser Python runner, or "" when the question has no demo."""
+    tests = extract_code.ROOT / "tests" / q["id"]
+    demo = tests / "demo.py"
+    if not demo.exists():
+        return ""
+    page_code = "\n".join(extract_code.blocks_from_text(markdown, "python"))
+    demo_code = demo.read_text(encoding="utf-8")
+
+    sv_note = ""
+    tb = tests / "tb.sv"
+    if tb.exists():
+        translated = "//@translation-of" in tb.read_text(encoding="utf-8")
+        sv_note = ("<p class=\"py-runner-note\">קוד ה-SystemVerilog בשאלה נבדק אוטומטית ב-Verilator "
+                   "בכל עדכון של האתר"
+                   + (" (בגרסת בדיקה שמותאמת למגבלות הסימולטור)" if translated else "")
+                   + ".</p>")
+
+    return f"""
+
+## הרצה בדפדפן
+
+<details class="example py-runner">
+<summary>▶ הרצת קוד ה-Python של השאלה</summary>
+<p class="py-runner-note">הפונקציות מהפתרון כבר טעונות. אפשר לשנות את הקוד שבתיבה ולהריץ שוב.
+ההרצה הראשונה טוענת את Python לדפדפן ולוקחת כמה שניות.</p>
+<script type="application/json" class="py-page-code">{json.dumps(page_code).replace("</", "<\\/")}</script>
+<textarea class="py-editor" spellcheck="false" dir="ltr" rows="{min(max(demo_code.count(chr(10)) + 1, 6), 22)}">{html.escape(demo_code)}</textarea>
+<div class="py-buttons">
+<button type="button" class="md-button md-button--primary py-run">▶ הרץ</button>
+<button type="button" class="md-button py-stop" disabled>עצור</button>
+<button type="button" class="md-button py-reset">איפוס</button>
+<span class="py-status"></span>
+</div>
+<pre class="py-output" dir="ltr"></pre>
+{sv_note}
+</details>
+"""
+
+
 def on_page_markdown(markdown, page, config, files, **kwargs):
     q = _questions.get(page.file.src_uri)
     if q:
         diff_label, _ = DIFFICULTIES[q["difficulty"]]
         page.meta["tags"] = [LEVELS[q["level"]], diff_label, *q["tags"]]
-        markdown = _badges(q) + markdown
+        markdown = _badges(q) + markdown + _run_panel(q, markdown)
 
     return PLACEHOLDER.sub(lambda m: _table(m.group(1), page.url), markdown)

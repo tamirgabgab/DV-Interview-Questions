@@ -160,3 +160,64 @@
 .md-typeset .viz-legend .s1 { background: var(--viz-s1); }
 .md-typeset .viz-legend .s2 { background: var(--viz-s2); }
 .md-typeset .viz-legend .ink { background: var(--viz-ink); }
+
+/* In-browser Python runner */
+.md-typeset .py-runner .py-editor {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0.6rem 0;
+  padding: 0.6rem;
+  font-family: var(--md-code-font-family);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: left;
+  color: var(--md-code-fg-color);
+  background: var(--md-code-bg-color);
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+  resize: vertical;
+  tab-size: 4;
+}
+
+.md-typeset .py-runner .py-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.md-typeset .py-runner .md-button {
+  padding: 0.3em 1.2em;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.md-typeset .py-runner .md-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.md-typeset .py-runner .py-status {
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .py-runner .py-output:not(:empty) {
+  margin: 0.6rem 0 0;
+  padding: 0.6rem;
+  font-size: 0.72rem;
+  white-space: pre-wrap;
+  text-align: left;
+  background: var(--md-code-bg-color);
+  border-radius: 0.2rem;
+}
+
+.md-typeset .py-runner .py-output.py-failed {
+  border-inline-start: 0.2rem solid var(--md-typeset-del-color, #e34948);
+}
+
+.md-typeset .py-runner-note {
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}

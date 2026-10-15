@@ -78,8 +78,18 @@ DV-Interview-Questions/
 ├── HANDOFF.md                  # Task list: done / in progress / future work
 ├── mkdocs.yml                  # Site configuration
 ├── requirements.txt            # Pinned Python dependencies for building the site
+├── requirements-dev.txt        # Test dependencies (pytest)
 ├── hooks/
-│   └── questions.py            # Validation, navigation, tags and filterable tables
+│   └── questions.py            # Validation, navigation, tags, tables, run panels
+├── tools/
+│   ├── extract_code.py         # Pulls the code blocks out of a question page
+│   └── run_tests.py            # Runs all question tests (Python + SystemVerilog)
+├── tests/
+│   ├── conftest.py
+│   └── <id>/                   # One folder per question with code, e.g. tests/0006/
+│       ├── test_<id>.py        # pytest tests of the page's Python code
+│       ├── tb.sv               # SystemVerilog testbench of the page's SV code
+│       └── demo.py             # Starting code of the in-browser "run" panel
 ├── templates/
 │   └── question.md             # Copy this to start a new question
 ├── docs/                       # Site content
@@ -93,9 +103,9 @@ DV-Interview-Questions/
 │   │   ├── senior/            # 0007-…
 │   │   └── staff/
 │   ├── assets/images/          # Figures and screenshots referenced by questions
-│   ├── javascripts/            # MathJax config, WaveDrom rendering, table filter
+│   ├── javascripts/            # MathJax, WaveDrom, table filter, Python runner (Pyodide)
 │   └── stylesheets/extra.css   # RTL fixes and question styling
-└── .github/workflows/deploy.yml  # Build on every push, deploy main to GitHub Pages
+└── .github/workflows/deploy.yml  # Test + build on every push, deploy main to GitHub Pages
 ```
 
 Files are named `<id>-<short-slug>.md`, where `<id>` is a zero-padded running number that
@@ -119,10 +129,10 @@ Conventions:
   (`=== "SystemVerilog"` / `=== "Python"`, always in this order). Picking a language in one
   tab switches every tab on the site. Pure RTL design questions (like 0001) may be
   SystemVerilog only.
-- **Every code answer is executed before it is published**: Python directly, SystemVerilog
-  in a simulator (Verilator, Icarus as a cross-check), usually by comparing a simple
-  reference solution with the efficient one on many random inputs. When something could
-  not be run (e.g. constraints the available simulator does not support), the page says so.
+- **Every code answer is tested automatically** (see [Tests](#tests) below): the tests run
+  the code exactly as it appears on the page, and the site is only published when they pass.
+- **Questions with code get a "run" panel**: the page's Python code runs in the reader's
+  browser (Pyodide), with an editable starting script from `tests/<id>/demo.py`.
 - **Math stays symbolic**: no Hebrew inside MathJax (`\text{...}` renders Hebrew reversed);
   Hebrew goes in the surrounding sentence.
 
@@ -206,14 +216,47 @@ holds the same numbers.
 2. Take the next free `id` (one more than the highest existing id under `docs/questions/`).
 3. Copy `templates/question.md` to `docs/questions/<level>/<id>-<slug>.md` and fill it in.
 4. Put any images in `docs/assets/images/` named `<id>-<description>.<ext>`.
-5. Build locally (below) and check the page.
-6. Add the question to the catalog table at the top of this README.
-7. Commit with a message like `Add question 0042: async FIFO depth`.
+5. If the question has code, add `tests/<id>/` with `test_<id>.py`, `tb.sv` and `demo.py`
+   (copy a similar question's folder) and run `python tools/run_tests.py <id>`.
+6. Build locally (below) and check the page.
+7. Add the question to the catalog table at the top of this README.
+8. Commit with a message like `Add question 0042: async FIFO depth`.
 
 The question automatically appears in the navigation, on its level page, on the home page
 table and in the tag index — no other file needs to change.
 
 ---
+
+## Tests
+
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+sudo apt install verilator            # Verilator 5.020 on Ubuntu 24.04
+python tools/run_tests.py             # everything (a few seconds once compiled)
+python tools/run_tests.py 6 7         # only questions 0006 and 0007
+python tools/run_tests.py --python-only
+```
+
+- **Python** (`tests/<id>/test_<id>.py`, pytest): `load_python(<id>)` executes every Python
+  block of the page and returns the namespace, so the tests call the published functions.
+  Typical test: a simple reference solution against the efficient one on random inputs.
+- **SystemVerilog** (`tests/<id>/tb.sv`, Verilator): the testbench pulls code from the page
+  with directives, and must print a line starting with `PASS`.
+
+  | Directive | Meaning |
+  |-----------|---------|
+  | `//@page <text>` | Replaced by the page's SV block that contains `<text>` |
+  | `//@translation-of <text> <hash>` | The testbench holds a hand translation of that block (for simulator limits); fails when the page block changes, so the translation is never stale |
+  | `//@flags <flags>` | Extra Verilator flags, e.g. `--timing` for clocked RTL |
+
+  When the published SV uses something Verilator cannot run, the testbench translates the
+  *intent* into supported code, e.g. constraints become check functions plus
+  "draw from the declared ranges until all constraints hold", and `dist` becomes a weighted
+  queue that is shuffled before taking its first element. Get the hash for a translation
+  with `python -c "import sys; sys.path.insert(0, 'tools'); import extract_code as e; print(e.fingerprint(e.pick(<id>, 'systemverilog', '<text>')))"`.
+- Compiled testbenches are cached in `.cache/sv/` by content hash, so unchanged ones are not
+  recompiled. A first full compile takes about 10 seconds with 4 cores.
+- Logic and proof questions have no tests; only questions with code get a `tests/<id>/` folder.
 
 ## Running the site locally
 
@@ -225,8 +268,9 @@ mkdocs build --strict # the same check that CI runs
 
 ## Publishing
 
-The GitHub Actions workflow builds the site on every push and pull request, and deploys
-the `main` branch to GitHub Pages. One-time setup in the repository settings:
+The GitHub Actions workflow runs the tests and builds the site on every push and pull
+request, and deploys the `main` branch to GitHub Pages. A failing test blocks the deploy,
+so the live site keeps its previous version. One-time setup in the repository settings:
 **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
 This is already set up: every push to `main` publishes the site within about a minute at
