@@ -44,7 +44,7 @@ Each question carries one or more tags. Use the existing ones where possible:
 | Area                | Tags                                                                        |
 |---------------------|-----------------------------------------------------------------------------|
 | Digital design      | `digital-logic`, `fsm`, `fifo`, `clock-domain-crossing`, `timing`           |
-| Verification        | `systemverilog`, `uvm`, `sva`, `coverage`, `methodology`, `debug`           |
+| Verification        | `systemverilog`, `uvm`, `sva`, `coverage`, `constraints`, `randomization`, `methodology`, `debug` |
 | Hardware / systems  | `protocols`, `computer-architecture`, `memory`, `cache`                     |
 | Software            | `scripting`, `python`, `c-cpp`, `algorithms`, `sorting`, `bfs`, `bitwise`   |
 | Math and logic      | `math`, `probability`, `combinatorics`, `logic-puzzles`                     |
@@ -71,8 +71,8 @@ DV-Interview-Questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…
-│   │   ├── junior/            # 0004-…, 0005-…
-│   │   ├── senior/
+│   │   ├── junior/            # 0004-…, 0005-…, 0006-…
+│   │   ├── senior/            # 0007-…
 │   │   └── staff/
 │   ├── assets/images/          # Figures and screenshots referenced by questions
 │   ├── javascripts/            # MathJax config, WaveDrom rendering, table filter
@@ -81,7 +81,7 @@ DV-Interview-Questions/
 ```
 
 Files are named `<id>-<short-slug>.md`, where `<id>` is a zero-padded running number that
-is unique across the whole repository (e.g. `0007-async-fifo-depth.md`).
+is unique across the whole repository (e.g. `0042-async-fifo-depth.md`).
 
 ---
 
@@ -103,7 +103,7 @@ Conventions:
 
 ```markdown
 ---
-id: 7
+id: 42
 title: חישוב עומק של FIFO אסינכרוני
 level: junior            # student | junior | senior | staff  (must match the folder)
 difficulty: medium       # easy | medium | hard
@@ -167,7 +167,7 @@ Prefer text-based diagrams (Mermaid / WaveDrom) over images so they stay editabl
 3. Copy `templates/question.md` to `docs/questions/<level>/<id>-<slug>.md` and fill it in.
 4. Put any images in `docs/assets/images/` named `<id>-<description>.<ext>`.
 5. Build locally (below) and check the page.
-6. Commit with a message like `Add question 0007: async FIFO depth`.
+6. Commit with a message like `Add question 0042: async FIFO depth`.
 
 The question automatically appears in the navigation, on its level page, on the home page
 table and in the tag index — no other file needs to change.

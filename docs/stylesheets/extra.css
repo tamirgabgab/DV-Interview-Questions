@@ -99,6 +99,7 @@
   --viz-s3: #1baf7a;
   --viz-grid: #e4e3df;
   --viz-text: #52514e;
+  --viz-ink: #3b3a37;
 }
 
 [data-md-color-scheme="slate"] {
@@ -107,6 +108,7 @@
   --viz-s3: #199e70;
   --viz-grid: #3a3a37;
   --viz-text: #c3c2b7;
+  --viz-ink: #e8e7e2;
 }
 
 .perf-chart .by-multiples { fill: var(--viz-s1); }
@@ -140,3 +142,21 @@
 .md-typeset .viz-legend .by-multiples { background: var(--viz-s1); }
 .md-typeset .viz-legend .by-enum { background: var(--viz-s2); }
 .md-typeset .viz-legend .by-bfs { background: var(--viz-s3); }
+
+/* Line / dot / figure marks shared by inline SVG charts and figures. */
+.md-typeset svg .s1-line { stroke: var(--viz-s1); }
+.md-typeset svg .s2-line { stroke: var(--viz-s2); }
+.md-typeset svg .ink-line { stroke: var(--viz-ink); }
+.md-typeset svg .s1-dot { fill: var(--viz-s1); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .s2-dot { fill: var(--viz-s2); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .ink-dot { fill: var(--viz-ink); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .center-dot { fill: var(--viz-ink); }
+.md-typeset svg .axis-c { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .tri-ok { fill: var(--viz-s3); fill-opacity: 0.18; stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .tri-bad { fill: var(--viz-s2); fill-opacity: 0.15; stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg .half-fill { fill: var(--viz-s1); fill-opacity: 0.15; }
+.md-typeset svg.figure .tick,
+.md-typeset svg.figure .legend { fill: var(--viz-text); font-size: 13px; font-family: var(--md-text-font-family); }
+.md-typeset .viz-legend .s1 { background: var(--viz-s1); }
+.md-typeset .viz-legend .s2 { background: var(--viz-s2); }
+.md-typeset .viz-legend .ink { background: var(--viz-ink); }
