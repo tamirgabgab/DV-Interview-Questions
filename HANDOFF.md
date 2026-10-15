@@ -10,10 +10,11 @@ _Last updated: 2026-10-15_
 
 ## Project goal
 
-A web interface for a personal collection of Design Verification (DV) interview
-questions. Each question is written clearly, with a full readable solution and diagrams
-where relevant, and is classified by **position level** (Student / Junior / Senior /
-Staff), **difficulty** (Easy / Medium / Hard) and **topic tags**.
+A public website for a personal collection of Design Verification (DV) interview
+questions, plus math and logic questions. Each question is written clearly in Hebrew, with
+a full readable solution and diagrams where relevant, and is classified by **position
+level** (Student / Junior / Senior / Staff), **difficulty** (Easy / Medium / Hard) and
+**topic tags**.
 
 Workflow: the repository owner sends questions + solutions (text and sometimes images)
 during the week; each one is rewritten in a clean, consistent format and added to the
@@ -21,76 +22,94 @@ requested place in the repository.
 
 ---
 
+## Decisions
+
+| Topic               | Decision                                                                   |
+|---------------------|----------------------------------------------------------------------------|
+| Content language    | Hebrew (code, identifiers and repo docs stay in English)                   |
+| Visibility          | Public site on GitHub Pages                                                |
+| Topics              | DV topics plus math, probability and logic puzzles                         |
+| Site technology     | MkDocs + Material for MkDocs, RTL layout (`language: he`)                  |
+| Difficulty scale    | 3 levels: easy / medium / hard (default — not yet confirmed by the owner)  |
+| Multi-level questions | One file in one level folder (default — not yet confirmed by the owner)  |
+| Source field        | Optional `source` field, empty by default (not yet confirmed by the owner) |
+
+---
+
 ## Done
 
-- [x] Initial `README.md`: purpose, classification scheme (level / difficulty / tags),
-      planned repository layout, question file format, diagram conventions.
+- [x] `README.md`: purpose, classification scheme, repository layout, question format,
+      diagram conventions, how to add a question, local run and publishing.
 - [x] `HANDOFF.md` (this file).
+- [x] MkDocs Material site skeleton in Hebrew / RTL with light and dark mode.
+- [x] `hooks/questions.py`:
+  - front-matter validation that fails the build on errors;
+  - navigation generated automatically (one tab per level, questions sorted by id);
+  - level, difficulty and topics turned into Material tags + a metadata line per question;
+  - `<!-- questions-table -->` placeholder replaced by a filterable table
+    (level / difficulty / topic / free text) on the home page and on each level page.
+- [x] Rendering support: Mermaid diagrams, WaveDrom timing diagrams, MathJax formulas,
+      syntax highlighting, collapsible hints (`??? tip`), copy button on code blocks.
+- [x] RTL fixes: code, formulas and diagrams stay left-to-right.
+- [x] Question template: `templates/question.md`.
+- [x] Example question `0001` (student, easy): rising edge detector — shows a Mermaid
+      diagram, a formula, SystemVerilog code and a WaveDrom waveform.
+- [x] GitHub Actions workflow: `mkdocs build --strict` on every push / PR, deploy of
+      `main` to GitHub Pages.
 
 ## In progress
 
-- Nothing yet.
+- Waiting for the first batch of real questions from the owner.
 
 ---
 
 ## To do
 
-### Phase 1 — Content foundation
+### Owner actions (one-time)
 
-- [ ] Confirm the classification scheme with the owner (open decisions below).
-- [ ] Create the folder structure: `questions/{student,junior,senior,staff}/`,
-      `assets/images/`.
-- [ ] Add a question template file (`templates/question.md`) matching the README format.
-- [ ] Add the first real questions as they arrive.
-- [ ] Keep a question index (table of all questions with level, difficulty, tags) —
-      generated automatically once the site exists.
+- [ ] Merge the work branch into `main`.
+- [ ] Enable GitHub Pages: **Settings → Pages → Source: GitHub Actions**.
+- [ ] Decide whether example question `0001` stays or is replaced by real content.
 
-### Phase 2 — Web interface (MVP)
+### Phase 1 — Content
 
-- [ ] Choose the site technology (see open decisions). Current recommendation:
-      **MkDocs + Material for MkDocs** — renders Markdown directly, built-in search,
-      tags, Mermaid support, dark mode, Hebrew/RTL support, minimal maintenance.
-- [ ] Site configuration (`mkdocs.yml`), navigation by position level.
-- [ ] Filtering by level, difficulty and tag (Material tags plugin + a filter page).
-- [ ] Render diagrams: Mermaid (built in) and WaveDrom (plugin) for timing diagrams.
-- [ ] Syntax highlighting for SystemVerilog, Verilog, Python, C/C++, TCL.
-- [ ] "Practice mode": solutions collapsed by default, revealed on click.
-- [ ] GitHub Actions workflow that builds the site on every push to `main` and deploys
-      it to GitHub Pages.
+- [ ] Add questions as they arrive (rewrite statement + solution, add diagrams).
+- [ ] Confirm the default decisions marked "not yet confirmed" above.
+
+### Phase 2 — Practice experience
+
+- [ ] "Practice mode": solution collapsed by default and revealed on click
+      (check that Mermaid / WaveDrom render correctly inside collapsed blocks).
+- [ ] "Random question" button (optionally filtered by level / difficulty / topic).
+- [ ] Mark questions as solved / favourite (stored locally in the browser).
 
 ### Phase 3 — Quality and convenience
 
-- [ ] Validation script / CI check: required front-matter fields present, valid
-      `level` / `difficulty` values, unique ids, image links not broken.
-- [ ] Auto-generated statistics page (questions per level / difficulty / tag).
-- [ ] "Random question" button for practice.
-- [ ] Mark questions as solved / favourite (stored locally in the browser).
+- [ ] Statistics page: number of questions per level / difficulty / topic.
+- [ ] Check for broken image links in the build.
+- [ ] Custom site logo / favicon.
+- [ ] Hebrew-aware search (the built-in search tokenizes Hebrew by whitespace only).
 
 ### Future ideas (not committed)
 
-- [ ] Hebrew UI or a bilingual (Hebrew / English) interface.
 - [ ] Export a filtered set of questions to PDF for offline practice.
-- [ ] Related-questions links between questions that share tags.
+- [ ] "Related questions" links between questions that share tags.
+- [ ] Bilingual (Hebrew / English) content.
 
 ---
 
-## Open decisions (need the owner's input)
+## Technical notes for whoever continues this work
 
-1. **Language of the questions:** English, Hebrew, or both?
-2. **Difficulty scale:** 3 levels (Easy / Medium / Hard) or a 1–5 scale?
-3. **A question that fits several levels:** keep it in one folder with a
-   `levels: [junior, senior]` list, or duplicate it per level?
-4. **Site technology:** MkDocs Material (recommended, simplest) vs. a custom web app
-   (e.g. React/Vite — more flexible UI, more maintenance).
-5. **Visibility:** public site on GitHub Pages, or private?
-6. **Source field:** keep the company / interview round each question came from, or omit it?
-
----
-
-## Conventions for whoever continues this work
-
-- Code, comments, commit messages and documentation are in **English**.
-- One question per file, named `<id>-<slug>.md`, ids are unique and never reused.
-- Images go in `assets/images/`, named `<id>-<short-description>.<ext>`.
-- Prefer text-based diagrams (Mermaid / WaveDrom) over images, so they stay editable.
+- Build: `pip install -r requirements.txt && mkdocs build --strict`. Versions are pinned
+  (MkDocs 1.6.1, Material 9.7.7); Material warns about MkDocs 2.0 — do not upgrade MkDocs
+  to 2.x, its plugin system (and therefore the hook and the tags plugin) is gone.
+- Navigation is **not** written in `mkdocs.yml`; it is generated in `on_config` of
+  `hooks/questions.py` from the files in `docs/questions/<level>/`.
+- The `level` field must match the folder name; ids are unique across all levels and
+  the file name must start with the zero-padded id.
+- External scripts (MathJax, WaveDrom) load from `cdn.jsdelivr.net`; Mermaid is loaded by
+  Material itself from `unpkg.com`.
+- Images go in `docs/assets/images/`, named `<id>-<short-description>.<ext>`.
+- Code, comments, commit messages and repo documentation are in **English**; question
+  content is in **Hebrew**.
 - Update the **Done / In progress / To do** sections of this file at the end of every session.

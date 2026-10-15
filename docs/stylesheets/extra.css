@@ -1,0 +1,55 @@
+/* Keep code, math and diagrams left-to-right inside the RTL (Hebrew) layout. */
+.md-typeset pre,
+.md-typeset code,
+.md-typeset .arithmatex,
+.md-typeset .mermaid,
+.md-typeset [id^="WaveDrom_Display_"] {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.md-typeset .arithmatex,
+.md-typeset [id^="WaveDrom_Display_"] {
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* Metadata line at the top of every question. */
+.md-typeset .question-meta {
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1.2rem;
+  border-inline-start: 0.25rem solid var(--md-accent-fg-color);
+  background: var(--md-code-bg-color);
+  border-radius: 0.2rem;
+}
+
+/* Filter bar above question tables. */
+.md-typeset .question-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.md-typeset .question-filter label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+}
+
+.md-typeset .question-filter select,
+.md-typeset .question-filter input {
+  font: inherit;
+  padding: 0.2rem 0.4rem;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+}
+
+.md-typeset .questions-count,
+.md-typeset .questions-empty {
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
