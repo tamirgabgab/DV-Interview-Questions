@@ -8,8 +8,26 @@ formulas and code where they help.
 The content is written in **Hebrew** and published as a public website (MkDocs Material,
 right-to-left layout) with filtering by **position level**, **difficulty** and **topic**.
 
-> **Status:** the site is built and contains the first questions.
-> See [`HANDOFF.md`](HANDOFF.md) for the task list, progress and next steps.
+**Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
+
+> **Status:** the site is live and holds 7 questions (see the catalog below).
+> [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
+
+---
+
+## Catalog
+
+| Id | Question (Hebrew title on the site) | Level | Difficulty | Main topics |
+|----|-------------------------------------|-------|------------|-------------|
+| 0001 | Rising edge detector | student | 🟢 easy | digital logic, SystemVerilog, WaveDrom |
+| 0002 | Swap two variables (temp / arithmetic / XOR) | student | 🟢 easy | bitwise, math proofs |
+| 0003 | What does this code do? (double-loop sort) | student | 🟢 easy | algorithms, sorting |
+| 0004 | Three mislabeled boxes | junior | 🟡 medium | logic puzzle, algorithms |
+| 0005 | Smallest multiple made of digits 0 and 1 | junior | 🟡 medium | BFS, math, performance chart |
+| 0006 | Stock max profit, long or short | junior | 🟡 medium | algorithms, O(n²) vs. O(n) |
+| 0007 | Random triangle on the unit circle containing the center | senior | 🟡 medium | SV constraints, probability |
+
+Update this table whenever a question is added.
 
 ---
 
@@ -99,7 +117,14 @@ Conventions:
   separate collapsed solution right after each part.
 - **Code answers are given in SystemVerilog and Python**, as linked content tabs
   (`=== "SystemVerilog"` / `=== "Python"`, always in this order). Picking a language in one
-  tab switches every tab on the site.
+  tab switches every tab on the site. Pure RTL design questions (like 0001) may be
+  SystemVerilog only.
+- **Every code answer is executed before it is published**: Python directly, SystemVerilog
+  in a simulator (Verilator, Icarus as a cross-check), usually by comparing a simple
+  reference solution with the efficient one on many random inputs. When something could
+  not be run (e.g. constraints the available simulator does not support), the page says so.
+- **Math stays symbolic**: no Hebrew inside MathJax (`\text{...}` renders Hebrew reversed);
+  Hebrew goes in the surrounding sentence.
 
 ```markdown
 ---
@@ -152,11 +177,26 @@ page and turns level, difficulty and topics into tags.
 | Timing diagrams / waveforms      | ` ```wavedrom ` fenced blocks ([WaveDrom](https://wavedrom.com/))  |
 | Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax)           |
 | Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |
-| Charts                           | Inline SVG using the `perf-chart` CSS classes (light / dark aware) |
+| Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007) |
+| Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles)          |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 
 Prefer text-based diagrams (Mermaid / WaveDrom) over images so they stay editable.
+
+Inline SVG colours come from CSS variables in `docs/stylesheets/extra.css`, so figures
+follow the light / dark switch automatically:
+
+| Class | Use |
+|-------|-----|
+| `s1-line`, `s2-line`, `ink-line` | Series lines (blue, orange, neutral ink) |
+| `s1-dot`, `s2-dot`, `ink-dot` | Markers with a background-coloured ring |
+| `by-multiples`, `by-enum`, `by-bfs` | Bar fills (series 1–3) |
+| `grid`, `axis`, `tick`, `legend` | Chart scaffolding and text |
+| `tri-ok`, `tri-bad`, `half-fill`, `axis-c`, `center-dot` | Geometry figures |
+
+Hover text on a mark is an SVG `<title>` element. Always pair a chart with a table that
+holds the same numbers.
 
 ---
 
@@ -167,7 +207,8 @@ Prefer text-based diagrams (Mermaid / WaveDrom) over images so they stay editabl
 3. Copy `templates/question.md` to `docs/questions/<level>/<id>-<slug>.md` and fill it in.
 4. Put any images in `docs/assets/images/` named `<id>-<description>.<ext>`.
 5. Build locally (below) and check the page.
-6. Commit with a message like `Add question 0042: async FIFO depth`.
+6. Add the question to the catalog table at the top of this README.
+7. Commit with a message like `Add question 0042: async FIFO depth`.
 
 The question automatically appears in the navigation, on its level page, on the home page
 table and in the tag index — no other file needs to change.
@@ -188,4 +229,6 @@ The GitHub Actions workflow builds the site on every push and pull request, and 
 the `main` branch to GitHub Pages. One-time setup in the repository settings:
 **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
-The site is then available at `https://tamirgabgab.github.io/DV-Interview-Questions/`.
+This is already set up: every push to `main` publishes the site within about a minute at
+<https://tamirgabgab.github.io/DV-Interview-Questions/>. A failed deploy can be re-run from
+the Actions tab (the workflow also has a manual `workflow_dispatch` trigger).
