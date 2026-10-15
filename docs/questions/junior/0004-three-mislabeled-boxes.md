@@ -1,0 +1,293 @@
+---
+id: 4
+title: שלוש קופסאות עם תוויות שגויות
+level: junior
+difficulty: medium
+tags: [logic-puzzles, algorithms, python, systemverilog]
+source: ""
+added: 2026-10-15
+---
+
+## השאלה
+
+לפניכם שלוש קופסאות סגורות. באחת יש רק כדורים **אדומים**, באחרת רק כדורים **שחורים**,
+ובשלישית יש **גם אדומים וגם שחורים**. על כל קופסה מודבקת תווית אחת: "אדום", "שחור"
+ו"אדום ושחור".
+
+<svg class="figure" viewBox="0 0 600 190" role="img" aria-label="שלוש קופסאות סגורות עם התוויות אדום, שחור, ואדום ושחור">
+  <g font-family="var(--md-text-font-family)" text-anchor="middle">
+    <g>
+      <polygon points="20,50 50,20 200,20 170,50" fill="#b98a55" stroke="#5a3a18"/>
+      <polygon points="170,50 200,20 200,120 170,150" fill="#7a4f22" stroke="#5a3a18"/>
+      <rect x="20" y="50" width="150" height="100" fill="#a0692e" stroke="#5a3a18"/>
+      <text x="125" y="42" fill="#fff" font-size="20">?</text>
+      <text x="95" y="108" fill="#fff" font-size="22">אדום</text>
+      <text x="95" y="178" fill="var(--viz-text)" font-size="14">קופסה 0</text>
+    </g>
+    <g>
+      <polygon points="220,50 250,20 400,20 370,50" fill="#b98a55" stroke="#5a3a18"/>
+      <polygon points="370,50 400,20 400,120 370,150" fill="#7a4f22" stroke="#5a3a18"/>
+      <rect x="220" y="50" width="150" height="100" fill="#a0692e" stroke="#5a3a18"/>
+      <text x="325" y="42" fill="#fff" font-size="20">?</text>
+      <text x="295" y="108" fill="#fff" font-size="22">שחור</text>
+      <text x="295" y="178" fill="var(--viz-text)" font-size="14">קופסה 1</text>
+    </g>
+    <g>
+      <polygon points="420,50 450,20 600,20 570,50" fill="#b98a55" stroke="#5a3a18"/>
+      <polygon points="570,50 600,20 600,120 570,150" fill="#7a4f22" stroke="#5a3a18"/>
+      <rect x="420" y="50" width="150" height="100" fill="#a0692e" stroke="#5a3a18"/>
+      <text x="525" y="42" fill="#fff" font-size="20">?</text>
+      <text x="495" y="94" fill="#fff" font-size="22">אדום</text>
+      <text x="495" y="124" fill="#fff" font-size="22">ושחור</text>
+      <text x="495" y="178" fill="var(--viz-text)" font-size="14">קופסה 2</text>
+    </g>
+  </g>
+</svg>
+
+**כל התוויות שגויות.** אי אפשר להציץ לתוך הקופסאות, אבל אפשר לבקש דגימה: מצביעים על
+קופסה ומקבלים ממנה כדור אחד שנבחר באקראי.
+
+---
+
+### סעיף א
+
+מהו המספר **המינימלי** של דגימות שמבטיח שתוכלו לתקן את כל התוויות?
+
+??? tip "רמז"
+    על איזו קופסה אנחנו יודעים בוודאות שיש בה כדורים **מצבע אחד בלבד**?
+
+??? success "פתרון סעיף א"
+    **מספיקה דגימה אחת**, מהקופסה שעליה כתוב "אדום ושחור".
+
+    #### למה דווקא מהקופסה הזו?
+
+    התווית עליה שגויה, ולכן היא **לא** מעורבת: יש בה רק אדומים או רק שחורים. כדור אחד
+    מספיק כדי לדעת איזה מהשניים.
+
+    מכיוון שכל שלוש התוויות שגויות, יש רק **שני סידורים אפשריים** של התוכן:
+
+    | התווית על הקופסה | אדום | שחור | אדום ושחור |
+    |------------------|------|------|------------|
+    | תוכן אפשרי, סידור 1 | שחור | אדום ושחור | **אדום** |
+    | תוכן אפשרי, סידור 2 | אדום ושחור | אדום | **שחור** |
+
+    בעמודה של "אדום ושחור" שני הסידורים נבדלים בצבע אחד וברור, ולכן כדור אחד מכריע בין
+    הסידורים:
+
+    ```mermaid
+    flowchart TD
+        D["שולפים כדור אחד מהקופסה<br/>שהתווית שלה: אדום ושחור"] --> Q{"איזה צבע יצא?"}
+        Q -- "אדום" --> A["הקופסה הזו: אדום<br/>התווית אדום: שחור<br/>התווית שחור: אדום ושחור"]
+        Q -- "שחור" --> B["הקופסה הזו: שחור<br/>התווית שחור: אדום<br/>התווית אדום: אדום ושחור"]
+    ```
+
+    **הכלל:** אם יצא כדור בצבע \( c \), הקופסה המעורבת-לכאורה היא \( c \). הקופסה
+    שהתווית שלה \( c \) לא יכולה להכיל \( c \) (התווית שגויה) וגם לא את התערובת (כי
+    התערובת היא בקופסה השלישית), ולכן היא מכילה את **הצבע השני**. הקופסה האחרונה מכילה את
+    התערובת.
+
+    #### למה דגימה מקופסה אחרת לא מספיקה?
+
+    נניח ששולפים מהקופסה שעליה כתוב "אדום" ומקבלים כדור שחור. לפי הטבלה, ייתכן שהיא
+    "שחור" (סידור 1) וייתכן שהיא "אדום ושחור" (סידור 2), ואין דרך להכריע. לכן אין הבטחה
+    שדגימה אחת תספיק, וזה אותו מצב גם בקופסה "שחור".
+
+---
+
+### סעיף ב
+
+כתבו פונקציה שמקבלת מערך `labels` בגודל 3 של מחרוזות: התוויות של קופסאות 0, 1 ו-2,
+**בסדר כלשהו**. ערכי התוויות הם `"RED"`, `"BLACK"` ו-`"MIXED"`. הפונקציה צריכה להחזיר את
+התוויות הנכונות.
+
+לרשותכם API נתון, `draw(i)`, ששולף כדור אקראי מקופסה `i` ומחזיר `"RED"` או `"BLACK"`.
+
+=== "SystemVerilog"
+    ```systemverilog
+    typedef string labels_t[3];
+
+    // Provided API: draws one random ball from box i and returns "RED" or "BLACK".
+    function automatic string draw(int i);
+    ```
+
+=== "Python"
+    ```python
+    # Provided API: draws one random ball from box i and returns "RED" or "BLACK".
+    def draw(i): ...
+    ```
+
+??? success "פתרון 1 – פשוט וישיר"
+    מתרגמים את פתרון סעיף א לקוד כמעט מילה במילה, ובונים מערך תוויות **חדש**:
+
+    1. **לולאה** שמוצאת את הקופסה `k` שהתווית שלה `"MIXED"`, ושולפים ממנה כדור.
+    2. **תנאי `if`** קובע מה הצבע השני (`other`), והקופסה `k` מקבלת את צבע הכדור.
+    3. **לולאה שנייה** מוצאת את הקופסה שהתווית שלה היא צבע הכדור, ומסמנת אותה בצבע השני.
+    4. **לולאה שלישית** מוצאת את הקופסה שהתווית שלה היא הצבע השני, ומסמנת אותה `"MIXED"`.
+
+    === "SystemVerilog"
+        ```systemverilog
+        function automatic labels_t fix_labels_simple(labels_t labels);
+          labels_t fixed;
+          int      k;
+          string   ball, other;
+
+          // 1. Find the box labelled MIXED and draw one ball from it.
+          foreach (labels[i])
+            if (labels[i] == "MIXED") k = i;
+          ball = draw(k);
+
+          // 2. That box really holds only `ball`-coloured balls.
+          if (ball == "RED") other = "BLACK";
+          else               other = "RED";
+          fixed[k] = ball;
+
+          // 3. The box labelled `ball` cannot hold `ball` -> it holds `other`.
+          foreach (labels[i])
+            if (labels[i] == ball) fixed[i] = other;
+
+          // 4. The box labelled `other` holds the mix.
+          foreach (labels[i])
+            if (labels[i] == other) fixed[i] = "MIXED";
+
+          return fixed;
+        endfunction
+        ```
+
+    === "Python"
+        ```python
+        def fix_labels_simple(labels):
+            fixed = ["", "", ""]
+
+            # 1. Find the box labelled MIXED and draw one ball from it.
+            for i in range(3):
+                if labels[i] == "MIXED":
+                    k = i
+            ball = draw(k)
+
+            # 2. That box really holds only `ball`-coloured balls.
+            if ball == "RED":
+                other = "BLACK"
+            else:
+                other = "RED"
+            fixed[k] = ball
+
+            # 3. The box labelled `ball` cannot hold `ball` -> it holds `other`.
+            for i in range(3):
+                if labels[i] == ball:
+                    fixed[i] = other
+
+            # 4. The box labelled `other` holds the mix.
+            for i in range(3):
+                if labels[i] == other:
+                    fixed[i] = "MIXED"
+
+            return fixed
+        ```
+
+    הפתרון נכון וקל לקריאה, אבל הוא עובר על המערך שלוש פעמים ומחזיק מערך נוסף.
+
+??? success "פתרון 2 – אופטימלי: שתי החלפות במקום"
+    #### הרעיון
+
+    אחרי שמוצאים את `k` ושולפים כדור, לא צריך לחפש שוב. שתי הקופסאות האחרות הן
+    \( (k+1) \bmod 3 \) ו-\( (k-1) \bmod 3 \), ובדיקה אחת אומרת איזו מהן נושאת את התווית של
+    צבע הכדור:
+
+    - **`same`:** הקופסה שהתווית שלה שווה לצבע הכדור.
+    - **`other`:** הקופסה שהתווית שלה היא הצבע השני.
+
+    לפי הכלל מסעיף א, שלוש התוויות פשוט **מסתובבות** בין הקופסאות:
+
+    ```mermaid
+    flowchart LR
+        S["same<br/>התווית: צבע הכדור"] -- "צבע הכדור עובר ל-k" --> K["k<br/>התווית: MIXED"]
+        K -- "MIXED עובר ל-other" --> O["other<br/>התווית: הצבע השני"]
+        O -- "הצבע השני עובר ל-same" --> S
+    ```
+
+    סיבוב של שלושה איברים (מחזור באורך 3) שווה בדיוק ל**שתי החלפות**:
+
+    1. **החלפה בין `k` ל-`same`:** קופסה `k` מקבלת את צבע הכדור, ו-`same` מקבלת זמנית את `"MIXED"`.
+    2. **החלפה בין `same` ל-`other`:** `same` מקבלת את הצבע השני, ו-`other` מקבלת את `"MIXED"`.
+
+    #### הקוד
+
+    === "SystemVerilog"
+        ```systemverilog
+        function automatic void fix_labels(ref labels_t labels);
+          int    k, n1, n2, same, other;
+          string ball, tmp;
+
+          foreach (labels[i])
+            if (labels[i] == "MIXED") k = i;
+          ball = draw(k);                       // the true colour of box k
+
+          n1    = (k + 1) % 3;                  // the two other boxes
+          n2    = (k + 2) % 3;                  // (k + 2) % 3 == (k - 1) mod 3
+          same  = (labels[n1] == ball) ? n1 : n2;
+          other = (same == n1) ? n2 : n1;
+
+          // Rotate the three labels with two swaps.
+          tmp = labels[k];    labels[k]    = labels[same];  labels[same]  = tmp;
+          tmp = labels[same]; labels[same] = labels[other]; labels[other] = tmp;
+        endfunction
+        ```
+
+    === "Python"
+        ```python
+        def fix_labels(labels):
+            k = labels.index("MIXED")
+            ball = draw(k)                      # the true colour of box k
+
+            n1, n2 = (k + 1) % 3, (k + 2) % 3   # the two other boxes
+            same = n1 if labels[n1] == ball else n2
+            other = n2 if same == n1 else n1
+
+            # Rotate the three labels with two swaps.
+            labels[k], labels[same] = labels[same], labels[k]
+            labels[same], labels[other] = labels[other], labels[same]
+            return labels
+        ```
+
+    !!! warning "למה `(k + 2) % 3` ולא `(k - 1) % 3`?"
+        ב-SystemVerilog, כמו ב-C, האופרטור `%` שומר על הסימן של המחולק: עבור \( k = 0 \)
+        מתקבל `(0 - 1) % 3 == -1`, שהוא אינדקס לא חוקי. ב-Python דווקא מתקבל 2. כדי שהקוד
+        יהיה זהה ובטוח בשתי השפות, משתמשים ב-\( k + 2 \), ששקול ל-\( k - 1 \) מודולו 3.
+
+    #### דוגמת הרצה
+
+    נניח שהקלט הוא `{"RED", "BLACK", "MIXED"}`, והתוכן האמיתי הוא סידור 1 מסעיף א.
+    לכן \( k = 2 \), והכדור שנשלף אדום. השכנים הם `n1 = 0` ו-`n2 = 1`. בקופסה 0 התווית
+    `"RED"`, ולכן `same = 0` ו-`other = 1`:
+
+    | שלב | התוויות |
+    |-----|---------|
+    | התחלה | <span class="arr"><span>RED</span><span>BLACK</span><span class="hl">MIXED</span></span> |
+    | החלפה 1, בין `k=2` ל-`same=0` | <span class="arr"><span class="hl">MIXED</span><span>BLACK</span><span class="hl">RED</span></span> |
+    | החלפה 2, בין `same=0` ל-`other=1` | <span class="arr"><span class="hl">BLACK</span><span class="hl">MIXED</span><span>RED</span></span> |
+
+    התוצאה `{"BLACK", "MIXED", "RED"}` תואמת בדיוק לסידור 1.
+
+    #### השוואה בין הפתרונות
+
+    | | פתרון 1 | פתרון 2 |
+    |-|---------|---------|
+    | מעברים על המערך | שלושה | אחד (למציאת `k`) |
+    | זיכרון נוסף | מערך חדש | שני אינדקסים |
+    | פעולות על התוויות | שלוש השמות למערך החדש | בדיוק שתי החלפות במקום |
+    | דגימות | אחת | אחת |
+
+    כשיש רק 3 קופסאות שני הפתרונות הם \( O(1) \). בראיון היתרון של פתרון 2 הוא בעיקר
+    הזיהוי שמדובר ב**סיבוב** של התוויות, כלומר תמורה מחזורית, ושכל סיבוב כזה מתבצע בשתי
+    החלפות.
+
+## נקודות חשובות ושאלות המשך
+
+??? note "נקודות שהמראיין מחפש"
+    - **הבנה ולא ניחוש:** לנמק למה דגימה מקופסה אחרת **לא** מבטיחה תשובה, ולא רק לומר
+      "דגימה מהקופסה המעורבת".
+    - **רשימת המקרים:** לזהות שיש בדיוק שני סידורים שבהם כל התוויות שגויות. בשפה
+      מתמטית, אלה שתי התמורות בלי נקודת שבת (derangements) של שלושה איברים.
+    - **מודולו של מספר שלילי:** להיזהר מ-`%` עם מספר שלילי ב-SystemVerilog וב-C.
+    - **שאלת המשך:** מה קורה אם רק **חלק** מהתוויות שגויות? אז דגימה אחת כבר לא מספיקה
+      בכל המקרים. נסו למצוא דוגמה.

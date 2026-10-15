@@ -30,9 +30,12 @@ requested place in the repository.
 | Visibility          | Public site on GitHub Pages                                                |
 | Topics              | DV topics plus math, probability and logic puzzles                         |
 | Site technology     | MkDocs + Material for MkDocs, RTL layout (`language: he`)                  |
-| Difficulty scale    | 3 levels: easy / medium / hard (default — not yet confirmed by the owner)  |
-| Multi-level questions | One file in one level folder (default — not yet confirmed by the owner)  |
-| Source field        | Optional `source` field, empty by default (not yet confirmed by the owner) |
+| Difficulty scale    | 3 levels: easy / medium / hard                                             |
+| Multi-level questions | One file in one level folder                                             |
+| Source field        | Optional `source` field, empty by default                                  |
+| Code languages      | SystemVerilog + Python only, as linked tabs (SystemVerilog first)          |
+| Solutions           | Collapsed by default (practice mode); one collapsed solution per sub-part  |
+| Multi-part questions | One file, `### סעיף א/ב/ג` with a solution after each part                |
 
 ---
 
@@ -56,10 +59,24 @@ requested place in the repository.
       diagram, a formula, SystemVerilog code and a WaveDrom waveform.
 - [x] GitHub Actions workflow: `mkdocs build --strict` on every push / PR, deploy of
       `main` to GitHub Pages.
+- [x] Practice mode: solutions, hints and takeaways are collapsible blocks (verified that
+      Mermaid, WaveDrom and MathJax render correctly inside them).
+- [x] Linked SystemVerilog / Python code tabs (`pymdownx.tabbed` + `content.tabs.link`).
+- [x] CSS helpers: array visualisation (`.arr`), inline SVG charts (`.perf-chart`,
+      `.viz-legend`) with light / dark colours.
+- [x] First batch of questions (all code tested in Python, and in SystemVerilog with
+      Verilator / Icarus):
+
+| Id | Title | Level | Difficulty |
+|----|-------|-------|------------|
+| 0002 | Swap two variables (temp / arithmetic / XOR, with proofs and pitfalls) | student | easy |
+| 0003 | What does this code do? (the "surprising" double-loop sort) | student | easy |
+| 0004 | Three mislabeled boxes (puzzle + simple and two-swap algorithms) | junior | medium |
+| 0005 | Smallest multiple made of digits 0/1 (enumeration vs. BFS on remainders, existence proof, chart) | junior | medium |
 
 ## In progress
 
-- Waiting for the first batch of real questions from the owner.
+- Waiting for the next batch of questions from the owner.
 
 ---
 
@@ -69,17 +86,15 @@ requested place in the repository.
 
 - [ ] Merge the work branch into `main`.
 - [ ] Enable GitHub Pages: **Settings → Pages → Source: GitHub Actions**.
-- [ ] Decide whether example question `0001` stays or is replaced by real content.
+- [ ] Decide whether example question `0001` stays or is replaced by real content
+      (it is an RTL design question, so its code is SystemVerilog only).
 
 ### Phase 1 — Content
 
-- [ ] Add questions as they arrive (rewrite statement + solution, add diagrams).
-- [ ] Confirm the default decisions marked "not yet confirmed" above.
+- [ ] Add questions as they arrive (rewrite statement + solution, add diagrams, test the code).
 
 ### Phase 2 — Practice experience
 
-- [ ] "Practice mode": solution collapsed by default and revealed on click
-      (check that Mermaid / WaveDrom render correctly inside collapsed blocks).
 - [ ] "Random question" button (optionally filtered by level / difficulty / topic).
 - [ ] Mark questions as solved / favourite (stored locally in the browser).
 
@@ -112,4 +127,9 @@ requested place in the repository.
 - Images go in `docs/assets/images/`, named `<id>-<short-description>.<ext>`.
 - Code, comments, commit messages and repo documentation are in **English**; question
   content is in **Hebrew**.
+- Verilator 5.020 (Debian) gotchas found while testing: it does not reset an automatic
+  function's local queue between calls inside a loop (an LRM-correct function returned
+  wrong results), and it rejects `ref` arguments that are queue elements when inlining
+  (use `/*verilator no_inline_task*/` in the test harness). Icarus does not support `ref`
+  ports or `break`. Cross-check SV answers on more than one simulator.
 - Update the **Done / In progress / To do** sections of this file at the end of every session.

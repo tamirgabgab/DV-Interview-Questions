@@ -8,7 +8,7 @@ formulas and code where they help.
 The content is written in **Hebrew** and published as a public website (MkDocs Material,
 right-to-left layout) with filtering by **position level**, **difficulty** and **topic**.
 
-> **Status:** the site skeleton is built and contains one example question.
+> **Status:** the site is built and contains the first questions.
 > See [`HANDOFF.md`](HANDOFF.md) for the task list, progress and next steps.
 
 ---
@@ -46,7 +46,7 @@ Each question carries one or more tags. Use the existing ones where possible:
 | Digital design      | `digital-logic`, `fsm`, `fifo`, `clock-domain-crossing`, `timing`           |
 | Verification        | `systemverilog`, `uvm`, `sva`, `coverage`, `methodology`, `debug`           |
 | Hardware / systems  | `protocols`, `computer-architecture`, `memory`, `cache`                     |
-| Software            | `scripting`, `python`, `c-cpp`, `algorithms`                                |
+| Software            | `scripting`, `python`, `c-cpp`, `algorithms`, `sorting`, `bfs`, `bitwise`   |
 | Math and logic      | `math`, `probability`, `combinatorics`, `logic-puzzles`                     |
 | Other               | `behavioral`                                                                |
 
@@ -70,8 +70,8 @@ DV-Interview-Questions/
 │   ├── questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
-│   │   │   └── 0001-rising-edge-detector.md
-│   │   ├── junior/
+│   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…
+│   │   ├── junior/            # 0004-…, 0005-…
 │   │   ├── senior/
 │   │   └── staff/
 │   ├── assets/images/          # Figures and screenshots referenced by questions
@@ -88,8 +88,18 @@ is unique across the whole repository (e.g. `0007-async-fifo-depth.md`).
 ## Question format
 
 Each question is a single Markdown file: a front-matter header followed by the question,
-an optional collapsible hint, the solution and the key takeaways. The headings and text are
+optional collapsible hints, the solution and the key takeaways. The headings and text are
 in Hebrew. See [`templates/question.md`](templates/question.md).
+
+Conventions:
+
+- **Solutions are collapsed** (`??? success "פתרון"`) so the page can be used for practice.
+  Hints use `??? tip "רמז"`; takeaways and follow-ups use `??? note` / `??? warning`.
+- **Multi-part questions** stay in one file, with `### סעיף א`, `### סעיף ב`, ... and a
+  separate collapsed solution right after each part.
+- **Code answers are given in SystemVerilog and Python**, as linked content tabs
+  (`=== "SystemVerilog"` / `=== "Python"`, always in this order). Picking a language in one
+  tab switches every tab on the site.
 
 ```markdown
 ---
@@ -109,10 +119,24 @@ added: 2026-10-15
     ...
 
 ## הפתרון
-...
+
+??? success "פתרון"
+    ...
+
+    === "SystemVerilog"
+        ```systemverilog
+        ...
+        ```
+
+    === "Python"
+        ```python
+        ...
+        ```
 
 ## נקודות חשובות ושאלות המשך
-...
+
+??? note "נקודות חשובות"
+    ...
 ```
 
 The build hook validates the front matter and **fails the build** on a missing field, an
@@ -127,7 +151,9 @@ page and turns level, difficulty and topics into tags.
 | Block diagrams, flows, FSMs      | ` ```mermaid ` fenced blocks ([Mermaid](https://mermaid.js.org/))  |
 | Timing diagrams / waveforms      | ` ```wavedrom ` fenced blocks ([WaveDrom](https://wavedrom.com/))  |
 | Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax)           |
-| Code                             | Fenced blocks with a language (`systemverilog`, `python`, `c`, …)  |
+| Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |
+| Charts                           | Inline SVG using the `perf-chart` CSS classes (light / dark aware) |
+| Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 
 Prefer text-based diagrams (Mermaid / WaveDrom) over images so they stay editable.

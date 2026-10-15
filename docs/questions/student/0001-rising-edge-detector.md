@@ -21,64 +21,66 @@ added: 2026-10-15
 
 ## הפתרון
 
-### הרעיון
+??? success "פתרון"
+    ### הרעיון
 
-שומרים את הערך של `sig` מהמחזור הקודם ב-Flip-Flop אחד, ונקרא לו `sig_q`.
-עליית שפה מתרחשת בדיוק כאשר הערך הנוכחי הוא `1` והערך הקודם היה `0`:
+    שומרים את הערך של `sig` מהמחזור הקודם ב-Flip-Flop אחד, ונקרא לו `sig_q`.
+    עליית שפה מתרחשת בדיוק כאשר הערך הנוכחי הוא `1` והערך הקודם היה `0`:
 
-\[
-pulse = sig \land \lnot sig\_q
-\]
+    \[
+    pulse = sig \land \lnot sig\_q
+    \]
 
-### המעגל
+    ### המעגל
 
-```mermaid
-flowchart LR
-    sig([sig]) --> FF["D-FF"]
-    clk([clk]) --> FF
-    FF -- sig_q --> INV["NOT"]
-    sig --> AND["AND"]
-    INV --> AND
-    AND --> pulse([pulse])
-```
+    ```mermaid
+    flowchart LR
+        sig([sig]) --> FF["D-FF"]
+        clk([clk]) --> FF
+        FF -- sig_q --> INV["NOT"]
+        sig --> AND["AND"]
+        INV --> AND
+        AND --> pulse([pulse])
+    ```
 
-### מימוש ב-SystemVerilog
+    ### מימוש ב-SystemVerilog
 
-```systemverilog
-module rise_detect (
-  input  logic clk,
-  input  logic rst_n,
-  input  logic sig,
-  output logic pulse
-);
-  logic sig_q;
+    ```systemverilog
+    module rise_detect (
+      input  logic clk,
+      input  logic rst_n,
+      input  logic sig,
+      output logic pulse
+    );
+      logic sig_q;
 
-  always_ff @(posedge clk or negedge rst_n)
-    if (!rst_n) sig_q <= 1'b0;
-    else        sig_q <= sig;
+      always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) sig_q <= 1'b0;
+        else        sig_q <= sig;
 
-  assign pulse = sig & ~sig_q;
-endmodule
-```
+      assign pulse = sig & ~sig_q;
+    endmodule
+    ```
 
-### דיאגרמת תזמון
+    ### דיאגרמת תזמון
 
-```wavedrom
-{ signal: [
-  { name: "clk",   wave: "p........." },
-  { name: "sig",   wave: "0.1...0.1." },
-  { name: "sig_q", wave: "0..1...0.1" },
-  { name: "pulse", wave: "0.10....10" }
-]}
-```
+    ```wavedrom
+    { signal: [
+      { name: "clk",   wave: "p........." },
+      { name: "sig",   wave: "0.1...0.1." },
+      { name: "sig_q", wave: "0..1...0.1" },
+      { name: "pulse", wave: "0.10....10" }
+    ]}
+    ```
 
-הפולס עולה באותו מחזור שבו `sig` עולה, ויורד במחזור הבא, כאשר `sig_q` כבר "תפס" את הערך `1`.
+    הפולס עולה באותו מחזור שבו `sig` עולה, ויורד במחזור הבא, כאשר `sig_q` כבר "תפס" את הערך `1`.
 
 ## נקודות חשובות ושאלות המשך
 
-- **ירידת שפה:** מחליפים את התנאי ל-`~sig & sig_q`.
-- **שתי השפות:** משתמשים ב-`sig ^ sig_q` (XOR).
-- **אות אסינכרוני:** אם `sig` מגיע מדומיין שעון אחר, קודם מעבירים אותו דרך סנכרון של שני
-  Flip-Flops (2-FF synchronizer), ורק אחר כך מבצעים את זיהוי השפה על האות המסונכרן.
-- **מוצא רשום:** המוצא כאן קומבינטורי. אם רוצים מוצא נקי ישירות מ-Flip-Flop, אפשר לרשום
-  גם את `pulse`, במחיר השהיה של מחזור אחד.
+??? note "נקודות חשובות"
+    - **ירידת שפה:** מחליפים את התנאי ל-`~sig & sig_q`.
+    - **שתי השפות:** משתמשים ב-`sig ^ sig_q` (XOR).
+    - **אות אסינכרוני:** אם `sig` מגיע מדומיין שעון אחר, קודם מעבירים אותו דרך סנכרון של שני
+      Flip-Flops (2-FF synchronizer), ורק אחר כך מבצעים את זיהוי השפה על האות המסונכרן.
+    - **מוצא רשום:** המוצא כאן קומבינטורי. אם רוצים מוצא נקי ישירות מ-Flip-Flop, אפשר לרשום
+      גם את `pulse`, במחיר השהיה של מחזור אחד.

@@ -11,17 +11,33 @@ added: YYYY-MM-DD
 ## השאלה
 
 ניסוח מלא וברור של השאלה, כולל כל ההנחות והאילוצים.
+(For multi-part questions use "### סעיף א", "### סעיף ב", ... each followed by its own
+collapsed solution.)
 
 ??? tip "רמז"
     כיוון לפתרון בלי לחשוף אותו.
 
 ## הפתרון
 
-הסבר שלב אחר שלב. דיאגרמות (Mermaid), דיאגרמות תזמון (WaveDrom), נוסחאות (\( LaTeX \))
-וקוד לפי הצורך.
+??? success "פתרון"
+    הסבר שלב אחר שלב. דיאגרמות (Mermaid), דיאגרמות תזמון (WaveDrom), נוסחאות (\( LaTeX \))
+    לפי הצורך.
+
+    Code is always given in both languages, as linked tabs:
+
+    === "SystemVerilog"
+        ```systemverilog
+        // ...
+        ```
+
+    === "Python"
+        ```python
+        # ...
+        ```
 
 ## נקודות חשובות ושאלות המשך
 
-- מה המראיין באמת בודק.
-- טעויות נפוצות.
-- שאלות המשך צפויות.
+??? note "נקודות חשובות"
+    - מה המראיין באמת בודק.
+    - טעויות נפוצות.
+    - שאלות המשך צפויות.

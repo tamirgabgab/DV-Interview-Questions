@@ -53,3 +53,90 @@
   font-size: 0.7rem;
   color: var(--md-default-fg-color--light);
 }
+
+/* Array visualisation: <span class="arr"><span>3</span>...</span> */
+.md-typeset .arr {
+  display: inline-flex;
+  direction: ltr;
+  gap: 0.2rem;
+  vertical-align: middle;
+}
+
+.md-typeset .arr > span {
+  min-width: 1.8rem;
+  padding: 0.15rem 0.4rem;
+  text-align: center;
+  font-family: var(--md-code-font-family);
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+}
+
+.md-typeset .arr > span.done {
+  background: var(--md-accent-fg-color--transparent);
+  border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .arr > span.hl {
+  border-width: 2px;
+  border-color: var(--md-primary-fg-color);
+  font-weight: 700;
+}
+
+/* Inline SVG charts and figures: colours follow the Material light / dark scheme. */
+.md-typeset svg.perf-chart,
+.md-typeset svg.figure {
+  display: block;
+  width: 100%;
+  max-width: 40rem;
+  height: auto;
+  margin: 1rem auto;
+  direction: ltr;
+}
+
+:root {
+  --viz-s1: #2a78d6;
+  --viz-s2: #eb6834;
+  --viz-s3: #1baf7a;
+  --viz-grid: #e4e3df;
+  --viz-text: #52514e;
+}
+
+[data-md-color-scheme="slate"] {
+  --viz-s1: #3987e5;
+  --viz-s2: #d95926;
+  --viz-s3: #199e70;
+  --viz-grid: #3a3a37;
+  --viz-text: #c3c2b7;
+}
+
+.perf-chart .by-multiples { fill: var(--viz-s1); }
+.perf-chart .by-enum { fill: var(--viz-s2); }
+.perf-chart .by-bfs { fill: var(--viz-s3); }
+.perf-chart .grid { stroke: var(--viz-grid); stroke-width: 1; }
+.perf-chart .axis { stroke: var(--viz-text); stroke-width: 1; }
+.perf-chart .tick,
+.perf-chart .legend { fill: var(--viz-text); font-size: 12px; font-family: var(--md-text-font-family); }
+.perf-chart .legend { font-size: 13px; }
+.perf-chart .bar:hover { opacity: 0.8; }
+
+/* HTML legend for inline charts (keeps Hebrew bidi correct). */
+.md-typeset .viz-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  font-size: 0.7rem;
+  color: var(--viz-text);
+}
+
+.md-typeset .viz-legend i {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-inline-end: 0.35rem;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.md-typeset .viz-legend .by-multiples { background: var(--viz-s1); }
+.md-typeset .viz-legend .by-enum { background: var(--viz-s2); }
+.md-typeset .viz-legend .by-bfs { background: var(--viz-s3); }
