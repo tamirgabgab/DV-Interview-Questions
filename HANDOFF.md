@@ -6,6 +6,8 @@ where the last session stopped.
 
 _Last updated: 2026-10-15_
 
+**Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
+
 ---
 
 ## Project goal
@@ -16,65 +18,62 @@ a full readable solution and diagrams where relevant, and is classified by **pos
 level** (Student / Junior / Senior / Staff), **difficulty** (Easy / Medium / Hard) and
 **topic tags**.
 
-Workflow: the repository owner sends questions + solutions (text and sometimes images)
-during the week; each one is rewritten in a clean, consistent format and added to the
-requested place in the repository.
+Workflow: the repository owner sends questions + solutions (text, code and sometimes
+images) during the week. Each one is rewritten in a clean, consistent format, the code is
+translated to the missing language and executed, figures are drawn, and the result is
+pushed to `main`, which publishes the site.
 
 ---
 
 ## Decisions
 
-| Topic               | Decision                                                                   |
-|---------------------|----------------------------------------------------------------------------|
-| Content language    | Hebrew (code, identifiers and repo docs stay in English)                   |
-| Visibility          | Public site on GitHub Pages                                                |
-| Topics              | DV topics plus math, probability and logic puzzles                         |
-| Site technology     | MkDocs + Material for MkDocs, RTL layout (`language: he`)                  |
-| Difficulty scale    | 3 levels: easy / medium / hard                                             |
+| Topic                 | Decision                                                                 |
+|-----------------------|--------------------------------------------------------------------------|
+| Content language      | Hebrew (code, identifiers and repo docs stay in English)                 |
+| Visibility            | Public site on GitHub Pages, deployed from `main`                        |
+| Topics                | DV topics plus math, probability and logic puzzles                       |
+| Site technology       | MkDocs + Material for MkDocs, RTL layout (`language: he`)                |
+| Difficulty scale      | 3 levels: easy / medium / hard, relative to the position level           |
 | Multi-level questions | One file in one level folder                                             |
-| Source field        | Optional `source` field, empty by default                                  |
-| Code languages      | SystemVerilog + Python only, as linked tabs (SystemVerilog first)          |
-| Solutions           | Collapsed by default (practice mode); one collapsed solution per sub-part  |
-| Multi-part questions | One file, `### סעיף א/ב/ג` with a solution after each part                |
+| Source field          | Optional `source` field, empty by default                                |
+| Code languages        | SystemVerilog + Python, as linked tabs (SystemVerilog first)             |
+| Solutions             | Collapsed by default (practice mode); one collapsed solution per sub-part |
+| Multi-part questions  | One file, `### סעיף א/ב/ג` with a solution after each part               |
+| Owner's own code      | Kept as sent (comments added, minimal bug fixes called out to the owner) |
+| Workflow before adding | Ask the owner guiding questions first, then implement                   |
 
 ---
 
-## Done
+## Work log
 
-- [x] `README.md`: purpose, classification scheme, repository layout, question format,
-      diagram conventions, how to add a question, local run and publishing.
-- [x] `HANDOFF.md` (this file).
-- [x] MkDocs Material site skeleton in Hebrew / RTL with light and dark mode.
-- [x] `hooks/questions.py`:
-  - front-matter validation that fails the build on errors;
-  - navigation generated automatically (one tab per level, questions sorted by id);
-  - level, difficulty and topics turned into Material tags + a metadata line per question;
-  - `<!-- questions-table -->` placeholder replaced by a filterable table
-    (level / difficulty / topic / free text) on the home page and on each level page.
-- [x] Rendering support: Mermaid diagrams, WaveDrom timing diagrams, MathJax formulas,
-      syntax highlighting, collapsible hints (`??? tip`), copy button on code blocks.
-- [x] RTL fixes: code, formulas and diagrams stay left-to-right.
-- [x] Question template: `templates/question.md`.
-- [x] Example question `0001` (student, easy): rising edge detector — shows a Mermaid
-      diagram, a formula, SystemVerilog code and a WaveDrom waveform.
-- [x] GitHub Actions workflow: `mkdocs build --strict` on every push / PR, deploy of
-      `main` to GitHub Pages.
-- [x] Practice mode: solutions, hints and takeaways are collapsible blocks (verified that
-      Mermaid, WaveDrom and MathJax render correctly inside them).
-- [x] Linked SystemVerilog / Python code tabs (`pymdownx.tabbed` + `content.tabs.link`).
-- [x] CSS helpers: array visualisation (`.arr`), inline SVG charts (`.perf-chart`,
-      `.viz-legend`) with light / dark colours.
-- [x] First batch of questions (all code tested in Python, and in SystemVerilog with
-      Verilator / Icarus):
+### Session 1 — 2026-10-15
 
-| Id | Title | Level | Difficulty |
-|----|-------|-------|------------|
-| 0002 | Swap two variables (temp / arithmetic / XOR, with proofs and pitfalls) | student | easy |
-| 0003 | What does this code do? (the "surprising" double-loop sort) | student | easy |
-| 0004 | Three mislabeled boxes (puzzle + simple and two-swap algorithms) | junior | medium |
-| 0005 | Smallest multiple made of digits 0/1 (enumeration vs. BFS on remainders, existence proof, chart) | junior | medium |
-| 0006 | Stock max profit, long or short (O(n²) vs. O(n), price chart with running min/max, trace table) | junior | medium |
-| 0007 | Random triangle on the unit circle containing the center (Python rejection, SV constraints, P = 1/4 and the discrete M-point formula) | senior | medium |
+1. **Docs:** first `README.md` and `HANDOFF.md`.
+2. **Site skeleton:** MkDocs Material in Hebrew / RTL, light and dark mode, level tabs,
+   tag index, home page and level pages with a filterable question table.
+3. **Build hook** (`hooks/questions.py`): front-matter validation that fails the build,
+   navigation generated from the files, tags and a metadata line on every question.
+4. **Rendering:** Mermaid, WaveDrom, MathJax, syntax highlighting, copy buttons, RTL fixes
+   for code / math / diagrams.
+5. **CI/CD:** GitHub Actions builds with `--strict` on every push and PR, and deploys
+   `main` to GitHub Pages. Pages was enabled by the owner; the site is live.
+6. **Practice mode:** solutions, hints and takeaways in collapsible blocks; verified that
+   diagrams, waveforms and formulas render inside collapsed blocks.
+7. **Linked code tabs:** SystemVerilog / Python, synchronised across the site.
+8. **Figure toolkit:** `.arr` array cells, `.perf-chart` charts with HTML legends,
+   `.figure` geometry; colours from CSS variables for both themes.
+9. **Questions 0001–0007** (catalog in `README.md`). All code was executed:
+   Python directly; SystemVerilog in Verilator 5.020, with Icarus as a cross-check.
+
+| Id | Title | Level | Difficulty | How it was verified |
+|----|-------|-------|------------|---------------------|
+| 0001 | Rising edge detector | student | easy | example question, rendering only |
+| 0002 | Swap two variables | student | easy | Python + Verilator, incl. overflow and aliasing cases |
+| 0003 | What does this code do? (double-loop sort) | student | easy | Python + Verilator, trace generated by script |
+| 0004 | Three mislabeled boxes | junior | medium | all 12 label/content combinations, Python + Verilator |
+| 0005 | Smallest multiple made of digits 0 and 1 | junior | medium | Python x < 2000; SV BFS on Icarus (x ≤ 300), SV enumeration on Verilator |
+| 0006 | Stock max profit, long or short | junior | medium | 3,000 random arrays, brute vs. fast, Python + Verilator |
+| 0007 | Random triangle containing the circle center | senior | medium | Python 20k triangles + Monte Carlo; SV class logic on 60k triples (solver not run, see notes) |
 
 ## In progress
 
@@ -82,61 +81,93 @@ requested place in the repository.
 
 ---
 
-## To do
+## Open items
 
-### Owner actions (one-time)
+### Owner decisions
 
-- [ ] Merge the work branch into `main`.
-- [ ] Enable GitHub Pages: **Settings → Pages → Source: GitHub Actions**.
-- [ ] Decide whether example question `0001` stays or is replaced by real content
-      (it is an RTL design question, so its code is SystemVerilog only).
+- [ ] Keep example question `0001` or replace it with real content.
+- [ ] Staff level is still empty, Senior has one question — any questions for these levels?
 
-### Phase 1 — Content
+### Content
 
-- [ ] Add questions as they arrive (rewrite statement + solution, add diagrams, test the code).
+- [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
+- [ ] Re-run the 0007 constraints in a simulator with full constraint support
+      (VCS / Xcelium / Questa, or a newer Verilator) and update the note on the page.
 
-### Phase 2 — Practice experience
+---
 
-- [ ] "Random question" button (optionally filtered by level / difficulty / topic).
-- [ ] Mark questions as solved / favourite (stored locally in the browser).
+## Improvement ideas
 
-### Phase 3 — Quality and convenience
+Ordered roughly by value for effort. **S** = small (under an hour), **M** = a few hours,
+**L** = a day or more.
 
-- [ ] Statistics page: number of questions per level / difficulty / topic.
-- [ ] Check for broken image links in the build.
-- [ ] Custom site logo / favicon.
-- [ ] Hebrew-aware search (the built-in search tokenizes Hebrew by whitespace only).
+### Practice experience
 
-### Future ideas (not committed)
+| # | Idea | Effort | Notes |
+|---|------|--------|-------|
+| 1 | **Previous / next question** links at the bottom of each page | S | Material `navigation.footer` feature, one line in `mkdocs.yml` |
+| 2 | **"Open all / close all solutions"** button on each question | S | Small JS that toggles every `<details>` on the page |
+| 3 | **Random question** button, honouring the current filters | S–M | JS on the home page, reads the generated question table |
+| 4 | **Solved / favourite marks** stored in the browser, with progress per level | M | `localStorage`; show ✅ / ⭐ in the tables and a progress bar on level pages |
+| 5 | **Interview mode**: show only the question with a countdown timer, then reveal hints and solution step by step | M | Query parameter or toggle that hides the solution blocks |
+| 6 | **Sortable table columns** (id, level, difficulty) and coloured level / difficulty chips | S–M | Extend `question-filter.js` and the hook's table output |
+| 7 | **Related questions** at the bottom of each page, by shared tags | S–M | Generated in the hook from the question metadata |
 
-- [ ] Export a filtered set of questions to PDF for offline practice.
-- [ ] "Related questions" links between questions that share tags.
-- [ ] Bilingual (Hebrew / English) content.
+### Content quality and safety net
+
+| # | Idea | Effort | Notes |
+|---|------|--------|-------|
+| 8 | **Keep the test harnesses in the repo** (`tests/<id>/`) and run them in CI: Python with `pytest`, SystemVerilog with `verilator --lint-only` / `--binary` | M | Today the tests live only in the session scratchpad and are lost; this is the most valuable quality item |
+| 9 | **Extract code from the pages for testing** (a script that pulls the tabbed code blocks) so the published code and the tested code can never drift | M | Pairs with #8 |
+| 10 | **Keep the figure generators in the repo** (`tools/figures/`) instead of throw-away scripts | S | Makes charts reproducible when numbers change |
+| 11 | **Broken link / image check** in CI | S | e.g. a small script over `site/` after the build |
+| 12 | **Repository `CLAUDE.md`** with the conventions in this file (Hebrew RTL rules, tabs, testing, figures) | S | Lets every future AI session follow the same rules without re-discovery |
+
+### Site polish
+
+| # | Idea | Effort | Notes |
+|---|------|--------|-------|
+| 13 | Site **logo and favicon** | S | |
+| 14 | **Statistics** on the home page: questions per level / difficulty / topic | S–M | Generated in the hook |
+| 15 | Show the **`added` date** (and `source`, when filled) in the metadata line; a "new" badge for recent questions | S | Hook change only |
+| 16 | **Better Hebrew search** | M | The built-in search splits Hebrew on whitespace only; evaluate the search `separator` setting or an alternative index |
+| 17 | **Social preview cards** when sharing a question link | S–M | Material `social` plugin (needs extra image dependencies in CI) |
+| 18 | **Comments / discussion** per question via GitHub Discussions (giscus) | M | Public site, so readers could ask questions |
+| 19 | **PDF export** of a filtered question set for offline practice | M–L | e.g. a print-site plugin |
+| 20 | Bilingual content (Hebrew / English) | L | Only if the audience grows beyond Hebrew readers |
 
 ---
 
 ## Technical notes for whoever continues this work
 
 - Build: `pip install -r requirements.txt && mkdocs build --strict`. Versions are pinned
-  (MkDocs 1.6.1, Material 9.7.7); Material warns about MkDocs 2.0 — do not upgrade MkDocs
+  (MkDocs 1.6.1, Material 9.7.7). Material warns about MkDocs 2.0 — do not upgrade MkDocs
   to 2.x, its plugin system (and therefore the hook and the tags plugin) is gone.
 - Navigation is **not** written in `mkdocs.yml`; it is generated in `on_config` of
   `hooks/questions.py` from the files in `docs/questions/<level>/`.
 - The `level` field must match the folder name; ids are unique across all levels and
   the file name must start with the zero-padded id.
 - External scripts (MathJax, WaveDrom) load from `cdn.jsdelivr.net`; Mermaid is loaded by
-  Material itself from `unpkg.com`.
+  Material itself from `unpkg.com`. The cloud sandbox cannot reach these CDNs, so local
+  screenshot checks serve them from `npm pack` copies via Playwright request routing.
+- Publishing: push to `main` → the workflow builds and deploys. It can also be started
+  manually (`workflow_dispatch`). `actions/deploy-pages@v4` prints a Node.js 20
+  deprecation warning; bump the action versions when newer majors are available.
 - Images go in `docs/assets/images/`, named `<id>-<short-description>.<ext>`.
 - Code, comments, commit messages and repo documentation are in **English**; question
   content is in **Hebrew**.
-- Verilator 5.020 (Debian) gotchas found while testing: it does not reset an automatic
-  function's local queue between calls inside a loop (an LRM-correct function returned
-  wrong results), and it rejects `ref` arguments that are queue elements when inlining
-  (use `/*verilator no_inline_task*/` in the test harness). Icarus does not support `ref`
-  ports or `break`. Verilator 5.020 also cannot run `randomize()` with constraints on arrays
-  (question 0007: the class logic was tested without the solver). Cross-check SV answers
-  on more than one simulator.
-- Figures for 0006 / 0007 are inline SVG generated by small throw-away Python scripts and
-  styled by the `.perf-chart` / `.figure` classes in `extra.css`. Do not put Hebrew inside
-  MathJax (`\text{...}`): it renders reversed. Keep Hebrew in the surrounding sentence.
-- Update the **Done / In progress / To do** sections of this file at the end of every session.
+- Do not put Hebrew inside MathJax (`\text{...}`): it renders reversed. In inline SVG,
+  give Hebrew `<text>` elements `direction="rtl"`, and prefer an HTML legend over SVG text.
+- Inline SVG figures are generated by Python scripts and styled by `.perf-chart` /
+  `.figure` classes in `extra.css` (see the table in `README.md`).
+- Simulator gotchas found while testing:
+  - Verilator 5.020 (Debian) does not reset an automatic function's local queue between
+    calls inside a loop; an LRM-correct function returned wrong results (0005).
+  - Verilator rejects `ref` arguments that are queue elements when inlining; use
+    `/*verilator no_inline_task*/` in the test harness (0003).
+  - Verilator 5.020 cannot run `randomize()` with constraints on arrays (0007).
+  - Icarus does not support `ref` ports or `break`.
+  - In a module `initial` block, `string y = f(x);` inside a loop is a **static**
+    initialiser that runs once — declare first, assign inside the loop.
+  - Cross-check SystemVerilog answers on more than one simulator.
+- Update the **Work log / Open items** sections of this file at the end of every session.
