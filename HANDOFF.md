@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-16_
+_Last updated: 2026-10-16 (session 4)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -44,6 +44,7 @@ pushed to `main`, which publishes the site.
 | Tests                 | Python: full tests of the page code. SystemVerilog: Verilator 5.020 from apt; unsupported constructs are translated by intent in the testbench (with a fingerprint of the page block) |
 | Failing tests         | Block the deploy; the live site keeps its previous version              |
 | Run button            | Per question, Python only (Pyodide in a web worker); SV cannot run in a browser, the panel says it is checked in CI instead |
+| Look and feel         | Own navy + amber palette, logo and footer; level / difficulty as CSS chips; one header card per question (see **Site redesign plan**) |
 
 ---
 
@@ -196,8 +197,28 @@ pushed to `main`, which publishes the site.
     uses `do_randomize()`); `cell` is reserved again. A variable declared with an
     initializer inside a loop of an `initial` block is static (initialised once).
 
+### Session 4 — 2026-10-16
+
+1. **Site review** (desktop and phone screenshots of every page type) and a proposal list
+   in three rounds; the owner chose the navy + amber palette from three mock-ups. Plan and
+   decisions in **Site redesign plan** below.
+2. **Round A implemented:** logo and favicon (`docs/assets/`), custom palette for light and
+   dark mode (`extra.css`, Material `primary: custom`), level / difficulty chips instead of
+   emoji, own footer (`copyright`, `extra.generator: false`), question header card (id
+   label, clean title, chips, topic links, date, code / tested badges; Material tag chips
+   hidden with `hide: tags`), previous / next links (`navigation.footer`), related
+   questions by shared tags, chip filters (one choice per group) with a counter, and
+   question tables that become cards below 45 em. Level pages no longer show the level
+   column. Checked at 1280 px and 390 px in both schemes: no horizontal scroll, filters
+   work (e.g. junior + constraints → 1 of 14).
+3. **Material notes:** tables are styled and wrapped for scrolling only when the `<table>`
+   has no class, so our hooks put the class on a wrapper `div`. A raw `<h1>` in the page
+   content stops Material from inserting the title heading. `page.meta["hide"]` accepts
+   `tags` from a hook.
+
 ## In progress
 
+- Round B of the redesign (clearer explanations), when the owner picks its items.
 - Waiting for the next batch of questions from the owner.
 
 ---
@@ -284,6 +305,79 @@ solution; do not copy text). Quality varies, so check the answers.
 
 ---
 
+## Site redesign plan (decided 2026-10-16)
+
+The owner reviewed the site (desktop and phone screenshots of the home page, a level page,
+question pages open and closed, and the tag index) and asked for a more professional, less
+generic look, with clearer and better explained answers. Findings that drove the plan:
+
+- The home page was a heading, a paragraph and a table; the colours and the icon were
+  Material's defaults; the footer said "Made with Material for MkDocs".
+- Question pages opened with the same metadata twice (Material tag chips above the title,
+  then the metadata box), and the title started with the id ("0002 · ...").
+- On a phone the five-column question tables broke: titles wrapped word by word and the
+  topics column was pushed off screen.
+- Open solutions were one long run of identical green blocks, with no one-line answer at
+  the top, and "what the interviewer checks" buried at the end.
+- Difficulty was shown with emoji, which render differently on every OS.
+- No previous / next links, no related questions, no "open all" button.
+
+### Decisions
+
+| Topic | Decision |
+|-------|----------|
+| Colour palette | **Navy + amber** (variant 1 of three mock-ups: navy + amber, forest + gold, charcoal + teal). Light: primary `#1b2a4a`, accent `#d99a00`, links `#1f4e9c`. Dark: primary `#243760`, accent `#ffc233`, links `#8db3ff`, page background `#141a26`, code background `#1b2231` |
+| Logo / favicon | A drawn SVG: digital waveform ending in an amber check mark (white on the navy header; navy rounded square for the favicon) |
+| Question id | A small label above a clean title; the id stays in the side navigation and the tables |
+| Footer | Site name + link to the repository, no personal name; the Material generator line is off |
+| Table filters | Chip buttons, single choice per group (level, difficulty, topic), plus the text search |
+
+### Proposals and rounds
+
+Effort: **S** under an hour, **M** a few hours, **L** a day or more.
+
+**Round A — identity and mobile** (done in session 4):
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| A1 | Logo and favicon | S |
+| A2 | Own colour palette (navy + amber) in light and dark mode | S |
+| A3 | Styled level / difficulty chips (CSS) instead of emoji, used in tables, question header and legends | S |
+| A4 | Own footer | S |
+| A6 | One question header card: id label, clean title, level and difficulty chips, topics, added date, "code in SV + Python / tested in CI" badges; hide the duplicate Material tag chips | S–M |
+| A13 | Previous / next question links (`navigation.footer`) and "related questions" by shared tags | S |
+| A15 | Question tables become cards on narrow screens | S–M |
+| A16 | Chip filters instead of selects, with a result counter | S–M |
+
+**Round B — clearer explanations** (next; touches the template and existing pages):
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| B5 | Home page redesign: one-line intro, four level cards with counts, a statistics strip (questions, by difficulty, "all code is tested"), a "how to practise" box, then the full table | M |
+| B7 | "Answer in short" line at the top of every solution | S per question |
+| B8 | Fixed structure inside solutions: idea → steps → code → why it is correct → complexity; numbered steps with a vertical timeline line | M, applied gradually |
+| B9 | Custom admonitions with own icons: "what the interviewer checks" (moved to the top of the solution area), "trap", "follow-up" | S–M |
+| B10 | More readable code: a title per block, line numbers on long blocks, highlighted key lines, Material **code annotations** (numbered circles that open a Hebrew explanation next to the line) | S infra, M per question |
+| B11 | Hint ladder: hint 1 light, hint 2 stronger, opened one after another | S |
+| B12 | "Open all / close all solutions" buttons and a practice mode (solutions hidden, optional timer) | S / M |
+| B14 | Step-through figures (next / previous) for the stack in 0010 and the cycles in 0009 | M |
+
+**Round C — navigation, discovery, sharing** (later):
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| C17 | Phone check in CI: screenshot every page at 390 px and fail on horizontal scroll | M |
+| C18 | Sortable table columns | S |
+| C19 | Topic pages / study paths (e.g. constraints: 0007 → 0014 → 0011) with a short intro each | M |
+| C20 | Random question button honouring the filters | S |
+| C21 | Better Hebrew search (prefix letters ו/ה/ב/ל/מ/ש as separators) | M |
+| C22 | Solved / favourite marks in the browser with a progress bar per level | M |
+| C23 | Social preview cards per question | S–M |
+| C24 | Comments per question via GitHub Discussions | M |
+
+The older idea list below is kept for reference; items covered by the rounds above are
+marked.
+
 ## Improvement ideas
 
 Ordered roughly by value for effort. **S** = small (under an hour), **M** = a few hours,
@@ -293,13 +387,13 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 
 | # | Idea | Effort | Notes |
 |---|------|--------|-------|
-| 1 | **Previous / next question** links at the bottom of each page | S | Material `navigation.footer` feature, one line in `mkdocs.yml` |
+| 1 | ~~Previous / next question links~~ | S | **Done** in session 4 (round A) |
 | 2 | **"Open all / close all solutions"** button on each question | S | Small JS that toggles every `<details>` on the page |
 | 3 | **Random question** button, honouring the current filters | S–M | JS on the home page, reads the generated question table |
 | 4 | **Solved / favourite marks** stored in the browser, with progress per level | M | `localStorage`; show ✅ / ⭐ in the tables and a progress bar on level pages |
 | 5 | **Interview mode**: show only the question with a countdown timer, then reveal hints and solution step by step | M | Query parameter or toggle that hides the solution blocks |
-| 6 | **Sortable table columns** (id, level, difficulty) and coloured level / difficulty chips | S–M | Extend `question-filter.js` and the hook's table output |
-| 7 | **Related questions** at the bottom of each page, by shared tags | S–M | Generated in the hook from the question metadata |
+| 6 | **Sortable table columns** (id, level, difficulty); ~~coloured chips~~ | S–M | Chips done in session 4; sorting is C18 |
+| 7 | ~~Related questions by shared tags~~ | S–M | **Done** in session 4 (round A) |
 | 7a | **Hint ladder**: hints that open one after another, each a bit stronger | S | Already possible with several `??? tip` blocks; add a convention and styling |
 | 7b | **Question type filter** (puzzle / code / design / knowledge) next to level and difficulty | S–M | New optional front-matter field, read by the hook and `question-filter.js` |
 | 7c | **"Open in EDA Playground"** link for SV code, so readers can run it on a commercial simulator | S–M | EDA Playground has no prefill API; a "copy code + open site" button is the simple version |
@@ -323,9 +417,9 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 
 | # | Idea | Effort | Notes |
 |---|------|--------|-------|
-| 13 | Site **logo and favicon** | S | |
+| 13 | ~~Site logo and favicon~~ | S | **Done** in session 4 (round A) |
 | 14 | **Statistics** on the home page: questions per level / difficulty / topic | S–M | Generated in the hook |
-| 15 | Show the **`added` date** (and `source`, when filled) in the metadata line; a "new" badge for recent questions | S | Hook change only |
+| 15 | ~~Show the `added` date in the header~~; still open: `source` when filled, and a "new" badge for recent questions | S | Date shown since session 4 |
 | 16 | **Better Hebrew search** | M | The built-in search splits Hebrew on whitespace only; evaluate the search `separator` setting or an alternative index |
 | 17 | **Social preview cards** when sharing a question link | S–M | Material `social` plugin (needs extra image dependencies in CI) |
 | 18 | **Comments / discussion** per question via GitHub Discussions (giscus) | M | Public site, so readers could ask questions |

@@ -17,7 +17,7 @@ hide:
 | [סניור](questions/senior/index.md) | ארכיטקטורת סביבת אימות, UVM מתקדם, SVA, סגירת כיסוי, דיבאג |
 | [סטאף](questions/staff/index.md) | אסטרטגיית אימות, תכנון, מתודולוגיה והובלת צוות |
 
-**דרגות קושי:** 🟢 קל · 🟡 בינוני · 🔴 קשה (ביחס לרמת המשרה).
+**דרגות קושי:** <span class="chip chip-diff chip-diff-easy">קל</span> <span class="chip chip-diff chip-diff-medium">בינוני</span> <span class="chip chip-diff chip-diff-hard">קשה</span> (ביחס לרמת המשרה).
 
 ## כל השאלות
 

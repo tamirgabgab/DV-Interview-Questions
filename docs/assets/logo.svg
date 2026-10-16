@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="DV interview questions">
+  <!-- Digital waveform (white) ending in a check mark (amber). Used on the navy header. -->
+  <path d="M4 44 H14 V20 H26 V44 H38 V20 H44" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M42 40 L49 47 L61 27" fill="none" stroke="#ffc233" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

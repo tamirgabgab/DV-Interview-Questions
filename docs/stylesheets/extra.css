@@ -1,3 +1,48 @@
+/* Site palette: navy + amber (theme palette is "custom", so every colour is defined here). */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #1b2a4a;
+  --md-primary-fg-color--light: #2d4370;
+  --md-primary-fg-color--dark: #121d33;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
+  --md-accent-fg-color: #d99a00;
+  --md-accent-fg-color--transparent: rgba(217, 154, 0, 0.12);
+  --md-accent-bg-color: #ffffff;
+  --md-accent-bg-color--light: rgba(255, 255, 255, 0.7);
+  --md-typeset-a-color: #1f4e9c;
+  --site-primary-soft: rgba(27, 42, 74, 0.09);
+  --site-card-border: rgba(27, 42, 74, 0.16);
+  --diff-easy: #1e7d4f;   --diff-easy-bg: rgba(30, 125, 79, 0.12);
+  --diff-medium: #b26a00; --diff-medium-bg: rgba(217, 154, 0, 0.16);
+  --diff-hard: #b4332c;   --diff-hard-bg: rgba(180, 51, 44, 0.12);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #243760;
+  --md-primary-fg-color--light: #2d4370;
+  --md-primary-fg-color--dark: #121d33;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
+  --md-accent-fg-color: #ffc233;
+  --md-accent-fg-color--transparent: rgba(255, 194, 51, 0.12);
+  --md-accent-bg-color: #1b2a4a;
+  --md-accent-bg-color--light: rgba(27, 42, 74, 0.7);
+  --md-typeset-a-color: #8db3ff;
+  --md-default-bg-color: #141a26;
+  --md-code-bg-color: #1b2231;
+  --site-primary-soft: rgba(141, 179, 255, 0.14);
+  --site-card-border: rgba(141, 179, 255, 0.22);
+  --diff-easy: #5fd39a;   --diff-easy-bg: rgba(95, 211, 154, 0.14);
+  --diff-medium: #ffc233; --diff-medium-bg: rgba(255, 194, 51, 0.14);
+  --diff-hard: #ff7b72;   --diff-hard-bg: rgba(255, 123, 114, 0.14);
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
 /* Keep code, math and diagrams left-to-right inside the RTL (Hebrew) layout. */
 .md-typeset pre,
 .md-typeset code,
@@ -14,44 +59,302 @@
   overflow-x: auto;
 }
 
-/* Metadata line at the top of every question. */
-.md-typeset .question-meta {
-  padding: 0.6rem 0.9rem;
-  margin-bottom: 1.2rem;
-  border-inline-start: 0.25rem solid var(--md-accent-fg-color);
-  background: var(--md-code-bg-color);
-  border-radius: 0.2rem;
+/* Level and difficulty chips (tables, question header, legends). */
+.md-typeset .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.05em 0.65em;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.7;
+  white-space: nowrap;
+  border-radius: 999px;
+  vertical-align: middle;
 }
 
-/* Filter bar above question tables. */
-.md-typeset .question-filter {
+.md-typeset .chip-level {
+  color: var(--md-primary-fg-color);
+  background: var(--site-primary-soft);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .chip-level {
+  color: var(--md-typeset-a-color);
+}
+
+.md-typeset .chip-diff::before {
+  content: "";
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.md-typeset .chip-diff-easy { color: var(--diff-easy); background: var(--diff-easy-bg); }
+.md-typeset .chip-diff-medium { color: var(--diff-medium); background: var(--diff-medium-bg); }
+.md-typeset .chip-diff-hard { color: var(--diff-hard); background: var(--diff-hard-bg); }
+
+/* Header card at the top of every question. */
+.md-typeset .question-header {
+  margin-bottom: 1.6rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--site-card-border);
+}
+
+.md-typeset .question-header .qh-top {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem 1.2rem;
-  margin-bottom: 0.8rem;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
 }
 
-.md-typeset .question-filter label {
+.md-typeset .question-header .qh-id {
+  font-family: var(--md-code-font-family);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--md-accent-fg-color);
+}
+
+.md-typeset .question-header h1 {
+  margin: 0 0 0.6rem;
+  font-weight: 500;
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset .question-header .qh-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.5rem;
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .question-header .qh-bottom code {
+  font-size: 0.65rem;
+}
+
+.md-typeset .question-header .qh-bottom a {
+  color: inherit;
+}
+
+.md-typeset .question-header .qh-bottom a:hover {
+  color: var(--md-accent-fg-color);
+}
+
+.md-typeset .question-header .qh-sep::before {
+  content: "·";
+  color: var(--md-default-fg-color--lighter);
+}
+
+.md-typeset .question-header .qh-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0 0.5em;
+  border: 1px solid var(--site-card-border);
+  border-radius: 0.3rem;
+  line-height: 1.7;
+}
+
+.md-typeset .question-header .qh-badge-ok {
+  color: var(--diff-easy);
+  border-color: currentColor;
+}
+
+/* Related questions at the end of a question page. */
+.md-typeset .related-questions {
+  list-style: none;
+  padding: 0;
+  margin: 0.6rem 0 1rem;
+}
+
+.md-typeset .related-questions > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.5rem;
+  margin: 0;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--site-card-border);
+}
+
+.md-typeset .related-questions > li:first-child {
+  border-top: 1px solid var(--site-card-border);
+}
+
+.md-typeset .related-questions .rq-id {
+  font-family: var(--md-code-font-family);
+  font-size: 0.65rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .related-questions .rq-title {
+  flex: 1 1 12rem;
+}
+
+/* Filter bar above question tables: chip buttons, one choice per group, plus text search. */
+.md-typeset .question-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.md-typeset .filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.md-typeset .filter-label {
+  min-width: 2.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .filter-chip {
+  padding: 0.05em 0.7em;
+  font: inherit;
+  font-size: 0.68rem;
+  line-height: 1.7;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--site-card-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.md-typeset .filter-chip:hover {
+  border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .filter-chip.is-active {
+  color: var(--md-primary-bg-color);
+  background: var(--md-primary-fg-color);
+  border-color: var(--md-primary-fg-color);
+}
+
+.md-typeset .filter-search {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--md-default-fg-color--light);
 }
 
-.md-typeset .question-filter select,
-.md-typeset .question-filter input {
+.md-typeset .filter-search input {
+  flex: 1 1 10rem;
+  max-width: 18rem;
   font: inherit;
-  padding: 0.2rem 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 400;
+  padding: 0.25rem 0.6rem;
   color: var(--md-default-fg-color);
   background: var(--md-default-bg-color);
-  border: 1px solid var(--md-default-fg-color--lighter);
-  border-radius: 0.2rem;
+  border: 1px solid var(--site-card-border);
+  border-radius: 999px;
+}
+
+.md-typeset .filter-search input:focus {
+  outline: none;
+  border-color: var(--md-accent-fg-color);
 }
 
 .md-typeset .questions-count,
 .md-typeset .questions-empty {
   font-size: 0.7rem;
   color: var(--md-default-fg-color--light);
+}
+
+/* Question tables: a table on wide screens, a stack of cards on narrow ones.
+   The table has no class so Material styles it; the wrapper carries ours. */
+.md-typeset .questions-wrap table:not([class]) {
+  display: table;
+  width: 100%;
+  font-size: 0.7rem;
+}
+
+.md-typeset .questions-wrap td.q-id {
+  font-family: var(--md-code-font-family);
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .questions-wrap td.q-title a {
+  font-weight: 600;
+}
+
+.md-typeset .questions-wrap td.q-tags code {
+  font-size: 0.62rem;
+}
+
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .questions-wrap .md-typeset__scrollwrap {
+    margin: 0;
+    overflow: visible;
+  }
+
+  .md-typeset .questions-wrap .md-typeset__table {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  .md-typeset .questions-wrap table:not([class]),
+  .md-typeset .questions-wrap table:not([class]) tbody {
+    display: block;
+    border: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .md-typeset .questions-wrap table:not([class]) thead {
+    display: none;
+  }
+
+  .md-typeset .questions-wrap table:not([class]) tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.5rem;
+    margin-bottom: 0.6rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--site-card-border);
+    border-radius: 0.4rem;
+    background: var(--md-default-bg-color);
+  }
+
+  .md-typeset .questions-wrap table:not([class]) tr:hover {
+    background: var(--md-default-bg-color);
+  }
+
+  .md-typeset .questions-wrap table:not([class]) td {
+    display: block;
+    padding: 0;
+    border: 0;
+    vertical-align: middle;
+  }
+
+  .md-typeset .questions-wrap td.q-id { order: 0; }
+  .md-typeset .questions-wrap td.q-level { order: 1; }
+  .md-typeset .questions-wrap td.q-diff { order: 2; }
+
+  .md-typeset .questions-wrap td.q-title {
+    order: 3;
+    flex-basis: 100%;
+    font-size: 0.8rem;
+  }
+
+  .md-typeset .questions-wrap td.q-tags {
+    order: 4;
+    flex-basis: 100%;
+  }
 }
 
 /* Array visualisation: <span class="arr"><span>3</span>...</span> */

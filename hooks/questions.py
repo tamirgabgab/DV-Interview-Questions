@@ -3,9 +3,10 @@
 Responsibilities:
 - Validate the front matter of every question file (fails the build on errors).
 - Build the navigation: one section per position level, questions sorted by id.
-- Turn level / difficulty / topic fields into Material tags and a badge line.
-- Replace the ``<!-- questions-table -->`` placeholder with a filterable table.
-- Append an in-browser "run" panel to questions that have ``tests/<id>/demo.py``.
+- Turn level / difficulty / topic fields into Material tags and a header card.
+- Replace the ``<!-- questions-table -->`` placeholder with a filterable table (cards on phones).
+- Append "related questions" (by shared tags) and an in-browser "run" panel to questions
+  that have ``tests/<id>/demo.py``.
 """
 
 from __future__ import annotations
@@ -31,10 +32,14 @@ LEVELS = {
 }
 
 DIFFICULTIES = {
-    "easy": ("קל", "🟢"),
-    "medium": ("בינוני", "🟡"),
-    "hard": ("קשה", "🔴"),
+    "easy": "קל",
+    "medium": "בינוני",
+    "hard": "קשה",
 }
+
+# Tags that almost every question carries; they do not make two questions "related".
+GENERIC_TAGS = {"python", "systemverilog"}
+RELATED_MAX = 3
 
 REQUIRED_FIELDS = ("id", "title", "level", "difficulty", "tags")
 PLACEHOLDER = re.compile(r"<!--\s*questions-table(?:\s+level=(\w+))?\s*-->")
@@ -103,17 +108,66 @@ def on_config(config, **kwargs):
     return config
 
 
-def _badges(q: dict) -> str:
-    diff_label, diff_icon = DIFFICULTIES[q["difficulty"]]
-    topics = " ".join(f"`{t}`" for t in q["tags"])
+def level_chip(level: str) -> str:
+    return f'<span class="chip chip-level">{LEVELS[level]}</span>'
+
+
+def difficulty_chip(difficulty: str) -> str:
+    return f'<span class="chip chip-diff chip-diff-{difficulty}">{DIFFICULTIES[difficulty]}</span>'
+
+
+def _tag_link(tag: str, base: str) -> str:
+    href = posixpath.relpath("tags/", base or ".") + "/#tag:" + tag
+    return f'<a href="{html.escape(href)}"><code>{html.escape(tag)}</code></a>'
+
+
+def _header(q: dict, markdown: str, page_url: str) -> str:
+    """Header card: id label, clean title, chips, topics, date and code badges."""
+    base = posixpath.dirname(page_url) + "/" if page_url else ""
+    langs = [name for name, fence in (("SystemVerilog", "systemverilog"), ("Python", "python"))
+             if extract_code.blocks_from_text(markdown, fence)]
+    topics = " ".join(_tag_link(t, base) for t in q["tags"])
+    bottom = [f"<span>נושאים: {topics}</span>"]
+    if q.get("added"):
+        bottom.append(f'<span class="qh-sep"></span><span>נוסף {html.escape(str(q["added"]))}</span>')
+    if langs:
+        bottom.append(f'<span class="qh-sep"></span><span class="qh-badge">קוד: {" + ".join(langs)}</span>')
+        if (extract_code.ROOT / "tests" / q["id"]).exists():
+            bottom.append('<span class="qh-badge qh-badge-ok">✓ נבדק אוטומטית</span>')
     return (
-        f'<div class="question-meta" markdown>\n'
-        f"**מס' שאלה:** {q['id']} &nbsp;|&nbsp; "
-        f"**משרה:** {LEVELS[q['level']]} &nbsp;|&nbsp; "
-        f"**קושי:** {diff_icon} {diff_label} &nbsp;|&nbsp; "
-        f"**נושאים:** {topics}\n"
-        f"</div>\n\n"
+        '<div class="question-header">\n'
+        f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
+        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}</div>\n'
+        f'<h1>{html.escape(str(q["title"]))}</h1>\n'
+        f'<div class="qh-bottom">{"".join(bottom)}</div>\n'
+        '</div>\n\n'
     )
+
+
+def _related(q: dict, page_url: str) -> str:
+    """Up to RELATED_MAX other questions that share the most (non-generic) tags."""
+    mine = set(q["tags"]) - GENERIC_TAGS
+    base = posixpath.dirname(page_url) + "/" if page_url else ""
+    scored = []
+    for other in _questions.values():
+        if other["id"] == q["id"]:
+            continue
+        shared = mine & set(other["tags"])
+        if shared:
+            same_level = other["level"] == q["level"]
+            scored.append((-len(shared), not same_level, abs(int(other["id"]) - int(q["id"])), other))
+    scored.sort(key=lambda t: t[:3])
+    if not scored:
+        return ""
+    items = []
+    for *_, other in scored[:RELATED_MAX]:
+        href = posixpath.relpath(other["src_uri"][: -len(".md")] + "/", base or ".") + "/"
+        items.append(
+            f'<li><span class="rq-id">{other["id"]}</span>'
+            f'<a class="rq-title" href="{href}">{html.escape(str(other["title"]))}</a>'
+            f'{level_chip(other["level"])}{difficulty_chip(other["difficulty"])}</li>'
+        )
+    return "\n\n## שאלות קשורות\n\n<ul class=\"related-questions\">\n" + "\n".join(items) + "\n</ul>\n"
 
 
 def _table(level: str | None, page_url: str) -> str:
@@ -127,44 +181,44 @@ def _table(level: str | None, page_url: str) -> str:
     base = page_url if page_url.endswith("/") or not page_url else posixpath.dirname(page_url) + "/"
     tags = sorted({t for q in rows for t in q["tags"]})
 
-    def options(values):
-        return "".join(f'<option value="{html.escape(v)}">{html.escape(l)}</option>' for v, l in values)
+    def group(name: str, label: str, values) -> str:
+        chips = '<button type="button" class="filter-chip is-active" data-value="">הכל</button>'
+        chips += "".join(
+            f'<button type="button" class="filter-chip" data-value="{html.escape(v)}">{html.escape(l)}</button>'
+            for v, l in values
+        )
+        return (f'<div class="filter-group" data-filter="{name}" data-value="">'
+                f'<span class="filter-label">{label}</span>{chips}</div>')
 
     out = ['<div class="question-filter" markdown="0">']
     if level is None:
-        out.append(
-            '<label>משרה <select data-filter="level"><option value="">הכל</option>'
-            + options(LEVELS.items()) + "</select></label>"
-        )
-    out.append(
-        '<label>קושי <select data-filter="difficulty"><option value="">הכל</option>'
-        + options((k, f"{v[1]} {v[0]}") for k, v in DIFFICULTIES.items()) + "</select></label>"
-    )
-    out.append(
-        '<label>נושא <select data-filter="tag"><option value="">הכל</option>'
-        + options((t, t) for t in tags) + "</select></label>"
-    )
-    out.append('<label>חיפוש <input type="search" data-filter="text" placeholder="חיפוש בכותרת"></label>')
+        out.append(group("level", "משרה", LEVELS.items()))
+    out.append(group("difficulty", "קושי", DIFFICULTIES.items()))
+    out.append(group("tag", "נושא", ((t, t) for t in tags)))
+    out.append('<label class="filter-search">חיפוש '
+               '<input type="search" data-filter="text" placeholder="חיפוש בכותרת"></label>')
     out.append("</div>")
 
-    out.append('<table><thead><tr>'
-               "<th>#</th><th>שאלה</th><th>משרה</th><th>קושי</th><th>נושאים</th>"
+    level_col = "<th>משרה</th>" if level is None else ""
+    # The table itself has no class, so Material styles it and wraps it for scrolling
+    out.append('<div class="questions-wrap"><table><thead><tr>'
+               f"<th>#</th><th>שאלה</th>{level_col}<th>קושי</th><th>נושאים</th>"
                "</tr></thead><tbody>")
     for q in rows:
         target = q["src_uri"][: -len(".md")] + "/"
         href = posixpath.relpath(target, base or ".") + "/"
-        diff_label, diff_icon = DIFFICULTIES[q["difficulty"]]
+        level_td = f'<td class="q-level">{level_chip(q["level"])}</td>' if level is None else ""
         out.append(
             f'<tr data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" '
             f'data-tags="{html.escape(" ".join(q["tags"]))}">'
-            f"<td>{q['id']}</td>"
-            f'<td><a href="{href}">{html.escape(str(q["title"]))}</a></td>'
-            f"<td>{LEVELS[q['level']]}</td>"
-            f"<td>{diff_icon} {diff_label}</td>"
-            f"<td>{' '.join(f'<code>{html.escape(t)}</code>' for t in q['tags'])}</td>"
+            f'<td class="q-id">{q["id"]}</td>'
+            f'<td class="q-title"><a href="{href}">{html.escape(str(q["title"]))}</a></td>'
+            f"{level_td}"
+            f'<td class="q-diff">{difficulty_chip(q["difficulty"])}</td>'
+            f'<td class="q-tags">{" ".join(f"<code>{html.escape(t)}</code>" for t in q["tags"])}</td>'
             "</tr>"
         )
-    out.append("</tbody></table>")
+    out.append("</tbody></table></div>")
     out.append('<p class="questions-count"></p>')
     return "\n".join(out)
 
@@ -212,8 +266,9 @@ def _run_panel(q: dict, markdown: str) -> str:
 def on_page_markdown(markdown, page, config, files, **kwargs):
     q = _questions.get(page.file.src_uri)
     if q:
-        diff_label, _ = DIFFICULTIES[q["difficulty"]]
-        page.meta["tags"] = [LEVELS[q["level"]], diff_label, *q["tags"]]
-        markdown = _badges(q) + markdown + _run_panel(q, markdown)
+        page.meta["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], *q["tags"]]
+        page.meta.setdefault("hide", []).append("tags")   # the header card shows them
+        markdown = (_header(q, markdown, page.url) + markdown + _run_panel(q, markdown)
+                    + _related(q, page.url))
 
     return PLACEHOLDER.sub(lambda m: _table(m.group(1), page.url), markdown)
