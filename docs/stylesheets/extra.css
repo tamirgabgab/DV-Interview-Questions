@@ -221,3 +221,45 @@
   font-size: 0.7rem;
   color: var(--md-default-fg-color--light);
 }
+
+/* Question 0008: "cups" chart (room up to Israel's total) and the crossing chart */
+.md-typeset svg .s3-line { stroke: var(--viz-s3); }
+.perf-chart .cup-room { fill: var(--viz-s2); fill-opacity: 0.14; stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.perf-chart .left-bar { fill: var(--viz-ink); fill-opacity: 0.7; }
+.perf-chart .overflow { fill: var(--viz-s2); }
+.perf-chart .israel-line { stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 6 4; }
+.perf-chart .lost-zone { fill: var(--viz-s2); fill-opacity: 0.08; }
+.md-typeset .viz-legend .cup-room { background: var(--viz-s2); opacity: 0.35; outline: 1px dashed var(--viz-s2); }
+.md-typeset .viz-legend .left-bar { background: var(--viz-ink); opacity: 0.7; }
+.md-typeset .viz-legend .s3 { background: var(--viz-s3); }
+
+/* Question 0009: boxes as graph nodes, an arrow from each box to the box named on its note */
+.md-typeset svg .box-node { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .box-node.box-hl { stroke: var(--viz-s2); stroke-width: 4; }
+.md-typeset svg .box-num { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .ink-fill { fill: var(--viz-ink); }
+.md-typeset svg .s1-fill { fill: var(--viz-s1); }
+.md-typeset svg .s2-fill { fill: var(--viz-s2); }
+.md-typeset svg .s3-fill { fill: var(--viz-s3); }
+.md-typeset .box-grid {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin: 1rem 0;
+  direction: ltr;
+}
+@media screen and (max-width: 44em) {
+  .md-typeset .box-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+}
+.md-typeset .box-grid > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.2rem 0;
+  font-family: var(--md-code-font-family);
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+}
+.md-typeset .box-grid small { font-size: 0.6rem; color: var(--md-default-fg-color--light); }
+.md-typeset .box-grid b { font-size: 0.85rem; }
+.md-typeset .box-grid > span.hl { border: 2px solid var(--viz-s2); }

@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-15_
+_Last updated: 2026-10-16_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -77,6 +77,8 @@ pushed to `main`, which publishes the site.
 | 0005 | Smallest multiple made of digits 0 and 1 | junior | medium | Python x < 2000; SV BFS on Icarus (x ≤ 300), SV enumeration on Verilator |
 | 0006 | Stock max profit, long or short | junior | medium | 3,000 random arrays, brute vs. fast, Python + Verilator |
 | 0007 | Random triangle containing the circle center | senior | medium | Python 20k triangles + Monte Carlo; SV class logic on 60k triples (solver not run, see notes) |
+| 0008 | Eurovision: when was Israel's loss certain? | junior | medium | brute force on small inputs, scan vs. O(k²) reference, Python + Verilator (session 3) |
+| 0009 | 16 people, 16 boxes and a helper | junior | medium | all 231 cycle structures + 20k random, Python + Verilator (session 3) |
 
 ### Session 2 — 2026-10-15
 
@@ -100,6 +102,26 @@ pushed to `main`, which publishes the site.
    `tests/<id>/demo.py`, Run / Stop / Reset, output and clean tracebacks. Pyodide 0.26.4
    from jsdelivr runs in a web worker; first run about 3 seconds (loading Python),
    later runs well under a second. Stop terminates the worker (endless loops are safe).
+
+### Session 3 — 2026-10-16
+
+1. **Question 0008** (junior, medium): Eurovision 2026 — the earliest moment Israel's loss
+   was certain (right after France's public points: 512 points left, 495 of room).
+   "Cups" chart before / after, a step table and a crossing chart; `israel_cannot_win`
+   and an O(k) scan `earliest_certain_loss`, in SV and Python.
+2. **Question 0009** (junior, medium): 16 people, 16 boxes and a helper who may swap notes
+   (100 prisoners variant). Room class with enforced limits, the helper cuts the one long
+   cycle in half with a single swap. Cycle diagrams before / after, box grids and a trace
+   table showing all 16 people succeed.
+3. **Tests:** 0008 — brute force over every split on small inputs, and the O(k) scan
+   against an O(k²) reference on 3,000 random cases (Python + Verilator). 0009 — all 231
+   cycle structures, 20,000 random arrangements, the rule enforcement of the room, and the
+   ~34% win rate without the helper (Python + Verilator). Mutation check: breaking the scan
+   or the split point fails both languages.
+4. **Figure generators kept in the repo** (`tools/figures/q0008.py`, `q0009.py`), idea #10.
+5. Verilator 5.020 quirk hit again in the 0009 testbench: a local queue of an automatic
+   function keeps its contents between calls; the testbench calls `delete()` first. The
+   page code initialises its queue in the declaration (`= '{start}`), which works.
 
 ## In progress
 
@@ -147,7 +169,7 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 9 | ~~Extract code from the pages for testing~~ | M | **Done** in session 2 (`tools/extract_code.py`) |
 | 9a | Show a "tested ✓" badge per question on the tables, from the last CI run | S–M | The run panel already states that the SV code is checked |
 | 9b | Adopt Verilator 5.052+ in CI (cached source build + z3) to run constraints natively and drop translations | M | Proven to work on 0007 in session 2 |
-| 10 | **Keep the figure generators in the repo** (`tools/figures/`) instead of throw-away scripts | S | Makes charts reproducible when numbers change |
+| 10 | ~~Keep the figure generators in the repo~~ (`tools/figures/`) | S | **Done** for 0008 and 0009 in session 3; older figures (0005–0007) still have no generator |
 | 11 | **Broken link / image check** in CI | S | e.g. a small script over `site/` after the build |
 | 12 | **Repository `CLAUDE.md`** with the conventions in this file (Hebrew RTL rules, tabs, testing, figures) | S | Lets every future AI session follow the same rules without re-discovery |
 
