@@ -83,6 +83,7 @@ pushed to `main`, which publishes the site.
 | 0011 | Random final board of tic-tac-toe | senior | medium | game tree (958 / 1,314 ends), Python; SV check function as published, class via translation (session 3) |
 | 0012 | Sort the digits and subtract | student | easy | all 1,000 inputs against a digit-count reference, final array = [0, 495], Python + Verilator (session 3) |
 | 0013 | Sort the digits and subtract – four digits | junior | medium | all 10,000 inputs, final array = [0, 6174], every proof step (999p + 90q, column digits, 55 candidates), ≤ 7 iterations, Python + Verilator (session 3) |
+| 0014 | Random non-overlapping squares and rectangles | junior | medium | Python: every pair against cell painting, thousands of draws; SV checker as published; classes via translation in CI, and once as published on Verilator 5.052 + z3 (session 3) |
 
 ### Session 2 — 2026-10-15
 
@@ -174,6 +175,26 @@ pushed to `main`, which publishes the site.
 16. **Phone layout lesson:** a long display equation or an inline MathJax chain cannot wrap
     and widens the whole page at 390 px. Split equations with `aligned`, and write long
     number chains as text in `<span dir="ltr">`.
+17. **Question 0014** (junior, medium): random number of non-overlapping squares on a grid
+    of points (1,1)..(N,M), then rectangles. Corners on grid points, shapes given by start
+    (bottom-left) and end (top-right); touching (edge or corner) is allowed, so the
+    no-overlap constraint uses `<=`. SV: `square_set` with rand dynamic arrays and four
+    constraint blocks (count, on grid, square, pairwise no-overlap with `i < j`);
+    `rect_set` overrides `c_square` with an empty constraint, `constraint_mode(0)` shown
+    too. Python: step-by-step placement among all free candidates, restart if stuck.
+    A plain checker `shapes_ok` in both languages. Six figures from
+    `tools/figures/q0014.py` (the generator runs the page's Python code with fixed seeds,
+    and a test checks the page figures are up to date), including the "cross" trap where
+    no corner is inside the other rectangle.
+18. **Verilator 5.052 + z3, built locally** (not in CI) to run the 0014 classes as
+    published: `square_set` and `constraint_mode(0)` gave only legal sets (no failed
+    randomize, every n from 1 to 6, many touching pairs). **Simulator bug:** any subclass
+    of a class with constraint-sized rand dynamic arrays — even an empty subclass — leaves
+    some shapes at 0 while randomize() returns 1. The page says so; the code is
+    LRM-correct. z3 is ~0.1 s per randomize() on this problem.
+19. **Verilator 5.020 notes:** `randomize` cannot be redefined in a class (the translation
+    uses `do_randomize()`); `cell` is reserved again. A variable declared with an
+    initializer inside a loop of an `initial` block is static (initialised once).
 
 ## In progress
 
@@ -192,19 +213,19 @@ pushed to `main`, which publishes the site.
 ### Content
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
-- [ ] Re-run the 0007 and 0011 constraints in a simulator with full constraint support
+- [ ] Re-run the 0007, 0011 and 0014 constraints (0014: also the rect_set subclass) in a simulator with full constraint support
       (VCS / Xcelium / Questa, or a newer Verilator) and update the notes on the pages.
 
 ---
 
 ## Question variety
 
-### Coverage today (13 questions)
+### Coverage today (14 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012 | digital logic, bitwise, sorting, stack, digit puzzles |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013 | logic puzzles, BFS, O(n) scans, permutations |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014 | logic puzzles, BFS, O(n) scans, permutations, SV constraints |
 | Senior | 0007, 0011 | SV constraints, randomization, probability, combinatorics |
 | Staff | — | — |
 

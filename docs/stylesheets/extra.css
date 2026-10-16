@@ -272,3 +272,20 @@
 .md-typeset svg .cell-s1 { fill: var(--viz-s1); fill-opacity: 0.3; }
 .md-typeset svg .cell-s2 { fill: var(--viz-s2); fill-opacity: 0.3; }
 .md-typeset svg .cell-s3 { fill: var(--viz-s3); fill-opacity: 0.3; }
+
+/* Question 0014: shapes on a grid of points */
+.md-typeset svg .gp-line { stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .gp-dot { fill: var(--viz-text); }
+.md-typeset svg .shp-1 { fill: var(--viz-s1); fill-opacity: 0.22; stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg .shp-2 { fill: var(--viz-s3); fill-opacity: 0.22; stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .shp-3 { fill: var(--viz-ink); fill-opacity: 0.14; stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .shp-bad { fill: var(--viz-s2); fill-opacity: 0.75; }
+.md-typeset svg .shp-num { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .sep-zone { fill: var(--viz-s3); fill-opacity: 0.12; }
+.md-typeset svg .dash { stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.md-typeset svg .coord { fill: var(--viz-ink); font-size: 13px; font-family: var(--md-code-font-family); }
+.md-typeset svg .zone-label { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-text-font-family); }
+.md-typeset svg .shp-num,
+.md-typeset svg .zone-label,
+.md-typeset svg .coord,
+.md-typeset svg .halo { paint-order: stroke; stroke: var(--md-default-bg-color); stroke-width: 4px; stroke-linejoin: round; }
