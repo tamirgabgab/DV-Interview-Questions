@@ -10,7 +10,7 @@ right-to-left layout) with filtering by **position level**, **difficulty** and *
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 12 questions (see the catalog below).
+> **Status:** the site is live and holds 13 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
 
 ---
@@ -31,6 +31,7 @@ right-to-left layout) with filtering by **position level**, **difficulty** and *
 | 0010 | Valid parentheses (LeetCode 20) | student | 🟢 easy | stack, O(n²) vs. O(n), log-scale chart |
 | 0011 | Random final board of tic-tac-toe, plus wrap-around diagonals | senior | 🟡 medium | SV constraints, solve-before, Steiner system S(2,3,9) |
 | 0012 | Sort the digits and subtract (3-digit Kaprekar routine) | student | 🟢 easy | digits, 3-element sorting network, proof (0 and 495) |
+| 0013 | Sort the digits and subtract, four digits (Kaprekar's constant) | junior | 🟡 medium | 4-element sorting network, column subtraction, case analysis (0 and 6174) |
 
 Update this table whenever a question is added.
 
@@ -115,7 +116,7 @@ DV-Interview-Questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…
-│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…
+│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…
 │   │   ├── senior/            # 0007-…, 0011-…
 │   │   └── staff/
 │   ├── assets/images/          # Figures and screenshots referenced by questions

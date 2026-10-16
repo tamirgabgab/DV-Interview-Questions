@@ -82,6 +82,7 @@ pushed to `main`, which publishes the site.
 | 0010 | Valid parentheses | student | easy | all strings up to length 8 + Catalan count, Python + Verilator (session 3) |
 | 0011 | Random final board of tic-tac-toe | senior | medium | game tree (958 / 1,314 ends), Python; SV check function as published, class via translation (session 3) |
 | 0012 | Sort the digits and subtract | student | easy | all 1,000 inputs against a digit-count reference, final array = [0, 495], Python + Verilator (session 3) |
+| 0013 | Sort the digits and subtract – four digits | junior | medium | all 10,000 inputs, final array = [0, 6174], every proof step (999p + 90q, column digits, 55 candidates), ≤ 7 iterations, Python + Verilator (session 3) |
 
 ### Session 2 — 2026-10-15
 
@@ -163,6 +164,16 @@ pushed to `main`, which publishes the site.
     keywords; an assignment pattern that reads the array it writes
     (`d = '{d[1], d[0], d[2]}`) is updated in place and gives wrong values — use named
     variables or a concatenation swap.
+15. **Question 0013** (junior, medium): the same question with four digits, at the
+    owner's request (95 is 0095, so 9500 − 0059). Answer 0 and 6174. Full proof: the
+    difference is 999p + 90q (p = a − d, q = b − c, 55 candidates), its digits come from
+    the column subtraction (p, q−1, 9−q, 10−p, or p−1, 9, 9, 10−p when q = 0), then q = 0
+    is ruled out and 7 cases (which digit is largest / smallest) leave only p = 6, q = 2.
+    Triangle figure of all candidates (`tools/figures/q0013.py`), a 5-comparator sorting
+    network in SV, and the iteration counts (at most 7 steps) as a follow-up.
+16. **Phone layout lesson:** a long display equation or an inline MathJax chain cannot wrap
+    and widens the whole page at 390 px. Split equations with `aligned`, and write long
+    number chains as text in `<span dir="ltr">`.
 
 ## In progress
 
@@ -188,12 +199,12 @@ pushed to `main`, which publishes the site.
 
 ## Question variety
 
-### Coverage today (12 questions)
+### Coverage today (13 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012 | digital logic, bitwise, sorting, stack, digit puzzles |
-| Junior | 0004, 0005, 0006, 0008, 0009 | logic puzzles, BFS, O(n) scans, permutations |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013 | logic puzzles, BFS, O(n) scans, permutations |
 | Senior | 0007, 0011 | SV constraints, randomization, probability, combinatorics |
 | Staff | — | — |
 
