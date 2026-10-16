@@ -51,8 +51,13 @@ def pick(qid: str | int, lang: str, marker: str) -> str:
     return found[0]
 
 
+ANNOTATION = re.compile(r"[ \t]*(?://|#)[ \t]*\(\d+\)!?[ \t]*$", re.M)
+
+
 def fingerprint(code: str) -> str:
-    """Short, whitespace-insensitive hash of a code block."""
+    """Short hash of a code block, insensitive to whitespace and to the Material code
+    annotation markers (``// (1)!`` / ``# (1)!``) that only carry page explanations."""
+    code = ANNOTATION.sub("", code)
     normalized = "\n".join(line.rstrip() for line in code.strip().splitlines())
     return hashlib.sha256(normalized.encode()).hexdigest()[:12]
 

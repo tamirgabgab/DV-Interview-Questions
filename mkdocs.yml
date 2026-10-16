@@ -36,6 +36,7 @@ theme:
     - search.highlight
     - search.suggest
     - content.code.copy
+    - content.code.annotate
     - content.tabs.link
     - content.action.edit
 
@@ -66,6 +67,7 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+      toc_depth: 3            # parts (h3) in the sidebar; solution block labels (h4) stay out
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
@@ -96,6 +98,7 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/wavedrom.min.js
   - javascripts/wavedrom-init.js
   - javascripts/question-filter.js
+  - javascripts/question-tools.js
   - javascripts/run-python.js
 
 

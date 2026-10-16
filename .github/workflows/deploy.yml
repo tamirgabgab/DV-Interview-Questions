@@ -33,6 +33,8 @@ jobs:
           path: .cache/sv
           key: sv-${{ runner.os }}-${{ hashFiles('tests/**', 'docs/questions/**') }}
           restore-keys: sv-${{ runner.os }}-
+      - name: Lint the question pages (structure and RTL rules)
+        run: python tools/lint_pages.py
       - name: Run question tests (Python + SystemVerilog)
         run: python tools/run_tests.py
 

@@ -592,3 +592,303 @@
 .md-typeset svg .zone-label,
 .md-typeset svg .coord,
 .md-typeset svg .halo { paint-order: stroke; stroke: var(--md-default-bg-color); stroke-width: 4px; stroke-linejoin: round; }
+
+/* ---------- Round B: clearer solutions ---------- */
+
+/* Custom admonition types: answer (amber), interviewer (navy), trap (red), followup (teal). */
+:root {
+  --md-admonition-icon--answer: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm0-13a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0-4.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>');
+  --md-admonition-icon--interviewer: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 5C7 5 2.7 8.1 1 12c1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 11.5A4.5 4.5 0 1 1 12 7.5a4.5 4.5 0 0 1 0 9zm0-7a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>');
+  --sol-icon-idea: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 21h6v-1.5H9V21zm3-19a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zm2 13h-4v-1.6l-.6-.5A5 5 0 1 1 14.6 13l-.6.4V15z"/></svg>');
+  --sol-icon-steps: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 4h3v3H3V4zm5 .5h13v2H8v-2zM3 10.5h3v3H3v-3zm5 .5h13v2H8v-2zM3 17h3v3H3v-3zm5 .5h13v2H8v-2z"/></svg>');
+  --sol-icon-code: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.7 17.3 3.4 12l5.3-5.3 1.4 1.4L6.2 12l3.9 3.9-1.4 1.4zm6.6 0-1.4-1.4 3.9-3.9-3.9-3.9 1.4-1.4 5.3 5.3-5.3 5.3zM13.6 4l-3.2 16h-2l3.2-16h2z"/></svg>');
+  --sol-icon-proof: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4zm-1.5 15.5-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4-7 7z"/></svg>');
+  --sol-icon-cost: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.8-13h-1.6v5.6l4.7 2.8.8-1.3-3.9-2.3V7z"/></svg>');
+  --adm-answer: #d99a00;
+  --adm-interviewer: #1b2a4a;
+  --adm-trap: #b4332c;
+  --adm-followup: #0f766e;
+}
+
+[data-md-color-scheme="slate"] {
+  --adm-answer: #ffc233;
+  --adm-interviewer: #8db3ff;
+  --adm-trap: #ff7b72;
+  --adm-followup: #5eead4;
+}
+
+.md-typeset .admonition.answer, .md-typeset details.answer { border-color: var(--adm-answer); }
+.md-typeset .answer > .admonition-title, .md-typeset .answer > summary { background-color: color-mix(in srgb, var(--adm-answer) 12%, transparent); }
+.md-typeset .answer > .admonition-title::before, .md-typeset .answer > summary::before {
+  background-color: var(--adm-answer);
+  -webkit-mask-image: var(--md-admonition-icon--answer); mask-image: var(--md-admonition-icon--answer);
+}
+
+.md-typeset .admonition.interviewer, .md-typeset details.interviewer { border-color: var(--adm-interviewer); }
+.md-typeset .interviewer > .admonition-title, .md-typeset .interviewer > summary { background-color: color-mix(in srgb, var(--adm-interviewer) 10%, transparent); }
+.md-typeset .interviewer > .admonition-title::before, .md-typeset .interviewer > summary::before {
+  background-color: var(--adm-interviewer);
+  -webkit-mask-image: var(--md-admonition-icon--interviewer); mask-image: var(--md-admonition-icon--interviewer);
+}
+
+.md-typeset .admonition.trap, .md-typeset details.trap { border-color: var(--adm-trap); }
+.md-typeset .trap > .admonition-title, .md-typeset .trap > summary { background-color: color-mix(in srgb, var(--adm-trap) 10%, transparent); }
+.md-typeset .trap > .admonition-title::before, .md-typeset .trap > summary::before {
+  background-color: var(--adm-trap);
+  -webkit-mask-image: var(--md-admonition-icon--warning); mask-image: var(--md-admonition-icon--warning);
+}
+
+.md-typeset .admonition.followup, .md-typeset details.followup { border-color: var(--adm-followup); }
+.md-typeset .followup > .admonition-title, .md-typeset .followup > summary { background-color: color-mix(in srgb, var(--adm-followup) 10%, transparent); }
+.md-typeset .followup > .admonition-title::before, .md-typeset .followup > summary::before {
+  background-color: var(--adm-followup);
+  -webkit-mask-image: var(--md-admonition-icon--question); mask-image: var(--md-admonition-icon--question);
+}
+
+/* The one-line answer is the first block inside a solution: compact, bold text. */
+.md-typeset details.success > .admonition.answer {
+  margin-top: 0.6rem;
+}
+
+.md-typeset .admonition.answer > p {
+  font-weight: 600;
+}
+
+/* Solution block labels: h4 with a fixed class (idea, steps, code, proof, cost). */
+.md-typeset h4.sol-idea, .md-typeset h4.sol-steps, .md-typeset h4.sol-code,
+.md-typeset h4.sol-proof, .md-typeset h4.sol-cost {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 1.4rem 0 0.6rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--md-primary-fg-color);
+  border-bottom: 1px solid var(--site-card-border);
+}
+
+[data-md-color-scheme="slate"] .md-typeset h4.sol-idea, [data-md-color-scheme="slate"] .md-typeset h4.sol-steps,
+[data-md-color-scheme="slate"] .md-typeset h4.sol-code, [data-md-color-scheme="slate"] .md-typeset h4.sol-proof,
+[data-md-color-scheme="slate"] .md-typeset h4.sol-cost {
+  color: var(--md-typeset-a-color);
+}
+
+.md-typeset h4.sol-idea::before, .md-typeset h4.sol-steps::before, .md-typeset h4.sol-code::before,
+.md-typeset h4.sol-proof::before, .md-typeset h4.sol-cost::before {
+  content: "";
+  flex: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  background-color: var(--md-accent-fg-color);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-size: contain; mask-size: contain;
+}
+
+.md-typeset h4.sol-idea::before { -webkit-mask-image: var(--sol-icon-idea); mask-image: var(--sol-icon-idea); }
+.md-typeset h4.sol-steps::before { -webkit-mask-image: var(--sol-icon-steps); mask-image: var(--sol-icon-steps); }
+.md-typeset h4.sol-code::before { -webkit-mask-image: var(--sol-icon-code); mask-image: var(--sol-icon-code); }
+.md-typeset h4.sol-proof::before { -webkit-mask-image: var(--sol-icon-proof); mask-image: var(--sol-icon-proof); }
+.md-typeset h4.sol-cost::before { -webkit-mask-image: var(--sol-icon-cost); mask-image: var(--sol-icon-cost); }
+
+.md-typeset h4.sol-idea .headerlink, .md-typeset h4.sol-steps .headerlink, .md-typeset h4.sol-code .headerlink,
+.md-typeset h4.sol-proof .headerlink, .md-typeset h4.sol-cost .headerlink {
+  display: none;
+}
+
+/* Numbered steps drawn as a timeline: <div class="steps" markdown> with an ordered list. */
+.md-typeset .steps > ol {
+  position: relative;
+  margin: 0.4rem 0 1rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.md-typeset .steps > ol > li {
+  position: relative;
+  margin: 0 0 0.7rem;
+  padding-inline-start: 2.2rem;
+  counter-increment: step;
+}
+
+.md-typeset .steps > ol > li::before {
+  content: counter(step);
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0.05rem;
+  width: 1.45rem;
+  height: 1.45rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.45rem;
+  text-align: center;
+  color: var(--md-primary-bg-color);
+  background: var(--md-primary-fg-color);
+  border-radius: 50%;
+}
+
+.md-typeset .steps > ol > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0.68rem;
+  top: 1.6rem;
+  bottom: -0.6rem;
+  border-inline-start: 2px solid var(--site-card-border);
+}
+
+.md-typeset .steps > ol > li > :last-child {
+  margin-bottom: 0;
+}
+
+/* Toolbar under the question header: open / close all, practice mode, stopwatch. */
+.md-typeset .question-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -0.8rem 0 1.4rem;
+  font-size: 0.7rem;
+}
+
+.md-typeset .question-tools .qt-btn {
+  padding: 0.05em 0.75em;
+  font: inherit;
+  font-size: 0.68rem;
+  line-height: 1.8;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--site-card-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.md-typeset .question-tools .qt-btn:hover {
+  border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .question-tools .qt-practice.is-active {
+  color: #1b2a4a;
+  background: var(--md-accent-fg-color);
+  border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .question-tools .qt-clock {
+  font-family: var(--md-code-font-family);
+  color: var(--md-default-fg-color--light);
+}
+
+body.practice-mode .md-typeset .question-tools {
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.4rem;
+  background: var(--md-accent-fg-color--transparent);
+}
+
+/* Hint ladder: a hint stays hidden until the previous hint is open. */
+.md-typeset details.tip.hint-locked {
+  display: none;
+}
+
+/* Home page: level cards, statistics strip. */
+.md-typeset .level-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0 1.4rem;
+}
+
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .level-cards { grid-template-columns: 1fr; }
+}
+
+.md-typeset .level-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem 1rem;
+  color: inherit;
+  border: 1px solid var(--site-card-border);
+  border-top: 3px solid var(--md-primary-fg-color);
+  border-radius: 0.5rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.md-typeset a.level-card:hover {
+  color: inherit;
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.08);
+}
+
+.md-typeset .level-card .lc-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.md-typeset .level-card .lc-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--md-primary-fg-color);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .level-card .lc-name {
+  color: var(--md-typeset-a-color);
+}
+
+.md-typeset .level-card .lc-count {
+  font-family: var(--md-code-font-family);
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .level-card .lc-desc {
+  flex: 1;
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .level-card .lc-diff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.md-typeset .level-card .lc-empty {
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--md-default-fg-color--lighter);
+}
+
+.md-typeset .stats-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0.8rem 0 1.4rem;
+}
+
+.md-typeset .stat {
+  flex: 1 1 7rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.4rem;
+  background: var(--site-primary-soft);
+}
+
+.md-typeset .stat b {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--md-primary-fg-color);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .stat b {
+  color: var(--md-typeset-a-color);
+}
+
+.md-typeset .stat span {
+  font-size: 0.68rem;
+  color: var(--md-default-fg-color--light);
+}

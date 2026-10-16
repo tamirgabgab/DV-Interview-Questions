@@ -31,6 +31,13 @@ LEVELS = {
     "staff": "סטאף",
 }
 
+LEVEL_DESC = {
+    "student": "יסודות לוגיקה ספרתית, HDL בסיסי, מתמטיקה, הסתברות וחידות היגיון",
+    "junior": "SystemVerilog, יסודות UVM, כתיבת טסטים ו-checkers, פרוטוקולים פשוטים",
+    "senior": "ארכיטקטורת סביבת אימות, UVM מתקדם, SVA, סגירת כיסוי, דיבאג",
+    "staff": "אסטרטגיית אימות, תכנון, מתודולוגיה והובלת צוות",
+}
+
 DIFFICULTIES = {
     "easy": "קל",
     "medium": "בינוני",
@@ -43,6 +50,8 @@ RELATED_MAX = 3
 
 REQUIRED_FIELDS = ("id", "title", "level", "difficulty", "tags")
 PLACEHOLDER = re.compile(r"<!--\s*questions-table(?:\s+level=(\w+))?\s*-->")
+CARDS = re.compile(r"<!--\s*level-cards\s*-->")
+STATS = re.compile(r"<!--\s*stats\s*-->")
 QUESTIONS_DIR = "questions"
 
 # Question metadata keyed by src_uri, filled in on_config.
@@ -132,7 +141,7 @@ def _header(q: dict, markdown: str, page_url: str) -> str:
         bottom.append(f'<span class="qh-sep"></span><span>נוסף {html.escape(str(q["added"]))}</span>')
     if langs:
         bottom.append(f'<span class="qh-sep"></span><span class="qh-badge">קוד: {" + ".join(langs)}</span>')
-        if (extract_code.ROOT / "tests" / q["id"]).exists():
+        if _has_tests(q):
             bottom.append('<span class="qh-badge qh-badge-ok">✓ נבדק אוטומטית</span>')
     return (
         '<div class="question-header">\n'
@@ -142,6 +151,55 @@ def _header(q: dict, markdown: str, page_url: str) -> str:
         f'<div class="qh-bottom">{"".join(bottom)}</div>\n'
         '</div>\n\n'
     )
+
+
+def _tools() -> str:
+    """Toolbar under the header: open / close every block, practice mode with a stopwatch."""
+    return ('<div class="question-tools">'
+            '<button type="button" class="qt-btn qt-open">פתח הכל</button>'
+            '<button type="button" class="qt-btn qt-close">סגור הכל</button>'
+            '<button type="button" class="qt-btn qt-practice">מצב תרגול</button>'
+            '<span class="qt-clock" hidden></span>'
+            '</div>\n\n')
+
+
+def _has_tests(q: dict) -> bool:
+    return (extract_code.ROOT / "tests" / q["id"]).exists()
+
+
+def _level_cards(page_url: str) -> str:
+    base = posixpath.dirname(page_url) + "/" if page_url else ""
+    cards = []
+    for level, label in LEVELS.items():
+        qs = [q for q in _questions.values() if q["level"] == level]
+        href = posixpath.relpath(f"{QUESTIONS_DIR}/{level}/", base or ".") + "/"
+        counts = {d: sum(q["difficulty"] == d for q in qs) for d in DIFFICULTIES}
+        diff = "".join(f'<span class="chip chip-diff chip-diff-{d}">{n} {DIFFICULTIES[d]}</span>'
+                       for d, n in counts.items() if n)
+        if not diff:
+            diff = '<span class="lc-empty">עדיין אין שאלות ברמה הזו</span>'
+        cards.append(
+            f'<a class="level-card" href="{href}">'
+            f'<div class="lc-head"><span class="lc-name">{label}</span>'
+            f'<span class="lc-count">{len(qs)} שאלות</span></div>'
+            f'<p class="lc-desc">{LEVEL_DESC[level]}</p>'
+            f'<div class="lc-diff">{diff}</div></a>'
+        )
+    return '<div class="level-cards">' + "".join(cards) + "</div>"
+
+
+def _stats() -> str:
+    qs = list(_questions.values())
+    with_code = sum(_has_tests(q) for q in qs)
+    topics = {t for q in qs for t in q["tags"]}
+    levels = sum(any(q["level"] == level for q in qs) for level in LEVELS)
+    items = [(len(qs), "שאלות עם פתרון מלא"),
+             (with_code, "שאלות עם קוד ב-SystemVerilog וב-Python, שנבדק אוטומטית"),
+             (len(topics), "נושאים"),
+             (f"{levels}/{len(LEVELS)}", "רמות משרה עם שאלות")]
+    return ('<div class="stats-strip">'
+            + "".join(f'<div class="stat"><b>{n}</b><span>{label}</span></div>' for n, label in items)
+            + "</div>")
 
 
 def _related(q: dict, page_url: str) -> str:
@@ -268,7 +326,9 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     if q:
         page.meta["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], *q["tags"]]
         page.meta.setdefault("hide", []).append("tags")   # the header card shows them
-        markdown = (_header(q, markdown, page.url) + markdown + _run_panel(q, markdown)
-                    + _related(q, page.url))
+        markdown = (_header(q, markdown, page.url) + _tools() + markdown
+                    + _run_panel(q, markdown) + _related(q, page.url))
 
+    markdown = CARDS.sub(lambda m: _level_cards(page.url), markdown)
+    markdown = STATS.sub(lambda m: _stats(), markdown)
     return PLACEHOLDER.sub(lambda m: _table(m.group(1), page.url), markdown)
