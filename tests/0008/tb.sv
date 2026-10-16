@@ -29,7 +29,7 @@ module tb;
     int       israel_total, points_left;
 
     above = '{'{"Poland", 133, 17}, '{"Italy", 134, 147}, '{"Finland", 141, 138},
-              '{"France", 144, 14}, '{"Australia", 165, 122}, '{"Denmark", 165, 78},
+              '{"France", 144, 14}, '{"Denmark", 165, 78}, '{"Australia", 165, 122},
               '{"Bulgaria", 204, 312}};
     if (earliest_certain_loss(343, above, 828) != 4) errors++;
     jury = '{133, 134, 141, 144, 165, 165, 204};

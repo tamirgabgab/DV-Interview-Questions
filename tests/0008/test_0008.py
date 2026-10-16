@@ -8,7 +8,7 @@ cannot_win = ns["israel_cannot_win"]
 earliest = ns["earliest_certain_loss"]
 
 ABOVE_2026 = [("Poland", 133, 17), ("Italy", 134, 147), ("Finland", 141, 138),
-              ("France", 144, 14), ("Australia", 165, 122), ("Denmark", 165, 78),
+              ("France", 144, 14), ("Denmark", 165, 78), ("Australia", 165, 122),
               ("Bulgaria", 204, 312)]
 
 
@@ -19,7 +19,7 @@ def test_page_example():
     assert cannot_win(343, [344], 0)                       # already ahead
     assert not cannot_win(343, [], 0)
     assert earliest(343, ABOVE_2026, 828) == 4             # France
-    # The order between Australia and Denmark does not matter
+    # The order between Denmark and Australia (165 each) does not change the answer
     swapped = ABOVE_2026[:4] + [ABOVE_2026[5], ABOVE_2026[4], ABOVE_2026[6]]
     assert earliest(343, swapped, 828) == 4
 

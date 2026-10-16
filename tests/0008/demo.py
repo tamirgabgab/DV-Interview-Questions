@@ -12,7 +12,9 @@ results = [
 ]
 PUBLIC_TOTAL = 36 * 58
 
-order = sorted(results, key=lambda r: r[1])          # announced from the lowest jury score
+# Announced from the lowest jury score. Australia and Denmark both had 165; the jury table
+# ranked Australia above Denmark, so Denmark is announced first.
+order = sorted(results, key=lambda r: (r[1], r[0] == "Australia"))
 me = next(i for i, r in enumerate(order) if r[0] == "Israel")
 israel_total = order[me][1] + order[me][2]
 above = order[me + 1:]

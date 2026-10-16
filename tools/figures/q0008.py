@@ -22,7 +22,9 @@ PUBLIC_TOTAL = 36 * 58
 assert sum(r[1] for r in RESULTS) == 35 * 58
 assert sum(r[2] for r in RESULTS) == PUBLIC_TOTAL
 
-ORDER = sorted(RESULTS, key=lambda r: r[1])          # lowest jury score is announced first
+# Lowest jury score is announced first. Australia and Denmark both had 165, and the jury
+# table ranked Australia above Denmark, so Denmark is announced first.
+ORDER = sorted(RESULTS, key=lambda r: (r[1], r[0] == "Australia"))
 ISRAEL = next(i for i, r in enumerate(ORDER) if r[0] == "Israel")
 ISRAEL_TOTAL = ORDER[ISRAEL][1] + ORDER[ISRAEL][2]
 ABOVE = ORDER[ISRAEL + 1:]
