@@ -10,7 +10,7 @@ right-to-left layout) with filtering by **position level**, **difficulty** and *
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 11 questions (see the catalog below).
+> **Status:** the site is live and holds 12 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
 
 ---
@@ -30,6 +30,7 @@ right-to-left layout) with filtering by **position level**, **difficulty** and *
 | 0009 | 16 people, 16 boxes and a helper (100 prisoners variant) | junior | 🟡 medium | permutation cycles, API with limits, cycle diagrams |
 | 0010 | Valid parentheses (LeetCode 20) | student | 🟢 easy | stack, O(n²) vs. O(n), log-scale chart |
 | 0011 | Random final board of tic-tac-toe, plus wrap-around diagonals | senior | 🟡 medium | SV constraints, solve-before, Steiner system S(2,3,9) |
+| 0012 | Sort the digits and subtract (3-digit Kaprekar routine) | student | 🟢 easy | digits, 3-element sorting network, proof (0 and 495) |
 
 Update this table whenever a question is added.
 
@@ -69,7 +70,7 @@ Each question carries one or more tags. Use the existing ones where possible:
 | Verification        | `systemverilog`, `uvm`, `sva`, `coverage`, `constraints`, `randomization`, `methodology`, `debug` |
 | Hardware / systems  | `protocols`, `computer-architecture`, `memory`, `cache`                     |
 | Software            | `scripting`, `python`, `c-cpp`, `algorithms`, `sorting`, `bfs`, `stack`, `bitwise` |
-| Math and logic      | `math`, `probability`, `combinatorics`, `logic-puzzles`                     |
+| Math and logic      | `math`, `digits`, `probability`, `combinatorics`, `logic-puzzles`           |
 | Other               | `behavioral`                                                                |
 
 ---
@@ -113,7 +114,7 @@ DV-Interview-Questions/
 │   ├── questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
-│   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…
+│   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…
 │   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…
 │   │   ├── senior/            # 0007-…, 0011-…
 │   │   └── staff/

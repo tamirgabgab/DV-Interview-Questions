@@ -81,6 +81,7 @@ pushed to `main`, which publishes the site.
 | 0009 | 16 people, 16 boxes and a helper | junior | medium | all 231 cycle structures + 20k random, Python + Verilator (session 3) |
 | 0010 | Valid parentheses | student | easy | all strings up to length 8 + Catalan count, Python + Verilator (session 3) |
 | 0011 | Random final board of tic-tac-toe | senior | medium | game tree (958 / 1,314 ends), Python; SV check function as published, class via translation (session 3) |
+| 0012 | Sort the digits and subtract | student | easy | all 1,000 inputs against a digit-count reference, final array = [0, 495], Python + Verilator (session 3) |
 
 ### Session 2 — 2026-10-15
 
@@ -153,6 +154,16 @@ pushed to `main`, which publishes the site.
 12. **Docs:** this file and `README.md` got a coverage map, ideas for a wider variety of
     questions, more site ideas, and a list of sources for new questions.
 
+13. **Question 0012** (student, easy): sort the three digits (with leading zeros), subtract
+    ascending from descending, and check whether the result is the number itself. Part b
+    runs it on 0–999: only 0 and 495. The owner's proof was kept, extended to cover k = 1
+    (099) instead of excluding it, plus a table of the nine candidates 99k. SV sorts with
+    three compare-and-swap steps on `a`, `b`, `c` (`{a, b} = {b, a}`).
+14. **Verilator 5.020 notes:** `small` (and `large`, `medium`) are reserved strength
+    keywords; an assignment pattern that reads the array it writes
+    (`d = '{d[1], d[0], d[2]}`) is updated in place and gives wrong values — use named
+    variables or a concatenation swap.
+
 ## In progress
 
 - Waiting for the next batch of questions from the owner.
@@ -177,11 +188,11 @@ pushed to `main`, which publishes the site.
 
 ## Question variety
 
-### Coverage today (11 questions)
+### Coverage today (12 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
-| Student | 0001, 0002, 0003, 0010 | digital logic, bitwise, sorting, stack |
+| Student | 0001, 0002, 0003, 0010, 0012 | digital logic, bitwise, sorting, stack, digit puzzles |
 | Junior | 0004, 0005, 0006, 0008, 0009 | logic puzzles, BFS, O(n) scans, permutations |
 | Senior | 0007, 0011 | SV constraints, randomization, probability, combinatorics |
 | Staff | — | — |
