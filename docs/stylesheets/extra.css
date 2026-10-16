@@ -263,3 +263,12 @@
 .md-typeset .box-grid small { font-size: 0.6rem; color: var(--md-default-fg-color--light); }
 .md-typeset .box-grid b { font-size: 0.85rem; }
 .md-typeset .box-grid > span.hl { border: 2px solid var(--viz-s2); }
+
+/* Question 0011: tic-tac-toe boards */
+.md-typeset svg .ttt-grid { stroke: var(--viz-ink); stroke-width: 2; stroke-linecap: round; }
+.md-typeset svg .ttt-ghost { opacity: 0.35; }
+.md-typeset svg .mark { fill: none; stroke: var(--viz-ink); stroke-width: 3; stroke-linecap: round; }
+.md-typeset svg .mark-new { stroke: var(--viz-s2); }
+.md-typeset svg .cell-s1 { fill: var(--viz-s1); fill-opacity: 0.3; }
+.md-typeset svg .cell-s2 { fill: var(--viz-s2); fill-opacity: 0.3; }
+.md-typeset svg .cell-s3 { fill: var(--viz-s3); fill-opacity: 0.3; }

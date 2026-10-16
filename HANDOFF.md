@@ -79,6 +79,8 @@ pushed to `main`, which publishes the site.
 | 0007 | Random triangle containing the circle center | senior | medium | Python 20k triangles + Monte Carlo; SV class logic on 60k triples (solver not run, see notes) |
 | 0008 | Eurovision: when was Israel's loss certain? | junior | medium | brute force on small inputs, scan vs. O(k²) reference, Python + Verilator (session 3) |
 | 0009 | 16 people, 16 boxes and a helper | junior | medium | all 231 cycle structures + 20k random, Python + Verilator (session 3) |
+| 0010 | Valid parentheses | student | easy | all strings up to length 8 + Catalan count, Python + Verilator (session 3) |
+| 0011 | Random final board of tic-tac-toe | senior | medium | game tree (958 / 1,314 ends), Python; SV check function as published, class via translation (session 3) |
 
 ### Session 2 — 2026-10-15
 
@@ -123,6 +125,30 @@ pushed to `main`, which publishes the site.
    function keeps its contents between calls; the testbench calls `delete()` first. The
    page code initialises its queue in the declaration (`= '{start}`), which works.
 
+### Session 3 (continued) — 2026-10-16
+
+6. **0008 update:** Australia and Denmark both had 165 jury points; the owner confirmed the
+   jury table ranks Australia above Denmark, so Denmark is announced first. Step table,
+   charts and the Bulgaria follow-up were updated (the answer, France, did not change).
+7. **Question 0010** (student, easy): valid parentheses (LeetCode 20). The owner's pair
+   removal solution and stack solution, an SV port of both (`remove_pair` mimics
+   `str.replace`), traces, and a log-scale chart of characters read (n²/4 vs. n).
+8. **Question 0011** (senior, medium): random final board of tic-tac-toe with an SV
+   constraint class (`solve result before board`) and Python (enumerate all 3^9 boards,
+   group by result). Corrections agreed with the owner: the winner can have **two** lines
+   (X completing a row and a diagonal with the last move), and the owner's parity proof
+   for part b had a gap (a line can meet the set in one cell); the page uses the pair
+   counting proof (4 directions × 2 pairs = 8 < 10 pairs) for S(2,3,9).
+9. **Tests:** 0010 — every string up to length 8 (brute = stack, and the number of valid
+   strings is 3^k·Catalan(k)), random long strings, Verilator. 0011 — conditions against a
+   full game-tree scan (958 ends; 1,314 with wrap-around, 0 draws), the Steiner property,
+   every 5 cells contain a line, uniform results. SV: the page's `final_result` runs as
+   published against a game tree in Verilator; the constraint class runs through a
+   fingerprinted translation (exhaustive solver), like 0007.
+10. **Verilator 5.020 notes:** `cell` and `before` are reserved words (renamed to `board`
+    and `prev`); an array of queues indexed by a variable fails C++ compilation; the
+    `sum() with` reduction on a fixed array in a constraint is rejected by the linter.
+
 ## In progress
 
 - Waiting for the next batch of questions from the owner.
@@ -139,8 +165,8 @@ pushed to `main`, which publishes the site.
 ### Content
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
-- [ ] Re-run the 0007 constraints in a simulator with full constraint support
-      (VCS / Xcelium / Questa, or a newer Verilator) and update the note on the page.
+- [ ] Re-run the 0007 and 0011 constraints in a simulator with full constraint support
+      (VCS / Xcelium / Questa, or a newer Verilator) and update the notes on the pages.
 
 ---
 
@@ -169,7 +195,7 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 9 | ~~Extract code from the pages for testing~~ | M | **Done** in session 2 (`tools/extract_code.py`) |
 | 9a | Show a "tested ✓" badge per question on the tables, from the last CI run | S–M | The run panel already states that the SV code is checked |
 | 9b | Adopt Verilator 5.052+ in CI (cached source build + z3) to run constraints natively and drop translations | M | Proven to work on 0007 in session 2 |
-| 10 | ~~Keep the figure generators in the repo~~ (`tools/figures/`) | S | **Done** for 0008 and 0009 in session 3; older figures (0005–0007) still have no generator |
+| 10 | ~~Keep the figure generators in the repo~~ (`tools/figures/`) | S | **Done** for 0008–0011 in session 3; older figures (0005–0007) still have no generator |
 | 11 | **Broken link / image check** in CI | S | e.g. a small script over `site/` after the build |
 | 12 | **Repository `CLAUDE.md`** with the conventions in this file (Hebrew RTL rules, tabs, testing, figures) | S | Lets every future AI session follow the same rules without re-discovery |
 
