@@ -148,6 +148,10 @@ pushed to `main`, which publishes the site.
 10. **Verilator 5.020 notes:** `cell` and `before` are reserved words (renamed to `board`
     and `prev`); an array of queues indexed by a variable fails C++ compilation; the
     `sum() with` reduction on a fixed array in a constraint is rejected by the linter.
+11. **Published:** the branch was fast-forwarded to `main` at the owner's request; the
+    workflow (tests, strict build, Pages deploy) passed and questions 0008–0011 are live.
+12. **Docs:** this file and `README.md` got a coverage map, ideas for a wider variety of
+    questions, more site ideas, and a list of sources for new questions.
 
 ## In progress
 
@@ -160,13 +164,80 @@ pushed to `main`, which publishes the site.
 ### Owner decisions
 
 - [ ] Keep example question `0001` or replace it with real content.
-- [ ] Staff level is still empty, Senior has one question — any questions for these levels?
+- [ ] Staff level is still empty and Senior has two questions (0007, 0011) — any questions for these levels?
+- [ ] Pick the next topic gaps to fill from **Question variety** below.
 
 ### Content
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
 - [ ] Re-run the 0007 and 0011 constraints in a simulator with full constraint support
       (VCS / Xcelium / Questa, or a newer Verilator) and update the notes on the pages.
+
+---
+
+## Question variety
+
+### Coverage today (11 questions)
+
+| Level | Questions | Main topics covered |
+|-------|-----------|---------------------|
+| Student | 0001, 0002, 0003, 0010 | digital logic, bitwise, sorting, stack |
+| Junior | 0004, 0005, 0006, 0008, 0009 | logic puzzles, BFS, O(n) scans, permutations |
+| Senior | 0007, 0011 | SV constraints, randomization, probability, combinatorics |
+| Staff | — | — |
+
+Algorithms and puzzles are well covered. **Core DV topics are missing:** UVM, SVA,
+functional coverage, FIFOs, clock domain crossing, FSM design, protocols, debug, and
+verification planning.
+
+### Topic gaps worth filling
+
+| Topic | Example questions | Level |
+|-------|-------------------|-------|
+| FSM design | Sequence detector (Mealy vs. Moore) with a WaveDrom trace; a vending machine | student / junior |
+| FIFO | Synchronous FIFO with full / empty, then "how deep must the FIFO be" for a given burst | junior |
+| Clock domain crossing | Two-flop synchronizer and metastability; Gray-code pointers in an async FIFO | junior / senior |
+| SVA | Write the assertion: req → ack within 1–3 cycles, one-hot, no grant without request | junior / senior |
+| Functional coverage | Write a covergroup with crosses and illegal / ignore bins for an ALU or a packet | junior / senior |
+| Constraints | Unique values without `unique`, a sorted array, a weighted `dist`, a constraint that fails on purpose | junior / senior |
+| UVM | Phases, factory override, sequence / sequencer / driver handshake, a scoreboard for out-of-order responses | senior |
+| Protocols | Valid / ready handshake (AXI-stream) checker, APB transfer, arbiter fairness | senior |
+| Debug | "Find the bug" in a short RTL or testbench, or from a waveform | any |
+| Computer architecture | Cache hit / miss trace, LRU replacement, pipeline hazards | junior / senior |
+| Verification planning | Write a test plan for a FIFO / arbiter; what to measure for sign-off; regression strategy | staff |
+| Behavioral | A bug that escaped to silicon: what happened and what you changed | staff |
+
+### New question formats
+
+| Format | Why | How on the site |
+|--------|-----|-----------------|
+| **Find the bug** | Very common in DV interviews and quick to practise | Code with a hidden bug, the fix in the solution; the test proves the fix |
+| **Read the waveform** | Tests timing intuition | WaveDrom figure plus "what is the value of X at cycle 5?" |
+| **Write the assertion / covergroup** | Core DV skills with no coverage yet | SV only; check with Verilator `--assert` where it is supported |
+| **Mini-project** | Design + verify in one question (e.g. FIFO + scoreboard) | Several parts, each with its own collapsed solution |
+| **Quick quiz** | Short knowledge questions (blocking vs. non-blocking, `logic` vs. `wire`) | A short multiple-choice block, many per page |
+
+### Sources for new questions
+
+Links found during session 3, for inspiration (take the idea, write our own question and
+solution; do not copy text). Quality varies, so check the answers.
+
+| Source | What is there |
+|--------|---------------|
+| [HDLBits](https://hdlbits.01xz.net/) | ~180 small Verilog design problems with online checking (FSMs, counters, shift registers, waveforms) |
+| [Verification Academy cookbooks](https://www.verificationacademy.com/cookbook) | UVM and coverage cookbooks (free registration) |
+| [ChipVerify](https://www.chipverify.com/) | SystemVerilog / UVM / SVA tutorials with examples |
+| [Sunburst Design papers](http://www.sunburst-design.com/papers/) | Cliff Cummings' classic papers: async FIFO, CDC, non-blocking assignments |
+| [ZipCPU: async FIFO](https://zipcpu.com/blog/2018/07/06/afifo.html) | A detailed walk-through of an async FIFO, with formal verification |
+| [vlsiweb: Top 60 DV questions](https://vlsiweb.com/design-verification-interview-questions/) | A tiered list of DV interview questions |
+| [vlsiweb: SystemVerilog questions](https://vlsiweb.com/system-verilog-interview-questions/) | SystemVerilog interview questions |
+| [leetcode-for-asic-verification](https://github.com/Mad-Hat-uvm/leetcode-for-asic-verification) | LeetCode-style problems picked for DV interviews |
+| [awesome-open-hardware-verification](https://github.com/ben-marshall/awesome-open-hardware-verification) | Open-source verification tools and frameworks |
+| [Glassdoor: verification engineer interviews](https://www.glassdoor.com/Interview/verification-engineer-interview-questions-SRCH_KO0,21.htm) | Questions reported by candidates, per company |
+| [Brainstellar](https://brainstellar.com/) | Free probability and logic puzzles, by difficulty |
+| [Tradermath brainteasers](https://www.tradermath.org/brainteasers) | Quant-style brainteasers (titles are free, many solutions are paid) |
+| [LeetCode](https://leetcode.com/problemset/) | Algorithm questions (stacks, queues, bit manipulation are common in DV) |
+| [Project Euler](https://projecteuler.net/) | Math / programming problems, good for "math + code" questions |
 
 ---
 
@@ -186,6 +257,10 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 5 | **Interview mode**: show only the question with a countdown timer, then reveal hints and solution step by step | M | Query parameter or toggle that hides the solution blocks |
 | 6 | **Sortable table columns** (id, level, difficulty) and coloured level / difficulty chips | S–M | Extend `question-filter.js` and the hook's table output |
 | 7 | **Related questions** at the bottom of each page, by shared tags | S–M | Generated in the hook from the question metadata |
+| 7a | **Hint ladder**: hints that open one after another, each a bit stronger | S | Already possible with several `??? tip` blocks; add a convention and styling |
+| 7b | **Question type filter** (puzzle / code / design / knowledge) next to level and difficulty | S–M | New optional front-matter field, read by the hook and `question-filter.js` |
+| 7c | **"Open in EDA Playground"** link for SV code, so readers can run it on a commercial simulator | S–M | EDA Playground has no prefill API; a "copy code + open site" button is the simple version |
+| 7d | **Step-through figures** (e.g. the stack in 0010, the cycles in 0009) with next / previous buttons | M | Small JS over a list of SVG frames generated by `tools/figures/` |
 
 ### Content quality and safety net
 
@@ -198,6 +273,8 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 10 | ~~Keep the figure generators in the repo~~ (`tools/figures/`) | S | **Done** for 0008–0011 in session 3; older figures (0005–0007) still have no generator |
 | 11 | **Broken link / image check** in CI | S | e.g. a small script over `site/` after the build |
 | 12 | **Repository `CLAUDE.md`** with the conventions in this file (Hebrew RTL rules, tabs, testing, figures) | S | Lets every future AI session follow the same rules without re-discovery |
+| 12a | Generators for the older figures (0004–0007) in `tools/figures/` | S–M | So all figures can be regenerated the same way |
+| 12b | A **"new question" script** that creates the page, `tests/<id>/` and the catalog row from the template | S–M | Fewer manual steps when a batch arrives |
 
 ### Site polish
 
@@ -211,6 +288,8 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 18 | **Comments / discussion** per question via GitHub Discussions (giscus) | M | Public site, so readers could ask questions |
 | 19 | **PDF export** of a filtered question set for offline practice | M–L | e.g. a print-site plugin |
 | 20 | Bilingual content (Hebrew / English) | L | Only if the audience grows beyond Hebrew readers |
+| 21 | **Mobile check** of every page in CI (screenshots at phone width) | M | Wide tables and figures were the main issue so far (see the 0009 box grid) |
+| 22 | **Topic pages**: a short intro per topic (FSM, SVA, coverage...) linking to its questions | M | Turns the tag index into a study guide |
 
 ---
 

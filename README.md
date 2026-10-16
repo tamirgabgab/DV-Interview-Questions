@@ -74,6 +74,16 @@ Each question carries one or more tags. Use the existing ones where possible:
 
 ---
 
+## Where new questions come from
+
+The owner sends questions and solutions during the week. Gaps in the coverage, new
+question formats, and a list of external sources for inspiration (HDLBits, Verification
+Academy, ChipVerify, Sunburst Design papers, puzzle sites and more) are kept in
+[`HANDOFF.md` → Question variety](HANDOFF.md#question-variety). Take ideas from them, but
+write our own statement and solution.
+
+---
+
 ## Repository layout
 
 ```text
