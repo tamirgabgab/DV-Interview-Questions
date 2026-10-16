@@ -11,7 +11,8 @@ Checks, per page:
   ``!!! answer`` block; the solution block labels (h4 with ``.sol-*`` classes) use only the
   known names and appear in the fixed order; hints are numbered "רמז 1", "רמז 2", ...
 - One ``??? interviewer`` block right after the question, and the end-of-page blocks use
-  the ``trap`` / ``followup`` types (no plain ``note`` / ``warning`` left).
+  the ``trap`` / ``followup`` types (a top-level ``note`` / ``warning`` titled like an
+  interviewer / trap / follow-up block is reported; other notes may keep their type).
 Exit status 1 when anything is reported, so it can run in CI.
 """
 
@@ -104,7 +105,8 @@ def lint(path: Path) -> list[str]:
                     problems.append(f"{n}: hint without a number: {title!r} (use רמז 1, רמז 2)")
             elif typ == "interviewer":
                 interviewer += 1
-            elif typ in ("note", "warning") and kind.startswith("???") and len(indent) == 0:
+            elif (typ in ("note", "warning") and kind.startswith("???") and len(indent) == 0
+                  and any(w in title for w in ("מראיין", "המשך", "מלכודת", "נקודות חשובות"))):
                 leftovers.append(f"{n}: top-level ??? {typ} {title!r}: use trap / followup / interviewer")
             if current is not None and typ != "success" and current["first"] is None:
                 current["first"] = n
