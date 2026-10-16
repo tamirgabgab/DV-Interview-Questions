@@ -104,6 +104,7 @@ DV-Interview-Questions/
 │   └── questions.py            # Validation, navigation, tags, tables, run panels
 ├── tools/
 │   ├── extract_code.py         # Pulls the code blocks out of a question page
+│   ├── lint_pages.py           # Checks the page skeleton and the RTL rules
 │   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
 │   └── figures/                # Generators of the inline SVG figures (q<id>.py)
 ├── tests/
@@ -146,19 +147,38 @@ in Hebrew. See [`templates/question.md`](templates/question.md).
 Conventions:
 
 - **Solutions are collapsed** (`??? success "פתרון"`) so the page can be used for practice.
-  Hints use `??? tip "רמז"`; takeaways and follow-ups use `??? note` / `??? warning`.
 - **Multi-part questions** stay in one file, with `### סעיף א`, `### סעיף ב`, ... and a
   separate collapsed solution right after each part.
+- **Fixed page skeleton** (checked by `tools/lint_pages.py`, which runs in CI):
+  - one `??? interviewer "מה המראיין בודק"` block right after the question text, written
+    so that it does not reveal the answer;
+  - hints as a ladder: `??? tip "רמז 1"`, `??? tip "רמז 2"` (hint 2 is shown only after
+    hint 1 was opened);
+  - every solution starts with `!!! answer "תשובה בקצרה"` (one or two sentences), followed
+    by the blocks `#### הרעיון { .sol-idea }`, `#### השלבים { .sol-steps }`,
+    `#### הקוד { .sol-code }`, `#### למה זה נכון { .sol-proof }`, `#### סיבוכיות { .sol-cost }`
+    in this order, keeping only the ones that apply; no other `####` headings;
+  - steps are an ordered list inside `<div class="steps" markdown>`, drawn as a timeline;
+  - traps and follow-ups at the end use `??? trap "מלכודת: ..."` and `??? followup`.
 - **Code answers are given in SystemVerilog and Python**, as linked content tabs
   (`=== "SystemVerilog"` / `=== "Python"`, always in this order). Picking a language in one
   tab switches every tab on the site. Pure RTL design questions (like 0001) may be
   SystemVerilog only.
+- **Readable code blocks:** every block has a `title=`, long blocks `linenums="1"`, the
+  key lines `hl_lines=`, and non-trivial lines carry Material **code annotations**: a
+  `// (1)!` / `# (1)!` marker (or ` (1)` appended to an existing comment) and a numbered
+  Hebrew list right after the block. Annotation markers are ignored by the testbench
+  fingerprints, so they can be added without touching the translations.
 - **Every code answer is tested automatically** (see [Tests](#tests) below): the tests run
   the code exactly as it appears on the page, and the site is only published when they pass.
 - **Questions with code get a "run" panel**: the page's Python code runs in the reader's
   browser (Pyodide), with an editable starting script from `tests/<id>/demo.py`.
 - **Math stays symbolic**: no Hebrew inside MathJax (`\text{...}` renders Hebrew reversed);
   Hebrew goes in the surrounding sentence.
+- **RTL-safe text:** every line, list item and table cell starts with a Hebrew word, or
+  with the RLM mark (U+200F) when it has to start with Latin text, code or math.
+
+The full skeleton with comments is in [`templates/question.md`](templates/question.md):
 
 ```markdown
 ---
@@ -174,27 +194,44 @@ added: 2026-10-15
 ## השאלה
 ...
 
-??? tip "רמז"
+??? interviewer "מה המראיין בודק"
+    - **...:** ...
+
+### סעיף א – ...
+
+??? tip "רמז 1"
     ...
 
-## הפתרון
+??? success "פתרון סעיף א"
+    !!! answer "תשובה בקצרה"
+        ...
 
-??? success "פתרון"
+    #### הרעיון { .sol-idea }
     ...
+
+    #### הקוד { .sol-code }
 
     === "SystemVerilog"
-        ```systemverilog
+        ```systemverilog title="function f" hl_lines="2"
+        ...   // (1)!
+        ```
+
+        1. ...
+
+    === "Python"
+        ```python title="f"
         ...
         ```
 
-    === "Python"
-        ```python
-        ...
-        ```
+    #### למה זה נכון { .sol-proof }
+    ...
 
 ## נקודות חשובות ושאלות המשך
 
-??? note "נקודות חשובות"
+??? trap "מלכודת: ..."
+    ...
+
+??? followup "שאלות המשך"
     ...
 ```
 
@@ -208,6 +245,8 @@ not start with the id, or a duplicate id. It also generates, per question page:
   Markdown must not start with a `#` heading;
 - the Material tags (level, difficulty, topics) for the tag index, with the tag chips above
   the title hidden because the header card shows them;
+- a **toolbar** (open all / close all, practice mode that hides the solutions and starts a
+  stopwatch; the mode is remembered in the browser);
 - a **related questions** list at the end (up to three questions sharing the most topic
   tags, `python` and `systemverilog` not counted), and the previous / next links come from
   Material's `navigation.footer`.
@@ -269,7 +308,7 @@ holds the same numbers.
 4. Put any images in `docs/assets/images/` named `<id>-<description>.<ext>`.
 5. If the question has code, add `tests/<id>/` with `test_<id>.py`, `tb.sv` and `demo.py`
    (copy a similar question's folder) and run `python tools/run_tests.py <id>`.
-6. Build locally (below) and check the page.
+6. Run `python tools/lint_pages.py <id>`, build locally (below) and check the page.
 7. Add the question to the catalog table at the top of this README.
 8. Commit with a message like `Add question 0042: async FIFO depth`.
 
@@ -283,6 +322,7 @@ table and in the tag index — no other file needs to change.
 ```bash
 pip install -r requirements.txt -r requirements-dev.txt
 sudo apt install verilator            # Verilator 5.020 on Ubuntu 24.04
+python tools/lint_pages.py            # page structure and RTL rules (also in CI)
 python tools/run_tests.py             # everything (a few seconds once compiled)
 python tools/run_tests.py 6 7         # only questions 0006 and 0007
 python tools/run_tests.py --python-only
