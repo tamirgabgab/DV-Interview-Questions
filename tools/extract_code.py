@@ -52,12 +52,18 @@ def pick(qid: str | int, lang: str, marker: str) -> str:
 
 
 ANNOTATION = re.compile(r"[ \t]*(?://|#)[ \t]*\(\d+\)!?[ \t]*$", re.M)
+ANNOTATION_IN_COMMENT = {  # " (1)" appended to an existing comment: SV uses //, Python #
+    "//": re.compile(r"(//[^\n]*?)[ \t]*\(\d+\)!?[ \t]*$", re.M),
+    "#": re.compile(r"(#[^\n]*?)[ \t]*\(\d+\)!?[ \t]*$", re.M),
+}
 
 
 def fingerprint(code: str) -> str:
     """Short hash of a code block, insensitive to whitespace and to the Material code
-    annotation markers (``// (1)!`` / ``# (1)!``) that only carry page explanations."""
+    annotation markers (``// (1)!`` / ``# (1)!``, or `` (1)`` at the end of an existing
+    comment) that only carry page explanations."""
     code = ANNOTATION.sub("", code)
+    code = ANNOTATION_IN_COMMENT["//" if "//" in code else "#"].sub(r"\1", code)
     normalized = "\n".join(line.rstrip() for line in code.strip().splitlines())
     return hashlib.sha256(normalized.encode()).hexdigest()[:12]
 

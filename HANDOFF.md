@@ -230,6 +230,12 @@ pushed to `main`, which publishes the site.
    Content: all 14 pages were rewritten into the skeleton (0012 and 0004 by hand as the
    reference, the rest by parallel agents from a written guide), with new hint ladders,
    short answers, traps / follow-ups and Hebrew annotations; code text unchanged.
+5. **Notes from the conversion:** `fingerprint()` strips both whole-comment markers
+   (`// (1)!`) and ` (1)` appended to an existing comment, so annotations never change a
+   testbench hash. `tools/figures/q0008.py` now emits the RLM before Latin country names
+   in the step table, as the page has it. Pages with Mermaid diagrams (0001, 0004, 0005)
+   overflow at 390 px only in the sandbox, where the Mermaid CDN is blocked and the raw
+   `<pre>` text shows; on the live site they render as SVG.
 
 ## In progress
 

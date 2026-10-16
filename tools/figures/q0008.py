@@ -137,7 +137,7 @@ def step_table() -> str:
     for label, left, room, lost in steps():
         jury, public = publics.get(label, (ORDER[ISRAEL][1], ORDER[ISRAEL][2]))
         verdict = "**לא**" if lost else "כן"
-        rows.append(f"| {label} | {public} | {jury + public} | {left} | {room} | {verdict} |")
+        rows.append(f"| \u200f{label} | {public} | {jury + public} | {left} | {room} | {verdict} |")   # RLM: cell starts with Latin
     return "\n".join(rows)
 
 
