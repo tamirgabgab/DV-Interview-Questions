@@ -26,6 +26,18 @@ added: 2026-10-16
 לפני שהמשחק מתחיל כולם, כולל אדם 0, יכולים לתכנן אסטרטגיה משותפת. מהרגע שהראשון נכנס
 לחדר אין יותר תקשורת: מי שיצא לא יכול לחזור, ואי אפשר להעביר מידע למי שבחוץ.
 
+??? interviewer "מה המראיין בודק"
+    - **מבנה במקום רעש:** האם המועמד רואה בסידור האקראי של הפתקים אובייקט עם מבנה שאפשר
+      לנצל, ולא רק "ערבוב" שמולו נשארת רק הסתברות.
+    - **הערוץ היחיד של אדם 0:** אין תקשורת, אבל לאדם 0 יש פעולה אחת שמשנה את החדר. האם
+      המועמד מבין שהפעולה הזו היא הדרך היחידה שלו "לדבר" עם האחרים?
+    - **ספירה לפני אופטימיזציה:** כמה "מצבים רעים" בכלל יכולים להתקיים בו-זמנית ב-16
+      קופסאות? בדיקה כזו קובעת כמה מהמשאבים בשאלה באמת נחוצים.
+    - **מספרים נדיבים:** בשאלה נתונים 4 החלפות ו-8 פתיחות. מראיין טוב מצפה שהמועמד ישאל
+      אילו מהמספרים הכרחיים ואילו הסחת דעת.
+    - **‏API עם מגבלות:** בקוד, האכיפה של המגבלות צריכה להיות בתוך החדר ולא "בהבטחה" של מי
+      שקורא לו. זה אותו רעיון כמו checker בסביבת אימות.
+
 ---
 
 ### סעיף א – האסטרטגיה
@@ -41,23 +53,43 @@ added: 2026-10-16
     מתי היא נכשלת, וכמה החלפות צריך כדי למנוע את זה?
 
 ??? success "פתרון סעיף א"
-    #### שלב 1 – לכל אחד: ללכת לפי הפתקים
+    !!! answer "תשובה בקצרה"
+        כל אדם פותח את הקופסה שלו וממשיך לקופסה שהמספר שלה כתוב על הפתק. לפני כן אדם 0
+        מוצא את המעגלים, ואם יש מעגל ארוך מ-8 הוא חותך אותו באמצע **בהחלפה אחת**. זה
+        מבטיח ניצחון בכל סידור, ושלוש ההחלפות הנוספות מיותרות.
 
-    כל אדם \( i \) פותח קודם את **הקופסה שלו**, קופסה \( i \). אם הפתק לא שלו, הוא
-    פותח את הקופסה **שהמספר שלה כתוב על הפתק**, וכן הלאה.
+    #### הרעיון { .sol-idea }
 
-    כל קופסה מצביעה על הקופסה הבאה, כמו **רשימה מקושרת**. מכיוון שכל מספר מופיע על פתק
-    אחד בדיוק, לכל קופסה נכנס חץ אחד ויוצא חץ אחד. לכן הגרף מתפרק **למעגלים** זרים, וזו
-    בדיוק פירוק התמורה למעגלים.
+    הפתקים מגדירים תמורה, ותמורה מתפרקת למעגלים זרים. מי שהולך לפי הפתקים מהקופסה שלו
+    מסתובב על המעגל שלו ומוצא את הפתק שלו בדיוק אחרי \( L \) פתיחות, כש-\( L \) הוא אורך
+    המעגל. לכן הסכנה היחידה היא מעגל ארוך מ-8, ואדם 0 יכול לפרק אותו.
 
-    **למה זה עובד?** אדם \( i \) מתחיל בקופסה \( i \), ולכן הוא הולך על המעגל שקופסה
-    \( i \) נמצאת בו. הפתק \( i \) נמצא בקופסה שמצביעה **חזרה** אל קופסה \( i \), כלומר
-    בקופסה האחרונה של אותו מעגל. מי שנמצא במעגל באורך \( L \) מוצא את הפתק שלו בדיוק
-    בפתיחה ה-\( L \)-ית.
+    #### השלבים { .sol-steps }
+
+    <div class="steps" markdown>
+
+    1. **אדם 0 ממפה את המעגלים:** הוא מתחיל מקופסה 1, הולך לפי הפתקים עד שחוזר אליה,
+       ואז ממשיך מהקופסה הבאה שעוד לא ביקר בה, עד שכל 16 הקופסאות שייכות למעגל כלשהו.
+    2. **אם יש מעגל ארוך מ-8, הוא חותך אותו:** מחליפים בין הפתק שבתחילת המעגל לפתק
+       שבאמצעו. המעגל מתפצל לשני מעגלים, ושניהם באורך 8 לכל היותר.
+    3. **כל אדם \( i \) הולך לפי הפתקים:** הוא פותח את קופסה \( i \). אם הפתק לא שלו,
+       הוא פותח את הקופסה שהמספר שלה כתוב על הפתק, וכן הלאה, עד 8 פתיחות.
+
+    </div>
+
+    #### למה זה נכון { .sol-proof }
+
+    **שלב 1: לכל אחד, ללכת לפי הפתקים.** כל קופסה מצביעה על הקופסה הבאה, כמו **רשימה
+    מקושרת**. מכיוון שכל מספר מופיע על פתק אחד בדיוק, לכל קופסה נכנס חץ אחד ויוצא חץ
+    אחד. לכן הגרף מתפרק **למעגלים** זרים, וזו בדיוק פירוק התמורה למעגלים.
+
+    אדם \( i \) מתחיל בקופסה \( i \), ולכן הוא הולך על המעגל שקופסה \( i \) נמצאת בו. הפתק
+    \( i \) נמצא בקופסה שמצביעה **חזרה** אל קופסה \( i \), כלומר בקופסה האחרונה של אותו
+    מעגל. מי שנמצא במעגל באורך \( L \) מוצא את הפתק שלו בדיוק בפתיחה ה-\( L \)-ית.
 
     לכן: **כל מי שנמצא במעגל באורך 8 לכל היותר מצליח**, ומי שנמצא במעגל ארוך יותר נכשל.
 
-    #### שלב 2 – אדם 0 מציל את המצב
+    **שלב 2: אדם 0 מציל את המצב.**
 
     - **יש לכל היותר מעגל ארוך אחד.** סכום אורכי המעגלים הוא 16. שני מעגלים באורך 9
       לפחות כבר דורשים 18 קופסאות.
@@ -73,9 +105,8 @@ added: 2026-10-16
     בתחילת המעגל לפתק שבאמצע שלו. אחר כך כל אחד הולך לפי הפתקים. **החלפה אחת מספיקה**,
     ושלוש ההחלפות הנוספות מיותרות.
 
-    #### דוגמה: לפני ההחלפה
-
-    בכל משבצת, המספר הקטן הוא מספר הקופסה, והמספר הגדול הוא הפתק שבתוכה:
+    **דוגמה: לפני ההחלפה.** בכל משבצת, המספר הקטן הוא מספר הקופסה, והמספר הגדול הוא
+    הפתק שבתוכה:
 
     <div class="box-grid" dir="ltr"><span class="hl"><small>1</small><b>7</b></span><span><small>2</small><b>11</b></span><span><small>3</small><b>15</b></span><span><small>4</small><b>16</b></span><span><small>5</small><b>13</b></span><span><small>6</small><b>2</b></span><span><small>7</small><b>12</b></span><span><small>8</small><b>14</b></span><span class="hl"><small>9</small><b>4</b></span><span><small>10</small><b>5</b></span><span><small>11</small><b>6</b></span><span><small>12</small><b>3</b></span><span><small>13</small><b>1</b></span><span><small>14</small><b>8</b></span><span><small>15</small><b>9</b></span><span><small>16</small><b>10</b></span></div>
 
@@ -87,7 +118,7 @@ added: 2026-10-16
 
     <svg class="figure" viewBox="0 0 640 300" role="img" aria-label="המעגלים לפני ההחלפה: מעגל באורך 11, מעגל באורך 3 ומעגל באורך 2"><defs><marker id="q9b-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q9b-s1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s1-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q9b-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q9b-s3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s3-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><path class="s2-line" d="M193.9,31.5 A120,120 0 0 1 223.1,40.1" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 1 holds note 7</title></path><path class="s2-line" d="M255.0,60.5 A120,120 0 0 1 274.9,83.6" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 7 holds note 12</title></path><path class="s2-line" d="M290.7,118.0 A120,120 0 0 1 295.0,148.1" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 12 holds note 3</title></path><path class="s2-line" d="M289.6,185.6 A120,120 0 0 1 276.9,213.3" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 3 holds note 15</title></path><path class="s2-line" d="M252.2,241.9 A120,120 0 0 1 226.5,258.4" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 15 holds note 9</title></path><path class="s2-line" d="M190.2,269.0 A120,120 0 0 1 159.8,269.0" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 9 holds note 4</title></path><path class="s2-line" d="M123.5,258.4 A120,120 0 0 1 97.8,241.9" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 4 holds note 16</title></path><path class="s2-line" d="M73.1,213.3 A120,120 0 0 1 60.4,185.6" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 16 holds note 10</title></path><path class="s2-line" d="M55.0,148.1 A120,120 0 0 1 59.3,118.0" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 10 holds note 5</title></path><path class="s2-line" d="M75.1,83.6 A120,120 0 0 1 95.0,60.5" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 5 holds note 13</title></path><path class="s2-line" d="M126.9,40.1 A120,120 0 0 1 156.1,31.5" fill="none" stroke-width="2.5" marker-end="url(#q9b-s2)"><title>box 13 holds note 1</title></path><text class="legend" x="175" y="154" text-anchor="middle">L = 11</text><path class="ink-line" d="M448.7,93.0 A60,60 0 0 1 488.7,162.3" fill="none" stroke-width="2.5" marker-end="url(#q9b-ink)"><title>box 2 holds note 11</title></path><path class="ink-line" d="M470.0,194.7 A60,60 0 0 1 390.0,194.7" fill="none" stroke-width="2.5" marker-end="url(#q9b-ink)"><title>box 11 holds note 6</title></path><path class="ink-line" d="M371.3,162.3 A60,60 0 0 1 411.3,93.0" fill="none" stroke-width="2.5" marker-end="url(#q9b-ink)"><title>box 6 holds note 2</title></path><text class="legend" x="430" y="154" text-anchor="middle">L = 3</text><path class="ink-line" d="M583.4,109.0 A45,45 0 0 1 583.4,191.0" fill="none" stroke-width="2.5" marker-end="url(#q9b-ink)"><title>box 8 holds note 14</title></path><path class="ink-line" d="M546.6,191.0 A45,45 0 0 1 546.6,109.0" fill="none" stroke-width="2.5" marker-end="url(#q9b-ink)"><title>box 14 holds note 8</title></path><text class="legend" x="565" y="154" text-anchor="middle">L = 2</text><circle class="box-node box-hl" cx="175.0" cy="30.0" r="15"><title>box 1</title></circle><text class="box-num" x="175.0" y="35.0" text-anchor="middle">1</text><circle class="box-node" cx="239.9" cy="49.0" r="15"><title>box 7</title></circle><text class="box-num" x="239.9" y="54.0" text-anchor="middle">7</text><circle class="box-node" cx="284.2" cy="100.2" r="15"><title>box 12</title></circle><text class="box-num" x="284.2" y="105.2" text-anchor="middle">12</text><circle class="box-node" cx="293.8" cy="167.1" r="15"><title>box 3</title></circle><text class="box-num" x="293.8" y="172.1" text-anchor="middle">3</text><circle class="box-node" cx="265.7" cy="228.6" r="15"><title>box 15</title></circle><text class="box-num" x="265.7" y="233.6" text-anchor="middle">15</text><circle class="box-node box-hl" cx="208.8" cy="265.1" r="15"><title>box 9</title></circle><text class="box-num" x="208.8" y="270.1" text-anchor="middle">9</text><circle class="box-node" cx="141.2" cy="265.1" r="15"><title>box 4</title></circle><text class="box-num" x="141.2" y="270.1" text-anchor="middle">4</text><circle class="box-node" cx="84.3" cy="228.6" r="15"><title>box 16</title></circle><text class="box-num" x="84.3" y="233.6" text-anchor="middle">16</text><circle class="box-node" cx="56.2" cy="167.1" r="15"><title>box 10</title></circle><text class="box-num" x="56.2" y="172.1" text-anchor="middle">10</text><circle class="box-node" cx="65.8" cy="100.2" r="15"><title>box 5</title></circle><text class="box-num" x="65.8" y="105.2" text-anchor="middle">5</text><circle class="box-node" cx="110.1" cy="49.0" r="15"><title>box 13</title></circle><text class="box-num" x="110.1" y="54.0" text-anchor="middle">13</text><circle class="box-node" cx="430.0" cy="90.0" r="15"><title>box 2</title></circle><text class="box-num" x="430.0" y="95.0" text-anchor="middle">2</text><circle class="box-node" cx="482.0" cy="180.0" r="15"><title>box 11</title></circle><text class="box-num" x="482.0" y="185.0" text-anchor="middle">11</text><circle class="box-node" cx="378.0" cy="180.0" r="15"><title>box 6</title></circle><text class="box-num" x="378.0" y="185.0" text-anchor="middle">6</text><circle class="box-node" cx="565.0" cy="105.0" r="15"><title>box 8</title></circle><text class="box-num" x="565.0" y="110.0" text-anchor="middle">8</text><circle class="box-node" cx="565.0" cy="195.0" r="15"><title>box 14</title></circle><text class="box-num" x="565.0" y="200.0" text-anchor="middle">14</text></svg>
 
-    #### דוגמה: אחרי ההחלפה
+    **דוגמה: אחרי ההחלפה.**
 
     <div class="box-grid" dir="ltr"><span class="hl"><small>1</small><b>4</b></span><span><small>2</small><b>11</b></span><span><small>3</small><b>15</b></span><span><small>4</small><b>16</b></span><span><small>5</small><b>13</b></span><span><small>6</small><b>2</b></span><span><small>7</small><b>12</b></span><span><small>8</small><b>14</b></span><span class="hl"><small>9</small><b>7</b></span><span><small>10</small><b>5</b></span><span><small>11</small><b>6</b></span><span><small>12</small><b>3</b></span><span><small>13</small><b>1</b></span><span><small>14</small><b>8</b></span><span><small>15</small><b>9</b></span><span><small>16</small><b>10</b></span></div>
 
@@ -98,9 +129,7 @@ added: 2026-10-16
 
     <svg class="figure" viewBox="0 0 640 300" role="img" aria-label="המעגלים אחרי ההחלפה: מעגלים באורך 6, 5, 3 ו-2"><defs><marker id="q9a-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q9a-s1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s1-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q9a-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q9a-s3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s3-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><path class="s1-line" d="M128.8,67.1 A85,85 0 0 1 172.4,92.2" fill="none" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#q9a-s1)"><title>box 1 holds note 4</title></path><path class="s1-line" d="M191.2,124.9 A85,85 0 0 1 191.2,175.1" fill="none" stroke-width="2.5" marker-end="url(#q9a-s1)"><title>box 4 holds note 16</title></path><path class="s1-line" d="M172.4,207.8 A85,85 0 0 1 128.8,232.9" fill="none" stroke-width="2.5" marker-end="url(#q9a-s1)"><title>box 16 holds note 10</title></path><path class="s1-line" d="M91.2,232.9 A85,85 0 0 1 47.6,207.8" fill="none" stroke-width="2.5" marker-end="url(#q9a-s1)"><title>box 10 holds note 5</title></path><path class="s1-line" d="M28.8,175.1 A85,85 0 0 1 28.8,124.9" fill="none" stroke-width="2.5" marker-end="url(#q9a-s1)"><title>box 5 holds note 13</title></path><path class="s1-line" d="M47.6,92.2 A85,85 0 0 1 91.2,67.1" fill="none" stroke-width="2.5" marker-end="url(#q9a-s1)"><title>box 13 holds note 1</title></path><text class="legend" x="110" y="154" text-anchor="middle">L = 6</text><path class="s3-line" d="M318.8,72.2 A80,80 0 0 1 368.1,108.1" fill="none" stroke-width="2.5" marker-end="url(#q9a-s3)"><title>box 3 holds note 15</title></path><path class="s3-line" d="M379.8,143.9 A80,80 0 0 1 360.9,201.8" fill="none" stroke-width="2.5" marker-end="url(#q9a-s3)"><title>box 15 holds note 9</title></path><path class="s3-line" d="M330.5,224.0 A80,80 0 0 1 269.5,224.0" fill="none" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#q9a-s3)"><title>box 9 holds note 7</title></path><path class="s3-line" d="M239.1,201.8 A80,80 0 0 1 220.2,143.9" fill="none" stroke-width="2.5" marker-end="url(#q9a-s3)"><title>box 7 holds note 12</title></path><path class="s3-line" d="M231.9,108.1 A80,80 0 0 1 281.2,72.2" fill="none" stroke-width="2.5" marker-end="url(#q9a-s3)"><title>box 12 holds note 3</title></path><text class="legend" x="300" y="154" text-anchor="middle">L = 5</text><path class="ink-line" d="M483.6,98.2 A55,55 0 0 1 519.1,159.7" fill="none" stroke-width="2.5" marker-end="url(#q9a-ink)"><title>box 2 holds note 11</title></path><path class="ink-line" d="M500.5,192.0 A55,55 0 0 1 429.5,192.0" fill="none" stroke-width="2.5" marker-end="url(#q9a-ink)"><title>box 11 holds note 6</title></path><path class="ink-line" d="M410.9,159.7 A55,55 0 0 1 446.4,98.2" fill="none" stroke-width="2.5" marker-end="url(#q9a-ink)"><title>box 6 holds note 2</title></path><text class="legend" x="465" y="154" text-anchor="middle">L = 3</text><path class="ink-line" d="M598.3,114.4 A40,40 0 0 1 598.3,185.6" fill="none" stroke-width="2.5" marker-end="url(#q9a-ink)"><title>box 8 holds note 14</title></path><path class="ink-line" d="M561.7,185.6 A40,40 0 0 1 561.7,114.4" fill="none" stroke-width="2.5" marker-end="url(#q9a-ink)"><title>box 14 holds note 8</title></path><text class="legend" x="580" y="154" text-anchor="middle">L = 2</text><circle class="box-node box-hl" cx="110.0" cy="65.0" r="15"><title>box 1</title></circle><text class="box-num" x="110.0" y="70.0" text-anchor="middle">1</text><circle class="box-node" cx="183.6" cy="107.5" r="15"><title>box 4</title></circle><text class="box-num" x="183.6" y="112.5" text-anchor="middle">4</text><circle class="box-node" cx="183.6" cy="192.5" r="15"><title>box 16</title></circle><text class="box-num" x="183.6" y="197.5" text-anchor="middle">16</text><circle class="box-node" cx="110.0" cy="235.0" r="15"><title>box 10</title></circle><text class="box-num" x="110.0" y="240.0" text-anchor="middle">10</text><circle class="box-node" cx="36.4" cy="192.5" r="15"><title>box 5</title></circle><text class="box-num" x="36.4" y="197.5" text-anchor="middle">5</text><circle class="box-node" cx="36.4" cy="107.5" r="15"><title>box 13</title></circle><text class="box-num" x="36.4" y="112.5" text-anchor="middle">13</text><circle class="box-node" cx="300.0" cy="70.0" r="15"><title>box 3</title></circle><text class="box-num" x="300.0" y="75.0" text-anchor="middle">3</text><circle class="box-node" cx="376.1" cy="125.3" r="15"><title>box 15</title></circle><text class="box-num" x="376.1" y="130.3" text-anchor="middle">15</text><circle class="box-node box-hl" cx="347.0" cy="214.7" r="15"><title>box 9</title></circle><text class="box-num" x="347.0" y="219.7" text-anchor="middle">9</text><circle class="box-node" cx="253.0" cy="214.7" r="15"><title>box 7</title></circle><text class="box-num" x="253.0" y="219.7" text-anchor="middle">7</text><circle class="box-node" cx="223.9" cy="125.3" r="15"><title>box 12</title></circle><text class="box-num" x="223.9" y="130.3" text-anchor="middle">12</text><circle class="box-node" cx="465.0" cy="95.0" r="15"><title>box 2</title></circle><text class="box-num" x="465.0" y="100.0" text-anchor="middle">2</text><circle class="box-node" cx="512.6" cy="177.5" r="15"><title>box 11</title></circle><text class="box-num" x="512.6" y="182.5" text-anchor="middle">11</text><circle class="box-node" cx="417.4" cy="177.5" r="15"><title>box 6</title></circle><text class="box-num" x="417.4" y="182.5" text-anchor="middle">6</text><circle class="box-node" cx="580.0" cy="110.0" r="15"><title>box 8</title></circle><text class="box-num" x="580.0" y="115.0" text-anchor="middle">8</text><circle class="box-node" cx="580.0" cy="190.0" r="15"><title>box 14</title></circle><text class="box-num" x="580.0" y="195.0" text-anchor="middle">14</text></svg>
 
-    #### כולם מצליחים
-
-    אחרי ההחלפה כל אחד מוצא את הפתק שלו ב-6 פתיחות לכל היותר:
+    **כולם מצליחים.** אחרי ההחלפה כל אחד מוצא את הפתק שלו ב-6 פתיחות לכל היותר:
 
     | אדם | הקופסאות שהוא פותח, לפי הסדר | פתיחות | הצליח? |
     |---|---|---|---|
@@ -140,18 +169,50 @@ added: 2026-10-16
 ממשו את החדר עם האכיפה של המגבלות, את האסטרטגיה של אדם 0, את האסטרטגיה של כל אחד מהאחרים,
 ומשחק שלם שמחזיר האם כולם ניצחו.
 
-??? tip "רמז"
+??? tip "רמז 1"
+    איזה חלק מהאסטרטגיה משותף לאדם 0 ולכל אחד מהאחרים? כתבו אותו פעם אחת, ותנו לשניהם
+    להשתמש בו.
+
+??? tip "רמז 2"
     תתחילו מפונקציית עזר שמקבלת קופסת התחלה ומחזירה את רשימת הקופסאות במעגל שלה.
 
 ??? success "פתרון סעיף ב"
-    #### החדר וה-API
+    !!! answer "תשובה בקצרה"
+        מחלקת חדר שמחזיקה את המערך כפרטי ואוכפת את המגבלות בתוך ה-API, פונקציית עזר
+        `cycle_from` שהולכת לפי הפתקים, `helper` שחותך את המעגל הארוך ב-`swap` אחת,
+        `find_my_note` שעושה את אותו הילוך דרך `open_box`, ו-`play` שמריץ את כולם.
+        **בכל סידור כל 16 האנשים מנצחים, עם החלפה אחת לכל היותר.**
 
-    המערך עצמו פרטי. הדרך היחידה לראות אותו היא דרך ה-API, ושם נאכפות המגבלות: אחרי
+    #### הרעיון { .sol-idea }
+
+    המערך עצמו פרטי, והדרך היחידה לראות אותו היא דרך ה-API, ושם נאכפות המגבלות: אחרי
     שהאדם הראשון נכנס, אדם 0 כבר לא יכול להציץ או להחליף, ואף אחד לא יכול לפתוח יותר
-    מ-8 קופסאות.
+    מ-8 קופסאות. ההילוך "לפי הפתקים" נכתב פעם אחת, ואדם 0 וכל אחד מהאחרים משתמשים בו.
+
+    #### השלבים { .sol-steps }
+
+    <div class="steps" markdown>
+
+    1. **החדר:** מחלקה עם מערך פרטי, מונה החלפות, מונה פתיחות ודגל `helper_done` שנדלק
+       כשהאדם הראשון מבין 1 עד 16 נכנס. כל פונקציית API בודקת את המגבלה שלה לפני שהיא
+       פועלת.
+    2. **פונקציית העזר `cycle_from`:** מתחילה מקופסה נתונה, הולכת לפי הפתקים, ומחזירה
+       את רשימת הקופסאות עד שחוזרים להתחלה.
+    3. **אדם 0 (`helper`):** קורא את כל המערך, מוצא את המעגלים אחד אחד (ומסמן קופסאות
+       שכבר ביקר בהן), וכשהוא מוצא מעגל ארוך מ-8 מחליף בין הקופסה הראשונה לקופסה
+       האמצעית ומסיים.
+    4. **כל אחד מהאחרים (`find_my_note`):** נכנס, פותח את הקופסה שלו, וממשיך לפי הפתק
+       עד שמוצא את המספר שלו או עד שנגמרות 8 הפתיחות.
+    5. **המשחק (`play`):** בונה חדר, מריץ את אדם 0 ואז את כולם, ומחזיר האם כולם מצאו.
+
+    </div>
+
+    #### הקוד { .sol-code }
+
+    **החדר וה-API.**
 
     === "SystemVerilog"
-        ```systemverilog
+        ```systemverilog title="class room_c" linenums="1" hl_lines="8 25 39"
         localparam int N         = 16;      // people and boxes
         localparam int MAX_OPENS = N / 2;   // boxes each person may open
         localparam int MAX_SWAPS = 4;       // swaps person 0 may make
@@ -159,10 +220,10 @@ added: 2026-10-16
         typedef int notes_t[N + 1];         // notes[b] = the note in box b (1..N); [0] unused
 
         class room_c;
-          local notes_t notes;              // hidden: only the API below can read it
+          local notes_t notes;              // hidden: only the API below can read it (1)
           int swaps_left  = MAX_SWAPS;
           int opens_left  = 0;
-          bit helper_done = 0;              // set when the first of persons 1..N walks in
+          bit helper_done = 0;              // set when the first of persons 1..N walks in (2)
 
           function new(notes_t initial_notes);
             notes = initial_notes;
@@ -176,7 +237,7 @@ added: 2026-10-16
 
           function void swap(int a, int b);
             int tmp;
-            assert (!helper_done && swaps_left > 0) else $fatal(1, "no swaps allowed");
+            assert (!helper_done && swaps_left > 0) else $fatal(1, "no swaps allowed");   // (3)!
             swaps_left--;
             tmp      = notes[a];
             notes[a] = notes[b];
@@ -186,7 +247,7 @@ added: 2026-10-16
           // ---- persons 1..N, one at a time ----
           function void enter();
             helper_done = 1;
-            opens_left  = MAX_OPENS;
+            opens_left  = MAX_OPENS;   // (4)!
           endfunction
 
           function int open_box(int box);
@@ -197,8 +258,17 @@ added: 2026-10-16
         endclass
         ```
 
+        1. ‏`local` מונע מהקוד של האנשים לקרוא את המערך ישירות. בלי זה "האסטרטגיה" הייתה
+           יכולה לרמות בלי שאף בדיקה תתפוס את זה.
+        2. דגל אחד מספיק כדי להפריד בין שני השלבים של המשחק: ברגע שמישהו מבין 1 עד 16
+           נכנס, הזכויות של אדם 0 פגות לצמיתות.
+        3. שתי המגבלות נבדקות באותו מקום: לא אחרי שהאדם הראשון נכנס, ולא יותר מ-4 פעמים.
+           ‏`$fatal` ולא ערך החזרה, כי חריגה מהכללים היא באג בבדיקה ולא מצב חוקי של המשחק.
+        4. כל כניסה מאפסת את מונה הפתיחות, כי המגבלה היא 8 פתיחות **לכל אדם** ולא לכולם
+           יחד.
+
     === "Python"
-        ```python
+        ```python title="class Room" linenums="1" hl_lines="10 21 31"
         N = 16               # people and boxes
         MAX_OPENS = N // 2   # boxes each person may open
         MAX_SWAPS = 4        # swaps person 0 may make
@@ -208,7 +278,7 @@ added: 2026-10-16
             """notes[b] is the note in box b (1..N); notes[0] is unused."""
 
             def __init__(self, notes):
-                self._notes = list(notes)    # hidden: only the API below can read it
+                self._notes = list(notes)    # hidden: only the API below can read it (1)
                 self.swaps_left = MAX_SWAPS
                 self.opens_left = 0
                 self.helper_done = False     # set when the first of persons 1..N walks in
@@ -216,17 +286,17 @@ added: 2026-10-16
             # ---- person 0 only ----
             def look_all(self):
                 assert not self.helper_done, "only person 0 may look at all the boxes"
-                return list(self._notes)
+                return list(self._notes)   # (2)!
 
             def swap(self, a, b):
-                assert not self.helper_done and self.swaps_left > 0, "no swaps allowed"
+                assert not self.helper_done and self.swaps_left > 0, "no swaps allowed"   # (3)!
                 self.swaps_left -= 1
                 self._notes[a], self._notes[b] = self._notes[b], self._notes[a]
 
             # ---- persons 1..N, one at a time ----
             def enter(self):
                 self.helper_done = True
-                self.opens_left = MAX_OPENS
+                self.opens_left = MAX_OPENS   # (4)!
 
             def open_box(self, box):
                 assert self.opens_left > 0, "no opens left"
@@ -234,21 +304,26 @@ added: 2026-10-16
                 return self._notes[box]
         ```
 
-    #### האסטרטגיה
+        1. ‏`list(notes)` מעתיק את הקלט, כדי שמי שבנה את החדר לא יוכל לשנות את הפתקים
+           דרך הרשימה המקורית. הקו התחתון מסמן שהשדה פרטי.
+        2. גם כאן מוחזר עותק ולא הרשימה עצמה. אחרת אדם 0 היה יכול "להחליף" כמה שהוא רוצה
+           בלי לעבור דרך `swap`.
+        3. שתי המגבלות של אדם 0 במקום אחד: אחרי שהאדם הראשון נכנס, ולא יותר מ-4 פעמים.
+        4. המונה מתאפס בכל כניסה, כי 8 הפתיחות הן לכל אדם בנפרד.
 
-    `cycle_from` הולכת לפי הפתקים מקופסה מסוימת עד שחוזרים אליה. אדם 0 משתמש בה כדי למצוא
-    את המעגל הארוך, וכל אחד מהאחרים עושה את אותו הילוך בדיוק, אבל דרך `open_box` ועם
-    מגבלה של 8 פתיחות.
+    **האסטרטגיה.** `cycle_from` הולכת לפי הפתקים מקופסה מסוימת עד שחוזרים אליה. אדם 0
+    משתמש בה כדי למצוא את המעגל הארוך, וכל אחד מהאחרים עושה את אותו הילוך בדיוק, אבל
+    דרך `open_box` ועם מגבלה של 8 פתיחות.
 
     === "SystemVerilog"
-        ```systemverilog
+        ```systemverilog title="cycle_from, helper, find_my_note, play" linenums="1" hl_lines="25 26 33"
         typedef int box_list_t[$];
 
         // The boxes met when following the notes from box `start` until back at `start`
         function automatic box_list_t cycle_from(notes_t notes, int start);
           box_list_t cycle = '{start};
           int        box   = notes[start];
-          while (box != start) begin
+          while (box != start) begin   // (1)!
             cycle.push_back(box);
             box = notes[box];
           end
@@ -262,22 +337,22 @@ added: 2026-10-16
           box_list_t cycle;
           room.look_all(notes);
           for (int start = 1; start <= N; start++) begin
-            if (seen[start]) continue;
+            if (seen[start]) continue;   // (2)!
             cycle = cycle_from(notes, start);
             foreach (cycle[i]) seen[cycle[i]] = 1;
             if (cycle.size() > MAX_OPENS) begin
-              room.swap(cycle[0], cycle[cycle.size() / 2]);  // -> cycles of L/2 and L - L/2
-              return;                                        // there is at most one long cycle
+              room.swap(cycle[0], cycle[cycle.size() / 2]);  // -> cycles of L/2 and L - L/2 (3)
+              return;                                        // there is at most one long cycle (4)
             end
           end
         endfunction
 
         // Person `me`: open my own box, then always the box whose number is on the note
         function automatic bit find_my_note(room_c room, int me);
-          int box = me;
+          int box = me;   // (5)!
           int note;
           room.enter();
-          repeat (MAX_OPENS) begin
+          repeat (MAX_OPENS) begin   // (6)!
             note = room.open_box(box);
             if (note == me) return 1;
             box = note;
@@ -296,13 +371,26 @@ added: 2026-10-16
         endfunction
         ```
 
+        1. הלולאה בטוחה: מכיוון שהפתקים הם תמורה, ההילוך מקופסה `start` חייב לחזור אליה
+           ואי אפשר להיתקע בלולאה אחרת. בלי ההנחה הזו היה צריך מגבלה.
+        2. כל קופסה שכבר שייכת למעגל שנמצא מדולגת, ולכן כל מעגל מתגלה פעם אחת וכל המיפוי
+           הוא מעבר אחד על 16 הקופסאות.
+        3. ‏`cycle[0]` ו-`cycle[L/2]` הם \( c_0 \) ו-\( c_h \) מההוכחה. אחרי ההחלפה שני
+           החלקים הם באורך \( \lfloor L/2 \rfloor \) ו-\( \lceil L/2 \rceil \), שניהם עד 8.
+        4. יוצאים מיד אחרי החלפה אחת. לא צריך להמשיך לחפש, כי 16 קופסאות לא מכילות שני
+           מעגלים ארוכים מ-8.
+        5. הנקודה שקובעת הכול: מתחילים מהקופסה **שלי**, וכך מובטח שאני על המעגל שמכיל את
+           הפתק שלי.
+        6. המגבלה נאכפת פעמיים: כאן, כדי שהאסטרטגיה לא תנסה פתיחה תשיעית, ובתוך `open_box`,
+           כדי שאף אסטרטגיה אחרת לא תוכל לרמות.
+
     === "Python"
-        ```python
+        ```python title="cycle_from, helper, find_my_note, play" linenums="1" hl_lines="21 22 28"
         def cycle_from(notes, start):
             """The boxes met when following the notes from box `start` until back at `start`."""
             cycle = [start]
             box = notes[start]
-            while box != start:
+            while box != start:   # (1)!
                 cycle.append(box)
                 box = notes[box]
             return cycle
@@ -318,14 +406,14 @@ added: 2026-10-16
                 cycle = cycle_from(notes, start)
                 seen.update(cycle)
                 if len(cycle) > MAX_OPENS:
-                    room.swap(cycle[0], cycle[len(cycle) // 2])   # -> cycles of L/2 and L - L/2
-                    return                                        # there is at most one long cycle
+                    room.swap(cycle[0], cycle[len(cycle) // 2])   # -> cycles of L/2 and L - L/2 (2)
+                    return                                        # there is at most one long cycle (3)
 
 
         def find_my_note(room, me):
             """Person `me`: open my own box, then always the box whose number is on the note."""
             room.enter()
-            box = me
+            box = me   # (4)!
             for _ in range(MAX_OPENS):
                 note = room.open_box(box)
                 if note == me:
@@ -342,26 +430,47 @@ added: 2026-10-16
             return len(winners) == N
         ```
 
-    **סיבוכיות:** אדם 0 עובר על כל קופסה פעם אחת, \( O(N) \) זמן וזיכרון. כל אחד
-    מהאחרים פותח לכל היותר \( N/2 \) קופסאות, וזוכר רק את הקופסה הבאה.
+        1. הלולאה מסתיימת תמיד, כי הפתקים הם תמורה וההילוך מ-`start` חייב לחזור אליו.
+        2. ‏`cycle[0]` ו-`cycle[L // 2]` הם \( c_0 \) ו-\( c_h \) מההוכחה: החלקים באורך
+           \( \lfloor L/2 \rfloor \) ו-\( \lceil L/2 \rceil \), שניהם עד 8.
+        3. החלפה אחת ויוצאים. אין מעגל ארוך שני ב-16 קופסאות.
+        4. מתחילים מהקופסה **שלי**, וכך מובטח שאני על המעגל שמכיל את הפתק שלי.
 
-    **בדיקה:** הקוד נבדק על כל אחד מ-231 מבני המעגלים האפשריים של 16 קופסאות (כל חלוקה של
-    16 לאורכי מעגלים), ועל 20,000 סידורים אקראיים. בכולם כל 16 האנשים ניצחו, ואדם 0
-    השתמש בהחלפה אחת לכל היותר. בלי אדם 0, אותה אסטרטגיה מצליחה רק בכ-34% מהסידורים.
+    #### למה זה נכון { .sol-proof }
+
+    הנכונות של האסטרטגיה הוכחה בסעיף א. מה שהקוד מוסיף הוא שהחדר הוא המקום היחיד שאוכף
+    את הכללים: אם `helper` היה מנסה להחליף פעם חמישית או אחרי שמישהו נכנס, ואם
+    `find_my_note` היה מנסה פתיחה תשיעית, הבדיקה הייתה נכשלת בתוך ה-API ולא "בהבטחה" של
+    מי שקורא לו.
+
+    !!! note "איך נבדק הקוד"
+        הקוד נבדק על כל אחד מ-231 מבני המעגלים האפשריים של 16 קופסאות (כל חלוקה של 16
+        לאורכי מעגלים), ועל 20,000 סידורים אקראיים. בכולם כל 16 האנשים ניצחו, ואדם 0
+        השתמש בהחלפה אחת לכל היותר. בלי אדם 0, אותה אסטרטגיה מצליחה רק בכ-34% מהסידורים.
+
+    #### סיבוכיות { .sol-cost }
+
+    אדם 0 עובר על כל קופסה פעם אחת, \( O(N) \) זמן וזיכרון. כל אחד מהאחרים פותח לכל
+    היותר \( N/2 \) קופסאות, וזוכר רק את הקופסה הבאה, כלומר \( O(1) \) זיכרון.
 
 ## נקודות חשובות ושאלות המשך
 
-??? note "נקודות שהמראיין מחפש"
-    - **פירוק תמורה למעגלים:** "ללכת לפי הפתקים" זה בדיוק לעבור על רשימה מקושרת, וכל
-      רשימה כזו נסגרת למעגל.
-    - **למה מתחילים מהקופסה שלך?** כך מובטח שאתה על המעגל שמכיל את הפתק שלך. מי שמתחיל
-      מקופסה אחרת עלול להסתובב במעגל אחר.
-    - **ספירה פשוטה:** אין מקום לשני מעגלים ארוכים, ולכן החלפה אחת מספיקה. 4 ההחלפות הן
-      הסחת דעת.
-    - **API עם מגבלות:** האכיפה בתוך החדר, ולא "בהבטחה" של מי שקורא לו. זה אותו רעיון כמו
-      checker בסביבת אימות.
+??? trap "מלכודת: לבחור קופסאות באקראי"
+    מי שפותח 8 קופסאות אקראיות מוצא את הפתק שלו בסיכוי \( 1/2 \), ו-16 אנשים בלתי
+    תלויים מנצחים יחד בסיכוי \( 2^{-16} \). השיפור הגדול מגיע מכך שהבחירות של כולם
+    **תלויות** באותו סידור פתקים, ולא מכך שכל אחד חכם יותר לבדו.
 
-??? note "שאלות המשך"
+??? trap "מלכודת: להתחיל מקופסה אחרת"
+    מתחילים דווקא מהקופסה עם המספר שלך, כי רק כך מובטח שאתה על המעגל שמכיל את הפתק שלך.
+    מי שמתחיל מקופסה אחרת, למשל קופסה 1 תמיד, עלול להסתובב במעגל שהפתק שלו בכלל לא
+    נמצא בו.
+
+??? trap "מלכודת: המספרים בשאלה מסיחים"
+    ‏4 ההחלפות הן הסחת דעת. סכום אורכי המעגלים הוא 16, ולכן יש לכל היותר מעגל אחד ארוך
+    מ-8, והחלפה אחת באמצעו מספיקה. מי שמנסה "לנצל" את כל ההחלפות מסבך את האסטרטגיה בלי
+    צורך.
+
+??? followup "שאלות המשך"
     - **בלי אדם 0, מה סיכוי ההצלחה?** הסיכוי שבתמורה אקראית של 16 יש מעגל באורך
       \( L > 8 \) הוא \( \sum_{L=9}^{16} \frac{1}{L} \approx 0.663 \). לכן הסיכוי שכולם מצליחים הוא
       בערך 33.7%. ב-100 האסירים המקוריים הוא בערך 31%.
