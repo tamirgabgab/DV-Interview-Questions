@@ -90,6 +90,13 @@
   background: currentColor;
 }
 
+.md-typeset .chip-new {
+  color: #1b2a4a;
+  background: var(--md-accent-fg-color);
+  font-size: 0.6rem;
+  letter-spacing: 0.03em;
+}
+
 .md-typeset .chip-diff-easy { color: var(--diff-easy); background: var(--diff-easy-bg); }
 .md-typeset .chip-diff-medium { color: var(--diff-medium); background: var(--diff-medium-bg); }
 .md-typeset .chip-diff-hard { color: var(--diff-hard); background: var(--diff-hard-bg); }
@@ -892,3 +899,91 @@ body.practice-mode .md-typeset .question-tools {
   font-size: 0.68rem;
   color: var(--md-default-fg-color--light);
 }
+
+/* Step-through figures (B14): one frame at a time, previous / next buttons. */
+.md-typeset .stepper {
+  margin: 1rem 0 1.4rem;
+  padding: 0.6rem 0.8rem 0.5rem;
+  border: 1px solid var(--site-card-border);
+  border-radius: 0.5rem;
+  outline: none;
+}
+
+.md-typeset .stepper:focus-visible {
+  border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .stepper-frame {
+  display: none;
+  margin: 0;
+}
+
+.md-typeset .stepper-frame.is-active {
+  display: block;
+}
+
+.md-typeset .stepper-frame svg.figure {
+  margin: 0.2rem auto 0.4rem;
+}
+
+.md-typeset .stepper-frame figcaption {
+  min-height: 2.4em;
+  margin: 0;
+  font-size: 0.72rem;
+  font-style: normal;
+  line-height: 1.5;
+  text-align: start;
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset .stepper-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--site-card-border);
+}
+
+.md-typeset .stepper-btn {
+  min-width: 4.6rem;
+  padding: 0.1em 0.9em;
+  font: inherit;
+  font-size: 0.7rem;
+  line-height: 1.8;
+  color: var(--md-primary-bg-color);
+  background: var(--md-primary-fg-color);
+  border: 1px solid var(--md-primary-fg-color);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.md-typeset .stepper-btn:disabled {
+  color: var(--md-default-fg-color--light);
+  background: transparent;
+  border-color: var(--site-card-border);
+  cursor: default;
+}
+
+.md-typeset .stepper-pos {
+  min-width: 6.5rem;
+  font-size: 0.7rem;
+  text-align: center;
+  color: var(--md-default-fg-color--light);
+}
+
+/* Cells of the step-through figures: input characters, stack cells, opened boxes */
+.md-typeset svg .st-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .st-done { fill: var(--viz-grid); fill-opacity: 0.5; stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .st-cur { fill: var(--viz-s2); fill-opacity: 0.25; stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .st-stack { fill: var(--viz-s1); fill-opacity: 0.18; stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg .st-top { fill: var(--viz-s1); fill-opacity: 0.45; stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .st-bad { fill: var(--viz-s2); fill-opacity: 0.45; stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .st-ok { fill: var(--viz-s3); fill-opacity: 0.45; stroke: var(--viz-s3); stroke-width: 2.5; }
+.md-typeset svg .st-text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .st-small { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .st-faded { opacity: 0.35; }
+.md-typeset svg .st-path { fill: none; stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .st-order { fill: var(--md-default-bg-color); font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .st-order-bg { fill: var(--viz-s1); }

@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-16 (session 4)_
+_Last updated: 2026-10-16 (session 5)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -41,7 +41,7 @@ pushed to `main`, which publishes the site.
 | Multi-part questions  | One file, `### סעיף א/ב/ג` with a solution after each part               |
 | Owner's own code      | Kept as sent (comments added, minimal bug fixes called out to the owner) |
 | Workflow before adding | Ask the owner guiding questions first, then implement                   |
-| Tests                 | Python: full tests of the page code. SystemVerilog: Verilator 5.020 from apt; unsupported constructs are translated by intent in the testbench (with a fingerprint of the page block) |
+| Tests                 | Python: full tests of the page code. SystemVerilog: Verilator built from a pinned development commit (after 5.052) with z3, so every class runs as published; a translation by intent (fingerprinted) is allowed only for a proven simulator bug, and none is needed today |
 | Failing tests         | Block the deploy; the live site keeps its previous version              |
 | Run button            | Per question, Python only (Pyodide in a web worker); SV cannot run in a browser, the panel says it is checked in CI instead |
 | Look and feel         | Own navy + amber palette, logo and footer; level / difficulty as CSS chips; one header card per question (see **Site redesign plan**) |
@@ -237,6 +237,32 @@ pushed to `main`, which publishes the site.
    overflow at 390 px only in the sandbox, where the Mermaid CDN is blocked and the raw
    `<pre>` text shows; on the live site they render as SVG.
 
+### Session 5 — 2026-10-16
+
+1. **B14, step-through figures:** `tools/figures/stepper.py` (frames + previous / next
+   buttons, keyboard arrows, `question-tools.js`, `.stepper` CSS). 0010 got two steppers
+   (the stack on `{[()]}` and on `([)]`), 0009 one (the helper's swap, then the walk of each
+   of the 16 people). Tests compare the page copies with the generators. Lesson: a lone
+   bracket inside Hebrew text is mirrored by the bidi algorithm even inside an LTR isolate,
+   so captions name the bracket kinds (פותח עגול, סוגר מרובע) instead of showing glyphs.
+2. **"New" chip** (30 days from `added`) in the header card and the tables, and the `source`
+   field in the header when filled.
+3. **Verilator with constraints in CI:** CI builds Verilator from a pinned commit
+   (`VERILATOR_REF` in the workflow, cached per commit) and installs z3. Findings on the
+   way: the 5.052 release runs 0003, 0005, 0007 and 0014 as published, but crashes on the
+   0011 class (segfault in `verilated_random.cpp` on the `rand` enum array, also without
+   solve-before and with an int board) and leaves shapes of the 0014 subclass
+   unrandomized; master at commit 7a5509c (5.053 devel, 2026-10-16) fixes both. So all
+   five translations were removed and the testbenches run the page code; the
+   `//@translation-of` mechanism stays for the next simulator bug. `run_tests.py`
+   requires Verilator >= 5.053 and z3 and raises the simulation timeout to 300 s (z3 takes
+   ~0.1 s per `randomize()` on 0014). The verification notes on 0007, 0011 and 0014 were
+   rewritten.
+4. **Link check:** `tools/check_links.py` walks the built site (hrefs, src, srcset,
+   fragments against ids) and runs in the build job after `mkdocs build --strict`.
+5. **`CLAUDE.md`** in the repository with the working rules (language and RTL, page
+   skeleton, tests, workflow).
+
 ## In progress
 
 - Waiting for the next batch of questions from the owner.
@@ -254,8 +280,8 @@ pushed to `main`, which publishes the site.
 ### Content
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
-- [ ] Re-run the 0007, 0011 and 0014 constraints (0014: also the rect_set subclass) in a simulator with full constraint support
-      (VCS / Xcelium / Questa, or a newer Verilator) and update the notes on the pages.
+- [x] ~~Re-run the 0007, 0011 and 0014 constraints in a simulator with full constraint support~~ — done in session 5 (Verilator snapshot + z3 in CI).
+- [ ] When a Verilator release newer than 5.052 is out, bump `VERILATOR_REF` to its tag and check that 0011 and the 0014 subclass still pass.
 
 ---
 
@@ -425,11 +451,11 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 |---|------|--------|-------|
 | 8 | ~~Keep the test harnesses in the repo and run them in CI~~ | M | **Done** in session 2 |
 | 9 | ~~Extract code from the pages for testing~~ | M | **Done** in session 2 (`tools/extract_code.py`) |
-| 9a | Show a "tested ✓" badge per question on the tables, from the last CI run | S–M | The run panel already states that the SV code is checked |
-| 9b | Adopt Verilator 5.052+ in CI (cached source build + z3) to run constraints natively and drop translations | M | Proven to work on 0007 in session 2 |
+| 9a | Show a "tested ✓" badge per question on the tables, from the last CI run | S–M | The header card shows "נבדק אוטומטית" since session 4 |
+| 9b | ~~Adopt a newer Verilator in CI to run constraints natively and drop translations~~ | M | **Done** in session 5 (pinned commit + z3) |
 | 10 | ~~Keep the figure generators in the repo~~ (`tools/figures/`) | S | **Done** for 0008–0011 in session 3; older figures (0005–0007) still have no generator |
-| 11 | **Broken link / image check** in CI | S | e.g. a small script over `site/` after the build |
-| 12 | **Repository `CLAUDE.md`** with the conventions in this file (Hebrew RTL rules, tabs, testing, figures) | S | Lets every future AI session follow the same rules without re-discovery |
+| 11 | ~~Broken link / image check in CI~~ | S | **Done** in session 5 (`tools/check_links.py`) |
+| 12 | ~~Repository `CLAUDE.md`~~ | S | **Done** in session 5 |
 | 12a | Generators for the older figures (0004–0007) in `tools/figures/` | S–M | So all figures can be regenerated the same way |
 | 12b | A **"new question" script** that creates the page, `tests/<id>/` and the catalog row from the template | S–M | Fewer manual steps when a batch arrives |
 
@@ -439,7 +465,7 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 |---|------|--------|-------|
 | 13 | ~~Site logo and favicon~~ | S | **Done** in session 4 (round A) |
 | 14 | ~~Statistics on the home page~~ | S–M | **Done** in session 4 (round B) |
-| 15 | ~~Show the `added` date in the header~~; still open: `source` when filled, and a "new" badge for recent questions | S | Date shown since session 4 |
+| 15 | ~~Show the `added` date, `source` and a "new" badge~~ | S | **Done** (date in session 4, source and the 30-day "new" chip in session 5) |
 | 16 | **Better Hebrew search** | M | The built-in search splits Hebrew on whitespace only; evaluate the search `separator` setting or an alternative index |
 | 17 | **Social preview cards** when sharing a question link | S–M | Material `social` plugin (needs extra image dependencies in CI) |
 | 18 | **Comments / discussion** per question via GitHub Discussions (giscus) | M | Public site, so readers could ask questions |
@@ -447,12 +473,16 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 20 | Bilingual content (Hebrew / English) | L | Only if the audience grows beyond Hebrew readers |
 | 21 | **Mobile check** of every page in CI (screenshots at phone width) | M | Wide tables and figures were the main issue so far (see the 0009 box grid) |
 | 22 | **Topic pages**: a short intro per topic (FSM, SVA, coverage...) linking to its questions | M | Turns the tag index into a study guide (C19) |
-| 23 | **Step-through figures** (B14) for the stack in 0010 and the cycles in 0009 | M | The only round B item left |
+| 23 | ~~Step-through figures (B14)~~ | M | **Done** in session 5 (0010 stack, 0009 walks) |
 
 ---
 
 ## Technical notes for whoever continues this work
 
+- SystemVerilog tests: Verilator must be newer than 5.052 (CI builds the commit in
+  `VERILATOR_REF`; the same recipe is in `README.md`) and `z3` must be on the PATH. The
+  5.052 release crashes on 0011 and mis-randomizes the 0014 subclass; the apt package
+  (5.020) has no constraint support. `run_tests.py` refuses older versions.
 - Build: `pip install -r requirements.txt && mkdocs build --strict`. Versions are pinned
   (MkDocs 1.6.1, Material 9.7.7). Material warns about MkDocs 2.0 — do not upgrade MkDocs
   to 2.x, its plugin system (and therefore the hook and the tags plugin) is gone.
@@ -471,6 +501,9 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   content is in **Hebrew**.
 - Do not put Hebrew inside MathJax (`\text{...}`): it renders reversed. In inline SVG,
   give Hebrew `<text>` elements `direction="rtl"`, and prefer an HTML legend over SVG text.
+- A lone bracket (`(`, `[`, `{`) in inline code inside Hebrew text is displayed mirrored by
+  the browser, whatever `direction` / `unicode-bidi` the `code` element has. Name the
+  bracket in Hebrew or show it inside an LTR figure instead.
 - Inline SVG figures are generated by Python scripts and styled by `.perf-chart` /
   `.figure` classes in `extra.css` (see the table in `README.md`).
 - Simulator gotchas found while testing:
@@ -478,10 +511,16 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
     calls inside a loop; an LRM-correct function returned wrong results (0005).
   - Verilator rejects `ref` arguments that are queue elements when inlining; use
     `/*verilator no_inline_task*/` in the test harness (0003).
-  - Verilator 5.020 cannot run `randomize()` with constraints on arrays (0007).
+  - Verilator 5.020 cannot run `randomize()` with constraints on arrays (0007); 5.052 can,
+    but crashes on a `rand` array of enums in a class (0011) and leaves elements of
+    constraint-sized rand dynamic arrays unrandomized in a subclass (0014). Both fixed in
+    master after 5.052 (the pinned commit in CI). z3 prints `%Warning-UNSATCONSTR` for an
+    unsatisfiable `randomize() with`, which the 0007 and 0011 testbenches trigger on purpose.
   - Icarus does not support `ref` ports or `break`.
   - In a module `initial` block, `string y = f(x);` inside a loop is a **static**
-    initialiser that runs once — declare first, assign inside the loop.
+    initialiser that runs once — declare first, assign inside the loop. Verilator 5.020
+    re-ran such initialisers on every iteration (not LRM-correct), which hid two testbench
+    bugs (0009 `all_found`, 0014 `k`) that 5.052+ exposed; both fixed in session 5.
   - Verilator 5.020 `sort()` on a queue of signed `int` sorts as unsigned (found in the
     0003 testbench); the testbench checks order pairwise instead.
   - A comment that starts with the word `Verilator` (`// Verilator ...`) is parsed as a

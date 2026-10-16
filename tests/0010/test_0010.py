@@ -1,3 +1,6 @@
+import subprocess
+import sys
+import re
 import itertools
 import math
 import random
@@ -47,3 +50,13 @@ def test_random_long_strings():
             s[rng.randrange(len(s))] = rng.choice("()[]{}")
         s = "".join(s)
         assert brute(s) == fast(s), s
+
+
+def test_steppers_up_to_date():
+    # The step-through figures on the page are the output of tools/figures/q0010.py
+    from extract_code import ROOT, question_path
+    out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0010.py")],
+                         capture_output=True, text=True, check=True).stdout
+    generated = re.findall(r'<div class="stepper".*?</div></div>', out)
+    page = re.findall(r'<div class="stepper".*?</div></div>', question_path(10).read_text(encoding="utf-8"))
+    assert page == generated and len(page) == 2

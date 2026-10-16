@@ -1,3 +1,6 @@
+import subprocess
+import sys
+import re
 import random
 
 import pytest
@@ -96,3 +99,15 @@ def test_room_enforces_the_rules():
         room.open_box(1)                                   # a ninth box
     room.enter()
     room.open_box(1)                                       # the next person starts fresh
+
+
+def test_figures_up_to_date():
+    # The SVG figures and the step-through figure on the page are the output of tools/figures/q0009.py
+    from extract_code import ROOT, question_path
+    out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0009.py")],
+                         capture_output=True, text=True, check=True).stdout
+    text = question_path(9).read_text(encoding="utf-8")
+    generated = [l.strip() for l in out.splitlines() if l.strip().startswith("<svg class=\"figure\" viewBox=\"0 0 640")]
+    page = re.findall(r'<svg class="figure" viewBox="0 0 640.*?</svg>', text)
+    assert page == generated and len(page) == 2
+    assert re.findall(r'<div class="stepper".*?</div></div>', text) == re.findall(r'<div class="stepper".*?</div></div>', out)

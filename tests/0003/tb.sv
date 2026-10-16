@@ -1,22 +1,6 @@
-// Simulator limitation (Verilator 5.020): cannot inline a function whose `ref` arguments are queue elements.
-// The translation below is the page code plus a pragma that disables inlining.
-//@translation-of function automatic void swap( 070a229b977e
 
 module tb;
-  function automatic void swap(ref int x, ref int y);
-    /*verilator no_inline_task*/
-    int t = x;
-    x = y;
-    y = t;
-  endfunction
-
-  function automatic void mystery(ref int A[$]);
-    int n = A.size();
-    for (int i = 0; i < n; i++)
-      for (int j = 0; j < n; j++)
-        if (A[i] < A[j])
-          swap(A[i], A[j]);
-  endfunction
+  //@page function automatic void swap(
 
   initial begin
     int a[$], expected[$];
@@ -29,7 +13,7 @@ module tb;
     repeat (500) begin
       a.delete();
       repeat ($urandom_range(0, 12)) a.push_back(int'($urandom_range(0, 40)) - 20);
-      // Built-in sort() is not used: Verilator 5.020 sorts signed ints as unsigned.
+      // The order is checked pairwise and the values as a multiset (sort() is not needed).
       count.delete();
       foreach (a[i]) count[a[i]]++;
       mystery(a);

@@ -6,11 +6,15 @@
     python tools/run_tests.py --python-only   # skip SystemVerilog
     python tools/run_tests.py --sv-only
 
+SystemVerilog needs Verilator 5.053 or newer (today: a development snapshot built from a
+pinned commit, see README.md "Tests" and the CI workflow) with the z3 solver on the PATH,
+so that randomize() with constraints runs as published.
+
 SystemVerilog testbenches (tests/<id>/tb.sv) use these directives:
 
     //@page <marker>                  replaced by the page's SV block that contains <marker>
     //@translation-of <marker> <hash> the testbench holds a hand translation of that block
-                                      (for simulator limitations); fails when the page changes
+                                      (for a proven simulator bug; none today); fails when the page changes
     //@flags <verilator flags>        extra flags, e.g. --timing
 
 A testbench passes when it prints a line starting with PASS. Compiled simulators are
@@ -36,6 +40,8 @@ import extract_code  # noqa: E402
 ROOT = extract_code.ROOT
 TESTS = ROOT / "tests"
 CACHE = ROOT / ".cache" / "sv"
+MIN_VERILATOR = (5, 53)       # 5.052 crashes on 0011 and mis-randomizes the 0014 subclass
+SIM_TIMEOUT = 300             # seconds; the solver takes ~0.1 s per randomize() on 0014
 
 PAGE = re.compile(r"^(?P<indent>[ \t]*)//@page[ \t]+(?P<marker>.+?)[ \t]*$", re.M)
 TRANSLATION = re.compile(r"^//@translation-of[ \t]+(?P<marker>.+?)[ \t]+(?P<hash>[0-9a-f]{12})[ \t]*$", re.M)
@@ -107,7 +113,7 @@ def run_sv(tb: Path, verilator: str, version: str) -> tuple[str, bool, str]:
             return name, False, "compile failed: " + " | ".join(errors[:5])
 
     try:
-        result = subprocess.run([str(sim)], cwd=work, capture_output=True, text=True, timeout=60)
+        result = subprocess.run([str(sim)], cwd=work, capture_output=True, text=True, timeout=SIM_TIMEOUT)
     except subprocess.TimeoutExpired:
         return name, False, "simulation timed out"
     passed = result.returncode == 0 and any(l.startswith("PASS") for l in result.stdout.splitlines())
@@ -125,6 +131,14 @@ def run_all_sv(dirs: list[Path]) -> bool:
         print("!! verilator not found: install it (e.g. apt install verilator) or use --python-only")
         return False
     version = subprocess.run([verilator, "--version"], capture_output=True, text=True).stdout.strip()
+    found = re.search(r"Verilator (\d+)\.(\d+)", version)
+    if not found or (int(found[1]), int(found[2])) < MIN_VERILATOR:
+        print(f"!! {version or 'unknown Verilator'}: the testbenches need Verilator "
+              f"{MIN_VERILATOR[0]}.{MIN_VERILATOR[1]:03d}+ with z3 (see README.md, Tests), or use --python-only")
+        return False
+    if not shutil.which("z3"):
+        print("!! z3 not found: randomize() with constraints needs the z3 solver (apt install z3)")
+        return False
     print(f"== SystemVerilog: {len(tbs)} testbench(es), {version}")
     with ThreadPoolExecutor(max_workers=4) as pool:
         results = list(pool.map(lambda tb: run_sv(tb, verilator, version), tbs))

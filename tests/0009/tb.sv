@@ -6,7 +6,7 @@ module tb;
 
   function automatic void shuffle_notes(output notes_t notes);
     int perm[$];
-    perm.delete();                     // local queues are not reset between calls in Verilator 5.020
+    perm.delete();                     // start from an empty queue on every call
     for (int b = 1; b <= N; b++) perm.push_back(b);
     perm.shuffle();
     notes[0] = 0;
@@ -41,6 +41,7 @@ module tb;
     room_c     room;
     box_list_t cycle;
     int        wins = 0;
+    bit        all_found;
 
     // The example on the page: a cycle of 11 splits into 6 and 5 by swapping boxes 1 and 9
     notes = '{0, 7, 11, 15, 16, 13, 2, 12, 14, 4, 5, 6, 3, 1, 8, 9, 10};
@@ -65,7 +66,7 @@ module tb;
 
     // Without person 0 about one third of the arrangements win
     repeat (20000) begin
-      bit all_found = 1;
+      all_found = 1;                 // a declaration initializer here would run only once (static)
       shuffle_notes(notes);
       room = new(notes);
       for (int me = 1; me <= N; me++)

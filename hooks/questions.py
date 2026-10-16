@@ -11,6 +11,7 @@ Responsibilities:
 
 from __future__ import annotations
 
+import datetime as dt
 import html
 import json
 import posixpath
@@ -43,6 +44,8 @@ DIFFICULTIES = {
     "medium": "בינוני",
     "hard": "קשה",
 }
+
+NEW_DAYS = 30   # a question added within this many days of the build gets a "new" chip
 
 # Tags that almost every question carries; they do not make two questions "related".
 GENERIC_TAGS = {"python", "systemverilog"}
@@ -117,6 +120,19 @@ def on_config(config, **kwargs):
     return config
 
 
+def _is_new(q: dict) -> bool:
+    added = q.get("added")
+    if isinstance(added, dt.datetime):
+        added = added.date()
+    if not isinstance(added, dt.date):
+        return False
+    return (dt.date.today() - added).days <= NEW_DAYS
+
+
+def new_chip(q: dict) -> str:
+    return '<span class="chip chip-new">חדש</span>' if _is_new(q) else ""
+
+
 def level_chip(level: str) -> str:
     return f'<span class="chip chip-level">{LEVELS[level]}</span>'
 
@@ -139,6 +155,8 @@ def _header(q: dict, markdown: str, page_url: str) -> str:
     bottom = [f"<span>נושאים: {topics}</span>"]
     if q.get("added"):
         bottom.append(f'<span class="qh-sep"></span><span>נוסף {html.escape(str(q["added"]))}</span>')
+    if q.get("source"):
+        bottom.append(f'<span class="qh-sep"></span><span>מקור: {html.escape(str(q["source"]))}</span>')
     if langs:
         bottom.append(f'<span class="qh-sep"></span><span class="qh-badge">קוד: {" + ".join(langs)}</span>')
         if _has_tests(q):
@@ -146,7 +164,7 @@ def _header(q: dict, markdown: str, page_url: str) -> str:
     return (
         '<div class="question-header">\n'
         f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
-        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}</div>\n'
+        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{new_chip(q)}</div>\n'
         f'<h1>{html.escape(str(q["title"]))}</h1>\n'
         f'<div class="qh-bottom">{"".join(bottom)}</div>\n'
         '</div>\n\n'
@@ -270,7 +288,7 @@ def _table(level: str | None, page_url: str) -> str:
             f'<tr data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" '
             f'data-tags="{html.escape(" ".join(q["tags"]))}">'
             f'<td class="q-id">{q["id"]}</td>'
-            f'<td class="q-title"><a href="{href}">{html.escape(str(q["title"]))}</a></td>'
+            f'<td class="q-title"><a href="{href}">{html.escape(str(q["title"]))}</a> {new_chip(q)}</td>'
             f"{level_td}"
             f'<td class="q-diff">{difficulty_chip(q["difficulty"])}</td>'
             f'<td class="q-tags">{" ".join(f"<code>{html.escape(t)}</code>" for t in q["tags"])}</td>'

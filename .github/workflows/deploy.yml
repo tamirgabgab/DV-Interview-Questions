@@ -15,6 +15,11 @@ concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Development snapshot after 5.052: the release crashes on the 0011 class and leaves
+  # shapes of the 0014 subclass unrandomized; this commit runs every class as published.
+  VERILATOR_REF: "7a5509c89b1dd55cf78809907729a55f7fef55b7"
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -25,8 +30,34 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt -r requirements-dev.txt
-      - name: Install Verilator
-        run: sudo apt-get update -q && sudo apt-get install -y -q verilator
+      # Verilator built from source at a pinned commit (the apt package is 5.020, which
+      # cannot run randomize() with constraints); the install tree is cached per commit.
+      # z3 is the SMT solver Verilator calls for constrained randomization.
+      - uses: actions/cache@v4
+        id: verilator
+        with:
+          path: ~/verilator
+          key: verilator-${{ env.VERILATOR_REF }}-${{ runner.os }}
+      - name: Build Verilator (pinned commit)
+        if: steps.verilator.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q git help2man perl python3 make autoconf g++ flex bison \
+            libfl2 libfl-dev zlib1g zlib1g-dev
+          git init -q /tmp/verilator
+          cd /tmp/verilator
+          git fetch -q --depth 1 https://github.com/verilator/verilator.git "${{ env.VERILATOR_REF }}"
+          git checkout -q FETCH_HEAD
+          autoconf
+          ./configure --prefix="$HOME/verilator"
+          make -j"$(nproc)"
+          make install
+      - name: Install z3 and the Verilator run-time dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q z3 perl libfl2
+          echo "$HOME/verilator/bin" >> "$GITHUB_PATH"
+      - run: verilator --version && z3 --version
       # Compiled testbenches are cached by content hash; only changed ones recompile.
       - uses: actions/cache@v4
         with:
@@ -50,6 +81,8 @@ jobs:
       - run: pip install -r requirements.txt
       # --strict also fails on invalid question front matter (see hooks/questions.py).
       - run: mkdocs build --strict
+      - name: Check internal links and anchors
+        run: python tools/check_links.py site
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:

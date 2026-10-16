@@ -8,6 +8,11 @@ them into the question page.
 """
 
 import math
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from stepper import stepper  # noqa: E402
 
 N, MAX_OPENS = 16, 8
 
@@ -100,6 +105,67 @@ def trace_table(notes):
     return "\n".join(rows)
 
 
+def walk(notes, me):
+    """The boxes person `me` opens, in order (at most MAX_OPENS)."""
+    box, path = me, []
+    for _ in range(MAX_OPENS):
+        path.append(box)
+        if notes[box] == me:
+            break
+        box = notes[box]
+    return path
+
+
+def boxes_frame(notes, marked=(), path=(), found=None, faded=False):
+    """16 boxes in two rows (small number = box, big number = note). `path` boxes are numbered
+    in opening order and joined by lines; `found` is drawn green; `marked` orange."""
+    cell, gap, x0, y0 = 50, 10, 14, 22
+    centre = {}
+    p = ['<svg class="figure" viewBox="0 0 500 180" style="max-width:31rem" role="img" aria-label="16 הקופסאות והפתקים שבהן">']
+    for b in range(1, N + 1):
+        r, c = divmod(b - 1, 8)
+        x, y = x0 + c * (cell + gap), y0 + r * 80
+        centre[b] = (x + cell / 2, y + 22)
+        if b == found:
+            cls = "st-ok"
+        elif b in path:
+            cls = "st-stack"
+        elif b in marked:
+            cls = "st-cur"
+        else:
+            cls = "st-cell"
+        extra = " st-faded" if faded and b not in path and b != found and b not in marked else ""
+        p.append(f'<g class="{extra.strip()}"><rect class="{cls}" x="{x}" y="{y}" width="{cell}" height="44" rx="6"/>'
+                 f'<text class="st-small" x="{x + 6}" y="{y + 12}">{b}</text>'
+                 f'<text class="st-text" x="{x + cell / 2}" y="{y + 33}" text-anchor="middle">{notes[b]}</text></g>')
+    for i in range(len(path) - 1):
+        (xa, ya), (xb, yb) = centre[path[i]], centre[path[i + 1]]
+        p.append(f'<line class="st-path" x1="{xa:.0f}" y1="{ya:.0f}" x2="{xb:.0f}" y2="{yb:.0f}" stroke-dasharray="5 4"/>')
+    for i, b in enumerate(path):
+        x, y = centre[b]
+        p.append(f'<circle class="st-order-bg" cx="{x + 18:.0f}" cy="{y - 18:.0f}" r="8"/>'
+                 f'<text class="st-order" x="{x + 18:.0f}" y="{y - 14.5:.0f}" text-anchor="middle">{i + 1}</text>')
+    p.append("</svg>")
+    return "".join(p)
+
+
+def walk_stepper():
+    """Frame 0: the helper's swap. Frames 1..16: each person's walk after the swap."""
+    frames = [(boxes_frame(NOTES, marked=SWAP),
+               f"לפני ההחלפה. אדם 0 מצא מעגל באורך 11 ומחליף בין הפתקים של קופסה {SWAP[0]} "
+               f"(פתק {NOTES[SWAP[0]]}) וקופסה {SWAP[1]} (פתק {NOTES[SWAP[1]]})."),
+              (boxes_frame(AFTER, marked=SWAP),
+               f"אחרי ההחלפה: בקופסה {SWAP[0]} עכשיו הפתק {AFTER[SWAP[0]]}, ובקופסה {SWAP[1]} הפתק "
+               f"{AFTER[SWAP[1]]}. מכאן כל אחד הולך לפי הפתקים, מתחיל בקופסה עם המספר שלו.")]
+    for me in range(1, N + 1):
+        path = walk(AFTER, me)
+        chain = " ← ".join(str(b) for b in path)
+        frames.append((boxes_frame(AFTER, path=path, found=path[-1], faded=True),
+                       f"אדם {me} פותח <span dir=\"ltr\">{chain.replace(' ← ', ' → ')}</span>: הפתק {me} נמצא "
+                       f"בקופסה {path[-1]} אחרי {len(path)} פתיחות מתוך {MAX_OPENS} מותרות ✓"))
+    return stepper(frames, "ההחלפה של העוזר ואז המסלול של כל אחד מ-16 האנשים")
+
+
 if __name__ == "__main__":
     print(boxes_table(NOTES, SWAP), "\n")
     before = [(LONG, 175, 150, 120), (SHORT[0], 430, 150, 60), (SHORT[1], 565, 150, 45)]
@@ -114,4 +180,5 @@ if __name__ == "__main__":
                     SWAP), "\n")
     print([len(c) for c in after_cycles], "\n")
     print(trace_table(NOTES), "\n")
-    print(trace_table(AFTER))
+    print(trace_table(AFTER), "\n")
+    print(walk_stepper())
