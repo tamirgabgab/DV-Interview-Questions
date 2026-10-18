@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-16 (session 5)_
+_Last updated: 2026-10-18 (session 8)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -378,6 +378,41 @@ figure per event.
 This session started from an older branch point (0008 / 0009 were free then); the work was
 re-applied on top of the current `main` as 0018 / 0019 in the new page skeleton.
 
+### Session 8 — 2026-10-18: question 0020
+
+The owner asked about PCIe completion splitting (MRRS / MPS / RCB) in chat, then asked to
+turn it into a question with code in both languages and figures like his sketch (every
+split of the example drawn over the address axis). Choices: senior / medium, a single
+part, the function assumes `len <= MRRS` (MRRS explained in the question and a trap), and
+three figures: the parameters figure, the map of all splits, a Mermaid flowchart.
+
+1. **0020, every completion split of one read** (`docs/questions/senior/`): the three
+   rules of the spec reduce to "every cut between two completions is on an RCB
+   boundary", so a split is a subset of the c boundaries inside the request, filtered by
+   MPS. `completion_splits(addr, len, mps, rcb)` enumerates them recursively, largest
+   cut first, so the first split is the greedy minimum and the last cuts on every
+   boundary. Example 0x1010 / 256 / RCB 64 / MPS 256: 16 splits, from [256] to
+   [48, 64, 64, 64, 16]; with MPS = 128, 8 remain. SystemVerilog returns `int splits[$][$]`
+   (a queue of queues works on the pinned Verilator, also as a `ref` argument and through
+   recursion). Traps: reading the sizes backwards (144+64+48 cuts off-boundary), cutting
+   by MPS instead of RCB ([128, 128] from 0x1010), MRRS vs. MPS. Follow-ups: counting with
+   a DP, min / max formulas, Byte Count / Lower Address, scoreboard and coverage, who sets
+   the RCB.
+2. **Figures** from `tools/figures/q0020.py` (the generator runs the page's Python code,
+   like 0014): the parameters figure (RCB grid, request limits, MPS reach with the two
+   legal ends of the first completion, one split by role), the map of the 16 splits as
+   rows over the address axis grouped by the number of completions, the same map with
+   the splits MPS = 128 rules out faded, and the two tables. New `cs-*` classes in
+   `extra.css`. Mermaid: the flowchart of the recursion and the recursion tree for
+   RCB = 128 with the MPS = 128 pruning dashed.
+3. **Tests:** Python compares the page function with a subset enumeration on 600 random
+   requests inside a 4 KB page, checks every split against the rules, the order (greedy
+   first, c + 1 last, 2^c when MPS >= len) and the page figures. Mutation check: dropping
+   the MPS condition or the descending order fails the tests. SystemVerilog: the same
+   subset reference (bit mask over the boundaries), 400 random requests, as published.
+   Note: `join` is a reserved word (fork / join), the testbench helper is `joined`.
+4. README catalog, layout and figure class tables; this file.
+
 ## In progress
 
 - Waiting for the next batch of questions from the owner.
@@ -389,7 +424,7 @@ re-applied on top of the current `main` as 0018 / 0019 in the new page skeleton.
 ### Owner decisions
 
 - [ ] Keep example question `0001` or replace it with real content.
-- [ ] Staff level is still empty and Senior has three questions (0007, 0011, 0019) — any questions for these levels?
+- [ ] Staff level is still empty and Senior has four questions (0007, 0011, 0019, 0020) — any questions for these levels?
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 
 ### Content
@@ -404,18 +439,18 @@ re-applied on top of the current `main` as 0018 / 0019 in the new page skeleton.
 
 ## Question variety
 
-### Coverage today (19 questions)
+### Coverage today (20 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus, cycle detection |
-| Senior | 0007, 0011, 0019 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph |
+| Senior | 0007, 0011, 0019, 0020 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules and recursive enumeration |
 | Staff | — | — |
 
-Algorithms and puzzles are well covered. **Core DV topics are missing:** UVM, SVA,
-functional coverage, FIFOs, clock domain crossing, FSM design, protocols, debug, and
-verification planning.
+Algorithms and puzzles are well covered, and 0020 is the first protocol question (PCIe).
+**Core DV topics are still missing:** UVM, SVA, functional coverage, FIFOs, clock domain
+crossing, FSM design, debug, and verification planning.
 
 ### Topic gaps worth filling
 
