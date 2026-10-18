@@ -987,3 +987,22 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .st-path { fill: none; stroke: var(--viz-s1); stroke-width: 2.5; }
 .md-typeset svg .st-order { fill: var(--md-default-bg-color); font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset svg .st-order-bg { fill: var(--viz-s1); }
+
+/* Probability grids (question 0015): equally likely outcomes, the condition, the target */
+.md-typeset svg .pg-out { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.2; }
+.md-typeset svg .pg-cond { fill: var(--viz-s1); fill-opacity: 0.3; stroke: var(--viz-s1); stroke-width: 1.2; }
+.md-typeset svg .pg-hit { fill: var(--viz-s3); fill-opacity: 0.65; stroke: var(--viz-s3); stroke-width: 1.2; }
+.md-typeset svg .pg-twice { fill: none; stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .pg-quad { fill: none; stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 6 4; }
+.md-typeset svg .pg-split { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .pg-strike { stroke: var(--viz-s2); stroke-opacity: 0.6; stroke-width: 2.5; stroke-linecap: round; }
+.md-typeset svg .pg-head { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-text-font-family); }
+.md-typeset svg .pg-label { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-text-font-family); }
+.md-typeset svg .pg-small { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg .pg-day { fill: var(--viz-text); font-size: 11px; font-family: var(--md-text-font-family); }
+.md-typeset svg .pg-day-hl { fill: var(--viz-s2); font-weight: 700; }
+.md-typeset .viz-legend .pg-hit { background: var(--viz-s3); opacity: 0.75; }
+.md-typeset .viz-legend .pg-cond { background: var(--viz-s1); opacity: 0.4; }
+.md-typeset .viz-legend .pg-out { background: var(--md-default-bg-color); outline: 1px solid var(--viz-grid); }
+.md-typeset .viz-legend .pg-quad { background: transparent; outline: 2px dashed var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .pg-twice { background: transparent; border: 2px solid var(--viz-ink); border-radius: 50%; }

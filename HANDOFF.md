@@ -263,6 +263,22 @@ pushed to `main`, which publishes the site.
 5. **`CLAUDE.md`** in the repository with the working rules (language and RTL, page
    skeleton, tests, workflow).
 
+### Session 6 — 2026-10-18
+
+1. **Question 0015** (student, easy, no code): two children, at least one boy (1/3); a boy
+   born on Tuesday (13/27, counted with inclusion-exclusion and checked with Bayes); part
+   c, the general formula for C children, P(boy) = p and a trait of probability q:
+   p^C (1 - (1 - q)^C) / (1 - (1 - pq)^C). Owner's choices: student level, a separate
+   parameter q, no code on the page, a 14 x 14 grid for part b.
+2. **Figures** from `tools/figures/q0015.py`: a 2 x 2 grid for part a, the 14 x 14 grid of
+   (sex, weekday) pairs for part b (the 27-cell cross, the 13 boy-boy cells, the dashed
+   boy-boy quadrant for P(A) and P(T | A), the double-Tuesday cell circled), and the table
+   of the formula for q = 1, 1/2, 1/7, 1/365. New `pg-*` classes in `extra.css`.
+3. **Tests without page code:** `tests/0015/test_0015.py` checks every number by
+   exhaustive enumeration (Fractions) and that the page copies of the figures and the
+   table match the generator. The home stats strip now counts "questions with code" only
+   for pages that have code (`has_code` in the hook), so 0015 is not counted there.
+
 ## In progress
 
 - Waiting for the next batch of questions from the owner.
@@ -287,11 +303,11 @@ pushed to `main`, which publishes the site.
 
 ## Question variety
 
-### Coverage today (14 questions)
+### Coverage today (15 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
-| Student | 0001, 0002, 0003, 0010, 0012 | digital logic, bitwise, sorting, stack, digit puzzles |
+| Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014 | logic puzzles, BFS, O(n) scans, permutations, SV constraints |
 | Senior | 0007, 0011 | SV constraints, randomization, probability, combinatorics |
 | Staff | — | — |

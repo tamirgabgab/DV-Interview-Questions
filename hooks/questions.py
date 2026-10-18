@@ -70,7 +70,7 @@ def _load_questions(docs_dir: Path) -> dict[str, dict]:
         if path.name == "index.md":
             continue
         src_uri = path.relative_to(docs_dir).as_posix()
-        _, meta = get_data(path.read_text(encoding="utf-8"))
+        body, meta = get_data(path.read_text(encoding="utf-8"))
 
         missing = [f for f in REQUIRED_FIELDS if f not in meta]
         if missing:
@@ -94,7 +94,8 @@ def _load_questions(docs_dir: Path) -> dict[str, dict]:
             errors.append(f"{src_uri}: duplicate id {qid} (also in {seen_ids[qid]})")
         seen_ids[qid] = src_uri
 
-        questions[src_uri] = {**meta, "id": qid, "src_uri": src_uri}
+        has_code = any(extract_code.blocks_from_text(body, f) for f in ("systemverilog", "python"))
+        questions[src_uri] = {**meta, "id": qid, "src_uri": src_uri, "has_code": has_code}
 
     if errors:
         raise PluginError("Invalid question files:\n  " + "\n  ".join(errors))
@@ -208,7 +209,7 @@ def _level_cards(page_url: str) -> str:
 
 def _stats() -> str:
     qs = list(_questions.values())
-    with_code = sum(_has_tests(q) for q in qs)
+    with_code = sum(q["has_code"] and _has_tests(q) for q in qs)   # a page may have tests but no code
     topics = {t for q in qs for t in q["tags"]}
     levels = sum(any(q["level"] == level for q in qs) for level in LEVELS)
     items = [(len(qs), "שאלות עם פתרון מלא"),

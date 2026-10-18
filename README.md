@@ -268,6 +268,7 @@ level, difficulty, topic) plus a title search, and turn into **cards** on narrow
 | Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |
 | Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007) |
 | Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles)          |
+| Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
 | Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack) |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
