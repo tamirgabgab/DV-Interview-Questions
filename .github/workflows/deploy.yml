@@ -83,6 +83,20 @@ jobs:
       - run: mkdocs build --strict
       - name: Check internal links and anchors
         run: python tools/check_links.py site
+      # Every page at 390 px with all blocks open: no sideways scroll, no script errors.
+      - name: Install Playwright and Chromium for the phone check
+        run: |
+          pip install -r requirements-dev.txt
+          python -m playwright install --with-deps chromium
+      - name: Check every page at phone width
+        run: python tools/check_phone.py site --shots phone-shots
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phone-screenshots
+          path: phone-shots
+          retention-days: 7
+          if-no-files-found: ignore
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:

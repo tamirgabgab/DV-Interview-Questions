@@ -1,5 +1,6 @@
 // Question page tools: open / close every collapsible block, practice mode (solutions
-// hidden, with a stopwatch) and the hint ladder (hint n+1 appears once hint n is open).
+// hidden, with a stopwatch), solved / favourite marks (marks.js), a random question of the
+// same level, and the hint ladder (hint n+1 appears once hint n is open).
 // Practice mode is remembered across pages in localStorage; the stopwatch is per page.
 (() => {
   const KEY = "dvq-practice";
@@ -45,6 +46,32 @@
       details().forEach((d) => (d.open = false));
     });
     practiceBtn.addEventListener("click", () => setPractice(!document.body.classList.contains("practice-mode")));
+
+    // Solved / favourite marks
+    const qid = bar.dataset.qid;
+    const LABEL = { solved: ["✓ פתרתי", "✓ סומנה כפתורה"], star: ["☆ מועדף", "★ במועדפים"] };
+    const paint = () => {
+      bar.querySelectorAll(".qt-mark").forEach((b) => {
+        const on = Boolean(window.dvqMarks && window.dvqMarks.has(qid, b.dataset.mark));
+        b.setAttribute("aria-pressed", String(on));
+        b.classList.toggle("is-active", on);
+        b.textContent = LABEL[b.dataset.mark][on ? 1 : 0];
+      });
+    };
+    bar.querySelectorAll(".qt-mark").forEach((b) => {
+      b.addEventListener("click", () => { if (window.dvqMarks) window.dvqMarks.toggle(qid, b.dataset.mark); });
+    });
+    document.addEventListener("dvq-marks", paint);
+    paint();
+
+    // Random question of the same level (links computed by the hook, relative to this page)
+    const random = bar.querySelector(".qt-random");
+    if (random) {
+      random.addEventListener("click", () => {
+        const hrefs = JSON.parse(random.dataset.hrefs || "[]");
+        if (hrefs.length) window.location.href = hrefs[Math.floor(Math.random() * hrefs.length)];
+      });
+    }
 
     let remembered = false;
     try { remembered = localStorage.getItem(KEY) === "1"; } catch (e) { /* ignore */ }

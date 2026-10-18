@@ -49,7 +49,7 @@ extra:
 
 plugins:
   - search:
-      lang: en
+      lang: en          # Hebrew prefix letters: see on_post_build in hooks/questions.py
   - tags
 
 hooks:
@@ -97,6 +97,7 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/skins/default.js
   - https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/wavedrom.min.js
   - javascripts/wavedrom-init.js
+  - javascripts/marks.js
   - javascripts/question-filter.js
   - javascripts/question-tools.js
   - javascripts/run-python.js

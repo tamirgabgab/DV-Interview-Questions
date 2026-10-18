@@ -43,9 +43,10 @@ python tools/lint_pages.py            # page skeleton and RTL rules
 python tools/run_tests.py             # pytest + Verilator (needs Verilator 5.052+ with z3)
 mkdocs build --strict                 # the build CI runs
 python tools/check_links.py           # internal links and anchors of the built site
+python tools/check_phone.py           # every page at 390 px (add --offline and --route in a sandbox)
 ```
 
-All four run in CI on every push; a failure blocks the deploy. Verilator notes and
+All five run in CI on every push; a failure blocks the deploy. Verilator notes and
 simulator quirks are listed in `HANDOFF.md` under "Technical notes".
 
 ## Workflow

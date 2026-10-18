@@ -7,6 +7,9 @@ Responsibilities:
 - Replace the ``<!-- questions-table -->`` placeholder with a filterable table (cards on phones).
 - Append "related questions" (by shared tags) and an in-browser "run" panel to questions
   that have ``tests/<id>/demo.py``.
+- Study paths (``docs/paths/*.md``): validate the steps, add them to the navigation, render
+  the step list and the path cards, and put a previous / next bar on every question of a path.
+- Add the prefix-stripped Hebrew words to the search index (on_post_build).
 """
 
 from __future__ import annotations
@@ -55,10 +58,24 @@ REQUIRED_FIELDS = ("id", "title", "level", "difficulty", "tags")
 PLACEHOLDER = re.compile(r"<!--\s*questions-table(?:\s+level=(\w+))?\s*-->")
 CARDS = re.compile(r"<!--\s*level-cards\s*-->")
 STATS = re.compile(r"<!--\s*stats\s*-->")
+PATH_STEPS = re.compile(r"<!--\s*path-steps\s*-->")
+PATH_CARDS = re.compile(r"<!--\s*path-cards\s*-->")
 QUESTIONS_DIR = "questions"
+PATHS_DIR = "paths"
+LEVEL_RANK = {level: i for i, level in enumerate(LEVELS)}
+DIFF_RANK = {d: i for i, d in enumerate(DIFFICULTIES)}
 
-# Question metadata keyed by src_uri, filled in on_config.
+# Hebrew search. The lunr index splits on whitespace only and has no Hebrew stemmer (the
+# bundled lunr.he only rewrites final letters), so "טבלה" does not find "בטבלה" and
+# "(לולאה" hides "לולאה". on_post_build adds a hidden field to every search document with
+# the clean words and their forms without the prefix letters ו ה ב כ ל מ ש.
+SEARCH_FIELD = "alt"
+PREFIX_LETTERS = set("והבכלמש")
+WORD = re.compile(r"[\u05d0-\u05ea]+|[A-Za-z0-9_]+")
+
+# Question metadata keyed by src_uri, and the study paths in order; filled in on_config.
 _questions: dict[str, dict] = {}
+_paths: list[dict] = []
 
 
 def _load_questions(docs_dir: Path) -> dict[str, dict]:
@@ -102,9 +119,35 @@ def _load_questions(docs_dir: Path) -> dict[str, dict]:
     return questions
 
 
+def _load_paths(docs_dir: Path) -> list[dict]:
+    by_id = {q["id"]: q for q in _questions.values()}
+    paths, errors = [], []
+    for path in sorted((docs_dir / PATHS_DIR).glob("*.md")):
+        if path.name == "index.md":
+            continue
+        src_uri = path.relative_to(docs_dir).as_posix()
+        _, meta = get_data(path.read_text(encoding="utf-8"))
+        steps = []
+        for step in meta.get("steps") or []:
+            qid = f"{int(step['id']):04d}"
+            if qid not in by_id:
+                errors.append(f"{src_uri}: step {qid} is not a question")
+                continue
+            steps.append({"q": by_id[qid], "note": str(step.get("note", ""))})
+        if not meta.get("title") or len(steps) < 2:
+            errors.append(f"{src_uri}: a path needs a title and at least two steps")
+        paths.append({"src_uri": src_uri, "title": str(meta.get("title", "")),
+                      "description": str(meta.get("description", "")),
+                      "order": meta.get("order", 99), "steps": steps})
+    if errors:
+        raise PluginError("Invalid study paths:\n  " + "\n  ".join(errors))
+    return sorted(paths, key=lambda p: (p["order"], p["src_uri"]))
+
+
 def on_config(config, **kwargs):
-    global _questions
+    global _questions, _paths
     _questions = _load_questions(Path(config["docs_dir"]))
+    _paths = _load_paths(Path(config["docs_dir"]))
 
     nav: list = [{"ראשי": "index.md"}]
     for level, label in LEVELS.items():
@@ -116,6 +159,9 @@ def on_config(config, **kwargs):
             {label: [f"{QUESTIONS_DIR}/{level}/index.md"]
              + [{f"{q['id']} · {q['title']}": q["src_uri"]} for q in pages]}
         )
+    if _paths:
+        nav.append({"מסלולים": [f"{PATHS_DIR}/index.md"]
+                    + [{p["title"]: p["src_uri"]} for p in _paths]})
     nav.append({"תגיות": "tags.md"})
     config["nav"] = nav
     return config
@@ -140,6 +186,19 @@ def level_chip(level: str) -> str:
 
 def difficulty_chip(difficulty: str) -> str:
     return f'<span class="chip chip-diff chip-diff-{difficulty}">{DIFFICULTIES[difficulty]}</span>'
+
+
+def _base(page_url: str) -> str:
+    """Directory of a page URL, for relative links (page URLs end with '/')."""
+    return page_url if page_url.endswith("/") or not page_url else posixpath.dirname(page_url) + "/"
+
+
+def _href(src_uri: str, page_url: str) -> str:
+    """Relative link from the page at page_url to the page built from src_uri."""
+    target = src_uri[: -len(".md")] + "/"
+    if target.endswith("/index/"):
+        target = target[: -len("index/")]
+    return posixpath.relpath(target or ".", _base(page_url) or ".") + "/"
 
 
 def _tag_link(tag: str, base: str) -> str:
@@ -172,14 +231,89 @@ def _header(q: dict, markdown: str, page_url: str) -> str:
     )
 
 
-def _tools() -> str:
-    """Toolbar under the header: open / close every block, practice mode with a stopwatch."""
-    return ('<div class="question-tools">'
+def _tools(q: dict, page_url: str) -> str:
+    """Toolbar under the header: open / close every block, practice mode with a stopwatch,
+    solved / favourite marks (kept in the browser) and a random question of the same level."""
+    others = [o for o in _questions.values() if o["id"] != q["id"]]
+    same = [o for o in others if o["level"] == q["level"]] or others
+    random_btn = ""
+    if same:
+        hrefs = json.dumps([_href(o["src_uri"], page_url) for o in sorted(same, key=lambda o: o["id"])])
+        random_btn = (f'<button type="button" class="qt-btn qt-random" data-hrefs="{html.escape(hrefs)}" '
+                      'title="שאלה אקראית מאותה רמה">שאלה אקראית</button>')
+    return (f'<div class="question-tools" data-search-exclude data-qid="{q["id"]}">'
             '<button type="button" class="qt-btn qt-open">פתח הכל</button>'
             '<button type="button" class="qt-btn qt-close">סגור הכל</button>'
             '<button type="button" class="qt-btn qt-practice">מצב תרגול</button>'
             '<span class="qt-clock" hidden></span>'
+            '<span class="qt-spacer"></span>'
+            '<button type="button" class="qt-btn qt-mark qt-solved" data-mark="solved" aria-pressed="false">✓ פתרתי</button>'
+            '<button type="button" class="qt-btn qt-mark qt-star" data-mark="star" aria-pressed="false">☆ מועדף</button>'
+            f'{random_btn}'
             '</div>\n\n')
+
+
+def _progress(ids) -> str:
+    """Placeholder for the "solved n of m" bar; marks.js fills it from the browser's marks."""
+    return (f'<div class="mark-progress" data-ids="{" ".join(ids)}" hidden>'
+            '<span class="mp-bar"><i></i></span><span class="mp-text"></span></div>')
+
+
+def _path_nav(q: dict, page_url: str) -> str:
+    """One line per study path that contains the question: step n of m, previous and next."""
+    lines = []
+    for p in _paths:
+        ids = [s["q"]["id"] for s in p["steps"]]
+        if q["id"] not in ids:
+            continue
+        i = ids.index(q["id"])
+        parts = [f'<span class="pn-path">מסלול <a href="{_href(p["src_uri"], page_url)}">{html.escape(p["title"])}</a></span>'
+                 f'<span class="pn-step">שלב {i + 1} מתוך {len(ids)}</span>']
+        for label, cls, k in (("הקודם", "pn-prev", i - 1), ("הבא", "pn-next", i + 1)):
+            if 0 <= k < len(ids):
+                other = p["steps"][k]["q"]
+                parts.append(f'<a class="{cls}" href="{_href(other["src_uri"], page_url)}" '
+                             f'title="{html.escape(str(other["title"]))}">{label}: <span class="pn-id">{other["id"]}</span></a>')
+        lines.append('<div class="path-nav-line">' + "".join(parts) + "</div>")
+    if not lines:
+        return ""
+    return '<div class="path-nav" data-search-exclude>' + "".join(lines) + "</div>\n\n"
+
+
+def _inline_code(text: str) -> str:
+    """Escape a note and turn `x` into <code>x</code> (keeps "f()" from being mirrored)."""
+    return re.sub(r"`([^`]+)`", r"<code>\1</code>", html.escape(text))
+
+
+def _path_steps(page) -> str:
+    p = next((p for p in _paths if p["src_uri"] == page.file.src_uri), None)
+    if p is None:
+        return ""
+    items = []
+    for n, s in enumerate(p["steps"], 1):
+        q = s["q"]
+        items.append(
+            f'<li class="path-step" data-id="{q["id"]}"><span class="ps-num">{n}</span>'
+            f'<div class="ps-body"><div class="ps-head"><span class="ps-id">{q["id"]}</span>'
+            f'<a class="ps-title" href="{_href(q["src_uri"], page.url)}">{html.escape(str(q["title"]))}</a>'
+            f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}<span class="ps-mark"></span></div>'
+            f'<p class="ps-note">{_inline_code(s["note"])}</p></div></li>')
+    ids = [s["q"]["id"] for s in p["steps"]]
+    return _progress(ids) + '<ol class="path-steps">' + "".join(items) + "</ol>"
+
+
+def _path_cards(page_url: str) -> str:
+    cards = []
+    for p in _paths:
+        ids = [s["q"]["id"] for s in p["steps"]]
+        cards.append(
+            f'<a class="level-card path-card" href="{_href(p["src_uri"], page_url)}">'
+            f'<div class="lc-head"><span class="lc-name">{html.escape(p["title"])}</span>'
+            f'<span class="lc-count">{len(ids)} שאלות</span></div>'
+            f'<p class="lc-desc">{html.escape(p["description"])}</p>'
+            f'<div class="lc-diff"><span class="pc-ids">{" · ".join(ids)}</span></div>'
+            f'{_progress(ids)}</a>')
+    return '<div class="level-cards">' + "".join(cards) + "</div>"
 
 
 def _has_tests(q: dict) -> bool:
@@ -202,7 +336,8 @@ def _level_cards(page_url: str) -> str:
             f'<div class="lc-head"><span class="lc-name">{label}</span>'
             f'<span class="lc-count">{len(qs)} שאלות</span></div>'
             f'<p class="lc-desc">{LEVEL_DESC[level]}</p>'
-            f'<div class="lc-diff">{diff}</div></a>'
+            f'<div class="lc-diff">{diff}</div>'
+            f'{_progress(sorted(q["id"] for q in qs)) if qs else ""}</a>'
         )
     return '<div class="level-cards">' + "".join(cards) + "</div>"
 
@@ -255,7 +390,6 @@ def _table(level: str | None, page_url: str) -> str:
     if not rows:
         return '<p class="questions-empty">עדיין אין שאלות בקטגוריה הזו.</p>'
 
-    base = page_url if page_url.endswith("/") or not page_url else posixpath.dirname(page_url) + "/"
     tags = sorted({t for q in rows for t in q["tags"]})
 
     def group(name: str, label: str, values) -> str:
@@ -267,29 +401,42 @@ def _table(level: str | None, page_url: str) -> str:
         return (f'<div class="filter-group" data-filter="{name}" data-value="">'
                 f'<span class="filter-label">{label}</span>{chips}</div>')
 
-    out = ['<div class="question-filter" markdown="0">']
+    out = ['<div class="question-filter" markdown="0" data-search-exclude>']
     if level is None:
         out.append(group("level", "משרה", LEVELS.items()))
     out.append(group("difficulty", "קושי", DIFFICULTIES.items()))
     out.append(group("tag", "נושא", ((t, t) for t in tags)))
-    out.append('<label class="filter-search">חיפוש '
-               '<input type="search" data-filter="text" placeholder="חיפוש בכותרת"></label>')
+    out.append(group("mark", "סימון", [("star", "מועדפים"), ("solved", "פתורות"), ("unsolved", "לא פתורות")]))
+    sorts = [("id", "מספר"), ("title", "שם")] + ([("level", "משרה")] if level is None else []) + [("difficulty", "קושי")]
+    out.append('<div class="filter-tools">'
+               '<label class="filter-search">חיפוש '
+               '<input type="search" data-filter="text" placeholder="חיפוש בכותרת"></label>'
+               '<label class="filter-sort">מיון <select>'
+               + "".join(f'<option value="{k}">{l}</option>' for k, l in sorts)
+               + '</select></label>'
+               '<button type="button" class="filter-random">שאלה אקראית</button></div>')
     out.append("</div>")
 
-    level_col = "<th>משרה</th>" if level is None else ""
+    def th(key: str | None, label: str) -> str:
+        if key is None:
+            return f"<th>{label}</th>"
+        return f'<th data-sort="{key}"><button type="button" class="th-sort">{label}</button></th>'
+
+    level_col = th("level", "משרה") if level is None else ""
     # The table itself has no class, so Material styles it and wraps it for scrolling
     out.append('<div class="questions-wrap"><table><thead><tr>'
-               f"<th>#</th><th>שאלה</th>{level_col}<th>קושי</th><th>נושאים</th>"
+               f'{th("id", "#")}{th("title", "שאלה")}{level_col}{th("difficulty", "קושי")}{th(None, "נושאים")}'
                "</tr></thead><tbody>")
     for q in rows:
-        target = q["src_uri"][: -len(".md")] + "/"
-        href = posixpath.relpath(target, base or ".") + "/"
+        href = _href(q["src_uri"], page_url)
         level_td = f'<td class="q-level">{level_chip(q["level"])}</td>' if level is None else ""
         out.append(
-            f'<tr data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" '
+            f'<tr data-id="{q["id"]}" data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" '
+            f'data-level-rank="{LEVEL_RANK[q["level"]]}" data-diff-rank="{DIFF_RANK[q["difficulty"]]}" '
             f'data-tags="{html.escape(" ".join(q["tags"]))}">'
             f'<td class="q-id">{q["id"]}</td>'
-            f'<td class="q-title"><a href="{href}">{html.escape(str(q["title"]))}</a> {new_chip(q)}</td>'
+            f'<td class="q-title"><a href="{href}">{html.escape(str(q["title"]))}</a> {new_chip(q)}'
+            '<span class="q-marks"></span></td>'
             f"{level_td}"
             f'<td class="q-diff">{difficulty_chip(q["difficulty"])}</td>'
             f'<td class="q-tags">{" ".join(f"<code>{html.escape(t)}</code>" for t in q["tags"])}</td>'
@@ -345,9 +492,48 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     if q:
         page.meta["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], *q["tags"]]
         page.meta.setdefault("hide", []).append("tags")   # the header card shows them
-        markdown = (_header(q, markdown, page.url) + _tools() + markdown
+        markdown = (_header(q, markdown, page.url) + _tools(q, page.url) + _path_nav(q, page.url) + markdown
                     + _run_panel(q, markdown) + _related(q, page.url))
 
     markdown = CARDS.sub(lambda m: _level_cards(page.url), markdown)
     markdown = STATS.sub(lambda m: _stats(), markdown)
+    markdown = PATH_STEPS.sub(lambda m: _path_steps(page), markdown)
+    markdown = PATH_CARDS.sub(lambda m: _path_cards(page.url), markdown)
     return PLACEHOLDER.sub(lambda m: _table(m.group(1), page.url), markdown)
+
+
+def _search_variants(raw_tokens: set[str], words: list[str], known: set[str]) -> set[str]:
+    """Clean words that differ from the raw index tokens, and Hebrew words without their
+    prefix letters: one letter always (when 3+ letters remain), two or three letters only
+    when the rest is a word that appears somewhere on the site."""
+    out = set()
+    for w in words:
+        out.add(w.lower())
+        if not ("\u05d0" <= w[0] <= "\u05ea"):
+            continue
+        for k in (1, 2, 3):
+            if len(w) - k < 3 or w[k - 1] not in PREFIX_LETTERS:
+                break
+            rest = w[k:]
+            if k == 1 or rest in known:
+                out.add(rest)
+    return out - raw_tokens
+
+
+def on_post_build(config, **kwargs):
+    path = Path(config["site_dir"]) / "search" / "search_index.json"
+    if not path.exists():
+        return
+    index = json.loads(path.read_text(encoding="utf-8"))
+    sep = re.compile(index["config"].get("separator") or r"[\s\-]+")
+    texts = []
+    for doc in index["docs"]:
+        plain = re.sub(r"<[^>]+>", " ", doc.get("title", "") + " " + doc.get("text", ""))
+        texts.append((set(t.lower() for t in sep.split(plain) if t), WORD.findall(plain)))
+    known = {w for _, words in texts for w in words}
+    for doc, (raw, words) in zip(index["docs"], texts):
+        extra = _search_variants(raw, words, known)
+        if extra:
+            doc[SEARCH_FIELD] = " ".join(sorted(extra))
+    index["config"]["fields"][SEARCH_FIELD] = {"boost": 1.0}
+    path.write_text(json.dumps(index, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")

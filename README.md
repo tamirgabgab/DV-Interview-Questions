@@ -34,6 +34,7 @@ level**, **difficulty** and **topic**.
 | 0012 | Sort the digits and subtract (3-digit Kaprekar routine) | student | 🟢 easy | digits, 3-element sorting network, proof (0 and 495) |
 | 0013 | Sort the digits and subtract, four digits (Kaprekar's constant) | junior | 🟡 medium | 4-element sorting network, column subtraction, case analysis (0 and 6174) |
 | 0014 | Random non-overlapping squares, then rectangles, on a grid of points | junior | 🟡 medium | SV constraints on dynamic arrays, pairwise no-overlap, constraint override, the cross trap |
+| 0015 | Two children, at least one boy (boy or girl paradox, the Tuesday boy) | student | 🟢 easy | conditional probability, inclusion-exclusion, Bayes, general formula, outcome grids (no code) |
 
 Update this table whenever a question is added.
 
@@ -107,10 +108,12 @@ DV-Interview-Questions/
 │   ├── extract_code.py         # Pulls the code blocks out of a question page
 │   ├── lint_pages.py           # Checks the page skeleton and the RTL rules
 │   ├── check_links.py          # Internal link / anchor check of the built site
+│   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors)
 │   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
 │   └── figures/                # Generators of the inline SVG figures (q<id>.py, stepper.py)
 ├── tests/
 │   ├── conftest.py
+│   ├── hook/                   # Tests of the site hook (search variants, study paths)
 │   └── <id>/                   # One folder per question with code, e.g. tests/0006/
 │       ├── test_<id>.py        # pytest tests of the page's Python code
 │       ├── tb.sv               # SystemVerilog testbench of the page's SV code
@@ -120,17 +123,18 @@ DV-Interview-Questions/
 ├── docs/                       # Site content
 │   ├── index.md                # Home page with the table of all questions
 │   ├── tags.md                 # Tag index
+│   ├── paths/                  # Study paths: index.md + one page per path
 │   ├── questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
-│   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…
+│   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
 │   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…
 │   │   ├── senior/            # 0007-…, 0011-…
 │   │   └── staff/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
 │   │   └── images/             # Figures and screenshots referenced by questions
-│   ├── javascripts/            # MathJax, WaveDrom, table filter, Python runner (Pyodide)
+│   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner
 │   └── stylesheets/extra.css   # Palette, chips, question header, tables / cards, figures
 └── .github/workflows/deploy.yml  # Test + build on every push, deploy main to GitHub Pages
 ```
@@ -249,14 +253,38 @@ not start with the id, or a duplicate id. It also generates, per question page:
 - the Material tags (level, difficulty, topics) for the tag index, with the tag chips above
   the title hidden because the header card shows them;
 - a **toolbar** (open all / close all, practice mode that hides the solutions and starts a
-  stopwatch; the mode is remembered in the browser);
+  stopwatch; "solved" and "favourite" marks; a random question of the same level). Practice
+  mode and the marks are kept in the browser's localStorage (`docs/javascripts/marks.js`),
+  so they are per browser and are not sent anywhere;
+- a **study path bar** under the toolbar for every path that contains the question (step n
+  of m, previous and next in the path);
 - a **related questions** list at the end (up to three questions sharing the most topic
   tags, `python` and `systemverilog` not counted), and the previous / next links come from
   Material's `navigation.footer`.
 
 The question tables on the home and level pages have **chip filters** (one choice per group:
-level, difficulty, topic) plus a title search, and turn into **cards** on narrow screens
-(`docs/javascripts/question-filter.js`, `.questions-wrap` in `extra.css`).
+level, difficulty, topic, and the reader's own marks: favourites, solved, not solved) plus a
+title search, **sortable columns** (header buttons; a "sort" select on phones), a **random
+question** button that picks among the rows left after filtering, and turn into **cards** on
+narrow screens (`docs/javascripts/question-filter.js`, `.questions-wrap` in `extra.css`).
+The level cards and path cards show a "solved n of m" bar from the same marks.
+
+### Study paths
+
+A study path is a short ordered list of questions on one topic, one file per path in
+`docs/paths/` (front matter `title`, `description`, `order`, and `steps`: a list of
+`{id, note}`; the note is one Hebrew sentence, with code in backticks). The page body is a
+short intro and the `<!-- path-steps -->` placeholder; `docs/paths/index.md` and the home
+page show the `<!-- path-cards -->`. The hook validates the ids, adds a "מסלולים" tab to the
+navigation and puts the path bar on each question of the path.
+
+### Search
+
+Material's search splits on whitespace only and has no Hebrew stemmer, so a word with a
+prefix letter (ו ה ב כ ל מ ש) or glued punctuation would not be found. After the build, the
+hook adds a hidden `alt` field to every search document with the clean words and their forms
+without the prefix letters (one letter always, two or three letters when the rest is a word
+used on the site). The toolbar, filters and path bar carry `data-search-exclude`.
 
 ### Diagrams, formulas and figures
 
@@ -293,7 +321,8 @@ follow the light / dark switch automatically:
 
 Site-wide (HTML) classes in the same file: `chip`, `chip-level`, `chip-diff-*`, `chip-new`
 (level, difficulty and "new" chips), `question-header` (header card), `question-tools`
-(toolbar), `related-questions`, `question-filter` / `filter-group` / `filter-chip` (table
+(toolbar, with `qt-mark` / `qt-random`), `path-nav`, `path-steps`, `path-card`, `mark-progress`,
+`related-questions`, `question-filter` / `filter-group` / `filter-chip` (table
 filters), `questions-wrap` (table that becomes cards on phones), the admonition types
 `answer` / `interviewer` / `trap` / `followup`, the solution labels `sol-*`, `steps` and
 `stepper` (with the `st-*` SVG cell classes). The palette lives in the `[data-md-color-scheme]` blocks at the top:
@@ -333,7 +362,14 @@ python tools/run_tests.py             # everything (under a minute once compiled
 python tools/run_tests.py 6 7         # only questions 0006 and 0007
 python tools/run_tests.py --python-only
 python tools/check_links.py           # internal links and anchors of the built site
+python tools/check_phone.py           # every built page at 390 px: no sideways scroll, no JS errors
 ```
+
+`check_phone.py` needs Playwright (`requirements-dev.txt`) and its Chromium
+(`python -m playwright install chromium`). It writes a screenshot of each page to
+`.cache/phone/` (CI uploads them as the `phone-screenshots` artifact). Without access to the
+CDNs, add `--offline` and serve MathJax and Mermaid from local copies with `--route`, as in
+`HANDOFF.md`. `tests/hook/` tests the hook itself (search variants, study paths).
 
 The SystemVerilog tests need **Verilator newer than 5.052, with the z3 solver**, so that
 `randomize()` with constraints runs the classes exactly as published (the 5.052 release

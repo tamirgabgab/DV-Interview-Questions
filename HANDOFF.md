@@ -279,6 +279,42 @@ pushed to `main`, which publishes the site.
    table match the generator. The home stats strip now counts "questions with code" only
    for pages that have code (`has_code` in the hook), so 0015 is not counted there.
 
+### Session 6 (continued) — 2026-10-18: round C, C17 to C22
+
+Owner's choices: the proposed five paths; manual "solved" + "favourite" marks; the phone
+check blocks the deploy; the random button in the tables and on question pages.
+
+1. **C17, phone check in CI:** `tools/check_phone.py` serves the built site, opens every page
+   at 390 x 844 with all blocks open, and fails on sideways scroll or a script error, naming
+   the widest elements (the off-screen menu drawer and elements inside scroll containers are
+   skipped). Screenshots are uploaded as the `phone-screenshots` artifact. Playwright 1.56.0
+   is in `requirements-dev.txt`. Locally: `--offline` and `--route` for MathJax and Mermaid
+   (without Mermaid the raw diagram source overflows on 0001, 0004 and 0005, which is a
+   sandbox artefact). Checked that it fails on an injected 700 px element and a JS error.
+2. **C18, sorting:** header buttons on wide screens (id, title, level, difficulty; again to
+   reverse; ties keep the ids ascending), a "sort" select on phones where the header is hidden.
+3. **C19, study paths:** `docs/paths/*.md` (constraints 0007-0014-0011, probability
+   0015-0007-0009, logic puzzles 0004-0008-0009, coding 0002-0010-0006-0005, digits
+   0012-0013-0005), a "מסלולים" tab, path cards on the home page, and a path bar on every
+   question of a path. Notes may use backticks: a call like `f()` at the end of a Latin run
+   inside Hebrew text is otherwise shown with mirrored parentheses.
+4. **C20, random question:** in the tables, among the rows left after filtering (disabled
+   when none); on a question page, another question of the same level (all questions when
+   the level has no other).
+5. **C21, Hebrew search:** the bundled `lunr.he` turned out to do almost nothing (it only
+   rewrites final letters), and MkDocs drops `lang: he` anyway. Instead `on_post_build`
+   adds a hidden `alt` field per search document: clean words and the forms without prefix
+   letters (one letter always, two or three when the rest is a word on the site). Measured
+   in the browser: "טבלה" 1 page before, 9 after; "ישראל" 1 to 11; "תנאי" 7 to 13; English
+   queries unchanged. Toolbar, filters and path bar carry `data-search-exclude`.
+6. **C22, marks:** `docs/javascripts/marks.js` keeps `dvq-marks` in localStorage (per browser,
+   synced across tabs), the toolbar buttons toggle them, the tables show ✓ / ★ and a "סימון"
+   filter, the counter says how many are solved, and level cards, path cards and path pages
+   show a "solved n of m" bar.
+7. **Tests of the hook:** `tests/hook/test_hook.py` (search variants, path validation and
+   RTL of the notes), run by `run_tests.py` with the question tests.
+8. README catalog row for 0015 (was missing), README / CLAUDE.md updated.
+
 ## In progress
 
 - Waiting for the next batch of questions from the owner.
@@ -428,12 +464,12 @@ Effort: **S** under an hour, **M** a few hours, **L** a day or more.
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| C17 | Phone check in CI: screenshot every page at 390 px and fail on horizontal scroll | M |
-| C18 | Sortable table columns | S |
-| C19 | Topic pages / study paths (e.g. constraints: 0007 → 0014 → 0011) with a short intro each | M |
-| C20 | Random question button honouring the filters | S |
-| C21 | Better Hebrew search (prefix letters ו/ה/ב/ל/מ/ש as separators) | M |
-| C22 | Solved / favourite marks in the browser with a progress bar per level | M |
+| C17 | ~~Phone check in CI: screenshot every page at 390 px and fail on horizontal scroll~~ — done in session 6 | M |
+| C18 | ~~Sortable table columns~~ — done in session 6 | S |
+| C19 | ~~Topic pages / study paths (e.g. constraints: 0007 → 0014 → 0011) with a short intro each~~ — done in session 6 | M |
+| C20 | ~~Random question button honouring the filters~~ — done in session 6 | S |
+| C21 | ~~Better Hebrew search (prefix letters ו/ה/ב/ל/מ/ש as separators)~~ — done in session 6 | M |
+| C22 | ~~Solved / favourite marks in the browser with a progress bar per level~~ — done in session 6 | M |
 | C23 | Social preview cards per question | S–M |
 | C24 | Comments per question via GitHub Discussions | M |
 
@@ -454,7 +490,7 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 3 | **Random question** button, honouring the current filters | S–M | JS on the home page, reads the generated question table |
 | 4 | **Solved / favourite marks** stored in the browser, with progress per level | M | `localStorage`; show ✅ / ⭐ in the tables and a progress bar on level pages |
 | 5 | ~~Interview mode~~ | M | **Done** in session 4 as "practice mode" (solutions hidden, stopwatch counting up) |
-| 6 | **Sortable table columns** (id, level, difficulty); ~~coloured chips~~ | S–M | Chips done in session 4; sorting is C18 |
+| 6 | ~~**Sortable table columns** (id, level, difficulty); coloured chips~~ | S–M | Done: chips in session 4, sorting in session 6 (C18) |
 | 7 | ~~Related questions by shared tags~~ | S–M | **Done** in session 4 (round A) |
 | 7a | ~~Hint ladder~~ | S | **Done** in session 4 (round B) |
 | 7b | **Question type filter** (puzzle / code / design / knowledge) next to level and difficulty | S–M | New optional front-matter field, read by the hook and `question-filter.js` |
@@ -482,12 +518,12 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 13 | ~~Site logo and favicon~~ | S | **Done** in session 4 (round A) |
 | 14 | ~~Statistics on the home page~~ | S–M | **Done** in session 4 (round B) |
 | 15 | ~~Show the `added` date, `source` and a "new" badge~~ | S | **Done** (date in session 4, source and the 30-day "new" chip in session 5) |
-| 16 | **Better Hebrew search** | M | The built-in search splits Hebrew on whitespace only; evaluate the search `separator` setting or an alternative index |
+| 16 | ~~**Better Hebrew search**~~ (done, C21) | M | The built-in search splits Hebrew on whitespace only; evaluate the search `separator` setting or an alternative index |
 | 17 | **Social preview cards** when sharing a question link | S–M | Material `social` plugin (needs extra image dependencies in CI) |
 | 18 | **Comments / discussion** per question via GitHub Discussions (giscus) | M | Public site, so readers could ask questions |
 | 19 | **PDF export** of a filtered question set for offline practice | M–L | e.g. a print-site plugin |
 | 20 | Bilingual content (Hebrew / English) | L | Only if the audience grows beyond Hebrew readers |
-| 21 | **Mobile check** of every page in CI (screenshots at phone width) | M | Wide tables and figures were the main issue so far (see the 0009 box grid) |
+| 21 | ~~**Mobile check** of every page in CI~~ (done, C17) (screenshots at phone width) | M | Wide tables and figures were the main issue so far (see the 0009 box grid) |
 | 22 | **Topic pages**: a short intro per topic (FSM, SVA, coverage...) linking to its questions | M | Turns the tag index into a study guide (C19) |
 | 23 | ~~Step-through figures (B14)~~ | M | **Done** in session 5 (0010 stack, 0009 walks) |
 
@@ -508,7 +544,9 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   the file name must start with the zero-padded id.
 - External scripts (MathJax, WaveDrom) load from `cdn.jsdelivr.net`; Mermaid is loaded by
   Material itself from `unpkg.com`. The cloud sandbox cannot reach these CDNs, so local
-  screenshot checks serve them from `npm pack` copies via Playwright request routing.
+  screenshot checks serve them from `npm pack` copies via Playwright request routing. The
+  phone check in the sandbox:
+  `python tools/check_phone.py site --offline --route 'mathjax@3\.2\.2/es5/tex-mml-chtml\.js=<mathjax copy>/es5/tex-mml-chtml.js' --route 'unpkg\.com/mermaid@11/dist/mermaid\.min\.js=<mermaid copy>/dist/mermaid.min.js'`.
 - Publishing: push to `main` → the workflow builds and deploys. It can also be started
   manually (`workflow_dispatch`). `actions/deploy-pages@v4` prints a Node.js 20
   deprecation warning; bump the action versions when newer majors are available.

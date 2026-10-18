@@ -53,6 +53,8 @@ def selected_dirs(ids: list[str]) -> list[Path]:
     if ids:
         wanted = {f"{int(i):04d}" for i in ids}
         dirs = [d for d in dirs if d.name[:4] in wanted]
+    else:
+        dirs.append(TESTS / "hook")      # tests of the site hook, not of a question
     return dirs
 
 
