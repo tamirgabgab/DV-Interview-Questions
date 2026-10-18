@@ -11,7 +11,7 @@ level**, **difficulty** and **topic**.
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 14 questions (see the catalog below).
+> **Status:** the site is live and holds 19 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
 
 ---
@@ -37,6 +37,8 @@ level**, **difficulty** and **topic**.
 | 0015 | Two children, at least one boy (boy or girl paradox, the Tuesday boy) | student | 🟢 easy | conditional probability, inclusion-exclusion, Bayes, general formula, outcome grids (no code) |
 | 0016 | The Josephus problem: who is left last in the circle? | junior | 🟡 medium | queue simulation, closed form 2L + 1 by induction, bit rotation, recurrence for any k, step-through circles |
 | 0017 | Find the duplicate number without changing the array and in O(1) memory | junior | 🟡 medium | sort / seen table / binary search on values / Floyd's cycle detection, rho graph, tortoise-and-hare stepper |
+| 0018 | Two hourglasses: measure D minutes from time 0 | junior | 🟡 medium | BFS over (time, sand, sand) states, decide only at events, hourglass stepper and branching figure |
+| 0019 | Two hourglasses: measure D minutes between two moments | senior | 🔴 hard | Dijkstra over (sand, sand, measured) with a zero-cost "start" edge, Bézout, hourglass stepper |
 
 Update this table whenever a question is added.
 
@@ -130,8 +132,8 @@ DV-Interview-Questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
-│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…
-│   │   ├── senior/            # 0007-…, 0011-…
+│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…
+│   │   ├── senior/            # 0007-…, 0011-…, 0019-…
 │   │   └── staff/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
@@ -299,7 +301,7 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 | Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007) |
 | Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles)          |
 | Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
-| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 circles, 0017 tortoise and hare) |
+| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events) |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 
@@ -319,6 +321,7 @@ follow the light / dark switch automatically:
 | `box-node`, `box-hl`, `box-num`, `*-fill` (arrowheads), `s3-line` | Graph of boxes / cycles (0009) |
 | `.box-grid` (HTML) | Compact row of numbered cells with a value in each (0009; `bg-10` for ten cells, 0017) |
 | `fl-slow`, `fl-fast` | Tortoise and hare rings on a graph (0017) |
+| `sand-a`, `sand-b`, `stream-*`, `glass`, `frame`, `measure`, `pruned` | Hourglasses: sand, the falling stream, the glass and frame, the measurement window, a pruned option (0018, 0019; drawn by `tools/figures/hourglass.py`) |
 | `ttt-grid`, `ttt-ghost`, `mark`, `mark-new`, `cell-s1`…`cell-s3` | Tic-tac-toe boards with highlighted cells (0011) |
 | `gp-line`, `gp-dot`, `shp-1`…`shp-3`, `shp-bad`, `shp-num`, `sep-zone`, `dash`, `coord`, `zone-label`, `halo` | Shapes on a grid of points, overlap areas, zones, text with a background halo (0014) |
 
