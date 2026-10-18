@@ -413,6 +413,47 @@ three figures: the parameters figure, the map of all splits, a Mermaid flowchart
    Note: `join` is a reserved word (fork / join), the testbench helper is `joined`.
 4. README catalog, layout and figure class tables; this file.
 
+### Session 8 (continued) — 2026-10-18: question 0021
+
+The owner sent a Markdown proof of the counting formula and asked for a second PCIe
+question, senior / medium, no code: count the splits for numeric cases, then prove the
+general formula. Choices: all cases with MPS = 256 and RCB = 64 (the special case of the
+bonus), 256-byte requests aligned / unaligned in part a (8, 16), 512-byte requests in
+part b (108, 208), the proof as part c with T(N, k), the special cases, the delta example
+and the numeric verification; figures: block structure per case, maps of all splits only
+for the small cases, the first-completion branching for N = 8, the three cases of lemma 2.
+
+1. **0021** (`docs/questions/senior/0021-pcie-completion-count.md`): part a, every subset of
+   the interior boundaries is legal when L <= MPS, so 2^(N-1) with N the number of blocks
+   (the unaligned request touches one block more). Part b, a completion holds at most
+   m = MPS / RCB blocks, so the count is the number of compositions of N with parts 1..m:
+   C(N) = C(N-1) + ... + C(N-4), the table 1, 1, 2, 4, 8, 15, 29, 56, 108, 208. Part c, the
+   owner's proof written out step by step: five lemmas (bijection with subsets, the MPS
+   rule in blocks with its three cases, the delta exception for N = m + 1 and L <= MPS,
+   compositions and the generating function (1 - x) / (1 - 2x + x^(m+1)), the closed form
+   S(n) by geometric series and binomial), the count by number of completions by
+   inclusion-exclusion, the special cases m = 1 / 2 / >= N, the special case MPS = 256 and
+   RCB = 64 with the S(n) table and the four cases of parts a and b, and the numeric sweep.
+   The unaligned 256-byte request is itself the delta case (f + e = 64 <= RCB), which the
+   page uses as the bridge between parts a and c.
+2. **Figures** from `tools/figures/q0021.py` (self-contained counting: splits, DP count,
+   compositions, S, T; shares the `cs-*` classes of 0020): block structure with f, e, N,
+   |B|, m and delta per case; the maps of all splits for 8, 16 and the delta example
+   (0x1020, 128, MPS 128: 4 splits); the branching of the first completion for N = 8; the
+   three cases of lemma 2 with the inequality next to each.
+3. **Tests** (`tests/0021`, no page code): the four counts and the delta example by subset
+   enumeration, DP count and formula; the recursion and S(n) tables; T(N, k) against the
+   enumeration grouped by k; the special cases (Fibonacci, 2^(N-1)); 400 random requests;
+   the sweep quoted on the page (RCB 64 / 128, MPS 128..1024, every DW offset, lengths 4
+   to 1596: 76,608 cases, formula = DP); figures and tables against the generator.
+4. **0020 fixes:** the four rules were written with an RLM before the list numbers, which
+   turned them into one paragraph; now a real ordered list. The "count without
+   enumerating" follow-up links to 0021.
+5. **Phone lesson again:** every display equation wider than ~350 px at 390 px was split
+   with `aligned` (ten of them in the proof); a long inline chain in a short answer was
+   shortened with `\dots`. Measured with a Playwright script that lists the
+   `mjx-container[display]` widths.
+
 ## In progress
 
 - Waiting for the next batch of questions from the owner.
@@ -424,7 +465,7 @@ three figures: the parameters figure, the map of all splits, a Mermaid flowchart
 ### Owner decisions
 
 - [ ] Keep example question `0001` or replace it with real content.
-- [ ] Staff level is still empty and Senior has four questions (0007, 0011, 0019, 0020) — any questions for these levels?
+- [ ] Staff level is still empty and Senior has five questions (0007, 0011, 0019, 0020, 0021) — any questions for these levels?
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 
 ### Content
@@ -439,16 +480,16 @@ three figures: the parameters figure, the map of all splits, a Mermaid flowchart
 
 ## Question variety
 
-### Coverage today (20 questions)
+### Coverage today (21 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus, cycle detection |
-| Senior | 0007, 0011, 0019, 0020 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules and recursive enumeration |
+| Senior | 0007, 0011, 0019, 0020, 0021 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof |
 | Staff | — | — |
 
-Algorithms and puzzles are well covered, and 0020 is the first protocol question (PCIe).
+Algorithms and puzzles are well covered, and 0020 / 0021 are the first protocol questions (PCIe).
 **Core DV topics are still missing:** UVM, SVA, functional coverage, FIFOs, clock domain
 crossing, FSM design, debug, and verification planning.
 

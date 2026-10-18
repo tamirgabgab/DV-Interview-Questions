@@ -11,7 +11,7 @@ level**, **difficulty** and **topic**.
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 20 questions (see the catalog below).
+> **Status:** the site is live and holds 21 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
 
 ---
@@ -40,6 +40,7 @@ level**, **difficulty** and **topic**.
 | 0018 | Two hourglasses: measure D minutes from time 0 | junior | 🟡 medium | BFS over (time, sand, sand) states, decide only at events, hourglass stepper and branching figure |
 | 0019 | Two hourglasses: measure D minutes between two moments | senior | 🔴 hard | Dijkstra over (sand, sand, measured) with a zero-cost "start" edge, Bézout, hourglass stepper |
 | 0020 | PCIe: every legal completion split of one read request (MRRS, MPS, RCB) | senior | 🟡 medium | protocol rules → "every cut on an RCB boundary", recursive enumeration largest-first, 2^c count, splits map, MPS pruning |
+| 0021 | PCIe: how many completion splits (two 256-byte and two 512-byte requests), and the general formula with proof | senior | 🟡 medium | blocks and interior boundaries, 2^(N-1) when MPS does not bind, compositions with parts ≤ m, generating function, closed form S(N) − S(N−1) + δ, T(N, k), no code |
 
 Update this table whenever a question is added.
 
@@ -134,7 +135,7 @@ DV-Interview-Questions/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
 │   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…
-│   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…
+│   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…
 │   │   └── staff/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
@@ -323,7 +324,7 @@ follow the light / dark switch automatically:
 | `.box-grid` (HTML) | Compact row of numbered cells with a value in each (0009; `bg-10` for ten cells, 0017) |
 | `fl-slow`, `fl-fast` | Tortoise and hare rings on a graph (0017) |
 | `sand-a`, `sand-b`, `stream-*`, `glass`, `frame`, `measure`, `pruned` | Hourglasses: sand, the falling stream, the glass and frame, the measurement window, a pruned option (0018, 0019; drawn by `tools/figures/hourglass.py`) |
-| `cs-rcb`, `cs-req`, `cs-first`, `cs-mid`, `cs-last`, `cs-one`, `cs-bad`, `cs-can`, `cs-size` | PCIe completion splits over the address axis: RCB grid, request limits, completions by role, one above MPS (0020; drawn by `tools/figures/q0020.py`) |
+| `cs-rcb`, `cs-req`, `cs-first`, `cs-mid`, `cs-last`, `cs-one`, `cs-bad`, `cs-can`, `cs-size` | PCIe completion splits over the address axis: RCB grid, request limits, completions by role, one above MPS (0020, 0021; drawn by `tools/figures/q0020.py` and `q0021.py`) |
 | `ttt-grid`, `ttt-ghost`, `mark`, `mark-new`, `cell-s1`…`cell-s3` | Tic-tac-toe boards with highlighted cells (0011) |
 | `gp-line`, `gp-dot`, `shp-1`…`shp-3`, `shp-bad`, `shp-num`, `sep-zone`, `dash`, `coord`, `zone-label`, `halo` | Shapes on a grid of points, overlap areas, zones, text with a background halo (0014) |
 
