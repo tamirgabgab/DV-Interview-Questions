@@ -315,6 +315,30 @@ check blocks the deploy; the random button in the tables and on question pages.
    RTL of the notes), run by `run_tests.py` with the question tests.
 8. README catalog row for 0015 (was missing), README / CLAUDE.md updated.
 
+### Session 6 (continued) — 2026-10-18: questions 0016 and 0017
+
+The owner asked for questions with more logic, coding, math and a little digital design
+(not UVM / methodology), picked two from a list of fifteen, and chose junior / medium for
+both, three parts for Josephus, four solutions for the duplicate, steppers plus figures.
+
+1. **0016, the Josephus problem:** part a, queue simulation; part b, the closed form
+   J(n) = 2L + 1 for n = 2^m + L, proved from J(2j) = 2J(j) - 1 and J(2j + 1) = 2J(j) + 1,
+   and the bit rotation (move the leading 1 to the end); part c, any k with
+   f(m) = (f(m - 1) + k) mod m (41 people, k = 3: 31). Figures from `tools/figures/q0016.py`:
+   circle steppers for n = 10, k = 2 and n = 7, k = 3, the survivors table, the sawtooth chart,
+   the one-round table, the bit-rotation figure, the recurrence table. **Bug found by the
+   tests:** `while (2 * top <= n)` never ends for n >= 2^30 (32-bit overflow); the page uses
+   `top <= n / 2` and says why.
+2. **0017, find the duplicate (LeetCode 287):** solutions sort (copy), seen table, binary
+   search on the values (pigeonhole invariant), Floyd (rho graph, the entry has two incoming
+   edges, proof of phase 2). `const ref` inputs in SystemVerilog, and the tests check that no
+   solution changes the array. Figures from `tools/figures/q0017.py`: the array as cells,
+   the rho graph, the binary-search table, the tortoise-and-hare stepper.
+3. Both added to the coding path (after 0006). Phone tables: Material's 5rem header
+   min-width made four-column tables scroll at 390 px; on phones the padding is smaller and
+   the min-width 3rem. Number chains like "8 + 2" or "6 > 5" inside a Hebrew table cell are
+   shown reversed by the bidi algorithm, so they are written as math.
+
 ## In progress
 
 - Waiting for the next batch of questions from the owner.
@@ -333,18 +357,20 @@ check blocks the deploy; the random button in the tables and on question pages.
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
 - [x] ~~Re-run the 0007, 0011 and 0014 constraints in a simulator with full constraint support~~ — done in session 5 (Verilator snapshot + z3 in CI).
+- [ ] Wide data tables still scroll sideways on phones (inside the table, not the page): 0005, 0006, 0008, 0013 (five or more columns). Consider splitting them or cards on phones.
+- [ ] Question ideas the owner has not picked yet (logic, math, digital design, EE): poisoned wine with 10 testers, 12 coins in 3 weighings, two eggs and 100 floors, Boyer-Moore majority, 100 doors, Gray code, XOR from NAND / universal MUX, two's complement overflow, divide-by-3 clock with 50% duty, maximal LFSR, Hamming (7,4), resistor cube, infinite resistor ladder.
 - [ ] When a Verilator release newer than 5.052 is out, bump `VERILATOR_REF` to its tag and check that 0011 and the 0014 subclass still pass.
 
 ---
 
 ## Question variety
 
-### Coverage today (15 questions)
+### Coverage today (17 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014 | logic puzzles, BFS, O(n) scans, permutations, SV constraints |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017 | logic puzzles, BFS, O(n) scans, permutations, SV constraints, Josephus, cycle detection |
 | Senior | 0007, 0011 | SV constraints, randomization, probability, combinatorics |
 | Staff | — | — |
 

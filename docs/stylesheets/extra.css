@@ -1180,3 +1180,20 @@ body.practice-mode .md-typeset .question-tools {
 }
 .md-typeset .path-nav .pn-step { white-space: nowrap; color: var(--md-default-fg-color--light); }
 .md-typeset .path-nav .pn-id { font-family: var(--md-code-font-family); }
+
+/* Floyd's tortoise and hare (question 0017) */
+.md-typeset svg .fl-slow { fill: none; stroke: var(--viz-s1); stroke-width: 3.5; }
+.md-typeset svg .fl-fast { fill: none; stroke: var(--viz-s2); stroke-width: 3; stroke-dasharray: 6 4; }
+.md-typeset .viz-legend .fl-slow { background: transparent; border: 3px solid var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .fl-fast { background: transparent; border: 3px dashed var(--viz-s2); border-radius: 50%; }
+.md-typeset .box-grid.bg-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); max-width: 26rem; }
+@media screen and (max-width: 44em) {
+  .md-typeset .box-grid.bg-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+}
+
+/* Tables on phones: less padding, so four or five columns fit at 390 px */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset table:not([class]) th,
+  .md-typeset table:not([class]) td { padding: 0.55em 0.6em; }
+  .md-typeset table:not([class]) th { min-width: 3rem; }   /* Material: 5rem */
+}
