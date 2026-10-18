@@ -456,7 +456,10 @@ for the small cases, the first-completion branching for N = 8, the three cases o
 
 ## In progress
 
-- Waiting for the next batch of questions from the owner.
+- Session 8 closed: 0020 and 0021 are live, the full test suite (Python + 20 Verilator
+  testbenches) passes, README / HANDOFF are current.
+- Next: the owner picks items from **Round D to G** below (proposed 2026-10-18), or sends
+  the next batch of questions.
 
 ---
 
@@ -614,6 +617,59 @@ Effort: **S** under an hour, **M** a few hours, **L** a day or more.
 | C23 | Social preview cards per question | S–M |
 | C24 | Comments per question via GitHub Discussions | M |
 
+**Rounds D to G — proposed 2026-10-18, after 0020 / 0021** (not started; the owner picks):
+
+The two PCIe pages are the longest on the site (three parts, a proof, ten figures and
+tables) and showed where the interface strains: long pages have no in-page navigation,
+figures with 16 rows are unreadable at 390 px, and display math wider than the phone was
+found by hand. The proposals are grouped so a round can be done in one session.
+
+**Round D — reading long pages and figures, especially on a phone**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| D25 | **Part navigation bar**: sticky chips "סעיף א / ב / ג" under the toolbar on multi-part pages, the current part highlighted, plus "back to top" | S–M |
+| D26 | **Figure lightbox**: tap a figure to open it full screen with pinch-zoom and pan (the 16-row splits map of 0020 / 0021 and the 14 × 14 grid of 0015 are unreadable at phone width) | M |
+| D27 | **Progressive reveal in practice mode**: inside an opened solution show idea → steps → code → proof one block at a time with a "הצג עוד" button; "solved" mark and stopwatch split per part | M |
+| D28 | **Print / PDF stylesheet** and a "print this question" button: all blocks open, toolbar and navigation hidden, figures kept (the light version of idea 19) | S |
+| D29 | **Anchor links and share button**: a link icon on every heading (including parts), Web Share API on phones and "copy link" on desktop | S |
+| D30 | **Reading aids**: estimated reading time in the header card and a "read first" line from a `prerequisites:` front-matter field (0021 needs 0020) | S |
+
+**Round E — discovery and navigation**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| E31 | **Question kind filter**: `kind:` front matter (puzzle / code / design / proof / knowledge) → a chip group in the tables and a badge in the header card (idea 7b) | S–M |
+| E32 | **Explicit `related:` links** in front matter that take precedence over tag overlap, a "PCIe" study path 0020 → 0021 with a topic intro, and topic pages for the largest tags (idea 22) | S–M |
+| E33 | **Search results with context**: level / difficulty chips and a snippet per hit, and search by id ("0021") | S–M |
+| E34 | **Home page memory**: a "continue where you left off" card (last visited question from localStorage) and a "recently added" strip | S |
+| E35 | **Keyboard shortcuts** on desktop: n / p previous-next question, s open / close solutions, r random, ? help overlay | S |
+| E36 | **"מה חדש" changelog page** generated from the `added` dates (and the git log), linked from the footer | S |
+
+**Round F — interactivity**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| F37 | **Parameter explorer for 0020 / 0021**: sliders for address, length, MPS and RCB; the page draws the splits map and shows the count live (a JS port of the recursion, with a test that compares it to the Python output on a grid of cases) | M |
+| F38 | **Run panel presets**: a dropdown of example inputs per question, an "expected output" comparison, and a shareable link that carries the editor code | M |
+| F39 | **Quick quiz blocks**: multiple-choice self-checks (`??? quiz`) with instant feedback, counted in the marks (the "quick quiz" format of Question variety) | M |
+| F40 | **Side-by-side SystemVerilog / Python** on wide screens (a toggle next to the tabs) with matching line highlights | M |
+| F41 | **"Open in EDA Playground"**: copy the SV code and open the site in one click (idea 7c) | S |
+
+**Round G — infrastructure and quality**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| G42 | **`tools/new_question.py`**: scaffold the page, `tests/<id>/`, a figure-generator stub and the README catalog row from the template (idea 12b) | S–M |
+| G43 | **Generators for the old figures** 0004–0007 in `tools/figures/` (idea 12a) | S–M |
+| G44 | **Accessibility pass**: focus rings, aria labels on the toolbar and steppers, contrast of the amber chips in dark mode, `prefers-reduced-motion`; an axe / Lighthouse check in CI | M |
+| G45 | **Social preview cards** (C23) and **giscus comments** (C24) | S–M / M |
+| G46 | **Scheduled workflow**: a weekly external-link check and a reminder when a Verilator release newer than the pinned commit is out | S |
+| G47 | **Display-math width in CI**: extend `check_phone.py` to report `mjx-container[display]` elements wider than the content box (the ten equations of 0021 were found with an ad-hoc script) | S |
+
+Suggested order by value for effort: D26 and D25 (the phone experience of the long pages),
+G47 (so the next proof page is caught by CI), F37 (the PCIe explorer), E31 and E32.
+
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
 
@@ -628,15 +684,15 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 |---|------|--------|-------|
 | 1 | ~~Previous / next question links~~ | S | **Done** in session 4 (round A) |
 | 2 | ~~"Open all / close all solutions" button~~ | S | **Done** in session 4 (round B) |
-| 3 | **Random question** button, honouring the current filters | S–M | JS on the home page, reads the generated question table |
-| 4 | **Solved / favourite marks** stored in the browser, with progress per level | M | `localStorage`; show ✅ / ⭐ in the tables and a progress bar on level pages |
+| 3 | ~~Random question button, honouring the current filters~~ | S–M | **Done** in session 6 (C20) |
+| 4 | ~~Solved / favourite marks stored in the browser, with progress per level~~ | M | **Done** in session 6 (C22) |
 | 5 | ~~Interview mode~~ | M | **Done** in session 4 as "practice mode" (solutions hidden, stopwatch counting up) |
 | 6 | ~~**Sortable table columns** (id, level, difficulty); coloured chips~~ | S–M | Done: chips in session 4, sorting in session 6 (C18) |
 | 7 | ~~Related questions by shared tags~~ | S–M | **Done** in session 4 (round A) |
 | 7a | ~~Hint ladder~~ | S | **Done** in session 4 (round B) |
-| 7b | **Question type filter** (puzzle / code / design / knowledge) next to level and difficulty | S–M | New optional front-matter field, read by the hook and `question-filter.js` |
+| 7b | **Question type filter** (puzzle / code / design / knowledge) next to level and difficulty | S–M | New optional front-matter field, read by the hook and `question-filter.js` (proposed again as E31) |
 | 7c | **"Open in EDA Playground"** link for SV code, so readers can run it on a commercial simulator | S–M | EDA Playground has no prefill API; a "copy code + open site" button is the simple version |
-| 7d | **Step-through figures** (e.g. the stack in 0010, the cycles in 0009) with next / previous buttons | M | Small JS over a list of SVG frames generated by `tools/figures/` |
+| 7d | ~~Step-through figures with next / previous buttons~~ | M | **Done** in session 5 (B14) |
 
 ### Content quality and safety net
 
@@ -665,7 +721,7 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 19 | **PDF export** of a filtered question set for offline practice | M–L | e.g. a print-site plugin |
 | 20 | Bilingual content (Hebrew / English) | L | Only if the audience grows beyond Hebrew readers |
 | 21 | ~~**Mobile check** of every page in CI~~ (done, C17) (screenshots at phone width) | M | Wide tables and figures were the main issue so far (see the 0009 box grid) |
-| 22 | **Topic pages**: a short intro per topic (FSM, SVA, coverage...) linking to its questions | M | Turns the tag index into a study guide (C19) |
+| 22 | **Topic pages**: a short intro per topic (FSM, SVA, coverage...) linking to its questions | M | Study paths done in C19; topic intros proposed again as E32 |
 | 23 | ~~Step-through figures (B14)~~ | M | **Done** in session 5 (0010 stack, 0009 walks) |
 
 ---

@@ -419,7 +419,10 @@ without it.
 - Compiled testbenches are cached in `.cache/sv/` by content hash, so unchanged ones are not
   recompiled. A first full compile takes about a minute with 4 cores; the z3 solver needs
   about 0.1 s per `randomize()` on 0014, so that testbench runs for ~30 s.
-- Logic and proof questions have no tests; only questions with code get a `tests/<id>/` folder.
+- Pure logic questions have no tests. A page without code can still have a `tests/<id>/`
+  folder when it states numbers worth checking (0015 probabilities, 0021 counts and the
+  formula): the tests then compute them independently and check the figures against the
+  generator. The "tested automatically" badge needs both code and a tests folder.
 
 ## Running the site locally
 
