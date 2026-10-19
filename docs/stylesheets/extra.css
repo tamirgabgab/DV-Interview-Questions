@@ -1244,3 +1244,24 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .cs-keep { background: var(--viz-grid); }
 .md-typeset .viz-legend .cs-one { background: var(--viz-s1); opacity: 0.5; }
 .md-typeset .viz-legend .st-done { background: var(--viz-grid); opacity: 0.7; }
+
+/* 0024: USB4 credit counters on the modulo-256 circle, and the two adapters of the stepper */
+.md-typeset svg .fc-ring { fill: none; stroke: var(--viz-grid); stroke-width: 2; }
+.md-typeset svg .fc-tick { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg .fc-window { fill: none; stroke: var(--viz-s1); stroke-opacity: 0.2; stroke-width: 14; }
+.md-typeset svg .fc-ahead { fill: none; stroke: var(--viz-s3); stroke-width: 6; stroke-linecap: round; }
+.md-typeset svg .fc-pkt { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .fc-grant { stroke: var(--viz-s3); stroke-width: 2.5; }
+.md-typeset svg .fc-sync { stroke: var(--viz-ink); stroke-width: 2.5; stroke-dasharray: 7 4; }
+.md-typeset svg .fc-drop { stroke: var(--viz-s2); stroke-width: 2.5; stroke-dasharray: 3 4; }
+.md-typeset svg .fc-slot { fill: var(--md-default-bg-color); stroke: var(--viz-text); stroke-width: 1.2; }
+.md-typeset svg .fc-full { fill: var(--viz-s1); fill-opacity: 0.45; stroke: var(--viz-s1); stroke-width: 1.2; }
+.md-typeset .viz-legend .fc-window { background: var(--viz-s1); opacity: 0.3; }
+.md-typeset .viz-legend .fc-ahead { background: var(--viz-s3); }
+.md-typeset .viz-legend .fc-pkt { background: var(--viz-s1); height: 0.2rem; }
+.md-typeset .viz-legend .fc-grant { background: var(--viz-s3); height: 0.2rem; }
+.md-typeset .viz-legend .fc-sync { background: transparent; border-top: 2px dashed var(--viz-ink); height: 0; }
+.md-typeset .viz-legend .fc-drop { background: transparent; border-top: 2px dotted var(--viz-s2); height: 0; }
+.md-typeset .viz-legend .fc-slot { background: var(--md-default-bg-color); outline: 1.2px solid var(--viz-text); }
+.md-typeset .viz-legend .fc-full { background: var(--viz-s1); opacity: 0.6; }
+.md-typeset .viz-legend .st-cur { background: var(--viz-s2); opacity: 0.45; }

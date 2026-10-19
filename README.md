@@ -11,7 +11,7 @@ level**, **difficulty** and **topic**.
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 21 questions (see the catalog below).
+> **Status:** the site is live and holds 24 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
 
 ---
@@ -43,6 +43,7 @@ level**, **difficulty** and **topic**.
 | 0021 | PCIe: how many completion splits (two 256-byte and two 512-byte requests), and the general formula with proof | senior | 🟡 medium | blocks and interior boundaries, 2^(N-1) when MPS does not bind, compositions with parts ≤ m, generating function, closed form S(N) − S(N−1) + δ, T(N, k), no code |
 | 0022 | Generalized Josephus: one stays, two leave (N = 30, a formula, bonus for any L) | senior | 🔴 hard | recurrence in steps of 2, parity chains, zero points 3^m and 2·3^m, F = 3(N − M)/2, general L with residue chains, charts of the chains (no code) |
 | 0023 | PCIe endpoint reference model: writes, reads and completions (aligned, then any address) | senior | 🟡 medium | memory as RCB-sized blocks, completions built at request time, per-read queue with a random ready cycle, interleaving between reads, read-modify-write of partial blocks, random subset of the interior RCB boundaries, Byte Count; SV classes with virtual methods and a Python subclass |
+| 0024 | USB4 Path credits reference model: Credit Grant, the transmit rule across the wrap, and Path Credit Sync after a lost packet | senior | 🟡 medium | four cumulative 8-bit counters (PCC, PCL at the Egress; PCR, PCA at the Ingress), forward distance on the modulo-256 circle (1..127), grant overwrites PCL, credits leak on packet loss, Sync corrects PCA with the old PCR; one class per side, subclasses add the Sync; stepper of both runs, circle figures |
 
 Update this table whenever a question is added.
 
@@ -137,7 +138,7 @@ DV-Interview-Questions/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
 │   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…
-│   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…, 0023-…
+│   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…, 0023-…, 0024-…
 │   │   └── staff/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
@@ -298,14 +299,14 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 
 | Kind of figure                   | How it is written                                                  |
 |----------------------------------|--------------------------------------------------------------------|
-| Block diagrams, flows, FSMs      | ` ```mermaid ` fenced blocks ([Mermaid](https://mermaid.js.org/))  |
+| Block diagrams, flows, FSMs      | ` ```mermaid ` fenced blocks ([Mermaid](https://mermaid.js.org/); 0024 has a sequence diagram)  |
 | Timing diagrams / waveforms      | ` ```wavedrom ` fenced blocks ([WaveDrom](https://wavedrom.com/))  |
 | Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax)           |
 | Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |
 | Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007; 0016 and 0022 survivor chains) |
-| Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0022 box rows: relabelling, one round, bits; 0020, 0021 and 0023 address axes) |
+| Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0022 box rows: relabelling, one round, bits; 0020, 0021 and 0023 address axes; 0024 modulo-256 circles) |
 | Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
-| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0022 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events, 0023 completion queues cycle by cycle) |
+| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0022 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events, 0023 completion queues cycle by cycle, 0024 credit counters step by step) |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 
@@ -328,6 +329,7 @@ follow the light / dark switch automatically:
 | `sand-a`, `sand-b`, `stream-*`, `glass`, `frame`, `measure`, `pruned` | Hourglasses: sand, the falling stream, the glass and frame, the measurement window, a pruned option (0018, 0019; drawn by `tools/figures/hourglass.py`) |
 | `cs-rcb`, `cs-req`, `cs-first`, `cs-mid`, `cs-last`, `cs-one`, `cs-bad`, `cs-can`, `cs-size` | PCIe completion splits over the address axis: RCB grid, request limits, completions by role, one above MPS (0020, 0021, 0023; drawn by `tools/figures/q0020.py`, `q0021.py` and `q0023.py`) |
 | `cs-blk`, `cs-new`, `cs-keep` | Memory blocks of the endpoint model: a block, the bytes a request touches, the bytes kept by a read-modify-write (0023) |
+| `fc-ring`, `fc-tick`, `fc-window`, `fc-ahead`, `fc-pkt`, `fc-grant`, `fc-sync`, `fc-drop`, `fc-slot`, `fc-full` | USB4 credit counters on the modulo-256 circle (the 127-step window, the forward distance) and the stepper of the two adapters: packet / grant / sync arrows, a dropped packet, buffer slots (0024; drawn by `tools/figures/q0024.py`) |
 | `ttt-grid`, `ttt-ghost`, `mark`, `mark-new`, `cell-s1`…`cell-s3` | Tic-tac-toe boards with highlighted cells (0011) |
 | `gp-line`, `gp-dot`, `shp-1`…`shp-3`, `shp-bad`, `shp-num`, `sep-zone`, `dash`, `coord`, `zone-label`, `halo` | Shapes on a grid of points, overlap areas, zones, text with a background halo (0014) |
 

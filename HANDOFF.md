@@ -527,6 +527,48 @@ completion per cycle at most), no clocked task.
    this file's `from __future__ import annotations`, which made the field types strings).
 6. **Path:** new `docs/paths/pcie.md` (0020 → 0021 → 0023).
 
+### Session 11 — 2026-10-19: question 0024, USB4 Path credits reference model
+
+The owner sent `usb4_credit_ref_model_interview_spec.md` (counter definitions, rules,
+six numerical examples, a suggested SystemVerilog solution and a rubric) and asked for a
+senior / medium question on the USB4 Dedicated Flow Control credits between a HOST and a
+DEVICE, with code in both languages, figures and a numerical walkthrough. Decisions
+(asked first): two parts (the normal flow with the transmit rule across the wrap, then
+packet loss and Path Credit Sync); one class per side of the Path (`egress_credit_model`
+with PCC / PCL, `ingress_credit_model` with PCR / PCA and the buffer) instead of the
+reference's single class, so the ownership split is in the code; one continuous example
+in a stepper plus modulo-256 circle figures for the wrap examples; violations reported
+with `$error` + return in SV and `ValueError` in Python, as in 0023.
+
+1. **Page** `docs/questions/senior/0024-usb4-path-credits-reference-model.md`. Question:
+   the four cumulative counters as a table, the two management packets, the assumptions,
+   the given packet classes. Part a: Example A step by step, Example D (251 / 254, then a
+   grant of 2), why `PCL > PCC` fails; a Mermaid sequence diagram of the flow, the circle
+   figure (no wrap and wrap, same distance 4), a nine-frame stepper of the no-loss run,
+   the no-overflow argument, and a table showing the spec's two-clause rule equals
+   "forward distance in 1..127". Part b: the leak (grant of 7 against five free slots), the
+   Sync with the old PCR, Example E on the circle, a ten-frame stepper of the lossy run.
+   Traps: grant as an addition, PCR as occupancy, `PCL > PCC`, the Sync order, queued
+   packets counted in PCC. Follow-ups: why 127, lost grants and syncs, Sync timing on an
+   unordered link, Shared Credits, hooking the model to a scoreboard, HIA E2E credits.
+2. **Code:** `forward_distance` + two classes per language; part b adds `egress_sync_model`
+   / `ingress_sync_model` (Python `EgressSyncModel` / `IngressSyncModel`) by inheritance so
+   the part-a code stays as published. Simpler than the reference's two-clause transmit
+   test: one modulo distance serves `can_transmit` and the Sync correction.
+3. **Figures** `tools/figures/q0024.py`: both steppers and tables come from running the
+   page's classes; the circle figures draw the 127-step window and the forward arc. New
+   CSS `fc-*` classes and legend entries (`st-cur` too).
+4. **Tests** `tests/0024/`: pytest runs the six examples of the spec, all 65,536 (PCC, PCL)
+   pairs against the two-clause formula, the reported violations, random lossy traffic
+   through in-order links with integer bookkeeping (no overflow ever; after Sync + Grant
+   the credits equal the free slots; thousands of packets, hundreds of losses, many wraps),
+   the leak without Sync, the 127 limit, and the figures. `tb.sv` does the same in
+   Verilator (128 checks, 6,753 packets, 235 lost). Verilator's `$error` stops the
+   simulation (it is `$stop`), so the SV testbench covers the legal paths and Python the
+   violations. `demo.py` prints the lossy run for the run panel.
+5. **Checks:** lint, pytest, Verilator, strict build, links, phone check at 390 px, and
+   screenshots (desktop / phone, light / dark, every stepper frame) all reviewed.
+
 ## In progress
 
 - Session 10 closed: 0023 is written and tested; README / HANDOFF are current. The branch
@@ -541,7 +583,7 @@ completion per cycle at most), no clocked task.
 ### Owner decisions
 
 - [ ] Keep example question `0001` or replace it with real content.
-- [ ] Staff level is still empty and Senior has seven questions (0007, 0011, 0019, 0020, 0021, 0022, 0023) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
+- [ ] Staff level is still empty and Senior has eight questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 
 ### Content
@@ -556,16 +598,16 @@ completion per cycle at most), no clocked task.
 
 ## Question variety
 
-### Coverage today (23 questions)
+### Coverage today (24 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization) |
 | Staff | — | — |
 
-Algorithms and puzzles are well covered, and 0020 / 0021 / 0023 are the first protocol questions (PCIe, with 0023 the first reference-model question).
+Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 are the protocol questions (PCIe, USB4), with 0023 and 0024 reference models.
 **Core DV topics are still missing:** UVM, SVA, functional coverage, FIFOs, clock domain
 crossing, FSM design, debug, and verification planning.
 
