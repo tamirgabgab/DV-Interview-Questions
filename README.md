@@ -35,8 +35,9 @@ level**, **difficulty** and **topic**.
 | 0013 | Sort the digits and subtract, four digits (Kaprekar's constant) | junior | 🟡 medium | 4-element sorting network, column subtraction, case analysis (0 and 6174) |
 | 0014 | Random non-overlapping squares, then rectangles, on a grid of points | junior | 🟡 medium | SV constraints on dynamic arrays, pairwise no-overlap, constraint override, the cross trap |
 | 0015 | Two children, at least one boy (boy or girl paradox, the Tuesday boy) | student | 🟢 easy | conditional probability, inclusion-exclusion, Bayes, general formula, outcome grids (no code) |
-| 0016 | The Josephus problem: who is left last in the circle? | junior | 🟡 medium | queue simulation, closed form 2L + 1 by induction, bit rotation, recurrence for any k, step-through circles |
+| 0016 | The Josephus problem, every second person leaves (N = 20, then a formula) | junior | 🟡 medium | round-by-round simulation, recurrence by relabelling, zero points at powers of 2, F = 2r by induction, binary view, step-through circle (no code) |
 | 0017 | Find the duplicate number without changing the array and in O(1) memory | junior | 🟡 medium | sort / seen table / binary search on values / Floyd's cycle detection, rho graph, tortoise-and-hare stepper |
+| 0018 | Generalized Josephus: one stays, two leave (N = 30, a formula, bonus for any L) | senior | 🔴 hard | recurrence in steps of 2, parity chains, zero points 3^m and 2·3^m, F = 3(N − M)/2, general L with residue chains, charts of the chains (no code) |
 
 Update this table whenever a question is added.
 
@@ -131,7 +132,7 @@ DV-Interview-Questions/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
 │   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…
-│   │   ├── senior/            # 0007-…, 0011-…
+│   │   ├── senior/            # 0007-…, 0011-…, 0018-…
 │   │   └── staff/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
@@ -296,10 +297,10 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 | Timing diagrams / waveforms      | ` ```wavedrom ` fenced blocks ([WaveDrom](https://wavedrom.com/))  |
 | Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax)           |
 | Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |
-| Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007) |
-| Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles)          |
+| Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007; 0016 and 0018 survivor chains) |
+| Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0018 box rows: relabelling, one round, bits) |
 | Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
-| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 circles, 0017 tortoise and hare) |
+| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0018 circles, 0017 tortoise and hare) |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 

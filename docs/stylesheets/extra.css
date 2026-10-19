@@ -459,6 +459,7 @@
 .md-typeset svg .ink-line { stroke: var(--viz-ink); }
 .md-typeset svg .s1-dot { fill: var(--viz-s1); stroke: var(--md-default-bg-color); stroke-width: 2; }
 .md-typeset svg .s2-dot { fill: var(--viz-s2); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .s3-dot { fill: var(--viz-s3); stroke: var(--md-default-bg-color); stroke-width: 2; }
 .md-typeset svg .ink-dot { fill: var(--viz-ink); stroke: var(--md-default-bg-color); stroke-width: 2; }
 .md-typeset svg .center-dot { fill: var(--viz-ink); }
 .md-typeset svg .axis-c { stroke: var(--viz-text); stroke-width: 1.5; }
@@ -470,6 +471,7 @@
 .md-typeset .viz-legend .s1 { background: var(--viz-s1); }
 .md-typeset .viz-legend .s2 { background: var(--viz-s2); }
 .md-typeset .viz-legend .ink { background: var(--viz-ink); }
+.md-typeset .viz-legend .ink-dash { height: 0; border-top: 2px dashed var(--viz-ink); border-radius: 0; }
 
 /* In-browser Python runner */
 .md-typeset .py-runner .py-editor {
@@ -984,6 +986,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .st-text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset svg .st-small { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
 .md-typeset svg .st-faded { opacity: 0.35; }
+.md-typeset svg .st-text.st-sm { font-size: 12px; }
 .md-typeset svg .st-path { fill: none; stroke: var(--viz-s1); stroke-width: 2.5; }
 .md-typeset svg .st-order { fill: var(--md-default-bg-color); font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset svg .st-order-bg { fill: var(--viz-s1); }

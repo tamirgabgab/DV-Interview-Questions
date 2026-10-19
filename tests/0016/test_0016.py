@@ -1,48 +1,74 @@
+"""Question 0016 has no code on the page; these tests check the closed form against an
+independent simulation and that the figures and tables are the generator's output."""
+
 import re
 import subprocess
 import sys
 
-from extract_code import ROOT, load_python, question_path
+from extract_code import ROOT, question_path
 
-ns = load_python(16)
-sim, formula, bits = ns["josephus_sim"], ns["josephus_formula"], ns["josephus_bits"]
-sim_k, rec_k = ns["josephus_sim_k"], ns["josephus_k"]
+sys.path.insert(0, str(ROOT / "tools" / "figures"))
+import q0016  # noqa: E402
 
 
-def reference(n, k):
-    """Plain list simulation, written independently of the page."""
-    people, i = list(range(1, n + 1)), 0
+def reference(n, L=2):
+    """Plain list simulation of "one stays, L - 1 leave", written independently of the
+    generator: the index of the one who stays, then L - 1 pops right after it."""
+    people, i = list(range(n)), 0
     while len(people) > 1:
-        i = (i + k - 1) % len(people)
-        people.pop(i)
+        for _ in range(L - 1):
+            if len(people) == 1:
+                break
+            j = (i + 1) % len(people)
+            people.pop(j)
+            if j < i:
+                i -= 1
+        i = (i + 1) % len(people)
     return people[0]
 
 
+def closed_form(n):
+    top = 1 << (n.bit_length() - 1)
+    return 2 * (n - top)
+
+
+def recurrence(n):
+    f = 0
+    for m in range(2, n + 1):
+        f = (f + 2) % m
+    return f
+
+
 def test_page_examples():
-    assert sim(5) == 3 and sim(10) == 5 and sim(41) == 19
-    assert formula(41) == bits(41) == 19
-    assert rec_k(41, 3) == sim_k(41, 3) == 31
-    assert rec_k(7, 3) == 4
+    assert reference(5) == 2 and reference(20) == 8 and reference(41) == 18
+    assert closed_form(20) == 8 and closed_form(41) == 18
 
 
-def test_k2_all_solutions_agree():
-    for n in range(1, 2049):
-        expected = reference(n, 2)
-        assert sim(n) == formula(n) == bits(n) == sim_k(n, 2) == rec_k(n, 2) == expected, n
-    # powers of two: the survivor is 1
-    assert all(formula(1 << m) == 1 for m in range(40))
+def test_closed_form_against_simulation():
+    for n in range(1, 4097):
+        assert reference(n) == closed_form(n) == recurrence(n) == q0016.formula(n) == q0016.survivor(n), n
+    assert all(closed_form(1 << m) == 0 for m in range(40))
 
 
-def test_any_k():
-    for n in range(1, 120):
-        for k in range(1, 12):
-            assert sim_k(n, k) == rec_k(n, k) == reference(n, k), (n, k)
+def test_halving_and_odd_recurrences():
+    for k in range(1, 600):
+        assert closed_form(2 * k) == 2 * closed_form(k)
+        assert closed_form(2 * k + 1) == 2 * closed_form(k) + 2
 
 
-def test_bits_is_a_rotation():
+def test_binary_view():
     for n in range(1, 5000):
         b = f"{n:b}"
-        assert bits(n) == int(b[1:] + b[0], 2), n
+        assert closed_form(n) == int(b[1:] + "0", 2), n
+
+
+def test_rounds_of_twenty():
+    groups, win = q0016.rounds(20)
+    assert win == 8
+    assert [v for _, leave in groups[0] for v in leave] == list(range(1, 20, 2))
+    assert [v for _, leave in groups[1] for v in leave] == [2, 6, 10, 14, 18]
+    assert [v for _, leave in groups[2] for v in leave] == [4, 12, 0]
+    assert [v for _, leave in groups[3] for v in leave] == [16]
 
 
 def test_figures_up_to_date():

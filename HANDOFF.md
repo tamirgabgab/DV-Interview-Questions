@@ -339,6 +339,36 @@ both, three parts for Josephus, four solutions for the duplicate, steppers plus 
    the min-width 3rem. Number chains like "8 + 2" or "6 > 5" inside a Hebrew table cell are
    shown reversed by the bidi algorithm, so they are written as math.
 
+### Session 7 — 2026-10-19: Josephus rewritten as 0016 (L = 2) and 0018 (L = 3, any L)
+
+The owner wanted the Josephus question split in two, math-first, no code: an easier page
+(N = 20, every second person leaves, then a formula with a step-by-step proof checked on
+the example) and a harder page (N = 30, one stays and two leave, then a formula, and a
+staff-level bonus for "one stays, L - 1 leave" following the owner's reference notes).
+Decisions: people numbered 0 .. N - 1 (the formulas are F = 2r and F = 3(N - M)/2, the
+classical 1-based answers are these plus 1); 0018 is senior / hard; no code at all.
+
+1. **0016 rewritten** at the same URL: part a, N = 20 by rounds (the shortcut
+   F(20) = 2F(10) = 4F(5) = 8); part b, F(N) = (F(N - 1) + 2) mod N by relabelling after one
+   elimination, F(2k) = 2F(k) from a full round, zero points at powers of 2, induction along
+   r with the modulus inactive while r < 2^m, F = 2r, binary view (drop the top bit, append
+   0). The old queue / formula / any-k code and `tests/0016/tb.sv`, `demo.py` are gone.
+2. **0018 new:** part a, N = 30 by rounds (F_3(30) = 3F_3(10) = 18); part b,
+   F_3(N) = (F_3(N - 2) + 3) mod N, two parity chains, zero points 3^m and 2·3^m, the lemma
+   F_3(M + 2j) = 3j for j < M, F_3 = 3(N - M)/2 with M of the same parity (N = 21 gives M = 9,
+   not 18); part c (bonus), the general recurrence in steps of L - 1, residue chains
+   r = 1 + ((N - 1) mod (L - 1)), zero points b·L^m, F_L = L(N - M)/(L - 1), checked for
+   L = 2, 3 and F_4(20) = 16.
+3. **Figures:** `tools/figures/q0016.py` now holds the general drawing code (`run`,
+   `rounds`, `circle_stepper`, `rounds_table`, `values_table`, `zeros_table`, `chart` with
+   one line per chain, `relabel_svg`, `round_svg`, `bits_svg`); `q0018.py` imports it. New
+   CSS: `.st-text.st-sm` (smaller numbers for 30 people), `.s3-dot`, `.viz-legend .ink-dash`.
+4. **Tests:** `tests/0016/test_0016.py` and `tests/0018/test_0018.py` check the closed forms
+   against an independent simulation (L = 2..7), the zero-point sets, the rounds of 20 and
+   30, and that the page figures and tables are the generators' output.
+5. **Paths:** 0016 left the coding path; a new two-step path `docs/paths/josephus.md`
+   (0016 → 0018). Wide display equations are split with `aligned` so they fit 390 px.
+
 ## In progress
 
 - Waiting for the next batch of questions from the owner.
@@ -350,7 +380,7 @@ both, three parts for Josephus, four solutions for the duplicate, steppers plus 
 ### Owner decisions
 
 - [ ] Keep example question `0001` or replace it with real content.
-- [ ] Staff level is still empty and Senior has two questions (0007, 0011) — any questions for these levels?
+- [ ] Staff level is still empty and Senior has three questions (0007, 0011, 0018) — any questions for these levels? (The bonus part of 0018 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 
 ### Content
@@ -365,13 +395,13 @@ both, three parts for Josephus, four solutions for the duplicate, steppers plus 
 
 ## Question variety
 
-### Coverage today (17 questions)
+### Coverage today (18 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017 | logic puzzles, BFS, O(n) scans, permutations, SV constraints, Josephus, cycle detection |
-| Senior | 0007, 0011 | SV constraints, randomization, probability, combinatorics |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017 | logic puzzles, BFS, O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection |
+| Senior | 0007, 0011, 0018 | SV constraints, randomization, probability, combinatorics, generalized Josephus (recurrences, induction) |
 | Staff | — | — |
 
 Algorithms and puzzles are well covered. **Core DV topics are missing:** UVM, SVA,
