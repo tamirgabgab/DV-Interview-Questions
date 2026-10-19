@@ -105,11 +105,11 @@ def test_js_matches_python():
     if not node:
         pytest.skip("node is not installed")
     params = [(a / 1000, d / 100) for a in range(5, 600, 37) for d in range(1, 51, 3)]
-    script = (f"const m = require({json.dumps(str(ROOT / 'docs/javascripts/cake-explorer.js'))});"
+    script = (f"const m = require({json.dumps(str(ROOT / 'docs/javascripts/explorer.js'))});"
               f"const ps = {json.dumps(params)};"
               "console.log(JSON.stringify(ps.map(([a, d]) => {"
-              "  const rows = m.split('arith', a, d);"
-              "  return [rows.length, m.best(rows), m.formula('arith', a, d), m.threshold('arith', d)]; })));")
+              "  const rows = m.cakeSplit('arith', a, d);"
+              "  return [rows.length, m.cakeBest(rows), m.cakeFormula('arith', a, d), m.cakeThreshold('arith', d)]; })));")
     out = json.loads(subprocess.run([node, "-e", script], capture_output=True, text=True, check=True).stdout)
     for (a, d), (n, best, f, T) in zip(params, out):
         s = shares(Fr(a).limit_denominator(10 ** 6), Fr(d).limit_denominator(10 ** 6))

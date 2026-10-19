@@ -121,11 +121,11 @@ def test_js_matches_python():
     if not node:
         pytest.skip("node is not installed")
     params = [(a / 1000, q / 100) for a in range(1, 500, 23) for q in range(105, 201, 5)]
-    script = (f"const m = require({json.dumps(str(ROOT / 'docs/javascripts/cake-explorer.js'))});"
+    script = (f"const m = require({json.dumps(str(ROOT / 'docs/javascripts/explorer.js'))});"
               f"const ps = {json.dumps(params)};"
               "console.log(JSON.stringify(ps.map(([a, q]) => {"
-              "  const rows = m.split('geo', a, q);"
-              "  return [rows.length, m.best(rows), m.formula('geo', a, q)]; })));")
+              "  const rows = m.cakeSplit('geo', a, q);"
+              "  return [rows.length, m.cakeBest(rows), m.cakeFormula('geo', a, q)]; })));")
     out = json.loads(subprocess.run([node, "-e", script], capture_output=True, text=True, check=True).stdout)
     for (a, q), (n, best, f) in zip(params, out):
         A, Q = Fr(a).limit_denominator(10 ** 6), Fr(q).limit_denominator(10 ** 6)

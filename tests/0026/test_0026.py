@@ -160,3 +160,18 @@ def test_figures_up_to_date():
     page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
     table_rows = [l.strip() for l in out.splitlines() if l.startswith("|")]
     assert page_rows == table_rows
+
+
+def test_explorer_matches_python():
+    from page_tests import explorer_require, node_json
+
+    alphas = [1.5, 2, 4, 13, 30]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({alphas}.map((a) => m.motorcyclePlan(a))));")
+    for alpha, plan in zip(alphas, got):
+        ref = q0026.plan(Fr(alpha).limit_denominator(100))
+        for key in ("x", "y", "z", "Q", "C", "D", "E", "t1", "t2", "T"):
+            assert abs(plan[key] - float(ref[key])) < 1e-12, (alpha, key)
+    times = node_json(f"const m = {explorer_require()};"
+                      "console.log(JSON.stringify([m.motorcycleTime(13, 1), m.motorcycleTime(24, 6)]));")
+    assert abs(times[0] - 2.5) < 1e-12 and abs(times[1] - 78 / 7) < 1e-12

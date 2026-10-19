@@ -277,7 +277,7 @@ added: 2026-10-19
     **נסו בעצמכם.** הזיזו את \( a \) ואת \( d \), וראו איך הפסגה זזה. הנוסחה והעמודות
     מסכימות בכל התחום:
 
-    <div class="cake-explorer" data-kind="arith" data-a="0.01" data-step="0.1"></div>
+    <div class="explorer" data-kind="cake-arith" data-a="0.01" data-step="0.1"></div>
 
 ## נקודות חשובות ושאלות המשך
 

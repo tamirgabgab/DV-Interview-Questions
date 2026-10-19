@@ -270,7 +270,7 @@ added: 2026-10-19
     **נסו בעצמכם.** הזיזו את \( a \) ואת \( q \), וראו איך הפסגה זזה. הנוסחה והעמודות
     מסכימות בכל התחום:
 
-    <div class="cake-explorer" data-kind="geo" data-a="0.01" data-step="1.5"></div>
+    <div class="explorer" data-kind="cake-geo" data-a="0.01" data-step="1.5"></div>
 
 ## נקודות חשובות ושאלות המשך
 

@@ -82,3 +82,13 @@ def test_figures_up_to_date():
     page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
     for row in (l for l in out.splitlines() if l.startswith("|")):
         assert row.strip() in page_rows, row
+
+
+def test_explorer_matches_simulation():
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"const m = {explorer_require()};"
+                    "console.log(JSON.stringify([...Array(64).keys()].map((i) => "
+                    "[m.josephusRun(i + 1, 2), m.josephusFormula(i + 1, 2)])));")
+    for n, (sim, form) in enumerate(got, 1):
+        assert sim == form == reference(n, 2) == q0016.formula(n, 2), n

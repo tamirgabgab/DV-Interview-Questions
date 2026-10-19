@@ -85,3 +85,15 @@ def test_figures_up_to_date():
     page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
     for row in (l for l in out.splitlines() if l.startswith("|")):
         assert row.strip() in page_rows, row
+
+
+def test_explorer_matches_simulation():
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"const m = {explorer_require()}; const out = [];"
+                    "for (let L = 2; L <= 6; L++) for (let n = 1; n <= 64; n++)"
+                    " out.push([L, n, m.josephusRun(n, L), m.josephusFormula(n, L), m.josephusZero(n, L)]);"
+                    "console.log(JSON.stringify(out));")
+    for L, n, sim, form, zero in got:
+        assert sim == form == reference(n, L) == closed_form(n, L), (L, n)
+        assert zero == q0016.zero_below(n, L)
