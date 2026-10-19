@@ -11,7 +11,7 @@ level**, **difficulty** and **topic**.
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 26 questions (see the catalog below).
+> **Status:** the site is live and holds 28 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
 
 ---
@@ -46,6 +46,8 @@ level**, **difficulty** and **topic**.
 | 0024 | USB4 Path credits reference model: Credit Grant, the transmit rule across the wrap, and Path Credit Sync after a lost packet | senior | 🟡 medium | four cumulative 8-bit counters (PCC, PCL at the Egress; PCR, PCA at the Ingress), forward distance on the modulo-256 circle (1..127), grant overwrites PCL, credits leak on packet loss, Sync corrects PCA with the old PCR; one class per side, subclasses add the Sync; stepper of both runs, circle figures |
 | 0025 | PCIe Data Link Ack/Nak reference model: Sequence Numbers, Retry Buffer, cumulative Ack (a random 1..4 TLPs per Ack), rollover, then bad LCRC, Nak and Replay, lost Acks, duplicates and illegal DLLPs | senior | 🟡 medium | transmitter (NEXT_TRANSMIT_SEQ, ACKD_SEQ, Retry Buffer purged by position) and receiver (NEXT_RCV_SEQ, NAK_SCHEDULED, random Ack coalescing) classes, part b subclasses add Nak / Replay / duplicate window / DLLP checks; error injection on the link, replay timeout from the environment; steppers of both runs, Mermaid decision flows |
 | 0026 | Three people and one motorcycle: the fastest way for all three to arrive (walk 13 h, ride 1 h, then a formula) | junior | 🟢 easy | speed ratio α instead of the unknown distance, three phases with one equation each, symmetry y = r, T = (3α + 1)/(α + 3)·t1, three strategies compared, position-time chart, road figure (no code) |
+| 0027 | Cake split by fractions of what is left, growing as an arithmetic sequence: who gets the most (a = 0.01, d = 0.1, then any a and d ≤ 1/2) | junior | 🟡 medium | ratio of neighbours, quadratic threshold T = (√(d² + 4d) − d)/2, single peak because p²/(1 − p) grows, the capped last person, ties, a = d; cake rows, shares bars, fractions against T, ratio chart, slider explorer (no code) |
+| 0028 | Cake split by fractions of what is left, growing as a geometric sequence: who gets the most (a = 0.01, q = 1.5, then any a and 1 < q ≤ 2) | junior | 🟡 medium | ratio q(1 − p), threshold 1 − 1/q, k = ⌈log_q((q − 1)/a)⌉, ties, the capped last person, q ≤ 1 and q > 2; cake rows, shares bars, fractions against T, ratio chart, slider explorer (no code) |
 
 Update this table whenever a question is added.
 
@@ -88,7 +90,7 @@ Each question carries one or more tags. Use the existing ones where possible:
 | Verification        | `systemverilog`, `uvm`, `sva`, `coverage`, `constraints`, `randomization`, `methodology`, `debug` |
 | Hardware / systems  | `protocols`, `computer-architecture`, `memory`, `cache`                     |
 | Software            | `scripting`, `python`, `c-cpp`, `algorithms`, `sorting`, `bfs`, `stack`, `bitwise` |
-| Math and logic      | `math`, `digits`, `geometry`, `probability`, `combinatorics`, `logic-puzzles` |
+| Math and logic      | `math`, `digits`, `geometry`, `probability`, `combinatorics`, `sequences`, `logic-puzzles` |
 | Other               | `behavioral`                                                                |
 
 ---
@@ -139,13 +141,13 @@ DV-Interview-Questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
-│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-…
+│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0028-…
 │   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…, 0023-…, 0024-…, 0025-…
 │   │   └── staff/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
 │   │   └── images/             # Figures and screenshots referenced by questions
-│   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner
+│   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner, cake explorer
 │   └── stylesheets/extra.css   # Palette, chips, question header, tables / cards, figures
 └── .github/workflows/deploy.yml  # Test + build on every push, deploy main to GitHub Pages
 ```
@@ -309,6 +311,7 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 | Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0022 box rows: relabelling, one round, bits; 0020, 0021 and 0023 address axes; 0024 modulo-256 circles) |
 | Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
 | Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0022 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events, 0023 completion queues cycle by cycle, 0024 credit counters step by step, 0025 Retry Buffer and receiver state per packet) |
+| Interactive explorers            | `div.cake-explorer` with `data-kind` (`arith` / `geo`), `data-a` and `data-step`: `docs/javascripts/cake-explorer.js` adds two sliders and redraws the shares bars and the fractions against the threshold (0027, 0028). Its math functions are exported under Node, and the question tests compare them with the Python reference |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 
@@ -332,6 +335,7 @@ follow the light / dark switch automatically:
 | `cs-rcb`, `cs-req`, `cs-first`, `cs-mid`, `cs-last`, `cs-one`, `cs-bad`, `cs-can`, `cs-size` | PCIe completion splits over the address axis: RCB grid, request limits, completions by role, one above MPS (0020, 0021, 0023; drawn by `tools/figures/q0020.py`, `q0021.py` and `q0023.py`) |
 | `cs-blk`, `cs-new`, `cs-keep` | Memory blocks of the endpoint model: a block, the bytes a request touches, the bytes kept by a read-modify-write (0023) |
 | `fc-ring`, `fc-tick`, `fc-window`, `fc-ahead`, `fc-pkt`, `fc-grant`, `fc-sync`, `fc-drop`, `fc-slot`, `fc-full` | USB4 credit counters on the modulo-256 circle (the 127-step window, the forward distance) and the stepper of the two adapters: packet / grant / sync arrows, a dropped packet, buffer slots (0024; drawn by `tools/figures/q0024.py`; 0025 adds `fc-nak`, `fc-replay`) |
+| `cake-slice`, `cake-slice2`, `cake-peak`, `cake-rest`, `cake-gone`, `cake-edge` | Cake split rows: a person's slice (two alternating colours), the largest slice, what is left for the next people, what is already taken, the outline of the whole cake (0027, 0028; drawn by `tools/figures/cake.py`) |
 | `ttt-grid`, `ttt-ghost`, `mark`, `mark-new`, `cell-s1`…`cell-s3` | Tic-tac-toe boards with highlighted cells (0011) |
 | `gp-line`, `gp-dot`, `shp-1`…`shp-3`, `shp-bad`, `shp-num`, `sep-zone`, `dash`, `coord`, `zone-label`, `halo` | Shapes on a grid of points, overlap areas, zones, text with a background halo (0014) |
 

@@ -638,12 +638,50 @@ the page shows both.
 4. **Checks:** lint, pytest, strict build, links, phone check, screenshots (desktop
    light, phone dark).
 
+### Session 12 (continued) — 2026-10-19: questions 0027 and 0028, cake split by sequences
+
+The owner sent `cake_problem.md` (a cake split where person k takes the fraction p_k of
+what is left; arithmetic and geometric fractions; the ratio of neighbours, the thresholds,
+the general formulas, value tables and examples) and asked for two Quant-style questions,
+each with a numeric part and a general part with a proof, graded hints, traps, follow-ups,
+many figures and, if possible, sliders. Decisions (asked first): two pages (0027
+arithmetic, 0028 geometric) plus a study path; both junior / medium; the cake drawn as rows
+of a rectangle. Called out to the owner: the file's general formulas fail when the person
+who takes the rest is capped at 1 (d > 1/2, or q > 2 for some a; e.g. a = 0.55, d = 0.8
+and a = 0.6, q = 3 give person 1, not 2). The owner chose to assume d ≤ 1/2 and q ≤ 2 in
+part b; the pages prove the formulas exact under that assumption (the capped ratio
+(1 − p)/p) and leave the larger jumps as follow-ups. Also: the file rounds S_8 of the
+arithmetic table to 0.0385; the exact value is 0.03845 (0.0384 to four places).
+
+1. **Pages** `docs/questions/junior/0027-cake-arithmetic-fractions.md` and
+   `0028-cake-geometric-fractions.md`. Statement with a small example figure (no peak
+   marked). Part a: three hints (two forces, the ratio of neighbours, the condition on
+   p_k), answer, idea with the shares bars, steps, fractions against T, ratio chart (log
+   scale for 0027), the cake rows with the peak, the value table. Part b: three hints,
+   the single-peak proof, the threshold below 1 (and ≤ 1/2), the capped last person, the
+   index formula and the tie; the curve p²/(1 − p) against y = d (0027) or the lines
+   q(1 − p) against y = 1 (0028); examples tables (a = d, other q); a tie example; the
+   slider explorer. Traps and follow-ups as the owner listed, plus the off-by-one, the
+   rounding of T / of the logarithm and the jumps above 1/2 / 2.
+2. **Figures** `tools/figures/cake.py` (exact Fractions, all drawings), `q0027.py`,
+   `q0028.py`; CSS `cake-*` classes.
+3. **Explorer** `docs/javascripts/cake-explorer.js` (registered in `mkdocs.yml`): sliders
+   for a and d (0.005..0.6, 0.01..0.5) or a and q (0.001..0.5, 1.05..2), the summary line
+   compares the bars with the closed form. Math functions exported under Node.
+4. **Tests** `tests/0027/`, `tests/0028/`: exact split, every number on the pages, the
+   closed form and the single peak over parameter grids (ties included), the stated
+   counterexamples, the follow-up answers, the JS functions under Node against the
+   Python reference (skipped when Node is missing), figures and tables.
+5. **Path** `docs/paths/cake.md` (0027 → 0028). Tag `sequences` added to the README.
+6. **Checks:** lint, pytest, strict build, links, phone check (43 pages), screenshots
+   (desktop light, phone dark and light), sliders driven in Chromium.
+
 ---
 
 ## In progress
 
-- Session 12 closed: 0026 is written and tested; README / HANDOFF are current. The branch
-  is pushed; `main` is updated when the owner asks.
+- Session 12 closed: 0026 is on `main`; 0027 and 0028 are written and tested on the
+  branch; README / HANDOFF are current. `main` is updated when the owner asks.
 - Next: the owner picks items from **Round D to G** below (proposed 2026-10-18), or sends
   the next batch of questions.
 
@@ -669,12 +707,12 @@ the page shows both.
 
 ## Question variety
 
-### Coverage today (26 questions)
+### Coverage today (28 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 | Staff | — | — |
 
