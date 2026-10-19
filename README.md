@@ -12,7 +12,8 @@ level**, **difficulty** and **topic**.
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
 > **Status:** the site is live and holds 28 questions (see the catalog below).
-> [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
+> [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and the proposed rounds of
+> improvements (interface, new questions, tooling).
 
 ---
 

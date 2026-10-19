@@ -694,6 +694,7 @@ arithmetic table to 0.0385; the exact value is 0.03845 (0.0384 to four places).
 - [ ] Keep example question `0001` or replace it with real content.
 - [ ] Staff level is still empty and Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
+- [ ] Pick the next rounds from **Proposals and rounds** (D to G, and H to K proposed in session 12).
 
 ### Content
 
@@ -893,6 +894,58 @@ found by hand. The proposals are grouped so a round can be done in one session.
 
 Suggested order by value for effort: D26 and D25 (the phone experience of the long pages),
 G47 (so the next proof page is caught by CI), F37 (the PCIe explorer), E31 and E32.
+
+**Rounds H to K — proposed 2026-10-19, after 0026 to 0028** (not started; the owner picks):
+
+Session 12 added the first questions without code that lean on figures (0026 motion,
+0027 / 0028 cake split) and the first interactive component (`cake-explorer.js`). What it
+showed: charts with 11 to 13 bars and rows are small at 390 px, wide display math is still
+found by eye, the page linter skips indented lines and everything inside the steps
+timeline, and each new figure page repeats the same bar / stem / threshold code. Rounds D
+to G above are still open; H to K add to them.
+
+**Round H — interface, building on the explorer**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| H48 | **One explorer component**: turn `cake-explorer.js` into a small declarative widget (sliders from `data-*`, charts from a shared JS module) and reuse it: α for 0026 (the position-time chart moves), N for 0016 / 0022, address / MPS / RCB for 0020 / 0021 (this is F37) | M |
+| H49 | **Guess before you look**: in practice mode an input "your answer" above the solution (a number or a person), checked against an `answer:` front-matter field before the solution opens; counted in the marks | M |
+| H50 | **Figure lightbox** (D26), now more pressing: the cake rows, the 13-bar charts and the 0015 grid need pinch-zoom on a phone | M |
+| H51 | **Part navigation bar** (D25): every new page has two parts with long solutions | S–M |
+| H52 | **Theme check**: run the phone check in dark mode too (all screenshots today are light), and flag SVG text whose colour is not a CSS variable | S |
+| H53 | **Chart hover values on touch**: tap a bar or dot to show its `<title>` as a small tooltip (phones have no hover) | S |
+
+**Round I — new questions, by theme** (each line is one or two pages)
+
+| # | Theme | Questions |
+|---|-------|-----------|
+| I54 | Motion and rates, after 0026 | bridge and torch (4 people, 17 minutes), the jeep / desert crossing, two trains and a fly, river boat up and down stream |
+| I55 | Quant brainteasers, after 0027 / 0028 | optimal stopping (secretary problem, 1/e), gambler's ruin, coupon collector, broken stick into a triangle; each with an explorer |
+| I56 | Owner's open list (Open items) | poisoned wine with 10 testers, 12 coins in 3 weighings, two eggs and 100 floors, 100 doors, Boyer–Moore majority |
+| I57 | Digital design for DV | Gray code and async FIFO pointers, divide-by-3 clock with 50% duty, maximal LFSR, Hamming (7,4), XOR from NAND only; WaveDrom and Verilator tests |
+| I58 | Core DV gaps | SVA req → ack in 1–3 cycles, a covergroup with crosses and illegal bins, FIFO depth for a burst, find-the-bug in a scoreboard, UVM sequence / driver handshake |
+| I59 | Staff level (empty today) | a verification plan for an arbiter, sign-off metrics, regression strategy; a written "what would you check" format |
+
+**Round J — adding questions faster**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| J60 | **`tools/new_question.py`** (G42): page, tests folder with the figures-up-to-date test, generator stub, README row | S–M |
+| J61 | **Shared chart helpers** `tools/figures/charts.py`: bars with a highlighted bar, stems against a threshold, ratio against y = 1, curve against a line; 0026–0028 and the older charts move onto it | M |
+| J62 | **Fill script in the repo**: the page template with `{{B0}}` placeholders and the generator blocks (used by hand in session 12) as `tools/figures/fill.py`, so a page and its figures are regenerated in one command | S |
+| J63 | **One test helper** for "figures and tables match the generator" (copied into every no-code test today) | S |
+
+**Round K — safety net**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| K64 | **Linter gaps**: check RTL on indented lines and inside `<div class="steps">` (paragraph starts only), and fail on a `\tag` inside a list item without `aligned` | S |
+| K65 | **Display-math width in CI** (G47): every equation split by hand in sessions 8–12 would have been caught | S |
+| K66 | **Node in CI explicitly** (`actions/setup-node`), so the explorer tests can never be skipped silently | S |
+| K67 | **Owner-file check list**: when a source file arrives, recompute its tables and formulas in a test first (done by hand for 0026–0028; it found the capped-last-person gap and one rounding) | S per question |
+
+Suggested order: K64 + K65 + K66 (small, protect every next page), H51 + H50 (phone
+reading), J60 + J62 (faster batches), then H48 and a content round from I.
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
