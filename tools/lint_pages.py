@@ -5,15 +5,21 @@
     python tools/lint_pages.py 12 14      # some pages
 
 Checks, per page:
-- RTL safety: outside code blocks, HTML and math, no line (or table cell) starts with a
-  Latin letter or inline code; such lines need the RLM mark (U+200F) first.
+- RTL safety: outside code blocks, HTML and math, no paragraph, list item, heading or
+  table cell starts with a Latin letter, inline code or inline math; such lines need the
+  RLM mark (U+200F) first. Indented blocks (admonitions, list items) and the Markdown
+  inside ``<div class="steps" markdown>`` are checked too; continuation lines of a
+  paragraph are not, since only the first strong character sets the direction.
 - Solution structure: every collapsed solution (``??? success``) starts with an
   ``!!! answer`` block; the solution block labels (h4 with ``.sol-*`` classes) use only the
   known names and appear in the fixed order; hints are numbered "רמז 1", "רמז 2", ...
 - One ``??? interviewer`` block right after the question, and the end-of-page blocks use
   the ``trap`` / ``followup`` types (a top-level ``note`` / ``warning`` titled like an
   interviewer / trap / follow-up block is reported; other notes may keep their type).
-Exit status 1 when anything is reported, so it can run in CI.
+Warnings (printed, exit status unchanged): an inline SVG colour written as a literal
+(``fill="#..."``, ``stroke:#...``, ``fill="white"``) instead of a class whose colour is a CSS
+variable, since such a figure does not follow the light / dark switch.
+Exit status 1 when a problem (not a warning) is reported, so it can run in CI.
 """
 
 from __future__ import annotations
@@ -31,6 +37,7 @@ LABEL_RE = re.compile(r"^\s*#### (.+?)\s*\{\s*\.(sol-\w+)\s*\}\s*$")
 H4_RE = re.compile(r"^\s*#### ")
 ADMON_RE = re.compile(r'^(\s*)(\?\?\?\+?|!!!)\s+(\w+)(?:\s+"([^"]*)")?')
 RLM = "‏"
+LITERAL_COLOUR = re.compile(r'(?:fill|stroke|color)\s*(?:=\s*"|:\s*)\s*(#[0-9a-fA-F]{3,8}|white|black|red|green|blue|gray|grey|orange)\b')
 LATIN_START = re.compile(r"^[A-Za-z`\\]")
 
 
@@ -42,8 +49,9 @@ def strip_front_matter(text: str) -> str:
     return text
 
 
-def lint(path: Path) -> list[str]:
+def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     problems: list[str] = []
+    warnings = warnings if warnings is not None else []
     lines = strip_front_matter(path.read_text(encoding="utf-8")).splitlines()
 
     in_code = False
@@ -55,6 +63,7 @@ def lint(path: Path) -> list[str]:
     hint_numbers: list[int] = []
     interviewer = 0
     leftovers = []
+    para_start = True            # the next text line starts a paragraph
 
     for n, raw in enumerate(lines, 1):
         line = raw.rstrip()
@@ -67,6 +76,7 @@ def lint(path: Path) -> list[str]:
                 in_code, fence_indent = True, m.group(1)
             elif m.group(1) == fence_indent:
                 in_code = False
+            para_start = True
             continue
         if in_code:
             continue
@@ -76,15 +86,26 @@ def lint(path: Path) -> list[str]:
         if in_math:
             if stripped.endswith("\\]"):
                 in_math = False
+            para_start = True
+            continue
+        # Markdown inside an HTML block (the steps timeline) is linted like the rest
+        if re.match(r"<div\b[^>]*\bmarkdown\b[^>]*>$", stripped) or stripped == "</div>":
+            para_start = True
             continue
         # html blocks (svg etc.)
+        if stripped.startswith("<") or in_html:
+            colours = sorted(set(LITERAL_COLOUR.findall(stripped)))
+            if colours:
+                warnings.append(f"{n}: literal SVG colour {', '.join(colours)}: use a class with a CSS variable")
         if stripped.startswith("<") and not stripped.startswith("</"):
             in_html += len(re.findall(r"<(?!/)(?!br)(?!!--)\w+(?![^>]*/>)", stripped))
         if in_html:
             in_html -= len(re.findall(r"</\w+>", stripped))
             in_html = max(in_html, 0)
+            para_start = True
             continue
         if not stripped or stripped.startswith("<!--"):
+            para_start = True
             continue
 
         # admonitions
@@ -110,6 +131,7 @@ def lint(path: Path) -> list[str]:
                 leftovers.append(f"{n}: top-level ??? {typ} {title!r}: use trap / followup / interviewer")
             if current is not None and typ != "success" and current["first"] is None:
                 current["first"] = n
+            para_start = True
             continue
 
         # first content line of a solution must be the answer block
@@ -132,10 +154,16 @@ def lint(path: Path) -> list[str]:
                     if current["labels"] and order <= current["labels"][-1]:
                         problems.append(f"{n}: label {text!r} out of order (idea → steps → code → proof → cost)")
                     current["labels"].append(order)
+            para_start = True
             continue
 
-        # RTL: lines and table cells
-        body = re.sub(r"^\s*(?:[-*]|\d+\.|>|#{1,6}|\|)\s*", "", line)
+        # RTL: paragraph starts, list items, headings and table cells
+        new_item = re.match(r"^\s*(?:[-*]|\d+\.|>|#{1,6})\s", line) is not None
+        starts = para_start or new_item or stripped.startswith("|")
+        para_start = stripped.startswith("|")
+        if not starts:
+            continue
+        body = re.sub(r"^\s*(?:[-*]|\d+\.|>|#{1,6}|\|)\s*", "", line).lstrip()
         body = re.sub(r"^(\*\*|\*|_)", "", body)
         cells = [c.strip() for c in line.split("|")[1:-1]] if stripped.startswith("|") else [body]
         if stripped.startswith("|") and set(stripped) <= set("|-: "):
@@ -156,15 +184,19 @@ def lint(path: Path) -> list[str]:
 
 def main(argv: list[str]) -> int:
     paths = [question_path(a) for a in argv] if argv else sorted(QUESTIONS.glob("*/0*.md"))
-    bad = 0
+    bad = warned = 0
     for path in paths:
-        problems = lint(path)
-        if problems:
-            bad += 1
+        warnings: list[str] = []
+        problems = lint(path, warnings)
+        if problems or warnings:
             print(f"{path.relative_to(QUESTIONS.parent.parent)}:")
             for p in problems:
                 print(f"  {p}")
-    print(f"{len(paths) - bad}/{len(paths)} pages clean")
+            for w in warnings:
+                print(f"  warn {w}")
+        bad += bool(problems)
+        warned += bool(warnings)
+    print(f"{len(paths) - bad}/{len(paths)} pages clean" + (f", {warned} with warnings" if warned else ""))
     return 1 if bad else 0
 
 

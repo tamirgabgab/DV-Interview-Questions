@@ -371,7 +371,10 @@ added: 2026-10-15
     1. **המועמדים.** נסתכל על \( x + 1 \) המספרים שבנויים רק מאחדות:
 
         \[
-        R_1 = 1,\quad R_2 = 11,\quad R_3 = 111,\quad \ldots,\quad R_{x+1} = \underbrace{11\ldots1}_{x+1}
+        \begin{aligned}
+        &R_1 = 1,\quad R_2 = 11,\quad R_3 = 111,\quad \ldots, \\
+        &R_{x+1} = \underbrace{11\ldots1}_{x+1}
+        \end{aligned}
         \]
 
     2. **שתי יונים באותו שובך.** יש רק \( x \) שאריות אפשריות בחלוקה ב-\( x \). לפי

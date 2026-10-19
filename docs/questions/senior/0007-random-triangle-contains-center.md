@@ -250,7 +250,10 @@ added: 2026-10-15
     הווקטורית
 
     \[
-    s_i = (P_j - P_i) \times (O - P_i) = (x_j - x_i)(0 - y_i) - (y_j - y_i)(0 - x_i)
+    \begin{aligned}
+    s_i &= (P_j - P_i) \times (O - P_i) \\
+        &= (x_j - x_i)(0 - y_i) - (y_j - y_i)(0 - x_i)
+    \end{aligned}
     \]
 
     אומר אם \( O \) נמצא משמאל לצלע (חיובי) או מימין לה (שלילי). \( O \) בתוך המשולש אם
@@ -317,9 +320,11 @@ added: 2026-10-15
     4. **מחברים.** נסמן ב-\( O \in \triangle \) את המאורע "המרכז בתוך המשולש". לכן:
 
         \[
-        \Pr[O \notin \triangle] = \Pr[A_1] + \Pr[A_2] + \Pr[A_3] = 3 \cdot \tfrac14 = \tfrac34
-        \qquad\Longrightarrow\qquad
-        \Pr[O \in \triangle] = 1 - \tfrac34 = \tfrac14
+        \begin{aligned}
+        \Pr[O \notin \triangle] &= \Pr[A_1] + \Pr[A_2] + \Pr[A_3] \\
+                                &= 3 \cdot \tfrac14 = \tfrac34 \\
+        \Pr[O \in \triangle]    &= 1 - \tfrac34 = \tfrac14
+        \end{aligned}
         \]
 
     </div>
@@ -375,9 +380,10 @@ added: 2026-10-15
        \( M \) אפשרויות ל-\( p \). לכן:
 
         \[
-        \#\text{good} = \binom{M}{3} - M \binom{\lfloor M/2 \rfloor}{2}
-        \qquad
-        P(M) = 1 - \frac{M \binom{\lfloor M/2 \rfloor}{2}}{\binom{M}{3}}
+        \begin{aligned}
+        \#\text{good} &= \binom{M}{3} - M \binom{\lfloor M/2 \rfloor}{2} \\
+        P(M)          &= 1 - \frac{M \binom{\lfloor M/2 \rfloor}{2}}{\binom{M}{3}}
+        \end{aligned}
         \]
 
     4. **מפשטים לפי הזוגיות של \( M \):**

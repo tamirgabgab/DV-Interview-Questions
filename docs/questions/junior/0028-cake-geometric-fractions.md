@@ -95,7 +95,7 @@ added: 2026-10-19
         \[
         \begin{aligned}
         S_{k+1} > S_k &\iff q(1 - p_k) > 1 \\
-                      &\iff p_k < 1 - \frac{1}{q} = 1 - \frac{1}{1.5} = \frac13
+                      &\iff p_k < 1 - \frac{1}{q} = \frac13
         \end{aligned}
         \]
 
@@ -103,13 +103,14 @@ added: 2026-10-19
 
         \[
         \begin{aligned}
-        0.01 \cdot 1.5^{k-1} \ge \frac13
-        &\iff 1.5^{k} \ge \frac{0.5}{0.01} = 50 \\
-        &\iff k \ge \log_{1.5} 50 = \frac{\ln 50}{\ln 1.5} \approx 9.65
+                 & 0.01 \cdot 1.5^{k-1} \ge \tfrac13 \\
+        \iff\quad & 1.5^{k} \ge 50 \\
+        \iff\quad & k \ge \log_{1.5} 50 \approx 9.65
         \end{aligned}
         \]
 
-        ולכן \( k = \lceil 9.65 \rceil = 10 \).
+        כי \( \frac{0.5}{0.01} = 50 \) ו-\( \log_{1.5} 50 = \frac{\ln 50}{\ln 1.5} \). לכן
+        \( k = \lceil 9.65 \rceil = 10 \).
 
     5. **בדיקה ישירה:** ‏\( p_9 = 0.01 \cdot 1.5^8 \approx 0.256 < \tfrac13 \), ולכן
        \( S_{10} > S_9 \). ‏\( p_{10} = 0.01 \cdot 1.5^9 \approx 0.384 \ge \tfrac13 \), ולכן

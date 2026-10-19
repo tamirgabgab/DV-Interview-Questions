@@ -5,6 +5,11 @@ on:
     branches: ["**"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      phone_dark:
+        description: "Also run the phone check in dark mode (screenshots as phone-screenshots-dark)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -30,6 +35,11 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt -r requirements-dev.txt
+      # Node runs the math of the interactive explorers against the Python reference
+      # (tests/0026 to tests/0028 and the Josephus tests); without it those tests skip.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       # Verilator built from source at a pinned commit (the apt package is 5.020, which
       # cannot run randomize() with constraints); the install tree is cached per commit.
       # z3 is the SMT solver Verilator calls for constrained randomization.
@@ -95,6 +105,17 @@ jobs:
         with:
           name: phone-screenshots
           path: phone-shots
+          retention-days: 7
+          if-no-files-found: ignore
+      # Dark mode on request only (Actions → Run workflow → phone_dark), it doubles the check time.
+      - name: Check every page at phone width in dark mode
+        if: github.event_name == 'workflow_dispatch' && inputs.phone_dark
+        run: python tools/check_phone.py site --scheme dark --shots phone-shots-dark
+      - uses: actions/upload-artifact@v4
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.phone_dark
+        with:
+          name: phone-screenshots-dark
+          path: phone-shots-dark
           retention-days: 7
           if-no-files-found: ignore
       - uses: actions/upload-pages-artifact@v3

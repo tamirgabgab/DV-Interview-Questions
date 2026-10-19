@@ -9,6 +9,10 @@ script throws. A full-page screenshot of each page goes to --shots (CI uploads t
 artifact). Needs Playwright: pip install -r requirements-dev.txt and
 python -m playwright install chromium (or --browser PATH to an installed Chromium).
 
+It also warns (without failing) about display math wider than its column: such an
+equation scrolls sideways on its own, which is easy to miss on a phone; split it with
+`aligned`. --scheme dark runs the same check in dark mode (CI runs it on manual request).
+
 In a sandbox without access to the CDNs, --offline ignores errors of external scripts and
 --route REGEX=FILE serves a CDN script from a local copy (e.g. MathJax, so math is laid out
 as on the live site).
@@ -45,6 +49,24 @@ INSPECT = """(width) => {
   return { scrollWidth: document.documentElement.scrollWidth, wide: out };
 }""" % SCROLLERS
 
+# Display math that is wider than its column (it scrolls inside the page); the warning shows
+# the start of the equation as text.
+WIDE_MATH = """async () => {
+  if (window.MathJax && MathJax.startup && MathJax.startup.promise) {
+    try { await MathJax.startup.promise; } catch (e) {}
+  }
+  const out = [];
+  for (const el of document.querySelectorAll("mjx-container[display='true']")) {
+    const box = el.parentElement;            // div.arithmatex, the width of the column
+    const over = el.getBoundingClientRect().width - box.clientWidth;
+    if (box.clientWidth === 0 || over <= 1) continue;
+    const mml = el.querySelector("mjx-assistive-mml");
+    const text = (mml ? mml.textContent : el.textContent).replace(/\\s+/g, " ").trim();
+    out.push(`+${Math.round(over)} px: ${text.slice(0, 60)}`);
+  }
+  return out;
+}"""
+
 OPEN_ALL = """() => {
   document.querySelectorAll("details").forEach((d) => (d.open = true));
   document.querySelectorAll(".hint-locked").forEach((d) => d.classList.remove("hint-locked"));
@@ -72,6 +94,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--route", action="append", default=[], metavar="REGEX=FILE",
                     help="serve requests matching REGEX from a local file")
     ap.add_argument("--only", help="check only pages whose path matches this regex")
+    ap.add_argument("--scheme", choices=["light", "dark"], default="light",
+                    help="colour scheme of the browser (the site follows it)")
     args = ap.parse_args(argv)
 
     from playwright.sync_api import sync_playwright
@@ -87,10 +111,11 @@ def main(argv: list[str]) -> int:
     shots.mkdir(parents=True, exist_ok=True)
     server, base = serve(site)
 
-    failures = 0
+    failures = warned = 0
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
-        ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1)
+        ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1,
+                                  color_scheme=args.scheme)
         for spec in args.route:
             pattern, file = spec.split("=", 1)
             ctx.route(re.compile(pattern), functools.partial(lambda file, route: route.fulfill(path=file), file))
@@ -106,6 +131,7 @@ def main(argv: list[str]) -> int:
             page.evaluate(OPEN_ALL)
             page.wait_for_timeout(800)
             info = page.evaluate(INSPECT, WIDTH)
+            wide_math = page.evaluate(WIDE_MATH)
             if args.offline:
                 errors = [e for e in errors if not re.search(r"https?://(?!127\.0\.0\.1)", e)]
             name = rel[: -len("/index.html")].replace("/", "__") or "home"
@@ -121,9 +147,13 @@ def main(argv: list[str]) -> int:
                     print(f"        too wide: {w}")
             for e in errors:
                 print(f"        script error: {e[:200]}")
+            for w in wide_math:
+                print(f"        warn wide math {w}")
+            warned += bool(wide_math)
         browser.close()
     server.shutdown()
-    print(f"{len(pages)} pages checked at {WIDTH} px, {failures} with problems; screenshots in {shots}")
+    print(f"{len(pages)} pages checked at {WIDTH} px ({args.scheme}), {failures} with problems, "
+          f"{warned} with wide math warnings; screenshots in {shots}")
     return 1 if failures else 0
 
 

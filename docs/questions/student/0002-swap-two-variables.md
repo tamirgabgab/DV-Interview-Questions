@@ -212,7 +212,7 @@ added: 2026-10-15
 
     #### הרעיון { .sol-idea }
 
-    XOR משחק את התפקיד של חיבור **וגם** של חיסור: \( (x \oplus y) \oplus y = x \). לכן
+    ‏XOR משחק את התפקיד של חיבור **וגם** של חיסור: \( (x \oplus y) \oplus y = x \). לכן
     \( a_0 \oplus b_0 \) מחזיק את שני הערכים ביחד, ו-XOR נוסף עם אחד מהם מחזיר את השני,
     בדיוק כמו הסכום בסעיף ב, אבל בלי נשא (carry) ובלי גלישה.
 
@@ -269,8 +269,10 @@ added: 2026-10-15
     \[
     \begin{aligned}
     \text{1:}\quad a &= a_0 \oplus b_0 \\
-    \text{2:}\quad b &= (a_0 \oplus b_0) \oplus b_0 = a_0 \oplus (b_0 \oplus b_0) = a_0 \oplus 0 = a_0 \\
-    \text{3:}\quad a &= (a_0 \oplus b_0) \oplus a_0 = (a_0 \oplus a_0) \oplus b_0 = 0 \oplus b_0 = b_0
+    \text{2:}\quad b &= (a_0 \oplus b_0) \oplus b_0 = a_0 \oplus (b_0 \oplus b_0) \\
+                     &= a_0 \oplus 0 = a_0 \\
+    \text{3:}\quad a &= (a_0 \oplus b_0) \oplus a_0 = (a_0 \oplus a_0) \oplus b_0 \\
+                     &= 0 \oplus b_0 = b_0
     \end{aligned}
     \]
 
