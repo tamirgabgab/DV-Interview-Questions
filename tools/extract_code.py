@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import hashlib
 import re
+import sys
 import textwrap
+import types
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -71,7 +73,9 @@ def fingerprint(code: str) -> str:
 def load_python(qid: str | int, skip: tuple[str, ...] = ()) -> dict:
     """Execute every Python block of the page (except blocks containing a `skip` marker)
     in one namespace and return it, so tests can call the published functions."""
-    namespace: dict = {"__name__": f"question_{int(qid):04d}"}
+    module = types.ModuleType(f"question_{int(qid):04d}")   # a real module: dataclasses look it up
+    sys.modules[module.__name__] = module
+    namespace = module.__dict__
     for code in blocks(qid, "python"):
         if any(s in code for s in skip):
             continue

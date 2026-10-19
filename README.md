@@ -42,6 +42,7 @@ level**, **difficulty** and **topic**.
 | 0020 | PCIe: every legal completion split of one read request (MRRS, MPS, RCB) | senior | 🟡 medium | protocol rules → "every cut on an RCB boundary", recursive enumeration largest-first, 2^c count, splits map, MPS pruning |
 | 0021 | PCIe: how many completion splits (two 256-byte and two 512-byte requests), and the general formula with proof | senior | 🟡 medium | blocks and interior boundaries, 2^(N-1) when MPS does not bind, compositions with parts ≤ m, generating function, closed form S(N) − S(N−1) + δ, T(N, k), no code |
 | 0022 | Generalized Josephus: one stays, two leave (N = 30, a formula, bonus for any L) | senior | 🔴 hard | recurrence in steps of 2, parity chains, zero points 3^m and 2·3^m, F = 3(N − M)/2, general L with residue chains, charts of the chains (no code) |
+| 0023 | PCIe endpoint reference model: writes, reads and completions (aligned, then any address) | senior | 🟡 medium | memory as RCB-sized blocks, completions built at request time, per-read queue with a random ready cycle, interleaving between reads, read-modify-write of partial blocks, random subset of the interior RCB boundaries, Byte Count; SV classes with virtual methods and a Python subclass |
 
 Update this table whenever a question is added.
 
@@ -136,7 +137,7 @@ DV-Interview-Questions/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
 │   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…
-│   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…
+│   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…, 0023-…
 │   │   └── staff/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
@@ -302,9 +303,9 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 | Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax)           |
 | Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |
 | Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007; 0016 and 0022 survivor chains) |
-| Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0022 box rows: relabelling, one round, bits) |
+| Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0022 box rows: relabelling, one round, bits; 0020, 0021 and 0023 address axes) |
 | Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
-| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0022 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events) |
+| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0022 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events, 0023 completion queues cycle by cycle) |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 
@@ -325,7 +326,8 @@ follow the light / dark switch automatically:
 | `.box-grid` (HTML) | Compact row of numbered cells with a value in each (0009; `bg-10` for ten cells, 0017) |
 | `fl-slow`, `fl-fast` | Tortoise and hare rings on a graph (0017) |
 | `sand-a`, `sand-b`, `stream-*`, `glass`, `frame`, `measure`, `pruned` | Hourglasses: sand, the falling stream, the glass and frame, the measurement window, a pruned option (0018, 0019; drawn by `tools/figures/hourglass.py`) |
-| `cs-rcb`, `cs-req`, `cs-first`, `cs-mid`, `cs-last`, `cs-one`, `cs-bad`, `cs-can`, `cs-size` | PCIe completion splits over the address axis: RCB grid, request limits, completions by role, one above MPS (0020, 0021; drawn by `tools/figures/q0020.py` and `q0021.py`) |
+| `cs-rcb`, `cs-req`, `cs-first`, `cs-mid`, `cs-last`, `cs-one`, `cs-bad`, `cs-can`, `cs-size` | PCIe completion splits over the address axis: RCB grid, request limits, completions by role, one above MPS (0020, 0021, 0023; drawn by `tools/figures/q0020.py`, `q0021.py` and `q0023.py`) |
+| `cs-blk`, `cs-new`, `cs-keep` | Memory blocks of the endpoint model: a block, the bytes a request touches, the bytes kept by a read-modify-write (0023) |
 | `ttt-grid`, `ttt-ghost`, `mark`, `mark-new`, `cell-s1`…`cell-s3` | Tic-tac-toe boards with highlighted cells (0011) |
 | `gp-line`, `gp-dot`, `shp-1`…`shp-3`, `shp-bad`, `shp-num`, `sep-zone`, `dash`, `coord`, `zone-label`, `halo` | Shapes on a grid of points, overlap areas, zones, text with a background halo (0014) |
 

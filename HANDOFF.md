@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-18 (session 8)_
+_Last updated: 2026-10-19 (session 10)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -486,10 +486,51 @@ became 0022 when the branches were merged.
 5. **Paths:** 0016 left the coding path; a new two-step path `docs/paths/josephus.md`
    (0016 → 0022). Wide display equations are split with `aligned` so they fit 390 px.
 
+### Session 10 — 2026-10-19: question 0023, PCIe endpoint reference model
+
+The owner sent `ref_pcie.md` (an exercise plus a suggested solution) and asked for a
+senior / medium code question: a reference model of a PCIe endpoint as Completer with
+MRRS = MPS = 256 and RCB = 128, memory as an associative array of RCB-sized blocks, posted
+writes, reads answered by one or more completions with random delay and interleaving
+between reads. Decisions (asked first): memory in 128-byte blocks keyed by the block
+address (the reference used a byte map; blocks make part b harder on the write side too);
+part a is the whole model under the aligned assumption (address a multiple of 128, length
+128 or 256), part b drops it for writes and reads; the MPS = 128 extension of the reference
+is left out entirely; output through `tick()` + `get_next_completion()` (pull, one
+completion per cycle at most), no clocked task.
+
+1. **Page** `docs/questions/senior/0023-pcie-endpoint-reference-model.md`. Question: rules,
+   the block memory, the four-function interface, the given classes in both languages.
+   Part a: the two legal answers for 256 bytes from 0x10000 (256, or 128 + 128 with Byte
+   Count 256 then 128), the architecture (Mermaid), a six-frame stepper of two reads
+   interleaving, the full class. Part b: block and offset, read-modify-write of partial
+   blocks, the four splits of 256 bytes from 0x10020 (and why 128 + 128 is illegal), a
+   subclass that overrides exactly `process_write`, `read_bytes` and `create_fragments`
+   (virtual in part a for that reason). Traps: RCB as a size, Byte Count as payload size,
+   whole-block replace on a partial write, one random queue instead of one queue per read.
+2. **Code:** SystemVerilog `endpoint_ref_model` / `unaligned_endpoint_model` and Python
+   `EndpointRefModel` / `UnalignedEndpointModel`; the Python model takes a `random.Random`
+   so runs are reproducible. Better than the reference in two places: the model does not
+   hand-code the splits, and the aligned model rejects traffic outside its assumptions.
+3. **Figures** `tools/figures/q0023.py`: address-axis figures (aligned read over the two
+   blocks; the three blocks a 0x10020 request touches; the four splits plus the illegal
+   one), the stepper and the tables, all produced by the page's own Python classes driven
+   by a scripted random source (`Script`) so the runs are fixed and hand-picked. New CSS
+   `cs-blk`, `cs-new`, `cs-keep` and legend entries for `cs-one`, `st-done`.
+4. **Tests** `tests/0023/`: pytest against a byte-level shadow memory and the rules as the
+   page states them (random aligned and unaligned traffic, the two examples, every legal
+   split and only those, neighbours kept on partial writes, one completion per cycle,
+   figures up to date); `tb.sv` does the same in Verilator (525 completions, both examples,
+   interleaving seen); `demo.py` for the run panel.
+5. **Tooling:** `extract_code.load_python` now executes the page blocks inside a real
+   module registered in `sys.modules` (dataclasses on a page need it; `compile()` inherited
+   this file's `from __future__ import annotations`, which made the field types strings).
+6. **Path:** new `docs/paths/pcie.md` (0020 → 0021 → 0023).
+
 ## In progress
 
-- Session 9 closed: 0016 (rewritten) and 0022 are live, the full test suite passes, README /
-  HANDOFF are current.
+- Session 10 closed: 0023 is written and tested; README / HANDOFF are current. The branch
+  is pushed; `main` is updated when the owner asks.
 - Next: the owner picks items from **Round D to G** below (proposed 2026-10-18), or sends
   the next batch of questions.
 
@@ -500,7 +541,7 @@ became 0022 when the branches were merged.
 ### Owner decisions
 
 - [ ] Keep example question `0001` or replace it with real content.
-- [ ] Staff level is still empty and Senior has six questions (0007, 0011, 0019, 0020, 0021, 0022) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
+- [ ] Staff level is still empty and Senior has seven questions (0007, 0011, 0019, 0020, 0021, 0022, 0023) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 
 ### Content
@@ -515,16 +556,16 @@ became 0022 when the branches were merged.
 
 ## Question variety
 
-### Coverage today (22 questions)
+### Coverage today (23 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0022 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling) |
 | Staff | — | — |
 
-Algorithms and puzzles are well covered, and 0020 / 0021 are the first protocol questions (PCIe).
+Algorithms and puzzles are well covered, and 0020 / 0021 / 0023 are the first protocol questions (PCIe, with 0023 the first reference-model question).
 **Core DV topics are still missing:** UVM, SVA, functional coverage, FIFOs, clock domain
 crossing, FSM design, debug, and verification planning.
 
@@ -814,6 +855,11 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
     `/*verilator*/` pragma and fails the build. Start such comments with other words.
   - Assignment patterns in comparisons (`if (q != '{1, 2})`) are unsupported in 5.020;
     compare against a variable.
+  - In the 5.053 snapshot, `blk = '{default: 8'h00}` on an unpacked-array local of a class
+    method did not zero it (0023, blocks created by a partial write kept stale bytes); the
+    page zeroes with a `foreach` loop. An associative array whose value is an unpacked
+    array (`typedef byte unsigned block_t[RCB]; block_t memory[bit [63:0]];`) works,
+    including `memory[key][i]` reads, with a harmless `SIDEEFFECT` warning on the store.
   - Cross-check SystemVerilog answers on more than one simulator.
 - Run panel: `hooks/questions.py` embeds the page's Python blocks as JSON and the demo as
   the editor content; `docs/javascripts/run-python.js` + `py-worker.js` run them. The
