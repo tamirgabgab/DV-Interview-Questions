@@ -11,7 +11,7 @@ level**, **difficulty** and **topic**.
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 14 questions (see the catalog below).
+> **Status:** the site is live and holds 21 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
 
 ---
@@ -37,7 +37,11 @@ level**, **difficulty** and **topic**.
 | 0015 | Two children, at least one boy (boy or girl paradox, the Tuesday boy) | student | 🟢 easy | conditional probability, inclusion-exclusion, Bayes, general formula, outcome grids (no code) |
 | 0016 | The Josephus problem, every second person leaves (N = 20, then a formula) | junior | 🟡 medium | round-by-round simulation, recurrence by relabelling, zero points at powers of 2, F = 2r by induction, binary view, step-through circle (no code) |
 | 0017 | Find the duplicate number without changing the array and in O(1) memory | junior | 🟡 medium | sort / seen table / binary search on values / Floyd's cycle detection, rho graph, tortoise-and-hare stepper |
-| 0018 | Generalized Josephus: one stays, two leave (N = 30, a formula, bonus for any L) | senior | 🔴 hard | recurrence in steps of 2, parity chains, zero points 3^m and 2·3^m, F = 3(N − M)/2, general L with residue chains, charts of the chains (no code) |
+| 0018 | Two hourglasses: measure D minutes from time 0 | junior | 🟡 medium | BFS over (time, sand, sand) states, decide only at events, hourglass stepper and branching figure |
+| 0019 | Two hourglasses: measure D minutes between two moments | senior | 🔴 hard | Dijkstra over (sand, sand, measured) with a zero-cost "start" edge, Bézout, hourglass stepper |
+| 0020 | PCIe: every legal completion split of one read request (MRRS, MPS, RCB) | senior | 🟡 medium | protocol rules → "every cut on an RCB boundary", recursive enumeration largest-first, 2^c count, splits map, MPS pruning |
+| 0021 | PCIe: how many completion splits (two 256-byte and two 512-byte requests), and the general formula with proof | senior | 🟡 medium | blocks and interior boundaries, 2^(N-1) when MPS does not bind, compositions with parts ≤ m, generating function, closed form S(N) − S(N−1) + δ, T(N, k), no code |
+| 0022 | Generalized Josephus: one stays, two leave (N = 30, a formula, bonus for any L) | senior | 🔴 hard | recurrence in steps of 2, parity chains, zero points 3^m and 2·3^m, F = 3(N − M)/2, general L with residue chains, charts of the chains (no code) |
 
 Update this table whenever a question is added.
 
@@ -131,8 +135,8 @@ DV-Interview-Questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
-│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…
-│   │   ├── senior/            # 0007-…, 0011-…, 0018-…
+│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…
+│   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…
 │   │   └── staff/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
@@ -297,10 +301,10 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 | Timing diagrams / waveforms      | ` ```wavedrom ` fenced blocks ([WaveDrom](https://wavedrom.com/))  |
 | Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax)           |
 | Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |
-| Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007; 0016 and 0018 survivor chains) |
-| Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0018 box rows: relabelling, one round, bits) |
+| Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007; 0016 and 0022 survivor chains) |
+| Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0022 box rows: relabelling, one round, bits) |
 | Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
-| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0018 circles, 0017 tortoise and hare) |
+| Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0022 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events) |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 
@@ -320,6 +324,8 @@ follow the light / dark switch automatically:
 | `box-node`, `box-hl`, `box-num`, `*-fill` (arrowheads), `s3-line` | Graph of boxes / cycles (0009) |
 | `.box-grid` (HTML) | Compact row of numbered cells with a value in each (0009; `bg-10` for ten cells, 0017) |
 | `fl-slow`, `fl-fast` | Tortoise and hare rings on a graph (0017) |
+| `sand-a`, `sand-b`, `stream-*`, `glass`, `frame`, `measure`, `pruned` | Hourglasses: sand, the falling stream, the glass and frame, the measurement window, a pruned option (0018, 0019; drawn by `tools/figures/hourglass.py`) |
+| `cs-rcb`, `cs-req`, `cs-first`, `cs-mid`, `cs-last`, `cs-one`, `cs-bad`, `cs-can`, `cs-size` | PCIe completion splits over the address axis: RCB grid, request limits, completions by role, one above MPS (0020, 0021; drawn by `tools/figures/q0020.py` and `q0021.py`) |
 | `ttt-grid`, `ttt-ghost`, `mark`, `mark-new`, `cell-s1`…`cell-s3` | Tic-tac-toe boards with highlighted cells (0011) |
 | `gp-line`, `gp-dot`, `shp-1`…`shp-3`, `shp-bad`, `shp-num`, `sep-zone`, `dash`, `coord`, `zone-label`, `halo` | Shapes on a grid of points, overlap areas, zones, text with a background halo (0014) |
 
@@ -414,7 +420,10 @@ without it.
 - Compiled testbenches are cached in `.cache/sv/` by content hash, so unchanged ones are not
   recompiled. A first full compile takes about a minute with 4 cores; the z3 solver needs
   about 0.1 s per `randomize()` on 0014, so that testbench runs for ~30 s.
-- Logic and proof questions have no tests; only questions with code get a `tests/<id>/` folder.
+- Pure logic questions have no tests. A page without code can still have a `tests/<id>/`
+  folder when it states numbers worth checking (0015 probabilities, 0021 counts and the
+  formula): the tests then compute them independently and check the figures against the
+  generator. The "tested automatically" badge needs both code and a tests folder.
 
 ## Running the site locally
 

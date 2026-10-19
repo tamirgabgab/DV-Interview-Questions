@@ -1200,3 +1200,37 @@ body.practice-mode .md-typeset .question-tools {
   .md-typeset table:not([class]) td { padding: 0.55em 0.6em; }
   .md-typeset table:not([class]) th { min-width: 3rem; }   /* Material: 5rem */
 }
+
+/* Hourglass figures (questions 0018, 0019), drawn by tools/figures/hourglass.py */
+.md-typeset svg .sand-a { fill: var(--viz-s1); }
+.md-typeset svg .sand-b { fill: var(--viz-s2); }
+.md-typeset svg .stream-a { stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: 2 2; }
+.md-typeset svg .stream-b { stroke: var(--viz-s2); stroke-width: 2; stroke-dasharray: 2 2; }
+.md-typeset svg .glass { fill: none; stroke: var(--viz-ink); stroke-width: 1.5; stroke-linejoin: round; }
+.md-typeset svg .frame { stroke: var(--viz-ink); stroke-width: 3; stroke-linecap: round; }
+.md-typeset svg .ink-fill { fill: var(--viz-ink); }
+.md-typeset svg .measure { fill: var(--viz-s3); fill-opacity: 0.12; stroke: var(--viz-s3); stroke-width: 1.5; }
+.md-typeset svg .pruned { opacity: 0.4; }
+.md-typeset svg.hourglass-fig .tick { font-size: 12px; }
+.md-typeset .viz-legend .s3 { background: var(--viz-s3); }
+/* Material gives figures width: fit-content, so a frame with a short caption shrank its SVG */
+.md-typeset .stepper-frame { width: auto; }
+
+/* PCIe completion splits (question 0020), drawn by tools/figures/q0020.py */
+.md-typeset svg .cs-rcb { stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.md-typeset svg .cs-req { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .cs-first { fill: var(--viz-s1); fill-opacity: 0.28; stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg .cs-one { fill: var(--viz-s1); fill-opacity: 0.28; stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg .cs-mid { fill: var(--viz-grid); fill-opacity: 0.7; stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .cs-last { fill: var(--viz-s3); fill-opacity: 0.3; stroke: var(--viz-s3); stroke-width: 1.5; }
+.md-typeset svg .cs-bad { fill: var(--viz-s2); fill-opacity: 0.4; stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg .cs-can { fill: var(--viz-s3); stroke: var(--md-default-bg-color); stroke-width: 1.5; }
+.md-typeset svg .cs-no { fill: var(--viz-s2); font-size: 13px; font-weight: 700; font-family: var(--md-text-font-family); }
+.md-typeset svg .cs-size { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .cs-rcb { background: transparent; border-top: 2px dashed var(--viz-text); height: 0; }
+.md-typeset .viz-legend .cs-req { background: var(--viz-ink); width: 0.2rem; }
+.md-typeset .viz-legend .cs-can { background: var(--viz-s3); border-radius: 50%; }
+.md-typeset .viz-legend .cs-first { background: var(--viz-s1); opacity: 0.5; }
+.md-typeset .viz-legend .cs-mid { background: var(--viz-grid); outline: 1px solid var(--viz-text); }
+.md-typeset .viz-legend .cs-last { background: var(--viz-s3); opacity: 0.55; }
+.md-typeset .viz-legend .cs-bad { background: var(--viz-s2); opacity: 0.6; }

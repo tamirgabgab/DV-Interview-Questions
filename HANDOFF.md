@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-16 (session 5)_
+_Last updated: 2026-10-18 (session 8)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -339,21 +339,138 @@ both, three parts for Josephus, four solutions for the duplicate, steppers plus 
    the min-width 3rem. Number chains like "8 + 2" or "6 > 5" inside a Hebrew table cell are
    shown reversed by the bidi algorithm, so they are written as math.
 
-### Session 7 — 2026-10-19: Josephus rewritten as 0016 (L = 2) and 0018 (L = 3, any L)
+### Session 7 — 2026-10-18: questions 0018 and 0019
+
+The owner sent two hourglass questions with his Python solutions (BFS, then Dijkstra) and
+chose: the hard example (A = 7, B = 11, D = 1: measure from 21 to 22) for 0019 part a with no
+warm-up, junior / medium and senior / hard, SystemVerilog versions too, a sorted-insert queue
+instead of a heap in SystemVerilog, earliest finish as the optimality criterion, and a
+figure per event.
+
+1. **0018, measure D from time 0:** part a, the plan for 7 / 11 / 15 (flip both at 0, flip
+   A at 7 and again at 11, when it holds exactly 4 minutes of sand below); part b, BFS over
+   (t, a, b) with four options per event, "decide only when an hourglass runs out", the
+   state-space bound (D + 1)(A + B + 1), the search tree (Mermaid) and the queue trace (9
+   pops). Owner's Python kept as sent.
+2. **0019, measure D between two moments:** part a, 1 = 2·11 − 3·7, why 14 / 15 are not on the
+   same run, the Bézout generalisation; part b, Dijkstra over (a, b, measured) with t as the
+   path cost and a zero-cost "start measuring" edge, stale entries, the tie counter, the
+   16-pop trace and the path graph. Owner's Python kept (only the missing `heapq` /
+   `itertools` imports added).
+3. **Figures:** `tools/figures/hourglass.py` (shared drawing: two hourglasses with the sand
+   split, a stream while running, the measurement frame) and `q0018.py` / `q0019.py`: a
+   stepper frame per event (before → action → after, Hebrew captions) and the four-way
+   branching figure. New `sand-*` / `glass` / `frame` / `measure` / `pruned` classes.
+   Material gives `figure` `width: fit-content`, so a frame with a short caption shrank its
+   SVG to the caption width; `.stepper-frame { width: auto }` fixes every stepper.
+4. **Tests:** Python replays every returned plan with an independent simulator; 0018 checks
+   feasibility against an exhaustive search (A, B ≤ 11, D < 25), 0019 the earliest finish
+   against a reachability oracle (A, B ≤ 9, D ≤ 10); both check the figures against the
+   generators. SystemVerilog testbenches run the page code as published on the pinned
+   Verilator (no translations): 150 cases from an expected table for 0018, 30 cases
+   including impossible ones for 0019. **Testbench bug found by 5.053:** `int A = pairs[k]`
+   inside a loop of an `initial` block is a static initialiser that runs once (5.020 re-ran
+   it); both testbenches assign instead.
+5. Both questions added to the end of the coding path (after 0005: BFS on states, then
+   Dijkstra). README catalog, layout, figure and class tables; HANDOFF coverage and notes.
+   Checked: lint, tests, strict build, links, phone check at 390 px, desktop screenshots.
+
+This session started from an older branch point (0008 / 0009 were free then); the work was
+re-applied on top of the current `main` as 0018 / 0019 in the new page skeleton.
+
+### Session 8 — 2026-10-18: question 0020
+
+The owner asked about PCIe completion splitting (MRRS / MPS / RCB) in chat, then asked to
+turn it into a question with code in both languages and figures like his sketch (every
+split of the example drawn over the address axis). Choices: senior / medium, a single
+part, the function assumes `len <= MRRS` (MRRS explained in the question and a trap), and
+three figures: the parameters figure, the map of all splits, a Mermaid flowchart.
+
+1. **0020, every completion split of one read** (`docs/questions/senior/`): the three
+   rules of the spec reduce to "every cut between two completions is on an RCB
+   boundary", so a split is a subset of the c boundaries inside the request, filtered by
+   MPS. `completion_splits(addr, len, mps, rcb)` enumerates them recursively, largest
+   cut first, so the first split is the greedy minimum and the last cuts on every
+   boundary. Example 0x1010 / 256 / RCB 64 / MPS 256: 16 splits, from [256] to
+   [48, 64, 64, 64, 16]; with MPS = 128, 8 remain. SystemVerilog returns `int splits[$][$]`
+   (a queue of queues works on the pinned Verilator, also as a `ref` argument and through
+   recursion). Traps: reading the sizes backwards (144+64+48 cuts off-boundary), cutting
+   by MPS instead of RCB ([128, 128] from 0x1010), MRRS vs. MPS. Follow-ups: counting with
+   a DP, min / max formulas, Byte Count / Lower Address, scoreboard and coverage, who sets
+   the RCB.
+2. **Figures** from `tools/figures/q0020.py` (the generator runs the page's Python code,
+   like 0014): the parameters figure (RCB grid, request limits, MPS reach with the two
+   legal ends of the first completion, one split by role), the map of the 16 splits as
+   rows over the address axis grouped by the number of completions, the same map with
+   the splits MPS = 128 rules out faded, and the two tables. New `cs-*` classes in
+   `extra.css`. Mermaid: the flowchart of the recursion and the recursion tree for
+   RCB = 128 with the MPS = 128 pruning dashed.
+3. **Tests:** Python compares the page function with a subset enumeration on 600 random
+   requests inside a 4 KB page, checks every split against the rules, the order (greedy
+   first, c + 1 last, 2^c when MPS >= len) and the page figures. Mutation check: dropping
+   the MPS condition or the descending order fails the tests. SystemVerilog: the same
+   subset reference (bit mask over the boundaries), 400 random requests, as published.
+   Note: `join` is a reserved word (fork / join), the testbench helper is `joined`.
+4. README catalog, layout and figure class tables; this file.
+
+### Session 8 (continued) — 2026-10-18: question 0021
+
+The owner sent a Markdown proof of the counting formula and asked for a second PCIe
+question, senior / medium, no code: count the splits for numeric cases, then prove the
+general formula. Choices: all cases with MPS = 256 and RCB = 64 (the special case of the
+bonus), 256-byte requests aligned / unaligned in part a (8, 16), 512-byte requests in
+part b (108, 208), the proof as part c with T(N, k), the special cases, the delta example
+and the numeric verification; figures: block structure per case, maps of all splits only
+for the small cases, the first-completion branching for N = 8, the three cases of lemma 2.
+
+1. **0021** (`docs/questions/senior/0021-pcie-completion-count.md`): part a, every subset of
+   the interior boundaries is legal when L <= MPS, so 2^(N-1) with N the number of blocks
+   (the unaligned request touches one block more). Part b, a completion holds at most
+   m = MPS / RCB blocks, so the count is the number of compositions of N with parts 1..m:
+   C(N) = C(N-1) + ... + C(N-4), the table 1, 1, 2, 4, 8, 15, 29, 56, 108, 208. Part c, the
+   owner's proof written out step by step: five lemmas (bijection with subsets, the MPS
+   rule in blocks with its three cases, the delta exception for N = m + 1 and L <= MPS,
+   compositions and the generating function (1 - x) / (1 - 2x + x^(m+1)), the closed form
+   S(n) by geometric series and binomial), the count by number of completions by
+   inclusion-exclusion, the special cases m = 1 / 2 / >= N, the special case MPS = 256 and
+   RCB = 64 with the S(n) table and the four cases of parts a and b, and the numeric sweep.
+   The unaligned 256-byte request is itself the delta case (f + e = 64 <= RCB), which the
+   page uses as the bridge between parts a and c.
+2. **Figures** from `tools/figures/q0021.py` (self-contained counting: splits, DP count,
+   compositions, S, T; shares the `cs-*` classes of 0020): block structure with f, e, N,
+   |B|, m and delta per case; the maps of all splits for 8, 16 and the delta example
+   (0x1020, 128, MPS 128: 4 splits); the branching of the first completion for N = 8; the
+   three cases of lemma 2 with the inequality next to each.
+3. **Tests** (`tests/0021`, no page code): the four counts and the delta example by subset
+   enumeration, DP count and formula; the recursion and S(n) tables; T(N, k) against the
+   enumeration grouped by k; the special cases (Fibonacci, 2^(N-1)); 400 random requests;
+   the sweep quoted on the page (RCB 64 / 128, MPS 128..1024, every DW offset, lengths 4
+   to 1596: 76,608 cases, formula = DP); figures and tables against the generator.
+4. **0020 fixes:** the four rules were written with an RLM before the list numbers, which
+   turned them into one paragraph; now a real ordered list. The "count without
+   enumerating" follow-up links to 0021.
+5. **Phone lesson again:** every display equation wider than ~350 px at 390 px was split
+   with `aligned` (ten of them in the proof); a long inline chain in a short answer was
+   shortened with `\dots`. Measured with a Playwright script that lists the
+   `mjx-container[display]` widths.
+
+### Session 9 — 2026-10-19: Josephus rewritten as 0016 (L = 2) and 0022 (L = 3, any L)
 
 The owner wanted the Josephus question split in two, math-first, no code: an easier page
 (N = 20, every second person leaves, then a formula with a step-by-step proof checked on
 the example) and a harder page (N = 30, one stays and two leave, then a formula, and a
 staff-level bonus for "one stays, L - 1 leave" following the owner's reference notes).
 Decisions: people numbered 0 .. N - 1 (the formulas are F = 2r and F = 3(N - M)/2, the
-classical 1-based answers are these plus 1); 0018 is senior / hard; no code at all.
+classical 1-based answers are these plus 1); the hard page is senior / hard; no code at
+all. It was written as 0018 in parallel with session 7 and 8 of another session, so it
+became 0022 when the branches were merged.
 
 1. **0016 rewritten** at the same URL: part a, N = 20 by rounds (the shortcut
    F(20) = 2F(10) = 4F(5) = 8); part b, F(N) = (F(N - 1) + 2) mod N by relabelling after one
    elimination, F(2k) = 2F(k) from a full round, zero points at powers of 2, induction along
    r with the modulus inactive while r < 2^m, F = 2r, binary view (drop the top bit, append
    0). The old queue / formula / any-k code and `tests/0016/tb.sv`, `demo.py` are gone.
-2. **0018 new:** part a, N = 30 by rounds (F_3(30) = 3F_3(10) = 18); part b,
+2. **0022 new:** part a, N = 30 by rounds (F_3(30) = 3F_3(10) = 18); part b,
    F_3(N) = (F_3(N - 2) + 3) mod N, two parity chains, zero points 3^m and 2·3^m, the lemma
    F_3(M + 2j) = 3j for j < M, F_3 = 3(N - M)/2 with M of the same parity (N = 21 gives M = 9,
    not 18); part c (bonus), the general recurrence in steps of L - 1, residue chains
@@ -361,17 +478,20 @@ classical 1-based answers are these plus 1); 0018 is senior / hard; no code at a
    L = 2, 3 and F_4(20) = 16.
 3. **Figures:** `tools/figures/q0016.py` now holds the general drawing code (`run`,
    `rounds`, `circle_stepper`, `rounds_table`, `values_table`, `zeros_table`, `chart` with
-   one line per chain, `relabel_svg`, `round_svg`, `bits_svg`); `q0018.py` imports it. New
+   one line per chain, `relabel_svg`, `round_svg`, `bits_svg`); `q0022.py` imports it. New
    CSS: `.st-text.st-sm` (smaller numbers for 30 people), `.s3-dot`, `.viz-legend .ink-dash`.
-4. **Tests:** `tests/0016/test_0016.py` and `tests/0018/test_0018.py` check the closed forms
+4. **Tests:** `tests/0016/test_0016.py` and `tests/0022/test_0022.py` check the closed forms
    against an independent simulation (L = 2..7), the zero-point sets, the rounds of 20 and
    30, and that the page figures and tables are the generators' output.
 5. **Paths:** 0016 left the coding path; a new two-step path `docs/paths/josephus.md`
-   (0016 → 0018). Wide display equations are split with `aligned` so they fit 390 px.
+   (0016 → 0022). Wide display equations are split with `aligned` so they fit 390 px.
 
 ## In progress
 
-- Waiting for the next batch of questions from the owner.
+- Session 9 closed: 0016 (rewritten) and 0022 are live, the full test suite passes, README /
+  HANDOFF are current.
+- Next: the owner picks items from **Round D to G** below (proposed 2026-10-18), or sends
+  the next batch of questions.
 
 ---
 
@@ -380,7 +500,7 @@ classical 1-based answers are these plus 1); 0018 is senior / hard; no code at a
 ### Owner decisions
 
 - [ ] Keep example question `0001` or replace it with real content.
-- [ ] Staff level is still empty and Senior has three questions (0007, 0011, 0018) — any questions for these levels? (The bonus part of 0018 is marked staff-level inside the page.)
+- [ ] Staff level is still empty and Senior has six questions (0007, 0011, 0019, 0020, 0021, 0022) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 
 ### Content
@@ -395,18 +515,18 @@ classical 1-based answers are these plus 1); 0018 is senior / hard; no code at a
 
 ## Question variety
 
-### Coverage today (18 questions)
+### Coverage today (22 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017 | logic puzzles, BFS, O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection |
-| Senior | 0007, 0011, 0018 | SV constraints, randomization, probability, combinatorics, generalized Josephus (recurrences, induction) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0022 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction) |
 | Staff | — | — |
 
-Algorithms and puzzles are well covered. **Core DV topics are missing:** UVM, SVA,
-functional coverage, FIFOs, clock domain crossing, FSM design, protocols, debug, and
-verification planning.
+Algorithms and puzzles are well covered, and 0020 / 0021 are the first protocol questions (PCIe).
+**Core DV topics are still missing:** UVM, SVA, functional coverage, FIFOs, clock domain
+crossing, FSM design, debug, and verification planning.
 
 ### Topic gaps worth filling
 
@@ -529,6 +649,59 @@ Effort: **S** under an hour, **M** a few hours, **L** a day or more.
 | C23 | Social preview cards per question | S–M |
 | C24 | Comments per question via GitHub Discussions | M |
 
+**Rounds D to G — proposed 2026-10-18, after 0020 / 0021** (not started; the owner picks):
+
+The two PCIe pages are the longest on the site (three parts, a proof, ten figures and
+tables) and showed where the interface strains: long pages have no in-page navigation,
+figures with 16 rows are unreadable at 390 px, and display math wider than the phone was
+found by hand. The proposals are grouped so a round can be done in one session.
+
+**Round D — reading long pages and figures, especially on a phone**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| D25 | **Part navigation bar**: sticky chips "סעיף א / ב / ג" under the toolbar on multi-part pages, the current part highlighted, plus "back to top" | S–M |
+| D26 | **Figure lightbox**: tap a figure to open it full screen with pinch-zoom and pan (the 16-row splits map of 0020 / 0021 and the 14 × 14 grid of 0015 are unreadable at phone width) | M |
+| D27 | **Progressive reveal in practice mode**: inside an opened solution show idea → steps → code → proof one block at a time with a "הצג עוד" button; "solved" mark and stopwatch split per part | M |
+| D28 | **Print / PDF stylesheet** and a "print this question" button: all blocks open, toolbar and navigation hidden, figures kept (the light version of idea 19) | S |
+| D29 | **Anchor links and share button**: a link icon on every heading (including parts), Web Share API on phones and "copy link" on desktop | S |
+| D30 | **Reading aids**: estimated reading time in the header card and a "read first" line from a `prerequisites:` front-matter field (0021 needs 0020) | S |
+
+**Round E — discovery and navigation**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| E31 | **Question kind filter**: `kind:` front matter (puzzle / code / design / proof / knowledge) → a chip group in the tables and a badge in the header card (idea 7b) | S–M |
+| E32 | **Explicit `related:` links** in front matter that take precedence over tag overlap, a "PCIe" study path 0020 → 0021 with a topic intro, and topic pages for the largest tags (idea 22) | S–M |
+| E33 | **Search results with context**: level / difficulty chips and a snippet per hit, and search by id ("0021") | S–M |
+| E34 | **Home page memory**: a "continue where you left off" card (last visited question from localStorage) and a "recently added" strip | S |
+| E35 | **Keyboard shortcuts** on desktop: n / p previous-next question, s open / close solutions, r random, ? help overlay | S |
+| E36 | **"מה חדש" changelog page** generated from the `added` dates (and the git log), linked from the footer | S |
+
+**Round F — interactivity**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| F37 | **Parameter explorer for 0020 / 0021**: sliders for address, length, MPS and RCB; the page draws the splits map and shows the count live (a JS port of the recursion, with a test that compares it to the Python output on a grid of cases) | M |
+| F38 | **Run panel presets**: a dropdown of example inputs per question, an "expected output" comparison, and a shareable link that carries the editor code | M |
+| F39 | **Quick quiz blocks**: multiple-choice self-checks (`??? quiz`) with instant feedback, counted in the marks (the "quick quiz" format of Question variety) | M |
+| F40 | **Side-by-side SystemVerilog / Python** on wide screens (a toggle next to the tabs) with matching line highlights | M |
+| F41 | **"Open in EDA Playground"**: copy the SV code and open the site in one click (idea 7c) | S |
+
+**Round G — infrastructure and quality**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| G42 | **`tools/new_question.py`**: scaffold the page, `tests/<id>/`, a figure-generator stub and the README catalog row from the template (idea 12b) | S–M |
+| G43 | **Generators for the old figures** 0004–0007 in `tools/figures/` (idea 12a) | S–M |
+| G44 | **Accessibility pass**: focus rings, aria labels on the toolbar and steppers, contrast of the amber chips in dark mode, `prefers-reduced-motion`; an axe / Lighthouse check in CI | M |
+| G45 | **Social preview cards** (C23) and **giscus comments** (C24) | S–M / M |
+| G46 | **Scheduled workflow**: a weekly external-link check and a reminder when a Verilator release newer than the pinned commit is out | S |
+| G47 | **Display-math width in CI**: extend `check_phone.py` to report `mjx-container[display]` elements wider than the content box (the ten equations of 0021 were found with an ad-hoc script) | S |
+
+Suggested order by value for effort: D26 and D25 (the phone experience of the long pages),
+G47 (so the next proof page is caught by CI), F37 (the PCIe explorer), E31 and E32.
+
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
 
@@ -543,15 +716,15 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 |---|------|--------|-------|
 | 1 | ~~Previous / next question links~~ | S | **Done** in session 4 (round A) |
 | 2 | ~~"Open all / close all solutions" button~~ | S | **Done** in session 4 (round B) |
-| 3 | **Random question** button, honouring the current filters | S–M | JS on the home page, reads the generated question table |
-| 4 | **Solved / favourite marks** stored in the browser, with progress per level | M | `localStorage`; show ✅ / ⭐ in the tables and a progress bar on level pages |
+| 3 | ~~Random question button, honouring the current filters~~ | S–M | **Done** in session 6 (C20) |
+| 4 | ~~Solved / favourite marks stored in the browser, with progress per level~~ | M | **Done** in session 6 (C22) |
 | 5 | ~~Interview mode~~ | M | **Done** in session 4 as "practice mode" (solutions hidden, stopwatch counting up) |
 | 6 | ~~**Sortable table columns** (id, level, difficulty); coloured chips~~ | S–M | Done: chips in session 4, sorting in session 6 (C18) |
 | 7 | ~~Related questions by shared tags~~ | S–M | **Done** in session 4 (round A) |
 | 7a | ~~Hint ladder~~ | S | **Done** in session 4 (round B) |
-| 7b | **Question type filter** (puzzle / code / design / knowledge) next to level and difficulty | S–M | New optional front-matter field, read by the hook and `question-filter.js` |
+| 7b | **Question type filter** (puzzle / code / design / knowledge) next to level and difficulty | S–M | New optional front-matter field, read by the hook and `question-filter.js` (proposed again as E31) |
 | 7c | **"Open in EDA Playground"** link for SV code, so readers can run it on a commercial simulator | S–M | EDA Playground has no prefill API; a "copy code + open site" button is the simple version |
-| 7d | **Step-through figures** (e.g. the stack in 0010, the cycles in 0009) with next / previous buttons | M | Small JS over a list of SVG frames generated by `tools/figures/` |
+| 7d | ~~Step-through figures with next / previous buttons~~ | M | **Done** in session 5 (B14) |
 
 ### Content quality and safety net
 
@@ -580,7 +753,7 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 19 | **PDF export** of a filtered question set for offline practice | M–L | e.g. a print-site plugin |
 | 20 | Bilingual content (Hebrew / English) | L | Only if the audience grows beyond Hebrew readers |
 | 21 | ~~**Mobile check** of every page in CI~~ (done, C17) (screenshots at phone width) | M | Wide tables and figures were the main issue so far (see the 0009 box grid) |
-| 22 | **Topic pages**: a short intro per topic (FSM, SVA, coverage...) linking to its questions | M | Turns the tag index into a study guide (C19) |
+| 22 | **Topic pages**: a short intro per topic (FSM, SVA, coverage...) linking to its questions | M | Study paths done in C19; topic intros proposed again as E32 |
 | 23 | ~~Step-through figures (B14)~~ | M | **Done** in session 5 (0010 stack, 0009 walks) |
 
 ---
@@ -617,8 +790,12 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 - Inline SVG figures are generated by Python scripts and styled by `.perf-chart` /
   `.figure` classes in `extra.css` (see the table in `README.md`).
 - Simulator gotchas found while testing:
-  - Verilator 5.020 (Debian) does not reset an automatic function's local queue between
-    calls inside a loop; an LRM-correct function returned wrong results (0005).
+  - Verilator 5.020 (Debian) does not reset an automatic function's local queues and
+    associative arrays between calls inside a loop; LRM-correct functions returned wrong
+    results (0005, and the 0018 / 0019 BFS and Dijkstra). The pinned 5.053 snapshot resets
+    them, so those pages run as published.
+  - `wait` is a reserved word in SystemVerilog (`wait(...)` statement); the hourglass code
+    calls the waiting time `delay`.
   - Verilator rejects `ref` arguments that are queue elements when inlining; use
     `/*verilator no_inline_task*/` in the test harness (0003).
   - Verilator 5.020 cannot run `randomize()` with constraints on arrays (0007); 5.052 can,

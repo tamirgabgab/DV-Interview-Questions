@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figures and tables of questions 0016 and 0018: the Josephus problem with the rule
+"""Figures and tables of questions 0016 and 0022: the Josephus problem with the rule
 "one stays, the next L - 1 leave", people numbered 0 .. N - 1.
 
     python tools/figures/q0016.py > /tmp/q0016.html
@@ -7,8 +7,8 @@
 Prints the figures of 0016 (L = 2) in page order: the step-through circle for N = 20, the
 round-by-round table for N = 20, the table of survivors for N = 1..16, the survivor chart
 for N = 1..40, the relabelling figure after one elimination, the one-round figure for
-N = 8, and the binary figure. tools/figures/q0018.py imports this module for L = 3 and
-the general L. tests/0016 and tests/0018 check that the page copies match.
+N = 8, and the binary figure. tools/figures/q0022.py imports this module for L = 3 and
+the general L. tests/0016 and tests/0022 check that the page copies match.
 """
 
 import math

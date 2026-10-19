@@ -1,5 +1,5 @@
 ---
-id: 18
+id: 22
 title: בעיית יוספוס המוכללת – כל שני ושלישי יוצאים
 level: senior
 difficulty: hard

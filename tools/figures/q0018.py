@@ -1,31 +1,47 @@
 #!/usr/bin/env python3
-"""Figures and tables of question 0018 (the Josephus problem with "one stays, two leave",
-and the general "one stays, L - 1 leave").
+"""Figures of question 0018 (two hourglasses, measure D from time 0).
 
     python tools/figures/q0018.py > /tmp/q0018.html
 
-Prints, in page order: the step-through circle for N = 30, the round-by-round table for
-N = 30, the values table for N = 1..20 (L = 3), the survivor chart for N = 1..60 (L = 3),
-the relabelling figure after one step, the one-round figure for N = 9; then for the bonus
-part the zero-point table for L = 2..5, the values table for L = 4 and the chart for L = 4.
-The drawing code lives in q0016.py; tests/0018 checks that the page copies match.
+Prints, in page order: the step-through figure of the plan for A = 7, B = 11, D = 15 (one
+frame per event) and the four-way branching from the state t = 7, A = 0, B = 4. Paste them
+into the page; tests/0018 checks that the page copies match.
 """
 
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import q0016 as j  # noqa: E402
+from hourglass import branches, event_frame  # noqa: E402
+from stepper import stepper  # noqa: E402
+
+A, B = 7, 11
+
+# (t, what happened, (a, b) on arrival, action, (a, b) after, caption)
+PLAN = [
+    (0, "start", (0, 0), "flip A + B", (7, 11),
+     "רגע 0: הופכים את שני השעונים. השעון הראשון שייגמר הוא A, בעוד 7 דקות."),
+    (7, "A runs out", (0, 4), "flip A", (7, 4),
+     "רגע 7: שעון A נגמר והופכים אותו מיד. בשעון B נשארו 4 דקות למעלה, והוא ייגמר ראשון."),
+    (11, "B runs out", (3, 0), "flip A", (4, 0),
+     "רגע 11: שעון B נגמר. בשעון A נשארו 3 דקות למעלה ו-4 למטה; ההיפוך מעלה את 4 הדקות."),
+    (15, "A runs out", (0, 0), "✓ D = 15", None,
+     "רגע 15: שעון A נגמר. עברו בדיוק 11 + 4 = 15 דקות מרגע 0."),
+]
+
+
+def main() -> None:
+    frames = [(event_frame(A, B, t, event, before, action, after, f"רגע {t}: {event}"), caption)
+              for t, event, before, action, after, caption in PLAN]
+    print(stepper(frames, "התוכנית למדידת 15 דקות עם שעוני חול של 7 ו-11 דקות, אירוע אחרי אירוע"))
+    print()
+    print(branches(A, B, 7, 0, 4, [
+        ("no flip", 4, (11, 0, 0), "seen ✗", "pruned"),
+        ("flip A", 4, (11, 3, 0), "new ✓", "kept"),
+        ("flip B", 7, (14, 0, 0), "seen ✗", "pruned"),
+        ("flip A + B", 7, (14, 0, 0), "seen ✗", "pruned"),
+    ], "ארבע האפשרויות מהמצב t = 7, A = 0, B = 4"))
+
 
 if __name__ == "__main__":
-    print(j.circle_stepper(30, 3), "\n")
-    print(j.rounds_table(30, 3), "\n")
-    print(j.values_table(3, 20), "\n")
-    print(j.chart_legend(3), "\n")
-    print(j.chart(3, 60, 6), "\n")
-    print(j.relabel_svg(8, 3), "\n")
-    print(j.round_svg(9, 3), "\n")
-    print(j.zeros_table(), "\n")
-    print(j.values_table(4, 20, with_residue=True), "\n")
-    print(j.chart_legend(4), "\n")
-    print(j.chart(4, 64, 8))
+    main()
