@@ -1265,3 +1265,9 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .fc-slot { background: var(--md-default-bg-color); outline: 1.2px solid var(--viz-text); }
 .md-typeset .viz-legend .fc-full { background: var(--viz-s1); opacity: 0.6; }
 .md-typeset .viz-legend .st-cur { background: var(--viz-s2); opacity: 0.45; }
+
+/* 0025: the Ack/Nak stepper reuses the fc-* arrows and adds a Nak and a replayed TLP */
+.md-typeset svg .fc-nak { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .fc-replay { stroke: var(--viz-s1); stroke-width: 2.5; stroke-dasharray: 7 4; }
+.md-typeset .viz-legend .fc-nak { background: var(--viz-s2); height: 0.2rem; }
+.md-typeset .viz-legend .fc-replay { background: transparent; border-top: 2px dashed var(--viz-s1); height: 0; }

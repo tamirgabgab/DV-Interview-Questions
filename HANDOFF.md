@@ -569,6 +569,47 @@ with `$error` + return in SV and `ValueError` in Python, as in 0023.
 5. **Checks:** lint, pytest, Verilator, strict build, links, phone check at 390 px, and
    screenshots (desktop / phone, light / dark, every stepper frame) all reviewed.
 
+### Session 11 (continued) — 2026-10-19: question 0025, PCIe Ack/Nak reference model
+
+The owner sent `pcie_ack_nak_ref_model.md` (a simplified Data Link Layer Ack/Nak model in
+SystemVerilog with five numerical examples and a rubric) and asked for a senior / medium
+question: sequence tracking, cumulative Acks with random coalescing, and a second part on
+error scenarios (corrupt TLP or DLLP, bad sequence numbers, the Retry Buffer surviving it
+all), in both languages with figures and a traceable example. Decisions (asked first):
+two parts; two classes by role (`dll_transmitter`, `dll_receiver`) instead of the
+reference's one class per device, with part b as subclasses; the Ack coalescing inside the
+receiver (a random threshold 1..4, redrawn after every Ack, plus `flush_ack()` for the
+environment); error injection on the link, outside the model, so the "Retry Buffer keeps
+a clean copy" rule is testable. One deviation from the reference: it excludes the
+REPLAY_TIMER, but without a replay there is no recovery from a lost Ack/Nak and its own
+examples 4 and 5 cannot happen; the model gets `on_replay_timeout()`, called by the
+environment, with no timing inside.
+
+1. **Page** `docs/questions/senior/0025-pcie-ack-nak-reference-model.md`. Question: the
+   five state variables as a table, cumulative Ack / Nak, the simplifications, the given
+   packet classes. Part a: five TLPs across the 4095 → 0 wrap with thresholds 2, 3, 1,
+   purge by position (why `entry.seq <= ack.seq` fails), a Mermaid flow of the pieces, a
+   ten-frame stepper. Part b: the receiver's three cases (expected, old, future) and the
+   transmitter's DLLP checks as Mermaid decision flows, a fifteen-frame stepper (bad LCRC,
+   Nak once, quiet discards, Replay, corrupt Ack, timeout, duplicates answered with Acks,
+   repeated Ack for ACKD_SEQ, an Ack with an unknown number). Traps: Ack purges one entry,
+   numeric comparison across the wrap, the Retry Buffer holding the wire object, a Nak per
+   discarded TLP, trusting a corrupt DLLP.
+2. **Code:** `dll_transmitter` / `dll_receiver` with `purge_through` and `accept` as the
+   reusable steps; part b `dll_transmitter_with_replay` / `dll_receiver_with_nak` (Python
+   `TransmitterWithReplay` / `ReceiverWithNak`). The receiver takes a `random.Random` in
+   Python; SV uses `$urandom_range`.
+3. **Figures** `tools/figures/q0025.py`: both steppers and tables from the page's classes
+   driven by a scripted threshold source. CSS `fc-nak`, `fc-replay`.
+4. **Tests** `tests/0025/`: pytest runs the five examples of the reference, the illegal
+   DLLP cases, the part-a models refusing errors, the duplicate window over the whole
+   space, the clean-copy rule, the 1..4 Ack sizes, random traffic over a link that
+   corrupts, drops and tampers (every TLP delivered once, in order; the Retry Buffer clean
+   and consecutive; several wraps), and the figures; `tb.sv` does the same in Verilator.
+   Verilator note: a function with a `ref` argument that also touches module variables is
+   rejected (`IMPURE`); pass the formatted string instead.
+5. **Checks:** lint, pytest, Verilator, strict build, links, phone check, screenshots.
+
 ## In progress
 
 - Session 10 closed: 0023 is written and tested; README / HANDOFF are current. The branch
@@ -583,7 +624,7 @@ with `$error` + return in SV and `ValueError` in Python, as in 0023.
 ### Owner decisions
 
 - [ ] Keep example question `0001` or replace it with real content.
-- [ ] Staff level is still empty and Senior has eight questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
+- [ ] Staff level is still empty and Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 
 ### Content
@@ -598,16 +639,16 @@ with `$error` + return in SV and `ValueError` in Python, as in 0023.
 
 ## Question variety
 
-### Coverage today (24 questions)
+### Coverage today (25 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 | Staff | — | — |
 
-Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 are the protocol questions (PCIe, USB4), with 0023 and 0024 reference models.
+Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 **Core DV topics are still missing:** UVM, SVA, functional coverage, FIFOs, clock domain
 crossing, FSM design, debug, and verification planning.
 
