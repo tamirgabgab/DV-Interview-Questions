@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-19 (session 12)_
+_Last updated: 2026-10-19 (session 13)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -676,14 +676,54 @@ arithmetic table to 0.0385; the exact value is 0.03845 (0.0384 to four places).
 6. **Checks:** lint, pytest, strict build, links, phone check (43 pages), screenshots
    (desktop light, phone dark and light), sliders driven in Chromium.
 
+### Session 13 — 2026-10-19: rounds K, H (without H49) and J
+
+The owner asked for round K, then round H without "guess before you look" (H49), then
+round J, and new proposals. Decisions (asked first): the explorer goes to 0026 and
+0016 / 0022 as well (not PCIe 0020 / 0021 yet); wide math and literal colours only warn;
+the dark-mode phone check runs only on a manual CI run; only 0026–0028 move onto the
+chart helpers.
+
+1. **K64 linter:** RTL is checked at every paragraph start, list item, heading and table
+   cell at any indent, including the Markdown inside `<div class="steps" markdown>`;
+   continuation lines are not (only the first strong character sets the direction).
+   Multi-line HTML comments are skipped. It found five real cases (0002, 0011, 0023).
+2. **K65 / H52 warnings:** `check_phone.py` warns about display math wider than its column
+   (measured against the `div.arithmatex` box) and takes `--scheme dark`; the linter warns
+   about literal SVG colours (only 0004's boxes, which have no generator yet). The
+   warnings found wide equations on 0002, 0005, 0007, 0012, 0022 and 0028, all split.
+3. **K66 / K67:** `actions/setup-node` in the test job; `CLAUDE.md` and the README ask to
+   recompute an owner's source file in the test before writing the page. The workflow
+   has a `phone_dark` input that adds the dark-mode pass and its screenshots artifact.
+4. **H48 explorer:** `docs/javascripts/explorer.js` replaces `cake-explorer.js`. Kinds
+   `cake-arith`, `cake-geo`, `motorcycle` (0026: walk and ride times) and `josephus`
+   (0016: N; 0022: N and L, zero points marked). Node tests in 0016, 0022, 0026–0028
+   compare the JS with the Python reference; they caught a loop bound in the JS
+   simulation that was recomputed after each removal (survivor of N = 3, L = 3 was 2).
+   Math in the summary lines is wrapped in `<bdi dir="ltr">`.
+5. **H50 / H51 / H53 reading aids:** `docs/javascripts/reading-tools.js`: an enlarge
+   button on every inline SVG figure and chart (lightbox with pinch / wheel zoom, drag,
+   double tap, Esc), tap tooltips from the SVG `<title>` on touch screens, and a sticky
+   part bar on pages with two or more parts. Explorer charts get the button through
+   `window.dvqDecorate`.
+6. **J61 / J62 / J63 / J60 tools:** `tools/figures/charts.py` (`Chart`), used by the cake
+   charts and the 0026 position-time chart; generators of 0026–0028 define `blocks()`,
+   their pages carry `<!-- gen n -->` / `<!-- /gen -->` markers, and
+   `tools/figures/fill.py` rewrites or checks them; `tools/page_tests.py` holds the Node
+   runner and `assert_figures_match()`; `tools/new_question.py` scaffolds a question;
+   `tests/tools/` tests the three tools.
+7. **Checks:** lint (28 pages, one warning page), all Python tests, strict build, links,
+   phone check of 43 pages (0 problems, 0 wide math), Playwright runs of the explorers,
+   the lightbox, the tooltip and the part bar on a phone.
+
 ---
 
 ## In progress
 
-- Session 12 closed: 0026 is on `main`; 0027 and 0028 are written and tested on the
-  branch; README / HANDOFF are current. `main` is updated when the owner asks.
-- Next: the owner picks items from **Round D to G** below (proposed 2026-10-18), or sends
-  the next batch of questions.
+- Session 13 closed: rounds K, H (without H49) and J are done on the branch and pushed;
+  README / HANDOFF / CLAUDE.md are current. `main` is updated when the owner asks.
+- Next: the owner picks from rounds L to O (proposed in session 13), the open D to G and I
+  items, or sends the next batch of questions.
 
 ---
 
@@ -694,7 +734,7 @@ arithmetic table to 0.0385; the exact value is 0.03845 (0.0384 to four places).
 - [ ] Keep example question `0001` or replace it with real content.
 - [ ] Staff level is still empty and Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
-- [ ] Pick the next rounds from **Proposals and rounds** (D to G, and H to K proposed in session 12).
+- [ ] Pick the next rounds from **Proposals and rounds**: D to G and I (open), L to O (proposed in session 13).
 
 ### Content
 
@@ -895,7 +935,7 @@ found by hand. The proposals are grouped so a round can be done in one session.
 Suggested order by value for effort: D26 and D25 (the phone experience of the long pages),
 G47 (so the next proof page is caught by CI), F37 (the PCIe explorer), E31 and E32.
 
-**Rounds H to K — proposed 2026-10-19, after 0026 to 0028** (not started; the owner picks):
+**Rounds H to K — proposed 2026-10-19, after 0026 to 0028** (K, H and J done in session 13 except H49; I open):
 
 Session 12 added the first questions without code that lean on figures (0026 motion,
 0027 / 0028 cake split) and the first interactive component (`cake-explorer.js`). What it
@@ -908,12 +948,12 @@ to G above are still open; H to K add to them.
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| H48 | **One explorer component**: turn `cake-explorer.js` into a small declarative widget (sliders from `data-*`, charts from a shared JS module) and reuse it: α for 0026 (the position-time chart moves), N for 0016 / 0022, address / MPS / RCB for 0020 / 0021 (this is F37) | M |
-| H49 | **Guess before you look**: in practice mode an input "your answer" above the solution (a number or a person), checked against an `answer:` front-matter field before the solution opens; counted in the marks | M |
-| H50 | **Figure lightbox** (D26), now more pressing: the cake rows, the 13-bar charts and the 0015 grid need pinch-zoom on a phone | M |
-| H51 | **Part navigation bar** (D25): every new page has two parts with long solutions | S–M |
-| H52 | **Theme check**: run the phone check in dark mode too (all screenshots today are light), and flag SVG text whose colour is not a CSS variable | S |
-| H53 | **Chart hover values on touch**: tap a bar or dot to show its `<title>` as a small tooltip (phones have no hover) | S |
+| H48 | **One explorer component**: turn `cake-explorer.js` into a small declarative widget (sliders from `data-*`, charts from a shared JS module) and reuse it: α for 0026 (the position-time chart moves), N for 0016 / 0022, address / MPS / RCB for 0020 / 0021 (this is F37) | M — **done** |
+| H49 | **Guess before you look**: in practice mode an input "your answer" above the solution (a number or a person), checked against an `answer:` front-matter field before the solution opens; counted in the marks | M — **deferred by the owner** |
+| H50 | **Figure lightbox** (D26), now more pressing: the cake rows, the 13-bar charts and the 0015 grid need pinch-zoom on a phone | M — **done** |
+| H51 | **Part navigation bar** (D25): every new page has two parts with long solutions | S–M — **done** |
+| H52 | **Theme check**: run the phone check in dark mode too (all screenshots today are light), and flag SVG text whose colour is not a CSS variable | S — **done (warn only; dark mode on a manual run)** |
+| H53 | **Chart hover values on touch**: tap a bar or dot to show its `<title>` as a small tooltip (phones have no hover) | S — **done** |
 
 **Round I — new questions, by theme** (each line is one or two pages)
 
@@ -930,22 +970,72 @@ to G above are still open; H to K add to them.
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| J60 | **`tools/new_question.py`** (G42): page, tests folder with the figures-up-to-date test, generator stub, README row | S–M |
-| J61 | **Shared chart helpers** `tools/figures/charts.py`: bars with a highlighted bar, stems against a threshold, ratio against y = 1, curve against a line; 0026–0028 and the older charts move onto it | M |
-| J62 | **Fill script in the repo**: the page template with `{{B0}}` placeholders and the generator blocks (used by hand in session 12) as `tools/figures/fill.py`, so a page and its figures are regenerated in one command | S |
-| J63 | **One test helper** for "figures and tables match the generator" (copied into every no-code test today) | S |
+| J60 | **`tools/new_question.py`** (G42): page, tests folder with the figures-up-to-date test, generator stub, README row | S–M — **done** |
+| J61 | **Shared chart helpers** `tools/figures/charts.py`: bars with a highlighted bar, stems against a threshold, ratio against y = 1, curve against a line; 0026–0028 and the older charts move onto it | M — **done for 0026–0028** |
+| J62 | **Fill script in the repo**: the page template with `{{B0}}` placeholders and the generator blocks (used by hand in session 12) as `tools/figures/fill.py`, so a page and its figures are regenerated in one command | S — **done (gen markers + fill.py)** |
+| J63 | **One test helper** for "figures and tables match the generator" (copied into every no-code test today) | S — **done** |
 
 **Round K — safety net**
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| K64 | **Linter gaps**: check RTL on indented lines and inside `<div class="steps">` (paragraph starts only), and fail on a `\tag` inside a list item without `aligned` | S |
-| K65 | **Display-math width in CI** (G47): every equation split by hand in sessions 8–12 would have been caught | S |
-| K66 | **Node in CI explicitly** (`actions/setup-node`), so the explorer tests can never be skipped silently | S |
-| K67 | **Owner-file check list**: when a source file arrives, recompute its tables and formulas in a test first (done by hand for 0026–0028; it found the capped-last-person gap and one rounding) | S per question |
+| K64 | **Linter gaps**: check RTL on indented lines and inside `<div class="steps">` (paragraph starts only), and fail on a `\tag` inside a list item without `aligned` | S — **done** |
+| K65 | **Display-math width in CI** (G47): every equation split by hand in sessions 8–12 would have been caught | S — **done (warn only)** |
+| K66 | **Node in CI explicitly** (`actions/setup-node`), so the explorer tests can never be skipped silently | S — **done** |
+| K67 | **Owner-file check list**: when a source file arrives, recompute its tables and formulas in a test first (done by hand for 0026–0028; it found the capped-last-person gap and one rounding) | S per question — **done (CLAUDE.md, README)** |
 
 Suggested order: K64 + K65 + K66 (small, protect every next page), H51 + H50 (phone
 reading), J60 + J62 (faster batches), then H48 and a content round from I.
+
+**Rounds L to O — proposed 2026-10-19, after session 13** (not started; the owner picks):
+
+Session 13 gave every page a lightbox, tooltips and a part bar, one explorer component and
+authoring tools. The next gaps: practising (the site shows solutions but does not help to
+remember them), explorers on the rest of the "numbers" pages, the older figures still
+outside `fill.py`, and no visual or accessibility check in CI.
+
+**Round L — practising and remembering**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| L68 | **Review queue**: the "solved" mark keeps the date; the home page shows "to review" for questions solved more than 7 / 30 days ago (spaced repetition, localStorage only) | M |
+| L69 | **Progressive reveal** in practice mode (D27): idea → steps → proof one block at a time, with "show more" | M |
+| L70 | **Key-ideas page per study path**: the "answer in short" and "idea" blocks of each question on one page, for revision before an interview | S–M |
+| L71 | **Print / PDF of a path** (D28, idea 19): all blocks open, figures kept, one question per page | M |
+| L72 | **Guess before you look** (H49), kept for later: a typed answer checked against an `answer:` field | M |
+
+**Round M — more explorers and figures**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| M73 | **PCIe split explorer** for 0020 / 0021 (F37): address, length, MPS, RCB → the splits map and the count | M–L |
+| M74 | **Hourglass explorer** for 0018 / 0019: pick the two glasses and the target, the BFS / Dijkstra path shown step by step | M |
+| M75 | **Probability explorer** for 0015: p, q and the number of children move the outcome grid and the answer | S–M |
+| M76 | **Stepper upgrades**: autoplay with a speed control, a deep link to a step (`#step-5`), swipe on phones | S–M |
+| M77 | **"Interactive" badge** in the header card and a filter chip for pages with an explorer or a stepper | S |
+
+**Round N — finding questions**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| N78 | **Search by id and with context** (E33): "0027" finds the page; hits show level / difficulty chips | S–M |
+| N79 | **Home page memory** (E34): "continue where you left off" and a "recently added" strip | S |
+| N80 | **"מה חדש" page** (E36) generated from the `added` dates, linked from the footer | S |
+| N81 | **Keyboard shortcuts** (E35): n / p, s, r, ? help | S |
+
+**Round O — tooling and quality**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| O82 | **All generators on `blocks()` + `fill.py`** (0008–0025), dropping the per-test regex comparisons; generators for 0004–0007 (G43) end the literal-colour warning | M |
+| O83 | **Visual regression**: compare the CI phone screenshots with the last `main` run and list pages whose pixels changed | M |
+| O84 | **Accessibility check** (G44): axe in the phone check, focus rings, labels on the toolbar, lightbox and sliders | M |
+| O85 | **Browser tests of the reading tools** in `tests/tools/` (lightbox, part bar, tooltip, explorer sliders) with Playwright | S–M |
+| O86 | **Weekly scheduled workflow** (G46): external links and a newer Verilator release | S |
+
+Suggested order: O85 (protects what session 13 added), N78 + N79 (cheap and visible),
+M75 or M74 (one more explorer), L68 + L70 (practising), then O82 before the next large
+batch of figure pages.
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
@@ -1069,4 +1159,11 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   the editor content; `docs/javascripts/run-python.js` + `py-worker.js` run them. The
   page code runs as `solution.py`, the editor as `your_code.py` (tracebacks show those
   names). Local screenshot tests route the Pyodide CDN to an `npm pack pyodide@0.26.4` copy.
+- Explorers (`explorer.js`): a new kind is a pure function exported under Node plus a view
+  in `VIEWS`; add a Node test that compares it with the Python reference. Build summary
+  text with `ltr()` (a `<bdi dir="ltr">`) around math and numbers, or the RTL paragraph
+  reorders them.
+- Generated blocks: wrap each block on the page in `<!-- gen n -->` / `<!-- /gen -->` with
+  a blank line inside on both sides (an HTML comment line directly before a Markdown table
+  would swallow it into an HTML block); `fill.py` writes them that way.
 - Update the **Work log / Open items** sections of this file at the end of every session.
