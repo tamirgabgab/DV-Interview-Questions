@@ -101,6 +101,7 @@ extra_javascript:
   - javascripts/question-filter.js
   - javascripts/question-tools.js
   - javascripts/run-python.js
+  - javascripts/reading-tools.js
   - javascripts/explorer.js
 
 

@@ -290,6 +290,7 @@
       const res = view.draw(state);
       summary.innerHTML = res.summary;          // built from numbers only
       charts.innerHTML = res.charts.map(([title, svg]) => `<p class="ex-title">${title}</p>${svg}`).join("");
+      if (window.dvqDecorate) window.dvqDecorate(charts);   // enlarge buttons (reading-tools.js)
     };
     draw();
   };
