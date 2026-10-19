@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-19 (session 10)_
+_Last updated: 2026-10-19 (session 12)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -610,9 +610,39 @@ environment, with no timing inside.
    rejected (`IMPURE`); pass the formatted string instead.
 5. **Checks:** lint, pytest, Verilator, strict build, links, phone check, screenshots.
 
+### Session 12 — 2026-10-19: question 0026, three people and one motorcycle
+
+The owner sent `motorcycle_problem.md` (three people, a two-seat motorcycle, walk 13 h,
+ride 1 h; the strategy, the phase equations, the general formula, a numeric timeline and
+an optimality proof) and asked for a junior / easy question with clean LaTeX and figures,
+no code. Decisions (asked first): one part that ends with the general formula in t0 and
+t1; figures: a position-time chart, the road with its points, and a comparison of
+strategies; no optimality proof on the page (it is a follow-up question instead); three
+strategies compared. Called out to the owner: the file's "naive strategy takes 3 hours"
+holds only when the third person waits at A; walking meanwhile gives 19/7 ≈ 2.71 h, and
+the page shows both.
+
+1. **Page** `docs/questions/junior/0026-three-people-one-motorcycle.md`. Idea: the three
+   strategies (3, 2.71, 2.5 hours) as a table and bar chart, "nobody waits". Steps: α,
+   the road figure, one equation per phase, y = r, the segments, T through the walker,
+   the t0 / t1 form, the numbers. Check: T through the motorcycle, the position-time
+   chart, timeline and points tables, limit cases, the α = 4 example. Traps: riding the
+   passenger to B, the walker moving towards the motorcycle, looking for the distance.
+   Follow-ups: 52 km, the drop point, four people, n people, why nothing is faster.
+   Display math is split with `aligned` so it fits at 390 px.
+2. **Figures** `tools/figures/q0026.py` (tables, bars, road with phase arrows drawn to
+   scale for α = 4, position-time chart for α = 13); no new CSS classes.
+3. **Tests** `tests/0026/`: exact-fraction replay of the phases, the page's numbers,
+   the other two strategies, a grid search over the drop point, the n-person follow-up by
+   simulating the shuttle, the limits, and the figures and tables against the generator.
+4. **Checks:** lint, pytest, strict build, links, phone check, screenshots (desktop
+   light, phone dark).
+
+---
+
 ## In progress
 
-- Session 10 closed: 0023 is written and tested; README / HANDOFF are current. The branch
+- Session 12 closed: 0026 is written and tested; README / HANDOFF are current. The branch
   is pushed; `main` is updated when the owner asks.
 - Next: the owner picks items from **Round D to G** below (proposed 2026-10-18), or sends
   the next batch of questions.
@@ -639,12 +669,12 @@ environment, with no timing inside.
 
 ## Question variety
 
-### Coverage today (25 questions)
+### Coverage today (26 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 | Staff | — | — |
 

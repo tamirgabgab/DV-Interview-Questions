@@ -11,7 +11,7 @@ level**, **difficulty** and **topic**.
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 25 questions (see the catalog below).
+> **Status:** the site is live and holds 26 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and improvement ideas.
 
 ---
@@ -45,6 +45,7 @@ level**, **difficulty** and **topic**.
 | 0023 | PCIe endpoint reference model: writes, reads and completions (aligned, then any address) | senior | 🟡 medium | memory as RCB-sized blocks, completions built at request time, per-read queue with a random ready cycle, interleaving between reads, read-modify-write of partial blocks, random subset of the interior RCB boundaries, Byte Count; SV classes with virtual methods and a Python subclass |
 | 0024 | USB4 Path credits reference model: Credit Grant, the transmit rule across the wrap, and Path Credit Sync after a lost packet | senior | 🟡 medium | four cumulative 8-bit counters (PCC, PCL at the Egress; PCR, PCA at the Ingress), forward distance on the modulo-256 circle (1..127), grant overwrites PCL, credits leak on packet loss, Sync corrects PCA with the old PCR; one class per side, subclasses add the Sync; stepper of both runs, circle figures |
 | 0025 | PCIe Data Link Ack/Nak reference model: Sequence Numbers, Retry Buffer, cumulative Ack (a random 1..4 TLPs per Ack), rollover, then bad LCRC, Nak and Replay, lost Acks, duplicates and illegal DLLPs | senior | 🟡 medium | transmitter (NEXT_TRANSMIT_SEQ, ACKD_SEQ, Retry Buffer purged by position) and receiver (NEXT_RCV_SEQ, NAK_SCHEDULED, random Ack coalescing) classes, part b subclasses add Nak / Replay / duplicate window / DLLP checks; error injection on the link, replay timeout from the environment; steppers of both runs, Mermaid decision flows |
+| 0026 | Three people and one motorcycle: the fastest way for all three to arrive (walk 13 h, ride 1 h, then a formula) | junior | 🟢 easy | speed ratio α instead of the unknown distance, three phases with one equation each, symmetry y = r, T = (3α + 1)/(α + 3)·t1, three strategies compared, position-time chart, road figure (no code) |
 
 Update this table whenever a question is added.
 
@@ -138,7 +139,7 @@ DV-Interview-Questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
-│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…
+│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-…
 │   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…, 0023-…, 0024-…, 0025-…
 │   │   └── staff/
 │   ├── assets/
@@ -304,7 +305,7 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 | Timing diagrams / waveforms      | ` ```wavedrom ` fenced blocks ([WaveDrom](https://wavedrom.com/))  |
 | Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax)           |
 | Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |
-| Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007; 0016 and 0022 survivor chains) |
+| Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007; 0016 and 0022 survivor chains; 0026 strategy bars and a position-time chart) |
 | Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0022 box rows: relabelling, one round, bits; 0020, 0021 and 0023 address axes; 0024 modulo-256 circles) |
 | Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
 | Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0022 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events, 0023 completion queues cycle by cycle, 0024 credit counters step by step, 0025 Retry Buffer and receiver state per packet) |
