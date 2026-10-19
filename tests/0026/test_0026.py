@@ -2,12 +2,10 @@
 (exact fractions), check every number the page states, and check that the figures and the
 tables are the generator's output."""
 
-import re
-import subprocess
 import sys
 from fractions import Fraction as Fr
 
-from extract_code import ROOT, question_path
+from extract_code import ROOT
 
 sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0026  # noqa: E402
@@ -151,15 +149,9 @@ def test_limits():
 
 
 def test_figures_up_to_date():
-    out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0026.py")],
-                         capture_output=True, text=True, check=True).stdout
-    text = question_path(26).read_text(encoding="utf-8")
-    pattern = r'<svg class="(?:figure|perf-chart)".*?</svg>|<span class="viz-legend">.*?</span></span>'
-    assert re.findall(pattern, text) == re.findall(pattern, out)
-    assert len(re.findall(pattern, out)) == 6
-    page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
-    table_rows = [l.strip() for l in out.splitlines() if l.startswith("|")]
-    assert page_rows == table_rows
+    from page_tests import assert_figures_match
+
+    assert_figures_match(26)
 
 
 def test_explorer_matches_python():

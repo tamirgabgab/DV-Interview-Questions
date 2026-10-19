@@ -63,15 +63,27 @@ added: 2026-10-19
     מוקדם יותר אל ההולך, ובוחרים את נקודת הירידה כך ששלושתם מגיעים ל-\( B \) יחד. ככה
     אף דקה של אף אחד לא מתבזבזת, והזמן יורד לשעתיים וחצי:
 
+    <!-- gen 0 -->
+
     | האסטרטגיה | הזמן הכללי | כש-\( \alpha = 13 \) |
     |---|---|---|
     | השני מחכה ב-\( A \) | ‏\( 3\,t_1 \) | ‏\( 3 \) שעות |
     | השני הולך בינתיים | ‏\( \dfrac{3\alpha - 1}{\alpha + 1}\, t_1 \) | ‏\( \tfrac{19}{7} \approx 2.714 \) שעות |
     | הנוסע יורד בדרך | ‏\( \dfrac{3\alpha + 1}{\alpha + 3}\, t_1 \) | ‏\( 2.5 \) שעות |
 
+    <!-- /gen -->
+
+    <!-- gen 1 -->
+
     <svg class="perf-chart" viewBox="0 0 560 150" style="max-width:35rem" role="img" aria-label="הזמן של שלוש האסטרטגיות: 3 שעות כשהשני מחכה, כ-2.71 שעות כשהוא הולך בינתיים, ו-2.5 שעות כשהנוסע יורד בדרך"><line class="grid" x1="24.0" x2="24.0" y1="6" y2="130"/><text class="tick" x="24.0" y="146" text-anchor="middle">0</text><line class="grid" x1="182.7" x2="182.7" y1="6" y2="130"/><text class="tick" x="182.7" y="146" text-anchor="middle">1</text><line class="grid" x1="341.3" x2="341.3" y1="6" y2="130"/><text class="tick" x="341.3" y="146" text-anchor="middle">2</text><line class="grid" x1="500.0" x2="500.0" y1="6" y2="130"/><text class="tick" x="500.0" y="146" text-anchor="middle">3</text><rect class="bar by-multiples" x="24" y="10" width="476.0" height="28" rx="3"><title>3</title></rect><text class="legend" x="508.0" y="29">3</text><rect class="bar by-enum" x="24" y="50" width="430.7" height="28" rx="3"><title>2.714</title></rect><text class="legend" x="462.7" y="69">2.714</text><rect class="bar by-bfs" x="24" y="90" width="396.7" height="28" rx="3"><title>2.5</title></rect><text class="legend" x="428.7" y="109">2.5</text><line class="axis" x1="24" x2="510" y1="130" y2="130"/><text class="tick" x="524" y="146" text-anchor="middle">t</text></svg>
 
+    <!-- /gen -->
+
+    <!-- gen 2 -->
+
     <span class="viz-legend"><span><i class="by-multiples"></i>השני מחכה ב-\( A \)</span><span><i class="by-enum"></i>השני הולך בינתיים</span><span><i class="by-bfs"></i>הנוסע יורד בדרך</span></span>
+
+    <!-- /gen -->
 
     #### השלבים { .sol-steps }
 
@@ -85,9 +97,17 @@ added: 2026-10-19
     התוכנית מחלקת את הדרך לחמישה קטעים, \( y, x, z, x, r \), ואת הזמן לשלושה שלבים. בשרטוט
     (סכמטי), כל שורה היא שלב, והחצים מראים מי זז ולאן:
 
+    <!-- gen 3 -->
+
     <svg class="figure" viewBox="0 0 640 228" style="max-width:40rem" role="img" aria-label="הדרך מ-A ל-B עם הנקודות Q, C, D, E והקטעים y, x, z, x, r, ומתחתיה שלושת השלבים: מי נוסע ומי הולך בכל שלב"><defs><marker id="q26-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q26-s1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="s1-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q26-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="40.0" y1="50" x2="610.0" y2="50" stroke-width="2"/><line class="axis-c" x1="43.0" y1="36" x2="138.8" y2="36" stroke-width="1"/><text class="legend" x="90.9" y="30" text-anchor="middle" font-style="italic" style="font-size:20px">y</text><line class="axis-c" x1="144.8" y1="36" x2="199.9" y2="36" stroke-width="1"/><text class="legend" x="172.3" y="30" text-anchor="middle" font-style="italic" style="font-size:20px">x</text><line class="axis-c" x1="205.9" y1="36" x2="444.1" y2="36" stroke-width="1"/><text class="legend" x="325.0" y="30" text-anchor="middle" font-style="italic" style="font-size:20px">z</text><line class="axis-c" x1="450.1" y1="36" x2="505.2" y2="36" stroke-width="1"/><text class="legend" x="477.7" y="30" text-anchor="middle" font-style="italic" style="font-size:20px">x</text><line class="axis-c" x1="511.2" y1="36" x2="607.0" y2="36" stroke-width="1"/><text class="legend" x="559.1" y="30" text-anchor="middle" font-style="italic" style="font-size:20px">r</text><line class="axis-c" x1="40.0" y1="43" x2="40.0" y2="57"/><text class="legend" x="40.0" y="78" text-anchor="middle" style="font-size:20px">A</text><line class="axis-c" x1="141.8" y1="43" x2="141.8" y2="57"/><text class="legend" x="141.8" y="78" text-anchor="middle" style="font-size:20px">Q</text><line class="axis-c" x1="202.9" y1="43" x2="202.9" y2="57"/><text class="legend" x="202.9" y="78" text-anchor="middle" style="font-size:20px">C</text><line class="axis-c" x1="447.1" y1="43" x2="447.1" y2="57"/><text class="legend" x="447.1" y="78" text-anchor="middle" style="font-size:20px">D</text><line class="axis-c" x1="508.2" y1="43" x2="508.2" y2="57"/><text class="legend" x="508.2" y="78" text-anchor="middle" style="font-size:20px">E</text><line class="axis-c" x1="610.0" y1="43" x2="610.0" y2="57"/><text class="legend" x="610.0" y="78" text-anchor="middle" style="font-size:20px">B</text><text class="legend" x="18" y="115" text-anchor="middle" style="font-size:20px">1</text><line class="ink-line" x1="42.0" y1="101" x2="445.1" y2="101" stroke-width="3" marker-end="url(#q26-ink)"/><line class="s2-line" x1="42.0" y1="115" x2="139.8" y2="115" stroke-width="2" marker-end="url(#q26-s2)"/><text class="legend" x="18" y="155" text-anchor="middle" style="font-size:20px">2</text><line class="ink-line" x1="445.1" y1="141" x2="204.9" y2="141" stroke-width="3" marker-end="url(#q26-ink)"/><line class="s1-line" x1="449.1" y1="155" x2="506.2" y2="155" stroke-width="2" marker-end="url(#q26-s1)"/><line class="s2-line" x1="143.8" y1="155" x2="200.9" y2="155" stroke-width="2" marker-end="url(#q26-s2)"/><text class="legend" x="18" y="195" text-anchor="middle" style="font-size:20px">3</text><line class="ink-line" x1="204.9" y1="181" x2="608.0" y2="181" stroke-width="3" marker-end="url(#q26-ink)"/><line class="s1-line" x1="510.2" y1="195" x2="608.0" y2="195" stroke-width="2" marker-end="url(#q26-s1)"/></svg>
 
+    <!-- /gen -->
+
+    <!-- gen 4 -->
+
     <span class="viz-legend"><span><i class="ink"></i>האופנוע (הנהג, ואיתו נוסע או לא)</span><span><i class="s1"></i>הנוסע הולך ברגל</span><span><i class="s2"></i>ההולך הולך ברגל</span></span>
+
+    <!-- /gen -->
 
     <div class="steps" markdown>
 
@@ -209,12 +229,22 @@ added: 2026-10-19
     שטוח הוא הליכה. בשלב 1 הנוסע נוסע על האופנוע, ולכן הקו שלו מכסה את קו האופנוע. בשלב 3
     ההולך על האופנוע. נקודה שבה שני קווים נפגשים היא פגישה על הדרך:
 
+    <!-- gen 5 -->
+
     <svg class="perf-chart" viewBox="0 0 640 320" role="img" aria-label="המקום של האופנוע ושל שני האנשים שאינם נוהגים כפונקציה של הזמן: האופנוע נוסע קדימה, חוזר ונוסע שוב קדימה, ושלושתם מגיעים ל-B יחד אחרי 2.5 שעות"><defs><marker id="q26-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q26-s1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="s1-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q26-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="grid" x1="52" x2="616" y1="286.0" y2="286.0"/><text class="tick" x="44" y="290.0" text-anchor="end">0</text><line class="grid" x1="52" x2="616" y1="254.5" y2="254.5"/><text class="tick" x="44" y="258.5" text-anchor="end">1/8</text><line class="grid" x1="52" x2="616" y1="65.5" y2="65.5"/><text class="tick" x="44" y="69.5" text-anchor="end">7/8</text><line class="grid" x1="52" x2="616" y1="34.0" y2="34.0"/><text class="tick" x="44" y="38.0" text-anchor="end">1</text><line class="grid" x1="52.0" x2="52.0" y1="28" y2="286" stroke-dasharray="4 4"/><text class="tick" x="52.0" y="304" text-anchor="middle">0</text><line class="grid" x1="249.4" x2="249.4" y1="28" y2="286" stroke-dasharray="4 4"/><text class="tick" x="249.4" y="304" text-anchor="middle">0.875</text><line class="grid" x1="418.6" x2="418.6" y1="28" y2="286" stroke-dasharray="4 4"/><text class="tick" x="418.6" y="304" text-anchor="middle">1.625</text><line class="grid" x1="616.0" x2="616.0" y1="28" y2="286" stroke-dasharray="4 4"/><text class="tick" x="616.0" y="304" text-anchor="middle">2.5</text><text class="legend" x="150.7" y="20" text-anchor="middle" direction="rtl">שלב 1</text><text class="legend" x="334.0" y="20" text-anchor="middle" direction="rtl">שלב 2</text><text class="legend" x="517.3" y="20" text-anchor="middle" direction="rtl">שלב 3</text><polyline class="ink-line" points="52.0,286.0 249.4,65.5 418.6,254.5 616.0,34.0" fill="none" stroke-width="7" stroke-opacity="0.28" stroke-linejoin="round"/><polyline class="s1-line" points="52.0,286.0 249.4,65.5 418.6,51.0 616.0,34.0" fill="none" stroke-width="2.5"/><polyline class="s2-line" points="52.0,286.0 249.4,269.0 418.6,254.5 616.0,34.0" fill="none" stroke-width="2.5"/><circle class="s2-dot" cx="249.4" cy="269.0" r="5"><title>Q: ההולך כשהנוסע יורד, t = 0.875</title></circle><text class="legend" x="249.4" y="259.0" text-anchor="middle" style="font-size:17px">Q</text><circle class="s1-dot" cx="249.4" cy="65.5" r="5"><title>D: הנוסע יורד, t = 0.875</title></circle><text class="legend" x="249.4" y="53.5" text-anchor="middle" style="font-size:17px">D</text><circle class="s2-dot" cx="418.6" cy="254.5" r="5"><title>C: האופנוע אוסף את ההולך, t = 1.625</title></circle><text class="legend" x="418.6" y="276.5" text-anchor="middle" style="font-size:17px">C</text><circle class="s1-dot" cx="418.6" cy="51.0" r="5"><title>E: הנוסע כשההולך עולה, t = 1.625</title></circle><text class="legend" x="418.6" y="39.0" text-anchor="middle" style="font-size:17px">E</text><circle class="ink-dot" cx="616.0" cy="34.0" r="5"><title>B: שלושתם מגיעים, t = 2.5</title></circle><text class="legend" x="600.0" y="28.0" text-anchor="middle" style="font-size:17px">B</text><line class="axis" x1="52" x2="616" y1="286" y2="286"/><text class="tick" x="630" y="290" text-anchor="middle">t</text></svg>
+
+    <!-- /gen -->
+
+    <!-- gen 6 -->
 
     <span class="viz-legend"><span><i class="ink" style="opacity:0.4"></i>האופנוע</span><span><i class="s1"></i>הנוסע</span><span><i class="s2"></i>ההולך</span></span>
 
+    <!-- /gen -->
+
     בגרף רואים את הסימטריה: הקטע השטוח של ההולך בהתחלה ושל הנוסע בסוף מקבילים ושווים.
     אותם מספרים בטבלה:
+
+    <!-- gen 7 -->
 
     | שלב | השעות | האופנוע | הנוסע | ההולך |
     |---|---|---|---|---|
@@ -222,7 +252,11 @@ added: 2026-10-19
     | שלב 2 | ‏0.875 עד 1.625 | ‏\( D \to C \) | ‏\( D \to E \) | ‏\( Q \to C \) |
     | שלב 3 | ‏1.625 עד 2.5 | ‏\( C \to B \) | ‏\( E \to B \) | על האופנוע |
 
+    <!-- /gen -->
+
     ובמקומות על הדרך, עם \( \alpha = 13 \):
+
+    <!-- gen 8 -->
 
     | הנקודה | המרחק מ-\( A \) | מה קורה שם |
     |---|---|---|
@@ -230,6 +264,8 @@ added: 2026-10-19
     | ‏\( C \) | ‏\( \tfrac{1}{8}\,AB \approx 0.125\,AB \) | האופנוע אוסף את ההולך |
     | ‏\( D \) | ‏\( \tfrac{7}{8}\,AB \approx 0.875\,AB \) | הנוסע יורד מהאופנוע |
     | ‏\( E \) | ‏\( \tfrac{97}{104}\,AB \approx 0.933\,AB \) | הנוסע, כשהאופנוע אוסף את ההולך |
+
+    <!-- /gen -->
 
     כל אחד מהשניים הולך \( \tfrac18 \) מהדרך, שעה ו-37.5 דקות, ונוסע \( \tfrac78 \) מהדרך,
     52.5 דקות. בסך הכול שעתיים וחצי לכל אחד.

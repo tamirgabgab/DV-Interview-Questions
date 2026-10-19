@@ -10,7 +10,12 @@ timeline and points tables (alpha = 13). Units: AB = 1 and t1 = 1 (the ride time
 whole road), so the walking speed is 1 / alpha. tests/0026 checks that the page copies match.
 """
 
+import sys
 from fractions import Fraction as Fr
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from charts import Chart  # noqa: E402
 
 ALPHA = 13          # walk 13 hours, ride 1 hour
 ROAD_ALPHA = 4      # proportions of the schematic road figure
@@ -165,42 +170,32 @@ def road_legend():
 def spacetime_svg(alpha=ALPHA):
     """Position (0 = A, 1 = B) against time for the motorcycle and the two non-drivers."""
     pl = plan(alpha)
-    w, h, x0, right, top, base = 640, 320, 52, 24, 34, 286
     T = pl["T"]
-    X = lambda t: x0 + float(t) / float(T) * (w - x0 - right)
-    Y = lambda v: base - float(v) * (base - top)
-    p = [f'<svg class="perf-chart" viewBox="0 0 {w} {h}" role="img" '
-         'aria-label="המקום של האופנוע ושל שני האנשים שאינם נוהגים כפונקציה של הזמן: האופנוע נוסע קדימה, '
-         'חוזר ונוסע שוב קדימה, ושלושתם מגיעים ל-B יחד אחרי 2.5 שעות">', DEFS]
-    for v in (0, pl["C"], pl["D"], 1):
-        p.append(f'<line class="grid" x1="{x0}" x2="{w - right}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/>'
-                 f'<text class="tick" x="{x0 - 8}" y="{Y(v) + 4:.1f}" text-anchor="end">{slash(v)}</text>')
-    for t in (0, pl["t1"], pl["t2"], T):
-        p.append(f'<line class="grid" x1="{X(t):.1f}" x2="{X(t):.1f}" y1="{top - 6}" y2="{base}" stroke-dasharray="4 4"/>'
-                 f'<text class="tick" x="{X(t):.1f}" y="{base + 18}" text-anchor="middle">{hours(t)}</text>')
+    c = Chart("המקום של האופנוע ושל שני האנשים שאינם נוהגים כפונקציה של הזמן: האופנוע נוסע קדימה, "
+              "חוזר ונוסע שוב קדימה, ושלושתם מגיעים ל-B יחד אחרי 2.5 שעות",
+              h=320, x0=52, right=24, top=34, base=286, x_max=float(T), y_max=1)
+    c.add(DEFS)
+    ys = (0, pl["C"], pl["D"], 1)
+    c.grid_y(ys, labels=[slash(v) for v in ys])
+    ts = (0, pl["t1"], pl["t2"], T)
+    c.grid_x(ts, [hours(t) for t in ts])
     for k, (a, b) in enumerate(((0, pl["t1"]), (pl["t1"], pl["t2"]), (pl["t2"], T)), 1):
-        p.append(f'<text class="legend" x="{(X(a) + X(b)) / 2:.1f}" y="{top - 14}" text-anchor="middle" '
-                 f'direction="rtl">שלב {k}</text>')
-    path = lambda pts: " ".join(f"{X(t):.1f},{Y(v):.1f}" for t, v in pts)
-    bike = [(0, 0), (pl["t1"], pl["D"]), (pl["t2"], pl["C"]), (T, 1)]
-    passenger = [(0, 0), (pl["t1"], pl["D"]), (pl["t2"], pl["E"]), (T, 1)]
-    walker = [(0, 0), (pl["t1"], pl["Q"]), (pl["t2"], pl["C"]), (T, 1)]
-    p.append(f'<polyline class="ink-line" points="{path(bike)}" fill="none" stroke-width="7" '
-             'stroke-opacity="0.28" stroke-linejoin="round"/>')
-    p.append(f'<polyline class="s1-line" points="{path(passenger)}" fill="none" stroke-width="2.5"/>')
-    p.append(f'<polyline class="s2-line" points="{path(walker)}" fill="none" stroke-width="2.5"/>')
-    marks = [("Q", pl["t1"], pl["Q"], "s2-dot", 0, -10, "ההולך כשהנוסע יורד"),
-             ("D", pl["t1"], pl["D"], "s1-dot", 0, -12, "הנוסע יורד"),
-             ("C", pl["t2"], pl["C"], "s2-dot", 0, 22, "האופנוע אוסף את ההולך"),
-             ("E", pl["t2"], pl["E"], "s1-dot", 0, -12, "הנוסע כשההולך עולה"),
-             ("B", T, 1, "ink-dot", -16, -6, "שלושתם מגיעים")]
+        c.add(f'<text class="legend" x="{(c.X(a) + c.X(b)) / 2:.1f}" y="{c.top - 14}" text-anchor="middle" '
+              f'direction="rtl">שלב {k}</text>')
+    c.path([(0, 0), (pl["t1"], pl["D"]), (pl["t2"], pl["C"]), (T, 1)], "ink-line", width=7,
+           extra=' stroke-opacity="0.28" stroke-linejoin="round"')
+    c.path([(0, 0), (pl["t1"], pl["D"]), (pl["t2"], pl["E"]), (T, 1)], "s1-line", width=2.5)
+    c.path([(0, 0), (pl["t1"], pl["Q"]), (pl["t2"], pl["C"]), (T, 1)], "s2-line", width=2.5)
+    marks = [("Q", pl["t1"], pl["Q"], "s2", 0, -10, "ההולך כשהנוסע יורד"),
+             ("D", pl["t1"], pl["D"], "s1", 0, -12, "הנוסע יורד"),
+             ("C", pl["t2"], pl["C"], "s2", 0, 22, "האופנוע אוסף את ההולך"),
+             ("E", pl["t2"], pl["E"], "s1", 0, -12, "הנוסע כשההולך עולה"),
+             ("B", T, 1, "ink", -16, -6, "שלושתם מגיעים")]
     for name, t, v, cls, dx, dy, title in marks:
-        p.append(f'<circle class="{cls}" cx="{X(t):.1f}" cy="{Y(v):.1f}" r="5"><title>{name}: {title}, '
-                 f't = {hours(t)}</title></circle>'
-                 f'<text class="legend" x="{X(t) + dx:.1f}" y="{Y(v) + dy:.1f}" text-anchor="middle" style="font-size:17px">{name}</text>')
-    p.append(f'<line class="axis" x1="{x0}" x2="{w - right}" y1="{base}" y2="{base}"/>'
-             f'<text class="tick" x="{w - right + 14}" y="{base + 4}" text-anchor="middle">t</text></svg>')
-    return "".join(p)
+        c.dot(t, v, cls, r=5, title=f"{name}: {title}, t = {hours(t)}", label=name, dx=dx, dy=dy, label_size=17)
+    c.add(f'<line class="axis" x1="{c.x0}" x2="{c.x1}" y1="{c.base}" y2="{c.base}"/>'
+          f'<text class="tick" x="{c.x1 + 14}" y="{c.base + 4}" text-anchor="middle">t</text>')
+    return c.svg()
 
 
 def spacetime_legend():
@@ -233,13 +228,20 @@ def points_table(alpha=ALPHA):
     return "\n".join(lines)
 
 
+def blocks():
+    """The generated blocks, in page order (tools/figures/fill.py puts them on the page)."""
+    return [
+        strategies_table(),
+        strategies_chart(),
+        strategies_legend(),
+        road_svg(),
+        road_legend(),
+        spacetime_svg(),
+        spacetime_legend(),
+        timeline_table(),
+        points_table(),
+    ]
+
+
 if __name__ == "__main__":
-    print(strategies_table(), "\n")
-    print(strategies_chart(), "\n")
-    print(strategies_legend(), "\n")
-    print(road_svg(), "\n")
-    print(road_legend(), "\n")
-    print(spacetime_svg(), "\n")
-    print(spacetime_legend(), "\n")
-    print(timeline_table(), "\n")
-    print(points_table())
+    print("\n\n".join(blocks()))

@@ -34,18 +34,25 @@ def q_table(a=A):
     return "\n".join(lines)
 
 
+def blocks():
+    """The generated blocks, in page order (tools/figures/fill.py puts them on the page)."""
+    return [
+        c.cake_rows(c.GEO, Fr(1, 10), Fr(2), show_peak=False),
+        c.cake_legend(False),
+        c.shares_chart(c.GEO, A, Q),
+        c.shares_legend(),
+        c.fraction_chart(c.GEO, A, Q),
+        c.fraction_legend(),
+        c.ratio_chart(c.GEO, A, Q),
+        c.ratio_legend(),
+        c.cake_rows(c.GEO, A, Q),
+        c.cake_legend(),
+        c.table(c.GEO, A, Q),
+        c.g_lines(A),
+        c.g_legend(),
+        q_table(),
+    ]
+
+
 if __name__ == "__main__":
-    print(c.cake_rows(c.GEO, Fr(1, 10), Fr(2), show_peak=False), "\n")
-    print(c.cake_legend(False), "\n")
-    print(c.shares_chart(c.GEO, A, Q), "\n")
-    print(c.shares_legend(), "\n")
-    print(c.fraction_chart(c.GEO, A, Q), "\n")
-    print(c.fraction_legend(), "\n")
-    print(c.ratio_chart(c.GEO, A, Q), "\n")
-    print(c.ratio_legend(), "\n")
-    print(c.cake_rows(c.GEO, A, Q), "\n")
-    print(c.cake_legend(), "\n")
-    print(c.table(c.GEO, A, Q), "\n")
-    print(c.g_lines(A), "\n")
-    print(c.g_legend(), "\n")
-    print(q_table())
+    print("\n\n".join(blocks()))

@@ -55,6 +55,7 @@ def selected_dirs(ids: list[str]) -> list[Path]:
         dirs = [d for d in dirs if d.name[:4] in wanted]
     else:
         dirs.append(TESTS / "hook")      # tests of the site hook, not of a question
+        dirs.append(TESTS / "tools")     # tests of the authoring tools
     return dirs
 
 

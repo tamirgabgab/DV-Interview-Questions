@@ -39,18 +39,25 @@ def examples_table():
     return "\n".join(lines)
 
 
+def blocks():
+    """The generated blocks, in page order (tools/figures/fill.py puts them on the page)."""
+    return [
+        c.cake_rows(c.ARITH, Fr(1, 5), Fr(1, 5), show_peak=False),
+        c.cake_legend(False),
+        c.shares_chart(c.ARITH, A, D),
+        c.shares_legend(),
+        c.fraction_chart(c.ARITH, A, D),
+        c.fraction_legend(),
+        c.ratio_chart(c.ARITH, A, D, log=True),
+        c.ratio_legend(),
+        c.cake_rows(c.ARITH, A, D),
+        c.cake_legend(),
+        c.table(c.ARITH, A, D),
+        c.f_curve(A, D),
+        c.f_legend(),
+        examples_table(),
+    ]
+
+
 if __name__ == "__main__":
-    print(c.cake_rows(c.ARITH, Fr(1, 5), Fr(1, 5), show_peak=False), "\n")
-    print(c.cake_legend(False), "\n")
-    print(c.shares_chart(c.ARITH, A, D), "\n")
-    print(c.shares_legend(), "\n")
-    print(c.fraction_chart(c.ARITH, A, D), "\n")
-    print(c.fraction_legend(), "\n")
-    print(c.ratio_chart(c.ARITH, A, D, log=True), "\n")
-    print(c.ratio_legend(), "\n")
-    print(c.cake_rows(c.ARITH, A, D), "\n")
-    print(c.cake_legend(), "\n")
-    print(c.table(c.ARITH, A, D), "\n")
-    print(c.f_curve(A, D), "\n")
-    print(c.f_legend(), "\n")
-    print(examples_table())
+    print("\n\n".join(blocks()))

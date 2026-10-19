@@ -11,6 +11,8 @@ import math
 from decimal import ROUND_HALF_UP, Decimal, getcontext
 from fractions import Fraction as Fr
 
+from charts import Chart
+
 getcontext().prec = 60
 ARITH, GEO = "arith", "geo"
 
@@ -149,37 +151,18 @@ def cake_legend(show_peak=True):
             '<span><i class="cake-gone"></i>כבר נלקח</span></span>')
 
 
-def _frame(w, h, label):
-    return [f'<svg class="perf-chart" viewBox="0 0 {w} {h}" role="img" aria-label="{label}">']
-
-
 def shares_chart(kind, a, step):
     """Bars of S(k), the largest one highlighted."""
     rows = split(kind, a, step)
     peak, top_s = best(rows)
     n = len(rows)
-    w, h, x0, right, top, base = 640, 250, 46, 12, 22, 216
-    ymax = math.ceil(float(top_s) * 20 + 0.6) / 20
-    slot = (w - x0 - right) / n
-    bw = slot * 0.68
-    Y = lambda v: base - float(v) / ymax * (base - top)
-    p = _frame(w, h, f"החלק של כל אדם. הגדול ביותר הוא של האדם ה-{peak[0]}, בערך {dec(top_s, 3)} מהעוגה")
-    v = 0.0
-    while v <= ymax + 1e-9:
-        p.append(f'<line class="grid" x1="{x0}" x2="{w - right}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/>'
-                 f'<text class="tick" x="{x0 - 8}" y="{Y(v) + 4:.1f}" text-anchor="end">{v:.2f}</text>')
-        v += 0.05
+    c = Chart(f"החלק של כל אדם. הגדול ביותר הוא של האדם ה-{peak[0]}, בערך {dec(top_s, 3)} מהעוגה",
+              top=22, slots=n, y_max=math.ceil(float(top_s) * 20 + 0.6) / 20)
+    c.grid_y([i * 0.05 for i in range(int(round(c.y_max / 0.05)) + 1)], "{:.2f}")
     for k, pk, R, S in rows:
-        cx = x0 + (k - 0.5) * slot
-        cls = "by-enum" if k in peak else "by-multiples"
-        p.append(f'<rect class="bar {cls}" x="{cx - bw / 2:.1f}" y="{Y(S):.1f}" width="{bw:.1f}" '
-                 f'height="{base - Y(S):.1f}" rx="2"><title>S({k}) = {dec(S)}</title></rect>')
-        if n <= 13:
-            p.append(f'<text class="tick" x="{cx:.1f}" y="{Y(S) - 5:.1f}" text-anchor="middle">{dec(S, 3)}</text>')
-        p.append(f'<text class="tick" x="{cx:.1f}" y="{base + 18}" text-anchor="middle">{k}</text>')
-    p.append(f'<line class="axis" x1="{x0}" x2="{w - right}" y1="{base}" y2="{base}"/>'
-             f'<text class="tick" x="{x0 - 8}" y="{base + 18}" text-anchor="end">k</text></svg>')
-    return "".join(p)
+        c.bar(k, S, "by-enum" if k in peak else "by-multiples", title=f"S({k}) = {dec(S)}",
+              value_label=dec(S, 3) if n <= 13 else None)
+    return c.x_ticks(range(1, n + 1)).axis("k").svg()
 
 
 def shares_legend():
@@ -193,28 +176,13 @@ def fraction_chart(kind, a, step):
     rows = split(kind, a, step)
     T = threshold(kind, step)
     peak = best(rows)[0]
-    n = len(rows)
-    w, h, x0, right, top, base = 640, 250, 46, 12, 16, 216
-    slot = (w - x0 - right) / n
-    Y = lambda v: base - float(v) * (base - top)
-    p = _frame(w, h, f"השבר של כל אדם מול הסף T, בערך {T:.3f}. הראשון שמגיע לסף הוא האדם ה-{peak[0]}")
-    for v in (0, 0.25, 0.5, 0.75, 1):
-        p.append(f'<line class="grid" x1="{x0}" x2="{w - right}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/>'
-                 f'<text class="tick" x="{x0 - 8}" y="{Y(v) + 4:.1f}" text-anchor="end">{v:g}</text>')
-    p.append(f'<line class="ink-line" x1="{x0}" x2="{w - right}" y1="{Y(T):.1f}" y2="{Y(T):.1f}" '
-             'stroke-width="1.5" stroke-dasharray="6 4"/>'
-             f'<text class="legend" x="{x0 + 6}" y="{Y(T) - 6:.1f}">T ≈ {T:.3f}</text>')
+    c = Chart(f"השבר של כל אדם מול הסף T, בערך {T:.3f}. הראשון שמגיע לסף הוא האדם ה-{peak[0]}",
+              slots=len(rows))
+    c.grid_y([0, 0.25, 0.5, 0.75, 1]).hline(T, f"T ≈ {T:.3f}")
     for k, pk, R, S in rows:
-        cx = x0 + (k - 0.5) * slot
-        above = float(pk) >= T - 1e-12
-        cls = "s2" if k == peak[0] else ("s1" if not above else "ink")
-        p.append(f'<line class="{cls}-line" x1="{cx:.1f}" x2="{cx:.1f}" y1="{base}" y2="{Y(pk):.1f}" stroke-width="2"/>'
-                 f'<circle class="{cls}-dot" cx="{cx:.1f}" cy="{Y(pk):.1f}" r="{6 if k == peak[0] else 4.5}">'
-                 f'<title>p({k}) = {dec(pk)}</title></circle>'
-                 f'<text class="tick" x="{cx:.1f}" y="{base + 18}" text-anchor="middle">{k}</text>')
-    p.append(f'<line class="axis" x1="{x0}" x2="{w - right}" y1="{base}" y2="{base}"/>'
-             f'<text class="tick" x="{x0 - 8}" y="{base + 18}" text-anchor="end">k</text></svg>')
-    return "".join(p)
+        cls = "s2" if k == peak[0] else ("s1" if float(pk) < T - 1e-12 else "ink")
+        c.stem(k, pk, cls, r=6 if k == peak[0] else 4.5, title=f"p({k}) = {dec(pk)}")
+    return c.x_ticks(range(1, len(rows) + 1)).axis("k").svg()
 
 
 def fraction_legend():
@@ -230,36 +198,20 @@ def ratio_chart(kind, a, step, log=False):
     rows = split(kind, a, step)
     rs = ratios(rows)
     peak = best(rows)[0]
-    n = len(rows)
-    w, h, x0, right, top, base = 640, 250, 46, 12, 16, 216
-    slot = (w - x0 - right) / n
+    label = f"היחס בין החלק של האדם הבא לחלק של האדם הנוכחי. הוא יורד מתחת ל-1 לראשונה אצל האדם ה-{peak[0]}"
     if log:
-        lo, hi = math.log10(0.05), math.log10(20)
-        Y = lambda v: base - (math.log10(float(v)) - lo) / (hi - lo) * (base - top)
+        c = Chart(label, slots=len(rows), log=True, y_min=0.05, y_max=20)
         ticks = [0.1, 0.2, 0.5, 1, 2, 5, 10]
     else:
         ymax = math.ceil(float(step) * 2) / 2
-        Y = lambda v: base - float(v) / ymax * (base - top)
+        c = Chart(label, slots=len(rows), y_max=ymax)
         ticks = [i / 2 for i in range(int(ymax * 2) + 1)]
-    p = _frame(w, h, f"היחס בין החלק של האדם הבא לחלק של האדם הנוכחי. הוא יורד מתחת ל-1 לראשונה אצל האדם ה-{peak[0]}")
-    for v in ticks:
-        p.append(f'<line class="grid" x1="{x0}" x2="{w - right}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/>'
-                 f'<text class="tick" x="{x0 - 8}" y="{Y(v) + 4:.1f}" text-anchor="end">{v:g}</text>')
-    p.append(f'<line class="ink-line" x1="{x0}" x2="{w - right}" y1="{Y(1):.1f}" y2="{Y(1):.1f}" '
-             'stroke-width="1.5" stroke-dasharray="6 4"/>')
-    pts = " ".join(f"{x0 + (k - 0.5) * slot:.1f},{Y(r):.1f}" for k, r in rs)
-    p.append(f'<polyline class="s1-line" points="{pts}" fill="none" stroke-width="1.5"/>')
+    c.grid_y(ticks).hline(1).path(rs, "s1-line", width=1.5)
     last = rs[-1][0]
     for k, r in rs:
-        cx = x0 + (k - 0.5) * slot
-        cls = "s2-dot" if k == peak[0] else ("ink-dot" if k == last else "s1-dot")
-        p.append(f'<circle class="{cls}" cx="{cx:.1f}" cy="{Y(r):.1f}" r="{6 if k == peak[0] else 4.5}">'
-                 f'<title>S({k + 1}) / S({k}) = {dec(r, 3)}</title></circle>')
-    for k in range(1, n):
-        p.append(f'<text class="tick" x="{x0 + (k - 0.5) * slot:.1f}" y="{base + 18}" text-anchor="middle">{k}</text>')
-    p.append(f'<line class="axis" x1="{x0}" x2="{w - right}" y1="{base}" y2="{base}"/>'
-             f'<text class="tick" x="{x0 - 8}" y="{base + 18}" text-anchor="end">k</text></svg>')
-    return "".join(p)
+        cls = "s2" if k == peak[0] else ("ink" if k == last else "s1")
+        c.dot(k, r, cls, r=6 if k == peak[0] else 4.5, title=f"S({k + 1}) / S({k}) = {dec(r, 3)}")
+    return c.x_ticks(range(1, len(rows))).axis("k").svg()
 
 
 def ratio_legend():
@@ -273,44 +225,26 @@ def f_curve(a=Fr(1, 100), d=Fr(1, 10), people=6):
     """f(p) = p^2 / (1 - p) against the line y = d; they cross at p = T. The fractions of
     the first people sit on the curve: below the line the next person gets more."""
     T = threshold(ARITH, d)
-    w, h, x0, right, top, base = 640, 260, 46, 14, 14, 226
-    pmax, ymax = 0.7, 0.6
-    X = lambda v: x0 + v / pmax * (w - x0 - right)
-    Y = lambda v: base - v / ymax * (base - top)
-    p = _frame(w, h, f"הפונקציה p בריבוע חלקי 1 פחות p, מול הקו בגובה d = {short(d)}. הם נחתכים ב-T, בערך {T:.3f}")
-    for v in (0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6):
-        p.append(f'<line class="grid" x1="{x0}" x2="{w - right}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/>'
-                 f'<text class="tick" x="{x0 - 8}" y="{Y(v) + 4:.1f}" text-anchor="end">{v:g}</text>')
-    for v in (0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6):
-        p.append(f'<text class="tick" x="{X(v):.1f}" y="{base + 18}" text-anchor="middle">{v:g}</text>')
+    c = Chart(f"הפונקציה p בריבוע חלקי 1 פחות p, מול הקו בגובה d = {short(d)}. הם נחתכים ב-T, בערך {T:.3f}",
+              h=260, right=14, top=14, base=226, x_max=0.7, y_max=0.6)
+    c.grid_y([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]).x_ticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+                                                     ["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6"])
     pts, v = [], 0.0
-    while v <= pmax + 1e-9:
-        fv = v * v / (1 - v)
-        if fv > ymax:
-            break
-        pts.append(f"{X(v):.1f},{Y(fv):.1f}")
+    while v <= c.x_max + 1e-9 and v * v / (1 - v) <= c.y_max:
+        pts.append((v, v * v / (1 - v)))
         v += 0.005
-    p.append(f'<polyline class="s1-line" points="{" ".join(pts)}" fill="none" stroke-width="2.5"/>')
-    p.append(f'<line class="ink-line" x1="{x0}" x2="{w - right}" y1="{Y(float(d)):.1f}" y2="{Y(float(d)):.1f}" '
-             'stroke-width="1.5" stroke-dasharray="6 4"/>'
-             f'<text class="legend" x="{w - right - 4}" y="{Y(float(d)) - 6:.1f}" text-anchor="end">y = d = {short(d)}</text>')
-    p.append(f'<line class="ink-line" x1="{X(T):.1f}" x2="{X(T):.1f}" y1="{Y(float(d)):.1f}" y2="{base}" '
-             'stroke-width="1" stroke-dasharray="3 3"/>'
-             f'<text class="legend" x="{X(T) + 6:.1f}" y="{base - 6}">T ≈ {T:.3f}</text>')
-    rows = split(ARITH, a, d)[:people]
+    c.path(pts, "s1-line", width=2.5).hline(d, f"y = d = {short(d)}", label_at="end")
+    c.vline(T, d, f"T ≈ {T:.3f}")
     peak = best(split(ARITH, a, d))[0]
-    for k, pk, _, _ in rows:
+    for k, pk, _, _ in split(ARITH, a, d)[:people]:
         fv = float(pk) ** 2 / (1 - float(pk))
-        if fv > ymax:
+        if fv > c.y_max:
             continue
-        cls = "s2-dot" if k == peak[0] else ("s1-dot" if float(pk) < T else "ink-dot")
-        p.append(f'<circle class="{cls}" cx="{X(float(pk)):.1f}" cy="{Y(fv):.1f}" r="{6 if k == peak[0] else 4.5}">'
-                 f'<title>p({k}) = {dec(pk)}</title></circle>'
-                 f'<text class="tick" x="{X(float(pk)):.1f}" y="{Y(fv) - 9:.1f}" text-anchor="middle">{k}</text>')
-    p.append(f'<circle class="ink-dot" cx="{X(T):.1f}" cy="{Y(float(d)):.1f}" r="3.5"/>')
-    p.append(f'<line class="axis" x1="{x0}" x2="{w - right}" y1="{base}" y2="{base}"/>'
-             f'<text class="tick" x="{w - right}" y="{base + 18}" text-anchor="end">p</text></svg>')
-    return "".join(p)
+        cls = "s2" if k == peak[0] else ("s1" if float(pk) < T else "ink")
+        c.dot(pk, fv, cls, r=6 if k == peak[0] else 4.5, title=f"p({k}) = {dec(pk)}")
+        c.text(pk, fv, k, cls="tick", dy=-9)
+    c.dot(T, d, "ink", r=3.5)
+    return c.axis("p", at="end").svg()
 
 
 def f_legend():
@@ -323,37 +257,22 @@ def f_legend():
 def g_lines(a=Fr(1, 100), qs=(Fr(3, 2), Fr(2))):
     """y = q (1 - p) for a few q against y = 1; they cross at p = 1 - 1/q. The fractions of
     the people of the first q sit on its line."""
-    w, h, x0, right, top, base = 640, 260, 46, 14, 14, 226
-    ymax = 2.1
-    X = lambda v: x0 + float(v) * (w - x0 - right)
-    Y = lambda v: base - float(v) / ymax * (base - top)
-    p = _frame(w, h, "הקווים q כפול 1 פחות p מול הקו y = 1. הם נחתכים ב-p = 1 פחות 1 חלקי q: שליש עבור q = 1.5, וחצי עבור q = 2")
-    for v in (0, 0.5, 1, 1.5, 2):
-        p.append(f'<line class="grid" x1="{x0}" x2="{w - right}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/>'
-                 f'<text class="tick" x="{x0 - 8}" y="{Y(v) + 4:.1f}" text-anchor="end">{v:g}</text>')
-    for v in (0, 0.25, 0.5, 0.75):
-        p.append(f'<text class="tick" x="{X(v):.1f}" y="{base + 18}" text-anchor="middle">{v:g}</text>')
-    p.append(f'<line class="ink-line" x1="{x0}" x2="{w - right}" y1="{Y(1):.1f}" y2="{Y(1):.1f}" '
-             'stroke-width="1.5" stroke-dasharray="6 4"/>')
+    c = Chart("הקווים q כפול 1 פחות p מול הקו y = 1. הם נחתכים ב-p = 1 פחות 1 חלקי q: שליש עבור q = 1.5, וחצי עבור q = 2",
+              h=260, right=14, top=14, base=226, x_max=1, y_max=2.1)
+    c.grid_y([0, 0.5, 1, 1.5, 2]).x_ticks([0, 0.25, 0.5, 0.75]).hline(1)
     for i, q in enumerate(qs):
-        cls = "s1" if i == 0 else "s3"
         T = 1 - 1 / q
-        p.append(f'<line class="{cls}-line" x1="{X(0):.1f}" y1="{Y(q):.1f}" x2="{X(1):.1f}" y2="{Y(0):.1f}" stroke-width="2.5"/>'
-                 f'<text class="legend" x="{X(0) + 8:.1f}" y="{Y(q) - 6:.1f}">q = {short(q)}</text>'
-                 f'<line class="ink-line" x1="{X(T):.1f}" x2="{X(T):.1f}" y1="{Y(1):.1f}" y2="{base}" stroke-width="1" stroke-dasharray="3 3"/>'
-                 f'<circle class="ink-dot" cx="{X(T):.1f}" cy="{Y(1):.1f}" r="3.5"/>'
-                 f'<text class="legend" x="{X(T) + 6:.1f}" y="{base - 6}">{T.numerator}/{T.denominator}</text>')
+        c.segment((0, q), (1, 0), "s1-line" if i == 0 else "s3-line")
+        c.text(0, q, f"q = {short(q)}", anchor="start", dx=8, dy=-6)
+        c.vline(T, 1, f"{T.numerator}/{T.denominator}").dot(T, 1, "ink", r=3.5)
     q = qs[0]
     rows = split(GEO, a, q)
     peak = best(rows)[0]
     T = 1 - 1 / q
     for k, pk, _, _ in rows[:-1]:
-        cls = "s2-dot" if k == peak[0] else ("s1-dot" if pk < T else "ink-dot")
-        p.append(f'<circle class="{cls}" cx="{X(pk):.1f}" cy="{Y(q * (1 - pk)):.1f}" r="{6 if k == peak[0] else 4}">'
-                 f'<title>p({k}) = {dec(pk)}</title></circle>')
-    p.append(f'<line class="axis" x1="{x0}" x2="{w - right}" y1="{base}" y2="{base}"/>'
-             f'<text class="tick" x="{w - right}" y="{base + 18}" text-anchor="end">p</text></svg>')
-    return "".join(p)
+        cls = "s2" if k == peak[0] else ("s1" if pk < T else "ink")
+        c.dot(pk, q * (1 - pk), cls, r=6 if k == peak[0] else 4, title=f"p({k}) = {dec(pk)}")
+    return c.axis("p", at="end").svg()
 
 
 def g_legend():

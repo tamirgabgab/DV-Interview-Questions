@@ -64,6 +64,7 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     interviewer = 0
     leftovers = []
     para_start = True            # the next text line starts a paragraph
+    in_comment = False
 
     for n, raw in enumerate(lines, 1):
         line = raw.rstrip()
@@ -104,7 +105,11 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
             in_html = max(in_html, 0)
             para_start = True
             continue
-        if not stripped or stripped.startswith("<!--"):
+        if in_comment or stripped.startswith("<!--"):   # an HTML comment, maybe over several lines
+            in_comment = "-->" not in stripped
+            para_start = True
+            continue
+        if not stripped:
             para_start = True
             continue
 

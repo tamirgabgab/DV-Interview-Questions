@@ -6,7 +6,6 @@ generator's output."""
 
 import json
 import math
-import re
 import shutil
 import subprocess
 import sys
@@ -14,7 +13,7 @@ from fractions import Fraction as Fr
 
 import pytest
 
-from extract_code import ROOT, question_path
+from extract_code import ROOT
 
 sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import cake  # noqa: E402
@@ -121,12 +120,6 @@ def test_js_matches_python():
 
 
 def test_figures_up_to_date():
-    out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0027.py")],
-                         capture_output=True, text=True, check=True).stdout
-    text = question_path(27).read_text(encoding="utf-8")
-    pattern = r'<svg class="(?:figure|perf-chart)".*?</svg>|<span class="viz-legend">.*?</span></span>'
-    assert re.findall(pattern, text) == re.findall(pattern, out)
-    assert len(re.findall(pattern, out)) == 12
-    page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
-    table_rows = [l.strip() for l in out.splitlines() if l.startswith("|")]
-    assert page_rows == table_rows
+    from page_tests import assert_figures_match
+
+    assert_figures_match(27)

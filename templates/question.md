@@ -49,10 +49,10 @@ hints and collapsed solution. A single-part question skips the part heading.)
 
     #### הקוד { .sol-code }
 
-    Code is always given in both languages, as linked tabs. Non-trivial blocks get code
+    <!-- Code is always given in both languages, as linked tabs. Non-trivial blocks get code
     annotations: a `// (1)!` / `# (1)!` marker at the end of a line and a numbered list
     right after the block. Use `title=` on every block, `linenums="1"` on long blocks and
-    `hl_lines=` for the key lines.
+    `hl_lines=` for the key lines. -->
 
     === "SystemVerilog"
         ```systemverilog title="function my_function" hl_lines="2"
