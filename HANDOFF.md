@@ -824,12 +824,67 @@ candidate routes.
 
 ---
 
+### Session 15 — 2026-10-20: round P (P87 to P92) and questions 0031, 0032
+
+The owner asked for P87 to P92 in full and for Q94 and Q96 only, each with a solution
+part for the specific data and a code part in Python and SystemVerilog. Decisions
+(asked first): 0031's code is general (N people, the least time and the crossing
+sequence); 0032's code is fixed to the three items and returns the seven crossings; P92
+covers the hourglass and probability explorers only (the PCIe split explorer M73 stays
+open); `main` is updated once, at the end, when everything is green.
+
+1. **P87, strip explorer** (`strip` kind, 0030): two wall panels where S and F are
+   dragged (or typed, with sliders for the box), the periodic strip redrawn with the
+   eight images, the valid lines, the shortest in orange, the exit and entry points, a
+   select for all 48 lines, and a table of the path face by face with the 3D point at
+   the end of each segment. The strip math (`stripLines`, `stripBest`, ...) is exported;
+   `tests/0030` compares it with the generator and the reference on random boxes.
+2. **P88, motorcycle animation** (0026): play at four speeds moves the three travellers
+   on a road figure while the position-time chart draws itself; a scrubber; a strategy
+   select (wait / walk meanwhile / get off on the way) for comparison. `motorcyclePhases`
+   and `motorcyclePositions` exported and tested (speeds, pickup point, arrival).
+3. **P89, cake stepper** (0027, 0028): a law select with the same a, a person-by-person
+   stepper (round cake, growing table, faint future bars), play.
+4. **P90, Josephus animation** (0016, 0022): the circle played step by step or at a
+   speed, the survivor highlighted from the start, the order of leaving as chips, the
+   step and round in the caption. `josephusSteps` exported and compared with the
+   generator for N up to 64, L = 2, 3, 4.
+5. **P91, clock additions** (0029): a timeline row per pair with a tick per meeting
+   (click to jump), a pair filter for the jumps and the "next meeting" text, a
+   next-triple button. `clockNext` / `clockPrev` take a pair mask (tested).
+6. **P92, hourglass and probability explorers**: `hourglass` (0018 BFS from zero, 0019
+   Dijkstra for the earliest interval: the plan on a time axis, the events one at a time
+   with the two glasses, the measurable values when D is impossible) and `probability`
+   (0015: p, the trait, C; the two-children square with area-proportional cells; the
+   answer as a curve against q). Both ported from the page code and compared with it.
+7. **Question 0031** `docs/questions/junior/0031-bridge-and-torch.md` (junior / medium):
+   the bridge and the torch. Part a: 17 (the slowest pair crosses together) against the
+   19 of the escort plan, a step figure, the plan and strategy tables, a lower-bound
+   proof. Part b: Dijkstra over (who is across, torch side) with parent pointers, SV
+   (array scan) and Python (heapq), the greedy rule as a corollary with a table where
+   the search and the rule agree; a `bridge` explorer with typed times. Tests: brute
+   force, the greedy rule, the explorer; `tb.sv` against the greedy rule on 400 random
+   sets with the plan string replayed.
+8. **Question 0032** `docs/questions/student/0032-wolf-goat-cabbage.md` (student / easy):
+   wolf, goat and cabbage. Part a: the seven crossings, the two mirror solutions, a step
+   figure, a lower-bound argument. Part b: four-bit states, the safety test, BFS with
+   parents in SV and Python, the state graph with the forbidden states struck out, the
+   table of the ten safe states; a `river` explorer to cross by hand or watch the plan.
+   Tests: the safety rule in words, exhaustive enumeration, the page code, the explorer;
+   `tb.sv` replays the plan.
+9. **Checks:** lint (32 pages, the 0004 warning only), 194 Python tests, strict build,
+   links (49 pages, 0 broken), phone check of the new and changed pages in light and
+   dark mode, screenshots of every explorer. SV keyword scan on the new blocks (clean).
+
+---
+
 ## In progress
 
-- Session 14 closed: questions 0029 and 0030 are on the branch and pushed; README /
-  HANDOFF are current. `main` is updated when the owner asks.
-- Next: the owner picks from rounds P to S (proposed in session 14), L to O, the open D to G and I
-  items, or sends the next batch of questions.
+- Session 15 closed: round P (P87 to P92) and questions 0031, 0032 are on the branch;
+  README / HANDOFF are current. `main` is fast-forwarded once CI is green (the owner asked
+  for one update at the end).
+- Next: the rest of round Q (Q93, Q95, Q97 to Q99), rounds R and S, L to O, the open D to G
+  and I items, the PCIe split explorer (M73), or the next batch of questions.
 
 ---
 
@@ -854,12 +909,12 @@ candidate routes.
 
 ## Question variety
 
-### Coverage today (30 questions)
+### Coverage today (32 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
-| Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly) |
+| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 | Staff | — | — |
 
@@ -1158,21 +1213,21 @@ and for new questions.
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| P87 | **Strip explorer for 0030, in the site's style**: drag S on the wall x = 0 and F on x = a (two small wall panels), the periodic strip redraws with the eight images, the 48 lines faint, the valid ones solid and the shortest in orange; the exit point and the distance in the summary. Hebrew, follows light / dark. The owner's tool stays as the full 3D view | M |
-| P88 | **Motorcycle animation for 0026**: a play button moves the three travellers along the road figure while the position-time chart draws itself; a scrubber for the time, the phase boundaries marked (the clock explorer's play loop reused) | M |
-| P89 | **Cake cutting animation for 0027 / 0028**: the rows appear one person at a time with the slice highlighted, the bar chart grows with them; a toggle "arithmetic / geometric" on one page to compare the two laws with the same a | S–M |
-| P90 | **Josephus circle animation for 0016 / 0022**: people leave the circle one by one at a chosen speed, the survivor highlighted, the binary of N shown rotating for L = 2; the survivor chart stays | M |
-| P91 | **Clock explorer additions for 0029**: a timeline strip under the day slider with a tick at every meeting (dense bands show where the pairs cluster), a pair filter, and a "next triple" jump | S–M |
-| P92 | **Hourglass explorer for 0018 / 0019** (M74) and **probability explorer for 0015** (M75), both still open; the PCIe split explorer (M73) after them | M each |
+| P87 | ~~**Strip explorer for 0030, in the site's style**: drag S on the wall x = 0 and F on x = a (two small wall panels), the periodic strip redraws with the eight images, the 48 lines faint, the valid ones solid and the shortest in orange; the exit point and the distance in the summary. Hebrew, follows light / dark. The owner's tool stays as the full 3D view~~ **Done** in session 15 | M |
+| P88 | ~~**Motorcycle animation for 0026**: a play button moves the three travellers along the road figure while the position-time chart draws itself; a scrubber for the time, the phase boundaries marked (the clock explorer's play loop reused)~~ **Done** in session 15 | M |
+| P89 | ~~**Cake cutting animation for 0027 / 0028**: the rows appear one person at a time with the slice highlighted, the bar chart grows with them; a toggle "arithmetic / geometric" on one page to compare the two laws with the same a~~ **Done** in session 15 | S–M |
+| P90 | ~~**Josephus circle animation for 0016 / 0022**: people leave the circle one by one at a chosen speed, the survivor highlighted, the binary of N shown rotating for L = 2; the survivor chart stays~~ **Done** in session 15 (without the rotating binary) | M |
+| P91 | ~~**Clock explorer additions for 0029**: a timeline strip under the day slider with a tick at every meeting (dense bands show where the pairs cluster), a pair filter, and a "next triple" jump~~ **Done** in session 15 | S–M |
+| P92 | ~~**Hourglass explorer for 0018 / 0019** (M74) and **probability explorer for 0015** (M75), both still open; the PCIe split explorer (M73) after them~~ **Done** in session 15 (hourglass and probability; M73 still open) | M each |
 
 **Round Q — new questions, puzzles in the style of 0026–0030**
 
 | # | Proposal | Effort |
 |---|----------|--------|
 | Q93 | **Ant on a can** (geodesics again): the shortest path on a cylinder from a point outside to a drop inside the rim, by unrolling the side and reflecting in the rim; junior / medium, no code, an unrolled-strip figure like 0030 | M |
-| Q94 | **Bridge and torch**: four people, 1 / 2 / 5 / 10 minutes, two at a time, one torch; 17 minutes and why 19 is the trap; part b a BFS over states in SV + Python with a stepper of the crossings; junior / medium | M |
+| Q94 | ~~**Bridge and torch**: four people, 1 / 2 / 5 / 10 minutes, two at a time, one torch; 17 minutes and why 19 is the trap; part b a BFS over states in SV + Python with a stepper of the crossings; junior / medium~~ **Done** in session 15 as 0031 (Dijkstra, not BFS: the crossings are weighted) | M |
 | Q95 | **Two trains and the fly**: the fly's total distance by the easy way and by the geometric series; student / easy, an animation of the fly bouncing (play button) | S–M |
-| Q96 | **Wolf, goat and cabbage**: BFS over the eight bank states with the forbidden ones struck out; student / easy; a stepper and code | S–M |
+| Q96 | ~~**Wolf, goat and cabbage**: BFS over the eight bank states with the forbidden ones struck out; student / easy; a stepper and code~~ **Done** in session 15 as 0032 | S–M |
 | Q97 | **Clock angles** (0029 follow-ups made a question): when are the minute and hour hands opposite, at right angles, mirror images; student / easy; the clock explorer reused with a target angle | S |
 | Q98 | **Heron's shortest path** (reflection in a wall): the path from A to B that touches a line; student / easy, prepares 0030 and Q93 | S |
 | Q99 | **Rope around the Earth**: add one metre to the rope, how high does it lift; student / easy, mental arithmetic and a figure not to scale | S |
@@ -1337,7 +1392,12 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   0030 uses `hinge`, `gap` and `in_wall`. Verilator is not installed in the sandbox, so
   before pushing new SV, intersect its identifiers with the IEEE 1800 keyword list (a
   ten-line script over `extract_code.blocks(qid, "systemverilog")` and `tests/*/*.sv`).
-- A view with `mount(box)` (the `clock` kind) builds its own controls instead of sliders.
+- Every explorer kind now has `mount(box)` and builds its own controls (the generic
+  slider path in `setup` is kept for a future kind without `mount`). Patterns to reuse:
+  a play loop on `requestAnimationFrame` with a speed select (clock, motorcycle), a
+  stepper on `setInterval` with prev / next / play (cake, Josephus, hourglass, bridge,
+  river), pointer drag on an SVG with `setPointerCapture` (clock, strip). Keep the math
+  pure and exported; every kind has a Node test against the Python reference.
   Keep the math on integers where it can be (the clock counts meetings in the window
   [sec, sec + 1) as k·P < (sec + 1)·q), and keep time labels inside their second (the
   hundredths are capped at .99) so the label and the highlighted second agree. Avoid

@@ -11,7 +11,7 @@ level**, **difficulty** and **topic**.
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 30 questions (see the catalog below).
+> **Status:** the site is live and holds 32 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and the proposed rounds of
 > improvements (interface, explorers per question, new puzzle and DV-core questions, tooling).
 
@@ -150,8 +150,8 @@ DV-Interview-Questions/
 │   ├── questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
-│   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
-│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0030-…
+│   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…, 0032-…
+│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0031-…
 │   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…, 0023-…, 0024-…, 0025-…
 │   │   └── staff/
 │   ├── assets/
@@ -329,7 +329,7 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 | Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0022 box rows: relabelling, one round, bits; 0020, 0021 and 0023 address axes; 0024 modulo-256 circles) |
 | Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
 | Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0022 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events, 0023 completion queues cycle by cycle, 0024 credit counters step by step, 0025 Retry Buffer and receiver state per packet) |
-| Interactive explorers            | `<div class="explorer" data-kind="..." data-...>`: `docs/javascripts/explorer.js` adds sliders, a summary line and charts. Kinds: `cake-arith` / `cake-geo` (`data-a`, `data-step`; 0027, 0028), `motorcycle` (`data-t0`, `data-t1`; 0026), `josephus` (`data-n`, `data-l`, optional `data-lmax`, `data-nmax`; 0016, 0022), `clock` (`data-t`, the start time in seconds; 0029: a face with draggable hands, play with a speed, a day slider, a time field, jumps to the next or previous meeting, and live counters per pair; hands that meet in the second shown turn orange). A kind whose view has `mount(box)` builds its own controls instead of sliders. The math of each kind is exported under Node, and the question tests compare it with the Python reference |
+| Interactive explorers            | `<div class="explorer" data-kind="..." data-...>`: `docs/javascripts/explorer.js` builds the controls, a summary line and live figures. Every kind now has its own `mount(box)` (controls, a play loop where motion matters, a stepper where steps matter). Kinds: `cake-arith` / `cake-geo` (`data-a`, `data-step`; 0027, 0028: a law select to compare the two laws with the same a, sliders, and a person-by-person stepper of a round cake with the growing table), `motorcycle` (`data-t0`, `data-t1`; 0026: sliders, a strategy select, play at four speeds moving the travellers on a road while the chart draws, a scrubber), `josephus` (`data-n`, `data-l`, optional `data-lmax`, `data-nmax`; 0016, 0022: the circle played step by step or at a speed, the survivor highlighted from the start, the order of leaving, the survivor chart), `clock` (`data-t`; 0029: a draggable face, play, a day slider, a typed time, next / previous / next-triple jumps, a pair filter, live counters, and a timeline with a tick per meeting), `strip` (`data-a`, `data-b`, `data-h`, `data-y0`, `data-z0`, `data-y1`, `data-z1`; 0030: drag S and F on two wall panels, the periodic strip with the images, the 48 lines and the shortest one, the path face by face), `hourglass` (`data-mode` zero / interval, `data-a`, `data-b`, `data-d`; 0018, 0019: the plan on a time axis and the events one at a time), `probability` (`data-p`, `data-c`; 0015: the answer, the two-children square, the curve against q), `bridge` (`data-times`; 0031: typed crossing times, the Dijkstra plan played crossing by crossing), `river` (0032: cross by hand or watch the BFS plan, the state graph follows). The math of each kind is exported under Node, and the question tests compare it with the Python reference |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 | Standalone HTML tools            | A self-contained page under `docs/assets/`, kept exactly as the owner sent it, embedded with `<iframe class="tool-frame" src="../../../assets/<name>.html">` plus a Markdown link `(../../assets/<name>.html)` to open it in a new tab (0030: `spider-fly.html`). Such a page is not a question page: the linter, the phone check and the figure tests leave it alone, only the link checker sees it |
