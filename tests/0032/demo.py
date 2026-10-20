@@ -1,5 +1,4 @@
-# Starting code of the run panel of question 0032: the page's Python code is loaded
-# as solution.py; call its functions here.
-from solution import *  # noqa: F401,F403
-
-print("ready")
+# The plan found by BFS, and the ten safe states
+plan = river_plan()
+print("crossings:", " -> ".join("alone" if p is None else p for p in plan))
+print("safe states:", [s for s in range(16) if river_safe(s)])

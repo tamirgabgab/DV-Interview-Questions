@@ -1374,6 +1374,11 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer input.ex-times { font: inherit; font-family: var(--md-code-font-family); padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
 .md-typeset .explorer .bridge-caption { margin: 0.2em 0 0.4em; font-size: 0.75rem; }
 
+/* the river figure and state graph of 0032 */
+.md-typeset svg .boat { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset .viz-legend .boat { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-ink); border-radius: 0.4rem; }
+.md-typeset svg .st-cur { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 3; }
+
 /* the hourglass explorer of 0018 / 0019 and the probability explorer of 0015 */
 .md-typeset .explorer svg.hg-live { width: 100%; max-width: 40rem; display: block; }
 .md-typeset .explorer .hg-frame svg.figure { margin: 0.3rem 0; }
