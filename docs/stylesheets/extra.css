@@ -1304,6 +1304,42 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ex-summary { font-weight: 600; }
 .md-typeset .explorer .ex-title { margin: 0.6em 0 0; font-size: 0.7rem; color: var(--viz-text); }
 
+/* Clock (0029): the face in the figures and in the explorer; hands that meet turn orange */
+.md-typeset svg .clock-face { fill: none; stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .clock-tick { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg .clock-tick5 { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset .explorer .clock-box { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.4rem; margin-top: 0.6rem; }
+.md-typeset .explorer svg.clock-live { width: 15rem; max-width: 100%; touch-action: none; cursor: grab; user-select: none; }
+.md-typeset .explorer svg.clock-live.is-dragging { cursor: grabbing; }
+.md-typeset .explorer svg .hand.is-meet { stroke: var(--viz-s2); }
+.md-typeset .explorer .clock-panel { flex: 1 1 14rem; min-width: 0; }
+.md-typeset .explorer .clock-panel p { margin: 0.3em 0; }
+.md-typeset .explorer .clock-time {
+  font-family: var(--md-code-font-family);
+  font-size: 1.4rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.md-typeset .explorer .clock-total { font-weight: 700; font-size: 0.95rem; }
+.md-typeset .explorer .clock-counts { margin: 0.2em 0; padding-inline-start: 1.1rem; }
+.md-typeset .explorer .clock-counts li { margin: 0.1em 0; }
+.md-typeset .explorer .clock-counts li.is-meet { color: var(--viz-s2); font-weight: 700; }
+.md-typeset .explorer input.ex-time,
+.md-typeset .explorer select {
+  font: inherit;
+  font-family: var(--md-code-font-family);
+  color: inherit;
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--viz-grid);
+  border-radius: 0.2rem;
+  padding: 0.1rem 0.3rem;
+}
+.md-typeset .explorer select { font-family: inherit; }
+.md-typeset .explorer .clock-day { display: flex; margin-top: 0.4rem; }
+.md-typeset .explorer .clock-day input[type="range"] { flex: 1 1 auto; width: auto; }
+.md-typeset .explorer .ex-controls .md-button { padding: 0.2rem 0.7rem; font-size: 0.65rem; margin: 0; }
+.md-typeset .explorer .md-button:not(.md-button--primary) { color: var(--md-typeset-a-color); border-color: currentColor; }
+
 /* Reading aids (reading-tools.js): enlarge button and lightbox, tap tooltip, part bar */
 .md-typeset .fig-wrap { position: relative; }
 .md-typeset .fig-enlarge {

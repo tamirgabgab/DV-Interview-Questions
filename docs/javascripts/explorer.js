@@ -3,8 +3,9 @@
 //   cake-arith / cake-geo  0027, 0028  sliders a and d (or q): shares and fractions vs T
 //   motorcycle             0026        sliders t0 and t1: the position-time chart
 //   josephus               0016, 0022  sliders N (and L): the survivor of every circle size
+//   clock                  0029        a clock face to drag, play or type: meetings of the hands so far
 // The math of each model is exported under Node, where the question tests compare it with
-// the Python reference (tests/0016, 0022, 0026, 0027, 0028).
+// the Python reference (tests/0016, 0022, 0026, 0027, 0028, 0029).
 (() => {
   const EPS = 1e-9;
 
@@ -70,9 +71,57 @@
   };
   const josephusFormula = (n, L) => (L * (n - josephusZero(n, L))) / (L - 1);
 
+  // Clock (0029), time in seconds from 00:00:00. Hands i and j meet at k * P / q: the second
+  // and minute hands every 3600/59 s, second and hour every 43200/719 s, minute and hour every
+  // 43200/11 s. A "second" is the window [sec, sec + 1), so integer arithmetic stays exact.
+  const CLOCK_PERIOD = { s: 60, m: 3600, h: 43200 };
+  const CLOCK_PAIRS = [["s", "m", 3600, 59], ["s", "h", 43200, 719], ["m", "h", 43200, 11]];
+  const CLOCK_DAY = 86400, CLOCK_HALF = 43200;
+  // Meetings from 00:00:00 to the end of second sec: per pair, all three, and distinct moments.
+  const clockCounts = (sec) => {
+    const pairs = CLOCK_PAIRS.map(([, , P, q]) => Math.floor(((sec + 1) * q - 1) / P) + 1);
+    const triple = Math.floor(sec / CLOCK_HALF) + 1;
+    return { pairs, triple, total: pairs[0] + pairs[1] + pairs[2] - 2 * triple };
+  };
+  // The meetings inside second sec, as [pair index, time].
+  const clockMeetsIn = (sec) => {
+    const out = [];
+    CLOCK_PAIRS.forEach(([, , P, q], n) => {
+      const k = Math.floor((sec * q + P - 1) / P);           // the first k with k P >= sec q
+      if (k * P < (sec + 1) * q) out.push([n, (k * P) / q]);
+    });
+    return out;
+  };
+  // The first meeting after t, or the last one before it (null outside the day).
+  const clockNext = (t) => {
+    let best = null;
+    CLOCK_PAIRS.forEach(([, , P, q]) => {
+      const v = ((Math.floor((t * q) / P + EPS) + 1) * P) / q;
+      if (v < CLOCK_DAY && (best === null || v < best)) best = v;
+    });
+    return best;
+  };
+  const clockPrev = (t) => {
+    let best = null;
+    CLOCK_PAIRS.forEach(([, , P, q]) => {
+      const k = Math.ceil((t * q) / P - EPS) - 1;
+      if (k >= 0 && (best === null || (k * P) / q > best)) best = (k * P) / q;
+    });
+    return best;
+  };
+  // "H:MM:SS.ss" as tools/figures/q0029.py writes it: hundredths rounded, but at most .99.
+  const clockLabel = (t) => {
+    const sec = Math.floor(t);
+    const two = (v) => String(v).padStart(2, "0");
+    const base = `${Math.floor(sec / 3600)}:${two(Math.floor(sec / 60) % 60)}:${two(sec % 60)}`;
+    if (Math.abs(t - sec) < 1e-9) return base;
+    return `${base}.${two(Math.min(Math.floor((t - sec) * 100 + 0.5), 99))}`;
+  };
+
   const models = {
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
     motorcyclePlan, motorcycleTime, josephusRun, josephusZero, josephusFormula,
+    clockCounts, clockMeetsIn, clockNext, clockPrev, clockLabel,
   };
   if (typeof module !== "undefined" && module.exports) {
     module.exports = models;
@@ -233,11 +282,172 @@
     };
   };
 
+  // The clock box: a face whose hands can be dragged, a play button with a speed, a day
+  // slider, a time field and jumps to the next or previous meeting. The counters cover
+  // 00:00:00 to the end of the second shown; hands that meet inside that second turn orange.
+  const clockView = () => ({
+    mount(box) {
+      const C = 140, R = 124, LAST = CLOCK_DAY - 1e-6;
+      const HAND = { h: ["ink", 62, 7], m: ["s1", 96, 4.5], s: ["s3", 108, 2] };
+      const NAMES = { s: "השניות", m: "הדקות", h: "השעות" };
+      const PAIR_NAME = CLOCK_PAIRS.map(([i, j]) => `${NAMES[i]} ו${NAMES[j]}`);
+      const pt = (turn, r) => [C + r * Math.sin(2 * Math.PI * turn), C - r * Math.cos(2 * Math.PI * turn)];
+      let face = `<svg class="figure clock-live" viewBox="0 0 280 280" role="img" aria-label="שעון">` +
+        `<circle class="clock-face" cx="${C}" cy="${C}" r="${R}"/>`;
+      for (let n = 0; n < 60; n++) {
+        const [x0, y0] = pt(n / 60, R - (n % 5 ? 5 : 11)), [x1, y1] = pt(n / 60, R);
+        face += `<line class="${n % 5 ? "clock-tick" : "clock-tick5"}" x1="${f(x0)}" y1="${f(y0)}" x2="${f(x1)}" y2="${f(y1)}"/>`;
+      }
+      for (let n = 1; n <= 12; n++) {
+        const [x, y] = pt(n / 12, R - 26);
+        face += `<text class="legend" x="${f(x)}" y="${f(y + 5)}" text-anchor="middle">${n}</text>`;
+      }
+      ["h", "m", "s"].forEach((k) => {
+        const [cls, len, w] = HAND[k];
+        face += `<line class="${cls}-line hand hand-${k}" x1="${C}" y1="${C}" x2="${C}" y2="${C - len}" ` +
+                `stroke-width="${w}" stroke-linecap="round"/>`;
+      });
+      face += `<circle class="ink-dot" cx="${C}" cy="${C}" r="5"/></svg>`;
+
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<button type="button" class="md-button md-button--primary ex-play">הפעלה</button>` +
+        `<label>הקצב <select class="ex-speed">` +
+        [[1, "זמן אמת"], [10, "פי 10"], [60, "דקה בשנייה"], [600, "10 דקות בשנייה"], [3600, "שעה בשנייה"]]
+          .map(([v, n]) => `<option value="${v}"${v === 60 ? " selected" : ""}>${n}</option>`).join("") +
+        `</select></label>` +
+        `<button type="button" class="md-button ex-prev">לפגישה הקודמת</button>` +
+        `<button type="button" class="md-button ex-next">לפגישה הבאה</button>` +
+        `<button type="button" class="md-button ex-reset">חזרה ל-00:00</button></div>` +
+        `<div class="clock-box">${face}<div class="clock-panel">` +
+        `<p class="clock-time" dir="ltr"></p>` +
+        `<label>שעה <input type="text" class="ex-time" inputmode="numeric" maxlength="8" size="8" ` +
+        `placeholder="HH:MM:SS" aria-label="שעה, שעות:דקות:שניות" dir="ltr"></label>` +
+        `<p class="clock-total"></p><ul class="clock-counts"></ul></div></div>` +
+        `<label class="clock-day">היממה <input type="range" class="ex-day" min="0" max="${CLOCK_DAY - 1}" step="1" dir="ltr"></label>` +
+        `<p class="ex-summary" aria-live="polite"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const svg = $("svg"), hands = {}, play = $(".ex-play"), speed = $(".ex-speed");
+      const timeIn = $(".ex-time"), day = $(".ex-day"), summary = $(".ex-summary");
+      ["h", "m", "s"].forEach((k) => { hands[k] = $(`.hand-${k}`); });
+      let t = Number(box.dataset.t || 0), shown = -1, running = false, last = 0;
+
+      const two = (v) => String(v).padStart(2, "0");
+      const hms = (sec) => `${two(Math.floor(sec / 3600))}:${two(Math.floor(sec / 60) % 60)}:${two(sec % 60)}`;
+      const render = (force) => {
+        ["h", "m", "s"].forEach((k) => {
+          const turn = (t / CLOCK_PERIOD[k]) % 1;
+          hands[k].setAttribute("transform", `rotate(${(turn * 360).toFixed(3)} ${C} ${C})`);
+        });
+        const sec = Math.floor(t);
+        if (sec === shown && !force) return;
+        shown = sec;
+        const meets = clockMeetsIn(sec), cnt = clockCounts(sec);
+        const on = new Set();
+        meets.forEach(([n]) => { on.add(CLOCK_PAIRS[n][0]); on.add(CLOCK_PAIRS[n][1]); });
+        ["h", "m", "s"].forEach((k) => hands[k].classList.toggle("is-meet", on.has(k)));
+        $(".clock-time").textContent = hms(sec);
+        svg.setAttribute("aria-label", `שעון בשעה ${hms(sec)}`);
+        if (document.activeElement !== timeIn || running) timeIn.value = hms(sec);
+        day.value = sec;
+        $(".clock-total").innerHTML = `מתחילת היממה: ${cnt.total === 1 ? "פגישה אחת" : `${ltr(cnt.total)} פגישות`}`;
+        const hit = new Set(meets.map(([n]) => n));
+        $(".clock-counts").innerHTML = PAIR_NAME.map((name, n) =>
+          `<li${hit.has(n) ? ' class="is-meet"' : ""}>${name}: ${ltr(cnt.pairs[n])}</li>`).join("") +
+          `<li${sec % CLOCK_HALF === 0 ? ' class="is-meet"' : ""}>שלושתם יחד: ${ltr(cnt.triple)}, ` +
+          `ולכן ${ltr(`${cnt.pairs.join(" + ")} − 2 · ${cnt.triple} = ${cnt.total}`)}</li>`;
+        let text;
+        const triple = sec % CLOCK_HALF === 0;               // all three meet only at 00:00 and 12:00
+        if (triple) {
+          text = `בשנייה הזו שלושת המחוגים נפגשים, ב-${ltr(clockLabel(meets[0][1]))}.`;
+        } else if (meets.length) {
+          text = "בשנייה הזו: " + meets.map(([n, v]) => `${PAIR_NAME[n]} נפגשים ב-${ltr(clockLabel(v))}`).join(", ") + ".";
+        } else {
+          const nx = clockNext(sec + 1 - 1e-9);
+          text = "בשנייה הזו אין פגישה." + (nx === null ? " אין עוד פגישות עד סוף היממה."
+            : ` הבאה: ב-${ltr(clockLabel(nx))}, ${clockMeetsIn(Math.floor(nx)).map(([n]) => PAIR_NAME[n]).join(" וגם ")}.`);
+        }
+        summary.innerHTML = text;                    // built from numbers and fixed names only
+      };
+      const setTime = (v) => { t = Math.min(Math.max(v, 0), LAST); render(); };
+      const stop = () => {
+        running = false;
+        play.textContent = "הפעלה";
+        summary.setAttribute("aria-live", "polite");
+      };
+      const tick = (now) => {
+        if (!running) return;
+        t = Math.min(t + ((now - last) / 1000) * Number(speed.value), LAST);
+        last = now;
+        render();
+        if (t >= LAST) stop(); else requestAnimationFrame(tick);
+      };
+      play.addEventListener("click", () => {
+        if (running) { stop(); return; }
+        if (t >= LAST) t = 0;
+        running = true;
+        play.textContent = "עצירה";
+        summary.setAttribute("aria-live", "off");
+        last = performance.now();
+        requestAnimationFrame(tick);
+      });
+      $(".ex-next").addEventListener("click", () => { stop(); const v = clockNext(t); if (v !== null) setTime(v); });
+      $(".ex-prev").addEventListener("click", () => { stop(); const v = clockPrev(t); if (v !== null) setTime(v); });
+      $(".ex-reset").addEventListener("click", () => { stop(); setTime(0); });
+      day.addEventListener("input", () => { stop(); setTime(Number(day.value)); });
+      timeIn.addEventListener("change", () => {
+        const m = /^\s*(\d{1,2})(?::(\d{1,2}))?(?::(\d{1,2}))?\s*$/.exec(timeIn.value);
+        const [h, mi, se] = m ? [1, 2, 3].map((n) => Number(m[n] || 0)) : [];
+        if (m && h < 24 && mi < 60 && se < 60) { stop(); setTime(h * 3600 + mi * 60 + se); }
+        render(true);                                   // a bad entry falls back to the time shown
+      });
+      timeIn.addEventListener("keydown", (e) => { if (e.key === "Enter") timeIn.blur(); });
+
+      // drag: the hand nearest to the finger follows it; a full turn of that hand moves the
+      // time by its period (60 s, an hour or 12 hours)
+      let drag = null;
+      const where = (e) => {
+        const r = svg.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width * 280 - C, y = (e.clientY - r.top) / r.height * 280 - C;
+        return [((Math.atan2(x, -y) / (2 * Math.PI)) + 1) % 1, Math.hypot(x, y)];
+      };
+      const turnAt = (e) => where(e)[0];
+      svg.addEventListener("pointerdown", (e) => {
+        stop();
+        const [at, rad] = where(e);
+        const dist = (k) => { const d = Math.abs(((t / CLOCK_PERIOD[k]) % 1) - at); return Math.min(d, 1 - d); };
+        const best = Math.min(...["s", "m", "h"].map(dist));
+        const near = ["s", "m", "h"].filter((k) => dist(k) < best + 0.02);
+        // hands on top of each other: the length of the hand under the finger decides
+        const byLength = rad > 100 ? "s" : rad > 66 ? "m" : "h";
+        const k = near.includes(byLength) ? byLength : near[0];
+        drag = { k, at };
+        svg.setPointerCapture(e.pointerId);
+        svg.classList.add("is-dragging");
+        e.preventDefault();
+      });
+      svg.addEventListener("pointermove", (e) => {
+        if (!drag) return;
+        const at = turnAt(e);
+        let d = at - drag.at;
+        if (d > 0.5) d -= 1;
+        if (d < -0.5) d += 1;
+        drag.at = at;
+        setTime(t + d * CLOCK_PERIOD[drag.k]);
+      });
+      const end = () => { drag = null; svg.classList.remove("is-dragging"); };
+      svg.addEventListener("pointerup", end);
+      svg.addEventListener("pointercancel", end);
+      render(true);
+    },
+  });
+
   const VIEWS = {
     "cake-arith": () => cakeView("arith"),
     "cake-geo": () => cakeView("geo"),
     motorcycle: motorcycleView,
     josephus: josephusView,
+    clock: clockView,
   };
 
   // --- the box -----------------------------------------------------------------------------
@@ -246,6 +456,7 @@
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
     const view = make(box);
+    if (view.mount) { view.mount(box); return; }      // a box with its own controls
     const defaults = {};
     view.sliders.forEach((sl) => { defaults[sl.key] = Number(box.dataset[sl.key] ?? sl.min); });
     const state = { ...defaults };

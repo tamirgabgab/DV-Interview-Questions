@@ -33,7 +33,7 @@ def test_new_question_with_figures_and_code(tmp_path):
                      "tools/figures/q0042.py", "README.md"}
     page = (root / "docs/questions/junior/0042-cake-split.md").read_text(encoding="utf-8")
     assert page.startswith("---\nid: 42\ntitle: חלוקת עוגה\nlevel: junior\ndifficulty: medium\n"
-                           "tags: [math, sequences]\nsource: \"\"\nadded: 2026-10-20\n---\n")
+                           "tags: [math, sequences]\nsource: \"\"\nadded: 2026-10-20\n---\n\n## השאלה\n")
     assert "    <!-- gen 0 -->" in page
     assert lint_pages.lint(root / "docs/questions/junior/0042-cake-split.md") == []
     # the generator stub fills the page

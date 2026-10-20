@@ -39,7 +39,7 @@ def page_text(template: str, qid: int, title: str, level: str, difficulty: str, 
               today: str, figures: bool) -> str:
     front = (f"---\nid: {qid}\ntitle: {title}\nlevel: {level}\ndifficulty: {difficulty}\n"
              f"tags: [{', '.join(tags)}]\nsource: \"\"\nadded: {today}\n---\n")
-    body = template[template.index("\n---", 3) + 4:]
+    body = "\n" + template[template.index("\n---", 3) + 4:].lstrip("\n")
     if figures:
         body = body.replace("    #### הרעיון { .sol-idea }\n",
                             "    #### הרעיון { .sol-idea }\n\n    <!-- gen 0 -->\n\n    <!-- /gen -->\n", 1)

@@ -11,7 +11,7 @@ level**, **difficulty** and **topic**.
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 28 questions (see the catalog below).
+> **Status:** the site is live and holds 29 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and the proposed rounds of
 > improvements (interface, new questions, tooling).
 
@@ -49,6 +49,7 @@ level**, **difficulty** and **topic**.
 | 0026 | Three people and one motorcycle: the fastest way for all three to arrive (walk 13 h, ride 1 h, then a formula) | junior | 🟢 easy | speed ratio α instead of the unknown distance, three phases with one equation each, symmetry y = r, T = (3α + 1)/(α + 3)·t1, three strategies compared, position-time chart, road figure (no code) |
 | 0027 | Cake split by fractions of what is left, growing as an arithmetic sequence: who gets the most (a = 0.01, d = 0.1, then any a and d ≤ 1/2) | junior | 🟡 medium | ratio of neighbours, quadratic threshold T = (√(d² + 4d) − d)/2, single peak because p²/(1 − p) grows, the capped last person, ties, a = d; cake rows, shares bars, fractions against T, ratio chart, slider explorer (no code) |
 | 0028 | Cake split by fractions of what is left, growing as a geometric sequence: who gets the most (a = 0.01, q = 1.5, then any a and 1 < q ≤ 2) | junior | 🟡 medium | ratio q(1 − p), threshold 1 − 1/q, k = ⌈log_q((q − 1)/a)⌉, ties, the capped last person, q ≤ 1 and q > 2; cake rows, shares bars, fractions against T, ratio chart, slider explorer (no code) |
+| 0029 | Second, minute and hour hands: how many times at least two meet in a day (00:00 to 23:59:59), then the general formula and proof | junior | 🟡 medium | laps of the faster hand, n_i − n_j meetings per pair (1416, 1438, 22), 00:00 and 12:00 counted three times, 2872; T_ij = t_i t_j / (t_j − t_i), closed / open / half-open counts, 11a = 708b so triple meetings only every 12 h; clock face, angle charts, a draggable clock explorer with live counters (no code) |
 
 Update this table whenever a question is added.
 
@@ -324,7 +325,7 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 | Geometric figures                | Inline SVG with class `figure` (0004 boxes, 0007 circles, 0016 and 0022 box rows: relabelling, one round, bits; 0020, 0021 and 0023 address axes; 0024 modulo-256 circles) |
 | Probability grids                | Inline SVG `figure` with `pg-*` cell classes (outcome ruled out / condition / target) + `viz-legend` (0015) |
 | Step-through figures             | `div.stepper` from `tools/figures/stepper.py`: SVG frames with captions, shown one at a time with previous / next buttons (0009 walks, 0010 stack, 0016 and 0022 circles, 0017 tortoise and hare, 0018 and 0019 hourglass events, 0023 completion queues cycle by cycle, 0024 credit counters step by step, 0025 Retry Buffer and receiver state per packet) |
-| Interactive explorers            | `<div class="explorer" data-kind="..." data-...>`: `docs/javascripts/explorer.js` adds sliders, a summary line and charts. Kinds: `cake-arith` / `cake-geo` (`data-a`, `data-step`; 0027, 0028), `motorcycle` (`data-t0`, `data-t1`; 0026), `josephus` (`data-n`, `data-l`, optional `data-lmax`, `data-nmax`; 0016, 0022). The math of each kind is exported under Node, and the question tests compare it with the Python reference |
+| Interactive explorers            | `<div class="explorer" data-kind="..." data-...>`: `docs/javascripts/explorer.js` adds sliders, a summary line and charts. Kinds: `cake-arith` / `cake-geo` (`data-a`, `data-step`; 0027, 0028), `motorcycle` (`data-t0`, `data-t1`; 0026), `josephus` (`data-n`, `data-l`, optional `data-lmax`, `data-nmax`; 0016, 0022), `clock` (`data-t`, the start time in seconds; 0029: a face with draggable hands, play with a speed, a day slider, a time field, jumps to the next or previous meeting, and live counters per pair; hands that meet in the second shown turn orange). A kind whose view has `mount(box)` builds its own controls instead of sliders. The math of each kind is exported under Node, and the question tests compare it with the Python reference |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
 
@@ -348,6 +349,7 @@ follow the light / dark switch automatically:
 | `cs-rcb`, `cs-req`, `cs-first`, `cs-mid`, `cs-last`, `cs-one`, `cs-bad`, `cs-can`, `cs-size` | PCIe completion splits over the address axis: RCB grid, request limits, completions by role, one above MPS (0020, 0021, 0023; drawn by `tools/figures/q0020.py`, `q0021.py` and `q0023.py`) |
 | `cs-blk`, `cs-new`, `cs-keep` | Memory blocks of the endpoint model: a block, the bytes a request touches, the bytes kept by a read-modify-write (0023) |
 | `fc-ring`, `fc-tick`, `fc-window`, `fc-ahead`, `fc-pkt`, `fc-grant`, `fc-sync`, `fc-drop`, `fc-slot`, `fc-full` | USB4 credit counters on the modulo-256 circle (the 127-step window, the forward distance) and the stepper of the two adapters: packet / grant / sync arrows, a dropped packet, buffer slots (0024; drawn by `tools/figures/q0024.py`; 0025 adds `fc-nak`, `fc-replay`) |
+| `clock-face`, `clock-tick`, `clock-tick5` | The clock dial and its minute and five-minute marks (0029, in the figures and in the clock explorer; hands use `ink-line`, `s1-line`, `s3-line`, and `.hand.is-meet` turns a meeting hand orange) |
 | `cake-slice`, `cake-slice2`, `cake-peak`, `cake-rest`, `cake-gone`, `cake-edge` | Cake split rows: a person's slice (two alternating colours), the largest slice, what is left for the next people, what is already taken, the outline of the whole cake (0027, 0028; drawn by `tools/figures/cake.py`) |
 | `ttt-grid`, `ttt-ghost`, `mark`, `mark-new`, `cell-s1`…`cell-s3` | Tic-tac-toe boards with highlighted cells (0011) |
 | `gp-line`, `gp-dot`, `shp-1`…`shp-3`, `shp-bad`, `shp-num`, `sep-zone`, `dash`, `coord`, `zone-label`, `halo` | Shapes on a grid of points, overlap areas, zones, text with a background halo (0014) |

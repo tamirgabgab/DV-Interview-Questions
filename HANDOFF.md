@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-19 (session 13)_
+_Last updated: 2026-10-20 (session 14)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -716,12 +716,65 @@ chart helpers.
    phone check of 43 pages (0 problems, 0 wide math), Playwright runs of the explorers,
    the lightbox, the tooltip and the part bar on a phone.
 
+### Session 14 — 2026-10-20: question 0029, meetings of the clock hands
+
+The owner sent `clock_hand_overlaps.md` (three hands turning continuously; the gap
+T_ij = t_i t_j / (t_j − t_i), counts on closed and open intervals, the proof 11a = 708b
+that the three meet only every 12 hours, 707 + 718 + 10 = 1435 inside 12 hours) and
+asked for a junior / medium question over a full day, 00:00 to 23:59:59 with 00:00 once,
+with the general case explained, the proof that all three meet only at 12, and an
+interactive clock (drag, play at a speed, typed time) with a counter and the meeting hands
+highlighted. Every number of the file holds (recomputed with fractions). Called out to the
+owner: doubling the 12-hour count gives 2870 and misses the two triple moments 00:00 and
+12:00; the day count is 2872 (the owner agreed). The last meeting of the day is at
+23:58:59.92, so including 23:59 or not changes nothing. Decisions (asked first): part a
+counts the day, the general formula and the proof are a bonus part b; a hand meeting is
+highlighted for the whole displayed second; the explorer has next / previous meeting
+jumps and per-pair counters; the angle-versus-time charts go into the solution.
+
+1. **Page** `docs/questions/junior/0029-clock-hands-meetings.md`. Part a: laps of the
+   faster hand, n_i − n_j meetings per pair (1416, 1438, 22), 2876 − 2·2 = 2872; the
+   check of the 11 minute-hour meetings (the second hand is elsewhere except at 00:00 and
+   12:00), the zoom on the second hand around 0:01:00 (hour hand at 60.08 s, minute hand
+   at 61.02 s), the minute without a second-minute meeting (minute 59 of every hour), the
+   end of the day, the 12-hour cross-check. Part b: relative speed, T_ij, the three
+   interval counts, the clock values, 11a = 708b, inclusion-exclusion, and the same proof
+   by the second hand's position 5k/11. Traps (doubling, adding the pairs, a minute-hour
+   meeting every hour, the second hand meeting both at once, counting midnight twice) and
+   follow-ups (a week, a 24-hour dial: 2876, opposite hands: 22, right angles: 44, a
+   ticking second hand: 44).
+2. **Figures** `tools/figures/q0029.py` (exact fractions, `Chart`, gen markers 0–10): the
+   pairs table, the clock face at 1:05:27.27 with the 11 meeting places, the minute-hour
+   angle chart over 12 hours, the zoom chart, the seconds-past-the-minute chart of the
+   first hour, the minute-hour meetings table and the interval-count table. CSS
+   `clock-face`, `clock-tick`, `clock-tick5`.
+3. **Explorer** `clock` kind in `docs/javascripts/explorer.js`: a view may now define
+   `mount(box)` and build its own controls. The clock box has a face whose nearest hand
+   follows the finger (hands on top of each other: the radius picks the hand), play /
+   stop with five speeds, next / previous meeting, back to 00:00, a typed HH:MM:SS field
+   (text, not `type="time"`, which shows AM / PM in some locales), a day slider, the total
+   and per-pair counters and a summary of the meetings in the displayed second. The math
+   (`clockCounts`, `clockMeetsIn`, `clockNext`, `clockPrev`, `clockLabel`) uses integer
+   windows [sec, sec + 1) and is exported under Node. Explorer buttons now use the link
+   colour (the outline buttons were dark on dark in dark mode).
+4. **Tests** `tests/0029/`: every page number with fractions, an independent meeting list
+   from the relative speeds, the triple-meeting equation, the minute without a meeting,
+   the closest second-minute and second-hour meetings (3600/42421 s apart), the
+   follow-ups, and the JS math under Node for the whole day (counts, the meetings of every
+   second, the next / previous chains, the labels).
+5. **Tools:** `new_question.py` wrote two blank lines after the front matter; fixed, and
+   the tool test checks it.
+6. **Checks:** lint (29 pages, one warning page), all Python tests, strict build, links,
+   phone check (44 pages, 0 problems, 0 wide math; 0029 also in dark mode), screenshots
+   (desktop light, phone dark), the explorer driven in Chromium (jumps, typing, play,
+   drag).
+
 ---
 
 ## In progress
 
-- Session 13 closed: rounds K, H (without H49) and J are done on the branch and pushed;
-  README / HANDOFF / CLAUDE.md are current. `main` is updated when the owner asks.
+- Session 14 closed: question 0029 is on the branch and pushed; README / HANDOFF are
+  current. `main` is updated when the owner asks.
 - Next: the owner picks from rounds L to O (proposed in session 13), the open D to G and I
   items, or sends the next batch of questions.
 
@@ -748,12 +801,12 @@ chart helpers.
 
 ## Question variety
 
-### Coverage today (28 questions)
+### Coverage today (29 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 | Staff | — | — |
 
@@ -1163,6 +1216,11 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   in `VIEWS`; add a Node test that compares it with the Python reference. Build summary
   text with `ltr()` (a `<bdi dir="ltr">`) around math and numbers, or the RTL paragraph
   reorders them.
+- A view with `mount(box)` (the `clock` kind) builds its own controls instead of sliders.
+  Keep the math on integers where it can be (the clock counts meetings in the window
+  [sec, sec + 1) as k·P < (sec + 1)·q), and keep time labels inside their second (the
+  hundredths are capped at .99) so the label and the highlighted second agree. Avoid
+  `<input type="time">`: it shows AM / PM in some locales.
 - Generated blocks: wrap each block on the page in `<!-- gen n -->` / `<!-- /gen -->` with
   a blank line inside on both sides (an HTML comment line directly before a Markdown table
   would swallow it into an HTML block); `fill.py` writes them that way.
