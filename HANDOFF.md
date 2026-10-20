@@ -816,7 +816,8 @@ candidate routes.
    generator against the reference; `tb.sv` checks 16 reference cases (ties accepted) and
    2,000 random boxes for the air bound, the exit point on an edge and three symmetries.
    Verilator is not installed in the sandbox: the SV is checked only by CI, which caught
-   a struct field named `edge` (a keyword) on the first push.
+   a struct field named `edge` on the first push and `dist` on the second (both SV
+   keywords); a keyword scan of every SV block is now part of the technical notes.
 5. **Checks:** lint (30 pages, one warning page), all Python tests, strict build, links
    (47 pages), phone check of 0030 in light and dark mode (0 problems, 0 wide math after
    splitting the 40 equation), screenshots (desktop light, phone dark).
@@ -1329,10 +1330,13 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   in `VIEWS`; add a Node test that compares it with the Python reference. Build summary
   text with `ltr()` (a `<bdi dir="ltr">`) around math and numbers, or the RTL paragraph
   reorders them.
-- SystemVerilog keywords that read like field names: `edge`, `inside`, `table`, `wait`,
-  `type`, `ref`, `var`, `do`, `bind`. A struct field or variable with one of these names
-  fails to parse in Verilator ("syntax error, unexpected edge"); 0030 uses `hinge` and
-  `within`. Verilator is not installed in the sandbox, so this is caught only by CI.
+- SystemVerilog keywords that read like field names: `edge`, `dist`, `inside`, `within`,
+  `table`, `wait`, `type`, `var`, `do`, `bind`, `cross`, `cover`, `expect`, `with`,
+  `before`, `solve`, `soft`, `local`, `global`, `let`, `until`. A struct field or variable
+  with one of these names fails to parse in Verilator ("syntax error, unexpected dist");
+  0030 uses `hinge`, `gap` and `in_wall`. Verilator is not installed in the sandbox, so
+  before pushing new SV, intersect its identifiers with the IEEE 1800 keyword list (a
+  ten-line script over `extract_code.blocks(qid, "systemverilog")` and `tests/*/*.sv`).
 - A view with `mount(box)` (the `clock` kind) builds its own controls instead of sliders.
   Keep the math on integers where it can be (the clock counts meetings in the window
   [sec, sec + 1) as k·P < (sec + 1)·q), and keep time labels inside their second (the

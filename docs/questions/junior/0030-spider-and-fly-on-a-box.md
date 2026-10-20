@@ -302,7 +302,7 @@ added: 2026-10-20
 
         typedef struct {
           int  hinge;     // 0 bottom, 1 sideB, 2 top, 3 side0: the edge the point leaves through
-          real dist;      // the distance from the point to that edge, inside the end face
+          real gap;      // the distance from the point to that edge, inside the end face
           real p;         // the perimeter coordinate of the foot of the perpendicular on the edge
           real lo, hi;    // the edge itself, as a range of the perimeter coordinate
         } image_t;
@@ -312,10 +312,10 @@ added: 2026-10-20
           image_t img;
           img.hinge = e;
           case (e)
-            0:       begin img.dist = z;     img.p = y;                   img.lo = 0.0;     img.hi = b;         end  // (1)!
-            1:       begin img.dist = b - y; img.p = b + z;               img.lo = b;       img.hi = b + h;     end
-            2:       begin img.dist = h - z; img.p = b + h + (b - y);     img.lo = b + h;   img.hi = 2*b + h;   end
-            default: begin img.dist = y;     img.p = 2*b + h + (h - z);   img.lo = 2*b + h; img.hi = 2*(b + h); end
+            0:       begin img.gap = z;     img.p = y;                   img.lo = 0.0;     img.hi = b;         end  // (1)!
+            1:       begin img.gap = b - y; img.p = b + z;               img.lo = b;       img.hi = b + h;     end
+            2:       begin img.gap = h - z; img.p = b + h + (b - y);     img.lo = b + h;   img.hi = 2*b + h;   end
+            default: begin img.gap = y;     img.p = 2*b + h + (h - z);   img.lo = 2*b + h; img.hi = 2*(b + h); end
           endcase
           return img;
         endfunction
@@ -342,10 +342,10 @@ added: 2026-10-20
             for (int ef = 0; ef < 4; ef++) begin
               image_t f = edge_image(ef, y1, z1, b, h);
               for (int k = -1; k <= 1; k++) begin                     // (2)!
-                real dx = s.dist + a + f.dist;                        // from x = -s.dist to x = a + f.dist
+                real dx = s.gap + a + f.gap;                        // from x = -s.gap to x = a + f.gap
                 real dp = f.p + k * period - s.p;
-                real p_exit  = s.p + dp * s.dist / dx;                // where the line crosses x = 0
-                real p_enter = s.p + dp * (s.dist + a) / dx;          // where it crosses x = a
+                real p_exit  = s.p + dp * s.gap / dx;                // where the line crosses x = 0
+                real p_enter = s.p + dp * (s.gap + a) / dx;          // where it crosses x = a
                 real d;
                 if (p_exit < s.lo - EPS || p_exit > s.hi + EPS) continue;                            // (3)!
                 if (p_enter < f.lo + k * period - EPS || p_enter > f.hi + k * period + EPS) continue;

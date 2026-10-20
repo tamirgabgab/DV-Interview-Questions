@@ -40,8 +40,8 @@ module tb;
 
   // The point (0, y, z) is on an edge of the wall x = 0
   function automatic bit on_edge(real y, real z, real b, real h);
-    bit within = y >= -1e-9 && y <= b + 1e-9 && z >= -1e-9 && z <= h + 1e-9;
-    return within && (near(y, 0.0, 1e-9) || near(y, b, 1e-9) || near(z, 0.0, 1e-9) || near(z, h, 1e-9));
+    bit in_wall = y >= -1e-9 && y <= b + 1e-9 && z >= -1e-9 && z <= h + 1e-9;
+    return in_wall && (near(y, 0.0, 1e-9) || near(y, b, 1e-9) || near(z, 0.0, 1e-9) || near(z, h, 1e-9));
   endfunction
 
   initial begin
