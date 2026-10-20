@@ -7,8 +7,9 @@
 //   strip                  0030        drag the spider and the fly on their walls: the periodic strip and the path
 //   hourglass              0018, 0019  A, B and D: the plan on a time axis and event by event (BFS or Dijkstra)
 //   probability            0015        p, q and C: the answer, the two-children square and the curve against q
+//   bridge                 0031        crossing times: the Dijkstra plan played crossing by crossing
 // The math of each model is exported under Node, where the question tests compare it with
-// the Python reference (tests/0015, 0016, 0018, 0019, 0022, 0026, 0027, 0028, 0029, 0030).
+// the Python reference (tests/0015, 0016, 0018, 0019, 0022, 0026, 0027, 0028, 0029, 0030, 0031).
 (() => {
   const EPS = 1e-9;
 
@@ -351,12 +352,47 @@
   // Probability (0015): P(all C children are boys | at least one is a boy with the trait).
   const probabilityAnswer = (C, p, q) => (Math.pow(p, C) * (1 - Math.pow(1 - q, C))) / (1 - Math.pow(1 - p * q, C));
 
+  // Bridge and torch (0031): Dijkstra over (who is across, torch side); a crossing of one
+  // or two people from the torch's bank costs the time of the slower. Returns the least
+  // time and the crossings as arrays of indices, as the page code does.
+  const bridgeSolve = (times) => {
+    const n = times.length, everyone = (1 << n) - 1, S = 2 << n;
+    const reach = new Array(S).fill(Infinity), prev = new Array(S).fill(-1), via = new Array(S).fill(0), closed = new Array(S).fill(false);
+    reach[0] = 0;
+    for (;;) {
+      let cur = -1;
+      for (let s = 0; s < S; s++) if (!closed[s] && (cur < 0 || reach[s] < reach[cur])) cur = s;
+      if (cur < 0 || reach[cur] === Infinity) break;
+      closed[cur] = true;
+      const across = cur >> 1, side = cur & 1;
+      if (across === everyone) break;
+      for (let i = 0; i < n; i++) {
+        if (((across >> i) & 1) !== side) continue;
+        for (let j = i; j < n; j++) {
+          if (((across >> j) & 1) !== side) continue;
+          const cost = Math.max(times[i], times[j]);
+          const nxt = ((across ^ (1 << i) ^ (j === i ? 0 : 1 << j)) << 1) | (1 - side);
+          if (reach[cur] + cost < reach[nxt]) { reach[nxt] = reach[cur] + cost; prev[nxt] = cur; via[nxt] = (1 << i) | (1 << j); }
+        }
+      }
+    }
+    const moves = [];
+    for (let s = (everyone << 1) | 1; prev[s] >= 0; s = prev[s]) {
+      const g = [];
+      for (let i = 0; i < n; i++) if (via[s] & (1 << i)) g.push(i);
+      moves.unshift(g);
+    }
+    return { time: reach[(everyone << 1) | 1], moves };
+  };
+  const bridgeEscort = (times) => { const s = [...times].sort((u, v) => u - v); return s.length < 3 ? s[s.length - 1] : s[0] * (s.length - 2) + s.slice(1).reduce((u, v) => u + v, 0); };
+
   const models = {
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
     motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, josephusRun, josephusSteps, josephusZero, josephusFormula,
     clockCounts, clockMeetsIn, clockNext, clockPrev, clockLabel,
     stripImages, stripEdgePoint, stripPoint3, stripFacesBetween, stripLines, stripBest,
     hourglassSolve, hourglassInterval, hourglassReplay, hourglassReachable, probabilityAnswer,
+    bridgeSolve, bridgeEscort,
   };
   if (typeof module !== "undefined" && module.exports) {
     module.exports = models;
@@ -1354,6 +1390,94 @@
     },
   });
 
+  // The bridge box (0031): type the crossing times, the Dijkstra of the page runs in the
+  // browser, and the crossings play one at a time on the banks figure.
+  const bridgeView = () => ({
+    mount(box) {
+      const NAMES = "ABCDEFGH";
+      const defaults = box.dataset.times || "1 2 5 10";
+      const st = { times: [], s: 0 };
+      box.innerHTML =
+        `<div class="ex-controls"><label>הזמנים (עד שמונה) <input type="text" class="ex-times" value="${defaults}" size="22" dir="ltr" inputmode="numeric" aria-label="זמני החצייה, מופרדים ברווחים"></label>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<p class="ex-summary" aria-live="polite"></p>` +
+        `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">החצייה הקודמת</button>` +
+        `<button type="button" class="md-button md-button--primary ex-next">החצייה הבאה</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button><span class="ex-pos"></span></div>` +
+        `<div class="bridge-frame"></div><p class="bridge-caption"></p>` +
+        `<span class="viz-legend"><span><i class="st-cell"></i>על הגדה הקרובה</span><span><i class="st-stack"></i>חוצים עכשיו</span><span><i class="st-ok"></i>כבר על הגדה הרחוקה</span><span><i class="torch"></i>הלפיד</span></span>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play"), input = $(".ex-times");
+      let timer = null;
+      const parse = () => {
+        const ts = input.value.split(/[\s,]+/).filter(Boolean).map(Number).filter((v) => Number.isFinite(v) && v > 0).slice(0, 8);
+        return ts.map((v) => Math.round(v * 100) / 100);
+      };
+      const frameSvg = (times, across, side, moving, forward, t) => {
+        const n = times.length, per = Math.max(34, Math.min(40, 170 / Math.max(n, 1)));
+        let s = `<svg class="figure bridge-fig" viewBox="0 0 640 190" style="max-width:40rem" role="img" aria-label="הגשר, שתי הגדות, הלפיד והאנשים בזמן ${t}">` +
+          `<rect class="bank" x="0" y="20" width="190" height="150" rx="8"/><rect class="bank" x="450" y="20" width="190" height="150" rx="8"/>` +
+          `<rect class="river" x="190" y="20" width="260" height="150"/><rect class="bridge" x="190" y="78" width="260" height="34" rx="4"/>` +
+          `<text class="legend" x="95" y="160" text-anchor="middle">near</text><text class="legend" x="545" y="160" text-anchor="middle">far</text>`;
+        const person = (i, x, y, cls) => `<g><circle class="${cls}" cx="${f(x)}" cy="${y}" r="17"/><text class="st-text" x="${f(x)}" y="${y + 5}" text-anchor="middle">${times[i]}</text>` +
+          `<text class="st-small" x="${f(x)}" y="${y + 30}" text-anchor="middle">${NAMES[i]}</text></g>`;
+        const near = [], far = [];
+        for (let i = 0; i < n; i++) { if (moving.includes(i)) continue; ((across >> i) & 1 ? far : near).push(i); }
+        near.forEach((i, k) => { s += person(i, 40 + per * (k % 4), 60 + 60 * Math.floor(k / 4), "st-cell"); });
+        far.forEach((i, k) => { s += person(i, 490 + per * (k % 4), 60 + 60 * Math.floor(k / 4), "st-ok"); });
+        moving.forEach((i, k) => { s += person(i, 290 + 60 * k, 95, "st-stack"); });
+        if (moving.length) {
+          const [x0, x1] = forward ? [236, 404] : [404, 236], d = forward ? 9 : -9;
+          s += `<line class="ink-line" x1="${x0}" y1="128" x2="${x1}" y2="128" stroke-width="2"/><polygon class="ink-fill" points="${x1},128 ${x1 - d},123 ${x1 - d},133"/>`;
+        }
+        const tx = moving.length ? 320 : side === 0 ? 150 : 490, ty = moving.length ? 150 : 118;
+        s += `<polygon class="torch" points="${tx},${ty - 14} ${tx + 6},${ty - 2} ${tx},${ty + 2} ${tx - 6},${ty - 2}"/><rect class="ink-fill" x="${tx - 1.5}" y="${ty + 2}" width="3" height="10"/>` +
+             `<text class="legend" x="630" y="182" text-anchor="end" font-weight="700">t = ${t}</text>`;
+        return s + "</svg>";
+      };
+      const draw = () => {
+        const times = st.times;
+        if (!times.length) { $(".ex-summary").textContent = "הקלידו זמני חצייה חיוביים, מופרדים ברווחים."; $(".bridge-frame").innerHTML = ""; $(".bridge-caption").textContent = ""; $(".ex-pos").textContent = ""; return; }
+        const r = bridgeSolve(times), esc = bridgeEscort(times);
+        st.s = Math.min(Math.max(st.s, 0), r.moves.length);
+        const names = (g) => g.map((i) => `${NAMES[i]} (${times[i]})`).join(" ו-");
+        const planText = r.moves.map((g, k) => `${g.map((i) => NAMES[i]).join("+")}${k % 2 ? "<" : ">"}`).join(" ");
+        $(".ex-summary").innerHTML = `${times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`}: הזמן הקצר ביותר הוא ${ltr(r.time)} דקות ב-${ltr(r.moves.length)} חציות, ${ltr(planText)}. ` +
+          (times.length >= 3 ? `אם המהיר היה מלווה את כולם: ${ltr(esc)}${esc > r.time ? `, כלומר ${ltr(esc - r.time)} דקות יותר.` : ", אותו דבר."}` : "");
+        let across = 0, side = 0, t = 0, caption = "רגע 0: כולם והלפיד על הגדה הקרובה.";
+        let moving = [], forward = true;
+        for (let k = 0; k < st.s; k++) {
+          const g = r.moves[k], cost = Math.max(...g.map((i) => times[i]));
+          forward = side === 0; t += cost;
+          if (k === st.s - 1) { moving = g; caption = `חצייה ${k + 1}: ${names(g)} ${g.length > 1 ? "חוצים" : (forward ? "חוצה" : "חוזר")} ${forward ? "קדימה" : "עם הלפיד חזרה"}, ${ltr(cost)} דקות. עברו ${ltr(t)} דקות.`; }
+          else { across ^= g.reduce((m, i) => m | (1 << i), 0); side = 1 - side; }
+        }
+        $(".bridge-frame").innerHTML = frameSvg(times, across, side, moving, forward, t);
+        $(".bridge-caption").innerHTML = caption + (st.s === r.moves.length && st.s > 0 ? " כולם בצד הרחוק." : "");
+        $(".ex-pos").textContent = `חצייה ${st.s} מתוך ${r.moves.length}`;
+        $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = st.s >= r.moves.length;
+        if (window.dvqDecorate) window.dvqDecorate($(".bridge-frame"));
+      };
+      const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
+      const total = () => (st.times.length ? bridgeSolve(st.times).moves.length : 0);
+      $(".ex-next").addEventListener("click", () => { stop(); st.s += 1; draw(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.s -= 1; draw(); });
+      play.addEventListener("click", () => {
+        if (timer) { stop(); return; }
+        if (!total()) return;
+        if (st.s >= total()) st.s = 0;
+        play.textContent = "עצירה";
+        timer = setInterval(() => { if (st.s >= total()) { stop(); return; } st.s += 1; draw(); }, 1000);
+        st.s += 1; draw();
+      });
+      input.addEventListener("change", () => { stop(); st.times = parse(); st.s = 0; draw(); });
+      input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); input.value = defaults; st.times = parse(); st.s = 0; draw(); });
+      st.times = parse();
+      draw();
+    },
+  });
+
   const VIEWS = {
     "cake-arith": () => cakeView("arith"),
     "cake-geo": () => cakeView("geo"),
@@ -1363,6 +1487,7 @@
     strip: stripView,
     hourglass: hourglassView,
     probability: probabilityView,
+    bridge: bridgeView,
   };
 
   // --- the box -----------------------------------------------------------------------------
