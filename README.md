@@ -13,7 +13,7 @@ level**, **difficulty** and **topic**.
 
 > **Status:** the site is live and holds 30 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and the proposed rounds of
-> improvements (interface, new questions, tooling).
+> improvements (interface, explorers per question, new puzzle and DV-core questions, tooling).
 
 ---
 

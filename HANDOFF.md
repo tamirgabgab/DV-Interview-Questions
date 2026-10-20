@@ -815,7 +815,8 @@ candidate routes.
    corner and flat-box cases; `test_0030.py` checks every number on the page and the
    generator against the reference; `tb.sv` checks 16 reference cases (ties accepted) and
    2,000 random boxes for the air bound, the exit point on an edge and three symmetries.
-   Verilator is not installed in the sandbox: the SV is checked only by CI.
+   Verilator is not installed in the sandbox: the SV is checked only by CI, which caught
+   a struct field named `edge` (a keyword) on the first push.
 5. **Checks:** lint (30 pages, one warning page), all Python tests, strict build, links
    (47 pages), phone check of 0030 in light and dark mode (0 problems, 0 wide math after
    splitting the 40 equation), screenshots (desktop light, phone dark).
@@ -826,7 +827,7 @@ candidate routes.
 
 - Session 14 closed: questions 0029 and 0030 are on the branch and pushed; README /
   HANDOFF are current. `main` is updated when the owner asks.
-- Next: the owner picks from rounds L to O (proposed in session 13), the open D to G and I
+- Next: the owner picks from rounds P to S (proposed in session 14), L to O, the open D to G and I
   items, or sends the next batch of questions.
 
 ---
@@ -838,7 +839,7 @@ candidate routes.
 - [ ] Keep example question `0001` or replace it with real content.
 - [ ] Staff level is still empty and Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
-- [ ] Pick the next rounds from **Proposals and rounds**: D to G and I (open), L to O (proposed in session 13).
+- [ ] Pick the next rounds from **Proposals and rounds**: D to G and I (open), L to O (proposed in session 13), P to S (proposed in session 14: explorers per question, puzzle and DV-core questions, clearer pages).
 
 ### Content
 
@@ -1141,6 +1142,67 @@ Suggested order: O85 (protects what session 13 added), N78 + N79 (cheap and visi
 M75 or M74 (one more explorer), L68 + L70 (practising), then O82 before the next large
 batch of figure pages.
 
+**Rounds P to S — proposed 2026-10-20, after 0029 and 0030**
+
+Session 14 added the first explorer with its own controls (the clock of 0029) and the
+first embedded standalone tool (the owner's spider-and-fly page of 0030). What it showed:
+a play button and a draggable figure explain motion better than a slider and a chart; a
+tool sent as a file can be embedded as is, but it does not follow the site's theme or
+language; the recent questions are all puzzles, and the senior / staff and DV-core shelves
+have not grown since 0025. Rounds D to G, I and L to O above stay open; P to S add to
+them, and P and R answer the owner's request for clearer graphics on specific questions
+and for new questions.
+
+**Round P — graphical explorers for specific questions**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| P87 | **Strip explorer for 0030, in the site's style**: drag S on the wall x = 0 and F on x = a (two small wall panels), the periodic strip redraws with the eight images, the 48 lines faint, the valid ones solid and the shortest in orange; the exit point and the distance in the summary. Hebrew, follows light / dark. The owner's tool stays as the full 3D view | M |
+| P88 | **Motorcycle animation for 0026**: a play button moves the three travellers along the road figure while the position-time chart draws itself; a scrubber for the time, the phase boundaries marked (the clock explorer's play loop reused) | M |
+| P89 | **Cake cutting animation for 0027 / 0028**: the rows appear one person at a time with the slice highlighted, the bar chart grows with them; a toggle "arithmetic / geometric" on one page to compare the two laws with the same a | S–M |
+| P90 | **Josephus circle animation for 0016 / 0022**: people leave the circle one by one at a chosen speed, the survivor highlighted, the binary of N shown rotating for L = 2; the survivor chart stays | M |
+| P91 | **Clock explorer additions for 0029**: a timeline strip under the day slider with a tick at every meeting (dense bands show where the pairs cluster), a pair filter, and a "next triple" jump | S–M |
+| P92 | **Hourglass explorer for 0018 / 0019** (M74) and **probability explorer for 0015** (M75), both still open; the PCIe split explorer (M73) after them | M each |
+
+**Round Q — new questions, puzzles in the style of 0026–0030**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| Q93 | **Ant on a can** (geodesics again): the shortest path on a cylinder from a point outside to a drop inside the rim, by unrolling the side and reflecting in the rim; junior / medium, no code, an unrolled-strip figure like 0030 | M |
+| Q94 | **Bridge and torch**: four people, 1 / 2 / 5 / 10 minutes, two at a time, one torch; 17 minutes and why 19 is the trap; part b a BFS over states in SV + Python with a stepper of the crossings; junior / medium | M |
+| Q95 | **Two trains and the fly**: the fly's total distance by the easy way and by the geometric series; student / easy, an animation of the fly bouncing (play button) | S–M |
+| Q96 | **Wolf, goat and cabbage**: BFS over the eight bank states with the forbidden ones struck out; student / easy; a stepper and code | S–M |
+| Q97 | **Clock angles** (0029 follow-ups made a question): when are the minute and hour hands opposite, at right angles, mirror images; student / easy; the clock explorer reused with a target angle | S |
+| Q98 | **Heron's shortest path** (reflection in a wall): the path from A to B that touches a line; student / easy, prepares 0030 and Q93 | S |
+| Q99 | **Rope around the Earth**: add one metre to the rope, how high does it lift; student / easy, mental arithmetic and a figure not to scale | S |
+
+**Round R — new questions, DV core (the shelves that did not grow)**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| R100 | **Synchroniser MTBF**: two flops, τ, T0, the clock and data rates; compute the MTBF and how a third flop changes it; senior / medium; a small calculator explorer (sliders for the rates) and the formula in SV + Python | M |
+| R101 | **FIFO depth from rates and bursts**: write and read rates, a burst length, back-pressure; the depth formula and a simulation of the fill level; junior / medium; an explorer that plots the fill level over time for the chosen rates | M |
+| R102 | **Gray code pointers for an async FIFO**: why one bit changes, the conversion both ways, the full / empty test with the two top bits; junior / medium; SV + Python and a WaveDrom of the pointer crossing | M |
+| R103 | **Divide-by-3 clock with 50% duty**: the design with a negative-edge flop, a WaveDrom timing diagram, and the testbench that checks the duty; junior / medium | S–M |
+| R104 | **Maximal LFSR**: period of a 4-bit LFSR for two tap sets, why one is 15 and the other shorter; the sequence table from code; student / easy | S |
+| R105 | **Staff level, first question**: reviewing a verification plan (a given feature list with holes: missing negative tests, no coverage goals, no reset / power scenarios); a rubric-style answer with no code; staff / medium | M |
+| R106 | **SVA for a handshake**: req must hold until ack, ack within N cycles, no ack without req; the assertions, a WaveDrom with a passing and a failing trace; junior / medium; Verilator checks the assertions | M |
+
+**Round S — clearer question pages**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| S107 | **Answer-at-a-glance card**: the first screen of every solution shows the final result, the one-line idea and a thumbnail of the key figure (the 40 net, the clock, the strategies bars), before the steps | S–M |
+| S108 | **Steps linked to figures**: a step in the timeline highlights its element in the figure on hover or tap (the triangle legs in step 3 of 0030, a phase in 0026, a band in 0029), with `data-step` attributes written by the generators | M |
+| S109 | **"Naive vs best" compare card**: the two routes, strategies or indices side by side with their numbers (0026 strategies, 0030 42 vs 40, 0027 person 3 vs 4), two columns on desktop and stacked on a phone | S |
+| S110 | **Embedded tools follow the site**: the iframe of 0030 gets `?theme=` and `?lang=` from the page; needs a few lines in the owner's file (the owner decides), otherwise a note on the page that the tool is English and dark by default | S |
+| S111 | **Numbered figure captions** ("איור 3") with the caption as the lightbox title, and cross-references from the text; the generators emit the caption | S–M |
+| S112 | **Full-screen explorer on phones**: an explorer box opens in the lightbox overlay with its charts at full width (the strip and the clock are cramped at 390 px) | M |
+
+Suggested order: P87 + S109 (0030 gets its own figure explorer and the 42-vs-40 card),
+R101 + R102 (two DV-core questions that share the FIFO theme and a path), Q94 (the bridge,
+with code), then P88 and S108, and R105 to open the staff shelf.
+
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
 
@@ -1267,6 +1329,10 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   in `VIEWS`; add a Node test that compares it with the Python reference. Build summary
   text with `ltr()` (a `<bdi dir="ltr">`) around math and numbers, or the RTL paragraph
   reorders them.
+- SystemVerilog keywords that read like field names: `edge`, `inside`, `table`, `wait`,
+  `type`, `ref`, `var`, `do`, `bind`. A struct field or variable with one of these names
+  fails to parse in Verilator ("syntax error, unexpected edge"); 0030 uses `hinge` and
+  `within`. Verilator is not installed in the sandbox, so this is caught only by CI.
 - A view with `mount(box)` (the `clock` kind) builds its own controls instead of sliders.
   Keep the math on integers where it can be (the clock counts meetings in the window
   [sec, sec + 1) as k·P < (sec + 1)·q), and keep time labels inside their second (the

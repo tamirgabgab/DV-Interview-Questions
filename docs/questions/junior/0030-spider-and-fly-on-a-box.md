@@ -301,7 +301,7 @@ added: 2026-10-20
         localparam real EPS = 1e-9;   // a line through a corner still counts as inside
 
         typedef struct {
-          int  edge;      // 0 bottom, 1 sideB, 2 top, 3 side0: the edge the point leaves through
+          int  hinge;     // 0 bottom, 1 sideB, 2 top, 3 side0: the edge the point leaves through
           real dist;      // the distance from the point to that edge, inside the end face
           real p;         // the perimeter coordinate of the foot of the perpendicular on the edge
           real lo, hi;    // the edge itself, as a range of the perimeter coordinate
@@ -310,7 +310,7 @@ added: 2026-10-20
         // The image of the point (y, z) of an end face when the face is folded flat on edge e.
         function automatic image_t edge_image(int e, real y, real z, real b, real h);
           image_t img;
-          img.edge = e;
+          img.hinge = e;
           case (e)
             0:       begin img.dist = z;     img.p = y;                   img.lo = 0.0;     img.hi = b;         end  // (1)!
             1:       begin img.dist = b - y; img.p = b + z;               img.lo = b;       img.hi = b + h;     end
