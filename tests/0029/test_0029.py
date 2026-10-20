@@ -164,3 +164,22 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(29)
+
+
+def test_explorer_pair_filter():
+    """clockNext / clockPrev with a pair mask walk exactly the meetings of those pairs."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"const m = {explorer_require()}; const out = {{}};"
+                    "for (const mask of [[2], [0], [1, 2]]) {"
+                    "  const fwd = [0]; for (let v = m.clockNext(0, mask); v !== null; v = m.clockNext(v, mask)) fwd.push(v);"
+                    "  const back = []; for (let v = m.clockPrev(86400 - 1e-6, mask); v !== null; v = m.clockPrev(v, mask)) back.push(v);"
+                    "  out[mask.join()] = { fwd, back }; }"
+                    "console.log(JSON.stringify(out));")
+    per_pair = [q0029.meetings(i, j) for i, j in q0029.PAIRS]
+    for key, r in got.items():
+        pairs = [int(k) for k in key.split(",")]
+        ref = sorted(set(t for n in pairs for t in per_pair[n]))
+        assert len(r["fwd"]) == len(ref) and all(abs(a - float(b)) < 1e-9 for a, b in zip(r["fwd"], ref)), key
+        assert all(abs(a - float(b)) < 1e-9 for a, b in zip(r["back"], ref[::-1])), key
+    assert len(got["2"]["fwd"]) == 22 and len(got["0"]["fwd"]) == 1416 and len(got["1,2"]["fwd"]) == 1438 + 22 - 2

@@ -142,17 +142,20 @@
     return out;
   };
   // The first meeting after t, or the last one before it (null outside the day).
-  const clockNext = (t) => {
+  // `mask` limits the search to some pairs (indices into CLOCK_PAIRS).
+  const clockNext = (t, mask = [0, 1, 2]) => {
     let best = null;
-    CLOCK_PAIRS.forEach(([, , P, q]) => {
+    mask.forEach((n) => {
+      const [, , P, q] = CLOCK_PAIRS[n];
       const v = ((Math.floor((t * q) / P + EPS) + 1) * P) / q;
       if (v < CLOCK_DAY && (best === null || v < best)) best = v;
     });
     return best;
   };
-  const clockPrev = (t) => {
+  const clockPrev = (t, mask = [0, 1, 2]) => {
     let best = null;
-    CLOCK_PAIRS.forEach(([, , P, q]) => {
+    mask.forEach((n) => {
+      const [, , P, q] = CLOCK_PAIRS[n];
       const k = Math.ceil((t * q) / P - EPS) - 1;
       if (k >= 0 && (best === null || (k * P) / q > best)) best = (k * P) / q;
     });
@@ -721,19 +724,53 @@
         `</select></label>` +
         `<button type="button" class="md-button ex-prev">לפגישה הקודמת</button>` +
         `<button type="button" class="md-button ex-next">לפגישה הבאה</button>` +
+        `<button type="button" class="md-button ex-triple">למשולשת הבאה</button>` +
         `<button type="button" class="md-button ex-reset">חזרה ל-00:00</button></div>` +
+        `<div class="ex-controls clock-filter"><span>הקפיצות ופס הזמן:</span>` +
+        PAIR_NAME.map((name, n) => `<label><input type="checkbox" class="ex-pair" value="${n}" checked> ${name}</label>`).join("") + `</div>` +
         `<div class="clock-box">${face}<div class="clock-panel">` +
         `<p class="clock-time" dir="ltr"></p>` +
         `<label>שעה <input type="text" class="ex-time" inputmode="numeric" maxlength="8" size="8" ` +
         `placeholder="HH:MM:SS" aria-label="שעה, שעות:דקות:שניות" dir="ltr"></label>` +
         `<p class="clock-total"></p><ul class="clock-counts"></ul></div></div>` +
         `<label class="clock-day">היממה <input type="range" class="ex-day" min="0" max="${CLOCK_DAY - 1}" step="1" dir="ltr"></label>` +
+        `<div class="clock-timeline" dir="ltr"></div>` +
         `<p class="ex-summary" aria-live="polite"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const svg = $("svg"), hands = {}, play = $(".ex-play"), speed = $(".ex-speed");
       const timeIn = $(".ex-time"), day = $(".ex-day"), summary = $(".ex-summary");
       ["h", "m", "s"].forEach((k) => { hands[k] = $(`.hand-${k}`); });
       let t = Number(box.dataset.t || 0), shown = -1, running = false, last = 0;
+      const mask = () => {
+        const on = [...box.querySelectorAll(".ex-pair")].filter((c) => c.checked).map((c) => Number(c.value));
+        return on.length ? on : [0, 1, 2];
+      };
+      // the timeline: one row per pair with a tick at every meeting; dense bands show where
+      // the meetings of a pair cluster. A click jumps to the nearest meeting of that row.
+      const TL_W = 600, TL_CLS = ["s1-line", "s3-line", "s2-line"];
+      const tlX = (sec) => (sec / CLOCK_DAY) * TL_W;
+      const timeline = $(".clock-timeline");
+      timeline.innerHTML = CLOCK_PAIRS.map(([, , P, q], n) => {
+        let ticks = "";
+        for (let k = 0; k * P < CLOCK_DAY * q; k++) {
+          const x = tlX((k * P) / q).toFixed(1);
+          ticks += `<line class="${TL_CLS[n]}" x1="${x}" x2="${x}" y1="1" y2="13" stroke-width="${n === 2 ? 2 : 1}" stroke-opacity="${n === 2 ? 0.9 : 0.55}"/>`;
+        }
+        return `<div class="tl-row" data-pair="${n}"><span class="tl-name">${PAIR_NAME[n]}</span>` +
+          `<svg viewBox="0 0 ${TL_W} 14" preserveAspectRatio="none" role="img" aria-label="הפגישות של ${PAIR_NAME[n]} לאורך היממה">${ticks}` +
+          `<line class="tl-cursor" x1="0" x2="0" y1="0" y2="14"/></svg></div>`;
+      }).join("") + `<div class="tl-axis"><span>00:00</span><span class="tl-mid">06:00</span><span>12:00</span><span class="tl-mid">18:00</span><span>24:00</span></div>`;
+      timeline.querySelectorAll(".tl-row").forEach((row) => {
+        const n = Number(row.dataset.pair), svg = row.querySelector("svg");
+        svg.addEventListener("click", (e) => {
+          const r = svg.getBoundingClientRect();
+          const at = ((e.clientX - r.left) / r.width) * CLOCK_DAY;
+          const [, , P, q] = CLOCK_PAIRS[n];
+          const k = Math.round((at * q) / P);
+          stop();
+          setTime(Math.min(Math.max((k * P) / q, 0), LAST));
+        });
+      });
 
       const two = (v) => String(v).padStart(2, "0");
       const hms = (sec) => `${two(Math.floor(sec / 3600))}:${two(Math.floor(sec / 60) % 60)}:${two(sec % 60)}`;
@@ -753,6 +790,13 @@
         svg.setAttribute("aria-label", `שעון בשעה ${hms(sec)}`);
         if (document.activeElement !== timeIn || running) timeIn.value = hms(sec);
         day.value = sec;
+        const enabled = mask();
+        timeline.querySelectorAll(".tl-row").forEach((row) => {
+          row.classList.toggle("is-off", !enabled.includes(Number(row.dataset.pair)));
+          const x = tlX(t).toFixed(1);
+          const c = row.querySelector(".tl-cursor");
+          c.setAttribute("x1", x); c.setAttribute("x2", x);
+        });
         $(".clock-total").innerHTML = `מתחילת היממה: ${cnt.total === 1 ? "פגישה אחת" : `${ltr(cnt.total)} פגישות`}`;
         const hit = new Set(meets.map(([n]) => n));
         $(".clock-counts").innerHTML = PAIR_NAME.map((name, n) =>
@@ -766,7 +810,7 @@
         } else if (meets.length) {
           text = "בשנייה הזו: " + meets.map(([n, v]) => `${PAIR_NAME[n]} נפגשים ב-${ltr(clockLabel(v))}`).join(", ") + ".";
         } else {
-          const nx = clockNext(sec + 1 - 1e-9);
+          const nx = clockNext(sec + 1 - 1e-9, mask());
           text = "בשנייה הזו אין פגישה." + (nx === null ? " אין עוד פגישות עד סוף היממה."
             : ` הבאה: ב-${ltr(clockLabel(nx))}, ${clockMeetsIn(Math.floor(nx)).map(([n]) => PAIR_NAME[n]).join(" וגם ")}.`);
         }
@@ -794,8 +838,10 @@
         last = performance.now();
         requestAnimationFrame(tick);
       });
-      $(".ex-next").addEventListener("click", () => { stop(); const v = clockNext(t); if (v !== null) setTime(v); });
-      $(".ex-prev").addEventListener("click", () => { stop(); const v = clockPrev(t); if (v !== null) setTime(v); });
+      $(".ex-next").addEventListener("click", () => { stop(); const v = clockNext(t, mask()); if (v !== null) setTime(v); });
+      $(".ex-prev").addEventListener("click", () => { stop(); const v = clockPrev(t, mask()); if (v !== null) setTime(v); });
+      $(".ex-triple").addEventListener("click", () => { stop(); setTime(t < CLOCK_HALF - 1e-9 ? CLOCK_HALF : 0); });
+      box.querySelectorAll(".ex-pair").forEach((c) => c.addEventListener("change", () => render(true)));
       $(".ex-reset").addEventListener("click", () => { stop(); setTime(0); });
       day.addEventListener("input", () => { stop(); setTime(Number(day.value)); });
       timeIn.addEventListener("change", () => {
