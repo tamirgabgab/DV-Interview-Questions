@@ -1304,6 +1304,28 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ex-summary { font-weight: 600; }
 .md-typeset .explorer .ex-title { margin: 0.6em 0 0; font-size: 0.7rem; color: var(--viz-text); }
 
+/* Box nets (0030): faces of the unfolded box, the path, and the embedded tool */
+.md-typeset svg .box-face { fill: var(--viz-s1); fill-opacity: 0.14; stroke: var(--viz-ink); stroke-width: 1.2; }
+.md-typeset svg .box-end { fill: var(--viz-s2); fill-opacity: 0.18; stroke: var(--viz-ink); stroke-width: 1.2; }
+.md-typeset svg .box-copy { fill: var(--viz-grid); fill-opacity: 0.35; stroke: var(--viz-text); stroke-width: 1; stroke-dasharray: 4 3; }
+.md-typeset svg .box-edge { stroke: var(--viz-ink); stroke-width: 1.6; }
+.md-typeset svg .box-path { stroke: var(--viz-s2); stroke-linecap: round; }
+.md-typeset .viz-legend .box-face { background: var(--viz-s1); opacity: 0.35; outline: 1px solid var(--viz-ink); }
+.md-typeset .viz-legend .box-end { background: var(--viz-s2); opacity: 0.4; outline: 1px solid var(--viz-ink); }
+.md-typeset .viz-legend .box-copy { background: var(--viz-grid); outline: 1px dashed var(--viz-text); outline-offset: -1px; }
+.md-typeset .viz-legend .box-path { background: var(--viz-s2); height: 0.2rem; border-radius: 0.1rem; }
+.md-typeset iframe.tool-frame {
+  display: block;
+  width: 100%;
+  height: 48rem;
+  border: 1px solid var(--viz-grid);
+  border-radius: 0.4rem;
+  background: var(--md-default-bg-color);
+}
+@media screen and (max-width: 44.9375em) {
+  .md-typeset iframe.tool-frame { height: 40rem; }
+}
+
 /* Clock (0029): the face in the figures and in the explorer; hands that meet turn orange */
 .md-typeset svg .clock-face { fill: none; stroke: var(--viz-ink); stroke-width: 2; }
 .md-typeset svg .clock-tick { stroke: var(--viz-text); stroke-width: 1; }

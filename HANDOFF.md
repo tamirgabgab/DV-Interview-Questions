@@ -769,12 +769,63 @@ jumps and per-pair counters; the angle-versus-time charts go into the solution.
    (desktop light, phone dark), the explorer driven in Chromium (jumps, typing, play,
    drag).
 
+### Session 14 (continued) — 2026-10-20: question 0030, spider and fly on a box
+
+The owner sent `box_surface_paths_with_animation.html`, a self-contained English tool
+(3D box with draggable spider and fly, the six-face net with the shortest path, an
+unfolding animation, a general face-sequence solver), and asked for a junior / medium
+question: part a the classic 30 × 12 × 12 room with the spider one unit below the ceiling
+and the fly one unit above the floor on the opposite wall, explained step by step; part b
+code (Python and SystemVerilog) that, for the spider anywhere on `end0` and the fly
+anywhere on `enda`, finds the shortest distance and the point where the spider leaves
+its wall; the tool kept as sent and available to the reader. Checked first: the tool's
+solver agrees with two independent solvers on 61 random cases (and 40 for the defaults,
+two tied routes); no bugs. Decisions (asked first): the tool is embedded in the page in an
+iframe plus a new-tab link; the code returns the distance and the exit point only; the
+algorithm is the periodic strip (4 × 4 × 3 straight lines, two interval checks), not the
+face-sequence enumeration; part a shows nets of the main routes and a table of all
+candidate routes.
+
+1. **Page** `docs/questions/junior/0030-spider-and-fly-on-a-box.md`. Part a: 42 over the
+   ceiling, 43.17 over a side wall, 40 through five faces (legs 32 and 24), why a line in
+   a net must stay inside the faces, the 16 candidate routes with their legs and lengths,
+   the path in 3D with its five segments; proof: a straight line in a net is shortest for
+   its face order, face sequences with a repeat can be shortened, the through-the-air
+   lower bound 31.6. Part b: the perimeter coordinate p (period 2(b + h)), the four
+   images of each point (one per edge, at x = −distance or a + distance), the line, the
+   two crossing checks, the exit point; SV and Python with annotations; proof that every
+   net is a line in the strip and every valid line is a path. Traps (42, the distance
+   through the air, a line that leaves the faces, the missing periodic shift, exact real
+   comparisons) and follow-ups (fly in the middle: 37, the cube: 2, when five faces win,
+   both points on lateral faces, straightness inside a face).
+2. **Tool** `docs/assets/spider-fly.html`: the owner's file byte for byte (sha256
+   11d9a5e8…). Embedded with `<iframe class="tool-frame">` (48rem, 40rem on phones) and a
+   Markdown link that opens it in a new tab. Not a question page: the linter, the phone
+   check and the figure tests skip it; the link checker resolves it.
+3. **Figures** `tools/figures/q0030.py` (gen markers 0–8): the box in an oblique view with
+   S and F, the net of the 42 route, the staircase net of the 40 route with the right
+   triangle and the crossing points, the candidates table, the periodic strip with the
+   eight images and the chosen line, the images table. All in strip coordinates (x, p);
+   exact fractions. CSS `box-face`, `box-end`, `box-copy`, `box-edge`, `box-path`,
+   `iframe.tool-frame`.
+4. **Code** on the page: `edge_images` / `edge_image`, `edge_point`, `shortest_path`
+   (48 lines, EPS 1e-9). `tests/0030/reference.py` is an independent solver (every face
+   sequence unfolded with 2D frames, as the tool does); `test_0030_code.py` compares the
+   page's Python with it on a grid and 400 random boxes (distance and exit point) plus
+   corner and flat-box cases; `test_0030.py` checks every number on the page and the
+   generator against the reference; `tb.sv` checks 16 reference cases (ties accepted) and
+   2,000 random boxes for the air bound, the exit point on an edge and three symmetries.
+   Verilator is not installed in the sandbox: the SV is checked only by CI.
+5. **Checks:** lint (30 pages, one warning page), all Python tests, strict build, links
+   (47 pages), phone check of 0030 in light and dark mode (0 problems, 0 wide math after
+   splitting the 40 equation), screenshots (desktop light, phone dark).
+
 ---
 
 ## In progress
 
-- Session 14 closed: question 0029 is on the branch and pushed; README / HANDOFF are
-  current. `main` is updated when the owner asks.
+- Session 14 closed: questions 0029 and 0030 are on the branch and pushed; README /
+  HANDOFF are current. `main` is updated when the owner asks.
 - Next: the owner picks from rounds L to O (proposed in session 13), the open D to G and I
   items, or sends the next batch of questions.
 
@@ -801,12 +852,12 @@ jumps and per-pair counters; the angle-versus-time charts go into the solution.
 
 ## Question variety
 
-### Coverage today (29 questions)
+### Coverage today (30 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 | Staff | — | — |
 

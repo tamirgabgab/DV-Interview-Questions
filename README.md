@@ -11,7 +11,7 @@ level**, **difficulty** and **topic**.
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
-> **Status:** the site is live and holds 29 questions (see the catalog below).
+> **Status:** the site is live and holds 30 questions (see the catalog below).
 > [`HANDOFF.md`](HANDOFF.md) has the work log, open tasks and the proposed rounds of
 > improvements (interface, new questions, tooling).
 
@@ -50,6 +50,7 @@ level**, **difficulty** and **topic**.
 | 0027 | Cake split by fractions of what is left, growing as an arithmetic sequence: who gets the most (a = 0.01, d = 0.1, then any a and d ≤ 1/2) | junior | 🟡 medium | ratio of neighbours, quadratic threshold T = (√(d² + 4d) − d)/2, single peak because p²/(1 − p) grows, the capped last person, ties, a = d; cake rows, shares bars, fractions against T, ratio chart, slider explorer (no code) |
 | 0028 | Cake split by fractions of what is left, growing as a geometric sequence: who gets the most (a = 0.01, q = 1.5, then any a and 1 < q ≤ 2) | junior | 🟡 medium | ratio q(1 − p), threshold 1 − 1/q, k = ⌈log_q((q − 1)/a)⌉, ties, the capped last person, q ≤ 1 and q > 2; cake rows, shares bars, fractions against T, ratio chart, slider explorer (no code) |
 | 0029 | Second, minute and hour hands: how many times at least two meet in a day (00:00 to 23:59:59), then the general formula and proof | junior | 🟡 medium | laps of the faster hand, n_i − n_j meetings per pair (1416, 1438, 22), 00:00 and 12:00 counted three times, 2872; T_ij = t_i t_j / (t_j − t_i), closed / open / half-open counts, 11a = 708b so triple meetings only every 12 h; clock face, angle charts, a draggable clock explorer with live counters (no code) |
+| 0030 | Spider and fly on a box: the shortest surface path (30 × 12 × 12 room, spider one unit below the ceiling, fly one unit above the floor), then code for any two points on the opposite end walls | junior | 🟡 medium | unfolding the faces into a plane, the 42 over the ceiling vs 40 through five faces (legs 32 and 24), all 16 nets in a table, validity of a straight line in a net; part b: the four lateral faces as a periodic strip, 4 × 4 × 3 images, two interval checks, the exit point from the spider's wall; SV + Python, tests against an independent face-sequence unfolder; the owner's 3D / net / unfolding-animation tool embedded as is |
 
 Update this table whenever a question is added.
 
@@ -148,12 +149,13 @@ DV-Interview-Questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…
-│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0028-…
+│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0030-…
 │   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…, 0023-…, 0024-…, 0025-…
 │   │   └── staff/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
-│   │   └── images/             # Figures and screenshots referenced by questions
+│   │   ├── images/             # Figures and screenshots referenced by questions
+│   │   └── spider-fly.html     # The owner's standalone spider-and-fly tool, embedded by 0030 (kept as sent)
 │   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner,
 │   │                           # explorer.js (sliders), reading-tools.js (lightbox, tooltips, part bar)
 │   └── stylesheets/extra.css   # Palette, chips, question header, tables / cards, figures
@@ -328,6 +330,7 @@ used on the site). The toolbar, filters and path bar carry `data-search-exclude`
 | Interactive explorers            | `<div class="explorer" data-kind="..." data-...>`: `docs/javascripts/explorer.js` adds sliders, a summary line and charts. Kinds: `cake-arith` / `cake-geo` (`data-a`, `data-step`; 0027, 0028), `motorcycle` (`data-t0`, `data-t1`; 0026), `josephus` (`data-n`, `data-l`, optional `data-lmax`, `data-nmax`; 0016, 0022), `clock` (`data-t`, the start time in seconds; 0029: a face with draggable hands, play with a speed, a day slider, a time field, jumps to the next or previous meeting, and live counters per pair; hands that meet in the second shown turn orange). A kind whose view has `mount(box)` builds its own controls instead of sliders. The math of each kind is exported under Node, and the question tests compare it with the Python reference |
 | Arrays / small data states       | `<span class="arr"><span>3</span>…</span>` (see question 0003)     |
 | Hand-drawn sketches, screenshots | Image files under `docs/assets/images/`, linked by relative path   |
+| Standalone HTML tools            | A self-contained page under `docs/assets/`, kept exactly as the owner sent it, embedded with `<iframe class="tool-frame" src="../../../assets/<name>.html">` plus a Markdown link `(../../assets/<name>.html)` to open it in a new tab (0030: `spider-fly.html`). Such a page is not a question page: the linter, the phone check and the figure tests leave it alone, only the link checker sees it |
 
 Prefer text-based diagrams (Mermaid / WaveDrom) over images so they stay editable.
 

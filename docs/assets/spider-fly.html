@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spider and Fly — Shortest Path on a Box</title>
+<script>
+try{document.documentElement.dataset.theme=localStorage.getItem('box-surface-theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}
+</script>
+<style>
+  :root{font-family:Arial,sans-serif;color:#172b40;background:white;color-scheme:light;--line:#cfdae5;--red:#bd3434}
+  *{box-sizing:border-box}body{margin:24px auto;padding:0 20px;max-width:1420px}
+  h1{font-size:27px;margin:0 0 10px}h2{font-size:18px;margin:0 0 12px}p{line-height:1.5}
+  .muted{color:#50667b;font-size:14px}.panel{background:white;border:1px solid var(--line);border-radius:10px;padding:18px;margin:16px 0}
+  .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:22px}
+  .control label{display:block;font-weight:600;margin-bottom:10px}.control input[type=range]{width:100%;accent-color:#196bac;cursor:pointer}
+  .control input[type=number]{width:86px;padding:6px;border:1px solid #acbdcc;border-radius:4px;font:inherit}
+  .ends{display:flex;justify-content:space-between;font-size:12px;color:#52677c;margin:4px 0 10px}
+  button{background:#edf4fa;border:1px solid #9db4c8;border-radius:5px;padding:8px 12px;color:#194c74;cursor:pointer}
+  .result{background:#ecf8ee;border:1px solid #82b98b;border-radius:9px;padding:16px;margin:16px 0}
+  #distance{font-size:25px;font-weight:700;color:#15662e}#routeName{margin-top:8px}#summary{margin-bottom:0}
+  .views{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:18px}
+  .view{min-width:0;border:1px solid var(--line);border-radius:8px;padding:12px;background:#fbfcfd}
+  svg{width:100%;display:block}#box3d{height:auto;aspect-ratio:600/500;max-height:490px;overflow:hidden}
+  #box3d{cursor:grab;touch-action:none;user-select:none}#box3d [data-face],#box3d .path-hit{cursor:grab}#box3d.dragging,#box3d.dragging *{cursor:grabbing!important}#box3d:focus-visible{outline:2px solid #196bac;outline-offset:3px}
+  .camera-controls{display:grid;gap:10px;margin-top:10px}.camera-controls label{display:grid;grid-template-columns:100px minmax(0,1fr) 42px;gap:8px;align-items:center;font-size:13px}.camera-controls input{width:100%;accent-color:#196bac}.camera-controls output{text-align:right}.camera-controls button{justify-self:start}
+  #net{height:auto;aspect-ratio:760/700;max-width:630px;margin:auto}
+  #net{touch-action:none;user-select:none}#net [data-point]{cursor:grab}#net.dragging,#net.dragging *{cursor:grabbing!important}
+  .label-toggle{display:flex;align-items:center;gap:7px;margin:0 0 12px;font-size:14px;cursor:pointer}.label-toggle input{accent-color:#196bac;width:16px;height:16px;margin:0}
+  #net.hide-labels .net-detail-label,#net.hide-labels .face-label{display:none}#box3d [data-point]{cursor:grab}#box3d [data-point]:focus-visible{outline:none;stroke:#152d43;stroke-width:3px}
+  .point-controls{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}.point-panel{border:1px solid var(--line);border-radius:8px;padding:14px;min-width:0}.point-panel .controls{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.point-panel select{max-width:100%;padding:7px;margin:0 0 18px;border:1px solid #acbdcc;border-radius:4px;background:white}.point-panel h3{margin:0 0 12px}.point-panel .control input[type=number]{width:90%;max-width:105px}
+  #surfaceStatus{margin:12px 0}#surfaceStatus:empty{display:none}#net [data-point]:focus-visible{outline:none;stroke:#152d43;stroke-width:3px}
+  [data-face]{cursor:pointer;transition:fill-opacity .1s}[data-face].highlight{stroke:#132b44!important;stroke-width:3.5!important;fill-opacity:1!important}
+  .face-label{font:600 14px Arial,sans-serif;paint-order:stroke;stroke:white;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+  #box3d.hide-face-labels .face-label,#fold-animation.hide-face-labels .face-label,#fold-animation.hide-face-labels .net-detail-label{display:none}
+  .point-label,.dimension{font:600 16px Arial,sans-serif;paint-order:stroke;stroke:white;stroke-width:5px;stroke-linejoin:round;pointer-events:none}
+  .point-label{font-size:14px}.dimension{fill:#244d79}.guide{stroke:#355e8c;stroke-width:1.7;stroke-dasharray:7 5;fill:none;pointer-events:none}
+  .axis{stroke:#273f57;stroke-width:1.4}.axes{pointer-events:none}.axis-label{font:italic 18px Arial,sans-serif;fill:#273f57}
+  #box3d .axis-label,#fold-animation .axis-label{paint-order:stroke;stroke:var(--label-halo,#fff);stroke-width:4px;stroke-linejoin:round}
+  .path{stroke:var(--red);stroke-width:3;fill:none;pointer-events:none}.path-hit{stroke:transparent;stroke-width:15;fill:none;cursor:help}
+  .math{font-family:Consolas,monospace;line-height:1.7;background:#f2f6fa;padding:12px;border-radius:6px;overflow-wrap:anywhere}
+  #hoverInfo{min-height:42px;padding:10px;border-radius:6px;background:#eaf2f9;margin-top:12px;font-size:14px}
+  #tooltip{display:none;position:fixed;z-index:9;max-width:310px;padding:9px 12px;background:#172b40;color:white;border-radius:5px;font-size:13px;pointer-events:none}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:12px;font-size:13px}.legend span{display:inline-flex;align-items:center;gap:6px}.swatch{width:13px;height:13px;display:inline-block;border:1px solid #72899d}
+  .algorithm-notes{line-height:1.65}.algorithm-notes h3{font-size:19px;margin:30px 0 12px;scroll-margin-top:18px}.algorithm-notes p{max-width:1100px}
+  .math-nav{font-size:14px;line-height:2}.math-nav a{color:#196bac}.math-equation{overflow-x:auto;padding:14px 12px;margin:14px 0;background:#f2f6fa;border-radius:6px}
+  .math-equation math{width:max-content;max-width:none;margin:0 auto;font-size:1.12em}.math-inline{white-space:nowrap}.math-inline math{font-size:1.05em}
+  .math-table-scroll{overflow-x:auto;margin:16px 0}.math-table{width:100%;border-collapse:collapse;font-size:14px}.math-table caption{text-align:left;font-weight:600;padding:0 0 10px}
+  .math-table th,.math-table td{border:1px solid var(--line);padding:10px 12px;text-align:left;white-space:nowrap}.math-table th{background:#eaf2f9}.math-table tbody tr:nth-child(even){background:#f8fafc}
+  .algorithm-code{background:#f2f6fa;padding:16px;border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}.latex-source{margin-top:22px}.latex-source summary{cursor:pointer;color:#194c74;font-weight:600}
+  .latex-source pre{max-height:360px;overflow:auto;padding:14px;background:#f2f6fa;font-size:13px}
+  .fold-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:16px 0}.fold-options label{display:grid;gap:7px;font-size:14px;font-weight:600}.fold-options select{min-width:0;width:100%;padding:8px;border:1px solid #acbdcc;border-radius:5px;background:white;color:inherit;font:inherit}
+  .fold-buttons{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}button:disabled{opacity:.5;cursor:default}.fold-stage{background:#fbfcfd;border:1px solid var(--line);border-radius:8px;padding:10px}#fold-animation{height:auto;max-height:590px;aspect-ratio:900/650}
+  .fold-timeline{display:grid;grid-template-columns:auto minmax(60px,1fr) auto;gap:10px;align-items:center;margin:12px 0;font-size:13px}.fold-timeline input{width:100%;accent-color:#196bac}.fold-timeline output{display:inline-block;min-width:40px;text-align:right}#fold-method{font-size:14px;min-height:22px}
+  #fold-animation{cursor:grab;touch-action:none;user-select:none;overflow:hidden}#fold-animation [data-face],#fold-animation .path-hit{cursor:grab}#fold-animation.dragging,#fold-animation.dragging *{cursor:grabbing!important}#fold-animation:focus-visible{outline:2px solid #196bac;outline-offset:3px}
+  .theme-control{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:16px;font-size:14px}
+  .units-control{display:flex;align-items:center;gap:8px;margin-bottom:20px;font-size:14px}
+  #length-unit{padding:7px;border:1px solid #acbdcc;border-radius:5px;background:white;color:inherit;font:inherit}
+  [data-theme="dark"] #length-unit{background:#101b28;border-color:#647d96;color:#e5edf5}
+  #site-theme{position:relative;width:48px;height:28px;padding:0;border:1px solid #718399;border-radius:14px;background:#718399}
+  #site-theme::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 1px 3px #0004}
+  #site-theme[aria-checked="true"]{background:#196bac;border-color:#8ecbff}
+  #site-theme[aria-checked="true"]::after{transform:translateX(20px)}
+  :root[data-theme="dark"]{color-scheme:dark;color:#e5edf5;background:#101720;--line:#435469;--red:#ff8585;--label-halo:#141e2a}
+  [data-theme="dark"] .panel{background:#192330}
+  [data-theme="dark"] .view,[data-theme="dark"] .fold-stage{background:#141e2a}
+  [data-theme="dark"] .muted,[data-theme="dark"] .ends{color:#b5c5d6}
+  [data-theme="dark"] button{background:#273b50;border-color:#647d96;color:#c5e4ff}
+  [data-theme="dark"] input[type="number"],[data-theme="dark"] select{background:#101b28;border-color:#647d96;color:#e5edf5}
+  :root[data-theme="dark"] input[type="range"],:root[data-theme="dark"] input[type="checkbox"]{accent-color:#8ecbff}
+  [data-theme="dark"] :focus-visible{outline:2px solid #8ecbff;outline-offset:3px}
+  [data-theme="dark"] .result{background:#18352b;border-color:#548a6a}
+  [data-theme="dark"] #distance{color:#99e7b0}
+  [data-theme="dark"] .math,[data-theme="dark"] .math-equation,[data-theme="dark"] .algorithm-code,[data-theme="dark"] .latex-source pre{background:#101b28}
+  [data-theme="dark"] #hoverInfo,[data-theme="dark"] .math-table th{background:#273b50}
+  [data-theme="dark"] .math-table tbody tr:nth-child(even){background:#1e2c3c}
+  [data-theme="dark"] .math-nav a,[data-theme="dark"] .latex-source summary{color:#9fd2ff}
+  [data-theme="dark"] #tooltip{background:#e5edf5;color:#101720}
+  [data-theme="dark"] svg .face-label{fill:#e5edf5}
+  [data-theme="dark"] svg .face-label,[data-theme="dark"] svg .point-label,[data-theme="dark"] svg .dimension,[data-theme="dark"] svg .axis-label{paint-order:stroke;stroke:#141e2a;stroke-linejoin:round}
+  [data-theme="dark"] svg .axis-label{stroke-width:4px}
+  [data-theme="dark"] svg .dimension{fill:#b9ddff}
+  [data-theme="dark"] svg .axis{stroke:#e5edf5}
+  [data-theme="dark"] svg .axis-label,[data-theme="dark"] svg .axes polygon{fill:#e5edf5}
+  [data-theme="dark"] svg .guide,[data-theme="dark"] svg [stroke="#355e8c"]{stroke:#a6c8ec}
+  [data-theme="dark"] svg [fill="#1769aa"]{fill:#8ecbff}
+  [data-theme="dark"] svg [fill="#16803c"]{fill:#91edac}
+  [data-theme="dark"] svg [fill="#875800"],[data-theme="dark"] svg [fill="#b77300"]{fill:#ffd080}
+  [data-theme="dark"] svg [stroke="#b77300"]{stroke:#ffd080}
+  [data-theme="dark"] svg [stroke="#5a7185"]{stroke:#94a9be}
+  [data-theme="dark"] [data-face].highlight{stroke:#e5edf5!important}
+  [data-theme="dark"] svg [data-point]:focus-visible{stroke:#e5edf5}
+  @media(max-width:850px){.views,.point-controls{grid-template-columns:1fr}body{padding:0 12px;margin-top:18px}.controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:430px){.controls{grid-template-columns:1fr}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="theme-control"><label id="theme-label" for="site-theme">Dark</label><button id="site-theme" type="button" role="switch" aria-checked="true" aria-labelledby="theme-label"></button></div>
+<h1>Spider and Fly — Shortest Path on a Box</h1>
+<section class="panel">
+  <h2>Box and point positions</h2>
+  <div class="units-control"><label for="length-unit">Units</label><select id="length-unit"><option value="cm" selected>Centimeters (cm)</option><option value="ft">Feet (ft)</option><option value="m">Meters (m)</option><option value="km">Kilometers (km)</option></select></div>
+  <div class="controls" id="controls"></div>
+  <div class="point-controls" id="pointControls"></div>
+  <p class="muted" id="positions"></p>
+  <p class="muted" id="surfaceStatus" role="status"></p>
+  <button id="reset" type="button">Reset to the 30 × 12 × 12 example</button>
+</section>
+<section class="result" aria-live="polite" aria-atomic="true">
+  <div id="distance"></div><div id="routeName"></div><p class="muted" id="summary"></p>
+</section>
+<section class="panel" id="solution">
+  <div class="views">
+    <div class="view"><h2>3D box and shortest surface path</h2><label class="label-toggle"><input id="hide-box-face-labels" type="checkbox" aria-controls="box3d net">Hide face labels</label><svg id="box3d" viewBox="0 0 600 500" role="group" tabindex="0" aria-label="Rotatable and zoomable 3D box with draggable spider and fly"></svg>
+      <div class="camera-controls">
+        <label for="camera-yaw">Rotate around<input id="camera-yaw" type="range" min="-180" max="180" step="1" value="-28"><output id="yaw-value" for="camera-yaw">-28°</output></label>
+        <label for="camera-pitch">Tilt up / down<input id="camera-pitch" type="range" min="-85" max="85" step="1" value="24"><output id="pitch-value" for="camera-pitch">24°</output></label>
+        <label for="camera-zoom">Zoom<input id="camera-zoom" type="range" min="25" max="300" step="1" value="100"><output id="zoom-value" for="camera-zoom">100%</output></label>
+        <button id="reset-view" type="button">Reset 3D view</button>
+      </div>
+    </div>
+    <div class="view"><h2>Shortest path — stable six-face unfolding</h2><svg id="net" viewBox="0 0 760 700" role="group" aria-label="Six-face unfolded box with draggable spider and fly"></svg></div>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div id="hoverInfo">Hover a face, S, F, or the red path for details.</div>
+  <h2 style="margin-top:18px">Coordinates and calculation</h2><div class="math" id="calculation"></div>
+</section>
+<section class="panel" id="folding-demo" aria-labelledby="folding-title">
+  <h2 id="folding-title">Animate the box unfolding : 3D → 2D</h2>
+  <div id="fold-method"></div>
+  <div class="fold-options">
+    <label for="fold-root">First face in the middle strip<select id="fold-root"></select></label>
+    <label for="fold-left">Attach end0 to<select id="fold-left"></select></label>
+    <label for="fold-right">Attach enda to<select id="fold-right"></select></label>
+    <label for="fold-speed">Playback speed<select id="fold-speed"><option value="2">2 seconds</option><option value="4" selected>4 seconds</option><option value="6">6 seconds</option><option value="8">8 seconds</option></select></label>
+  </div>
+  <div class="fold-buttons">
+    <button id="fold-use-current" type="button">Use current shortest-path net</button>
+    <button id="fold-unfold" type="button">Unfold → 2D</button>
+    <button id="fold-back" type="button">Fold back → 3D</button>
+    <button id="fold-replay" type="button">Replay</button>
+    <button id="fold-pause" type="button" disabled>Pause</button>
+  </div>
+  <label class="label-toggle"><input id="hide-fold-face-labels" type="checkbox" aria-controls="fold-animation">Hide labels</label>
+  <div class="fold-stage"><svg id="fold-animation" viewBox="0 0 900 650" role="group" tabindex="0" aria-label="Rotatable and zoomable six-face hinge unfolding animation with spider, fly and shortest surface path"></svg></div>
+  <div class="camera-controls">
+    <label for="fold-yaw">Rotate around<input id="fold-yaw" type="range" min="-180" max="180" step="1" value="0"><output id="fold-yaw-value" for="fold-yaw">0°</output></label>
+    <label for="fold-pitch">Tilt up / down<input id="fold-pitch" type="range" min="-85" max="85" step="1" value="0"><output id="fold-pitch-value" for="fold-pitch">0°</output></label>
+    <label for="fold-zoom">Zoom<input id="fold-zoom" type="range" min="25" max="300" step="1" value="100"><output id="fold-zoom-value" for="fold-zoom">100%</output></label>
+  </div>
+  <div class="fold-timeline"><label for="fold-progress">Closed 3D</label><input id="fold-progress" aria-label="Unfolding progress" type="range" min="0" max="1000" step="1" value="0"><span>Flat 2D <output id="fold-percent" for="fold-progress">0%</output></span></div>
+  <button id="fold-reset-view" type="button">Reset animation view</button>
+</section>
+<div id="tooltip" role="tooltip"></div>
+<script>
+'use strict';
+const themeButton=document.getElementById('site-theme');
+function syncThemeButton(){
+  const dark=document.documentElement.dataset.theme==='dark';
+  themeButton.setAttribute('aria-checked',String(dark));
+  themeButton.title=dark?'Switch to white theme':'Switch to dark theme';
+}
+syncThemeButton();
+themeButton.addEventListener('click',()=>{
+  const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=theme;
+  syncThemeButton();
+  try{localStorage.setItem('box-surface-theme',theme);}catch{}
+});
+const defaults={a:30,b:12,h:12,x0:0,y0:6,z0:11,x1:30,y1:6,z1:1,sFace:'end0',fFace:'enda'};
+const state={...defaults};
+const cameraDefault={yaw:-28,pitch:24,zoom:1};
+const camera={...cameraDefault};
+let displayedOptimal=null,rotationDrag=null,pointDrag=null,boxPointDrag=null,netLayout=null,boxView=null;
+const foldDemo={progress:0,target:1,running:false,frame:null,rig:null,route:null,parameters:null,rigKey:'',contentKey:'',view:{yaw:0,pitch:0,zoom:1},drag:null};
+const colors={end0:'#ffd0a8',enda:'#ffc1c1',top:'#b9dcff',bottom:'#cfd8df',side0:'#ffe28a',sideB:'#e7baff'};
+const names={end0:'end0 (x = 0)',enda:'enda (x = a)',top:'top (z = h)',bottom:'bottom (z = 0)',side0:'side0 (y = 0)',sideB:'sideB (y = b)'};
+const faceOrder=['end0','enda','side0','sideB','bottom','top'];
+const specs=[{key:'a',label:'a — length',min:1,max:60},{key:'b',label:'b — width',min:1,max:40},{key:'h',label:'h — height',min:1,max:40},...[0,1].flatMap(i=>['x','y','z'].map(axis=>({key:axis+i,label:axis+(i?'₁':'₀'),min:0,max:axis==='x'?30:12})))];
+// Geometry stays in centimeters; convert only at the display/input boundary.
+const units={cm:{factor:1,name:'centimeters'},ft:{factor:30.48,name:'feet'},m:{factor:100,name:'meters'},km:{factor:100000,name:'kilometers'}};
+let unit='cm';
+const toUnit=n=>n/units[unit].factor;
+const fromUnit=n=>n*units[unit].factor;
+function formatLength(n,digits=3,fixed=false){
+  const value=toUnit(n);
+  // Tiny lengths in kilometers must not appear to be zero after rounding.
+  if(value!==0&&Math.abs(value)<10**-digits)return value.toExponential(digits);
+  const rounded=value.toFixed(digits);
+  return fixed?rounded:Number(rounded).toString();
+}
+const fmt=n=>formatLength(n);
+const fmtLabel=n=>formatLength(n,2);
+const fmtDistance=n=>formatLength(n,2,true);
+const inputValue=n=>Number(toUnit(n).toPrecision(12)).toString();
+const coord=p=>'('+p.map(fmtLabel).join(', ')+') '+unit;
+const distance=o=>o.length??Math.hypot(o.f[0]-o.s[0],o.f[1]-o.s[1]);
+const eps=1e-8;
+
+const add=(a,b)=>a.map((v,i)=>v+b[i]),sub=(a,b)=>a.map((v,i)=>v-b[i]);
+const mul=(a,t)=>a.map(v=>v*t),dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0);
+const cross=(a,b)=>a[0]*b[1]-a[1]*b[0];
+const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
+const point3=(p,i)=>[p['x'+i],p['y'+i],p['z'+i]];
+const faceKey=i=>i===0?'sFace':'fFace';
+
+// Every face has an orthonormal 3D frame and an isometric 2D frame.
+// Keeping both frames makes dragging back from the net to 3D unambiguous.
+function boxFaces(p){
+  const {a,b,h}=p;
+  const spec=[['end0',[0,0,0],[0,1,0],[0,0,1],b,h,0,0],['enda',[a,0,0],[0,1,0],[0,0,1],b,h,0,a],
+    ['top',[0,0,h],[1,0,0],[0,1,0],a,b,2,h],['bottom',[0,0,0],[1,0,0],[0,1,0],a,b,2,0],
+    ['side0',[0,0,0],[1,0,0],[0,0,1],a,h,1,0],['sideB',[0,b,0],[1,0,0],[0,0,1],a,h,1,b]];
+  return Object.fromEntries(spec.map(([id,o,u,v,w,h,axis,value])=>{
+    const corners=[o,add(o,mul(u,w)),add(add(o,mul(u,w)),mul(v,h)),add(o,mul(v,h))];
+    return [id,{id,o,u,v,w,h,axis,value,corners,center:add(o,add(mul(u,w/2),mul(v,h/2)))}];
+  }));
+}
+function containingFaces(q,faces){return Object.values(faces).filter(f=>Math.abs(q[f.axis]-f.value)<eps).map(f=>f.id);}
+function onSurface(q,p){return q.every((x,i)=>Number.isFinite(x)&&x>=-eps&&x<=[p.a,p.b,p.h][i]+eps)&&containingFaces(q,boxFaces(p)).length>0;}
+function sharedEdge(a,b){return a.corners.filter(q=>b.corners.some(r=>Math.hypot(...sub(q,r))<eps));}
+function to2(part,q){const d=sub(q,part.model.o);return add(part.o,add(mul(part.u,dot(d,part.model.u)),mul(part.v,dot(d,part.model.v))));}
+function to3(part,q){const d=sub(q,part.o);return add(part.model.o,add(mul(part.model.u,dot(d,part.u)),mul(part.model.v,dot(d,part.v))));}
+function makePart(model,o=[0,0],u=[1,0],v=[0,1]){
+  const part={face:model.id,model,o,u,v},corners=model.corners.map(q=>to2(part,q));
+  return Object.assign(part,{x0:Math.min(...corners.map(q=>q[0])),x1:Math.max(...corners.map(q=>q[0])),y0:Math.min(...corners.map(q=>q[1])),y1:Math.max(...corners.map(q=>q[1]))});
+}
+function unfold(part,neighbor){
+  const edge=sharedEdge(part.model,neighbor);if(edge.length!==2)return null;
+  const [a,b]=edge,A=to2(part,a),B=to2(part,b),length=Math.hypot(...sub(b,a));
+  const t3=mul(sub(b,a),1/length),t2=mul(sub(B,A),1/length);
+  const c=sub(neighbor.center,a),normal3=sub(c,mul(t3,dot(c,t3))),n3=mul(normal3,1/Math.hypot(...normal3));
+  let n2=[-t2[1],t2[0]];
+  if(dot(sub(to2(part,part.model.center),A),n2)>0)n2=mul(n2,-1);
+  const map=q=>add(A,add(mul(t2,dot(sub(q,a),t3)),mul(n2,dot(sub(q,a),n3))));
+  const origin=map(neighbor.o);
+  return {part:makePart(neighbor,origin,sub(map(add(neighbor.o,neighbor.u)),origin),sub(map(add(neighbor.o,neighbor.v)),origin)),edge:[A,B]};
+}
+const inside=(q,f)=>q[0]>=f.x0-eps&&q[0]<=f.x1+eps&&q[1]>=f.y0-eps&&q[1]<=f.y1+eps;
+const overlaps=(a,b)=>Math.min(a.x1,b.x1)-Math.max(a.x0,b.x0)>eps&&Math.min(a.y1,b.y1)-Math.max(a.y0,b.y0)>eps;
+function crossingTime(s,f,edge,previous){
+  const d=sub(f,s),e=sub(edge[1],edge[0]),q=sub(edge[0],s),det=cross(d,e);
+  if(Math.abs(det)>eps){
+    const t=cross(q,e)/det,u=cross(q,d)/det;
+    return t>=previous-eps&&t<=1+eps&&u>=-eps&&u<=1+eps?clamp(t,previous,1):null;
+  }
+  // Collinear paths along a fold are valid, including zero-length corner segments.
+  const dd=dot(d,d);
+  if(dd<eps*eps){const ee=dot(e,e),u=dot(sub(s,edge[0]),e)/ee;return Math.abs(cross(sub(s,edge[0]),e))<eps&&u>=-eps&&u<=1+eps?previous:null;}
+  if(Math.abs(cross(q,d))>eps)return null;
+  const t0=dot(q,d)/dd,t1=dot(sub(edge[1],s),d)/dd,lo=Math.max(previous,0,Math.min(t0,t1)),hi=Math.min(1,Math.max(t0,t1));
+  return lo<=hi+eps?clamp(lo,0,1):null;
+}
+function routeCandidate(parts,hinges,S,F){
+  const s=to2(parts[0],S),f=to2(parts.at(-1),F),d=sub(f,s),crossings=[];
+  let previous=0;
+  for(let i=0;i<hinges.length;i++){
+    const t=crossingTime(s,f,hinges[i],previous);if(t===null)return null;
+    const q=add(s,mul(d,t));crossings.push({q,t,edge:hinges[i]});previous=t;
+  }
+  const path2=[s,...crossings.map(c=>c.q),f];
+  if(parts.some((part,i)=>!inside(path2[i],part)||!inside(path2[i+1],part)))return null;
+  return {s,f,length:Math.hypot(...sub(f,s)),seq:parts.map(f=>f.face),parts,crossings,surfacePoints:[S,...crossings.map((c,i)=>to3(parts[i],c.q)),F],valid:true};
+}
+let stripCacheKey='',stripCache=[];
+function stripLayouts(p){
+  const key=[p.a,p.b,p.h].join(',');if(key===stripCacheKey)return stripCache;
+  const faces=boxFaces(p),cycle=['top','sideB','bottom','side0'],layouts=[];
+  const bounds={minX:-Math.max(p.b,p.h),maxX:p.a+Math.max(p.b,p.h),minY:0,maxY:2*(p.b+p.h)};
+  // One orientation only: every lateral face's 3D x points to the right.
+  // Rotating the perimeter cut can translate a face, but can never mirror it.
+  for(let start=0;start<4;start++){
+    const order=cycle.map((_,i)=>cycle[(start+i)%4]),first=faces[order[0]],sign=['sideB','bottom'].includes(first.id)?-1:1;
+    const middle=[makePart(first,[0,sign<0?first.h:0],[1,0],[0,sign])];
+    for(let i=1;i<4;i++)middle.push(unfold(middle.at(-1),faces[order[i]]).part);
+    for(let left=0;left<4;left++)for(let right=0;right<4;right++){
+      const end0=unfold(middle[left],faces.end0).part,enda=unfold(middle[right],faces.enda).part;
+      layouts.push({key:[start,left,right].join(':'),start,left,right,parts:[...middle,end0,enda],bounds});
+    }
+  }
+  stripCacheKey=key;stripCache=layouts;return layouts;
+}
+function projectRoute(route,layout,endpointFaces=null){
+  // At a cut edge a point has two paper-net images. Keep the dragged marker
+  // on its selected face and mark the zero-distance seam to the route face.
+  if(endpointFaces){
+    route={...route,seq:[...route.seq],surfacePoints:[...route.surfacePoints]};
+    if(endpointFaces[0]!==route.seq[0]){route.seq.unshift(endpointFaces[0]);route.surfacePoints.unshift(route.surfacePoints[0]);}
+    if(endpointFaces[1]!==route.seq.at(-1)){route.seq.push(endpointFaces[1]);route.surfacePoints.push(route.surfacePoints.at(-1));}
+  }
+  const segments=route.seq.map((face,i)=>{
+    const part=layout.parts.find(p=>p.face===face),a=to2(part,route.surfacePoints[i]),b=to2(part,route.surfacePoints[i+1]);
+    return {face,a,b,length:Math.hypot(...sub(b,a))};
+  });
+  const cuts=[],crossings=[];
+  for(let i=0;i<segments.length-1;i++){
+    const a=segments[i].b,b=segments[i+1].a;
+    if(Math.hypot(...sub(a,b))>eps)cuts.push({a,b,label:String.fromCharCode(65+cuts.length),physical:route.surfacePoints[i+1]});
+    else{
+      const part=layout.parts.find(p=>p.face===route.seq[i]),next=layout.parts.find(p=>p.face===route.seq[i+1]);
+      crossings.push({q:a,edge:sharedEdge(part.model,next.model).map(q=>to2(part,q))});
+    }
+  }
+  const s=segments[0].a,f=segments.at(-1).b;
+  return {...route,parts:layout.parts,bounds:layout.bounds,layoutKey:layout.key,s,f,segments,cuts,crossings,split:cuts.length>0};
+}
+function chooseLayout(ties,p,preferred){
+  const layouts=stripLayouts(p),old=layouts.find(l=>l.key===preferred?.layoutKey);
+  // Preserve face frames, end-wall attachment orientation, scale, and offset.
+  // Distance takes priority; previous layout / route only break exact ties.
+  const orderedRoutes=[...ties].sort((a,b)=>Number(b.seq.join(',')===preferred?.seq.join(','))-Number(a.seq.join(',')===preferred?.seq.join(','))||a.seq.length-b.seq.length);
+  const center=f=>[(f.x0+f.x1)/2,(f.y0+f.y1)/2];
+  const movement=layout=>old?layout.parts.reduce((sum,part)=>sum+Math.hypot(...sub(center(part),center(old.parts.find(p=>p.face===part.face)))),0)/(p.a+p.b+p.h):0;
+  const orderedLayouts=[...layouts].sort((a,b)=>{
+    if(old){const exact=Number(b.key===old.key)-Number(a.key===old.key);if(exact)return exact;
+      const middle=Number(a.start!==old.start)-Number(b.start!==old.start);if(middle)return middle;
+      return movement(a)-movement(b);}
+    return a.start-b.start||a.left-b.left||a.right-b.right;
+  });
+  for(const layout of orderedLayouts)for(const route of orderedRoutes){
+    const projected=projectRoute(route,layout);
+    if(!projected.split&&Math.abs(Math.hypot(...sub(projected.f,projected.s))-distance(route))<eps)return projected;
+  }
+  // Some shortest routes cross an end face between lateral faces. A central
+  // four-face strip cannot unfold those into one straight line. Keep the net
+  // and show the exact geodesic in pieces, with identical cut-edge marks.
+  return projectRoute(orderedRoutes[0],old||layouts[0]);
+}
+function solve(p,preferred=null){
+  const S=point3(p,0),F=point3(p,1);
+  if(![p.a,p.b,p.h].every(x=>Number.isFinite(x)&&x>0)||!onSurface(S,p)||!onSurface(F,p))throw Error('Both points must be on the box surface.');
+  const faces=boxFaces(p),starts=containingFaces(S,faces),ends=containingFaces(F,faces),valid=[];
+  let checked=0;
+  function walk(parts,hinges){
+    const last=parts.at(-1);
+    if(ends.includes(last.face)){
+      checked++;const candidate=routeCandidate(parts,hinges,S,F);if(candidate)valid.push(candidate);
+      // Any route that continues past a face containing F can be shortened within that face.
+      return;
+    }
+    for(const face of Object.values(faces))if(!parts.some(p=>p.face===face.id)){
+      const next=unfold(last,face);if(next)walk([...parts,next.part],[...hinges,next.edge]);
+    }
+  }
+  for(const id of starts)walk([makePart(faces[id])],[]);
+  valid.sort((a,b)=>distance(a)-distance(b)||a.seq.length-b.seq.length);
+  if(!valid.length)throw Error('No valid surface path.');
+  const minimum=distance(valid[0]),ties=valid.filter(o=>Math.abs(distance(o)-minimum)<eps).sort((a,b)=>a.seq.length-b.seq.length);
+  const best=chooseLayout(ties,p,preferred);
+  return {best,ties,candidates:valid,checked};
+}
+
+function faceInfo(id,p){
+  const dimensions=id.startsWith('end')?[p.b,p.h]:['top','bottom'].includes(id)?[p.a,p.b]:[p.a,p.h];
+  return names[id]+' · '+dimensions.map(fmt).join(' × ')+' '+unit;
+}
+function pointMark(x,y,label,detail,color,anchor='start',point=null,coordinates=''){
+  return `<g data-info="${detail}" tabindex="0" ${point===null?'':`data-point="${point}" role="button" aria-label="${detail}. Drag or use arrow keys to move on the surface."`}><title>${detail}</title>${point===null?'':`<circle cx="${x}" cy="${y}" r="16" fill="transparent"/>`}<circle cx="${x}" cy="${y}" r="6" fill="${color}" stroke="white" stroke-width="1.5"/><text class="point-label" text-anchor="${anchor}" x="${x+(anchor==='start'?10:-10)}" y="${y+(point===1?22:-14)}" fill="${color}">${label}${coordinates?`<tspan class="net-detail-label"> ${coordinates}</tspan>`:''}</text></g>`;
+}
+function drawNet(o,p,preview=false){
+  const W=760,H=700,pad=65,parts=o.parts;
+  const {minX,maxX,minY,maxY}=o.bounds;
+  const scale=Math.min((W-2*pad)/(maxX-minX),(H-2*pad)/(maxY-minY));
+  const left=(W-(maxX-minX)*scale)/2,top=(H-(maxY-minY)*scale)/2;
+  const X=x=>left+(x-minX)*scale,Y=y=>H-top-(y-minY)*scale;
+  netLayout={parts,bounds:o.bounds,layoutKey:o.layoutKey,scale,left,top,minX,minY,H};
+  let out='';
+  for(const f of parts){
+    const width=(f.x1-f.x0)*scale,height=(f.y1-f.y0)*scale;
+    out+=`<rect data-face="${f.face}" x="${X(f.x0)}" y="${Y(f.y1)}" width="${width}" height="${height}" fill="${colors[f.face]}" fill-opacity=".82" stroke="#5a7185" stroke-width="1.2"><title>${faceInfo(f.face,p)}</title></rect>`;
+    // Avoid labels spilling out of very thin faces at extreme slider settings.
+    if(width>65&&height>26)out+=`<text class="face-label" text-anchor="middle" x="${X((f.x0+f.x1)/2)}" y="${Y((f.y0+f.y1)/2)+4}">${f.face}</text>`;
+  }
+  if(!preview)for(const {edge:[a,b]} of o.crossings)out+=`<line class="guide" x1="${X(a[0])}" y1="${Y(a[1])}" x2="${X(b[0])}" y2="${Y(b[1])}"/>`;
+  const sx=X(o.s[0]),sy=Y(o.s[1]),fx=X(o.f[0]),fy=Y(o.f[1]);
+  const dx=Math.abs(o.f[0]-o.s[0]),dy=Math.abs(o.f[1]-o.s[1]),d=distance(o);
+  const sign=Math.sign(fy-sy),offset=sign>0?-19:24;
+  if(!preview&&!o.split&&dy>eps){
+    const r=Math.min(12,Math.abs(fx-sx)/4,Math.abs(fy-sy)/4);
+    const rx=Math.sign(sx-fx)*r;
+    out+=`<path class="guide" d="M${sx},${sy} H${fx} V${fy}"/><path d="M${fx+rx},${sy} v${sign*r} h${-rx}" fill="none" stroke="#355e8c" stroke-width="1.7" style="pointer-events:none"/>
+      <text class="dimension net-detail-label" text-anchor="middle" transform="translate(${fx+23},${(sy+fy)/2}) rotate(-90)">Δy = ${fmtLabel(dy)} ${unit}</text>`;
+  }
+  if(!preview&&!o.split)out+=`<text class="dimension net-detail-label" text-anchor="middle" x="${(sx+fx)/2}" y="${sy+offset}">Δx = ${fmtLabel(dx)} ${unit}${dy<=eps?' · Δy = 0':''}</text>`;
+  const path=o.split?o.segments.map(s=>`M${X(s.a[0])},${Y(s.a[1])} L${X(s.b[0])},${Y(s.b[1])}`).join(' '):`M${sx},${sy} L${fx},${fy}`;
+  out+=`<path class="path" d="${path}"/><path class="path-hit" d="${path}" data-info="Shortest path : ${fmt(d)} ${unit}" tabindex="0"><title>Shortest path : ${fmt(d)} ${unit}</title></path>`;
+  if(o.split){
+    // Very short segments have their lengths in the calculation below; do not
+    // obscure the draggable point or its matching cut mark with a tiny label.
+    o.segments.forEach((s,i)=>{if(s.length*scale>55)out+=`<text class="dimension net-detail-label" style="font-size:13px" text-anchor="middle" x="${X((s.a[0]+s.b[0])/2)}" y="${Y((s.a[1]+s.b[1])/2)-12}">L${i+1} = ${fmt(s.length)}</text>`;});
+    for(const cut of o.cuts)for(const q of [cut.a,cut.b])out+=`<g data-info="Cut ${cut.label} : both marks are the same 3D point ${coord(cut.physical)}"><circle cx="${X(q[0])}" cy="${Y(q[1])}" r="4" fill="#b77300"/><text class="point-label" x="${X(q[0])+8}" y="${Y(q[1])+16}" fill="#875800">${cut.label}</text></g>`;
+  }
+  const ox=X(0),oy=Y(0),ax=X(maxX)+24,ay=Y(maxY)-24;
+  out+=`<g class="axes"><line class="axis" x1="${X(minX)-12}" y1="${oy}" x2="${ax}" y2="${oy}"/><polygon fill="#273f57" points="${ax},${oy} ${ax-9},${oy-4} ${ax-9},${oy+4}"/><text class="axis-label" x="${ax+9}" y="${oy+5}">x</text>
+    <line class="axis" x1="${ox}" y1="${Y(minY)+12}" x2="${ox}" y2="${ay}"/><polygon fill="#273f57" points="${ox},${ay} ${ox-4},${ay+9} ${ox+4},${ay+9}"/><text class="axis-label" x="${ox+10}" y="${ay+5}">y</text></g>`;
+  out+=pointMark(sx,sy,'S','Spider S · 2D '+coord(o.s)+' · 3D '+coord(point3(p,0)),'#1769aa',sx<fx?'start':'end',0,coord(o.s));
+  out+=pointMark(fx,fy,'F','Fly F · 2D '+coord(o.f)+' · 3D '+coord(point3(p,1)),'#16803c',fx>sx?'end':'start',1,coord(o.f));
+  out+=`<text class="dimension net-distance" text-anchor="middle" x="${W/2}" y="25">${preview?`Live shortest surface distance : ${fmtDistance(d)} ${unit}`:o.split?`d = sum of surface segments ≈ ${fmtDistance(d)} ${unit}`:`d = √(${fmtDistance(dx)}² + ${fmtDistance(dy)}²) ≈ ${fmtDistance(d)} ${unit}`}</text>`;
+  return out;
+}
+
+const cross3=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const smoothStep=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
+function rotateHinge(point,anchor,axis,angle){
+  const q=sub(point,anchor),c=Math.cos(angle),s=Math.sin(angle);
+  return add(anchor,add(add(mul(q,c),mul(cross3(axis,q),s)),mul(axis,dot(axis,q)*(1-c))));
+}
+function makeFoldRig(p,layout){
+  const middle=layout.parts.slice(0,4),root=middle[0],nodes={},order=['end0','enda',middle[3].face,middle[2].face,middle[1].face];
+  const links=[[middle[1],middle[0]],[middle[2],middle[1]],[middle[3],middle[2]],
+    [layout.parts.find(f=>f.face==='end0'),middle[layout.left]],[layout.parts.find(f=>f.face==='enda'),middle[layout.right]]];
+  // Each child carries its entire subtree. Its hinge is expressed in the
+  // original box frame, then carried by its parent's rigid transformation.
+  for(const [child,parent] of links){
+    const edge=sharedEdge(parent.model,child.model),axis=mul(sub(edge[1],edge[0]),1/Math.hypot(...sub(edge[1],edge[0])));
+    const flat=unfold(makePart(parent.model),child.model).part,center=to2(flat,child.model.center);
+    const target=add(parent.model.o,add(mul(parent.model.u,center[0]),mul(parent.model.v,center[1])));
+    const positive=rotateHinge(child.model.center,edge[0],axis,Math.PI/2);
+    const negative=rotateHinge(child.model.center,edge[0],axis,-Math.PI/2);
+    const sign=Math.hypot(...sub(positive,target))<Math.hypot(...sub(negative,target))?1:-1;
+    nodes[child.face]={face:child.face,parent:parent.face,edge,axis,sign,stage:order.indexOf(child.face)};
+  }
+  const poses=progress=>{
+    const result={[root.face]:q=>q};
+    for(const [child] of links){
+      const node=nodes[child.face],parent=result[node.parent],angle=node.sign*Math.PI/2*smoothStep(progress/.85*5-node.stage);
+      result[child.face]=q=>parent(rotateHinge(q,node.edge[0],node.axis,angle));
+    }
+    return result;
+  };
+  const X=add(mul(root.model.u,root.u[0]),mul(root.model.v,root.v[0]));
+  const Y=add(mul(root.model.u,root.u[1]),mul(root.model.v,root.v[1])),Z=cross3(X,Y);
+  const centerX=(layout.bounds.minX+layout.bounds.maxX)/2,centerY=(layout.bounds.minY+layout.bounds.maxY)/2;
+  const project=(point,progress)=>{
+    const delta=sub(point,root.model.o),x=root.o[0]+dot(delta,X)-centerX,y=root.o[1]+dot(delta,Y)-centerY,z=dot(delta,Z);
+    // Faces are fully flat before the camera gently turns to a true 2D view.
+    const turn=1-smoothStep((progress-.85)/.15),yaw=-25*Math.PI/180*turn,pitch=-35*Math.PI/180*turn;
+    const horizontal=Math.cos(yaw)*x+Math.sin(yaw)*z,depth=-Math.sin(yaw)*x+Math.cos(yaw)*z;
+    return [horizontal,-Math.cos(pitch)*y+Math.sin(pitch)*depth,Math.sin(pitch)*y+Math.cos(pitch)*depth];
+  };
+  // One fit for the complete motion: no per-frame resizing or zoom jumps.
+  const bounds=[Infinity,Infinity,-Infinity,-Infinity];
+  for(let sample=0;sample<=100;sample++){
+    const progress=sample/100,pose=poses(progress);
+    for(const part of layout.parts)for(const q of part.model.corners){
+      const v=project(pose[part.face](q),progress);bounds[0]=Math.min(bounds[0],v[0]);bounds[1]=Math.min(bounds[1],v[1]);bounds[2]=Math.max(bounds[2],v[0]);bounds[3]=Math.max(bounds[3],v[1]);
+    }
+  }
+  const scale=Math.min(760/(bounds[2]-bounds[0]),510/(bounds[3]-bounds[1]));
+  const xy=(q,progress)=>{const v=project(q,progress);return [450+(v[0]-(bounds[0]+bounds[2])/2)*scale,325+(v[1]-(bounds[1]+bounds[3])/2)*scale];};
+  return {layout,root,nodes,order,poses,project,xy,scale};
+}
+function drawFoldAnimation(rig,route,p,progress,view={yaw:0,pitch:0,zoom:1},minimum=distance(route)){
+  const poses=rig.poses(progress),active=progress>0&&progress<.85?Math.min(4,Math.floor(progress/.85*5)):-1;
+  // Rotate the entire posed model, then fit its CURRENT projected bounds.
+  // Center after rotation, so zoom cannot magnify an old camera offset.
+  const vertices=rig.layout.parts.flatMap(part=>part.model.corners.map(q=>rig.project(poses[part.face](q),progress)));
+  const pivot=[0,1,2].map(i=>(Math.min(...vertices.map(q=>q[i]))+Math.max(...vertices.map(q=>q[i])))/2);
+  const yaw=view.yaw*Math.PI/180,pitch=view.pitch*Math.PI/180;
+  const project=q=>{
+    const v=rig.project(q,progress),[x,y,z]=sub(v,pivot);
+    const horizontal=Math.cos(yaw)*x+Math.sin(yaw)*z,depth=-Math.sin(yaw)*x+Math.cos(yaw)*z;
+    return add(pivot,[horizontal,Math.cos(pitch)*y-Math.sin(pitch)*depth,Math.sin(pitch)*y+Math.cos(pitch)*depth]);
+  };
+  const projected=rig.layout.parts.flatMap(part=>part.model.corners.map(q=>project(poses[part.face](q))));
+  // Keep the original box coordinate axes in view as the faces unfold.
+  projected.push(...[[0,0,0],[p.a,0,0],[0,p.b,0],[0,0,p.h]].map(project));
+  const lo=[0,1].map(i=>Math.min(...projected.map(q=>q[i]))),hi=[0,1].map(i=>Math.max(...projected.map(q=>q[i])));
+  const center=mul(add(lo,hi),.5),scale=Math.min(780/Math.max(hi[0]-lo[0],eps),530/Math.max(hi[1]-lo[1],eps))*view.zoom;
+  const xy=q=>{const v=project(q);return [450+(v[0]-center[0])*scale,310+(v[1]-center[1])*scale];};
+  const parts=[...rig.layout.parts].sort((a,b)=>project(poses[a.face](a.model.center))[2]-project(poses[b.face](b.model.center))[2]);
+  let out='';
+  for(const part of parts){
+    const corners=part.model.corners.map(q=>xy(poses[part.face](q))),center=xy(poses[part.face](part.model.center));
+    out+=`<g data-face="${part.face}"><polygon points="${corners.map(q=>q.join(',')).join(' ')}" fill="${colors[part.face]}" fill-opacity=".72" stroke="#5a7185" stroke-width="1.5"><title>${faceInfo(part.face,p)}</title></polygon><text class="face-label" text-anchor="middle" x="${center[0]}" y="${center[1]+4}">${part.face}</text></g>`;
+  }
+  out+=drawBoxAxes({xy},p);
+  if(active>=0){const node=rig.nodes[rig.order[active]],edge=node.edge.map(q=>xy(poses[node.parent](q)));out+=`<line x1="${edge[0][0]}" y1="${edge[0][1]}" x2="${edge[1][0]}" y2="${edge[1][1]}" stroke="#b77300" stroke-width="4" stroke-dasharray="8 5"><title>Moving hinge : ${node.parent} ↔ ${node.face}</title></line>`;}
+  const segments=route.seq.map((face,i)=>({face,a:xy(poses[face](route.surfacePoints[i])),b:xy(poses[face](route.surfacePoints[i+1]))}));
+  const path=segments.map(s=>`M${s.a.join(',')} L${s.b.join(',')}`).join(' ');
+  out+=`<path class="path" d="${path}"/><path class="path-hit" d="${path}"><title>Shortest route on the selected connected net : ${fmt(distance(route))} ${unit}. Paper gaps are not traveled.</title></path>`;
+  let cut=0;
+  for(let i=0;i<segments.length-1;i++)if(Math.hypot(...sub(route.segments[i].b,route.segments[i+1].a))>eps){
+    const label=String.fromCharCode(65+cut++),a=segments[i].b,b=segments[i+1].a;
+    if(Math.hypot(...sub(a,b))>14)for(const q of [a,b])out+=`<circle cx="${q[0]}" cy="${q[1]}" r="4" fill="#b77300"/><text class="point-label" x="${q[0]+8}" y="${q[1]+16}" fill="#875800">${label}</text>`;
+  }
+  const s=xy(poses[route.seq[0]](point3(p,0))),f=xy(poses[route.seq.at(-1)](point3(p,1)));
+  out+=pointMark(...s,'S','Spider S · fixed box coordinates '+coord(point3(p,0)),'#1769aa',s[0]>450?'end':'start',null,coord(point3(p,0)));
+  out+=pointMark(...f,'F','Fly F · fixed box coordinates '+coord(point3(p,1)),'#16803c',f[0]>450?'end':'start',null,coord(point3(p,1)));
+  return out+`<text class="dimension" text-anchor="middle" x="450" y="632">Selected-net route : ${fmt(distance(route))} ${unit} · Shortest : ${fmt(minimum)} ${unit}</text>`;
+}
+
+function makeBoxView(p,orientation=camera){
+  const {a,b,h}=p,W=600,H=500;
+  // Rotate around the box center; apply the same camera to faces, points and path.
+  const yaw=orientation.yaw*Math.PI/180,pitch=orientation.pitch*Math.PI/180;
+  const project=([x,y,z])=>{
+    x-=a/2;y-=b/2;z-=h/2;
+    const horizontal=Math.cos(yaw)*x-Math.sin(yaw)*y;
+    const depth=Math.sin(yaw)*x+Math.cos(yaw)*y;
+    return [horizontal,Math.sin(pitch)*depth-Math.cos(pitch)*z,Math.cos(pitch)*depth+Math.sin(pitch)*z];
+  };
+  const vertices=[[0,0,0],[a,0,0],[a,b,0],[0,b,0],[0,0,h],[a,0,h],[a,b,h],[0,b,h]];
+  const points=vertices.map(project),loX=Math.min(...points.map(p=>p[0])),hiX=Math.max(...points.map(p=>p[0])),loY=Math.min(...points.map(p=>p[1])),hiY=Math.max(...points.map(p=>p[1]));
+  const scale=Math.min((W-90)/(hiX-loX),(H-100)/(hiY-loY))*(orientation.zoom??1);
+  const xy=p=>{const [x,y]=project(p);return [(W-(hiX-loX)*scale)/2+(x-loX)*scale,(H-(hiY-loY)*scale)/2+(y-loY)*scale];};
+  const models=boxFaces(p);
+  const frames=Object.fromEntries(Object.values(models).map(f=>{
+    const origin=xy(f.o),u=sub(xy(add(f.o,f.u)),origin),v=sub(xy(add(f.o,f.v)),origin);
+    return [f.id,{origin,u,v,det:cross(u,v)}];
+  }));
+  const unproject=(face,target)=>{
+    const f=frames[face];
+    // Nearly edge-on faces cannot recover both coordinates from a 2D pointer.
+    if(Math.abs(f.det)<scale*scale*.02)return null;
+    const delta=sub(target,f.origin);return [cross(delta,f.v)/f.det,cross(f.u,delta)/f.det];
+  };
+  return {project,xy,scale,vertices,models,frames,unproject};
+}
+function moveOnBox(view,q,face,target){
+  const local=(f,q)=>[dot(sub(q,f.o),f.u),dot(sub(q,f.o),f.v)];
+  const physical=(f,uv)=>add(f.o,add(mul(f.u,clamp(uv[0],0,f.w)),mul(f.v,clamp(uv[1],0,f.h))));
+  const visited=new Set();
+  for(let step=0;step<6;step++){
+    const f=view.models[face],start=local(f,q),end=view.unproject(face,target),limits=[f.w,f.h];
+    if(!end)return {q,face,blocked:'edge-on'};
+    if(end.every((x,i)=>x>=-eps&&x<=limits[i]+eps))return {q:physical(f,end),face,blocked:''};
+    // Follow the projected pointer segment to the FIRST edge it crosses.
+    // Do not ray-pick a front face through the selected transparent back face.
+    const exits=[];
+    for(let i=0;i<2;i++){
+      const bound=end[i]<0?0:end[i]>limits[i]?limits[i]:null;
+      if(bound!==null&&Math.abs(end[i]-start[i])>eps){const t=(bound-start[i])/(end[i]-start[i]);if(t>=-eps&&t<=1+eps)exits.push(clamp(t,0,1));}
+    }
+    if(!exits.length)return {q,face,blocked:'edge'};
+    const t=Math.min(...exits);q=physical(f,add(start,mul(sub(end,start),t)));visited.add(face);
+    // Only an adjacent face reached at this physical edge may take over.
+    const next=containingFaces(q,view.models).filter(id=>!visited.has(id)).find(id=>{
+      const model=view.models[id],uv=local(model,q),dest=view.unproject(id,target);if(!dest)return false;
+      return dest.every((x,i)=>!(uv[i]<=eps&&x<-eps)&&!(uv[i]>=[model.w,model.h][i]-eps&&x>[model.w,model.h][i]+eps));
+    });
+    if(!next)return {q,face,blocked:'edge'};
+    face=next;
+  }
+  return {q,face,blocked:'edge'};
+}
+function drawBoxAxes(view,p){
+  const origin=view.xy([0,0,0]);
+  let out='<g class="axes" aria-label="3D x, y, z axes from the corner (0, 0, 0)"><title>Positive 3D axes from (0, 0, 0); no ticks</title>';
+  for(const [label,point] of [['x',[p.a,0,0]],['y',[0,p.b,0]],['z',[0,0,p.h]]]){
+    const edge=view.xy(point),delta=sub(edge,origin),length=Math.hypot(...delta);
+    out+=`<g data-axis="${label}">`;
+    if(length<1e-8){
+      // A view-aligned axis projects to a point; do not invent a direction.
+      out+=`<text class="axis-label" x="${origin[0]+14}" y="${origin[1]+18}">${label}<title>This axis is aligned with the viewing direction. Rotate the box to see its arrow.</title></text>`;
+    }else{
+      const u=mul(delta,1/length),n=[-u[1],u[0]],tip=add(edge,mul(u,18)),base=sub(tip,mul(u,9)),left=add(base,mul(n,4)),right=sub(base,mul(n,4)),text=add(tip,mul(u,13));
+      out+=`<line class="axis" x1="${origin[0]}" y1="${origin[1]}" x2="${tip[0]}" y2="${tip[1]}"/><polygon fill="#273f57" points="${tip.join(',')} ${left.join(',')} ${right.join(',')}"/><text class="axis-label" text-anchor="middle" x="${text[0]}" y="${text[1]+5}">${label}</text>`;
+    }
+    out+='</g>';
+  }
+  return out+'</g>';
+}
+function drawBox(o,p){
+  boxView=makeBoxView(p);
+  const {project,xy,vertices}=boxView;
+  const faces=[['sideB',[3,2,6,7]],['bottom',[0,1,2,3]],['enda',[1,2,6,5]],['end0',[0,3,7,4]],['top',[4,5,6,7]],['side0',[0,1,5,4]]];
+  // Draw far faces first so transparent faces remain coherent at every angle.
+  const faceDepth=corners=>corners.reduce((sum,i)=>sum+project(vertices[i])[2],0)/corners.length;
+  faces.sort((f,g)=>faceDepth(f[1])-faceDepth(g[1]));
+  let out='';
+  for(const [id,corners] of faces)out+=`<polygon data-face="${id}" points="${corners.map(i=>xy(vertices[i]).join(',')).join(' ')}" fill="${colors[id]}" fill-opacity=".32" stroke="#5a7185" stroke-width="1.3"><title>${faceInfo(id,p)}</title></polygon>`;
+  for(const [id] of faces){
+    const center=xy(boxView.models[id].center);
+    out+=`<text class="face-label" text-anchor="middle" x="${center[0]}" y="${center[1]+4}">${id}</text>`;
+  }
+  out+=drawBoxAxes(boxView,p);
+  const path=o.surfacePoints.map(xy).map(p=>p.join(',')).join(' ');
+  out+=`<polyline class="path" points="${path}"/><polyline class="path-hit" points="${path}" data-info="Surface path : ${fmt(distance(o))} ${unit}"><title>Surface path : ${fmt(distance(o))} ${unit}</title></polyline>`;
+  const s=xy(point3(p,0)),f=xy(point3(p,1));
+  out+=pointMark(...s,'S','Spider S · 3D '+coord(point3(p,0)),'#1769aa','start',0);
+  out+=pointMark(...f,'F','Fly F · 3D '+coord(point3(p,1)),'#16803c','end',1);
+  return out;
+}
+
+function render(){
+  const activeDrag=pointDrag||boxPointDrag;
+  const result=solve(state,activeDrag?activeDrag.preferred:displayedOptimal),o=result.best,d=distance(o),dx=Math.abs(o.f[0]-o.s[0]),dy=Math.abs(o.f[1]-o.s[1]);
+  displayedOptimal=o;
+  document.getElementById('positions').textContent='Spider S = '+coord(point3(state,0))+'; fly F = '+coord(point3(state,1))+'. Both points are on the surface. Heights z₀ and z₁ are measured above the floor.';
+  document.getElementById('distance').textContent='Minimum distance : '+fmtDistance(d)+' '+unit;
+  document.getElementById('routeName').textContent='S → '+o.seq.join(' → ')+' → F';
+  document.getElementById('summary').textContent=(activeDrag?'Dragging : distance and both red paths update live; 2D faces stay fixed. ':'One optimal solution shown. ')+(result.ties.length>1?result.ties.length+' face sequences tie for the minimum. ':'')+result.checked+' candidate sequences checked.';
+  let netRoute=o;
+  if(activeDrag){
+    netRoute=projectRoute(o,{...activeDrag.layout,key:activeDrag.layout.layoutKey},activeDrag.faces);
+  }
+  document.getElementById('net').innerHTML=drawNet(netRoute,state,!!activeDrag);
+  document.getElementById('box3d').innerHTML=drawBox(o,state);
+  document.getElementById('legend').innerHTML=Object.keys(colors).map(id=>`<span data-face="${id}"><i class="swatch" style="background:${colors[id]}"></i>${faceInfo(id,state)}</span>`).join('');
+  const positions=`S : ${coord(point3(state,0))} in 3D → ${coord(netRoute.s)} in 2D<br>F : ${coord(point3(state,1))} in 3D → ${coord(netRoute.f)} in 2D<br>`;
+  document.getElementById('calculation').innerHTML=positions+(activeDrag?`Live minimum surface distance : ${fmt(d)} ${unit}.<br>Release to update the unfolding. Your physical 3D positions will not change.`:o.split?o.segments.map((s,i)=>`L${i+1} (${s.face}) : √(${fmt(Math.abs(s.b[0]-s.a[0]))}² + ${fmt(Math.abs(s.b[1]-s.a[1]))}²) = ${fmt(s.length)} ${unit}`).join('<br>')+`<br>d = ${o.segments.map(s=>fmt(s.length)).join(' + ')} ≈ ${fmt(d)} ${unit}<br>Matching cut marks are identical 3D points. Gaps between them are not part of the distance.`:`Δx = |${fmt(o.f[0])} − (${fmt(o.s[0])})| = ${fmt(dx)} ${unit}<br>Δy = |${fmt(o.f[1])} − (${fmt(o.s[1])})| = ${fmt(dy)} ${unit}<br>d = √(Δx² + Δy²) = √(${fmt(dx)}² + ${fmt(dy)}²) ≈ ${fmt(d)} ${unit}`);
+  document.getElementById('tooltip').style.display='none';
+  document.getElementById('hoverInfo').textContent='Hover a face, S, F, or the red path for details.';
+  refreshFoldDemo();
+}
+const parameterMax=spec=>spec.key.length===2?state[{x:'a',y:'b',z:'h'}[spec.key[0]]]:spec.max;
+function syncControls(){
+  for(const spec of specs){
+    const max=parameterMax(spec);
+    for(const suffix of ['range','number']){
+      const el=document.getElementById(spec.key+'-'+suffix);
+      el.min=inputValue(spec.min);el.max=inputValue(max);
+      el.step=suffix==='range'?inputValue(.1):'any';
+      el.value=inputValue(state[spec.key]);
+      el.setAttribute('aria-label',spec.label+(spec.key.length===2?(spec.key.endsWith('0')?' spider':' fly'):'')+' in '+units[unit].name);
+    }
+    document.getElementById(spec.key+'-min').textContent=fmt(spec.min)+' '+unit;
+    document.getElementById(spec.key+'-max').textContent=fmt(max)+' '+unit;
+  }
+  document.querySelectorAll('[data-length-unit]').forEach(el=>el.textContent=unit);
+  document.getElementById('reset').textContent='Reset to the '+[defaults.a,defaults.b,defaults.h].map(fmt).join(' × ')+' '+unit+' example';
+  for(const i of [0,1])document.getElementById('face-'+i).value=state[faceKey(i)];
+}
+function setPoint(i,q,face){
+  const model=boxFaces(state)[face],limits=[state.a,state.b,state.h];
+  q=q.map((v,k)=>clamp(v,0,limits[k]));q[model.axis]=model.value;
+  ['x','y','z'].forEach((axis,k)=>state[axis+i]=q[k]);state[faceKey(i)]=face;
+}
+function changeParameter(key,value){
+  if(!Number.isFinite(value))return;
+  const spec=specs.find(s=>s.key===key),old=state[key];
+  state[key]=clamp(value,spec.min,parameterMax(spec));
+  let message='Both points remain on the box surface.';
+  if(key.length===1){
+    const axis={a:'x',b:'y',h:'z'}[key];
+    for(const i of [0,1]){state[axis+i]*=state[key]/old;setPoint(i,point3(state,i),state[faceKey(i)]);}
+  }else{
+    const i=Number(key[1]),axis=['x','y','z'].indexOf(key[0]),q=point3(state,i),faces=boxFaces(state),ids=containingFaces(q,faces);
+    let face=ids.includes(state[faceKey(i)])?state[faceKey(i)]:ids[0];
+    if(!face){
+      const nearest=Object.values(faces).filter(f=>f.axis!==axis).sort((a,b)=>Math.abs(q[a.axis]-a.value)-Math.abs(q[b.axis]-b.value))[0];
+      face=nearest.id;
+      message=(i?'Fly F':'Spider S')+' : kept '+key+' = '+fmt(state[key])+' and snapped '+['x','y','z'][nearest.axis]+i+' to '+fmt(nearest.value)+' on '+names[face]+', so the point cannot enter the box.';
+    }
+    setPoint(i,q,face);
+  }
+  document.getElementById('surfaceStatus').textContent=message;
+  syncControls();render();
+}
+const controlHTML=s=>`<div class="control"><label for="${s.key}-range">${s.label}</label><input id="${s.key}-range" type="range" min="${inputValue(s.min)}" max="${inputValue(s.max)}" step="${inputValue(.1)}" value="${inputValue(state[s.key])}"><div class="ends"><span id="${s.key}-min">${fmt(s.min)} ${unit}</span><span id="${s.key}-max">${fmt(s.max)} ${unit}</span></div><input id="${s.key}-number" type="number" min="${inputValue(s.min)}" max="${inputValue(s.max)}" step="any" value="${inputValue(state[s.key])}"> <span data-length-unit>${unit}</span></div>`;
+document.getElementById('controls').innerHTML=specs.filter(s=>s.key.length===1).map(controlHTML).join('');
+document.getElementById('pointControls').innerHTML=[0,1].map(i=>`<div class="point-panel"><h3>${i?'Fly F — (x₁, y₁, z₁)':'Spider S — (x₀, y₀, z₀)'}</h3><label for="face-${i}">Surface face : </label><select id="face-${i}">${faceOrder.map(id=>`<option value="${id}">${names[id]}</option>`).join('')}</select><div class="controls">${specs.filter(s=>s.key.length===2&&s.key.endsWith(i)).map(controlHTML).join('')}</div></div>`).join('');
+for(const i of [0,1])document.getElementById('face-'+i).addEventListener('change',e=>{
+  setPoint(i,point3(state,i),e.target.value);document.getElementById('surfaceStatus').textContent=(i?'Fly F':'Spider S')+' moved to '+names[e.target.value]+'.';syncControls();render();
+});
+for(const s of specs){
+  document.getElementById(s.key+'-range').addEventListener('input',e=>changeParameter(s.key,fromUnit(e.target.valueAsNumber)));
+  document.getElementById(s.key+'-number').addEventListener('change',e=>{changeParameter(s.key,fromUnit(e.target.valueAsNumber));syncControls();});
+}
+document.getElementById('length-unit').addEventListener('change',e=>{
+  unit=e.target.value;
+  document.getElementById('surfaceStatus').textContent='';
+  syncControls();render();renderFoldFrame();
+});
+document.getElementById('reset').addEventListener('click',()=>{Object.assign(state,defaults);displayedOptimal=null;document.getElementById('surfaceStatus').textContent='Default positions restored; both points are on opposite end walls.';syncControls();render();});
+const solution=document.getElementById('solution'),tooltip=document.getElementById('tooltip');
+function clearHover(){solution.querySelectorAll('.highlight').forEach(e=>e.classList.remove('highlight'));tooltip.style.display='none';}
+const net=document.getElementById('net');
+for(const [toggleId,viewId,className] of [['hide-box-face-labels','box3d','hide-face-labels'],['hide-box-face-labels','net','hide-labels'],['hide-fold-face-labels','fold-animation','hide-face-labels']]){
+  const toggle=document.getElementById(toggleId),view=document.getElementById(viewId);
+  const syncLabels=()=>view.classList.toggle(className,toggle.checked);
+  toggle.addEventListener('change',syncLabels);
+  syncLabels();
+}
+function freezeDragLayout(){
+  // Live text must not push either diagram away from the pointer.
+  const panels=[...document.querySelectorAll('.result,#positions,#surfaceStatus,#calculation,#hoverInfo')].map(el=>({el,style:el.getAttribute('style'),height:el.getBoundingClientRect().height}));
+  for(const {el,height} of panels){el.style.height=height+'px';el.style.overflow='auto';}
+  const controls=[...document.querySelectorAll('#controls input,#pointControls input,#pointControls select,.camera-controls input,.camera-controls button,#reset,#length-unit')].map(el=>({el,disabled:el.disabled}));
+  for(const {el} of controls)el.disabled=true;
+  return {panels,controls};
+}
+function restoreDragLayout(frozen){
+  for(const {el,style} of frozen.panels){if(style===null)el.removeAttribute('style');else el.setAttribute('style',style);}
+  for(const {el,disabled} of frozen.controls)el.disabled=disabled;
+}
+function placementStatus(){document.getElementById('surfaceStatus').textContent='Placement saved : S = '+coord(point3(state,0))+'; F = '+coord(point3(state,1))+'. Refolding preserves these 3D positions.';}
+function planePoint(e,layout){
+  const q=new DOMPoint(e.clientX,e.clientY).matrixTransform(net.getScreenCTM().inverse());
+  return [layout.minX+(q.x-layout.left)/layout.scale,layout.minY+(layout.H-layout.top-q.y)/layout.scale];
+}
+function moveOnNet(i,q,layout,previousFace){
+  const containing=layout.parts.filter(f=>inside(q,f));
+  const part=containing.find(f=>f.face===previousFace)||containing[0]||layout.parts.find(f=>f.face===previousFace);
+  const clipped=[clamp(q[0],part.x0,part.x1),clamp(q[1],part.y0,part.y1)];
+  setPoint(i,to3(part,clipped),part.face);return part.face;
+}
+net.addEventListener('pointerdown',e=>{
+  const handle=e.target.closest('[data-point]');if(!handle||e.button!==0||pointDrag||boxPointDrag||rotationDrag)return;
+  e.preventDefault();handle.focus({preventScroll:true});clearHover();
+  const i=Number(handle.dataset.point),q=i?displayedOptimal.f:displayedOptimal.s;
+  const frozen=freezeDragLayout();
+  pointDrag={id:e.pointerId,i,layout:netLayout,preferred:displayedOptimal,frozen,faces:[displayedOptimal.seq[0],displayedOptimal.seq.at(-1)],offset:sub(q,planePoint(e,netLayout))};
+  net.setPointerCapture(e.pointerId);net.classList.add('dragging');render();
+});
+net.addEventListener('pointermove',e=>{
+  if(!pointDrag||pointDrag.id!==e.pointerId)return;
+  const {i,layout,offset}=pointDrag,q=add(planePoint(e,layout),offset);
+  pointDrag.faces[i]=moveOnNet(i,q,layout,pointDrag.faces[i]);
+  document.getElementById('surfaceStatus').textContent=(i?'Fly F':'Spider S')+' = '+coord(point3(state,i))+' on '+names[pointDrag.faces[i]]+'.';
+  syncControls();render();
+});
+function endPointDrag(e){
+  if(!pointDrag||pointDrag.id!==e.pointerId)return;
+  const i=pointDrag.i;
+  restoreDragLayout(pointDrag.frozen);
+  pointDrag=null;net.classList.remove('dragging');
+  if(net.hasPointerCapture(e.pointerId))net.releasePointerCapture(e.pointerId);
+  placementStatus();
+  render();net.querySelector('[data-point="'+i+'"]').focus({preventScroll:true});
+}
+net.addEventListener('pointerup',endPointDrag);net.addEventListener('pointercancel',endPointDrag);net.addEventListener('lostpointercapture',endPointDrag);
+net.addEventListener('keydown',e=>{
+  const handle=e.target.closest('[data-point]'),direction={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,1],ArrowDown:[0,-1]}[e.key];
+  if(!handle||!direction||pointDrag||boxPointDrag||rotationDrag)return;e.preventDefault();
+  const i=Number(handle.dataset.point),q=i?displayedOptimal.f:displayedOptimal.s,face=i?displayedOptimal.seq.at(-1):displayedOptimal.seq[0];
+  moveOnNet(i,add(q,mul(direction,e.shiftKey?1:.1)),netLayout,face);syncControls();render();
+  document.getElementById('surfaceStatus').textContent='Placement saved : S = '+coord(point3(state,0))+'; F = '+coord(point3(state,1))+'. Refolding preserves these 3D positions.';
+  net.querySelector('[data-point="'+i+'"]').focus({preventScroll:true});
+});
+function setCamera(yaw,pitch,zoom=camera.zoom){
+  if(pointDrag||boxPointDrag)return;
+  camera.yaw=((yaw+180)%360+360)%360-180;
+  camera.pitch=Math.max(-85,Math.min(85,pitch));
+  camera.zoom=clamp(zoom,.25,3);
+  document.getElementById('camera-yaw').value=camera.yaw;
+  document.getElementById('camera-pitch').value=camera.pitch;
+  document.getElementById('yaw-value').textContent=Math.round(camera.yaw)+'°';
+  document.getElementById('pitch-value').textContent=Math.round(camera.pitch)+'°';
+  document.getElementById('camera-zoom').value=Math.round(camera.zoom*100);
+  document.getElementById('zoom-value').textContent=Math.round(camera.zoom*100)+'%';
+  clearHover();
+  if(displayedOptimal)document.getElementById('box3d').innerHTML=drawBox(displayedOptimal,state);
+}
+document.getElementById('camera-yaw').addEventListener('input',e=>setCamera(e.target.valueAsNumber,camera.pitch));
+document.getElementById('camera-pitch').addEventListener('input',e=>setCamera(camera.yaw,e.target.valueAsNumber));
+document.getElementById('camera-zoom').addEventListener('input',e=>setCamera(camera.yaw,camera.pitch,e.target.valueAsNumber/100));
+document.getElementById('reset-view').addEventListener('click',()=>setCamera(cameraDefault.yaw,cameraDefault.pitch,cameraDefault.zoom));
+const box=document.getElementById('box3d');
+box.addEventListener('wheel',e=>{
+  e.preventDefault();if(pointDrag||boxPointDrag)return;
+  const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?box.clientHeight:1);
+  setCamera(camera.yaw,camera.pitch,camera.zoom*Math.exp(clamp(-delta*.0015,-1,1)));
+},{passive:false});
+function boxPointer(e){const q=new DOMPoint(e.clientX,e.clientY).matrixTransform(box.getScreenCTM().inverse());return [q.x,q.y];}
+function boxMoveStatus(i,result){
+  document.getElementById('surfaceStatus').textContent=(i?'Fly F':'Spider S')+' = '+coord(point3(state,i))+' on '+names[result.face]+'.'+(result.blocked==='edge-on'?' This face is edge-on : rotate the box or use the 2D unfolding.':result.blocked?' Stopped at the outline; rotate the box to reach the next side.':'');
+}
+box.addEventListener('pointerdown',e=>{
+  if(e.button!==0||rotationDrag||pointDrag||boxPointDrag)return;
+  e.preventDefault();clearHover();
+  const handle=e.target.closest('[data-point]');
+  if(handle){
+    handle.focus({preventScroll:true});
+    const i=Number(handle.dataset.point),frozen=freezeDragLayout();
+    boxPointDrag={id:e.pointerId,i,face:state[faceKey(i)],view:boxView,layout:netLayout,preferred:displayedOptimal,frozen,faces:[displayedOptimal.seq[0],displayedOptimal.seq.at(-1)],offset:sub(boxView.xy(point3(state,i)),boxPointer(e))};
+    box.setPointerCapture(e.pointerId);box.classList.add('dragging');render();return;
+  }
+  box.focus({preventScroll:true});
+  rotationDrag={id:e.pointerId,x:e.clientX,y:e.clientY,yaw:camera.yaw,pitch:camera.pitch};
+  box.setPointerCapture(e.pointerId);box.classList.add('dragging');clearHover();
+});
+box.addEventListener('pointermove',e=>{
+  if(boxPointDrag&&boxPointDrag.id===e.pointerId){
+    const {i,face,view,offset}=boxPointDrag;
+    const moved=moveOnBox(view,point3(state,i),face,add(boxPointer(e),offset));
+    setPoint(i,moved.q,moved.face);boxPointDrag.face=moved.face;boxPointDrag.faces[i]=moved.face;
+    syncControls();render();boxMoveStatus(i,moved);return;
+  }
+  if(!rotationDrag||rotationDrag.id!==e.pointerId)return;
+  setCamera(rotationDrag.yaw+(e.clientX-rotationDrag.x)*.5,rotationDrag.pitch-(e.clientY-rotationDrag.y)*.5);
+});
+function endBoxPointDrag(e){
+  if(!boxPointDrag||boxPointDrag.id!==e.pointerId)return;
+  const {i,frozen}=boxPointDrag;restoreDragLayout(frozen);boxPointDrag=null;box.classList.remove('dragging');
+  if(box.hasPointerCapture(e.pointerId))box.releasePointerCapture(e.pointerId);
+  placementStatus();render();box.querySelector('[data-point="'+i+'"]').focus({preventScroll:true});
+}
+box.addEventListener('pointerup',endBoxPointDrag);box.addEventListener('pointercancel',endBoxPointDrag);box.addEventListener('lostpointercapture',endBoxPointDrag);
+function endRotation(e){
+  if(!rotationDrag||rotationDrag.id!==e.pointerId)return;
+  rotationDrag=null;box.classList.remove('dragging');
+  if(box.hasPointerCapture(e.pointerId))box.releasePointerCapture(e.pointerId);
+}
+box.addEventListener('pointerup',endRotation);box.addEventListener('pointercancel',endRotation);box.addEventListener('lostpointercapture',endRotation);
+box.addEventListener('keydown',e=>{
+  if(pointDrag||boxPointDrag||rotationDrag)return;
+  if(!e.target.closest('[data-point]')&&['+','=','-','_','Home'].includes(e.key)){
+    e.preventDefault();
+    if(e.key==='Home')setCamera(cameraDefault.yaw,cameraDefault.pitch,cameraDefault.zoom);
+    else setCamera(camera.yaw,camera.pitch,camera.zoom*(['+','='].includes(e.key)?1.1:1/1.1));
+    return;
+  }
+  const delta={ArrowLeft:[-5,0],ArrowRight:[5,0],ArrowUp:[0,5],ArrowDown:[0,-5]}[e.key];
+  if(!delta)return;e.preventDefault();
+  const handle=e.target.closest('[data-point]');
+  if(handle){
+    const i=Number(handle.dataset.point),step=boxView.scale*(e.shiftKey?1:.1)/5;
+    const moved=moveOnBox(boxView,point3(state,i),state[faceKey(i)],add(boxView.xy(point3(state,i)),[delta[0]*step,-delta[1]*step]));
+    setPoint(i,moved.q,moved.face);syncControls();render();boxMoveStatus(i,moved);box.querySelector('[data-point="'+i+'"]').focus({preventScroll:true});return;
+  }
+  setCamera(camera.yaw+delta[0],camera.pitch+delta[1]);
+});
+solution.addEventListener('pointerover',e=>{
+  if(rotationDrag||pointDrag||boxPointDrag)return;
+  const item=e.target.closest('[data-face],[data-info]');if(!item)return;clearHover();
+  const id=item.dataset.face,info=id?faceInfo(id,state):item.dataset.info;
+  if(id)solution.querySelectorAll('[data-face]').forEach(x=>x.classList.toggle('highlight',x.dataset.face===id));
+  tooltip.textContent=info;tooltip.style.display='block';document.getElementById('hoverInfo').textContent=info;
+});
+solution.addEventListener('pointermove',e=>{tooltip.style.left=Math.max(8,Math.min(e.clientX+14,window.innerWidth-tooltip.offsetWidth-10))+'px';tooltip.style.top=Math.max(8,Math.min(e.clientY+14,window.innerHeight-tooltip.offsetHeight-10))+'px';});
+solution.addEventListener('pointerout',e=>{if(e.target.closest('[data-face],[data-info]'))clearHover();});
+solution.addEventListener('focusin',e=>{if(e.target.dataset.info)document.getElementById('hoverInfo').textContent=e.target.dataset.info;});
+
+function stopFoldPlayback(){
+  if(foldDemo.frame!==null)cancelAnimationFrame(foldDemo.frame);
+  foldDemo.frame=null;foldDemo.running=false;
+}
+function selectedFoldLayout(){
+  const cycle=['top','sideB','bottom','side0'],start=cycle.indexOf(document.getElementById('fold-root').value);
+  const order=cycle.map((_,i)=>cycle[(start+i)%4]);
+  const left=order.indexOf(document.getElementById('fold-left').value),right=order.indexOf(document.getElementById('fold-right').value);
+  return stripLayouts(state).find(l=>l.key===[start,left,right].join(':'));
+}
+function selectedNetRoute(rig,p){
+  const layout=rig.layout,adj=Object.fromEntries(layout.parts.map(part=>[part.face,[]]));
+  for(const node of Object.values(rig.nodes)){adj[node.face].push(node.parent);adj[node.parent].push(node.face);}
+  function chain(face,previous){
+    if(face===p.fFace)return [face];
+    for(const next of adj[face])if(next!==previous){const tail=chain(next,face);if(tail)return [face,...tail];}
+    return null;
+  }
+  // The hinge graph is a tree. Any detour off this unique face chain can
+  // be shortened along its entry hinge, so it cannot improve the net route.
+  const parts=chain(p.sFace,null).map(face=>layout.parts.find(part=>part.face===face));
+  const hinges=parts.slice(1).map((part,i)=>sharedEdge(parts[i].model,part.model).map(q=>to2(parts[i],q)));
+  const S=point3(p,0),F=point3(p,1),direct=routeCandidate(parts,hinges,S,F);
+  let route=direct;
+  if(!route){
+    // A shortest polygonal path bends only at boundary vertices. All possible
+    // bends here are hinge endpoints. Connect visible vertices in face order;
+    // each edge must cross every intervening hinge and stay inside its faces.
+    const nodes=[{layer:0,q:S,cost:0,previous:null}];
+    hinges.forEach((edge,i)=>edge.forEach(q=>nodes.push({layer:i+1,q:to3(parts[i],q),cost:Infinity})));
+    nodes.push({layer:parts.length,q:F,cost:Infinity});
+    for(let j=1;j<nodes.length;j++)for(let i=0;i<j;i++){
+      const a=nodes[i],b=nodes[j];if(a.layer>=b.layer||!Number.isFinite(a.cost))continue;
+      const segment=routeCandidate(parts.slice(a.layer,b.layer),hinges.slice(a.layer,b.layer-1),a.q,b.q);
+      if(segment&&a.cost+segment.length<b.cost){b.cost=a.cost+segment.length;b.previous=i;b.segment=segment;}
+    }
+    const last=nodes.at(-1);if(!Number.isFinite(last.cost))throw Error('No connected route in the selected net.');
+    const pieces=[];let index=nodes.length-1;
+    while(index!==0){pieces.unshift(nodes[index].segment);index=nodes[index].previous;}
+    route={seq:pieces.flatMap(piece=>piece.seq),surfacePoints:[S,...pieces.flatMap(piece=>piece.surfacePoints.slice(1))],length:last.cost,valid:true};
+  }
+  return {...projectRoute(route,layout),straight:!!direct,directLength:Math.hypot(...sub(to2(parts.at(-1),F),to2(parts[0],S)))};
+}
+function refreshFoldDemo(force=false,preserveProgress=false){
+  if(!displayedOptimal)return;
+  const layout=selectedFoldLayout(),parameters={...state};
+  const key=JSON.stringify([parameters,layout.key,displayedOptimal.seq]);
+  if(!force&&key===foldDemo.contentKey)return;
+  const resume=preserveProgress&&foldDemo.running;
+  stopFoldPlayback();foldDemo.contentKey=key;foldDemo.parameters=parameters;
+  if(!preserveProgress){foldDemo.progress=0;foldDemo.target=1;}
+  const rigKey=[state.a,state.b,state.h,layout.key].join(':');
+  if(rigKey!==foldDemo.rigKey){foldDemo.rig=makeFoldRig(parameters,layout);foldDemo.rigKey=rigKey;}
+  foldDemo.route=selectedNetRoute(foldDemo.rig,parameters);
+  document.getElementById('fold-method').textContent='Middle : '+layout.parts.slice(0,4).map(p=>p.face).join(' → ')+' · end0 ↔ '+layout.parts[layout.left].face+' · enda ↔ '+layout.parts[layout.right].face;
+  renderFoldFrame();
+  if(resume)playFold(foldDemo.target);
+}
+function renderFoldFrame(){
+  if(!foldDemo.rig)return;
+  const p=foldDemo.progress;
+  document.getElementById('fold-animation').innerHTML=drawFoldAnimation(foldDemo.rig,foldDemo.route,foldDemo.parameters,p,foldDemo.view,distance(displayedOptimal));
+  document.getElementById('fold-progress').value=Math.round(p*1000);
+  document.getElementById('fold-percent').textContent=Math.round(p*100)+'%';
+  document.getElementById('fold-unfold').disabled=p>=1;
+  document.getElementById('fold-back').disabled=p<=0;
+  document.getElementById('fold-pause').disabled=!foldDemo.running&&(p<=0||p>=1);
+  document.getElementById('fold-pause').textContent=foldDemo.running?'Pause':'Resume';
+}
+function playFold(target,replay=false){
+  if(!foldDemo.rig)return;stopFoldPlayback();
+  if(replay)foldDemo.progress=0;
+  foldDemo.target=target;
+  const from=foldDemo.progress,duration=1000*Number(document.getElementById('fold-speed').value)*Math.abs(target-from);
+  if(duration<1||window.matchMedia('(prefers-reduced-motion: reduce)').matches){foldDemo.progress=target;renderFoldFrame();return;}
+  foldDemo.running=true;const started=performance.now();
+  function tick(now){
+    const amount=clamp((now-started)/duration,0,1);foldDemo.progress=from+(target-from)*amount;
+    if(amount>=1){foldDemo.running=false;foldDemo.frame=null;}else foldDemo.frame=requestAnimationFrame(tick);
+    renderFoldFrame();
+  }
+  renderFoldFrame();foldDemo.frame=requestAnimationFrame(tick);
+}
+function setFoldView(yaw,pitch,zoom){
+  foldDemo.view={yaw:((yaw+180)%360+360)%360-180,pitch:clamp(pitch,-85,85),zoom:clamp(zoom,.25,3)};
+  for(const key of ['yaw','pitch','zoom']){
+    const value=foldDemo.view[key]*(key==='zoom'?100:1);
+    document.getElementById('fold-'+key).value=Math.round(value);
+    document.getElementById('fold-'+key+'-value').textContent=Math.round(value)+(key==='zoom'?'%':'°');
+  }
+  renderFoldFrame();
+}
+function initializeFoldView(){
+  const svg=document.getElementById('fold-animation');
+  for(const key of ['yaw','pitch','zoom'])document.getElementById('fold-'+key).addEventListener('input',e=>{
+    const view={...foldDemo.view,[key]:e.target.valueAsNumber/(key==='zoom'?100:1)};
+    setFoldView(view.yaw,view.pitch,view.zoom);
+  });
+  document.getElementById('fold-reset-view').addEventListener('click',()=>setFoldView(0,0,1));
+  svg.addEventListener('pointerdown',e=>{
+    if(e.button!==0||foldDemo.drag)return;
+    e.preventDefault();svg.focus({preventScroll:true});
+    foldDemo.drag={id:e.pointerId,x:e.clientX,y:e.clientY,yaw:foldDemo.view.yaw,pitch:foldDemo.view.pitch};
+    svg.setPointerCapture(e.pointerId);svg.classList.add('dragging');
+  });
+  svg.addEventListener('pointermove',e=>{
+    const drag=foldDemo.drag;if(!drag||drag.id!==e.pointerId)return;
+    setFoldView(drag.yaw+(e.clientX-drag.x)*.5,drag.pitch-(e.clientY-drag.y)*.5,foldDemo.view.zoom);
+  });
+  const endDrag=e=>{
+    if(!foldDemo.drag||foldDemo.drag.id!==e.pointerId)return;
+    foldDemo.drag=null;svg.classList.remove('dragging');
+    if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);
+  };
+  for(const type of ['pointerup','pointercancel','lostpointercapture'])svg.addEventListener(type,endDrag);
+  svg.addEventListener('wheel',e=>{
+    e.preventDefault();const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?svg.clientHeight:1);
+    setFoldView(foldDemo.view.yaw,foldDemo.view.pitch,foldDemo.view.zoom*Math.exp(clamp(-delta*.0015,-1,1)));
+  },{passive:false});
+  svg.addEventListener('keydown',e=>{
+    const view=foldDemo.view,delta={ArrowLeft:[-5,0],ArrowRight:[5,0],ArrowUp:[0,5],ArrowDown:[0,-5]}[e.key];
+    if(delta){e.preventDefault();setFoldView(view.yaw+delta[0],view.pitch+delta[1],view.zoom);}
+    else if(['+','=','-','_','Home'].includes(e.key)){
+      e.preventDefault();if(e.key==='Home')setFoldView(0,0,1);
+      else setFoldView(view.yaw,view.pitch,view.zoom*(['+','='].includes(e.key)?1.1:1/1.1));
+    }
+  });
+}
+function initializeFoldDemo(){
+  initializeFoldView();
+  const options=faceOrder.filter(face=>!face.startsWith('end'));
+  for(const id of ['fold-root','fold-left','fold-right']){
+    const select=document.getElementById(id);select.innerHTML=options.map(face=>`<option value="${face}">${names[face]}</option>`).join('');
+    select.addEventListener('change',()=>refreshFoldDemo(true,true));
+  }
+  document.getElementById('fold-root').value='top';
+  document.getElementById('fold-left').value='top';
+  document.getElementById('fold-right').value='bottom';
+  document.getElementById('fold-use-current').addEventListener('click',()=>{
+    const layout=stripLayouts(state).find(l=>l.key===displayedOptimal.layoutKey);
+    document.getElementById('fold-root').value=layout.parts[0].face;
+    document.getElementById('fold-left').value=layout.parts[layout.left].face;
+    document.getElementById('fold-right').value=layout.parts[layout.right].face;
+    refreshFoldDemo(true,true);
+  });
+  document.getElementById('fold-unfold').addEventListener('click',()=>playFold(1));
+  document.getElementById('fold-back').addEventListener('click',()=>playFold(0));
+  document.getElementById('fold-replay').addEventListener('click',()=>playFold(1,true));
+  document.getElementById('fold-pause').addEventListener('click',()=>{if(foldDemo.running){stopFoldPlayback();renderFoldFrame();}else playFold(foldDemo.target);});
+  document.getElementById('fold-progress').addEventListener('input',e=>{stopFoldPlayback();foldDemo.progress=e.target.valueAsNumber/1000;renderFoldFrame();});
+  document.getElementById('fold-speed').addEventListener('change',()=>{if(foldDemo.running)playFold(foldDemo.target);});
+}
+initializeFoldDemo();syncControls();render();
+</script>
+</body>
+</html>
