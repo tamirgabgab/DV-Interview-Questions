@@ -167,3 +167,40 @@ def test_explorer_matches_python():
     times = node_json(f"const m = {explorer_require()};"
                       "console.log(JSON.stringify([m.motorcycleTime(13, 1), m.motorcycleTime(24, 6)]));")
     assert abs(times[0] - 2.5) < 1e-12 and abs(times[1] - 78 / 7) < 1e-12
+
+
+def test_explorer_motion_matches_python():
+    """The animated strategies of the explorer: the phase times and the positions of the
+    motorcycle, the passenger and the walker, against the plan and the strategy formulas."""
+    from page_tests import explorer_require, node_json
+
+    alphas = [1.5, 2, 4, 13, 30]
+    got = node_json(f"const m = {explorer_require()}; const out = [];"
+                    f"for (const a of {alphas}) for (const s of ['wait', 'meanwhile', 'optimal']) {{"
+                    "  const ph = m.motorcyclePhases(s, a); const ts = [];"
+                    "  for (let i = 0; i <= 200; i++) ts.push(ph.T * i / 200);"
+                    "  out.push({ a, s, ph, pos: ts.map((t) => [t, ...m.motorcyclePositions(s, a, t)]), at2: m.motorcyclePositions(s, a, ph.t2) }); }"
+                    "console.log(JSON.stringify(out));")
+    for r in got:
+        a = Fr(r["a"]).limit_denominator(100)
+        T = {"wait": q0026.t_wait(a), "meanwhile": q0026.t_walk_meanwhile(a), "optimal": q0026.t_optimal(a)}[r["s"]]
+        assert abs(r["ph"]["T"] - float(T)) < 1e-12, r["s"]
+        if r["s"] == "optimal":
+            pl = q0026.plan(a)
+            assert abs(r["ph"]["t1"] - float(pl["t1"])) < 1e-12 and abs(r["ph"]["t2"] - float(pl["t2"])) < 1e-12
+        pos = r["pos"]
+        assert pos[0][1:] == [0, 0, 0] and all(abs(v - 1) < 1e-9 for v in pos[-1][1:])   # all at A, then all at B
+        for (t, b0, p0, w0), (u, b1, p1, w1) in zip(pos, pos[1:]):
+            dt = u - t
+            for v0, v1, who in ((b0, b1, "bike"), (p0, p1, "pass"), (w0, w1, "walk")):
+                assert -1e-9 <= v0 <= 1 + 1e-9
+                speed = (v1 - v0) / dt
+                # a speed is 0 (waiting), 1 / alpha (walking) or +-1 (riding), or a knot between two
+                legal = any(abs(speed - s) < 1e-6 for s in (0, 1 / float(a), 1, -1))
+                knot = any(t < k < u + 1e-12 for k in (r["ph"]["t1"], r["ph"]["t2"]))
+                assert legal or knot, (r["s"], r["a"], who, t, speed)
+            # a rider is on the motorcycle whenever he moves at the motorcycle's speed
+            if abs((p1 - p0) / dt - 1) < 1e-6: assert abs(p0 - b0) < 1e-9 or any(t < k < u + 1e-12 for k in (r["ph"]["t1"], r["ph"]["t2"]))
+        # the walker is picked up exactly where the motorcycle meets him
+        b, _, w = r["at2"]
+        assert abs(b - w) < 1e-9

@@ -1,7 +1,7 @@
 // Interactive explorers: a box `<div class="explorer" data-kind="..." data-...>` gets
 // sliders, a summary line and charts that redraw on every change. One model per kind:
 //   cake-arith / cake-geo  0027, 0028  sliders a and d (or q): shares and fractions vs T
-//   motorcycle             0026        sliders t0 and t1: the position-time chart
+//   motorcycle             0026        sliders t0 and t1, a strategy, and play: the travellers on the road and the chart
 //   josephus               0016, 0022  sliders N (and L): the survivor of every circle size
 //   clock                  0029        a clock face to drag, play or type: meetings of the hands so far
 //   strip                  0030        drag the spider and the fly on their walls: the periodic strip and the path
@@ -49,6 +49,37 @@
     return { x, y, z, r: y, Q, C, D, E, t1, t2, T };
   };
   const motorcycleTime = (t0, t1) => (3 * t0 + t1) / (t0 + 3 * t1) * t1;
+  // The three strategies as motion: positions on the road (0 is A, 1 is B) at time t, in
+  // units of AB = 1 and t1 = 1 (the walker moves at 1 / alpha). "wait": the walker waits at
+  // A; "meanwhile": he walks and the returning motorcycle meets him; "optimal": the plan.
+  const motorcyclePhases = (strategy, alpha) => {
+    if (strategy === "wait") return { t1: 1, t2: 2, T: 3 };
+    if (strategy === "meanwhile") {
+      const tm = (2 * alpha) / (alpha + 1);
+      return { t1: 1, t2: tm, T: (3 * alpha - 1) / (alpha + 1) };
+    }
+    const pl = motorcyclePlan(alpha);
+    return { t1: pl.t1, t2: pl.t2, T: pl.T };
+  };
+  // [motorcycle, passenger, walker] positions at time t.
+  const motorcyclePositions = (strategy, alpha, t) => {
+    const ph = motorcyclePhases(strategy, alpha);
+    t = Math.min(Math.max(t, 0), ph.T);
+    if (strategy === "wait") {
+      const bike = t <= 1 ? t : t <= 2 ? 2 - t : t - 2;
+      return [bike, Math.min(t, 1), t <= 2 ? 0 : t - 2];
+    }
+    if (strategy === "meanwhile") {
+      const m = 2 / (alpha + 1);
+      const bike = t <= 1 ? t : t <= ph.t2 ? 2 - t : m + (t - ph.t2);
+      return [bike, Math.min(t, 1), t <= ph.t2 ? t / alpha : m + (t - ph.t2)];
+    }
+    const pl = motorcyclePlan(alpha);
+    const bike = t <= pl.t1 ? t : t <= pl.t2 ? pl.D - (t - pl.t1) : pl.C + (t - pl.t2);
+    const pass = t <= pl.t1 ? t : Math.min(pl.D + (t - pl.t1) / alpha, 1);
+    const walk = t <= pl.t2 ? t / alpha : pl.C + (t - pl.t2);
+    return [bike, pass, walk];
+  };
 
   // Josephus (0016, 0022): person 0 stays, the next L - 1 leave, and so on around.
   const josephusRun = (n, L) => {
@@ -208,7 +239,7 @@
 
   const models = {
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
-    motorcyclePlan, motorcycleTime, josephusRun, josephusZero, josephusFormula,
+    motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, josephusRun, josephusZero, josephusFormula,
     clockCounts, clockMeetsIn, clockNext, clockPrev, clockLabel,
     stripImages, stripEdgePoint, stripPoint3, stripFacesBetween, stripLines, stripBest,
   };
@@ -297,45 +328,143 @@
     },
   });
 
+  // The motorcycle box (0026): sliders for the walk and ride times, a strategy to compare,
+  // and a play button that moves the three travellers along the road while the
+  // position-time chart draws itself; a scrubber sets the time by hand.
   const motorcycleView = () => ({
-    sliders: [
-      { key: "t0", label: "הליכה של כל הדרך t0 (שעות)", min: 2, max: 30, step: 1 },
-      { key: "t1", label: "נסיעה של כל הדרך t1 (שעות)", min: 0.5, max: 3, step: 0.5 },
-    ],
-    draw(st) {
-      const alpha = st.t0 / st.t1;
-      if (alpha <= 1 + EPS) {
-        return { summary: `יחס המהירויות ${ltr(`α = ${f(alpha, 2)}`)}: האופנוע לא מהיר מההליכה, ולכן כולם פשוט הולכים, ${fmt(st.t0, 2)} שעות.`, charts: [] };
-      }
-      const pl = motorcyclePlan(alpha);
-      const T = pl.T * st.t1;
-      const naive = 3 * st.t1, meanwhile = (3 * alpha - 1) / (alpha + 1) * st.t1;
-      const summary = `יחס המהירויות ${ltr(`α = ${f(alpha, 2)}`)}. שלושתם מגיעים אחרי ${fmt(T, 2)} שעות ` +
-        `(להסיע אחד ולחזור: ${fmt(naive, 2)}, ההולך יוצא בינתיים: ${fmt(meanwhile, 2)}, רק ברגל: ${fmt(st.t0, 2)}). ` +
-        `הנוסע יורד אחרי ${fmt(pl.D, 3)} מהדרך, וכל אחד מהשניים הולך ${fmt(pl.y + pl.x, 3)} ממנה.`;
-      const w = 640, h = 280, x0 = 52, right = 24, top = 30, base = 246;
-      const X = (t) => x0 + (t / pl.T) * (w - x0 - right);
-      const Y = (v) => base - v * (base - top);
-      let s = `<svg class="perf-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="המקום של האופנוע ושל שני ההולכים לאורך הזמן">`;
-      [[0, "0"], [pl.C, fmt(pl.C, 3)], [pl.D, fmt(pl.D, 3)], [1, "1"]].forEach(([v, lab]) => {
-        s += `<line class="grid" x1="${x0}" x2="${w - right}" y1="${f(Y(v))}" y2="${f(Y(v))}"/>` +
-             `<text class="tick" x="${x0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${lab}</text>`;
+    mount(box) {
+      const defaults = { t0: Number(box.dataset.t0 || 13), t1: Number(box.dataset.t1 || 1) };
+      const st = { ...defaults, strategy: "optimal", t: 0 };
+      const NAMES = { wait: "השני מחכה ב-A", meanwhile: "השני הולך בינתיים", optimal: "הנוסע יורד בדרך" };
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label><span>הליכה של כל הדרך t0 (שעות)</span><input type="range" class="ex-t0" min="2" max="30" step="1" value="${st.t0}" dir="ltr"><output class="out-t0"></output></label>` +
+        `<label><span>נסיעה של כל הדרך t1 (שעות)</span><input type="range" class="ex-t1" min="0.5" max="3" step="0.5" value="${st.t1}" dir="ltr"><output class="out-t1"></output></label>` +
+        `<label>התוכנית <select class="ex-strategy">` + Object.entries(NAMES).map(([k, n]) => `<option value="${k}"${k === "optimal" ? " selected" : ""}>${n}</option>`).join("") + `</select></label>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<button type="button" class="md-button md-button--primary ex-play">הפעלה</button>` +
+        `<label>הקצב <select class="ex-speed"><option value="0.25">רבע שעה בשנייה</option><option value="0.5" selected>חצי שעה בשנייה</option><option value="1">שעה בשנייה</option><option value="2">שעתיים בשנייה</option></select></label>` +
+        `<label class="ex-scrub"><span>הזמן</span><input type="range" class="ex-t" min="0" max="1" step="0.001" value="0" dir="ltr"><output class="out-t" dir="ltr"></output></label></div>` +
+        `<div class="road-box"></div>` +
+        `<p class="ex-summary" aria-live="polite"></p>` +
+        `<p class="ex-title">המקום על הדרך (0 הוא A ו-1 הוא B) מול הזמן בשעות</p><div class="road-chart"></div>` +
+        `<span class="viz-legend"><span><i class="ink" style="opacity:0.4"></i>האופנוע</span><span><i class="s1"></i>הנוסע</span><span><i class="s2"></i>ההולך</span></span>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play"), speed = $(".ex-speed"), scrub = $(".ex-t"), summary = $(".ex-summary");
+      const road = $(".road-box"), chart = $(".road-chart"), strategy = $(".ex-strategy");
+      let running = false, last = 0;
+      const alpha = () => st.t0 / st.t1;
+      const phases = () => motorcyclePhases(st.strategy, alpha());
+
+      const roadSvg = (pos, ph) => {
+        const w = 640, h = 96, x0 = 36, x1 = 604, yr = 58;
+        const X = (v) => x0 + v * (x1 - x0);
+        let s = `<svg class="figure road-live" viewBox="0 0 ${w} ${h}" role="img" aria-label="הדרך מ-A ל-B עם האופנוע, הנוסע וההולך במקומם בזמן הנוכחי">` +
+          `<line class="axis-c" x1="${x0}" x2="${x1}" y1="${yr}" y2="${yr}" stroke-width="3"/>` +
+          `<text class="legend" x="${x0}" y="${yr + 24}" text-anchor="middle">A</text><text class="legend" x="${x1}" y="${yr + 24}" text-anchor="middle">B</text>`;
+        const marks = [];
+        if (st.strategy === "optimal") {
+          const pl = motorcyclePlan(alpha());
+          marks.push(["Q", pl.Q], ["C", pl.C], ["D", pl.D], ["E", pl.E]);
+        } else if (st.strategy === "meanwhile") marks.push(["M", 2 / (alpha() + 1)]);
+        marks.forEach(([n, v]) => {
+          s += `<line class="grid" x1="${f(X(v))}" x2="${f(X(v))}" y1="${yr - 8}" y2="${yr + 8}" stroke-width="1.5"/>` +
+               `<text class="tick" x="${f(X(v))}" y="${yr + 24}" text-anchor="middle">${n}</text>`;
+        });
+        const [bike, pass, walk] = pos;
+        const onBike = (v) => Math.abs(v - bike) < 1e-9;
+        s += `<circle class="ink-dot" cx="${f(X(bike))}" cy="${yr}" r="9" fill-opacity="0.45"><title>האופנוע: ${fmt(bike)}</title></circle>`;
+        [["s1", pass, "הנוסע", -1], ["s2", walk, "ההולך", 1]].forEach(([cls, v, name, side]) => {
+          const cy = onBike(v) ? yr - 12 * side - (side < 0 ? 6 : -6) : yr;
+          s += `<circle class="${cls}-dot" cx="${f(X(v))}" cy="${f(onBike(v) ? yr + 14 * side : yr)}" r="6"><title>${name}: ${fmt(v)}${onBike(v) ? " (על האופנוע)" : ""}</title></circle>`;
+          void cy;
+        });
+        return s + "</svg>";
+      };
+      const chartSvg = (ph, pos) => {
+        const w = 640, h = 280, x0 = 52, right = 24, top = 30, base = 246;
+        const X = (t) => x0 + (t / ph.T) * (w - x0 - right);
+        const Y = (v) => base - v * (base - top);
+        let s = `<svg class="perf-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="המקום של האופנוע ושל שני ההולכים לאורך הזמן, עד הזמן הנוכחי">`;
+        const yt = [[0, "0"], [1, "1"]];
+        if (st.strategy === "optimal") { const pl = motorcyclePlan(alpha()); yt.push([pl.C, fmt(pl.C, 3)], [pl.D, fmt(pl.D, 3)]); }
+        if (st.strategy === "meanwhile") yt.push([2 / (alpha() + 1), fmt(2 / (alpha() + 1), 3)]);
+        yt.forEach(([v, lab]) => {
+          s += `<line class="grid" x1="${x0}" x2="${w - right}" y1="${f(Y(v))}" y2="${f(Y(v))}"/>` +
+               `<text class="tick" x="${x0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${lab}</text>`;
+        });
+        [0, ph.t1, ph.t2, ph.T].forEach((t) => {
+          s += `<line class="grid" x1="${f(X(t))}" x2="${f(X(t))}" y1="${top - 6}" y2="${base}" stroke-dasharray="4 4"/>` +
+               `<text class="tick" x="${f(X(t))}" y="${base + 18}" text-anchor="middle">${fmt(t * st.t1, 2)}</text>`;
+        });
+        // the paths are polylines through the phase ends; the drawn part stops at the time shown
+        const knots = [0, ph.t1, ph.t2, ph.T];
+        const line = (idx, cls, width, upTo, extra = "") => {
+          const ts = knots.filter((t) => t < upTo - 1e-12).concat([upTo]);
+          const pts = ts.map((t) => `${f(X(t))},${f(Y(motorcyclePositions(st.strategy, alpha(), t)[idx]))}`).join(" ");
+          return `<polyline class="${cls}" points="${pts}" fill="none" stroke-width="${width}" stroke-linejoin="round"${extra}/>`;
+        };
+        s += line(0, "ink-line", 7, ph.T, ' stroke-opacity="0.1"') + line(1, "s1-line", 2.5, ph.T, ' stroke-opacity="0.2"') + line(2, "s2-line", 2.5, ph.T, ' stroke-opacity="0.2"');
+        if (st.t > 0) s += line(0, "ink-line", 7, st.t, ' stroke-opacity="0.28"') + line(1, "s1-line", 2.5, st.t) + line(2, "s2-line", 2.5, st.t);
+        s += `<line class="axis-c" x1="${f(X(st.t))}" x2="${f(X(st.t))}" y1="${top - 6}" y2="${base}" stroke-width="1"/>`;
+        [["ink-dot", pos[0], 7], ["s1-dot", pos[1], 5], ["s2-dot", pos[2], 5]].forEach(([cls, v, r]) => {
+          s += `<circle class="${cls}" cx="${f(X(st.t))}" cy="${f(Y(v))}" r="${r}"/>`;
+        });
+        s += `<line class="axis" x1="${x0}" x2="${w - right}" y1="${base}" y2="${base}"/></svg>`;
+        return s;
+      };
+      const draw = () => {
+        $(".out-t0").textContent = String(st.t0); $(".out-t1").textContent = String(st.t1);
+        const a = alpha();
+        if (a <= 1 + EPS) {
+          road.innerHTML = ""; chart.innerHTML = "";
+          summary.innerHTML = `יחס המהירויות ${ltr(`α = ${f(a, 2)}`)}: האופנוע לא מהיר מההליכה, ולכן כולם פשוט הולכים, ${fmt(st.t0, 2)} שעות.`;
+          return;
+        }
+        const ph = phases();
+        st.t = Math.min(st.t, ph.T);
+        scrub.max = ph.T; scrub.value = st.t;
+        $(".out-t").textContent = `${fmt(st.t * st.t1, 2)} / ${fmt(ph.T * st.t1, 2)} h`;
+        const pos = motorcyclePositions(st.strategy, a, st.t);
+        road.innerHTML = roadSvg(pos, ph);
+        chart.innerHTML = chartSvg(ph, pos);
+        const T = { wait: 3, meanwhile: (3 * a - 1) / (a + 1), optimal: motorcyclePlan(a).T };
+        const pl = motorcyclePlan(a);
+        const phase = st.t < ph.t1 ? 1 : st.t < ph.t2 ? 2 : 3;
+        summary.innerHTML = `יחס המהירויות ${ltr(`α = ${f(a, 2)}`)}. בתוכנית "${NAMES[st.strategy]}" שלושתם מגיעים אחרי ${fmt(T[st.strategy] * st.t1, 2)} שעות ` +
+          `(להשוואה: מחכה ${fmt(T.wait * st.t1, 2)}, הולך בינתיים ${fmt(T.meanwhile * st.t1, 2)}, יורד בדרך ${fmt(T.optimal * st.t1, 2)}). ` +
+          (st.strategy === "optimal" ? `הנוסע יורד אחרי ${fmt(pl.D, 3)} מהדרך, וכל אחד מהשניים הולך ${fmt(pl.y + pl.x, 3)} ממנה. ` : "") +
+          `עכשיו שלב ${phase}: האופנוע ב-${ltr(fmt(pos[0]))}, הנוסע ב-${ltr(fmt(pos[1]))}, ההולך ב-${ltr(fmt(pos[2]))}.`;
+        if (window.dvqDecorate) window.dvqDecorate(chart);
+      };
+      const stop = () => { running = false; play.textContent = "הפעלה"; summary.setAttribute("aria-live", "polite"); };
+      const tick = (now) => {
+        if (!running) return;
+        const ph = phases();
+        st.t = Math.min(st.t + ((now - last) / 1000) * Number(speed.value) / st.t1, ph.T);
+        last = now;
+        draw();
+        if (st.t >= ph.T) stop(); else requestAnimationFrame(tick);
+      };
+      play.addEventListener("click", () => {
+        if (running) { stop(); return; }
+        if (alpha() <= 1 + EPS) return;
+        if (st.t >= phases().T - 1e-9) st.t = 0;
+        running = true;
+        play.textContent = "עצירה";
+        summary.setAttribute("aria-live", "off");
+        last = performance.now();
+        requestAnimationFrame(tick);
       });
-      [0, pl.t1, pl.t2, pl.T].forEach((t) => {
-        s += `<line class="grid" x1="${f(X(t))}" x2="${f(X(t))}" y1="${top - 6}" y2="${base}" stroke-dasharray="4 4"/>` +
-             `<text class="tick" x="${f(X(t))}" y="${base + 18}" text-anchor="middle">${fmt(t * st.t1, 2)}</text>`;
+      scrub.addEventListener("input", () => { stop(); st.t = Number(scrub.value); draw(); });
+      ["t0", "t1"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { st[k] = Number($(`.ex-${k}`).value); draw(); }));
+      strategy.addEventListener("change", () => { st.strategy = strategy.value; draw(); });
+      $(".ex-reset").addEventListener("click", () => {
+        stop(); Object.assign(st, defaults, { strategy: "optimal", t: 0 });
+        $(".ex-t0").value = st.t0; $(".ex-t1").value = st.t1; strategy.value = "optimal"; draw();
       });
-      const path = (pts) => pts.map(([t, v]) => `${f(X(t))},${f(Y(v))}`).join(" ");
-      s += `<polyline class="ink-line" points="${path([[0, 0], [pl.t1, pl.D], [pl.t2, pl.C], [pl.T, 1]])}" fill="none" ` +
-           `stroke-width="7" stroke-opacity="0.28" stroke-linejoin="round"/>` +
-           `<polyline class="s1-line" points="${path([[0, 0], [pl.t1, pl.D], [pl.t2, pl.E], [pl.T, 1]])}" fill="none" stroke-width="2.5"/>` +
-           `<polyline class="s2-line" points="${path([[0, 0], [pl.t1, pl.Q], [pl.t2, pl.C], [pl.T, 1]])}" fill="none" stroke-width="2.5"/>`;
-      [["D", pl.t1, pl.D, "s1-dot", -12], ["C", pl.t2, pl.C, "s2-dot", 22], ["B", pl.T, 1, "ink-dot", -8]].forEach(([n, t, v, cls, dy]) => {
-        s += `<circle class="${cls}" cx="${f(X(t))}" cy="${f(Y(v))}" r="5"/>` +
-             `<text class="legend" x="${f(X(t) - (n === "B" ? 14 : 0))}" y="${f(Y(v) + dy)}" text-anchor="middle">${n}</text>`;
-      });
-      s += `<line class="axis" x1="${x0}" x2="${w - right}" y1="${base}" y2="${base}"/></svg>`;
-      return { summary, charts: [["המקום על הדרך (0 הוא A ו-1 הוא B) מול הזמן בשעות", s]] };
+      draw();
     },
   });
 
