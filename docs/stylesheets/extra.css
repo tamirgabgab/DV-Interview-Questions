@@ -1362,6 +1362,29 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ex-controls .md-button { padding: 0.2rem 0.7rem; font-size: 0.65rem; margin: 0; }
 .md-typeset .explorer .md-button:not(.md-button--primary) { color: var(--md-typeset-a-color); border-color: currentColor; }
 
+/* the cake explorer of 0027 / 0028: the cake and the growing table */
+.md-typeset .explorer .cake-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .cake-pie { flex: 0 1 13rem; }
+.md-typeset .explorer svg.cake-live { width: 100%; display: block; }
+.md-typeset .explorer .cake-panel { flex: 1 1 15rem; min-width: 0; }
+.md-typeset .explorer .cake-panel p { margin: 0.2em 0 0.4em; }
+.md-typeset .explorer .cake-table { font-size: 0.7rem; margin: 0; }
+.md-typeset .explorer .cake-table td, .md-typeset .explorer .cake-table th { padding: 0.15em 0.6em; }
+.md-typeset .explorer .cake-table tr.is-best td { font-weight: 700; color: var(--viz-s2); }
+.md-typeset .explorer .cake-table tr[data-now] td { background: var(--md-code-bg-color); }
+.md-typeset svg .cake-peak.is-now, .md-typeset svg .cake-slice.is-now, .md-typeset svg .cake-slice2.is-now { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset .explorer .ex-pos { font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .ex-controls label:has(input[type="checkbox"]) { gap: 0.3rem; }
+
+/* the Josephus explorer of 0016 / 0022: the circle and the order of leaving */
+.md-typeset .explorer .jos-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .jos-circle { flex: 0 1 19rem; }
+.md-typeset .explorer svg.jos-live { width: 100%; display: block; margin: 0; }
+.md-typeset .explorer .jos-panel { flex: 1 1 14rem; min-width: 0; }
+.md-typeset .explorer .jos-panel p { margin: 0.2em 0 0.5em; }
+.md-typeset .explorer .jos-chip { display: inline-block; min-width: 1.5em; padding: 0 0.3em; margin: 0.1em 0; text-align: center; font-family: var(--md-code-font-family); font-size: 0.65rem; border: 1px solid var(--viz-grid); border-radius: 0.3em; }
+.md-typeset .explorer .jos-chip.is-now { background: var(--viz-s2); color: var(--md-primary-bg-color); border-color: var(--viz-s2); font-weight: 700; }
+
 /* the motorcycle explorer of 0026: the play row, the road and the scrubber */
 .md-typeset .explorer .ex-play-row { margin-top: 0.5rem; }
 .md-typeset .explorer .ex-scrub { flex: 1 1 14rem; }

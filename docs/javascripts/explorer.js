@@ -1,8 +1,8 @@
 // Interactive explorers: a box `<div class="explorer" data-kind="..." data-...>` gets
 // sliders, a summary line and charts that redraw on every change. One model per kind:
-//   cake-arith / cake-geo  0027, 0028  sliders a and d (or q): shares and fractions vs T
+//   cake-arith / cake-geo  0027, 0028  the law, sliders a and d (or q), and a person-by-person stepper of the cake
 //   motorcycle             0026        sliders t0 and t1, a strategy, and play: the travellers on the road and the chart
-//   josephus               0016, 0022  sliders N (and L): the survivor of every circle size
+//   josephus               0016, 0022  sliders N (and L), and the circle played step by step; the survivor chart
 //   clock                  0029        a clock face to drag, play or type: meetings of the hands so far
 //   strip                  0030        drag the spider and the fly on their walls: the periodic strip and the path
 // The math of each model is exported under Node, where the question tests compare it with
@@ -102,6 +102,23 @@
     return m;
   };
   const josephusFormula = (n, L) => (L * (n - josephusZero(n, L))) / (L - 1);
+  // The elimination step by step: [who stays, [who leave]] per step, and the survivor.
+  const josephusSteps = (n, L) => {
+    const circle = Array.from({ length: n }, (_, i) => i), steps = [];
+    let i = 0;
+    while (circle.length > 1) {
+      const stays = circle[i], leave = [];
+      const count = Math.min(L - 1, circle.length - 1);
+      for (let s = 0; s < count; s++) {
+        const j = (i + 1) % circle.length;
+        leave.push(circle.splice(j, 1)[0]);
+        if (j < i) i -= 1;
+      }
+      steps.push([stays, leave]);
+      i = (i + 1) % circle.length;
+    }
+    return { steps, survivor: circle[0] };
+  };
 
   // Clock (0029), time in seconds from 00:00:00. Hands i and j meet at k * P / q: the second
   // and minute hands every 3600/59 s, second and hour every 43200/719 s, minute and hour every
@@ -239,7 +256,7 @@
 
   const models = {
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
-    motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, josephusRun, josephusZero, josephusFormula,
+    motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, josephusRun, josephusSteps, josephusZero, josephusFormula,
     clockCounts, clockMeetsIn, clockNext, clockPrev, clockLabel,
     stripImages, stripEdgePoint, stripPoint3, stripFacesBetween, stripLines, stripBest,
   };
@@ -296,41 +313,128 @@
 
   // --- views: one per kind ----------------------------------------------------------------
 
-  const cakeView = (kind) => ({
-    sliders: kind === "arith"
-      ? [{ key: "a", label: "השבר הראשון a", min: 0.005, max: 0.6, step: 0.005 },
-         { key: "step", label: "ההפרש d", min: 0.01, max: 0.5, step: 0.01 }]
-      : [{ key: "a", label: "השבר הראשון a", min: 0.001, max: 0.5, step: 0.001 },
-         { key: "step", label: "המנה q", min: 1.05, max: 2, step: 0.05 }],
-    draw(st) {
-      const rows = cakeSplit(kind, st.a, st.step);
-      const peak = cakeBest(rows);
-      const T = cakeThreshold(kind, st.step);
-      const fm = cakeFormula(kind, st.a, st.step);
-      const who = peak.length > 1 ? `תיקו בין האדם ה-${peak[0]} לאדם ה-${peak[1]}` : `האדם ה-${peak[0]}`;
-      const agree = fm.k === peak[0] && fm.tie === (peak.length > 1);
-      const summary = `המקבל הגדול: ${who}, עם ${fmt(rows[peak[0] - 1].S)} מהעוגה, מתוך ${rows.length} אנשים. ` +
-        `הסף הוא ${ltr(`T ≈ ${fmt(T)}`)}, והנוסחה נותנת את האדם ה-${fm.k}${fm.tie ? " (תיקו עם הבא)" : ""}` +
-        `${agree ? ", בדיוק כמו בעמודות." : ", שלא כמו בעמודות."}`;
-      const shares = barsChart("החלק של כל אדם", rows.map((r) => r.S), peak, (k, v) => `S(${k}) = ${fmt(v, 4)}`);
-      const fr = frame("השבר של כל אדם מול הסף", rows.length, 1, [0, 0.25, 0.5, 0.75, 1]);
-      let fs = fr.s + hline(fr, T, `T ≈ ${fmt(T)}`);
-      rows.forEach((r) => {
-        const cls = r.k === peak[0] ? "s2" : r.p < T - EPS ? "s1" : "ink";
-        const rad = r.k === peak[0] ? 6 : Math.min(4.5, Math.max(1.5, fr.slot * 0.35));
-        fs += `<line class="${cls}-line" x1="${f(fr.cx(r.k))}" x2="${f(fr.cx(r.k))}" y1="${BASE}" y2="${f(fr.Y(r.p))}" ` +
-              `stroke-width="${f(Math.min(2, fr.slot * 0.4))}"/>` +
-              `<circle class="${cls}-dot" cx="${f(fr.cx(r.k))}" cy="${f(fr.Y(r.p))}" r="${f(rad)}">` +
-              `<title>p(${r.k}) = ${fmt(r.p, 4)}</title></circle>`;
-        if (r.k % fr.every === 0 || r.k === 1 || r.k === peak[0]) fs += fr.xtick(r.k);
+  // The cake box (0027, 0028): the law (arithmetic or geometric, with the same a), the two
+  // sliders, and a stepper that adds one person at a time: the slice appears on the cake,
+  // the row joins the table and the bar lights up. Play adds a person every moment.
+  const cakeView = (kind0) => ({
+    mount(box) {
+      const d = box.dataset;
+      const SL = { arith: { a: [0.005, 0.6, 0.005], step: [0.01, 0.5, 0.01], name: "ההפרש d", law: "החשבוני" },
+                   geo: { a: [0.005, 0.6, 0.005], step: [1.05, 2, 0.05], name: "המנה q", law: "ההנדסי" } };
+      const defaults = { kind: kind0, a: Number(d.a || 0.01), step: { arith: 0.1, geo: 1.5 } };
+      defaults.step[kind0] = Number(d.step || defaults.step[kind0]);
+      const st = { kind: kind0, a: defaults.a, step: { ...defaults.step }, shown: 1 };
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label>החוק <select class="ex-kind"><option value="arith">חשבוני, ‏p = a + (k − 1)d</option><option value="geo">הנדסי, ‏p = a · q^(k − 1)</option></select></label>` +
+        `<label><span>השבר הראשון a</span><input type="range" class="ex-a" dir="ltr"><output class="out-a"></output></label>` +
+        `<label><span class="step-name"></span><input type="range" class="ex-step" dir="ltr"><output class="out-step"></output></label>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<button type="button" class="md-button ex-prev">האדם הקודם</button>` +
+        `<button type="button" class="md-button md-button--primary ex-next">האדם הבא</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` +
+        `<button type="button" class="md-button ex-all">כולם</button>` +
+        `<span class="ex-pos"></span></div>` +
+        `<div class="cake-box"><div class="cake-pie"></div><div class="cake-panel"><p class="cake-now"></p><table class="cake-table"><thead><tr><th>האדם</th><th>השבר</th><th>נשאר לפניו</th><th>מקבל</th></tr></thead><tbody></tbody></table></div></div>` +
+        `<p class="ex-summary" aria-live="polite"></p><div class="cake-charts"></div>`;
+      const $ = (sel) => box.querySelector(sel);
+      const kindSel = $(".ex-kind"), aIn = $(".ex-a"), stepIn = $(".ex-step"), pie = $(".cake-pie"), charts = $(".cake-charts");
+      const play = $(".ex-play");
+      let timer = null;
+      const setSliders = () => {
+        const sl = SL[st.kind];
+        [aIn.min, aIn.max, aIn.step] = sl.a; [stepIn.min, stepIn.max, stepIn.step] = sl.step;
+        aIn.value = st.a; stepIn.value = st.step[st.kind];
+        $(".step-name").textContent = sl.name;
+        kindSel.value = st.kind;
+      };
+      const rowsOf = (kind) => cakeSplit(kind, st.a, st.step[kind]);
+      const pieSvg = (rows, peak) => {
+        const C = 110, R = 92;
+        const pt = (turn, r = R) => [C + r * Math.sin(2 * Math.PI * turn), C - r * Math.cos(2 * Math.PI * turn)];
+        let s = `<svg class="figure cake-live" viewBox="0 0 220 220" role="img" aria-label="העוגה עם הפרוסות של האנשים שכבר חתכו">` +
+                `<circle class="cake-rest" cx="${C}" cy="${C}" r="${R}"/>`;
+        let c = 0;
+        rows.slice(0, st.shown).forEach((r) => {
+          const from = c, to = Math.min(c + r.S, 1);
+          c = to;
+          const [x0, y0] = pt(from), [x1, y1] = pt(to);
+          const big = to - from > 0.5 ? 1 : 0;
+          const cls = peak.includes(r.k) ? "cake-peak" : r.k % 2 ? "cake-slice" : "cake-slice2";
+          const path = to - from >= 1 - 1e-9 ? `M${C},${C - R} A${R},${R} 0 1 1 ${C - 0.01},${C - R} Z`
+            : `M${C},${C} L${f(x0, 2)},${f(y0, 2)} A${R},${R} 0 ${big} 1 ${f(x1, 2)},${f(y1, 2)} Z`;
+          s += `<path class="${cls}${r.k === st.shown ? " is-now" : ""}" d="${path}"><title>אדם ${r.k}: p = ${fmt(r.p, 3)}, S = ${fmt(r.S, 4)}</title></path>`;
+          if (to - from > 0.045) {
+            const [tx, ty] = pt((from + to) / 2, R * 0.68);
+            s += `<text class="st-text" x="${f(tx)}" y="${f(ty + 5)}" text-anchor="middle" style="fill:var(--md-default-bg-color)">${r.k}</text>`;
+          }
+        });
+        s += `<circle class="cake-edge" cx="${C}" cy="${C}" r="${R}" fill="none"/>`;
+        return s + "</svg>";
+      };
+      const draw = () => {
+        const rows = rowsOf(st.kind), n = rows.length;
+        st.shown = Math.min(Math.max(st.shown, 1), n);
+        $(".out-a").textContent = String(st.a); $(".out-step").textContent = String(st.step[st.kind]);
+        const peak = cakeBest(rows), T = cakeThreshold(st.kind, st.step[st.kind]), fm = cakeFormula(st.kind, st.a, st.step[st.kind]);
+        const seen = rows.slice(0, st.shown), topSeen = Math.max(...seen.map((r) => r.S));
+        const peakSeen = seen.filter((r) => Math.abs(r.S - topSeen) <= EPS * topSeen).map((r) => r.k);
+        pie.innerHTML = pieSvg(rows, st.shown >= n ? peak : peakSeen);
+        const now = rows[st.shown - 1];
+        $(".cake-now").innerHTML = `האדם ה-${now.k} מוצא ${ltr(fmt(now.R, 4))} מהעוגה, לוקח ממנה ${ltr(fmt(now.p, 3))} ומקבל ${ltr(fmt(now.S, 4))}` +
+          (now.p >= 1 ? ", את כל מה שנשאר." : `; נשאר ${ltr(fmt(now.R - now.S, 4))} לבאים אחריו.`);
+        $(".cake-table tbody").innerHTML = seen.map((r) =>
+          `<tr${peakSeen.includes(r.k) ? ' class="is-best"' : ""}${r.k === st.shown ? ' data-now="1"' : ""}><td>${ltr(r.k)}</td><td>${ltr(fmt(r.p, 3))}</td><td>${ltr(fmt(r.R, 4))}</td><td>${ltr(fmt(r.S, 4))}</td></tr>`).join("");
+        $(".ex-pos").textContent = `אדם ${st.shown} מתוך ${n}`;
+        $(".ex-prev").disabled = st.shown <= 1; $(".ex-next").disabled = st.shown >= n; $(".ex-all").disabled = st.shown >= n;
+        const who = peak.length > 1 ? `תיקו בין האדם ה-${peak[0]} לאדם ה-${peak[1]}` : `האדם ה-${peak[0]}`;
+        const other = st.kind === "arith" ? "geo" : "arith";
+        const orows = rowsOf(other), opeak = cakeBest(orows);
+        const agree = fm.k === peak[0] && fm.tie === (peak.length > 1);
+        summary.innerHTML = `בחוק ${SL[st.kind].law}: המקבל הגדול הוא ${who}, עם ${ltr(fmt(rows[peak[0] - 1].S))} מהעוגה, מתוך ${n} אנשים. ` +
+          `הסף הוא ${ltr(`T ≈ ${fmt(T)}`)}, והנוסחה נותנת את האדם ה-${fm.k}${fm.tie ? " (תיקו עם הבא)" : ""}${agree ? ", בדיוק כמו בעמודות." : ", שלא כמו בעמודות."} ` +
+          `להשוואה, בחוק ${SL[other].law} עם אותו ${ltr("a")} ו-${ltr(`${SL[other].name.split(" ")[1]} = ${st.step[other]}`)}: האדם ה-${opeak[0]} עם ${ltr(fmt(orows[opeak[0] - 1].S))}, מתוך ${orows.length}.`;
+        const shares = barsChart("החלק של כל אדם", rows.map((r) => r.S), peak, (k, v) => `S(${k}) = ${fmt(v, 4)}`)
+          .replace(/<rect class="bar ([a-z-]+)" /g, (m0, cls, off) => m0);
+        // bars of people not yet shown are faint
+        let i = 0;
+        const sharesShown = shares.replace(/<rect class="bar [a-z-]+" /g, (m0) => { i += 1; return i > st.shown ? m0.replace('class="bar', 'fill-opacity="0.22" class="bar') : m0; });
+        const fr = frame("השבר של כל אדם מול הסף", n, 1, [0, 0.25, 0.5, 0.75, 1]);
+        let fs = fr.s + hline(fr, T, `T ≈ ${fmt(T)}`);
+        rows.forEach((r) => {
+          const cls = r.k === peak[0] ? "s2" : r.p < T - EPS ? "s1" : "ink";
+          const rad = r.k === peak[0] ? 6 : Math.min(4.5, Math.max(1.5, fr.slot * 0.35));
+          const dim = r.k > st.shown ? ' opacity="0.25"' : "";
+          fs += `<line class="${cls}-line" x1="${f(fr.cx(r.k))}" x2="${f(fr.cx(r.k))}" y1="${BASE}" y2="${f(fr.Y(r.p))}" stroke-width="${f(Math.min(2, fr.slot * 0.4))}"${dim}/>` +
+                `<circle class="${cls}-dot" cx="${f(fr.cx(r.k))}" cy="${f(fr.Y(r.p))}" r="${f(rad)}"${dim}><title>p(${r.k}) = ${fmt(r.p, 4)}</title></circle>`;
+          if (r.k % fr.every === 0 || r.k === 1 || r.k === peak[0]) fs += fr.xtick(r.k);
+        });
+        charts.innerHTML = `<p class="ex-title">החלק של כל אדם</p>${sharesShown}<p class="ex-title">השבר של כל אדם מול הסף</p>${fs + fr.close()}`;
+        if (window.dvqDecorate) window.dvqDecorate(charts);
+      };
+      const summary = $(".ex-summary");
+      const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
+      const go = (k) => { st.shown = k; draw(); };
+      $(".ex-next").addEventListener("click", () => { stop(); go(st.shown + 1); });
+      $(".ex-prev").addEventListener("click", () => { stop(); go(st.shown - 1); });
+      $(".ex-all").addEventListener("click", () => { stop(); go(rowsOf(st.kind).length); });
+      play.addEventListener("click", () => {
+        if (timer) { stop(); return; }
+        if (st.shown >= rowsOf(st.kind).length) st.shown = 0;
+        play.textContent = "עצירה";
+        timer = setInterval(() => { if (st.shown >= rowsOf(st.kind).length) { stop(); return; } go(st.shown + 1); }, 700);
+        go(st.shown + 1);
       });
-      return { summary, charts: [["החלק של כל אדם", shares], ["השבר של כל אדם מול הסף", fs + fr.close()]] };
+      kindSel.addEventListener("change", () => { stop(); st.kind = kindSel.value; st.shown = 1; setSliders(); draw(); });
+      aIn.addEventListener("input", () => { stop(); st.a = Number(aIn.value); draw(); });
+      stepIn.addEventListener("input", () => { stop(); st.step[st.kind] = Number(stepIn.value); draw(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); st.kind = kind0; st.a = defaults.a; st.step = { ...defaults.step }; st.shown = 1; setSliders(); draw(); });
+      setSliders();
+      draw();
     },
   });
 
-  // The motorcycle box (0026): sliders for the walk and ride times, a strategy to compare,
-  // and a play button that moves the three travellers along the road while the
-  // position-time chart draws itself; a scrubber sets the time by hand.
   const motorcycleView = () => ({
     mount(box) {
       const defaults = { t0: Number(box.dataset.t0 || 13), t1: Number(box.dataset.t1 || 1) };
@@ -468,37 +572,118 @@
     },
   });
 
-  const josephusView = (box) => {
-    const withL = box.dataset.lmax && Number(box.dataset.lmax) > Number(box.dataset.l);
-    const sliders = [{ key: "n", label: "מספר האנשים N", min: 1, max: Number(box.dataset.nmax || 64), step: 1 }];
-    if (withL) sliders.push({ key: "l", label: `הכלל ${ltr("L")}: אחד נשאר, ${ltr("L − 1")} יוצאים`, min: 2, max: Number(box.dataset.lmax), step: 1 });
-    return {
-      sliders,
-      draw(st) {
-        const L = st.l, n = st.n, nmax = sliders[0].max;
-        const sim = josephusRun(n, L), form = josephusFormula(n, L), M = josephusZero(n, L);
-        const summary = `עם ${ltr(`N = ${n}`)} ו-${ltr(`L = ${L}`)} השורד הוא ${sim} בסימולציה, והנוסחה ` +
-          `${ltr(`${L}(N − M) / ${L - 1}`)} עם נקודת האפס ${ltr(`M = ${M}`)} נותנת ${form}` +
-          `${sim === form ? ", אותו דבר." : ", שלא כמו בסימולציה."}` +
-          (L === 2 ? ` בבינארי: ${ltr(`N = ${n.toString(2)}`)}, והשורד ${ltr(sim.toString(2))}.` : "");
+  // The Josephus box (0016, 0022): sliders for N (and L), and a circle that plays the
+  // elimination step by step or at a chosen speed; the survivor can be highlighted from the
+  // start, the people who left are listed in order, and the survivor chart stays.
+  const josephusView = (box) => ({
+    mount(box2) {
+      const withL = box.dataset.lmax && Number(box.dataset.lmax) > Number(box.dataset.l);
+      const nmax = Number(box.dataset.nmax || 64);
+      const defaults = { n: Number(box.dataset.n || 20), l: Number(box.dataset.l || 2) };
+      const st = { ...defaults, s: 0 };
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label><span>מספר האנשים N</span><input type="range" class="ex-n" min="1" max="${nmax}" step="1" value="${st.n}" dir="ltr"><output class="out-n"></output></label>` +
+        (withL ? `<label><span>הכלל ${ltr("L")}: אחד נשאר, ${ltr("L − 1")} יוצאים</span><input type="range" class="ex-l" min="2" max="${box.dataset.lmax}" step="1" value="${st.l}" dir="ltr"><output class="out-l"></output></label>` : "") +
+        `<label><input type="checkbox" class="ex-mark" checked> להדגיש את השורד מההתחלה</label>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
+        `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` +
+        `<label>הקצב <select class="ex-speed"><option value="1200">איטי</option><option value="500" selected>בינוני</option><option value="150">מהיר</option></select></label>` +
+        `<button type="button" class="md-button ex-start">להתחלה</button>` +
+        `<span class="ex-pos"></span></div>` +
+        `<div class="jos-box"><div class="jos-circle"></div><div class="jos-panel"><p class="jos-now"></p><p class="jos-order"></p></div></div>` +
+        `<p class="ex-summary" aria-live="polite"></p><p class="ex-title">השורד לכל N, עם N הנבחר מודגש; נקודות שחורות הן נקודות אפס</p><div class="jos-chart"></div>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play"), speed = $(".ex-speed"), mark = $(".ex-mark");
+      let timer = null, chartFor = "";
+      const circleSvg = (n, out, stays, leave, winner) => {
+        let w, R, r, small;
+        if (n <= 12) [w, R, r, small] = [300, 105, 17, ""];
+        else if (n <= 20) [w, R, r, small] = [300, 118, 15, ""];
+        else if (n <= 40) [w, R, r, small] = [340, 140, 11, " st-sm"];
+        else [w, R, r, small] = [340, 150, 7, " st-none"];
+        const cx = w / 2, cy = w / 2, h = w - 20;
+        let s = `<svg class="figure jos-live" viewBox="0 0 ${w} ${h}" style="max-width:${(w / 16).toFixed(0)}rem" role="img" aria-label="${n} אנשים במעגל">` +
+                `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" class="ink-line" stroke-width="1" stroke-dasharray="3 5" opacity="0.5"/>`;
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + (2 * Math.PI * i) / n;
+          const x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
+          const cls = i === winner ? "st-ok" : leave.includes(i) ? "st-bad" : i === stays ? "st-stack" : out.has(i) ? "st-done" : "st-cell";
+          const faded = out.has(i) && !leave.includes(i) ? ' class="st-faded"' : "";
+          s += `<g${faded}><circle class="${cls}" cx="${f(x)}" cy="${f(y)}" r="${r}"><title>אדם ${i}</title></circle>`;
+          if (small !== " st-none") s += `<text class="st-text${small}" x="${f(x)}" y="${f(y + (small ? 4 : 5))}" text-anchor="middle">${i}</text>`;
+          if (out.has(i)) { const dd = Math.max(r - 3, 3); s += `<line class="pg-strike" x1="${f(x - dd)}" y1="${f(y + dd)}" x2="${f(x + dd)}" y2="${f(y - dd)}"/>`; }
+          s += "</g>";
+        }
+        s += `<text class="st-text" x="${cx}" y="${cy + 6}" text-anchor="middle">${n - out.size}</text></svg>`;
+        return s;
+      };
+      const chartSvg = (n, L) => {
         const vals = Array.from({ length: nmax }, (_, i) => josephusRun(i + 1, L));
-        const ymax = Math.max(nmax, 1);
-        const step = ymax > 40 ? 16 : 8;
-        const ticks = [];
+        const ymax = Math.max(nmax, 1), step = ymax > 40 ? 16 : 8, ticks = [];
         for (let v = 0; v <= ymax; v += step) ticks.push(v);
         const fr = frame("השורד לכל גודל מעגל", nmax, ymax, ticks);
         let s = fr.s;
         vals.forEach((v, i) => {
-          const k = i + 1;
-          const cls = k === n ? "s2-dot" : v === 0 ? "ink-dot" : "s1-dot";
-          s += `<circle class="${cls}" cx="${f(fr.cx(k))}" cy="${f(fr.Y(v))}" r="${k === n ? 6 : Math.min(4, fr.slot * 0.4).toFixed(1)}">` +
-               `<title>N = ${k}: ${v}</title></circle>`;
+          const k = i + 1, cls = k === n ? "s2-dot" : v === 0 ? "ink-dot" : "s1-dot";
+          s += `<circle class="${cls}" cx="${f(fr.cx(k))}" cy="${f(fr.Y(v))}" r="${k === n ? 6 : Math.min(4, fr.slot * 0.4).toFixed(1)}"><title>N = ${k}: ${v}</title></circle>`;
           if (k % fr.every === 0 || k === 1 || k === n) s += fr.xtick(k);
         });
-        return { summary, charts: [["השורד לכל N, עם N הנבחר מודגש; נקודות שחורות הן נקודות אפס", s + fr.close()]] };
-      },
-    };
-  };
+        return s + fr.close();
+      };
+      const people = (nums) => nums.length === 1 ? String(nums[0]) : `${nums.slice(0, -1).join(", ")} ו-${nums[nums.length - 1]}`;
+      const draw = () => {
+        const n = st.n, L = st.l;
+        $(".out-n").textContent = String(n);
+        if (withL) $(".out-l").textContent = String(L);
+        const { steps, survivor } = josephusSteps(n, L);
+        st.s = Math.min(Math.max(st.s, 0), steps.length);
+        const out = new Set();
+        steps.slice(0, st.s).forEach(([, leave]) => leave.forEach((p) => out.add(p)));
+        const cur = st.s > 0 ? steps[st.s - 1] : null;
+        const done = st.s >= steps.length;
+        const winner = done || mark.checked ? survivor : null;
+        $(".jos-circle").innerHTML = circleSvg(n, out, cur ? cur[0] : null, cur ? cur[1] : [], winner);
+        const rule = L === 2 ? "נשאר, והבא אחריו יוצא" : `נשאר, ו-${L - 1} הבאים אחריו יוצאים`;
+        let round = 0, prev = null;
+        steps.slice(0, Math.max(st.s, 1)).forEach(([stays]) => { if (prev === null || stays <= prev) round += 1; prev = stays; });
+        $(".jos-now").innerHTML = st.s === 0 ? `${n} אנשים במעגל. מתחילים מאדם 0: הוא ${rule}. המספר במרכז הוא כמה אנשים נשארו.`
+          : done && steps.length === st.s ? `צעד ${st.s}: אדם ${cur[0]} נשאר, ${cur[1].length === 1 ? `ואדם ${cur[1][0]} יוצא` : `ואנשים ${people(cur[1])} יוצאים`}. נשאר אדם ${survivor}, והוא השורד.`
+          : `צעד ${st.s}, סיבוב ${round}: אדם ${cur[0]} נשאר, ${cur[1].length === 1 ? `ואדם ${cur[1][0]} יוצא` : `ואנשים ${people(cur[1])} יוצאים`}.`;
+        const order = steps.slice(0, st.s).flatMap(([, leave]) => leave);
+        $(".jos-order").innerHTML = order.length ? `סדר היציאה (${ltr(order.length)} מתוך ${ltr(n - 1)}): ` +
+          order.map((p, i) => `<span class="jos-chip${i >= order.length - (cur ? cur[1].length : 0) ? " is-now" : ""}">${p}</span>`).join(" ") : "עוד אף אחד לא יצא.";
+        $(".ex-pos").textContent = `צעד ${st.s} מתוך ${steps.length}`;
+        $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = done;
+        const sim = survivor, form = josephusFormula(n, L), M = josephusZero(n, L);
+        $(".ex-summary").innerHTML = `עם ${ltr(`N = ${n}`)} ו-${ltr(`L = ${L}`)} השורד הוא ${sim} בסימולציה, והנוסחה ` +
+          `${ltr(`${L}(N − M) / ${L - 1}`)} עם נקודת האפס ${ltr(`M = ${M}`)} נותנת ${form}` +
+          `${sim === form ? ", אותו דבר." : ", שלא כמו בסימולציה."}` +
+          (L === 2 ? ` בבינארי: ${ltr(`N = ${n.toString(2)}`)}, והשורד ${ltr(sim.toString(2))}.` : "");
+        if (chartFor !== `${n}/${L}`) { chartFor = `${n}/${L}`; $(".jos-chart").innerHTML = chartSvg(n, L); if (window.dvqDecorate) window.dvqDecorate($(".jos-chart")); }
+      };
+      const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
+      const total = () => josephusSteps(st.n, st.l).steps.length;
+      $(".ex-next").addEventListener("click", () => { stop(); st.s += 1; draw(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.s -= 1; draw(); });
+      $(".ex-start").addEventListener("click", () => { stop(); st.s = 0; draw(); });
+      play.addEventListener("click", () => {
+        if (timer) { stop(); return; }
+        if (st.s >= total()) st.s = 0;
+        play.textContent = "עצירה";
+        timer = setInterval(() => { if (st.s >= total()) { stop(); return; } st.s += 1; draw(); }, Number(speed.value));
+      });
+      speed.addEventListener("change", () => { if (timer) { stop(); play.click(); } });
+      mark.addEventListener("change", draw);
+      $(".ex-n").addEventListener("input", () => { stop(); st.n = Number($(".ex-n").value); st.s = 0; draw(); });
+      if (withL) $(".ex-l").addEventListener("input", () => { stop(); st.l = Number($(".ex-l").value); st.s = 0; draw(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0 }); $(".ex-n").value = st.n; if (withL) $(".ex-l").value = st.l; draw(); });
+      draw();
+    },
+  });
 
   // The clock box: a face whose hands can be dragged, a play button with a speed, a day
   // slider, a time field and jumps to the next or previous meeting. The counters cover

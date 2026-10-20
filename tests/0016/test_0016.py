@@ -92,3 +92,19 @@ def test_explorer_matches_simulation():
                     "[m.josephusRun(i + 1, 2), m.josephusFormula(i + 1, 2)])));")
     for n, (sim, form) in enumerate(got, 1):
         assert sim == form == reference(n, 2) == q0016.formula(n, 2), n
+
+
+def test_explorer_steps_match_generator():
+    """The step-by-step elimination of the explorer (who stays, who leaves, per step) is the
+    generator's, for every N up to 64 and L = 2, 3, 4."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"const m = {explorer_require()};"
+                    "const out = []; for (const L of [2, 3, 4]) for (let n = 1; n <= 64; n++) out.push([n, L, m.josephusSteps(n, L)]);"
+                    "console.log(JSON.stringify(out));")
+    for n, L, r in got:
+        steps, win = q0016.run(n, L)
+        assert r["survivor"] == win and [tuple(s) for s in r["steps"]] == [(a, list(b)) for a, b in steps] or \
+            ([list(s) for s in r["steps"]] == [[a, list(b)] for a, b in steps] and r["survivor"] == win), (n, L)
+        gone = [p for _, leave in r["steps"] for p in leave]
+        assert len(gone) == n - 1 and len(set(gone)) == n - 1 and win not in gone
