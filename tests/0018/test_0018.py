@@ -73,3 +73,24 @@ def test_figures_up_to_date():
     for pattern in (r'<div class="stepper".*?</div></div>', r'<svg class="figure hourglass-fig".*?</svg>'):
         generated = re.findall(pattern, out)
         assert generated and re.findall(pattern, text) == generated, pattern
+
+
+def test_explorer_matches_page_code():
+    """The BFS of the explorer (docs/javascripts/explorer.js) returns the page's plan, or
+    None exactly when the page does, on a grid of A, B, D; and its list of measurable D
+    agrees with the oracle."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(A, B, D) for A in range(1, 9) for B in range(A, 12) for D in range(1, 25)]
+    got = node_json(f"const m = {explorer_require()}; const cases = {[list(c) for c in cases]};"
+                    "console.log(JSON.stringify({ plans: cases.map(([A, B, D]) => m.hourglassSolve(A, B, D)),"
+                    " reach: [[7, 11], [4, 6], [3, 5]].map(([A, B]) => m.hourglassReachable(A, B, 30)) }));")
+    for (A, B, D), plan in zip(cases, got["plans"]):
+        ref = solve(A, B, D)
+        if ref is None:
+            assert plan is None, (A, B, D)
+            continue
+        assert plan is not None and {t: act for t, act in plan} == ref, (A, B, D)
+        assert replay(A, B, {t: act for t, act in plan})[-1] == D
+    for (A, B), times in zip([(7, 11), (4, 6), (3, 5)], got["reach"]):
+        assert times == [D for D in range(1, 31) if measurable(A, B, D)], (A, B)

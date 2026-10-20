@@ -77,3 +77,18 @@ def test_figures_up_to_date():
     page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
     table_rows = [l for l in out.splitlines() if l.startswith("|")]
     assert page_rows == table_rows
+
+
+def test_explorer_matches_formula():
+    """probabilityAnswer of the explorer against the generator's formula and the enumeration."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(C, p, q) for C in (1, 2, 3, 4, 6) for p in (Fraction(1, 2), Fraction(1, 4), Fraction(9, 10))
+             for q in (Fraction(1), Fraction(1, 2), Fraction(1, 7), Fraction(1, 365))]
+    got = node_json(f"const m = {explorer_require()}; const cases = {[[C, float(p), float(q)] for C, p, q in cases]};"
+                    "console.log(JSON.stringify(cases.map(([C, p, q]) => m.probabilityAnswer(C, p, q))));")
+    for (C, p, q), v in zip(cases, got):
+        assert abs(v - float(q0015.answer(C, p, q))) < 1e-12, (C, p, q)
+        if C <= 4:
+            assert abs(v - float(enumerate_kinds(C, p, q))) < 1e-12, (C, p, q)
+    assert abs(got[cases.index((2, Fraction(1, 2), Fraction(1, 7)))] - 13 / 27) < 1e-12

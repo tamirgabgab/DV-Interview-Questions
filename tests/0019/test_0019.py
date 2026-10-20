@@ -88,6 +88,23 @@ def test_earliest_end_matches_oracle():
                 assert start + D == min(candidates), (A, B, D, result)
 
 
+def test_explorer_matches_page_code():
+    """The Dijkstra of the explorer returns the page's (start, plan), or None exactly when
+    the page does, on a grid of A, B, D."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(A, B, D) for A in range(2, 9) for B in range(A + 1, 12) for D in range(1, 13)]
+    got = node_json(f"const m = {explorer_require()}; const cases = {[list(c) for c in cases]};"
+                    "console.log(JSON.stringify(cases.map(([A, B, D]) => m.hourglassInterval(A, B, D))));")
+    for (A, B, D), r in zip(cases, got):
+        ref = solve(A, B, D)
+        if ref is None:
+            assert r is None, (A, B, D)
+            continue
+        start, plan = ref
+        assert r is not None and r["start"] == start and {t: act for t, act in r["plan"]} == plan, (A, B, D)
+
+
 def test_figures_up_to_date():
     # The step-through figure on the page is the output of tools/figures/q0019.py
     out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0019.py")],

@@ -5,8 +5,10 @@
 //   josephus               0016, 0022  sliders N (and L), and the circle played step by step; the survivor chart
 //   clock                  0029        a clock face to drag, play or type: meetings of the hands so far
 //   strip                  0030        drag the spider and the fly on their walls: the periodic strip and the path
+//   hourglass              0018, 0019  A, B and D: the plan on a time axis and event by event (BFS or Dijkstra)
+//   probability            0015        p, q and C: the answer, the two-children square and the curve against q
 // The math of each model is exported under Node, where the question tests compare it with
-// the Python reference (tests/0016, 0022, 0026, 0027, 0028, 0029, 0030).
+// the Python reference (tests/0015, 0016, 0018, 0019, 0022, 0026, 0027, 0028, 0029, 0030).
 (() => {
   const EPS = 1e-9;
 
@@ -257,11 +259,104 @@
              valid: lines.filter((l) => l.valid).length };
   };
 
+  // Hourglasses (0018, 0019): A and B minutes, flipped only when one runs out. A plan is a
+  // list of events [t, action] (action "", "A", "B" or "AB"). hourglassSolve is the BFS of
+  // 0018 (measure D from time 0); hourglassInterval is the Dijkstra of 0019 (the earliest
+  // measurement of D between two events). Both follow the page code line by line.
+  const hourglassStep = (A, B, a, b, fa, fb) => {
+    const a2 = fa ? A - a : a, b2 = fb ? B - b : b;
+    const running = [a2, b2].filter((s) => s > 0);
+    if (!running.length) return null;
+    const w = Math.min(...running);
+    return [w, Math.max(a2 - w, 0), Math.max(b2 - w, 0)];
+  };
+  const hourglassSolve = (A, B, D) => {
+    const seen = new Set(["0,0,0"]);
+    const queue = [[0, 0, 0, []]];
+    for (let head = 0; head < queue.length; head++) {
+      const [t, a, b, plan] = queue[head];
+      if (t === D) return plan;
+      for (const fa of [0, 1]) for (const fb of [0, 1]) {
+        const r = hourglassStep(A, B, a, b, fa, fb);
+        if (!r || t + r[0] > D) continue;
+        const key = `${t + r[0]},${r[1]},${r[2]}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        queue.push([t + r[0], r[1], r[2], [...plan, [t, (fa ? "A" : "") + (fb ? "B" : "")]]]);
+      }
+    }
+    return null;
+  };
+  const hourglassInterval = (A, B, D) => {
+    const best = new Map([["0,0,-1", 0]]);
+    const queue = [[0, 0, [0, 0, -1], null, []]];      // [t, tie, state, start, plan]
+    let tie = 1;
+    const pop = () => { queue.sort((u, v) => u[0] - v[0] || u[1] - v[1]); return queue.shift(); };
+    while (queue.length) {
+      const [t, , state, start, plan] = pop();
+      const key = state.join();
+      if (t > best.get(key)) continue;
+      const [a, b, m] = state;
+      if (m === D) return { start, plan };
+      const options = [];
+      if (m === -1) options.push([[a, b, 0], t, t, plan]);
+      for (const fa of [0, 1]) for (const fb of [0, 1]) {
+        const r = hourglassStep(A, B, a, b, fa, fb);
+        if (!r) continue;
+        const m2 = m === -1 ? -1 : m + r[0];
+        if (m2 > D) continue;
+        options.push([[r[1], r[2], m2], t + r[0], start, [...plan, [t, (fa ? "A" : "") + (fb ? "B" : "")]]]);
+      }
+      options.forEach(([s2, t2, st2, pl2]) => {
+        const k2 = s2.join();
+        if (!best.has(k2) || t2 < best.get(k2)) { best.set(k2, t2); queue.push([t2, tie++, s2, st2, pl2]); }
+      });
+    }
+    return null;
+  };
+  // Replay a plan from rest: the events as [t, action, [a, b] on arrival, [a, b] after].
+  const hourglassReplay = (A, B, plan, end) => {
+    let t = 0, a = 0, b = 0;
+    const events = [];
+    const acts = new Map(plan.map(([w, act]) => [w, act]));
+    for (;;) {
+      const act = acts.has(t) ? acts.get(t) : null;
+      if (act === null) { events.push([t, "", [a, b], null]); return events; }
+      const r = hourglassStep(A, B, a, b, act.includes("A"), act.includes("B"));
+      const fa = act.includes("A"), fb = act.includes("B");
+      events.push([t, act, [a, b], [fa ? A - a : a, fb ? B - b : b]]);
+      if (!r) return events;
+      t += r[0]; a = r[1]; b = r[2];
+      if (end !== undefined && t > end) return events;
+    }
+  };
+  // Every D that can be measured from time 0, up to a bound.
+  const hourglassReachable = (A, B, bound) => {
+    const seen = new Set(["0,0,0"]), times = new Set([0]);
+    const queue = [[0, 0, 0]];
+    for (let head = 0; head < queue.length; head++) {
+      const [t, a, b] = queue[head];
+      for (const fa of [0, 1]) for (const fb of [0, 1]) {
+        const r = hourglassStep(A, B, a, b, fa, fb);
+        if (!r || t + r[0] > bound) continue;
+        const key = `${t + r[0]},${r[1]},${r[2]}`;
+        if (seen.has(key)) continue;
+        seen.add(key); times.add(t + r[0]);
+        queue.push([t + r[0], r[1], r[2]]);
+      }
+    }
+    return [...times].sort((u, v) => u - v).filter((v) => v > 0);
+  };
+
+  // Probability (0015): P(all C children are boys | at least one is a boy with the trait).
+  const probabilityAnswer = (C, p, q) => (Math.pow(p, C) * (1 - Math.pow(1 - q, C))) / (1 - Math.pow(1 - p * q, C));
+
   const models = {
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
     motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, josephusRun, josephusSteps, josephusZero, josephusFormula,
     clockCounts, clockMeetsIn, clockNext, clockPrev, clockLabel,
     stripImages, stripEdgePoint, stripPoint3, stripFacesBetween, stripLines, stripBest,
+    hourglassSolve, hourglassInterval, hourglassReplay, hourglassReachable, probabilityAnswer,
   };
   if (typeof module !== "undefined" && module.exports) {
     module.exports = models;
@@ -1058,6 +1153,207 @@
     },
   });
 
+  // The hourglass box (0018: measure D from 0 by BFS; 0019: the earliest interval by
+  // Dijkstra): sliders for A, B and D, the plan on a time axis with the flips marked and the
+  // measured window framed, and the events one at a time with the two hourglasses.
+  const hourglassView = (box) => ({
+    mount(box2) {
+      const interval = box.dataset.mode === "interval";
+      const defaults = { A: Number(box.dataset.a || 7), B: Number(box.dataset.b || 11), D: Number(box.dataset.d || (interval ? 1 : 15)) };
+      const st = { ...defaults, s: 0 };
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        [["A", "שעון A (דקות)", 1, 30], ["B", "שעון B (דקות)", 1, 30], ["D", "המטרה D (דקות)", 1, 60]].map(([k, label, min, max]) =>
+          `<label><span>${label}</span><input type="range" class="ex-${k}" min="${min}" max="${max}" step="1" value="${st[k]}" dir="ltr"><output class="out-${k}"></output></label>`).join("") +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<p class="ex-summary" aria-live="polite"></p>` +
+        `<div class="hg-axis"></div>` +
+        `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">האירוע הקודם</button>` +
+        `<button type="button" class="md-button md-button--primary ex-next">האירוע הבא</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button><span class="ex-pos"></span></div>` +
+        `<div class="hg-frame"></div><p class="hg-caption"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play");
+      let timer = null, uid = 0;
+      const HEB = { "": "לא הופכים כלום", A: "הופכים את A", B: "הופכים את B", AB: "הופכים את A ואת B" };
+      // one hourglass glyph, as tools/figures/hourglass.py draws it
+      const glass = (x, y, top, total, kind) => {
+        const W = 30, H = 50, NECK = 3, cx = x + W / 2, mid = y + H / 2;
+        uid += 1;
+        const id = `exhg${uid}`;
+        const bt = `${x},${y} ${x + W},${y} ${cx + NECK},${mid} ${cx - NECK},${mid}`;
+        const bb = `${cx - NECK},${mid} ${cx + NECK},${mid} ${x + W},${y + H} ${x},${y + H}`;
+        const th = (H / 2) * top / total, bh = (H / 2) * (total - top) / total;
+        let s = `<clipPath id="${id}t"><polygon points="${bt}"/></clipPath><clipPath id="${id}b"><polygon points="${bb}"/></clipPath>`;
+        if (top) s += `<rect class="sand-${kind}" clip-path="url(#${id}t)" x="${x}" y="${f(mid - th)}" width="${W}" height="${f(th)}"/>` +
+                      `<line class="stream-${kind}" x1="${cx}" y1="${mid}" x2="${cx}" y2="${f(y + H - bh - 1)}"/>`;
+        if (total - top) s += `<rect class="sand-${kind}" clip-path="url(#${id}b)" x="${x}" y="${f(y + H - bh)}" width="${W}" height="${f(bh)}"/>`;
+        s += `<polygon class="glass" points="${bt}"/><polygon class="glass" points="${bb}"/>` +
+             `<line class="frame" x1="${x - 4}" y1="${y}" x2="${x + W + 4}" y2="${y}"/><line class="frame" x1="${x - 4}" y1="${y + H}" x2="${x + W + 4}" y2="${y + H}"/>` +
+             `<text class="tick" x="${x + W + 7}" y="${y + 12}">${top}</text><text class="tick" x="${x + W + 7}" y="${y + H - 2}">${total - top}</text>` +
+             `<text class="legend" x="${cx}" y="${y + H + 15}" text-anchor="middle">${kind.toUpperCase()}</text>`;
+        return s;
+      };
+      const pair = (x, y, a, b) => glass(x, y, a, st.A, "a") + glass(x + 64, y, b, st.B, "b");
+      const frameSvg = (ev, measuring, verdict) => {
+        const [t, act, before, after] = ev, cy = 12 + 25;
+        let s = `<svg class="figure hourglass-fig" viewBox="0 0 460 92" style="max-width:29rem" role="img" aria-label="אירוע ברגע ${t}">`;
+        if (measuring) s += `<rect class="measure" x="2" y="2" width="456" height="88" rx="6"/>`;
+        s += `<text class="legend" x="10" y="${cy - 4}" font-weight="700">t = ${t}</text><text class="tick" x="10" y="${cy + 14}">${verdict.event}</text>` + pair(92, 12, before[0], before[1]);
+        if (after === null) s += `<text class="legend" x="226" y="${cy + 5}" font-weight="700">${verdict.text}</text>`;
+        else s += `<line class="ink-line" x1="222" y1="${cy}" x2="306" y2="${cy}" stroke-width="1.5"/><polygon class="ink-fill" points="312,${cy} 304,${cy - 4} 304,${cy + 4}"/>` +
+                  `<text class="legend" x="267" y="${cy - 8}" text-anchor="middle">${verdict.text}</text>` + pair(336, 12, after[0], after[1]);
+        return s + "</svg>";
+      };
+      const axisSvg = (events, start, end) => {
+        const w = 640, x0 = 30, x1 = 610, y = 40, last = Math.max(end, 1);
+        const X = (t) => x0 + (t / last) * (x1 - x0);
+        let s = `<svg class="perf-chart hg-live" viewBox="0 0 ${w} 78" role="img" aria-label="ציר הזמן של התוכנית: האירועים, ההיפוכים וחלון המדידה">`;
+        if (start !== null) s += `<rect class="measure" x="${f(X(start))}" y="${y - 22}" width="${f(X(end) - X(start))}" height="44" rx="4"/>`;
+        s += `<line class="axis" x1="${x0}" x2="${x1}" y1="${y}" y2="${y}"/>`;
+        events.forEach(([t, act], i) => {
+          const cur = i === st.s;
+          s += `<line class="${cur ? "s2-line" : "ink-line"}" x1="${f(X(t))}" x2="${f(X(t))}" y1="${y - 10}" y2="${y + 10}" stroke-width="${cur ? 3 : 1.5}"/>` +
+               `<text class="tick" x="${f(X(t))}" y="${y + 26}" text-anchor="middle">${t}</text>` +
+               (act ? `<text class="legend" x="${f(X(t))}" y="${y - 14}" text-anchor="middle" style="font-size:11px">${act === "AB" ? "A+B" : act}</text>` : "");
+        });
+        return s + "</svg>";
+      };
+      const solve = () => {
+        if (interval) { const r = hourglassInterval(st.A, st.B, st.D); return r ? { start: r.start, plan: r.plan, end: r.start + st.D } : null; }
+        const plan = hourglassSolve(st.A, st.B, st.D);
+        return plan ? { start: 0, plan, end: st.D } : null;
+      };
+      const draw = () => {
+        ["A", "B", "D"].forEach((k) => { $(`.out-${k}`).textContent = String(st[k]); });
+        const res = solve();
+        const summary = $(".ex-summary");
+        if (!res) {
+          const g = (u, v) => (v ? g(v, u % v) : u);
+          st.s = 0;
+          summary.innerHTML = `עם שעונים של ${ltr(st.A)} ו-${ltr(st.B)} דקות אי אפשר למדוד ${ltr(st.D)} דקות${interval ? "" : " מרגע 0"}` +
+            (st.D % g(st.A, st.B) ? `: ‏${ltr(st.D)} איננו כפולה של ${ltr(`gcd(${st.A}, ${st.B}) = ${g(st.A, st.B)}`)}.` : ".") +
+            (interval ? "" : ` מרגע 0 אפשר למדוד: ${ltr(hourglassReachable(st.A, st.B, 60).join(", "))} (עד 60).`);
+          $(".hg-axis").innerHTML = ""; $(".hg-frame").innerHTML = ""; $(".hg-caption").textContent = ""; $(".ex-pos").textContent = "";
+          $(".ex-prev").disabled = $(".ex-next").disabled = true;
+          return;
+        }
+        const events = hourglassReplay(st.A, st.B, res.plan, res.end);
+        st.s = Math.min(Math.max(st.s, 0), events.length - 1);
+        const flips = res.plan.map(([t, act]) => `${ltr(t)}: ${HEB[act]}`).join("; ");
+        summary.innerHTML = (interval ? `המדידה שמסתיימת הכי מוקדם: מרגע ${ltr(res.start)} עד רגע ${ltr(res.end)}, ‏${ltr(`${res.end} − ${res.start} = ${st.D}`)}. ` : `מודדים ${ltr(st.D)} דקות מרגע 0 ב-${ltr(events.length - 1)} אירועים. `) +
+          `התוכנית: ${flips}.` + (interval ? "" : ` מרגע 0 אפשר למדוד גם: ${ltr(hourglassReachable(st.A, st.B, 60).filter((v) => v !== st.D).slice(0, 12).join(", "))}, ...`);
+        $(".hg-axis").innerHTML = axisSvg(events, interval ? res.start : null, res.end);
+        const ev = events[st.s], [t, act, before, after] = ev;
+        // which hourglass ran out: the one whose sand on top after the previous action equals the wait
+        const prevEv = st.s > 0 ? events[st.s - 1] : null;
+        const out = [];
+        if (prevEv) { const w = t - prevEv[0]; if (prevEv[3][0] === w) out.push("A"); if (prevEv[3][1] === w) out.push("B"); }
+        const what = st.s === 0 ? "start" : `${out.join(" + ")} run${out.length === 1 ? "s" : ""} out`;
+        const ran = st.s === 0 ? "התחלה" : out.length === 2 ? "שני השעונים נגמרים" : `שעון ${out[0]} נגמר`;
+        const done = st.s === events.length - 1;
+        const flip = act ? `flip ${act === "AB" ? "A + B" : act}` : "";
+        let verdict;
+        if (done) verdict = { event: what, text: interval ? `STOP ✓ ${res.end} − ${res.start} = ${st.D}` : `✓ D = ${st.D}` };
+        else if (interval && t === res.start) verdict = { event: what, text: flip ? `START, ${flip}` : "START" };
+        else verdict = { event: what, text: flip || "wait" };
+        $(".hg-frame").innerHTML = frameSvg(ev, interval && t >= res.start, verdict);
+        $(".hg-caption").innerHTML = `רגע ${ltr(t)}: ${ran}. חול למעלה: ${ltr(`A = ${before[0]}, B = ${before[1]}`)}. ` +
+          (done ? (interval ? `מסיימים: נמדדו ${ltr(st.D)} דקות מרגע ${ltr(res.start)}.` : `עברו בדיוק ${ltr(st.D)} דקות מרגע 0.`)
+            : `${interval && t === res.start ? "מתחילים למדוד, ו" : ""}${HEB[act]}${act ? `; אחרי ההיפוך למעלה ${ltr(`A = ${after[0]}, B = ${after[1]}`)}` : ""}.`);
+        $(".ex-pos").textContent = `אירוע ${st.s + 1} מתוך ${events.length}`;
+        $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = done;
+      };
+      const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
+      const count = () => { const r = solve(); return r ? hourglassReplay(st.A, st.B, r.plan, r.end).length : 0; };
+      $(".ex-next").addEventListener("click", () => { stop(); st.s += 1; draw(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.s -= 1; draw(); });
+      play.addEventListener("click", () => {
+        if (timer) { stop(); return; }
+        if (!count()) return;
+        if (st.s >= count() - 1) st.s = 0;
+        play.textContent = "עצירה";
+        timer = setInterval(() => { if (st.s >= count() - 1) { stop(); return; } st.s += 1; draw(); }, 1100);
+        draw();
+      });
+      ["A", "B", "D"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { stop(); st[k] = Number($(`.ex-${k}`).value); st.s = 0; draw(); }));
+      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0 }); ["A", "B", "D"].forEach((k) => { $(`.ex-${k}`).value = st[k]; }); draw(); });
+      draw();
+    },
+  });
+
+  // The probability box (0015): p, q and the number of children move the answer; for two
+  // children an area-proportional grid of the four kinds of child, and a curve of the
+  // answer against q for the chosen p and C.
+  const probabilityView = () => ({
+    mount(box) {
+      const QS = [["1", "בלי תכונה (q = 1)"], ["0.5", "הטלת מטבע (q = 1/2)"], ["0.14285714285714285", "יום בשבוע (q = 1/7)"],
+                  ["0.08333333333333333", "חודש בשנה (q = 1/12)", ], ["0.0027397260273972603", "יום בשנה (q = 1/365)"]];
+      const defaults = { p: Number(box.dataset.p || 0.5), q: QS[2][0], C: Number(box.dataset.c || 2) };
+      const st = { ...defaults };
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label><span>ההסתברות לבן p</span><input type="range" class="ex-p" min="0.05" max="0.95" step="0.05" value="${st.p}" dir="ltr"><output class="out-p"></output></label>` +
+        `<label>התכונה <select class="ex-q">${QS.map(([v, n]) => `<option value="${v}"${v === st.q ? " selected" : ""}>${n}</option>`).join("")}</select></label>` +
+        `<label><span>מספר הילדים C</span><input type="range" class="ex-C" min="1" max="6" step="1" value="${st.C}" dir="ltr"><output class="out-C"></output></label>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<p class="ex-summary" aria-live="polite"></p><div class="prob-box"><div class="prob-grid"></div><div class="prob-chart"></div></div>`;
+      const $ = (sel) => box.querySelector(sel);
+      const gridSvg = (p, q) => {
+        // child 1 along the rows, child 2 along the columns; four kinds each, with areas
+        // proportional to their probabilities
+        const kinds = [["בן, עם", p * q, true, true], ["בן, בלי", p * (1 - q), true, false], ["בת, עם", (1 - p) * q, false, true], ["בת, בלי", (1 - p) * (1 - q), false, false]];
+        const S = 240, x0 = 70, y0 = 30;
+        let s = `<svg class="figure prob-live" viewBox="0 0 ${x0 + S + 10} ${y0 + S + 10}" style="max-width:21rem" role="img" aria-label="ריבוע ההסתברות של שני ילדים: שטח כל משבצת הוא ההסתברות של הזוג">`;
+        let cy = y0;
+        kinds.forEach(([n1, w1, boy1, tr1]) => {
+          let cx = x0 + S;
+          kinds.forEach(([n2, w2, boy2, tr2]) => {
+            const cw = w2 * S, ch = w1 * S;
+            cx -= cw;
+            const cond = (boy1 && tr1) || (boy2 && tr2), hit = cond && boy1 && boy2;
+            if (cw > 0.2 && ch > 0.2) s += `<rect class="${hit ? "pg-hit" : cond ? "pg-cond" : "pg-out"}" x="${f(cx)}" y="${f(cy)}" width="${f(cw)}" height="${f(ch)}"><title>${n1} / ${n2}: ${fmt(w1 * w2, 4)}</title></rect>`;
+          });
+          if (w1 * S > 11) s += `<text class="pg-day" x="${x0 - 6}" y="${f(cy + (w1 * S) / 2 + 4)}" text-anchor="start" direction="rtl">${n1}</text>`;
+          cy += w1 * S;
+        });
+        let cx = x0 + S;
+        kinds.forEach(([n2, w2]) => { cx -= w2 * S; if (w2 * S > 30) s += `<text class="pg-day" x="${f(cx + (w2 * S) / 2)}" y="${y0 - 8}" text-anchor="middle" direction="rtl">${n2}</text>`; });
+        s += `<rect class="pg-quad" x="${x0 + S - p * S}" y="${y0}" width="${f(p * S)}" height="${f(p * S)}"/>`;
+        return s + "</svg>";
+      };
+      const curveSvg = (p, C, q) => {
+        const fr = frame("התשובה כפונקציה של q", 100, 1, [0, 0.25, 0.5, 0.75, 1]);
+        let s = fr.s;
+        const pts = [];
+        for (let i = 1; i <= 100; i++) { const qq = i / 100; pts.push(`${f(fr.cx(i))},${f(fr.Y(probabilityAnswer(C, p, qq)))}`); }
+        s += `<polyline class="s1-line" points="${pts.join(" ")}" fill="none" stroke-width="2.5"/>`;
+        s += hline(fr, Math.pow(p, C - 1), `q → 0: p^(C−1) = ${fmt(Math.pow(p, C - 1))}`);
+        s += `<circle class="s2-dot" cx="${f(fr.cx(Math.max(q * 100, 0.5)))}" cy="${f(fr.Y(probabilityAnswer(C, p, q)))}" r="6"/>`;
+        [1, 25, 50, 75, 100].forEach((i) => { s += fr.xtick(i, (i / 100).toFixed(2)); });
+        return s + fr.close();
+      };
+      const draw = () => {
+        const p = st.p, q = Number(st.q), C = st.C;
+        $(".out-p").textContent = String(p); $(".out-C").textContent = String(C);
+        const PT = 1 - Math.pow(1 - p * q, C), PAT = Math.pow(p, C) * (1 - Math.pow(1 - q, C)), ans = probabilityAnswer(C, p, q);
+        $(".ex-summary").innerHTML = `עם ${ltr(`p = ${p}`)}, ‏${ltr(`q = ${fmt(q, 4)}`)} ו-${ltr(`C = ${C}`)}: ‏${ltr(`P(T) = ${fmt(PT, 4)}`)}, ‏${ltr(`P(A ∩ T) = ${fmt(PAT, 4)}`)}, ` +
+          `ולכן ${ltr(`P(A | T) = ${fmt(ans, 4)}`)}. בלי התכונה (${ltr("q = 1")}) התשובה היא ${ltr(fmt(Math.pow(p, C) / (1 - Math.pow(1 - p, C)), 4))}, ` +
+          `ועם תכונה נדירה מאוד היא שואפת ל-${ltr(`p^(C−1) = ${fmt(Math.pow(p, C - 1), 4)}`)}.`;
+        $(".prob-grid").innerHTML = C === 2 ? `<p class="ex-title">שני ילדים: שטח כל משבצת הוא ההסתברות של הזוג; הריבוע המקווקו הוא "שני בנים"</p>${gridSvg(p, q)}` +
+          `<span class="viz-legend"><span><i class="pg-hit"></i>מקיים את התנאי, ושני הילדים בנים</span><span><i class="pg-cond"></i>מקיים את התנאי, יש גם בת</span><span><i class="pg-out"></i>לא מקיים את התנאי</span></span>`
+          : `<p class="ex-title">הריבוע מצויר רק לשני ילדים; עם ${C} ילדים המספרים בשורה שלמעלה</p>`;
+        $(".prob-chart").innerHTML = `<p class="ex-title">התשובה כפונקציה של q, עם p ו-C הנבחרים; הנקודה היא q הנבחר</p>${curveSvg(p, C, q)}`;
+        if (window.dvqDecorate) window.dvqDecorate(box);
+      };
+      $(".ex-p").addEventListener("input", () => { st.p = Number($(".ex-p").value); draw(); });
+      $(".ex-C").addEventListener("input", () => { st.C = Number($(".ex-C").value); draw(); });
+      $(".ex-q").addEventListener("change", () => { st.q = $(".ex-q").value; draw(); });
+      $(".ex-reset").addEventListener("click", () => { Object.assign(st, defaults); $(".ex-p").value = st.p; $(".ex-C").value = st.C; $(".ex-q").value = st.q; draw(); });
+      draw();
+    },
+  });
+
   const VIEWS = {
     "cake-arith": () => cakeView("arith"),
     "cake-geo": () => cakeView("geo"),
@@ -1065,6 +1361,8 @@
     josephus: josephusView,
     clock: clockView,
     strip: stripView,
+    hourglass: hourglassView,
+    probability: probabilityView,
   };
 
   // --- the box -----------------------------------------------------------------------------
