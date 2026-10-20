@@ -93,6 +93,47 @@ def test_follow_ups():
                                                             ["end0", "top", "sideB", "bottom", "enda"]]
 
 
+def test_explorer_matches_python():
+    """The strip math of docs/javascripts/explorer.js (the live strip) against the generator
+    and the independent reference: the 48 lines, which are valid, the best length, the
+    exit point and the path point by point, on the question and on random boxes."""
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(87)
+    cases = [(30, 12, 12, 6, 11, 6, 1), (30, 12, 12, 6, 1, 6, 11), (30, 12, 12, 6, 11, 6, 6), (1, 1, 1, 0.5, 0.5, 0.5, 0.5),
+             (30, 12, 12, 0, 0, 12, 12), (0.5, 12, 12, 6, 11, 6, 1)]
+    for _ in range(120):
+        a, b, h = rng.choice([2, 5, 10, 30, 60]), rng.choice([3, 7, 12, 30]), rng.choice([2, 6, 12, 25])
+        cases.append((a, b, h, rng.randint(0, 4 * b) / 4, rng.randint(0, 4 * h) / 4, rng.randint(0, 4 * b) / 4, rng.randint(0, 4 * h) / 4))
+    got = node_json(f"const m = {explorer_require()}; const cases = {[list(c) for c in cases]};"
+                    "const out = cases.map(([a, b, h, y0, z0, y1, z1]) => { const r = m.stripBest(a, b, h, y0, z0, y1, z1);"
+                    " return { length: r.line.length, faces: r.faces, exit: r.exit, enter: r.enter, segs: r.segs, pts: r.pts,"
+                    " valid: r.lines.filter((l) => l.valid).map((l) => [l.sEdge, l.fEdge, l.k, l.length]) }; });"
+                    "console.log(JSON.stringify(out));")
+    for case, r in zip(cases, got):
+        a, b, h, y0, z0, y1, z1 = case
+        s, f = (0, Fr(y0), Fr(z0)), (a, Fr(y1), Fr(z1))
+        best = q0030.best(a, b, h, s, f)
+        assert math.isclose(r["length"], best["length"], abs_tol=1e-9), case
+        ref_best, ref_seqs, ref_exits = reference.shortest(a, b, h, y0, z0, y1, z1)
+        assert math.isclose(r["length"], ref_best, abs_tol=1e-7), case
+        assert any(math.dist(r["exit"], e) < 1e-6 for e in ref_exits), case
+        assert r["faces"] in ref_seqs, case
+        # the strip's valid lines are the generator's, with the same lengths
+        mine = sorted((c["s_edge"], c["f_edge"], c["k"], round(c["length"], 7)) for c in q0030.candidates(a, b, h, s, f) if c["valid"])
+        assert sorted((e, g, k, round(v, 7)) for e, g, k, v in r["valid"]) == mine, case
+        # the segments add up, follow the faces, and the points are the reference's
+        assert len(r["segs"]) == len(r["faces"]) == len(r["pts"]) - 1
+        assert math.isclose(sum(r["segs"]), r["length"], abs_tol=1e-9)
+        assert all(math.isclose(math.dist(p, q), g, abs_tol=1e-9) for p, q, g in zip(r["pts"], r["pts"][1:], r["segs"]))
+        ref_pts = next(rt[2] for rt in reference.routes(a, b, h, (0, y0, z0), (a, y1, z1)) if rt[1] == r["faces"])
+        assert all(math.dist(p, q) < 1e-6 for p, q in zip(r["pts"], ref_pts)), case
+    # the question's numbers
+    r = got[0]
+    assert r["faces"] == ["end0", "top", "sideB", "bottom", "enda"] and r["segs"] == [1.25, 8.75, 20, 8.75, 1.25]
+    assert r["exit"] == [0, 6.75, 12] and r["enter"] == [30, 6.75, 0] and len(r["valid"]) == 22
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 

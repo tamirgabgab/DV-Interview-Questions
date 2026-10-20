@@ -1362,6 +1362,21 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ex-controls .md-button { padding: 0.2rem 0.7rem; font-size: 0.65rem; margin: 0; }
 .md-typeset .explorer .md-button:not(.md-button--primary) { color: var(--md-typeset-a-color); border-color: currentColor; }
 
+/* the strip explorer of 0030: two wall panels to drag S and F, and the live strip */
+.md-typeset .explorer .strip-walls { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .strip-wall { flex: 0 1 13rem; max-width: 100%; }
+.md-typeset .explorer .strip-wall p { margin: 0.2em 0; font-size: 0.7rem; }
+.md-typeset .explorer .strip-wall svg { width: 100%; display: block; touch-action: none; cursor: grab; user-select: none; }
+.md-typeset .explorer .strip-wall svg.is-dragging { cursor: grabbing; }
+.md-typeset .explorer .strip-coords input[type="number"] { width: 4.2rem; font: inherit; padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer svg.strip-live { width: 100%; max-width: 40rem; display: block; }
+.md-typeset svg .strip-faint { stroke: var(--viz-text); stroke-opacity: 0.22; }
+.md-typeset svg .strip-valid { stroke: var(--viz-ink); stroke-opacity: 0.55; }
+.md-typeset .viz-legend .strip-faint { background: var(--viz-text); opacity: 0.3; height: 0.1rem; border-radius: 0; }
+.md-typeset .viz-legend .strip-valid { background: var(--viz-ink); opacity: 0.6; height: 0.12rem; border-radius: 0; }
+.md-typeset .explorer .strip-segments table { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer .strip-segments td, .md-typeset .explorer .strip-segments th { padding: 0.15em 0.6em; }
+
 /* Reading aids (reading-tools.js): enlarge button and lightbox, tap tooltip, part bar */
 .md-typeset .fig-wrap { position: relative; }
 .md-typeset .fig-enlarge {
