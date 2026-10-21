@@ -1662,43 +1662,20 @@ its follow-up questions, done before rounds V to X were proposed:
 
 ### Round W — follow-up questions inside the boxes (proposed in session 20, owner picks)
 
-One row per page: what the box lacks to try the page's own follow-up questions.
+The owner's picks (session 20): the rows below are the whole of round W, to be implemented when the owner says "round W". The other rows of the audit were dropped on the owner's request, to keep the round small.
 
 | Id | Page | Missing | Size |
 |---|---|---|---|
-| W148 | 0001 edge | A pulse of N cycles and a registered output | S |
 | W149 | 0002 trace (swap) | A three-variable rotation; a reset | S |
-| W150 | 0003 trace (loop) | The `j < i` and flipped-condition variants; a stability check with tagged equal items | S–M |
-| W151 | 0004 boxes3 | A "only some labels wrong" mode; a table of the two candidate arrangements, one crossed off per draw | S |
 | W152 | 0005 bfs01 | A digit-set choice (3 and 7); a "length only" mode without parents, with the bit count for the hardware follow-up | S–M |
-| W153 | 0006 stock | Add / remove days; k-trade and fee modes | M |
 | W154 | 0007 triangle / polygon | The exact discrete count over C(360, n) beside the continuous formula; a histogram of the largest arc ("fat triangles") | M |
-| W155 | 0008 eurovision | A "certain win" view for the leader; a per-announcement list of who can still win | S–M |
-| W156 | 0009 boxes | A free number of openings (not only N/2); a "helper only peeks" mode | S |
-| W157 | 0010 brackets | A random string; a single-type counter mode; a longest-valid-substring mode | S–M |
-| W158 | 0011 ttt | A mid-game legality mode; a 4 × 4 board | S–M |
-| W159 | 0012, 0013 kaprekar | A digit-count choice (2, 5, 6) with cycle detection for chains that never stop (549945, 631764) | S–M |
-| W160 | 0014 shapes | A gap G and a coverage target; a frequency count over whole sets ("is every legal set equally likely?") | M |
-| W161 | 0015 probability | An "eldest is a boy" mode; a Monte Carlo button; a free q | S |
 | W162 | 0016, 0022 josephus | The "every third leaves" rule (41 people) on 0016; a reverse lookup "for which N does seat s survive"; N above 64 | S–M |
-| W163 | 0017 floyd | μ and λ marked on the graph; the "meeting step is a multiple of λ" invariant shown, not only told | S |
 | W164 | 0018, 0019 hourglass | Minimise flips instead of events; a third hourglass | M |
-| W165 | 0020, 0021 pcie | L up to 4096; the expected number of completions (0021); a split into several requests by MRRS | S–M |
-| W166 | 0023 endpoint | A repeated tag; Lower Address shown; undo | S–M |
-| W167 | 0024 credits | A "Credit Grant lost" event; a random sequence (with U135) | S |
-| W168 | 0025 acknak | Control of the Ack thresholds (or a seed) instead of hidden randomness (with U135) | S |
 | W169 | 0026 motorcycle | Four people and n; a distance field (52 km); two strategies overlaid on one chart | M |
 | W170 | 0027, 0028 cake | Wider ranges: d up to 0.8 and negative, a down to 0.0001, q up to 3 and below 1 | S |
-| W171 | 0029 clock | Opposite-hands and 90° modes; a 24-hour dial; a jumping seconds hand | M |
-| W172 | 0030 strip | A sweep of z0 that answers "when do five faces win"; points on side faces; a cube preset | M |
+| W172 | 0030 strip | **A cube as a new part a** (owner's rework): a worked numeric example with equal length, width and height, the spider on face end0 and the fly on face enda, placed so that the shortest path crosses four faces (not five as in the current example); the current content becomes part b, the explorer gets the cube as a preset | M |
 | W173 | 0031 bridge | Bridge capacity 3; a comparison with the two classic strategies | S |
-| W174 | 0032 river | A boat for two; a second goat (a selectable item set) | M |
-| W175 | 0033 fifo | A reader start delay D, a second burst with a gap, back-pressure (`fifoFill` needs a delay parameter) | M |
-| W176 | 0034 gray | Simultaneous read and write; the synchroniser delay on the far pointer ("by how many cycles is empty late"); almost-full; a 12-entry FIFO | M |
 | W177 | 0035 div3 | Divide by a general N (5); a selectable strip length | M |
-| W178 | 0036 lfsr | A selectable seed; the Galois form; 8 bits (with U139) | S–M |
-| W179 | 0037 mtbf | A target MTBF that answers "how many flops"; more than three flops; a preset for a synchroniser flop with a smaller τ | S |
-| W180 | 0038 handshake | Selectable MAX_WAIT and strip length; same-cycle ack and back-to-back toggles; a `cover` row for 1, 2 and 3 cycles | S–M |
 
 ### Round X — one timing strip for the protocols (proposed in session 20, owner picks)
 
@@ -1708,11 +1685,9 @@ One row per page: what the box lacks to try the page's own follow-up questions.
 | X146 | 0023, 0024, 0025 | **Event axis for the three reference models**: every event a column on a strip with Seq / credits / cycle, which merges U136 into one uniform view | M |
 | X147 | 0033 | **A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart | S |
 
-Suggested order (session 20): round V first (a few days, touches every box), then the
-S-sized rows of round W that unlock follow-ups the page itself asks the reader to try
-(W170 cake ranges, W165 PCIe 4 KB, W161 probability, W179 mtbf,
-W173 bridge, W167 credits, W178 lfsr, W148 edge), then U135 with
-W168 and W167, U139 with W176 and W178, then round X on top of V.
+Suggested order (session 20): round V is done. Round W next, as listed (the owner picks
+the batches and answers multiple-choice questions per batch), then U135 and U139, then
+round X on top of V.
 
 
 The older idea list below is kept for reference; items covered by the rounds above are
