@@ -111,3 +111,69 @@ def test_figures_up_to_date():
     page = re.findall(r'<svg class="figure" viewBox="0 0 640.*?</svg>', text)
     assert page == generated and len(page) == 2
     assert re.findall(r'<div class="stepper".*?</div></div>', text) == re.findall(r'<div class="stepper".*?</div></div>', out)
+
+
+def test_explorer_matches_page_code():
+    """The boxes explorer: its cycles, person 0's cut and the walks against the page's
+    cycle_from, helper and find_my_note on the example and random arrangements; the two
+    closed-form rates against the page's test value and a simulation."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(99)
+    arrangements = [EXAMPLE] + [random_notes(rng) for _ in range(60)]
+    arrangements += [from_cycle_lengths(lengths, rng) for lengths in ([16], [9, 7], [8, 8], [10, 3, 3], [1] * 16)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const arr = {json.dumps(arrangements)};
+      let seed = 7;
+      const rnd = () => {{ seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }};
+      let wins = 0, randWins = 0;
+      for (let r = 0; r < 4000; r++) {{ const notes = m.permShuffle(16, rnd); wins += m.permAllWin(notes, 8); randWins += m.permRandomPicks(notes, 8, rnd); }}
+      console.log(JSON.stringify({{
+        cycles: arr.map((a) => m.permCycles(a)),
+        cut: arr.map((a) => m.permHelper(a, 8)),
+        walks: arr.map((a) => {{ const c = m.permHelper(a, 8); const n = c ? m.permSwap(a, c[0], c[1]) : a;
+          return Array.from({{length: 16}}, (_, i) => m.permWalk(n, i + 1, 8)); }}),
+        before: arr.map((a) => Array.from({{length: 16}}, (_, i) => m.permWalk(a, i + 1, 8).found)),
+        pStrat: m.permStrategyProb(16, 8), pRand: m.permRandomProb(16, 8), wins, randWins,
+        small: [4, 6, 8].map((n) => [m.permStrategyProb(n, n / 2), m.permRandomProb(n, n / 2)]),
+      }}));""")
+    for notes, cycles, cut, walks, before in zip(arrangements, got["cycles"], got["cut"], got["walks"], got["before"]):
+        seen = set()
+        for c in cycles:
+            assert c == ns["cycle_from"](notes, c[0]) and c[0] == min(c) and not seen & set(c)
+            seen.update(c)
+        assert seen == set(range(1, N + 1))
+        room = Room(notes)
+        ns["helper"](room)
+        after = room._notes
+        if cut is None:
+            assert after == notes and room.swaps_left == ns["MAX_SWAPS"]
+        else:
+            assert room.swaps_left == ns["MAX_SWAPS"] - 1
+            a, b = cut
+            assert after == notes[:a] + [notes[b]] + notes[a + 1:b] + [notes[a]] + notes[b + 1:]
+        for me, walk in enumerate(walks, start=1):
+            assert walk["found"] == ns["find_my_note"](room, me)
+            # the boxes opened, replayed on the page's Room
+            replay = Room(after)
+            replay.enter()
+            opened, box = [], me
+            for _ in range(MAX_OPENS):
+                opened.append(box)
+                note = replay.open_box(box)
+                if note == me:
+                    break
+                box = note
+            assert walk["opened"] == opened
+        plain = Room(notes)
+        assert before == [ns["find_my_note"](plain, me) for me in range(1, N + 1)]
+    assert abs(got["pStrat"] - 0.3371) < 1e-4 and got["pRand"] == 2 ** -16
+    assert abs(got["wins"] / 4000 - got["pStrat"]) < 0.05
+    assert got["randWins"] <= 3                     # expected 0.06 of 4000 rounds
+    # small N: 1 - sum 1/k over the long lengths, and (1/2)^n
+    want = [[1 - (1 / 3 + 1 / 4), 2 ** -4], [1 - (1 / 4 + 1 / 5 + 1 / 6), 2 ** -6], [1 - sum(1 / k for k in range(5, 9)), 2 ** -8]]
+    for (a, b), (c, d) in zip(got["small"], want):
+        assert abs(a - c) < 1e-12 and b == d
