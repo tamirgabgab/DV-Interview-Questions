@@ -1027,7 +1027,19 @@ axe check warns only; `main` is updated at the end of each round.
    series names in running text, and `--viz-s4` (purple) as a fourth series colour.
    The ring of 0009 is `role="group"` because its boxes are buttons (axe:
    nested-interactive under `role="img"`).
-5. **Checks:** lint 38/38, 234 Python tests, strict build, links 0 broken, phone check
+5. **Round T, second batch (the owner's order): T117 board (0011), T116 shapes (0014),
+   T120 Kaprekar (0012, 0013), T121 announcements (0008), T122 three boxes (0004).**
+   Owner's answers: 0011 with a board builder, random legal boards and the wrap toggle;
+   0014 with rejection flashes and a heat map (no hand drawing); 0012/0013 with the chain
+   and the histogram; 0008 with a what-if box for Israel's scores; 0004 with hidden random
+   contents and no try counter beyond a small games line. Kinds `ttt`, `shapes`,
+   `kaprekar`, `eurovision`, `boxes3`; tests replay the page code (`tests/0011` on all
+   19,683 fillings, `tests/0014` with the painting reference, `tests/0012`, `0013` on every
+   number, `tests/0008` against the generator's steps and the what-if data, `tests/0004`
+   on the twelve cases). `shapesRandom` caps n at the number of unit cells: the page's
+   retry loop never returns for an impossible n (an explorer with a free slider would
+   hang the tab). Test RNG under Node is mulberry32 (an LCG in doubles loses precision).
+6. **Checks:** lint 38/38, 240 Python tests, strict build, links 0 broken, phone check
    light and dark with axe (0 problems, 0 violations).
 
 ---
@@ -1430,13 +1442,13 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 | ~~T113~~ | Done in session 19. Was: 0009 boxes and cycles | **Permutation lab**: N boxes (sliders 4..16), "shuffle" draws the permutation as arrows and colours its cycles; a stepper follows one prisoner box by box; "1,000 rounds" runs the strategy against random choice and shows the success rates side by side (≈ 31% against 1 / 2^N) | M |
 | ~~T114~~ | Done in session 19. Was: 0010 valid parentheses | **Stack animation**: type a string, the stack pushes and pops character by character, the depth chart draws itself, the first mismatch is circled; presets for the page examples and the traps (`([)]`, lone `)`) | S–M |
 | ~~T115~~ | Done in session 19. Was: 0017 duplicate number | **Tortoise and hare**: the array as nodes i → a[i] (type or shuffle an array), the two runners move at their speeds, the meeting and the second phase to the entry of the cycle (the duplicate); a second tab plays the binary-search-on-values method with the count per step | M |
-| T116 | 0014 random shapes | **Generate**: a button draws N random squares or rectangles on the grid with the constraints of the page (a JS port of the rejection sampling), rejected attempts flashed in red; a heat map of where shapes land after 500 draws shows the bias the question asks about | M |
-| T117 | 0011 tic-tac-toe | **Board builder**: tap cells to place X / O, the page's rules decide live whether the board is a legal final board and say why not (counts, two winners, play after a win); "random legal board" and the wrap-around variant of part b as a toggle | M |
+| ~~T116~~ | Done in session 19. Was: 0014 random shapes | **Generate**: a button draws N random squares or rectangles on the grid with the constraints of the page (a JS port of the rejection sampling), rejected attempts flashed in red; a heat map of where shapes land after 500 draws shows the bias the question asks about | M |
+| ~~T117~~ | Done in session 19. Was: 0011 tic-tac-toe | **Board builder**: tap cells to place X / O, the page's rules decide live whether the board is a legal final board and say why not (counts, two winners, play after a win); "random legal board" and the wrap-around variant of part b as a toggle | M |
 | ~~T118~~ | Done in session 19 (see the log). Was: 0007 triangle and centre | **Throw three points**: a button (or drag the points) on the unit circle, the arcs coloured, inside / outside decided; "1,000 throws" fills a running counter that converges to 1/4; an M slider for the discrete version with the formula beside it | S–M |
 | ~~T119~~ | Done in session 19. Was: 0005 smallest 0/1 multiple | **BFS on remainders**: x up to ~30, the x remainders as a ring, the queue and the visited set grow step by step, the path back to 0 spelled out as the answer; a step counter next to the enumeration count for the same x | M |
-| T120 | 0012, 0013 Kaprekar | **Iterate**: type a number, sort-subtract step by step until 495 / 6174, the chain drawn; a histogram of the number of steps over all numbers (the page's part b) with the typed number highlighted | S–M |
-| T121 | 0008 Eurovision | **Announcement slider**: the cups chart with a slider "countries announced so far"; the room left for Israel against the points left, the moment of certain loss marked; a "what if" box to change Israel's jury score and watch the moment move | S–M |
-| T122 | 0004 three boxes | **Sample a ball**: tap a box to draw one ball (the hidden contents are random each time), the deduction appears line by line; "try the wrong box first" shows why one draw from "red" or "black" is not enough | S |
+| ~~T120~~ | Done in session 19. Was: 0012, 0013 Kaprekar | **Iterate**: type a number, sort-subtract step by step until 495 / 6174, the chain drawn; a histogram of the number of steps over all numbers (the page's part b) with the typed number highlighted | S–M |
+| ~~T121~~ | Done in session 19. Was: 0008 Eurovision | **Announcement slider**: the cups chart with a slider "countries announced so far"; the room left for Israel against the points left, the moment of certain loss marked; a "what if" box to change Israel's jury score and watch the moment move | S–M |
+| ~~T122~~ | Done in session 19. Was: 0004 three boxes | **Sample a ball**: tap a box to draw one ball (the hidden contents are random each time), the deduction appears line by line; "try the wrong box first" shows why one draw from "red" or "black" is not enough | S |
 | T123 | 0001 edge detector | **Waveform lab**: click the input per cycle, the output and the flop values appear on a live WaveDrom-like strip with the two-flop diagram beside it; a toggle for the one-cycle-late variant of the follow-ups | S–M |
 | T124 | 0002, 0003 swaps and loops | **Code tracer**: a step button runs the page's loop with a variable table and the current line highlighted (the swap variants, the double loop); one component reused by every short-code question | M |
 | T125 | 0024 USB4 credits | **Credit flow**: sliders for the buffer size and the packet rate, the two modulo-256 counters and the credits in flight animated, a "lose a packet" button and the resynchronisation that follows, as in the page's step figures | M–L |
@@ -1446,8 +1458,7 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 Suggested order: T114, T118, T122 (small, each page gets its "try it" box in an hour),
 then T113 and T115 (the two algorithm animations that readers ask about most), T121 and
 T120, and the protocol trio T125 to T127 after M73. Session 19 did T118, T113, T115, T119
-and T114; the owner's next picks, in order: T117 (0011), T116 (0014), T120 (0012, 0013),
-T121 (0008), T122 (0004).
+and T114, then T117, T116, T120, T121 and T122. Open: T123 to T127.
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.

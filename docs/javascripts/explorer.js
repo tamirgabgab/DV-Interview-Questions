@@ -3176,7 +3176,7 @@
         st.board.forEach((v, i) => {
           const x = 6 + (i % 3) * 34, y = 6 + Math.floor(i / 3) * 34;
           const inX = chk.xLines.some((l) => chk.lines[l].includes(i));
-          s += `<g class="ttt-cell" data-i="${i}" tabindex="0" role="button" aria-label="משבצת ${i}: ${v === "." ? "ריקה" : v}">` +
+          s += `<g class="ttt-cell" data-i="${i}" tabindex="0" role="button" aria-label="${v === "." ? `${i}: משבצת ריקה` : `${v} במשבצת ${i}`}">` +
                `<rect class="${lit.has(i) ? (inX ? "cell-s2" : "cell-s1") : "ttt-empty"}" x="${x}" y="${y}" width="34" height="34"/>`;
           if (v === "X") s += `<path class="mark" d="M${x + 9},${y + 9} L${x + 25},${y + 25} M${x + 25},${y + 9} L${x + 9},${y + 25}"/>`;
           else if (v === "O") s += `<circle class="mark" cx="${x + 17}" cy="${y + 17}" r="9"/>`;
@@ -3230,7 +3230,7 @@
         `<label><span>‏N (עמודות)</span><input type="range" class="ex-N" min="3" max="14" step="1" value="${st.N}" dir="ltr"><output class="out-N"></output></label>` +
         `<label><span>‏M (שורות)</span><input type="range" class="ex-M" min="3" max="12" step="1" value="${st.M}" dir="ltr"><output class="out-M"></output></label>` +
         `<label><span>צורות לכל היותר</span><input type="range" class="ex-max" min="1" max="10" step="1" value="${st.max}" dir="ltr"><output class="out-max"></output></label>` +
-        `<label><select class="ex-kind"><option value="squares" selected>ריבועים (סעיף א)</option><option value="rects">מלבנים (סעיף ב)</option></select></label></div>` +
+        `<label><select class="ex-kind" aria-label="סוג הצורות"><option value="squares" selected>ריבועים (סעיף א)</option><option value="rects">מלבנים (סעיף ב)</option></select></label></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button md-button--primary ex-one">עוד צורה</button>` +
         `<button type="button" class="md-button ex-all">הגרלה שלמה</button>` +
@@ -3342,7 +3342,7 @@
       const draw = () => {
         const c = kapChain(st.x, d);
         if (document.activeElement !== input) input.value = st.x;
-        $(".kp-table").innerHTML = `<table><thead><tr><th>צעד</th><th>המספר</th><th>מהגדול לקטן</th><th>מהקטן לגדול</th><th>ההפרש</th><th>מיוחד?</th></tr></thead><tbody>` +
+        $(".kp-table").innerHTML = `<table tabindex="0" aria-label="צעדי המיון והחיסור"><thead><tr><th>צעד</th><th>המספר</th><th>מהגדול לקטן</th><th>מהקטן לגדול</th><th>ההפרש</th><th>מיוחד?</th></tr></thead><tbody>` +
           c.steps.map((s, k) => `<tr${k === c.steps.length - 1 ? ' class="is-last"' : ""}><td>${ltr(k + 1)}</td><td>${ltr(pad(s.x))}</td><td>${ltr(s.digits)}</td><td>${ltr(pad(s.smallest))}</td><td>${ltr(pad(s.diff))}</td><td>${s.special ? "✓" : "✗"}</td></tr>`).join("") +
           `</tbody></table>`;
         const chain = c.steps.map((s) => pad(s.x)).concat(c.fixed ? [] : [pad(c.end)]);
@@ -3483,12 +3483,13 @@
       const $ = (sel) => box.querySelector(sel);
       const crate = (i, label, balls, open) => {
         const x = 20 + 200 * i, cx = x + 75;
-        let s = `<g class="b3-crate" data-i="${i}" tabindex="0" role="button" aria-label="קופסה ${i}, התווית ${HE[label]}: דגימת כדור">` +
+        // the accessible name repeats the visible texts in order (axe: label-content-name-mismatch)
+        const visible = [label === "MIXED" ? "אדום ושחור" : HE[label], open ? "" : "?", `קופסה ${i}${open ? `: ${HE[st.content[i]]}` : ""}`].filter(Boolean).join(" ");
+        let s = `<g class="b3-crate" data-i="${i}" tabindex="0" role="button" aria-label="${visible}, דגימת כדור מהקופסה">` +
           `<polygon class="crate-top" points="${x},50 ${x + 30},20 ${x + 180},20 ${x + 150},50"/>` +
           `<polygon class="crate-side" points="${x + 150},50 ${x + 180},20 ${x + 180},120 ${x + 150},150"/>` +
           `<rect class="crate-front" x="${x}" y="50" width="150" height="100"/>`;
-        if (label === "MIXED") s += `<text class="crate-text" x="${cx}" y="94" font-size="22">אדום</text><text class="crate-text" x="${cx}" y="124" font-size="22">ושחור</text>`;
-        else s += `<text class="crate-text" x="${cx}" y="108" font-size="22">${HE[label]}</text>`;
+        s += `<text class="crate-text" x="${cx}" y="108" font-size="${label === "MIXED" ? 18 : 22}">${label === "MIXED" ? "אדום ושחור" : HE[label]}</text>`;
         s += `<text class="crate-text" x="${cx + 30}" y="42" font-size="20">${open ? "" : "?"}</text>`;
         balls.forEach((b, k) => { s += `<circle class="b3-ball b3-${b.toLowerCase()}" cx="${x + 18 + 22 * k}" cy="166" r="8"><title>כדור ${HE[b]}</title></circle>`; });
         s += `<text class="tick" x="${cx}" y="192" font-size="13" direction="rtl" text-anchor="middle">קופסה ${i}${open ? `: ${HE[st.content[i]]}` : ""}</text></g>`;
