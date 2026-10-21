@@ -75,7 +75,6 @@ Every question is classified along two independent axes, plus free-form topic ta
 | Student | `docs/questions/student/` | Digital logic fundamentals, basic HDL, basic programming, math, logic puzzles |
 | Junior  | `docs/questions/junior/`  | SystemVerilog, basic UVM, writing tests and checkers, simple protocols        |
 | Senior  | `docs/questions/senior/`  | Testbench architecture, advanced UVM, SVA, coverage closure, debugging        |
-| Staff   | `docs/questions/staff/`   | Verification strategy and planning, methodology, scaling, leading a team      |
 
 ### 2. Difficulty (within a level)
 
@@ -160,8 +159,7 @@ DV-Interview-Questions/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…, 0032-…, 0036-…
 │   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0031-…, 0033-… to 0035-…, 0038-…
-│   │   ├── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…, 0023-…, 0024-…, 0025-…, 0037-…
-│   │   └── staff/
+│   │   └── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0022-…, 0023-…, 0024-…, 0025-…, 0037-…
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
 │   │   ├── images/             # Figures and screenshots referenced by questions
@@ -225,7 +223,7 @@ The full skeleton with comments is in [`templates/question.md`](templates/questi
 ---
 id: 42
 title: חישוב עומק של FIFO אסינכרוני
-level: junior            # student | junior | senior | staff  (must match the folder)
+level: junior            # student | junior | senior  (must match the folder)
 difficulty: medium       # easy | medium | hard
 tags: [fifo, clock-domain-crossing]
 source: ""               # optional: company / interview round

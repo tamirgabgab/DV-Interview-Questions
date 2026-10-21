@@ -1,7 +1,7 @@
 ---
 id: 0                    # next free running number (unique across all levels)
 title: כותרת השאלה
-level: student           # student | junior | senior | staff  (must match the folder)
+level: student           # student | junior | senior  (must match the folder)
 difficulty: easy         # easy | medium | hard
 tags: [digital-logic]    # topic tags, see README.md
 source: ""               # optional: company / interview round

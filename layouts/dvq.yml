@@ -44,7 +44,7 @@ definitions:
   # Level and difficulty of a question page, empty elsewhere
   - &page_meta_line >-
     {%- if page.meta.get("level") -%}
-      {{ {"student": "Student", "junior": "Junior", "senior": "Senior", "staff": "Staff"}[page.meta.level] }}
+      {{ {"student": "Student", "junior": "Junior", "senior": "Senior"}[page.meta.level] }}
       ·
       {{ {"easy": "קל", "medium": "בינוני", "hard": "קשה"}[page.meta.difficulty] }}
       {%- if page.meta.get("id") %} · {{ "%04d" | format(page.meta.id) }}{% endif -%}

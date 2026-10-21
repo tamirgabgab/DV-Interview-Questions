@@ -15,7 +15,7 @@ _Last updated: 2026-10-21 (session 18)_
 A public website for a personal collection of Design Verification (DV) interview
 questions, plus math and logic questions. Each question is written clearly in Hebrew, with
 a full readable solution and diagrams where relevant, and is classified by **position
-level** (Student / Junior / Senior / Staff), **difficulty** (Easy / Medium / Hard) and
+level** (Student / Junior / Senior), **difficulty** (Easy / Medium / Hard) and
 **topic tags**.
 
 Workflow: the repository owner sends questions + solutions (text, code and sometimes
@@ -44,6 +44,7 @@ pushed to `main`, which publishes the site.
 | Tests                 | Python: full tests of the page code. SystemVerilog: Verilator built from a pinned development commit (after 5.052) with z3, so every class runs as published; a translation by intent (fingerprinted) is allowed only for a proven simulator bug, and none is needed today |
 | Failing tests         | Block the deploy; the live site keeps its previous version              |
 | Run button            | Per question, Python only (Pyodide in a web worker); SV cannot run in a browser, the panel says it is checked in CI instead |
+| Position levels       | Student / Junior / Senior; the Staff level was removed on 2026-10-21 (owner: no staff questions planned) |
 | Look and feel         | Own navy + amber palette, logo and footer; level / difficulty as CSS chips; one header card per question (see **Site redesign plan**) |
 
 ---
@@ -991,6 +992,19 @@ axe check warns only; `main` is updated at the end of each round.
 5. **Checks:** lint 32/32 clean, 201 Python tests, strict build (with the cards), links
    (49 pages, 0 broken), phone check light and dark with axe (0 problems, 0 violations).
 
+### Session 19 — 2026-10-21: Staff level removed
+
+1. **Staff level removed** at the owner's request (empty, no staff questions planned):
+   `LEVELS` / `LEVEL_DESC` in `hooks/questions.py`, `tools/new_question.py`, the template,
+   the card layout `layouts/dvq.yml`, README and `docs/questions/staff/` are gone. The
+   nav, filters and home statistics follow `LEVELS` (now 3/3). The home level cards are a
+   three-column grid (one row on desktop, one column on phones). The "רמת staff" note of
+   the 0022 bonus part is kept as a difficulty label.
+2. **Light-mode strings** `--md-code-hl-string-color: #186b42`: axe found 4.4:1 on a
+   highlighted line of 0006.
+3. **Checks:** lint 38/38, 229 Python tests, strict build, links 0 broken, phone check
+   light and dark with axe (0 problems, 0 violations).
+
 ---
 
 ## In progress
@@ -999,8 +1013,8 @@ axe check warns only; `main` is updated at the end of each round.
   green). Owner's check: the five WaveDrom diagrams (0034, 0035, 0038) on the live site,
   the sandbox cannot render them.
 - Next: the owner's picks from round T (explorers for existing questions), the rest of
-  round Q, rounds D to F, I, L, N, O and S, R105 (the first staff question), or new
-  questions.
+  round Q, rounds D to F, I, L, N, O and S, or new questions. (R105 and I59, the staff
+  questions, are dropped with the Staff level.)
 - Waiting on the owner: enable Discussions and giscus (README, Comments) and fill in
   `extra.comments` in `mkdocs.yml`; check the social card of a shared link once deployed.
 
@@ -1011,7 +1025,7 @@ axe check warns only; `main` is updated at the end of each round.
 ### Owner decisions
 
 - [ ] Keep example question `0001` or replace it with real content.
-- [ ] Staff level is still empty and Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
+- [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 - [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14). M and R (without R105) are picked for sessions 17 and 18.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
@@ -1035,12 +1049,11 @@ axe check warns only; `main` is updated at the end of each round.
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
-| Staff | — | — |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock
 divider, an LFSR, synchronizer MTBF and SVA. **Still missing:** UVM, functional coverage,
-FSM design, debug ("find the bug") and verification planning (the staff level).
+FSM design, debug ("find the bug") and verification planning.
 
 ### Topic gaps worth filling
 
@@ -1245,7 +1258,7 @@ to G above are still open; H to K add to them.
 | I56 | Owner's open list (Open items) | poisoned wine with 10 testers, 12 coins in 3 weighings, two eggs and 100 floors, 100 doors, Boyer–Moore majority |
 | I57 | Digital design for DV | Gray code and async FIFO pointers, divide-by-3 clock with 50% duty, maximal LFSR, Hamming (7,4), XOR from NAND only; WaveDrom and Verilator tests |
 | I58 | Core DV gaps | SVA req → ack in 1–3 cycles, a covergroup with crosses and illegal bins, FIFO depth for a burst, find-the-bug in a scoreboard, UVM sequence / driver handshake |
-| I59 | Staff level (empty today) | a verification plan for an arbiter, sign-off metrics, regression strategy; a written "what would you check" format |
+| ~~I59~~ | Dropped, the Staff level was removed (session 19). Was: staff level | a verification plan for an arbiter, sign-off metrics, regression strategy; a written "what would you check" format |
 
 **Round J — adding questions faster**
 
@@ -1361,7 +1374,7 @@ and for new questions.
 | R102 | ~~**Gray code pointers for an async FIFO**: why one bit changes, the conversion both ways, the full / empty test with the two top bits; junior / medium; SV + Python and a WaveDrom of the pointer crossing~~ | M — **done** in session 18 as 0034 |
 | R103 | ~~**Divide-by-3 clock with 50% duty**: the design with a negative-edge flop, a WaveDrom timing diagram, and the testbench that checks the duty; junior / medium~~ | S–M — **done** in session 18 as 0035 |
 | R104 | ~~**Maximal LFSR**: period of a 4-bit LFSR for two tap sets, why one is 15 and the other shorter; the sequence table from code; student / easy~~ | S — **done** in session 18 as 0036 |
-| R105 | **Staff level, first question**: reviewing a verification plan (a given feature list with holes: missing negative tests, no coverage goals, no reset / power scenarios); a rubric-style answer with no code; staff / medium | M |
+| ~~R105~~ | Dropped with the Staff level (session 19). Was: **staff level, first question**: reviewing a verification plan (a given feature list with holes: missing negative tests, no coverage goals, no reset / power scenarios); a rubric-style answer with no code; staff / medium | M |
 | R106 | ~~**SVA for a handshake**: req must hold until ack, ack within N cycles, no ack without req; the assertions, a WaveDrom with a passing and a failing trace; junior / medium; Verilator checks the assertions~~ | M — **done** in session 18 as 0038 |
 
 **Round S — clearer question pages**

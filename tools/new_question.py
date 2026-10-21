@@ -26,7 +26,7 @@ import re
 import sys
 from pathlib import Path
 
-LEVELS = ("student", "junior", "senior", "staff")
+LEVELS = ("student", "junior", "senior")
 DIFFICULTIES = {"easy": "🟢 easy", "medium": "🟡 medium", "hard": "🔴 hard"}
 
 
