@@ -59,3 +59,43 @@ def test_scan_matches_reference():
                  for i in range(rng.randint(0, 8))]
         points_left = sum(p for _, _, p in above)
         assert earliest(israel_total, above, points_left) == earliest_reference(israel_total, above, points_left)
+
+
+def test_explorer_matches_page_code():
+    """The Eurovision explorer: its scan rows against the generator's steps() and the
+    page's earliest_certain_loss, its check against israel_cannot_win on random inputs,
+    and the what-if box against the page functions on the changed results."""
+    import json
+    import sys
+
+    from extract_code import ROOT
+    from page_tests import explorer_require, node_json
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0008
+
+    rng = random.Random(8)
+    checks = [[rng.randint(100, 400), [rng.randint(0, 420) for _ in range(rng.randint(0, 8))], rng.randint(0, 2088)] for _ in range(300)]
+    whatif = [[123, 220], [123, 400], [300, 220], [0, 0], [204, 312], [150, 100], [140, 220], [165, 220]]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({{
+        order: m.euroOrder(m.EURO_RESULTS), scan: m.euroScan(m.EURO_RESULTS),
+        checks: {json.dumps(checks)}.map(([t, j, l]) => m.euroCannotWin(t, j, l)),
+        whatif: {json.dumps(whatif)}.map(([j, p]) => {{ const s = m.euroScan(m.euroWithIsrael(j, p)); return [s.first, s.total, s.rows.map((r) => [r.country, r.left, r.room, r.lost])]; }}),
+      }}));""")
+    assert [tuple(r) for r in got["order"]] == q0008.ORDER
+    sc = got["scan"]
+    assert [(r["country"], r["left"], r["room"], r["lost"]) for r in sc["rows"]] == q0008.steps()
+    assert sc["first"] == 4 == ns["earliest_certain_loss"](343, ABOVE_2026, 828) and sc["total"] == 343
+    for (t, j, l), got_c in zip(checks, got["checks"]):
+        assert got_c == ns["israel_cannot_win"](t, j, l)
+    for (jury, pub), (first, total, rows) in zip(whatif, got["whatif"]):
+        results = [("Israel", jury, pub) if c == "Israel" else (c, j, p) for c, j, p in q0008.RESULTS]
+        order = sorted(results, key=lambda r: (r[1], r[0] == "Australia"))
+        idx = next(i for i, r in enumerate(order) if r[0] == "Israel")
+        above = order[idx + 1:]
+        left = q0008.PUBLIC_TOTAL - sum(r[2] for r in order[:idx + 1])
+        want = ns["earliest_certain_loss"](jury + pub, above, left)
+        assert total == jury + pub and first == (-1 if want is None else want), (jury, pub)
+        assert [r[0] for r in rows] == ["Israel"] + [c for c, _, _ in above]

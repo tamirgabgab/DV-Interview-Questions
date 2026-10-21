@@ -1793,3 +1793,23 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .kp-table tr.is-last td { font-weight: 700; }
 .md-typeset .explorer .kp-chain { margin: 0.5em 0; }
 .md-typeset .explorer .kp-chart svg { max-width: 30rem; }
+
+/* Eurovision explorer (0008) and the three boxes explorer (0004) */
+.md-typeset .explorer .eu-what { margin-top: 0.5rem; }
+.md-typeset .explorer .eu-what input { width: 4.2rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .eu-chart { margin-top: 0.5rem; }
+.md-typeset .explorer .eu-chart svg { max-width: 34rem; }
+.md-typeset .explorer .eu-step { margin: 0.4em 0; }
+.md-typeset .explorer .eu-ok, .md-typeset .explorer .b3-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .eu-bad, .md-typeset .explorer .b3-bad { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer svg.b3-live { width: 100%; max-width: 34rem; user-select: none; }
+.md-typeset svg .b3-crate { cursor: pointer; }
+.md-typeset svg .b3-crate:focus-visible { outline: none; }
+.md-typeset svg .b3-crate:focus-visible .crate-front { stroke: var(--site-focus-ring); stroke-width: 4; }
+.md-typeset svg .b3-ball { stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .b3-red { fill: #d33a2f; }
+.md-typeset svg .b3-black { fill: #2b2b2b; }
+.md-typeset .explorer .b3-stats { font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .b3-step { margin: 0.5em 0 0.2em; }
+.md-typeset .explorer .b3-lines { margin: 0.2em 0; padding-inline-start: 1.3rem; }
+.md-typeset .explorer .b3-lines li { margin: 0.1em 0; }

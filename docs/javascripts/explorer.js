@@ -20,8 +20,10 @@
 //   ttt                    0011        tap cells on a 3 x 3 board: is it a legal final board and why not; random legal boards; wrap diagonals
 //   shapes                 0014        squares or rectangles drawn one at a time with the rejected candidates flashed; a heat map of draws
 //   kaprekar               0012, 0013  a number, its sort-and-subtract chain to 495 / 6174, the histogram of chain lengths
+//   eurovision             0008        the announcements one by one: the cups under Israel's total against the points left; a what-if box
+//   boxes3                 0004        three mislabelled boxes with hidden contents: draw a ball, the deduction line by line
 // The math of each model is exported under Node, where the question tests compare it with
-// the Python reference (tests/0005, 0007, 0009, 0010, 0011, 0012, 0013, 0014, 0015, 0017, 0016, 0018 to 0022, 0026 to 0033, 0037).
+// the Python reference (tests/0004, 0005, 0007, 0008, 0009, 0010, 0011, 0012, 0013, 0014, 0015, 0017, 0016, 0018 to 0022, 0026 to 0033, 0037).
 (() => {
   const EPS = 1e-9;
 
@@ -906,6 +908,74 @@
     return { hist, ends };
   };
 
+  // Eurovision 2026 (0008): the grand final results, the announcement order (lowest jury
+  // first), and the page's scan: after every announcement the public points left and the
+  // room left under Israel's total; the first announcement after which Israel cannot win.
+  const EURO_RESULTS = [
+    ["Bulgaria", 204, 312], ["Israel", 123, 220], ["Romania", 64, 232], ["Australia", 165, 122], ["Italy", 134, 147],
+    ["Finland", 141, 138], ["Denmark", 165, 78], ["Moldova", 43, 183], ["Ukraine", 54, 167], ["Greece", 73, 147],
+    ["France", 144, 14], ["Poland", 133, 17], ["Albania", 60, 85], ["Norway", 115, 19], ["Croatia", 53, 71],
+    ["Czechia", 104, 9], ["Serbia", 38, 52], ["Malta", 81, 8], ["Cyprus", 41, 34], ["Sweden", 35, 16],
+    ["Belgium", 36, 0], ["Lithuania", 10, 12], ["Germany", 12, 0], ["Austria", 1, 5], ["United Kingdom", 1, 0],
+  ];
+  const EURO_PUBLIC_TOTAL = 36 * 58;
+  // the order of the public announcements: by jury score, Denmark before Australia at 165
+  const euroOrder = (results) => results.slice().sort((a, b) => a[1] - b[1] || (a[0] === "Australia") - (b[0] === "Australia"));
+  // results with Israel's jury and public scores replaced (the "what if" box)
+  const euroWithIsrael = (jury, pub) => EURO_RESULTS.map((r) => (r[0] === "Israel" ? ["Israel", jury, pub] : r));
+  // the page's israel_cannot_win
+  const euroCannotWin = (israelTotal, juryAbove, pointsLeft) => {
+    let room = 0;
+    for (const j of juryAbove) { if (j > israelTotal) return true; room += israelTotal - j; }
+    return pointsLeft > room;
+  };
+  // the scan: one row per announcement from Israel's own on, with left, room and the verdict
+  const euroScan = (results) => {
+    const order = euroOrder(results);
+    const idx = order.findIndex((r) => r[0] === "Israel");
+    const total = order[idx][1] + order[idx][2];
+    const above = order.slice(idx + 1);
+    let left = EURO_PUBLIC_TOTAL - order.slice(0, idx + 1).reduce((s, r) => s + r[2], 0);
+    let room = above.reduce((s, r) => s + Math.max(0, total - r[1]), 0);
+    let lost = euroCannotWin(total, above.map((r) => r[1]), left);
+    const rows = [{ country: "Israel", jury: order[idx][1], pub: order[idx][2], total, left, room, lost }];
+    let passed = false;
+    for (const [country, jury, pub] of above) {
+      left -= pub;
+      room -= Math.max(0, total - jury);
+      passed = passed || jury + pub > total;
+      lost = lost || passed || left > room;
+      rows.push({ country, jury, pub, total: jury + pub, left, room, lost });
+    }
+    const first = rows.findIndex((r) => r.lost);               // 0 = right after Israel, -1 = never
+    return { order, idx, total, above, rows, first, won: first < 0 };
+  };
+
+  // Three mislabelled boxes (0004): the twelve cases (a label order and a content where
+  // every label is wrong), a draw from a box, and the page's rule applied to one draw.
+  const BOX_LABELS = ["RED", "BLACK", "MIXED"];
+  const boxesCases = () => {
+    const perms = (a) => (a.length <= 1 ? [a] : a.flatMap((x, i) => perms(a.filter((_, j) => j !== i)).map((p) => [x, ...p])));
+    const out = [];
+    for (const labels of perms(BOX_LABELS)) for (const content of perms(BOX_LABELS))
+      if (labels.every((l, i) => l !== content[i])) out.push({ labels, content });
+    return out;
+  };
+  const boxesDraw = (content, i, rnd = Math.random) => (content[i] === "MIXED" ? (rnd() < 0.5 ? "RED" : "BLACK") : content[i]);
+  // the page's fix_labels_simple, given the ball drawn from the box labelled MIXED
+  const boxesFix = (labels, ball) => {
+    const k = labels.indexOf("MIXED"), other = ball === "RED" ? "BLACK" : "RED", fixed = ["", "", ""];
+    fixed[k] = ball;
+    labels.forEach((l, i) => { if (l === ball) fixed[i] = other; });
+    labels.forEach((l, i) => { if (l === other) fixed[i] = "MIXED"; });
+    return fixed;
+  };
+  // what a draw from box i tells: the contents still possible afterwards
+  const boxesDeduce = (labels, i, ball) => {
+    const possible = boxesCases().filter((c) => c.labels.join() === labels.join()).map((c) => c.content);
+    return possible.filter((content) => content[i] === ball || content[i] === "MIXED");
+  };
+
   const models = {
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
     motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, josephusRun, josephusSteps, josephusZero, josephusFormula,
@@ -921,6 +991,8 @@
     TTT_LINES, TTT_WRAP, tttCheck, tttFinalBoards, tttRandom,
     shapesOverlap, shapesCandidates, shapesOk, shapesTry, shapesRandom, shapesHeat,
     kapStep, kapChain, kapHistogram,
+    EURO_RESULTS, EURO_PUBLIC_TOTAL, euroOrder, euroWithIsrael, euroCannotWin, euroScan,
+    boxesCases, boxesDraw, boxesFix, boxesDeduce,
   };
   if (typeof module !== "undefined" && module.exports) {
     module.exports = models;
@@ -3309,6 +3381,177 @@
     },
   });
 
+  // The Eurovision box (0008): a slider over the public announcements from Israel's own
+  // to the last; the cups of the countries still to come (room under Israel's total)
+  // against the points left, the moment of certain loss marked; a "what if" box for
+  // Israel's own jury and public scores.
+  const euroView = () => ({
+    mount(box) {
+      const st = { k: 0, jury: 123, pub: 220 };
+      const num = (v) => Number(v).toLocaleString("en-US");
+      box.innerHTML =
+        `<div class="ex-controls"><label><span>הכרזות הקהל אחרי ישראל</span><input type="range" class="ex-k" min="0" max="7" step="1" value="0" dir="ltr"><output class="out-k"></output></label>` +
+        `<button type="button" class="md-button ex-prev">הקודמת</button><button type="button" class="md-button md-button--primary ex-next">ההכרזה הבאה</button></div>` +
+        `<div class="ex-controls eu-what"><span>מה אם לישראל היו</span><label>שופטים <input type="number" class="ex-jury" min="0" max="420" step="1" dir="ltr" aria-label="ניקוד השופטים של ישראל"></label>` +
+        `<label>קהל <input type="number" class="ex-pub" min="0" max="432" step="1" dir="ltr" aria-label="ניקוד הקהל של ישראל"></label>` +
+        `<button type="button" class="md-button ex-reset">הנתונים האמיתיים</button></div>` +
+        `<div class="eu-chart"></div><p class="eu-step" aria-live="polite"></p><p class="ex-summary eu-sum"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const slider = $(".ex-k");
+      const draw = () => {
+        const sc = euroScan(euroWithIsrael(st.jury, st.pub));
+        const n = sc.rows.length - 1;
+        slider.max = n; st.k = Math.min(st.k, n); slider.value = st.k;
+        $(".out-k").textContent = `${st.k} / ${n}`;
+        $(".ex-jury").value = st.jury; $(".ex-pub").value = st.pub;
+        const row = sc.rows[st.k];
+        // the cups: every country above Israel by the jury, announced or not
+        const W = 640, H = 300, X0 = 48, BASE = 240, TOP = 20;
+        const ymax = Math.max(sc.total, ...sc.above.map((r) => r[1] + r[2]), 1) * 1.08;
+        const Y = (v) => BASE - (v / ymax) * (BASE - TOP);
+        const slot = (W - X0 - 12) / Math.max(sc.above.length, 1), bw = slot * 0.6;
+        let s = `<svg class="perf-chart eu-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="הכוסות של המדינות שמעל ישראל אחרי ${st.k} הכרזות">`;
+        [0, 100, 200, 300, 400, 500].filter((v) => v < ymax).forEach((v) => {
+          s += `<line class="grid" x1="${X0}" x2="${W - 12}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`;
+        });
+        s += `<line class="s2-line" x1="${X0}" x2="${W - 12}" y1="${f(Y(sc.total))}" y2="${f(Y(sc.total))}" stroke-width="2" stroke-dasharray="6 4"/>` +
+             `<text class="legend" x="${X0 + 4}" y="${f(Y(sc.total) - 6)}">Israel ${sc.total}</text>`;
+        sc.above.forEach(([country, jury, pub], i) => {
+          const x = X0 + i * slot + (slot - bw) / 2, announced = i < st.k, cx = x + bw / 2;
+          s += `<rect class="bar by-multiples" x="${f(x)}" y="${f(Y(jury))}" width="${f(bw)}" height="${f(BASE - Y(jury))}"><title>${country}: שופטים ${jury}</title></rect>`;
+          if (announced) {
+            s += `<rect class="bar ${jury + pub > sc.total ? "by-enum" : "by-bfs"}" x="${f(x)}" y="${f(Y(jury + pub))}" width="${f(bw)}" height="${f(Y(jury) - Y(jury + pub))}"><title>${country}: קהל ${pub}, סך הכול ${jury + pub}</title></rect>`;
+          } else if (jury < sc.total) {
+            s += `<rect class="cup-room" x="${f(x)}" y="${f(Y(sc.total))}" width="${f(bw)}" height="${f(Y(jury) - Y(sc.total))}"><title>${country}: מקום פנוי ${sc.total - jury}</title></rect>`;
+          }
+          s += `<text class="tick" x="${f(cx)}" y="${BASE + 16}" text-anchor="middle" font-size="10">${country.length > 9 ? country.slice(0, 8) + "…" : country}</text>` +
+               `<text class="tick" x="${f(cx)}" y="${BASE + 30}" text-anchor="middle" font-size="10">${announced ? jury + pub : jury}</text>`;
+        });
+        s += `<line class="axis" x1="${X0}" x2="${W - 12}" y1="${BASE}" y2="${BASE}"/></svg>`;
+        $(".eu-chart").innerHTML = s;
+        const left = row.left, room = row.room;
+        let step = st.k === 0
+          ? `מיד אחרי ההכרזה של ישראל (${ltr(`${sc.rows[0].jury} + ${sc.rows[0].pub} = ${sc.total}`)}): `
+          : `אחרי ההכרזה של ${ltr(row.country)} (${ltr(`${row.jury} + ${row.pub} = ${row.total}`)}): `;
+        step += `נותרו ${ltr(num(left))} נקודות קהל, והמקום הפנוי עד ${ltr(sc.total)} ב${n - st.k === 1 ? "כוס האחרונה" : `-${ltr(n - st.k)} הכוסות שנותרו`} הוא ${ltr(num(room))}. `;
+        if (row.total > sc.total && st.k > 0) step += `<span class="eu-bad">✗ ${ltr(row.country)} עברה את ישראל, ההפסד ודאי.</span>`;
+        else if (left > room) step += `<span class="eu-bad">✗ יותר מים מנפח (${ltr(`${num(left)} > ${num(room)}`)}): מישהי חייבת לעבור את ישראל.</span>`;
+        else step += `<span class="eu-ok">✓ הכול עוד נכנס (${ltr(`${num(left)} ≤ ${num(room)}`)}): ישראל עדיין יכולה לנצח.</span>`;
+        $(".eu-step").innerHTML = step;
+        const real = st.jury === 123 && st.pub === 220;
+        $(".eu-sum").innerHTML = (sc.won
+          ? `עם ${ltr(`${st.jury} + ${st.pub} = ${sc.total}`)} אף מדינה לא עוברת את ישראל: היא מנצחת.`
+          : sc.first === 0
+            ? `עם ${ltr(`${st.jury} + ${st.pub} = ${sc.total}`)} ההפסד ודאי כבר ברגע ההכרזה של ישראל.`
+            : `ההפסד ודאי אחרי ההכרזה ה-${ltr(sc.first)} שאחרי ישראל, של ${ltr(sc.rows[sc.first].country)}, כשנותרו ${ltr(n - sc.first)} הכרזות.`) +
+          (real ? "" : ` (במציאות: 123 + 220 = 343, וההפסד ודאי אחרי צרפת, ההכרזה הרביעית.)`) +
+          ` סדר ההכרזות נקבע לפי ניקוד השופטים${real ? "" : ", ולכן שינוי בניקוד השופטים של ישראל מזיז גם את מקומה בתור"}.`;
+      };
+      slider.addEventListener("input", () => { st.k = Number(slider.value); draw(); });
+      $(".ex-next").addEventListener("click", () => { st.k = Math.min(st.k + 1, Number(slider.max)); draw(); });
+      $(".ex-prev").addEventListener("click", () => { st.k = Math.max(st.k - 1, 0); draw(); });
+      ["jury", "pub"].forEach((k) => $(`.ex-${k}`).addEventListener("change", () => {
+        const v = Math.round(Number($(`.ex-${k}`).value));
+        if (v >= 0 && v <= (k === "jury" ? 420 : 432)) { st[k] = v; st.k = 0; }
+        draw();
+      }));
+      $(".ex-reset").addEventListener("click", () => { st.jury = 123; st.pub = 220; st.k = 0; draw(); });
+      draw();
+    },
+  });
+
+  // The three boxes box (0004): every game hides one of the two possible contents behind
+  // the labels; tap a box to draw a ball, the deduction appears line by line, and a draw
+  // from a box labelled with a colour shows why one ball is not enough.
+  const boxes3View = () => ({
+    mount(box) {
+      const HE = { RED: "אדום", BLACK: "שחור", MIXED: "אדום ושחור" };
+      const st = { labels: ["RED", "BLACK", "MIXED"], content: null, draws: [], games: 0, solvedFirst: 0 };
+      const newGame = (keepStats = true) => {
+        const cases = boxesCases().filter((c) => c.labels.join() === st.labels.join());
+        st.content = cases[Math.floor(Math.random() * cases.length)].content;
+        st.draws = [];
+        if (!keepStats) { st.games = 0; st.solvedFirst = 0; }
+      };
+      newGame(false);
+      box.innerHTML =
+        `<div class="ex-controls"><button type="button" class="md-button md-button--primary ex-new">משחק חדש</button>` +
+        `<button type="button" class="md-button ex-shuffle">ערבוב התוויות</button>` +
+        `<button type="button" class="md-button ex-reveal">גילוי התוכן</button><span class="b3-stats"></span></div>` +
+        `<div class="b3-crates" role="group" aria-label="שלוש קופסאות, לחיצה דוגמת כדור"></div>` +
+        `<p class="b3-step" aria-live="polite"></p><ol class="b3-lines"></ol><p class="ex-summary b3-sum"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const crate = (i, label, balls, open) => {
+        const x = 20 + 200 * i, cx = x + 75;
+        let s = `<g class="b3-crate" data-i="${i}" tabindex="0" role="button" aria-label="קופסה ${i}, התווית ${HE[label]}: דגימת כדור">` +
+          `<polygon class="crate-top" points="${x},50 ${x + 30},20 ${x + 180},20 ${x + 150},50"/>` +
+          `<polygon class="crate-side" points="${x + 150},50 ${x + 180},20 ${x + 180},120 ${x + 150},150"/>` +
+          `<rect class="crate-front" x="${x}" y="50" width="150" height="100"/>`;
+        if (label === "MIXED") s += `<text class="crate-text" x="${cx}" y="94" font-size="22">אדום</text><text class="crate-text" x="${cx}" y="124" font-size="22">ושחור</text>`;
+        else s += `<text class="crate-text" x="${cx}" y="108" font-size="22">${HE[label]}</text>`;
+        s += `<text class="crate-text" x="${cx + 30}" y="42" font-size="20">${open ? "" : "?"}</text>`;
+        balls.forEach((b, k) => { s += `<circle class="b3-ball b3-${b.toLowerCase()}" cx="${x + 18 + 22 * k}" cy="166" r="8"><title>כדור ${HE[b]}</title></circle>`; });
+        s += `<text class="tick" x="${cx}" y="192" font-size="13" direction="rtl" text-anchor="middle">קופסה ${i}${open ? `: ${HE[st.content[i]]}` : ""}</text></g>`;
+        return s;
+      };
+      const draw = (reveal = false) => {
+        const balls = [[], [], []];
+        st.draws.forEach((d) => balls[d.i].push(d.ball));
+        $(".b3-crates").innerHTML = `<svg class="figure b3-live" viewBox="0 0 620 200">` +
+          st.labels.map((l, i) => crate(i, l, balls[i], reveal)).join("") + `</svg>`;
+        $(".b3-stats").textContent = st.games ? `${st.games} משחקים, ${st.solvedFirst} נפתרו בדגימה הראשונה` : "";
+        const lines = [];
+        let sum = "";
+        if (!st.draws.length) {
+          $(".b3-step").innerHTML = `כל התוויות שגויות. בחרו קופסה ודגמו ממנה כדור.`;
+        } else {
+          const first = st.draws[0];
+          const k = st.labels.indexOf("MIXED");
+          const left = boxesDeduce(st.labels, first.i, first.ball);
+          if (first.i === k) {
+            const fixed = boxesFix(st.labels, first.ball);
+            const other = first.ball === "RED" ? "BLACK" : "RED";
+            lines.push(`הקופסה "אדום ושחור" לא מעורבת (התווית שגויה), ויצא ממנה ${HE[first.ball]}: יש בה רק ${HE[first.ball]}.`);
+            lines.push(`הקופסה שתוויתה "${HE[first.ball]}" לא מכילה ${HE[first.ball]} (תווית שגויה) ולא את התערובת (היא בקופסה ${ltr(k)}): נשאר ${HE[other]}.`);
+            lines.push(`הקופסה שתוויתה "${HE[other]}" מקבלת את מה שנשאר: אדום ושחור.`);
+            $(".b3-step").innerHTML = `<span class="b3-ok">✓ דגימה אחת הספיקה.</span> התוויות הנכונות: ${fixed.map((c, i) => `קופסה ${ltr(i)} = ${HE[c]}`).join(", ")}.`;
+            sum = `הדגימה מהקופסה "אדום ושחור" מכריעה תמיד, כי שני הסידורים האפשריים נבדלים בה בצבע אחד וברור.`;
+          } else {
+            const otherOfLabel = st.labels[first.i] === "RED" ? "BLACK" : "RED";
+            lines.push(`הקופסה "${HE[st.labels[first.i]]}" לא מכילה ${HE[st.labels[first.i]]}, ולכן היא או ${HE[otherOfLabel]} או אדום ושחור.`);
+            lines.push(left.length === 2
+              ? `כדור ${HE[first.ball]} מתאים לשתי האפשרויות: שני הסידורים עדיין פתוחים.`
+              : `כדור ${HE[first.ball]} לא יכול לצאת מקופסה של ${HE[otherOfLabel]} בלבד: הקופסה מעורבת, ונשאר סידור אחד.`);
+            if (left.length === 2) {
+              $(".b3-step").innerHTML = `<span class="b3-bad">✗ דגימה מקופסה "${HE[st.labels[first.i]]}" לא מכריעה.</span> ` +
+                (st.draws.length > 1 ? `דגימות נוספות: ${st.draws.slice(1).map((d) => `קופסה ${ltr(d.i)} ${HE[d.ball]}`).join(", ")}.` : `דגמו שוב, מאותה קופסה או מאחרת.`);
+              const rest = boxesDeduce(st.labels, first.i, first.ball).filter((content) => st.draws.every((d) => content[d.i] === d.ball || content[d.i] === "MIXED"));
+              if (rest.length === 1) $(".b3-step").innerHTML += ` <span class="b3-ok">✓ אחרי ${ltr(st.draws.length)} דגימות נשאר סידור אחד: ${rest[0].map((c, i) => `קופסה ${ltr(i)} = ${HE[c]}`).join(", ")}.</span>`;
+              else $(".b3-step").innerHTML += ` עדיין ${ltr(rest.length)} סידורים אפשריים.`;
+            } else {
+              $(".b3-step").innerHTML = `<span class="b3-ok">✓ הפעם התמזל: כדור ${HE[first.ball]} מקופסה "${HE[st.labels[first.i]]}" פוסל סידור אחד.</span> הסידור שנשאר: ${left[0].map((c, i) => `קופסה ${ltr(i)} = ${HE[c]}`).join(", ")}. אבל זה מזל, לא הבטחה: הצבע השני היה משאיר שני סידורים.`;
+            }
+            sum = `דגימה מקופסה שתוויתה צבע מבטיחה הכרעה רק אם יוצא הצבע שעל התווית; הצבע השני משאיר ספק. רק הקופסה "אדום ושחור" מבטיחה הכרעה בכדור אחד.`;
+          }
+        }
+        $(".b3-lines").innerHTML = lines.map((l) => `<li>${l}</li>`).join("");
+        $(".b3-sum").innerHTML = sum;
+      };
+      const drawFrom = (i) => {
+        const ball = boxesDraw(st.content, i);
+        if (!st.draws.length) { st.games++; if (i === st.labels.indexOf("MIXED")) st.solvedFirst++; }
+        st.draws.push({ i, ball });
+        draw();
+      };
+      $(".b3-crates").addEventListener("click", (e) => { const g = e.target.closest(".b3-crate"); if (g) drawFrom(Number(g.dataset.i)); });
+      $(".b3-crates").addEventListener("keydown", (e) => { const g = e.target.closest(".b3-crate"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); drawFrom(Number(g.dataset.i)); } });
+      $(".ex-new").addEventListener("click", () => { newGame(); draw(); });
+      $(".ex-shuffle").addEventListener("click", () => { st.labels = st.labels.slice().sort(() => Math.random() - 0.5); newGame(); draw(); });
+      $(".ex-reveal").addEventListener("click", () => draw(true));
+      draw();
+    },
+  });
+
   const VIEWS = {
     "cake-arith": () => cakeView("arith"),
     "cake-geo": () => cakeView("geo"),
@@ -3331,6 +3574,8 @@
     ttt: tttView,
     shapes: shapesView,
     kaprekar: kaprekarView,
+    eurovision: euroView,
+    boxes3: boxes3View,
   };
 
   // --- the box -----------------------------------------------------------------------------
