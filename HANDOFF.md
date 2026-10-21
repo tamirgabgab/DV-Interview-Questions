@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-21 (session 17)_
+_Last updated: 2026-10-21 (session 18)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -876,6 +876,50 @@ open); `main` is updated once, at the end, when everything is green.
    links (49 pages, 0 broken), phone check of the new and changed pages in light and
    dark mode, screenshots of every explorer. SV keyword scan on the new blocks (clean).
 
+### Session 18 — 2026-10-21: round R (R100 to R104, R106), questions 0033 to 0038
+
+Six DV-core questions, each with SystemVerilog and Python code, tests and a Verilator
+testbench (`new_question.py` scaffolds). The Verilator pinned in CI supports bounded SVA
+delays, `$rose`, `disable iff` and action blocks (checked in the commit's `Changes` and
+`V3AssertPre.cpp`), so 0038 uses real concurrent assertions with `--assert`.
+
+1. **0033** `junior/0033-fifo-depth-from-rates.md` (R101): a burst of 120 words at 100 MHz
+   read at 80 MHz (24 by the formula, 25 in the cycle simulation because of the phase), a
+   reader that skips one slot in four (48); `fifo_depth` (closed form) and `fifo_fill`
+   (integer time axis, fill measured after the write) in both languages; generator chart
+   of the fill level and a cases table; a `fifo` explorer; tests of formula against
+   simulation (within one word for a continuous reader, two for a skipping one), the
+   generator and the explorer.
+2. **0034** `junior/0034-gray-code-fifo-pointers.md` (R102): why a binary pointer breaks
+   across a synchronizer (WaveDrom of 0111 → 1000), `bin2gray` / `gray2bin` with the
+   inverse and one-bit-per-step proofs and the 16-row table, `fifo_empty` / `fifo_full`
+   on Gray pointers with the wrap bit (top two bits inverted); exhaustive tests for 3, 5
+   and 7-bit pointers against the occupancy.
+3. **0035** `junior/0035-divide-by-three-fifty-duty.md` (R103): module `div3_50` (mod-3
+   counter, a registered pulse, the same pulse on the falling edge, OR), the glitch
+   argument, a WaveDrom with a half-cycle shifted signal; a half-cycle Python model; the
+   testbench measures period and high time with `$realtime` over 90 periods.
+4. **0036** `student/0036-maximal-lfsr.md` (R104): `lfsr_next` / `lfsr_period`, the 15-state
+   and 6-state sequences as generated tables, every x^4 + … + 1 with its period
+   (two primitive: x^4 + x^3 + 1 and x^4 + x + 1), the order-of-x argument; tests on every
+   mask and seed and an 8-bit maximal polynomial.
+5. **0037** `senior/0037-synchronizer-mtbf.md` (R100): MTBF = e^(t_res/τ) / (T0 f_clk f_data)
+   with t_res = N T − overhead; 19 s / 297 years / 1.4·10^11 years at 500 MHz and 0.44 ms /
+   9.7 s / 2.5 days at 1 GHz (τ = 100 ps); `sync_mtbf` in both languages; generated table
+   and a log chart against the clock; an `mtbf` explorer with readable units.
+6. **0038** `junior/0038-sva-handshake.md` (R106): four concurrent assertions
+   (`(req && !ack) |=> req`, `$rose(req) |-> ##[1:3] ack`, `ack |-> req`, `ack |=> !req`)
+   in `handshake_checker` with counting action blocks; `check_handshake` in Python as the
+   reference on sampled traces; WaveDrom of a good transaction and three violations; the
+   testbench (`--assert`) drives 400 random transactions with injected violations and
+   compares the checker's four counters with a procedural reference.
+7. **Docs and checks:** README catalog rows and layout, HANDOFF coverage (38 questions),
+   lint 38/38, Python tests, strict build, links, phone and axe checks of the new pages
+   in light and dark mode. WaveDrom cannot be rendered in the sandbox (CDN), so the five
+   new timing diagrams are checked on the live site after the deploy.
+
+---
+
 ### Session 17 — 2026-10-21: round M (M73, M76, M77)
 
 1. **M73, PCIe split explorer** (`pcie` kind, 0020 and 0021): address (hex), length
@@ -946,9 +990,12 @@ axe check warns only; `main` is updated at the end of each round.
 
 ## In progress
 
-- Session 17: round M is done and goes to `main` once CI is green. Next by the owner's
-  plan: **round R** without R105 (R100 to R104, R106), pushed to `main` at its end; the
-  round T proposal list (explorers for existing questions) waits for the owner's picks.
+- Session 18: round R (0033 to 0038) is on the branch and goes to `main` once CI (with
+  the six new Verilator testbenches) is green. After the deploy: look at the five WaveDrom
+  diagrams (0034, 0035, 0038) on the live site, the sandbox cannot render them.
+- Next: the owner's picks from round T (explorers for existing questions), the rest of
+  round Q, rounds D to F, I, L, N, O and S, R105 (the first staff question), or new
+  questions.
 - Waiting on the owner: enable Discussions and giscus (README, Comments) and fill in
   `extra.comments` in `mkdocs.yml`; check the social card of a shared link once deployed.
 
@@ -976,18 +1023,19 @@ axe check warns only; `main` is updated at the end of each round.
 
 ## Question variety
 
-### Coverage today (32 questions)
+### Coverage today (38 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
-| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage) |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031 | logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch) |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025 | SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
+| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 | Staff | — | — |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
-**Core DV topics are still missing:** UVM, SVA, functional coverage, FIFOs, clock domain
-crossing, FSM design, debug, and verification planning.
+Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock
+divider, an LFSR, synchronizer MTBF and SVA. **Still missing:** UVM, functional coverage,
+FSM design, debug ("find the bug") and verification planning (the staff level).
 
 ### Topic gaps worth filling
 
@@ -1303,13 +1351,13 @@ and for new questions.
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| R100 | **Synchroniser MTBF**: two flops, τ, T0, the clock and data rates; compute the MTBF and how a third flop changes it; senior / medium; a small calculator explorer (sliders for the rates) and the formula in SV + Python | M |
-| R101 | **FIFO depth from rates and bursts**: write and read rates, a burst length, back-pressure; the depth formula and a simulation of the fill level; junior / medium; an explorer that plots the fill level over time for the chosen rates | M |
-| R102 | **Gray code pointers for an async FIFO**: why one bit changes, the conversion both ways, the full / empty test with the two top bits; junior / medium; SV + Python and a WaveDrom of the pointer crossing | M |
-| R103 | **Divide-by-3 clock with 50% duty**: the design with a negative-edge flop, a WaveDrom timing diagram, and the testbench that checks the duty; junior / medium | S–M |
-| R104 | **Maximal LFSR**: period of a 4-bit LFSR for two tap sets, why one is 15 and the other shorter; the sequence table from code; student / easy | S |
+| R100 | ~~**Synchroniser MTBF**: two flops, τ, T0, the clock and data rates; compute the MTBF and how a third flop changes it; senior / medium; a small calculator explorer (sliders for the rates) and the formula in SV + Python~~ | M — **done** in session 18 as 0037 |
+| R101 | ~~**FIFO depth from rates and bursts**: write and read rates, a burst length, back-pressure; the depth formula and a simulation of the fill level; junior / medium; an explorer that plots the fill level over time for the chosen rates~~ | M — **done** in session 18 as 0033 |
+| R102 | ~~**Gray code pointers for an async FIFO**: why one bit changes, the conversion both ways, the full / empty test with the two top bits; junior / medium; SV + Python and a WaveDrom of the pointer crossing~~ | M — **done** in session 18 as 0034 |
+| R103 | ~~**Divide-by-3 clock with 50% duty**: the design with a negative-edge flop, a WaveDrom timing diagram, and the testbench that checks the duty; junior / medium~~ | S–M — **done** in session 18 as 0035 |
+| R104 | ~~**Maximal LFSR**: period of a 4-bit LFSR for two tap sets, why one is 15 and the other shorter; the sequence table from code; student / easy~~ | S — **done** in session 18 as 0036 |
 | R105 | **Staff level, first question**: reviewing a verification plan (a given feature list with holes: missing negative tests, no coverage goals, no reset / power scenarios); a rubric-style answer with no code; staff / medium | M |
-| R106 | **SVA for a handshake**: req must hold until ack, ack within N cycles, no ack without req; the assertions, a WaveDrom with a passing and a failing trace; junior / medium; Verilator checks the assertions | M |
+| R106 | ~~**SVA for a handshake**: req must hold until ack, ack within N cycles, no ack without req; the assertions, a WaveDrom with a passing and a failing trace; junior / medium; Verilator checks the assertions~~ | M — **done** in session 18 as 0038 |
 
 **Round S — clearer question pages**
 
