@@ -1146,6 +1146,36 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     yourself" text and follow-up questions; the findings and three new proposal rounds
     (V140 to V144 infrastructure, W148 to W180 follow-ups per page, X145 to X147 timing strips) are recorded under
     "Round U" in the redesign plan, with a suggested order.
+11. **Round V, explorer infrastructure (owner's answers: → is next, ← previous, space
+    play, Home / End; a seed field and a link with the seed only; the slow / medium / fast
+    select; "reset" returns to the page's example; the generic slider code deleted; one
+    commit per item, `main` once at the end; a general key hint, no per-box text):**
+    - V144: `setup()` mounts the kind and decorates the box through a `MutationObserver`
+      (`dvqDecorate(root, selector)` takes a selector now), so every figure keeps its
+      enlarge button through redraws; the eleven per-view calls and the dead generic slider
+      path are gone. The strip's button sits above the rows (`.wv-wrap .fig-wrap`).
+    - V142: triangle, polygon, ttt, Gray (sync), brackets, bfs01 and the swap tracer got
+      "חזרה לערכים של השאלה" that restores the page's values.
+    - V143: `speedSel()` and `autoplay()` helpers; cake, hourglass, bridge and river play
+      at a chosen speed; the 0009 walk, Eurovision, the Ack/Nak and credits scripts and the
+      endpoint cycles got a play button (free events stop the play).
+    - V140: `keyboard(box)` in setup: the box is focusable, → / ← / space / Home / End click
+      the matching buttons (fields and buttons keep their own keys), a `.ex-keys` hint line
+      closes every stepping box. Previous buttons in lfsr, div3, Gray flags (a history of
+      the pointers) and the endpoint (JSON snapshots; its draws come from a seeded
+      mulberry32 with a draw counter, so undo and redo replay the same completions).
+    - V141: `seedControls(box, after, run, opts)`: a seed field and "העתקת קישור" after the
+      random button of fourteen boxes; the random button draws a new seed, a typed seed
+      replays, `#seed-<kind>-<n>` replays on load and scrolls to the box (the first box of
+      that kind). The Ack/Nak thresholds and the endpoint delays come from the seed too
+      (their "איפוס" draws a new one). `mulberry32` is exported;
+      `tests/tools/test_explorer_controls.py` checks it against the Python recurrence and
+      that seeded draws replay.
+    - Checks in the sandbox with Playwright: enlarge and lightbox on the strip, the seven
+      resets, the nine play loops, keyboard stepping on 0017, the four previous buttons,
+      replay from a link on all fourteen boxes (identical state twice, the clipboard link
+      matches the field). Lint 38/38, 256 Python tests, strict build, links, phone and axe
+      light and dark on every page.
 
 ---
 
@@ -1155,8 +1185,11 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   and T124 (0002, 0003) of the explorer batch are done; `main` follows each round. Every
   question now has an explorer. Round T is closed. An audit of all 34 explorer kinds
   against the pages' follow-up questions produced rounds V (infrastructure), W (follow-ups
-  per page) and X (timing strips), recorded under "Round U" below. Next: the owner's pick
-  from rounds U to X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
+  per page) and X (timing strips), recorded under "Round U" below. Round V is done
+  (session 20). Next: the owner's picks from round W (W149, W152, W154, W162, W164, W169,
+  W170, W173, W177, and a reworked W172: a cube part a for 0030 whose shortest path
+  crosses four faces, the current content becoming part b), then rounds U and X, the open
+  rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1621,11 +1654,11 @@ its follow-up questions, done before rounds V to X were proposed:
 
 | Id | Page | Idea | Size |
 |---|---|---|---|
-| V140 | all with prev / next | **Arrow keys step** (← / → when the box has focus, space for play) in every stepping box; a "previous" button in lfsr, div3, endpoint and gray (flags) | S–M |
-| V141 | the 14 boxes with a random button | **Random seed**: a small seed field next to every "random" button and a "copy link" that carries it (complements U134) | S–M |
-| V142 | 0007, 0011, 0034, 0010, 0002, 0005 | **"Back to the page's example"** in every box that starts from the page's values (triangle, polygon, ttt, gray sync, brackets, trace swap, bfs01) | S |
-| V143 | 0027, 0028, 0018, 0019, 0031, 0032, 0009, 0025, 0024, 0023, 0033 | **Uniform speed control** on every play (cake, hourglass, bridge, river) and play where only "next" exists (the 0009 walk, acknak, credits, endpoint, fifo) | S |
-| V144 | all | **Enlarge button on every box** (11 of 34 today) and removal of the unused generic slider code in `setup()` | S |
+| V140 | all with prev / next | ~~**Arrow keys step** (← / → when the box has focus, space for play) in every stepping box; a "previous" button in lfsr, div3, endpoint and gray (flags)~~ | S–M — **done** |
+| V141 | the 14 boxes with a random button | ~~**Random seed**: a small seed field next to every "random" button and a "copy link" that carries it (complements U134)~~ | S–M — **done** |
+| V142 | 0007, 0011, 0034, 0010, 0002, 0005 | ~~**"Back to the page's example"** in every box that starts from the page's values (triangle, polygon, ttt, gray sync, brackets, trace swap, bfs01)~~ | S — **done** |
+| V143 | 0027, 0028, 0018, 0019, 0031, 0032, 0009, 0025, 0024, 0023, 0033 | ~~**Uniform speed control** on every play (cake, hourglass, bridge, river) and play where only "next" exists (the 0009 walk, acknak, credits, endpoint, fifo)~~ | S — **done (no fifo: it has no stepping)** |
+| V144 | all | ~~**Enlarge button on every box** (11 of 34 today) and removal of the unused generic slider code in `setup()`~~ | S — **done** |
 
 ### Round W — follow-up questions inside the boxes (proposed in session 20, owner picks)
 
