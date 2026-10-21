@@ -995,9 +995,9 @@ axe check warns only; `main` is updated at the end of each round.
 
 ## In progress
 
-- Session 18: round R (0033 to 0038) is on the branch and goes to `main` once CI (with
-  the six new Verilator testbenches) is green. After the deploy: look at the five WaveDrom
-  diagrams (0034, 0035, 0038) on the live site, the sandbox cannot render them.
+- Session 18: round R (0033 to 0038) is on `main` (commit 11a5109, deploy run 39564541732
+  green). Owner's check: the five WaveDrom diagrams (0034, 0035, 0038) on the live site,
+  the sandbox cannot render them.
 - Next: the owner's picks from round T (explorers for existing questions), the rest of
   round Q, rounds D to F, I, L, N, O and S, R105 (the first staff question), or new
   questions.
