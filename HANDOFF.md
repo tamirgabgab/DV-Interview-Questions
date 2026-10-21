@@ -1176,6 +1176,41 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       replay from a link on all fourteen boxes (identical state twice, the clipboard link
       matches the field). Lint 38/38, 256 Python tests, strict build, links, phone and axe
       light and dark on every page.
+12. **Round W, batch 1 (W149, W170, W173; the owner's answers: the rotation as a fourth
+    option of the version select; wide sliders with a number field beside each; the
+    charts and table limited to a window of 200 people that holds the peak; a capacity
+    select and a plan select on the bridge, with a table of the three plans):**
+    - W149: `rotTrace(a, b, c, bits)` in the 0002 tracer, the follow-up rotation
+      a ← b, b ← c, c ← a as two XOR swaps (six lines), a `c` field that appears with the
+      option, the symbolic column in a0 / b0 / c0 (`symText` takes a third coefficient);
+      "same variable" is off for the rotation. The reset of V142 already covered the
+      other half of the item. Test: the six frames evaluate their expressions, the end
+      state is the rotation, modulo 256 in the 8-bit mode.
+    - W170: the cake sliders reach a = 0.0001, d from −0.2 to 0.8, q from 0.5 to 3, with
+      an exact number field beside each (clamped to a in (0, 1], d in [−1, 1], q in
+      [0.1, 10]). `cakeSplit` stops at a negligible fraction (below 1e−9, or negative)
+      or at `CAKE_MAX` = 10,000 people; `cakeDone(rows)` says whether the cake was
+      finished, and the summary explains the three endings (finished; the fractions never
+      grow, 10,000 listed; the fractions shrink to nothing) and says "no threshold" when
+      d ≤ 0 or q ≤ 1. The table scrolls (19 rem, sticky head, the current person kept in
+      view); the charts and the table show a window of 200 people (the first 200, or 200
+      around the peak) with a note line; slices below 0.001 of the pie merge into one
+      grey region. `barsChart` takes a first index and skips the ticks that would overlap
+      a highlighted one. Tests: d < 0, d = 0, a = d = 0.0001 (the 100th on top), the
+      page's jump cases, q < 1, q = 1.
+    - W173: `bridgeSolve(times, cap)` enumerates groups i ≤ j ≤ k (the page's tie-break on
+      a bridge of two is kept); `bridgeEscortMoves` and `bridgePairMoves` build the two
+      classic plans as crossings and `bridgeTime` replays them. The box: "הגשר מחזיק"
+      (two / three), "התוכנית" (the search, the fastest escorts everyone, the two slowest
+      cross together), the animation runs the chosen plan, a table of the three plans with
+      their crossings and times (the shortest in bold, the shown one shaded); on a bridge
+      of three only the search, with the bridge-of-two time for comparison. Tests: the
+      bridge of three against a brute force (13 for 1, 2, 5, 10), the classic plans
+      against the page's `escort` and the pair rule.
+    - Checks in the sandbox: the three boxes light and dark at 1100 and 390 px (the
+      rotation at the end, the 10,000-person cake with its window and scrolling table,
+      the escort plan and the bridge of three played to the end); lint, the Python tests,
+      strict build, links, phone and axe light and dark.
 
 ---
 
@@ -1186,9 +1221,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   question now has an explorer. Round T is closed. An audit of all 34 explorer kinds
   against the pages' follow-up questions produced rounds V (infrastructure), W (follow-ups
   per page) and X (timing strips), recorded under "Round U" below. Round V is done
-  (session 20). Next: round W as trimmed by the owner (W149, W152, W154, W162, W164,
-  W169, W170, W173, W177; W172 dropped), then rounds U and X, the open rounds D to F, I,
-  L, N, O, Q, S, or new questions.
+  (session 20). Round W (trimmed by the owner; W172 dropped) runs in batches: batch 1
+  (W149, W170, W173) is done; next batch 2 (W152, W162, W177), then batch 3 (W154, W164,
+  W169), then rounds U and X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1665,14 +1700,14 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 
 | Id | Page | Missing | Size |
 |---|---|---|---|
-| W149 | 0002 trace (swap) | A three-variable rotation; a reset | S |
+| ~~W149~~ | 0002 trace (swap) | ~~A three-variable rotation; a reset~~ done (session 20, batch 1) | S |
 | W152 | 0005 bfs01 | A digit-set choice (3 and 7); a "length only" mode without parents, with the bit count for the hardware follow-up | S–M |
 | W154 | 0007 triangle / polygon | The exact discrete count over C(360, n) beside the continuous formula; a histogram of the largest arc ("fat triangles") | M |
 | W162 | 0016, 0022 josephus | The "every third leaves" rule (41 people) on 0016; a reverse lookup "for which N does seat s survive"; N above 64 | S–M |
 | W164 | 0018, 0019 hourglass | Minimise flips instead of events; a third hourglass | M |
 | W169 | 0026 motorcycle | Four people and n; a distance field (52 km); two strategies overlaid on one chart | M |
-| W170 | 0027, 0028 cake | Wider ranges: d up to 0.8 and negative, a down to 0.0001, q up to 3 and below 1 | S |
-| W173 | 0031 bridge | Bridge capacity 3; a comparison with the two classic strategies | S |
+| ~~W170~~ | 0027, 0028 cake | ~~Wider ranges: d up to 0.8 and negative, a down to 0.0001, q up to 3 and below 1~~ done (session 20, batch 1) | S |
+| ~~W173~~ | 0031 bridge | ~~Bridge capacity 3; a comparison with the two classic strategies~~ done (session 20, batch 1) | S |
 | W177 | 0035 div3 | Divide by a general N (5); a selectable strip length | M |
 
 ### Round X — one timing strip for the protocols (proposed in session 20, owner picks)
@@ -1683,9 +1718,10 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 | X146 | 0023, 0024, 0025 | **Event axis for the three reference models**: every event a column on a strip with Seq / credits / cycle, which merges U136 into one uniform view | M |
 | X147 | 0033 | **A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart | S |
 
-Suggested order (session 20): round V is done. Round W next, as listed (the owner picks
-the batches and answers multiple-choice questions per batch), then U135 and U139, then
-round X on top of V.
+Suggested order (session 20): round V is done. Round W runs in three batches (the owner
+answers multiple-choice questions per batch): batch 1 (W149, W170, W173) is done; batch 2
+is W152, W162, W177; batch 3 is W154, W164, W169. Then U135 and U139, then round X on top
+of V.
 
 
 The older idea list below is kept for reference; items covered by the rounds above are
