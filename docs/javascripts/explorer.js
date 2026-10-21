@@ -4163,7 +4163,7 @@
         const bitsRow = (label, v, sampled) => `<div class="gr-row"><span class="gr-label">${label}</span><span class="gr-bits" dir="ltr">` +
           [...Array(BITS)].map((_, j) => {
             const i = BITS - 1 - j, ch = changed.includes(i), bit = (v >> i) & 1;
-            if (sampled && ch) return `<button type="button" class="gr-bit gr-btn ${arrived[i] ? "is-new" : "is-old"}" data-kind="${kind}" data-i="${i}" aria-label="ביט ${i}: ${arrived[i] ? "החדש הגיע" : "עדיין הישן"}, לחיצה הופכת">${bit}</button>`;
+            if (sampled && ch) return `<button type="button" class="gr-bit gr-btn ${arrived[i] ? "is-new" : "is-old"}" data-kind="${kind}" data-i="${i}" aria-label="${bit}, ביט ${i}: ${arrived[i] ? "החדש הגיע" : "עדיין הישן"}, לחיצה הופכת">${bit}</button>`;
             return `<span class="gr-bit${ch && !sampled ? " is-changed" : ""}">${bit}</span>`;
           }).join("") + `</span><span class="gr-dec">${ltr(v)}</span></div>`;
         return `<p class="ex-title">${title}</p>` + bitsRow("ישן", oldV, false) + bitsRow("חדש", newV, false) + bitsRow("נדגם", seen, true);

@@ -1094,8 +1094,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
    part c (16 slots, W and R markers, the pointers split top bit / top two bits, the rule
    lines). `tests/0034` checks every 5-bit pointer pair and every arrived subset of
    every 4-bit step.
-5. **Checks:** lint 38/38, Python tests, strict build, links, phone check light and dark
-   with axe on the four pages.
+5. **Checks:** lint 38/38, 247 Python tests, strict build, links 0 broken, phone check
+   light and dark with axe (0 problems; one axe finding fixed: the bit buttons of the
+   Gray box carry their visible digit in the aria-label, label-content-name-mismatch).
 
 ---
 
