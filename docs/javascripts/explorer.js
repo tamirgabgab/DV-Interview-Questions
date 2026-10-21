@@ -1554,6 +1554,27 @@
   // The cake box (0027, 0028): the law (arithmetic or geometric, with the same a), the two
   // sliders, and a stepper that adds one person at a time: the slice appears on the cake,
   // the row joins the table and the bar lights up. Play adds a person every moment.
+  // --- shared controls ---------------------------------------------------------------------
+
+  // A speed select (milliseconds per step) and the play loop of a stepper: the play
+  // button toggles a timer that calls step() every speed.value ms until done(); pressed
+  // at the end, restart() rewinds first. Returns stop(), for the other controls.
+  const speedSel = (slow, mid, fast) =>
+    `<label>הקצב <select class="ex-speed"><option value="${slow}">איטי</option><option value="${mid}" selected>בינוני</option><option value="${fast}">מהיר</option></select></label>`;
+  const autoplay = (play, speed, { step, done, restart }) => {
+    let timer = null;
+    const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
+    play.addEventListener("click", () => {
+      if (timer) { stop(); return; }
+      if (done()) restart();
+      if (done()) return;
+      play.textContent = "עצירה";
+      timer = setInterval(() => { step(); if (done()) stop(); }, Number(speed.value));
+    });
+    speed.addEventListener("change", () => { if (timer) { stop(); play.click(); } });
+    return stop;
+  };
+
   const cakeView = (kind0) => ({
     mount(box) {
       const d = box.dataset;
@@ -1571,7 +1592,7 @@
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-prev">האדם הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">האדם הבא</button>` +
-        `<button type="button" class="md-button ex-play">הפעלה</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1200, 700, 250) +
         `<button type="button" class="md-button ex-all">כולם</button>` +
         `<span class="ex-pos"></span></div>` +
         `<div class="cake-box"><div class="cake-pie"></div><div class="cake-panel"><p class="cake-now"></p><table class="cake-table"><thead><tr><th>האדם</th><th>השבר</th><th>נשאר לפניו</th><th>מקבל</th></tr></thead><tbody></tbody></table></div></div>` +
@@ -1661,9 +1682,10 @@
         if (timer) { stop(); return; }
         if (st.shown >= rowsOf(st.kind).length) st.shown = 0;
         play.textContent = "עצירה";
-        timer = setInterval(() => { if (st.shown >= rowsOf(st.kind).length) { stop(); return; } go(st.shown + 1); }, 700);
+        timer = setInterval(() => { if (st.shown >= rowsOf(st.kind).length) { stop(); return; } go(st.shown + 1); }, Number($(".ex-speed").value));
         go(st.shown + 1);
       });
+      $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); play.click(); } });
       kindSel.addEventListener("change", () => { stop(); st.kind = kindSel.value; st.shown = 1; setSliders(); draw(); });
       aIn.addEventListener("input", () => { stop(); st.a = Number(aIn.value); draw(); });
       stepIn.addEventListener("input", () => { stop(); st.step[st.kind] = Number(stepIn.value); draw(); });
@@ -2310,7 +2332,7 @@
         `<div class="hg-axis"></div>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">האירוע הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">האירוע הבא</button>` +
-        `<button type="button" class="md-button ex-play">הפעלה</button><span class="ex-pos"></span></div>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1100, 400) + `<span class="ex-pos"></span></div>` +
         `<div class="hg-frame"></div><p class="hg-caption"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play");
@@ -2413,9 +2435,10 @@
         if (!count()) return;
         if (st.s >= count() - 1) st.s = 0;
         play.textContent = "עצירה";
-        timer = setInterval(() => { if (st.s >= count() - 1) { stop(); return; } st.s += 1; draw(); }, 1100);
+        timer = setInterval(() => { if (st.s >= count() - 1) { stop(); return; } st.s += 1; draw(); }, Number($(".ex-speed").value));
         draw();
       });
+      $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); play.click(); } });
       ["A", "B", "D"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { stop(); st[k] = Number($(`.ex-${k}`).value); st.s = 0; draw(); }));
       $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0 }); ["A", "B", "D"].forEach((k) => { $(`.ex-${k}`).value = st[k]; }); draw(); });
       draw();
@@ -2507,7 +2530,7 @@
         `<p class="ex-summary" aria-live="polite"></p>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">החצייה הקודמת</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">החצייה הבאה</button>` +
-        `<button type="button" class="md-button ex-play">הפעלה</button><span class="ex-pos"></span></div>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1600, 1000, 400) + `<span class="ex-pos"></span></div>` +
         `<div class="bridge-frame"></div><p class="bridge-caption"></p>` +
         `<span class="viz-legend"><span><i class="st-cell"></i>על הגדה הקרובה</span><span><i class="st-stack"></i>חוצים עכשיו</span><span><i class="st-ok"></i>כבר על הגדה הרחוקה</span><span><i class="torch"></i>הלפיד</span></span>`;
       const $ = (sel) => box.querySelector(sel);
@@ -2571,9 +2594,10 @@
         if (!total()) return;
         if (st.s >= total()) st.s = 0;
         play.textContent = "עצירה";
-        timer = setInterval(() => { if (st.s >= total()) { stop(); return; } st.s += 1; draw(); }, 1000);
+        timer = setInterval(() => { if (st.s >= total()) { stop(); return; } st.s += 1; draw(); }, Number($(".ex-speed").value));
         st.s += 1; draw();
       });
+      $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); play.click(); } });
       input.addEventListener("change", () => { stop(); st.times = parse(); st.s = 0; draw(); });
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
       $(".ex-reset").addEventListener("click", () => { stop(); input.value = defaults; st.times = parse(); st.s = 0; draw(); });
@@ -2595,7 +2619,7 @@
         ["wolf", "goat", "cabbage"].map((i) => `<button type="button" class="md-button ex-go" data-item="${i}">עם ${HEB[i]}</button>`).join("") +
         `<button type="button" class="md-button ex-undo">צעד אחורה</button>` +
         `<button type="button" class="md-button ex-reset">מההתחלה</button>` +
-        `<button type="button" class="md-button md-button--primary ex-solve">פתרון</button></div>` +
+        `<button type="button" class="md-button md-button--primary ex-solve">פתרון</button>` + speedSel(1800, 1100, 500) + `</div>` +
         `<div class="river-frame"></div><p class="ex-summary" aria-live="polite"></p>` +
         `<p class="ex-title">גרף המצבים: המצב הנוכחי מודגש, והמסלול שעברתם בכתום</p><div class="river-graph"></div>`;
       const $ = (sel) => box.querySelector(sel);
@@ -2694,16 +2718,18 @@
         st.s = 0; st.history = []; st.unsafe = null;
         const plan = riverPlan();
         let k = 0;
+        const ms = Number($(".ex-speed").value);
         $(".ex-solve").textContent = "עצירה";
         timer = setInterval(() => {
           if (k >= plan.length) { stop(); draw(); return; }
           const item = plan[k];
           draw({ from: st.s, item });                               // on the boat
-          setTimeout(() => { if (timer) cross(item); }, 500);
+          setTimeout(() => { if (timer) cross(item); }, ms * 0.45);
           k += 1;
-        }, 1100);
+        }, ms);
         draw();
       });
+      $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); $(".ex-solve").click(); } });
       draw();
     },
   });
@@ -3175,6 +3201,7 @@
         `<div class="ex-controls bx-walk-row"><label>אדם <input type="number" class="ex-me" min="1" max="${nmax}" step="1" dir="ltr" aria-label="מספר האדם שהולך"></label>` +
         `<button type="button" class="md-button ex-prev">הפתיחה הקודמת</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">הפתיחה הבאה</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1500, 700, 250) +
         `<button type="button" class="md-button ex-all">עד הסוף</button>` +
         `<button type="button" class="md-button ex-start">מההתחלה</button></div>` +
         `<p class="bx-walk" aria-live="polite"></p></div></div>` +
@@ -3273,17 +3300,23 @@
         $(".bx-formula").innerHTML = `הצפי: האסטרטגיה מצליחה כשאין מעגל ארוך מ-${ltr(m)}, בהסתברות ${ltr(`1 − (${terms.join(" + ")}) ≈ ${fmt(pStrat, 4)}`)}; ` +
           `בחירה אקראית מצליחה לכל אחד בהסתברות ${ltr(`1/2`)}, ולכולם ${ltr(`(1/2)^${st.n} ≈ ${pRand < 1e-3 ? pRand.toExponential(2).replace("e-", "·10^−") : fmt(pRand, 4)}`)}. עם אדם 0 האסטרטגיה מצליחה תמיד.`;
       };
-      const setN = (n) => { st.n = n; st.notes = permShuffle(n); st.me = Math.min(st.me, n); st.step = 0; st.runs = st.strat = st.rand = 0; draw(); };
-      $(".ex-n").addEventListener("input", () => setN(Number($(".ex-n").value)));
-      $(".ex-shuffle").addEventListener("click", () => { st.notes = permShuffle(st.n); st.step = 0; draw(); });
-      $(".ex-example").addEventListener("click", () => { st.n = nmax; $(".ex-n").value = nmax; st.notes = EXAMPLE.slice(0, nmax + 1); st.me = 13; st.step = 0; draw(); });
-      helperCb.addEventListener("change", () => { st.helper = helperCb.checked; st.step = 0; draw(); });
       const steps = () => permWalk(effective().notes, st.me, maxOpens()).opened.length;
-      $(".ex-next").addEventListener("click", () => { st.step = Math.min(st.step + 1, steps()); draw(); });
-      $(".ex-prev").addEventListener("click", () => { st.step = Math.max(st.step - 1, 0); draw(); });
-      $(".ex-all").addEventListener("click", () => { st.step = steps(); draw(); });
-      $(".ex-start").addEventListener("click", () => { st.step = 0; draw(); });
+      const stop = autoplay($(".ex-play"), $(".ex-speed"), {
+        step: () => { st.step = Math.min(st.step + 1, steps()); draw(); },
+        done: () => st.step >= steps(),
+        restart: () => { st.step = 0; draw(); },
+      });
+      const setN = (n) => { stop(); st.n = n; st.notes = permShuffle(n); st.me = Math.min(st.me, n); st.step = 0; st.runs = st.strat = st.rand = 0; draw(); };
+      $(".ex-n").addEventListener("input", () => setN(Number($(".ex-n").value)));
+      $(".ex-shuffle").addEventListener("click", () => { stop(); st.notes = permShuffle(st.n); st.step = 0; draw(); });
+      $(".ex-example").addEventListener("click", () => { stop(); st.n = nmax; $(".ex-n").value = nmax; st.notes = EXAMPLE.slice(0, nmax + 1); st.me = 13; st.step = 0; draw(); });
+      helperCb.addEventListener("change", () => { stop(); st.helper = helperCb.checked; st.step = 0; draw(); });
+      $(".ex-next").addEventListener("click", () => { stop(); st.step = Math.min(st.step + 1, steps()); draw(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.step = Math.max(st.step - 1, 0); draw(); });
+      $(".ex-all").addEventListener("click", () => { stop(); st.step = steps(); draw(); });
+      $(".ex-start").addEventListener("click", () => { stop(); st.step = 0; draw(); });
       meIn.addEventListener("change", () => {
+        stop();
         const v = Math.round(Number(meIn.value));
         if (v >= 1 && v <= st.n) { st.me = v; st.step = 0; }
         draw();
@@ -3292,11 +3325,11 @@
       ring.addEventListener("click", (e) => {
         const g = e.target.closest(".bx-g");
         if (!g) return;
-        st.me = Number(g.dataset.b); st.step = 0; draw();
+        stop(); st.me = Number(g.dataset.b); st.step = 0; draw();
       });
       ring.addEventListener("keydown", (e) => {
         const g = e.target.closest(".bx-g");
-        if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); st.me = Number(g.dataset.b); st.step = 0; draw(); }
+        if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); stop(); st.me = Number(g.dataset.b); st.step = 0; draw(); }
       });
       $(".ex-rounds").addEventListener("click", () => {
         const m = maxOpens();
@@ -3907,7 +3940,8 @@
       const num = (v) => Number(v).toLocaleString("en-US");
       box.innerHTML =
         `<div class="ex-controls"><label><span>הכרזות הקהל אחרי ישראל</span><input type="range" class="ex-k" min="0" max="7" step="1" value="0" dir="ltr"><output class="out-k"></output></label>` +
-        `<button type="button" class="md-button ex-prev">הקודמת</button><button type="button" class="md-button md-button--primary ex-next">ההכרזה הבאה</button></div>` +
+        `<button type="button" class="md-button ex-prev">הקודמת</button><button type="button" class="md-button md-button--primary ex-next">ההכרזה הבאה</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(2200, 1300, 500) + `</div>` +
         `<div class="ex-controls eu-what"><span>מה אם לישראל היו</span><label>שופטים <input type="number" class="ex-jury" min="0" max="420" step="1" dir="ltr" aria-label="ניקוד השופטים של ישראל"></label>` +
         `<label>קהל <input type="number" class="ex-pub" min="0" max="432" step="1" dir="ltr" aria-label="ניקוד הקהל של ישראל"></label>` +
         `<button type="button" class="md-button ex-reset">הנתונים האמיתיים</button></div>` +
@@ -3964,8 +3998,13 @@
           ` סדר ההכרזות נקבע לפי ניקוד השופטים${real ? "" : ", ולכן שינוי בניקוד השופטים של ישראל מזיז גם את מקומה בתור"}.`;
       };
       slider.addEventListener("input", () => { st.k = Number(slider.value); draw(); });
-      $(".ex-next").addEventListener("click", () => { st.k = Math.min(st.k + 1, Number(slider.max)); draw(); });
-      $(".ex-prev").addEventListener("click", () => { st.k = Math.max(st.k - 1, 0); draw(); });
+      const stop = autoplay($(".ex-play"), $(".ex-speed"), {
+        step: () => { st.k = Math.min(st.k + 1, Number(slider.max)); draw(); },
+        done: () => st.k >= Number(slider.max),
+        restart: () => { st.k = 0; draw(); },
+      });
+      $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, Number(slider.max)); draw(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
       ["jury", "pub"].forEach((k) => $(`.ex-${k}`).addEventListener("change", () => {
         const v = Math.round(Number($(`.ex-${k}`).value));
         if (v >= 0 && v <= (k === "jury" ? 420 : 432)) { st[k] = v; st.k = 0; }
@@ -4853,7 +4892,8 @@
         `<button type="button" class="md-button ex-preset" data-p="a">סעיף א</button> ` +
         `<button type="button" class="md-button ex-preset" data-p="b">סעיף ב</button></span>` +
         `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא בתסריט</button>` +
-        `<button type="button" class="md-button ex-prev">הצעד הקודם</button><span class="ex-pos"></span>` +
+        `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) + `<span class="ex-pos"></span>` +
         `<label>מתחילים מ-<select class="ex-start" aria-label="המספר הראשון"><option value="4094" selected>4094 (לפני הגלישה)</option><option value="0">0</option></select></label>` +
         `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
         `<div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים:</span>` +
@@ -4886,6 +4926,7 @@
           `<div class="an-queue"><p class="an-qtitle">→ ‏DLLPs בדרך אל ה-RC</p><div class="an-chips" dir="ltr">${chips(s.dllps.map((d, i) => ({ text: `${d.kind === "ACK" ? "Ack" : "Nak"} ${d.seq}`, cls: (i === 0 ? "is-head" : "") + (d.kind === "NAK" ? " is-nak" : "") })))}</div>${headBtns("dllp", !s.dllps.length)}</div>`;
         const scripted = !!st.script, left = scripted ? st.script.steps.length - st.pos : 0;
         $(".ex-next").disabled = !scripted || left === 0;
+        $(".ex-play").disabled = !scripted;
         $(".ex-prev").disabled = !st.history.length;
         $(".ex-pos").textContent = scripted ? `צעד ${st.pos} מתוך ${st.script.steps.length}` : "";
         $(".an-log").innerHTML = st.log ? logText(st.log) : `מצב התחלתי: ${ltr(`ACKD_SEQ = ${s.ackd}`)} הוא "לפני ${ltr(s.nts)}", ה-Retry Buffer ריק, וה-EP מצפה ל-${ltr(s.nrs)} עם סף Ack ${ltr(s.threshold)} שהגריל.`;
@@ -4922,15 +4963,21 @@
         });
         return parts.join(" ");
       };
-      $(".ex-next").addEventListener("click", () => { if (st.script && st.pos < st.script.steps.length) { const ev = st.script.steps[st.pos]; st.pos += 1; apply(ev, true); } });
-      $(".ex-prev").addEventListener("click", () => { const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; render(); } });
-      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { reset(AN_SCRIPTS[b.dataset.p].start, AN_SCRIPTS[b.dataset.p]); $(".ex-start").value = "4094"; }));
-      $(".ex-reset").addEventListener("click", () => reset(Number($(".ex-start").value), null));
-      $(".ex-start").addEventListener("change", () => reset(Number($(".ex-start").value), null));
-      $(".ex-send").addEventListener("click", () => apply({ type: "send", n: 1 }));
-      $(".ex-flush").addEventListener("click", () => apply({ type: "flush" }));
-      $(".ex-timeout").addEventListener("click", () => apply({ type: "timeout" }));
-      box.addEventListener("click", (e) => { const b = e.target.closest(".an-act"); if (b) apply({ type: b.dataset.q, how: b.dataset.how }); });
+      const nextStep = () => { if (st.script && st.pos < st.script.steps.length) { const ev = st.script.steps[st.pos]; st.pos += 1; apply(ev, true); } };
+      const stop = autoplay($(".ex-play"), $(".ex-speed"), {
+        step: nextStep,
+        done: () => !st.script || st.pos >= st.script.steps.length,
+        restart: () => { if (st.script) reset(st.start, st.script); },
+      });
+      $(".ex-next").addEventListener("click", () => { stop(); nextStep(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; render(); } });
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { stop(); reset(AN_SCRIPTS[b.dataset.p].start, AN_SCRIPTS[b.dataset.p]); $(".ex-start").value = "4094"; }));
+      $(".ex-reset").addEventListener("click", () => { stop(); reset(Number($(".ex-start").value), null); });
+      $(".ex-start").addEventListener("change", () => { stop(); reset(Number($(".ex-start").value), null); });
+      $(".ex-send").addEventListener("click", () => { stop(); apply({ type: "send", n: 1 }); });
+      $(".ex-flush").addEventListener("click", () => { stop(); apply({ type: "flush" }); });
+      $(".ex-timeout").addEventListener("click", () => { stop(); apply({ type: "timeout" }); });
+      box.addEventListener("click", (e) => { const b = e.target.closest(".an-act"); if (b) { stop(); apply({ type: b.dataset.q, how: b.dataset.how }); } });
       reset(4094, AN_SCRIPTS.a);
     },
   });
@@ -4953,7 +5000,8 @@
         `<button type="button" class="md-button ex-preset" data-p="a">סעיף א</button> ` +
         `<button type="button" class="md-button ex-preset" data-p="b">סעיף ב</button></span>` +
         `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא בתסריט</button>` +
-        `<button type="button" class="md-button ex-prev">הצעד הקודם</button><span class="ex-pos"></span>` +
+        `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) + `<span class="ex-pos"></span>` +
         `<label>גודל ה-buffer <select class="ex-size" aria-label="גודל ה-buffer">${[3, 4, 5, 6, 8].map((v) => `<option value="${v}"${v === 5 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<label><input type="checkbox" class="ex-wrap"> <span>להתחיל מ-250 (הגלישה)</span></label>` +
         `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
@@ -5002,6 +5050,7 @@
         });
         const scripted = !!st.script;
         $(".ex-next").disabled = !scripted || st.pos >= st.script.steps.length;
+        $(".ex-play").disabled = !scripted;
         $(".ex-prev").disabled = !st.history.length;
         $(".ex-pos").textContent = scripted ? `צעד ${st.pos} מתוך ${st.script.steps.length}` : "";
         $(".an-log").innerHTML = st.log ? st.log.items.map(logText).join(" ") : `הקמת הנתיב: ${ltr(`PCA = ${s.pca}`)} הוא גודל ה-buffer${s.pca !== s.size ? " מעל נקודת ההתחלה" : ""}, ושאר המונים ב-${ltr(s.pcc)}. ‏PCL עדיין ${ltr(s.pcl)}, ולכן אין קרדיטים עד ה-Credit Grant הראשון.`;
@@ -5024,13 +5073,19 @@
           default: return "";
         }
       };
-      $(".ex-next").addEventListener("click", () => { if (st.script && st.pos < st.script.steps.length) { const ev = st.script.steps[st.pos]; st.pos += 1; apply(ev, true); } });
-      $(".ex-prev").addEventListener("click", () => { const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; render(); } });
-      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { st.size = CR_SCRIPTS[b.dataset.p].size; $(".ex-size").value = String(st.size); reset(CR_SCRIPTS[b.dataset.p]); }));
-      $(".ex-size").addEventListener("change", () => { st.size = Number($(".ex-size").value); reset(null); });
-      $(".ex-wrap").addEventListener("change", () => { st.base = $(".ex-wrap").checked ? 250 : 0; reset(null); });
-      $(".ex-reset").addEventListener("click", () => reset(null));
-      box.addEventListener("click", (e) => { const b = e.target.closest(".cr-act"); if (b) apply({ type: b.dataset.ev, how: b.dataset.how }); });
+      const nextStep = () => { if (st.script && st.pos < st.script.steps.length) { const ev = st.script.steps[st.pos]; st.pos += 1; apply(ev, true); } };
+      const stop = autoplay($(".ex-play"), $(".ex-speed"), {
+        step: nextStep,
+        done: () => !st.script || st.pos >= st.script.steps.length,
+        restart: () => { if (st.script) reset(st.script); },
+      });
+      $(".ex-next").addEventListener("click", () => { stop(); nextStep(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; render(); } });
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { stop(); st.size = CR_SCRIPTS[b.dataset.p].size; $(".ex-size").value = String(st.size); reset(CR_SCRIPTS[b.dataset.p]); }));
+      $(".ex-size").addEventListener("change", () => { stop(); st.size = Number($(".ex-size").value); reset(null); });
+      $(".ex-wrap").addEventListener("change", () => { stop(); st.base = $(".ex-wrap").checked ? 250 : 0; reset(null); });
+      $(".ex-reset").addEventListener("click", () => { stop(); reset(null); });
+      box.addEventListener("click", (e) => { const b = e.target.closest(".cr-act"); if (b) { stop(); apply({ type: b.dataset.ev, how: b.dataset.how }); } });
       reset(CR_SCRIPTS.a);
     },
   });
@@ -5053,6 +5108,7 @@
         `<label>אורך בבתים <input type="number" class="ex-len" dir="ltr" min="1" max="256" value="256" aria-label="האורך בבתים"></label>` +
         `<button type="button" class="md-button md-button--primary ex-send">שלח בקשה</button><span class="ep-err"></span></div>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button md-button--primary ex-cycle">מחזור</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1200, 600, 250) +
         `<button type="button" class="md-button ex-run">הרץ עד שכל ה-Completions יצאו</button><span class="ex-pos"></span></div>` +
         `<p class="ex-title">הזיכרון, בלוק אחרי בלוק (128 בתים): הכתיבות צבועות, הקריאות הפתוחות מסומנות בקו</p><div class="ep-mem"></div>` +
         `<p class="ex-title">קריאות פתוחות</p><div class="ep-pending"></div>` +
@@ -5117,6 +5173,7 @@
       };
       const parseAddr = () => { const t = $(".ex-addr").value.trim(); const v = /^0x[0-9a-f]+$/i.test(t) ? parseInt(t, 16) : /^\d+$/.test(t) ? Number(t) : NaN; return v; };
       $(".ex-send").addEventListener("click", () => {
+        stop();
         st.err = "";
         const address = parseAddr(), length = Number($(".ex-len").value);
         if (!Number.isFinite(address) || address < 0) st.err = "כתובת לא תקינה (הקסה, למשל 0x10020).";
@@ -5140,9 +5197,15 @@
         st.log = c ? `מחזור ${ltr(st.s.cycle)}: יוצא Completion של Tag ${ltr(hex(c.tag, 2))} מ-${ltr(hex(c.address))}, ${ltr(c.size)} בתים, Byte Count ${ltr(c.bc)}` + (st.s.pending.some((p) => p.tag === c.tag) ? ` (הבא של אותה קריאה אחרי המתנה אקראית).` : ` (האחרון של הקריאה).`)
           : `מחזור ${ltr(st.s.cycle)}: אין קריאה מוכנה, לא יוצא דבר.`;
       };
-      $(".ex-cycle").addEventListener("click", () => { cycle(); render(); });
-      $(".ex-run").addEventListener("click", () => { let guard = 0; while (st.s.pending.length && guard++ < 400) cycle(); if (!guard) st.log = "אין קריאות פתוחות."; render(); });
+      const stop = autoplay($(".ex-play"), $(".ex-speed"), {
+        step: () => { cycle(); render(); },
+        done: () => !st.s.pending.length,
+        restart: () => {},
+      });
+      $(".ex-cycle").addEventListener("click", () => { stop(); cycle(); render(); });
+      $(".ex-run").addEventListener("click", () => { stop(); let guard = 0; while (st.s.pending.length && guard++ < 400) cycle(); if (!guard) st.log = "אין קריאות פתוחות."; render(); });
       const load = (script) => {
+        stop();
         st.s = epInit(); st.rng = epValueRng(script ? [...script.draws] : [], epUnitRng([])); st.err = "";
         if (script) {
           epWrite(st.s, 0x10000, Array.from({ length: 512 }, (_, i) => i & 0xFF));
