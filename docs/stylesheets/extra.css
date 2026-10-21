@@ -1783,3 +1783,13 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .sh-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .sh-bad { color: var(--diff-hard); font-weight: 700; }
 .md-typeset .explorer .sh-note { font-size: 0.7rem; color: var(--viz-text); }
+
+/* Kaprekar explorer (0012, 0013) */
+.md-typeset .explorer input.ex-x { width: 5rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .kp-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0 0.1rem; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .kp-table { margin-top: 0.5rem; overflow-x: auto; }
+.md-typeset .explorer .kp-table table { font-size: 0.72rem; margin: 0; }
+.md-typeset .explorer .kp-table td, .md-typeset .explorer .kp-table th { padding: 0.25em 0.7em; }
+.md-typeset .explorer .kp-table tr.is-last td { font-weight: 700; }
+.md-typeset .explorer .kp-chain { margin: 0.5em 0; }
+.md-typeset .explorer .kp-chart svg { max-width: 30rem; }

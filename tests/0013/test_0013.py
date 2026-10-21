@@ -58,3 +58,24 @@ def test_follow_up_steps():
             x, n = step(x), n + 1
         counts[n] += 1
     assert counts == [1, 383, 576, 2400, 1272, 1518, 1656, 2184]
+
+
+def test_explorer_matches_page_code():
+    """The Kaprekar explorer with four digits: its step against is_special_4 and the
+    test's own step() on every number, every chain ending at 6174 (or 0) within 7 steps."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const chains = Array.from({{length: 10000}}, (_, x) => m.kapChain(x, 4));
+      console.log(JSON.stringify({{
+        special: chains.map((c) => c.steps[0].special), ends: chains.map((c) => [c.end, c.length, c.fixed]),
+        diff: chains.map((c) => c.steps[0].diff), hist: m.kapHistogram(4),
+      }}));""")
+    for x in range(10000):
+        assert got["special"][x] == bool(is_special(x)) and got["diff"][x] == step(x)
+        end, length, fixed = got["ends"][x]
+        assert fixed and length <= 7
+        assert end == (0 if len(set(f"{x:04d}")) == 1 else 6174), x
+    assert got["hist"]["ends"] == {"0": 10, "6174": 9990}
+    assert sum(got["hist"]["hist"]["6174"]) == 9990 and len(got["hist"]["hist"]["6174"]) == 8
