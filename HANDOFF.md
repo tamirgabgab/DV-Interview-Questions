@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-20 (session 14)_
+_Last updated: 2026-10-21 (session 16)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -876,15 +876,56 @@ open); `main` is updated once, at the end, when everything is green.
    links (49 pages, 0 broken), phone check of the new and changed pages in light and
    dark mode, screenshots of every explorer. SV keyword scan on the new blocks (clean).
 
+### Session 16 — 2026-10-21: round G (G43 to G46)
+
+The owner picked rounds G, then M, then R without R105, and asked for a proposal list of
+explorers for the existing questions (round T below) to choose from. Decisions (asked
+first): comments are prepared in full and the owner enables Discussions and giscus; the
+axe check warns only; `main` is updated at the end of each round.
+
+1. **G43, generators for the old figures:** `tools/figures/q0004.py` (the three crates,
+   now `crate-*` CSS classes instead of literal colours: the last lint warning is gone),
+   `q0005.py` (the log-scale step chart, the counts recomputed), `q0006.py` (the price
+   chart from the best trades) and `q0007.py` (the two example triangles, the half-circle
+   figure, the P(M) chart from the closed formula), all on `blocks()` + gen markers +
+   `fill.py`; `tests/0004` to `tests/0007` check the numbers against the page code and the
+   page copies.
+2. **G44, accessibility pass:** `check_phone.py --axe PATH` runs axe-core on every page
+   and prints serious / critical violations as warnings (`--axe-fail` to fail); CI
+   installs `axe-core@4.14.0` from npm and passes it. Everything it found is fixed: the
+   contrast of the id label, the difficulty chips, the stats strip, the path bar, the
+   meeting list of the clock explorer, the code line numbers, comments, keywords and
+   numbers, and the highlighted-line tint (now a faint tint with an amber bar, in both
+   schemes); links in running text are underlined; every control shows a focus ring
+   (`--site-focus-ring`); the toolbar has `role="toolbar"`, the Python editor a label,
+   Material's code-annotation markers a name (added by a MutationObserver), and tables or
+   code that scroll sideways `tabindex="0"`; motion is off under `prefers-reduced-motion`.
+   Light and dark runs over all 47 pages: 0 violations.
+3. **G45, social cards and comments:** the Material `social` plugin with the RTL layout
+   `layouts/dvq.yml` (navy, logo top-left, title and description aligned right, level ·
+   difficulty · id on question pages, amber bar); `site_url` set so `og:image` is linked;
+   `pillow` + `cairosvg` in `requirements.txt`, `libcairo2` and a cache of
+   `.cache/plugin/social` in CI. giscus: `extra.comments` in `mkdocs.yml`, the hook adds
+   "## דיון" once `repo_id` and `category_id` are filled in; the frame follows the palette
+   toggle. The owner's steps are in README ("Comments").
+4. **G46, weekly workflow:** `.github/workflows/weekly.yml` (Mondays 06:23 UTC and on
+   request): `check_links.py site --external` fetches every external link (HEAD then GET,
+   403 / 429 listed as "refused the robot"), and the latest Verilator release is compared
+   with `VERILATOR_RELEASE`; a newer one opens an issue once.
+5. **Checks:** lint 32/32 clean, 201 Python tests, strict build (with the cards), links
+   (49 pages, 0 broken), phone check light and dark with axe (0 problems, 0 violations).
+
 ---
 
 ## In progress
 
-- Session 15 closed: round P (P87 to P92) and questions 0031, 0032 are on the branch;
-  README / HANDOFF are current. `main` is fast-forwarded once CI is green (the owner asked
-  for one update at the end).
-- Next: the rest of round Q (Q93, Q95, Q97 to Q99), rounds R and S, L to O, the open D to G
-  and I items, the PCIe split explorer (M73), or the next batch of questions.
+- Session 16: round G is done and on `main` once CI is green. The owner's plan for the
+  next rounds: **M** (M73 PCIe explorer, M76 stepper deep links and swipe, M77 interactive
+  badge), then **R** without R105 (R100 to R104, R106), each pushed to `main` at its end;
+  plus the round T proposal list (explorers for existing questions) for the owner to pick
+  from.
+- Waiting on the owner: enable Discussions and giscus (README, Comments) and fill in
+  `extra.comments` in `mkdocs.yml`; check the social card of a shared link once deployed.
 
 ---
 
@@ -895,7 +936,8 @@ open); `main` is updated once, at the end, when everything is green.
 - [ ] Keep example question `0001` or replace it with real content.
 - [ ] Staff level is still empty and Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
-- [ ] Pick the next rounds from **Proposals and rounds**: D to G and I (open), L to O (proposed in session 13), P to S (proposed in session 14: explorers per question, puzzle and DV-core questions, clearer pages).
+- [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14). M and R (without R105) are picked for sessions 17 and 18.
+- [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
 
@@ -1040,8 +1082,8 @@ Effort: **S** under an hour, **M** a few hours, **L** a day or more.
 | C20 | ~~Random question button honouring the filters~~ — done in session 6 | S |
 | C21 | ~~Better Hebrew search (prefix letters ו/ה/ב/ל/מ/ש as separators)~~ — done in session 6 | M |
 | C22 | ~~Solved / favourite marks in the browser with a progress bar per level~~ — done in session 6 | M |
-| C23 | Social preview cards per question | S–M |
-| C24 | Comments per question via GitHub Discussions | M |
+| C23 | ~~Social preview cards per question~~ | S–M — **done** in session 16 (G45) |
+| C24 | ~~Comments per question via GitHub Discussions~~ | M — **done** in session 16 (G45), waits for the owner's ids |
 
 **Rounds D to G — proposed 2026-10-18, after 0020 / 0021** (not started; the owner picks):
 
@@ -1086,12 +1128,12 @@ found by hand. The proposals are grouped so a round can be done in one session.
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| G42 | **`tools/new_question.py`**: scaffold the page, `tests/<id>/`, a figure-generator stub and the README catalog row from the template (idea 12b) | S–M |
-| G43 | **Generators for the old figures** 0004–0007 in `tools/figures/` (idea 12a) | S–M |
-| G44 | **Accessibility pass**: focus rings, aria labels on the toolbar and steppers, contrast of the amber chips in dark mode, `prefers-reduced-motion`; an axe / Lighthouse check in CI | M |
-| G45 | **Social preview cards** (C23) and **giscus comments** (C24) | S–M / M |
-| G46 | **Scheduled workflow**: a weekly external-link check and a reminder when a Verilator release newer than the pinned commit is out | S |
-| G47 | **Display-math width in CI**: extend `check_phone.py` to report `mjx-container[display]` elements wider than the content box (the ten equations of 0021 were found with an ad-hoc script) | S |
+| G42 | ~~**`tools/new_question.py`**: scaffold the page, `tests/<id>/`, a figure-generator stub and the README catalog row from the template (idea 12b)~~ | S–M — **done** as J60 |
+| G43 | ~~**Generators for the old figures** 0004–0007 in `tools/figures/` (idea 12a)~~ | S–M — **done** in session 16 |
+| G44 | ~~**Accessibility pass**: focus rings, aria labels on the toolbar and steppers, contrast of the amber chips in dark mode, `prefers-reduced-motion`; an axe / Lighthouse check in CI~~ | M — **done** in session 16 (axe warns in CI) |
+| G45 | ~~**Social preview cards** (C23) and **giscus comments** (C24)~~ | S–M / M — **done** in session 16 (comments wait for the owner's ids) |
+| G46 | ~~**Scheduled workflow**: a weekly external-link check and a reminder when a Verilator release newer than the pinned commit is out~~ | S — **done** in session 16 |
+| G47 | ~~**Display-math width in CI**: extend `check_phone.py` to report `mjx-container[display]` elements wider than the content box (the ten equations of 0021 were found with an ad-hoc script)~~ | S — **done** as K65 |
 
 Suggested order by value for effort: D26 and D25 (the phone experience of the long pages),
 G47 (so the next proof page is caught by CI), F37 (the PCIe explorer), E31 and E32.
@@ -1333,6 +1375,13 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   screenshot checks serve them from `npm pack` copies via Playwright request routing. The
   phone check in the sandbox:
   `python tools/check_phone.py site --offline --route 'mathjax@3\.2\.2/es5/tex-mml-chtml\.js=<mathjax copy>/es5/tex-mml-chtml.js' --route 'unpkg\.com/mermaid@11/dist/mermaid\.min\.js=<mermaid copy>/dist/mermaid.min.js'`.
+- Social cards in the sandbox: Google Fonts is unreachable, so before a build copy a
+  Hebrew-capable TTF (DejaVu Sans) to `.cache/plugin/social/fonts/Rubik/Regular.ttf` and
+  `Bold.ttf`; the plugin then skips the download (the cards use that font locally, Rubik in
+  CI). axe-core comes from `npm pack axe-core@4.14.0` (the npm registry is reachable):
+  `python tools/check_phone.py site --offline --axe <copy>/package/axe.min.js ...`.
+  `check_links.py --external` in the sandbox reports most hosts as broken (the proxy blocks
+  them); it is meant for the weekly workflow.
 - Publishing: push to `main` → the workflow builds and deploys. It can also be started
   manually (`workflow_dispatch`). `actions/deploy-pages@v4` prints a Node.js 20
   deprecation warning; bump the action versions when newer majors are available.

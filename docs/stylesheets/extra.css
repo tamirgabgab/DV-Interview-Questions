@@ -585,7 +585,7 @@
   border: 1px solid var(--md-default-fg-color--lighter);
   border-radius: 0.2rem;
 }
-.md-typeset .box-grid small { font-size: 0.6rem; color: var(--md-default-fg-color--light); }
+.md-typeset .box-grid small { font-size: 0.6rem; color: var(--md-default-fg-color); opacity: 0.8; }
 .md-typeset .box-grid b { font-size: 0.85rem; }
 .md-typeset .box-grid > span.hl { border: 2px solid var(--viz-s2); }
 
@@ -1428,7 +1428,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .cake-panel p { margin: 0.2em 0 0.4em; }
 .md-typeset .explorer .cake-table { font-size: 0.7rem; margin: 0; }
 .md-typeset .explorer .cake-table td, .md-typeset .explorer .cake-table th { padding: 0.15em 0.6em; }
-.md-typeset .explorer .cake-table tr.is-best td { font-weight: 700; color: var(--viz-s2); }
+.md-typeset .explorer .cake-table tr.is-best td { font-weight: 700; color: var(--viz-s2-text); }
 .md-typeset .explorer .cake-table tr[data-now] td { background: var(--md-code-bg-color); }
 .md-typeset svg .cake-peak.is-now, .md-typeset svg .cake-slice.is-now, .md-typeset svg .cake-slice2.is-now { stroke: var(--viz-ink); stroke-width: 2; }
 .md-typeset .explorer .ex-pos { font-size: 0.7rem; color: var(--viz-text); }
@@ -1591,6 +1591,8 @@ body.practice-mode .md-typeset .question-tools {
   --md-code-hl-comment-color: #616161;
   --md-code-hl-keyword-color: #2f5ead;
   --md-code-hl-number-color: #b31f1f;
+  --md-code-hl-operator-color: #5f5f5f;
+  --md-code-hl-punctuation-color: #5f5f5f;
 }
 [data-md-color-scheme="default"] .md-typeset .highlight .hll {
   background-color: rgba(27, 42, 74, 0.06);
