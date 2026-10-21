@@ -1186,10 +1186,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   question now has an explorer. Round T is closed. An audit of all 34 explorer kinds
   against the pages' follow-up questions produced rounds V (infrastructure), W (follow-ups
   per page) and X (timing strips), recorded under "Round U" below. Round V is done
-  (session 20). Next: the owner's picks from round W (W149, W152, W154, W162, W164, W169,
-  W170, W173, W177, and a reworked W172: a cube part a for 0030 whose shortest path
-  crosses four faces, the current content becoming part b), then rounds U and X, the open
-  rounds D to F, I, L, N, O, Q, S, or new questions.
+  (session 20). Next: round W as trimmed by the owner (W149, W152, W154, W162, W164,
+  W169, W170, W173, W177; W172 dropped), then rounds U and X, the open rounds D to F, I,
+  L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1662,7 +1661,7 @@ its follow-up questions, done before rounds V to X were proposed:
 
 ### Round W — follow-up questions inside the boxes (proposed in session 20, owner picks)
 
-The owner's picks (session 20): the rows below are the whole of round W, to be implemented when the owner says "round W". The other rows of the audit were dropped on the owner's request, to keep the round small.
+The owner's picks (session 20): the rows below are the whole of round W, to be implemented when the owner says "round W". The other rows of the audit were dropped on the owner's request, to keep the round small; W172 (a cube part for 0030) was dropped too, by the owner.
 
 | Id | Page | Missing | Size |
 |---|---|---|---|
@@ -1673,7 +1672,6 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 | W164 | 0018, 0019 hourglass | Minimise flips instead of events; a third hourglass | M |
 | W169 | 0026 motorcycle | Four people and n; a distance field (52 km); two strategies overlaid on one chart | M |
 | W170 | 0027, 0028 cake | Wider ranges: d up to 0.8 and negative, a down to 0.0001, q up to 3 and below 1 | S |
-| W172 | 0030 strip | **A cube as a new part a** (owner's rework): a worked numeric example with equal length, width and height, the spider on face end0 and the fly on face enda, placed so that the shortest path crosses four faces (not five as in the current example); the current content becomes part b, the explorer gets the cube as a preset | M |
 | W173 | 0031 bridge | Bridge capacity 3; a comparison with the two classic strategies | S |
 | W177 | 0035 div3 | Divide by a general N (5); a selectable strip length | M |
 
