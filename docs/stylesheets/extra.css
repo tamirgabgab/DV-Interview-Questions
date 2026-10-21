@@ -1665,8 +1665,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .tri-panel bdi { white-space: nowrap; }
 
 /* Boxes explorer (0009): one colour per cycle, the long cycle red, the walk in blue badges */
-:root { --viz-s4: #8a5cc9; }
-[data-md-color-scheme="slate"] { --viz-s4: #b394e6; }
+:root { --viz-s4: #8a5cc9; --viz-s1-text: #1f63b5; --viz-s3-text: #157a52; --viz-s4-text: #6f42b0; }   /* the series as text: 4.5:1 on white */
+[data-md-color-scheme="slate"] { --viz-s4: #b394e6; --viz-s1-text: var(--viz-s1); --viz-s3-text: var(--viz-s3); --viz-s4-text: var(--viz-s4); }
 .md-typeset .explorer .bx-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
 .md-typeset .explorer .bx-ring { flex: 0 1 20rem; }
 .md-typeset .explorer svg.bx-live { width: 20rem; max-width: 100%; user-select: none; }
@@ -1674,9 +1674,9 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .bx-panel p { margin: 0.3em 0; }
 .md-typeset svg .bx-arrow { stroke-width: 2.2; }
 .md-typeset svg .bx-arrow.is-walked { stroke-width: 4; }
-.md-typeset svg .bx-c0, .md-typeset .explorer .bx-chip.bx-c0 { stroke: var(--viz-s1); color: var(--viz-s1); }
-.md-typeset svg .bx-c1, .md-typeset .explorer .bx-chip.bx-c1 { stroke: var(--viz-s3); color: var(--viz-s3); }
-.md-typeset svg .bx-c2, .md-typeset .explorer .bx-chip.bx-c2 { stroke: var(--viz-s4); color: var(--viz-s4); }
+.md-typeset svg .bx-c0, .md-typeset .explorer .bx-chip.bx-c0 { stroke: var(--viz-s1); color: var(--viz-s1-text); }
+.md-typeset svg .bx-c1, .md-typeset .explorer .bx-chip.bx-c1 { stroke: var(--viz-s3); color: var(--viz-s3-text); }
+.md-typeset svg .bx-c2, .md-typeset .explorer .bx-chip.bx-c2 { stroke: var(--viz-s4); color: var(--viz-s4-text); }
 .md-typeset svg .bx-c3, .md-typeset .explorer .bx-chip.bx-c3 { stroke: var(--site-label-color); color: var(--site-label-color); }
 .md-typeset svg .bx-c4, .md-typeset .explorer .bx-chip.bx-c4 { stroke: var(--viz-ink); color: var(--viz-ink); }
 .md-typeset svg .bx-long, .md-typeset .explorer .bx-chip.bx-long { stroke: var(--diff-hard); color: var(--diff-hard); }

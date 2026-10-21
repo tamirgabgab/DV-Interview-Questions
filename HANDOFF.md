@@ -1017,7 +1017,17 @@ axe check warns only; `main` is updated at the end of each round.
    over all 7.7 million triples (about 3 s) and checks frames, inverse and counts at 50
    checkpoints, the class against the page's `contains_center` and `center_inside`, and the
    totals quoted on the page (1,911,720 / 64,440 / 5,735,160).
-4. **Checks:** lint 38/38, 230 Python tests, strict build, links 0 broken, phone check
+4. **Round T, first batch (the owner's picks and order): T113 boxes (0009), T115 Floyd
+   (0017), T119 remainders (0005), T114 brackets (0010).** Owner's answers: 0009 compares
+   the strategy without person 0 with random picks (with person 0 is always 100%); 0017
+   animates Floyd only; 0005 keeps x up to 40 on a ring; 0010 accepts only the six
+   brackets. Each kind has a `mount(box)` view, exported math, and a test that replays
+   the page's loop in Python frame by frame (`tests/0009`, `0017`, `0005`, `0010`). New
+   text colours `--viz-s1-text`, `--viz-s3-text`, `--viz-s4-text` (4.5:1 on white) for
+   series names in running text, and `--viz-s4` (purple) as a fourth series colour.
+   The ring of 0009 is `role="group"` because its boxes are buttons (axe:
+   nested-interactive under `role="img"`).
+5. **Checks:** lint 38/38, 234 Python tests, strict build, links 0 broken, phone check
    light and dark with axe (0 problems, 0 violations).
 
 ---
@@ -1417,13 +1427,13 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 
 | # | Page | Explorer | Effort |
 |---|------|----------|--------|
-| T113 | 0009 boxes and cycles | **Permutation lab**: N boxes (sliders 4..16), "shuffle" draws the permutation as arrows and colours its cycles; a stepper follows one prisoner box by box; "1,000 rounds" runs the strategy against random choice and shows the success rates side by side (≈ 31% against 1 / 2^N) | M |
-| T114 | 0010 valid parentheses | **Stack animation**: type a string, the stack pushes and pops character by character, the depth chart draws itself, the first mismatch is circled; presets for the page examples and the traps (`([)]`, lone `)`) | S–M |
-| T115 | 0017 duplicate number | **Tortoise and hare**: the array as nodes i → a[i] (type or shuffle an array), the two runners move at their speeds, the meeting and the second phase to the entry of the cycle (the duplicate); a second tab plays the binary-search-on-values method with the count per step | M |
+| ~~T113~~ | Done in session 19. Was: 0009 boxes and cycles | **Permutation lab**: N boxes (sliders 4..16), "shuffle" draws the permutation as arrows and colours its cycles; a stepper follows one prisoner box by box; "1,000 rounds" runs the strategy against random choice and shows the success rates side by side (≈ 31% against 1 / 2^N) | M |
+| ~~T114~~ | Done in session 19. Was: 0010 valid parentheses | **Stack animation**: type a string, the stack pushes and pops character by character, the depth chart draws itself, the first mismatch is circled; presets for the page examples and the traps (`([)]`, lone `)`) | S–M |
+| ~~T115~~ | Done in session 19. Was: 0017 duplicate number | **Tortoise and hare**: the array as nodes i → a[i] (type or shuffle an array), the two runners move at their speeds, the meeting and the second phase to the entry of the cycle (the duplicate); a second tab plays the binary-search-on-values method with the count per step | M |
 | T116 | 0014 random shapes | **Generate**: a button draws N random squares or rectangles on the grid with the constraints of the page (a JS port of the rejection sampling), rejected attempts flashed in red; a heat map of where shapes land after 500 draws shows the bias the question asks about | M |
 | T117 | 0011 tic-tac-toe | **Board builder**: tap cells to place X / O, the page's rules decide live whether the board is a legal final board and say why not (counts, two winners, play after a win); "random legal board" and the wrap-around variant of part b as a toggle | M |
 | ~~T118~~ | Done in session 19 (see the log). Was: 0007 triangle and centre | **Throw three points**: a button (or drag the points) on the unit circle, the arcs coloured, inside / outside decided; "1,000 throws" fills a running counter that converges to 1/4; an M slider for the discrete version with the formula beside it | S–M |
-| T119 | 0005 smallest 0/1 multiple | **BFS on remainders**: x up to ~30, the x remainders as a ring, the queue and the visited set grow step by step, the path back to 0 spelled out as the answer; a step counter next to the enumeration count for the same x | M |
+| ~~T119~~ | Done in session 19. Was: 0005 smallest 0/1 multiple | **BFS on remainders**: x up to ~30, the x remainders as a ring, the queue and the visited set grow step by step, the path back to 0 spelled out as the answer; a step counter next to the enumeration count for the same x | M |
 | T120 | 0012, 0013 Kaprekar | **Iterate**: type a number, sort-subtract step by step until 495 / 6174, the chain drawn; a histogram of the number of steps over all numbers (the page's part b) with the typed number highlighted | S–M |
 | T121 | 0008 Eurovision | **Announcement slider**: the cups chart with a slider "countries announced so far"; the room left for Israel against the points left, the moment of certain loss marked; a "what if" box to change Israel's jury score and watch the moment move | S–M |
 | T122 | 0004 three boxes | **Sample a ball**: tap a box to draw one ball (the hidden contents are random each time), the deduction appears line by line; "try the wrong box first" shows why one draw from "red" or "black" is not enough | S |
@@ -1435,7 +1445,9 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 
 Suggested order: T114, T118, T122 (small, each page gets its "try it" box in an hour),
 then T113 and T115 (the two algorithm animations that readers ask about most), T121 and
-T120, and the protocol trio T125 to T127 after M73.
+T120, and the protocol trio T125 to T127 after M73. Session 19 did T118, T113, T115, T119
+and T114; the owner's next picks, in order: T117 (0011), T116 (0014), T120 (0012, 0013),
+T121 (0008), T122 (0004).
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.

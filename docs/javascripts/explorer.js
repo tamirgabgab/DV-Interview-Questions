@@ -2502,7 +2502,7 @@
         const walk = permWalk(notes, st.me, m);
         const shown = walk.opened.slice(0, st.step);
         const cur = shown[shown.length - 1];
-        let s = `<svg class="figure bx-live" viewBox="0 0 ${W} ${W}" role="img" aria-label="${st.n} קופסאות במעגל, חץ מכל קופסה לקופסה שהפתק שלה מצביע עליה">`;
+        let s = `<svg class="figure bx-live" viewBox="0 0 ${W} ${W}" role="group" aria-label="${st.n} קופסאות במעגל, חץ מכל קופסה לקופסה שהפתק שלה מצביע עליה; לחיצה על קופסה בוחרת את האדם">`;
         for (let b = 1; b <= st.n; b++) {
           const dashed = cut && (b === cut[0] || b === cut[1]);
           const onPath = shown.includes(b) && shown.indexOf(b) < shown.length - 1;
