@@ -116,3 +116,30 @@ def test_figures_up_to_date():
         block = block[:block.index("\n\n")]
         assert "\n".join(line.strip() for line in block.splitlines()) in \
             "\n".join(line.strip() for line in text.splitlines()), table_start
+
+
+def test_explorer_matches_page_code():
+    """The JavaScript enumeration (docs/javascripts/explorer.js) returns the page's splits,
+    in the page's order, on random requests."""
+    from page_tests import explorer_require, node_json
+
+    splits = load_python(20)["completion_splits"]
+    rng = random.Random(20)
+    cases = []
+    for _ in range(60):
+        rcb = rng.choice([64, 128])
+        mps = rng.choice([128, 256, 512, 1024])
+        if mps < rcb:
+            continue
+        addr = 0x1000 + rng.randrange(0, 512, 4)
+        length = rng.randrange(4, 600, 4)
+        cases.append((addr, length, mps, rcb))
+    cases.append((0x1010, 256, 256, 64))
+    cases.append((0x1010, 256, 128, 64))
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const cases = {[list(c) for c in cases]};
+      console.log(JSON.stringify(cases.map(([a, l, mps, rcb]) => m.pcieSplits(a, l, mps, rcb))));
+    """)
+    for (addr, length, mps, rcb), js in zip(cases, got):
+        assert js == splits(addr, length, mps, rcb), (addr, length, mps, rcb)

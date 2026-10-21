@@ -955,9 +955,10 @@ body.practice-mode .md-typeset .question-tools {
 
 .md-typeset .stepper-nav {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.8rem;
+  gap: 0.5rem 0.8rem;
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--site-card-border);
@@ -1612,3 +1613,19 @@ body.practice-mode .md-typeset .question-tools {
 /* Comments (giscus, GitHub Discussions) at the end of a question page. */
 .md-typeset .comments-note { font-size: 0.7rem; color: var(--md-default-fg-color--light); }
 .md-typeset .comments { margin: 0.6rem 0 1.5rem; }
+
+/* PCIe split explorer (0020, 0021) */
+.md-typeset .explorer input.ex-addr { font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0.1rem 0.4rem; border: 1px solid var(--md-default-fg-color--lighter); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); width: 6.5rem; }
+.md-typeset .explorer .pcie-table { font-size: 0.65rem; margin: 0.3rem 0 0.8rem; }
+.md-typeset .explorer .pcie-table td, .md-typeset .explorer .pcie-table th { padding: 0.1em 0.8em; text-align: center; }
+
+/* M77: pages with an explorer, a step figure or an embedded tool */
+.md-typeset .chip-interactive { color: var(--md-primary-fg-color); background: var(--site-primary-soft); border: 1px solid var(--site-card-border); }
+[data-md-color-scheme="slate"] .md-typeset .chip-interactive { color: var(--md-typeset-a-color); }
+.md-typeset .q-interactive { margin-inline-start: 0.3em; font-size: 0.6em; color: var(--md-primary-fg-color); opacity: 0.8; vertical-align: middle; }
+[data-md-color-scheme="slate"] .md-typeset .q-interactive { color: var(--md-typeset-a-color); }
+
+/* M76: swipe on step figures, and the copy-link button */
+.md-typeset .stepper { touch-action: pan-y; }
+.md-typeset .stepper-link { min-width: 0; padding-inline: 0.6em; }
+.md-typeset .stepper-pos { min-width: 5.5rem; }

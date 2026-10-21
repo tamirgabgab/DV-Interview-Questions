@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
           (!f.level || row.dataset.level === f.level) &&
           (!f.difficulty || row.dataset.difficulty === f.difficulty) &&
           (!f.tag || row.dataset.tags.split(" ").includes(f.tag)) &&
+          (!f.interactive || row.dataset.interactive === f.interactive) &&
           (!f.mark || (f.mark === "star" ? marks.has(id, "star") : f.mark === "solved" ? isSolved : !isSolved)) &&
           (!text || row.textContent.toLowerCase().includes(text));
         row.hidden = !ok;

@@ -113,7 +113,9 @@ def _load_questions(docs_dir: Path) -> dict[str, dict]:
         seen_ids[qid] = src_uri
 
         has_code = any(extract_code.blocks_from_text(body, f) for f in ("systemverilog", "python"))
-        questions[src_uri] = {**meta, "id": qid, "src_uri": src_uri, "has_code": has_code}
+        interactive = 'class="explorer"' in body or 'class="stepper"' in body or "<iframe" in body
+        questions[src_uri] = {**meta, "id": qid, "src_uri": src_uri, "has_code": has_code,
+                              "interactive": interactive}
 
     if errors:
         raise PluginError("Invalid question files:\n  " + "\n  ".join(errors))
@@ -190,6 +192,12 @@ def difficulty_chip(difficulty: str) -> str:
     return f'<span class="chip chip-diff chip-diff-{difficulty}">{DIFFICULTIES[difficulty]}</span>'
 
 
+def interactive_chip(q: dict) -> str:
+    """A chip on pages with an explorer, a step figure or an embedded tool."""
+    return ('<span class="chip chip-interactive" title="יש בדף ממשק אינטראקטיבי: סליידרים, אנימציה או איור צעד-צעד">אינטראקטיבי</span>'
+            if q.get("interactive") else "")
+
+
 def _base(page_url: str) -> str:
     """Directory of a page URL, for relative links (page URLs end with '/')."""
     return page_url if page_url.endswith("/") or not page_url else posixpath.dirname(page_url) + "/"
@@ -226,7 +234,7 @@ def _header(q: dict, markdown: str, page_url: str) -> str:
     return (
         '<div class="question-header">\n'
         f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
-        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{new_chip(q)}</div>\n'
+        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{interactive_chip(q)}{new_chip(q)}</div>\n'
         f'<h1>{html.escape(str(q["title"]))}</h1>\n'
         f'<div class="qh-bottom">{"".join(bottom)}</div>\n'
         '</div>\n\n'
@@ -409,6 +417,7 @@ def _table(level: str | None, page_url: str) -> str:
     out.append(group("difficulty", "קושי", DIFFICULTIES.items()))
     out.append(group("tag", "נושא", ((t, t) for t in tags)))
     out.append(group("mark", "סימון", [("star", "מועדפים"), ("solved", "פתורות"), ("unsolved", "לא פתורות")]))
+    out.append(group("interactive", "ממשק", [("1", "אינטראקטיביות")]))
     sorts = [("id", "מספר"), ("title", "שם")] + ([("level", "משרה")] if level is None else []) + [("difficulty", "קושי")]
     out.append('<div class="filter-tools">'
                '<label class="filter-search">חיפוש '
@@ -432,12 +441,13 @@ def _table(level: str | None, page_url: str) -> str:
     for q in rows:
         href = _href(q["src_uri"], page_url)
         level_td = f'<td class="q-level">{level_chip(q["level"])}</td>' if level is None else ""
+        interactive_mark = '<span class="q-interactive" title="עם ממשק אינטראקטיבי">▶</span>' if q.get("interactive") else ""
         out.append(
             f'<tr data-id="{q["id"]}" data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" '
             f'data-level-rank="{LEVEL_RANK[q["level"]]}" data-diff-rank="{DIFF_RANK[q["difficulty"]]}" '
-            f'data-tags="{html.escape(" ".join(q["tags"]))}">'
+            f'data-tags="{html.escape(" ".join(q["tags"]))}" data-interactive="{int(bool(q.get("interactive")))}">'
             f'<td class="q-id">{q["id"]}</td>'
-            f'<td class="q-title"><a href="{href}">{html.escape(str(q["title"]))}</a> {new_chip(q)}'
+            f'<td class="q-title"><a href="{href}">{html.escape(str(q["title"]))}</a> {new_chip(q)}{interactive_mark}'
             '<span class="q-marks"></span></td>'
             f"{level_td}"
             f'<td class="q-diff">{difficulty_chip(q["difficulty"])}</td>'

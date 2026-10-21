@@ -124,3 +124,39 @@ def test_figures_up_to_date():
         block = out[out.index(table_start):]
         block = block[:block.index("\n\n")]
         assert "\n".join(line.strip() for line in block.splitlines()) in flat, table_start
+
+
+def test_explorer_counts_match_generator():
+    """The JavaScript count (dynamic program), closed form and count per number of
+    completions agree with the generator on random requests, including large ones."""
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(21)
+    cases = [(0x1000, 256, 256, 64), (0x1010, 256, 256, 64), (0x1000, 512, 256, 64), (0x1010, 512, 256, 64),
+             (0x1020, 128, 128, 64), (0x1000, 4096, 4096, 64), (0x1004, 4092, 1024, 128)]
+    for _ in range(40):
+        rcb = rng.choice([64, 128])
+        mps = rng.choice([128, 256, 512, 1024, 2048, 4096])
+        if mps < rcb:
+            continue
+        addr = 0x1000 + rng.randrange(0, 4096, 4)
+        length = rng.randrange(4, 4096 - (addr - 0x1000) + 1, 4)
+        cases.append((addr, length, mps, rcb))
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const cases = {[list(c) for c in cases]};
+      console.log(JSON.stringify(cases.map(([a, l, mps, rcb]) => [String(m.pcieCount(a, l, mps, rcb)),
+        String(m.pcieFormula(a, l, mps, rcb)), m.pcieByCompletions(a, l, mps, rcb).map(String), m.pcieBlocks(a, l, rcb)])));
+    """)
+    for (addr, length, mps, rcb), (cnt, form, by_k, blocks) in zip(cases, got):
+        expected = q.count(addr, length, mps, rcb)
+        assert int(cnt) == expected == int(form) == q.formula(addr, length, mps, rcb), (addr, length, mps, rcb)
+        assert blocks == q.blocks(addr, length, rcb)
+        N, m = len(blocks), mps // rcb
+        d = q.delta(addr, length, mps, rcb)
+        for k, w in enumerate(by_k):
+            if k:   # T(N, k): compositions of N into k parts of at most m; delta is one more split with k = 1
+                assert int(w) == q.T(N, k, m) + (d if k == 1 else 0), (addr, length, mps, rcb, k)
+        assert sum(int(w) for w in by_k) == expected

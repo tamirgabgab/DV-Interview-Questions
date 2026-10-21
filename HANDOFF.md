@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-21 (session 16)_
+_Last updated: 2026-10-21 (session 17)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -876,6 +876,33 @@ open); `main` is updated once, at the end, when everything is green.
    links (49 pages, 0 broken), phone check of the new and changed pages in light and
    dark mode, screenshots of every explorer. SV keyword scan on the new blocks (clean).
 
+### Session 17 — 2026-10-21: round M (M73, M76, M77)
+
+1. **M73, PCIe split explorer** (`pcie` kind, 0020 and 0021): address (hex), length
+   slider, MPS and RCB selects, presets of the six page examples. The box draws the
+   request cut into its N blocks on the RCB grid (f, e, m, δ under the bar), counts the
+   splits by the dynamic program and by the closed form of 0021 (always equal; BigInt, so
+   a 4 KB request over RCB 64 shows 2^63), lists the count per number of completions
+   (T(N, k)), and draws the splits map of 0020 for up to forty rows (the first forty in
+   the page's order when there are more; the label margin grows with the longest label).
+   `pcieBlocks`, `pcieSplits`, `pcieByCompletions`, `pcieCount`, `pcieS`, `pcieFormula`
+   exported; `tests/0020` compares the enumeration with the page code, `tests/0021` the
+   counts, the closed form and the per-k counts with the generator, on random requests up
+   to 4 KB.
+2. **M76, stepper upgrades:** every `div.stepper` gets an id in page order, a 🔗 button
+   that copies a deep link (`#stepper-2-step-5` opens the step, opening the collapsed
+   blocks above it, also on `hashchange`), and a horizontal swipe on touch screens (left
+   is forward, like the arrow keys). JavaScript only, the generators are unchanged. The
+   nav row wraps on phones.
+3. **M77, interactive badge:** the hook marks pages with an explorer, a stepper or an
+   iframe (`interactive`), the header card shows an "אינטראקטיבי" chip, the tables a ▶
+   mark after the title and a "ממשק" filter group.
+4. **Checks:** lint 32/32, Python tests, strict build, phone and axe checks of the changed
+   pages in light and dark mode (0 problems), screenshots of the explorer at 256 B and
+   1024 B, the badge, the filter and a deep-linked stepper.
+
+---
+
 ### Session 16 — 2026-10-21: round G (G43 to G46)
 
 The owner picked rounds G, then M, then R without R105, and asked for a proposal list of
@@ -919,11 +946,9 @@ axe check warns only; `main` is updated at the end of each round.
 
 ## In progress
 
-- Session 16: round G is done and on `main` once CI is green. The owner's plan for the
-  next rounds: **M** (M73 PCIe explorer, M76 stepper deep links and swipe, M77 interactive
-  badge), then **R** without R105 (R100 to R104, R106), each pushed to `main` at its end;
-  plus the round T proposal list (explorers for existing questions) for the owner to pick
-  from.
+- Session 17: round M is done and goes to `main` once CI is green. Next by the owner's
+  plan: **round R** without R105 (R100 to R104, R106), pushed to `main` at its end; the
+  round T proposal list (explorers for existing questions) waits for the owner's picks.
 - Waiting on the owner: enable Discussions and giscus (README, Comments) and fill in
   `extra.comments` in `mkdocs.yml`; check the social card of a shared link once deployed.
 
@@ -1118,7 +1143,7 @@ found by hand. The proposals are grouped so a round can be done in one session.
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| F37 | **Parameter explorer for 0020 / 0021**: sliders for address, length, MPS and RCB; the page draws the splits map and shows the count live (a JS port of the recursion, with a test that compares it to the Python output on a grid of cases) | M |
+| F37 | ~~**Parameter explorer for 0020 / 0021**~~ (done as M73, session 17): sliders for address, length, MPS and RCB; the page draws the splits map and shows the count live (a JS port of the recursion, with a test that compares it to the Python output on a grid of cases) | M |
 | F38 | **Run panel presets**: a dropdown of example inputs per question, an "expected output" comparison, and a shareable link that carries the editor code | M |
 | F39 | **Quick quiz blocks**: multiple-choice self-checks (`??? quiz`) with instant feedback, counted in the marks (the "quick quiz" format of Question variety) | M |
 | F40 | **Side-by-side SystemVerilog / Python** on wide screens (a toggle next to the tabs) with matching line highlights | M |
@@ -1211,11 +1236,11 @@ outside `fill.py`, and no visual or accessibility check in CI.
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| M73 | **PCIe split explorer** for 0020 / 0021 (F37): address, length, MPS, RCB → the splits map and the count | M–L |
+| M73 | ~~**PCIe split explorer** for 0020 / 0021 (F37): address, length, MPS, RCB → the splits map and the count~~ | M–L — **done** in session 17 |
 | M74 | **Hourglass explorer** for 0018 / 0019: pick the two glasses and the target, the BFS / Dijkstra path shown step by step | M |
 | M75 | **Probability explorer** for 0015: p, q and the number of children move the outcome grid and the answer | S–M |
-| M76 | **Stepper upgrades**: autoplay with a speed control, a deep link to a step (`#step-5`), swipe on phones | S–M |
-| M77 | **"Interactive" badge** in the header card and a filter chip for pages with an explorer or a stepper | S |
+| M76 | ~~**Stepper upgrades**: autoplay with a speed control, a deep link to a step (`#step-5`), swipe on phones~~ | S–M — **done** in session 17 (deep link and swipe; autoplay lives in the explorers) |
+| M77 | ~~**"Interactive" badge** in the header card and a filter chip for pages with an explorer or a stepper~~ | S — **done** in session 17 |
 
 **Round N — finding questions**
 
@@ -1300,6 +1325,36 @@ and for new questions.
 Suggested order: P87 + S109 (0030 gets its own figure explorer and the 42-vs-40 card),
 R101 + R102 (two DV-core questions that share the FIFO theme and a path), Q94 (the bridge,
 with code), then P88 and S108, and R105 to open the staff shelf.
+
+**Round T — explorers for the existing questions, proposed 2026-10-21** (the owner picks)
+
+A survey of the pages that have no interactive component yet (the clock, strip, cake,
+motorcycle, Josephus, hourglass, probability, bridge and river explorers exist). Each
+proposal names the one thing the reader should be able to *do* that the static figures
+cannot show; the pattern (play loop, stepper, drag, "generate") is the one already in
+`explorer.js`. Effort as above.
+
+| # | Page | Explorer | Effort |
+|---|------|----------|--------|
+| T113 | 0009 boxes and cycles | **Permutation lab**: N boxes (sliders 4..16), "shuffle" draws the permutation as arrows and colours its cycles; a stepper follows one prisoner box by box; "1,000 rounds" runs the strategy against random choice and shows the success rates side by side (≈ 31% against 1 / 2^N) | M |
+| T114 | 0010 valid parentheses | **Stack animation**: type a string, the stack pushes and pops character by character, the depth chart draws itself, the first mismatch is circled; presets for the page examples and the traps (`([)]`, lone `)`) | S–M |
+| T115 | 0017 duplicate number | **Tortoise and hare**: the array as nodes i → a[i] (type or shuffle an array), the two runners move at their speeds, the meeting and the second phase to the entry of the cycle (the duplicate); a second tab plays the binary-search-on-values method with the count per step | M |
+| T116 | 0014 random shapes | **Generate**: a button draws N random squares or rectangles on the grid with the constraints of the page (a JS port of the rejection sampling), rejected attempts flashed in red; a heat map of where shapes land after 500 draws shows the bias the question asks about | M |
+| T117 | 0011 tic-tac-toe | **Board builder**: tap cells to place X / O, the page's rules decide live whether the board is a legal final board and say why not (counts, two winners, play after a win); "random legal board" and the wrap-around variant of part b as a toggle | M |
+| T118 | 0007 triangle and centre | **Throw three points**: a button (or drag the points) on the unit circle, the arcs coloured, inside / outside decided; "1,000 throws" fills a running counter that converges to 1/4; an M slider for the discrete version with the formula beside it | S–M |
+| T119 | 0005 smallest 0/1 multiple | **BFS on remainders**: x up to ~30, the x remainders as a ring, the queue and the visited set grow step by step, the path back to 0 spelled out as the answer; a step counter next to the enumeration count for the same x | M |
+| T120 | 0012, 0013 Kaprekar | **Iterate**: type a number, sort-subtract step by step until 495 / 6174, the chain drawn; a histogram of the number of steps over all numbers (the page's part b) with the typed number highlighted | S–M |
+| T121 | 0008 Eurovision | **Announcement slider**: the cups chart with a slider "countries announced so far"; the room left for Israel against the points left, the moment of certain loss marked; a "what if" box to change Israel's jury score and watch the moment move | S–M |
+| T122 | 0004 three boxes | **Sample a ball**: tap a box to draw one ball (the hidden contents are random each time), the deduction appears line by line; "try the wrong box first" shows why one draw from "red" or "black" is not enough | S |
+| T123 | 0001 edge detector | **Waveform lab**: click the input per cycle, the output and the flop values appear on a live WaveDrom-like strip with the two-flop diagram beside it; a toggle for the one-cycle-late variant of the follow-ups | S–M |
+| T124 | 0002, 0003 swaps and loops | **Code tracer**: a step button runs the page's loop with a variable table and the current line highlighted (the swap variants, the double loop); one component reused by every short-code question | M |
+| T125 | 0024 USB4 credits | **Credit flow**: sliders for the buffer size and the packet rate, the two modulo-256 counters and the credits in flight animated, a "lose a packet" button and the resynchronisation that follows, as in the page's step figures | M–L |
+| T126 | 0025 PCIe Ack/Nak | **Sequence timeline**: send TLPs, press Ack / Nak at the receiver, watch the Retry Buffer fill and empty, a Replay after a Nak or a timeout; the page's error cases as presets | M–L |
+| T127 | 0023 PCIe endpoint | **Request builder** on top of M73: address, length, MPS, RCB → the completions the model returns and the memory reads it performs, reusing the split explorer | L (after M73) |
+
+Suggested order: T114, T118, T122 (small, each page gets its "try it" box in an hour),
+then T113 and T115 (the two algorithm animations that readers ask about most), T121 and
+T120, and the protocol trio T125 to T127 after M73.
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
