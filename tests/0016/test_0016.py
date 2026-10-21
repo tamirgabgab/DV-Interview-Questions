@@ -71,6 +71,50 @@ def test_rounds_of_twenty():
     assert [v for _, leave in groups[3] for v in leave] == [16]
 
 
+def test_explorer_follow_ups():
+    """The box's follow-ups: the general keep / remove rule agrees with the page's steps
+    for keep 1, Josephus's own rule (keep 2, remove 1) agrees with a plain "every third
+    leaves" simulation and with the recurrence, the linked-list survivor agrees with the
+    list simulation, and the seat lookup lists exactly the first circles where the seat
+    survives."""
+    from page_tests import explorer_require, node_json
+
+    def every_third(n):
+        people, i = list(range(n)), 0
+        while len(people) > 1:
+            i = (i + 2) % len(people)
+            people.pop(i)
+        return people[0]
+
+    def recurrence(n):
+        f = 0
+        for m in range(2, n + 1):
+            f = (f + 3) % m
+        return f
+
+    got = node_json(f"const m = {explorer_require()};"
+                    "const out = { kr: [], jos: [], fast: [], seats2: [], seats3: [], seatsJ: [] };"
+                    "for (let n = 1; n <= 64; n++) { for (const L of [2, 3, 4]) out.kr.push([n, L, m.josephusKR(n, 1, L - 1), m.josephusSteps(n, L)]);"
+                    "  out.jos.push([m.josephusKR(n, 2, 1).survivor, m.josephusSurvivor(n, 2, 1), m.josephusRecurrence(n)]);"
+                    "  out.fast.push([m.josephusSurvivor(n, 1, 1), m.josephusSurvivor(n, 1, 2), m.josephusRun(n, 2), m.josephusRun(n, 3)]); }"
+                    "for (let s = 0; s <= 40; s++) { out.seats2.push(m.josephusSeats(s, 2, 4, 5000)); out.seats3.push(m.josephusSeats(s, 3, 4, 5000)); out.seatsJ.push(m.josephusSeats(s, null, 4, 5000)); }"
+                    "out.big = [m.josephusSurvivor(1000000, 1, 1), m.josephusFormula(1000000, 2), m.josephusSurvivor(1000000, 2, 1), m.josephusRecurrence(1000000), m.josephusRecurrence(41)];"
+                    "console.log(JSON.stringify(out));")
+    for n, L, kr, steps in got["kr"]:
+        assert kr["survivor"] == steps["survivor"] and [[[a], b] for a, b in steps["steps"]] == kr["steps"], (n, L)
+    for n, (sim, fast, rec) in enumerate(got["jos"], 1):
+        assert sim == fast == rec == every_third(n) == recurrence(n), n
+    for n, (f2, f3, r2, r3) in enumerate(got["fast"], 1):
+        assert f2 == r2 == q0016.formula(n, 2) and f3 == r3 == q0016.formula(n, 3), n
+    for s in range(41):
+        want2 = [n for n in range(1, 5001) if q0016.formula(n, 2) == s][:4]
+        want3 = [n for n in range(1, 5001) if q0016.formula(n, 3) == s][:4]
+        wantj = [n for n in range(1, 5001) if recurrence(n) == s][:4]
+        assert got["seats2"][s] == want2 and got["seats3"][s] == want3 and got["seatsJ"][s] == wantj, s
+    big = got["big"]
+    assert big[0] == big[1] == q0016.formula(1000000, 2) and big[2] == big[3] and big[4] == 30
+
+
 def test_figures_up_to_date():
     out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0016.py")],
                          capture_output=True, text=True, check=True).stdout

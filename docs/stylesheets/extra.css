@@ -1446,6 +1446,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ex-controls label:has(input[type="checkbox"]) { gap: 0.3rem; }
 
 /* the Josephus explorer of 0016 / 0022: the circle and the order of leaving */
+.md-typeset svg .jos-seat-ring { fill: none; stroke: var(--viz-s3); stroke-width: 2.5; }
 .md-typeset .explorer .jos-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
 .md-typeset .explorer .jos-circle { flex: 0 1 19rem; }
 .md-typeset .explorer svg.jos-live { width: 100%; display: block; margin: 0; }
