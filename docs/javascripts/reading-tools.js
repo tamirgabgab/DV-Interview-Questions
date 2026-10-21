@@ -5,7 +5,8 @@
 //   (there is no hover on phones);
 // - part bar: on a page with two or more parts ("### סעיף ..."), a sticky row of chips that
 //   jumps to a part and marks the part being read.
-// window.dvqDecorate(root) adds the enlarge buttons to figures drawn later (explorer.js).
+// window.dvqDecorate(root, selector?) adds the enlarge buttons to figures drawn later
+// (explorer.js passes its own selector for the live figures of a box).
 (() => {
   const FIGURES = "svg.figure, svg.perf-chart";
 
@@ -107,8 +108,8 @@
     if (lastFocus) lastFocus.focus();
   }
 
-  const decorate = (root) => {
-    root.querySelectorAll(FIGURES).forEach((svg) => {
+  const decorate = (root, selector = FIGURES) => {
+    root.querySelectorAll(selector).forEach((svg) => {
       if (svg.closest(".fig-wrap") || svg.closest(".fig-lightbox")) return;
       const wrap = document.createElement("div");
       wrap.className = "fig-wrap";

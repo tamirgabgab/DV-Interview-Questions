@@ -1,5 +1,6 @@
-// Interactive explorers: a box `<div class="explorer" data-kind="..." data-...>` gets
-// sliders, a summary line and charts that redraw on every change. One model per kind:
+// Interactive explorers: a box `<div class="explorer" data-kind="..." data-...>` mounts
+// the controls, a summary line and figures of its kind, redrawn on every change. One
+// model per kind:
 //   cake-arith / cake-geo  0027, 0028  the law, sliders a and d (or q), and a person-by-person stepper of the cake
 //   motorcycle             0026        sliders t0 and t1, a strategy, and play: the travellers on the road and the chart
 //   josephus               0016, 0022  sliders N (and L), and the circle played step by step; the survivor chart
@@ -1648,7 +1649,7 @@
           if (r.k % fr.every === 0 || r.k === 1 || r.k === peak[0]) fs += fr.xtick(r.k);
         });
         charts.innerHTML = `<p class="ex-title">החלק של כל אדם</p>${sharesShown}<p class="ex-title">השבר של כל אדם מול הסף</p>${fs + fr.close()}`;
-        if (window.dvqDecorate) window.dvqDecorate(charts);
+
       };
       const summary = $(".ex-summary");
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
@@ -1777,7 +1778,7 @@
           `(להשוואה: מחכה ${fmt(T.wait * st.t1, 2)}, הולך בינתיים ${fmt(T.meanwhile * st.t1, 2)}, יורד בדרך ${fmt(T.optimal * st.t1, 2)}). ` +
           (st.strategy === "optimal" ? `הנוסע יורד אחרי ${fmt(pl.D, 3)} מהדרך, וכל אחד מהשניים הולך ${fmt(pl.y + pl.x, 3)} ממנה. ` : "") +
           `עכשיו שלב ${phase}: האופנוע ב-${ltr(fmt(pos[0]))}, הנוסע ב-${ltr(fmt(pos[1]))}, ההולך ב-${ltr(fmt(pos[2]))}.`;
-        if (window.dvqDecorate) window.dvqDecorate(chart);
+
       };
       const stop = () => { running = false; play.textContent = "הפעלה"; summary.setAttribute("aria-live", "polite"); };
       const tick = (now) => {
@@ -1900,7 +1901,7 @@
           `${ltr(`${L}(N − M) / ${L - 1}`)} עם נקודת האפס ${ltr(`M = ${M}`)} נותנת ${form}` +
           `${sim === form ? ", אותו דבר." : ", שלא כמו בסימולציה."}` +
           (L === 2 ? ` בבינארי: ${ltr(`N = ${n.toString(2)}`)}, והשורד ${ltr(sim.toString(2))}.` : "");
-        if (chartFor !== `${n}/${L}`) { chartFor = `${n}/${L}`; $(".jos-chart").innerHTML = chartSvg(n, L); if (window.dvqDecorate) window.dvqDecorate($(".jos-chart")); }
+        if (chartFor !== `${n}/${L}`) { chartFor = `${n}/${L}`; $(".jos-chart").innerHTML = chartSvg(n, L); }
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
       const total = () => josephusSteps(st.n, st.l).steps.length;
@@ -2257,7 +2258,7 @@
         segsBox.innerHTML = `<table><thead><tr><th>הפאה</th><th>אורך הקטע</th><th>הנקודה בסוף הקטע</th></tr></thead><tbody>` +
           res.faces.map((name, i) => `<tr><td>${HEB[name]} <bdi dir="ltr">(${name})</bdi></td><td>${ltr(num(res.segs[i]))}</td><td>${ltr(p3(res.pts[i + 1]))}</td></tr>`).join("") +
           `</tbody></table>`;
-        if (window.dvqDecorate) window.dvqDecorate(chart);
+
       };
       ["a", "b", "h"].forEach((k) => inputs[k].addEventListener("input", () => { st[k] = Number(inputs[k].value); draw(); }));
       ["y0", "z0", "y1", "z1"].forEach((k) => inputs[k].addEventListener("change", () => {
@@ -2483,7 +2484,7 @@
           `<span class="viz-legend"><span><i class="pg-hit"></i>מקיים את התנאי, ושני הילדים בנים</span><span><i class="pg-cond"></i>מקיים את התנאי, יש גם בת</span><span><i class="pg-out"></i>לא מקיים את התנאי</span></span>`
           : `<p class="ex-title">הריבוע מצויר רק לשני ילדים; עם ${C} ילדים המספרים בשורה שלמעלה</p>`;
         $(".prob-chart").innerHTML = `<p class="ex-title">התשובה כפונקציה של q, עם p ו-C הנבחרים; הנקודה היא q הנבחר</p>${curveSvg(p, C, q)}`;
-        if (window.dvqDecorate) window.dvqDecorate(box);
+
       };
       $(".ex-p").addEventListener("input", () => { st.p = Number($(".ex-p").value); draw(); });
       $(".ex-C").addEventListener("input", () => { st.C = Number($(".ex-C").value); draw(); });
@@ -2559,7 +2560,7 @@
         $(".bridge-caption").innerHTML = caption + (st.s === r.moves.length && st.s > 0 ? " כולם בצד הרחוק." : "");
         $(".ex-pos").textContent = `חצייה ${st.s} מתוך ${r.moves.length}`;
         $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = st.s >= r.moves.length;
-        if (window.dvqDecorate) window.dvqDecorate($(".bridge-frame"));
+
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
       const total = () => (st.times.length ? bridgeSolve(st.times).moves.length : 0);
@@ -2673,7 +2674,7 @@
         });
         $(".ex-undo").disabled = n === 0 || !!timer;
         $(".river-graph").innerHTML = graphSvg();
-        if (window.dvqDecorate) window.dvqDecorate($(".river-graph"));
+
       };
       const cross = (item) => {
         const nxt = st.s ^ 1 ^ (item ? RIVER[item] : 0);
@@ -2833,7 +2834,7 @@
           $(".pcie-map").innerHTML = `<p class="ex-title">${note}</p>${mapSvg(addr, len, mps, rcb, rows, Number(total))}` +
             `<span class="viz-legend"><span><i class="cs-first"></i>ה-Completion הראשון (או היחיד)</span><span><i class="cs-mid"></i>אמצעי</span><span><i class="cs-last"></i>אחרון</span><span><i class="cs-rcb"></i>גבול RCB</span><span><i class="cs-req"></i>קצות הבקשה</span></span>`;
         }
-        if (window.dvqDecorate) window.dvqDecorate(box);
+
       };
       $(".ex-addr").addEventListener("input", draw);
       $(".ex-len").addEventListener("input", () => { st.len = Number($(".ex-len").value); draw(); });
@@ -2901,7 +2902,7 @@
         const tEnd = r.trace[r.trace.length - 1][0] || 1;
         const yMax = Math.max(5, Math.ceil(Math.max(r.max, formula) * 1.15 / 5) * 5);
         $(".fifo-chart").innerHTML = `<p class="ex-title">רמת המילוי לאורך הזמן; הקו המקווקו הוא הנוסחה</p>${chart(r.trace, tEnd, formula, yMax)}`;
-        if (window.dvqDecorate) window.dvqDecorate(box);
+
       };
       ["burst", "fw", "fr"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { st[k] = Number($(`.ex-${k}`).value); draw(); }));
       $(".ex-idle").addEventListener("change", () => { st.idle = Number($(".ex-idle").value); draw(); });
@@ -2952,7 +2953,7 @@
         $(".ex-summary").innerHTML = `מחזור של ${ltr(`${fmt(T, 2)} ns`)}; כניסות ל-metastability בשנייה: ${ltr(`T0 · f_clk · f_data = ${(st.t0 * 1e-12 * st.fclk * 1e6 * st.fdata * 1e6).toExponential(2).replace("e+", "·10^")}`)}; כל פלופ נוסף מכפיל את ה-MTBF ב-${ltr(`e^(T/τ) = ${Math.exp(T / (st.tau / 1000)).toExponential(2).replace("e+", "·10^")}`)}.`;
         $(".mtbf-table").innerHTML = `<table class="pcie-table" dir="ltr"><thead><tr><th>פלופים</th><th>t_res</th><th>e^(t_res/τ)</th><th>MTBF</th></tr></thead><tbody>${rows}</tbody></table>`;
         $(".mtbf-chart").innerHTML = `<p class="ex-title">MTBF כפונקציה של תדר השעון, לפלופ אחד (כתום), שניים (כחול) ושלושה (ירוק); הנקודות הן התדר הנבחר</p>${chart()}`;
-        if (window.dvqDecorate) window.dvqDecorate(box);
+
       };
       SL.forEach(([k]) => $(`.ex-${k}`).addEventListener("input", () => { st[k] = Number($(`.ex-${k}`).value); draw(); }));
       $(".ex-reset").addEventListener("click", () => { Object.assign(st, defaults); SL.forEach(([k]) => { $(`.ex-${k}`).value = st[k]; }); draw(); });
@@ -3873,7 +3874,7 @@
         const toFixed = H.ends[FIXED] || 0, toZero = H.ends[0] || 0, longest = hist.length - 1;
         $(".kp-sum").innerHTML = `מתוך ${ltr(num(MAX + 1))} המספרים, ${ltr(num(toFixed))} מגיעים ל-${ltr(FIXED)} (אחרי ${ltr(longest)} צעדים לכל היותר) ו-${ltr(num(toZero))} מגיעים ל-0: אלה המספרים שכל הספרות שלהם שוות${d === 3 ? "" : ""}. ` +
           `רק ${ltr(`0 ו-${FIXED}`)} מיוחדים, כלומר נעצרים ב-0 צעדים.`;
-        if (window.dvqDecorate) window.dvqDecorate($(".kp-chart"));
+
       };
       const set = (x) => { if (Number.isInteger(x) && x >= 0 && x <= MAX) st.x = x; draw(); };
       input.addEventListener("change", () => set(Math.round(Number(input.value))));
@@ -5316,58 +5317,22 @@
 
   // --- the box -----------------------------------------------------------------------------
 
+  // Enlarge buttons (reading-tools.js) on every figure of a box, kept through redraws: a
+  // view rebuilds its figures with innerHTML, so the buttons are added again after each
+  // change (decorate skips figures that already have one).
+  const LIVE_FIGURES = "svg.figure, svg.perf-chart, svg.lf-live, svg.cr-live, svg.ep-live, svg.wave-strip";
+  const decorateLive = (box) => {
+    if (!window.dvqDecorate) return;
+    const dec = () => window.dvqDecorate(box, LIVE_FIGURES);
+    dec();
+    new MutationObserver(dec).observe(box, { childList: true, subtree: true });
+  };
+
   const setup = (box) => {
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
-    const view = make(box);
-    if (view.mount) { view.mount(box); return; }      // a box with its own controls
-    const defaults = {};
-    view.sliders.forEach((sl) => { defaults[sl.key] = Number(box.dataset[sl.key] ?? sl.min); });
-    const state = { ...defaults };
-    if (state.l === undefined) state.l = Number(box.dataset.l || 2);
-    const controls = document.createElement("div");
-    controls.className = "ex-controls";
-    const inputs = [], outputs = {};
-    view.sliders.forEach((sl) => {
-      const label = document.createElement("label");
-      const id = `ex-${box.dataset.kind}-${sl.key}-${Math.random().toString(36).slice(2, 7)}`;
-      label.htmlFor = id;
-      label.innerHTML = `<span>${sl.label}</span>`;
-      const input = document.createElement("input");
-      Object.assign(input, { type: "range", id, min: sl.min, max: sl.max, step: sl.step, value: state[sl.key] });
-      input.dir = "ltr";
-      const out = document.createElement("output");
-      out.htmlFor = id;
-      outputs[sl.key] = out;
-      input.addEventListener("input", () => { state[sl.key] = Number(input.value); draw(); });
-      inputs.push([sl.key, input]);
-      label.append(input, out);
-      controls.append(label);
-    });
-    const reset = document.createElement("button");
-    reset.type = "button";
-    reset.className = "md-button ex-reset";
-    reset.textContent = "חזרה לערכים של השאלה";
-    reset.addEventListener("click", () => {
-      Object.assign(state, defaults);
-      inputs.forEach(([key, input]) => { input.value = state[key]; });
-      draw();
-    });
-    controls.append(reset);
-    const summary = document.createElement("p");
-    summary.className = "ex-summary";
-    summary.setAttribute("aria-live", "polite");
-    const charts = document.createElement("div");
-    box.append(controls, summary, charts);
-
-    const draw = () => {
-      Object.entries(outputs).forEach(([key, out]) => { out.textContent = String(state[key]); });
-      const res = view.draw(state);
-      summary.innerHTML = res.summary;          // built from numbers only
-      charts.innerHTML = res.charts.map(([title, svg]) => `<p class="ex-title">${title}</p>${svg}`).join("");
-      if (window.dvqDecorate) window.dvqDecorate(charts);   // enlarge buttons (reading-tools.js)
-    };
-    draw();
+    make(box).mount(box);
+    decorateLive(box);
   };
 
   document.addEventListener("DOMContentLoaded", () => {
