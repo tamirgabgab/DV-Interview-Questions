@@ -1723,3 +1723,36 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .fl-graph { margin-top: 0.5rem; }
 .md-typeset .explorer svg.fl-live { max-width: 34rem; width: 100%; }
 .md-typeset .explorer .fl-step { margin: 0.4em 0; }
+
+/* Remainders explorer (0005): the ring and the BFS tree */
+.md-typeset .explorer .bf-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.4rem; }
+.md-typeset .explorer .bf-ring { flex: 0 1 20rem; }
+.md-typeset .explorer svg.bf-live { width: 20rem; max-width: 100%; }
+.md-typeset .explorer .bf-panel { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .bf-panel p { margin: 0.3em 0; }
+.md-typeset .explorer .bf-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0 0.1rem; }
+.md-typeset svg .st-stack.is-cur { stroke-width: 4; }
+.md-typeset svg .st-text.bf-xs { font-size: 10px; }
+.md-typeset svg circle.is-path { stroke: var(--viz-s3); stroke-width: 3; }
+
+/* Brackets explorer (0010): the characters row, the stack column, the depth chart */
+.md-typeset .explorer input.ex-s { width: 14rem; max-width: 100%; font: inherit; font-family: var(--md-code-font-family); font-size: 0.8rem; letter-spacing: 0.15em; padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .br-presets .md-button { padding: 0.1rem 0.45rem; font-size: 0.65rem; margin: 0.1rem; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .br-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .br-main { flex: 1 1 18rem; min-width: 0; }
+.md-typeset .explorer .br-chars { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.md-typeset .explorer .br-chars > span { display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem; font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.85rem; color: var(--viz-text); background: var(--md-default-bg-color); }
+.md-typeset .explorer .br-chars > span.is-done { color: var(--viz-ink); border-color: var(--viz-ink); }
+.md-typeset .explorer .br-chars > span.is-cur { box-shadow: inset 0 0 0 3px var(--viz-s1); color: var(--viz-ink); }
+.md-typeset .explorer .br-chars > span.is-fail { border: 3px solid var(--diff-hard); color: var(--diff-hard); border-radius: 50%; }
+.md-typeset .explorer .br-chars > span.is-end { font-size: 0.7rem; }
+.md-typeset .explorer .br-chars .br-empty, .md-typeset .explorer .br-stack .br-empty { width: auto; height: auto; border: 0; font-family: inherit; font-weight: 400; color: var(--viz-text); }
+.md-typeset .explorer .br-chart { margin-top: 0.4rem; max-width: 24rem; }
+.md-typeset .explorer .br-stackwrap { flex: 0 0 auto; min-width: 4rem; }
+.md-typeset .explorer .br-stackwrap .ex-title { margin: 0 0 0.3rem; }
+.md-typeset .explorer .br-stack { display: flex; flex-direction: column-reverse; align-items: center; gap: 0.2rem; min-height: 5rem; padding: 0.3rem; border: 1.5px solid var(--viz-grid); border-top: 0; border-radius: 0 0 0.3rem 0.3rem; width: 3rem; justify-content: flex-start; }
+.md-typeset .explorer .br-stack > span { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 1.6rem; border-radius: 0.25rem; font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.85rem; background: var(--site-primary-soft); color: var(--viz-ink); }
+.md-typeset .explorer .br-stack > span.is-top { box-shadow: inset 0 0 0 2px var(--viz-s1); }
+.md-typeset .explorer .br-step { margin: 0.4em 0; }
+.md-typeset .explorer .br-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .br-bad { color: var(--diff-hard); font-weight: 700; }

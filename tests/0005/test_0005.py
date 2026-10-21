@@ -46,3 +46,55 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(5)
+
+
+def test_explorer_matches_page_code():
+    """The remainders explorer: every frame of its BFS against a replay of the page's loop
+    (the remainder dequeued, the fate of each child, the queue), its answer against the
+    page function, and its three counts against the generator's steps()."""
+    import json
+    import sys
+    from collections import deque
+
+    from extract_code import ROOT
+    from page_tests import explorer_require, node_json
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0005
+
+    xs = list(range(1, 41)) + [99, 999]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(xs)}.map((x) => [m.bfs01Trace(x), m.bfs01Counts(x)])));""")
+    for x, (tr, counts) in zip(xs, got):
+        y = bfs(x)
+        assert tr["answer"] == y == counts["answer"]
+        assert (int(counts["multiples"]), int(counts["enumerated"]), counts["dequeues"]) == q0005.steps(x)
+        # the replay of the page's loop, frame by frame
+        parent, digit, visited = [-1] * x, [""] * x, [False] * x
+        start = 1 % x
+        visited[start], digit[start] = True, "1"
+        queue, frames = deque([start]), []
+        while not visited[0]:
+            r = queue.popleft()
+            kids = []
+            for d in (0, 1):
+                nr = (r * 10 + d) % x
+                if not visited[nr]:
+                    visited[nr], parent[nr], digit[nr] = True, r, str(d)
+                    queue.append(nr)
+                    kids.append({"d": d, "nr": nr, "status": "found" if nr == 0 else "new"})
+                else:
+                    kids.append({"d": d, "nr": nr, "status": "seen"})
+            number, q = "", r
+            while q != -1:
+                number, q = digit[q] + number, parent[q]
+            frames.append({"r": r, "number": number, "kids": kids, "queue": list(queue)})
+        assert tr["frames"] == frames and tr["dequeues"] == len(frames)
+        path, q = [], 0
+        while q != -1:
+            path.insert(0, q)
+            q = parent[q]
+        assert tr["path"] == path and tr["start"] == start
+        assert tr["parent"] == parent and tr["digit"] == digit
+        assert "".join(digit[r] for r in path) == y

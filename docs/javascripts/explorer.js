@@ -15,8 +15,10 @@
 //   triangle               0007        three points to drag or type, inside / edge / outside; play counts every triangle
 //   boxes                  0009        N boxes on a ring with their cycles, person 0's cut, a walk box by box, rounds without person 0
 //   floyd                  0017        the array as the graph i -> nums[i], the tortoise and the hare through both phases
+//   bfs01                  0005        the remainders modulo x on a ring, the BFS tree one dequeue at a time, the answer read back
+//   brackets               0010        a typed bracket string read character by character: the stack, the depth chart, the first failure
 // The math of each model is exported under Node, where the question tests compare it with
-// the Python reference (tests/0007, 0009, 0015, 0017, 0016, 0018 to 0022, 0026 to 0033, 0037).
+// the Python reference (tests/0005, 0007, 0009, 0010, 0015, 0017, 0016, 0018 to 0022, 0026 to 0033, 0037).
 (() => {
   const EPS = 1e-9;
 
@@ -712,6 +714,61 @@
     return nums.every((v) => v >= 1 && v <= n) ? nums : null;
   };
 
+  // Smallest 0/1 multiple (0005): the page's BFS over the remainders modulo x, one frame
+  // per dequeue: the remainder taken out, its two children (+0 first) with their fate,
+  // and the queue after the step. Numbers are strings of digits (they outgrow 2^53).
+  const bfs01Trace = (x) => {
+    const parent = new Array(x).fill(-1), digit = new Array(x).fill(""), visited = new Array(x).fill(false);
+    const start = 1 % x;
+    visited[start] = true; digit[start] = "1";
+    const number = (r) => { let s = ""; for (let q = r; q !== -1; q = parent[q]) s = digit[q] + s; return s; };
+    const queue = [start], frames = [];
+    while (!visited[0]) {
+      const r = queue.shift(), kids = [];
+      for (const d of [0, 1]) {
+        const nr = (r * 10 + d) % x;
+        if (!visited[nr]) { visited[nr] = true; parent[nr] = r; digit[nr] = String(d); queue.push(nr); kids.push({ d, nr, status: nr === 0 ? "found" : "new" }); }
+        else kids.push({ d, nr, status: "seen" });
+      }
+      frames.push({ r, number: number(r), kids, queue: [...queue] });
+    }
+    const path = [];                                 // remainders from the start to 0
+    for (let q = 0; q !== -1; q = parent[q]) path.unshift(q);
+    return { frames, answer: number(0), path, parent, digit, start, dequeues: frames.length };
+  };
+  // the counts of the page's chart: multiples of x scanned, 0/1 numbers enumerated, dequeues
+  const bfs01Counts = (x) => {
+    const t = bfs01Trace(x), y = BigInt(t.answer);
+    let enumerated = 0n;
+    for (const ch of t.answer) enumerated = enumerated * 2n + BigInt(ch);
+    return { multiples: (y / BigInt(x)).toString(), enumerated: enumerated.toString(), dequeues: t.dequeues, answer: t.answer };
+  };
+
+  // Valid parentheses (0010): the page's stack, one frame per character: push, pop, or
+  // the first failure (a closer with an empty stack, or one that does not match the top);
+  // openers left at the end are the third failure.
+  const BRACKET_OF = { ")": "(", "]": "[", "}": "{" };
+  const bracketsClean = (text) => [...String(text)].filter((c) => "()[]{}".includes(c)).join("");
+  const bracketsTrace = (s) => {
+    const frames = [], stack = [];
+    let fail = null;
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      if (ch in BRACKET_OF) {
+        if (!stack.length) { fail = { i, kind: "unopened" }; frames.push({ i, ch, action: "unopened", stack: stack.join("") }); break; }
+        const top = stack[stack.length - 1];
+        if (top !== BRACKET_OF[ch]) { fail = { i, kind: "mismatch", top }; frames.push({ i, ch, action: "mismatch", stack: stack.join(""), top }); break; }
+        stack.pop();
+        frames.push({ i, ch, action: "pop", stack: stack.join("") });
+      } else {
+        stack.push(ch);
+        frames.push({ i, ch, action: "push", stack: stack.join("") });
+      }
+    }
+    if (!fail && stack.length) fail = { i: s.length, kind: "unclosed", left: stack.join("") };
+    return { frames, valid: !fail, fail, odd: s.length % 2 === 1 };
+  };
+
   const models = {
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
     motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, josephusRun, josephusSteps, josephusZero, josephusFormula,
@@ -723,7 +780,7 @@
     fifoSteps, fifoDepth, fifoFill, mtbfSeconds, mtbfHuman,
     TRI_TOTAL, triArcs, triClass, triCountC, triFrame, triIndex, triCounts,
     permCycles, permHelper, permSwap, permWalk, permAllWin, permShuffle, permRandomPicks, permStrategyProb, permRandomProb,
-    floydRho, floydTrace, floydRandom, floydParse,
+    floydRho, floydTrace, floydRandom, floydParse, bfs01Trace, bfs01Counts, bracketsClean, bracketsTrace,
   };
   if (typeof module !== "undefined" && module.exports) {
     module.exports = models;
@@ -2667,6 +2724,212 @@
     },
   });
 
+  // The remainders box (0005): the x remainders on a ring, the BFS tree growing one
+  // dequeue at a time with +0 edges blue and +1 edges orange, the queue beside it, and at
+  // the end the path back from 0 that spells the answer, with the step counts of the
+  // three methods.
+  const bfs01View = () => ({
+    mount(box) {
+      const xmax = Number(box.dataset.xmax || 40);
+      const st = { x: Number(box.dataset.x || 7), k: 0 };
+      const big = (s) => { const b = BigInt(s); return b < 10n ** 12n ? Number(b).toLocaleString("en-US") : `${(Number(b / 10n ** BigInt(s.length - 3)) / 100).toFixed(2)}·10^${s.length - 1}`; };
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label><span>‏x</span><input type="range" class="ex-x" min="1" max="${xmax}" step="1" value="${st.x}" dir="ltr"><output class="out-x"></output></label>` +
+        `<span class="bf-presets">דוגמאות: ` + [7, 9, 11, 13, 37].filter((v) => v <= xmax).map((v) => `<button type="button" class="md-button ex-preset" data-x="${v}">${v}</button>`).join(" ") + `</span></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
+        `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` +
+        `<label>הקצב <select class="ex-speed"><option value="1500">איטי</option><option value="700" selected>בינוני</option><option value="250">מהיר</option></select></label>` +
+        `<button type="button" class="md-button ex-start">להתחלה</button>` +
+        `<button type="button" class="md-button ex-end">לסוף</button><span class="ex-pos"></span></div>` +
+        `<span class="viz-legend"><span><i class="s1"></i>הוספת 0</span><span><i class="s2"></i>הוספת 1</span><span><i class="st-stack"></i>בתור</span><span><i class="st-done"></i>טופל</span><span><i class="st-ok"></i>שארית 0</span></span>` +
+        `<div class="bf-box"><div class="bf-ring"></div><div class="bf-panel"><p class="bf-step" aria-live="polite"></p><p class="bf-queue"></p><p class="bf-path"></p></div></div>` +
+        `<p class="ex-summary bf-sum"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play"), speed = $(".ex-speed");
+      let timer = null, trace = null;
+      const ringSvg = (tr, k) => {
+        const x = st.x, W = 360, C = 180, R = x <= 12 ? 120 : 140, NODE = x <= 12 ? 16 : x <= 24 ? 13 : 10;
+        const pt = (r, rad) => { const a = -Math.PI / 2 + (2 * Math.PI * r) / x; return [C + rad * Math.cos(a), C + rad * Math.sin(a)]; };
+        const done = new Set(), queued = new Set(tr.frames.length ? [tr.start] : []);
+        const edges = [];
+        for (let i = 0; i < k; i++) {
+          const fr = tr.frames[i];
+          done.add(fr.r); queued.delete(fr.r);
+          fr.kids.forEach((kid) => { if (kid.status !== "seen") { queued.add(kid.nr); edges.push([fr.r, kid.nr, kid.d, false]); } });
+        }
+        const cur = k > 0 ? tr.frames[k - 1] : null;
+        if (cur) cur.kids.forEach((kid) => { if (kid.status === "seen") edges.push([cur.r, kid.nr, kid.d, true]); });
+        const finished = k >= tr.frames.length;
+        const onPath = new Set(finished ? tr.path : []);
+        let s = `<svg class="figure bf-live" viewBox="0 0 ${W} ${W}" role="img" aria-label="${x} השאריות מודולו ${x} במעגל, ועץ ה-BFS">`;
+        const arrow = (a, b, cls, dashed, thick) => {
+          const [x0, y0] = pt(a, R), [x1, y1] = pt(b, R);
+          if (a === b) {
+            const [ox, oy] = pt(a, R + NODE + 10);
+            return `<circle class="${cls}" cx="${f(ox)}" cy="${f(oy)}" r="8" fill="none" stroke-width="${thick ? 3.5 : 2}"${dashed ? ' stroke-dasharray="4 3"' : ""}/>`;
+          }
+          const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
+          const mx = (x0 + x1) / 2 + (-dy / len) * len * 0.2, my = (y0 + y1) / 2 + (dx / len) * len * 0.2;
+          const d1 = Math.hypot(x1 - mx, y1 - my), ux = (x1 - mx) / d1, uy = (y1 - my) / d1;
+          const d0 = Math.hypot(mx - x0, my - y0), vx = (mx - x0) / d0, vy = (my - y0) / d0;
+          const sx = x0 + vx * (NODE + 1), sy = y0 + vy * (NODE + 1), ex = x1 - ux * (NODE + 2), ey = y1 - uy * (NODE + 2);
+          const hx = ex - ux * 8, hy = ey - uy * 8;
+          return `<path class="${cls}" d="M${f(sx)},${f(sy)} Q${f(mx)},${f(my)} ${f(ex)},${f(ey)}" fill="none" stroke-width="${thick ? 3.5 : 2}"${dashed ? ' stroke-dasharray="4 3"' : ""}/>` +
+                 (dashed ? "" : `<polygon class="${cls === "s1-line" ? "s1-fill" : "s2-fill"}" points="${f(ex)},${f(ey)} ${f(hx + uy * 4)},${f(hy - ux * 4)} ${f(hx - uy * 4)},${f(hy + ux * 4)}"/>`);
+        };
+        edges.forEach(([a, b, d, pruned]) => {
+          const thick = onPath.has(a) && onPath.has(b) && tr.parent[b] === a;
+          s += arrow(a, b, d === 0 ? "s1-line" : "s2-line", pruned, thick);
+        });
+        for (let r = 0; r < x; r++) {
+          const [px, py] = pt(r, R);
+          const cls = finished && r === 0 ? "st-ok" : cur && r === cur.r ? "st-stack is-cur" : queued.has(r) ? "st-stack" : done.has(r) ? "st-done" : "st-cell";
+          s += `<g><circle class="${cls}${onPath.has(r) ? " is-path" : ""}" cx="${f(px)}" cy="${f(py)}" r="${NODE}"><title>שארית ${r}</title></circle>` +
+               `<text class="st-text ${x <= 12 ? "st-sm" : "bf-xs"}" x="${f(px)}" y="${f(py + (x <= 12 ? 4 : 3.5))}" text-anchor="middle">${r}</text></g>`;
+        }
+        return s + "</svg>";
+      };
+      const draw = () => {
+        $(".out-x").textContent = String(st.x);
+        trace = bfs01Trace(st.x);
+        const tr = trace, total = tr.frames.length;
+        st.k = Math.min(st.k, total);
+        $(".bf-ring").innerHTML = ringSvg(tr, st.k);
+        $(".ex-pos").textContent = `הוצאה ${st.k} מתוך ${total}`;
+        const name = (r, n) => `${ltr(`r = ${r}`)} (המספר ${ltr(n)})`;
+        let step;
+        if (st.k === 0) {
+          step = total === 0
+            ? `עבור ${ltr(`x = ${st.x}`)} המספר 1 כבר נותן שארית 0, ולכן התשובה היא 1 בלי צעדים.`
+            : `מתחילים מהמספר 1, שארית ${ltr(1 % st.x)}. התור: ${ltr(`[${1 % st.x}]`)}.`;
+        } else {
+          const fr = tr.frames[st.k - 1];
+          const kid = (kd) => {
+            const n = fr.number + kd.d;
+            return `${ltr(`+${kd.d}`)} → ${ltr(n)}, שארית ${ltr(kd.nr)}: ` +
+              (kd.status === "new" ? "חדשה, נכנסת לתור" : kd.status === "seen" ? `כבר נראתה, נגזמת ✗` : `<b>0, מצאנו ✓</b>`);
+          };
+          step = `הוצאה ${ltr(st.k)}: מוציאים ${name(fr.r, fr.number)}. ${kid(fr.kids[0])}; ${kid(fr.kids[1])}.`;
+        }
+        $(".bf-step").innerHTML = step;
+        const q = st.k === 0 ? (total ? [1 % st.x] : []) : tr.frames[st.k - 1].queue;
+        $(".bf-queue").innerHTML = st.k > 0 ? `התור אחרי הצעד: ${ltr(`[${q.join(", ")}]`)}.` : "";
+        const finished = st.k >= total;
+        $(".bf-path").innerHTML = finished
+          ? `השחזור: ${ltr(tr.path.slice().reverse().map((r, i) => (i === 0 ? "0" : `← ${r}`)).join(" "))}, הספרות מהסוף להתחלה נותנות <b>${ltr(`y = ${tr.answer}`)}</b> (${ltr(`${tr.answer.length}`)} ספרות).`
+          : "";
+        const c = bfs01Counts(st.x);
+        $(".bf-sum").innerHTML = `עבור ${ltr(`x = ${st.x}`)}: ה-BFS מוציא מהתור ${ltr(c.dequeues)} שאריות${c.dequeues < st.x ? ` (פחות מ-${ltr(st.x)})` : ""}. ` +
+          `לשם השוואה, המעבר על מספרי 0/1 בודק ${ltr(big(c.enumerated))} מספרים, והמעבר על הכפולות של ${ltr(st.x)} בודק ${ltr(big(c.multiples))}.`;
+      };
+      const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
+      const total = () => bfs01Trace(st.x).frames.length;
+      const setX = (x) => { stop(); st.x = x; st.k = 0; $(".ex-x").value = x; draw(); };
+      $(".ex-x").addEventListener("input", () => setX(Number($(".ex-x").value)));
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => setX(Number(b.dataset.x))));
+      $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
+      $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
+      $(".ex-end").addEventListener("click", () => { stop(); st.k = total(); draw(); });
+      play.addEventListener("click", () => {
+        if (timer) { stop(); return; }
+        if (st.k >= total()) st.k = 0;
+        play.textContent = "עצירה";
+        timer = setInterval(() => { st.k++; draw(); if (st.k >= total()) stop(); }, Number(speed.value));
+      });
+      speed.addEventListener("change", () => { if (timer) { stop(); play.click(); } });
+      draw();
+    },
+  });
+
+  // The brackets box (0010): a typed string of brackets (other characters are dropped),
+  // the characters as cells with the one being read marked, the stack as a column that
+  // grows and shrinks, the depth chart, and the first failure circled with its reason.
+  const bracketsView = () => ({
+    mount(box) {
+      const PRESETS = ["()", "()[]{}", "{[()]}", "([]{})", "(]", "([)]", "(((", "())", ")("];
+      const st = { s: box.dataset.s || "{[()]}", k: 0 };
+      const NAMES = { "(": "עגול", "[": "מרובע", "{": "מסולסל" };
+      const esc = (c) => c.replace(/</g, "&lt;");
+      box.innerHTML =
+        `<div class="ex-controls"><label><span>המחרוזת</span><input type="text" class="ex-s" dir="ltr" spellcheck="false" maxlength="40" aria-label="מחרוזת של סוגריים"></label>` +
+        `<span class="br-presets">דוגמאות: ` + PRESETS.map((p) => `<button type="button" class="md-button ex-preset" dir="ltr" data-s="${esc(p)}">${esc(p)}</button>`).join(" ") + `</span></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<button type="button" class="md-button ex-prev">התו הקודם</button>` +
+        `<button type="button" class="md-button md-button--primary ex-next">התו הבא</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` +
+        `<label>הקצב <select class="ex-speed"><option value="1200">איטי</option><option value="600" selected>בינוני</option><option value="200">מהיר</option></select></label>` +
+        `<button type="button" class="md-button ex-start">להתחלה</button>` +
+        `<button type="button" class="md-button ex-end">לסוף</button><span class="ex-pos"></span></div>` +
+        `<div class="br-box"><div class="br-main"><div class="br-chars" dir="ltr"></div><div class="br-chart"></div></div>` +
+        `<div class="br-stackwrap"><p class="ex-title">המחסנית</p><div class="br-stack" dir="ltr"></div></div></div>` +
+        `<p class="br-step" aria-live="polite"></p><p class="ex-summary br-sum"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play"), speed = $(".ex-speed"), input = $(".ex-s");
+      let timer = null;
+      const draw = () => {
+        const s = st.s, tr = bracketsTrace(s), total = tr.frames.length;
+        st.k = Math.min(st.k, total);
+        if (document.activeElement !== input) input.value = s;
+        const fr = st.k ? tr.frames[st.k - 1] : null;
+        const failAt = tr.fail && st.k >= total ? tr.fail.i : -1;
+        $(".br-chars").innerHTML = s.length ? [...s].map((c, i) =>
+          `<span class="${[i === st.k - 1 ? "is-cur" : "", i < st.k - 1 || (i === st.k - 1 && fr.action !== "mismatch" && fr.action !== "unopened") ? "is-done" : "", i === failAt ? "is-fail" : ""].join(" ").trim()}">${esc(c)}</span>`).join("") +
+          (tr.fail && tr.fail.kind === "unclosed" && st.k >= total ? `<span class="is-fail is-end" aria-label="סוף המחרוזת">⏎</span>` : "")
+          : `<span class="br-empty">(מחרוזת ריקה)</span>`;
+        const stack = fr ? fr.stack : "";
+        $(".br-stack").innerHTML = stack.length ? [...stack].map((c, i) =>
+          `<span class="${i === stack.length - 1 ? "is-top" : ""}">${esc(c)}</span>`).join("") : `<span class="br-empty">ריקה</span>`;
+        // the depth after each character read so far
+        const depths = tr.frames.map((g) => g.stack.length);
+        const n = Math.max(s.length, 1), W = 320, H = 90, X0 = 8, BASE = H - 18, dmax = Math.max(1, ...depths);
+        const slot = (W - 2 * X0) / n, bw = Math.max(2, slot * 0.7);
+        let c = `<svg class="perf-chart br-depth" viewBox="0 0 ${W} ${H}" role="img" aria-label="עומק המחסנית אחרי כל תו"><line class="axis" x1="${X0}" x2="${W - X0}" y1="${BASE}" y2="${BASE}"/>`;
+        for (let d = 1; d <= dmax; d++) { const y = BASE - (d / dmax) * (BASE - 10); c += `<line class="grid" x1="${X0}" x2="${W - X0}" y1="${f(y)}" y2="${f(y)}"/><text class="tick" x="${W - X0 + 2}" y="${f(y + 3)}" font-size="8">${d}</text>`; }
+        depths.slice(0, st.k).forEach((d, i) => {
+          const h = (d / dmax) * (BASE - 10);
+          const cls = i === failAt ? "by-enum" : "by-multiples";
+          c += `<rect class="bar ${cls}" x="${f(X0 + i * slot + (slot - bw) / 2)}" y="${f(BASE - h)}" width="${f(bw)}" height="${f(h)}"><title>אחרי התו ${i + 1}: עומק ${d}</title></rect>`;
+        });
+        if (s.length <= 24) [...s].forEach((ch, i) => { c += `<text class="tick" x="${f(X0 + (i + 0.5) * slot)}" y="${BASE + 12}" text-anchor="middle" font-size="9">${esc(ch)}</text>`; });
+        $(".br-chart").innerHTML = c + "</svg>";
+        $(".ex-pos").textContent = `תו ${st.k} מתוך ${s.length}`;
+        let step;
+        if (!fr) step = s.length ? "לפני התו הראשון המחסנית ריקה." : "המחרוזת הריקה תקינה: אין מה לפתוח ואין מה לסגור.";
+        else if (fr.action === "push") step = `התו ${ltr(esc(fr.ch))} פותח, ולכן נדחף למחסנית.`;
+        else if (fr.action === "pop") step = `התו ${ltr(esc(fr.ch))} סוגר, בראש המחסנית ${ltr(esc(BRACKET_OF[fr.ch]))} מאותו סוג, ולכן מוציאים אותו.`;
+        else if (fr.action === "mismatch") step = `<span class="br-bad">✗ התו ${ltr(esc(fr.ch))} סוגר ${NAMES[BRACKET_OF[fr.ch]]}, אבל בראש המחסנית ${ltr(esc(fr.top))}: הסוגר שנפתח אחרון עוד לא נסגר. סוג לא מתאים או סדר לא נכון.</span>`;
+        else step = `<span class="br-bad">✗ התו ${ltr(esc(fr.ch))} סוגר, אבל המחסנית ריקה: אין לו סוגר פותח.</span>`;
+        if (st.k >= total && tr.fail && tr.fail.kind === "unclosed") step += ` <span class="br-bad">✗ המחרוזת נגמרה והמחסנית לא ריקה: ${ltr(esc(tr.fail.left))} לא נסגרו.</span>`;
+        if (st.k >= total && tr.valid && s.length) step += ` <span class="br-ok">✓ כל התווים נקראו והמחסנית ריקה: המחרוזת תקינה.</span>`;
+        $(".br-step").innerHTML = step;
+        $(".br-sum").innerHTML = (tr.valid ? `<span class="br-ok">תקינה ✓</span>` : `<span class="br-bad">לא תקינה ✗</span>`) +
+          (tr.odd ? `, ואפשר לדעת את זה מיד: האורך ${ltr(s.length)} אי-זוגי, והקוד עוצר לפני המחסנית.` : ".") +
+          ` העומק המרבי של המחסנית: ${ltr(Math.max(0, ...depths))}.`;
+      };
+      const total = () => bracketsTrace(st.s).frames.length;
+      const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
+      const setS = (s) => { stop(); st.s = bracketsClean(s).slice(0, 40); st.k = 0; draw(); };
+      input.addEventListener("input", () => { const v = bracketsClean(input.value).slice(0, 40); if (v !== input.value) input.value = v; setS(v); });
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { setS(b.dataset.s); st.k = total(); draw(); }));
+      $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
+      $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
+      $(".ex-end").addEventListener("click", () => { stop(); st.k = total(); draw(); });
+      play.addEventListener("click", () => {
+        if (timer) { stop(); return; }
+        if (st.k >= total()) st.k = 0;
+        play.textContent = "עצירה";
+        timer = setInterval(() => { st.k++; draw(); if (st.k >= total()) stop(); }, Number(speed.value));
+      });
+      speed.addEventListener("change", () => { if (timer) { stop(); play.click(); } });
+      draw();
+    },
+  });
+
   const VIEWS = {
     "cake-arith": () => cakeView("arith"),
     "cake-geo": () => cakeView("geo"),
@@ -2684,6 +2947,8 @@
     triangle: triangleView,
     boxes: boxesView,
     floyd: floydView,
+    bfs01: bfs01View,
+    brackets: bracketsView,
   };
 
   // --- the box -----------------------------------------------------------------------------
