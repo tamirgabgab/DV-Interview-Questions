@@ -1574,6 +1574,40 @@
   // A speed select (milliseconds per step) and the play loop of a stepper: the play
   // button toggles a timer that calls step() every speed.value ms until done(); pressed
   // at the end, restart() rewinds first. Returns stop(), for the other controls.
+  // The seed of a box's random draws: a seed field and a "copy link" button inserted after
+  // `after`; run(rng, seed) redraws with a seeded generator. draw() picks a new seed and
+  // runs it, a typed seed replays, and `#seed-<kind>-<n>` in the URL replays on load (the
+  // first box of that kind on the page). opts.seed fills the field without running.
+  const SEED_HASH = /^#seed-([a-z0-9-]+)-(\d+)$/;
+  const seedControls = (box, after, run, opts = {}) => {
+    const kind = box.dataset.kind;
+    const label = document.createElement("label");
+    label.className = "ex-seedlab";
+    label.innerHTML = `<span>זרע</span> <input type="number" class="ex-seed" min="1" max="${SEED_MAX}" step="1" dir="ltr" inputmode="numeric" aria-label="זרע ההגרלה, מספר לשחזור">`;
+    const copy = document.createElement("button");
+    copy.type = "button"; copy.className = "md-button ex-copy"; copy.textContent = "העתקת קישור";
+    copy.title = "קישור שפותח את התיבה עם אותו זרע";
+    after.after(label, copy);
+    const input = label.querySelector("input");
+    if (opts.seed) input.value = opts.seed;
+    const runSeed = (seed) => { input.value = seed; run(mulberry32(seed), seed); };
+    const draw = () => runSeed(newSeed());
+    input.addEventListener("change", () => { const v = Math.round(Number(input.value)); if (v >= 1 && v <= SEED_MAX) runSeed(v); else input.value = ""; });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
+    copy.addEventListener("click", () => {
+      if (!input.value) draw();
+      const url = `${location.origin}${location.pathname}#seed-${kind}-${input.value}`;
+      const done = () => { copy.textContent = "הועתק ✓"; setTimeout(() => { copy.textContent = "העתקת קישור"; }, 1500); };
+      const fallback = () => { window.prompt("הקישור:", url); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
+    });
+    const m = SEED_HASH.exec(location.hash);
+    if (m && m[1] === kind && box === document.querySelector(`.explorer[data-kind="${kind}"]`)) {
+      runSeed(Number(m[2]));
+      requestAnimationFrame(() => box.scrollIntoView({ block: "start" }));
+    }
+    return { draw };
+  };
   const speedSel = (slow, mid, fast) =>
     `<label>הקצב <select class="ex-speed"><option value="${slow}">איטי</option><option value="${mid}" selected>בינוני</option><option value="${fast}">מהיר</option></select></label>`;
   const autoplay = (play, speed, { step, done, restart }) => {
@@ -3147,10 +3181,8 @@
       $(".ex-first").addEventListener("click", () => { stop(); setFrame(0); });
       $(".ex-last").addEventListener("click", () => { stop(); setFrame(TRI_TOTAL - 1); });
       slider.addEventListener("input", () => { stop(); setFrame(Number(slider.value)); });
-      $(".ex-random").addEventListener("click", () => {
-        stop();
-        setAngles([0, 1, 2].map(() => Math.floor(Math.random() * 360)));
-      });
+      const seed = seedControls(box, $(".ex-random"), (rng) => { stop(); setAngles([0, 1, 2].map(() => Math.floor(rng() * 360))); });
+      $(".ex-random").addEventListener("click", seed.draw);
       $(".ex-reset").addEventListener("click", () => { stop(); setAngles(PAGE); });
       inputs.forEach((inp, i) => {
         inp.addEventListener("change", () => {
@@ -3323,7 +3355,8 @@
       });
       const setN = (n) => { stop(); st.n = n; st.notes = permShuffle(n); st.me = Math.min(st.me, n); st.step = 0; st.runs = st.strat = st.rand = 0; draw(); };
       $(".ex-n").addEventListener("input", () => setN(Number($(".ex-n").value)));
-      $(".ex-shuffle").addEventListener("click", () => { stop(); st.notes = permShuffle(st.n); st.step = 0; draw(); });
+      const seed = seedControls(box, $(".ex-example"), (rng) => { stop(); st.notes = permShuffle(st.n, rng); st.step = 0; draw(); });
+      $(".ex-shuffle").addEventListener("click", seed.draw);
       $(".ex-example").addEventListener("click", () => { stop(); st.n = nmax; $(".ex-n").value = nmax; st.notes = EXAMPLE.slice(0, nmax + 1); st.me = 13; st.step = 0; draw(); });
       helperCb.addEventListener("change", () => { stop(); st.helper = helperCb.checked; st.step = 0; draw(); });
       $(".ex-next").addEventListener("click", () => { stop(); st.step = Math.min(st.step + 1, steps()); draw(); });
@@ -3478,7 +3511,8 @@
       });
       speed.addEventListener("change", () => { if (timer) { stop(); play.click(); } });
       $(".ex-n").addEventListener("input", () => setNums(floydRandom(Number($(".ex-n").value))));
-      $(".ex-shuffle").addEventListener("click", () => setNums(floydRandom(st.nums.length - 1)));
+      const seed = seedControls(box, $(".ex-example"), (rng) => setNums(floydRandom(st.nums.length - 1, rng)));
+      $(".ex-shuffle").addEventListener("click", seed.draw);
       $(".ex-example").addEventListener("click", () => setNums(EXAMPLE));
       const apply = () => {
         const nums = floydParse(numsIn.value);
@@ -3772,7 +3806,8 @@
         const g = e.target.closest(".ttt-cell");
         if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); cycle(Number(g.dataset.i)); }
       });
-      $(".ex-random").addEventListener("click", () => { st.board = tttRandom(st.wrap).board; draw(); });
+      const seed = seedControls(box, $(".ex-reset"), (rng) => { st.board = tttRandom(st.wrap, rng).board; draw(); });
+      $(".ex-random").addEventListener("click", seed.draw);
       $(".ex-clear").addEventListener("click", () => { st.board = new Array(9).fill("."); draw(); });
       const PAGE = st.board.slice();
       $(".ex-reset").addEventListener("click", () => { st.board = PAGE.slice(); draw(); });
@@ -3868,12 +3903,13 @@
         step();
         if (t.tries.length > 1) timer = setInterval(step, 350);
       });
-      $(".ex-all").addEventListener("click", () => {
+      const seed = seedControls(box, $(".ex-heat"), (rng) => {
         stop(); st.heat = null;
-        st.shapes = shapesRandom(st.N, st.M, st.max, st.squares);
+        st.shapes = shapesRandom(st.N, st.M, st.max, st.squares, rng);
         $(".sh-step").innerHTML = `הגרלה שלמה כמו ${ltr("random_shapes")}: ${ltr(st.shapes.length)} ${st.shapes.length === 1 ? "צורה" : "צורות"} (מספר אחיד בין 1 ל-${ltr(st.max)}), כל אחת אחידה מבין המועמדים הפנויים אחרי קודמותיה.`;
         draw();
       });
+      $(".ex-all").addEventListener("click", seed.draw);
       $(".ex-heat").addEventListener("click", () => {
         stop();
         $(".sh-note").textContent = "מחשב…";
@@ -3939,7 +3975,8 @@
       const set = (x) => { if (Number.isInteger(x) && x >= 0 && x <= MAX) st.x = x; draw(); };
       input.addEventListener("change", () => set(Math.round(Number(input.value))));
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
-      $(".ex-random").addEventListener("click", () => set(Math.floor(Math.random() * (MAX + 1))));
+      const seed = seedControls(box, $(".kp-presets"), (rng) => set(Math.floor(rng() * (MAX + 1))));
+      $(".ex-random").addEventListener("click", seed.draw);
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => set(Number(b.dataset.x))));
       draw();
     },
@@ -4037,9 +4074,9 @@
     mount(box) {
       const HE = { RED: "אדום", BLACK: "שחור", MIXED: "אדום ושחור" };
       const st = { labels: ["RED", "BLACK", "MIXED"], content: null, draws: [], games: 0, solvedFirst: 0 };
-      const newGame = (keepStats = true) => {
+      const newGame = (keepStats = true, rnd = Math.random) => {
         const cases = boxesCases().filter((c) => c.labels.join() === st.labels.join());
-        st.content = cases[Math.floor(Math.random() * cases.length)].content;
+        st.content = cases[Math.floor(rnd() * cases.length)].content;
         st.draws = [];
         if (!keepStats) { st.games = 0; st.solvedFirst = 0; }
       };
@@ -4116,7 +4153,8 @@
       };
       $(".b3-crates").addEventListener("click", (e) => { const g = e.target.closest(".b3-crate"); if (g) drawFrom(Number(g.dataset.i)); });
       $(".b3-crates").addEventListener("keydown", (e) => { const g = e.target.closest(".b3-crate"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); drawFrom(Number(g.dataset.i)); } });
-      $(".ex-new").addEventListener("click", () => { newGame(); draw(); });
+      const seed = seedControls(box, $(".ex-reveal"), (rng) => { newGame(true, rng); draw(); });
+      $(".ex-new").addEventListener("click", seed.draw);
       $(".ex-shuffle").addEventListener("click", () => { st.labels = st.labels.slice().sort(() => Math.random() - 0.5); newGame(); draw(); });
       $(".ex-reveal").addEventListener("click", () => draw(true));
       draw();
@@ -4206,7 +4244,8 @@
       };
       const setN = (n) => { st.n = n; st.angles = regular(n); st.runs = st.hits = 0; render(); };
       $(".ex-n").addEventListener("input", () => setN(Number($(".ex-n").value)));
-      $(".ex-random").addEventListener("click", () => { st.angles = polyRandom(st.n); render(); });
+      const seed = seedControls(box, $(".ex-random"), (rng) => { st.angles = polyRandom(st.n, rng); render(); });
+      $(".ex-random").addEventListener("click", seed.draw);
       $(".ex-regular").addEventListener("click", () => { st.angles = regular(st.n); render(); });
       const N0 = st.n;
       $(".ex-reset").addEventListener("click", () => { $(".ex-n").value = N0; setN(N0); });
@@ -4366,14 +4405,15 @@
       });
       $(".ex-mode").addEventListener("change", () => { st.mode = $(".ex-mode").value; draw(); });
       $(".ex-hi").addEventListener("change", () => { st.sig[0] = $(".ex-hi").checked ? 1 : 0; st.cur = 0; draw(); });
+      const cursorAfter = (p) => { st.cur = p === "clear" ? 1 : Math.max(1, st.sig.findIndex((v, i) => i > 0 && v !== st.sig[i - 1])); draw(); };
+      const seed = seedControls(box, $(".wv-presets"), (rng) => { st.sig = Array.from({ length: N }, () => (rng() < 0.5 ? 1 : 0)); cursorAfter("random"); });
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => {
         const p = b.dataset.p;
+        if (p === "random") { seed.draw(); return; }
         if (p === "page") st.sig = PAGE.slice();
         else if (p === "short") st.sig = [0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1];
-        else if (p === "random") st.sig = Array.from({ length: N }, () => (Math.random() < 0.5 ? 1 : 0));
         else st.sig = new Array(N).fill(0);
-        st.cur = p === "clear" ? 1 : Math.max(1, st.sig.findIndex((v, i) => i > 0 && v !== st.sig[i - 1]));
-        draw();
+        cursorAfter(p);
       }));
       draw();
     },
@@ -4609,15 +4649,15 @@
         const k = r.changedBin.length;
         $(".gr-sum").innerHTML = `בצעד ${ltr(`${r.oldB} → ${r.newB}`)} משתנים ${ltr(k)} ביטים בבינארי: ${ltr(`2^${k} = ${1 << k}`)} צירופים של ישן/חדש, ${ltr(r.wrongCount)} מהם ערכים שגויים. ב-Gray משתנה ביט אחד: שני צירופים, שניהם ערכים שהמצביע עבר בהם.`;
       };
-      const randomize = () => {
+      const randomize = (rng) => {
         const r = graySample(st.b, BITS, {}, {});
         st.arrBin = {}; st.arrGray = {};
-        r.changedBin.forEach((i) => { st.arrBin[i] = Math.random() < 0.5 ? 1 : 0; });
-        r.changedGray.forEach((i) => { st.arrGray[i] = Math.random() < 0.5 ? 1 : 0; });
+        r.changedBin.forEach((i) => { st.arrBin[i] = rng() < 0.5 ? 1 : 0; });
+        r.changedGray.forEach((i) => { st.arrGray[i] = rng() < 0.5 ? 1 : 0; });
       };
       const setAll = (v) => { for (let i = 0; i < BITS; i++) { st.arrBin[i] = v; st.arrGray[i] = v; } };
       $(".ex-b").addEventListener("input", () => { st.b = Number($(".ex-b").value); draw(); });
-      $(".ex-random").addEventListener("click", () => { randomize(); draw(); });
+      $(".ex-random").addEventListener("click", () => seed.draw());
       $(".ex-all").addEventListener("click", () => { setAll(1); draw(); });
       $(".ex-none").addEventListener("click", () => { setAll(0); draw(); });
       box.addEventListener("click", (e) => {
@@ -4631,6 +4671,7 @@
       const page = () => { st.b = 7; st.arrBin = { 3: 1, 0: 1, 2: 0, 1: 0 }; st.arrGray = { 3: 0 }; draw(); };
       $(".ex-reset").addEventListener("click", page);
       page();
+      const seed = seedControls(box, $(".ex-reset"), (rng) => { randomize(rng); draw(); });
     },
   });
   const grayFlagsMount = (box) => {
@@ -4804,12 +4845,13 @@
         chart.querySelector(`.st-pt[data-i="${i}"]`).focus({ preventScroll: true });
       });
       $(".ex-mode").addEventListener("change", () => { st.both = $(".ex-mode").value === "both"; draw(); });
+      const seed = seedControls(box, $(".wv-presets"), (rng) => setPrices(stockRandom(10, rng), 0));
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => {
         const p = b.dataset.p;
         if (p === "page") setPrices(PAGE.slice(), 0);
         else if (p === "up") setPrices([3, 4, 6, 7, 9, 11, 12, 14, 16, 18], 0);
         else if (p === "down") setPrices([18, 16, 15, 13, 12, 10, 8, 7, 5, 3], 0);
-        else setPrices(stockRandom(10), 0);
+        else seed.draw();
       }));
       $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, st.prices.length); draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
@@ -4902,11 +4944,11 @@
   // through with the same engine.
   const acknakView = () => ({
     mount(box) {
-      const rnd = () => 1 + Math.floor(Math.random() * 4);
-      const st = { start: 4094, history: [], script: null, pos: 0, state: null, log: null, th: [] };
-      const draw4 = () => (st.th.length ? st.th.shift() : rnd());
+      const st = { start: 4094, history: [], script: null, pos: 0, state: null, log: null, th: [], seed: newSeed(), unit: null };
+      const draw4 = () => (st.th.length ? st.th.shift() : 1 + Math.floor(st.unit() * 4));
       const reset = (start, script) => {
         st.start = start; st.script = script || null; st.pos = 0; st.th = script ? [...script.thresholds] : [];
+        st.unit = mulberry32(st.seed);
         st.state = anInit(start, draw4); st.history = []; st.log = null; render();
       };
       const apply = (ev, scripted) => {
@@ -5001,13 +5043,14 @@
       $(".ex-next").addEventListener("click", () => { stop(); nextStep(); });
       $(".ex-prev").addEventListener("click", () => { stop(); const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; render(); } });
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { stop(); reset(AN_SCRIPTS[b.dataset.p].start, AN_SCRIPTS[b.dataset.p]); $(".ex-start").value = "4094"; }));
-      $(".ex-reset").addEventListener("click", () => { stop(); reset(Number($(".ex-start").value), null); });
+      $(".ex-reset").addEventListener("click", () => seed.draw());
       $(".ex-start").addEventListener("change", () => { stop(); reset(Number($(".ex-start").value), null); });
       $(".ex-send").addEventListener("click", () => { stop(); apply({ type: "send", n: 1 }); });
       $(".ex-flush").addEventListener("click", () => { stop(); apply({ type: "flush" }); });
       $(".ex-timeout").addEventListener("click", () => { stop(); apply({ type: "timeout" }); });
       box.addEventListener("click", (e) => { const b = e.target.closest(".an-act"); if (b) { stop(); apply({ type: b.dataset.q, how: b.dataset.how }); } });
       reset(4094, AN_SCRIPTS.a);
+      const seed = seedControls(box, $(".ex-reset"), (rng, n) => { stop(); st.seed = n; reset(Number($(".ex-start").value), null); }, { seed: st.seed });
     },
   });
 
@@ -5265,8 +5308,9 @@
         render();
       };
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => load(EP_SCRIPTS[b.dataset.p])));
-      $(".ex-reset").addEventListener("click", () => load(null));
+      $(".ex-reset").addEventListener("click", () => seed.draw());
       load(EP_SCRIPTS.b);
+      const seed = seedControls(box, $(".ex-reset"), (rng, n) => { st.seed = n; load(null); }, { seed: st.seed });
     },
   });
 
@@ -5396,7 +5440,8 @@
       };
       $(".ex-nums").addEventListener("change", parse);
       $(".ex-page").addEventListener("click", () => { $(".ex-nums").value = PAGE.join(", "); parse(); });
-      $(".ex-random").addEventListener("click", () => { const n = 3 + Math.floor(Math.random() * 6); $(".ex-nums").value = Array.from({ length: n }, () => Math.floor(Math.random() * 20)).join(", "); parse(); });
+      const seed = seedControls(box, $(".ex-random"), (rng) => { const n = 3 + Math.floor(rng() * 6); $(".ex-nums").value = Array.from({ length: n }, () => Math.floor(rng() * 20)).join(", "); parse(); });
+      $(".ex-random").addEventListener("click", seed.draw);
       $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
       $(".ex-endi").addEventListener("click", () => { stop(); const n = st.A.length; if (st.k < total()) st.k = Math.min(total(), (Math.floor((st.k) / n) + 1) * n); draw(); });
