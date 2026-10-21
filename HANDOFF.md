@@ -1126,16 +1126,38 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
    `tests/0024` (400 events from 0 and from 250), `tests/0023` (40 random requests run to
    completion with the same draws, memory compared block by block); all three check the
    page tables through the scripts.
+8. **T124, `trace` on 0002 and 0003 (owner's answers: same-variable and 8-bit toggles,
+   symbolic expressions, typed or random arrays of 3 to 8, one comparison per step with
+   a jump to the end of i, Python only in the box).** One kind, `data-mode` swap / loop:
+   `swapTrace` keeps every cell as a numeric value plus a symbolic `{p, q}` (p·a0 + q·b0,
+   or parities for XOR) so the expressions simplify by themselves (`(a0 + b0) − b0`
+   shows as `a0`); the aliased call shows the doubling-then-zero of the arithmetic swap
+   and the `a ^ a = 0` of the XOR swap; the 8-bit mode wraps inputs and results modulo
+   256 and the summary explains why the overflowing sum still swaps. `loopTrace` is the
+   page's loop one comparison per frame with `endOfI` frames carrying the invariant
+   (`A[0..i]` sorted, the maximum at `i`). Tests: `tests/0002` evaluates every symbolic
+   expression on the numbers and compares the end state with the page's three
+   functions (both modes, aliased or not); `tests/0003` compares with `mystery`, an
+   instrumented copy of the loop and the invariant on 150 random arrays.
+9. **Checks for rounds 4 and T124:** lint 38/38, Python tests, strict build, links, phone
+   and axe light and dark on the five pages, all clean.
 
 ---
 
 ## In progress
 
-- Session 20: rounds 1 (0001, 0036, 0035, 0034), 2 (0006, 0038) and 4 (0025, 0024,
-  0023) of the explorer batch are done; `main` follows each round. Every question but
-  0002 and 0003 now has an explorer; T124 (the code tracer for those two) was listed but
-  not chosen. Next: the owner's pick (T124, open rounds D to F, I, L, N, O, Q, S, or new
-  questions).
+- Session 20: rounds 1 (0001, 0036, 0035, 0034), 2 (0006, 0038), 4 (0025, 0024, 0023)
+  and T124 (0002, 0003) of the explorer batch are done; `main` follows each round. Every
+  question now has an explorer. Round T is closed. Next: the owner's pick from the
+  explorer polish list (round U below), the open rounds D to F, I, L, N, O, Q, S, or new
+  questions.
+- Decision (owner, session 20): the repository stays public for now. The dilemma was
+  raised (interviewers benefit; candidates could parrot answers). Options discussed and
+  kept for later: a private "interview bank" beside the public site; two builds of the
+  site from one repository (public without the interviewer / trap / follow-up blocks,
+  full version behind a password on Cloudflare Pages or Netlify); or private with no
+  Pages site (needs GitHub Pro to publish Pages from a private repository, and the site
+  would still be public). Visibility is changed under Settings, General, Danger Zone.
 - Owner's checks on the live site: the five WaveDrom diagrams of round R (0034, 0035,
   0038), the dragging in the explorers on a real phone, and the new timing strips
   (0001, 0035) scrolled sideways on a phone.
@@ -1540,7 +1562,7 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 | ~~T121~~ | Done in session 19. Was: 0008 Eurovision | **Announcement slider**: the cups chart with a slider "countries announced so far"; the room left for Israel against the points left, the moment of certain loss marked; a "what if" box to change Israel's jury score and watch the moment move | S–M |
 | ~~T122~~ | Done in session 19. Was: 0004 three boxes | **Sample a ball**: tap a box to draw one ball (the hidden contents are random each time), the deduction appears line by line; "try the wrong box first" shows why one draw from "red" or "black" is not enough | S |
 | ~~T123~~ | Done in session 20. Was: 0001 edge detector | **Waveform lab**: click the input per cycle, the output and the flop values appear on a live WaveDrom-like strip with the two-flop diagram beside it; a toggle for the one-cycle-late variant of the follow-ups | S–M |
-| T124 | 0002, 0003 swaps and loops | **Code tracer**: a step button runs the page's loop with a variable table and the current line highlighted (the swap variants, the double loop); one component reused by every short-code question | M |
+| ~~T124~~ | Done in session 20. Was: 0002, 0003 swaps and loops | **Code tracer**: a step button runs the page's loop with a variable table and the current line highlighted (the swap variants, the double loop); one component reused by every short-code question | M |
 | ~~T125~~ | Done in session 20. Was: 0024 USB4 credits | **Credit flow**: sliders for the buffer size and the packet rate, the two modulo-256 counters and the credits in flight animated, a "lose a packet" button and the resynchronisation that follows, as in the page's step figures | M–L |
 | ~~T126~~ | Done in session 20. Was: 0025 PCIe Ack/Nak | **Sequence timeline**: send TLPs, press Ack / Nak at the receiver, watch the Retry Buffer fill and empty, a Replay after a Nak or a timeout; the page's error cases as presets | M–L |
 | ~~T127~~ | Done in session 20. Was: 0023 PCIe endpoint | **Request builder** on top of M73: address, length, MPS, RCB → the completions the model returns and the memory reads it performs, reusing the split explorer | L (after M73) |
@@ -1553,8 +1575,20 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 Suggested order: T114, T118, T122 (small, each page gets its "try it" box in an hour),
 then T113 and T115 (the two algorithm animations that readers ask about most), T121 and
 T120, and the protocol trio T125 to T127 after M73. Session 19 did T118, T113, T115, T119
-and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T132 and T125 to T127.
-Open: T124 only (not chosen).
+and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T132, T125 to T127 and T124. Round T is closed.
+
+### Round U — explorer polish (proposed in session 20, owner picks)
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| U133 | 0001, 0035, 0038 | **Export the strip as WaveDrom**: a button that copies the drawn trace as WaveDrom JSON, so a reader can paste it into the page's own diagrams or a report | S |
+| U134 | 0006, 0017, 0009 | **Shareable state in the URL**: the typed array / prices / N in the hash, so a link opens the box in the same state (the stepper deep links of M76 extended to explorers) | S–M |
+| U135 | 0025, 0024 | **Random traffic button**: a "run 50 random events" that injects faults at a chosen rate and checks the invariants after each, the way the testbenches of the pages do; the first violation stops the run | M |
+| U136 | 0023 | **Pending-read timeline**: a small Gantt of the open reads over the cycles (ready at, completions out), beside the table | S–M |
+| U137 | 0007, 0014, 0009 | **Keyboard dragging**: arrow keys move a focused point or shape, as the stock box does; the triangle and polygon points are the first | S |
+| U138 | all | **A "reset everything" and a help tooltip per box**: one line that says what the box shows and what each button does, for first-time readers | S |
+| U139 | 0034, 0036 | **Wider widths**: an N select (4 to 6 bits) on the Gray box and on the LFSR box, with the table of primitive polynomials per width | M |
+
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.

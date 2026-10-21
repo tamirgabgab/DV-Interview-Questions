@@ -2010,3 +2010,32 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ep-table tr.ep-c1 td:nth-child(3) { color: var(--viz-s2-text); font-weight: 700; }
 .md-typeset .explorer .ep-table tr.ep-c2 td:nth-child(3) { color: var(--viz-s3-text); font-weight: 700; }
 .md-typeset .explorer .ep-table tr.ep-c3 td:nth-child(3) { color: var(--viz-s4-text); font-weight: 700; }
+
+/* Code tracer (0002, 0003): the code with the current line lit, the variables, the array */
+.md-typeset .explorer .tr-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .tr-left { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .tr-right { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer pre.tr-code { margin: 0; padding: 0.4rem 0; font-size: 0.72rem; line-height: 1.6; background: var(--md-code-bg-color); border-radius: 0.3rem; overflow-x: auto; }
+.md-typeset .explorer .tr-line { display: block; padding: 0 0.6rem; white-space: pre; }
+.md-typeset .explorer .tr-ln { display: inline-block; width: 1.4rem; color: var(--viz-text); user-select: none; }
+.md-typeset .explorer .tr-line.is-cur { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-code-bg-color)); box-shadow: inset 3px 0 0 var(--viz-s1); }
+.md-typeset .explorer .tr-line.is-swap { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-code-bg-color)); box-shadow: inset 3px 0 0 var(--viz-s2); }
+.md-typeset .explorer table.tr-vars { font-size: 0.72rem; margin: 0; }
+.md-typeset .explorer table.tr-vars td, .md-typeset .explorer table.tr-vars th { padding: 0.2em 0.6em; }
+.md-typeset .explorer table.tr-vars tr.is-changed td { background: var(--diff-medium-bg); font-weight: 700; }
+.md-typeset .explorer input.ex-a, .md-typeset .explorer input.ex-b { width: 5rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .tr-arr { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.md-typeset .explorer .tr-arr > span { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.2rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.9rem; background: var(--md-default-bg-color); color: var(--viz-ink); }
+.md-typeset .explorer .tr-arr > span .tr-idx { position: absolute; top: -0.9rem; left: 0; right: 0; text-align: center; font-size: 0.6rem; font-weight: 400; color: var(--viz-text); }
+.md-typeset .explorer .tr-arr { padding-top: 0.9rem; }
+.md-typeset .explorer .tr-arr > span.is-done { background: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset .explorer .tr-arr > span.is-i { box-shadow: inset 0 0 0 3px var(--viz-s1); }
+.md-typeset .explorer .tr-arr > span.is-j { outline: 3px dashed var(--viz-s2); outline-offset: -1px; }
+.md-typeset .explorer .tr-arr > span.is-swapped { animation: tr-flash 0.6s ease-out; }
+@keyframes tr-flash { from { background: var(--diff-medium-bg); } }
+.md-typeset .explorer .tr-counts { margin: 0.5em 0 0.2em; font-size: 0.75rem; }
+.md-typeset .explorer .tr-legend { margin: 0; font-size: 0.65rem; color: var(--viz-text); display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; }
+.md-typeset .explorer .tr-lg-i { color: var(--viz-s1-text); }
+.md-typeset .explorer .tr-lg-j { color: var(--viz-s2-text); }
+.md-typeset .explorer .tr-lg-done { color: var(--viz-s3-text); }
+.md-typeset .explorer .tr-step { margin: 0.4em 0; }
