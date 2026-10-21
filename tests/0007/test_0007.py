@@ -64,3 +64,85 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(7)
+
+
+def test_explorer_matches_brute_force():
+    """The triangle explorer: its class of a triangle against the page's contains_center
+    and an exact integer rule, and its enumeration (frame -> angles, angles -> frame, the
+    running counts) against a plain loop over every a < b < c."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    def kind(a, b, c):
+        s = sorted((a % 360, b % 360, c % 360))
+        arcs = (s[1] - s[0], s[2] - s[1], 360 - (s[2] - s[0]))
+        if 0 in arcs or 360 in arcs:
+            return "degenerate"
+        top = max(arcs)
+        return "in" if top < 180 else "edge" if top == 180 else "out"
+
+    rng = random.Random(3)
+    triples = [[rng.randrange(360) for _ in range(3)] for _ in range(3000)]
+    triples += [[0, 180, 90], [10, 190, 300], [5, 5, 100], [7, 7, 7], [20, 140, 250], [20, 70, 150]]
+
+    # the enumeration by brute force, with the counts after a set of checkpoint frames
+    total = comb(360, 3)
+    checks = sorted({0, 1, 177, 358, 359, 63_903, 1_000_000, 3_855_659, total - 2, total - 1}
+                    | {rng.randrange(total) for _ in range(40)})
+    want, counts, k, nxt = {}, {"in": 0, "edge": 0, "out": 0}, 0, 0
+    for a in range(360):
+        for b in range(a + 1, 360):
+            for c in range(b + 1, 360):
+                counts[kind(a, b, c)] += 1
+                if k == checks[nxt]:
+                    want[k] = ([a, b, c], dict(counts))
+                    nxt += 1
+                    if nxt == len(checks):
+                        break
+                k += 1
+            else:
+                continue
+            break
+        else:
+            continue
+        break
+    assert set(want) == set(checks)
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const triples = {json.dumps(triples)}, checks = {json.dumps(checks)};
+      console.log(JSON.stringify({{
+        total: m.TRI_TOTAL,
+        kinds: triples.map((t) => m.triClass(t)),
+        arcs: triples.map((t) => m.triArcs(t)),
+        frames: checks.map((k) => m.triFrame(k)),
+        index: checks.map((k) => m.triIndex(m.triFrame(k))),
+        counts: checks.map((k) => m.triCounts(k)),
+      }}));""")
+
+    assert got["total"] == total == 7_711_320
+    for t, g, arcs in zip(triples, got["kinds"], got["arcs"]):
+        assert g == kind(*t), t
+        s = sorted(t)
+        assert arcs == [s[1] - s[0], s[2] - s[1], 360 - (s[2] - s[0])]
+        if g in ("in", "out"):                      # away from the boundary the page agrees
+            assert ns["contains_center"]([math.radians(v) for v in t]) == (g == "in"), t
+            pts = [(math.cos(math.radians(v)), math.sin(math.radians(v))) for v in t]
+            assert ns["center_inside"](pts) == (g == "in"), t
+    for k, frame, index, c in zip(checks, got["frames"], got["index"], got["counts"]):
+        angles, cnt = want[k]
+        assert frame == angles and index == k
+        assert c == {"seen": k + 1, **cnt}
+
+    # the totals the page quotes: part c's count, the 180 diameters times 358 third points
+    end = got["counts"][-1]
+    assert end["in"] == comb(360, 3) - 360 * comb(180, 2) == 1_911_720
+    assert end["edge"] == 180 * 358 == 64_440
+    assert end["out"] == 5_735_160
+    assert Fraction(end["in"], total) == Fraction(89, 359)
+    from extract_code import ROOT
+
+    page = next((ROOT / "docs" / "questions" / "senior").glob("0007-*.md")).read_text(encoding="utf-8")
+    for n in ("7,711,320", "1,911,720", "64,440", "5,735,160"):
+        assert n in page

@@ -1630,3 +1630,36 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .stepper { touch-action: pan-y; }
 .md-typeset .stepper-link { min-width: 0; padding-inline: 0.6em; }
 .md-typeset .stepper-pos { min-width: 5.5rem; }
+
+/* Triangle explorer (0007): green with the centre inside, amber on an edge (or no
+   triangle), red outside; the longest arc takes the same colour. */
+.md-typeset .explorer .tri-box { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.4rem; }
+.md-typeset .explorer svg.tri-live { width: 17rem; max-width: 100%; touch-action: none; cursor: grab; user-select: none; }
+.md-typeset .explorer svg.tri-live.is-dragging { cursor: grabbing; }
+.md-typeset .explorer .tri-panel { flex: 1 1 14rem; min-width: 0; }
+.md-typeset .explorer .tri-panel p { margin: 0.3em 0; }
+.md-typeset .explorer .tri-angles { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; }
+.md-typeset .explorer input.ex-deg { width: 4.2rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset svg .tri-arc { stroke: var(--viz-s1); stroke-width: 3; }
+.md-typeset svg .tri-arc.is-max { stroke-width: 6; }
+.md-typeset svg .tri-max-label { font-weight: 700; }
+.md-typeset svg .tri-pt { fill: var(--viz-ink); stroke: var(--md-default-bg-color); stroke-width: 2; cursor: grab; }
+.md-typeset svg .tri-shape { stroke-width: 2.5; stroke-linejoin: round; fill-opacity: 0.2; }
+.md-typeset svg.is-in .tri-shape { fill: var(--diff-easy); stroke: var(--diff-easy); }
+.md-typeset svg.is-out .tri-shape { fill: var(--diff-hard); stroke: var(--diff-hard); }
+.md-typeset svg.is-edge .tri-shape,
+.md-typeset svg.is-degenerate .tri-shape { fill: var(--md-accent-fg-color); stroke: var(--md-accent-fg-color); }
+.md-typeset svg.is-in .tri-arc.is-max { stroke: var(--diff-easy); }
+.md-typeset svg.is-out .tri-arc.is-max { stroke: var(--diff-hard); }
+.md-typeset svg.is-edge .tri-arc.is-max { stroke: var(--md-accent-fg-color); }
+.md-typeset .explorer .tri-kind { font-weight: 700; }
+.md-typeset .explorer .is-in.tri-kind, .md-typeset .explorer .tri-counts .is-in { color: var(--diff-easy); }
+.md-typeset .explorer .is-out.tri-kind, .md-typeset .explorer .tri-counts .is-out { color: var(--diff-hard); }
+.md-typeset .explorer .is-edge.tri-kind, .md-typeset .explorer .is-degenerate.tri-kind,
+.md-typeset .explorer .tri-counts .is-edge { color: var(--diff-medium); }
+.md-typeset .explorer .tri-run { margin-top: 0.8rem; }
+.md-typeset .explorer .tri-frames { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem; }
+.md-typeset .explorer .tri-frames input { flex: 1 1 auto; min-width: 0; }
+.md-typeset .explorer .tri-counts { margin: 0.2em 0; padding-inline-start: 1.1rem; font-weight: 600; }
+.md-typeset .explorer .tri-counts li { margin: 0.1em 0; }
+.md-typeset .explorer .tri-panel bdi { white-space: nowrap; }

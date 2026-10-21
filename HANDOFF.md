@@ -992,7 +992,7 @@ axe check warns only; `main` is updated at the end of each round.
 5. **Checks:** lint 32/32 clean, 201 Python tests, strict build (with the cards), links
    (49 pages, 0 broken), phone check light and dark with axe (0 problems, 0 violations).
 
-### Session 19 — 2026-10-21: Staff level removed
+### Session 19 — 2026-10-21: Staff level removed, triangle explorer (T118)
 
 1. **Staff level removed** at the owner's request (empty, no staff questions planned):
    `LEVELS` / `LEVEL_DESC` in `hooks/questions.py`, `tools/new_question.py`, the template,
@@ -1002,7 +1002,22 @@ axe check warns only; `main` is updated at the end of each round.
    the 0022 bonus part is kept as a difficulty label.
 2. **Light-mode strings** `--md-code-hl-string-color: #186b42`: axe found 4.4:1 on a
    highlighted line of 0006.
-3. **Checks:** lint 38/38, 229 Python tests, strict build, links 0 broken, phone check
+3. **T118, triangle explorer on 0007** (the owner's spec: points dragged or typed in
+   degrees, green inside, red outside, a third colour for the boundary; play and a frame
+   slider over every angle at 1 degree resolution). The owner picked: all sets of three
+   different angles in increasing order (C(360, 3) = 7,711,320 frames, ending at exactly
+   1,911,720 inside = 89/359 of part c), amber for an arc of exactly 180 (and for
+   coinciding points when dragged), one box at the end of part a's proof, the arcs in
+   degrees with the longest marked, a random button and the comparison with 89/359 and 1/4.
+   Model in `explorer.js` (`triArcs`, `triClass`, `triCountC`, `triFrame`, `triIndex`,
+   `triCounts`): per pair (a, b) the counts of c come in closed form, running totals per
+   pair are built once (64,261 pairs), so any frame and its counts are a binary search
+   away. A hand-made triangle shows its frame number and the counts up to it. Speeds 2 to
+   a million frames per second (the whole run in about 8 s). `tests/0007` runs a plain loop
+   over all 7.7 million triples (about 3 s) and checks frames, inverse and counts at 50
+   checkpoints, the class against the page's `contains_center` and `center_inside`, and the
+   totals quoted on the page (1,911,720 / 64,440 / 5,735,160).
+4. **Checks:** lint 38/38, 230 Python tests, strict build, links 0 broken, phone check
    light and dark with axe (0 problems, 0 violations).
 
 ---
@@ -1407,7 +1422,7 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 | T115 | 0017 duplicate number | **Tortoise and hare**: the array as nodes i → a[i] (type or shuffle an array), the two runners move at their speeds, the meeting and the second phase to the entry of the cycle (the duplicate); a second tab plays the binary-search-on-values method with the count per step | M |
 | T116 | 0014 random shapes | **Generate**: a button draws N random squares or rectangles on the grid with the constraints of the page (a JS port of the rejection sampling), rejected attempts flashed in red; a heat map of where shapes land after 500 draws shows the bias the question asks about | M |
 | T117 | 0011 tic-tac-toe | **Board builder**: tap cells to place X / O, the page's rules decide live whether the board is a legal final board and say why not (counts, two winners, play after a win); "random legal board" and the wrap-around variant of part b as a toggle | M |
-| T118 | 0007 triangle and centre | **Throw three points**: a button (or drag the points) on the unit circle, the arcs coloured, inside / outside decided; "1,000 throws" fills a running counter that converges to 1/4; an M slider for the discrete version with the formula beside it | S–M |
+| ~~T118~~ | Done in session 19 (see the log). Was: 0007 triangle and centre | **Throw three points**: a button (or drag the points) on the unit circle, the arcs coloured, inside / outside decided; "1,000 throws" fills a running counter that converges to 1/4; an M slider for the discrete version with the formula beside it | S–M |
 | T119 | 0005 smallest 0/1 multiple | **BFS on remainders**: x up to ~30, the x remainders as a ring, the queue and the visited set grow step by step, the path back to 0 spelled out as the answer; a step counter next to the enumeration count for the same x | M |
 | T120 | 0012, 0013 Kaprekar | **Iterate**: type a number, sort-subtract step by step until 495 / 6174, the chain drawn; a histogram of the number of steps over all numbers (the page's part b) with the typed number highlighted | S–M |
 | T121 | 0008 Eurovision | **Announcement slider**: the cups chart with a slider "countries announced so far"; the room left for Israel against the points left, the moment of certain loss marked; a "what if" box to change Israel's jury score and watch the moment move | S–M |
