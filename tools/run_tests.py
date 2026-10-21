@@ -122,6 +122,9 @@ def run_sv(tb: Path, verilator: str, version: str) -> tuple[str, bool, str]:
     passed = result.returncode == 0 and any(l.startswith("PASS") for l in result.stdout.splitlines())
     summary = next((l for l in result.stdout.splitlines() if l.startswith(("PASS", "FAIL"))), "no PASS line")
     note = "cached" if cached else "compiled"
+    if not passed:      # the testbench's own messages explain the failure: show its last lines
+        tail = [l for l in (result.stdout + result.stderr).splitlines() if l.strip() and not l.startswith(("PASS", "FAIL"))][-12:]
+        summary += "".join("\n         | " + l[:160] for l in tail)
     return name, passed, f"{summary} ({note}, {time.time() - start:.1f}s)"
 
 
