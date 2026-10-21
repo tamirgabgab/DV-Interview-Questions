@@ -31,3 +31,22 @@ def test_fast_matches_brute():
         check_trade(prices, brute)
         check_trade(prices, fast)
         assert ns["max_long_brute"](prices)[0] == ns["max_long_fast"](prices)[0], prices
+
+
+def test_chart_trades_match_page_code():
+    import sys
+
+    from extract_code import ROOT
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0006
+
+    (lp, lb, ls), (sp, ss, sb) = q0006.best_trades()
+    assert (lp, lb, ls) == tuple(ns["max_long_fast"](q0006.PRICES))
+    assert (sp, "short", ss, sb) == tuple(ns["max_profit_fast"](q0006.PRICES))
+
+
+def test_figures_up_to_date():
+    from page_tests import assert_figures_match
+
+    assert_figures_match(6)

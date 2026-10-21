@@ -466,6 +466,14 @@
 .md-typeset svg .tri-ok { fill: var(--viz-s3); fill-opacity: 0.18; stroke: var(--viz-s3); stroke-width: 2; }
 .md-typeset svg .tri-bad { fill: var(--viz-s2); fill-opacity: 0.15; stroke: var(--viz-s2); stroke-width: 2; }
 .md-typeset svg .half-fill { fill: var(--viz-s1); fill-opacity: 0.15; }
+
+/* 0004: the three wooden crates of the statement (tools/figures/q0004.py). */
+:root { --viz-crate: #a0692e; --viz-crate-top: #b98a55; --viz-crate-side: #7a4f22; --viz-crate-edge: #5a3a18; }
+[data-md-color-scheme="slate"] { --viz-crate: #8d5b27; --viz-crate-top: #a67a4a; --viz-crate-side: #66411c; --viz-crate-edge: #3d270f; }
+.md-typeset svg .crate-front { fill: var(--viz-crate); stroke: var(--viz-crate-edge); }
+.md-typeset svg .crate-top { fill: var(--viz-crate-top); stroke: var(--viz-crate-edge); }
+.md-typeset svg .crate-side { fill: var(--viz-crate-side); stroke: var(--viz-crate-edge); }
+.md-typeset svg .crate-text { fill: #fff; font-family: var(--md-text-font-family); }
 .md-typeset svg.figure .tick,
 .md-typeset svg.figure .legend { fill: var(--viz-text); font-size: 13px; font-family: var(--md-text-font-family); }
 .md-typeset .viz-legend .s1 { background: var(--viz-s1); }

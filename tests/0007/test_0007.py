@@ -42,3 +42,25 @@ def test_discrete_formula():
         assert good == comb(m, 3) - m * comb(m // 2, 2)
         assert Fraction(good, comb(m, 3)) == p_formula(m)
     assert p_formula(360) == Fraction(89, 359)
+
+
+def test_generator_formula_and_examples():
+    import sys
+
+    from extract_code import ROOT
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0007
+
+    assert all(q0007.p_formula(m) == p_formula(m) for m in range(3, 41))
+    for angles, inside in q0007.EXAMPLES:
+        gaps = [(angles[(i + 1) % 3] - angles[i]) % 360 for i in range(3)]
+        assert (max(gaps) < 180) == inside
+    a1, a2, a3 = q0007.HALF_POINTS
+    assert 0 < (a2 - a1) % 360 < 180 and 0 < (a3 - a1) % 360 < 180   # P2, P3 in the half circle from P1
+
+
+def test_figures_up_to_date():
+    from page_tests import assert_figures_match
+
+    assert_figures_match(7)

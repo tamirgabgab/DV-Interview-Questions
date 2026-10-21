@@ -23,3 +23,26 @@ def test_bfs_is_minimal():
         y = bfs(x)
         if len(y) <= 16:
             assert y == enum(x), x
+
+
+def test_chart_steps_match_page_code():
+    """The step counts behind the chart: the generator's BFS equals the page code, and the
+    other two counts follow from the answer (y / x multiples, y read as binary)."""
+    import sys
+
+    from extract_code import ROOT
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0005
+
+    for x in q0005.XS:
+        y = bfs(x)
+        assert q0005.smallest_01_multiple(x)[0] == y
+        assert q0005.steps(x)[:2] == (int(y) // x, int(y, 2))
+    assert [q0005.steps(x)[2] for x in q0005.XS] == [4, 8, 89, 899, 8999]   # the page table
+
+
+def test_figures_up_to_date():
+    from page_tests import assert_figures_match
+
+    assert_figures_match(5)

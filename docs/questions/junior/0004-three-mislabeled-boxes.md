@@ -14,35 +14,11 @@ added: 2026-10-15
 ובשלישית יש **גם אדומים וגם שחורים**. על כל קופסה מודבקת תווית אחת: "אדום", "שחור"
 ו"אדום ושחור".
 
-<svg class="figure" viewBox="0 0 600 190" role="img" aria-label="שלוש קופסאות סגורות עם התוויות אדום, שחור, ואדום ושחור">
-  <g font-family="var(--md-text-font-family)" text-anchor="middle">
-    <g>
-      <polygon points="20,50 50,20 200,20 170,50" fill="#b98a55" stroke="#5a3a18"/>
-      <polygon points="170,50 200,20 200,120 170,150" fill="#7a4f22" stroke="#5a3a18"/>
-      <rect x="20" y="50" width="150" height="100" fill="#a0692e" stroke="#5a3a18"/>
-      <text x="125" y="42" fill="#fff" font-size="20">?</text>
-      <text x="95" y="108" fill="#fff" font-size="22">אדום</text>
-      <text x="95" y="178" fill="var(--viz-text)" font-size="14">קופסה 0</text>
-    </g>
-    <g>
-      <polygon points="220,50 250,20 400,20 370,50" fill="#b98a55" stroke="#5a3a18"/>
-      <polygon points="370,50 400,20 400,120 370,150" fill="#7a4f22" stroke="#5a3a18"/>
-      <rect x="220" y="50" width="150" height="100" fill="#a0692e" stroke="#5a3a18"/>
-      <text x="325" y="42" fill="#fff" font-size="20">?</text>
-      <text x="295" y="108" fill="#fff" font-size="22">שחור</text>
-      <text x="295" y="178" fill="var(--viz-text)" font-size="14">קופסה 1</text>
-    </g>
-    <g>
-      <polygon points="420,50 450,20 600,20 570,50" fill="#b98a55" stroke="#5a3a18"/>
-      <polygon points="570,50 600,20 600,120 570,150" fill="#7a4f22" stroke="#5a3a18"/>
-      <rect x="420" y="50" width="150" height="100" fill="#a0692e" stroke="#5a3a18"/>
-      <text x="525" y="42" fill="#fff" font-size="20">?</text>
-      <text x="495" y="94" fill="#fff" font-size="22">אדום</text>
-      <text x="495" y="124" fill="#fff" font-size="22">ושחור</text>
-      <text x="495" y="178" fill="var(--viz-text)" font-size="14">קופסה 2</text>
-    </g>
-  </g>
-</svg>
+<!-- gen 0 -->
+
+<svg class="figure" viewBox="0 0 600 190" role="img" aria-label="שלוש קופסאות סגורות עם התוויות אדום, שחור, ואדום ושחור"><g text-anchor="middle"><g><polygon class="crate-top" points="20,50 50,20 200,20 170,50"/><polygon class="crate-side" points="170,50 200,20 200,120 170,150"/><rect class="crate-front" x="20" y="50" width="150" height="100"/><text class="crate-text" x="125" y="42" font-size="20">?</text><text class="crate-text" x="95" y="108" font-size="22">אדום</text><text class="tick" x="95" y="178" font-size="14" direction="rtl">קופסה 0</text></g><g><polygon class="crate-top" points="220,50 250,20 400,20 370,50"/><polygon class="crate-side" points="370,50 400,20 400,120 370,150"/><rect class="crate-front" x="220" y="50" width="150" height="100"/><text class="crate-text" x="325" y="42" font-size="20">?</text><text class="crate-text" x="295" y="108" font-size="22">שחור</text><text class="tick" x="295" y="178" font-size="14" direction="rtl">קופסה 1</text></g><g><polygon class="crate-top" points="420,50 450,20 600,20 570,50"/><polygon class="crate-side" points="570,50 600,20 600,120 570,150"/><rect class="crate-front" x="420" y="50" width="150" height="100"/><text class="crate-text" x="525" y="42" font-size="20">?</text><text class="crate-text" x="495" y="94" font-size="22">אדום</text><text class="crate-text" x="495" y="124" font-size="22">ושחור</text><text class="tick" x="495" y="178" font-size="14" direction="rtl">קופסה 2</text></g></g></svg>
+
+<!-- /gen -->
 
 **כל התוויות שגויות.** אי אפשר להציץ לתוך הקופסאות, אבל אפשר לבקש דגימה: מצביעים על
 קופסה ומקבלים ממנה כדור אחד שנבחר באקראי.

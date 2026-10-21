@@ -36,3 +36,9 @@ def test_two_swap_solution():
         use_boxes(content)
         for _ in range(5):
             assert ns["fix_labels"](list(labels)) == content
+
+
+def test_figures_up_to_date():
+    from page_tests import assert_figures_match
+
+    assert_figures_match(4)
