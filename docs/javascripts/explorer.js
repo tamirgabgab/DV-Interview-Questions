@@ -2989,7 +2989,8 @@
         `</svg><div class="tri-panel">` +
         `<p class="tri-angles">` + NAMES.map((n, i) =>
           `<label>${ltr(n)} <input type="number" class="ex-deg" data-i="${i}" min="0" max="359" step="1" dir="ltr" aria-label="הזווית של ${n} במעלות">°</label>`).join(" ") + `</p>` +
-        `<div class="ex-controls"><button type="button" class="md-button ex-random">הגרלה</button></div>` +
+        `<div class="ex-controls"><button type="button" class="md-button ex-random">הגרלה</button>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<p class="tri-status" aria-live="polite"></p><p class="tri-arcs-text"></p></div></div>` +
         `<div class="ex-controls tri-run">` +
         `<button type="button" class="md-button md-button--primary ex-play">הפעלה</button>` +
@@ -3010,6 +3011,7 @@
       const inputs = [...box.querySelectorAll(".ex-deg")];
       const play = $(".ex-play"), speed = $(".ex-speed"), slider = $(".ex-frame");
       let angles = (box.dataset.angles || "20,140,250").split(",").map(Number).map((v) => ((v % 360) + 360) % 360);
+      const PAGE = angles.slice();
       let frame = 0, running = false, last = 0, pos = 0;
 
       const arcPath = (from, len) => {
@@ -3108,6 +3110,7 @@
         stop();
         setAngles([0, 1, 2].map(() => Math.floor(Math.random() * 360)));
       });
+      $(".ex-reset").addEventListener("click", () => { stop(); setAngles(PAGE); });
       inputs.forEach((inp, i) => {
         inp.addEventListener("change", () => {
           const v = Number(inp.value);
@@ -3452,7 +3455,8 @@
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label><span>‏x</span><input type="range" class="ex-x" min="1" max="${xmax}" step="1" value="${st.x}" dir="ltr"><output class="out-x"></output></label>` +
-        `<span class="bf-presets">דוגמאות: ` + [7, 9, 11, 13, 37].filter((v) => v <= xmax).map((v) => `<button type="button" class="md-button ex-preset" data-x="${v}">${v}</button>`).join(" ") + `</span></div>` +
+        `<span class="bf-presets">דוגמאות: ` + [7, 9, 11, 13, 37].filter((v) => v <= xmax).map((v) => `<button type="button" class="md-button ex-preset" data-x="${v}">${v}</button>`).join(" ") + `</span>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא</button>` +
@@ -3546,6 +3550,8 @@
       const setX = (x) => { stop(); st.x = x; st.k = 0; $(".ex-x").value = x; draw(); };
       $(".ex-x").addEventListener("input", () => setX(Number($(".ex-x").value)));
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => setX(Number(b.dataset.x))));
+      const X0 = st.x;
+      $(".ex-reset").addEventListener("click", () => setX(X0));
       $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
       $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
@@ -3572,7 +3578,8 @@
       const esc = (c) => c.replace(/</g, "&lt;");
       box.innerHTML =
         `<div class="ex-controls"><label><span>המחרוזת</span><input type="text" class="ex-s" dir="ltr" spellcheck="false" maxlength="40" aria-label="מחרוזת של סוגריים"></label>` +
-        `<span class="br-presets">דוגמאות: ` + PRESETS.map((p) => `<button type="button" class="md-button ex-preset" dir="ltr" data-s="${esc(p)}">${esc(p)}</button>`).join(" ") + `</span></div>` +
+        `<span class="br-presets">דוגמאות: ` + PRESETS.map((p) => `<button type="button" class="md-button ex-preset" dir="ltr" data-s="${esc(p)}">${esc(p)}</button>`).join(" ") + `</span>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-prev">התו הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">התו הבא</button>` +
@@ -3631,6 +3638,8 @@
       const setS = (s) => { stop(); st.s = bracketsClean(s).slice(0, 40); st.k = 0; draw(); };
       input.addEventListener("input", () => { const v = bracketsClean(input.value).slice(0, 40); if (v !== input.value) input.value = v; setS(v); });
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { setS(b.dataset.s); st.k = total(); draw(); }));
+      const PAGE = st.s;
+      $(".ex-reset").addEventListener("click", () => setS(PAGE));
       $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
       $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
@@ -3665,6 +3674,7 @@
         `<div class="ex-controls">` +
         `<button type="button" class="md-button md-button--primary ex-random">לוח חוקי אקראי</button>` +
         `<button type="button" class="md-button ex-clear">ניקוי</button>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button>` +
         `<label><input type="checkbox" class="ex-wrap"> אלכסונים מסביב (סעיף ב)</label></div>` +
         `<div class="ttt-box"><div class="ttt-board" role="group" aria-label="לוח 3 על 3, לחיצה על משבצת מחליפה ריק, X ו-O"></div>` +
         `<div class="ttt-panel"><p class="ttt-counts"></p><p class="ttt-verdict" aria-live="polite"></p><p class="ttt-why"></p></div></div>` +
@@ -3716,6 +3726,8 @@
       });
       $(".ex-random").addEventListener("click", () => { st.board = tttRandom(st.wrap).board; draw(); });
       $(".ex-clear").addEventListener("click", () => { st.board = new Array(9).fill("."); draw(); });
+      const PAGE = st.board.slice();
+      $(".ex-reset").addEventListener("click", () => { st.board = PAGE.slice(); draw(); });
       $(".ex-wrap").addEventListener("change", () => { st.wrap = $(".ex-wrap").checked; draw(); });
       draw();
     },
@@ -4073,7 +4085,8 @@
       box.innerHTML =
         `<div class="ex-controls"><label><span>מספר הקודקודים n</span><input type="range" class="ex-n" min="3" max="${NMAX}" step="1" value="${st.n}" dir="ltr"><output class="out-n"></output></label>` +
         `<button type="button" class="md-button md-button--primary ex-random">הגרלה</button>` +
-        `<button type="button" class="md-button ex-regular">מצולע משוכלל</button></div>` +
+        `<button type="button" class="md-button ex-regular">מצולע משוכלל</button>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<div class="tri-box"><svg class="figure tri-live" viewBox="0 0 320 320" role="img" aria-label="קודקודים על מעגל היחידה">` +
         `<circle class="axis-c" cx="${C}" cy="${C}" r="${R}" fill="none"/><g class="tri-arcs"></g><polygon class="tri-shape"/>` +
         `<circle class="center-dot" cx="${C}" cy="${C}" r="4"/><text class="tick" x="${C + 7}" y="${C + 15}">O</text><g class="poly-pts"></g></svg>` +
@@ -4141,6 +4154,8 @@
       $(".ex-n").addEventListener("input", () => setN(Number($(".ex-n").value)));
       $(".ex-random").addEventListener("click", () => { st.angles = polyRandom(st.n); render(); });
       $(".ex-regular").addEventListener("click", () => { st.angles = regular(st.n); render(); });
+      const N0 = st.n;
+      $(".ex-reset").addEventListener("click", () => { $(".ex-n").value = N0; setN(N0); });
       $(".ex-rounds").addEventListener("click", () => {
         for (let r = 0; r < 1000; r++) if (polyClass(polyRandom(st.n)) === "in") st.hits++;
         st.runs += 1000; render();
@@ -4505,7 +4520,8 @@
         `<div class="ex-controls"><label><span>המצביע לפני הצעד</span><input type="range" class="ex-b" min="0" max="15" step="1" value="7" dir="ltr" aria-label="המצביע לפני הצעד"><output class="ex-bout"></output></label>` +
         `<button type="button" class="md-button ex-random">הגרלה: אילו ביטים הגיעו</button>` +
         `<button type="button" class="md-button ex-all">הכול הגיע</button>` +
-        `<button type="button" class="md-button ex-none">כלום עוד לא הגיע</button></div>` +
+        `<button type="button" class="md-button ex-none">כלום עוד לא הגיע</button>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<p class="wv-hint">כל ביט שמשתנה בצעד עובר סנכרן משלו, ויכול להידגם ישן או חדש. לחיצה על ביט כזה בשורה "נדגם" הופכת אותו.</p>` +
         `<div class="gr-box"><div class="gr-side gr-bin"></div><div class="gr-side gr-gray"></div></div>` +
         `<p class="ex-summary gr-sum" aria-live="polite"></p>`;
@@ -4552,8 +4568,9 @@
         draw();
       });
       // the page's example: bits 3 and 0 arrived, 2 and 1 did not (1110); in Gray the old value
-      st.arrBin = { 3: 1, 0: 1, 2: 0, 1: 0 }; st.arrGray = { 3: 0 };
-      draw();
+      const page = () => { st.b = 7; st.arrBin = { 3: 1, 0: 1, 2: 0, 1: 0 }; st.arrGray = { 3: 0 }; draw(); };
+      $(".ex-reset").addEventListener("click", page);
+      page();
     },
   });
   const grayFlagsMount = (box) => {
@@ -5167,7 +5184,8 @@
           `<label><span>a</span> <input type="number" class="ex-a" dir="ltr" value="5" aria-label="הערך של a"></label>` +
           `<label><span>b</span> <input type="number" class="ex-b" dir="ltr" value="3" aria-label="הערך של b"></label>` +
           `<label><input type="checkbox" class="ex-same"> <span>‏a ו-b הם אותו משתנה (${code("swap(v, i, i)")})</span></label>` +
-          `<label><input type="checkbox" class="ex-bits"> <span>‏int של 8 ביט (מודולו 256)</span></label></div>` +
+          `<label><input type="checkbox" class="ex-bits"> <span>‏int של 8 ביט (מודולו 256)</span></label>` +
+          `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
           playRow("השורה הבאה", "השורה הקודמת") +
           `<div class="tr-box"><div class="tr-left"></div><div class="tr-right"></div></div>` +
           `<p class="wv-step tr-step" aria-live="polite"></p><p class="ex-summary tr-sum"></p>`;
@@ -5206,6 +5224,11 @@
         [".ex-a", ".ex-b"].forEach((sel) => $(sel).addEventListener("change", () => { stop(); readInputs(); st.k = 0; draw(); }));
         $(".ex-same").addEventListener("change", () => { stop(); st.same = $(".ex-same").checked; $(".ex-b").disabled = st.same; st.k = 0; draw(); });
         $(".ex-bits").addEventListener("change", () => { stop(); st.bits = $(".ex-bits").checked ? 8 : 0; readInputs(); st.k = 0; draw(); });
+        $(".ex-reset").addEventListener("click", () => {
+          stop(); Object.assign(st, { kind: "arith", a: 5, b: 3, same: false, bits: 0, k: 0 });
+          $(".ex-kind").value = "arith"; $(".ex-a").value = 5; $(".ex-b").value = 3; $(".ex-b").disabled = false; $(".ex-same").checked = false; $(".ex-bits").checked = false;
+          draw();
+        });
         $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
         $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
         $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
