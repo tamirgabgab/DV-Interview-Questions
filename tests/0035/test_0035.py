@@ -64,3 +64,59 @@ def test_explorer_matches_page_model():
     assert all(r["out"] == 0 for r in got["wide"])             # the Python model from 3: stuck low
     assert [r["out"] for r in got["wrap"]] == [r["out"] for r in got["guard"]]
     assert [r["out"] for r in got["wrap"]][2:] == div3_50(22)  # one cycle late, then the same
+
+
+def test_explorer_divide_by_n():
+    """The box's follow-up: a divide by N for N = 2..10 against a plain Python model of
+    the same statements (a counter modulo N in ceil(log2 N) bits, a high for the last
+    floor(N / 2) counts, b half a cycle later, the output a | b for an odd N and
+    a for an even N): 50% duty and a period of N cycles from the first rise; the
+    unreachable wake-up state is the counter's highest, when it exists."""
+    import json
+    import math
+
+    from page_tests import explorer_require, node_json
+
+    def model(N, half_cycles, cnt0=0, counter="wrap"):
+        bits = max(1, math.ceil(math.log2(N)))
+        high = N // 2
+        cnt = cnt0
+        a = b = 0
+        out = []
+        for edge in range(half_cycles):
+            if edge % 2 == 0:
+                a = 1 if N - high <= cnt <= N - 1 else 0
+                if counter == "guard":
+                    cnt = 0 if cnt >= N - 1 else cnt + 1
+                elif counter == "wide":
+                    cnt = 0 if cnt == N - 1 else cnt + 1
+                else:
+                    cnt = 0 if cnt == N - 1 else (cnt + 1) & ((1 << bits) - 1)
+            else:
+                b = a
+            out.append((cnt, a, b, (a | b) if N % 2 else a))
+        return out, bits
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const out = {{}};
+      for (let N = 2; N <= 10; N++) {{
+        const p = m.div3Params(N);
+        out[N] = {{ p, rows: m.div3Trace(120, 0, "wrap", N).map((r) => [r.cnt, r.a, r.b, r.out]), duty: m.div3Duty(m.div3Trace(120, 0, "wrap", N)),
+          woke: p.wake === null ? null : {{ wrap: m.div3Trace(40, p.wake, "wrap", N).map((r) => r.out), wide: m.div3Trace(40, p.wake, "wide", N).map((r) => r.out), guard: m.div3Trace(40, p.wake, "guard", N).map((r) => r.out) }} }};
+      }}
+      console.log(JSON.stringify(out));""")
+    for N in range(2, 11):
+        g = got[str(N)]
+        rows, bits = model(N, 120)
+        assert [tuple(r) for r in g["rows"]] == rows, N
+        assert g["p"]["bits"] == bits and g["p"]["high"] == N // 2
+        assert g["p"]["wake"] == ((1 << bits) - 1 if (1 << bits) - 1 >= N else None), N
+        assert g["duty"]["period"] == 2 * N and g["duty"]["high"] == N and g["duty"]["ok"], N
+        if g["woke"] is not None:
+            w = g["p"]["wake"]
+            for key in ("wrap", "wide", "guard"):
+                assert g["woke"][key] == [r[3] for r in model(N, 40, w, key)[0]], (N, key)
+            assert all(v == 0 for v in g["woke"]["wide"]), N           # stuck above N - 1
+            assert g["woke"]["wrap"][2 * bits:] == g["woke"]["guard"][2 * bits:] or N == 3, N
+    assert [tuple(r) for r in got["3"]["rows"]] == [tuple(r) for r in model(3, 120)[0]]
