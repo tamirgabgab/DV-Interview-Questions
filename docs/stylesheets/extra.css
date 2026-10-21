@@ -12,9 +12,11 @@
   --md-typeset-a-color: #1f4e9c;
   --site-primary-soft: rgba(27, 42, 74, 0.09);
   --site-card-border: rgba(27, 42, 74, 0.16);
-  --diff-easy: #1e7d4f;   --diff-easy-bg: rgba(30, 125, 79, 0.12);
-  --diff-medium: #b26a00; --diff-medium-bg: rgba(217, 154, 0, 0.16);
-  --diff-hard: #b4332c;   --diff-hard-bg: rgba(180, 51, 44, 0.12);
+  --diff-easy: #176a42;   --diff-easy-bg: rgba(30, 125, 79, 0.12);
+  --diff-medium: #8a5300; --diff-medium-bg: rgba(217, 154, 0, 0.16);
+  --diff-hard: #a32a23;   --diff-hard-bg: rgba(180, 51, 44, 0.12);
+  --site-label-color: #8a5300;      /* the amber of the id label, dark enough on white (4.5:1) */
+  --site-focus-ring: #1b2a4a;
 }
 
 [data-md-color-scheme="slate"] {
@@ -35,6 +37,8 @@
   --diff-easy: #5fd39a;   --diff-easy-bg: rgba(95, 211, 154, 0.14);
   --diff-medium: #ffc233; --diff-medium-bg: rgba(255, 194, 51, 0.14);
   --diff-hard: #ff7b72;   --diff-hard-bg: rgba(255, 123, 114, 0.14);
+  --site-label-color: #ffc233;
+  --site-focus-ring: #ffc233;
 }
 
 .md-header__button.md-logo img,
@@ -121,7 +125,7 @@
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--md-accent-fg-color);
+  color: var(--site-label-color);
 }
 
 .md-typeset .question-header h1 {
@@ -270,7 +274,6 @@
 }
 
 .md-typeset .filter-search input:focus {
-  outline: none;
   border-color: var(--md-accent-fg-color);
 }
 
@@ -410,6 +413,7 @@
   --viz-grid: #e4e3df;
   --viz-text: #52514e;
   --viz-ink: #3b3a37;
+  --viz-s2-text: #bf4a16;         /* the orange as running text: 4.5:1 on the page background */
 }
 
 [data-md-color-scheme="slate"] {
@@ -419,6 +423,7 @@
   --viz-grid: #3a3a37;
   --viz-text: #c3c2b7;
   --viz-ink: #e8e7e2;
+  --viz-s2-text: #f58a5c;
 }
 
 .perf-chart .by-multiples { fill: var(--viz-s1); }
@@ -876,7 +881,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .level-card .lc-empty {
   font-size: 0.68rem;
   font-style: italic;
-  color: var(--md-default-fg-color--lighter);
+  color: var(--md-default-fg-color);
+  opacity: 0.7;
 }
 
 .md-typeset .stats-strip {
@@ -907,7 +913,8 @@ body.practice-mode .md-typeset .question-tools {
 
 .md-typeset .stat span {
   font-size: 0.68rem;
-  color: var(--md-default-fg-color--light);
+  color: var(--md-default-fg-color);
+  opacity: 0.8;
 }
 
 /* Step-through figures (B14): one frame at a time, previous / next buttons. */
@@ -1140,7 +1147,7 @@ body.practice-mode .md-typeset .question-tools {
   align-items: baseline;
   gap: 0.2rem 0.9rem;
 }
-.md-typeset .path-nav .pn-path { color: var(--md-default-fg-color--light); }
+.md-typeset .path-nav .pn-path { color: var(--md-default-fg-color); opacity: 0.85; }
 .md-typeset .path-nav .pn-path a { font-weight: 600; }
 .md-typeset .path-nav .pn-next { margin-inline-start: auto; }
 
@@ -1189,7 +1196,7 @@ body.practice-mode .md-typeset .question-tools {
   font-size: 0.72rem;
   color: var(--md-default-fg-color--light);
 }
-.md-typeset .path-nav .pn-step { white-space: nowrap; color: var(--md-default-fg-color--light); }
+.md-typeset .path-nav .pn-step { white-space: nowrap; color: var(--md-default-fg-color); opacity: 0.85; }
 .md-typeset .path-nav .pn-id { font-family: var(--md-code-font-family); }
 
 /* Floyd's tortoise and hare (question 0017) */
@@ -1353,7 +1360,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .clock-total { font-weight: 700; font-size: 0.95rem; }
 .md-typeset .explorer .clock-counts { margin: 0.2em 0; padding-inline-start: 1.1rem; }
 .md-typeset .explorer .clock-counts li { margin: 0.1em 0; }
-.md-typeset .explorer .clock-counts li.is-meet { color: var(--viz-s2); font-weight: 700; }
+.md-typeset .explorer .clock-counts li.is-meet { color: var(--viz-s2-text); font-weight: 700; }
 .md-typeset .explorer input.ex-time,
 .md-typeset .explorer select {
   font: inherit;
@@ -1368,7 +1375,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .clock-day { display: flex; margin-top: 0.4rem; }
 .md-typeset .explorer .clock-day input[type="range"] { flex: 1 1 auto; width: auto; }
 .md-typeset .explorer .ex-controls .md-button { padding: 0.2rem 0.7rem; font-size: 0.65rem; margin: 0; }
-.md-typeset .explorer .md-button:not(.md-button--primary) { color: var(--md-typeset-a-color); border-color: currentColor; }
+.md-typeset .explorer .md-button:not(.md-button--primary),
+.md-typeset .py-runner .md-button:not(.md-button--primary) { color: var(--md-typeset-a-color); border-color: currentColor; }
 
 /* the bridge figure of 0031 */
 .md-typeset svg .bank { fill: var(--viz-s3); fill-opacity: 0.12; stroke: var(--viz-s3); stroke-width: 1; }
@@ -1552,3 +1560,49 @@ body.practice-mode .md-typeset .question-tools {
   color: var(--md-accent-bg-color);
 }
 @media print { .md-typeset .fig-enlarge, .md-typeset .part-nav { display: none; } }
+
+/* Accessibility (G44): a visible focus ring on every control of the site's own components,
+   links in running text underlined (not told apart by colour alone), and no motion for
+   readers who asked for less of it. */
+.md-typeset :is(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--site-focus-ring);
+  outline-offset: 2px;
+}
+
+.md-typeset :is(p, li, td, dd) > a:not(.md-button):not(.headerlink):not(.level-card) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+/* Line numbers of code blocks and the highlighted lines in dark mode: the theme's defaults
+   fall short of 4.5:1 against the code background. */
+.md-typeset .highlighttable .linenos,
+.md-typeset .highlighttable .linenos a,
+.md-typeset .highlight [data-linenos]::before { color: #5f5f5f; }
+[data-md-color-scheme="slate"] .md-typeset .highlighttable .linenos,
+[data-md-color-scheme="slate"] .md-typeset .highlighttable .linenos a,
+[data-md-color-scheme="slate"] .md-typeset .highlight [data-linenos]::before { color: #a7a6a0; }
+[data-md-color-scheme="slate"] .md-typeset .highlight .hll {
+  background-color: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 3px 0 0 var(--md-accent-fg-color);
+}
+[data-md-color-scheme="default"] {
+  --md-code-hl-comment-color: #616161;
+  --md-code-hl-keyword-color: #2f5ead;
+  --md-code-hl-number-color: #b31f1f;
+}
+[data-md-color-scheme="default"] .md-typeset .highlight .hll {
+  background-color: rgba(27, 42, 74, 0.06);
+  box-shadow: inset 3px 0 0 var(--md-accent-fg-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset *,
+  .fig-lightbox,
+  .fig-lightbox * {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

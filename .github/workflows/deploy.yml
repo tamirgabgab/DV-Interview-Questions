@@ -94,12 +94,14 @@ jobs:
       - name: Check internal links and anchors
         run: python tools/check_links.py site
       # Every page at 390 px with all blocks open: no sideways scroll, no script errors.
-      - name: Install Playwright and Chromium for the phone check
+      # axe-core runs on each page too and reports serious / critical violations as warnings.
+      - name: Install Playwright, Chromium and axe-core for the phone check
         run: |
           pip install -r requirements-dev.txt
           python -m playwright install --with-deps chromium
+          npm install --no-save --no-audit --no-fund axe-core@4.14.0
       - name: Check every page at phone width
-        run: python tools/check_phone.py site --shots phone-shots
+        run: python tools/check_phone.py site --shots phone-shots --axe node_modules/axe-core/axe.min.js
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -110,7 +112,7 @@ jobs:
       # Dark mode on request only (Actions → Run workflow → phone_dark), it doubles the check time.
       - name: Check every page at phone width in dark mode
         if: github.event_name == 'workflow_dispatch' && inputs.phone_dark
-        run: python tools/check_phone.py site --scheme dark --shots phone-shots-dark
+        run: python tools/check_phone.py site --scheme dark --shots phone-shots-dark --axe node_modules/axe-core/axe.min.js
       - uses: actions/upload-artifact@v4
         if: always() && github.event_name == 'workflow_dispatch' && inputs.phone_dark
         with:

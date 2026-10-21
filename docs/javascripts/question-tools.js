@@ -121,9 +121,33 @@
     show(0);
   };
 
+  // Accessibility fixes for markup the theme renders: a name on every code-annotation
+  // marker (Material draws them after load, so watch the article), and keyboard access to
+  // tables that scroll sideways.
+  const annotationNames = (article) => {
+    const label = () => article.querySelectorAll(".md-annotation__index:not([aria-label])").forEach((a) => {
+      const id = a.querySelector("[data-md-annotation-id]");
+      a.setAttribute("aria-label", `הערה ${id ? id.dataset.mdAnnotationId : ""}`.trim());
+    });
+    new MutationObserver(label).observe(article, { childList: true, subtree: true });
+    label();
+  };
+  const scrollableTables = (article) => {
+    article.querySelectorAll(".md-typeset__scrollwrap, pre > code").forEach((w) => {
+      if (w.scrollWidth > w.clientWidth + 1 && !w.hasAttribute("tabindex")) {
+        w.setAttribute("tabindex", "0");
+        w.setAttribute("role", "region");
+        w.setAttribute("aria-label", w.tagName === "CODE" ? "קוד רחב, גלילה לרוחב" : "טבלה רחבה, גלילה לרוחב");
+      }
+    });
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".question-tools").forEach(setup);
     document.querySelectorAll("article").forEach(ladder);
     document.querySelectorAll(".stepper").forEach(stepper);
+    document.querySelectorAll("article").forEach(annotationNames);
+    document.querySelectorAll("article").forEach(scrollableTables);
+    window.addEventListener("resize", () => document.querySelectorAll("article").forEach(scrollableTables), { passive: true });
   });
 })();

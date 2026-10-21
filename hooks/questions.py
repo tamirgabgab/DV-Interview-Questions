@@ -241,7 +241,7 @@ def _tools(q: dict, page_url: str) -> str:
         hrefs = json.dumps([_href(o["src_uri"], page_url) for o in sorted(same, key=lambda o: o["id"])])
         random_btn = (f'<button type="button" class="qt-btn qt-random" data-hrefs="{html.escape(hrefs)}" '
                       'title="שאלה אקראית מאותה רמה">שאלה אקראית</button>')
-    return (f'<div class="question-tools" data-search-exclude data-qid="{q["id"]}">'
+    return (f'<div class="question-tools" role="toolbar" aria-label="כלי השאלה" data-search-exclude data-qid="{q["id"]}">'
             '<button type="button" class="qt-btn qt-open">פתח הכל</button>'
             '<button type="button" class="qt-btn qt-close">סגור הכל</button>'
             '<button type="button" class="qt-btn qt-practice">מצב תרגול</button>'
@@ -474,7 +474,7 @@ def _run_panel(q: dict, markdown: str) -> str:
 <p class="py-runner-note">הפונקציות מהפתרון כבר טעונות. אפשר לשנות את הקוד שבתיבה ולהריץ שוב.
 ההרצה הראשונה טוענת את Python לדפדפן ולוקחת כמה שניות.</p>
 <script type="application/json" class="py-page-code">{json.dumps(page_code).replace("</", "<\\/")}</script>
-<textarea class="py-editor" spellcheck="false" dir="ltr" rows="{min(max(demo_code.count(chr(10)) + 1, 6), 22)}">{html.escape(demo_code)}</textarea>
+<textarea class="py-editor" aria-label="הקוד להרצה (Python)" spellcheck="false" dir="ltr" rows="{min(max(demo_code.count(chr(10)) + 1, 6), 22)}">{html.escape(demo_code)}</textarea>
 <div class="py-buttons">
 <button type="button" class="md-button md-button--primary py-run">▶ הרץ</button>
 <button type="button" class="md-button py-stop" disabled>עצור</button>
