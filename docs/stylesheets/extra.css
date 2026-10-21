@@ -1756,3 +1756,17 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .br-step { margin: 0.4em 0; }
 .md-typeset .explorer .br-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .br-bad { color: var(--diff-hard); font-weight: 700; }
+
+/* Tic-tac-toe explorer (0011) */
+.md-typeset .explorer .ttt-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .ttt-board { flex: 0 0 auto; }
+.md-typeset .explorer svg.ttt-live { width: 11rem; max-width: 100%; user-select: none; }
+.md-typeset .explorer .ttt-panel { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .ttt-panel p { margin: 0.3em 0; }
+.md-typeset svg .ttt-empty { fill: var(--md-default-bg-color); }
+.md-typeset svg .ttt-cell { cursor: pointer; }
+.md-typeset svg .ttt-cell:focus-visible { outline: none; }
+.md-typeset svg .ttt-cell:focus-visible rect { stroke: var(--site-focus-ring); stroke-width: 3; }
+.md-typeset svg .ttt-idx { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); opacity: 0.6; }
+.md-typeset .explorer .ttt-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .ttt-bad { color: var(--diff-hard); font-weight: 700; }
