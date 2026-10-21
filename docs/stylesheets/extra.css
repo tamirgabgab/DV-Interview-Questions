@@ -1747,6 +1747,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .bf-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0 0.1rem; }
 .md-typeset svg .st-stack.is-cur { stroke-width: 4; }
 .md-typeset svg .st-text.bf-xs { font-size: 10px; }
+.md-typeset svg .bf-layer { font-size: 10px; font-weight: 700; fill: var(--viz-s2-text); }
+.md-typeset .explorer input.ex-digits { width: 4.5rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
 .md-typeset svg circle.is-path { stroke: var(--viz-s3); stroke-width: 3; }
 
 /* Brackets explorer (0010): the characters row, the stack column, the depth chart */
