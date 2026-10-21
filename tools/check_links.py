@@ -5,17 +5,29 @@
 
 Walks every HTML file under the site directory and checks that each internal link (href,
 src, srcset, poster), including a #fragment, points at an existing file and, for a
-fragment, at an element with that id. External links (http, https, mailto, ...) are not
-fetched. Exit status 1 when anything is broken, so it can run in CI after the build.
+fragment, at an element with that id. Absolute links under the site's own path (the 404
+page uses them, from site_url) are resolved against the site root. External links (http,
+https, mailto, ...) are not fetched unless --external is given: then every distinct
+http(s) URL is requested once (HEAD, then GET), with a browser-like User-Agent and a
+timeout; 404s, 5xx and connection failures are broken, while 403 / 429 answers (sites that
+refuse robots) are listed as warnings only. Exit status 1 when anything is broken, so it
+can run in CI after the build; the weekly workflow runs the external check.
 """
 
 from __future__ import annotations
 
 import re
 import sys
+import urllib.error
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+
+USER_AGENT = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
+              "Chrome/124.0 Safari/537.36 dv-interview-questions-link-check")
+BLOCKED = {401, 403, 429, 999}      # answers that mean "no robots", not "gone"
 
 ATTRS = {"href", "src", "poster", "data", "xlink:href"}
 SKIP_SCHEMES = ("http:", "https:", "mailto:", "tel:", "data:", "javascript:")
@@ -42,11 +54,66 @@ class Collector(HTMLParser):
                         self.links.append((url, self.getpos()[0]))
 
 
+def fetch(url: str, timeout: float = 20.0) -> tuple[str, int | None, str]:
+    """(url, status or None, note) after a HEAD request, retried as GET when HEAD is refused."""
+    for method in ("HEAD", "GET"):
+        req = urllib.request.Request(url, method=method, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as res:
+                return url, res.status, ""
+        except urllib.error.HTTPError as e:
+            if method == "HEAD" and e.code in (403, 404, 405, 429, 500, 501):
+                continue
+            return url, e.code, e.reason if isinstance(e.reason, str) else ""
+        except Exception as e:   # DNS, TLS, timeout, reset
+            if method == "HEAD":
+                continue
+            return url, None, type(e).__name__ + (f": {e}" if str(e) else "")
+    return url, None, "no answer"
+
+
+def check_external(pages: dict[Path, "Collector"], site: Path, workers: int = 8) -> int:
+    """Request every distinct external URL once; print the broken ones and the blocked ones."""
+    where: dict[str, str] = {}
+    for page, c in pages.items():
+        for url, line in c.links:
+            if url.lower().startswith(("http:", "https:")) or url.startswith("//"):
+                full = "https:" + url if url.startswith("//") else url
+                where.setdefault(full.split("#")[0], f"{page.relative_to(site)}:{line}")
+    broken, blocked = [], []
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for url, status, note in pool.map(fetch, sorted(where)):
+            if status is not None and status < 400:
+                continue
+            line = f"{where[url]}: {status or 'error'} {note} {url}".replace("  ", " ")
+            (blocked if status in BLOCKED else broken).append(line)
+    for b in broken:
+        print(b)
+    for b in blocked:
+        print(f"warn blocked: {b}")
+    print(f"{len(where)} external links checked, {len(broken)} broken, {len(blocked)} refused the robot")
+    return len(broken)
+
+
+def site_prefix(site: Path) -> str:
+    """The path of site_url ("/DV-Interview-Questions/"), from the canonical link of the home page."""
+    index = site / "index.html"
+    if index.exists():
+        m = re.search(r'<link rel="canonical" href="([^"]+)"', index.read_text(encoding="utf-8", errors="replace"))
+        if m:
+            path = urlsplit(m.group(1)).path
+            return path if path.endswith("/") else path + "/"
+    return "/"
+
+
 def main(argv: list[str]) -> int:
+    external = "--external" in argv
+    argv = [a for a in argv if a != "--external"]
     site = Path(argv[0] if argv else "site").resolve()
     if not site.is_dir():
         print(f"site directory not found: {site}")
         return 1
+    prefix = site_prefix(site)
 
     pages: dict[Path, Collector] = {}
     for html in sorted(site.rglob("*.html")):
@@ -61,6 +128,8 @@ def main(argv: list[str]) -> int:
         path = unquote(urlsplit(url).path)
         if not path:
             return page
+        if prefix != "/" and path.startswith(prefix):
+            path = "/" + path[len(prefix):]
         target = (site / path.lstrip("/")) if path.startswith("/") else (page.parent / path)
         target = target.resolve()
         if target.is_dir():
@@ -94,7 +163,10 @@ def main(argv: list[str]) -> int:
     for b in broken:
         print(b)
     print(f"{len(pages)} pages, {checked} internal links checked, {len(broken)} broken")
-    return 1 if broken else 0
+    bad = len(broken)
+    if external:
+        bad += check_external(pages, site)
+    return 1 if bad else 0
 
 
 if __name__ == "__main__":

@@ -125,8 +125,8 @@ DV-Interview-Questions/
 ├── tools/
 │   ├── extract_code.py         # Pulls the code blocks out of a question page
 │   ├── lint_pages.py           # Checks the page skeleton and the RTL rules
-│   ├── check_links.py          # Internal link / anchor check of the built site
-│   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors)
+│   ├── check_links.py          # Internal link / anchor check of the built site (--external fetches the rest)
+│   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors, axe-core)
 │   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
 │   ├── new_question.py         # Scaffold: page, tests folder, generator stub, README row
 │   ├── page_tests.py           # Test helpers: Node runner, "page blocks match the generator"
@@ -143,6 +143,8 @@ DV-Interview-Questions/
 │       └── demo.py             # Starting code of the in-browser "run" panel
 ├── templates/
 │   └── question.md             # Copy this to start a new question
+├── layouts/
+│   └── dvq.yml                 # Social preview card layout (RTL) for Material's social plugin
 ├── docs/                       # Site content
 │   ├── index.md                # Home page with the table of all questions
 │   ├── tags.md                 # Tag index
@@ -161,7 +163,9 @@ DV-Interview-Questions/
 │   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner,
 │   │                           # explorer.js (sliders), reading-tools.js (lightbox, tooltips, part bar)
 │   └── stylesheets/extra.css   # Palette, chips, question header, tables / cards, figures
-└── .github/workflows/deploy.yml  # Test + build on every push, deploy main to GitHub Pages
+└── .github/workflows/
+    ├── deploy.yml              # Test + build on every push, deploy main to GitHub Pages
+    └── weekly.yml              # Mondays: external links of the site, newer Verilator release
 ```
 
 Files are named `<id>-<short-slug>.md`, where `<id>` is a zero-padded running number that
@@ -410,16 +414,21 @@ python tools/run_tests.py             # everything (under a minute once compiled
 python tools/run_tests.py 6 7         # only questions 0006 and 0007
 python tools/run_tests.py --python-only
 python tools/check_links.py           # internal links and anchors of the built site
+python tools/check_links.py site --external   # also fetch every external link (the weekly workflow)
 python tools/check_phone.py           # every built page at 390 px: no sideways scroll, no JS errors
 python tools/check_phone.py --scheme dark   # the same in dark mode (CI: manual run with phone_dark)
+python tools/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-core (npm install axe-core)
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```
 
 The linter checks RTL at the start of every paragraph, list item, heading and table cell,
 at any indent (admonitions, list items, the steps timeline), and **warns** about literal
 SVG colours. The phone check also **warns** about display math wider than its column (it
-would scroll on its own; split it with `aligned`). Warnings never fail CI. The explorer
-tests run the JavaScript under Node (CI installs it; locally the tests skip without it).
+would scroll on its own; split it with `aligned`) and, with `--axe`, about serious and
+critical [axe-core](https://github.com/dequelabs/axe-core) findings (contrast, names,
+keyboard access; CI runs it on every page, `--axe-fail` makes them failures). Warnings never
+fail CI. The explorer tests run the JavaScript under Node (CI installs it; locally the tests
+skip without it).
 
 `check_phone.py` needs Playwright (`requirements-dev.txt`) and its Chromium
 (`python -m playwright install chromium`). It writes a screenshot of each page to
@@ -490,3 +499,40 @@ so the live site keeps its previous version. One-time setup in the repository se
 This is already set up: every push to `main` publishes the site within about a minute at
 <https://tamirgabgab.github.io/DV-Interview-Questions/>. A failed deploy can be re-run from
 the Actions tab (the workflow also has a manual `workflow_dispatch` trigger).
+
+### Social preview cards
+
+Material's `social` plugin renders a 1200 × 630 card per page (`og:image`, shown when a
+link is shared in WhatsApp, LinkedIn, Slack...) from the RTL layout in `layouts/dvq.yml`:
+navy background, the logo, the title aligned to the right, level · difficulty · id on
+question pages, the description and an amber bar. It needs `pillow` and `cairosvg`
+(`requirements.txt`; `libcairo2` on the machine) and downloads the Rubik font from Google
+Fonts into `.cache/plugin/social/` on the first build (CI caches that directory). Without
+network access, put any Hebrew-capable TTF there as `fonts/Rubik/Regular.ttf` and
+`Bold.ttf`. The cards are written to `site/assets/images/social/`.
+
+### Comments
+
+Question pages can end with a **discussion** section backed by GitHub Discussions through
+[giscus](https://giscus.app) (readers sign in with GitHub; the thread lives in the
+repository's Discussions, one per page path). The code is in place and switched off until
+the ids are filled in. One-time setup by the repository owner:
+
+1. **Settings → General → Features**: tick **Discussions**. In the Discussions tab create
+   (or keep) a category of the **Announcements** type, so only the site creates threads.
+2. Install the [giscus GitHub App](https://github.com/apps/giscus) on this repository.
+3. Open <https://giscus.app>, enter `tamirgabgab/DV-Interview-Questions`, choose the
+   category, and copy the `data-repo-id` and `data-category-id` values it shows.
+4. Paste them into `mkdocs.yml` under `extra.comments` (`repo_id`, `category_id`; change
+   `category` if a different one was chosen) and push to `main`.
+
+The hook (`_comments_block` in `hooks/questions.py`) then adds "## דיון" with the giscus
+script to every question page, in Hebrew, following the site's light / dark toggle.
+
+### Weekly checks
+
+`.github/workflows/weekly.yml` runs every Monday (and on request): it builds the site and
+fetches every external link (`check_links.py --external`; 403 / 429 answers count as
+"refused the robot", not broken), and compares the latest Verilator release with
+`VERILATOR_RELEASE` (the release the pinned commit of `deploy.yml` follows). A broken link
+fails the run; a newer release opens one issue with the steps to bump the pin.

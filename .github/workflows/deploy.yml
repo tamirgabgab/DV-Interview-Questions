@@ -89,6 +89,14 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
+      # Social cards: libcairo for cairosvg (the logo on the card); the rendered cards and the
+      # fonts downloaded from Google Fonts are cached, keyed on the pages and the layout.
+      - run: sudo apt-get update -q && sudo apt-get install -y -q libcairo2
+      - uses: actions/cache@v4
+        with:
+          path: .cache/plugin/social
+          key: social-${{ hashFiles('docs/**/*.md', 'layouts/**', 'mkdocs.yml') }}
+          restore-keys: social-
       # --strict also fails on invalid question front matter (see hooks/questions.py).
       - run: mkdocs build --strict
       - name: Check internal links and anchors

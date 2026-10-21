@@ -1,5 +1,6 @@
 site_name: שאלות ראיון DV
 site_description: אוסף שאלות ראיון עבודה ב-Design Verification עם פתרונות מלאים
+site_url: https://tamirgabgab.github.io/DV-Interview-Questions/
 repo_url: https://github.com/tamirgabgab/DV-Interview-Questions
 repo_name: DV-Interview-Questions
 edit_uri: edit/main/docs/
@@ -46,11 +47,24 @@ copyright: >
 
 extra:
   generator: false
+  # Comments per question through GitHub Discussions (giscus). Empty ids keep the section
+  # off; README.md ("Comments") says how to fill them in once Discussions is enabled.
+  comments:
+    repo: tamirgabgab/DV-Interview-Questions
+    repo_id: ""
+    category: Announcements
+    category_id: ""
 
 plugins:
   - search:
       lang: en          # Hebrew prefix letters: see on_post_build in hooks/questions.py
   - tags
+  # Social preview cards (one PNG per page, linked from og:image); the layout is RTL and
+  # lives in layouts/dvq.yml. Needs pillow + cairosvg (requirements.txt); fonts are
+  # downloaded from Google Fonts into .cache/plugin/social on the first build.
+  - social:
+      cards_layout_dir: layouts
+      cards_layout: dvq
 
 hooks:
   - hooks/questions.py

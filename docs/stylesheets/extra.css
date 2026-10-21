@@ -1606,3 +1606,7 @@ body.practice-mode .md-typeset .question-tools {
     scroll-behavior: auto !important;
   }
 }
+
+/* Comments (giscus, GitHub Discussions) at the end of a question page. */
+.md-typeset .comments-note { font-size: 0.7rem; color: var(--md-default-fg-color--light); }
+.md-typeset .comments { margin: 0.6rem 0 1.5rem; }

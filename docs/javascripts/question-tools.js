@@ -142,7 +142,16 @@
     });
   };
 
+  // Comments (giscus): follow the site's light / dark toggle.
+  const giscusTheme = () => {
+    const frame = document.querySelector("iframe.giscus-frame");
+    if (!frame) return;
+    const theme = document.body.dataset.mdColorScheme === "slate" ? "dark" : "light";
+    frame.contentWindow.postMessage({ giscus: { setConfig: { theme } } }, "https://giscus.app");
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("input[name='__palette']").forEach((i) => i.addEventListener("change", () => setTimeout(giscusTheme, 50)));
     document.querySelectorAll(".question-tools").forEach(setup);
     document.querySelectorAll("article").forEach(ladder);
     document.querySelectorAll(".stepper").forEach(stepper);

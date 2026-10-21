@@ -76,6 +76,7 @@ WORD = re.compile(r"[\u05d0-\u05ea]+|[A-Za-z0-9_]+")
 # Question metadata keyed by src_uri, and the study paths in order; filled in on_config.
 _questions: dict[str, dict] = {}
 _paths: list[dict] = []
+_comments: dict = {}
 
 
 def _load_questions(docs_dir: Path) -> dict[str, dict]:
@@ -145,9 +146,10 @@ def _load_paths(docs_dir: Path) -> list[dict]:
 
 
 def on_config(config, **kwargs):
-    global _questions, _paths
+    global _questions, _paths, _comments
     _questions = _load_questions(Path(config["docs_dir"]))
     _paths = _load_paths(Path(config["docs_dir"]))
+    _comments = dict(config["extra"].get("comments") or {})
 
     nav: list = [{"ראשי": "index.md"}]
     for level, label in LEVELS.items():
@@ -487,13 +489,30 @@ def _run_panel(q: dict, markdown: str) -> str:
 """
 
 
+def _comments_block() -> str:
+    """The giscus comments section (GitHub Discussions), or "" until the repository and
+    category ids are set in mkdocs.yml (extra.comments)."""
+    c = _comments
+    if not (c.get("repo") and c.get("repo_id") and c.get("category_id")):
+        return ""
+    attrs = {"data-repo": c["repo"], "data-repo-id": c["repo_id"], "data-category": c.get("category", ""),
+             "data-category-id": c["category_id"], "data-mapping": "pathname", "data-strict": "1",
+             "data-reactions-enabled": "1", "data-emit-metadata": "0", "data-input-position": "top",
+             "data-theme": "preferred_color_scheme", "data-lang": "he", "data-loading": "lazy"}
+    attr_text = " ".join(f'{k}="{html.escape(v)}"' for k, v in attrs.items())
+    return ("\n\n## דיון\n\n"
+            '<p class="comments-note">שאלות, תיקונים ופתרונות אחרים: הדיון נשמר ב-GitHub Discussions של המאגר, '
+            "וכדי לכתוב צריך להתחבר עם חשבון GitHub.</p>\n"
+            f'<div class="comments"><script src="https://giscus.app/client.js" {attr_text} crossorigin="anonymous" async></script></div>\n')
+
+
 def on_page_markdown(markdown, page, config, files, **kwargs):
     q = _questions.get(page.file.src_uri)
     if q:
         page.meta["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], *q["tags"]]
         page.meta.setdefault("hide", []).append("tags")   # the header card shows them
         markdown = (_header(q, markdown, page.url) + _tools(q, page.url) + _path_nav(q, page.url) + markdown
-                    + _run_panel(q, markdown) + _related(q, page.url))
+                    + _run_panel(q, markdown) + _related(q, page.url) + _comments_block())
 
     markdown = CARDS.sub(lambda m: _level_cards(page.url), markdown)
     markdown = STATS.sub(lambda m: _stats(), markdown)

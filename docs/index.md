@@ -1,4 +1,5 @@
 ---
+description: שאלות ראיון ב-Design Verification, מתמטיקה ולוגיקה, בעברית, עם פתרון מלא, איורים וקוד שנבדק אוטומטית
 hide:
   - navigation
 ---

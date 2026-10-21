@@ -1,0 +1,62 @@
+name: Weekly checks
+
+# Once a week (and on request): the external links of the built site are fetched, and the
+# latest Verilator release is compared with the one the test workflow is pinned after.
+# Broken links fail the run (GitHub mails the owner); a newer Verilator release opens an
+# issue once, with the steps to bump the pin.
+
+on:
+  schedule:
+    - cron: "23 6 * * 1"        # Mondays, 06:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  # The release the pinned development commit in deploy.yml follows (VERILATOR_REF).
+  VERILATOR_RELEASE: v5.052
+
+jobs:
+  external-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: sudo apt-get update -q && sudo apt-get install -y -q libcairo2
+      - run: mkdocs build --strict
+      - name: Fetch every external link of the site
+        run: python tools/check_links.py site --external
+
+  verilator-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compare the latest Verilator release with the pinned one
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh api repos/verilator/verilator/releases/latest --jq .tag_name)
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "Latest Verilator release: $latest (pinned after: $VERILATOR_RELEASE)"
+      - name: Open an issue once when a newer release is out
+        if: steps.latest.outputs.latest != env.VERILATOR_RELEASE
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LATEST: ${{ steps.latest.outputs.latest }}
+        run: |
+          title="Verilator $LATEST is out: check the pin in deploy.yml"
+          if gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "in:title \"$title\"" --json number --jq 'length' | grep -qv '^0$'; then
+            echo "issue already open"; exit 0
+          fi
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$(cat <<EOF
+          The weekly check found Verilator release **$LATEST**; the test workflow is pinned to a development commit after **$VERILATOR_RELEASE** (\`VERILATOR_REF\` in \`.github/workflows/deploy.yml\`).
+
+          To move to the release: set \`VERILATOR_REF\` to the release tag, push a branch, and check that the 0011 class and the 0014 subclass still pass in CI (the pinned commit fixed a crash and an unrandomized subclass; see \`HANDOFF.md\`, Technical notes). Then update \`VERILATOR_RELEASE\` in \`.github/workflows/weekly.yml\` so this check is quiet again.
+          EOF
+          )"

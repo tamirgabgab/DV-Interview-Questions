@@ -1,0 +1,138 @@
+# Social preview card of this site (Material's social plugin, `cards_layout: dvq`).
+#
+# A right-to-left variant of the plugin's default layout: navy background, the site logo
+# in the top-left corner, the page title and description aligned to the right, a line with
+# the level and difficulty on question pages, and an amber bar at the bottom. Text is drawn
+# with the theme font (Rubik, downloaded from Google Fonts into the plugin cache); Pillow's
+# raqm engine lays Hebrew out right-to-left.
+
+definitions:
+  - &background_color "#1b2a4a"
+  - &color "#ffffff"
+  - &muted "#c9d3ea"
+  - &accent "#ffc233"
+
+  - &font_family >-
+    {%- if config.theme.font is mapping -%}
+      {{ config.theme.font.get("text", "Roboto") }}
+    {%- else -%}
+      Roboto
+    {%- endif -%}
+
+  - &site_name >-
+    {%- if not page.is_homepage -%}
+      {{ config.site_name }}
+    {%- endif -%}
+
+  - &page_title >-
+    {%- if page.is_homepage -%}
+      {{ config.site_name }}
+    {%- else -%}
+      {{ page.meta.get("title", page.title) }}
+    {%- endif -%}
+
+  - &page_title_with_site_name >-
+    {%- if not page.is_homepage -%}
+      {{ page.meta.get("title", page.title) }} - {{ config.site_name }}
+    {%- else -%}
+      {{ config.site_name }}
+    {%- endif -%}
+
+  - &page_description >-
+    {{ page.meta.get("description", config.site_description) | x }}
+
+  # Level and difficulty of a question page, empty elsewhere
+  - &page_meta_line >-
+    {%- if page.meta.get("level") -%}
+      {{ {"student": "Student", "junior": "Junior", "senior": "Senior", "staff": "Staff"}[page.meta.level] }}
+      ·
+      {{ {"easy": "קל", "medium": "בינוני", "hard": "קשה"}[page.meta.difficulty] }}
+      {%- if page.meta.get("id") %} · {{ "%04d" | format(page.meta.id) }}{% endif -%}
+    {%- endif -%}
+
+  - &logo >-
+    {{ config.docs_dir }}/{{ config.theme.logo }}
+
+# Meta tags
+tags:
+  og:type: website
+  og:title: *page_title_with_site_name
+  og:description: *page_description
+  og:image: "{{ image.url }}"
+  og:image:type: "{{ image.type }}"
+  og:image:width: "{{ image.width }}"
+  og:image:height: "{{ image.height }}"
+  og:url: "{{ page.canonical_url }}"
+  twitter:card: summary_large_image
+  twitter:title: *page_title_with_site_name
+  twitter:description: *page_description
+  twitter:image: "{{ image.url }}"
+
+# Card size and layers
+size: { width: 1200, height: 630 }
+layers:
+
+  - background:
+      color: *background_color
+
+  # Logo, top-left (the text reads from the right)
+  - size: { width: 128, height: 128 }
+    offset: { x: 64, y: 56 }
+    background:
+      image: *logo
+
+  # Site name, top-right
+  - size: { width: 960, height: 48 }
+    offset: { x: 176, y: 72 }
+    typography:
+      content: *site_name
+      align: end
+      color: *muted
+      font:
+        family: *font_family
+        style: Bold
+
+  # Level · difficulty · id (question pages)
+  - size: { width: 960, height: 40 }
+    offset: { x: 176, y: 132 }
+    typography:
+      content: *page_meta_line
+      align: end
+      color: *accent
+      font:
+        family: *font_family
+        style: Bold
+
+  # Page title
+  - size: { width: 1072, height: 280 }
+    offset: { x: 64, y: 196 }
+    typography:
+      content: *page_title
+      align: end
+      color: *color
+      line:
+        amount: 3
+        height: 1.25
+      font:
+        family: *font_family
+        style: Bold
+
+  # Page description
+  - size: { width: 1072, height: 96 }
+    offset: { x: 64, y: 492 }
+    typography:
+      content: *page_description
+      align: end
+      color: *muted
+      line:
+        amount: 2
+        height: 1.5
+      font:
+        family: *font_family
+        style: Regular
+
+  # Amber bar at the bottom
+  - size: { width: 1200, height: 14 }
+    offset: { x: 0, y: 616 }
+    background:
+      color: *accent
