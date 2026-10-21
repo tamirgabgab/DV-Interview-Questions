@@ -1908,3 +1908,26 @@ body.practice-mode .md-typeset .question-tools {
   .md-typeset .explorer .gr-slots { grid-template-columns: repeat(8, minmax(0, 1fr)); }
   .md-typeset .explorer .gr-bit { width: 1.5rem; height: 1.5rem; }
 }
+
+/* Stock explorer (0006): the price chart with draggable points, the running lines */
+.md-typeset .explorer .st-chart { margin-top: 0.5rem; max-width: 40rem; touch-action: none; }
+.md-typeset .explorer .st-chart svg { width: 100%; display: block; user-select: none; }
+.md-typeset .explorer .st-chart.is-dragging { cursor: grabbing; }
+.md-typeset svg .st-price { fill: none; stroke: var(--viz-ink); stroke-width: 1.5; stroke-opacity: 0.6; }
+.md-typeset svg .st-run { fill: none; stroke-width: 2.5; stroke-dasharray: 6 4; }
+.md-typeset svg .st-run.st-min { stroke: var(--viz-s1); }
+.md-typeset svg .st-run.st-max { stroke: var(--viz-s2); }
+.md-typeset svg .st-trade { stroke-width: 5; stroke-linecap: round; stroke-opacity: 0.85; }
+.md-typeset svg .st-trade.st-min { stroke: var(--viz-s1); }
+.md-typeset svg .st-trade.st-max { stroke: var(--viz-s2); }
+.md-typeset svg .st-cursor { fill: var(--viz-s3); fill-opacity: 0.12; }
+.md-typeset svg .st-pt { cursor: grab; }
+.md-typeset svg .st-pt circle { fill: var(--md-default-bg-color); stroke: var(--viz-text); stroke-width: 2; }
+.md-typeset svg .st-pt.is-seen circle { stroke: var(--viz-ink); fill: var(--viz-ink); }
+.md-typeset svg .st-pt.is-cur circle { stroke: var(--viz-s3); stroke-width: 4; }
+.md-typeset svg .st-pt text { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg .st-pt:focus-visible { outline: none; }
+.md-typeset svg .st-pt:focus-visible circle { stroke: var(--site-focus-ring); stroke-width: 4; }
+/* Handshake explorer (0038): the assertion rows */
+.md-typeset svg .wv-fail circle { fill: var(--diff-hard-bg); stroke: var(--diff-hard); stroke-width: 2; }
+.md-typeset svg .wv-fail text { fill: var(--diff-hard); font-size: 12px; font-weight: 700; }

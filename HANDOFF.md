@@ -1097,16 +1097,27 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 5. **Checks:** lint 38/38, 247 Python tests, strict build, links 0 broken, phone check
    light and dark with axe (0 problems; one axe finding fixed: the bit buttons of the
    Gray box carry their visible digit in the aria-label, label-content-name-mismatch).
+6. **Round 2 (owner's answers: prices by drag plus random and presets, a long / long+short
+   select, four assertion rows, no reset row).** T131, `stock` on 0006: `stockScan`
+   returns the frames of the page's loop (the cheapest and dearest day before today, the
+   trades closing today, the best so far) and the page's verdict (a short wins only when
+   strictly better); points are `role="slider"` groups dragged with pointer capture or
+   moved with the arrow keys; the running lines are steps over the days scanned.
+   T132, `handshake` on 0038: `hsCheck` is the page's `check_handshake` ported, the
+   strip has a `flag` row kind (a cross at the reporting cycle) and the page's WaveDrom
+   strings are the presets (`HS_PRESETS`, `hsWave`). Tests: `tests/0006` against
+   `max_long_fast` / `max_profit_fast` on 300 random arrays, `tests/0038` against
+   `check_handshake` on the four traces and 400 random traces with max_wait 3 and 2.
+   Phone and axe checks clean on both pages in both schemes.
 
 ---
 
 ## In progress
 
-- Session 20: round 1 of the second explorer batch (0001, 0036, 0035, 0034) is on the
-  work branch; `main` follows at the end of the round. The owner's plan for the next
-  rounds: round 2 = 0006 (stock) and 0038 (handshake), then round 4 = the protocol trio
-  T125 to T127 (0025, 0024, 0023); round 3 (T124, the code tracer for 0002 / 0003) was
-  listed but not chosen. Multiple-choice questions before each round, as before.
+- Session 20: round 1 (0001, 0036, 0035, 0034) is on `main` (724be4b) and round 2
+  (0006, 0038) follows it. Next by the owner's plan: round 4 = the protocol trio T125 to
+  T127 (0025, 0024, 0023); round 3 (T124, the code tracer for 0002 / 0003) was listed
+  but not chosen. Multiple-choice questions before each round, as before.
 - Owner's checks on the live site: the five WaveDrom diagrams of round R (0034, 0035,
   0038), the dragging in the explorers on a real phone, and the new timing strips
   (0001, 0035) scrolled sideways on a phone.
@@ -1518,14 +1529,14 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 | ~~T128~~ | Done in session 20: 0036 LFSR | **Tap lab**: tick the taps, step or play on a ring of the 15 states, the output bits, the table of the eight polynomials | S–M |
 | ~~T129~~ | Done in session 20: 0035 divide by 3 | **Half-cycle stepper**: cnt, a, b and clk_out edge by edge, the overlap shaded, the duty measured; a wake-up in state 3 in three counter variants | S–M |
 | ~~T130~~ | Done in session 20: 0034 Gray pointers | **Sampled step and flags**: every changing bit arrived or not (binary against Gray); a 16-entry FIFO with 5-bit pointers and the full / empty rules | M |
-| T131 | 0006 stock | **Scan lab**: an editable price chart (drag or random), the scan animated with the running minimum and the best trade so far, a long / short toggle for part b | M |
-| T132 | 0038 handshake | **Rule checker**: draw req and ack on a timing strip (the `waveStrip` helper), the four rules evaluated every cycle, a violation marked with its rule, the three violations of the page as presets | M |
+| ~~T131~~ | Done in session 20. Was: 0006 stock | **Scan lab**: an editable price chart (drag or random), the scan animated with the running minimum and the best trade so far, a long / short toggle for part b | M |
+| ~~T132~~ | Done in session 20. Was: 0038 handshake | **Rule checker**: draw req and ack on a timing strip (the `waveStrip` helper), the four rules evaluated every cycle, a violation marked with its rule, the three violations of the page as presets | M |
 
 Suggested order: T114, T118, T122 (small, each page gets its "try it" box in an hour),
 then T113 and T115 (the two algorithm animations that readers ask about most), T121 and
 T120, and the protocol trio T125 to T127 after M73. Session 19 did T118, T113, T115, T119
-and T114, then T117, T116, T120, T121 and T122. Session 20 did T123 and T128 to T130.
-Open: T124 (not chosen), T131 and T132 (round 2), then T125 to T127 (round 4).
+and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T130, T131 and T132.
+Open: T124 (not chosen), then T125 to T127 (round 4).
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.

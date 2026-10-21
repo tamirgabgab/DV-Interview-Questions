@@ -50,3 +50,33 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(6)
+
+
+def test_explorer_matches_page_code():
+    """The stock explorer: its scan against the page's max_long_fast and max_profit_fast
+    on the page example, short arrays and random prices."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(6)
+    cases = [[5, 8, 3, 9, 2, 6], [], [7], [9, 1], [1, 9], [4, 4, 4], [3, 4, 6, 7, 9, 11, 12, 14, 16, 18], [18, 16, 15, 13, 12, 10, 8, 7, 5, 3]]
+    cases += [[rng.randint(1, 20) for _ in range(rng.randint(0, 12))] for _ in range(300)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map((p) => m.stockScan(p))));""")
+    for prices, sc in zip(cases, got):
+        best, buy, sell = ns["max_long_fast"](prices)
+        assert (sc["long"]["best"], sc["long"]["open"], sc["long"]["close"]) == (best, buy, sell), prices
+        profit, kind, first, second = ns["max_profit_fast"](prices)
+        side = sc["short"] if kind == "short" else sc["long"] if kind == "long" else None
+        assert sc["kind"] == kind, prices
+        if side:
+            assert (side["best"], side["open"], side["close"]) == (profit, first, second), prices
+        else:
+            assert profit == 0
+        # the frames replay the loop: the running minimum and maximum before each day
+        for i, fr in enumerate(sc["frames"]):
+            assert fr["minP"] == min(prices[:i + 1]) if i == 0 else fr["minP"] == min(prices[:i])
+            assert fr["maxP"] == max(prices[:i + 1]) if i == 0 else fr["maxP"] == max(prices[:i])
+            assert fr["longToday"] == prices[i] - fr["minP"] and fr["shortToday"] == fr["maxP"] - prices[i]

@@ -60,3 +60,37 @@ def test_random_against_independent_model():
         ack = [rng.random() < 0.3 for _ in range(n)]
         req, ack = [int(v) for v in req], [int(v) for v in ack]
         assert check_handshake(req, ack) == independent(req, ack)
+
+
+def test_explorer_matches_page_model():
+    """The handshake explorer: the page's four traces expanded from their WaveDrom strings,
+    and random traffic, against check_handshake (max_wait 3 and 2)."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(38)
+    cases = []
+    for key, (r, a) in {"ok": ("01..0...", "0..10..."), "late": ("01....0.", "0....10."),
+                        "drop": ("01.0....", "0......."), "orphan": ("0.......", "0.10....")}.items():
+        cases.append((key, r, a))
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const presets = {json.dumps([[k, r, a] for k, r, a in cases])}.map(([k, r, a]) =>
+        [m.hsWave(m.HS_PRESETS[k][0], 12), m.hsWave(m.HS_PRESETS[k][1], 12), m.hsCheck(m.hsWave(r, 12), m.hsWave(a, 12), 3)]);
+      const rnd = (() => {{ let x = 38; return () => {{ x |= 0; x = (x + 0x6D2B79F5) | 0; let t = Math.imul(x ^ (x >>> 15), 1 | x); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }}; }})();
+      const random = [];
+      for (let c = 0; c < 400; c++) {{
+        const n = 8 + Math.floor(rnd() * 9), req = [], ack = [];
+        for (let i = 0; i < n; i++) {{ req.push(rnd() < 0.6 ? 1 : 0); ack.push(rnd() < 0.3 ? 1 : 0); }}
+        random.push([req, ack, m.hsCheck(req, ack, 3), m.hsCheck(req, ack, 2)]);
+      }}
+      console.log(JSON.stringify({{ presets, random }}));""")
+    expected = {"ok": {}, "late": {"late": [4]}, "drop": {"hold": [3], "late": [4]}, "orphan": {"orphan": [2]}}
+    for (key, r, a), (req, ack, fails) in zip(cases, got["presets"]):
+        exp = [int(c) if c != "." else None for c in r]
+        assert req[:8] == [v if v is not None else req[i - 1] for i, v in enumerate(exp)]
+        assert fails == check_handshake(req, ack, 3) and only(fails, **expected[key]), key
+    for req, ack, f3, f2 in got["random"]:
+        assert f3 == check_handshake(req, ack, 3)
+        assert f2 == check_handshake(req, ack, 2)
