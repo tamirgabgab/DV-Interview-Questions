@@ -61,6 +61,7 @@ module tb;
   endtask
 
   initial begin
+    int n;
     int times[MAXN];
     string plan;
     int got;
@@ -80,7 +81,7 @@ module tb;
 
     void'($urandom(31));
     for (int k = 0; k < 400; k++) begin
-      int n = 1 + $urandom % MAXN;
+      n = 1 + $urandom % MAXN;                  // assigned, not declared here: a static block initialises once
       foreach (times[i]) times[i] = (i < n) ? 1 + $urandom % 30 : 0;
       check(n, times, greedy(n, times));
     end

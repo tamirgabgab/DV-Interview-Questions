@@ -15,12 +15,16 @@ module tb;
 
   initial begin
     int widths[3] = '{3, 5, 7};
+    int bits, size, half, g, occupancy;
+    bit e, f;
+    // Declarations inside the loops would be initialised once (a static initial block),
+    // so every per-iteration value is assigned, not declared with an initialiser.
     foreach (widths[k]) begin
-      int bits = widths[k];
-      int size = 1 << bits;
-      int half = size / 2;                       // FIFO entries: one wrap bit on top
+      bits = widths[k];
+      size = 1 << bits;
+      half = size / 2;                           // FIFO entries: one wrap bit on top
       for (int b = 0; b < size; b++) begin
-        int g = bin2gray(b);
+        g = bin2gray(b);
         if (gray2bin(g, bits) != b) begin errors++; $display("bits %0d: gray2bin(bin2gray(%0d)) != %0d", bits, b, b); end
         if (popcount(g ^ bin2gray((b + 1) % size)) != 1) begin
           errors++; $display("bits %0d: step %0d -> %0d changes %0d bits", bits, b, (b + 1) % size, popcount(g ^ bin2gray((b + 1) % size)));
@@ -28,9 +32,9 @@ module tb;
       end
       for (int w = 0; w < size; w++)
         for (int r = 0; r < size; r++) begin
-          int occupancy = (w - r + size) % size;
-          bit e = fifo_empty(bin2gray(w), bin2gray(r));
-          bit f = fifo_full(bin2gray(w), bin2gray(r), bits);
+          occupancy = (w - r + size) % size;
+          e = fifo_empty(bin2gray(w), bin2gray(r));
+          f = fifo_full(bin2gray(w), bin2gray(r), bits);
           if (e != (occupancy == 0)) begin errors++; $display("bits %0d: empty wrong for w=%0d r=%0d", bits, w, r); end
           if (f != (occupancy == half)) begin errors++; $display("bits %0d: full wrong for w=%0d r=%0d", bits, w, r); end
         end

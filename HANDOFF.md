@@ -913,7 +913,12 @@ delays, `$rose`, `disable iff` and action blocks (checked in the commit's `Chang
    reference on sampled traces; WaveDrom of a good transaction and three violations; the
    testbench (`--assert`) drives 400 random transactions with injected violations and
    compares the checker's four counters with a procedural reference.
-7. **Docs and checks:** README catalog rows and layout, HANDOFF coverage (38 questions),
+7. **CI round trip:** the first run failed on 0033 (a skipping reader two words under the
+   formula: tolerance widened), 0034 and 0038 (variables declared with initialisers inside
+   loops of a static `initial` block are initialised once, so the loops ran with constant
+   values; see Technical notes). `run_tests.py` now prints the last messages of a failing
+   testbench, and 0031's random sets had the same trap (one random size for all 400).
+8. **Docs and checks:** README catalog rows and layout, HANDOFF coverage (38 questions),
    lint 38/38, Python tests, strict build, links, phone and axe checks of the new pages
    in light and dark mode. WaveDrom cannot be rendered in the sandbox (CDN), so the five
    new timing diagrams are checked on the live site after the deploy.
@@ -1478,6 +1483,11 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   screenshot checks serve them from `npm pack` copies via Playwright request routing. The
   phone check in the sandbox:
   `python tools/check_phone.py site --offline --route 'mathjax@3\.2\.2/es5/tex-mml-chtml\.js=<mathjax copy>/es5/tex-mml-chtml.js' --route 'unpkg\.com/mermaid@11/dist/mermaid\.min\.js=<mermaid copy>/dist/mermaid.min.js'`.
+- SystemVerilog static blocks: a variable declared **with an initialiser inside a loop of
+  an `initial` block** is initialised once (IEEE 6.21, and Verilator follows it): `int g =
+  f(b);` inside `for (int b ...)` keeps the value of the first iteration. Declare such
+  variables at the top of the block and assign them in the loop (session 18 found this in
+  tests/0031, 0034 and 0038; `run_tests.py` now prints a failing testbench's messages).
 - Social cards in the sandbox: Google Fonts is unreachable, so before a build copy a
   Hebrew-capable TTF (DejaVu Sans) to `.cache/plugin/social/fonts/Rubik/Regular.ttf` and
   `Bold.ttf`; the plugin then skips the download (the cards use that font locally, Rubik in

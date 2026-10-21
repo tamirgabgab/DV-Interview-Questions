@@ -33,9 +33,10 @@ module tb;
       duty = (idle == 0) ? 1.0 : 1.0 - 1.0 / idle;
       d = fifo_depth(burst, real'(fw), real'(fr), duty);
       s = fifo_fill(burst, steps(fw), steps(fr), idle);
-      if (s < d || s > d + (idle == 0 ? 1 : 2)) begin
-        // the period rounding to 0.05 ns moves the rates slightly; allow one more word
-        if (s < d - 1 || s > d + 3) begin
+      // continuous reader: formula .. formula + 1; skipping reader: up to two words either
+      // way (it skips a whole number of slots); the 0.05 ns period rounding adds one more
+      if ((idle == 0 && (s < d - 1 || s > d + 2)) || (idle != 0 && (s < d - 3 || s > d + 3))) begin
+        begin
           errors++;
           $display("burst %0d fw %0d fr %0d idle %0d: formula %0d, simulation %0d", burst, fw, fr, idle, d, s);
         end

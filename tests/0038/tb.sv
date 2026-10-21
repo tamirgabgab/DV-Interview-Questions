@@ -56,11 +56,12 @@ module tb;
   endtask
 
   initial begin
+    int kind;                                    // assigned per iteration: an initialiser here would run once
     idle(3);
     @(negedge clk) rst_n = 1;
     idle(2);
     for (int k = 0; k < 400; k++) begin
-      int kind = $urandom_range(0, 9);
+      kind = $urandom_range(0, 9);
       case (kind)
         0: transaction($urandom_range(4, 6), 0, 0);        // late ack (rule 2)
         1: transaction($urandom_range(1, 2), 1, 0);        // req dropped before ack (rules 1, 2)
