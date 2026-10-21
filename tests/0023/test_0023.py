@@ -252,3 +252,74 @@ def test_figures_up_to_date():
     page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
     for row in (l for l in out.splitlines() if l.startswith("|")):
         assert row.strip() in page_rows, row
+
+
+def test_explorer_matches_page_model():
+    """The endpoint explorer: its model against UnalignedEndpointModel with the same random
+    draws (unit values mapped the same way on both sides) on random writes and reads run
+    to completion; the page's two examples with their exact draws."""
+    import json
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(23)
+    reqs = []
+    for _ in range(40):
+        length = rng.randint(1, 256)
+        address = 0x20000 + rng.randrange(0, 4096 - length)
+        if rng.random() < 0.4:
+            reqs.append(["write", address, length])
+        else:
+            reqs.append(["read", address, length, 0x0200 + rng.randint(0, 3), len(reqs)])
+    units = [rng.random() for _ in range(4000)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const units = {json.dumps(units)}, rng = m.epUnitRng(units);
+      const s = m.epInit();
+      let w = 1;
+      for (const r of {json.dumps(reqs)}) {{
+        if (r[0] === "write") {{ m.epWrite(s, r[1], Array.from({{ length: r[2] }}, (_, i) => (i + 0x10 * w) & 0xFF)); w++; }}
+        else m.epRead(s, {{ address: r[1], length: r[2], rid: r[3], tag: r[4] }}, rng);
+      }}
+      let guard = 0;
+      while (s.pending.length && guard++ < 600) m.epCycle(s, rng);
+      const mem = Object.fromEntries(Object.entries(s.memory).map(([k, v]) => [k, v]));
+      const ea = m.epRunScript(m.EP_SCRIPTS.a), eb = m.epRunScript(m.EP_SCRIPTS.b);
+      const rows = (st) => st.out.map((c) => [c.cycle, c.rid, c.tag, c.address, c.size, c.bc, c.first, c.last]);
+      console.log(JSON.stringify({{ out: rows(s), mem, cycles: s.cycle, used: 4000 - units.length, a: rows(ea), b: rows(eb) }}));""")
+
+    class Units:
+        def __init__(self, values):
+            self.values = list(values)
+
+        def randint(self, a, b):
+            return a + int(self.values.pop(0) * (b - a + 1))
+
+        def choice(self, seq):
+            return seq[int(self.values.pop(0) * len(seq))]
+
+    units_py = Units(units)
+    model = Unaligned(units_py)
+    w = 1
+    for r in reqs:
+        if r[0] == "write":
+            model.process_write(MemWriteReq(r[1], bytes((i + 0x10 * w) & 0xFF for i in range(r[2]))))
+            w += 1
+        else:
+            model.process_read(MemReadReq(r[1], r[2], r[3], r[4]))
+    out = []
+    while model.pending_reads and model.current_cycle < 600:
+        model.tick()
+        cpl = model.get_next_completion()
+        if cpl:
+            out.append([model.current_cycle, cpl.requester_id, cpl.tag, cpl.start_address, len(cpl.data), cpl.byte_count, cpl.data[0], cpl.data[-1]])
+    assert got["out"] == out and got["cycles"] == model.current_cycle
+    assert 4000 - len(units_py.values) == got["used"]
+    assert {int(k): list(v) for k, v in got["mem"].items()} == {k: list(v) for k, v in model.memory.items()}
+    # the page's tables
+    assert got["a"] == [[3, 0x0200, 0x16, 0x10100, 128, 256, 0x00, 0x7F], [5, 0x0200, 0x15, 0x10000, 128, 256, 0x00, 0x7F],
+                        [6, 0x0200, 0x16, 0x10180, 128, 128, 0x80, 0xFF], [7, 0x0200, 0x15, 0x10080, 128, 128, 0x80, 0xFF]]
+    assert got["b"] == [[2, 0x0300, 0x22, 0x10020, 96, 256, 0x20, 0x7F], [4, 0x0200, 0x15, 0x10000, 128, 256, 0x00, 0x7F],
+                        [5, 0x0300, 0x22, 0x10080, 128, 160, 0x80, 0xFF], [6, 0x0200, 0x15, 0x10080, 128, 128, 0x80, 0xFF],
+                        [7, 0x0300, 0x22, 0x10100, 32, 32, 0x00, 0x1F]]

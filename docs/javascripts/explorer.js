@@ -29,6 +29,9 @@
 //   gray                   0034        a pointer step through a synchroniser, bit by bit, in binary and in Gray; a 16-entry FIFO with 5-bit pointers and the flags
 //   stock                  0006        prices to drag or draw, the scan played day by day: the cheapest and dearest day so far, the best long and short
 //   handshake              0038        req and ack drawn cell by cell; the four rules checked every cycle, a failure marked on its assertion's row
+//   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts
+//   credits                0024        the four counters as hands on a modulo-256 circle, the buffer, packets in flight; grant, transmit, lose, dequeue, sync
+//   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table
 // The math of each model is exported under Node, where the question tests compare it with
 // the Python reference (tests/0001, 0004 to 0022, 0026 to 0038).
 (() => {
@@ -1184,6 +1187,225 @@
     return out;
   };
 
+  // Ack/Nak (0025): the page's TransmitterWithReplay and ReceiverWithNak as one state
+  // object with the two link queues between them (TLPs towards the EP, DLLPs towards
+  // the RC). `anApply` is pure: it returns the next state and a log of what happened.
+  // `rnd()` draws the EP's next Ack threshold (1..4), as the page's rng.randint(1, 4).
+  const AN_MOD = 4096;
+  const anInit = (startSeq, rnd) => ({
+    nts: startSeq % AN_MOD, ackd: (startSeq - 1 + AN_MOD) % AN_MOD, retry: [], link: [], dllps: [],
+    badDllp: 0, proto: 0, replays: 0,
+    nrs: startSeq % AN_MOD, nak: false, pending: 0, threshold: rnd(), received: [], badTlp: 0, dups: 0,
+    payload: 0xA0,
+  });
+  const anClone = (s) => ({ ...s, retry: s.retry.map((t) => ({ ...t })), link: s.link.map((t) => ({ ...t })), dllps: s.dllps.map((d) => ({ ...d })), received: [...s.received] });
+  const anApply = (state, ev, rnd) => {
+    const s = anClone(state), log = { type: ev.type, how: ev.how, items: [] };
+    const lastAccepted = () => (s.nrs - 1 + AN_MOD) % AN_MOD;
+    const sendAck = () => { s.dllps.push({ kind: "ACK", seq: lastAccepted(), crcOk: true }); s.pending = 0; s.threshold = rnd(); log.items.push({ out: "ack", seq: lastAccepted() }); };
+    const scheduleNak = () => { if (s.nak) { log.items.push({ out: "nakHeld" }); return; } s.dllps.push({ kind: "NAK", seq: lastAccepted(), crcOk: true }); s.nak = true; s.pending = 0; log.items.push({ out: "nak", seq: lastAccepted() }); };
+    const accept = (t) => { s.received.push(t.seq); s.nrs = (s.nrs + 1) % AN_MOD; s.nak = false; s.pending += 1; log.items.push({ out: "accepted", seq: t.seq, replay: t.replay }); if (s.pending >= s.threshold) sendAck(); };
+    const isDup = (seq) => { const behind = (s.nrs - seq + AN_MOD) % AN_MOD; return behind > 0 && behind <= AN_MOD / 2; };
+    const replay = () => { if (!s.retry.length) { log.items.push({ out: "nothingToReplay" }); return; } s.retry.forEach((t) => s.link.push({ ...t, crcOk: true, replay: true })); s.replays += 1; log.items.push({ out: "replay", seqs: s.retry.map((t) => t.seq) }); };
+    if (ev.type === "send") {
+      for (let i = 0; i < (ev.n || 1); i++) {
+        const t = { seq: s.nts, payload: s.payload, crcOk: true, replay: false };
+        s.retry.push({ seq: t.seq, payload: t.payload }); s.link.push(t);
+        log.items.push({ out: "sent", seq: t.seq });
+        s.nts = (s.nts + 1) % AN_MOD; s.payload += 1;
+      }
+    } else if (ev.type === "tlp") {
+      for (let i = 0; i < (ev.count || 1); i++) {
+        const t = s.link.shift();
+        if (!t) { log.items.push({ out: "emptyLink" }); break; }
+        if (ev.how === "lose") { log.items.push({ out: "lost", seq: t.seq }); continue; }
+        if (ev.how === "bad" && i === 0) t.crcOk = false;
+        if (!t.crcOk) { s.badTlp += 1; log.items.push({ out: "badTlp", seq: t.seq }); scheduleNak(); }
+        else if (t.seq === s.nrs) accept(t);
+        else if (isDup(t.seq)) { s.dups += 1; log.items.push({ out: "dup", seq: t.seq }); sendAck(); }
+        else { s.badTlp += 1; log.items.push({ out: "future", seq: t.seq, expected: s.nrs }); scheduleNak(); }
+      }
+    } else if (ev.type === "dllp") {
+      const d = s.dllps.shift();
+      if (!d) log.items.push({ out: "emptyLink" });
+      else if (ev.how === "lose") log.items.push({ out: "lost", kind: d.kind, seq: d.seq });
+      else {
+        if (ev.how === "bad") d.crcOk = false;
+        if (ev.tamper !== undefined) d.seq = ev.tamper;
+        log.kind = d.kind; log.seq = d.seq;
+        if (!d.crcOk) { s.badDllp += 1; log.items.push({ out: "badDllp", kind: d.kind, seq: d.seq }); }
+        else {
+          const idx = s.retry.findIndex((t) => t.seq === d.seq);
+          if (idx >= 0) { const purged = s.retry.slice(0, idx + 1).map((t) => t.seq); s.retry.splice(0, idx + 1); s.ackd = d.seq; log.items.push({ out: "purged", kind: d.kind, seq: d.seq, seqs: purged }); if (d.kind === "NAK") replay(); }
+          else if (d.seq !== s.ackd) { s.proto += 1; log.items.push({ out: "protoErr", kind: d.kind, seq: d.seq }); }
+          else { log.items.push({ out: "noProgress", kind: d.kind, seq: d.seq }); if (d.kind === "NAK") replay(); }
+        }
+      }
+    } else if (ev.type === "flush") {
+      if (s.pending && !s.nak) sendAck(); else log.items.push({ out: s.nak ? "flushNak" : "flushNothing" });
+    } else if (ev.type === "timeout") {
+      replay();
+    }
+    return { state: s, log };
+  };
+  // The page's two examples (tools/figures/q0025.py): start at 4094, scripted thresholds.
+  const AN_SCRIPTS = {
+    a: { start: 4094, thresholds: [2, 3, 1], steps: [
+      { type: "send", n: 2 }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" }, { type: "dllp", how: "ok" },
+      { type: "send", n: 3 }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" }, { type: "dllp", how: "ok" }] },
+    b: { start: 4094, thresholds: [3, 1, 1, 1, 1], steps: [
+      { type: "send", n: 4 }, { type: "tlp", how: "ok" }, { type: "tlp", how: "bad" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" },
+      { type: "dllp", how: "ok" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok", count: 2 }, { type: "dllp", how: "bad" },
+      { type: "timeout" }, { type: "tlp", how: "ok", count: 3 }, { type: "dllp", how: "ok" }, { type: "dllp", how: "ok" }, { type: "dllp", how: "ok", tamper: 9 }] },
+  };
+  const anRun = (script, rnd) => {
+    const th = [...script.thresholds];
+    const draw = () => (th.length ? th.shift() : rnd());
+    let s = anInit(script.start, draw);
+    const states = [s];
+    script.steps.forEach((ev) => { s = anApply(s, ev, draw).state; states.push(s); });
+    return states;
+  };
+
+  // USB4 path credits (0024): the page's EgressSyncModel and IngressSyncModel as one
+  // state with the packets in flight between them. Errors the page raises (a transmission
+  // without a credit, a buffer overflow, a dequeue from an empty buffer) are counted and
+  // leave the counters as they were.
+  const CR_MOD = 256;
+  const crDist = (a, b) => (b - a + CR_MOD) % CR_MOD;
+  const crInit = (size, base = 0) => ({
+    size, pcc: base % CR_MOD, pcl: base % CR_MOD, pcr: base % CR_MOD, pca: (base + size) % CR_MOD,
+    occ: 0, link: [], nextId: 1, errors: 0,
+  });
+  const crCanTransmit = (s) => { const ahead = crDist(s.pcc, s.pcl); return ahead > 0 && ahead < 128; };
+  const crApply = (state, ev) => {
+    const s = { ...state, link: [...state.link] }, log = { type: ev.type, how: ev.how, items: [] };
+    const transmit = () => {
+      if (!crCanTransmit(s)) { s.errors += 1; log.items.push({ out: "noCredit", pcc: s.pcc, pcl: s.pcl }); return false; }
+      s.pcc = (s.pcc + 1) % CR_MOD; s.link.push(s.nextId); log.items.push({ out: "transmitted", id: s.nextId }); s.nextId += 1; return true;
+    };
+    const receive = (how) => {
+      const id = s.link.shift();
+      if (id === undefined) { log.items.push({ out: "emptyLink" }); return; }
+      if (how === "lose") { log.items.push({ out: "lost", id }); return; }
+      if (s.occ >= s.size) { s.errors += 1; log.items.push({ out: "overflow", id }); return; }
+      s.pcr = (s.pcr + 1) % CR_MOD; s.occ += 1; log.items.push({ out: "received", id });
+    };
+    if (ev.type === "grant") { s.pcl = s.pca; log.items.push({ out: "grant", value: s.pca, credits: crDist(s.pcc, s.pcl) }); }
+    else if (ev.type === "transmit") transmit();
+    else if (ev.type === "receive") receive(ev.how);
+    else if (ev.type === "packet") { if (transmit()) receive(ev.how); }
+    else if (ev.type === "dequeue") {
+      if (s.occ === 0) { s.errors += 1; log.items.push({ out: "emptyBuffer" }); }
+      else { s.occ -= 1; s.pca = (s.pca + 1) % CR_MOD; log.items.push({ out: "dequeued", pca: s.pca }); }
+    } else if (ev.type === "sync") {
+      const missing = crDist(s.pcr, s.pcc);
+      s.pca = (s.pca + missing) % CR_MOD; log.items.push({ out: "sync", pcc: s.pcc, pcrBefore: s.pcr, missing, pca: s.pca }); s.pcr = s.pcc;
+    }
+    return { state: s, log };
+  };
+  // The page's two examples (tools/figures/q0024.py): a buffer of 5.
+  const CR_SCRIPTS = {
+    a: { size: 5, steps: [{ type: "grant" }, { type: "packet", how: "ok" }, { type: "packet", how: "ok" }, { type: "packet", how: "ok" }, { type: "dequeue" }, { type: "dequeue" }, { type: "grant" },
+      { type: "packet", how: "ok" }, { type: "packet", how: "ok" }, { type: "packet", how: "ok" }, { type: "packet", how: "ok" }] },
+    b: { size: 5, steps: [{ type: "grant" }, { type: "packet", how: "ok" }, { type: "packet", how: "lose" }, { type: "packet", how: "ok" }, { type: "dequeue" }, { type: "dequeue" }, { type: "grant" }, { type: "sync" }, { type: "grant" }] },
+  };
+  const crRun = (script, base = 0) => {
+    let s = crInit(script.size, base);
+    const states = [s];
+    script.steps.forEach((ev) => { s = crApply(s, ev).state; states.push(s); });
+    return states;
+  };
+
+  // PCIe endpoint (0023): the page's UnalignedEndpointModel. `rng` is {randint(a, b),
+  // choice(n)}: the draws in the page's order (the cut coins of a read, then its delay;
+  // the pick among the ready reads, then the gap), so they can be scripted (the page's
+  // examples) or replayed by the tests.
+  const EP_RCB = 128, EP_MRRS = 256, EP_MIN_DELAY = 1, EP_MAX_DELAY = 20, EP_MAX_GAP = 10;
+  const epUnitRng = (units) => {
+    const next = () => (units.length ? units.shift() : Math.random());
+    return { randint: (a, b) => a + Math.floor(next() * (b - a + 1)), choice: (n) => Math.floor(next() * n) };
+  };
+  const epValueRng = (values, fallback) => ({
+    randint: (a, b) => (values.length ? values.shift() : fallback.randint(a, b)),
+    choice: (n) => (values.length ? values.shift() : fallback.choice(n)),
+  });
+  const epInit = () => ({ memory: {}, pending: [], cycle: 0, out: [], writes: [], reads: [], nextTag: 0x15, nextRead: 0 });
+  const epWrite = (s, address, data) => {
+    let done = 0;
+    while (done < data.length) {
+      const block = Math.floor((address + done) / EP_RCB), off = (address + done) % EP_RCB;
+      const n = Math.min(EP_RCB - off, data.length - done), key = block * EP_RCB;
+      if (!s.memory[key]) s.memory[key] = new Array(EP_RCB).fill(0);
+      for (let i = 0; i < n; i++) s.memory[key][off + i] = data[done + i];
+      done += n;
+    }
+    s.writes.push({ address, length: data.length, id: s.writes.length + 1 });
+  };
+  const epReadBytes = (s, address, length) => {
+    const out = [];
+    let done = 0;
+    while (done < length) {
+      const block = Math.floor((address + done) / EP_RCB), off = (address + done) % EP_RCB;
+      const n = Math.min(EP_RCB - off, length - done), blk = s.memory[block * EP_RCB];
+      for (let i = 0; i < n; i++) out.push(blk ? blk[off + i] : 0);
+      done += n;
+    }
+    return out;
+  };
+  const epFragments = (address, length, rng) => {
+    const end = address + length, sizes = [];
+    let last = address, boundary = (Math.floor(address / EP_RCB) + 1) * EP_RCB;
+    while (boundary < end) {
+      if (rng.randint(0, 1)) { sizes.push(boundary - last); last = boundary; }
+      boundary += EP_RCB;
+    }
+    sizes.push(end - last);
+    return sizes;
+  };
+  const epRead = (s, req, rng) => {
+    if (!(req.length > 0 && req.length <= EP_MRRS)) throw new Error("read exceeds MRRS");
+    const data = epReadBytes(s, req.address, req.length);
+    const p = { id: s.nextRead++, tag: req.tag, rid: req.rid, address: req.address, length: req.length, cpls: [], ready: 0, sent: 0 };
+    let address = req.address, remaining = req.length;
+    epFragments(req.address, req.length, rng).forEach((size) => {
+      const off = address - req.address;
+      p.cpls.push({ address, size, bc: remaining, data: data.slice(off, off + size) });
+      address += size; remaining -= size;
+    });
+    p.total = p.cpls.length;
+    p.ready = s.cycle + rng.randint(EP_MIN_DELAY, EP_MAX_DELAY);
+    s.pending.push(p);
+    s.reads.push({ id: p.id, tag: p.tag, rid: p.rid, address: p.address, length: p.length, sizes: p.cpls.map((c) => c.size) });
+    return p;
+  };
+  const epNext = (s, rng) => {
+    const ready = s.pending.filter((p) => p.ready <= s.cycle);
+    if (!ready.length) return null;
+    const pick = ready[rng.choice(ready.length)], cpl = pick.cpls.shift();
+    pick.sent += 1;
+    if (pick.cpls.length) pick.ready = s.cycle + rng.randint(1, EP_MAX_GAP);
+    else s.pending.splice(s.pending.indexOf(pick), 1);
+    const rec = { cycle: s.cycle, read: pick.id, tag: pick.tag, rid: pick.rid, address: cpl.address, size: cpl.size, bc: cpl.bc, first: cpl.data[0], last: cpl.data[cpl.data.length - 1] };
+    s.out.push(rec);
+    return rec;
+  };
+  // One cycle as the page's run does it: tick, then one completion at most.
+  const epCycle = (s, rng) => { s.cycle += 1; return epNext(s, rng); };
+  // The page's two examples (tools/figures/q0023.py): a 512-byte write of i mod 256, two reads.
+  const EP_SCRIPTS = {
+    a: { reads: [[0x10000, 256, 0x0200, 0x15], [0x10100, 256, 0x0200, 0x16]], draws: [1, 5, 1, 3, 0, 3, 0, 1, 1, 0] },
+    b: { reads: [[0x10000, 256, 0x0200, 0x15], [0x10020, 256, 0x0300, 0x22]], draws: [1, 4, 1, 1, 2, 0, 3, 0, 2, 0, 1, 0, 0] },
+  };
+  const epRunScript = (script) => {
+    const s = epInit(), rng = epValueRng([...script.draws], epUnitRng([]));
+    epWrite(s, 0x10000, Array.from({ length: 512 }, (_, i) => i & 0xFF));
+    script.reads.forEach(([address, length, rid, tag]) => epRead(s, { address, length, rid, tag }, rng));
+    let guard = 0;
+    while (s.pending.length && guard++ < 400) epCycle(s, rng);
+    return s;
+  };
+
   const models = {
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
     motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, josephusRun, josephusSteps, josephusZero, josephusFormula,
@@ -1204,6 +1426,8 @@
     EDGE_MODES, edgeTrace, lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, div3Trace, div3Duty,
     grayOf, grayToBin, bitsOf, graySample, grayFlags,
     stockScan, stockRandom, hsCheck, HS_PRESETS, hsWave,
+    AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun,
+    EP_RCB, epUnitRng, epValueRng, epInit, epWrite, epReadBytes, epFragments, epRead, epNext, epCycle, EP_SCRIPTS, epRunScript,
   };
   if (typeof module !== "undefined" && module.exports) {
     module.exports = models;
@@ -4518,6 +4742,336 @@
     },
   });
 
+  // The Ack/Nak box (0025): the RC and the EP side by side with the two link queues
+  // between them; free event buttons (a new TLP, the head of each queue delivered,
+  // corrupted or lost, the two timers) and the page's two examples as scripts stepped
+  // through with the same engine.
+  const acknakView = () => ({
+    mount(box) {
+      const rnd = () => 1 + Math.floor(Math.random() * 4);
+      const st = { start: 4094, history: [], script: null, pos: 0, state: null, log: null, th: [] };
+      const draw4 = () => (st.th.length ? st.th.shift() : rnd());
+      const reset = (start, script) => {
+        st.start = start; st.script = script || null; st.pos = 0; st.th = script ? [...script.thresholds] : [];
+        st.state = anInit(start, draw4); st.history = []; st.log = null; render();
+      };
+      const apply = (ev, scripted) => {
+        if (!scripted && st.script) { st.script = null; st.th = []; }
+        st.history.push({ state: st.state, log: st.log, pos: st.pos });
+        if (st.history.length > 300) st.history.shift();
+        const r = anApply(st.state, ev, draw4);
+        st.state = r.state; st.log = r.log; render();
+      };
+      box.innerHTML =
+        `<div class="ex-controls"><span class="wv-presets">הדוגמאות שבעמוד: ` +
+        `<button type="button" class="md-button ex-preset" data-p="a">סעיף א</button> ` +
+        `<button type="button" class="md-button ex-preset" data-p="b">סעיף ב</button></span>` +
+        `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא בתסריט</button>` +
+        `<button type="button" class="md-button ex-prev">הצעד הקודם</button><span class="ex-pos"></span>` +
+        `<label>מתחילים מ-<select class="ex-start" aria-label="המספר הראשון"><option value="4094" selected>4094 (לפני הגלישה)</option><option value="0">0</option></select></label>` +
+        `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
+        `<div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים:</span>` +
+        `<button type="button" class="md-button ex-send">ה-RC שולח TLP</button>` +
+        `<button type="button" class="md-button ex-flush">טיימר ה-Ack פג</button>` +
+        `<button type="button" class="md-button ex-timeout">ה-REPLAY_TIMER פג</button></div>` +
+        `<div class="an-box"><div class="an-side an-rc"></div><div class="an-link"></div><div class="an-side an-ep"></div></div>` +
+        `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const chips = (items, cls) => (items.length ? items.map((t) => `<span class="an-chip${t.cls ? " " + t.cls : ""}">${t.text}</span>`).join("") : `<span class="an-empty">ריק</span>`);
+      const field = (name, value, changed) => `<div class="an-field${changed ? " is-changed" : ""}"><span class="an-name">${name}</span><span class="an-val">${value}</span></div>`;
+      const render = () => {
+        const s = st.state, prev = st.history.length ? st.history[st.history.length - 1].state : null;
+        const ch = (key) => prev && JSON.stringify(prev[key]) !== JSON.stringify(s[key]);
+        $(".an-rc").innerHTML = `<p class="an-title">ה-RC, המשדר</p>` +
+          field("NEXT_TRANSMIT_SEQ", ltr(s.nts), ch("nts")) + field("ACKD_SEQ", ltr(s.ackd), ch("ackd")) +
+          `<div class="an-field${ch("retry") ? " is-changed" : ""}"><span class="an-name">Retry Buffer</span><span class="an-chips" dir="ltr">${chips(s.retry.map((t) => ({ text: t.seq })))}</span></div>` +
+          `<p class="an-counts">‏DLLPs פגומים: ${ltr(s.badDllp)}, שגיאות פרוטוקול: ${ltr(s.proto)}, ‏Replays: ${ltr(s.replays)}</p>`;
+        $(".an-ep").innerHTML = `<p class="an-title">ה-EP, המקבל</p>` +
+          field("NEXT_RCV_SEQ", ltr(s.nrs), ch("nrs")) + field("ממתינים / סף", ltr(`${s.pending} / ${s.threshold}`), ch("pending") || ch("threshold")) +
+          field("NAK_SCHEDULED", s.nak ? "1" : "0", ch("nak")) +
+          `<div class="an-field${ch("received") ? " is-changed" : ""}"><span class="an-name">נמסרו ל-TL</span><span class="an-chips" dir="ltr">${chips(s.received.slice(-8).map((q) => ({ text: q, cls: "is-done" })))}${s.received.length > 8 ? `<span class="an-empty">…</span>` : ""}</span></div>` +
+          `<p class="an-counts">‏TLPs פגומים או מוקדמים: ${ltr(s.badTlp)}, כפולים: ${ltr(s.dups)}</p>`;
+        const headBtns = (kind, empty) => `<span class="an-head-btns">` +
+          `<button type="button" class="md-button an-act" data-q="${kind}" data-how="ok" ${empty ? "disabled" : ""}>מסור</button>` +
+          `<button type="button" class="md-button an-act" data-q="${kind}" data-how="bad" ${empty ? "disabled" : ""}>מסור עם CRC שגוי</button>` +
+          `<button type="button" class="md-button an-act" data-q="${kind}" data-how="lose" ${empty ? "disabled" : ""}>אבד</button></span>`;
+        $(".an-link").innerHTML =
+          `<div class="an-queue"><p class="an-qtitle">‏TLPs בדרך אל ה-EP ←</p><div class="an-chips" dir="ltr">${chips(s.link.map((t, i) => ({ text: `${t.seq}${t.replay ? " R" : ""}`, cls: (i === 0 ? "is-head" : "") + (t.replay ? " is-replay" : "") })))}</div>${headBtns("tlp", !s.link.length)}</div>` +
+          `<div class="an-queue"><p class="an-qtitle">→ ‏DLLPs בדרך אל ה-RC</p><div class="an-chips" dir="ltr">${chips(s.dllps.map((d, i) => ({ text: `${d.kind === "ACK" ? "Ack" : "Nak"} ${d.seq}`, cls: (i === 0 ? "is-head" : "") + (d.kind === "NAK" ? " is-nak" : "") })))}</div>${headBtns("dllp", !s.dllps.length)}</div>`;
+        const scripted = !!st.script, left = scripted ? st.script.steps.length - st.pos : 0;
+        $(".ex-next").disabled = !scripted || left === 0;
+        $(".ex-prev").disabled = !st.history.length;
+        $(".ex-pos").textContent = scripted ? `צעד ${st.pos} מתוך ${st.script.steps.length}` : "";
+        $(".an-log").innerHTML = st.log ? logText(st.log) : `מצב התחלתי: ${ltr(`ACKD_SEQ = ${s.ackd}`)} הוא "לפני ${ltr(s.nts)}", ה-Retry Buffer ריק, וה-EP מצפה ל-${ltr(s.nrs)} עם סף Ack ${ltr(s.threshold)} שהגריל.`;
+        const expect = []; for (let q = (s.ackd + 1) % AN_MOD; q !== s.nts; q = (q + 1) % AN_MOD) { expect.push(q); if (expect.length > 4200) break; }
+        const inv = JSON.stringify(expect) === JSON.stringify(s.retry.map((t) => t.seq));
+        const ordered = s.received.every((q, i) => i === 0 || q === (s.received[i - 1] + 1) % AN_MOD);
+        $(".an-sum").innerHTML = (inv ? `<span class="wv-ok">✓ ה-Retry Buffer מכיל בדיוק את ${ltr("ACKD_SEQ + 1")} עד ${ltr("NEXT_TRANSMIT_SEQ − 1")}.</span>` : `<span class="wv-bad">✗ ה-Retry Buffer אינו הרצף מ-ACKD_SEQ + 1.</span>`) +
+          ` ` + (ordered ? `<span class="wv-ok">✓ ה-TLPs נמסרו בסדר, בלי חור ובלי כפילות.</span>` : `<span class="wv-bad">✗ המסירה אינה בסדר.</span>`);
+      };
+      const logText = (log) => {
+        const seqs = (a) => ltr(a.join(", "));
+        const parts = log.items.map((it) => {
+          switch (it.out) {
+            case "sent": return `‏TLP ${ltr(it.seq)} יצא לקישור ועותק שלו נשמר ב-Retry Buffer.`;
+            case "accepted": return `‏TLP ${ltr(it.seq)}${it.replay ? " (Replay)" : ""} הוא הצפוי: נמסר ל-Transaction Layer, ו-NEXT_RCV_SEQ מתקדם.`;
+            case "ack": return `<span class="wv-ok">הספירה הגיעה לסף, יוצא Ack ${ltr(it.seq)} (מצטבר) וסף חדש מוגרל.</span>`;
+            case "nak": return `<span class="wv-bad">יוצא Nak ${ltr(it.seq)}: הכול עד ${ltr(it.seq)} התקבל, מה שאחריו לא. NAK_SCHEDULED נדלק.</span>`;
+            case "nakHeld": return `‏Nak כבר נשלח על הפער הזה, ולכן לא יוצא עוד אחד (בלי סופת Nak-ים).`;
+            case "badTlp": return `<span class="wv-bad">‏TLP ${ltr(it.seq)} הגיע עם LCRC שגוי: נזרק, המצב לא משתנה.</span>`;
+            case "dup": return `‏TLP ${ltr(it.seq)} ישן (כבר נמסר): נזרק, ויוצא Ack חוזר כדי שהמשדר ינקה את ה-Retry Buffer.`;
+            case "future": return `<span class="wv-bad">‏TLP ${ltr(it.seq)} הגיע לפני זמנו (מצפים ל-${ltr(it.expected)}): נזרק.</span>`;
+            case "lost": return `${it.kind ? (it.kind === "ACK" ? "Ack" : "Nak") + " " + ltr(it.seq) : "‏TLP " + ltr(it.seq)} אבד על הקו: אף צד לא יודע על זה עדיין.`;
+            case "badDllp": return `<span class="wv-bad">${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} הגיע עם CRC שגוי: לא סומכים לא על הסוג ולא על המספר, נזרק.</span>`;
+            case "purged": return `<span class="wv-ok">${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} מצטבר: ${seqs(it.seqs)} נמחקים מה-Retry Buffer ו-ACKD_SEQ הופך ל-${ltr(it.seq)}.</span>`;
+            case "noProgress": return `${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} שווה ל-ACKD_SEQ: אין התקדמות, המצב לא משתנה.`;
+            case "protoErr": return `<span class="wv-bad">${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} לא ב-Retry Buffer ולא ACKD_SEQ: שגיאת פרוטוקול, נזרק ונספר.</span>`;
+            case "replay": return `<span class="wv-ok">‏Replay: ${seqs(it.seqs)} יוצאים שוב לקישור מהעותקים השמורים, עם המספרים המקוריים.</span>`;
+            case "nothingToReplay": return `אין מה לשדר מחדש: ה-Retry Buffer ריק.`;
+            case "flushNak": return `הטיימר פג, אבל Nak תלוי ועומד: לא יוצא Ack.`;
+            case "flushNothing": return `הטיימר פג ואין TLPs שממתינים ל-Ack.`;
+            case "emptyLink": return `התור ריק.`;
+            default: return "";
+          }
+        });
+        return parts.join(" ");
+      };
+      $(".ex-next").addEventListener("click", () => { if (st.script && st.pos < st.script.steps.length) { const ev = st.script.steps[st.pos]; st.pos += 1; apply(ev, true); } });
+      $(".ex-prev").addEventListener("click", () => { const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; render(); } });
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { reset(AN_SCRIPTS[b.dataset.p].start, AN_SCRIPTS[b.dataset.p]); $(".ex-start").value = "4094"; }));
+      $(".ex-reset").addEventListener("click", () => reset(Number($(".ex-start").value), null));
+      $(".ex-start").addEventListener("change", () => reset(Number($(".ex-start").value), null));
+      $(".ex-send").addEventListener("click", () => apply({ type: "send", n: 1 }));
+      $(".ex-flush").addEventListener("click", () => apply({ type: "flush" }));
+      $(".ex-timeout").addEventListener("click", () => apply({ type: "timeout" }));
+      box.addEventListener("click", (e) => { const b = e.target.closest(".an-act"); if (b) apply({ type: b.dataset.q, how: b.dataset.how }); });
+      reset(4094, AN_SCRIPTS.a);
+    },
+  });
+
+  // The credits box (0024): the four counters as hands on one modulo-256 circle (the
+  // credits are the arc from PCC to PCL, the free slots the arc from PCR to PCA), the
+  // dedicated buffer, the packets in flight, and the counters in a table; free events
+  // and the page's two examples as scripts. A start near 250 shows the wrap.
+  const creditsView = () => ({
+    mount(box) {
+      const st = { size: 5, base: 0, script: null, pos: 0, state: null, log: null, history: [] };
+      const reset = (script) => { st.script = script || null; st.pos = 0; st.state = crInit(st.size, st.base); st.history = []; st.log = null; render(); };
+      const apply = (ev, scripted) => {
+        if (!scripted && st.script) st.script = null;
+        st.history.push({ state: st.state, log: st.log, pos: st.pos }); if (st.history.length > 300) st.history.shift();
+        const r = crApply(st.state, ev); st.state = r.state; st.log = r.log; render();
+      };
+      box.innerHTML =
+        `<div class="ex-controls"><span class="wv-presets">הדוגמאות שבעמוד: ` +
+        `<button type="button" class="md-button ex-preset" data-p="a">סעיף א</button> ` +
+        `<button type="button" class="md-button ex-preset" data-p="b">סעיף ב</button></span>` +
+        `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא בתסריט</button>` +
+        `<button type="button" class="md-button ex-prev">הצעד הקודם</button><span class="ex-pos"></span>` +
+        `<label>גודל ה-buffer <select class="ex-size" aria-label="גודל ה-buffer">${[3, 4, 5, 6, 8].map((v) => `<option value="${v}"${v === 5 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
+        `<label><input type="checkbox" class="ex-wrap"> <span>להתחיל מ-250 (הגלישה)</span></label>` +
+        `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
+        `<div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים:</span>` +
+        `<button type="button" class="md-button cr-act" data-ev="grant">Credit Grant</button>` +
+        `<button type="button" class="md-button cr-act" data-ev="transmit">ה-Egress משדר פקטה</button>` +
+        `<button type="button" class="md-button cr-act" data-ev="receive" data-how="ok">הפקטה הבאה התקבלה</button>` +
+        `<button type="button" class="md-button cr-act" data-ev="receive" data-how="lose">הפקטה הבאה אבדה</button>` +
+        `<button type="button" class="md-button cr-act" data-ev="dequeue">פקטה יוצאת מה-buffer</button>` +
+        `<button type="button" class="md-button cr-act" data-ev="sync">Path Credit Sync</button></div>` +
+        `<div class="cr-box"><div class="cr-circle"></div><div class="cr-panel"><div class="cr-table"></div><p class="cr-buf"></p><p class="cr-link"></p></div></div>` +
+        `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const circle = (s) => {
+        const C = 150, R = 110, ang = (v) => -Math.PI / 2 + (v / CR_MOD) * 2 * Math.PI;
+        const pt = (v, r) => [C + r * Math.cos(ang(v)), C + r * Math.sin(ang(v))];
+        const arc = (a, b, r, cls) => {
+          const d = crDist(a, b); if (d === 0) return "";
+          const [x1, y1] = pt(a, r), [x2, y2] = pt(b, r);
+          return `<path class="${cls}" d="M${f(x1)},${f(y1)} A${r},${r} 0 ${d > 128 ? 1 : 0} 1 ${f(x2)},${f(y2)}"/>`;
+        };
+        let g = `<svg class="cr-live" viewBox="0 0 300 300" role="img" aria-label="מעגל של 256 ערכים עם ארבעת המונים; הקשת מ-PCC ל-PCL היא הקרדיטים, הקשת מ-PCR ל-PCA היא התאים הפנויים לפי ה-Ingress">` +
+          `<circle class="cr-ring" cx="${C}" cy="${C}" r="${R}"/>`;
+        for (let v = 0; v < CR_MOD; v += 32) { const [x1, y1] = pt(v, R - 5), [x2, y2] = pt(v, R + 5); g += `<line class="cr-tick" x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}"/><text class="cr-ticktext" x="${f(pt(v, R + 17)[0])}" y="${f(pt(v, R + 17)[1] + 4)}" text-anchor="middle">${v}</text>`; }
+        g += arc(s.pcc, s.pcl, R - 14, "cr-arc cr-arc-credits") + arc(s.pcr, s.pca, R - 28, "cr-arc cr-arc-free");
+        // the labels sit at four different radii, so equal counters still read
+        const hand = (v, r, cls, name, lr) => { const [x, y] = pt(v, r), [lx, ly] = pt(v, lr); return `<line class="cr-hand ${cls}" x1="${C}" y1="${C}" x2="${f(x)}" y2="${f(y)}"/><circle class="cr-dot ${cls}" cx="${f(x)}" cy="${f(y)}" r="5"/><text class="cr-label ${cls}" x="${f(lx)}" y="${f(ly + 4)}" text-anchor="middle">${name}</text>`; };
+        g += hand(s.pcr, R - 28, "cr-pcr", "PCR", 24) + hand(s.pcc, R - 14, "cr-pcc", "PCC", 46) + hand(s.pcl, R - 14, "cr-pcl", "PCL", 68) + hand(s.pca, R - 28, "cr-pca", "PCA", 92);
+        return g + `</svg><p class="cr-legend"><span class="cr-lg cr-lg-s1">‏PCC מלא, ‏PCL מקווקו: ה-Egress</span> <span class="cr-lg cr-lg-s2">‏PCR מלא, ‏PCA מקווקו: ה-Ingress</span></p>`;
+      };
+      const render = () => {
+        const s = st.state, prev = st.history.length ? st.history[st.history.length - 1].state : null;
+        const ch = (k) => prev && prev[k] !== s[k];
+        $(".cr-circle").innerHTML = circle(s);
+        const credits = crDist(s.pcc, s.pcl), free = crDist(s.pcr, s.pca);
+        const row = (k, name, meaning) => `<div class="an-field${ch(k) ? " is-changed" : ""}"><span class="an-name">${name}</span><span class="an-val">${ltr(s[k])}</span><span class="cr-meaning">${meaning}</span></div>`;
+        $(".cr-table").innerHTML = row("pcc", "PCC", "‏Egress: פקטות ששודרו") + row("pcl", "PCL", "‏Egress: ה-Grant האחרון") +
+          row("pcr", "PCR", "‏Ingress: פקטות שנכנסו ל-buffer") + row("pca", "PCA", "‏Ingress: תאים שהוקצו מאז ההקמה") +
+          `<p class="cr-derived">קרדיטים ${ltr(`= PCL − PCC = ${credits}`)}; תאים פנויים לפי ה-Ingress ${ltr(`= PCA − PCR = ${free}`)}.</p>`;
+        let cells = ""; for (let i = 0; i < s.size; i++) cells += `<span class="cr-slot${i < s.occ ? " is-full" : ""}"></span>`;
+        $(".cr-buf").innerHTML = `ה-buffer הייעודי (${ltr(s.size)} תאים, תפוסה ${ltr(s.occ)}): <span class="cr-slots" dir="ltr">${cells}</span>`;
+        $(".cr-link").innerHTML = `פקטות בדרך אל ה-Ingress: <span class="an-chips" dir="ltr">${s.link.length ? s.link.map((id, i) => `<span class="an-chip${i === 0 ? " is-head" : ""}">${id}</span>`).join("") : `<span class="an-empty">אין</span>`}</span>`;
+        box.querySelectorAll(".cr-act").forEach((b) => {
+          const ev = b.dataset.ev;
+          b.disabled = (ev === "receive" && !s.link.length) || (ev === "transmit" && !crCanTransmit(s)) || (ev === "dequeue" && !s.occ);
+        });
+        const scripted = !!st.script;
+        $(".ex-next").disabled = !scripted || st.pos >= st.script.steps.length;
+        $(".ex-prev").disabled = !st.history.length;
+        $(".ex-pos").textContent = scripted ? `צעד ${st.pos} מתוך ${st.script.steps.length}` : "";
+        $(".an-log").innerHTML = st.log ? st.log.items.map(logText).join(" ") : `הקמת הנתיב: ${ltr(`PCA = ${s.pca}`)} הוא גודל ה-buffer${s.pca !== s.size ? " מעל נקודת ההתחלה" : ""}, ושאר המונים ב-${ltr(s.pcc)}. ‏PCL עדיין ${ltr(s.pcl)}, ולכן אין קרדיטים עד ה-Credit Grant הראשון.`;
+        const agree = free === s.size - s.occ;
+        $(".an-sum").innerHTML = (crCanTransmit(s) ? `<span class="wv-ok">מותר לשדר: ${ltr(credits)} קרדיטים (מרחק 1 עד 127 קדימה מ-PCC ל-PCL).</span>` : `<span class="wv-bad">אסור לשדר: ${credits === 0 ? "הקרדיטים אזלו, PCL = PCC" : "PCL מאחורי PCC על המעגל (Grant ישן או מושחת)"}.</span>`) +
+          ` ` + (agree ? `<span class="wv-ok">✓ שני הצדדים מסכימים: ${ltr(`PCA − PCR = ${free}`)} הוא מספר התאים הפנויים באמת.</span>` : `<span class="wv-bad">✗ דליפה: ה-Ingress חושב שיש ${ltr(free)} תאים פנויים, אבל יש ${ltr(s.size - s.occ)}: ${ltr(crDist(s.pcr, s.pcc))} פקטות ששודרו ולא הגיעו. ‏Path Credit Sync מתקן את זה.</span>`);
+      };
+      const logText = (it) => {
+        switch (it.out) {
+          case "grant": return `‏Credit Grant נושא ${ltr(`PCA = ${it.value}`)}; ה-Egress מחליף בו את PCL (לא מחבר), ועכשיו יש ${ltr(it.credits)} קרדיטים.`;
+          case "transmitted": return `פקטה ${ltr(it.id)} שודרה: PCC עולה באחד והיא בדרך.`;
+          case "noCredit": return `<span class="wv-bad">שידור בלי קרדיט (${ltr(`PCC = ${it.pcc}, PCL = ${it.pcl}`)}): המודל מדווח על הפרה ולא משנה דבר.</span>`;
+          case "received": return `פקטה ${ltr(it.id)} התקבלה: PCR עולה באחד והיא תופסת תא.`;
+          case "lost": return `<span class="wv-bad">פקטה ${ltr(it.id)} אבדה על הקו: ה-Egress ספר אותה ב-PCC, ה-Ingress לא יודע עליה, ואף מונה שלו לא זז.</span>`;
+          case "overflow": return `<span class="wv-bad">ה-buffer מלא: גלישה, הפרה של הסביבה.</span>`;
+          case "dequeued": return `פקטה יצאה מה-buffer: התא התפנה ו-PCA עולה ל-${ltr(it.pca)} (מצטבר).`;
+          case "emptyBuffer": return `<span class="wv-bad">הוצאה מ-buffer ריק: הפרה.</span>`;
+          case "sync": return `<span class="wv-ok">‏Path Credit Sync עם ${ltr(`PCC = ${it.pcc}`)}: ${ltr(`PCC − PCR = ${it.missing}`)} פקטות שודרו ולא התקבלו, הקרדיטים שלהן חוזרים (${ltr(`PCA = ${it.pca}`)}) ו-PCR מיושר ל-PCC.</span>`;
+          case "emptyLink": return `אין פקטות בדרך.`;
+          default: return "";
+        }
+      };
+      $(".ex-next").addEventListener("click", () => { if (st.script && st.pos < st.script.steps.length) { const ev = st.script.steps[st.pos]; st.pos += 1; apply(ev, true); } });
+      $(".ex-prev").addEventListener("click", () => { const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; render(); } });
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { st.size = CR_SCRIPTS[b.dataset.p].size; $(".ex-size").value = String(st.size); reset(CR_SCRIPTS[b.dataset.p]); }));
+      $(".ex-size").addEventListener("change", () => { st.size = Number($(".ex-size").value); reset(null); });
+      $(".ex-wrap").addEventListener("change", () => { st.base = $(".ex-wrap").checked ? 250 : 0; reset(null); });
+      $(".ex-reset").addEventListener("click", () => reset(null));
+      box.addEventListener("click", (e) => { const b = e.target.closest(".cr-act"); if (b) apply({ type: b.dataset.ev, how: b.dataset.how }); });
+      reset(CR_SCRIPTS.a);
+    },
+  });
+
+  // The endpoint box (0023): a request builder (a write paints bytes on the block map, a
+  // read is cut at random RCB boundaries and parked), a cycle button that runs the
+  // page's tick-then-completion loop with the reads interleaved, the completions table
+  // with the falling Byte Count, and the page's two examples with their exact draws.
+  const endpointView = () => ({
+    mount(box) {
+      const hex = (v, w = 0) => "0x" + v.toString(16).toUpperCase().padStart(w, "0");
+      const st = { s: epInit(), rng: epValueRng([], epUnitRng([])), log: "", err: "" };
+      box.innerHTML =
+        `<div class="ex-controls"><span class="wv-presets">הדוגמאות שבעמוד: ` +
+        `<button type="button" class="md-button ex-preset" data-p="a">סעיף א (מיושר)</button> ` +
+        `<button type="button" class="md-button ex-preset" data-p="b">סעיף ב (לא מיושר)</button></span>` +
+        `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
+        `<div class="ex-controls ep-form"><label>הבקשה <select class="ex-kind" aria-label="סוג הבקשה"><option value="write">MemWr (כתיבה)</option><option value="read" selected>MemRd (קריאה)</option></select></label>` +
+        `<label>כתובת <input type="text" class="ex-addr" dir="ltr" value="0x10020" spellcheck="false" aria-label="כתובת בהקסה"></label>` +
+        `<label>אורך בבתים <input type="number" class="ex-len" dir="ltr" min="1" max="256" value="256" aria-label="האורך בבתים"></label>` +
+        `<button type="button" class="md-button md-button--primary ex-send">שלח בקשה</button><span class="ep-err"></span></div>` +
+        `<div class="ex-controls ex-play-row"><button type="button" class="md-button md-button--primary ex-cycle">מחזור</button>` +
+        `<button type="button" class="md-button ex-run">הרץ עד שכל ה-Completions יצאו</button><span class="ex-pos"></span></div>` +
+        `<p class="ex-title">הזיכרון, בלוק אחרי בלוק (128 בתים): הכתיבות צבועות, הקריאות הפתוחות מסומנות בקו</p><div class="ep-mem"></div>` +
+        `<p class="ex-title">קריאות פתוחות</p><div class="ep-pending"></div>` +
+        `<p class="wv-step an-log" aria-live="polite"></p>` +
+        `<p class="ex-title">ה-Completions שיצאו</p><div class="ep-table" tabindex="0"></div><p class="ex-summary an-sum"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const colour = (id) => `ep-c${id % 4}`;
+      const render = () => {
+        const s = st.s;
+        $(".ex-pos").textContent = `מחזור ${s.cycle}`;
+        // the block map
+        const keys = new Set(Object.keys(s.memory).map(Number));
+        s.pending.forEach((p) => { for (let a = Math.floor(p.address / EP_RCB) * EP_RCB; a < p.address + p.length; a += EP_RCB) keys.add(a); });
+        const blocks = [...keys].sort((a, b) => a - b);
+        if (!blocks.length) $(".ep-mem").innerHTML = `<p class="an-empty">הזיכרון ריק: בית שלא נכתב נקרא כאפס.</p>`;
+        else {
+          const W = 520, L = 86, SW = (W - L - 8) / EP_RCB, RH = 26;
+          let g = `<svg class="ep-live" viewBox="0 0 ${W} ${blocks.length * RH + 6}" role="img" aria-label="מפת הבלוקים: הבתים שנכתבו והקריאות הפתוחות">`;
+          blocks.forEach((key, r) => {
+            const y = 3 + r * RH;
+            g += `<text class="wv-name" x="${L - 6}" y="${y + 16}" text-anchor="end">${hex(key)}</text><rect class="ep-block" x="${L}" y="${y}" width="${f(EP_RCB * SW)}" height="${RH - 6}"/>`;
+            // written ranges: by the write that touched each byte (the latest wins)
+            const owner = new Array(EP_RCB).fill(0);
+            s.writes.forEach((w) => { for (let a = Math.max(w.address, key); a < Math.min(w.address + w.length, key + EP_RCB); a++) owner[a - key] = w.id; });
+            let i = 0;
+            while (i < EP_RCB) { let j = i; while (j + 1 < EP_RCB && owner[j + 1] === owner[i]) j++; if (owner[i]) g += `<rect class="ep-written ${colour(owner[i])}" x="${f(L + i * SW)}" y="${y}" width="${f((j - i + 1) * SW)}" height="${RH - 6}"><title>כתיבה ${owner[i]}: ${hex(key + i)} עד ${hex(key + j)}</title></rect>`; i = j + 1; }
+            s.pending.forEach((p) => {
+              const a = Math.max(p.address, key), b = Math.min(p.address + p.length, key + EP_RCB);
+              if (a < b) g += `<rect class="ep-read ${colour(p.id)}" x="${f(L + (a - key) * SW)}" y="${y - 2}" width="${f((b - a) * SW)}" height="${RH - 2}"/>`;
+            });
+          });
+          $(".ep-mem").innerHTML = g + `</svg>`;
+        }
+        $(".ep-pending").innerHTML = s.pending.length ? s.pending.map((p) => {
+          const status = p.ready > s.cycle ? `מוכן ממחזור ${ltr(p.ready)}` : `<span class="wv-ok">מוכן</span>`;
+          return `<p class="ep-pend ${colour(p.id)}"><span class="ep-swatch"></span>‏Tag ${ltr(hex(p.tag, 2))}, ${ltr(hex(p.address))}, ${ltr(p.length)} בתים: ` +
+            `<span class="an-chips" dir="ltr">${p.cpls.map((c, i) => `<span class="an-chip${i === 0 ? " is-head" : ""}">${c.size} B · BC ${c.bc}</span>`).join("")}</span> ` +
+            `${p.sent ? `יצאו ${ltr(p.sent)} מתוך ${ltr(p.total)}, ` : ""}${status}.</p>`;
+        }).join("") : `<p class="an-empty">אין קריאות פתוחות.</p>`;
+        $(".an-log").innerHTML = (st.err ? `<span class="wv-bad">${st.err}</span> ` : "") + st.log;
+        $(".ep-table").innerHTML = s.out.length ? `<table><thead><tr><th>מחזור</th><th>Requester ID</th><th>Tag</th><th>כתובת</th><th>גודל</th><th>Byte Count</th><th>הבית הראשון והאחרון</th></tr></thead><tbody>` +
+          s.out.map((c) => `<tr class="${colour(c.read)}"><td>${ltr(c.cycle)}</td><td>${ltr(hex(c.rid, 4))}</td><td>${ltr(hex(c.tag, 2))}</td><td>${ltr(hex(c.address))}</td><td>${ltr(c.size)}</td><td>${ltr(c.bc)}</td><td>${ltr(`${hex(c.first, 2)} … ${hex(c.last, 2)}`)}</td></tr>`).join("") + `</tbody></table>` : `<p class="an-empty">עדיין לא יצא Completion.</p>`;
+        // the rules, checked on what went out
+        const perRead = new Map();
+        s.out.forEach((c) => { if (!perRead.has(c.read)) perRead.set(c.read, []); perRead.get(c.read).push(c); });
+        let ok = true, notes = [];
+        perRead.forEach((list, id) => {
+          const rd = s.reads.find((r) => r.id === id);
+          const ascending = list.every((c, i) => i === 0 || c.address === list[i - 1].address + list[i - 1].size);
+          const cuts = list.every((c, i) => i === 0 || c.address % EP_RCB === 0);
+          const bc = list.every((c, i) => c.bc === rd.length - (c.address - rd.address));
+          const mps = list.every((c) => c.size <= 256);
+          if (!(ascending && cuts && bc && mps)) ok = false;
+          const done = !s.pending.some((p) => p.id === id);
+          if (done && list.reduce((a, c) => a + c.size, 0) !== rd.length) ok = false;
+          notes.push(`Tag ${ltr(hex(rd.tag, 2))}: ${ltr(list.map((c) => c.size).join(" + "))}${done ? ` = ${ltr(rd.length)}` : " …"}`);
+        });
+        const perCycle = new Set(s.out.map((c) => c.cycle)).size === s.out.length;
+        $(".an-sum").innerHTML = s.out.length
+          ? (ok && perCycle ? `<span class="wv-ok">✓ בכל קריאה: סדר כתובות עולה, חיתוך רק על כפולות של 128, Byte Count יורד נכון, לכל היותר 256 בתים, ו-Completion אחד לכל היותר במחזור.</span> ` : `<span class="wv-bad">✗ כלל הופר.</span> `) + notes.join("; ") + "."
+          : `שולחים כתיבה וקריאות, ואז מקדמים מחזורים: כל קריאה מחכה זמן אקראי, ובין קריאות מוכנות הבחירה אקראית, ומכאן השילוב.`;
+      };
+      const parseAddr = () => { const t = $(".ex-addr").value.trim(); const v = /^0x[0-9a-f]+$/i.test(t) ? parseInt(t, 16) : /^\d+$/.test(t) ? Number(t) : NaN; return v; };
+      $(".ex-send").addEventListener("click", () => {
+        st.err = "";
+        const address = parseAddr(), length = Number($(".ex-len").value);
+        if (!Number.isFinite(address) || address < 0) st.err = "כתובת לא תקינה (הקסה, למשל 0x10020).";
+        else if (!(length >= 1 && length <= EP_MRRS)) st.err = `האורך חייב להיות בין 1 ל-${EP_MRRS} (MRRS).`;
+        else if (Math.floor(address / 4096) !== Math.floor((address + length - 1) / 4096)) st.err = "בקשה לא חוצה גבול של 4 KB.";
+        if (st.err) { render(); return; }
+        if ($(".ex-kind").value === "write") {
+          const w = st.s.writes.length + 1;
+          epWrite(st.s, address, Array.from({ length }, (_, i) => (i + 0x10 * w) & 0xFF));
+          st.log = `כתיבה ${ltr(w)}: ${ltr(length)} בתים מ-${ltr(hex(address))} (הבית ה-${ltr("i")} שווה ל-${ltr(`i + ${hex(0x10 * w)}`)}), posted: הבלוקים שנגעו בהם מתעדכנים, בלי Completion.`;
+        } else {
+          const tag = st.s.nextTag++, rid = 0x0200;
+          const p = epRead(st.s, { address, length, rid, tag }, st.rng);
+          st.log = `קריאה Tag ${ltr(hex(tag, 2))}: ${ltr(length)} בתים מ-${ltr(hex(address))}. ה-Completions נבנו עכשיו, בסדר כתובות: ${ltr(p.cpls.map((c) => c.size).join(" + "))} (חיתוך אקראי על גבולות 128), ויחכו עד מחזור ${ltr(p.ready)}.`;
+        }
+        render();
+      });
+      const cycle = () => {
+        const c = epCycle(st.s, st.rng);
+        st.err = "";
+        st.log = c ? `מחזור ${ltr(st.s.cycle)}: יוצא Completion של Tag ${ltr(hex(c.tag, 2))} מ-${ltr(hex(c.address))}, ${ltr(c.size)} בתים, Byte Count ${ltr(c.bc)}` + (st.s.pending.some((p) => p.tag === c.tag) ? ` (הבא של אותה קריאה אחרי המתנה אקראית).` : ` (האחרון של הקריאה).`)
+          : `מחזור ${ltr(st.s.cycle)}: אין קריאה מוכנה, לא יוצא דבר.`;
+      };
+      $(".ex-cycle").addEventListener("click", () => { cycle(); render(); });
+      $(".ex-run").addEventListener("click", () => { let guard = 0; while (st.s.pending.length && guard++ < 400) cycle(); if (!guard) st.log = "אין קריאות פתוחות."; render(); });
+      const load = (script) => {
+        st.s = epInit(); st.rng = epValueRng(script ? [...script.draws] : [], epUnitRng([])); st.err = "";
+        if (script) {
+          epWrite(st.s, 0x10000, Array.from({ length: 512 }, (_, i) => i & 0xFF));
+          script.reads.forEach(([address, length, rid, tag]) => epRead(st.s, { address, length, rid, tag }, st.rng));
+          st.s.nextTag = 0x30;
+          st.log = `הדוגמה שבעמוד: כתיבה של 512 בתים מ-${ltr("0x10000")} (הבית ה-${ltr("i")} שווה ל-${ltr("i mod 256")}) ושתי קריאות עם הפיצול וההמתנות שבעמוד. "מחזור" או "הרץ" מוציאים את ה-Completions.`;
+        } else st.log = "";
+        render();
+      };
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => load(EP_SCRIPTS[b.dataset.p])));
+      $(".ex-reset").addEventListener("click", () => load(null));
+      load(EP_SCRIPTS.b);
+    },
+  });
+
   const VIEWS = {
     "cake-arith": () => cakeView("arith"),
     "cake-geo": () => cakeView("geo"),
@@ -4549,6 +5103,9 @@
     gray: grayView,
     stock: stockView,
     handshake: handshakeView,
+    acknak: acknakView,
+    credits: creditsView,
+    endpoint: endpointView,
   };
 
   // --- the box -----------------------------------------------------------------------------

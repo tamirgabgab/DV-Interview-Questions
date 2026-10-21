@@ -285,3 +285,87 @@ def test_figures_up_to_date():
     page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
     for row in (l for l in out.splitlines() if l.startswith("|")):
         assert row.strip() in page_rows, row
+
+
+def test_explorer_matches_page_classes():
+    """The Ack/Nak explorer: its engine against TransmitterWithReplay and ReceiverWithNak on
+    300 random events (sends, deliveries, corruptions, losses, the two timers) with the
+    same scripted Ack thresholds, state by state; and its two scripts end where the page
+    tables end."""
+    import json
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(25)
+    events = []
+    for _ in range(300):
+        r = rng.random()
+        if r < 0.3:
+            events.append({"type": "send", "n": rng.randint(1, 3)})
+        elif r < 0.6:
+            events.append({"type": "tlp", "how": rng.choice(["ok", "ok", "ok", "bad", "lose"])})
+        elif r < 0.85:
+            events.append({"type": "dllp", "how": rng.choice(["ok", "ok", "ok", "bad", "lose"])})
+        elif r < 0.93:
+            events.append({"type": "flush"})
+        else:
+            events.append({"type": "timeout"})
+    thresholds = [rng.randint(1, 4) for _ in range(2000)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const th = {json.dumps(thresholds)}, draw = () => th.shift();
+      let s = m.anInit(4090, draw);
+      const out = [];
+      for (const ev of {json.dumps(events)}) {{
+        s = m.anApply(s, ev, draw).state;
+        out.push([s.nts, s.ackd, s.retry.map((t) => t.seq), s.link.map((t) => [t.seq, t.crcOk, t.replay]),
+                  s.dllps.map((d) => [d.kind, d.seq, d.crcOk]), s.nrs, s.nak, s.pending, s.threshold, s.received,
+                  s.badDllp, s.proto, s.replays, s.badTlp, s.dups]);
+      }}
+      const a = m.anRun(m.AN_SCRIPTS.a, () => 1).pop(), b = m.anRun(m.AN_SCRIPTS.b, () => 1).pop();
+      console.log(JSON.stringify({{ out, a: [a.nts, a.ackd, a.nrs, a.retry.length], b: [b.nts, b.ackd, b.nrs, b.badDllp, b.proto, b.replays, b.badTlp, b.dups] }}));""")
+
+    class Script:
+        def __init__(self, values):
+            self.values = list(values)
+
+        def randint(self, a, b):
+            v = self.values.pop(0)
+            assert a <= v <= b
+            return v
+
+    rc, ep = Tx(4090), Rx(4090, Script(thresholds))
+    payload = 0xA0
+    for ev, g in zip(events, got["out"]):
+        if ev["type"] == "send":
+            for _ in range(ev["n"]):
+                rc.send_tlp(Tlp(payload))
+                payload += 1
+        elif ev["type"] == "tlp":
+            if rc.tx_tlps:
+                t = rc.tx_tlps.pop(0)
+                if ev["how"] != "lose":
+                    if ev["how"] == "bad":
+                        t.crc_ok = False
+                    ep.receive_tlp(t)
+        elif ev["type"] == "dllp":
+            if ep.tx_dllps:
+                d = ep.tx_dllps.pop(0)
+                if ev["how"] != "lose":
+                    if ev["how"] == "bad":
+                        d.crc_ok = False
+                    rc.receive_dllp(d)
+        elif ev["type"] == "flush":
+            ep.flush_ack()
+        else:
+            rc.on_replay_timeout()
+        expected = [rc.next_transmit_seq, rc.ackd_seq, [t.seq for t in rc.retry_buffer],
+                    [[t.seq, t.crc_ok, t.is_replay] for t in rc.tx_tlps],
+                    [[d.kind.name, d.seq, d.crc_ok] for d in ep.tx_dllps],
+                    ep.next_rcv_seq, ep.nak_scheduled, ep.accepted_since_ack, ep.ack_threshold,
+                    [t.seq for t in ep.received_tlps],
+                    rc.bad_dllp_count, rc.protocol_error_count, rc.replay_count, ep.bad_tlp_count, ep.duplicate_count]
+        assert g == expected, ev
+    assert got["a"] == [3, 2, 3, 0]                       # the part a table: NEXT_TRANSMIT_SEQ 3, ACKD_SEQ 2, NEXT_RCV_SEQ 3
+    assert got["b"] == [2, 1, 2, 1, 1, 2, 3, 3]           # the part b table and its counters

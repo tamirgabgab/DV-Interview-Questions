@@ -1109,15 +1109,33 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
    `max_long_fast` / `max_profit_fast` on 300 random arrays, `tests/0038` against
    `check_handshake` on the four traces and 400 random traces with max_wait 3 and 2.
    Phone and axe checks clean on both pages in both schemes.
+7. **Round 4, the protocol trio (owner's answers: free event buttons plus the page's
+   examples as scripts; deliver / corrupt / lose for the head of each link queue; the
+   counters on a modulo-256 circle with a table; part b of 0023 with cycles and
+   interleaving).** T126, `acknak` on 0025: `anApply(state, event, rnd)` is the page's
+   two part b classes ported as one pure step over a state with the two link queues
+   (`tx_tlps` / `tx_dllps` become the queues the user empties); `AN_SCRIPTS` are the
+   generator's two runs (start 4094, scripted thresholds, the tampered Ack 9 as a script
+   event). T125, `credits` on 0024: `crApply` with the page's errors counted instead of
+   raised; `CR_SCRIPTS` the two runs; the circle draws the PCC→PCL and PCR→PCA arcs and
+   the summary flags the leak (PCA − PCR ≠ free slots) until the Sync. T127, `endpoint`
+   on 0023: the unaligned model with `{randint, choice}` draws in the page's order so the
+   examples' `Script(...)` values reproduce the page tables and the tests replay unit
+   draws on both sides; the block map colours bytes by write and outlines open reads.
+   Tests: `tests/0025` (300 random events against the page classes, state by state),
+   `tests/0024` (400 events from 0 and from 250), `tests/0023` (40 random requests run to
+   completion with the same draws, memory compared block by block); all three check the
+   page tables through the scripts.
 
 ---
 
 ## In progress
 
-- Session 20: round 1 (0001, 0036, 0035, 0034) is on `main` (724be4b) and round 2
-  (0006, 0038) follows it. Next by the owner's plan: round 4 = the protocol trio T125 to
-  T127 (0025, 0024, 0023); round 3 (T124, the code tracer for 0002 / 0003) was listed
-  but not chosen. Multiple-choice questions before each round, as before.
+- Session 20: rounds 1 (0001, 0036, 0035, 0034), 2 (0006, 0038) and 4 (0025, 0024,
+  0023) of the explorer batch are done; `main` follows each round. Every question but
+  0002 and 0003 now has an explorer; T124 (the code tracer for those two) was listed but
+  not chosen. Next: the owner's pick (T124, open rounds D to F, I, L, N, O, Q, S, or new
+  questions).
 - Owner's checks on the live site: the five WaveDrom diagrams of round R (0034, 0035,
   0038), the dragging in the explorers on a real phone, and the new timing strips
   (0001, 0035) scrolled sideways on a phone.
@@ -1523,9 +1541,9 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 | ~~T122~~ | Done in session 19. Was: 0004 three boxes | **Sample a ball**: tap a box to draw one ball (the hidden contents are random each time), the deduction appears line by line; "try the wrong box first" shows why one draw from "red" or "black" is not enough | S |
 | ~~T123~~ | Done in session 20. Was: 0001 edge detector | **Waveform lab**: click the input per cycle, the output and the flop values appear on a live WaveDrom-like strip with the two-flop diagram beside it; a toggle for the one-cycle-late variant of the follow-ups | S–M |
 | T124 | 0002, 0003 swaps and loops | **Code tracer**: a step button runs the page's loop with a variable table and the current line highlighted (the swap variants, the double loop); one component reused by every short-code question | M |
-| T125 | 0024 USB4 credits | **Credit flow**: sliders for the buffer size and the packet rate, the two modulo-256 counters and the credits in flight animated, a "lose a packet" button and the resynchronisation that follows, as in the page's step figures | M–L |
-| T126 | 0025 PCIe Ack/Nak | **Sequence timeline**: send TLPs, press Ack / Nak at the receiver, watch the Retry Buffer fill and empty, a Replay after a Nak or a timeout; the page's error cases as presets | M–L |
-| T127 | 0023 PCIe endpoint | **Request builder** on top of M73: address, length, MPS, RCB → the completions the model returns and the memory reads it performs, reusing the split explorer | L (after M73) |
+| ~~T125~~ | Done in session 20. Was: 0024 USB4 credits | **Credit flow**: sliders for the buffer size and the packet rate, the two modulo-256 counters and the credits in flight animated, a "lose a packet" button and the resynchronisation that follows, as in the page's step figures | M–L |
+| ~~T126~~ | Done in session 20. Was: 0025 PCIe Ack/Nak | **Sequence timeline**: send TLPs, press Ack / Nak at the receiver, watch the Retry Buffer fill and empty, a Replay after a Nak or a timeout; the page's error cases as presets | M–L |
+| ~~T127~~ | Done in session 20. Was: 0023 PCIe endpoint | **Request builder** on top of M73: address, length, MPS, RCB → the completions the model returns and the memory reads it performs, reusing the split explorer | L (after M73) |
 | ~~T128~~ | Done in session 20: 0036 LFSR | **Tap lab**: tick the taps, step or play on a ring of the 15 states, the output bits, the table of the eight polynomials | S–M |
 | ~~T129~~ | Done in session 20: 0035 divide by 3 | **Half-cycle stepper**: cnt, a, b and clk_out edge by edge, the overlap shaded, the duty measured; a wake-up in state 3 in three counter variants | S–M |
 | ~~T130~~ | Done in session 20: 0034 Gray pointers | **Sampled step and flags**: every changing bit arrived or not (binary against Gray); a 16-entry FIFO with 5-bit pointers and the full / empty rules | M |
@@ -1535,8 +1553,8 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 Suggested order: T114, T118, T122 (small, each page gets its "try it" box in an hour),
 then T113 and T115 (the two algorithm animations that readers ask about most), T121 and
 T120, and the protocol trio T125 to T127 after M73. Session 19 did T118, T113, T115, T119
-and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T130, T131 and T132.
-Open: T124 (not chosen), then T125 to T127 (round 4).
+and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T132 and T125 to T127.
+Open: T124 only (not chosen).
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.

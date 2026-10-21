@@ -291,3 +291,64 @@ def test_figures_up_to_date():
     page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
     for row in (l for l in out.splitlines() if l.startswith("|")):
         assert row.strip() in page_rows, row
+
+
+def test_explorer_matches_page_classes():
+    """The credits explorer: its engine against EgressSyncModel and IngressSyncModel on
+    random events (the page's errors become counted violations), from 0 and from 250 for
+    the wrap; its two scripts reproduce the page tables."""
+    import json
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(24)
+    events = []
+    for _ in range(400):
+        r = rng.random()
+        if r < 0.12:
+            events.append({"type": "grant"})
+        elif r < 0.45:
+            events.append({"type": "transmit"})
+        elif r < 0.72:
+            events.append({"type": "receive", "how": rng.choice(["ok", "ok", "ok", "lose"])})
+        elif r < 0.92:
+            events.append({"type": "dequeue"})
+        else:
+            events.append({"type": "sync"})
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const run = (base) => {{ let s = m.crInit(5, base); const out = [];
+        for (const ev of {json.dumps(events)}) {{ s = m.crApply(s, ev).state; out.push([s.pcc, s.pcl, s.pcr, s.pca, s.occ, s.errors, m.crCanTransmit(s), s.link.length]); }}
+        return out; }};
+      const table = (states) => states.map((s) => [s.pcc, s.pcl, s.pcr, s.pca, s.occ, m.crDist(s.pcc, s.pcl)]);
+      console.log(JSON.stringify({{ from0: run(0), from250: run(250), a: table(m.crRun(m.CR_SCRIPTS.a)), b: table(m.crRun(m.CR_SCRIPTS.b)) }}));""")
+    for base, rows in ((0, got["from0"]), (250, got["from250"])):
+        eg, ing = Egress(1), Ingress(1, 5)
+        eg.pcc = eg.pcl = ing.pcr = base
+        ing.pca = (base + 5) % 256
+        link, errors, next_id = [], 0, 1
+        for ev, g in zip(events, rows):
+            try:
+                if ev["type"] == "grant":
+                    eg.consume_credit_grant(ing.build_credit_grant())
+                elif ev["type"] == "transmit":
+                    eg.on_packet_transmitted()
+                    link.append(next_id)
+                    next_id += 1
+                elif ev["type"] == "receive":
+                    if link:
+                        pkt = TunneledPacket(1, link.pop(0))
+                        ing.on_packet_received(pkt, ev["how"] == "ok")
+                elif ev["type"] == "dequeue":
+                    ing.on_packet_dequeued()
+                else:
+                    ing.consume_credit_sync(eg.build_credit_sync())
+            except ValueError:
+                errors += 1
+            assert g == [eg.pcc, eg.pcl, ing.pcr, ing.pca, ing.rx_occupancy, errors, eg.can_transmit(), len(link)], (base, ev)
+    # the page tables (part a: step 8 is the burst of four packets, here four steps)
+    assert got["a"][0] == [0, 0, 0, 5, 0, 0] and got["a"][1] == [0, 5, 0, 5, 0, 5] and got["a"][7] == [3, 7, 3, 7, 1, 4]
+    assert got["a"][-1] == [7, 7, 7, 7, 5, 0]
+    assert got["b"][3] == [2, 5, 1, 5, 1, 3] and got["b"][7] == [3, 7, 2, 7, 0, 4]
+    assert got["b"][8] == [3, 7, 3, 8, 0, 4] and got["b"][9] == [3, 8, 3, 8, 0, 5]
