@@ -1813,3 +1813,98 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .b3-step { margin: 0.5em 0 0.2em; }
 .md-typeset .explorer .b3-lines { margin: 0.2em 0; padding-inline-start: 1.3rem; }
 .md-typeset .explorer .b3-lines li { margin: 0.1em 0; }
+
+/* Timing strips (0001, 0035): a scrollable strip of rows over clock cycles */
+.md-typeset .explorer .wv-wrap { overflow-x: auto; margin-top: 0.5rem; direction: ltr; padding-bottom: 0.2rem; }
+.md-typeset .explorer .wv-wrap:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer svg.wave-strip { display: block; max-width: none; }
+.md-typeset svg .wv-grid { stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .wv-grid-half { stroke-dasharray: 2 3; }
+.md-typeset svg .wv-name { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg .wv-tick { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .wv-line { fill: none; stroke: var(--viz-ink); stroke-width: 2; stroke-linejoin: round; }
+.md-typeset svg .wv-line.wv-dim { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .wv-line.wv-s1 { stroke: var(--viz-s1); }
+.md-typeset svg .wv-line.wv-s2 { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .wv-line.wv-s3 { stroke: var(--viz-s3); }
+.md-typeset svg .wv-high { fill: var(--viz-ink); fill-opacity: 0.08; }
+.md-typeset svg .wv-high.wv-s1 { fill: var(--viz-s1); fill-opacity: 0.14; }
+.md-typeset svg .wv-high.wv-s2 { fill: var(--viz-s2); fill-opacity: 0.16; }
+.md-typeset svg .wv-high.wv-s3 { fill: var(--viz-s3); fill-opacity: 0.14; }
+.md-typeset svg .wv-high.wv-dim { fill-opacity: 0.04; }
+.md-typeset svg .wv-mark { fill: var(--viz-s3); fill-opacity: 0.22; }
+.md-typeset svg .wv-bus { fill: var(--site-primary-soft); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .wv-val { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg .wv-cursor { fill: var(--viz-s2); fill-opacity: 0.1; stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.md-typeset svg .wv-cell { fill: transparent; cursor: pointer; }
+.md-typeset svg .wv-cell:hover { fill: var(--viz-s1); fill-opacity: 0.1; }
+.md-typeset svg .wv-cell:focus-visible { outline: none; stroke: var(--site-focus-ring); stroke-width: 2.5; }
+.md-typeset .explorer .wv-hint { margin: 0.4em 0 0; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .wv-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0.1rem; }
+.md-typeset .explorer .wv-step { margin: 0.4em 0; }
+.md-typeset .explorer .wv-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .wv-bad { color: var(--diff-hard); font-weight: 700; }
+
+/* LFSR explorer (0036): the taps, the ring of states, the output bits, the table */
+.md-typeset .explorer .lf-taps { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.5rem; font-family: var(--md-code-font-family); font-size: 0.75rem; }
+.md-typeset .explorer .lf-taps label { gap: 0.2rem; }
+.md-typeset .explorer .lf-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0.1rem; }
+.md-typeset .explorer .lf-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .lf-ring { flex: 0 1 19rem; }
+.md-typeset .explorer svg.lf-live { width: 19rem; max-width: 100%; display: block; }
+.md-typeset .explorer .lf-panel { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .lf-panel p { margin: 0.3em 0; }
+.md-typeset svg .lf-node circle { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .lf-node text { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .lf-node.is-seen circle { fill: var(--viz-s1); fill-opacity: 0.18; stroke: var(--viz-s1); }
+.md-typeset svg .lf-node.is-seen text { fill: var(--viz-ink); }
+.md-typeset svg .lf-node.is-seed circle { stroke-width: 3; }
+.md-typeset svg .lf-node.is-cur circle { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .lf-node.lf-zero circle { stroke-dasharray: 3 3; }
+.md-typeset svg .lf-edge { stroke: var(--viz-s1); stroke-width: 1.5; stroke-opacity: 0.7; }
+.md-typeset svg .lf-edge.is-cur { stroke: var(--viz-s2); stroke-width: 2.5; stroke-opacity: 1; }
+.md-typeset svg .lf-arrowhead { fill: var(--viz-ink); }
+.md-typeset svg .lf-loop { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 3 2; }
+.md-typeset .explorer .lf-out { font-family: var(--md-code-font-family); font-size: 0.8rem; letter-spacing: 0.12em; word-break: break-all; }
+.md-typeset .explorer .lf-out span.is-cur { color: var(--viz-s2-text); font-weight: 700; }
+.md-typeset .explorer .lf-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .lf-bad { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer .lf-table { margin-top: 0.3rem; overflow-x: auto; }
+.md-typeset .explorer .lf-table table { font-size: 0.72rem; margin: 0; }
+.md-typeset .explorer .lf-table td, .md-typeset .explorer .lf-table th { padding: 0.2em 0.7em; }
+.md-typeset .explorer .lf-table tr.is-max td { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer .lf-table tr.is-cur td { background: var(--md-code-bg-color); }
+
+/* Gray pointers explorer (0034): the sampled bits, the FIFO slots, the pointer table */
+.md-typeset .explorer .gr-box { display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; align-items: flex-start; margin-top: 0.4rem; }
+.md-typeset .explorer .gr-side { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .gr-side p { margin: 0.3em 0; }
+.md-typeset .explorer .gr-row { display: flex; align-items: center; gap: 0.6rem; margin: 0.2rem 0; }
+.md-typeset .explorer .gr-label { flex: 0 0 3rem; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .gr-bits { display: inline-flex; gap: 0.2rem; }
+.md-typeset .explorer .gr-bit { display: inline-flex; align-items: center; justify-content: center; width: 1.7rem; height: 1.7rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem; font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.85rem; color: var(--viz-ink); background: var(--md-default-bg-color); }
+.md-typeset .explorer .gr-bit.is-changed { border-color: var(--viz-s2); border-width: 2.5px; }
+.md-typeset .explorer button.gr-btn { cursor: pointer; padding: 0; font: inherit; font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset .explorer button.gr-btn.is-old { background: var(--viz-s2); background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset .explorer button.gr-btn.is-new { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset .explorer button.gr-btn:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer .gr-dec { font-variant-numeric: tabular-nums; font-size: 0.75rem; color: var(--viz-text); }
+.md-typeset .explorer .gr-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .gr-bad { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer .gr-slots { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 0.15rem; margin-top: 0.6rem; max-width: 36rem; }
+.md-typeset .explorer .gr-slot { display: flex; flex-direction: column; align-items: center; font-family: var(--md-code-font-family); font-size: 0.6rem; color: var(--viz-text); }
+.md-typeset .explorer .gr-slot .gr-idx { display: block; width: 100%; text-align: center; padding: 0.35rem 0; border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--viz-ink); }
+.md-typeset .explorer .gr-slot.is-full .gr-idx { background: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset .explorer .gr-slot .gr-w, .md-typeset .explorer .gr-slot .gr-r { height: 1rem; font-weight: 700; }
+.md-typeset .explorer .gr-slot .gr-w { color: var(--viz-s2-text); }
+.md-typeset .explorer .gr-slot .gr-r { color: var(--viz-s3-text); }
+.md-typeset .explorer .gr-ptrs { margin-top: 0.4rem; overflow-x: auto; }
+.md-typeset .explorer .gr-ptrs table { font-size: 0.72rem; margin: 0; }
+.md-typeset .explorer .gr-ptrs td, .md-typeset .explorer .gr-ptrs th { padding: 0.2em 0.7em; }
+.md-typeset .explorer .gr-ptrs td[dir="ltr"] { font-family: var(--md-code-font-family); letter-spacing: 0.1em; }
+.md-typeset .explorer .gr-top { color: var(--viz-s2-text); font-weight: 700; }
+.md-typeset .explorer .gr-top2 { color: var(--viz-s2-text); font-weight: 700; margin-inline-end: 0.2em; border-inline-end: 1.5px solid var(--viz-grid); padding-inline-end: 0.15em; }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .gr-slots { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  .md-typeset .explorer .gr-bit { width: 1.5rem; height: 1.5rem; }
+}

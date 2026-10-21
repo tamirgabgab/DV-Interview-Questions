@@ -1060,11 +1060,55 @@ axe check warns only; `main` is updated at the end of each round.
 
 ---
 
+### Session 20 — 2026-10-21: explorers round 1 (0001, 0036, 0035, 0034)
+
+The owner asked for more explorer proposals in rounds; the thirteen pages without one
+were grouped (hardware basics, algorithms, the code tracer, the protocol trio) and the
+owner chose round 1 first, then round 2 (0006, 0038) and round 4 (0025, 0024, 0023).
+Note: 0027 / 0028 were listed as candidates by mistake (they already have the `cake-*`
+box). Owner's answers to the multiple-choice questions: 0001 with an edge select
+(rise / fall / both) and a "sig high during reset" toggle; 0036 fixed at 4 bits; 0035
+stepped half a cycle at a time with play, a wake-up in state 3 and the overlap of a and
+b highlighted (no comparison with a plain counter); 0034 with both the synchroniser
+sampling (bits tapped or drawn at random) and the FIFO flags.
+
+1. **T123, `edge` on 0001:** a shared timing-strip helper (`waveStrip`: clock, bit and
+   bus rows, cells as buttons, a cursor, shaded marks, half-cycle mode; the wrapper
+   scrolls sideways on phones and is focusable for axe). Cycle 0 is the reset cycle, so
+   the "sig high during reset" toggle is sig[0] and the phantom pulse of note 2 on the
+   page appears there. `tests/0001/test_0001.py` (new; the question only had `tb.sv`)
+   replays the circuit in Python, parses the page's WaveDrom rows and checks one high
+   cycle per edge.
+2. **T128, `lfsr` on 0036:** tap checkboxes in a `dir="ltr"` span (the polynomial reads
+   left to right), a ring of the 15 non-zero states in numeric order with 0000 in the
+   middle, the walk with arrows and the closing edge back to 0001, the output bits, the
+   table of the eight polynomials. `lfsrWalk` returns `{states, period, back}`.
+3. **T129, `div3` on 0035:** `div3Trace(halfCycles, cnt0, counter)` with three counter
+   variants. **Found while building it:** from state 3 the module's 2-bit counter wraps
+   `3 + 1` to 0 and recovers after one cycle, but the page's Python model has no width,
+   so from 3 it counts 4, 5, 6… and `a` never rises. The state is unreachable after
+   reset, so the published tests are unaffected; the explorer's "wide" variant shows it
+   and the page's intro paragraph says so (reported to the owner, not changed).
+4. **T130, `gray` on 0034:** two boxes of one kind, `data-mode="sync"` in part a (the
+   page's 7 → 8 example preset: bits 3 and 0 arrived, 1110) and `data-mode="flags"` in
+   part c (16 slots, W and R markers, the pointers split top bit / top two bits, the rule
+   lines). `tests/0034` checks every 5-bit pointer pair and every arrived subset of
+   every 4-bit step.
+5. **Checks:** lint 38/38, Python tests, strict build, links, phone check light and dark
+   with axe on the four pages.
+
+---
+
 ## In progress
 
-- Session 19: the Staff removal, the ten round T explorers and the 0007 polygon part are
-  on `main` (45d16eb). Owner's checks on the live site: the five WaveDrom diagrams of
-  round R (0034, 0035, 0038), and the dragging in the explorers on a real phone.
+- Session 20: round 1 of the second explorer batch (0001, 0036, 0035, 0034) is on the
+  work branch; `main` follows at the end of the round. The owner's plan for the next
+  rounds: round 2 = 0006 (stock) and 0038 (handshake), then round 4 = the protocol trio
+  T125 to T127 (0025, 0024, 0023); round 3 (T124, the code tracer for 0002 / 0003) was
+  listed but not chosen. Multiple-choice questions before each round, as before.
+- Owner's checks on the live site: the five WaveDrom diagrams of round R (0034, 0035,
+  0038), the dragging in the explorers on a real phone, and the new timing strips
+  (0001, 0035) scrolled sideways on a phone.
 - Next: the owner's picks from round T (explorers for existing questions), the rest of
   round Q, rounds D to F, I, L, N, O and S, or new questions. (R105 and I59, the staff
   questions, are dropped with the Staff level.)
@@ -1465,16 +1509,22 @@ cannot show; the pattern (play loop, stepper, drag, "generate") is the one alrea
 | ~~T120~~ | Done in session 19. Was: 0012, 0013 Kaprekar | **Iterate**: type a number, sort-subtract step by step until 495 / 6174, the chain drawn; a histogram of the number of steps over all numbers (the page's part b) with the typed number highlighted | S–M |
 | ~~T121~~ | Done in session 19. Was: 0008 Eurovision | **Announcement slider**: the cups chart with a slider "countries announced so far"; the room left for Israel against the points left, the moment of certain loss marked; a "what if" box to change Israel's jury score and watch the moment move | S–M |
 | ~~T122~~ | Done in session 19. Was: 0004 three boxes | **Sample a ball**: tap a box to draw one ball (the hidden contents are random each time), the deduction appears line by line; "try the wrong box first" shows why one draw from "red" or "black" is not enough | S |
-| T123 | 0001 edge detector | **Waveform lab**: click the input per cycle, the output and the flop values appear on a live WaveDrom-like strip with the two-flop diagram beside it; a toggle for the one-cycle-late variant of the follow-ups | S–M |
+| ~~T123~~ | Done in session 20. Was: 0001 edge detector | **Waveform lab**: click the input per cycle, the output and the flop values appear on a live WaveDrom-like strip with the two-flop diagram beside it; a toggle for the one-cycle-late variant of the follow-ups | S–M |
 | T124 | 0002, 0003 swaps and loops | **Code tracer**: a step button runs the page's loop with a variable table and the current line highlighted (the swap variants, the double loop); one component reused by every short-code question | M |
 | T125 | 0024 USB4 credits | **Credit flow**: sliders for the buffer size and the packet rate, the two modulo-256 counters and the credits in flight animated, a "lose a packet" button and the resynchronisation that follows, as in the page's step figures | M–L |
 | T126 | 0025 PCIe Ack/Nak | **Sequence timeline**: send TLPs, press Ack / Nak at the receiver, watch the Retry Buffer fill and empty, a Replay after a Nak or a timeout; the page's error cases as presets | M–L |
 | T127 | 0023 PCIe endpoint | **Request builder** on top of M73: address, length, MPS, RCB → the completions the model returns and the memory reads it performs, reusing the split explorer | L (after M73) |
+| ~~T128~~ | Done in session 20: 0036 LFSR | **Tap lab**: tick the taps, step or play on a ring of the 15 states, the output bits, the table of the eight polynomials | S–M |
+| ~~T129~~ | Done in session 20: 0035 divide by 3 | **Half-cycle stepper**: cnt, a, b and clk_out edge by edge, the overlap shaded, the duty measured; a wake-up in state 3 in three counter variants | S–M |
+| ~~T130~~ | Done in session 20: 0034 Gray pointers | **Sampled step and flags**: every changing bit arrived or not (binary against Gray); a 16-entry FIFO with 5-bit pointers and the full / empty rules | M |
+| T131 | 0006 stock | **Scan lab**: an editable price chart (drag or random), the scan animated with the running minimum and the best trade so far, a long / short toggle for part b | M |
+| T132 | 0038 handshake | **Rule checker**: draw req and ack on a timing strip (the `waveStrip` helper), the four rules evaluated every cycle, a violation marked with its rule, the three violations of the page as presets | M |
 
 Suggested order: T114, T118, T122 (small, each page gets its "try it" box in an hour),
 then T113 and T115 (the two algorithm animations that readers ask about most), T121 and
 T120, and the protocol trio T125 to T127 after M73. Session 19 did T118, T113, T115, T119
-and T114, then T117, T116, T120, T121 and T122. Open: T123 to T127.
+and T114, then T117, T116, T120, T121 and T122. Session 20 did T123 and T128 to T130.
+Open: T124 (not chosen), T131 and T132 (round 2), then T125 to T127 (round 4).
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
