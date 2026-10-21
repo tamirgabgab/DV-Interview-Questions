@@ -119,6 +119,22 @@ def test_js_matches_python():
         assert abs(T - cake.threshold(A, d)) < 1e-12
 
 
+def test_js_wide_ranges():
+    """The box's wide ranges: a negative d stops the queue at the first non-positive
+    fraction, d = 0 never finishes (capped), and a tiny a = d lists 10,000 people with the
+    hundredth on top, as the page's follow-up says."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"const m = {explorer_require()};"
+                    "const r = (a, d) => { const rows = m.cakeSplit('arith', a, d); return [rows.length, m.cakeDone(rows), m.cakeBest(rows)]; };"
+                    "console.log(JSON.stringify([r(0.01, -0.2), r(0.3, 0), r(0.0001, 0.0001), r(0.55, 0.8), m.CAKE_MAX]));")
+    neg, zero, tiny, jump, cap = got
+    assert neg == [1, False, [1]]
+    assert zero == [cap, False, [1]]
+    assert tiny == [10000, True, [100]]
+    assert jump == [2, True, [1]]
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 

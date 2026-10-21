@@ -135,6 +135,20 @@ def test_js_matches_python():
         assert (f["k"], f["tie"]) == closed_form(A, Q), (a, q)
 
 
+def test_js_wide_ranges():
+    """The box's wide ranges: q below 1 never finishes (the queue stops at a negligible
+    fraction, the first person on top), q = 3 with a = 0.6 is the page's two-person case."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"const m = {explorer_require()};"
+                    "const r = (a, q) => { const rows = m.cakeSplit('geo', a, q); return [rows.length, m.cakeDone(rows), m.cakeBest(rows), rows[rows.length - 1].p]; };"
+                    "console.log(JSON.stringify([r(0.01, 0.9), r(0.5, 1), r(0.6, 3), m.CAKE_MAX]));")
+    below, one, three, cap = got
+    assert below[1] is False and below[2] == [1] and below[3] < 1e-8 and below[0] < cap
+    assert one == [cap, False, [1], 0.5]
+    assert three[:3] == [2, True, [1]]
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 

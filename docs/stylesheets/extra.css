@@ -1293,6 +1293,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .cake-slice2 { fill: var(--viz-s3); fill-opacity: 0.85; }
 .md-typeset svg .cake-peak { fill: var(--viz-s2); }
 .md-typeset svg .cake-rest { fill: var(--viz-grid); }
+.md-typeset svg .cake-tiny { fill: var(--viz-text); fill-opacity: 0.35; }
 .md-typeset svg .cake-gone { fill: none; stroke: var(--viz-text); stroke-opacity: 0.45; stroke-width: 1; stroke-dasharray: 4 3; }
 .md-typeset svg .cake-edge { fill: none; stroke: var(--viz-ink); stroke-width: 1.2; }
 .md-typeset .viz-legend .cake-slice { background: var(--viz-s1); opacity: 0.85; margin-inline-end: 0.1rem; }
@@ -1427,7 +1428,12 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer svg.cake-live { width: 100%; display: block; }
 .md-typeset .explorer .cake-panel { flex: 1 1 15rem; min-width: 0; }
 .md-typeset .explorer .cake-panel p { margin: 0.2em 0 0.4em; }
+.md-typeset .explorer .cake-scroll { max-height: 19rem; overflow-y: auto; position: relative; }
+.md-typeset .explorer .cake-scroll thead th { position: sticky; top: 0; background: var(--md-default-bg-color); }
 .md-typeset .explorer .cake-table { font-size: 0.7rem; margin: 0; }
+.md-typeset .explorer input.ex-num { width: 5.2rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; margin-inline-start: 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .cake-note { margin: 0.2em 0 0.4em; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .cake-note:empty { display: none; }
 .md-typeset .explorer .cake-table td, .md-typeset .explorer .cake-table th { padding: 0.15em 0.6em; }
 .md-typeset .explorer .cake-table tr.is-best td { font-weight: 700; color: var(--viz-s2-text); }
 .md-typeset .explorer .cake-table tr[data-now] td { background: var(--md-code-bg-color); }
