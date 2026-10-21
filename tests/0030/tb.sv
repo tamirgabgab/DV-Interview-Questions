@@ -45,6 +45,7 @@ module tb;
   endfunction
 
   initial begin
+    real a, b, h, y0, z0, y1, z1, air;
     real d, ey, ez, d2, ey2, ez2;
 
     // the reference cases
@@ -64,12 +65,13 @@ module tb;
     // random boxes: never shorter than through the air, exit on an edge, symmetric
     void'($urandom(30));
     for (int i = 0; i < 2000; i++) begin
-      real a = 1.0 + ($urandom % 300) / 10.0;
-      real b = 1.0 + ($urandom % 200) / 10.0;
-      real h = 1.0 + ($urandom % 200) / 10.0;
-      real y0 = ($urandom % 1001) / 1000.0 * b, z0 = ($urandom % 1001) / 1000.0 * h;
-      real y1 = ($urandom % 1001) / 1000.0 * b, z1 = ($urandom % 1001) / 1000.0 * h;
-      real air = $sqrt(a * a + (y1 - y0) * (y1 - y0) + (z1 - z0) * (z1 - z0));
+      // assigned, not declared with initialisers: a static block would initialise them once
+      a = 1.0 + ($urandom % 300) / 10.0;
+      b = 1.0 + ($urandom % 200) / 10.0;
+      h = 1.0 + ($urandom % 200) / 10.0;
+      y0 = ($urandom % 1001) / 1000.0 * b; z0 = ($urandom % 1001) / 1000.0 * h;
+      y1 = ($urandom % 1001) / 1000.0 * b; z1 = ($urandom % 1001) / 1000.0 * h;
+      air = $sqrt(a * a + (y1 - y0) * (y1 - y0) + (z1 - z0) * (z1 - z0));
       d = shortest_path(a, b, h, y0, z0, y1, z1, ey, ez);
       if (d < air - 1e-9 || d > a + b + 2.0 * h + 1e-9) begin
         errors++;
