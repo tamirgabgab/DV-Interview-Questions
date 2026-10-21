@@ -1140,7 +1140,12 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
    functions (both modes, aliased or not); `tests/0003` compares with `mystery`, an
    instrumented copy of the loop and the invariant on 150 random arrays.
 9. **Checks for rounds 4 and T124:** lint 38/38, Python tests, strict build, links, phone
-   and axe light and dark on the five pages, all clean.
+   and axe light and dark on the five pages, all clean. The T124 deploy (9ff60a1)
+   succeeded.
+10. **Explorer audit:** every kind in `explorer.js` compared with its page's "try it
+    yourself" text and follow-up questions; the findings and three new proposal rounds
+    (V infrastructure, W follow-ups per page, X timing strips) are recorded under
+    "Round U" in the redesign plan, with a suggested order.
 
 ---
 
@@ -1148,9 +1153,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 
 - Session 20: rounds 1 (0001, 0036, 0035, 0034), 2 (0006, 0038), 4 (0025, 0024, 0023)
   and T124 (0002, 0003) of the explorer batch are done; `main` follows each round. Every
-  question now has an explorer. Round T is closed. Next: the owner's pick from the
-  explorer polish list (round U below), the open rounds D to F, I, L, N, O, Q, S, or new
-  questions.
+  question now has an explorer. Round T is closed. An audit of all 34 explorer kinds
+  against the pages' follow-up questions produced rounds V (infrastructure), W (follow-ups
+  per page) and X (timing strips), recorded under "Round U" below. Next: the owner's pick
+  from rounds U to X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1161,7 +1167,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 - Owner's checks on the live site: the five WaveDrom diagrams of round R (0034, 0035,
   0038), the dragging in the explorers on a real phone, and the new timing strips
   (0001, 0035) scrolled sideways on a phone.
-- Next: the owner's picks from round T (explorers for existing questions), the rest of
+- Next: the owner's picks from rounds U to X (explorer polish), the rest of
   round Q, rounds D to F, I, L, N, O and S, or new questions. (R105 and I59, the staff
   questions, are dropped with the Staff level.)
 - Waiting on the owner: enable Discussions and giscus (README, Comments) and fill in
@@ -1176,7 +1182,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
-- [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14). M and R (without R105) are picked for sessions 17 and 18.
+- [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14), U to X (explorer polish, proposed in session 20). M and R (without R105) are picked for sessions 17 and 18.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
@@ -1588,6 +1594,91 @@ and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T13
 | U137 | 0007, 0014, 0009 | **Keyboard dragging**: arrow keys move a focused point or shape, as the stock box does; the triangle and polygon points are the first | S |
 | U138 | all | **A "reset everything" and a help tooltip per box**: one line that says what the box shows and what each button does, for first-time readers | S |
 | U139 | 0034, 0036 | **Wider widths**: an N select (4 to 6 bits) on the Gray box and on the LFSR box, with the table of primitive polynomials per width | M |
+
+### Survey of the explorers (session 20)
+
+An audit of all 34 kinds in `explorer.js` against each page's "try it yourself" text and
+its follow-up questions, done before rounds V to X were proposed:
+
+- The largest gap is follow-up questions that change one parameter the box does not
+  expose (listed per page in round W). Slider ranges block page examples in the cake
+  boxes (0027 / 0028 ask a=0.55 with d=0.8, q=3) and in the PCIe boxes (L stops at 2048,
+  the follow-up asks 4 KB).
+- No box keeps state in the URL, takes a random seed, or has copy / export. "Back to the
+  page's values" is missing in triangle, polygon, ttt, gray (sync), brackets, trace (swap)
+  and bfs01.
+- Play is missing in 15 boxes (the 0009 walk, eurovision, acknak, credits, endpoint, edge,
+  handshake, pcie, fifo, mtbf, probability, strip, ttt, kaprekar, polygon); "previous" is
+  missing in lfsr, div3, endpoint and gray (flags); cake, hourglass, bridge and river play
+  without a speed control. Arrow keys exist only in the stock box; the drag-only boxes
+  (clock, strip, triangle, polygon) have no keyboard path.
+- `waveStrip` is used by three boxes (edge, div3, handshake) but suits lfsr, gray (flags),
+  fifo and the three protocol models; the enlarge button (`dvqDecorate`) is wired in 11
+  boxes of 34; the generic slider / reset / summary code in `setup()` is dead (every view
+  has its own `mount`).
+
+### Round V — explorer infrastructure (proposed in session 20, owner picks)
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| V140 | all with prev / next | **Arrow keys step** (← / → when the box has focus, space for play) in every stepping box; a "previous" button in lfsr, div3, endpoint and gray (flags) | S–M |
+| V141 | the 14 boxes with a random button | **Random seed**: a small seed field next to every "random" button and a "copy link" that carries it (complements U134) | S–M |
+| V142 | 0007, 0011, 0034, 0010, 0002, 0005 | **"Back to the page's example"** in every box that starts from the page's values (triangle, polygon, ttt, gray sync, brackets, trace swap, bfs01) | S |
+| V143 | 0027, 0028, 0018, 0019, 0031, 0032, 0009, 0025, 0024, 0023, 0033 | **Uniform speed control** on every play (cake, hourglass, bridge, river) and play where only "next" exists (the 0009 walk, acknak, credits, endpoint, fifo) | S |
+| V144 | all | **Enlarge button on every box** (11 of 34 today) and removal of the unused generic slider code in `setup()` | S |
+
+### Round W — follow-up questions inside the boxes (proposed in session 20, owner picks)
+
+One row per page: what the box lacks to try the page's own follow-up questions.
+
+| Page | Missing | Size |
+|---|---|---|
+| 0001 edge | A pulse of N cycles and a registered output | S |
+| 0002 trace (swap) | A three-variable rotation; a reset | S |
+| 0003 trace (loop) | The `j < i` and flipped-condition variants; a stability check with tagged equal items | S–M |
+| 0004 boxes3 | A "only some labels wrong" mode; a table of the two candidate arrangements, one crossed off per draw | S |
+| 0005 bfs01 | A digit-set choice (3 and 7); a "length only" mode without parents, with the bit count for the hardware follow-up | S–M |
+| 0006 stock | Add / remove days; k-trade and fee modes | M |
+| 0007 triangle / polygon | The exact discrete count over C(360, n) beside the continuous formula; a histogram of the largest arc ("fat triangles") | M |
+| 0008 eurovision | A "certain win" view for the leader; a per-announcement list of who can still win | S–M |
+| 0009 boxes | A free number of openings (not only N/2); a "helper only peeks" mode | S |
+| 0010 brackets | A random string; a single-type counter mode; a longest-valid-substring mode | S–M |
+| 0011 ttt | A mid-game legality mode; a 4 × 4 board | S–M |
+| 0012, 0013 kaprekar | A digit-count choice (2, 5, 6) with cycle detection for chains that never stop (549945, 631764) | S–M |
+| 0014 shapes | A gap G and a coverage target; a frequency count over whole sets ("is every legal set equally likely?") | M |
+| 0015 probability | An "eldest is a boy" mode; a Monte Carlo button; a free q | S |
+| 0016, 0022 josephus | The "every third leaves" rule (41 people) on 0016; a reverse lookup "for which N does seat s survive"; N above 64 | S–M |
+| 0017 floyd | μ and λ marked on the graph; the "meeting step is a multiple of λ" invariant shown, not only told | S |
+| 0018, 0019 hourglass | Minimise flips instead of events; a third hourglass | M |
+| 0020, 0021 pcie | L up to 4096; the expected number of completions (0021); a split into several requests by MRRS | S–M |
+| 0023 endpoint | A repeated tag; Lower Address shown; undo | S–M |
+| 0024 credits | A "Credit Grant lost" event; a random sequence (with U135) | S |
+| 0025 acknak | Control of the Ack thresholds (or a seed) instead of hidden randomness (with U135) | S |
+| 0026 motorcycle | Four people and n; a distance field (52 km); two strategies overlaid on one chart | M |
+| 0027, 0028 cake | Wider ranges: d up to 0.8 and negative, a down to 0.0001, q up to 3 and below 1 | S |
+| 0029 clock | Opposite-hands and 90° modes; a 24-hour dial; a jumping seconds hand | M |
+| 0030 strip | A sweep of z0 that answers "when do five faces win"; points on side faces; a cube preset | M |
+| 0031 bridge | Bridge capacity 3; a comparison with the two classic strategies | S |
+| 0032 river | A boat for two; a second goat (a selectable item set) | M |
+| 0033 fifo | A reader start delay D, a second burst with a gap, back-pressure (`fifoFill` needs a delay parameter) | M |
+| 0034 gray | Simultaneous read and write; the synchroniser delay on the far pointer ("by how many cycles is empty late"); almost-full; a 12-entry FIFO | M |
+| 0035 div3 | Divide by a general N (5); a selectable strip length | M |
+| 0036 lfsr | A selectable seed; the Galois form; 8 bits (with U139) | S–M |
+| 0037 mtbf | A target MTBF that answers "how many flops"; more than three flops; a preset for a synchroniser flop with a smaller τ | S |
+| 0038 handshake | Selectable MAX_WAIT and strip length; same-cycle ack and back-to-back toggles; a `cover` row for 1, 2 and 3 cycles | S–M |
+
+### Round X — one timing strip for the protocols (proposed in session 20, owner picks)
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| X145 | 0036, 0034 | **Timing strip in the LFSR and FIFO-flags boxes**: states, output bits and pointers as waves over time with the `waveStrip` of 0001 / 0035, instead of lists | S–M |
+| X146 | 0023, 0024, 0025 | **Event axis for the three reference models**: every event a column on a strip with Seq / credits / cycle, which merges U136 into one uniform view | M |
+| X147 | 0033 | **A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart | S |
+
+Suggested order (session 20): round V first (a few days, touches every box), then the
+S-sized rows of round W that unlock follow-ups the page itself asks the reader to try
+(cake ranges, PCIe 4 KB, probability, mtbf, bridge, credits, lfsr, edge), then U135 and
+U139 together with their W rows, then round X on top of V.
 
 
 The older idea list below is kept for reference; items covered by the rounds above are
