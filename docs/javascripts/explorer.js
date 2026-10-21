@@ -39,6 +39,20 @@
 (() => {
   const EPS = 1e-9;
 
+  // mulberry32: a small seeded generator, so a random draw can be replayed from its seed
+  // (the question tests use the same recurrence).
+  const mulberry32 = (seed) => {
+    let a = seed | 0;
+    return () => {
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  };
+  const SEED_MAX = 99999;
+  const newSeed = () => 1 + Math.floor(Math.random() * SEED_MAX);
+
   // --- models: pure math ---------------------------------------------------------------
 
   // Cake: person k takes p of what is left (R); a fraction of 1 or more takes the rest.
@@ -1324,8 +1338,8 @@
   // the pick among the ready reads, then the gap), so they can be scripted (the page's
   // examples) or replayed by the tests.
   const EP_RCB = 128, EP_MRRS = 256, EP_MIN_DELAY = 1, EP_MAX_DELAY = 20, EP_MAX_GAP = 10;
-  const epUnitRng = (units) => {
-    const next = () => (units.length ? units.shift() : Math.random());
+  const epUnitRng = (units, rnd = Math.random) => {
+    const next = () => (units.length ? units.shift() : rnd());
     return { randint: (a, b) => a + Math.floor(next() * (b - a + 1)), choice: (n) => Math.floor(next() * n) };
   };
   const epValueRng = (values, fallback) => ({
@@ -1475,6 +1489,7 @@
   };
 
   const models = {
+    mulberry32,
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
     motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, josephusRun, josephusSteps, josephusZero, josephusFormula,
     clockCounts, clockMeetsIn, clockNext, clockPrev, clockLabel,
@@ -4386,6 +4401,7 @@
         `<button type="button" class="md-button ex-preset" data-mask="5">${ltr("x<sup>4</sup> + x<sup>2</sup> + 1")}</button></span></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button md-button--primary ex-next">צעד</button>` +
+        `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` +
         `<label>הקצב <select class="ex-speed"><option value="1000">איטי</option><option value="500" selected>בינוני</option><option value="180">מהיר</option></select></label>` +
         `<button type="button" class="md-button ex-start">להתחלה</button>` +
@@ -4429,6 +4445,7 @@
         let fb = 0; tapsIdx.forEach((i) => { fb ^= (cur >> i) & 1; });
         const next = lfsrNext(cur, st.mask, WIDTH);
         $(".ex-pos").textContent = `צעד ${st.k} מתוך ${total}`;
+        $(".ex-prev").disabled = st.k === 0;
         $(".lf-poly").innerHTML = `הפולינום ${polyHtml(st.mask)}, המסכה ${code(bits(st.mask))}: היזון חוזר מהביטים ${ltr(tapsIdx.map((i) => `s[${i}]`).join(", "))}.`;
         $(".lf-state").innerHTML = `המצב אחרי ${ltr(st.k)} צעדים: ${code(bits(cur))}` + (st.k === total ? ` — חזר למצב ההתחלה.` : ".");
         $(".lf-fb").innerHTML = `הצעד הבא: ${ltr(`${code("fb")} = ${code(tapsIdx.map((i) => `s[${i}]`).join(" ^ "))} = ${tapsIdx.map((i) => (cur >> i) & 1).join(" ^ ")} = ${fb}`)}, ` +
@@ -4452,6 +4469,7 @@
       }));
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { stop(); st.mask = Number(b.dataset.mask); st.k = 0; draw(); }));
       $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
       $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
       $(".ex-end").addEventListener("click", () => { stop(); st.k = total(); draw(); });
       play.addEventListener("click", () => {
@@ -4476,6 +4494,7 @@
       box.innerHTML =
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button md-button--primary ex-next">השפה הבאה</button>` +
+        `<button type="button" class="md-button ex-prev">השפה הקודמת</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` +
         `<label>הקצב <select class="ex-speed"><option value="900">איטי</option><option value="450" selected>בינוני</option><option value="150">מהיר</option></select></label>` +
         `<button type="button" class="md-button ex-start">איפוס</button>` +
@@ -4499,6 +4518,7 @@
         ];
         $(".wv-wrap").innerHTML = waveStrip(strip, TOTAL, { half: true, label: "דיאגרמת תזמון בחצאי מחזורים", cursor: st.k ? st.k - 1 : null, ticks: (k) => (k % 2 === 0 ? k / 2 : "") });
         $(".ex-pos").textContent = `שפה ${st.k} מתוך ${TOTAL}`;
+        $(".ex-prev").disabled = st.k === 0;
         let step;
         if (!st.k) step = st.cnt0 === 3
           ? `המונה התעורר במצב 3, שאינו נגיש אחרי איפוס: ${ltr(`${code("cnt")} = 3`)}, ${ltr(`${code("a")} = 0`)}, ${ltr(`${code("b")} = 0`)}.`
@@ -4531,6 +4551,7 @@
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
       $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, TOTAL); draw(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
       $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; st.cnt0 = 0; draw(); });
       $(".ex-wake").addEventListener("click", () => { stop(); st.k = 0; st.cnt0 = 3; draw(); });
       $(".ex-counter").addEventListener("change", () => { stop(); st.counter = $(".ex-counter").value; st.k = 0; draw(); });
@@ -4614,13 +4635,14 @@
   });
   const grayFlagsMount = (box) => {
     const BITS = 5, SIZE = 16;
-    const st = { w: 0, r: 0 };
+    const st = { w: 0, r: 0, hist: [] };
     box.innerHTML =
       `<div class="ex-controls">` +
       `<button type="button" class="md-button md-button--primary ex-write">כתיבה</button>` +
       `<button type="button" class="md-button md-button--primary ex-read">קריאה</button>` +
       `<button type="button" class="md-button ex-write8">8 כתיבות</button>` +
       `<button type="button" class="md-button ex-read8">8 קריאות</button>` +
+      `<button type="button" class="md-button ex-prev">צעד אחורה</button>` +
       `<button type="button" class="md-button ex-start">איפוס</button></div>` +
       `<div class="gr-slots" dir="ltr" role="img" aria-label="16 הכניסות של ה-FIFO, המלאות מודגשות, עם מצביעי הכתיבה והקריאה"></div>` +
       `<div class="gr-ptrs"></div><p class="ex-summary gr-sum" aria-live="polite"></p>`;
@@ -4629,6 +4651,7 @@
       const fl = grayFlags(st.w, st.r, BITS);
       $(".ex-write").disabled = fl.full; $(".ex-write8").disabled = fl.full;
       $(".ex-read").disabled = fl.empty; $(".ex-read8").disabled = fl.empty;
+      $(".ex-prev").disabled = !st.hist.length;
       const wa = st.w & (SIZE - 1), ra = st.r & (SIZE - 1);
       let cells = "";
       for (let i = 0; i < SIZE; i++) {
@@ -4651,12 +4674,18 @@
       if (fl.full) sum += ` ארבעת הביטים הנמוכים של שני המצביעים שווים (${ltr(bitsOf(wa, 4))}): בלי הביט החמישי זה היה נראה ריק.`;
       $(".gr-sum").innerHTML = sum;
     };
-    const step = (dw, dr) => { for (let i = 0; i < dw; i++) if (!grayFlags(st.w, st.r, BITS).full) st.w = (st.w + 1) & 31; for (let i = 0; i < dr; i++) if (!grayFlags(st.w, st.r, BITS).empty) st.r = (st.r + 1) & 31; draw(); };
+    const step = (dw, dr) => {
+      st.hist.push([st.w, st.r]); if (st.hist.length > 200) st.hist.shift();
+      for (let i = 0; i < dw; i++) if (!grayFlags(st.w, st.r, BITS).full) st.w = (st.w + 1) & 31;
+      for (let i = 0; i < dr; i++) if (!grayFlags(st.w, st.r, BITS).empty) st.r = (st.r + 1) & 31;
+      draw();
+    };
     $(".ex-write").addEventListener("click", () => step(1, 0));
     $(".ex-read").addEventListener("click", () => step(0, 1));
     $(".ex-write8").addEventListener("click", () => step(8, 0));
     $(".ex-read8").addEventListener("click", () => step(0, 8));
-    $(".ex-start").addEventListener("click", () => { st.w = 0; st.r = 0; draw(); });
+    $(".ex-prev").addEventListener("click", () => { const h = st.hist.pop(); if (h) { [st.w, st.r] = h; } draw(); });
+    $(".ex-start").addEventListener("click", () => { st.w = 0; st.r = 0; st.hist = []; draw(); });
     draw();
   };
 
@@ -5097,7 +5126,16 @@
   const endpointView = () => ({
     mount(box) {
       const hex = (v, w = 0) => "0x" + v.toString(16).toUpperCase().padStart(w, "0");
-      const st = { s: epInit(), rng: epValueRng([], epUnitRng([])), log: "", err: "" };
+      const st = { s: epInit(), values: [], seed: newSeed(), used: 0, rng: null, log: "", err: "", history: [] };
+      // the generator: the script's draws first, then mulberry32 from the seed; `used` counts
+      // the seeded draws so a snapshot can be restored and replayed
+      const makeRng = () => {
+        const unit = mulberry32(st.seed);
+        for (let i = 0; i < st.used; i++) unit();
+        st.rng = epValueRng(st.values, epUnitRng([], () => { st.used += 1; return unit(); }));
+      };
+      makeRng();
+      const snap = () => { st.history.push({ s: JSON.parse(JSON.stringify(st.s)), values: [...st.values], used: st.used, log: st.log }); if (st.history.length > 200) st.history.shift(); };
       box.innerHTML =
         `<div class="ex-controls"><span class="wv-presets">הדוגמאות שבעמוד: ` +
         `<button type="button" class="md-button ex-preset" data-p="a">סעיף א (מיושר)</button> ` +
@@ -5108,6 +5146,7 @@
         `<label>אורך בבתים <input type="number" class="ex-len" dir="ltr" min="1" max="256" value="256" aria-label="האורך בבתים"></label>` +
         `<button type="button" class="md-button md-button--primary ex-send">שלח בקשה</button><span class="ep-err"></span></div>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button md-button--primary ex-cycle">מחזור</button>` +
+        `<button type="button" class="md-button ex-prev">צעד אחורה</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1200, 600, 250) +
         `<button type="button" class="md-button ex-run">הרץ עד שכל ה-Completions יצאו</button><span class="ex-pos"></span></div>` +
         `<p class="ex-title">הזיכרון, בלוק אחרי בלוק (128 בתים): הכתיבות צבועות, הקריאות הפתוחות מסומנות בקו</p><div class="ep-mem"></div>` +
@@ -5119,6 +5158,7 @@
       const render = () => {
         const s = st.s;
         $(".ex-pos").textContent = `מחזור ${s.cycle}`;
+        $(".ex-prev").disabled = !st.history.length;
         // the block map
         const keys = new Set(Object.keys(s.memory).map(Number));
         s.pending.forEach((p) => { for (let a = Math.floor(p.address / EP_RCB) * EP_RCB; a < p.address + p.length; a += EP_RCB) keys.add(a); });
@@ -5180,6 +5220,7 @@
         else if (!(length >= 1 && length <= EP_MRRS)) st.err = `האורך חייב להיות בין 1 ל-${EP_MRRS} (MRRS).`;
         else if (Math.floor(address / 4096) !== Math.floor((address + length - 1) / 4096)) st.err = "בקשה לא חוצה גבול של 4 KB.";
         if (st.err) { render(); return; }
+        snap();
         if ($(".ex-kind").value === "write") {
           const w = st.s.writes.length + 1;
           epWrite(st.s, address, Array.from({ length }, (_, i) => (i + 0x10 * w) & 0xFF));
@@ -5198,15 +5239,23 @@
           : `מחזור ${ltr(st.s.cycle)}: אין קריאה מוכנה, לא יוצא דבר.`;
       };
       const stop = autoplay($(".ex-play"), $(".ex-speed"), {
-        step: () => { cycle(); render(); },
+        step: () => { snap(); cycle(); render(); },
         done: () => !st.s.pending.length,
         restart: () => {},
       });
-      $(".ex-cycle").addEventListener("click", () => { stop(); cycle(); render(); });
-      $(".ex-run").addEventListener("click", () => { stop(); let guard = 0; while (st.s.pending.length && guard++ < 400) cycle(); if (!guard) st.log = "אין קריאות פתוחות."; render(); });
+      $(".ex-cycle").addEventListener("click", () => { stop(); snap(); cycle(); render(); });
+      $(".ex-prev").addEventListener("click", () => {
+        stop();
+        const h = st.history.pop();
+        if (!h) return;
+        st.s = h.s; st.values = h.values; st.used = h.used; st.log = h.log; st.err = "";
+        makeRng(); render();
+      });
+      $(".ex-run").addEventListener("click", () => { stop(); if (st.s.pending.length) snap(); let guard = 0; while (st.s.pending.length && guard++ < 400) cycle(); if (!guard) st.log = "אין קריאות פתוחות."; render(); });
       const load = (script) => {
         stop();
-        st.s = epInit(); st.rng = epValueRng(script ? [...script.draws] : [], epUnitRng([])); st.err = "";
+        st.s = epInit(); st.values = script ? [...script.draws] : []; st.used = 0; st.history = []; st.err = "";
+        makeRng();
         if (script) {
           epWrite(st.s, 0x10000, Array.from({ length: 512 }, (_, i) => i & 0xFF));
           script.reads.forEach(([address, length, rid, tag]) => epRead(st.s, { address, length, rid, tag }, st.rng));
@@ -5414,10 +5463,46 @@
     new MutationObserver(dec).observe(box, { childList: true, subtree: true });
   };
 
+  // Keyboard stepping: with the box focused (it is in the tab order), → is the next step,
+  // ← the previous, space plays or stops, Home and End jump to the ends. Keys typed in a
+  // field, and space on a button, are left to the field or the button.
+  const KEYS = [
+    ["ArrowRight", "button.ex-next, button.ex-cycle"],
+    ["ArrowLeft", "button.ex-prev"],
+    [" ", "button.ex-play, button.ex-solve"],
+    ["Home", "button.ex-start, button.ex-first"],
+    ["End", "button.ex-end, button.ex-last"],
+  ];
+  const KEY_HINTS = [
+    ["button.ex-next, button.ex-cycle, button.ex-prev", "חיצים ← → לצעד"],
+    ["button.ex-play, button.ex-solve", "רווח להפעלה ולעצירה"],
+    ["button.ex-start, button.ex-first, button.ex-end, button.ex-last", "‏Home ו-End להתחלה ולסוף"],
+  ];
+  const keyboard = (box) => {
+    const hints = KEY_HINTS.filter(([sel]) => box.querySelector(sel)).map(([, text]) => text);
+    if (!hints.length) return;
+    box.tabIndex = 0;
+    const hint = document.createElement("p");
+    hint.className = "ex-keys";
+    hint.textContent = `מקשים כשהתיבה ממוקדת: ${hints.join(", ")}.`;
+    box.append(hint);
+    box.addEventListener("keydown", (e) => {
+      const t = e.target;
+      if (t.matches("input, select, textarea") || (e.key === " " && t !== box && (t.matches("button") || t.getAttribute("role") === "button"))) return;
+      const hit = KEYS.find(([key]) => key === e.key);
+      if (!hit) return;
+      const btn = box.querySelector(hit[1]);
+      if (!btn || btn.disabled) return;
+      e.preventDefault();
+      btn.click();
+    });
+  };
+
   const setup = (box) => {
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
     make(box).mount(box);
+    keyboard(box);
     decorateLive(box);
   };
 

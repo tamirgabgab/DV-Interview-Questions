@@ -1446,6 +1446,8 @@ body.practice-mode .md-typeset .question-tools {
 
 /* the motorcycle explorer of 0026: the play row, the road and the scrubber */
 .md-typeset .explorer .ex-play-row { margin-top: 0.5rem; }
+.md-typeset .explorer:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 3px; }
+.md-typeset .explorer .ex-keys { margin: 0.5rem 0 0; font-size: 0.6rem; color: var(--viz-text); }
 .md-typeset .explorer .ex-scrub { flex: 1 1 14rem; }
 .md-typeset .explorer .ex-scrub input[type="range"] { flex: 1 1 auto; width: auto; }
 .md-typeset .explorer svg.road-live { width: 100%; max-width: 40rem; display: block; margin-top: 0.4rem; }
