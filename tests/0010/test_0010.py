@@ -60,3 +60,45 @@ def test_steppers_up_to_date():
     generated = re.findall(r'<div class="stepper".*?</div></div>', out)
     page = re.findall(r'<div class="stepper".*?</div></div>', question_path(10).read_text(encoding="utf-8"))
     assert page == generated and len(page) == 2
+
+
+def test_explorer_matches_page_code():
+    """The brackets explorer: its verdict against the page's isValid and isValid_brute on
+    the examples, every short string and random long ones, and its frames against a
+    replay of the page's stack loop."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(10)
+    alphabet = "()[]{}"
+    cases = list(EXAMPLES) + ["".join(p) for n in range(1, 5) for p in itertools.product(alphabet, repeat=n)]
+    cases += ["".join(rng.choice(alphabet) for _ in range(rng.randint(5, 40))) for _ in range(400)]
+    cases += ["(" * 20 + ")" * 20, "([{" * 6 + "}])" * 6, "a(b)[c]{ }x"]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map((s) => m.bracketsTrace(m.bracketsClean(s)))));""")
+    pairs = {")": "(", "]": "[", "}": "{"}
+    for raw, tr in zip(cases, got):
+        s = "".join(c for c in raw if c in alphabet)
+        assert tr["valid"] == ns["isValid"](s) == ns["isValid_brute"](s), s
+        assert tr["odd"] == (len(s) % 2 == 1)
+        frames, stack, fail = [], [], None
+        for i, ch in enumerate(s):
+            if ch in pairs:
+                if not stack:
+                    fail = {"i": i, "kind": "unopened"}
+                    frames.append({"i": i, "ch": ch, "action": "unopened", "stack": ""})
+                    break
+                if stack[-1] != pairs[ch]:
+                    fail = {"i": i, "kind": "mismatch", "top": stack[-1]}
+                    frames.append({"i": i, "ch": ch, "action": "mismatch", "stack": "".join(stack), "top": stack[-1]})
+                    break
+                stack.pop()
+                frames.append({"i": i, "ch": ch, "action": "pop", "stack": "".join(stack)})
+            else:
+                stack.append(ch)
+                frames.append({"i": i, "ch": ch, "action": "push", "stack": "".join(stack)})
+        if fail is None and stack:
+            fail = {"i": len(s), "kind": "unclosed", "left": "".join(stack)}
+        assert tr["frames"] == frames and tr["fail"] == fail, s
