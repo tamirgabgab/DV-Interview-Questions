@@ -1053,8 +1053,8 @@ axe check warns only; `main` is updated at the end of each round.
    cross products for n = 3..10, checks the acceptance rate against the formula, and the
    explorer against the page code; `tb.sv` randomizes the class 200 times per n with the
    arcs re-checked and a 200-degree square rejected. Verilator at the pinned commit
-   supports `.size()` constraints on rand dynamic arrays (Changes: #7558, #7225), but
-   this is the first page that relies on it: watch the CI run.
+   supports `.size()` constraints on rand dynamic arrays (Changes: #7558, #7225); the
+   CI run of 45d16eb confirmed it (the first page that relies on it).
 7. **Checks:** lint 38/38, 242 Python tests, strict build, links 0 broken, phone check
    light and dark with axe (0 problems, 0 violations).
 
@@ -1062,9 +1062,9 @@ axe check warns only; `main` is updated at the end of each round.
 
 ## In progress
 
-- Session 18: round R (0033 to 0038) is on `main` (commit 11a5109, deploy run 39564541732
-  green). Owner's check: the five WaveDrom diagrams (0034, 0035, 0038) on the live site,
-  the sandbox cannot render them.
+- Session 19: the Staff removal, the ten round T explorers and the 0007 polygon part are
+  on `main` (45d16eb). Owner's checks on the live site: the five WaveDrom diagrams of
+  round R (0034, 0035, 0038), and the dragging in the explorers on a real phone.
 - Next: the owner's picks from round T (explorers for existing questions), the rest of
   round Q, rounds D to F, I, L, N, O and S, or new questions. (R105 and I59, the staff
   questions, are dropped with the Staff level.)
