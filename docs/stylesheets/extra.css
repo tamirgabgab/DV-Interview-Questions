@@ -1710,3 +1710,16 @@ body.practice-mode .md-typeset .question-tools {
 @media screen and (max-width: 44.9375em) {
   .md-typeset .explorer .bx-bar { grid-template-columns: 1fr; gap: 0.15rem; }
 }
+
+/* Floyd explorer (0017): the cells row with the two runners, the rho graph */
+.md-typeset .explorer .fl-cells { margin-top: 0.6rem; }
+.md-typeset .explorer .box-grid.fl-grid { max-width: 100%; }
+.md-typeset .explorer .box-grid.fl-grid > span { position: relative; }
+.md-typeset .explorer .box-grid.fl-grid > span.is-slow { box-shadow: inset 0 0 0 3px var(--viz-s1); }
+.md-typeset .explorer .box-grid.fl-grid > span.is-fast { outline: 3px dashed var(--viz-s2); outline-offset: -1px; }
+.md-typeset .explorer .box-grid.fl-grid > span.is-slow.is-fast { box-shadow: inset 0 0 0 3px var(--viz-s1); }
+.md-typeset .explorer input.ex-nums { width: 16rem; max-width: 100%; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .fl-err { color: var(--diff-hard); font-size: 0.7rem; }
+.md-typeset .explorer .fl-graph { margin-top: 0.5rem; }
+.md-typeset .explorer svg.fl-live { max-width: 34rem; width: 100%; }
+.md-typeset .explorer .fl-step { margin: 0.4em 0; }

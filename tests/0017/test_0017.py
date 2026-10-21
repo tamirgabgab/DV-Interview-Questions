@@ -77,3 +77,50 @@ def test_figures_up_to_date():
     page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
     for row in (l.strip() for l in out.splitlines() if l.startswith("|")):
         assert row in page_rows, row
+
+
+def test_explorer_matches_page_code():
+    """The Floyd explorer: its frames against a Python replay of the page's
+    find_duplicate_floyd, its answer against the page function, and the rho (tail, cycle,
+    entry) against a plain walk."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(17)
+    cases = [EXAMPLE] + [random_case(rng, rng.randint(3, 12)) for _ in range(80)]
+    cases += [[1, 1], [2, 1, 2], [1, 2, 3, 1], [3, 3, 3, 3]]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const cases = {json.dumps(cases)};
+      console.log(JSON.stringify({{
+        rho: cases.map((c) => m.floydRho(c)),
+        trace: cases.map((c) => m.floydTrace(c)),
+        parse: [m.floydParse("3, 9, 5, 6, 7, 8, 1, 1, 2, 4"), m.floydParse("1 2 3"), m.floydParse("0 1"), m.floydParse("x")],
+      }}));""")
+    assert got["parse"] == [EXAMPLE, None, None, None]
+    for nums, rho, tr in zip(cases, got["rho"], got["trace"]):
+        # the rho by a plain walk from 0
+        walk, x = [], 0
+        while x not in walk:
+            walk.append(x)
+            x = nums[x]
+        mu = walk.index(x)
+        assert rho["tail"] == walk[:mu] and rho["cycle"] == walk[mu:] and rho["entry"] == x
+        assert rho["mu"] == mu and rho["lambda"] == len(walk) - mu
+        assert rho["others"] == [i for i in range(len(nums)) if i not in walk]
+        assert nums.count(x) >= 2
+        # the frames: a replay of the page's two loops
+        frames, slow, fast, step = [{"phase": 1, "step": 0, "slow": 0, "fast": 0}], 0, 0, 0
+        while True:
+            slow, fast, step = nums[slow], nums[nums[fast]], step + 1
+            frames.append({"phase": 1, "step": step, "slow": slow, "fast": fast})
+            if slow == fast:
+                break
+        meet, slow, step = slow, 0, 0
+        frames.append({"phase": 2, "step": 0, "slow": 0, "fast": fast})
+        while slow != fast:
+            slow, fast, step = nums[slow], nums[fast], step + 1
+            frames.append({"phase": 2, "step": step, "slow": slow, "fast": fast})
+        assert tr["frames"] == frames and tr["meet"] == meet
+        assert tr["answer"] == slow == x == ns["find_duplicate_floyd"](list(nums))
