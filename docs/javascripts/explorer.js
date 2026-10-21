@@ -33,7 +33,7 @@
 //   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts
 //   credits                0024        the four counters as hands on a modulo-256 circle, the buffer, packets in flight; grant, transmit, lose, dequeue, sync
 //   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table
-//   trace                  0002, 0003  the page's Python one line (or one comparison) at a time: the swaps with a0 / b0 expressions, the double loop with its invariant
+//   trace                  0002, 0003  the page's Python one line (or one comparison) at a time: the swaps (and the three-variable XOR rotation) with a0 / b0 / c0 expressions, the double loop with its invariant
 // The math of each model is exported under Node, where the question tests compare it with
 // the Python reference (tests/0001 to 0022, 0026 to 0038).
 (() => {
@@ -1432,13 +1432,15 @@
     arith: ["v[i] = v[i] + v[j]", "v[j] = v[i] - v[j]", "v[i] = v[i] - v[j]"],
     xor: ["v[i] = v[i] ^ v[j]", "v[j] = v[i] ^ v[j]", "v[i] = v[i] ^ v[j]"],
   };
-  // A symbolic value is {p, q}: p*a0 + q*b0 for arith (and temp), p*a0 xor q*b0 for xor.
+  // A symbolic value is {p, q, r?}: p*a0 + q*b0 (+ r*c0) for arith (and temp), the xor
+  // of the same terms for xor and the rotation.
   const symText = (sym, kind) => {
-    const op = kind === "xor" ? " ^ " : " + ";
+    const op = kind === "arith" || kind === "temp" ? " + " : " ^ ";
     const terms = [];
     const coef = (c, name) => (c === 1 ? name : `${c}·${name}`);
     if (sym.p) terms.push(coef(sym.p, "a0"));
     if (sym.q) terms.push(coef(sym.q, "b0"));
+    if (sym.r) terms.push(coef(sym.r, "c0"));
     return terms.length ? terms.join(op) : "0";
   };
   const swapTrace = (kind, a, b, same = false, bits = 0) => {
@@ -1470,6 +1472,24 @@
       apply(2, I, I, J, op || "-");
     }
     return { code: SWAP_CODE[kind], frames, ok: !same && cells[I] === wrap(b) && cells[J] === wrap(a), same };
+  };
+  // rotTrace: the follow-up rotation a <- b, b <- c, c <- a without a helper, as two XOR
+  // swaps (a with b, then b with c): six lines, one frame each, with the values and the
+  // symbolic expressions in a0, b0 and c0.
+  const ROT_CODE = ["a = a ^ b", "b = a ^ b", "a = a ^ b", "b = b ^ c", "c = b ^ c", "b = b ^ c"];
+  const ROT_STEPS = [["a", "b"], ["b", "a"], ["a", "b"], ["b", "c"], ["c", "b"], ["b", "c"]];   // target, other
+  const rotTrace = (a, b, c, bits = 0) => {
+    const wrap = (v) => (bits ? ((v % (1 << bits)) + (1 << bits)) % (1 << bits) : v);
+    const v = { a, b, c }, sym = { a: { p: 1, q: 0, r: 0 }, b: { p: 0, q: 1, r: 0 }, c: { p: 0, q: 0, r: 1 } };
+    const snap = (line, text) => ({ line, text, a: v.a, b: v.b, c: v.c, temp: null, aSym: symText(sym.a, "xor"), bSym: symText(sym.b, "xor"), cSym: symText(sym.c, "xor"), tempSym: null });
+    const frames = [snap(-1, "")];
+    ROT_STEPS.forEach(([t, o], line) => {
+      const [x, y] = [t, o].sort(), before = [v[x], v[y]], raw = v[t] ^ v[o];   // printed in the order of the line
+      v[t] = wrap(raw);
+      sym[t] = { p: sym[t].p ^ sym[o].p, q: sym[t].q ^ sym[o].q, r: sym[t].r ^ sym[o].r };
+      frames.push(snap(line, `${before[0]} ^ ${before[1]} = ${raw}`));
+    });
+    return { code: ROT_CODE, frames, ok: v.a === wrap(b) && v.b === wrap(c) && v.c === wrap(a) };
   };
   // loopTrace: the page's mystery(A), one comparison per frame; `endOfI` marks the last
   // comparison of an outer iteration, with the sorted prefix and the maximum noted.
@@ -1511,7 +1531,7 @@
     stockScan, stockRandom, hsCheck, HS_PRESETS, hsWave,
     AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun,
     EP_RCB, epUnitRng, epValueRng, epInit, epWrite, epReadBytes, epFragments, epRead, epNext, epCycle, EP_SCRIPTS, epRunScript,
-    SWAP_CODE, swapTrace, LOOP_CODE, loopTrace,
+    SWAP_CODE, swapTrace, ROT_CODE, rotTrace, LOOP_CODE, loopTrace,
   };
   if (typeof module !== "undefined" && module.exports) {
     module.exports = models;
@@ -5334,11 +5354,13 @@
       let timer = null;
       const stop = () => { if (timer) clearInterval(timer); timer = null; $(".ex-play").textContent = "הפעלה"; };
       if (mode === "swap") {
-        const st = { kind: "arith", a: 5, b: 3, same: false, bits: 0, k: 0 };
+        const PAGE = { kind: "arith", a: 5, b: 3, c: 7, same: false, bits: 0, k: 0 };
+        const st = { ...PAGE };
         box.innerHTML =
-          `<div class="ex-controls"><label>הגרסה <select class="ex-kind" aria-label="גרסת ההחלפה"><option value="temp">עם משתנה עזר (סעיף א)</option><option value="arith" selected>אריתמטיקה (סעיף ב)</option><option value="xor">XOR (סעיף ג)</option></select></label>` +
+          `<div class="ex-controls"><label>הגרסה <select class="ex-kind" aria-label="גרסת ההחלפה"><option value="temp">עם משתנה עזר (סעיף א)</option><option value="arith" selected>אריתמטיקה (סעיף ב)</option><option value="xor">XOR (סעיף ג)</option><option value="rot">סיבוב של שלושה ב-XOR (שאלת המשך)</option></select></label>` +
           `<label><span>a</span> <input type="number" class="ex-a" dir="ltr" value="5" aria-label="הערך של a"></label>` +
           `<label><span>b</span> <input type="number" class="ex-b" dir="ltr" value="3" aria-label="הערך של b"></label>` +
+          `<label class="tr-c" hidden><span>c</span> <input type="number" class="ex-c" dir="ltr" value="7" aria-label="הערך של c"></label>` +
           `<label><input type="checkbox" class="ex-same"> <span>‏a ו-b הם אותו משתנה (${code("swap(v, i, i)")})</span></label>` +
           `<label><input type="checkbox" class="ex-bits"> <span>‏int של 8 ביט (מודולו 256)</span></label>` +
           `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
@@ -5346,43 +5368,56 @@
           `<div class="tr-box"><div class="tr-left"></div><div class="tr-right"></div></div>` +
           `<p class="wv-step tr-step" aria-live="polite"></p><p class="ex-summary tr-sum"></p>`;
         const bits8 = (v) => (st.bits ? ltr(v.toString(2).padStart(8, "0")) : "");
+        const rot = () => st.kind === "rot";
+        const traceOf = () => (rot() ? rotTrace(st.a, st.b, st.c, st.bits) : swapTrace(st.kind, st.a, st.b, st.same, st.bits));
         const draw = () => {
-          const tr = swapTrace(st.kind, st.a, st.b, st.same, st.bits), total = tr.frames.length - 1;
+          const tr = traceOf(), total = tr.frames.length - 1;
           st.k = Math.min(st.k, total);
           const fr = tr.frames[st.k], prev = st.k ? tr.frames[st.k - 1] : null;
           $(".tr-left").innerHTML = codeHtml(tr.code, fr.line, -1);
           const row = (name, v, sym, changed) => `<tr class="${changed ? "is-changed" : ""}"><td>${ltr(name)}</td><td>${v === null ? "–" : ltr(v)}</td>${st.bits ? `<td>${v === null ? "" : bits8(v)}</td>` : ""}<td>${sym === null ? "–" : ltr(sym)}</td></tr>`;
           $(".tr-right").innerHTML = `<table class="tr-vars"><thead><tr><th>משתנה</th><th>ערך</th>${st.bits ? "<th>ביטים</th>" : ""}<th>סימבולית</th></tr></thead><tbody>` +
-            row(st.same ? "v[i] = v[j]" : "v[i] (a)", fr.a, fr.aSym, prev && prev.a !== fr.a) +
-            (st.same ? "" : row("v[j] (b)", fr.b, fr.bSym, prev && prev.b !== fr.b)) +
+            row(rot() ? "a" : st.same ? "v[i] = v[j]" : "v[i] (a)", fr.a, fr.aSym, prev && prev.a !== fr.a) +
+            (st.same ? "" : row(rot() ? "b" : "v[j] (b)", fr.b, fr.bSym, prev && prev.b !== fr.b)) +
+            (rot() ? row("c", fr.c, fr.cSym, prev && prev.c !== fr.c) : "") +
             (st.kind === "temp" ? row("temp", fr.temp, fr.tempSym, prev && prev.temp !== fr.temp) : "") + `</tbody></table>`;
           $(".ex-pos").textContent = `שורה ${st.k} מתוך ${total}`;
           $(".tr-step").innerHTML = st.k === 0
-            ? `לפני הריצה: ${ltr(`a = a0 = ${st.a}`)}${st.same ? ` ו-b הוא אותו תא` : `, ${ltr(`b = b0 = ${st.b}`)}`}.`
-            : `שורה ${ltr(st.k)}: ${ltr(code(tr.code[fr.line]))} ⇒ ${ltr(fr.text)}. סימבולית: ${ltr(`a = ${fr.aSym}`)}${st.same ? "" : `, ${ltr(`b = ${fr.bSym}`)}`}${fr.tempSym !== null && st.kind === "temp" ? `, ${ltr(`temp = ${fr.tempSym}`)}` : ""}.`;
+            ? `לפני הריצה: ${ltr(`a = a0 = ${st.a}`)}${st.same ? ` ו-b הוא אותו תא` : `, ${ltr(`b = b0 = ${st.b}`)}`}${rot() ? `, ${ltr(`c = c0 = ${st.c}`)}` : ""}.`
+            : `שורה ${ltr(st.k)}: ${ltr(code(tr.code[fr.line]))} ⇒ ${ltr(fr.text)}. סימבולית: ${ltr(`a = ${fr.aSym}`)}${st.same ? "" : `, ${ltr(`b = ${fr.bSym}`)}`}${rot() ? `, ${ltr(`c = ${fr.cSym}`)}` : ""}${fr.tempSym !== null && st.kind === "temp" ? `, ${ltr(`temp = ${fr.tempSym}`)}` : ""}.`;
           let sum = "";
           if (st.k === total) {
-            if (tr.ok) sum = `<span class="wv-ok">✓ הוחלפו: ${ltr(`a = b0 = ${fr.a}`)}, ${ltr(`b = a0 = ${fr.b}`)}.</span>`;
+            if (rot()) sum = tr.ok
+              ? `<span class="wv-ok">✓ סובבו: ${ltr(`a = b0 = ${fr.a}`)}, ${ltr(`b = c0 = ${fr.b}`)}, ${ltr(`c = a0 = ${fr.c}`)}.</span> שש פעולות XOR, כי סיבוב של שלושה הוא שתי החלפות: ${ltr("a ↔ b")} (שורות 1 עד 3) ואז ${ltr("b ↔ c")} (שורות 4 עד 6). אחרי ההחלפה הראשונה ${ltr("b = a0")}, וההחלפה השנייה מעבירה את ${ltr("a0")} ל-${ltr("c")}.`
+              : `<span class="wv-bad">✗ הערכים לא סובבו.</span>`;
+            else if (tr.ok) sum = `<span class="wv-ok">✓ הוחלפו: ${ltr(`a = b0 = ${fr.a}`)}, ${ltr(`b = a0 = ${fr.b}`)}.</span>`;
             else if (st.same) sum = st.kind === "temp" ? `<span class="wv-ok">✓ אותו משתנה: עם משתנה עזר הערך נשמר (${ltr(fr.a)}).</span>` : `<span class="wv-bad">✗ אותו משתנה: ${st.kind === "arith" ? "השורה הראשונה מכפילה והשנייה מאפסת" : "השורה הראשונה מחשבת a ^ a = 0"}, והערך ${ltr(st.a)} אבד. זו המלכודת של ${code("swap(v, i, i)")}.</span>`;
             else sum = `<span class="wv-bad">✗ הערכים לא הוחלפו.</span>`;
             if (st.bits && st.kind === "arith" && !st.same && st.a + st.b >= 256) sum += ` הסכום ${ltr(`${st.a} + ${st.b} = ${st.a + st.b}`)} גלש מעבר ל-255, ובכל זאת ההחלפה נכונה: החיסור מתבצע באותו מודולו, ו-${ltr("(a0 + b0) − b0 ≡ a0 (mod 256)")}.`;
           }
           $(".tr-sum").innerHTML = sum;
         };
-        const total = () => swapTrace(st.kind, st.a, st.b, st.same, st.bits).frames.length - 1;
+        const total = () => traceOf().frames.length - 1;
         const readInputs = () => {
           const lim = st.bits ? 255 : 1e9;
-          st.a = Math.max(st.bits ? 0 : -lim, Math.min(lim, Math.round(Number($(".ex-a").value) || 0)));
-          st.b = Math.max(st.bits ? 0 : -lim, Math.min(lim, Math.round(Number($(".ex-b").value) || 0)));
-          $(".ex-a").value = st.a; $(".ex-b").value = st.b;
+          const clamp = (sel) => Math.max(st.bits ? 0 : -lim, Math.min(lim, Math.round(Number($(sel).value) || 0)));
+          st.a = clamp(".ex-a"); st.b = clamp(".ex-b"); st.c = clamp(".ex-c");
+          $(".ex-a").value = st.a; $(".ex-b").value = st.b; $(".ex-c").value = st.c;
         };
-        $(".ex-kind").addEventListener("change", () => { stop(); st.kind = $(".ex-kind").value; st.k = 0; draw(); });
-        [".ex-a", ".ex-b"].forEach((sel) => $(sel).addEventListener("change", () => { stop(); readInputs(); st.k = 0; draw(); }));
+        // the rotation has three cells and no aliasing: the c field appears, "same" is off
+        const setKind = (kind) => {
+          st.kind = kind; $(".ex-kind").value = kind;
+          $(".tr-c").hidden = !rot();
+          if (rot()) { st.same = false; $(".ex-same").checked = false; $(".ex-b").disabled = false; }
+          $(".ex-same").disabled = rot();
+        };
+        $(".ex-kind").addEventListener("change", () => { stop(); setKind($(".ex-kind").value); st.k = 0; draw(); });
+        [".ex-a", ".ex-b", ".ex-c"].forEach((sel) => $(sel).addEventListener("change", () => { stop(); readInputs(); st.k = 0; draw(); }));
         $(".ex-same").addEventListener("change", () => { stop(); st.same = $(".ex-same").checked; $(".ex-b").disabled = st.same; st.k = 0; draw(); });
         $(".ex-bits").addEventListener("change", () => { stop(); st.bits = $(".ex-bits").checked ? 8 : 0; readInputs(); st.k = 0; draw(); });
         $(".ex-reset").addEventListener("click", () => {
-          stop(); Object.assign(st, { kind: "arith", a: 5, b: 3, same: false, bits: 0, k: 0 });
-          $(".ex-kind").value = "arith"; $(".ex-a").value = 5; $(".ex-b").value = 3; $(".ex-b").disabled = false; $(".ex-same").checked = false; $(".ex-bits").checked = false;
+          stop(); Object.assign(st, PAGE);
+          setKind(PAGE.kind); $(".ex-a").value = PAGE.a; $(".ex-b").value = PAGE.b; $(".ex-c").value = PAGE.c; $(".ex-b").disabled = false; $(".ex-same").checked = false; $(".ex-bits").checked = false;
           draw();
         });
         $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });

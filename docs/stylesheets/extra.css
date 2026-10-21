@@ -2028,7 +2028,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer table.tr-vars { font-size: 0.72rem; margin: 0; }
 .md-typeset .explorer table.tr-vars td, .md-typeset .explorer table.tr-vars th { padding: 0.2em 0.6em; }
 .md-typeset .explorer table.tr-vars tr.is-changed td { background: var(--diff-medium-bg); font-weight: 700; }
-.md-typeset .explorer input.ex-a, .md-typeset .explorer input.ex-b { width: 5rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer input.ex-a, .md-typeset .explorer input.ex-b, .md-typeset .explorer input.ex-c { width: 5rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
 .md-typeset .explorer .tr-arr { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .md-typeset .explorer .tr-arr > span { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.2rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.9rem; background: var(--md-default-bg-color); color: var(--viz-ink); }
 .md-typeset .explorer .tr-arr > span .tr-idx { position: absolute; top: -0.9rem; left: 0; right: 0; text-align: center; font-size: 0.6rem; font-weight: 400; color: var(--viz-text); }
