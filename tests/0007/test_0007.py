@@ -146,3 +146,67 @@ def test_explorer_matches_brute_force():
     page = next((ROOT / "docs" / "questions" / "senior").glob("0007-*.md")).read_text(encoding="utf-8")
     for n in ("7,711,320", "1,911,720", "64,440", "5,735,160"):
         assert n in page
+
+
+def test_polygon_matches_triangle_and_cross_products():
+    """Part b: the n-vertex rule agrees with the triangle rule for n = 3, with the
+    cross-product check on random polygons, and the generator only returns polygons
+    that contain the centre; the acceptance rate follows 1 - n / 2^(n - 1)."""
+    rng = random.Random(70)
+    for _ in range(5000):
+        angles = [rng.uniform(0, 2 * math.pi) for _ in range(3)]
+        assert ns["contains_center_poly"](angles) == ns["contains_center"](angles)
+    for n in range(3, 11):
+        for _ in range(3000):
+            angles = [rng.uniform(0, 2 * math.pi) for _ in range(n)]
+            points = [(math.cos(t), math.sin(t)) for t in sorted(angles)]
+            assert ns["contains_center_poly"](angles) == ns["center_inside_poly"](points), (n, angles)
+        random.seed(n)
+        for _ in range(300):
+            points = ns["random_polygon_with_center"](n)
+            assert len(points) == n and ns["center_inside_poly"](points)
+        hits = sum(ns["contains_center_poly"]([rng.uniform(0, 2 * math.pi) for _ in range(n)]) for _ in range(20000))
+        assert abs(hits / 20000 - (1 - n / 2 ** (n - 1))) < 0.015, n
+    # the sorted order matters: the same points in another order are not the same polygon
+    pts = [(math.cos(t), math.sin(t)) for t in (0.1, 2.2, 4.3, 5.9)]
+    assert ns["center_inside_poly"](pts) and not ns["center_inside_poly"]([pts[0], pts[2], pts[1], pts[3]])
+
+
+def test_polygon_explorer_matches_page_code():
+    """The polygon explorer: its class on whole-degree polygons against the page's
+    contains_center_poly / center_inside_poly, its arcs, its probability formula and its
+    random draws (n different angles)."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(71)
+    cases = [[rng.randrange(360) for _ in range(rng.randint(3, 10))] for _ in range(2000)]
+    cases += [[0, 90, 180, 270], [0, 10, 20, 30, 40], [0, 120, 240], [5, 5, 100, 200], [0, 180, 90], [0, 72, 144, 216, 288]]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const rnd = (() => {{ let a = 7; return () => {{ a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }}; }})();
+      const cases = {json.dumps(cases)};
+      console.log(JSON.stringify({{
+        kinds: cases.map((c) => m.polyClass(c)), arcs: cases.map((c) => m.polyArcs(c)),
+        probs: [3, 4, 5, 10].map((n) => m.polyProb(n)),
+        draws: Array.from({{length: 200}}, (_, k) => m.polyRandom(3 + (k % 8), rnd)),
+        tri: cases.filter((c) => c.length === 3).map((c) => [m.polyClass(c), m.triClass(c)]),
+      }}));""")
+    for angles, kind, arcs in zip(cases, got["kinds"], got["arcs"]):
+        s = sorted(angles)
+        want_arcs = [s[i + 1] - s[i] for i in range(len(s) - 1)] + [360 - (s[-1] - s[0])]
+        assert arcs == want_arcs
+        if 0 in want_arcs or 360 in want_arcs:
+            assert kind == "degenerate"
+            continue
+        top = max(want_arcs)
+        assert kind == ("in" if top < 180 else "edge" if top == 180 else "out")
+        if kind in ("in", "out"):
+            rad = [math.radians(v) for v in angles]
+            assert ns["contains_center_poly"](rad) == (kind == "in")
+            assert ns["center_inside_poly"]([(math.cos(t), math.sin(t)) for t in sorted(rad)]) == (kind == "in")
+    assert all(a == b for a, b in got["tri"])
+    assert got["probs"] == [1 - 3 / 4, 1 - 4 / 8, 1 - 5 / 16, 1 - 10 / 512]
+    for k, d in enumerate(got["draws"]):
+        assert len(d) == 3 + (k % 8) == len(set(d)) and all(0 <= v < 360 for v in d)

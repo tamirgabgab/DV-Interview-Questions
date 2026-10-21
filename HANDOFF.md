@@ -992,7 +992,7 @@ axe check warns only; `main` is updated at the end of each round.
 5. **Checks:** lint 32/32 clean, 201 Python tests, strict build (with the cards), links
    (49 pages, 0 broken), phone check light and dark with axe (0 problems, 0 violations).
 
-### Session 19 — 2026-10-21: Staff level removed, triangle explorer (T118)
+### Session 19 — 2026-10-21: Staff level removed, round T explorers, 0007 polygon part
 
 1. **Staff level removed** at the owner's request (empty, no staff questions planned):
    `LEVELS` / `LEVEL_DESC` in `hooks/questions.py`, `tools/new_question.py`, the template,
@@ -1039,7 +1039,23 @@ axe check warns only; `main` is updated at the end of each round.
    on the twelve cases). `shapesRandom` caps n at the number of unit cells: the page's
    retry loop never returns for an impossible n (an explorer with a free slider would
    hang the tab). Test RNG under Node is mulberry32 (an LCG in doubles loses precision).
-6. **Checks:** lint 38/38, 240 Python tests, strict build, links 0 broken, phone check
+6. **0007, new part b (owner's request): the polygon with n vertices.** The old parts b
+   and c are now c and d (every cross reference on the page, in the triangle explorer's
+   compare line and in the follow-ups updated). Part b: `class circle_poly` with `int n`
+   set before `randomize()`, `rand int a[]` sized by `a.size() == n`, `foreach` order
+   and arc constraints plus the closing arc, `center_inside()` with two sign flags; Python
+   `contains_center_poly`, `random_polygon_with_center(n)` (points returned sorted by
+   angle, the polygon is the circular order) and `center_inside_poly`. The explorer kind
+   `polygon` (`data-n`, `data-nmax`) is the triangle box generalised: an n slider 3..10,
+   inputs P1..Pn, drag, a random draw, a regular polygon, and "1,000 draws" against
+   1 - n / 2^(n-1) (no enumeration: C(360, n) is beyond reach past n = 3, owner's call).
+   `tests/0007` compares the polygon rule with the triangle rule at n = 3 and with the
+   cross products for n = 3..10, checks the acceptance rate against the formula, and the
+   explorer against the page code; `tb.sv` randomizes the class 200 times per n with the
+   arcs re-checked and a 200-degree square rejected. Verilator at the pinned commit
+   supports `.size()` constraints on rand dynamic arrays (Changes: #7558, #7225), but
+   this is the first page that relies on it: watch the CI run.
+7. **Checks:** lint 38/38, 242 Python tests, strict build, links 0 broken, phone check
    light and dark with axe (0 problems, 0 violations).
 
 ---
