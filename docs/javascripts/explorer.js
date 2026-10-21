@@ -8,7 +8,7 @@
 //   strip                  0030        drag the spider and the fly on their walls: the periodic strip and the path
 //   hourglass              0018, 0019  A, B and D: the plan on a time axis and event by event (BFS or Dijkstra)
 //   probability            0015        p, q and C: the answer, the two-children square and the curve against q
-//   bridge                 0031        crossing times: the Dijkstra plan played crossing by crossing
+//   bridge                 0031        crossing times, a bridge of two or three: the Dijkstra plan (or one of the two classic plans) played crossing by crossing
 //   river                  0032        cross by hand or let the BFS plan play; the state graph follows
 //   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits
 //   fifo                   0033        burst, write and read rates, a skipping reader: the fill level over time
@@ -401,7 +401,10 @@
   // Bridge and torch (0031): Dijkstra over (who is across, torch side); a crossing of one
   // or two people from the torch's bank costs the time of the slower. Returns the least
   // time and the crossings as arrays of indices, as the page code does.
-  const bridgeSolve = (times) => {
+  // bridgeSolve: Dijkstra over (who is across, torch side); `cap` people fit on the bridge
+  // (2 on the page, 3 in the follow-up). Groups are tried as i <= j <= k so that the
+  // tie-break of the page's figure is kept.
+  const bridgeSolve = (times, cap = 2) => {
     const n = times.length, everyone = (1 << n) - 1, S = 2 << n;
     const reach = new Array(S).fill(Infinity), prev = new Array(S).fill(-1), via = new Array(S).fill(0), closed = new Array(S).fill(false);
     reach[0] = 0;
@@ -412,15 +415,17 @@
       closed[cur] = true;
       const across = cur >> 1, side = cur & 1;
       if (across === everyone) break;
-      for (let i = 0; i < n; i++) {
-        if (((across >> i) & 1) !== side) continue;
-        for (let j = i; j < n; j++) {
-          if (((across >> j) & 1) !== side) continue;
-          const cost = Math.max(times[i], times[j]);
-          const nxt = ((across ^ (1 << i) ^ (j === i ? 0 : 1 << j)) << 1) | (1 - side);
-          if (reach[cur] + cost < reach[nxt]) { reach[nxt] = reach[cur] + cost; prev[nxt] = cur; via[nxt] = (1 << i) | (1 << j); }
-        }
-      }
+      const bank = [];
+      for (let i = 0; i < n; i++) if (((across >> i) & 1) === side) bank.push(i);
+      const relax = (g) => {
+        const mask = g.reduce((m, i) => m | (1 << i), 0), cost = Math.max(...g.map((i) => times[i]));
+        const nxt = ((across ^ mask) << 1) | (1 - side);
+        if (reach[cur] + cost < reach[nxt]) { reach[nxt] = reach[cur] + cost; prev[nxt] = cur; via[nxt] = mask; }
+      };
+      bank.forEach((i, a) => bank.slice(a).forEach((j, b) => {
+        if (cap >= 3) bank.slice(a + b).forEach((k) => relax([i, j, k]));
+        else relax([i, j]);
+      }));
     }
     const moves = [];
     for (let s = (everyone << 1) | 1; prev[s] >= 0; s = prev[s]) {
@@ -431,6 +436,30 @@
     return { time: reach[(everyone << 1) | 1], moves };
   };
   const bridgeEscort = (times) => { const s = [...times].sort((u, v) => u - v); return s.length < 3 ? s[s.length - 1] : s[0] * (s.length - 2) + s.slice(1).reduce((u, v) => u + v, 0); };
+  // The two classic plans of the page as crossings (a bridge of two): the fastest escorts
+  // everyone one by one; or, round after round, the two slowest cross together (the fast
+  // pair goes first, the fastest brings the torch back, the slowest pair crosses, the
+  // second brings it back), with three or fewer left done directly. bridgeTime replays.
+  const bridgeTime = (times, moves) => moves.reduce((t, g) => t + Math.max(...g.map((i) => times[i])), 0);
+  const bridgeOrder = (times) => times.map((t, i) => i).sort((u, v) => times[u] - times[v] || u - v);
+  const bridgeEscortMoves = (times) => {
+    const o = bridgeOrder(times), moves = [];
+    if (o.length === 1) return [[o[0]]];
+    o.slice(1).forEach((p, k) => { moves.push([o[0], p]); if (k < o.length - 2) moves.push([o[0]]); });
+    return moves;
+  };
+  const bridgePairMoves = (times) => {
+    const o = bridgeOrder(times), moves = [];
+    let rest = o;
+    while (rest.length > 3) {
+      const [f, s] = rest, slow2 = rest.slice(-2);
+      moves.push([f, s], [f], slow2, [s]);
+      rest = rest.slice(0, -2);
+    }
+    if (rest.length === 3) moves.push([rest[0], rest[1]], [rest[0]], [rest[0], rest[2]]);
+    else moves.push(rest);
+    return moves;
+  };
 
   // Wolf, goat and cabbage (0032): a state is four bits (farmer 1, wolf 2, goat 4,
   // cabbage 8; 0 near, 1 far). riverSafe is the page's test, riverMoves the crossings
@@ -1521,7 +1550,7 @@
     clockCounts, clockMeetsIn, clockNext, clockPrev, clockLabel,
     stripImages, stripEdgePoint, stripPoint3, stripFacesBetween, stripLines, stripBest,
     hourglassSolve, hourglassInterval, hourglassReplay, hourglassReachable, probabilityAnswer,
-    bridgeSolve, bridgeEscort, riverSafe, riverMoves, riverPlan,
+    bridgeSolve, bridgeEscort, bridgeTime, bridgeEscortMoves, bridgePairMoves, riverSafe, riverMoves, riverPlan,
     pcieBoundaries, pcieBlocks, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula,
     fifoSteps, fifoDepth, fifoFill, mtbfSeconds, mtbfHuman,
     TRI_TOTAL, triArcs, triClass, triCountC, triFrame, triIndex, triCounts, polyArcs, polyClass, polyProb, polyRandom,
@@ -2638,11 +2667,14 @@
     mount(box) {
       const NAMES = "ABCDEFGH";
       const defaults = box.dataset.times || "1 2 5 10";
-      const st = { times: [], s: 0 };
+      const PLANS = { best: "החיפוש (הקצרה ביותר)", escort: "המהיר מלווה את כולם", pair: "שני האיטיים חוצים יחד" };
+      const st = { times: [], s: 0, cap: 2, plan: "best" };
       box.innerHTML =
         `<div class="ex-controls"><label>הזמנים (עד שמונה) <input type="text" class="ex-times" value="${defaults}" size="22" dir="ltr" inputmode="numeric" aria-label="זמני החצייה, מופרדים ברווחים"></label>` +
+        `<label>הגשר מחזיק <select class="ex-cap" aria-label="כמה אנשים הגשר מחזיק"><option value="2" selected>שניים</option><option value="3">שלושה</option></select></label>` +
+        `<label>התוכנית <select class="ex-plan" aria-label="התוכנית שמוצגת">${Object.entries(PLANS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
-        `<p class="ex-summary" aria-live="polite"></p>` +
+        `<p class="ex-summary" aria-live="polite"></p><div class="bridge-plans"></div>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">החצייה הקודמת</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">החצייה הבאה</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1600, 1000, 400) + `<span class="ex-pos"></span></div>` +
@@ -2677,15 +2709,33 @@
              `<text class="legend" x="630" y="182" text-anchor="end" font-weight="700">t = ${t}</text>`;
         return s + "</svg>";
       };
+      // the plans on the current times: the search (for the chosen capacity) and, on a
+      // bridge of two, the two classic plans of the page
+      const plansOf = () => {
+        const times = st.times, best = bridgeSolve(times, st.cap);
+        const out = { best };
+        if (st.cap === 2) {
+          out.escort = { moves: bridgeEscortMoves(times) }; out.escort.time = bridgeTime(times, out.escort.moves);
+          out.pair = { moves: bridgePairMoves(times) }; out.pair.time = bridgeTime(times, out.pair.moves);
+        }
+        return out;
+      };
+      const planText = (moves) => moves.map((g, k) => `${g.map((i) => NAMES[i]).join("+")}${k % 2 ? "<" : ">"}`).join(" ");
       const draw = () => {
         const times = st.times;
-        if (!times.length) { $(".ex-summary").textContent = "הקלידו זמני חצייה חיוביים, מופרדים ברווחים."; $(".bridge-frame").innerHTML = ""; $(".bridge-caption").textContent = ""; $(".ex-pos").textContent = ""; return; }
-        const r = bridgeSolve(times), esc = bridgeEscort(times);
+        if (!times.length) { $(".ex-summary").textContent = "הקלידו זמני חצייה חיוביים, מופרדים ברווחים."; $(".bridge-plans").innerHTML = ""; $(".bridge-frame").innerHTML = ""; $(".bridge-caption").textContent = ""; $(".ex-pos").textContent = ""; return; }
+        const plans = plansOf();
+        if (!plans[st.plan]) { st.plan = "best"; $(".ex-plan").value = "best"; }
+        const r = plans[st.plan], best = plans.best;
         st.s = Math.min(Math.max(st.s, 0), r.moves.length);
         const names = (g) => g.map((i) => `${NAMES[i]} (${times[i]})`).join(" ו-");
-        const planText = r.moves.map((g, k) => `${g.map((i) => NAMES[i]).join("+")}${k % 2 ? "<" : ">"}`).join(" ");
-        $(".ex-summary").innerHTML = `${times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`}: הזמן הקצר ביותר הוא ${ltr(r.time)} דקות ב-${ltr(r.moves.length)} חציות, ${ltr(planText)}. ` +
-          (times.length >= 3 ? `אם המהיר היה מלווה את כולם: ${ltr(esc)}${esc > r.time ? `, כלומר ${ltr(esc - r.time)} דקות יותר.` : ", אותו דבר."}` : "");
+        $(".ex-summary").innerHTML = `${times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`} על גשר של ${st.cap === 2 ? "שניים" : "שלושה"}: הזמן הקצר ביותר הוא ${ltr(best.time)} דקות ב-${ltr(best.moves.length)} חציות, ${ltr(planText(best.moves))}.` +
+          (st.plan === "best" ? "" : ` מוצגת התוכנית "${PLANS[st.plan]}": ${ltr(r.time)} דקות${r.time > best.time ? `, ${ltr(r.time - best.time)} יותר מהקצרה ביותר` : ", בדיוק כמו הקצרה ביותר"}.`);
+        $(".bridge-plans").innerHTML = st.cap === 2 && times.length >= 2
+          ? `<table class="bridge-table"><thead><tr><th>התוכנית</th><th>החציות</th><th>הזמן</th></tr></thead><tbody>` +
+            Object.keys(PLANS).map((k) => `<tr${k === st.plan ? ' class="is-now"' : ""}${plans[k].time === best.time ? ' data-best="1"' : ""}><td>${PLANS[k]}</td><td>${ltr(planText(plans[k].moves))}</td><td>${ltr(plans[k].time)}</td></tr>`).join("") + `</tbody></table>`
+          : st.cap === 3 ? `<p class="ex-note">שתי התוכניות הקלאסיות מוגדרות לגשר של שניים; לגשר של שלושה מוצג החיפוש בלבד${times.length >= 3 ? `, לעומת ${ltr(bridgeSolve(times, 2).time)} דקות על גשר של שניים` : ""}.</p>` : "";
+        $(".ex-plan").querySelectorAll("option").forEach((o) => { o.disabled = !plans[o.value]; });
         let across = 0, side = 0, t = 0, caption = "רגע 0: כולם והלפיד על הגדה הקרובה.";
         let moving = [], forward = true;
         for (let k = 0; k < st.s; k++) {
@@ -2701,7 +2751,7 @@
 
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
-      const total = () => (st.times.length ? bridgeSolve(st.times).moves.length : 0);
+      const total = () => (st.times.length ? plansOf()[st.plan].moves.length : 0);
       $(".ex-next").addEventListener("click", () => { stop(); st.s += 1; draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.s -= 1; draw(); });
       play.addEventListener("click", () => {
@@ -2715,7 +2765,9 @@
       $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); play.click(); } });
       input.addEventListener("change", () => { stop(); st.times = parse(); st.s = 0; draw(); });
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
-      $(".ex-reset").addEventListener("click", () => { stop(); input.value = defaults; st.times = parse(); st.s = 0; draw(); });
+      $(".ex-cap").addEventListener("change", () => { stop(); st.cap = Number($(".ex-cap").value); st.s = 0; draw(); });
+      $(".ex-plan").addEventListener("change", () => { stop(); st.plan = $(".ex-plan").value; st.s = 0; draw(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); input.value = defaults; st.times = parse(); st.cap = 2; st.plan = "best"; $(".ex-cap").value = "2"; $(".ex-plan").value = "best"; st.s = 0; draw(); });
       st.times = parse();
       draw();
     },

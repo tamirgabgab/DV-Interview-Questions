@@ -1390,7 +1390,13 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .st-ok { background: var(--viz-s3); opacity: 0.6; }
 .md-typeset .viz-legend .torch { background: var(--viz-s2); clip-path: polygon(50% 0, 100% 60%, 50% 100%, 0 60%); }
 .md-typeset .explorer input.ex-times { font: inherit; font-family: var(--md-code-font-family); padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .ex-note { margin: 0.2em 0 0.4em; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .ex-note:empty { display: none; }
 .md-typeset .explorer .bridge-caption { margin: 0.2em 0 0.4em; font-size: 0.75rem; }
+.md-typeset .explorer .bridge-table { font-size: 0.7rem; margin: 0.2em 0 0.5em; }
+.md-typeset .explorer .bridge-table td, .md-typeset .explorer .bridge-table th { padding: 0.15em 0.6em; }
+.md-typeset .explorer .bridge-table tr[data-best] td:last-child { font-weight: 700; color: var(--viz-s2-text); }
+.md-typeset .explorer .bridge-table tr.is-now td { background: var(--md-code-bg-color); }
 
 /* the river figure and state graph of 0032 */
 .md-typeset svg .boat { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
@@ -1432,8 +1438,6 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .cake-scroll thead th { position: sticky; top: 0; background: var(--md-default-bg-color); }
 .md-typeset .explorer .cake-table { font-size: 0.7rem; margin: 0; }
 .md-typeset .explorer input.ex-num { width: 5.2rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; margin-inline-start: 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
-.md-typeset .explorer .cake-note { margin: 0.2em 0 0.4em; font-size: 0.7rem; color: var(--viz-text); }
-.md-typeset .explorer .cake-note:empty { display: none; }
 .md-typeset .explorer .cake-table td, .md-typeset .explorer .cake-table th { padding: 0.15em 0.6em; }
 .md-typeset .explorer .cake-table tr.is-best td { font-weight: 700; color: var(--viz-s2-text); }
 .md-typeset .explorer .cake-table tr[data-now] td { background: var(--md-code-bg-color); }

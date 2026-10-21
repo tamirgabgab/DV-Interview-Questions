@@ -93,6 +93,55 @@ def test_explorer_matches_generator():
     assert got[0][1] == [[0, 1], [0], [2, 3], [1], [0, 1]]
 
 
+def test_explorer_capacity_and_classic_plans():
+    """The box's follow-ups: a bridge of three (Dijkstra against a brute force with groups
+    of up to three; 13 for the page's times), and the two classic plans as crossings,
+    whose replay gives the page's escort time and the pair rule's time."""
+    from page_tests import explorer_require, node_json
+
+    def brute3(times):
+        n, everyone = len(times), (1 << len(times)) - 1
+        best = [float("inf")]
+
+        def rec(across, side, t, seen):
+            if t >= best[0]:
+                return
+            if across == everyone:
+                best[0] = t
+                return
+            bank = [i for i in range(n) if ((across >> i) & 1) == side]
+            groups = [(i,) for i in bank] + list(combinations(bank, 2)) + list(combinations(bank, 3))
+            for g in groups:
+                new = (across ^ sum(1 << i for i in g), 1 - side)
+                if new not in seen:
+                    rec(new[0], new[1], t + max(times[i] for i in g), seen | {new})
+
+        rec(0, 0, 0, {(0, 0)})
+        return best[0]
+
+    def pair_rule(times):
+        s = sorted(times)
+        total = 0
+        while len(s) > 3:
+            total += s[0] + 2 * s[1] + s[-1]
+            s = s[:-2]
+        return total + (sum(s) if len(s) == 3 else s[-1])
+
+    rng = random.Random(3132)
+    cases = [[1, 2, 5, 10], [1, 2, 3, 4], [1, 2, 5, 10, 20], [7], [3, 9], [2, 2, 2]]
+    cases += [[rng.randint(1, 25) for _ in range(rng.randint(1, 6))] for _ in range(40)]
+    got = node_json(f"const m = {explorer_require()}; const cases = {cases};"
+                    "console.log(JSON.stringify(cases.map((ts) => { const r3 = m.bridgeSolve(ts, 3), e = m.bridgeEscortMoves(ts), p = m.bridgePairMoves(ts);"
+                    " return [r3.time, r3.moves, m.bridgeTime(ts, e), e, m.bridgeTime(ts, p), p]; })));")
+    for ts, (t3, m3, te, me, tp, mp) in zip(cases, got):
+        assert t3 == brute3(ts) and all(len(g) <= 3 for g in m3), ts
+        assert t3 <= q0031.plan(ts)[0]
+        assert te == q0031.escort(ts) and q0031.replay(ts, [tuple(g) for g in me]) == te, ts
+        assert tp == pair_rule(ts) and q0031.replay(ts, [tuple(g) for g in mp]) == tp, ts
+        assert tp >= q0031.plan(ts)[0] and te >= q0031.plan(ts)[0]
+    assert got[0][0] == 13
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
