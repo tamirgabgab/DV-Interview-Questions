@@ -127,8 +127,7 @@ def test_explorer_matches_page_code():
     got = node_json(f"""
       const m = {explorer_require()};
       const arr = {json.dumps(arrangements)};
-      let seed = 7;
-      const rnd = () => {{ seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }};
+      const rnd = (() => {{ let a = 7; return () => {{ a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }}; }})();   // mulberry32: exact in doubles
       let wins = 0, randWins = 0;
       for (let r = 0; r < 4000; r++) {{ const notes = m.permShuffle(16, rnd); wins += m.permAllWin(notes, 8); randWins += m.permRandomPicks(notes, 8, rnd); }}
       console.log(JSON.stringify({{

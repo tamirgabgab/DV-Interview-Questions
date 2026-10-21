@@ -101,3 +101,50 @@ def test_figures_up_to_date():
     generated = [line.strip() for line in out.splitlines() if line.strip().startswith("<svg")]
     page = re.findall(r'<svg class="figure".*?</svg>', question_path(14).read_text(encoding="utf-8"))
     assert page == generated
+
+
+def test_explorer_matches_page_code():
+    """The shapes explorer: its candidates and overlap test against the page's, every
+    draw it makes accepted by shapes_ok and by the painting check, its rejection draw
+    uniform among the free candidates, and its heat map consistent with its draws."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(14)
+    pairs = [[[rng.randint(1, 9), rng.randint(1, 7), 0, 0] for _ in range(2)] for _ in range(300)]
+    for p in pairs:
+        for s in p:
+            s[2], s[3] = s[0] + rng.randint(1, 10 - s[0]), s[1] + rng.randint(1, 8 - s[1])
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const rnd = (() => {{ let a = 14; return () => {{ a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }}; }})();   // mulberry32: exact in doubles
+      const draws = [];
+      for (const [N, M, mx, sq] of [[10, 8, 6, true], [10, 8, 6, false], [4, 4, 8, true], [3, 3, 4, false], [12, 10, 10, true]])
+        for (let r = 0; r < 30; r++) draws.push([N, M, sq, m.shapesRandom(N, M, mx, sq, rnd)]);
+      const tries = Array.from({{length: 200}}, () => m.shapesTry(10, 8, [[1, 1, 5, 5], [6, 2, 10, 6]], true, rnd));
+      const heat = m.shapesHeat(10, 8, 6, true, 40, rnd);
+      console.log(JSON.stringify({{
+        counts: [m.shapesCandidates(10, 8, true).length, m.shapesCandidates(10, 8, false).length, m.shapesCandidates(4, 4, true).length],
+        overlap: {json.dumps(pairs)}.map(([a, b]) => m.shapesOverlap(a, b)),
+        draws, tries, heat,
+        ok: [m.shapesOk(10, 8, [[1, 1, 3, 3], [3, 3, 5, 5]], true), m.shapesOk(10, 8, [[1, 1, 3, 3], [2, 2, 4, 4]], true), m.shapesOk(10, 8, [[1, 1, 3, 4]], true), m.shapesOk(10, 8, [[1, 1, 3, 4]], false)],
+      }}));""")
+    assert got["counts"] == [len(list(ns["candidates"](10, 8, True))), len(list(ns["candidates"](10, 8, False))), len(list(ns["candidates"](4, 4, True)))]
+    assert got["counts"][:2] == [196, 1260]
+    for (a, b), o in zip(pairs, got["overlap"]):
+        assert o == ns["overlap"](tuple(a), tuple(b))
+    assert got["ok"] == [True, False, False, True]
+    for N, M, sq, shapes in got["draws"]:
+        shapes = [tuple(s) for s in shapes]
+        assert 1 <= len(shapes) and ns["shapes_ok"](N, M, shapes, sq) and painted_ok(N, M, shapes, sq)
+    fixed = [(1, 1, 5, 5), (6, 2, 10, 6)]
+    free = [c for c in ns["candidates"](10, 8, True) if not any(ns["overlap"](c, s) for s in fixed)]
+    for t in got["tries"]:
+        assert t["free"] == len(free) and t["all"] == 196
+        assert tuple(t["shape"]) in free and tuple(t["tries"][-1]) == tuple(t["shape"])
+        for c in t["tries"][:-1]:
+            assert any(ns["overlap"](tuple(c), s) for s in fixed)
+    h = got["heat"]
+    assert h["rounds"] == 40 and sum(h["sides"]) == h["count"] and len(h["cells"]) == 7 and all(len(r) == 9 for r in h["cells"])
+    assert sum(map(sum, h["cells"])) >= h["count"]            # every shape covers at least one cell

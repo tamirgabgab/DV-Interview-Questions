@@ -1770,3 +1770,16 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .ttt-idx { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); opacity: 0.6; }
 .md-typeset .explorer .ttt-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .ttt-bad { color: var(--diff-hard); font-weight: 700; }
+
+/* Shapes explorer (0014): the grid, the flashed candidate, the heat map */
+.md-typeset .explorer .sh-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .sh-grid, .md-typeset .explorer .sh-heat { flex: 1 1 18rem; min-width: 0; max-width: 24rem; }
+.md-typeset .explorer svg.sh-live { width: 100%; }
+.md-typeset svg .sh-reject { fill: var(--diff-hard); fill-opacity: 0.25; stroke: var(--diff-hard); stroke-width: 2.5; stroke-dasharray: 5 3; }
+.md-typeset svg .sh-accept { fill: var(--diff-easy); fill-opacity: 0.3; stroke: var(--diff-easy); stroke-width: 3; }
+.md-typeset svg .sh-cell { fill: var(--viz-s2); stroke: none; }
+.md-typeset .explorer .sh-sides { font-size: 0.72rem; margin: 0.3em 0; }
+.md-typeset .explorer .sh-step { margin: 0.4em 0; }
+.md-typeset .explorer .sh-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .sh-bad { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer .sh-note { font-size: 0.7rem; color: var(--viz-text); }

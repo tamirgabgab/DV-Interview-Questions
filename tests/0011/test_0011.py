@@ -95,8 +95,7 @@ def test_explorer_matches_page_code():
         }}
         return out;
       }};
-      let seed = 11;
-      const rnd = () => {{ seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }};
+      const rnd = (() => {{ let a = 11; return () => {{ a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }}; }})();   // mulberry32: exact in doubles
       const g = m.tttFinalBoards(false), w = m.tttFinalBoards(true);
       console.log(JSON.stringify({{
         plain: verdicts(false), wrap: verdicts(true),
