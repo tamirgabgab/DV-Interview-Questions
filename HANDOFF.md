@@ -1453,6 +1453,12 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       with a mid-flight Sync flagged), every export of the nine strip pages rendered
       with the wavedrom package; lint, the Python tests (282), strict build, links,
       phone and axe light and dark. `main` fast-forwarded at the end of the round.
+21. **Round D dropped; a second series of proposals (A181 to E201).** The owner dropped
+    round D and asked for new ideas on presenting the answers, numbered from round A
+    again. A short web search (explorable explanations, steppers against scrollytelling,
+    program visualisation, interview-prep products, the state of Material for MkDocs)
+    and screenshots of 0020 at 1280 and 390 px went into five rounds, recorded at the end
+    of the round list. Nothing implemented.
 
 ---
 
@@ -1466,8 +1472,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   (session 20). Round W (trimmed by the owner; W172 dropped) is done in three batches
   (W149, W170, W173; W152, W162, W177; W154, W164, W169). Round U (U134 to U139, the
   owner's pick) is done in three batches (U134, U135; U136, U137; U138, U139). Round X
-  with U133 is done in three batches (U133, X147; X145; X146). Next: the
-  open rounds D to F, I, L, N, O, Q, S, or new questions.
+  with U133 is done in three batches (U133, X147; X145; X146). Round D was dropped by the
+  owner. A second series of rounds A to E (items A181 to E201) on how the answers are
+  presented is proposed (see the end of the round list); next: the owner picks from it,
+  or the open rounds E, F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1649,16 +1657,9 @@ tables) and showed where the interface strains: long pages have no in-page navig
 figures with 16 rows are unreadable at 390 px, and display math wider than the phone was
 found by hand. The proposals are grouped so a round can be done in one session.
 
-**Round D — reading long pages and figures, especially on a phone**
-
-| # | Proposal | Effort |
-|---|----------|--------|
-| D25 | **Part navigation bar**: sticky chips "סעיף א / ב / ג" under the toolbar on multi-part pages, the current part highlighted, plus "back to top" | S–M |
-| D26 | **Figure lightbox**: tap a figure to open it full screen with pinch-zoom and pan (the 16-row splits map of 0020 / 0021 and the 14 × 14 grid of 0015 are unreadable at phone width) | M |
-| D27 | **Progressive reveal in practice mode**: inside an opened solution show idea → steps → code → proof one block at a time with a "הצג עוד" button; "solved" mark and stopwatch split per part | M |
-| D28 | **Print / PDF stylesheet** and a "print this question" button: all blocks open, toolbar and navigation hidden, figures kept (the light version of idea 19) | S |
-| D29 | **Anchor links and share button**: a link icon on every heading (including parts), Web Share API on phones and "copy link" on desktop | S |
-| D30 | **Reading aids**: estimated reading time in the header card and a "read first" line from a `prerequisites:` front-matter field (0021 needs 0020) | S |
+**Round D** — dropped by the owner in session 20 (2026-10-22). D25 and D26 had been done
+as H51 and H50; D27 and D28 live on as L69 and L71; D29 (a share button beside the
+existing heading anchors) and D30 (reading time, a `prerequisites:` line) were dropped.
 
 **Round E — discovery and navigation**
 
@@ -1692,7 +1693,7 @@ found by hand. The proposals are grouped so a round can be done in one session.
 | G46 | ~~**Scheduled workflow**: a weekly external-link check and a reminder when a Verilator release newer than the pinned commit is out~~ | S — **done** in session 16 |
 | G47 | ~~**Display-math width in CI**: extend `check_phone.py` to report `mjx-container[display]` elements wider than the content box (the ten equations of 0021 were found with an ad-hoc script)~~ | S — **done** as K65 |
 
-Suggested order by value for effort: D26 and D25 (the phone experience of the long pages),
+Suggested order by value for effort: D26 and D25 (done as H50 and H51; round D since dropped),
 G47 (so the next proof page is caught by CI), F37 (the PCIe explorer), E31 and E32.
 
 **Rounds H to K — proposed 2026-10-19, after 0026 to 0028** (K, H and J done in session 13 except H49; I open):
@@ -1966,6 +1967,92 @@ Suggested order (session 20): rounds V and W are done (W in three batches, the o
 answering multiple-choice questions per batch). Round U134 to U139 is being done the same
 way (U134 to U139 done in three batches); round X with U133 done in three batches.
 
+
+### Second series, rounds A to E — presenting the answers (proposed 2026-10-22, owner picks)
+
+The owner asked for new proposals on how answers are shown: clear, good-looking pages
+with visual explanations. The rounds restart at A; item numbers continue the global
+count (181 on), so they do not collide with the first series' A1 to D30.
+
+What the pages look like today (screenshots of 0020 at 1280 and 390 px, light): a long
+single column; each solution is a stack of blocks (short answer, idea, steps, code,
+proof, cost) that the reader scrolls through; figures are generated SVG with a separate
+legend under them, and on a phone the address-axis figures shrink until their labels are
+about 6 px high while the legend wraps to four or five lines; the table of contents lists
+only the top sections; the 34 explorer boxes each have their own control layout.
+
+What the short research found (sources in the chat summary of 2026-10-22):
+
+- Interactive diagrams should add to the text, never replace it: the reader learns without
+  touching anything, and a box is not dropped on the reader as a sandbox without guidance
+  (Red Blob Games). Diagrams work best interlinked with the text and annotations (UW
+  CSE442). Animation must reveal something, interactions must be discoverable, and a
+  reduced-motion path must exist.
+- Discrete states read better in an explicit stepper than in scroll-driven animation
+  (known length, direct access, replay, comparison); scrollytelling needs a stacked or
+  stepped fallback on phones (Kosara, "The scrollytelling scourge"; The Pudding's
+  responsive scrollytelling guide).
+- Program visualisation that steps forwards and backwards through real execution, with
+  the state beside the code, is the best-studied form for code answers (Python Tutor,
+  Guo, SIGCSE 2013). Diagrams should focus on the part of the code that matters for the
+  task (MIT thesis on code-comprehension diagrams).
+- Interview-prep products stage the answer: hints, then complexity, then patterns, then
+  code, each behind a toggle, and give every approach its complexity (AlgoExpert,
+  StreamPrep, AlgoMaster's animated visualisations).
+- Material for MkDocs is in maintenance mode (no new features since 9.7, end of life
+  announced for November 2026; the team moved to Zensical, which reads `mkdocs.yml`).
+  New interface work should therefore live in our own CSS / JS, not wait for theme
+  features; a move to Zensical is a separate decision for the owner.
+
+**Round A — the answer at a glance**
+
+| Id | Idea | Size |
+|---|---|---|
+| A181 | **Solution map**: a strip at the top of every solution with its blocks (idea → steps → code → proof → cost), one line each, clickable; the block in view is marked while scrolling | S–M |
+| A182 | **Answer hero card**: the short answer with its key result set large (a number, a formula, a verdict), a thumbnail of the main figure beside it, and the hint ladder folded into a progress line above it | M |
+| A183 | **Cost as chips and a comparison**: time / space (and flops, gates, latency on design pages) as chips in the solution header; on pages with several approaches a small table or bar chart comparing them | S–M |
+| A184 | **Approaches side by side**: where a page has a naive and a good solution, a two-column compare view (or tabs with a "what changed" note) instead of two blocks far apart | M |
+
+**Round B — code and figure linked**
+
+| Id | Idea | Size |
+|---|---|---|
+| B185 | **Linked highlighting**: tapping a code line, or one of its annotation markers, highlights the figure element it builds, and the other way round (ids emitted by the figure generators, a shared `data-link`) | M |
+| B186 | **Step-through of the page code beside its state** (the Python Tutor pattern) for the algorithm pages that have a trace-like box: the current line lit, the variables and data structures beside it, forward and back; generalises the 0002 / 0003 trace view to 0005, 0010, 0017 | M–L |
+| B187 | **Proofs as steppers**: each step of a proof block highlights the part of the figure it talks about, with the step text under it (the figure steppers of M76 applied to proofs) | M |
+| B188 | **Code and waveform side by side** on the DV pages: on a wide screen the SystemVerilog tab and its WaveDrom diagram in two columns, the waveform sticky while the code scrolls | S–M |
+
+**Round C — the reading surface**
+
+| Id | Idea | Size |
+|---|---|---|
+| C189 | **Sticky figure column on wide screens**: in long solutions the current figure stays beside the text while it scrolls (a stepper, not scroll-driven animation); one column with the figures inline on phones | M |
+| C190 | **Typography pass for Hebrew**: a Hebrew face with good digits (e.g. Assistant or Heebo), tabular numbers in tables, a line-length cap, more line height, styled LTR runs | S–M |
+| C191 | **One visual identity per block**: idea / steps / code / proof / cost / trap each with an icon, an accent colour and a side rail, the same in light and dark | S |
+| C192 | **Tables that read**: sticky header, numbers aligned, the row the text refers to highlighted, and on phones long tables as cards | S–M |
+| C193 | **Direct labels instead of separate legends** in the generated figures where there is room, and a colour-blind-safe palette checked by a script over every `--viz-*` pair | M |
+
+**Round D — figures made for the phone**
+
+| Id | Idea | Size |
+|---|---|---|
+| D194 | **Compact figure variants**: generators emit a narrow layout for phones (fewer ticks, larger text, stacked rows) shown under 480 px; today's address-axis figures fall to ~6 px labels | M–L |
+| D195 | **Minimum text size check**: `check_phone.py` measures rendered SVG text at 390 px and warns below 9 px | S |
+| D196 | **Controls in a bottom sheet** on phones for the explorer boxes: the figure stays in view while the controls sit at the bottom of the screen | M |
+| D197 | **Legend as chips** under a figure on phones (one row that scrolls) instead of a list of five lines | S |
+
+**Round E — motion and consistency in the boxes**
+
+| Id | Idea | Size |
+|---|---|---|
+| E198 | **Purposeful transitions**: values and cells move between states (tweened bus values, sliding queue chips, growing arcs), off under `prefers-reduced-motion` | M |
+| E199 | **The answer lights up**: when a box reaches its result, the element that is the answer (the duplicate, the survivor, the maximal polynomial) is outlined and named in one line | S–M |
+| E200 | **One layout for all 34 boxes**: control groups in a fixed order (input, playback, output), a status line at the bottom, the same spacing and button sizes, documented once | M |
+| E201 | **A first-visit guide** on one box per page: three dismissible hints pointing at the main control, the figure and the summary, remembered per browser | S–M |
+
+Suggested order: A181 and C191 (small, visible on every page), D195 then D194 (the phone
+figures are the weakest point today), B185 (the largest gain in understanding), then A182
+and A183.
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
