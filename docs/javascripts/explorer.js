@@ -3,7 +3,7 @@
 // model per kind:
 //   cake-arith / cake-geo  0027, 0028  the law, sliders a and d (or q) with exact fields (a tiny a, a negative d, q below 1), and a person-by-person stepper of the cake
 //   motorcycle             0026        sliders t0 and t1, a strategy, and play: the travellers on the road and the chart; 1 to 5 riders, a km field, a second plan dashed
-//   josephus               0016, 0022  sliders N (and L), and the circle played step by step; the survivor chart; Josephus's own rule (0016), a seat lookup, N up to a million
+//   josephus               0016        sliders N and L (2 to 6), and the circle played step by step; the survivor chart with the zero points; a seat lookup, N up to a million
 //   clock                  0029        a clock face to drag, play or type: meetings of the hands so far
 //   strip                  0030        drag the spider and the fly on their walls: the periodic strip and the path
 //   hourglass              0018, 0019  A, B (and C) and D: the plan on a time axis and event by event (BFS or Dijkstra), the page's objective or the fewest flips
@@ -36,7 +36,7 @@
 //   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table; a timeline of every read's waits and completions; a cycle axis of the completions and the ready reads
 //   trace                  0002, 0003  the page's Python one line (or one comparison) at a time: the swaps (and the three-variable XOR rotation) with a0 / b0 / c0 expressions, the double loop with its invariant
 // The math of each model is exported under Node, where the question tests compare it with
-// the Python reference (tests/0001 to 0022, 0026 to 0038).
+// the Python reference (tests/0001 to 0021, 0023 to 0038).
 (() => {
   const EPS = 1e-9;
 
@@ -184,7 +184,7 @@
   const motorcycleAt = (plan, t) => [motorcycleInterp(plan.bike, t), ...plan.riders.map((r) => motorcycleInterp(r, t))];
   const motorcycleTimeK = (alpha, k) => ((2 * k - 1) * alpha + 1) / (alpha + 2 * k - 1);
 
-  // Josephus (0016, 0022): person 0 stays, the next L - 1 leave, and so on around.
+  // Josephus (0016): person 0 stays, the next L - 1 leave, and so on around.
   const josephusRun = (n, L) => {
     const circle = Array.from({ length: n }, (_, i) => i);
     let i = 0;
@@ -223,54 +223,23 @@
     return { steps, survivor: circle[0] };
   };
 
-  // The general rule "keep people stay, remove leave" (the page's L rule is keep 1,
-  // remove L - 1; Josephus's own story is keep 2, remove 1): the steps as
-  // [who stay (an array), who leave] and the survivor, by the same semantics as
-  // josephusSteps (the count of leavers is fixed before anyone leaves).
-  const josephusKR = (n, keep, remove) => {
-    const circle = Array.from({ length: n }, (_, i) => i), steps = [];
-    let i = 0;
-    while (circle.length > 1) {
-      const stays = [];
-      for (let k = 0; k < keep; k++) { stays.push(circle[(i + k) % circle.length]); }
-      i = (i + keep - 1) % circle.length;
-      const leave = [], count = Math.min(remove, circle.length - 1);
-      for (let s = 0; s < count; s++) {
-        const j = (i + 1) % circle.length;
-        leave.push(circle.splice(j, 1)[0]);
-        if (j < i) i -= 1;
-      }
-      steps.push([stays, leave]);
-      i = (i + 1) % circle.length;
-    }
-    return { steps, survivor: circle[0] };
-  };
   // The survivor alone, in O(n) with a circular linked list (N up to a million).
-  const josephusSurvivor = (n, keep, remove) => {
+  const josephusSurvivor = (n, L) => {
     if (n === 1) return 0;
     const next = new Int32Array(n);
     for (let i = 0; i < n; i++) next[i] = (i + 1) % n;
-    let cur = 0, left = n;                          // cur is the first to stay in the step
+    let cur = 0, left = n;                          // cur stays in this step
     while (left > 1) {
-      for (let k = 0; k < keep - 1; k++) cur = next[cur];
-      const count = Math.min(remove, left - 1);
+      const count = Math.min(L - 1, left - 1);
       for (let s = 0; s < count; s++) { next[cur] = next[next[cur]]; left -= 1; }   // the one after cur leaves
       cur = next[cur];
     }
     return cur;
   };
-  // Josephus's own rule has no closed form: the recurrence f(m) = (f(m - 1) + 3) mod m.
-  const josephusRecurrence = (n, step = 3) => { let f = 0; for (let m = 2; m <= n; m++) f = (f + step) % m; return f; };
   // The reverse lookup: the first `count` circle sizes N (up to `limit`) in which seat s
-  // survives. The page's L rule uses the closed form; Josephus's rule (L null) the recurrence.
+  // survives, by the closed form.
   const josephusSeats = (s, L, count = 5, limit = 1000000) => {
     const out = [];
-    if (L === null) {
-      let f = 0;
-      if (s === 0) out.push(1);
-      for (let m = 2; m <= limit && out.length < count; m++) { f = (f + 3) % m; if (f === s) out.push(m); }
-      return out;
-    }
     if (s % L !== 0) return out;                    // F_L is always a multiple of L
     for (let n = 1; n <= limit && out.length < count; n++) if (josephusFormula(n, L) === s) out.push(n);
     return out;
@@ -2094,7 +2063,7 @@
     mulberry32, waveDromOf, waveDromText,
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
     motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, motorcycleRiders, motorcycleAt, motorcycleTimeK, josephusRun, josephusSteps, josephusZero, josephusFormula,
-    josephusKR, josephusSurvivor, josephusRecurrence, josephusSeats,
+    josephusSurvivor, josephusSeats,
     clockCounts, clockMeetsIn, clockNext, clockPrev, clockLabel,
     stripImages, stripEdgePoint, stripPoint3, stripFacesBetween, stripLines, stripBest,
     hourglassSolve, hourglassInterval, hourglassReplay, hourglassReachable, hourglassStepN, hourglassSearch, hourglassReplayN, hourglassReachableN, probabilityAnswer,
@@ -2598,26 +2567,21 @@
     },
   });
 
-  // The Josephus box (0016, 0022): sliders for N (and L), and a circle that plays the
-  // elimination step by step or at a chosen speed; the survivor can be highlighted from the
-  // start, the people who left are listed in order, and the survivor chart stays.
+  // The Josephus box (0016): sliders for N and L (one stays, L - 1 leave), and a circle
+  // that plays the elimination step by step or at a chosen speed; the survivor can be
+  // highlighted from the start, the people who left are listed in order, and the survivor
+  // chart stays, with the zero points and the seat lookup's circles ringed.
   const josephusView = (box) => ({
     mount(box2) {
-      const withL = box.dataset.lmax && Number(box.dataset.lmax) > Number(box.dataset.l);
-      const nmax = Number(box.dataset.nmax || 64), NBIG = 1000000, NCIRCLE = 128;
-      const defaults = { n: Number(box.dataset.n || 20), l: Number(box.dataset.l || 2), rule: "page" };
+      const nmax = Number(box.dataset.nmax || 64), lmax = Number(box.dataset.lmax || 6), NBIG = 1000000, NCIRCLE = 128;
+      const defaults = { n: Number(box.dataset.n || 20), l: Number(box.dataset.l || 2) };
       const st = { ...defaults, s: 0, seat: null };
-      // rule "josephus" (0016 only): keep 2, remove 1, no closed form
-      const jos = () => st.rule === "josephus";
-      const keepRemove = () => (jos() ? [2, 1] : [1, st.l - 1]);
-      const runFast = (n) => josephusSurvivor(n, ...keepRemove());
+      const runFast = (n) => josephusSurvivor(n, st.l);
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label><span>מספר האנשים N</span><input type="range" class="ex-n" min="1" max="${nmax}" step="1" value="${st.n}" dir="ltr"><output class="out-n"></output>` +
         `<input type="number" class="ex-num ex-nbig" min="1" max="${NBIG}" step="1" value="${st.n}" dir="ltr" aria-label="מספר האנשים, עד מיליון"></label>` +
-        (withL ? "" : `<label>הכלל <select class="ex-rule" aria-label="כלל היציאה"><option value="page">אחד נשאר, אחד יוצא (השאלה)</option><option value="josephus">שניים נשארים, אחד יוצא (הגרסה של יוסף)</option></select></label>` +
-          `<button type="button" class="md-button ex-41">41 אנשים, הגרסה של יוסף</button>`) +
-        (withL ? `<label><span>הכלל ${ltr("L")}: אחד נשאר, ${ltr("L − 1")} יוצאים</span><input type="range" class="ex-l" min="2" max="${box.dataset.lmax}" step="1" value="${st.l}" dir="ltr"><output class="out-l"></output></label>` : "") +
+        `<label><span>הכלל ${ltr("L")}: אחד נשאר, ${ltr("L − 1")} יוצאים</span><input type="range" class="ex-l" min="2" max="${lmax}" step="1" value="${st.l}" dir="ltr"><output class="out-l"></output></label>` +
         `<label><input type="checkbox" class="ex-mark" checked> להדגיש את השורד מההתחלה</label>` +
         `<label>המושב <input type="number" class="ex-num ex-seat" min="0" step="1" dir="ltr" placeholder="s" aria-label="מושב לחיפוש הפוך: לאילו N הוא שורד"></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
@@ -2675,10 +2639,9 @@
       const draw = () => {
         const n = st.n, L = st.l, big = n > NCIRCLE;
         $(".out-n").textContent = String(n); $(".ex-nbig").value = n; $(".ex-n").value = Math.min(n, nmax);
-        if (withL) $(".out-l").textContent = String(L);
+        $(".out-l").textContent = String(L);
         // the circle and the steps up to NCIRCLE people; above that only the numbers
-        const [keep, remove] = keepRemove();
-        const { steps, survivor } = big ? { steps: [], survivor: runFast(n) } : josephusKR(n, keep, remove);
+        const { steps, survivor } = big ? { steps: [], survivor: runFast(n) } : josephusSteps(n, L);
         st.s = Math.min(Math.max(st.s, 0), steps.length);
         const out = new Set();
         steps.slice(0, st.s).forEach(([, leave]) => leave.forEach((p) => out.add(p)));
@@ -2688,11 +2651,11 @@
         $(".jos-box").hidden = big;
         $(".ex-play-row").hidden = big;
         if (!big) {
-          const stays = cur ? cur[0] : [];
+          const stays = cur ? [cur[0]] : [];
           $(".jos-circle").innerHTML = circleSvg(n, out, stays, cur ? cur[1] : [], winner);
-          const rule = jos() ? "נשאר, גם הבא אחריו, והשלישי יוצא" : L === 2 ? "נשאר, והבא אחריו יוצא" : `נשאר, ו-${L - 1} הבאים אחריו יוצאים`;
+          const rule = L === 2 ? "נשאר, והבא אחריו יוצא" : `נשאר, ו-${L - 1} הבאים אחריו יוצאים`;
           let round = 0, prev = null;
-          steps.slice(0, Math.max(st.s, 1)).forEach(([st0]) => { if (prev === null || st0[0] <= prev) round += 1; prev = st0[0]; });
+          steps.slice(0, Math.max(st.s, 1)).forEach(([st0]) => { if (prev === null || st0 <= prev) round += 1; prev = st0; });
           const stayText = stays.length === 1 ? `אדם ${stays[0]} נשאר` : `אנשים ${people(stays)} נשארים`;
           const leaveText = cur ? (cur[1].length === 1 ? `ואדם ${cur[1][0]} יוצא` : `ואנשים ${people(cur[1])} יוצאים`) : "";
           $(".jos-now").innerHTML = st.s === 0 ? `${n} אנשים במעגל. מתחילים מאדם 0: הוא ${rule}. המספר במרכז הוא כמה אנשים נשארו.`
@@ -2705,36 +2668,29 @@
           $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = done;
         }
         const sim = survivor, how = big ? "בסימולציה ברשימה מקושרת" : "בסימולציה";
-        let text;
-        if (jos()) {
-          const rec = josephusRecurrence(n);
-          text = `בגרסה של יוסף (שניים נשארים, אחד יוצא) עם ${ltr(`N = ${n}`)}: השורד הוא ${sim} ${how} (${ltr(sim + 1)} במספור מ-1), והנסיגה ` +
-            `${ltr("f(m) = (f(m − 1) + 3) mod m")} נותנת ${rec}${rec === sim ? ", אותו דבר" : ", שלא כמו בסימולציה"}. לכלל הזה אין נוסחה סגורה כמו ${ltr("2r")}: הנסיגה עוברת על כל ${ltr("m")}.`;
-        } else {
-          const form = josephusFormula(n, L), M = josephusZero(n, L);
-          text = `עם ${ltr(`N = ${n}`)} ו-${ltr(`L = ${L}`)} השורד הוא ${sim} ${how}, והנוסחה ` +
-            `${ltr(`${L}(N − M) / ${L - 1}`)} עם נקודת האפס ${ltr(`M = ${M}`)} נותנת ${form}` +
-            `${sim === form ? ", אותו דבר." : ", שלא כמו בסימולציה."}` +
-            (L === 2 ? ` בבינארי: ${ltr(`N = ${digitsIn(n, 2)}`)}, והשורד ${ltr(digitsIn(sim, 2))}.`
-              : L === 3 ? ` בבסיס 3: ${ltr(`N = ${digitsIn(n, 3)}`)}, והשורד ${ltr(digitsIn(sim, 3))}.` : "");
-        }
+        const form = josephusFormula(n, L), M = josephusZero(n, L);
+        const text = `עם ${ltr(`N = ${n}`)} ו-${ltr(`L = ${L}`)} השורד הוא ${sim} ${how}, והנוסחה ` +
+          `${ltr(`${L}(N − M) / ${L - 1}`)} עם נקודת האפס ${ltr(`M = ${M}`)} נותנת ${form}` +
+          `${sim === form ? ", אותו דבר." : ", שלא כמו בסימולציה."}` +
+          (L === 2 ? ` בבינארי: ${ltr(`N = ${digitsIn(n, 2)}`)}, והשורד ${ltr(digitsIn(sim, 2))}.`
+            : L === 3 ? ` בבסיס 3: ${ltr(`N = ${digitsIn(n, 3)}`)}, ‏${ltr(`⌊N/2⌋ = ${digitsIn(Math.floor(n / 2), 3)}`)}, ‏${ltr(`⌊M/2⌋ = ${digitsIn(Math.floor(M / 2), 3)}`)}, והשורד ${ltr(digitsIn(sim, 3))}.` : "");
         $(".ex-summary").innerHTML = text + (big ? ` המעגל והצעדים מצוירים עד ${ltr(NCIRCLE)} אנשים.` : "");
         // the reverse lookup: in which circles does seat s survive
         let seatText = "";
         if (st.seat !== null) {
-          const ns = josephusSeats(st.seat, jos() ? null : L, 5);
+          const ns = josephusSeats(st.seat, L, 5);
           seatText = ns.length === 0
-            ? `המושב ${ltr(st.seat)} לא שורד באף מעגל${jos() ? " עד מיליון אנשים" : L === 2 ? ": השורד תמיד זוגי" : `: השורד תמיד כפולה של ${ltr(L)}`}.`
+            ? `המושב ${ltr(st.seat)} לא שורד באף מעגל${L === 2 ? ": השורד תמיד זוגי" : `: השורד תמיד כפולה של ${ltr(L)}`}.`
             : `המושב ${ltr(st.seat)} שורד כש-${ltr("N")} הוא ${ltr(ns.join(", "))}${ns.length === 5 ? ", …" : ""}` +
-              (jos() ? " (לפי הנסיגה)." : L === 2 ? ` (כל ${ltr("N = 2^k + s/2")} עם ${ltr("2^k > s/2")}).` : ` (כל ${ltr("N = M + s(L − 1)/L")} עם נקודת אפס ${ltr("M")} מתאימה).`) +
+              (L === 2 ? ` (כל ${ltr("N = 2^k + s/2")} עם ${ltr("2^k > s/2")}).` : ` (כל ${ltr("N = M + s(L − 1)/L")} עם נקודת אפס ${ltr("M")} מתאימה).`) +
               (ns.some((v) => v <= nmax) ? " בגרף הם מוקפים." : "");
         }
         $(".jos-seat").innerHTML = seatText;
-        const key = `${n}/${L}/${st.rule}/${st.seat}`;
+        const key = `${n}/${L}/${st.seat}`;
         if (chartFor !== key) { chartFor = key; $(".jos-chart").innerHTML = chartSvg(n, st.seat); }
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
-      const total = () => (st.n > NCIRCLE ? 0 : josephusKR(st.n, ...keepRemove()).steps.length);
+      const total = () => (st.n > NCIRCLE ? 0 : josephusSteps(st.n, st.l).steps.length);
       $(".ex-next").addEventListener("click", () => { stop(); st.s += 1; draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.s -= 1; draw(); });
       $(".ex-start").addEventListener("click", () => { stop(); st.s = 0; draw(); });
@@ -2750,12 +2706,8 @@
       $(".ex-nbig").addEventListener("change", () => { const v = Math.round(Number($(".ex-nbig").value)); if (!Number.isFinite(v) || v < 1) { $(".ex-nbig").value = st.n; return; } stop(); st.n = Math.min(NBIG, v); st.s = 0; draw(); });
       $(".ex-seat").addEventListener("change", () => { const v = Math.round(Number($(".ex-seat").value)); stop(); st.seat = $(".ex-seat").value === "" || !Number.isFinite(v) || v < 0 ? null : v; draw(); });
       [$(".ex-nbig"), $(".ex-seat")].forEach((el) => el.addEventListener("keydown", (e) => { if (e.key === "Enter") el.blur(); }));
-      if (withL) $(".ex-l").addEventListener("input", () => { stop(); st.l = Number($(".ex-l").value); st.s = 0; draw(); });
-      if (!withL) {
-        $(".ex-rule").addEventListener("change", () => { stop(); st.rule = $(".ex-rule").value; st.s = 0; draw(); });
-        $(".ex-41").addEventListener("click", () => { stop(); st.rule = "josephus"; $(".ex-rule").value = "josephus"; st.n = 41; st.s = 0; draw(); });
-      }
-      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0, seat: null }); $(".ex-n").value = st.n; $(".ex-seat").value = ""; if (withL) $(".ex-l").value = st.l; else $(".ex-rule").value = "page"; draw(); });
+      $(".ex-l").addEventListener("input", () => { stop(); st.l = Number($(".ex-l").value); st.s = 0; draw(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0, seat: null }); $(".ex-n").value = st.n; $(".ex-seat").value = ""; $(".ex-l").value = st.l; draw(); });
       draw();
     },
   });
@@ -6850,7 +6802,7 @@
     "cake-arith": "העוגה מחולקת לפי החוק החשבוני: a הוא החלק הראשון ו-d התוספת לכל אדם. הסליידרים ושדות המספר קובעים אותם, ״הבא״ ו״הפעלה״ עוברים אדם אחרי אדם, והטבלה והגרפים מראים מי מקבל הכי הרבה.",
     "cake-geo": "העוגה מחולקת לפי החוק ההנדסי: a הוא החלק הראשון ו-q היחס בין אדם לאדם. הסליידרים ושדות המספר קובעים אותם, ״הבא״ ו״הפעלה״ עוברים אדם אחרי אדם, והטבלה והגרפים מראים מי מקבל הכי הרבה.",
     motorcycle: "הציור מראה את הנוסעים על הדרך והגרף את מיקומם בזמן. הסליידרים קובעים את מהירויות ההליכה והרכיבה, בורר האסטרטגיה ומספר הרוכבים את התכנית, ״הפעלה״ מריץ אותה, ו״להשוואה עם״ מצייר תכנית שנייה מקווקוות.",
-    josephus: "המעגל מראה את המשחק: N (ו-L) בסליידרים, ״הצעד הבא״ או ״הפעלה״ מוציאים אדם אחרי אדם, השורד מודגש מהתחלה, והגרף מראה את השורד לכל N. שדה המושב מחפש באילו מעגלים מושב שורד.",
+    josephus: "המעגל מראה את המשחק: N ו-L (אחד נשאר, L − 1 יוצאים) בסליידרים, ״הצעד הבא״ או ״הפעלה״ מוציאים אדם אחרי אדם, השורד מודגש מהתחלה, והגרף מראה את השורד לכל N עם נקודות האפס. שדה המושב מחפש באילו מעגלים מושב שורד.",
     clock: "השעון מראה את מפגשי המחוגים: גוררים מחוג, מקלידים שעה או מפעילים, והקפיצות עוברות למפגש הבא או הקודם. המונים וציר הזמן סופרים את המפגשים מההתחלה.",
     strip: "גוררים את העכביש ואת הזבוב על הקירות: הרצועה המחזורית מראה את התמונות, את 48 הקווים ואת הקצר שבהם, והמסלול נפרש פנים אחרי פנים.",
     hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן, ״הצעד הבא״ ו״הפעלה״ עוברים אירוע אחרי אירוע, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר.",

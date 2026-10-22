@@ -1486,6 +1486,24 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     testbench passed there with a local `queue.delete()`; CI's newer Verilator runs the
     page code as is. Icarus 12 crashes on the testbench (an assertion in vvp). Checks:
     lint, the Python tests (288), strict build, links, phone and axe light and dark.
+23. **Josephus merged into one page (the owner's answers: one page 0016 at junior, 0022
+    deleted; Josephus's own rule out of the box and kept as a trap; a base-3 view and a
+    table for L = 3).** 0016 now has part a (one stays, one leaves: 20 people, then the
+    formula with the binary view), part b (one stays, two leave: 30 people, then
+    F_3 = 3(N − M)/2 with the parity chains) and the bonus part c (any L), each with its
+    own hints and solutions, the traps and follow-ups of both pages merged. New in part b:
+    the base-3 digit rule F_3(N) = 3(⌊N/2⌋ − ⌊M/2⌋) with ⌊M/2⌋ = 10…0 (N even) or 11…1
+    (N odd) in base 3, a digits figure (30 and 21 both give 200₃ = 18) and a table for
+    N up to 20 (`base3_table`, `digits3_svg`, `half_rule` in `tools/figures/q0016.py`;
+    `q0022.py` deleted, `q0016.py` prints the whole page). The josephus box always has
+    the L slider (2 to `data-lmax`, default 6); the rule select, the 41 button, `josephusKR`
+    and `josephusRecurrence` are gone, `josephusSurvivor(n, L)`; the L = 3 summary also
+    shows ⌊N/2⌋ and ⌊M/2⌋ in base 3. Three boxes on the page (20 / L = 2, 30 / L = 3,
+    20 / L = 4). The "Josephus, easy to hard" study path (two steps, now one page) was
+    deleted. `tests/0022` merged into `tests/0016` (the base-3 rule and the every-third
+    trap added). The old URL of 0022 is gone (no redirects plugin); internal links were
+    updated and the link check passes. Checks: lint, the Python tests, strict build,
+    links, phone and axe light and dark.
 
 ---
 
@@ -1502,7 +1520,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   with U133 is done in three batches (U133, X147; X145; X146). Round D was dropped by the
   owner. A second series of rounds A to E (items A181 to E201) on how the answers are
   presented is proposed (see the end of the round list). 0005 gained the two-digit
-  follow-up with its theorem and the `abmap` box (work log item 22). Next: the owner
+  follow-up with its theorem and the `abmap` box (work log item 22); 0022 was merged into
+  0016 with a base-3 view (item 23). Next: the owner
   picks from the second series, or the open rounds E, F, I, L, N, O, Q, S, or new
   questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
@@ -1551,7 +1570,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch) |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock

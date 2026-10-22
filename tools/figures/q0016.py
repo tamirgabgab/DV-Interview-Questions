@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-"""Figures and tables of questions 0016 and 0022: the Josephus problem with the rule
-"one stays, the next L - 1 leave", people numbered 0 .. N - 1.
+"""Figures and tables of question 0016: the Josephus problem with the rule "one stays,
+the next L - 1 leave", people numbered 0 .. N - 1, for L = 2 (part a), L = 3 (part b) and
+any L (the bonus part).
 
     python tools/figures/q0016.py > /tmp/q0016.html
 
-Prints the figures of 0016 (L = 2) in page order: the step-through circle for N = 20, the
+Prints, in page order: part a (L = 2): the step-through circle for N = 20, the
 round-by-round table for N = 20, the table of survivors for N = 1..16, the survivor chart
 for N = 1..40, the relabelling figure after one elimination, the one-round figure for
-N = 8, and the binary figure. tools/figures/q0022.py imports this module for L = 3 and
-the general L. tests/0016 and tests/0022 check that the page copies match.
+N = 8, and the binary figure; part b (L = 3): the step-through circle for N = 30, the
+round-by-round table for N = 30, the values table for N = 1..20, the base-3 table, the
+survivor chart for N = 1..60, the relabelling figure, the one-round figure for N = 9, and
+the base-3 digits figure; the bonus part: the zero-point table for L = 2..5, the values
+table for L = 4 and the chart for L = 4. tests/0016 checks that the page copies match.
 """
 
 import math
@@ -184,6 +188,36 @@ def zeros_table(Ls=(2, 3, 4, 5), limit=100):
 
 
 
+def base3(v):
+    """v in base 3, as a string of digits."""
+    digits = ""
+    while v:
+        digits, v = str(v % 3) + digits, v // 3
+    return digits or "0"
+
+
+def half_rule(n):
+    """L = 3 as a digit rule: F_3(N) = 3 (floor(N/2) - c) where c = floor(M/2), M the zero
+    point of N's chain. For even N, c = 3^m (10..0 in base 3, as long as floor(N/2)); for
+    odd N, c = (3^m - 1) / 2 (11..1 in base 3, one digit shorter than N)."""
+    M = zero_below(n, 3)
+    half, c = n // 2, M // 2
+    assert 3 * (half - c) == formula(n, 3)
+    return half, c, half - c
+
+
+def base3_table(N=20):
+    """L = 3: N and floor(N/2) in base 3, the digits to subtract, and the survivor in base 3."""
+    head = ["‏\\( N \\)", "בבסיס 3", "השרשרת", "‏\\( \\lfloor N/2 \\rfloor \\)", "מחסרים", "ההפרש", "‏\\( F_3(N) \\) בבסיס 3", "‏\\( F_3(N) \\)"]
+    lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+    for n in range(1, N + 1):
+        half, c, diff = half_rule(n)
+        chain = "אי-זוגית" if n % 2 else "זוגית"
+        F = formula(n, 3)
+        lines.append(f"| {n} | ‏`{base3(n)}` | {chain} | ‏`{base3(half)}` | ‏`{base3(c)}` | ‏`{base3(diff)}` | ‏`{base3(F)}` | **{F}** |")
+    return "\n".join(lines)
+
+
 # --- charts ------------------------------------------------------------------------------
 
 def chart(L=2, N=40, step=4):
@@ -344,7 +378,41 @@ def bits_svg(examples=(20, 41)):
     return "".join(p)
 
 
+def digits3_svg(examples=(30, 21)):
+    """L = 3: floor(N/2) in base 3, minus 10..0 (N even) or 11..1 (N odd), then a 0 appended;
+    the result is F_3(N)."""
+    rows = [(n, *half_rule(n)) for n in examples]
+    longest = max(len(base3(half)) for _, half, _, _ in rows)
+    unit = CELL + GAP
+    xa = 70
+    xc = xa + longest * unit + 36                  # the digits to subtract
+    xb = xc + longest * unit + 70                  # the result, one digit longer
+    w, h = xb + (longest + 1) * unit + 50, 24 + 86 * len(rows)
+    p = [f'<svg class="figure" viewBox="0 0 {w} {h}" style="max-width:{w / 16:.0f}rem" role="img" '
+         'aria-label="חצי N בבסיס 3, פחות הספרות של חצי נקודת האפס, ועוד 0 בסוף: התוצאה היא השורד">', DEFS]
+    y = 14
+    for n, half, c, diff in rows:
+        a, b = base3(half).rjust(longest), base3(c).rjust(len(base3(half))).rjust(longest)
+        res = base3(diff) + "0"
+        p.append(f'<text class="legend" x="{xa - 12}" y="{y + 20}" text-anchor="end">{n}</text>')
+        _row(p, xa, y, [d.strip() for d in a], ["st-cell st-faded" if d == " " else "st-cell" for d in a])
+        p.append(f'<text class="legend" x="{xc - 22}" y="{y + 21}" text-anchor="middle">−</text>')
+        _row(p, xc, y, [d.strip() for d in b], ["st-cell st-faded" if d == " " else "st-bad" for d in b])
+        p.append(f'<line class="ink-line" x1="{xc + longest * unit + 10}" y1="{y + CELL / 2}" '
+                 f'x2="{xb - 14}" y2="{y + CELL / 2}" stroke-width="1.5" marker-end="url(#q16-ink)"/>')
+        _row(p, xb, y, res, ["st-cell"] * (len(res) - 1) + ["st-ok"])
+        p.append(f'<text class="legend" x="{xb + len(res) * unit + 8}" y="{y + 20}">{int(res, 3)}</text>')
+        # the digits of the difference slide one place to the left
+        xs, xe = xc + (longest - 1) * unit + CELL / 2, xb + (len(res) - 2) * unit + CELL / 2
+        p.append(f'<path class="s2-line" d="M{xs},{y + CELL + 4} C{xs},{y + CELL + 40} {xe},{y + CELL + 40} {xe},{y + CELL + 6}" '
+                 f'fill="none" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#q16-s2)"/>')
+        y += 86
+    p.append("</svg>")
+    return "".join(p)
+
+
 if __name__ == "__main__":
+    # part a: L = 2
     print(circle_stepper(20), "\n")
     print(rounds_table(20), "\n")
     print(survivors_table(), "\n")
@@ -352,4 +420,19 @@ if __name__ == "__main__":
     print(chart(), "\n")
     print(relabel_svg(7), "\n")
     print(round_svg(8), "\n")
-    print(bits_svg())
+    print(bits_svg(), "\n")
+    # part b: L = 3
+    print(circle_stepper(30, 3), "\n")
+    print(rounds_table(30, 3), "\n")
+    print(values_table(3, 20), "\n")
+    print(base3_table(), "\n")
+    print(chart_legend(3), "\n")
+    print(chart(3, 60, 6), "\n")
+    print(relabel_svg(8, 3), "\n")
+    print(round_svg(9, 3), "\n")
+    print(digits3_svg(), "\n")
+    # the bonus part: any L
+    print(zeros_table(), "\n")
+    print(values_table(4, 20, with_residue=True), "\n")
+    print(chart_legend(4), "\n")
+    print(chart(4, 64, 8))
