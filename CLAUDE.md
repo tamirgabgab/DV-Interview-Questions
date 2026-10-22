@@ -7,7 +7,10 @@ work session, and update `HANDOFF.md` (work log, open items) at the end of every
 
 ## Language and RTL
 
-- Chat with the owner in Hebrew. Question content is Hebrew. Code, comments, identifiers,
+- Always answer the owner in Hebrew, never in English: every chat reply, status update,
+  question and end-of-round summary, also after a model switch or a context summary.
+  English appears only as relevant technical terms, identifiers and file names inside a
+  Hebrew sentence. Question content is Hebrew. Code, comments, identifiers,
   commit messages, `README.md`, `HANDOFF.md` and this file are English.
 - RTL safety: every paragraph, heading, list item and table cell starts with a Hebrew word.
   A line that must start with Latin text, inline code, a number followed by a period, or
