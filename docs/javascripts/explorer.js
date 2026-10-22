@@ -11,7 +11,7 @@
 //   bridge                 0031        crossing times, a bridge of two or three: the Dijkstra plan (or one of the two classic plans) played crossing by crossing
 //   river                  0032        cross by hand or let the BFS plan play; the state graph follows
 //   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits
-//   fifo                   0033        burst, write and read rates, a skipping reader: the fill level over time
+//   fifo                   0033        burst, write and read rates, a skipping reader: the fill level over time; a wr / rd timing strip on a real time axis over a sliding window
 //   mtbf                   0037        clock and data rates, tau, T0 and overhead: the MTBF of one to three flops
 //   triangle               0007        three points to drag, type or nudge with arrow keys, inside / edge / outside; play counts every triangle; a largest-arc histogram of 1,000 draws
 //   polygon                0007        the same for n vertices (3 to 10): drag, type, arrow keys or draw; random draws against 1 - n / 2^(n-1)
@@ -771,6 +771,39 @@
       if (t > 5e6) break;
     }
     return { max, trace };
+  };
+  // WaveDrom draws a lane with an integer `period` only, so the export puts the two clocks
+  // on a common grid: a write cycle of a units and a read cycle of b. Exact when the ratio
+  // of the periods reduces to a, b <= 8; otherwise the closest ratio with a <= 6.
+  const fifoGrid = (tWrite, tRead) => {
+    const gcd = (x, y) => (y ? gcd(y, x % y) : x), g = gcd(tWrite, tRead);
+    if (tWrite / g <= 8 && tRead / g <= 8) return { a: tWrite / g, b: tRead / g, exact: true };
+    let best = null;
+    for (let a = 1; a <= 6; a++) {
+      const b = Math.max(1, Math.round((a * tRead) / tWrite)), err = Math.abs(b / a - tRead / tWrite);
+      if (!best || err < best.err - 1e-12) best = { a, b, err };
+    }
+    return { a: best.a, b: best.b, exact: best.err < 1e-12 };
+  };
+  // The same simulation as fifoFill, keeping the events for the timing strip: the time of
+  // every write, every read slot (its time, whether the reader skips it, whether a word
+  // was read), the fill trace and the end time.
+  const fifoEvents = (burst, tWrite, tRead, idleEvery = 0) => {
+    let count = 0, written = 0, slot = 0, t = 0, max = 0;
+    const trace = [[0, 0]], writes = [], slots = [];
+    while (written < burst || count > 0) {
+      if (t % tWrite === 0 && written < burst) { count++; written++; writes.push(t); trace.push([t, count]); }
+      if (count > max) max = count;
+      if (t > 0 && t % tRead === 0) {
+        slot++;
+        const idle = !!(idleEvery && slot % idleEvery === 0), read = !idle && count > 0;
+        if (read) { count--; trace.push([t, count]); }
+        slots.push({ t, idle, read });
+      }
+      t++;
+      if (t > 5e6) break;
+    }
+    return { max, trace, writes, slots, end: t - 1 };
   };
 
   // Synchronizer MTBF (0037): exp(t_res / tau) / (T0 f_clk f_data) with
@@ -1926,8 +1959,46 @@
     return { code: LOOP_CODE, frames, result: A, comparisons, swaps };
   };
 
+  // A timing strip as WaveDrom, the format of the ```wavedrom blocks on the pages: one
+  // lane per row, a character per slot ("." repeats the previous level or value), bus
+  // values in `data`; a clock is "p…" per cycle, or "h"/"l" per slot on a half-cycle
+  // strip; a flag row is a level that is high where the rule fails. Names lose their
+  // markup. Rows that stop early (frames not reached yet) give a shorter lane.
+  const plainText = (s) => String(s).replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n))).replace(/&amp;/g, "&").replace(/\u200f/g, "").trim();
+  const waveDromOf = (rows, N, opts = {}) => {
+    const signal = rows.map((row) => {
+      let len = N;
+      if (row.values) { len = row.values.findIndex((v) => v === undefined || v === null); if (len < 0) len = Math.min(N, row.values.length); }
+      const lane = { name: plainText(row.name) };
+      if (row.kind === "clock") lane.wave = opts.half ? Array.from({ length: len }, (_, k) => (k % 2 ? "l" : "h")).join("") : len ? "p" + ".".repeat(len - 1) : "";
+      else if (row.kind === "bus") {
+        let wave = "";
+        const data = [];
+        for (let k = 0; k < len; k++) {
+          if (k && row.values[k] === row.values[k - 1]) wave += ".";
+          else { wave += "="; data.push(plainText(row.values[k])); }
+        }
+        lane.wave = wave; lane.data = data;
+      } else {
+        let wave = "";
+        for (let k = 0; k < len; k++) { const v = row.values[k] ? "1" : "0"; wave += k && v === (row.values[k - 1] ? "1" : "0") ? "." : v; }
+        lane.wave = wave;
+      }
+      return lane;
+    });
+    const out = { signal };
+    if (opts.ticks && !opts.half) out.head = { tick: 0 };
+    return out;
+  };
+  // WaveDrom text as the pages write it: one lane per line.
+  const waveDromText = (wd) => {
+    const lanes = wd.signal.map((l) => "  " + JSON.stringify(l)).join(",\n");
+    const rest = Object.keys(wd).filter((k) => k !== "signal").map((k) => `,\n  ${JSON.stringify(k)}: ${JSON.stringify(wd[k])}`).join("");
+    return `{ "signal": [\n${lanes}\n]${rest} }`;
+  };
+
   const models = {
-    mulberry32,
+    mulberry32, waveDromOf, waveDromText,
     cakeSplit, cakeThreshold, cakeFormula, cakeBest,
     motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, motorcycleRiders, motorcycleAt, motorcycleTimeK, josephusRun, josephusSteps, josephusZero, josephusFormula,
     josephusKR, josephusSurvivor, josephusRecurrence, josephusSeats,
@@ -1936,7 +2007,7 @@
     hourglassSolve, hourglassInterval, hourglassReplay, hourglassReachable, hourglassStepN, hourglassSearch, hourglassReplayN, hourglassReachableN, probabilityAnswer,
     bridgeSolve, bridgeEscort, bridgeTime, bridgeEscortMoves, bridgePairMoves, riverSafe, riverMoves, riverPlan,
     pcieBoundaries, pcieBlocks, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula,
-    fifoSteps, fifoDepth, fifoFill, mtbfSeconds, mtbfHuman,
+    fifoSteps, fifoDepth, fifoFill, fifoEvents, fifoGrid, mtbfSeconds, mtbfHuman,
     TRI_TOTAL, triArcs, triClass, triCountC, triFrame, triIndex, triCounts, triArcCdf, triHistogram, polyArcs, polyClass, polyProb, polyProbDiscrete, polyRandom,
     permCycles, permHelper, permSwap, permWalk, permAllWin, permShuffle, permRandomPicks, permStrategyProb, permRandomProb,
     floydRho, floydTrace, floydRandom, floydParse, STATE_CODECS, bfs01Trace, bfs01Counts, bracketsClean, bracketsTrace,
@@ -1960,6 +2031,7 @@
   // --- drawing helpers ---------------------------------------------------------------
 
   const f = (v, n = 1) => Number(v).toFixed(n);
+  const attr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const ltr = (x) => `<bdi dir="ltr">${x}</bdi>`;   // math and numbers inside Hebrew text
   // Arrow keys on a focused point: +1 for right / up, -1 for left / down, ten times with Shift.
   const arrowStep = (e) => {
@@ -3576,7 +3648,9 @@
   });
 
   // The FIFO box (0033): burst, write and read rates and the reader's idle slot; the fill
-  // level over time from the cycle simulation, the formula beside it.
+  // level over time from the cycle simulation, the formula beside it; a timing strip of
+  // the two clocks, the transfers and the count on a real time axis, over a window of 40
+  // write cycles that a slider moves (marked on the chart).
   const fifoView = () => ({
     mount(box) {
       const defaults = { burst: Number(box.dataset.burst || 120), fw: Number(box.dataset.fw || 100), fr: Number(box.dataset.fr || 80), idle: Number(box.dataset.idle || 0) };
@@ -3588,9 +3662,104 @@
         `<label><span>קצב הקריאה (MHz)</span><input type="range" class="ex-fr" min="10" max="400" step="5" value="${st.fr}" dir="ltr"><output class="out-fr"></output></label>` +
         `<label>הקורא מדלג על <select class="ex-idle"><option value="0">כלום</option>${[2, 3, 4, 5, 8, 16].map((k) => `<option value="${k}"${k === st.idle ? " selected" : ""}>משבצת אחת מכל ${k}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
-        `<p class="ex-summary" aria-live="polite"></p><div class="fifo-chart"></div>`;
+        `<p class="ex-summary" aria-live="polite"></p>` +
+        `<div class="ex-controls"><label class="fifo-winlab"><span>החלון ברצועה</span><input type="range" class="ex-win" min="0" max="0" step="1" value="0" dir="ltr" aria-label="תחילת החלון, במחזורי כתיבה"></label><span class="fifo-wintext"></span></div>` +
+        `<div class="wv-wrap fifo-strip" tabindex="0" role="group" aria-label="רצועת תזמון של הכתיבות והקריאות, גלילה אופקית"></div>` +
+        `<div class="fifo-chart"></div>`;
       const $ = (sel) => box.querySelector(sel);
-      const chart = (trace, tEnd, formula, yMax) => {
+      const WIN = 40, CW = 16, L = 66;             // write cycles in the window, px per write cycle
+      let win = 0;
+      // the window [ws, we): one write cycle before the burst, then WIN write cycles
+      const range = (tW) => { const ws = (win - 1) * tW; return [ws, ws + WIN * tW]; };
+      // a timing strip on a real time axis: both clocks at their own period, the enables
+      // high in the cycle that ends with the transfer (skipped read slots shaded), and
+      // the fill count as a bus; its WaveDrom counts in write cycles, the read lanes with
+      // period tRead / tWrite and the count sampled at the write clock
+      const strip = (ev, tW, tR) => {
+        const [ws, we] = range(tW), RH = 30, T = 20, rows = ["wr_clk", "wr_en", "rd_clk", "rd_en", "count"];
+        const W = L + WIN * CW + 6, H = T + rows.length * RH + 4, X = (t) => L + ((t - ws) / tW) * CW;
+        const clip = (a, b) => [Math.max(a, ws), Math.min(b, we)];
+        let s = "";
+        const yTop = (r) => T + r * RH + 5, yBot = (r) => T + r * RH + RH - 7;
+        for (let k = 0; k <= WIN; k++) {
+          const t = ws + k * tW;
+          s += `<line class="wv-grid" x1="${f(X(t))}" x2="${f(X(t))}" y1="${T - 4}" y2="${H - 4}"/>`;
+          if (k % 5 === 0) s += `<text class="wv-tick" x="${f(X(t))}" y="${T - 8}" text-anchor="${k === WIN ? "end" : k === 0 ? "start" : "middle"}">${f(t * 0.05, 0)}</text>`;
+        }
+        s += `<text class="wv-name" x="${L - 8}" y="${T - 8}" text-anchor="end">ns</text>`;
+        rows.forEach((n, r) => { s += `<text class="wv-name" x="${L - 8}" y="${T + r * RH + RH / 2 + 2}" text-anchor="end">${n}</text>`; });
+        const clock = (r, period, cls) => {
+          let d = "";
+          for (let e = Math.floor(ws / period) * period; e < we; e += period) {
+            const [a, b] = clip(e, e + period / 2), [c, g] = clip(e + period / 2, e + period);
+            if (b > a) d += `M${f(X(a))},${yTop(r)} H${f(X(b))} `;
+            if (g > c) d += `M${f(X(c))},${yBot(r)} H${f(X(g))} `;
+            if (e >= ws) d += `M${f(X(e))},${yBot(r)} V${yTop(r)} `;
+            if (e + period / 2 >= ws && e + period / 2 < we) d += `M${f(X(e + period / 2))},${yTop(r)} V${yBot(r)} `;
+          }
+          return `<path class="wv-line wv-clock${cls}" d="${d}"/>`;
+        };
+        // a level that is high over [t − period, t) for every transfer time t
+        const enable = (r, times, period, cls) => {
+          let hi = "", d;
+          const spans = [];                                // back-to-back transfers merge into one high level
+          times.forEach((t) => {
+            const [a, b] = clip(t - period, t);
+            if (b <= a) return;
+            const last = spans[spans.length - 1];
+            if (last && last[1] === a) last[1] = b; else spans.push([a, b]);
+          });
+          let at = ws;
+          d = "";
+          spans.forEach(([a, b]) => {
+            hi += `<rect class="wv-high${cls}" x="${f(X(a))}" y="${yTop(r)}" width="${f(X(b) - X(a))}" height="${yBot(r) - yTop(r)}"/>`;
+            d += `M${f(X(at))},${yBot(r)} H${f(X(a))} V${yTop(r)} H${f(X(b))} V${yBot(r)} `;
+            at = b;
+          });
+          d += `M${f(X(at))},${yBot(r)} H${f(X(we))}`;
+          return hi + `<path class="wv-line${cls}" d="${d}"/>`;
+        };
+        s += clock(0, tW, "") + enable(1, ev.writes, tW, " wv-s1") + clock(2, tR, "");
+        ev.slots.filter((sl) => sl.idle).forEach((sl) => {
+          const [a, b] = clip(sl.t - tR, sl.t);
+          if (b > a) s += `<rect class="wv-mark" x="${f(X(a))}" y="${T + 3 * RH + 2}" width="${f(X(b) - X(a))}" height="${RH - 4}"><title>הקורא מדלג על המשבצת הזאת</title></rect>`;
+        });
+        s += enable(3, ev.slots.filter((sl) => sl.read).map((sl) => sl.t), tR, " wv-s3");
+        // the count as a bus: one segment per value inside the window
+        const y0 = T + 4 * RH, ym = y0 + RH / 2 - 1, yh = y0 + 5, yl = y0 + RH - 7;
+        const seg = [];
+        ev.trace.forEach(([t, v], i) => { const next = i + 1 < ev.trace.length ? ev.trace[i + 1][0] : ev.end + 1; seg.push([t, next, v]); });
+        const merged = [];
+        seg.forEach(([a, b, v]) => { const [ca, cb] = clip(a, b); if (cb <= ca) return; const last = merged[merged.length - 1]; if (last && last[2] === v && last[1] === ca) last[1] = cb; else merged.push([ca, cb, v]); });
+        if (ws < 0 && merged.length) merged[0][0] = Math.max(ws, merged[0][0] === 0 ? ws : merged[0][0]);
+        merged.forEach(([a, b, v]) => {
+          const xa = X(a), w = X(b) - xa;
+          if (w < 1) return;
+          const e = Math.min(4, w / 2);
+          s += `<path class="wv-bus" d="M${f(xa + 0.5)},${ym} L${f(xa + e)},${yh} H${f(xa + w - e)} L${f(xa + w - 0.5)},${ym} L${f(xa + w - e)},${yl} H${f(xa + e)} Z"><title>מילוי ${v}</title></path>`;
+          if (w >= 8 * String(v).length + 12) s += `<text class="wv-val" x="${f(xa + w / 2)}" y="${ym + 4}" text-anchor="middle">${v}</text>`;
+        });
+        // WaveDrom on the integer grid: a write cycle is a units, a read cycle b units; the
+        // count is sampled once per unit
+        const { a, b, exact } = fifoGrid(tW, tR), u = tW / a, units = WIN * a;
+        const e0 = Math.floor(ws / tR) * tR, nR = Math.ceil((we - e0) / tR), phase = Math.round((ws - e0) / (tR / b));
+        const lvl = (chars) => chars.map((c, i) => (i && c === chars[i - 1] ? "." : c)).join("");
+        const writeAt = new Set(ev.writes), readAt = new Set(ev.slots.filter((sl) => sl.read).map((sl) => sl.t));
+        const wrEn = Array.from({ length: WIN }, (_, k) => (writeAt.has(ws + (k + 1) * tW) ? "1" : "0"));
+        const rdEn = Array.from({ length: nR }, (_, j) => (readAt.has(e0 + (j + 1) * tR) ? "1" : "0"));
+        const countAt = (t) => { let v = 0; for (const [tt, c] of ev.trace) { if (tt <= t) v = c; else break; } return v; };
+        const cv = Array.from({ length: units }, (_, k) => countAt(ws + k * u));
+        const wd = { signal: [
+          { name: "wr_clk", wave: "p" + ".".repeat(WIN - 1), period: a },
+          { name: "wr_en", wave: lvl(wrEn), period: a },
+          { name: exact ? "rd_clk" : `rd_clk (≈ ${b}/${a})`, wave: "p" + ".".repeat(nR - 1), period: b, phase },
+          { name: "rd_en", wave: lvl(rdEn), period: b, phase },
+          { name: "count", wave: cv.map((v, k) => (k && v === cv[k - 1] ? "." : "=")).join(""), data: cv.filter((v, k) => !k || v !== cv[k - 1]).map(String) },
+        ], head: { text: `t = ${f(ws * 0.05, 1)} .. ${f(we * 0.05, 1)} ns` } };
+        wd.signal.forEach((l) => { if (l.period === 1) delete l.period; if (l.phase === 0) delete l.phase; });
+        return `<svg class="wave-strip fifo-wave" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="רצועת תזמון: שני השעונים, הכתיבות, הקריאות ומילוי ה-FIFO" data-wavedrom="${attr(waveDromText(wd))}">${s}</svg>`;
+      };
+      const chart = (trace, tEnd, formula, yMax, tW) => {
         const w = 640, h = 240, x0 = 44, right = 16, top = 16, base = 204;
         const X = (t) => x0 + (t / tEnd) * (w - x0 - right), Y = (v) => base - (v / yMax) * (base - top);
         let s = `<svg class="perf-chart fifo-live" viewBox="0 0 ${w} ${h}" role="img" aria-label="רמת המילוי של ה-FIFO לאורך הזמן">`;
@@ -3600,6 +3769,8 @@
         for (let v = 0; v <= ns; v += xStep) s += `<line class="grid" x1="${f(X(v / 0.05))}" x2="${f(X(v / 0.05))}" y1="${top - 6}" y2="${base}" stroke-dasharray="4 4"/><text class="tick" x="${f(X(v / 0.05))}" y="${base + 18}" text-anchor="middle">${v ? `${v} ns` : "0"}</text>`;
         const pts = [];
         trace.forEach(([t, v], i) => { if (i) pts.push(`${f(X(t))},${f(Y(trace[i - 1][1]))}`); pts.push(`${f(X(t))},${f(Y(v))}`); });
+        const [ws, we] = range(tW);
+        s += `<rect class="fifo-win" x="${f(X(Math.max(0, ws)))}" y="${top - 6}" width="${f(Math.max(2, X(Math.min(tEnd, we)) - X(Math.max(0, ws))))}" height="${base - top + 6}"><title>החלון שברצועה</title></rect>`;
         s += `<polyline class="s1-line" points="${pts.join(" ")}" fill="none" stroke-width="2"/>`;
         s += `<line class="ink-line" x1="${x0}" x2="${w - right}" y1="${f(Y(formula))}" y2="${f(Y(formula))}" stroke-width="1" stroke-dasharray="6 4"/>`;
         s += `<text class="legend" x="${w - right - 4}" y="${f(Y(formula) - 5)}" text-anchor="end">${formula}</text>`;
@@ -3609,7 +3780,8 @@
         ["burst", "fw", "fr"].forEach((k) => { $(`.out-${k}`).textContent = String(st[k]); });
         const duty = st.idle ? 1 - 1 / st.idle : 1;
         const formula = fifoDepth(st.burst, st.fw, st.fr, duty);
-        const r = fifoFill(st.burst, fifoSteps(st.fw), fifoSteps(st.fr), st.idle);
+        const tW = fifoSteps(st.fw), tR = fifoSteps(st.fr);
+        const r = fifoEvents(st.burst, tW, tR, st.idle);
         const eff = st.fr * duty;
         const burstNs = (st.burst * 1000) / st.fw;
         $(".ex-summary").innerHTML =
@@ -3620,12 +3792,20 @@
           (eff >= st.fw ? " הקורא לא איטי מהכותב, ולכן ה-FIFO כמעט לא מתמלא." : "");
         const tEnd = r.trace[r.trace.length - 1][0] || 1;
         const yMax = Math.max(5, Math.ceil(Math.max(r.max, formula) * 1.15 / 5) * 5);
-        $(".fifo-chart").innerHTML = `<p class="ex-title">רמת המילוי לאורך הזמן; הקו המקווקו הוא הנוסחה</p>${chart(r.trace, tEnd, formula, yMax)}`;
+        const cycles = Math.ceil(r.end / tW) + 2, maxWin = Math.max(0, cycles - WIN);
+        win = Math.min(win, maxWin);
+        const slider = $(".ex-win");
+        slider.max = String(maxWin); slider.value = String(win); slider.disabled = maxWin === 0;
+        const [ws, we] = range(tW);
+        $(".fifo-wintext").innerHTML = `מחזורי כתיבה ${ltr(`${win} … ${win + WIN - 1}`)} מתוך ${ltr(cycles - 1)}, ${ltr(`${f(Math.max(0, ws) * 0.05, 0)}–${f(we * 0.05, 0)} ns`)}`;
+        $(".fifo-strip").innerHTML = strip(r, tW, tR);
+        $(".fifo-chart").innerHTML = `<p class="ex-title">רמת המילוי לאורך הזמן; הקו המקווקו הוא הנוסחה, והמלבן הוא החלון שברצועה</p>${chart(r.trace, tEnd, formula, yMax, tW)}`;
 
       };
       ["burst", "fw", "fr"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { st[k] = Number($(`.ex-${k}`).value); draw(); }));
+      $(".ex-win").addEventListener("input", () => { win = Number($(".ex-win").value); draw(); });
       $(".ex-idle").addEventListener("change", () => { st.idle = Number($(".ex-idle").value); draw(); });
-      $(".ex-reset").addEventListener("click", () => { Object.assign(st, defaults); ["burst", "fw", "fr", "idle"].forEach((k) => { $(`.ex-${k}`).value = st[k]; }); draw(); });
+      $(".ex-reset").addEventListener("click", () => { Object.assign(st, defaults); win = 0; ["burst", "fw", "fr", "idle"].forEach((k) => { $(`.ex-${k}`).value = st[k]; }); draw(); });
       draw();
     },
   });
@@ -5037,7 +5217,7 @@
     const L = opts.labelW ?? 66, SW = opts.slotW ?? 36, RH = 30, T = opts.ticks ? 20 : 8;
     const W = L + N * SW + 6, H = T + rows.length * RH + 4;
     const x = (k) => L + k * SW;
-    let s = `<svg class="wave-strip" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="${opts.role || "img"}" aria-label="${opts.label || ""}">`;
+    let s = `<svg class="wave-strip" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="${opts.role || "img"}" aria-label="${opts.label || ""}" data-wavedrom="${attr(waveDromText(waveDromOf(rows, N, opts)))}">`;
     for (let k = 0; k <= N; k++) s += `<line class="wv-grid${opts.half && k % 2 ? " wv-grid-half" : ""}" x1="${x(k)}" x2="${x(k)}" y1="${T - 4}" y2="${H - 4}"/>`;
     if (opts.ticks) for (let k = 0; k < N; k++) {
       const t = opts.ticks(k);
@@ -6416,7 +6596,7 @@
     bridge: "זמני החצייה בשדה, קיבולת הגשר ובורר התכנית: ״הבא״ ו״הפעלה״ מעבירים חצייה אחרי חצייה, והטבלה משווה את שלוש התכניות.",
     river: "מעבירים את הזאב, העז והכרוב בלחיצה, או נותנים לתכנית ה-BFS לרוץ; גרף המצבים מתעדכן עם כל מעבר.",
     pcie: "כתובת, אורך, MPS ו-RCB: התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד.",
-    fifo: "ה-burst וקצבי הכתיבה והקריאה בסליידרים: הגרף מראה את מפלס המילוי לאורך ה-burst מהסימולציה, והנוסחה לצדו.",
+    fifo: "ה-burst וקצבי הכתיבה והקריאה בסליידרים: הרצועה מראה את שני השעונים, הכתיבות, הקריאות (משבצת מדולגת מוצללת) ואת המילוי בזמן אמיתי, הסליידר שלה מזיז חלון של 40 מחזורי כתיבה, והגרף מראה את המילוי לאורך כל ה-burst ליד הנוסחה.",
     mtbf: "תדר השעון והנתונים, tau, T0 ו-overhead: התיבה מחשבת את ה-MTBF של פלופ אחד עד שלושה ביחידות קריאות, ומציירת אותו כנגד תדר השעון.",
     triangle: "שלוש נקודות על המעגל: גוררים, מקלידים זוויות או מזיזים בחיצים, וירוק אומר שהמרכז בפנים. ״הפעלה״ עובר על כל השלשות וסופר, ו״1,000 הגרלות״ מצייר היסטוגרמה של הקשת הגדולה.",
     polygon: "n קודקודים על המעגל: גוררים, מקלידים או מגרילים, וירוק אומר שהמרכז בפנים. ״1,000 הגרלות״ משווה לנוסחה הרציפה ולשבר הבדיד.",
@@ -6429,12 +6609,12 @@
     kaprekar: "מקלידים או מגרילים מספר: ״הצעד הבא״ ממיין ומחסר עד 495 או 6174, וההיסטוגרמה סופרת את אורכי השרשראות של כל המספרים.",
     eurovision: "״ההכרזה הבאה״ מוסיפה מדינה: הכוסות מתחת לסכום של ישראל כנגד הנקודות שנותרו. תיבת ה״מה אם״ משנה את הניקוד של ישראל.",
     boxes3: "שלוש קופסאות עם תוויות שגויות: לוחצים על קופסה כדי להוציא כדור, וההיסק נכתב שורה אחרי שורה. ״סידור אחר״ מגריל תכולה.",
-    edge: "לוחצים על משבצות של sig ברצועת התזמון: sig_q ו-pulse עוקבים לפי בורר השפה. המתג מראה את מלכודת האיפוס, והכפתור טוען את הדיאגרמה של העמוד.",
+    edge: "לוחצים על משבצות של sig ברצועת התזמון: sig_q ו-pulse עוקבים לפי בורר השפה. המתג מראה את מלכודת האיפוס, והכפתור טוען את הדיאגרמה של העמוד. ״העתקת WaveDrom״ מעתיקה את הרצועה כ-JSON.",
     lfsr: "מסמנים taps ובוחרים רוחב: ״צעד״ ו״הפעלה״ מריצים את המצב מ-0…01 על טבעת המצבים (רשימה מ-7 ביטים), הביטים שיצאו נרשמים, והטבלה נותנת את אורך המחזור של כל פולינום.",
-    div3: "״השפה הבאה״ ו״הפעלה״ מריצים את מודל חצאי המחזור: cnt, a, b ו-clk_out על רצועה, וה-duty נמדד. ״התעוררות״ מתחילה ממצב לא נגיש לפי בורר המונה, והסליידר מחלק ב-N.",
+    div3: "״השפה הבאה״ ו״הפעלה״ מריצים את מודל חצאי המחזור: cnt, a, b ו-clk_out על רצועה, וה-duty נמדד. ״התעוררות״ מתחילה ממצב לא נגיש לפי בורר המונה, והסליידר מחלק ב-N. ״העתקת WaveDrom״ מעתיקה את הרצועה כ-JSON.",
     gray: "בסנכרן בוחרים מצביע ורוחב, וכל ביט שמשתנה נדגם ישן או חדש (בלחיצה או ב״הגרלה״). ב-FIFO ״כתיבה״ ו״קריאה״ מזיזים את המצביעים, ו-empty ו-full מחושבים לפי הכללים.",
     stock: "גוררים מחירים או מגרילים: ״היום הבא״ ו״הפעלה״ מריצים את הסריקה יום אחרי יום עם המינימום והמקסימום עד כה והעסקה הטובה ביותר. הבורר עובר ללונג בלבד.",
-    handshake: "לוחצים על משבצות של req ו-ack ברצועה: ארבעת הכללים נבדקים בכל מחזור, וכישלון מסומן בשורת ה-assertion שלו. ה-presets טוענים את ארבע הדוגמאות של העמוד.",
+    handshake: "לוחצים על משבצות של req ו-ack ברצועה: ארבעת הכללים נבדקים בכל מחזור, וכישלון מסומן בשורת ה-assertion שלו. ה-presets טוענים את ארבע הדוגמאות של העמוד. ״העתקת WaveDrom״ מעתיקה את הרצועה כ-JSON.",
     acknak: "ה-RC וה-EP עם שני תורי הקישור: ״הצעד הבא״ ו״הפעלה״ מריצים את תסריטי העמוד, האירועים החופשיים שולחים, מוסרים (גם עם CRC שגוי או אובדן) ומפעילים טיימרים, ו״הרצה אקראית״ מגרילה תנועה עם תקלות ובודקת את האינווריאנטים.",
     credits: "ארבעת המונים כמחוגים על מעגל: תסריטי העמוד ב״הצעד הבא״, אירועים חופשיים (Grant, שידור, קבלה או אובדן, הוצאה, Sync) ו״הרצה אקראית״ עם שיעור אובדן. שורת הסיכום מאזנת קרדיטים מול תאים פנויים.",
     endpoint: "בונים בקשות כתיבה וקריאה: ״מחזור״ ו״הרץ״ מוציאים Completions לפי המודל, ומפת הבלוקים, ציר המחזורים וטבלת ה-Completions מתעדכנים. ה-presets טוענים את דוגמאות העמוד.",
@@ -6463,9 +6643,38 @@
   // view rebuilds its figures with innerHTML, so the buttons are added again after each
   // change (decorate skips figures that already have one).
   const LIVE_FIGURES = "svg.figure, svg.perf-chart, svg.lf-live, svg.cr-live, svg.ep-live, svg.wave-strip";
+  // The WaveDrom row after every timing strip (any svg with data-wavedrom): copy the
+  // source to the clipboard, or open it in the WaveDrom editor. The row sits after the
+  // strip's scroll container, which the views redraw inside, and reads the current strip
+  // when clicked.
+  const WD_EDITOR = "https://wavedrom.com/editor.html?";
+  const exportRows = (box) => {
+    box.querySelectorAll("svg[data-wavedrom]").forEach((svg) => {
+      if (svg.closest(".fig-lightbox")) return;
+      const host = svg.closest(".wv-wrap") || svg.closest(".fig-wrap") || svg;
+      if (host.nextElementSibling && host.nextElementSibling.classList.contains("wv-export")) return;
+      const row = document.createElement("p");
+      row.className = "wv-export";
+      row.innerHTML = `<button type="button" class="md-button wv-copy" title="מעתיק את הרצועה כ-JSON של WaveDrom, כמו הבלוקים שבדפים">העתקת WaveDrom</button> ` +
+        `<a class="wv-open" target="_blank" rel="noopener" href="${WD_EDITOR}">פתיחה בעורך WaveDrom</a>`;
+      host.after(row);
+      const source = () => { const s = host.querySelector("svg[data-wavedrom]") || (host.matches("svg[data-wavedrom]") ? host : null); return s ? s.getAttribute("data-wavedrom") : ""; };
+      const link = row.querySelector(".wv-open");
+      const refresh = () => { link.href = WD_EDITOR + encodeURIComponent(source()); };
+      ["pointerdown", "focus", "click"].forEach((ev) => link.addEventListener(ev, refresh));
+      const btn = row.querySelector(".wv-copy");
+      btn.addEventListener("click", () => {
+        const text = source();
+        const done = () => { btn.textContent = "הועתק ✓"; setTimeout(() => { btn.textContent = "העתקת WaveDrom"; }, 1500); };
+        const fallback = () => { window.prompt("‏JSON של WaveDrom:", text); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+      });
+    });
+  };
   const decorateLive = (box) => {
-    if (!window.dvqDecorate) return;
-    const dec = () => window.dvqDecorate(box, LIVE_FIGURES);
+    exportRows(box);
+    if (!window.dvqDecorate) { if (!box.dvqObserved) { box.dvqObserved = true; new MutationObserver(() => exportRows(box)).observe(box, { childList: true, subtree: true }); } return; }
+    const dec = () => { window.dvqDecorate(box, LIVE_FIGURES); exportRows(box); };
     dec();
     if (box.dvqObserved) return;                         // a rebuilt box keeps its observer
     box.dvqObserved = true;

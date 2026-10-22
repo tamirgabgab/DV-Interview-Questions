@@ -52,3 +52,29 @@ def test_seeded_draws_replay():
     assert len(set(got["a"]["poly"])) == 6 and all(0 <= v < 360 for v in got["a"]["poly"])
     assert len(got["a"]["stock"]) == 10 and all(1 <= v <= 20 for v in got["a"]["stock"])
     assert sorted(got["a"]["perm"][1:]) == list(range(1, 9))
+
+
+def test_wavedrom_export():
+    """The WaveDrom export of a timing strip (U133): a lane per row, "." for a repeated
+    level or bus value, bus values in data, a "p…" clock (or "h"/"l" per half-cycle slot),
+    a flag as a level, names without markup, a shorter lane for frames not reached yet;
+    the text form parses back to the same object."""
+    import json
+
+    got = node_json(
+        f"""
+      const m = {explorer_require()};
+      const rows = [{{ name: "clk", kind: "clock" }}, {{ name: "<code>sig</code> &amp; &#8207;x", kind: "bit", values: [0, 0, 1, 1, 1, 0, 0, 1] }},
+        {{ name: "cnt", kind: "bus", values: [0, 1, 2, 2, 0, 1, null, null] }}, {{ name: "a_rule", kind: "flag", values: [0, 0, 0, 1, 0, 0, 0, 0] }}];
+      const full = m.waveDromOf(rows, 8, {{ ticks: (k) => k }}), half = m.waveDromOf(rows.slice(0, 1), 6, {{ half: true }});
+      console.log(JSON.stringify({{ full, half, text: m.waveDromText(full) }}));
+    """
+    )
+    assert got["full"] == {"signal": [
+        {"name": "clk", "wave": "p......."},
+        {"name": "sig & x", "wave": "0.1..0.1"},
+        {"name": "cnt", "wave": "===.==", "data": ["0", "1", "2", "0", "1"]},
+        {"name": "a_rule", "wave": "0..10..."},
+    ], "head": {"tick": 0}}
+    assert got["half"] == {"signal": [{"name": "clk", "wave": "hlhlhl"}]}
+    assert json.loads(got["text"]) == got["full"]
