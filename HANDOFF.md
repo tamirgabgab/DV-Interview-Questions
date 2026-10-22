@@ -1565,7 +1565,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     - README rows and the explorer-kinds cell, the explorer header comment and HELP, CSS
       blocks for the three kinds. Checks: lint, the Python tests, Verilator on the three
       testbenches (locally with 5.020 where it compiles), strict build, links, phone and
-      axe light and dark.
+      axe light and dark (the full run found one wide equation in the 0039 proof; the
+      identity is now split over three rows of the `aligned` block). On `main` since
+      2026-10-22 (d110eed).
 
 ---
 
