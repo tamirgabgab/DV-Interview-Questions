@@ -322,8 +322,9 @@ added: 2026-10-22
 
     \[
     \begin{aligned}
-    f(k - 1, t - 1) + 1 + f(k, t - 1)
-      &= \sum_{i=1}^{k-1} \binom{t-1}{i} + \binom{t-1}{0} + \sum_{i=1}^{k} \binom{t-1}{i} \\
+    f(k - 1, t - 1) &+ 1 + f(k, t - 1) \\
+      &= \binom{t-1}{0} + \sum_{i=1}^{k-1} \binom{t-1}{i} \\
+      &\quad + \sum_{i=1}^{k} \binom{t-1}{i} \\
       &= \sum_{i=1}^{k} \left[ \binom{t-1}{i-1} + \binom{t-1}{i} \right] \\
       &= \sum_{i=1}^{k} \binom{t}{i} = f(k, t).
     \end{aligned}
