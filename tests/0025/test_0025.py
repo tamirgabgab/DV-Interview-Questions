@@ -369,3 +369,62 @@ def test_explorer_matches_page_classes():
         assert g == expected, ev
     assert got["a"] == [3, 2, 3, 0]                       # the part a table: NEXT_TRANSMIT_SEQ 3, ACKD_SEQ 2, NEXT_RCV_SEQ 3
     assert got["b"] == [2, 1, 2, 1, 1, 2, 3, 3]           # the part b table and its counters
+
+
+def test_explorer_random_traffic():
+    """The random traffic of the box: every script is legal (a delivery only from a
+    non-empty queue, the replay timer only on a drained link), its fault counts are the
+    events it marked, its thresholds replay exactly, and fed through the page's classes
+    the delivered TLPs are complete and in order; the invariant check names what a
+    corrupted state breaks."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    seeds = [1, 7, 4242, 99999]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const scripts = {json.dumps(seeds)}.map((seed) => m.anRandomScript(4090, 200, 0.3, m.mulberry32(seed)));
+      const states = scripts.map((sc) => m.anRun(sc, () => {{ throw new Error("threshold fallback"); }}));
+      const s = states[0][states[0].length - 1];
+      const same = JSON.stringify(m.anRandomScript(4090, 50, 0.3, m.mulberry32(5))) === JSON.stringify(m.anRandomScript(4090, 50, 0.3, m.mulberry32(5)));
+      console.log(JSON.stringify({{ scripts, same,
+        legal: states.map((st, i) => scripts[i].steps.every((ev, k) => {{ const b = st[k];
+          return ev.type === "tlp" ? b.link.length > 0 : ev.type === "dllp" ? b.dllps.length > 0 : ev.type === "timeout" ? b.link.length === 0 && b.retry.length > 0 : true; }})),
+        held: states.map((st) => st.every((b) => m.anInvariants(b).length === 0)),
+        corrupt: [m.anInvariants(s), m.anInvariants({{ ...s, retry: s.retry.slice(1) }}), m.anInvariants({{ ...s, received: [...s.received, 3] }}), m.anInvariants({{ ...s, ackd: (s.ackd + 1) % 4096, received: [9, 11] }})],
+        retryLen: s.retry.length }}));""")
+    assert got["same"] and all(got["legal"]) and all(got["held"])
+    assert got["retryLen"] > 0 and got["corrupt"] == [[], ["retry"], ["order"], ["retry", "order"]]
+    for seed, sc in zip(seeds, got["scripts"]):
+        steps = sc["steps"]
+        assert len(steps) == 200 and sc["random"]["violation"] is None, seed
+        assert sc["random"]["faults"] == {"lost": sum(ev.get("how") == "lose" for ev in steps), "bad": sum(ev.get("how") == "bad" for ev in steps)}
+        assert sum(ev.get("how") in ("lose", "bad") for ev in steps) > 15, seed    # the fault rate bites
+        # the page's classes on the same script: everything sent is delivered once, in order
+        th = list(sc["thresholds"])
+        rc, ep = Tx(4090), Rx(4090, random.Random(seed))
+        ep.ack_threshold = th.pop(0)
+        ep.rng = type("R", (), {"randint": staticmethod(lambda a, b: th.pop(0))})()
+        payload = 0xA0
+        for ev in steps:
+            if ev["type"] == "send":
+                for _ in range(ev["n"]):
+                    rc.send_tlp(Tlp(payload))
+                    payload += 1
+            elif ev["type"] == "tlp":
+                t = rc.tx_tlps.pop(0)
+                if ev["how"] != "lose":
+                    t.crc_ok = ev["how"] != "bad"
+                    ep.receive_tlp(t)
+            elif ev["type"] == "dllp":
+                d = ep.tx_dllps.pop(0)
+                if ev["how"] != "lose":
+                    d.crc_ok = ev["how"] != "bad"
+                    rc.receive_dllp(d)
+            elif ev["type"] == "flush":
+                ep.flush_ack()
+            else:
+                rc.on_replay_timeout()
+        delivered = [t.payload for t in ep.received_tlps]
+        assert delivered == list(range(0xA0, 0xA0 + len(delivered))) and len(delivered) > 10, seed

@@ -15,8 +15,8 @@
 //   mtbf                   0037        clock and data rates, tau, T0 and overhead: the MTBF of one to three flops
 //   triangle               0007        three points to drag or type, inside / edge / outside; play counts every triangle; a largest-arc histogram of 1,000 draws
 //   polygon                0007        the same for n vertices (3 to 10): drag, type or draw; random draws against 1 - n / 2^(n-1)
-//   boxes                  0009        N boxes on a ring with their cycles, person 0's cut, a walk box by box, rounds without person 0
-//   floyd                  0017        the array as the graph i -> nums[i], the tortoise and the hare through both phases
+//   boxes                  0009        N boxes on a ring with their cycles, person 0's cut, a walk box by box, rounds without person 0; the copy link carries the arrangement and the walk
+//   floyd                  0017        the array as the graph i -> nums[i], the tortoise and the hare through both phases; the copy link carries the array and the step
 //   bfs01                  0005        the remainders modulo x on a ring, the BFS tree one dequeue at a time, the answer read back; a digit set and a length-only mode
 //   brackets               0010        a typed bracket string read character by character: the stack, the depth chart, the first failure
 //   ttt                    0011        tap cells on a 3 x 3 board: is it a legal final board and why not; random legal boards; wrap diagonals
@@ -28,10 +28,10 @@
 //   lfsr                   0036        tick the taps, step or play from 0001 on a ring of the 15 states; the output bits; the eight polynomials and their periods
 //   div3                   0035        the half-cycle model one clock edge at a time: cnt, a, b and clk_out on a strip, the duty measured; a wake-up in an unreachable state; a divide by N (2 to 10) and a strip length
 //   gray                   0034        a pointer step through a synchroniser, bit by bit, in binary and in Gray; a 16-entry FIFO with 5-bit pointers and the flags
-//   stock                  0006        prices to drag or draw, the scan played day by day: the cheapest and dearest day so far, the best long and short
+//   stock                  0006        prices to drag or draw, the scan played day by day: the cheapest and dearest day so far, the best long and short; the copy link carries the prices and the day
 //   handshake              0038        req and ack drawn cell by cell; the four rules checked every cycle, a failure marked on its assertion's row
-//   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts
-//   credits                0024        the four counters as hands on a modulo-256 circle, the buffer, packets in flight; grant, transmit, lose, dequeue, sync
+//   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts; random traffic at a fault rate with the invariants checked
+//   credits                0024        the four counters as hands on a modulo-256 circle, the buffer, packets in flight; grant, transmit, lose, dequeue, sync; random legal traffic at a loss rate with the invariants checked
 //   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table
 //   trace                  0002, 0003  the page's Python one line (or one comparison) at a time: the swaps (and the three-variable XOR rotation) with a0 / b0 / c0 expressions, the double loop with its invariant
 // The math of each model is exported under Node, where the question tests compare it with
@@ -969,6 +969,46 @@
     return nums.every((v) => v >= 1 && v <= n) ? nums : null;
   };
 
+  // Shareable state (0006, 0017, 0009): the payload after `#state-<kind>.` reopens a box
+  // with the typed input and the step it was at. enc() writes the payload, dec() returns
+  // the state (the step clamped to the trace) or null for anything malformed, out of
+  // range or not a permutation.
+  const intList = (text, lo, hi) => {
+    if (!/^\d+(\.\d+)*$/.test(text)) return null;
+    const v = text.split(".").map(Number);
+    return v.every((x) => x >= lo && x <= hi) ? v : null;
+  };
+  const STATE_CODECS = {
+    stock: {
+      enc: (s) => `${s.prices.join(".")}-${s.k}-${s.both ? "both" : "long"}`,
+      dec: (text) => {
+        const m = /^([\d.]+)-(\d+)-(both|long)$/.exec(text);
+        const prices = m && intList(m[1], 1, 20);
+        if (!prices || prices.length < 2 || prices.length > 20) return null;
+        return { prices, k: Math.min(Number(m[2]), prices.length), both: m[3] === "both" };
+      },
+    },
+    floyd: {
+      enc: (s) => `${s.nums.join(".")}-${s.k}`,
+      dec: (text, nmax = 12) => {
+        const m = /^([\d.]+)-(\d+)$/.exec(text);
+        const nums = m && floydParse(m[1].replace(/\./g, " "));
+        if (!nums || nums.length - 1 > nmax) return null;
+        return { nums, k: Math.min(Number(m[2]), floydTrace(nums).frames.length - 1) };
+      },
+    },
+    boxes: {
+      enc: (s) => `${s.notes.slice(1).join(".")}-${s.me}-${s.helper ? 1 : 0}-${s.step}`,
+      dec: (text, nmax = 16) => {
+        const m = /^([\d.]+)-(\d+)-([01])-(\d+)$/.exec(text);
+        const p = m && intList(m[1], 1, nmax), n = p ? p.length : 0, me = m && Number(m[2]);
+        if (!p || n < 4 || n % 2 || n > nmax || me < 1 || me > n) return null;
+        if ([...p].sort((a, b) => a - b).some((v, i) => v !== i + 1)) return null;
+        return { n, notes: [0, ...p], me, helper: m[3] === "1", step: Number(m[4]) };
+      },
+    },
+  };
+
   // Smallest 0/1 multiple (0005): the page's BFS over the remainders modulo x, one frame
   // per dequeue: the remainder taken out, its children (the smaller digit first) with
   // their fate, and the queue after the step. Numbers are strings of digits (they outgrow
@@ -1570,6 +1610,47 @@
     script.steps.forEach((ev) => { s = anApply(s, ev, draw).state; states.push(s); });
     return states;
   };
+  // The two invariants the box checks, as the names of those that fail: "retry" (the
+  // Retry Buffer holds exactly ACKD_SEQ + 1 .. NEXT_TRANSMIT_SEQ − 1) and "order" (the
+  // TLPs were delivered once, in order).
+  const anInvariants = (s) => {
+    const expect = [];
+    for (let q = (s.ackd + 1) % AN_MOD; q !== s.nts && expect.length <= AN_MOD; q = (q + 1) % AN_MOD) expect.push(q);
+    const bad = [];
+    if (expect.length !== s.retry.length || expect.some((q, i) => q !== s.retry[i].seq)) bad.push("retry");
+    if (s.received.some((q, i) => i > 0 && q !== (s.received[i - 1] + 1) % AN_MOD)) bad.push("order");
+    return bad;
+  };
+  // Random traffic, the way the page's test drives the link: `count` events drawn from
+  // rnd (sends of 1 or 2 TLPs while fewer than 12 wait for an Ack, the head of a queue
+  // delivered, the Ack timer, the replay timer once the link is drained), a delivery
+  // corrupted or lost with probability `rate` (half each). The Ack thresholds are drawn
+  // first and kept in the script, so the box replays it exactly. The invariants are
+  // checked after every event and the first violation ends the script there (the
+  // page's model never reaches one; the test corrupts a state to see the check fire).
+  const anRandomScript = (start, count, rate, rnd) => {
+    const thresholds = Array.from({ length: count + 2 }, () => 1 + Math.floor(rnd() * 4));
+    const th = [...thresholds], draw = () => (th.length ? th.shift() : 1 + Math.floor(rnd() * 4));
+    let s = anInit(start, draw);
+    const steps = [], faults = { lost: 0, bad: 0 };
+    let violation = null;
+    const how = () => (rnd() < rate ? (rnd() < 0.5 ? "lose" : "bad") : "ok");
+    while (steps.length < count) {
+      const r = rnd();
+      let ev;
+      if (r < 0.15) { if (s.retry.length >= 12) continue; ev = { type: "send", n: 1 + Math.floor(rnd() * 2) }; }
+      else if (r < 0.6) { if (!s.link.length) continue; ev = { type: "tlp", how: how() }; }
+      else if (r < 0.85) { if (!s.dllps.length) continue; ev = { type: "dllp", how: how() }; }
+      else if (r < 0.93) ev = { type: "flush" };
+      else { if (s.link.length || !s.retry.length) continue; ev = { type: "timeout" }; }
+      if (ev.how === "lose") faults.lost += 1; else if (ev.how === "bad") faults.bad += 1;
+      steps.push(ev);
+      s = anApply(s, ev, draw).state;
+      const bad = anInvariants(s);
+      if (bad.length) { violation = { index: steps.length, names: bad }; break; }
+    }
+    return { start, thresholds, steps, random: { count, rate, faults, violation } };
+  };
 
   // USB4 path credits (0024): the page's EgressSyncModel and IngressSyncModel as one
   // state with the packets in flight between them. Errors the page raises (a transmission
@@ -1619,6 +1700,47 @@
     const states = [s];
     script.steps.forEach((ev) => { s = crApply(s, ev).state; states.push(s); });
     return states;
+  };
+  // What the credits add up to against the buffer: the credits the Egress holds plus the
+  // packets in flight can never exceed the free slots; the gap is slots freed but not yet
+  // granted (PCA − PCL) plus packets lost and not yet synced (the leak). A negative leak
+  // means a Sync counted a packet in flight as lost, and the gap turns into an overflow
+  // risk. crInvariants names what fails: "overflow" (an error of the page's models, or
+  // more packets than slots) and "credits" (credits + in flight > free slots).
+  const crBalance = (s) => {
+    const credits = crDist(s.pcc, s.pcl), free = s.size - s.occ, ungranted = crDist(s.pcl, s.pca);
+    return { credits, inFlight: s.link.length, free, ungranted, leak: free - credits - s.link.length - ungranted };
+  };
+  const crInvariants = (s) => {
+    const b = crBalance(s), bad = [];
+    if (s.errors || s.occ > s.size) bad.push("overflow");
+    if (b.credits + b.inFlight > b.free) bad.push("credits");
+    return bad;
+  };
+  // Random traffic as the page's test drives it: only legal events (a transmission with a
+  // credit, a dequeue from a non-empty buffer, a Sync when nothing is in flight, since on
+  // the in-order link it arrives after the packets ahead of it), a received packet lost
+  // with probability `rate`. The invariants are checked after every event; the first
+  // violation ends the script there.
+  const crRandomScript = (size, base, count, rate, rnd) => {
+    let s = crInit(size, base);
+    const steps = [], faults = { lost: 0, syncs: 0 };
+    let violation = null;
+    while (steps.length < count) {
+      const r = rnd();
+      let ev;
+      if (r < 0.3) { if (!crCanTransmit(s)) continue; ev = { type: "transmit" }; }
+      else if (r < 0.65) { if (!s.link.length) continue; ev = { type: "receive", how: rnd() < rate ? "lose" : "ok" }; }
+      else if (r < 0.8) { if (!s.occ) continue; ev = { type: "dequeue" }; }
+      else if (r < 0.93) ev = { type: "grant" };
+      else { if (s.link.length) continue; ev = { type: "sync" }; }
+      if (ev.how === "lose") faults.lost += 1; else if (ev.type === "sync") faults.syncs += 1;
+      steps.push(ev);
+      s = crApply(s, ev).state;
+      const bad = crInvariants(s);
+      if (bad.length) { violation = { index: steps.length, names: bad }; break; }
+    }
+    return { size, steps, random: { count, rate, faults, violation } };
   };
 
   // PCIe endpoint (0023): the page's UnalignedEndpointModel. `rng` is {randint(a, b),
@@ -1809,7 +1931,7 @@
     fifoSteps, fifoDepth, fifoFill, mtbfSeconds, mtbfHuman,
     TRI_TOTAL, triArcs, triClass, triCountC, triFrame, triIndex, triCounts, triArcCdf, triHistogram, polyArcs, polyClass, polyProb, polyProbDiscrete, polyRandom,
     permCycles, permHelper, permSwap, permWalk, permAllWin, permShuffle, permRandomPicks, permStrategyProb, permRandomProb,
-    floydRho, floydTrace, floydRandom, floydParse, bfs01Trace, bfs01Counts, bracketsClean, bracketsTrace,
+    floydRho, floydTrace, floydRandom, floydParse, STATE_CODECS, bfs01Trace, bfs01Counts, bracketsClean, bracketsTrace,
     TTT_LINES, TTT_WRAP, tttCheck, tttFinalBoards, tttRandom,
     shapesOverlap, shapesCandidates, shapesOk, shapesTry, shapesRandom, shapesHeat,
     kapStep, kapChain, kapHistogram,
@@ -1818,7 +1940,7 @@
     EDGE_MODES, edgeTrace, lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, div3Params, div3Trace, div3Duty,
     grayOf, grayToBin, bitsOf, graySample, grayFlags,
     stockScan, stockRandom, hsCheck, HS_PRESETS, hsWave,
-    AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun,
+    AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, anInvariants, anRandomScript, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun, crBalance, crInvariants, crRandomScript,
     EP_RCB, epUnitRng, epValueRng, epInit, epWrite, epReadBytes, epFragments, epRead, epNext, epCycle, EP_SCRIPTS, epRunScript,
     CAKE_MAX, cakeDone, SWAP_CODE, swapTrace, ROT_CODE, rotTrace, LOOP_CODE, loopTrace,
   };
@@ -1890,7 +2012,11 @@
   // `after`; run(rng, seed) redraws with a seeded generator. draw() picks a new seed and
   // runs it, a typed seed replays, and `#seed-<kind>-<n>` in the URL replays on load (the
   // first box of that kind on the page). opts.seed fills the field without running.
+  // opts.state = { get, set }: get() returns the box's state as a payload (or null to fall
+  // back to the seed), the copy button then writes `#state-<kind>.<payload>` and set()
+  // reopens it on load (true when the payload was valid).
   const SEED_HASH = /^#seed-([a-z0-9-]+)-(\d+)$/;
+  const STATE_HASH = /^#state-([a-z0-9-]+)\.(.+)$/;
   const seedControls = (box, after, run, opts = {}) => {
     const kind = box.dataset.kind;
     const label = document.createElement("label");
@@ -1898,7 +2024,7 @@
     label.innerHTML = `<span>זרע</span> <input type="number" class="ex-seed" min="1" max="${SEED_MAX}" step="1" dir="ltr" inputmode="numeric" aria-label="זרע ההגרלה, מספר לשחזור">`;
     const copy = document.createElement("button");
     copy.type = "button"; copy.className = "md-button ex-copy"; copy.textContent = "העתקת קישור";
-    copy.title = "קישור שפותח את התיבה עם אותו זרע";
+    copy.title = opts.state ? "קישור שפותח את התיבה במצב הזה" : "קישור שפותח את התיבה עם אותו זרע";
     after.after(label, copy);
     const input = label.querySelector("input");
     if (opts.seed) input.value = opts.seed;
@@ -1907,18 +2033,37 @@
     input.addEventListener("change", () => { const v = Math.round(Number(input.value)); if (v >= 1 && v <= SEED_MAX) runSeed(v); else input.value = ""; });
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
     copy.addEventListener("click", () => {
-      if (!input.value) draw();
-      const url = `${location.origin}${location.pathname}#seed-${kind}-${input.value}`;
+      const payload = opts.state ? opts.state.get() : null;
+      if (!payload && !input.value) draw();
+      const url = `${location.origin}${location.pathname}#${payload ? `state-${kind}.${payload}` : `seed-${kind}-${input.value}`}`;
       const done = () => { copy.textContent = "הועתק ✓"; setTimeout(() => { copy.textContent = "העתקת קישור"; }, 1500); };
       const fallback = () => { window.prompt("הקישור:", url); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
     });
-    const m = SEED_HASH.exec(location.hash);
-    if (m && m[1] === kind && box === document.querySelector(`.explorer[data-kind="${kind}"]`)) {
+    const first = box === document.querySelector(`.explorer[data-kind="${kind}"]`);
+    const m = SEED_HASH.exec(location.hash), sm = STATE_HASH.exec(location.hash);
+    if (first && m && m[1] === kind) {
       runSeed(Number(m[2]));
+      requestAnimationFrame(() => box.scrollIntoView({ block: "start" }));
+    } else if (first && sm && sm[1] === kind && opts.state && opts.state.set(sm[2])) {
       requestAnimationFrame(() => box.scrollIntoView({ block: "start" }));
     }
     return { draw };
+  };
+  // The random traffic row of the two protocol boxes (0025, 0024): how many events and
+  // the fault rate; the run button draws a new seed. `randNote` is the line under the box
+  // once a random script runs: the counts, and whether the invariants held.
+  const randomRow = (label, title) =>
+    `<div class="ex-controls an-free an-random"><span class="ex-title">${title}</span>` +
+    `<label>אירועים <select class="ex-count" aria-label="מספר האירועים">${[20, 50, 200].map((v) => `<option value="${v}"${v === 50 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
+    `<label>${label} <input type="range" class="ex-rate" min="0" max="50" step="5" value="20" dir="ltr" aria-label="${label} באחוזים"><output class="out-rate">20%</output></label>` +
+    `<button type="button" class="md-button md-button--primary ex-run">הרצה אקראית</button></div>`;
+  const RAND_HASH = /^r(20|50|200)\.(\d+)\.(\d+)$/;
+  const randNote = (rd, seed, faults, names, checks) => {
+    const v = rd.violation;
+    return `תנועה אקראית מהזרע ${ltr(seed)}: ${ltr(rd.count)} אירועים בשיעור ${ltr(`${Math.round(rd.rate * 100)}%`)}, ${faults}. ${checks} ` +
+      (v ? `<span class="wv-bad">✗ אחרי אירוע ${ltr(v.index)} הופר: ${v.names.map((n) => names[n]).join(", ")}; התסריט נעצר שם.</span>` : `<span class="wv-ok">✓ אף אחד מהם לא הופר לאורך כל התסריט.</span>`) +
+      ` אותו זרע נותן את אותו תסריט; "הצעד הקודם" חוזר אחורה.`;
   };
   const speedSel = (slow, mid, fast) =>
     `<label>הקצב <select class="ex-speed"><option value="${slow}">איטי</option><option value="${mid}" selected>בינוני</option><option value="${fast}">מהיר</option></select></label>`;
@@ -3869,7 +4014,15 @@
       });
       const setN = (n) => { stop(); st.n = n; st.notes = permShuffle(n); st.me = Math.min(st.me, n); st.step = 0; st.runs = st.strat = st.rand = 0; draw(); };
       $(".ex-n").addEventListener("input", () => setN(Number($(".ex-n").value)));
-      const seed = seedControls(box, $(".ex-example"), (rng) => { stop(); st.notes = permShuffle(st.n, rng); st.step = 0; draw(); });
+      const seed = seedControls(box, $(".ex-example"), (rng) => { stop(); st.notes = permShuffle(st.n, rng); st.step = 0; draw(); }, { state: {
+        get: () => STATE_CODECS.boxes.enc({ notes: st.notes, me: st.me, helper: st.helper, step: st.step }),
+        set: (p) => {
+          const d = STATE_CODECS.boxes.dec(p, nmax);
+          if (!d) return false;
+          stop(); st.n = d.n; $(".ex-n").value = d.n; st.notes = d.notes; st.me = d.me; st.helper = d.helper; helperCb.checked = d.helper;
+          st.step = Math.min(d.step, steps()); draw(); return true;
+        },
+      } });
       $(".ex-shuffle").addEventListener("click", seed.draw);
       $(".ex-example").addEventListener("click", () => { stop(); st.n = nmax; $(".ex-n").value = nmax; st.notes = EXAMPLE.slice(0, nmax + 1); st.me = 13; st.step = 0; draw(); });
       helperCb.addEventListener("change", () => { stop(); st.helper = helperCb.checked; st.step = 0; draw(); });
@@ -4025,7 +4178,10 @@
       });
       speed.addEventListener("change", () => { if (timer) { stop(); play.click(); } });
       $(".ex-n").addEventListener("input", () => setNums(floydRandom(Number($(".ex-n").value))));
-      const seed = seedControls(box, $(".ex-example"), (rng) => setNums(floydRandom(st.nums.length - 1, rng)));
+      const seed = seedControls(box, $(".ex-example"), (rng) => setNums(floydRandom(st.nums.length - 1, rng)), { state: {
+        get: () => STATE_CODECS.floyd.enc({ nums: st.nums, k: st.k }),
+        set: (p) => { const d = STATE_CODECS.floyd.dec(p, nmax); if (!d) return false; setNums(d.nums); st.k = d.k; draw(); return true; },
+      } });
       $(".ex-shuffle").addEventListener("click", seed.draw);
       $(".ex-example").addEventListener("click", () => setNums(EXAMPLE));
       const apply = () => {
@@ -5419,7 +5575,10 @@
         chart.querySelector(`.st-pt[data-i="${i}"]`).focus({ preventScroll: true });
       });
       $(".ex-mode").addEventListener("change", () => { st.both = $(".ex-mode").value === "both"; draw(); });
-      const seed = seedControls(box, $(".wv-presets"), (rng) => setPrices(stockRandom(10, rng), 0));
+      const seed = seedControls(box, $(".wv-presets"), (rng) => setPrices(stockRandom(10, rng), 0), { state: {
+        get: () => STATE_CODECS.stock.enc({ prices: st.prices, k: st.k, both: st.both }),
+        set: (p) => { const d = STATE_CODECS.stock.dec(p); if (!d) return false; st.both = d.both; $(".ex-mode").value = d.both ? "both" : "long"; setPrices(d.prices, d.k); return true; },
+      } });
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => {
         const p = b.dataset.p;
         if (p === "page") setPrices(PAGE.slice(), 0);
@@ -5518,17 +5677,23 @@
   // through with the same engine.
   const acknakView = () => ({
     mount(box) {
-      const st = { start: 4094, history: [], script: null, pos: 0, state: null, log: null, th: [], seed: newSeed(), unit: null };
-      const draw4 = () => (st.th.length ? st.th.shift() : 1 + Math.floor(st.unit() * 4));
+      const st = { start: 4094, history: [], script: null, pos: 0, state: null, log: null, th: [], seed: newSeed(), unit: null, draws: 0, mode: "free" };
+      // the EP's thresholds: the script's list first, then the seeded generator; the
+      // history keeps the list and the draw count, so "previous" then "next" redraws the same
+      const draw4 = () => { if (st.th.length) return st.th.shift(); st.draws += 1; return 1 + Math.floor(st.unit() * 4); };
+      const rewind = (draws) => { st.unit = mulberry32(st.seed); st.draws = 0; while (st.draws < draws) draw4(); };
       const reset = (start, script) => {
         st.start = start; st.script = script || null; st.pos = 0; st.th = script ? [...script.thresholds] : [];
-        st.unit = mulberry32(st.seed);
+        rewind(0);
         st.state = anInit(start, draw4); st.history = []; st.log = null; render();
       };
+      // a step: the state before it (and the script position) go to the history, so
+      // "previous" restores both; a free event leaves the script
       const apply = (ev, scripted) => {
         if (!scripted && st.script) { st.script = null; st.th = []; }
-        st.history.push({ state: st.state, log: st.log, pos: st.pos });
+        st.history.push({ state: st.state, log: st.log, pos: st.pos, th: [...st.th], draws: st.draws });
         if (st.history.length > 300) st.history.shift();
+        if (scripted) st.pos += 1;
         const r = anApply(st.state, ev, draw4);
         st.state = r.state; st.log = r.log; render();
       };
@@ -5538,15 +5703,17 @@
         `<button type="button" class="md-button ex-preset" data-p="b">סעיף ב</button></span>` +
         `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא בתסריט</button>` +
         `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
-        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) + `<span class="ex-pos"></span>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) +
+        `<button type="button" class="md-button ex-end">לסוף התסריט</button><span class="ex-pos"></span>` +
         `<label>מתחילים מ-<select class="ex-start" aria-label="המספר הראשון"><option value="4094" selected>4094 (לפני הגלישה)</option><option value="0">0</option></select></label>` +
         `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
         `<div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים:</span>` +
         `<button type="button" class="md-button ex-send">ה-RC שולח TLP</button>` +
         `<button type="button" class="md-button ex-flush">טיימר ה-Ack פג</button>` +
         `<button type="button" class="md-button ex-timeout">ה-REPLAY_TIMER פג</button></div>` +
+        randomRow("שיעור התקלות", "תנועה אקראית (כמו ה-test של העמוד):") +
         `<div class="an-box"><div class="an-side an-rc"></div><div class="an-link"></div><div class="an-side an-ep"></div></div>` +
-        `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p>`;
+        `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const chips = (items, cls) => (items.length ? items.map((t) => `<span class="an-chip${t.cls ? " " + t.cls : ""}">${t.text}</span>`).join("") : `<span class="an-empty">ריק</span>`);
       const field = (name, value, changed) => `<div class="an-field${changed ? " is-changed" : ""}"><span class="an-name">${name}</span><span class="an-val">${value}</span></div>`;
@@ -5575,11 +5742,13 @@
         $(".ex-prev").disabled = !st.history.length;
         $(".ex-pos").textContent = scripted ? `צעד ${st.pos} מתוך ${st.script.steps.length}` : "";
         $(".an-log").innerHTML = st.log ? logText(st.log) : `מצב התחלתי: ${ltr(`ACKD_SEQ = ${s.ackd}`)} הוא "לפני ${ltr(s.nts)}", ה-Retry Buffer ריק, וה-EP מצפה ל-${ltr(s.nrs)} עם סף Ack ${ltr(s.threshold)} שהגריל.`;
-        const expect = []; for (let q = (s.ackd + 1) % AN_MOD; q !== s.nts; q = (q + 1) % AN_MOD) { expect.push(q); if (expect.length > 4200) break; }
-        const inv = JSON.stringify(expect) === JSON.stringify(s.retry.map((t) => t.seq));
-        const ordered = s.received.every((q, i) => i === 0 || q === (s.received[i - 1] + 1) % AN_MOD);
-        $(".an-sum").innerHTML = (inv ? `<span class="wv-ok">✓ ה-Retry Buffer מכיל בדיוק את ${ltr("ACKD_SEQ + 1")} עד ${ltr("NEXT_TRANSMIT_SEQ − 1")}.</span>` : `<span class="wv-bad">✗ ה-Retry Buffer אינו הרצף מ-ACKD_SEQ + 1.</span>`) +
-          ` ` + (ordered ? `<span class="wv-ok">✓ ה-TLPs נמסרו בסדר, בלי חור ובלי כפילות.</span>` : `<span class="wv-bad">✗ המסירה אינה בסדר.</span>`);
+        const bad = anInvariants(s);
+        $(".an-sum").innerHTML = (!bad.includes("retry") ? `<span class="wv-ok">✓ ה-Retry Buffer מכיל בדיוק את ${ltr("ACKD_SEQ + 1")} עד ${ltr("NEXT_TRANSMIT_SEQ − 1")}.</span>` : `<span class="wv-bad">✗ ה-Retry Buffer אינו הרצף מ-ACKD_SEQ + 1.</span>`) +
+          ` ` + (!bad.includes("order") ? `<span class="wv-ok">✓ ה-TLPs נמסרו בסדר, בלי חור ובלי כפילות.</span>` : `<span class="wv-bad">✗ המסירה אינה בסדר.</span>`);
+        $(".ex-end").disabled = !scripted || left === 0;
+        const rd = st.script && st.script.random;
+        $(".an-rand").innerHTML = rd ? randNote(rd, st.seed, `ובהם ${ltr(rd.faults.lost)} פקטים שאבדו ו-${ltr(rd.faults.bad)} שהגיעו עם CRC שגוי`,
+          { retry: "אינווריאנט ה-Retry Buffer", order: "סדר המסירה" }, "שני האינווריאנטים נבדקו אחרי כל אירוע.") : "";
       };
       const logText = (log) => {
         const seqs = (a) => ltr(a.join(", "));
@@ -5608,23 +5777,41 @@
         });
         return parts.join(" ");
       };
-      const nextStep = () => { if (st.script && st.pos < st.script.steps.length) { const ev = st.script.steps[st.pos]; st.pos += 1; apply(ev, true); } };
+      const nextStep = () => { if (st.script && st.pos < st.script.steps.length) apply(st.script.steps[st.pos], true); };
       const stop = autoplay($(".ex-play"), $(".ex-speed"), {
         step: nextStep,
         done: () => !st.script || st.pos >= st.script.steps.length,
         restart: () => { if (st.script) reset(st.start, st.script); },
       });
       $(".ex-next").addEventListener("click", () => { stop(); nextStep(); });
-      $(".ex-prev").addEventListener("click", () => { stop(); const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; render(); } });
+      $(".ex-end").addEventListener("click", () => { stop(); while (st.script && st.pos < st.script.steps.length) nextStep(); });
+      $(".ex-prev").addEventListener("click", () => { stop(); const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; st.th = h.th; rewind(h.draws); render(); } });
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { stop(); reset(AN_SCRIPTS[b.dataset.p].start, AN_SCRIPTS[b.dataset.p]); $(".ex-start").value = "4094"; }));
-      $(".ex-reset").addEventListener("click", () => seed.draw());
+      $(".ex-reset").addEventListener("click", () => { st.mode = "free"; seed.draw(); });
       $(".ex-start").addEventListener("change", () => { stop(); reset(Number($(".ex-start").value), null); });
+      // the random run: a script drawn from the seed, replayed with the script controls
+      const runRandom = () => {
+        stop();
+        const script = anRandomScript(Number($(".ex-start").value), Number($(".ex-count").value), Number($(".ex-rate").value) / 100, mulberry32(st.seed));
+        reset(script.start, script);
+      };
+      $(".ex-run").addEventListener("click", () => { st.mode = "run"; seed.draw(); });
+      $(".ex-rate").addEventListener("input", () => { $(".out-rate").textContent = `${$(".ex-rate").value}%`; if (st.script && st.script.random) runRandom(); });
+      $(".ex-count").addEventListener("change", () => { if (st.script && st.script.random) runRandom(); });
       $(".ex-send").addEventListener("click", () => { stop(); apply({ type: "send", n: 1 }); });
       $(".ex-flush").addEventListener("click", () => { stop(); apply({ type: "flush" }); });
       $(".ex-timeout").addEventListener("click", () => { stop(); apply({ type: "timeout" }); });
       box.addEventListener("click", (e) => { const b = e.target.closest(".an-act"); if (b) { stop(); apply({ type: b.dataset.q, how: b.dataset.how }); } });
       reset(4094, AN_SCRIPTS.a);
-      const seed = seedControls(box, $(".ex-reset"), (rng, n) => { stop(); st.seed = n; reset(Number($(".ex-start").value), null); }, { seed: st.seed });
+      const seed = seedControls(box, $(".ex-run"), (rng, n) => { stop(); st.seed = n; if (st.mode === "run") runRandom(); else reset(Number($(".ex-start").value), null); }, { seed: st.seed, state: {
+        get: () => (st.script && st.script.random ? `r${$(".ex-count").value}.${$(".ex-rate").value}.${st.seed}` : null),
+        set: (p) => {
+          const m = RAND_HASH.exec(p);
+          if (!m || Number(m[2]) > 50 || Number(m[2]) % 5 || Number(m[3]) < 1 || Number(m[3]) > SEED_MAX) return false;
+          $(".ex-count").value = m[1]; $(".ex-rate").value = m[2]; $(".out-rate").textContent = `${m[2]}%`;
+          st.seed = Number(m[3]); $(".ex-seed").value = st.seed; st.mode = "run"; runRandom(); return true;
+        },
+      } });
     },
   });
 
@@ -5634,11 +5821,12 @@
   // and the page's two examples as scripts. A start near 250 shows the wrap.
   const creditsView = () => ({
     mount(box) {
-      const st = { size: 5, base: 0, script: null, pos: 0, state: null, log: null, history: [] };
+      const st = { size: 5, base: 0, script: null, pos: 0, state: null, log: null, history: [], seed: newSeed() };
       const reset = (script) => { st.script = script || null; st.pos = 0; st.state = crInit(st.size, st.base); st.history = []; st.log = null; render(); };
       const apply = (ev, scripted) => {
         if (!scripted && st.script) st.script = null;
         st.history.push({ state: st.state, log: st.log, pos: st.pos }); if (st.history.length > 300) st.history.shift();
+        if (scripted) st.pos += 1;
         const r = crApply(st.state, ev); st.state = r.state; st.log = r.log; render();
       };
       box.innerHTML =
@@ -5647,7 +5835,8 @@
         `<button type="button" class="md-button ex-preset" data-p="b">סעיף ב</button></span>` +
         `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא בתסריט</button>` +
         `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
-        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) + `<span class="ex-pos"></span>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) +
+        `<button type="button" class="md-button ex-end">לסוף התסריט</button><span class="ex-pos"></span>` +
         `<label>גודל ה-buffer <select class="ex-size" aria-label="גודל ה-buffer">${[3, 4, 5, 6, 8].map((v) => `<option value="${v}"${v === 5 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<label><input type="checkbox" class="ex-wrap"> <span>להתחיל מ-250 (הגלישה)</span></label>` +
         `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
@@ -5658,8 +5847,9 @@
         `<button type="button" class="md-button cr-act" data-ev="receive" data-how="lose">הפקטה הבאה אבדה</button>` +
         `<button type="button" class="md-button cr-act" data-ev="dequeue">פקטה יוצאת מה-buffer</button>` +
         `<button type="button" class="md-button cr-act" data-ev="sync">Path Credit Sync</button></div>` +
+        randomRow("שיעור האובדן", "תנועה אקראית (כמו ה-test של העמוד, אירועים חוקיים בלבד):") +
         `<div class="cr-box"><div class="cr-circle"></div><div class="cr-panel"><div class="cr-table"></div><p class="cr-buf"></p><p class="cr-link"></p></div></div>` +
-        `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p>`;
+        `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const circle = (s) => {
         const C = 150, R = 110, ang = (v) => -Math.PI / 2 + (v / CR_MOD) * 2 * Math.PI;
@@ -5696,13 +5886,25 @@
         });
         const scripted = !!st.script;
         $(".ex-next").disabled = !scripted || st.pos >= st.script.steps.length;
+        $(".ex-end").disabled = !scripted || st.pos >= st.script.steps.length;
         $(".ex-play").disabled = !scripted;
         $(".ex-prev").disabled = !st.history.length;
         $(".ex-pos").textContent = scripted ? `צעד ${st.pos} מתוך ${st.script.steps.length}` : "";
         $(".an-log").innerHTML = st.log ? st.log.items.map(logText).join(" ") : `הקמת הנתיב: ${ltr(`PCA = ${s.pca}`)} הוא גודל ה-buffer${s.pca !== s.size ? " מעל נקודת ההתחלה" : ""}, ושאר המונים ב-${ltr(s.pcc)}. ‏PCL עדיין ${ltr(s.pcl)}, ולכן אין קרדיטים עד ה-Credit Grant הראשון.`;
-        const agree = free === s.size - s.occ;
+        // the balance against the buffer: credits + in flight never exceed the free slots;
+        // the gap is slots not yet granted plus packets lost and not yet synced
+        const b = crBalance(s), bad = crInvariants(s);
+        const gap = [];
+        if (b.ungranted) gap.push(`${ltr(b.ungranted)} תאים שהתפנו ומחכים ל-Grant`);
+        if (b.leak > 0) gap.push(`<b>דליפה</b>: ${ltr(b.leak)} פקטות אבדו ולא סונכרנו, ולכן ${ltr(b.leak)} תאים פנויים בלי קרדיט עד ה-Path Credit Sync הבא`);
         $(".an-sum").innerHTML = (crCanTransmit(s) ? `<span class="wv-ok">מותר לשדר: ${ltr(credits)} קרדיטים (מרחק 1 עד 127 קדימה מ-PCC ל-PCL).</span>` : `<span class="wv-bad">אסור לשדר: ${credits === 0 ? "הקרדיטים אזלו, PCL = PCC" : "PCL מאחורי PCC על המעגל (Grant ישן או מושחת)"}.</span>`) +
-          ` ` + (agree ? `<span class="wv-ok">✓ שני הצדדים מסכימים: ${ltr(`PCA − PCR = ${free}`)} הוא מספר התאים הפנויים באמת.</span>` : `<span class="wv-bad">✗ דליפה: ה-Ingress חושב שיש ${ltr(free)} תאים פנויים, אבל יש ${ltr(s.size - s.occ)}: ${ltr(crDist(s.pcr, s.pcc))} פקטות ששודרו ולא הגיעו. ‏Path Credit Sync מתקן את זה.</span>`);
+          ` ` + (bad.includes("overflow") ? `<span class="wv-bad">✗ ${s.occ > s.size ? "ה-buffer גלש" : `${ltr(s.errors)} הפרות של הסביבה (שידור בלי קרדיט, גלישה או הוצאה מ-buffer ריק)`}.</span> ` : "") +
+          (bad.includes("credits")
+            ? `<span class="wv-bad">✗ קרדיטים ועוד פקטות בדרך (${ltr(`${b.credits} + ${b.inFlight}`)}) עולים על ${ltr(b.free)} התאים הפנויים: Sync שנשלח כשפקטות היו בדרך ספר אותן כאבודות, וה-buffer עלול לגלוש.</span>`
+            : `<span class="wv-ok">✓ קרדיטים ועוד פקטות בדרך (${ltr(`${b.credits} + ${b.inFlight}`)}) אינם עולים על ${ltr(b.free)} התאים הפנויים${gap.length ? `: ההפרש הוא ${gap.join(", ו")}` : ""}.</span>`);
+        const rd = st.script && st.script.random;
+        $(".an-rand").innerHTML = rd ? randNote(rd, st.seed, `ובהם ${ltr(rd.faults.lost)} פקטות שאבדו ו-${ltr(rd.faults.syncs)} סנכרונים`,
+          { overflow: "אין גלישה", credits: "קרדיטים ועוד פקטות בדרך אינם עולים על התאים הפנויים" }, "שני האינווריאנטים נבדקו אחרי כל אירוע.") : "";
       };
       const logText = (it) => {
         switch (it.out) {
@@ -5719,20 +5921,38 @@
           default: return "";
         }
       };
-      const nextStep = () => { if (st.script && st.pos < st.script.steps.length) { const ev = st.script.steps[st.pos]; st.pos += 1; apply(ev, true); } };
+      const nextStep = () => { if (st.script && st.pos < st.script.steps.length) apply(st.script.steps[st.pos], true); };
       const stop = autoplay($(".ex-play"), $(".ex-speed"), {
         step: nextStep,
         done: () => !st.script || st.pos >= st.script.steps.length,
         restart: () => { if (st.script) reset(st.script); },
       });
       $(".ex-next").addEventListener("click", () => { stop(); nextStep(); });
+      $(".ex-end").addEventListener("click", () => { stop(); while (st.script && st.pos < st.script.steps.length) nextStep(); });
       $(".ex-prev").addEventListener("click", () => { stop(); const h = st.history.pop(); if (h) { st.state = h.state; st.log = h.log; st.pos = h.pos; render(); } });
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { stop(); st.size = CR_SCRIPTS[b.dataset.p].size; $(".ex-size").value = String(st.size); reset(CR_SCRIPTS[b.dataset.p]); }));
       $(".ex-size").addEventListener("change", () => { stop(); st.size = Number($(".ex-size").value); reset(null); });
       $(".ex-wrap").addEventListener("change", () => { stop(); st.base = $(".ex-wrap").checked ? 250 : 0; reset(null); });
       $(".ex-reset").addEventListener("click", () => { stop(); reset(null); });
       box.addEventListener("click", (e) => { const b = e.target.closest(".cr-act"); if (b) { stop(); apply({ type: b.dataset.ev, how: b.dataset.how }); } });
+      // the random run: a script of legal events drawn from the seed
+      const runRandom = () => {
+        stop();
+        reset(crRandomScript(st.size, st.base, Number($(".ex-count").value), Number($(".ex-rate").value) / 100, mulberry32(st.seed)));
+      };
+      $(".ex-run").addEventListener("click", () => seed.draw());
+      $(".ex-rate").addEventListener("input", () => { $(".out-rate").textContent = `${$(".ex-rate").value}%`; if (st.script && st.script.random) runRandom(); });
+      $(".ex-count").addEventListener("change", () => { if (st.script && st.script.random) runRandom(); });
       reset(CR_SCRIPTS.a);
+      const seed = seedControls(box, $(".ex-run"), (rng, n) => { st.seed = n; runRandom(); }, { seed: st.seed, state: {
+        get: () => (st.script && st.script.random ? `r${$(".ex-count").value}.${$(".ex-rate").value}.${st.seed}` : null),
+        set: (p) => {
+          const m = RAND_HASH.exec(p);
+          if (!m || Number(m[2]) > 50 || Number(m[2]) % 5 || Number(m[3]) < 1 || Number(m[3]) > SEED_MAX) return false;
+          $(".ex-count").value = m[1]; $(".ex-rate").value = m[2]; $(".out-rate").textContent = `${m[2]}%`;
+          st.seed = Number(m[3]); $(".ex-seed").value = st.seed; runRandom(); return true;
+        },
+      } });
     },
   });
 

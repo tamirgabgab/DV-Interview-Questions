@@ -352,3 +352,59 @@ def test_explorer_matches_page_classes():
     assert got["a"][-1] == [7, 7, 7, 7, 5, 0]
     assert got["b"][3] == [2, 5, 1, 5, 1, 3] and got["b"][7] == [3, 7, 2, 7, 0, 4]
     assert got["b"][8] == [3, 7, 3, 8, 0, 4] and got["b"][9] == [3, 8, 3, 8, 0, 5]
+
+
+def test_explorer_random_traffic():
+    """The random traffic of the box: only legal events (the page's classes raise on
+    nothing), a Sync only on an empty link, the loss count is the events it marked, the
+    credits plus the packets in flight never exceed the free slots, the leak the box
+    reports is the number of packets lost since the last Sync, and the invariant check
+    flags the state a Sync sent with a packet in flight leaves."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    seeds = [1, 7, 4242, 99999]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const scripts = {json.dumps(seeds)}.map((seed, i) => m.crRandomScript([3, 5, 8, 4][i], [0, 250, 0, 250][i], 200, 0.25, m.mulberry32(seed)));
+      const states = scripts.map((sc, i) => m.crRun(sc, [0, 250, 0, 250][i]));
+      let t = m.crInit(5, 0);
+      for (const ev of [{{ type: "grant" }}, {{ type: "transmit" }}, {{ type: "sync" }}, {{ type: "receive", how: "ok" }}, {{ type: "grant" }}]) t = m.crApply(t, ev).state;
+      console.log(JSON.stringify({{ scripts, balances: states.map((st) => st.map((s) => m.crBalance(s))),
+        held: states.map((st) => st.every((s) => m.crInvariants(s).length === 0)),
+        midFlight: [m.crInvariants(t), m.crBalance(t)],
+        same: JSON.stringify(m.crRandomScript(5, 0, 40, 0.2, m.mulberry32(9))) === JSON.stringify(m.crRandomScript(5, 0, 40, 0.2, m.mulberry32(9))) }}));""")
+    assert got["same"] and all(got["held"])
+    assert got["midFlight"] == [["credits"], {"credits": 5, "inFlight": 0, "free": 4, "ungranted": 0, "leak": -1}]
+    for seed, size, base, sc, balances in zip(seeds, [3, 5, 8, 4], [0, 250, 0, 250], got["scripts"], got["balances"]):
+        steps = sc["steps"]
+        assert len(steps) == 200 and sc["random"]["violation"] is None, seed
+        assert sc["random"]["faults"] == {"lost": sum(ev.get("how") == "lose" for ev in steps), "syncs": sum(ev["type"] == "sync" for ev in steps)}
+        assert sc["random"]["faults"]["lost"] > 2 and sc["random"]["faults"]["syncs"] > 2, seed
+        eg, ing = Egress(1), Ingress(1, size)
+        eg.pcc = eg.pcl = ing.pcr = base
+        ing.pca = (base + size) % 256
+        link, lost_since_sync = [], 0
+        for ev, b in zip(steps, balances[1:]):
+            if ev["type"] == "grant":
+                eg.consume_credit_grant(ing.build_credit_grant())
+            elif ev["type"] == "transmit":
+                eg.on_packet_transmitted()                # raises without a credit
+                link.append(1)
+            elif ev["type"] == "receive":
+                link.pop(0)
+                if ev["how"] == "lose":
+                    lost_since_sync += 1
+                else:
+                    ing.on_packet_received(TunneledPacket(1), True)     # raises on overflow
+            elif ev["type"] == "dequeue":
+                ing.on_packet_dequeued()                  # raises on an empty buffer
+            else:
+                assert not link, (seed, "a Sync with packets in flight")
+                ing.consume_credit_sync(eg.build_credit_sync())
+                lost_since_sync = 0
+            free = size - ing.rx_occupancy
+            credits = forward_distance(eg.pcc, eg.pcl)
+            assert credits + len(link) <= free
+            assert b == {"credits": credits, "inFlight": len(link), "free": free, "ungranted": forward_distance(eg.pcl, ing.pca), "leak": lost_since_sync}, (seed, ev)
