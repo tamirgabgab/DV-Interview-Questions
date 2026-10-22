@@ -83,3 +83,43 @@ def test_explorer_matches_page_code():
         assert sm["binValid"] == (seen in (b, nb)) == (all(arrived) or not any(arrived))
         assert sm["seenGray"] in (bin2gray(b), bin2gray(nb)) and sm["seenGrayAsBin"] in (b, nb)
         assert sm["wrongCount"] == 2 ** len(changed) - 2
+
+
+def test_explorer_widths():
+    """The width selects of the two boxes: the sampled step on every value of 3 to 6 bits
+    (every subset of arrived bits for the wrap step, where all bits change) against the
+    page's conversions, and the flags of a FIFO of 8, 32 and 64 entries (pointers one bit
+    wider) on every pointer pair against the page's fifo_empty / fifo_full."""
+    import itertools
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    sizes = [8, 32, 64]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const wraps = {{}}, flags = {{}};
+      for (const bits of [3, 4, 5, 6]) {{
+        const b = (1 << bits) - 1, out = [];
+        for (let s = 0; s < (1 << bits); s++) {{ const arr = {{}}; for (let i = 0; i < bits; i++) arr[i] = (s >> i) & 1; out.push(m.graySample(b, bits, arr, arr)); }}
+        wraps[bits] = out;
+      }}
+      for (const size of {json.dumps(sizes)}) {{
+        const bits = Math.log2(size) + 1, out = [];
+        for (let w = 0; w < 2 * size; w++) for (let r = 0; r < 2 * size; r++) out.push(m.grayFlags(w, r, bits));
+        flags[size] = out;
+      }}
+      console.log(JSON.stringify({{ wraps, flags }}));""")
+    for bits in (3, 4, 5, 6):
+        b, size = (1 << bits) - 1, 1 << bits
+        for s, sm in enumerate(got["wraps"][str(bits)]):
+            assert sm["changedBin"] == list(range(bits)) and sm["changedGray"] == [bits - 1]
+            seen = sum(((0 if s >> i & 1 else 1) << i) for i in range(bits))   # old bit 1 unless the new 0 arrived
+            assert sm["seenBin"] == seen and sm["binValid"] == (s in (0, size - 1))
+            assert sm["seenGrayAsBin"] in (b, 0) and sm["wrongCount"] == size - 2
+    for size in sizes:
+        bits = size.bit_length()                                   # log2(size) + 1
+        for (w, r), fl in zip(itertools.product(range(2 * size), range(2 * size)), got["flags"][str(size)]):
+            assert fl["empty"] == fifo_empty(bin2gray(w), bin2gray(r)) == ((w - r) % (2 * size) == 0)
+            assert fl["full"] == fifo_full(bin2gray(w), bin2gray(r), bits) == ((w - r) % (2 * size) == size)
+            assert fl["occupancy"] == (w - r) % (2 * size)

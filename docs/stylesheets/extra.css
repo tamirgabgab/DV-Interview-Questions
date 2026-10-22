@@ -1898,6 +1898,10 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .lf-loop { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 3 2; }
 .md-typeset .explorer .lf-out { font-family: var(--md-code-font-family); font-size: 0.8rem; letter-spacing: 0.12em; word-break: break-all; }
 .md-typeset .explorer .lf-out span.is-cur { color: var(--viz-s2-text); font-weight: 700; }
+.md-typeset .explorer .lf-list { font-family: var(--md-code-font-family); font-size: 0.7rem; line-height: 1.7; max-height: 12rem; overflow-y: auto; }
+.md-typeset .explorer .lf-list span { padding: 0 0.15rem; border-radius: 0.2rem; }
+.md-typeset .explorer .lf-list span.is-seed { font-weight: 700; }
+.md-typeset .explorer .lf-list span.is-cur { background: var(--viz-s2); color: var(--md-default-bg-color); font-weight: 700; }
 .md-typeset .explorer .lf-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .lf-bad { color: var(--diff-hard); font-weight: 700; }
 .md-typeset .explorer .lf-table { margin-top: 0.3rem; overflow-x: auto; }
@@ -1922,7 +1926,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .gr-dec { font-variant-numeric: tabular-nums; font-size: 0.75rem; color: var(--viz-text); }
 .md-typeset .explorer .gr-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .gr-bad { color: var(--diff-hard); font-weight: 700; }
-.md-typeset .explorer .gr-slots { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 0.15rem; margin-top: 0.6rem; max-width: 36rem; }
+.md-typeset .explorer .gr-slots { display: grid; grid-template-columns: repeat(var(--gr-cols, 16), minmax(0, 1fr)); gap: 0.15rem; margin-top: 0.6rem; max-width: 36rem; }
 .md-typeset .explorer .gr-slot { display: flex; flex-direction: column; align-items: center; font-family: var(--md-code-font-family); font-size: 0.6rem; color: var(--viz-text); }
 .md-typeset .explorer .gr-slot .gr-idx { display: block; width: 100%; text-align: center; padding: 0.35rem 0; border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--viz-ink); }
 .md-typeset .explorer .gr-slot.is-full .gr-idx { background: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
@@ -2094,3 +2098,12 @@ body.practice-mode .md-typeset .question-tools {
 
 /* 0007: a focused point of the triangle and polygon boxes (U137) */
 .md-typeset svg .tri-pt:focus-visible { outline: none; stroke: var(--viz-s3); stroke-width: 4; }
+
+/* every box: the help button, the help line and "reset everything" (U138) */
+.md-typeset .explorer .ex-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.6rem; margin: -0.2rem 0 0.4rem; }
+.md-typeset .explorer .ex-help-btn { width: 1.35rem; height: 1.35rem; padding: 0; border-radius: 50%; border: 1px solid var(--viz-grid); background: var(--md-default-bg-color); color: var(--viz-ink); font: inherit; font-size: 0.7rem; font-weight: 700; line-height: 1; cursor: pointer; }
+.md-typeset .explorer .ex-help-btn[aria-expanded="true"] { background: var(--viz-s1); border-color: var(--viz-s1); color: var(--md-default-bg-color); }
+.md-typeset .explorer .ex-reset-all { border: none; background: none; padding: 0; color: var(--viz-text); font: inherit; font-size: 0.65rem; text-decoration: underline dotted; cursor: pointer; }
+.md-typeset .explorer .ex-reset-all:hover { color: var(--md-accent-fg-color); }
+.md-typeset .explorer .ex-help { flex-basis: 100%; margin: 0; font-size: 0.7rem; line-height: 1.5; color: var(--viz-text); }
+.md-typeset .explorer .ex-help[hidden] { display: none; }

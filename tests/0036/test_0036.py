@@ -27,3 +27,37 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(36)
+
+
+def test_explorer_widths():
+    """The width select of the box (3 to 8 bits): the explorer's table of every polynomial
+    agrees with a plain Python LFSR on the period from 0…01, its count of primitive
+    polynomials equals phi(2^n - 1) / n and the number of period-(2^n - 1) rows, and the
+    4-bit table is the page's."""
+    from math import gcd
+
+    from page_tests import explorer_require, node_json
+
+    def period(mask, width):
+        seen, s = {}, 1
+        while s not in seen:
+            seen[s] = len(seen)
+            fb = bin(s & mask).count("1") & 1
+            s = (s >> 1) | (fb << (width - 1))
+        return len(seen) - seen[s]
+
+    def phi(n):
+        return sum(1 for k in range(1, n + 1) if gcd(k, n) == 1)
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify([3, 4, 5, 6, 7, 8].map((w) => [m.lfsrTable(w), m.lfsrPrimitiveCount(w)])));""")
+    for width, (table, count) in zip(range(3, 9), got):
+        n = (1 << width) - 1
+        assert [r["mask"] for r in table] == [1 | (m << 1) for m in range(1 << (width - 1))]
+        for r in table:
+            assert r["period"] == period(r["mask"], width), (width, r)
+        assert count == phi(n) // width == sum(r["period"] == n for r in table), width
+    four = {r["poly"]: r["period"] for r in got[1][0]}
+    assert four["x^4 + x^3 + 1"] == 15 and four["x^4 + x^2 + 1"] == 6 and four["x^4 + x + 1"] == 15 and four["x^4 + 1"] == 4
+    assert got[5][1] == 16                                   # the 8-bit follow-up: 16 primitive polynomials

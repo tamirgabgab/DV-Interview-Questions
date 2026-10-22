@@ -25,9 +25,9 @@
 //   eurovision             0008        the announcements one by one: the cups under Israel's total against the points left; a what-if box
 //   boxes3                 0004        three mislabelled boxes with hidden contents: draw a ball, the deduction line by line
 //   edge                   0001        sig drawn cell by cell on a timing strip; sig_q and pulse follow, for a rising, falling or any edge; the reset trap
-//   lfsr                   0036        tick the taps, step or play from 0001 on a ring of the 15 states; the output bits; the eight polynomials and their periods
+//   lfsr                   0036        a width of 3 to 8 bits: tick the taps, step or play from 0…01 on a ring of the states (a list from 7 bits); the output bits; the polynomials and their periods, the primitive ones counted
 //   div3                   0035        the half-cycle model one clock edge at a time: cnt, a, b and clk_out on a strip, the duty measured; a wake-up in an unreachable state; a divide by N (2 to 10) and a strip length
-//   gray                   0034        a pointer step through a synchroniser, bit by bit, in binary and in Gray; a 16-entry FIFO with 5-bit pointers and the flags
+//   gray                   0034        a pointer step through a synchroniser, bit by bit, in binary and in Gray, for 3 to 6 bits; a FIFO of 8 to 64 entries with the pointers one bit wider and the flags
 //   stock                  0006        prices to drag or draw, the scan played day by day: the cheapest and dearest day so far, the best long and short; the copy link carries the prices and the day
 //   handshake              0038        req and ack drawn cell by cell; the four rules checked every cycle, a failure marked on its assertion's row
 //   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts; random traffic at a fault rate with the invariants checked
@@ -1381,6 +1381,13 @@
     for (let k = width - 1; k >= 1; k--) if ((mask >> (width - k)) & 1) terms.push(k === 1 ? "x" : `x^${k}`);
     return terms.concat("1").join(" + ");
   };
+  // φ(2^n − 1) / n: the number of primitive polynomials of degree n (Euler's totient by trial division)
+  const lfsrPrimitiveCount = (width) => {
+    let n = (1 << width) - 1, phi = n;
+    for (let p = 2; p * p <= n; p++) if (n % p === 0) { while (n % p === 0) n /= p; phi -= phi / p; }
+    if (n > 1) phi -= phi / n;
+    return phi / width;
+  };
   const lfsrTable = (width) => {
     const rows = [];
     for (let m = 0; m < 1 << (width - 1); m++) {
@@ -1938,7 +1945,7 @@
     kapStep, kapChain, kapHistogram,
     EURO_RESULTS, EURO_PUBLIC_TOTAL, euroOrder, euroWithIsrael, euroCannotWin, euroScan,
     boxesCases, boxesDraw, boxesFix, boxesDeduce,
-    EDGE_MODES, edgeTrace, lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, div3Params, div3Trace, div3Duty,
+    EDGE_MODES, edgeTrace, lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, lfsrPrimitiveCount, div3Params, div3Trace, div3Duty,
     grayOf, grayToBin, bitsOf, graySample, grayFlags,
     stockScan, stockRandom, hsCheck, HS_PRESETS, hsWave,
     AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, anInvariants, anRandomScript, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun, crBalance, crInvariants, crRandomScript,
@@ -5155,24 +5162,26 @@
     },
   });
 
-  // The LFSR box (0036): tick the taps (x^4 and 1 are fixed), step or play from 0001 on a
-  // ring of the 15 non-zero states (0000 sits in the middle as the fixed point), the
-  // output bits so far, and the table of the eight polynomials with their periods.
+  // The LFSR box (0036): a width of 3 to 8 bits, tick the taps (x^n and 1 are fixed), step
+  // or play from 0…01 on a ring of the 2^n − 1 non-zero states (0 sits in the middle as the
+  // fixed point; from 7 bits the states are listed instead of drawn), the output bits so
+  // far, and the table of the polynomials with their periods: every one up to 5 bits, the
+  // primitive ones from 6 bits on, with the count φ(2^n − 1) / n.
   const lfsrView = () => ({
     mount(box) {
-      const WIDTH = 4, SEED = 1;
-      const st = { mask: 0b0011, k: 0 };
-      const bits = (v) => bitsOf(v, WIDTH);
+      const SEED = 1, RING_MAX = 6, FULL_TABLE = 5;
+      const st = { width: 4, mask: 0b0011, k: 0 };
+      const bits = (v) => bitsOf(v, st.width);
+      const states = () => (1 << st.width) - 1;
       const sup = (k) => (k === 1 ? "x" : `x<sup>${k}</sup>`);
-      const polyHtml = (mask) => {
-        const t = [`x<sup>${WIDTH}</sup>`];
-        for (let k = WIDTH - 1; k >= 1; k--) if ((mask >> (WIDTH - k)) & 1) t.push(sup(k));
+      const polyHtml = (mask, width = st.width) => {
+        const t = [`x<sup>${width}</sup>`];
+        for (let k = width - 1; k >= 1; k--) if ((mask >> (width - k)) & 1) t.push(sup(k));
         return ltr(t.concat("1").join(" + "));
       };
       box.innerHTML =
-        `<div class="ex-controls"><span class="lf-taps" dir="ltr" role="group" aria-label="בחירת ה-taps"><span class="lf-fixed">${ltr("x<sup>4</sup>")} +</span> ` +
-        [3, 2, 1].map((k) => `<label><input type="checkbox" class="ex-tap" data-k="${k}"> <span>${ltr(sup(k))} +</span></label>`).join(" ") +
-        `<span class="lf-fixed">1</span></span>` +
+        `<div class="ex-controls"><label>רוחב <select class="ex-width" aria-label="מספר הביטים">${[3, 4, 5, 6, 7, 8].map((w) => `<option value="${w}"${w === 4 ? " selected" : ""}>${w} ביטים</option>`).join("")}</select></label>` +
+        `<span class="lf-taps" dir="ltr" role="group" aria-label="בחירת ה-taps"></span>` +
         `<span class="lf-presets">הפולינומים של השאלה: <button type="button" class="md-button ex-preset" data-mask="3">${ltr("x<sup>4</sup> + x<sup>3</sup> + 1")}</button> ` +
         `<button type="button" class="md-button ex-preset" data-mask="5">${ltr("x<sup>4</sup> + x<sup>2</sup> + 1")}</button></span></div>` +
         `<div class="ex-controls ex-play-row">` +
@@ -5186,64 +5195,90 @@
         `<p class="lf-poly"></p><p class="lf-state"></p><p class="lf-fb"></p>` +
         `<p class="ex-title">הביטים שיצאו (${code("s[0]")} של כל מצב)</p><p class="lf-out" dir="ltr"></p>` +
         `<p class="ex-summary lf-sum" aria-live="polite"></p></div></div>` +
-        `<p class="ex-title">כל שמונת הפולינומים ${ltr("x<sup>4</sup> + … + 1")} ואורך המחזור של כל אחד מ-${code("0001")}</p><div class="lf-table" tabindex="0"></div>`;
+        `<p class="ex-title lf-table-title"></p><div class="lf-table" tabindex="0"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       let timer = null;
-      const ring = () => {
-        const R = 118, C = 150, rr = 17;
-        const pos = (v) => { const ang = -Math.PI / 2 + ((v - 1) / 15) * 2 * Math.PI; return [C + R * Math.cos(ang), C + R * Math.sin(ang)]; };
-        const walk = lfsrWalk(st.mask, WIDTH, SEED), shown = walk.states.concat(walk.states[walk.back]).slice(0, st.k + 1);
+      // the tap boxes follow the width: x^width and 1 fixed, a box per middle power
+      const tapsHtml = () => {
+        const ks = []; for (let k = st.width - 1; k >= 1; k--) ks.push(k);
+        $(".lf-taps").innerHTML = `<span class="lf-fixed">${ltr(`x<sup>${st.width}</sup>`)} +</span> ` +
+          ks.map((k) => `<label><input type="checkbox" class="ex-tap" data-k="${k}"> <span>${ltr(sup(k))} +</span></label>`).join(" ") + `<span class="lf-fixed">1</span>`;
+        box.querySelectorAll(".ex-tap").forEach((c) => c.addEventListener("change", () => {
+          const bit = 1 << (st.width - Number(c.dataset.k));
+          st.mask = c.checked ? st.mask | bit : st.mask & ~bit;
+          stop(); st.k = 0; draw();
+        }));
+      };
+      const ring = (walk, shown) => {
+        const n = states(), C = 150, R = st.width <= 4 ? 118 : 128;
+        const rr = st.width <= 4 ? 17 : st.width === 5 ? 11 : 6, label = st.width <= 5;
+        const pos = (v) => { const ang = -Math.PI / 2 + ((v - 1) / n) * 2 * Math.PI; return [C + R * Math.cos(ang), C + R * Math.sin(ang)]; };
         const visited = new Set(shown), cur = shown[shown.length - 1];
-        let s = `<svg class="lf-live" viewBox="0 0 300 300" role="img" aria-label="טבעת של 15 המצבים שאינם אפס, המצבים שבוקרו וחיצים ביניהם">` +
-          `<defs><marker id="lf-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="lf-arrowhead"/></marker></defs>`;
+        let s = `<svg class="lf-live" viewBox="0 0 300 300" role="img" aria-label="טבעת של ${n} המצבים שאינם אפס, המצבים שבוקרו וחיצים ביניהם">` +
+          `<defs><marker id="lf-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="${rr > 8 ? 7 : 5}" markerHeight="${rr > 8 ? 7 : 5}" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="lf-arrowhead"/></marker></defs>`;
         for (let i = 1; i < shown.length; i++) {
           const [x1, y1] = pos(shown[i - 1]), [x2, y2] = pos(shown[i]);
           const dx = x2 - x1, dy = y2 - y1, d = Math.hypot(dx, dy) || 1;
           s += `<line class="lf-edge${i === shown.length - 1 ? " is-cur" : ""}" x1="${f(x1 + (dx / d) * rr)}" y1="${f(y1 + (dy / d) * rr)}" x2="${f(x2 - (dx / d) * (rr + 2))}" y2="${f(y2 - (dy / d) * (rr + 2))}" marker-end="url(#lf-arrow)"/>`;
         }
-        for (let v = 1; v < 16; v++) {
+        for (let v = 1; v <= n; v++) {
           const [x, y] = pos(v);
-          s += `<g class="lf-node${visited.has(v) ? " is-seen" : ""}${v === cur ? " is-cur" : ""}${v === SEED ? " is-seed" : ""}"><circle cx="${f(x)}" cy="${f(y)}" r="${rr}"/><text x="${f(x)}" y="${f(y + 4)}" text-anchor="middle">${bits(v)}</text></g>`;
+          s += `<g class="lf-node${visited.has(v) ? " is-seen" : ""}${v === cur ? " is-cur" : ""}${v === SEED ? " is-seed" : ""}"><circle cx="${f(x)}" cy="${f(y)}" r="${rr}"><title>${bits(v)}</title></circle>` +
+               (label ? `<text x="${f(x)}" y="${f(y + (rr > 12 ? 4 : 3))}" text-anchor="middle"${rr > 12 ? "" : ' font-size="7"'}>${bits(v)}</text>` : "") + `</g>`;
         }
-        s += `<g class="lf-node lf-zero"><circle cx="${C}" cy="${C}" r="${rr}"/><text x="${C}" y="${C + 4}" text-anchor="middle">0000</text></g>` +
-             `<path class="lf-loop" d="M${C + 12},${C - 13} a 11 11 0 1 1 -24 0" marker-end="url(#lf-arrow)"/></svg>`;
+        const zr = Math.max(rr, 14);
+        s += `<g class="lf-node lf-zero"><circle cx="${C}" cy="${C}" r="${zr}"/><text x="${C}" y="${C + 4}" text-anchor="middle"${st.width > 4 ? ' font-size="8"' : ""}>${bits(0)}</text></g>` +
+             `<path class="lf-loop" d="M${C + 12},${C - zr + 4} a 11 11 0 1 1 -24 0" marker-end="url(#lf-arrow)"/></svg>`;
         return s;
       };
+      // from 7 bits: the states visited so far, as a list, the current one marked
+      const list = (shown) => `<p class="ex-note">‏${ltr(states())} מצבים שאינם אפס: יותר מדי לטבעת, ולכן רשימת המצבים שבוקרו.</p>` +
+        `<p class="lf-list" dir="ltr">${shown.map((v, i) => `<span class="${i === shown.length - 1 ? "is-cur" : ""}${v === SEED ? " is-seed" : ""}">${bits(v)}</span>`).join(" ")}</p>`;
       const draw = () => {
-        const walk = lfsrWalk(st.mask, WIDTH, SEED), total = walk.period;
+        const walk = lfsrWalk(st.mask, st.width, SEED), total = walk.period, n = states();
         st.k = Math.min(st.k, total);
-        box.querySelectorAll(".ex-tap").forEach((c) => { c.checked = ((st.mask >> (WIDTH - Number(c.dataset.k))) & 1) === 1; });
-        $(".lf-ring").innerHTML = ring();
+        box.querySelectorAll(".ex-tap").forEach((c) => { c.checked = ((st.mask >> (st.width - Number(c.dataset.k))) & 1) === 1; });
+        const shown = walk.states.concat(walk.states[walk.back]).slice(0, st.k + 1);
+        $(".lf-ring").innerHTML = st.width <= RING_MAX ? ring(walk, shown) : list(shown);
         const cur = st.k < total ? walk.states[st.k] : walk.states[walk.back];
         const tapsIdx = [];
-        for (let i = 0; i < WIDTH; i++) if ((st.mask >> i) & 1) tapsIdx.push(i);
+        for (let i = 0; i < st.width; i++) if ((st.mask >> i) & 1) tapsIdx.push(i);
         let fb = 0; tapsIdx.forEach((i) => { fb ^= (cur >> i) & 1; });
-        const next = lfsrNext(cur, st.mask, WIDTH);
+        const next = lfsrNext(cur, st.mask, st.width);
         $(".ex-pos").textContent = `צעד ${st.k} מתוך ${total}`;
         $(".ex-prev").disabled = st.k === 0;
         $(".lf-poly").innerHTML = `הפולינום ${polyHtml(st.mask)}, המסכה ${code(bits(st.mask))}: היזון חוזר מהביטים ${ltr(tapsIdx.map((i) => `s[${i}]`).join(", "))}.`;
         $(".lf-state").innerHTML = `המצב אחרי ${ltr(st.k)} צעדים: ${code(bits(cur))}` + (st.k === total ? ` — חזר למצב ההתחלה.` : ".");
         $(".lf-fb").innerHTML = `הצעד הבא: ${ltr(`${code("fb")} = ${code(tapsIdx.map((i) => `s[${i}]`).join(" ^ "))} = ${tapsIdx.map((i) => (cur >> i) & 1).join(" ^ ")} = ${fb}`)}, ` +
-          `ואז ${ltr(`${code(`(${bits(cur)} >> 1) | (${fb} << 3)`)} = ${code(bits(next))}`)}.`;
+          `ואז ${ltr(`${code(`(${bits(cur)} >> 1) | (${fb} << ${st.width - 1})`)} = ${code(bits(next))}`)}.`;
         $(".lf-out").innerHTML = walk.states.slice(0, Math.min(st.k, total - 1) + 1).map((v, i) => `<span class="${i === st.k ? "is-cur" : ""}">${v & 1}</span>`).join("");
-        const maximal = total === 15;
+        const maximal = total === n;
         $(".lf-sum").innerHTML = st.k < total
-          ? `בוקרו ${ltr(st.k + 1)} מצבים מתוך 15. ` + (maximal ? `הפולינום פרימיטיבי: המחזור יהיה 15.` : `המחזור של הפולינום הזה הוא ${ltr(total)}, ולכן ${ltr(15 - total)} מצבים לא יבוקרו לעולם.`)
-          : maximal ? `<span class="lf-ok">מחזור מקסימלי: 15 צעדים, כל מצב שאינו אפס פעם אחת ✓</span>`
-          : `<span class="lf-bad">מחזור של ${ltr(total)} צעדים בלבד: ${ltr(15 - total)} מצבים לא בוקרו.</span>`;
+          ? `בוקרו ${ltr(st.k + 1)} מצבים מתוך ${ltr(n)}. ` + (maximal ? `הפולינום פרימיטיבי: המחזור יהיה ${ltr(n)}.` : `המחזור של הפולינום הזה הוא ${ltr(total)}, ולכן ${ltr(n - total)} מצבים לא יבוקרו לעולם.`)
+          : maximal ? `<span class="lf-ok">מחזור מקסימלי: ${ltr(n)} צעדים, כל מצב שאינו אפס פעם אחת ✓</span>`
+          : `<span class="lf-bad">מחזור של ${ltr(total)} צעדים בלבד: ${ltr(n - total)} מצבים לא בוקרו.</span>`;
+        // the table: every polynomial up to 5 bits, only the primitive ones from 6
+        const all = lfsrTable(st.width), prim = lfsrPrimitiveCount(st.width), full = st.width <= FULL_TABLE;
+        const rows = full ? all : all.filter((r) => r.period === n);
+        $(".lf-table-title").innerHTML = (full
+          ? `כל ${ltr(all.length)} הפולינומים ${ltr(`x<sup>${st.width}</sup> + … + 1`)} ואורך המחזור של כל אחד מ-${code(bits(SEED))}`
+          : `${ltr(rows.length)} הפולינומים הפרימיטיביים מתוך ${ltr(all.length)} (מחזור ${ltr(n)} מ-${code(bits(SEED))})`) +
+          `; לפי הנוסחה ${ltr(`φ(2<sup>${st.width}</sup> − 1) / ${st.width} = φ(${n}) / ${st.width} = ${prim}`)}`;
         $(".lf-table").innerHTML = `<table><thead><tr><th>הפולינום</th><th>המסכה</th><th>אורך המחזור</th></tr></thead><tbody>` +
-          lfsrTable(WIDTH).map((r) => `<tr class="${r.mask === st.mask ? "is-cur" : ""}${r.period === 15 ? " is-max" : ""}"><td>${polyHtml(r.mask)}</td><td>${code(bits(r.mask))}</td><td>${ltr(r.period)}${r.period === 15 ? " ✓" : ""}</td></tr>`).join("") +
+          rows.map((r) => `<tr class="${r.mask === st.mask ? "is-cur" : ""}${r.period === n ? " is-max" : ""}"><td>${polyHtml(r.mask)}</td><td>${code(bits(r.mask))}</td><td>${ltr(r.period)}${r.period === n ? " ✓" : ""}</td></tr>`).join("") +
           `</tbody></table>`;
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
-      const total = () => lfsrWalk(st.mask, WIDTH, SEED).period;
-      box.querySelectorAll(".ex-tap").forEach((c) => c.addEventListener("change", () => {
-        const bit = 1 << (WIDTH - Number(c.dataset.k));
-        st.mask = c.checked ? st.mask | bit : st.mask & ~bit;
-        stop(); st.k = 0; draw();
-      }));
-      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { stop(); st.mask = Number(b.dataset.mask); st.k = 0; draw(); }));
+      const total = () => lfsrWalk(st.mask, st.width, SEED).period;
+      // a new width: the first primitive polynomial of the table, the question's one at 4
+      const setWidth = (w) => {
+        stop(); st.width = w; st.k = 0;
+        st.mask = w === 4 ? 0b0011 : (lfsrTable(w).find((r) => r.period === states()) || lfsrTable(w)[0]).mask;
+        $(".ex-width").value = String(w); tapsHtml(); draw();
+      };
+      $(".ex-width").addEventListener("change", () => setWidth(Number($(".ex-width").value)));
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { if (st.width !== 4) setWidth(4); stop(); st.mask = Number(b.dataset.mask); st.k = 0; draw(); }));
       $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
       $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
@@ -5255,6 +5290,7 @@
         timer = setInterval(() => { st.k++; draw(); if (st.k >= total()) stop(); }, Number(speed.value));
       });
       speed.addEventListener("change", () => { if (timer) { stop(); play.click(); } });
+      tapsHtml();
       draw();
     },
   });
@@ -5362,16 +5398,18 @@
 
   // The Gray pointer box (0034). data-mode="sync": a step b -> b + 1 of a 4-bit pointer
   // seen through a synchroniser, every changing bit tapped as arrived or not (or drawn
-  // at random), in binary and in Gray side by side. data-mode="flags": a 16-entry FIFO
-  // with 5-bit pointers, write and read, the pointers in binary and Gray, empty and full
-  // by the page's rules.
+  // at random), in binary and in Gray side by side, for a pointer of 3 to 6 bits.
+  // data-mode="flags": a FIFO of 8 to 64 entries with pointers one bit wider than the
+  // address, write and read, the pointers in binary and Gray, empty and full by the
+  // page's rules.
   const grayView = (box) => ({
     mount() {
-      const BITS = 4;
       if (box.dataset.mode === "flags") { grayFlagsMount(box); return; }
-      const st = { b: 7, arrBin: {}, arrGray: {} };
+      const st = { bits: 4, b: 7, arrBin: {}, arrGray: {} };
+      let BITS = 4;
       box.innerHTML =
-        `<div class="ex-controls"><label><span>המצביע לפני הצעד</span><input type="range" class="ex-b" min="0" max="15" step="1" value="7" dir="ltr" aria-label="המצביע לפני הצעד"><output class="ex-bout"></output></label>` +
+        `<div class="ex-controls"><label>רוחב <select class="ex-bits" aria-label="מספר הביטים של המצביע">${[3, 4, 5, 6].map((w) => `<option value="${w}"${w === 4 ? " selected" : ""}>${w} ביטים</option>`).join("")}</select></label>` +
+        `<label><span>המצביע לפני הצעד</span><input type="range" class="ex-b" min="0" max="15" step="1" value="7" dir="ltr" aria-label="המצביע לפני הצעד"><output class="ex-bout"></output></label>` +
         `<button type="button" class="md-button ex-random">הגרלה: אילו ביטים הגיעו</button>` +
         `<button type="button" class="md-button ex-all">הכול הגיע</button>` +
         `<button type="button" class="md-button ex-none">כלום עוד לא הגיע</button>` +
@@ -5390,8 +5428,9 @@
         return `<p class="ex-title">${title}</p>` + bitsRow("ישן", oldV, false) + bitsRow("חדש", newV, false) + bitsRow("נדגם", seen, true);
       };
       const draw = () => {
+        BITS = st.bits;
         const r = graySample(st.b, BITS, st.arrBin, st.arrGray);
-        $(".ex-b").value = st.b; $(".ex-bout").textContent = String(st.b);
+        $(".ex-b").max = String((1 << BITS) - 1); $(".ex-b").value = st.b; $(".ex-bout").textContent = String(st.b);
         const bin = side(`בינארי: ${ltr(`${bitsOf(r.oldB, BITS)} → ${bitsOf(r.newB, BITS)}`)}, ${ltr(r.changedBin.length)} ביטים משתנים`, r.oldB, r.newB, r.changedBin, st.arrBin, r.seenBin, "bin");
         const gray = side(`‏Gray: ${ltr(`${bitsOf(r.oldG, BITS)} → ${bitsOf(r.newG, BITS)}`)}, ביט אחד משתנה`, r.oldG, r.newG, r.changedGray, st.arrGray, r.seenGray, "gray");
         const binV = r.binValid
@@ -5421,31 +5460,34 @@
         map[i] = map[i] ? 0 : 1;
         draw();
       });
-      // the page's example: bits 3 and 0 arrived, 2 and 1 did not (1110); in Gray the old value
-      const page = () => { st.b = 7; st.arrBin = { 3: 1, 0: 1, 2: 0, 1: 0 }; st.arrGray = { 3: 0 }; draw(); };
+      // the page's example: 4 bits, bits 3 and 0 arrived, 2 and 1 did not (1110); in Gray the old value
+      const page = () => { st.bits = 4; $(".ex-bits").value = "4"; st.b = 7; st.arrBin = { 3: 1, 0: 1, 2: 0, 1: 0 }; st.arrGray = { 3: 0 }; draw(); };
       $(".ex-reset").addEventListener("click", page);
+      // a new width: the step before the wrap (all bits change), nothing arrived yet
+      $(".ex-bits").addEventListener("change", () => { st.bits = Number($(".ex-bits").value); st.b = (1 << (st.bits - 1)) - 1; st.arrBin = {}; st.arrGray = {}; draw(); });
       page();
       const seed = seedControls(box, $(".ex-reset"), (rng) => { randomize(rng); draw(); });
     },
   });
   const grayFlagsMount = (box) => {
-    const BITS = 5, SIZE = 16;
-    const st = { w: 0, r: 0, hist: [] };
+    const st = { size: 16, w: 0, r: 0, hist: [] };
+    const bitsN = () => Math.log2(st.size) + 1;          // one bit above the address
     box.innerHTML =
-      `<div class="ex-controls">` +
+      `<div class="ex-controls"><label>עומק ה-FIFO <select class="ex-size" aria-label="מספר הכניסות">${[8, 16, 32, 64].map((v) => `<option value="${v}"${v === 16 ? " selected" : ""}>${v} כניסות</option>`).join("")}</select></label>` +
       `<button type="button" class="md-button md-button--primary ex-write">כתיבה</button>` +
       `<button type="button" class="md-button md-button--primary ex-read">קריאה</button>` +
-      `<button type="button" class="md-button ex-write8">8 כתיבות</button>` +
-      `<button type="button" class="md-button ex-read8">8 קריאות</button>` +
+      `<button type="button" class="md-button ex-write8"></button>` +
+      `<button type="button" class="md-button ex-read8"></button>` +
       `<button type="button" class="md-button ex-prev">צעד אחורה</button>` +
       `<button type="button" class="md-button ex-start">איפוס</button></div>` +
-      `<div class="gr-slots" dir="ltr" role="img" aria-label="16 הכניסות של ה-FIFO, המלאות מודגשות, עם מצביעי הכתיבה והקריאה"></div>` +
+      `<div class="gr-slots" dir="ltr" role="img"></div>` +
       `<div class="gr-ptrs"></div><p class="ex-summary gr-sum" aria-live="polite"></p>`;
     const $ = (sel) => box.querySelector(sel);
     const draw = () => {
-      const fl = grayFlags(st.w, st.r, BITS);
+      const BITS = bitsN(), SIZE = st.size, half = SIZE / 2, fl = grayFlags(st.w, st.r, BITS);
       $(".ex-write").disabled = fl.full; $(".ex-write8").disabled = fl.full;
       $(".ex-read").disabled = fl.empty; $(".ex-read8").disabled = fl.empty;
+      $(".ex-write8").textContent = `${half} כתיבות`; $(".ex-read8").textContent = `${half} קריאות`;
       $(".ex-prev").disabled = !st.hist.length;
       const wa = st.w & (SIZE - 1), ra = st.r & (SIZE - 1);
       let cells = "";
@@ -5453,34 +5495,40 @@
         const filled = ((i - ra) & (SIZE - 1)) < fl.occupancy;
         cells += `<span class="gr-slot${filled ? " is-full" : ""}"><span class="gr-w">${i === wa ? "W" : ""}</span><span class="gr-idx">${i}</span><span class="gr-r">${i === ra ? "R" : ""}</span></span>`;
       }
-      $(".gr-slots").innerHTML = cells;
+      const slots = $(".gr-slots");
+      slots.innerHTML = cells;
+      slots.style.setProperty("--gr-cols", String(Math.min(SIZE, 16)));
+      slots.setAttribute("aria-label", `${SIZE} הכניסות של ה-FIFO, המלאות מודגשות, עם מצביעי הכתיבה והקריאה`);
       const split = (v, n) => { const s = bitsOf(v, BITS); return n === 1 ? `<span class="gr-top2">${s[0]}</span>${s.slice(1)}` : `<span class="gr-top">${s[0]}</span><span class="gr-top2">${s[1]}</span>${s.slice(2)}`; };
-      $(".gr-ptrs").innerHTML = `<table><thead><tr><th>המצביע</th><th>בינארי</th><th>‏Gray</th><th>כתובת</th></tr></thead><tbody>` +
+      $(".gr-ptrs").innerHTML = `<table><thead><tr><th>המצביע</th><th>בינארי (${ltr(BITS)} ביטים)</th><th>‏Gray</th><th>כתובת</th></tr></thead><tbody>` +
         `<tr><td>כתיבה ${code("wptr")}</td><td dir="ltr">${split(st.w, 1)}</td><td dir="ltr">${split(fl.wg, 2)}</td><td>${ltr(wa)}</td></tr>` +
         `<tr><td>קריאה ${code("rptr")}</td><td dir="ltr">${split(st.r, 1)}</td><td dir="ltr">${split(fl.rg, 2)}</td><td>${ltr(ra)}</td></tr></tbody></table>`;
       const wg = bitsOf(fl.wg, BITS), rg = bitsOf(fl.rg, BITS);
-      const topFlip = wg.slice(0, 2) === rg.slice(0, 2).replace(/[01]/g, (c) => (c === "0" ? "1" : "0")), restEq = wg.slice(2) === rg.slice(2);
-      let sum = `תפוסה ${ltr(fl.occupancy)} מתוך 16 (ההפרש בין המצביעים מודולו 32). `;
+      const topFlip = wg.slice(0, 2) === rg.slice(0, 2).replace(/[01]/g, (c) => (c === "0" ? "1" : "0"));
+      const low = BITS - 1, lowBits = bitsOf(wa, low);
+      let sum = `תפוסה ${ltr(fl.occupancy)} מתוך ${ltr(SIZE)} (ההפרש בין המצביעים מודולו ${ltr(2 * SIZE)}). `;
       sum += fl.empty ? `<span class="gr-ok">ריק ✓</span>: שני ה-Gray שווים (${ltr(wg)} = ${ltr(rg)}). `
         : `ריק? לא: ${ltr(wg)} ≠ ${ltr(rg)}. `;
-      sum += fl.full ? `<span class="gr-ok">מלא ✓</span>: שני הביטים העליונים הפוכים (${ltr(wg.slice(0, 2))} מול ${ltr(rg.slice(0, 2))}) ושלושת הנמוכים שווים (${ltr(wg.slice(2))}).`
+      sum += fl.full ? `<span class="gr-ok">מלא ✓</span>: שני הביטים העליונים הפוכים (${ltr(wg.slice(0, 2))} מול ${ltr(rg.slice(0, 2))}) ו-${ltr(BITS - 2)} הנמוכים שווים (${ltr(wg.slice(2))}).`
         : `מלא? לא: ` + (topFlip ? `העליונים הפוכים, אבל הנמוכים ${ltr(wg.slice(2))} מול ${ltr(rg.slice(2))}.` : `העליונים ${ltr(wg.slice(0, 2))} מול ${ltr(rg.slice(0, 2))} אינם הפוכים.`);
-      if (fl.occupancy === 0 && st.w !== 0) sum += ` בלי הביט החמישי המצביעים היו ${ltr(bitsOf(wa, 4))} ו-${ltr(bitsOf(ra, 4))}: שווים, בדיוק כמו במצב מלא.`;
-      if (fl.full) sum += ` ארבעת הביטים הנמוכים של שני המצביעים שווים (${ltr(bitsOf(wa, 4))}): בלי הביט החמישי זה היה נראה ריק.`;
+      if (fl.occupancy === 0 && st.w !== 0) sum += ` בלי הביט הנוסף המצביעים היו ${ltr(lowBits)} ו-${ltr(bitsOf(ra, low))}: שווים, בדיוק כמו במצב מלא.`;
+      if (fl.full) sum += ` ${ltr(low)} הביטים הנמוכים של שני המצביעים שווים (${ltr(lowBits)}): בלי הביט הנוסף זה היה נראה ריק.`;
       $(".gr-sum").innerHTML = sum;
     };
     const step = (dw, dr) => {
+      const BITS = bitsN(), wrap = 2 * st.size - 1;
       st.hist.push([st.w, st.r]); if (st.hist.length > 200) st.hist.shift();
-      for (let i = 0; i < dw; i++) if (!grayFlags(st.w, st.r, BITS).full) st.w = (st.w + 1) & 31;
-      for (let i = 0; i < dr; i++) if (!grayFlags(st.w, st.r, BITS).empty) st.r = (st.r + 1) & 31;
+      for (let i = 0; i < dw; i++) if (!grayFlags(st.w, st.r, BITS).full) st.w = (st.w + 1) & wrap;
+      for (let i = 0; i < dr; i++) if (!grayFlags(st.w, st.r, BITS).empty) st.r = (st.r + 1) & wrap;
       draw();
     };
     $(".ex-write").addEventListener("click", () => step(1, 0));
     $(".ex-read").addEventListener("click", () => step(0, 1));
-    $(".ex-write8").addEventListener("click", () => step(8, 0));
-    $(".ex-read8").addEventListener("click", () => step(0, 8));
+    $(".ex-write8").addEventListener("click", () => step(st.size / 2, 0));
+    $(".ex-read8").addEventListener("click", () => step(0, st.size / 2));
     $(".ex-prev").addEventListener("click", () => { const h = st.hist.pop(); if (h) { [st.w, st.r] = h; } draw(); });
     $(".ex-start").addEventListener("click", () => { st.w = 0; st.r = 0; st.hist = []; draw(); });
+    $(".ex-size").addEventListener("change", () => { st.size = Number($(".ex-size").value); st.w = 0; st.r = 0; st.hist = []; draw(); });
     draw();
   };
 
@@ -6353,6 +6401,64 @@
 
   // --- the box -----------------------------------------------------------------------------
 
+  // One line of help per kind: what the box shows and what its buttons do, behind the "?"
+  // button of the box header; "איפוס הכול" beside it rebuilds the box from its data
+  // attributes, so every control returns to its default.
+  const HELP = {
+    "cake-arith": "העוגה מחולקת לפי החוק החשבוני: a הוא החלק הראשון ו-d התוספת לכל אדם. הסליידרים ושדות המספר קובעים אותם, ״הבא״ ו״הפעלה״ עוברים אדם אחרי אדם, והטבלה והגרפים מראים מי מקבל הכי הרבה.",
+    "cake-geo": "העוגה מחולקת לפי החוק ההנדסי: a הוא החלק הראשון ו-q היחס בין אדם לאדם. הסליידרים ושדות המספר קובעים אותם, ״הבא״ ו״הפעלה״ עוברים אדם אחרי אדם, והטבלה והגרפים מראים מי מקבל הכי הרבה.",
+    motorcycle: "הציור מראה את הנוסעים על הדרך והגרף את מיקומם בזמן. הסליידרים קובעים את מהירויות ההליכה והרכיבה, בורר האסטרטגיה ומספר הרוכבים את התכנית, ״הפעלה״ מריץ אותה, ו״להשוואה עם״ מצייר תכנית שנייה מקווקוות.",
+    josephus: "המעגל מראה את המשחק: N (ו-L) בסליידרים, ״הצעד הבא״ או ״הפעלה״ מוציאים אדם אחרי אדם, השורד מודגש מהתחלה, והגרף מראה את השורד לכל N. שדה המושב מחפש באילו מעגלים מושב שורד.",
+    clock: "השעון מראה את מפגשי המחוגים: גוררים מחוג, מקלידים שעה או מפעילים, והקפיצות עוברות למפגש הבא או הקודם. המונים וציר הזמן סופרים את המפגשים מההתחלה.",
+    strip: "גוררים את העכביש ואת הזבוב על הקירות: הרצועה המחזורית מראה את התמונות, את 48 הקווים ואת הקצר שבהם, והמסלול נפרש פנים אחרי פנים.",
+    hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן, ״הצעד הבא״ ו״הפעלה״ עוברים אירוע אחרי אירוע, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר.",
+    probability: "p ו-q הן ההסתברויות ו-C המספר: התיבה מחשבת את התשובה, מציירת את ריבוע שני הילדים ואת העקומה כנגד q.",
+    bridge: "זמני החצייה בשדה, קיבולת הגשר ובורר התכנית: ״הבא״ ו״הפעלה״ מעבירים חצייה אחרי חצייה, והטבלה משווה את שלוש התכניות.",
+    river: "מעבירים את הזאב, העז והכרוב בלחיצה, או נותנים לתכנית ה-BFS לרוץ; גרף המצבים מתעדכן עם כל מעבר.",
+    pcie: "כתובת, אורך, MPS ו-RCB: התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד.",
+    fifo: "ה-burst וקצבי הכתיבה והקריאה בסליידרים: הגרף מראה את מפלס המילוי לאורך ה-burst מהסימולציה, והנוסחה לצדו.",
+    mtbf: "תדר השעון והנתונים, tau, T0 ו-overhead: התיבה מחשבת את ה-MTBF של פלופ אחד עד שלושה ביחידות קריאות, ומציירת אותו כנגד תדר השעון.",
+    triangle: "שלוש נקודות על המעגל: גוררים, מקלידים זוויות או מזיזים בחיצים, וירוק אומר שהמרכז בפנים. ״הפעלה״ עובר על כל השלשות וסופר, ו״1,000 הגרלות״ מצייר היסטוגרמה של הקשת הגדולה.",
+    polygon: "n קודקודים על המעגל: גוררים, מקלידים או מגרילים, וירוק אומר שהמרכז בפנים. ״1,000 הגרלות״ משווה לנוסחה הרציפה ולשבר הבדיד.",
+    boxes: "N קופסאות במעגל עם המעגלים שלהן בצבעים: ״ערבוב״ מגריל סידור, בוחרים אדם ועוקבים אחרי הפתיחות שלו, ו״1,000 סיבובים״ משווה את האסטרטגיה לבחירה אקראית. ״העתקת קישור״ שומר את המצב.",
+    floyd: "המערך כגרף של זנב ומעגל: ״הגרלה״ או הקלדה קובעים אותו, ו״הצעד הבא״ ו״הפעלה״ מזיזים את הצב ואת הארנב דרך שני השלבים עד הערך הכפול.",
+    bfs01: "השאריות מודולו x על טבעת: ״הצעד הבא״ מוציא שארית מהתור ומצייר את עץ ה-BFS, ובסוף התשובה נקראת בחזרה. שדה הספרות ומצב ״רק האורך״ הם שאלות ההמשך.",
+    brackets: "מקלידים מחרוזת סוגריים: ״הצעד הבא״ ו״הפעלה״ קוראים תו אחרי תו, המחסנית וגרף העומק מתעדכנים, והכישלון הראשון מסומן עם הסיבה.",
+    ttt: "לוחצים על משבצות הלוח: התיבה אומרת אם זה לוח סיום חוקי ולמה לא. ״הגרלה״ נותנת לוח חוקי, והבורר מפעיל את האלכסונים המתגלגלים של סעיף ב.",
+    shapes: "״עוד צורה״ מגריל מועמד ומראה את הנדחים בגלל חפיפה, ״הגרלה שלמה״ מציירת את כולן, ו״500 הגרלות״ בונה מפת חום. N, M ומספר הצורות בסליידרים.",
+    kaprekar: "מקלידים או מגרילים מספר: ״הצעד הבא״ ממיין ומחסר עד 495 או 6174, וההיסטוגרמה סופרת את אורכי השרשראות של כל המספרים.",
+    eurovision: "״ההכרזה הבאה״ מוסיפה מדינה: הכוסות מתחת לסכום של ישראל כנגד הנקודות שנותרו. תיבת ה״מה אם״ משנה את הניקוד של ישראל.",
+    boxes3: "שלוש קופסאות עם תוויות שגויות: לוחצים על קופסה כדי להוציא כדור, וההיסק נכתב שורה אחרי שורה. ״סידור אחר״ מגריל תכולה.",
+    edge: "לוחצים על משבצות של sig ברצועת התזמון: sig_q ו-pulse עוקבים לפי בורר השפה. המתג מראה את מלכודת האיפוס, והכפתור טוען את הדיאגרמה של העמוד.",
+    lfsr: "מסמנים taps ובוחרים רוחב: ״צעד״ ו״הפעלה״ מריצים את המצב מ-0…01 על טבעת המצבים (רשימה מ-7 ביטים), הביטים שיצאו נרשמים, והטבלה נותנת את אורך המחזור של כל פולינום.",
+    div3: "״השפה הבאה״ ו״הפעלה״ מריצים את מודל חצאי המחזור: cnt, a, b ו-clk_out על רצועה, וה-duty נמדד. ״התעוררות״ מתחילה ממצב לא נגיש לפי בורר המונה, והסליידר מחלק ב-N.",
+    gray: "בסנכרן בוחרים מצביע ורוחב, וכל ביט שמשתנה נדגם ישן או חדש (בלחיצה או ב״הגרלה״). ב-FIFO ״כתיבה״ ו״קריאה״ מזיזים את המצביעים, ו-empty ו-full מחושבים לפי הכללים.",
+    stock: "גוררים מחירים או מגרילים: ״היום הבא״ ו״הפעלה״ מריצים את הסריקה יום אחרי יום עם המינימום והמקסימום עד כה והעסקה הטובה ביותר. הבורר עובר ללונג בלבד.",
+    handshake: "לוחצים על משבצות של req ו-ack ברצועה: ארבעת הכללים נבדקים בכל מחזור, וכישלון מסומן בשורת ה-assertion שלו. ה-presets טוענים את ארבע הדוגמאות של העמוד.",
+    acknak: "ה-RC וה-EP עם שני תורי הקישור: ״הצעד הבא״ ו״הפעלה״ מריצים את תסריטי העמוד, האירועים החופשיים שולחים, מוסרים (גם עם CRC שגוי או אובדן) ומפעילים טיימרים, ו״הרצה אקראית״ מגרילה תנועה עם תקלות ובודקת את האינווריאנטים.",
+    credits: "ארבעת המונים כמחוגים על מעגל: תסריטי העמוד ב״הצעד הבא״, אירועים חופשיים (Grant, שידור, קבלה או אובדן, הוצאה, Sync) ו״הרצה אקראית״ עם שיעור אובדן. שורת הסיכום מאזנת קרדיטים מול תאים פנויים.",
+    endpoint: "בונים בקשות כתיבה וקריאה: ״מחזור״ ו״הרץ״ מוציאים Completions לפי המודל, ומפת הבלוקים, ציר המחזורים וטבלת ה-Completions מתעדכנים. ה-presets טוענים את דוגמאות העמוד.",
+    trace: "הקוד של העמוד שורה אחרי שורה: ״הבא״ ו״הפעלה״ מריצים אותו עם הערכים והביטויים, הבורר מחליף בין הגרסאות, והשדות קובעים את הקלט.",
+  };
+  const header = (box, helpOpen) => {
+    const bar = document.createElement("div");
+    bar.className = "ex-bar";
+    bar.innerHTML = `<button type="button" class="ex-help-btn" aria-expanded="false" aria-label="עזרה: מה התיבה מראה ומה הכפתורים עושים" title="עזרה">?</button>` +
+      `<button type="button" class="ex-reset-all" title="כל הבקרות של התיבה חוזרות לברירת המחדל">איפוס הכול</button>` +
+      `<p class="ex-help" hidden>${HELP[box.dataset.kind] || ""}</p>`;
+    box.prepend(bar);
+    const btn = bar.querySelector(".ex-help-btn"), help = bar.querySelector(".ex-help");
+    const show = (open) => { help.hidden = !open; btn.setAttribute("aria-expanded", String(open)); };
+    btn.addEventListener("click", () => show(help.hidden));
+    if (helpOpen) show(true);
+    bar.querySelector(".ex-reset-all").addEventListener("click", () => {
+      const play = box.querySelector(".ex-play");
+      if (play && play.textContent === "עצירה") play.click();        // stop a running loop first
+      if (/^#(seed|state)-/.test(location.hash)) history.replaceState(null, "", `${location.pathname}${location.search}`);
+      setup(box, !help.hidden);
+    });
+  };
+
   // Enlarge buttons (reading-tools.js) on every figure of a box, kept through redraws: a
   // view rebuilds its figures with innerHTML, so the buttons are added again after each
   // change (decorate skips figures that already have one).
@@ -6361,6 +6467,8 @@
     if (!window.dvqDecorate) return;
     const dec = () => window.dvqDecorate(box, LIVE_FIGURES);
     dec();
+    if (box.dvqObserved) return;                         // a rebuilt box keeps its observer
+    box.dvqObserved = true;
     new MutationObserver(dec).observe(box, { childList: true, subtree: true });
   };
 
@@ -6388,6 +6496,8 @@
     hint.className = "ex-keys";
     hint.textContent = `מקשים כשהתיבה ממוקדת: ${hints.join(", ")}.`;
     box.append(hint);
+    if (box.dvqKeys) return;                             // a rebuilt box keeps its listener
+    box.dvqKeys = true;
     box.addEventListener("keydown", (e) => {
       const t = e.target;
       if (t.matches("input, select, textarea") || t.getAttribute("role") === "slider" || (e.key === " " && t !== box && (t.matches("button") || t.getAttribute("role") === "button"))) return;
@@ -6400,10 +6510,11 @@
     });
   };
 
-  const setup = (box) => {
+  const setup = (box, helpOpen = false) => {
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
     make(box).mount(box);
+    header(box, helpOpen);
     keyboard(box);
     decorateLive(box);
   };
