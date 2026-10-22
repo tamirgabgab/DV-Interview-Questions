@@ -204,3 +204,48 @@ def test_explorer_motion_matches_python():
         # the walker is picked up exactly where the motorcycle meets him
         b, _, w = r["at2"]
         assert abs(b - w) < 1e-9
+
+
+def test_explorer_riders_follow_up():
+    """The k-rider follow-up in the box: the symmetric shuttle of the explorer is the
+    test's `shuttle` (everyone arrives at the formula's time, the last drop is B), two
+    riders reproduce the page's motion for every strategy, the waiting plan takes
+    2k - 1 rides, and the walking plan is a Python port of the same meeting rule."""
+    from page_tests import explorer_require, node_json
+
+    def meanwhile_T(alpha, k):
+        a = Fr(alpha)
+        t = Fr(0)
+        for i in range(k):
+            P = t / a
+            tb = t + 1 - P
+            t = tb + (1 - tb / a) / (1 + 1 / a) if i < k - 1 else tb
+        return t
+
+    alphas = [1.5, 2, 4, 13, 30]
+    got = node_json(f"const m = {explorer_require()}; const out = [];"
+                    f"for (const a of {alphas}) for (const k of [1, 2, 3, 4, 5]) for (const s of ['wait', 'meanwhile', 'optimal']) {{"
+                    "  const p = m.motorcycleRiders(s, a, k); const ts = []; for (let i = 0; i <= 120; i++) ts.push(p.T * i / 120);"
+                    "  out.push({ a, k, s, T: p.T, ride: p.ride, ends: p.riders.map((r) => r[r.length - 1]), bikeEnd: p.bike[p.bike.length - 1], Tk: m.motorcycleTimeK(a, k),"
+                    "    pos: ts.map((t) => [t, ...m.motorcycleAt(p, t)]), two: k === 2 ? ts.map((t) => m.motorcyclePositions(s, a, t)) : null }); }"
+                    "console.log(JSON.stringify(out));")
+    for r in got:
+        a, k, s = Fr(r["a"]).limit_denominator(100), r["k"], r["s"]
+        if s == "optimal":
+            arrivals, bike, drops = shuttle(a, k, best_ride(a, k))
+            assert abs(r["T"] - float(formula(a, k))) < 1e-12 and abs(r["Tk"] - float(formula(a, k))) < 1e-12, (a, k)
+            assert abs(r["ride"] - float(best_ride(a, k))) < 1e-12 and drops[-1] == 1
+        elif s == "wait":
+            assert abs(r["T"] - (2 * k - 1)) < 1e-12
+        else:
+            assert abs(r["T"] - float(meanwhile_T(a, k))) < 1e-9, (a, k)
+        for t_end, x_end in r["ends"]:
+            assert abs(t_end - r["T"]) < 1e-9 and abs(x_end - 1) < 1e-9, (a, k, s)
+        assert abs(r["bikeEnd"][0] - r["T"]) < 1e-9 and abs(r["bikeEnd"][1] - 1) < 1e-9
+        pos = r["pos"]
+        assert all(abs(v) < 1e-9 for v in pos[0][1:]) and all(abs(v - 1) < 1e-9 for v in pos[-1][1:])
+        for row in pos:
+            assert all(-1e-9 <= v <= 1 + 1e-9 for v in row[1:])
+        if r["two"] is not None:
+            for row, ref in zip(pos, r["two"]):
+                assert all(abs(u - v) < 1e-9 for u, v in zip(row[1:], ref)), (a, s)

@@ -554,6 +554,12 @@
 
 /* Question 0008: "cups" chart (room up to Israel's total) and the crossing chart */
 .md-typeset svg .s3-line { stroke: var(--viz-s3); }
+.md-typeset svg .s4-line { stroke: var(--viz-s4); }
+.md-typeset svg .s5-line { stroke: var(--viz-s5); }
+.md-typeset svg .s4-dot { fill: var(--viz-s4); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .s5-dot { fill: var(--viz-s5); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset .viz-legend .s4 { background: var(--viz-s4); }
+.md-typeset .viz-legend .s5 { background: var(--viz-s5); }
 .perf-chart .cup-room { fill: var(--viz-s2); fill-opacity: 0.14; stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 4 3; }
 .perf-chart .left-bar { fill: var(--viz-ink); fill-opacity: 0.7; }
 .perf-chart .overflow { fill: var(--viz-s2); }
@@ -1687,8 +1693,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .tri-panel bdi { white-space: nowrap; }
 
 /* Boxes explorer (0009): one colour per cycle, the long cycle red, the walk in blue badges */
-:root { --viz-s4: #8a5cc9; --viz-s1-text: #1f63b5; --viz-s3-text: #157a52; --viz-s4-text: #6f42b0; }   /* the series as text: 4.5:1 on white */
-[data-md-color-scheme="slate"] { --viz-s4: #b394e6; --viz-s1-text: var(--viz-s1); --viz-s3-text: var(--viz-s3); --viz-s4-text: var(--viz-s4); }
+:root { --viz-s4: #8a5cc9; --viz-s5: #c2185b; --viz-s1-text: #1f63b5; --viz-s3-text: #157a52; --viz-s4-text: #6f42b0; }   /* the series as text: 4.5:1 on white */
+[data-md-color-scheme="slate"] { --viz-s4: #b394e6; --viz-s5: #f06292; --viz-s1-text: var(--viz-s1); --viz-s3-text: var(--viz-s3); --viz-s4-text: var(--viz-s4); }
 .md-typeset .explorer .bx-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
 .md-typeset .explorer .bx-ring { flex: 0 1 20rem; }
 .md-typeset .explorer svg.bx-live { width: 20rem; max-width: 100%; user-select: none; }
