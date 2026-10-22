@@ -19,6 +19,9 @@
 //   floyd                  0017        the array as the graph i -> nums[i], the tortoise and the hare through both phases; the copy link carries the array and the step
 //   bfs01                  0005        the remainders modulo x on a ring, the BFS tree one dequeue at a time, the answer read back; a digit set and a length-only mode
 //   abmap                  0005        the 45 digit pairs a < b for one x: the length of the smallest multiple or ✗, the answer, x = 2^s 5^t m and the rule of the theorem
+//   eggs                   0039        k eggs and n floors: the building with the unknown range, a zoom of its floors to pick the threshold, the plan played drop by drop, drops per threshold under the worst case
+//   seqdet                 0040        a pattern of up to 8 bits, Mealy or Moore: the KMP automaton drawn as a row of states, bits fed by hand, at random or played, the strip of din / state / found
+//   coverage               0041        2 to 10 bins with a weight each and at_least k: tests played one at a time into the bins, 1,000 runs as a histogram against the exact expectation (the integral, the k = 1 closed form)
 //   brackets               0010        a typed bracket string read character by character: the stack, the depth chart, the first failure
 //   ttt                    0011        tap cells on a 3 x 3 board: is it a legal final board and why not; random legal boards; wrap diagonals
 //   shapes                 0014        squares or rectangles drawn one at a time with the rejected candidates flashed; a heat map of draws
@@ -36,7 +39,7 @@
 //   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table; a timeline of every read's waits and completions; a cycle axis of the completions and the ready reads
 //   trace                  0002, 0003  the page's Python one line (or one comparison) at a time: the swaps (and the three-variable XOR rotation) with a0 / b0 / c0 expressions, the double loop with its invariant
 // The math of each model is exported under Node, where the question tests compare it with
-// the Python reference (tests/0001 to 0021, 0023 to 0038).
+// the Python reference (tests/0001 to 0021, 0023 to 0041).
 (() => {
   const EPS = 1e-9;
 
@@ -1103,6 +1106,92 @@
   // the first failure (a closer with an empty stack, or one that does not match the top);
   // openers left at the end are the third failure.
   const BRACKET_OF = { ")": "(", "]": "[", "}": "{" };
+  // Egg drop (0039): F[e][t] is how many floors e eggs settle in t drops, capped at n
+  // (the cap keeps the numbers small and changes no decision); the worst case is the
+  // first t with F[k][t] >= n; the plan drops from low + F[eggs - 1][t - 1] + 1 and
+  // plays against a threshold T (the egg breaks from floor T + 1).
+  const eggsTable = (k, n) => {
+    const F = Array.from({ length: k + 1 }, () => new Int32Array(n + 1));
+    for (let e = 1; e <= k; e++) for (let t = 1; t <= n; t++) F[e][t] = Math.min(n, F[e - 1][t - 1] + 1 + F[e][t - 1]);
+    return F;
+  };
+  const eggsDropsOf = (F, k, n) => { for (let t = 0; t <= n; t++) if (F[k][t] >= n) return t; return n; };
+  const eggsDrops = (k, n) => eggsDropsOf(eggsTable(k, n), k, n);
+  const eggsRunOf = (F, k, n, T) => {
+    let t = eggsDropsOf(F, k, n), low = 0, high = n + 1, eggs = k;
+    const drops = [];
+    while (high - low > 1) {
+      const fl = Math.min(low + F[eggs - 1][t - 1] + 1, high - 1), broke = fl > T;
+      drops.push([fl, broke]);
+      t--;
+      if (broke) { high = fl; eggs--; } else low = fl;
+    }
+    return drops;
+  };
+  const eggsRun = (k, n, T) => eggsRunOf(eggsTable(k, n), k, n, T);
+  const eggsFirst = (k, n) => eggsRun(k, n, n).map((d) => d[0]);
+  const eggsPerThreshold = (k, n) => { const F = eggsTable(k, n); return Array.from({ length: n + 1 }, (_, T) => eggsRunOf(F, k, n, T).length); };
+
+  // Sequence detector (0040): the KMP automaton of a pattern (states 0..L, nxt[s][b]),
+  // the Mealy state the full match collapses to (the state with the same transitions),
+  // and a run over bits: the state before each bit and the output (Mealy on the bit that
+  // completes the pattern, Moore one cycle later).
+  const seqTable = (pattern) => {
+    const L = pattern.length, nxt = Array.from({ length: L + 1 }, () => [0, 0]);
+    nxt[0][pattern[0]] = 1;
+    let fail = 0;
+    for (let s = 1; s <= L; s++) {
+      for (let b = 0; b < 2; b++) nxt[s][b] = s < L && pattern[s] === b ? s + 1 : nxt[fail][b];
+      if (s < L) fail = nxt[fail][pattern[s]];
+    }
+    let rest = 0;
+    for (let s = 0; s < L; s++) if (nxt[s][0] === nxt[L][0] && nxt[s][1] === nxt[L][1]) { rest = s; break; }
+    return { nxt, rest, L };
+  };
+  const seqRun = (pattern, bits, moore = false) => {
+    const { nxt, rest, L } = seqTable(pattern);
+    let state = 0;
+    const states = [], out = [];
+    bits.forEach((b) => {
+      states.push(state);
+      const n = nxt[state][b];
+      out.push(moore ? (state === L ? 1 : 0) : (n === L ? 1 : 0));
+      state = moore || n < L ? n : rest;
+    });
+    return { states, out, next: state };
+  };
+
+  // Coverage (0041): n bins with probabilities p, at_least k. The expectation by the
+  // Poisson embedding (Simpson's rule on 1 - prod P(Poisson(p_i t) >= k)), the k = 1
+  // closed form over the subsets, the chain on the number of covered equal bins, and
+  // one simulated run.
+  const covProbs = (weights) => { const s = weights.reduce((a, b) => a + b, 0); return weights.map((w) => w / s); };
+  const covPoissonAtLeast = (lam, k) => { let term = Math.exp(-lam), below = 0; for (let j = 0; j < k; j++) { below += term; term *= lam / (j + 1); } return 1 - below; };
+  const covExpected = (p, k, h = 0.02) => {
+    const uncovered = (t) => { let prod = 1; for (const pi of p) prod *= covPoissonAtLeast(pi * t, k); return 1 - prod; };
+    let total = 0, t = 0;
+    for (;;) {
+      const a = uncovered(t), m = uncovered(t + h / 2), b = uncovered(t + h);
+      total += (h * (a + 4 * m + b)) / 6;
+      t += h;
+      if (t > 1 && b < 1e-12) return total;
+    }
+  };
+  const covK1 = (p) => {
+    let total = 0;
+    for (let mask = 1; mask < 1 << p.length; mask++) {
+      let s = 0, bits = 0;
+      for (let i = 0; i < p.length; i++) if ((mask >> i) & 1) { s += p[i]; bits++; }
+      total += (bits % 2 ? 1 : -1) / s;
+    }
+    return total;
+  };
+  const covStep = (prob, n) => prob.map((v, c) => (v * c) / n + (c ? (prob[c - 1] * (n - c + 1)) / n : 0));
+  const covCurve = (n, tmax) => { let prob = [1].concat(new Array(n).fill(0)); const out = []; for (let t = 0; t <= tmax; t++) { out.push(prob[n]); prob = covStep(prob, n); } return out; };
+  const covQuantile = (n, q) => { let prob = [1].concat(new Array(n).fill(0)), t = 0; while (prob[n] < q) { prob = covStep(prob, n); t++; } return t; };
+  const covDraw = (p, rnd) => { let r = rnd(), i = 0; while (i < p.length - 1 && r >= p[i]) { r -= p[i]; i++; } return i; };
+  const covSimulate = (p, k, rnd) => { const hits = new Array(p.length).fill(0); let left = p.length, t = 0; while (left) { const i = covDraw(p, rnd); hits[i]++; t++; if (hits[i] === k) left--; } return t; };
+
   const bracketsClean = (text) => [...String(text)].filter((c) => "()[]{}".includes(c)).join("");
   const bracketsTrace = (s) => {
     const frames = [], stack = [];
@@ -2076,6 +2165,9 @@
     TTT_LINES, TTT_WRAP, tttCheck, tttFinalBoards, tttRandom,
     shapesOverlap, shapesCandidates, shapesOk, shapesTry, shapesRandom, shapesHeat,
     kapStep, kapChain, kapHistogram,
+    covProbs, covExpected, covK1, covCurve, covQuantile, covSimulate, covDraw,
+    seqTable, seqRun,
+    eggsTable, eggsDrops, eggsRun, eggsFirst, eggsPerThreshold,
     EURO_RESULTS, EURO_PUBLIC_TOTAL, euroOrder, euroWithIsrael, euroCannotWin, euroScan,
     boxesCases, boxesDraw, boxesFix, boxesDeduce,
     EDGE_MODES, edgeTrace, lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, lfsrPrimitiveCount, div3Params, div3Trace, div3Duty,
@@ -4704,6 +4796,389 @@
     },
   });
 
+  // The egg drop box (0039): k eggs and n floors, a threshold picked on the building or
+  // in the zoom of the unknown floors, and the plan played drop by drop; the whole
+  // building keeps the known-safe and known-breaking floors tinted, the zoom shows a
+  // window of the floors still unknown one by one, and the chart counts the drops the
+  // plan needs for every threshold under the worst-case line.
+  const eggsView = () => ({
+    mount(box) {
+      const d = box.dataset;
+      const KMAX = Number(d.kmax || 10), NMAX = Number(d.nmax || 1000), ZW = 30;
+      const K0 = Math.min(KMAX, Number(d.k || 3)), N0 = Math.min(NMAX, Number(d.n || 100)), T0 = Math.min(N0, Number(d.t || 36));
+      const st = { k: K0, n: N0, T: T0, step: 0, win: null, F: null, drops: [], worst: 0, used: [] };
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label><span>ביצים k</span><input type="range" class="ex-k" min="1" max="${KMAX}" step="1" value="${st.k}" dir="ltr" aria-label="מספר הביצים"><output class="out-k">${st.k}</output></label>` +
+        `<label><span>קומות n</span><input type="number" class="ex-num eg-n" min="1" max="${NMAX}" step="1" value="${st.n}" dir="ltr" inputmode="numeric" aria-label="מספר הקומות, מ-1 עד ${NMAX}"></label>` +
+        `<label><span>הסף T</span><input type="number" class="ex-num eg-t" min="0" max="${st.n}" step="1" value="${st.T}" dir="ltr" inputmode="numeric" aria-label="קומת הסף, מ-0 עד n"></label>` +
+        `<button type="button" class="md-button ex-random">הגרלת סף</button>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err eg-err"></span></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<button type="button" class="md-button md-button--primary ex-next">ההטלה הבאה</button>` +
+        `<button type="button" class="md-button ex-prev">ההטלה הקודמת</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 300) +
+        `<button type="button" class="md-button ex-start">מההתחלה</button>` +
+        `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
+        `<p class="ex-summary eg-sum" aria-live="polite"></p><p class="eg-step"></p>` +
+        `<span class="viz-legend"><span><i class="eg-key-safe"></i>ידוע שלא נשברת</span><span><i class="eg-key-broke"></i>ידוע שנשברת</span><span><i class="eg-key-unknown"></i>עוד לא ידוע</span><span><i class="eg-key-thr"></i>הסף שבחרתם</span><span><i class="eg-key-next"></i>ההטלה הבאה</span></span>` +
+        `<div class="eg-box"><div class="eg-building"></div><div class="eg-zoomwrap"><p class="ex-title eg-zoomtitle"></p><div class="eg-zoom"></div>` +
+        `<label class="eg-winlab"><span>חלון התקריב</span><input type="range" class="eg-win" min="1" max="1" step="1" value="1" dir="ltr" aria-label="הקומה הראשונה בחלון התקריב"></label></div></div>` +
+        `<p class="ex-title">מספר ההטלות של התוכנית לכל סף אפשרי</p><div class="eg-chart"></div>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play"), speed = $(".ex-speed");
+      const compute = () => {
+        st.F = eggsTable(st.k, st.n);
+        st.worst = eggsDropsOf(st.F, st.k, st.n);
+        st.drops = eggsRunOf(st.F, st.k, st.n, st.T);
+        st.used = Array.from({ length: st.n + 1 }, (_, T) => eggsRunOf(st.F, st.k, st.n, T).length);
+        st.step = Math.min(st.step, st.drops.length);
+      };
+      // the state after `step` drops: the known range, the eggs and drops left
+      const after = (step) => {
+        let low = 0, high = st.n + 1, eggs = st.k;
+        for (let i = 0; i < step; i++) { const [fl, broke] = st.drops[i]; if (broke) { high = fl; eggs--; } else low = fl; }
+        return { low, high, eggs, left: st.worst - step };
+      };
+      const clampWin = (s) => { const { low, high } = after(st.step); const len = Math.min(ZW, high - low - 1); return Math.max(low + 1, Math.min(s, high - len)); };
+      const building = (s) => {
+        const W = 150, H = 380, X0 = 44, X1 = 112, TOP = 18, BOT = 362, n = st.n;
+        const pitch = (BOT - TOP) / n, y = (fl) => BOT - fl * pitch;
+        const next = st.step < st.drops.length ? st.drops[st.step][0] : null;
+        const len = Math.min(ZW, s.high - s.low - 1), w0 = st.win, w1 = st.win + len - 1;
+        let h = `<svg class="figure eg-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="הבניין : ${n} קומות, הקומות הידועות צבועות והטווח הלא ידוע ביניהן">` +
+          `<rect class="eg-wall" x="${X0}" y="${TOP}" width="${X1 - X0}" height="${BOT - TOP}" rx="3"/>` +
+          `<rect class="eg-safe" x="${X0 + 1}" y="${f(y(s.low))}" width="${X1 - X0 - 2}" height="${f(BOT - y(s.low))}"/>` +
+          `<rect class="eg-broke" x="${X0 + 1}" y="${TOP + 1}" width="${X1 - X0 - 2}" height="${f(Math.max(0, y(s.high - 1) - TOP - 1))}"/>`;
+        if (s.high - s.low > 1) h += `<rect class="eg-win" x="${X0 - 3}" y="${f(y(w1))}" width="${X1 - X0 + 6}" height="${f(y(w0 - 1) - y(w1))}"/>`;
+        const every = n <= 20 ? 1 : n <= 100 ? 10 : n <= 400 ? 50 : 100;
+        for (let fl = every; fl < n; fl += every) h += `<line class="eg-floor" x1="${X0}" x2="${X1}" y1="${f(y(fl))}" y2="${f(y(fl))}"/><text class="eg-tick" x="${X0 - 4}" y="${f(y(fl) + 3)}" text-anchor="end">${fl}</text>`;
+        h += `<text class="eg-tick" x="${X0 - 4}" y="${BOT + 3}" text-anchor="end">0</text><text class="eg-tick" x="${X0 - 4}" y="${TOP + 3}" text-anchor="end">${n}</text>`;
+        h += `<line class="eg-thr" x1="${X0 - 2}" x2="${X1 + 2}" y1="${f(y(st.T))}" y2="${f(y(st.T))}"/>`;
+        st.drops.slice(0, st.step).forEach(([fl, broke], i) => {
+          h += `<g class="eg-drop ${broke ? "is-broke" : "is-safe"}"><circle cx="${X1 + 16}" cy="${f(y(fl))}" r="7"/><text x="${X1 + 16}" y="${f(y(fl) + 3)}" text-anchor="middle">${i + 1}</text><title>הטלה ${i + 1} מקומה ${fl} : ${broke ? "נשברה" : "לא נשברה"}</title></g>`;
+        });
+        if (next !== null) h += `<line class="eg-next" x1="${X0}" x2="${X1 + 8}" y1="${f(y(next))}" y2="${f(y(next))}"/><text class="eg-nextlbl" x="${X1 + 28}" y="${f(y(next) + 3)}">${next}</text>`;
+        h += `<rect class="eg-hit" x="${X0}" y="${TOP}" width="${X1 - X0}" height="${BOT - TOP}"/></svg>`;
+        return h;
+      };
+      const zoom = (s) => {
+        const unknown = s.high - s.low - 1;
+        if (unknown <= 0) return `<p class="ex-note">אין קומות לא ידועות : הסף נמצא.</p>`;
+        const len = Math.min(ZW, unknown), w0 = st.win, w1 = w0 + len - 1, RH = 16, W = 250, H = len * RH + 8;
+        const next = st.step < st.drops.length ? st.drops[st.step][0] : null;
+        let h = `<svg class="figure eg-zoomsvg" viewBox="0 0 ${W} ${H}" role="group" aria-label="תקריב : הקומות ${w0} עד ${w1}, לחיצה על קומה קובעת את הסף">`;
+        for (let i = 0; i < len; i++) {
+          const fl = w1 - i, y0 = 4 + i * RH;
+          const cls = (fl === st.T ? " is-thr" : "") + (fl === next ? " is-next" : "");
+          h += `<g class="eg-row${cls}" data-fl="${fl}" tabindex="0" role="button">` +
+               `<rect x="40" y="${y0}" width="${W - 44}" height="${RH - 2}" rx="2"/><text class="eg-rownum" x="34" y="${y0 + RH - 5}" text-anchor="end">${fl}</text>` +
+               (fl === next ? `<text class="eg-rowtxt" x="${W - 10}" y="${y0 + RH - 5}" text-anchor="end">ההטלה הבאה</text>` : fl === st.T ? `<text class="eg-rowtxt" x="${W - 10}" y="${y0 + RH - 5}" text-anchor="end">הסף</text>` : "") + `</g>`;
+        }
+        return h + "</svg>";
+      };
+      const chart = () => {
+        const n = st.n, t = st.worst, W = 640, H = 200, X0 = 40, R = 12, TOP = 14, BASE = 170;
+        const X = (v) => X0 + (v / (n + 1)) * (W - X0 - R), Y = (v) => BASE - (v / (t + 1)) * (BASE - TOP);
+        let h = `<svg class="perf-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="מספר ההטלות לכל סף, מתחת לקו של ${t}">`;
+        const ystep = t > 20 ? 10 : t > 8 ? 4 : t > 3 ? 2 : 1;
+        for (let v = 0; v <= t + 1; v += ystep) h += `<line class="grid" x1="${X0}" x2="${W - R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`;
+        const xs = n <= 10 ? Array.from({ length: n + 1 }, (_, i) => i) : [0, Math.round(n / 4), Math.round(n / 2), Math.round(3 * n / 4), n];
+        xs.forEach((v) => { h += `<text class="tick" x="${f(X(v + 0.5))}" y="${BASE + 16}" text-anchor="middle">${v}</text>`; });
+        h += `<line class="ink-line" x1="${X0}" x2="${W - R}" y1="${f(Y(t))}" y2="${f(Y(t))}" stroke-width="1.5" stroke-dasharray="6 4"/><text class="legend" x="${W - R - 4}" y="${f(Y(t) - 6)}" text-anchor="end">המקרה הגרוע : ${t}</text>`;
+        let path = "";
+        st.used.forEach((v, T) => { path += `${f(X(T))},${f(Y(v))} ${f(X(T + 1))},${f(Y(v))} `; });
+        h += `<polyline class="s1-line" points="${path.trim()}" fill="none" stroke-width="2"/>`;
+        h += `<rect class="eg-chart-thr" x="${f(X(st.T))}" y="${TOP}" width="${f(Math.max(2, X(1) - X(0)))}" height="${BASE - TOP}"/>`;
+        h += `<circle class="s2-dot" cx="${f(X(st.T + 0.5))}" cy="${f(Y(st.used[st.T]))}" r="5"><title>הסף ${st.T} : ${st.used[st.T]} הטלות</title></circle>`;
+        return h + `<line class="axis" x1="${X0}" x2="${W - R}" y1="${BASE}" y2="${BASE}"/></svg>`;
+      };
+      const draw = () => {
+        const s = after(st.step), done = st.step === st.drops.length;
+        st.win = clampWin(st.win === null ? st.T - Math.floor(ZW / 2) : st.win);
+        $(".out-k").textContent = String(st.k); $(".eg-n").value = st.n; $(".eg-t").value = st.T; $(".eg-t").max = st.n;
+        const win = $(".eg-win"), len = Math.min(ZW, s.high - s.low - 1);
+        win.min = s.low + 1; win.max = Math.max(s.low + 1, s.high - len); win.value = st.win; win.disabled = s.high - s.low - 1 <= ZW;
+        $(".eg-building").innerHTML = building(s);
+        $(".eg-zoom").innerHTML = zoom(s);
+        $(".eg-zoomtitle").textContent = s.high - s.low > 1 ? `תקריב : קומות ${st.win} עד ${st.win + len - 1} מתוך ${s.high - s.low - 1} הלא ידועות (${s.low + 1} עד ${s.high - 1})` : "תקריב";
+        $(".eg-chart").innerHTML = chart();
+        $(".ex-pos").textContent = `הטלה ${st.step} מתוך ${st.drops.length}`;
+        $(".ex-prev").disabled = st.step === 0; $(".ex-next").disabled = done; $(".ex-end").disabled = done;
+        const worstCount = st.used.filter((v) => v === st.worst).length;
+        $(".eg-sum").innerHTML = `${ltr(st.k)} ${st.k === 1 ? "ביצה" : "ביצים"} ו-${ltr(st.n)} קומות : המקרה הגרוע הוא ${ltr(st.worst)} הטלות, ` +
+          `והסף ${ltr(st.T)} דורש ${ltr(st.drops.length)}. ${worstCount === st.n + 1 ? "כל" : ltr(worstCount)} ${worstCount === 1 ? "סף אחד מגיע" : "ספים מגיעים"} למקרה הגרוע, ואף סף לא עובר אותו ✓`;
+        let step;
+        if (st.step === 0) step = `לפני ההטלה הראשונה : ${ltr(st.n)} קומות לא ידועות, ${ltr(st.k)} ביצים ו-${ltr(st.worst)} הטלות. ` +
+          (st.drops.length ? `ההטלה הראשונה מקומה ${ltr(st.drops[0][0])} : מתחתיה ${ltr(st.drops[0][0] - 1)} קומות, בדיוק מה ש-${ltr(st.k - 1)} ${st.k - 1 === 1 ? "ביצה מספיקה לה" : "ביצים מספיקות להן"} ב-${ltr(st.worst - 1)} הטלות.` : "אין מה להטיל.");
+        else {
+          const [fl, broke] = st.drops[st.step - 1];
+          step = `הטלה ${ltr(st.step)} מקומה ${ltr(fl)} : ` + (broke ? `<span class="wv-bad">נשברה</span>, הסף מתחת ל-${ltr(fl)}, נשארו ${ltr(s.eggs)} ${s.eggs === 1 ? "ביצה" : "ביצים"}.` : `<span class="wv-ok">לא נשברה</span>, הסף הוא ${ltr(fl)} או מעליו.`) +
+            (done ? ` <b>הסתיים אחרי ${ltr(st.step)} הטלות</b> : קומה ${ltr(s.low)} בטוחה ו-${ltr(s.high)} שוברת, ולכן הסף הוא ${ltr(s.low)} ✓` :
+              ` נשארו ${ltr(s.high - s.low - 1)} קומות לא ידועות (${ltr(s.low + 1)} עד ${ltr(s.high - 1)}), ${ltr(s.eggs)} ${s.eggs === 1 ? "ביצה" : "ביצים"} ו-${ltr(s.left)} הטלות; הבאה מקומה ${ltr(st.drops[st.step][0])}` +
+              (s.eggs === 1 ? ` (ביצה אחרונה : קומה אחר קומה).` : `.`));
+        }
+        $(".eg-step").innerHTML = step;
+        // the clickable floors
+        box.querySelectorAll(".eg-row").forEach((r) => {
+          const pick = () => { setT(Number(r.dataset.fl), false); };
+          r.addEventListener("click", pick);
+          r.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+        });
+        const hit = $(".eg-hit");
+        if (hit) hit.addEventListener("click", (e) => {
+          const svg = hit.ownerSVGElement, r = svg.getBoundingClientRect();
+          const yv = 18 + ((e.clientY - r.top) / r.height) * 380;
+          const fl = Math.round(st.n - ((yv - 18) / (362 - 18)) * st.n);
+          setT(Math.max(0, Math.min(st.n, fl)), true);
+        });
+      };
+      let stop = () => {};
+      const setT = (T, recentre) => { stop(); st.T = T; st.step = 0; if (recentre) st.win = null; compute(); draw(); };
+      const setKN = (k, n) => {
+        const err = !Number.isInteger(n) || n < 1 || n > NMAX ? `מספר קומות שלם מ-1 עד ${NMAX}` : "";
+        $(".eg-err").textContent = err;
+        if (err) return;
+        stop(); st.k = k; st.n = n; st.T = Math.min(st.T, n); st.step = 0; st.win = null; compute(); draw();
+      };
+      $(".ex-k").addEventListener("input", () => setKN(Number($(".ex-k").value), st.n));
+      $(".eg-n").addEventListener("change", () => setKN(st.k, Math.round(Number($(".eg-n").value))));
+      $(".eg-n").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".eg-n").blur(); });
+      const readT = () => { const v = Math.round(Number($(".eg-t").value)); if (v >= 0 && v <= st.n) setT(v, true); else $(".eg-t").value = st.T; };
+      $(".eg-t").addEventListener("change", readT);
+      $(".eg-t").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".eg-t").blur(); });
+      $(".eg-win").addEventListener("input", () => { st.win = clampWin(Number($(".eg-win").value)); draw(); });
+      const seed = seedControls(box, $(".ex-random"), (rng) => { setT(Math.floor(rng() * (st.n + 1)), true); });
+      $(".ex-random").addEventListener("click", () => seed.draw());
+      $(".ex-reset").addEventListener("click", () => { $(".ex-k").value = K0; st.T = T0; setKN(K0, N0); });
+      $(".ex-next").addEventListener("click", () => { stop(); if (st.step < st.drops.length) { st.step++; st.win = null; draw(); } });
+      $(".ex-prev").addEventListener("click", () => { stop(); if (st.step > 0) { st.step--; st.win = null; draw(); } });
+      $(".ex-start").addEventListener("click", () => { stop(); st.step = 0; st.win = null; draw(); });
+      $(".ex-end").addEventListener("click", () => { stop(); st.step = st.drops.length; st.win = null; draw(); });
+      stop = autoplay(play, speed, { step: () => { st.step++; st.win = null; draw(); }, done: () => st.step >= st.drops.length, restart: () => { st.step = 0; st.win = null; draw(); } });
+      compute();
+      draw();
+    },
+  });
+
+  // The sequence detector box (0040): a pattern of up to 8 bits and a Mealy / Moore
+  // select; bits fed one at a time by the 0 and 1 buttons, by a random bit at the chosen
+  // probability of 1, or played; the automaton drawn as a row of states with the taken
+  // transition lit; a strip of clk, din, the state and found; the summary names where
+  // 0 and 1 lead next.
+  const seqdetView = () => ({
+    mount(box) {
+      const P0 = (box.dataset.pattern || "1011").replace(/[^01]/g, "").slice(0, 8) || "1011";
+      const KEEP = 24;
+      const st = { pattern: [...P0].map(Number), moore: false, p1: 0.5, bits: [] };
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label><span>התבנית</span><input type="text" class="ex-num sq-pat" value="${P0}" dir="ltr" maxlength="8" pattern="[01]{1,8}" inputmode="numeric" aria-label="התבנית, 1 עד 8 ביטים"></label>` +
+        `<label>המכונה <select class="sq-kind" aria-label="Mealy או Moore"><option value="mealy">Mealy</option><option value="moore">Moore</option></select></label>` +
+        `<label><span>הסתברות ל-1</span><input type="range" class="sq-p" min="0" max="100" step="5" value="50" dir="ltr" aria-label="ההסתברות שביט אקראי הוא 1, באחוזים"><output class="out-p">50%</output></label>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err sq-err"></span></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<span class="ex-title">הביט הבא :</span>` +
+        `<button type="button" class="md-button md-button--primary sq-bit" data-b="0">0</button>` +
+        `<button type="button" class="md-button md-button--primary sq-bit" data-b="1">1</button>` +
+        `<button type="button" class="md-button ex-next">ביט אקראי</button>` +
+        `<button type="button" class="md-button ex-prev">ביטול הביט האחרון</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1200, 600, 250) +
+        `<button type="button" class="md-button ex-start">ניקוי</button>` +
+        `<span class="wv-presets">דוגמאות : <button type="button" class="md-button ex-preset" data-s="1011011">1011011</button> <button type="button" class="md-button ex-preset" data-s="10101011">10101011</button></span></div>` +
+        `<p class="ex-summary sq-sum" aria-live="polite"></p><p class="sq-next"></p>` +
+        `<div class="sq-graph"></div>` +
+        `<span class="viz-legend"><span><i class="fs-key"></i>מעבר</span><span><i class="fs-key-found"></i>המעבר שמזהה (Mealy) או המצב שמוציא 1 (Moore)</span><span><i class="sq-key-cur"></i>המצב הנוכחי</span></span>` +
+        `<div class="wv-wrap sq-strip" tabindex="0" role="group" aria-label="רצועת התזמון של הגלאי, גלילה אופקית"></div>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play"), speed = $(".ex-speed");
+      let stop = () => {};
+      const graph = (t, run) => {
+        const L = t.L, N = st.moore ? L + 1 : L;
+        const W = 640, Y = 90, R = N > 6 ? 18 : 24, H = 200;
+        const xs = Array.from({ length: N }, (_, k) => (N === 1 ? W / 2 : 50 + (k * (W - 100)) / (N - 1)));
+        const cur = run.next, last = st.bits.length ? st.bits[st.bits.length - 1] : null, before = st.bits.length ? run.states[run.states.length - 1] : null;
+        const target = (s, b) => { const n = t.nxt[s][b]; return st.moore || n < L ? n : t.rest; };
+        let h = `<svg class="figure sq-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="גרף המצבים : ${N} מצבים, המצב הנוכחי מודגש">` +
+          `<defs><marker id="sq-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs>`;
+        const labels = [];
+        for (let s = 0; s < N; s++) for (let b = 0; b < 2; b++) {
+          const n = t.nxt[s][b], found = !st.moore && n === L, tg = target(s, b);
+          const taken = before === s && last === b;
+          const cls = `fs-edge${found ? " is-found" : ""}${taken ? " is-taken" : ""}`;
+          const x0 = xs[s], x1 = xs[tg], lab = found ? `${b} / 1` : String(b);
+          if (tg === s + 1) { h += `<line class="${cls}" x1="${f(x0 + R)}" y1="${Y}" x2="${f(x1 - R - 2)}" y2="${Y}" marker-end="url(#sq-arrow)"/>`; labels.push([(x0 + x1) / 2, Y - 7, lab, found, taken]); }
+          else if (tg === s) { h += `<path class="${cls}" d="M${f(x0 - 9)},${Y - R + 3} C${f(x0 - 30)},${Y - R - 40} ${f(x0 + 30)},${Y - R - 40} ${f(x0 + 9)},${Y - R + 2}" marker-end="url(#sq-arrow)"/>`; labels.push([x0, Y - R - 29, lab, found, taken]); }
+          else { const depth = 26 + 14 * Math.abs(s - tg); h += `<path class="${cls}" d="M${f(x0)},${Y + R} Q${f((x0 + x1) / 2)},${Y + R + depth} ${f(x1)},${Y + R + 2}" marker-end="url(#sq-arrow)"/>`; labels.push([(x0 + x1) / 2, Y + R + depth / 2 + 14, lab, found, taken]); }
+        }
+        for (let s = 0; s < N; s++) {
+          const out = st.moore && s === L;
+          h += `<g class="fs-node${s === cur ? " is-cur" : ""}${out ? " is-out" : ""}"><circle cx="${f(xs[s])}" cy="${Y}" r="${R}"/><text x="${f(xs[s])}" y="${Y + 4}" text-anchor="middle">S${s}</text></g>` +
+               `<text class="fs-meaning" x="${f(xs[s])}" y="${Y + R + 14}" text-anchor="middle">${s === 0 ? "start" : st.pattern.slice(0, s).join("")}</text>`;
+        }
+        labels.forEach(([x, y, lab, found, taken]) => { h += `<text class="fs-label halo${found ? " is-found" : ""}${taken ? " is-taken" : ""}" x="${f(x)}" y="${f(y)}" text-anchor="middle">${lab}</text>`; });
+        return h + "</svg>";
+      };
+      const draw = () => {
+        const t = seqTable(st.pattern), run = seqRun(st.pattern, st.bits, st.moore), L = t.L;
+        $(".sq-kind").value = st.moore ? "moore" : "mealy"; $(".out-p").textContent = `${Math.round(st.p1 * 100)}%`;
+        $(".sq-graph").innerHTML = graph(t, run);
+        const from = Math.max(0, st.bits.length - KEEP), bits = st.bits.slice(from), states = run.states.slice(from), out = run.out.slice(from);
+        const n = bits.length;
+        $(".sq-strip").innerHTML = n ? waveStrip([
+          { name: "clk", kind: "clock" },
+          { name: "din", kind: "bit", values: bits, cls: "wv-s1" },
+          { name: "state", kind: "bus", values: states.map((s) => `S${s}`), split: true },
+          { name: "found", kind: "bit", values: out, cls: "wv-s2" },
+        ], n, { cursor: n - 1, ticks: (k) => from + k + 1, label: `רצועת התזמון : ${n} מחזורים` }) : `<p class="ex-note">עוד לא הוזן אף ביט.</p>`;
+        $(".sq-strip").scrollLeft = $(".sq-strip").scrollWidth;
+        $(".ex-prev").disabled = st.bits.length === 0;
+        const hits = run.out.reduce((a, b) => a + b, 0), pat = st.pattern.join("");
+        $(".sq-sum").innerHTML = `התבנית ${code(pat)}, ${st.moore ? "Moore" : "Mealy"} עם ${ltr(st.moore ? L + 1 : L)} מצבים : ` +
+          (st.bits.length ? `${ltr(st.bits.length)} ביטים הוזנו, ${hits === 1 ? "זיהוי אחד" : `${ltr(hits)} זיהויים`}` : "עוד לא הוזן אף ביט") +
+          (st.bits.length && run.out[run.out.length - 1] ? ` <span class="wv-ok">✓ המוצא גבוה עכשיו</span>` : "") + `. המצב הנוכחי ${code(`S${run.next}`)}` +
+          (run.next === 0 ? " (כלום מהתבנית)." : run.next === L ? " (התבנית הסתיימה, המוצא 1)." : ` (הביטים האחרונים ${code(st.pattern.slice(0, run.next).join(""))}).`);
+        const where = (b) => { const nx = t.nxt[run.next][b], det = nx === L; const s = st.moore || !det ? nx : t.rest; return `${code(String(b))} → ${code(`S${s}`)}${det ? (st.moore ? " (יוציא 1 במחזור הבא)" : " ופלט 1") : ""}`; };
+        $(".sq-next").innerHTML = `הביט הבא : ${where(0)}; ${where(1)}.` + (st.moore && run.next === L ? ` המצב ${code(`S${L}`)} מוציא 1 עכשיו, מחזור אחרי הביט האחרון.` : "");
+      };
+      const feed = (b) => { st.bits.push(b); draw(); };
+      const setPattern = (text) => {
+        const clean = String(text).replace(/\s/g, "");
+        const err = /^[01]{1,8}$/.test(clean) ? "" : "תבנית של 1 עד 8 ביטים, רק 0 ו-1";
+        $(".sq-err").textContent = err;
+        if (err) return;
+        stop(); st.pattern = [...clean].map(Number); $(".sq-pat").value = clean; draw();
+      };
+      $(".sq-pat").addEventListener("change", () => setPattern($(".sq-pat").value));
+      $(".sq-pat").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".sq-pat").blur(); });
+      $(".sq-kind").addEventListener("change", () => { stop(); st.moore = $(".sq-kind").value === "moore"; draw(); });
+      $(".sq-p").addEventListener("input", () => { st.p1 = Number($(".sq-p").value) / 100; draw(); });
+      box.querySelectorAll(".sq-bit").forEach((btn) => btn.addEventListener("click", () => { stop(); feed(Number(btn.dataset.b)); }));
+      const seed = seedControls(box, $(".wv-presets"), (rng) => { stop(); st.bits = Array.from({ length: 12 }, () => (rng() < st.p1 ? 1 : 0)); draw(); });
+      $(".ex-next").addEventListener("click", () => { stop(); feed(Math.random() < st.p1 ? 1 : 0); });
+      $(".ex-prev").addEventListener("click", () => { stop(); st.bits.pop(); draw(); });
+      $(".ex-start").addEventListener("click", () => { stop(); st.bits = []; draw(); });
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { stop(); st.bits = [...b.dataset.s].map(Number); draw(); }));
+      $(".ex-reset").addEventListener("click", () => { stop(); st.moore = false; st.p1 = 0.5; $(".sq-p").value = 50; st.bits = []; setPattern(P0); });
+      stop = autoplay(play, speed, { step: () => feed(Math.random() < st.p1 ? 1 : 0), done: () => st.bits.length >= 400, restart: () => { st.bits = []; draw(); } });
+      void seed;
+      draw();
+    },
+  });
+
+  // The coverage box (0041): 2 to 10 bins with a weight slider each (the probabilities
+  // are the weights normalised) and at_least k; tests played one at a time into the bins
+  // until every bin has k hits; 1,000 seeded runs as a histogram of the number of tests
+  // with the mean and the 95 % point against the exact expectation.
+  const coverageView = () => ({
+    mount(box) {
+      const d = box.dataset;
+      const NMAX = 10, KMAX = 5, RUNS = 1000;
+      const W0 = (d.weights || "1 1 1 1").split(/\s+/).map(Number).filter((v) => v >= 1 && v <= 10).slice(0, NMAX);
+      const N0 = Math.min(NMAX, Math.max(2, Number(d.n || W0.length))), K0 = Math.min(KMAX, Math.max(1, Number(d.k || 1)));
+      while (W0.length < N0) W0.push(1);
+      const st = { w: W0.slice(0, N0), k: K0, hits: [], t: 0, runs: null, seed: null };
+      const presets = [["equal", "שווים"], ["rare", "אחד נדיר"], ["steps", "מדרגות"]];
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label>תאים <select class="cv-n" aria-label="מספר התאים">${Array.from({ length: NMAX - 1 }, (_, i) => `<option value="${i + 2}"${i + 2 === N0 ? " selected" : ""}>${i + 2}</option>`).join("")}</select></label>` +
+        `<label>‏at_least <select class="cv-k" aria-label="פגיעות נדרשות בכל תא">${Array.from({ length: KMAX }, (_, i) => `<option value="${i + 1}"${i + 1 === K0 ? " selected" : ""}>${i + 1}</option>`).join("")}</select></label>` +
+        `<span class="wv-presets">משקלים : ${presets.map(([v, t]) => `<button type="button" class="md-button ex-preset" data-w="${v}">${t}</button>`).join(" ")}</span>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button></div>` +
+        `<div class="cv-weights" role="group" aria-label="המשקל של כל תא"></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<button type="button" class="md-button md-button--primary ex-next">הטסט הבא</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(700, 300, 80) +
+        `<button type="button" class="md-button ex-end">עד הכיסוי</button>` +
+        `<button type="button" class="md-button ex-start">ניקוי</button>` +
+        `<button type="button" class="md-button ex-random">${ltr("1,000")} ריצות</button><span class="ex-pos"></span></div>` +
+        `<p class="ex-summary cv-sum" aria-live="polite"></p><p class="cv-run"></p>` +
+        `<div class="cv-bins"></div>` +
+        `<p class="ex-title cv-hist-title"></p><div class="cv-hist"></div><p class="ex-note cv-hist-note"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play"), speed = $(".ex-speed");
+      let stop = () => {}, runRng = Math.random;
+      const probs = () => covProbs(st.w);
+      const covered = () => st.hits.every((h) => h >= st.k);
+      const weightsHtml = () => {
+        $(".cv-weights").innerHTML = st.w.map((w, i) => `<label><span>תא ${i}</span><input type="range" class="cv-w" data-i="${i}" min="1" max="10" step="1" value="${w}" dir="ltr" aria-label="המשקל של תא ${i}"><output>${w}</output></label>`).join("");
+        box.querySelectorAll(".cv-w").forEach((r) => r.addEventListener("input", () => { st.w[Number(r.dataset.i)] = Number(r.value); r.nextElementSibling.textContent = r.value; st.runs = null; clear(); }));
+      };
+      const binsSvg = (p) => {
+        const n = st.w.length, W = 640, H = 190, X0 = 40, BASE = 150, TOP = 20, slot = (W - X0 - 12) / n, bw = Math.min(56, slot * 0.6);
+        const top = Math.max(st.k + 1, ...st.hits), Y = (v) => BASE - (v / top) * (BASE - TOP);
+        let h = `<svg class="perf-chart cv-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="${n} התאים : מספר הפגיעות בכל אחד, והקו של at_least">`;
+        const step = top > 20 ? 5 : top > 8 ? 2 : 1;
+        for (let v = 0; v <= top; v += step) h += `<line class="grid" x1="${X0}" x2="${W - 12}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`;
+        h += `<line class="ink-line" x1="${X0}" x2="${W - 12}" y1="${f(Y(st.k))}" y2="${f(Y(st.k))}" stroke-width="1.5" stroke-dasharray="6 4"/><text class="legend halo" x="${X0 + 6}" y="${f(Y(st.k) - 5)}">at_least = ${st.k}</text>`;
+        st.hits.forEach((v, i) => {
+          const x = X0 + (i + 0.5) * slot, done = v >= st.k;
+          h += `<rect class="bar ${done ? "by-bfs" : "by-multiples"}" x="${f(x - bw / 2)}" y="${f(Y(v))}" width="${f(bw)}" height="${f(BASE - Y(v))}" rx="2"><title>תא ${i} : ${v} פגיעות, p = ${p[i].toFixed(3)}</title></rect>` +
+               `<text class="tick" x="${f(x)}" y="${f(Y(v) - 5)}" text-anchor="middle">${v}</text>` +
+               `<text class="tick" x="${f(x)}" y="${BASE + 16}" text-anchor="middle">${i}</text><text class="tick" x="${f(x)}" y="${BASE + 32}" text-anchor="middle">${p[i].toFixed(2)}</text>`;
+        });
+        return h + `<line class="axis" x1="${X0}" x2="${W - 12}" y1="${BASE}" y2="${BASE}"/></svg>`;
+      };
+      const histSvg = (exact) => {
+        const runs = st.runs, m = runs.length, lo = Math.min(...runs), hi = Math.max(...runs);
+        const width = Math.max(1, Math.ceil((hi - lo + 1) / 40)), nb = Math.ceil((hi - lo + 1) / width);
+        const counts = new Array(nb).fill(0);
+        runs.forEach((v) => { counts[Math.floor((v - lo) / width)]++; });
+        const sorted = runs.slice().sort((a, b) => a - b), mean = runs.reduce((a, b) => a + b, 0) / m, q95 = sorted[Math.min(m - 1, Math.ceil(0.95 * m) - 1)];
+        const W = 640, H = 210, X0 = 40, BASE = 170, TOP = 16, slot = (W - X0 - 12) / nb, cmax = Math.max(...counts);
+        const Y = (v) => BASE - (v / cmax) * (BASE - TOP), X = (v) => X0 + ((v - lo) / width) * slot;
+        let h = `<svg class="perf-chart cv-histsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="היסטוגרמה של מספר הטסטים ב-${m} ריצות">`;
+        counts.forEach((c, b) => { h += `<rect class="bar by-multiples" x="${f(X0 + b * slot + 1)}" y="${f(Y(c))}" width="${f(Math.max(1, slot - 2))}" height="${f(BASE - Y(c))}"><title>${lo + b * width}${width > 1 ? `–${lo + b * width + width - 1}` : ""} טסטים : ${c} ריצות</title></rect>`; });
+        const mark = (v, cls, lab, dy) => `<line class="${cls}" x1="${f(X(v) + slot / 2)}" x2="${f(X(v) + slot / 2)}" y1="${TOP}" y2="${BASE}" stroke-width="2"/><text class="legend halo" x="${f(X(v) + slot / 2 + 4)}" y="${TOP + dy}">${lab}</text>`;
+        h += mark(mean, "s2-line", `ממוצע ${mean.toFixed(1)}`, 12) + mark(exact, "ink-line", `תוחלת ${exact.toFixed(1)}`, 28) + mark(q95, "s3-line", `95% : ${q95}`, 44);
+        const every = Math.max(1, Math.ceil(nb / 8));
+        for (let b = 0; b < nb; b += every) h += `<text class="tick" x="${f(X0 + b * slot + slot / 2)}" y="${BASE + 16}" text-anchor="middle">${lo + b * width}</text>`;
+        return h + `<line class="axis" x1="${X0}" x2="${W - 12}" y1="${BASE}" y2="${BASE}"/></svg>`;
+      };
+      const draw = () => {
+        const p = probs(), n = st.w.length, exact = covExpected(p, st.k), k1 = st.k === 1 ? covK1(p) : null;
+        const done = covered();
+        $(".cv-bins").innerHTML = binsSvg(p);
+        $(".ex-pos").textContent = `${st.t} טסטים`;
+        $(".ex-next").disabled = done; $(".ex-end").disabled = done;
+        const equal = st.w.every((w) => w === st.w[0]);
+        $(".cv-sum").innerHTML = `${ltr(n)} תאים${equal ? " שווים" : ` עם ההסתברויות ${ltr(p.map((x) => x.toFixed(2)).join(", "))}`}, לפחות ${ltr(st.k)} ${st.k === 1 ? "פגיעה" : "פגיעות"} בכל תא : התוחלת היא ${ltr(exact.toFixed(2))} טסטים` +
+          (k1 !== null ? ` (הנוסחה הסגורה : ${ltr(k1.toFixed(2))}${equal ? `, כלומר ${ltr(`${n}·H${n}`)}` : ""})` : " (האינטגרל)") + (equal && st.k === 1 ? `; ל-95% צריך ${ltr(covQuantile(n, 0.95))}.` : ".");
+        const left = st.hits.filter((h) => h < st.k).length;
+        $(".cv-run").innerHTML = st.t === 0 ? `עוד לא רץ אף טסט. "הטסט הבא" מגריל תא לפי ההסתברויות.` :
+          done ? `<span class="wv-ok">✓ כיסוי מלא אחרי ${ltr(st.t)} טסטים</span>` + (st.t > exact ? `, יותר מהתוחלת.` : `, פחות מהתוחלת.`) :
+          `אחרי ${ltr(st.t)} טסטים חסרים עוד ${ltr(left)} ${left === 1 ? "תא" : "תאים"} (${ltr(st.hits.map((h, i) => (h < st.k ? i : null)).filter((v) => v !== null).join(", "))}); הסיכוי שהטסט הבא מתקדם : ${ltr(st.hits.reduce((acc, h, i) => acc + (h < st.k ? p[i] : 0), 0).toFixed(2))}.`;
+        if (st.runs) {
+          const m = st.runs.length, mean = st.runs.reduce((a, b) => a + b, 0) / m;
+          $(".cv-hist-title").innerHTML = `${ltr("1,000")} ריצות מהזרע ${ltr(st.seed)} : היסטוגרמה של מספר הטסטים עד הכיסוי`;
+          $(".cv-hist").innerHTML = histSvg(exact);
+          const sd = Math.sqrt(st.runs.reduce((a, v) => a + (v - mean) ** 2, 0) / m);
+          $(".cv-hist-note").innerHTML = `הממוצע ${ltr(mean.toFixed(1))} לעומת התוחלת ${ltr(exact.toFixed(1))} (סטיית תקן ${ltr(sd.toFixed(1))}, שגיאת הממוצע כ-${ltr((sd / Math.sqrt(m)).toFixed(1))}); ` +
+            `הריצה הקצרה ${ltr(Math.min(...st.runs))} והארוכה ${ltr(Math.max(...st.runs))}.`;
+        } else { $(".cv-hist-title").textContent = ""; $(".cv-hist").innerHTML = ""; $(".cv-hist-note").textContent = ""; }
+      };
+      const clear = () => { stop(); st.hits = new Array(st.w.length).fill(0); st.t = 0; draw(); };
+      const test = () => { if (covered()) return; const i = covDraw(probs(), runRng); st.hits[i]++; st.t++; draw(); };
+      const setN = (n) => { st.w = st.w.slice(0, n); while (st.w.length < n) st.w.push(1); st.runs = null; weightsHtml(); clear(); };
+      $(".cv-n").addEventListener("change", () => setN(Number($(".cv-n").value)));
+      $(".cv-k").addEventListener("change", () => { st.k = Number($(".cv-k").value); st.runs = null; clear(); });
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => {
+        const n = st.w.length;
+        st.w = b.dataset.w === "equal" ? new Array(n).fill(5) : b.dataset.w === "rare" ? [1].concat(new Array(n - 1).fill(10)) : Array.from({ length: n }, (_, i) => i + 1);
+        st.runs = null; weightsHtml(); clear();
+      }));
+      $(".ex-reset").addEventListener("click", () => { st.w = W0.slice(0, N0); st.k = K0; $(".cv-n").value = String(N0); $(".cv-k").value = String(K0); st.runs = null; weightsHtml(); clear(); });
+      $(".ex-next").addEventListener("click", () => { stop(); test(); });
+      $(".ex-end").addEventListener("click", () => { stop(); while (!covered()) { const i = covDraw(probs(), runRng); st.hits[i]++; st.t++; } draw(); });
+      $(".ex-start").addEventListener("click", clear);
+      const seed = seedControls(box, $(".ex-random"), (rng, s) => { stop(); st.seed = s; st.runs = Array.from({ length: RUNS }, () => covSimulate(probs(), st.k, rng)); draw(); });
+      $(".ex-random").addEventListener("click", () => seed.draw());
+      stop = autoplay(play, speed, { step: test, done: covered, restart: () => { st.hits = new Array(st.w.length).fill(0); st.t = 0; draw(); } });
+      weightsHtml();
+      clear();
+    },
+  });
+
   const bracketsView = () => ({
     mount(box) {
       const PRESETS = ["()", "()[]{}", "{[()]}", "([]{})", "(]", "([)]", "(((", "())", ")("];
@@ -6775,6 +7250,9 @@
     floyd: floydView,
     bfs01: bfs01View,
     abmap: abmapView,
+    eggs: eggsView,
+    seqdet: seqdetView,
+    coverage: coverageView,
     brackets: bracketsView,
     ttt: tttView,
     shapes: shapesView,
@@ -6818,6 +7296,9 @@
     floyd: "המערך כגרף של זנב ומעגל : ״הגרלה״ או הקלדה קובעים אותו, ו״הצעד הבא״ ו״הפעלה״ מזיזים את הצב ואת הארנב דרך שני השלבים עד הערך הכפול.",
     bfs01: "השאריות מודולו x על טבעת : ״הצעד הבא״ מוציא שארית מהתור ומצייר את עץ ה-BFS, ובסוף התשובה נקראת בחזרה. שדה הספרות ומצב ״רק האורך״ הם שאלות ההמשך.",
     abmap: "בוחרים x ורואים את כל 45 זוגות הספרות a < b : בתא ירוק אורך הכפולה הקטנה ביותר, ו-✗ כשאין. לחיצה על תא מציגה את התשובה, את הפירוק x = 2^s · 5^t · m ואת הכלל של המשפט, ושתי הפונקציות של העמוד מושוות בכל תא.",
+    eggs: "k ביצים ו-n קומות בבקרות, והסף נבחר בלחיצה על הבניין, על קומה בתקריב או בשדה. ״ההטלה הבאה״ ו״הפעלה״ מריצים את התוכנית : הבניין צובע את הקומות הידועות, התקריב מראה את הקומות הלא ידועות אחת-אחת, והגרף סופר את ההטלות לכל סף מתחת לקו של המקרה הגרוע.",
+    seqdet: "מקלידים תבנית ובוחרים Mealy או Moore : הכפתורים 0 ו-1 מזינים ביט, ״ביט אקראי״ ו״הפעלה״ מגרילים לפי ההסתברות שבסליידר. הגרף מדגיש את המצב ואת המעבר שנלקח, הרצועה מראה din, state ו-found, והשורה מתחת אומרת לאן 0 ו-1 יובילו.",
+    coverage: "בוחרים מספר תאים, משקל לכל תא ו-at_least : ״הטסט הבא״ ו״הפעלה״ מגרילים טסט אחרי טסט עד שכל התאים מכוסים, ו״1,000 ריצות״ מציירות היסטוגרמה של מספר הטסטים עם הממוצע וה-95% לעומת התוחלת המחושבת.",
     brackets: "מקלידים מחרוזת סוגריים : ״הצעד הבא״ ו״הפעלה״ קוראים תו אחרי תו, המחסנית וגרף העומק מתעדכנים, והכישלון הראשון מסומן עם הסיבה.",
     ttt: "לוחצים על משבצות הלוח : התיבה אומרת אם זה לוח סיום חוקי ולמה לא. ״הגרלה״ נותנת לוח חוקי, והבורר מפעיל את האלכסונים המתגלגלים של סעיף ב.",
     shapes: "״עוד צורה״ מגריל מועמד ומראה את הנדחים בגלל חפיפה, ״הגרלה שלמה״ מציירת את כולן, ו״500 הגרלות״ בונה מפת חום. N, M ומספר הצורות בסליידרים.",

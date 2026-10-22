@@ -2128,3 +2128,91 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .viz-legend .ab-ok-key { background: var(--diff-easy); }
 .md-typeset .explorer .viz-legend .ab-no-key { background: var(--diff-hard); }
 .md-typeset .explorer .ab-ans { display: inline-block; max-width: 100%; max-height: 6rem; overflow-y: auto; vertical-align: top; word-break: break-all; font-family: var(--md-code-font-family); font-size: 0.75rem; }
+
+/* Egg drop (0039): the page's building figure, and the explorer with the building, the zoom and the chart */
+.md-typeset svg .egg-wall { fill: var(--md-code-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .egg-floor { stroke: var(--viz-grid); stroke-width: 0.8; }
+.md-typeset svg .egg-band0 { fill: var(--viz-s1); fill-opacity: 0.1; }
+.md-typeset svg .egg-band1 { fill: var(--viz-s1); fill-opacity: 0.22; }
+.md-typeset svg .egg-drop1 { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .egg-drop2 { stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg .egg-drop3 { stroke: var(--viz-s3); stroke-width: 1.5; }
+.md-typeset svg .egg-lbl1 { fill: var(--viz-s1-text); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .egg-lbl2 { fill: var(--viz-s2-text); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .egg-lbl3 { fill: var(--viz-s3-text); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .egg-key1 { background: var(--viz-s1); }
+.md-typeset .viz-legend .egg-key2 { background: var(--viz-s2); }
+.md-typeset .viz-legend .egg-key3 { background: var(--viz-s3); }
+.md-typeset .explorer .eg-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .eg-building { flex: 0 0 9.5rem; }
+.md-typeset .explorer svg.eg-live { width: 9.5rem; max-width: 100%; display: block; }
+.md-typeset .explorer .eg-zoomwrap { flex: 1 1 14rem; min-width: 0; max-width: 20rem; }
+.md-typeset .explorer .eg-zoomwrap .ex-title { margin: 0 0 0.3rem; }
+.md-typeset .explorer svg.eg-zoomsvg { width: 100%; max-width: 16rem; display: block; }
+.md-typeset .explorer .eg-winlab { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .eg-winlab input[type="range"] { flex: 1 1 6rem; }
+.md-typeset .explorer .eg-step { margin: 0.3em 0 0.5em; }
+.md-typeset svg .eg-wall { fill: var(--md-code-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .eg-safe { fill: var(--diff-easy); fill-opacity: 0.28; }
+.md-typeset svg .eg-broke { fill: var(--diff-hard); fill-opacity: 0.28; }
+.md-typeset svg .eg-win { fill: none; stroke: var(--viz-ink); stroke-width: 1.2; stroke-dasharray: 3 2; }
+.md-typeset svg .eg-floor { stroke: var(--viz-grid); stroke-width: 0.8; }
+.md-typeset svg .eg-tick { fill: var(--viz-text); font-size: 9px; font-family: var(--md-code-font-family); }
+.md-typeset svg .eg-thr { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .eg-next { stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: 5 3; }
+.md-typeset svg .eg-nextlbl { fill: var(--viz-s1-text); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .eg-drop circle { fill: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .eg-drop text { font-size: 9px; font-weight: 700; font-family: var(--md-code-font-family); fill: var(--viz-ink); }
+.md-typeset svg .eg-drop.is-safe circle { stroke: var(--diff-easy); }
+.md-typeset svg .eg-drop.is-broke circle { stroke: var(--diff-hard); }
+.md-typeset svg .eg-hit { fill: transparent; cursor: pointer; }
+.md-typeset svg .eg-row rect { fill: var(--md-code-bg-color); stroke: var(--viz-grid); stroke-width: 1; cursor: pointer; }
+.md-typeset svg .eg-row:hover rect { fill: var(--viz-s1); fill-opacity: 0.18; }
+.md-typeset svg .eg-row:focus-visible { outline: none; }
+.md-typeset svg .eg-row:focus-visible rect { stroke: var(--site-focus-ring); stroke-width: 2.5; }
+.md-typeset svg .eg-row.is-thr rect { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg .eg-row.is-next rect { stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: 4 2; }
+.md-typeset svg .eg-rownum { fill: var(--viz-ink); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .eg-rowtxt { fill: var(--viz-text); font-size: 9px; }
+.md-typeset svg .eg-chart-thr { fill: var(--viz-s2); fill-opacity: 0.25; }
+.md-typeset .viz-legend .eg-key-safe { background: var(--diff-easy); opacity: 0.6; }
+.md-typeset .viz-legend .eg-key-broke { background: var(--diff-hard); opacity: 0.6; }
+.md-typeset .viz-legend .eg-key-unknown { background: var(--md-code-bg-color); outline: 1.5px solid var(--viz-grid); }
+.md-typeset .viz-legend .eg-key-thr { background: var(--viz-s2); }
+.md-typeset .viz-legend .eg-key-next { background: var(--viz-s1); }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .eg-building { flex: 0 0 7.5rem; }
+  .md-typeset .explorer svg.eg-live { width: 7.5rem; }
+}
+
+/* Sequence detector (0040): the state diagram figure and the explorer's live graph */
+.md-typeset svg .fs-node circle { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .fs-node text { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .fs-node.is-start circle { stroke-width: 3.5; }
+.md-typeset svg .fs-node.is-cur circle { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 3.5; }
+.md-typeset svg .fs-node.is-out circle { stroke-dasharray: 4 3; }
+.md-typeset svg .fs-meaning { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg .fs-edge { fill: none; stroke: var(--viz-s1); stroke-width: 1.8; }
+.md-typeset svg .fs-edge.is-found { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .fs-edge.is-taken { stroke: var(--viz-ink); stroke-width: 3.5; }
+.md-typeset svg .fs-arrowhead { fill: var(--viz-ink); }
+.md-typeset svg .fs-label { fill: var(--viz-s1-text); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .fs-label.is-found { fill: var(--viz-s2-text); }
+.md-typeset svg .fs-label.is-taken { fill: var(--viz-ink); font-size: 14px; }
+.md-typeset .viz-legend .fs-key { background: var(--viz-s1); }
+.md-typeset .viz-legend .fs-key-found { background: var(--viz-s2); }
+.md-typeset .viz-legend .sq-key-cur { background: var(--viz-s2); opacity: 0.5; outline: 2px solid var(--viz-s2); }
+.md-typeset .explorer .sq-graph { margin-top: 0.4rem; }
+.md-typeset .explorer svg.sq-live { width: 100%; max-width: 41rem; display: block; }
+.md-typeset .explorer input.sq-pat { width: 7rem; letter-spacing: 0.15em; }
+.md-typeset .explorer .sq-next { margin: 0.2em 0 0.4em; }
+.md-typeset .explorer .sq-bit { min-width: 2.4rem; font-family: var(--md-code-font-family); font-weight: 700; }
+
+/* Coverage explorer (0041): the weight sliders, the bins, the histogram */
+.md-typeset .explorer .cv-weights { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin-top: 0.4rem; }
+.md-typeset .explorer .cv-weights label { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; }
+.md-typeset .explorer .cv-weights input[type="range"] { width: 5.5rem; }
+.md-typeset .explorer .cv-weights output { min-width: 1.2rem; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer .cv-bins { margin-top: 0.4rem; max-width: 40rem; }
+.md-typeset .explorer .cv-hist { max-width: 40rem; }
+.md-typeset .explorer .cv-run { margin: 0.2em 0 0.4em; }

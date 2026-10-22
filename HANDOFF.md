@@ -1524,6 +1524,48 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     now plain words ("L − 1", "בזיכרון קבוע", "n"), with their old anchors pinned
     (`#l-1`, `#o1`, `#n`). A scan of every TOC entry, page title and search-index title
     of the built site found nothing else. The rule is in `CLAUDE.md`.
+26. **Round Z, three new questions (the owner's picks from the Z202 to Z217 list; answers:
+    one push at the end; eggs junior / medium, detector student / easy, coverage junior /
+    medium).**
+    - **0039 egg drop** (`junior/0039-egg-drop-floors.md`): part a is three eggs and 100
+      floors (9 drops from 37 / 66 / 88 / 100; the owner wanted three eggs, not the classic
+      two), part b is k eggs and n floors: the capped table F[e][t] = min(n, F[e−1][t−1] +
+      1 + F[e][t−1]), the plan from low + F[eggs−1][t−1] + 1 clipped at high − 1, and
+      egg_run replayed against every threshold (never more than the worst case, the worst
+      case reached, the run ends on the threshold); the decision-tree lower bound
+      (Σ C(t, i) leaves against n + 1 thresholds). `tools/figures/q0039.py` is the
+      binomial reference (covered, run, the building figure, the drops-per-threshold chart,
+      the tables). The `eggs` box: the whole building tinted (safe / breaking / unknown), a
+      zoom of up to 30 unknown floors with a window slider, the threshold set by a click on
+      the building, on a zoom row or in a field, play drop by drop, the chart of drops per
+      threshold. The SV uses int arrays of MAXK + 1 by MAXN + 1 (1,000 floors).
+    - **0040 sequence detector** (`student/0040-sequence-detector-1011.md`): part a the
+      1011 Mealy machine (four states, S3 on 0 falls back to S2, found = S3 & din, a
+      WaveDrom block that the test decodes), part b the KMP automaton as a parametrised
+      module (`seq_detect #(L, PATTERN, MOORE)`, the table built by a constant function
+      `next_state`, Mealy merges state L into the state with the same transitions) and
+      `fsm_table` / `run_fsm` in Python. `q0040.py` builds the automaton by brute force
+      (longest suffix that is a prefix) and draws the state diagram as a row of states
+      (advancing edges on the line, self loops above, fall-backs below, the detecting edge
+      orange). The `seqdet` box: pattern up to 8 bits, Mealy / Moore, bits by the 0 / 1
+      buttons, at random by a probability slider or played, the graph with the taken
+      transition lit, a strip of din / state / found. The testbench pulls two blocks; the
+      second marker is `module seq_detect #(` because `module seq_detect` also matches
+      the first.
+    - **0041 coverage** (`junior/0041-coverage-random-tests.md`): part a n equal bins:
+      n·H_n (54.1 for 16, 518.7 for 100), the chain on the number of covered bins for the
+      distribution (90 and 754 tests for 95 %; the alternating inclusion-exclusion sum is
+      shown and explained to fail numerically at n = 100), part b unequal bins and
+      at_least k by the Poisson embedding and Wald (E[T] = ∫ (1 − Π P(Poisson(p_i t) ≥ k))
+      dt by Simpson, the k = 1 closed form over subsets, a simulation). The owner chose
+      "a slider per bin, simulation only for k ≥ 2" for the box; the box still shows the
+      integral for k ≥ 2 since it is cheap. `q0041.py` is the reference (exact fractions
+      for the inclusion-exclusion check). Note: a page function named `tests_for` must be
+      bound under another name in the test module, or pytest collects it.
+    - README rows and the explorer-kinds cell, the explorer header comment and HELP, CSS
+      blocks for the three kinds. Checks: lint, the Python tests, Verilator on the three
+      testbenches (locally with 5.020 where it compiles), strict build, links, phone and
+      axe light and dark.
 
 ---
 
@@ -1588,8 +1630,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
-| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch) |
+| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
