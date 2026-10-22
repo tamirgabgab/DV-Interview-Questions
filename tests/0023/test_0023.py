@@ -323,3 +323,37 @@ def test_explorer_matches_page_model():
     assert got["b"] == [[2, 0x0300, 0x22, 0x10020, 96, 256, 0x20, 0x7F], [4, 0x0200, 0x15, 0x10000, 128, 256, 0x00, 0x7F],
                         [5, 0x0300, 0x22, 0x10080, 128, 160, 0x80, 0xFF], [6, 0x0200, 0x15, 0x10080, 128, 128, 0x80, 0xFF],
                         [7, 0x0300, 0x22, 0x10100, 32, 32, 0x00, 0x1F]]
+
+
+def test_explorer_read_timeline():
+    """The timeline the box draws (U136): every read's record carries the cycle it was
+    issued at and its wait windows; the k-th window starts at the issue (k = 0) or at the
+    k-th completion, ends at the ready cycle the draw gave, and the k-th completion goes
+    out at or after that ready cycle; a finished read has one window per completion."""
+    import json
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(230)
+    reqs = [["read", 0x20000 + rng.randrange(0, 3800), rng.randint(1, 256), 0x0200, i] for i in range(12)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const rng = m.epUnitRng({json.dumps([rng.random() for _ in range(2000)])});
+      const s = m.epInit();
+      const issued = [];
+      for (const r of {json.dumps(reqs)}) {{ if (r[4] % 3 === 2) m.epCycle(s, rng); m.epRead(s, {{ address: r[1], length: r[2], rid: r[3], tag: r[4] }}, rng); issued.push(s.cycle); }}
+      const mid = JSON.parse(JSON.stringify(s.reads));
+      let guard = 0;
+      while (s.pending.length && guard++ < 600) m.epCycle(s, rng);
+      const a = m.epRunScript(m.EP_SCRIPTS.a);
+      console.log(JSON.stringify({{ issued, mid, reads: s.reads, out: s.out, a: a.reads, aout: a.out }}));""")
+    assert [r["issued"] for r in got["reads"]] == got["issued"]
+    for reads, out in ((got["reads"], got["out"]), (got["a"], got["aout"])):
+        for r in reads:
+            outs = [c["cycle"] for c in out if c["read"] == r["id"]]
+            assert len(r["waits"]) == len(r["sizes"]) == len(outs), r
+            for k, (start, ready) in enumerate(r["waits"]):
+                assert start == (r["issued"] if k == 0 else outs[k - 1]), (r, k)
+                assert start < ready <= outs[k], (r, k)
+    assert all(r["waits"][0][0] == r["issued"] and 1 <= len(r["waits"]) <= len(r["sizes"]) for r in got["mid"])

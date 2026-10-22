@@ -2070,3 +2070,27 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .tr-lg-j { color: var(--viz-s2-text); }
 .md-typeset .explorer .tr-lg-done { color: var(--viz-s3-text); }
 .md-typeset .explorer .tr-step { margin: 0.4em 0; }
+
+/* 0023: the timeline of the reads (U136) */
+.md-typeset .explorer .ep-gantt { direction: ltr; margin-top: 0.3rem; }
+.md-typeset .explorer .ep-gantt svg.ep-live { width: 100%; max-width: 34rem; display: block; }
+.md-typeset svg .ep-wait { fill: none; stroke-width: 2.5; stroke-dasharray: 5 3; opacity: 0.8; }
+.md-typeset svg .ep-ready { fill: none; stroke-width: 6; opacity: 0.45; }
+.md-typeset svg .ep-cpl { stroke: var(--md-default-bg-color); stroke-width: 1.5; }
+.md-typeset svg .ep-now { stroke: var(--viz-s3); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.md-typeset svg :is(.ep-wait, .ep-ready).ep-c0 { stroke: var(--viz-s1); }
+.md-typeset svg :is(.ep-wait, .ep-ready).ep-c1 { stroke: var(--viz-s2); }
+.md-typeset svg :is(.ep-wait, .ep-ready).ep-c2 { stroke: var(--viz-s3); }
+.md-typeset svg :is(.ep-wait, .ep-ready).ep-c3 { stroke: var(--viz-s4); }
+.md-typeset svg .ep-cpl.ep-c0 { fill: var(--viz-s1); }
+.md-typeset svg .ep-cpl.ep-c1 { fill: var(--viz-s2); }
+.md-typeset svg .ep-cpl.ep-c2 { fill: var(--viz-s3); }
+.md-typeset svg .ep-cpl.ep-c3 { fill: var(--viz-s4); }
+.md-typeset .explorer .ep-legend { direction: rtl; }
+.md-typeset .explorer .ep-legend i.ep-lg-wait { background: none; border-top: 2px dashed var(--viz-ink); height: 0; }
+.md-typeset .explorer .ep-legend i.ep-lg-ready { background: var(--viz-ink); opacity: 0.45; height: 0.4rem; }
+.md-typeset .explorer .ep-legend i.ep-lg-cpl { background: var(--viz-ink); border-radius: 50%; }
+.md-typeset .explorer .ep-legend i.ep-lg-now { background: none; border-left: 2px dashed var(--viz-s3); width: 0; }
+
+/* 0007: a focused point of the triangle and polygon boxes (U137) */
+.md-typeset svg .tri-pt:focus-visible { outline: none; stroke: var(--viz-s3); stroke-width: 4; }

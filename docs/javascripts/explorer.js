@@ -13,8 +13,8 @@
 //   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits
 //   fifo                   0033        burst, write and read rates, a skipping reader: the fill level over time
 //   mtbf                   0037        clock and data rates, tau, T0 and overhead: the MTBF of one to three flops
-//   triangle               0007        three points to drag or type, inside / edge / outside; play counts every triangle; a largest-arc histogram of 1,000 draws
-//   polygon                0007        the same for n vertices (3 to 10): drag, type or draw; random draws against 1 - n / 2^(n-1)
+//   triangle               0007        three points to drag, type or nudge with arrow keys, inside / edge / outside; play counts every triangle; a largest-arc histogram of 1,000 draws
+//   polygon                0007        the same for n vertices (3 to 10): drag, type, arrow keys or draw; random draws against 1 - n / 2^(n-1)
 //   boxes                  0009        N boxes on a ring with their cycles, person 0's cut, a walk box by box, rounds without person 0; the copy link carries the arrangement and the walk
 //   floyd                  0017        the array as the graph i -> nums[i], the tortoise and the hare through both phases; the copy link carries the array and the step
 //   bfs01                  0005        the remainders modulo x on a ring, the BFS tree one dequeue at a time, the answer read back; a digit set and a length-only mode
@@ -32,7 +32,7 @@
 //   handshake              0038        req and ack drawn cell by cell; the four rules checked every cycle, a failure marked on its assertion's row
 //   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts; random traffic at a fault rate with the invariants checked
 //   credits                0024        the four counters as hands on a modulo-256 circle, the buffer, packets in flight; grant, transmit, lose, dequeue, sync; random legal traffic at a loss rate with the invariants checked
-//   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table
+//   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table; a timeline of every read's waits and completions
 //   trace                  0002, 0003  the page's Python one line (or one comparison) at a time: the swaps (and the three-variable XOR rotation) with a0 / b0 / c0 expressions, the double loop with its invariant
 // The math of each model is exported under Node, where the question tests compare it with
 // the Python reference (tests/0001 to 0022, 0026 to 0038).
@@ -1802,7 +1802,8 @@
     p.total = p.cpls.length;
     p.ready = s.cycle + rng.randint(EP_MIN_DELAY, EP_MAX_DELAY);
     s.pending.push(p);
-    s.reads.push({ id: p.id, tag: p.tag, rid: p.rid, address: p.address, length: p.length, sizes: p.cpls.map((c) => c.size) });
+    // the read's record keeps its timeline: issued at, and every wait window [from, ready]
+    s.reads.push({ id: p.id, tag: p.tag, rid: p.rid, address: p.address, length: p.length, sizes: p.cpls.map((c) => c.size), issued: s.cycle, waits: [[s.cycle, p.ready]] });
     return p;
   };
   const epNext = (s, rng) => {
@@ -1810,7 +1811,7 @@
     if (!ready.length) return null;
     const pick = ready[rng.choice(ready.length)], cpl = pick.cpls.shift();
     pick.sent += 1;
-    if (pick.cpls.length) pick.ready = s.cycle + rng.randint(1, EP_MAX_GAP);
+    if (pick.cpls.length) { pick.ready = s.cycle + rng.randint(1, EP_MAX_GAP); s.reads.find((r) => r.id === pick.id).waits.push([s.cycle, pick.ready]); }
     else s.pending.splice(s.pending.indexOf(pick), 1);
     const rec = { cycle: s.cycle, read: pick.id, tag: pick.tag, rid: pick.rid, address: cpl.address, size: cpl.size, bc: cpl.bc, first: cpl.data[0], last: cpl.data[cpl.data.length - 1] };
     s.out.push(rec);
@@ -1953,6 +1954,11 @@
 
   const f = (v, n = 1) => Number(v).toFixed(n);
   const ltr = (x) => `<bdi dir="ltr">${x}</bdi>`;   // math and numbers inside Hebrew text
+  // Arrow keys on a focused point: +1 for right / up, -1 for left / down, ten times with Shift.
+  const arrowStep = (e) => {
+    const d = e.key === "ArrowRight" || e.key === "ArrowUp" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -1 : 0;
+    return d * (e.shiftKey ? 10 : 1);
+  };
   const fmt = (v, n = 3) => Number(v).toFixed(n);
   const W = 640, H = 230, X0 = 46, RIGHT = 12, TOP = 14, BASE = 198;
 
@@ -3686,11 +3692,11 @@
       const rad = (d) => (d * Math.PI) / 180;
       const at = (d, r) => [C + r * Math.cos(rad(d)), C - r * Math.sin(rad(d))];
       box.innerHTML =
-        `<div class="tri-box"><svg class="figure tri-live" viewBox="0 0 320 320" role="img" aria-label="שלוש נקודות על מעגל היחידה">` +
+        `<div class="tri-box"><svg class="figure tri-live" viewBox="0 0 320 320" role="group" aria-label="שלוש נקודות על מעגל היחידה">` +
         `<circle class="axis-c" cx="${C}" cy="${C}" r="${R}" fill="none"/>` +
         `<g class="tri-arcs"></g><polygon class="tri-shape"/>` +
         `<circle class="center-dot" cx="${C}" cy="${C}" r="4"/><text class="tick" x="${C + 7}" y="${C + 15}">O</text>` +
-        NAMES.map((n, i) => `<circle class="tri-pt" data-i="${i}" r="9"><title>${n}</title></circle>` +
+        NAMES.map((n, i) => `<circle class="tri-pt" data-i="${i}" r="9" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="359"><title>${n}</title></circle>` +
           `<text class="legend tri-name" data-i="${i}" text-anchor="middle">${n}</text>`).join("") +
         `</svg><div class="tri-panel">` +
         `<p class="tri-angles">` + NAMES.map((n, i) =>
@@ -3770,6 +3776,7 @@
         angles.forEach((d, i) => {
           const [x, y] = at(d, R), [nx, ny] = at(d, R - 24);
           pts[i].setAttribute("cx", f(x)); pts[i].setAttribute("cy", f(y));
+          pts[i].setAttribute("aria-valuenow", d); pts[i].setAttribute("aria-label", `${NAMES[i]}: ${d} מעלות, חיצים מזיזים`);
           names[i].setAttribute("x", f(nx)); names[i].setAttribute("y", f(ny + 5));
           if (document.activeElement !== inputs[i] || running) inputs[i].value = d;
         });
@@ -3881,6 +3888,13 @@
       const end = () => { drag = null; svg.classList.remove("is-dragging"); };
       svg.addEventListener("pointerup", end);
       svg.addEventListener("pointercancel", end);
+      // keyboard: a focused point moves one degree per arrow, ten with Shift
+      svg.addEventListener("keydown", (e) => {
+        const t = e.target.closest(".tri-pt"), d = arrowStep(e);
+        if (!t || !d) return;
+        e.preventDefault(); e.stopPropagation(); stop();
+        const i = Number(t.dataset.i), next = [...angles]; next[i] += d; setAngles(next);
+      });
       render();
     },
   });
@@ -4889,7 +4903,7 @@
         `<button type="button" class="md-button md-button--primary ex-random">הגרלה</button>` +
         `<button type="button" class="md-button ex-regular">מצולע משוכלל</button>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
-        `<div class="tri-box"><svg class="figure tri-live" viewBox="0 0 320 320" role="img" aria-label="קודקודים על מעגל היחידה">` +
+        `<div class="tri-box"><svg class="figure tri-live" viewBox="0 0 320 320" role="group" aria-label="קודקודים על מעגל היחידה">` +
         `<circle class="axis-c" cx="${C}" cy="${C}" r="${R}" fill="none"/><g class="tri-arcs"></g><polygon class="tri-shape"/>` +
         `<circle class="center-dot" cx="${C}" cy="${C}" r="4"/><text class="tick" x="${C + 7}" y="${C + 15}">O</text><g class="poly-pts"></g></svg>` +
         `<div class="tri-panel"><p class="tri-angles"></p><p class="tri-status" aria-live="polite"></p><p class="tri-arcs-text"></p></div></div>` +
@@ -4921,7 +4935,7 @@
         arcsG.innerHTML = g;
         ptsG.innerHTML = angles.map((d, i) => {
           const [x, y] = at(d, R), [nx, ny] = at(d, R - 22);
-          return `<circle class="tri-pt" data-i="${i}" cx="${f(x)}" cy="${f(y)}" r="${n > 7 ? 7 : 9}"><title>P${i + 1}</title></circle>` +
+          return `<circle class="tri-pt" data-i="${i}" cx="${f(x)}" cy="${f(y)}" r="${n > 7 ? 7 : 9}" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="359" aria-valuenow="${d}" aria-label="P${i + 1}: ${d} מעלות, חיצים מזיזים"><title>P${i + 1}</title></circle>` +
                  `<text class="legend tri-name" x="${f(nx)}" y="${f(ny + 4)}" text-anchor="middle" font-size="${n > 6 ? 10 : 12}">P${i + 1}</text>`;
         }).join("");
         // the inputs follow n
@@ -4992,6 +5006,16 @@
       const end = () => { drag = null; svg.classList.remove("is-dragging"); };
       svg.addEventListener("pointerup", end);
       svg.addEventListener("pointercancel", end);
+      // keyboard: a focused vertex moves one degree per arrow, ten with Shift; the
+      // vertices are redrawn, so the focus is put back on the same one
+      svg.addEventListener("keydown", (e) => {
+        const t = e.target.closest(".tri-pt"), d = arrowStep(e);
+        if (!t || !d) return;
+        e.preventDefault(); e.stopPropagation();
+        const i = Number(t.dataset.i), next = [...st.angles];
+        next[i] = ((next[i] + d) % 360 + 360) % 360; st.angles = next; render();
+        const g = svg.querySelector(`.tri-pt[data-i="${i}"]`); if (g) g.focus({ preventScroll: true });
+      });
       void running;
       render();
     },
@@ -5567,9 +5591,9 @@
       chart.addEventListener("keydown", (e) => {
         const g = e.target.closest(".st-pt");
         if (!g) return;
-        const d = e.key === "ArrowUp" ? 1 : e.key === "ArrowDown" ? -1 : 0;
+        const d = e.key === "ArrowUp" || e.key === "ArrowDown" ? Math.sign(arrowStep(e)) * (e.shiftKey ? 5 : 1) : 0;
         if (!d) return;
-        e.preventDefault(); stop();
+        e.preventDefault(); e.stopPropagation(); stop();
         const i = Number(g.dataset.i), next = [...st.prices];
         next[i] = Math.max(1, Math.min(PMAX, next[i] + d)); st.prices = next; draw();
         chart.querySelector(`.st-pt[data-i="${i}"]`).focus({ preventScroll: true });
@@ -5987,7 +6011,7 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1200, 600, 250) +
         `<button type="button" class="md-button ex-run">הרץ עד שכל ה-Completions יצאו</button><span class="ex-pos"></span></div>` +
         `<p class="ex-title">הזיכרון, בלוק אחרי בלוק (128 בתים): הכתיבות צבועות, הקריאות הפתוחות מסומנות בקו</p><div class="ep-mem"></div>` +
-        `<p class="ex-title">קריאות פתוחות</p><div class="ep-pending"></div>` +
+        `<p class="ex-title">קריאות פתוחות</p><div class="ep-pending"></div><div class="ep-gantt"></div>` +
         `<p class="wv-step an-log" aria-live="polite"></p>` +
         `<p class="ex-title">ה-Completions שיצאו</p><div class="ep-table" tabindex="0"></div><p class="ex-summary an-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
@@ -6025,6 +6049,29 @@
             `<span class="an-chips" dir="ltr">${p.cpls.map((c, i) => `<span class="an-chip${i === 0 ? " is-head" : ""}">${c.size} B · BC ${c.bc}</span>`).join("")}</span> ` +
             `${p.sent ? `יצאו ${ltr(p.sent)} מתוך ${ltr(p.total)}, ` : ""}${status}.</p>`;
         }).join("") : `<p class="an-empty">אין קריאות פתוחות.</p>`;
+        // the timeline of every read: its random wait dashed, the time it is ready and
+        // waiting its turn solid, a mark per completion, and a line at the current cycle
+        const reads = s.reads;
+        if (!reads.length) $(".ep-gantt").innerHTML = "";
+        else {
+          const W = 520, L = 86, RH = 22, last = Math.max(s.cycle, ...reads.flatMap((r) => r.waits.map((w) => w[1]))) + 1;
+          const X = (c) => L + (c / last) * (W - L - 10), H = reads.length * RH + 22;
+          const step = last > 60 ? 20 : last > 30 ? 10 : last > 12 ? 5 : 1;
+          let g = `<svg class="ep-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="ציר המחזורים: לכל קריאה ההמתנות שלה וה-Completions שיצאו">`;
+          for (let c = 0; c <= last; c += step) g += `<line class="grid" x1="${f(X(c))}" x2="${f(X(c))}" y1="2" y2="${H - 18}"/><text class="tick" x="${f(X(c))}" y="${H - 5}" text-anchor="middle">${c}</text>`;
+          reads.forEach((r, i) => {
+            const y = 2 + i * RH + RH / 2, outs = s.out.filter((c) => c.read === r.id);
+            g += `<text class="wv-name" x="${L - 6}" y="${f(y + 4)}" text-anchor="end">Tag ${hex(r.tag, 2)}</text>`;
+            r.waits.forEach(([from, ready], k) => {
+              const until = outs[k] ? outs[k].cycle : s.cycle;
+              g += `<line class="ep-wait ${colour(r.id)}" x1="${f(X(from))}" x2="${f(X(ready))}" y1="${y}" y2="${y}"><title>ממתינה ממחזור ${from} עד ${ready}</title></line>`;
+              if (until > ready) g += `<line class="ep-ready ${colour(r.id)}" x1="${f(X(ready))}" x2="${f(X(until))}" y1="${y}" y2="${y}"><title>מוכנה ממחזור ${ready}, מחכה לתורה</title></line>`;
+            });
+            outs.forEach((c) => { g += `<circle class="ep-cpl ${colour(r.id)}" cx="${f(X(c.cycle))}" cy="${y}" r="5"><title>מחזור ${c.cycle}: ${c.size} בתים מ-${hex(c.address)}, Byte Count ${c.bc}</title></circle>`; });
+          });
+          g += `<line class="ep-now" x1="${f(X(s.cycle))}" x2="${f(X(s.cycle))}" y1="0" y2="${H - 16}"/>`;
+          $(".ep-gantt").innerHTML = g + `</svg><p class="viz-legend ep-legend"><span><i class="ep-lg-wait"></i>ממתינה לזמן האקראי</span><span><i class="ep-lg-ready"></i>מוכנה, מחכה לתורה</span><span><i class="ep-lg-cpl"></i>‏Completion יצא</span><span><i class="ep-lg-now"></i>המחזור הנוכחי</span></p>`;
+        }
         $(".an-log").innerHTML = (st.err ? `<span class="wv-bad">${st.err}</span> ` : "") + st.log;
         $(".ep-table").innerHTML = s.out.length ? `<table><thead><tr><th>מחזור</th><th>Requester ID</th><th>Tag</th><th>כתובת</th><th>גודל</th><th>Byte Count</th><th>הבית הראשון והאחרון</th></tr></thead><tbody>` +
           s.out.map((c) => `<tr class="${colour(c.read)}"><td>${ltr(c.cycle)}</td><td>${ltr(hex(c.rid, 4))}</td><td>${ltr(hex(c.tag, 2))}</td><td>${ltr(hex(c.address))}</td><td>${ltr(c.size)}</td><td>${ltr(c.bc)}</td><td>${ltr(`${hex(c.first, 2)} … ${hex(c.last, 2)}`)}</td></tr>`).join("") + `</tbody></table>` : `<p class="an-empty">עדיין לא יצא Completion.</p>`;
@@ -6331,6 +6378,7 @@
     ["button.ex-next, button.ex-cycle, button.ex-prev", "חיצים ← → לצעד"],
     ["button.ex-play, button.ex-solve", "רווח להפעלה ולעצירה"],
     ["button.ex-start, button.ex-first, button.ex-end, button.ex-last", "‏Home ו-End להתחלה ולסוף"],
+    ["[role=slider].tri-pt, [role=slider].st-pt", "‏Tab לנקודה וחיצים מזיזים אותה (עם Shift בקפיצות)"],
   ];
   const keyboard = (box) => {
     const hints = KEY_HINTS.filter(([sel]) => box.querySelector(sel)).map(([, text]) => text);
@@ -6342,7 +6390,7 @@
     box.append(hint);
     box.addEventListener("keydown", (e) => {
       const t = e.target;
-      if (t.matches("input, select, textarea") || (e.key === " " && t !== box && (t.matches("button") || t.getAttribute("role") === "button"))) return;
+      if (t.matches("input, select, textarea") || t.getAttribute("role") === "slider" || (e.key === " " && t !== box && (t.matches("button") || t.getAttribute("role") === "button"))) return;
       const hit = KEYS.find(([key]) => key === e.key);
       if (!hit) return;
       const btn = box.querySelector(hit[1]);
