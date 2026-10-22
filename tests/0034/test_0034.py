@@ -123,3 +123,40 @@ def test_explorer_widths():
             assert fl["empty"] == fifo_empty(bin2gray(w), bin2gray(r)) == ((w - r) % (2 * size) == 0)
             assert fl["full"] == fifo_full(bin2gray(w), bin2gray(r), bits) == ((w - r) % (2 * size) == size)
             assert fl["occupancy"] == (w - r) % (2 * size)
+
+
+def test_explorer_flag_strip():
+    """The timing strip of the FIFO box (X145): one column per write or read that the
+    FIFO accepts (a write when full and a read when empty are refused, so a burst stops
+    early), the pointers after it and the flags by the page's fifo_full / fifo_empty."""
+    import json
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(34)
+    runs = []
+    for size in (8, 16, 32, 64):
+        ops = []
+        for _ in range(60):
+            ops += [rng.choice("wr")] * rng.choice([1, 1, 2, size // 2])
+        runs.append((size, ops))
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(runs)}.map(([size, ops]) => m.grayFlagsOps(ops, size))));""")
+    for (size, ops), cols in zip(runs, got):
+        bits, w, r = size.bit_length(), 0, 0
+        want = [(None, 0, 0)]
+        for op in ops:
+            occ = (w - r) % (2 * size)
+            if op == "w" and occ < size:
+                w = (w + 1) % (2 * size)
+                want.append(("w", w, r))
+            elif op == "r" and occ > 0:
+                r = (r + 1) % (2 * size)
+                want.append(("r", w, r))
+        assert [(c["op"], c["w"], c["r"]) for c in cols] == want
+        for c in cols:
+            assert c["wg"] == bin2gray(c["w"]) and c["rg"] == bin2gray(c["r"])
+            assert c["full"] == fifo_full(c["wg"], c["rg"], bits) and c["empty"] == fifo_empty(c["wg"], c["rg"])
+        assert any(c["full"] for c in cols) and any(c["empty"] for c in cols[1:])

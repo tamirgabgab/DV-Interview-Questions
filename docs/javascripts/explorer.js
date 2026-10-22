@@ -25,9 +25,9 @@
 //   eurovision             0008        the announcements one by one: the cups under Israel's total against the points left; a what-if box
 //   boxes3                 0004        three mislabelled boxes with hidden contents: draw a ball, the deduction line by line
 //   edge                   0001        sig drawn cell by cell on a timing strip; sig_q and pulse follow, for a rising, falling or any edge; the reset trap
-//   lfsr                   0036        a width of 3 to 8 bits: tick the taps, step or play from 0…01 on a ring of the states (a list from 7 bits); the output bits; the polynomials and their periods, the primitive ones counted
+//   lfsr                   0036        a width of 3 to 8 bits: tick the taps, step or play from 0…01 on a ring of the states (up to 6 bits); a strip of clk, state, s[0] and fb; the polynomials and their periods, the primitive ones counted
 //   div3                   0035        the half-cycle model one clock edge at a time: cnt, a, b and clk_out on a strip, the duty measured; a wake-up in an unreachable state; a divide by N (2 to 10) and a strip length
-//   gray                   0034        a pointer step through a synchroniser, bit by bit, in binary and in Gray, for 3 to 6 bits; a FIFO of 8 to 64 entries with the pointers one bit wider and the flags
+//   gray                   0034        a pointer step through a synchroniser, bit by bit, in binary and in Gray, for 3 to 6 bits; a FIFO of 8 to 64 entries with the pointers one bit wider, the flags and a strip of the operations
 //   stock                  0006        prices to drag or draw, the scan played day by day: the cheapest and dearest day so far, the best long and short; the copy link carries the prices and the day
 //   handshake              0038        req and ack drawn cell by cell; the four rules checked every cycle, a failure marked on its assertion's row
 //   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts; random traffic at a fault rate with the invariants checked
@@ -1414,6 +1414,14 @@
     for (let k = width - 1; k >= 1; k--) if ((mask >> (width - k)) & 1) terms.push(k === 1 ? "x" : `x^${k}`);
     return terms.concat("1").join(" + ");
   };
+  // The LFSR strip: one slot per state visited so far (step 0 .. k), its value, the bit
+  // that leaves (s[0]) and the feedback bit that enters the next state.
+  const lfsrStrip = (mask, width, k, seed = 1) => {
+    const walk = lfsrWalk(mask, width, seed), total = walk.period;
+    const states = walk.states.concat(walk.states[walk.back]).slice(0, Math.min(k, total) + 1);
+    const fb = states.map((s) => { let v = 0; for (let x = s & mask; x; x >>= 1) v ^= x & 1; return v; });
+    return { states, out: states.map((s) => s & 1), fb, total };
+  };
   // φ(2^n − 1) / n: the number of primitive polynomials of degree n (Euler's totient by trial division)
   const lfsrPrimitiveCount = (width) => {
     let n = (1 << width) - 1, phi = n;
@@ -1508,6 +1516,21 @@
       seenGrayAsBin: grayToBin(seenGray, bits),
       wrongCount: changedBin.length >= 1 ? (1 << changedBin.length) - 2 : 0,
     };
+  };
+  // The FIFO strip: the operations so far, one column each (a burst is several), with the
+  // pointers and the flags after it; a full FIFO refuses a write and an empty one a read,
+  // so a burst stops early. Column 0 is the reset.
+  const grayFlagsOps = (ops, size) => {
+    const bits = Math.log2(size) + 1, wrap = 2 * size - 1;
+    let w = 0, r = 0;
+    const col = (op) => { const fl = grayFlags(w, r, bits); return { op, w, r, wg: fl.wg, rg: fl.rg, full: fl.full, empty: fl.empty, occupancy: fl.occupancy }; };
+    const cols = [col(null)];
+    ops.forEach((op) => {
+      const fl = grayFlags(w, r, bits);
+      if (op === "w" && !fl.full) { w = (w + 1) & wrap; cols.push(col("w")); }
+      else if (op === "r" && !fl.empty) { r = (r + 1) & wrap; cols.push(col("r")); }
+    });
+    return cols;
   };
   const grayFlags = (w, r, bits) => {
     const wg = grayOf(w), rg = grayOf(r);
@@ -2017,7 +2040,7 @@
     EURO_RESULTS, EURO_PUBLIC_TOTAL, euroOrder, euroWithIsrael, euroCannotWin, euroScan,
     boxesCases, boxesDraw, boxesFix, boxesDeduce,
     EDGE_MODES, edgeTrace, lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, lfsrPrimitiveCount, div3Params, div3Trace, div3Duty,
-    grayOf, grayToBin, bitsOf, graySample, grayFlags,
+    grayOf, grayToBin, bitsOf, graySample, grayFlags, grayFlagsOps, lfsrStrip,
     stockScan, stockRandom, hsCheck, HS_PRESETS, hsWave,
     AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, anInvariants, anRandomScript, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun, crBalance, crInvariants, crRandomScript,
     EP_RCB, epUnitRng, epValueRng, epInit, epWrite, epReadBytes, epFragments, epRead, epNext, epCycle, EP_SCRIPTS, epRunScript,
@@ -3757,7 +3780,7 @@
           { name: "count", wave: cv.map((v, k) => (k && v === cv[k - 1] ? "." : "=")).join(""), data: cv.filter((v, k) => !k || v !== cv[k - 1]).map(String) },
         ], head: { text: `t = ${f(ws * 0.05, 1)} .. ${f(we * 0.05, 1)} ns` } };
         wd.signal.forEach((l) => { if (l.period === 1) delete l.period; if (l.phase === 0) delete l.phase; });
-        return `<svg class="wave-strip fifo-wave" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="רצועת תזמון: שני השעונים, הכתיבות, הקריאות ומילוי ה-FIFO" data-wavedrom="${attr(waveDromText(wd))}">${s}</svg>`;
+        return stickyNames(`<svg class="wave-strip fifo-wave" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="רצועת תזמון: שני השעונים, הכתיבות, הקריאות ומילוי ה-FIFO" data-wavedrom="${attr(waveDromText(wd))}">${s}</svg>`, rows, L, T, RH);
       };
       const chart = (trace, tEnd, formula, yMax, tW) => {
         const w = 640, h = 240, x0 = 44, right = 16, top = 16, base = 204;
@@ -5213,6 +5236,12 @@
   // shaded where high), "bus" (labelled boxes merged over equal values). A row's values
   // may stop early (frames not reached yet). `cells` on a row makes every slot a button
   // (data-k); `marks` on a row shades slots; `cursor` outlines one slot.
+  // The row names of a strip again as an HTML column that sticks to the left edge of the
+  // scroll container, so a long strip scrolled to its end still says which row is which
+  // (the names inside the svg stay for the enlarged copy).
+  const stickyNames = (svg, names, L, T, RH) =>
+    `<div class="wv-row"><div class="wv-names" aria-hidden="true" style="width:${L}px;margin-right:-${L}px;padding-top:${T}px">` +
+    names.map((n) => `<div style="height:${RH}px;line-height:${RH - 2}px">${n}</div>`).join("") + `</div>${svg}</div>`;
   const waveStrip = (rows, N, opts = {}) => {
     const L = opts.labelW ?? 66, SW = opts.slotW ?? 36, RH = 30, T = opts.ticks ? 20 : 8;
     const W = L + N * SW + 6, H = T + rows.length * RH + 4;
@@ -5265,7 +5294,7 @@
         s += `<rect class="wv-cell" data-k="${k}" x="${x(k)}" y="${y0 + 1}" width="${SW}" height="${RH - 2}" tabindex="0" role="button" aria-label="${row.cells(k)}"/>`;
       }
     });
-    return s + "</svg>";
+    return stickyNames(s + "</svg>", rows.map((row) => row.name), L, T, RH);
   };
   const code = (t) => `<code>${t}</code>`;
 
@@ -5344,9 +5373,9 @@
 
   // The LFSR box (0036): a width of 3 to 8 bits, tick the taps (x^n and 1 are fixed), step
   // or play from 0…01 on a ring of the 2^n − 1 non-zero states (0 sits in the middle as the
-  // fixed point; from 7 bits the states are listed instead of drawn), the output bits so
-  // far, and the table of the polynomials with their periods: every one up to 5 bits, the
-  // primitive ones from 6 bits on, with the count φ(2^n − 1) / n.
+  // fixed point; up to 6 bits), a timing strip of clk, the state, s[0] and the feedback bit
+  // for every step so far, and the table of the polynomials with their periods: every one
+  // up to 5 bits, the primitive ones from 6 bits on, with the count φ(2^n − 1) / n.
   const lfsrView = () => ({
     mount(box) {
       const SEED = 1, RING_MAX = 6, FULL_TABLE = 5;
@@ -5373,8 +5402,9 @@
         `<button type="button" class="md-button ex-end">עד שהמצב חוזר</button><span class="ex-pos"></span></div>` +
         `<div class="lf-box"><div class="lf-ring"></div><div class="lf-panel">` +
         `<p class="lf-poly"></p><p class="lf-state"></p><p class="lf-fb"></p>` +
-        `<p class="ex-title">הביטים שיצאו (${code("s[0]")} של כל מצב)</p><p class="lf-out" dir="ltr"></p>` +
         `<p class="ex-summary lf-sum" aria-live="polite"></p></div></div>` +
+        `<p class="ex-title">רצועת התזמון: המצב, הביט שיוצא (${code("s[0]")}) וביט ההיזון החוזר שנכנס, צעד אחרי צעד</p>` +
+        `<div class="wv-wrap lf-strip" tabindex="0" role="group" aria-label="רצועת התזמון של ה-LFSR, גלילה אופקית"></div>` +
         `<p class="ex-title lf-table-title"></p><div class="lf-table" tabindex="0"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
@@ -5412,15 +5442,26 @@
              `<path class="lf-loop" d="M${C + 12},${C - zr + 4} a 11 11 0 1 1 -24 0" marker-end="url(#lf-arrow)"/></svg>`;
         return s;
       };
-      // from 7 bits: the states visited so far, as a list, the current one marked
-      const list = (shown) => `<p class="ex-note">‏${ltr(states())} מצבים שאינם אפס: יותר מדי לטבעת, ולכן רשימת המצבים שבוקרו.</p>` +
-        `<p class="lf-list" dir="ltr">${shown.map((v, i) => `<span class="${i === shown.length - 1 ? "is-cur" : ""}${v === SEED ? " is-seed" : ""}">${bits(v)}</span>`).join(" ")}</p>`;
+      // from 7 bits there is no ring: the strip below lists the states
+      const noRing = () => `<p class="ex-note">‏${ltr(states())} מצבים שאינם אפס: יותר מדי לטבעת. רצועת התזמון שמתחת מראה את המצבים שבוקרו, בהקסה.</p>`;
+      // the strip: every step so far, the bus in binary up to 6 bits and in hex beyond
+      const stripHtml = () => {
+        const sp = lfsrStrip(st.mask, st.width, st.k, SEED), hex = st.width > 6;
+        const label = (v) => (hex ? `0x${v.toString(16).toUpperCase().padStart(2, "0")}` : bits(v));
+        const SW = hex ? 40 : Math.max(36, Math.round(14 + 7.6 * st.width)), n = sp.states.length;
+        return waveStrip([
+          { name: "clk", kind: "clock" },
+          { name: "state", kind: "bus", values: sp.states.map(label) },
+          { name: "s[0]", kind: "bit", values: sp.out, cls: "wv-s2" },
+          { name: "fb", kind: "bit", values: sp.fb, cls: "wv-s1" },
+        ], n, { slotW: SW, cursor: n - 1, ticks: (k) => k, label: `רצועת התזמון של ה-LFSR: ${n} מצבים` });
+      };
       const draw = () => {
         const walk = lfsrWalk(st.mask, st.width, SEED), total = walk.period, n = states();
         st.k = Math.min(st.k, total);
         box.querySelectorAll(".ex-tap").forEach((c) => { c.checked = ((st.mask >> (st.width - Number(c.dataset.k))) & 1) === 1; });
         const shown = walk.states.concat(walk.states[walk.back]).slice(0, st.k + 1);
-        $(".lf-ring").innerHTML = st.width <= RING_MAX ? ring(walk, shown) : list(shown);
+        $(".lf-ring").innerHTML = st.width <= RING_MAX ? ring(walk, shown) : noRing();
         const cur = st.k < total ? walk.states[st.k] : walk.states[walk.back];
         const tapsIdx = [];
         for (let i = 0; i < st.width; i++) if ((st.mask >> i) & 1) tapsIdx.push(i);
@@ -5432,7 +5473,9 @@
         $(".lf-state").innerHTML = `המצב אחרי ${ltr(st.k)} צעדים: ${code(bits(cur))}` + (st.k === total ? ` — חזר למצב ההתחלה.` : ".");
         $(".lf-fb").innerHTML = `הצעד הבא: ${ltr(`${code("fb")} = ${code(tapsIdx.map((i) => `s[${i}]`).join(" ^ "))} = ${tapsIdx.map((i) => (cur >> i) & 1).join(" ^ ")} = ${fb}`)}, ` +
           `ואז ${ltr(`${code(`(${bits(cur)} >> 1) | (${fb} << ${st.width - 1})`)} = ${code(bits(next))}`)}.`;
-        $(".lf-out").innerHTML = walk.states.slice(0, Math.min(st.k, total - 1) + 1).map((v, i) => `<span class="${i === st.k ? "is-cur" : ""}">${v & 1}</span>`).join("");
+        const wrap = $(".lf-strip");
+        wrap.innerHTML = stripHtml();
+        wrap.scrollLeft = wrap.scrollWidth;                // the current step in view
         const maximal = total === n;
         $(".lf-sum").innerHTML = st.k < total
           ? `בוקרו ${ltr(st.k + 1)} מצבים מתוך ${ltr(n)}. ` + (maximal ? `הפולינום פרימיטיבי: המחזור יהיה ${ltr(n)}.` : `המחזור של הפולינום הזה הוא ${ltr(total)}, ולכן ${ltr(n - total)} מצבים לא יבוקרו לעולם.`)
@@ -5650,7 +5693,8 @@
     },
   });
   const grayFlagsMount = (box) => {
-    const st = { size: 16, w: 0, r: 0, hist: [] };
+    const st = { size: 16, w: 0, r: 0, hist: [], ops: [] };
+    const KEEP = 64;                                       // columns kept on the strip
     const bitsN = () => Math.log2(st.size) + 1;          // one bit above the address
     box.innerHTML =
       `<div class="ex-controls"><label>עומק ה-FIFO <select class="ex-size" aria-label="מספר הכניסות">${[8, 16, 32, 64].map((v) => `<option value="${v}"${v === 16 ? " selected" : ""}>${v} כניסות</option>`).join("")}</select></label>` +
@@ -5661,7 +5705,9 @@
       `<button type="button" class="md-button ex-prev">צעד אחורה</button>` +
       `<button type="button" class="md-button ex-start">איפוס</button></div>` +
       `<div class="gr-slots" dir="ltr" role="img"></div>` +
-      `<div class="gr-ptrs"></div><p class="ex-summary gr-sum" aria-live="polite"></p>`;
+      `<div class="gr-ptrs"></div><p class="ex-summary gr-sum" aria-live="polite"></p>` +
+      `<p class="ex-title">רצועת התזמון: עמודה לכל כתיבה או קריאה, המצביעים אחריה והדגלים</p>` +
+      `<div class="wv-wrap gr-strip" tabindex="0" role="group" aria-label="רצועת התזמון של ה-FIFO, גלילה אופקית"></div>`;
     const $ = (sel) => box.querySelector(sel);
     const draw = () => {
       const BITS = bitsN(), SIZE = st.size, half = SIZE / 2, fl = grayFlags(st.w, st.r, BITS);
@@ -5694,21 +5740,36 @@
       if (fl.occupancy === 0 && st.w !== 0) sum += ` בלי הביט הנוסף המצביעים היו ${ltr(lowBits)} ו-${ltr(bitsOf(ra, low))}: שווים, בדיוק כמו במצב מלא.`;
       if (fl.full) sum += ` ${ltr(low)} הביטים הנמוכים של שני המצביעים שווים (${ltr(lowBits)}): בלי הביט הנוסף זה היה נראה ריק.`;
       $(".gr-sum").innerHTML = sum;
+      // the strip: the last KEEP columns of the operations so far
+      const all = grayFlagsOps(st.ops, SIZE), first = Math.max(0, all.length - KEEP), cols = all.slice(first);
+      const SW = Math.round(16 + 7.6 * BITS), n = cols.length;
+      const wrapEl = $(".gr-strip");
+      wrapEl.innerHTML = waveStrip([
+        { name: "wr", kind: "bit", values: cols.map((c) => (c.op === "w" ? 1 : 0)), cls: "wv-s2" },
+        { name: "rd", kind: "bit", values: cols.map((c) => (c.op === "r" ? 1 : 0)), cls: "wv-s3" },
+        { name: "wptr", kind: "bus", values: cols.map((c) => bitsOf(c.w, BITS)) },
+        { name: "wptr Gray", kind: "bus", values: cols.map((c) => bitsOf(c.wg, BITS)) },
+        { name: "rptr", kind: "bus", values: cols.map((c) => bitsOf(c.r, BITS)) },
+        { name: "rptr Gray", kind: "bus", values: cols.map((c) => bitsOf(c.rg, BITS)) },
+        { name: "full", kind: "bit", values: cols.map((c) => (c.full ? 1 : 0)), cls: "wv-s1" },
+        { name: "empty", kind: "bit", values: cols.map((c) => (c.empty ? 1 : 0)), cls: "wv-s1" },
+      ], n, { slotW: SW, labelW: 84, cursor: n - 1, ticks: (k) => first + k, label: `רצועת התזמון של ה-FIFO: ${n} עמודות` });
+      wrapEl.scrollLeft = wrapEl.scrollWidth;
     };
     const step = (dw, dr) => {
       const BITS = bitsN(), wrap = 2 * st.size - 1;
-      st.hist.push([st.w, st.r]); if (st.hist.length > 200) st.hist.shift();
-      for (let i = 0; i < dw; i++) if (!grayFlags(st.w, st.r, BITS).full) st.w = (st.w + 1) & wrap;
-      for (let i = 0; i < dr; i++) if (!grayFlags(st.w, st.r, BITS).empty) st.r = (st.r + 1) & wrap;
+      st.hist.push([st.w, st.r, st.ops.length]); if (st.hist.length > 200) st.hist.shift();
+      for (let i = 0; i < dw; i++) if (!grayFlags(st.w, st.r, BITS).full) { st.w = (st.w + 1) & wrap; st.ops.push("w"); }
+      for (let i = 0; i < dr; i++) if (!grayFlags(st.w, st.r, BITS).empty) { st.r = (st.r + 1) & wrap; st.ops.push("r"); }
       draw();
     };
     $(".ex-write").addEventListener("click", () => step(1, 0));
     $(".ex-read").addEventListener("click", () => step(0, 1));
     $(".ex-write8").addEventListener("click", () => step(st.size / 2, 0));
     $(".ex-read8").addEventListener("click", () => step(0, st.size / 2));
-    $(".ex-prev").addEventListener("click", () => { const h = st.hist.pop(); if (h) { [st.w, st.r] = h; } draw(); });
-    $(".ex-start").addEventListener("click", () => { st.w = 0; st.r = 0; st.hist = []; draw(); });
-    $(".ex-size").addEventListener("change", () => { st.size = Number($(".ex-size").value); st.w = 0; st.r = 0; st.hist = []; draw(); });
+    $(".ex-prev").addEventListener("click", () => { const h = st.hist.pop(); if (h) { [st.w, st.r] = h; st.ops.length = h[2]; } draw(); });
+    $(".ex-start").addEventListener("click", () => { st.w = 0; st.r = 0; st.hist = []; st.ops = []; draw(); });
+    $(".ex-size").addEventListener("change", () => { st.size = Number($(".ex-size").value); st.w = 0; st.r = 0; st.hist = []; st.ops = []; draw(); });
     draw();
   };
 
@@ -6610,9 +6671,9 @@
     eurovision: "״ההכרזה הבאה״ מוסיפה מדינה: הכוסות מתחת לסכום של ישראל כנגד הנקודות שנותרו. תיבת ה״מה אם״ משנה את הניקוד של ישראל.",
     boxes3: "שלוש קופסאות עם תוויות שגויות: לוחצים על קופסה כדי להוציא כדור, וההיסק נכתב שורה אחרי שורה. ״סידור אחר״ מגריל תכולה.",
     edge: "לוחצים על משבצות של sig ברצועת התזמון: sig_q ו-pulse עוקבים לפי בורר השפה. המתג מראה את מלכודת האיפוס, והכפתור טוען את הדיאגרמה של העמוד. ״העתקת WaveDrom״ מעתיקה את הרצועה כ-JSON.",
-    lfsr: "מסמנים taps ובוחרים רוחב: ״צעד״ ו״הפעלה״ מריצים את המצב מ-0…01 על טבעת המצבים (רשימה מ-7 ביטים), הביטים שיצאו נרשמים, והטבלה נותנת את אורך המחזור של כל פולינום.",
+    lfsr: "מסמנים taps ובוחרים רוחב: ״צעד״ ו״הפעלה״ מריצים את המצב מ-0…01 על טבעת המצבים (עד 6 ביטים), רצועת התזמון מראה את המצב, הביט שיוצא וביט ההיזון בכל צעד, והטבלה נותנת את אורך המחזור של כל פולינום.",
     div3: "״השפה הבאה״ ו״הפעלה״ מריצים את מודל חצאי המחזור: cnt, a, b ו-clk_out על רצועה, וה-duty נמדד. ״התעוררות״ מתחילה ממצב לא נגיש לפי בורר המונה, והסליידר מחלק ב-N. ״העתקת WaveDrom״ מעתיקה את הרצועה כ-JSON.",
-    gray: "בסנכרן בוחרים מצביע ורוחב, וכל ביט שמשתנה נדגם ישן או חדש (בלחיצה או ב״הגרלה״). ב-FIFO ״כתיבה״ ו״קריאה״ מזיזים את המצביעים, ו-empty ו-full מחושבים לפי הכללים.",
+    gray: "בסנכרן בוחרים מצביע ורוחב, וכל ביט שמשתנה נדגם ישן או חדש (בלחיצה או ב״הגרלה״). ב-FIFO ״כתיבה״ ו״קריאה״ מזיזים את המצביעים, empty ו-full מחושבים לפי הכללים, ורצועת התזמון מוסיפה עמודה לכל פעולה.",
     stock: "גוררים מחירים או מגרילים: ״היום הבא״ ו״הפעלה״ מריצים את הסריקה יום אחרי יום עם המינימום והמקסימום עד כה והעסקה הטובה ביותר. הבורר עובר ללונג בלבד.",
     handshake: "לוחצים על משבצות של req ו-ack ברצועה: ארבעת הכללים נבדקים בכל מחזור, וכישלון מסומן בשורת ה-assertion שלו. ה-presets טוענים את ארבע הדוגמאות של העמוד. ״העתקת WaveDrom״ מעתיקה את הרצועה כ-JSON.",
     acknak: "ה-RC וה-EP עם שני תורי הקישור: ״הצעד הבא״ ו״הפעלה״ מריצים את תסריטי העמוד, האירועים החופשיים שולחים, מוסרים (גם עם CRC שגוי או אובדן) ומפעילים טיימרים, ו״הרצה אקראית״ מגרילה תנועה עם תקלות ובודקת את האינווריאנטים.",

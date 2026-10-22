@@ -61,3 +61,32 @@ def test_explorer_widths():
     four = {r["poly"]: r["period"] for r in got[1][0]}
     assert four["x^4 + x^3 + 1"] == 15 and four["x^4 + x^2 + 1"] == 6 and four["x^4 + x + 1"] == 15 and four["x^4 + 1"] == 4
     assert got[5][1] == 16                                   # the 8-bit follow-up: 16 primitive polynomials
+
+
+def test_explorer_strip():
+    """The timing strip of the box (X145): for every width and a primitive and a
+    non-primitive mask, the slots are the states from 0…01 up to the step reached (the
+    first state again after a full period), s[0] is the low bit of each and fb the parity
+    of the tapped bits, which is the bit the next state takes at the top."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    cases = [(3, 0b011, 20), (4, 0b0011, 15), (4, 0b0101, 9), (5, 0b00101, 31), (6, 0b000011, 70), (8, 0b00011101, 300)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map(([w, mask, k]) => m.lfsrStrip(mask, w, k))));""")
+    for (width, mask, k), sp in zip(cases, got):
+        s, states = 1, []
+        while True:
+            states.append(s)
+            fb = bin(s & mask).count("1") & 1
+            s = (s >> 1) | (fb << (width - 1))
+            if s in states:
+                break
+        period = len(states) - states.index(s)
+        assert sp["total"] == period
+        want = (states + [s])[: min(k, period) + 1]
+        assert sp["states"] == want and sp["out"] == [v & 1 for v in want]
+        assert sp["fb"] == [bin(v & mask).count("1") & 1 for v in want]
+        assert all(nxt >> (width - 1) == fb for nxt, fb in zip(want[1:], sp["fb"]))

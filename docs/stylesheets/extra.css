@@ -1896,12 +1896,6 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .lf-edge.is-cur { stroke: var(--viz-s2); stroke-width: 2.5; stroke-opacity: 1; }
 .md-typeset svg .lf-arrowhead { fill: var(--viz-ink); }
 .md-typeset svg .lf-loop { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 3 2; }
-.md-typeset .explorer .lf-out { font-family: var(--md-code-font-family); font-size: 0.8rem; letter-spacing: 0.12em; word-break: break-all; }
-.md-typeset .explorer .lf-out span.is-cur { color: var(--viz-s2-text); font-weight: 700; }
-.md-typeset .explorer .lf-list { font-family: var(--md-code-font-family); font-size: 0.7rem; line-height: 1.7; max-height: 12rem; overflow-y: auto; }
-.md-typeset .explorer .lf-list span { padding: 0 0.15rem; border-radius: 0.2rem; }
-.md-typeset .explorer .lf-list span.is-seed { font-weight: 700; }
-.md-typeset .explorer .lf-list span.is-cur { background: var(--viz-s2); color: var(--md-default-bg-color); font-weight: 700; }
 .md-typeset .explorer .lf-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .lf-bad { color: var(--diff-hard); font-weight: 700; }
 .md-typeset .explorer .lf-table { margin-top: 0.3rem; overflow-x: auto; }
@@ -2116,3 +2110,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .fifo-win { fill: var(--viz-s3); fill-opacity: 0.12; stroke: var(--viz-s3); stroke-width: 1; stroke-dasharray: 4 3; }
 .md-typeset .explorer .fifo-winlab input[type="range"] { width: 14rem; }
 .md-typeset .explorer .fifo-wintext { font-size: 0.7rem; color: var(--viz-text); }
+
+/* every timing strip: the row names stick to the left edge while the strip scrolls */
+.md-typeset .explorer .wv-row { display: flex; align-items: flex-start; width: max-content; }
+.md-typeset .explorer .wv-names { position: sticky; left: 0; z-index: 1; flex: none; box-sizing: border-box; padding-right: 8px; text-align: right; background: var(--md-default-bg-color); font-family: var(--md-code-font-family); font-size: 12px; color: var(--viz-text); white-space: nowrap; overflow: hidden; }
+.md-typeset .explorer .wv-row:has(> .fig-wrap) .wv-names { margin-top: 1.8rem; }
