@@ -1211,6 +1211,47 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       rotation at the end, the 10,000-person cake with its window and scrolling table,
       the escort plan and the bridge of three played to the end); lint, the Python tests,
       strict build, links, phone and axe light and dark.
+13. **Round W, batch 2 (W152, W162, W177; the owner's answers: a digits field with two
+    preset buttons; the length-only mode as the same ring without arrows, a layer number
+    per remainder and a memory line; a rule select on 0016 with a "41 people" button; the
+    seat lookup as a field, rings on the chart and a sentence with the next N; an N field
+    up to a million with the circle and steps up to 128; an N slider from 2 to 10, even
+    included; a strip length select 18 / 30 / 60):**
+    - W152: `bfs01Trace(x, digits)` and `bfs01Counts(x, digits)`: the BFS starts from
+      every non-zero digit, tries the digits in order, answers null when the queue
+      empties, and records the BFS layer (`depth`) of every remainder; the enumerated
+      count is the answer's rank among the numbers over the set. The box: "הספרות
+      המותרות" (up to three digits) with the page's and the follow-up's sets as buttons,
+      a legend per digit, a "רק האורך" toggle (no arrows or digits, the layer beside each
+      remainder, the length alone in the panel, and the memory line: x parents of
+      ⌈log₂ x⌉ bits plus x digits against three x-bit bitmaps, for the typed x and for a
+      16-bit x). Test: six digit sets for x up to 40 against a rank enumeration and a
+      reachability check.
+    - W162: `josephusKR(n, keep, remove)` (the page's semantics, steps as [stays[],
+      leave[]]), `josephusSurvivor` (a circular linked list, O(n)), `josephusRecurrence`
+      (f(m) = (f(m − 1) + 3) mod m) and `josephusSeats(s, L | null, count, limit)`. The
+      0016 box: "הכלל" (the page's rule or Josephus's two-stay-one-leaves) with "41
+      אנשים" (survivor 30, 31 counted from 1), the recurrence in the summary. Both boxes:
+      "המושב" rings the chart points and lists the first five N (for L = 2 the sentence
+      gives N = 2^k + s/2 and "never" for an odd seat), and an N field up to a million
+      (above 128 the circle and the play row hide; the summary compares the linked-list
+      survivor with the formula or the recurrence, with the digits in base 2 or 3). The
+      chart skips the tick that would overlap the chosen N's. Tests: the general rule
+      against the page's steps, a plain every-third simulation, the formula, a scan for
+      the seats and N = 10⁶.
+    - W177: `div3Params(N)` and `div3Trace(halfCycles, cnt0, counter, N)`: a counter
+      modulo N in ⌈log₂ N⌉ bits, `a` high for the last ⌊N/2⌋ counts, `b` half a cycle
+      later, the output `a | b` for an odd N and `a` alone for an even one (the OR would
+      add half a cycle); the wake-up state is the counter's highest when it is ≥ N. The
+      box: an N slider (2 to 10), "אורך הרצועה" (18 / 30 / 60 cycles), a reset, texts
+      that follow N (the `a` condition, the wrap of the wake state, the even case), the
+      wake button names its state and is disabled for N = 2, 4, 8. Test: every N against
+      a plain Python model, 50% duty with a period of N cycles, the three counter
+      variants from the wake state.
+    - Checks in the sandbox: the three boxes light and dark at 1100 and 390 px (the 3/7
+      set, the length-only ring, the no-solution case; the 41-people run, the seat rings,
+      N = 10⁶ on both pages; N = 5 and N = 4 strips); lint, the Python tests, strict
+      build, links, phone and axe light and dark.
 
 ---
 
@@ -1221,9 +1262,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   question now has an explorer. Round T is closed. An audit of all 34 explorer kinds
   against the pages' follow-up questions produced rounds V (infrastructure), W (follow-ups
   per page) and X (timing strips), recorded under "Round U" below. Round V is done
-  (session 20). Round W (trimmed by the owner; W172 dropped) runs in batches: batch 1
-  (W149, W170, W173) is done; next batch 2 (W152, W162, W177), then batch 3 (W154, W164,
-  W169), then rounds U and X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
+  (session 20). Round W (trimmed by the owner; W172 dropped) runs in batches: batches 1
+  (W149, W170, W173) and 2 (W152, W162, W177) are done; next batch 3 (W154, W164, W169),
+  then rounds U and X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1701,14 +1742,14 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 | Id | Page | Missing | Size |
 |---|---|---|---|
 | ~~W149~~ | 0002 trace (swap) | ~~A three-variable rotation; a reset~~ done (session 20, batch 1) | S |
-| W152 | 0005 bfs01 | A digit-set choice (3 and 7); a "length only" mode without parents, with the bit count for the hardware follow-up | S–M |
+| ~~W152~~ | 0005 bfs01 | ~~A digit-set choice (3 and 7); a "length only" mode without parents, with the bit count for the hardware follow-up~~ done (session 20, batch 2) | S–M |
 | W154 | 0007 triangle / polygon | The exact discrete count over C(360, n) beside the continuous formula; a histogram of the largest arc ("fat triangles") | M |
-| W162 | 0016, 0022 josephus | The "every third leaves" rule (41 people) on 0016; a reverse lookup "for which N does seat s survive"; N above 64 | S–M |
+| ~~W162~~ | 0016, 0022 josephus | ~~The "every third leaves" rule (41 people) on 0016; a reverse lookup "for which N does seat s survive"; N above 64~~ done (session 20, batch 2) | S–M |
 | W164 | 0018, 0019 hourglass | Minimise flips instead of events; a third hourglass | M |
 | W169 | 0026 motorcycle | Four people and n; a distance field (52 km); two strategies overlaid on one chart | M |
 | ~~W170~~ | 0027, 0028 cake | ~~Wider ranges: d up to 0.8 and negative, a down to 0.0001, q up to 3 and below 1~~ done (session 20, batch 1) | S |
 | ~~W173~~ | 0031 bridge | ~~Bridge capacity 3; a comparison with the two classic strategies~~ done (session 20, batch 1) | S |
-| W177 | 0035 div3 | Divide by a general N (5); a selectable strip length | M |
+| ~~W177~~ | 0035 div3 | ~~Divide by a general N (5); a selectable strip length~~ done (session 20, batch 2) | M |
 
 ### Round X — one timing strip for the protocols (proposed in session 20, owner picks)
 
@@ -1719,8 +1760,8 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 | X147 | 0033 | **A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart | S |
 
 Suggested order (session 20): round V is done. Round W runs in three batches (the owner
-answers multiple-choice questions per batch): batch 1 (W149, W170, W173) is done; batch 2
-is W152, W162, W177; batch 3 is W154, W164, W169. Then U135 and U139, then round X on top
+answers multiple-choice questions per batch): batches 1 (W149, W170, W173) and 2 (W152,
+W162, W177) are done; batch 3 is W154, W164, W169. Then U135 and U139, then round X on top
 of V.
 
 
