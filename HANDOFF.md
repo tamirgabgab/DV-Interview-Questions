@@ -1406,6 +1406,27 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       lane renders correctly (levels, not "p"); the 0033 strip at the start, the middle
       and past the peak, light and dark at 1100 and 390 px; lint, the Python tests (277),
       strict build, links, phone and axe light and dark.
+19. **Round X, batch 2 (X145; the owner's answers: clk, the state as a bus, s[0] and fb,
+    replacing the output-bit line and the 7–8-bit list; every step so far, scrolled to
+    the cursor; wr, rd, both pointers in binary and Gray, full and empty; one column per
+    write or read, a burst button adding several):**
+    - `lfsrStrip(mask, width, k)` and `grayFlagsOps(ops, size)` (pure, exported). The
+      LFSR box draws the strip under the ring and the panel (the bus in binary up to 6
+      bits, in hex beyond; slots sized to the label); from 7 bits the ring area says the
+      strip lists the states. The FIFO box keeps the operations it accepted (a refused
+      write or read adds nothing), draws the last 64 columns with their absolute index as
+      ticks, and "צעד אחורה" removes the columns of the press it undoes.
+    - Every strip's row names are now also an HTML column that sticks to the left edge
+      of the scroll container (`stickyNames`, used by `waveStrip` and the 0033 strip), so
+      a long strip scrolled to its end still names its rows; the names in the svg stay
+      for the enlarged copy.
+    - Tests: the strip states, s[0] and fb of six width / mask cases against a Python
+      LFSR (including the wrap after a full period); the FIFO columns of random bursts
+      on 8 to 64 entries against a Python occupancy model and the page's fifo_full /
+      fifo_empty. Checks in the sandbox: both strips light and dark at 1100 and 390 px,
+      the 8-bit LFSR at step 40, the FIFO after a full burst, a read burst and an undo,
+      the sticky names on 0001, 0034 and 0038; lint, the Python tests (279), strict
+      build, links, phone and axe light and dark.
 
 ---
 
@@ -1419,7 +1440,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   (session 20). Round W (trimmed by the owner; W172 dropped) is done in three batches
   (W149, W170, W173; W152, W162, W177; W154, W164, W169). Round U (U134 to U139, the
   owner's pick) is done in three batches (U134, U135; U136, U137; U138, U139). Round X
-  with U133 is in progress: batch 1 (U133, X147) done; next X145, then X146; then the
+  with U133 is in progress: batches 1 (U133, X147) and 2 (X145) done; next X146; then the
   open rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
@@ -1911,13 +1932,13 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 
 | Id | Page | Idea | Size |
 |---|---|---|---|
-| X145 | 0036, 0034 | **Timing strip in the LFSR and FIFO-flags boxes**: states, output bits and pointers as waves over time with the `waveStrip` of 0001 / 0035, instead of lists | S–M |
+| ~~X145~~ | 0036, 0034 | ~~**Timing strip in the LFSR and FIFO-flags boxes**: states, output bits and pointers as waves over time with the `waveStrip` of 0001 / 0035, instead of lists~~ done (session 20, round X batch 2; the FIFO strip a column per accepted operation) | S–M |
 | X146 | 0023, 0024, 0025 | **Event axis for the three reference models**: every event a column on a strip with Seq / credits / cycle, which merges U136 into one uniform view | M |
 | ~~X147~~ | 0033 | ~~**A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart~~ done (session 20, round X batch 1; a real time axis over a sliding window) | S |
 
 Suggested order (session 20): rounds V and W are done (W in three batches, the owner
 answering multiple-choice questions per batch). Round U134 to U139 is being done the same
-way (U134 to U139 done in three batches); round X with U133 in three batches (U133 + X147 done, then X145, then X146).
+way (U134 to U139 done in three batches); round X with U133 in three batches (U133 + X147 and X145 done, then X146).
 
 
 The older idea list below is kept for reference; items covered by the rounds above are
