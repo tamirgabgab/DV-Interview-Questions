@@ -210,3 +210,49 @@ def test_polygon_explorer_matches_page_code():
     assert got["probs"] == [1 - 3 / 4, 1 - 4 / 8, 1 - 5 / 16, 1 - 10 / 512]
     for k, d in enumerate(got["draws"]):
         assert len(d) == 3 + (k % 8) == len(set(d)) and all(0 <= v < 360 for v in d)
+
+
+def test_explorer_discrete_count_and_histogram():
+    """The follow-ups in the boxes: the exact discrete probability for n vertices is the
+    count of part d generalised (checked against a brute force over all n-subsets of M
+    points for small M, and 89/359 for n = 3), and the largest-arc histogram of 1,000
+    seeded draws is consistent (bins add up, a largest arc below 180 is inside, the
+    expected densities follow the continuous distribution function, which agrees with
+    the enumeration of part d at 180)."""
+    import json
+    from fractions import Fraction
+    from itertools import combinations
+
+    from page_tests import explorer_require, node_json
+
+    def brute(n, M):
+        good = 0
+        for pts in combinations(range(M), n):
+            arcs = [pts[i + 1] - pts[i] for i in range(n - 1)] + [M - (pts[-1] - pts[0])]
+            good += max(arcs) < M / 2
+        return Fraction(good, comb(M, n))
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({{
+        small: [[12, 3], [12, 4], [12, 5], [11, 3], [11, 4], [13, 5], [20, 6]].map(([M, n]) => [M, n, m.polyProbDiscrete(n, M)]),
+        full: [3, 4, 5, 10].map((n) => m.polyProbDiscrete(n)),
+        hist: m.triHistogram(m.mulberry32(4242), 1000, 10),
+        cdf: [120, 150, 180, 240, 300, 360].map((x) => m.triArcCdf(x)),
+      }}));""")
+    for M, n, d in got["small"]:
+        assert Fraction(int(d["num"]), int(d["den"])) == brute(n, M), (M, n)
+    assert (got["full"][0]["num"], got["full"][0]["den"]) == ("89", "359")
+    for n, d in zip([3, 4, 5, 10], got["full"]):
+        want = Fraction(comb(360, n) - 360 * comb(180, n - 1), comb(360, n))
+        assert Fraction(int(d["num"]), int(d["den"])) == want and abs(d["value"] - float(want)) < 1e-12
+    h = got["hist"]
+    assert sum(b["in"] + b["out"] for b in h["bins"]) + h["degenerate"] == 1000 == h["draws"]
+    assert [b["lo"] for b in h["bins"]] == list(range(120, 360, 10))
+    assert all(b["out"] == 0 for b in h["bins"] if b["hi"] <= 180) and all(b["in"] == 0 for b in h["bins"] if b["lo"] >= 180)
+    assert abs(sum(b["expected"] for b in h["bins"]) - 1000) < 1e-9
+    assert got["cdf"][0] == 0 and got["cdf"][-1] == 1 and abs(got["cdf"][2] - 0.25) < 1e-12
+    # the continuous distribution against the whole-degree enumeration: within a percent
+    inside = sum(b["in"] for b in h["bins"])
+    assert abs(inside / (1000 - h["degenerate"]) - 0.25) < 0.05
+    assert abs(got["cdf"][3] - (1 - 3 * (1 / 3) ** 2)) < 1e-12

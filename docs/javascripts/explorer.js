@@ -13,7 +13,7 @@
 //   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits
 //   fifo                   0033        burst, write and read rates, a skipping reader: the fill level over time
 //   mtbf                   0037        clock and data rates, tau, T0 and overhead: the MTBF of one to three flops
-//   triangle               0007        three points to drag or type, inside / edge / outside; play counts every triangle
+//   triangle               0007        three points to drag or type, inside / edge / outside; play counts every triangle; a largest-arc histogram of 1,000 draws
 //   polygon                0007        the same for n vertices (3 to 10): drag, type or draw; random draws against 1 - n / 2^(n-1)
 //   boxes                  0009        N boxes on a ring with their cycles, person 0's cut, a walk box by box, rounds without person 0
 //   floyd                  0017        the array as the graph i -> nums[i], the tortoise and the hare through both phases
@@ -1125,6 +1125,40 @@
     return top < 180 ? "in" : top === 180 ? "edge" : "out";
   };
   const polyProb = (n) => 1 - n / Math.pow(2, n - 1);
+  // The discrete count of part d for n vertices at whole degrees (M points): the bad sets
+  // by the first vertex of the half circle, M * C(floor(M / 2), n - 1) of the C(M, n).
+  // Exact in BigInt: { num, den } reduced, and the value.
+  const bigGcd = (a, b) => (b ? bigGcd(b, a % b) : a);
+  const polyProbDiscrete = (n, M = TRI_M) => {
+    const all = bigComb(M, n), bad = BigInt(M) * bigComb(Math.floor(M / 2), n - 1), good = all - bad;
+    const g = bigGcd(good, all);
+    return { num: (good / g).toString(), den: (all / g).toString(), value: Number(good) / Number(all) };
+  };
+  // The largest arc of three random points: the continuous distribution function (the
+  // arcs are Dirichlet(1, 1, 1)), and a histogram of `draws` random whole-degree
+  // triangles in bins of `bin` degrees from 120 to 360, split inside / outside (a
+  // largest arc below 180 is inside; exactly 180 is the centre on an edge, counted
+  // outside; a degenerate triangle is skipped and counted).
+  const triArcCdf = (x) => {
+    const u = x / 360;
+    if (x <= 120) return 0;
+    if (x >= 360) return 1;
+    return x < 180 ? 1 - 3 * (1 - u) * (1 - u) + 3 * (1 - 2 * u) * (1 - 2 * u) : 1 - 3 * (1 - u) * (1 - u);
+  };
+  const triHistogram = (rnd = Math.random, draws = 1000, bin = 10) => {
+    const bins = [];
+    for (let lo = 120; lo < 360; lo += bin) bins.push({ lo, hi: lo + bin, in: 0, out: 0, expected: draws * (triArcCdf(lo + bin) - triArcCdf(lo)) });
+    let degenerate = 0;
+    for (let k = 0; k < draws; k++) {
+      const angles = [0, 1, 2].map(() => Math.floor(rnd() * TRI_M));
+      const kind = triClass(angles);
+      if (kind === "degenerate") { degenerate += 1; continue; }
+      const top = Math.max(...triArcs(angles));
+      const b = bins[Math.min(bins.length - 1, Math.floor((top - 120) / bin))];
+      if (kind === "in") b.in += 1; else b.out += 1;
+    }
+    return { bins, draws, degenerate };
+  };
   const polyRandom = (n, rnd = Math.random) => {
     const used = new Set(), out = [];
     while (out.length < n) { const v = Math.floor(rnd() * TRI_M); if (!used.has(v)) { used.add(v); out.push(v); } }
@@ -1637,7 +1671,7 @@
     bridgeSolve, bridgeEscort, bridgeTime, bridgeEscortMoves, bridgePairMoves, riverSafe, riverMoves, riverPlan,
     pcieBoundaries, pcieBlocks, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula,
     fifoSteps, fifoDepth, fifoFill, mtbfSeconds, mtbfHuman,
-    TRI_TOTAL, triArcs, triClass, triCountC, triFrame, triIndex, triCounts, polyArcs, polyClass, polyProb, polyRandom,
+    TRI_TOTAL, triArcs, triClass, triCountC, triFrame, triIndex, triCounts, triArcCdf, triHistogram, polyArcs, polyClass, polyProb, polyProbDiscrete, polyRandom,
     permCycles, permHelper, permSwap, permWalk, permAllWin, permShuffle, permRandomPicks, permStrategyProb, permRandomProb,
     floydRho, floydTrace, floydRandom, floydParse, bfs01Trace, bfs01Counts, bracketsClean, bracketsTrace,
     TTT_LINES, TTT_WRAP, tttCheck, tttFinalBoards, tttRandom,
@@ -1680,6 +1714,8 @@
     const close = () => `<line class="axis" x1="${X0}" x2="${W - RIGHT}" y1="${BASE}" y2="${BASE}"/></svg>`;
     return { s, slot, Y, cx, every, xtick, close };
   };
+
+  const chartFrame = frame;   // for views whose own `frame` is a number (the triangle enumeration)
 
   const hline = (fr, v, label) =>
     `<line class="ink-line" x1="${X0}" x2="${W - RIGHT}" y1="${f(fr.Y(v))}" y2="${f(fr.Y(v))}" ` +
@@ -3330,9 +3366,36 @@
         `<button type="button" class="md-button ex-last">לסוף</button></div>` +
         `<label class="tri-frames">הספירה <input type="range" class="ex-frame" min="0" max="${TRI_TOTAL - 1}" step="1" dir="ltr" aria-label="מספר המשולש בספירה"></label>` +
         `<p class="tri-frame-text"></p><ul class="tri-counts"></ul>` +
-        `<p class="ex-summary tri-compare"></p>`;
+        `<p class="ex-summary tri-compare"></p>` +
+        `<div class="ex-controls tri-hist-row"><button type="button" class="md-button ex-hist">1,000 הגרלות: הקשת הגדולה</button><span class="tri-hist-text"></span></div><div class="tri-hist"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const svg = $("svg"), shape = $(".tri-shape"), arcsG = $(".tri-arcs");
+      // the histogram of the largest arc over 1,000 random triangles, stacked inside / outside
+      const histSvg = (h) => {
+        const n = h.bins.length, vmax = Math.max(...h.bins.map((b) => Math.max(b.in + b.out, b.expected)));
+        const ymax = Math.ceil(vmax / 20) * 20 || 20, ticks = [];
+        for (let v = 0; v <= ymax; v += ymax / 4) ticks.push(v);
+        const fr = chartFrame("הקשת הגדולה ביותר ב-1,000 משולשים אקראיים", n, ymax, ticks);
+        let s = fr.s;
+        h.bins.forEach((b, i) => {
+          const x = fr.cx(i + 1), bw = Math.max(fr.slot * 0.72, 1);
+          const yOut = fr.Y(b.out), yIn = fr.Y(b.in + b.out);
+          const title = `${b.lo}° עד ${b.hi}°: ${b.in} בפנים, ${b.out} בחוץ; צפוי ${fmt(b.expected, 1)}`;
+          if (b.lo === 170) s += `<rect class="hist-near" x="${f(x - fr.slot / 2)}" y="${TOP}" width="${f(fr.slot)}" height="${f(BASE - TOP)}"/>`;
+          if (b.out) s += `<rect class="bar hist-out" x="${f(x - bw / 2)}" y="${f(yOut)}" width="${f(bw)}" height="${f(BASE - yOut)}"><title>${title}</title></rect>`;
+          if (b.in) s += `<rect class="bar hist-in${b.lo === 120 ? " is-fat" : ""}" x="${f(x - bw / 2)}" y="${f(yIn)}" width="${f(bw)}" height="${f(yOut - yIn)}"><title>${title}</title></rect>`;
+          s += `<line class="ink-line" x1="${f(x - bw / 2)}" x2="${f(x + bw / 2)}" y1="${f(fr.Y(b.expected))}" y2="${f(fr.Y(b.expected))}" stroke-width="2" stroke-dasharray="3 2"/>`;
+          if (b.lo % 30 === 0) s += fr.xtick(i + 1, `${b.lo}°`);
+        });
+        return s + fr.close();
+      };
+      const drawHist = (rng) => {
+        const h = triHistogram(rng, 1000, 10);
+        const fat = h.bins[0], near = h.bins.find((b) => b.lo === 170), inside = h.bins.reduce((t, b) => t + b.in, 0);
+        $(".tri-hist").innerHTML = histSvg(h);
+        $(".tri-hist-text").innerHTML = `${ltr(num(inside))} מתוך ${ltr(num(h.draws - h.degenerate))} בפנים${h.degenerate ? ` (${ltr(h.degenerate)} מנוונים הושמטו)` : ""}; ` +
+          `"שמנים", קשת מתחת ל-130°: ${ltr(fat.in)} (צפוי ${ltr(fmt(fat.expected, 1))}); כמעט מנוונים, 170° עד 180°: ${ltr(near.in)} (צפוי ${ltr(fmt(near.expected, 1))}). הקו המקווקו בכל עמודה הוא הצפי מההתפלגות הרציפה.`;
+      };
       const pts = [...box.querySelectorAll(".tri-pt")], names = [...box.querySelectorAll(".tri-name")];
       const inputs = [...box.querySelectorAll(".ex-deg")];
       const play = $(".ex-play"), speed = $(".ex-speed"), slider = $(".ex-frame");
@@ -3434,7 +3497,8 @@
       slider.addEventListener("input", () => { stop(); setFrame(Number(slider.value)); });
       const seed = seedControls(box, $(".ex-random"), (rng) => { stop(); setAngles([0, 1, 2].map(() => Math.floor(rng() * 360))); });
       $(".ex-random").addEventListener("click", seed.draw);
-      $(".ex-reset").addEventListener("click", () => { stop(); setAngles(PAGE); });
+      $(".ex-hist").addEventListener("click", () => { drawHist(mulberry32(Number($(".ex-seed").value) || 1)); });
+      $(".ex-reset").addEventListener("click", () => { stop(); setAngles(PAGE); $(".tri-hist").innerHTML = ""; $(".tri-hist-text").textContent = ""; });
       inputs.forEach((inp, i) => {
         inp.addEventListener("change", () => {
           const v = Number(inp.value);
@@ -4529,9 +4593,11 @@
         const mark = { in: "✓", edge: "●", out: "✗", degenerate: "●" }[kind];
         $(".tri-status").innerHTML = `<span class="tri-kind is-${kind}">${mark} ${KIND[kind]}.</span> ${why}`;
         $(".tri-arcs-text").innerHTML = kind === "degenerate" ? "" : `הקשתות לפי הסדר על המעגל: ${ltr(arcs.map((v) => `${v}°`).join(", "))}.`;
-        const p = polyProb(n);
+        const p = polyProb(n), d = polyProbDiscrete(n);
         $(".tri-compare").innerHTML = `הנוסחה של סעיף ג לזוויות רציפות: ${ltr(`1 − ${n}/2^${n - 1} = ${fmt(p, 4)}`)}. ` +
-          (st.runs ? `מתוך ${ltr(num(st.runs))} מצולעים אקראיים (זוויות שלמות שונות), ${ltr(num(st.hits))} הכילו את המרכז: ${ltr(fmt(st.hits / st.runs, 4))}.` : `לחצו "1,000 הגרלות" כדי להשוות.`);
+          `בזוויות שלמות, כמו בספירה של סעיף ד: ${ltr(`1 − 360·C(180, ${n - 1}) / C(360, ${n}) = ${d.num}/${d.den} ≈ ${fmt(d.value, 4)}`)}, ` +
+          `${ltr(fmt(Math.abs(d.value - p), 4))} ${d.value < p ? "פחות" : "יותר"} מהרציף. ` +
+          (st.runs ? `מתוך ${ltr(num(st.runs))} מצולעים אקראיים (זוויות שלמות שונות), ${ltr(num(st.hits))} הכילו את המרכז: ${ltr(fmt(st.hits / st.runs, 4))}, מול ${ltr(fmt(d.value, 4))} הבדיד.` : `לחצו "1,000 הגרלות" כדי להשוות.`);
       };
       const setN = (n) => { st.n = n; st.angles = regular(n); st.runs = st.hits = 0; render(); };
       $(".ex-n").addEventListener("input", () => setN(Number($(".ex-n").value)));
