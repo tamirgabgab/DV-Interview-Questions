@@ -59,7 +59,7 @@ def numbering():
 
 
 def examples():
-    boards = [("XXXOXOOOX", "X ניצח: 2 שלישיות"), ("XXOXO.O..", "O ניצח"),
+    boards = [("XXXOXOOOX", "X ניצח : 2 שלישיות"), ("XXOXO.O..", "O ניצח"),
               ("XOXXOOOXX", "תיקו"), ("XXXOOO...", "✗ שניהם ניצחו"),
               ("XXXOO.O..", "✗ O שיחק אחרי הניצחון")]
     body, x = [], 6
@@ -102,7 +102,7 @@ def directions():
         fills = {i: f"cell-s{key(i // 3, i % 3) + 1}" for i in range(9)}
         body.append(board(x, 6, fills=fills, caption=caption, numbers=True))
         x += 3 * C + 36
-    return svg(x - 30, 3 * C + 34, "ארבעת הכיוונים: כל כיוון מחלק את הלוח לשלושה קווים מקבילים",
+    return svg(x - 30, 3 * C + 34, "ארבעת הכיוונים : כל כיוון מחלק את הלוח לשלושה קווים מקבילים",
                "".join(body))
 
 

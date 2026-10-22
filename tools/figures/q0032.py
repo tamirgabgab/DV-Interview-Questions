@@ -139,7 +139,7 @@ def frame(state, carried=None, forward=True, moving=False, label="", unsafe=None
 
 def legend():
     return ('<span class="viz-legend"><span><i class="st-stack"></i>האיכר (F)</span><span><i class="st-cell"></i>הזאב (W), העז (G) והכרוב (C)</span>'
-            '<span><i class="boat"></i>הסירה: האיכר ועוד אחד</span></span>')
+            '<span><i class="boat"></i>הסירה : האיכר ועוד אחד</span></span>')
 
 
 def statement_figure():
@@ -149,13 +149,13 @@ def statement_figure():
 def crossing_stepper():
     plan = solve()
     states = replay(plan)
-    frames = [(frame(0, label="התחלה: כולם על הגדה הקרובה"), "רגע 0: כולם על הגדה הקרובה. הסירה מכילה את האיכר ועוד אחד.")]
+    frames = [(frame(0, label="התחלה : כולם על הגדה הקרובה"), "רגע 0 : כולם על הגדה הקרובה. הסירה מכילה את האיכר ועוד אחד.")]
     for k, (item, s_from, s_to) in enumerate(zip(plan, states, states[1:]), 1):
         forward = not s_from & FARMER
         what = f"האיכר לוקח את {HEB[item]}" if item else "האיכר חוזר לבד"
         left = ", ".join(HEB[n] for n in ITEMS if bool(s_from & BITS[n]) == bool(s_from & FARMER) and n != item)
         frames.append((frame(s_from, item, forward, moving=True, label=f"חצייה {k}"),
-                       f"חצייה {k}: {what} {'קדימה' if forward else 'חזרה'}. "
+                       f"חצייה {k} : {what} {'קדימה' if forward else 'חזרה'}. "
                        + (f"על הגדה שעזב נשארים {left}, וזה בטוח." if left else "הגדה שעזב ריקה.")))
     frames.append((frame(15, label="סיום"), f"כולם על הגדה הרחוקה אחרי {len(plan)} חציות."))
     return stepper(frames, "שבע החציות של האיכר, חצייה אחרי חצייה")
@@ -187,7 +187,7 @@ def graph_svg():
     X = lambda s: 48 + col(s) * 78
     Y = lambda s: 60 if not s & FARMER else 190
     p = [f'<svg class="figure river-graph" viewBox="0 0 {w} {h}" style="max-width:40rem" role="img" '
-         'aria-label="גרף המצבים: שש עשרה חלוקות של האיכר ושלושת הפריטים בין הגדות, שש אסורות, ושני המסלולים הקצרים ביותר">']
+         'aria-label="גרף המצבים : שש עשרה חלוקות של האיכר ושלושת הפריטים בין הגדות, שש אסורות, ושני המסלולים הקצרים ביותר">']
     on_path = set()
     for sol in all_solutions():
         states = replay(sol)
@@ -216,7 +216,7 @@ def graph_svg():
 
 def graph_legend():
     return ('<span class="viz-legend"><span><i class="st-ok"></i>ההתחלה והסיום</span><span><i class="st-cell"></i>מצב בטוח</span>'
-            '<span><i class="st-bad"></i>מצב אסור: מישהו נאכל</span><span><i class="box-path"></i>שני המסלולים הקצרים ביותר</span>'
+            '<span><i class="st-bad"></i>מצב אסור : מישהו נאכל</span><span><i class="box-path"></i>שני המסלולים הקצרים ביותר</span>'
             '<span><i class="ink"></i>חצייה בטוחה אחרת</span></span>')
 
 

@@ -11,12 +11,12 @@ added: 2026-10-16
 ## השאלה
 
 נתונה מחרוזת `s` שמכילה רק את התווים `(`, `)`, `[`, `]`, `{` ו-`}`. כתבו פונקציה שבודקת
-האם המחרוזת **תקינה**. מחרוזת תקינה אם:
+האם המחרוזת **תקינה**. מחרוזת תקינה אם :
 
-- **אותו סוג:** כל סוגר פותח נסגר על ידי סוגר מאותו סוג.
-- **הסדר הנכון:** הסוגר שנפתח אחרון נסגר ראשון (LIFO). אסור ש-`[` ייסגר לפני `(`
+- **אותו סוג :** כל סוגר פותח נסגר על ידי סוגר מאותו סוג.
+- **הסדר הנכון :** הסוגר שנפתח אחרון נסגר ראשון (LIFO). אסור ש-`[` ייסגר לפני `(`
   שנפתח אחריו.
-- **אין עודפים:** לכל סוגר סוגר יש סוגר פותח מתאים לפניו, וכל סוגר פותח נסגר עד סוף
+- **אין עודפים :** לכל סוגר סוגר יש סוגר פותח מתאים לפניו, וכל סוגר פותח נסגר עד סוף
   המחרוזת.
 
 המחרוזת הריקה נחשבת תקינה.
@@ -28,20 +28,20 @@ added: 2026-10-16
 | ‏`{[()]}` | ✓ | זוגות מקוננים, כל אחד נסגר בסדר ההפוך לפתיחה |
 | ‏`([]{})` | ✓ | בתוך הסוגריים העגולים יש שני זוגות נפרדים |
 | ‏`(]` | ✗ | הסוגר הסוגר מסוג אחר |
-| ‏`([)]` | ✗ | הסדר לא נכון: `(` נסגר לפני `[` שנפתח אחריו |
+| ‏`([)]` | ✗ | הסדר לא נכון : `(` נסגר לפני `[` שנפתח אחריו |
 | ‏`(((` | ✗ | סוגריים שלא נסגרו |
 | ‏`())` | ✗ | סוגר סוגר שאין לו פותח |
 | ‏`)(` | ✗ | יש אותו מספר של פותחים וסוגרים, אבל הסוגר מגיע לפני הפותח |
 
 ??? interviewer "מה המראיין בודק"
-    - **מבנה הנתונים הנכון:** האם המועמד מזהה איזו תכונה בהגדרה של "תקינה" מכתיבה את
+    - **מבנה הנתונים הנכון :** האם המועמד מזהה איזו תכונה בהגדרה של "תקינה" מכתיבה את
       מבנה הנתונים, ולא רק סופר תווים.
-    - **שלושה מקרי כישלון:** סוג לא מתאים, סוגר סוגר שאין לו פותח, ופותחים שנשארו פתוחים
+    - **שלושה מקרי כישלון :** סוג לא מתאים, סוגר סוגר שאין לו פותח, ופותחים שנשארו פתוחים
       בסוף. קל לשכוח את האחרון.
-    - **קיצורי דרך:** בדיקת אורך אי-זוגי היא זולה, אבל לא מחליפה את הבדיקה המלאה. למשל
+    - **קיצורי דרך :** בדיקת אורך אי-זוגי היא זולה, אבל לא מחליפה את הבדיקה המלאה. למשל
       `)(` באורך זוגי ולא תקינה.
-    - **ניתוח הפתרון הפשוט:** לדעת להסביר למה הוא \( O(n^2) \) ולתת קלט שמראה את זה.
-    - **מעבר יחיד:** בפתרון היעיל, לנמק למה כל תו נבדק פעם אחת בלבד.
+    - **ניתוח הפתרון הפשוט :** לדעת להסביר למה הוא \( O(n^2) \) ולתת קלט שמראה את זה.
+    - **מעבר יחיד :** בפתרון היעיל, לנמק למה כל תו נבדק פעם אחת בלבד.
 
 ---
 
@@ -50,7 +50,7 @@ added: 2026-10-16
 כתבו פתרון פשוט, גם אם הוא לא יעיל, ונתחו את הסיבוכיות שלו.
 
 ??? tip "רמז 1"
-    נסו להקטין את הבעיה: איזו פעולה על מחרוזת תקינה משאירה מחרוזת **קצרה יותר** שגם היא
+    נסו להקטין את הבעיה : איזו פעולה על מחרוזת תקינה משאירה מחרוזת **קצרה יותר** שגם היא
     תקינה? אם חוזרים עליה מספיק פעמים, במה אמורים להישאר?
 
 ??? tip "רמז 2"
@@ -65,17 +65,17 @@ added: 2026-10-16
     #### הרעיון { .sol-idea }
 
     במחרוזת תקינה ולא ריקה תמיד יש זוג צמוד, ומחיקה שלו משאירה מחרוזת שתקינה אם ורק
-    אם המקורית תקינה. לכן מוחקים זוגות צמודים שוב ושוב: אם בסוף נשארת מחרוזת ריקה,
+    אם המקורית תקינה. לכן מוחקים זוגות צמודים שוב ושוב : אם בסוף נשארת מחרוזת ריקה,
     המחרוזת תקינה. אם נתקעים עם מחרוזת שאין בה אף זוג צמוד, היא לא תקינה.
 
     #### השלבים { .sol-steps }
 
     <div class="steps" markdown>
 
-    1. **מעבר:** מוחקים מהמחרוזת את כל המופעים של `()`, אחר כך של `[]`, ואחר כך של `{}`.
-    2. **לחזור:** כל עוד המעבר האחרון שינה את המחרוזת, עושים מעבר נוסף (מחיקה יכולה
+    1. **מעבר :** מוחקים מהמחרוזת את כל המופעים של `()`, אחר כך של `[]`, ואחר כך של `{}`.
+    2. **לחזור :** כל עוד המעבר האחרון שינה את המחרוזת, עושים מעבר נוסף (מחיקה יכולה
        ליצור זוג צמוד חדש, למשל `(())` הופך ל-`()`).
-    3. **להכריע:** אם נשארה מחרוזת ריקה היא תקינה, אחרת לא.
+    3. **להכריע :** אם נשארה מחרוזת ריקה היא תקינה, אחרת לא.
 
     </div>
 
@@ -116,9 +116,9 @@ added: 2026-10-16
            מעבר לסוף המחרוזת בתו האחרון.
         2. אחרי שמוחקים זוג מדלגים על שני התווים ולא ממשיכים מהתו השני שלו, כדי שהמופעים
            לא יחפפו. זה בדיוק מה ש-`str.replace` עושה, ולכן שתי הגרסאות מתנהגות אותו דבר.
-        3. התנאי לעצירה הוא "מעבר שלם לא שינה כלום", ולא "המחרוזת ריקה": מחרוזת לא תקינה
+        3. התנאי לעצירה הוא "מעבר שלם לא שינה כלום", ולא "המחרוזת ריקה" : מחרוזת לא תקינה
            כמו `([)]` לעולם לא תתרוקן, ובלי התנאי הזה הלולאה הייתה אינסופית.
-        4. מחרוזת שנשארו בה תווים היא לא תקינה, גם אם היא קצרה: למשל `(` או `)(`.
+        4. מחרוזת שנשארו בה תווים היא לא תקינה, גם אם היא קצרה : למשל `(` או `)(`.
 
     === "Python"
         ```python title="isValid_brute" hl_lines="2 3"
@@ -128,7 +128,7 @@ added: 2026-10-16
             return s == ""
         ```
 
-        1. תנאי הלולאה הוא "יש עוד זוג צמוד למחוק", ולא "המחרוזת לא ריקה": על `([)]` הלולאה
+        1. תנאי הלולאה הוא "יש עוד זוג צמוד למחוק", ולא "המחרוזת לא ריקה" : על `([)]` הלולאה
            לא נכנסת בכלל, ובלי זה היא הייתה אינסופית.
         2. ‏`replace` מוחק את כל המופעים הלא חופפים במעבר אחד, אבל זוג חדש שנוצר מהמחיקה
            (למשל `()` מתוך `(())`) מטופל רק במעבר הבא.
@@ -136,12 +136,12 @@ added: 2026-10-16
     #### למה זה נכון { .sol-proof }
 
     במחרוזת תקינה ולא ריקה, הסוגר הפותח **האחרון** לפני הסוגר הסוגר הראשון חייב להיות
-    צמוד אליו ומאותו סוג: בין שניהם אין סוגר פותח (הוא האחרון) ואין סוגר סוגר (ההוא
+    צמוד אליו ומאותו סוג : בין שניהם אין סוגר פותח (הוא האחרון) ואין סוגר סוגר (ההוא
     הראשון), ולפי כלל LIFO הסוגר הסוגר הראשון סוגר את הפותח האחרון. לכן תמיד יש זוג
-    צמוד, ומחיקה שלו משאירה מחרוזת שתקינה אם ורק אם המקורית תקינה. ולהפך: במחרוזת
+    צמוד, ומחיקה שלו משאירה מחרוזת שתקינה אם ורק אם המקורית תקינה. ולהפך : במחרוזת
     שאין בה אף זוג צמוד, הסוגר הסוגר הראשון לא צמוד לפותח מאותו סוג, ולכן היא לא תקינה.
 
-    **דוגמה.** עבור `(((())))` כל מעבר מוחק רק את הזוג הפנימי, ולכן צריך 4 מעברים:
+    **דוגמה.** עבור `(((())))` כל מעבר מוחק רק את הזוג הפנימי, ולכן צריך 4 מעברים :
 
     | מעבר | לפני | אחרי |
     |---|---|---|
@@ -154,11 +154,11 @@ added: 2026-10-16
 
     #### סיבוכיות { .sol-cost }
 
-    - **זמן:** כל מעבר עובר על כל המחרוזת, כלומר \( O(n) \). כל מעבר מוחק לפחות זוג אחד,
+    - **זמן :** כל מעבר עובר על כל המחרוזת, כלומר \( O(n) \). כל מעבר מוחק לפחות זוג אחד,
       ולכן יש עד \( n/2 \) מעברים. בסך הכול \( O(n^2) \).
-    - **המקרה הגרוע:** סוגריים מקוננים מאותו סוג, \( k \) פעמים `(` ואחריהן \( k \) פעמים
+    - **המקרה הגרוע :** סוגריים מקוננים מאותו סוג, \( k \) פעמים `(` ואחריהן \( k \) פעמים
       `)`. כל מעבר מוריד רק זוג אחד.
-    - **זיכרון:** \( O(n) \), כי כל `replace` בונה מחרוזת חדשה.
+    - **זיכרון :** \( O(n) \), כי כל `replace` בונה מחרוזת חדשה.
 
 ---
 
@@ -171,12 +171,12 @@ added: 2026-10-16
     להחליט אם הסוגר הסוגר הבא חוקי? האם צריך לזכור את כל המחרוזת, או רק חלק ממנה?
 
 ??? tip "רמז 2"
-    כשמגיע סוגר סוגר, רק סוגר פותח אחד יכול להתאים לו: האחרון שנפתח ועוד לא נסגר. איזה
+    כשמגיע סוגר סוגר, רק סוגר פותח אחד יכול להתאים לו : האחרון שנפתח ועוד לא נסגר. איזה
     מבנה נתונים נותן תמיד את האיבר האחרון שנכנס?
 
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"
-        **מחסנית (stack):** סוגר פותח נדחף, סוגר סוגר חייב להתאים לראש המחסנית ומוציא
+        **מחסנית (stack) :** סוגר פותח נדחף, סוגר סוגר חייב להתאים לראש המחסנית ומוציא
         אותו, ובסוף המחסנית חייבת להיות ריקה. מעבר אחד, \( O(n) \).
 
     #### הרעיון { .sol-idea }
@@ -189,11 +189,11 @@ added: 2026-10-16
 
     <div class="steps" markdown>
 
-    1. **בדיקה מקדימה:** מחרוזת באורך אי-זוגי אף פעם לא תקינה, כי סוגריים באים בזוגות.
-    2. **סוגר פותח:** דוחפים אותו למחסנית.
-    3. **סוגר סוגר:** בראש המחסנית חייב להיות הפותח מאותו סוג. אם המחסנית ריקה, או
+    1. **בדיקה מקדימה :** מחרוזת באורך אי-זוגי אף פעם לא תקינה, כי סוגריים באים בזוגות.
+    2. **סוגר פותח :** דוחפים אותו למחסנית.
+    3. **סוגר סוגר :** בראש המחסנית חייב להיות הפותח מאותו סוג. אם המחסנית ריקה, או
        שבראשה סוג אחר, המחרוזת לא תקינה. אחרת מוציאים את הפותח מהמחסנית.
-    4. **בסוף:** המחרוזת תקינה רק אם המחסנית ריקה, כלומר כל הפותחים נסגרו.
+    4. **בסוף :** המחרוזת תקינה רק אם המחסנית ריקה, כלומר כל הפותחים נסגרו.
 
     </div>
 
@@ -226,15 +226,15 @@ added: 2026-10-16
         endfunction
         ```
 
-        1. תור (queue) משמש כמחסנית: `push_back` דוחף, `pop_back` מוציא, ו-`stack[$]` הוא
+        1. תור (queue) משמש כמחסנית : `push_back` דוחף, `pop_back` מוציא, ו-`stack[$]` הוא
            האיבר האחרון, כלומר ראש המחסנית.
-        2. קיצור דרך זול לפני הלולאה. הוא לא מחליף את הבדיקה המלאה: `)(` באורך זוגי ועדיין
+        2. קיצור דרך זול לפני הלולאה. הוא לא מחליף את הבדיקה המלאה : `)(` באורך זוגי ועדיין
            לא תקינה.
-        3. שני מקרי כישלון בתנאי אחד. הסדר חשוב: בודקים קודם שהמחסנית לא ריקה, ורק אז
+        3. שני מקרי כישלון בתנאי אחד. הסדר חשוב : בודקים קודם שהמחסנית לא ריקה, ורק אז
            ניגשים ל-`stack[$]`, כי `||` מפסיק לחשב אחרי תנאי ראשון שמתקיים.
         4. ‏`pop_back` מחזיר את האיבר שהוצא, ולא צריך אותו כאן. העטיפה ב-`void'()` אומרת
            במפורש שהערך נזרק, ומונעת אזהרה של הכלים.
-        5. מקרה הכישלון השלישי, שקל לשכוח: `(((` עובר את כל הלולאה בלי תקלה, ורק כאן
+        5. מקרה הכישלון השלישי, שקל לשכוח : `(((` עובר את כל הלולאה בלי תקלה, ורק כאן
            מתגלה שנשארו פותחים בלי סוגרים.
 
     === "Python"
@@ -257,7 +257,7 @@ added: 2026-10-16
             return not stack             # valid only if every opener was closed (3)
         ```
 
-        1. מילון מסוגר סוגר לפותח שלו עושה שתי עבודות: `ch in pairs` מזהה שזה סוגר סוגר,
+        1. מילון מסוגר סוגר לפותח שלו עושה שתי עבודות : `ch in pairs` מזהה שזה סוגר סוגר,
            ו-`pairs[ch]` נותן את הפותח שצריך להיות בראש המחסנית.
         2. ‏`not stack` נבדק ראשון, ולכן `stack[-1]` לא ניגש לרשימה ריקה.
         3. רשימה ריקה היא `False`, ולכן `not stack` הוא בדיוק "כל הפותחים נסגרו". בלי השורה
@@ -266,13 +266,13 @@ added: 2026-10-16
     #### למה זה נכון { .sol-proof }
 
     **המחסנית צעד אחרי צעד.** לחצו "הבא" כדי לעקוב אחרי המחסנית תו אחרי תו, קודם על
-    מחרוזת תקינה ואז על מחרוזת שנכשלת בגלל סדר הסגירה:
+    מחרוזת תקינה ואז על מחרוזת שנכשלת בגלל סדר הסגירה :
 
-    <div class="stepper" role="group" aria-label="המחסנית תו אחרי תו על {[()]}" tabindex="0"><figure class="stepper-frame is-active"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-cell" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><text class="st-small" x="394" y="162" text-anchor="middle">empty</text></svg><figcaption>לפני הקריאה: המחרוזת שבאיור, והמחסנית ריקה.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-cur" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><path class="s2-fill" d="M29.0,92 L43.0,92 L36.0,82 z"/><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-top" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text></svg><figcaption>תו 1 הוא פותח מסולסל, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-cur" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><path class="s2-fill" d="M75.0,92 L89.0,92 L82.0,82 z"/><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text><rect class="st-top" x="372" y="100" width="44" height="34" rx="5"/><text class="st-text" x="394" y="124" text-anchor="middle">[</text></svg><figcaption>תו 2 הוא פותח מרובע, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cur" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><path class="s2-fill" d="M121.0,92 L135.0,92 L128.0,82 z"/><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text><rect class="st-stack" x="372" y="100" width="44" height="34" rx="5"/><text class="st-text" x="394" y="124" text-anchor="middle">[</text><rect class="st-top" x="372" y="62" width="44" height="34" rx="5"/><text class="st-text" x="394" y="86" text-anchor="middle">(</text></svg><figcaption>תו 3 הוא פותח עגול, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-done" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-cur" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><path class="s2-fill" d="M167.0,92 L181.0,92 L174.0,82 z"/><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text><rect class="st-top" x="372" y="100" width="44" height="34" rx="5"/><text class="st-text" x="394" y="124" text-anchor="middle">[</text></svg><figcaption>תו 4 הוא סוגר עגול. בראש המחסנית פותח עגול, מתאים, ולכן הוא מוצא מהמחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-done" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-done" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cur" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><path class="s2-fill" d="M213.0,92 L227.0,92 L220.0,82 z"/><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-top" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text></svg><figcaption>תו 5 הוא סוגר מרובע. בראש המחסנית פותח מרובע, מתאים, ולכן הוא מוצא מהמחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-done" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-done" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-done" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cur" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><path class="s2-fill" d="M259.0,92 L273.0,92 L266.0,82 z"/><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><text class="st-small" x="394" y="162" text-anchor="middle">empty</text></svg><figcaption>תו 6 הוא סוגר מסולסל. בראש המחסנית פותח מסולסל, מתאים, ולכן הוא מוצא מהמחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-done" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-done" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-done" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-done" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><text class="st-small" x="394" y="162" text-anchor="middle">empty</text></svg><figcaption>סוף המחרוזת והמחסנית ריקה: כל פותח נסגר, המחרוזת תקינה ✓</figcaption></figure><div class="stepper-nav"><button type="button" class="stepper-btn stepper-prev">הקודם</button><span class="stepper-pos" data-total="8"></span><button type="button" class="stepper-btn stepper-next">הבא</button></div></div>
+    <div class="stepper" role="group" aria-label="המחסנית תו אחרי תו על {[()]}" tabindex="0"><figure class="stepper-frame is-active"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-cell" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><text class="st-small" x="394" y="162" text-anchor="middle">empty</text></svg><figcaption>לפני הקריאה : המחרוזת שבאיור, והמחסנית ריקה.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-cur" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><path class="s2-fill" d="M29.0,92 L43.0,92 L36.0,82 z"/><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-top" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text></svg><figcaption>תו 1 הוא פותח מסולסל, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-cur" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><path class="s2-fill" d="M75.0,92 L89.0,92 L82.0,82 z"/><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text><rect class="st-top" x="372" y="100" width="44" height="34" rx="5"/><text class="st-text" x="394" y="124" text-anchor="middle">[</text></svg><figcaption>תו 2 הוא פותח מרובע, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cur" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><path class="s2-fill" d="M121.0,92 L135.0,92 L128.0,82 z"/><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text><rect class="st-stack" x="372" y="100" width="44" height="34" rx="5"/><text class="st-text" x="394" y="124" text-anchor="middle">[</text><rect class="st-top" x="372" y="62" width="44" height="34" rx="5"/><text class="st-text" x="394" y="86" text-anchor="middle">(</text></svg><figcaption>תו 3 הוא פותח עגול, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-done" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-cur" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><path class="s2-fill" d="M167.0,92 L181.0,92 L174.0,82 z"/><rect class="st-cell" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text><rect class="st-top" x="372" y="100" width="44" height="34" rx="5"/><text class="st-text" x="394" y="124" text-anchor="middle">[</text></svg><figcaption>תו 4 הוא סוגר עגול. בראש המחסנית פותח עגול, מתאים, ולכן הוא מוצא מהמחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-done" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-done" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-cur" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><path class="s2-fill" d="M213.0,92 L227.0,92 L220.0,82 z"/><rect class="st-cell" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><rect class="st-top" x="372" y="138" width="44" height="34" rx="5"/><text class="st-text" x="394" y="162" text-anchor="middle">{</text></svg><figcaption>תו 5 הוא סוגר מרובע. בראש המחסנית פותח מרובע, מתאים, ולכן הוא מוצא מהמחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-done" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-done" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-done" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-cur" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><path class="s2-fill" d="M259.0,92 L273.0,92 L266.0,82 z"/><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><text class="st-small" x="394" y="162" text-anchor="middle">empty</text></svg><figcaption>תו 6 הוא סוגר מסולסל. בראש המחסנית פותח מסולסל, מתאים, ולכן הוא מוצא מהמחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 442 190" style="max-width:28rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">{</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-done" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">(</text><rect class="st-done" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">)</text><rect class="st-done" x="200" y="36" width="40" height="40" rx="5"/><text class="st-text" x="220.0" y="63" text-anchor="middle">]</text><rect class="st-done" x="246" y="36" width="40" height="40" rx="5"/><text class="st-text" x="266.0" y="63" text-anchor="middle">}</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="394" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="366" x2="422" y1="176" y2="176" stroke-width="2"/><text class="st-small" x="394" y="162" text-anchor="middle">empty</text></svg><figcaption>סוף המחרוזת והמחסנית ריקה : כל פותח נסגר, המחרוזת תקינה ✓</figcaption></figure><div class="stepper-nav"><button type="button" class="stepper-btn stepper-prev">הקודם</button><span class="stepper-pos" data-total="8"></span><button type="button" class="stepper-btn stepper-next">הבא</button></div></div>
 
-    <div class="stepper" role="group" aria-label="המחסנית תו אחרי תו על ([)]" tabindex="0"><figure class="stepper-frame is-active"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-cell" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><text class="st-small" x="312" y="162" text-anchor="middle">empty</text></svg><figcaption>לפני הקריאה: המחרוזת שבאיור, והמחסנית ריקה.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-cur" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><path class="s2-fill" d="M29.0,92 L43.0,92 L36.0,82 z"/><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><rect class="st-top" x="290" y="138" width="44" height="34" rx="5"/><text class="st-text" x="312" y="162" text-anchor="middle">(</text></svg><figcaption>תו 1 הוא פותח עגול, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><rect class="st-cur" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><path class="s2-fill" d="M75.0,92 L89.0,92 L82.0,82 z"/><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="290" y="138" width="44" height="34" rx="5"/><text class="st-text" x="312" y="162" text-anchor="middle">(</text><rect class="st-top" x="290" y="100" width="44" height="34" rx="5"/><text class="st-text" x="312" y="124" text-anchor="middle">[</text></svg><figcaption>תו 2 הוא פותח מרובע, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-bad" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><path class="s2-fill" d="M121.0,92 L135.0,92 L128.0,82 z"/><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="290" y="138" width="44" height="34" rx="5"/><text class="st-text" x="312" y="162" text-anchor="middle">(</text><rect class="st-bad" x="290" y="100" width="44" height="34" rx="5"/><text class="st-text" x="312" y="124" text-anchor="middle">[</text></svg><figcaption>תו 3 הוא סוגר עגול, אבל בראש המחסנית פותח מרובע ולא פותח עגול. סדר הסגירה שגוי: המחרוזת לא תקינה ✗</figcaption></figure><div class="stepper-nav"><button type="button" class="stepper-btn stepper-prev">הקודם</button><span class="stepper-pos" data-total="4"></span><button type="button" class="stepper-btn stepper-next">הבא</button></div></div>
+    <div class="stepper" role="group" aria-label="המחסנית תו אחרי תו על ([)]" tabindex="0"><figure class="stepper-frame is-active"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-cell" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><text class="st-small" x="312" y="162" text-anchor="middle">empty</text></svg><figcaption>לפני הקריאה : המחרוזת שבאיור, והמחסנית ריקה.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-cur" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><path class="s2-fill" d="M29.0,92 L43.0,92 L36.0,82 z"/><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><rect class="st-top" x="290" y="138" width="44" height="34" rx="5"/><text class="st-text" x="312" y="162" text-anchor="middle">(</text></svg><figcaption>תו 1 הוא פותח עגול, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><rect class="st-cur" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><path class="s2-fill" d="M75.0,92 L89.0,92 L82.0,82 z"/><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="290" y="138" width="44" height="34" rx="5"/><text class="st-text" x="312" y="162" text-anchor="middle">(</text><rect class="st-top" x="290" y="100" width="44" height="34" rx="5"/><text class="st-text" x="312" y="124" text-anchor="middle">[</text></svg><figcaption>תו 2 הוא פותח מרובע, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-bad" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><path class="s2-fill" d="M121.0,92 L135.0,92 L128.0,82 z"/><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="290" y="138" width="44" height="34" rx="5"/><text class="st-text" x="312" y="162" text-anchor="middle">(</text><rect class="st-bad" x="290" y="100" width="44" height="34" rx="5"/><text class="st-text" x="312" y="124" text-anchor="middle">[</text></svg><figcaption>תו 3 הוא סוגר עגול, אבל בראש המחסנית פותח מרובע ולא פותח עגול. סדר הסגירה שגוי : המחרוזת לא תקינה ✗</figcaption></figure><div class="stepper-nav"><button type="button" class="stepper-btn stepper-prev">הקודם</button><span class="stepper-pos" data-total="4"></span><button type="button" class="stepper-btn stepper-next">הבא</button></div></div>
 
-    **אותן דוגמאות בטבלה.** עבור `{[()]}`:
+    **אותן דוגמאות בטבלה.** עבור `{[()]}` :
 
     | תו | פעולה | המחסנית |
     |---|---|---|
@@ -283,7 +283,7 @@ added: 2026-10-16
     | ‏`]` | בראש `[`, מתאים, הוצאה | <span class="arr"><span>{</span></span> |
     | ‏`}` | בראש `{`, מתאים, הוצאה | (ריקה) ✓ |
 
-    עבור `([)]`:
+    עבור `([)]` :
 
     | תו | פעולה | המחסנית |
     |---|---|---|
@@ -292,26 +292,26 @@ added: 2026-10-16
     | ‏`)` | בראש `[`, לא מתאים ל-`(` | לא תקינה ✗ |
 
     **נסו בעצמכם.** הקלידו מחרוזת מששת הסוגריים (תווים אחרים נמחקים), או בחרו דוגמה
-    מהטבלה: התיבה קוראת תו אחרי תו, המחסנית גדלה ומתכווצת, גרף העומק מצטייר, והכישלון
-    הראשון מוקף באדום עם הסיבה שלו: סוג לא מתאים, סוגר בלי פותח, או פותחים שנשארו בסוף.
+    מהטבלה : התיבה קוראת תו אחרי תו, המחסנית גדלה ומתכווצת, גרף העומק מצטייר, והכישלון
+    הראשון מוקף באדום עם הסיבה שלו : סוג לא מתאים, סוגר בלי פותח, או פותחים שנשארו בסוף.
 
     <div class="explorer" data-kind="brackets" data-s="{[()]}"></div>
 
     **למה המחסנית מספיקה.** בכל רגע המחסנית מכילה בדיוק את הפותחים שעוד לא נסגרו, מהישן
     לחדש. סוגר סוגר יכול לסגור רק את החדש שבהם (כלל LIFO), ולכן השוואה לראש המחסנית
-    בודקת את כל שלושת התנאים: סוג תואם (ראש המחסנית מאותו סוג), סדר נכון (סוגרים רק את
+    בודקת את כל שלושת התנאים : סוג תואם (ראש המחסנית מאותו סוג), סדר נכון (סוגרים רק את
     האחרון שנפתח) ואין עודפים (מחסנית ריקה כשמגיע סוגר, או מחסנית לא ריקה בסוף).
 
     #### סיבוכיות { .sol-cost }
 
-    - **זמן:** \( O(n) \). כל תו נדחף או נבדק פעם אחת, וכל פעולה על המחסנית היא \( O(1) \).
-    - **זיכרון:** \( O(n) \) במקרה הגרוע, למשל `((((((` שבה כל התווים נדחפים.
+    - **זמן :** \( O(n) \). כל תו נדחף או נבדק פעם אחת, וכל פעולה על המחסנית היא \( O(1) \).
+    - **זיכרון :** \( O(n) \) במקרה הגרוע, למשל `((((((` שבה כל התווים נדחפים.
 
     **כמה זה משנה?** על הקלט הגרוע של הפתרון הפשוט, \( n/2 \) פעמים `(` ואחריהן \( n/2 \)
     פעמים `)`, הפתרון הפשוט עושה \( n/2 \) מעברים, וכל מעבר קורא את כל מה שנשאר מהמחרוזת.
-    המחסנית קוראת כל תו פעם אחת:
+    המחסנית קוראת כל תו פעם אחת :
 
-    | אורך \( n \) | מעברים בפתרון הפשוט | תווים שנקראו: פשוט | תווים שנקראו: מחסנית | פי כמה |
+    | אורך \( n \) | מעברים בפתרון הפשוט | תווים שנקראו : פשוט | תווים שנקראו : מחסנית | פי כמה |
     |---|---|---|---|---|
     | 10 | 5 | 30 | 10 | 3 |
     | 100 | 50 | 2,550 | 100 | 25 |
@@ -319,7 +319,7 @@ added: 2026-10-16
     | 10,000 | 5,000 | 25,005,000 | 10,000 | 2,500 |
     | 100,000 | 50,000 | 2,500,050,000 | 100,000 | 25,000 |
 
-    <span class="viz-legend"><span><i class="by-enum"></i>פתרון פשוט: מחיקת זוגות</span><span><i class="by-multiples"></i>פתרון יעיל: מחסנית</span></span>
+    <span class="viz-legend"><span><i class="by-enum"></i>פתרון פשוט : מחיקת זוגות</span><span><i class="by-multiples"></i>פתרון יעיל : מחסנית</span></span>
 
     <svg class="perf-chart" viewBox="0 0 640 280" role="img" aria-label="מספר התווים שכל פתרון קורא, בסקאלה לוגריתמית"><line class="grid" x1="64" x2="630" y1="240.0" y2="240.0"/><text class="tick" x="56" y="244.0" text-anchor="end">10<tspan dy="-5" font-size="9">0</tspan></text><line class="grid" x1="64" x2="630" y1="217.6" y2="217.6"/><text class="tick" x="56" y="221.6" text-anchor="end">10<tspan dy="-5" font-size="9">1</tspan></text><line class="grid" x1="64" x2="630" y1="195.2" y2="195.2"/><text class="tick" x="56" y="199.2" text-anchor="end">10<tspan dy="-5" font-size="9">2</tspan></text><line class="grid" x1="64" x2="630" y1="172.8" y2="172.8"/><text class="tick" x="56" y="176.8" text-anchor="end">10<tspan dy="-5" font-size="9">3</tspan></text><line class="grid" x1="64" x2="630" y1="150.4" y2="150.4"/><text class="tick" x="56" y="154.4" text-anchor="end">10<tspan dy="-5" font-size="9">4</tspan></text><line class="grid" x1="64" x2="630" y1="128.0" y2="128.0"/><text class="tick" x="56" y="132.0" text-anchor="end">10<tspan dy="-5" font-size="9">5</tspan></text><line class="grid" x1="64" x2="630" y1="105.6" y2="105.6"/><text class="tick" x="56" y="109.6" text-anchor="end">10<tspan dy="-5" font-size="9">6</tspan></text><line class="grid" x1="64" x2="630" y1="83.2" y2="83.2"/><text class="tick" x="56" y="87.2" text-anchor="end">10<tspan dy="-5" font-size="9">7</tspan></text><line class="grid" x1="64" x2="630" y1="60.8" y2="60.8"/><text class="tick" x="56" y="64.8" text-anchor="end">10<tspan dy="-5" font-size="9">8</tspan></text><line class="grid" x1="64" x2="630" y1="38.4" y2="38.4"/><text class="tick" x="56" y="42.4" text-anchor="end">10<tspan dy="-5" font-size="9">9</tspan></text><line class="grid" x1="64" x2="630" y1="16.0" y2="16.0"/><text class="tick" x="56" y="20.0" text-anchor="end">10<tspan dy="-5" font-size="9">10</tspan></text><rect class="bar by-enum" x="86.6" y="206.9" width="34.0" height="33.1"><title>n = 10: pair removal reads 30</title></rect><rect class="bar by-multiples" x="120.6" y="217.6" width="34.0" height="22.4"><title>n = 10: stack reads 10</title></rect><text class="tick" x="120.6" y="258" text-anchor="middle">n = 10</text><rect class="bar by-enum" x="199.8" y="163.7" width="34.0" height="76.3"><title>n = 100: pair removal reads 2,550</title></rect><rect class="bar by-multiples" x="233.8" y="195.2" width="34.0" height="44.8"><title>n = 100: stack reads 100</title></rect><text class="tick" x="233.8" y="258" text-anchor="middle">n = 100</text><rect class="bar by-enum" x="313.0" y="119.1" width="34.0" height="120.9"><title>n = 1,000: pair removal reads 250,500</title></rect><rect class="bar by-multiples" x="347.0" y="172.8" width="34.0" height="67.2"><title>n = 1,000: stack reads 1,000</title></rect><text class="tick" x="347.0" y="258" text-anchor="middle">n = 1,000</text><rect class="bar by-enum" x="426.2" y="74.3" width="34.0" height="165.7"><title>n = 10,000: pair removal reads 25,005,000</title></rect><rect class="bar by-multiples" x="460.2" y="150.4" width="34.0" height="89.6"><title>n = 10,000: stack reads 10,000</title></rect><text class="tick" x="460.2" y="258" text-anchor="middle">n = 10,000</text><rect class="bar by-enum" x="539.4" y="29.5" width="34.0" height="210.5"><title>n = 100,000: pair removal reads 2,500,050,000</title></rect><rect class="bar by-multiples" x="573.4" y="128.0" width="34.0" height="112.0"><title>n = 100,000: stack reads 100,000</title></rect><text class="tick" x="573.4" y="258" text-anchor="middle">n = 100,000</text><line class="axis" x1="64" x2="630" y1="240" y2="240"/></svg>
 
@@ -328,20 +328,20 @@ added: 2026-10-16
 
 ## נקודות חשובות ושאלות המשך
 
-??? trap "מלכודת: לספור במקום לזכור"
+??? trap "מלכודת : לספור במקום לזכור"
     פתרון מפתה הוא לספור פותחים וסוגרים ולבדוק שהמונים שווים. זה מפספס את הסדר (`)(`
     עובר) ואת הסוג (`(]` עובר אם סופרים את כל הסוגריים יחד, ו-`([)]` עובר גם עם מונה
     לכל סוג). צריך לזכור **אילו** פותחים פתוחים ובאיזה סדר, וזה בדיוק מה שהמחסנית עושה.
 
-??? trap "מלכודת: לשכוח את הבדיקה בסוף"
+??? trap "מלכודת : לשכוח את הבדיקה בסוף"
     מחרוזת כמו `(((` או `{[` עוברת את כל הלולאה בלי אף כישלון, כי אין בה סוגר סוגר. רק
     הבדיקה שהמחסנית ריקה בסוף תופסת אותה. גם בפתרון הפשוט המקבילה היא לבדוק שנשארה
     מחרוזת ריקה, ולא רק שהלולאה נעצרה.
 
 ??? followup "שאלות המשך"
-    - **רק סוג אחד של סוגריים:** אפשר בלי מחסנית, עם מונה בלבד. מוסיפים 1 על `(`, מורידים 1
+    - **רק סוג אחד של סוגריים :** אפשר בלי מחסנית, עם מונה בלבד. מוסיפים 1 על `(`, מורידים 1
       על `)`, והמחרוזת תקינה אם המונה אף פעם לא שלילי ובסוף הוא 0. זיכרון \( O(1) \).
-    - **בחומרה:** אותו מונה הוא FSM פשוט שבודק זרם של תווים, תו אחד בכל מחזור שעון. עם כמה
+    - **בחומרה :** אותו מונה הוא FSM פשוט שבודק זרם של תווים, תו אחד בכל מחזור שעון. עם כמה
       סוגים צריך זיכרון LIFO, ואז שואלים מה העומק המקסימלי ומה קורה ב-overflow.
-    - **הסוגריים התקינים הארוכים ביותר:** מצאו את אורך תת-המחרוזת התקינה הארוכה ביותר
+    - **הסוגריים התקינים הארוכים ביותר :** מצאו את אורך תת-המחרוזת התקינה הארוכה ביותר
       (LeetCode 32).

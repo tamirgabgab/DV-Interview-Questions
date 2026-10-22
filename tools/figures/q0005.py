@@ -75,7 +75,7 @@ def chart():
             X = c.X(i + 1) + (k - 1) * bw
             Y = c.Y(n)
             c.add(f'<rect class="bar {cls}" x="{X - bw / 2:.1f}" y="{Y:.1f}" width="{bw:.1f}" '
-                  f'height="{c.base - Y:.1f}" rx="2"><title>{name}, x = {x}: {fmt(n)} צעדים</title></rect>')
+                  f'height="{c.base - Y:.1f}" rx="2"><title>{name}, x = {x} : {fmt(n)} צעדים</title></rect>')
     c.x_ticks(range(1, len(XS) + 1), labels=[f"x = {x}" for x in XS])
     c.axis()
     return c.svg()

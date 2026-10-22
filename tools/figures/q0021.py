@@ -159,7 +159,7 @@ def blocks_svg(addr, length, mps=MPS, rcb=RCB):
     sizes = blocks(addr, length, rcb)
     N, m = len(sizes), mps // rcb
     d = delta(addr, length, mps, rcb)
-    label = (f"בקשה של {length} בתים מכתובת 0x{addr:X} על רשת RCB של {rcb}: {N} בלוקים, "
+    label = (f"בקשה של {length} בתים מכתובת 0x{addr:X} על רשת RCB של {rcb} : {N} בלוקים, "
              f"{N - 1} גבולות פנימיים")
     p = [f'<svg class="figure cs-fig" viewBox="0 0 640 132" style="max-width:40rem" role="img" aria-label="{label}">',
          ax.grid(26, 96, addr, length)]
@@ -214,7 +214,7 @@ def branch_svg(N=8, m=M):
     """The first step of the recursion C(N) = C(N-1) + ... + C(N-m): the first completion
     covers i blocks, what is left is a smaller instance."""
     bw, x0, y0, rh = 44, 150, 34, 30
-    label = f"הפיצול לפי מספר הבלוקים של ה-Completion הראשון: C({N}) כסכום של C({N - 1}) עד C({N - m})"
+    label = f"הפיצול לפי מספר הבלוקים של ה-Completion הראשון : C({N}) כסכום של C({N - 1}) עד C({N - m})"
     height = y0 + m * (rh + 14) + 30
     p = [f'<svg class="figure cs-fig" viewBox="0 0 640 {height}" style="max-width:40rem" role="img" aria-label="{label}">']
     for j in range(N + 1):
@@ -247,7 +247,7 @@ def lemma2_svg(m=M):
     N, bw, x0, y0, rh = 6, 64, 30, 40, 28
     f, e = 0.45, 0.3                                    # end blocks as a fraction of RCB
     edges = [x0, x0 + f * bw] + [x0 + f * bw + j * bw for j in range(1, N - 1)] + [x0 + f * bw + (N - 2) * bw + e * bw]
-    label = "שלושת המקרים של למה 2: Completion פנימי, Completion עם קצה אחד, ו-Completion יחיד שמכיל את שני הקצוות"
+    label = "שלושת המקרים של למה 2 : Completion פנימי, Completion עם קצה אחד, ו-Completion יחיד שמכיל את שני הקצוות"
     rows = [("(a) interior, r = 3", 1, 4, f"3·RCB ≤ MPS ⇔ r ≤ {m}"),
             ("(b) one end, r = 4", 0, 4, f"f + 3·RCB ≤ MPS ⇔ r ≤ {m}"),
             ("(c) both ends, r = N", 0, N, "L ≤ MPS ? (the δ case)")]
@@ -281,7 +281,7 @@ def blocks_legend():
             '<span><i class="cs-first"></i>הבלוק הראשון, f בתים</span>'
             '<span><i class="cs-mid"></i>בלוק מלא, RCB בתים</span>'
             '<span><i class="cs-last"></i>הבלוק האחרון, e בתים</span>'
-            '<span><i class="cs-can"></i>גבול פנימי: כאן מותר לחתוך</span>'
+            '<span><i class="cs-can"></i>גבול פנימי : כאן מותר לחתוך</span>'
             '</span>')
 
 

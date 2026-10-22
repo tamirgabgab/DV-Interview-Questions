@@ -81,7 +81,7 @@ def chart():
         c.path(pts, f"{cls}-line", width=2)
     for n, cls in ((1, "s2"), (2, "s1"), (3, "s3")):
         v = mtbf(F_CLK, F_DATA, TAU, T0, OVERHEAD, n)
-        c.dot(500, min(v, y_max), cls, r=4.5, title=f"{n} flops at 500 MHz: {human(v)}")
+        c.dot(500, min(v, y_max), cls, r=4.5, title=f"{n} flops at 500 MHz : {human(v)}")
     c.axis()
     return c.svg()
 

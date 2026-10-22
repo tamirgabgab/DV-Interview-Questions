@@ -54,7 +54,7 @@ def fill(burst, t_write, t_read, idle_every=0):
 def legend():
     return ('<span class="viz-legend"><span><i class="s1"></i>קורא ב-80 MHz, כל מחזור</span>'
             '<span><i class="s2"></i>קורא ב-80 MHz, מדלג על קריאה אחת מכל ארבע</span>'
-            '<span><i class="ink"></i>הנוסחה: 24 ו-48</span></span>')
+            '<span><i class="ink"></i>הנוסחה : 24 ו-48</span></span>')
 
 
 def fill_chart():

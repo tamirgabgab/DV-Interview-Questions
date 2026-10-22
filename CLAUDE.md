@@ -13,6 +13,11 @@ work session, and update `HANDOFF.md` (work log, open items) at the end of every
   A line that must start with Latin text, inline code, a number followed by a period, or
   math gets the RLM mark (U+200F, `‏`) first. English terms go in the middle or at the end
   of a sentence.
+- Colons in Hebrew text have a space on both sides: a non-breaking space (U+00A0) before,
+  so the colon never wraps to the start of a line, and an ordinary space after ("סיבוב 8 :
+  שלום", "**זמן :** ..."). This covers pages, admonition titles, figure generators,
+  `explorer.js` strings and the hook's HTML. It does not apply to times and ratios (12:00,
+  23:58:59), code, math, URLs or English-only text.
 - No Hebrew inside MathJax (`\text{...}` renders reversed). In inline SVG, Hebrew `<text>`
   gets `direction="rtl"`; prefer an HTML legend over SVG text.
 - Long display math or inline chains widen the page on phones: split equations with

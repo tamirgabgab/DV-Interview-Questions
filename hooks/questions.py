@@ -192,7 +192,7 @@ def difficulty_chip(difficulty: str) -> str:
 
 def interactive_chip(q: dict) -> str:
     """A chip on pages with an explorer, a step figure or an embedded tool."""
-    return ('<span class="chip chip-interactive" title="יש בדף ממשק אינטראקטיבי: סליידרים, אנימציה או איור צעד-צעד">אינטראקטיבי</span>'
+    return ('<span class="chip chip-interactive" title="יש בדף ממשק אינטראקטיבי : סליידרים, אנימציה או איור צעד-צעד">אינטראקטיבי</span>'
             if q.get("interactive") else "")
 
 
@@ -220,13 +220,13 @@ def _header(q: dict, markdown: str, page_url: str) -> str:
     langs = [name for name, fence in (("SystemVerilog", "systemverilog"), ("Python", "python"))
              if extract_code.blocks_from_text(markdown, fence)]
     topics = " ".join(_tag_link(t, base) for t in q["tags"])
-    bottom = [f"<span>נושאים: {topics}</span>"]
+    bottom = [f"<span>נושאים : {topics}</span>"]
     if q.get("added"):
         bottom.append(f'<span class="qh-sep"></span><span>נוסף {html.escape(str(q["added"]))}</span>')
     if q.get("source"):
-        bottom.append(f'<span class="qh-sep"></span><span>מקור: {html.escape(str(q["source"]))}</span>')
+        bottom.append(f'<span class="qh-sep"></span><span>מקור : {html.escape(str(q["source"]))}</span>')
     if langs:
-        bottom.append(f'<span class="qh-sep"></span><span class="qh-badge">קוד: {" + ".join(langs)}</span>')
+        bottom.append(f'<span class="qh-sep"></span><span class="qh-badge">קוד : {" + ".join(langs)}</span>')
         if _has_tests(q):
             bottom.append('<span class="qh-badge qh-badge-ok">✓ נבדק אוטומטית</span>')
     return (
@@ -281,7 +281,7 @@ def _path_nav(q: dict, page_url: str) -> str:
             if 0 <= k < len(ids):
                 other = p["steps"][k]["q"]
                 parts.append(f'<a class="{cls}" href="{_href(other["src_uri"], page_url)}" '
-                             f'title="{html.escape(str(other["title"]))}">{label}: <span class="pn-id">{other["id"]}</span></a>')
+                             f'title="{html.escape(str(other["title"]))}">{label} : <span class="pn-id">{other["id"]}</span></a>')
         lines.append('<div class="path-nav-line">' + "".join(parts) + "</div>")
     if not lines:
         return ""
@@ -509,7 +509,7 @@ def _comments_block() -> str:
              "data-theme": "preferred_color_scheme", "data-lang": "he", "data-loading": "lazy"}
     attr_text = " ".join(f'{k}="{html.escape(v)}"' for k, v in attrs.items())
     return ("\n\n## דיון\n\n"
-            '<p class="comments-note">שאלות, תיקונים ופתרונות אחרים: הדיון נשמר ב-GitHub Discussions של המאגר, '
+            '<p class="comments-note">שאלות, תיקונים ופתרונות אחרים : הדיון נשמר ב-GitHub Discussions של המאגר, '
             "וכדי לכתוב צריך להתחבר עם חשבון GitHub.</p>\n"
             f'<div class="comments"><script src="https://giscus.app/client.js" {attr_text} crossorigin="anonymous" async></script></div>\n')
 

@@ -258,7 +258,7 @@ def middle(p, f, uid):
 
 def frame_svg(k, f, uid):
     p = [f'<svg class="figure" viewBox="0 0 640 250" style="max-width:40rem" role="img" '
-         f'aria-label="צעד {k}: {f["event"]}; מצב המשדר והמקבל">', defs(uid)]
+         f'aria-label="צעד {k} : {f["event"]}; מצב המשדר והמקבל">', defs(uid)]
     p.append(f'<text class="coord" x="8" y="20" font-weight="700">step {k} · {f["label"].replace(" · ", " ")}</text>')
     rc_box(p, f["before"], f["after"])
     ep_box(p, f["before"], f["after"])
@@ -277,14 +277,14 @@ def caption(k, f):
     purged = [s for s in a["retry"] if s not in b["retry"]]
     replayed = [s for s, r in b["tx_tlps"][len(a["tx_tlps"]):] if r]
     if kind == "start":
-        return (f"צעד {k}: הקישור פעיל כבר זמן מה. ה-RC עומד על NEXT_TRANSMIT_SEQ = {b['nts']} ו-ACKD_SEQ = "
+        return (f"צעד {k} : הקישור פעיל כבר זמן מה. ה-RC עומד על NEXT_TRANSMIT_SEQ = {b['nts']} ו-ACKD_SEQ = "
                 f"{b['ackd']}, ה-Retry Buffer ריק; ה-EP מצפה ל-{b['nrs']} והסף הראשון שהגריל הוא {b['threshold']}.")
     if kind == "send":
-        return (f"צעד {k}: {f['event']}. כל אחד מקבל את NEXT_TRANSMIT_SEQ ומקדם אותו; ה-Retry Buffer מחזיק "
+        return (f"צעד {k} : {f['event']}. כל אחד מקבל את NEXT_TRANSMIT_SEQ ומקדם אותו; ה-Retry Buffer מחזיק "
                 f"{fmt(b['retry'])}, ועותקים נפרדים יצאו לקישור. ‏NEXT_TRANSMIT_SEQ = {b['nts']}.")
     if kind in ("tlp", "replay"):
         n = len(b["delivered"]) - len(a["delivered"])
-        head = f"צעד {k}: {f['event']}: {'המספר הצפוי' if n == 1 else 'המספרים הצפויים'}, {'נמסר' if n == 1 else 'נמסרים'} ל-TL"
+        head = f"צעד {k} : {f['event']} : {'המספר הצפוי' if n == 1 else 'המספרים הצפויים'}, {'נמסר' if n == 1 else 'נמסרים'} ל-TL"
         nak = " ו-NAK_SCHEDULED כבה" if a["nak"] and not b["nak"] else ""
         if sent:
             return (f"{head}{nak}. ‏NEXT_RCV_SEQ = {b['nrs']}; הספירה הגיעה לסף {a['threshold']}, ולכן יוצא "
@@ -292,28 +292,28 @@ def caption(k, f):
         return f"{head}{nak}. ‏NEXT_RCV_SEQ = {b['nrs']}, {b['pending']} ממתינים ל-Ack מול סף {b['threshold']}."
     if kind == "ack":
         if purged:
-            return (f"צעד {k}: {f['event']}. ה-RC מוצא את {a['tx_dllps'][len(a['tx_dllps']) - 1][1] if False else purged[-1]} "
-                    f"ב-Retry Buffer ומוחק מהראש עד אליו: {fmt(purged)}. נשאר {fmt(b['retry'])}, ‏ACKD_SEQ = {b['ackd']}.")
-        return (f"צעד {k}: {f['event']}. המספר הוא ACKD_SEQ עצמו: Ack חוזר בלי התקדמות, שום דבר לא משתנה.")
+            return (f"צעד {k} : {f['event']}. ה-RC מוצא את {a['tx_dllps'][len(a['tx_dllps']) - 1][1] if False else purged[-1]} "
+                    f"ב-Retry Buffer ומוחק מהראש עד אליו : {fmt(purged)}. נשאר {fmt(b['retry'])}, ‏ACKD_SEQ = {b['ackd']}.")
+        return (f"צעד {k} : {f['event']}. המספר הוא ACKD_SEQ עצמו : Ack חוזר בלי התקדמות, שום דבר לא משתנה.")
     if kind == "bad":
-        return (f"צעד {k}: {f['event']}. ה-EP זורק אותו ושולח {sent[0]} (האחרון שנמסר); NAK_SCHEDULED נדלק "
+        return (f"צעד {k} : {f['event']}. ה-EP זורק אותו ושולח {sent[0]} (האחרון שנמסר); NAK_SCHEDULED נדלק "
                 f"והספירה ל-Ack מתאפסת. ‏NEXT_RCV_SEQ נשאר {b['nrs']}.")
     if kind == "future":
-        return (f"צעד {k}: {f['event']}: ה-EP עדיין מצפה ל-{b['nrs']}, ולכן זה TLP \"מהעתיד\". נזרק, ובלי Nak נוסף "
+        return (f"צעד {k} : {f['event']} : ה-EP עדיין מצפה ל-{b['nrs']}, ולכן זה TLP \"מהעתיד\". נזרק, ובלי Nak נוסף "
                 f"כי NAK_SCHEDULED דולק.")
     if kind == "nak":
-        return (f"צעד {k}: {f['event']}. קודם כמו Ack: {fmt(purged)} נמחק ו-ACKD_SEQ = {b['ackd']}; ואז Replay של כל "
-                f"מה שנשאר, בסדר ועם המספרים המקוריים: {fmt(replayed)}.")
+        return (f"צעד {k} : {f['event']}. קודם כמו Ack : {fmt(purged)} נמחק ו-ACKD_SEQ = {b['ackd']}; ואז Replay של כל "
+                f"מה שנשאר, בסדר ועם המספרים המקוריים : {fmt(replayed)}.")
     if kind == "bad_dllp":
-        return (f"צעד {k}: {f['event']}. אי אפשר לסמוך על הסוג ולא על המספר: ה-RC סופר DLLP פגום ולא נוגע "
+        return (f"צעד {k} : {f['event']}. אי אפשר לסמוך על הסוג ולא על המספר : ה-RC סופר DLLP פגום ולא נוגע "
                 f"ב-Retry Buffer ({fmt(b['retry'])}) ולא ב-ACKD_SEQ.")
     if kind == "timeout":
-        return (f"צעד {k}: {f['event']} וב-Retry Buffer עוד {fmt(b['retry'])}. ה-RC משדר מחדש את כולם מהעותקים "
-                f"השמורים: {fmt(replayed)}.")
+        return (f"צעד {k} : {f['event']} וב-Retry Buffer עוד {fmt(b['retry'])}. ה-RC משדר מחדש את כולם מהעותקים "
+                f"השמורים : {fmt(replayed)}.")
     if kind == "dup":
-        return (f"צעד {k}: {f['event']}. ה-EP כבר מסר אותם (NEXT_RCV_SEQ = {b['nrs']}), ולכן כל אחד נזרק ועונה "
-                f"ב-Ack חוזר: {', '.join(sent)}. ‏Nak אין, כי שום דבר לא חסר.")
-    return (f"צעד {k}: {f['event']}. המספר אינו ב-Retry Buffer ואינו ACKD_SEQ ({b['ackd']}): Data Link Protocol "
+        return (f"צעד {k} : {f['event']}. ה-EP כבר מסר אותם (NEXT_RCV_SEQ = {b['nrs']}), ולכן כל אחד נזרק ועונה "
+                f"ב-Ack חוזר : {', '.join(sent)}. ‏Nak אין, כי שום דבר לא חסר.")
+    return (f"צעד {k} : {f['event']}. המספר אינו ב-Retry Buffer ואינו ACKD_SEQ ({b['ackd']}) : Data Link Protocol "
             f"Error, נספר ונזרק בלי שינוי.")
 
 
@@ -340,9 +340,9 @@ def run_table(frames):
 def figures():
     a, b = run_a(), run_b()
     return {
-        "FIG:stepper_a": run_stepper(a, "a", "הזרימה התקינה, צעד אחרי צעד: חמישה TLPs דרך הגלישה ושני Ack-ים מצטברים"),
+        "FIG:stepper_a": run_stepper(a, "a", "הזרימה התקינה, צעד אחרי צעד : חמישה TLPs דרך הגלישה ושני Ack-ים מצטברים"),
         "LEG:stepper_a": stepper_legend(), "TAB:stepper_a": run_table(a),
-        "FIG:stepper_b": run_stepper(b, "b", "שגיאות, צעד אחרי צעד: TLP פגום, Nak ו-Replay, Ack פגום, טיימר, כפילויות ו-Ack לא חוקי"),
+        "FIG:stepper_b": run_stepper(b, "b", "שגיאות, צעד אחרי צעד : TLP פגום, Nak ו-Replay, Ack פגום, טיימר, כפילויות ו-Ack לא חוקי"),
         "LEG:stepper_b": stepper_legend(), "TAB:stepper_b": run_table(b),
     }
 

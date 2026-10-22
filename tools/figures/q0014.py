@@ -126,7 +126,7 @@ def cases():
              (a, (3, 3, 5, 5), True, "פינה משותפת"),
              ((1, 1, 4, 4), (3, 2, 5, 4), False, "חפיפה"),
              ((1, 1, 5, 5), (2, 2, 4, 4), False, "אחד בתוך השני")]
-    return pair_panels(pairs, 3, 6, 5, 22, "זוגות של ריבועים: ארבעה מותרים ושניים אסורים")
+    return pair_panels(pairs, 3, 6, 5, 22, "זוגות של ריבועים : ארבעה מותרים ושניים אסורים")
 
 
 def zones():
@@ -147,7 +147,7 @@ def zones():
                        ("מתחת", 5.5, (1 + y1) / 2), ("מעל", 5.5, (y2 + 8) / 2)]:
         body.append(f'<text class="zone-label" x="{g.px(x)}" y="{g.py(y) + 5}" text-anchor="middle" '
                     f'direction="rtl">{text}</text>')
-    return svg(g.px(10) + 20, g.py(1) + 12, "ארבעת האזורים סביב ריבוע i: משמאל, מימין, מתחת ומעל",
+    return svg(g.px(10) + 20, g.py(1) + 12, "ארבעת האזורים סביב ריבוע i : משמאל, מימין, מתחת ומעל",
                "".join(body), max_w=22)
 
 
@@ -159,7 +159,7 @@ def random_examples(squares, seeds):
         assert ns["shapes_ok"](10, 8, items, squares)
         g = Grid(20 + k * w, 10, 10, 8, c)
         name = "ריבועים" if squares else "מלבנים"
-        body += [g.background(), shapes(g, items), g.caption(f"הגרלה {k + 1}: {len(items)} {name}")]
+        body += [g.background(), shapes(g, items), g.caption(f"הגרלה {k + 1} : {len(items)} {name}")]
     what = "ריבועים" if squares else "מלבנים"
     return svg(len(seeds) * w, 7 * c + 44, f"שלוש הגרלות של {what} בלי חפיפה", "".join(body))
 
@@ -179,7 +179,7 @@ def cross():
                     f'width="{(s[2] - s[0]) * c}" height="6" rx="3"/>')
         body.append(f'<rect class="{cls}" x="{g.px(1) - 34 + 9 * k}" y="{g.py(s[3])}" '
                     f'width="6" height="{(s[3] - s[1]) * c}" rx="3"/>')
-    body.append(g.caption("✗ צלב: אין פינה בפנים, ויש חפיפה", dy=50))
+    body.append(g.caption("✗ צלב : אין פינה בפנים, ויש חפיפה", dy=50))
 
     h = Grid(g.px(9) + 70, 10, 7, 8, c)
     legal = [(1, 1, 4, 3), (4, 1, 7, 6), (1, 3, 3, 8), (3, 6, 7, 8), (3, 3, 4, 6)]

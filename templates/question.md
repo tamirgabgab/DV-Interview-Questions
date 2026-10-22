@@ -14,8 +14,8 @@ added: YYYY-MM-DD
 comes from the front matter and the hook renders the header card.)
 
 ??? interviewer "מה המראיין בודק"
-    - **נקודה 1:** what the interviewer is really testing, without revealing the answer.
-    - **נקודה 2:** ...
+    - **נקודה 1 :** what the interviewer is really testing, without revealing the answer.
+    - **נקודה 2 :** ...
 
 ---
 
@@ -36,14 +36,14 @@ hints and collapsed solution. A single-part question skips the part heading.)
 
     #### הרעיון { .sol-idea }
 
-    פסקה או שתיים: מה הרעיון המרכזי.
+    פסקה או שתיים : מה הרעיון המרכזי.
 
     #### השלבים { .sol-steps }
 
     <div class="steps" markdown>
 
-    1. **שם הצעד:** מה עושים.
-    2. **שם הצעד:** מה עושים.
+    1. **שם הצעד :** מה עושים.
+    2. **שם הצעד :** מה עושים.
 
     </div>
 
@@ -84,12 +84,12 @@ hints and collapsed solution. A single-part question skips the part heading.)
 
 ## נקודות חשובות ושאלות המשך
 
-??? trap "מלכודת: שם המלכודת"
+??? trap "מלכודת : שם המלכודת"
     טעות נפוצה ואיך נמנעים ממנה.
 
 ??? followup "שאלות המשך"
-    - **שאלה 1:** ...
-    - **שאלה 2:** ...
+    - **שאלה 1 :** ...
+    - **שאלה 2 :** ...
 
 <!--
 If the question has code, also add tests/<id>/ (copy a similar question's folder):

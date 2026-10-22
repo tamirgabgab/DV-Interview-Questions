@@ -25,7 +25,7 @@ def grid_a():
     cw, ch, x_right, top = 110, 56, 240, 28
     w, h = 300, top + 2 * ch + 10
     p = [f'<svg class="figure" viewBox="0 0 {w} {h}" style="max-width:{w / 16:.0f}rem" role="img" '
-         'aria-label="ארבע המשפחות האפשריות: בן בן, בן בת, בת בן, בת בת. בת בת נפסלת, ומבין שלוש הנותרות '
+         'aria-label="ארבע המשפחות האפשריות : בן בן, בן בת, בת בן, בת בת. בת בת נפסלת, ומבין שלוש הנותרות '
          'רק אחת היא בן בן">']
     for j, s in enumerate(SEXES):                         # column headers: the second child
         x = x_right - (j + 0.5) * cw

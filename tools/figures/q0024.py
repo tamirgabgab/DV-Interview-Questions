@@ -84,26 +84,26 @@ def circle_svg(aria, left, right):
 
 
 def circle_a():
-    return circle_svg("שני מצבים עם אותו מרחק קדימה: PCC = 9 ו-PCL = 13 בלי גלישה, PCC = 254 ו-PCL = 2 עם גלישה; "
+    return circle_svg("שני מצבים עם אותו מרחק קדימה : PCC = 9 ו-PCL = 13 בלי גלישה, PCC = 254 ו-PCL = 2 עם גלישה; "
                       "בשניהם ארבעה קרדיטים",
                       (9, 13, "PCC", "PCL", "no wrap: PCC = 9, PCL = 13", "(13 − 9) mod 256 = 4", "credits"),
                       (254, 2, "PCC", "PCL", "wrap: PCC = 254, PCL = 2", "(2 − 254) mod 256 = 4", "credits"))
 
 
 def circle_a_legend():
-    return legend([("ink", f"{RLM}PCC"), ("s3", f"{RLM}PCL"), ("fc-ahead", "המרחק קדימה: הקרדיטים שנותרו"),
-                   ("fc-window", "חלון של 127 צעדים קדימה מ-PCC: רק שם PCL נקרא כ\"לפני\"")])
+    return legend([("ink", f"{RLM}PCC"), ("s3", f"{RLM}PCL"), ("fc-ahead", "המרחק קדימה : הקרדיטים שנותרו"),
+                   ("fc-window", "חלון של 127 צעדים קדימה מ-PCC : רק שם PCL נקרא כ\"לפני\"")])
 
 
 def circle_b():
-    return circle_svg("תיקון ה-Credit Sync מעבר לגלישה: מ-PCR = 253 ל-PCC = 1 המרחק 4, ולכן PCA מתקדם מ-254 ל-2",
+    return circle_svg("תיקון ה-Credit Sync מעבר לגלישה : מ-PCR = 253 ל-PCC = 1 המרחק 4, ולכן PCA מתקדם מ-254 ל-2",
                       (253, 1, "PCR", "PCC", "Sync: PCR = 253, received PCC = 1", "(1 − 253) mod 256 = 4", "missing"),
                       (254, 2, "old PCA", "new PCA", "PCA = (254 + 4) mod 256", "then PCR = 1", "credits back"))
 
 
 def circle_b_legend():
     return legend([("ink", "הערך הישן"), ("s3", "הערך שהגיע, או החדש"),
-                   ("fc-ahead", "המרחק קדימה: פקטות שאבדו, והקרדיטים שחוזרים"),
+                   ("fc-ahead", "המרחק קדימה : פקטות שאבדו, והקרדיטים שחוזרים"),
                    ("fc-window", "חלון של 127 צעדים קדימה")])
 
 
@@ -231,7 +231,7 @@ def middle(p, f, uid):
 def frame_svg(k, f, uid):
     a, b = f["before"], f["after"]
     p = [f'<svg class="figure" viewBox="0 0 640 212" style="max-width:40rem" role="img" '
-         f'aria-label="צעד {k}: {f["event"]}; המונים של שני הצדדים ותפוסת ה-buffer">', defs(uid)]
+         f'aria-label="צעד {k} : {f["event"]}; המונים של שני הצדדים ותפוסת ה-buffer">', defs(uid)]
     p.append(f'<text class="coord" x="8" y="20" font-weight="700">step {k} · {f["label"]}</text>')
     adapter(p, 16, "HOST · Egress Adapter",
             [("PCC", a["pcc"], b["pcc"]), ("PCL", a["pcl"], b["pcl"]), ("credits", a["credits"], b["credits"])])
@@ -246,30 +246,30 @@ def caption(k, f):
     a, b = f["before"], f["after"]
     kind = f["kind"]
     if kind == "setup":
-        return (f"צעד {k}: הקמת הנתיב. ה-Egress מתחיל מ-PCC = 0 ו-PCL = 0; ה-Ingress מ-PCR = 0 ו-PCA = {b['pca']}, "
+        return (f"צעד {k} : הקמת הנתיב. ה-Egress מתחיל מ-PCC = 0 ו-PCL = 0; ה-Ingress מ-PCR = 0 ו-PCA = {b['pca']}, "
                 f"כמספר התאים ב-buffer. המרחק מ-PCC ל-PCL הוא 0, ולכן עדיין אסור לשדר.")
     if kind == "grant":
         free = CREDITS - b["occ"]
         tail = (f" בדיוק מספר התאים הפנויים, {free}." if b["credits"] == free else
-                f" אבל ב-buffer יש {free} תאים פנויים: קרדיט אחד דלף עם הפקטה שאבדה.")
-        return (f"צעד {k}: ה-Ingress שולח Credit Grant עם PCA = {b['pcl']}, וה-Egress מחליף: PCL = {b['pcl']}. "
+                f" אבל ב-buffer יש {free} תאים פנויים : קרדיט אחד דלף עם הפקטה שאבדה.")
+        return (f"צעד {k} : ה-Ingress שולח Credit Grant עם PCA = {b['pcl']}, וה-Egress מחליף : PCL = {b['pcl']}. "
                 f"המרחק מ-PCC = {b['pcc']} הוא {b['credits']} קרדיטים.{tail}")
     if kind == "packet":
         n = b["pcc"] - a["pcc"]
         if n == 1:
-            return (f"צעד {k}: {f['event']}. ‏PCC = {b['pcc']}, ‏PCR = {b['pcr']}, התפוסה {b['occ']}. "
+            return (f"צעד {k} : {f['event']}. ‏PCC = {b['pcc']}, ‏PCR = {b['pcr']}, התפוסה {b['occ']}. "
                     f"נשארו {b['credits']} קרדיטים.")
-        return (f"צעד {k}: {f['event']}. ‏PCC = {b['pcc']} = PCL, ‏PCR = {b['pcr']}, התפוסה {b['occ']} "
+        return (f"צעד {k} : {f['event']}. ‏PCC = {b['pcc']} = PCL, ‏PCR = {b['pcr']}, התפוסה {b['occ']} "
                 f"וה-buffer מלא. המרחק 0, ולכן can_transmit מחזירה 0 עד ה-Credit Grant הבא.")
     if kind == "drop":
-        return (f"צעד {k}: {f['event']}. ה-Egress צרך קרדיט, ‏PCC = {b['pcc']}, אבל ה-Ingress לא ראה את הפקטה: "
+        return (f"צעד {k} : {f['event']}. ה-Egress צרך קרדיט, ‏PCC = {b['pcc']}, אבל ה-Ingress לא ראה את הפקטה : "
                 f"‏PCR נשאר {b['pcr']}, ‏PCA נשאר {b['pca']} והתפוסה {b['occ']}. הקרדיט הזה לא יחזור מעצמו.")
     if kind == "dequeue":
-        return (f"צעד {k}: פקטה יוצאת מה-buffer. התפוסה {b['occ']}, ‏PCA = {b['pca']}. ‏PCR נשאר {b['pcr']}: "
+        return (f"צעד {k} : פקטה יוצאת מה-buffer. התפוסה {b['occ']}, ‏PCA = {b['pca']}. ‏PCR נשאר {b['pcr']} : "
                 f"הוא סופר קבלות, לא תפוסה.")
     missing = (b["pcr"] - a["pcr"]) % 256
-    return (f"צעד {k}: ה-Egress שולח Credit Sync עם PCC = {b['pcr']}. ה-Ingress מודד מ-PCR = {a['pcr']} עד "
-            f"{b['pcr']}: המרחק {missing}, פקטה אחת אבדה. ‏PCA = {a['pca']} + {missing} = {b['pca']}, ואז PCR = {b['pcr']}.")
+    return (f"צעד {k} : ה-Egress שולח Credit Sync עם PCC = {b['pcr']}. ה-Ingress מודד מ-PCR = {a['pcr']} עד "
+            f"{b['pcr']} : המרחק {missing}, פקטה אחת אבדה. ‏PCA = {a['pca']} + {missing} = {b['pca']}, ואז PCR = {b['pcr']}.")
 
 
 def run_stepper(frames, part, aria):
@@ -296,10 +296,10 @@ def figures():
     a, b = run_a(), run_b()
     return {
         "FIG:circle_a": circle_a(), "LEG:circle_a": circle_a_legend(),
-        "FIG:stepper_a": run_stepper(a, "a", "הזרימה התקינה, צעד אחרי צעד: Credit Grant, שלוש פקטות, שתי הוצאות ו-Grant נוסף"),
+        "FIG:stepper_a": run_stepper(a, "a", "הזרימה התקינה, צעד אחרי צעד : Credit Grant, שלוש פקטות, שתי הוצאות ו-Grant נוסף"),
         "LEG:stepper_a": stepper_legend(), "TAB:stepper_a": run_table(a),
         "FIG:circle_b": circle_b(), "LEG:circle_b": circle_b_legend(),
-        "FIG:stepper_b": run_stepper(b, "b", "אובדן פקטה, צעד אחרי צעד: הדליפה, ה-Credit Sync והתיקון"),
+        "FIG:stepper_b": run_stepper(b, "b", "אובדן פקטה, צעד אחרי צעד : הדליפה, ה-Credit Sync והתיקון"),
         "LEG:stepper_b": stepper_legend(), "TAB:stepper_b": run_table(b),
     }
 

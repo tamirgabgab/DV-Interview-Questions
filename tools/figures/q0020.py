@@ -53,7 +53,7 @@ def params_svg(mps=128, split=(48, 128, 80)):
 
     p = ['<svg class="figure cs-fig" viewBox="0 0 640 196" style="max-width:40rem" role="img" '
          'aria-label="בקשת קריאה של 256 בתים מכתובת 0x1010 על רשת גבולות ה-RCB, טווח ה-MPS של '
-         'ה-Completion הראשון, ופיצול חוקי אחד: 48, 128, 80">']
+         'ה-Completion הראשון, ופיצול חוקי אחד : 48, 128, 80">']
     p.append('<defs><marker id="cs-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" '
              'markerHeight="6" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/>'
              '</marker></defs>')
@@ -99,12 +99,12 @@ def params_svg(mps=128, split=(48, 128, 80)):
 
 def params_legend():
     return ('<span class="viz-legend">'
-            '<span><i class="cs-rcb"></i>גבול RCB: כאן מותר לחתוך</span>'
+            '<span><i class="cs-rcb"></i>גבול RCB : כאן מותר לחתוך</span>'
             '<span><i class="cs-req"></i>תחילת הבקשה וסופה</span>'
             '<span><i class="cs-can"></i>סוף אפשרי ל-Completion הראשון</span>'
-            '<span><i class="cs-first"></i>ראשון: עד גבול RCB</span>'
-            '<span><i class="cs-mid"></i>אמצעי: כפולה של RCB</span>'
-            '<span><i class="cs-last"></i>אחרון: עד סוף הבקשה</span>'
+            '<span><i class="cs-first"></i>ראשון : עד גבול RCB</span>'
+            '<span><i class="cs-mid"></i>אמצעי : כפולה של RCB</span>'
+            '<span><i class="cs-last"></i>אחרון : עד סוף הבקשה</span>'
             '</span>')
 
 
@@ -127,7 +127,7 @@ def splits_map_svg(splits, mps_filter=None):
     height = 30 + sum(head + len(g) * (row + gap) for g in groups.values()) + 4
     label = ("כל הפיצולים החוקיים של הבקשה, שורה לכל פיצול, מקובצים לפי מספר ה-Completions"
              if mps_filter is None else
-             f"אותם פיצולים כש-MPS = {mps_filter}: הפיצולים שיש בהם Completion גדול מ-{mps_filter} מסומנים ודהויים")
+             f"אותם פיצולים כש-MPS = {mps_filter} : הפיצולים שיש בהם Completion גדול מ-{mps_filter} מסומנים ודהויים")
     p = [f'<svg class="figure cs-fig" viewBox="0 0 640 {height}" style="max-width:40rem" role="img" '
          f'aria-label="{label}">']
     for off in range(0, SPAN + 1, RCB):

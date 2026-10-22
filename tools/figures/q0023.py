@@ -85,8 +85,8 @@ def legend(items):
 
 def aligned_svg():
     p = ['<svg class="figure cs-fig" viewBox="0 0 640 206" style="max-width:40rem" role="img" '
-         'aria-label="קריאה מיושרת של 256 בתים מכתובת 0x10000: שני הבלוקים בזיכרון, ושתי התשובות '
-         'החוקיות: Completion אחד של 256 בתים, או שניים של 128">']
+         'aria-label="קריאה מיושרת של 256 בתים מכתובת 0x10000 : שני הבלוקים בזיכרון, ושתי התשובות '
+         'החוקיות : Completion אחד של 256 בתים, או שניים של 128">']
     grid(p, 26, 174)
     request_lines(p, 0x10000, 0x10100, 30, 174)
     p.append('<text class="legend halo" x="44" y="46">memory after the write</text>')
@@ -146,7 +146,7 @@ def snapshot(m):
 
 def frame_svg(cycle, state, sent, all_cpls):
     p = [f'<svg class="figure cs-fig" viewBox="0 0 640 236" style="max-width:40rem" role="img" '
-         f'aria-label="מחזור {cycle}: תורי ההמתנה של שתי הקריאות וה-Completions שכבר נשלחו">']
+         f'aria-label="מחזור {cycle} : תורי ההמתנה של שתי הקריאות וה-Completions שכבר נשלחו">']
     p.append(f'<text class="coord" x="8" y="22" font-weight="700">cycle {cycle}</text>')
     queued = {name: (ready, cpls) for name, ready, cpls in state}
     for row, name in enumerate(("A", "B")):
@@ -200,17 +200,17 @@ def timeline_stepper():
         svg = frame_svg(cycle, state, sent_so_far, all_cpls)
         ready = {name for name, r, _ in state if r <= cycle}
         if cycle == 0:
-            cap = ("מחזור 0: שתי הקריאות הגיעו. כל אחת פוצלה ל-128 + 128 וקיבלה מחזור מוכנות אקראי: "
+            cap = ("מחזור 0 : שתי הקריאות הגיעו. כל אחת פוצלה ל-128 + 128 וקיבלה מחזור מוכנות אקראי : "
                    "A מוכנה ממחזור 5, ‏B ממחזור 3.")
         elif cpl is None:
-            cap = f"מחזור {cycle}: אף קריאה לא מוכנה עדיין, ולכן אין Completion."
+            cap = f"מחזור {cycle} : אף קריאה לא מוכנה עדיין, ולכן אין Completion."
         else:
             name = NAMES[cpl.tag]
             left = next((len(c) for n, _, c in snapshot_after(state, name)), 0)
             both = " שתי הקריאות מוכנות, והבחירה ביניהן אקראית." if len(ready) == 2 else ""
             tail = (f" זה היה ה-Completion האחרון של {name}." if left == 1 else
                     f" ‏{name} ממתינה שוב, עם מחזור מוכנות חדש.")
-            cap = (f"מחזור {cycle}:{both} נבחרה {name} ושלחה את ה-Completion הבא שלה: "
+            cap = (f"מחזור {cycle} :{both} נבחרה {name} ושלחה את ה-Completion הבא שלה : "
                    f"{len(cpl.data)} בתים מ-<span dir=\"ltr\">0x{cpl.start_address:X}</span>, "
                    f"Byte Count {cpl.byte_count}.{tail}")
         out.append((svg, cap))
@@ -253,7 +253,7 @@ def chunks_svg():
     start, length = REQ_B
     end = start + length
     p = ['<svg class="figure cs-fig" viewBox="0 0 640 150" style="max-width:40rem" role="img" '
-         'aria-label="בקשה של 256 בתים מכתובת 0x10020 נוגעת בשלושה בלוקים: 96 בתים אחרונים של 0x10000, '
+         'aria-label="בקשה של 256 בתים מכתובת 0x10020 נוגעת בשלושה בלוקים : 96 בתים אחרונים של 0x10000, '
          'כל 0x10080, ו-32 הבתים הראשונים של 0x10100; שני גבולות RCB בתוך הבקשה">']
     grid(p, 26, 124)
     for key in (0x10000, 0x10080, 0x10100):
@@ -343,8 +343,8 @@ def splits_svg():
 
 
 def splits_legend():
-    return legend([("cs-one", f"{RLM}Completion יחיד"), ("cs-first", "ראשון: מכתובת הבקשה עד גבול"),
-                   ("cs-mid", "אמצעי: מגבול לגבול"), ("cs-last", "אחרון: עד סוף הבקשה"),
+    return legend([("cs-one", f"{RLM}Completion יחיד"), ("cs-first", "ראשון : מכתובת הבקשה עד גבול"),
+                   ("cs-mid", "אמצעי : מגבול לגבול"), ("cs-last", "אחרון : עד סוף הבקשה"),
                    ("cs-bad", "חיתוך שלא על גבול RCB")])
 
 

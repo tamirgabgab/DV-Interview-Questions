@@ -136,14 +136,14 @@ def heb_group(times, g):
 
 def crossing_stepper(times=TIMES):
     total, moves = plan(times)
-    frames = [(frame(times, 0, 0, label="התחלה: כולם על הגדה הקרובה"), "רגע 0: כולם והלפיד על הגדה הקרובה. הגשר מחזיק שניים, והזוג הולך בקצב האיטי.")]
+    frames = [(frame(times, 0, 0, label="התחלה : כולם על הגדה הקרובה"), "רגע 0 : כולם והלפיד על הגדה הקרובה. הגשר מחזיק שניים, והזוג הולך בקצב האיטי.")]
     across, side, t = 0, 0, 0
     for k, g in enumerate(moves, 1):
         forward = side == 0
         cost = max(times[i] for i in g)
         t += cost
         frames.append((frame(times, across, side, g, forward, t, label=f"חצייה {k}"),
-                       f"חצייה {k}: {heb_group(times, g)} {'חוצים' if len(g) > 1 else 'חוזר'} "
+                       f"חצייה {k} : {heb_group(times, g)} {'חוצים' if len(g) > 1 else 'חוזר'} "
                        f"{'קדימה' if forward else 'עם הלפיד חזרה'}, {cost} דקות. עברו {t} דקות."))
         across ^= sum(1 << i for i in g)
         side = 1 - side

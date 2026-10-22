@@ -138,7 +138,7 @@ def face_svg(k=1):
     size, c, R = 280, 140, 124
     pt = lambda turn, r: (c + r * math.sin(2 * math.pi * turn), c - r * math.cos(2 * math.pi * turn))
     p = [f'<svg class="figure" viewBox="0 0 {size} {size}" style="max-width:17rem" role="img" '
-         f'aria-label="שעון בשעה {clock(t)}: מחוג הדקות ומחוג השעות אחד על השני, ומחוג השניות במקום אחר. '
+         f'aria-label="שעון בשעה {clock(t)} : מחוג הדקות ומחוג השעות אחד על השני, ומחוג השניות במקום אחר. '
          'הנקודות הן 11 המקומות שבהם הדקות והשעות נפגשים">',
          f'<circle class="clock-face" cx="{c}" cy="{c}" r="{R}"/>']
     for n in range(60):
@@ -177,7 +177,7 @@ def deg(i, t):
 def mh_chart():
     """Minute and hour angle over 12 hours: the minute hand is a saw with 12 teeth, the hour
     hand one slow line, and every crossing is a meeting."""
-    c = Chart("זווית מחוג הדקות ומחוג השעות לאורך 12 שעות: 12 נקודות מפגש, הראשונה והאחרונה עם מחוג השניות",
+    c = Chart("זווית מחוג הדקות ומחוג השעות לאורך 12 שעות : 12 נקודות מפגש, הראשונה והאחרונה עם מחוג השניות",
               w=480, h=260, base=226, x_max=12, y_max=360, style="max-width:36rem")
     c.grid_y([0, 90, 180, 270, 360], fmt="{:g}°")
     c.grid_x(range(13))
@@ -197,7 +197,7 @@ def mh_chart():
 def zoom_chart():
     """The second hand around 00:01:00: it passes the hour hand, then the minute hand."""
     lo, hi = Fr(598, 10), Fr(616, 10)
-    c = Chart("הזווית של שלושת המחוגים בין 0:00:59.8 ל-0:01:01.6: מחוג השניות פוגש את מחוג השעות "
+    c = Chart("הזווית של שלושת המחוגים בין 0:00:59.8 ל-0:01:01.6 : מחוג השניות פוגש את מחוג השעות "
               "ב-60.08 שניות ואת מחוג הדקות ב-61.02 שניות", w=480, h=260, base=226, x_min=float(lo), x_max=float(hi),
               style="max-width:36rem",
               y_max=10)
@@ -208,7 +208,7 @@ def zoom_chart():
     c.segment((float(lo), deg("h", lo)), (float(hi), deg("h", hi)), "ink-line", width=3)
     for i, j, dx, dy in (("s", "h", -24, -12), ("s", "m", -30, -10)):
         t = gap(i, j)
-        c.dot(float(t), deg(i, t), "s2", r=5.5, title=f"{clock(t)}: {NAME[i]} ו{NAME[j]}",
+        c.dot(float(t), deg(i, t), "s2", r=5.5, title=f"{clock(t)} : {NAME[i]} ו{NAME[j]}",
               label=f"{dec(t)}", dx=dx, dy=dy)
     c.axis()
     return c.svg()
@@ -217,7 +217,7 @@ def zoom_chart():
 def offsets_chart():
     """For every minute of the first hour, the second within it at which the second hand
     meets the minute hand and the hour hand."""
-    c = Chart("בכל דקה בשעה הראשונה: באיזו שנייה מחוג השניות פוגש את מחוג הדקות ואת מחוג השעות. "
+    c = Chart("בכל דקה בשעה הראשונה : באיזו שנייה מחוג השניות פוגש את מחוג הדקות ואת מחוג השעות. "
               "בדקה 59 אין פגישה עם מחוג הדקות", w=480, h=260, base=226, x_min=-1, x_max=60, y_max=60,
               style="max-width:36rem")
     c.grid_y([0, 15, 30, 45, 60])
@@ -225,7 +225,7 @@ def offsets_chart():
     for i, j in (("s", "h"), ("s", "m")):
         for t in meetings(i, j, 3600):
             minute, sec = int(t // 60), t - 60 * (t // 60)
-            c.dot(minute, float(sec), CLS[j], r=3.2, title=f"{clock(t)}: {NAME[i]} ו{NAME[j]}")
+            c.dot(minute, float(sec), CLS[j], r=3.2, title=f"{clock(t)} : {NAME[i]} ו{NAME[j]}")
     c.text(58.6, 40, "בדקה 59 אין", anchor="start", rtl=True)
     c.axis()
     return c.svg()

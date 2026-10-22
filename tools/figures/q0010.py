@@ -40,7 +40,7 @@ def rows():
 
 
 def table():
-    lines = ["| אורך \\( n \\) | מעברים בפתרון הפשוט | תווים שנקראו: פשוט | תווים שנקראו: מחסנית | פי כמה |",
+    lines = ["| אורך \\( n \\) | מעברים בפתרון הפשוט | תווים שנקראו : פשוט | תווים שנקראו : מחסנית | פי כמה |",
              "|---|---|---|---|---|"]
     for n, passes, work, stack in rows():
         lines.append(f"| {n:,} | {passes:,} | {work:,} | {stack:,} | {work // stack:,} |")
@@ -101,18 +101,18 @@ def stack_frame(text, pos, stack, status=None):
 def stack_stepper(text):
     """Frames of the stack solution on `text`, one per character, plus start and verdict."""
     name = lambda ch: f"{'סוגר' if ch in PAIRS else 'פותח'} {KIND[ch]}"
-    frames = [(stack_frame(text, -1, []), "לפני הקריאה: המחרוזת שבאיור, והמחסנית ריקה.")]
+    frames = [(stack_frame(text, -1, []), "לפני הקריאה : המחרוזת שבאיור, והמחסנית ריקה.")]
     stack = []
     for i, ch in enumerate(text):
         if ch in PAIRS:
             if not stack:
                 frames.append((stack_frame(text, i, stack, "bad"),
-                               f"תו {i + 1} הוא {name(ch)}, אבל המחסנית ריקה. אין מה לסגור: המחרוזת לא תקינה ✗"))
+                               f"תו {i + 1} הוא {name(ch)}, אבל המחסנית ריקה. אין מה לסגור : המחרוזת לא תקינה ✗"))
                 return stepper(frames, f"המחסנית תו אחרי תו על {text}")
             if stack[-1] != PAIRS[ch]:
                 frames.append((stack_frame(text, i, stack, "bad"),
                                f"תו {i + 1} הוא {name(ch)}, אבל בראש המחסנית {name(stack[-1])} ולא {name(PAIRS[ch])}. "
-                               f"סדר הסגירה שגוי: המחרוזת לא תקינה ✗"))
+                               f"סדר הסגירה שגוי : המחרוזת לא תקינה ✗"))
                 return stepper(frames, f"המחסנית תו אחרי תו על {text}")
             stack.pop()
             frames.append((stack_frame(text, i, stack),
@@ -121,8 +121,8 @@ def stack_stepper(text):
             stack.append(ch)
             frames.append((stack_frame(text, i, stack),
                            f"תו {i + 1} הוא {name(ch)}, ולכן נדחף למחסנית."))
-    verdict = ("סוף המחרוזת והמחסנית ריקה: כל פותח נסגר, המחרוזת תקינה ✓" if not stack
-               else f"סוף המחרוזת, אבל במחסנית נשארו {len(stack)} פותחים שלא נסגרו: המחרוזת לא תקינה ✗")
+    verdict = ("סוף המחרוזת והמחסנית ריקה : כל פותח נסגר, המחרוזת תקינה ✓" if not stack
+               else f"סוף המחרוזת, אבל במחסנית נשארו {len(stack)} פותחים שלא נסגרו : המחרוזת לא תקינה ✗")
     frames.append((stack_frame(text, len(text), stack, "ok" if not stack else "bad"), verdict))
     return stepper(frames, f"המחסנית תו אחרי תו על {text}")
 

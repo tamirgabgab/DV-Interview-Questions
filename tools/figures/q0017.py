@@ -63,7 +63,7 @@ def rho_svg(uid, slow=None, fast=None, mark_entry=False, faded_other=True, hot=(
         f'<marker id="{uid}-{c}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" '
         f'orient="auto-start-reverse"><path class="{c}-fill" d="M0,0 L10,5 L0,10 z"/></marker>' for c in ("ink", "s2"))
     p = [f'<svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" '
-         f'aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו: זנב, מעגל, ומעגל נפרד"><defs>{heads}</defs>']
+         f'aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs>{heads}</defs>']
     other = {2, 5, 8}
     for i, j in enumerate(NUMS):
         cls = "s2-line" if (i, j) in hot else "ink-line"
@@ -109,28 +109,28 @@ def floyd_stepper():
     for n, (phase, step, slow, fast) in enumerate(frames):
         uid = f"q17s{n}"
         if phase == 1 and step == 0:
-            text = "שלב 1: הצב והארנב מתחילים באינדקס 0, שאף ערך לא מצביע עליו."
+            text = "שלב 1 : הצב והארנב מתחילים באינדקס 0, שאף ערך לא מצביע עליו."
         elif phase == 1 and slow != fast:
-            text = f"שלב 1, איטרציה {step}: הצב מתקדם צעד אחד ל-{slow}, והארנב שני צעדים ל-{fast}."
+            text = f"שלב 1, איטרציה {step} : הצב מתקדם צעד אחד ל-{slow}, והארנב שני צעדים ל-{fast}."
         elif phase == 1:
-            text = (f"שלב 1, איטרציה {step}: שניהם ב-{slow}. נפגשו בתוך המעגל, ומספר האיטרציות {step} "
+            text = (f"שלב 1, איטרציה {step} : שניהם ב-{slow}. נפגשו בתוך המעגל, ומספר האיטרציות {step} "
                     "הוא כפולה של אורך המעגל.")
         elif step == 0:
-            text = f"שלב 2: מחזירים את הצב ל-0. הארנב נשאר בנקודת המפגש {meet}, ומעכשיו שניהם צועדים צעד אחד."
+            text = f"שלב 2 : מחזירים את הצב ל-0. הארנב נשאר בנקודת המפגש {meet}, ומעכשיו שניהם צועדים צעד אחד."
         elif slow != fast:
-            text = f"שלב 2, איטרציה {step}: הצב ב-{slow}, הארנב ב-{fast}."
+            text = f"שלב 2, איטרציה {step} : הצב ב-{slow}, הארנב ב-{fast}."
         else:
-            text = (f"שלב 2, איטרציה {step}: שניהם ב-{slow}, הכניסה למעגל. שני חצים נכנסים אליה, מאינדקס 6 "
+            text = (f"שלב 2, איטרציה {step} : שניהם ב-{slow}, הכניסה למעגל. שני חצים נכנסים אליה, מאינדקס 6 "
                     f"ומאינדקס 7, ולכן {slow} הוא הערך הכפול.")
         entry = phase == 2 and slow == fast
         hot = {(6, DUP), (7, DUP)} if entry else set()
         out.append((rho_svg(uid, slow, fast, mark_entry=entry, hot=hot), text))
-    return stepper(out, "האלגוריתם של Floyd על הדוגמה: שלב המפגש ושלב הכניסה למעגל")
+    return stepper(out, "האלגוריתם של Floyd על הדוגמה : שלב המפגש ושלב הכניסה למעגל")
 
 
 def legend():
-    return ('<span class="viz-legend"><span><i class="fl-slow"></i>הצב: צעד אחד בכל פעם</span>'
-            '<span><i class="fl-fast"></i>הארנב: שני צעדים בכל פעם</span>'
+    return ('<span class="viz-legend"><span><i class="fl-slow"></i>הצב : צעד אחד בכל פעם</span>'
+            '<span><i class="fl-fast"></i>הארנב : שני צעדים בכל פעם</span>'
             '<span><i class="s3"></i>הכניסה למעגל, הערך הכפול</span></span>')
 
 
@@ -153,9 +153,9 @@ def binary_search_table(nums=NUMS):
     lines = ["| הטווח | ‏\\( mid \\) | כמה \\( \\le mid \\) | הכפול נמצא |", "|---|---|---|---|"]
     for lo, hi, mid, count in rows:
         if count > mid:
-            dec = f"‏\\( {count} > {mid} \\): " + (f"הוא {lo}" if lo == mid else f"בין {lo} ל-{mid}")
+            dec = f"‏\\( {count} > {mid} \\) : " + (f"הוא {lo}" if lo == mid else f"בין {lo} ל-{mid}")
         else:
-            dec = f"‏\\( {count} \\le {mid} \\): " + (f"הוא {hi}" if mid + 1 == hi else f"בין {mid + 1} ל-{hi}")
+            dec = f"‏\\( {count} \\le {mid} \\) : " + (f"הוא {hi}" if mid + 1 == hi else f"בין {mid + 1} ל-{hi}")
         lines.append(f"| {lo} עד {hi} | {mid} | {count} | {dec} |")
     lines.append(f"| {found} עד {found} | | | **{found}** |")
     return "\n".join(lines)

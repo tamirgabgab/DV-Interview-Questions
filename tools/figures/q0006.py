@@ -59,7 +59,7 @@ def chart(prices=PRICES):
     c.path(list(enumerate(prices)), "ink-line")
     for d, p in enumerate(prices):
         up = d > 0 and p > prices[d - 1] or d == 0 and p >= prices[1]
-        c.dot(d, p, "ink", r=5, title=f"יום {d}: מחיר {p}", label=p, dy=-11 if up else 20, label_size=12)
+        c.dot(d, p, "ink", r=5, title=f"יום {d} : מחיר {p}", label=p, dy=-11 if up else 20, label_size=12)
     c.text((lb + ls) / 2, 5.8, f"long +{lp}", anchor="end", dx=-12)
     c.text((ss + sb) / 2, 5.8, f"short +{sp} ✓", anchor="start", dx=12)
     return c.svg()

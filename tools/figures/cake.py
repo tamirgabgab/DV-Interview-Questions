@@ -121,7 +121,7 @@ def cake_rows(kind, a, step, show_peak=True):
     H = strip_y + h + 26
     X = lambda v: x0 + float(v) * W
     p = [f'<svg class="figure" viewBox="0 0 640 {H}" style="max-width:40rem" role="img" '
-         f'aria-label="חלוקת העוגה, שורה לכל אדם: כמה נשאר כשהוא מגיע והפרוסה שהוא חותך, ובסוף כל העוגה '
+         f'aria-label="חלוקת העוגה, שורה לכל אדם : כמה נשאר כשהוא מגיע והפרוסה שהוא חותך, ובסוף כל העוגה '
          f'עם הפרוסות של כל {n} האנשים">']
     for k, pk, R, S in rows:
         y = top + (k - 1) * (h + gap)
@@ -130,7 +130,7 @@ def cake_rows(kind, a, step, show_peak=True):
         if rest > 0:
             p.append(f'<rect class="cake-rest" x="{x0}" y="{y}" width="{float(rest) * W:.1f}" height="{h}"/>')
         p.append(f'<rect class="{slice_class(k, peak)}" x="{X(rest):.1f}" y="{y}" width="{max(float(S) * W, 0.6):.1f}" '
-                 f'height="{h}"><title>אדם {k}: p = {short(dec(pk))}, S = {dec(S)}</title></rect>')
+                 f'height="{h}"><title>אדם {k} : p = {short(dec(pk))}, S = {dec(S)}</title></rect>')
         p.append(f'<text class="legend" x="{x0 - 12}" y="{y + 17}" text-anchor="end" style="font-size:17px">{k}</text>')
         p.append(f'<text class="tick" x="{X(R) + 6:.1f}" y="{y + 16}" style="font-size:15px">p = {short(dec(pk))}</text>')
     for k, pk, R, S in rows:
@@ -186,8 +186,8 @@ def fraction_chart(kind, a, step):
 
 
 def fraction_legend():
-    return ('<span class="viz-legend"><span><i class="s1"></i>מתחת לסף: הבא אחריו מקבל יותר</span>'
-            '<span><i class="s2"></i>הראשון שמגיע לסף: החלק הגדול ביותר</span>'
+    return ('<span class="viz-legend"><span><i class="s1"></i>מתחת לסף : הבא אחריו מקבל יותר</span>'
+            '<span><i class="s2"></i>הראשון שמגיע לסף : החלק הגדול ביותר</span>'
             '<span><i class="ink"></i>מעל הסף</span>'
             '<span><i class="ink-dash"></i>הסף \\( T \\)</span></span>')
 
@@ -250,14 +250,14 @@ def f_curve(a=Fr(1, 100), d=Fr(1, 10), people=6):
 def f_legend():
     return ('<span class="viz-legend"><span><i class="s1"></i>‏\\( f(p) = p^2 / (1 - p) \\)</span>'
             '<span><i class="ink-dash"></i>הקו \\( y = d \\)</span>'
-            '<span><i class="s2"></i>האדם ה-4: הראשון מעל הקו</span>'
+            '<span><i class="s2"></i>האדם ה-4 : הראשון מעל הקו</span>'
             '<span><i class="ink"></i>אחריו, גם הם מעל הקו</span></span>')
 
 
 def g_lines(a=Fr(1, 100), qs=(Fr(3, 2), Fr(2))):
     """y = q (1 - p) for a few q against y = 1; they cross at p = 1 - 1/q. The fractions of
     the people of the first q sit on its line."""
-    c = Chart("הקווים q כפול 1 פחות p מול הקו y = 1. הם נחתכים ב-p = 1 פחות 1 חלקי q: שליש עבור q = 1.5, וחצי עבור q = 2",
+    c = Chart("הקווים q כפול 1 פחות p מול הקו y = 1. הם נחתכים ב-p = 1 פחות 1 חלקי q : שליש עבור q = 1.5, וחצי עבור q = 2",
               h=260, right=14, top=14, base=226, x_max=1, y_max=2.1)
     c.grid_y([0, 0.5, 1, 1.5, 2]).x_ticks([0, 0.25, 0.5, 0.75]).hline(1)
     for i, q in enumerate(qs):
@@ -279,5 +279,5 @@ def g_legend():
     return ('<span class="viz-legend"><span><i class="s1"></i>‏\\( y = 1.5\\,(1 - p) \\)</span>'
             '<span><i class="s3"></i>‏\\( y = 2\\,(1 - p) \\)</span>'
             '<span><i class="ink-dash"></i>הקו \\( y = 1 \\)</span>'
-            '<span><i class="s2"></i>האדם ה-10: הראשון מתחת לקו</span>'
+            '<span><i class="s2"></i>האדם ה-10 : הראשון מתחת לקו</span>'
             '<span><i class="ink"></i>אחריו, גם הם מתחת לקו</span></span>')

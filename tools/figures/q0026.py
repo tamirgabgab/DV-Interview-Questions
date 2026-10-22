@@ -90,7 +90,7 @@ def strategies_chart(alpha=ALPHA):
     tmax = 3
     sx = (w - x0 - right) / tmax
     p = [f'<svg class="perf-chart" viewBox="0 0 {w} {h}" style="max-width:{w / 16:.0f}rem" role="img" '
-         'aria-label="הזמן של שלוש האסטרטגיות: 3 שעות כשהשני מחכה, כ-2.71 שעות כשהוא הולך בינתיים, '
+         'aria-label="הזמן של שלוש האסטרטגיות : 3 שעות כשהשני מחכה, כ-2.71 שעות כשהוא הולך בינתיים, '
          'ו-2.5 שעות כשהנוסע יורד בדרך">']
     base = top + 3 * (bh + gap)
     for t in range(tmax + 1):
@@ -133,7 +133,7 @@ def road_svg(alpha=ROAD_ALPHA):
     ya, row0, rh = 50, 108, 40
     h = row0 + 3 * rh
     p = [f'<svg class="figure" viewBox="0 0 {w} {h}" style="max-width:{w / 16:.0f}rem" role="img" '
-         'aria-label="הדרך מ-A ל-B עם הנקודות Q, C, D, E והקטעים y, x, z, x, r, ומתחתיה שלושת השלבים: '
+         'aria-label="הדרך מ-A ל-B עם הנקודות Q, C, D, E והקטעים y, x, z, x, r, ומתחתיה שלושת השלבים : '
          'מי נוסע ומי הולך בכל שלב">', DEFS]
     p.append(f'<line class="ink-line" x1="{X(0)}" y1="{ya}" x2="{X(1)}" y2="{ya}" stroke-width="2"/>')
     for (_, a), (_, b), s in zip(pts, pts[1:], segs):
@@ -171,7 +171,7 @@ def spacetime_svg(alpha=ALPHA):
     """Position (0 = A, 1 = B) against time for the motorcycle and the two non-drivers."""
     pl = plan(alpha)
     T = pl["T"]
-    c = Chart("המקום של האופנוע ושל שני האנשים שאינם נוהגים כפונקציה של הזמן: האופנוע נוסע קדימה, "
+    c = Chart("המקום של האופנוע ושל שני האנשים שאינם נוהגים כפונקציה של הזמן : האופנוע נוסע קדימה, "
               "חוזר ונוסע שוב קדימה, ושלושתם מגיעים ל-B יחד אחרי 2.5 שעות",
               h=320, x0=52, right=24, top=34, base=286, x_max=float(T), y_max=1)
     c.add(DEFS)
@@ -192,7 +192,7 @@ def spacetime_svg(alpha=ALPHA):
              ("E", pl["t2"], pl["E"], "s1", 0, -12, "הנוסע כשההולך עולה"),
              ("B", T, 1, "ink", -16, -6, "שלושתם מגיעים")]
     for name, t, v, cls, dx, dy, title in marks:
-        c.dot(t, v, cls, r=5, title=f"{name}: {title}, t = {hours(t)}", label=name, dx=dx, dy=dy, label_size=17)
+        c.dot(t, v, cls, r=5, title=f"{name} : {title}, t = {hours(t)}", label=name, dx=dx, dy=dy, label_size=17)
     c.add(f'<line class="axis" x1="{c.x0}" x2="{c.x1}" y1="{c.base}" y2="{c.base}"/>'
           f'<text class="tick" x="{c.x1 + 14}" y="{c.base + 4}" text-anchor="middle">t</text>')
     return c.svg()

@@ -155,13 +155,13 @@ def walk_stepper():
                f"לפני ההחלפה. אדם 0 מצא מעגל באורך 11 ומחליף בין הפתקים של קופסה {SWAP[0]} "
                f"(פתק {NOTES[SWAP[0]]}) וקופסה {SWAP[1]} (פתק {NOTES[SWAP[1]]})."),
               (boxes_frame(AFTER, marked=SWAP),
-               f"אחרי ההחלפה: בקופסה {SWAP[0]} עכשיו הפתק {AFTER[SWAP[0]]}, ובקופסה {SWAP[1]} הפתק "
+               f"אחרי ההחלפה : בקופסה {SWAP[0]} עכשיו הפתק {AFTER[SWAP[0]]}, ובקופסה {SWAP[1]} הפתק "
                f"{AFTER[SWAP[1]]}. מכאן כל אחד הולך לפי הפתקים, מתחיל בקופסה עם המספר שלו.")]
     for me in range(1, N + 1):
         path = walk(AFTER, me)
         chain = " ← ".join(str(b) for b in path)
         frames.append((boxes_frame(AFTER, path=path, found=path[-1], faded=True),
-                       f"אדם {me} פותח <span dir=\"ltr\">{chain.replace(' ← ', ' → ')}</span>: הפתק {me} נמצא "
+                       f"אדם {me} פותח <span dir=\"ltr\">{chain.replace(' ← ', ' → ')}</span> : הפתק {me} נמצא "
                        f"בקופסה {path[-1]} אחרי {len(path)} פתיחות מתוך {MAX_OPENS} מותרות ✓"))
     return stepper(frames, "ההחלפה של העוזר ואז המסלול של כל אחד מ-16 האנשים")
 
@@ -169,13 +169,13 @@ def walk_stepper():
 if __name__ == "__main__":
     print(boxes_table(NOTES, SWAP), "\n")
     before = [(LONG, 175, 150, 120), (SHORT[0], 430, 150, 60), (SHORT[1], 565, 150, 45)]
-    print(cycle_svg(before, NOTES, "q9b", "המעגלים לפני ההחלפה: מעגל באורך 11, מעגל באורך 3 ומעגל באורך 2",
+    print(cycle_svg(before, NOTES, "q9b", "המעגלים לפני ההחלפה : מעגל באורך 11, מעגל באורך 3 ומעגל באורך 2",
                     lambda cyc, b, n: "s2-line" if len(cyc) > MAX_OPENS else "ink-line", SWAP), "\n")
     print(boxes_table(AFTER, SWAP), "\n")
     after_cycles = cycles(AFTER)
     a, b = [c for c in after_cycles if SWAP[0] in c or SWAP[1] in c]
     after = [(a, 110, 150, 85), (b, 300, 150, 80), (SHORT[0], 465, 150, 55), (SHORT[1], 580, 150, 40)]
-    print(cycle_svg(after, AFTER, "q9a", "המעגלים אחרי ההחלפה: מעגלים באורך 6, 5, 3 ו-2",
+    print(cycle_svg(after, AFTER, "q9a", "המעגלים אחרי ההחלפה : מעגלים באורך 6, 5, 3 ו-2",
                     lambda cyc, b, n: ("s1-line" if SWAP[0] in cyc else "s3-line") if len(cyc) > 3 else "ink-line",
                     SWAP), "\n")
     print([len(c) for c in after_cycles], "\n")

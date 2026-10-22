@@ -1504,6 +1504,20 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     trap added). The old URL of 0022 is gone (no redirects plugin); internal links were
     updated and the link check passes. Checks: lint, the Python tests, strict build,
     links, phone and axe light and dark.
+24. **Space around colons in Hebrew text (the owner's rule, now in `CLAUDE.md`).** Every
+    colon in Hebrew text has a non-breaking space (U+00A0) before it and an ordinary
+    space after it ("סיבוב 8 : שלום", "**זמן :** ..."); the NBSP keeps a colon from
+    wrapping to the start of a line. Applied to the whole site at once: 37 pages, the
+    index and path pages, `templates/question.md`, 27 figure generators, `explorer.js`
+    and `hooks/questions.py`, about 3,470 colons. A one-off script did it (not kept in the
+    repo): it fixed only colons in Hebrew text segments, with code, math, URLs, tags, front
+    matter and admonition keywords protected, Markdown on the pages and string literals in
+    the generators (tokenize) and in the JS (acorn), so the page copies still match the
+    generators. Left as they were: times and ratios (12:00, 23:58:59, hh:mm:ss in the clock
+    box), English-only SVG titles and labels, code. Separators in literals without Hebrew
+    (`f"\\( … \\): "` in q0017, `{name}: {title}` in q0026, and nested templates in
+    `explorer.js`) were fixed by hand. The owner chose no linter check for it. Checks:
+    lint, the Python tests, strict build, links, phone and axe light and dark.
 
 ---
 

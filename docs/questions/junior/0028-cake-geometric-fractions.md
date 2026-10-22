@@ -11,20 +11,20 @@ added: 2026-10-19
 ## השאלה
 
 יש עוגה שלמה, בגודל 1. אנשים ניגשים אליה בתור, וכל אחד חותך לעצמו פרוסה **ממה שנשאר**
-כשהגיע תורו:
+כשהגיע תורו :
 
 - **האדם הראשון** לוקח את השבר \( p_1 = a \) מהעוגה.
 - **האדם ה-\( k \)** לוקח את השבר \( p_k = a\,q^{k-1} \) ממה שנשאר אחרי כל מי שלפניו.
   השברים עולים בסדרה הנדסית עם מנה \( q > 1 \).
-- **הסוף:** אדם שהשבר שלו מגיע ל-1 או עובר אותו לוקח את כל מה שנשאר, והחלוקה נגמרת.
+- **הסוף :** אדם שהשבר שלו מגיע ל-1 או עובר אותו לוקח את כל מה שנשאר, והחלוקה נגמרת.
 
 בשרטוט יש דוגמה עם \( a = 0.1 \) ו-\( q = 2 \). כל שורה היא העוגה ברגע שאדם אחד מגיע
-אליה: השבר שהוא לוקח מוכפל משורה לשורה, אבל מה שנשאר לחתוך ממנו קטן. האדם החמישי היה
-אמור לקחת \( 1.6 \), ולכן הוא לוקח את כל השארית. בפס התחתון כל הפרוסות במקומן:
+אליה : השבר שהוא לוקח מוכפל משורה לשורה, אבל מה שנשאר לחתוך ממנו קטן. האדם החמישי היה
+אמור לקחת \( 1.6 \), ולכן הוא לוקח את כל השארית. בפס התחתון כל הפרוסות במקומן :
 
 <!-- gen 0 -->
 
-<svg class="figure" viewBox="0 0 640 241" style="max-width:40rem" role="img" aria-label="חלוקת העוגה, שורה לכל אדם: כמה נשאר כשהוא מגיע והפרוסה שהוא חותך, ובסוף כל העוגה עם הפרוסות של כל 5 האנשים"><rect class="cake-gone" x="52" y="8" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="8" width="441.0" height="24"/><rect class="cake-slice" x="493.0" y="8" width="49.0" height="24"><title>אדם 1: p = 0.1, S = 0.1000</title></rect><text class="legend" x="40" y="25" text-anchor="end" style="font-size:17px">1</text><text class="tick" x="548.0" y="24" style="font-size:15px">p = 0.1</text><rect class="cake-gone" x="52" y="41" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="41" width="352.8" height="24"/><rect class="cake-slice2" x="404.8" y="41" width="88.2" height="24"><title>אדם 2: p = 0.2, S = 0.1800</title></rect><text class="legend" x="40" y="58" text-anchor="end" style="font-size:17px">2</text><text class="tick" x="499.0" y="57" style="font-size:15px">p = 0.2</text><rect class="cake-gone" x="52" y="74" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="74" width="211.7" height="24"/><rect class="cake-slice" x="263.7" y="74" width="141.1" height="24"><title>אדם 3: p = 0.4, S = 0.2880</title></rect><text class="legend" x="40" y="91" text-anchor="end" style="font-size:17px">3</text><text class="tick" x="410.8" y="90" style="font-size:15px">p = 0.4</text><rect class="cake-gone" x="52" y="107" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="107" width="42.3" height="24"/><rect class="cake-slice2" x="94.3" y="107" width="169.3" height="24"><title>אדם 4: p = 0.8, S = 0.3456</title></rect><text class="legend" x="40" y="124" text-anchor="end" style="font-size:17px">4</text><text class="tick" x="269.7" y="123" style="font-size:15px">p = 0.8</text><rect class="cake-gone" x="52" y="140" width="490" height="24" rx="3"/><rect class="cake-slice" x="52.0" y="140" width="42.3" height="24"><title>אדם 5: p = 1, S = 0.0864</title></rect><text class="legend" x="40" y="157" text-anchor="end" style="font-size:17px">5</text><text class="tick" x="100.3" y="156" style="font-size:15px">p = 1</text><rect class="cake-slice" x="493.0" y="191" width="49.0" height="24"/><text class="tick" x="517.5" y="233" text-anchor="middle" style="font-size:15px">1</text><rect class="cake-slice2" x="404.8" y="191" width="88.2" height="24"/><text class="tick" x="448.9" y="233" text-anchor="middle" style="font-size:15px">2</text><rect class="cake-slice" x="263.7" y="191" width="141.1" height="24"/><text class="tick" x="334.2" y="233" text-anchor="middle" style="font-size:15px">3</text><rect class="cake-slice2" x="94.3" y="191" width="169.3" height="24"/><text class="tick" x="179.0" y="233" text-anchor="middle" style="font-size:15px">4</text><rect class="cake-slice" x="52.0" y="191" width="42.3" height="24"/><text class="tick" x="73.2" y="233" text-anchor="middle" style="font-size:15px">5</text><rect class="cake-edge" x="52" y="191" width="490" height="24" rx="3"/></svg>
+<svg class="figure" viewBox="0 0 640 241" style="max-width:40rem" role="img" aria-label="חלוקת העוגה, שורה לכל אדם : כמה נשאר כשהוא מגיע והפרוסה שהוא חותך, ובסוף כל העוגה עם הפרוסות של כל 5 האנשים"><rect class="cake-gone" x="52" y="8" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="8" width="441.0" height="24"/><rect class="cake-slice" x="493.0" y="8" width="49.0" height="24"><title>אדם 1 : p = 0.1, S = 0.1000</title></rect><text class="legend" x="40" y="25" text-anchor="end" style="font-size:17px">1</text><text class="tick" x="548.0" y="24" style="font-size:15px">p = 0.1</text><rect class="cake-gone" x="52" y="41" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="41" width="352.8" height="24"/><rect class="cake-slice2" x="404.8" y="41" width="88.2" height="24"><title>אדם 2 : p = 0.2, S = 0.1800</title></rect><text class="legend" x="40" y="58" text-anchor="end" style="font-size:17px">2</text><text class="tick" x="499.0" y="57" style="font-size:15px">p = 0.2</text><rect class="cake-gone" x="52" y="74" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="74" width="211.7" height="24"/><rect class="cake-slice" x="263.7" y="74" width="141.1" height="24"><title>אדם 3 : p = 0.4, S = 0.2880</title></rect><text class="legend" x="40" y="91" text-anchor="end" style="font-size:17px">3</text><text class="tick" x="410.8" y="90" style="font-size:15px">p = 0.4</text><rect class="cake-gone" x="52" y="107" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="107" width="42.3" height="24"/><rect class="cake-slice2" x="94.3" y="107" width="169.3" height="24"><title>אדם 4 : p = 0.8, S = 0.3456</title></rect><text class="legend" x="40" y="124" text-anchor="end" style="font-size:17px">4</text><text class="tick" x="269.7" y="123" style="font-size:15px">p = 0.8</text><rect class="cake-gone" x="52" y="140" width="490" height="24" rx="3"/><rect class="cake-slice" x="52.0" y="140" width="42.3" height="24"><title>אדם 5 : p = 1, S = 0.0864</title></rect><text class="legend" x="40" y="157" text-anchor="end" style="font-size:17px">5</text><text class="tick" x="100.3" y="156" style="font-size:15px">p = 1</text><rect class="cake-slice" x="493.0" y="191" width="49.0" height="24"/><text class="tick" x="517.5" y="233" text-anchor="middle" style="font-size:15px">1</text><rect class="cake-slice2" x="404.8" y="191" width="88.2" height="24"/><text class="tick" x="448.9" y="233" text-anchor="middle" style="font-size:15px">2</text><rect class="cake-slice" x="263.7" y="191" width="141.1" height="24"/><text class="tick" x="334.2" y="233" text-anchor="middle" style="font-size:15px">3</text><rect class="cake-slice2" x="94.3" y="191" width="169.3" height="24"/><text class="tick" x="179.0" y="233" text-anchor="middle" style="font-size:15px">4</text><rect class="cake-slice" x="52.0" y="191" width="42.3" height="24"/><text class="tick" x="73.2" y="233" text-anchor="middle" style="font-size:15px">5</text><rect class="cake-edge" x="52" y="191" width="490" height="24" rx="3"/></svg>
 
 <!-- /gen -->
 
@@ -37,12 +37,12 @@ added: 2026-10-19
 מי מקבל את החלק הגדול ביותר של העוגה?
 
 ??? interviewer "מה המראיין בודק"
-    - **מודל נכון:** להבחין בין שבר מהעוגה לשבר ממה שנשאר, ולכתוב את החלק של כל אדם בעזרת
+    - **מודל נכון :** להבחין בין שבר מהעוגה לשבר ממה שנשאר, ולכתוב את החלק של כל אדם בעזרת
       מה שנשאר לפניו.
-    - **השוואה בין שכנים:** להשוות כל אדם לבא אחריו, ולראות שבסדרה הנדסית היחס יוצא פשוט
+    - **השוואה בין שכנים :** להשוות כל אדם לבא אחריו, ולראות שבסדרה הנדסית היחס יוצא פשוט
       מאוד.
-    - **לוגריתמים:** לפתור אי-שוויון מעריכי ולעגל לכיוון הנכון.
-    - **הוכחה ולא רק חישוב:** להראות שהחלקים עולים ואחר כך רק יורדים, ולא לשכוח את התיקו.
+    - **לוגריתמים :** לפתור אי-שוויון מעריכי ולעגל לכיוון הנכון.
+    - **הוכחה ולא רק חישוב :** להראות שהחלקים עולים ואחר כך רק יורדים, ולא לשכוח את התיקו.
 
 ---
 
@@ -52,11 +52,11 @@ added: 2026-10-19
 החלק הגדול ביותר, וכמה הוא מקבל?
 
 ??? tip "רמז 1"
-    שני כוחות מושכים לכיוונים הפוכים: השבר גדל, אבל מה שנשאר לחתוך ממנו קטן. סמנו ב-\( R_k \)
+    שני כוחות מושכים לכיוונים הפוכים : השבר גדל, אבל מה שנשאר לחתוך ממנו קטן. סמנו ב-\( R_k \)
     את מה שנשאר לפני האדם ה-\( k \), וכתבו את החלק שלו \( S_k \) בעזרתו.
 
 ??? tip "רמז 2"
-    השוו שני אנשים סמוכים: חשבו את היחס \( S_{k+1} / S_k \). עם \( p_{k+1} = q\,p_k \) כמעט
+    השוו שני אנשים סמוכים : חשבו את היחס \( S_{k+1} / S_k \). עם \( p_{k+1} = q\,p_k \) כמעט
     הכול מצטמצם.
 
 ??? tip "רמז 3"
@@ -70,9 +70,9 @@ added: 2026-10-19
     #### הרעיון { .sol-idea }
 
     בהתחלה השבר גדל מהר יותר ממה שהעוגה נגמרת, ולכן כל אדם מקבל יותר מקודמו. אחר כך העוגה
-    נגמרת מהר יותר, והחלקים קטנים. משווים כל אדם לבא אחריו: בסדרה הנדסית היחס ביניהם הוא
+    נגמרת מהר יותר, והחלקים קטנים. משווים כל אדם לבא אחריו : בסדרה הנדסית היחס ביניהם הוא
     פשוט \( q(1 - p_k) \), והאדם הבא מקבל יותר כל עוד \( p_k < 1 - \frac1q = \frac13 \).
-    החלק הגדול ביותר הוא של **האדם הראשון שהשבר שלו מגיע לשליש**:
+    החלק הגדול ביותר הוא של **האדם הראשון שהשבר שלו מגיע לשליש** :
 
     <!-- gen 2 -->
 
@@ -90,14 +90,14 @@ added: 2026-10-19
 
     <div class="steps" markdown>
 
-    1. **סימונים:** ‏\( R_k \) הוא מה שנשאר מהעוגה לפני האדם ה-\( k \), עם \( R_1 = 1 \).
-       האדם לוקח \( p_k \) ממנו, והשאר עובר הלאה:
+    1. **סימונים :** ‏\( R_k \) הוא מה שנשאר מהעוגה לפני האדם ה-\( k \), עם \( R_1 = 1 \).
+       האדם לוקח \( p_k \) ממנו, והשאר עובר הלאה :
 
         \[
         S_k = p_k R_k, \qquad R_{k+1} = (1 - p_k) R_k
         \]
 
-    2. **היחס בין שכנים:** מה שנשאר מצטמצם, ועם \( p_{k+1} = q\,p_k \) מצטמצם גם השבר:
+    2. **היחס בין שכנים :** מה שנשאר מצטמצם, ועם \( p_{k+1} = q\,p_k \) מצטמצם גם השבר :
 
         \[
         \begin{aligned}
@@ -106,7 +106,7 @@ added: 2026-10-19
         \end{aligned}
         \]
 
-    3. **התנאי והסף:** האדם ה-\( k + 1 \) מקבל יותר בדיוק כשהיחס גדול מ-1:
+    3. **התנאי והסף :** האדם ה-\( k + 1 \) מקבל יותר בדיוק כשהיחס גדול מ-1 :
 
         \[
         \begin{aligned}
@@ -115,7 +115,7 @@ added: 2026-10-19
         \end{aligned}
         \]
 
-    4. **מי עובר את הסף:** כופלים את שני האגפים ב-\( q / a \) ולוקחים לוגריתם:
+    4. **מי עובר את הסף :** כופלים את שני האגפים ב-\( q / a \) ולוקחים לוגריתם :
 
         \[
         \begin{aligned}
@@ -128,17 +128,17 @@ added: 2026-10-19
         כי \( \frac{0.5}{0.01} = 50 \) ו-\( \log_{1.5} 50 = \frac{\ln 50}{\ln 1.5} \). לכן
         \( k = \lceil 9.65 \rceil = 10 \).
 
-    5. **בדיקה ישירה:** ‏\( p_9 = 0.01 \cdot 1.5^8 \approx 0.256 < \tfrac13 \), ולכן
+    5. **בדיקה ישירה :** ‏\( p_9 = 0.01 \cdot 1.5^8 \approx 0.256 < \tfrac13 \), ולכן
        \( S_{10} > S_9 \). ‏\( p_{10} = 0.01 \cdot 1.5^9 \approx 0.384 \ge \tfrac13 \), ולכן
        \( S_{11} < S_{10} \).
 
-    6. **החלק שלו:** לפני האדם העשירי נשאר \( R_{10} \approx 0.4415 \), והוא לוקח ממנו
+    6. **החלק שלו :** לפני האדם העשירי נשאר \( R_{10} \approx 0.4415 \), והוא לוקח ממנו
        \( 0.3844 \): ‏\( S_{10} \approx 0.3844 \cdot 0.4415 \approx 0.1697 \).
 
     </div>
 
     בגרף, כל עמוד הוא השבר של אדם אחד, והקו המקווקו הוא הסף \( \tfrac13 \). העמודים הכחולים
-    מתחת לסף: אחרי כל אחד מהם בא אדם שמקבל יותר. הראשון שמגיע לסף הוא האדם העשירי:
+    מתחת לסף : אחרי כל אחד מהם בא אדם שמקבל יותר. הראשון שמגיע לסף הוא האדם העשירי :
 
     <!-- gen 4 -->
 
@@ -148,7 +148,7 @@ added: 2026-10-19
 
     <!-- gen 5 -->
 
-    <span class="viz-legend"><span><i class="s1"></i>מתחת לסף: הבא אחריו מקבל יותר</span><span><i class="s2"></i>הראשון שמגיע לסף: החלק הגדול ביותר</span><span><i class="ink"></i>מעל הסף</span><span><i class="ink-dash"></i>הסף \( T \)</span></span>
+    <span class="viz-legend"><span><i class="s1"></i>מתחת לסף : הבא אחריו מקבל יותר</span><span><i class="s2"></i>הראשון שמגיע לסף : החלק הגדול ביותר</span><span><i class="ink"></i>מעל הסף</span><span><i class="ink-dash"></i>הסף \( T \)</span></span>
 
     <!-- /gen -->
 
@@ -156,7 +156,7 @@ added: 2026-10-19
 
     **היחס על גרף.** הנקודה ב-\( k \) היא היחס \( S_{k+1} / S_k = q(1 - p_k) \). הוא מתחיל
     קרוב ל-\( 1.5 \) ויורד, כי \( p_k \) גדל. כל עוד הנקודה מעל הקו \( y = 1 \), האדם הבא
-    מקבל יותר. הנקודה הראשונה מתחת לקו היא אצל האדם העשירי:
+    מקבל יותר. הנקודה הראשונה מתחת לקו היא אצל האדם העשירי :
 
     <!-- gen 6 -->
 
@@ -171,11 +171,11 @@ added: 2026-10-19
     <!-- /gen -->
 
     **העוגה עצמה.** אותה חלוקה בשורות, עם הפרוסה של האדם העשירי מודגשת. תשעת האנשים
-    הראשונים לוקחים יחד פחות מ-60% מהעוגה, ומשם השבר קופץ מהר:
+    הראשונים לוקחים יחד פחות מ-60% מהעוגה, ומשם השבר קופץ מהר :
 
     <!-- gen 8 -->
 
-    <svg class="figure" viewBox="0 0 640 505" style="max-width:40rem" role="img" aria-label="חלוקת העוגה, שורה לכל אדם: כמה נשאר כשהוא מגיע והפרוסה שהוא חותך, ובסוף כל העוגה עם הפרוסות של כל 13 האנשים"><rect class="cake-gone" x="52" y="8" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="8" width="485.1" height="24"/><rect class="cake-slice" x="537.1" y="8" width="4.9" height="24"><title>אדם 1: p = 0.01, S = 0.0100</title></rect><text class="legend" x="40" y="25" text-anchor="end" style="font-size:17px">1</text><text class="tick" x="548.0" y="24" style="font-size:15px">p = 0.01</text><rect class="cake-gone" x="52" y="41" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="41" width="477.8" height="24"/><rect class="cake-slice2" x="529.8" y="41" width="7.3" height="24"><title>אדם 2: p = 0.015, S = 0.0149</title></rect><text class="legend" x="40" y="58" text-anchor="end" style="font-size:17px">2</text><text class="tick" x="543.1" y="57" style="font-size:15px">p = 0.015</text><rect class="cake-gone" x="52" y="74" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="74" width="467.1" height="24"/><rect class="cake-slice" x="519.1" y="74" width="10.8" height="24"><title>אדם 3: p = 0.0225, S = 0.0219</title></rect><text class="legend" x="40" y="91" text-anchor="end" style="font-size:17px">3</text><text class="tick" x="535.8" y="90" style="font-size:15px">p = 0.0225</text><rect class="cake-gone" x="52" y="107" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="107" width="451.3" height="24"/><rect class="cake-slice2" x="503.3" y="107" width="15.8" height="24"><title>אדם 4: p = 0.0338, S = 0.0322</title></rect><text class="legend" x="40" y="124" text-anchor="end" style="font-size:17px">4</text><text class="tick" x="525.1" y="123" style="font-size:15px">p = 0.0338</text><rect class="cake-gone" x="52" y="140" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="140" width="428.5" height="24"/><rect class="cake-slice" x="480.5" y="140" width="22.8" height="24"><title>אדם 5: p = 0.0506, S = 0.0466</title></rect><text class="legend" x="40" y="157" text-anchor="end" style="font-size:17px">5</text><text class="tick" x="509.3" y="156" style="font-size:15px">p = 0.0506</text><rect class="cake-gone" x="52" y="173" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="173" width="395.9" height="24"/><rect class="cake-slice2" x="447.9" y="173" width="32.5" height="24"><title>אדם 6: p = 0.0759, S = 0.0664</title></rect><text class="legend" x="40" y="190" text-anchor="end" style="font-size:17px">6</text><text class="tick" x="486.5" y="189" style="font-size:15px">p = 0.0759</text><rect class="cake-gone" x="52" y="206" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="206" width="350.8" height="24"/><rect class="cake-slice" x="402.8" y="206" width="45.1" height="24"><title>אדם 7: p = 0.1139, S = 0.0920</title></rect><text class="legend" x="40" y="223" text-anchor="end" style="font-size:17px">7</text><text class="tick" x="453.9" y="222" style="font-size:15px">p = 0.1139</text><rect class="cake-gone" x="52" y="239" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="239" width="290.9" height="24"/><rect class="cake-slice2" x="342.9" y="239" width="59.9" height="24"><title>אדם 8: p = 0.1709, S = 0.1223</title></rect><text class="legend" x="40" y="256" text-anchor="end" style="font-size:17px">8</text><text class="tick" x="408.8" y="255" style="font-size:15px">p = 0.1709</text><rect class="cake-gone" x="52" y="272" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="272" width="216.3" height="24"/><rect class="cake-slice" x="268.3" y="272" width="74.6" height="24"><title>אדם 9: p = 0.2563, S = 0.1521</title></rect><text class="legend" x="40" y="289" text-anchor="end" style="font-size:17px">9</text><text class="tick" x="348.9" y="288" style="font-size:15px">p = 0.2563</text><rect class="cake-gone" x="52" y="305" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="305" width="133.2" height="24"/><rect class="cake-peak" x="185.2" y="305" width="83.2" height="24"><title>אדם 10: p = 0.3844, S = 0.1697</title></rect><text class="legend" x="40" y="322" text-anchor="end" style="font-size:17px">10</text><text class="tick" x="274.3" y="321" style="font-size:15px">p = 0.3844</text><rect class="cake-gone" x="52" y="338" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="338" width="56.4" height="24"/><rect class="cake-slice" x="108.4" y="338" width="76.8" height="24"><title>אדם 11: p = 0.5767, S = 0.1567</title></rect><text class="legend" x="40" y="355" text-anchor="end" style="font-size:17px">11</text><text class="tick" x="191.2" y="354" style="font-size:15px">p = 0.5767</text><rect class="cake-gone" x="52" y="371" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="371" width="7.6" height="24"/><rect class="cake-slice2" x="59.6" y="371" width="48.8" height="24"><title>אדם 12: p = 0.865, S = 0.0995</title></rect><text class="legend" x="40" y="388" text-anchor="end" style="font-size:17px">12</text><text class="tick" x="114.4" y="387" style="font-size:15px">p = 0.865</text><rect class="cake-gone" x="52" y="404" width="490" height="24" rx="3"/><rect class="cake-slice" x="52.0" y="404" width="7.6" height="24"><title>אדם 13: p = 1, S = 0.0155</title></rect><text class="legend" x="40" y="421" text-anchor="end" style="font-size:17px">13</text><text class="tick" x="65.6" y="420" style="font-size:15px">p = 1</text><rect class="cake-slice" x="537.1" y="455" width="4.9" height="24"/><rect class="cake-slice2" x="529.8" y="455" width="7.3" height="24"/><rect class="cake-slice" x="519.1" y="455" width="10.8" height="24"/><rect class="cake-slice2" x="503.3" y="455" width="15.8" height="24"/><rect class="cake-slice" x="480.5" y="455" width="22.8" height="24"/><text class="tick" x="491.9" y="497" text-anchor="middle" style="font-size:15px">5</text><rect class="cake-slice2" x="447.9" y="455" width="32.5" height="24"/><text class="tick" x="464.2" y="497" text-anchor="middle" style="font-size:15px">6</text><rect class="cake-slice" x="402.8" y="455" width="45.1" height="24"/><text class="tick" x="425.4" y="497" text-anchor="middle" style="font-size:15px">7</text><rect class="cake-slice2" x="342.9" y="455" width="59.9" height="24"/><text class="tick" x="372.9" y="497" text-anchor="middle" style="font-size:15px">8</text><rect class="cake-slice" x="268.3" y="455" width="74.6" height="24"/><text class="tick" x="305.6" y="497" text-anchor="middle" style="font-size:15px">9</text><rect class="cake-peak" x="185.2" y="455" width="83.2" height="24"/><text class="tick" x="226.8" y="497" text-anchor="middle" style="font-size:15px">10</text><rect class="cake-slice" x="108.4" y="455" width="76.8" height="24"/><text class="tick" x="146.8" y="497" text-anchor="middle" style="font-size:15px">11</text><rect class="cake-slice2" x="59.6" y="455" width="48.8" height="24"/><text class="tick" x="84.0" y="497" text-anchor="middle" style="font-size:15px">12</text><rect class="cake-slice" x="52.0" y="455" width="7.6" height="24"/><rect class="cake-edge" x="52" y="455" width="490" height="24" rx="3"/></svg>
+    <svg class="figure" viewBox="0 0 640 505" style="max-width:40rem" role="img" aria-label="חלוקת העוגה, שורה לכל אדם : כמה נשאר כשהוא מגיע והפרוסה שהוא חותך, ובסוף כל העוגה עם הפרוסות של כל 13 האנשים"><rect class="cake-gone" x="52" y="8" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="8" width="485.1" height="24"/><rect class="cake-slice" x="537.1" y="8" width="4.9" height="24"><title>אדם 1 : p = 0.01, S = 0.0100</title></rect><text class="legend" x="40" y="25" text-anchor="end" style="font-size:17px">1</text><text class="tick" x="548.0" y="24" style="font-size:15px">p = 0.01</text><rect class="cake-gone" x="52" y="41" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="41" width="477.8" height="24"/><rect class="cake-slice2" x="529.8" y="41" width="7.3" height="24"><title>אדם 2 : p = 0.015, S = 0.0149</title></rect><text class="legend" x="40" y="58" text-anchor="end" style="font-size:17px">2</text><text class="tick" x="543.1" y="57" style="font-size:15px">p = 0.015</text><rect class="cake-gone" x="52" y="74" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="74" width="467.1" height="24"/><rect class="cake-slice" x="519.1" y="74" width="10.8" height="24"><title>אדם 3 : p = 0.0225, S = 0.0219</title></rect><text class="legend" x="40" y="91" text-anchor="end" style="font-size:17px">3</text><text class="tick" x="535.8" y="90" style="font-size:15px">p = 0.0225</text><rect class="cake-gone" x="52" y="107" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="107" width="451.3" height="24"/><rect class="cake-slice2" x="503.3" y="107" width="15.8" height="24"><title>אדם 4 : p = 0.0338, S = 0.0322</title></rect><text class="legend" x="40" y="124" text-anchor="end" style="font-size:17px">4</text><text class="tick" x="525.1" y="123" style="font-size:15px">p = 0.0338</text><rect class="cake-gone" x="52" y="140" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="140" width="428.5" height="24"/><rect class="cake-slice" x="480.5" y="140" width="22.8" height="24"><title>אדם 5 : p = 0.0506, S = 0.0466</title></rect><text class="legend" x="40" y="157" text-anchor="end" style="font-size:17px">5</text><text class="tick" x="509.3" y="156" style="font-size:15px">p = 0.0506</text><rect class="cake-gone" x="52" y="173" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="173" width="395.9" height="24"/><rect class="cake-slice2" x="447.9" y="173" width="32.5" height="24"><title>אדם 6 : p = 0.0759, S = 0.0664</title></rect><text class="legend" x="40" y="190" text-anchor="end" style="font-size:17px">6</text><text class="tick" x="486.5" y="189" style="font-size:15px">p = 0.0759</text><rect class="cake-gone" x="52" y="206" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="206" width="350.8" height="24"/><rect class="cake-slice" x="402.8" y="206" width="45.1" height="24"><title>אדם 7 : p = 0.1139, S = 0.0920</title></rect><text class="legend" x="40" y="223" text-anchor="end" style="font-size:17px">7</text><text class="tick" x="453.9" y="222" style="font-size:15px">p = 0.1139</text><rect class="cake-gone" x="52" y="239" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="239" width="290.9" height="24"/><rect class="cake-slice2" x="342.9" y="239" width="59.9" height="24"><title>אדם 8 : p = 0.1709, S = 0.1223</title></rect><text class="legend" x="40" y="256" text-anchor="end" style="font-size:17px">8</text><text class="tick" x="408.8" y="255" style="font-size:15px">p = 0.1709</text><rect class="cake-gone" x="52" y="272" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="272" width="216.3" height="24"/><rect class="cake-slice" x="268.3" y="272" width="74.6" height="24"><title>אדם 9 : p = 0.2563, S = 0.1521</title></rect><text class="legend" x="40" y="289" text-anchor="end" style="font-size:17px">9</text><text class="tick" x="348.9" y="288" style="font-size:15px">p = 0.2563</text><rect class="cake-gone" x="52" y="305" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="305" width="133.2" height="24"/><rect class="cake-peak" x="185.2" y="305" width="83.2" height="24"><title>אדם 10 : p = 0.3844, S = 0.1697</title></rect><text class="legend" x="40" y="322" text-anchor="end" style="font-size:17px">10</text><text class="tick" x="274.3" y="321" style="font-size:15px">p = 0.3844</text><rect class="cake-gone" x="52" y="338" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="338" width="56.4" height="24"/><rect class="cake-slice" x="108.4" y="338" width="76.8" height="24"><title>אדם 11 : p = 0.5767, S = 0.1567</title></rect><text class="legend" x="40" y="355" text-anchor="end" style="font-size:17px">11</text><text class="tick" x="191.2" y="354" style="font-size:15px">p = 0.5767</text><rect class="cake-gone" x="52" y="371" width="490" height="24" rx="3"/><rect class="cake-rest" x="52" y="371" width="7.6" height="24"/><rect class="cake-slice2" x="59.6" y="371" width="48.8" height="24"><title>אדם 12 : p = 0.865, S = 0.0995</title></rect><text class="legend" x="40" y="388" text-anchor="end" style="font-size:17px">12</text><text class="tick" x="114.4" y="387" style="font-size:15px">p = 0.865</text><rect class="cake-gone" x="52" y="404" width="490" height="24" rx="3"/><rect class="cake-slice" x="52.0" y="404" width="7.6" height="24"><title>אדם 13 : p = 1, S = 0.0155</title></rect><text class="legend" x="40" y="421" text-anchor="end" style="font-size:17px">13</text><text class="tick" x="65.6" y="420" style="font-size:15px">p = 1</text><rect class="cake-slice" x="537.1" y="455" width="4.9" height="24"/><rect class="cake-slice2" x="529.8" y="455" width="7.3" height="24"/><rect class="cake-slice" x="519.1" y="455" width="10.8" height="24"/><rect class="cake-slice2" x="503.3" y="455" width="15.8" height="24"/><rect class="cake-slice" x="480.5" y="455" width="22.8" height="24"/><text class="tick" x="491.9" y="497" text-anchor="middle" style="font-size:15px">5</text><rect class="cake-slice2" x="447.9" y="455" width="32.5" height="24"/><text class="tick" x="464.2" y="497" text-anchor="middle" style="font-size:15px">6</text><rect class="cake-slice" x="402.8" y="455" width="45.1" height="24"/><text class="tick" x="425.4" y="497" text-anchor="middle" style="font-size:15px">7</text><rect class="cake-slice2" x="342.9" y="455" width="59.9" height="24"/><text class="tick" x="372.9" y="497" text-anchor="middle" style="font-size:15px">8</text><rect class="cake-slice" x="268.3" y="455" width="74.6" height="24"/><text class="tick" x="305.6" y="497" text-anchor="middle" style="font-size:15px">9</text><rect class="cake-peak" x="185.2" y="455" width="83.2" height="24"/><text class="tick" x="226.8" y="497" text-anchor="middle" style="font-size:15px">10</text><rect class="cake-slice" x="108.4" y="455" width="76.8" height="24"/><text class="tick" x="146.8" y="497" text-anchor="middle" style="font-size:15px">11</text><rect class="cake-slice2" x="59.6" y="455" width="48.8" height="24"/><text class="tick" x="84.0" y="497" text-anchor="middle" style="font-size:15px">12</text><rect class="cake-slice" x="52.0" y="455" width="7.6" height="24"/><rect class="cake-edge" x="52" y="455" width="490" height="24" rx="3"/></svg>
 
     <!-- /gen -->
 
@@ -185,8 +185,8 @@ added: 2026-10-19
 
     <!-- /gen -->
 
-    **כל המספרים.** הטבלה מאשרת: החלקים עולים עד האדם העשירי ויורדים אחריו. האדם ה-13
-    היה אמור לקחת \( 1.3 \) ממה שנשאר, ולכן הוא לוקח את כל השארית:
+    **כל המספרים.** הטבלה מאשרת : החלקים עולים עד האדם העשירי ויורדים אחריו. האדם ה-13
+    היה אמור לקחת \( 1.3 \) ממה שנשאר, ולכן הוא לוקח את כל השארית :
 
     <!-- gen 10 -->
 
@@ -213,7 +213,7 @@ added: 2026-10-19
 ### סעיף ב – המקרה הכללי
 
 עבור \( a > 0 \) ו-\( 1 < q \le 2 \) כלשהם, מצאו נוסחה לאדם שמקבל את החלק הגדול ביותר.
-הוכיחו שיש פסגה אחת: החלקים עולים עד אדם מסוים, ואחריו רק יורדים. מתי יש תיקו?
+הוכיחו שיש פסגה אחת : החלקים עולים עד אדם מסוים, ואחריו רק יורדים. מתי יש תיקו?
 
 ההנחה \( q \le 2 \) אומרת שהשבר לכל היותר מוכפל בין שני אנשים סמוכים. כש-\( q > 2 \)
 התשובה תלויה גם ב-\( a \), ונחזור לזה בשאלות ההמשך.
@@ -225,19 +225,19 @@ added: 2026-10-19
     מצאו את הסף כפונקציה של \( q \), ואז פתרו \( a\,q^{k-1} \ge T \) עם לוגריתם בבסיס \( q \).
 
 ??? tip "רמז 3"
-    אל תשכחו את האדם האחרון: השבר שלו נחתך ל-1. בדקו שהחיתוך לא משנה את התשובה כש-\( q \le 2 \).
+    אל תשכחו את האדם האחרון : השבר שלו נחתך ל-1. בדקו שהחיתוך לא משנה את התשובה כש-\( q \le 2 \).
 
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"
         הסף הוא \( T = 1 - \dfrac{1}{q} \), והחלק הגדול ביותר הוא של האדם הראשון שהשבר שלו
-        מגיע לסף:
+        מגיע לסף :
         \( k = \max\left(1,\ \left\lceil \log_q \frac{q - 1}{a} \right\rceil\right) \).
         אם \( q^k = \frac{q - 1}{a} \) בדיוק, יש תיקו בינו לבין האדם שאחריו.
 
     #### הרעיון { .sol-idea }
 
     היחס בין שכנים הוא \( q(1 - p_k) \). כש-\( q > 1 \) השברים עולים, ולכן היחס רק יורד.
-    ברגע שהוא יורד מתחת ל-1 הוא נשאר שם: החלקים עולים, ומאז רק יורדים. זו פסגה אחת, והיא
+    ברגע שהוא יורד מתחת ל-1 הוא נשאר שם : החלקים עולים, ומאז רק יורדים. זו פסגה אחת, והיא
     אצל האדם הראשון שהשבר שלו מגיע לסף \( 1 - 1/q \), הנקודה שבה הקו \( q(1 - p) \) חוצה
     את 1.
 
@@ -245,27 +245,27 @@ added: 2026-10-19
 
     <div class="steps" markdown>
 
-    1. **היחס:** כמו בסעיף א, לכל מי שאינו האחרון,
+    1. **היחס :** כמו בסעיף א, לכל מי שאינו האחרון,
 
         \[
         \frac{S_{k+1}}{S_k} = q(1 - p_k)
         \]
 
-    2. **פסגה אחת:** ‏\( p_k \) עולה עם \( k \), ולכן \( q(1 - p_k) \) יורד. כל עוד הוא
+    2. **פסגה אחת :** ‏\( p_k \) עולה עם \( k \), ולכן \( q(1 - p_k) \) יורד. כל עוד הוא
        גדול מ-1 החלקים גדלים. מהאדם הראשון שבו הוא 1 או פחות, הוא נשאר כזה, והחלקים רק
-       קטנים. אם הוא שווה ל-1 בדיוק, אז \( S_{k+1} = S_k \): תיקו.
+       קטנים. אם הוא שווה ל-1 בדיוק, אז \( S_{k+1} = S_k \) : תיקו.
 
-    3. **הסף:** ‏\( q(1 - p) = 1 \) בדיוק כש-\( p = T = 1 - \frac1q = \frac{q - 1}{q} \).
+    3. **הסף :** ‏\( q(1 - p) = 1 \) בדיוק כש-\( p = T = 1 - \frac1q = \frac{q - 1}{q} \).
        הוא תמיד בין 0 ל-1, וכש-\( q \le 2 \) גם \( T \le \tfrac12 \).
 
-    4. **האדם האחרון:** האדם \( L \) שלוקח את השארית מקבל את השבר 1 ולא \( q\,p_{L-1} \),
+    4. **האדם האחרון :** האדם \( L \) שלוקח את השארית מקבל את השבר 1 ולא \( q\,p_{L-1} \),
        ולכן היחס אליו הוא \( \frac{1 - p_{L-1}}{p_{L-1}} \). אם \( p_{L-1} < T \le \tfrac12 \),
        היחס הזה גדול מ-1, כמו שהתנאי אומר. אם \( p_{L-1} \ge T \), היחס קטן מהיחס בלי
-       החיתוך, שכבר קטן מ-1 או שווה לו. בשני המקרים התשובה לא משתנה. גם התיקו נשאר: אם
+       החיתוך, שכבר קטן מ-1 או שווה לו. בשני המקרים התשובה לא משתנה. גם התיקו נשאר : אם
        \( p_{L-1} = T \), אז \( q\,p_{L-1} = q - 1 \le 1 \), ולכן השבר של האחרון הוא בדיוק 1,
        בלי חיתוך.
 
-    5. **מי עובר את הסף:** כופלים ב-\( q / a \) ולוקחים לוגריתם בבסיס \( q > 1 \):
+    5. **מי עובר את הסף :** כופלים ב-\( q / a \) ולוקחים לוגריתם בבסיס \( q > 1 \) :
 
         \[
         \begin{aligned}
@@ -274,7 +274,7 @@ added: 2026-10-19
         \end{aligned}
         \]
 
-    6. **הנוסחה:** ה-\( k \) הקטן ביותר שמקיים את זה הוא
+    6. **הנוסחה :** ה-\( k \) הקטן ביותר שמקיים את זה הוא
 
         \[
         \begin{aligned}
@@ -290,25 +290,25 @@ added: 2026-10-19
 
     #### למה זה נכון { .sol-proof }
 
-    **הסף בגרף.** כל קו הוא \( y = q(1 - p) \): הוא מתחיל ב-\( q \) כש-\( p = 0 \) ויורד
-    ל-0 כש-\( p = 1 \). הוא חוצה את הקו \( y = 1 \) בדיוק ב-\( p = 1 - 1/q \): שליש עבור
+    **הסף בגרף.** כל קו הוא \( y = q(1 - p) \) : הוא מתחיל ב-\( q \) כש-\( p = 0 \) ויורד
+    ל-0 כש-\( p = 1 \). הוא חוצה את הקו \( y = 1 \) בדיוק ב-\( p = 1 - 1/q \) : שליש עבור
     \( q = 1.5 \), וחצי עבור \( q = 2 \). על הקו של \( q = 1.5 \) מסומנים השברים של האנשים
-    בסעיף א: תשעה מעל הקו, והעשירי הוא הראשון מתחתיו:
+    בסעיף א : תשעה מעל הקו, והעשירי הוא הראשון מתחתיו :
 
     <!-- gen 11 -->
 
-    <svg class="perf-chart" viewBox="0 0 640 260" role="img" aria-label="הקווים q כפול 1 פחות p מול הקו y = 1. הם נחתכים ב-p = 1 פחות 1 חלקי q: שליש עבור q = 1.5, וחצי עבור q = 2"><line class="grid" x1="46" x2="626" y1="226.0" y2="226.0"/><text class="tick" x="38" y="230.0" text-anchor="end">0</text><line class="grid" x1="46" x2="626" y1="175.5" y2="175.5"/><text class="tick" x="38" y="179.5" text-anchor="end">0.5</text><line class="grid" x1="46" x2="626" y1="125.0" y2="125.0"/><text class="tick" x="38" y="129.0" text-anchor="end">1</text><line class="grid" x1="46" x2="626" y1="74.6" y2="74.6"/><text class="tick" x="38" y="78.6" text-anchor="end">1.5</text><line class="grid" x1="46" x2="626" y1="24.1" y2="24.1"/><text class="tick" x="38" y="28.1" text-anchor="end">2</text><text class="tick" x="46.0" y="244" text-anchor="middle">0</text><text class="tick" x="191.0" y="244" text-anchor="middle">0.25</text><text class="tick" x="336.0" y="244" text-anchor="middle">0.5</text><text class="tick" x="481.0" y="244" text-anchor="middle">0.75</text><line class="ink-line" x1="46" x2="626" y1="125.0" y2="125.0" stroke-width="1.5" stroke-dasharray="6 4"/><line class="s1-line" x1="46.0" y1="74.6" x2="626.0" y2="226.0" stroke-width="2.5"/><text class="legend" x="54.0" y="68.6" text-anchor="start">q = 1.5</text><line class="ink-line" x1="239.3" x2="239.3" y1="125.0" y2="226" stroke-width="1" stroke-dasharray="3 3"/><text class="legend" x="245.3" y="220">1/3</text><circle class="ink-dot" cx="239.3" cy="125.0" r="3.5"></circle><line class="s3-line" x1="46.0" y1="24.1" x2="626.0" y2="226.0" stroke-width="2.5"/><text class="legend" x="54.0" y="18.1" text-anchor="start">q = 2</text><line class="ink-line" x1="336.0" x2="336.0" y1="125.0" y2="226" stroke-width="1" stroke-dasharray="3 3"/><text class="legend" x="342.0" y="220">1/2</text><circle class="ink-dot" cx="336.0" cy="125.0" r="3.5"></circle><circle class="s1-dot" cx="51.8" cy="76.1" r="4"><title>p(1) = 0.0100</title></circle><circle class="s1-dot" cx="54.7" cy="76.8" r="4"><title>p(2) = 0.0150</title></circle><circle class="s1-dot" cx="59.0" cy="78.0" r="4"><title>p(3) = 0.0225</title></circle><circle class="s1-dot" cx="65.6" cy="79.7" r="4"><title>p(4) = 0.0338</title></circle><circle class="s1-dot" cx="75.4" cy="82.2" r="4"><title>p(5) = 0.0506</title></circle><circle class="s1-dot" cx="90.0" cy="86.1" r="4"><title>p(6) = 0.0759</title></circle><circle class="s1-dot" cx="112.1" cy="91.8" r="4"><title>p(7) = 0.1139</title></circle><circle class="s1-dot" cx="145.1" cy="100.4" r="4"><title>p(8) = 0.1709</title></circle><circle class="s1-dot" cx="194.6" cy="113.4" r="4"><title>p(9) = 0.2563</title></circle><circle class="s2-dot" cx="269.0" cy="132.8" r="6"><title>p(10) = 0.3844</title></circle><circle class="ink-dot" cx="380.5" cy="161.9" r="4"><title>p(11) = 0.5767</title></circle><circle class="ink-dot" cx="547.7" cy="205.6" r="4"><title>p(12) = 0.8650</title></circle><line class="axis" x1="46" x2="626" y1="226" y2="226"/><text class="tick" x="626" y="244" text-anchor="end">p</text></svg>
+    <svg class="perf-chart" viewBox="0 0 640 260" role="img" aria-label="הקווים q כפול 1 פחות p מול הקו y = 1. הם נחתכים ב-p = 1 פחות 1 חלקי q : שליש עבור q = 1.5, וחצי עבור q = 2"><line class="grid" x1="46" x2="626" y1="226.0" y2="226.0"/><text class="tick" x="38" y="230.0" text-anchor="end">0</text><line class="grid" x1="46" x2="626" y1="175.5" y2="175.5"/><text class="tick" x="38" y="179.5" text-anchor="end">0.5</text><line class="grid" x1="46" x2="626" y1="125.0" y2="125.0"/><text class="tick" x="38" y="129.0" text-anchor="end">1</text><line class="grid" x1="46" x2="626" y1="74.6" y2="74.6"/><text class="tick" x="38" y="78.6" text-anchor="end">1.5</text><line class="grid" x1="46" x2="626" y1="24.1" y2="24.1"/><text class="tick" x="38" y="28.1" text-anchor="end">2</text><text class="tick" x="46.0" y="244" text-anchor="middle">0</text><text class="tick" x="191.0" y="244" text-anchor="middle">0.25</text><text class="tick" x="336.0" y="244" text-anchor="middle">0.5</text><text class="tick" x="481.0" y="244" text-anchor="middle">0.75</text><line class="ink-line" x1="46" x2="626" y1="125.0" y2="125.0" stroke-width="1.5" stroke-dasharray="6 4"/><line class="s1-line" x1="46.0" y1="74.6" x2="626.0" y2="226.0" stroke-width="2.5"/><text class="legend" x="54.0" y="68.6" text-anchor="start">q = 1.5</text><line class="ink-line" x1="239.3" x2="239.3" y1="125.0" y2="226" stroke-width="1" stroke-dasharray="3 3"/><text class="legend" x="245.3" y="220">1/3</text><circle class="ink-dot" cx="239.3" cy="125.0" r="3.5"></circle><line class="s3-line" x1="46.0" y1="24.1" x2="626.0" y2="226.0" stroke-width="2.5"/><text class="legend" x="54.0" y="18.1" text-anchor="start">q = 2</text><line class="ink-line" x1="336.0" x2="336.0" y1="125.0" y2="226" stroke-width="1" stroke-dasharray="3 3"/><text class="legend" x="342.0" y="220">1/2</text><circle class="ink-dot" cx="336.0" cy="125.0" r="3.5"></circle><circle class="s1-dot" cx="51.8" cy="76.1" r="4"><title>p(1) = 0.0100</title></circle><circle class="s1-dot" cx="54.7" cy="76.8" r="4"><title>p(2) = 0.0150</title></circle><circle class="s1-dot" cx="59.0" cy="78.0" r="4"><title>p(3) = 0.0225</title></circle><circle class="s1-dot" cx="65.6" cy="79.7" r="4"><title>p(4) = 0.0338</title></circle><circle class="s1-dot" cx="75.4" cy="82.2" r="4"><title>p(5) = 0.0506</title></circle><circle class="s1-dot" cx="90.0" cy="86.1" r="4"><title>p(6) = 0.0759</title></circle><circle class="s1-dot" cx="112.1" cy="91.8" r="4"><title>p(7) = 0.1139</title></circle><circle class="s1-dot" cx="145.1" cy="100.4" r="4"><title>p(8) = 0.1709</title></circle><circle class="s1-dot" cx="194.6" cy="113.4" r="4"><title>p(9) = 0.2563</title></circle><circle class="s2-dot" cx="269.0" cy="132.8" r="6"><title>p(10) = 0.3844</title></circle><circle class="ink-dot" cx="380.5" cy="161.9" r="4"><title>p(11) = 0.5767</title></circle><circle class="ink-dot" cx="547.7" cy="205.6" r="4"><title>p(12) = 0.8650</title></circle><line class="axis" x1="46" x2="626" y1="226" y2="226"/><text class="tick" x="626" y="244" text-anchor="end">p</text></svg>
 
     <!-- /gen -->
 
     <!-- gen 12 -->
 
-    <span class="viz-legend"><span><i class="s1"></i>‏\( y = 1.5\,(1 - p) \)</span><span><i class="s3"></i>‏\( y = 2\,(1 - p) \)</span><span><i class="ink-dash"></i>הקו \( y = 1 \)</span><span><i class="s2"></i>האדם ה-10: הראשון מתחת לקו</span><span><i class="ink"></i>אחריו, גם הם מתחת לקו</span></span>
+    <span class="viz-legend"><span><i class="s1"></i>‏\( y = 1.5\,(1 - p) \)</span><span><i class="s3"></i>‏\( y = 2\,(1 - p) \)</span><span><i class="ink-dash"></i>הקו \( y = 1 \)</span><span><i class="s2"></i>האדם ה-10 : הראשון מתחת לקו</span><span><i class="ink"></i>אחריו, גם הם מתחת לקו</span></span>
 
     <!-- /gen -->
 
     **‏\( q \) אחרים.** עם \( a = 0.01 \), ככל ש-\( q \) קרוב יותר ל-1, הפסגה מגיעה מאוחר
-    יותר והיא נמוכה ושטוחה יותר:
+    יותר והיא נמוכה ושטוחה יותר :
 
     <!-- gen 13 -->
 
@@ -320,48 +320,48 @@ added: 2026-10-19
 
     <!-- /gen -->
 
-    **תיקו.** עם \( a = 0.25 \) ו-\( q = 2 \): ‏\( \frac{q - 1}{a} = 4 = 2^2 \), ולכן
+    **תיקו.** עם \( a = 0.25 \) ו-\( q = 2 \) : ‏\( \frac{q - 1}{a} = 4 = 2^2 \), ולכן
     \( k = 2 \) עם תיקו. אכן \( p_2 = 0.5 = T \), והאדם השני והשלישי מקבלים כל אחד \( 0.375 \).
 
     **נסו בעצמכם.** הוסיפו אדם אחרי אדם, בכפתור או בהפעלה, וראו את הפרוסה שלו נחתכת
     מהעוגה ואת השורה שלו נכנסת לטבלה; הפרוסה הגדולה ביותר עד כה כתומה. הזיזו את \( a \)
-    ואת \( q \), וראו איך הפסגה זזה: הנוסחה והעמודות מסכימות בכל התחום. בבחירת החוק אפשר
-    לעבור לחוק החשבוני של שאלה 0027 עם אותו \( a \) ולהשוות:
+    ואת \( q \), וראו איך הפסגה זזה : הנוסחה והעמודות מסכימות בכל התחום. בבחירת החוק אפשר
+    לעבור לחוק החשבוני של שאלה 0027 עם אותו \( a \) ולהשוות :
 
     <div class="explorer" data-kind="cake-geo" data-a="0.01" data-step="1.5"></div>
 
 ## נקודות חשובות ושאלות המשך
 
-??? trap "מלכודת: האחרון מקבל הכי הרבה"
+??? trap "מלכודת : האחרון מקבל הכי הרבה"
     לאדם האחרון יש השבר הגדול ביותר, הוא לוקח את כל מה שנשאר. אבל בסעיף א נשאר לו רק
     \( 0.0155 \) מהעוגה, פחות מעשירית מהחלק של האדם העשירי.
 
-??? trap "מלכודת: שבר מהעוגה או שבר ממה שנשאר"
+??? trap "מלכודת : שבר מהעוגה או שבר ממה שנשאר"
     אם כל אחד היה לוקח \( p_k \) **מהעוגה כולה**, החלק שלו היה פשוט \( p_k \), והחלק הגדול
     היה של מי שהשבר שלו הכי גדול, כל עוד נשארה עוגה. כאן השבר הוא ממה שנשאר, ולכן החלק הוא
     \( p_k R_k \), ושני הגורמים זזים בכיוונים הפוכים.
 
-??? trap "מלכודת: לשכוח את התיקו"
+??? trap "מלכודת : לשכוח את התיקו"
     כש-\( q^k = \frac{q - 1}{a} \) בדיוק, הלוגריתם יוצא מספר שלם, והיחס \( q(1 - p_k) \) שווה
     ל-1. שני אנשים מקבלים את אותו חלק, כמו בדוגמה \( a = 0.25 \), \( q = 2 \).
 
-??? trap "מלכודת: הלוגריתם הלא נכון"
+??? trap "מלכודת : הלוגריתם הלא נכון"
     הסף הוא \( 1 - 1/q \) ולא 1. מי שפותר \( a\,q^{k-1} \ge 1 \) מוצא את האדם **האחרון**,
-    זה שלוקח את השארית: ‏\( \lceil \log_{1.5} 100 \rceil + 1 = 13 \) במקום 10.
+    זה שלוקח את השארית : ‏\( \lceil \log_{1.5} 100 \rceil + 1 = 13 \) במקום 10.
 
-??? trap "מלכודת: עיגול של לוגריתם"
+??? trap "מלכודת : עיגול של לוגריתם"
     ‏\( \log_{1.5} 50 \approx 9.65 \), ולכן מעגלים **למעלה** ל-10. אבל כשהתשובה המדויקת היא
     מספר שלם, זה מקרה התיקו, ומחשבון שמחזיר \( 7.0000001 \) במקום 7 יעגל למעלה ל-8. כשהלוגריתם
     קרוב למספר שלם, בודקים ישירות את \( q^k \) מול \( \frac{q - 1}{a} \).
 
 ??? followup "שאלות המשך"
-    - **‏\( q \le 1 \):** מה קורה כשהשברים לא עולים? ‏(‏\( q(1 - p_k) < 1 \) תמיד, כי
+    - **‏\( q \le 1 \) :** מה קורה כשהשברים לא עולים? ‏(‏\( q(1 - p_k) < 1 \) תמיד, כי
       \( p_k > 0 \), ולכן האדם הראשון מקבל הכי הרבה.)
-    - **‏\( q > 2 \):** נסו \( a = 0.6 \) ו-\( q = 3 \). הנוסחה נותנת את האדם השני, אבל הוא
+    - **‏\( q > 2 \) :** נסו \( a = 0.6 \) ו-\( q = 3 \). הנוסחה נותנת את האדם השני, אבל הוא
       מקבל \( 0.4 \) והראשון \( 0.6 \). מה השתבש, ולמה זה קורה רק לחלק מערכי \( a \)?
-    - **פסגה שטוחה:** הראו שכש-\( q \to 1 \) ההפרש בין החלק הגדול לחלקים של שכניו הולך
+    - **פסגה שטוחה :** הראו שכש-\( q \to 1 \) ההפרש בין החלק הגדול לחלקים של שכניו הולך
       ל-0. כמה אנשים מקבלים לפחות 90% מהחלק הגדול כש-\( q = 1.1 \)?
-    - **כמה אנשים בסך הכול:** הראו שמספר האנשים הוא \( \left\lceil \log_q \frac1a \right\rceil + 1 \),
+    - **כמה אנשים בסך הכול :** הראו שמספר האנשים הוא \( \left\lceil \log_q \frac1a \right\rceil + 1 \),
       ובדקו שבסעיף א יוצא 13.
-    - **סדרה חשבונית:** מה משתנה כשהשברים עולים ב-\( d \) בכל פעם? זו
+    - **סדרה חשבונית :** מה משתנה כשהשברים עולים ב-\( d \) בכל פעם? זו
       [שאלה 0027](0027-cake-arithmetic-fractions.md).

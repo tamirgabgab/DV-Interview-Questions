@@ -128,14 +128,14 @@ def circle_stepper(n, L=2):
     steps, win = run(n, L)
     rule = "נשאר, והבא אחריו יוצא" if L == 2 else f"נשאר, ו-{L - 1} הבאים אחריו יוצאים"
     frames = [(circle_frame(n, set()),
-               f"{n} אנשים במעגל. מתחילים מאדם 0: הוא {rule}. המספר במרכז הוא כמה אנשים נשארו.")]
+               f"{n} אנשים במעגל. מתחילים מאדם 0 : הוא {rule}. המספר במרכז הוא כמה אנשים נשארו.")]
     out = set()
     for s, (stays, leave) in enumerate(steps, 1):
         who = f"ואדם {leave[0]} יוצא" if len(leave) == 1 else f"ואנשים {_people(leave)} יוצאים"
         frames.append((circle_frame(n, out | set(leave), stays, leave),
-                       f"צעד {s}: אדם {stays} נשאר, {who}."))
+                       f"צעד {s} : אדם {stays} נשאר, {who}."))
         out |= set(leave)
-    frames.append((circle_frame(n, out, winner=win), f"נשאר אדם {win}. הוא השורד: \\( F_{L}({n}) = {win} \\)."))
+    frames.append((circle_frame(n, out, winner=win), f"נשאר אדם {win}. הוא השורד : \\( F_{L}({n}) = {win} \\)."))
     return stepper(frames, f"יוספוס עם {n} אנשים, כל {HEB_ORD.get(L, str(L))} יוצא")
 
 
@@ -255,7 +255,7 @@ def chart(L=2, N=40, step=4):
 def chart_legend(L=2):
     if L == 2:
         chains = '<span><i class="s1"></i>השורד \\( F(N) \\)</span>'
-        zeros = "חזקה של 2: השורד הוא 0"
+        zeros = "חזקה של 2 : השורד הוא 0"
     else:
         if L == 3:
             chains = ('<span><i class="s1"></i>‏\\( N \\) אי-זוגי</span>'
@@ -263,7 +263,7 @@ def chart_legend(L=2):
         else:
             chains = "".join(f'<span><i class="s{r}"></i>‏\\( N \\equiv {r % (L - 1)} \\pmod{{{L - 1}}} \\)</span>'
                              for r in range(1, L))
-        zeros = "נקודת אפס: השורד הוא 0"
+        zeros = "נקודת אפס : השורד הוא 0"
     return (f'<span class="viz-legend">{chains}<span><i class="ink"></i>{zeros}</span>'
             '<span><i class="ink-dash"></i>הקו \\( F = N \\)</span></span>')
 
@@ -297,7 +297,7 @@ def round_svg(n=8, L=2):
     x0, w = 70, 70 + n * (CELL + GAP) + 20
     h = 3 * CELL + 2 * 34 + 20
     p = [f'<svg class="figure" viewBox="0 0 {w} {h}" style="max-width:{w / 16:.0f}rem" role="img" '
-         f'aria-label="סיבוב אחד שלם עם {n} אנשים: נשארים הכפולות של {L}, ואחרי חלוקה ב-{L} זו אותה בעיה עם {k} אנשים">', DEFS]
+         f'aria-label="סיבוב אחד שלם עם {n} אנשים : נשארים הכפולות של {L}, ואחרי חלוקה ב-{L} זו אותה בעיה עם {k} אנשים">', DEFS]
     y = 10
     labels = list(range(n))
     _row(p, x0, y, labels, ["st-stack" if i % L == 0 else "st-bad" for i in labels])
@@ -389,7 +389,7 @@ def digits3_svg(examples=(30, 21)):
     xb = xc + longest * unit + 70                  # the result, one digit longer
     w, h = xb + (longest + 1) * unit + 50, 24 + 86 * len(rows)
     p = [f'<svg class="figure" viewBox="0 0 {w} {h}" style="max-width:{w / 16:.0f}rem" role="img" '
-         'aria-label="חצי N בבסיס 3, פחות הספרות של חצי נקודת האפס, ועוד 0 בסוף: התוצאה היא השורד">', DEFS]
+         'aria-label="חצי N בבסיס 3, פחות הספרות של חצי נקודת האפס, ועוד 0 בסוף : התוצאה היא השורד">', DEFS]
     y = 14
     for n, half, c, diff in rows:
         a, b = base3(half).rjust(longest), base3(c).rjust(len(base3(half))).rjust(longest)

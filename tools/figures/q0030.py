@@ -191,7 +191,7 @@ def box_svg(a=A, b=B, h=H, s=S, f=F):
     ox, oy = 50, 236
     P = lambda x, y, z: (ox + sc * x + sc * ky * y, oy - sc * z - sc * ky * y)
     w, hh = int(ox + sc * a + sc * ky * b + 60), int(oy + 30)
-    out = [svg_open(w, hh, f"קופסה באורך {a}, רוחב {b} וגובה {h}: העכביש על הקיר השמאלי, {s[2]} מתחת לתקרה, "
+    out = [svg_open(w, hh, f"קופסה באורך {a}, רוחב {b} וגובה {h} : העכביש על הקיר השמאלי, {s[2]} מתחת לתקרה, "
                     f"והזבוב על הקיר הימני, {f[2]} מעל הרצפה, שניהם באמצע הרוחב", max_rem=36)]
     c = {k: P(*v) for k, v in dict(A=(0, 0, 0), Bc=(a, 0, 0), C=(a, b, 0), D=(0, b, 0),
                                    E=(0, 0, h), Fc=(a, 0, h), G=(a, b, h), Hc=(0, b, h)).items()}
@@ -239,7 +239,7 @@ def box_legend():
 def naive_net(a=A, b=B, h=H, s=S, f=F):
     """end0 folded on its top edge, the top, enda folded on its top edge: a 42 straight line."""
     lo, hi = bands(b, h)["top"]
-    n = Net(-h, a + h, lo - 2, hi + 2, 9, label=f"פריסה של הקיר של העכביש, התקרה והקיר של הזבוב בשורה אחת: "
+    n = Net(-h, a + h, lo - 2, hi + 2, 9, label=f"פריסה של הקיר של העכביש, התקרה והקיר של הזבוב בשורה אחת : "
             f"קו ישר באורך {a + (h - s[2]) + (h - f[2])}", max_rem=36)
     n.rect(-h, 0, lo, hi, "box-end", "end0", title=HEB["end0"])
     n.rect(0, a, lo, hi, "box-face", "top", title=HEB["top"])
@@ -261,7 +261,7 @@ def best_net(a=A, b=B, h=H, s=S, f=F):
     """The best route: end0 on its top edge, top, sideB, bottom, enda on its bottom edge."""
     c = best(a, b, h, s, f)
     rng = bands(b, h)
-    n = Net(-h, a + h, 0, 2 * b + h, 9, label=f"פריסה של חמש פאות במדרגות: הקיר של העכביש על התקרה, התקרה, הקיר הרחוק, "
+    n = Net(-h, a + h, 0, 2 * b + h, 9, label=f"פריסה של חמש פאות במדרגות : הקיר של העכביש על התקרה, התקרה, הקיר הרחוק, "
             f"הרצפה והקיר של הזבוב על הרצפה. הקו הישר הוא היתר של משולש ישר-זווית עם ניצבים {num(c['dx'])} ו-{num(-c['dp'])}, "
             f"ואורכו {num(c['length'])}", max_rem=36)
     n.rect(-h, 0, *rng["top"], "box-end", "end0", title=HEB["end0"])
@@ -332,7 +332,7 @@ def strip_svg(a=A, b=B, h=H, s=S, f=F):
     for es, ds, ps, lo, hi in images(s[1], s[2], b, h):
         chosen = es == c["s_edge"]
         n.point(-ds, ps, "s1" if chosen else "ink", r=5 if chosen else 3.5,
-                title=f"S דרך {HEB[es]}: x = −{num(ds)}, p = {num(ps)}")
+                title=f"S דרך {HEB[es]} : x = −{num(ds)}, p = {num(ps)}")
         n.label(-ds, ps, es, dx=-8, dy=4, size=12, anchor="end")
     for ef, df, pf, lo, hi in images(f[1], f[2], b, h):
         for k in (-1, 0, 1):
@@ -341,7 +341,7 @@ def strip_svg(a=A, b=B, h=H, s=S, f=F):
                 continue
             chosen = ef == c["f_edge"] and k == c["k"]
             n.point(a + df, p, "s2" if chosen else "ink", r=5 if chosen else 3.5,
-                    title=f"F דרך {HEB[ef]}, k = {k}: x = {num(a + df)}, p = {num(p)}")
+                    title=f"F דרך {HEB[ef]}, k = {k} : x = {num(a + df)}, p = {num(p)}")
             n.label(a + df, p, ef if k == 0 else f"{ef}, k = {k:+d}", dx=8, dy=4, size=12, anchor="start")
     # the chosen hinge edges and the line
     es = [i for i in images(s[1], s[2], b, h) if i[0] == c["s_edge"]][0]
@@ -349,8 +349,8 @@ def strip_svg(a=A, b=B, h=H, s=S, f=F):
     n.line(0, es[3], 0, es[4], "s3-line", 5).line(a, ef[3] + c["k"] * P, a, ef[4] + c["k"] * P, "s3-line", 5)
     xs, ps, xf, pf = -es[1], es[2], a + ef[1], ef[2] + c["k"] * P
     n.line(xs, ps, xf, pf, "box-path", 3)
-    n.point(0, c["p_exit"], "s3", r=4, title=f"נקודת היציאה: p = {num(c['p_exit'])}")
-    n.point(a, c["p_enter"], "s3", r=4, title=f"נקודת הכניסה: p = {num(c['p_enter'])}")
+    n.point(0, c["p_exit"], "s3", r=4, title=f"נקודת היציאה : p = {num(c['p_exit'])}")
+    n.point(a, c["p_enter"], "s3", r=4, title=f"נקודת הכניסה : p = {num(c['p_enter'])}")
     n.label((xs + xf) / 2, (ps + pf) / 2, f"d = {num(c['length'])}", dx=-30, dy=24, size=17)
     n.label(0, p_lo, "x = 0", dy=16, size=13).label(a, p_lo, f"x = {a}", dy=16, size=13)
     n.label(-h - 2, (p_lo + p_hi) / 2, "p", dx=-14, size=15)
