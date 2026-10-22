@@ -1351,6 +1351,34 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       light and dark at 1100 and 390 px; keyboard on both 0007 boxes (right, right,
       Shift+up, left moved P2 by 11°, the focus and aria-valuenow followed); lint, the
       Python tests (273), strict build, links, phone and axe light and dark.
+17. **Round U, batch 3 (U138, U139; the owner's answers: a "?" button that opens a help
+    line above the box, with one sentence per kind in explorer.js; a shared "reset
+    everything" that rebuilds the box; LFSR widths 3 to 8 with the ring up to 6 bits, a
+    state list above that and only the primitive polynomials in the table from 6 bits;
+    both Gray boxes, the synchroniser 3 to 6 bits and the FIFO 8 / 16 / 32 / 64):**
+    - U139: `lfsrPrimitiveCount(width)` (φ(2^n − 1) / n). The LFSR box: a width select,
+      the tap boxes rebuilt per width, the question's presets jump back to 4 bits, the
+      ring scales its nodes (labels up to 5 bits, titles always) and from 7 bits a list
+      of the visited states replaces it, the table shows every polynomial up to 5 bits
+      and the primitive ones from 6 with the count against the formula. The Gray boxes: a
+      width select on the synchroniser (a new width starts at the step before the wrap,
+      the reset returns to the page's 4-bit example), a depth select on the FIFO (pointers
+      one bit above the address, the burst buttons do half the depth, the slot grid in
+      rows of 16 through `--gr-cols`, the summary texts follow the width). Tests: every
+      polynomial's period of 3 to 8 bits against a plain Python LFSR and the count
+      against φ; the wrap step of 3 to 6 bits and the flags of 8, 32 and 64 entries
+      against the page's functions.
+    - U138: `HELP` (34 sentences) and `header(box, helpOpen)` in setup: a "?" button
+      (aria-expanded) toggles the `.ex-help` line, "איפוס הכול" stops a running play
+      (by clicking its button), drops a `#seed-` / `#state-` hash and calls `setup`
+      again; `keyboard` and `decorateLive` keep one listener and one observer per box
+      across rebuilds (`box.dvqKeys`, `box.dvqObserved`), the key hint is re-appended.
+    - Checks in the sandbox: the LFSR box at 3, 6 and 8 bits (the ring, the list, the
+      table titles, the preset returning to 4 bits), the synchroniser at 6 bits, the FIFO
+      at 64 and 8, the help line open, a reset after a play (one enlarge button, one key
+      hint, one header, the help kept open), two resets then one arrow stepping once, a
+      state link dropped by the reset; lint, the Python tests (275), strict build, links,
+      phone and axe light and dark. `main` fast-forwarded at the end of the round.
 
 ---
 
@@ -1363,8 +1391,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   per page) and X (timing strips), recorded under "Round U" below. Round V is done
   (session 20). Round W (trimmed by the owner; W172 dropped) is done in three batches
   (W149, W170, W173; W152, W162, W177; W154, W164, W169). Round U (U134 to U139, the
-  owner's pick) is in progress: batches 1 (U134, U135) and 2 (U136, U137) done; next
-  U138 and U139, then round X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
+  owner's pick) is done in three batches (U134, U135; U136, U137; U138, U139); U133
+  (WaveDrom export) stays open. Next: round X, the open rounds D to F, I, L, N, O, Q, S,
+  or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1800,8 +1829,8 @@ and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T13
 | ~~U135~~ | 0025, 0024 | ~~**Random traffic button**: a "run 50 random events" that injects faults at a chosen rate and checks the invariants after each, the way the testbenches of the pages do; the first violation stops the run~~ done (session 20, round U batch 1) | M |
 | ~~U136~~ | 0023 | ~~**Pending-read timeline**: a small Gantt of the open reads over the cycles (ready at, completions out), beside the table~~ done (session 20, round U batch 2; under the open reads, full width) | S–M |
 | ~~U137~~ | 0007, 0014, 0009 | ~~**Keyboard dragging**: arrow keys move a focused point or shape, as the stock box does; the triangle and polygon points are the first~~ done (session 20, round U batch 2; triangle and polygon only, the owner's pick: 0014 and 0009 have nothing to drag) | S |
-| U138 | all | **A "reset everything" and a help tooltip per box**: one line that says what the box shows and what each button does, for first-time readers | S |
-| U139 | 0034, 0036 | **Wider widths**: an N select (4 to 6 bits) on the Gray box and on the LFSR box, with the table of primitive polynomials per width | M |
+| ~~U138~~ | all | ~~**A "reset everything" and a help tooltip per box**: one line that says what the box shows and what each button does, for first-time readers~~ done (session 20, round U batch 3) | S |
+| ~~U139~~ | 0034, 0036 | ~~**Wider widths**: an N select (4 to 6 bits) on the Gray box and on the LFSR box, with the table of primitive polynomials per width~~ done (session 20, round U batch 3; 3 to 8 bits on the LFSR, 3 to 6 on the synchroniser, 8 to 64 entries on the FIFO) | M |
 
 ### Survey of the explorers (session 20)
 
@@ -1861,7 +1890,7 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 
 Suggested order (session 20): rounds V and W are done (W in three batches, the owner
 answering multiple-choice questions per batch). Round U134 to U139 is being done the same
-way (batches 1 and 2, U134 to U137, done); then round X on top of V.
+way (U134 to U139 done in three batches; U133 open); then round X on top of V.
 
 
 The older idea list below is kept for reference; items covered by the rounds above are
