@@ -176,3 +176,30 @@ def test_explorer_matches_page_code():
     want = [[1 - (1 / 3 + 1 / 4), 2 ** -4], [1 - (1 / 4 + 1 / 5 + 1 / 6), 2 ** -6], [1 - sum(1 / k for k in range(5, 9)), 2 ** -8]]
     for (a, b), (c, d) in zip(got["small"], want):
         assert abs(a - c) < 1e-12 and b == d
+
+
+def test_explorer_state_link():
+    """The copy link of the box carries the arrangement, the person, the helper toggle and
+    the opening reached as `#state-boxes.<payload>`: the codec round-trips the example and
+    random arrangements of every even N up to 16, and rejects an odd N, a list that is not
+    a permutation, a person outside 1..N or a malformed payload."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(90)
+    states = [{"notes": EXAMPLE, "me": 13, "helper": True, "step": 3}]
+    for n in range(4, 17, 2):
+        for _ in range(5):
+            p = list(range(1, n + 1))
+            rng.shuffle(p)
+            states.append({"notes": [0] + p, "me": rng.randint(1, n), "helper": rng.random() < 0.5, "step": rng.randint(0, n // 2)})
+    bad = ["2.1.4.4-3-1-1", "2.1.3-1-0-0", "2.1.4.3-5-1-1", "2.1.4.3-0-1-1", "2.1.4.3-3-2-1", "2.1.4.3-3-1", "", "1.2.3.4.5.6.7.8.9.10.11.12.13.14.15.16.17.18-1-1-0"]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const C = m.STATE_CODECS.boxes;
+      console.log(JSON.stringify({{ trip: {json.dumps(states)}.map((s) => [C.enc(s), C.dec(C.enc(s), 16)]), bad: {json.dumps(bad)}.map((t) => C.dec(t, 16)) }}));""")
+    for s, (payload, back) in zip(states, got["trip"]):
+        assert payload == ".".join(map(str, s["notes"][1:])) + f"-{s['me']}-{1 if s['helper'] else 0}-{s['step']}"
+        assert back == {"n": len(s["notes"]) - 1, "notes": s["notes"], "me": s["me"], "helper": s["helper"], "step": s["step"]}, s
+    assert got["bad"] == [None] * len(bad)

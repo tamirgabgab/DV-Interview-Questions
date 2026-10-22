@@ -124,3 +124,25 @@ def test_explorer_matches_page_code():
             frames.append({"phase": 2, "step": step, "slow": slow, "fast": fast})
         assert tr["frames"] == frames and tr["meet"] == meet
         assert tr["answer"] == slow == x == ns["find_duplicate_floyd"](list(nums))
+
+
+def test_explorer_state_link():
+    """The copy link of the box carries the array and the step as `#state-floyd.<payload>`:
+    the codec round-trips the example and random arrays, clamps the step to the length of
+    the trace, and rejects an array over the box's n or one that is not n + 1 numbers in
+    1..n."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(170)
+    states = [{"nums": EXAMPLE, "k": 5}] + [{"nums": random_case(rng, rng.randint(3, 12)), "k": rng.randint(0, 40)} for _ in range(40)]
+    bad = ["3.9.5-0", "1.2.3.1.1.1.1.1.1.1.1.1.1.1-0", "0.1-0", "3.9.5.6.7.8.1.1.2.4", "3.9.5.6.7.8.1.1.2.4-x", "", "2.2.2-1-1"]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const C = m.STATE_CODECS.floyd;
+      console.log(JSON.stringify({{ trip: {json.dumps(states)}.map((s) => [C.enc(s), C.dec(C.enc(s), 12), m.floydTrace(s.nums).frames.length - 1]), bad: {json.dumps(bad)}.map((t) => C.dec(t, 12)) }}));""")
+    for s, (payload, back, total) in zip(states, got["trip"]):
+        assert payload == ".".join(map(str, s["nums"])) + f"-{s['k']}"
+        assert back == {"nums": s["nums"], "k": min(s["k"], total)}, s
+    assert got["bad"] == [None] * len(bad)
