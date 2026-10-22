@@ -1329,6 +1329,28 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       links opening each box, the copy link read back, a random run on both boxes to
       the end and back one step, a mid-flight Sync showing the violation; lint, the
       Python tests (272), strict build, links, phone and axe light and dark.
+16. **Round U, batch 2 (U136, U137; the owner's answers: the timeline under the open
+    reads at full width; a bar from the issue to the last completion with the waits
+    dashed and a mark per completion; keyboard only on the triangle and polygon points;
+    Tab to each point with a focus ring and slider aria):**
+    - U136: the read records of the endpoint model carry `issued` and `waits` (one
+      [from, ready] window per completion; `epRead` opens the first, `epNext` the next).
+      The box draws a timeline under the open reads: the random wait dashed, the time a
+      read is ready and waiting its turn solid, a circle per completion with a tooltip,
+      a dashed line at the current cycle, ticks every 1 / 5 / 10 / 20 cycles, a legend.
+      Test: the windows against the completions on random reads and the page's script a.
+    - U137: `arrowStep(e)` (±1, ×10 with Shift); the triangle and polygon points are
+      `tabindex="0" role="slider"` with aria-valuenow and a label, a keydown on the svg
+      moves the focused point (the polygon redraws its points and puts the focus back),
+      `.tri-pt:focus-visible` ring (the two svgs are `role="group"` now, since an
+      `img` role may not hold focusable children, axe's nested-interactive); the
+      box-level key handler of V140 now leaves any
+      `role="slider"` target alone (so a focused point owns the arrows; the stock points
+      got Shift steps of 5 through the same helper); a key hint line for points.
+    - Checks in the sandbox: the timeline mid-run, at the end and after a step back,
+      light and dark at 1100 and 390 px; keyboard on both 0007 boxes (right, right,
+      Shift+up, left moved P2 by 11°, the focus and aria-valuenow followed); lint, the
+      Python tests (273), strict build, links, phone and axe light and dark.
 
 ---
 
@@ -1341,8 +1363,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   per page) and X (timing strips), recorded under "Round U" below. Round V is done
   (session 20). Round W (trimmed by the owner; W172 dropped) is done in three batches
   (W149, W170, W173; W152, W162, W177; W154, W164, W169). Round U (U134 to U139, the
-  owner's pick) is in progress: batch 1 (U134, U135) done; next U136 and U137, then U138
-  and U139, then round X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
+  owner's pick) is in progress: batches 1 (U134, U135) and 2 (U136, U137) done; next
+  U138 and U139, then round X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1776,8 +1798,8 @@ and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T13
 | U133 | 0001, 0035, 0038 | **Export the strip as WaveDrom**: a button that copies the drawn trace as WaveDrom JSON, so a reader can paste it into the page's own diagrams or a report | S |
 | ~~U134~~ | 0006, 0017, 0009 | ~~**Shareable state in the URL**: the typed array / prices / N in the hash, so a link opens the box in the same state (the stepper deep links of M76 extended to explorers)~~ done (session 20, round U batch 1; also the random runs of 0025 / 0024) | S–M |
 | ~~U135~~ | 0025, 0024 | ~~**Random traffic button**: a "run 50 random events" that injects faults at a chosen rate and checks the invariants after each, the way the testbenches of the pages do; the first violation stops the run~~ done (session 20, round U batch 1) | M |
-| U136 | 0023 | **Pending-read timeline**: a small Gantt of the open reads over the cycles (ready at, completions out), beside the table | S–M |
-| U137 | 0007, 0014, 0009 | **Keyboard dragging**: arrow keys move a focused point or shape, as the stock box does; the triangle and polygon points are the first | S |
+| ~~U136~~ | 0023 | ~~**Pending-read timeline**: a small Gantt of the open reads over the cycles (ready at, completions out), beside the table~~ done (session 20, round U batch 2; under the open reads, full width) | S–M |
+| ~~U137~~ | 0007, 0014, 0009 | ~~**Keyboard dragging**: arrow keys move a focused point or shape, as the stock box does; the triangle and polygon points are the first~~ done (session 20, round U batch 2; triangle and polygon only, the owner's pick: 0014 and 0009 have nothing to drag) | S |
 | U138 | all | **A "reset everything" and a help tooltip per box**: one line that says what the box shows and what each button does, for first-time readers | S |
 | U139 | 0034, 0036 | **Wider widths**: an N select (4 to 6 bits) on the Gray box and on the LFSR box, with the table of primitive polynomials per width | M |
 
@@ -1839,7 +1861,7 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 
 Suggested order (session 20): rounds V and W are done (W in three batches, the owner
 answering multiple-choice questions per batch). Round U134 to U139 is being done the same
-way (batch 1: U134, U135 done); then round X on top of V.
+way (batches 1 and 2, U134 to U137, done); then round X on top of V.
 
 
 The older idea list below is kept for reference; items covered by the rounds above are
