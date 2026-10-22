@@ -1518,11 +1518,12 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     (`f"\\( … \\): "` in q0017, `{name}: {title}` in q0026, and nested templates in
     `explorer.js`) were fixed by hand. The owner chose no linter check for it. Checks:
     lint, the Python tests, strict build, links, phone and axe light and dark.
-25. **Math in the sidebar's table of contents.** The owner saw `\( L - 1 \)` raw in the
-    table of contents of 0016: the TOC is plain text, MathJax does not run there. The
-    three headings with math (0016 part c, 0017 part b, 0007 part b) got a
-    `data-toc-label` in Hebrew words ("L − 1", "בזיכרון קבוע", "n"); the anchors did
-    not change. The rule is in `CLAUDE.md`.
+25. **Math in headings.** The owner saw `\( L - 1 \)` raw in the table of contents of
+    0016: the TOC and the search results show headings as plain text, MathJax does not
+    run there. The three headings with math (0016 part c, 0017 part b, 0007 part b) are
+    now plain words ("L − 1", "בזיכרון קבוע", "n"), with their old anchors pinned
+    (`#l-1`, `#o1`, `#n`). A scan of every TOC entry, page title and search-index title
+    of the built site found nothing else. The rule is in `CLAUDE.md`.
 
 ---
 

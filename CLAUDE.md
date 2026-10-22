@@ -23,9 +23,9 @@ work session, and update `HANDOFF.md` (work log, open items) at the end of every
   23:58:59), code, math, URLs or English-only text.
 - No Hebrew inside MathJax (`\text{...}` renders reversed). In inline SVG, Hebrew `<text>`
   gets `direction="rtl"`; prefer an HTML legend over SVG text.
-- The sidebar's table of contents shows headings as plain text, so MathJax there appears
-  raw (`\( L - 1 \)`). A heading with math gets a plain Hebrew label:
-  `### ... \( n \) ... { data-toc-label="... n ..." }`; the anchor stays the same.
+- No math in headings: the sidebar's table of contents and the search
+  results show headings as plain text, so `\( L - 1 \)` appears raw there. Write the
+  heading in words ("L − 1", "בזיכרון קבוע") and keep its old anchor with `{ #id }`.
 - Long display math or inline chains widen the page on phones: split equations with
   `aligned`, write number chains as text in `<span dir="ltr">`.
 
