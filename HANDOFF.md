@@ -1379,6 +1379,33 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       hint, one header, the help kept open), two resets then one arrow stepping once, a
       state link dropped by the reset; lint, the Python tests (275), strict build, links,
       phone and axe light and dark. `main` fast-forwarded at the end of the round.
+18. **Round X, batch 1 (U133, X147; the owner's answers: copy the WaveDrom JSON and a link
+    to the editor; on every strip built by `waveStrip`, the new ones of round X included;
+    the 0033 strip on a real time axis, each clock at its own period; a window of about 40
+    write cycles with a position slider, the window marked on the fill chart):**
+    - U133: `waveDromOf(rows, N, opts)` and `waveDromText` (exported): a lane per row,
+      "p…" clocks or "h"/"l" per half-cycle slot, levels with ".", buses with `data`,
+      flags as levels, names without markup or entities. `waveStrip` puts the text in
+      `data-wavedrom`; `exportRows(box)` (run with the figure decoration on every
+      redraw) adds one row after each strip's scroll container: "העתקת WaveDrom" (the
+      clipboard, a prompt as the fallback) and "פתיחה בעורך WaveDrom"
+      (`https://wavedrom.com/editor.html?` + the encoded source, refreshed on focus and
+      click). The editor's URL form could not be opened from the sandbox (wavedrom.com
+      is outside the network policy): check the link on the live site.
+    - X147: `fifoEvents` (the fifoFill loop keeping every write and every read slot) and
+      `fifoGrid(tWrite, tRead)`. The 0033 box draws a strip of wr_clk, wr_en, rd_clk,
+      rd_en (skipped slots shaded) and the count over [window − 1 cycle, +40 write
+      cycles), ns ticks every 5 cycles, a window slider and the window as a dashed
+      rectangle on the fill chart. WaveDrom draws integer lane periods only (a fractional
+      period like 1.25 rounds, checked by rendering with the wavedrom 3.5.0 package), so
+      the export puts a write cycle on a units and a read cycle on b: the reduced ratio
+      when both are at most 8 (100 / 80 MHz: 4 and 5), else the closest ratio with a ≤ 6,
+      named "rd_clk (≈ b/a)"; the count is sampled once per unit.
+    - Checks in the sandbox: every exported source of 0001, 0035, 0038 and 0033 rendered
+      with the wavedrom package (and looked at); the 0035 page diagram's `period: 0.5`
+      lane renders correctly (levels, not "p"); the 0033 strip at the start, the middle
+      and past the peak, light and dark at 1100 and 390 px; lint, the Python tests (277),
+      strict build, links, phone and axe light and dark.
 
 ---
 
@@ -1391,9 +1418,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   per page) and X (timing strips), recorded under "Round U" below. Round V is done
   (session 20). Round W (trimmed by the owner; W172 dropped) is done in three batches
   (W149, W170, W173; W152, W162, W177; W154, W164, W169). Round U (U134 to U139, the
-  owner's pick) is done in three batches (U134, U135; U136, U137; U138, U139); U133
-  (WaveDrom export) stays open. Next: round X, the open rounds D to F, I, L, N, O, Q, S,
-  or new questions.
+  owner's pick) is done in three batches (U134, U135; U136, U137; U138, U139). Round X
+  with U133 is in progress: batch 1 (U133, X147) done; next X145, then X146; then the
+  open rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1824,7 +1851,7 @@ and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T13
 
 | Id | Page | Idea | Size |
 |---|---|---|---|
-| U133 | 0001, 0035, 0038 | **Export the strip as WaveDrom**: a button that copies the drawn trace as WaveDrom JSON, so a reader can paste it into the page's own diagrams or a report | S |
+| ~~U133~~ | 0001, 0035, 0038 | ~~**Export the strip as WaveDrom**: a button that copies the drawn trace as WaveDrom JSON, so a reader can paste it into the page's own diagrams or a report~~ done (session 20, round X batch 1; on every strip, the 0033 one included) | S |
 | ~~U134~~ | 0006, 0017, 0009 | ~~**Shareable state in the URL**: the typed array / prices / N in the hash, so a link opens the box in the same state (the stepper deep links of M76 extended to explorers)~~ done (session 20, round U batch 1; also the random runs of 0025 / 0024) | S–M |
 | ~~U135~~ | 0025, 0024 | ~~**Random traffic button**: a "run 50 random events" that injects faults at a chosen rate and checks the invariants after each, the way the testbenches of the pages do; the first violation stops the run~~ done (session 20, round U batch 1) | M |
 | ~~U136~~ | 0023 | ~~**Pending-read timeline**: a small Gantt of the open reads over the cycles (ready at, completions out), beside the table~~ done (session 20, round U batch 2; under the open reads, full width) | S–M |
@@ -1886,11 +1913,11 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 |---|---|---|---|
 | X145 | 0036, 0034 | **Timing strip in the LFSR and FIFO-flags boxes**: states, output bits and pointers as waves over time with the `waveStrip` of 0001 / 0035, instead of lists | S–M |
 | X146 | 0023, 0024, 0025 | **Event axis for the three reference models**: every event a column on a strip with Seq / credits / cycle, which merges U136 into one uniform view | M |
-| X147 | 0033 | **A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart | S |
+| ~~X147~~ | 0033 | ~~**A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart~~ done (session 20, round X batch 1; a real time axis over a sliding window) | S |
 
 Suggested order (session 20): rounds V and W are done (W in three batches, the owner
 answering multiple-choice questions per batch). Round U134 to U139 is being done the same
-way (U134 to U139 done in three batches; U133 open); then round X on top of V.
+way (U134 to U139 done in three batches); round X with U133 in three batches (U133 + X147 done, then X145, then X146).
 
 
 The older idea list below is kept for reference; items covered by the rounds above are
