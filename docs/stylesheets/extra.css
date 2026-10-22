@@ -2115,3 +2115,16 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .wv-row { display: flex; align-items: flex-start; width: max-content; }
 .md-typeset .explorer .wv-names { position: sticky; left: 0; z-index: 1; flex: none; box-sizing: border-box; padding-right: 8px; text-align: right; background: var(--md-default-bg-color); font-family: var(--md-code-font-family); font-size: 12px; color: var(--viz-text); white-space: nowrap; overflow: hidden; }
 .md-typeset .explorer .wv-row:has(> .fig-wrap) .wv-names { margin-top: 1.8rem; }
+
+/* the 45 digit pairs of the 0005 follow-up: rows a = 0..8, columns b = 1..9 */
+.md-typeset .explorer .ab-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 0.15rem; margin-top: 0.5rem; max-width: 30rem; }
+.md-typeset .explorer .ab-head { align-self: center; text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--viz-text); }
+.md-typeset .explorer .ab-corner { font-weight: 400; font-size: 0.6rem; white-space: nowrap; }
+.md-typeset .explorer .ab-cell { min-height: 2rem; padding: 0; border-radius: 0.2rem; border: 1px solid transparent; font: inherit; font-size: 0.7rem; font-variant-numeric: tabular-nums; cursor: pointer; overflow: hidden; }
+.md-typeset .explorer .ab-cell.ab-ok { background: var(--diff-easy-bg); color: var(--diff-easy); border-color: var(--diff-easy-bg); }
+.md-typeset .explorer .ab-cell.ab-no { background: var(--diff-hard-bg); color: var(--diff-hard); border-color: var(--diff-hard-bg); }
+.md-typeset .explorer .ab-cell.is-sel { border-color: currentColor; box-shadow: 0 0 0 1px currentColor; font-weight: 700; }
+.md-typeset .explorer .ab-cell:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 1px; }
+.md-typeset .explorer .viz-legend .ab-ok-key { background: var(--diff-easy); }
+.md-typeset .explorer .viz-legend .ab-no-key { background: var(--diff-hard); }
+.md-typeset .explorer .ab-ans { display: inline-block; max-width: 100%; max-height: 6rem; overflow-y: auto; vertical-align: top; word-break: break-all; font-family: var(--md-code-font-family); font-size: 0.75rem; }
