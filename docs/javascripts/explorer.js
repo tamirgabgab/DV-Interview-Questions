@@ -2167,7 +2167,7 @@
                `<text class="tick" x="${x0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${lab}</text>`;
         });
         // the knots as ticks when they are few; whole hours otherwise
-        const xt = pl.times.length <= 8 ? pl.times : Array.from({ length: Math.floor(Tmax * st.t1) + 1 }, (_, h) => h / st.t1).concat([pl.T]);
+        const xt = pl.times.length <= 8 ? pl.times : Array.from({ length: Math.floor(Tmax * st.t1) + 1 }, (_, h) => h / st.t1).filter((t) => Math.abs(t - pl.T) * st.t1 > 0.4).concat([pl.T]);
         xt.forEach((t) => {
           s += `<line class="grid" x1="${f(X(t))}" x2="${f(X(t))}" y1="${top - 6}" y2="${base}" stroke-dasharray="4 4"/>` +
                `<text class="tick" x="${f(X(t))}" y="${base + 18}" text-anchor="middle">${fmt(t * st.t1, 2)}</text>`;

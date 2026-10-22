@@ -1252,6 +1252,46 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       set, the length-only ring, the no-solution case; the 41-people run, the seat rings,
       N = 10⁶ on both pages; N = 5 and N = 4 strips); lint, the Python tests, strict
       build, links, phone and axe light and dark.
+14. **Round W, batch 3 (W154, W164, W169; the owner's answers: the discrete fraction as a
+    summary line and a column of the 1,000-draws comparison; a histogram of 1,000 uniform
+    draws stacked inside / outside; an objective select with a comparison line; an
+    optional C field; a riders slider 2 to 5 with the full animation; an optional km
+    field; a "compare with" select drawing the second plan dashed):**
+    - W154: `polyProbDiscrete(n, M)` (BigInt, the count of part d generalised: bad sets
+      360·C(180, n − 1)) in the polygon summary and the draws comparison; the page's
+      follow-up hint said C(179, n − 1) and now says C(180, n − 1), as part d counts.
+      `triArcCdf` (the largest arc of three uniform points) and `triHistogram(rnd, draws,
+      bin)`; the triangle box: "1,000 הגרלות: הקשת הגדולה" (seeded by the seed field), a
+      stacked histogram in 10° bins from 120° to 360° with the expected count per bin as
+      a dashed mark, the first bin outlined ("fat"), the 170°–180° bin shaded (the
+      coverage follow-up), and a text line. `chartFrame` aliases the chart `frame` helper
+      for views whose own `frame` is a number. Tests: a brute force over all n-subsets of
+      small circles, 89/359, the histogram's consistency, the CDF at 180 and 240.
+    - W164: `hourglassSearch(sizes, D, { interval, objective })`: one Dijkstra on a binary
+      heap for two or three hourglasses, from time 0 or between events, objective
+      "events" (0018), "time" (0019) or "flips" (a wait is free, ties by time);
+      `hourglassReplayN`, `hourglassReachableN`. The boxes: "שעון C" (empty keeps two;
+      with C the state is (t, a, b, c) and eight choices per event), "המטרה" (the page's
+      objective or the fewest flips), frames with three glasses (`.sand-c` green), letters
+      for any flip set, the comparison line "התוכנית הזו … במטרה האחרת …" with the states
+      explored. The page's own solvers still run for two hourglasses and the page's
+      objective. Tests: independent Dijkstras for the fewest flips (zero and interval),
+      the page's solvers, 4-6-5 measuring 3.
+    - W169: `motorcycleRiders(strategy, alpha, k)` (knots per traveller for the three
+      strategies with k riders: the symmetric shuttle, waiting, walking meanwhile),
+      `motorcycleAt(plan, t)`, `motorcycleTimeK`. The box: "כמה צריכים הסעה" (1 to 5;
+      the road, the chart and the summary follow, with P / D marks per rider and the
+      formula ((2n − 1)α + 1)/(α + 2n − 1)·t1), "המרחק AB" in km (speeds, km ridden and
+      walked, the chart axis in km), "להשוואה עם" (the second plan dashed on the same
+      chart with its end line and the difference in the summary); series colours s4 and
+      s5 added (`--viz-s5`). Tests: the explorer's shuttle against the test's `shuttle`,
+      two riders against the page's motion, the waiting and walking plans against Python
+      ports.
+    - Checks in the sandbox: the five boxes light and dark at 1100 and 390 px (the
+      histogram, the polygon summary for n = 5 and 10, three hourglasses on both pages
+      with the flips objective, three and five riders with a dashed comparison and km);
+      lint, the Python tests, strict build, links, phone and axe light and dark. `main`
+      fast-forwarded at the end of the round.
 
 ---
 
@@ -1262,9 +1302,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   question now has an explorer. Round T is closed. An audit of all 34 explorer kinds
   against the pages' follow-up questions produced rounds V (infrastructure), W (follow-ups
   per page) and X (timing strips), recorded under "Round U" below. Round V is done
-  (session 20). Round W (trimmed by the owner; W172 dropped) runs in batches: batches 1
-  (W149, W170, W173) and 2 (W152, W162, W177) are done; next batch 3 (W154, W164, W169),
-  then rounds U and X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
+  (session 20). Round W (trimmed by the owner; W172 dropped) is done in three batches
+  (W149, W170, W173; W152, W162, W177; W154, W164, W169). Next: rounds U (U135, U139) and
+  X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1743,10 +1783,10 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 |---|---|---|---|
 | ~~W149~~ | 0002 trace (swap) | ~~A three-variable rotation; a reset~~ done (session 20, batch 1) | S |
 | ~~W152~~ | 0005 bfs01 | ~~A digit-set choice (3 and 7); a "length only" mode without parents, with the bit count for the hardware follow-up~~ done (session 20, batch 2) | S–M |
-| W154 | 0007 triangle / polygon | The exact discrete count over C(360, n) beside the continuous formula; a histogram of the largest arc ("fat triangles") | M |
+| ~~W154~~ | 0007 triangle / polygon | ~~The exact discrete count over C(360, n) beside the continuous formula; a histogram of the largest arc ("fat triangles")~~ done (session 20, batch 3) | M |
 | ~~W162~~ | 0016, 0022 josephus | ~~The "every third leaves" rule (41 people) on 0016; a reverse lookup "for which N does seat s survive"; N above 64~~ done (session 20, batch 2) | S–M |
-| W164 | 0018, 0019 hourglass | Minimise flips instead of events; a third hourglass | M |
-| W169 | 0026 motorcycle | Four people and n; a distance field (52 km); two strategies overlaid on one chart | M |
+| ~~W164~~ | 0018, 0019 hourglass | ~~Minimise flips instead of events; a third hourglass~~ done (session 20, batch 3) | M |
+| ~~W169~~ | 0026 motorcycle | ~~Four people and n; a distance field (52 km); two strategies overlaid on one chart~~ done (session 20, batch 3) | M |
 | ~~W170~~ | 0027, 0028 cake | ~~Wider ranges: d up to 0.8 and negative, a down to 0.0001, q up to 3 and below 1~~ done (session 20, batch 1) | S |
 | ~~W173~~ | 0031 bridge | ~~Bridge capacity 3; a comparison with the two classic strategies~~ done (session 20, batch 1) | S |
 | ~~W177~~ | 0035 div3 | ~~Divide by a general N (5); a selectable strip length~~ done (session 20, batch 2) | M |
@@ -1759,9 +1799,8 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 | X146 | 0023, 0024, 0025 | **Event axis for the three reference models**: every event a column on a strip with Seq / credits / cycle, which merges U136 into one uniform view | M |
 | X147 | 0033 | **A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart | S |
 
-Suggested order (session 20): round V is done. Round W runs in three batches (the owner
-answers multiple-choice questions per batch): batches 1 (W149, W170, W173) and 2 (W152,
-W162, W177) are done; batch 3 is W154, W164, W169. Then U135 and U139, then round X on top
+Suggested order (session 20): rounds V and W are done (W in three batches, the owner
+answering multiple-choice questions per batch). Next U135 and U139, then round X on top
 of V.
 
 
