@@ -2122,6 +2122,32 @@ Suggested order: A181 and C191 (small, visible on every page), D195 then D194 (t
 figures are the weakest point today), B185 (the largest gain in understanding), then A182
 and A183.
 
+### Round Z — new questions from outside sources (proposed 2026-10-22, owner picks)
+
+Half logic and math, half electrical engineering for beginners. Each idea is rewritten in
+our words with an original solution and generalisation; the `source` field names where the
+idea came from. Not to repeat: the open Q93, Q95, Q97 to Q99 (ant on a can, trains and
+fly, clock angles, Heron, rope around the Earth).
+
+| # | Question | Level | Source | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|---|
+| Z202 | **Two burning ropes, 45 minutes** | student / easy | Wu, Leino | which times n ropes can measure (sums of 60/2^k), a search over lighting states | ropes burning from one or both ends, a timeline | S–M |
+| Z203 | **Two eggs, 100 floors** | junior / medium | Leino, LeetCode 887 | k eggs and n floors: the DP and the binomial sum; 14 drops | sliders k and n, the drop tree and the table | M |
+| Z204 | **Twelve coins, one fake, three weighings** | senior / hard | Wu | (3^n − 3)/2 coins in n weighings, fake heavier or lighter | a balance: pick coins per pan, the tree of outcomes | M–L |
+| Z205 | **100 prisoners and a light bulb** | senior / hard | Wu | the counter protocol for n prisoners, the expected number of days | a simulation with a day counter and a histogram | M |
+| Z206 | **Pirates dividing gold** | junior / medium | Wu, Winkler | backward induction for n pirates; the twist past 200 | a stepper adding one pirate at a time | M |
+| Z207 | **Ants on a stick** | student / easy | Wu | n ants, any directions: collisions as passing through | an animation with the "swap labels" view | S–M |
+| Z208 | **HH or HT – expected flips** | junior / medium | Zhou | any pattern: the Markov chain and Conway's correlation formula | a pattern field, simulation and the chain | M |
+| Z209 | **Gambler's ruin** | junior / medium | Zhou | reach N before 0 with probability p, the closed form and the expected time | sliders p, N and the start, simulated paths | M |
+| Z210 | **Sequence detector 1011, overlapping** | student / easy | HDLBits, Harris & Harris | any pattern: the KMP automaton, Mealy against Moore | type a bit stream, the state graph lights up | M |
+| Z211 | **Setup and hold: the highest clock frequency** | junior / medium | Harris & Harris | clock skew both ways, hold violations, a path with several stages | sliders for t_cq, logic, t_su, skew, and a timing diagram | M |
+| Z212 | **Reset synchronizer: async assert, sync deassert** | junior / easy | Cummings | why two flops, what goes wrong without them | a waveform with the release edge near the clock | S–M |
+| Z213 | **A one-cycle pulse to a slower clock domain** | junior / medium | Cummings | the toggle synchronizer and the minimum spacing for any clock ratio | two clocks with a ratio slider, lost and kept pulses | M |
+| Z214 | **Glitch-free clock mux** | senior / medium | Cummings, ChipVerify | the two-flop handshake per clock, any two frequencies | a waveform where select switches at a random moment | M |
+| Z215 | **Round-robin arbiter** | junior / medium | ChipVerify, Verification Guide | N requesters, fairness as SVA, a weighted variant | request toggles, a grant pointer stepping round | M |
+| Z216 | **Priority encoder and leading zeros in log depth** | student / medium | HDLBits | a tree for N bits, depth log2 N against a chain | a bit field, the tree with the winning path marked | S–M |
+| Z217 | **How many random tests close coverage** | junior / medium | coupon collector, Zhou | n bins: n·H_n, the variance, unequal bin weights | a covergroup filling up, a histogram over runs | M |
+
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
 
