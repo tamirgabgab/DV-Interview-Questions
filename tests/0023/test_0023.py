@@ -357,3 +357,39 @@ def test_explorer_read_timeline():
                 assert start == (r["issued"] if k == 0 else outs[k - 1]), (r, k)
                 assert start < ready <= outs[k], (r, k)
     assert all(r["waits"][0][0] == r["issued"] and 1 <= len(r["waits"]) <= len(r["sizes"]) for r in got["mid"])
+
+
+def test_explorer_cycle_axis():
+    """The cycle axis of the box (X146): a slot per cycle up to now with the completion
+    that went out in it (none in the others), and for the last six reads a ready level
+    that is high from each wait window's ready cycle to the completion that closes it
+    (to now while it is open)."""
+    import json
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(2323)
+    reqs = [[0x20000 + rng.randrange(0, 3800), rng.randint(1, 256), i] for i in range(9)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const rng = m.epUnitRng({json.dumps([rng.random() for _ in range(3000)])});
+      const s = m.epInit();
+      for (const [a, l, t] of {json.dumps(reqs)}) {{ m.epRead(s, {{ address: a, length: l, rid: 0x200, tag: t }}, rng); m.epCycle(s, rng); }}
+      for (let i = 0; i < 6; i++) m.epCycle(s, rng);
+      console.log(JSON.stringify({{ s, strip: m.epStrip(s) }}));""")
+    s, st = got["s"], got["strip"]
+    assert st["n"] == s["cycle"] + 1
+    by = {c["cycle"]: c for c in s["out"]}
+    assert [c and (c["cycle"], c["tag"]) for c in st["cpl"]] == [(k, by[k]["tag"]) if k in by else None for k in range(st["n"])]
+    assert [r["id"] for r in st["reads"]] == [r["id"] for r in s["reads"][-6:]]
+    for r in st["reads"]:
+        rec = next(x for x in s["reads"] if x["id"] == r["id"])
+        outs = [c["cycle"] for c in s["out"] if c["read"] == r["id"]]
+        want = [0] * st["n"]
+        for k, (_, ready) in enumerate(rec["waits"]):
+            end = outs[k] if k < len(outs) else s["cycle"]
+            for c in range(ready, min(end, st["n"] - 1) + 1):
+                want[c] = 1
+        assert r["ready"] == want, r["id"]
+        assert all(r["ready"][c] for c in outs)       # a completion goes out only when ready

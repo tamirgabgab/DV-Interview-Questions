@@ -408,3 +408,14 @@ def test_explorer_random_traffic():
             credits = forward_distance(eg.pcc, eg.pcl)
             assert credits + len(link) <= free
             assert b == {"credits": credits, "inFlight": len(link), "free": free, "ungranted": forward_distance(eg.pcl, ing.pca), "leak": lost_since_sync}, (seed, ev)
+
+
+def test_explorer_event_labels():
+    """The event row of the box's event axis (X146) names the page's part b script."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      let s = m.crInit(5, 0);
+      console.log(JSON.stringify(m.CR_SCRIPTS.b.steps.map((ev) => {{ const r = m.crApply(s, ev); s = r.state; return m.crEventLabel(r.log); }})));""")
+    assert got == ["Grant", "pkt", "pkt×", "pkt", "deq", "deq", "Grant", "Sync", "Grant"]

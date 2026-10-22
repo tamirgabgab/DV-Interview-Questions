@@ -66,8 +66,8 @@ def test_wavedrom_export():
       const m = {explorer_require()};
       const rows = [{{ name: "clk", kind: "clock" }}, {{ name: "<code>sig</code> &amp; &#8207;x", kind: "bit", values: [0, 0, 1, 1, 1, 0, 0, 1] }},
         {{ name: "cnt", kind: "bus", values: [0, 1, 2, 2, 0, 1, null, null] }}, {{ name: "a_rule", kind: "flag", values: [0, 0, 0, 1, 0, 0, 0, 0] }}];
-      const full = m.waveDromOf(rows, 8, {{ ticks: (k) => k }}), half = m.waveDromOf(rows.slice(0, 1), 6, {{ half: true }});
-      console.log(JSON.stringify({{ full, half, text: m.waveDromText(full) }}));
+      const full = m.waveDromOf(rows, 8, {{ ticks: (k) => k }}), late = m.waveDromOf(rows.slice(0, 1), 1, {{ ticks: (k) => 40 + k }}), half = m.waveDromOf(rows.slice(0, 1), 6, {{ half: true }});
+      console.log(JSON.stringify({{ full, late, half, text: m.waveDromText(full) }}));
     """
     )
     assert got["full"] == {"signal": [
@@ -75,6 +75,7 @@ def test_wavedrom_export():
         {"name": "sig & x", "wave": "0.1..0.1"},
         {"name": "cnt", "wave": "===.==", "data": ["0", "1", "2", "0", "1"]},
         {"name": "a_rule", "wave": "0..10..."},
-    ], "head": {"tick": 0}}
+    ], "head": {"tick": "0"}}
     assert got["half"] == {"signal": [{"name": "clk", "wave": "hlhlhl"}]}
+    assert got["late"] == {"signal": [{"name": "clk", "wave": "p"}], "head": {"tick": "40"}}   # a window, one slot
     assert json.loads(got["text"]) == got["full"]

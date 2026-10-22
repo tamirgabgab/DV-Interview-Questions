@@ -30,9 +30,9 @@
 //   gray                   0034        a pointer step through a synchroniser, bit by bit, in binary and in Gray, for 3 to 6 bits; a FIFO of 8 to 64 entries with the pointers one bit wider, the flags and a strip of the operations
 //   stock                  0006        prices to drag or draw, the scan played day by day: the cheapest and dearest day so far, the best long and short; the copy link carries the prices and the day
 //   handshake              0038        req and ack drawn cell by cell; the four rules checked every cycle, a failure marked on its assertion's row
-//   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts; random traffic at a fault rate with the invariants checked
-//   credits                0024        the four counters as hands on a modulo-256 circle, the buffer, packets in flight; grant, transmit, lose, dequeue, sync; random legal traffic at a loss rate with the invariants checked
-//   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table; a timeline of every read's waits and completions
+//   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts; random traffic at a fault rate with the invariants checked; an event axis of the counters
+//   credits                0024        the four counters as hands on a modulo-256 circle, the buffer, packets in flight; grant, transmit, lose, dequeue, sync; random legal traffic at a loss rate with the invariants checked; an event axis of the counters
+//   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table; a timeline of every read's waits and completions; a cycle axis of the completions and the ready reads
 //   trace                  0002, 0003  the page's Python one line (or one comparison) at a time: the swaps (and the three-variable XOR rotation) with a0 / b0 / c0 expressions, the double loop with its invariant
 // The math of each model is exported under Node, where the question tests compare it with
 // the Python reference (tests/0001 to 0022, 0026 to 0038).
@@ -1715,6 +1715,15 @@
     return { start, thresholds, steps, random: { count, rate, faults, violation } };
   };
 
+  // The event axis of the box (X146): a short label per event, from its log.
+  const anEventLabel = (log) => {
+    if (!log) return "start";
+    const mark = log.how === "bad" ? "!" : log.how === "lose" ? "×" : "";
+    if (log.type === "send") return `TX${log.items.length > 1 ? log.items.length : ""}`;
+    if (log.type === "tlp") return `TLP${mark}`;
+    if (log.type === "dllp") { const it = log.items.find((x) => x.kind); const k = log.kind || (it && it.kind); return `${k === "NAK" ? "Nak" : k === "ACK" ? "Ack" : "DLLP"}${mark}`; }
+    return log.type === "flush" ? "flush" : log.type === "timeout" ? "replay" : log.type;
+  };
   // USB4 path credits (0024): the page's EgressSyncModel and IngressSyncModel as one
   // state with the packets in flight between them. Errors the page raises (a transmission
   // without a credit, a buffer overflow, a dequeue from an empty buffer) are counted and
@@ -1806,6 +1815,11 @@
     return { size, steps, random: { count, rate, faults, violation } };
   };
 
+  const crEventLabel = (log) => {
+    if (!log) return "start";
+    const mark = log.how === "lose" ? "×" : "";
+    return { grant: "Grant", transmit: "TX", receive: `RX${mark}`, packet: `pkt${mark}`, dequeue: "deq", sync: "Sync" }[log.type] || log.type;
+  };
   // PCIe endpoint (0023): the page's UnalignedEndpointModel. `rng` is {randint(a, b),
   // choice(n)}: the draws in the page's order (the cut coins of a read, then its delay;
   // the pick among the ready reads, then the gap), so they can be scripted (the page's
@@ -1886,6 +1900,20 @@
   const EP_SCRIPTS = {
     a: { reads: [[0x10000, 256, 0x0200, 0x15], [0x10100, 256, 0x0200, 0x16]], draws: [1, 5, 1, 3, 0, 3, 0, 1, 1, 0] },
     b: { reads: [[0x10000, 256, 0x0200, 0x15], [0x10020, 256, 0x0300, 0x22]], draws: [1, 4, 1, 1, 2, 0, 3, 0, 2, 0, 1, 0, 0] },
+  };
+  // The cycle axis of the endpoint box (X146): per cycle 0 .. now, the completion that
+  // went out (or none), and for each of the last `keep` reads whether it was ready and
+  // waiting its turn: from a wait window's ready cycle to the completion that ends it.
+  const epStrip = (s, keep = 6) => {
+    const n = s.cycle + 1, byCycle = new Map(s.out.map((c) => [c.cycle, c]));
+    const cpl = Array.from({ length: n }, (_, c) => byCycle.get(c) || null);
+    const reads = s.reads.slice(-keep).map((r) => {
+      const outs = s.out.filter((c) => c.read === r.id).map((c) => c.cycle);
+      const ready = Array.from({ length: n }, () => 0);
+      r.waits.forEach(([, rdy], k) => { const end = k < outs.length ? outs[k] : s.cycle; for (let c = rdy; c <= end && c < n; c++) ready[c] = 1; });
+      return { id: r.id, tag: r.tag, ready };
+    });
+    return { n, cpl, reads };
   };
   const epRunScript = (script) => {
     const s = epInit(), rng = epValueRng([...script.draws], epUnitRng([]));
@@ -1998,7 +2026,7 @@
         let wave = "";
         const data = [];
         for (let k = 0; k < len; k++) {
-          if (k && row.values[k] === row.values[k - 1]) wave += ".";
+          if (k && !row.split && row.values[k] === row.values[k - 1]) wave += ".";
           else { wave += "="; data.push(plainText(row.values[k])); }
         }
         lane.wave = wave; lane.data = data;
@@ -2010,7 +2038,9 @@
       return lane;
     });
     const out = { signal };
-    if (opts.ticks && !opts.half) out.head = { tick: 0 };
+    // the first tick as a string: WaveDrom 3.5 throws on a numeric tick when the strip has
+    // a single slot; a windowed strip starts at its first column's own number
+    if (opts.ticks && !opts.half) { const t0 = Number(opts.ticks(0)); out.head = { tick: String(Number.isFinite(t0) ? t0 : 0) }; }
     return out;
   };
   // WaveDrom text as the pages write it: one lane per line.
@@ -2042,7 +2072,7 @@
     EDGE_MODES, edgeTrace, lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, lfsrPrimitiveCount, div3Params, div3Trace, div3Duty,
     grayOf, grayToBin, bitsOf, graySample, grayFlags, grayFlagsOps, lfsrStrip,
     stockScan, stockRandom, hsCheck, HS_PRESETS, hsWave,
-    AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, anInvariants, anRandomScript, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun, crBalance, crInvariants, crRandomScript,
+    AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, anInvariants, anRandomScript, anEventLabel, crEventLabel, epStrip, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun, crBalance, crInvariants, crRandomScript,
     EP_RCB, epUnitRng, epValueRng, epInit, epWrite, epReadBytes, epFragments, epRead, epNext, epCycle, EP_SCRIPTS, epRunScript,
     CAKE_MAX, cakeDone, SWAP_CODE, swapTrace, ROT_CODE, rotTrace, LOOP_CODE, loopTrace,
   };
@@ -2167,6 +2197,19 @@
     `<label>${label} <input type="range" class="ex-rate" min="0" max="50" step="5" value="20" dir="ltr" aria-label="${label} באחוזים"><output class="out-rate">20%</output></label>` +
     `<button type="button" class="md-button md-button--primary ex-run">הרצה אקראית</button></div>`;
   const RAND_HASH = /^r(20|50|200)\.(\d+)\.(\d+)$/;
+  // The event axis of 0025 / 0024: the states before every event in the history and the
+  // current one, a column each (the last 64, ticks with the absolute event number).
+  const EVENT_KEEP = 64;
+  const eventStrip = (st, rowsOf, label, invariants) => {
+    const states = st.history.map((h) => h.state).concat([st.state]);
+    const logs = [st.history.length ? st.history[0].log : null].concat(st.history.slice(1).map((h) => h.log), st.history.length ? [st.log] : []);
+    const base = st.dropped || 0, from = Math.max(0, states.length - EVENT_KEEP);
+    const S = states.slice(from), Lg = logs.slice(from), n = S.length;
+    const first = base + from;
+    const rows = [{ name: "event", kind: "bus", split: true, values: Lg.map((l, i) => (first + i === 0 ? "start" : label(l))) }]
+      .concat(rowsOf(S), [{ name: "✗", kind: "flag", values: S.map((s) => (invariants(s).length ? 1 : 0)) }]);
+    return waveStrip(rows, n, { slotW: 52, labelW: 92, cursor: n - 1, ticks: (k) => first + k, label: `ציר האירועים: ${n} עמודות` });
+  };
   const randNote = (rd, seed, faults, names, checks) => {
     const v = rd.violation;
     return `תנועה אקראית מהזרע ${ltr(seed)}: ${ltr(rd.count)} אירועים בשיעור ${ltr(`${Math.round(rd.rate * 100)}%`)}, ${faults}. ${checks} ` +
@@ -5235,7 +5278,8 @@
   // names in a left column. Row kinds: "clock" (the square wave), "bit" (a level line,
   // shaded where high), "bus" (labelled boxes merged over equal values). A row's values
   // may stop early (frames not reached yet). `cells` on a row makes every slot a button
-  // (data-k); `marks` on a row shades slots; `cursor` outlines one slot.
+  // (data-k); `marks` on a row shades slots; `cursor` outlines one slot; `split` on a bus
+  // row keeps equal neighbours apart (one box per slot, for a row of events).
   // The row names of a strip again as an HTML column that sticks to the left edge of the
   // scroll container, so a long strip scrolled to its end still says which row is which
   // (the names inside the svg stay for the enlarged copy).
@@ -5274,7 +5318,7 @@
         let k = 0;
         while (k < len) {
           let j = k;
-          while (j + 1 < len && row.values[j + 1] === row.values[k]) j++;
+          while (!row.split && j + 1 < len && row.values[j + 1] === row.values[k]) j++;
           const xk = x(k), w = (j - k + 1) * SW;
           s += `<path class="wv-bus${cls}" d="M${xk + 2},${ym} L${xk + 6},${yh} H${xk + w - 6} L${xk + w - 2},${ym} L${xk + w - 6},${yl} H${xk + 6} Z"/>` +
                `<text class="wv-val" x="${xk + w / 2}" y="${ym + 4}" text-anchor="middle">${row.values[k]}</text>`;
@@ -5998,14 +6042,14 @@
       const reset = (start, script) => {
         st.start = start; st.script = script || null; st.pos = 0; st.th = script ? [...script.thresholds] : [];
         rewind(0);
-        st.state = anInit(start, draw4); st.history = []; st.log = null; render();
+        st.state = anInit(start, draw4); st.history = []; st.dropped = 0; st.log = null; render();
       };
       // a step: the state before it (and the script position) go to the history, so
       // "previous" restores both; a free event leaves the script
       const apply = (ev, scripted) => {
         if (!scripted && st.script) { st.script = null; st.th = []; }
         st.history.push({ state: st.state, log: st.log, pos: st.pos, th: [...st.th], draws: st.draws });
-        if (st.history.length > 300) st.history.shift();
+        if (st.history.length > 300) { st.history.shift(); st.dropped = (st.dropped || 0) + 1; }
         if (scripted) st.pos += 1;
         const r = anApply(st.state, ev, draw4);
         st.state = r.state; st.log = r.log; render();
@@ -6026,6 +6070,7 @@
         `<button type="button" class="md-button ex-timeout">ה-REPLAY_TIMER פג</button></div>` +
         randomRow("שיעור התקלות", "תנועה אקראית (כמו ה-test של העמוד):") +
         `<div class="an-box"><div class="an-side an-rc"></div><div class="an-link"></div><div class="an-side an-ep"></div></div>` +
+        `<p class="ex-title">ציר האירועים: עמודה לכל אירוע, המונים אחריו, ו-✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
         `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const chips = (items, cls) => (items.length ? items.map((t) => `<span class="an-chip${t.cls ? " " + t.cls : ""}">${t.text}</span>`).join("") : `<span class="an-empty">ריק</span>`);
@@ -6055,6 +6100,15 @@
         $(".ex-prev").disabled = !st.history.length;
         $(".ex-pos").textContent = scripted ? `צעד ${st.pos} מתוך ${st.script.steps.length}` : "";
         $(".an-log").innerHTML = st.log ? logText(st.log) : `מצב התחלתי: ${ltr(`ACKD_SEQ = ${s.ackd}`)} הוא "לפני ${ltr(s.nts)}", ה-Retry Buffer ריק, וה-EP מצפה ל-${ltr(s.nrs)} עם סף Ack ${ltr(s.threshold)} שהגריל.`;
+        const strip = $(".an-strip");
+        strip.innerHTML = eventStrip(st, (S) => [
+          { name: "NTS", kind: "bus", values: S.map((x) => x.nts) },
+          { name: "ACKD_SEQ", kind: "bus", values: S.map((x) => x.ackd) },
+          { name: "NRS", kind: "bus", values: S.map((x) => x.nrs) },
+          { name: "retry", kind: "bus", values: S.map((x) => x.retry.length) },
+          { name: "NAK_SCHED", kind: "bit", values: S.map((x) => (x.nak ? 1 : 0)), cls: "wv-s2" },
+        ], anEventLabel, anInvariants);
+        strip.scrollLeft = strip.scrollWidth;
         const bad = anInvariants(s);
         $(".an-sum").innerHTML = (!bad.includes("retry") ? `<span class="wv-ok">✓ ה-Retry Buffer מכיל בדיוק את ${ltr("ACKD_SEQ + 1")} עד ${ltr("NEXT_TRANSMIT_SEQ − 1")}.</span>` : `<span class="wv-bad">✗ ה-Retry Buffer אינו הרצף מ-ACKD_SEQ + 1.</span>`) +
           ` ` + (!bad.includes("order") ? `<span class="wv-ok">✓ ה-TLPs נמסרו בסדר, בלי חור ובלי כפילות.</span>` : `<span class="wv-bad">✗ המסירה אינה בסדר.</span>`);
@@ -6135,10 +6189,10 @@
   const creditsView = () => ({
     mount(box) {
       const st = { size: 5, base: 0, script: null, pos: 0, state: null, log: null, history: [], seed: newSeed() };
-      const reset = (script) => { st.script = script || null; st.pos = 0; st.state = crInit(st.size, st.base); st.history = []; st.log = null; render(); };
+      const reset = (script) => { st.script = script || null; st.pos = 0; st.state = crInit(st.size, st.base); st.history = []; st.dropped = 0; st.log = null; render(); };
       const apply = (ev, scripted) => {
         if (!scripted && st.script) st.script = null;
-        st.history.push({ state: st.state, log: st.log, pos: st.pos }); if (st.history.length > 300) st.history.shift();
+        st.history.push({ state: st.state, log: st.log, pos: st.pos }); if (st.history.length > 300) { st.history.shift(); st.dropped = (st.dropped || 0) + 1; }
         if (scripted) st.pos += 1;
         const r = crApply(st.state, ev); st.state = r.state; st.log = r.log; render();
       };
@@ -6162,6 +6216,7 @@
         `<button type="button" class="md-button cr-act" data-ev="sync">Path Credit Sync</button></div>` +
         randomRow("שיעור האובדן", "תנועה אקראית (כמו ה-test של העמוד, אירועים חוקיים בלבד):") +
         `<div class="cr-box"><div class="cr-circle"></div><div class="cr-panel"><div class="cr-table"></div><p class="cr-buf"></p><p class="cr-link"></p></div></div>` +
+        `<p class="ex-title">ציר האירועים: עמודה לכל אירוע, המונים אחריו, ו-✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
         `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const circle = (s) => {
@@ -6206,6 +6261,16 @@
         $(".an-log").innerHTML = st.log ? st.log.items.map(logText).join(" ") : `הקמת הנתיב: ${ltr(`PCA = ${s.pca}`)} הוא גודל ה-buffer${s.pca !== s.size ? " מעל נקודת ההתחלה" : ""}, ושאר המונים ב-${ltr(s.pcc)}. ‏PCL עדיין ${ltr(s.pcl)}, ולכן אין קרדיטים עד ה-Credit Grant הראשון.`;
         // the balance against the buffer: credits + in flight never exceed the free slots;
         // the gap is slots not yet granted plus packets lost and not yet synced
+        const strip = $(".an-strip");
+        strip.innerHTML = eventStrip(st, (S) => [
+          { name: "PCC", kind: "bus", values: S.map((x) => x.pcc) },
+          { name: "PCL", kind: "bus", values: S.map((x) => x.pcl) },
+          { name: "PCR", kind: "bus", values: S.map((x) => x.pcr) },
+          { name: "PCA", kind: "bus", values: S.map((x) => x.pca) },
+          { name: "credits", kind: "bus", values: S.map((x) => crDist(x.pcc, x.pcl)) },
+          { name: "occupancy", kind: "bus", values: S.map((x) => x.occ) },
+        ], crEventLabel, crInvariants);
+        strip.scrollLeft = strip.scrollWidth;
         const b = crBalance(s), bad = crInvariants(s);
         const gap = [];
         if (b.ungranted) gap.push(`${ltr(b.ungranted)} תאים שהתפנו ומחכים ל-Grant`);
@@ -6301,6 +6366,7 @@
         `<button type="button" class="md-button ex-run">הרץ עד שכל ה-Completions יצאו</button><span class="ex-pos"></span></div>` +
         `<p class="ex-title">הזיכרון, בלוק אחרי בלוק (128 בתים): הכתיבות צבועות, הקריאות הפתוחות מסומנות בקו</p><div class="ep-mem"></div>` +
         `<p class="ex-title">קריאות פתוחות</p><div class="ep-pending"></div><div class="ep-gantt"></div>` +
+        `<p class="ex-title">ציר המחזורים: ה-Completion שיצא בכל מחזור, ומתי כל קריאה מוכנה</p><div class="wv-wrap ep-strip" tabindex="0" role="group" aria-label="ציר המחזורים, גלילה אופקית"></div>` +
         `<p class="wv-step an-log" aria-live="polite"></p>` +
         `<p class="ex-title">ה-Completions שיצאו</p><div class="ep-table" tabindex="0"></div><p class="ex-summary an-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
@@ -6361,6 +6427,17 @@
           g += `<line class="ep-now" x1="${f(X(s.cycle))}" x2="${f(X(s.cycle))}" y1="0" y2="${H - 16}"/>`;
           $(".ep-gantt").innerHTML = g + `</svg><p class="viz-legend ep-legend"><span><i class="ep-lg-wait"></i>ממתינה לזמן האקראי</span><span><i class="ep-lg-ready"></i>מוכנה, מחכה לתורה</span><span><i class="ep-lg-cpl"></i>‏Completion יצא</span><span><i class="ep-lg-now"></i>המחזור הנוכחי</span></p>`;
         }
+        // the cycle axis: the last 64 cycles
+        const es = epStrip(s), from = Math.max(0, es.n - 64), n = es.n - from;
+        const cut = (a) => a.slice(from);
+        const stripEl = $(".ep-strip");
+        stripEl.innerHTML = waveStrip([
+          { name: "Tag", kind: "bus", split: true, values: cut(es.cpl).map((c) => (c ? hex(c.tag, 2) : "—")) },
+          { name: "size", kind: "bus", split: true, values: cut(es.cpl).map((c) => (c ? c.size : "—")) },
+          { name: "BC", kind: "bus", split: true, values: cut(es.cpl).map((c) => (c ? c.bc : "—")) },
+        ].concat(es.reads.map((r) => ({ name: `ready ${hex(r.tag, 2)}`, kind: "bit", values: cut(r.ready), cls: ["wv-s1", "wv-s2", "wv-s3"][r.id % 3] }))),
+        n, { slotW: 46, labelW: 92, cursor: n - 1, ticks: (k) => from + k, label: `ציר המחזורים: ${n} מחזורים` });
+        stripEl.scrollLeft = stripEl.scrollWidth;
         $(".an-log").innerHTML = (st.err ? `<span class="wv-bad">${st.err}</span> ` : "") + st.log;
         $(".ep-table").innerHTML = s.out.length ? `<table><thead><tr><th>מחזור</th><th>Requester ID</th><th>Tag</th><th>כתובת</th><th>גודל</th><th>Byte Count</th><th>הבית הראשון והאחרון</th></tr></thead><tbody>` +
           s.out.map((c) => `<tr class="${colour(c.read)}"><td>${ltr(c.cycle)}</td><td>${ltr(hex(c.rid, 4))}</td><td>${ltr(hex(c.tag, 2))}</td><td>${ltr(hex(c.address))}</td><td>${ltr(c.size)}</td><td>${ltr(c.bc)}</td><td>${ltr(`${hex(c.first, 2)} … ${hex(c.last, 2)}`)}</td></tr>`).join("") + `</tbody></table>` : `<p class="an-empty">עדיין לא יצא Completion.</p>`;
@@ -6676,9 +6753,9 @@
     gray: "בסנכרן בוחרים מצביע ורוחב, וכל ביט שמשתנה נדגם ישן או חדש (בלחיצה או ב״הגרלה״). ב-FIFO ״כתיבה״ ו״קריאה״ מזיזים את המצביעים, empty ו-full מחושבים לפי הכללים, ורצועת התזמון מוסיפה עמודה לכל פעולה.",
     stock: "גוררים מחירים או מגרילים: ״היום הבא״ ו״הפעלה״ מריצים את הסריקה יום אחרי יום עם המינימום והמקסימום עד כה והעסקה הטובה ביותר. הבורר עובר ללונג בלבד.",
     handshake: "לוחצים על משבצות של req ו-ack ברצועה: ארבעת הכללים נבדקים בכל מחזור, וכישלון מסומן בשורת ה-assertion שלו. ה-presets טוענים את ארבע הדוגמאות של העמוד. ״העתקת WaveDrom״ מעתיקה את הרצועה כ-JSON.",
-    acknak: "ה-RC וה-EP עם שני תורי הקישור: ״הצעד הבא״ ו״הפעלה״ מריצים את תסריטי העמוד, האירועים החופשיים שולחים, מוסרים (גם עם CRC שגוי או אובדן) ומפעילים טיימרים, ו״הרצה אקראית״ מגרילה תנועה עם תקלות ובודקת את האינווריאנטים.",
-    credits: "ארבעת המונים כמחוגים על מעגל: תסריטי העמוד ב״הצעד הבא״, אירועים חופשיים (Grant, שידור, קבלה או אובדן, הוצאה, Sync) ו״הרצה אקראית״ עם שיעור אובדן. שורת הסיכום מאזנת קרדיטים מול תאים פנויים.",
-    endpoint: "בונים בקשות כתיבה וקריאה: ״מחזור״ ו״הרץ״ מוציאים Completions לפי המודל, ומפת הבלוקים, ציר המחזורים וטבלת ה-Completions מתעדכנים. ה-presets טוענים את דוגמאות העמוד.",
+    acknak: "ה-RC וה-EP עם שני תורי הקישור: ״הצעד הבא״ ו״הפעלה״ מריצים את תסריטי העמוד, האירועים החופשיים שולחים, מוסרים (גם עם CRC שגוי או אובדן) ומפעילים טיימרים, ו״הרצה אקראית״ מגרילה תנועה עם תקלות ובודקת את האינווריאנטים. ציר האירועים מוסיף עמודה לכל אירוע.",
+    credits: "ארבעת המונים כמחוגים על מעגל: תסריטי העמוד ב״הצעד הבא״, אירועים חופשיים (Grant, שידור, קבלה או אובדן, הוצאה, Sync) ו״הרצה אקראית״ עם שיעור אובדן. שורת הסיכום מאזנת קרדיטים מול תאים פנויים, וציר האירועים מוסיף עמודה לכל אירוע.",
+    endpoint: "בונים בקשות כתיבה וקריאה: ״מחזור״ ו״הרץ״ מוציאים Completions לפי המודל, ומפת הבלוקים, ציר ההמתנות, ציר המחזורים וטבלת ה-Completions מתעדכנים. ה-presets טוענים את דוגמאות העמוד.",
     trace: "הקוד של העמוד שורה אחרי שורה: ״הבא״ ו״הפעלה״ מריצים אותו עם הערכים והביטויים, הבורר מחליף בין הגרסאות, והשדות קובעים את הקלט.",
   };
   const header = (box, helpOpen) => {

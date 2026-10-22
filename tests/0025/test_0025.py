@@ -428,3 +428,20 @@ def test_explorer_random_traffic():
                 rc.on_replay_timeout()
         delivered = [t.payload for t in ep.received_tlps]
         assert delivered == list(range(0xA0, 0xA0 + len(delivered))) and len(delivered) > 10, seed
+
+
+def test_explorer_event_labels():
+    """The event row of the box's event axis (X146) names every event of the page's
+    part b script: the sends, deliveries (! for a bad CRC, × for a loss), the Ack and
+    Nak DLLPs by kind, and the replay timer."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const sc = m.AN_SCRIPTS.b, th = [...sc.thresholds], draw = () => (th.length ? th.shift() : 1);
+      let s = m.anInit(sc.start, draw);
+      const labels = sc.steps.map((ev) => {{ const r = m.anApply(s, ev, draw); s = r.state; return m.anEventLabel(r.log); }});
+      const extra = [m.anApply(m.anInit(0, () => 1), {{ type: "dllp", how: "lose" }}, () => 1).log, null].map(m.anEventLabel);
+      console.log(JSON.stringify({{ labels, extra }}));""")
+    assert got["labels"] == ["TX4", "TLP", "TLP!", "TLP", "TLP", "Nak", "TLP", "TLP", "Ack!", "replay", "TLP", "Ack", "Ack", "Ack"]
+    assert got["extra"] == ["DLLP×", "start"]
