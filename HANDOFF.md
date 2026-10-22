@@ -1427,6 +1427,32 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       the 8-bit LFSR at step 40, the FIFO after a full burst, a read burst and an undo,
       the sticky names on 0001, 0034 and 0038; lint, the Python tests (279), strict
       build, links, phone and axe light and dark.
+20. **Round X, batch 3 (X146; the owner's answers: on 0023 the Gantt of U136 stays and a
+    strip goes under it; a column per event in 0025 / 0024, script steps, free events
+    and random runs alike; an event row, the counters and a ✗ row; the strip under the
+    two sides, before the log):**
+    - `anEventLabel`, `crEventLabel` (TX / TLP / Ack / Nak / replay / flush, Grant / TX /
+      RX / pkt / deq / Sync, "!" for a bad CRC and "×" for a loss) and `epStrip(s)`
+      (pure, exported). `eventStrip(st, rowsOf, label, invariants)` builds the strip of
+      the two protocol boxes from their history (the states before every event and the
+      current one, the last 64 columns, ticks with the absolute event number, kept
+      across the 300-entry history cap by `st.dropped`): 0025 shows NTS, ACKD_SEQ, NRS,
+      the retry count and NAK_SCHEDULED, 0024 the four counters, the credits and the
+      occupancy; "הצעד הקודם" removes a column. The endpoint strip has a slot per cycle
+      (the last 64): the Tag, size and Byte Count of the completion that went out and a
+      ready row for each of the last six reads.
+    - `waveStrip` bus rows take `split` (no merging of equal neighbours), used by the
+      event row and the completion rows, where equal values are different events.
+    - A WaveDrom 3.5 bug found by rendering every export: a numeric `head.tick` throws
+      when the strip has one slot (the endpoint box before its first cycle). The export
+      now writes the tick as a string, and a windowed strip starts it at its first
+      column's own number.
+    - Tests: the event labels of both page part b scripts; the cycle axis against the
+      completions and the wait windows on random reads; the export of a one-slot window.
+      Checks in the sandbox: the three strips after the page examples (the 0024 one
+      with a mid-flight Sync flagged), every export of the nine strip pages rendered
+      with the wavedrom package; lint, the Python tests (282), strict build, links,
+      phone and axe light and dark. `main` fast-forwarded at the end of the round.
 
 ---
 
@@ -1440,7 +1466,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   (session 20). Round W (trimmed by the owner; W172 dropped) is done in three batches
   (W149, W170, W173; W152, W162, W177; W154, W164, W169). Round U (U134 to U139, the
   owner's pick) is done in three batches (U134, U135; U136, U137; U138, U139). Round X
-  with U133 is in progress: batches 1 (U133, X147) and 2 (X145) done; next X146; then the
+  with U133 is done in three batches (U133, X147; X145; X146). Next: the
   open rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
@@ -1933,12 +1959,12 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 | Id | Page | Idea | Size |
 |---|---|---|---|
 | ~~X145~~ | 0036, 0034 | ~~**Timing strip in the LFSR and FIFO-flags boxes**: states, output bits and pointers as waves over time with the `waveStrip` of 0001 / 0035, instead of lists~~ done (session 20, round X batch 2; the FIFO strip a column per accepted operation) | S–M |
-| X146 | 0023, 0024, 0025 | **Event axis for the three reference models**: every event a column on a strip with Seq / credits / cycle, which merges U136 into one uniform view | M |
+| ~~X146~~ | 0023, 0024, 0025 | ~~**Event axis for the three reference models**: every event a column on a strip with Seq / credits / cycle, which merges U136 into one uniform view~~ done (session 20, round X batch 3; on 0023 beside the Gantt, not merged into it) | M |
 | ~~X147~~ | 0033 | ~~**A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart~~ done (session 20, round X batch 1; a real time axis over a sliding window) | S |
 
 Suggested order (session 20): rounds V and W are done (W in three batches, the owner
 answering multiple-choice questions per batch). Round U134 to U139 is being done the same
-way (U134 to U139 done in three batches); round X with U133 in three batches (U133 + X147 and X145 done, then X146).
+way (U134 to U139 done in three batches); round X with U133 done in three batches.
 
 
 The older idea list below is kept for reference; items covered by the rounds above are
