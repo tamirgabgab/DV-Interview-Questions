@@ -1227,6 +1227,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .sand-b { fill: var(--viz-s2); }
 .md-typeset svg .stream-a { stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: 2 2; }
 .md-typeset svg .stream-b { stroke: var(--viz-s2); stroke-width: 2; stroke-dasharray: 2 2; }
+.md-typeset svg .sand-c { fill: var(--viz-s3); }
+.md-typeset svg .stream-c { stroke: var(--viz-s3); stroke-width: 2; stroke-dasharray: 2 2; }
 .md-typeset svg .glass { fill: none; stroke: var(--viz-ink); stroke-width: 1.5; stroke-linejoin: round; }
 .md-typeset svg .frame { stroke: var(--viz-ink); stroke-width: 3; stroke-linecap: round; }
 .md-typeset svg .ink-fill { fill: var(--viz-ink); }

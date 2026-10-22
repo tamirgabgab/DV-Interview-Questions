@@ -113,3 +113,82 @@ def test_figures_up_to_date():
     pattern = r'<div class="stepper".*?</div></div>'
     generated = re.findall(pattern, out)
     assert generated and re.findall(pattern, text) == generated
+
+
+def test_explorer_general_search_interval():
+    """The follow-ups in the box: the general search with the time objective ends when the
+    page's Dijkstra ends (or finds nothing exactly when the page does), the flips objective
+    measures D with the fewest flips (an independent Dijkstra over (tops, measured)), and
+    a third hourglass measures the page's impossible D = 3 with 4, 6 and 5."""
+    import heapq
+
+    from page_tests import explorer_require, node_json
+
+    def step_n(sizes, tops, mask):
+        nxt = [sizes[i] - v if (mask >> i) & 1 else v for i, v in enumerate(tops)]
+        running = [v for v in nxt if v > 0]
+        if not running:
+            return None
+        return min(running), tuple(max(v - min(running), 0) for v in nxt)
+
+    def min_flips_interval(sizes, D):
+        start = (tuple(0 for _ in sizes), -1)
+        best = {start: 0}
+        heap = [(0, 0, start)]
+        tie = 1
+        while heap:
+            c, _, (tops, m) = heapq.heappop(heap)
+            if c > best[(tops, m)]:
+                continue
+            if m == D:
+                return c
+            options = []
+            if m == -1:
+                options.append((0, (tops, 0)))
+            for mask in range(1 << len(sizes)):
+                r = step_n(sizes, tops, mask)
+                if r is None:
+                    continue
+                m2 = -1 if m == -1 else m + r[0]
+                if m2 > D:
+                    continue
+                options.append((bin(mask).count("1"), (r[1], m2)))
+            for dc, k in options:
+                if c + dc < best.get(k, 10 ** 9):
+                    best[k] = c + dc
+                    heapq.heappush(heap, (c + dc, tie, k))
+                    tie += 1
+        return None
+
+    def replay_interval(sizes, res, D):
+        t, tops = 0, tuple(0 for _ in sizes)
+        acts = {w: act for w, act in res["plan"]}
+        flips = 0
+        while t in acts:
+            mask = sum(1 << i for i in range(len(sizes)) if "ABC"[i] in acts[t])
+            flips += bin(mask).count("1")
+            r = step_n(sizes, tops, mask)
+            assert r is not None
+            t, tops = t + r[0], r[1]
+        assert t == res["end"] == res["start"] + D, (sizes, res, D)
+        return flips
+
+    two = [(A, B, D) for A in range(2, 8) for B in range(A + 1, 12) for D in range(1, 13)]
+    three = [(4, 6, 5, 3), (7, 11, 5, 4), (3, 5, 7, 2), (4, 6, 8, 3)]
+    got = node_json(f"const m = {explorer_require()}; const two = {[list(c) for c in two]}, three = {[list(c) for c in three]};"
+                    "console.log(JSON.stringify({ two: two.map(([A, B, D]) => [m.hourglassInterval(A, B, D), m.hourglassSearch([A, B], D, { interval: true, objective: 'time' }), m.hourglassSearch([A, B], D, { interval: true, objective: 'flips' })]),"
+                    " three: three.map(([A, B, C, D]) => [m.hourglassSearch([A, B, C], D, { interval: true, objective: 'time' }), m.hourglassSearch([A, B, C], D, { interval: true, objective: 'flips' })]) }));")
+    for (A, B, D), (page, tm, fl) in zip(two, got["two"]):
+        if page is None:
+            assert tm is None and fl is None, (A, B, D)
+            continue
+        assert tm["end"] == page["start"] + D and replay_interval([A, B], tm, D) == tm["flips"]
+        assert fl["flips"] == replay_interval([A, B], fl, D) == min_flips_interval([A, B], D) <= tm["flips"], (A, B, D)
+    for (A, B, C, D), (tm, fl) in zip(three, got["three"]):
+        want = min_flips_interval([A, B, C], D)
+        if want is None:
+            assert tm is None and fl is None, (A, B, C, D)
+            continue
+        assert replay_interval([A, B, C], tm, D) == tm["flips"] and tm["end"] <= fl["end"]
+        assert fl["flips"] == replay_interval([A, B, C], fl, D) == want <= tm["flips"], (A, B, C, D)
+    assert got["three"][0][0] is not None and got["three"][3][0] is None
