@@ -1292,6 +1292,43 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       with the flips objective, three and five riders with a dashed comparison and km);
       lint, the Python tests, strict build, links, phone and axe light and dark. `main`
       fast-forwarded at the end of the round.
+15. **Round U, batch 1 (U134, U135; the owner's answers: the typed input plus the current
+    step in the link, through the existing "העתקת קישור" button; an event count select
+    and a fault rate slider for the random run; the run stops on the violating event):**
+    - U134: `STATE_CODECS` (stock, floyd, boxes: `enc(state)` to a payload of dotted
+      numbers and dashes, `dec(payload, nmax)` back or null, the step clamped) and a
+      `state: { get, set }` option of `seedControls`: when get() returns a payload the
+      copy button writes `#state-<kind>.<payload>` instead of the seed link, and set()
+      reopens the first box of that kind on load. Stock carries prices, day and the
+      long / both select; floyd the array and the step; boxes the arrangement, the
+      person, the helper toggle and the opening. Tests: round trips, clamping and
+      rejections per codec.
+    - U135: `anInvariants(s)` and `anRandomScript(start, count, rate, rnd)` (a script
+      with its thresholds drawn first so it replays exactly; sends of 1 or 2 while fewer
+      than 12 wait for an Ack, deliveries, the Ack timer, the replay timer on a drained
+      link; a delivery lost or corrupted with probability rate; the invariants checked
+      after every event, a violation truncates the script), `crBalance(s)`,
+      `crInvariants(s)` and `crRandomScript(size, base, count, rate, rnd)` (legal events
+      only; a Sync only on an empty link, as the in-order link of the page's test
+      implies). The boxes: a "תנועה אקראית" row (20 / 50 / 200 events, a 0 to 50% rate
+      slider, "הרצה אקראית" drawing a new seed), the script played with the existing
+      controls plus "לסוף התסריט", a note line with the counts and the verdict, and the
+      state link `#state-<kind>.r<count>.<rate>.<seed>` replaying the run. The credits
+      box got the seed field. Tests: legal scripts, exact replay, fault counts, the
+      page's classes fed the same scripts (delivery once in order; no error raised),
+      the invariant checks on corrupted states, the leak against a Python count.
+    - Two bugs fixed on the way, both pre-existing: "הצעד הקודם" in acknak and credits
+      restored the state but not the script position (the next step then skipped one),
+      and in acknak the threshold draws were not rewound (the history now keeps the
+      threshold list and a draw counter). The credits summary's "דליפה" sentence
+      compared PCA − PCR with the real free slots, which the model keeps equal after a
+      loss, so it never showed; the summary now balances credits + packets in flight
+      against the free slots (the leak is the gap after a loss, a mid-flight Sync is the
+      overflow risk).
+    - Checks in the sandbox: the five boxes light and dark at 1100 and 390 px, state
+      links opening each box, the copy link read back, a random run on both boxes to
+      the end and back one step, a mid-flight Sync showing the violation; lint, the
+      Python tests (272), strict build, links, phone and axe light and dark.
 
 ---
 
@@ -1303,8 +1340,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   against the pages' follow-up questions produced rounds V (infrastructure), W (follow-ups
   per page) and X (timing strips), recorded under "Round U" below. Round V is done
   (session 20). Round W (trimmed by the owner; W172 dropped) is done in three batches
-  (W149, W170, W173; W152, W162, W177; W154, W164, W169). Next: rounds U (U135, U139) and
-  X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
+  (W149, W170, W173; W152, W162, W177; W154, W164, W169). Round U (U134 to U139, the
+  owner's pick) is in progress: batch 1 (U134, U135) done; next U136 and U137, then U138
+  and U139, then round X, the open rounds D to F, I, L, N, O, Q, S, or new questions.
 - Decision (owner, session 20): the repository stays public for now. The dilemma was
   raised (interviewers benefit; candidates could parrot answers). Options discussed and
   kept for later: a private "interview bank" beside the public site; two builds of the
@@ -1736,8 +1774,8 @@ and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T13
 | Id | Page | Idea | Size |
 |---|---|---|---|
 | U133 | 0001, 0035, 0038 | **Export the strip as WaveDrom**: a button that copies the drawn trace as WaveDrom JSON, so a reader can paste it into the page's own diagrams or a report | S |
-| U134 | 0006, 0017, 0009 | **Shareable state in the URL**: the typed array / prices / N in the hash, so a link opens the box in the same state (the stepper deep links of M76 extended to explorers) | S–M |
-| U135 | 0025, 0024 | **Random traffic button**: a "run 50 random events" that injects faults at a chosen rate and checks the invariants after each, the way the testbenches of the pages do; the first violation stops the run | M |
+| ~~U134~~ | 0006, 0017, 0009 | ~~**Shareable state in the URL**: the typed array / prices / N in the hash, so a link opens the box in the same state (the stepper deep links of M76 extended to explorers)~~ done (session 20, round U batch 1; also the random runs of 0025 / 0024) | S–M |
+| ~~U135~~ | 0025, 0024 | ~~**Random traffic button**: a "run 50 random events" that injects faults at a chosen rate and checks the invariants after each, the way the testbenches of the pages do; the first violation stops the run~~ done (session 20, round U batch 1) | M |
 | U136 | 0023 | **Pending-read timeline**: a small Gantt of the open reads over the cycles (ready at, completions out), beside the table | S–M |
 | U137 | 0007, 0014, 0009 | **Keyboard dragging**: arrow keys move a focused point or shape, as the stock box does; the triangle and polygon points are the first | S |
 | U138 | all | **A "reset everything" and a help tooltip per box**: one line that says what the box shows and what each button does, for first-time readers | S |
@@ -1800,8 +1838,8 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 | X147 | 0033 | **A wr / rd strip for the FIFO-from-rates box**: the bursts and the reads as waves above the fill chart | S |
 
 Suggested order (session 20): rounds V and W are done (W in three batches, the owner
-answering multiple-choice questions per batch). Next U135 and U139, then round X on top
-of V.
+answering multiple-choice questions per batch). Round U134 to U139 is being done the same
+way (batch 1: U134, U135 done); then round X on top of V.
 
 
 The older idea list below is kept for reference; items covered by the rounds above are
