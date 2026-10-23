@@ -1,5 +1,5 @@
 // kinds: pcie
-//   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits
+//   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits; a toggle to cut the boundaries by hand
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -23,6 +23,13 @@
   const pcieBlocks = (addr, len, rcb) => {
     const pts = pciePoints(addr, len, rcb);
     return pts.slice(1).map((b, i) => b - pts[i]);
+  };
+  // A split is a subset of the inner boundaries: the completions that a set of cuts forms,
+  // and whether every one of them fits in MPS.
+  const pcieSplitOf = (addr, len, mps, rcb, cuts) => {
+    const pts = [addr, ...pcieBoundaries(addr, len, rcb).filter((b) => cuts.includes(b)), addr + len];
+    const sizes = pts.slice(1).map((b, i) => b - pts[i]);
+    return { sizes, ok: sizes.every((v) => v <= mps) };
   };
   const pcieSplits = (addr, len, mps, rcb, limit = Infinity) => {
     const end = addr + len, out = [];
@@ -76,7 +83,7 @@
                        ["0x1000", 256, 256, 64, "0021 א : ‏0x1000, ‏256 B"], ["0x1000", 512, 256, 64, "0021 ב : ‏0x1000, ‏512 B"],
                        ["0x1010", 512, 256, 64, "0021 ב : ‏0x1010, ‏512 B"], ["0x1020", 128, 128, 64, "0021 ג : ‏0x1020, ‏128 B, ‏MPS 128 (δ = 1)"]];
       const defaults = { addr: box.dataset.addr || "0x1010", len: Number(box.dataset.len || 256), mps: Number(box.dataset.mps || 256), rcb: Number(box.dataset.rcb || 64) };
-      const st = { ...defaults };
+      const st = { ...defaults, cuts: null };   // cuts: the boundaries chosen by hand, null = the greedy split's
       const MAX_ROWS = 40;
       box.innerHTML =
         `<div class="ex-controls">` +
@@ -85,8 +92,9 @@
         `<label><span>האורך ${ltr("L")} (בתים)</span><input type="range" class="ex-len" min="4" max="2048" step="4" value="${st.len}" dir="ltr"><output class="out-len" dir="ltr"></output></label>` +
         `<label>MPS <select class="ex-mps">${[128, 256, 512, 1024, 2048, 4096].map((v) => `<option value="${v}"${v === st.mps ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<label>RCB <select class="ex-rcb">${[64, 128].map((v) => `<option value="${v}"${v === st.rcb ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
-        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
-        `<p class="ex-summary" aria-live="polite"></p><div class="pcie-blocks"></div><div class="pcie-counts"></div><div class="pcie-map"></div>`;
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button>` +
+        `<label><input type="checkbox" class="ex-choose" checked> לבחור חיתוכים בעצמי</label></div>` +
+        `<p class="ex-summary" aria-live="polite"></p><div class="pcie-blocks"></div><p class="pcie-choose"></p><div class="pcie-counts"></div><div class="pcie-map"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const hex = (v) => "0x" + v.toString(16).toUpperCase();
       const big = (v) => v.toLocaleString("en-US");
@@ -122,19 +130,33 @@
         // narrower bars keep only their tooltip: a label above would collide with the row before
         return g;
       };
-      const blocksSvg = (addr, len, mps, rcb) => {
+      const blocksSvg = (addr, len, mps, rcb, cuts) => {
         const ax = axis(addr, len, rcb, 40, 600);
         const sizes = pcieBlocks(addr, len, rcb), N = sizes.length, m = mps / rcb;
-        const d = N === m + 1 && len <= mps ? 1 : 0;
-        let g = `<svg class="figure cs-fig pcie-live" viewBox="0 0 640 132" style="max-width:40rem" role="img" aria-label="הבקשה על רשת ה-RCB, חתוכה ל-${N} בלוקים">${ax.grid(26, 96)}`;
+        const d = N === m + 1 && len <= mps ? 1 : 0, H = cuts ? 160 : 132;
+        let g = `<svg class="figure cs-fig pcie-live" viewBox="0 0 640 ${H}" style="max-width:40rem" role="${cuts ? "group" : "img"}" aria-label="הבקשה על רשת ה-RCB, חתוכה ל-${N} בלוקים${cuts ? "; לחיצה על גבול חותכת שם או מבטלת" : ""}">${ax.grid(26, cuts ? 122 : 96)}`;
         let pos = addr;
         sizes.forEach((sz, i) => {
           const cls = i === 0 ? "cs-first" : i === N - 1 ? "cs-last" : "cs-mid";
           g += segment(ax, cls, pos, sz, 50, 28, `block ${i + 1}: ${hex(pos)}–${hex(pos + sz - 1)}, ${sz} bytes`);
           pos += sz;
         });
-        pcieBoundaries(addr, len, rcb).forEach((b) => { g += `<circle class="cs-can" cx="${f(ax.x(b))}" cy="50" r="4"><title>boundary ${hex(b)}</title></circle>`; });
-        g += `<text class="legend" x="40" y="118">N = ${N}, |B| = ${N - 1}, f = ${sizes[0]}, e = ${sizes[N - 1]}, m = MPS / RCB = ${m}, δ = ${d}${d ? " (N = m + 1 and L ≤ MPS)" : ""}</text>`;
+        if (cuts) {
+          // the completions the chosen cuts form, under the blocks; one above MPS is marked
+          const sp = pcieSplitOf(addr, len, mps, rcb, cuts);
+          let at = addr;
+          sp.sizes.forEach((size, i) => {
+            const r = size > mps ? "bad" : sp.sizes.length === 1 ? "one" : i === 0 ? "first" : i === sp.sizes.length - 1 ? "last" : "mid";
+            g += segment(ax, `cs-${r}`, at, size, 88, 24, `${hex(at)}–${hex(at + size - 1)}: ${size} bytes${size > mps ? ` > MPS ${mps}` : ""}`);
+            at += size;
+          });
+          pcieBoundaries(addr, len, rcb).forEach((b) => {
+            const on = cuts.includes(b);
+            g += `<g class="cs-pick${on ? " is-cut" : ""}" data-b="${b}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${hex(b)}, ${on ? "חותכים כאן" : "לא חותכים כאן"}">` +
+                 `<line class="cs-pick-line" x1="${f(ax.x(b))}" x2="${f(ax.x(b))}" y1="44" y2="116"/><circle class="cs-can" cx="${f(ax.x(b))}" cy="50" r="7"><title>${hex(b)}</title></circle></g>`;
+          });
+        } else pcieBoundaries(addr, len, rcb).forEach((b) => { g += `<circle class="cs-can" cx="${f(ax.x(b))}" cy="50" r="4"><title>boundary ${hex(b)}</title></circle>`; });
+        g += `<text class="legend" x="40" y="${H - 14}">N = ${N}, |B| = ${N - 1}, f = ${sizes[0]}, e = ${sizes[N - 1]}, m = MPS / RCB = ${m}, δ = ${d}${d ? " (N = m + 1 and L ≤ MPS)" : ""}</text>`;
         return g + "</svg>";
       };
       const mapSvg = (addr, len, mps, rcb, rows, total) => {
@@ -182,7 +204,16 @@
           (total === formula ? ` (הנוסחה הסגורה נותנת אותו מספר).` : ` (הנוסחה הסגורה נותנת ${ltr(big(formula))}!).`) +
           (first ? ` הפיצול החמדני, עם הכי פחות Completions : ${ltr(first.join("+"))}.` : " אין פיצול חוקי.") +
           (crosses ? ` <b>הבקשה חוצה גבול 4 KB</b>, וזה אסור ב-PCIe; המספר מחושב כאילו מותר.` : "");
-        $(".pcie-blocks").innerHTML = `<p class="ex-title">הבלוקים : הבקשה על רשת ה-RCB, הגבולות הפנימיים בירוק</p>${blocksSvg(addr, len, mps, rcb)}`;
+        // the hand-made split: the greedy split's cuts until a boundary is clicked
+        const choose = $(".ex-choose").checked, B = pcieBoundaries(addr, len, rcb);
+        if (st.cuts === null || st.cuts.some((b) => !B.includes(b))) st.cuts = first ? B.filter((b) => { let at = addr; return first.slice(0, -1).some((v) => (at += v) === b); }) : [];
+        $(".pcie-blocks").innerHTML = `<p class="ex-title">הבלוקים : הבקשה על רשת ה-RCB, הגבולות הפנימיים בירוק${choose ? "; לחיצה על גבול חותכת שם, והשורה שמתחת היא ה-Completions" : ""}</p>${blocksSvg(addr, len, mps, rcb, choose ? st.cuts : null)}`;
+        if (choose) {
+          const sp = pcieSplitOf(addr, len, mps, rcb, st.cuts), all = 1n << BigInt(B.length), over = sp.sizes.filter((v) => v > mps);
+          $(".pcie-choose").innerHTML = `החיתוכים שבחרתם : ${ltr(sp.sizes.join("+"))}, ${ltr(sp.sizes.length)} Completions. ` +
+            (sp.ok ? `<span class="eu-ok">✓ כולם עד ${ltr(`MPS = ${mps}`)}.</span> ` : `<span class="eu-bad">✗ ${ltr(over.join(", "))} גדול מ-${ltr(`MPS = ${mps}`)}.</span> `) +
+            `פיצול הוא בדיוק בחירה של תת-קבוצה של ${ltr(`|B| = ${B.length}`)} הגבולות : יש ${ltr(`2^${B.length} = ${big(all)}`)} תת-קבוצות, ומהן ${ltr(big(total))} לא משאירות קטע ארוך מ-MPS. זה מספר הפיצולים.`;
+        } else $(".pcie-choose").innerHTML = "";
         const counts = byK.map((w, k) => (k && w ? `<tr><td>${k}</td><td>${big(w)}</td></tr>` : "")).join("");
         $(".pcie-counts").innerHTML = total > 1n ? `<p class="ex-title">כמה פיצולים יש לכל מספר Completions</p><table class="pcie-table" dir="ltr"><thead><tr><th>Completions</th><th>פיצולים</th></tr></thead><tbody>${counts}</tbody></table>` : "";
         if (total === 0n) { $(".pcie-map").innerHTML = ""; }
@@ -195,6 +226,15 @@
 
       };
       $(".ex-addr").addEventListener("input", draw);
+      $(".ex-choose").addEventListener("change", draw);
+      const pick = (g, keyboard) => {
+        const b = Number(g.dataset.b);
+        st.cuts = st.cuts.includes(b) ? st.cuts.filter((v) => v !== b) : st.cuts.concat([b]).sort((u, v) => u - v);
+        draw();
+        if (keyboard) { const again = box.querySelector(`.cs-pick[data-b="${b}"]`); if (again) again.focus(); }
+      };
+      $(".pcie-blocks").addEventListener("click", (e) => { const g = e.target.closest(".cs-pick"); if (g) pick(g, false); });
+      $(".pcie-blocks").addEventListener("keydown", (e) => { const g = e.target.closest(".cs-pick"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(g, true); } });
       $(".ex-len").addEventListener("input", () => { st.len = Number($(".ex-len").value); draw(); });
       $(".ex-mps").addEventListener("change", () => { st.mps = Number($(".ex-mps").value); draw(); });
       $(".ex-rcb").addEventListener("change", () => { st.rcb = Number($(".ex-rcb").value); draw(); });
@@ -206,7 +246,7 @@
         draw();
       });
       $(".ex-reset").addEventListener("click", () => {
-        Object.assign(st, defaults);
+        Object.assign(st, defaults, { cuts: null });
         $(".ex-addr").value = st.addr; $(".ex-len").value = st.len; $(".ex-mps").value = st.mps; $(".ex-rcb").value = st.rcb; $(".ex-preset").value = "";
         draw();
       });
@@ -217,8 +257,8 @@
   dvqExplorers.register({
     views: { pcie: pcieView },
     help: {
-      pcie: "כתובת, אורך, MPS ו-RCB : התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד.",
+      pcie: "כתובת, אורך, MPS ו-RCB : התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד. עם ״לבחור חיתוכים בעצמי״ לוחצים על הגבולות כדי לחתוך או לא, ורואים את ה-Completions שנוצרים.",
     },
-    models: { pcieBoundaries, pcieBlocks, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula },
+    models: { pcieBoundaries, pcieBlocks, pcieSplitOf, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula },
   });
 })();

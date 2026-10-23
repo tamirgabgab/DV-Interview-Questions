@@ -1811,6 +1811,18 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     the rejected candidate marked in the main box, and `main` fast-forwarded once round L
     passes every check.
 
+16. **`main` fast-forwarded** to 4847d65 (round L) after the full checks: 734 clicks, no
+    problems.
+17. **Round K, first batch (K303, K304, K307), each a toggle on the existing drawing:**
+    0042 "המחירון על הדרך" draws a band under every stretch with its crossings so far out
+    of 2j − 1 and the litres per km, and a line with the prices (`camelCrossings`, tested:
+    every stretch crossed 2j − 1 times, the burnt water adds up to w − T); 0020 "לבחור
+    חיתוכים בעצמי" turns the inner boundaries into buttons, the completions they form drawn
+    under the blocks (one above MPS in red), and the line counts the valid subsets of the
+    2^|B| (`pcieSplitOf`, tested on every subset of five requests against the page's
+    rules and splits); 0019 "ההסתעפות" draws the run-outs of each glass flipped every
+    time (multiples of 7 and of 11) and the fork at t = 11 into 14 and 15
+    (`hourglassFork`, tested for every pair of sizes up to 12).
 ---
 
 ## In progress
@@ -1846,7 +1858,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   questions, M263 to R283).
 - Session 22: the owner picked round L, then round K. L's first batch (L311, L312, L313,
   L316, L317, L318) and second batch (L309, L310, L314, L315) are done on the branch:
-  round L is closed. Next: round K, small items first (K303, K304, K307).
+  round L is closed and on `main`. Round K: the first batch (K303, K304, K307) is done;
+  next the second (K301, K302, K306, K305, K308).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2522,11 +2535,11 @@ the first series' rounds of the same letters.
 |---|---|---|---|
 | K301 | 0039 | **The recurrence on the building**: at every drop the band below is marked f(k − 1, t − 1), the drop floor 1 and the band above f(k, t − 1), with the matching cell of the table lit | M |
 | K302 | 0040 | **How the automaton is built**: the pattern slides under itself to show each state's fall-back (the longest suffix that is a prefix) and the edge it gives, state by state | M |
-| K303 | 0042 | **The price list on the road**: every stretch of road shows how many times the camel crosses it (5 / 3 / 1) as the passes play, so the litres per km of the solution appear on the road | S |
-| K304 | 0020 | **Splits are sets of boundaries**: click the RCB boundaries inside the request to cut or not; the split forms live, a gap above MPS is marked, and the count is the number of allowed subsets | S |
+| ~~K303~~ | 0042 | Done in session 22. **The price list on the road**: every stretch of road shows how many times the camel crosses it (5 / 3 / 1) as the passes play, so the litres per km of the solution appear on the road | S |
+| ~~K304~~ | 0020 | Done in session 22. **Splits are sets of boundaries**: click the RCB boundaries inside the request to cut or not; the split forms live, a gap above MPS is marked, and the count is the number of allowed subsets | S |
 | K305 | 0014 | **The projections**: two rectangles to drag, their projections on both axes and the page's four conditions turning true or false; in the main box a rejected candidate shades the shape and the projection that rejected it | M |
 | K306 | 0031 | **The greedy rule, round by round**: the two costs of moving the current slowest pair (escort by the fastest, or the two fastest shuttle) side by side, the cheaper one taken and the pair removed, ending at the plan's total | M |
-| K307 | 0019 part a | **The run that branches**: at t = 11 the timeline forks into "flip A" and "do not flip", the end times of each branch coloured, so the reader sees why 14 and 15 never share a run, with the 7k and 11k ticks | S |
+| ~~K307~~ | 0019 part a | Done in session 22. **The run that branches**: at t = 11 the timeline forks into "flip A" and "do not flip", the end times of each branch coloured, so the reader sees why 14 and 15 never share a run, with the 7k and 11k ticks | S |
 | K308 | 0013 part b | **Subtraction by columns**: the sorted digits of the typed number subtracted column by column with the borrows lit, as in the page's table | M |
 
 **Round L — the proof step, visible**

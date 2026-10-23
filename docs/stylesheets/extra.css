@@ -1261,6 +1261,13 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .cs-size { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset .viz-legend .cs-rcb { background: transparent; border-top: 2px dashed var(--viz-text); height: 0; }
 .md-typeset .viz-legend .cs-req { background: var(--viz-ink); width: 0.2rem; }
+.md-typeset svg .cs-bad { fill: var(--diff-hard); fill-opacity: 0.3; stroke: var(--diff-hard); stroke-width: 2; }
+.md-typeset svg .cs-pick { cursor: pointer; }
+.md-typeset svg .cs-pick .cs-can { fill: var(--md-default-bg-color); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .cs-pick.is-cut .cs-can { fill: var(--viz-s3); }
+.md-typeset svg .cs-pick-line { stroke: transparent; stroke-width: 1.5; }
+.md-typeset svg .cs-pick.is-cut .cs-pick-line { stroke: var(--viz-s3); stroke-dasharray: 4 3; }
+.md-typeset svg .cs-pick:focus-visible .cs-can { outline: none; stroke: var(--viz-ink); stroke-width: 3; }
 .md-typeset .viz-legend .cs-can { background: var(--viz-s3); border-radius: 50%; }
 .md-typeset .viz-legend .cs-first { background: var(--viz-s1); opacity: 0.5; }
 .md-typeset .viz-legend .cs-mid { background: var(--viz-grid); outline: 1px solid var(--viz-text); }
@@ -1757,6 +1764,9 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .bx-badge { fill: var(--viz-s1); }
 .md-typeset svg .bx-badge-num { fill: #fff; font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset .explorer .bx-chip { font-weight: 700; white-space: nowrap; }
+.md-typeset svg .cm-band { stroke: var(--viz-s1); stroke-width: 6; stroke-opacity: 0.35; stroke-linecap: round; }
+.md-typeset svg .cm-band.is-full { stroke-opacity: 0.85; }
+.md-typeset svg .cm-price-lbl { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
 .md-typeset .explorer .bx-chip.bx-long { white-space: normal; }   /* a cycle longer than N / 2 can be wider than a phone */
 .md-typeset .explorer .bx-chip bdi { font-family: var(--md-code-font-family); font-size: 0.7rem; }
 .md-typeset .explorer .bx-ok { color: var(--diff-easy); font-weight: 700; }

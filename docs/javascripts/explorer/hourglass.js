@@ -1,5 +1,5 @@
 // kinds: hourglass
-//   hourglass              0018, 0019  A, B (and C) and D: the plan on a time axis and event by event (BFS or Dijkstra), the page's objective or the fewest flips; the proof panel: the page's search pop by pop, the queue and the tree
+//   hourglass              0018, 0019  A, B (and C) and D: the plan on a time axis and event by event (BFS or Dijkstra), the page's objective or the fewest flips; the proof panel: the page's search pop by pop, the queue and the tree; on 0019 a toggle for the fork at the first run-out of the larger glass
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -118,6 +118,14 @@
       pops.push({ id, children, queue: queue.slice().sort((u, v) => u[0] - v[0] || u[1] - v[1]).map((q) => q[2]) });
     }
     return { nodes, pops, goal: null };
+  };
+
+  // The fork of 0019 part a: both flipped at 0, the larger B runs out first at t = B with
+  // `top` minutes left in A. Not flipping A ends it at B + top, flipping it at B + A − top:
+  // two run-outs that one run cannot both have. Null when A is empty at B (A divides B).
+  const hourglassFork = (A, B) => {
+    const [a, b] = A < B ? [A, B] : [B, A], top = (a - (b % a)) % a;
+    return top ? { t: b, small: A < B ? "A" : "B", top, keep: b + top, flip: b + a - top } : null;
   };
 
   // Replay a plan from rest: the events as [t, action, [a, b] on arrival, [a, b] after].
@@ -257,7 +265,8 @@
         `<label>המטרה <select class="ex-obj" aria-label="מטרת החיפוש"><option value="page">${interval ? "הסיום המוקדם ביותר (השאלה)" : "הכי מעט אירועים (השאלה)"}</option><option value="flips">הכי מעט היפוכים</option></select></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<p class="ex-summary" aria-live="polite"></p>` +
-        `<div class="hg-axis"></div>` +
+        (interval ? `<label class="hg-fork-toggle"><input type="checkbox" class="ex-fork" checked> ההסתעפות על ציר הזמן</label>` : "") +
+        `<div class="hg-axis"></div><p class="hg-fork"></p>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">האירוע הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">האירוע הבא</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1100, 400) + `<span class="ex-pos"></span></div>` +
@@ -305,10 +314,23 @@
                   `<text class="legend" x="${(ax0 + ax1) / 2}" y="${cy - 8}" text-anchor="middle">${verdict.text}</text>` + group(right, 12, after);
         return s + "</svg>";
       };
-      const axisSvg = (events, start, end) => {
-        const w = 640, x0 = 30, x1 = 610, y = 40, last = Math.max(end, 1);
+      const axisSvg = (events, start, end, fork) => {
+        const w = 640, x0 = 30, x1 = 610, y = 40, last = Math.max(end, fork ? fork.flip : 1, 1);
         const X = (t) => x0 + (t / last) * (x1 - x0);
-        let s = `<svg class="perf-chart hg-live" viewBox="0 0 ${w} 78" role="img" aria-label="ציר הזמן של התוכנית : האירועים, ההיפוכים וחלון המדידה">`;
+        let s = `<svg class="perf-chart hg-live" viewBox="0 0 ${w} ${fork ? 170 : 78}" role="img" aria-label="ציר הזמן של התוכנית : האירועים, ההיפוכים וחלון המדידה${fork ? ", ומתחתיו הרגעים שבהם כל שעון נגמר אם הופכים אותו תמיד, וההסתעפות" : ""}">`;
+        if (fork) {
+          // the multiples of A and of B (each flipped whenever it runs out), then the fork at t = B
+          [["A", st.A, 92], ["B", st.B, 112]].forEach(([n, v, yy]) => {
+            s += `<text class="legend" x="${x0 - 22}" y="${yy + 4}">${n}</text><line class="grid" x1="${x0}" x2="${x1}" y1="${yy}" y2="${yy}"/>`;
+            for (let k = v; k <= last; k += v) s += `<circle class="${n === "A" ? "s1" : "s3"}-dot" cx="${f(X(k))}" cy="${yy}" r="4"><title>${n}: ${k}</title></circle><text class="tick" x="${f(X(k))}" y="${yy - 7}" text-anchor="middle" style="font-size:10px">${k}</text>`;
+          });
+          const yf = 138, xs = X(fork.t);
+          [[fork.keep, `no flip: ${fork.keep}`, "s1", yf - 8], [fork.flip, `flip ${fork.small}: ${fork.flip}`, "s2", yf + 18]].forEach(([t, lab, cls, yy]) => {
+            s += `<path class="${cls}-line" d="M ${f(xs)} ${yf} L ${f(xs + 12)} ${yy} L ${f(X(t))} ${yy}" fill="none" stroke-width="2.5"/><circle class="${cls}-dot" cx="${f(X(t))}" cy="${yy}" r="5"/>` +
+                 `<text class="legend" x="${f(X(t) + 9)}" y="${yy + 4}">${lab}</text>`;
+          });
+          s += `<circle class="ink-dot" cx="${f(xs)}" cy="${yf}" r="4"/><text class="tick" x="${f(xs - 8)}" y="${yf + 4}" text-anchor="end">t = ${fork.t}</text>`;
+        }
         if (start !== null) s += `<rect class="measure" x="${f(X(start))}" y="${y - 22}" width="${f(X(end) - X(start))}" height="44" rx="4"/>`;
         s += `<line class="axis" x1="${x0}" x2="${x1}" y1="${y}" y2="${y}"/>`;
         events.forEach(([t, act], i) => {
@@ -404,7 +426,7 @@
           summary.innerHTML = `עם שעונים של ${sizesText} דקות אי אפשר למדוד ${ltr(st.D)} דקות${interval ? "" : " מרגע 0"}` +
             (st.D % gAll ? ` : ‏${ltr(st.D)} איננו כפולה של ${ltr(`gcd(${sz.join(", ")}) = ${gAll}`)}.` : ".") +
             (interval ? "" : ` מרגע 0 אפשר למדוד : ${ltr(reach().join(", "))} (עד 60).`);
-          $(".hg-axis").innerHTML = ""; $(".hg-frame").innerHTML = ""; $(".hg-caption").textContent = ""; $(".ex-pos").textContent = ""; $(".hg-compare").textContent = "";
+          $(".hg-axis").innerHTML = ""; $(".hg-fork").innerHTML = ""; $(".hg-frame").innerHTML = ""; $(".hg-caption").textContent = ""; $(".ex-pos").textContent = ""; $(".hg-compare").textContent = "";
           $(".ex-prev").disabled = $(".ex-next").disabled = true;
           return;
         }
@@ -419,7 +441,13 @@
         $(".hg-compare").innerHTML = `התוכנית הזו : ${describe(res)}. ` +
           (other ? `במטרה האחרת (${st.objective === "page" ? "הכי מעט היפוכים" : interval ? "הסיום המוקדם ביותר" : "הכי מעט אירועים"}) : ${describe(other)}${other.flips === res.flips && other.events === res.events && other.end === res.end ? ", אותו דבר" : ""}.` : "") +
           (res.explored !== null ? ` החיפוש בדק ${ltr(res.explored)} מצבים${sz.length === 3 ? " (עם שעון שלישי: 8 אפשרויות בכל אירוע)" : ""}.` : "");
-        $(".hg-axis").innerHTML = axisSvg(events, interval ? res.start : null, res.end);
+        const fork = interval && st.C === null && $(".ex-fork") && $(".ex-fork").checked ? hourglassFork(st.A, st.B) : null;
+        $(".hg-axis").innerHTML = axisSvg(events, interval ? res.start : null, res.end, fork);
+        $(".hg-fork").innerHTML = fork
+          ? `ההסתעפות : ברגע ${ltr(fork.t)} השעון הגדול נגמר בפעם הראשונה, וב-${ltr(fork.small)} נשארו ${ltr(fork.top)} דקות. אם לא הופכים אותו הוא נגמר ברגע ${ltr(fork.keep)}, ואם הופכים ברגע ${ltr(fork.flip)}. ` +
+            (Math.abs(fork.flip - fork.keep) === st.D ? `ההפרש ביניהם הוא בדיוק ${ltr(st.D)}, אבל אלה שתי ריצות שונות : בכל ריצה קורה רק אחד מהם, ולכן הם לא נותנים מדידה.` : `שני הרגעים שייכים לשתי ריצות שונות, ובכל ריצה קורה רק אחד מהם.`) +
+            ` שתי השורות שמעל ההסתעפות הן הרגעים שבהם כל שעון נגמר אם הופכים אותו תמיד : כפולות של ${ltr(st.A)} ושל ${ltr(st.B)}.`
+          : "";
         const ev = events[st.s], [t, act, before, after] = ev;
         // which hourglasses ran out: those whose sand on top after the previous action equals the wait
         const prevEv = st.s > 0 ? events[st.s - 1] : null;
@@ -464,6 +492,7 @@
         stop(); st.C = $(".ex-C").value.trim() === "" || !Number.isFinite(v) || v < 1 ? null : Math.min(30, v); $(".ex-C").value = st.C === null ? "" : st.C; st.s = 0; draw();
       });
       $(".ex-C").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".ex-C").blur(); });
+      if (interval) $(".ex-fork").addEventListener("change", draw);
       $(".ex-obj").addEventListener("change", () => { stop(); st.objective = $(".ex-obj").value; st.s = 0; draw(); });
       $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0, q: 0 }); ["A", "B", "D"].forEach((k) => { $(`.ex-${k}`).value = st[k]; }); $(".ex-C").value = ""; $(".ex-obj").value = "page"; draw(); });
       draw();
@@ -473,8 +502,8 @@
   dvqExplorers.register({
     views: { hourglass: hourglassView },
     help: {
-      hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן, ״הצעד הבא״ ו״הפעלה״ עוברים אירוע אחרי אירוע, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר. בשלב ההוכחה ״השליפה הבאה״ מריץ את החיפוש של העמוד מצב אחרי מצב, עם התור ועץ החיפוש.",
+      hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן, ״הצעד הבא״ ו״הפעלה״ עוברים אירוע אחרי אירוע, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר. בתיבה של 0019 המתג ״ההסתעפות״ מראה את שתי הריצות שמתפצלות ברגע שהשעון הגדול נגמר. בשלב ההוכחה ״השליפה הבאה״ מריץ את החיפוש של העמוד מצב אחרי מצב, עם התור ועץ החיפוש.",
     },
-    models: { hourglassSolve, hourglassInterval, hourglassSolveTrace, hourglassIntervalTrace, hourglassReplay, hourglassReachable, hourglassStepN, hourglassSearch, hourglassReplayN, hourglassReachableN },
+    models: { hourglassSolve, hourglassInterval, hourglassSolveTrace, hourglassIntervalTrace, hourglassFork, hourglassReplay, hourglassReachable, hourglassStepN, hourglassSearch, hourglassReplayN, hourglassReachableN },
   });
 })();

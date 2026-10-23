@@ -186,3 +186,25 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(42)
+
+
+def test_explorer_price_list():
+    """The box's price list under the road: after the last pass every stretch was crossed
+    2j - 1 times (j loads there), the crossings grow one pass at a time, and the water
+    burnt on a stretch is that count times a times its length."""
+    from page_tests import explorer_require, node_json
+
+    cases = [list(c) for c in CASES]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map(([a, c, w, T]) => {{
+        const segs = m.camelSegments(a, c, w, T), passes = m.camelPasses(a, c, w, T);
+        return [segs, passes.length, [...Array(passes.length + 1).keys()].map((k) => m.camelCrossings(segs, passes, k))];
+      }})));""")
+    for (a, c, w, T), (segs, n, per_step) in zip(CASES, got):
+        final = per_step[-1]
+        assert [x["done"] for x in final] == [x["total"] for x in final] == [2 * sg["loads"] - 1 for sg in segs]
+        for k in range(1, n + 1):
+            assert sum(x["done"] for x in per_step[k]) == k
+        burnt = sum(x["total"] * a * (sg["x1"] - sg["x0"]) for x, sg in zip(final, segs))
+        assert near(burnt, w - T, 1e-6), (a, c, w, T)

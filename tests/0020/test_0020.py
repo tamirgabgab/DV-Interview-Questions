@@ -143,3 +143,31 @@ def test_explorer_matches_page_code():
     """)
     for (addr, length, mps, rcb), js in zip(cases, got):
         assert js == splits(addr, length, mps, rcb), (addr, length, mps, rcb)
+
+
+def test_explorer_cuts_by_hand():
+    """The box's hand-made split: every subset of the inner boundaries gives the completions
+    between the cuts, valid exactly when the page's rules accept them, so the valid subsets
+    are the page's splits (the count of the box)."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    cases = [(0x1010, 256, 256, 64), (0x1010, 256, 128, 64), (0x1000, 512, 256, 64), (0x1020, 128, 128, 64), (0x1004, 300, 128, 128)]
+    jobs = []
+    for addr, length, mps, rcb in cases:
+        bounds = list(range((addr // rcb + 1) * rcb, addr + length, rcb))
+        for k in range(len(bounds) + 1):
+            for sub in combinations(bounds, k):
+                jobs.append([addr, length, mps, rcb, list(sub)])
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({json.dumps(jobs)}.map(([a, l, p, r, c]) => m.pcieSplitOf(a, l, p, r, c))));")
+    valid = {}
+    for (addr, length, mps, rcb, sub), out in zip(jobs, got):
+        pts = [addr, *sub, addr + length]
+        assert out["sizes"] == [b - a for a, b in zip(pts, pts[1:])]
+        assert out["ok"] == split_ok(addr, length, mps, rcb, out["sizes"])
+        if out["ok"]:
+            valid.setdefault((addr, length, mps, rcb), set()).add(tuple(out["sizes"]))
+    for case in cases:
+        assert valid.get(case, set()) == reference(*case), case

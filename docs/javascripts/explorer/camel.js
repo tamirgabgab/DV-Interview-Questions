@@ -1,5 +1,5 @@
 // kinds: camel
-//   camel                  0042        a, c, w and T (or the page's numbers with data-fixed): the passes played one at a time on a distance axis with the camel, the litres on it and the depots; the chart of the distance against the water with the logarithmic approximation
+//   camel                  0042        a, c, w and T (or the page's numbers with data-fixed): the passes played one at a time on a distance axis with the camel, the litres on it and the depots; the chart of the distance against the water with the logarithmic approximation; a toggle for the price list under the road
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -38,6 +38,15 @@
     return out;
   };
 
+  // The price list of the solution: how many times the camel has crossed each stretch
+  // after `step` passes, out of 2j − 1 for a stretch with j loads (so a km there costs
+  // (2j − 1) a litres).
+  const camelCrossings = (segs, passes, step) => {
+    const done = segs.map(() => 0);
+    passes.slice(0, step).forEach((p) => { done[p.seg] += 1; });
+    return segs.map((sg, i) => ({ done: done[i], total: 2 * sg.loads - 1 }));
+  };
+
   // The camel box (0042): the page's numbers (data-fixed) or a, c, w and T to set; the
   // passes played one at a time on a distance axis with the camel, the litres on it and
   // the depots at the start, at every stop and at the end; the general box adds the
@@ -61,8 +70,9 @@
         `<button type="button" class="md-button ex-prev">המעבר הקודם</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1600, 900, 350) +
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
-        `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
-        `<p class="ex-summary cm-sum" aria-live="polite"></p><p class="cm-step"></p>` +
+        `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span>` +
+        `<label><input type="checkbox" class="cm-price" checked> המחירון על הדרך</label></div>` +
+        `<p class="ex-summary cm-sum" aria-live="polite"></p><p class="cm-step"></p><p class="ex-note cm-price-text"></p>` +
         `<span class="viz-legend"><span><i class="cm-key-depot"></i>מחסן : הליטרים שבו מעל הציר</span><span><i class="cm-key-camel"></i>הגמל והליטרים שעליו</span><span><i class="cm-key-pass"></i>המעבר האחרון : ליטרים ביציאה ← בהגעה</span><span><i class="cm-key-next"></i>המעבר הבא</span></span>` +
         `<div class="cm-road"></div>` +
         (fixed ? "" : `<p class="ex-title">המרחק המקסימלי לפי כמות המים בהתחלה, עם הקירוב הלוגריתמי מקווקו</p><div class="cm-chart"></div>`);
@@ -81,7 +91,8 @@
         return { pos: p.back ? sg.x0 : sg.x1, carry: p.back ? 0 : p.carry1 - p.drop, depots: p.depots, last: p };
       };
       const road = (s) => {
-        const W = 480, H = 200, X0 = 28, X1 = 452, YA = 110, BAR = 76, dmax = Math.max(st.d, 1e-9);   // 480 wide: readable at phone width
+        const price = $(".cm-price").checked;
+        const W = 480, H = price ? 236 : 200, X0 = 28, X1 = 452, YA = 110, BAR = 76, dmax = Math.max(st.d, 1e-9);   // 480 wide: readable at phone width
         const X = (x) => X0 + (x / dmax) * (X1 - X0);
         const pts = [0].concat(st.segs.map((sg) => sg.x1));
         let h = `<svg class="figure cm-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="ציר הדרך מ-0 עד ${lit(st.d)} ק״מ : המחסנים עם הליטרים שבהם, הגמל במקומו ומה שעליו, והמעבר האחרון">` +
@@ -107,6 +118,15 @@
         };
         if (s.last) h += arrow(s.last, "is-last", YA + 44);
         if (st.step < st.passes.length) h += arrow(st.passes[st.step], "is-next", YA + 70);
+        if (price) {
+          // under the road: every stretch with its crossings so far out of 2j − 1, and the price per km
+          const cross = camelCrossings(st.segs, st.passes, st.step), y = H - 24;
+          st.segs.forEach((sg, i) => {
+            const xa = X(sg.x0), xb = X(sg.x1), cx = (xa + xb) / 2, c = cross[i], full = c.done === c.total;
+            h += `<line class="cm-band${full ? " is-full" : ""}" x1="${f(xa + 2)}" x2="${f(xb - 2)}" y1="${y}" y2="${y}"><title>קטע ${i + 1} : ${c.done} מתוך ${c.total} מעברים, ${lit(c.total * st.a)} ליטר לק״מ</title></line>`;
+            if (xb - xa >= 30) h += `<text class="cm-price-lbl" x="${f(cx)}" y="${y + 15}" text-anchor="middle">${c.done}/${c.total}${xb - xa >= 62 ? ` · ${lit(c.total * st.a)}/km` : ""}</text>`;
+          });
+        }
         const xc = X(s.pos);
         h += `<text class="cm-camel" x="${f(xc)}" y="${YA + 36}" text-anchor="middle">🐪</text>` +
           `<text class="cm-carry" x="${f(xc + (xc > X0 + 60 ? -36 : 36))}" y="${YA + 34}" text-anchor="middle">💧${lit(s.carry)}</text>`;
@@ -154,6 +174,12 @@
                 (p.carry1 - p.drop > 1e-9 ? `משאיר ${ltr(lit(p.drop))} במחסן ושומר ${ltr(lit(p.carry1 - p.drop))} לדרך חזרה.` : `משאיר הכול (${ltr(lit(p.drop))}).`)) +
             (done ? ` <b>הגיע ליעד</b> ב-${ltr(lit(st.d))} ק"מ עם ${ltr(lit(st.T))} ליטר ✓` : ` במחסנים : ${ltr(s.depots.map((v, i) => `${lit(i === 0 ? 0 : st.segs[i - 1].x1)} → ${lit(v)}`).filter((t) => !t.endsWith("→ 0")).join(", ") || "0 → 0")}.`);
         }
+        // the price list in one line: each stretch, its crossings so far out of 2j − 1, and the price
+        const priceOn = $(".cm-price").checked && st.segs.length, cross = priceOn ? camelCrossings(st.segs, st.passes, st.step) : [];
+        $(".cm-price-text").innerHTML = priceOn
+          ? `המחירון : ` + st.segs.map((sg, i) => `קטע ${ltr(i + 1)} נחצה ${ltr(cross[i].total)} ${cross[i].total === 1 ? "פעם" : "פעמים"}, ${ltr(lit(cross[i].total * st.a))} ליטר לק"מ (עד עכשיו ${ltr(cross[i].done)})`).join("; ") +
+            `. בקטע האחרון הקילומטר הכי זול, ולכן מטען מים שלם מגיע בו הכי רחוק.`
+          : "";
         $(".cm-step").innerHTML = step;
       };
       let stop = () => {};
@@ -173,6 +199,7 @@
         });
         $(".ex-reset").addEventListener("click", () => { $(".cm-a").value = A0; $(".cm-c").value = C0; setParams(A0, C0, W0, T0, true); });
       }
+      $(".cm-price").addEventListener("change", draw);
       $(".ex-next").addEventListener("click", () => { stop(); if (st.step < st.passes.length) { st.step++; draw(); } });
       $(".ex-prev").addEventListener("click", () => { stop(); if (st.step > 0) { st.step--; draw(); } });
       $(".ex-start").addEventListener("click", () => { stop(); st.step = 0; draw(); });
@@ -186,8 +213,8 @@
   dvqExplorers.register({
     views: { camel: camelView },
     help: {
-      camel: "״המעבר הבא״ ו״הפעלה״ מזיזים את הגמל מעבר אחרי מעבר על ציר הדרך : הליטרים שעליו מסומנים לידו, כל מחסן מראה כמה ליטר יש בו, והשורה מתחת מסבירה מה הוא עשה. בתיבה הכללית הסליידרים והשדות קובעים את הצריכה, הקיבולת, המים והיעד, והגרף מראה את המרחק המקסימלי לכל כמות מים עם הקירוב הלוגריתמי.",
+      camel: "״המעבר הבא״ ו״הפעלה״ מזיזים את הגמל מעבר אחרי מעבר על ציר הדרך : הליטרים שעליו מסומנים לידו, כל מחסן מראה כמה ליטר יש בו, והשורה מתחת מסבירה מה הוא עשה. בתיבה הכללית הסליידרים והשדות קובעים את הצריכה, הקיבולת, המים והיעד, והגרף מראה את המרחק המקסימלי לכל כמות מים עם הקירוב הלוגריתמי. המתג ״המחירון על הדרך״ מראה מתחת לכל קטע כמה פעמים הגמל עבר בו ומה עולה בו ק״מ.",
     },
-    models: { camelLevels, camelSegments, camelDistance, camelApprox, camelPasses },
+    models: { camelLevels, camelSegments, camelDistance, camelApprox, camelPasses, camelCrossings },
   });
 })();

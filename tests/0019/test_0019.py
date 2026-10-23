@@ -222,3 +222,23 @@ def test_explorer_search_trace():
                 got_plan[parent["t"]] = nodes[i]["act"]
             i = nodes[i]["parent"]
         assert got_start == start and got_plan == plan, (A, B, D)
+
+
+def test_explorer_fork():
+    """The box's fork: at the first run-out of the larger glass the smaller has `top` left;
+    not flipping it and flipping it give the two run-outs of the page (14 and 15 for 7 and
+    11), which a replay of both choices confirms for other sizes."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(A, B) for A in range(2, 13) for B in range(2, 13) if A != B]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({[list(c) for c in cases]}.map(([A, B]) => m.hourglassFork(A, B))));")
+    for (A, B), fork in zip(cases, got):
+        small, big = min(A, B), max(A, B)
+        left = (-big) % small              # both flipped at 0, the larger runs out at t = big
+        if left == 0:
+            assert fork is None, (A, B)
+            continue
+        assert fork["t"] == big and fork["top"] == left and fork["small"] == ("A" if A < B else "B")
+        assert fork["keep"] == big + left and fork["flip"] == big + (small - left)
+    assert got[cases.index((7, 11))] == {"t": 11, "small": "A", "top": 3, "keep": 14, "flip": 15}
