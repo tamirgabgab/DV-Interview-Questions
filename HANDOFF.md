@@ -1568,6 +1568,30 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       axe light and dark (the full run found one wide equation in the 0039 proof; the
       identity is now split over three rows of the `aligned` block). On `main` since
       2026-10-22 (d110eed).
+27. **0042, the camel and the water (the owner's write-up, sent as a Markdown file with
+    a part a and a general part; verified first with exact fractions: every number holds,
+    the 1.96 is 2 ln 2 + γ = 1.9635). Answers: a from 0.2 to 1.0, w up to ten loads and
+    T up to one load in the box, part a numeric / part b formula and derivation / bonus
+    special cases, a step is one pass, junior / medium, the "60 km a day" datum dropped,
+    a distance-against-water chart in the general box.**
+    - `junior/0042-camel-water-depots.md`: part a (450 litres, 150 on the camel, 0.5 per
+      km, 30 to deliver: the price list 2.5 / 1.5 / 0.5, Φ(450) = 460, 400 km, stops at 60
+      and 160, the walks of the owner's tables, 9 passes and 840 km walked), part b (the
+      levels w, the multiples of c above T, T; a segment per pair of levels with the price
+      of its loads; the closed form; the chain-rule upper bound; the stops; the check
+      against part a), bonus (one load, T > c with the same levels, the logarithmic
+      approximation and the divergence). Page code: `camel_levels`, `camel_segments`,
+      `camel_distance` (closed form, T ≤ c), `camel_passes` (full loads first, the partial
+      last, every return made by a camel that left full), `camel_check` (burned +
+      delivered = w); the SV mirrors them with real arrays (`MAXS` 32, `MAXP` 1024).
+    - `tools/figures/q0042.py` is the exact reference (fractions): the price, stops and
+      walks tables, the water-in-motion chart, the examples table, the distance-against-
+      water chart and the approximation table of the bonus. tests/0042 also searches the
+      stop positions by brute force (two and three loads) and never beats the formula.
+    - The `camel` box (`data-fixed` for part a): the passes on a distance axis with the
+      camel (an emoji), the litres on it, the depots as bars with their litres, the last
+      and the next pass as arrows, a line per pass; the general box adds a, c, w, T and
+      the chart. Trap text corrected while testing: 1.5 instead of 2.5 gives 440, not 460.
 
 ---
 
@@ -1628,12 +1652,12 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 
 ## Question variety
 
-### Coverage today (38 questions)
+### Coverage today (42 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.

@@ -43,7 +43,7 @@ def test_new_question_with_figures_and_code(tmp_path):
     text, problems = fill.fill_text(page, ns["blocks"]())
     assert problems == ["block 0 is out of date"] and "<!-- figure 0" in text
     readme = (root / "README.md").read_text(encoding="utf-8").split("\n")
-    row = next(i for i, l in enumerate(readme) if l.startswith("| 0042 |"))
+    row = max(i for i, l in enumerate(readme) if l.startswith("| 0042 |"))      # the appended row (the real catalog has a 0042 too)
     assert readme[row - 1].startswith("| 00") and "junior | 🟡 medium | math, sequences |" in readme[row]
 
 
