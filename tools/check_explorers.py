@@ -11,6 +11,16 @@ then presses "reset everything". It fails when a script throws or logs a console
 and when the page scrolls sideways after a box was clicked through. The failing button is
 named in the report (its aria-label, text or title).
 
+Then, for every box, the link and the remembered state: the box's controls are changed one
+by one after a draw with a fixed seed where the box has one (a range or number field to
+another value, a select to the next option, a checkbox toggled; the play speed is left
+alone), and the box is compared with the same box opened
+from its "copy link" URL in a fresh browser, and with the box after a reload of the page
+(the remembered state, with its notice). Different control values fail the check; a
+different drawing (hidden elements aside) is a warning, since a box may draw from its
+history. "Reset everything" must then forget the state.
+--no-links skips this part.
+
 Needs Playwright, as tools/check_phone.py. In a sandbox without access to the CDNs,
 --offline ignores errors of external scripts and --route REGEX=FILE serves a CDN script
 from a local copy; --only REGEX checks only the matching pages.
@@ -61,6 +71,127 @@ RESET = """(b) => {
 
 WIDTH_NOW = "() => document.documentElement.scrollWidth"
 
+# Draw with seed 4242 where the box has a seed field, then change every control of box b in
+# document order (re-queried after each change); returns the number changed.
+CHANGE = """(b) => {
+  const box = document.querySelectorAll(".explorer")[b];
+  const seed = box.querySelector(".ex-seed");
+  if (seed) { seed.value = "4242"; seed.dispatchEvent(new Event("change", { bubbles: true })); }
+  const ctl = () => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed"));
+  let changed = 0;
+  for (let i = 0; i < ctl().length; i++) {
+    const el = ctl()[i];
+    if (el.disabled || !el.getClientRects().length || el.classList.contains("ex-speed")) continue;
+    if (el.type === "checkbox") el.checked = !el.checked;
+    else if (el.tagName === "SELECT") {
+      const opts = [...el.options].filter((o) => !o.disabled);
+      if (opts.length < 2) continue;
+      el.value = opts[(opts.findIndex((o) => o.value === el.value) + 1) % opts.length].value;
+    } else if (el.type === "range" || el.type === "number") {
+      const min = el.min === "" ? 0 : Number(el.min), max = el.max === "" ? Number(el.value) + 10 : Number(el.max);
+      const step = el.step === "" || el.step === "any" ? 1 : Number(el.step), now = Number(el.value);
+      let v = min + Math.round(((max - min) * 0.37) / step) * step;
+      if (Math.abs(v - now) < step / 2) v = now + step <= max ? now + step : now - step;
+      if (v < min || v > max) continue;
+      el.value = String(Number(v.toFixed(6)));
+    } else continue;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    changed++;
+  }
+  return changed;
+}"""
+
+# Box b as compared across pages: its control values and its drawing without the header,
+# the notices, the key hint and what is hidden. The seed counts unless the box links with
+# its own codec (`#state-`), whose data stands for the draw.
+SNAP = """([b, own]) => {
+  const box = document.querySelectorAll(".explorer")[b];
+  const values = [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed"))
+    .map((el) => el.type === "checkbox" ? el.checked : el.value);
+  const seed = box.querySelector(".ex-seed");
+  if (seed && !own) values.push(`seed ${seed.value}`);
+  const copy = box.cloneNode(true);
+  copy.querySelectorAll(".ex-bar, .ex-restored, .ex-keys, [hidden]").forEach((el) => el.remove());
+  return { values, html: copy.innerHTML, restored: !!box.querySelector(".ex-restored") };
+}"""
+
+
+def first_difference(a: str, b: str) -> str:
+    i = next((k for k in range(min(len(a), len(b))) if a[k] != b[k]), min(len(a), len(b)))
+    return f"at {i}: {a[max(0, i - 40):i + 60]!r} / {b[max(0, i - 40):i + 60]!r}"
+
+
+def open_page(ctx, url: str, errors: list[str]):
+    page = ctx.new_page()
+    page.on("pageerror", lambda e: errors.append(str(e)))
+    page.on("dialog", lambda d: d.dismiss())
+    try:
+        page.goto(url, wait_until="networkidle", timeout=60_000)
+    except Exception as e:
+        errors.append(f"load: {e}")
+    page.evaluate(OPEN_ALL)
+    page.wait_for_timeout(500)
+    return page
+
+
+def check_links(browser, routes, url: str) -> tuple[list[str], list[str]]:
+    """The link and the remembered state of every box on the page at url: problems and
+    warnings."""
+    problems: list[str] = []
+    warnings: list[str] = []
+    errors: list[str] = []
+
+    def context():
+        ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1)
+        for pattern, handler in routes:
+            ctx.route(pattern, handler)
+        return ctx
+
+    ctx = context()
+    page = open_page(ctx, url, errors)
+    n_boxes = page.evaluate("() => document.querySelectorAll('.explorer').length")
+    page.close()
+    for b in range(n_boxes):
+        page = open_page(ctx, url, errors)
+        kind = page.evaluate("(b) => document.querySelectorAll('.explorer')[b].dataset.kind", b)
+        if not page.evaluate(CHANGE, b):
+            page.close()
+            continue
+        page.wait_for_timeout(500)                          # the state is saved after 300 ms
+        link = page.evaluate("(b) => dvqExplorers.linkOf(document.querySelectorAll('.explorer')[b])", b)
+        own = link.startswith("#state-")
+        want = page.evaluate(SNAP, [b, own])
+        page.close()
+
+        fresh = context()
+        other = open_page(fresh, url + link, errors)
+        got = other.evaluate(SNAP, [b, own])
+        other.close()
+        fresh.close()
+        if got["values"] != want["values"]:
+            problems.append(f"{kind} {b}: the link {link[:80]} gives the controls {got['values']}, not {want['values']}")
+        elif got["html"] != want["html"]:
+            warnings.append(f"{kind} {b}: the link {link[:80]} draws another box, {first_difference(want['html'], got['html'])}")
+
+        page = open_page(ctx, url, errors)
+        got = page.evaluate(SNAP, [b, own])
+        if not got["restored"]:
+            problems.append(f"{kind} {b}: no remembered state after a reload")
+        elif got["values"] != want["values"]:
+            problems.append(f"{kind} {b}: the remembered state gives the controls {got['values']}, not {want['values']}")
+        elif got["html"] != want["html"]:
+            warnings.append(f"{kind} {b}: the remembered state draws another box, {first_difference(want['html'], got['html'])}")
+        page.evaluate(RESET, b)
+        page.wait_for_timeout(500)
+        page.close()
+        page = open_page(ctx, url, errors)
+        if page.evaluate(SNAP, [b, own])["restored"]:
+            problems.append(f"{kind} {b}: \"reset everything\" did not forget the state")
+        page.close()
+    ctx.close()
+    return problems + [f"links: {e[:200]}" for e in errors], warnings
+
 
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -70,6 +201,7 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--route", action="append", default=[], metavar="REGEX=FILE",
                     help="serve requests matching REGEX from a local file")
     ap.add_argument("--only", help="check only pages whose path matches this regex")
+    ap.add_argument("--no-links", action="store_true", help="skip the link and remembered-state checks")
     args = ap.parse_args(argv)
 
     from playwright.sync_api import sync_playwright
@@ -89,9 +221,12 @@ def main(argv: list[str]) -> int:
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
         ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1)
+        routes = []
         for spec in args.route:
             pattern, file = spec.split("=", 1)
-            ctx.route(re.compile(pattern), functools.partial(lambda file, route: route.fulfill(path=file), file))
+            routes.append((re.compile(pattern), functools.partial(lambda file, route: route.fulfill(path=file), file)))
+        for pattern, handler in routes:
+            ctx.route(pattern, handler)
         for rel in pages:
             url = base + rel[: -len("index.html")]
             page = ctx.new_page()
@@ -133,6 +268,12 @@ def main(argv: list[str]) -> int:
                 page.wait_for_timeout(100)
                 problems += [f"{kind}, reset everything: {e[:200]}" for e in take()]
             page.close()
+            warnings: list[str] = []
+            if not args.no_links:
+                found, warnings = check_links(browser, routes, url)
+                if args.offline:
+                    found = [p for p in found if not external.search(p)]
+                problems += found
 
             failures += bool(problems)
             boxes_total += n_boxes
@@ -140,6 +281,8 @@ def main(argv: list[str]) -> int:
             print(f"{'FAIL' if problems else 'ok':4}  {rel[: -len('index.html')]}  {n_boxes} boxes, {clicks} clicks")
             for p in problems:
                 print(f"        {p}")
+            for w in warnings:
+                print(f"        warn {w}")
         browser.close()
     server.shutdown()
     print(f"{len(pages)} pages, {boxes_total} boxes, {clicks_total} clicks, {failures} pages with problems")

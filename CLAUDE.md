@@ -64,7 +64,7 @@ python tools/run_tests.py             # pytest + Verilator (needs Verilator 5.05
 mkdocs build --strict                 # the build CI runs
 python tools/check_links.py           # internal links and anchors of the built site
 python tools/check_phone.py           # every page at 390 px (add --offline and --route in a sandbox)
-python tools/check_explorers.py       # every button of every explorer box clicked once
+python tools/check_explorers.py       # every explorer box: buttons clicked, link and saved state
 ```
 
 The linter checks RTL at every paragraph start (indented blocks and the steps timeline

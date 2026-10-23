@@ -181,38 +181,31 @@
   // A speed select (milliseconds per step) and the play loop of a stepper: the play
   // button toggles a timer that calls step() every speed.value ms until done(); pressed
   // at the end, restart() rewinds first. Returns stop(), for the other controls.
-  // The seed of a box's random draws: a seed field and a "copy link" button inserted after
-  // `after`; run(rng, seed) redraws with a seeded generator. draw() picks a new seed and
-  // runs it, a typed seed replays, and `#seed-<kind>-<n>` in the URL replays on load (the
-  // first box of that kind on the page). opts.seed fills the field without running.
-  // opts.state = { get, set }: get() returns the box's state as a payload (or null to fall
-  // back to the seed), the copy button then writes `#state-<kind>.<payload>` and set()
-  // reopens it on load (true when the payload was valid).
+  // The seed of a box's random draws: a seed field inserted after `after`; run(rng, seed)
+  // redraws with a seeded generator. draw() picks a new seed and runs it, a typed seed
+  // replays, and `#seed-<kind>-<n>` in the URL replays on load (the first box of that kind
+  // on the page). opts.seed fills the field without running. opts.state = { get, set }:
+  // get() returns the box's own state as a payload (or null to fall back to the controls),
+  // the link button of the header then writes `#state-<kind>.<payload>`, and set() reopens
+  // it on load (true when the payload was valid). The field and the codec are kept on the
+  // box for the link and the remembered state (see "links" below).
   const SEED_HASH = /^#seed-([a-z0-9-]+)-(\d+)$/;
   const STATE_HASH = /^#state-([a-z0-9-]+)\.(.+)$/;
+  let tick = 0;                      // orders a box's last seeded draw against its last control change
   const seedControls = (box, after, run, opts = {}) => {
     const kind = box.dataset.kind;
     const label = document.createElement("label");
     label.className = "ex-seedlab";
     label.innerHTML = `<span>זרע</span> <input type="number" class="ex-seed" min="1" max="${SEED_MAX}" step="1" dir="ltr" inputmode="numeric" aria-label="זרע ההגרלה, מספר לשחזור">`;
-    const copy = document.createElement("button");
-    copy.type = "button"; copy.className = "md-button ex-copy"; copy.textContent = "העתקת קישור";
-    copy.title = opts.state ? "קישור שפותח את התיבה במצב הזה" : "קישור שפותח את התיבה עם אותו זרע";
-    after.after(label, copy);
+    after.after(label);
     const input = label.querySelector("input");
     if (opts.seed) input.value = opts.seed;
-    const runSeed = (seed) => { input.value = seed; run(mulberry32(seed), seed); };
+    const runSeed = (seed) => { input.value = seed; box.dvqSeedAt = ++tick; run(mulberry32(seed), seed); };
+    box.dvqSeed = { input, runSeed };
+    box.dvqState = opts.state || null;
     const draw = () => runSeed(newSeed());
     input.addEventListener("change", () => { const v = Math.round(Number(input.value)); if (v >= 1 && v <= SEED_MAX) runSeed(v); else input.value = ""; });
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
-    copy.addEventListener("click", () => {
-      const payload = opts.state ? opts.state.get() : null;
-      if (!payload && !input.value) draw();
-      const url = `${location.origin}${location.pathname}#${payload ? `state-${kind}.${payload}` : `seed-${kind}-${input.value}`}`;
-      const done = () => { copy.textContent = "הועתק ✓"; setTimeout(() => { copy.textContent = "העתקת קישור"; }, 1500); };
-      const fallback = () => { window.prompt("הקישור :", url); };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
-    });
     const first = box === document.querySelector(`.explorer[data-kind="${kind}"]`);
     const m = SEED_HASH.exec(location.hash), sm = STATE_HASH.exec(location.hash);
     if (first && m && m[1] === kind) {
@@ -340,6 +333,7 @@
     bar.className = "ex-bar";
     bar.innerHTML = `<button type="button" class="ex-help-btn" aria-expanded="false" aria-label="עזרה : מה התיבה מראה ומה הכפתורים עושים" title="עזרה">?</button>` +
       `<button type="button" class="ex-reset-all" title="כל הבקרות של התיבה חוזרות לברירת המחדל">איפוס הכול</button>` +
+      `<button type="button" class="ex-link" title="קישור שפותח את התיבה עם אותן בחירות">העתקת קישור</button>` +
       `<p class="ex-help" hidden>${HELP[box.dataset.kind] || ""}</p>`;
     box.prepend(bar);
     const btn = bar.querySelector(".ex-help-btn"), help = bar.querySelector(".ex-help");
@@ -349,8 +343,16 @@
     bar.querySelector(".ex-reset-all").addEventListener("click", () => {
       const play = box.querySelector(".ex-play");
       if (play && play.textContent === "עצירה") play.click();        // stop a running loop first
-      if (/^#(seed|state)-/.test(location.hash)) history.replaceState(null, "", `${location.pathname}${location.search}`);
+      if (/^#(seed|state|ctl)-/.test(location.hash)) history.replaceState(null, "", `${location.pathname}${location.search}`);
+      store.drop(storeKey(box));
       setup(box, !help.hidden);
+    });
+    const link = bar.querySelector(".ex-link");
+    link.addEventListener("click", () => {
+      const url = `${location.origin}${location.pathname}${linkOf(box)}`;
+      const done = () => { link.textContent = "הועתק ✓"; setTimeout(() => { link.textContent = "העתקת קישור"; }, 1500); };
+      const fallback = () => { window.prompt("הקישור :", url); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
     });
   };
 
@@ -434,33 +436,134 @@
     });
   };
 
+  // --- links and the remembered state ---------------------------------------------------
+
+  // The controls of a box are its inputs, selects and textareas in document order, the
+  // seed field aside. Their values are the payload of the header's link,
+  // `#ctl-<kind>-<n>.<head>~<v1>~<v2>…` (n counts the boxes of that kind on the page from
+  // 1): the head is the seed, after "s" when the controls were changed after the last
+  // seeded draw (the draw is replayed first) or after "S" when the draw came last (it is
+  // replayed after the controls), and empty when nothing was drawn (a seed the view put in
+  // the field when it was built is the page's own example, not a draw). A box with its own
+  // codec (opts.state of seedControls) links with `#state-<kind>.<payload>` instead.
+  // Applying a payload sets each control in turn and fires its input and change events,
+  // so a control that adds others (the bins of 0041) is set before the ones it adds.
+  const CTL_HASH = /^#ctl-([a-z0-9-]+)-(\d+)\.(.*)$/;
+  const controlsOf = (box) => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed"));
+  const valueOf = (el) => (el.type === "checkbox" || el.type === "radio" ? (el.checked ? "1" : "0") : el.value);
+  const enc = (v) => encodeURIComponent(v).replace(/~/g, "%7E");
+  const payloadOf = (box) => {
+    const seed = box.dvqSeed && box.dvqSeedAt ? box.dvqSeed.input.value : "";   // a field filled at mount is no draw
+    const head = seed ? `${(box.dvqSeedAt || 0) > (box.dvqCtlAt || 0) ? "S" : "s"}${seed}` : "";
+    return [head, ...controlsOf(box).map((el) => enc(valueOf(el)))].join("~");
+  };
+  const setValue = (el, v) => {
+    if (el.disabled || valueOf(el) === v) return;
+    if (el.tagName === "SELECT" && ![...el.options].some((o) => o.value === v)) return;
+    if (el.type === "checkbox" || el.type === "radio") el.checked = v === "1"; else el.value = v;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+  const applyPayload = (box, payload) => {
+    let parts;
+    try { parts = payload.split("~").map(decodeURIComponent); } catch (e) { return false; }
+    const m = /^([sS])(\d+)$/.exec(parts.shift());
+    const seed = () => {
+      const n = m ? Number(m[2]) : 0;
+      if (box.dvqSeed && n >= 1 && n <= SEED_MAX) box.dvqSeed.runSeed(n);
+    };
+    if (m && m[1] === "s") seed();
+    parts.forEach((v, i) => { const el = controlsOf(box)[i]; if (el) setValue(el, v); });
+    if (m && m[1] === "S") seed();
+    return true;
+  };
+  const indexOf = (box) => [...document.querySelectorAll(`.explorer[data-kind="${box.dataset.kind}"]`)].indexOf(box) + 1;
+  const ownState = (box) => (box.dvqState ? box.dvqState.get() : null);
+  const linkOf = (box) => {
+    const own = ownState(box);
+    return own ? `#state-${box.dataset.kind}.${own}` : `#ctl-${box.dataset.kind}-${indexOf(box)}.${payloadOf(box)}`;
+  };
+
+  // The remembered state: the box's payload (its own codec's when it has one) in
+  // localStorage, per page and box, written a moment after every change and restored when
+  // the box is next built, with a line that says so and offers to start over. "איפוס הכול"
+  // drops it. The saved entry carries the box's page attributes and the shape of its
+  // controls at their defaults, so a box that changed on the site starts from its
+  // defaults. A box opened through a link shows the link and remembers nothing.
+  const STORE = "dvq-box";
+  const storeKey = (box) => `${STORE}:${location.pathname}:${box.dataset.kind}:${indexOf(box)}`;
+  const store = {
+    get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } },
+    set(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) { /* storage off */ } },
+    drop(key) { try { localStorage.removeItem(key); } catch (e) { /* storage off */ } },
+  };
+  const stateOf = (box) => { const own = ownState(box); return own ? { own } : { ctl: payloadOf(box) }; };
+  const signature = (box) => JSON.stringify([{ ...box.dataset }, controlsOf(box).map((el) => `${el.tagName}.${el.type}`)]);
+  const save = (box) => {
+    if (box.dvqLinked || !box.dvqDefault) return;
+    const now = stateOf(box);
+    if (JSON.stringify(now) === box.dvqDefault) store.drop(storeKey(box));
+    else store.set(storeKey(box), { sig: box.dvqSig, ...now });
+  };
+  const restore = (box) => {
+    const saved = store.get(storeKey(box));
+    if (!saved) return;
+    const ok = saved.sig === box.dvqSig
+      && (saved.own ? Boolean(box.dvqState && box.dvqState.set(saved.own)) : applyPayload(box, saved.ctl || ""));
+    if (!ok) { store.drop(storeKey(box)); return; }
+    const note = document.createElement("p");
+    note.className = "ex-restored";
+    note.setAttribute("role", "status");
+    note.innerHTML = `התיבה חזרה למצב שבו עצרת. <button type="button" class="ex-restart">להתחיל מחדש</button>`;
+    box.querySelector(".ex-bar").after(note);
+    note.querySelector(".ex-restart").addEventListener("click", () => box.querySelector(".ex-reset-all").click());
+  };
+  // Once per box: a change of a control (not the seed field) is timed against the seeded
+  // draws, and any change is saved a moment later.
+  const watch = (box) => {
+    if (box.dvqWatched) return;
+    box.dvqWatched = true;
+    box.addEventListener("input", (e) => { if (!e.target.classList.contains("ex-seed")) box.dvqCtlAt = ++tick; }, true);
+    let timer = null;
+    const later = () => { clearTimeout(timer); timer = setTimeout(() => save(box), 300); };
+    ["input", "change", "click", "pointerup", "keyup"].forEach((ev) => box.addEventListener(ev, later));
+  };
+
   const setup = (box, helpOpen = false) => {
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
+    box.dvqSeedAt = box.dvqCtlAt = 0;                    // a rebuilt box has drawn nothing yet
     make(box).mount(box);
     header(box, helpOpen);
     keyboard(box);
     decorateLive(box);
+    watch(box);
+    box.dvqSig = signature(box);
+    box.dvqDefault = JSON.stringify(stateOf(box));
   };
 
   // --- lazy building -------------------------------------------------------------------------
 
   // A box is built when it comes within one screen of the viewport (a box inside a closed
-  // block waits until the block opens). The box a link points at (`#seed-<kind>-…` or
-  // `#state-<kind>.…`) is built at once, so it can scroll itself into view. ready() builds
-  // every box that is still waiting, for the page checks (tools/check_phone.py,
-  // tools/check_explorers.py) and for printing.
+  // block waits until the block opens), and then gets its remembered state back. The box a
+  // link points at (`#seed-<kind>-…`, `#state-<kind>.…` or `#ctl-<kind>-<n>.…`) is built at
+  // once, its closed blocks opened, and scrolled into view. ready() builds every box that
+  // is still waiting, for the page checks (tools/check_phone.py, tools/check_explorers.py)
+  // and for printing.
   const waiting = new Set();
   let observer = null;
   const build = (box) => {
     if (!waiting.delete(box)) return;
     if (observer) observer.unobserve(box);
     setup(box);
+    if (!box.dvqLinked) restore(box);
   };
   const ready = () => { [...waiting].forEach(build); return Promise.resolve(); };
-  const linkedKind = () => {
-    const m = SEED_HASH.exec(location.hash) || STATE_HASH.exec(location.hash);
-    return m ? m[1] : null;
+  const linked = (boxes) => {
+    const c = CTL_HASH.exec(location.hash), m = c || SEED_HASH.exec(location.hash) || STATE_HASH.exec(location.hash);
+    if (!m) return null;
+    const box = boxes.filter((b) => b.dataset.kind === m[1])[c ? Number(c[2]) - 1 : 0];
+    return box ? { box, payload: c ? c[3] : null } : null;
   };
 
   // --- the registry ----------------------------------------------------------------------------
@@ -480,16 +583,24 @@
     arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, f, floydParse, floydTrace, fmt, frame, hline,
     ltr, mulberry32, newSeed, randNote, randomRow, seedControls, speedSel, stickyNames, triNorm, waveDromText, waveStrip,
   };
-  globalThis.dvqExplorers = { lib, models, register, ready };
+  globalThis.dvqExplorers = { lib, models, register, ready, linkOf };
   if (typeof document === "undefined") return;
 
   window.addEventListener("beforeprint", ready);
   document.addEventListener("DOMContentLoaded", () => {
     const boxes = [...document.querySelectorAll(".explorer")];
     boxes.forEach((box) => waiting.add(box));
-    const kind = linkedKind();
-    const linked = kind && boxes.find((box) => box.dataset.kind === kind);
-    if (linked) build(linked);
+    const link = linked(boxes);
+    if (link) {
+      const { box, payload } = link;
+      for (let d = box.closest("details"); d; d = d.parentElement.closest("details")) d.open = true;
+      box.dvqLinked = true;
+      build(box);
+      if (payload !== null) {
+        applyPayload(box, payload);
+        requestAnimationFrame(() => box.scrollIntoView({ block: "start" }));
+      }
+    }
     if (!("IntersectionObserver" in window)) { ready(); return; }
     observer = new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting) build(e.target); });

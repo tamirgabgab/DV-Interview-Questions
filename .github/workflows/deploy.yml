@@ -118,7 +118,8 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
       # Every explorer box clicked through, each button once, then "reset everything":
-      # a script error or a page that turns wider than 390 px fails the deploy.
+      # a script error or a page that turns wider than 390 px fails the deploy. Then each
+      # box's link and remembered state reopen the same controls.
       - name: Click through every explorer box
         run: python tools/check_explorers.py site
       # Dark mode on request only (Actions → Run workflow → phone_dark), it doubles the check time.

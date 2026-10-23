@@ -2097,8 +2097,14 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ex-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.6rem; margin: -0.2rem 0 0.4rem; }
 .md-typeset .explorer .ex-help-btn { width: 1.35rem; height: 1.35rem; padding: 0; border-radius: 50%; border: 1px solid var(--viz-grid); background: var(--md-default-bg-color); color: var(--viz-ink); font: inherit; font-size: 0.7rem; font-weight: 700; line-height: 1; cursor: pointer; }
 .md-typeset .explorer .ex-help-btn[aria-expanded="true"] { background: var(--viz-s1); border-color: var(--viz-s1); color: var(--md-default-bg-color); }
-.md-typeset .explorer .ex-reset-all { border: none; background: none; padding: 0; color: var(--viz-text); font: inherit; font-size: 0.65rem; text-decoration: underline dotted; cursor: pointer; }
-.md-typeset .explorer .ex-reset-all:hover { color: var(--md-accent-fg-color); }
+.md-typeset .explorer .ex-reset-all,
+.md-typeset .explorer .ex-link,
+.md-typeset .explorer .ex-restart { border: none; background: none; padding: 0; color: var(--viz-text); font: inherit; font-size: 0.65rem; text-decoration: underline dotted; cursor: pointer; }
+.md-typeset .explorer .ex-reset-all:hover,
+.md-typeset .explorer .ex-link:hover,
+.md-typeset .explorer .ex-restart:hover { color: var(--md-accent-fg-color); }
+/* G221: the line under the header of a box that got its remembered state back */
+.md-typeset .explorer .ex-restored { margin: 0 0 0.5rem; padding: 0.25rem 0.5rem; border-inline-start: 3px solid var(--viz-s1); font-size: 0.65rem; color: var(--viz-text); background: var(--md-code-bg-color); }
 .md-typeset .explorer .ex-help { flex-basis: 100%; margin: 0; font-size: 0.7rem; line-height: 1.5; color: var(--viz-text); }
 .md-typeset .explorer .ex-help[hidden] { display: none; }
 
