@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-21 (session 18)_
+_Last updated: 2026-10-23 (session 21)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -1670,6 +1670,18 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     - The `kap4base` box; three long inline formulas widened the page on a phone and pushed
       the older kaprekar box's table out with it; they are display math now.
 
+### Session 21 — 2026-10-23: explorer proposals, rounds F to H
+
+1. **Explorer survey.** The owner asked for proposals to improve the explorer boxes,
+   grouped into rounds. A scan of the 41 views in `explorer.js` (shared controls used per
+   view: speed select, seed, state in the link, play) and of `mkdocs.yml` and
+   `check_phone.py` found the gaps listed under "Second series, rounds F to H": the file
+   is loaded and every box built on every page, no test clicks the boxes, the state link
+   exists in 5 boxes, nothing is remembered or downloadable. A speed item first proposed
+   in the chat was dropped: the scan showed a speed select on every play but the 0014
+   flash.
+2. **Rounds F to H** (F218 to H224) recorded with a suggested order; no code changed.
+
 ---
 
 ## In progress
@@ -1699,9 +1711,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 - Owner's checks on the live site: the five WaveDrom diagrams of round R (0034, 0035,
   0038), the dragging in the explorers on a real phone, and the new timing strips
   (0001, 0035) scrolled sideways on a phone.
-- Next: the owner's picks from rounds U to X (explorer polish), the rest of
-  round Q, rounds D to F, I, L, N, O and S, or new questions. (R105 and I59, the staff
-  questions, are dropped with the Staff level.)
+- Next: the owner's picks from the second series (rounds A to E on how answers are
+  presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
+  round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
+  (R105 and I59, the staff questions, are dropped with the Staff level.)
 - Waiting on the owner: enable Discussions and giscus (README, Comments) and fill in
   `extra.comments` in `mkdocs.yml`; check the social card of a shared link once deployed.
 
@@ -1714,7 +1727,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
-- [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14), U to X (explorer polish, proposed in session 20). M and R (without R105) are picked for sessions 17 and 18.
+- [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14), the second series A to E (presenting the answers) and F to H (the explorer boxes, proposed in session 21). U to X are done; M and R (without R105) were picked for sessions 17 and 18.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
@@ -2266,6 +2279,63 @@ What the short research found (sources in the chat summary of 2026-10-22):
 Suggested order: A181 and C191 (small, visible on every page), D195 then D194 (the phone
 figures are the weakest point today), B185 (the largest gain in understanding), then A182
 and A183.
+
+### Second series, rounds F to H — the explorer boxes (proposed 2026-10-23, owner picks)
+
+The owner asked for proposals to improve the explorer boxes. A read of `explorer.js`
+(41 views, 8,114 lines) on 2026-10-23 found:
+
+- `explorer.js` is 631 KB unminified and is listed in `extra_javascript`, so every page
+  loads and parses it, the home page and the catalogs included; every box on a page is
+  built at `DOMContentLoaded`, also the ones far below the fold.
+- No test clicks the boxes: the Node tests compare each model's math with the Python
+  reference, and `check_phone.py` loads every page (axe, `pageerror`, width) without
+  pressing a control. The 8,000 lines of view code have no interaction test.
+- The copy link carries the box state (`seedControls` with `opts.state`) in 5 boxes
+  (boxes, floyd, stock, acknak, credits); the other seeded boxes (eggs, seqdet, coverage,
+  horses, kapbase, kap4base, triangle, polygon, trace, endpoint and more) carry only the
+  seed, and the boxes driven by typed fields (cake, motorcycle, josephus, clock,
+  hourglass, bridge, pcie, fifo, mtbf, bfs01, abmap, camel, brackets, lfsr, div3) have no
+  link at all.
+- No box remembers its state when the reader comes back (no `localStorage`); nothing
+  downloads a figure or a table (U133 covers the WaveDrom strips only).
+- A speed select exists on every play except the 0014 shapes flash (350 ms), so no
+  speed item is needed.
+
+Item numbers continue the global count; rounds F to H here are the second series and do
+not collide with the first series' F to H (items 37 to 53).
+
+**Round F — safety net and load time**
+
+| Id | Idea | Size |
+|---|---|---|
+| F218 | **Click-through test of every box**: a Playwright run over the built site that, in every box, presses each button, plays to the end, uses "reset everything", copies a link and reopens it; it fails on a JS error, a console error or a page wider than 390 px. Runs in CI next to `check_phone.py` (offline routes as there) | M |
+| F219 | **Split and lazy-load `explorer.js`**: a small shared core (seed, strip, controls, header, keyboard) and one file per kind, loaded only on a page that has that kind; each box is built when it nears the viewport (IntersectionObserver); minified at build time. The Node tests keep requiring the same model exports | M–L |
+
+**Round G — the same behaviour in every box**
+
+| Id | Idea | Size |
+|---|---|---|
+| G220 | **State in the copy link for every box**: a generic serializer of the box's inputs, selects and toggles (plus the step index where a box steps), written to `#state-<kind>.<payload>`; the 5 hand-written states stay, every other box gets a link without its own code | M |
+| G221 | **The box remembers where the reader stopped**: the same payload saved per page and box in `localStorage` (wrapped in try / catch), restored on load, cleared by "reset everything"; a URL state wins over the saved one | S |
+| G222 | **Download the figure and the table**: a button per box that saves the current SVG (and a PNG) and the box's table as CSV, next to the WaveDrom row of U133 | S |
+
+Pairs with E200 (one layout for all boxes): both touch every view, so they are best done
+in the same pass.
+
+**Round H — practice inside the boxes**
+
+| Id | Idea | Size |
+|---|---|---|
+| H223 | **"Guess before the step"**: an optional practice mode in the stepping boxes that asks for the next state or the result before showing it (who survives in Josephus, how many drops for the eggs, the next state of seqdet, the next chain value in kaprekar) and counts the hits. Not H49 / L72 (a typed answer checked before the solution opens, deferred by the owner): this one lives inside the box and checks a step | M |
+| H224 | **"Open in the box" from the text**: a small button on a table row or a worked example that sets the box to those values and scrolls to it (a row of the k / n table of 0039, the base-7 example of 0012, the scripts of 0025); the page text and the box linked, as the second-series research recommends | S–M |
+
+Pairs with E199 (the answer lights up) and E201 (a first-visit guide).
+
+Suggested order: F218 first (a safety net before changes that touch every box), then F219
+with G220 (both reshape the shared code), G221 and G222 with E200, then round H with E199.
+D196 (controls in a bottom sheet on phones) and B186 (the page code stepped beside its
+state) stay open in their rounds.
 
 ### Round Z — new questions from outside sources (proposed 2026-10-22, owner picks)
 
