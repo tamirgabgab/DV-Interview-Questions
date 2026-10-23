@@ -75,14 +75,14 @@ def covered_table(tmax=9, ks=(1, 2, 3), n=N):
 
 def plan_table(k=K, n=N):
     t = min_drops(k, n)
-    lines = ["| הטלה | הקומה | אם נשברה : נשארו | אם לא נשברה : נשארו |", "|:-:|:-:|---|---|"]
+    lines = ["| הטלה | הקומה | אם נשברה : נשארו | אם לא נשברה : נשארו |", "|:-:|:-:|---|---|"]
     low = 0
     for i, fl in enumerate(first_egg_floors(k, n), 1):
         left = t - i
         below = fl - low - 1
         above = n - fl
         lines.append(f"| {RLM}{i} | {RLM}{fl} | {RLM}{k - 1} ביצים ו-{left} הטלות ל-{below} קומות ({low + 1} עד {fl - 1}) | "
-                     + (f"{RLM}{k} ביצים ו-{left} הטלות ל-{above} קומות ({fl + 1} עד {n}) |" if above else "הכול ידוע : הסף הוא 100 |"))
+                     + (f"{RLM}{k} ביצים ו-{left} הטלות ל-{above} קומות ({fl + 1} עד {n}) |" if above else "הכול ידוע : הסף הוא 100 |"))
         low = fl
     return "\n".join(lines)
 
@@ -118,7 +118,7 @@ def building_svg(k=K, n=N):
     second = [fl for fl, broke in run(k, n, first[0] - 1) if not broke and fl < first[0]]
     third = list(range(1, second[0]))
     p = [f'<svg class="figure egg-fig" viewBox="0 0 {W} {H}" style="max-width:40rem" role="img" '
-         f'aria-label="בניין של {n} קומות : הקומות של הביצה הראשונה {", ".join(map(str, first))}, של השנייה {", ".join(map(str, second))} ושל השלישית {third[0]} עד {third[-1]}">',
+         f'aria-label="בניין של {n} קומות : הקומות של הביצה הראשונה {", ".join(map(str, first))}, של השנייה {", ".join(map(str, second))} ושל השלישית {third[0]} עד {third[-1]}">',
          f'<rect class="egg-wall" x="{X0}" y="{TOP}" width="{X1 - X0}" height="{BOT - TOP}" rx="4"/>']
     for fl in range(10, n, 10):
         p.append(f'<line class="egg-floor" x1="{X0}" x2="{X1}" y1="{y(fl):.1f}" y2="{y(fl):.1f}"/>')
@@ -162,7 +162,7 @@ def threshold_chart(k=K, n=N):
 
     used = drops_per_threshold(k, n)
     t = min_drops(k, n)
-    c = Chart(f"מספר ההטלות לכל סף מ-0 עד {n} : לעולם לא יותר מ-{t}", x_max=n, y_max=t + 1, h=230, base=196)
+    c = Chart(f"מספר ההטלות לכל סף מ-0 עד {n} : לעולם לא יותר מ-{t}", x_max=n, y_max=t + 1, h=230, base=196)
     c.grid_y(list(range(0, t + 2, 3)))
     c.grid_x([0, 25, 50, 75, 100], dashed=True)
     c.hline(t, f"{t} = המקרה הגרוע", label_at="end")
@@ -174,7 +174,7 @@ def threshold_chart(k=K, n=N):
     c.add(f'<polyline class="s1-line" points="{path}" fill="none" stroke-width="2"/>')
     worst = [T for T, d in enumerate(used) if d == t]
     for T in worst[:1] + worst[-1:]:
-        c.dot(T + 0.5, used[T], "s2", r=4, title=f"סף {T} : {used[T]} הטלות")
+        c.dot(T + 0.5, used[T], "s2", r=4, title=f"סף {T} : {used[T]} הטלות")
     c.axis("הסף")
     return c.svg()
 
@@ -184,7 +184,7 @@ def chart_legend(k=K, n=N):
     t = min_drops(k, n)
     worst = sum(1 for d in used if d == t)
     return (f'<span class="viz-legend"><span><i class="by-multiples"></i>ההטלות שהתוכנית משתמשת בהן לסף הזה</span>'
-            f'<span><i class="by-enum"></i>ספים שמגיעים ל-{t} : {worst} מתוך {n + 1}</span></span>')
+            f'<span><i class="by-enum"></i>ספים שמגיעים ל-{t} : {worst} מתוך {n + 1}</span></span>')
 
 
 def blocks():

@@ -218,7 +218,7 @@ def grid_svg(a, b, c, seed, upto):
     CW, CH, X0, Y0 = 64, 40, 70, 30
     W, H = X0 + b * CW + 10, Y0 + len(rows) * CH + 10
     p = [f'<svg class="figure hr-grid" viewBox="0 0 {W} {H}" style="max-width:{W / 16:.0f}rem" role="img" '
-         f'aria-label="הסוסים אחרי {upto} תחרויות : שורה לכל קבוצה לפי סדר המנצחים, תא ירוק נקבע, כחול מועמד, אפור נפסל">']
+         f'aria-label="הסוסים אחרי {upto} תחרויות : שורה לכל קבוצה לפי סדר המנצחים, תא ירוק נקבע, כחול מועמד, אפור נפסל">']
     for i in range(b):
         p.append(f'<text class="tick" x="{X0 + i * CW + CW / 2:.0f}" y="{Y0 - 10}" text-anchor="middle">{i + 1}</text>')
     for j, row in enumerate(rows):
@@ -236,9 +236,9 @@ def grid_svg(a, b, c, seed, upto):
 
 
 def grid_legend():
-    return ('<span class="viz-legend"><span><i class="hr-key-placed"></i>נקבע : הדירוג המדויק ידוע</span>'
-            '<span><i class="hr-key-cand"></i>מועמד : פחות מ-c מהירים ידועים</span>'
-            '<span><i class="hr-key-out"></i>נפסל : לפחות c מהירים ידועים (המספר בפינה)</span></span>')
+    return ('<span class="viz-legend"><span><i class="hr-key-placed"></i>נקבע : הדירוג המדויק ידוע</span>'
+            '<span><i class="hr-key-cand"></i>מועמד : פחות מ-c מהירים ידועים</span>'
+            '<span><i class="hr-key-out"></i>נפסל : לפחות c מהירים ידועים (המספר בפינה)</span></span>')
 
 
 def blocks():

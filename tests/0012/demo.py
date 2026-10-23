@@ -16,3 +16,9 @@ while True:
         break
     path.append(x)
 print(" -> ".join(map(str, path)))
+
+# Part c: the same step in base 7, from 610 (301 in decimal)
+DIGITS = "0123456789ABCDEF"
+text = lambda v, b: "".join(DIGITS[u] for u in (v // (b * b), v // b % b, v % b))  # noqa: E731
+print("base 7:", " -> ".join(text(v, 7) for v in kaprekar_chain_b(301, 7)), "| attractor:", [text(v, 7) for v in kaprekar_attractor_b(7)])
+print("base 10 attractor:", kaprekar_attractor_b(10), "| base 12:", text(kaprekar_attractor_b(12)[0], 12))

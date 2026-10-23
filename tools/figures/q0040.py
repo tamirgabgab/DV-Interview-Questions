@@ -122,7 +122,7 @@ def diagram(pattern=PATTERN):
     L, nxt = len(pattern), table(pattern)
     W, H, Y, R = 660, 240, 118, 26
     xs = [70 + k * (W - 140) / (L - 1) for k in range(L)]
-    p = [f'<svg class="figure fs-fig" viewBox="0 0 {W} {H}" style="max-width:41rem" role="img" aria-label="דיאגרמת המצבים של גלאי {pattern} : {L} מצבים, הקשתות מסומנות בביט ובפלט">',
+    p = [f'<svg class="figure fs-fig" viewBox="0 0 {W} {H}" style="max-width:41rem" role="img" aria-label="דיאגרמת המצבים של גלאי {pattern} : {L} מצבים, הקשתות מסומנות בביט ובפלט">',
          '<defs><marker id="fs-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs>']
     labels = []
     for s in range(L):
@@ -154,8 +154,8 @@ def diagram(pattern=PATTERN):
 
 
 def legend():
-    return ('<span class="viz-legend"><span><i class="fs-key"></i>מעבר : הביט שמתקבל</span>'
-            '<span><i class="fs-key-found"></i>המעבר שמזהה : הביט / הפלט 1</span></span>')
+    return ('<span class="viz-legend"><span><i class="fs-key"></i>מעבר : הביט שמתקבל</span>'
+            '<span><i class="fs-key-found"></i>המעבר שמזהה : הביט / הפלט 1</span></span>')
 
 
 def blocks():

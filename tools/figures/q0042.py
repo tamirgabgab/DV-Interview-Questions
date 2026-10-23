@@ -199,7 +199,7 @@ def profile_chart(a=A, c=C, w=W, T=T):
     Chart = chart_module()
     segs = segments(a, c, w, T)
     d = segs[-1][1]
-    cc = Chart(f"המים בתנועה לאורך הדרך : מ-{num(w)} ליטר ב-0 ל-{num(T)} ב-{num(d)} ק\"מ, קטע לכל מחיר",
+    cc = Chart(f"המים בתנועה לאורך הדרך : מ-{num(w)} ליטר ב-0 ל-{num(T)} ב-{num(d)} ק\"מ, קטע לכל מחיר",
                x_max=float(d), y_max=float(w), h=250, base=210)
     cc.grid_y([0, 150, 300, 450] if w == 450 else [0, float(w) / 2, float(w)])
     cc.grid_x([float(x1) for _, x1, *_ in segs[:-1]], labels=[""] * (len(segs) - 1), dashed=True)
@@ -211,7 +211,7 @@ def profile_chart(a=A, c=C, w=W, T=T):
         xm, ym = float(x0 + x1) / 2, float(n0 + n1) / 2
         cc.text(xm, ym, f"{num(price(j, a))} ליטר לק\"מ", dx=0, dy=-10, rtl=True)
     for x0, x1, j, n0, n1 in segs[:-1]:
-        cc.dot(float(x1), float(n1), "s2", r=5, title=f"עצירה ב-{num(x1)} ק\"מ : נשארו {num(n1)} ליטר, {j - 1} מטענים")
+        cc.dot(float(x1), float(n1), "s2", r=5, title=f"עצירה ב-{num(x1)} ק\"מ : נשארו {num(n1)} ליטר, {j - 1} מטענים")
     cc.dot(float(d), float(T), "ink", r=5, title=f"היעד ב-{num(d)} ק\"מ עם {num(T)} ליטר")
     cc.axis("ק\"מ")
     return cc.svg()
@@ -219,7 +219,7 @@ def profile_chart(a=A, c=C, w=W, T=T):
 
 def profile_legend():
     return ('<span class="viz-legend"><span><i class="s1"></i>המים שעוד בתנועה (במחסן של תחילת הקטע ועל הגמל)</span>'
-            '<span><i class="s2"></i>עצירה : מטען שלם נגמר והמחיר לק"מ יורד</span>'
+            '<span><i class="s2"></i>עצירה : מטען שלם נגמר והמחיר לק"מ יורד</span>'
             '<span><i class="ink"></i>היעד</span></span>')
 
 
@@ -238,7 +238,7 @@ def distance_chart(a=A, c=C, T=T, wmax=3000):
     ap = [(w, approx(a, c, w, T)) for w in ws if w >= c]
     cc.path(ap, "ink-line", width=1.5, extra=' stroke-dasharray="6 4"')
     cc.path(exact, "s1-line", width=2.5)
-    cc.dot(W, float(distance(a, c, W, T)), "s2", r=5, title=f"{W} ליטר : {num(distance(a, c, W, T))} ק\"מ")
+    cc.dot(W, float(distance(a, c, W, T)), "s2", r=5, title=f"{W} ליטר : {num(distance(a, c, W, T))} ק\"מ")
     cc.axis("ליטר בהתחלה")
     return cc.svg()
 
@@ -246,7 +246,7 @@ def distance_chart(a=A, c=C, T=T, wmax=3000):
 def distance_legend():
     return ('<span class="viz-legend"><span><i class="s1"></i>המרחק המדויק (שבר בכל כפולה של 150)</span>'
             '<span><i class="ink-dash"></i>הקירוב 150 (ln n + 1.96) − 60</span>'
-            '<span><i class="s2"></i>סעיף א : 450 ליטר, 400 ק"מ</span></span>')
+            '<span><i class="s2"></i>סעיף א : 450 ליטר, 400 ק"מ</span></span>')
 
 
 def blocks():

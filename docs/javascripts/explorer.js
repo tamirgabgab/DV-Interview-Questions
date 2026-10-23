@@ -28,6 +28,7 @@
 //   ttt                    0011        tap cells on a 3 x 3 board: is it a legal final board and why not; random legal boards; wrap diagonals
 //   shapes                 0014        squares or rectangles drawn one at a time with the rejected candidates flashed; a heat map of draws
 //   kaprekar               0012, 0013  a number, its sort-and-subtract chain to 495 / 6174, the histogram of chain lengths
+//   kapbase                0012        three digits in a base from 2 to 16: the chain to the fixed point (even base) or the 2-cycle (odd), each step explained by d = max − min, the map d → max(b − d, d − 1) with the path, the histogram of chain lengths over all b³ numbers
 //   eurovision             0008        the announcements one by one: the cups under Israel's total against the points left; a what-if box
 //   boxes3                 0004        three mislabelled boxes with hidden contents: draw a ball, the deduction line by line
 //   edge                   0001        sig drawn cell by cell on a timing strip; sig_q and pulse follow, for a rising, falling or any edge; the reset trap
@@ -1429,6 +1430,38 @@
     return { hist, ends };
   };
 
+  // Sort the digits and subtract in base b (0012 part c): one step on three digits, the
+  // attractor (the fixed point of an even base, the two values of the cycle of an odd
+  // one), the chain until the value is in the attractor or 0, and the chain lengths over
+  // every number of the base.
+  const KB_DIGITS = "0123456789ABCDEF";
+  const kbDigits = (x, b) => [Math.floor(x / (b * b)), Math.floor(x / b) % b, x % b];
+  const kbText = (x, b) => kbDigits(x, b).map((v) => KB_DIGITS[v]).join("");
+  const kbParse = (text, b) => {                     // three digits of the base, or null
+    const t = String(text).trim().toUpperCase();
+    if (!/^[0-9A-F]{3}$/.test(t)) return null;
+    const vals = [...t].map((ch) => KB_DIGITS.indexOf(ch));
+    return vals.some((v) => v >= b) ? null : vals[0] * b * b + vals[1] * b + vals[2];
+  };
+  const kbStep = (x, b) => {
+    const sorted = kbDigits(x, b).sort((u, v) => u - v), [lo, mid, hi] = sorted;
+    const largest = hi * b * b + mid * b + lo, smallest = lo * b * b + mid * b + hi, diff = largest - smallest, d = hi - lo;
+    return { x, largest, smallest, diff, d, dNext: d ? Math.max(b - d, d - 1) : 0, digits: d ? [d - 1, b - 1, b - d] : [0, 0, 0] };
+  };
+  const kbAttractor = (b) => { const k = Math.floor(b / 2); return b % 2 === 0 ? [k * (b * b - 1)] : [k * (b * b - 1), (k + 1) * (b * b - 1)]; };
+  const kbChain = (x, b) => {
+    const att = kbAttractor(b), values = [x];
+    while (values[values.length - 1] !== 0 && !att.includes(values[values.length - 1]) && values.length < 40) values.push(kbStep(values[values.length - 1], b).diff);
+    return values;
+  };
+  const kbHistogram = (b) => {
+    const hist = [];
+    let zeros = 0;
+    for (let x = 0; x < b * b * b; x++) { const c = kbChain(x, b); const n = c.length - 1; hist[n] = (hist[n] || 0) + 1; if (c[c.length - 1] === 0) zeros++; }
+    for (let i = 0; i < hist.length; i++) hist[i] = hist[i] || 0;
+    return { hist, zeros };
+  };
+
   // Eurovision 2026 (0008): the grand final results, the announcement order (lowest jury
   // first), and the page's scan: after every announcement the public points left and the
   // room left under Israel's total; the first announcement after which Israel cannot win.
@@ -2247,6 +2280,7 @@
     TTT_LINES, TTT_WRAP, tttCheck, tttFinalBoards, tttRandom,
     shapesOverlap, shapesCandidates, shapesOk, shapesTry, shapesRandom, shapesHeat,
     kapStep, kapChain, kapHistogram,
+    kbDigits, kbText, kbParse, kbStep, kbAttractor, kbChain, kbHistogram,
     covProbs, covExpected, covK1, covCurve, covQuantile, covSimulate, covDraw,
     seqTable, seqRun,
     eggsTable, eggsDrops, eggsRun, eggsFirst, eggsPerThreshold,
@@ -2931,7 +2965,7 @@
         `<div class="clock-box">${face}<div class="clock-panel">` +
         `<p class="clock-time" dir="ltr"></p>` +
         `<label>שעה <input type="text" class="ex-time" inputmode="numeric" maxlength="8" size="8" ` +
-        `placeholder="HH:MM:SS" aria-label="שעה, שעות:דקות:שניות" dir="ltr"></label>` +
+        `placeholder="HH:MM:SS" aria-label="שעה, שעות : דקות : שניות" dir="ltr"></label>` +
         `<p class="clock-total"></p><ul class="clock-counts"></ul></div></div>` +
         `<label class="clock-day">היממה <input type="range" class="ex-day" min="0" max="${CLOCK_DAY - 1}" step="1" dir="ltr"></label>` +
         `<div class="clock-timeline" dir="ltr"></div>` +
@@ -4930,7 +4964,7 @@
         const pitch = (BOT - TOP) / n, y = (fl) => BOT - fl * pitch;
         const next = st.step < st.drops.length ? st.drops[st.step][0] : null;
         const len = Math.min(ZW, s.high - s.low - 1), w0 = st.win, w1 = st.win + len - 1;
-        let h = `<svg class="figure eg-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="הבניין : ${n} קומות, הקומות הידועות צבועות והטווח הלא ידוע ביניהן">` +
+        let h = `<svg class="figure eg-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="הבניין : ${n} קומות, הקומות הידועות צבועות והטווח הלא ידוע ביניהן">` +
           `<rect class="eg-wall" x="${X0}" y="${TOP}" width="${X1 - X0}" height="${BOT - TOP}" rx="3"/>` +
           `<rect class="eg-safe" x="${X0 + 1}" y="${f(y(s.low))}" width="${X1 - X0 - 2}" height="${f(BOT - y(s.low))}"/>` +
           `<rect class="eg-broke" x="${X0 + 1}" y="${TOP + 1}" width="${X1 - X0 - 2}" height="${f(Math.max(0, y(s.high - 1) - TOP - 1))}"/>`;
@@ -4940,7 +4974,7 @@
         h += `<text class="eg-tick" x="${X0 - 4}" y="${BOT + 3}" text-anchor="end">0</text><text class="eg-tick" x="${X0 - 4}" y="${TOP + 3}" text-anchor="end">${n}</text>`;
         h += `<line class="eg-thr" x1="${X0 - 2}" x2="${X1 + 2}" y1="${f(y(st.T))}" y2="${f(y(st.T))}"/>`;
         st.drops.slice(0, st.step).forEach(([fl, broke], i) => {
-          h += `<g class="eg-drop ${broke ? "is-broke" : "is-safe"}"><circle cx="${X1 + 16}" cy="${f(y(fl))}" r="7"/><text x="${X1 + 16}" y="${f(y(fl) + 3)}" text-anchor="middle">${i + 1}</text><title>הטלה ${i + 1} מקומה ${fl} : ${broke ? "נשברה" : "לא נשברה"}</title></g>`;
+          h += `<g class="eg-drop ${broke ? "is-broke" : "is-safe"}"><circle cx="${X1 + 16}" cy="${f(y(fl))}" r="7"/><text x="${X1 + 16}" y="${f(y(fl) + 3)}" text-anchor="middle">${i + 1}</text><title>הטלה ${i + 1} מקומה ${fl} : ${broke ? "נשברה" : "לא נשברה"}</title></g>`;
         });
         if (next !== null) h += `<line class="eg-next" x1="${X0}" x2="${X1 + 8}" y1="${f(y(next))}" y2="${f(y(next))}"/><text class="eg-nextlbl" x="${X1 + 28}" y="${f(y(next) + 3)}">${next}</text>`;
         h += `<rect class="eg-hit" x="${X0}" y="${TOP}" width="${X1 - X0}" height="${BOT - TOP}"/></svg>`;
@@ -4948,10 +4982,10 @@
       };
       const zoom = (s) => {
         const unknown = s.high - s.low - 1;
-        if (unknown <= 0) return `<p class="ex-note">אין קומות לא ידועות : הסף נמצא.</p>`;
+        if (unknown <= 0) return `<p class="ex-note">אין קומות לא ידועות : הסף נמצא.</p>`;
         const len = Math.min(ZW, unknown), w0 = st.win, w1 = w0 + len - 1, RH = 16, W = 250, H = len * RH + 8;
         const next = st.step < st.drops.length ? st.drops[st.step][0] : null;
-        let h = `<svg class="figure eg-zoomsvg" viewBox="0 0 ${W} ${H}" role="group" aria-label="תקריב : הקומות ${w0} עד ${w1}, לחיצה על קומה קובעת את הסף">`;
+        let h = `<svg class="figure eg-zoomsvg" viewBox="0 0 ${W} ${H}" role="group" aria-label="תקריב : הקומות ${w0} עד ${w1}, לחיצה על קומה קובעת את הסף">`;
         for (let i = 0; i < len; i++) {
           const fl = w1 - i, y0 = 4 + i * RH;
           const cls = (fl === st.T ? " is-thr" : "") + (fl === next ? " is-next" : "");
@@ -4969,12 +5003,12 @@
         for (let v = 0; v <= t + 1; v += ystep) h += `<line class="grid" x1="${X0}" x2="${W - R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`;
         const xs = n <= 10 ? Array.from({ length: n + 1 }, (_, i) => i) : [0, Math.round(n / 4), Math.round(n / 2), Math.round(3 * n / 4), n];
         xs.forEach((v) => { h += `<text class="tick" x="${f(X(v + 0.5))}" y="${BASE + 16}" text-anchor="middle">${v}</text>`; });
-        h += `<line class="ink-line" x1="${X0}" x2="${W - R}" y1="${f(Y(t))}" y2="${f(Y(t))}" stroke-width="1.5" stroke-dasharray="6 4"/><text class="legend" x="${W - R - 4}" y="${f(Y(t) - 6)}" text-anchor="end">המקרה הגרוע : ${t}</text>`;
+        h += `<line class="ink-line" x1="${X0}" x2="${W - R}" y1="${f(Y(t))}" y2="${f(Y(t))}" stroke-width="1.5" stroke-dasharray="6 4"/><text class="legend" x="${W - R - 4}" y="${f(Y(t) - 6)}" text-anchor="end">המקרה הגרוע : ${t}</text>`;
         let path = "";
         st.used.forEach((v, T) => { path += `${f(X(T))},${f(Y(v))} ${f(X(T + 1))},${f(Y(v))} `; });
         h += `<polyline class="s1-line" points="${path.trim()}" fill="none" stroke-width="2"/>`;
         h += `<rect class="eg-chart-thr" x="${f(X(st.T))}" y="${TOP}" width="${f(Math.max(2, X(1) - X(0)))}" height="${BASE - TOP}"/>`;
-        h += `<circle class="s2-dot" cx="${f(X(st.T + 0.5))}" cy="${f(Y(st.used[st.T]))}" r="5"><title>הסף ${st.T} : ${st.used[st.T]} הטלות</title></circle>`;
+        h += `<circle class="s2-dot" cx="${f(X(st.T + 0.5))}" cy="${f(Y(st.used[st.T]))}" r="5"><title>הסף ${st.T} : ${st.used[st.T]} הטלות</title></circle>`;
         return h + `<line class="axis" x1="${X0}" x2="${W - R}" y1="${BASE}" y2="${BASE}"/></svg>`;
       };
       const draw = () => {
@@ -4985,22 +5019,22 @@
         win.min = s.low + 1; win.max = Math.max(s.low + 1, s.high - len); win.value = st.win; win.disabled = s.high - s.low - 1 <= ZW;
         $(".eg-building").innerHTML = building(s);
         $(".eg-zoom").innerHTML = zoom(s);
-        $(".eg-zoomtitle").textContent = s.high - s.low > 1 ? `תקריב : קומות ${st.win} עד ${st.win + len - 1} מתוך ${s.high - s.low - 1} הלא ידועות (${s.low + 1} עד ${s.high - 1})` : "תקריב";
+        $(".eg-zoomtitle").textContent = s.high - s.low > 1 ? `תקריב : קומות ${st.win} עד ${st.win + len - 1} מתוך ${s.high - s.low - 1} הלא ידועות (${s.low + 1} עד ${s.high - 1})` : "תקריב";
         $(".eg-chart").innerHTML = chart();
         $(".ex-pos").textContent = `הטלה ${st.step} מתוך ${st.drops.length}`;
         $(".ex-prev").disabled = st.step === 0; $(".ex-next").disabled = done; $(".ex-end").disabled = done;
         const worstCount = st.used.filter((v) => v === st.worst).length;
-        $(".eg-sum").innerHTML = `${ltr(st.k)} ${st.k === 1 ? "ביצה" : "ביצים"} ו-${ltr(st.n)} קומות : המקרה הגרוע הוא ${ltr(st.worst)} הטלות, ` +
+        $(".eg-sum").innerHTML = `${ltr(st.k)} ${st.k === 1 ? "ביצה" : "ביצים"} ו-${ltr(st.n)} קומות : המקרה הגרוע הוא ${ltr(st.worst)} הטלות, ` +
           `והסף ${ltr(st.T)} דורש ${ltr(st.drops.length)}. ${worstCount === st.n + 1 ? "כל" : ltr(worstCount)} ${worstCount === 1 ? "סף אחד מגיע" : "ספים מגיעים"} למקרה הגרוע, ואף סף לא עובר אותו ✓`;
         let step;
-        if (st.step === 0) step = `לפני ההטלה הראשונה : ${ltr(st.n)} קומות לא ידועות, ${ltr(st.k)} ביצים ו-${ltr(st.worst)} הטלות. ` +
-          (st.drops.length ? `ההטלה הראשונה מקומה ${ltr(st.drops[0][0])} : מתחתיה ${ltr(st.drops[0][0] - 1)} קומות, בדיוק מה ש-${ltr(st.k - 1)} ${st.k - 1 === 1 ? "ביצה מספיקה לה" : "ביצים מספיקות להן"} ב-${ltr(st.worst - 1)} הטלות.` : "אין מה להטיל.");
+        if (st.step === 0) step = `לפני ההטלה הראשונה : ${ltr(st.n)} קומות לא ידועות, ${ltr(st.k)} ביצים ו-${ltr(st.worst)} הטלות. ` +
+          (st.drops.length ? `ההטלה הראשונה מקומה ${ltr(st.drops[0][0])} : מתחתיה ${ltr(st.drops[0][0] - 1)} קומות, בדיוק מה ש-${ltr(st.k - 1)} ${st.k - 1 === 1 ? "ביצה מספיקה לה" : "ביצים מספיקות להן"} ב-${ltr(st.worst - 1)} הטלות.` : "אין מה להטיל.");
         else {
           const [fl, broke] = st.drops[st.step - 1];
-          step = `הטלה ${ltr(st.step)} מקומה ${ltr(fl)} : ` + (broke ? `<span class="wv-bad">נשברה</span>, הסף מתחת ל-${ltr(fl)}, נשארו ${ltr(s.eggs)} ${s.eggs === 1 ? "ביצה" : "ביצים"}.` : `<span class="wv-ok">לא נשברה</span>, הסף הוא ${ltr(fl)} או מעליו.`) +
-            (done ? ` <b>הסתיים אחרי ${ltr(st.step)} הטלות</b> : קומה ${ltr(s.low)} בטוחה ו-${ltr(s.high)} שוברת, ולכן הסף הוא ${ltr(s.low)} ✓` :
+          step = `הטלה ${ltr(st.step)} מקומה ${ltr(fl)} : ` + (broke ? `<span class="wv-bad">נשברה</span>, הסף מתחת ל-${ltr(fl)}, נשארו ${ltr(s.eggs)} ${s.eggs === 1 ? "ביצה" : "ביצים"}.` : `<span class="wv-ok">לא נשברה</span>, הסף הוא ${ltr(fl)} או מעליו.`) +
+            (done ? ` <b>הסתיים אחרי ${ltr(st.step)} הטלות</b> : קומה ${ltr(s.low)} בטוחה ו-${ltr(s.high)} שוברת, ולכן הסף הוא ${ltr(s.low)} ✓` :
               ` נשארו ${ltr(s.high - s.low - 1)} קומות לא ידועות (${ltr(s.low + 1)} עד ${ltr(s.high - 1)}), ${ltr(s.eggs)} ${s.eggs === 1 ? "ביצה" : "ביצים"} ו-${ltr(s.left)} הטלות; הבאה מקומה ${ltr(st.drops[st.step][0])}` +
-              (s.eggs === 1 ? ` (ביצה אחרונה : קומה אחר קומה).` : `.`));
+              (s.eggs === 1 ? ` (ביצה אחרונה : קומה אחר קומה).` : `.`));
         }
         $(".eg-step").innerHTML = step;
         // the clickable floors
@@ -5062,14 +5096,14 @@
         `<label><span>הסתברות ל-1</span><input type="range" class="sq-p" min="0" max="100" step="5" value="50" dir="ltr" aria-label="ההסתברות שביט אקראי הוא 1, באחוזים"><output class="out-p">50%</output></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err sq-err"></span></div>` +
         `<div class="ex-controls ex-play-row">` +
-        `<span class="ex-title">הביט הבא :</span>` +
+        `<span class="ex-title">הביט הבא :</span>` +
         `<button type="button" class="md-button md-button--primary sq-bit" data-b="0">0</button>` +
         `<button type="button" class="md-button md-button--primary sq-bit" data-b="1">1</button>` +
         `<button type="button" class="md-button ex-next">ביט אקראי</button>` +
         `<button type="button" class="md-button ex-prev">ביטול הביט האחרון</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1200, 600, 250) +
         `<button type="button" class="md-button ex-start">ניקוי</button>` +
-        `<span class="wv-presets">דוגמאות : <button type="button" class="md-button ex-preset" data-s="1011011">1011011</button> <button type="button" class="md-button ex-preset" data-s="10101011">10101011</button></span></div>` +
+        `<span class="wv-presets">דוגמאות : <button type="button" class="md-button ex-preset" data-s="1011011">1011011</button> <button type="button" class="md-button ex-preset" data-s="10101011">10101011</button></span></div>` +
         `<p class="ex-summary sq-sum" aria-live="polite"></p><p class="sq-next"></p>` +
         `<div class="sq-graph"></div>` +
         `<span class="viz-legend"><span><i class="fs-key"></i>מעבר</span><span><i class="fs-key-found"></i>המעבר שמזהה (Mealy) או המצב שמוציא 1 (Moore)</span><span><i class="sq-key-cur"></i>המצב הנוכחי</span></span>` +
@@ -5083,7 +5117,7 @@
         const xs = Array.from({ length: N }, (_, k) => (N === 1 ? W / 2 : 50 + (k * (W - 100)) / (N - 1)));
         const cur = run.next, last = st.bits.length ? st.bits[st.bits.length - 1] : null, before = st.bits.length ? run.states[run.states.length - 1] : null;
         const target = (s, b) => { const n = t.nxt[s][b]; return st.moore || n < L ? n : t.rest; };
-        let h = `<svg class="figure sq-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="גרף המצבים : ${N} מצבים, המצב הנוכחי מודגש">` +
+        let h = `<svg class="figure sq-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="גרף המצבים : ${N} מצבים, המצב הנוכחי מודגש">` +
           `<defs><marker id="sq-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs>`;
         const labels = [];
         for (let s = 0; s < N; s++) for (let b = 0; b < 2; b++) {
@@ -5114,16 +5148,16 @@
           { name: "din", kind: "bit", values: bits, cls: "wv-s1" },
           { name: "state", kind: "bus", values: states.map((s) => `S${s}`), split: true },
           { name: "found", kind: "bit", values: out, cls: "wv-s2" },
-        ], n, { cursor: n - 1, ticks: (k) => from + k + 1, label: `רצועת התזמון : ${n} מחזורים` }) : `<p class="ex-note">עוד לא הוזן אף ביט.</p>`;
+        ], n, { cursor: n - 1, ticks: (k) => from + k + 1, label: `רצועת התזמון : ${n} מחזורים` }) : `<p class="ex-note">עוד לא הוזן אף ביט.</p>`;
         $(".sq-strip").scrollLeft = $(".sq-strip").scrollWidth;
         $(".ex-prev").disabled = st.bits.length === 0;
         const hits = run.out.reduce((a, b) => a + b, 0), pat = st.pattern.join("");
-        $(".sq-sum").innerHTML = `התבנית ${code(pat)}, ${st.moore ? "Moore" : "Mealy"} עם ${ltr(st.moore ? L + 1 : L)} מצבים : ` +
+        $(".sq-sum").innerHTML = `התבנית ${code(pat)}, ${st.moore ? "Moore" : "Mealy"} עם ${ltr(st.moore ? L + 1 : L)} מצבים : ` +
           (st.bits.length ? `${ltr(st.bits.length)} ביטים הוזנו, ${hits === 1 ? "זיהוי אחד" : `${ltr(hits)} זיהויים`}` : "עוד לא הוזן אף ביט") +
           (st.bits.length && run.out[run.out.length - 1] ? ` <span class="wv-ok">✓ המוצא גבוה עכשיו</span>` : "") + `. המצב הנוכחי ${code(`S${run.next}`)}` +
           (run.next === 0 ? " (כלום מהתבנית)." : run.next === L ? " (התבנית הסתיימה, המוצא 1)." : ` (הביטים האחרונים ${code(st.pattern.slice(0, run.next).join(""))}).`);
         const where = (b) => { const nx = t.nxt[run.next][b], det = nx === L; const s = st.moore || !det ? nx : t.rest; return `${code(String(b))} → ${code(`S${s}`)}${det ? (st.moore ? " (יוציא 1 במחזור הבא)" : " ופלט 1") : ""}`; };
-        $(".sq-next").innerHTML = `הביט הבא : ${where(0)}; ${where(1)}.` + (st.moore && run.next === L ? ` המצב ${code(`S${L}`)} מוציא 1 עכשיו, מחזור אחרי הביט האחרון.` : "");
+        $(".sq-next").innerHTML = `הביט הבא : ${where(0)}; ${where(1)}.` + (st.moore && run.next === L ? ` המצב ${code(`S${L}`)} מוציא 1 עכשיו, מחזור אחרי הביט האחרון.` : "");
       };
       const feed = (b) => { st.bits.push(b); draw(); };
       const setPattern = (text) => {
@@ -5167,7 +5201,7 @@
         `<div class="ex-controls">` +
         `<label>תאים <select class="cv-n" aria-label="מספר התאים">${Array.from({ length: NMAX - 1 }, (_, i) => `<option value="${i + 2}"${i + 2 === N0 ? " selected" : ""}>${i + 2}</option>`).join("")}</select></label>` +
         `<label>‏at_least <select class="cv-k" aria-label="פגיעות נדרשות בכל תא">${Array.from({ length: KMAX }, (_, i) => `<option value="${i + 1}"${i + 1 === K0 ? " selected" : ""}>${i + 1}</option>`).join("")}</select></label>` +
-        `<span class="wv-presets">משקלים : ${presets.map(([v, t]) => `<button type="button" class="md-button ex-preset" data-w="${v}">${t}</button>`).join(" ")}</span>` +
+        `<span class="wv-presets">משקלים : ${presets.map(([v, t]) => `<button type="button" class="md-button ex-preset" data-w="${v}">${t}</button>`).join(" ")}</span>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button></div>` +
         `<div class="cv-weights" role="group" aria-label="המשקל של כל תא"></div>` +
         `<div class="ex-controls ex-play-row">` +
@@ -5191,13 +5225,13 @@
       const binsSvg = (p) => {
         const n = st.w.length, W = 640, H = 190, X0 = 40, BASE = 150, TOP = 20, slot = (W - X0 - 12) / n, bw = Math.min(56, slot * 0.6);
         const top = Math.max(st.k + 1, ...st.hits), Y = (v) => BASE - (v / top) * (BASE - TOP);
-        let h = `<svg class="perf-chart cv-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="${n} התאים : מספר הפגיעות בכל אחד, והקו של at_least">`;
+        let h = `<svg class="perf-chart cv-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="${n} התאים : מספר הפגיעות בכל אחד, והקו של at_least">`;
         const step = top > 20 ? 5 : top > 8 ? 2 : 1;
         for (let v = 0; v <= top; v += step) h += `<line class="grid" x1="${X0}" x2="${W - 12}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`;
         h += `<line class="ink-line" x1="${X0}" x2="${W - 12}" y1="${f(Y(st.k))}" y2="${f(Y(st.k))}" stroke-width="1.5" stroke-dasharray="6 4"/><text class="legend halo" x="${X0 + 6}" y="${f(Y(st.k) - 5)}">at_least = ${st.k}</text>`;
         st.hits.forEach((v, i) => {
           const x = X0 + (i + 0.5) * slot, done = v >= st.k;
-          h += `<rect class="bar ${done ? "by-bfs" : "by-multiples"}" x="${f(x - bw / 2)}" y="${f(Y(v))}" width="${f(bw)}" height="${f(BASE - Y(v))}" rx="2"><title>תא ${i} : ${v} פגיעות, p = ${p[i].toFixed(3)}</title></rect>` +
+          h += `<rect class="bar ${done ? "by-bfs" : "by-multiples"}" x="${f(x - bw / 2)}" y="${f(Y(v))}" width="${f(bw)}" height="${f(BASE - Y(v))}" rx="2"><title>תא ${i} : ${v} פגיעות, p = ${p[i].toFixed(3)}</title></rect>` +
                `<text class="tick" x="${f(x)}" y="${f(Y(v) - 5)}" text-anchor="middle">${v}</text>` +
                `<text class="tick" x="${f(x)}" y="${BASE + 16}" text-anchor="middle">${i}</text><text class="tick" x="${f(x)}" y="${BASE + 32}" text-anchor="middle">${p[i].toFixed(2)}</text>`;
         });
@@ -5212,7 +5246,7 @@
         const W = 640, H = 210, X0 = 40, BASE = 170, TOP = 16, slot = (W - X0 - 12) / nb, cmax = Math.max(...counts);
         const Y = (v) => BASE - (v / cmax) * (BASE - TOP), X = (v) => X0 + ((v - lo) / width) * slot;
         let h = `<svg class="perf-chart cv-histsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="היסטוגרמה של מספר הטסטים ב-${m} ריצות">`;
-        counts.forEach((c, b) => { h += `<rect class="bar by-multiples" x="${f(X0 + b * slot + 1)}" y="${f(Y(c))}" width="${f(Math.max(1, slot - 2))}" height="${f(BASE - Y(c))}"><title>${lo + b * width}${width > 1 ? `–${lo + b * width + width - 1}` : ""} טסטים : ${c} ריצות</title></rect>`; });
+        counts.forEach((c, b) => { h += `<rect class="bar by-multiples" x="${f(X0 + b * slot + 1)}" y="${f(Y(c))}" width="${f(Math.max(1, slot - 2))}" height="${f(BASE - Y(c))}"><title>${lo + b * width}${width > 1 ? `–${lo + b * width + width - 1}` : ""} טסטים : ${c} ריצות</title></rect>`; });
         const mark = (v, cls, lab, dy) => `<line class="${cls}" x1="${f(X(v) + slot / 2)}" x2="${f(X(v) + slot / 2)}" y1="${TOP}" y2="${BASE}" stroke-width="2"/><text class="legend halo" x="${f(X(v) + slot / 2 + 4)}" y="${TOP + dy}">${lab}</text>`;
         h += mark(mean, "s2-line", `ממוצע ${mean.toFixed(1)}`, 12) + mark(exact, "ink-line", `תוחלת ${exact.toFixed(1)}`, 28) + mark(q95, "s3-line", `95% : ${q95}`, 44);
         const every = Math.max(1, Math.ceil(nb / 8));
@@ -5226,15 +5260,15 @@
         $(".ex-pos").textContent = `${st.t} טסטים`;
         $(".ex-next").disabled = done; $(".ex-end").disabled = done;
         const equal = st.w.every((w) => w === st.w[0]);
-        $(".cv-sum").innerHTML = `${ltr(n)} תאים${equal ? " שווים" : ` עם ההסתברויות ${ltr(p.map((x) => x.toFixed(2)).join(", "))}`}, לפחות ${ltr(st.k)} ${st.k === 1 ? "פגיעה" : "פגיעות"} בכל תא : התוחלת היא ${ltr(exact.toFixed(2))} טסטים` +
-          (k1 !== null ? ` (הנוסחה הסגורה : ${ltr(k1.toFixed(2))}${equal ? `, כלומר ${ltr(`${n}·H${n}`)}` : ""})` : " (האינטגרל)") + (equal && st.k === 1 ? `; ל-95% צריך ${ltr(covQuantile(n, 0.95))}.` : ".");
+        $(".cv-sum").innerHTML = `${ltr(n)} תאים${equal ? " שווים" : ` עם ההסתברויות ${ltr(p.map((x) => x.toFixed(2)).join(", "))}`}, לפחות ${ltr(st.k)} ${st.k === 1 ? "פגיעה" : "פגיעות"} בכל תא : התוחלת היא ${ltr(exact.toFixed(2))} טסטים` +
+          (k1 !== null ? ` (הנוסחה הסגורה : ${ltr(k1.toFixed(2))}${equal ? `, כלומר ${ltr(`${n}·H${n}`)}` : ""})` : " (האינטגרל)") + (equal && st.k === 1 ? `; ל-95% צריך ${ltr(covQuantile(n, 0.95))}.` : ".");
         const left = st.hits.filter((h) => h < st.k).length;
         $(".cv-run").innerHTML = st.t === 0 ? `עוד לא רץ אף טסט. "הטסט הבא" מגריל תא לפי ההסתברויות.` :
           done ? `<span class="wv-ok">✓ כיסוי מלא אחרי ${ltr(st.t)} טסטים</span>` + (st.t > exact ? `, יותר מהתוחלת.` : `, פחות מהתוחלת.`) :
-          `אחרי ${ltr(st.t)} טסטים חסרים עוד ${ltr(left)} ${left === 1 ? "תא" : "תאים"} (${ltr(st.hits.map((h, i) => (h < st.k ? i : null)).filter((v) => v !== null).join(", "))}); הסיכוי שהטסט הבא מתקדם : ${ltr(st.hits.reduce((acc, h, i) => acc + (h < st.k ? p[i] : 0), 0).toFixed(2))}.`;
+          `אחרי ${ltr(st.t)} טסטים חסרים עוד ${ltr(left)} ${left === 1 ? "תא" : "תאים"} (${ltr(st.hits.map((h, i) => (h < st.k ? i : null)).filter((v) => v !== null).join(", "))}); הסיכוי שהטסט הבא מתקדם : ${ltr(st.hits.reduce((acc, h, i) => acc + (h < st.k ? p[i] : 0), 0).toFixed(2))}.`;
         if (st.runs) {
           const m = st.runs.length, mean = st.runs.reduce((a, b) => a + b, 0) / m;
-          $(".cv-hist-title").innerHTML = `${ltr("1,000")} ריצות מהזרע ${ltr(st.seed)} : היסטוגרמה של מספר הטסטים עד הכיסוי`;
+          $(".cv-hist-title").innerHTML = `${ltr("1,000")} ריצות מהזרע ${ltr(st.seed)} : היסטוגרמה של מספר הטסטים עד הכיסוי`;
           $(".cv-hist").innerHTML = histSvg(exact);
           const sd = Math.sqrt(st.runs.reduce((a, v) => a + (v - mean) ** 2, 0) / m);
           $(".cv-hist-note").innerHTML = `הממוצע ${ltr(mean.toFixed(1))} לעומת התוחלת ${ltr(exact.toFixed(1))} (סטיית תקן ${ltr(sd.toFixed(1))}, שגיאת הממוצע כ-${ltr((sd / Math.sqrt(m)).toFixed(1))}); ` +
@@ -5288,7 +5322,7 @@
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
         `<p class="ex-summary cm-sum" aria-live="polite"></p><p class="cm-step"></p>` +
-        `<span class="viz-legend"><span><i class="cm-key-depot"></i>מחסן : הליטרים שבו מעל הציר</span><span><i class="cm-key-camel"></i>הגמל והליטרים שעליו</span><span><i class="cm-key-pass"></i>המעבר האחרון : ליטרים ביציאה ← בהגעה</span><span><i class="cm-key-next"></i>המעבר הבא</span></span>` +
+        `<span class="viz-legend"><span><i class="cm-key-depot"></i>מחסן : הליטרים שבו מעל הציר</span><span><i class="cm-key-camel"></i>הגמל והליטרים שעליו</span><span><i class="cm-key-pass"></i>המעבר האחרון : ליטרים ביציאה ← בהגעה</span><span><i class="cm-key-next"></i>המעבר הבא</span></span>` +
         `<div class="cm-road"></div>` +
         (fixed ? "" : `<p class="ex-title">המרחק המקסימלי לפי כמות המים בהתחלה, עם הקירוב הלוגריתמי מקווקו</p><div class="cm-chart"></div>`);
       const $ = (sel) => box.querySelector(sel);
@@ -5309,7 +5343,7 @@
         const W = 480, H = 200, X0 = 28, X1 = 452, YA = 110, BAR = 76, dmax = Math.max(st.d, 1e-9);   // 480 wide: readable at phone width
         const X = (x) => X0 + (x / dmax) * (X1 - X0);
         const pts = [0].concat(st.segs.map((sg) => sg.x1));
-        let h = `<svg class="figure cm-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="ציר הדרך מ-0 עד ${lit(st.d)} ק״מ : המחסנים עם הליטרים שבהם, הגמל במקומו ומה שעליו, והמעבר האחרון">` +
+        let h = `<svg class="figure cm-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="ציר הדרך מ-0 עד ${lit(st.d)} ק״מ : המחסנים עם הליטרים שבהם, הגמל במקומו ומה שעליו, והמעבר האחרון">` +
           `<line class="cm-axis" x1="${X0}" x2="${X1}" y1="${YA}" y2="${YA}"/>`;
         let lastLabel = -1e9, lastLitres = -1e9, lift = 0;
         pts.forEach((x, i) => {
@@ -5318,7 +5352,7 @@
           if (v > 1e-9) {
             lift = xx - lastLitres < 34 ? (lift + 1) % 3 : 0;            // crowded depots: the litres stacked in three rows
             lastLitres = xx;
-            h += `<rect class="cm-depot" x="${f(xx - 6)}" y="${f(YA - hb)}" width="12" height="${f(hb)}" rx="2"><title>מחסן ב-${lit(x)} ק״מ : ${lit(v)} ליטר</title></rect>` +
+            h += `<rect class="cm-depot" x="${f(xx - 6)}" y="${f(YA - hb)}" width="12" height="${f(hb)}" rx="2"><title>מחסן ב-${lit(x)} ק״מ : ${lit(v)} ליטר</title></rect>` +
               `<text class="cm-litres" x="${f(xx)}" y="${f(YA - hb - 5 - 12 * lift)}" text-anchor="middle">${lit(v)}</text>`;
           }
           if (xx - lastLabel >= 28 || i === pts.length - 1) { h += `<text class="cm-km" x="${f(xx)}" y="${YA + 19}" text-anchor="middle">${lit(x)}</text>`; lastLabel = xx; }
@@ -5352,7 +5386,7 @@
         const ap = ws.filter((w) => w >= st.c).map((w) => `${f(X(w))},${f(Y(Math.max(0, camelApprox(st.a, st.c, w, st.T))))}`).join(" ");
         h += `<polyline class="s1-line" points="${ws.map((w) => `${f(X(w))},${f(Y(camelDistance(st.a, st.c, w, st.T)))}`).join(" ")}" fill="none" stroke-width="2.5"/>`;
         if (ap) h += `<polyline class="ink-line" points="${ap}" fill="none" stroke-width="1.5" stroke-dasharray="6 4"/>`;
-        h += `<circle class="s2-dot" cx="${f(X(st.w))}" cy="${f(Y(st.d))}" r="5"><title>${lit(st.w)} ליטר : ${lit(st.d)} ק״מ</title></circle>`;
+        h += `<circle class="s2-dot" cx="${f(X(st.w))}" cy="${f(Y(st.d))}" r="5"><title>${lit(st.w)} ליטר : ${lit(st.d)} ק״מ</title></circle>`;
         return h + `<line class="axis" x1="${X0}" x2="${W - R}" y1="${BASE}" y2="${BASE}"/></svg>`;
       };
       const draw = () => {
@@ -5363,21 +5397,21 @@
         $(".ex-pos").textContent = `מעבר ${st.step} מתוך ${st.passes.length}`;
         $(".ex-prev").disabled = st.step === 0; $(".ex-next").disabled = done; $(".ex-end").disabled = done;
         const stops = st.segs.slice(0, -1).map((sg) => lit(sg.x1));
-        $(".cm-sum").innerHTML = `צריכה ${ltr(st.a)} ליטר לק"מ, קיבולת ${ltr(st.c)}, ${ltr(st.w)} ליטר בהתחלה ו-${ltr(st.T)} ליעד : ${ltr(k)} ${k === 1 ? "מטען" : "מטענים"}` +
+        $(".cm-sum").innerHTML = `צריכה ${ltr(st.a)} ליטר לק"מ, קיבולת ${ltr(st.c)}, ${ltr(st.w)} ליטר בהתחלה ו-${ltr(st.T)} ליעד : ${ltr(k)} ${k === 1 ? "מטען" : "מטענים"}` +
           (k > 1 ? ` (העליון ${ltr(lit(r))})` : "") + `, המרחק המקסימלי <b>${ltr(lit(st.d))} ק"מ</b>, ` +
           (stops.length ? `עצירות ב-${ltr(stops.join(", "))}` : "בלי עצירות") + `, ${ltr(st.passes.length)} מעברים. ` +
-          `בדיקה : נשרפו ${ltr(lit(st.w - st.T))} והגיעו ${ltr(lit(st.T))}, ביחד ${ltr(lit(st.w))} ✓` +
+          `בדיקה : נשרפו ${ltr(lit(st.w - st.T))} והגיעו ${ltr(lit(st.T))}, ביחד ${ltr(lit(st.w))} ✓` +
           (!fixed && st.w >= st.c ? ` הקירוב הלוגריתמי נותן ${ltr(lit(camelApprox(st.a, st.c, st.w, st.T)))}; פי ${ltr("e")} מים (${ltr(lit(Math.E * st.w))} ליטר) היו מוסיפים ${ltr(lit(st.c / (2 * st.a)))} ק"מ.` : "");
         let step;
-        if (st.step === 0) step = `לפני המעבר הראשון : ${ltr(lit(st.w))} ליטר במחסן של נקודת ההתחלה, והגמל ריק.` +
-          (st.passes.length ? ` המעבר הראשון : לוקח ${ltr(lit(st.passes[0].carry0))} ליטר ל-${ltr(lit(st.segs[0].x1))} ק"מ.` : " אין מה להזיז.");
+        if (st.step === 0) step = `לפני המעבר הראשון : ${ltr(lit(st.w))} ליטר במחסן של נקודת ההתחלה, והגמל ריק.` +
+          (st.passes.length ? ` המעבר הראשון : לוקח ${ltr(lit(st.passes[0].carry0))} ליטר ל-${ltr(lit(st.segs[0].x1))} ק"מ.` : " אין מה להזיז.");
         else {
           const p = s.last, sg = st.segs[p.seg], L = sg.x1 - sg.x0, cost = st.a * L;
-          step = `מעבר ${ltr(st.step)} (קטע ${ltr(p.seg + 1)}, ${p.back ? "חזור" : "הלוך"}) : ` +
+          step = `מעבר ${ltr(st.step)} (קטע ${ltr(p.seg + 1)}, ${p.back ? "חזור" : "הלוך"})  : ` +
             (p.back ? `חוזר מ-${ltr(lit(sg.x1))} ל-${ltr(lit(sg.x0))} עם ${ltr(lit(p.carry0))} ליטר, בדיוק מה ש-${ltr(lit(L))} ק"מ שורפים, ומגיע ריק.`
               : `יוצא מ-${ltr(lit(sg.x0))} עם ${ltr(lit(p.carry0))} ליטר, שורף ${ltr(lit(cost))} ב-${ltr(lit(L))} ק"מ ומגיע ל-${ltr(lit(sg.x1))} עם ${ltr(lit(p.carry1))}; ` +
                 (p.carry1 - p.drop > 1e-9 ? `משאיר ${ltr(lit(p.drop))} במחסן ושומר ${ltr(lit(p.carry1 - p.drop))} לדרך חזרה.` : `משאיר הכול (${ltr(lit(p.drop))}).`)) +
-            (done ? ` <b>הגיע ליעד</b> ב-${ltr(lit(st.d))} ק"מ עם ${ltr(lit(st.T))} ליטר ✓` : ` במחסנים : ${ltr(s.depots.map((v, i) => `${lit(i === 0 ? 0 : st.segs[i - 1].x1)} → ${lit(v)}`).filter((t) => !t.endsWith("→ 0")).join(", ") || "0 → 0")}.`);
+            (done ? ` <b>הגיע ליעד</b> ב-${ltr(lit(st.d))} ק"מ עם ${ltr(lit(st.T))} ליטר ✓` : ` במחסנים : ${ltr(s.depots.map((v, i) => `${lit(i === 0 ? 0 : st.segs[i - 1].x1)} → ${lit(v)}`).filter((t) => !t.endsWith("→ 0")).join(", ") || "0 → 0")}.`);
         }
         $(".cm-step").innerHTML = step;
       };
@@ -5434,7 +5468,7 @@
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
         `<p class="ex-summary hr-sum" aria-live="polite"></p><p class="hr-step"></p>` +
-        `<span class="viz-legend"><span><i class="hr-key-placed"></i>נקבע</span><span><i class="hr-key-cand"></i>מועמד</span><span><i class="hr-key-out"></i>נפסל (המספר : כמה מהירים ידועים)</span><span><i class="hr-key-now"></i>רץ בתחרות הזו</span></span>` +
+        `<span class="viz-legend"><span><i class="hr-key-placed"></i>נקבע</span><span><i class="hr-key-cand"></i>מועמד</span><span><i class="hr-key-out"></i>נפסל (המספר : כמה מהירים ידועים)</span><span><i class="hr-key-now"></i>רץ בתחרות הזו</span></span>` +
         `<div class="hr-gridbox"></div><p class="ex-title">התחרויות עד כה</p><div class="hr-table"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
@@ -5467,7 +5501,7 @@
       const grid = (s) => {
         const CW = 64, CH = 40, X0 = 70, Y0 = 30, W = X0 + st.b * CW + 10, H = Y0 + s.rows.length * CH + 10;
         const now = new Set(st.step ? st.plan.log[st.step - 1].horses : []);
-        let h = `<svg class="figure hr-grid hr-live" viewBox="0 0 ${W} ${H}" style="max-width:${(W / 16).toFixed(0)}rem" role="img" aria-label="הסוסים אחרי ${st.step} תחרויות : שורה לכל קבוצה, הצבע אומר נפסל, מועמד או נקבע">`;
+        let h = `<svg class="figure hr-grid hr-live" viewBox="0 0 ${W} ${H}" style="max-width : ${(W / 16).toFixed(0)}rem" role="img" aria-label="הסוסים אחרי ${st.step} תחרויות : שורה לכל קבוצה, הצבע אומר נפסל, מועמד או נקבע">`;
         for (let i = 0; i < st.b; i++) h += `<text class="tick" x="${X0 + i * CW + CW / 2}" y="${Y0 - 10}" text-anchor="middle">${i + 1}</text>`;
         s.rows.forEach((row, j) => {
           h += `<text class="tick" x="${X0 - 8}" y="${Y0 + j * CH + CH / 2 + 4}" text-anchor="end">${L[row.k]}${s.winners ? ` (${j + 1})` : ""}</text>`;
@@ -5501,10 +5535,10 @@
         $(".ex-pos").textContent = `תחרות ${st.step} מתוך ${R}`;
         $(".ex-prev").disabled = st.step === 0; $(".ex-next").disabled = done; $(".ex-end").disabled = done;
         const n = (st.c * (st.c + 1)) / 2 - 1;
-        $(".hr-sum").innerHTML = `${ltr(st.a)} סוסים, ${ltr(st.b)} במסלול, ${ltr(st.c)} ראשונים : <b>${ltr(R)} תחרויות</b> (${ltr(g)} קבוצות${g > 1 ? ", המנצחים" : ""}${R > g + 1 ? `, ועוד ${ltr(R - g - 1)} על המועמדים` : ""}); מועמדי המדרגות אחרי המנצחים : ${ltr(Math.min(n, st.a - 1))}. ` +
-          (done ? `הדירוג : ${ltr(st.plan.ranking.map((x, i) => `${i + 1}. ${nm(x)}`).join(", "))} ✓` : `זרע ${ltr(st.seed)}; המהירויות נסתרות${st.reveal ? ", והמתג חושף אותן" : ""}.`);
+        $(".hr-sum").innerHTML = `${ltr(st.a)} סוסים, ${ltr(st.b)} במסלול, ${ltr(st.c)} ראשונים : <b>${ltr(R)} תחרויות</b> (${ltr(g)} קבוצות${g > 1 ? ", המנצחים" : ""}${R > g + 1 ? `, ועוד ${ltr(R - g - 1)} על המועמדים` : ""}); מועמדי המדרגות אחרי המנצחים : ${ltr(Math.min(n, st.a - 1))}. ` +
+          (done ? `הדירוג : ${ltr(st.plan.ranking.map((x, i) => `${i + 1}. ${nm(x)}`).join(", "))} ✓` : `זרע ${ltr(st.seed)}; המהירויות נסתרות${st.reveal ? ", והמתג חושף אותן" : ""}.`);
         let step;
-        if (!st.step) step = `לפני התחרות הראשונה : ${ltr(st.a)} סוסים, אף אחד לא רץ, וכל סוס יכול להיות הראשון.`;
+        if (!st.step) step = `לפני התחרות הראשונה : ${ltr(st.a)} סוסים, אף אחד לא רץ, וכל סוס יכול להיות הראשון.`;
         else {
           const e = st.plan.log[st.step - 1];
           const reasons = e.gone.slice().sort((u, v) => (nm(u) < nm(v) ? -1 : 1)).map((x) => {
@@ -5512,8 +5546,8 @@
             return `${nm(x)} (${f.slice(0, st.c).map(nm).join(", ")}${f.length > st.c ? ` ועוד ${f.length - st.c}` : ""})`;
           });
           step = `תחרות ${ltr(st.step)}, ${whatText(e)} : ${ltr(e.order.map(nm).join(" > "))}. ` +
-            (e.gone.length ? `<span class="wv-bad">נפסלו ${ltr(e.gone.length)}</span>` + (e.what[0] === "final" || e.gone.length <= 6 ? ` : ${ltr(reasons.join("; "))}` : ` : ${ltr(e.gone.map(nm).sort().join(", "))}`) + ` (בסוגריים : מהירים ידועים). ` : "אף סוס לא נפסל. ") +
-            (e.placed.length ? `<span class="wv-ok">נקבעו</span> : ${ltr(e.placed.slice().sort((u, v) => rankOf(u) - rankOf(v)).map((x) => `${nm(x)} מקום ${rankOf(x)}`).join(", "))}. ` : "") +
+            (e.gone.length ? `<span class="wv-bad">נפסלו ${ltr(e.gone.length)}</span>` + (e.what[0] === "final" || e.gone.length <= 6 ? ` : ${ltr(reasons.join("; "))}` : ` : ${ltr(e.gone.map(nm).sort().join(", "))}`) + ` (בסוגריים : מהירים ידועים). ` : "אף סוס לא נפסל. ") +
+            (e.placed.length ? `<span class="wv-ok">נקבעו</span> : ${ltr(e.placed.slice().sort((u, v) => rankOf(u) - rankOf(v)).map((x) => `${nm(x)} מקום ${rankOf(x)}`).join(", "))}. ` : "") +
             (done ? `<b>סיימנו אחרי ${ltr(st.step)} תחרויות.</b>` : `נשארו ${ltr(e.open.length)} מועמדים פתוחים${st.step < R ? `; התחרות הבאה : ${ltr(st.plan.log[st.step].horses.map(nm).join(", "))}` : ""}.`);
         }
         $(".hr-step").innerHTML = step;
@@ -5541,6 +5575,123 @@
       $(".ex-end").addEventListener("click", () => { stop(); st.step = st.plan.log.length; draw(); });
       stop = autoplay(play, speed, { step: () => { st.step++; draw(); }, done: () => st.step >= st.plan.log.length, restart: () => { st.step = 0; draw(); } });
       compute();
+      draw();
+    },
+  });
+
+  // The base-b Kaprekar box (0012 part c): a base from 2 to 16 and three digits typed in
+  // that base; the chain played step by step in a table (the sort, the subtraction, the
+  // difference in the base and in decimal, d), a line that explains the step by the
+  // digits (d − 1, b − 1, b − d) and the move d → max(b − d, d − 1), the map of d with
+  // the path of the number, and the histogram of chain lengths over every b³ number.
+  const kapbaseView = () => ({
+    mount(box) {
+      const d0 = box.dataset, B0 = Math.min(16, Math.max(2, Number(d0.b || 7)));
+      const X0 = kbParse(d0.x || "610", B0) ?? 0;
+      const st = { b: B0, x: X0, step: 0 };
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label><span>הבסיס b</span><input type="range" class="kb-b" min="2" max="16" step="1" value="${st.b}" dir="ltr" aria-label="הבסיס, מ-2 עד 16"><output class="out-b">${st.b}</output></label>` +
+        `<label><span>שלוש ספרות בבסיס</span><input type="text" class="ex-num kb-x" maxlength="3" value="${kbText(st.x, st.b)}" dir="ltr" spellcheck="false" aria-label="שלוש ספרות בבסיס שנבחר, 0 עד 9 ו-A עד F"></label>` +
+        `<span class="kb-dec"></span>` +
+        `<button type="button" class="md-button ex-random">הגרלה</button>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err kb-err"></span></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא</button>` +
+        `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) +
+        `<button type="button" class="md-button ex-start">מההתחלה</button>` +
+        `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
+        `<p class="ex-summary kb-sum" aria-live="polite"></p><div class="kp-table kb-table"></div><p class="kb-step"></p>` +
+        `<p class="ex-title">המפה של d : מכל d חץ ל-max(b − d, d − 1), והמסלול של המספר מודגש</p><div class="kb-map"></div>` +
+        `<span class="viz-legend"><span><i class="kb-key-arrow"></i>חץ מ-d ל-d'</span><span><i class="kb-key-fixed"></i>היעד : נקודת שבת או מחזור</span><span><i class="kb-key-path"></i>המסלול של המספר</span></span>` +
+        `<p class="ex-title kb-hist-title"></p><div class="kb-chart"></div>`;
+      const $ = (sel) => box.querySelector(sel);
+      const play = $(".ex-play"), speed = $(".ex-speed"), input = $(".kb-x");
+      let H = null, Hb = 0;
+      const chainOf = () => kbChain(st.x, st.b);
+      const draw = () => {
+        const b = st.b, chain = chainOf(), att = kbAttractor(b), total = chain.length - 1;
+        st.step = Math.min(st.step, total);
+        const done = st.step === total;
+        $(".out-b").textContent = String(b);
+        if (document.activeElement !== input) input.value = kbText(st.x, b);
+        $(".kb-dec").innerHTML = `= ${ltr(st.x)} בעשרוני`;
+        $(".ex-pos").textContent = `צעד ${st.step} מתוך ${total}`;
+        $(".ex-prev").disabled = st.step === 0; $(".ex-next").disabled = done; $(".ex-end").disabled = done;
+        const attText = att.map((v) => kbText(v, b));
+        $(".kb-sum").innerHTML = `בסיס ${ltr(b)} : ` + (b % 2 === 0
+          ? `נקודת שבת יחידה <b>${ltr(attText[0])}</b> (‏${ltr(att[0])} בעשרוני, d = ${ltr(b / 2)}).`
+          : `אין נקודת שבת; המחזור <b>${ltr(attText[0])} ↔ ${ltr(attText[1])}</b> (‏${ltr(att[0])} ↔ ${ltr(att[1])} בעשרוני, d = ${ltr(Math.floor(b / 2))} ↔ ${ltr(Math.floor(b / 2) + 1)}).`) +
+          ` המספר ${ltr(kbText(st.x, b))} ` + (total === 0 ? (st.x === 0 || att.includes(st.x) ? `כבר ביעד.` : "") : `מגיע ליעד אחרי ${ltr(total)} ${total === 1 ? "צעד" : "צעדים"} : ${ltr(chain.map((v) => kbText(v, b)).join(" → "))}.`);
+        // the table of the steps so far
+        let rows = "";
+        for (let i = 0; i < Math.max(st.step, 0); i++) {
+          const sp = kbStep(chain[i], b);
+          rows += `<tr${i === st.step - 1 ? ' class="is-last"' : ""}><td>${ltr(i + 1)}</td><td>${ltr(kbText(sp.x, b))} (${ltr(sp.x)})</td><td>${ltr(kbText(sp.largest, b))}</td><td>${ltr(kbText(sp.smallest, b))}</td><td class="kb-diff">${ltr(`${sp.largest} − ${sp.smallest} = ${sp.diff} = <b>${kbText(sp.diff, b)}</b>`)}</td><td>${ltr(sp.d)}</td><td>${ltr(sp.dNext)}</td></tr>`;
+        }
+        $(".kb-table").innerHTML = st.step ? `<table tabindex="0" aria-label="צעדי המיון והחיסור בבסיס"><thead><tr><th>צעד</th><th>X</th><th>מהגדול לקטן</th><th>מהקטן לגדול</th><th>ההפרש</th><th>d</th><th>d הבא</th></tr></thead><tbody>${rows}</tbody></table>` : `<p class="ex-note">עוד לא נעשה צעד. ״הצעד הבא״ ממיין ומחסר.</p>`;
+        let text;
+        if (st.step === 0) {
+          const sp = kbStep(st.x, b);
+          text = sp.d === 0 ? `כל הספרות שוות, ולכן d = 0 וההפרש יהיה 0.` : `הספרה הגדולה פחות הקטנה : d = ${ltr(sp.d)}. ההפרש יהיה ${ltr(`d · (b² − 1) = ${sp.d} · ${b * b - 1} = ${sp.diff}`)}, עם הספרות ${ltr(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)}.`;
+        } else {
+          const sp = kbStep(chain[st.step - 1], b);
+          text = `צעד ${ltr(st.step)} : ‏d = ${ltr(sp.d)}, ולכן ${ltr(`F(X) = ${sp.d} · ${b * b - 1} = ${sp.diff}`)} = ${ltr(kbText(sp.diff, b))}, הספרות ${ltr(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)}; ` +
+            (sp.d === 0 ? `ההפרש 0 ושם זה נגמר.` : `ה-d הבא הוא ${ltr(`max(b − d, d − 1) = max(${b - sp.d}, ${sp.d - 1}) = ${sp.dNext}`)}.`) +
+            (done ? (att.includes(sp.diff) ? ` <b>${ltr(kbText(sp.diff, b))} ${b % 2 === 0 ? "היא נקודת השבת" : "במחזור"}</b>${b % 2 === 0 ? " : הצעד הבא מחזיר אותה לעצמה ✓" : ` : הצעד הבא נותן ${ltr(kbText(kbStep(sp.diff, b).diff, b))}, ואז שוב ${ltr(kbText(sp.diff, b))} ✓`}` : "") : "");
+        }
+        $(".kb-step").innerHTML = text;
+        // the map of d with the path so far
+        const W = 420, Hh = 150, X0 = 22, X1 = 398, YA = 90, X = (d) =>   // 420 wide: readable at phone width
+           (b > 2 ? X0 + ((d - 1) * (X1 - X0)) / (b - 2) : (X0 + X1) / 2);
+        const attD = att.map((v) => Math.floor(v / (b * b - 1)));
+        const path = new Set();
+        for (let i = 0; i < st.step; i++) { const sp = kbStep(chain[i], b); if (sp.d) path.add(`${sp.d}>${sp.dNext}`); }
+        let m = `<svg class="figure kb-map kb-live" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="המפה של d בבסיס ${b} עם המסלול של המספר"><line class="kb-axis" x1="${X0}" x2="${X1}" y1="${YA}" y2="${YA}"/>`;
+        for (let d = 1; d < b; d++) {
+          const nd = Math.max(b - d, d - 1);
+          m += `<text class="kb-tick" x="${f(X(d))}" y="${YA + 18}" text-anchor="middle">${d}</text>`;
+          if (nd === d) continue;
+          const up = nd > d, xa = X(d), xb = X(nd), bulge = up ? YA - 12 - 7 * Math.abs(nd - d) : YA + 26 + 7 * Math.abs(nd - d), y = up ? YA - 4 : YA + 4;
+          const cls = "kb-arrow" + (path.has(`${d}>${nd}`) ? " is-path" : "") + (attD.includes(d) && attD.includes(nd) ? " is-cycle" : "");
+          m += `<path class="${cls}" d="M ${f(xa)} ${y} Q ${f((xa + xb) / 2)} ${f(bulge)} ${f(xb)} ${y}"/><circle class="${cls}" cx="${f(xb)}" cy="${y}" r="2.6"/>`;
+        }
+        attD.forEach((d) => { m += `<circle class="kb-fixed" cx="${f(X(d))}" cy="${YA}" r="7"><title>d = ${d}</title></circle>`; });
+        const cur = kbStep(chain[st.step], b).d;
+        if (cur) m += `<circle class="kb-cur" cx="${f(X(cur))}" cy="${YA}" r="10"><title>d של המספר הנוכחי = ${cur}</title></circle>`;
+        $(".kb-map").innerHTML = m + "</svg>";
+        // the histogram of chain lengths over every number of the base
+        if (Hb !== b) { H = kbHistogram(b); Hb = b; }
+        const n = H.hist.length, ymax = Math.max(...H.hist), stepT = ymax > 2000 ? 500 : ymax > 400 ? 100 : ymax > 80 ? 20 : 5, ticks = [];
+        for (let v = 0; v <= ymax + stepT - 1; v += stepT) ticks.push(v);
+        const fr = frame("התפלגות מספר הצעדים עד היעד", n, ticks[ticks.length - 1], ticks, (v) => String(v));
+        let sv = fr.s;
+        H.hist.forEach((v, k) => {
+          const bw = Math.max(fr.slot * 0.6, 1), cls = k === total ? "by-enum" : "by-multiples";
+          sv += `<rect class="bar ${cls}" x="${f(fr.cx(k + 1) - bw / 2)}" y="${f(fr.Y(v))}" width="${f(bw)}" height="${f(BASE - fr.Y(v))}"><title>${k} צעדים : ${v} מספרים</title></rect>` +
+            `<text class="tick" x="${f(fr.cx(k + 1))}" y="${f(fr.Y(v) - 4)}" text-anchor="middle" font-size="10">${v}</text>` + fr.xtick(k + 1, k);
+        });
+        $(".kb-chart").innerHTML = sv + fr.close();
+        $(".kb-hist-title").textContent = `מספר הצעדים עד היעד על כל ${b * b * b} המספרים של בסיס ${b}; הארוך ביותר ${n - 1}, ו-${H.zeros} מספרים עם ספרות שוות נופלים ל-0`;
+      };
+      let stop = () => {};
+      const setX = (x) => { stop(); st.x = x; st.step = 0; draw(); };
+      $(".kb-b").addEventListener("input", () => {
+        stop(); const b = Number($(".kb-b").value);
+        const vals = kbDigits(st.x, st.b).map((v) => Math.min(v, b - 1));            // the same digits, clipped to the new base
+        st.b = b; st.x = vals[0] * b * b + vals[1] * b + vals[2]; st.step = 0; $(".kb-err").textContent = ""; draw();
+      });
+      input.addEventListener("change", () => { const x = kbParse(input.value, st.b); $(".kb-err").textContent = x === null ? `שלוש ספרות מ-0 עד ${KB_DIGITS[st.b - 1]}` : ""; if (x !== null) setX(x); else input.value = kbText(st.x, st.b); });
+      input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
+      const seed = seedControls(box, $(".ex-random"), (rng) => setX(Math.floor(rng() * st.b * st.b * st.b)));
+      $(".ex-random").addEventListener("click", () => seed.draw());
+      $(".ex-reset").addEventListener("click", () => { stop(); st.b = B0; st.x = X0; st.step = 0; $(".kb-b").value = B0; $(".kb-err").textContent = ""; draw(); });
+      $(".ex-next").addEventListener("click", () => { stop(); if (st.step < chainOf().length - 1) { st.step++; draw(); } });
+      $(".ex-prev").addEventListener("click", () => { stop(); if (st.step > 0) { st.step--; draw(); } });
+      $(".ex-start").addEventListener("click", () => { stop(); st.step = 0; draw(); });
+      $(".ex-end").addEventListener("click", () => { stop(); st.step = chainOf().length - 1; draw(); });
+      stop = autoplay(play, speed, { step: () => { st.step++; draw(); }, done: () => st.step >= chainOf().length - 1, restart: () => { st.step = 0; draw(); } });
       draw();
     },
   });
@@ -5763,7 +5914,7 @@
           $(".sh-heat").innerHTML = gridSvg((g) => {
             let s = "";
             h.cells.forEach((row, yi) => row.forEach((v, xi) => {
-              s += `<rect class="sh-cell" x="${f(g.X(xi + 1))}" y="${f(g.Y(yi + 2))}" width="${f(g.u)}" height="${f(g.u)}" fill-opacity="${f(0.85 * v / top, 2)}"><title>תא (${xi + 1}, ${yi + 1}) : ${v} מתוך ${h.rounds} הגרלות</title></rect>`;
+              s += `<rect class="sh-cell" x="${f(g.X(xi + 1))}" y="${f(g.Y(yi + 2))}" width="${f(g.u)}" height="${f(g.u)}" fill-opacity="${f(0.85 * v / top, 2)}"><title>תא (${xi + 1}, ${yi + 1})  : ${v} מתוך ${h.rounds} הגרלות</title></rect>`;
             }));
             return s;
           }, "מפת חום : כמה פעמים כל תא כוסה") +
@@ -5926,12 +6077,12 @@
         $(".eu-chart").innerHTML = s;
         const left = row.left, room = row.room;
         let step = st.k === 0
-          ? `מיד אחרי ההכרזה של ישראל (${ltr(`${sc.rows[0].jury} + ${sc.rows[0].pub} = ${sc.total}`)}) : `
-          : `אחרי ההכרזה של ${ltr(row.country)} (${ltr(`${row.jury} + ${row.pub} = ${row.total}`)}) : `;
+          ? `מיד אחרי ההכרזה של ישראל (${ltr(`${sc.rows[0].jury} + ${sc.rows[0].pub} = ${sc.total}`)})  : `
+          : `אחרי ההכרזה של ${ltr(row.country)} (${ltr(`${row.jury} + ${row.pub} = ${row.total}`)})  : `;
         step += `נותרו ${ltr(num(left))} נקודות קהל, והמקום הפנוי עד ${ltr(sc.total)} ב${n - st.k === 1 ? "כוס האחרונה" : `-${ltr(n - st.k)} הכוסות שנותרו`} הוא ${ltr(num(room))}. `;
         if (row.total > sc.total && st.k > 0) step += `<span class="eu-bad">✗ ${ltr(row.country)} עברה את ישראל, ההפסד ודאי.</span>`;
-        else if (left > room) step += `<span class="eu-bad">✗ יותר מים מנפח (${ltr(`${num(left)} > ${num(room)}`)}) : מישהי חייבת לעבור את ישראל.</span>`;
-        else step += `<span class="eu-ok">✓ הכול עוד נכנס (${ltr(`${num(left)} ≤ ${num(room)}`)}) : ישראל עדיין יכולה לנצח.</span>`;
+        else if (left > room) step += `<span class="eu-bad">✗ יותר מים מנפח (${ltr(`${num(left)} > ${num(room)}`)})  : מישהי חייבת לעבור את ישראל.</span>`;
+        else step += `<span class="eu-ok">✓ הכול עוד נכנס (${ltr(`${num(left)} ≤ ${num(room)}`)})  : ישראל עדיין יכולה לנצח.</span>`;
         $(".eu-step").innerHTML = step;
         const real = st.jury === 123 && st.pub === 220;
         $(".eu-sum").innerHTML = (sc.won
@@ -6013,7 +6164,7 @@
             const fixed = boxesFix(st.labels, first.ball);
             const other = first.ball === "RED" ? "BLACK" : "RED";
             lines.push(`הקופסה "אדום ושחור" לא מעורבת (התווית שגויה), ויצא ממנה ${HE[first.ball]} : יש בה רק ${HE[first.ball]}.`);
-            lines.push(`הקופסה שתוויתה "${HE[first.ball]}" לא מכילה ${HE[first.ball]} (תווית שגויה) ולא את התערובת (היא בקופסה ${ltr(k)}) : נשאר ${HE[other]}.`);
+            lines.push(`הקופסה שתוויתה "${HE[first.ball]}" לא מכילה ${HE[first.ball]} (תווית שגויה) ולא את התערובת (היא בקופסה ${ltr(k)})  : נשאר ${HE[other]}.`);
             lines.push(`הקופסה שתוויתה "${HE[other]}" מקבלת את מה שנשאר : אדום ושחור.`);
             $(".b3-step").innerHTML = `<span class="b3-ok">✓ דגימה אחת הספיקה.</span> התוויות הנכונות : ${fixed.map((c, i) => `קופסה ${ltr(i)} = ${HE[c]}`).join(", ")}.`;
             sum = `הדגימה מהקופסה "אדום ושחור" מכריעה תמיד, כי שני הסידורים האפשריים נבדלים בה בצבע אחד וברור.`;
@@ -6698,7 +6849,7 @@
       sum += fl.full ? `<span class="gr-ok">מלא ✓</span> : שני הביטים העליונים הפוכים (${ltr(wg.slice(0, 2))} מול ${ltr(rg.slice(0, 2))}) ו-${ltr(BITS - 2)} הנמוכים שווים (${ltr(wg.slice(2))}).`
         : `מלא? לא : ` + (topFlip ? `העליונים הפוכים, אבל הנמוכים ${ltr(wg.slice(2))} מול ${ltr(rg.slice(2))}.` : `העליונים ${ltr(wg.slice(0, 2))} מול ${ltr(rg.slice(0, 2))} אינם הפוכים.`);
       if (fl.occupancy === 0 && st.w !== 0) sum += ` בלי הביט הנוסף המצביעים היו ${ltr(lowBits)} ו-${ltr(bitsOf(ra, low))} : שווים, בדיוק כמו במצב מלא.`;
-      if (fl.full) sum += ` ${ltr(low)} הביטים הנמוכים של שני המצביעים שווים (${ltr(lowBits)}) : בלי הביט הנוסף זה היה נראה ריק.`;
+      if (fl.full) sum += ` ${ltr(low)} הביטים הנמוכים של שני המצביעים שווים (${ltr(lowBits)})  : בלי הביט הנוסף זה היה נראה ריק.`;
       $(".gr-sum").innerHTML = sum;
       // the strip: the last KEEP columns of the operations so far
       const all = grayFlagsOps(st.ops, SIZE), first = Math.max(0, all.length - KEEP), cols = all.slice(first);
@@ -6980,7 +7131,7 @@
         `<button type="button" class="md-button ex-end">לסוף התסריט</button><span class="ex-pos"></span>` +
         `<label>מתחילים מ-<select class="ex-start" aria-label="המספר הראשון"><option value="4094" selected>4094 (לפני הגלישה)</option><option value="0">0</option></select></label>` +
         `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
-        `<div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים :</span>` +
+        `<div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים :</span> ` +
         `<button type="button" class="md-button ex-send">ה-RC שולח TLP</button>` +
         `<button type="button" class="md-button ex-flush">טיימר ה-Ack פג</button>` +
         `<button type="button" class="md-button ex-timeout">ה-REPLAY_TIMER פג</button></div>` +
@@ -7044,7 +7195,7 @@
             case "nakHeld": return `‏Nak כבר נשלח על הפער הזה, ולכן לא יוצא עוד אחד (בלי סופת Nak-ים).`;
             case "badTlp": return `<span class="wv-bad">‏TLP ${ltr(it.seq)} הגיע עם LCRC שגוי : נזרק, המצב לא משתנה.</span>`;
             case "dup": return `‏TLP ${ltr(it.seq)} ישן (כבר נמסר) : נזרק, ויוצא Ack חוזר כדי שהמשדר ינקה את ה-Retry Buffer.`;
-            case "future": return `<span class="wv-bad">‏TLP ${ltr(it.seq)} הגיע לפני זמנו (מצפים ל-${ltr(it.expected)}) : נזרק.</span>`;
+            case "future": return `<span class="wv-bad">‏TLP ${ltr(it.seq)} הגיע לפני זמנו (מצפים ל-${ltr(it.expected)})  : נזרק.</span>`;
             case "lost": return `${it.kind ? (it.kind === "ACK" ? "Ack" : "Nak") + " " + ltr(it.seq) : "‏TLP " + ltr(it.seq)} אבד על הקו : אף צד לא יודע על זה עדיין.`;
             case "badDllp": return `<span class="wv-bad">${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} הגיע עם CRC שגוי : לא סומכים לא על הסוג ולא על המספר, נזרק.</span>`;
             case "purged": return `<span class="wv-ok">${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} מצטבר : ${seqs(it.seqs)} נמחקים מה-Retry Buffer ו-ACKD_SEQ הופך ל-${ltr(it.seq)}.</span>`;
@@ -7123,7 +7274,7 @@
         `<label>גודל ה-buffer <select class="ex-size" aria-label="גודל ה-buffer">${[3, 4, 5, 6, 8].map((v) => `<option value="${v}"${v === 5 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<label><input type="checkbox" class="ex-wrap"> <span>להתחיל מ-250 (הגלישה)</span></label>` +
         `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
-        `<div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים :</span>` +
+        `<div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים :</span> ` +
         `<button type="button" class="md-button cr-act" data-ev="grant">Credit Grant</button>` +
         `<button type="button" class="md-button cr-act" data-ev="transmit">ה-Egress משדר פקטה</button>` +
         `<button type="button" class="md-button cr-act" data-ev="receive" data-how="ok">הפקטה הבאה התקבלה</button>` +
@@ -7162,7 +7313,7 @@
           row("pcr", "PCR", "‏Ingress : פקטות שנכנסו ל-buffer") + row("pca", "PCA", "‏Ingress : תאים שהוקצו מאז ההקמה") +
           `<p class="cr-derived">קרדיטים ${ltr(`= PCL − PCC = ${credits}`)}; תאים פנויים לפי ה-Ingress ${ltr(`= PCA − PCR = ${free}`)}.</p>`;
         let cells = ""; for (let i = 0; i < s.size; i++) cells += `<span class="cr-slot${i < s.occ ? " is-full" : ""}"></span>`;
-        $(".cr-buf").innerHTML = `ה-buffer הייעודי (${ltr(s.size)} תאים, תפוסה ${ltr(s.occ)}) : <span class="cr-slots" dir="ltr">${cells}</span>`;
+        $(".cr-buf").innerHTML = `ה-buffer הייעודי (${ltr(s.size)} תאים, תפוסה ${ltr(s.occ)})  : <span class="cr-slots" dir="ltr">${cells}</span>`;
         $(".cr-link").innerHTML = `פקטות בדרך אל ה-Ingress : <span class="an-chips" dir="ltr">${s.link.length ? s.link.map((id, i) => `<span class="an-chip${i === 0 ? " is-head" : ""}">${id}</span>`).join("") : `<span class="an-empty">אין</span>`}</span>`;
         box.querySelectorAll(".cr-act").forEach((b) => {
           const ev = b.dataset.ev;
@@ -7204,7 +7355,7 @@
         switch (it.out) {
           case "grant": return `‏Credit Grant נושא ${ltr(`PCA = ${it.value}`)}; ה-Egress מחליף בו את PCL (לא מחבר), ועכשיו יש ${ltr(it.credits)} קרדיטים.`;
           case "transmitted": return `פקטה ${ltr(it.id)} שודרה : PCC עולה באחד והיא בדרך.`;
-          case "noCredit": return `<span class="wv-bad">שידור בלי קרדיט (${ltr(`PCC = ${it.pcc}, PCL = ${it.pcl}`)}) : המודל מדווח על הפרה ולא משנה דבר.</span>`;
+          case "noCredit": return `<span class="wv-bad">שידור בלי קרדיט (${ltr(`PCC = ${it.pcc}, PCL = ${it.pcl}`)})  : המודל מדווח על הפרה ולא משנה דבר.</span>`;
           case "received": return `פקטה ${ltr(it.id)} התקבלה : PCR עולה באחד והיא תופסת תא.`;
           case "lost": return `<span class="wv-bad">פקטה ${ltr(it.id)} אבדה על הקו : ה-Egress ספר אותה ב-PCC, ה-Ingress לא יודע עליה, ואף מונה שלו לא זז.</span>`;
           case "overflow": return `<span class="wv-bad">ה-buffer מלא : גלישה, הפרה של הסביבה.</span>`;
@@ -7625,6 +7776,7 @@
     ttt: tttView,
     shapes: shapesView,
     kaprekar: kaprekarView,
+    kapbase: kapbaseView,
     eurovision: euroView,
     boxes3: boxes3View,
     edge: edgeView,
@@ -7664,15 +7816,16 @@
     floyd: "המערך כגרף של זנב ומעגל : ״הגרלה״ או הקלדה קובעים אותו, ו״הצעד הבא״ ו״הפעלה״ מזיזים את הצב ואת הארנב דרך שני השלבים עד הערך הכפול.",
     bfs01: "השאריות מודולו x על טבעת : ״הצעד הבא״ מוציא שארית מהתור ומצייר את עץ ה-BFS, ובסוף התשובה נקראת בחזרה. שדה הספרות ומצב ״רק האורך״ הם שאלות ההמשך.",
     abmap: "בוחרים x ורואים את כל 45 זוגות הספרות a < b : בתא ירוק אורך הכפולה הקטנה ביותר, ו-✗ כשאין. לחיצה על תא מציגה את התשובה, את הפירוק x = 2^s · 5^t · m ואת הכלל של המשפט, ושתי הפונקציות של העמוד מושוות בכל תא.",
-    eggs: "k ביצים ו-n קומות בבקרות, והסף נבחר בלחיצה על הבניין, על קומה בתקריב או בשדה. ״ההטלה הבאה״ ו״הפעלה״ מריצים את התוכנית : הבניין צובע את הקומות הידועות, התקריב מראה את הקומות הלא ידועות אחת-אחת, והגרף סופר את ההטלות לכל סף מתחת לקו של המקרה הגרוע.",
-    seqdet: "מקלידים תבנית ובוחרים Mealy או Moore : הכפתורים 0 ו-1 מזינים ביט, ״ביט אקראי״ ו״הפעלה״ מגרילים לפי ההסתברות שבסליידר. הגרף מדגיש את המצב ואת המעבר שנלקח, הרצועה מראה din, state ו-found, והשורה מתחת אומרת לאן 0 ו-1 יובילו.",
-    coverage: "בוחרים מספר תאים, משקל לכל תא ו-at_least : ״הטסט הבא״ ו״הפעלה״ מגרילים טסט אחרי טסט עד שכל התאים מכוסים, ו״1,000 ריצות״ מציירות היסטוגרמה של מספר הטסטים עם הממוצע וה-95% לעומת התוחלת המחושבת.",
-    camel: "״המעבר הבא״ ו״הפעלה״ מזיזים את הגמל מעבר אחרי מעבר על ציר הדרך : הליטרים שעליו מסומנים לידו, כל מחסן מראה כמה ליטר יש בו, והשורה מתחת מסבירה מה הוא עשה. בתיבה הכללית הסליידרים והשדות קובעים את הצריכה, הקיבולת, המים והיעד, והגרף מראה את המרחק המקסימלי לכל כמות מים עם הקירוב הלוגריתמי.",
-    horses: "המהירויות מוגרלות מזרע ונסתרות, כמו בחידה. ״התחרות הבאה״ ו״הפעלה״ מריצים את התוכנית תחרות אחרי תחרות : הרשת צובעת כל סוס (נפסל, מועמד, נקבע) עם מספר המהירים הידועים ממנו, הטבלה גדלה, והשורה מתחת מסבירה מי נפסל ולמה. בתיבה הכללית קובעים a, b ו-c, ומתג החשיפה מראה את הדירוג האמיתי.",
+    eggs: "k ביצים ו-n קומות בבקרות, והסף נבחר בלחיצה על הבניין, על קומה בתקריב או בשדה. ״ההטלה הבאה״ ו״הפעלה״ מריצים את התוכנית : הבניין צובע את הקומות הידועות, התקריב מראה את הקומות הלא ידועות אחת-אחת, והגרף סופר את ההטלות לכל סף מתחת לקו של המקרה הגרוע.",
+    seqdet: "מקלידים תבנית ובוחרים Mealy או Moore : הכפתורים 0 ו-1 מזינים ביט, ״ביט אקראי״ ו״הפעלה״ מגרילים לפי ההסתברות שבסליידר. הגרף מדגיש את המצב ואת המעבר שנלקח, הרצועה מראה din, state ו-found, והשורה מתחת אומרת לאן 0 ו-1 יובילו.",
+    coverage: "בוחרים מספר תאים, משקל לכל תא ו-at_least : ״הטסט הבא״ ו״הפעלה״ מגרילים טסט אחרי טסט עד שכל התאים מכוסים, ו״1,000 ריצות״ מציירות היסטוגרמה של מספר הטסטים עם הממוצע וה-95% לעומת התוחלת המחושבת.",
+    camel: "״המעבר הבא״ ו״הפעלה״ מזיזים את הגמל מעבר אחרי מעבר על ציר הדרך : הליטרים שעליו מסומנים לידו, כל מחסן מראה כמה ליטר יש בו, והשורה מתחת מסבירה מה הוא עשה. בתיבה הכללית הסליידרים והשדות קובעים את הצריכה, הקיבולת, המים והיעד, והגרף מראה את המרחק המקסימלי לכל כמות מים עם הקירוב הלוגריתמי.",
+    horses: "המהירויות מוגרלות מזרע ונסתרות, כמו בחידה. ״התחרות הבאה״ ו״הפעלה״ מריצים את התוכנית תחרות אחרי תחרות : הרשת צובעת כל סוס (נפסל, מועמד, נקבע) עם מספר המהירים הידועים ממנו, הטבלה גדלה, והשורה מתחת מסבירה מי נפסל ולמה. בתיבה הכללית קובעים a, b ו-c, ומתג החשיפה מראה את הדירוג האמיתי.",
     brackets: "מקלידים מחרוזת סוגריים : ״הצעד הבא״ ו״הפעלה״ קוראים תו אחרי תו, המחסנית וגרף העומק מתעדכנים, והכישלון הראשון מסומן עם הסיבה.",
     ttt: "לוחצים על משבצות הלוח : התיבה אומרת אם זה לוח סיום חוקי ולמה לא. ״הגרלה״ נותנת לוח חוקי, והבורר מפעיל את האלכסונים המתגלגלים של סעיף ב.",
     shapes: "״עוד צורה״ מגריל מועמד ומראה את הנדחים בגלל חפיפה, ״הגרלה שלמה״ מציירת את כולן, ו״500 הגרלות״ בונה מפת חום. N, M ומספר הצורות בסליידרים.",
     kaprekar: "מקלידים או מגרילים מספר : ״הצעד הבא״ ממיין ומחסר עד 495 או 6174, וההיסטוגרמה סופרת את אורכי השרשראות של כל המספרים.",
+    kapbase: "בוחרים בסיס ומקלידים שלוש ספרות בו : ״הצעד הבא״ ו״הפעלה״ ממיינים ומחסרים צעד אחרי צעד, הטבלה מראה את ההפרש בבסיס ובעשרוני, השורה מתחת מסבירה את הספרות (d − 1, b − 1, b − d) ואת המעבר d → max(b − d, d − 1), המפה מראה את המסלול, וההיסטוגרמה סופרת את הצעדים של כל מספרי הבסיס.",
     eurovision: "״ההכרזה הבאה״ מוסיפה מדינה : הכוסות מתחת לסכום של ישראל כנגד הנקודות שנותרו. תיבת ה״מה אם״ משנה את הניקוד של ישראל.",
     boxes3: "שלוש קופסאות עם תוויות שגויות : לוחצים על קופסה כדי להוציא כדור, וההיסק נכתב שורה אחרי שורה. ״סידור אחר״ מגריל תכולה.",
     edge: "לוחצים על משבצות של sig ברצועת התזמון : sig_q ו-pulse עוקבים לפי בורר השפה. המתג מראה את מלכודת האיפוס, והכפתור טוען את הדיאגרמה של העמוד. ״העתקת WaveDrom״ מעתיקה את הרצועה כ-JSON.",
@@ -7732,7 +7885,7 @@
       btn.addEventListener("click", () => {
         const text = source();
         const done = () => { btn.textContent = "הועתק ✓"; setTimeout(() => { btn.textContent = "העתקת WaveDrom"; }, 1500); };
-        const fallback = () => { window.prompt("‏JSON של WaveDrom :", text); };
+        const fallback = () => { window.prompt("‏JSON של WaveDrom :" , text); };
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
       });
     });

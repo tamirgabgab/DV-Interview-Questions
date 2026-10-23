@@ -2265,3 +2265,24 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer table.hr-races td, .md-typeset .explorer table.hr-races th { padding: 0.2em 0.5em; }
 .md-typeset .explorer table.hr-races tr.is-now td { background: var(--diff-medium-bg); font-weight: 700; }
 .md-typeset .explorer table.hr-races td:nth-child(3) { white-space: nowrap; }
+
+/* Kaprekar in base b (0012 part c): the map of d and the explorer */
+.md-typeset svg .kb-axis { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .kb-tick { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg path.kb-arrow { fill: none; stroke: var(--viz-s1); stroke-width: 1.6; stroke-opacity: 0.75; }
+.md-typeset svg circle.kb-arrow { fill: var(--viz-s1); }
+.md-typeset svg path.kb-arrow.is-cycle { stroke: var(--viz-s3); stroke-width: 2.2; stroke-opacity: 1; }
+.md-typeset svg circle.kb-arrow.is-cycle { fill: var(--viz-s3); }
+.md-typeset svg path.kb-arrow.is-path { stroke: var(--viz-s2); stroke-width: 3; stroke-opacity: 1; }
+.md-typeset svg circle.kb-arrow.is-path { fill: var(--viz-s2); }
+.md-typeset svg .kb-fixed { fill: var(--viz-s3); fill-opacity: 0.35; stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .kb-cur { fill: none; stroke: var(--viz-s2); stroke-width: 2.5; stroke-dasharray: 4 3; }
+.md-typeset .viz-legend .kb-key-arrow { background: var(--viz-s1); }
+.md-typeset .viz-legend .kb-key-fixed { background: var(--viz-s3); opacity: 0.7; }
+.md-typeset .viz-legend .kb-key-path { background: var(--viz-s2); }
+.md-typeset .explorer svg.kb-live { width: 100%; max-width: 40rem; display: block; }
+.md-typeset .explorer input.kb-x { width: 4.5rem; letter-spacing: 0.15em; font-family: var(--md-code-font-family); text-transform: uppercase; }
+.md-typeset .explorer .kb-dec { font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .kb-step { margin: 0.4em 0 0.6em; }
+.md-typeset .explorer .kb-chart svg { max-width: 30rem; }
+.md-typeset .explorer .kb-table td.kb-diff { white-space: nowrap; }

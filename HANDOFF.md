@@ -1621,6 +1621,29 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       the race table, the explanation line with the known-faster horses in brackets, the
       reveal toggle (true ranks in the cells and in the tooltips), the seed field and
       the copy link. The general box validates a ≤ b² and c ≤ min(a, b).
+29. **0012 part c, three digits in base b (the owner's write-up, sent as Markdown;
+    verified first: every table and the base-7 example hold, and an exhaustive run over
+    bases 2 to 16 finds exactly the predicted fixed point or 2-cycle). Answers: a regular
+    part c with the difficulty raised to medium, bases 2 to 16 (digits 0-9, A-F), the
+    number typed as three digits in the base, the box shows the chain step by step, the
+    d-map and the histogram of chain lengths.**
+    - The page: F(X) = d(b² − 1), the digits (d − 1, b − 1, b − d), the map
+      d' = max(b − d, d − 1), even bases (fixed point (b/2 − 1, b − 1, b/2)) and odd bases
+      (the 2-cycle), the proof that a fixed point exists iff b is even, the convergence
+      (the longest chain is floor(b/2) + 1 steps from d = 1, one step in bases 2 and 3;
+      the owner's source did not state a bound, the page's first draft said ceil(b/2) and
+      the exhaustive test corrected it), the base-7 example, a trap on looking for a fixed
+      point in an odd base. Page code: `kaprekar_step_b`, `kaprekar_attractor_b` (SV
+      and Python) and `kaprekar_chain_b` (Python).
+    - `tools/figures/q0012.py` is new: the even and odd tables, the base-7 example table,
+      the d-map figures for bases 10 and 7 (with the path of 610 in base 7).
+    - The `kapbase` box: base slider, three-digit field with the decimal value, random
+      with a seed, the chain table, the explanation line, the live d-map (420 wide so it
+      reads on a phone) and the histogram.
+    - Also in this round: the colon rule (NBSP before) applied to 0039 to 0043 and to
+      the newer strings of `explorer.js` and the generators (the scratchpad colonfix
+      script; two of its changes were wrong and reverted: an English line in the template
+      and a q0023 f-string whose inserted text already starts with a space).
 
 ---
 
@@ -1685,7 +1708,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
-| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
+| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 
