@@ -16,3 +16,11 @@ while True:
         break
     path.append(x)
 print(" -> ".join(f"{v:04d}" for v in path), f"({len(path) - 1} steps)")
+
+# The bonus: four digits in base B
+DIG = "0123456789ABCDEF"
+text = lambda v, B: "".join(DIG[v // B**k % B] for k in (3, 2, 1, 0))  # noqa: E731
+for B in (5, 10, 15):
+    print(f"base {B}: fixed points", [text(v, B) for v in kaprekar4_fixed_b(B)])
+values, start = kaprekar4_orbit_b(1 * 15**3 + 2 * 15**2 + 3 * 15 + 4, 15)
+print("base 15, 1234:", " -> ".join(text(v, 15) for v in values), "| the cycle starts at step", start + 1)

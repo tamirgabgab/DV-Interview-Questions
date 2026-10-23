@@ -1644,6 +1644,31 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       the newer strings of `explorer.js` and the generators (the scratchpad colonfix
       script; two of its changes were wrong and reverted: an English line in the template
       and a q0023 f-string whose inserted text already starts with a space).
+    - CI caught a testbench bug after the push (run 154 red, nothing deployed): the
+      attractor of each base came from an initialiser on a declaration inside the loop of
+      the static `initial` block (the known quirk in "Technical notes"); Verilator 5.020
+      re-runs it, 5.053 does not. Fixed in d64d5a5 (run 156 green). Lesson: in tb.sv, never
+      initialise a declaration inside a loop of `initial`, and clear queues declared there.
+30. **0013 bonus, four digits in base B (the owner's write-up with the theorem and its
+    proof; verified first: the fixed points by an exhaustive search over the pairs for
+    every base from 2 to 60 and over every number to 12, the digit forms to base 30, the
+    value table to 50; all hold). Answers: the base is called B so the page keeps
+    a ≥ b ≥ c ≥ d and p, q; bases 2 to 16 in the box; the box shows the (p, q) map with
+    the path and where all numbers go; the full proof.**
+    - The page: F = p(B³ − 1) + q(B² − B), the digits (p − 1, B − 1, B − 1, B − p) or
+      (p, q − 1, B − q − 1, B − p), the condition on the pair, the q = 0 case, the three
+      pairings with every sub-case (the owner's P, Q, R, S are α, β, γ, δ here and u is t),
+      the family B = 5k with its value both ways, existence is not convergence (an
+      attractor table for B = 2..16 by running every number; base 15 has the fixed point
+      92B6 but only 2,160 of 50,610 numbers reach it), the map of the pairs in base 15 with
+      the path of 1234 (a 4-cycle 30DC, D852, B2B4, 9676), a trap on assuming convergence.
+      Page code: `kaprekar4_step_b`, `kaprekar4_fixed_b` (SV and Python),
+      `kaprekar4_orbit_b` (Python).
+    - `tools/figures/q0013.py` gained `blocks()` (the candidates figure of part b stays
+      pasted by hand): the theorem table, the family table, the base-15 example, the
+      attractor table, the map of the pairs and its legend.
+    - The `kap4base` box; three long inline formulas widened the page on a phone and pushed
+      the older kaprekar box's table out with it; they are display math now.
 
 ---
 

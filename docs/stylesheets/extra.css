@@ -2286,3 +2286,21 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .kb-step { margin: 0.4em 0 0.6em; }
 .md-typeset .explorer .kb-chart svg { max-width: 30rem; }
 .md-typeset .explorer .kb-table td.kb-diff { white-space: nowrap; }
+
+/* Kaprekar with four digits in base B (0013 bonus): the map of the pairs (p, q) */
+.md-typeset svg .kq-tick { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .kq-cell { stroke: var(--md-default-bg-color); stroke-width: 1; }
+.md-typeset svg .kq-cell.is-fixed { fill: var(--viz-s3); }
+.md-typeset svg .kq-cell.is-cycle { fill: var(--viz-s1); }
+.md-typeset svg .kq-cell.to-fixed { fill: var(--viz-s3); fill-opacity: 0.35; }
+.md-typeset svg .kq-cell.to-cycle { fill: var(--viz-s1); fill-opacity: 0.25; }
+.md-typeset svg .kq-path { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .kq-head { fill: var(--viz-s2); }
+.md-typeset svg .kq-start { fill: none; stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset .viz-legend .kq-key-fixed { background: var(--viz-s3); }
+.md-typeset .viz-legend .kq-key-cycle { background: var(--viz-s1); }
+.md-typeset .viz-legend .kq-key-tofixed { background: var(--viz-s3); opacity: 0.4; }
+.md-typeset .viz-legend .kq-key-tocycle { background: var(--viz-s1); opacity: 0.3; }
+.md-typeset .viz-legend .kq-key-path { background: var(--viz-s2); }
+.md-typeset .explorer svg.k4-live { width: 100%; max-width: 28rem; display: block; }
+.md-typeset .explorer input.k4-x { width: 5rem; letter-spacing: 0.15em; font-family: var(--md-code-font-family); text-transform: uppercase; }
