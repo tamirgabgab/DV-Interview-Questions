@@ -35,7 +35,8 @@ module tb;
     for (int x = 0; x <= 999; x++)
       if ((kaprekar_step_b(x, 10) == x) != is_special(x)) begin errors++; $display("base 10 step disagrees at %0d", x); end
     for (int b = 2; b <= 16; b++) begin
-      int x1, x2, n = kaprekar_attractor_b(b, x1, x2), y, d, lo, mid, hi, v;
+      int x1, x2, n, y, d, lo, mid, hi, v;   // no initializers: in a static block they would run only once
+      n = kaprekar_attractor_b(b, x1, x2);
       if (n == 1 && kaprekar_step_b(x1, b) != x1) begin errors++; $display("base %0d: %0d is not a fixed point", b, x1); end
       if (n == 2 && (kaprekar_step_b(x1, b) != x2 || kaprekar_step_b(x2, b) != x1)) begin errors++; $display("base %0d: %0d <-> %0d is not a cycle", b, x1, x2); end
       for (int x = 0; x < b * b * b; x++) begin
