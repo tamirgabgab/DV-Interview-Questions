@@ -1,5 +1,5 @@
 // kinds: lfsr
-//   lfsr                   0036        a width of 3 to 8 bits: tick the taps, step or play from 0…01 on a ring of the states (up to 6 bits); a strip of clk, state, s[0] and fb; the polynomials and their periods, the primitive ones counted
+//   lfsr                   0036        a width of 3 to 8 bits: tick the taps, step or play from 0…01 on a ring of the states (up to 6 bits); a strip of clk, state, s[0] and fb; the polynomials and their periods, the primitive ones counted; the proof panel: every cycle of the polynomial as its own ring
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -33,6 +33,19 @@
     const states = walk.states.concat(walk.states[walk.back]).slice(0, Math.min(k, total) + 1);
     const fb = states.map((s) => { let v = 0; for (let x = s & mask; x; x >>= 1) v ^= x & 1; return v; });
     return { states, out: states.map((s) => s & 1), fb, total };
+  };
+  // Every cycle of the step: with the 1 of the polynomial always a tap (bit 0 of the mask)
+  // the step can be undone, so the non-zero states split into disjoint cycles; the first
+  // one is the cycle of the seed 0…01, the rest in order of their smallest state.
+  const lfsrCycles = (mask, width) => {
+    const n = 1 << width, done = new Uint8Array(n), cycles = [];
+    for (let s0 = 1; s0 < n; s0++) {
+      if (done[s0]) continue;
+      const c = [];
+      for (let v = s0; !done[v]; v = lfsrNext(v, mask, width)) { done[v] = 1; c.push(v); }
+      cycles.push(c);
+    }
+    return cycles;
   };
   // φ(2^n − 1) / n: the number of primitive polynomials of degree n (Euler's totient by trial division)
   const lfsrPrimitiveCount = (width) => {
@@ -84,7 +97,9 @@
         `<p class="ex-summary lf-sum" aria-live="polite"></p></div></div>` +
         `<p class="ex-title">רצועת התזמון : המצב, הביט שיוצא (${code("s[0]")}) וביט ההיזון החוזר שנכנס, צעד אחרי צעד</p>` +
         `<div class="wv-wrap lf-strip" tabindex="0" role="group" aria-label="רצועת התזמון של ה-LFSR, גלילה אופקית"></div>` +
-        `<p class="ex-title lf-table-title"></p><div class="lf-table" tabindex="0"></div>`;
+        `<p class="ex-title lf-table-title"></p><div class="lf-table" tabindex="0"></div>` +
+        `<section class="ex-proof lf-proof"><p class="ex-proof-title">שלב ההוכחה : כל המחזורים של הפולינום</p>` +
+        `<div class="lf-cycles"></div><p class="lf-cycles-text"></p></section>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       let timer = null;
@@ -135,6 +150,59 @@
           { name: "fb", kind: "bit", values: sp.fb, cls: "wv-s1" },
         ], n, { slotW: SW, cursor: n - 1, ticks: (k) => k, label: `רצועת התזמון של ה-LFSR : ${n} מצבים` });
       };
+      // the proof panel: every state with its arrow, one small ring per cycle (up to 6 bits),
+      // the seed's cycle first and the current state lit, and the cycle lengths in words
+      const cyclesSvg = (cycles, cur) => {
+        const rr = st.width <= 4 ? 14 : st.width === 5 ? 10 : 5, label = st.width <= 5, gap = 14, Wd = 640;
+        // the fixed point 0 first, then the cycles; packed in rows, left to right
+        const rings = [{ c: [0], R: rr * 1.8 }].concat(cycles.map((c) => ({ c, R: Math.max(rr * 1.8, (c.length * (2 * rr + (rr > 8 ? 8 : 4))) / (2 * Math.PI)) })));
+        let x = gap, y = gap, rowH = 0, used = 0;
+        rings.forEach((g) => {
+          const D = 2 * (g.R + rr) + 4;
+          if (x + D > Wd - gap && x > gap) { x = gap; y += rowH + gap; rowH = 0; }
+          g.cx = x + D / 2; g.cy = y + D / 2; x += D + gap; rowH = Math.max(rowH, D); used = Math.max(used, x);
+        });
+        // the picture is as wide as its rings, so a few small rings fill a phone
+        const Hd = y + rowH + gap;
+        let s = `<svg class="figure lf-all" viewBox="0 0 ${f(used)} ${f(Hd)}" style="max-width:${f(used / 14)}rem" role="img" aria-label="כל ${cycles.length} המחזורים של המצבים שאינם אפס, ונקודת השבת 0">` +
+          `<defs><marker id="lf-arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="${rr > 8 ? 6 : 4}" markerHeight="${rr > 8 ? 6 : 4}" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="lf-arrowhead"/></marker></defs>`;
+        rings.forEach((g, j) => {
+          const L = g.c.length, cls = j === 0 ? "lf-zero" : `lf-c${(j - 1) % 3}`;
+          const pos = (i) => { const ang = -Math.PI / 2 + (i / L) * 2 * Math.PI; return [g.cx + g.R * Math.cos(ang), g.cy + g.R * Math.sin(ang)]; };
+          if (L === 1) {
+            const [px, py] = [g.cx, g.cy];
+            s += `<path class="lf-loop" d="M${f(px + rr * 0.7)},${f(py - rr * 0.7)} a ${f(rr * 0.8)} ${f(rr * 0.8)} 0 1 0 ${f(-rr * 1.4)} 0" marker-end="url(#lf-arrow2)"/>`;
+          } else {
+            for (let i = 0; i < L; i++) {
+              // a chord bent outward a little, so a cycle of two shows two arrows
+              const [x1, y1] = pos(i), [x2, y2] = pos((i + 1) % L), mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+              const ox = mx - g.cx, oy = my - g.cy, od = Math.hypot(ox, oy) || 1, bend = L === 2 ? g.R * 0.6 : rr * 0.6;
+              const qx = mx + (ox / od) * bend + (L === 2 ? (i ? -1 : 1) * g.R * 0.6 : 0), qy = my + (oy / od) * bend;
+              const u1 = Math.hypot(qx - x1, qy - y1) || 1, u2 = Math.hypot(x2 - qx, y2 - qy) || 1;
+              s += `<path class="lf-edge ${cls}" d="M${f(x1 + ((qx - x1) / u1) * rr)},${f(y1 + ((qy - y1) / u1) * rr)} Q${f(qx)},${f(qy)} ${f(x2 - ((x2 - qx) / u2) * (rr + 2))},${f(y2 - ((y2 - qy) / u2) * (rr + 2))}" fill="none" marker-end="url(#lf-arrow2)"/>`;
+            }
+          }
+          g.c.forEach((v, i) => {
+            const [px, py] = L === 1 ? [g.cx, g.cy] : pos(i);
+            s += `<g class="lf-node ${cls}${v === cur ? " is-cur" : ""}${v === SEED ? " is-seed" : ""}"><circle cx="${f(px)}" cy="${f(py)}" r="${rr}"><title>${bits(v)}</title></circle>` +
+                 (label ? `<text x="${f(px)}" y="${f(py + (rr > 12 ? 4 : 3))}" text-anchor="middle"${rr > 12 ? "" : ' font-size="7"'}>${bits(v)}</text>` : "") + `</g>`;
+          });
+          if (L > 1) s += `<text class="tick" x="${f(g.cx)}" y="${f(g.cy + 4)}" text-anchor="middle">${L}</text>`;
+        });
+        return s + "</svg>";
+      };
+      const drawCycles = (cur) => {
+        const cycles = lfsrCycles(st.mask, st.width), n = states(), lens = cycles.map((c) => c.length);
+        $(".lf-cycles").innerHTML = st.width <= RING_MAX ? cyclesSvg(cycles, cur) : "";
+        // the lengths: a sum when the cycles are few, counts per length otherwise
+        const byLen = new Map(); lens.forEach((l) => byLen.set(l, (byLen.get(l) || 0) + 1));
+        const sum = lens.length <= 8 ? lens.join(" + ") : [...byLen].sort((u, v) => v[0] - u[0]).map(([l, k]) => `${k} × ${l}`).join(" + ");
+        $(".lf-cycles-text").innerHTML = `הצעד הפיך, כי ה-1 של הפולינום הוא תמיד tap : מהמצב הבא אפשר לשחזר את הביט שיצא. לכן לכל מצב יש קודם אחד בלבד, ` +
+          `והמצבים מתחלקים למחזורים זרים. כאן ${ltr(n)} המצבים שאינם אפס מתחלקים ל-${ltr(lens.length)} ${lens.length === 1 ? "מחזור" : "מחזורים"} : ${ltr(`${sum} = ${n}`)}, ` +
+          `והאפס חוזר לעצמו. ` + (lens.length === 1
+            ? `<span class="lf-ok">מחזור אחד שעובר על כל ${ltr(n)} המצבים : הפולינום פרימיטיבי.</span>`
+            : `המחזור של ${code(bits(SEED))} ${st.width <= RING_MAX ? " (עם המסגרת העבה)" : ""} הוא ${ltr(lens[0])}, ואף התחלה לא מגיעה ליותר מ-${ltr(Math.max(...lens))} מצבים.`);
+      };
       const draw = () => {
         const walk = lfsrWalk(st.mask, st.width, SEED), total = walk.period, n = states();
         st.k = Math.min(st.k, total);
@@ -142,6 +210,7 @@
         const shown = walk.states.concat(walk.states[walk.back]).slice(0, st.k + 1);
         $(".lf-ring").innerHTML = st.width <= RING_MAX ? ring(walk, shown) : noRing();
         const cur = st.k < total ? walk.states[st.k] : walk.states[walk.back];
+        drawCycles(cur);
         const tapsIdx = [];
         for (let i = 0; i < st.width; i++) if ((st.mask >> i) & 1) tapsIdx.push(i);
         let fb = 0; tapsIdx.forEach((i) => { fb ^= (cur >> i) & 1; });
@@ -200,8 +269,8 @@
   dvqExplorers.register({
     views: { lfsr: lfsrView },
     help: {
-      lfsr: "מסמנים taps ובוחרים רוחב : ״צעד״ ו״הפעלה״ מריצים את המצב מ-0…01 על טבעת המצבים (עד 6 ביטים), רצועת התזמון מראה את המצב, הביט שיוצא וביט ההיזון בכל צעד, והטבלה נותנת את אורך המחזור של כל פולינום.",
+      lfsr: "מסמנים taps ובוחרים רוחב : ״צעד״ ו״הפעלה״ מריצים את המצב מ-0…01 על טבעת המצבים (עד 6 ביטים), רצועת התזמון מראה את המצב, הביט שיוצא וביט ההיזון בכל צעד, והטבלה נותנת את אורך המחזור של כל פולינום. שלב ההוכחה מצייר את כל המחזורים של הפולינום, טבעת קטנה לכל מחזור.",
     },
-    models: { lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, lfsrPrimitiveCount, lfsrStrip },
+    models: { lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, lfsrPrimitiveCount, lfsrStrip, lfsrCycles },
   });
 })();

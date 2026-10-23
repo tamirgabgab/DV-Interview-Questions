@@ -49,6 +49,39 @@ def test_explorer_matches_generator():
         assert sorted(got["moves"][s], key=str) == sorted([[i, t] for i, t in q0032.moves(s)], key=str), s
 
 
+def test_explorer_bfs_layers():
+    """The proof panel of the box: the BFS layers from the start with every parent one layer
+    up, against a plain Python BFS over the generator's moves; the goal is in layer 7 and the
+    parents give exactly the page's two mirror plans."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"const m = {explorer_require()}; console.log(JSON.stringify(m.riverLayers()));")
+    depth, layers = {0: 0}, [[0]]
+    while True:
+        nxt = []
+        for s in layers[-1]:
+            for _, t in q0032.moves(s):
+                if q0032.safe(t) and t not in depth:
+                    depth[t] = len(layers)
+                    nxt.append(t)
+        if not nxt:
+            break
+        layers.append(nxt)
+    assert [sorted(layer) for layer in got["layers"]] == [sorted(layer) for layer in layers]
+    assert {int(k): v for k, v in got["depth"].items()} == depth and depth[15] == 7
+    for t, ps in got["parents"].items():
+        t = int(t)
+        want = [[i, s] for s in depth for i, u in q0032.moves(s) if u == t and depth[s] == depth[t] - 1]
+        assert sorted([[i, p] for p, i in ps], key=str) == sorted(want, key=str), t
+
+    def plans(t):
+        if t == 0:
+            return [[]]
+        return [plan + [item] for p, item in got["parents"][str(t)] for plan in plans(p)]
+
+    assert sorted(map(str, plans(15))) == sorted(map(str, q0032.all_solutions()))
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 

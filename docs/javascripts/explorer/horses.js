@@ -1,5 +1,5 @@
 // kinds: horses
-//   horses                 0043        a horses, b per race, the c fastest in order (or the page's numbers with data-fixed): hidden seeded speeds, the plan played race by race on a grid of the groups with the race table and who was ruled out and why; a reveal toggle
+//   horses                 0043        a horses, b per race, the c fastest in order (or the page's numbers with data-fixed): hidden seeded speeds, the plan played race by race on a grid of the groups with the race table and who was ruled out and why; a reveal toggle; the proof panel: a tapped horse's known-faster set and the chain of results behind it
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -54,6 +54,27 @@
     return { ranking, log };
   };
 
+  // The proof of a known-faster set: after `step` races, every horse known faster than x
+  // with a shortest chain of direct results down to x (each link [faster, slower, race]),
+  // and the races those chains use.
+  const horsesChain = (log, step, x) => {
+    const above = new Map();                         // v -> [[u, race]]: u beat v in that race
+    log.slice(0, step).forEach((e, r) => e.order.forEach((u, i) => e.order.slice(i + 1).forEach((v) => {
+      if (!above.has(v)) above.set(v, []);
+      above.get(v).push([u, r]);
+    })));
+    const below = new Map([[x, null]]), queue = [x];   // below: y -> [the next horse down the chain, race]
+    for (let h = 0; h < queue.length; h++) {
+      (above.get(queue[h]) || []).forEach(([u, r]) => { if (!below.has(u)) { below.set(u, [queue[h], r]); queue.push(u); } });
+    }
+    const chains = queue.slice(1).map((y) => {
+      const links = [];
+      for (let u = y; u !== x; ) { const [v, r] = below.get(u); links.push([u, v, r]); u = v; }
+      return { y, links };
+    });
+    return { chains, races: [...new Set(chains.flatMap((c) => c.links.map((l) => l[2])))].sort((a, b) => a - b) };
+  };
+
   // The horse races box (0043): the page's numbers (data-fixed) or a, b and c to set;
   // hidden speeds drawn from a seed, the plan played race by race: a grid of the groups
   // (rows in the winners' order once they raced) with every horse coloured out /
@@ -63,7 +84,7 @@
     mount(box) {
       const d = box.dataset, fixed = d.fixed === "1", AMAX = 64, BMAX = 8, CMAX = 6, L = "ABCDEFGHIJ";
       const A0 = Number(d.a || 36), B0 = Number(d.b || 6), C0 = Number(d.c || 4), S0 = Number(d.seed || 1);
-      const st = { a: A0, b: B0, c: C0, seed: S0, speed: [], plan: null, step: 0, reveal: false, names: {} };
+      const st = { a: A0, b: B0, c: C0, seed: S0, speed: [], plan: null, step: 0, reveal: false, names: {}, pick: null };   // pick: the horse whose chain is shown
       box.innerHTML =
         (fixed ? "" :
           `<div class="ex-controls">` +
@@ -81,7 +102,8 @@
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
         `<p class="ex-summary hr-sum" aria-live="polite"></p><p class="hr-step"></p>` +
         `<span class="viz-legend"><span><i class="hr-key-placed"></i>נקבע</span><span><i class="hr-key-cand"></i>מועמד</span><span><i class="hr-key-out"></i>נפסל (המספר : כמה מהירים ידועים)</span><span><i class="hr-key-now"></i>רץ בתחרות הזו</span></span>` +
-        `<div class="hr-gridbox"></div><p class="ex-title">התחרויות עד כה</p><div class="hr-table"></div>`;
+        `<div class="hr-gridbox"></div><p class="ex-title">התחרויות עד כה</p><div class="hr-table"></div>` +
+        `<section class="ex-proof hr-proof"><p class="ex-proof-title">שלב ההוכחה : השרשרת מאחורי ההכרעה</p><p class="hr-chain"></p></section>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       const compute = () => {
@@ -90,6 +112,7 @@
         st.names = {};
         st.plan.log.forEach((e) => { if (e.what[0] === "group") e.order.forEach((x, i) => { st.names[x] = `${L[Math.floor(x / st.b)]}${i + 1}`; }); });
         st.step = Math.min(st.step, st.plan.log.length);
+        st.pick = null;
       };
       const nm = (x) => st.names[x] || `${L[Math.floor(x / st.b)]}?`;
       const rankOf = (x) => st.speed.filter((v) => v < st.speed[x]).length + 1;
@@ -113,6 +136,9 @@
       const grid = (s) => {
         const CW = 64, CH = 40, X0 = 70, Y0 = 30, W = X0 + st.b * CW + 10, H = Y0 + s.rows.length * CH + 10;
         const now = new Set(st.step ? st.plan.log[st.step - 1].horses : []);
+        const ch = st.pick === null ? null : horsesChain(st.plan.log, st.step, st.pick), lit = new Set(ch ? ch.chains.map((c) => c.y) : []);
+        const at = {};                                   // the centre of every horse's cell
+        s.rows.forEach((row, j) => row.horses.forEach((x, i) => { at[x] = [X0 + i * CW + CW / 2, Y0 + j * CH + CH / 2]; }));
         let h = `<svg class="figure hr-grid hr-live" viewBox="0 0 ${W} ${H}" style="max-width : ${(W / 16).toFixed(0)}rem" role="img" aria-label="הסוסים אחרי ${st.step} תחרויות : שורה לכל קבוצה, הצבע אומר נפסל, מועמד או נקבע">`;
         for (let i = 0; i < st.b; i++) h += `<text class="tick" x="${X0 + i * CW + CW / 2}" y="${Y0 - 10}" text-anchor="middle">${i + 1}</text>`;
         s.rows.forEach((row, j) => {
@@ -121,21 +147,50 @@
             const nf = s.faster[x].size, cls = nf + s.slower[x].size === st.a - 1 && nf < st.c ? "is-placed" : nf >= st.c ? "is-out" : "is-cand";
             const X = X0 + i * CW, Y = Y0 + j * CH;
             const label = s.raced.has(row.k) ? nm(x) : `${L[row.k]}?`;        // a name only once the group raced
-            h += `<g class="hr-cell ${cls}${now.has(x) ? " is-now" : ""}"><rect x="${X + 2}" y="${Y + 2}" width="${CW - 4}" height="${CH - 4}" rx="4"><title>${label} : ${nf} מהירים ידועים, ${s.slower[x].size} איטיים ידועים${st.reveal ? `, מקום אמיתי ${rankOf(x)}` : ""}</title></rect>` +
+            const name = `${label} ${nf}${st.reveal ? ` #${rankOf(x)}` : ""}`;   // the visible texts, in order
+            h += `<g class="hr-cell ${cls}${now.has(x) ? " is-now" : ""}${lit.has(x) ? " is-chain" : ""}${x === st.pick ? " is-pick" : ""}" data-x="${x}" tabindex="0" role="button" aria-pressed="${x === st.pick}" aria-label="${name}, השרשרת של הסוס"><rect x="${X + 2}" y="${Y + 2}" width="${CW - 4}" height="${CH - 4}" rx="4"><title>${label} : ${nf} מהירים ידועים, ${s.slower[x].size} איטיים ידועים${st.reveal ? `, מקום אמיתי ${rankOf(x)}` : ""}</title></rect>` +
               `<text class="hr-name" x="${X + CW / 2}" y="${Y + CH / 2 + 5}" text-anchor="middle">${label}</text><text class="hr-count" x="${X + CW - 6}" y="${Y + 13}" text-anchor="end">${nf}</text>` +
               (st.reveal ? `<text class="hr-rank" x="${X + 6}" y="${Y + CH - 6}">#${rankOf(x)}</text>` : "") + `</g>`;
           });
         });
+        if (ch) {
+          const links = new Map();
+          ch.chains.forEach((c) => c.links.forEach(([u, v]) => links.set(`${u}-${v}`, [u, v])));
+          links.forEach(([u, v]) => {
+            const [x1, y1] = at[u], [x2, y2] = at[v], d = Math.hypot(x2 - x1, y2 - y1) || 1, k = Math.min(16, d / 3);
+            h += `<line class="hr-link" x1="${f(x1 + ((x2 - x1) / d) * k)}" y1="${f(y1 + ((y2 - y1) / d) * k)}" x2="${f(x2 - ((x2 - x1) / d) * (k + 2))}" y2="${f(y2 - ((y2 - y1) / d) * (k + 2))}" marker-end="url(#hr-arrow)"/>`;
+          });
+          h = h.replace(">", `><defs><marker id="hr-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="ink-fill"/></marker></defs>`);
+        }
         return h + "</svg>";
+      };
+      // the proof line: who is known faster than the picked horse, and the chain of results
+      // that proves each, with the races that hold them lit in the table
+      const chainText = () => {
+        if (st.pick === null) return `לחצו על סוס ברשת, ויסומנו הסוסים שידוע שהם מהירים ממנו, החצים של התוצאות שמוכיחות את זה, והשורות של התחרויות האלה בטבלה.`;
+        const x = st.pick, ch = horsesChain(st.plan.log, st.step, x), n = ch.chains.length, s = after(st.step);
+        if (!s.raced.has(Math.floor(x / st.b))) return `הסוס הזה עוד לא רץ, ולכן אין עליו שום מידע.`;
+        const fast = s.faster[x].size, slow = s.slower[x].size;
+        const verdict = fast >= st.c ? `<span class="wv-bad">נפסל</span> : ${ltr(fast)} סוסים מהירים ממנו, ו-${ltr(st.c)} מספיקים כדי שלא יהיה בין ${ltr(st.c)} הראשונים.`
+          : fast + slow === st.a - 1 ? `<span class="wv-ok">נקבע במקום ${ltr(fast + 1)}</span> : ${ltr(fast)} מהירים ממנו וכל השאר איטיים ממנו.`
+          : `עדיין מועמד : רק ${ltr(fast)} ${fast === 1 ? "סוס מהיר" : "סוסים מהירים"} ממנו.`;
+        const SHOW = 8, sorted = ch.chains.slice().sort((p, q) => p.links.length - q.links.length || (nm(p.y) < nm(q.y) ? -1 : 1));
+        const line = (c) => `${ltr([c.y, ...c.links.map((l) => l[1])].map(nm).join(" > "))} (${c.links.length === 1 ? "תחרות" : "תחרויות"} ${ltr([...new Set(c.links.map((l) => l[2] + 1))].join(", "))})`;
+        return `הסוס ${nm(x)} ${verdict} ` + (n
+          ? `השרשראות : ${sorted.slice(0, SHOW).map(line).join("; ")}${n > SHOW ? `; ועוד ${ltr(n - SHOW)}` : ""}. ` +
+            `כל חץ הוא תוצאה של תחרות אחת, והשרשרת מעבירה את "מהיר מ-" הלאה, ולכן אין צורך שהשניים ירוצו יחד.`
+          : `אף סוס לא ידוע כמהיר ממנו.`);
       };
       const whatText = (e) => (e.what[0] === "group" ? `קבוצה ${L[e.what[1]]}` : e.what[0] === "winners" ? "המנצחים" : "המועמדים");
       const table = () => {
         if (!st.step) return `<p class="ex-note">עוד לא רצה תחרות.</p>`;
+        const used = new Set(st.pick === null ? [] : horsesChain(st.plan.log, st.step, st.pick).races);
         let h = `<table class="hr-races"><thead><tr><th>תחרות</th><th>מי רץ</th><th>התוצאה</th><th>נפסלו</th><th>נקבעו</th><th>פתוחים</th></tr></thead><tbody>`;
         st.plan.log.slice(0, st.step).forEach((e, r) => {
           const gone = e.gone.map(nm).sort().join(", ") || "—";
           const placed = e.placed.slice().sort((u, v) => rankOf(u) - rankOf(v)).map((x) => `${nm(x)} מקום ${rankOf(x)}`).join(", ") || "—";
-          h += `<tr${r === st.step - 1 ? ' class="is-now"' : ""}><td>${r + 1}</td><td>${whatText(e)}${e.what[0] === "group" ? "" : ` (${e.horses.length})`}</td><td dir="ltr">${e.order.map(nm).join(" > ")}</td><td>${gone}</td><td>${placed}</td><td>${e.open.length}</td></tr>`;
+          const cls = [r === st.step - 1 ? "is-now" : "", used.has(r) ? "is-proof" : ""].filter(Boolean).join(" ");
+          h += `<tr${cls ? ` class="${cls}"` : ""}><td>${r + 1}</td><td>${whatText(e)}${e.what[0] === "group" ? "" : ` (${e.horses.length})`}</td><td dir="ltr">${e.order.map(nm).join(" > ")}</td><td>${gone}</td><td>${placed}</td><td>${e.open.length}</td></tr>`;
         });
         return h + "</tbody></table>";
       };
@@ -144,6 +199,7 @@
         if (!fixed) { $(".hr-a").value = st.a; $(".hr-b").value = st.b; $(".out-b").textContent = String(st.b); $(".hr-c").value = st.c; $(".out-c").textContent = String(st.c); }
         $(".hr-gridbox").innerHTML = grid(s);
         $(".hr-table").innerHTML = table();
+        $(".hr-chain").innerHTML = chainText();
         $(".ex-pos").textContent = `תחרות ${st.step} מתוך ${R}`;
         $(".ex-prev").disabled = st.step === 0; $(".ex-next").disabled = done; $(".ex-end").disabled = done;
         const n = (st.c * (st.c + 1)) / 2 - 1;
@@ -160,7 +216,7 @@
           step = `תחרות ${ltr(st.step)}, ${whatText(e)} : ${ltr(e.order.map(nm).join(" > "))}. ` +
             (e.gone.length ? `<span class="wv-bad">נפסלו ${ltr(e.gone.length)}</span>` + (e.what[0] === "final" || e.gone.length <= 6 ? ` : ${ltr(reasons.join("; "))}` : ` : ${ltr(e.gone.map(nm).sort().join(", "))}`) + ` (בסוגריים : מהירים ידועים). ` : "אף סוס לא נפסל. ") +
             (e.placed.length ? `<span class="wv-ok">נקבעו</span> : ${ltr(e.placed.slice().sort((u, v) => rankOf(u) - rankOf(v)).map((x) => `${nm(x)} מקום ${rankOf(x)}`).join(", "))}. ` : "") +
-            (done ? `<b>סיימנו אחרי ${ltr(st.step)} תחרויות.</b>` : `נשארו ${ltr(e.open.length)} מועמדים פתוחים${st.step < R ? `; התחרות הבאה : ${ltr(st.plan.log[st.step].horses.map(nm).join(", "))}` : ""}.`);
+            (done ? `<b>סיימנו אחרי ${ltr(st.step)} תחרויות.</b>` : `נשארו ${ltr(e.open.length)} מועמדים פתוחים${st.step < R ? `; התחרות הבאה : ${ltr(st.plan.log[st.step].horses.map(nm).join(", "))}` : ""}.`);
         }
         $(".hr-step").innerHTML = step;
       };
@@ -179,6 +235,18 @@
         $(".ex-reset").addEventListener("click", () => { st.seed = S0; setParams(A0, B0, C0); });
       }
       $(".hr-show").addEventListener("change", () => { st.reveal = $(".hr-show").checked; draw(); });
+      // a tap or Enter on a horse shows its chain, again hides it
+      const pick = (cell, keyboard) => {
+        const x = Number(cell.dataset.x);
+        st.pick = st.pick === x ? null : x;
+        draw();
+        if (keyboard) { const again = box.querySelector(`.hr-cell[data-x="${x}"]`); if (again) again.focus(); }
+      };
+      $(".hr-gridbox").addEventListener("click", (e) => { const cell = e.target.closest(".hr-cell"); if (cell) pick(cell, false); });
+      $(".hr-gridbox").addEventListener("keydown", (e) => {
+        const cell = e.target.closest(".hr-cell");
+        if (cell && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(cell, true); }
+      });
       const seed = seedControls(box, $(".ex-random"), (rng, sd) => { stop(); st.seed = sd; st.step = 0; compute(); draw(); }, { seed: S0 });
       $(".ex-random").addEventListener("click", () => seed.draw());
       $(".ex-next").addEventListener("click", () => { stop(); if (st.step < st.plan.log.length) { st.step++; draw(); } });
@@ -194,8 +262,8 @@
   dvqExplorers.register({
     views: { horses: horsesView },
     help: {
-      horses: "המהירויות מוגרלות מזרע ונסתרות, כמו בחידה. ״התחרות הבאה״ ו״הפעלה״ מריצים את התוכנית תחרות אחרי תחרות : הרשת צובעת כל סוס (נפסל, מועמד, נקבע) עם מספר המהירים הידועים ממנו, הטבלה גדלה, והשורה מתחת מסבירה מי נפסל ולמה. בתיבה הכללית קובעים a, b ו-c, ומתג החשיפה מראה את הדירוג האמיתי.",
+      horses: "המהירויות מוגרלות מזרע ונסתרות, כמו בחידה. ״התחרות הבאה״ ו״הפעלה״ מריצים את התוכנית תחרות אחרי תחרות : הרשת צובעת כל סוס (נפסל, מועמד, נקבע) עם מספר המהירים הידועים ממנו, הטבלה גדלה, והשורה מתחת מסבירה מי נפסל ולמה. בתיבה הכללית קובעים a, b ו-c, ומתג החשיפה מראה את הדירוג האמיתי. לחיצה על סוס ברשת מראה בשלב ההוכחה את שרשרת התוצאות שמוכיחה מי מהיר ממנו.",
     },
-    models: { horsesSpeeds, horsesPlan },
+    models: { horsesSpeeds, horsesPlan, horsesChain },
   });
 })();

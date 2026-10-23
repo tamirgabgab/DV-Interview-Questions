@@ -1333,6 +1333,11 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ex-reset { padding: 0.2rem 0.7rem; font-size: 0.65rem; }
 .md-typeset .explorer .ex-summary { font-weight: 600; }
 .md-typeset .explorer .ex-title { margin: 0.6em 0 0; font-size: 0.7rem; color: var(--viz-text); }
+/* the proof panel inside a box: the step of the page's proof, driven by the same controls */
+.md-typeset .explorer .ex-proof { margin-top: 0.9rem; padding-top: 0.5rem; border-top: 1px dashed var(--viz-grid); }
+.md-typeset .explorer .ex-proof[hidden] { display: none; }
+.md-typeset .explorer .ex-proof-title { margin: 0 0 0.4em; font-size: 0.75rem; font-weight: 700; }
+.md-typeset .explorer .ex-proof .ex-nowrap { white-space: nowrap; }
 
 /* Box nets (0030): faces of the unfolded box, the path, and the embedded tool */
 .md-typeset svg .box-face { fill: var(--viz-s1); fill-opacity: 0.14; stroke: var(--viz-ink); stroke-width: 1.2; }
@@ -1895,6 +1900,14 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .lf-edge { stroke: var(--viz-s1); stroke-width: 1.5; stroke-opacity: 0.7; }
 .md-typeset svg .lf-edge.is-cur { stroke: var(--viz-s2); stroke-width: 2.5; stroke-opacity: 1; }
 .md-typeset svg .lf-arrowhead { fill: var(--viz-ink); }
+/* the cycles of the proof panel: a colour per cycle, in turn */
+.md-typeset .explorer svg.lf-all { width: 100%; max-width: 40rem; display: block; }
+.md-typeset svg .lf-node.lf-c0 circle { fill: var(--viz-s1); fill-opacity: 0.16; stroke: var(--viz-s1); }
+.md-typeset svg .lf-node.lf-c1 circle { fill: var(--viz-s3); fill-opacity: 0.16; stroke: var(--viz-s3); }
+.md-typeset svg .lf-node.lf-c2 circle { fill: var(--viz-s2); fill-opacity: 0.12; stroke: var(--viz-s2); }
+.md-typeset svg .lf-edge.lf-c1 { stroke: var(--viz-s3); }
+.md-typeset svg .lf-edge.lf-c2 { stroke: var(--viz-s2); }
+.md-typeset svg .lf-all .lf-node.is-cur circle { fill: var(--viz-ink); fill-opacity: 0.3; stroke: var(--viz-ink); stroke-width: 3; }
 .md-typeset svg .lf-loop { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 3 2; }
 .md-typeset .explorer .lf-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .lf-bad { color: var(--diff-hard); font-weight: 700; }
@@ -2253,6 +2266,11 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .hr-cell.is-placed rect { fill: var(--viz-s3); fill-opacity: 0.35; stroke: var(--viz-s3); stroke-width: 2; }
 .md-typeset svg .hr-cell.is-out rect { fill: var(--viz-grid); fill-opacity: 0.35; }
 .md-typeset svg .hr-cell.is-now rect { stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .hr-cell { cursor: pointer; }
+.md-typeset svg .hr-cell:focus-visible rect { outline: none; stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg .hr-cell.is-chain rect { stroke: var(--viz-ink); stroke-width: 2.5; stroke-dasharray: 5 3; }
+.md-typeset svg .hr-cell.is-pick rect { stroke: var(--viz-ink); stroke-width: 4; }
+.md-typeset svg .hr-link { stroke: var(--viz-ink); stroke-width: 1.8; stroke-opacity: 0.75; }
 .md-typeset svg .hr-name { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset svg .hr-cell.is-out .hr-name { fill: var(--viz-text); font-weight: 400; }
 .md-typeset svg .hr-count { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
@@ -2270,6 +2288,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer table.hr-races { font-size: 0.7rem; margin: 0; }
 .md-typeset .explorer table.hr-races td, .md-typeset .explorer table.hr-races th { padding: 0.2em 0.5em; }
 .md-typeset .explorer table.hr-races tr.is-now td { background: var(--diff-medium-bg); font-weight: 700; }
+.md-typeset .explorer table.hr-races tr.is-proof td { background: var(--md-code-bg-color); box-shadow: inset 0 -2px var(--viz-ink); }
+.md-typeset .explorer table.hr-races tr.is-proof td:first-child { font-weight: 700; }
 .md-typeset .explorer table.hr-races td:nth-child(3) { white-space: nowrap; }
 
 /* Kaprekar in base b (0012 part c): the map of d and the explorer */

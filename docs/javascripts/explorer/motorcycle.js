@@ -1,5 +1,5 @@
 // kinds: motorcycle
-//   motorcycle             0026        sliders t0 and t1, a strategy, and play: the travellers on the road and the chart; 1 to 5 riders, a km field, a second plan dashed
+//   motorcycle             0026        sliders t0 and t1, a strategy, and play: the travellers on the road and the chart; 1 to 5 riders, a km field, a second plan dashed; the proof panel: the drop point D against both arrival times
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -100,6 +100,15 @@
   };
   const motorcycleAt = (plan, t) => [motorcycleInterp(plan.bike, t), ...plan.riders.map((r) => motorcycleInterp(r, t))];
   const motorcycleTimeK = (alpha, k) => ((2 * k - 1) * alpha + 1) / (alpha + 2 * k - 1);
+  // The drop point of the proof (two need a ride): the passenger rides to d and walks on,
+  // the motorcycle rides back to meet the walker, who left A at time 0, and drives him to
+  // B. Both arrival times are linear in d, the passenger's falling and the walker's rising,
+  // so the latest of the two is smallest where they are equal: the plan's D.
+  const motorcycleDrop = (alpha, d) => {
+    const meet = d + (d - d / alpha) / (1 + 1 / alpha), C = meet / alpha;
+    const passenger = d + (1 - d) * alpha, walker = meet + (1 - C);
+    return { meet, C, passenger, walker, T: Math.max(passenger, walker) };
+  };
 
   // Josephus (0016): person 0 stays, the next L - 1 leave, and so on around.
   const josephusRun = (n, L) => {
@@ -119,7 +128,7 @@
   const motorcycleView = () => ({
     mount(box) {
       const defaults = { t0: Number(box.dataset.t0 || 13), t1: Number(box.dataset.t1 || 1), k: 2, km: null, cmp: "none" };
-      const st = { ...defaults, strategy: "optimal", t: 0 };
+      const st = { ...defaults, strategy: "optimal", t: 0, drop: null };   // drop: the proof's D, null = the plan's
       const NAMES = { wait: "הנוסעים מחכים ב-A", meanwhile: "הנוסעים הולכים בינתיים", optimal: "הנוסעים יורדים בדרך" };
       const NAMES2 = { wait: "השני מחכה ב-A", meanwhile: "השני הולך בינתיים", optimal: "הנוסע יורד בדרך" };
       const CLS = ["s1", "s2", "s3", "s4", "s5"];
@@ -140,7 +149,13 @@
         `<div class="road-box"></div>` +
         `<p class="ex-summary" aria-live="polite"></p>` +
         `<p class="ex-title road-title"></p><div class="road-chart"></div>` +
-        `<span class="viz-legend road-legend"></span>`;
+        `<span class="viz-legend road-legend"></span>` +
+        `<section class="ex-proof road-proof"><p class="ex-proof-title">שלב ההוכחה : למה הנוסע יורד דווקא ב-D</p>` +
+        `<div class="ex-controls"><label><span>נקודת הירידה D</span><input type="range" class="ex-drop" min="0" max="1" step="0.005" value="0.875" dir="ltr" aria-label="נקודת הירידה של הנוסע, חלק מהדרך"><output class="out-drop"></output></label>` +
+        `<button type="button" class="md-button ex-drop-best">ה-D של התוכנית</button></div>` +
+        `<p class="ex-title road-drop-title"></p><div class="road-drop"></div>` +
+        `<span class="viz-legend"><span><i class="s1"></i>הנוסע מגיע</span><span><i class="s2"></i>ההולך מגיע</span><span><i class="ink" style="opacity:0.35"></i>כולם מגיעים : המאוחר מהשניים</span></span>` +
+        `<p class="road-drop-text"></p></section>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), scrub = $(".ex-t"), summary = $(".ex-summary");
       const road = $(".road-box"), chart = $(".road-chart"), strategy = $(".ex-strategy"), cmpSel = $(".ex-cmp");
@@ -213,7 +228,58 @@
         s += `<line class="axis" x1="${x0}" x2="${w - right}" y1="${base}" y2="${base}"/></svg>`;
         return s;
       };
+      // the proof panel: both arrival times against the drop point, their maximum, D marked
+      const dropSvg = (a, d, best) => {
+        const w = 640, h = 240, x0 = 52, right = 24, top = 16, base = 206;
+        // the height follows the dragged point, so both of its dots stay on the chart
+        const opt = motorcycleDrop(a, best).T, ymax = Math.ceil(Math.max(opt * 1.6, motorcycleDrop(a, 1).T * 1.15, motorcycleDrop(a, d).T * 1.08) * st.t1) / st.t1;
+        const X = (v) => x0 + v * (w - x0 - right), Y = (t) => base - (t / ymax) * (base - top);
+        // a straight line from d = u0 to d = u1, cut where it leaves the chart at the top
+        const seg = (g, u0, u1) => {
+          const t0 = g(u0), t1 = g(u1);
+          if (t0 > ymax && t1 > ymax) return "";
+          const cut = (u, t, uo, to) => (t <= ymax ? [u, t] : [u + ((ymax - t) / (to - t)) * (uo - u), ymax]);
+          const [ua, ta] = cut(u0, t0, u1, t1), [ub, tb] = cut(u1, t1, u0, t0);
+          return `${f(X(ua))},${f(Y(ta))} ${f(X(ub))},${f(Y(tb))}`;
+        };
+        const pas = (u) => motorcycleDrop(a, u).passenger, wal = (u) => motorcycleDrop(a, u).walker, both = (u) => motorcycleDrop(a, u).T;
+        let s = `<svg class="perf-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="זמן ההגעה של הנוסע ושל ההולך מול נקודת הירידה D : הנוסע מגיע מוקדם יותר ככל ש-D רחוק, ההולך מאוחר יותר, והמאוחר מהשניים הכי קטן כשהם שווים">`;
+        const step = ymax * st.t1 <= 6 ? 0.5 : ymax * st.t1 <= 15 ? 1 : 5;
+        for (let t = 0; t <= ymax * st.t1 + 1e-9; t += step) {
+          s += `<line class="grid" x1="${x0}" x2="${w - right}" y1="${f(Y(t / st.t1))}" y2="${f(Y(t / st.t1))}"/>` +
+               `<text class="tick" x="${x0 - 8}" y="${f(Y(t / st.t1) + 4)}" text-anchor="end">${fmt(t, step < 1 ? 1 : 0)}</text>`;
+        }
+        [0, 0.25, 0.5, 0.75, 1].forEach((v) => { s += `<text class="tick" x="${f(X(v))}" y="${base + 18}" text-anchor="middle">${v === 0 ? "A" : v === 1 ? "B" : fmt(v, 2)}</text>`; });
+        const maxPts = [seg(both, 0, best), seg(both, best, 1)].filter(Boolean).join(" ");
+        s += `<polyline class="ink-line" points="${maxPts}" fill="none" stroke-width="8" stroke-opacity="0.18" stroke-linejoin="round"/>`;
+        s += `<polyline class="s1-line" points="${seg(pas, 0, 1)}" fill="none" stroke-width="2.5"/><polyline class="s2-line" points="${seg(wal, 0, 1)}" fill="none" stroke-width="2.5"/>`;
+        s += `<line class="ink-line" x1="${f(X(best))}" x2="${f(X(best))}" y1="${f(Y(opt))}" y2="${base}" stroke-width="1" stroke-dasharray="3 3"/>` +
+             `<circle class="ink-dot" cx="${f(X(best))}" cy="${f(Y(opt))}" r="4"><title>המינימום : D = ${fmt(best)}, כולם מגיעים אחרי ${fmt(opt * st.t1, 2)} שעות</title></circle>` +
+             `<text class="legend" x="${f(X(best) - 6)}" y="${f(Y(opt) + 18)}" text-anchor="end">${fmt(opt * st.t1, 2)}</text>`;
+        const cur = motorcycleDrop(a, d);
+        s += `<line class="axis-c" x1="${f(X(d))}" x2="${f(X(d))}" y1="${top}" y2="${base}" stroke-width="1"/>`;
+        [["s1", cur.passenger], ["s2", cur.walker]].forEach(([c, t]) => { if (t <= ymax) s += `<circle class="${c}-dot" cx="${f(X(d))}" cy="${f(Y(t))}" r="5.5"/>`; });
+        return s + `<line class="axis" x1="${x0}" x2="${w - right}" y1="${base}" y2="${base}"/></svg>`;
+      };
+      const drawDrop = () => {
+        const a = alpha(), panel = $(".road-proof");
+        panel.hidden = st.k !== 2 || a <= 1 + EPS;
+        if (panel.hidden) return;
+        const best = motorcyclePlan(a).D, d = st.drop === null ? best : st.drop;
+        $(".ex-drop").value = d;
+        $(".out-drop").textContent = fmt(d);
+        $(".road-drop-title").textContent = `זמן ההגעה בשעות מול נקודת הירידה D, מ-A עד B${st.km === null ? "" : ` (${st.km} ק"מ)`}`;
+        $(".road-drop").innerHTML = dropSvg(a, d, best);
+        const cur = motorcycleDrop(a, d), opt = motorcycleDrop(a, best).T, hr = (t) => fmt(t * st.t1, 2);
+        const at = Math.abs(d - best) < 1e-9;
+        const late = cur.passenger > cur.walker + 1e-9 ? "הנוסע" : "ההולך";
+        $(".road-drop-text").innerHTML = (at
+          ? `ב-D = ${ltr(dist(best))} הנוסע וההולך מגיעים יחד, אחרי ${hr(opt)} שעות : זה המינימום. `
+          : `ב-D = ${ltr(dist(d))} הנוסע מגיע אחרי ${hr(cur.passenger)} שעות וההולך אחרי ${hr(cur.walker)}. ${late} מאחר, ולכן כולם מגיעים אחרי ${hr(cur.T)} שעות, ${hr(cur.T - opt)} יותר מהתוכנית. `) +
+          `הזזת D לכיוון B מקצרת את ההליכה של הנוסע, אבל מאריכה את הדרך שהאופנוע חוזר אל ההולך. קו אחד יורד והשני עולה, ולכן המאוחר מהשניים הכי קטן בדיוק כשהם שווים, ב-D = ${ltr(dist(best))}.`;
+      };
       const draw = () => {
+        drawDrop();
         $(".out-t0").textContent = String(st.t0); $(".out-t1").textContent = String(st.t1); $(".out-k").textContent = String(st.k);
         strategy.querySelectorAll("option").forEach((o) => { o.textContent = name(o.value); });
         cmpSel.querySelectorAll("option").forEach((o) => { if (o.value !== "none") o.textContent = name(o.value); });
@@ -273,10 +339,12 @@
       $(".ex-k").addEventListener("input", () => { stop(); st.k = Number($(".ex-k").value); st.t = 0; draw(); });
       $(".ex-km").addEventListener("change", () => { const v = Number($(".ex-km").value); st.km = $(".ex-km").value.trim() === "" || !Number.isFinite(v) || v <= 0 ? null : v; $(".ex-km").value = st.km === null ? "" : st.km; draw(); });
       $(".ex-km").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".ex-km").blur(); });
+      $(".ex-drop").addEventListener("input", () => { st.drop = Number($(".ex-drop").value); drawDrop(); });
+      $(".ex-drop-best").addEventListener("click", () => { st.drop = null; drawDrop(); });
       strategy.addEventListener("change", () => { st.strategy = strategy.value; draw(); });
       cmpSel.addEventListener("change", () => { st.cmp = cmpSel.value; draw(); });
       $(".ex-reset").addEventListener("click", () => {
-        stop(); Object.assign(st, defaults, { strategy: "optimal", t: 0 });
+        stop(); Object.assign(st, defaults, { strategy: "optimal", t: 0, drop: null });
         $(".ex-t0").value = st.t0; $(".ex-t1").value = st.t1; $(".ex-k").value = 2; $(".ex-km").value = ""; strategy.value = "optimal"; cmpSel.value = "none"; draw();
       });
       draw();
@@ -286,8 +354,8 @@
   dvqExplorers.register({
     views: { motorcycle: motorcycleView },
     help: {
-      motorcycle: "הציור מראה את הנוסעים על הדרך והגרף את מיקומם בזמן. הסליידרים קובעים את מהירויות ההליכה והרכיבה, בורר האסטרטגיה ומספר הרוכבים את התכנית, ״הפעלה״ מריץ אותה, ו״להשוואה עם״ מצייר תכנית שנייה מקווקוות.",
+      motorcycle: "הציור מראה את הנוסעים על הדרך והגרף את מיקומם בזמן. הסליידרים קובעים את מהירויות ההליכה והרכיבה, בורר האסטרטגיה ומספר הרוכבים את התכנית, ״הפעלה״ מריץ אותה, ו״להשוואה עם״ מצייר תכנית שנייה מקווקוות. בשלב ההוכחה מזיזים את נקודת הירידה D ורואים את זמני ההגעה של הנוסע ושל ההולך : המאוחר מהשניים הכי קטן כשהם שווים.",
     },
-    models: { motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, motorcycleRiders, motorcycleAt, motorcycleTimeK, josephusRun },
+    models: { motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, motorcycleRiders, motorcycleAt, motorcycleTimeK, motorcycleDrop, josephusRun },
   });
 })();

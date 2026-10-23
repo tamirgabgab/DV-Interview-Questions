@@ -135,6 +135,27 @@ def test_js_matches_python():
         assert (f["k"], f["tie"]) == closed_form(A, Q), (a, q)
 
 
+def test_js_proof_condition():
+    """The proof panel of the box: "the next person gets more" is the condition curve against
+    its level, person by person (the one before the last excluded, step 5), and the
+    curve meets the level at the threshold."""
+    from page_tests import explorer_require, node_json
+
+    params = [(a / 1000, q / 100) for a in range(5, 600, 37) for q in range(105, 201, 5)]
+    got = node_json(f"const m = {explorer_require()}; const ps = {json.dumps(params)};"
+                    "console.log(JSON.stringify(ps.map(([a, q]) => {"
+                    "  const rows = m.cakeSplit('geo', a, q);"
+                    "  return [rows.map((r) => m.cakeCondition('geo', q, r.p).more),"
+                    "          m.cakeCondition('geo', q, m.cakeThreshold('geo', q))]; })));")
+    for (a, q), (more, at) in zip(params, got):
+        a, q = Fr(a).limit_denominator(10 ** 6), Fr(q).limit_denominator(10 ** 6)
+        s = shares(a, q)
+        for k in range(len(s) - 2):
+            if s[k + 1] != s[k]:
+                assert more[k] == (s[k + 1] > s[k]), (a, q, k + 1)
+        assert abs(at["g"] - at["level"]) < 1e-9
+
+
 def test_js_wide_ranges():
     """The box's wide ranges: q below 1 never finishes (the queue stops at a negligible
     fraction, the first person on top), q = 3 with a = 0.6 is the page's two-person case."""

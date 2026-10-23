@@ -133,6 +133,28 @@ def test_drop_point_is_best():
     assert best == Fr(7, 8) and latest(best) == Fr(5, 2)
 
 
+def test_explorer_drop_point():
+    """The proof panel of the box: both arrival times against the drop point d, against the
+    exact replay above, and the latest of them smallest at the plan's D for every alpha."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(a, i / 40) for a in (2, 4, 13, 30) for i in range(41)]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({[list(c) for c in cases]}.map(([a, d]) => m.motorcycleDrop(a, d))));")
+    for (alpha, d), out in zip(cases, got):
+        d = Fr(d).limit_denominator(40)
+        dt = meet(d, d / alpha, alpha)
+        assert abs(out["passenger"] - float(d + (1 - d) * alpha)) < 1e-12
+        assert abs(out["walker"] - float(1 + 2 * dt)) < 1e-12
+        assert abs(out["C"] - float(d - dt)) < 1e-12
+    for alpha in (2, 4, 13, 30):
+        D = q0026.plan(Fr(alpha))["D"]
+        best = node_json(f"const m = {explorer_require()}; const r = m.motorcycleDrop({alpha}, {float(D)});"
+                         "console.log(JSON.stringify(r));")
+        assert abs(best["passenger"] - best["walker"]) < 1e-12
+        assert abs(best["T"] - float(formula(alpha))) < 1e-12
+
+
 def test_more_people_follow_up():
     for alpha in (2, 4, 13):
         for k in range(1, 7):

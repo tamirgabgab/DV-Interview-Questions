@@ -119,6 +119,27 @@ def test_js_matches_python():
         assert abs(T - cake.threshold(A, d)) < 1e-12
 
 
+def test_js_proof_condition():
+    """The proof panel of the box: "the next person gets more" is the condition curve against
+    its level, person by person (the one before the last excluded, step 5), and the
+    curve meets the level at the threshold."""
+    from page_tests import explorer_require, node_json
+
+    params = [(a / 1000, d / 100) for a in range(5, 600, 37) for d in range(1, 51, 3)]
+    got = node_json(f"const m = {explorer_require()}; const ps = {json.dumps(params)};"
+                    "console.log(JSON.stringify(ps.map(([a, d]) => {"
+                    "  const rows = m.cakeSplit('arith', a, d);"
+                    "  return [rows.map((r) => m.cakeCondition('arith', d, r.p).more),"
+                    "          m.cakeCondition('arith', d, m.cakeThreshold('arith', d))]; })));")
+    for (a, d), (more, at) in zip(params, got):
+        a, d = Fr(a).limit_denominator(10 ** 6), Fr(d).limit_denominator(10 ** 6)
+        s = shares(a, d)
+        for k in range(len(s) - 2):
+            if s[k + 1] != s[k]:
+                assert more[k] == (s[k + 1] > s[k]), (a, d, k + 1)
+        assert abs(at["g"] - at["level"]) < 1e-9
+
+
 def test_js_wide_ranges():
     """The box's wide ranges: a negative d stops the queue at the first non-positive
     fraction, d = 0 never finishes (capped), and a tiny a = d lists 10,000 people with the

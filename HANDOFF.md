@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-23 (session 21)_
+_Last updated: 2026-10-23 (session 22)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -1740,6 +1740,46 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
    version (I225 to L262) was replaced by I284 to L318; the trap round was dropped and K
    now shows the solution's mechanism inside the existing boxes.
 
+### Session 22 — 2026-10-23: round L, first batch (L311, L312, L313, L316, L317, L318)
+
+1. **The owner's picks:** round L, then round K, with clarifying questions before each
+   round. Answers for L: the proof view is a panel inside the existing box (under its
+   drawing, driven by the same controls; no new boxes), L in two batches (the small
+   items, then L309, L310, L314 and L315) with `main` only when the owner asks, the
+   search of L314 as both a queue list and a small tree, and the renumbering of L309 as
+   two labels on the circle.
+2. **The proof panel** is `<section class="ex-proof">` with a title "שלב ההוכחה : …"
+   (CSS in `extra.css`, hidden with `[hidden]` when it does not apply). Each page's "נסו
+   בעצמכם" paragraph names it; the README table rows mention it.
+3. **L311, 0026:** a drop-point slider D (step 0.005, so 7/8 is on it) and "ה-D של
+   התוכנית"; the chart of both arrival times against D (the passenger's falling, the
+   walker's rising), their maximum as a wide band, the minimum marked, and a sentence
+   for the current D. The height follows the dragged point. Shown for two riders only.
+   Model `motorcycleDrop(alpha, d)`, tested against the exact replay of the page test.
+4. **L312, 0027 and 0028:** the condition curve (f(p) = p² / (1 − p) against y = d, or
+   q (1 − p) against y = 1), the threshold T, and the people seen so far as dots on it
+   (before the peak, the peak, after), so stepping person by person shows the dots move
+   one way and cross once. Model `cakeCondition`, tested against the exact shares on the
+   grids of both pages (the person before the last excluded, as the proof's step 5).
+5. **L313, 0036:** every cycle of the polynomial as its own small ring (the fixed point
+   0 first, the seed's cycle with the thick frame, the current state lit), cropped to the
+   rings so a phone shows them large, and the lengths in words (6 + 6 + 3 = 15 for
+   x^4 + x^2 + 1). Up to 6 bits drawn, beyond that the lengths only. Model `lfsrCycles`,
+   tested for every polynomial of 3 to 8 bits.
+6. **L316, 0032:** "השכבה הבאה" fills the state graph layer by layer: the depth on every
+   state, the newest layer lit, an arrow from every parent one layer up, and at layer 7
+   both shortest plans; the sentence names each new state and where it came from. Model
+   `riverLayers`, tested against a plain BFS and the generator's two solutions.
+7. **L317, 0043:** a tap (or Enter) on a horse frames the horses known faster than it,
+   draws an arrow per direct result on the chains, marks the races used in the table,
+   and the panel lists the chains with their races and the verdict (out, settled,
+   candidate). Model `horsesChain`, tested after every race of three seeds: the chains
+   are direct results, reach exactly the known-faster set, and are as short as a BFS.
+   One Hebrew colon in the step line got its NBSP.
+8. **L318:** the help lines of `boxes3` and `ttt` name the buttons that exist.
+9. **Checks:** Python tests (340), lint, strict build, links, the phone check with axe
+   (55 pages, none with problems) and `check_explorers.py` (every button of every box, the links and the remembered state).
+
 ---
 
 ## In progress
@@ -1773,6 +1813,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   deferred by the owner. Proposed for the owner to pick: rounds I to L (boxes that show
   the solution, revised: I284 to L318; suggested order L, K, I, J) and rounds M to R (new
   questions, M263 to R283).
+- Session 22: the owner picked round L, then round K. L's first batch (L311, L312, L313,
+  L316, L317, L318) is done on the branch; next the second batch (L309, L310, L314,
+  L315), then the clarifying questions for round K.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2461,14 +2504,14 @@ the first series' rounds of the same letters.
 |---|---|---|---|
 | L309 | 0016 | **Renumbering**: after each step every remaining person shows the old and the new label (new = old − L mod N), the survivor the same person under both, so F(N − 1) visibly becomes F(N); a "full round" button shrinks the circle by L | M |
 | L310 | 0009 | **Choose your cut**: tap any box of the long cycle to swap with c0; the two pieces h and L − h are shown, and only the middle range keeps both at 8 or less | M |
-| L311 | 0026 | **The drop point**: drag D; the passenger's and the walker's arrival times and the curve of T = max of both against D, its minimum where the two are equal (7/8) | S |
-| L312 | 0027, 0028 | **The live proof panel**: the f(p) = p²/(1 − p) curve (0027) or the q(1 − p) line (0028) with the people's p_k as dots and the threshold that moves with the slider; the single crossing is the peak | S |
-| L313 | 0036 | **All cycles**: every state's arrow, so the ring shows its cycles (6 + 6 + 3 and the 0 loop for x⁴ + x² + 1, one cycle of 15 for a primitive polynomial) | S–M |
+| ~~L311~~ | 0026 | Done in session 22. **The drop point**: drag D; the passenger's and the walker's arrival times and the curve of T = max of both against D, its minimum where the two are equal (7/8) | S |
+| ~~L312~~ | 0027, 0028 | Done in session 22. **The live proof panel**: the f(p) = p²/(1 − p) curve (0027) or the q(1 − p) line (0028) with the people's p_k as dots and the threshold that moves with the slider; the single crossing is the peak | S |
+| ~~L313~~ | 0036 | Done in session 22. **All cycles**: every state's arrow, so the ring shows its cycles (6 + 6 + 3 and the 0 loop for x⁴ + x² + 1, one cycle of 15 for a primitive polynomial) | S–M |
 | L314 | 0018, 0019 | **The search itself**: one panel for both pages that steps through the queue (BFS in 0018, Dijkstra ordered by t in 0019), each state's four children marked new, seen or past D, until the goal is popped | M |
 | L315 | 0008 | **Pouring the points**: the points left fill the cups to the brim with nobody above Israel; after France 17 points spill over, which is the page's moment of certain loss | M |
-| L316 | 0032 | **BFS layers**: the state graph filled layer by layer (visited, frontier, parent arrows) until 1111 at depth 7 by the two mirror paths | S |
-| L317 | 0043 | **The chain behind a verdict**: clicking a horse lights the race results that prove its known-faster set | S |
-| L318 | 0004, 0011 | **Help lines that match the buttons**: `boxes3` names "סידור אחר", `ttt` names "הגרלה" and "הבורר", buttons that no longer exist | S |
+| ~~L316~~ | 0032 | Done in session 22. **BFS layers**: the state graph filled layer by layer (visited, frontier, parent arrows) until 1111 at depth 7 by the two mirror paths | S |
+| ~~L317~~ | 0043 | Done in session 22. **The chain behind a verdict**: clicking a horse lights the race results that prove its known-faster set | S |
+| ~~L318~~ | 0004, 0011 | Done in session 22. **Help lines that match the buttons**: `boxes3` names "סידור אחר", `ttt` names "הגרלה" and "הבורר", buttons that no longer exist | S |
 
 Suggested order (session 21): L first (the proofs are where a box teaches most, and L312,
 L311, L313 and L316 are small), then K (inside boxes that already exist, so the pages do

@@ -90,3 +90,28 @@ def test_explorer_strip():
         assert sp["states"] == want and sp["out"] == [v & 1 for v in want]
         assert sp["fb"] == [bin(v & mask).count("1") & 1 for v in want]
         assert all(nxt >> (width - 1) == fb for nxt, fb in zip(want[1:], sp["fb"]))
+
+
+def test_explorer_cycles():
+    """The proof panel of the box: every polynomial of 3 to 8 bits splits the non-zero states
+    into disjoint cycles (a plain Python step from every state), the seed's cycle first;
+    the page's x^4 + x^2 + 1 gives 6 + 6 + 3 and a primitive polynomial one cycle of all."""
+    from page_tests import explorer_require, node_json
+
+    def step(s, mask, width):
+        return (s >> 1) | ((bin(s & mask).count("1") & 1) << (width - 1))
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const out = {{}};
+      for (let w = 3; w <= 8; w++) out[w] = m.lfsrTable(w).map((r) => [r.mask, m.lfsrCycles(r.mask, w)]);
+      console.log(JSON.stringify(out));""")
+    for width in range(3, 9):
+        n = (1 << width) - 1
+        for mask, cycles in got[str(width)]:
+            assert sorted(v for c in cycles for v in c) == list(range(1, n + 1)), (width, mask)
+            assert 1 in cycles[0]
+            for c in cycles:
+                assert [step(v, mask, width) for v in c] == c[1:] + c[:1], (width, mask, c)
+    four = dict((mask, [len(c) for c in cycles]) for mask, cycles in got["4"])
+    assert four[0b0101] == [6, 6, 3] and four[0b0011] == [15] and four[0b1001] == [15]

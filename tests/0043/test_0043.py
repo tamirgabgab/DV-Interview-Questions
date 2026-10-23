@@ -130,6 +130,45 @@ def test_explorer_matches_the_page_code():
         assert details == [[sorted(e["gone"]), sorted(e["placed"]), len(e["open"])] for e in log2]
 
 
+def test_explorer_chains():
+    """The proof panel of the box: after every race, for every horse, the chains are made of
+    direct results of the races so far (the faster horse ahead of the slower in that race),
+    they reach exactly the horses known faster (the transitive closure), and each is as
+    short as a plain BFS over the direct results says."""
+    from page_tests import explorer_require, node_json
+
+    cases = [[36, 6, 4, q0043.SEED_A], [30, 6, 3, q0043.SEED_B], [16, 4, 3, 8]]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map(([a, b, c, seed]) => {{
+        const r = m.horsesPlan(a, b, c, m.horsesSpeeds(a, m.mulberry32(seed)));
+        return [r.log.map((e) => e.order), r.log.map((_, k) => [...Array(a).keys()].map((x) => m.horsesChain(r.log, k + 1, x)))];
+      }})));""")
+    for (a, b, c, seed), (orders, per_step) in zip(cases, got):
+        for k, chains in enumerate(per_step, 1):
+            beat = {(u, v, r) for r, order in enumerate(orders[:k]) for i, u in enumerate(order) for v in order[i + 1:]}
+            above = {}
+            for u, v, _ in beat:
+                above.setdefault(v, set()).add(u)
+            for x, ch in enumerate(chains):
+                dist, queue = {x: 0}, [x]          # a plain BFS up the direct results
+                for h in queue:
+                    for u in sorted(above.get(h, ())):
+                        if u not in dist:
+                            dist[u] = dist[h] + 1
+                            queue.append(u)
+                assert sorted(c["y"] for c in ch["chains"]) == sorted(dist.keys() - {x}), (seed, k, x)
+                used = set()
+                for chain in ch["chains"]:
+                    links = chain["links"]
+                    assert links[0][0] == chain["y"] and links[-1][1] == x
+                    assert all(l1[1] == l2[0] for l1, l2 in zip(links, links[1:]))
+                    assert all(tuple(link) in beat for link in links)
+                    assert len(links) == dist[chain["y"]]
+                    used |= {link[2] for link in links}
+                assert ch["races"] == sorted(used)
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 

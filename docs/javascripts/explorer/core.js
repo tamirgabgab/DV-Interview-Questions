@@ -579,7 +579,7 @@
     Object.assign(models, own);
   };
   const lib = {
-    BASE, EPS, H, KB_DIGITS, RAND_HASH, SEED_MAX, STATE_CODECS, TOP, TRI_M, W, X0,
+    BASE, EPS, H, KB_DIGITS, RAND_HASH, RIGHT, SEED_MAX, STATE_CODECS, TOP, TRI_M, W, X0,
     arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, f, floydParse, floydTrace, fmt, frame, hline,
     ltr, mulberry32, newSeed, randNote, randomRow, seedControls, speedSel, stickyNames, triNorm, waveDromText, waveStrip,
   };
