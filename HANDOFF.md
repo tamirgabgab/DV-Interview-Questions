@@ -1592,6 +1592,35 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       camel (an emoji), the litres on it, the depots as bars with their litres, the last
       and the next pass as arrows, a line per pass; the general box adds a, c, w, T and
       the chart. Trap text corrected while testing: 1.5 instead of 2.5 gives 440, not 460.
+28. **0043, horse races without a stopwatch (the owner asked for the classic puzzle,
+    then a plan for a horses, b per race, the c fastest; answers: part a 36 / 6 / 4, part
+    b a = 30 (not a square) with 6 and 3, a short adversary argument, a grid in the box,
+    a reveal toggle for the hidden speeds).** Worked out first in the chat: with a = b²
+    the plan is b groups, the winners, then the staircase of candidates ((i − 1) + (j − 1)
+    known faster, c(c + 1)/2 − 1 of them); b + 2 races when they fit one race, the
+    greedy third phase otherwise (checked against every linear extension of the
+    staircase: 768 orderings for 36 / 6 / 4, always 9).
+    - `junior/0043-horse-races-top-k.md`: part a (9 races: the groups, the winners, race
+      8 = A2, B1, A3, B2, C1, D1 which settles ranks 2 and 3, race 9 on at most four
+      horses for rank 4; the adversary argument for 8), part b (30 horses: 7 races, the
+      spare slot of the winners' race does not help; the general plan as code with
+      known-faster / known-slower sets closed transitively, the greedy choice of the
+      next race by the most missing comparisons; the staircase bound; an examples table
+      of race counts). Page code: `horses_plan(a, b, c, race)` in Python (race is the
+      oracle), `hr_beats` / `hr_race` / `horses_plan` in SV with 64-bit masks (a ≤ 64,
+      b ≤ 8, 80 races at most) and `$countones`. The same tie-breaking in every
+      implementation (pool sorted by known-faster asc, known-slower desc, index; the
+      first horse with the most missing comparisons), so the race logs are comparable.
+    - `tools/figures/q0043.py`: the reference plan with a log (who was ruled out and the
+      horses known faster, who was settled, the open candidates), horse names by group
+      letter and place in the group race, the hidden speeds from a Python port of
+      mulberry32 (so `data-seed` reproduces the page's example in the box), the
+      staircase table, the grid figures after the winners' race, the race-log tables of
+      both examples, the examples table. SEED_A = 3 (race 9 has two horses), SEED_B = 11.
+    - The `horses` box (`data-fixed` for part a): the grid with the current race framed,
+      the race table, the explanation line with the known-faster horses in brackets, the
+      reveal toggle (true ranks in the cells and in the tooltips), the seed field and
+      the copy link. The general box validates a ≤ b² and c ≤ min(a, b).
 
 ---
 
@@ -1652,12 +1681,12 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 
 ## Question variety
 
-### Coverage today (42 questions)
+### Coverage today (43 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040 | digital logic, bitwise, sorting, stack, digit puzzles, conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.

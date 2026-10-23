@@ -2240,3 +2240,28 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .cm-key-camel { background: var(--viz-ink); }
 .md-typeset .viz-legend .cm-key-pass { background: var(--viz-s2); }
 .md-typeset .viz-legend .cm-key-next { background: var(--viz-s3); }
+
+/* Horse races (0043): the page's grid figure and the explorer's grid and race table */
+.md-typeset svg .hr-cell rect { fill: var(--md-code-bg-color); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .hr-cell.is-cand rect { fill: var(--viz-s1); fill-opacity: 0.22; stroke: var(--viz-s1); }
+.md-typeset svg .hr-cell.is-placed rect { fill: var(--viz-s3); fill-opacity: 0.35; stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .hr-cell.is-out rect { fill: var(--viz-grid); fill-opacity: 0.35; }
+.md-typeset svg .hr-cell.is-now rect { stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .hr-name { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .hr-cell.is-out .hr-name { fill: var(--viz-text); font-weight: 400; }
+.md-typeset svg .hr-count { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .hr-rank { fill: var(--viz-s2-text); font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .hr-key-placed { background: var(--viz-s3); opacity: 0.7; }
+.md-typeset .viz-legend .hr-key-cand { background: var(--viz-s1); opacity: 0.5; }
+.md-typeset .viz-legend .hr-key-out { background: var(--viz-grid); }
+.md-typeset .viz-legend .hr-key-now { background: transparent; outline: 2.5px solid var(--viz-s2); }
+.md-typeset .explorer .hr-gridbox { margin-top: 0.4rem; }
+.md-typeset .explorer svg.hr-live { display: block; width: 100%; }
+.md-typeset .explorer .hr-step { margin: 0.3em 0 0.5em; }
+.md-typeset .explorer .hr-reveal { display: inline-flex; align-items: center; gap: 0.3rem; }
+.md-typeset .explorer input.hr-a { width: 4.5rem; }
+.md-typeset .explorer .hr-table { max-width: 100%; overflow-x: auto; }
+.md-typeset .explorer table.hr-races { font-size: 0.7rem; margin: 0; }
+.md-typeset .explorer table.hr-races td, .md-typeset .explorer table.hr-races th { padding: 0.2em 0.5em; }
+.md-typeset .explorer table.hr-races tr.is-now td { background: var(--diff-medium-bg); font-weight: 700; }
+.md-typeset .explorer table.hr-races td:nth-child(3) { white-space: nowrap; }
