@@ -1844,8 +1844,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     request to the GitHub API gets 403 when the runner is rate-limited (the sandbox runs
     with `--offline`, which hid it). A failed load from another host no longer counts; a
     failed local resource still does. The fix went to `main` alone (84bc64f, on top of
-    round L) and was merged into the branch, so round K stays off `main` until the owner
-    asks. Lesson: after a push, wait for the deploy run and read it, not just the local
+    round L) and was merged into the branch; round K followed to `main` on the owner's
+    request. Lesson: after a push, wait for the deploy run and read it, not just the local
     checks.
 ---
 
@@ -1882,7 +1882,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   questions, M263 to R283).
 - Session 22: the owner picked round L, then round K. L's first batch (L311, L312, L313,
   L316, L317, L318) and second batch (L309, L310, L314, L315) are done on the branch:
-  round L is closed and on `main` (with the CI fix, 84bc64f). Round K is done in two batches (K303, K304, K307;
+  rounds L and K are closed and on `main` (the CI fix 84bc64f, then round K). Round K is done in two batches (K303, K304, K307;
   K301, K302, K306, K305, K308). Next: the owner's pick, rounds I and J (new boxes for
   the parts with no visual) or the new questions of rounds M to R.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
