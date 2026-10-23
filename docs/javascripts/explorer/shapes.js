@@ -1,5 +1,5 @@
 // kinds: shapes
-//   shapes                 0014        squares or rectangles drawn one at a time with the rejected candidates flashed; a heat map of draws
+//   shapes                 0014        squares or rectangles drawn one at a time with the rejected candidates flashed; a heat map of draws; a toggle for the projections of a rejected candidate and a sandbox of two shapes to drag
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -11,6 +11,13 @@
   // (a candidate at random until one is free, so uniform among the free ones, like the
   // page's choice from the filtered list); a whole draw like random_shapes; a heat map.
   const shapesOverlap = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+  // The page's four cases of "no overlap", for b against a: b wholly left, right, below or
+  // above a (with <=, so a shared side is allowed). They overlap exactly when none holds,
+  // that is when the projections meet on both axes.
+  const shapesWhy = (a, b) => {
+    const left = b[2] <= a[0], right = b[0] >= a[2], below = b[3] <= a[1], above = b[1] >= a[3];
+    return { left, right, below, above, overlap: !(left || right || below || above) };
+  };
   const shapesCandidates = (N, M, squares) => {
     const out = [];
     for (let x1 = 1; x1 < N; x1++) for (let x2 = x1 + 1; x2 <= N; x2++)
@@ -85,11 +92,15 @@
         `<button type="button" class="md-button ex-all">הגרלה שלמה</button>` +
         `<button type="button" class="md-button ex-clear">ניקוי</button>` +
         `<button type="button" class="md-button ex-heat">500 הגרלות למפת חום</button><span class="sh-note" aria-live="polite"></span></div>` +
+        `<label><input type="checkbox" class="ex-proj" checked> ההטלות על הצירים</label>` +
         `<div class="sh-box"><div class="sh-grid"></div><div class="sh-heat"></div></div>` +
-        `<p class="sh-step" aria-live="polite"></p><p class="ex-summary sh-sum"></p>`;
+        `<p class="sh-step" aria-live="polite"></p><p class="ex-summary sh-sum"></p>` +
+        `<div class="sh-sand"><p class="ex-title">שתי צורות להזזה : גוררים את A או את B (או מקש Tab וחצים), וההטלות והתנאים מתעדכנים</p><div class="sh-sand-svg"></div><ul class="sh-conds"></ul></div>`;
       const $ = (sel) => box.querySelector(sel);
       let timer = null;
-      const geom = () => { const u = Math.min(30, 300 / Math.max(st.N - 1, st.M - 1)); return { u, W: (st.N - 1) * u + 40, H: (st.M - 1) * u + 30, X: (x) => 30 + (x - 1) * u, Y: (y) => 10 + (st.M - y) * u }; };
+      const sand = { a: [2, 2, 5, 4], b: [4, 3, 7, 6], N: 9, M: 7 };   // the sandbox: points 1..9 by 1..7
+      // the projections need room below the grid and to its right
+      const geom = () => { const u = Math.min(30, 300 / Math.max(st.N - 1, st.M - 1)), pr = $(".ex-proj").checked ? 24 : 0; return { u, W: (st.N - 1) * u + 40 + pr, H: (st.M - 1) * u + 30 + pr, X: (x) => 30 + (x - 1) * u, Y: (y) => 10 + (st.M - y) * u }; };
       const gridSvg = (extra, label) => {
         const g = geom();
         let s = `<svg class="figure sh-live" viewBox="0 0 ${f(g.W, 0)} ${f(g.H, 0)}" role="img" aria-label="${label}">`;
@@ -102,12 +113,55 @@
       };
       const rect = (g, [x1, y1, x2, y2], cls, extra = "") =>
         `<rect class="${cls}" x="${f(g.X(x1))}" y="${f(g.Y(y2))}" width="${f(g.X(x2) - g.X(x1))}" height="${f(g.Y(y1) - g.Y(y2))}"${extra}><title>(${x1}, ${y1}) → (${x2}, ${y2})</title></rect>`;
+      // the two projections of a pair on both axes, below the grid and to its right
+      const projections = (g, a, b, N, M) => {
+        const yb = g.Y(1) + 20, xr = g.X(N) + 10;
+        let s = "";
+        [[a, "sh-pa", 0], [b, "sh-pb", 6]].forEach(([r, cls, d]) => {
+          s += `<line class="${cls}" x1="${f(g.X(r[0]))}" x2="${f(g.X(r[2]))}" y1="${f(yb + d)}" y2="${f(yb + d)}"/>` +
+               `<line class="${cls}" x1="${f(xr + d)}" x2="${f(xr + d)}" y1="${f(g.Y(r[3]))}" y2="${f(g.Y(r[1]))}"/>`;
+        });
+        const x0 = Math.max(a[0], b[0]), x1 = Math.min(a[2], b[2]), y0 = Math.max(a[1], b[1]), y1 = Math.min(a[3], b[3]);
+        if (x0 < x1) s += `<rect class="sh-pmeet" x="${f(g.X(x0))}" y="${f(yb - 4)}" width="${f(g.X(x1) - g.X(x0))}" height="14"/>`;
+        if (y0 < y1) s += `<rect class="sh-pmeet" x="${f(xr - 4)}" y="${f(g.Y(y1))}" width="14" height="${f(g.Y(y0) - g.Y(y1))}"/>`;
+        return s;
+      };
+      // the sandbox: two shapes to drag on a small grid, their projections and the four cases
+      const SU = 30, SX = (x) => 30 + (x - 1) * SU, SY = (y) => 10 + (sand.M - y) * SU;
+      const drawSand = () => {
+        const show = $(".ex-proj").checked;
+        $(".sh-sand").hidden = !show;
+        if (!show) return;
+        const g = { u: SU, X: SX, Y: SY }, W = (sand.N - 1) * SU + 70, Hh = (sand.M - 1) * SU + 50;
+        let svg = `<svg class="figure sh-live sh-sandbox" viewBox="0 0 ${W} ${Hh}" role="group" aria-label="שתי צורות להזזה, A ו-B">`;
+        for (let x = 1; x <= sand.N; x++) svg += `<line class="gp-line" x1="${SX(x)}" x2="${SX(x)}" y1="${SY(sand.M)}" y2="${SY(1)}"/><text class="tick" x="${SX(x)}" y="${SY(1) + 40}" text-anchor="middle" font-size="9">${x}</text>`;
+        for (let y = 1; y <= sand.M; y++) svg += `<line class="gp-line" x1="${SX(1)}" x2="${SX(sand.N)}" y1="${SY(y)}" y2="${SY(y)}"/><text class="tick" x="${SX(1) - 8}" y="${SY(y) + 3}" text-anchor="end" font-size="9">${y}</text>`;
+        [["a", "A", "shp-1"], ["b", "B", "shp-2"]].forEach(([k, name, cls]) => {
+          const r = sand[k];
+          svg += `<g class="sh-drag" data-k="${k}" tabindex="0" role="button" aria-label="${name}, הזזה בגרירה או בחצים"><rect class="${cls}" x="${SX(r[0])}" y="${SY(r[3])}" width="${SX(r[2]) - SX(r[0])}" height="${SY(r[1]) - SY(r[3])}"/>` +
+                 `<text class="coord halo" x="${(SX(r[0]) + SX(r[2])) / 2}" y="${(SY(r[1]) + SY(r[3])) / 2 + 4}" text-anchor="middle">${name}</text></g>`;
+        });
+        svg += projections(g, sand.a, sand.b, sand.N, sand.M) + "</svg>";
+        $(".sh-sand-svg").innerHTML = svg;
+        const w = shapesWhy(sand.a, sand.b), [a, b] = [sand.a, sand.b];
+        const row = (ok, text, math) => `<li class="${ok ? "is-true" : ""}">${text} ${ltr(math)} ${ok ? "✓" : "✗"}</li>`;
+        $(".sh-conds").innerHTML = row(w.left, "הצורה B משמאל ל-A,", `B.x2 = ${b[2]} ≤ A.x1 = ${a[0]}`) + row(w.right, "הצורה B מימין ל-A,", `B.x1 = ${b[0]} ≥ A.x2 = ${a[2]}`) +
+          row(w.below, "הצורה B מתחת ל-A,", `B.y2 = ${b[3]} ≤ A.y1 = ${a[1]}`) + row(w.above, "הצורה B מעל A,", `B.y1 = ${b[1]} ≥ A.y2 = ${a[3]}`) +
+          `<li class="sh-verdict">${w.overlap ? `<span class="sh-bad">אף מקרה לא מתקיים : ההטלות נפגשות על שני הצירים (באדום), והצורות חופפות.</span>` : `<span class="sh-ok">מקרה אחד מספיק : ההטלות על ציר אחד לפחות זרות, ואין חפיפה.</span>`}</li>`;
+      };
       const draw = () => {
+        drawSand();
         ["N", "M", "max"].forEach((k) => { $(`.out-${k}`).textContent = String(st[k]); });
         $(".sh-grid").innerHTML = gridSvg((g) => {
           let s = st.shapes.map((sh, i) => rect(g, sh, i % 2 ? "shp-2" : "shp-1") +
             `<text class="coord halo" x="${f((g.X(sh[0]) + g.X(sh[2])) / 2)}" y="${f((g.Y(sh[1]) + g.Y(sh[3])) / 2 + 4)}" text-anchor="middle" font-size="11">${i + 1}</text>`).join("");
           if (st.flash) s += rect(g, st.flash.shape, st.flash.ok ? "sh-accept" : "sh-reject");
+          // a rejected candidate: its projections and those of the first shape it overlaps,
+          // under the grid (x) and beside it (y), the shared stretch of each in red
+          if (st.flash && !st.flash.ok && $(".ex-proj").checked) {
+            const c = st.flash.shape, o = st.shapes.find((t) => shapesOverlap(c, t));
+            if (o) s += projections(g, c, o, st.N, st.M);
+          }
           return s;
         }, `grid של ${st.N} על ${st.M} נקודות עם ${st.shapes.length} צורות`);
         const all = shapesCandidates(st.N, st.M, st.squares).length;
@@ -134,6 +188,36 @@
       ["N", "M", "max"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { st[k] = Number($(`.ex-${k}`).value); reset(); }));
       $(".ex-kind").addEventListener("change", () => { st.squares = $(".ex-kind").value === "squares"; reset(); });
       $(".ex-clear").addEventListener("click", reset);
+      $(".ex-proj").addEventListener("change", draw);
+      // dragging in the sandbox: whole grid steps, kept inside the grid
+      const moveTo = (k, dx, dy) => {
+        const r = sand[k], w = r[2] - r[0], h = r[3] - r[1];
+        const x1 = Math.max(1, Math.min(sand.N - w, r[0] + dx)), y1 = Math.max(1, Math.min(sand.M - h, r[1] + dy));
+        if (x1 === r[0] && y1 === r[1]) return false;
+        sand[k] = [x1, y1, x1 + w, y1 + h]; drawSand(); return true;
+      };
+      let drag = null;
+      const at = (e) => { const svg = box.querySelector(".sh-sandbox"), p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const q = p.matrixTransform(svg.getScreenCTM().inverse()); return [Math.round((q.x - 30) / SU) + 1, sand.M - Math.round((q.y - 10) / SU)]; };
+      $(".sh-sand-svg").addEventListener("pointerdown", (e) => {
+        const g = e.target.closest(".sh-drag");
+        if (!g) return;
+        e.preventDefault();
+        drag = { k: g.dataset.k, from: at(e) };
+        $(".sh-sand-svg").setPointerCapture(e.pointerId);
+      });
+      $(".sh-sand-svg").addEventListener("pointermove", (e) => {
+        if (!drag) return;
+        const [x, y] = at(e);
+        if (moveTo(drag.k, x - drag.from[0], y - drag.from[1])) drag.from = [x, y];
+      });
+      ["pointerup", "pointercancel"].forEach((ev) => $(".sh-sand-svg").addEventListener(ev, () => { drag = null; }));
+      $(".sh-sand-svg").addEventListener("keydown", (e) => {
+        const g = e.target.closest(".sh-drag"), d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[e.key];
+        if (!g || !d) return;
+        e.preventDefault();
+        moveTo(g.dataset.k, d[0], d[1]);
+        const again = box.querySelector(`.sh-drag[data-k="${g.dataset.k}"]`); if (again) again.focus();
+      });
       $(".ex-one").addEventListener("click", () => {
         stop();
         if (st.shapes.length >= st.max) { $(".sh-step").innerHTML = `כבר יש ${ltr(st.max)} צורות, המספר המרבי. "ניקוי" מתחיל מחדש.`; return; }
@@ -145,7 +229,8 @@
           st.flash = { shape: c, ok: last };
           $(".sh-step").innerHTML = last
             ? `<span class="sh-ok">✓ ניסיון ${ltr(k + 1)} : ${ltr(`(${c[0]}, ${c[1]}) → (${c[2]}, ${c[3]})`)} לא חופף, נכנס.</span> ${t.tries.length === 1 ? "" : `${ltr(t.tries.length - 1)} מועמדים נדחו לפניו.`} מועמדים פנויים : ${ltr(num(t.free))} מתוך ${ltr(num(t.all))}.`
-            : `<span class="sh-bad">✗ ניסיון ${ltr(k + 1)} : ${ltr(`(${c[0]}, ${c[1]}) → (${c[2]}, ${c[3]})`)} חופף צורה קיימת, נדחה.</span>`;
+            : `<span class="sh-bad">✗ ניסיון ${ltr(k + 1)} : ${ltr(`(${c[0]}, ${c[1]}) → (${c[2]}, ${c[3]})`)} חופף צורה קיימת, נדחה.</span>` +
+              ($(".ex-proj").checked ? ` ההטלות שלו ושל צורה ${ltr(st.shapes.findIndex((t) => shapesOverlap(c, t)) + 1)} נפגשות גם על ציר x (מתחת) וגם על ציר y (מימין) : אף אחד מארבעת המקרים לא מתקיים.` : "");
           draw();
           k++;
           if (last) { clearInterval(timer); timer = null; st.shapes.push(c); st.flash = null; draw(); }
@@ -172,8 +257,8 @@
   dvqExplorers.register({
     views: { shapes: shapesView },
     help: {
-      shapes: "״עוד צורה״ מגריל מועמד ומראה את הנדחים בגלל חפיפה, ״הגרלה שלמה״ מציירת את כולן, ו״500 הגרלות״ בונה מפת חום. N, M ומספר הצורות בסליידרים.",
+      shapes: "״עוד צורה״ מגריל מועמד ומראה את הנדחים בגלל חפיפה, ״הגרלה שלמה״ מציירת את כולן, ו״500 הגרלות״ בונה מפת חום. N, M ומספר הצורות בסליידרים. המתג ״ההטלות״ מצייר את ההטלות של מועמד שנדחה ושל הצורה שהוא חופף, ומתחת שתי צורות להזזה עם ארבעת התנאים של הדף.",
     },
-    models: { shapesOverlap, shapesCandidates, shapesOk, shapesTry, shapesRandom, shapesHeat },
+    models: { shapesOverlap, shapesWhy, shapesCandidates, shapesOk, shapesTry, shapesRandom, shapesHeat },
   });
 })();

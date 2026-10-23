@@ -146,3 +146,29 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(31)
+
+
+def test_explorer_greedy_rounds():
+    """The box's greedy rule round by round: each round removes the two slowest at the
+    cheaper of t1 + 2t2 + tn and 2t1 + t(n-1) + tn, the running total ends at the search's
+    least time on random sets of up to eight people."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(31)
+    sets = [[1, 2, 5, 10], [1, 2, 3, 4], [1, 2, 5, 10, 20], [1, 4, 5, 6, 7, 8], [3], [2, 7]]
+    sets += [[rng.randint(1, 30) for _ in range(rng.randint(1, 8))] for _ in range(150)]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({json.dumps(sets)}.map((t) => [m.bridgeGreedy(t), m.bridgeSolve(t).time])));")
+    for times, (gr, best) in zip(sets, got):
+        rest = sorted(times)
+        total = 0
+        for r in gr["rounds"]:
+            t1, t2, a, b = rest[0], rest[1], rest[-2], rest[-1]
+            assert r["pair"] == t1 + 2 * t2 + b and r["escort"] == 2 * t1 + a + b
+            assert sorted(times[i] for i in r["slow"]) == [a, b]
+            total += min(r["pair"], r["escort"])
+            assert r["total"] == total
+            rest = rest[:-2]
+        assert gr["time"] == best, times

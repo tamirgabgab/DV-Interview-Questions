@@ -1,5 +1,5 @@
 // kinds: kaprekar
-//   kaprekar               0012, 0013  a number, its sort-and-subtract chain to 495 / 6174, the histogram of chain lengths
+//   kaprekar               0012, 0013  a number, its sort-and-subtract chain to 495 / 6174, the histogram of chain lengths; a toggle for the first step as a column subtraction with the borrows
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -13,6 +13,18 @@
     const digits = String(x).padStart(d, "0").split("").sort();
     const smallest = Number(digits.join("")), largest = Number(digits.slice().reverse().join(""));
     return { x, digits: digits.slice().reverse().join(""), largest, smallest, diff: largest - smallest, special: largest - smallest === x };
+  };
+  // The column subtraction of the proof: largest minus smallest digit by digit from the
+  // units, each column's borrow in and out and the digit it leaves.
+  const kapColumns = (largest, smallest, d) => {
+    const top = String(largest).padStart(d, "0"), bot = String(smallest).padStart(d, "0"), cols = [];
+    let borrow = 0;
+    for (let i = d - 1; i >= 0; i--) {
+      const v = Number(top[i]) - Number(bot[i]) - borrow, out = v < 0 ? 1 : 0;
+      cols.unshift({ top: Number(top[i]), bottom: Number(bot[i]), borrowIn: borrow, borrowOut: out, digit: v + 10 * out });
+      borrow = out;
+    }
+    return cols;
   };
   const kapChain = (x, d, cap = 12) => {
     const steps = [];
@@ -54,6 +66,7 @@
         `<button type="button" class="md-button md-button--primary ex-random">הגרלה</button>` +
         `<span class="kp-presets">דוגמאות : ` + presets.map((p) => `<button type="button" class="md-button ex-preset" data-x="${p}">${p}</button>`).join(" ") + `</span></div>` +
         `<div class="kp-table"></div><p class="kp-chain" aria-live="polite"></p>` +
+        `<label><input type="checkbox" class="ex-cols" checked> החיסור במאונך של הצעד הראשון</label><div class="kp-cols"></div>` +
         `<p class="ex-title">מספר הצעדים עד שהערך מפסיק להשתנות, על כל ${ltr(num(MAX + 1))} המספרים; המספר שלכם מסומן</p><div class="kp-chart"></div><p class="ex-summary kp-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const input = $(".ex-x");
@@ -72,6 +85,23 @@
             (c.fixed ? `, ואחרי ${c.length === 1 ? "צעד אחד" : `${ltr(c.length)} צעדים`} מגיעים ל-<b>${ltr(pad(c.end))}</b>, שהוא מיוחד ונשאר.` : `, ועדיין לא נעצר.`);
         if (c.end === 0 && !first.special) text += ` כל הספרות שוות, ולכן ההפרש הוא 0 ושם זה נגמר.`;
         $(".kp-chain").innerHTML = text;
+        // the first step as a column subtraction, units first, with the borrows; the digits
+        // the page's p and q predict beside it
+        if ($(".ex-cols").checked) {
+          const s0 = c.steps[0], cols = kapColumns(s0.largest, s0.smallest, d), ds = s0.digits.split("").map(Number);
+          const p = ds[0] - ds[d - 1], q = d === 4 ? ds[1] - ds[2] : null;
+          const NAMES = ["אחדות", "עשרות", "מאות", "אלפים"];
+          const cell = (v, cls = "") => `<td class="${cls}">${v}</td>`;
+          const head = cols.map((col, i) => cell(NAMES[d - 1 - i], "kp-col-name")).join("");
+          const borrows = cols.map((col) => cell(col.borrowOut ? "1" : "", col.borrowOut ? "kp-borrow" : "")).join("");
+          $(".kp-cols").innerHTML = `<table class="kp-sub" dir="ltr"><tbody><tr><td></td>${head}</tr><tr><td class="kp-col-name">לווה</td>${borrows}</tr>` +
+            `<tr><td></td>${cols.map((col) => cell(col.top)).join("")}</tr><tr><td>−</td>${cols.map((col) => cell(col.bottom)).join("")}</tr>` +
+            `<tr class="kp-res"><td>=</td>${cols.map((col) => cell(col.digit, col.borrowOut ? "kp-lent" : "")).join("")}</tr></tbody></table>` +
+            `<p class="ex-note">${p === 0 ? "כל הספרות שוות, ולכן ההפרש 0 בלי שום לווה." :
+              `החיסור מהאחדות שמאלה. ${cols.filter((col) => col.borrowOut).map((col) => NAMES[d - 1 - cols.indexOf(col)]).join(", ")} ${cols.filter((col) => col.borrowOut).length === 1 ? "לווה" : "לוות"} מהעמודה שמשמאל (ה-1 מעל). ` +
+              (d === 4 ? `עם ${ltr(`p = ${ds[0]} − ${ds[3]} = ${p}`)} ו-${ltr(`q = ${ds[1]} − ${ds[2]} = ${q}`)} הדף צופה ${q >= 1 ? ltr(`p, q − 1, 9 − q, 10 − p = ${p}, ${q - 1}, ${9 - q}, ${10 - p}`) : ltr(`p − 1, 9, 9, 10 − p = ${p - 1}, 9, 9, ${10 - p}`)}${q === 0 ? " (q = 0, ולכן גם המאות לוות)" : ""}.`
+                : `עם ${ltr(`p = ${ds[0]} − ${ds[2]} = ${p}`)} הספרות הן ${ltr(`p − 1, 9, 10 − p = ${p - 1}, 9, ${10 - p}`)}.`)}</p>`;
+        } else $(".kp-cols").innerHTML = "";
         const hist = H.hist[FIXED] || [], hist0 = H.hist[0] || [];
         const n = Math.max(hist.length, hist0.length);
         const vals = Array.from({ length: n }, (_, k) => (hist[k] || 0) + (hist0[k] || 0));
@@ -93,6 +123,7 @@
       };
       const set = (x) => { if (Number.isInteger(x) && x >= 0 && x <= MAX) st.x = x; draw(); };
       input.addEventListener("change", () => set(Math.round(Number(input.value))));
+      $(".ex-cols").addEventListener("change", draw);
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
       const seed = seedControls(box, $(".kp-presets"), (rng) => set(Math.floor(rng() * (MAX + 1))));
       $(".ex-random").addEventListener("click", seed.draw);
@@ -104,8 +135,8 @@
   dvqExplorers.register({
     views: { kaprekar: kaprekarView },
     help: {
-      kaprekar: "מקלידים או מגרילים מספר : ״הצעד הבא״ ממיין ומחסר עד 495 או 6174, וההיסטוגרמה סופרת את אורכי השרשראות של כל המספרים.",
+      kaprekar: "מקלידים או מגרילים מספר : ״הצעד הבא״ ממיין ומחסר עד 495 או 6174, וההיסטוגרמה סופרת את אורכי השרשראות של כל המספרים. המתג ״החיסור במאונך״ מראה את הצעד הראשון עמודה אחרי עמודה, עם הלווים.",
     },
-    models: { kapStep, kapChain, kapHistogram },
+    models: { kapStep, kapColumns, kapChain, kapHistogram },
   });
 })();

@@ -116,3 +116,24 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(40)
+
+
+def test_explorer_fallback():
+    """The box's build of an edge: for every pattern of up to 6 bits, every state and both
+    bits, the longest prefix of the pattern that the text ends with is the KMP table's
+    next state (the page's fsm_table for 1011), and the shift is the length difference."""
+    from page_tests import explorer_require, node_json
+
+    patterns = [[int(c) for c in format(v, f"0{w}b")] for w in range(1, 7) for v in range(1 << w)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(patterns)}.map((p) => [m.seqTable(p).nxt,
+        [...Array(p.length + 1).keys()].map((s) => [0, 1].map((b) => m.seqFallback(p, s, b)))])));""")
+    for p, (nxt, fbs) in zip(patterns, got):
+        for s, pair in enumerate(fbs):
+            for b, fb in enumerate(pair):
+                text = p[:s] + [b]
+                want = max(k for k in range(min(len(text), len(p)) + 1) if text[len(text) - k:] == p[:k])
+                assert fb["text"] == text and fb["target"] == want and fb["shift"] == len(text) - want
+                if s < len(p):
+                    assert fb["target"] == nxt[s][b], (p, s, b)

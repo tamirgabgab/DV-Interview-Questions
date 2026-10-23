@@ -176,3 +176,25 @@ def test_base_b_explorer_matches_page_code():
             assert digits_f == (q0013.digits_b(diff, B) if p else [0, 0, 0, 0])
             assert (p_next, q_next) == q0013.pair_b(diff, B)
             assert (values, start) == orbit_b(x, B)
+
+
+def test_explorer_column_subtraction():
+    """The box's column subtraction: for every four-digit number, the columns of largest
+    minus smallest give the difference digit by digit with the borrows of the page's
+    table (units and tens always, hundreds only when q = 0, thousands never)."""
+    from page_tests import explorer_require, node_json
+
+    xs = list(range(0, 10000, 7)) + [95, 3524, 1000, 6174]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({xs}.map((x) => {{ const s = m.kapStep(x, 4); return [s.diff, m.kapColumns(s.largest, s.smallest, 4)]; }})));")
+    for x, (diff, cols) in zip(xs, got):
+        ds = sorted(f"{x:04d}", reverse=True)
+        a, b, c, d = map(int, ds)
+        p, q = a - d, b - c
+        assert int("".join(str(col["digit"]) for col in cols)) == diff
+        if p == 0:
+            assert not any(col["borrowOut"] for col in cols)
+            continue
+        assert [col["borrowOut"] for col in cols] == [0, int(q == 0), 1, 1], x
+        want = [p, q - 1, 9 - q, 10 - p] if q >= 1 else [p - 1, 9, 9, 10 - p]
+        assert [col["digit"] for col in cols] == want, x

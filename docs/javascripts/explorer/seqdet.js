@@ -1,5 +1,5 @@
 // kinds: seqdet
-//   seqdet                 0040        a pattern of up to 8 bits, Mealy or Moore: the KMP automaton drawn as a row of states, bits fed by hand, at random or played, the strip of din / state / found
+//   seqdet                 0040        a pattern of up to 8 bits, Mealy or Moore: the KMP automaton drawn as a row of states, bits fed by hand, at random or played, the strip of din / state / found; a toggle for the pattern slid under the input, the build of both edges
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -21,6 +21,17 @@
     let rest = 0;
     for (let s = 0; s < L; s++) if (nxt[s][0] === nxt[L][0] && nxt[s][1] === nxt[L][1]) { rest = s; break; }
     return { nxt, rest, L };
+  };
+  // How an edge is built: in state s the last s bits are the pattern's first s; a bit b
+  // makes the text pattern[0..s) + b, and the next state is the longest prefix of the
+  // pattern that this text ends with (the pattern slid under it by `shift`).
+  const seqFallback = (pattern, s, b) => {
+    const text = pattern.slice(0, s).concat([b]), L = pattern.length;
+    for (let k = Math.min(text.length, L); k >= 0; k--) {
+      const tail = text.slice(text.length - k);
+      if (tail.every((v, i) => v === pattern[i])) return { text, shift: text.length - k, target: k };
+    }
+    return { text, shift: text.length, target: 0 };
   };
   const seqRun = (pattern, bits, moore = false) => {
     const { nxt, rest, L } = seqTable(pattern);
@@ -62,6 +73,7 @@
         `<span class="wv-presets">דוגמאות : <button type="button" class="md-button ex-preset" data-s="1011011">1011011</button> <button type="button" class="md-button ex-preset" data-s="10101011">10101011</button></span></div>` +
         `<p class="ex-summary sq-sum" aria-live="polite"></p><p class="sq-next"></p>` +
         `<div class="sq-graph"></div>` +
+        `<label class="sq-build-toggle"><input type="checkbox" class="sq-build" checked> איך נבנה המעבר מהמצב הנוכחי</label><div class="sq-slide"></div>` +
         `<span class="viz-legend"><span><i class="fs-key"></i>מעבר</span><span><i class="fs-key-found"></i>המעבר שמזהה (Mealy) או המצב שמוציא 1 (Moore)</span><span><i class="sq-key-cur"></i>המצב הנוכחי</span></span>` +
         `<div class="wv-wrap sq-strip" tabindex="0" role="group" aria-label="רצועת התזמון של הגלאי, גלילה אופקית"></div>`;
       const $ = (sel) => box.querySelector(sel);
@@ -97,6 +109,20 @@
         const t = seqTable(st.pattern), run = seqRun(st.pattern, st.bits, st.moore), L = t.L;
         $(".sq-kind").value = st.moore ? "moore" : "mealy"; $(".out-p").textContent = `${Math.round(st.p1 * 100)}%`;
         $(".sq-graph").innerHTML = graph(t, run);
+        // the build of the two edges out of the current state: the text so far plus each
+        // bit, with the pattern slid under it to the longest prefix that the text ends with
+        if ($(".sq-build").checked) {
+          const cur = run.next, rows = [0, 1].map((b) => {
+            const fb = seqFallback(st.pattern, cur, b), n = fb.text.length, cell = (v, cls) => `<span class="sq-c ${cls}">${v}</span>`;
+            const textRow = fb.text.map((v, i) => cell(v, i === n - 1 ? "is-bit" : "")).join("");
+            const patRow = cell("", "is-pad").repeat(fb.shift) + st.pattern.map((v, i) => cell(v, i < fb.target ? "is-match" : "is-rest")).join("");
+            const tg = st.moore || fb.target < L ? fb.target : t.rest;
+            const what = fb.shift === 0 && fb.target === n ? `ממשיך קדימה` : fb.target === 0 ? `אף התחלה של התבנית לא נשארת` : `התבנית הוזזה ב-${ltr(fb.shift)}, ו-${ltr(fb.target)} ${fb.target === 1 ? "ביט מתאים" : "ביטים מתאימים"}`;
+            return `<div class="sq-slide-case"><p>מ-${code(`S${cur}`)} עם ${code(String(b))} : ${what}, ולכן המעבר ל-${code(`S${tg}`)}${!st.moore && fb.target === L ? " (זיהוי, ומשם ממשיכים כמו מ-" + code(`S${t.rest}`) + ")" : ""}.</p>` +
+              `<div class="sq-grid" dir="ltr"><span class="sq-lab">input</span>${textRow}<br><span class="sq-lab">pattern</span>${patRow}</div></div>`;
+          });
+          $(".sq-slide").innerHTML = `<p class="ex-title">במצב ${code(`S${cur}`)} ידוע ש${cur ? `-${ltr(cur)} הביטים האחרונים הם ${code(st.pattern.slice(0, cur).join(""))}` : "שום ביט מהתבנית עוד לא הופיע"}. לכל ביט הבא, התבנית מוזזת מתחת לקלט עד ההתאמה הארוכה ביותר :</p>` + rows.join("");
+        } else $(".sq-slide").innerHTML = "";
         const from = Math.max(0, st.bits.length - KEEP), bits = st.bits.slice(from), states = run.states.slice(from), out = run.out.slice(from);
         const n = bits.length;
         $(".sq-strip").innerHTML = n ? waveStrip([
@@ -125,6 +151,7 @@
       };
       $(".sq-pat").addEventListener("change", () => setPattern($(".sq-pat").value));
       $(".sq-pat").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".sq-pat").blur(); });
+      $(".sq-build").addEventListener("change", draw);
       $(".sq-kind").addEventListener("change", () => { stop(); st.moore = $(".sq-kind").value === "moore"; draw(); });
       $(".sq-p").addEventListener("input", () => { st.p1 = Number($(".sq-p").value) / 100; draw(); });
       box.querySelectorAll(".sq-bit").forEach((btn) => btn.addEventListener("click", () => { stop(); feed(Number(btn.dataset.b)); }));
@@ -143,8 +170,8 @@
   dvqExplorers.register({
     views: { seqdet: seqdetView },
     help: {
-      seqdet: "מקלידים תבנית ובוחרים Mealy או Moore : הכפתורים 0 ו-1 מזינים ביט, ״ביט אקראי״ ו״הפעלה״ מגרילים לפי ההסתברות שבסליידר. הגרף מדגיש את המצב ואת המעבר שנלקח, הרצועה מראה din, state ו-found, והשורה מתחת אומרת לאן 0 ו-1 יובילו.",
+      seqdet: "מקלידים תבנית ובוחרים Mealy או Moore : הכפתורים 0 ו-1 מזינים ביט, ״ביט אקראי״ ו״הפעלה״ מגרילים לפי ההסתברות שבסליידר. הגרף מדגיש את המצב ואת המעבר שנלקח, הרצועה מראה din, state ו-found, והשורה מתחת אומרת לאן 0 ו-1 יובילו. המתג ״איך נבנה המעבר״ מראה את התבנית מוזזת מתחת לקלט עד ההתאמה הארוכה ביותר, וזה המצב הבא.",
     },
-    models: { seqTable, seqRun },
+    models: { seqTable, seqFallback, seqRun },
   });
 })();

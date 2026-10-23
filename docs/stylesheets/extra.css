@@ -1433,6 +1433,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .bridge-table td, .md-typeset .explorer .bridge-table th { padding: 0.15em 0.6em; }
 .md-typeset .explorer .bridge-table tr[data-best] td:last-child { font-weight: 700; color: var(--viz-s2-text); }
 .md-typeset .explorer .bridge-table tr.is-now td { background: var(--md-code-bg-color); }
+.md-typeset .explorer .bridge-table td.is-take { font-weight: 700; color: var(--viz-s3-text); }
 
 /* the river figure and state graph of 0032 */
 .md-typeset svg .boat { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
@@ -1767,6 +1768,34 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .cm-band { stroke: var(--viz-s1); stroke-width: 6; stroke-opacity: 0.35; stroke-linecap: round; }
 .md-typeset svg .cm-band.is-full { stroke-opacity: 0.85; }
 .md-typeset svg .cm-price-lbl { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg .eg-band-below { fill: var(--viz-s3); fill-opacity: 0.75; }
+.md-typeset svg .eg-band-above { fill: var(--viz-s1); fill-opacity: 0.75; }
+.md-typeset .explorer .eg-below-txt { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer .eg-above-txt { color: var(--viz-s1-text); font-weight: 700; }
+.md-typeset .explorer .sq-build-toggle { margin-top: 0.4rem; }
+.md-typeset .explorer .sq-slide-case p { margin: 0.4em 0 0.2em; }
+.md-typeset .explorer .sq-grid { font-family: var(--md-code-font-family); font-size: 0.75rem; line-height: 1.9; overflow-x: auto; white-space: nowrap; }
+.md-typeset .explorer .sq-lab { display: inline-block; width: 4.2rem; color: var(--viz-text); font-size: 0.65rem; }
+.md-typeset .explorer .sq-c { display: inline-block; width: 1.3rem; text-align: center; border: 1px solid var(--viz-grid); margin-right: 1px; }
+.md-typeset .explorer .sq-c.is-pad { border-color: transparent; }
+.md-typeset .explorer .sq-c.is-bit { border-color: var(--viz-s2); font-weight: 700; }
+.md-typeset .explorer .sq-c.is-match { background: var(--viz-s3); color: var(--md-default-bg-color); border-color: var(--viz-s3); font-weight: 700; }
+.md-typeset .explorer .sq-c.is-rest { color: var(--viz-text); border-style: dashed; }
+.md-typeset .explorer table.kp-sub { direction: ltr; font-family: var(--md-code-font-family); font-size: 0.8rem; margin: 0.3em 0; }
+.md-typeset .explorer table.kp-sub td { padding: 0.05em 0.7em; text-align: center; border: none; }
+.md-typeset .explorer table.kp-sub .kp-col-name { font-family: var(--md-text-font-family); font-size: 0.6rem; color: var(--viz-text); }
+.md-typeset .explorer table.kp-sub .kp-borrow { color: var(--viz-s2-text); font-weight: 700; font-size: 0.65rem; }
+.md-typeset .explorer table.kp-sub tr.kp-res td { border-top: 1.5px solid var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer table.kp-sub td.kp-lent { color: var(--viz-s2-text); }
+.md-typeset svg .sh-pa { stroke: var(--viz-s1); stroke-width: 4; stroke-linecap: round; }
+.md-typeset svg .sh-pb { stroke: var(--viz-s2); stroke-width: 4; stroke-linecap: round; }
+.md-typeset svg .sh-pmeet { fill: var(--diff-hard); fill-opacity: 0.25; }
+.md-typeset svg .sh-drag { cursor: grab; touch-action: none; }
+.md-typeset svg .sh-drag:focus-visible rect { outline: none; stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset .explorer .sh-sandbox { max-width: 20rem; touch-action: none; }
+.md-typeset .explorer .sh-conds { margin: 0.2em 0 0.4em; font-size: 0.75rem; list-style: none; padding: 0; }
+.md-typeset .explorer .sh-conds li { margin: 0.1em 0; color: var(--viz-text); }
+.md-typeset .explorer .sh-conds li.is-true { color: var(--viz-s3-text); font-weight: 700; }
 .md-typeset .explorer .bx-chip.bx-long { white-space: normal; }   /* a cycle longer than N / 2 can be wider than a phone */
 .md-typeset .explorer .bx-chip bdi { font-family: var(--md-code-font-family); font-size: 0.7rem; }
 .md-typeset .explorer .bx-ok { color: var(--diff-easy); font-weight: 700; }

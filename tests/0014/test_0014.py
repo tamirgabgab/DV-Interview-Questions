@@ -148,3 +148,21 @@ def test_explorer_matches_page_code():
     h = got["heat"]
     assert h["rounds"] == 40 and sum(h["sides"]) == h["count"] and len(h["cells"]) == 7 and all(len(r) == 9 for r in h["cells"])
     assert sum(map(sum, h["cells"])) >= h["count"]            # every shape covers at least one cell
+
+
+def test_explorer_four_cases():
+    """The box's projections and sandbox: the four cases of "no overlap" (b left of, right
+    of, below or above a) hold none exactly when the page's overlap() says the two
+    rectangles overlap, on every pair of small rectangles."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rects = [[x1, y1, x2, y2] for x1 in range(1, 5) for x2 in range(x1 + 1, 6) for y1 in range(1, 4) for y2 in range(y1 + 1, 5)]
+    pairs = [[a, b] for a in rects[::3] for b in rects[::2]]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({json.dumps(pairs)}.map(([a, b]) => m.shapesWhy(a, b))));")
+    for (a, b), w in zip(pairs, got):
+        assert w["left"] == (b[2] <= a[0]) and w["right"] == (b[0] >= a[2])
+        assert w["below"] == (b[3] <= a[1]) and w["above"] == (b[1] >= a[3])
+        assert w["overlap"] == bool(overlap(tuple(a), tuple(b))) == (not (w["left"] or w["right"] or w["below"] or w["above"]))

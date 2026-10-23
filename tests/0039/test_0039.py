@@ -117,3 +117,32 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(39)
+
+
+def test_explorer_recurrence_bands():
+    """The box's recurrence on the building: at every drop of the plan, for every threshold,
+    the floors below the drop are f(e - 1, t - 1) (capped by the unknown range) and the
+    floors above at most f(e, t - 1), from an independent table of sums of binomials."""
+    from page_tests import explorer_require, node_json
+
+    def f(e, t):
+        return sum(comb(t, i) for i in range(1, e + 1))
+
+    cases = [(3, 100), (2, 36), (4, 200), (1, 9)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({[list(c) for c in cases]}.map(([k, n]) => {{
+        const F = m.eggsTable(k, n), out = [];
+        for (let T = 0; T <= n; T += 7) {{
+          const run = m.eggsRun(k, n, T);
+          let low = 0, high = n + 1, eggs = k, left = run.length ? [...Array(n + 1).keys()].find((t) => F[k][t] >= n) : 0;
+          run.forEach(([fl, broke]) => {{ out.push([low, high, eggs, left, fl, m.eggsSplitAt(F, low, high, eggs, left)]); left--; if (broke) {{ high = fl; eggs--; }} else low = fl; }});
+        }}
+        return out;
+      }})));""")
+    for (k, n), rows in zip(cases, got):
+        for low, high, eggs, left, fl, sp in rows:
+            assert sp["floor"] == fl
+            assert sp["fBelow"] == min(n, f(eggs - 1, left - 1)) and sp["fAbove"] == min(n, f(eggs, left - 1))
+            assert sp["below"] == min(sp["fBelow"], high - low - 2) and sp["above"] <= sp["fAbove"]
+            assert sp["below"] + 1 + sp["above"] == high - low - 1

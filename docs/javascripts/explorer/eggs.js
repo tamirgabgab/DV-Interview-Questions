@@ -1,5 +1,5 @@
 // kinds: eggs
-//   eggs                   0039        k eggs and n floors: the building with the unknown range, a zoom of its floors to pick the threshold, the plan played drop by drop, drops per threshold under the worst case
+//   eggs                   0039        k eggs and n floors: the building with the unknown range, a zoom of its floors to pick the threshold, the plan played drop by drop, drops per threshold under the worst case; a toggle for the recurrence's two bands at the next drop
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -28,6 +28,14 @@
     }
     return drops;
   };
+  // The recurrence at a drop: with `eggs` eggs and `left` drops on the unknown floors
+  // low + 1 .. high − 1, the plan drops from low + f(eggs − 1, left − 1) + 1. The floors
+  // below are what the eggs left after a break settle in the drops left, the floors above
+  // at most what all the eggs settle in them: f(e, t) = f(e − 1, t − 1) + 1 + f(e, t − 1).
+  const eggsSplitAt = (F, low, high, eggs, left) => {
+    const floor = Math.min(low + F[eggs - 1][left - 1] + 1, high - 1);
+    return { floor, below: floor - low - 1, above: high - floor - 1, fBelow: F[eggs - 1][left - 1], fAbove: F[eggs][left - 1], f: F[eggs][left] };
+  };
   const eggsRun = (k, n, T) => eggsRunOf(eggsTable(k, n), k, n, T);
   const eggsFirst = (k, n) => eggsRun(k, n, n).map((d) => d[0]);
   const eggsPerThreshold = (k, n) => { const F = eggsTable(k, n); return Array.from({ length: n + 1 }, (_, T) => eggsRunOf(F, k, n, T).length); };
@@ -55,8 +63,9 @@
         `<button type="button" class="md-button ex-prev">ההטלה הקודמת</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 300) +
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
-        `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
-        `<p class="ex-summary eg-sum" aria-live="polite"></p><p class="eg-step"></p>` +
+        `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span>` +
+        `<label><input type="checkbox" class="eg-rec" checked> הנוסחה על הבניין</label></div>` +
+        `<p class="ex-summary eg-sum" aria-live="polite"></p><p class="eg-step"></p><p class="eg-rec-text"></p>` +
         `<span class="viz-legend"><span><i class="eg-key-safe"></i>ידוע שלא נשברת</span><span><i class="eg-key-broke"></i>ידוע שנשברת</span><span><i class="eg-key-unknown"></i>עוד לא ידוע</span><span><i class="eg-key-thr"></i>הסף שבחרתם</span><span><i class="eg-key-next"></i>ההטלה הבאה</span></span>` +
         `<div class="eg-box"><div class="eg-building"></div><div class="eg-zoomwrap"><p class="ex-title eg-zoomtitle"></p><div class="eg-zoom"></div>` +
         `<label class="eg-winlab"><span>חלון התקריב</span><input type="range" class="eg-win" min="1" max="1" step="1" value="1" dir="ltr" aria-label="הקומה הראשונה בחלון התקריב"></label></div></div>` +
@@ -95,6 +104,14 @@
           h += `<g class="eg-drop ${broke ? "is-broke" : "is-safe"}"><circle cx="${X1 + 16}" cy="${f(y(fl))}" r="7"/><text x="${X1 + 16}" y="${f(y(fl) + 3)}" text-anchor="middle">${i + 1}</text><title>הטלה ${i + 1} מקומה ${fl} : ${broke ? "נשברה" : "לא נשברה"}</title></g>`;
         });
         if (next !== null) h += `<line class="eg-next" x1="${X0}" x2="${X1 + 8}" y1="${f(y(next))}" y2="${f(y(next))}"/><text class="eg-nextlbl" x="${X1 + 28}" y="${f(y(next) + 3)}">${next}</text>`;
+        if (next !== null && $(".eg-rec").checked) {
+          // the next drop's split: the band below it (what the eggs left after a break
+          // settle) and the band above (what all of them settle), beside the building
+          const sp = eggsSplitAt(st.F, s.low, s.high, s.eggs, s.left), bx = X0 - 34;
+          if (sp.below > 0) h += `<rect class="eg-band-below" x="${bx}" y="${f(y(sp.floor - 1))}" width="7" height="${f(y(s.low) - y(sp.floor - 1))}"><title>מתחת להטלה : ${sp.below} קומות</title></rect>`;
+          if (sp.above > 0) h += `<rect class="eg-band-above" x="${bx}" y="${f(y(s.high - 1))}" width="7" height="${f(y(sp.floor) - y(s.high - 1))}"><title>מעל ההטלה : ${sp.above} קומות</title></rect>`;
+          h += `<line class="eg-next" x1="${bx}" x2="${X0}" y1="${f(y(sp.floor))}" y2="${f(y(sp.floor))}"/>`;
+        }
         h += `<rect class="eg-hit" x="${X0}" y="${TOP}" width="${X1 - X0}" height="${BOT - TOP}"/></svg>`;
         return h;
       };
@@ -155,6 +172,15 @@
               (s.eggs === 1 ? ` (ביצה אחרונה : קומה אחר קומה).` : `.`));
         }
         $(".eg-step").innerHTML = step;
+        // the recurrence for the next drop, in words, next to the bands on the building
+        if ($(".eg-rec").checked && !done) {
+          const sp = eggsSplitAt(st.F, s.low, s.high, s.eggs, s.left), e = s.eggs, t = s.left;
+          $(".eg-rec-text").innerHTML = `הנוסחה על הבניין : ההטלה הבאה מקומה ${ltr(sp.floor)}. מתחתיה <span class="eg-below-txt">${ltr(sp.below)} קומות</span>, ` +
+            (e === 1 ? `ואין עוד ביצה אחרי שבירה, ולכן עולים קומה אחר קומה. ` :
+              `בדיוק ${ltr(`f(${e - 1}, ${t - 1}) = ${sp.fBelow}`)} : מה ש-${ltr(e - 1)} ${e - 1 === 1 ? "ביצה שנשארת" : "ביצים שנשארות"} אחרי שבירה מכריעות ב-${ltr(t - 1)} ההטלות שנשארו. `) +
+            `מעליה <span class="eg-above-txt">${ltr(sp.above)} קומות</span>, ו-${ltr(`f(${e}, ${t - 1}) = ${sp.fAbove}`)} ${sp.above === sp.fAbove ? "מכריעות בדיוק אותן" : "מכריעות עד כמה שצריך"} אם היא לא נשברת. ` +
+            `ביחד ${ltr(`f(${e}, ${t}) = f(${e - 1}, ${t - 1}) + 1 + f(${e}, ${t - 1}) = ${sp.fBelow} + 1 + ${sp.fAbove}`)}${sp.fBelow + 1 + sp.fAbove > st.n ? `, יותר מ-${ltr(st.n)} הקומות` : ""}, והטווח הלא ידוע הוא ${ltr(s.high - s.low - 1)} קומות.`;
+        } else $(".eg-rec-text").innerHTML = "";
         // the clickable floors
         box.querySelectorAll(".eg-row").forEach((r) => {
           const pick = () => { setT(Number(r.dataset.fl), false); };
@@ -183,6 +209,7 @@
       const readT = () => { const v = Math.round(Number($(".eg-t").value)); if (v >= 0 && v <= st.n) setT(v, true); else $(".eg-t").value = st.T; };
       $(".eg-t").addEventListener("change", readT);
       $(".eg-t").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".eg-t").blur(); });
+      $(".eg-rec").addEventListener("change", draw);
       $(".eg-win").addEventListener("input", () => { st.win = clampWin(Number($(".eg-win").value)); draw(); });
       const seed = seedControls(box, $(".ex-random"), (rng) => { setT(Math.floor(rng() * (st.n + 1)), true); });
       $(".ex-random").addEventListener("click", () => seed.draw());
@@ -200,8 +227,8 @@
   dvqExplorers.register({
     views: { eggs: eggsView },
     help: {
-      eggs: "k ביצים ו-n קומות בבקרות, והסף נבחר בלחיצה על הבניין, על קומה בתקריב או בשדה. ״ההטלה הבאה״ ו״הפעלה״ מריצים את התוכנית : הבניין צובע את הקומות הידועות, התקריב מראה את הקומות הלא ידועות אחת-אחת, והגרף סופר את ההטלות לכל סף מתחת לקו של המקרה הגרוע.",
+      eggs: "k ביצים ו-n קומות בבקרות, והסף נבחר בלחיצה על הבניין, על קומה בתקריב או בשדה. ״ההטלה הבאה״ ו״הפעלה״ מריצים את התוכנית : הבניין צובע את הקומות הידועות, התקריב מראה את הקומות הלא ידועות אחת-אחת, והגרף סופר את ההטלות לכל סף מתחת לקו של המקרה הגרוע. המתג ״הנוסחה על הבניין״ מסמן ליד הבניין את שני החלקים של ההטלה הבאה, f(k − 1, t − 1) מתחתיה ו-f(k, t − 1) מעליה.",
     },
-    models: { eggsTable, eggsDrops, eggsRun, eggsFirst, eggsPerThreshold },
+    models: { eggsTable, eggsSplitAt, eggsDrops, eggsRun, eggsFirst, eggsPerThreshold },
   });
 })();
