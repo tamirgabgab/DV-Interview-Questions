@@ -1735,6 +1735,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
    1101111111 with 0 first, 1111111101 with 1 first). New question ideas not already
    listed are rounds M to R (M263 to R283); the Monty Hall formula and the birthday
    approximation were checked by simulation.
+9. **Rounds I to L revised** on the owner's direction: illustrate the solutions on the
+   pages, without comparisons to a naive solution and without trap views. The first
+   version (I225 to L262) was replaced by I284 to L318; the trap round was dropped and K
+   now shows the solution's mechanism inside the existing boxes.
 
 ---
 
@@ -1767,7 +1771,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   (0001, 0035) scrolled sideways on a phone.
 - Session 21: F218, F219, G220 and G221 are done and on `main`; G222, H223 and H224 are
   deferred by the owner. Proposed for the owner to pick: rounds I to L (boxes that show
-  the solution, I225 to L262) and rounds M to R (new questions, M263 to R283).
+  the solution, revised: I284 to L318; suggested order L, K, I, J) and rounds M to R (new
+  questions, M263 to R283).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2394,79 +2399,81 @@ with G220 (both reshape the shared code), G221 and G222 with E200, then round H 
 D196 (controls in a bottom sheet on phones) and B186 (the page code stepped beside its
 state) stay open in their rounds.
 
-### Second series, rounds I to L — boxes that show the solution (proposed 2026-10-23, owner picks)
+### Second series, rounds I to L — boxes that show the solution (proposed 2026-10-23, revised, owner picks)
 
 A review of every page (session 21, three read-only passes over the pages and the kind
-files) asked of each box: does it show the key idea, the invariant, the proof step or the
-trap, and which parts have no visual at all. Every page has a box, but 13 pages have a part
-(beyond the statement) with no visual, more have parts with static figures only, and most
-boxes show the answer rather than why it holds. Item numbers continue the global count, so
-rounds I to R here do not collide with the first series' rounds of the same letters. Ideas that are only
-parameter knobs were left out (the owner turned those down in round W). Two help lines do
-not match their buttons (0004 `boxes3` names "סידור אחר", 0011 `ttt` names "הגרלה" and "הבורר");
-that fix is L262.
+files) asked of each box whether it shows the solution the page gives (its idea, the steps
+of the algorithm, the invariant or the proof) and which parts have no visual at all. Every
+page has a box, but 13 pages have a part (beyond the statement) with no visual, more have
+parts with static figures only, and most boxes show the answer rather than why it holds.
 
-**Round I — a first box in the parts that have none (puzzles and algorithms)**
+The owner's direction (session 21): illustrate the solutions on the pages; no comparisons
+with a naive solution and no "trap failing on screen" views. This version replaces the
+first one (I225 to L262): the trap round and the naive comparisons were dropped, the trap
+toggles were removed from the items that stayed, and round K now shows the mechanism of the
+solution inside the existing boxes. Parameter knobs stay out (the owner turned them down
+in round W). Item numbers continue the global count, so these rounds do not collide with
+the first series' rounds of the same letters.
 
-| Id | Page | Idea | Size |
-|---|---|---|---|
-| I225 | 0002 part a | **The naive swap**: `a = b; b = a` as a version of the `trace` box, placed in part a; the symbolic column shows both variables becoming b0, which is why the temporary exists | S |
-| I226 | 0004 part b | **The labels fix**: a `boxes3` mode with the labels array, k, same and other marked, the two swaps drawn as a 3-cycle, and a "C-style `(k - 1) % 3`" toggle that shows index −1 at k = 0 | M |
-| I227 | 0006 part a | **The pair triangle**: every (buy, sell) pair coloured by profit beside the price chart; as the scan plays, the best cell of each sell day lies on the minimum-so-far row, so the naive O(n²) and the scan are one picture | M |
-| I228 | 0010 part a | **Pair erasing**: a `brackets` mode that deletes adjacent pairs pass by pass with a pass and character counter, against the stack's one pass (`((((…))))` shows the O(n²)) | M |
-| I229 | 0012, 0013 part b | **The proof map in part b**: `kapbase` with base 10 in 0012 (the map k → max(10 − k, k − 1), the fixed point at 5); in 0013 the 55-cell (p, q) grid made clickable (the digits, the case of the analysis, the arrow to the next pair; only 6174 points to itself) | S–M |
-| I230 | 0007 part c | **Three half-circles**: for a drawn triangle, the half-circle that starts at each point; at most one holds the other two; seeded draws count A1, A2, A3 apart (about 1/4 each, never two at once) | M |
-| I231 | 0005 bonus | **Pigeonhole on the repunits**: R1 … R(x+1) dropped into x remainder slots, the first collision lit, and R_i − R_j = 1…10…0 shown as the multiple | M |
-| I232 | 0011 part b | **Any five cells hold a line**: pick cells on the wrap-around board, the 2-2-1 split per direction and the pair count shown; the fifth cell always completes a line, a 2 × 2 square is the four-cell counterexample | M |
-| I233 | 0017 solution 3 | **Binary search on values**: the histogram of 1..n with the count of values ≤ mid against y = mid, lo and hi narrowing with the invariant in colour, on the same array as the Floyd box | M |
-
-**Round J — a first box in the parts that have none (DV, math and probability)**
+**Round I — a visual in the parts that have none (puzzles and algorithms)**
 
 | Id | Page | Idea | Size |
 |---|---|---|---|
-| J234 | 0033 part a | **Written and read staircases**: the two cumulative step curves; the gap between them is the fill, and it peaks at the last write of the burst; a phase sweep shows the formula-to-formula + 1 band (the 24 against 25 trap) | S–M |
-| J235 | 0034 part b | **The conversions stepped**: binary, the shifted row, XOR gives Gray; back by a prefix XOR from the MSB one bit per step; then a counter walk marks the one changing bit, the 15 → 0 wrap included | S |
-| J236 | 0037 part a | **Metastability by Monte Carlo**: data edges on a clock timeline, those in the T0 window settle after an exponential time; the histogram with the t_res cut, and a second flop moving the cut by Tclk; the two factors of the formula become visible | M |
-| J237 | 0038 part a | **Attempt lanes**: one lane per property with the antecedent match, the window as a bracket and pass / fail / vacuous; the traps (`\|->` in rule 4, no `$rose`) as variants that fail a valid transaction; an rst_n row with `disable iff` on and off | M |
-| J238 | 0041 part a | **The stage ribbon**: equal bins played test by test, a bar per stage i → i + 1 with the measured wait against n / (n − i), so the long tail of the last bins is seen | S–M |
-| J239 | 0029 part b | **The gap line**: the unwrapped angle difference of a chosen pair against time with the integers as lines (each crossing a meeting), and the interval ends switched between closed, open and half-open with the three counts | S |
-| J240 | 0021 part b | **The recurrence ladder**: C(0..N) as a row; a click on C(n) lights the m terms it sums and the block strip shows "the first completion takes i blocks" per term; a bar of all 2^(N−1) subsets against the allowed ones (the trap) | M |
-| J241 | 0015 trap | **How the information was obtained**: many families, two filters side by side ("we asked yes / no" against "a random child is described"), counters converging to 13/27 (or 1/3) against 1/2 | M |
+| I284 | 0002 parts a, b | **Each part with its own swap**: the existing `trace` box placed in part a (the temporary variable) and in part b (the sum and the XOR), each preset to its part's version, the values and the a0 / b0 expressions line by line | S |
+| I285 | 0004 part b | **The labels fix**: a `boxes3` mode with the labels array, k, same and other marked, and the two swaps drawn as a 3-cycle | M |
+| I286 | 0006 part a | **The scan in part a**: the `stock` box placed in part a in long-only mode, so the minimum so far and the best long sit beside the part that explains them | S |
+| I287 | 0005 bonus | **Pigeonhole on the repunits**: R1 … R(x+1) dropped into x remainder slots, the first collision lit, and R_i − R_j = 1…10…0 shown as the multiple | M |
+| I288 | 0007 part c | **Three half-circles**: for a drawn triangle, the half-circle that starts at each point; at most one holds the other two; seeded draws count A1, A2, A3 apart (about 1/4 each, never two at once) | M |
+| I289 | 0011 part b | **Any five cells hold a line**: pick cells on the wrap-around board; the 2-2-1 split per direction and the pair count are shown, and the fifth cell always completes a line | M |
+| I290 | 0012 part b | **The map of the proof**: `kapbase` with base 10 placed in part b: the map k → max(10 − k, k − 1) and the fixed point at 5 | S |
+| I291 | 0013 part b | **The 55 pairs, clickable**: a cell of the (p, q) grid shows its digits, the case of the analysis that applies and the arrow to the next pair; only 6174 points to itself | S–M |
+| I292 | 0017 solution 3 | **Binary search on values**: the histogram of 1..n with the count of values ≤ mid against y = mid, lo and hi narrowing with the invariant in colour, on the same array as the Floyd box | M |
 
-**Round K — the trap, failing on screen**
+**Round J — a visual in the parts that have none (DV, math and probability)**
 
 | Id | Page | Idea | Size |
 |---|---|---|---|
-| K242 | 0001 | **Without the flip-flop**: a dimmed `pulse_naive = sig` row under `pulse`, high for as long as sig, beside the one-cycle pulse | S |
-| K243 | 0003 | **The inner loop from i + 1**: the same array run with the variant beside the page's loop; the reader watches it sort in descending order | S–M |
-| K244 | 0040 | **The naive detector alongside**: a second state and found row for the reset-to-S0 machine, the miss in 10101011 marked | S |
-| K245 | 0039 | **The naive plans on the chart**: the drops-per-threshold curves of "start at 50" and "every 25" (worst case 11) beside the optimal 9 | S |
-| K246 | 0014 part b | **The pair tester**: drag two rectangles; their projections on both axes, each of the four "or" conditions turning true or false, the corner test's verdict beside it (a cross preset where corners say "no overlap"), a < / ≤ toggle for touching shapes; the main box shades the shape and projection that rejected a candidate | M |
-| K247 | 0035 | **The glitch**: a toggle to `(cnt == 0) \| b` with small gate delays; the 01 → 10 change passes through 00 or 11 and a runt pulse appears on clk_out, while `a \| b` stays clean | M |
-| K248 | 0020 | **Check a split**: type completion sizes (144, 64, 48 or 128, 128); the box puts the cuts on the RCB grid and marks a cut off a boundary or a completion above MPS; clicking boundaries to cut or not shows the 2^c subsets | S |
-| K249 | 0023, 0024, 0025 | **A wrong model beside the right one**: one shared "inject a bug" select per protocol box (0023 one queue with a random pick, one FIFO; 0024 `PCL += grant`, PCR first in Sync; 0025 Ack deletes one record, `seq <=` purge at the wrap, a Nak per discarded TLP), the same script or seed run on both, the first invariant failure marked | M–L |
-| K250 | 0042 | **Move the first depot**: drag the stop (to 50 km, say) and see the litres spilled or the km lost against 60; each stretch of road shows its pass count (5 / 3 / 1) as the camel plays | M |
-| K251 | 0005 | **One before zero**: the two digit orders run side by side; same length, a different number (x = 27: 1101111111 against 1111111101) | S |
-| K252 | 0012, 0013 | **No zero padding**: a toggle in `kaprekar` where 45 is not read as 045, so the chain goes wrong | S |
+| J293 | 0033 part a | **Written and read staircases**: the two cumulative step curves; the gap between them is the fill, and it peaks at the last write of the burst | S–M |
+| J294 | 0034 part b | **The conversions stepped**: binary, the shifted row, XOR gives Gray; back by a prefix XOR from the MSB one bit per step; a counter walk marks the one changing bit, the 15 → 0 wrap included | S |
+| J295 | 0037 part a | **Metastability by Monte Carlo**: data edges on a clock timeline, those in the T0 window settle after an exponential time; the histogram with the t_res cut, and a second flop moving the cut by Tclk, so the two factors of the formula are seen | M |
+| J296 | 0038 part a | **Attempt lanes**: one lane per property of the page, where the antecedent matched, the window as a bracket, and pass / fail / vacuous | M |
+| J297 | 0041 part a | **The stage ribbon**: equal bins played test by test, a bar per stage i → i + 1 with the measured wait against n / (n − i), the sum that makes n·H_n | S–M |
+| J298 | 0029 part b | **The gap line**: the unwrapped angle difference of a chosen pair against time with the integers as lines, each crossing a meeting; the interval ends switched between closed, open and half-open with the page's three counts | S |
+| J299 | 0021 part b | **The recurrence ladder**: C(0..N) as a row; a click on C(n) lights the m terms it sums and the block strip shows "the first completion takes i blocks" for each term | M |
+| J300 | 0015 part b | **The Tuesday grid**: the 14 × 14 grid of (child, weekday) pairs, the cross of the 27 families with a boy born on Tuesday lit, the shared cell counted once, and the 13 with two boys | S–M |
+
+**Round K — the mechanism of the solution, inside the existing boxes**
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| K301 | 0039 | **The recurrence on the building**: at every drop the band below is marked f(k − 1, t − 1), the drop floor 1 and the band above f(k, t − 1), with the matching cell of the table lit | M |
+| K302 | 0040 | **How the automaton is built**: the pattern slides under itself to show each state's fall-back (the longest suffix that is a prefix) and the edge it gives, state by state | M |
+| K303 | 0042 | **The price list on the road**: every stretch of road shows how many times the camel crosses it (5 / 3 / 1) as the passes play, so the litres per km of the solution appear on the road | S |
+| K304 | 0020 | **Splits are sets of boundaries**: click the RCB boundaries inside the request to cut or not; the split forms live, a gap above MPS is marked, and the count is the number of allowed subsets | S |
+| K305 | 0014 | **The projections**: two rectangles to drag, their projections on both axes and the page's four conditions turning true or false; in the main box a rejected candidate shades the shape and the projection that rejected it | M |
+| K306 | 0031 | **The greedy rule, round by round**: the two costs of moving the current slowest pair (escort by the fastest, or the two fastest shuttle) side by side, the cheaper one taken and the pair removed, ending at the plan's total | M |
+| K307 | 0019 part a | **The run that branches**: at t = 11 the timeline forks into "flip A" and "do not flip", the end times of each branch coloured, so the reader sees why 14 and 15 never share a run, with the 7k and 11k ticks | S |
+| K308 | 0013 part b | **Subtraction by columns**: the sorted digits of the typed number subtracted column by column with the borrows lit, as in the page's table | M |
 
 **Round L — the proof step, visible**
 
 | Id | Page | Idea | Size |
 |---|---|---|---|
-| L253 | 0016 | **Renumbering**: after each step every remaining person shows the old and the new label (new = old − L mod N), the survivor the same person under both, so F(N − 1) visibly becomes F(N); a "full round" button shrinks the circle by L | M |
-| L254 | 0009 | **Choose your cut**: tap any box of the long cycle to swap with c0, the two pieces h and L − h shown; only the middle range keeps both at 8 or less; a "start from box 1" trap toggle | M |
-| L255 | 0026 | **The drop point**: drag D; the passenger's and the walker's arrival times and the curve of T = max of both against D, its minimum where the two are equal (7/8) | S |
-| L256 | 0027, 0028 | **The live proof panel**: the f(p) = p²/(1 − p) curve (0027) or the q(1 − p) line (0028) with the people's p_k as dots and the threshold that moves with the slider; the single crossing is the peak; a "fraction of the whole cake" toggle for the trap | S |
-| L257 | 0036 | **All cycles**: every state's arrow, so the ring breaks into its cycles (6 + 6 + 3 and the 0 loop for x⁴ + x² + 1, against one 15) | S–M |
-| L258 | 0018, 0019 | **The search itself**: one panel for both pages that steps through the queue (BFS in 0018, Dijkstra ordered by t in 0019), each state's four children marked new, seen or past D, the stale entries and the 0-cost start edges of 0019; a "flip only when empty" toggle in 0018 that loses 15 | M |
-| L259 | 0008 | **Pouring the points**: before France the points left fill the cups to the brim with nobody above Israel; after France 17 points spill over; a part b toggle with the wrong update (room −= public) that catches the loss three announcements late | M |
-| L260 | 0032 | **BFS layers**: the state graph filled layer by layer (visited, frontier, parent arrows) until 1111 at depth 7 by the two mirror paths | S |
-| L261 | 0043 | **The chain behind a verdict**: clicking a horse lights the race results that prove its known-faster set | S |
-| L262 | 0004, 0011 | **Help lines that match the buttons**: `boxes3` and `ttt` name buttons that no longer exist | S |
+| L309 | 0016 | **Renumbering**: after each step every remaining person shows the old and the new label (new = old − L mod N), the survivor the same person under both, so F(N − 1) visibly becomes F(N); a "full round" button shrinks the circle by L | M |
+| L310 | 0009 | **Choose your cut**: tap any box of the long cycle to swap with c0; the two pieces h and L − h are shown, and only the middle range keeps both at 8 or less | M |
+| L311 | 0026 | **The drop point**: drag D; the passenger's and the walker's arrival times and the curve of T = max of both against D, its minimum where the two are equal (7/8) | S |
+| L312 | 0027, 0028 | **The live proof panel**: the f(p) = p²/(1 − p) curve (0027) or the q(1 − p) line (0028) with the people's p_k as dots and the threshold that moves with the slider; the single crossing is the peak | S |
+| L313 | 0036 | **All cycles**: every state's arrow, so the ring shows its cycles (6 + 6 + 3 and the 0 loop for x⁴ + x² + 1, one cycle of 15 for a primitive polynomial) | S–M |
+| L314 | 0018, 0019 | **The search itself**: one panel for both pages that steps through the queue (BFS in 0018, Dijkstra ordered by t in 0019), each state's four children marked new, seen or past D, until the goal is popped | M |
+| L315 | 0008 | **Pouring the points**: the points left fill the cups to the brim with nobody above Israel; after France 17 points spill over, which is the page's moment of certain loss | M |
+| L316 | 0032 | **BFS layers**: the state graph filled layer by layer (visited, frontier, parent arrows) until 1111 at depth 7 by the two mirror paths | S |
+| L317 | 0043 | **The chain behind a verdict**: clicking a horse lights the race results that prove its known-faster set | S |
+| L318 | 0004, 0011 | **Help lines that match the buttons**: `boxes3` names "סידור אחר", `ttt` names "הגרלה" and "הבורר", buttons that no longer exist | S |
 
-Suggested order: K (mostly small, and the traps are what interviews test), then I and J
-(the missing parts), then L. Shared work: K249 is one pattern for three boxes, L258 one
-panel for two pages, L256 one panel for two pages.
+Suggested order (session 21): L first (the proofs are where a box teaches most, and L312,
+L311, L313 and L316 are small), then K (inside boxes that already exist, so the pages do
+not grow), then I and J. Within a round, the small items first in one batch. Shared work:
+L314 is one panel for two pages, L312 one panel for two pages.
 
 ### Second series, rounds M to R — new questions (proposed 2026-10-23, owner picks)
 
