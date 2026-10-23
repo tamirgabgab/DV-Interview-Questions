@@ -192,3 +192,33 @@ def test_explorer_general_search_interval():
         assert replay_interval([A, B, C], tm, D) == tm["flips"] and tm["end"] <= fl["end"]
         assert fl["flips"] == replay_interval([A, B, C], fl, D) == want <= tm["flips"], (A, B, C, D)
     assert got["three"][0][0] is not None and got["three"][3][0] is None
+
+
+def test_explorer_search_trace():
+    """The proof panel of the box: the traced Dijkstra pops in order of t (stale copies
+    skipped), measures exactly D at the goal, and the path to the goal is the page's start
+    and plan."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(A, B, D) for A in range(2, 9) for B in range(A + 1, 12) for D in range(1, 13)]
+    got = node_json(f"const m = {explorer_require()}; const cases = {[list(c) for c in cases]};"
+                    "console.log(JSON.stringify(cases.map(([A, B, D]) => m.hourglassIntervalTrace(A, B, D))));")
+    for (A, B, D), tr in zip(cases, got):
+        nodes, pops, ref = tr["nodes"], tr["pops"], solve(A, B, D)
+        times = [nodes[p["id"]]["t"] for p in pops]
+        assert times == sorted(times), (A, B, D)
+        if ref is None:
+            assert tr["goal"] is None, (A, B, D)
+            continue
+        start, plan = ref
+        goal = nodes[tr["goal"]]
+        assert goal["m"] == D and goal["t"] == start + D
+        got_plan, got_start, i = {}, None, tr["goal"]
+        while nodes[i]["parent"] >= 0:
+            parent = nodes[nodes[i]["parent"]]
+            if nodes[i]["act"] == "start":
+                got_start = parent["t"]
+            else:
+                got_plan[parent["t"]] = nodes[i]["act"]
+            i = nodes[i]["parent"]
+        assert got_start == start and got_plan == plan, (A, B, D)

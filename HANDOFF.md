@@ -1777,8 +1777,39 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
    are direct results, reach exactly the known-faster set, and are as short as a BFS.
    One Hebrew colon in the step line got its NBSP.
 8. **L318:** the help lines of `boxes3` and `ttt` name the buttons that exist.
-9. **Checks:** Python tests (340), lint, strict build, links, the phone check with axe
+9. **Checks of the first batch:** Python tests (340), lint, strict build, links, the phone check with axe
    (55 pages, none with problems) and `check_explorers.py` (every button of every box, the links and the remembered state).
+
+10. **Second batch, L309:** "עד סוף הסיבוב" and a checkbox in the 0016 box: after any
+    step every person left gets a green new label (the position in counting order from
+    the next one who stays) outside the circle; the text reads F(N) off F of the smaller
+    circle, the recurrence F(N) = (F(N − L + 1) + L) mod N after one step, and, when the
+    old labels are a·new + b (after a full round), F(N) = a·F(N') + b: F(2k) = 2F(k) and
+    F(2k + 1) = 2F(k) + 2 for L = 2. Model `josephusRenumber`, tested for N up to 40 and L
+    2 to 6 against a plain simulation.
+11. **L310, 0009:** the long cycle as a row of its boxes, a tap picks c_h (the ring above
+    applies that cut while person 0 is on), and a chart of the larger piece for every h
+    against N / 2: the safe range L − N/2 ≤ h ≤ N/2 always holds the middle. Model
+    `permCutAt`, tested on the page's Room and cycle_from.
+12. **L314, 0018 and 0019:** the page's own search, pop by pop ("השליפה הבאה", "עד
+    המטרה"): the popped state, its children with what happens to each (new, seen, past D,
+    nothing runs; in the Dijkstra also "start", better and stale), the queue as chips, and
+    the search tree with the path to the goal (the owner's choice: both the list and the
+    tree). Shown for two hourglasses and the page's objective. Models
+    `hourglassSolveTrace` and `hourglassIntervalTrace`, tested on the grids of both pages
+    (FIFO order, depths, t order, the goal path is the page's plan; 16 pops in 0019's
+    example, as its cost section says).
+13. **L315, 0008:** "מזיגה" pours the points left into the cups still to come, each to
+    Israel's total, with the spill beside them (17 after France), animated. Model
+    `euroPour`, tested against israel_cannot_win after every announcement.
+14. **Found by `check_explorers.py`:** a cut away from the middle leaves a cycle longer than
+    N / 2, and its chip in the 0009 cycle line did not wrap (427 px at phone width); a long
+    cycle's chip now wraps.
+15. **Round L is done.** The owner's answers for round K: the mechanism on the existing
+    drawing with a toggle (no new panel), the small items first (K303, K304, K307, then
+    K301, K302, K306, K305, K308), K305 both as a small sandbox of two rectangles and as
+    the rejected candidate marked in the main box, and `main` fast-forwarded once round L
+    passes every check.
 
 ---
 
@@ -1814,8 +1845,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   the solution, revised: I284 to L318; suggested order L, K, I, J) and rounds M to R (new
   questions, M263 to R283).
 - Session 22: the owner picked round L, then round K. L's first batch (L311, L312, L313,
-  L316, L317, L318) is done on the branch; next the second batch (L309, L310, L314,
-  L315), then the clarifying questions for round K.
+  L316, L317, L318) and second batch (L309, L310, L314, L315) are done on the branch:
+  round L is closed. Next: round K, small items first (K303, K304, K307).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2502,13 +2533,13 @@ the first series' rounds of the same letters.
 
 | Id | Page | Idea | Size |
 |---|---|---|---|
-| L309 | 0016 | **Renumbering**: after each step every remaining person shows the old and the new label (new = old − L mod N), the survivor the same person under both, so F(N − 1) visibly becomes F(N); a "full round" button shrinks the circle by L | M |
-| L310 | 0009 | **Choose your cut**: tap any box of the long cycle to swap with c0; the two pieces h and L − h are shown, and only the middle range keeps both at 8 or less | M |
+| ~~L309~~ | 0016 | Done in session 22. **Renumbering**: after each step every remaining person shows the old and the new label (new = old − L mod N), the survivor the same person under both, so F(N − 1) visibly becomes F(N); a "full round" button shrinks the circle by L | M |
+| ~~L310~~ | 0009 | Done in session 22. **Choose your cut**: tap any box of the long cycle to swap with c0; the two pieces h and L − h are shown, and only the middle range keeps both at 8 or less | M |
 | ~~L311~~ | 0026 | Done in session 22. **The drop point**: drag D; the passenger's and the walker's arrival times and the curve of T = max of both against D, its minimum where the two are equal (7/8) | S |
 | ~~L312~~ | 0027, 0028 | Done in session 22. **The live proof panel**: the f(p) = p²/(1 − p) curve (0027) or the q(1 − p) line (0028) with the people's p_k as dots and the threshold that moves with the slider; the single crossing is the peak | S |
 | ~~L313~~ | 0036 | Done in session 22. **All cycles**: every state's arrow, so the ring shows its cycles (6 + 6 + 3 and the 0 loop for x⁴ + x² + 1, one cycle of 15 for a primitive polynomial) | S–M |
-| L314 | 0018, 0019 | **The search itself**: one panel for both pages that steps through the queue (BFS in 0018, Dijkstra ordered by t in 0019), each state's four children marked new, seen or past D, until the goal is popped | M |
-| L315 | 0008 | **Pouring the points**: the points left fill the cups to the brim with nobody above Israel; after France 17 points spill over, which is the page's moment of certain loss | M |
+| ~~L314~~ | 0018, 0019 | Done in session 22. **The search itself**: one panel for both pages that steps through the queue (BFS in 0018, Dijkstra ordered by t in 0019), each state's four children marked new, seen or past D, until the goal is popped | M |
+| ~~L315~~ | 0008 | Done in session 22. **Pouring the points**: the points left fill the cups to the brim with nobody above Israel; after France 17 points spill over, which is the page's moment of certain loss | M |
 | ~~L316~~ | 0032 | Done in session 22. **BFS layers**: the state graph filled layer by layer (visited, frontier, parent arrows) until 1111 at depth 7 by the two mirror paths | S |
 | ~~L317~~ | 0043 | Done in session 22. **The chain behind a verdict**: clicking a horse lights the race results that prove its known-faster set | S |
 | ~~L318~~ | 0004, 0011 | Done in session 22. **Help lines that match the buttons**: `boxes3` names "סידור אחר", `ttt` names "הגרלה" and "הבורר", buttons that no longer exist | S |

@@ -230,3 +230,34 @@ def test_explorer_steps_match_generator():
             ([list(s) for s in r["steps"]] == [[a, list(b)] for a, b in steps] and r["survivor"] == win), (n, L)
         gone = [p for _, leave in r["steps"] for p in leave]
         assert len(gone) == n - 1 and len(set(gone)) == n - 1 and win not in gone
+
+
+def test_explorer_renumbering():
+    """The proof panel of the box: after every step the people left, in counting order from
+    the next one who stays, are the plain simulation's circle; the survivor of the smaller
+    circle, read in the new labels, is the survivor of the whole (F(N) from F(N - L + 1)
+    after one step, F(2k) = 2F(k) and F(2k + 1) = 2F(k) + 2 after a full round of L = 2)."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(n, L) for L in range(2, 7) for n in range(1, 41)]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({[list(c) for c in cases]}.map(([n, L]) =>"
+                    "  [...Array(n).keys()].map((s) => m.josephusRenumber(n, L, s)))));")
+    for (n, L), per_step in zip(cases, got):
+        circle, i = list(range(n)), 0
+        for s, left in enumerate(per_step):
+            assert left == circle[i:] + circle[:i], (n, L, s)
+            assert left[reference(len(left), L)] == reference(n, L), (n, L, s)
+            if len(circle) == 1:
+                break
+            for _ in range(min(L - 1, len(circle) - 1)):
+                j = (i + 1) % len(circle)
+                circle.pop(j)
+                if j < i:
+                    i -= 1
+            i = (i + 1) % len(circle)
+    for k in range(1, 20):
+        even, odd = got[cases.index((2 * k, 2))][k], got[cases.index((2 * k + 1, 2))][k + 1] if 2 * k + 1 <= 40 else None
+        assert even == [2 * v for v in range(k)]
+        if odd is not None:
+            assert odd == [2 * v + 2 for v in range(k)]

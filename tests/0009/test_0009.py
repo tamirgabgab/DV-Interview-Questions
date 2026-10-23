@@ -203,3 +203,35 @@ def test_explorer_state_link():
         assert payload == ".".join(map(str, s["notes"][1:])) + f"-{s['me']}-{1 if s['helper'] else 0}-{s['step']}"
         assert back == {"n": len(s["notes"]) - 1, "notes": s["notes"], "me": s["me"], "helper": s["helper"], "step": s["step"]}, s
     assert got["bad"] == [None] * len(bad)
+
+
+def test_explorer_any_cut():
+    """The proof panel of the box: for every h, person 0's swap of c0 and c_h on the page's
+    Room splits the long cycle into h and L - h (the page's own cycle_from), and both
+    pieces are at most N / 2 exactly for L - N / 2 <= h <= N / 2, the middle among them."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(5)
+    arrangements = [EXAMPLE] + [from_cycle_lengths(lengths, rng) for lengths in ([16], [9, 7], [10, 3, 3], [13, 2, 1], [8, 8])]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(arrangements)}.map((a) => [...Array(17).keys()].map((h) => m.permCutAt(a, 8, h)))));""")
+    for notes, cuts in zip(arrangements, got):
+        long = [c for c in (ns["cycle_from"](notes, b) for b in range(1, N + 1)) if len(c) > MAX_OPENS]
+        if not long:
+            assert all(c is None for c in cuts)
+            continue
+        L = len(long[0])
+        for h, cut in enumerate(cuts):
+            if not 1 <= h < L:
+                assert cut is None
+                continue
+            a, b = cut["pair"]
+            assert cut["cycle"][0] == a and cut["cycle"][h] == b and len(cut["cycle"]) == L
+            after = notes[:]
+            after[a], after[b] = notes[b], notes[a]
+            assert sorted([len(ns["cycle_from"](after, a)), len(ns["cycle_from"](after, b))]) == sorted([h, L - h])
+            assert (max(h, L - h) <= MAX_OPENS) == (L - MAX_OPENS <= h <= MAX_OPENS)
+        assert L - MAX_OPENS <= L // 2 <= MAX_OPENS

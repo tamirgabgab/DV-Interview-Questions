@@ -1,5 +1,5 @@
 // kinds: hourglass
-//   hourglass              0018, 0019  A, B (and C) and D: the plan on a time axis and event by event (BFS or Dijkstra), the page's objective or the fewest flips
+//   hourglass              0018, 0019  A, B (and C) and D: the plan on a time axis and event by event (BFS or Dijkstra), the page's objective or the fewest flips; the proof panel: the page's search pop by pop, the queue and the tree
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -61,6 +61,65 @@
     }
     return null;
   };
+  // The two searches of the pages, traced for the proof panel: every node pushed (with its
+  // parent and the action that made it), and every pop with its four children marked
+  // "new", "seen" (already queued), "past" (beyond D) or "stuck" (nothing runs), the
+  // queue after it, and in the Dijkstra a pop that a better copy made "stale" and a child
+  // that improves a queued state ("better"). Same order and tests as the page code.
+  const hourglassSolveTrace = (A, B, D) => {
+    const seen = new Set(["0,0,0"]), nodes = [{ t: 0, a: 0, b: 0, m: 0, parent: -1, act: null, depth: 0 }], queue = [0], pops = [];
+    for (let head = 0; head < queue.length; head++) {
+      const id = queue[head], { t, a, b } = nodes[id];
+      if (t === D) { pops.push({ id, children: [], queue: queue.slice(head + 1), goal: true }); return { nodes, pops, goal: id }; }
+      const children = [];
+      for (const fa of [0, 1]) for (const fb of [0, 1]) {
+        const act = (fa ? "A" : "") + (fb ? "B" : ""), r = hourglassStep(A, B, a, b, fa, fb);
+        if (!r) { children.push({ act, status: "stuck" }); continue; }
+        const kid = { act, t: t + r[0], a: r[1], b: r[2], m: 0 };
+        if (kid.t > D) { children.push({ ...kid, status: "past" }); continue; }
+        const key = `${kid.t},${kid.a},${kid.b}`;
+        if (seen.has(key)) { children.push({ ...kid, status: "seen" }); continue; }
+        seen.add(key);
+        nodes.push({ ...kid, parent: id, depth: nodes[id].depth + 1 });
+        queue.push(nodes.length - 1);
+        children.push({ ...kid, status: "new", id: nodes.length - 1 });
+      }
+      pops.push({ id, children, queue: queue.slice(head + 1) });
+    }
+    return { nodes, pops, goal: null };
+  };
+  const hourglassIntervalTrace = (A, B, D) => {
+    const best = new Map([["0,0,-1", 0]]), nodes = [{ t: 0, a: 0, b: 0, m: -1, parent: -1, act: null, depth: 0 }], pops = [];
+    let queue = [[0, 0, 0]];                         // [t, tie, node]
+    let tie = 1;
+    while (queue.length) {
+      queue.sort((u, v) => u[0] - v[0] || u[1] - v[1]);
+      const [t, , id] = queue.shift(), { a, b, m } = nodes[id];
+      if (t > best.get(`${a},${b},${m}`)) { pops.push({ id, stale: true, children: [], queue: queue.map((q) => q[2]) }); continue; }
+      if (m === D) { pops.push({ id, children: [], queue: queue.map((q) => q[2]), goal: true }); return { nodes, pops, goal: id }; }
+      const options = [];
+      if (m === -1) options.push({ act: "start", t, a, b, m: 0 });
+      for (const fa of [0, 1]) for (const fb of [0, 1]) {
+        const act = (fa ? "A" : "") + (fb ? "B" : ""), r = hourglassStep(A, B, a, b, fa, fb);
+        if (!r) { options.push({ act, status: "stuck" }); continue; }
+        const m2 = m === -1 ? -1 : m + r[0];
+        options.push({ act, t: t + r[0], a: r[1], b: r[2], m: m2, status: m2 > D ? "past" : null });
+      }
+      const children = options.map((o) => {
+        if (o.status) return o;
+        const k2 = `${o.a},${o.b},${o.m}`;
+        if (best.has(k2) && o.t >= best.get(k2)) return { ...o, status: "seen" };
+        const status = best.has(k2) ? "better" : "new";
+        best.set(k2, o.t);
+        nodes.push({ t: o.t, a: o.a, b: o.b, m: o.m, parent: id, act: o.act, depth: nodes[id].depth + 1 });
+        queue.push([o.t, tie++, nodes.length - 1]);
+        return { ...o, status, id: nodes.length - 1 };
+      });
+      pops.push({ id, children, queue: queue.slice().sort((u, v) => u[0] - v[0] || u[1] - v[1]).map((q) => q[2]) });
+    }
+    return { nodes, pops, goal: null };
+  };
+
   // Replay a plan from rest: the events as [t, action, [a, b] on arrival, [a, b] after].
   const hourglassReplay = (A, B, plan, end) => {
     let t = 0, a = 0, b = 0;
@@ -185,7 +244,7 @@
     mount(box2) {
       const interval = box.dataset.mode === "interval";
       const defaults = { A: Number(box.dataset.a || 7), B: Number(box.dataset.b || 11), D: Number(box.dataset.d || (interval ? 1 : 15)), C: null, objective: "page" };
-      const st = { ...defaults, s: 0 };
+      const st = { ...defaults, s: 0, q: 0 };   // q: the pops of the proof's search shown
       // sizes: [A, B] or [A, B, C]; the page's objective ("page": fewest events on 0018,
       // the earliest end on 0019) or the fewest flips of the follow-up
       const sizes = () => (st.C === null ? [st.A, st.B] : [st.A, st.B, st.C]);
@@ -202,7 +261,15 @@
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">האירוע הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">האירוע הבא</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1100, 400) + `<span class="ex-pos"></span></div>` +
-        `<div class="hg-frame"></div><p class="hg-caption"></p><p class="ex-note hg-compare"></p>`;
+        `<div class="hg-frame"></div><p class="hg-caption"></p><p class="ex-note hg-compare"></p>` +
+        `<section class="ex-proof hg-proof"><p class="ex-proof-title">שלב ההוכחה : החיפוש עצמו</p>` +
+        `<div class="ex-controls"><button type="button" class="md-button md-button--primary ex-q-next">השליפה הבאה</button>` +
+        `<button type="button" class="md-button ex-q-end">עד המטרה</button><button type="button" class="md-button ex-q-start">מההתחלה</button><span class="hg-q-pos"></span></div>` +
+        `<p class="hg-q-now"></p><div class="hg-q-kids"></div>` +
+        `<p class="ex-title hg-q-title"></p><div class="hg-q-list"></div>` +
+        `<p class="ex-title">עץ החיפוש : כל מצב והמצב שממנו הגיע</p><div class="hg-q-tree"></div>` +
+        `<span class="viz-legend"><span><i class="hg-key-done"></i>נשלף</span><span><i class="hg-key-now"></i>נשלף עכשיו</span><span><i class="hg-key-wait"></i>בתור</span><span><i class="box-path"></i>הדרך למטרה</span></span>` +
+        `<p class="hg-q-text"></p></section>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play");
       let timer = null, uid = 0;
@@ -267,7 +334,66 @@
       const solve = () => solveFor(st.objective);
       const replay = (res) => hourglassReplayN(sizes(), res.plan, res.end);
       const reach = () => hourglassReachableN(sizes(), 60);
+      // the proof panel: the page's own search, pop by pop, for two hourglasses and the
+      // page's objective: the popped state, its four children, the queue, and the tree
+      const STATUS = { new: "חדש, נכנס לתור", better: "מוקדם יותר, נכנס לתור", seen: "כבר נמצא", past: "אחרי D, נזרק", stuck: "שום שעון לא רץ" };
+      const label = (n) => `t = ${n.t} · A ${n.a} · B ${n.b}${interval ? ` · ${n.m < 0 ? "לפני המדידה" : `נמדדו ${n.m}`}` : ""}`;
+      const actText = (act) => (act === "start" ? "מתחילים למדוד" : act ? `הופכים ${plus(act)}` : "לא הופכים");
+      const traceOf = () => (interval ? hourglassIntervalTrace(st.A, st.B, st.D) : hourglassSolveTrace(st.A, st.B, st.D));
+      const treeSvg = (tr, upTo, path) => {
+        const known = tr.nodes.filter((_, i) => i <= upTo.maxId), popped = new Set(tr.pops.slice(0, st.q).map((p) => p.id));
+        const rows = []; known.forEach((n, i) => { (rows[n.depth] = rows[n.depth] || []).push(i); });
+        const w = 640, dy = 46, h = rows.length * dy + 14, pos = {};
+        rows.forEach((ids, d) => ids.forEach((id, k) => { pos[id] = [((k + 1) * w) / (ids.length + 1), 22 + d * dy]; }));
+        let s = `<svg class="figure hg-tree" viewBox="0 0 ${w} ${h}" role="img" aria-label="עץ החיפוש עם ${known.length} מצבים">`;
+        known.forEach((n, i) => {
+          if (n.parent < 0) return;
+          const [x1, y1] = pos[n.parent], [x2, y2] = pos[i], on = path.has(i);
+          s += `<line class="${on ? "box-path" : "ink-line"}" x1="${f(x1)}" y1="${f(y1 + 11)}" x2="${f(x2)}" y2="${f(y2 - 11)}" stroke-width="${on ? 3 : 1}"${on ? "" : ' stroke-opacity="0.45"'}/>`;
+        });
+        known.forEach((n, i) => {
+          const [x, y] = pos[i], cls = i === upTo.now ? "is-now" : popped.has(i) ? "is-done" : "is-wait";
+          s += `<g class="hg-node ${cls}${path.has(i) ? " is-path" : ""}"><circle cx="${f(x)}" cy="${f(y)}" r="11"><title>${label(n)}${n.act === null ? "" : `, ${actText(n.act)}`}</title></circle><text x="${f(x)}" y="${f(y + 4)}" text-anchor="middle">${n.t}</text></g>`;
+        });
+        return s + "</svg>";
+      };
+      const drawQueue = () => {
+        const panel = $(".hg-proof");
+        panel.hidden = st.C !== null || st.objective !== "page";
+        if (panel.hidden) return;
+        const tr = traceOf(), P = tr.pops.length;
+        st.q = Math.min(Math.max(st.q, 0), P);
+        const pop = st.q ? tr.pops[st.q - 1] : null, done = !!(pop && pop.goal);
+        const queue = pop ? pop.queue : [0];
+        const maxId = Math.max(0, ...queue, ...tr.pops.slice(0, st.q).map((p) => p.id));
+        $(".hg-q-pos").textContent = `שליפה ${st.q} מתוך ${P}`;
+        $(".ex-q-next").disabled = st.q >= P; $(".ex-q-end").disabled = st.q >= P; $(".ex-q-start").disabled = st.q === 0;
+        const kind = interval ? "התור ממוין לפי הזמן t (Dijkstra)" : "התור לפי סדר הכניסה (BFS)";
+        $(".hg-q-now").innerHTML = !pop ? `בתור רק מצב ההתחלה, ${ltr(label(tr.nodes[0]))}. ${kind}.`
+          : pop.stale ? `נשלף ${ltr(label(tr.nodes[pop.id]))}, אבל כבר הגענו למצב הזה מוקדם יותר : מדלגים עליו.`
+          : done ? `נשלף ${ltr(label(tr.nodes[pop.id]))} : ${interval ? `נמדדו בדיוק ${ltr(st.D)} דקות` : `t = ${ltr(st.D)}`}, וזו המטרה.`
+          : `נשלף ${ltr(label(tr.nodes[pop.id]))}. ${interval && tr.nodes[pop.id].m < 0 ? "חמש" : "ארבע"} אפשרויות ממנו :`;
+        $(".hg-q-kids").innerHTML = pop && !pop.stale && !done
+          ? `<table class="hg-kids"><thead><tr><th>מה עושים</th><th>המצב הבא</th><th>מה קורה איתו</th></tr></thead><tbody>` +
+            pop.children.map((c) => `<tr class="is-${c.status}"><td>${actText(c.act)}</td><td>${c.status === "stuck" ? "—" : ltr(label(c))}</td><td>${STATUS[c.status]}</td></tr>`).join("") + `</tbody></table>`
+          : "";
+        $(".hg-q-title").textContent = queue.length ? `התור (${queue.length})${interval ? ", לפי t" : ", הראשון ייצא ראשון"}` : "התור ריק";
+        $(".hg-q-list").innerHTML = queue.map((id) => `<span class="hg-chip">${ltr(label(tr.nodes[id]))}</span>`).join(" ");
+        const path = new Set();
+        if (done) for (let id = pop.id; id >= 0; id = tr.nodes[id].parent) path.add(id);
+        $(".hg-q-tree").innerHTML = maxId < 60 ? treeSvg(tr, { maxId, now: pop ? pop.id : -1 }, path) : `<p class="ex-note">העץ גדול מדי לציור (${ltr(maxId + 1)} מצבים).</p>`;
+        let text = "";
+        if (done) {
+          const plan = []; for (let id = pop.id; tr.nodes[id].parent >= 0; id = tr.nodes[id].parent) plan.unshift(tr.nodes[id]);
+          text = (interval
+            ? `התור ממוין לפי t, ולכן המצב הראשון שנשלף עם ${ltr(`m = ${st.D}`)} הוא המדידה שמסתיימת הכי מוקדם : ברגע ${ltr(tr.nodes[pop.id].t)}. `
+            : `BFS שולף את המצבים לפי מספר האירועים, ולכן המטרה נשלפת לראשונה בדרך עם הכי מעט אירועים : ${ltr(tr.nodes[pop.id].depth)}. `) +
+            `החיפוש שלף ${ltr(st.q)} מצבים מתוך ${ltr(tr.nodes.length)} שנכנסו לתור. הדרך בעץ : ${plan.map((n) => `ברגע ${ltr(tr.nodes[n.parent].t)} ${actText(n.act)}`).join(", ")}.`;
+        } else if (st.q >= P) text = `התור התרוקן בלי להגיע למטרה : אי אפשר למדוד ${ltr(st.D)} דקות.`;
+        $(".hg-q-text").innerHTML = text;
+      };
       const draw = () => {
+        drawQueue();
         ["A", "B", "D"].forEach((k) => { $(`.out-${k}`).textContent = String(st[k]); });
         const res = solve(), sz = sizes(), names = sz.map((v, i) => `${LET[i]} = ${v}`);
         const sizesText = sz.length === 2 ? `${ltr(st.A)} ו-${ltr(st.B)}` : `${ltr(st.A)}, ${ltr(st.B)} ו-${ltr(st.C)}`;
@@ -329,14 +455,17 @@
         draw();
       });
       $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); play.click(); } });
-      ["A", "B", "D"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { stop(); st[k] = Number($(`.ex-${k}`).value); st.s = 0; draw(); }));
+      $(".ex-q-next").addEventListener("click", () => { st.q += 1; drawQueue(); });
+      $(".ex-q-end").addEventListener("click", () => { st.q = traceOf().pops.length; drawQueue(); });
+      $(".ex-q-start").addEventListener("click", () => { st.q = 0; drawQueue(); });
+      ["A", "B", "D"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { stop(); st[k] = Number($(`.ex-${k}`).value); st.s = 0; st.q = 0; draw(); }));
       $(".ex-C").addEventListener("change", () => {
         const v = Math.round(Number($(".ex-C").value));
         stop(); st.C = $(".ex-C").value.trim() === "" || !Number.isFinite(v) || v < 1 ? null : Math.min(30, v); $(".ex-C").value = st.C === null ? "" : st.C; st.s = 0; draw();
       });
       $(".ex-C").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".ex-C").blur(); });
       $(".ex-obj").addEventListener("change", () => { stop(); st.objective = $(".ex-obj").value; st.s = 0; draw(); });
-      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0 }); ["A", "B", "D"].forEach((k) => { $(`.ex-${k}`).value = st[k]; }); $(".ex-C").value = ""; $(".ex-obj").value = "page"; draw(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0, q: 0 }); ["A", "B", "D"].forEach((k) => { $(`.ex-${k}`).value = st[k]; }); $(".ex-C").value = ""; $(".ex-obj").value = "page"; draw(); });
       draw();
     },
   });
@@ -344,8 +473,8 @@
   dvqExplorers.register({
     views: { hourglass: hourglassView },
     help: {
-      hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן, ״הצעד הבא״ ו״הפעלה״ עוברים אירוע אחרי אירוע, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר.",
+      hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן, ״הצעד הבא״ ו״הפעלה״ עוברים אירוע אחרי אירוע, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר. בשלב ההוכחה ״השליפה הבאה״ מריץ את החיפוש של העמוד מצב אחרי מצב, עם התור ועץ החיפוש.",
     },
-    models: { hourglassSolve, hourglassInterval, hourglassReplay, hourglassReachable, hourglassStepN, hourglassSearch, hourglassReplayN, hourglassReachableN },
+    models: { hourglassSolve, hourglassInterval, hourglassSolveTrace, hourglassIntervalTrace, hourglassReplay, hourglassReachable, hourglassStepN, hourglassSearch, hourglassReplayN, hourglassReachableN },
   });
 })();

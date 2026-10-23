@@ -99,3 +99,26 @@ def test_explorer_matches_page_code():
         want = ns["earliest_certain_loss"](jury + pub, above, left)
         assert total == jury + pub and first == (-1 if want is None else want), (jury, pub)
         assert [r[0] for r in rows] == ["Israel"] + [c for c, _, _ in above]
+
+
+def test_explorer_pouring():
+    """The proof panel of the box: after every announcement the points left poured into the
+    cups still to come, each to Israel's total; the spill is positive exactly when the
+    page's israel_cannot_win says so for a country still below Israel (17 after France),
+    and a part of the points (the animation) never overfills a cup."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify([0, 1, 2, 3, 4, 5, 6, 7].map((k) => [m.euroPour(m.EURO_RESULTS, k), m.euroPour(m.EURO_RESULTS, k, 0.5)])));""")
+    left = 828
+    for k, (full, half) in enumerate(got):
+        if k:
+            left -= ABOVE_2026[k - 1][2]
+        rest = ABOVE_2026[k:]
+        assert [c["country"] for c in full["cups"]] == [c for c, _, _ in rest]
+        assert [c["room"] for c in full["cups"]] == [max(0, 343 - j) for _, j, _ in rest]
+        assert sum(c["fill"] for c in full["cups"]) + full["spill"] == full["left"] == left
+        assert all(0 <= c["fill"] <= c["room"] for c in full["cups"] + half["cups"])
+        assert (full["spill"] > 0) == cannot_win(343, [j for _, j, _ in rest], left)
+    assert got[4][0]["spill"] == 17 and got[3][0]["spill"] == 0

@@ -166,3 +166,33 @@ def test_explorer_general_search():
         assert replay_n([A, B, C], ev["plan"], D) == ev["flips"] and ev["events"] == len(ev["plan"])
         assert fl["flips"] == replay_n([A, B, C], fl["plan"], D) == want <= ev["flips"], (A, B, C, D)
         assert D in reach or D > 30
+
+
+def test_explorer_search_trace():
+    """The proof panel of the box: the traced BFS pops the states in the order they entered
+    the queue, each pop's children are the four flips in the page's order with every "new"
+    one queued, the depths never go down, and the path to the goal is the page's plan."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(A, B, D) for A in range(1, 9) for B in range(A, 12) for D in range(1, 25)]
+    got = node_json(f"const m = {explorer_require()}; const cases = {[list(c) for c in cases]};"
+                    "console.log(JSON.stringify(cases.map(([A, B, D]) => m.hourglassSolveTrace(A, B, D))));")
+    for (A, B, D), tr in zip(cases, got):
+        nodes, pops, ref = tr["nodes"], tr["pops"], solve(A, B, D)
+        assert [p["id"] for p in pops] == list(range(len(pops))), (A, B, D)     # first in, first out
+        depths = [nodes[p["id"]]["depth"] for p in pops]
+        assert depths == sorted(depths)
+        for p in pops:
+            if p.get("goal"):
+                continue
+            assert [c["act"] for c in p["children"]] == ["", "B", "A", "AB"]
+            assert all(nodes[c["id"]]["parent"] == p["id"] for c in p["children"] if c["status"] == "new")
+            assert all(c["t"] > D for c in p["children"] if c["status"] == "past")
+        if ref is None:
+            assert tr["goal"] is None, (A, B, D)
+            continue
+        plan, i = {}, tr["goal"]
+        while nodes[i]["parent"] >= 0:
+            plan[nodes[nodes[i]["parent"]]["t"]] = nodes[i]["act"]
+            i = nodes[i]["parent"]
+        assert nodes[tr["goal"]]["t"] == D and plan == ref, (A, B, D)

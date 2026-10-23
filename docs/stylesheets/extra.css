@@ -563,6 +563,9 @@
 .perf-chart .cup-room { fill: var(--viz-s2); fill-opacity: 0.14; stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 4 3; }
 .perf-chart .left-bar { fill: var(--viz-ink); fill-opacity: 0.7; }
 .perf-chart .overflow { fill: var(--viz-s2); }
+.perf-chart .pour-water { fill: var(--viz-s3); fill-opacity: 0.7; }
+.md-typeset .viz-legend .pour-water { background: var(--viz-s3); opacity: 0.7; }
+.md-typeset .viz-legend .overflow { background: var(--viz-s2); }
 .perf-chart .israel-line { stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 6 4; }
 .perf-chart .lost-zone { fill: var(--viz-s2); fill-opacity: 0.08; }
 .md-typeset .viz-legend .cup-room { background: var(--viz-s2); opacity: 0.35; outline: 1px dashed var(--viz-s2); }
@@ -1338,6 +1341,14 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ex-proof[hidden] { display: none; }
 .md-typeset .explorer .ex-proof-title { margin: 0 0 0.4em; font-size: 0.75rem; font-weight: 700; }
 .md-typeset .explorer .ex-proof .ex-nowrap { white-space: nowrap; }
+.md-typeset svg .jos-new { fill: var(--viz-s3-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg .jos-new.is-win { font-weight: 700; font-size: 13px; }
+.md-typeset .explorer .bx-cut-row { display: flex; flex-wrap: wrap; gap: 0.25rem; direction: ltr; margin: 0.3rem 0; }
+.md-typeset .explorer .bx-cut-cell { min-width: 2rem; padding: 0.15rem 0.3rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font: inherit; font-family: var(--md-code-font-family); font-size: 0.75rem; text-align: center; cursor: pointer; }
+.md-typeset .explorer .bx-cut-cell.is-first { border-color: var(--viz-ink); font-weight: 700; cursor: default; }
+.md-typeset .explorer .bx-cut-cell.is-a { border-color: var(--viz-s1); }
+.md-typeset .explorer .bx-cut-cell.is-b { border-color: var(--viz-s3); }
+.md-typeset .explorer .bx-cut-cell.is-cut { background: var(--viz-s2); color: var(--md-default-bg-color); border-color: var(--viz-s2); font-weight: 700; }
 
 /* Box nets (0030): faces of the unfolded box, the path, and the embedded tool */
 .md-typeset svg .box-face { fill: var(--viz-s1); fill-opacity: 0.14; stroke: var(--viz-ink); stroke-width: 1.2; }
@@ -1425,6 +1436,23 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer svg.hg-live { width: 100%; max-width: 40rem; display: block; }
 .md-typeset .explorer .hg-frame svg.figure { margin: 0.3rem 0; }
 .md-typeset .explorer .hg-caption { margin: 0.2em 0 0; font-size: 0.75rem; }
+.md-typeset .explorer .hg-q-kids { max-width: 100%; overflow-x: auto; }
+.md-typeset .explorer table.hg-kids { font-size: 0.7rem; margin: 0.2em 0 0.4em; }
+.md-typeset .explorer table.hg-kids td:nth-child(2) { white-space: nowrap; }
+.md-typeset .explorer table.hg-kids td, .md-typeset .explorer table.hg-kids th { padding: 0.15em 0.6em; }
+.md-typeset .explorer table.hg-kids tr.is-new td:last-child, .md-typeset .explorer table.hg-kids tr.is-better td:last-child { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer table.hg-kids tr.is-past td, .md-typeset .explorer table.hg-kids tr.is-stuck td, .md-typeset .explorer table.hg-kids tr.is-seen td { color: var(--viz-text); }
+.md-typeset .explorer .hg-q-list { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.2rem 0 0.4rem; }
+.md-typeset .explorer .hg-chip { padding: 0.05rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.3rem; font-family: var(--md-code-font-family); font-size: 0.65rem; }
+.md-typeset .explorer svg.hg-tree { width: 100%; max-width: 40rem; display: block; }
+.md-typeset svg .hg-node circle { fill: var(--md-default-bg-color); stroke: var(--viz-s1); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.md-typeset svg .hg-node.is-done circle { fill: var(--viz-s1); fill-opacity: 0.25; stroke-dasharray: none; }
+.md-typeset svg .hg-node.is-now circle { fill: var(--viz-s2); fill-opacity: 0.35; stroke: var(--viz-s2); stroke-width: 3; stroke-dasharray: none; }
+.md-typeset svg .hg-node.is-path circle { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .hg-node text { fill: var(--viz-ink); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .hg-key-done { background: var(--viz-s1); opacity: 0.4; }
+.md-typeset .viz-legend .hg-key-now { background: var(--viz-s2); opacity: 0.55; }
+.md-typeset .viz-legend .hg-key-wait { background: transparent; outline: 1.5px dashed var(--viz-s1); outline-offset: -1px; }
 .md-typeset .explorer .prob-box { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; align-items: flex-start; }
 .md-typeset .explorer .prob-grid { flex: 0 1 21rem; max-width: 100%; }
 .md-typeset .explorer .prob-chart { flex: 1 1 18rem; min-width: 0; }
@@ -1729,6 +1757,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .bx-badge { fill: var(--viz-s1); }
 .md-typeset svg .bx-badge-num { fill: #fff; font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset .explorer .bx-chip { font-weight: 700; white-space: nowrap; }
+.md-typeset .explorer .bx-chip.bx-long { white-space: normal; }   /* a cycle longer than N / 2 can be wider than a phone */
 .md-typeset .explorer .bx-chip bdi { font-family: var(--md-code-font-family); font-size: 0.7rem; }
 .md-typeset .explorer .bx-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .bx-bad { color: var(--diff-hard); font-weight: 700; }
