@@ -7,8 +7,9 @@ Serves the site locally and opens every page that has an explorer box (`div.expl
 Chromium at 390 x 844 px, with every collapsible block open. In each box it clicks every
 visible, enabled button once, in document order (the box is queried again before each
 click, since the views redraw their controls), lets a running play go on for a moment,
-then presses "reset everything". It fails when a script throws or logs a console error,
-and when the page scrolls sideways after a box was clicked through. The failing button is
+then presses "reset everything". It fails when a script throws or logs a console error
+(a resource from another host that fails to load is the network and does not count), and
+when the page scrolls sideways after a box was clicked through. The failing button is
 named in the report (its aria-label, text or title).
 
 Then, for every box, the link and the remembered state: the box's controls are changed one
@@ -217,6 +218,9 @@ def main(argv: list[str]) -> int:
     server, base = serve(site)
 
     external = re.compile(r"https?://(?!127\.0\.0\.1)")
+    # a resource from another host that failed to load (the GitHub API behind the repository
+    # widget answers 403 when CI is rate-limited) is the network, not a box
+    remote_fetch = re.compile(r"^Failed to load resource: .*\(https?://(?!127\.0\.0\.1)")
     failures = boxes_total = clicks_total = 0
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
@@ -244,7 +248,7 @@ def main(argv: list[str]) -> int:
             n_boxes = page.evaluate(BOXES)
 
             def take() -> list[str]:
-                got = [e for e in errors if not (args.offline and external.search(e))]
+                got = [e for e in errors if not (args.offline and external.search(e)) and not remote_fetch.search(e)]
                 errors.clear()
                 return got
 
