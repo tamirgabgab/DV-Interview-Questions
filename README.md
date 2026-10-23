@@ -136,6 +136,7 @@ DV-Interview-Questions/
 │   ├── lint_pages.py           # Checks the page skeleton and the RTL rules
 │   ├── check_links.py          # Internal link / anchor check of the built site (--external fetches the rest)
 │   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors, axe-core)
+│   ├── check_explorers.py      # Clicks every button of every explorer box (JS errors, width)
 │   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
 │   ├── new_question.py         # Scaffold: page, tests folder, generator stub, README row
 │   ├── page_tests.py           # Test helpers: Node runner, "page blocks match the generator"
@@ -434,6 +435,7 @@ python tools/check_links.py site --external   # also fetch every external link (
 python tools/check_phone.py           # every built page at 390 px: no sideways scroll, no JS errors
 python tools/check_phone.py --scheme dark   # the same in dark mode (CI: manual run with phone_dark)
 python tools/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-core (npm install axe-core)
+python tools/check_explorers.py       # every explorer box clicked through: no JS errors, no sideways scroll
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```
 
@@ -445,6 +447,12 @@ critical [axe-core](https://github.com/dequelabs/axe-core) findings (contrast, n
 keyboard access; CI runs it on every page, `--axe-fail` makes them failures). Warnings never
 fail CI. The explorer tests run the JavaScript under Node (CI installs it; locally the tests
 skip without it).
+
+`check_explorers.py` opens every page with an explorer box at 390 px and, in each box,
+clicks every visible button once in document order, then "reset everything"; an uncaught
+error, a console error or a page wider than the screen fails it, and the report names the
+box and the button. It takes the same `--offline`, `--route`, `--browser` and `--only`
+options as the phone check.
 
 `check_phone.py` needs Playwright (`requirements-dev.txt`) and its Chromium
 (`python -m playwright install chromium`). It writes a screenshot of each page to

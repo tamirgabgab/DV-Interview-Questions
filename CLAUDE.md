@@ -63,6 +63,7 @@ python tools/run_tests.py             # pytest + Verilator (needs Verilator 5.05
 mkdocs build --strict                 # the build CI runs
 python tools/check_links.py           # internal links and anchors of the built site
 python tools/check_phone.py           # every page at 390 px (add --offline and --route in a sandbox)
+python tools/check_explorers.py       # every button of every explorer box clicked once
 ```
 
 The linter checks RTL at every paragraph start (indented blocks and the steps timeline
@@ -71,7 +72,7 @@ math wider than its column (split it with `aligned`). `--scheme dark` runs the p
 in dark mode; CI runs it only on a manual run with `phone_dark`. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
-All five run in CI on every push; a failure blocks the deploy. Verilator notes and
+All six run in CI on every push; a failure blocks the deploy. Verilator notes and
 simulator quirks are listed in `HANDOFF.md` under "Technical notes".
 
 ## Workflow

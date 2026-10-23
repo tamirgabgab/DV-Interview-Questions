@@ -117,6 +117,10 @@ jobs:
           path: phone-shots
           retention-days: 7
           if-no-files-found: ignore
+      # Every explorer box clicked through, each button once, then "reset everything":
+      # a script error or a page that turns wider than 390 px fails the deploy.
+      - name: Click through every explorer box
+        run: python tools/check_explorers.py site
       # Dark mode on request only (Actions → Run workflow → phone_dark), it doubles the check time.
       - name: Check every page at phone width in dark mode
         if: github.event_name == 'workflow_dispatch' && inputs.phone_dark
