@@ -6,7 +6,7 @@
 // - part bar: on a page with two or more parts ("### סעיף ..."), a sticky row of chips that
 //   jumps to a part and marks the part being read.
 // window.dvqDecorate(root, selector?) adds the enlarge buttons to figures drawn later
-// (explorer.js passes its own selector for the live figures of a box).
+// (explorer/core.js passes its own selector for the live figures of a box).
 (() => {
   const FIGURES = "svg.figure, svg.perf-chart";
 

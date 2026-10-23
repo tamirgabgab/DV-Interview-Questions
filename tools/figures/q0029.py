@@ -82,7 +82,7 @@ def dec(v, n=2):
 
 def clock(t, digits=2):
     """'H:MM:SS.ss' of a time in seconds; the hundredths are rounded but stay inside the
-    second (at most .99), so the label and the highlighted second agree (explorer.js too)."""
+    second (at most .99), so the label and the highlighted second agree (explorer/clock.js too)."""
     t = Fr(t)
     sec = math.floor(t)
     hund = min(math.floor((t - sec) * 100 + Fr(1, 2)), 99)

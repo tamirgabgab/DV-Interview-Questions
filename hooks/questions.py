@@ -9,6 +9,8 @@ Responsibilities:
   that have ``tests/<id>/demo.py``.
 - Study paths (``docs/paths/*.md``): validate the steps, add them to the navigation, render
   the step list and the path cards, and put a previous / next bar on every question of a path.
+- Add the explorer scripts to the pages that have explorer boxes: the shared core and the
+  file of each kind on the page (on_post_page).
 - Add the prefix-stripped Hebrew words to the search index (on_post_build).
 """
 
@@ -71,10 +73,18 @@ SEARCH_FIELD = "alt"
 PREFIX_LETTERS = set("והבכלמש")
 WORD = re.compile(r"[\u05d0-\u05ea]+|[A-Za-z0-9_]+")
 
+# Explorer boxes: docs/javascripts/explorer/core.js and one file per kind, whose first line
+# names the kinds it registers ("// kinds: cake-arith cake-geo").
+EXPLORER_DIR = "javascripts/explorer"
+EXPLORER_BOX = re.compile(r"<div\b[^>]*\bclass=\"explorer\"[^>]*>")
+EXPLORER_KIND = re.compile(r"\bdata-kind=\"([\w-]+)\"")
+KINDS_LINE = re.compile(r"^// kinds: ([\w -]+)$")
+
 # Question metadata keyed by src_uri, and the study paths in order; filled in on_config.
 _questions: dict[str, dict] = {}
 _paths: list[dict] = []
 _comments: dict = {}
+_kind_files: dict[str, str] = {}   # explorer kind -> its file name in EXPLORER_DIR
 
 
 def _load_questions(docs_dir: Path) -> dict[str, dict]:
@@ -145,11 +155,29 @@ def _load_paths(docs_dir: Path) -> list[dict]:
     return sorted(paths, key=lambda p: (p["order"], p["src_uri"]))
 
 
+def _load_kind_files(docs_dir: Path) -> dict[str, str]:
+    """Map every explorer kind to the file that registers it (its "// kinds:" first line)."""
+    kinds: dict[str, str] = {}
+    for path in sorted((docs_dir / EXPLORER_DIR).glob("*.js")):
+        if path.name == "core.js":
+            continue
+        first = path.read_text(encoding="utf-8").split("\n", 1)[0]
+        m = KINDS_LINE.match(first)
+        if not m:
+            raise PluginError(f"{EXPLORER_DIR}/{path.name}: the first line must be '// kinds: <kind> ...'")
+        for kind in m.group(1).split():
+            if kind in kinds:
+                raise PluginError(f"explorer kind {kind!r} is registered by {kinds[kind]} and {path.name}")
+            kinds[kind] = path.name
+    return kinds
+
+
 def on_config(config, **kwargs):
-    global _questions, _paths, _comments
+    global _questions, _paths, _comments, _kind_files
     _questions = _load_questions(Path(config["docs_dir"]))
     _paths = _load_paths(Path(config["docs_dir"]))
     _comments = dict(config["extra"].get("comments") or {})
+    _kind_files = _load_kind_files(Path(config["docs_dir"]))
 
     nav: list = [{"ראשי": "index.md"}]
     for level, label in LEVELS.items():
@@ -527,6 +555,34 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     markdown = PATH_STEPS.sub(lambda m: _path_steps(page), markdown)
     markdown = PATH_CARDS.sub(lambda m: _path_cards(page.url), markdown)
     return PLACEHOLDER.sub(lambda m: _table(m.group(1), page.url), markdown)
+
+
+def explorer_scripts(output: str, page_url: str) -> str:
+    """The script tags for the explorer boxes in a built page: the core, then the file of
+    every kind on the page (each once), or "" when the page has no box."""
+    files: list[str] = []
+    for tag in EXPLORER_BOX.findall(output):
+        m = EXPLORER_KIND.search(tag)
+        if not m:
+            raise PluginError(f"{page_url}: an explorer box without data-kind: {tag[:80]}")
+        kind = m.group(1)
+        if kind not in _kind_files:
+            raise PluginError(f"{page_url}: no file in docs/{EXPLORER_DIR}/ registers the explorer kind {kind!r}")
+        if _kind_files[kind] not in files:
+            files.append(_kind_files[kind])
+    if not files:
+        return ""
+    base = _base(page_url) or "."
+    return "".join(f'<script src="{posixpath.relpath(f"{EXPLORER_DIR}/{name}", base)}"></script>'
+                   for name in ["core.js", *files])
+
+
+def on_post_page(output, page, config, **kwargs):
+    scripts = explorer_scripts(output, page.url)
+    if not scripts:
+        return output
+    at = output.rfind("</body>")
+    return output[:at] + scripts + output[at:] if at >= 0 else output + scripts
 
 
 def _search_variants(raw_tokens: set[str], words: list[str], known: set[str]) -> set[str]:

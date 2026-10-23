@@ -94,7 +94,7 @@ def test_follow_ups():
 
 
 def test_explorer_matches_python():
-    """The strip math of docs/javascripts/explorer.js (the live strip) against the generator
+    """The strip math of docs/javascripts/explorer/strip.js (the live strip) against the generator
     and the independent reference: the 48 lines, which are valid, the best length, the
     exit point and the path point by point, on the question and on random boxes."""
     from page_tests import explorer_require, node_json

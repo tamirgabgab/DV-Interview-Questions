@@ -18,9 +18,9 @@ work session, and update `HANDOFF.md` (work log, open items) at the end of every
   of a sentence.
 - Colons in Hebrew text have a space on both sides: a non-breaking space (U+00A0) before,
   so the colon never wraps to the start of a line, and an ordinary space after ("סיבוב 8 :
-  שלום", "**זמן :** ..."). This covers pages, admonition titles, figure generators,
-  `explorer.js` strings and the hook's HTML. It does not apply to times and ratios (12:00,
-  23:58:59), code, math, URLs or English-only text.
+  שלום", "**זמן :** ..."). This covers pages, admonition titles, figure generators, the
+  explorer strings (`docs/javascripts/explorer/`) and the hook's HTML. It does not apply
+  to times and ratios (12:00, 23:58:59), code, math, URLs or English-only text.
 - No Hebrew inside MathJax (`\text{...}` renders reversed). In inline SVG, Hebrew `<text>`
   gets `direction="rtl"`; prefer an HTML legend over SVG text.
 - No math in headings: the sidebar's table of contents and the search
@@ -47,7 +47,8 @@ work session, and update `HANDOFF.md` (work log, open items) at the end of every
   `python tools/figures/fill.py <id>` rewrites. Colours come from CSS variables in
   `docs/stylesheets/extra.css`, never hard-coded.
 - Start a question with `python tools/new_question.py` (see `README.md`). Interactive
-  sliders are a `data-kind` of `docs/javascripts/explorer.js`, tested under Node.
+  sliders are a `data-kind` with its own file in `docs/javascripts/explorer/` (the shared
+  code is `core.js`), tested under Node.
 - The owner's own code is kept as sent; comments may be added, and bugs are called out to
   the owner rather than silently fixed.
 - A source file from the owner (a solution write-up with tables and formulas) is checked

@@ -87,9 +87,12 @@ AXE = """async () => {
                    help: v.help.slice(0, 70) }));
 }"""
 
-OPEN_ALL = """() => {
+# Every collapsible block open, and every explorer box built (they are built lazily, when
+# they near the viewport).
+OPEN_ALL = """async () => {
   document.querySelectorAll("details").forEach((d) => (d.open = true));
   document.querySelectorAll(".hint-locked").forEach((d) => d.classList.remove("hint-locked"));
+  if (window.dvqExplorers) await window.dvqExplorers.ready();
 }"""
 
 

@@ -119,7 +119,7 @@ def test_figures_up_to_date():
 
 
 def test_explorer_matches_page_code():
-    """The JavaScript enumeration (docs/javascripts/explorer.js) returns the page's splits,
+    """The JavaScript enumeration (docs/javascripts/explorer/pcie.js) returns the page's splits,
     in the page's order, on random requests."""
     from page_tests import explorer_require, node_json
 

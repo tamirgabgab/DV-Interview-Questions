@@ -2,7 +2,8 @@
 
 - ``node_json(script)`` runs a Node script and returns its JSON output; the test is
   skipped when Node is not installed (CI installs it).
-- ``explorer_require()`` is the ``require`` expression of docs/javascripts/explorer.js.
+- ``explorer_require()`` is the ``require`` expression of the explorer models: the core and
+  every kind file of docs/javascripts/explorer/, merged by tools/explorer_node.js.
 - ``assert_figures_match(qid)`` checks that every generated block on the page equals the
   generator output (see tools/figures/fill.py).
 """
@@ -27,7 +28,7 @@ def node_json(script: str):
 
 
 def explorer_require() -> str:
-    return f"require({json.dumps(str(ROOT / 'docs' / 'javascripts' / 'explorer.js'))})"
+    return f"require({json.dumps(str(ROOT / 'tools' / 'explorer_node.js'))})"
 
 
 def assert_figures_match(qid: int) -> None:

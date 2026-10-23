@@ -120,7 +120,7 @@ def test_js_matches_python():
     if not node:
         pytest.skip("node is not installed")
     params = [(a / 1000, q / 100) for a in range(1, 500, 23) for q in range(105, 201, 5)]
-    script = (f"const m = require({json.dumps(str(ROOT / 'docs/javascripts/explorer.js'))});"
+    script = (f"const m = require({json.dumps(str(ROOT / 'tools/explorer_node.js'))});"
               f"const ps = {json.dumps(params)};"
               "console.log(JSON.stringify(ps.map(([a, q]) => {"
               "  const rows = m.cakeSplit('geo', a, q);"

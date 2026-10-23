@@ -1,4 +1,5 @@
-"""Tests of the site hook (hooks/questions.py): Hebrew search variants and study paths."""
+"""Tests of the site hook (hooks/questions.py): Hebrew search variants, study paths and the
+explorer scripts of a page."""
 
 import importlib.util
 import re
@@ -47,3 +48,29 @@ def test_study_paths():
         for s in p["steps"]:
             assert HEBREW.match(s["note"]), (p["src_uri"], s["note"])   # RTL: notes start in Hebrew
         assert "<!-- path-steps -->" in (DOCS / p["src_uri"]).read_text(encoding="utf-8")
+
+
+def test_explorer_kinds_have_files():
+    kinds = hook._load_kind_files(DOCS)
+    assert kinds["cake-arith"] == kinds["cake-geo"] == "cake.js"
+    used = set()
+    for page in (DOCS / "questions").rglob("*.md"):
+        used |= set(re.findall(r'class="explorer" data-kind="([\w-]+)"', page.read_text(encoding="utf-8")))
+    assert used and used <= set(kinds)
+    assert set(kinds.values()) == {p.name for p in (DOCS / hook.EXPLORER_DIR).glob("*.js")} - {"core.js"}
+
+
+def test_explorer_scripts_per_page():
+    hook._kind_files = hook._load_kind_files(DOCS)
+    page = ('<div class="explorer" data-kind="kaprekar" data-digits="3"></div>'
+            '<div class="explorer" data-kind="kapbase"></div><div class="explorer" data-kind="kaprekar"></div>')
+    tags = re.findall(r'src="([^"]+)"', hook.explorer_scripts(page, "questions/student/0012-x/"))
+    assert tags == ["../../../javascripts/explorer/core.js", "../../../javascripts/explorer/kaprekar.js",
+                    "../../../javascripts/explorer/kapbase.js"]
+    assert hook.explorer_scripts("<p>no box</p>", "") == ""
+    try:
+        hook.explorer_scripts('<div class="explorer" data-kind="nope"></div>', "x/")
+    except hook.PluginError as e:
+        assert "nope" in str(e)
+    else:
+        raise AssertionError("an unknown kind must fail the build")

@@ -96,7 +96,7 @@ def names(a, b, log):
 
 
 def mulberry32(seed):
-    """The explorer's seeded generator (docs/javascripts/explorer.js), so a seed gives the
+    """The explorer's seeded generator (docs/javascripts/explorer/core.js), so a seed gives the
     same hidden speeds on the page and in the box."""
     state = seed & 0xFFFFFFFF
 

@@ -1,0 +1,499 @@
+// Interactive explorers, the shared core: a box `<div class="explorer" data-kind="..."
+// data-...>` mounts the controls, a summary line and figures of its kind, redrawn on every
+// change. This file holds what every kind uses (the seeded generator, the drawing helpers,
+// the shared controls, the timing strip, the box header, keyboard stepping, lazy building)
+// and the registry; each kind lives in explorer/<kind>.js, whose first line names the
+// kinds it registers. hooks/questions.py adds this file and the files of the kinds on a
+// page as script tags to that page only. Under Node, tools/explorer_node.js loads every
+// file and returns the merged models, which the question tests (tests/0001 to 0043)
+// compare with the Python reference.
+(() => {
+  const EPS = 1e-9;
+
+  // mulberry32: a small seeded generator, so a random draw can be replayed from its seed
+  // (the question tests use the same recurrence).
+  const mulberry32 = (seed) => {
+    let a = seed | 0;
+    return () => {
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  };
+  const SEED_MAX = 99999;
+  const newSeed = () => 1 + Math.floor(Math.random() * SEED_MAX);
+
+  const bigComb = (n, k) => {
+    if (k < 0 || k > n) return 0n;
+    let r = 1n;
+    for (let i = 1; i <= k; i++) r = (r * BigInt(n - k + i)) / BigInt(i);
+    return r;
+  };
+  // Degrees on the unit circle (0007, the triangle and the polygon).
+  const TRI_M = 360;
+  const triNorm = (v) => ((Math.round(v) % TRI_M) + TRI_M) % TRI_M;
+  // the frames of the page's algorithm: {phase, step, slow, fast}, and the meeting node
+  const floydTrace = (nums) => {
+    const frames = [{ phase: 1, step: 0, slow: 0, fast: 0 }];
+    let slow = 0, fast = 0, step = 0;
+    do {
+      slow = nums[slow]; fast = nums[nums[fast]]; step++;
+      frames.push({ phase: 1, step, slow, fast });
+    } while (slow !== fast);
+    const meet = slow;
+    slow = 0; step = 0;
+    frames.push({ phase: 2, step, slow, fast });
+    while (slow !== fast) {
+      slow = nums[slow]; fast = nums[fast]; step++;
+      frames.push({ phase: 2, step, slow, fast });
+    }
+    return { frames, meet, answer: slow };
+  };
+  // "3, 9, 5" -> the array, or null when it is not n + 1 values in 1..n
+  const floydParse = (text) => {
+    const parts = String(text).trim().split(/[\s,;]+/).filter(Boolean);
+    if (parts.length < 2 || parts.some((p) => !/^\d+$/.test(p))) return null;
+    const nums = parts.map(Number), n = nums.length - 1;
+    return nums.every((v) => v >= 1 && v <= n) ? nums : null;
+  };
+
+  // Shareable state (0006, 0017, 0009): the payload after `#state-<kind>.` reopens a box
+  // with the typed input and the step it was at. enc() writes the payload, dec() returns
+  // the state (the step clamped to the trace) or null for anything malformed, out of
+  // range or not a permutation.
+  const intList = (text, lo, hi) => {
+    if (!/^\d+(\.\d+)*$/.test(text)) return null;
+    const v = text.split(".").map(Number);
+    return v.every((x) => x >= lo && x <= hi) ? v : null;
+  };
+  const STATE_CODECS = {
+    stock: {
+      enc: (s) => `${s.prices.join(".")}-${s.k}-${s.both ? "both" : "long"}`,
+      dec: (text) => {
+        const m = /^([\d.]+)-(\d+)-(both|long)$/.exec(text);
+        const prices = m && intList(m[1], 1, 20);
+        if (!prices || prices.length < 2 || prices.length > 20) return null;
+        return { prices, k: Math.min(Number(m[2]), prices.length), both: m[3] === "both" };
+      },
+    },
+    floyd: {
+      enc: (s) => `${s.nums.join(".")}-${s.k}`,
+      dec: (text, nmax = 12) => {
+        const m = /^([\d.]+)-(\d+)$/.exec(text);
+        const nums = m && floydParse(m[1].replace(/\./g, " "));
+        if (!nums || nums.length - 1 > nmax) return null;
+        return { nums, k: Math.min(Number(m[2]), floydTrace(nums).frames.length - 1) };
+      },
+    },
+    boxes: {
+      enc: (s) => `${s.notes.slice(1).join(".")}-${s.me}-${s.helper ? 1 : 0}-${s.step}`,
+      dec: (text, nmax = 16) => {
+        const m = /^([\d.]+)-(\d+)-([01])-(\d+)$/.exec(text);
+        const p = m && intList(m[1], 1, nmax), n = p ? p.length : 0, me = m && Number(m[2]);
+        if (!p || n < 4 || n % 2 || n > nmax || me < 1 || me > n) return null;
+        if ([...p].sort((a, b) => a - b).some((v, i) => v !== i + 1)) return null;
+        return { n, notes: [0, ...p], me, helper: m[3] === "1", step: Number(m[4]) };
+      },
+    },
+  };
+
+  // The digits of a base up to 16 (kapbase, kap4base); a value as a bit string (lfsr, gray).
+  const KB_DIGITS = "0123456789ABCDEF";
+  const bitsOf = (v, bits) => v.toString(2).padStart(bits, "0");
+  // A timing strip as WaveDrom, the format of the ```wavedrom blocks on the pages: one
+  // lane per row, a character per slot ("." repeats the previous level or value), bus
+  // values in `data`; a clock is "p…" per cycle, or "h"/"l" per slot on a half-cycle
+  // strip; a flag row is a level that is high where the rule fails. Names lose their
+  // markup. Rows that stop early (frames not reached yet) give a shorter lane.
+  const plainText = (s) => String(s).replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n))).replace(/&amp;/g, "&").replace(/\u200f/g, "").trim();
+  const waveDromOf = (rows, N, opts = {}) => {
+    const signal = rows.map((row) => {
+      let len = N;
+      if (row.values) { len = row.values.findIndex((v) => v === undefined || v === null); if (len < 0) len = Math.min(N, row.values.length); }
+      const lane = { name: plainText(row.name) };
+      if (row.kind === "clock") lane.wave = opts.half ? Array.from({ length: len }, (_, k) => (k % 2 ? "l" : "h")).join("") : len ? "p" + ".".repeat(len - 1) : "";
+      else if (row.kind === "bus") {
+        let wave = "";
+        const data = [];
+        for (let k = 0; k < len; k++) {
+          if (k && !row.split && row.values[k] === row.values[k - 1]) wave += ".";
+          else { wave += "="; data.push(plainText(row.values[k])); }
+        }
+        lane.wave = wave; lane.data = data;
+      } else {
+        let wave = "";
+        for (let k = 0; k < len; k++) { const v = row.values[k] ? "1" : "0"; wave += k && v === (row.values[k - 1] ? "1" : "0") ? "." : v; }
+        lane.wave = wave;
+      }
+      return lane;
+    });
+    const out = { signal };
+    // the first tick as a string: WaveDrom 3.5 throws on a numeric tick when the strip has
+    // a single slot; a windowed strip starts at its first column's own number
+    if (opts.ticks && !opts.half) { const t0 = Number(opts.ticks(0)); out.head = { tick: String(Number.isFinite(t0) ? t0 : 0) }; }
+    return out;
+  };
+  // WaveDrom text as the pages write it: one lane per line.
+  const waveDromText = (wd) => {
+    const lanes = wd.signal.map((l) => "  " + JSON.stringify(l)).join(",\n");
+    const rest = Object.keys(wd).filter((k) => k !== "signal").map((k) => `,\n  ${JSON.stringify(k)}: ${JSON.stringify(wd[k])}`).join("");
+    return `{ "signal": [\n${lanes}\n]${rest} }`;
+  };
+
+  // --- drawing helpers ---------------------------------------------------------------
+
+  const f = (v, n = 1) => Number(v).toFixed(n);
+  const attr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const ltr = (x) => `<bdi dir="ltr">${x}</bdi>`;   // math and numbers inside Hebrew text
+  // Arrow keys on a focused point: +1 for right / up, -1 for left / down, ten times with Shift.
+  const arrowStep = (e) => {
+    const d = e.key === "ArrowRight" || e.key === "ArrowUp" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -1 : 0;
+    return d * (e.shiftKey ? 10 : 1);
+  };
+  const fmt = (v, n = 3) => Number(v).toFixed(n);
+  const W = 640, H = 230, X0 = 46, RIGHT = 12, TOP = 14, BASE = 198;
+
+  // A chart frame with n slots along x and the value range [0, ymax] along y.
+  const frame = (label, n, ymax, yticks, tickFmt = (v) => String(v)) => {
+    const slot = (W - X0 - RIGHT) / n;
+    const Y = (v) => BASE - (v / ymax) * (BASE - TOP);
+    const cx = (k) => X0 + (k - 0.5) * slot;
+    let s = `<svg class="perf-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}">`;
+    yticks.forEach((v) => {
+      s += `<line class="grid" x1="${X0}" x2="${W - RIGHT}" y1="${f(Y(v))}" y2="${f(Y(v))}"/>` +
+           `<text class="tick" x="${X0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${tickFmt(v)}</text>`;
+    });
+    const every = Math.ceil(n / 16);
+    const xtick = (k, label = k) =>
+      `<text class="tick" x="${f(cx(k))}" y="${BASE + 18}" text-anchor="middle">${label}</text>`;
+    const close = () => `<line class="axis" x1="${X0}" x2="${W - RIGHT}" y1="${BASE}" y2="${BASE}"/></svg>`;
+    return { s, slot, Y, cx, every, xtick, close };
+  };
+
+  const hline = (fr, v, label) =>
+    `<line class="ink-line" x1="${X0}" x2="${W - RIGHT}" y1="${f(fr.Y(v))}" y2="${f(fr.Y(v))}" ` +
+    `stroke-width="1.5" stroke-dasharray="6 4"/>` +
+    (label ? `<text class="legend" x="${X0 + 6}" y="${f(fr.Y(v) - 6)}">${label}</text>` : "");
+
+  // --- shared controls ---------------------------------------------------------------------
+
+  // A speed select (milliseconds per step) and the play loop of a stepper: the play
+  // button toggles a timer that calls step() every speed.value ms until done(); pressed
+  // at the end, restart() rewinds first. Returns stop(), for the other controls.
+  // The seed of a box's random draws: a seed field and a "copy link" button inserted after
+  // `after`; run(rng, seed) redraws with a seeded generator. draw() picks a new seed and
+  // runs it, a typed seed replays, and `#seed-<kind>-<n>` in the URL replays on load (the
+  // first box of that kind on the page). opts.seed fills the field without running.
+  // opts.state = { get, set }: get() returns the box's state as a payload (or null to fall
+  // back to the seed), the copy button then writes `#state-<kind>.<payload>` and set()
+  // reopens it on load (true when the payload was valid).
+  const SEED_HASH = /^#seed-([a-z0-9-]+)-(\d+)$/;
+  const STATE_HASH = /^#state-([a-z0-9-]+)\.(.+)$/;
+  const seedControls = (box, after, run, opts = {}) => {
+    const kind = box.dataset.kind;
+    const label = document.createElement("label");
+    label.className = "ex-seedlab";
+    label.innerHTML = `<span>זרע</span> <input type="number" class="ex-seed" min="1" max="${SEED_MAX}" step="1" dir="ltr" inputmode="numeric" aria-label="זרע ההגרלה, מספר לשחזור">`;
+    const copy = document.createElement("button");
+    copy.type = "button"; copy.className = "md-button ex-copy"; copy.textContent = "העתקת קישור";
+    copy.title = opts.state ? "קישור שפותח את התיבה במצב הזה" : "קישור שפותח את התיבה עם אותו זרע";
+    after.after(label, copy);
+    const input = label.querySelector("input");
+    if (opts.seed) input.value = opts.seed;
+    const runSeed = (seed) => { input.value = seed; run(mulberry32(seed), seed); };
+    const draw = () => runSeed(newSeed());
+    input.addEventListener("change", () => { const v = Math.round(Number(input.value)); if (v >= 1 && v <= SEED_MAX) runSeed(v); else input.value = ""; });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
+    copy.addEventListener("click", () => {
+      const payload = opts.state ? opts.state.get() : null;
+      if (!payload && !input.value) draw();
+      const url = `${location.origin}${location.pathname}#${payload ? `state-${kind}.${payload}` : `seed-${kind}-${input.value}`}`;
+      const done = () => { copy.textContent = "הועתק ✓"; setTimeout(() => { copy.textContent = "העתקת קישור"; }, 1500); };
+      const fallback = () => { window.prompt("הקישור :", url); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
+    });
+    const first = box === document.querySelector(`.explorer[data-kind="${kind}"]`);
+    const m = SEED_HASH.exec(location.hash), sm = STATE_HASH.exec(location.hash);
+    if (first && m && m[1] === kind) {
+      runSeed(Number(m[2]));
+      requestAnimationFrame(() => box.scrollIntoView({ block: "start" }));
+    } else if (first && sm && sm[1] === kind && opts.state && opts.state.set(sm[2])) {
+      requestAnimationFrame(() => box.scrollIntoView({ block: "start" }));
+    }
+    return { draw };
+  };
+  // The random traffic row of the two protocol boxes (0025, 0024): how many events and
+  // the fault rate; the run button draws a new seed. `randNote` is the line under the box
+  // once a random script runs: the counts, and whether the invariants held.
+  const randomRow = (label, title) =>
+    `<div class="ex-controls an-free an-random"><span class="ex-title">${title}</span>` +
+    `<label>אירועים <select class="ex-count" aria-label="מספר האירועים">${[20, 50, 200].map((v) => `<option value="${v}"${v === 50 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
+    `<label>${label} <input type="range" class="ex-rate" min="0" max="50" step="5" value="20" dir="ltr" aria-label="${label} באחוזים"><output class="out-rate">20%</output></label>` +
+    `<button type="button" class="md-button md-button--primary ex-run">הרצה אקראית</button></div>`;
+  const RAND_HASH = /^r(20|50|200)\.(\d+)\.(\d+)$/;
+  // The event axis of 0025 / 0024: the states before every event in the history and the
+  // current one, a column each (the last 64, ticks with the absolute event number).
+  const EVENT_KEEP = 64;
+  const eventStrip = (st, rowsOf, label, invariants) => {
+    const states = st.history.map((h) => h.state).concat([st.state]);
+    const logs = [st.history.length ? st.history[0].log : null].concat(st.history.slice(1).map((h) => h.log), st.history.length ? [st.log] : []);
+    const base = st.dropped || 0, from = Math.max(0, states.length - EVENT_KEEP);
+    const S = states.slice(from), Lg = logs.slice(from), n = S.length;
+    const first = base + from;
+    const rows = [{ name: "event", kind: "bus", split: true, values: Lg.map((l, i) => (first + i === 0 ? "start" : label(l))) }]
+      .concat(rowsOf(S), [{ name: "✗", kind: "flag", values: S.map((s) => (invariants(s).length ? 1 : 0)) }]);
+    return waveStrip(rows, n, { slotW: 52, labelW: 92, cursor: n - 1, ticks: (k) => first + k, label: `ציר האירועים : ${n} עמודות` });
+  };
+  const randNote = (rd, seed, faults, names, checks) => {
+    const v = rd.violation;
+    return `תנועה אקראית מהזרע ${ltr(seed)} : ${ltr(rd.count)} אירועים בשיעור ${ltr(`${Math.round(rd.rate * 100)}%`)}, ${faults}. ${checks} ` +
+      (v ? `<span class="wv-bad">✗ אחרי אירוע ${ltr(v.index)} הופר : ${v.names.map((n) => names[n]).join(", ")}; התסריט נעצר שם.</span>` : `<span class="wv-ok">✓ אף אחד מהם לא הופר לאורך כל התסריט.</span>`) +
+      ` אותו זרע נותן את אותו תסריט; "הצעד הקודם" חוזר אחורה.`;
+  };
+  const speedSel = (slow, mid, fast) =>
+    `<label>הקצב <select class="ex-speed"><option value="${slow}">איטי</option><option value="${mid}" selected>בינוני</option><option value="${fast}">מהיר</option></select></label>`;
+  const autoplay = (play, speed, { step, done, restart }) => {
+    let timer = null;
+    const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
+    play.addEventListener("click", () => {
+      if (timer) { stop(); return; }
+      if (done()) restart();
+      if (done()) return;
+      play.textContent = "עצירה";
+      timer = setInterval(() => { step(); if (done()) stop(); }, Number(speed.value));
+    });
+    speed.addEventListener("change", () => { if (timer) { stop(); play.click(); } });
+    return stop;
+  };
+
+  // A timing strip: rows over N slots (clock cycles, or half-cycles with `half`), the
+  // names in a left column. Row kinds: "clock" (the square wave), "bit" (a level line,
+  // shaded where high), "bus" (labelled boxes merged over equal values). A row's values
+  // may stop early (frames not reached yet). `cells` on a row makes every slot a button
+  // (data-k); `marks` on a row shades slots; `cursor` outlines one slot; `split` on a bus
+  // row keeps equal neighbours apart (one box per slot, for a row of events).
+  // The row names of a strip again as an HTML column that sticks to the left edge of the
+  // scroll container, so a long strip scrolled to its end still says which row is which
+  // (the names inside the svg stay for the enlarged copy).
+  const stickyNames = (svg, names, L, T, RH) =>
+    `<div class="wv-row"><div class="wv-names" aria-hidden="true" style="width:${L}px;margin-right:-${L}px;padding-top:${T}px">` +
+    names.map((n) => `<div style="height:${RH}px;line-height:${RH - 2}px">${n}</div>`).join("") + `</div>${svg}</div>`;
+  const waveStrip = (rows, N, opts = {}) => {
+    const L = opts.labelW ?? 66, SW = opts.slotW ?? 36, RH = 30, T = opts.ticks ? 20 : 8;
+    const W = L + N * SW + 6, H = T + rows.length * RH + 4;
+    const x = (k) => L + k * SW;
+    let s = `<svg class="wave-strip" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="${opts.role || "img"}" aria-label="${opts.label || ""}" data-wavedrom="${attr(waveDromText(waveDromOf(rows, N, opts)))}">`;
+    for (let k = 0; k <= N; k++) s += `<line class="wv-grid${opts.half && k % 2 ? " wv-grid-half" : ""}" x1="${x(k)}" x2="${x(k)}" y1="${T - 4}" y2="${H - 4}"/>`;
+    if (opts.ticks) for (let k = 0; k < N; k++) {
+      const t = opts.ticks(k);
+      if (t !== "" && t !== undefined && t !== null) s += `<text class="wv-tick" x="${x(k) + SW / 2}" y="${T - 8}" text-anchor="middle">${t}</text>`;
+    }
+    if (opts.cursor !== undefined && opts.cursor !== null) s += `<rect class="wv-cursor" x="${x(opts.cursor)}" y="${T - 4}" width="${SW}" height="${H - T}"/>`;
+    rows.forEach((row, r) => {
+      const y0 = T + r * RH, yh = y0 + 5, yl = y0 + RH - 7, ym = (yh + yl) / 2;
+      const cls = row.cls ? ` ${row.cls}` : "";
+      s += `<text class="wv-name" x="${L - 8}" y="${ym + 4}" text-anchor="end">${row.name}</text>`;
+      let len = N;
+      if (row.values) { len = row.values.findIndex((v) => v === undefined || v === null); if (len < 0) len = Math.min(N, row.values.length); }
+      if (row.marks) row.marks.forEach((m, k) => { if (m && k < len) s += `<rect class="wv-mark" x="${x(k)}" y="${y0 + 2}" width="${SW}" height="${RH - 4}"/>`; });
+      if (row.kind === "clock") {
+        let d = "";
+        for (let k = 0; k < len; k++) {
+          const xk = x(k);
+          if (opts.half) { const hi = k % 2 === 0; d += `M${xk},${hi ? yl : yh} V${hi ? yh : yl} H${xk + SW} `; }
+          else d += `M${xk},${yl} V${yh} H${xk + SW / 2} V${yl} H${xk + SW} `;
+        }
+        s += `<path class="wv-line wv-clock" d="${d}"/>`;
+      } else if (row.kind === "flag") {
+        for (let k = 0; k < len; k++) if (row.values[k]) s += `<g class="wv-fail"><circle cx="${x(k) + SW / 2}" cy="${ym}" r="9"/><text x="${x(k) + SW / 2}" y="${ym + 4}" text-anchor="middle">✗</text></g>`;
+      } else if (row.kind === "bus") {
+        let k = 0;
+        while (k < len) {
+          let j = k;
+          while (!row.split && j + 1 < len && row.values[j + 1] === row.values[k]) j++;
+          const xk = x(k), w = (j - k + 1) * SW;
+          s += `<path class="wv-bus${cls}" d="M${xk + 2},${ym} L${xk + 6},${yh} H${xk + w - 6} L${xk + w - 2},${ym} L${xk + w - 6},${yl} H${xk + 6} Z"/>` +
+               `<text class="wv-val" x="${xk + w / 2}" y="${ym + 4}" text-anchor="middle">${row.values[k]}</text>`;
+          k = j + 1;
+        }
+      } else {
+        let d = "", prev = null;
+        for (let k = 0; k < len; k++) {
+          const v = row.values[k] ? 1 : 0, xk = x(k), y = v ? yh : yl;
+          if (v) s += `<rect class="wv-high${cls}" x="${xk}" y="${yh}" width="${SW}" height="${yl - yh}"/>`;
+          d += (k === 0 ? `M${xk},${y}` : prev !== v ? ` V${y}` : "") + ` H${xk + SW}`;
+          prev = v;
+        }
+        if (len) s += `<path class="wv-line${cls}" d="${d}"/>`;
+      }
+      if (row.cells) for (let k = 0; k < N; k++) {
+        s += `<rect class="wv-cell" data-k="${k}" x="${x(k)}" y="${y0 + 1}" width="${SW}" height="${RH - 2}" tabindex="0" role="button" aria-label="${row.cells(k)}"/>`;
+      }
+    });
+    return stickyNames(s + "</svg>", rows.map((row) => row.name), L, T, RH);
+  };
+  const code = (t) => `<code>${t}</code>`;
+
+  const header = (box, helpOpen) => {
+    const bar = document.createElement("div");
+    bar.className = "ex-bar";
+    bar.innerHTML = `<button type="button" class="ex-help-btn" aria-expanded="false" aria-label="עזרה : מה התיבה מראה ומה הכפתורים עושים" title="עזרה">?</button>` +
+      `<button type="button" class="ex-reset-all" title="כל הבקרות של התיבה חוזרות לברירת המחדל">איפוס הכול</button>` +
+      `<p class="ex-help" hidden>${HELP[box.dataset.kind] || ""}</p>`;
+    box.prepend(bar);
+    const btn = bar.querySelector(".ex-help-btn"), help = bar.querySelector(".ex-help");
+    const show = (open) => { help.hidden = !open; btn.setAttribute("aria-expanded", String(open)); };
+    btn.addEventListener("click", () => show(help.hidden));
+    if (helpOpen) show(true);
+    bar.querySelector(".ex-reset-all").addEventListener("click", () => {
+      const play = box.querySelector(".ex-play");
+      if (play && play.textContent === "עצירה") play.click();        // stop a running loop first
+      if (/^#(seed|state)-/.test(location.hash)) history.replaceState(null, "", `${location.pathname}${location.search}`);
+      setup(box, !help.hidden);
+    });
+  };
+
+  // Enlarge buttons (reading-tools.js) on every figure of a box, kept through redraws: a
+  // view rebuilds its figures with innerHTML, so the buttons are added again after each
+  // change (decorate skips figures that already have one).
+  const LIVE_FIGURES = "svg.figure, svg.perf-chart, svg.lf-live, svg.cr-live, svg.ep-live, svg.wave-strip";
+  // The WaveDrom row after every timing strip (any svg with data-wavedrom): copy the
+  // source to the clipboard, or open it in the WaveDrom editor. The row sits after the
+  // strip's scroll container, which the views redraw inside, and reads the current strip
+  // when clicked.
+  const WD_EDITOR = "https://wavedrom.com/editor.html?";
+  const exportRows = (box) => {
+    box.querySelectorAll("svg[data-wavedrom]").forEach((svg) => {
+      if (svg.closest(".fig-lightbox")) return;
+      const host = svg.closest(".wv-wrap") || svg.closest(".fig-wrap") || svg;
+      if (host.nextElementSibling && host.nextElementSibling.classList.contains("wv-export")) return;
+      const row = document.createElement("p");
+      row.className = "wv-export";
+      row.innerHTML = `<button type="button" class="md-button wv-copy" title="מעתיק את הרצועה כ-JSON של WaveDrom, כמו הבלוקים שבדפים">העתקת WaveDrom</button> ` +
+        `<a class="wv-open" target="_blank" rel="noopener" href="${WD_EDITOR}">פתיחה בעורך WaveDrom</a>`;
+      host.after(row);
+      const source = () => { const s = host.querySelector("svg[data-wavedrom]") || (host.matches("svg[data-wavedrom]") ? host : null); return s ? s.getAttribute("data-wavedrom") : ""; };
+      const link = row.querySelector(".wv-open");
+      const refresh = () => { link.href = WD_EDITOR + encodeURIComponent(source()); };
+      ["pointerdown", "focus", "click"].forEach((ev) => link.addEventListener(ev, refresh));
+      const btn = row.querySelector(".wv-copy");
+      btn.addEventListener("click", () => {
+        const text = source();
+        const done = () => { btn.textContent = "הועתק ✓"; setTimeout(() => { btn.textContent = "העתקת WaveDrom"; }, 1500); };
+        const fallback = () => { window.prompt("‏JSON של WaveDrom :" , text); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+      });
+    });
+  };
+  const decorateLive = (box) => {
+    exportRows(box);
+    if (!window.dvqDecorate) { if (!box.dvqObserved) { box.dvqObserved = true; new MutationObserver(() => exportRows(box)).observe(box, { childList: true, subtree: true }); } return; }
+    const dec = () => { window.dvqDecorate(box, LIVE_FIGURES); exportRows(box); };
+    dec();
+    if (box.dvqObserved) return;                         // a rebuilt box keeps its observer
+    box.dvqObserved = true;
+    new MutationObserver(dec).observe(box, { childList: true, subtree: true });
+  };
+
+  // Keyboard stepping: with the box focused (it is in the tab order), → is the next step,
+  // ← the previous, space plays or stops, Home and End jump to the ends. Keys typed in a
+  // field, and space on a button, are left to the field or the button.
+  const KEYS = [
+    ["ArrowRight", "button.ex-next, button.ex-cycle"],
+    ["ArrowLeft", "button.ex-prev"],
+    [" ", "button.ex-play, button.ex-solve"],
+    ["Home", "button.ex-start, button.ex-first"],
+    ["End", "button.ex-end, button.ex-last"],
+  ];
+  const KEY_HINTS = [
+    ["button.ex-next, button.ex-cycle, button.ex-prev", "חיצים ← → לצעד"],
+    ["button.ex-play, button.ex-solve", "רווח להפעלה ולעצירה"],
+    ["button.ex-start, button.ex-first, button.ex-end, button.ex-last", "‏Home ו-End להתחלה ולסוף"],
+    ["[role=slider].tri-pt, [role=slider].st-pt", "‏Tab לנקודה וחיצים מזיזים אותה (עם Shift בקפיצות)"],
+  ];
+  const keyboard = (box) => {
+    const hints = KEY_HINTS.filter(([sel]) => box.querySelector(sel)).map(([, text]) => text);
+    if (!hints.length) return;
+    box.tabIndex = 0;
+    const hint = document.createElement("p");
+    hint.className = "ex-keys";
+    hint.textContent = `מקשים כשהתיבה ממוקדת : ${hints.join(", ")}.`;
+    box.append(hint);
+    if (box.dvqKeys) return;                             // a rebuilt box keeps its listener
+    box.dvqKeys = true;
+    box.addEventListener("keydown", (e) => {
+      const t = e.target;
+      if (t.matches("input, select, textarea") || t.getAttribute("role") === "slider" || (e.key === " " && t !== box && (t.matches("button") || t.getAttribute("role") === "button"))) return;
+      const hit = KEYS.find(([key]) => key === e.key);
+      if (!hit) return;
+      const btn = box.querySelector(hit[1]);
+      if (!btn || btn.disabled) return;
+      e.preventDefault();
+      btn.click();
+    });
+  };
+
+  const setup = (box, helpOpen = false) => {
+    const make = VIEWS[box.dataset.kind];
+    if (!make) return;
+    make(box).mount(box);
+    header(box, helpOpen);
+    keyboard(box);
+    decorateLive(box);
+  };
+
+  // --- lazy building -------------------------------------------------------------------------
+
+  // A box is built when it comes within one screen of the viewport (a box inside a closed
+  // block waits until the block opens). The box a link points at (`#seed-<kind>-…` or
+  // `#state-<kind>.…`) is built at once, so it can scroll itself into view. ready() builds
+  // every box that is still waiting, for the page checks (tools/check_phone.py,
+  // tools/check_explorers.py) and for printing.
+  const waiting = new Set();
+  let observer = null;
+  const build = (box) => {
+    if (!waiting.delete(box)) return;
+    if (observer) observer.unobserve(box);
+    setup(box);
+  };
+  const ready = () => { [...waiting].forEach(build); return Promise.resolve(); };
+  const linkedKind = () => {
+    const m = SEED_HASH.exec(location.hash) || STATE_HASH.exec(location.hash);
+    return m ? m[1] : null;
+  };
+
+  // --- the registry ----------------------------------------------------------------------------
+
+  // Every kind file (explorer/<kind>.js) registers its views, its help line and the pure
+  // functions the question tests compare with the Python reference. Under Node the
+  // models of every file are merged (tools/explorer_node.js) and nothing is built.
+  const VIEWS = {}, HELP = {};
+  const models = { mulberry32, waveDromOf, waveDromText, floydTrace, floydParse, STATE_CODECS, bitsOf };
+  const register = ({ views = {}, help = {}, models: own = {} }) => {
+    Object.assign(VIEWS, views);
+    Object.assign(HELP, help);
+    Object.assign(models, own);
+  };
+  const lib = {
+    BASE, EPS, H, KB_DIGITS, RAND_HASH, SEED_MAX, STATE_CODECS, TOP, TRI_M, W, X0,
+    arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, f, floydParse, floydTrace, fmt, frame, hline,
+    ltr, mulberry32, newSeed, randNote, randomRow, seedControls, speedSel, stickyNames, triNorm, waveDromText, waveStrip,
+  };
+  globalThis.dvqExplorers = { lib, models, register, ready };
+  if (typeof document === "undefined") return;
+
+  window.addEventListener("beforeprint", ready);
+  document.addEventListener("DOMContentLoaded", () => {
+    const boxes = [...document.querySelectorAll(".explorer")];
+    boxes.forEach((box) => waiting.add(box));
+    const kind = linkedKind();
+    const linked = kind && boxes.find((box) => box.dataset.kind === kind);
+    if (linked) build(linked);
+    if (!("IntersectionObserver" in window)) { ready(); return; }
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) build(e.target); });
+    }, { rootMargin: "100% 0px" });
+    waiting.forEach((box) => observer.observe(box));
+  });
+})();

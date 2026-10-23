@@ -76,7 +76,7 @@ def test_figures_up_to_date():
 
 
 def test_explorer_matches_page_code():
-    """The BFS of the explorer (docs/javascripts/explorer.js) returns the page's plan, or
+    """The BFS of the explorer (docs/javascripts/explorer/hourglass.js) returns the page's plan, or
     None exactly when the page does, on a grid of A, B, D; and its list of measurable D
     agrees with the oracle."""
     from page_tests import explorer_require, node_json

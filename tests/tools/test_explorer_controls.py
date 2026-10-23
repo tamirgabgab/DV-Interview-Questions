@@ -1,5 +1,5 @@
 """The shared explorer controls of round V: the seeded generator exported by
-explorer.js is the mulberry32 the question tests replay in Python, and a seeded
+explorer/core.js is the mulberry32 the question tests replay in Python, and a seeded
 draw of the random models is reproducible from its seed."""
 
 from page_tests import explorer_require, node_json

@@ -1,0 +1,224 @@
+// kinds: pcie
+//   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits
+// Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
+// script tags); under Node tools/explorer_node.js loads every kind file and merges the
+// models for the question tests.
+(() => {
+  const { bigComb, f, ltr } = dvqExplorers.lib;
+
+  // PCIe completion splits (0020, 0021): a read of `len` bytes from `addr` is answered by
+  // completions that cut only on RCB boundaries and never exceed MPS. pcieBlocks gives the
+  // N blocks (f, RCB, ..., RCB, e), pcieSplits enumerates the splits in the page's order
+  // (largest cut first; `limit` stops early), pcieCount counts them by a dynamic program
+  // over the cut points, pcieByCompletions splits that count by the number of completions,
+  // and pcieFormula is the closed form of 0021: S(N) - S(N - 1) + delta with
+  // S(n) = sum_j (-1)^j C(n - m j, j) 2^(n - (m + 1) j), m = MPS / RCB. Counts are BigInt
+  // (a 4 KB request over RCB 64 has 63 boundaries).
+  const pcieBoundaries = (addr, len, rcb) => {
+    const out = [];
+    for (let b = (Math.floor(addr / rcb) + 1) * rcb; b < addr + len; b += rcb) out.push(b);
+    return out;
+  };
+  const pciePoints = (addr, len, rcb) => [addr, ...pcieBoundaries(addr, len, rcb), addr + len];
+  const pcieBlocks = (addr, len, rcb) => {
+    const pts = pciePoints(addr, len, rcb);
+    return pts.slice(1).map((b, i) => b - pts[i]);
+  };
+  const pcieSplits = (addr, len, mps, rcb, limit = Infinity) => {
+    const end = addr + len, out = [];
+    const extend = (pos, sizes) => {
+      if (out.length >= limit) return;
+      if (pos === end) { out.push(sizes); return; }
+      const cuts = pos + mps >= end ? [end] : [];
+      for (let b = (Math.floor(pos / rcb) + 1) * rcb; b < end && b <= pos + mps; b += rcb) cuts.push(b);
+      cuts.sort((a, b) => b - a).forEach((cut) => extend(cut, sizes.concat([cut - pos])));
+    };
+    extend(addr, []);
+    return out;
+  };
+  const pcieByCompletions = (addr, len, mps, rcb) => {
+    // ways[i][k] = number of ways to cover pts[i]..end with k completions
+    const pts = pciePoints(addr, len, rcb), n = pts.length;
+    const ways = Array.from({ length: n }, () => []);
+    ways[n - 1] = [1n];
+    for (let i = n - 2; i >= 0; i--) {
+      const row = [];
+      for (let j = i + 1; j < n && pts[j] - pts[i] <= mps; j++) {
+        ways[j].forEach((w, k) => { row[k + 1] = (row[k + 1] || 0n) + w; });
+      }
+      ways[i] = row;
+    }
+    return Array.from(ways[0], (w) => w || 0n);   // index k = number of completions (index 0 is 0)
+  };
+  const pcieCount = (addr, len, mps, rcb) => pcieByCompletions(addr, len, mps, rcb).reduce((a, b) => a + b, 0n);
+  const pcieS = (n, m) => {
+    if (n < 0) return 0n;
+    let s = 0n;
+    for (let j = 0; j <= Math.floor(n / (m + 1)); j++) {
+      const term = bigComb(n - m * j, j) * (1n << BigInt(n - (m + 1) * j));
+      s += j % 2 ? -term : term;
+    }
+    return s;
+  };
+  const pcieFormula = (addr, len, mps, rcb) => {
+    const m = mps / rcb, N = pcieBlocks(addr, len, rcb).length;
+    const delta = N === m + 1 && len <= mps ? 1n : 0n;
+    return pcieS(N, m) - pcieS(N - 1, m) + delta;
+  };
+
+  // The PCIe box (0020, 0021): address, length, MPS and RCB; the request on the RCB grid
+  // cut into its blocks, the count by the dynamic program and by the closed form, the
+  // count per number of completions, and the map of the splits (rows, as on the page) when
+  // there are few enough to draw.
+  const pcieView = () => ({
+    mount(box) {
+      const PRESETS = [["0x1010", 256, 256, 64, "0020: ‏0x1010, ‏256 B, ‏MPS 256"], ["0x1010", 256, 128, 64, "0020 : אותה בקשה עם MPS 128"],
+                       ["0x1000", 256, 256, 64, "0021 א : ‏0x1000, ‏256 B"], ["0x1000", 512, 256, 64, "0021 ב : ‏0x1000, ‏512 B"],
+                       ["0x1010", 512, 256, 64, "0021 ב : ‏0x1010, ‏512 B"], ["0x1020", 128, 128, 64, "0021 ג : ‏0x1020, ‏128 B, ‏MPS 128 (δ = 1)"]];
+      const defaults = { addr: box.dataset.addr || "0x1010", len: Number(box.dataset.len || 256), mps: Number(box.dataset.mps || 256), rcb: Number(box.dataset.rcb || 64) };
+      const st = { ...defaults };
+      const MAX_ROWS = 40;
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label>דוגמאות מהדפים <select class="ex-preset"><option value="">בחרו...</option>${PRESETS.map((p, i) => `<option value="${i}">${p[4]}</option>`).join("")}</select></label>` +
+        `<label>הכתובת ${ltr("A")} <input type="text" class="ex-addr" value="${st.addr}" size="8" dir="ltr" inputmode="text" aria-label="כתובת הבקשה, בהקסדצימלי" spellcheck="false"></label>` +
+        `<label><span>האורך ${ltr("L")} (בתים)</span><input type="range" class="ex-len" min="4" max="2048" step="4" value="${st.len}" dir="ltr"><output class="out-len" dir="ltr"></output></label>` +
+        `<label>MPS <select class="ex-mps">${[128, 256, 512, 1024, 2048, 4096].map((v) => `<option value="${v}"${v === st.mps ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
+        `<label>RCB <select class="ex-rcb">${[64, 128].map((v) => `<option value="${v}"${v === st.rcb ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<p class="ex-summary" aria-live="polite"></p><div class="pcie-blocks"></div><div class="pcie-counts"></div><div class="pcie-map"></div>`;
+      const $ = (sel) => box.querySelector(sel);
+      const hex = (v) => "0x" + v.toString(16).toUpperCase();
+      const big = (v) => v.toLocaleString("en-US");
+      const parseAddr = () => {
+        const t = $(".ex-addr").value.trim().toLowerCase().replace(/^0x/, "");
+        const v = /^[0-9a-f]{1,8}$/.test(t) ? parseInt(t, 16) : NaN;
+        return Number.isNaN(v) ? null : v;
+      };
+      // An address axis like the page figures: base .. base + span mapped to x0 .. x1
+      const axis = (addr, len, rcb, x0, x1) => {
+        const base = Math.floor(addr / rcb) * rcb;
+        const endBlock = Math.ceil((addr + len) / rcb) * rcb;
+        const span = endBlock + rcb - base;
+        const sc = (x1 - x0) / span;
+        const x = (a) => x0 + (a - base) * sc;
+        const grid = (y0, y1, labelsY = 16) => {
+          let g = "";
+          const every = span <= 6 * rcb ? 1 : span <= 12 * rcb ? 2 : span <= 24 * rcb ? 4 : 8;
+          for (let off = 0, i = 0; off <= span; off += rcb, i++) {
+            g += `<line class="cs-rcb" x1="${f(x(base + off))}" y1="${y0}" x2="${f(x(base + off))}" y2="${y1}"/>`;
+            if (i % every === 0) g += `<text class="coord halo" x="${f(x(base + off))}" y="${labelsY}" text-anchor="middle">${hex(base + off)}</text>`;
+          }
+          [addr, addr + len].forEach((a) => { g += `<line class="cs-req" x1="${f(x(a))}" y1="${y0}" x2="${f(x(a))}" y2="${y1}"/>`; });
+          return g;
+        };
+        return { x, grid, span };
+      };
+      const segment = (ax, cls, start, size, y, h, title) => {
+        const a = ax.x(start), b = ax.x(start + size);
+        let g = `<rect class="${cls}" x="${f(a)}" y="${y}" width="${f(b - a)}" height="${h}" rx="3"><title>${title}</title></rect>`;
+        if (b - a >= 22) g += `<text class="cs-size" x="${f((a + b) / 2)}" y="${f(y + h / 2 + 4.5)}" text-anchor="middle">${size}</text>`;
+        else if (b - a >= 14) g += `<text class="cs-size" x="${f((a + b) / 2)}" y="${f(y + h / 2 + 3.5)}" text-anchor="middle" style="font-size:9px">${size}</text>`;
+        // narrower bars keep only their tooltip: a label above would collide with the row before
+        return g;
+      };
+      const blocksSvg = (addr, len, mps, rcb) => {
+        const ax = axis(addr, len, rcb, 40, 600);
+        const sizes = pcieBlocks(addr, len, rcb), N = sizes.length, m = mps / rcb;
+        const d = N === m + 1 && len <= mps ? 1 : 0;
+        let g = `<svg class="figure cs-fig pcie-live" viewBox="0 0 640 132" style="max-width:40rem" role="img" aria-label="הבקשה על רשת ה-RCB, חתוכה ל-${N} בלוקים">${ax.grid(26, 96)}`;
+        let pos = addr;
+        sizes.forEach((sz, i) => {
+          const cls = i === 0 ? "cs-first" : i === N - 1 ? "cs-last" : "cs-mid";
+          g += segment(ax, cls, pos, sz, 50, 28, `block ${i + 1}: ${hex(pos)}–${hex(pos + sz - 1)}, ${sz} bytes`);
+          pos += sz;
+        });
+        pcieBoundaries(addr, len, rcb).forEach((b) => { g += `<circle class="cs-can" cx="${f(ax.x(b))}" cy="50" r="4"><title>boundary ${hex(b)}</title></circle>`; });
+        g += `<text class="legend" x="40" y="118">N = ${N}, |B| = ${N - 1}, f = ${sizes[0]}, e = ${sizes[N - 1]}, m = MPS / RCB = ${m}, δ = ${d}${d ? " (N = m + 1 and L ≤ MPS)" : ""}</text>`;
+        return g + "</svg>";
+      };
+      const mapSvg = (addr, len, mps, rcb, rows, total) => {
+        const labelW = Math.max(...rows.map((sp) => sp.join("+").length)) * 8.2 + 16;   // room for "48+64+64+64+16"
+        const x0 = Math.min(330, Math.max(128, Math.round(labelW)));
+        const ax = axis(addr, len, rcb, x0, 612);
+        const row = 22, gap = 6, head = 24;
+        const groups = new Map();
+        rows.forEach((sp) => { if (!groups.has(sp.length)) groups.set(sp.length, []); groups.get(sp.length).push(sp); });
+        let height = 30 + 4;
+        groups.forEach((g) => { height += head + g.length * (row + gap); });
+        let g = `<svg class="figure cs-fig pcie-live" viewBox="0 0 640 ${height}" style="max-width:40rem" role="img" aria-label="${rows.length} מתוך ${total} הפיצולים, שורה לכל פיצול">${ax.grid(24, height - 4)}`;
+        let y = 30;
+        groups.forEach((list, n) => {
+          g += `<text class="legend halo" x="${x0 + 8}" y="${y + 15}" font-weight="700">${n} ${n === 1 ? "completion" : "completions"}: ${list.length}${rows.length < total ? "+" : ""} ${list.length === 1 && rows.length === total ? "split" : "splits"}</text>`;
+          y += head;
+          list.forEach((sp) => {
+            g += `<text class="coord halo" x="${x0 - 10}" y="${y + 15}" text-anchor="end">${sp.join("+")}</text>`;
+            let pos = addr;
+            sp.forEach((size, i) => {
+              const r = sp.length === 1 ? "one" : i === 0 ? "first" : i === sp.length - 1 ? "last" : "mid";
+              g += segment(ax, `cs-${r}`, pos, size, y, row, `${hex(pos)}–${hex(pos + size - 1)}: ${size} bytes (${r})`);
+              pos += size;
+            });
+            y += row + gap;
+          });
+        });
+        return g + "</svg>";
+      };
+      const draw = () => {
+        const addr = parseAddr();
+        $(".out-len").textContent = String(st.len);
+        if (addr === null) { $(".ex-summary").innerHTML = "הכתובת צריכה להיות מספר הקסדצימלי, למשל ‏<bdi dir=\"ltr\">0x1010</bdi>."; return; }
+        const { len, mps, rcb } = st;
+        if (mps < rcb) { $(".ex-summary").textContent = "בשאלה MPS ≥ RCB."; return; }
+        const sizes = pcieBlocks(addr, len, rcb), N = sizes.length, m = mps / rcb;
+        const byK = pcieByCompletions(addr, len, mps, rcb), total = byK.reduce((a, b) => a + b, 0n);
+        const formula = pcieFormula(addr, len, mps, rcb);
+        const crosses = (addr % 4096) + len > 4096;
+        const first = pcieSplits(addr, len, mps, rcb, 1)[0];
+        const blocksText = N === 1 ? `בלוק אחד של ${sizes[0]}` : `${sizes[0]}` + (N > 2 ? ` + ${N - 2} × ${rcb}` : "") + ` + ${sizes[N - 1]}`;
+        $(".ex-summary").innerHTML =
+          `בקשה של ${ltr(`${len} B`)} מכתובת ${ltr(hex(addr))} על רשת ${ltr(`RCB = ${rcb}`)} : ‏${ltr(`N = ${N}`)} בלוקים (${ltr(blocksText)}), ‏${ltr(`m = ${m}`)}. ` +
+          `מספר הפיצולים החוקיים עם ${ltr(`MPS = ${mps}`)} : <b>${ltr(big(total))}</b>` +
+          (total === formula ? ` (הנוסחה הסגורה נותנת אותו מספר).` : ` (הנוסחה הסגורה נותנת ${ltr(big(formula))}!).`) +
+          (first ? ` הפיצול החמדני, עם הכי פחות Completions : ${ltr(first.join("+"))}.` : " אין פיצול חוקי.") +
+          (crosses ? ` <b>הבקשה חוצה גבול 4 KB</b>, וזה אסור ב-PCIe; המספר מחושב כאילו מותר.` : "");
+        $(".pcie-blocks").innerHTML = `<p class="ex-title">הבלוקים : הבקשה על רשת ה-RCB, הגבולות הפנימיים בירוק</p>${blocksSvg(addr, len, mps, rcb)}`;
+        const counts = byK.map((w, k) => (k && w ? `<tr><td>${k}</td><td>${big(w)}</td></tr>` : "")).join("");
+        $(".pcie-counts").innerHTML = total > 1n ? `<p class="ex-title">כמה פיצולים יש לכל מספר Completions</p><table class="pcie-table" dir="ltr"><thead><tr><th>Completions</th><th>פיצולים</th></tr></thead><tbody>${counts}</tbody></table>` : "";
+        if (total === 0n) { $(".pcie-map").innerHTML = ""; }
+        else {
+          const rows = pcieSplits(addr, len, mps, rcb, MAX_ROWS);
+          const note = BigInt(rows.length) < total ? `רק ${rows.length} הראשונים מתוך ${big(total)} מצוירים, בסדר של הפונקציה (החיתוך הרחוק קודם)` : `כל ${rows.length === 1 ? "הפיצול היחיד" : `${rows.length} הפיצולים`}, מקובצים לפי מספר ה-Completions`;
+          $(".pcie-map").innerHTML = `<p class="ex-title">${note}</p>${mapSvg(addr, len, mps, rcb, rows, Number(total))}` +
+            `<span class="viz-legend"><span><i class="cs-first"></i>ה-Completion הראשון (או היחיד)</span><span><i class="cs-mid"></i>אמצעי</span><span><i class="cs-last"></i>אחרון</span><span><i class="cs-rcb"></i>גבול RCB</span><span><i class="cs-req"></i>קצות הבקשה</span></span>`;
+        }
+
+      };
+      $(".ex-addr").addEventListener("input", draw);
+      $(".ex-len").addEventListener("input", () => { st.len = Number($(".ex-len").value); draw(); });
+      $(".ex-mps").addEventListener("change", () => { st.mps = Number($(".ex-mps").value); draw(); });
+      $(".ex-rcb").addEventListener("change", () => { st.rcb = Number($(".ex-rcb").value); draw(); });
+      $(".ex-preset").addEventListener("change", () => {
+        const p = PRESETS[Number($(".ex-preset").value)];
+        if (!p) return;
+        [$(".ex-addr").value, st.len, st.mps, st.rcb] = p;
+        $(".ex-len").value = st.len; $(".ex-mps").value = st.mps; $(".ex-rcb").value = st.rcb;
+        draw();
+      });
+      $(".ex-reset").addEventListener("click", () => {
+        Object.assign(st, defaults);
+        $(".ex-addr").value = st.addr; $(".ex-len").value = st.len; $(".ex-mps").value = st.mps; $(".ex-rcb").value = st.rcb; $(".ex-preset").value = "";
+        draw();
+      });
+      draw();
+    },
+  });
+
+  dvqExplorers.register({
+    views: { pcie: pcieView },
+    help: {
+      pcie: "כתובת, אורך, MPS ו-RCB : התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד.",
+    },
+    models: { pcieBoundaries, pcieBlocks, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula },
+  });
+})();

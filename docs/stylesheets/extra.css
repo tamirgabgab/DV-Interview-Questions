@@ -1301,7 +1301,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .fc-nak { background: var(--viz-s2); height: 0.2rem; }
 .md-typeset .viz-legend .fc-replay { background: transparent; border-top: 2px dashed var(--viz-s1); height: 0; }
 
-/* 0027, 0028: the cake split (rows per person, one strip); the interactive explorers (explorer.js) */
+/* 0027, 0028: the cake split (rows per person, one strip); the interactive explorers (explorer/) */
 .md-typeset svg .cake-slice { fill: var(--viz-s1); fill-opacity: 0.85; }
 .md-typeset svg .cake-slice2 { fill: var(--viz-s3); fill-opacity: 0.85; }
 .md-typeset svg .cake-peak { fill: var(--viz-s2); }

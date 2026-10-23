@@ -2497,8 +2497,12 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   the editor content; `docs/javascripts/run-python.js` + `py-worker.js` run them. The
   page code runs as `solution.py`, the editor as `your_code.py` (tracebacks show those
   names). Local screenshot tests route the Pyodide CDN to an `npm pack pyodide@0.26.4` copy.
-- Explorers (`explorer.js`): a new kind is a pure function exported under Node plus a view
-  in `VIEWS`; add a Node test that compares it with the Python reference. Build summary
+- Explorers (`docs/javascripts/explorer/`, split in session 21): a new kind is a file
+  `<kind>.js` whose first line is `// kinds: <kind>`, with its pure functions, its view and
+  a `dvqExplorers.register({ views, help, models })` call; shared helpers come from
+  `dvqExplorers.lib` (add a helper to `core.js` and its `lib` only when two kinds use it).
+  Add a Node test (through `explorer_require()`) that compares the models with the Python
+  reference. Build summary
   text with `ltr()` (a `<bdi dir="ltr">`) around math and numbers, or the RTL paragraph
   reorders them.
 - SystemVerilog keywords that read like field names: `edge`, `dist`, `inside`, `within`,
@@ -2508,8 +2512,7 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   0030 uses `hinge`, `gap` and `in_wall`. Verilator is not installed in the sandbox, so
   before pushing new SV, intersect its identifiers with the IEEE 1800 keyword list (a
   ten-line script over `extract_code.blocks(qid, "systemverilog")` and `tests/*/*.sv`).
-- Every explorer kind now has `mount(box)` and builds its own controls (the generic
-  slider path in `setup` is kept for a future kind without `mount`). Patterns to reuse:
+- Every explorer kind has `mount(box)` and builds its own controls. Patterns to reuse:
   a play loop on `requestAnimationFrame` with a speed select (clock, motorcycle), a
   stepper on `setInterval` with prev / next / play (cake, Josephus, hourglass, bridge,
   river), pointer drag on an SVG with `setPointerCapture` (clock, strip). Keep the math
