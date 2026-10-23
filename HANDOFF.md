@@ -1726,6 +1726,15 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
    of every box (after a seed-4242 draw where there is a seed), opens the copied link in a
    fresh browser and reloads the page: different control values fail, a different drawing
    (hidden elements aside) warns, and the state must be gone after the reset.
+7. **`main` fast-forwarded** to the branch on the owner's request (cb34d66). The owner
+   deferred G222, H223 and H224 and asked instead for a pass over the questions.
+8. **Question pass and new questions.** Three read-only reviews (pages 0001–0013,
+   0014–0028, 0029–0043) checked each box against the page's key idea, proof and traps and
+   listed the parts with no visual; the result is rounds I to L (I225 to L262). Checked
+   by hand: the two help lines of L262, and the 0005 digit order of K251 (x = 27 gives
+   1101111111 with 0 first, 1111111101 with 1 first). New question ideas not already
+   listed are rounds M to R (M263 to R283); the Monty Hall formula and the birthday
+   approximation were checked by simulation.
 
 ---
 
@@ -1756,8 +1765,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 - Owner's checks on the live site: the five WaveDrom diagrams of round R (0034, 0035,
   0038), the dragging in the explorers on a real phone, and the new timing strips
   (0001, 0035) scrolled sideways on a phone.
-- Session 21: F218, F219, G220 and G221 are done on the work branch (not yet on `main`).
-  Open from rounds F to H: G222 (download the figure and the table), H223 and H224.
+- Session 21: F218, F219, G220 and G221 are done and on `main`; G222, H223 and H224 are
+  deferred by the owner. Proposed for the owner to pick: rounds I to L (boxes that show
+  the solution, I225 to L262) and rounds M to R (new questions, M263 to R283).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -1774,7 +1784,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
-- [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14), the second series A to E (presenting the answers) and F to H (the explorer boxes, proposed in session 21). U to X are done; M and R (without R105) were picked for sessions 17 and 18.
+- [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14), the second series A to E (presenting the answers), F to H (the explorer boxes; F218 to G221 done, the rest deferred), I to L (boxes that show the solution) and M to R (new questions), all proposed in session 21. U to X are done; M and R (without R105) were picked for sessions 17 and 18.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
@@ -2365,7 +2375,7 @@ not collide with the first series' F to H (items 37 to 53).
 |---|---|---|
 | ~~G220~~ | ~~**State in the copy link for every box**: a generic serializer of the box's inputs, selects and toggles (plus the step index where a box steps), written to `#state-<kind>.<payload>`; the 5 hand-written states stay, every other box gets a link without its own code~~ done (session 21) | M |
 | ~~G221~~ | ~~**The box remembers where the reader stopped**: the same payload saved per page and box in `localStorage` (wrapped in try / catch), restored on load, cleared by "reset everything"; a URL state wins over the saved one~~ done (session 21) | S |
-| G222 | **Download the figure and the table**: a button per box that saves the current SVG (and a PNG) and the box's table as CSV, next to the WaveDrom row of U133 | S |
+| ~~G222~~ | ~~**Download the figure and the table**: a button per box that saves the current SVG (and a PNG) and the box's table as CSV, next to the WaveDrom row of U133~~ deferred by the owner (session 21) | S |
 
 Pairs with E200 (one layout for all boxes): both touch every view, so they are best done
 in the same pass.
@@ -2374,8 +2384,8 @@ in the same pass.
 
 | Id | Idea | Size |
 |---|---|---|
-| H223 | **"Guess before the step"**: an optional practice mode in the stepping boxes that asks for the next state or the result before showing it (who survives in Josephus, how many drops for the eggs, the next state of seqdet, the next chain value in kaprekar) and counts the hits. Not H49 / L72 (a typed answer checked before the solution opens, deferred by the owner): this one lives inside the box and checks a step | M |
-| H224 | **"Open in the box" from the text**: a small button on a table row or a worked example that sets the box to those values and scrolls to it (a row of the k / n table of 0039, the base-7 example of 0012, the scripts of 0025); the page text and the box linked, as the second-series research recommends | S–M |
+| ~~H223~~ | ~~**"Guess before the step"**: an optional practice mode in the stepping boxes that asks for the next state or the result before showing it (who survives in Josephus, how many drops for the eggs, the next state of seqdet, the next chain value in kaprekar) and counts the hits. Not H49 / L72 (a typed answer checked before the solution opens, deferred by the owner): this one lives inside the box and checks a step~~ deferred by the owner (session 21) | M |
+| ~~H224~~ | ~~**"Open in the box" from the text**: a small button on a table row or a worked example that sets the box to those values and scrolls to it (a row of the k / n table of 0039, the base-7 example of 0012, the scripts of 0025); the page text and the box linked, as the second-series research recommends~~ deferred by the owner (session 21) | S–M |
 
 Pairs with E199 (the answer lights up) and E201 (a first-visit guide).
 
@@ -2383,6 +2393,143 @@ Suggested order: F218 first (a safety net before changes that touch every box), 
 with G220 (both reshape the shared code), G221 and G222 with E200, then round H with E199.
 D196 (controls in a bottom sheet on phones) and B186 (the page code stepped beside its
 state) stay open in their rounds.
+
+### Second series, rounds I to L — boxes that show the solution (proposed 2026-10-23, owner picks)
+
+A review of every page (session 21, three read-only passes over the pages and the kind
+files) asked of each box: does it show the key idea, the invariant, the proof step or the
+trap, and which parts have no visual at all. Every page has a box, but 13 pages have a part
+(beyond the statement) with no visual, more have parts with static figures only, and most
+boxes show the answer rather than why it holds. Item numbers continue the global count, so
+rounds I to R here do not collide with the first series' rounds of the same letters. Ideas that are only
+parameter knobs were left out (the owner turned those down in round W). Two help lines do
+not match their buttons (0004 `boxes3` names "סידור אחר", 0011 `ttt` names "הגרלה" and "הבורר");
+that fix is L262.
+
+**Round I — a first box in the parts that have none (puzzles and algorithms)**
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| I225 | 0002 part a | **The naive swap**: `a = b; b = a` as a version of the `trace` box, placed in part a; the symbolic column shows both variables becoming b0, which is why the temporary exists | S |
+| I226 | 0004 part b | **The labels fix**: a `boxes3` mode with the labels array, k, same and other marked, the two swaps drawn as a 3-cycle, and a "C-style `(k - 1) % 3`" toggle that shows index −1 at k = 0 | M |
+| I227 | 0006 part a | **The pair triangle**: every (buy, sell) pair coloured by profit beside the price chart; as the scan plays, the best cell of each sell day lies on the minimum-so-far row, so the naive O(n²) and the scan are one picture | M |
+| I228 | 0010 part a | **Pair erasing**: a `brackets` mode that deletes adjacent pairs pass by pass with a pass and character counter, against the stack's one pass (`((((…))))` shows the O(n²)) | M |
+| I229 | 0012, 0013 part b | **The proof map in part b**: `kapbase` with base 10 in 0012 (the map k → max(10 − k, k − 1), the fixed point at 5); in 0013 the 55-cell (p, q) grid made clickable (the digits, the case of the analysis, the arrow to the next pair; only 6174 points to itself) | S–M |
+| I230 | 0007 part c | **Three half-circles**: for a drawn triangle, the half-circle that starts at each point; at most one holds the other two; seeded draws count A1, A2, A3 apart (about 1/4 each, never two at once) | M |
+| I231 | 0005 bonus | **Pigeonhole on the repunits**: R1 … R(x+1) dropped into x remainder slots, the first collision lit, and R_i − R_j = 1…10…0 shown as the multiple | M |
+| I232 | 0011 part b | **Any five cells hold a line**: pick cells on the wrap-around board, the 2-2-1 split per direction and the pair count shown; the fifth cell always completes a line, a 2 × 2 square is the four-cell counterexample | M |
+| I233 | 0017 solution 3 | **Binary search on values**: the histogram of 1..n with the count of values ≤ mid against y = mid, lo and hi narrowing with the invariant in colour, on the same array as the Floyd box | M |
+
+**Round J — a first box in the parts that have none (DV, math and probability)**
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| J234 | 0033 part a | **Written and read staircases**: the two cumulative step curves; the gap between them is the fill, and it peaks at the last write of the burst; a phase sweep shows the formula-to-formula + 1 band (the 24 against 25 trap) | S–M |
+| J235 | 0034 part b | **The conversions stepped**: binary, the shifted row, XOR gives Gray; back by a prefix XOR from the MSB one bit per step; then a counter walk marks the one changing bit, the 15 → 0 wrap included | S |
+| J236 | 0037 part a | **Metastability by Monte Carlo**: data edges on a clock timeline, those in the T0 window settle after an exponential time; the histogram with the t_res cut, and a second flop moving the cut by Tclk; the two factors of the formula become visible | M |
+| J237 | 0038 part a | **Attempt lanes**: one lane per property with the antecedent match, the window as a bracket and pass / fail / vacuous; the traps (`\|->` in rule 4, no `$rose`) as variants that fail a valid transaction; an rst_n row with `disable iff` on and off | M |
+| J238 | 0041 part a | **The stage ribbon**: equal bins played test by test, a bar per stage i → i + 1 with the measured wait against n / (n − i), so the long tail of the last bins is seen | S–M |
+| J239 | 0029 part b | **The gap line**: the unwrapped angle difference of a chosen pair against time with the integers as lines (each crossing a meeting), and the interval ends switched between closed, open and half-open with the three counts | S |
+| J240 | 0021 part b | **The recurrence ladder**: C(0..N) as a row; a click on C(n) lights the m terms it sums and the block strip shows "the first completion takes i blocks" per term; a bar of all 2^(N−1) subsets against the allowed ones (the trap) | M |
+| J241 | 0015 trap | **How the information was obtained**: many families, two filters side by side ("we asked yes / no" against "a random child is described"), counters converging to 13/27 (or 1/3) against 1/2 | M |
+
+**Round K — the trap, failing on screen**
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| K242 | 0001 | **Without the flip-flop**: a dimmed `pulse_naive = sig` row under `pulse`, high for as long as sig, beside the one-cycle pulse | S |
+| K243 | 0003 | **The inner loop from i + 1**: the same array run with the variant beside the page's loop; the reader watches it sort in descending order | S–M |
+| K244 | 0040 | **The naive detector alongside**: a second state and found row for the reset-to-S0 machine, the miss in 10101011 marked | S |
+| K245 | 0039 | **The naive plans on the chart**: the drops-per-threshold curves of "start at 50" and "every 25" (worst case 11) beside the optimal 9 | S |
+| K246 | 0014 part b | **The pair tester**: drag two rectangles; their projections on both axes, each of the four "or" conditions turning true or false, the corner test's verdict beside it (a cross preset where corners say "no overlap"), a < / ≤ toggle for touching shapes; the main box shades the shape and projection that rejected a candidate | M |
+| K247 | 0035 | **The glitch**: a toggle to `(cnt == 0) \| b` with small gate delays; the 01 → 10 change passes through 00 or 11 and a runt pulse appears on clk_out, while `a \| b` stays clean | M |
+| K248 | 0020 | **Check a split**: type completion sizes (144, 64, 48 or 128, 128); the box puts the cuts on the RCB grid and marks a cut off a boundary or a completion above MPS; clicking boundaries to cut or not shows the 2^c subsets | S |
+| K249 | 0023, 0024, 0025 | **A wrong model beside the right one**: one shared "inject a bug" select per protocol box (0023 one queue with a random pick, one FIFO; 0024 `PCL += grant`, PCR first in Sync; 0025 Ack deletes one record, `seq <=` purge at the wrap, a Nak per discarded TLP), the same script or seed run on both, the first invariant failure marked | M–L |
+| K250 | 0042 | **Move the first depot**: drag the stop (to 50 km, say) and see the litres spilled or the km lost against 60; each stretch of road shows its pass count (5 / 3 / 1) as the camel plays | M |
+| K251 | 0005 | **One before zero**: the two digit orders run side by side; same length, a different number (x = 27: 1101111111 against 1111111101) | S |
+| K252 | 0012, 0013 | **No zero padding**: a toggle in `kaprekar` where 45 is not read as 045, so the chain goes wrong | S |
+
+**Round L — the proof step, visible**
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| L253 | 0016 | **Renumbering**: after each step every remaining person shows the old and the new label (new = old − L mod N), the survivor the same person under both, so F(N − 1) visibly becomes F(N); a "full round" button shrinks the circle by L | M |
+| L254 | 0009 | **Choose your cut**: tap any box of the long cycle to swap with c0, the two pieces h and L − h shown; only the middle range keeps both at 8 or less; a "start from box 1" trap toggle | M |
+| L255 | 0026 | **The drop point**: drag D; the passenger's and the walker's arrival times and the curve of T = max of both against D, its minimum where the two are equal (7/8) | S |
+| L256 | 0027, 0028 | **The live proof panel**: the f(p) = p²/(1 − p) curve (0027) or the q(1 − p) line (0028) with the people's p_k as dots and the threshold that moves with the slider; the single crossing is the peak; a "fraction of the whole cake" toggle for the trap | S |
+| L257 | 0036 | **All cycles**: every state's arrow, so the ring breaks into its cycles (6 + 6 + 3 and the 0 loop for x⁴ + x² + 1, against one 15) | S–M |
+| L258 | 0018, 0019 | **The search itself**: one panel for both pages that steps through the queue (BFS in 0018, Dijkstra ordered by t in 0019), each state's four children marked new, seen or past D, the stale entries and the 0-cost start edges of 0019; a "flip only when empty" toggle in 0018 that loses 15 | M |
+| L259 | 0008 | **Pouring the points**: before France the points left fill the cups to the brim with nobody above Israel; after France 17 points spill over; a part b toggle with the wrong update (room −= public) that catches the loss three announcements late | M |
+| L260 | 0032 | **BFS layers**: the state graph filled layer by layer (visited, frontier, parent arrows) until 1111 at depth 7 by the two mirror paths | S |
+| L261 | 0043 | **The chain behind a verdict**: clicking a horse lights the race results that prove its known-faster set | S |
+| L262 | 0004, 0011 | **Help lines that match the buttons**: `boxes3` and `ttt` name buttons that no longer exist | S |
+
+Suggested order: K (mostly small, and the traps are what interviews test), then I and J
+(the missing parts), then L. Shared work: K249 is one pattern for three boxes, L258 one
+panel for two pages, L256 one panel for two pages.
+
+### Second series, rounds M to R — new questions (proposed 2026-10-23, owner picks)
+
+Ideas not already listed (Z202 to Z217, Q93 to Q99, I54 to I58, the open items and the
+topic gaps are not repeated); 0015, 0009 and 0041 are the nearest existing pages, and each
+idea here asks something they do not. Each is rewritten in our words with an original solution, a
+generalisation and an explorer; the `source` field names a classic when there is one.
+
+**Round M — logic with an invariant**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| M263 | **Hats in a line**: 100 prisoners in a row, black or white hats, each sees the ones in front and says one colour from the back; how many are certainly saved | junior / medium | k colours: the sum mod k; why 99 is the most | the line, the parity the last one announces, each guess explained from what he sees and hears | M |
+| M264 | **The mutilated chessboard**: an 8 × 8 board without two opposite corners, 31 dominoes | student / easy | which two removed squares leave a tileable board (Gomory: any two of opposite colours) | place dominoes by tap, the colour count shown; Gomory's cycle for two squares of opposite colours | S–M |
+| M265 | **Lights out**: a 5 × 5 grid, a tap toggles a cell and its neighbours; turn everything off | junior / medium | a linear system over GF(2): which boards are solvable, the solution by Gaussian elimination (XOR rows, as in hardware) | the board to tap, "solve" lights the cells to press, the matrix row operations stepped | M |
+| M266 | **Tower of Hanoi and Gray code**: the moves for n discs, and which disc moves at step k | student / easy | 2^n − 1 moves; the disc of step k is the lowest set bit of k, the reflected Gray code walks the same states | the pegs animated beside the Gray-code counter, the changing bit lit with the disc it moves | S–M |
+
+**Round N — logic about knowledge and choice**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| N267 | **Monty Hall with n doors**: the host opens k empty doors; stay or switch | student / easy | P(win by switching) = (n − 1) / (n (n − k − 1)); the "host who does not know" trap | a game to play and 1,000 seeded games, the two strategies' bars against the formula | S |
+| N268 | **Knights and knaves**: three islanders' statements, who lies | student / easy | any set of statements as a truth table, solved by trying all 2^n assignments (the same brute force as a formal tool) | statements built from blocks, the truth table with the consistent rows lit | S–M |
+| N269 | **The blue-eyed islanders**: n blue-eyed islanders and one public announcement | senior / hard | induction on n: everyone leaves on day n; what the announcement adds (common knowledge) | a day stepper with each islander's possible worlds shrinking | M–L |
+
+**Round O — probability for random stimulus**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| O270 | **Birthday paradox and transaction IDs**: n random 8-bit tags, the chance that two outstanding transactions share one | junior / easy | 1 − Π(1 − i/N) ≈ 1 − e^(−n²/2N); the n for 50 % and 1 %; why tags are allocated, not drawn | sliders n and N, the exact curve and the approximation, seeded draws with the first collision marked | S–M |
+| O271 | **The longest run**: in n random bits, how long is the longest run of ones | junior / medium | about log2 n; the exact probability by a run-length recursion; why random stimulus rarely makes a 20-cycle burst | n slider, the stream with its longest run framed, the distribution of the longest run over runs | M |
+| O272 | **The inspection paradox**: buses every 10 minutes on average, how long do you wait | junior / medium | E[wait] = E[T²] / 2E[T]: fixed, uniform and exponential gaps; the same bias in "average packet size seen by a monitor" | a timeline of arrivals with random riders, the gap each rider lands in coloured | M |
+| O273 | **Derangements**: n letters in n envelopes at random, the chance that none is right | junior / medium | D(n) = n! Σ(−1)^k/k!, the limit 1/e, the expected number of fixed points is 1 | shuffle and look, the cycle picture of the permutation (as 0009), the exact and simulated fractions | S–M |
+
+**Round P — geometry and counting**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| P274 | **Buffon's needle**: needles of length l on lines d apart, the chance to cross a line | junior / medium | 2l / (π d) for l ≤ d, the long-needle case, estimating π and its error | needles dropped one by one or a thousand at once, the running estimate of π | S–M |
+| P275 | **Paths that do not cross the diagonal**: monotone paths on an n × n grid that stay below the diagonal | junior / medium | the Catalan number by the reflection trick; the same count as 0010's valid bracket strings | a path to draw or draw at random, the first crossing reflected into a path to the mirrored corner | M |
+
+**Round Q — digital design and checking**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| Q276 | **Divisible by 3, one bit at a time**: an FSM that reads a binary number MSB first and says whether it divides by 3 | student / easy | any modulus m: state = remainder, next = (2r + b) mod m; LSB first needs the powers of 2 mod m | bits fed by hand, the remainder automaton with the taken edge lit (the seqdet view) | S |
+| Q277 | **A serial CRC**: CRC-8 computed bit by bit in an LFSR, then checked against a table-driven reference | junior / medium | any polynomial and width, reflected or not, the residue a receiver checks (the LCRC of 0025) | the register stepping bit by bit with the XOR taps lit, the byte-wise table result beside it | M |
+| Q278 | **A button debouncer**: a noisy input, a clean one-cycle pulse per press | student / easy | an N-cycle stability counter; the SVA that no pulse comes within N cycles of another | a bouncing waveform to draw, the counter and the output on a strip | S–M |
+
+**Round R — flow, performance and verification method**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| R279 | **Outstanding requests to fill a link** (Little's law): latency L cycles, one request per cycle, how many tags | junior / medium | N = throughput × latency; with a reply size, a credit limit and a variable latency | a pipeline of requests with their tags, throughput against the number of tags | S–M |
+| R280 | **A skid buffer**: a valid / ready pipeline stage that registers ready without losing data | senior / medium | why one extra entry is enough; the SVA for "no data lost, no data duplicated" | a strip with valid / ready / data both sides, stalls drawn by tap, the buffer entry shown | M |
+| R281 | **Find the bug: a synchronous FIFO** whose full flag is one entry late | junior / medium | the count against the pointer compare, the test that finds it (fill to the brim), the assertion that would have caught it | the FIFO filled and drained on a strip, the buggy and fixed flags side by side | S–M |
+| R282 | **Why a constraint skews the distribution**: `x < y` on 8-bit values, how often is x = 0 | junior / medium | the solver is uniform over solutions, not per variable; `solve x before y` and `dist`; the histogram of both | the two histograms over seeded draws against the exact counts | M |
+| R283 | **Regression minimisation**: tests that each hit some coverage bins, the fewest tests that hit all | senior / medium | set cover is NP-hard; the greedy choice and its ln n bound; an exact search for small sets | a test × bin matrix, the greedy pick stepped, the exact optimum beside it | M |
+
+Suggested order: M and Q first (short pages with a strong picture: the hats, Hanoi and Gray
+code, the divisibility FSM, the serial CRC), then O (probability the DV pages lean on),
+then R, N and P. Round Z's open rows (Z202, Z204 to Z209, Z211 to Z216) stay open beside
+these.
 
 ### Round Z — new questions from outside sources (proposed 2026-10-22, owner picks)
 
