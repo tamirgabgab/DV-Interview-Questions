@@ -2917,3 +2917,30 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .mo-key-best { background: transparent; outline: 3px solid var(--viz-s2); outline-offset: -3px; }
 .md-typeset .viz-legend .mo-key-win { background: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
 .md-typeset .explorer.mo-is-rect .mo-key-nb-wrap, .md-typeset .explorer:not(.mo-is-rect) .mo-key-cand-wrap { display: none; }
+
+/* Typography (UI321): Rubik stays the text face; a little more line height for Hebrew,
+   firmer headings, tabular digits in tables and chips, and paragraphs and lists capped
+   near 75 characters so long lines stay readable on wide screens (code, tables, figures
+   and the boxes keep the full column). */
+.md-typeset { line-height: 1.7; }
+.md-typeset h1 { font-weight: 600; letter-spacing: 0; }
+.md-typeset :is(h2, h3) { font-weight: 600; }
+.md-typeset :is(table, .chip, .lc-count, .ex-pos, .stats-strip) { font-variant-numeric: tabular-nums; }
+.md-typeset :is(p, ul:not([class]), ol:not([class]), dl):not(.explorer *):not(td *):not(th *) { max-width: 75ch; }
+
+/* An icon per question kind (UI330): line icons from Material Design Icons (Apache 2.0, the
+   set the theme ships), drawn as a CSS mask in the text colour, so the hook's HTML and the
+   explorer scripts use the same <i class="kind-ico kind-ico-<kind>">. */
+.kind-ico { display: inline-block; flex: none; width: 1.15em; height: 1.15em; vertical-align: -0.2em; background-color: currentColor; -webkit-mask: var(--kind-ico) center / contain no-repeat; mask: var(--kind-ico) center / contain no-repeat; }
+.kind-ico-puzzle { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22 13.5c0 1.76-1.3 3.22-3 3.46V20a2 2 0 0 1-2 2h-3.8v-.3a2.7 2.7 0 0 0-2.7-2.7c-1.5 0-2.7 1.21-2.7 2.7v.3H4a2 2 0 0 1-2-2v-3.8h.3C3.79 16.2 5 15 5 13.5s-1.21-2.7-2.7-2.7H2V7a2 2 0 0 1 2-2h3.04c.24-1.7 1.7-3 3.46-3s3.22 1.3 3.46 3H17a2 2 0 0 1 2 2v3.04c1.7.24 3 1.7 3 3.46M17 15h1.5a1.5 1.5 0 0 0 1.5-1.5 1.5 1.5 0 0 0-1.5-1.5H17V7h-5V5.5A1.5 1.5 0 0 0 10.5 4 1.5 1.5 0 0 0 9 5.5V7H4v2.12c1.76.68 3 2.38 3 4.38s-1.25 3.7-3 4.38V20h2.12a4.7 4.7 0 0 1 4.38-3c2 0 3.7 1.25 4.38 3H17z'/%3E%3C/svg%3E"); }
+.kind-ico-code { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 3a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2H3v2h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2v-2H8v-5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V5h2V3m6 0a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1v2h-1a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2v-2h2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5h-2V3z'/%3E%3C/svg%3E"); }
+.kind-ico-design { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 4h12v1h3v2h-3v2h3v2h-3v2h3v2h-3v2h3v2h-3v1H6v-1H3v-2h3v-2H3v-2h3v-2H3V9h3V7H3V5h3zm5 11v3h1v-3zm2 0v3h1v-3zm2 0v3h1v-3z'/%3E%3C/svg%3E"); }
+.kind-ico-math { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18 6H8.83l6 6-6 6H18v2H6v-2l6-6-6-6V4h12z'/%3E%3C/svg%3E"); }
+.kind-ico-dv { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9'/%3E%3C/svg%3E"); }
+.md-typeset .chip-kind { display: inline-flex; align-items: center; gap: 0.25em; }
+
+/* Path cards (UI320): the count never wraps, the name carries the icon of the kind most of
+   the path's questions have. */
+.md-typeset .level-card .lc-count { flex: none; white-space: nowrap; }
+.md-typeset .level-card .lc-name { display: inline-flex; align-items: baseline; gap: 0.35em; }
+.md-typeset .level-card .lc-name .kind-ico { align-self: center; color: var(--md-accent-fg-color); }

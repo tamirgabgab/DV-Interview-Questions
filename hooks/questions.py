@@ -248,8 +248,12 @@ def difficulty_chip(difficulty: str) -> str:
     return f'<span class="chip chip-diff chip-diff-{difficulty}">{DIFFICULTIES[difficulty]}</span>'
 
 
+def kind_icon(kind: str) -> str:
+    return f'<i class="kind-ico kind-ico-{kind}" aria-hidden="true"></i>'
+
+
 def kind_chip(kind: str) -> str:
-    return f'<span class="chip chip-kind chip-kind-{kind}">{KINDS[kind]}</span>'
+    return f'<span class="chip chip-kind chip-kind-{kind}">{kind_icon(kind)}{KINDS[kind]}</span>'
 
 
 def interactive_chip(q: dict) -> str:
@@ -376,9 +380,11 @@ def _path_cards(page_url: str) -> str:
     cards = []
     for p in _paths:
         ids = [s["q"]["id"] for s in p["steps"]]
+        kinds = [s["q"]["kind"] for s in p["steps"]]
+        kind = max(KINDS, key=kinds.count)            # the kind most of its questions have
         cards.append(
             f'<a class="level-card path-card" href="{_href(p["src_uri"], page_url)}">'
-            f'<div class="lc-head"><span class="lc-name">{html.escape(p["title"])}</span>'
+            f'<div class="lc-head"><span class="lc-name">{kind_icon(kind)}{html.escape(p["title"])}</span>'
             f'<span class="lc-count">{len(ids)} שאלות</span></div>'
             f'<p class="lc-desc">{html.escape(p["description"])}</p>'
             f'<div class="lc-diff"><span class="pc-ids">{" · ".join(ids)}</span></div>'
@@ -518,7 +524,8 @@ def _table(level: str | None, page_url: str) -> str:
     def group(name: str, label: str, values) -> str:
         chips = '<button type="button" class="filter-chip is-active" data-value="">הכל</button>'
         chips += "".join(
-            f'<button type="button" class="filter-chip" data-value="{html.escape(v)}">{html.escape(l)}</button>'
+            f'<button type="button" class="filter-chip" data-value="{html.escape(v)}">'
+            f'{kind_icon(v) if name == "kind" else ""}{html.escape(l)}</button>'
             for v, l in values
         )
         return (f'<div class="filter-group" data-filter="{name}" data-value="">'
