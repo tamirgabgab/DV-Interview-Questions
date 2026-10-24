@@ -2193,7 +2193,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     The table lost its topics column (they sit under the title as filter buttons, "+n"
     for the rest) and its "interactive" mark and filter (every question has a box). The
     topics filter shows the six most common, the rest behind "עוד נושאים (n)" with its own
-    search. `TOPICS` in the hook names the 39 topics (the owner reviews the names); the
+    search. `TOPICS` in the hook names the 39 topics (approved by the owner); the
     tags page is rewritten in `on_post_page`, the search chips in `_search_question`, and
     the linter warns about a topic without a name (it reads the table with `ast`). Found
     on the way: the address parameter `q` opens Material's search, which then swallowed
@@ -2201,7 +2201,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     The theme's table wrapper shrank to the content, so the title column could not take
     the width (`.md-typeset__table` is a block now); "+3" read "3+" in RTL (isolated LTR).
     axe on the open drawer, the topics panel, the empty state and the rows (390 and 1280
-    px, light and dark): no violations.
+    px, light and dark): no violations. On `main` after a green CI run, with the topic
+    names approved.
 ---
 
 ## In progress
