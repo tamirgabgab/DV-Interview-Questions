@@ -12,6 +12,9 @@ work session, and update `HANDOFF.md` (work log, open items) at the end of every
   English appears only as relevant technical terms, identifiers and file names inside a
   Hebrew sentence. Question content is Hebrew. Code, comments, identifiers,
   commit messages, `README.md`, `HANDOFF.md` and this file are English.
+- Times shown to the owner are Israel time (Asia/Jerusalem: UTC+3 in summer time, UTC+2
+  in winter; summer time ends on 25 October 2026), never UTC. Tools report UTC: convert
+  before writing, e.g. "23:31 (שעון ישראל)".
 - RTL safety: every paragraph, heading, list item and table cell starts with a Hebrew word.
   A line that must start with Latin text, inline code, a number followed by a period, or
   math gets the RLM mark (U+200F, `‏`) first. English terms go in the middle or at the end
