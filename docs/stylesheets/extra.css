@@ -2837,3 +2837,43 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .kg-key-lo { background: color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s1); }
 .md-typeset .viz-legend .kg-key-hi { background: color-mix(in srgb, var(--viz-s1) 60%, var(--md-default-bg-color)); }
 .md-typeset .viz-legend .kg-key-end { background: transparent; outline: 2.5px solid var(--viz-s2); outline-offset: -2px; }
+
+/* The odd ball on a balance (0045): a row per weighing with its outcome beside the
+   balance; the odd ball red when heavy and blue when light, genuine balls moved to even
+   the pans dashed; the decision table with a colour per outcome of weighing 1. */
+.md-typeset .explorer .ob-row { display: flex; align-items: center; gap: 0.6rem; margin: 0.3rem 0; padding-bottom: 0.3rem; border-bottom: 1px dashed var(--viz-grid); }
+.md-typeset .explorer .ob-tag { flex: none; display: flex; flex-direction: column; align-items: center; min-width: 4.6rem; font-size: 0.65rem; }
+.md-typeset .explorer .ob-tag b { font-size: 1.5rem; line-height: 1.1; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .ob-tag small { color: var(--md-default-fg-color); text-align: center; }
+.md-typeset .explorer .ob-row > :not(.ob-tag) { flex: 1 1 auto; min-width: 0; }   /* the svg, or the enlarge wrapper around it */
+.md-typeset .explorer .ob-svg { width: 100%; max-width: 40rem; margin: 0.2rem auto; }
+.md-typeset .explorer .ob-beam { stroke: var(--viz-ink); stroke-width: 6; stroke-linecap: round; }
+.md-typeset .explorer .ob-stand { fill: var(--viz-ink); }
+.md-typeset .explorer .ob-off-label { fill: var(--viz-text); font-size: 14px; font-family: var(--md-text-font-family); }
+.md-typeset .explorer .ob-ball circle { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset .explorer .ob-ball .ob-num { fill: var(--viz-ink); font-size: 14px; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .ob-ball.is-heavy circle { fill: var(--diff-hard); stroke: var(--diff-hard); }
+.md-typeset .explorer .ob-ball.is-light circle { fill: var(--viz-s1); stroke: var(--viz-s1); }
+.md-typeset .explorer .ob-ball:is(.is-heavy, .is-light) .ob-num { fill: var(--md-default-bg-color); font-weight: 700; }
+.md-typeset .explorer .ob-ball.is-helper circle { stroke-dasharray: 3 2; stroke: var(--viz-text); }
+.md-typeset .viz-legend .ob-key-normal { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-ink); border-radius: 50%; }
+.md-typeset .viz-legend .ob-key-heavy { background: var(--diff-hard); border-radius: 50%; }
+.md-typeset .viz-legend .ob-key-light { background: var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .ob-key-helper { background: transparent; outline: 1.5px dashed var(--viz-text); border-radius: 50%; }
+.md-typeset .explorer .ob-table { max-height: 22rem; overflow-y: auto; margin-top: 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.3rem; }
+.md-typeset .explorer table.ob-decide { margin: 0; font-size: 0.68rem; border-collapse: collapse; width: 100%; }
+.md-typeset .explorer table.ob-decide th { position: sticky; top: 0; z-index: 1; background: var(--md-default-bg-color); padding: 0.25em 0.6em; text-align: center; box-shadow: inset 0 -1px 0 var(--viz-grid); }
+.md-typeset .explorer table.ob-decide td { padding: 0.15em 0.6em; text-align: center; border-top: 1px solid var(--viz-grid); cursor: pointer; }
+.md-typeset .explorer table.ob-decide td.ob-o { font-family: var(--md-code-font-family); }
+.md-typeset .explorer table.ob-decide td.ob-first.ob-oL { background: color-mix(in srgb, var(--viz-s3) 22%, transparent); }
+.md-typeset .explorer table.ob-decide td.ob-first.ob-oE { background: color-mix(in srgb, var(--viz-s2) 22%, transparent); }
+.md-typeset .explorer table.ob-decide td.ob-first.ob-oR { background: color-mix(in srgb, var(--viz-s1) 22%, transparent); }
+.md-typeset .explorer table.ob-decide td.ob-h { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer table.ob-decide td.ob-l { color: var(--viz-s1-text); font-weight: 700; }
+.md-typeset .explorer table.ob-decide tr.is-none td { color: var(--viz-text); font-style: italic; }
+.md-typeset .explorer table.ob-decide tr.is-now td { background: color-mix(in srgb, var(--md-accent-fg-color) 28%, transparent); color: var(--md-default-fg-color); font-weight: 700; }   /* the kind keeps 4.5:1 on the lit row */
+@media screen and (max-width: 30em) {
+  .md-typeset .explorer .ob-row { flex-direction: column; align-items: stretch; gap: 0.2rem; }
+  .md-typeset .explorer .ob-tag { flex-direction: row; justify-content: flex-start; gap: 0.5rem; }
+  .md-typeset .explorer .ob-tag b { font-size: 1.1rem; }
+}

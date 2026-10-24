@@ -2073,6 +2073,28 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     - E36: `docs/new.md` with `<!-- whats-new -->`, every question by the day it was
       added (Hebrew dates, the newest first); a "מה חדש" tab and a footer link on every
       page (the hook appends it to `copyright` with the site's path).
+35. **New question 0045, the odd ball on a balance (the owner's write-up).** Checked first
+    by exact computation: the tree of part a on all 24 cases (at most 3 weighings), the
+    codes of part b (distinct, no code with its negation, 4 against 4, the unused pair
+    ±(1, −1, 1), the weighings listed), the general code of part c on every N from 3 to
+    364 (always the fewest weighings), k = ⌈log₃(2N + 3)⌉ against the table up to N =
+    1999, the 13-ball argument (9 non-zero codes per column) and the N = 13 trap. All
+    hold. One wording point: step 4 of part c said "first digit 0 (off the scale)" while
+    the digits there are {0, 1, 2} (0 = right); the page says "0 in weighing 1" in the
+    {+1, −1, 0} notation. The owner's photos use another valid partition for 12 balls
+    (1, 2, 6, 8 against 3, 4, 5, 7, …); the owner chose part b's table for the box.
+    Answers: junior / hard / puzzle, SystemVerilog and Python, the box with N from 3 to
+    39, the table sorted by the outcomes as in the photos. The page keeps the owner's
+    Python as sent (the statement's Hebrew docstrings included) and adds SystemVerilog:
+    a `virtual class scale` with `weigh(left[$], right[$])` returning +1 / −1 / 0 and an
+    `odd_t` struct; the tree, the fixed codes and `odd_ball(n, s)` (the orbits, the
+    trimmed last orbit, the genuine balls). Tests: pytest (all three solvers, every N
+    from 3 to 364 with equal pans asserted, the page numbers, the explorer against the
+    page's pans for every scenario of N from 3 to 39), Verilator (a hidden-ball scale
+    class; N from 3 to 130 and 363), the run panel's demo (the owner's harness).
+    The `oddball` box (two boxes: part b fixed at 12, part c free): a row of balances per
+    weighing, the decision table, a scenario from a row or from the ball and kind fields.
+    Verilator was built locally from the CI's pinned commit for this (with z3).
 ---
 
 ## In progress
@@ -2120,7 +2142,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   the owner's write-up, with the state diagram box) is on `main` (76311df). The owner's
   interface plan (work log items 31 to 33): rounds 1 (D195, C191, A181, A183), 2
   (D194, D197, C192), 3 (E200, E199, the box state) and 6 (E31, E33, E34, E36) are
-  done on the branch; `main` when the owner asks. Still open: the rest of the second
+  done on the branch, and question 0045 (the odd ball, item 35); `main` when the owner
+  asks. Still open: the rest of the second
   series A to E, the new questions of M to R and Z, the deferred G222, H223, H224, E35.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
