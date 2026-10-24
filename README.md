@@ -204,6 +204,10 @@ Conventions:
     by the blocks `#### הרעיון { .sol-idea }`, `#### השלבים { .sol-steps }`,
     `#### הקוד { .sol-code }`, `#### למה זה נכון { .sol-proof }`, `#### סיבוכיות { .sol-cost }`
     in this order, keeping only the ones that apply; no other `####` headings;
+  - a solution with a `sol-cost` block has a line of **cost chips** right under its answer,
+    `<!-- cost: זמן \( O(n) \) | זיכרון \( O(1) \) -->` (each chip a Hebrew label word and a
+    value, chips separated by ` | `); the hook renders it as a row of chips, so the cost is
+    seen without scrolling to the end of the solution;
   - steps are an ordered list inside `<div class="steps" markdown>`, drawn as a timeline;
   - traps and follow-ups at the end use `??? trap "מלכודת: ..."` and `??? followup`.
 - **Code answers are given in SystemVerilog and Python**, as linked content tabs
@@ -302,11 +306,24 @@ not start with the id, or a duplicate id. It also generates, per question page:
   tags, `python` and `systemverilog` not counted), and the previous / next links come from
   Material's `navigation.footer`.
 
-`docs/javascripts/reading-tools.js` adds three reading aids to every question page: an
+`docs/javascripts/reading-tools.js` adds the reading aids of every question page: an
 **enlarge button** on each inline SVG figure and chart (a full-screen view with pinch / wheel
 zoom, drag, double tap and Esc), **tap tooltips** on touch screens (a tap on a mark shows its
 SVG `<title>`), and on pages with two or more parts a sticky **part bar** of chips under the
-toolbar that marks the part being read.
+toolbar that marks the part being read; and in every solution each labelled block (idea,
+steps, code, proof, cost) is wrapped in a `sol-block` with its own colour, icon and side
+rail, and a solution with two or more blocks gets a sticky **solution map** of chips that
+jumps to a block and marks the block being read (under the part bar when there is one).
+For phones it also fits the figures and tables: SVG text that would render under 9 px (a
+640-unit chart in a 340 px column) is enlarged to 9.5 px, at most 1.8 times its size, kept
+inside the viewBox, and a row of `tick` / `coord` labels that then overlaps is thinned
+(every k-th label kept, the first and the last always); this runs on every inline figure
+and on the live figures of the explorer boxes (refitted when a box redraws), and the
+lightbox copy keeps the original sizes. A content table of five or more columns and three
+or more rows that does not fit its column becomes compact cards under 30em (the first
+cell as the title, the others as "column value" pairs in two columns); a table of eight or
+more rows that fits keeps its header row in view while it scrolls; numbers in tables are
+tabular. Under 30em the figure legends (`viz-legend`) are compact chips that wrap.
 
 The question tables on the home and level pages have **chip filters** (one choice per group:
 level, difficulty, topic, and the reader's own marks: favourites, solved, not solved) plus a
@@ -387,7 +404,8 @@ Site-wide (HTML) classes in the same file: `chip`, `chip-level`, `chip-diff-*`, 
 (toolbar, with `qt-mark` / `qt-random`), `path-nav`, `path-steps`, `path-card`, `mark-progress`,
 `related-questions`, `question-filter` / `filter-group` / `filter-chip` (table
 filters), `questions-wrap` (table that becomes cards on phones), the admonition types
-`answer` / `interviewer` / `trap` / `followup`, the solution labels `sol-*`, `steps` and
+`answer` / `interviewer` / `trap` / `followup`, the solution labels `sol-*` with the
+`sol-block` wrappers, `sol-map` and `cost-chips` (colours `--sol-c-*`), `steps` and
 `stepper` (with the `st-*` SVG cell classes). The palette lives in the `[data-md-color-scheme]` blocks at the top:
 Material's `primary` / `accent` are set to `custom`, so every colour is defined there.
 
@@ -444,7 +462,9 @@ python tools/figures/fill.py --check 26     # generated blocks of a page are up 
 The linter checks RTL at the start of every paragraph, list item, heading and table cell,
 at any indent (admonitions, list items, the steps timeline), and **warns** about literal
 SVG colours. The phone check also **warns** about display math wider than its column (it
-would scroll on its own; split it with `aligned`) and, with `--axe`, about serious and
+would scroll on its own; split it with `aligned`), about SVG text drawn under 9 px at
+390 px (one line per figure or explorer box with its smallest text, so a figure that
+shrinks to an unreadable size on a phone is listed) and, with `--axe`, about serious and
 critical [axe-core](https://github.com/dequelabs/axe-core) findings (contrast, names,
 keyboard access; CI runs it on every page, `--axe-fail` makes them failures). Warnings never
 fail CI. The explorer tests run the JavaScript under Node (CI installs it; locally the tests

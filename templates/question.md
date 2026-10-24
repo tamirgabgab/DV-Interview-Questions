@@ -34,6 +34,11 @@ hints and collapsed solution. A single-part question skips the part heading.)
     !!! answer "תשובה בקצרה"
         שורה אחת עם התוצאה הסופית.
 
+    <!-- Cost chips under the short answer, required when the solution has a complexity block:
+    a Hebrew label word and a value per chip, chips separated by " | ". -->
+
+    <!-- cost: זמן \( O(n) \) | זיכרון \( O(1) \) -->
+
     #### הרעיון { .sol-idea }
 
     פסקה או שתיים : מה הרעיון המרכזי.

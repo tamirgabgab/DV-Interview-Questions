@@ -1986,6 +1986,54 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     the table of a_n, b_n, c_n, d_n with the closed form checked on every row and the
     repeated value last; a tap on a card or a row explains that step (`kapgChain`,
     `kapgStage`; tested on every number of bases 2 to 12 and samples up to 20).
+31. **The owner's interface plan, round 1 (D195, C191, A181, A183).** The owner picked
+    four rounds from the open interface proposals, asked in this order: round 1 (D195,
+    C191, A181, A183), round 2 (D194, D197, C192), round 3 (E200, E199 and the state of
+    the 0020 cuts and 0014 shapes; G222 stays deferred) and round 6 (E31, E33, E34, E36;
+    no E35), with multiple-choice questions per round. Round 1 answers: a colour and a
+    side rail per block kind, a sticky map inside the solution, cost chips written by
+    hand for every solution, a warning (not a failure) under 9 px.
+    - D195: `check_phone.py` measures every SVG text at 390 px (font size times the
+      figure's screen scale) and prints one "warn small text" line per figure or box with
+      its smallest text; the first run listed 160 figures on 36 pages (most charts at
+      about 6 px, the hourglass and bridge boxes under 5 px), which is round 2's list.
+    - C191: `reading-tools.js` wraps each `#### ... { .sol-* }` label and its content in
+      `div.sol-block.sol-block--<kind>`; colours `--sol-c-idea / steps / code / proof /
+      cost` (amber, blue, purple, green, orange as text colours, 4.5:1 in both schemes)
+      on the label, its icon and a side rail. The variables are set on `.md-typeset`, not
+      `:root`, since the scheme attribute sits on `<body>`.
+    - A181: a sticky `nav.sol-map` of chips (one per block, a coloured dot) above the
+      first block of every solution with two or more blocks, under the part bar
+      (`--part-nav-h`); the block being read is marked, and on a phone the row scrolls
+      sideways to keep it in view.
+    - A183: `<!-- cost: זמן \( O(n) \) | זיכרון \( O(1) \) -->` under the answer block,
+      rendered by the hook (`COST_LINE`, `_cost_chips`) as `div.cost-chips`; written for
+      all 70 solutions that have a complexity block (labels such as זמן, זיכרון,
+      פלופים, השהיה, הטלות, values copied from each block). The linter requires the line
+      when a solution has `.sol-cost` and a Hebrew label on every chip; the template has
+      it. Tests: the hook's chips and the lint rule.
+32. **The owner's interface plan, round 2 (D194, D197, C192).** Answers: a phone layer
+    rather than a second SVG per figure, the explorer boxes included, legends as chips
+    that wrap, cards only for wide tables.
+    - D194 (`reading-tools.js`, "figure text on narrow screens"): a ResizeObserver on every
+      inline SVG of the content (so a figure is fitted when first laid out, when the
+      solution or tab holding it opens, and on resize) and a MutationObserver on every
+      explorer box (refit once per frame after a redraw). Text that renders under 9 px
+      gets a font size that renders at 9.5 px, at most 1.8 times its own; a label wider
+      than the viewBox shrinks to fit, one past an edge moves inward (`translate`, not on
+      labels with their own transform); rows of `text.tick` / `text.coord` with
+      `text-anchor="middle"` at the same y are thinned when they overlap. `unfit()`
+      restores the page sizes (the lightbox copy uses it). The phone check's small-text
+      warnings fell from 160 figures to the few capped by the 1.8 limit (the bridge
+      letters and the hourglass and pcie boxes at 7.5 to 8.4 px).
+    - D197: under 30em every `viz-legend` entry is a small bordered chip; the chips wrap.
+    - C192: tabular numbers in every content table; a table of eight or more rows that
+      fits its column gets a sticky header (`data-long`, the scroll wrapper set to visible
+      by `.table-fits`); a table of five or more columns and three or more rows that does
+      not fit becomes cards under 30em (`data-cards`, measured on load, resize, toggle and
+      tab change): the first cell as the card's title, the other cells as "column value"
+      pairs in two columns. Nineteen pages have such tables at 390 px (0016's 20-row table
+      among them); the row-per-value tables (0013, 0044) stay tables.
 ---
 
 ## In progress
@@ -2030,10 +2078,12 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   asks): batches 1 (J294, J298, J300), 2 (J293, J297, J299) and 3 (J295, J296) are
   done; round J is closed and on `main` (the owner's go, CI green on e611961). Rounds I
   to L of the second series are all done. Question 0044 (Kaprekar after n steps, from
-  the owner's write-up, with the state diagram box) is on the branch; `main` when the
-  owner asks. Next: the owner's pick from the open
-  proposals (second series A to E, the new questions of M to R and Z, the deferred
-  G222, H223, H224).
+  the owner's write-up, with the state diagram box) is on `main` (76311df). The owner's
+  interface plan (work log items 31 and 32): rounds 1 (D195, C191, A181, A183) and 2
+  (D194, D197, C192) are done on the branch; next round 3 (E200, E199, the 0020 / 0014 state;
+  not G222) and round 6 (E31, E33, E34, E36; not E35), each after multiple-choice
+  questions. Still open after that: the rest of the second series A to E, the new
+  questions of M to R and Z, the deferred G222, H223, H224.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2062,7 +2112,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   copied link. Give these boxes an `opts.state` codec like the five boxes that have one,
   or mirror the state in a hidden input.
 - [x] ~~Re-run the 0007, 0011 and 0014 constraints in a simulator with full constraint support~~ — done in session 5 (Verilator snapshot + z3 in CI).
-- [ ] Wide data tables still scroll sideways on phones (inside the table, not the page): 0005, 0006, 0008, 0013 (five or more columns). Consider splitting them or cards on phones.
+- [x] ~~Wide data tables still scroll sideways on phones~~: tables of five or more columns that do not fit become cards on phones (C192, session 22).
 - [ ] Question ideas the owner has not picked yet (logic, math, digital design, EE): poisoned wine with 10 testers, 12 coins in 3 weighings, two eggs and 100 floors, Boyer-Moore majority, 100 doors, Gray code, XOR from NAND / universal MUX, two's complement overflow, divide-by-3 clock with 50% duty, maximal LFSR, Hamming (7,4), resistor cube, infinite resistor ladder.
 - [ ] When a Verilator release newer than 5.052 is out, bump `VERILATOR_REF` to its tag and check that 0011 and the 0014 subclass still pass.
 
@@ -2562,9 +2612,9 @@ What the short research found (sources in the chat summary of 2026-10-22):
 
 | Id | Idea | Size |
 |---|---|---|
-| A181 | **Solution map**: a strip at the top of every solution with its blocks (idea → steps → code → proof → cost), one line each, clickable; the block in view is marked while scrolling | S–M |
+| ~~A181~~ | ~~**Solution map**: a strip at the top of every solution with its blocks (idea → steps → code → proof → cost), one line each, clickable; the block in view is marked while scrolling~~ done (session 22, round 1 of the owner's interface plan) | S–M |
 | A182 | **Answer hero card**: the short answer with its key result set large (a number, a formula, a verdict), a thumbnail of the main figure beside it, and the hint ladder folded into a progress line above it | M |
-| A183 | **Cost as chips and a comparison**: time / space (and flops, gates, latency on design pages) as chips in the solution header; on pages with several approaches a small table or bar chart comparing them | S–M |
+| ~~A183~~ | ~~**Cost as chips and a comparison**: time / space (and flops, gates, latency on design pages) as chips in the solution header; on pages with several approaches a small table or bar chart comparing them~~ done as chips only (session 22; the comparison part dropped with the owner's no-naive-comparison rule) | S–M |
 | A184 | **Approaches side by side**: where a page has a naive and a good solution, a two-column compare view (or tabs with a "what changed" note) instead of two blocks far apart | M |
 
 **Round B — code and figure linked**
@@ -2582,18 +2632,18 @@ What the short research found (sources in the chat summary of 2026-10-22):
 |---|---|---|
 | C189 | **Sticky figure column on wide screens**: in long solutions the current figure stays beside the text while it scrolls (a stepper, not scroll-driven animation); one column with the figures inline on phones | M |
 | C190 | **Typography pass for Hebrew**: a Hebrew face with good digits (e.g. Assistant or Heebo), tabular numbers in tables, a line-length cap, more line height, styled LTR runs | S–M |
-| C191 | **One visual identity per block**: idea / steps / code / proof / cost / trap each with an icon, an accent colour and a side rail, the same in light and dark | S |
-| C192 | **Tables that read**: sticky header, numbers aligned, the row the text refers to highlighted, and on phones long tables as cards | S–M |
+| ~~C191~~ | ~~**One visual identity per block**: idea / steps / code / proof / cost / trap each with an icon, an accent colour and a side rail, the same in light and dark~~ done (session 22) | S |
+| ~~C192~~ | ~~**Tables that read**: sticky header, numbers aligned, the row the text refers to highlighted, and on phones long tables as cards~~ done without the row highlight (session 22) | S–M |
 | C193 | **Direct labels instead of separate legends** in the generated figures where there is room, and a colour-blind-safe palette checked by a script over every `--viz-*` pair | M |
 
 **Round D — figures made for the phone**
 
 | Id | Idea | Size |
 |---|---|---|
-| D194 | **Compact figure variants**: generators emit a narrow layout for phones (fewer ticks, larger text, stacked rows) shown under 480 px; today's address-axis figures fall to ~6 px labels | M–L |
-| D195 | **Minimum text size check**: `check_phone.py` measures rendered SVG text at 390 px and warns below 9 px | S |
+| ~~D194~~ | ~~**Compact figure variants**: generators emit a narrow layout for phones (fewer ticks, larger text, stacked rows) shown under 480 px; today's address-axis figures fall to ~6 px labels~~ done as a phone layer in `reading-tools.js` (session 22, the owner's pick over a second SVG per figure) | M–L |
+| ~~D195~~ | ~~**Minimum text size check**: `check_phone.py` measures rendered SVG text at 390 px and warns below 9 px~~ done (session 22; 160 figures on 36 pages warned, the input of D194) | S |
 | D196 | **Controls in a bottom sheet** on phones for the explorer boxes: the figure stays in view while the controls sit at the bottom of the screen | M |
-| D197 | **Legend as chips** under a figure on phones (one row that scrolls) instead of a list of five lines | S |
+| ~~D197~~ | ~~**Legend as chips** under a figure on phones (one row that scrolls) instead of a list of five lines~~ done as wrapping chips (session 22, the owner's pick) | S |
 
 **Round E — motion and consistency in the boxes**
 

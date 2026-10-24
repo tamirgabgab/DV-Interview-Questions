@@ -11,7 +11,9 @@ python -m playwright install chromium (or --browser PATH to an installed Chromiu
 
 It also warns (without failing) about display math wider than its column: such an
 equation scrolls sideways on its own, which is easy to miss on a phone; split it with
-`aligned`. --scheme dark runs the same check in dark mode (CI runs it on manual request).
+`aligned`. It warns, too, about SVG text drawn smaller than 9 px at this width (figures
+and explorer boxes that shrink to fit the phone): one line per figure with its smallest
+size. --scheme dark runs the same check in dark mode (CI runs it on manual request).
 
 In a sandbox without access to the CDNs, --offline ignores errors of external scripts and
 --route REGEX=FILE serves a CDN script from a local copy (e.g. MathJax, so math is laid out
@@ -68,6 +70,31 @@ WIDE_MATH = """async () => {
     const mml = el.querySelector("mjx-assistive-mml");
     const text = (mml ? mml.textContent : el.textContent).replace(/\\s+/g, " ").trim();
     out.push(`+${Math.round(over)} px: ${text.slice(0, 60)}`);
+  }
+  return out;
+}"""
+
+# SVG text smaller than MIN_TEXT px on screen: the font size times the scale of the figure
+# (a viewBox wider than the phone shrinks every label). One entry per figure, its smallest
+# text; the figure is named by its aria-label, else by its first text.
+MIN_TEXT = 9
+SMALL_TEXT = """(min) => {
+  const out = [];
+  for (const svg of document.querySelectorAll(".md-content svg")) {
+    if (svg.closest("mjx-container") || svg.parentElement.closest(".md-content svg")) continue;
+    let small = Infinity, sample = "";
+    for (const t of svg.querySelectorAll("text")) {
+      const r = t.getBoundingClientRect();
+      const m = t.getScreenCTM();
+      if (!m || r.width === 0 || !t.textContent.trim()) continue;
+      const px = parseFloat(getComputedStyle(t).fontSize) * Math.hypot(m.a, m.b);
+      if (px < small) { small = px; sample = t.textContent.trim(); }
+    }
+    if (small >= min) continue;
+    const name = svg.getAttribute("aria-label") || (svg.querySelector("text") || {}).textContent || "";
+    const box = svg.closest(".explorer");
+    out.push(`${small.toFixed(1)} px ("${sample.slice(0, 20)}") in ${box ? "box " + box.dataset.kind + ": " : ""}`
+             + name.trim().replace(/\\s+/g, " ").slice(0, 60));
   }
   return out;
 }"""
@@ -136,7 +163,7 @@ def main(argv: list[str]) -> int:
     shots.mkdir(parents=True, exist_ok=True)
     server, base = serve(site)
 
-    failures = warned = axe_pages = 0
+    failures = warned = axe_pages = small_pages = 0
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
         ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1,
@@ -157,6 +184,7 @@ def main(argv: list[str]) -> int:
             page.wait_for_timeout(800)
             info = page.evaluate(INSPECT, WIDTH)
             wide_math = page.evaluate(WIDE_MATH)
+            small_text = page.evaluate(SMALL_TEXT, MIN_TEXT)
             axe = []
             if args.axe:
                 page.add_script_tag(path=args.axe)
@@ -178,15 +206,18 @@ def main(argv: list[str]) -> int:
                 print(f"        script error: {e[:200]}")
             for w in wide_math:
                 print(f"        warn wide math {w}")
+            for w in small_text:
+                print(f"        warn small text {w}")
             for v in axe:
                 print(f"        {'axe' if args.axe_fail else 'warn axe'} {v['impact']} {v['id']} x{v['count']}: "
                       f"{v['help']} ({v['first']})")
             warned += bool(wide_math)
+            small_pages += bool(small_text)
             axe_pages += bool(axe)
         browser.close()
     server.shutdown()
     print(f"{len(pages)} pages checked at {WIDTH} px ({args.scheme}), {failures} with problems, "
-          f"{warned} with wide math warnings, {axe_pages} with axe violations; screenshots in {shots}")
+          f"{warned} with wide math warnings, {small_pages} with text under {MIN_TEXT} px, {axe_pages} with axe violations; screenshots in {shots}")
     return 1 if failures else 0
 
 

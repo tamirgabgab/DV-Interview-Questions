@@ -69,7 +69,8 @@ python tools/check_explorers.py       # every explorer box: buttons clicked, lin
 
 The linter checks RTL at every paragraph start (indented blocks and the steps timeline
 included) and warns about literal SVG colours; the phone check also warns about display
-math wider than its column (split it with `aligned`). `--scheme dark` runs the phone check
+math wider than its column (split it with `aligned`) and about figure text under 9 px at
+390 px. `--scheme dark` runs the phone check
 in dark mode; CI runs it only on a manual run with `phone_dark`. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 

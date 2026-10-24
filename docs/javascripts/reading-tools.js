@@ -4,7 +4,14 @@
 // - tap tooltips: on a touch screen, tapping a mark that has an SVG <title> shows the title
 //   (there is no hover on phones);
 // - part bar: on a page with two or more parts ("### סעיף ..."), a sticky row of chips that
-//   jumps to a part and marks the part being read.
+//   jumps to a part and marks the part being read;
+// - solution blocks: each labelled block of a solution (idea, steps, code, proof, cost) is
+//   wrapped for its colour and side rail, and a solution with two or more blocks gets a
+//   sticky map of chips that jumps to a block and marks the block being read;
+// - figure text on narrow screens: SVG text that would render under 9 px is enlarged and
+//   crowded tick rows thinned (window.dvqFitText(root) refits on demand);
+// - tables: a table of five or more columns that does not fit becomes cards on a phone,
+//   and a long table that fits keeps its header row in view while it scrolls.
 // window.dvqDecorate(root, selector?) adds the enlarge buttons to figures drawn later
 // (explorer/core.js passes its own selector for the live figures of a box).
 (() => {
@@ -94,6 +101,7 @@
     lastFocus = document.activeElement;
     const copy = svg.cloneNode(true);
     copy.removeAttribute("style");          // the page copy may carry a max-width
+    unfit(copy);                             // the phone text sizes (D194) are not needed here
     stage.replaceChildren(copy);
     view.scale = 1; view.x = 0; view.y = 0;
     apply();
@@ -187,8 +195,236 @@
     mark();
   };
 
+  // --- figure text on narrow screens (D194) ---------------------------------------------------
+
+  // A figure drawn for a 640-unit viewBox shrinks with the column, and on a phone its labels
+  // fall to 5-7 px. Every SVG text that would render under MIN_PX gets a font size (in the
+  // figure's units) that renders at FIT_PX, at most MAX_GROW times its own; a row of tick
+  // labels (class tick or coord) that then overlaps is thinned, every k-th label kept (the first and the last
+  // always), the smallest k with no overlap. Redone when a figure comes into view, on
+  // resize, and when an explorer box redraws; the lightbox copy gets the original sizes.
+  const MIN_PX = 9, FIT_PX = 9.5, MAX_GROW = 1.8;
+  const FIT_SVGS = ".md-content svg:not(mjx-container svg):not(.mermaid svg)";
+
+  const unfit = (root) => {
+    root.querySelectorAll("text[data-fit-base]").forEach((t) => {
+      t.style.fontSize = t.dataset.fitBase;
+      t.removeAttribute("data-fit-base");
+    });
+    root.querySelectorAll("text[data-fit-shift]").forEach((t) => {
+      t.removeAttribute("transform");
+      t.removeAttribute("data-fit-shift");
+    });
+    root.querySelectorAll("text.fit-hidden").forEach((t) => t.classList.remove("fit-hidden"));
+  };
+
+  // A grown label must stay inside the figure: one wider than the viewBox shrinks back to
+  // fit, one past an edge moves inward (labels that carry their own transform stay).
+  const keepInside = (svg, t) => {
+    const vb = svg.viewBox && svg.viewBox.baseVal;
+    if (!vb || !vb.width) return;
+    let b = t.getBBox();
+    if (b.width > vb.width - 4) {
+      t.style.fontSize = `${(parseFloat(t.style.fontSize) * (vb.width - 4) / b.width).toFixed(2)}px`;
+      b = t.getBBox();
+    }
+    if (t.hasAttribute("transform")) return;
+    const lo = vb.x + 1, hi = vb.x + vb.width - 1;
+    const dx = b.x < lo ? lo - b.x : b.x + b.width > hi ? hi - b.x - b.width : 0;
+    if (Math.abs(dx) < 0.5) return;
+    t.setAttribute("transform", `translate(${dx.toFixed(1)} 0)`);
+    t.dataset.fitShift = "";
+  };
+
+  const thinRow = (row) => {
+    row.sort((a, b) => a.box.x - b.box.x);
+    const overlaps = (keep) => keep.some((t, i) => i && t.box.x < keep[i - 1].box.x + keep[i - 1].box.width + 2);
+    for (let k = 1; k <= row.length; k++) {
+      const keep = row.filter((t, i) => i % k === 0 || i === row.length - 1);
+      if (k > 1 && keep.length > 1 && (row.length - 1) % k !== 0) keep.splice(-2, 1);   // the last kept, its left neighbour not
+      if (!overlaps(keep) || keep.length <= 2) {
+        row.forEach((t) => t.el.classList.toggle("fit-hidden", !keep.includes(t)));
+        return;
+      }
+    }
+  };
+
+  const fitSvg = (svg) => {
+    if (svg.parentElement && svg.parentElement.closest("svg")) return;
+    unfit(svg);
+    if (!svg.getBoundingClientRect().width) return;
+    for (const t of svg.querySelectorAll("text")) {
+      const m = t.getScreenCTM();
+      const scale = m ? Math.hypot(m.a, m.b) : 0;
+      if (!scale || !t.textContent.trim()) continue;
+      const size = parseFloat(getComputedStyle(t).fontSize);
+      if (size * scale >= MIN_PX) continue;
+      t.dataset.fitBase = t.style.fontSize;
+      t.style.fontSize = `${Math.min(FIT_PX / scale, size * MAX_GROW).toFixed(2)}px`;
+    }
+    const rows = new Map();
+    for (const t of svg.querySelectorAll("text.tick, text.coord")) {
+      if (t.getAttribute("text-anchor") !== "middle" || !t.textContent.trim()) continue;
+      const key = `${t.getAttribute("class")}|${t.parentNode === svg ? "" : "g"}${Math.round(parseFloat(t.getAttribute("y")) || 0)}`;
+      if (!rows.has(key)) rows.set(key, []);
+      rows.get(key).push({ el: t, box: t.getBBox() });
+    }
+    rows.forEach((row) => { if (row.length > 2) thinRow(row); });
+    svg.querySelectorAll("text[data-fit-base]:not(.fit-hidden)").forEach((t) => keepInside(svg, t));
+  };
+
+  // A figure is fitted whenever its rendered size changes: when it is first laid out, when
+  // a closed solution or a tab that holds it opens, and on resize.
+  const fitObserver = "ResizeObserver" in window
+    ? new ResizeObserver((entries) => entries.forEach((e) => fitSvg(e.target)))
+    : null;
+  const watchFigures = (root) => {
+    root.querySelectorAll(FIT_SVGS).forEach((svg) => {
+      if (svg.dvqFitWatched || (svg.parentElement && svg.parentElement.closest("svg"))) return;
+      svg.dvqFitWatched = true;
+      if (fitObserver) fitObserver.observe(svg); else fitSvg(svg);
+    });
+  };
+  window.dvqFitText = (root) => root.querySelectorAll(FIT_SVGS).forEach(fitSvg);
+  window.dvqUnfitText = unfit;
+
+  // An explorer box redraws its figures: refit the box once per frame.
+  const dirtyBoxes = new Set();
+  let fitFrame = 0;
+  const boxObserver = new MutationObserver((records) => {
+    for (const r of records) {
+      const box = r.target.closest && r.target.closest(".explorer");
+      if (box) dirtyBoxes.add(box);
+    }
+    if (!fitFrame) fitFrame = requestAnimationFrame(() => {
+      fitFrame = 0;
+      dirtyBoxes.forEach((box) => { watchFigures(box); box.querySelectorAll(FIT_SVGS).forEach(fitSvg); });
+      dirtyBoxes.clear();
+    });
+  });
+
+  // --- tables (C192) --------------------------------------------------------------------------
+
+  // A content table of CARD_COLS or more columns and CARD_ROWS or more rows that does not
+  // fit its column becomes cards on a phone: every cell gets its column's name
+  // (data-label), shown before the value by the CSS. A long table that fits its column keeps
+  // its header row in view while it scrolls (the scroll wrapper would otherwise hold the
+  // sticky header). Data attributes, not classes: Material styles only tables without one.
+  const CARD_COLS = 5, CARD_ROWS = 3, STICKY_ROWS = 8;
+  const tables = (root) => {
+    const wide = [], long = [];
+    root.querySelectorAll(".md-content .md-typeset__table > table:not([class])").forEach((table) => {
+      if (table.closest(".questions-wrap, .explorer")) return;
+      const heads = Array.from(table.querySelectorAll("thead th")).map((th) => th.textContent.trim());
+      const rows = table.querySelectorAll("tbody tr");
+      if (heads.length >= CARD_COLS && rows.length >= CARD_ROWS) {   // a row-per-value table stays a table
+        rows.forEach((tr) => Array.from(tr.children).forEach((td, i) => {
+          if (heads[i]) td.dataset.label = heads[i];
+        }));
+        wide.push(table);
+      }
+      if (rows.length >= STICKY_ROWS) { table.dataset.long = ""; long.push(table); }
+    });
+    // Cards only where the table does not fit its column (measured as a table), and a
+    // sticky header only where it does.
+    const layout = () => {
+      wide.forEach((table) => {
+        const wrap = table.closest(".md-typeset__scrollwrap");
+        delete table.dataset.cards;
+        if (wrap && wrap.clientWidth && table.offsetWidth > wrap.clientWidth + 1) table.dataset.cards = "";
+      });
+      long.forEach((table) => {
+        const wrap = table.closest(".md-typeset__scrollwrap");
+        if (!wrap) return;
+        wrap.classList.remove("table-fits");
+        wrap.classList.toggle("table-fits", "cards" in table.dataset ? false : table.offsetWidth <= wrap.clientWidth + 1);
+      });
+    };
+    layout();
+    window.addEventListener("resize", layout, { passive: true });
+    document.addEventListener("toggle", layout, true);
+    document.addEventListener("change", (e) => { if (e.target.closest && e.target.closest(".tabbed-set")) layout(); });
+  };
+
+  // --- solution blocks and map --------------------------------------------------------------
+
+  // Every "#### ... { .sol-* }" label and what follows it, up to the next label, goes into a
+  // <div class="sol-block sol-block--idea"> (C191: a colour and a side rail per kind). A
+  // solution with two or more blocks gets a sticky row of chips above its first block that
+  // jumps to a block and marks the block being read (A181).
+  const SOL_KINDS = ["idea", "steps", "code", "proof", "cost"];
+  const solKind = (el) => el.tagName === "H4" && SOL_KINDS.find((k) => el.classList.contains(`sol-${k}`));
+
+  const solutionBlocks = (sol) => {
+    const blocks = [];
+    for (const h of Array.from(sol.children).filter(solKind)) {
+      const block = document.createElement("div");
+      block.className = `sol-block sol-block--${solKind(h)}`;
+      h.before(block);
+      let el = h;
+      while (el && !(el !== h && solKind(el))) {
+        const next = el.nextElementSibling;
+        block.append(el);
+        el = next;
+      }
+      blocks.push(block);
+    }
+    return blocks;
+  };
+
+  const solutionMap = (sol, blocks) => {
+    if (blocks.length < 2) return;
+    const nav = document.createElement("nav");
+    nav.className = "sol-map";
+    nav.setAttribute("aria-label", "חלקי הפתרון");
+    nav.setAttribute("data-search-exclude", "");
+    const links = blocks.map((block, i) => {
+      const h = block.firstElementChild;
+      if (!h.id) h.id = `${sol.id || "sol"}-block-${i}`;
+      const a = document.createElement("a");
+      a.href = `#${h.id}`;
+      a.className = `sol-map__chip sol-map__chip--${solKind(h)}`;
+      a.textContent = h.textContent.replace("¶", "").trim();
+      nav.append(a);
+      return a;
+    });
+    blocks[0].before(nav);
+    const mark = () => {
+      if (!sol.open) return;
+      const y = nav.getBoundingClientRect().bottom + 24;
+      let current = 0;
+      blocks.forEach((b, i) => { if (b.getBoundingClientRect().top <= y) current = i; });
+      if (links[current].classList.contains("is-current")) return;
+      links.forEach((a, i) => {
+        a.classList.toggle("is-current", i === current);
+        if (i === current) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+      });
+      // On a phone the row scrolls sideways: keep the current chip in it.
+      const a = links[current], n = nav.getBoundingClientRect(), r = a.getBoundingClientRect();
+      if (r.left < n.left || r.right > n.right) nav.scrollLeft += r.left < n.left ? r.left - n.left - 8 : r.right - n.right + 8;
+    };
+    window.addEventListener("scroll", mark, { passive: true });
+    sol.addEventListener("toggle", mark);
+    mark();
+  };
+
+  // The sticky solution map sits under the part bar when the page has one.
+  const partBarHeight = () => {
+    const bar = document.querySelector(".part-nav");
+    document.documentElement.style.setProperty("--part-nav-h", bar ? `${bar.offsetHeight}px` : "0px");
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
     decorate(document);
     document.querySelectorAll("article.md-content__inner").forEach(partBar);
+    document.querySelectorAll("article.md-content__inner details.success").forEach((sol) => {
+      solutionMap(sol, solutionBlocks(sol));
+    });
+    partBarHeight();
+    tables(document);
+    watchFigures(document);
+    document.querySelectorAll(".md-content .explorer").forEach((box) =>
+      boxObserver.observe(box, { childList: true, subtree: true, characterData: true }));
+    window.addEventListener("resize", partBarHeight, { passive: true });
   });
 })();

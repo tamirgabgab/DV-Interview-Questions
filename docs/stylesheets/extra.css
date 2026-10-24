@@ -733,6 +733,180 @@
   display: none;
 }
 
+/* One colour per block kind (C191): the label, its icon and a side rail along the block.
+   The colours are the series colours as text (4.5:1 on the page in both schemes). The
+   blocks are wrapped by reading-tools.js. */
+.md-typeset {   /* set here, not on :root, so they follow the scheme set on <body> */
+  --sol-c-idea: var(--site-label-color);
+  --sol-c-steps: var(--viz-s1-text);
+  --sol-c-code: var(--viz-s4-text);
+  --sol-c-proof: var(--viz-s3-text);
+  --sol-c-cost: var(--viz-s2-text);
+}
+
+.md-typeset .sol-block {
+  --sol-c: var(--md-accent-fg-color);
+  margin: 1.1rem 0 0.4rem;
+  padding-inline-start: 0.8rem;
+  border-inline-start: 3px solid color-mix(in srgb, var(--sol-c) 55%, transparent);
+  scroll-margin-top: calc(5.2rem + var(--part-nav-h, 0px));
+}
+/* On a phone the rail sits in the solution's own side padding, so the text column (and
+   the display math in it) keeps its full width. */
+@media screen and (max-width: 30em) {
+  .md-typeset .sol-block { margin-inline-start: -0.5rem; padding-inline-start: calc(0.5rem - 3px); }
+}
+.md-typeset .sol-block--idea { --sol-c: var(--sol-c-idea); }
+.md-typeset .sol-block--steps { --sol-c: var(--sol-c-steps); }
+.md-typeset .sol-block--code { --sol-c: var(--sol-c-code); }
+.md-typeset .sol-block--proof { --sol-c: var(--sol-c-proof); }
+.md-typeset .sol-block--cost { --sol-c: var(--sol-c-cost); }
+
+.md-typeset .sol-block > h4:first-child {
+  margin-top: 0;
+  color: var(--sol-c);
+  border-bottom-color: color-mix(in srgb, var(--sol-c) 30%, transparent);
+}
+.md-typeset .sol-block > h4:first-child::before { background-color: var(--sol-c); }
+
+/* The solution map (A181): a sticky row of chips, one per block, under the part bar. */
+.md-typeset .sol-map {
+  position: sticky;
+  top: calc(2.4rem + var(--part-nav-h, 0px));
+  z-index: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+  margin: 0.6rem 0 0;
+  padding: 0.3rem 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--md-default-bg-color);
+  border-bottom: 1px solid var(--viz-grid);
+}
+.md-typeset .sol-map::-webkit-scrollbar { display: none; }
+.md-typeset .sol-map__chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.05rem 0.55rem;
+  border: 1px solid var(--viz-grid);
+  border-radius: 1rem;
+  font-size: 0.66rem;
+  color: var(--md-default-fg-color);
+  text-decoration: none;
+}
+.md-typeset .sol-map__chip::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--sol-c);
+}
+.md-typeset .sol-map__chip--idea { --sol-c: var(--sol-c-idea); }
+.md-typeset .sol-map__chip--steps { --sol-c: var(--sol-c-steps); }
+.md-typeset .sol-map__chip--code { --sol-c: var(--sol-c-code); }
+.md-typeset .sol-map__chip--proof { --sol-c: var(--sol-c-proof); }
+.md-typeset .sol-map__chip--cost { --sol-c: var(--sol-c-cost); }
+.md-typeset .sol-map__chip:hover { border-color: var(--sol-c); }
+.md-typeset .sol-map__chip.is-current {
+  border-color: var(--sol-c);
+  background: color-mix(in srgb, var(--sol-c) 14%, transparent);
+  font-weight: 700;
+}
+
+/* The cost chips (A183): under the short answer, one chip per resource. */
+.md-typeset .cost-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0;
+}
+.md-typeset .cost-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--sol-c-cost) 45%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--sol-c-cost) 8%, transparent);
+  font-size: 0.7rem;
+}
+.md-typeset .cost-chip > b { font-weight: 700; }
+.md-typeset .cost-chip .arithmatex { direction: ltr; unicode-bidi: isolate; }   /* a flex item: keep the formula LTR */
+
+@media print { .md-typeset .sol-map { display: none; } }
+
+/* Figure text on narrow screens (D194): reading-tools.js enlarges SVG text that would
+   render under 9 px and hides every other label of a tick row that then overlaps. */
+.md-typeset svg text.fit-hidden { display: none; }
+
+/* Content tables (C192): numbers of equal width; a long table that fits its column keeps
+   its header in view (reading-tools.js marks data-long and .table-fits); a table of five
+   or more columns becomes cards on a phone, each cell with its column's name. */
+.md-typeset table:not([class]) td { font-variant-numeric: tabular-nums; }
+.md-typeset .md-typeset__scrollwrap.table-fits { overflow: visible; }
+.md-typeset .table-fits table[data-long] { overflow: visible; }
+.md-typeset .table-fits table[data-long] thead th {
+  position: sticky;
+  top: calc(2.4rem + var(--part-nav-h, 0px));
+  z-index: 1;
+  background: var(--md-default-bg-color);
+  box-shadow: inset 0 -1px 0 var(--site-card-border);
+}
+@media screen and (max-width: 30em) {
+  .md-typeset .md-typeset__scrollwrap:has(> .md-typeset__table > table[data-cards]) { overflow: visible; margin: 0; }
+  .md-typeset .md-typeset__table:has(> table[data-cards]) { display: block; padding: 0; }
+  .md-typeset table[data-cards],
+  .md-typeset table[data-cards] tbody { display: block; border: 0; box-shadow: none; background: none; }
+  .md-typeset table[data-cards] thead { display: none; }
+  .md-typeset table[data-cards] tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.1rem 0.8rem;
+    margin: 0 0 0.4rem;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid var(--site-card-border);
+    border-radius: 0.4rem;
+  }
+  .md-typeset table[data-cards] td {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.4rem;
+    align-items: baseline;
+    min-width: 0;
+    padding: 0.1rem 0;
+    border: 0;
+  }
+  .md-typeset table[data-cards] td:first-child {
+    grid-column: 1 / -1;
+    padding-bottom: 0.15rem;
+    border-bottom: 1px dashed var(--viz-grid);
+    font-weight: 700;
+  }
+  .md-typeset table[data-cards] td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--md-default-fg-color--light);
+  }
+}
+
+/* Legends on a phone (D197): each entry a compact chip, the chips wrapping onto two or
+   three tight rows instead of one entry per line. */
+@media screen and (max-width: 30em) {
+  .md-typeset .viz-legend { gap: 0.25rem 0.3rem; font-size: 0.64rem; }
+  .md-typeset .viz-legend > span {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.05rem 0.45rem;
+    border: 1px solid var(--viz-grid);
+    border-radius: 1rem;
+    line-height: 1.35;
+  }
+  .md-typeset .viz-legend i { width: 0.5rem; height: 0.5rem; margin-inline-end: 0.25rem; }
+}
+
 /* Numbered steps drawn as a timeline: <div class="steps" markdown> with an ordered list. */
 .md-typeset .steps > ol {
   position: relative;

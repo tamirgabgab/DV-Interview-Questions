@@ -79,6 +79,9 @@ EXPLORER_DIR = "javascripts/explorer"
 EXPLORER_BOX = re.compile(r"<div\b[^>]*\bclass=\"explorer\"[^>]*>")
 EXPLORER_KIND = re.compile(r"\bdata-kind=\"([\w-]+)\"")
 KINDS_LINE = re.compile(r"^// kinds: ([\w -]+)$")
+# The cost chips of a solution (A183): one comment line under its answer block,
+# "<!-- cost: זמן \( O(n) \) | זיכרון \( O(1) \) -->", each chip a label word and a value.
+COST_LINE = re.compile(r"^([ \t]*)<!--\s*cost:\s*(.+?)\s*-->[ \t]*$", re.M)
 
 # Question metadata keyed by src_uri, and the study paths in order; filled in on_config.
 _questions: dict[str, dict] = {}
@@ -542,6 +545,18 @@ def _comments_block() -> str:
             f'<div class="comments"><script src="https://giscus.app/client.js" {attr_text} crossorigin="anonymous" async></script></div>\n')
 
 
+def _cost_chip(text: str) -> str:
+    """One chip: the label in bold, then the value (arithmatex wraps its \\( \\) math)."""
+    label, _, value = text.strip().partition(" ")
+    return f'<span class="cost-chip"><b>{html.escape(label)}</b> {html.escape(value.strip())}</span>'
+
+
+def _cost_chips(m: re.Match) -> str:
+    """A cost comment line as a row of chips, at the indentation of the comment."""
+    chips = "".join(_cost_chip(c) for c in m.group(2).split(" | "))
+    return f'{m.group(1)}<div class="cost-chips" role="note" aria-label="סיבוכיות" data-search-exclude>{chips}</div>'
+
+
 def on_page_markdown(markdown, page, config, files, **kwargs):
     q = _questions.get(page.file.src_uri)
     if q:
@@ -550,6 +565,7 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
         markdown = (_header(q, markdown, page.url) + _tools(q, page.url) + _path_nav(q, page.url) + markdown
                     + _run_panel(q, markdown) + _related(q, page.url) + _comments_block())
 
+    markdown = COST_LINE.sub(_cost_chips, markdown)
     markdown = CARDS.sub(lambda m: _level_cards(page.url), markdown)
     markdown = STATS.sub(lambda m: _stats(), markdown)
     markdown = PATH_STEPS.sub(lambda m: _path_steps(page), markdown)

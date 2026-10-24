@@ -79,3 +79,14 @@ def test_chart_mapping():
     assert abs(lg.Y(1) - (lg.base + lg.top) / 2) < 1e-9 and lg.X(1) == lg.x1
     svg = c.grid_y([0, 1, 2]).bar(3, 1.5, "by-enum", title="t").axis("k").svg()
     assert svg.startswith('<svg class="perf-chart"') and svg.endswith("</svg>") and "#" not in svg
+
+
+def test_lint_cost_chips(tmp_path):
+    page = (ROOT / "templates/question.md").read_text(encoding="utf-8").replace("id: 0 ", "id: 42 ")
+    path = tmp_path / "0042-x.md"
+    path.write_text(page, encoding="utf-8")
+    assert lint_pages.lint(path) == []
+    path.write_text(page.replace("<!-- cost: זמן", "<!-- cost: O(n) זמן"), encoding="utf-8")
+    assert any("Hebrew label" in p for p in lint_pages.lint(path))
+    path.write_text(page.replace("    <!-- cost: זמן \\( O(n) \\) | זיכרון \\( O(1) \\) -->\n", ""), encoding="utf-8")
+    assert any("no <!-- cost" in p for p in lint_pages.lint(path))

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lint the question pages for the site's writing conventions.
+r"""Lint the question pages for the site's writing conventions.
 
     python tools/lint_pages.py            # all pages
     python tools/lint_pages.py 12 14      # some pages
@@ -13,6 +13,9 @@ Checks, per page:
 - Solution structure: every collapsed solution (``??? success``) starts with an
   ``!!! answer`` block; the solution block labels (h4 with ``.sol-*`` classes) use only the
   known names and appear in the fixed order; hints are numbered "רמז 1", "רמז 2", ...
+- Cost chips: a solution with a complexity block (``.sol-cost``) has a chips line
+  ``<!-- cost: זמן \( O(n) \) | זיכרון \( O(1) \) -->`` (rendered by the hook under the
+  short answer), and every chip starts with a Hebrew label word.
 - One ``??? interviewer`` block right after the question, and the end-of-page blocks use
   the ``trap`` / ``followup`` types (a top-level ``note`` / ``warning`` titled like an
   interviewer / trap / follow-up block is reported; other notes may keep their type).
@@ -36,6 +39,8 @@ CLASSES = ["sol-idea", "sol-steps", "sol-code", "sol-proof", "sol-cost"]
 LABEL_RE = re.compile(r"^\s*#### (.+?)\s*\{\s*\.(sol-\w+)\s*\}\s*$")
 H4_RE = re.compile(r"^\s*#### ")
 ADMON_RE = re.compile(r'^(\s*)(\?\?\?\+?|!!!)\s+(\w+)(?:\s+"([^"]*)")?')
+COST_RE = re.compile(r"^<!--\s*cost:\s*(.+?)\s*-->$")
+HEBREW_WORD = re.compile(r"^[\u05d0-\u05ea]")
 RLM = "‏"
 LITERAL_COLOUR = re.compile(r'(?:fill|stroke|color)\s*(?:=\s*"|:\s*)\s*(#[0-9a-fA-F]{3,8}|white|black|red|green|blue|gray|grey|orange)\b')
 LATIN_START = re.compile(r"^[A-Za-z`\\]")
@@ -69,6 +74,13 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     for n, raw in enumerate(lines, 1):
         line = raw.rstrip()
         stripped = line.strip()
+        cost = COST_RE.match(stripped)
+        if cost and not in_code:
+            if current is not None:
+                current["cost"] = n
+            for chip in cost.group(1).split(" | "):
+                if not HEBREW_WORD.match(chip.strip()):
+                    problems.append(f"{n}: cost chip without a Hebrew label first: {chip.strip()[:30]!r}")
 
         # fenced code
         m = re.match(r"^(\s*)```", line)
@@ -179,6 +191,9 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
                 problems.append(f"{n}: starts with Latin/code, add RLM (U+200F): {cell[:40]!r}")
                 break
 
+    for sol in solutions:
+        if 4 in sol["labels"] and "cost" not in sol:
+            problems.append(f"{sol['line']}: solution with a complexity block has no <!-- cost: ... --> chips line")
     if interviewer != 1:
         problems.append(f"expected one ??? interviewer block, found {interviewer}")
     if hint_numbers and hint_numbers != sorted(hint_numbers):

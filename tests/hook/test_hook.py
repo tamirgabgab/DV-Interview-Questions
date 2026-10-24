@@ -74,3 +74,12 @@ def test_explorer_scripts_per_page():
         assert "nope" in str(e)
     else:
         raise AssertionError("an unknown kind must fail the build")
+
+
+def test_cost_chips():
+    md = "??? success \"x\"\n    !!! answer \"y\"\n        z\n\n    <!-- cost: זמן \\( O(n) \\) | פלופים 2 -->\n"
+    out = hook.COST_LINE.sub(hook._cost_chips, md)
+    assert ('    <div class="cost-chips" role="note" aria-label="סיבוכיות" data-search-exclude>'
+            '<span class="cost-chip"><b>זמן</b> \\( O(n) \\)</span>'
+            '<span class="cost-chip"><b>פלופים</b> 2</span></div>\n') in out
+    assert "<!--" not in out
