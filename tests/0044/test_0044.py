@@ -183,3 +183,49 @@ def test_figures_up_to_date():
 def test_generator_gaps():
     assert q0044.gaps(1, 10, 6) == [1, 9, 8, 7, 6, 5, 5]
     assert q0044.gaps(4, 5, 5) == [4, 3, 2, 3, 2, 3]
+
+
+def test_explorer_state_diagram():
+    """The state diagram box (kapgraph): the chain of every number in every base from 2 to
+    12, and of sampled numbers up to base 20, against the simulation: the nodes until a
+    value comes back, the cycle (the fixed point, 000, or two values in an odd base), and
+    the stage of each node from the rows of the closed form."""
+    import json
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(44)
+    cases = [(B, x) for B in range(2, 13) for x in range(B ** 3)]
+    cases += [(B, rng.randrange(B ** 3)) for B in range(13, 21) for _ in range(150)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map(([B, x]) => {{
+        const c = m.kapgChain(x, B), d = m.kapnDigits(x, B), d0 = Math.max(...d) - Math.min(...d);
+        return [c.nodes, c.cycleStart, c.cycleLen, c.nodes.map((_, i) => m.kapgStage(d0, i, B))];
+      }})));""")
+    for (B, x), (nodes, start, length, stages) in zip(cases, got):
+        want, y = [x], step(x, B)
+        while y not in want:
+            want.append(y)
+            y = step(y, B)
+        assert nodes == want and start == want.index(y) and length == len(want) - start
+        d0 = gap(x, B)
+        cyc = set(want[start:])
+        if d0 == 0:
+            assert cyc == {0}
+        elif B % 2 == 0:
+            assert cyc == {(B * B - 1) * B // 2}
+        else:
+            h = (B - 1) // 2
+            assert cyc == {(B * B - 1) * h, (B * B - 1) * (h + 1)}
+        assert stages[0] == "start"
+        for n in range(1, len(want)):
+            if d0 == 0:
+                assert stages[n] == "zero"
+            elif n == 1:
+                assert stages[n] == "first"
+            else:
+                assert stages[n] in ("line", "fixed", "cycle")
+                if stages[n] in ("fixed", "cycle"):
+                    assert n >= start

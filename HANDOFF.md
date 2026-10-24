@@ -1976,6 +1976,16 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     digits (`kapnStep`, `kapnRun`, `kapnGap`, `kapnFormula`, tested against the
     simulation for every base and starting gap). 0012's follow-up now links to 0044.
     Round Z's Z203, Z210 and Z217 are marked done (0039, 0040, 0041).
+30. **0044: a state diagram at the top of the page (the owner's ask).** The owner's
+    answers: one new box after the statement (the three `kapn` boxes stay in the parts),
+    a snake layout closed by a loop or a back arrow, everything shown at once, and on
+    every card the number in the base and in decimal, the gap d as the card's shade and
+    the stage of the proof. `kapgraph` (in `kapn.js`): base 2 to 20 (digits up to J),
+    three digits typed or drawn; cards right to left then back (one column under 520 px,
+    redrawn by a ResizeObserver), elbow arrows between rows, a 2-cycle kept on one row;
+    the table of a_n, b_n, c_n, d_n with the closed form checked on every row and the
+    repeated value last; a tap on a card or a row explains that step (`kapgChain`,
+    `kapgStage`; tested on every number of bases 2 to 12 and samples up to 20).
 ---
 
 ## In progress
@@ -2020,7 +2030,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   asks): batches 1 (J294, J298, J300), 2 (J293, J297, J299) and 3 (J295, J296) are
   done; round J is closed and on `main` (the owner's go, CI green on e611961). Rounds I
   to L of the second series are all done. Question 0044 (Kaprekar after n steps, from
-  the owner's write-up) is on the branch; `main` when the owner asks. Next: the owner's pick from the open
+  the owner's write-up, with the state diagram box) is on the branch; `main` when the
+  owner asks. Next: the owner's pick from the open
   proposals (second series A to E, the new questions of M to R and Z, the deferred
   G222, H223, H224).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
