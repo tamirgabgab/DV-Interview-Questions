@@ -2877,3 +2877,43 @@ body.practice-mode .md-typeset .question-tools {
   .md-typeset .explorer .ob-tag { flex-direction: row; justify-content: flex-start; gap: 0.5rem; }
   .md-typeset .explorer .ob-tag b { font-size: 1.1rem; }
 }
+
+/* The largest square and rectangle of ones (0046): the grid to edit and the dp (or heights)
+   matrix side by side, both left to right as matrices are; the current cell framed, the
+   neighbours dp read tinted, the stack's columns underlined, the best shape so far outlined
+   in orange, the rectangle being checked dashed, a dragged selection dashed in blue and
+   the answer green at the end. The boxes are grid items over the cells they cover. */
+.md-typeset .explorer .mo-panels { display: flex; flex-wrap: wrap; gap: 0.8rem 1.6rem; justify-content: center; margin: 0.5rem 0; }
+.md-typeset .explorer .mo-panel { flex: 0 1 auto; min-width: 0; max-width: 100%; margin: 0; }
+.md-typeset .explorer .mo-panel figcaption { margin: 0 auto 0.3rem; max-width: 22rem; font-size: 0.68rem; text-align: center; }
+.md-typeset .explorer .mo-grid { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1.75rem)); gap: 2px; width: max-content; max-width: 100%; margin: 0 auto; }
+.md-typeset .explorer .mo-r { display: contents; }
+.md-typeset .explorer .mo-cell { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; min-width: 0; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--viz-grid); background: var(--md-default-bg-color); color: var(--viz-text); font-family: var(--md-code-font-family); font-size: 0.7rem; line-height: 1; user-select: none; }
+.md-typeset .explorer .mo-dense .mo-cell { border-radius: 2px; font-size: 0.6rem; }
+.md-typeset .explorer .mo-in { touch-action: none; }
+.md-typeset .explorer .mo-in .mo-cell { cursor: pointer; }
+.md-typeset .explorer .mo-in .mo-cell.is-1 { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .mo-in .mo-cell:focus-visible { position: relative; z-index: 3; outline: 2px solid var(--md-accent-fg-color); outline-offset: 1px; }
+.md-typeset .explorer .mo-dp .mo-cell.is-wait { background: transparent; }
+.md-typeset .explorer .mo-dp .mo-cell.is-pos { background: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .mo-cell.is-row { box-shadow: inset 0 0 0 1px var(--viz-text); }
+.md-typeset .explorer .mo-cell.is-cur { box-shadow: inset 0 0 0 2.5px var(--viz-ink); }
+.md-typeset .explorer .mo-dp .mo-cell:is(.is-nb, .is-pop) { background: color-mix(in srgb, var(--viz-s4) 32%, var(--md-default-bg-color)); }
+.md-typeset .explorer .mo-dp .mo-cell.is-stack { background-image: linear-gradient(to top, var(--viz-s4) 3px, transparent 3px); }
+.md-typeset .explorer .mo-cell.is-win { background: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .mo-box { z-index: 2; margin: -2px; border-radius: 4px; pointer-events: none; }
+.md-typeset .explorer .mo-box--best { border: 3px solid var(--viz-s2); }
+.md-typeset .explorer .mo-box--cand { border: 2.5px dashed var(--viz-s4); }
+.md-typeset .explorer .mo-box--sel { border: 2px dashed var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 14%, transparent); }
+.md-typeset .explorer .mo-box--win { border: 3px solid var(--viz-s3); }
+.md-typeset .explorer .mo-edit-hint { margin: 0.2rem 0; color: var(--viz-text); font-size: 0.65rem; }
+.md-typeset .explorer :is(.mo-step, .mo-code) { margin: 0.3rem 0; font-size: 0.72rem; }
+.md-typeset .explorer .mo-step:empty, .md-typeset .explorer .mo-code:empty { display: none; }
+.md-typeset .viz-legend :is(.mo-key-one, .mo-key-cur, .mo-key-nb, .mo-key-cand, .mo-key-best, .mo-key-win) { border-radius: 3px; }
+.md-typeset .viz-legend .mo-key-one { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); }
+.md-typeset .viz-legend .mo-key-cur { background: transparent; outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; }
+.md-typeset .viz-legend .mo-key-nb { background: color-mix(in srgb, var(--viz-s4) 32%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .mo-key-cand { background: transparent; outline: 2px dashed var(--viz-s4); outline-offset: -2px; }
+.md-typeset .viz-legend .mo-key-best { background: transparent; outline: 3px solid var(--viz-s2); outline-offset: -3px; }
+.md-typeset .viz-legend .mo-key-win { background: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
+.md-typeset .explorer.mo-is-rect .mo-key-nb-wrap, .md-typeset .explorer:not(.mo-is-rect) .mo-key-cand-wrap { display: none; }

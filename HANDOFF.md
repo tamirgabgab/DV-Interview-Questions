@@ -2095,6 +2095,29 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     The `oddball` box (two boxes: part b fixed at 12, part c free): a row of balances per
     weighing, the decision table, a scenario from a row or from the ball and kind fields.
     Verilator was built locally from the CI's pinned commit for this (with z3).
+36. **New question 0046, the largest square and rectangle of ones (the owner's write-up).**
+    Checked first: both Python solvers against a brute force on 10,000 random grids up to
+    7 × 7, the dp table of the square example, (9, (0, 2), (2, 4)) and the second 3 × 3
+    square, the heights per row of the rectangle example (best 4, 8, 6), the stack trace
+    of row 1 (areas 2, 4, 6, 8, 5) and the 2 × 2 square of that grid. All hold. The
+    owner's "common mistake" note had no example; the trap uses [[0, 1], [1, 1]] (width 2
+    and height 2 at (1, 1), best rectangle 2). Answers: a box in each part (square, then
+    rectangle, with a mode select), a grid up to 16 × 16 edited by tap, drag (then set to
+    1 or 0) and a random fill at a probability of 1, the heights and the stack with the
+    rectangle being checked, SystemVerilog and Python with the owner's tester. The page
+    keeps the owner's Python as sent and adds SystemVerilog (`shape_t`, corners -1 for no
+    shape, `bit grid[][]`). The tester sits in the interviewer block fenced as `py`, not
+    `python`: the run panel and `load_python` run the python blocks in page order, and the
+    tester calls the solvers before the solutions define them; the test runs it after
+    them. Kind `code`, junior / medium. Tests: pytest (every grid up to 3 × 3 and 2 × 5,
+    3,000 random grids, the edge cases, the owner's tester, the page numbers, the explorer
+    against the page for 155 grids up to 16 × 16: dp, heights, every stack event, the
+    answers and the tie counts), Verilator (the examples, the edge cases, 3,000 random
+    grids against a brute force). The `maxones` box: the grid and the dp (or heights)
+    matrix side by side, a step per cell (square) or per row update, push and pop
+    (rectangle), "next row" and "to the end", the best so far in orange, the checked
+    rectangle dashed, the answer green with the count of ties; the link carries the grid
+    and the step.
 ---
 
 ## In progress
@@ -2142,7 +2165,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   the owner's write-up, with the state diagram box) is on `main` (76311df). The owner's
   interface plan (work log items 31 to 33): rounds 1 (D195, C191, A181, A183), 2
   (D194, D197, C192), 3 (E200, E199, the box state) and 6 (E31, E33, E34, E36) are
-  done on the branch, and question 0045 (the odd ball, item 35); `main` when the owner
+  on `main` (f79491c) with question 0045 (the odd ball, item 35). Question 0046 (the
+  largest square and rectangle of ones, item 36) is on the branch; `main` when the owner
   asks. Still open: the rest of the second
   series A to E, the new questions of M to R and Z, the deferred G222, H223, H224, E35.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
