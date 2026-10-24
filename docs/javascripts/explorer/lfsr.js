@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { bitsOf, code, f, ltr, waveStrip } = dvqExplorers.lib;
+  const { answer, bitsOf, code, f, ltr, waveStrip } = dvqExplorers.lib;
 
   // LFSR (0036): the page's step and period on the mask of the taps (bit i of the mask is
   // s[i]; x^k is s[width - k]); the walk from a seed until a state repeats; the eight
@@ -239,6 +239,8 @@
         $(".lf-table").innerHTML = `<table><thead><tr><th>הפולינום</th><th>המסכה</th><th>אורך המחזור</th></tr></thead><tbody>` +
           rows.map((r) => `<tr class="${r.mask === st.mask ? "is-cur" : ""}${r.period === n ? " is-max" : ""}"><td>${polyHtml(r.mask)}</td><td>${code(bits(r.mask))}</td><td>${ltr(r.period)}${r.period === n ? " ✓" : ""}</td></tr>`).join("") +
           `</tbody></table>`;
+        answer(box, st.k >= total ? (maximal ? `הפולינום ${polyHtml(st.mask)} פרימיטיבי : מחזור מקסימלי של ${ltr(n)} צעדים.`
+          : `הפולינום ${polyHtml(st.mask)} אינו פרימיטיבי : מחזור של ${ltr(total)} צעדים בלבד מתוך ${ltr(n)}.`) : null, ".lf-table tr.is-cur");
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
       const total = () => lfsrWalk(st.mask, st.width, SEED).period;

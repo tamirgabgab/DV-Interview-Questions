@@ -892,6 +892,58 @@
   }
 }
 
+/* One layout for every explorer box (E200): core.js tags the children of each controls
+   row; inputs first, then the actions, then playback (play, steps, speed, the counter),
+   with one spacing and one button size. The keyboard hint is the box's status line at the
+   bottom. */
+.md-typeset .explorer .ex-controls { gap: 0.45rem 1rem; margin: 0.35rem 0; }
+.md-typeset .explorer .ex-controls > .ex-c-input { order: 1; }
+.md-typeset .explorer .ex-controls > .ex-c-action { order: 2; }
+.md-typeset .explorer .ex-controls > .ex-c-play { order: 3; }
+.md-typeset .explorer .ex-controls > .ex-c-other { order: 4; }
+.md-typeset .explorer .ex-controls button.md-button,
+.md-typeset .explorer .ex-controls .ex-c-action,
+.md-typeset .explorer .ex-controls .ex-c-play:is(button) {
+  min-height: 1.8rem;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.66rem;
+  line-height: 1.3;
+  margin: 0;
+}
+.md-typeset .explorer .ex-keys {
+  margin: 0.7rem 0 0;
+  padding-top: 0.35rem;
+  border-top: 1px dashed var(--viz-grid);
+}
+
+/* The answer lights up (E199): the answer's line under the summary and its elements
+   outlined in the figure or the table. */
+.md-typeset .explorer .ex-answer {
+  margin: 0.4rem 0;
+  padding: 0.3rem 0.6rem;
+  border-inline-start: 3px solid var(--viz-s3);
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, var(--viz-s3) 10%, transparent);
+  font-weight: 600;
+}
+.md-typeset .explorer .ex-answer[hidden] { display: none; }
+.md-typeset .explorer .ex-answer__tag {
+  margin-inline-end: 0.35rem;
+  padding: 0 0.45rem;
+  border-radius: 1rem;
+  background: var(--viz-s3-text);
+  color: var(--md-default-bg-color);
+  font-size: 0.62rem;
+}
+.md-typeset .explorer svg .ex-answer-mark:not(#_) { stroke: var(--viz-s3); stroke-width: 3.5px; paint-order: stroke; }   /* :not(#_) outranks a view's own state colours */
+.md-typeset .explorer svg line.ex-answer-mark:not(#_) { stroke-width: 4px; }
+.md-typeset .explorer tr.ex-answer-mark > td { background: color-mix(in srgb, var(--viz-s3) 16%, transparent); }
+.md-typeset .explorer :not(svg *).ex-answer-mark:not(tr) { outline: 2px solid var(--viz-s3); outline-offset: 1px; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .explorer .ex-answer:not([hidden]) { animation: ex-answer-in 0.35s ease-out; }
+  @keyframes ex-answer-in { from { opacity: 0; transform: translateY(-3px); } }
+}
+
 /* Legends on a phone (D197): each entry a compact chip, the chips wrapping onto two or
    three tight rows instead of one entry per line. */
 @media screen and (max-width: 30em) {

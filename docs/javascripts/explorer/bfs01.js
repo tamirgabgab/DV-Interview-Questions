@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { W, X0, f, ltr } = dvqExplorers.lib;
+  const { W, X0, answer, f, ltr } = dvqExplorers.lib;
 
   // Smallest 0/1 multiple (0005): the page's BFS over the remainders modulo x, one frame
   // per dequeue: the remainder taken out, its children (the smaller digit first) with
@@ -183,6 +183,8 @@
           : `עבור ${ltr(`x = ${st.x}`)}${st.digits.join("") === "01" ? "" : ` והספרות ${ltr(digitsText())}`} : ה-BFS מוציא מהתור ${ltr(c.dequeues)} שאריות${c.dequeues < st.x ? ` (פחות מ-${ltr(st.x)})` : ""}. ` +
             `לשם השוואה, המעבר על המספרים מהספרות ${ltr(digitsText())} בודק ${ltr(big(c.enumerated))} מספרים, והמעבר על הכפולות של ${ltr(st.x)} בודק ${ltr(big(c.multiples))}.`;
         $(".bf-mem").innerHTML = st.lenOnly ? memLine() : "";
+        answer(box, !finished || none ? null : st.lenOnly ? `לכפולה הקטנה ביותר של ${ltr(st.x)} יש ${ltr(tr.depth[0])} ספרות.`
+          : `הכפולה הקטנה ביותר של ${ltr(st.x)} מהספרות ${ltr(digitsText())} היא ${ltr(tr.answer)}.`, ".bf-ring circle.is-path");
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
       const total = () => bfs01Trace(st.x, st.digits).frames.length;

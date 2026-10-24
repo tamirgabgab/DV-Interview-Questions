@@ -196,6 +196,20 @@
         if (x1 === r[0] && y1 === r[1]) return false;
         sand[k] = [x1, y1, x1 + w, y1 + h]; drawSand(); return true;
       };
+      // the two sandbox shapes ride in the copy link and the remembered state once moved
+      const SAND0 = JSON.stringify([sand.a, sand.b]);
+      box.dvqExtra = {
+        get: () => (JSON.stringify([sand.a, sand.b]) === SAND0 ? "" : `${sand.a.join(".")}-${sand.b.join(".")}`),
+        set: (text) => {
+          const rs = text.split("-").map((r) => r.split(".").map(Number));
+          const ok = rs.length === 2 && rs.every((r) => r.length === 4 && r.every(Number.isInteger)
+            && r[0] >= 1 && r[0] < r[2] && r[2] <= sand.N && r[1] >= 1 && r[1] < r[3] && r[3] <= sand.M);
+          if (!ok) return false;
+          [sand.a, sand.b] = rs;
+          drawSand();
+          return true;
+        },
+      };
       let drag = null;
       const at = (e) => { const svg = box.querySelector(".sh-sandbox"), p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const q = p.matrixTransform(svg.getScreenCTM().inverse()); return [Math.round((q.x - 30) / SU) + 1, sand.M - Math.round((q.y - 10) / SU)]; };
       $(".sh-sand-svg").addEventListener("pointerdown", (e) => {

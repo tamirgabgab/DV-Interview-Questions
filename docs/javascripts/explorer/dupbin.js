@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { autoplay, f, floydParse, ltr, seedControls, speedSel } = dvqExplorers.lib;
+  const { answer, autoplay, f, floydParse, ltr, seedControls, speedSel } = dvqExplorers.lib;
   const NB = " ";
 
   // The page's find_duplicate_binary step by step: each frame holds lo, hi, mid, the count
@@ -100,6 +100,7 @@
           (fr ? "" : ` לכן ${ltr(r.answer)} מופיע לפחות פעמיים.`);
         $(".ex-prev").disabled = st.k === 0;
         $(".ex-next").disabled = st.k >= r.frames.length;
+        answer(box, fr ? null : `הערך הכפול הוא ${ltr(r.answer)}, אחרי ${ltr(r.frames.length)} צעדים של חיפוש בינארי על הערכים.`, ".db-cells .hl");
       };
       const setNums = (nums) => { stop(); st.nums = nums; st.k = 0; $(".ex-n").value = nums.length - 1; $(".fl-err").textContent = ""; draw(); };
       let stop = () => {};

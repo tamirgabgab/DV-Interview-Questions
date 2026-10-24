@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { W, f, frame, ltr, speedSel } = dvqExplorers.lib;
+  const { W, answer, f, frame, ltr, speedSel } = dvqExplorers.lib;
 
   // Wolf, goat and cabbage (0032): a state is four bits (farmer 1, wolf 2, goat 4,
   // cabbage 8; 0 near, 1 far). riverSafe is the page's test, riverMoves the crossings
@@ -119,7 +119,7 @@
         for (let s = 0; s < 16; s++) {
           const ok = riverSafe(s);
           const cls = s === st.s ? "st-cur" : s === 0 || s === 15 ? "st-ok" : ok ? "st-cell" : "st-bad";
-          out += `<rect class="${cls}" x="${X(s) - 32}" y="${Y(s) - 20}" width="64" height="40" rx="6"/>` +
+          out += `<rect class="${cls}" data-s="${s}" x="${X(s) - 32}" y="${Y(s) - 20}" width="64" height="40" rx="6"/>` +
                  `<text class="st-text st-sm" x="${X(s)}" y="${Y(s) - 4}" text-anchor="middle">${bankText(s, 0)}</text><text class="st-text st-sm" x="${X(s)}" y="${Y(s) + 14}" text-anchor="middle">${bankText(s, 1)}</text>`;
           if (!ok) out += `<line class="pg-strike" x1="${X(s) - 26}" y1="${Y(s) + 16}" x2="${X(s) + 26}" y2="${Y(s) - 16}"/>`;
         }
@@ -203,7 +203,7 @@
         });
         $(".ex-undo").disabled = n === 0 || !!timer;
         $(".river-graph").innerHTML = graphSvg();
-
+        answer(box, s === 15 ? `כולם עברו בשלום אחרי ${ltr(n)} חציות${n === 7 ? ", המספר הקטן ביותר" : ""}.` : null, '.river-graph rect[data-s="15"]');
       };
       const cross = (item) => {
         const nxt = st.s ^ 1 ^ (item ? RIVER[item] : 0);

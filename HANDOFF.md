@@ -2034,6 +2034,26 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       tab change): the first cell as the card's title, the other cells as "column value"
       pairs in two columns. Nineteen pages have such tables at 390 px (0016's 20-row table
       among them); the row-per-value tables (0013, 0044) stay tables.
+33. **The owner's interface plan, round 3 (E200, E199, the 0020 / 0014 state; G222 stays
+    deferred).** Answers: a shared layer without rewriting the boxes, the answer lit in
+    the boxes with one clear result, the state in both the link and the memory.
+    - E200: `layout(box)` in `core.js` runs after every mount and tags each child of an
+      `.ex-controls` row `ex-c-input` / `ex-c-action` / `ex-c-play` / `ex-c-other`; CSS
+      `order` shows inputs, then actions, then playback, with one gap and one button
+      size, and the keyboard hint is a status line with a dashed rule at the bottom. The
+      DOM order is untouched, so every old `#ctl-` link and remembered state still
+      applies.
+    - E199: `lib.answer(box, text, marks)`: a `p.ex-answer` ("התשובה" tag and one line)
+      after the box's summary, and `ex-answer-mark` on the answer's elements (an SVG
+      stroke in the green series colour, `:not(#_)` to outrank the views' state colours;
+      a tinted table row; an outline otherwise). Called at the end of the draw of
+      josephus (the survivor), floyd and dupbin (the duplicate), kaprekar, kapbase and
+      kapgraph (where the chain ends), eggs (the threshold), bfs01 (the path), river (the
+      goal state), lfsr (the polynomial's row, primitive or not) and horses (the top c).
+    - The state: `box.dvqExtra = { get, set }` in core; its text rides at the end of the
+      `#ctl-` payload as `~!<text>` and is applied after the controls. `pcie` stores the
+      clicked cuts as hex addresses ("-" for none), `shapes` the two sandbox rectangles
+      once moved. Checked by clicking: the link and a reload bring both back.
 ---
 
 ## In progress
@@ -2079,11 +2099,11 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   done; round J is closed and on `main` (the owner's go, CI green on e611961). Rounds I
   to L of the second series are all done. Question 0044 (Kaprekar after n steps, from
   the owner's write-up, with the state diagram box) is on `main` (76311df). The owner's
-  interface plan (work log items 31 and 32): rounds 1 (D195, C191, A181, A183) and 2
-  (D194, D197, C192) are done on the branch; next round 3 (E200, E199, the 0020 / 0014 state;
-  not G222) and round 6 (E31, E33, E34, E36; not E35), each after multiple-choice
-  questions. Still open after that: the rest of the second series A to E, the new
-  questions of M to R and Z, the deferred G222, H223, H224.
+  interface plan (work log items 31 to 33): rounds 1 (D195, C191, A181, A183), 2
+  (D194, D197, C192) and 3 (E200, E199, the box state) are done on the branch; next
+  round 6 (E31, E33, E34, E36; not E35), its questions already answered. Still open
+  after that: the rest of the second series A to E, the new questions of M to R and Z,
+  the deferred G222, H223, H224.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2106,7 +2126,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 ### Content
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
-- [ ] Explorer state outside the controls is not in the box link or the remembered state
+- [x] ~~Explorer state outside the controls is not in the box link or the remembered state~~ (done in session 22 with `box.dvqExtra`, work log item 33)
   (code review, session 22): the hand-made cuts in 0020 and the dragged sandbox shapes in
   0014 come back as the greedy split and the start positions after a reload or from a
   copied link. Give these boxes an `opts.state` codec like the five boxes that have one,
@@ -2650,8 +2670,8 @@ What the short research found (sources in the chat summary of 2026-10-22):
 | Id | Idea | Size |
 |---|---|---|
 | E198 | **Purposeful transitions**: values and cells move between states (tweened bus values, sliding queue chips, growing arcs), off under `prefers-reduced-motion` | M |
-| E199 | **The answer lights up**: when a box reaches its result, the element that is the answer (the duplicate, the survivor, the maximal polynomial) is outlined and named in one line | S–M |
-| E200 | **One layout for all 34 boxes**: control groups in a fixed order (input, playback, output), a status line at the bottom, the same spacing and button sizes, documented once | M |
+| ~~E199~~ | ~~**The answer lights up**: when a box reaches its result, the element that is the answer (the duplicate, the survivor, the maximal polynomial) is outlined and named in one line~~ done in 11 kinds (session 22) | S–M |
+| ~~E200~~ | ~~**One layout for all 34 boxes**: control groups in a fixed order (input, playback, output), a status line at the bottom, the same spacing and button sizes, documented once~~ done as a shared layer in `core.js` (session 22) | M |
 | E201 | **A first-visit guide** on one box per page: three dismissible hints pointing at the main control, the figure and the summary, remembered per browser | S–M |
 
 Suggested order: A181 and C191 (small, visible on every page), D195 then D194 (the phone

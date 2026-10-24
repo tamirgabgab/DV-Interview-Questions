@@ -252,6 +252,18 @@
         $(".ex-len").value = st.len; $(".ex-mps").value = st.mps; $(".ex-rcb").value = st.rcb;
         draw();
       });
+      // the clicked cuts ride in the copy link and the remembered state: hex addresses, "-"
+      // for no cut at all, nothing while the greedy split is shown
+      box.dvqExtra = {
+        get: () => (st.cuts === null ? "" : st.cuts.length ? st.cuts.map((b) => b.toString(16)).join(".") : "-"),
+        set: (text) => {
+          const cuts = text === "-" ? [] : text.split(".").map((h) => (/^[0-9a-f]+$/i.test(h) ? parseInt(h, 16) : NaN));
+          if (cuts.some((b) => Number.isNaN(b))) return false;
+          st.cuts = cuts.sort((u, v) => u - v);
+          draw();
+          return true;
+        },
+      };
       $(".ex-reset").addEventListener("click", () => {
         Object.assign(st, defaults, { cuts: null });
         $(".ex-addr").value = st.addr; $(".ex-len").value = st.len; $(".ex-mps").value = st.mps; $(".ex-rcb").value = st.rcb; $(".ex-preset").value = "";

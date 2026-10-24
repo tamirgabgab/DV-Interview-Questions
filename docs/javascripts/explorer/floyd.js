@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { H, STATE_CODECS, W, f, floydParse, floydTrace, ltr, seedControls } = dvqExplorers.lib;
+  const { H, STATE_CODECS, W, answer, f, floydParse, floydTrace, ltr, seedControls } = dvqExplorers.lib;
 
   // Find the duplicate (0017): nums has n + 1 values in 1..n. The walk i -> nums[i] from
   // 0 is a tail and a cycle (the rho); the entry of the cycle is a duplicate value.
@@ -128,6 +128,7 @@
         $(".fl-sum").innerHTML = `הזנב : ${rho.mu === 0 ? "ריק" : ltr(rho.tail.join(" → "))} (${ltr(`μ = ${rho.mu}`)}), המעגל : ${ltr(rho.cycle.join(" → "))} (${ltr(`λ = ${rho.lambda}`)}). ` +
           `המפגש אחרי ${ltr(tr.frames.findIndex((g) => g.phase === 2) - 1)} איטרציות, ושלב 2 לוקח ${ltr(rho.mu)}. התשובה : ${ltr(tr.answer)}.` +
           (rho.others.length ? ` האינדקסים ${ltr(rho.others.join(", "))} לא נגישים מ-0 ולא משנים כלום.` : "");
+        answer(box, last ? `הערך הכפול הוא ${ltr(tr.answer)} : הכניסה למעגל, שהצב והארנב נפגשים בה בשלב 2.` : null, ".fl-cells .hl");
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
       const setNums = (nums) => { stop(); st.nums = nums; st.k = 0; $(".ex-n").value = nums.length - 1; $(".fl-err").textContent = ""; draw(); };

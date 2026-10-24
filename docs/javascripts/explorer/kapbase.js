@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { BASE, H, KB_DIGITS, W, X0, autoplay, f, frame, ltr, seedControls, speedSel } = dvqExplorers.lib;
+  const { BASE, H, KB_DIGITS, W, X0, answer, autoplay, f, frame, ltr, seedControls, speedSel } = dvqExplorers.lib;
 
   // Sort the digits and subtract in base b (0012 part c): one step on three digits, the
   // attractor (the fixed point of an even base, the two values of the cycle of an odd
@@ -100,6 +100,10 @@
             (done ? (att.includes(sp.diff) ? ` <b>${ltr(kbText(sp.diff, b))} ${b % 2 === 0 ? "היא נקודת השבת" : "במחזור"}</b>${b % 2 === 0 ? " : הצעד הבא מחזיר אותה לעצמה ✓" : ` : הצעד הבא נותן ${ltr(kbText(kbStep(sp.diff, b).diff, b))}, ואז שוב ${ltr(kbText(sp.diff, b))} ✓`}` : "") : "");
         }
         $(".kb-step").innerHTML = text;
+        const end = chain[total];
+        answer(box, done && total > 0 ? `${ltr(kbText(st.x, b))} מגיע אחרי ${ltr(total)} ${total === 1 ? "צעד" : "צעדים"} ל-<b>${ltr(kbText(end, b))}</b>` +
+          (end === 0 ? " (כל הספרות שוות)." : b % 2 === 0 ? ", נקודת השבת של בסיס " + ltr(b) + "." : `, שבמחזור ${ltr(attText[0])} ↔ ${ltr(attText[1])}.`) : null,
+          ".kb-table tr.is-last");
         // the map of d with the path so far
         const W = 420, Hh = 150, X0 = 22, X1 = 398, YA = 90, X = (d) =>   // 420 wide: readable at phone width
            (b > 2 ? X0 + ((d - 1) * (X1 - X0)) / (b - 2) : (X0 + X1) / 2);

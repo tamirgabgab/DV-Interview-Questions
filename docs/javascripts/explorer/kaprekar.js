@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { BASE, H, f, frame, ltr, seedControls } = dvqExplorers.lib;
+  const { BASE, H, answer, f, frame, ltr, seedControls } = dvqExplorers.lib;
 
   // Sort the digits and subtract (0012 with 3 digits, 0013 with 4): one step of the
   // routine, the chain of steps until the value stops changing (495 or 6174, or 0 for
@@ -119,6 +119,8 @@
         const toFixed = H.ends[FIXED] || 0, toZero = H.ends[0] || 0, longest = hist.length - 1;
         $(".kp-sum").innerHTML = `מתוך ${ltr(num(MAX + 1))} המספרים, ${ltr(num(toFixed))} מגיעים ל-${ltr(FIXED)} (אחרי ${ltr(longest)} צעדים לכל היותר) ו-${ltr(num(toZero))} מגיעים ל-0 : אלה המספרים שכל הספרות שלהם שוות${d === 3 ? "" : ""}. ` +
           `רק ${ltr(`0 ו-${FIXED}`)} מיוחדים, כלומר נעצרים ב-0 צעדים.`;
+        answer(box, c.fixed ? `${ltr(pad(st.x))} מגיע ל-<b>${ltr(pad(c.end))}</b> אחרי ${c.length === 1 ? "צעד אחד" : `${ltr(c.length)} צעדים`}${c.end === 0 ? " (כל הספרות שוות)" : ""}.` : null,
+          ".kp-table tr.is-last");
 
       };
       const set = (x) => { if (Number.isInteger(x) && x >= 0 && x <= MAX) st.x = x; draw(); };

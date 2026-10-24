@@ -328,6 +328,26 @@
   };
   const code = (t) => `<code>${t}</code>`;
 
+  // The answer lights up (E199): when a box reaches its result, answer(box, text, marks)
+  // outlines the elements that are the answer (an array, a NodeList or a selector inside
+  // the box) and names it in one line under the box's summary; answer(box, null) clears
+  // both. A view calls it after every draw, so the marks follow the redrawn figure.
+  const answer = (box, text, marks = []) => {
+    box.querySelectorAll(".ex-answer-mark").forEach((el) => el.classList.remove("ex-answer-mark"));
+    let line = box.querySelector(":scope > .ex-answer");
+    if (!text) { if (line) line.hidden = true; return; }
+    if (!line) {
+      line = document.createElement("p");
+      line.className = "ex-answer";
+      line.setAttribute("role", "status");
+      const at = box.querySelector(":scope > .ex-summary") || box.querySelector(":scope > .ex-controls:last-of-type");
+      if (at) at.after(line); else box.append(line);
+    }
+    line.hidden = false;
+    line.innerHTML = `<span class="ex-answer__tag">התשובה</span> ${text}`;
+    (typeof marks === "string" ? box.querySelectorAll(marks) : marks).forEach((el) => el && el.classList.add("ex-answer-mark"));
+  };
+
   const header = (box, helpOpen) => {
     const bar = document.createElement("div");
     bar.className = "ex-bar";
@@ -447,7 +467,10 @@
   // the field when it was built is the page's own example, not a draw). A box with its own
   // codec (opts.state of seedControls) links with `#state-<kind>.<payload>` instead.
   // Applying a payload sets each control in turn and fires its input and change events,
-  // so a control that adds others (the bins of 0041) is set before the ones it adds.
+  // so a control that adds others (the bins of 0041) is set before the ones it adds. A box
+  // whose state goes beyond its controls (the cuts clicked in 0020, the shapes dragged in
+  // 0014) sets box.dvqExtra = { get() → text or "", set(text) → ok }: its text rides as a
+  // last part "!<text>" and is applied after the controls.
   const CTL_HASH = /^#ctl-([a-z0-9-]+)-(\d+)\.(.*)$/;
   const controlsOf = (box) => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed"));
   const valueOf = (el) => (el.type === "checkbox" || el.type === "radio" ? (el.checked ? "1" : "0") : el.value);
@@ -455,7 +478,8 @@
   const payloadOf = (box) => {
     const seed = box.dvqSeed && box.dvqSeedAt ? box.dvqSeed.input.value : "";   // a field filled at mount is no draw
     const head = seed ? `${(box.dvqSeedAt || 0) > (box.dvqCtlAt || 0) ? "S" : "s"}${seed}` : "";
-    return [head, ...controlsOf(box).map((el) => enc(valueOf(el)))].join("~");
+    const extra = box.dvqExtra ? box.dvqExtra.get() : "";
+    return [head, ...controlsOf(box).map((el) => enc(valueOf(el))), ...(extra ? [`!${enc(extra)}`] : [])].join("~");
   };
   const setValue = (el, v) => {
     if (el.disabled || valueOf(el) === v) return;
@@ -467,6 +491,7 @@
   const applyPayload = (box, payload) => {
     let parts;
     try { parts = payload.split("~").map(decodeURIComponent); } catch (e) { return false; }
+    const extra = parts.length > 1 && parts[parts.length - 1].startsWith("!") ? parts.pop().slice(1) : null;
     const m = /^([sS])(\d+)$/.exec(parts.shift());
     const seed = () => {
       const n = m ? Number(m[2]) : 0;
@@ -475,6 +500,7 @@
     if (m && m[1] === "s") seed();
     parts.forEach((v, i) => { const el = controlsOf(box)[i]; if (el) setValue(el, v); });
     if (m && m[1] === "S") seed();
+    if (extra !== null && box.dvqExtra && !box.dvqExtra.set(extra)) return false;
     return true;
   };
   const indexOf = (box) => [...document.querySelectorAll(`.explorer[data-kind="${box.dataset.kind}"]`)].indexOf(box) + 1;
@@ -532,11 +558,30 @@
     ["input", "change", "click", "pointerup", "keyup"].forEach((ev) => box.addEventListener(ev, later));
   };
 
+  // One layout for every box (E200), without touching the views: every child of a
+  // controls row is tagged as an input (a label with a field), an action (a button that
+  // draws or resets), playback (play, step, the speed select, the step counter) or other,
+  // and the CSS shows them in that order with the same spacing and button size. The DOM
+  // order stays, so the link payloads (the controls in document order) do not change.
+  const PLAYBACK = "button.ex-play, button.ex-next, button.ex-prev, button.ex-start, button.ex-end, button.ex-first, " +
+    "button.ex-last, button.ex-solve, button.ex-cycle, button.ex-step, .ex-pos";
+  const layout = (box) => {
+    box.querySelectorAll(".ex-controls").forEach((row) => {
+      for (const el of row.children) {
+        const kind = el.matches(PLAYBACK) || el.querySelector("select.ex-speed") ? "play"
+          : el.matches("label") || el.querySelector("input, select, textarea") ? "input"
+          : el.matches("button, .md-button") ? "action" : "other";
+        el.classList.add(`ex-c-${kind}`);
+      }
+    });
+  };
+
   const setup = (box, helpOpen = false) => {
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
     box.dvqSeedAt = box.dvqCtlAt = 0;                    // a rebuilt box has drawn nothing yet
     make(box).mount(box);
+    layout(box);
     header(box, helpOpen);
     keyboard(box);
     decorateLive(box);
@@ -587,7 +632,7 @@
   };
   const lib = {
     BASE, EPS, H, KB_DIGITS, RAND_HASH, RIGHT, SEED_MAX, STATE_CODECS, TOP, TRI_M, W, X0,
-    arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, f, floydParse, floydTrace, fmt, frame, hline,
+    answer, arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, f, floydParse, floydTrace, fmt, frame, hline,
     ltr, mulberry32, newSeed, randNote, randomRow, seedControls, speedSel, stickyNames, triNorm, waveDromText, waveStrip,
   };
   globalThis.dvqExplorers = { lib, models, register, ready, linkOf };

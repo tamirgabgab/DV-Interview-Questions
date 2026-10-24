@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { f, frame, ltr } = dvqExplorers.lib;
+  const { answer, f, frame, ltr } = dvqExplorers.lib;
 
   const josephusZero = (n, L) => {
     let m = 1 + ((n - 1) % (L - 1));
@@ -180,6 +180,7 @@
           $(".ex-pos").textContent = `צעד ${st.s} מתוך ${steps.length}`;
           $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = done;
         }
+        answer(box, done ? `השורד הוא אדם ${ltr(survivor)}${big ? "" : `, אחרי ${ltr(steps.length)} צעדים`}.` : null, ".jos-circle circle.st-ok");
         const sim = survivor, how = big ? "בסימולציה ברשימה מקושרת" : "בסימולציה";
         const form = josephusFormula(n, L), M = josephusZero(n, L);
         const text = `עם ${ltr(`N = ${n}`)} ו-${ltr(`L = ${L}`)} השורד הוא ${sim} ${how}, והנוסחה ` +

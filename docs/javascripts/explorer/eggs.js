@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { BASE, H, TOP, W, X0, autoplay, f, ltr, seedControls, speedSel } = dvqExplorers.lib;
+  const { BASE, H, TOP, W, X0, answer, autoplay, f, ltr, seedControls, speedSel } = dvqExplorers.lib;
 
   // Egg drop (0039): F[e][t] is how many floors e eggs settle in t drops, capped at n
   // (the cap keeps the numbers small and changes no decision); the worst case is the
@@ -172,6 +172,8 @@
               (s.eggs === 1 ? ` (ביצה אחרונה : קומה אחר קומה).` : `.`));
         }
         $(".eg-step").innerHTML = step;
+        answer(box, done && st.step ? `הסף הוא קומה ${ltr(s.low)} : קומה ${ltr(s.low)} בטוחה ו-${ltr(s.high)} שוברת, אחרי ${ltr(st.step)} הטלות (לכל היותר ${ltr(st.worst)}).` : null,
+          ".eg-building .eg-thr");
         // the recurrence for the next drop, in words, next to the bands on the building
         if ($(".eg-rec").checked && !done) {
           const sp = eggsSplitAt(st.F, s.low, s.high, s.eggs, s.left), e = s.eggs, t = s.left;

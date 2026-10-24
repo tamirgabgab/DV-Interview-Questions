@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { H, W, X0, autoplay, f, ltr, mulberry32, seedControls, speedSel } = dvqExplorers.lib;
+  const { H, W, X0, answer, autoplay, f, ltr, mulberry32, seedControls, speedSel } = dvqExplorers.lib;
 
   // Horse races (0043): a horses with hidden speeds, b per race, the c fastest in order.
   // For every horse the set of horses known faster and known slower (transitively
@@ -219,6 +219,8 @@
             (done ? `<b>סיימנו אחרי ${ltr(st.step)} תחרויות.</b>` : `נשארו ${ltr(e.open.length)} מועמדים פתוחים${st.step < R ? `; התחרות הבאה : ${ltr(st.plan.log[st.step].horses.map(nm).join(", "))}` : ""}.`);
         }
         $(".hr-step").innerHTML = step;
+        answer(box, done ? `${ltr(st.c)} הראשונים, לפי הסדר : ${ltr(st.plan.ranking.map(nm).join(", "))}, אחרי ${ltr(R)} תחרויות.` : null,
+          st.plan.ranking.map((x) => box.querySelector(`.hr-gridbox .hr-cell[data-x="${x}"] rect`)));
       };
       let stop = () => {};
       const setParams = (a, b, c) => {

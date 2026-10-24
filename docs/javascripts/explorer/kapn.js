@@ -5,7 +5,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { KB_DIGITS, f, ltr, seedControls } = dvqExplorers.lib;
+  const { KB_DIGITS, answer, f, ltr, seedControls } = dvqExplorers.lib;
   const NB = " ";
 
   // Kaprekar's routine on three digits in base B (0044): one step, the direct digits after
@@ -280,6 +280,9 @@
           rows += `<tr data-i="${i}"${cls ? ` class="${cls}"` : ""}><td>${ltr(i)}</td><td>${ltr(txt(x))}</td><td>${ltr(KG_DIGITS[dg[0]])}</td><td>${ltr(KG_DIGITS[dg[1]])}</td><td>${ltr(KG_DIGITS[dg[2]])}</td><td>${ltr(d)}</td><td>${i === n ? "חוזר" : STAGE_NAME[stage]}</td><td>${check}</td></tr>`;
         });
         $(".kg-table").innerHTML = `<div class="at-scroll"><table class="bridge-table kg-steps"><thead><tr><th>‏n</th><th>המספר</th><th>‏a<sub>n</sub></th><th>‏b<sub>n</sub></th><th>‏c<sub>n</sub></th><th>‏d<sub>n</sub></th><th>השלב</th><th>הנוסחה</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        answer(box, d0 === 0 ? `${ltr(txt(st.x))} → ${ltr("000")}, ונשאר שם.` : ch.cycleLen === 1
+          ? `נקודת השבת ${ltr(cyc[0])}, אחרי ${ltr(k)} ${k === 1 ? "צעד" : "צעדים"}.`
+          : `המחזור ${ltr(`${cyc[0]} ↔ ${cyc[1]}`)}, מהצעד ה-${ltr(k)}.`, ".kg-graph .kg-node.is-end .kg-card");
         const i = st.sel;
         if (i === null || i >= all.length) $(".kg-step").innerHTML = d0 ? `לחיצה על כרטיס או על שורה מסבירה את הצעד. השורה האחרונה בטבלה היא הערך שחוזר, וממנו המעגל נסגר.` : "";
         else {
