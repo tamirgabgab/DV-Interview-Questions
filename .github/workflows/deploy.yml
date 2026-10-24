@@ -78,6 +78,9 @@ jobs:
           restore-keys: sv-${{ runner.os }}-
       - name: Lint the question pages (structure and RTL rules)
         run: python tools/lint_pages.py
+      # Every text and mark colour pair of the site, light and dark, against WCAG 2.
+      - name: Check the colour contrast of both schemes
+        run: python tools/check_contrast.py
       - name: Run question tests (Python + SystemVerilog)
         run: python tools/run_tests.py
 

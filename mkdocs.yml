@@ -7,6 +7,9 @@ edit_uri: edit/main/docs/
 
 theme:
   name: material
+  # overrides/: main.html adds the web app manifest (home-screen icon), 404.html the
+  # Hebrew "page not found" page
+  custom_dir: overrides
   language: he
   logo: assets/logo.svg
   favicon: assets/favicon.svg

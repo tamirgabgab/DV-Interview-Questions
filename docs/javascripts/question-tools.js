@@ -326,6 +326,25 @@
     frame.contentWindow.postMessage({ giscus: { setConfig: { theme } } }, "https://giscus.app");
   };
 
+  // Printing: every closed block opens (blocks hidden by practice mode stay hidden) and
+  // the dark scheme prints light; both are put back afterwards. The boxes are built by
+  // core.js on the same event.
+  let printed = null;
+  window.addEventListener("beforeprint", () => {
+    if (printed) return;                               // a second beforeprint before afterprint
+    const body = document.body, scheme = body.getAttribute("data-md-color-scheme");
+    const opened = Array.from(document.querySelectorAll("article details:not([open])")).filter((d) => !d.hidden);
+    opened.forEach((d) => { d.open = true; });
+    if (scheme === "slate") body.setAttribute("data-md-color-scheme", "default");
+    printed = { opened, scheme };
+  });
+  window.addEventListener("afterprint", () => {
+    if (!printed) return;
+    printed.opened.forEach((d) => { d.open = false; });
+    if (printed.scheme) document.body.setAttribute("data-md-color-scheme", printed.scheme);
+    printed = null;
+  });
+
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("input[name='__palette']").forEach((i) => i.addEventListener("change", () => setTimeout(giscusTheme, 50)));
     document.querySelectorAll(".question-tools").forEach(setup);

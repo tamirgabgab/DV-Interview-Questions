@@ -2161,6 +2161,30 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     unless the address has `?guide`. Also fixed: on phones the first three toolbar
     tooltips overflowed the right edge; they now open leftwards. axe on the message and
     the guide (light and dark, 390 px): no violations.
+39. **Part 7 of the look-and-feel plan (UI331, UI332, the 404 page, print, home screen).**
+    The owner picked the contrast check in CI and softer dark tones (not the colour-blind
+    pass or the old axe findings), the kind and the main pages on the social cards, the
+    Hebrew 404 with a guess by id, printing and the home-screen icon.
+    `tools/check_contrast.py` reads Material's tokens from the installed theme and ours
+    from `extra.css`, composites translucent layers, and checks 30 pairs per scheme (text
+    4.5:1, marks 3:1); it runs in the CI test job and has tests in `tests/tools/`. It found
+    two light-mode marks under 3:1: the chart green (`--viz-s3` #1baf7a → #17a06e) and the
+    amber of the star and the sort arrows (new `--site-mark-color` #b07d00; the amber stays
+    for hovers and decoration). Dark: navy #243760 → #2a3d66, page #141a26 → #171f2d,
+    the box card a shade lighter with a visible shadow. The lighter page pushed the dark
+    series text (`--viz-s1-text`, `--viz-s3-text`, which were the mark colours) and the
+    keywords on highlighted code lines under 4.5:1 in the axe run (11 pages instead of 6):
+    the series text is now #5a9cf0 / #24b583, the code background stayed #1b2231, and
+    both are pairs in the check now; the dark phone run is back to its 6 old findings.
+    Social cards: the meta line in Hebrew first (an English level made the line LTR and
+    put it in the wrong order), the kind added, counts on the home and level pages from
+    `config.extra.dvq_cards` (the card cache hashes the rendered text, so counts refresh);
+    "interactive" was left out since every question has a box. 404: `overrides/404.html`
+    (custom_dir) with search, random, home and levels, and a guess from the address
+    (`config.extra.dvq_404`). Print: Material keeps every admonition whole
+    (`page-break-inside: avoid`), which left near-blank pages; print now lets them break,
+    opens the blocks on `beforeprint` (ignoring a second one), prints dark as light and
+    restores both after. Manifest and icons (`tools/make_icons.py`).
 ---
 
 ## In progress
@@ -2219,6 +2243,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   38) is done on the branch; part 7 (UI331, the social card's additions, a 404 page, and
   the print and home-screen additions if the owner picks them) is next, then `main` when
   the owner asks. Still open after that: part 5 (UI322, UI323).
+  Part 7 (item 39) is done on the branch as well.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2340,7 +2365,7 @@ generic look, with clearer and better explained answers. Findings that drove the
 
 | Topic | Decision |
 |-------|----------|
-| Colour palette | **Navy + amber** (variant 1 of three mock-ups: navy + amber, forest + gold, charcoal + teal). Light: primary `#1b2a4a`, accent `#d99a00`, links `#1f4e9c`. Dark: primary `#243760`, accent `#ffc233`, links `#8db3ff`, page background `#141a26`, code background `#1b2231` |
+| Colour palette | **Navy + amber** (variant 1 of three mock-ups: navy + amber, forest + gold, charcoal + teal). Light: primary `#1b2a4a`, accent `#d99a00`, links `#1f4e9c`. Dark: primary `#2a3d66` (was `#243760`), accent `#ffc233`, links `#8db3ff`, page background `#171f2d` (was `#141a26`), code background `#1b2231`; every pair is checked by `tools/check_contrast.py` |
 | Logo / favicon | A drawn SVG: digital waveform ending in an amber check mark (white on the navy header; navy rounded square for the favicon) |
 | Question id | A small label above a clean title; the id stays in the side navigation and the tables |
 | Footer | Site name + link to the repository, no personal name; the Material generator line is off |
@@ -3071,9 +3096,9 @@ Item numbers continue the global count (319 on).
 
 | Id | Idea | Size |
 |---|---|---|
-| ~~UI330~~ | ~~**An icon per kind** (puzzle, code, design, math, dv) used in the chips, cards, headers and boxes; a friendly 404 page~~ done (session 22, part 1 (kinds only; no 404 page yet)) | S–M |
-| UI331 | **Dark mode tuning**: a contrast pass, a softer navy, the figure palette checked for colour-blind pairs (C193's script) | S–M |
-| UI332 | **Social cards** for shared links (idea 17): the title, the chips and the logo as an image per question | S–M |
+| ~~UI330~~ | ~~**An icon per kind** (puzzle, code, design, math, dv) used in the chips, cards, headers and boxes; a friendly 404 page~~ done (session 22, part 1 (kinds); the 404 page in session 23, part 7) | S–M |
+| ~~UI331~~ | ~~**Dark mode tuning**: a contrast pass, a softer navy, the figure palette checked for colour-blind pairs (C193's script)~~ done (session 23, part 7: the contrast check in CI and softer dark; the colour-blind pass not picked) | S–M |
+| ~~UI332~~ | ~~**Social cards** for shared links (idea 17): the title, the chips and the logo as an image per question~~ done (G45 in session 16; session 23, part 7 added the kind and the counts) | S–M |
 
 Suggested order: UI320 (a bug) and UI321 first, then UI319 and UI324 (the two most
 visible screens), then UI322 / UI323, then the boxes (UI327, UI328).

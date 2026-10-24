@@ -1,0 +1,50 @@
+{#- "Page not found" in Hebrew: search, a random question and the levels; when the missing
+    address holds a question's id (0046) or its slug, the page offers that question. The
+    question list comes from the hook (config.extra.dvq_404). base_url is absolute here. -#}
+{% extends "main.html" %}
+{% block content %}
+<div class="not-found" data-search-exclude>
+  <p class="nf-code" aria-hidden="true">404</p>
+  <h1>הדף לא נמצא</h1>
+  <p class="nf-lead">הכתובת הזו לא קיימת באתר. אולי הקישור ישן, או שהשם של הדף השתנה.</p>
+  <p class="nf-guess" hidden></p>
+  <div class="nf-actions">
+    <button type="button" class="md-button md-button--primary nf-search">חיפוש באתר</button>
+    <a class="md-button nf-random" href="{{ base_url }}">שאלה אקראית</a>
+    <a class="md-button" href="{{ base_url }}">לדף הבית</a>
+  </div>
+  <p class="nf-levels">השאלות לפי רמה :
+    {%- for level, name in config.extra.dvq_cards.levels.items() %}
+    <a href="{{ base_url }}questions/{{ level }}/">{{ name }}</a>{% if not loop.last %} ·{% endif %}
+    {%- endfor %}
+  </p>
+</div>
+<script>
+  (() => {
+    const base = {{ base_url | tojson }}, list = {{ config.extra.dvq_404 | tojson }};
+    const path = decodeURIComponent(location.pathname);
+    const id = (/(?:^|[\/-])(\d{4})(?=[\/-]|$)/.exec(path) || [])[1];
+    const slug = path.split("/").filter(Boolean).pop() || "";
+    const words = slug.replace(/^\d+-?/, "");
+    const hit = list.find((q) => q[0] === id) || (words.length > 3 && list.find((q) => q[2].includes(words)));
+    const guess = document.querySelector(".nf-guess");
+    if (hit) {
+      guess.textContent = "אולי חיפשת את ";
+      const a = document.createElement("a");
+      a.href = base + hit[2];
+      a.textContent = `שאלה ${hit[0]} : ${hit[1]}`;
+      guess.append(a, "?");
+      guess.hidden = false;
+    }
+    document.querySelector(".nf-random").addEventListener("click", (e) => {
+      e.preventDefault();
+      location.href = base + list[Math.floor(Math.random() * list.length)][2];
+    });
+    document.querySelector(".nf-search").addEventListener("click", () => {
+      const toggle = document.getElementById("__search"), input = document.querySelector(".md-search__input");
+      if (toggle && !toggle.checked) { toggle.checked = true; toggle.dispatchEvent(new Event("change")); }
+      if (input) input.focus();
+    });
+  })();
+</script>
+{% endblock %}

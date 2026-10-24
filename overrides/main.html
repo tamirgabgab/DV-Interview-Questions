@@ -1,0 +1,9 @@
+{#- The theme's main template with the web app manifest, so a phone can add the site to
+    its home screen with the logo (docs/manifest.webmanifest, icons from
+    tools/make_icons.py). -#}
+{% extends "base.html" %}
+{% block extrahead %}
+  {{ super() }}
+  <link rel="manifest" href="{{ 'manifest.webmanifest' | url }}">
+  <link rel="apple-touch-icon" href="{{ 'assets/icons/icon-180.png' | url }}">
+{% endblock %}

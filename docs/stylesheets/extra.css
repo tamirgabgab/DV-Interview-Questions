@@ -16,11 +16,13 @@
   --diff-medium: #8a5300; --diff-medium-bg: rgba(217, 154, 0, 0.16);
   --diff-hard: #a32a23;   --diff-hard-bg: rgba(180, 51, 44, 0.12);
   --site-label-color: #8a5300;      /* the amber of the id label, dark enough on white (4.5:1) */
+  --site-mark-color: #b07d00;       /* amber marks on white (the star, the sort arrows): 3:1 */
   --site-focus-ring: #1b2a4a;
 }
 
+/* The dark scheme (UI331): a softer navy and a blue-grey page rather than near-black. */
 [data-md-color-scheme="slate"] {
-  --md-primary-fg-color: #243760;
+  --md-primary-fg-color: #2a3d66;
   --md-primary-fg-color--light: #2d4370;
   --md-primary-fg-color--dark: #121d33;
   --md-primary-bg-color: #ffffff;
@@ -30,7 +32,7 @@
   --md-accent-bg-color: #1b2a4a;
   --md-accent-bg-color--light: rgba(27, 42, 74, 0.7);
   --md-typeset-a-color: #8db3ff;
-  --md-default-bg-color: #141a26;
+  --md-default-bg-color: #171f2d;
   --md-code-bg-color: #1b2231;
   --site-primary-soft: rgba(141, 179, 255, 0.14);
   --site-card-border: rgba(141, 179, 255, 0.22);
@@ -38,6 +40,7 @@
   --diff-medium: #ffc233; --diff-medium-bg: rgba(255, 194, 51, 0.14);
   --diff-hard: #ff7b72;   --diff-hard-bg: rgba(255, 123, 114, 0.14);
   --site-label-color: #ffc233;
+  --site-mark-color: #ffc233;
   --site-focus-ring: #ffc233;
 }
 
@@ -409,7 +412,7 @@
 :root {
   --viz-s1: #2a78d6;
   --viz-s2: #eb6834;
-  --viz-s3: #1baf7a;
+  --viz-s3: #17a06e;              /* 3:1 on white, as a mark must be */
   --viz-grid: #e4e3df;
   --viz-text: #52514e;
   --viz-ink: #3b3a37;
@@ -1297,14 +1300,14 @@ body.practice-mode .md-typeset .question-tools {
   margin-inline-start: 0.35em;
   color: var(--md-default-fg-color--lighter);
 }
-.md-typeset .questions-wrap th[aria-sort="ascending"] .th-sort::after { content: "▲"; color: var(--md-accent-fg-color); }
-.md-typeset .questions-wrap th[aria-sort="descending"] .th-sort::after { content: "▼"; color: var(--md-accent-fg-color); }
+.md-typeset .questions-wrap th[aria-sort="ascending"] .th-sort::after { content: "▲"; color: var(--site-mark-color); }
+.md-typeset .questions-wrap th[aria-sort="descending"] .th-sort::after { content: "▼"; color: var(--site-mark-color); }
 .md-typeset .questions-wrap .th-sort:hover { color: var(--md-accent-fg-color); }
 
 .md-typeset .q-marks { margin-inline-start: 0.3em; }
 .md-typeset .q-mark { margin-inline-start: 0.2em; font-weight: 700; }
 .md-typeset .q-mark-solved { color: var(--viz-s3); }
-.md-typeset .q-mark-star { color: var(--md-accent-fg-color); }
+.md-typeset .q-mark-star { color: var(--site-mark-color); }
 
 @media screen and (max-width: 44.9375em) {
   .md-typeset .filter-sort { display: flex; }
@@ -1970,7 +1973,7 @@ body.practice-mode .md-typeset .question-tools {
 
 /* Boxes explorer (0009): one colour per cycle, the long cycle red, the walk in blue badges */
 :root { --viz-s4: #8a5cc9; --viz-s5: #c2185b; --viz-s1-text: #1f63b5; --viz-s3-text: #157a52; --viz-s4-text: #6f42b0; }   /* the series as text: 4.5:1 on white */
-[data-md-color-scheme="slate"] { --viz-s4: #b394e6; --viz-s5: #f06292; --viz-s1-text: var(--viz-s1); --viz-s3-text: var(--viz-s3); --viz-s4-text: var(--viz-s4); }
+[data-md-color-scheme="slate"] { --viz-s4: #b394e6; --viz-s5: #f06292; --viz-s1-text: #5a9cf0; --viz-s3-text: #24b583; --viz-s4-text: var(--viz-s4); }   /* lighter than the marks: 4.5:1 on a dark box */
 .md-typeset .explorer .bx-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
 .md-typeset .explorer .bx-ring { flex: 0 1 20rem; }
 .md-typeset .explorer svg.bx-live { width: 20rem; max-width: 100%; user-select: none; }
@@ -3131,4 +3134,36 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer .ex-guide-target { outline: 2px dashed var(--md-accent-fg-color); outline-offset: 3px; border-radius: 0.3rem; }
 @media (prefers-reduced-motion: no-preference) {
   .md-typeset .explorer .ex-guide { animation: dt-in 0.25s ease-out; }
+}
+
+/* Dark scheme cards (UI331): a lighter surface and a shadow that shows on a dark page. */
+[data-md-color-scheme="slate"] .md-typeset .explorer { background: color-mix(in srgb, var(--md-default-fg-color) 4%, var(--md-default-bg-color)); box-shadow: 0 0.2rem 0.9rem rgba(0, 0, 0, 0.35); }
+
+/* The 404 page (overrides/404.html): a navy card like the home hero. */
+.md-typeset .not-found { margin: 0.5rem 0 1.5rem; padding: 1.4rem 1.6rem 1.2rem; border-radius: 0.8rem; background: var(--md-primary-fg-color); color: #fff; }
+[data-md-color-scheme="slate"] .md-typeset .not-found { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
+.md-typeset .not-found .nf-code { margin: 0; color: var(--md-accent-fg-color); font-size: 2.6rem; font-weight: 700; line-height: 1; }
+.md-typeset .not-found h1 { margin: 0.3rem 0 0.6rem; color: #fff; }
+.md-typeset .not-found p { margin: 0.4rem 0; }
+.md-typeset .not-found a:not(.md-button) { color: #fff; text-decoration: underline; }
+.md-typeset .not-found .nf-guess { font-size: 0.85rem; }
+.md-typeset .not-found .nf-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.9rem 0; }
+.md-typeset .not-found .md-button { margin: 0; color: #fff; border-color: rgba(255, 255, 255, 0.6); }
+.md-typeset .not-found .md-button--primary { background: var(--md-accent-fg-color); border-color: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .not-found .md-button:is(:hover, :focus-visible) { background: #fff; border-color: #fff; color: #1b2a4a; }
+
+/* Printing a question (or "save as PDF"): every block opened by question-tools.js (the
+   solutions stay hidden in practice mode, for a practice sheet), the light scheme, and
+   no page tools, box controls, messages or comments; a box prints its figures and summary
+   as they stand. */
+@media print {
+  .md-typeset :is(.question-tools, .part-nav, .ex-bar, .ex-controls, .ex-scrubwrap, .ex-keys, .ex-guide, .py-runner, .comments, .comments-note, .hh-tools),
+  .dvq-toast, .dvq-confetti, .md-content__button { display: none !important; }
+  .md-typeset details.tip.hint-locked { display: block; }
+  .md-typeset :is(.admonition, details) { page-break-inside: auto; break-inside: auto; }   /* the theme keeps each block whole, which leaves near-blank pages */
+  .md-typeset :is(.admonition-title, summary) { break-after: avoid; }
+  .md-typeset .explorer { box-shadow: none; break-inside: avoid; }
+  .md-typeset :is(figure, svg.figure, svg.perf-chart, table) { break-inside: avoid; }
+  .md-typeset pre > code { white-space: pre-wrap; word-break: break-word; }
+  .md-typeset h2, .md-typeset h3 { break-after: avoid; }
 }

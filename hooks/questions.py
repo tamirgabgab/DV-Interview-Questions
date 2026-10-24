@@ -224,6 +224,18 @@ def on_config(config, **kwargs):
     # the footer is the same on pages at every depth)
     root = urlparse(config.get("site_url") or "/").path or "/"
     config["copyright"] = (config.get("copyright") or "") + f' &middot; <a href="{root.rstrip("/")}/new/">מה חדש</a>'
+    # the social cards (layouts/dvq.yml) read the kind names and the counts from here
+    config["extra"]["dvq_cards"] = {
+        "kinds": KINDS,
+        "levels": LEVELS,
+        "counts": {lv: sum(q["level"] == lv for q in _questions.values()) for lv in LEVELS},
+        "total": len(_questions),
+        "boxes": sum(q.get("boxes", 0) for q in _questions.values()),
+    }
+    # the 404 page (overrides/404.html) offers the question whose id or slug is in the
+    # missing address: [id, title, path from the site root]
+    config["extra"]["dvq_404"] = [[q["id"], str(q["title"]), q["src_uri"][: -len(".md")] + "/"]
+                                  for q in sorted(_questions.values(), key=lambda q: q["id"])]
     return config
 
 

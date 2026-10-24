@@ -151,6 +151,7 @@ DV-Interview-Questions/
 │   ├── check_links.py          # Internal link / anchor check of the built site (--external fetches the rest)
 │   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors, axe-core)
 │   ├── check_explorers.py      # Every explorer box: each button clicked, its link and remembered state
+│   ├── check_contrast.py       # The site's colour pairs in both schemes against WCAG 2
 │   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
 │   ├── new_question.py         # Scaffold: page, tests folder, generator stub, README row
 │   ├── page_tests.py           # Test helpers: Node runner, "page blocks match the generator"
@@ -169,6 +170,9 @@ DV-Interview-Questions/
 │   └── question.md             # Copy this to start a new question
 ├── layouts/
 │   └── dvq.yml                 # Social preview card layout (RTL) for Material's social plugin
+├── overrides/                  # Theme overrides (custom_dir)
+│   ├── main.html               # Adds the web app manifest (home-screen icon)
+│   └── 404.html                # Hebrew "page not found" with the question the address names
 ├── docs/                       # Site content
 │   ├── index.md                # Home page with the table of all questions
 │   ├── tags.md                 # Tag index
@@ -497,6 +501,7 @@ python tools/check_phone.py           # every built page at 390 px: no sideways 
 python tools/check_phone.py --scheme dark   # the same in dark mode (CI: manual run with phone_dark)
 python tools/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-core (npm install axe-core)
 python tools/check_explorers.py       # every explorer box clicked through, its link and remembered state
+python tools/check_contrast.py        # every colour pair, light and dark (--all prints the passes)
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```
 
@@ -519,6 +524,14 @@ a fresh browser and reloads the page for the remembered state: different control
 fail, a different drawing is a warning (some boxes draw from their history), and "reset
 everything" must forget the state (`--no-links` skips this part). It takes the same
 `--offline`, `--route`, `--browser` and `--only` options as the phone check.
+
+`check_contrast.py` reads the colour tokens (Material's own from the installed theme,
+overridden by `docs/stylesheets/extra.css`) for the light and the dark scheme, and checks a
+list of pairs as the site draws them (body text, links, chips on their tint, white on the
+navy header and message, navy on amber buttons, figure text, chart marks, the focus ring),
+compositing translucent colours over the page: text needs 4.5:1, marks 3:1. It runs in the
+test job of CI, so a colour that reads badly stops the deploy. A new pair goes into
+`PAIRS`.
 
 `check_phone.py` needs Playwright (`requirements-dev.txt`) and its Chromium
 (`python -m playwright install chromium`). It writes a screenshot of each page to
@@ -594,12 +607,27 @@ the Actions tab (the workflow also has a manual `workflow_dispatch` trigger).
 
 Material's `social` plugin renders a 1200 × 630 card per page (`og:image`, shown when a
 link is shared in WhatsApp, LinkedIn, Slack...) from the RTL layout in `layouts/dvq.yml`:
-navy background, the logo, the title aligned to the right, level · difficulty · id on
-question pages, the description and an amber bar. It needs `pillow` and `cairosvg`
+navy background, the logo, the title aligned to the right, a line above it (level ·
+difficulty · id · kind on question pages, "n שאלות ברמת …" on a level page, the totals of
+questions and boxes on the home page; the hook passes the kind names and the counts in
+`config.extra.dvq_cards`), the description and an amber bar. It needs `pillow` and `cairosvg`
 (`requirements.txt`; `libcairo2` on the machine) and downloads the Rubik font from Google
 Fonts into `.cache/plugin/social/` on the first build (CI caches that directory). Without
 network access, put any Hebrew-capable TTF there as `fonts/Rubik/Regular.ttf` and
 `Bold.ttf`. The cards are written to `site/assets/images/social/`.
+
+### The 404 page, the home-screen icon and printing
+
+`overrides/404.html` is the page GitHub Pages serves for a missing address: "הדף לא נמצא"
+in a navy card with the site search, a random question, the home page and the levels; when
+the address holds a question's id (`/0046-old-name/`) or its slug, it offers that question
+(the list comes from the hook, `config.extra.dvq_404`). `docs/manifest.webmanifest`, linked
+from `overrides/main.html`, lets a phone add the site to its home screen (Hebrew name, RTL,
+navy theme); its icons are drawn from the logo by `python tools/make_icons.py` into
+`docs/assets/icons/`. Printing a question (or saving it as PDF) opens every block (the
+solutions stay hidden in practice mode, for a practice sheet), prints the dark scheme
+light, lets long blocks run across pages, and leaves out the page tools, the box controls,
+the run panel and the comments; each box prints its figures and summary as they stand.
 
 ### Comments
 

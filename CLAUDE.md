@@ -65,6 +65,7 @@ mkdocs build --strict                 # the build CI runs
 python tools/check_links.py           # internal links and anchors of the built site
 python tools/check_phone.py           # every page at 390 px (add --offline and --route in a sandbox)
 python tools/check_explorers.py       # every explorer box: buttons clicked, link and saved state
+python tools/check_contrast.py        # the site's colour pairs, light and dark (WCAG 2)
 ```
 
 The linter checks RTL at every paragraph start (indented blocks and the steps timeline
@@ -74,8 +75,9 @@ math wider than its column (split it with `aligned`) and about figure text under
 in dark mode; CI runs it only on a manual run with `phone_dark`. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
-All six run in CI on every push; a failure blocks the deploy. Verilator notes and
-simulator quirks are listed in `HANDOFF.md` under "Technical notes".
+All seven run in CI on every push; a failure blocks the deploy. A new colour pair (a text
+or a mark on a fill) goes into the `PAIRS` list of `tools/check_contrast.py`. Verilator
+notes and simulator quirks are listed in `HANDOFF.md` under "Technical notes".
 
 ## Workflow
 

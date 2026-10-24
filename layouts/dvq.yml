@@ -41,13 +41,26 @@ definitions:
   - &page_description >-
     {{ page.meta.get("description", config.site_description) | x }}
 
-  # Level and difficulty of a question page, empty elsewhere
+  # The line above the title: on a question page the level, the difficulty, the id and the
+  # kind (in Hebrew first, so the line reads right to left); on a level page its number of
+  # questions; on the home page the totals. The hook puts the names and the counts in
+  # config.extra.dvq_cards.
   - &page_meta_line >-
+    {%- set cards = config.extra.dvq_cards -%}
     {%- if page.meta.get("level") -%}
-      {{ {"student": "Student", "junior": "Junior", "senior": "Senior"}[page.meta.level] }}
+      {{ cards.levels[page.meta.level] }}
       ·
       {{ {"easy": "קל", "medium": "בינוני", "hard": "קשה"}[page.meta.difficulty] }}
       {%- if page.meta.get("id") %} · {{ "%04d" | format(page.meta.id) }}{% endif -%}
+      {%- if page.meta.get("kind") in cards.kinds %} · {{ cards.kinds[page.meta.kind] }}{% endif -%}
+    {%- elif page.is_homepage -%}
+      {{ cards.total }} שאלות · {{ cards.boxes }} תיבות אינטראקטיביות
+    {%- else -%}
+      {%- for level, name in cards.levels.items() -%}
+        {%- if page.file.src_uri == "questions/" ~ level ~ "/index.md" -%}
+          {{ cards.counts[level] }} שאלות ברמת {{ name }}
+        {%- endif -%}
+      {%- endfor -%}
     {%- endif -%}
 
   - &logo >-
@@ -92,7 +105,7 @@ layers:
         family: *font_family
         style: Bold
 
-  # Level · difficulty · id (question pages)
+  # Level · difficulty · id · kind (question pages), the counts (home and level pages)
   - size: { width: 960, height: 40 }
     offset: { x: 176, y: 132 }
     typography:
