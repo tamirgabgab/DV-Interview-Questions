@@ -62,7 +62,58 @@ KINDS = {
     "dv": "אימות ופרוטוקולים",
 }
 
-NEW_DAYS = 30   # a question added within this many days of the build gets a "new" chip
+NEW_DAYS = 7    # a question added within this many days of the build gets a "new" chip,
+NEW_MAX = 5     # and at most this many (the newest), so the chip stays rare (UI322)
+
+# The topics (front matter `tags:`) as the site shows them (UI322): Hebrew, or the term as
+# DV engineers say it. The tag itself stays in the files, the URLs and the anchors; a tag
+# without a name here shows as written, and `tools/lint_pages.py` warns about it.
+TOPICS = {
+    "algorithms": "אלגוריתמים",
+    "assertions": "Assertions",
+    "bfs": "BFS",
+    "bitwise": "פעולות על ביטים",
+    "cdc": "CDC",
+    "clocks": "שעונים",
+    "combinatorics": "קומבינטוריקה",
+    "constraints": "אילוצים",
+    "coverage": "כיסוי",
+    "digital-design": "תכן דיגיטלי",
+    "digital-logic": "לוגיקה ספרתית",
+    "digits": "ספרות",
+    "dijkstra": "Dijkstra",
+    "dynamic-programming": "תכנות דינמי",
+    "fifo": "FIFO",
+    "fsm": "מכונת מצבים",
+    "geometry": "גאומטריה",
+    "gray-code": "קוד Gray",
+    "greedy": "אלגוריתם חמדן",
+    "lfsr": "LFSR",
+    "logic": "לוגיקה",
+    "logic-puzzles": "חידות היגיון",
+    "math": "מתמטיקה",
+    "metastability": "מטא־יציבות",
+    "number-bases": "בסיסי ספירה",
+    "optimization": "אופטימיזציה",
+    "pcie": "PCIe",
+    "probability": "הסתברות",
+    "proof": "הוכחה",
+    "protocols": "פרוטוקולים",
+    "python": "Python",
+    "randomization": "רנדומיזציה",
+    "recursion": "רקורסיה",
+    "sequences": "סדרות",
+    "sorting": "מיון",
+    "stack": "מחסנית",
+    "sva": "SVA",
+    "systemverilog": "SystemVerilog",
+    "usb4": "USB4",
+}
+
+
+def topic_name(tag: str) -> str:
+    return TOPICS.get(tag, tag)
+
 
 # Tags that almost every question carries; they do not make two questions "related".
 GENERIC_TAGS = {"python", "systemverilog"}
@@ -239,13 +290,24 @@ def on_config(config, **kwargs):
     return config
 
 
-def _is_new(q: dict) -> bool:
+def _added_date(q: dict) -> dt.date | None:
     added = q.get("added")
     if isinstance(added, dt.datetime):
         added = added.date()
-    if not isinstance(added, dt.date):
-        return False
-    return (dt.date.today() - added).days <= NEW_DAYS
+    return added if isinstance(added, dt.date) else None
+
+
+def _new_ids() -> set[str]:
+    """The questions that get the "new" chip: added within NEW_DAYS of the build, the
+    newest NEW_MAX of them (the later id first on the same day)."""
+    today = dt.date.today()
+    recent = [q for q in _questions.values() if _added_date(q) and (today - _added_date(q)).days <= NEW_DAYS]
+    recent.sort(key=lambda q: (_added_date(q), q["id"]), reverse=True)
+    return {q["id"] for q in recent[:NEW_MAX]}
+
+
+def _is_new(q: dict) -> bool:
+    return q["id"] in _new_ids()
 
 
 def new_chip(q: dict) -> str:
@@ -283,7 +345,7 @@ def _href(src_uri: str, page_url: str) -> str:
 
 def _tag_link(tag: str, base: str) -> str:
     href = posixpath.relpath("tags/", base or ".") + "/#tag:" + tag
-    return f'<a href="{html.escape(href)}">{html.escape(tag)}</a>'
+    return f'<a href="{html.escape(href)}">{html.escape(topic_name(tag))}</a>'
 
 
 def ui_icon(name: str) -> str:
@@ -310,7 +372,7 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
         if _has_tests(q):
             badges.append(_badge("tested", "נבדק", "הקוד בדף רץ ונבדק אוטומטית בכל עדכון של האתר", " qh-badge-ok"))
     if _is_new(q):
-        badges.append(_badge("new", "חדש", f"נוספה ב-{NEW_DAYS} הימים האחרונים", " qh-badge-new"))
+        badges.append(_badge("new", "חדש", "מהשאלות החדשות ביותר באתר : נוספה בשבוע האחרון", " qh-badge-new"))
     topics = ", ".join(_tag_link(t, base) for t in q["tags"])
     bottom = [f"<span>נושאים : {topics}</span>"]
     if q.get("added"):
@@ -570,7 +632,20 @@ def _whats_new(page_url: str) -> str:
     return "\n".join(out)
 
 
+TOPICS_INLINE = 6   # topics shown in the filter before "more topics"
+ROW_TOPICS = 2      # topics shown in a row before "+n"
+
+
 def _table(level: str | None, page_url: str) -> str:
+    """A filterable question table (UI322, UI323). Above it: a search field (title,
+    topics in both names, id), a "filter (n)" button that opens the filters on phones,
+    and the filters as segmented groups (level on the all-questions table, difficulty,
+    kind, the reader's marks) with the topics behind "more topics"; under them the
+    active filters as chips with the count. Each row has the id, the title on one line
+    with the kind and the first topics under it (a topic filters the table; "+n" shows
+    the rest), the level on the all-questions table, and the difficulty.
+    question-filter.js keeps the filters in the address and says what to do when no
+    row is left."""
     rows = sorted(
         (q for q in _questions.values() if level is None or q["level"] == level),
         key=lambda q: q["id"],
@@ -578,64 +653,92 @@ def _table(level: str | None, page_url: str) -> str:
     if not rows:
         return '<p class="questions-empty">עדיין אין שאלות בקטגוריה הזו.</p>'
 
-    tags = sorted({t for q in rows for t in q["tags"]})
+    count = {}
+    for q in rows:
+        for t in q["tags"]:
+            count[t] = count.get(t, 0) + 1
+    tags = sorted(count, key=lambda t: (-count[t], topic_name(t)))   # the most common first
+
+    def chip(name: str, value: str, label: str, extra: str = "") -> str:
+        icon = kind_icon(value) if name == "kind" and value else ""
+        pressed = "true" if not value else "false"
+        return (f'<button type="button" class="filter-chip{" is-active" if not value else ""}" data-value="{html.escape(value)}" '
+                f'aria-pressed="{pressed}"{extra}>{icon}{html.escape(label)}</button>')
 
     def group(name: str, label: str, values) -> str:
-        chips = '<button type="button" class="filter-chip is-active" data-value="">הכל</button>'
-        chips += "".join(
-            f'<button type="button" class="filter-chip" data-value="{html.escape(v)}">'
-            f'{kind_icon(v) if name == "kind" else ""}{html.escape(l)}</button>'
-            for v, l in values
-        )
-        return (f'<div class="filter-group" data-filter="{name}" data-value="">'
-                f'<span class="filter-label">{label}</span>{chips}</div>')
+        chips = chip(name, "", "הכל") + "".join(chip(name, v, l) for v, l in values)
+        return (f'<div class="filter-group filter-seg" data-filter="{name}" data-value="" role="group" aria-label="{label}">'
+                f'<span class="filter-label">{label}</span><span class="seg">{chips}</span></div>')
 
-    out = ['<div class="question-filter" markdown="0" data-search-exclude>']
-    if level is None:
-        out.append(group("level", "משרה", LEVELS.items()))
-    out.append(group("difficulty", "קושי", DIFFICULTIES.items()))
-    out.append(group("kind", "סוג", [(k, v) for k, v in KINDS.items() if any(q["kind"] == k for q in rows)]))
-    out.append(group("tag", "נושא", ((t, t) for t in tags)))
-    out.append(group("mark", "סימון", [("star", "מועדפים"), ("solved", "פתורות"), ("unsolved", "לא פתורות")]))
-    out.append(group("interactive", "ממשק", [("1", "אינטראקטיביות")]))
+    inline, more = tags[:TOPICS_INLINE], tags[TOPICS_INLINE:]
+    topic_chips = chip("tag", "", "הכל") + "".join(chip("tag", t, topic_name(t), f' data-count="{count[t]}"') for t in inline)
+    more_html = ""
+    if more:
+        more_html = (f'<button type="button" class="topics-toggle" aria-expanded="false">עוד נושאים ({len(more)})</button>'
+                     '<div class="topics-more" hidden>'
+                     '<input type="search" class="topics-search" placeholder="חיפוש נושא" aria-label="חיפוש נושא">'
+                     + "".join(chip("tag", t, topic_name(t), f' data-count="{count[t]}" data-en="{html.escape(t)}"') for t in more)
+                     + '<p class="topics-none" hidden>אין נושא כזה.</p></div>')
+    topics = (f'<div class="filter-group filter-topics" data-filter="tag" data-value="" role="group" aria-label="נושא">'
+              f'<span class="filter-label">נושא</span><span class="topics-inline">{topic_chips}</span>{more_html}</div>')
+
     sorts = [("id", "מספר"), ("title", "שם")] + ([("level", "משרה")] if level is None else []) + [("difficulty", "קושי")]
-    out.append('<div class="filter-tools">'
-               '<label class="filter-search">חיפוש '
-               '<input type="search" data-filter="text" placeholder="חיפוש בכותרת"></label>'
+    panel_id = f"qf-{level or 'all'}"
+    out = ['<div class="question-filter" markdown="0" data-search-exclude>']
+    out.append('<div class="filter-bar">'
+               '<label class="filter-search"><span class="filter-search-label">חיפוש</span>'
+               '<input type="search" data-filter="text" placeholder="שם, נושא או מספר"></label>'
+               f'<button type="button" class="filter-toggle" aria-expanded="false" aria-controls="{panel_id}">'
+               '<span class="ui-ico ui-ico-filter" aria-hidden="true"></span>סינון<span class="filter-n"></span></button>'
                '<label class="filter-sort">מיון <select>'
                + "".join(f'<option value="{k}">{l}</option>' for k, l in sorts)
                + '</select></label>'
                '<button type="button" class="filter-random">שאלה אקראית</button></div>')
+    out.append(f'<div class="filter-panel" id="{panel_id}">')
+    if level is None:
+        out.append(group("level", "משרה", LEVELS.items()))
+    out.append(group("difficulty", "קושי", DIFFICULTIES.items()))
+    out.append(group("kind", "סוג", [(k, v) for k, v in KINDS.items() if any(q["kind"] == k for q in rows)]))
+    out.append(group("mark", "סימון", [("star", "מועדפים"), ("solved", "פתורות"), ("unsolved", "לא פתורות")]))
+    out.append(topics)
+    out.append("</div>")
+    out.append('<div class="filter-active" aria-live="polite"><span class="filter-count"></span></div>')
     out.append("</div>")
 
-    def th(key: str | None, label: str) -> str:
-        if key is None:
-            return f"<th>{label}</th>"
+    def th(key: str, label: str) -> str:
         return f'<th data-sort="{key}"><button type="button" class="th-sort">{label}</button></th>'
 
     level_col = th("level", "משרה") if level is None else ""
+    new = _new_ids()
     # The table itself has no class, so Material styles it and wraps it for scrolling
     out.append('<div class="questions-wrap"><table><thead><tr>'
-               f'{th("id", "#")}{th("title", "שאלה")}{level_col}{th("difficulty", "קושי")}{th(None, "נושאים")}'
+               f'{th("id", "#")}{th("title", "שאלה")}{level_col}{th("difficulty", "קושי")}'
                "</tr></thead><tbody>")
     for q in rows:
         href = _href(q["src_uri"], page_url)
+        title = html.escape(str(q["title"]))
         level_td = f'<td class="q-level">{level_chip(q["level"])}</td>' if level is None else ""
-        interactive_mark = '<span class="q-interactive" title="עם ממשק אינטראקטיבי">▶</span>' if q.get("interactive") else ""
+        topic_btn = lambda t: f'<button type="button" class="q-topic" data-tag="{html.escape(t)}" title="סינון לפי הנושא">{html.escape(topic_name(t))}</button>'  # noqa: E731
+        shown, rest = q["tags"][:ROW_TOPICS], q["tags"][ROW_TOPICS:]
+        topics_html = "".join(topic_btn(t) for t in shown)
+        if rest:
+            topics_html += (f'<button type="button" class="q-more" aria-expanded="false" aria-label="עוד {len(rest)} נושאים">+{len(rest)}</button>'
+                            f'<span class="q-rest" hidden>{"".join(topic_btn(t) for t in rest)}</span>')
+        search = " ".join([q["id"], str(int(q["id"])), str(q["title"]), *q["tags"], *(topic_name(t) for t in q["tags"])])
         out.append(
             f'<tr data-id="{q["id"]}" data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" data-kind="{q["kind"]}" '
             f'data-level-rank="{LEVEL_RANK[q["level"]]}" data-diff-rank="{DIFF_RANK[q["difficulty"]]}" '
-            f'data-tags="{html.escape(" ".join(q["tags"]))}" data-interactive="{int(bool(q.get("interactive")))}">'
+            f'data-tags="{html.escape(" ".join(q["tags"]))}" data-search="{html.escape(search.lower())}">'
             f'<td class="q-id">{q["id"]}</td>'
-            f'<td class="q-title"><a href="{href}">{html.escape(str(q["title"]))}</a> {new_chip(q)}{interactive_mark}'
-            '<span class="q-marks"></span></td>'
+            f'<td class="q-title"><div class="q-line"><a href="{href}" title="{title}">{title}</a>'
+            f'{new_chip(q) if q["id"] in new else ""}<span class="q-marks"></span></div>'
+            f'<div class="q-meta">{kind_chip(q["kind"])}<span class="q-topics">{topics_html}</span></div></td>'
             f"{level_td}"
-            f'<td class="q-diff">{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}</td>'
-            f'<td class="q-tags">{" ".join(f"<code>{html.escape(t)}</code>" for t in q["tags"])}</td>'
+            f'<td class="q-diff">{difficulty_chip(q["difficulty"])}</td>'
             "</tr>"
         )
     out.append("</tbody></table></div>")
-    out.append('<p class="questions-count"></p>')
+    out.append('<div class="questions-none" hidden></div>')
     return "\n".join(out)
 
 
@@ -747,7 +850,20 @@ def explorer_scripts(output: str, page_url: str) -> str:
                    for name in ["core.js", *files])
 
 
+TAG_CHIP = re.compile(r'(<span class="md-tag">)([^<]+)(</span>)')
+TAG_TOC = re.compile(r'(href="#tag:([^"]+)" class="md-nav__link">\s*<span class="md-ellipsis">\s*)([^<]+?)(\s*</span>)')
+
+
+def _tag_names(output: str) -> str:
+    """The tags page with the topics' Hebrew names, in its headings and its contents list
+    (the anchors keep the tags as written)."""
+    output = TAG_CHIP.sub(lambda m: m.group(1) + html.escape(topic_name(html.unescape(m.group(2).strip()))) + m.group(3), output)
+    return TAG_TOC.sub(lambda m: m.group(1) + html.escape(topic_name(m.group(2))) + m.group(4), output)
+
+
 def on_post_page(output, page, config, **kwargs):
+    if page.file.src_uri == "tags.md":
+        output = _tag_names(output)
     scripts = explorer_scripts(output, page.url)
     if not scripts:
         return output
@@ -776,12 +892,12 @@ def _search_variants(raw_tokens: set[str], words: list[str], known: set[str]) ->
 def _search_question(doc: dict, q: dict) -> None:
     """A question page in the search results (E33): the id before the title (so "0021"
     ranks it first), the kind beside the level and difficulty in its tags (the results
-    show them as chips under the title, with the topics), no text instead of the header
+    show them as chips under the title, with the topics by their Hebrew names), no text instead of the header
     card's run-together chips, and the id as written and without its zeros ("0021 21") in
     its own field."""
     doc["title"] = f'{q["id"]} · {q["title"]}'
     doc["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], KINDS[q["kind"]],
-                   *[t for t in doc.get("tags", []) if t not in (LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]])]]
+                   *[topic_name(t) for t in doc.get("tags", []) if t not in (LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]])]]
     doc["text"] = ""   # the tags, shown as chips under the title, are the topics already
     doc[ID_FIELD] = f'{q["id"]} {int(q["id"])}'
 

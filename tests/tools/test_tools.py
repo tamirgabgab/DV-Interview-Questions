@@ -91,3 +91,16 @@ def test_lint_cost_chips(tmp_path):
     assert any("Hebrew label" in p for p in lint_pages.lint(path))
     path.write_text(page.replace("    <!-- cost: זמן \\( O(n) \\) | זיכרון \\( O(1) \\) -->\n", ""), encoding="utf-8")
     assert any("no <!-- cost" in p for p in lint_pages.lint(path))
+
+
+def test_lint_topic_names(tmp_path):
+    # every topic of the site has a Hebrew name; an unknown one is a warning, not a problem
+    page = (ROOT / "templates/question.md").read_text(encoding="utf-8").replace("id: 0 ", "id: 42 ")
+    path = tmp_path / "0042-x.md"
+    path.write_text(page, encoding="utf-8")
+    warnings: list[str] = []
+    assert lint_pages.lint(path, warnings) == [] and not [w for w in warnings if "TOPICS" in w]
+    path.write_text(page.replace("tags: [", "tags: [no-such-topic, ", 1), encoding="utf-8")
+    warnings = []
+    assert lint_pages.lint(path, warnings) == []
+    assert any("'no-such-topic'" in w for w in warnings)

@@ -2185,6 +2185,23 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     (`page-break-inside: avoid`), which left near-blank pages; print now lets them break,
     opens the blocks on `beforeprint` (ignoring a second one), prints dark as light and
     restores both after. Manifest and icons (`tools/make_icons.py`).
+40. **Part 5 of the look-and-feel plan (UI322, UI323).** The owner picked two-line rows,
+    "new" for at most the newest five of the last 7 days, segmented filters with a phone
+    drawer, and three additions: filters in the address (replaceState, so "back" leaves
+    the page), Hebrew topic names everywhere they show, and a friendly empty state; the
+    row shows the first two topics as written; the search covers title, topics and id.
+    The table lost its topics column (they sit under the title as filter buttons, "+n"
+    for the rest) and its "interactive" mark and filter (every question has a box). The
+    topics filter shows the six most common, the rest behind "עוד נושאים (n)" with its own
+    search. `TOPICS` in the hook names the 39 topics (the owner reviews the names); the
+    tags page is rewritten in `on_post_page`, the search chips in `_search_question`, and
+    the linter warns about a topic without a name (it reads the table with `ast`). Found
+    on the way: the address parameter `q` opens Material's search, which then swallowed
+    every key typed into the table's search field, so the search text rides as `find`.
+    The theme's table wrapper shrank to the content, so the title column could not take
+    the width (`.md-typeset__table` is a block now); "+3" read "3+" in RTL (isolated LTR).
+    axe on the open drawer, the topics panel, the empty state and the rows (390 and 1280
+    px, light and dark): no violations.
 ---
 
 ## In progress
@@ -2243,7 +2260,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   38) is done on the branch; part 7 (UI331, the social card's additions, a 404 page, and
   the print and home-screen additions if the owner picks them) is next, then `main` when
   the owner asks. Still open after that: part 5 (UI322, UI323).
-  Part 7 (item 39) is done on the branch as well.
+  Part 7 (item 39) is on `main` (deceb8e) with part 6. Part 5 (item 40) is done on the
+  branch; with it all seven parts of the plan are done. The owner still reviews the 39
+  Hebrew topic names (`TOPICS`).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -3073,8 +3092,8 @@ Item numbers continue the global count (319 on).
 
 | Id | Idea | Size |
 |---|---|---|
-| UI322 | **Compact rows or cards**: the title on one line, level / difficulty / kind as one row of chips, two topics and "+3"; "חדש" only for the newest five or the last 14 days | S–M |
-| UI323 | **Folded filters**: level, difficulty and kind as segmented controls, topics behind "עוד נושאים" with a search field, the active filters as removable chips with the result count | M |
+| ~~UI322~~ | ~~**Compact rows or cards**: the title on one line, level / difficulty / kind as one row of chips, two topics and "+3"; "חדש" only for the newest five or the last 14 days~~ done (session 23, part 5: the newest five of 7 days) | S–M |
+| ~~UI323~~ | ~~**Folded filters**: level, difficulty and kind as segmented controls, topics behind "עוד נושאים" with a search field, the active filters as removable chips with the result count~~ done (session 23, part 5, with filters in the address, Hebrew topic names and an empty state) | M |
 
 **Round UI3 — the question page**
 

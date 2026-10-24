@@ -309,7 +309,8 @@ not start with the id, or a duplicate id. It also generates, per question page:
 
 - the **header card**: one row of chips (id label, level, difficulty, kind with its icon)
   and small badges with an icon and a word ("interactive", the code languages, "tested"
-  when the page has a `tests/<id>/` folder, "new" for 30 days after `added`; the full text
+  when the page has a `tests/<id>/` folder, "new" for the newest five questions added in
+  the last 7 days (`NEW_DAYS`, `NEW_MAX`); the full text
   is a tooltip), the page tools beside them, the title, and one quiet line of topic links,
   the `added` date in Hebrew and `source` when filled; the page's own title comes from
   `title`, so the Markdown must not start with a `#` heading;
@@ -352,14 +353,32 @@ cell as the title, the others as "column value" pairs in two columns); a table o
 more rows that fits keeps its header row in view while it scrolls; numbers in tables are
 tabular. Under 30em the figure legends (`viz-legend`) are compact chips that wrap.
 
-The question tables on the home and level pages have **chip filters** (one choice per group:
-level, difficulty, kind, topic, and the reader's own marks: favourites, solved, not solved) plus a
-title search, **sortable columns** (header buttons; a "sort" select on phones), a **random
-question** button that picks among the rows left after filtering, and turn into **cards** on
-narrow screens (`docs/javascripts/question-filter.js`, `.questions-wrap` in `extra.css`).
-The level cards and path cards show a "solved n of m" bar from the same marks. Pages with
-an explorer, a step figure or an embedded tool carry an "אינטראקטיבי" chip in the header
-card, a ▶ mark in the tables and a "ממשק" filter group.
+The question tables on the home and level pages (UI322, UI323) have a search field (the
+title, the topics in both names and the id: "46" finds 0046), **segmented filters** (one
+choice per group: level on the all-questions table, difficulty, kind, and the reader's own
+marks: favourites, solved, not solved), the topics with the six most common inline and the
+rest behind "עוד נושאים" with a search of their own, the active filters as removable
+chips with the count, **sortable columns** (header buttons; a "sort" select on phones) and
+a **random question** button that picks among the rows left. A row is two lines: the title
+on one line (cut with an ellipsis, the full title as a tooltip) with its "new" chip and
+marks, and under it the kind and the first two topics as buttons that filter the table by
+that topic ("+n" shows the rest); then the level (all-questions table) and the difficulty.
+On phones the filters fold behind one "סינון (n)" button and the rows are cards. The
+filters, the search and the sort ride in the address (`?difficulty=hard&tag=fifo&find=…&sort=-title`,
+replaced and not pushed, so "back" leaves the page; not `q`, which opens the theme's
+search), so a filtered table can be linked and survives a reload. When no row is left, a
+note offers the filter whose removal brings back the most rows ("בלי "קשה" יש 2 שאלות"),
+the last filter chosen, and clearing them all (`docs/javascripts/question-filter.js`,
+`.question-filter` and `.questions-wrap` in `extra.css`). The level cards and path cards
+show a "solved n of m" bar from the same marks. Pages with an explorer, a step figure or
+an embedded tool carry an "אינטראקטיבי" badge in the header card (every question has one
+now, so the tables no longer mark it).
+
+Topics show by their Hebrew names (the `TOPICS` table in `hooks/questions.py`; terms that
+DV engineers say in English, such as FIFO, CDC, PCIe and SVA, stay so) in the tables, the
+filters, the header card, the tags page (its headings and contents list, rewritten after
+the build) and the search results; the tag as written stays in the files, the addresses
+and the anchors. `tools/lint_pages.py` warns about a topic without a name.
 
 ### Study paths
 

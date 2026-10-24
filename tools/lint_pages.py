@@ -46,6 +46,21 @@ LITERAL_COLOUR = re.compile(r'(?:fill|stroke|color)\s*(?:=\s*"|:\s*)\s*(#[0-9a-f
 LATIN_START = re.compile(r"^[A-Za-z`\\]")
 
 
+def topic_names() -> dict[str, str]:
+    """The TOPICS table of hooks/questions.py (the Hebrew name of every topic), read
+    without importing the hook."""
+    import ast
+    src = (Path(__file__).resolve().parents[1] / "hooks" / "questions.py").read_text(encoding="utf-8")
+    for node in ast.parse(src).body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", "") == "TOPICS" for t in node.targets):
+            return ast.literal_eval(node.value)
+    return {}
+
+
+TOPICS = topic_names()
+TAGS_RE = re.compile(r"^tags:\s*\[(.*?)\]", re.M)
+
+
 def strip_front_matter(text: str) -> str:
     if text.startswith("---"):
         end = text.find("\n---", 3)
@@ -57,7 +72,12 @@ def strip_front_matter(text: str) -> str:
 def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     problems: list[str] = []
     warnings = warnings if warnings is not None else []
-    lines = strip_front_matter(path.read_text(encoding="utf-8")).splitlines()
+    text = path.read_text(encoding="utf-8")
+    m = TAGS_RE.search(text[: text.find("\n---", 3)] if text.startswith("---") else "")
+    for tag in (t.strip() for t in (m.group(1).split(",") if m else [])):
+        if tag and tag not in TOPICS:
+            warnings.append(f"front matter: the topic {tag!r} has no name in TOPICS (hooks/questions.py); it shows as written")
+    lines = strip_front_matter(text).splitlines()
 
     in_code = False
     fence_indent = ""
