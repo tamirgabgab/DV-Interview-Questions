@@ -256,12 +256,6 @@ def kind_chip(kind: str) -> str:
     return f'<span class="chip chip-kind chip-kind-{kind}">{kind_icon(kind)}{KINDS[kind]}</span>'
 
 
-def interactive_chip(q: dict) -> str:
-    """A chip on pages with an explorer, a step figure or an embedded tool."""
-    return ('<span class="chip chip-interactive" title="יש בדף ממשק אינטראקטיבי : סליידרים, אנימציה או איור צעד-צעד">אינטראקטיבי</span>'
-            if q.get("interactive") else "")
-
-
 def _base(page_url: str) -> str:
     """Directory of a page URL, for relative links (page URLs end with '/')."""
     return page_url if page_url.endswith("/") or not page_url else posixpath.dirname(page_url) + "/"
@@ -277,54 +271,74 @@ def _href(src_uri: str, page_url: str) -> str:
 
 def _tag_link(tag: str, base: str) -> str:
     href = posixpath.relpath("tags/", base or ".") + "/#tag:" + tag
-    return f'<a href="{html.escape(href)}"><code>{html.escape(tag)}</code></a>'
+    return f'<a href="{html.escape(href)}">{html.escape(tag)}</a>'
 
 
-def _header(q: dict, markdown: str, page_url: str) -> str:
-    """Header card: id label, clean title, chips, topics, date and code badges."""
+def ui_icon(name: str) -> str:
+    return f'<i class="ui-ico ui-ico-{name}" aria-hidden="true"></i>'
+
+
+def _badge(icon: str, text: str, title: str, cls: str = "") -> str:
+    return f'<span class="qh-badge{cls}" title="{html.escape(title)}">{ui_icon(icon)}{text}</span>'
+
+
+def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
+    """Header card (UI324): one row of chips (id, level, difficulty, kind) and small badges
+    (interactive, code, tested, new) with the page tools beside it, the title, and one
+    quiet line of topics, date and source."""
     base = posixpath.dirname(page_url) + "/" if page_url else ""
-    langs = [name for name, fence in (("SystemVerilog", "systemverilog"), ("Python", "python"))
+    langs = [name for name, fence in (("SV", "systemverilog"), ("Python", "python"))
              if extract_code.blocks_from_text(markdown, fence)]
-    topics = " ".join(_tag_link(t, base) for t in q["tags"])
+    badges = []
+    if q.get("interactive"):
+        badges.append(_badge("interactive", "אינטראקטיבי", "יש בדף ממשק אינטראקטיבי : סליידרים, אנימציה או איור צעד-צעד", " qh-badge-play"))
+    if langs:
+        full = " ו-".join("SystemVerilog" if n == "SV" else n for n in langs)
+        badges.append(_badge("code", f'<bdi dir="ltr">{" + ".join(langs)}</bdi>', f"פתרון בקוד {full}"))
+        if _has_tests(q):
+            badges.append(_badge("tested", "נבדק", "הקוד בדף רץ ונבדק אוטומטית בכל עדכון של האתר", " qh-badge-ok"))
+    if _is_new(q):
+        badges.append(_badge("new", "חדש", f"נוספה ב-{NEW_DAYS} הימים האחרונים", " qh-badge-new"))
+    topics = ", ".join(_tag_link(t, base) for t in q["tags"])
     bottom = [f"<span>נושאים : {topics}</span>"]
     if q.get("added"):
-        bottom.append(f'<span class="qh-sep"></span><span>נוסף {html.escape(str(q["added"]))}</span>')
+        added = q["added"] if isinstance(q["added"], dt.date) else dt.date.fromisoformat(str(q["added"]))
+        bottom.append(f'<span class="qh-sep"></span><span>נוספה ב-{_date_he(added)}</span>')
     if q.get("source"):
         bottom.append(f'<span class="qh-sep"></span><span>מקור : {html.escape(str(q["source"]))}</span>')
-    if langs:
-        bottom.append(f'<span class="qh-sep"></span><span class="qh-badge">קוד : {" + ".join(langs)}</span>')
-        if _has_tests(q):
-            bottom.append('<span class="qh-badge qh-badge-ok">✓ נבדק אוטומטית</span>')
     return (
         '<div class="question-header">\n'
-        f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
-        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{interactive_chip(q)}{new_chip(q)}</div>\n'
+        f'<div class="qh-row"><div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
+        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{"".join(badges)}</div>{tools}</div>\n'
         f'<h1>{html.escape(str(q["title"]))}</h1>\n'
         f'<div class="qh-bottom">{"".join(bottom)}</div>\n'
         '</div>\n\n'
     )
 
 
+def _tool(cls: str, icon: str, tip: str, extra: str = "") -> str:
+    return (f'<button type="button" class="qt-btn {cls}" aria-label="{tip}" data-tip="{tip}"{extra}>'
+            f'{ui_icon(icon)}</button>')
+
+
 def _tools(q: dict, page_url: str) -> str:
-    """Toolbar under the header: open / close every block, practice mode with a stopwatch,
-    solved / favourite marks (kept in the browser) and a random question of the same level."""
+    """The page tools as icon buttons (UI324): open or close every block (one toggle),
+    practice mode with a stopwatch, solved / favourite marks (kept in the browser) and a
+    random question of the same level. They sit beside the header's chip row."""
     others = [o for o in _questions.values() if o["id"] != q["id"]]
     same = [o for o in others if o["level"] == q["level"]] or others
     random_btn = ""
     if same:
         hrefs = json.dumps([_href(o["src_uri"], page_url) for o in sorted(same, key=lambda o: o["id"])])
-        random_btn = (f'<button type="button" class="qt-btn qt-random" data-hrefs="{html.escape(hrefs)}" '
-                      'title="שאלה אקראית מאותה רמה">שאלה אקראית</button>')
+        random_btn = _tool("qt-random", "random", "שאלה אקראית מאותה רמה", f' data-hrefs="{html.escape(hrefs)}"')
     return (f'<div class="question-tools" role="toolbar" aria-label="כלי השאלה" data-search-exclude data-qid="{q["id"]}">'
-            '<button type="button" class="qt-btn qt-open">פתח הכל</button>'
-            '<button type="button" class="qt-btn qt-close">סגור הכל</button>'
-            '<button type="button" class="qt-btn qt-practice">מצב תרגול</button>'
-            '<span class="qt-clock" hidden></span>'
-            '<span class="qt-spacer"></span>'
-            '<button type="button" class="qt-btn qt-mark qt-solved" data-mark="solved" aria-pressed="false">✓ פתרתי</button>'
-            '<button type="button" class="qt-btn qt-mark qt-star" data-mark="star" aria-pressed="false">☆ מועדף</button>'
-            f'{random_btn}'
-            '</div>\n\n')
+            + _tool("qt-fold", "unfold-more", "פתח הכל")
+            + _tool("qt-practice", "timer", "מצב תרגול", ' aria-pressed="false"')
+            + '<span class="qt-clock" hidden></span>'
+            + _tool("qt-mark qt-solved", "solved", "סמן כפתורה", ' data-mark="solved" aria-pressed="false"')
+            + _tool("qt-mark qt-star", "star", "הוסף למועדפים", ' data-mark="star" aria-pressed="false"')
+            + random_btn
+            + '</div>')
 
 
 def _progress(ids) -> str:
@@ -654,7 +668,7 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     if q:
         page.meta["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], *q["tags"]]
         page.meta.setdefault("hide", []).append("tags")   # the header card shows them
-        markdown = (_header(q, markdown, page.url) + _tools(q, page.url) + _path_nav(q, page.url) + markdown
+        markdown = (_header(q, markdown, page.url, _tools(q, page.url)) + _path_nav(q, page.url) + markdown
                     + _run_panel(q, markdown) + _related(q, page.url) + _comments_block())
 
     markdown = COST_LINE.sub(_cost_chips, markdown)

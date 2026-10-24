@@ -161,26 +161,68 @@
 
   // --- part bar ----------------------------------------------------------------------------
 
+  // The sticky bar (UI325): on a question page, the part chips (two parts or more), and
+  // once the header has scrolled away the solved toggle (it presses the header's own
+  // button, and mirrors it; the site header shows the title by then), with a
+  // reading-progress line along its bottom. With parts it is sticky in the flow under the header; without
+  // them it is fixed under the site header and slides in only after the header.
   const partBar = (article) => {
+    const header = article.querySelector(".question-header");
     const parts = Array.from(article.querySelectorAll("h3[id]")).filter((h) => /^סעיף/.test(h.textContent.trim()));
-    if (parts.length < 2) return;
+    if (!header && parts.length < 2) return;
+    const fixed = parts.length < 2;
     const nav = document.createElement("nav");
-    nav.className = "part-nav";
-    nav.setAttribute("aria-label", "סעיפי השאלה");
+    nav.className = `part-nav${fixed ? " pn-fixed" : ""}`;
+    nav.setAttribute("aria-label", fixed ? "השאלה" : "סעיפי השאלה");
     nav.setAttribute("data-search-exclude", "");
-    const links = parts.map((h) => {
+    const h1 = header && header.querySelector("h1");
+    const chips = document.createElement("span");
+    chips.className = "pn-chips";
+    const links = (fixed ? [] : parts).map((h) => {
       const a = document.createElement("a");
       a.href = `#${h.id}`;
       a.className = "part-nav__chip";
       a.textContent = h.textContent.replace("¶", "").split("–")[0].trim();
       a.title = h.textContent.replace("¶", "").trim();
-      nav.append(a);
+      chips.append(a);
       return a;
     });
+    nav.append(chips);
+    const own = header && header.querySelector(".qt-solved");
+    if (own) {
+      const solved = own.cloneNode(true);
+      solved.classList.remove("qt-mark", "qt-solved");
+      solved.classList.add("pn-solved");
+      solved.addEventListener("click", () => own.click());
+      const mirror = () => {
+        ["aria-pressed", "aria-label", "data-tip", "class"].forEach((at) => {
+          if (at === "class") solved.classList.toggle("is-active", own.classList.contains("is-active"));
+          else solved.setAttribute(at, own.getAttribute(at));
+        });
+        solved.querySelector(".ui-ico").className = own.querySelector(".ui-ico").className;
+      };
+      new MutationObserver(mirror).observe(own, { attributes: true, subtree: true });
+      mirror();
+      nav.append(solved);
+    }
+    const progress = document.createElement("span");
+    progress.className = "pn-progress";
+    progress.innerHTML = "<i></i>";
+    nav.append(progress);
     const h2 = Array.from(article.querySelectorAll("h2[id]"));
-    const end = h2.find((h) => h.compareDocumentPosition(parts[parts.length - 1]) & Node.DOCUMENT_POSITION_PRECEDING);
-    const anchor = article.querySelector(".path-nav") || article.querySelector(".question-tools");
-    if (anchor) anchor.after(nav); else article.prepend(nav);
+    const end = parts.length ? h2.find((h) => h.compareDocumentPosition(parts[parts.length - 1]) & Node.DOCUMENT_POSITION_PRECEDING) : null;
+    if (fixed) article.append(nav);
+    else {
+      const anchor = article.querySelector(".path-nav") || header;
+      if (anchor) anchor.after(nav); else article.prepend(nav);
+    }
+    const place = () => {                     // the fixed bar spans the article's column, under the site header
+      if (!fixed) return;
+      const r = article.getBoundingClientRect(), site = document.querySelector(".md-header");
+      nav.style.left = `${r.left}px`;
+      nav.style.width = `${r.width}px`;
+      if (site) nav.style.top = `${site.getBoundingClientRect().bottom}px`;
+    };
     const mark = () => {
       const y = 140;
       let current = -1;
@@ -190,8 +232,15 @@
         a.classList.toggle("is-current", i === current);
         if (i === current) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
       });
+      const stuck = Boolean(h1) && h1.getBoundingClientRect().bottom < 60;
+      if (stuck !== nav.classList.contains("is-stuck")) { nav.classList.toggle("is-stuck", stuck); place(); }
+      const r = article.getBoundingClientRect();
+      const read = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - window.innerHeight)));
+      nav.style.setProperty("--pn-read", `${(read * 100).toFixed(1)}%`);
     };
     window.addEventListener("scroll", mark, { passive: true });
+    window.addEventListener("resize", () => { place(); mark(); }, { passive: true });
+    place();
     mark();
   };
 

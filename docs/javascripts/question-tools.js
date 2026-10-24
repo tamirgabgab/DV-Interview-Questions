@@ -1,6 +1,8 @@
-// Question page tools: open / close every collapsible block, practice mode (solutions
-// hidden, with a stopwatch), solved / favourite marks (marks.js), a random question of the
-// same level, and the hint ladder (hint n+1 appears once hint n is open).
+// Question page tools, icon buttons at the end of the header's chip row (UI324): open or
+// close every collapsible block (one toggle), practice mode (solutions hidden, with a
+// stopwatch), solved / favourite marks (marks.js), a random question of the same level, and
+// the hint ladder (hint n+1 appears once hint n is open). A button's name is its
+// aria-label and its tooltip (data-tip); `retip` changes both, and the icon with them.
 // Practice mode is remembered across pages in localStorage; the stopwatch is per page.
 (() => {
   const KEY = "dvq-practice";
@@ -10,6 +12,12 @@
   const fmt = (ms) => {
     const s = Math.floor(ms / 1000);
     return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+  };
+
+  const retip = (btn, tip, icon) => {
+    btn.setAttribute("aria-label", tip);
+    btn.dataset.tip = tip;
+    if (icon) btn.querySelector(".ui-ico").className = `ui-ico ui-ico-${icon}`;
   };
 
   const setup = (bar) => {
@@ -23,7 +31,8 @@
     const setPractice = (on, remember = true) => {
       document.body.classList.toggle("practice-mode", on);
       practiceBtn.classList.toggle("is-active", on);
-      practiceBtn.textContent = on ? "הצג פתרונות" : "מצב תרגול";
+      practiceBtn.setAttribute("aria-pressed", String(on));
+      retip(practiceBtn, on ? "יציאה ממצב תרגול : הצג פתרונות" : "מצב תרגול : הפתרונות מוסתרים ושעון רץ");
       solutions().forEach((d) => { d.hidden = on; if (on) d.open = false; });
       if (remember) {
         try { localStorage.setItem(KEY, on ? "1" : "0"); } catch (e) { /* private mode */ }
@@ -32,30 +41,39 @@
       if (on) {
         start = Date.now();
         clock.hidden = false;
-        clock.textContent = "⏱ 00:00";
-        timer = setInterval(() => { clock.textContent = "⏱ " + fmt(Date.now() - start); }, 1000);
+        clock.textContent = "00:00";
+        timer = setInterval(() => { clock.textContent = fmt(Date.now() - start); }, 1000);
       } else if (start) {
-        clock.textContent = "⏱ " + fmt(Date.now() - start) + " · הפתרונות גלויים";
+        clock.textContent = fmt(Date.now() - start);
       }
+      fold.paint();
     };
 
-    bar.querySelector(".qt-open").addEventListener("click", () => {
-      details().forEach((d) => { if (!d.hidden) d.open = true; });
+    // one toggle for every block: it opens all while any visible block is closed
+    const foldBtn = bar.querySelector(".qt-fold");
+    const fold = {
+      allOpen: () => details().filter((d) => !d.hidden).every((d) => d.open),
+      paint: () => (fold.allOpen() ? retip(foldBtn, "סגור הכל", "unfold-less") : retip(foldBtn, "פתח הכל", "unfold-more")),
+    };
+    foldBtn.addEventListener("click", () => {
+      const open = !fold.allOpen();
+      details().forEach((d) => { if (!d.hidden) d.open = open; });
+      fold.paint();
     });
-    bar.querySelector(".qt-close").addEventListener("click", () => {
-      details().forEach((d) => (d.open = false));
-    });
+    article.addEventListener("toggle", () => fold.paint(), true);
+    fold.paint();
     practiceBtn.addEventListener("click", () => setPractice(!document.body.classList.contains("practice-mode")));
 
     // Solved / favourite marks
     const qid = bar.dataset.qid;
-    const LABEL = { solved: ["✓ פתרתי", "✓ סומנה כפתורה"], star: ["☆ מועדף", "★ במועדפים"] };
+    const LABEL = { solved: ["סמן כפתורה", "סומנה כפתורה : לחיצה מבטלת"], star: ["הוסף למועדפים", "במועדפים : לחיצה מסירה"] };
+    const ICON = { solved: ["solved", "solved-on"], star: ["star", "star-on"] };
     const paint = () => {
       bar.querySelectorAll(".qt-mark").forEach((b) => {
         const on = Boolean(window.dvqMarks && window.dvqMarks.has(qid, b.dataset.mark));
         b.setAttribute("aria-pressed", String(on));
         b.classList.toggle("is-active", on);
-        b.textContent = LABEL[b.dataset.mark][on ? 1 : 0];
+        retip(b, LABEL[b.dataset.mark][on ? 1 : 0], ICON[b.dataset.mark][on ? 1 : 0]);
       });
     };
     bar.querySelectorAll(".qt-mark").forEach((b) => {
