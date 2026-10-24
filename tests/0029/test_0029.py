@@ -183,3 +183,36 @@ def test_explorer_pair_filter():
         assert len(r["fwd"]) == len(ref) and all(abs(a - float(b)) < 1e-9 for a, b in zip(r["fwd"], ref)), key
         assert all(abs(a - float(b)) < 1e-9 for a, b in zip(r["back"], ref[::-1])), key
     assert len(got["2"]["fwd"]) == 22 and len(got["0"]["fwd"]) == 1416 and len(got["1,2"]["fwd"]) == 1438 + 22 - 2
+
+
+def test_explorer_gap_line():
+    """The gap line box of part b (J298): T = ti tj / (tj - ti) and L / T as exact fractions,
+    the three counts of formula 3 against counting the meetings k T in each interval, for
+    the clock's pairs over 12 hours and a day (the page's table) and for every length in
+    quarters of T up to 6 T with other periods; the box's dot test agrees with the counts."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    cases = [(60, 3600, 43200, 1), (60, 43200, 43200, 1), (3600, 43200, 43200, 1),
+             (60, 3600, 86400, 1), (60, 43200, 86400, 1), (3600, 43200, 86400, 1)]
+    for ti, tj in [(60, 3600), (60, 43200), (3600, 43200), (2, 3), (5, 7), (1, 1000)]:
+        T = Fr(ti * tj, tj - ti)
+        cases += [(ti, tj, (q * T).numerator, (q * T).denominator) for q in (Fr(n, 4) for n in range(1, 25))]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map(([ti, tj, Ln, Ld]) => {{
+        const r = m.gapLine(ti, tj, Ln, Ld), dots = {{}};
+        for (const mode of m.GAP_MODES) {{ let c = 0; for (let k = 0; k <= r.closed + 1; k++) if (m.gapIn(k, r.rn, r.rd, mode)) c++; dots[mode] = c; }}
+        return {{ ...r, dots }};
+      }})));""")
+    for (ti, tj, Ln, Ld), r in zip(cases, got):
+        T, L = Fr(ti * tj, tj - ti), Fr(Ln, Ld)
+        assert Fr(r["Tn"], r["Td"]) == T and Fr(r["rn"], r["rd"]) == L / T and r["whole"] == ((L / T).denominator == 1)
+        ks = range(0, int(L / T) + 2)
+        want = {"closed": sum(0 <= k * T <= L for k in ks), "open": sum(0 < k * T < L for k in ks), "half": sum(0 <= k * T < L for k in ks)}
+        assert {m: r[m] for m in want} == want == r["dots"]
+        assert want == {"closed": math.floor(L / T) + 1, "open": math.ceil(L / T) - 1, "half": math.ceil(L / T)}
+    table = [(r["closed"], r["open"], r["half"]) for r in got[:3]]
+    assert table == [(709, 707, 708), (720, 718, 719), (12, 10, 11)]
+    assert [r["half"] for r in got[3:6]] == [1416, 1438, 22]

@@ -160,3 +160,42 @@ def test_explorer_flag_strip():
             assert c["wg"] == bin2gray(c["w"]) and c["rg"] == bin2gray(c["r"])
             assert c["full"] == fifo_full(c["wg"], c["rg"], bits) and c["empty"] == fifo_empty(c["wg"], c["rg"])
         assert any(c["full"] for c in cols) and any(c["empty"] for c in cols[1:])
+
+
+def test_explorer_conversion_steps():
+    """The conversion box of part b (J294): forward every Gray bit is the XOR of the bit
+    above (0 over the top) and its own, back every binary bit is the bit found before XOR
+    its Gray bit, both against the page's bin2gray / gray2bin on every value of 3 to 6
+    bits; the counter walk changes one Gray bit per step, the trailing zeros of b + 1, and
+    the top bit on the wrap to 0."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const out = {{}};
+      for (const bits of [3, 4, 5, 6]) {{
+        const steps = [];
+        for (let b = 0; b < (1 << bits); b++) steps.push(m.grayConvertSteps(b, bits));
+        out[bits] = {{ steps, walk: m.grayWalk(bits) }};
+      }}
+      console.log(JSON.stringify(out));""")
+    for bits in (3, 4, 5, 6):
+        size = 1 << bits
+        steps, walk = got[str(bits)]["steps"], got[str(bits)]["walk"]
+        for b, r in enumerate(steps):
+            g = bin2gray(b)
+            assert r["g"] == g and gray2bin(g, bits) == b
+            assert [s["i"] for s in r["fwd"]] == [s["i"] for s in r["back"]] == list(range(bits - 1, -1, -1))
+            for s in r["fwd"]:
+                i = s["i"]
+                assert s["bit"] == b >> i & 1 and s["above"] == b >> (i + 1) & 1 and s["g"] == g >> i & 1
+            prev = 0
+            for s in r["back"]:
+                i = s["i"]
+                assert s["prev"] == prev and s["g"] == g >> i & 1 and s["b"] == prev ^ s["g"] == b >> i & 1
+                prev = s["b"]
+        for b, w in enumerate(walk):
+            nb = (b + 1) % size
+            assert w["g"] == bin2gray(b) and w["grayChanges"] == 1
+            assert w["binChanges"] == bin(b ^ nb).count("1")
+            assert w["bit"] == ((nb & -nb).bit_length() - 1 if nb else bits - 1)

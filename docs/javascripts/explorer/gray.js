@@ -1,10 +1,11 @@
 // kinds: gray
-//   gray                   0034        a pointer step through a synchroniser, bit by bit, in binary and in Gray, for 3 to 6 bits; a FIFO of 8 to 64 entries with the pointers one bit wider, the flags and a strip of the operations
+//   gray                   0034        a pointer step through a synchroniser, bit by bit, in binary and in Gray, for 3 to 6 bits; a FIFO of 8 to 64 entries with the pointers one bit wider, the flags and a strip of the operations; the two conversions bit by bit and a counter walk with the one changing Gray bit
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { W, bitsOf, code, ltr, seedControls, waveStrip } = dvqExplorers.lib;
+  const { W, autoplay, bitsOf, code, ltr, seedControls, speedSel, waveStrip } = dvqExplorers.lib;
+  const NB = "\u00a0";
 
   // Gray pointers (0034): the page's conversions, a sampled step b -> b + 1 where each
   // changing bit arrived or not, and the page's full / empty rules.
@@ -37,6 +38,30 @@
       seenGrayAsBin: grayToBin(seenGray, bits),
       wrongCount: changedBin.length >= 1 ? (1 << changedBin.length) - 2 : 0,
     };
+  };
+  // The page's two conversions bit by bit (part b), from the top bit down: forward,
+  // g_i = b_(i+1) xor b_i with 0 above the top; back, b_i = b_(i+1) xor g_i, where
+  // b_(i+1) is the bit found one step before (0 above the top again).
+  const grayConvertSteps = (b, bits) => {
+    const g = grayOf(b), fwd = [], back = [];
+    let prev = 0;
+    for (let i = bits - 1; i >= 0; i--) {
+      const bit = (b >> i) & 1, above = i === bits - 1 ? 0 : (b >> (i + 1)) & 1;
+      fwd.push({ i, above, bit, g: above ^ bit });
+      const gi = (g >> i) & 1;
+      back.push({ i, prev, g: gi, b: prev ^ gi });
+      prev ^= gi;
+    }
+    return { b, g, fwd, back };
+  };
+  // The counter walk 0, 1, ..., 2^bits − 1 and back to 0: for every b its Gray code, the
+  // Gray bits that change into b + 1 (always one) and how many binary bits change.
+  const grayWalk = (bits) => {
+    const size = 1 << bits, ones = (v) => v.toString(2).replace(/0/g, "").length;
+    return Array.from({ length: size }, (_, b) => {
+      const d = grayOf(b) ^ grayOf((b + 1) % size);
+      return { b, g: grayOf(b), bit: 31 - Math.clz32(d), grayChanges: ones(d), binChanges: ones(b ^ ((b + 1) % size)) };
+    });
   };
   // The FIFO strip: the operations so far, one column each (a burst is several), with the
   // pointers and the flags after it; a full FIFO refuses a write and an empty one a read,
@@ -71,6 +96,7 @@
   const grayView = (box) => ({
     mount() {
       if (box.dataset.mode === "flags") { grayFlagsMount(box); return; }
+      if (box.dataset.mode === "convert") { grayConvertMount(box); return; }
       const st = { bits: 4, b: 7, arrBin: {}, arrGray: {} };
       let BITS = 4;
       box.innerHTML =
@@ -135,6 +161,78 @@
       const seed = seedControls(box, $(".ex-reset"), (rng) => { randomize(rng); draw(); });
     },
   });
+  // data-mode="convert" (part b): a value b and a width of 3 to 6 bits; forward the
+  // binary row, the row shifted right (a 0 enters at the top) and their XOR, the Gray
+  // row; back the Gray row and the binary bits found one per step from the top, each the
+  // XOR of the bit before and its Gray bit; and the counter walk as a strip of the Gray
+  // bits over a full cycle, the wrap back to 0 included, with b as its cursor.
+  const grayConvertMount = (box) => {
+    const B0 = Number(box.dataset.b || 11);
+    const st = { bits: 4, b: B0, k: 4, walked: 0 };
+    box.innerHTML =
+      `<div class="ex-controls"><label>רוחב <select class="ex-bits" aria-label="מספר הביטים">${[3, 4, 5, 6].map((w) => `<option value="${w}"${w === 4 ? " selected" : ""}>${w} ביטים</option>`).join("")}</select></label>` +
+      `<label><span>הערך b</span><input type="range" class="ex-b" min="0" max="15" step="1" value="${B0}" dir="ltr" aria-label="הערך הבינארי b"><output class="ex-bout"></output></label>` +
+      `<button type="button" class="md-button md-button--primary ex-inc">‏b + 1</button>` +
+      `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 300) +
+      `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+      `<div class="gr-box"><div class="gr-side gr-fwd"></div><div class="gr-side gr-back"></div></div>` +
+      `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">הביט הקודם</button>` +
+      `<button type="button" class="md-button md-button--primary ex-next">הביט הבא</button>` +
+      `<button type="button" class="md-button ex-end">כל הביטים</button><span class="ex-pos"></span></div>` +
+      `<p class="wv-step gr-step" aria-live="polite"></p>` +
+      `<p class="ex-title">הליכת המונה : ביטי ה-Gray לאורך סיבוב שלם, מ-0 ובחזרה ל-0</p>` +
+      `<div class="wv-wrap gr-strip" tabindex="0" role="group" aria-label="ביטי ה-Gray לאורך סיבוב שלם של המונה, גלילה אופקית"></div>` +
+      `<p class="ex-summary gr-sum" aria-live="polite"></p>`;
+    const $ = (sel) => box.querySelector(sel);
+    const cell = (v, cls = "") => `<span class="gr-bit${cls ? ` ${cls}` : ""}">${v}</span>`;
+    const row = (label, cells, dec) => `<div class="gr-row"><span class="gr-label">${label}</span><span class="gr-bits" dir="ltr">${cells}</span><span class="gr-dec">${dec}</span></div>`;
+    const draw = () => {
+      const BITS = st.bits, size = 1 << BITS, r = grayConvertSteps(st.b, BITS), walk = grayWalk(BITS), w = walk[st.b];
+      st.k = Math.min(st.k, BITS);
+      $(".ex-b").max = String(size - 1); $(".ex-b").value = st.b; $(".ex-bout").textContent = String(st.b);
+      const ch = (i) => (i === w.bit ? " is-changed" : "");
+      $(".gr-fwd").innerHTML = `<p class="ex-title">קדימה : ${ltr("g = b ⊕ (b ≫ 1)")}</p>` +
+        row("בינארי", r.fwd.map((s) => cell(s.bit)).join(""), ltr(r.b)) +
+        row("מוזז", r.fwd.map((s, j) => cell(s.above, j === 0 ? "gr-in" : "")).join(""), ltr(r.b >> 1)) +
+        row("‏Gray", r.fwd.map((s) => cell(s.g, `gr-res${ch(s.i)}`)).join(""), ltr(r.g)) +
+        `<p>כל ביט של Gray הוא XOR של הביט שמעליו ושל עצמו. מעל הביט העליון נכנס 0, ולכן הוא מועתק כמו שהוא.</p>`;
+      const shown = r.back.slice(0, st.k);
+      $(".gr-back").innerHTML = `<p class="ex-title">חזרה : XOR מצטבר מהביט העליון</p>` +
+        row("‏Gray", r.back.map((s, j) => cell(s.g, j === st.k - 1 ? "gr-cur" : "")).join(""), ltr(r.g)) +
+        row("בינארי", r.back.map((s, j) => (j < st.k ? cell(s.b, `gr-res${j === st.k - 1 ? " gr-cur" : ""}`) : cell("?", "gr-unk"))).join(""),
+          st.k === BITS ? ltr(r.b) : "") +
+        `<p>${st.k === BITS ? `חזרנו ל-${ltr(r.b)} ✓ : שתי הפונקציות הפוכות זו לזו.` : `נמצאו ${ltr(st.k)} מתוך ${ltr(BITS)} הביטים.`}</p>`;
+      $(".ex-pos").textContent = `ביט ${st.k} מתוך ${BITS}`;
+      const s = shown[shown.length - 1];
+      $(".gr-step").innerHTML = !s ? `לחצו על ״הביט הבא״ : ההמרה חזרה מתחילה מהביט העליון, כי כל ביט צריך את הביט הבינארי שמעליו.`
+        : s.i === BITS - 1 ? `הביט העליון${NB}: ${ltr(`b<sub>${s.i}</sub> = g<sub>${s.i}</sub> = ${s.b}`)}, כי מעליו יש 0.`
+        : `ביט ${ltr(s.i)}${NB}: ${ltr(`b<sub>${s.i}</sub> = b<sub>${s.i + 1}</sub> ⊕ g<sub>${s.i}</sub> = ${s.prev} ⊕ ${s.g} = ${s.b}`)}` + (st.k === BITS ? "." : `, ועכשיו הוא הביט שמעל ביט ${ltr(s.i - 1)}.`);
+      $(".ex-prev").disabled = st.k === 0;
+      $(".ex-next").disabled = st.k >= BITS;
+      $(".ex-end").disabled = st.k >= BITS;
+      // the strip: one column per value of the cycle and a last column back at 0
+      const cols = walk.map((c) => c.g).concat([0]), SW = BITS > 4 ? 22 : 30;
+      const wrapEl = $(".gr-strip");
+      wrapEl.innerHTML = waveStrip(
+        [...Array(BITS)].map((_, j) => { const i = BITS - 1 - j; return { name: `g${i}`, kind: "bit", values: cols.map((g) => (g >> i) & 1), cls: i === w.bit ? "wv-s2" : "wv-s3" }; }),
+        cols.length, { slotW: SW, labelW: 40, cursor: st.b, ticks: (k) => (k === size ? 0 : k), label: `ביטי ה-Gray של ${size} ערכי המונה, הערך ${st.b} מסומן` });
+      wrapEl.scrollLeft = Math.max(0, 40 + st.b * SW - wrapEl.clientWidth / 2);
+      const nb = (st.b + 1) % size;
+      $(".gr-sum").innerHTML = `הצעד ${ltr(`${st.b} → ${nb}`)}${NB}: בבינארי ${w.binChanges === 1 ? "משתנה ביט אחד" : `משתנים ${ltr(w.binChanges)} ביטים`} ` +
+        `(${ltr(`${bitsOf(st.b, BITS)} → ${bitsOf(nb, BITS)}`)}), וב-Gray רק ביט ${ltr(w.bit)} (${ltr(`${bitsOf(w.g, BITS)} → ${bitsOf(grayOf(nb), BITS)}`)}), המודגש ברצועה. ` +
+        (nb === 0 ? `זו הגלישה : כל הביטים הבינאריים מתהפכים, וב-Gray משתנה רק הביט העליון.` : `זה מספר האפסים בסוף של ${ltr(nb)}.`);
+    };
+    const inc = () => { st.b = (st.b + 1) % (1 << st.bits); st.walked++; draw(); };
+    $(".ex-b").addEventListener("input", () => { stop(); st.b = Number($(".ex-b").value); draw(); });
+    $(".ex-bits").addEventListener("change", () => { stop(); st.bits = Number($(".ex-bits").value); st.b = Math.min(st.b, (1 << st.bits) - 1); st.k = st.bits; draw(); });
+    $(".ex-inc").addEventListener("click", () => { stop(); inc(); });
+    $(".ex-next").addEventListener("click", () => { st.k++; draw(); });
+    $(".ex-prev").addEventListener("click", () => { if (st.k > 0) st.k--; draw(); });
+    $(".ex-end").addEventListener("click", () => { st.k = st.bits; draw(); });
+    $(".ex-reset").addEventListener("click", () => { stop(); st.bits = 4; $(".ex-bits").value = "4"; st.b = B0; st.k = 4; draw(); });
+    const stop = autoplay($(".ex-play"), $(".ex-speed"), { step: inc, done: () => st.walked >= 1 << st.bits, restart: () => { st.walked = 0; } });
+    draw();
+  };
   const grayFlagsMount = (box) => {
     const st = { size: 16, w: 0, r: 0, hist: [], ops: [] };
     const KEEP = 64;                                       // columns kept on the strip
@@ -219,8 +317,8 @@
   dvqExplorers.register({
     views: { gray: grayView },
     help: {
-      gray: "בסנכרן בוחרים מצביע ורוחב, וכל ביט שמשתנה נדגם ישן או חדש (בלחיצה או ב״הגרלה״). ב-FIFO ״כתיבה״ ו״קריאה״ מזיזים את המצביעים, empty ו-full מחושבים לפי הכללים, ורצועת התזמון מוסיפה עמודה לכל פעולה.",
+      gray: "בסנכרן בוחרים מצביע ורוחב, וכל ביט שמשתנה נדגם ישן או חדש (בלחיצה או ב״הגרלה״). ב-FIFO ״כתיבה״ ו״קריאה״ מזיזים את המצביעים, empty ו-full מחושבים לפי הכללים, ורצועת התזמון מוסיפה עמודה לכל פעולה. בהמרות בוחרים ערך ורוחב : ״הביט הבא״ מוצא את הבינארי מה-Gray ביט אחרי ביט, ו-״b + 1״ ו״הפעלה״ מקדמים את המונה, והביט היחיד שמשתנה ב-Gray מודגש.",
     },
-    models: { grayOf, grayToBin, graySample, grayFlags, grayFlagsOps },
+    models: { grayOf, grayToBin, graySample, grayFlags, grayFlagsOps, grayConvertSteps, grayWalk },
   });
 })();

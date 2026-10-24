@@ -92,3 +92,34 @@ def test_explorer_matches_formula():
         if C <= 4:
             assert abs(v - float(enumerate_kinds(C, p, q))) < 1e-12, (C, p, q)
     assert abs(got[cases.index((2, Fraction(1, 2), Fraction(1, 7)))] - 13 / 27) < 1e-12
+
+
+def test_explorer_tuesday_grid():
+    """The grid box of part b (J300): for each kind of information and each weekday, the
+    first child's rows, the second child's columns, the cells counted twice, the families
+    that meet it and those with two boys, against enumerating the 196 families; the page's
+    27 and 13 for a boy born on Tuesday, a third for part a and a half for the elder."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const out = {{}};
+      for (const info of m.TU_INFOS) for (let day = 0; day < 7; day++) out[info + day] = m.tuesdayCount(info, day);
+      console.log(JSON.stringify(out));""")
+    kinds = [(s, d) for s in "BG" for d in range(7)]
+    for info in ("any", "day", "elder"):
+        for day in range(7):
+            S = {k for k in kinds if k[0] == "B" and (info != "day" or k[1] == day)}
+            meets = lambda a, b: a in S or (info != "elder" and b in S)
+            pairs = list(product(kinds, repeat=2))
+            cond = [x for x in pairs if meets(*x)]
+            hit = [x for x in cond if x[0][0] == x[1][0] == "B"]
+            r = got[info + str(day)]
+            assert r["row"] == sum(a in S for a, _ in pairs)
+            assert r["col"] == (0 if info == "elder" else sum(b in S for _, b in pairs))
+            assert r["overlap"] == (0 if info == "elder" else sum(a in S and b in S for a, b in pairs))
+            assert r["cond"] == len(cond) == r["row"] + r["col"] - r["overlap"]
+            assert r["hit"] == len(hit) and r["quad"] == 49
+            assert Fraction(r["num"], r["den"]) == Fraction(len(hit), len(cond))
+            assert (r["num"], r["den"]) == {"any": (1, 3), "day": (13, 27), "elder": (1, 2)}[info]
+    assert (got["day2"]["row"], got["day2"]["col"], got["day2"]["overlap"], got["day2"]["cond"], got["day2"]["hit"]) == (14, 14, 1, 27, 13)

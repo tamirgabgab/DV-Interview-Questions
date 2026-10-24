@@ -1912,6 +1912,25 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     in "Install Playwright": `ubuntu-latest` moved to Ubuntu 26.04, where Playwright 1.56
     cannot install Chromium. The three jobs of `deploy.yml` now run on `ubuntu-24.04` (the
     Verilator cache was built there too). The review fixes reach the site with round I.
+26. **Round J, first batch (J294, J298, J300).** The owner's answers (four questions for
+    the whole round): the Gray conversions as a mode of the existing box; sliders in the
+    medium boxes; a new SVA box in part a with presets and editing; τ, T0 and the flop
+    count in the Monte Carlo box. `gray` `data-mode="convert"` (0034 part b): forward
+    the binary row, the shifted row with a 0 entering at the top and the XOR; back the
+    binary bits one per step from the top, each the bit before XOR its Gray bit; the
+    counter walk as a strip of the Gray bits over a full cycle with the one changing bit
+    lit, b + 1 and play (`grayConvertSteps`, `grayWalk`, tested on every value of 3 to 6
+    bits against bin2gray / gray2bin and the trailing-zeros rule). `gapline` (0029 part
+    b, at the end of the proof): the angle difference in turns against time with the
+    integers as lines and a dot per meeting, L in quarters of T, the interval closed,
+    open or half-open with its ends filled or hollow and the three counts of formula 3
+    (`gapLine`, `gapIn`, exact fractions, tested against counting k T in each interval,
+    the page's table for 12 hours and the day's 1,416, 1,438 and 22). `tuesday` (0015
+    part b, after "why 13 and not 14"): the 196 families counted in four steps (row,
+    column, the shared cell once, two boys), a tap names a family, any weekday, and
+    "at least one boy" (1/3) and "the elder is a boy" (1/2) on the same grid with the
+    three answers in a table (`tuesdayCount`, tested against enumerating the families
+    for every information and day).
 ---
 
 ## In progress
@@ -1952,9 +1971,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   item 21); state outside the controls is an open item, and old links need nothing.
   Round I (the owner's pick, three batches, `main` at the end): batch 1 (I284, I286,
   I290), batch 2 (I291, I287, I292) and batch 3 (I285, I288, I289) are done: round I is
-  closed and on `main`. Next: the owner's pick, round J (the DV, math and probability
-  parts with no visual) or the new questions of rounds M to R. Next: the owner's pick, rounds I and J (new boxes for
-  the parts with no visual) or the new questions of rounds M to R.
+  closed and on `main`. Round J (the owner's pick, three batches; `main` when the owner
+  asks): batch 1 (J294, J298, J300) is done on the branch. Next: batch 2 (J293, J297,
+  J299), then batch 3 (J295, J296).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2621,13 +2640,13 @@ the first series' rounds of the same letters.
 | Id | Page | Idea | Size |
 |---|---|---|---|
 | J293 | 0033 part a | **Written and read staircases**: the two cumulative step curves; the gap between them is the fill, and it peaks at the last write of the burst | S–M |
-| J294 | 0034 part b | **The conversions stepped**: binary, the shifted row, XOR gives Gray; back by a prefix XOR from the MSB one bit per step; a counter walk marks the one changing bit, the 15 → 0 wrap included | S |
+| ~~J294~~ | 0034 part b | Done in session 22. **The conversions stepped**: binary, the shifted row, XOR gives Gray; back by a prefix XOR from the MSB one bit per step; a counter walk marks the one changing bit, the 15 → 0 wrap included | S |
 | J295 | 0037 part a | **Metastability by Monte Carlo**: data edges on a clock timeline, those in the T0 window settle after an exponential time; the histogram with the t_res cut, and a second flop moving the cut by Tclk, so the two factors of the formula are seen | M |
 | J296 | 0038 part a | **Attempt lanes**: one lane per property of the page, where the antecedent matched, the window as a bracket, and pass / fail / vacuous | M |
 | J297 | 0041 part a | **The stage ribbon**: equal bins played test by test, a bar per stage i → i + 1 with the measured wait against n / (n − i), the sum that makes n·H_n | S–M |
-| J298 | 0029 part b | **The gap line**: the unwrapped angle difference of a chosen pair against time with the integers as lines, each crossing a meeting; the interval ends switched between closed, open and half-open with the page's three counts | S |
+| ~~J298~~ | 0029 part b | Done in session 22. **The gap line**: the unwrapped angle difference of a chosen pair against time with the integers as lines, each crossing a meeting; the interval ends switched between closed, open and half-open with the page's three counts | S |
 | J299 | 0021 part b | **The recurrence ladder**: C(0..N) as a row; a click on C(n) lights the m terms it sums and the block strip shows "the first completion takes i blocks" for each term | M |
-| J300 | 0015 part b | **The Tuesday grid**: the 14 × 14 grid of (child, weekday) pairs, the cross of the 27 families with a boy born on Tuesday lit, the shared cell counted once, and the 13 with two boys | S–M |
+| ~~J300~~ | 0015 part b | Done in session 22. **The Tuesday grid**: the 14 × 14 grid of (child, weekday) pairs, the cross of the 27 families with a boy born on Tuesday lit, the shared cell counted once, and the 13 with two boys | S–M |
 
 **Round K — the mechanism of the solution, inside the existing boxes**
 
