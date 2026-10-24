@@ -146,3 +146,33 @@ def test_explorer_state_link():
         assert payload == ".".join(map(str, s["nums"])) + f"-{s['k']}"
         assert back == {"nums": s["nums"], "k": min(s["k"], total)}, s
     assert got["bad"] == [None] * len(bad)
+
+
+def test_explorer_binary_search_box():
+    """The solution 3 box: its frames are the page's loop (lo, hi, mid, the count of values
+    <= mid and the half it keeps), the answer is the page's, the invariant it prints holds
+    at every step, and the duplicate is the first v with c(v) > v. The example's frames
+    are the page's table."""
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(17)
+    cases = [EXAMPLE] + [random_case(rng, n) for n in range(3, 13) for _ in range(8)]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({cases}.map((a) => [m.dupBinarySearch(a), m.dupCounts(a)])));")
+    for nums, (r, c) in zip(cases, got):
+        assert r["answer"] == ns["find_duplicate_binary"](nums)
+        assert c == [sum(v <= t for v in nums) for t in range(len(nums))]
+        lo, hi = 1, len(nums) - 1
+        for fr in r["frames"]:
+            assert (fr["lo"], fr["hi"]) == (lo, hi)
+            assert c[lo - 1] <= lo - 1 and c[hi] > hi
+            mid = (lo + hi) // 2
+            assert (fr["mid"], fr["count"], fr["low"]) == (mid, c[mid], c[mid] > mid)
+            lo, hi = (lo, mid) if c[mid] > mid else (mid + 1, hi)
+        assert lo == hi == r["answer"]
+        ans = r["answer"]
+        assert c[ans - 1] <= ans - 1 < ans < c[ans] and nums.count(ans) >= 2
+        if len(set(nums)) == len(nums) - nums.count(ans) + 1:   # one repeated value: the first crossing
+            assert ans == next(v for v in range(1, len(nums)) if c[v] > v)
+    table = [(fr["lo"], fr["hi"], fr["mid"], fr["count"]) for fr in got[0][0]["frames"]]
+    assert table == [(1, 9, 5, 6), (1, 5, 3, 4), (1, 3, 2, 3), (1, 2, 1, 2)]

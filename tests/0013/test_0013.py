@@ -198,3 +198,34 @@ def test_explorer_column_subtraction():
         assert [col["borrowOut"] for col in cols] == [0, int(q == 0), 1, 1], x
         want = [p, q - 1, 9 - q, 10 - p] if q >= 1 else [p - 1, 9, 9, 10 - p]
         assert [col["digit"] for col in cols] == want, x
+
+
+def test_explorer_pairs_box():
+    """The pairs box of part b: for each of the 54 pairs, the difference, its digits by
+    step 3, the next pair (the pair of the difference), conditions a and b (both only at
+    (6, 2)), the cases of step 6 that hold, and the path that ends at 6174."""
+    from page_tests import explorer_require, node_json
+
+    pairs = [(p, q) for p in range(1, 10) for q in range(p + 1)]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({[list(t) for t in pairs]}.map(([p, q]) => [m.kapPair(p, q), m.kapPairPath(p, q)])));")
+    cases = {("P", "Q1"): 1, ("P", "N"): 2, ("P", "T"): 3, ("N", "Q1"): 4, ("N", "T"): 5, ("T", "Q1"): 6, ("T", "N"): 7}
+    for (p, q), (r, path) in zip(pairs, got):
+        v = 999 * p + 90 * q
+        assert r["value"] == v
+        assert r["digits"] == [int(ch) for ch in f"{v:04d}"]
+        a, b, c, d = digits_sorted(v)
+        assert r["next"] == [a - d, b - c]
+        assert step(v) == 999 * (a - d) + 90 * (b - c)
+        assert (r["condA"] and r["condB"]) == ((p, q) == (6, 2))
+        if q == 0:
+            assert r["cases"] == []
+        else:
+            ex = {"P": p, "Q1": q - 1, "N": 9 - q, "T": 10 - p}
+            want = sorted({n for (t, s), n in cases.items() if ex[t] == a and ex[s] == d})
+            assert r["cases"] == want, (p, q)
+        assert path[0] == [p, q] and path[-1] == [6, 2] and len(path) <= 8
+        x = v
+        for np_, nq in path[1:]:
+            x = step(x)
+            assert x == 999 * np_ + 90 * nq

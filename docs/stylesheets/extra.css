@@ -2397,5 +2397,29 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .kq-key-tofixed { background: var(--viz-s3); opacity: 0.4; }
 .md-typeset .viz-legend .kq-key-tocycle { background: var(--viz-s1); opacity: 0.3; }
 .md-typeset .viz-legend .kq-key-path { background: var(--viz-s2); }
+/* The pigeonhole box (0005 bonus): the remainder slots, the repunits dropped in them. */
+.md-typeset svg .rp-slot { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .rp-slot.is-hit { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .rp-chip { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .rp-chip.is-new { fill: var(--viz-s1); }
+.md-typeset .viz-legend .rp-key-new { background: var(--viz-s1); }
+.md-typeset .viz-legend .rp-key-hit { background: var(--viz-s2); opacity: 0.5; }
+/* The binary search box (0017 solution 3): counted cells, the range, mid, the line y = v. */
+.md-typeset .explorer .db-cells .box-grid > span.is-counted { background: color-mix(in srgb, var(--viz-s1) 22%, transparent); border-color: var(--viz-s1); }
+.md-typeset svg .db-range { fill: var(--viz-s3); fill-opacity: 0.14; }
+.md-typeset svg .db-bar { fill: var(--viz-s1); }
+.md-typeset svg .db-bar.is-out { fill-opacity: 0.3; }
+.md-typeset svg .db-bar.is-mid { fill: var(--viz-s2); fill-opacity: 1; }
+.md-typeset svg .db-line { stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 6 4; }
+.md-typeset .viz-legend .db-key-range { background: var(--viz-s3); opacity: 0.35; }
+.md-typeset .viz-legend .db-key-mid { background: var(--viz-s2); }
+.md-typeset .viz-legend .db-key-line { background: var(--viz-ink); height: 2px; }
+/* The pairs box (0013 part b): the picked cell, the later arrows of the path. */
+.md-typeset svg .kpp-cell { cursor: pointer; }
+.md-typeset svg .kpp-cell.is-pick .box-node { stroke: var(--viz-ink); stroke-width: 4; }
+.md-typeset svg .kpp-later { opacity: 0.4; }
+.md-typeset .viz-legend .kpp-key-q0 { background: var(--viz-s1); opacity: 0.4; }
+.md-typeset .viz-legend .kpp-key-fixed { background: var(--viz-s2); opacity: 0.4; }
+.md-typeset .explorer .kpp-text p { margin: 0.3em 0; }
 .md-typeset .explorer svg.k4-live { width: 100%; max-width: 28rem; display: block; }
 .md-typeset .explorer input.k4-x { width: 5rem; letter-spacing: 0.15em; font-family: var(--md-code-font-family); text-transform: uppercase; }

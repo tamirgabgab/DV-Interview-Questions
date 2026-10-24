@@ -1874,6 +1874,24 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     Links and remembered state made before this batch for the later boxes of 0002, 0006
     and 0012 now point one box earlier (a day's worth; the page-attribute check drops a
     remembered state that does not fit).
+23. **Round I, second batch (I291, I287, I292), three new kinds.** The owner's answers: the
+    0013 box goes under the static chart, which stays (it prints and needs no script); x
+    on a slider up to 40, stopping at the first collision; the 0017 box has its own
+    array, starting from the page's example. `kappairs` (0013 part b): the 54 pairs as
+    the chart's grid, a click (or the select, which carries the link) shows the
+    difference, the digits of step 3 with the largest and smallest marked, the case of
+    step 6 (several on a tie) or step 5 for q = 0, conditions a and b, and the arrow to
+    the next pair with the rest of the path to 6174 fainter (`kapPair`, `kapPairPath`,
+    tested on every pair against the proof's expressions and the page's step). `repunit`
+    (0005 bonus): R1, R11, … dropped into the x remainder slots, each remainder from the
+    one before, the shared slot lit, and R_i − R_j written as x times the quotient
+    (`repunitDrops`, `repunitDiff`, tested for x up to 40; the page's x = 7 example is
+    R7 − R1 = 1111110 = 7 · 158730). `dupbin` (0017 solution 3): the page's loop step by
+    step, the counted cells lit, c(v) against y = v with lo..hi shaded, and the invariant
+    per step (`dupBinarySearch`, `dupCounts`, tested against find_duplicate_binary and the
+    page's table). The 0017 text first said the duplicate is the first value over the
+    line; with several repeated values (the statement allows them) that is only true of
+    one repeated value, and the page now says what the invariant gives.
 ---
 
 ## In progress
@@ -1913,7 +1931,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   K301, K302, K306, K305, K308). A code review of round K fixed seven findings (work log
   item 21); state outside the controls is an open item, and old links need nothing.
   Round I (the owner's pick, three batches, `main` at the end): batch 1 (I284, I286,
-  I290) is done on the branch; next batch 2 (I291, I287, I292), then batch 3 (I285, I288,
+  I290) and batch 2 (I291, I287, I292) are done on the branch; next batch 3 (I285, I288,
   I289). Next: the owner's pick, rounds I and J (new boxes for
   the parts with no visual) or the new questions of rounds M to R.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
@@ -2570,12 +2588,12 @@ the first series' rounds of the same letters.
 | ~~I284~~ | 0002 parts a, b | Done in session 22. **Each part with its own swap**: the existing `trace` box placed in part a (the temporary variable) and in part b (the sum and the XOR), each preset to its part's version, the values and the a0 / b0 expressions line by line | S |
 | I285 | 0004 part b | **The labels fix**: a `boxes3` mode with the labels array, k, same and other marked, and the two swaps drawn as a 3-cycle | M |
 | ~~I286~~ | 0006 part a | Done in session 22. **The scan in part a**: the `stock` box placed in part a in long-only mode, so the minimum so far and the best long sit beside the part that explains them | S |
-| I287 | 0005 bonus | **Pigeonhole on the repunits**: R1 … R(x+1) dropped into x remainder slots, the first collision lit, and R_i − R_j = 1…10…0 shown as the multiple | M |
+| ~~I287~~ | 0005 bonus | Done in session 22. **Pigeonhole on the repunits**: R1 … R(x+1) dropped into x remainder slots, the first collision lit, and R_i − R_j = 1…10…0 shown as the multiple | M |
 | I288 | 0007 part c | **Three half-circles**: for a drawn triangle, the half-circle that starts at each point; at most one holds the other two; seeded draws count A1, A2, A3 apart (about 1/4 each, never two at once) | M |
 | I289 | 0011 part b | **Any five cells hold a line**: pick cells on the wrap-around board; the 2-2-1 split per direction and the pair count are shown, and the fifth cell always completes a line | M |
 | ~~I290~~ | 0012 part b | Done in session 22. **The map of the proof**: `kapbase` with base 10 placed in part b: the map k → max(10 − k, k − 1) and the fixed point at 5 | S |
-| I291 | 0013 part b | **The 55 pairs, clickable**: a cell of the (p, q) grid shows its digits, the case of the analysis that applies and the arrow to the next pair; only 6174 points to itself | S–M |
-| I292 | 0017 solution 3 | **Binary search on values**: the histogram of 1..n with the count of values ≤ mid against y = mid, lo and hi narrowing with the invariant in colour, on the same array as the Floyd box | M |
+| ~~I291~~ | 0013 part b | Done in session 22. **The 55 pairs, clickable**: a cell of the (p, q) grid shows its digits, the case of the analysis that applies and the arrow to the next pair; only 6174 points to itself | S–M |
+| ~~I292~~ | 0017 solution 3 | Done in session 22. **Binary search on values**: the histogram of 1..n with the count of values ≤ mid against y = mid, lo and hi narrowing with the invariant in colour, on the same array as the Floyd box | M |
 
 **Round J — a visual in the parts that have none (DV, math and probability)**
 

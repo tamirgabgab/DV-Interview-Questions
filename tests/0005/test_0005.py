@@ -251,3 +251,25 @@ def test_explorer_matches_page_code():
         assert tr["path"] == path and tr["start"] == start
         assert tr["parent"] == parent and tr["digit"] == digit
         assert "".join(digit[r] for r in path) == y
+
+
+def test_explorer_pigeonhole_box():
+    """The bonus box: the repunits R_1, R_2, … modulo x until two share a remainder; the
+    collision comes by R_{x+1}, the earlier one is the first with that remainder, and
+    R_i - R_j (ones then zeros) is x times the quotient the box prints, for x up to 40,
+    with the page's example x = 7 (R_7 and R_1, 1111110 = 7 * 158730)."""
+    from page_tests import explorer_require, node_json
+
+    xs = list(range(2, 41))
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({xs}.map((x) => {{ const r = m.repunitDrops(x); return [r, m.repunitDiff(x, r.i, r.j)]; }})));")
+    for x, (r, d) in zip(xs, got):
+        rems = [int("1" * k) % x for k in range(1, r["i"] + 1)]
+        assert r["rems"] == rems
+        assert len(set(rems[:-1])) == len(rems) - 1 and rems.index(rems[-1]) + 1 == r["j"]
+        assert r["j"] < r["i"] <= x + 1
+        diff = int("1" * r["i"]) - int("1" * r["j"])
+        assert d["digits"] == str(diff) and set(d["digits"]) <= {"0", "1"}
+        assert d["exact"] and int(d["quotient"]) * x == diff
+    r, d = got[xs.index(7)]
+    assert (r["i"], r["j"], d["digits"], d["quotient"]) == (7, 1, "1111110", "158730")
