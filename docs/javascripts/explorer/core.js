@@ -211,7 +211,7 @@
     if (first && m && m[1] === kind) {
       runSeed(Number(m[2]));
       requestAnimationFrame(() => box.scrollIntoView({ block: "start" }));
-    } else if (first && sm && sm[1] === kind && opts.state && opts.state.set(sm[2])) {
+    } else if (sm && sm[1] === stateName(box) && opts.state && opts.state.set(sm[2])) {
       requestAnimationFrame(() => box.scrollIntoView({ block: "start" }));
     }
     return { draw };
@@ -478,10 +478,13 @@
     return true;
   };
   const indexOf = (box) => [...document.querySelectorAll(`.explorer[data-kind="${box.dataset.kind}"]`)].indexOf(box) + 1;
+  // a codec link names its box: #state-<kind>.… for the first box of a kind on the page,
+  // #state-<kind>-<n>.… for the n-th (0006 has two stock boxes)
+  const stateName = (box) => { const n = indexOf(box); return n > 1 ? `${box.dataset.kind}-${n}` : box.dataset.kind; };
   const ownState = (box) => (box.dvqState ? box.dvqState.get() : null);
   const linkOf = (box) => {
     const own = ownState(box);
-    return own ? `#state-${box.dataset.kind}.${own}` : `#ctl-${box.dataset.kind}-${indexOf(box)}.${payloadOf(box)}`;
+    return own ? `#state-${stateName(box)}.${own}` : `#ctl-${box.dataset.kind}-${indexOf(box)}.${payloadOf(box)}`;
   };
 
   // The remembered state: the box's payload (its own codec's when it has one) in
@@ -562,6 +565,10 @@
   const linked = (boxes) => {
     const c = CTL_HASH.exec(location.hash), m = c || SEED_HASH.exec(location.hash) || STATE_HASH.exec(location.hash);
     if (!m) return null;
+    if (!c && !SEED_HASH.test(location.hash)) {   // a #state- link
+      const box = boxes.find((b) => stateName(b) === m[1]);
+      return box ? { box, payload: null } : null;
+    }
     const box = boxes.filter((b) => b.dataset.kind === m[1])[c ? Number(c[2]) - 1 : 0];
     return box ? { box, payload: c ? c[3] : null } : null;
   };

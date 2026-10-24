@@ -1332,6 +1332,7 @@ body.practice-mode .md-typeset .question-tools {
 }
 .md-typeset .explorer .ex-controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; align-items: center; }
 .md-typeset .explorer label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.5rem; }
+.md-typeset .explorer label[hidden] { display: none; }
 .md-typeset .explorer input[type="range"] { width: 11rem; max-width: 100%; accent-color: var(--viz-s1); }
 .md-typeset .explorer output {
   min-width: 3.2rem;

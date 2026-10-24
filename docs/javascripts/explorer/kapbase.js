@@ -144,6 +144,7 @@
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
       const seed = seedControls(box, $(".ex-random"), (rng) => setX(Math.floor(rng() * st.b * st.b * st.b)));
       $(".ex-random").addEventListener("click", () => seed.draw());
+      if (d0.fixed !== undefined) $(".kb-b").closest("label").hidden = true;   // data-fixed: the base stays b (0012 part b)
       $(".ex-reset").addEventListener("click", () => { stop(); st.b = B0; st.x = X0; st.step = 0; $(".kb-b").value = B0; $(".kb-err").textContent = ""; draw(); });
       $(".ex-next").addEventListener("click", () => { stop(); if (st.step < chainOf().length - 1) { st.step++; draw(); } });
       $(".ex-prev").addEventListener("click", () => { stop(); if (st.step > 0) { st.step--; draw(); } });

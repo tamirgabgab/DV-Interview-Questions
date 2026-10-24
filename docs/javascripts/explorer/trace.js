@@ -94,7 +94,8 @@
 
   // The tracer box (0002, 0003): the Python code of the page on the left with the current
   // line lit, the state on the right. data-mode="swap": a version select, a and b, the
-  // same-variable and 8-bit toggles, the symbolic expressions in a0 and b0.
+  // same-variable and 8-bit toggles, the symbolic expressions in a0 and b0; data-version
+  // locks it on one version.
   // data-mode="loop": a typed or random array, one comparison per step, a jump to the end
   // of the outer iteration with the invariant, the counters.
   const traceView = (box) => ({
@@ -112,7 +113,9 @@
       let timer = null;
       const stop = () => { if (timer) clearInterval(timer); timer = null; $(".ex-play").textContent = "הפעלה"; };
       if (mode === "swap") {
-        const PAGE = { kind: "arith", a: 5, b: 3, c: 7, same: false, bits: 0, k: 0 };
+        // data-version="temp" or "arith" locks the box on one part's version (0002 parts a, b)
+        const lock = ["temp", "arith"].includes(box.dataset.version) ? box.dataset.version : null;
+        const PAGE = { kind: lock || "arith", a: 5, b: 3, c: 7, same: false, bits: 0, k: 0 };
         const st = { ...PAGE };
         box.innerHTML =
           `<div class="ex-controls"><label>הגרסה <select class="ex-kind" aria-label="גרסת ההחלפה"><option value="temp">עם משתנה עזר (סעיף א)</option><option value="arith" selected>אריתמטיקה (סעיף ב)</option><option value="xor">XOR (סעיף ג)</option><option value="rot">סיבוב של שלושה ב-XOR (שאלת המשך)</option></select></label>` +
@@ -189,6 +192,11 @@
           timer = setInterval(() => { st.k++; draw(); if (st.k >= total()) stop(); }, Number($(".ex-speed").value));
         });
         $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); $(".ex-play").click(); } });
+        if (lock) {
+          $(".ex-kind").closest("label").hidden = true;
+          if (lock === "temp") $(".ex-bits").closest("label").hidden = true;   // overflow is part b's
+          setKind(lock);
+        }
         draw();
         return;
       }

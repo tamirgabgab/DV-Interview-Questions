@@ -36,7 +36,8 @@
   const stockView = () => ({
     mount(box) {
       const PAGE = [5, 8, 3, 9, 2, 6], PMAX = 20;
-      const st = { prices: PAGE.slice(), k: PAGE.length, both: true };
+      const longOnly = box.dataset.mode === "long";   // data-mode="long": part a's box, no short
+      const st = { prices: PAGE.slice(), k: PAGE.length, both: !longOnly };
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>העסקאות <select class="ex-mode" aria-label="אילו עסקאות מותרות"><option value="long">לונג בלבד (סעיף א)</option><option value="both" selected>לונג ושורט (סעיף ב)</option></select></label>` +
@@ -144,10 +145,11 @@
         next[i] = Math.max(1, Math.min(PMAX, next[i] + d)); st.prices = next; draw();
         chart.querySelector(`.st-pt[data-i="${i}"]`).focus({ preventScroll: true });
       });
+      if (longOnly) { $(".ex-mode").value = "long"; $(".ex-mode").closest("label").hidden = true; }
       $(".ex-mode").addEventListener("change", () => { st.both = $(".ex-mode").value === "both"; draw(); });
       const seed = seedControls(box, $(".wv-presets"), (rng) => setPrices(stockRandom(10, rng), 0), { state: {
         get: () => STATE_CODECS.stock.enc({ prices: st.prices, k: st.k, both: st.both }),
-        set: (p) => { const d = STATE_CODECS.stock.dec(p); if (!d) return false; st.both = d.both; $(".ex-mode").value = d.both ? "both" : "long"; setPrices(d.prices, d.k); return true; },
+        set: (p) => { const d = STATE_CODECS.stock.dec(p); if (!d) return false; st.both = d.both && !longOnly; $(".ex-mode").value = st.both ? "both" : "long"; setPrices(d.prices, d.k); return true; },
       } });
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => {
         const p = b.dataset.p;

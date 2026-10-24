@@ -1860,6 +1860,20 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     (a CDN script that fails still fails the check). Not fixed: old `#ctl-` links that
     predate the new toggles (none exist: the deploy was red from G220 until round K) and
     the state outside the controls, now an open item.
+22. **Round I, first batch (I284, I286, I290).** The owner's answers: each new box locked on
+    its part, and `main` only at the end of round I. 0002 parts a and b get their own
+    `trace` box (`data-version="temp"` or `"arith"` hides the version select; part a also
+    hides the 8-bit toggle, overflow being part b's); 0006 part a gets a `stock` box with
+    `data-mode="long"` (no mode select, a link cannot turn the short on); 0012 part b gets
+    `kapbase` on base 10 with `data-fixed` (no base slider), after a new paragraph that
+    reads k' = max(10 − k, k − 1) off the candidates table, with 352's path 3 → 7 → 6 → 5.
+    Two fixes on the way: a codec link (`#state-<kind>.…`) always opened the first box of
+    its kind, and now names the n-th as `#state-<kind>-<n>.…` (0006 has two stock boxes);
+    and `.explorer label { display: flex }` overrode the `hidden` attribute, so hidden
+    labels showed (the 0002 "c" field showed in every version, not only the rotation).
+    Links and remembered state made before this batch for the later boxes of 0002, 0006
+    and 0012 now point one box earlier (a day's worth; the page-attribute check drops a
+    remembered state that does not fit).
 ---
 
 ## In progress
@@ -1897,7 +1911,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   L316, L317, L318) and second batch (L309, L310, L314, L315) are done on the branch:
   rounds L and K are closed and on `main` (the CI fix 84bc64f, then round K). Round K is done in two batches (K303, K304, K307;
   K301, K302, K306, K305, K308). A code review of round K fixed seven findings (work log
-  item 21); state outside the controls is an open item, and old links need nothing. Next: the owner's pick, rounds I and J (new boxes for
+  item 21); state outside the controls is an open item, and old links need nothing.
+  Round I (the owner's pick, three batches, `main` at the end): batch 1 (I284, I286,
+  I290) is done on the branch; next batch 2 (I291, I287, I292), then batch 3 (I285, I288,
+  I289). Next: the owner's pick, rounds I and J (new boxes for
   the parts with no visual) or the new questions of rounds M to R.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
@@ -2550,13 +2567,13 @@ the first series' rounds of the same letters.
 
 | Id | Page | Idea | Size |
 |---|---|---|---|
-| I284 | 0002 parts a, b | **Each part with its own swap**: the existing `trace` box placed in part a (the temporary variable) and in part b (the sum and the XOR), each preset to its part's version, the values and the a0 / b0 expressions line by line | S |
+| ~~I284~~ | 0002 parts a, b | Done in session 22. **Each part with its own swap**: the existing `trace` box placed in part a (the temporary variable) and in part b (the sum and the XOR), each preset to its part's version, the values and the a0 / b0 expressions line by line | S |
 | I285 | 0004 part b | **The labels fix**: a `boxes3` mode with the labels array, k, same and other marked, and the two swaps drawn as a 3-cycle | M |
-| I286 | 0006 part a | **The scan in part a**: the `stock` box placed in part a in long-only mode, so the minimum so far and the best long sit beside the part that explains them | S |
+| ~~I286~~ | 0006 part a | Done in session 22. **The scan in part a**: the `stock` box placed in part a in long-only mode, so the minimum so far and the best long sit beside the part that explains them | S |
 | I287 | 0005 bonus | **Pigeonhole on the repunits**: R1 … R(x+1) dropped into x remainder slots, the first collision lit, and R_i − R_j = 1…10…0 shown as the multiple | M |
 | I288 | 0007 part c | **Three half-circles**: for a drawn triangle, the half-circle that starts at each point; at most one holds the other two; seeded draws count A1, A2, A3 apart (about 1/4 each, never two at once) | M |
 | I289 | 0011 part b | **Any five cells hold a line**: pick cells on the wrap-around board; the 2-2-1 split per direction and the pair count are shown, and the fifth cell always completes a line | M |
-| I290 | 0012 part b | **The map of the proof**: `kapbase` with base 10 placed in part b: the map k → max(10 − k, k − 1) and the fixed point at 5 | S |
+| ~~I290~~ | 0012 part b | Done in session 22. **The map of the proof**: `kapbase` with base 10 placed in part b: the map k → max(10 − k, k − 1) and the fixed point at 5 | S |
 | I291 | 0013 part b | **The 55 pairs, clickable**: a cell of the (p, q) grid shows its digits, the case of the analysis that applies and the arrow to the next pair; only 6174 points to itself | S–M |
 | I292 | 0017 solution 3 | **Binary search on values**: the histogram of 1..n with the count of values ≤ mid against y = mid, lo and hi narrowing with the invariant in colour, on the same array as the Floyd box | M |
 
