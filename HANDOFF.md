@@ -1956,6 +1956,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     bracket ending in ✓, ✗ or …, vacuous cycles grey, a cursor cycle explained and a
     count per property (`hsAttempts`; tested on the page's traces and 300 random ones:
     vacuous exactly where the antecedent fails, fails at the cycles of check_handshake).
+    The owner asked for `main` after the round; `main` was fast-forwarded to the round's
+    last commit. Final checks: all Python tests, lint 42/42, 0 broken links, 69 boxes
+    and 1,010 clicks with no problem, 55 pages at 390 px with no problem.
 ---
 
 ## In progress
@@ -1998,8 +2001,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   I290), batch 2 (I291, I287, I292) and batch 3 (I285, I288, I289) are done: round I is
   closed and on `main`. Round J (the owner's pick, three batches; `main` when the owner
   asks): batches 1 (J294, J298, J300), 2 (J293, J297, J299) and 3 (J295, J296) are
-  done on the branch; round J is closed. Next: `main` when the owner asks, then the
-  owner's pick (the new questions of rounds M to R, or the second series).
+  done; round J is closed and on `main` (the owner's go, CI green on e611961). Rounds I
+  to L of the second series are all done. Next: the owner's pick from the open
+  proposals (second series A to E, the new questions of M to R and Z, the deferred
+  G222, H223, H224).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2016,7 +2021,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0022, 0023, 0024, 0025) — any questions for these levels? (The bonus part of 0022 is marked staff-level inside the page.)
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
-- [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14), the second series A to E (presenting the answers), F to H (the explorer boxes; F218 to G221 done, the rest deferred), I to L (boxes that show the solution) and M to R (new questions), all proposed in session 21. U to X are done; M and R (without R105) were picked for sessions 17 and 18.
+- [ ] Pick the next rounds from **Proposals and rounds**: D to F and I (open), L to O (proposed in session 13), the rest of Q and S (proposed in session 14), the second series A to E (presenting the answers), F to H (the explorer boxes; F218 to G221 done, the rest deferred), I to L (boxes that show the solution; all done in session 22) and M to R (new questions), all proposed in session 21. U to X are done; M and R (without R105) were picked for sessions 17 and 18.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
