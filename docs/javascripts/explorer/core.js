@@ -587,13 +587,13 @@
   // and end buttons move (listeners and all) into a bar laid out left to right, as media
   // controls are, and show an icon; the word stays in the button as its name and shows as
   // a tooltip, and a play button whose word turns into "עצירה" shows the pause icon. The
-  // speed select is kept (it is a control of the link) but hidden behind three buttons
-  // beside the bar. A box with a "k מתוך T" counter gets a scrubber under the row: it
+  // usual slow / medium / fast select is kept (it is a control of the link) but hidden
+  // behind three buttons beside the bar; a box with its own speed list keeps the select. A box with a "k מתוך T" counter gets a scrubber under the row: it
   // presses the box's own start / next buttons to reach a step, so every view keeps its
   // own stepping. The scrubber and the speed buttons are not controls of the link.
   const TRANSPORT = [["button.ex-start, button.ex-first", "first"], ["button.ex-prev", "prev"], ["button.ex-play", "play"],
     ["button.ex-next", "next"], ["button.ex-end, button.ex-last", "last"]];
-  const SPEED_NAMES = ["×1", "×2", "×4"];
+  const SPEED_NAMES = ["×1", "×2", "×4"], SPEED_WORDS = "איטי,בינוני,מהיר";   // other speed lists stay a select
   const SCRUB_MAX = 5000;
   const POS = /(\d+)\s*מתוך\s*(\d+)/;
   const transport = (box) => {
@@ -617,7 +617,7 @@
         bar.append(b);
       });
       const sel = [...row.querySelectorAll("select.ex-speed")].find(own);
-      if (sel) {
+      if (sel && [...sel.options].map((o) => o.text.trim()).join() === SPEED_WORDS) {
         const seg = document.createElement("span");
         seg.className = "ex-speedseg";
         seg.setAttribute("role", "group");
