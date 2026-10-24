@@ -164,8 +164,9 @@
           : st.cap === 3 ? `<p class="ex-note">שתי התוכניות הקלאסיות מוגדרות לגשר של שניים; לגשר של שלושה מוצג החיפוש בלבד${times.length >= 3 ? `, לעומת ${ltr(bridgeSolve(times, 2).time)} דקות על גשר של שניים` : ""}.</p>` : "";
         $(".ex-plan").querySelectorAll("option").forEach((o) => { o.disabled = !plans[o.value]; });
         // the greedy rule: each round the two slowest leave by the cheaper of the two ways
+        $(".ex-greedy").disabled = st.cap !== 2;
         const gr = st.cap === 2 && times.length >= 2 && $(".ex-greedy").checked ? bridgeGreedy(times) : null;
-        $(".bridge-greedy").innerHTML = !gr ? "" :
+        $(".bridge-greedy").innerHTML = st.cap !== 2 ? `<p class="ex-note">הכלל החמדני מוגדר לגשר של שניים, ולכן הוא כבוי בגשר של שלושה.</p>` : !gr ? "" :
           `<table class="bridge-table"><thead><tr><th>הסיבוב</th><th>שני האיטיים</th><th>יחד, ${ltr("t1 + 2t2 + tn")}</th><th>מלווה, ${ltr("2t1 + tn−1 + tn")}</th><th>עד עכשיו</th></tr></thead><tbody>` +
           gr.rounds.map((r, k) => `<tr><td>${k + 1}</td><td>${ltr(r.slow.map((i) => `${NAMES[i]} (${times[i]})`).join(", "))}</td>` +
             `<td${r.take === "pair" ? ' class="is-take"' : ""}>${ltr(r.pair)}</td><td${r.take === "escort" ? ' class="is-take"' : ""}>${ltr(r.escort)}</td><td>${ltr(r.total)}</td></tr>`).join("") +

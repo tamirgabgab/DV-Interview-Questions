@@ -83,7 +83,7 @@
                        ["0x1000", 256, 256, 64, "0021 א : ‏0x1000, ‏256 B"], ["0x1000", 512, 256, 64, "0021 ב : ‏0x1000, ‏512 B"],
                        ["0x1010", 512, 256, 64, "0021 ב : ‏0x1010, ‏512 B"], ["0x1020", 128, 128, 64, "0021 ג : ‏0x1020, ‏128 B, ‏MPS 128 (δ = 1)"]];
       const defaults = { addr: box.dataset.addr || "0x1010", len: Number(box.dataset.len || 256), mps: Number(box.dataset.mps || 256), rcb: Number(box.dataset.rcb || 64) };
-      const st = { ...defaults, cuts: null };   // cuts: the boundaries chosen by hand, null = the greedy split's
+      const st = { ...defaults, cuts: null, shown: null };   // cuts: the boundaries chosen by hand, null = the greedy split's; shown: the cuts drawn
       const MAX_ROWS = 40;
       box.innerHTML =
         `<div class="ex-controls">` +
@@ -204,12 +204,16 @@
           (total === formula ? ` (הנוסחה הסגורה נותנת אותו מספר).` : ` (הנוסחה הסגורה נותנת ${ltr(big(formula))}!).`) +
           (first ? ` הפיצול החמדני, עם הכי פחות Completions : ${ltr(first.join("+"))}.` : " אין פיצול חוקי.") +
           (crosses ? ` <b>הבקשה חוצה גבול 4 KB</b>, וזה אסור ב-PCIe; המספר מחושב כאילו מותר.` : "");
-        // the hand-made split: the greedy split's cuts until a boundary is clicked
+        // the hand-made split: the greedy split's cuts until a boundary is clicked, then the
+        // clicked cuts for as long as they are all boundaries of the request
         const choose = $(".ex-choose").checked, B = pcieBoundaries(addr, len, rcb);
-        if (st.cuts === null || st.cuts.some((b) => !B.includes(b))) st.cuts = first ? B.filter((b) => { let at = addr; return first.slice(0, -1).some((v) => (at += v) === b); }) : [];
-        $(".pcie-blocks").innerHTML = `<p class="ex-title">הבלוקים : הבקשה על רשת ה-RCB, הגבולות הפנימיים בירוק${choose ? "; לחיצה על גבול חותכת שם, והשורה שמתחת היא ה-Completions" : ""}</p>${blocksSvg(addr, len, mps, rcb, choose ? st.cuts : null)}`;
+        if (st.cuts !== null && st.cuts.some((b) => !B.includes(b))) st.cuts = null;
+        let at = addr;
+        const cuts = st.cuts || (first ? first.slice(0, -1).map((v) => (at += v)) : []);
+        st.shown = cuts;
+        $(".pcie-blocks").innerHTML = `<p class="ex-title">הבלוקים : הבקשה על רשת ה-RCB, הגבולות הפנימיים בירוק${choose ? "; לחיצה על גבול חותכת שם, והשורה שמתחת היא ה-Completions" : ""}</p>${blocksSvg(addr, len, mps, rcb, choose ? cuts : null)}`;
         if (choose) {
-          const sp = pcieSplitOf(addr, len, mps, rcb, st.cuts), all = 1n << BigInt(B.length), over = sp.sizes.filter((v) => v > mps);
+          const sp = pcieSplitOf(addr, len, mps, rcb, cuts), all = 1n << BigInt(B.length), over = sp.sizes.filter((v) => v > mps);
           $(".pcie-choose").innerHTML = `החיתוכים שבחרתם : ${ltr(sp.sizes.join("+"))}, ${ltr(sp.sizes.length)} Completions. ` +
             (sp.ok ? `<span class="eu-ok">✓ כולם עד ${ltr(`MPS = ${mps}`)}.</span> ` : `<span class="eu-bad">✗ ${ltr(over.join(", "))} גדול מ-${ltr(`MPS = ${mps}`)}.</span> `) +
             `פיצול הוא בדיוק בחירה של תת-קבוצה של ${ltr(`|B| = ${B.length}`)} הגבולות : יש ${ltr(`2^${B.length} = ${big(all)}`)} תת-קבוצות, ומהן ${ltr(big(total))} לא משאירות קטע ארוך מ-MPS. זה מספר הפיצולים.`;
@@ -229,7 +233,8 @@
       $(".ex-choose").addEventListener("change", draw);
       const pick = (g, keyboard) => {
         const b = Number(g.dataset.b);
-        st.cuts = st.cuts.includes(b) ? st.cuts.filter((v) => v !== b) : st.cuts.concat([b]).sort((u, v) => u - v);
+        const cur = st.shown || [];
+        st.cuts = cur.includes(b) ? cur.filter((v) => v !== b) : cur.concat([b]).sort((u, v) => u - v);
         draw();
         if (keyboard) { const again = box.querySelector(`.cs-pick[data-b="${b}"]`); if (again) again.focus(); }
       };

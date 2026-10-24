@@ -1847,6 +1847,19 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     round L) and was merged into the branch; round K followed to `main` on the owner's
     request. Lesson: after a push, wait for the deploy run and read it, not just the local
     checks.
+21. **Code review of round K (nine findings); the owner picked seven to fix:** 0020's
+    hand-made cuts now follow the greedy split of the current parameters until a boundary
+    is clicked, and a clicked split stays while its cuts are boundaries (an empty greedy
+    list and an MPS change used to keep the old split and report it as invalid); 0039's
+    recurrence line says "fewer than f(e − 1, t − 1)" when the drop stops at the last
+    unknown floor, instead of "exactly"; the 0019 fork labels get room inside the frame
+    (A = 7, B = 11, D = 4 clipped "flip A: 15"); the 0014 sandbox is redrawn only when it
+    changes, so the animation no longer takes a dragged shape's keyboard focus; the 0031
+    greedy toggle is disabled with a note on a bridge of three, and the 0019 fork toggle
+    with a third glass; `check_explorers.py` ignores failed loads from api.github.com only
+    (a CDN script that fails still fails the check). Not fixed: old `#ctl-` links that
+    predate the new toggles (none exist: the deploy was red from G220 until round K) and
+    the state outside the controls, now an open item.
 ---
 
 ## In progress
@@ -1883,7 +1896,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 - Session 22: the owner picked round L, then round K. L's first batch (L311, L312, L313,
   L316, L317, L318) and second batch (L309, L310, L314, L315) are done on the branch:
   rounds L and K are closed and on `main` (the CI fix 84bc64f, then round K). Round K is done in two batches (K303, K304, K307;
-  K301, K302, K306, K305, K308). Next: the owner's pick, rounds I and J (new boxes for
+  K301, K302, K306, K305, K308). A code review of round K fixed seven findings (work log
+  item 21); state outside the controls is an open item, and old links need nothing. Next: the owner's pick, rounds I and J (new boxes for
   the parts with no visual) or the new questions of rounds M to R.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
@@ -1907,6 +1921,11 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 ### Content
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
+- [ ] Explorer state outside the controls is not in the box link or the remembered state
+  (code review, session 22): the hand-made cuts in 0020 and the dragged sandbox shapes in
+  0014 come back as the greedy split and the start positions after a reload or from a
+  copied link. Give these boxes an `opts.state` codec like the five boxes that have one,
+  or mirror the state in a hidden input.
 - [x] ~~Re-run the 0007, 0011 and 0014 constraints in a simulator with full constraint support~~ — done in session 5 (Verilator snapshot + z3 in CI).
 - [ ] Wide data tables still scroll sideways on phones (inside the table, not the page): 0005, 0006, 0008, 0013 (five or more columns). Consider splitting them or cards on phones.
 - [ ] Question ideas the owner has not picked yet (logic, math, digital design, EE): poisoned wine with 10 testers, 12 coins in 3 weighings, two eggs and 100 floors, Boyer-Moore majority, 100 doors, Gray code, XOR from NAND / universal MUX, two's complement overflow, divide-by-3 clock with 50% duty, maximal LFSR, Hamming (7,4), resistor cube, infinite resistor ladder.

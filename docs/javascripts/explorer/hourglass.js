@@ -315,24 +315,27 @@
         return s + "</svg>";
       };
       const axisSvg = (events, start, end, fork) => {
-        const w = 640, x0 = 30, x1 = 610, y = 40, last = Math.max(end, fork ? fork.flip : 1, 1);
-        const X = (t) => x0 + (t / last) * (x1 - x0);
+        const w = 640, x0 = 30, y = 40, last = Math.max(end, fork ? fork.flip : 1, 1);
+        // the fork's labels sit right of their dots: the scale leaves them room inside the frame
+        const forkLabels = fork ? [[fork.keep, `no flip: ${fork.keep}`], [fork.flip, `flip ${fork.small}: ${fork.flip}`]] : [];
+        const k = Math.min((610 - x0) / last, ...forkLabels.map(([t, lab]) => (w - 4 - 9 - 7.5 * lab.length - x0) / t));
+        const X = (t) => x0 + t * k, x1 = X(last);
         let s = `<svg class="perf-chart hg-live" viewBox="0 0 ${w} ${fork ? 170 : 78}" role="img" aria-label="ציר הזמן של התוכנית : האירועים, ההיפוכים וחלון המדידה${fork ? ", ומתחתיו הרגעים שבהם כל שעון נגמר אם הופכים אותו תמיד, וההסתעפות" : ""}">`;
         if (fork) {
           // the multiples of A and of B (each flipped whenever it runs out), then the fork at t = B
           [["A", st.A, 92], ["B", st.B, 112]].forEach(([n, v, yy]) => {
-            s += `<text class="legend" x="${x0 - 22}" y="${yy + 4}">${n}</text><line class="grid" x1="${x0}" x2="${x1}" y1="${yy}" y2="${yy}"/>`;
+            s += `<text class="legend" x="${x0 - 22}" y="${yy + 4}">${n}</text><line class="grid" x1="${x0}" x2="${f(x1)}" y1="${yy}" y2="${yy}"/>`;
             for (let k = v; k <= last; k += v) s += `<circle class="${n === "A" ? "s1" : "s3"}-dot" cx="${f(X(k))}" cy="${yy}" r="4"><title>${n}: ${k}</title></circle><text class="tick" x="${f(X(k))}" y="${yy - 7}" text-anchor="middle" style="font-size:10px">${k}</text>`;
           });
           const yf = 138, xs = X(fork.t);
-          [[fork.keep, `no flip: ${fork.keep}`, "s1", yf - 8], [fork.flip, `flip ${fork.small}: ${fork.flip}`, "s2", yf + 18]].forEach(([t, lab, cls, yy]) => {
+          [[...forkLabels[0], "s1", yf - 8], [...forkLabels[1], "s2", yf + 18]].forEach(([t, lab, cls, yy]) => {
             s += `<path class="${cls}-line" d="M ${f(xs)} ${yf} L ${f(xs + 12)} ${yy} L ${f(X(t))} ${yy}" fill="none" stroke-width="2.5"/><circle class="${cls}-dot" cx="${f(X(t))}" cy="${yy}" r="5"/>` +
                  `<text class="legend" x="${f(X(t) + 9)}" y="${yy + 4}">${lab}</text>`;
           });
           s += `<circle class="ink-dot" cx="${f(xs)}" cy="${yf}" r="4"/><text class="tick" x="${f(xs - 8)}" y="${yf + 4}" text-anchor="end">t = ${fork.t}</text>`;
         }
         if (start !== null) s += `<rect class="measure" x="${f(X(start))}" y="${y - 22}" width="${f(X(end) - X(start))}" height="44" rx="4"/>`;
-        s += `<line class="axis" x1="${x0}" x2="${x1}" y1="${y}" y2="${y}"/>`;
+        s += `<line class="axis" x1="${x0}" x2="${f(x1)}" y1="${y}" y2="${y}"/>`;
         events.forEach(([t, act], i) => {
           const cur = i === st.s;
           s += `<line class="${cur ? "s2-line" : "ink-line"}" x1="${f(X(t))}" x2="${f(X(t))}" y1="${y - 10}" y2="${y + 10}" stroke-width="${cur ? 3 : 1.5}"/>` +
@@ -441,9 +444,10 @@
         $(".hg-compare").innerHTML = `התוכנית הזו : ${describe(res)}. ` +
           (other ? `במטרה האחרת (${st.objective === "page" ? "הכי מעט היפוכים" : interval ? "הסיום המוקדם ביותר" : "הכי מעט אירועים"}) : ${describe(other)}${other.flips === res.flips && other.events === res.events && other.end === res.end ? ", אותו דבר" : ""}.` : "") +
           (res.explored !== null ? ` החיפוש בדק ${ltr(res.explored)} מצבים${sz.length === 3 ? " (עם שעון שלישי: 8 אפשרויות בכל אירוע)" : ""}.` : "");
-        const fork = interval && st.C === null && $(".ex-fork") && $(".ex-fork").checked ? hourglassFork(st.A, st.B) : null;
+        if (interval) $(".ex-fork").disabled = st.C !== null;
+        const fork = interval && st.C === null && $(".ex-fork").checked ? hourglassFork(st.A, st.B) : null;
         $(".hg-axis").innerHTML = axisSvg(events, interval ? res.start : null, res.end, fork);
-        $(".hg-fork").innerHTML = fork
+        $(".hg-fork").innerHTML = interval && st.C !== null ? `<span class="ex-note">ההסתעפות מוגדרת לשני שעונים, ולכן היא כבויה כשיש שעון שלישי.</span>` : fork
           ? `ההסתעפות : ברגע ${ltr(fork.t)} השעון הגדול נגמר בפעם הראשונה, וב-${ltr(fork.small)} נשארו ${ltr(fork.top)} דקות. אם לא הופכים אותו הוא נגמר ברגע ${ltr(fork.keep)}, ואם הופכים ברגע ${ltr(fork.flip)}. ` +
             (Math.abs(fork.flip - fork.keep) === st.D ? `ההפרש ביניהם הוא בדיוק ${ltr(st.D)}, אבל אלה שתי ריצות שונות : בכל ריצה קורה רק אחד מהם, ולכן הם לא נותנים מדידה.` : `שני הרגעים שייכים לשתי ריצות שונות, ובכל ריצה קורה רק אחד מהם.`) +
             ` שתי השורות שמעל ההסתעפות הן הרגעים שבהם כל שעון נגמר אם הופכים אותו תמיד : כפולות של ${ltr(st.A)} ושל ${ltr(st.B)}.`

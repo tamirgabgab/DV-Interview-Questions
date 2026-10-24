@@ -149,8 +149,8 @@
           row(w.below, "הצורה B מתחת ל-A,", `B.y2 = ${b[3]} ≤ A.y1 = ${a[1]}`) + row(w.above, "הצורה B מעל A,", `B.y1 = ${b[1]} ≥ A.y2 = ${a[3]}`) +
           `<li class="sh-verdict">${w.overlap ? `<span class="sh-bad">אף מקרה לא מתקיים : ההטלות נפגשות על שני הצירים (באדום), והצורות חופפות.</span>` : `<span class="sh-ok">מקרה אחד מספיק : ההטלות על ציר אחד לפחות זרות, ואין חפיפה.</span>`}</li>`;
       };
+      // the sandbox is drawn only when it changes, so a tick of the animation keeps its focus
       const draw = () => {
-        drawSand();
         ["N", "M", "max"].forEach((k) => { $(`.out-${k}`).textContent = String(st[k]); });
         $(".sh-grid").innerHTML = gridSvg((g) => {
           let s = st.shapes.map((sh, i) => rect(g, sh, i % 2 ? "shp-2" : "shp-1") +
@@ -188,7 +188,7 @@
       ["N", "M", "max"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { st[k] = Number($(`.ex-${k}`).value); reset(); }));
       $(".ex-kind").addEventListener("change", () => { st.squares = $(".ex-kind").value === "squares"; reset(); });
       $(".ex-clear").addEventListener("click", reset);
-      $(".ex-proj").addEventListener("change", draw);
+      $(".ex-proj").addEventListener("change", () => { drawSand(); draw(); });
       // dragging in the sandbox: whole grid steps, kept inside the grid
       const moveTo = (k, dx, dy) => {
         const r = sand[k], w = r[2] - r[0], h = r[3] - r[1];
@@ -250,6 +250,7 @@
         $(".sh-note").textContent = "מחשב…";
         setTimeout(() => { st.heat = shapesHeat(st.N, st.M, st.max, st.squares, 500); $(".sh-note").textContent = ""; draw(); }, 20);
       });
+      drawSand();
       draw();
     },
   });

@@ -218,9 +218,9 @@ def main(argv: list[str]) -> int:
     server, base = serve(site)
 
     external = re.compile(r"https?://(?!127\.0\.0\.1)")
-    # a resource from another host that failed to load (the GitHub API behind the repository
-    # widget answers 403 when CI is rate-limited) is the network, not a box
-    remote_fetch = re.compile(r"^Failed to load resource: .*\(https?://(?!127\.0\.0\.1)")
+    # the GitHub API behind the theme's repository widget answers 403 when CI is rate-limited:
+    # that is the network, not a box (a CDN script that fails to load still fails the check)
+    remote_fetch = re.compile(r"^Failed to load resource: .*\(https://api\.github\.com/")
     failures = boxes_total = clicks_total = 0
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
