@@ -94,3 +94,44 @@ def test_explorer_matches_page_model():
     for req, ack, f3, f2 in got["random"]:
         assert f3 == check_handshake(req, ack, 3)
         assert f2 == check_handshake(req, ack, 2)
+
+
+def test_explorer_attempt_lanes():
+    """The attempt box of part a (J296): every property starts one attempt per cycle; it is
+    vacuous exactly where its antecedent does not match, its fails end at the cycles the
+    page's check_handshake reports, a pass of rule 2 ends at the first ack of its window,
+    and a window cut by the end of the trace stays open. On the page's four traces and on
+    random ones."""
+    import json
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(38)
+    traces = [[[rng.randint(0, 1) for _ in range(12)] for _ in range(2)] for _ in range(300)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const pre = Object.keys(m.HS_PRESETS).map((k) => [m.hsWave(m.HS_PRESETS[k][0], 12), m.hsWave(m.HS_PRESETS[k][1], 12)]);
+      const all = pre.concat({json.dumps(traces)});
+      console.log(JSON.stringify(all.map(([req, ack]) => ({{ req, ack, att: m.hsAttempts(req, ack, 3) }}))));""")
+    for r in got:
+        req, ack, att = r["req"], r["ack"], r["att"]
+        n = len(req)
+        fails = check_handshake(req, ack, 3)
+        ante = {
+            "hold": lambda t: req[t] and not ack[t],
+            "late": lambda t: req[t] and not (req[t - 1] if t else 0),
+            "orphan": lambda t: ack[t],
+            "drop": lambda t: ack[t],
+        }
+        for key in ("hold", "late", "orphan", "drop"):
+            a = att[key]
+            assert [x["t"] for x in a] == list(range(n))
+            assert all((x["status"] == "vacuous") == (not ante[key](x["t"])) for x in a)
+            assert sorted(x["end"] for x in a if x["status"] == "fail") == fails[key]
+            for x in a:
+                if key == "late" and x["status"] == "pass":
+                    assert ack[x["end"]] and not any(ack[x["t"] + 1:x["end"]]) and x["end"] <= x["t"] + 3
+                if x["status"] == "open":
+                    assert x["end"] == n - 1
+    assert [x["status"] for x in got[1]["att"]["late"] if x["status"] != "vacuous"] == ["fail"]

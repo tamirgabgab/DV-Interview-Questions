@@ -38,3 +38,29 @@ def test_explorer_matches_python():
     for (fclk, fdata, tau, t0, ov, n), js in zip(cases, got):
         py = sync_mtbf(fclk * 1e6, fdata * 1e6, tau * 1e-12, t0 * 1e-12, ov * 1e-9, n)
         assert math.isclose(js, py, rel_tol=1e-9), (fclk, fdata, tau, t0, ov, n)
+
+
+def test_explorer_monte_carlo():
+    """The Monte Carlo box of part a (J295): its two factors multiply back to the page's
+    sync_mtbf (19 seconds for one flop on the page's numbers); in a large seeded draw
+    the share of edges inside the T0 window is T0 / T_clk, the settling times have mean
+    tau, and the share still unsettled after a time t is exp(-t / tau)."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(100, 50, 1), (100, 50, 2), (100, 50, 3), (300, 300, 1), (20, 10, 2)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const f = {[list(c) for c in cases]}.map(([tau, t0, n]) => m.metaFactors(500, 50, tau, t0, 0.3, n));
+      const d = m.metaDraw(200000, 2000, 300, 100, m.mulberry32(37));
+      console.log(JSON.stringify({{ f, n: d.phases.length, k: d.settle.length, maxPhase: d.phases.reduce((a, b) => Math.max(a, Math.abs(b)), 0),
+        inside: d.meta.every((i) => Math.abs(d.phases[i]) < 150), mean: d.settle.reduce((a, b) => a + b, 0) / d.settle.length,
+        tail: d.settle.filter((t) => t >= 200).length / d.settle.length }}));""")
+    for (tau, t0, n), r in zip(cases, got["f"]):
+        py = sync_mtbf(500e6, 50e6, tau * 1e-12, t0 * 1e-12, 0.3e-9, n)
+        assert math.isclose(r["mtbf"], py, rel_tol=1e-9)
+        assert math.isclose(r["pEnter"], t0 * 1e-12 * 500e6, rel_tol=1e-12) and r["tRes"] == n * 2000 - 300
+        assert math.isclose(r["pStay"], math.exp(-r["tRes"] / tau), rel_tol=1e-12)
+    assert round(got["f"][0]["mtbf"]) == 19
+    assert got["n"] == 200000 and got["maxPhase"] <= 1000 and got["inside"]
+    assert abs(got["k"] / got["n"] - 0.15) < 0.005
+    assert abs(got["mean"] - 100) < 2.5 and abs(got["tail"] - math.exp(-2)) < 0.01

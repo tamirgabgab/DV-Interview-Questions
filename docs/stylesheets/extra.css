@@ -2528,3 +2528,33 @@ body.practice-mode .md-typeset .question-tools {
   .md-typeset .explorer .ld-strip > i { width: 0.75rem; }
 }
 .md-typeset .explorer .ld-math { display: inline-block; font-family: var(--md-code-font-family); font-size: 0.8em; }
+
+/* Metastability Monte Carlo (0037 part a): edges around the clock edge, settling times */
+.md-typeset svg .mc-window { fill: var(--viz-s2); fill-opacity: 0.25; }
+.md-typeset svg .mc-clk { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .mc-in { fill: var(--viz-s2); }
+.md-typeset svg .mc-out { fill: var(--viz-text); fill-opacity: 0.35; }
+.md-typeset svg .mc-fail { fill: var(--viz-s2); fill-opacity: 0.1; }
+.md-typeset svg .mc-cut { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .mc-failed { fill: var(--viz-s2); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset .viz-legend .mc-key-in { background: var(--viz-s2); border-radius: 50%; }
+.md-typeset .viz-legend .mc-key-out { background: var(--viz-text); opacity: 0.45; border-radius: 50%; }
+.md-typeset .viz-legend .mc-key-cut { background: var(--viz-s2); opacity: 0.3; }
+
+/* SVA attempt lanes (0038 part a): a lane per property under the timing strip */
+.md-typeset svg .at-sep { stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .at-vac { fill: var(--viz-text); fill-opacity: 0.45; }
+.md-typeset svg .at-bracket { fill: none; stroke-width: 2; }
+.md-typeset svg .at-pass .at-bracket, .md-typeset svg .at-pass .at-start { stroke: var(--diff-easy); }
+.md-typeset svg .at-fail .at-bracket, .md-typeset svg .at-fail .at-start { stroke: var(--diff-hard); }
+.md-typeset svg .at-open .at-bracket, .md-typeset svg .at-open .at-start { stroke: var(--viz-text); stroke-dasharray: 3 2; }
+.md-typeset svg .at-start { fill: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .at-mark { font-size: 13px; font-weight: 700; }
+.md-typeset svg .at-pass .at-mark { fill: var(--diff-easy); }
+.md-typeset svg .at-fail .at-mark { fill: var(--diff-hard); }
+.md-typeset svg .at-open .at-mark { fill: var(--viz-text); }
+.md-typeset .viz-legend .at-key-start { background: transparent; border: 2px solid var(--viz-ink); border-radius: 50%; box-sizing: border-box; }
+.md-typeset .viz-legend .at-key-pass { background: var(--diff-easy); }
+.md-typeset .viz-legend .at-key-fail { background: var(--diff-hard); }
+.md-typeset .viz-legend .at-key-vac { background: var(--viz-text); opacity: 0.5; border-radius: 50%; }
+.md-typeset .explorer .at-scroll { overflow-x: auto; }
