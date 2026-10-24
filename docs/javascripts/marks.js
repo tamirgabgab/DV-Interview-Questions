@@ -78,10 +78,49 @@
     card.hidden = false;
   };
 
+  // The home page's hero (UI319): "start practising" goes to the first question (student
+  // to senior) not marked solved, and says so once some are; a random question; the large
+  // field and the ready searches open the site search (with the query typed in).
+  const hero = () => {
+    const start = document.querySelector(".hh-start");
+    if (!start) return;
+    const hrefs = JSON.parse(start.dataset.hrefs || "[]"), ids = (start.dataset.ids || "").split(" ");
+    const point = () => {
+      const i = ids.findIndex((id) => !window.dvqMarks.has(id, "solved"));
+      const some = ids.some((id) => window.dvqMarks.has(id, "solved"));
+      if (i < 0) { start.textContent = "פתרת הכל : לשאלה אקראית"; start.href = hrefs[Math.floor(Math.random() * hrefs.length)]; return; }
+      start.href = hrefs[i];
+      start.textContent = some ? `לשאלה הבאה שלא פתרת (${ids[i]})` : "להתחיל לתרגל";
+    };
+    document.addEventListener("dvq-marks", point);
+    point();
+    const random = document.querySelector(".hh-random");
+    if (random) random.addEventListener("click", (e) => {
+      const list = JSON.parse(random.dataset.hrefs || "[]");
+      if (!list.length) return;
+      e.preventDefault();
+      window.location.href = list[Math.floor(Math.random() * list.length)];
+    });
+    const search = (q) => {
+      const toggle = document.getElementById("__search"), input = document.querySelector(".md-search__input");
+      if (toggle && !toggle.checked) { toggle.checked = true; toggle.dispatchEvent(new Event("change")); }
+      if (!input) return;
+      input.focus();
+      if (q) {
+        input.value = q;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true }));
+      }
+    };
+    const field = document.querySelector(".hh-search");
+    if (field) field.addEventListener("click", () => search(""));
+    document.querySelectorAll(".hh-chip[data-q]").forEach((b) => b.addEventListener("click", () => search(b.dataset.q)));
+  };
+
   // Another tab changed the marks
   window.addEventListener("storage", (e) => {
     if (e.key === KEY) { marks = load(); document.dispatchEvent(new CustomEvent("dvq-marks")); }
   });
   document.addEventListener("dvq-marks", progress);
-  document.addEventListener("DOMContentLoaded", () => { progress(); remember(); resume(); });
+  document.addEventListener("DOMContentLoaded", () => { progress(); remember(); resume(); hero(); });
 })();

@@ -71,7 +71,7 @@ RELATED_MAX = 3
 REQUIRED_FIELDS = ("id", "title", "level", "difficulty", "kind", "tags")
 PLACEHOLDER = re.compile(r"<!--\s*questions-table(?:\s+level=(\w+))?\s*-->")
 CARDS = re.compile(r"<!--\s*level-cards\s*-->")
-STATS = re.compile(r"<!--\s*stats\s*-->")
+HERO = re.compile(r"<!--\s*hero\s*-->(.*?)<!--\s*/hero\s*-->", re.S)
 PATH_STEPS = re.compile(r"<!--\s*path-steps\s*-->")
 PATH_CARDS = re.compile(r"<!--\s*path-cards\s*-->")
 CONTINUE = re.compile(r"<!--\s*home-continue\s*-->")
@@ -148,7 +148,7 @@ def _load_questions(docs_dir: Path) -> dict[str, dict]:
         has_code = any(extract_code.blocks_from_text(body, f) for f in ("systemverilog", "python"))
         interactive = 'class="explorer"' in body or 'class="stepper"' in body or "<iframe" in body
         questions[src_uri] = {**meta, "id": qid, "src_uri": src_uri, "has_code": has_code,
-                              "interactive": interactive}
+                              "interactive": interactive, "boxes": body.count('class="explorer"')}
 
     if errors:
         raise PluginError("Invalid question files:\n  " + "\n  ".join(errors))
@@ -432,18 +432,44 @@ def _level_cards(page_url: str) -> str:
     return '<div class="level-cards">' + "".join(cards) + "</div>"
 
 
-def _stats() -> str:
+HERO_SEARCHES = ["FIFO", "PCIe", "SVA", "הסתברות", "חידות", "Gray"]
+
+# The hero's background: a clock, a data bit and a bus, drawn as a quiet line pattern.
+HERO_WAVES = (
+    '<svg class="hh-waves" viewBox="0 0 640 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">'
+    '<path class="hh-w1" d="M0 30h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20"/>'
+    '<path class="hh-w2" d="M0 75h50v-20h90v20h40v-20h130v20h60v-20h40v20h110v-20h120"/>'
+    '<path class="hh-w3" d="M0 120h30l10-15h90l10 15-10 15h-90l-10-15M140 120l10-15h110l10 15-10 15h-110l-10-15M270 120l10-15h70l10 15-10 15h-70l-10-15M360 120l10-15h130l10 15-10 15h-130l-10-15M510 120l10-15h110l10 15"/>'
+    '</svg>')
+
+
+def _hero(inner: str, page_url: str) -> str:
+    """The home page's hero (UI319): the title and the lead from the page, on a navy card
+    with a waveform pattern; "start practising" (marks.js points it at the first question
+    not marked solved, student to senior), a random question, a large search field that
+    opens the site search, a few ready searches, and one slim line of numbers."""
+    order = sorted(_questions.values(), key=lambda q: (list(LEVELS).index(q["level"]), q["id"]))
+    hrefs = [_href(q["src_uri"], page_url) for q in order]
+    ids = [q["id"] for q in order]
     qs = list(_questions.values())
-    with_code = sum(q["has_code"] and _has_tests(q) for q in qs)   # a page may have tests but no code
-    topics = {t for q in qs for t in q["tags"]}
-    levels = sum(any(q["level"] == level for q in qs) for level in LEVELS)
-    items = [(len(qs), "שאלות עם פתרון מלא"),
-             (with_code, "שאלות עם קוד ב-SystemVerilog וב-Python, שנבדק אוטומטית"),
-             (len(topics), "נושאים"),
-             (f"{levels}/{len(LEVELS)}", "רמות משרה עם שאלות")]
-    return ('<div class="stats-strip">'
-            + "".join(f'<div class="stat"><b>{n}</b><span>{label}</span></div>' for n, label in items)
-            + "</div>")
+    tested = sum(q["has_code"] and _has_tests(q) for q in qs)
+    boxes = sum(q.get("boxes", 0) for q in qs)
+    stats = [("help", len(qs), "שאלות עם פתרון מלא"), ("tested", tested, "עם קוד שנבדק אוטומטית"),
+             ("interactive", boxes, "תיבות אינטראקטיביות")]
+    searches = "".join(f'<button type="button" class="hh-chip" data-q="{html.escape(t)}">{html.escape(t)}</button>' for t in HERO_SEARCHES)
+    return (
+        '<div class="home-hero" markdown>\n'
+        f'<div class="hh-bg" aria-hidden="true">{HERO_WAVES}</div>\n\n{inner.strip()}\n\n'
+        '<div class="hh-tools" data-search-exclude>'
+        '<div class="hh-actions">'
+        f'<a class="md-button md-button--primary hh-start" href="{hrefs[0]}" data-hrefs="{html.escape(json.dumps(hrefs))}" data-ids="{" ".join(ids)}">להתחיל לתרגל</a>'
+        f'<a class="md-button hh-random" href="{hrefs[0]}" data-hrefs="{html.escape(json.dumps(hrefs))}">{ui_icon("random")}שאלה אקראית</a></div>'
+        f'<button type="button" class="hh-search">{ui_icon("search")}<span>חיפוש לפי מספר שאלה, שם או נושא</span><kbd>/</kbd></button>'
+        f'<div class="hh-suggest"><span>למשל\u00a0:</span>{searches}</div>'
+        '<div class="hh-stats">' + "".join(f'<span>{ui_icon(i)}<b>{n}</b> {label}</span>' for i, n, label in stats) + '</div>'
+        '</div>\n'
+        '</div>\n'
+    )
 
 
 def _related(q: dict, page_url: str) -> str:
@@ -673,7 +699,7 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
 
     markdown = COST_LINE.sub(_cost_chips, markdown)
     markdown = CARDS.sub(lambda m: _level_cards(page.url), markdown)
-    markdown = STATS.sub(lambda m: _stats(), markdown)
+    markdown = HERO.sub(lambda m: _hero(m.group(1), page.url), markdown)
     markdown = PATH_STEPS.sub(lambda m: _path_steps(page), markdown)
     markdown = PATH_CARDS.sub(lambda m: _path_cards(page.url), markdown)
     markdown = CONTINUE.sub(lambda m: _continue_card(), markdown)
