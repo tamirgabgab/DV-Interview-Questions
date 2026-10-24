@@ -1931,6 +1931,19 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     "at least one boy" (1/3) and "the elder is a boy" (1/2) on the same grid with the
     three answers in a table (`tuesdayCount`, tested against enumerating the families
     for every information and day).
+27. **Round J, second batch (J293, J297, J299).** Three new kinds, each in the file of
+    the box already on its page. `fifostairs` (0033 part a, in `fifo.js`): the words
+    written and read as two staircases from the cycle simulation, the gap shaded, a time
+    cursor with the counts, and the peak against the formula (`fifoStairs`, `fifoGapAt`;
+    tested against the page's fifo_fill: the peak is its maximum, reached last at the
+    last write whenever the reader is slower, checked on 22,464 cases while writing it;
+    the page's 1,190 ns with 120 − 95 = 25). `stages` (0041 part a, in `coverage.js`,
+    default seed 37, a run of 56 tests close to 54.1): the ribbon of tests cut into
+    stages, a bar per stage against n / (n − i), the mean over 500 runs (`stageRun`,
+    `stageExpect`, `stageAverage`; tested against expected_uniform and the page's
+    waits table). `ladder` (0021 part b, in `pcie.js`): C(0..N), the terms of C(n) and
+    a block strip per term (`ladderC`, `ladderTerms`; tested against counting
+    compositions for m up to 6 and the page's table).
 ---
 
 ## In progress
@@ -1972,8 +1985,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   Round I (the owner's pick, three batches, `main` at the end): batch 1 (I284, I286,
   I290), batch 2 (I291, I287, I292) and batch 3 (I285, I288, I289) are done: round I is
   closed and on `main`. Round J (the owner's pick, three batches; `main` when the owner
-  asks): batch 1 (J294, J298, J300) is done on the branch. Next: batch 2 (J293, J297,
-  J299), then batch 3 (J295, J296).
+  asks): batch 1 (J294, J298, J300) and batch 2 (J293, J297, J299) are done on the
+  branch. Next: batch 3 (J295, J296).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2639,13 +2652,13 @@ the first series' rounds of the same letters.
 
 | Id | Page | Idea | Size |
 |---|---|---|---|
-| J293 | 0033 part a | **Written and read staircases**: the two cumulative step curves; the gap between them is the fill, and it peaks at the last write of the burst | S–M |
+| ~~J293~~ | 0033 part a | Done in session 22. **Written and read staircases**: the two cumulative step curves; the gap between them is the fill, and it peaks at the last write of the burst | S–M |
 | ~~J294~~ | 0034 part b | Done in session 22. **The conversions stepped**: binary, the shifted row, XOR gives Gray; back by a prefix XOR from the MSB one bit per step; a counter walk marks the one changing bit, the 15 → 0 wrap included | S |
 | J295 | 0037 part a | **Metastability by Monte Carlo**: data edges on a clock timeline, those in the T0 window settle after an exponential time; the histogram with the t_res cut, and a second flop moving the cut by Tclk, so the two factors of the formula are seen | M |
 | J296 | 0038 part a | **Attempt lanes**: one lane per property of the page, where the antecedent matched, the window as a bracket, and pass / fail / vacuous | M |
-| J297 | 0041 part a | **The stage ribbon**: equal bins played test by test, a bar per stage i → i + 1 with the measured wait against n / (n − i), the sum that makes n·H_n | S–M |
+| ~~J297~~ | 0041 part a | Done in session 22. **The stage ribbon**: equal bins played test by test, a bar per stage i → i + 1 with the measured wait against n / (n − i), the sum that makes n·H_n | S–M |
 | ~~J298~~ | 0029 part b | Done in session 22. **The gap line**: the unwrapped angle difference of a chosen pair against time with the integers as lines, each crossing a meeting; the interval ends switched between closed, open and half-open with the page's three counts | S |
-| J299 | 0021 part b | **The recurrence ladder**: C(0..N) as a row; a click on C(n) lights the m terms it sums and the block strip shows "the first completion takes i blocks" for each term | M |
+| ~~J299~~ | 0021 part b | Done in session 22. **The recurrence ladder**: C(0..N) as a row; a click on C(n) lights the m terms it sums and the block strip shows "the first completion takes i blocks" for each term | M |
 | ~~J300~~ | 0015 part b | Done in session 22. **The Tuesday grid**: the 14 × 14 grid of (child, weekday) pairs, the cross of the 27 families with a boy born on Tuesday lit, the shared cell counted once, and the 13 with two boys | S–M |
 
 **Round K — the mechanism of the solution, inside the existing boxes**

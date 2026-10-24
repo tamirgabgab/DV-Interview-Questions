@@ -160,3 +160,38 @@ def test_explorer_counts_match_generator():
             if k:   # T(N, k): compositions of N into k parts of at most m; delta is one more split with k = 1
                 assert int(w) == q.T(N, k, m) + (d if k == 1 else 0), (addr, length, mps, rcb, k)
         assert sum(int(w) for w in by_k) == expected
+
+
+def test_explorer_ladder():
+    """The ladder box of part b (J299): C(n) for N up to 16 and m from 1 to 6 against
+    counting the compositions of n into parts of 1 to m (the page's splits by blocks);
+    the terms of C(n) are the first completion's i blocks with C(n - i) left, and the
+    page's table: 1, 1, 2, 4, 8, 15, 29, 56, 108, 208 with C(8) = 108 and C(9) = 208."""
+    import json
+    from functools import lru_cache
+
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const out = {{ c: {{}}, terms: {{}} }};
+      for (let mm = 1; mm <= 6; mm++) {{ out.c[mm] = m.ladderC(16, mm); for (let n = 1; n <= 16; n++) out.terms[mm + "," + n] = m.ladderTerms(n, mm); }}
+      console.log(JSON.stringify(out));""")
+
+    def compositions(n, m):
+        @lru_cache(None)
+        def go(k):
+            return 1 if k == 0 else sum(go(k - i) for i in range(1, min(m, k) + 1))
+        return go(n)
+
+    for m in range(1, 7):
+        c = got["c"][str(m)]
+        assert c == [compositions(n, m) for n in range(17)]
+        for n in range(1, 17):
+            terms = got["terms"][f"{m},{n}"]
+            assert [t["i"] for t in terms] == list(range(1, min(m, n) + 1))
+            assert all(t["rest"] == n - t["i"] and t["value"] == c[n - t["i"]] for t in terms)
+            assert sum(t["value"] for t in terms) == c[n]
+            if n <= m:
+                assert c[n] == 2 ** (n - 1)
+    assert got["c"]["4"][:10] == [1, 1, 2, 4, 8, 15, 29, 56, 108, 208]

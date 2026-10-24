@@ -1,10 +1,12 @@
-// kinds: fifo
+// kinds: fifo fifostairs
 //   fifo                   0033        burst, write and read rates, a skipping reader: the fill level over time; a wr / rd timing strip on a real time axis over a sliding window
+//   fifostairs             0033        part a: the words written and the words read as two staircases over the burst, the gap between them the fill, its peak at the last write
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { H, W, attr, f, fmt, ltr, stickyNames, waveDromText } = dvqExplorers.lib;
+  const { H, W, attr, autoplay, f, fmt, ltr, speedSel, stickyNames, waveDromText } = dvqExplorers.lib;
+  const NB = "\u00a0";
 
   // FIFO depth (0033): a burst of `burst` words written every t_write steps, read every
   // t_read steps from step t_read on, the reader skipping one read slot in idle_every.
@@ -64,6 +66,99 @@
     }
     return { max, trace, writes, slots, end: t - 1 };
   };
+
+  // Part a as two staircases: the times of the writes and of the reads of the cycle
+  // simulation (a reader that never skips). At a write the gap counts the writes up to
+  // and including it and the reads before it, the fill the simulation measures; the gap
+  // grows only at writes, so its peak is the simulation's maximum (the last write that
+  // reaches it: with a slower reader that is the last write of the burst, as on the page).
+  const fifoStairs = (burst, tWrite, tRead) => {
+    const e = fifoEvents(burst, tWrite, tRead, 0), reads = e.slots.filter((s) => s.read).map((s) => s.t);
+    let peak = { t: 0, w: 0, r: 0, fill: 0 }, j = 0;
+    e.writes.forEach((t, k) => {
+      while (j < reads.length && reads[j] < t) j++;
+      if (k + 1 - j >= peak.fill) peak = { t, w: k + 1, r: j, fill: k + 1 - j };
+    });
+    return { writes: e.writes, reads, end: e.end, peak };
+  };
+  // The two counts at time t: writes at or before t, reads before t.
+  const fifoGapAt = (st, t) => {
+    const w = st.writes.filter((u) => u <= t).length, r = st.reads.filter((u) => u < t).length;
+    return { w, r, fill: w - r };
+  };
+
+  // The staircase box (0033 part a): burst, write and read rates; the words written and
+  // the words read so far as two step curves on one time axis, the area between them
+  // (the fill) shaded, a time cursor (a slider, a jump to the peak, play) with the gap at
+  // that moment, and the peak at the last write against the formula.
+  const fifostairsView = () => ({
+    mount(box) {
+      const D = { burst: Number(box.dataset.burst || 120), fw: Number(box.dataset.fw || 100), fr: Number(box.dataset.fr || 80) };
+      const st = { ...D, t: null };
+      const POS = 400;
+      box.innerHTML =
+        `<div class="ex-controls">` +
+        `<label><span>גודל הפרץ B (מילים)</span><input type="range" class="fs-burst" min="4" max="256" step="4" value="${D.burst}" dir="ltr"><output class="fs-out-burst"></output></label>` +
+        `<label><span>קצב הכתיבה (MHz)</span><input type="range" class="fs-fw" min="10" max="400" step="5" value="${D.fw}" dir="ltr"><output class="fs-out-fw"></output></label>` +
+        `<label><span>קצב הקריאה (MHz)</span><input type="range" class="fs-fr" min="10" max="400" step="5" value="${D.fr}" dir="ltr"><output class="fs-out-fr"></output></label>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<div class="ex-controls ex-play-row"><label><span>הזמן</span><input type="range" class="fs-t" min="0" max="${POS}" step="1" value="0" dir="ltr" aria-label="הזמן על הציר"><output class="fs-out-t"></output></label>` +
+        `<button type="button" class="md-button md-button--primary fs-peak">לשיא</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(250, 100, 30) + `</div>` +
+        `<div class="fs-chart"></div>` +
+        `<span class="viz-legend"><span><i class="s1"></i>נכתבו עד הרגע</span><span><i class="s3"></i>נקראו עד הרגע</span><span><i class="fs-key-gap"></i>ב-FIFO : הפער</span></span>` +
+        `<p class="wv-step fs-now" aria-live="polite"></p><p class="ex-summary fs-sum"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const run = () => fifoStairs(st.burst, fifoSteps(st.fw), fifoSteps(st.fr));
+      const ns = (t) => fmt(t * 0.05, t * 0.05 < 100 ? 2 : 1).replace(/\.?0+$/, "");
+      const chart = (r, t) => {
+        const w = 640, h = 270, X0 = 46, X1 = 624, Y0 = 14, Y1 = 230, end = Math.max(r.end, 1);
+        const X = (u) => X0 + (u / end) * (X1 - X0), Y = (v) => Y1 - (v / st.burst) * (Y1 - Y0);
+        const stair = (times) => { let d = `M${f(X(0))},${f(Y(0))}`; times.forEach((u, k) => { d += ` H${f(X(u))} V${f(Y(k + 1))}`; }); return d + ` H${f(X(end))}`; };
+        let s = `<svg class="perf-chart fs-live" viewBox="0 0 ${w} ${h}" role="img" aria-label="שתי מדרגות : המילים שנכתבו והמילים שנקראו לאורך הזמן, והפער ביניהן">`;
+        const step = st.burst > 128 ? 50 : st.burst > 48 ? 20 : st.burst > 16 ? 5 : 2;
+        for (let v = 0; v <= st.burst; v += step) s += `<line class="grid" x1="${X0}" x2="${X1}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 6}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`;
+        const tick = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000].find((v) => (end * 0.05) / v <= 6) || 20000;
+        for (let v = 0; v * 20 <= end; v += tick) s += `<text class="tick" x="${f(X(v * 20))}" y="${Y1 + 18}" text-anchor="${X(v * 20) > X1 - 30 ? "end" : "middle"}">${v}${v ? " ns" : ""}</text>`;
+        // the area between the curves: the written stairs forward, the read stairs back
+        const back = r.reads.slice().reverse();
+        let area = stair(r.writes);
+        area += ` V${f(Y(r.reads.length))}`;
+        back.forEach((u, k) => { const left = r.reads.length - k - 1; area += ` H${f(X(u))} V${f(Y(left))}`; });
+        s += `<path class="fs-gap" d="${area} H${f(X(0))} Z"/>`;
+        s += `<path class="s1-line" d="${stair(r.writes)}" fill="none" stroke-width="2"/><path class="s3-line" d="${stair(r.reads)}" fill="none" stroke-width="2"/>`;
+        const p = r.peak;
+        s += `<line class="ink-line" x1="${f(X(p.t))}" x2="${f(X(p.t))}" y1="${Y0}" y2="${Y1}" stroke-width="1" stroke-dasharray="3 3"/><text class="legend halo" x="${f(X(p.t) - 6)}" y="${Y1 - 8}" text-anchor="end" direction="rtl">השיא : ${p.fill}</text>`;
+        const g = fifoGapAt(r, t);
+        s += `<line class="fs-cursor" x1="${f(X(t))}" x2="${f(X(t))}" y1="${f(Y(g.r))}" y2="${f(Y(g.w))}"/>`;
+        if (g.fill > 0) s += `<text class="legend halo" x="${f(X(t) + 6)}" y="${f((Y(g.r) + Y(g.w)) / 2 + 4)}">${g.fill}</text>`;
+        return s + `<line class="axis" x1="${X0}" x2="${X1}" y1="${Y1}" y2="${Y1}"/></svg>`;
+      };
+      const draw = () => {
+        const r = run(), end = Math.max(r.end, 1);
+        if (st.t === null) st.t = r.peak.t;
+        const t = Math.min(st.t, end), g = fifoGapAt(r, t);
+        ["burst", "fw", "fr"].forEach((k) => { $(`.fs-${k}`).value = st[k]; $(`.fs-out-${k}`).textContent = String(st[k]); });
+        $(".fs-t").value = Math.round((t / end) * POS); $(".fs-out-t").textContent = `${ns(t)} ns`;
+        $(".fs-chart").innerHTML = chart(r, t);
+        $(".fs-now").innerHTML = `בזמן ${ltr(`${ns(t)} ns`)} נכתבו ${ltr(g.w)} מילים ונקראו ${ltr(g.r)}, ולכן ב-FIFO ${ltr(`${g.w} − ${g.r} = ${g.fill}`)}.`;
+        const p = r.peak, cont = st.burst * (1 - st.fr / st.fw);
+        $(".fs-sum").innerHTML = st.fr >= st.fw
+          ? `הקורא לא איטי מהכותב, ולכן שתי המדרגות נשארות צמודות והפער לא גדל לאורך הפרץ${NB}: לכל היותר ${ltr(p.fill)}.`
+          : `הכותב מהיר יותר, ולכן הפער גדל כל עוד הפרץ נמשך. הוא הגדול ביותר בכתיבה האחרונה, ב-${ltr(`${ns(p.t)} ns`)}${NB}: ${ltr(`${p.w} − ${p.r} = ${p.fill}`)}. ` +
+            `הנוסחה ${ltr(`B (1 − f_r / f_w) = ${fmt(cont, 2).replace(/\.?0+$/, "")}`)} היא אותו הפער בלי העיגולים של שני השעונים, ולכן העומק הוא ${ltr(fifoDepth(st.burst, st.fw, st.fr))} או מילה אחת יותר.`;
+      };
+      const set = (k) => () => { stop(); st[k] = Number($(`.fs-${k}`).value); st.t = null; draw(); };
+      const endOf = () => Math.max(run().end, 1);
+      ["burst", "fw", "fr"].forEach((k) => $(`.fs-${k}`).addEventListener("input", set(k)));
+      $(".fs-t").addEventListener("input", () => { stop(); st.t = Math.round((Number($(".fs-t").value) / POS) * endOf()); draw(); });
+      $(".fs-peak").addEventListener("click", () => { stop(); st.t = null; draw(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, D, { t: null }); draw(); });
+      // play moves the cursor one write cycle a step, so it stops on every write
+      const stop = autoplay($(".ex-play"), $(".ex-speed"), { step: () => { st.t = Math.min(endOf(), st.t + fifoSteps(st.fw)); draw(); }, done: () => st.t >= endOf(), restart: () => { st.t = 0; draw(); } });
+      draw();
+    },
+  });
 
   // The FIFO box (0033): burst, write and read rates and the reader's idle slot; the fill
   // level over time from the cycle simulation, the formula beside it; a timing strip of
@@ -229,10 +324,11 @@
   });
 
   dvqExplorers.register({
-    views: { fifo: fifoView },
+    views: { fifo: fifoView, fifostairs: fifostairsView },
     help: {
       fifo: "ה-burst וקצבי הכתיבה והקריאה בסליידרים : הרצועה מראה את שני השעונים, הכתיבות, הקריאות (משבצת מדולגת מוצללת) ואת המילוי בזמן אמיתי, הסליידר שלה מזיז חלון של 40 מחזורי כתיבה, והגרף מראה את המילוי לאורך כל ה-burst ליד הנוסחה.",
+      fifostairs: "הסליידרים קובעים את הפרץ ואת שני הקצבים : הקו הכחול סופר את המילים שנכתבו, השני את המילים שנקראו, והשטח ביניהם הוא מה שיש ב-FIFO. סליידר הזמן, ״לשיא״ ו״הפעלה״ מזיזים את הרגע שבו נמדד הפער.",
     },
-    models: { fifoSteps, fifoDepth, fifoFill, fifoEvents, fifoGrid },
+    models: { fifoSteps, fifoDepth, fifoFill, fifoEvents, fifoGrid, fifoStairs, fifoGapAt },
   });
 })();

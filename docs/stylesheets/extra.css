@@ -2487,3 +2487,44 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .tu-key-a { background: var(--viz-s2); opacity: 0.4; }
 .md-typeset .viz-legend .tu-key-two { background: var(--viz-s2); opacity: 0.85; }
 .md-typeset .explorer .tu-cell { min-height: 1.4em; margin: 0.2em 0; }
+
+/* FIFO staircases (0033 part a): written and read words, the gap between them */
+.md-typeset svg .fs-gap { fill: var(--viz-s2); fill-opacity: 0.22; stroke: none; }
+.md-typeset svg .fs-cursor { stroke: var(--viz-s2); stroke-width: 4; stroke-linecap: round; }
+.md-typeset .viz-legend .fs-key-gap { background: var(--viz-s2); opacity: 0.45; }
+
+/* Stage ribbon (0041 part a): the tests cut into stages i -> i + 1 */
+.md-typeset .explorer .sg-bins { gap: 0.15rem; margin: 0.5rem 0 0; max-width: 40rem; }
+.md-typeset .explorer .sg-bins > span.is-counted { background: color-mix(in srgb, var(--viz-s3) 22%, transparent); border-color: var(--viz-s3); }
+.md-typeset .explorer .sg-bins > span.sg-new { outline: 2.5px solid var(--viz-s3); outline-offset: 1px; }
+.md-typeset .explorer .sg-bins > span.sg-again { outline: 2.5px solid var(--viz-s2); outline-offset: 1px; }
+.md-typeset .explorer .sg-ribbon { display: flex; flex-wrap: wrap; gap: 0.35rem 0.3rem; min-height: 1rem; margin: 0.3rem 0 0.6rem; }
+.md-typeset .explorer .sg-stage { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 2px; border-radius: 3px; background: color-mix(in srgb, var(--viz-s1) 12%, transparent); }
+.md-typeset .explorer .sg-stage.is-odd { background: color-mix(in srgb, var(--viz-s3) 12%, transparent); }
+.md-typeset .explorer .sg-stage > i { display: block; width: 0.6rem; height: 0.6rem; border-radius: 2px; background: var(--viz-grid); }
+.md-typeset .explorer .sg-stage > i.is-new { background: var(--viz-s3); }
+.md-typeset .explorer .sg-stage > i.is-last { outline: 2px solid var(--viz-ink); outline-offset: 1px; }
+.md-typeset svg .sg-now { fill: var(--viz-s2); fill-opacity: 0.45; }
+.md-typeset .viz-legend .sg-key-now { background: var(--viz-s2); opacity: 0.55; }
+
+/* Recurrence ladder (0021 part b): C(0..N), the terms of C(n), a block strip per term */
+.md-typeset .explorer .ld-row { display: flex; flex-wrap: wrap; gap: 0.2rem; margin: 0.6rem 0 0.3rem; }
+.md-typeset .explorer .ld-cell { display: flex; flex-direction: column; align-items: center; min-width: 2.6rem; padding: 0.15rem 0.2rem; font: inherit; font-family: var(--md-code-font-family); color: var(--viz-ink); background: var(--md-default-bg-color); border: 1.5px solid var(--viz-grid); border-radius: 0.25rem; cursor: pointer; }
+.md-typeset .explorer .ld-cell:disabled { cursor: default; }
+.md-typeset .explorer .ld-cell small { font-size: 0.55rem; color: var(--viz-text); min-height: 0.8em; }
+.md-typeset .explorer .ld-cell b { font-size: 0.8rem; }
+.md-typeset .explorer .ld-cell.is-sel { border-color: var(--viz-s2); background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .ld-cell.is-term { border-color: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .ld-cell:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer .ld-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.6rem; margin: 0.25rem 0; font-size: 0.75rem; }
+.md-typeset .explorer .ld-lab { flex: 0 0 2.8rem; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .ld-strip { display: inline-flex; gap: 2px; }
+.md-typeset .explorer .ld-strip > i { display: block; width: 1.05rem; height: 1rem; border-radius: 2px; }
+.md-typeset .explorer .ld-strip > i.ld-first { background: var(--viz-s3); }
+.md-typeset .explorer .ld-strip > i.ld-first.is-end { margin-right: 0.35rem; }
+.md-typeset .explorer .ld-strip > i.ld-rest { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); border: 1px solid var(--viz-s1); }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .ld-cell { min-width: 2.1rem; }
+  .md-typeset .explorer .ld-strip > i { width: 0.75rem; }
+}
+.md-typeset .explorer .ld-math { display: inline-block; font-family: var(--md-code-font-family); font-size: 0.8em; }

@@ -1,10 +1,12 @@
-// kinds: pcie
+// kinds: pcie ladder
 //   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits; a toggle to cut the boundaries by hand
+//   ladder                 0021        part b's recurrence: C(0..N) as a row, a click on C(n) lights the m terms it sums, and a block strip per term with the first completion taking i blocks
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
   const { bigComb, f, ltr } = dvqExplorers.lib;
+  const NB = "\u00a0";
 
   // PCIe completion splits (0020, 0021): a read of `len` bytes from `addr` is answered by
   // completions that cut only on RCB boundaries and never exceed MPS. pcieBlocks gives the
@@ -259,11 +261,70 @@
     },
   });
 
+  // Part b's recurrence (0021): C(n) splits of n blocks into runs of 1 to m blocks,
+  // C(n) = C(n − 1) + ... + C(n − m) with C(0) = 1 and C(n) = 0 below 0; the terms of
+  // C(n) are the cases "the first completion takes i blocks", each leaving C(n − i).
+  const ladderC = (N, m) => {
+    const c = [1];
+    for (let n = 1; n <= N; n++) { let v = 0; for (let i = 1; i <= m && i <= n; i++) v += c[n - i]; c.push(v); }
+    return c;
+  };
+  const ladderTerms = (n, m) => {
+    const c = ladderC(n, m), out = [];
+    for (let i = 1; i <= m && i <= n; i++) out.push({ i, rest: n - i, value: c[n - i] });
+    return out;
+  };
+
+  // The ladder box (0021 part b): N up to 16 and m = MPS / RCB from 2 to 4; C(0..N) as a
+  // row of cells, a click (or next / previous) picks C(n) and lights the terms it sums,
+  // the sum written out, and a strip of n blocks per term with the first completion
+  // covering i blocks and the rest left to C(n − i).
+  const ladderView = () => ({
+    mount(box) {
+      const D = { N: Number(box.dataset.n || 9), m: Number(box.dataset.m || 4), n: Number(box.dataset.pick || 8) };
+      const st = { ...D };
+      box.innerHTML =
+        `<div class="ex-controls"><label><span>‏N, מספר הבלוקים</span><input type="range" class="ld-N" min="1" max="16" step="1" value="${D.N}" dir="ltr" aria-label="מספר הבלוקים הגדול ביותר בשורה"><output class="ld-out-N"></output></label>` +
+        `<label>‏m = MPS / RCB <select class="ld-m" aria-label="כמה בלוקים יכול Completion אחד להכיל">${[2, 3, 4].map((v) => `<option value="${v}">${v}</option>`).join("")}</select></label>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">‏n הקודם</button>` +
+        `<button type="button" class="md-button md-button--primary ex-next">‏n הבא</button><span class="ex-pos"></span></div>` +
+        `<div class="ld-row" dir="ltr" role="group" aria-label="הערכים C(0) עד C(N), לחיצה בוחרת ערך"></div>` +
+        `<p class="wv-step ld-eq" aria-live="polite"></p><div class="ld-strips"></div><p class="ex-summary ld-sum"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const draw = () => {
+        st.n = Math.max(1, Math.min(st.n, st.N));
+        const c = ladderC(st.N, st.m), terms = ladderTerms(st.n, st.m), lit = new Map(terms.map((t) => [t.rest, t.i]));
+        $(".ld-N").value = st.N; $(".ld-out-N").textContent = String(st.N); $(".ld-m").value = String(st.m);
+        $(".ld-row").innerHTML = c.map((v, k) => `<button type="button" class="ld-cell${k === st.n ? " is-sel" : lit.has(k) ? " is-term" : ""}" data-n="${k}" aria-pressed="${k === st.n}" aria-label="C(${k}) = ${v}"${k === 0 ? " disabled" : ""}>` +
+          `<small>C(${k})</small><b>${v}</b><small class="ld-i">${lit.has(k) ? `i = ${lit.get(k)}` : ""}</small></button>`).join("");
+        $(".ex-pos").textContent = `‏n = ${st.n}`;
+        $(".ex-prev").disabled = st.n <= 1; $(".ex-next").disabled = st.n >= st.N;
+        $(".ld-eq").innerHTML = `ה-Completion הראשון מכסה ${terms.length === 1 ? "בלוק אחד" : `בין 1 ל-${ltr(terms.length)} בלוקים`}, וכל מקרה משאיר את אותה בעיה על פחות בלוקים${NB}: ` +
+          `<span class="ld-math" dir="ltr">C(${st.n}) = ${terms.map((t) => `C(${t.rest})`).join(" + ")} = ${terms.map((t) => t.value).join(" + ")} = ${c[st.n]}</span>`;
+        $(".ld-strips").innerHTML = terms.map((t) => `<div class="ld-line"><span class="ld-lab">‏i = ${t.i}</span><span class="ld-strip" dir="ltr">` +
+          Array.from({ length: st.n }, (_, b) => `<i class="${b < t.i ? "ld-first" : "ld-rest"}${b === t.i - 1 ? " is-end" : ""}"></i>`).join("") +
+          `</span><span class="ld-txt">${t.rest ? `ועוד ${ltr(`C(${t.rest}) = ${t.value}`)} ${t.value === 1 ? "דרך" : "דרכים"} לחלק את ${t.rest === 1 ? "הבלוק שנשאר" : `${ltr(t.rest)} הבלוקים שנשארו`}` : `Completion אחד לכל הבלוקים, ${ltr("C(0) = 1")}`}</span></div>`).join("");
+        const tag = st.m === 4 && st.n === 8 ? ` זו הבקשה המיושרת של העמוד, 108 פיצולים.` : st.m === 4 && st.n === 9 ? ` זו הבקשה הלא מיושרת של העמוד, 208 פיצולים.` : "";
+        $(".ld-sum").innerHTML = `בלי MPS כל אחד מ-${ltr(st.n - 1)} הגבולות הפנימיים חותך או לא, ${ltr(`2^${st.n - 1} = ${2 ** (st.n - 1)}`)} פיצולים. ` +
+          (c[st.n] < 2 ** (st.n - 1) ? `עם Completion של עד ${ltr(st.m)} בלוקים נשארים ${ltr(c[st.n])}${NB}: הפיצולים שבהם Completion מכסה יותר מ-${ltr(st.m)} בלוקים נפסלים.` : `כאן ${ltr(`n ≤ ${st.m}`)}, ולכן אף פיצול לא נפסל.`) + tag;
+      };
+      $(".ld-row").addEventListener("click", (e) => { const b = e.target.closest(".ld-cell"); if (b && !b.disabled) { st.n = Number(b.dataset.n); draw(); const again = box.querySelector(`.ld-cell[data-n="${st.n}"]`); if (again) again.focus(); } });
+      $(".ld-N").addEventListener("input", () => { st.N = Number($(".ld-N").value); draw(); });
+      $(".ld-m").addEventListener("change", () => { st.m = Number($(".ld-m").value); draw(); });
+      $(".ex-next").addEventListener("click", () => { st.n++; draw(); });
+      $(".ex-prev").addEventListener("click", () => { st.n--; draw(); });
+      $(".ex-reset").addEventListener("click", () => { Object.assign(st, D); draw(); });
+      draw();
+    },
+  });
+
   dvqExplorers.register({
-    views: { pcie: pcieView },
+    views: { pcie: pcieView, ladder: ladderView },
     help: {
       pcie: "כתובת, אורך, MPS ו-RCB : התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד. עם ״לבחור חיתוכים בעצמי״ לוחצים על הגבולות כדי לחתוך או לא, ורואים את ה-Completions שנוצרים.",
+      ladder: "לחיצה על C(n) בשורה, או ״n הבא״, מדליקה את האיברים שהוא סוכם : לכל i, ה-Completion הראשון מכסה i בלוקים, ומה שנשאר הוא C(n − i). N ו-m משנים את השורה.",
     },
-    models: { pcieBoundaries, pcieBlocks, pcieSplitOf, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula },
+    models: { pcieBoundaries, pcieBlocks, pcieSplitOf, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula, ladderC, ladderTerms },
   });
 })();

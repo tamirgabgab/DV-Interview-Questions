@@ -112,3 +112,38 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(41)
+
+
+def test_explorer_stages():
+    """The stage box of part a (J297): the expected wait of stage i -> i + 1 is n / (n - i)
+    and the waits add up to the page's expected_uniform (54.1 for 16 bins, the page's
+    table); a run's waits cut its tests exactly at the tests that find a new bin; and the
+    mean wait per stage over many runs sits on n / (n - i)."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const rnd = m.mulberry32(41), out = {{ exp: {{}}, runs: [], avg: m.stageAverage(8, 20000, m.mulberry32(7)) }};
+      for (let n = 2; n <= 20; n++) out.exp[n] = m.stageExpect(n);
+      for (let r = 0; r < 200; r++) {{ const n = 2 + (r % 19); out.runs.push([n, m.stageRun(n, rnd)]); }}
+      console.log(JSON.stringify(out));""")
+    for n in range(2, 21):
+        exp = got["exp"][str(n)]
+        assert all(abs(e - n / (n - i)) < 1e-12 for i, e in enumerate(exp))
+        assert abs(sum(exp) - expected_uniform(n)) < 1e-9
+    assert round(sum(got["exp"]["16"]), 1) == 54.1
+    assert [round(got["exp"]["16"][i], 2) for i in (0, 1, 2, 4, 8, 12, 14, 15)] == [1.0, 1.07, 1.14, 1.33, 2.0, 4.0, 8.0, 16.0]
+    for n, r in got["runs"]:
+        draws, waits = r["draws"], r["waits"]
+        assert len(waits) == n and sum(waits) == len(draws) and all(0 <= b < n for b in draws)
+        seen, t = set(), 0
+        for w in waits:
+            stage = draws[t:t + w]
+            assert all(b in seen for b in stage[:-1]) and stage[-1] not in seen
+            seen.add(stage[-1])
+            t += w
+        assert seen == set(range(n))
+    for i, a in enumerate(got["avg"]):
+        assert abs(a - 8 / (8 - i)) < 0.25, (i, a)

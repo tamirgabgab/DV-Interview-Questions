@@ -75,3 +75,38 @@ def test_explorer_matches_python():
         assert d == fifo_depth(burst, fw, fr, duty)
         py_s, py_trace = fifo_fill(burst, steps(fw), steps(fr), idle)
         assert s == py_s and n == len(py_trace) and tuple(last) == py_trace[-1]
+
+
+def test_explorer_staircases():
+    """The staircase box of part a (J293): the writes and the reads of the simulation as
+    two step curves, the peak of the gap (writes up to a write, reads before it) equal to
+    the page's fifo_fill maximum and at the last write when the reader is slower, the
+    page's 120 words at 100 / 80 MHz peaking at 1,190 ns with 120 - 95 = 25, and the gap
+    at any time the fill of the trace."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    cases = [(120, 100, 80), (64, 200, 150), (256, 100, 50), (100, 100, 99), (32, 125, 100), (40, 80, 100), (16, 400, 10), (8, 50, 50)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map(([b, fw, fr]) => {{
+        const tW = m.fifoSteps(fw), tR = m.fifoSteps(fr), s = m.fifoStairs(b, tW, tR), probes = [];
+        for (let k = 0; k <= 50; k++) {{ const t = Math.round(k * s.end / 50); probes.push([t, m.fifoGapAt(s, t)]); }}
+        return {{ tW, tR, s, probes }};
+      }})));""")
+    for (burst, fw, fr), r in zip(cases, got):
+        s, tW, tR = r["s"], r["tW"], r["tR"]
+        best, trace = fifo_fill(burst, tW, tR)
+        assert s["writes"] == [k * tW for k in range(burst)] and len(s["reads"]) == burst
+        assert all(t % tR == 0 and t > 0 for t in s["reads"]) and s["reads"] == sorted(s["reads"])
+        assert s["peak"]["fill"] == best == s["peak"]["w"] - s["peak"]["r"]
+        if fr < fw:
+            assert s["peak"]["t"] == (burst - 1) * tW and s["peak"]["w"] == burst
+        for t, g in r["probes"]:
+            before = [c for u, c in trace if u <= t]
+            reads_at_t = sum(u == t for u in s["reads"])
+            assert g["fill"] == before[-1] + reads_at_t, (burst, fw, fr, t)   # the trace is after the read of step t
+    p = got[0]["s"]["peak"]
+    assert (p["t"] * 0.05, p["w"], p["r"], p["fill"]) == (1190, 120, 95, 25)
+    assert fifo_depth(120, 100, 80) == 24
