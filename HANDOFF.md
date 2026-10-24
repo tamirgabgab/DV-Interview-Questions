@@ -2118,6 +2118,26 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     (rectangle), "next row" and "to the end", the best so far in orange, the checked
     rectangle dashed, the answer green with the count of ties; the link carries the grid
     and the step.
+37. **The owner's look-and-feel plan, parts 1 to 4 (UI319, UI320, UI321, UI324, UI325,
+    UI327, UI328, UI330).** Split into seven parts; the owner picked 1 to 4, with
+    multiple-choice questions before each. Part 1: Rubik kept with line height 1.7, firmer
+    headings, tabular digits and a 75-character cap on paragraphs and plain lists; a line
+    icon per kind (Material Design Icons as CSS masks, `kind-ico`); the path cards' count
+    no longer wraps and each path carries its dominant kind's icon. Part 2: the header as
+    one chip row with small badges (icon and word) and the tools beside it as icon buttons
+    with tooltips (open / close all as one toggle), a quiet line of topics, Hebrew date and
+    source; the part bar became the page's sticky bar (part chips, the solved toggle once
+    the header is gone, a reading-progress line; pages without parts get the line and a
+    floating button fixed under the site header). Material's own header already shows the
+    title on scroll, so the bar has none. Part 3: the home hero (`<!-- hero -->` …
+    `<!-- /hero -->`): a navy card with a waveform pattern, "start practising" to the
+    first unsolved question, a random question, a search field and ready searches that
+    open the site search, one line of numbers (the stat tiles removed). Part 4: every box
+    a card with a header (title, help / reset / link as icon buttons), playback as one
+    left-to-right icon bar (`transport()` moves the views' own buttons; the word stays as
+    the name and tooltip; "עצירה" shows pause), the speed select hidden behind ×1 ×2 ×4,
+    and a scrubber that presses the box's own start / next buttons (not a control of the
+    link). A new badge failed contrast (white on the accent) and now uses navy text.
 ---
 
 ## In progress
@@ -2170,7 +2190,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   asks. Still open: the rest of the second
   series A to E, the new questions of M to R and Z, the deferred G222, H223, H224, E35.
 - Session 22 (end): 0046 is on `main` (7786f37). A third series on look and feel
-  (UI319 to UI332) is proposed for the owner to pick.
+  (UI319 to UI332) was proposed; parts 1 to 4 (item 37) are done on the branch, `main`
+  when the owner asks. Open in it: UI322, UI323 (catalog), UI326, UI329, UI331, UI332.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2992,9 +3013,9 @@ Item numbers continue the global count (319 on).
 
 | Id | Idea | Size |
 |---|---|---|
-| UI319 | **A real hero**: a headline, one sentence, two buttons ("להתחיל לתרגל" to the next unsolved or a random question, "לכל השאלות"), a large search field; the stats as one slim row with icons | S–M |
-| UI320 | **Path cards fixed and polished**: the count never wraps (the letter-by-letter bug), equal heights, a progress ring instead of a bar, an icon per path | S |
-| UI321 | **Hebrew typography** (C190 promoted): a Hebrew face (Heebo or Assistant) for text and headings, tabular digits, a line-length cap near 70 characters, more line height | S–M |
+| ~~UI319~~ | ~~**A real hero**: a headline, one sentence, two buttons ("להתחיל לתרגל" to the next unsolved or a random question, "לכל השאלות"), a large search field; the stats as one slim row with icons~~ done (session 22, part 3) | S–M |
+| ~~UI320~~ | ~~**Path cards fixed and polished**: the count never wraps (the letter-by-letter bug), equal heights, a progress ring instead of a bar, an icon per path~~ done (session 22, part 1) | S |
+| ~~UI321~~ | ~~**Hebrew typography** (C190 promoted): a Hebrew face (Heebo or Assistant) for text and headings, tabular digits, a line-length cap near 70 characters, more line height~~ done (session 22, part 1 (Rubik kept)) | S–M |
 
 **Round UI2 — the catalog**
 
@@ -3007,23 +3028,23 @@ Item numbers continue the global count (319 on).
 
 | Id | Idea | Size |
 |---|---|---|
-| UI324 | **A calmer header**: id · level · difficulty · kind in one line, topics as quiet links, "interactive", "tested" and "new" as small icons with tooltips; the page tools (open / close all, practice, solved, favourite, random) in one icon toolbar, an overflow menu on phones | M |
-| UI325 | **A sticky mini-header** while scrolling: the title, the current part and the solved toggle, with a thin reading-progress line | S–M |
+| ~~UI324~~ | ~~**A calmer header**: id · level · difficulty · kind in one line, topics as quiet links, "interactive", "tested" and "new" as small icons with tooltips; the page tools (open / close all, practice, solved, favourite, random) in one icon toolbar, an overflow menu on phones~~ done (session 22, part 2 (icon-only tools)) | M |
+| ~~UI325~~ | ~~**A sticky mini-header** while scrolling: the title, the current part and the solved toggle, with a thin reading-progress line~~ done (session 22, part 2 (no title: the site header shows it)) | S–M |
 | UI326 | **Friendly feedback**: marking a question solved shows a short celebration (off under reduced motion) and the progress of its level ("5 of 27 in junior") | S |
 
 **Round UI4 — the explorer boxes**
 
 | Id | Idea | Size |
 |---|---|---|
-| UI327 | **Playback as an icon bar**: start, back, play / pause, step, end as icons with tooltips and a scrub slider, the speed as a three-way segmented control; the edit controls on one row | M |
-| UI328 | **Boxes as cards**: a soft background, rounded corners, a header with the kind's icon and name, one spacing scale | S |
+| ~~UI327~~ | ~~**Playback as an icon bar**: start, back, play / pause, step, end as icons with tooltips and a scrub slider, the speed as a three-way segmented control; the edit controls on one row~~ done (session 22, part 4) | M |
+| ~~UI328~~ | ~~**Boxes as cards**: a soft background, rounded corners, a header with the kind's icon and name, one spacing scale~~ done (session 22, part 4) | S |
 | UI329 | **Purposeful micro-motion** (a first cut of E198): changed cells and values fade or slide, the answer appears with a short reveal; off under `prefers-reduced-motion` | M |
 
 **Round UI5 — identity and polish**
 
 | Id | Idea | Size |
 |---|---|---|
-| UI330 | **An icon per kind** (puzzle, code, design, math, dv) used in the chips, cards, headers and boxes; a friendly 404 page | S–M |
+| ~~UI330~~ | ~~**An icon per kind** (puzzle, code, design, math, dv) used in the chips, cards, headers and boxes; a friendly 404 page~~ done (session 22, part 1 (kinds only; no 404 page yet)) | S–M |
 | UI331 | **Dark mode tuning**: a contrast pass, a softer navy, the figure palette checked for colour-blind pairs (C193's script) | S–M |
 | UI332 | **Social cards** for shared links (idea 17): the title, the chips and the logo as an image per question | S–M |
 

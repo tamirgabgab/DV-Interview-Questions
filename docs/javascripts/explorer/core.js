@@ -348,12 +348,15 @@
     (typeof marks === "string" ? box.querySelectorAll(marks) : marks).forEach((el) => el && el.classList.add("ex-answer-mark"));
   };
 
+  // The box's header (UI328): a title, and help, "reset everything" and "copy link" as
+  // icon buttons (the word stays in the button as its name and shows as a tooltip).
   const header = (box, helpOpen) => {
     const bar = document.createElement("div");
     bar.className = "ex-bar";
-    bar.innerHTML = `<button type="button" class="ex-help-btn" aria-expanded="false" aria-label="עזרה : מה התיבה מראה ומה הכפתורים עושים" title="עזרה">?</button>` +
-      `<button type="button" class="ex-reset-all" title="כל הבקרות של התיבה חוזרות לברירת המחדל">איפוס הכול</button>` +
-      `<button type="button" class="ex-link" title="קישור שפותח את התיבה עם אותן בחירות">העתקת קישור</button>` +
+    bar.innerHTML = `<span class="ex-bar-title"><i class="ui-ico ui-ico-gesture" aria-hidden="true"></i>נסו בעצמכם</span>` +
+      `<button type="button" class="ex-help-btn ex-ibtn ui-ico-boxhelp" aria-expanded="false" aria-label="עזרה : מה התיבה מראה ומה הכפתורים עושים" data-tip="עזרה">עזרה</button>` +
+      `<button type="button" class="ex-reset-all ex-ibtn ui-ico-reset" data-tip="איפוס הכול : כל הבקרות חוזרות לברירת המחדל">איפוס הכול</button>` +
+      `<button type="button" class="ex-link ex-ibtn ui-ico-link" data-tip="העתקת קישור לתיבה עם אותן בחירות">העתקת קישור</button>` +
       `<p class="ex-help" hidden>${HELP[box.dataset.kind] || ""}</p>`;
     box.prepend(bar);
     const btn = bar.querySelector(".ex-help-btn"), help = bar.querySelector(".ex-help");
@@ -370,7 +373,11 @@
     const link = bar.querySelector(".ex-link");
     link.addEventListener("click", () => {
       const url = `${location.origin}${location.pathname}${linkOf(box)}`;
-      const done = () => { link.textContent = "הועתק ✓"; setTimeout(() => { link.textContent = "העתקת קישור"; }, 1500); };
+      const done = () => {
+        link.textContent = link.dataset.tip = "הועתק ✓";
+        link.classList.add("is-done");
+        setTimeout(() => { link.textContent = "העתקת קישור"; link.dataset.tip = "העתקת קישור לתיבה עם אותן בחירות"; link.classList.remove("is-done"); }, 1500);
+      };
       const fallback = () => { window.prompt("הקישור :", url); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
     });
@@ -472,7 +479,7 @@
   // 0014) sets box.dvqExtra = { get() → text or "", set(text) → ok }: its text rides as a
   // last part "!<text>" and is applied after the controls.
   const CTL_HASH = /^#ctl-([a-z0-9-]+)-(\d+)\.(.*)$/;
-  const controlsOf = (box) => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed"));
+  const controlsOf = (box) => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed") && !el.classList.contains("ex-scrub"));
   const valueOf = (el) => (el.type === "checkbox" || el.type === "radio" ? (el.checked ? "1" : "0") : el.value);
   const enc = (v) => encodeURIComponent(v).replace(/~/g, "%7E");
   const payloadOf = (box) => {
@@ -552,7 +559,7 @@
   const watch = (box) => {
     if (box.dvqWatched) return;
     box.dvqWatched = true;
-    box.addEventListener("input", (e) => { if (!e.target.classList.contains("ex-seed")) box.dvqCtlAt = ++tick; }, true);
+    box.addEventListener("input", (e) => { if (!e.target.matches(".ex-seed, .ex-scrub")) box.dvqCtlAt = ++tick; }, true);
     let timer = null;
     const later = () => { clearTimeout(timer); timer = setTimeout(() => save(box), 300); };
     ["input", "change", "click", "pointerup", "keyup"].forEach((ev) => box.addEventListener(ev, later));
@@ -576,12 +583,114 @@
     });
   };
 
+  // Playback as one icon bar (UI327): in a controls row, the start, previous, play, next
+  // and end buttons move (listeners and all) into a bar laid out left to right, as media
+  // controls are, and show an icon; the word stays in the button as its name and shows as
+  // a tooltip, and a play button whose word turns into "עצירה" shows the pause icon. The
+  // speed select is kept (it is a control of the link) but hidden behind three buttons
+  // beside the bar. A box with a "k מתוך T" counter gets a scrubber under the row: it
+  // presses the box's own start / next buttons to reach a step, so every view keeps its
+  // own stepping. The scrubber and the speed buttons are not controls of the link.
+  const TRANSPORT = [["button.ex-start, button.ex-first", "first"], ["button.ex-prev", "prev"], ["button.ex-play", "play"],
+    ["button.ex-next", "next"], ["button.ex-end, button.ex-last", "last"]];
+  const SPEED_NAMES = ["×1", "×2", "×4"];
+  const SCRUB_MAX = 5000;
+  const POS = /(\d+)\s*מתוך\s*(\d+)/;
+  const transport = (box) => {
+    box.querySelectorAll(".ex-controls").forEach((row) => {
+      const own = (el) => el && el.closest(".ex-controls") === row;
+      const found = TRANSPORT.map(([sel, icon]) => [[...row.querySelectorAll(sel)].find(own), icon]).filter(([b]) => b);
+      if (!found.some(([, icon]) => icon === "play" || icon === "next")) return;
+      const bar = document.createElement("span");
+      bar.className = "ex-transport ex-c-play";
+      bar.setAttribute("dir", "ltr");
+      found[0][0].before(bar);
+      found.forEach(([b, icon]) => {
+        b.classList.add("ex-tbtn", `ui-ico-${icon}`);
+        const sync = () => {
+          const word = b.textContent.trim();
+          b.dataset.tip = word;
+          b.classList.toggle("is-playing", icon === "play" && word === "עצירה");
+        };
+        new MutationObserver(sync).observe(b, { childList: true, characterData: true, subtree: true });
+        sync();
+        bar.append(b);
+      });
+      const sel = [...row.querySelectorAll("select.ex-speed")].find(own);
+      if (sel) {
+        const seg = document.createElement("span");
+        seg.className = "ex-speedseg";
+        seg.setAttribute("role", "group");
+        seg.setAttribute("aria-label", "הקצב");
+        const btns = [...sel.options].map((o, i) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "ex-speedbtn";
+          b.textContent = SPEED_NAMES[i] || o.text;
+          b.dataset.tip = `קצב ${o.text}`;
+          b.setAttribute("aria-label", `קצב ${o.text}`);
+          b.addEventListener("click", () => {
+            sel.value = o.value;
+            sel.dispatchEvent(new Event("input", { bubbles: true }));
+            sel.dispatchEvent(new Event("change", { bubbles: true }));
+          });
+          seg.append(b);
+          return [b, o];
+        });
+        const paint = () => btns.forEach(([b, o]) => b.setAttribute("aria-pressed", String(sel.value === o.value)));
+        sel.addEventListener("change", paint);
+        paint();
+        (sel.closest("label") || sel).classList.add("ex-speed-kept");
+        bar.append(seg);
+      }
+      const pos = [...box.querySelectorAll(".ex-pos")].find(own) || null;
+      const next = found.find(([, icon]) => icon === "next"), first = found.find(([, icon]) => icon === "first");
+      const prev = found.find(([, icon]) => icon === "prev");
+      if (!pos || !next) return;
+      const wrap = document.createElement("div");
+      wrap.className = "ex-scrubwrap";
+      wrap.innerHTML = `<input type="range" class="ex-scrub" min="0" step="1" dir="ltr" aria-label="קפיצה לצעד">`;
+      row.after(wrap);
+      const scrub = wrap.querySelector("input");
+      const read = () => { const m = POS.exec(pos.textContent); return m ? [Number(m[1]), Number(m[2])] : null; };
+      const show = () => {
+        const kt = read();
+        wrap.hidden = !kt || kt[1] < 1 || kt[1] > SCRUB_MAX;
+        if (wrap.hidden) return;
+        scrub.max = kt[1];
+        if (document.activeElement !== scrub) scrub.value = kt[0];
+        scrub.style.setProperty("--scrub", `${(100 * kt[0]) / kt[1]}%`);
+        scrub.setAttribute("aria-valuetext", pos.textContent.trim());
+      };
+      new MutationObserver(show).observe(pos, { childList: true, characterData: true, subtree: true });
+      show();
+      scrub.addEventListener("input", () => {
+        const goal = Number(scrub.value);
+        let kt = read();
+        if (!kt) return;
+        if (goal < kt[0]) {
+          if (first) first[0].click();
+          else for (let i = kt[0] - goal; i > 0 && prev; i--) prev[0].click();
+          kt = read();
+        }
+        for (let guard = 0; kt && kt[0] < goal && guard < SCRUB_MAX; guard++) {
+          next[0].click();
+          const now = read();
+          if (!now || now[0] === kt[0]) break;            // the box stopped advancing
+          kt = now;
+        }
+        show();
+      });
+    });
+  };
+
   const setup = (box, helpOpen = false) => {
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
     box.dvqSeedAt = box.dvqCtlAt = 0;                    // a rebuilt box has drawn nothing yet
     make(box).mount(box);
     layout(box);
+    transport(box);
     header(box, helpOpen);
     keyboard(box);
     decorateLive(box);

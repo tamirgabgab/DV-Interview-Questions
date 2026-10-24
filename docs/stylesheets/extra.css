@@ -1518,12 +1518,6 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .cake-peak { background: var(--viz-s2); }
 .md-typeset .viz-legend .cake-rest { background: var(--viz-grid); outline: 1px solid var(--viz-text); }
 .md-typeset .viz-legend .cake-gone { background: transparent; outline: 1px dashed var(--viz-text); outline-offset: -1px; }
-.md-typeset .explorer {
-  border: 1px solid var(--viz-grid);
-  border-radius: 0.4rem;
-  padding: 0.6rem 0.8rem;
-  margin: 1em 0;
-}
 .md-typeset .explorer .ex-controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; align-items: center; }
 .md-typeset .explorer label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.5rem; }
 .md-typeset .explorer label[hidden] { display: none; }
@@ -3018,4 +3012,56 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
   .md-typeset .home-hero h1 { font-size: 1.45rem; }
   .md-typeset .home-hero .hh-actions .md-button { flex: 1 1 auto; justify-content: center; }
   .md-typeset .home-hero .hh-search kbd { display: none; }
+}
+
+/* The explorer boxes as cards (UI328, UI327): a soft card with a header (a title, and help,
+   reset and copy link as icon buttons), playback as one icon bar laid out left to right with
+   a large round play button, three speed buttons beside it, and a scrubber under the row.
+   Icon buttons keep their word as the accessible name: the text is zero-sized and the
+   ::before draws the icon, the ::after the tooltip; :not(#_) outranks the shared button
+   sizes of E200 and the views' md-button classes. */
+.ui-ico-first { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 18V6h2v12zm3.5-6L18 6v12z'/%3E%3C/svg%3E"); }
+.ui-ico-prev { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 5v14h-3V5m-2 0v14L3 12'/%3E%3C/svg%3E"); }
+.ui-ico-play { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5.14v14l11-7z'/%3E%3C/svg%3E"); }
+.ui-ico-next { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5v14h3V5m2 0v14l11-7'/%3E%3C/svg%3E"); }
+.ui-ico-last { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16 18h2V6h-2M6 18l8.5-6L6 6z'/%3E%3C/svg%3E"); }
+.ui-ico-boxhelp { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 18h2v-2h-2zm1-16A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m0-14a4 4 0 0 0-4 4h2a2 2 0 0 1 2-2 2 2 0 0 1 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4'/%3E%3C/svg%3E"); }
+.ui-ico-reset { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.9 8.9 0 0 0 13 21a9 9 0 0 0 9-9 9 9 0 0 0-9-9'/%3E%3C/svg%3E"); }
+.ui-ico-link { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10.59 13.41c.41.39.41 1.03 0 1.42-.39.39-1.03.39-1.42 0a5.003 5.003 0 0 1 0-7.07l3.54-3.54a5.003 5.003 0 0 1 7.07 0 5.003 5.003 0 0 1 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48a2.98 2.98 0 0 0 0-4.24 2.98 2.98 0 0 0-4.24 0l-3.53 3.53a2.98 2.98 0 0 0 0 4.24m2.82-4.24c.39-.39 1.03-.39 1.42 0a5.003 5.003 0 0 1 0 7.07l-3.54 3.54a5.003 5.003 0 0 1-7.07 0 5.003 5.003 0 0 1 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47a2.98 2.98 0 0 0 0 4.24 2.98 2.98 0 0 0 4.24 0l3.53-3.53a2.98 2.98 0 0 0 0-4.24.973.973 0 0 1 0-1.42'/%3E%3C/svg%3E"); }
+.ui-ico-gesture { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 9a1 1 0 0 1 1-1 1 1 0 0 1 1 1v4.47l1.21.13 4.94 2.19c.53.24.85.77.85 1.35v4.36c-.03.82-.68 1.47-1.5 1.5H11c-.38 0-.74-.15-1-.43l-4.9-4.2.74-.77c.19-.21.46-.32.74-.32h.22L10 19zm1-4a4 4 0 0 1 4 4c0 1.5-.8 2.77-2 3.46v-1.22c.61-.55 1-1.35 1-2.24a3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .89.39 1.69 1 2.24v1.22C7.8 11.77 7 10.5 7 9a4 4 0 0 1 4-4'/%3E%3C/svg%3E"); }
+.ui-ico-play.is-playing { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 19h4V5h-4M6 19h4V5H6z'/%3E%3C/svg%3E"); }
+.ui-ico-link.is-done { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z'/%3E%3C/svg%3E"); }
+.md-typeset .explorer { margin: 1.2em 0; padding: 0 1rem 0.7rem; border: 1px solid var(--site-card-border); border-radius: 0.8rem; background: color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color)); box-shadow: 0 0.1rem 0.6rem rgba(0, 0, 0, 0.05); }
+.md-typeset .explorer .ex-bar { gap: 0.2rem 0.3rem; margin: 0 -1rem 0.6rem; padding: 0.35rem 0.8rem 0.35rem 0.6rem; border-bottom: 1px solid var(--site-card-border); border-radius: 0.8rem 0.8rem 0 0; background: color-mix(in srgb, var(--md-typeset-a-color) 7%, var(--md-default-bg-color)); }
+.md-typeset .explorer .ex-bar-title { display: inline-flex; align-items: center; gap: 0.35em; margin-inline-end: auto; color: var(--md-typeset-a-color); font-size: 0.72rem; font-weight: 700; }
+.md-typeset .explorer .ex-help { padding: 0.3rem 0 0.1rem; }
+.md-typeset .explorer :is(.ex-ibtn, .ex-tbtn):not(#_) { position: relative; display: inline-flex; align-items: center; justify-content: center; flex: none; width: 1.8rem; height: 1.8rem; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--viz-ink); font-size: 0; line-height: 0; text-decoration: none; cursor: pointer; }
+.md-typeset .explorer :is(.ex-ibtn, .ex-tbtn)::before { content: ""; width: 0.95rem; height: 0.95rem; background-color: currentColor; -webkit-mask: var(--ui-ico) center / contain no-repeat; mask: var(--ui-ico) center / contain no-repeat; }
+.md-typeset .explorer :is(.ex-ibtn, .ex-tbtn):not(#_):is(:hover, :focus-visible) { background: var(--md-default-fg-color--lightest); color: var(--md-default-fg-color); }
+.md-typeset .explorer .ex-help-btn[aria-expanded="true"]:not(#_) { background: var(--viz-s1); color: var(--md-default-bg-color); }
+.md-typeset .explorer .ex-link.is-done { color: var(--viz-s3-text); }
+.md-typeset .explorer :is(.ex-ibtn, .ex-tbtn, .ex-speedbtn)[data-tip]:is(:hover, :focus-visible)::after {
+  content: attr(data-tip); position: absolute; top: calc(100% + 0.3rem); left: 50%; z-index: 6; transform: translateX(-50%);
+  padding: 0.2rem 0.5rem; border-radius: 0.3rem; background: var(--md-default-fg-color); color: var(--md-default-bg-color);
+  font-size: 0.6rem; font-weight: 400; line-height: 1.5; white-space: nowrap; pointer-events: none;
+}
+.md-typeset .explorer .ex-bar .ex-ibtn[data-tip]:is(:hover, :focus-visible)::after { left: auto; right: 0; transform: none; }
+.md-typeset .explorer .ex-transport { direction: ltr; display: inline-flex; align-items: center; gap: 0.15rem; padding: 0.15rem; border: 1px solid var(--site-card-border); border-radius: 2rem; background: var(--md-default-bg-color); }
+.md-typeset .explorer .ex-transport .ex-tbtn:not(#_) { width: 1.9rem; height: 1.9rem; }
+.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_) { width: 2.4rem; height: 2.4rem; background: var(--md-typeset-a-color); color: var(--md-default-bg-color); }
+.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play::before { width: 1.25rem; height: 1.25rem; }
+.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_):is(:hover, :focus-visible) { background: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .explorer .ex-transport .ex-tbtn:disabled { opacity: 0.35; cursor: default; }
+.md-typeset .explorer .ex-speed-kept { display: none; }
+.md-typeset .explorer .ex-speedseg { display: inline-flex; margin-inline-start: 0.35rem; padding-inline-start: 0.35rem; border-inline-start: 1px solid var(--site-card-border); }
+.md-typeset .explorer .ex-speedbtn { position: relative; padding: 0.15rem 0.4rem; border: 0; border-radius: 1rem; background: transparent; color: var(--viz-text); font: inherit; font-family: var(--md-code-font-family); font-size: 0.62rem; cursor: pointer; }
+.md-typeset .explorer .ex-speedbtn[aria-pressed="true"] { background: var(--site-primary-soft); color: var(--md-typeset-a-color); font-weight: 700; }
+.md-typeset .explorer .ex-scrubwrap { margin: -0.1rem 0 0.4rem; }
+.md-typeset .explorer .ex-scrubwrap[hidden] { display: none; }
+.md-typeset .explorer input.ex-scrub { display: block; width: 100%; max-width: 30rem; height: 1.1rem; margin: 0; accent-color: var(--md-typeset-a-color); cursor: pointer; }
+@media screen and (max-width: 30em) {
+  .md-typeset .explorer { padding-inline: 0.7rem; border-radius: 0.6rem; }
+  .md-typeset .explorer .ex-bar { margin-inline: -0.7rem; border-radius: 0.6rem 0.6rem 0 0; }
+  .md-typeset .explorer .ex-transport .ex-tbtn:not(#_):not(.ui-ico-play) { width: 1.65rem; height: 1.65rem; }
+  .md-typeset .explorer .ex-speedbtn { padding-inline: 0.3rem; }
 }
