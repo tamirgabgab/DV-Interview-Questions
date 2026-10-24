@@ -2169,6 +2169,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   largest square and rectangle of ones, item 36) is on the branch; `main` when the owner
   asks. Still open: the rest of the second
   series A to E, the new questions of M to R and Z, the deferred G222, H223, H224, E35.
+- Session 22 (end): 0046 is on `main` (7786f37). A third series on look and feel
+  (UI319 to UI332) is proposed for the owner to pick.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2950,7 +2952,7 @@ fly, clock angles, Heron, rope around the Earth).
 |---|---|---|---|---|---|---|
 | Z202 | **Two burning ropes, 45 minutes** | student / easy | Wu, Leino | which times n ropes can measure (sums of 60/2^k), a search over lighting states | ropes burning from one or both ends, a timeline | S–M |
 | ~~Z203~~ | Done as 0039. **Two eggs, 100 floors** | junior / medium | Leino, LeetCode 887 | k eggs and n floors: the DP and the binomial sum; 14 drops | sliders k and n, the drop tree and the table | M |
-| Z204 | **Twelve coins, one fake, three weighings** | senior / hard | Wu | (3^n − 3)/2 coins in n weighings, fake heavier or lighter | a balance: pick coins per pan, the tree of outcomes | M–L |
+| ~~Z204~~ | Done as 0045. **Twelve coins, one fake, three weighings** | senior / hard | Wu | (3^n − 3)/2 coins in n weighings, fake heavier or lighter | a balance: pick coins per pan, the tree of outcomes | M–L |
 | Z205 | **100 prisoners and a light bulb** | senior / hard | Wu | the counter protocol for n prisoners, the expected number of days | a simulation with a day counter and a histogram | M |
 | Z206 | **Pirates dividing gold** | junior / medium | Wu, Winkler | backward induction for n pirates; the twist past 200 | a stepper adding one pirate at a time | M |
 | Z207 | **Ants on a stick** | student / easy | Wu | n ants, any directions: collisions as passing through | an animation with the "swap labels" view | S–M |
@@ -2964,6 +2966,69 @@ fly, clock angles, Heron, rope around the Earth).
 | Z215 | **Round-robin arbiter** | junior / medium | ChipVerify, Verification Guide | N requesters, fairness as SVA, a weighted variant | request toggles, a grant pointer stepping round | M |
 | Z216 | **Priority encoder and leading zeros in log depth** | student / medium | HDLBits | a tree for N bits, depth log2 N against a chain | a bit field, the tree with the winning path marked | S–M |
 | ~~Z217~~ | Done as 0041. **How many random tests close coverage** | junior / medium | coupon collector, Zhou | n bins: n·H_n, the variance, unequal bin weights | a covergroup filling up, a histogram over runs | M |
+
+### Third series, rounds UI1 to UI5 — look and feel (proposed 2026-10-24, owner picks)
+
+The owner asked for UX / UI proposals that make the site prettier and friendlier. From
+screenshots of the home page, the junior catalog and the 0046 page at 1280 and 390 px
+(light) on 2026-10-24:
+
+- The home page opens with a plain title, a paragraph and four grey stat tiles; there
+  is no call to action, and "3/3 levels with questions" says little. On a phone the
+  tiles take most of the first screen.
+- Bug: in the study-path cards a long title squeezes the count, so "3 שאלות" breaks
+  letter by letter ("שאלו / ת") in the SystemVerilog and PCIe cards.
+- Every catalog row carries the "חדש" chip (all questions were added within 30 days),
+  so it says nothing; the title column wraps to three lines, and the topics column is
+  English monospace tags. The topic filter is four rows of chips.
+- The question header is busy: six chips, monospace topics, the source, two badges,
+  then two rows of tool buttons and the part bar before the statement.
+- Explorer controls are equal-weight outlined buttons that wrap to three or four rows.
+- Text uses the theme's Latin-first font; Hebrew has no face of its own (C190 open).
+
+Item numbers continue the global count (319 on).
+
+**Round UI1 — first impression**
+
+| Id | Idea | Size |
+|---|---|---|
+| UI319 | **A real hero**: a headline, one sentence, two buttons ("להתחיל לתרגל" to the next unsolved or a random question, "לכל השאלות"), a large search field; the stats as one slim row with icons | S–M |
+| UI320 | **Path cards fixed and polished**: the count never wraps (the letter-by-letter bug), equal heights, a progress ring instead of a bar, an icon per path | S |
+| UI321 | **Hebrew typography** (C190 promoted): a Hebrew face (Heebo or Assistant) for text and headings, tabular digits, a line-length cap near 70 characters, more line height | S–M |
+
+**Round UI2 — the catalog**
+
+| Id | Idea | Size |
+|---|---|---|
+| UI322 | **Compact rows or cards**: the title on one line, level / difficulty / kind as one row of chips, two topics and "+3"; "חדש" only for the newest five or the last 14 days | S–M |
+| UI323 | **Folded filters**: level, difficulty and kind as segmented controls, topics behind "עוד נושאים" with a search field, the active filters as removable chips with the result count | M |
+
+**Round UI3 — the question page**
+
+| Id | Idea | Size |
+|---|---|---|
+| UI324 | **A calmer header**: id · level · difficulty · kind in one line, topics as quiet links, "interactive", "tested" and "new" as small icons with tooltips; the page tools (open / close all, practice, solved, favourite, random) in one icon toolbar, an overflow menu on phones | M |
+| UI325 | **A sticky mini-header** while scrolling: the title, the current part and the solved toggle, with a thin reading-progress line | S–M |
+| UI326 | **Friendly feedback**: marking a question solved shows a short celebration (off under reduced motion) and the progress of its level ("5 of 27 in junior") | S |
+
+**Round UI4 — the explorer boxes**
+
+| Id | Idea | Size |
+|---|---|---|
+| UI327 | **Playback as an icon bar**: start, back, play / pause, step, end as icons with tooltips and a scrub slider, the speed as a three-way segmented control; the edit controls on one row | M |
+| UI328 | **Boxes as cards**: a soft background, rounded corners, a header with the kind's icon and name, one spacing scale | S |
+| UI329 | **Purposeful micro-motion** (a first cut of E198): changed cells and values fade or slide, the answer appears with a short reveal; off under `prefers-reduced-motion` | M |
+
+**Round UI5 — identity and polish**
+
+| Id | Idea | Size |
+|---|---|---|
+| UI330 | **An icon per kind** (puzzle, code, design, math, dv) used in the chips, cards, headers and boxes; a friendly 404 page | S–M |
+| UI331 | **Dark mode tuning**: a contrast pass, a softer navy, the figure palette checked for colour-blind pairs (C193's script) | S–M |
+| UI332 | **Social cards** for shared links (idea 17): the title, the chips and the logo as an image per question | S–M |
+
+Suggested order: UI320 (a bug) and UI321 first, then UI319 and UI324 (the two most
+visible screens), then UI322 / UI323, then the boxes (UI327, UI328).
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
