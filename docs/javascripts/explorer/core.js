@@ -643,16 +643,16 @@
         (sel.closest("label") || sel).classList.add("ex-speed-kept");
         bar.append(seg);
       }
-      const pos = [...box.querySelectorAll(".ex-pos")].find(own) || null;
+      const posOf = () => [...box.querySelectorAll(".ex-pos")].find(own) || null;   // views may redraw the counter
       const next = found.find(([, icon]) => icon === "next"), first = found.find(([, icon]) => icon === "first");
       const prev = found.find(([, icon]) => icon === "prev");
-      if (!pos || !next) return;
+      if (!posOf() || !next) return;
       const wrap = document.createElement("div");
       wrap.className = "ex-scrubwrap";
       wrap.innerHTML = `<input type="range" class="ex-scrub" min="0" step="1" dir="ltr" aria-label="קפיצה לצעד">`;
       row.after(wrap);
       const scrub = wrap.querySelector("input");
-      const read = () => { const m = POS.exec(pos.textContent); return m ? [Number(m[1]), Number(m[2])] : null; };
+      const read = () => { const pos = posOf(), m = pos && POS.exec(pos.textContent); return m ? [Number(m[1]), Number(m[2])] : null; };
       const show = () => {
         const kt = read();
         wrap.hidden = !kt || kt[1] < 1 || kt[1] > SCRUB_MAX;
@@ -660,9 +660,14 @@
         scrub.max = kt[1];
         if (document.activeElement !== scrub) scrub.value = kt[0];
         scrub.style.setProperty("--scrub", `${(100 * kt[0]) / kt[1]}%`);
-        scrub.setAttribute("aria-valuetext", pos.textContent.trim());
+        scrub.setAttribute("aria-valuetext", posOf().textContent.trim());
       };
-      new MutationObserver(show).observe(pos, { childList: true, characterData: true, subtree: true });
+      let queued = false;
+      new MutationObserver((records) => {
+        if (queued || records.every((r) => wrap.contains(r.target))) return;
+        queued = true;
+        queueMicrotask(() => { queued = false; show(); });
+      }).observe(box, { childList: true, characterData: true, subtree: true });
       show();
       scrub.addEventListener("input", () => {
         const goal = Number(scrub.value);
