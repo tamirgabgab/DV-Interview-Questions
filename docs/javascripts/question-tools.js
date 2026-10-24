@@ -4,6 +4,7 @@
 // the hint ladder (hint n+1 appears once hint n is open). A button's name is its
 // aria-label and its tooltip (data-tip); `retip` changes both, and the icon with them.
 // Practice mode is remembered across pages in localStorage; the stopwatch is per page.
+// Marking a question solved shows a short message with the level's progress (UI326).
 (() => {
   const KEY = "dvq-practice";
   const SOLUTION = "details.success";
@@ -18,6 +19,126 @@
     btn.setAttribute("aria-label", tip);
     btn.dataset.tip = tip;
     if (icon) btn.querySelector(".ui-ico").className = `ui-ico ui-ico-${icon}`;
+  };
+
+  // Marking a question solved (UI326): a short message at the bottom of the screen with
+  // the progress of its level and a link to the level's next question not solved yet; the
+  // check mark pops, and solving the level's last question drops a short confetti. Taking
+  // the mark off says so, with an undo. Under prefers-reduced-motion only the message shows.
+  const still = () => Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const TOAST_MS = 7000;
+  let toastTimer = null;
+  const toast = (fill) => {
+    let t = document.querySelector(".dvq-toast");
+    if (!t) {
+      t = document.createElement("div");
+      t.className = "dvq-toast";
+      t.setAttribute("role", "status");
+      t.setAttribute("data-search-exclude", "");
+      t.addEventListener("mouseenter", () => clearTimeout(toastTimer));
+      t.addEventListener("focusin", () => clearTimeout(toastTimer));
+      t.addEventListener("mouseleave", () => { if (!t.contains(document.activeElement)) later(t); });
+      t.addEventListener("focusout", (e) => { if (!t.contains(e.relatedTarget)) later(t); });
+      t.addEventListener("keydown", (e) => { if (e.key === "Escape") t.hidden = true; });
+      document.body.append(t);
+    }
+    t.replaceChildren();
+    const body = document.createElement("div");
+    body.className = "dt-body";
+    fill(body);
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "dt-close";
+    close.setAttribute("aria-label", "סגירת ההודעה");
+    close.textContent = "×";
+    close.addEventListener("click", () => { t.hidden = true; });
+    t.append(body, close);
+    t.hidden = false;
+    t.classList.remove("is-in");
+    void t.offsetWidth;                                  // restart the entrance
+    t.classList.add("is-in");
+    later(t);
+  };
+  const later = (t) => { clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, TOAST_MS); };
+
+  const pop = () => {
+    if (still()) return;
+    document.querySelectorAll(".qt-solved, .pn-solved").forEach((el) => {
+      el.classList.remove("is-pop");
+      void el.offsetWidth;
+      el.classList.add("is-pop");
+      el.addEventListener("animationend", () => el.classList.remove("is-pop"), { once: true });
+    });
+  };
+
+  const CONFETTI = 40;
+  const confetti = () => {
+    if (still()) return;
+    const layer = document.createElement("div");
+    layer.className = "dvq-confetti";
+    layer.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < CONFETTI; i++) {
+      const p = document.createElement("i");
+      p.className = `dc-${i % 4}`;
+      p.style.setProperty("--x", `${(Math.random() * 100).toFixed(1)}vw`);
+      p.style.setProperty("--dx", `${(Math.random() * 16 - 8).toFixed(1)}vw`);
+      p.style.setProperty("--r", `${Math.round(Math.random() * 720 - 360)}deg`);
+      p.style.setProperty("--d", `${Math.round(Math.random() * 400)}ms`);
+      layer.append(p);
+    }
+    document.body.append(layer);
+    setTimeout(() => layer.remove(), 2600);
+  };
+
+  const solvedFeedback = (bar, btn, on) => {
+    if (!on) {
+      toast((body) => {
+        body.append(Object.assign(document.createElement("p"), { className: "dt-text", textContent: "הסימון \"פתרתי\" בוטל." }));
+        const undo = document.createElement("button");
+        undo.type = "button";
+        undo.className = "dt-action";
+        undo.textContent = "ביטול";
+        undo.addEventListener("click", () => btn.click());
+        body.append(undo);
+      });
+      return;
+    }
+    const ids = (bar.dataset.levelIds || "").split(" ").filter(Boolean);
+    const hrefs = JSON.parse(bar.dataset.levelHrefs || "[]");
+    const solved = (id) => window.dvqMarks.has(id, "solved");
+    const done = ids.filter(solved).length, n = ids.length;
+    const all = n > 0 && done === n;
+    pop();
+    if (all) confetti();
+    toast((body) => {
+      const text = document.createElement("p");
+      text.className = "dt-text";
+      text.innerHTML = all
+        ? `<b>כל הכבוד!</b> פתרת את כל ${n} השאלות ברמת ${bar.dataset.levelName || ""}.`
+        : `<b>כל הכבוד!</b> פתרת ${done} מתוך ${n} שאלות ברמת ${bar.dataset.levelName || ""}.`;
+      const meter = document.createElement("span");
+      meter.className = "dt-bar";
+      meter.setAttribute("aria-hidden", "true");
+      meter.innerHTML = `<i style="width:${n ? (100 * done) / n : 0}%"></i>`;
+      body.append(text, meter);
+      // the level's next question not solved yet, after this one and around
+      const at = ids.indexOf(bar.dataset.qid);
+      let next = -1;
+      for (let k = 1; k <= n && next < 0; k++) {
+        const j = (at + k) % n;
+        if (!solved(ids[j])) next = j;
+      }
+      const link = document.createElement("a");
+      link.className = "dt-action";
+      if (next >= 0) {
+        link.href = hrefs[next];
+        link.textContent = `לשאלה הבאה שלא פתרת (${ids[next]})`;
+      } else {
+        link.href = bar.dataset.levelPage || "../";
+        link.textContent = `לכל שאלות ${bar.dataset.levelName || "הרמה"}`;
+      }
+      body.append(link);
+    });
   };
 
   const setup = (bar) => {
@@ -77,7 +198,11 @@
       });
     };
     bar.querySelectorAll(".qt-mark").forEach((b) => {
-      b.addEventListener("click", () => { if (window.dvqMarks) window.dvqMarks.toggle(qid, b.dataset.mark); });
+      b.addEventListener("click", () => {
+        if (!window.dvqMarks) return;
+        const on = window.dvqMarks.toggle(qid, b.dataset.mark);
+        if (b.dataset.mark === "solved") solvedFeedback(bar, b, on);
+      });
     });
     document.addEventListener("dvq-marks", paint);
     paint();

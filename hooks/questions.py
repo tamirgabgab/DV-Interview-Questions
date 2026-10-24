@@ -324,14 +324,21 @@ def _tool(cls: str, icon: str, tip: str, extra: str = "") -> str:
 def _tools(q: dict, page_url: str) -> str:
     """The page tools as icon buttons (UI324): open or close every block (one toggle),
     practice mode with a stopwatch, solved / favourite marks (kept in the browser) and a
-    random question of the same level. They sit beside the header's chip row."""
+    random question of the same level. They sit beside the header's chip row; the toolbar
+    carries the level's ids and links for the message shown when a question is marked
+    solved."""
     others = [o for o in _questions.values() if o["id"] != q["id"]]
     same = [o for o in others if o["level"] == q["level"]] or others
     random_btn = ""
     if same:
         hrefs = json.dumps([_href(o["src_uri"], page_url) for o in sorted(same, key=lambda o: o["id"])])
         random_btn = _tool("qt-random", "random", "שאלה אקראית מאותה רמה", f' data-hrefs="{html.escape(hrefs)}"')
-    return (f'<div class="question-tools" role="toolbar" aria-label="כלי השאלה" data-search-exclude data-qid="{q["id"]}">'
+    # the level's questions in order, for the "solved n of m" message (UI326)
+    level = sorted((o for o in _questions.values() if o["level"] == q["level"]), key=lambda o: o["id"])
+    level_data = (f' data-level-name="{html.escape(LEVELS[q["level"]])}" data-level-ids="{" ".join(o["id"] for o in level)}"'
+                  f' data-level-hrefs="{html.escape(json.dumps([_href(o["src_uri"], page_url) for o in level]))}"'
+                  f' data-level-page="{_href("questions/" + q["level"] + "/index.md", page_url)}"')
+    return (f'<div class="question-tools" role="toolbar" aria-label="כלי השאלה" data-search-exclude data-qid="{q["id"]}"{level_data}>'
             + _tool("qt-fold", "unfold-more", "פתח הכל")
             + _tool("qt-practice", "timer", "מצב תרגול", ' aria-pressed="false"')
             + '<span class="qt-clock" hidden></span>'

@@ -336,6 +336,10 @@
     box.querySelectorAll(".ex-answer-mark").forEach((el) => el.classList.remove("ex-answer-mark"));
     let line = box.querySelector(":scope > .ex-answer");
     if (!text) { if (line) line.hidden = true; return; }
+    if ((!line || line.hidden) && box.dvqArmed && !reduced()) {      // reached just now: one pulse (UI329)
+      box.classList.add("ex-answer-new");
+      setTimeout(() => box.classList.remove("ex-answer-new"), 1000);
+    }
     if (!line) {
       line = document.createElement("p");
       line.className = "ex-answer";
@@ -689,6 +693,199 @@
     });
   };
 
+  // Motion (UI329): once a person has touched the box (a trusted pointer or key event, so
+  // a restored state and the page checks draw without it), every redraw is compared with
+  // the one before. The values that changed (leaf elements of up to VALUE_MAX characters,
+  // empty ones too: table and grid cells, labels) flash for a moment; in the kinds of TWEEN a
+  // changed integer also counts to its new value, and a bar (an SVG rect with one edge
+  // kept) grows from its old size or slides from its old place. A redraw that keeps few of
+  // the places is a new picture and moves nothing; more than CHANGED_MAX changed values, or
+  // a reshuffle of values already shown, flash nothing either. The flash is as
+  // long as the time since the last redraw allows (a fast play keeps up), and none of it
+  // runs under prefers-reduced-motion. Values are matched by their place in the box (the
+  // path of child indices), so a redraw that adds an overlay still lines up. When a box
+  // reaches its answer, the marks pulse once.
+  const TWEEN = new Set(["maxones", "eggs", "eurovision", "coverage", "stages", "credits"]);
+  const VALUE_MAX = 8, FLASH_MS = [160, 600], MOST = 0.4, CHANGED_MAX = 8;
+  const STILL_PARTS = ".ex-bar, .ex-controls, .ex-scrubwrap, .ex-answer, .ex-help, .ex-keys, .ex-pos, .ex-guide, button, select, input, textarea, label, title, desc";
+  const INT = /^-?\d+$/;
+  const reduced = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const textOf = (el) => (el.dvqTo !== undefined ? el.dvqTo : el.textContent).trim();
+  // a value: an element with no child elements and a short text (an empty cell counts, so
+  // a cell filled in by the step flashes), not a drawn shape, a paragraph or a word inside
+  // a sentence
+  const SHAPES = new Set(["rect", "path", "circle", "ellipse", "line", "polyline", "polygon", "use", "image", "stop", "i", "br", "hr", "img", "p"]);
+  const valuesOf = (box) => [...box.querySelectorAll("*")].filter((el) => {
+    if (el.firstElementChild || SHAPES.has(el.localName) || el.closest(STILL_PARTS)) return false;
+    if ([...el.parentNode.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) return false;
+    return textOf(el).length <= VALUE_MAX;
+  });
+  const rectsOf = (box) => [...box.querySelectorAll("svg rect")].filter((el) => !el.closest(STILL_PARTS));
+  const pathOf = (box, el) => {                          // the element's place in the box
+    const at = [];
+    for (let e = el; e && e !== box; e = e.parentElement) at.push(Array.prototype.indexOf.call(e.parentElement.children, e));
+    return at.join(".");
+  };
+  const geomOf = (el) => ["x", "y", "width", "height"].map((a) => Number(el.getAttribute(a)) || 0);
+  const countTo = (el, from, to, ms) => {
+    const t0 = performance.now(), text = String(to);
+    el.dvqTo = text;
+    const tick = (now) => {
+      if (el.dvqTo !== text) return;                     // a newer count took over
+      const u = Math.min(1, (now - t0) / ms), e = 1 - (1 - u) * (1 - u);
+      el.textContent = u < 1 ? String(Math.round(from + (to - from) * e)) : text;
+      if (u < 1) requestAnimationFrame(tick);
+      else queueMicrotask(() => { if (el.dvqTo === text) delete el.dvqTo; });   // after the watch saw this last write
+    };
+    requestAnimationFrame(tick);
+  };
+  const moveRect = (el, [x0, y0, w0, h0], [x1, y1, w1, h1], ms) => {
+    if (typeof el.animate !== "function" || !w1 || !h1) return;
+    const near = (a, b) => Math.abs(a - b) < 0.05;
+    let from = null, origin = "center";
+    if (near(w0, w1) && near(h0, h1)) from = `translate(${x0 - x1}px, ${y0 - y1}px)`;
+    else if (near(x0, x1) && near(w0, w1)) {
+      if (near(y0 + h0, y1 + h1)) origin = "center bottom";
+      else if (near(y0, y1)) origin = "center top";
+      else return;
+      from = `scale(1, ${h0 / h1})`;
+    } else if (near(y0, y1) && near(h0, h1)) {
+      if (near(x0, x1)) origin = "left center";
+      else if (near(x0 + w0, x1 + w1)) origin = "right center";
+      else return;
+      from = `scale(${w0 / w1}, 1)`;
+    } else return;
+    el.style.transformBox = "fill-box";
+    el.style.transformOrigin = origin;
+    el.animate([{ transform: from }, { transform: "none" }], { duration: ms, easing: "ease-out" });
+  };
+  const motion = (box) => {
+    box.dvqSnap = null;
+    if (box.dvqMotion) return;                           // a box set up again keeps its watch
+    box.dvqMotion = true;
+    if (typeof MutationObserver === "undefined" || reduced()) return;
+    let queued = false, last = 0;
+    const arm = (e) => {
+      if (!e.isTrusted || box.dvqArmed) return;
+      box.dvqArmed = true;
+      compare();                                         // the picture before the first change
+    };
+    box.addEventListener("pointerdown", arm, true);
+    box.addEventListener("keydown", arm, true);
+    const compare = () => {
+      queued = false;
+      if (!box.dvqArmed) return;
+      const els = valuesOf(box), rects = TWEEN.has(box.dataset.kind) ? rectsOf(box) : [];
+      const snap = {
+        texts: new Map(els.map((el) => [pathOf(box, el), [el, textOf(el)]])),
+        geoms: new Map(rects.map((el) => [pathOf(box, el), [el, geomOf(el)]])),
+      };
+      const before = box.dvqSnap;
+      box.dvqSnap = snap;
+      const now = performance.now(), gap = now - last;
+      last = now;
+      if (!before || reduced()) return;
+      const ms = Math.round(Math.max(FLASH_MS[0], Math.min(FLASH_MS[1], gap * 0.8)));
+      box.style.setProperty("--ex-flash", `${ms}ms`);
+      // the same place in the drawing before and after; a new picture keeps few of them
+      const pairs = (now_, then) => {
+        const both = [...now_].filter(([k]) => then.has(k)).map(([k, [el, v]]) => [el, then.get(k)[1], v]);
+        return both.length >= MOST * Math.max(now_.size, then.size) ? both : [];
+      };
+      // a value that was emptied does not flash; more than a few changes that only move
+      // texts already shown (a list shifting, a circle renumbered) are a reshuffle
+      const changed = pairs(snap.texts, before.texts).filter(([, a, b]) => a !== b && b !== "");
+      const shown = new Set([...before.texts.values()].map(([, v]) => v));
+      const shifted = changed.filter(([, , b]) => shown.has(b)).length;
+      if (changed.length && changed.length <= CHANGED_MAX && (changed.length <= 3 || shifted < changed.length / 2)) {
+        changed.forEach(([el, a, b]) => {
+          if (el.dvqTo === undefined && TWEEN.has(box.dataset.kind) && INT.test(a) && INT.test(b) && Math.abs(Number(b) - Number(a)) > 1) {
+            countTo(el, Number(a), Number(b), ms);
+          }
+          el.classList.remove("ex-changed");
+          void el.getBoundingClientRect();               // restart the flash on a reused element
+          el.classList.add("ex-changed");
+          setTimeout(() => el.classList.remove("ex-changed"), ms + 50);
+        });
+      }
+      const moved = pairs(snap.geoms, before.geoms).filter(([, g0, g1]) => g0.some((v, k) => Math.abs(v - g1[k]) >= 0.05));
+      if (moved.length && moved.length <= Math.max(4, MOST * snap.geoms.size)) moved.forEach(([el, g0, g1]) => moveRect(el, g0, g1, ms));
+    };
+    new MutationObserver((records) => {
+      if (queued || records.every((r) => (r.target.nodeType === 1 ? r.target : r.target.parentNode).dvqTo !== undefined)) return;
+      queued = true;
+      queueMicrotask(compare);
+    }).observe(box, { childList: true, characterData: true, subtree: true });
+  };
+
+  // A first-visit guide (E201): on the page's first box with a playback bar, once per
+  // browser, three short hints in turn point at the playback bar, the figure and the
+  // summary line, each with "next" and "skip". They show when the box is mostly in view.
+  // An automated browser (the page checks) sees none unless the address has ?guide.
+  const GUIDE = "dvq-guide";
+  const GUIDE_STEPS = [
+    [".ex-transport", false, "כאן מריצים את התיבה : צעד קדימה או אחורה, הפעלה רציפה או קפיצה לסוף. הפס שמתחת קופץ ישר לכל צעד."],
+    ["svg", true, "הציור מתעדכן בכל צעד, ומה שהצעד שינה מהבהב לרגע בכתום."],
+    [".ex-summary", false, "כאן כתוב מה קרה בצעד, ובסוף מופיעה התשובה בירוק. בכפתור העזרה שבראש התיבה יש הסבר מלא."],
+  ];
+  const guideSeen = () => { try { return localStorage.getItem(GUIDE) === "1"; } catch (e) { return true; } };
+  const guide = (box) => {
+    const forced = /[?&]guide\b/.test(location.search);
+    if (document.querySelector(".ex-guide") || (!forced && (guideSeen() || navigator.webdriver))) return;
+    const first = [...document.querySelectorAll(".explorer")].find((b) => b.querySelector(".ex-transport"));
+    if (first !== box || typeof IntersectionObserver === "undefined") return;
+    const steps = GUIDE_STEPS.map(([sel, inside, text]) => {
+      const area = (e) => { const r = e.getBoundingClientRect(); return r.width > 120 ? r.width * r.height : 0; };
+      const all = [...box.querySelectorAll(sel)].filter((e) => sel === ".ex-transport" || !e.closest(".ex-bar, .ex-controls"));
+      const el = inside ? all.filter(area).sort((a, b) => area(b) - area(a))[0] : all[0];   // the largest figure
+      return el && el.getClientRects().length ? { el, inside, text } : null;
+    }).filter(Boolean);
+    if (!steps.length) return;
+    const seen = new IntersectionObserver((entries) => {
+      // mostly in view: 60% of the box, or half the screen for a tall box
+      if (!entries.some((e) => e.intersectionRatio >= 0.6 || e.intersectionRect.height >= 0.5 * window.innerHeight) || !box.isConnected) return;
+      seen.disconnect();
+      try { localStorage.setItem(GUIDE, "1"); } catch (e) { /* private mode */ }
+      let i = 0;
+      const tip = document.createElement("div");
+      tip.className = "ex-guide";
+      tip.setAttribute("role", "note");
+      tip.setAttribute("aria-live", "polite");
+      box.classList.add("has-guide");
+      box.append(tip);
+      const place = () => {
+        if (!tip.isConnected) return;
+        const st = steps[i], br = box.getBoundingClientRect(), tr = st.el.getBoundingClientRect();
+        const w = tip.offsetWidth, cx = tr.left + tr.width / 2 - br.left;
+        const left = Math.max(8, Math.min(br.width - w - 8, cx - w / 2));
+        tip.style.top = `${(st.inside ? tr.top + 12 : tr.bottom + 10) - br.top}px`;
+        tip.style.left = `${left}px`;
+        tip.style.setProperty("--ax", `${Math.round(cx - left)}px`);
+        tip.classList.toggle("is-inside", st.inside);
+      };
+      const end = () => {
+        steps.forEach((st) => st.el.classList.remove("ex-guide-target"));
+        tip.remove();
+        box.classList.remove("has-guide");
+        window.removeEventListener("resize", place);
+      };
+      const show = () => {
+        steps.forEach((st, k) => st.el.classList.toggle("ex-guide-target", k === i));
+        tip.innerHTML = `<p class="exg-text"></p><div class="exg-foot"><span class="exg-pos">${i + 1} מתוך ${steps.length}</span>` +
+          `<button type="button" class="exg-skip">דילוג</button><button type="button" class="exg-next">${i + 1 < steps.length ? "הבא" : "הבנתי"}</button></div>`;
+        tip.querySelector(".exg-text").textContent = steps[i].text;
+        tip.querySelector(".exg-skip").addEventListener("click", end);
+        tip.querySelector(".exg-next").addEventListener("click", () => { if (++i < steps.length) show(); else end(); });
+        place();
+        if (typeof tip.scrollIntoView === "function") tip.scrollIntoView({ block: "nearest" });
+      };
+      tip.addEventListener("keydown", (e) => { if (e.key === "Escape") end(); });
+      window.addEventListener("resize", place, { passive: true });
+      show();
+    }, { threshold: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6] });
+    seen.observe(box);
+  };
+
   const setup = (box, helpOpen = false) => {
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
@@ -700,6 +897,8 @@
     keyboard(box);
     decorateLive(box);
     watch(box);
+    motion(box);
+    guide(box);
     box.dvqSig = signature(box);
     box.dvqDefault = JSON.stringify(stateOf(box));
   };

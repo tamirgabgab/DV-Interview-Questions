@@ -2138,6 +2138,29 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     the name and tooltip; "עצירה" shows pause), the speed select hidden behind ×1 ×2 ×4,
     and a scrubber that presses the box's own start / next buttons (not a control of the
     link). A new badge failed contrast (white on the accent) and now uses navy text.
+38. **Part 6 of the look-and-feel plan (UI326, UI329, E201).** The owner picked the
+    message with confetti only at the end of a level, the level's progress with a link to
+    the next unsolved question, the shared flash plus tweens in a few kinds, and the
+    first-visit guide (not the export of the marks). UI326: the toolbar carries the
+    level's ids, links and page (`data-level-*`); `question-tools.js` shows a navy message
+    at the bottom ("פתרת n מתוך m שאלות ברמת …", a bar, "לשאלה הבאה שלא פתרת (id)", or
+    the level page when all are solved), pops the check mark, drops 40 confetti pieces
+    when the level is complete, and offers an undo when the mark is taken off. UI329:
+    `motion()` in `core.js` arms on the first trusted pointer or key event in a box (so
+    restores, links and the page checks never animate), snapshots the box's short values
+    by their path of child indices after every redraw, and flashes up to eight that
+    changed (a reshuffle of texts already shown, an emptied value and a new picture do
+    not); in `TWEEN` kinds integers count to their new value and SVG bars grow or slide
+    (Web Animations, transform-box fill-box); the flash lasts 80 % of the time since the
+    last redraw (160 to 600 ms), so ×4 play keeps up; the answer marks pulse once. A first
+    pass flashed whole reshuffled lists in josephus, lfsr and credits, hence the eight-value
+    cap and the reshuffle rule. E201: `guide()` on the page's first box with a playback
+    bar, once per browser (`dvq-guide` in localStorage, set when shown), when 60 % of the
+    box or half the screen shows; hints for the playback bar, the largest figure (inside
+    it) and the summary line, "הבא" / "דילוג" / Escape; none under `navigator.webdriver`
+    unless the address has `?guide`. Also fixed: on phones the first three toolbar
+    tooltips overflowed the right edge; they now open leftwards. axe on the message and
+    the guide (light and dark, 390 px): no violations.
 ---
 
 ## In progress
@@ -2192,6 +2215,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
 - Session 22 (end): 0046 is on `main` (7786f37). A third series on look and feel
   (UI319 to UI332) was proposed; parts 1 to 4 (item 37) are done on the branch, `main`
   when the owner asks. Open in it: UI322, UI323 (catalog), UI326, UI329, UI331, UI332.
+- Session 23: parts 1 to 4 are on `main` (eb70c0a). Part 6 (UI326, UI329, E201, item
+  38) is done on the branch; part 7 (UI331, the social card's additions, a 404 page, and
+  the print and home-screen additions if the owner picks them) is next, then `main` when
+  the owner asks. Still open after that: part 5 (UI322, UI323).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2760,7 +2787,7 @@ What the short research found (sources in the chat summary of 2026-10-22):
 | E198 | **Purposeful transitions**: values and cells move between states (tweened bus values, sliding queue chips, growing arcs), off under `prefers-reduced-motion` | M |
 | ~~E199~~ | ~~**The answer lights up**: when a box reaches its result, the element that is the answer (the duplicate, the survivor, the maximal polynomial) is outlined and named in one line~~ done in 11 kinds (session 22) | S–M |
 | ~~E200~~ | ~~**One layout for all 34 boxes**: control groups in a fixed order (input, playback, output), a status line at the bottom, the same spacing and button sizes, documented once~~ done as a shared layer in `core.js` (session 22) | M |
-| E201 | **A first-visit guide** on one box per page: three dismissible hints pointing at the main control, the figure and the summary, remembered per browser | S–M |
+| ~~E201~~ | ~~**A first-visit guide** on one box per page: three dismissible hints pointing at the main control, the figure and the summary, remembered per browser~~ done (session 23, part 6: once per browser, on the page's first box) | S–M |
 
 Suggested order: A181 and C191 (small, visible on every page), D195 then D194 (the phone
 figures are the weakest point today), B185 (the largest gain in understanding), then A182
@@ -3030,7 +3057,7 @@ Item numbers continue the global count (319 on).
 |---|---|---|
 | ~~UI324~~ | ~~**A calmer header**: id · level · difficulty · kind in one line, topics as quiet links, "interactive", "tested" and "new" as small icons with tooltips; the page tools (open / close all, practice, solved, favourite, random) in one icon toolbar, an overflow menu on phones~~ done (session 22, part 2 (icon-only tools)) | M |
 | ~~UI325~~ | ~~**A sticky mini-header** while scrolling: the title, the current part and the solved toggle, with a thin reading-progress line~~ done (session 22, part 2 (no title: the site header shows it)) | S–M |
-| UI326 | **Friendly feedback**: marking a question solved shows a short celebration (off under reduced motion) and the progress of its level ("5 of 27 in junior") | S |
+| ~~UI326~~ | ~~**Friendly feedback**: marking a question solved shows a short celebration (off under reduced motion) and the progress of its level ("5 of 27 in junior")~~ done (session 23, part 6) | S |
 
 **Round UI4 — the explorer boxes**
 
@@ -3038,7 +3065,7 @@ Item numbers continue the global count (319 on).
 |---|---|---|
 | ~~UI327~~ | ~~**Playback as an icon bar**: start, back, play / pause, step, end as icons with tooltips and a scrub slider, the speed as a three-way segmented control; the edit controls on one row~~ done (session 22, part 4) | M |
 | ~~UI328~~ | ~~**Boxes as cards**: a soft background, rounded corners, a header with the kind's icon and name, one spacing scale~~ done (session 22, part 4) | S |
-| UI329 | **Purposeful micro-motion** (a first cut of E198): changed cells and values fade or slide, the answer appears with a short reveal; off under `prefers-reduced-motion` | M |
+| ~~UI329~~ | ~~**Purposeful micro-motion** (a first cut of E198): changed cells and values fade or slide, the answer appears with a short reveal; off under `prefers-reduced-motion`~~ done (session 23, part 6: a shared flash, tweens in six kinds) | M |
 
 **Round UI5 — identity and polish**
 

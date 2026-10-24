@@ -2956,6 +2956,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .question-tools .qt-clock:not([hidden]) { padding-inline: 0.3rem; }
 body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1rem 0.3rem; border-radius: 1rem; }
 @media screen and (max-width: 30em) {
+  /* the toolbar starts at the right edge here: its first tooltips open leftwards */
+  .md-typeset .question-tools .qt-btn:nth-child(-n+3)[data-tip]:is(:hover, :focus-visible)::after { inset-inline: 0 auto; }
   .md-typeset .question-header .qh-row { flex-wrap: wrap; row-gap: 0.2rem; }
   .md-typeset .question-header .question-tools { flex-basis: 100%; margin: 0 -0.4rem; }
 }
@@ -3064,4 +3066,69 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
   .md-typeset .explorer .ex-bar { margin-inline: -0.7rem; border-radius: 0.6rem 0.6rem 0 0; }
   .md-typeset .explorer .ex-transport .ex-tbtn:not(#_):not(.ui-ico-play) { width: 1.65rem; height: 1.65rem; }
   .md-typeset .explorer .ex-speedbtn { padding-inline: 0.3rem; }
+}
+
+/* Marking a question solved (UI326): the message at the bottom of the screen (navy, like
+   the home hero), the check mark's pop and the confetti of a finished level. The motion
+   is defined only without prefers-reduced-motion (and the script skips it there). */
+.dvq-toast { position: fixed; z-index: 5; inset: auto 1rem 1rem; display: flex; align-items: flex-start; gap: 0.4rem; max-width: 24rem; margin-inline: auto; padding: 0.7rem 0.8rem 0.75rem 0.5rem; border-radius: 0.8rem; background: var(--md-primary-fg-color); color: #fff; box-shadow: 0 0.4rem 1.4rem rgba(0, 0, 0, 0.28); font-size: 0.74rem; line-height: 1.55; }
+[data-md-color-scheme="slate"] .dvq-toast { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
+.dvq-toast[hidden] { display: none; }
+.dvq-toast .dt-body { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 0.45rem; }
+.dvq-toast .dt-text { margin: 0; }
+.dvq-toast .dt-bar { display: block; width: 100%; height: 0.3rem; border-radius: 0.15rem; background: rgba(255, 255, 255, 0.2); overflow: hidden; }
+.dvq-toast .dt-bar i { display: block; height: 100%; border-radius: inherit; background: var(--md-accent-fg-color); }
+.dvq-toast .dt-action { padding: 0.25rem 0.75rem; border: 0; border-radius: 1rem; background: var(--md-accent-fg-color); color: #1b2a4a; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+.dvq-toast .dt-action:is(:hover, :focus-visible) { background: #fff; color: #1b2a4a; }
+.dvq-toast .dt-close { flex: none; width: 1.6rem; height: 1.6rem; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #fff; font-size: 1.1rem; line-height: 1; cursor: pointer; }
+.dvq-toast .dt-close:is(:hover, :focus-visible) { background: rgba(255, 255, 255, 0.16); }
+.dvq-toast :focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.dvq-confetti { position: fixed; z-index: 6; inset: 0; overflow: hidden; pointer-events: none; }
+.dvq-confetti i { position: absolute; top: -1rem; left: var(--x); width: 0.45rem; height: 0.7rem; border-radius: 0.1rem; opacity: 0; }
+.dvq-confetti .dc-0 { background: var(--md-accent-fg-color); }
+.dvq-confetti .dc-1 { background: var(--diff-easy); }
+.dvq-confetti .dc-2 { background: var(--diff-hard); }
+.dvq-confetti .dc-3 { background: var(--md-typeset-a-color); }
+@media (prefers-reduced-motion: no-preference) {
+  .dvq-toast.is-in { animation: dt-in 0.25s ease-out; }
+  @keyframes dt-in { from { opacity: 0; transform: translateY(0.8rem); } }
+  .md-typeset .qt-btn.is-pop { animation: qt-pop 0.45s ease-out; }
+  @keyframes qt-pop { 40% { transform: scale(1.35); } }
+  .dvq-confetti i { animation: dc-fall 2.1s cubic-bezier(0.3, 0.6, 0.5, 1) var(--d) forwards; }
+  @keyframes dc-fall {
+    0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+    85% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), 105vh) rotate(var(--r)); }
+  }
+}
+
+/* Motion in the boxes (UI329, core.js `motion`): a value the last step changed flashes
+   amber for --ex-flash (shorter in a fast play); an SVG label gets an amber halo. When the
+   box reaches its answer, the marks pulse once. */
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .explorer .ex-changed:not(svg *) { animation: ex-changed var(--ex-flash, 600ms) ease-out; }
+  .md-typeset .explorer svg .ex-changed { animation: ex-changed-svg var(--ex-flash, 600ms) ease-out; }
+  @keyframes ex-changed { from { background-color: color-mix(in srgb, var(--md-accent-fg-color) 42%, transparent); box-shadow: 0 0 0 2px var(--md-accent-fg-color); } }
+  @keyframes ex-changed-svg { from { stroke: var(--md-accent-fg-color); stroke-width: 4px; paint-order: stroke; } }
+  .md-typeset .explorer.ex-answer-new .ex-answer-mark { animation: ex-answer-pulse 0.9s ease-out; }
+  @keyframes ex-answer-pulse { 30% { filter: drop-shadow(0 0 0.35rem var(--viz-s3)); } }
+}
+
+/* The first-visit guide (E201, core.js `guide`): a navy bubble under its target (inside
+   the figure for the figure's hint) with an arrow at --ax, and the target outlined. */
+.md-typeset .explorer.has-guide { position: relative; }
+.md-typeset .explorer .ex-guide { position: absolute; z-index: 4; width: min(17rem, calc(100% - 1rem)); padding: 0.55rem 0.7rem 0.5rem; border-radius: 0.6rem; background: var(--md-primary-fg-color); color: #fff; box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.25); font-size: 0.7rem; line-height: 1.55; }
+[data-md-color-scheme="slate"] .md-typeset .explorer .ex-guide { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
+.md-typeset .explorer .ex-guide::before { content: ""; position: absolute; top: -0.35rem; left: calc(var(--ax, 50%) - 0.35rem); width: 0.7rem; height: 0.7rem; background: inherit; transform: rotate(45deg); }
+.md-typeset .explorer .ex-guide.is-inside::before { display: none; }
+.md-typeset .explorer .ex-guide .exg-text { margin: 0 0 0.4rem; }
+.md-typeset .explorer .ex-guide .exg-foot { display: flex; align-items: center; gap: 0.4rem; }
+.md-typeset .explorer .ex-guide .exg-pos { margin-inline-end: auto; opacity: 0.8; font-size: 0.62rem; }
+.md-typeset .explorer .ex-guide button { padding: 0.15rem 0.65rem; border: 0; border-radius: 1rem; font: inherit; font-weight: 600; cursor: pointer; }
+.md-typeset .explorer .ex-guide .exg-skip { background: transparent; color: #fff; text-decoration: underline; }
+.md-typeset .explorer .ex-guide .exg-next { background: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .explorer .ex-guide button:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.md-typeset .explorer .ex-guide-target { outline: 2px dashed var(--md-accent-fg-color); outline-offset: 3px; border-radius: 0.3rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .explorer .ex-guide { animation: dt-in 0.25s ease-out; }
 }
