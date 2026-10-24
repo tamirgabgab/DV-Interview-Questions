@@ -78,7 +78,7 @@ CHANGE = """(b) => {
   const box = document.querySelectorAll(".explorer")[b];
   const seed = box.querySelector(".ex-seed");
   if (seed) { seed.value = "4242"; seed.dispatchEvent(new Event("change", { bubbles: true })); }
-  const ctl = () => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed"));
+  const ctl = () => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.matches(".ex-seed, .ex-scrub"));
   let changed = 0;
   for (let i = 0; i < ctl().length; i++) {
     const el = ctl()[i];
@@ -108,7 +108,7 @@ CHANGE = """(b) => {
 # its own codec (`#state-`), whose data stands for the draw.
 SNAP = """([b, own]) => {
   const box = document.querySelectorAll(".explorer")[b];
-  const values = [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed"))
+  const values = [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.matches(".ex-seed, .ex-scrub"))
     .map((el) => el.type === "checkbox" ? el.checked : el.value);
   const seed = box.querySelector(".ex-seed");
   if (seed && !own) values.push(`seed ${seed.value}`);
