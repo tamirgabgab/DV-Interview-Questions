@@ -1922,6 +1922,32 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .q-interactive { margin-inline-start: 0.3em; font-size: 0.6em; color: var(--md-primary-fg-color); opacity: 0.8; vertical-align: middle; }
 [data-md-color-scheme="slate"] .md-typeset .q-interactive { color: var(--md-typeset-a-color); }
 
+/* E31: the kind of a question, a quiet chip in the header card and the tables */
+.md-typeset .chip-kind { color: var(--md-default-fg-color--light); background: transparent; border: 1px dashed var(--site-card-border); }
+.md-typeset .q-diff .chip-kind { margin-inline-start: 0.25rem; }
+
+/* E34 / E36: the home page's "continue" card, the "recently added" list and the "what's
+   new" page (the lists reuse .related-questions). */
+.md-typeset .continue-card { margin: 0.8rem 0 0.4rem; }
+.md-typeset .continue-card .cc-link {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--site-card-border);
+  border-inline-start: 4px solid var(--md-accent-fg-color);
+  border-radius: 0.4rem;
+  background: var(--site-primary-soft);
+  color: var(--md-default-fg-color);
+  text-decoration: none;
+}
+.md-typeset .continue-card .cc-link:hover { border-color: var(--md-accent-fg-color); }
+.md-typeset .continue-card .cc-label { font-size: 0.65rem; font-weight: 700; color: var(--site-label-color); }
+.md-typeset .continue-card .cc-title { font-weight: 700; }
+.md-typeset .continue-card .cc-meta { font-size: 0.65rem; color: var(--md-default-fg-color--light); }
+.md-typeset .recent-more { margin-top: 0.3rem; font-size: 0.7rem; }
+.md-typeset h2.new-day { display: flex; align-items: baseline; gap: 0.6rem; margin-top: 1.4rem; }
+.md-typeset h2.new-day .new-count { font-size: 0.65rem; font-weight: 400; color: var(--md-default-fg-color--light); }
+
 /* M76: swipe on step figures, and the copy-link button */
 .md-typeset .stepper { touch-action: pan-y; }
 .md-typeset .stepper-link { min-width: 0; padding-inline: 0.6em; }

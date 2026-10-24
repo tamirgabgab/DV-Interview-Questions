@@ -3,6 +3,7 @@ id: 7
 title: משולש אקראי על מעגל היחידה שמכיל את המרכז
 level: senior
 difficulty: medium
+kind: math
 tags: [systemverilog, constraints, randomization, probability, math, python]
 source: ""
 added: 2026-10-15

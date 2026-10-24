@@ -3,6 +3,7 @@ id: 11
 title: לוח סיום אקראי של איקס-עיגול
 level: senior
 difficulty: medium
+kind: dv
 tags: [systemverilog, constraints, randomization, combinatorics, math, python]
 source: ""
 added: 2026-10-16

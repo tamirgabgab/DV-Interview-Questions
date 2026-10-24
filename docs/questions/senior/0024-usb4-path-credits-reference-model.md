@@ -3,6 +3,7 @@ id: 24
 title: מודל ייחוס לקרדיטים של נתיב USB4 – Credit Grant, שידור ו-Path Credit Sync
 level: senior
 difficulty: medium
+kind: dv
 tags: [protocols, usb4, python, systemverilog]
 source: ""
 added: 2026-10-19

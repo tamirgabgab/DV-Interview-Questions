@@ -3,6 +3,7 @@ id: 31
 title: הגשר והלפיד – ארבעה אנשים, שניים על הגשר
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [logic-puzzles, algorithms, dijkstra, python, systemverilog]
 source: ""
 added: 2026-10-20

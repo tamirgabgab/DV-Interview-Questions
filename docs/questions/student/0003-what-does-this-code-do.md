@@ -3,6 +3,7 @@ id: 3
 title: מה עושה הקוד? (לולאה כפולה עם swap)
 level: student
 difficulty: easy
+kind: code
 tags: [algorithms, sorting, python, systemverilog]
 source: ""
 added: 2026-10-15

@@ -3,6 +3,7 @@ id: 9
 title: 16 אנשים, 16 קופסאות ועוזר אחד
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [logic-puzzles, combinatorics, algorithms, python, systemverilog]
 source: ""
 added: 2026-10-16

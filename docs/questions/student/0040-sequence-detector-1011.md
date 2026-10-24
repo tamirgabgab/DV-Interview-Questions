@@ -3,6 +3,7 @@ id: 40
 title: גלאי רצף 1011 עם חפיפה – מכונת מצבים
 level: student
 difficulty: easy
+kind: design
 tags: [digital-logic, fsm, systemverilog, python]
 source: "שאלת ראיון קלאסית ל-RTL (HDLBits, Harris & Harris); ההכללה דרך האוטומט של KMP"
 added: 2026-10-22

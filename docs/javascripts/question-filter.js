@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const ok =
           (!f.level || row.dataset.level === f.level) &&
           (!f.difficulty || row.dataset.difficulty === f.difficulty) &&
+          (!f.kind || row.dataset.kind === f.kind) &&
           (!f.tag || row.dataset.tags.split(" ").includes(f.tag)) &&
           (!f.interactive || row.dataset.interactive === f.interactive) &&
           (!f.mark || (f.mark === "star" ? marks.has(id, "star") : f.mark === "solved" ? isSolved : !isSolved)) &&

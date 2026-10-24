@@ -3,6 +3,7 @@ id: 4
 title: שלוש קופסאות עם תוויות שגויות
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [logic-puzzles, algorithms, python, systemverilog]
 source: ""
 added: 2026-10-15

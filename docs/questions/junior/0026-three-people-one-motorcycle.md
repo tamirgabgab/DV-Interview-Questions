@@ -3,6 +3,7 @@ id: 26
 title: שלושה אנשים ואופנוע אחד – הדרך המהירה להגיע יחד
 level: junior
 difficulty: easy
+kind: puzzle
 tags: [math, logic-puzzles]
 source: ""
 added: 2026-10-19

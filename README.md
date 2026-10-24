@@ -95,6 +95,17 @@ On the site, level and difficulty appear as coloured chips (CSS classes `chip-le
 Difficulty is **relative to the position level** — a "hard" student question may be an
 "easy" senior question.
 
+Every question also has one **kind** (front matter `kind:`), a filter group in the tables
+and a quiet chip beside the difficulty:
+
+| Kind     | Shown as             | For                                                         |
+|----------|----------------------|-------------------------------------------------------------|
+| `puzzle` | חידה                 | logic and motion puzzles (the bridge, the eggs, the camel)  |
+| `code`   | קוד ואלגוריתם        | algorithm and code questions (swap, brackets, duplicate)    |
+| `design` | תכן חומרה            | RTL and hardware design (edge detector, FIFOs, LFSR, CDC)   |
+| `math`   | מתמטיקה והוכחה       | number theory, probability and counting with a proof        |
+| `dv`     | אימות ופרוטוקולים    | constraints, reference models, SVA, coverage, protocols     |
+
 ### 3. Topic tags
 
 Each question carries one or more tags. Use the existing ones where possible:
@@ -236,6 +247,7 @@ id: 42
 title: חישוב עומק של FIFO אסינכרוני
 level: junior            # student | junior | senior  (must match the folder)
 difficulty: medium       # easy | medium | hard
+kind: design             # puzzle | code | design | math | dv
 tags: [fifo, clock-domain-crossing]
 source: ""               # optional: company / interview round
 added: 2026-10-15
@@ -286,10 +298,10 @@ added: 2026-10-15
 ```
 
 The build hook validates the front matter and **fails the build** on a missing field, an
-unknown level or difficulty, a level that does not match the folder, a file name that does
+unknown level, difficulty or kind, a level that does not match the folder, a file name that does
 not start with the id, or a duplicate id. It also generates, per question page:
 
-- the **header card** (id label, title, level and difficulty chips, a "new" chip for 30
+- the **header card** (id label, title, level, difficulty and kind chips, a "new" chip for 30
   days after `added`, topic links, `added` date, `source` when filled, and "code:
   SystemVerilog + Python" / "tested automatically" badges when the page has code and a
   `tests/<id>/` folder); the page's own title comes from `title`, so the
@@ -326,7 +338,7 @@ more rows that fits keeps its header row in view while it scrolls; numbers in ta
 tabular. Under 30em the figure legends (`viz-legend`) are compact chips that wrap.
 
 The question tables on the home and level pages have **chip filters** (one choice per group:
-level, difficulty, topic, and the reader's own marks: favourites, solved, not solved) plus a
+level, difficulty, kind, topic, and the reader's own marks: favourites, solved, not solved) plus a
 title search, **sortable columns** (header buttons; a "sort" select on phones), a **random
 question** button that picks among the rows left after filtering, and turn into **cards** on
 narrow screens (`docs/javascripts/question-filter.js`, `.questions-wrap` in `extra.css`).
@@ -349,7 +361,21 @@ Material's search splits on whitespace only and has no Hebrew stemmer, so a word
 prefix letter (ו ה ב כ ל מ ש) or glued punctuation would not be found. After the build, the
 hook adds a hidden `alt` field to every search document with the clean words and their forms
 without the prefix letters (one letter always, two or three letters when the rest is a word
-used on the site). The toolbar, filters and path bar carry `data-search-exclude`.
+used on the site). The toolbar, filters and path bar carry `data-search-exclude`. A
+question page's own search document gets the id before its title ("0021 · ..."), its
+level, difficulty and kind first in its tags (shown as chips under the result, with the
+topics), no text (the header card's run-together chips were its text), and the id as
+written and without its zeros in a field `qid` boosted above every other field, so
+typing "21" or "0021" puts that question first.
+
+### Home page and "what's new"
+
+The home page has a **"continue where you left off"** card (`<!-- home-continue -->`,
+filled by `marks.js` from the last question page this browser opened, with its marks and
+how long ago) and a **"recently added"** list of the five newest questions by `added`
+(`<!-- recent -->`). `docs/new.md` (`<!-- whats-new -->`) lists every question by the day
+it was added, the newest day first; it is the last tab of the navigation and is linked
+from the footer of every page (the hook appends the link to `copyright`).
 
 ### Diagrams, formulas and figures
 
@@ -426,7 +452,7 @@ holds the same numbers.
 
 1. Pick the position level and difficulty. When the owner sends a source file with tables
    and formulas, recompute them first in the question's test and report what does not hold.
-2. Run `python tools/new_question.py --level <level> --difficulty <d> --slug <slug> --title
+2. Run `python tools/new_question.py --level <level> --difficulty <d> --kind <kind> --slug <slug> --title
    "<Hebrew title>" --tags a,b [--figures] [--code]`. It takes the next free id, writes
    `docs/questions/<level>/<id>-<slug>.md` from the template, `tests/<id>/`, a generator stub
    with `--figures` and `tb.sv` / `demo.py` with `--code`, and adds a catalog row to this

@@ -26,13 +26,14 @@ def make_root(tmp_path):
 def test_new_question_with_figures_and_code(tmp_path):
     root = make_root(tmp_path)
     written = new_question.create(root, "junior", "medium", "cake-split", "חלוקת עוגה",
-                                  ["math", "sequences"], figures=True, code=True, today="2026-10-20")
+                                  ["math", "sequences"], figures=True, code=True, today="2026-10-20",
+                                  kind="math")
     names = {p.relative_to(root).as_posix() for p in written}
     assert names == {"docs/questions/junior/0042-cake-split.md", "tests/0042/test_0042.py",
                      "tests/0042/test_0042_code.py", "tests/0042/tb.sv", "tests/0042/demo.py",
                      "tools/figures/q0042.py", "README.md"}
     page = (root / "docs/questions/junior/0042-cake-split.md").read_text(encoding="utf-8")
-    assert page.startswith("---\nid: 42\ntitle: חלוקת עוגה\nlevel: junior\ndifficulty: medium\n"
+    assert page.startswith("---\nid: 42\ntitle: חלוקת עוגה\nlevel: junior\ndifficulty: medium\nkind: math\n"
                            "tags: [math, sequences]\nsource: \"\"\nadded: 2026-10-20\n---\n\n## השאלה\n")
     assert "    <!-- gen 0 -->" in page
     assert lint_pages.lint(root / "docs/questions/junior/0042-cake-split.md") == []

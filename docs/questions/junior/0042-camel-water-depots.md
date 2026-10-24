@@ -3,6 +3,7 @@ id: 42
 title: הגמל והמים – כמה רחוק מגיעים עם 450 ליטר
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [math, optimization, greedy, python, systemverilog]
 source: "חידת הגמל והבננות הקלאסית (jeep problem), כאן עם מים ובנתונים אחרים; הפתרון המפורט נכתב על ידי בעל האתר"
 added: 2026-10-23

@@ -3,6 +3,7 @@ id: 6
 title: רווח מקסימלי ממניה – לונג או שורט
 level: junior
 difficulty: medium
+kind: code
 tags: [algorithms, python, systemverilog]
 source: ""
 added: 2026-10-15

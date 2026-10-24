@@ -3,6 +3,7 @@ id: 21
 title: כמה פיצולי Completions יש לקריאה ב-PCIe – ספירה, ונוסחה כללית עם הוכחה
 level: senior
 difficulty: medium
+kind: math
 tags: [protocols, pcie, combinatorics, math, proof]
 source: ""
 added: 2026-10-18

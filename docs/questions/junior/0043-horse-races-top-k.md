@@ -3,6 +3,7 @@ id: 43
 title: מרוצי סוסים בלי שעון – כמה תחרויות עד ארבעת המהירים
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [logic, algorithms, sorting, python, systemverilog]
 source: "חידת 25 הסוסים הקלאסית (5 במסלול, שלושת הראשונים, 7 תחרויות); כאן 36 סוסים וארבעה ראשונים, ואז 30 סוסים והתוכנית הכללית"
 added: 2026-10-23

@@ -3,6 +3,7 @@ id: 14
 title: ריבועים ומלבנים אקראיים בלי חפיפה
 level: junior
 difficulty: medium
+kind: dv
 tags: [systemverilog, constraints, randomization, geometry, python]
 source: ""
 added: 2026-10-16

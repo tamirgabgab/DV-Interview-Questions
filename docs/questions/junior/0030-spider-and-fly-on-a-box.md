@@ -3,6 +3,7 @@ id: 30
 title: העכביש והזבוב – הדרך הקצרה ביותר על פני קופסה
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [math, geometry, logic-puzzles]
 source: ""
 added: 2026-10-20

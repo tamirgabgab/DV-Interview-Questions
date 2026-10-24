@@ -3,6 +3,7 @@ id: 25
 title: מודל ייחוס ל-Ack/Nak של PCIe – Sequence Number, ‏Retry Buffer ו-Replay
 level: senior
 difficulty: medium
+kind: dv
 tags: [protocols, pcie, python, systemverilog]
 source: ""
 added: 2026-10-19

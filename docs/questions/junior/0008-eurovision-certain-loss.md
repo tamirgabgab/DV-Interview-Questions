@@ -3,6 +3,7 @@ id: 8
 title: אירוויזיון 2026 – מתי כבר היה ברור שישראל לא תנצח?
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [math, logic-puzzles, algorithms, python, systemverilog]
 source: ""
 added: 2026-10-16

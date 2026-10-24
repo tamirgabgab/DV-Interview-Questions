@@ -3,6 +3,7 @@ id: 23
 title: מודל ייחוס ל-PCIe Endpoint – כתיבה, קריאה ושידור Completions
 level: senior
 difficulty: medium
+kind: dv
 tags: [protocols, pcie, python, systemverilog]
 source: ""
 added: 2026-10-19

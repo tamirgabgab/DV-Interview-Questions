@@ -3,6 +3,7 @@ id: 33
 title: עומק FIFO מקצבים ופרצים – כמה עמוק צריך
 level: junior
 difficulty: medium
+kind: design
 tags: [fifo, digital-design, python, systemverilog]
 source: ""
 added: 2026-10-21

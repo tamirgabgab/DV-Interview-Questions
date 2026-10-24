@@ -3,6 +3,7 @@ id: 2
 title: החלפת ערכים בין שני משתנים
 level: student
 difficulty: easy
+kind: code
 tags: [bitwise, math, python, systemverilog]
 source: ""
 added: 2026-10-15

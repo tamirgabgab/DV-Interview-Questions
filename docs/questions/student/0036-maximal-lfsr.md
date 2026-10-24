@@ -3,6 +3,7 @@ id: 36
 title: LFSR מקסימלי – למה סט אחד של taps נותן 15 ואחר פחות
 level: student
 difficulty: easy
+kind: design
 tags: [digital-design, lfsr, python, systemverilog]
 source: ""
 added: 2026-10-21

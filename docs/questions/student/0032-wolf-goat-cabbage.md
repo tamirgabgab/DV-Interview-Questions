@@ -3,6 +3,7 @@ id: 32
 title: זאב, עז וכרוב – חציית הנהר
 level: student
 difficulty: easy
+kind: puzzle
 tags: [logic-puzzles, algorithms, bfs, python, systemverilog]
 source: ""
 added: 2026-10-20

@@ -3,6 +3,7 @@ id: 10
 title: סוגריים תקינים
 level: student
 difficulty: easy
+kind: code
 tags: [algorithms, stack, python, systemverilog]
 source: "LeetCode 20 – Valid Parentheses"
 added: 2026-10-16

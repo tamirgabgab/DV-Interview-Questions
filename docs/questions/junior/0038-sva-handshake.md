@@ -3,6 +3,7 @@ id: 38
 title: SVA ללחיצת ידיים – req, ack ומה אסור ביניהם
 level: junior
 difficulty: medium
+kind: dv
 tags: [sva, assertions, systemverilog, python]
 source: ""
 added: 2026-10-21

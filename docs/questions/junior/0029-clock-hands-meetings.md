@@ -3,6 +3,7 @@ id: 29
 title: שלושה מחוגים – כמה פעמים הם נפגשים ביממה?
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [math, logic-puzzles]
 source: ""
 added: 2026-10-20

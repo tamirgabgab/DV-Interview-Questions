@@ -3,6 +3,7 @@ id: 18
 title: שני שעוני חול – מדידת D דקות מרגע 0
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [algorithms, bfs, logic-puzzles, python, systemverilog]
 source: ""
 added: 2026-10-18

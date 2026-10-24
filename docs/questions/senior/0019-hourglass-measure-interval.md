@@ -3,6 +3,7 @@ id: 19
 title: שני שעוני חול – מדידת D דקות בין שני רגעים
 level: senior
 difficulty: hard
+kind: puzzle
 tags: [algorithms, dijkstra, bfs, logic-puzzles, python, systemverilog]
 source: ""
 added: 2026-10-18

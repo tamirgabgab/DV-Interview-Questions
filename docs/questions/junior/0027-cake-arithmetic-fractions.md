@@ -3,6 +3,7 @@ id: 27
 title: חלוקת עוגה בסדרה חשבונית – מי מקבל הכי הרבה?
 level: junior
 difficulty: medium
+kind: math
 tags: [math, sequences]
 source: ""
 added: 2026-10-19

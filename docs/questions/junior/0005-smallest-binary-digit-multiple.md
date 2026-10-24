@@ -3,6 +3,7 @@ id: 5
 title: הכפולה הקטנה ביותר שבנויה מהספרות 0 ו-1
 level: junior
 difficulty: medium
+kind: code
 tags: [algorithms, bfs, math, python, systemverilog]
 source: ""
 added: 2026-10-15

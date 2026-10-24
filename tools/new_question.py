@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Start a new question: the page, its tests folder, a figure generator and the README row.
 
-    python tools/new_question.py --level junior --difficulty medium --slug cake-split \\
+    python tools/new_question.py --level junior --difficulty medium --kind math --slug cake-split \\
         --title "חלוקת עוגה" --tags math,sequences [--figures] [--code]
 
 Takes the next free id, copies templates/question.md to docs/questions/<level>/<id>-<slug>.md
@@ -28,6 +28,7 @@ from pathlib import Path
 
 LEVELS = ("student", "junior", "senior")
 DIFFICULTIES = {"easy": "🟢 easy", "medium": "🟡 medium", "hard": "🔴 hard"}
+KINDS = ("puzzle", "code", "design", "math", "dv")   # hooks/questions.py has their Hebrew names
 
 
 def next_id(root: Path) -> int:
@@ -36,8 +37,8 @@ def next_id(root: Path) -> int:
 
 
 def page_text(template: str, qid: int, title: str, level: str, difficulty: str, tags: list[str],
-              today: str, figures: bool) -> str:
-    front = (f"---\nid: {qid}\ntitle: {title}\nlevel: {level}\ndifficulty: {difficulty}\n"
+              today: str, figures: bool, kind: str = "puzzle") -> str:
+    front = (f"---\nid: {qid}\ntitle: {title}\nlevel: {level}\ndifficulty: {difficulty}\nkind: {kind}\n"
              f"tags: [{', '.join(tags)}]\nsource: \"\"\nadded: {today}\n---\n")
     body = "\n" + template[template.index("\n---", 3) + 4:].lstrip("\n")
     if figures:
@@ -123,9 +124,9 @@ def catalog_row(qid: int, title: str, level: str, difficulty: str, tags: list[st
 
 
 def create(root: Path, level: str, difficulty: str, slug: str, title: str, tags: list[str],
-           figures: bool = False, code: bool = False, today: str | None = None) -> list[Path]:
-    if level not in LEVELS or difficulty not in DIFFICULTIES:
-        raise ValueError(f"level must be one of {LEVELS}, difficulty one of {tuple(DIFFICULTIES)}")
+           figures: bool = False, code: bool = False, today: str | None = None, kind: str = "puzzle") -> list[Path]:
+    if level not in LEVELS or difficulty not in DIFFICULTIES or kind not in KINDS:
+        raise ValueError(f"level must be one of {LEVELS}, difficulty one of {tuple(DIFFICULTIES)}, kind one of {KINDS}")
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug):
         raise ValueError("slug: lower-case words joined by hyphens")
     qid = next_id(root)
@@ -133,7 +134,7 @@ def create(root: Path, level: str, difficulty: str, slug: str, title: str, tags:
     tid = f"{qid:04d}"
     files = {root / "docs" / "questions" / level / f"{tid}-{slug}.md":
              page_text((root / "templates" / "question.md").read_text(encoding="utf-8"),
-                       qid, title, level, difficulty, tags, today, figures)}
+                       qid, title, level, difficulty, tags, today, figures, kind)}
     test = FIGURES_TEST if figures else CODE_TEST if code else NUMBERS_TEST
     files[root / "tests" / tid / f"test_{tid}.py"] = test.format(qid=qid)
     if figures:
@@ -162,6 +163,8 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--level", required=True, choices=LEVELS)
     ap.add_argument("--difficulty", required=True, choices=tuple(DIFFICULTIES))
+    ap.add_argument("--kind", required=True, choices=KINDS,
+                    help="puzzle, code (and algorithms), design (hardware), math (and proofs), dv (verification and protocols)")
     ap.add_argument("--slug", required=True, help="lower-case words joined by hyphens")
     ap.add_argument("--title", required=True, help="the Hebrew title")
     ap.add_argument("--tags", default="", help="comma-separated topic tags")
@@ -170,7 +173,8 @@ def main(argv: list[str]) -> int:
     args = ap.parse_args(argv)
     root = Path(__file__).resolve().parent.parent
     tags = [t.strip() for t in args.tags.split(",") if t.strip()]
-    written = create(root, args.level, args.difficulty, args.slug, args.title, tags, args.figures, args.code)
+    written = create(root, args.level, args.difficulty, args.slug, args.title, tags, args.figures, args.code,
+                     kind=args.kind)
     for p in written:
         print(f"wrote {p.relative_to(root)}")
     print("next: write the page, then python tools/lint_pages.py and python tools/run_tests.py <id>")

@@ -3,6 +3,7 @@ id: 44
 title: הספרות של קפרקר אחרי n פעולות
 level: junior
 difficulty: hard
+kind: math
 tags: [math, digits, number-bases, sequences]
 source: "Kaprekar's routine (3 digits), a closed form for the digits"
 added: 2026-10-24

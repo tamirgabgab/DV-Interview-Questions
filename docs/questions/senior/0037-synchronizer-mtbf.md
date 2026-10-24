@@ -3,6 +3,7 @@ id: 37
 title: MTBF של סנכרן – שני פלופים, ומה נותן השלישי
 level: senior
 difficulty: medium
+kind: design
 tags: [cdc, metastability, digital-design, python, systemverilog]
 source: ""
 added: 2026-10-21

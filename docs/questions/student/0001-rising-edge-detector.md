@@ -3,6 +3,7 @@ id: 1
 title: גלאי עליית שפה – Rising Edge Detector
 level: student
 difficulty: easy
+kind: design
 tags: [digital-logic, systemverilog]
 source: ""
 added: 2026-10-15

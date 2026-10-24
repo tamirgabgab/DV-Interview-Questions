@@ -3,6 +3,7 @@ id: 17
 title: המספר הכפול – בלי לשנות את המערך ובלי זיכרון נוסף
 level: junior
 difficulty: medium
+kind: code
 tags: [algorithms, math, python, systemverilog]
 source: "LeetCode 287 – Find the Duplicate Number"
 added: 2026-10-18

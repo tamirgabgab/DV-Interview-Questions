@@ -2054,6 +2054,25 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
       `#ctl-` payload as `~!<text>` and is applied after the controls. `pcie` stores the
       clicked cuts as hex addresses ("-" for none), `shapes` the two sandbox rectangles
       once moved. Checked by clicking: the link and a reload bring both back.
+34. **The owner's interface plan, round 6 (E31, E33, E34, E36; not E35).** Answers: one
+    kind per question, the id and chips in the search results, the "continue" card and
+    a "recently added" list, a "what's new" page from the `added` dates.
+    - E31: `kind:` is a required front-matter field (`KINDS` in the hook: puzzle חידה 13,
+      code קוד ואלגוריתם 6, design תכן חומרה 7, math מתמטיקה והוכחה 9, dv אימות
+      ופרוטוקולים 8); a chip in the header card and beside the difficulty in the tables,
+      a "סוג" filter group (`data-kind` on the rows). `new_question.py` takes `--kind`;
+      the template has the field. The kinds were assigned by hand and are open to the
+      owner's review: 0007 (math, though it has constraints), 0020 (dv) against 0021
+      (math, the proof), 0039 (puzzle).
+    - E33: the question page's search document: "0021 · title", its tags led by the
+      level, difficulty and kind (the results show them as chips), no text, and a `qid`
+      field ("0021 21") boosted 1e7, so "21" and "0021" both put the question first.
+    - E34: `<!-- home-continue -->` (marks.js saves the last question page opened,
+      `dvq-last`, and fills the card with its marks and "how long ago") and
+      `<!-- recent -->` (the five newest by `added`) on the home page.
+    - E36: `docs/new.md` with `<!-- whats-new -->`, every question by the day it was
+      added (Hebrew dates, the newest first); a "מה חדש" tab and a footer link on every
+      page (the hook appends it to `copyright` with the site's path).
 ---
 
 ## In progress
@@ -2100,10 +2119,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   to L of the second series are all done. Question 0044 (Kaprekar after n steps, from
   the owner's write-up, with the state diagram box) is on `main` (76311df). The owner's
   interface plan (work log items 31 to 33): rounds 1 (D195, C191, A181, A183), 2
-  (D194, D197, C192) and 3 (E200, E199, the box state) are done on the branch; next
-  round 6 (E31, E33, E34, E36; not E35), its questions already answered. Still open
-  after that: the rest of the second series A to E, the new questions of M to R and Z,
-  the deferred G222, H223, H224.
+  (D194, D197, C192), 3 (E200, E199, the box state) and 6 (E31, E33, E34, E36) are
+  done on the branch; `main` when the owner asks. Still open: the rest of the second
+  series A to E, the new questions of M to R and Z, the deferred G222, H223, H224, E35.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
@@ -2289,12 +2307,12 @@ existing heading anchors) and D30 (reading time, a `prerequisites:` line) were d
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| E31 | **Question kind filter**: `kind:` front matter (puzzle / code / design / proof / knowledge) → a chip group in the tables and a badge in the header card (idea 7b) | S–M |
+| ~~E31~~ | ~~**Question kind filter**: `kind:` front matter (puzzle / code / design / proof / knowledge) → a chip group in the tables and a badge in the header card (idea 7b)~~ done (session 22: puzzle / code / design / math / dv) | S–M |
 | E32 | **Explicit `related:` links** in front matter that take precedence over tag overlap, a "PCIe" study path 0020 → 0021 with a topic intro, and topic pages for the largest tags (idea 22) | S–M |
-| E33 | **Search results with context**: level / difficulty chips and a snippet per hit, and search by id ("0021") | S–M |
-| E34 | **Home page memory**: a "continue where you left off" card (last visited question from localStorage) and a "recently added" strip | S |
+| ~~E33~~ | ~~**Search results with context**: level / difficulty chips and a snippet per hit, and search by id ("0021")~~ done (session 22) | S–M |
+| ~~E34~~ | ~~**Home page memory**: a "continue where you left off" card (last visited question from localStorage) and a "recently added" strip~~ done (session 22) | S |
 | E35 | **Keyboard shortcuts** on desktop: n / p previous-next question, s open / close solutions, r random, ? help overlay | S |
-| E36 | **"מה חדש" changelog page** generated from the `added` dates (and the git log), linked from the footer | S |
+| ~~E36~~ | ~~**"מה חדש" changelog page** generated from the `added` dates (and the git log), linked from the footer~~ done from the `added` dates only (session 22) | S |
 
 **Round F — interactivity**
 
@@ -2403,9 +2421,9 @@ outside `fill.py`, and no visual or accessibility check in CI.
 
 | # | Proposal | Effort |
 |---|----------|--------|
-| N78 | **Search by id and with context** (E33): "0027" finds the page; hits show level / difficulty chips | S–M |
-| N79 | **Home page memory** (E34): "continue where you left off" and a "recently added" strip | S |
-| N80 | **"מה חדש" page** (E36) generated from the `added` dates, linked from the footer | S |
+| ~~N78~~ | done as E33: **Search by id and with context** (E33): "0027" finds the page; hits show level / difficulty chips | S–M |
+| ~~N79~~ | done as E34: **Home page memory** (E34): "continue where you left off" and a "recently added" strip | S |
+| ~~N80~~ | done as E36: **"מה חדש" page** (E36) generated from the `added` dates, linked from the footer | S |
 | N81 | **Keyboard shortcuts** (E35): n / p, s, r, ? help | S |
 
 **Round O — tooling and quality**

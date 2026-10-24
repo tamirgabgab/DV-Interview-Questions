@@ -11,7 +11,10 @@ Responsibilities:
   the step list and the path cards, and put a previous / next bar on every question of a path.
 - Add the explorer scripts to the pages that have explorer boxes: the shared core and the
   file of each kind on the page (on_post_page).
-- Add the prefix-stripped Hebrew words to the search index (on_post_build).
+- The home page's "continue" card and "recently added" strip, and the "what's new" page
+  (``<!-- home-continue -->``, ``<!-- recent -->``, ``<!-- whats-new -->``).
+- Add the prefix-stripped Hebrew words to the search index, and the id, level,
+  difficulty and kind to the result of a question page (on_post_build).
 """
 
 from __future__ import annotations
@@ -23,6 +26,7 @@ import posixpath
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 from mkdocs.exceptions import PluginError
 from mkdocs.utils.meta import get_data
@@ -48,18 +52,33 @@ DIFFICULTIES = {
     "hard": "קשה",
 }
 
+# The kind of a question (front matter `kind:`), one per question: a filter group in the
+# tables and a chip in the header card.
+KINDS = {
+    "puzzle": "חידה",
+    "code": "קוד ואלגוריתם",
+    "design": "תכן חומרה",
+    "math": "מתמטיקה והוכחה",
+    "dv": "אימות ופרוטוקולים",
+}
+
 NEW_DAYS = 30   # a question added within this many days of the build gets a "new" chip
 
 # Tags that almost every question carries; they do not make two questions "related".
 GENERIC_TAGS = {"python", "systemverilog"}
 RELATED_MAX = 3
 
-REQUIRED_FIELDS = ("id", "title", "level", "difficulty", "tags")
+REQUIRED_FIELDS = ("id", "title", "level", "difficulty", "kind", "tags")
 PLACEHOLDER = re.compile(r"<!--\s*questions-table(?:\s+level=(\w+))?\s*-->")
 CARDS = re.compile(r"<!--\s*level-cards\s*-->")
 STATS = re.compile(r"<!--\s*stats\s*-->")
 PATH_STEPS = re.compile(r"<!--\s*path-steps\s*-->")
 PATH_CARDS = re.compile(r"<!--\s*path-cards\s*-->")
+CONTINUE = re.compile(r"<!--\s*home-continue\s*-->")
+RECENT = re.compile(r"<!--\s*recent\s*-->")
+WHATS_NEW = re.compile(r"<!--\s*whats-new\s*-->")
+RECENT_MAX = 5
+MONTHS = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"]
 QUESTIONS_DIR = "questions"
 PATHS_DIR = "paths"
 LEVEL_RANK = {level: i for i, level in enumerate(LEVELS)}
@@ -70,6 +89,7 @@ DIFF_RANK = {d: i for i, d in enumerate(DIFFICULTIES)}
 # "(לולאה" hides "לולאה". on_post_build adds a hidden field to every search document with
 # the clean words and their forms without the prefix letters ו ה ב כ ל מ ש.
 SEARCH_FIELD = "alt"
+ID_FIELD = "qid"      # a question page's id, "0021 21", ranked above every other field
 PREFIX_LETTERS = set("והבכלמש")
 WORD = re.compile(r"[\u05d0-\u05ea]+|[A-Za-z0-9_]+")
 
@@ -115,6 +135,8 @@ def _load_questions(docs_dir: Path) -> dict[str, dict]:
             errors.append(f"{src_uri}: level '{level}' does not match folder '{folder}'")
         if meta["difficulty"] not in DIFFICULTIES:
             errors.append(f"{src_uri}: unknown difficulty '{meta['difficulty']}'")
+        if meta["kind"] not in KINDS:
+            errors.append(f"{src_uri}: unknown kind '{meta['kind']}' (one of {', '.join(KINDS)})")
         if not isinstance(meta["tags"], list):
             errors.append(f"{src_uri}: 'tags' must be a list")
         if not path.name.startswith(qid + "-"):
@@ -196,7 +218,12 @@ def on_config(config, **kwargs):
         nav.append({"מסלולים": [f"{PATHS_DIR}/index.md"]
                     + [{p["title"]: p["src_uri"]} for p in _paths]})
     nav.append({"תגיות": "tags.md"})
+    nav.append({"מה חדש": "new.md"})
     config["nav"] = nav
+    # the "what's new" page linked from the footer of every page (an absolute path, since
+    # the footer is the same on pages at every depth)
+    root = urlparse(config.get("site_url") or "/").path or "/"
+    config["copyright"] = (config.get("copyright") or "") + f' &middot; <a href="{root.rstrip("/")}/new/">מה חדש</a>'
     return config
 
 
@@ -219,6 +246,10 @@ def level_chip(level: str) -> str:
 
 def difficulty_chip(difficulty: str) -> str:
     return f'<span class="chip chip-diff chip-diff-{difficulty}">{DIFFICULTIES[difficulty]}</span>'
+
+
+def kind_chip(kind: str) -> str:
+    return f'<span class="chip chip-kind chip-kind-{kind}">{KINDS[kind]}</span>'
 
 
 def interactive_chip(q: dict) -> str:
@@ -263,7 +294,7 @@ def _header(q: dict, markdown: str, page_url: str) -> str:
     return (
         '<div class="question-header">\n'
         f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
-        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{interactive_chip(q)}{new_chip(q)}</div>\n'
+        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{interactive_chip(q)}{new_chip(q)}</div>\n'
         f'<h1>{html.escape(str(q["title"]))}</h1>\n'
         f'<div class="qh-bottom">{"".join(bottom)}</div>\n'
         '</div>\n\n'
@@ -421,6 +452,59 @@ def _related(q: dict, page_url: str) -> str:
     return "\n\n## שאלות קשורות\n\n<ul class=\"related-questions\">\n" + "\n".join(items) + "\n</ul>\n"
 
 
+def _added(q: dict) -> dt.date | None:
+    added = q.get("added")
+    if isinstance(added, dt.datetime):
+        added = added.date()
+    return added if isinstance(added, dt.date) else None
+
+
+def _by_added() -> list[dict]:
+    """The questions with an added date, the newest first (a later id first on one day)."""
+    return sorted((q for q in _questions.values() if _added(q)), key=lambda q: (_added(q), q["id"]), reverse=True)
+
+
+def _date_he(d: dt.date) -> str:
+    return f"{d.day} ב{MONTHS[d.month - 1]} {d.year}"
+
+
+def _question_item(q: dict, page_url: str) -> str:
+    return (f'<li><span class="rq-id">{q["id"]}</span>'
+            f'<a class="rq-title" href="{_href(q["src_uri"], page_url)}">{html.escape(str(q["title"]))}</a>'
+            f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}</li>')
+
+
+def _continue_card() -> str:
+    """Filled by marks.js from the last question this browser opened; hidden until then."""
+    return '<div class="continue-card" hidden data-search-exclude></div>'
+
+
+def _recent(page_url: str) -> str:
+    qs = _by_added()[:RECENT_MAX]
+    if not qs:
+        return ""
+    href = posixpath.relpath("new/", _base(page_url) or ".") + "/"
+    return ('<ul class="related-questions recent-questions">\n' + "\n".join(_question_item(q, page_url) for q in qs)
+            + f'\n</ul>\n<p class="recent-more"><a href="{href}">כל השאלות לפי תאריך ההוספה</a></p>')
+
+
+def _whats_new(page_url: str) -> str:
+    """Every question by the day it was added, the newest day first."""
+    out, day = [], None
+    for q in _by_added():
+        if _added(q) != day:
+            if day is not None:
+                out.append("</ul>")
+            day = _added(q)
+            n = sum(_added(o) == day for o in _questions.values())
+            out.append(f'<h2 class="new-day" id="d{day.isoformat()}">\u200f{_date_he(day)}'
+                       f'<span class="new-count">{n} {"שאלה" if n == 1 else "שאלות"}</span></h2>\n<ul class="related-questions">')
+        out.append(_question_item(q, page_url))
+    if out:
+        out.append("</ul>")
+    return "\n".join(out)
+
+
 def _table(level: str | None, page_url: str) -> str:
     rows = sorted(
         (q for q in _questions.values() if level is None or q["level"] == level),
@@ -444,6 +528,7 @@ def _table(level: str | None, page_url: str) -> str:
     if level is None:
         out.append(group("level", "משרה", LEVELS.items()))
     out.append(group("difficulty", "קושי", DIFFICULTIES.items()))
+    out.append(group("kind", "סוג", [(k, v) for k, v in KINDS.items() if any(q["kind"] == k for q in rows)]))
     out.append(group("tag", "נושא", ((t, t) for t in tags)))
     out.append(group("mark", "סימון", [("star", "מועדפים"), ("solved", "פתורות"), ("unsolved", "לא פתורות")]))
     out.append(group("interactive", "ממשק", [("1", "אינטראקטיביות")]))
@@ -472,14 +557,14 @@ def _table(level: str | None, page_url: str) -> str:
         level_td = f'<td class="q-level">{level_chip(q["level"])}</td>' if level is None else ""
         interactive_mark = '<span class="q-interactive" title="עם ממשק אינטראקטיבי">▶</span>' if q.get("interactive") else ""
         out.append(
-            f'<tr data-id="{q["id"]}" data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" '
+            f'<tr data-id="{q["id"]}" data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" data-kind="{q["kind"]}" '
             f'data-level-rank="{LEVEL_RANK[q["level"]]}" data-diff-rank="{DIFF_RANK[q["difficulty"]]}" '
             f'data-tags="{html.escape(" ".join(q["tags"]))}" data-interactive="{int(bool(q.get("interactive")))}">'
             f'<td class="q-id">{q["id"]}</td>'
             f'<td class="q-title"><a href="{href}">{html.escape(str(q["title"]))}</a> {new_chip(q)}{interactive_mark}'
             '<span class="q-marks"></span></td>'
             f"{level_td}"
-            f'<td class="q-diff">{difficulty_chip(q["difficulty"])}</td>'
+            f'<td class="q-diff">{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}</td>'
             f'<td class="q-tags">{" ".join(f"<code>{html.escape(t)}</code>" for t in q["tags"])}</td>'
             "</tr>"
         )
@@ -570,6 +655,9 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     markdown = STATS.sub(lambda m: _stats(), markdown)
     markdown = PATH_STEPS.sub(lambda m: _path_steps(page), markdown)
     markdown = PATH_CARDS.sub(lambda m: _path_cards(page.url), markdown)
+    markdown = CONTINUE.sub(lambda m: _continue_card(), markdown)
+    markdown = RECENT.sub(lambda m: _recent(page.url), markdown)
+    markdown = WHATS_NEW.sub(lambda m: _whats_new(page.url), markdown)
     return PLACEHOLDER.sub(lambda m: _table(m.group(1), page.url), markdown)
 
 
@@ -619,6 +707,19 @@ def _search_variants(raw_tokens: set[str], words: list[str], known: set[str]) ->
     return out - raw_tokens
 
 
+def _search_question(doc: dict, q: dict) -> None:
+    """A question page in the search results (E33): the id before the title (so "0021"
+    ranks it first), the kind beside the level and difficulty in its tags (the results
+    show them as chips under the title, with the topics), no text instead of the header
+    card's run-together chips, and the id as written and without its zeros ("0021 21") in
+    its own field."""
+    doc["title"] = f'{q["id"]} · {q["title"]}'
+    doc["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], KINDS[q["kind"]],
+                   *[t for t in doc.get("tags", []) if t not in (LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]])]]
+    doc["text"] = ""   # the tags, shown as chips under the title, are the topics already
+    doc[ID_FIELD] = f'{q["id"]} {int(q["id"])}'
+
+
 def on_post_build(config, **kwargs):
     path = Path(config["site_dir"]) / "search" / "search_index.json"
     if not path.exists():
@@ -634,5 +735,10 @@ def on_post_build(config, **kwargs):
         extra = _search_variants(raw, words, known)
         if extra:
             doc[SEARCH_FIELD] = " ".join(sorted(extra))
+    pages = {q["src_uri"][: -len(".md")] + "/": q for q in _questions.values()}
+    for doc in index["docs"]:
+        if doc["location"] in pages:
+            _search_question(doc, pages[doc["location"]])
     index["config"]["fields"][SEARCH_FIELD] = {"boost": 1.0}
+    index["config"]["fields"][ID_FIELD] = {"boost": 1e7}
     path.write_text(json.dumps(index, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")

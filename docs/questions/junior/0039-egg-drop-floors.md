@@ -3,6 +3,7 @@ id: 39
 title: ביצים וקומות – כמה הטלות במקרה הגרוע
 level: junior
 difficulty: medium
+kind: puzzle
 tags: [math, algorithms, dynamic-programming, python, systemverilog]
 source: "חידת ראיון קלאסית (two eggs); כאן עם שלוש ביצים והכללה ל-k"
 added: 2026-10-22

@@ -3,6 +3,7 @@ id: 15
 title: שני ילדים, ולפחות אחד מהם בן
 level: student
 difficulty: easy
+kind: math
 tags: [probability, math, logic-puzzles]
 source: ""
 added: 2026-10-18

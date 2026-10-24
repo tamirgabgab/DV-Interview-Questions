@@ -3,6 +3,7 @@ id: 34
 title: קוד Gray למצביעי FIFO אסינכרוני
 level: junior
 difficulty: medium
+kind: design
 tags: [fifo, cdc, gray-code, digital-design, python, systemverilog]
 source: ""
 added: 2026-10-21
