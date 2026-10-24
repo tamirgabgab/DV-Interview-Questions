@@ -1892,6 +1892,26 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     page's table). The 0017 text first said the duplicate is the first value over the
     line; with several repeated values (the statement allows them) that is only true of
     one repeated value, and the page now says what the invariant gives.
+24. **Round I, third batch (I285, I288, I289); round I is done.** The owner's answers: new
+    boxes in the parts, not modes of the boxes above them; draws plus dragging for the
+    half-circles; up to five cells. `labelfix` (0004 part b, solution 2, in `boxes3.js`):
+    fix_labels step by step on three crates, k and the ball, same and other, swap 1 and
+    swap 2 on the labels array, and the three arcs of the 3-cycle (same → k, k → other,
+    other → same) lit as each label arrives, the true contents at the end (`labelSwaps`,
+    tested on the twelve cases against fix_labels and the page's example table).
+    `halfcirc` (0007 part c): P1, P2, P3 to drag or type, each half-circle as an arc in
+    its point's colour with its half-disc when A_i holds, and 100 or 1,000 continuous
+    random triangles counted per event against 1/4 (`halfEvents`, `halfCount`, tested on
+    3,000 integer triangles against contains_center and on 40,000 draws). `tttfive`
+    (0011 part b, default the page's 2 x 2 square): up to five cells, the four directions
+    with their split and pairs on a line, the full line, and the stars on the empty cells
+    that would complete one (`tttFive`, tested on every set of up to five cells: the
+    directions are the page's 12 lines, every pair on exactly one, five cells always
+    hold a line).
+25. **CI broke again, outside the code:** the deploy run of fcca5a9 (the review fixes) failed
+    in "Install Playwright": `ubuntu-latest` moved to Ubuntu 26.04, where Playwright 1.56
+    cannot install Chromium. The three jobs of `deploy.yml` now run on `ubuntu-24.04` (the
+    Verilator cache was built there too). The review fixes reach the site with round I.
 ---
 
 ## In progress
@@ -1931,8 +1951,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   K301, K302, K306, K305, K308). A code review of round K fixed seven findings (work log
   item 21); state outside the controls is an open item, and old links need nothing.
   Round I (the owner's pick, three batches, `main` at the end): batch 1 (I284, I286,
-  I290) and batch 2 (I291, I287, I292) are done on the branch; next batch 3 (I285, I288,
-  I289). Next: the owner's pick, rounds I and J (new boxes for
+  I290), batch 2 (I291, I287, I292) and batch 3 (I285, I288, I289) are done: round I is
+  closed and on `main`. Next: the owner's pick, round J (the DV, math and probability
+  parts with no visual) or the new questions of rounds M to R. Next: the owner's pick, rounds I and J (new boxes for
   the parts with no visual) or the new questions of rounds M to R.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
@@ -2586,11 +2607,11 @@ the first series' rounds of the same letters.
 | Id | Page | Idea | Size |
 |---|---|---|---|
 | ~~I284~~ | 0002 parts a, b | Done in session 22. **Each part with its own swap**: the existing `trace` box placed in part a (the temporary variable) and in part b (the sum and the XOR), each preset to its part's version, the values and the a0 / b0 expressions line by line | S |
-| I285 | 0004 part b | **The labels fix**: a `boxes3` mode with the labels array, k, same and other marked, and the two swaps drawn as a 3-cycle | M |
+| ~~I285~~ | 0004 part b | Done in session 22. **The labels fix**: a `boxes3` mode with the labels array, k, same and other marked, and the two swaps drawn as a 3-cycle | M |
 | ~~I286~~ | 0006 part a | Done in session 22. **The scan in part a**: the `stock` box placed in part a in long-only mode, so the minimum so far and the best long sit beside the part that explains them | S |
 | ~~I287~~ | 0005 bonus | Done in session 22. **Pigeonhole on the repunits**: R1 … R(x+1) dropped into x remainder slots, the first collision lit, and R_i − R_j = 1…10…0 shown as the multiple | M |
-| I288 | 0007 part c | **Three half-circles**: for a drawn triangle, the half-circle that starts at each point; at most one holds the other two; seeded draws count A1, A2, A3 apart (about 1/4 each, never two at once) | M |
-| I289 | 0011 part b | **Any five cells hold a line**: pick cells on the wrap-around board; the 2-2-1 split per direction and the pair count are shown, and the fifth cell always completes a line | M |
+| ~~I288~~ | 0007 part c | Done in session 22. **Three half-circles**: for a drawn triangle, the half-circle that starts at each point; at most one holds the other two; seeded draws count A1, A2, A3 apart (about 1/4 each, never two at once) | M |
+| ~~I289~~ | 0011 part b | Done in session 22. **Any five cells hold a line**: pick cells on the wrap-around board; the 2-2-1 split per direction and the pair count are shown, and the fifth cell always completes a line | M |
 | ~~I290~~ | 0012 part b | Done in session 22. **The map of the proof**: `kapbase` with base 10 placed in part b: the map k → max(10 − k, k − 1) and the fixed point at 5 | S |
 | ~~I291~~ | 0013 part b | Done in session 22. **The 55 pairs, clickable**: a cell of the (p, q) grid shows its digits, the case of the analysis that applies and the arrow to the next pair; only 6174 points to itself | S–M |
 | ~~I292~~ | 0017 solution 3 | Done in session 22. **Binary search on values**: the histogram of 1..n with the count of values ≤ mid against y = mid, lo and hi narrowing with the invariant in colour, on the same array as the Floyd box | M |

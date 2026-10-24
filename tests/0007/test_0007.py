@@ -256,3 +256,29 @@ def test_explorer_discrete_count_and_histogram():
     inside = sum(b["in"] for b in h["bins"])
     assert abs(inside / (1000 - h["degenerate"]) - 0.25) < 0.05
     assert abs(got["cdf"][3] - (1 - 3 * (1 / 3) ** 2)) < 1e-12
+
+
+def test_explorer_half_circles_box():
+    """The part c box: A_i holds when the other two points lie in the half-circle that
+    starts at P_i counterclockwise; at most one holds when the points are distinct and no
+    two are opposite, and the centre is inside (the page's contains_center) exactly when
+    none holds. The continuous counts come near 1/4 each, never two at once."""
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(7)
+    triples = [[rng.randrange(360) for _ in range(3)] for _ in range(3000)] + [[40, 110, 170], [20, 140, 250]]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({{ ev: {triples}.map((t) => m.halfEvents(t)), "
+                    f"count: m.halfCount(40000, m.mulberry32(7)) }}));")
+    for t, r in zip(triples, got["ev"]):
+        want = [all((t[j] - t[i]) % 360 <= 180 for j in range(3) if j != i) for i in range(3)]
+        assert r["events"] == want, t
+        generic = len(set(t)) == 3 and all((a - b) % 360 != 180 for a in t for b in t)
+        if generic:
+            assert sum(want) <= 1
+            assert r["inside"] == ns["contains_center"]([math.radians(v) for v in t]) == (sum(want) == 0), t
+    c = got["count"]
+    assert sum(c["a"]) + c["inside"] == c["n"] == 40000 and c["both"] == 0
+    for v in c["a"] + [c["inside"]]:
+        assert abs(v / c["n"] - 0.25) < 0.01
+    assert got["ev"][-2]["events"] == [True, False, False] and got["ev"][-1]["inside"]

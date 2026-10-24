@@ -1,10 +1,12 @@
-// kinds: boxes3
+// kinds: boxes3 labelfix
 //   boxes3                 0004        three mislabelled boxes with hidden contents: draw a ball, the deduction line by line
+//   labelfix               0004        part b's fix_labels step by step: k and the ball, same and other, the two swaps on the labels array drawn as a 3-cycle
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { ltr, seedControls } = dvqExplorers.lib;
+  const { autoplay, f, ltr, seedControls, speedSel } = dvqExplorers.lib;
+  const NB = "\u00a0";
 
   // Three mislabelled boxes (0004): the twelve cases (a label order and a content where
   // every label is wrong), a draw from a box, and the page's rule applied to one draw.
@@ -125,11 +127,111 @@
     },
   });
 
+  // The page's fix_labels (0004 part b, solution 2) given the ball drawn from box k: the
+  // two neighbours, same (labelled with the ball's colour) and other, and the labels after
+  // each of the two swaps; together they rotate the three labels.
+  const labelSwaps = (labels, ball) => {
+    const k = labels.indexOf("MIXED"), n1 = (k + 1) % 3, n2 = (k + 2) % 3;
+    const same = labels[n1] === ball ? n1 : n2, other = same === n1 ? n2 : n1;
+    const after1 = labels.slice();
+    [after1[k], after1[same]] = [after1[same], after1[k]];
+    const after2 = after1.slice();
+    [after2[same], after2[other]] = [after2[other], after2[same]];
+    return { k, n1, n2, same, other, after1, after2 };
+  };
+
+  // The labels fix box (0004 part b): the labels array on three crates, played step by
+  // step: k and the ball drawn from it, same and other, swap 1 (k, same) and swap 2 (same,
+  // other), then the true contents; the arcs of the 3-cycle above the crates light as
+  // their label arrives. "סידור חדש" draws another of the twelve cases.
+  const LF_STEPS = 6;
+  const labelfixView = () => ({
+    mount(box) {
+      const st = { labels: ["RED", "BLACK", "MIXED"], content: ["BLACK", "MIXED", "RED"], k: 0 };
+      box.innerHTML =
+        `<div class="ex-controls"><button type="button" class="md-button ex-new">סידור חדש</button>` +
+        `<button type="button" class="md-button ex-reset">הדוגמה מהדף</button></div>` +
+        `<div class="ex-controls ex-play-row">` +
+        `<button type="button" class="md-button md-button--primary ex-next">השלב הבא</button>` +
+        `<button type="button" class="md-button ex-prev">השלב הקודם</button>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(2200, 1300, 600) +
+        `<button type="button" class="md-button ex-start">להתחלה</button>` +
+        `<button type="button" class="md-button ex-end">לסוף</button><span class="ex-pos"></span></div>` +
+        `<div class="lf-crates"></div>` +
+        `<p class="lf-arr" dir="ltr"></p>` +
+        `<p class="wv-step lf-step" aria-live="polite"></p><p class="ex-summary lf-vars"></p>`;
+      const $ = (sel) => box.querySelector(sel);
+      const ball = () => st.content[st.labels.indexOf("MIXED")];
+      const labelsAt = (r) => (st.k >= 4 ? r.after2 : st.k >= 3 ? r.after1 : st.labels);
+      const CX = (i) => 95 + 200 * i, TOP = 120;
+      const svg = (r) => {
+        const cur = labelsAt(r), b = ball(), open = st.k >= LF_STEPS - 1;
+        // the 3-cycle: same -> k (the ball's colour), k -> other (MIXED, through same), other -> same
+        const arcs = [[r.same, r.k, st.labels[r.same], st.k >= 3], [r.k, r.other, "MIXED", st.k >= 4], [r.other, r.same, st.labels[r.other], st.k >= 4]];
+        let s = `<svg class="figure b3-live lf-live" viewBox="0 0 620 330" role="img" aria-label="שלוש הקופסאות עם התוויות ${cur.join(", ")}">`;
+        if (st.k >= 2) arcs.forEach(([from, to, lab, done]) => {
+          const x1 = CX(from), x2 = CX(to), h = Math.abs(from - to) === 2 ? 84 : 46, side = x2 > x1 ? -14 : 14;
+          const y = TOP - 6, mx = (x1 + x2) / 2, my = y - h * 2, ex = x2 - side;
+          // the head points along the curve's tangent at its end, from the control point
+          const ux = ex - mx, uy = y - my, ul = Math.hypot(ux, uy), [dx, dy] = [ux / ul, uy / ul];
+          const head = [[ex, y], [ex - 11 * dx - 6 * dy, y - 11 * dy + 6 * dx], [ex - 11 * dx + 6 * dy, y - 11 * dy - 6 * dx]];
+          s += `<path class="lf-arc${done ? " is-done" : ""}" d="M ${x1 + side} ${y} Q ${mx} ${my} ${ex} ${y}"/>` +
+               `<polygon class="lf-head${done ? " is-done" : ""}" points="${head.map(([u, v]) => `${f(u)},${f(v)}`).join(" ")}"/>` +
+               `<text class="tick lf-arc-text" x="${mx}" y="${f(y - h - 6)}" text-anchor="middle">${lab}</text>`;
+        });
+        for (let i = 0; i < 3; i++) {
+          const x = 20 + 200 * i, cx = CX(i), y0 = TOP, changed = (st.k === 3 && (i === r.k || i === r.same)) || (st.k === 4 && (i === r.same || i === r.other));
+          s += `<g class="lf-crate${changed ? " is-changed" : ""}"><polygon class="crate-top" points="${x},${y0 + 30} ${x + 30},${y0} ${x + 180},${y0} ${x + 150},${y0 + 30}"/>` +
+               `<polygon class="crate-side" points="${x + 150},${y0 + 30} ${x + 180},${y0} ${x + 180},${y0 + 100} ${x + 150},${y0 + 130}"/>` +
+               `<rect class="crate-front" x="${x}" y="${y0 + 30}" width="150" height="100"/>` +
+               `<text class="crate-text lf-label" x="${cx}" y="${y0 + 88}" font-size="20" text-anchor="middle">${cur[i]}</text></g>`;
+          if (st.k >= 1 && i === r.k) s += `<circle class="b3-ball b3-${b.toLowerCase()}" cx="${x + 120}" cy="${y0 + 150}" r="9"><title>${b}</title></circle>`;
+          const tags = [st.k >= 1 && i === r.k ? "k" : "", st.k >= 2 && i === r.same ? "same" : "", st.k >= 2 && i === r.other ? "other" : ""].filter(Boolean);
+          s += `<text class="tick" x="${cx}" y="${y0 + 156}" text-anchor="middle">${i}${tags.length ? ` : ${tags.join(", ")}` : ""}</text>`;
+          if (open) s += `<text class="tick lf-true${cur[i] === st.content[i] ? " is-ok" : ""}" x="${cx}" y="${y0 + 180}" text-anchor="middle">${st.content[i]} ${cur[i] === st.content[i] ? "✓" : "✗"}</text>`;
+        }
+        return s + "</svg>";
+      };
+      const draw = () => {
+        const b = ball(), r = labelSwaps(st.labels, b), cur = labelsAt(r), oth = b === "RED" ? "BLACK" : "RED";
+        $(".lf-crates").innerHTML = svg(r);
+        const hl = st.k === 3 ? [r.k, r.same] : st.k === 4 ? [r.same, r.other] : [];
+        $(".lf-arr").innerHTML = `labels = <span class="arr">${cur.map((l, i) => `<span${hl.includes(i) ? ' class="hl"' : ""}>${l}</span>`).join("")}</span>`;
+        $(".ex-pos").textContent = `שלב ${st.k} מתוך ${LF_STEPS - 1}`;
+        const steps = [
+          `כל התוויות שגויות, והתוכן מוסתר. ״השלב הבא״ מריץ את ${ltr("fix_labels")} שורה אחרי שורה.`,
+          `‏${ltr(`k = labels.index("MIXED") = ${r.k}`)}, ושולפים כדור מקופסה ${ltr(r.k)}${NB}: יצא ${ltr(b)}. התווית שלה שגויה, ולכן היא לא מעורבת, ויש בה רק ${ltr(b)}.`,
+          `השכנים הם ${ltr(`n1 = ${r.n1}`)} ו-${ltr(`n2 = ${r.n2}`)}. בקופסה ${ltr(r.n1)} התווית ${ltr(st.labels[r.n1])}, ` +
+            `${st.labels[r.n1] === b ? "כצבע הכדור" : "לא כצבע הכדור"}, ולכן ${ltr(`same = ${r.same}`)} ו-${ltr(`other = ${r.other}`)}. החצים הם הסיבוב של התוויות.`,
+          `החלפה 1, בין ${ltr(`k = ${r.k}`)} ל-${ltr(`same = ${r.same}`)}${NB}: קופסה ${ltr(r.k)} מקבלת את ${ltr(b)}, והיא כבר נכונה. ${ltr("MIXED")} עובר זמנית ל-${ltr(r.same)}.`,
+          `החלפה 2, בין ${ltr(`same = ${r.same}`)} ל-${ltr(`other = ${r.other}`)}${NB}: ${ltr(r.same)} מקבלת את ${ltr(oth)}, ו-${ltr("MIXED")} מגיע ל-${ltr(r.other)}. שתי ההחלפות יחד הן הסיבוב.`,
+          `התוכן האמיתי מתחת לכל קופסה${NB}: שלוש התוויות נכונות, אחרי דגימה אחת ושתי החלפות.`,
+        ];
+        $(".lf-step").innerHTML = steps[st.k];
+        $(".lf-vars").innerHTML = st.k ? `‏${ltr([`k = ${r.k}`, `ball = ${b}`].concat(st.k >= 2 ? [`n1 = ${r.n1}`, `n2 = ${r.n2}`, `same = ${r.same}`, `other = ${r.other}`] : []).join(", "))}` : "";
+        $(".ex-prev").disabled = st.k === 0;
+        $(".ex-next").disabled = st.k >= LF_STEPS - 1;
+      };
+      let stop = () => {};
+      const setCase = (c) => { stop(); st.labels = c.labels.slice(); st.content = c.content.slice(); st.k = 0; draw(); };
+      const seed = seedControls(box, $(".ex-reset"), (rng) => { const all = boxesCases(); setCase(all[Math.floor(rng() * all.length)]); });
+      $(".ex-new").addEventListener("click", () => seed.draw());
+      $(".ex-reset").addEventListener("click", () => setCase({ labels: ["RED", "BLACK", "MIXED"], content: ["BLACK", "MIXED", "RED"] }));
+      $(".ex-next").addEventListener("click", () => { stop(); if (st.k < LF_STEPS - 1) { st.k++; draw(); } });
+      $(".ex-prev").addEventListener("click", () => { stop(); if (st.k > 0) { st.k--; draw(); } });
+      $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
+      $(".ex-end").addEventListener("click", () => { stop(); st.k = LF_STEPS - 1; draw(); });
+      stop = autoplay($(".ex-play"), $(".ex-speed"), { step: () => { st.k++; draw(); }, done: () => st.k >= LF_STEPS - 1, restart: () => { st.k = 0; draw(); } });
+      draw();
+    },
+  });
+
   dvqExplorers.register({
-    views: { boxes3: boxes3View },
+    views: { boxes3: boxes3View, labelfix: labelfixView },
     help: {
       boxes3: "שלוש קופסאות עם תוויות שגויות : לוחצים על קופסה כדי להוציא כדור, וההיסק נכתב שורה אחרי שורה. ״משחק חדש״ מגריל תכולה חדשה לאותן תוויות, ״ערבוב התוויות״ מסדר את התוויות מחדש, ו״גילוי התוכן״ פותח את הקופסאות.",
+      labelfix: "״השלב הבא״ ו״הפעלה״ מריצים את fix_labels : מוצאים את k ושולפים כדור, מזהים את same ואת other, ומבצעים את שתי ההחלפות. החצים מעל הקופסאות הם הסיבוב של שלוש התוויות, ובסוף מופיע התוכן האמיתי. ״סידור חדש״ מגריל אחד מ-12 המקרים.",
     },
-    models: { boxesCases, boxesDraw, boxesFix, boxesDeduce },
+    models: { boxesCases, boxesDraw, boxesFix, boxesDeduce, labelSwaps },
   });
 })();

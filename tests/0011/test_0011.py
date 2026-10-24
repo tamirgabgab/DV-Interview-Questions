@@ -119,3 +119,32 @@ def test_explorer_matches_page_code():
         assert ns["final_result"](tuple(board), WRAP_LINES if wrap else LINES) == result
     assert {r for w, r, _ in got["random"] if w} == {"X", "O"} and {r for w, r, _ in got["random"] if not w} == {"X", "O", "draw"}
     assert got["reasons"] == ["count", "both", "o_after", "x_after", "unfinished", "X"]
+
+
+def test_explorer_five_cells_box():
+    """The part b box: its four directions are the page's 12 wrap lines, three parallel
+    lines each covering the board; for every set of up to five cells the pairs on a line
+    add up to C(m, 2), five cells always hold a full line, and four cells with no line
+    are completed by every empty cell. The page's example (the 2 x 2 square) has none."""
+    from itertools import combinations
+    from page_tests import explorer_require, node_json
+
+    sets = [list(c) for m in range(6) for c in combinations(range(9), m)]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({{ dirs: m.FIVE_DIRS, wrap: m.TTT_WRAP, r: {sets}.map((s) => m.tttFive(s)) }}));")
+    lines = [sorted(l) for d in got["dirs"] for l in d["lines"]]
+    assert sorted(lines) == sorted(sorted(l) for l in got["wrap"]) and len(lines) == 12
+    for d in got["dirs"]:
+        assert sorted(c for l in d["lines"] for c in l) == list(range(9))
+    for a, b in combinations(range(9), 2):
+        assert sum(a in l and b in l for l in lines) == 1
+    for cells, r in zip(sets, got["r"]):
+        m = len(cells)
+        assert r["linePairs"] == r["pairs"] == m * (m - 1) // 2
+        assert sorted(r["full"]) == sorted(l for l in lines if set(l) <= set(cells))
+        if m == 5:
+            assert r["full"]
+        if m == 4 and not r["full"]:
+            assert r["completers"] == [c for c in range(9) if c not in cells]
+    ex = got["r"][sets.index([0, 1, 3, 4])]
+    assert not ex["full"] and ex["completers"] == [2, 5, 6, 7, 8]

@@ -1728,6 +1728,28 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .is-edge.tri-kind, .md-typeset .explorer .is-degenerate.tri-kind,
 .md-typeset .explorer .tri-counts .is-edge { color: var(--diff-medium); }
 .md-typeset .explorer .tri-run { margin-top: 0.8rem; }
+/* The half-circles box (0007 part c): one arc per half outside the circle, its half-disc when it holds. */
+.md-typeset svg .hc-arc { fill: none; stroke-width: 4; stroke-linecap: round; opacity: 0.55; }
+.md-typeset svg .hc-arc.is-holds { stroke-width: 7; opacity: 1; }
+.md-typeset svg .hc-arc.hc-s1 { stroke: var(--viz-s1); }
+.md-typeset svg .hc-arc.hc-s2 { stroke: var(--viz-s2); }
+.md-typeset svg .hc-arc.hc-s3 { stroke: var(--viz-s3); }
+.md-typeset svg .hc-disc { stroke: none; fill-opacity: 0.18; }
+.md-typeset svg .hc-disc.hc-s1 { fill: var(--viz-s1); }
+.md-typeset svg .hc-disc.hc-s2 { fill: var(--viz-s2); }
+.md-typeset svg .hc-disc.hc-s3 { fill: var(--viz-s3); }
+.md-typeset .explorer .hc-key { display: inline-block; width: 0.8rem; height: 0.35rem; margin-inline-end: 0.3rem; border-radius: 0.15rem; vertical-align: middle; }
+.md-typeset .explorer .hc-key-s1 { background: var(--viz-s1); }
+.md-typeset .explorer .hc-key-s2 { background: var(--viz-s2); }
+.md-typeset .explorer .hc-key-s3 { background: var(--viz-s3); }
+.md-typeset .explorer .hc-events { margin: 0.3em 0; padding-inline-start: 0.4rem; list-style: none; }
+.md-typeset .explorer .hc-events li { margin: 0.15em 0; }
+.md-typeset .explorer .hc-events li.is-holds { font-weight: 700; }
+.md-typeset .explorer .hc-run { margin-top: 0.8rem; }
+.md-typeset svg .tri-pt.hc-pt-s1 { fill: var(--viz-s1); }
+.md-typeset svg .tri-pt.hc-pt-s2 { fill: var(--viz-s2); }
+.md-typeset svg .tri-pt.hc-pt-s3 { fill: var(--viz-s3); }
+.md-typeset .explorer .hc-table tr.is-in td { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .tri-frames { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem; }
 .md-typeset .explorer .tri-frames input { flex: 1 1 auto; min-width: 0; }
 .md-typeset .explorer .tri-counts { margin: 0.2em 0; padding-inline-start: 1.1rem; font-weight: 600; }
@@ -1872,6 +1894,11 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset svg .ttt-cell:focus-visible { outline: none; }
 .md-typeset svg .ttt-cell:focus-visible rect { stroke: var(--site-focus-ring); stroke-width: 3; }
 .md-typeset svg .ttt-idx { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); opacity: 0.6; }
+/* The five cells box (0011 part b): the picked cells, a full line, the cells that would complete one. */
+.md-typeset svg .tf-mark { fill: var(--viz-s1); fill-opacity: 0.85; }
+.md-typeset svg .tf-cell.is-full .ttt-empty { fill: var(--viz-s2); fill-opacity: 0.3; }
+.md-typeset svg .tf-star { fill: var(--viz-s2); font-size: 22px; }
+.md-typeset .explorer .tf-dirs tr.is-full td { font-weight: 700; color: var(--viz-s2-text); }
 .md-typeset .explorer .ttt-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .ttt-bad { color: var(--diff-hard); font-weight: 700; }
 
@@ -1917,6 +1944,16 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .b3-step { margin: 0.5em 0 0.2em; }
 .md-typeset .explorer .b3-lines { margin: 0.2em 0; padding-inline-start: 1.3rem; }
 .md-typeset .explorer .b3-lines li { margin: 0.1em 0; }
+/* The labels fix box (0004 part b): the arcs of the 3-cycle, the swapped crates. */
+.md-typeset svg .lf-arc { fill: none; stroke: var(--viz-grid); stroke-width: 2.5; stroke-dasharray: 6 4; }
+.md-typeset svg .lf-arc.is-done { stroke: var(--viz-s2); stroke-dasharray: none; }
+.md-typeset svg .lf-head { fill: var(--viz-grid); }
+.md-typeset svg .lf-head.is-done { fill: var(--viz-s2); }
+.md-typeset svg .lf-crate.is-changed .crate-front { stroke: var(--viz-s2); stroke-width: 4; }
+.md-typeset svg .lf-label { font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset svg .lf-true { font-family: var(--md-code-font-family); fill: var(--diff-hard); }
+.md-typeset svg .lf-true.is-ok { fill: var(--diff-easy); }
+.md-typeset .explorer .lf-arr { margin: 0.3em 0; font-family: var(--md-code-font-family); font-size: 0.75rem; text-align: left; }
 
 /* Timing strips (0001, 0035): a scrollable strip of rows over clock cycles */
 .md-typeset .explorer .wv-wrap { overflow-x: auto; margin-top: 0.5rem; direction: ltr; padding-bottom: 0.2rem; }

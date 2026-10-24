@@ -71,3 +71,28 @@ def test_explorer_matches_page_code():
             assert len(left) == 1
     for c, drawn in zip(got["cases"], got["draws"]):
         assert drawn == ["RED" if x == "MIXED" else x for x in c["content"]]
+
+
+def test_explorer_labels_fix_box():
+    """The part b box: for each of the twelve cases, k, the ball drawn from it, n1, n2,
+    same and other, and the labels after each swap are the page's fix_labels; the second
+    swap leaves the true contents, and the page's example is the table above the box."""
+    from page_tests import explorer_require, node_json
+
+    all_cases = list(cases())
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({[[l, c] for l, c in all_cases]}.map(([l, c]) => m.labelSwaps(l, c[l.indexOf('MIXED')]))));")
+    for (labels, content), r in zip(all_cases, got):
+        use_boxes(content)
+        assert ns["fix_labels"](list(labels)) == r["after2"] == content
+        k = labels.index("MIXED")
+        ball = content[k]
+        n1, n2 = (k + 1) % 3, (k + 2) % 3
+        assert (r["k"], r["n1"], r["n2"]) == (k, n1, n2)
+        assert labels[r["same"]] == ball and {r["same"], r["other"]} == {n1, n2}
+        after1 = list(labels)
+        after1[k], after1[r["same"]] = after1[r["same"]], after1[k]
+        assert r["after1"] == after1 and after1[k] == content[k]
+    ex = got[all_cases.index((["RED", "BLACK", "MIXED"], ["BLACK", "MIXED", "RED"]))]
+    assert (ex["k"], ex["same"], ex["other"]) == (2, 0, 1)
+    assert ex["after1"] == ["MIXED", "BLACK", "RED"] and ex["after2"] == ["BLACK", "MIXED", "RED"]

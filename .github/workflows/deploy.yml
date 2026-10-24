@@ -25,9 +25,11 @@ env:
   # shapes of the 0014 subclass unrandomized; this commit runs every class as published.
   VERILATOR_REF: "7a5509c89b1dd55cf78809907729a55f7fef55b7"
 
+# The runner image is pinned: ubuntu-latest moved to 26.04 (October 2026), where
+# Playwright 1.56 cannot install Chromium, and the Verilator cache was built on 24.04.
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -81,7 +83,7 @@ jobs:
 
   build:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -141,7 +143,7 @@ jobs:
   deploy:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
