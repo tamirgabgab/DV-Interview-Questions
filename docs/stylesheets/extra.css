@@ -2558,3 +2558,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .at-key-fail { background: var(--diff-hard); }
 .md-typeset .viz-legend .at-key-vac { background: var(--viz-text); opacity: 0.5; border-radius: 50%; }
 .md-typeset .explorer .at-scroll { overflow-x: auto; }
+
+/* Kaprekar after n steps (0044): the gap chart with the line part shaded */
+.md-typeset svg .kn-line { fill: var(--viz-s3); fill-opacity: 0.12; }
+.md-typeset .viz-legend .kn-key-line { background: var(--viz-s3); opacity: 0.3; }

@@ -1959,6 +1959,23 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     The owner asked for `main` after the round; `main` was fast-forwarded to the round's
     last commit. Final checks: all Python tests, lint 42/42, 0 broken links, 69 boxes
     and 1,010 clicks with no problem, 55 pages at 390 px with no problem.
+29. **New question 0044, Kaprekar after n steps (the owner's write-up).** The owner sent a
+    full solution: the closed form for the digits (a_n, b_n, c_n) after n steps of the
+    three-digit routine, the answer after 1000 steps in base 10 (495) and base 5 (143₅ or
+    242₅ by the parity of t = |d₀ − 3|), and any base B. Every table, example and
+    closed form was checked first by brute force (every number of every base from 2 to
+    16, n up to 59 and n = 1000): all hold, nothing to report. The owner's answers: a new
+    page (0012 part c already has the fixed point and the cycle; 0044 is about when and
+    how), junior / hard, no code, a new box. The page follows the write-up step by step
+    (parts a, b and the bonus, the facts with their proofs, the 211, 401₅ and 300₅
+    examples, the consistency table); math with Hebrew was rewritten (no `\text` in
+    Hebrew, parity as ≡ mod 2 or in a table), and the wide equations split for phones.
+    Figures (`q0044.py`): D_k for every starting gap in bases 10 and 5. The `kapn` box
+    (one kind, three boxes: base 10 and base 5 fixed, the bonus free): the gap chart with
+    the line part shaded and a table of the steps, the closed form beside the direct
+    digits (`kapnStep`, `kapnRun`, `kapnGap`, `kapnFormula`, tested against the
+    simulation for every base and starting gap). 0012's follow-up now links to 0044.
+    Round Z's Z203, Z210 and Z217 are marked done (0039, 0040, 0041).
 ---
 
 ## In progress
@@ -2002,7 +2019,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   closed and on `main`. Round J (the owner's pick, three batches; `main` when the owner
   asks): batches 1 (J294, J298, J300), 2 (J293, J297, J299) and 3 (J295, J296) are
   done; round J is closed and on `main` (the owner's go, CI green on e611961). Rounds I
-  to L of the second series are all done. Next: the owner's pick from the open
+  to L of the second series are all done. Question 0044 (Kaprekar after n steps, from
+  the owner's write-up) is on the branch; `main` when the owner asks. Next: the owner's pick from the open
   proposals (second series A to E, the new questions of M to R and Z, the deferred
   G222, H223, H224).
 - Next: the owner's picks from the second series (rounds A to E on how answers are
@@ -2785,21 +2803,21 @@ fly, clock angles, Heron, rope around the Earth).
 | # | Question | Level | Source | Generalisation | Explorer | Size |
 |---|---|---|---|---|---|---|
 | Z202 | **Two burning ropes, 45 minutes** | student / easy | Wu, Leino | which times n ropes can measure (sums of 60/2^k), a search over lighting states | ropes burning from one or both ends, a timeline | S–M |
-| Z203 | **Two eggs, 100 floors** | junior / medium | Leino, LeetCode 887 | k eggs and n floors: the DP and the binomial sum; 14 drops | sliders k and n, the drop tree and the table | M |
+| ~~Z203~~ | Done as 0039. **Two eggs, 100 floors** | junior / medium | Leino, LeetCode 887 | k eggs and n floors: the DP and the binomial sum; 14 drops | sliders k and n, the drop tree and the table | M |
 | Z204 | **Twelve coins, one fake, three weighings** | senior / hard | Wu | (3^n − 3)/2 coins in n weighings, fake heavier or lighter | a balance: pick coins per pan, the tree of outcomes | M–L |
 | Z205 | **100 prisoners and a light bulb** | senior / hard | Wu | the counter protocol for n prisoners, the expected number of days | a simulation with a day counter and a histogram | M |
 | Z206 | **Pirates dividing gold** | junior / medium | Wu, Winkler | backward induction for n pirates; the twist past 200 | a stepper adding one pirate at a time | M |
 | Z207 | **Ants on a stick** | student / easy | Wu | n ants, any directions: collisions as passing through | an animation with the "swap labels" view | S–M |
 | Z208 | **HH or HT – expected flips** | junior / medium | Zhou | any pattern: the Markov chain and Conway's correlation formula | a pattern field, simulation and the chain | M |
 | Z209 | **Gambler's ruin** | junior / medium | Zhou | reach N before 0 with probability p, the closed form and the expected time | sliders p, N and the start, simulated paths | M |
-| Z210 | **Sequence detector 1011, overlapping** | student / easy | HDLBits, Harris & Harris | any pattern: the KMP automaton, Mealy against Moore | type a bit stream, the state graph lights up | M |
+| ~~Z210~~ | Done as 0040. **Sequence detector 1011, overlapping** | student / easy | HDLBits, Harris & Harris | any pattern: the KMP automaton, Mealy against Moore | type a bit stream, the state graph lights up | M |
 | Z211 | **Setup and hold: the highest clock frequency** | junior / medium | Harris & Harris | clock skew both ways, hold violations, a path with several stages | sliders for t_cq, logic, t_su, skew, and a timing diagram | M |
 | Z212 | **Reset synchronizer: async assert, sync deassert** | junior / easy | Cummings | why two flops, what goes wrong without them | a waveform with the release edge near the clock | S–M |
 | Z213 | **A one-cycle pulse to a slower clock domain** | junior / medium | Cummings | the toggle synchronizer and the minimum spacing for any clock ratio | two clocks with a ratio slider, lost and kept pulses | M |
 | Z214 | **Glitch-free clock mux** | senior / medium | Cummings, ChipVerify | the two-flop handshake per clock, any two frequencies | a waveform where select switches at a random moment | M |
 | Z215 | **Round-robin arbiter** | junior / medium | ChipVerify, Verification Guide | N requesters, fairness as SVA, a weighted variant | request toggles, a grant pointer stepping round | M |
 | Z216 | **Priority encoder and leading zeros in log depth** | student / medium | HDLBits | a tree for N bits, depth log2 N against a chain | a bit field, the tree with the winning path marked | S–M |
-| Z217 | **How many random tests close coverage** | junior / medium | coupon collector, Zhou | n bins: n·H_n, the variance, unequal bin weights | a covergroup filling up, a histogram over runs | M |
+| ~~Z217~~ | Done as 0041. **How many random tests close coverage** | junior / medium | coupon collector, Zhou | n bins: n·H_n, the variance, unequal bin weights | a covergroup filling up, a histogram over runs | M |
 
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
