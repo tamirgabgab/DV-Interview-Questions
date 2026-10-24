@@ -628,7 +628,7 @@
           b.className = "ex-speedbtn";
           b.textContent = SPEED_NAMES[i] || o.text;
           b.dataset.tip = `קצב ${o.text}`;
-          b.setAttribute("aria-label", `קצב ${o.text}`);
+          b.setAttribute("aria-label", `${b.textContent}, קצב ${o.text}`);   // the visible text first
           b.addEventListener("click", () => {
             sel.value = o.value;
             sel.dispatchEvent(new Event("input", { bubbles: true }));
