@@ -62,6 +62,8 @@ PAIRS = [
     ("map digit on high ground", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 29%, var(--md-default-bg-color))"], TEXT),
     ("map digit on deep water", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color))"], TEXT),
     ("table text on water", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 20%, var(--md-default-bg-color))"], TEXT),
+    ("ladder cell label, chosen", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
+    ("ladder cell label, a term", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

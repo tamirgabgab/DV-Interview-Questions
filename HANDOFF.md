@@ -2367,6 +2367,26 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     run panel runs part b's million calls on load (2.2 s in CPython, a few seconds more in
     Pyodide). At the owner's request the function is named `kaprekar_step` on the page,
     in the tests and in the run panel (the write-up called it f).
+49. **Accessibility and small text on phones (session 26, 2026-10-25, fix rounds 1 and 2).**
+    The CI log of the phone check listed axe findings on seven pages and SVG text under
+    9 px on six; the owner chose to fix them, to grow the fonts (not to widen the figures)
+    and to make both checks fail in CI. axe: the ladder cells of 0021 lost contrast to
+    Material's `small { opacity: .75 }` (now `opacity: 1`; their tinted fills added to
+    `PAIRS`) and lost their `aria-label` (the name is the visible text); the 0013 pair cells
+    and the 0044 state-diagram cards start their names with the visible text (the card's
+    text elements end with a space, since axe joins SVG text without one); the points of
+    the 0007 triangle and half-circle boxes have an `aria-label`; the 0043 race grid is a
+    `group`, not an `img`; the scrolling table wrappers of 0038 and 0044 take focus with a
+    region name. Small text: `reading-tools.js` grows a label at most 2x (was 1.8x), which
+    lifts the 10 px labels of 0018, 0019 and 0031 over 9 px at the boxes' 0.47 scale; a
+    label marked `data-fit-drop` (the 9 px sizes inside narrow bars of the PCIe box) hides
+    when it still renders under 9 px; the long legend lines of the PCIe box and of the 0023
+    request figure split into two lines (the generator and the page copy updated); the
+    hourglass tree says "מצב אחד". `check_phone.py --small-fail` is new; CI runs the phone
+    check with `--axe-fail --small-fail` (light and the manual dark run). Checks: the full
+    phone check light and dark with both flags, the explorer click-check of the ten touched
+    pages, the Python tests (405), contrast, links, lint. The wide-math warning came and
+    went between local runs on untouched pages (0012, 0041): font timing in the sandbox.
 
 
 ## In progress
@@ -2447,11 +2467,12 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   The live page was not checked from the sandbox (github.io is not reachable there):
   the owner should glance at 0025 part b, step 11 of the stepper (dashed arrows) and the
   highlighted lines of the four code blocks.
+- Session 26 (later): fix rounds 1 and 2 (axe, small text; item 49) are on the branch,
+  `main` when the owner asks. Still proposed: round 3 (Node 20 actions, Verilator), round 4
+  (HANDOFF and CLAUDE.md upkeep), round 5 (a SessionStart hook), round 6 (safety net).
 - Session 26: question 0044 reworked into a coding question (item 48) is on `main`
   (1e516ef, 2026-10-25; the branch CI was green, the `main` run only built and deployed).
-  The live page was not checked from the sandbox. Proposed fix rounds (not yet picked): axe warnings on six
-  pages, text under 9 px on six pages, the Node 20 actions in CI, HANDOFF and CLAUDE.md
-  upkeep, a SessionStart hook for the sandbox.
+  The live page was not checked from the sandbox.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.

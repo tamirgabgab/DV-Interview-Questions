@@ -285,8 +285,9 @@ steps, code, proof, cost) is wrapped in a `sol-block` with its own colour, icon 
 rail, and a solution with two or more blocks gets a sticky **solution map** of chips that
 jumps to a block and marks the block being read (under the part bar when there is one).
 For phones it also fits the figures and tables: SVG text that would render under 9 px (a
-640-unit chart in a 340 px column) is enlarged to 9.5 px, at most 1.8 times its size, kept
-inside the viewBox, and a row of `tick` / `coord` labels that then overlaps is thinned
+640-unit chart in a 340 px column) is enlarged to 9.5 px, at most twice its size, kept
+inside the viewBox (a label marked `data-fit-drop`, like the size inside a narrow bar of the
+PCIe box, is hidden when even that leaves it under 9 px; its tooltip stays), and a row of `tick` / `coord` labels that then overlaps is thinned
 (every k-th label kept, the first and the last always); this runs on every inline figure
 and on the live figures of the explorer boxes (refitted when a box redraws), and the
 lightbox copy keeps the original sizes. A content table of five or more columns and three
@@ -473,8 +474,9 @@ would scroll on its own; split it with `aligned`), about SVG text drawn under 9 
 390 px (one line per figure or explorer box with its smallest text, so a figure that
 shrinks to an unreadable size on a phone is listed) and, with `--axe`, about serious and
 critical [axe-core](https://github.com/dequelabs/axe-core) findings (contrast, names,
-keyboard access; CI runs it on every page, `--axe-fail` makes them failures). Warnings never
-fail CI. It **fails** when the enlarge button of a figure covers SVG text (one line per
+keyboard access). CI runs it with `--axe-fail --small-fail`, so the axe findings and the
+small text **fail** there (a long label line splits into two, a small label grows in its
+generator); the wide math stays a warning. It also **fails** when the enlarge button of a figure covers SVG text (one line per
 figure, the live figures of the explorer boxes included): `reading-tools.js` moves the
 button above such a figure, so a failure means that mechanism broke. The explorer tests run the JavaScript under Node (CI installs it; locally the tests
 skip without it).

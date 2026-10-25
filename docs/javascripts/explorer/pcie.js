@@ -128,14 +128,15 @@
         const a = ax.x(start), b = ax.x(start + size);
         let g = `<rect class="${cls}" x="${f(a)}" y="${y}" width="${f(b - a)}" height="${h}" rx="3"><title>${title}</title></rect>`;
         if (b - a >= 22) g += `<text class="cs-size" x="${f((a + b) / 2)}" y="${f(y + h / 2 + 4.5)}" text-anchor="middle">${size}</text>`;
-        else if (b - a >= 14) g += `<text class="cs-size" x="${f((a + b) / 2)}" y="${f(y + h / 2 + 3.5)}" text-anchor="middle" style="font-size:9px">${size}</text>`;
-        // narrower bars keep only their tooltip: a label above would collide with the row before
+        else if (b - a >= 14) g += `<text class="cs-size" x="${f((a + b) / 2)}" y="${f(y + h / 2 + 3.5)}" text-anchor="middle" style="font-size:9px" data-fit-drop>${size}</text>`;
+        // narrower bars keep only their tooltip: a label above would collide with the row before;
+        // on a phone a 9 px label that the text fit cannot bring to a readable size drops too
         return g;
       };
       const blocksSvg = (addr, len, mps, rcb, cuts) => {
         const ax = axis(addr, len, rcb, 40, 600);
         const sizes = pcieBlocks(addr, len, rcb), N = sizes.length, m = mps / rcb;
-        const d = N === m + 1 && len <= mps ? 1 : 0, H = cuts ? 160 : 132;
+        const d = N === m + 1 && len <= mps ? 1 : 0, H = cuts ? 182 : 154;
         let g = `<svg class="figure cs-fig pcie-live" viewBox="0 0 640 ${H}" style="max-width:40rem" role="${cuts ? "group" : "img"}" aria-label="הבקשה על רשת ה-RCB, חתוכה ל-${N} בלוקים${cuts ? "; לחיצה על גבול חותכת שם או מבטלת" : ""}">${ax.grid(26, cuts ? 122 : 96)}`;
         let pos = addr;
         sizes.forEach((sz, i) => {
@@ -158,7 +159,9 @@
                  `<line class="cs-pick-line" x1="${f(ax.x(b))}" x2="${f(ax.x(b))}" y1="44" y2="116"/><circle class="cs-can" cx="${f(ax.x(b))}" cy="50" r="7"><title>${hex(b)}</title></circle></g>`;
           });
         } else pcieBoundaries(addr, len, rcb).forEach((b) => { g += `<circle class="cs-can" cx="${f(ax.x(b))}" cy="50" r="4"><title>boundary ${hex(b)}</title></circle>`; });
-        g += `<text class="legend" x="40" y="${H - 14}">N = ${N}, |B| = ${N - 1}, f = ${sizes[0]}, e = ${sizes[N - 1]}, m = MPS / RCB = ${m}, δ = ${d}${d ? " (N = m + 1 and L ≤ MPS)" : ""}</text>`;
+        // two lines: one line wider than the figure would be shrunk below 9 px on a phone
+        g += `<text class="legend" x="40" y="${H - 36}">N = ${N}, |B| = ${N - 1}, f = ${sizes[0]}, e = ${sizes[N - 1]}</text>` +
+             `<text class="legend" x="40" y="${H - 12}">m = MPS / RCB = ${m}, δ = ${d}${d ? " (N = m + 1 and L ≤ MPS)" : ""}</text>`;
         return g + "</svg>";
       };
       const mapSvg = (addr, len, mps, rcb, rows, total) => {
@@ -308,7 +311,7 @@
         st.n = Math.max(1, Math.min(st.n, st.N));
         const c = ladderC(st.N, st.m), terms = ladderTerms(st.n, st.m), lit = new Map(terms.map((t) => [t.rest, t.i]));
         $(".ld-N").value = st.N; $(".ld-out-N").textContent = String(st.N); $(".ld-m").value = String(st.m);
-        $(".ld-row").innerHTML = c.map((v, k) => `<button type="button" class="ld-cell${k === st.n ? " is-sel" : lit.has(k) ? " is-term" : ""}" data-n="${k}" aria-pressed="${k === st.n}" aria-label="C(${k}) = ${v}"${k === 0 ? " disabled" : ""}>` +
+        $(".ld-row").innerHTML = c.map((v, k) => `<button type="button" class="ld-cell${k === st.n ? " is-sel" : lit.has(k) ? " is-term" : ""}" data-n="${k}" aria-pressed="${k === st.n}"${k === 0 ? " disabled" : ""}>` +
           `<small>C(${k})</small><b>${v}</b><small class="ld-i">${lit.has(k) ? `i = ${lit.get(k)}` : ""}</small></button>`).join("");
         $(".ex-pos").textContent = `‏n = ${st.n}`;
         $(".ex-prev").disabled = st.n <= 1; $(".ex-next").disabled = st.n >= st.N;

@@ -72,7 +72,7 @@
           for (let q = 0; q <= p; q++) {
             const x = GX + q * CW, v = 999 * p + 90 * q, on = p === st.p && q === st.q;
             const cls = p === 6 && q === 2 ? "cell-s2" : q === 0 ? "cell-s1" : "";
-            s += `<g class="kpp-cell${on ? " is-pick" : ""}" data-p="${p}" data-q="${q}" tabindex="0" role="button" aria-pressed="${on}" aria-label="p = ${p}, q = ${q}, ${v}">` +
+            s += `<g class="kpp-cell${on ? " is-pick" : ""}" data-p="${p}" data-q="${q}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${String(v).padStart(4, "0")}, p = ${p}, q = ${q}">` +
                  `<rect class="box-node" x="${x}" y="${y}" width="${CW}" height="${CH}"/>` + (cls ? `<rect class="${cls}" x="${x}" y="${y}" width="${CW}" height="${CH}"/>` : "") +
                  `<text class="box-num" x="${x + CW / 2}" y="${y + CH / 2 + 5}" text-anchor="middle">${String(v).padStart(4, "0")}</text></g>`;
           }

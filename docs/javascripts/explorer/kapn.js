@@ -121,7 +121,7 @@
           const dig = (v) => v.map((q) => KB_DIGITS[q]).join(", ");
           rows += `<tr${n === st.n ? ' class="is-now"' : ""}><td>${ltr(n)}</td><td>${ltr(kapnGap(d0, n - 1, B))}</td><td>${ROW_NAME[r.row]}</td><td>${ltr(`(${dig([r.a, r.b, r.c])})`)}</td><td>${ltr(`(${dig(dir)})`)} ${ok ? "✓" : "✗"}</td></tr>`;
         });
-        $(".kn-table").innerHTML = `<div class="at-scroll"><table class="bridge-table kn-steps"><thead><tr><th>‏n</th><th>‏D<sub>n−1</sub></th><th>השורה בנוסחה</th><th>מהנוסחה</th><th>מהחישוב</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        $(".kn-table").innerHTML = `<div class="at-scroll" tabindex="0" role="region" aria-label="טבלת הצעדים"><table class="bridge-table kn-steps"><thead><tr><th>‏n</th><th>‏D<sub>n−1</sub></th><th>השורה בנוסחה</th><th>מהנוסחה</th><th>מהחישוב</th></tr></thead><tbody>${rows}</tbody></table></div>`;
         const r = kapnFormula(d0, st.n, B), val = (r.a * B + r.b) * B + r.c, g = kapnGap(d0, st.n - 1, B);
         $(".kn-sum").innerHTML = `אחרי ${ltr(st.n)} פעולות${NB}: ${ltr(`(${KB_DIGITS[r.a]}, ${KB_DIGITS[r.b]}, ${KB_DIGITS[r.c]})_${B} = ${val}`)}, כלומר ${ltr(`(B² − 1) · D = ${B * B - 1} · ${g}`)}. ` +
           (r.row === "fixed" ? `זה המספר הקבוע של הבסיס.` : r.row === "even" || r.row === "odd" ? `זה אחד משני המספרים של המחזור, והצעד הבא נותן את השני.` : `עוד לא הגענו לסוף החלק הליניארי.`);
@@ -250,11 +250,14 @@
         ch.nodes.forEach((x, i) => {
           const { x: px, y: py } = pos[i], d = gapOf(x), stage = labelOf(ch, d0, i), end = i >= ch.cycleStart;
           const shade = Math.round(8 + (52 * d) / Math.max(1, B - 1));
-          s += `<g class="kg-node${end ? " is-end" : ""}${st.sel === i ? " is-sel" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="צעד ${i}${NB}: ${txt(x)} בבסיס ${B}, ${x} בעשרוני, d = ${d}, ${STAGE_NAME[stage]}">` +
-            `<text class="kg-tag" x="${px + CW / 2}" y="${py - 6}" text-anchor="middle" direction="rtl">${i === 0 ? "" : `n = ${i} · `}${STAGE_NAME[stage]}</text>` +
+          // the name starts with the card's visible text (tag, number, base, line under it); the
+          // trailing spaces keep its parts apart in the text a screen reader or a checker reads
+          const tag = `${i === 0 ? "" : `n = ${i} · `}${STAGE_NAME[stage]}`, sub = `${B === 10 ? "" : `= ${x} · `}d = ${d}`;
+          s += `<g class="kg-node${end ? " is-end" : ""}${st.sel === i ? " is-sel" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="${tag} ${txt(x)}${B === 10 ? "" : B} ${sub}, צעד ${i}, ${txt(x)} בבסיס ${B}">` +
+            `<text class="kg-tag" x="${px + CW / 2}" y="${py - 6}" text-anchor="middle" direction="rtl">${tag} </text>` +
             `<rect class="kg-card" x="${px}" y="${py}" width="${CW}" height="${CH}" rx="9" style="--kg-t:${shade}%"/>` +
-            `<text class="kg-num" x="${px + CW / 2}" y="${py + 29}" text-anchor="middle">${txt(x)}${B === 10 ? "" : `<tspan class="kg-base" dy="5">${B}</tspan>`}</text>` +
-            `<text class="kg-sub" x="${px + CW / 2}" y="${py + 52}" text-anchor="middle">${B === 10 ? "" : `= ${x} · `}d = ${d}</text></g>`;
+            `<text class="kg-num" x="${px + CW / 2}" y="${py + 29}" text-anchor="middle">${txt(x)}${B === 10 ? "" : `<tspan class="kg-base" dy="5">${B}</tspan>`} </text>` +
+            `<text class="kg-sub" x="${px + CW / 2}" y="${py + 52}" text-anchor="middle">${sub}</text></g>`;
         });
         return s + "</svg>";
       };
@@ -279,7 +282,7 @@
           const cls = [st.sel === i ? "is-now" : "", i === n ? "kg-repeat" : ""].filter(Boolean).join(" ");
           rows += `<tr data-i="${i}"${cls ? ` class="${cls}"` : ""}><td>${ltr(i)}</td><td>${ltr(txt(x))}</td><td>${ltr(KG_DIGITS[dg[0]])}</td><td>${ltr(KG_DIGITS[dg[1]])}</td><td>${ltr(KG_DIGITS[dg[2]])}</td><td>${ltr(d)}</td><td>${i === n ? "חוזר" : STAGE_NAME[stage]}</td><td>${check}</td></tr>`;
         });
-        $(".kg-table").innerHTML = `<div class="at-scroll"><table class="bridge-table kg-steps"><thead><tr><th>‏n</th><th>המספר</th><th>‏a<sub>n</sub></th><th>‏b<sub>n</sub></th><th>‏c<sub>n</sub></th><th>‏d<sub>n</sub></th><th>השלב</th><th>הנוסחה</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        $(".kg-table").innerHTML = `<div class="at-scroll" tabindex="0" role="region" aria-label="טבלת הספרות בכל צעד"><table class="bridge-table kg-steps"><thead><tr><th>‏n</th><th>המספר</th><th>‏a<sub>n</sub></th><th>‏b<sub>n</sub></th><th>‏c<sub>n</sub></th><th>‏d<sub>n</sub></th><th>השלב</th><th>הנוסחה</th></tr></thead><tbody>${rows}</tbody></table></div>`;
         answer(box, d0 === 0 ? `${ltr(txt(st.x))} → ${ltr("000")}, ונשאר שם.` : ch.cycleLen === 1
           ? `נקודת השבת ${ltr(cyc[0])}, אחרי ${ltr(k)} ${k === 1 ? "צעד" : "צעדים"}.`
           : `המחזור ${ltr(`${cyc[0]} ↔ ${cyc[1]}`)}, מהצעד ה-${ltr(k)}.`, ".kg-graph .kg-node.is-end .kg-card");

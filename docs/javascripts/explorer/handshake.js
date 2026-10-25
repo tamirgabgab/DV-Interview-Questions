@@ -215,7 +215,7 @@
           });
         });
         $(".at-step").innerHTML = `מחזור ${ltr(t)}${NB}: ${ltr(`req = ${st.req[t]}, ack = ${st.ack[t]}`)}. ` + (said.length ? said.join(" ") : `אף אנטצדנט לא התאים כאן, וכל ארבעת הניסיונות שהתחילו במחזור הזה עברו באופן ריק (vacuous).`);
-        $(".at-table").innerHTML = `<div class="at-scroll"><table class="bridge-table at-counts"><thead><tr><th>החוק</th><th>האנטצדנט התאים</th><th>עבר</th><th>נכשל</th><th>פתוח</th><th>‏vacuous</th></tr></thead><tbody>` +
+        $(".at-table").innerHTML = `<div class="at-scroll" tabindex="0" role="region" aria-label="הספירה לכל חוק"><table class="bridge-table at-counts"><thead><tr><th>החוק</th><th>האנטצדנט התאים</th><th>עבר</th><th>נכשל</th><th>פתוח</th><th>‏vacuous</th></tr></thead><tbody>` +
           PROPS.map(([key, name, expr, rule]) => { const c = (s) => att[key].filter((a) => a.status === s).length; return `<tr><td title="${name}">${rule}</td><td>${ltr(N - c("vacuous"))}</td><td>${ltr(c("pass"))}</td><td>${c("fail") ? `<span class="wv-bad">${ltr(c("fail"))}</span>` : ltr(0)}</td><td>${ltr(c("open"))}</td><td>${ltr(c("vacuous"))}</td></tr>`; }).join("") +
           `</tbody></table></div><p class="ex-note">רוב הניסיונות עוברים באופן ריק${NB}: assertion שרק עוברת vacuous לא בדקה כלום, ולכן כדאי לבדוק גם שהאנטצדנט התאים (cover).</p>`;
       };

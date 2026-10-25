@@ -302,11 +302,12 @@
 
   // A figure drawn for a 640-unit viewBox shrinks with the column, and on a phone its labels
   // fall to 5-7 px. Every SVG text that would render under MIN_PX gets a font size (in the
-  // figure's units) that renders at FIT_PX, at most MAX_GROW times its own; a row of tick
+  // figure's units) that renders at FIT_PX, at most MAX_GROW times its own (a label marked
+  // data-fit-drop that still renders under MIN_PX is hidden, its tooltip stays); a row of tick
   // labels (class tick or coord) that then overlaps is thinned, every k-th label kept (the first and the last
   // always), the smallest k with no overlap. Redone when a figure comes into view, on
   // resize, and when an explorer box redraws; the lightbox copy gets the original sizes.
-  const MIN_PX = 9, FIT_PX = 9.5, MAX_GROW = 1.8;
+  const MIN_PX = 9, FIT_PX = 9.5, MAX_GROW = 2;
   const FIT_SVGS = ".md-content svg:not(mjx-container svg):not(.mermaid svg)";
 
   const unfit = (root) => {
@@ -363,7 +364,9 @@
       const size = parseFloat(getComputedStyle(t).fontSize);
       if (size * scale >= MIN_PX) continue;
       t.dataset.fitBase = t.style.fontSize;
-      t.style.fontSize = `${Math.min(FIT_PX / scale, size * MAX_GROW).toFixed(2)}px`;
+      const grown = Math.min(FIT_PX / scale, size * MAX_GROW);
+      t.style.fontSize = `${grown.toFixed(2)}px`;
+      if (t.hasAttribute("data-fit-drop") && grown * scale < MIN_PX) t.classList.add("fit-hidden");
     }
     const rows = new Map();
     for (const t of svg.querySelectorAll("text.tick, text.coord")) {

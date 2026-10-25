@@ -134,7 +134,7 @@
         `<circle class="axis-c" cx="${C}" cy="${C}" r="${R}" fill="none"/>` +
         `<g class="tri-arcs"></g><polygon class="tri-shape"/>` +
         `<circle class="center-dot" cx="${C}" cy="${C}" r="4"/><text class="tick" x="${C + 7}" y="${C + 15}">O</text>` +
-        NAMES.map((n, i) => `<circle class="tri-pt" data-i="${i}" r="9" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="359"><title>${n}</title></circle>` +
+        NAMES.map((n, i) => `<circle class="tri-pt" data-i="${i}" r="9" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="359" aria-label="${n}"><title>${n}</title></circle>` +
           `<text class="legend tri-name" data-i="${i}" text-anchor="middle">${n}</text>`).join("") +
         `</svg><div class="tri-panel">` +
         `<p class="tri-angles">` + NAMES.map((n, i) =>

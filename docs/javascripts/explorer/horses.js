@@ -139,7 +139,7 @@
         const ch = st.pick === null ? null : horsesChain(st.plan.log, st.step, st.pick), lit = new Set(ch ? ch.chains.map((c) => c.y) : []);
         const at = {};                                   // the centre of every horse's cell
         s.rows.forEach((row, j) => row.horses.forEach((x, i) => { at[x] = [X0 + i * CW + CW / 2, Y0 + j * CH + CH / 2]; }));
-        let h = `<svg class="figure hr-grid hr-live" viewBox="0 0 ${W} ${H}" style="max-width : ${(W / 16).toFixed(0)}rem" role="img" aria-label="הסוסים אחרי ${st.step} תחרויות : שורה לכל קבוצה, הצבע אומר נפסל, מועמד או נקבע">`;
+        let h = `<svg class="figure hr-grid hr-live" viewBox="0 0 ${W} ${H}" style="max-width : ${(W / 16).toFixed(0)}rem" role="group" aria-label="הסוסים אחרי ${st.step} תחרויות : שורה לכל קבוצה, הצבע אומר נפסל, מועמד או נקבע">`;
         for (let i = 0; i < st.b; i++) h += `<text class="tick" x="${X0 + i * CW + CW / 2}" y="${Y0 - 10}" text-anchor="middle">${i + 1}</text>`;
         s.rows.forEach((row, j) => {
           h += `<text class="tick" x="${X0 - 8}" y="${Y0 + j * CH + CH / 2 + 4}" text-anchor="end">${L[row.k]}${s.winners ? ` (${j + 1})` : ""}</text>`;

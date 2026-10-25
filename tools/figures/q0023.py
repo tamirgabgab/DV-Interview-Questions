@@ -252,7 +252,7 @@ def chunks(address, length):
 def chunks_svg():
     start, length = REQ_B
     end = start + length
-    p = ['<svg class="figure cs-fig" viewBox="0 0 640 150" style="max-width:40rem" role="img" '
+    p = ['<svg class="figure cs-fig" viewBox="0 0 640 176" style="max-width:40rem" role="img" '
          'aria-label="בקשה של 256 בתים מכתובת 0x10020 נוגעת בשלושה בלוקים : 96 בתים אחרונים של 0x10000, '
          'כל 0x10080, ו-32 הבתים הראשונים של 0x10100; שני גבולות RCB בתוך הבקשה">']
     grid(p, 26, 124)
@@ -268,8 +268,11 @@ def chunks_svg():
     p.append(f'<line class="ink-line" x1="{x(start):.1f}" y1="106" x2="{x(end):.1f}" y2="106" stroke-width="1.6"/>')
     for b in (0x10080, 0x10100):
         p.append(f'<circle class="cs-can" cx="{x(b):.1f}" cy="106" r="4.5"><title>0x{b:X}: a legal cut</title></circle>')
-    p.append(f'<text class="legend halo" x="{x(start + length / 2):.1f}" y="142" text-anchor="middle">'
-             f'request: {length} B from 0x{start:X} (0x{start:X} … 0x{end - 1:X}), cuts allowed at 0x10080 and 0x10100</text>')
+    # two lines: one line wider than the figure would be shrunk below 9 px on a phone
+    p.append(f'<text class="legend halo" x="{x(start + length / 2):.1f}" y="140" text-anchor="middle">'
+             f'request: {length} B from 0x{start:X} (0x{start:X} … 0x{end - 1:X})</text>')
+    p.append(f'<text class="legend halo" x="{x(start + length / 2):.1f}" y="164" text-anchor="middle">'
+             f'cuts allowed at 0x10080 and 0x10100</text>')
     p.append("</svg>")
     return "".join(p)
 

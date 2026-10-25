@@ -48,7 +48,7 @@
         `<div class="tri-box"><svg class="figure tri-live hc-live" viewBox="0 0 320 320" role="group" aria-label="שלוש נקודות על המעגל וחצאי המעגל שמתחילים בהן">` +
         `<g class="hc-halves"></g><circle class="axis-c" cx="${C}" cy="${C}" r="${R}" fill="none"/><polygon class="tri-shape"/>` +
         `<circle class="center-dot" cx="${C}" cy="${C}" r="4"/><text class="tick" x="${C + 7}" y="${C + 15}">O</text>` +
-        NAMES.map((n, i) => `<circle class="tri-pt hc-pt-${CLS[i]}" data-i="${i}" r="9" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="359"><title>${n}</title></circle>` +
+        NAMES.map((n, i) => `<circle class="tri-pt hc-pt-${CLS[i]}" data-i="${i}" r="9" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="359" aria-label="${n}"><title>${n}</title></circle>` +
           `<text class="legend tri-name" data-i="${i}" text-anchor="middle">${n}</text>`).join("") +
         `</svg><div class="tri-panel">` +
         `<p class="tri-angles">` + NAMES.map((n, i) =>

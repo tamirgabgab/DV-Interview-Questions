@@ -27,7 +27,8 @@ as on the live site).
 --axe PATH runs axe-core (its axe.min.js, e.g. from npm) on every page and warns about
 serious and critical violations without failing: the count per page is printed with the
 rule id and the first element, so the next accessibility regression is visible in the CI
-log. --axe-fail turns those warnings into failures.
+log. --axe-fail turns those warnings into failures, and --small-fail does the same for SVG
+text under MIN_TEXT px (CI runs with both).
 """
 
 from __future__ import annotations
@@ -168,6 +169,7 @@ def main(argv: list[str]) -> int:
                     help="colour scheme of the browser (the site follows it)")
     ap.add_argument("--axe", metavar="AXE_MIN_JS", help="run axe-core from this file and warn about violations")
     ap.add_argument("--axe-fail", action="store_true", help="count axe violations as failures")
+    ap.add_argument("--small-fail", action="store_true", help=f"count SVG text under {MIN_TEXT} px as a failure")
     args = ap.parse_args(argv)
 
     from playwright.sync_api import sync_playwright
@@ -216,7 +218,7 @@ def main(argv: list[str]) -> int:
             page.screenshot(path=str(shots / f"{name}.png"), full_page=True)
             page.close()
 
-            bad = info["scrollWidth"] > WIDTH + 1 or errors or covered or (args.axe_fail and axe)
+            bad = info["scrollWidth"] > WIDTH + 1 or errors or covered or (args.axe_fail and axe) or (args.small_fail and small_text)
             failures += bool(bad)
             status = "FAIL" if bad else "ok"
             print(f"{status:4}  {rel[: -len('index.html')] or '/'}  width {info['scrollWidth']}")
@@ -230,7 +232,7 @@ def main(argv: list[str]) -> int:
             for w in wide_math:
                 print(f"        warn wide math {w}")
             for w in small_text:
-                print(f"        warn small text {w}")
+                print(f"        {'small text' if args.small_fail else 'warn small text'} {w}")
             for v in axe:
                 print(f"        {'axe' if args.axe_fail else 'warn axe'} {v['impact']} {v['id']} x{v['count']}: "
                       f"{v['help']} ({v['first']})")

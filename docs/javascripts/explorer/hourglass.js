@@ -370,7 +370,7 @@
         const rows = []; known.forEach((n, i) => { (rows[n.depth] = rows[n.depth] || []).push(i); });
         const w = 640, dy = 46, h = rows.length * dy + 14, pos = {};
         rows.forEach((ids, d) => ids.forEach((id, k) => { pos[id] = [((k + 1) * w) / (ids.length + 1), 22 + d * dy]; }));
-        let s = `<svg class="figure hg-tree" viewBox="0 0 ${w} ${h}" role="img" aria-label="עץ החיפוש עם ${known.length} מצבים">`;
+        let s = `<svg class="figure hg-tree" viewBox="0 0 ${w} ${h}" role="img" aria-label="עץ החיפוש עם ${known.length === 1 ? "מצב אחד" : `${known.length} מצבים`}">`;
         known.forEach((n, i) => {
           if (n.parent < 0) return;
           const [x1, y1] = pos[n.parent], [x2, y2] = pos[i], on = path.has(i);
