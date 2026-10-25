@@ -713,21 +713,46 @@ section below starts at session 22, whose numbered items run on through the late
     12b, 17 and 18 are marked done; the senior list of the owner decisions is corrected.
     `CLAUDE.md`: Israel is on winter time (UTC+2) until 26 March 2027, and it points at the
     archive. The archive joins the files whose push runs no CI (`paths-ignore`, CONTRIBUTING).
+51. **Fix round 3, the CI actions on Node 24 (session 26, 2026-10-25).** GitHub warned on
+    every run that the actions ran on the deprecated Node 20. All moved to their latest
+    major (the owner's pick, version tags rather than SHAs): `checkout@v7`,
+    `setup-python@v7`, `setup-node@v7`, `cache@v6`, `upload-artifact@v7`,
+    `upload-pages-artifact@v5`, `deploy-pages@v5`, in `deploy.yml` and `weekly.yml`. Their
+    breaking changes (fork checkouts under `pull_request_target`, npm `always-auth`,
+    `package.json` caching, Docker container actions) do not touch these workflows. The
+    branch run was green with the Verilator cache found (no rebuild) and no Node 20
+    warning. Verilator: the newest release tag is still v5.052, and the pinned commit is
+    newer, so `VERILATOR_REF` stays.
+52. **Fix round 5, a prepared cloud sandbox (session 26, 2026-10-25).** The owner's picks:
+    a hook in the repository, Verilator only on request, a `--local-cdn` flag.
+    `tools/dev_setup.sh` (idempotent, reports what is missing) installs the Python
+    packages and `cairosvg`, fetches MathJax 3.2.2, Mermaid 11, WaveDrom 3.5.0 and axe-core
+    4.14.0 into `.cache/cdn` with `npm pack`, and checks Chromium; `--verilator` builds the
+    pinned commit into `~/verilator` or finds it there (by the short hash in
+    `--version`). `.claude/hooks/session-start.sh`, registered in `.claude/settings.json`,
+    runs it in cloud sessions only (synchronous; about 10 s on a fresh container, 1 s when
+    everything is in place), sets `DVQ_SOCIAL_CARDS=false` when fonts.google.com is blocked
+    (the social plugin's font; the build fails otherwise) and puts `~/verilator/bin` first
+    on `PATH` when it exists. `check_phone.py` and `check_explorers.py` take `--local-cdn`
+    (implies `--offline`, routes the four scripts; the phone check also runs axe-core from
+    there). Found on the way: this container already had the pinned Verilator in
+    `~/verilator` (built 2026-10-19), and every SV testbench passes with it; WaveDrom was
+    not routed in earlier local checks, so its diagrams were missing there. Checks: the
+    hook run as a cloud session would, the strict build, `--local-cdn` phone and explorer
+    checks on 0005, 0034 and 0044, `run_tests.py --sv-only` (all PASS).
 
 
 ## In progress
 
-- **State (2026-10-25, session 26):** `main` is edb83f1, deployed. 46 questions (0022 was
+- **State (2026-10-26, session 26):** `main` is aab8b64 (fix round 3); round 5 is on the branch. 46 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
-  and 2, axe and small text (item 49); fix round 4, this cleanup (item 50).
-- **Fix rounds proposed in session 26, still open:** round 3 (the CI actions that still
-  run on Node 20 moved to their Node 24 versions; a Verilator release newer than 5.052 in
-  place of the pinned commit), round 5 (a SessionStart hook for the cloud sandbox:
-  cairosvg, local MathJax, Mermaid and axe-core, optionally the pinned Verilator), round 6
-  (a jump check of the box texts, a visual diff of the phone screenshots).
+  and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
+  the cloud sandbox (item 52).
+- **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52); round 6 is still
+  open (a jump check of the box texts, a visual diff of the phone screenshots).
 - **Owner's checks on the live site (github.io is not reachable from the sandbox):** the
   WaveDrom diagrams of 0034, 0035 and 0038; dragging in the boxes on a real phone; the
   timing strips of 0001 and 0035 scrolled sideways; 0025 part b step 11 and its code
@@ -754,7 +779,7 @@ section below starts at session 22, whose numbered items run on through the late
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
-- [ ] Pick the next rounds from **Proposals and rounds**: the open rows of the first series (E, F, I, L, N, O, the rest of Q, S), the rest of the second series A to E, the deferred G222, H223, H224, the new questions of M to R and Z, and the fix rounds 3, 5 and 6 of session 26 (see **In progress**). Done: U to X (in the archive), I to L, the third series UI1 to UI5.
+- [ ] Pick the next rounds from **Proposals and rounds**: the open rows of the first series (E, F, I, L, N, O, the rest of Q, S), the rest of the second series A to E, the deferred G222, H223, H224, the new questions of M to R and Z, and fix round 6 of session 26 (see **In progress**). Done: U to X (in the archive), I to L, the third series UI1 to UI5.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
@@ -1599,9 +1624,9 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
   the file name must start with the zero-padded id.
 - External scripts (MathJax, WaveDrom) load from `cdn.jsdelivr.net`; Mermaid is loaded by
   Material itself from `unpkg.com`. The cloud sandbox cannot reach these CDNs, so local
-  screenshot checks serve them from `npm pack` copies via Playwright request routing. The
-  phone check in the sandbox:
-  `python tools/check_phone.py site --offline --route 'mathjax@3\.2\.2/es5/tex-mml-chtml\.js=<mathjax copy>/es5/tex-mml-chtml.js' --route 'unpkg\.com/mermaid@11/dist/mermaid\.min\.js=<mermaid copy>/dist/mermaid.min.js'`.
+  screenshot checks serve them from `npm pack` copies via Playwright request routing:
+  `tools/dev_setup.sh` (run by the SessionStart hook in cloud sessions) keeps them in
+  `.cache/cdn`, and `check_phone.py` / `check_explorers.py --local-cdn` route to them.
 - SystemVerilog static blocks: a variable declared **with an initialiser inside a loop of
   an `initial` block** is initialised once (IEEE 6.21, and Verilator follows it): `int g =
   f(b);` inside `for (int b ...)` keeps the value of the first iteration. Declare such

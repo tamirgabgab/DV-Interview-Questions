@@ -24,7 +24,8 @@ history. "Reset everything" must then forget the state.
 
 Needs Playwright, as tools/check_phone.py. In a sandbox without access to the CDNs,
 --offline ignores errors of external scripts and --route REGEX=FILE serves a CDN script
-from a local copy; --only REGEX checks only the matching pages. --shard K/N checks the K-th
+from a local copy; --local-cdn does both with the copies of .cache/cdn (tools/dev_setup.sh);
+--only REGEX checks only the matching pages. --shard K/N checks the K-th
 of N parts (CI runs the parts on parallel runners): the pages are dealt by their number of
 boxes, the largest first, to the part with the fewest boxes so far.
 """
@@ -38,7 +39,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check_phone import HEIGHT, OPEN_ALL, WIDTH, serve  # noqa: E402
+from check_phone import HEIGHT, OPEN_ALL, WIDTH, local_cdn_routes, serve  # noqa: E402
 
 BUTTONS = "button, [role=button]"
 
@@ -226,8 +227,13 @@ def main(argv: list[str]) -> int:
                     help="serve requests matching REGEX from a local file")
     ap.add_argument("--only", help="check only pages whose path matches this regex")
     ap.add_argument("--no-links", action="store_true", help="skip the link and remembered-state checks")
+    ap.add_argument("--local-cdn", action="store_true",
+                    help="--offline with the CDN copies of .cache/cdn (tools/dev_setup.sh)")
     ap.add_argument("--shard", metavar="K/N", help="check only the K-th of N parts of the pages (1 <= K <= N)")
     args = ap.parse_args(argv)
+    if args.local_cdn:
+        args.offline = True
+        args.route += local_cdn_routes()
 
     from playwright.sync_api import sync_playwright
 

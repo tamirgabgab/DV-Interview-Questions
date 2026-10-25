@@ -453,7 +453,7 @@ table and in the tag index — no other file needs to change.
 ## Tests
 
 ```bash
-pip install -r requirements.txt -r requirements-dev.txt
+pip install -r requirements.txt -r requirements-dev.txt   # or tools/dev_setup.sh (below)
 python tools/lint_pages.py            # page structure and RTL rules (also in CI)
 python tools/run_tests.py             # everything (under a minute once compiled)
 python tools/run_tests.py 6 7         # only questions 0006 and 0007
@@ -502,8 +502,20 @@ test job of CI, so a colour that reads badly stops the deploy. A new pair goes i
 `check_phone.py` needs Playwright (`requirements-dev.txt`) and its Chromium
 (`python -m playwright install chromium`). It writes a screenshot of each page to
 `.cache/phone/` (CI uploads them as the `phone-screenshots` artifact). Without access to the
-CDNs, add `--offline` and serve MathJax and Mermaid from local copies with `--route`, as in
-`HANDOFF.md`. `tests/hook/` tests the hook itself (search variants, study paths), and
+CDNs, add `--local-cdn`: it implies `--offline` and serves MathJax, Mermaid and WaveDrom
+from the copies `tools/dev_setup.sh` keeps in `.cache/cdn` (and, in the phone check, runs
+axe-core from there); `--route REGEX=FILE` serves any other script from a local file.
+
+**Cloud sessions** (Claude Code on the web) prepare themselves: the SessionStart hook
+`.claude/hooks/session-start.sh` (registered in `.claude/settings.json`, a no-op outside
+the cloud) runs `tools/dev_setup.sh`, which installs the Python packages (with `cairosvg`
+for the social cards), fetches the CDN copies (MathJax 3.2.2, Mermaid 11, WaveDrom 3.5.0,
+axe-core 4.14.0) with `npm pack`, and checks Playwright's Chromium; every step skips what
+is in place. The hook sets `DVQ_SOCIAL_CARDS=false` when fonts.google.com is blocked (the
+social plugin fetches its font there) and puts `~/verilator/bin` first on `PATH` when a
+build is there. `tools/dev_setup.sh --verilator` builds the commit CI pins
+(`VERILATOR_REF`) into `~/verilator` in 10 to 15 minutes, or reports a build of that
+commit already present. `tests/hook/` tests the hook itself (search variants, study paths), and
 `tests/tools/` the authoring tools.
 
 The SystemVerilog tests need **Verilator newer than 5.052, with the z3 solver**, so that

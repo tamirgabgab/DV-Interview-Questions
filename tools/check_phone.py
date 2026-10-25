@@ -22,7 +22,8 @@ explorer boxes included, one line per covered figure.
 
 In a sandbox without access to the CDNs, --offline ignores errors of external scripts and
 --route REGEX=FILE serves a CDN script from a local copy (e.g. MathJax, so math is laid out
-as on the live site).
+as on the live site). --local-cdn does both for the copies tools/dev_setup.sh keeps in
+.cache/cdn (MathJax, Mermaid, WaveDrom) and runs axe-core from there unless --axe is given.
 
 --axe PATH runs axe-core (its axe.min.js, e.g. from npm) on every page and warns about
 serious and critical violations without failing: the count per page is printed with the
@@ -144,6 +145,27 @@ OPEN_ALL = """async () => {
 }"""
 
 
+# The CDN scripts the pages load and their copies in .cache/cdn (tools/dev_setup.sh), as
+# --route specs for --local-cdn.
+CDN_DIR = Path(__file__).resolve().parent.parent / ".cache" / "cdn"
+LOCAL_CDN = [
+    (r"mathjax@3\.2\.2/es5/tex-mml-chtml\.js", "mathjax/es5/tex-mml-chtml.js"),
+    (r"unpkg\.com/mermaid@11/dist/mermaid\.min\.js", "mermaid/dist/mermaid.min.js"),
+    (r"wavedrom@3\.5\.0/skins/default\.js", "wavedrom/skins/default.js"),
+    (r"wavedrom@3\.5\.0/wavedrom\.min\.js", "wavedrom/wavedrom.min.js"),
+]
+
+
+def local_cdn_routes() -> list[str]:
+    """The --route specs of the local CDN copies; exits when a copy is missing."""
+    specs = []
+    for pattern, rel in LOCAL_CDN:
+        if not (CDN_DIR / rel).is_file():
+            sys.exit(f"--local-cdn: {CDN_DIR / rel} is missing; run tools/dev_setup.sh")
+        specs.append(f"{pattern}={CDN_DIR / rel}")
+    return specs
+
+
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *args):
         pass
@@ -170,7 +192,14 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--axe", metavar="AXE_MIN_JS", help="run axe-core from this file and warn about violations")
     ap.add_argument("--axe-fail", action="store_true", help="count axe violations as failures")
     ap.add_argument("--small-fail", action="store_true", help=f"count SVG text under {MIN_TEXT} px as a failure")
+    ap.add_argument("--local-cdn", action="store_true",
+                    help="--offline with the CDN copies of .cache/cdn (tools/dev_setup.sh), axe-core included")
     args = ap.parse_args(argv)
+    if args.local_cdn:
+        args.offline = True
+        args.route += local_cdn_routes()
+        if not args.axe and (CDN_DIR / "axe-core" / "axe.min.js").is_file():
+            args.axe = str(CDN_DIR / "axe-core" / "axe.min.js")
 
     from playwright.sync_api import sync_playwright
 
