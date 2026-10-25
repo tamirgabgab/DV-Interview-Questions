@@ -1520,6 +1520,10 @@ body.practice-mode .md-typeset .question-tools {
 }
 .md-typeset .explorer .ex-reset { padding: 0.2rem 0.7rem; font-size: 0.65rem; }
 .md-typeset .explorer .ex-summary { font-weight: 600; }
+/* Steady heights: the text under the controls changes at every step, and a line more moved
+   the figure under it. These lines reserve two lines from the start; core.js then keeps
+   every text paragraph of a box at the tallest height it has shown (see steady()). */
+.md-typeset .explorer :is(.ex-summary, .hg-caption, .bridge-caption) { min-height: 3.2em; min-height: 2lh; }
 .md-typeset .explorer .ex-title { margin: 0.6em 0 0; font-size: 0.7rem; color: var(--viz-text); }
 /* the proof panel inside a box: the step of the page's proof, driven by the same controls */
 .md-typeset .explorer .ex-proof { margin-top: 0.9rem; padding-top: 0.5rem; border-top: 1px dashed var(--viz-grid); }
@@ -1714,22 +1718,30 @@ body.practice-mode .md-typeset .question-tools {
 
 /* Reading aids (reading-tools.js): enlarge button and lightbox, tap tooltip, part bar */
 .md-typeset .fig-wrap { position: relative; }
+/* The enlarge button sits in the top inline-start corner of the figure, small and faint
+   until the pointer is over the figure. A figure with text in that corner gets
+   .fig-wrap--above from reading-tools.js: the button moves to a strip above the drawing. */
 .md-typeset .fig-enlarge {
   position: absolute;
-  inset-block-start: 0.2rem;
-  inset-inline-start: 0.2rem;
-  width: 1.6rem;
-  height: 1.6rem;
+  inset-block-start: 0.15rem;
+  inset-inline-start: 0.15rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  padding: 0;
   border: 1px solid var(--viz-grid);
-  border-radius: 0.3rem;
+  border-radius: 0.25rem;
   background: var(--md-default-bg-color);
   color: var(--viz-text);
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   line-height: 1;
   cursor: zoom-in;
-  opacity: 0.75;
+  opacity: 0.45;
+  transition: opacity 0.15s;
 }
-.md-typeset .fig-enlarge:hover, .md-typeset .fig-enlarge:focus-visible { opacity: 1; color: var(--md-accent-fg-color); }
+.md-typeset .fig-wrap:hover .fig-enlarge, .md-typeset .fig-enlarge:focus-visible { opacity: 1; color: var(--md-accent-fg-color); }
+@media (hover: none) { .md-typeset .fig-enlarge { opacity: 0.6; } }
+.md-typeset .fig-wrap--above { padding-top: 1.4rem; }
+.md-typeset .fig-wrap--above > .fig-enlarge { inset-block-start: 0; }
 .fig-lightbox {
   position: fixed;
   inset: 0;

@@ -107,7 +107,7 @@ CHANGE = """(b) => {
 }"""
 
 # Box b as compared across pages: its control values and its drawing without the header,
-# the notices, the key hint and what is hidden. The seed counts unless the box links with
+# the notices, the key hint, what is hidden and the reserved text heights. The seed counts unless the box links with
 # its own codec (`#state-`), whose data stands for the draw.
 SNAP = """([b, own]) => {
   const box = document.querySelectorAll(".explorer")[b];
@@ -117,6 +117,11 @@ SNAP = """([b, own]) => {
   if (seed && !own) values.push(`seed ${seed.value}`);
   const copy = box.cloneNode(true);
   copy.querySelectorAll(".ex-bar, .ex-restored, .ex-keys, [hidden]").forEach((el) => el.remove());
+  // the steady heights (core.js) and the enlarge button moved above a figure (reading-tools.js)
+  // depend on the steps the box went through, not on its state
+  copy.querySelectorAll("[style]").forEach((el) => { el.style.minHeight = ""; if (!el.getAttribute("style")) el.removeAttribute("style"); });
+  copy.querySelectorAll("[data-fig-above]").forEach((el) => el.removeAttribute("data-fig-above"));
+  copy.querySelectorAll(".fig-wrap--above").forEach((el) => el.classList.remove("fig-wrap--above"));
   return { values, html: copy.innerHTML, restored: !!box.querySelector(".ex-restored") };
 }"""
 

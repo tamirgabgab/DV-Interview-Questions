@@ -2315,6 +2315,35 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     Ubuntu 26.04 now, where Playwright 1.56 cannot install Chromium; `main` already pins
     `ubuntu-24.04`.
 ---
+47. **Steady text heights and a smaller enlarge button (session 25, 2026-10-25).** The
+    owner saw two things on the live site. (a) In the explorer boxes the text under the
+    controls changes at every step (the summary of 0026, the frame caption of 0018), a line
+    more or less moved the figure under it, and while playing the figure jumped up and down.
+    Options offered: a fixed floor plus "grow only", a measured line count per box, or a
+    measurement of every possible text at mount; the owner chose the first, for every text
+    paragraph of every box. `core.js` `steady(box)`: a MutationObserver on the box queues
+    one measurement per frame; every `p`, `.ex-note` and `[aria-live]` element outside the
+    controls keeps the tallest height it has shown as an inline `min-height` (border-box
+    aware); the heights are released on a `change` of a control outside the play row and
+    the scrubber, on "back to the question's values", and 150 ms after a resize. The CSS
+    gives `.ex-summary`, `.hg-caption` and `.bridge-caption` two lines from the start
+    (`2lh`, with a `3.2em` fallback). Measured at 1200 and 390 px: the hourglass frame and
+    the motorcycle chart keep the same top through every event and scrub position (one
+    8 px move at the first event comes from above the box, not from it). (b) The enlarge
+    button (1.6rem, opacity 0.75) hid the "5" of a flipped hourglass. Now 1.2rem, opacity
+    0.45 (0.6 on touch screens), full on hover or focus; and `reading-tools.js` decides per
+    figure, once the wrap is laid out (ResizeObserver), after the phone text fit and on
+    resize, whether the button's rectangle meets any SVG `<text>`: then the wrap gets
+    `fig-wrap--above` (a 1.4rem strip above the drawing) and the decision is kept on the
+    figure's container, so a live figure that a box redraws every frame does not flip
+    between the layouts. (c) `check_phone.py` fails when a button still covers text
+    (`ENLARGE_COVERS`, via `window.dvqFigCovers`); it caught the first version, where the
+    decision was taken before the phone fit enlarged the stepper text of 0025.
+    `check_explorers.py` strips the inline `min-height`, `data-fig-above` and
+    `fig-wrap--above` from the compared drawings, since they depend on the steps a box went
+    through, not on its state. The jitter check the owner was offered (step every box and
+    report a paragraph that outgrew its reservation) was not chosen.
+
 
 ## In progress
 
@@ -2382,6 +2411,11 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   each), then 1 minute on `main` (the gate found the verified commit). The
   other three coding proposals (meeting rooms, topological sort, single number II) are
   open for the owner to pick.
+- Session 25 (later): steady text heights in the boxes and the smaller, self-placing
+  enlarge button (item 47) are on the work branch `claude/ecstatic-cerf-wqi89q`, with
+  the new overlap failure of the phone check. The owner should look at the live boxes of
+  0018 and 0026 while playing (nothing under the text should move) and at the button on
+  the hourglass frames once the branch is on `main`.
 - Session 25: the eight review findings of 0025 and the `hl_lines` lint (item 46) are
   on `main` (0428b2a, 2026-10-25; the branch CI was green, the `main` run re-ran every
   check since the HANDOFF commit on top had no branch run, 12.5 minutes, then deployed).

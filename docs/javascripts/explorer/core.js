@@ -950,6 +950,52 @@
     seen.observe(box);
   };
 
+  // Steady heights: the text of a box changes at every step, and a line more or less moved
+  // everything under it (the figure jumped up and down while playing). Every text paragraph
+  // of the box (the summary, the captions, the step lines, the proof text) keeps the
+  // tallest height it has shown: the height only grows, until a control changes a value,
+  // "back to the question's values" is clicked, or the window changes width; then the
+  // heights are released and measured again. A rebuilt box keeps its listeners, and a
+  // paragraph that is hidden or empty (display: none) reserves nothing.
+  const STEADY = "p, .ex-note, [aria-live]";
+  const steady = (box) => {
+    let queued = false;
+    const fit = () => {
+      queued = false;
+      box.querySelectorAll(STEADY).forEach((el) => {
+        if (el.hidden || el.closest(".ex-controls, .ex-bar, .fig-lightbox")) return;
+        let h = el.getBoundingClientRect().height;
+        if (!h) return;
+        const cs = getComputedStyle(el);
+        if (cs.boxSizing !== "border-box") {
+          h -= parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+        }
+        if (h > (el.dvqSteady || 0) + 0.5) { el.dvqSteady = h; el.style.minHeight = `${h}px`; }
+      });
+    };
+    const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(fit); } };
+    const release = () => {
+      box.querySelectorAll(STEADY).forEach((el) => {
+        if (!el.dvqSteady) return;
+        el.dvqSteady = 0;
+        el.style.minHeight = "";
+        if (!el.getAttribute("style")) el.removeAttribute("style");
+      });
+      schedule();
+    };
+    schedule();
+    if (box.dvqSteadyOn) return;
+    box.dvqSteadyOn = true;
+    new MutationObserver(schedule).observe(box, { childList: true, characterData: true, subtree: true });
+    box.addEventListener("change", (e) => {
+      const t = e.target;
+      if (t.matches("input, select, textarea") && t.closest(".ex-controls") && !t.closest(".ex-play-row, .ex-scrub")) release();
+    });
+    box.addEventListener("click", (e) => { if (e.target.closest(".ex-reset")) release(); });
+    let timer = 0;
+    window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(release, 150); }, { passive: true });
+  };
+
   const setup = (box, helpOpen = false) => {
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
@@ -963,6 +1009,7 @@
     header(box, helpOpen);
     keyboard(box);
     decorateLive(box);
+    steady(box);
     watch(box);
     motion(box);
     guide(box);

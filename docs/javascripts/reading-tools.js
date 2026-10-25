@@ -1,6 +1,7 @@
 // Reading aids on question pages:
 // - figure lightbox: every inline SVG figure or chart gets an "enlarge" button that opens it
-//   full screen, with pinch / wheel zoom, drag to pan, double tap to zoom and Esc to close;
+//   full screen, with pinch / wheel zoom, drag to pan, double tap to zoom and Esc to close
+//   (the button moves above a drawing that has text in its corner);
 // - tap tooltips: on a touch screen, tapping a mark that has an SVG <title> shows the title
 //   (there is no hover on phones);
 // - part bar: on a page with two or more parts ("### סעיף ..."), a sticky row of chips that
@@ -116,6 +117,58 @@
     if (lastFocus) lastFocus.focus();
   }
 
+  // The button covers the top inline-start corner of the drawing. When SVG text is drawn
+  // there (a value label, an axis end), the wrap gets fig-wrap--above and the button moves
+  // to a strip above the drawing. The decision is taken once the wrap is laid out (a figure
+  // in a closed tab has no size yet), again after the phone fit enlarged the figure's text
+  // (fitSvg below), and again when the window changes width. A live figure
+  // that a box redraws gets a new wrap each time; the decision is kept on its container
+  // (data-fig-above), so the figure does not jump between the two layouts while playing.
+  const ABOVE = "fig-wrap--above";
+  const covers = (wrap, which = false) => {
+    const btn = wrap.querySelector(":scope > .fig-enlarge"), svg = wrap.querySelector("svg");
+    if (!btn || !svg) return null;
+    const b = btn.getBoundingClientRect();
+    if (!b.width || !b.height) return null;                   // not laid out yet
+    const pad = 2;
+    for (const t of svg.querySelectorAll("text")) {
+      if (t.closest("defs") || !t.textContent.trim()) continue;
+      const r = t.getBoundingClientRect();
+      if (!r.width || !r.height) continue;
+      if (r.left < b.right + pad && r.right > b.left - pad && r.top < b.bottom + pad && r.bottom > b.top - pad) return which ? t.textContent.trim() : true;
+    }
+    return false;
+  };
+  // The container remembers the decision per figure (its index among the container's
+  // figures, since a container may hold several).
+  const slot = (wrap) => {
+    const host = wrap.parentElement;
+    if (!host) return null;
+    const i = [...host.children].filter((c) => c.classList.contains("fig-wrap")).indexOf(wrap);
+    return { host, key: ` ${i} `, list: () => ` ${host.dataset.figAbove || ""} ` };
+  };
+  const decide = (wrap) => {
+    const at = slot(wrap);
+    if (at && at.list().includes(at.key)) { wrap.classList.add(ABOVE); return true; }
+    wrap.classList.remove(ABOVE);
+    const hit = covers(wrap);
+    if (hit === null) return false;
+    if (hit) { wrap.classList.add(ABOVE); if (at) at.host.dataset.figAbove = (at.list() + at.key).trim().replace(/\s+/g, " "); }
+    return true;
+  };
+  const sized = typeof ResizeObserver === "function" ? new ResizeObserver((entries) => {
+    entries.forEach((e) => { if (decide(e.target)) sized.unobserve(e.target); });
+  }) : null;
+  window.dvqFigCovers = covers;                                // the phone check reads it
+  let refit = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(refit);
+    refit = setTimeout(() => {
+      document.querySelectorAll("[data-fig-above]").forEach((h) => delete h.dataset.figAbove);
+      document.querySelectorAll(".fig-wrap").forEach((w) => { if (!decide(w) && sized) sized.observe(w); });
+    }, 150);
+  }, { passive: true });
+
   const decorate = (root, selector = FIGURES) => {
     root.querySelectorAll(selector).forEach((svg) => {
       if (svg.closest(".fig-wrap") || svg.closest(".fig-lightbox")) return;
@@ -130,6 +183,7 @@
       btn.textContent = "⤢";
       btn.addEventListener("click", () => open(svg));
       wrap.append(svg, btn);
+      if (sized) sized.observe(wrap); else decide(wrap);     // decided once the wrap is laid out
     });
   };
   window.dvqDecorate = decorate;
@@ -320,6 +374,8 @@
     }
     rows.forEach((row) => { if (row.length > 2) thinRow(row); });
     svg.querySelectorAll("text[data-fit-base]:not(.fit-hidden)").forEach((t) => keepInside(svg, t));
+    const wrap = svg.parentElement;
+    if (wrap && wrap.classList.contains("fig-wrap")) decide(wrap);   // the enlarged text may reach the button
   };
 
   // A figure is fitted whenever its rendered size changes: when it is first laid out, when

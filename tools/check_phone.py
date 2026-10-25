@@ -15,6 +15,11 @@ equation scrolls sideways on its own, which is easy to miss on a phone; split it
 and explorer boxes that shrink to fit the phone): one line per figure with its smallest
 size. --scheme dark runs the same check in dark mode (CI runs it on manual request).
 
+It fails when the enlarge button of a figure covers SVG text: reading-tools.js moves the
+button above a drawing whose corner holds text (see `fig-wrap--above` in extra.css), and
+this check runs the same test on every figure of the open page, the live figures of the
+explorer boxes included, one line per covered figure.
+
 In a sandbox without access to the CDNs, --offline ignores errors of external scripts and
 --route REGEX=FILE serves a CDN script from a local copy (e.g. MathJax, so math is laid out
 as on the live site).
@@ -95,6 +100,21 @@ SMALL_TEXT = """(min) => {
     const box = svg.closest(".explorer");
     out.push(`${small.toFixed(1)} px ("${sample.slice(0, 20)}") in ${box ? "box " + box.dataset.kind + ": " : ""}`
              + name.trim().replace(/\\s+/g, " ").slice(0, 60));
+  }
+  return out;
+}"""
+
+# The enlarge button of a figure over its SVG text (reading-tools.js should have moved the
+# button above the drawing): one entry per covered figure, named like SMALL_TEXT names them.
+ENLARGE_COVERS = """() => {
+  const out = [];
+  if (!window.dvqFigCovers) return out;
+  for (const wrap of document.querySelectorAll(".md-content .fig-wrap")) {
+    if (wrap.closest(".fig-lightbox") || !window.dvqFigCovers(wrap)) continue;
+    const svg = wrap.querySelector("svg");
+    const name = svg.getAttribute("aria-label") || (svg.querySelector("text") || {}).textContent || "";
+    const box = svg.closest(".explorer");
+    out.push(`${box ? "box " + box.dataset.kind + ": " : ""}` + name.trim().replace(/\\s+/g, " ").slice(0, 60));
   }
   return out;
 }"""
@@ -185,6 +205,7 @@ def main(argv: list[str]) -> int:
             info = page.evaluate(INSPECT, WIDTH)
             wide_math = page.evaluate(WIDE_MATH)
             small_text = page.evaluate(SMALL_TEXT, MIN_TEXT)
+            covered = page.evaluate(ENLARGE_COVERS)
             axe = []
             if args.axe:
                 page.add_script_tag(path=args.axe)
@@ -195,7 +216,7 @@ def main(argv: list[str]) -> int:
             page.screenshot(path=str(shots / f"{name}.png"), full_page=True)
             page.close()
 
-            bad = info["scrollWidth"] > WIDTH + 1 or errors or (args.axe_fail and axe)
+            bad = info["scrollWidth"] > WIDTH + 1 or errors or covered or (args.axe_fail and axe)
             failures += bool(bad)
             status = "FAIL" if bad else "ok"
             print(f"{status:4}  {rel[: -len('index.html')] or '/'}  width {info['scrollWidth']}")
@@ -204,6 +225,8 @@ def main(argv: list[str]) -> int:
                     print(f"        too wide: {w}")
             for e in errors:
                 print(f"        script error: {e[:200]}")
+            for w in covered:
+                print(f"        enlarge button covers text: {w}")
             for w in wide_math:
                 print(f"        warn wide math {w}")
             for w in small_text:
