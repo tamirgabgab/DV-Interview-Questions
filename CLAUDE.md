@@ -80,7 +80,9 @@ math wider than its column (split it with `aligned`) and about figure text under
 in dark mode; CI runs it only on a manual run with `phone_dark`. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
-All seven run in CI on every push; a failure blocks the deploy. A new colour pair (a text
+All seven run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
+CATALOG, HANDOFF or this file runs nothing, and `main` skips the checks for a commit that
+already passed on its branch); a failure blocks the deploy. A new colour pair (a text
 or a mark on a fill) goes into the `PAIRS` list of `tools/check_contrast.py`. Verilator
 notes and simulator quirks are listed in `HANDOFF.md` under "Technical notes".
 

@@ -1,9 +1,13 @@
 name: Build and deploy site
 
+# A push or pull request that changes only these files (none of them is part of the site)
+# runs nothing.
 on:
   push:
     branches: ["**"]
+    paths-ignore: ["README.md", "CONTRIBUTING.md", "CATALOG.md", "HANDOFF.md", "CLAUDE.md"]
   pull_request:
+    paths-ignore: ["README.md", "CONTRIBUTING.md", "CATALOG.md", "HANDOFF.md", "CLAUDE.md"]
   workflow_dispatch:
     inputs:
       phone_dark:
@@ -13,6 +17,7 @@ on:
 
 permissions:
   contents: read
+  actions: read            # the gate looks up the runs of the same commit
   pages: write
   id-token: write
 
@@ -28,7 +33,30 @@ env:
 # The runner image is pinned: ubuntu-latest moved to 26.04 (October 2026), where
 # Playwright 1.56 cannot install Chromium, and the Verilator cache was built on 24.04.
 jobs:
+  # main is fast-forwarded to a commit that passed every check on its work branch, so a push
+  # to main whose commit already has a successful run on another branch only builds and
+  # deploys (the tests, the phone check and the explorer check are skipped).
+  gate:
+    runs-on: ubuntu-24.04
+    outputs:
+      verified: ${{ steps.check.outputs.verified }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          verified=false
+          if [ "${{ github.event_name }}" = push ] && [ "${{ github.ref }}" = refs/heads/main ]; then
+            n=$(gh api "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?head_sha=${{ github.sha }}&status=success&event=push" \
+                  --jq '[.workflow_runs[] | select(.head_branch != "main")] | length' || echo 0)
+            if [ "${n:-0}" -gt 0 ]; then verified=true; fi
+          fi
+          echo "verified=$verified" >> "$GITHUB_OUTPUT"
+          echo "this commit already passed on a work branch: $verified"
+
   test:
+    needs: gate
+    if: needs.gate.outputs.verified != 'true'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +113,8 @@ jobs:
         run: python tools/run_tests.py
 
   build:
-    needs: test
+    needs: [gate, test]
+    if: ${{ !cancelled() && needs.gate.result == 'success' && (needs.test.result == 'success' || needs.gate.outputs.verified == 'true') }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -109,24 +138,21 @@ jobs:
       # Every page at 390 px with all blocks open: no sideways scroll, no script errors.
       # axe-core runs on each page too and reports serious / critical violations as warnings.
       - name: Install Playwright, Chromium and axe-core for the phone check
+        if: needs.gate.outputs.verified != 'true'
         run: |
           pip install -r requirements-dev.txt
           python -m playwright install --with-deps chromium
           npm install --no-save --no-audit --no-fund axe-core@4.14.0
       - name: Check every page at phone width
+        if: needs.gate.outputs.verified != 'true'
         run: python tools/check_phone.py site --shots phone-shots --axe node_modules/axe-core/axe.min.js
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && needs.gate.outputs.verified != 'true'
         with:
           name: phone-screenshots
           path: phone-shots
           retention-days: 7
           if-no-files-found: ignore
-      # Every explorer box clicked through, each button once, then "reset everything":
-      # a script error or a page that turns wider than 390 px fails the deploy. Then each
-      # box's link and remembered state reopen the same controls.
-      - name: Click through every explorer box
-        run: python tools/check_explorers.py site
       # Dark mode on request only (Actions → Run workflow → phone_dark), it doubles the check time.
       - name: Check every page at phone width in dark mode
         if: github.event_name == 'workflow_dispatch' && inputs.phone_dark
@@ -143,9 +169,34 @@ jobs:
         with:
           path: site
 
+  # Every explorer box clicked through, each button once, then "reset everything": a script
+  # error or a page that turns wider than 390 px fails the deploy. Then each box's link and
+  # remembered state reopen the same controls. Four runners, each a quarter of the boxes.
+  explorers:
+    needs: [gate, test]
+    if: needs.gate.outputs.verified != 'true'
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: mkdocs build --strict
+        env:
+          DVQ_SOCIAL_CARDS: "false"
+      - run: python -m playwright install --with-deps chromium
+      - name: Click through the explorer boxes, part ${{ matrix.shard }} of 4
+        run: python tools/check_explorers.py site --shard ${{ matrix.shard }}/4
+
   deploy:
-    needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [gate, build, explorers]
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.explorers.result == 'success' || needs.gate.outputs.verified == 'true') }}
     runs-on: ubuntu-24.04
     environment:
       name: github-pages

@@ -2273,6 +2273,14 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     hand-kept table had drifted: "38 questions"); the README keeps the site's links, a
     paragraph on what the site has and how to run it locally. CLAUDE.md, the template,
     `run_tests.py` and `mkdocs.yml` point to `CONTRIBUTING.md` now.
+45. **A shorter CI (session 24).** A README-only commit took 25 minutes on the branch and
+    25 more on `main`. The owner picked three changes: `paths-ignore` for README,
+    CONTRIBUTING, CATALOG, HANDOFF and CLAUDE.md (such a push runs nothing); a `gate` job
+    that finds a successful branch run of the same commit (the GitHub API, `actions:
+    read`), so `main` then only builds and deploys; the explorer check as its own job on
+    four runners (`check_explorers.py --shard K/N`, pages dealt by box count, 20 boxes
+    each; the shards build without social cards, `DVQ_SOCIAL_CARDS=false` in
+    `mkdocs.yml`). The tests and the build were left in sequence (not picked).
 ---
 
 ## In progress

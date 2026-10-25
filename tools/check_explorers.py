@@ -24,7 +24,9 @@ history. "Reset everything" must then forget the state.
 
 Needs Playwright, as tools/check_phone.py. In a sandbox without access to the CDNs,
 --offline ignores errors of external scripts and --route REGEX=FILE serves a CDN script
-from a local copy; --only REGEX checks only the matching pages.
+from a local copy; --only REGEX checks only the matching pages. --shard K/N checks the K-th
+of N parts (CI runs the parts on parallel runners): the pages are dealt by their number of
+boxes, the largest first, to the part with the fewest boxes so far.
 """
 
 from __future__ import annotations
@@ -195,6 +197,21 @@ def check_links(browser, routes, url: str) -> tuple[list[str], list[str]]:
     return problems + [f"links: {e[:200]}" for e in errors], warnings
 
 
+def shard(pages: list[str], counts: dict[str, int], spec: str) -> list[str] | None:
+    """The pages of part K of N: largest page first, each to the part with the fewest boxes."""
+    m = re.fullmatch(r"(\d+)/(\d+)", spec)
+    if not m or not 1 <= int(m.group(1)) <= int(m.group(2)):
+        return None
+    k, n = int(m.group(1)), int(m.group(2))
+    parts: list[list[str]] = [[] for _ in range(n)]
+    load = [0] * n
+    for p in sorted(pages, key=lambda p: (-counts[p], p)):
+        i = load.index(min(load))
+        parts[i].append(p)
+        load[i] += counts[p]
+    return sorted(parts[k - 1])
+
+
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("site", nargs="?", default="site")
@@ -204,6 +221,7 @@ def main(argv: list[str]) -> int:
                     help="serve requests matching REGEX from a local file")
     ap.add_argument("--only", help="check only pages whose path matches this regex")
     ap.add_argument("--no-links", action="store_true", help="skip the link and remembered-state checks")
+    ap.add_argument("--shard", metavar="K/N", help="check only the K-th of N parts of the pages (1 <= K <= N)")
     args = ap.parse_args(argv)
 
     from playwright.sync_api import sync_playwright
@@ -212,10 +230,16 @@ def main(argv: list[str]) -> int:
     if not site.is_dir():
         print(f"site directory not found: {site}")
         return 1
-    pages = sorted(p.relative_to(site).as_posix() for p in site.rglob("index.html")
-                   if 'class="explorer"' in p.read_text(encoding="utf-8"))
+    counts = {p.relative_to(site).as_posix(): p.read_text(encoding="utf-8").count('class="explorer"')
+              for p in site.rglob("index.html")}
+    pages = sorted(p for p, n in counts.items() if n)
     if args.only:
         pages = [p for p in pages if re.search(args.only, p)]
+    if args.shard:
+        pages = shard(pages, counts, args.shard)
+        if pages is None:
+            print(f"--shard takes K/N with 1 <= K <= N, not {args.shard}")
+            return 1
     server, base = serve(site)
 
     external = re.compile(r"https?://(?!127\.0\.0\.1)")

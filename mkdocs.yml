@@ -65,7 +65,9 @@ plugins:
   # Social preview cards (one PNG per page, linked from og:image); the layout is RTL and
   # lives in layouts/dvq.yml. Needs pillow + cairosvg (requirements.txt); fonts are
   # downloaded from Google Fonts into .cache/plugin/social on the first build.
+  # DVQ_SOCIAL_CARDS=false builds without them (the CI's explorer check does not need them).
   - social:
+      enabled: !ENV [DVQ_SOCIAL_CARDS, true]
       cards_layout_dir: layouts
       cards_layout: dvq
 

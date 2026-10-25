@@ -129,7 +129,7 @@ DV-Interview-Questions/
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
 │   └── stylesheets/extra.css   # Palette, chips, question header, tables / cards, figures
 └── .github/workflows/
-    ├── deploy.yml              # Test + build on every push, deploy main to GitHub Pages
+    ├── deploy.yml              # Test + build on every push (explorers on 4 runners), deploy main
     └── weekly.yml              # Mondays: external links of the site, newer Verilator release
 ```
 
@@ -554,6 +554,16 @@ The GitHub Actions workflow runs the tests and builds the site on every push and
 request, and deploys the `main` branch to GitHub Pages. A failing test blocks the deploy,
 so the live site keeps its previous version. One-time setup in the repository settings:
 **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+The jobs: `test` (lint, contrast, pytest and Verilator), then `build` (the strict build, the
+links and the phone check) beside `explorers` (the explorer check on four runners, a
+quarter of the boxes each, `--shard K/4`), then `deploy` on `main`. Two shortcuts keep it
+short, about 13 minutes on a work branch:
+
+- A push that changes only `README.md`, `CONTRIBUTING.md`, `CATALOG.md`, `HANDOFF.md` or
+  `CLAUDE.md` runs nothing (`paths-ignore`): none of them is part of the site.
+- The `gate` job looks up the commit's runs: when `main` is fast-forwarded to a commit that
+  already passed on a work branch, `main` only builds and deploys, in about 3 minutes.
 
 This is already set up: every push to `main` publishes the site within about a minute at
 <https://tamirgabgab.github.io/DV-Interview-Questions/>. A failed deploy can be re-run from
