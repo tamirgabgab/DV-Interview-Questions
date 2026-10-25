@@ -51,7 +51,7 @@ copyright: >
 extra:
   generator: false
   # Comments per question through GitHub Discussions (giscus). Empty ids keep the section
-  # off; README.md ("Comments") says how to fill them in once Discussions is enabled.
+  # off; CONTRIBUTING.md ("Comments") says how to fill them in once Discussions is enabled.
   comments:
     repo: tamirgabgab/DV-Interview-Questions
     repo_id: ""

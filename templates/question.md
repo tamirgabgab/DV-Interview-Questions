@@ -3,8 +3,8 @@ id: 0                    # next free running number (unique across all levels)
 title: כותרת השאלה
 level: student           # student | junior | senior  (must match the folder)
 difficulty: easy         # easy | medium | hard
-kind: puzzle             # puzzle | code | design | math | dv  (one; see README.md)
-tags: [digital-logic]    # topic tags, see README.md
+kind: puzzle             # puzzle | code | design | math | dv  (one; see CONTRIBUTING.md)
+tags: [digital-logic]    # topic tags, see CONTRIBUTING.md
 source: ""               # optional: company / interview round
 added: YYYY-MM-DD
 ---

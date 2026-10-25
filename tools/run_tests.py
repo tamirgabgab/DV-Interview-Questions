@@ -7,7 +7,7 @@
     python tools/run_tests.py --sv-only
 
 SystemVerilog needs Verilator 5.053 or newer (today: a development snapshot built from a
-pinned commit, see README.md "Tests" and the CI workflow) with the z3 solver on the PATH,
+pinned commit, see CONTRIBUTING.md "Tests" and the CI workflow) with the z3 solver on the PATH,
 so that randomize() with constraints runs as published.
 
 SystemVerilog testbenches (tests/<id>/tb.sv) use these directives:
@@ -140,7 +140,7 @@ def run_all_sv(dirs: list[Path]) -> bool:
     found = re.search(r"Verilator (\d+)\.(\d+)", version)
     if not found or (int(found[1]), int(found[2])) < MIN_VERILATOR:
         print(f"!! {version or 'unknown Verilator'}: the testbenches need Verilator "
-              f"{MIN_VERILATOR[0]}.{MIN_VERILATOR[1]:03d}+ with z3 (see README.md, Tests), or use --python-only")
+              f"{MIN_VERILATOR[0]}.{MIN_VERILATOR[1]:03d}+ with z3 (see CONTRIBUTING.md, Tests), or use --python-only")
         return False
     if not shutil.which("z3"):
         print("!! z3 not found: randomize() with constraints needs the z3 solver (apt install z3)")

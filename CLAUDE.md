@@ -1,9 +1,11 @@
 # CLAUDE.md — working rules for this repository
 
 This is a Hebrew, right-to-left MkDocs Material site of Design Verification interview
-questions, published to GitHub Pages from `main`. `README.md` documents the content format
-and the tooling; `HANDOFF.md` is the living task list and work log. Read both before a
-work session, and update `HANDOFF.md` (work log, open items) at the end of every session.
+questions, published to GitHub Pages from `main`. `README.md` has the links to the site;
+`CONTRIBUTING.md` documents the content format and the tooling; `CATALOG.md` lists the
+questions (written by `tools/catalog.py`); `HANDOFF.md` is the living task list and work
+log. Read `CONTRIBUTING.md` and `HANDOFF.md` before a work session, and update
+`HANDOFF.md` (work log, open items) at the end of every session.
 
 ## Language and RTL
 
@@ -11,7 +13,7 @@ work session, and update `HANDOFF.md` (work log, open items) at the end of every
   question and end-of-round summary, also after a model switch or a context summary.
   English appears only as relevant technical terms, identifiers and file names inside a
   Hebrew sentence. Question content is Hebrew. Code, comments, identifiers,
-  commit messages, `README.md`, `HANDOFF.md` and this file are English.
+  commit messages, `README.md`, `CONTRIBUTING.md`, `HANDOFF.md` and this file are English.
 - Times shown to the owner are Israel time (Asia/Jerusalem: UTC+3 in summer time, UTC+2
   in winter; summer time ends on 25 October 2026), never UTC. Tools report UTC: convert
   before writing, e.g. "23:31 (שעון ישראל)".
@@ -38,7 +40,7 @@ work session, and update `HANDOFF.md` (work log, open items) at the end of every
   unique across the repository, `level` equal to the folder. Start from
   `templates/question.md`; the skeleton (interviewer block, hint ladder, short answer,
   solution blocks idea → steps → code → proof → cost, traps, follow-ups) is described in
-  `README.md` and enforced by `python tools/lint_pages.py`.
+  `CONTRIBUTING.md` and enforced by `python tools/lint_pages.py`.
 - Code answers in SystemVerilog and Python as linked tabs, SystemVerilog first. The pages
   are the single source of truth: tests and the run panel execute the page code as is, so
   never change code on a page without running its tests. Annotation markers (`// (1)!`,
@@ -49,7 +51,7 @@ work session, and update `HANDOFF.md` (work log, open items) at the end of every
   `tools/figures/charts.py`, and their blocks sit between `<!-- gen n -->` markers that
   `python tools/figures/fill.py <id>` rewrites. Colours come from CSS variables in
   `docs/stylesheets/extra.css`, never hard-coded.
-- Start a question with `python tools/new_question.py` (see `README.md`). Interactive
+- Start a question with `python tools/new_question.py` (see `CONTRIBUTING.md`). Interactive
   sliders are a `data-kind` with its own file in `docs/javascripts/explorer/` (the shared
   code is `core.js`), tested under Node.
 - The owner's own code is kept as sent; comments may be added, and bugs are called out to

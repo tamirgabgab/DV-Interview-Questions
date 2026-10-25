@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Start a new question: the page, its tests folder, a figure generator and the README row.
+"""Start a new question: the page, its tests folder, a figure generator and the catalog row.
 
     python tools/new_question.py --level junior --difficulty medium --kind math --slug cake-split \\
         --title "חלוקת עוגה" --tags math,sequences [--figures] [--code]
@@ -13,7 +13,7 @@ with the front matter filled in, and creates:
   first gen markers on the page (see tools/figures/fill.py);
 - tests/<id>/tb.sv and tests/<id>/demo.py with --code: a testbench that pulls the page's
   SystemVerilog block and the starting code of the run panel;
-- a row at the end of the README catalog, to be completed by hand.
+- CATALOG.md rewritten with the new page (tools/catalog.py).
 
 Nothing is overwritten: the script stops if a file it would write already exists.
 """
@@ -25,6 +25,8 @@ import datetime
 import re
 import sys
 from pathlib import Path
+
+import catalog
 
 LEVELS = ("student", "junior", "senior")
 DIFFICULTIES = {"easy": "🟢 easy", "medium": "🟡 medium", "hard": "🔴 hard"}
@@ -119,10 +121,6 @@ print("ready")
 '''
 
 
-def catalog_row(qid: int, title: str, level: str, difficulty: str, tags: list[str]) -> str:
-    return f"| {qid:04d} | TODO English title ({title}) | {level} | {DIFFICULTIES[difficulty]} | {', '.join(tags)} |"
-
-
 def create(root: Path, level: str, difficulty: str, slug: str, title: str, tags: list[str],
            figures: bool = False, code: bool = False, today: str | None = None, kind: str = "puzzle") -> list[Path]:
     if level not in LEVELS or difficulty not in DIFFICULTIES or kind not in KINDS:
@@ -150,13 +148,7 @@ def create(root: Path, level: str, difficulty: str, slug: str, title: str, tags:
     for path, text in files.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
-    readme = root / "README.md"
-    lines = readme.read_text(encoding="utf-8").split("\n")
-    end = next(i for i, l in enumerate(lines) if l.startswith("Update this table"))
-    last = max(i for i in range(end) if re.match(r"\| \d{4} \|", lines[i]))
-    lines.insert(last + 1, catalog_row(qid, title, level, difficulty, tags))
-    readme.write_text("\n".join(lines), encoding="utf-8")
-    return list(files) + [readme]
+    return list(files) + [catalog.write(root)]
 
 
 def main(argv: list[str]) -> int:

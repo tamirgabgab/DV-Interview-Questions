@@ -2264,6 +2264,15 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     selection is painted in place now, and the double tap finds the cell under the
     pointer, since the pointer capture retargets it), and 0046's "the next direction"
     showed in every mode (the layout's display beat `[hidden]` on buttons).
+44. **A short README (session 24).** The owner found the README too long (the catalog's
+    long cells, the explorers row) and wanted it to be about reaching the site. Picked:
+    the technical sections move as they were to `CONTRIBUTING.md` (question format,
+    tests, tools, explorers, publishing); the catalog moves to `CATALOG.md`, written by
+    the new `tools/catalog.py` from the front matter (id, the Hebrew title linked to the
+    live page, the level), rewritten by `new_question.py` and checked by a test (the old
+    hand-kept table had drifted: "38 questions"); the README keeps the site's links, a
+    paragraph on what the site has and how to run it locally. CLAUDE.md, the template,
+    `run_tests.py` and `mkdocs.yml` point to `CONTRIBUTING.md` now.
 ---
 
 ## In progress

@@ -1,5 +1,5 @@
-"""Tests of the authoring tools: tools/new_question.py, tools/figures/fill.py and the
-shared chart helpers in tools/figures/charts.py."""
+"""Tests of the authoring tools: tools/new_question.py, tools/catalog.py, tools/figures/fill.py
+and the shared chart helpers in tools/figures/charts.py."""
 
 import shutil
 import sys
@@ -8,6 +8,7 @@ from extract_code import ROOT
 
 sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "tools" / "figures"))
+import catalog  # noqa: E402
 import charts  # noqa: E402
 import fill  # noqa: E402
 import lint_pages  # noqa: E402
@@ -17,9 +18,8 @@ import new_question  # noqa: E402
 def make_root(tmp_path):
     (tmp_path / "templates").mkdir()
     shutil.copy(ROOT / "templates" / "question.md", tmp_path / "templates" / "question.md")
-    shutil.copy(ROOT / "README.md", tmp_path / "README.md")
     (tmp_path / "docs" / "questions" / "junior").mkdir(parents=True)
-    (tmp_path / "docs" / "questions" / "junior" / "0041-old.md").write_text("---\nid: 41\n---\n")
+    (tmp_path / "docs" / "questions" / "junior" / "0041-old.md").write_text("---\nid: 41\ntitle: ישנה\nlevel: junior\n---\n", encoding="utf-8")
     return tmp_path
 
 
@@ -31,7 +31,7 @@ def test_new_question_with_figures_and_code(tmp_path):
     names = {p.relative_to(root).as_posix() for p in written}
     assert names == {"docs/questions/junior/0042-cake-split.md", "tests/0042/test_0042.py",
                      "tests/0042/test_0042_code.py", "tests/0042/tb.sv", "tests/0042/demo.py",
-                     "tools/figures/q0042.py", "README.md"}
+                     "tools/figures/q0042.py", "CATALOG.md"}
     page = (root / "docs/questions/junior/0042-cake-split.md").read_text(encoding="utf-8")
     assert page.startswith("---\nid: 42\ntitle: חלוקת עוגה\nlevel: junior\ndifficulty: medium\nkind: math\n"
                            "tags: [math, sequences]\nsource: \"\"\nadded: 2026-10-20\n---\n\n## השאלה\n")
@@ -43,9 +43,13 @@ def test_new_question_with_figures_and_code(tmp_path):
     exec(gen.read_text(encoding="utf-8"), ns)
     text, problems = fill.fill_text(page, ns["blocks"]())
     assert problems == ["block 0 is out of date"] and "<!-- figure 0" in text
-    readme = (root / "README.md").read_text(encoding="utf-8").split("\n")
-    row = max(i for i, l in enumerate(readme) if l.startswith("| 0042 |"))      # the appended row (the real catalog has a 0042 too)
-    assert readme[row - 1].startswith("| 00") and "junior | 🟡 medium | math, sequences |" in readme[row]
+    rows = [l for l in (root / "CATALOG.md").read_text(encoding="utf-8").split("\n") if l.startswith("| 00")]
+    assert rows == ["| 0041 | [ישנה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0041-old/) | junior (ג'וניור) |",
+                    "| 0042 | [חלוקת עוגה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0042-cake-split/) | junior (ג'וניור) |"]
+
+
+def test_catalog_is_up_to_date():
+    assert (ROOT / "CATALOG.md").read_text(encoding="utf-8") == catalog.render(ROOT), "run python tools/catalog.py"
 
 
 def test_new_question_refuses_to_overwrite(tmp_path):
