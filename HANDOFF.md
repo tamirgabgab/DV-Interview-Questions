@@ -2383,8 +2383,11 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   other three coding proposals (meeting rooms, topological sort, single number II) are
   open for the owner to pick.
 - Session 25: the eight review findings of 0025 and the `hl_lines` lint (item 46) are
-  on the branch `claude/ecstatic-cerf-wqi89q`, rebuilt on top of `main`; `main` when the
-  CI is green, as the owner asked.
+  on `main` (0428b2a, 2026-10-25; the branch CI was green, the `main` run re-ran every
+  check since the HANDOFF commit on top had no branch run, 12.5 minutes, then deployed).
+  The live page was not checked from the sandbox (github.io is not reachable there):
+  the owner should glance at 0025 part b, step 11 of the stepper (dashed arrows) and the
+  highlighted lines of the four code blocks.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
