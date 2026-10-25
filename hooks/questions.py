@@ -88,6 +88,7 @@ TOPICS = {
     "geometry": "גאומטריה",
     "gray-code": "קוד Gray",
     "greedy": "אלגוריתם חמדן",
+    "heap": "ערימה",
     "lfsr": "LFSR",
     "logic": "לוגיקה",
     "logic-puzzles": "חידות היגיון",
@@ -107,6 +108,7 @@ TOPICS = {
     "stack": "מחסנית",
     "sva": "SVA",
     "systemverilog": "SystemVerilog",
+    "two-pointers": "שני מצביעים",
     "usb4": "USB4",
 }
 

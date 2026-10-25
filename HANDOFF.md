@@ -2224,6 +2224,27 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     the way: `\text{top\_left}` showed its backslash (MathJax's `\text` is literal
     without textmacros); 0046 and 0038 now write `\text{top_left}`. The page title says
     "the square, the rectangle and the triangle"; the file name stays, so links hold.
+42. **New question 0047, trapping rain water in a row and on a map (session 24).** The
+    owner asked for coding questions of the kind Google, Meta, NVIDIA and Microsoft ask
+    (less architecture), picked this one from four proposals (trapping rain water,
+    meeting rooms, topological sort, single number II), and asked for the 2D map as the
+    hard part. Choices: two parts (a: the row, with two arrays as the step before two
+    pointers; b: the map), junior / hard, the functions return the amount only, a box in
+    each part. Part a: the column formula, the two-pointer proof (left_max never exceeds
+    the right wall). Part b: the row formula fails on a winding leak (13 instead of 8 on
+    the page's 5 × 5 map), the flood from the border with a min-heap pushed at the water
+    surface, the proof by the escape height (Dijkstra). SystemVerilog has a heap class
+    (`min_heap`, `cell_t`). Traps: moving the higher pointer (14 instead of 6), the row
+    formula on the map, pushing the ground (1 instead of 8), edge cases. Tests: pytest
+    (every row up to length 7 with heights 0 to 3, every map up to 3 × 3 with heights 0
+    to 2 and 3 × 4 with 0 to 1, random rows and maps against the column formula and the
+    escape height by relaxation, the tables and the trace, the traps, the explorer's
+    steps, water and heap order against the page), Verilator (the examples, 3,000 rows
+    and 2,000 maps against direct computations; two mutants caught). The `rainwater`
+    kind: the columns as stacks with the pointers and the maxL / maxR / water table, the
+    map with the heap outlined, the popped cell framed, the filled neighbours dashed,
+    the water by depth and the heap list. New topics `two-pointers` (שני מצביעים) and
+    `heap` (ערימה) in `TOPICS`; three new pairs in `tools/check_contrast.py`.
 ---
 
 ## In progress
@@ -2285,8 +2306,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   Part 7 (item 39) is on `main` (deceb8e) with part 6. Part 5 (item 40) is done on the
   branch; with it all seven parts of the plan are done. The topic names are approved and
   part 5 is on `main` (307a066).
-- Session 24: 0046 part c, the largest right triangle (item 41), is done on the branch;
-  `main` when the owner asks.
+- Session 24: 0046 part c, the largest right triangle (item 41), and question 0047,
+  trapping rain water (item 42), are done on the branch; `main` when the owner asks. The
+  other three coding proposals (meeting rooms, topological sort, single number II) are
+  open for the owner to pick.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.

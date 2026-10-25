@@ -59,6 +59,9 @@ PAIRS = [
     ("chart blue", "var(--viz-s1)", [PAGE], UI),
     ("chart orange", "var(--viz-s2)", [PAGE], UI),
     ("chart green", "var(--viz-s3)", [PAGE], UI),
+    ("map digit on high ground", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 29%, var(--md-default-bg-color))"], TEXT),
+    ("map digit on deep water", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color))"], TEXT),
+    ("table text on water", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 20%, var(--md-default-bg-color))"], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
