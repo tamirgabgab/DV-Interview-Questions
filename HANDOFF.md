@@ -2281,6 +2281,39 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     four runners (`check_explorers.py --shard K/N`, pages dealt by box count, 20 boxes
     each; the shards build without social cards, `DVQ_SOCIAL_CARDS=false` in
     `mkdocs.yml`). The tests and the build were left in sequence (not picked).
+46. **Code review of 0025 and a highlight lint (session 25, 2026-10-25).** A code
+    review of the 0025 commit found eight problems; the owner asked for all of them,
+    with option a for the Ack policy (no Ack of any kind while NAK_SCHEDULED is set).
+    The fixes were first made on the old session-11 branch, which `main` had left about
+    200 commits behind (tag `review-fixes-old-base` keeps those two commits locally); the
+    owner chose to re-apply them on the current `main`, which is this item. (a) Page
+    code, both languages: the duplicate branch of `receive_tlp` sends its Ack only when
+    `nak_scheduled` is off, like `flush_ack`; the steps, annotation (6), the part-b
+    overview and the "number of Naks" proof say so; the explorer engine
+    `docs/javascripts/explorer/acknak.js` mirrors it (its log says why no Ack went out),
+    since `test_explorer_matches_page_classes` compares the two. (b) `hl_lines`: the four
+    0025 blocks pointed at blank lines, comments and `end`; renumbered to the annotated
+    lines. `tools/lint_pages.py` now checks that every `hl_lines` number lands on a code
+    line of the dedented block; it found the same drift in 0007, 0012, 0020, 0023, 0024,
+    0035, 0038, 0040 and 0041 (14 blocks in 10 pages), all renumbered to their annotated
+    lines; documented in `CONTRIBUTING.md`. (c) `tools/figures/q0025.py`: frames record
+    whether the delivered TLPs are replays and draw them with the dashed `fc-replay`
+    arrow whatever the receiver does with them (part-b step 11, the three duplicates,
+    now matches the legend); the dead `if False else` caption expression and the unused
+    `faded` parameter of `seq_boxes` are gone; stepper b regenerated (only that arrow
+    class changed). (d) `tests/0025/demo.py`: the EP's first Ack threshold is pinned to 3,
+    so the scripted story (Nak, replay, damaged Ack, timer, duplicates) holds for every
+    seed the reader tries (with a first threshold of 1 an Ack was queued ahead of the Nak
+    and the comments described a run that did not happen). (e) "ולא רק את הרשומה
+    אחת" → "ולא רק רשומה אחת" in the interviewer block. Checks: lint (46/46), the
+    Python tests (403, including the Node explorer tests), the strict build (with
+    `DVQ_SOCIAL_CARDS=false` in the sandbox, which has no cairosvg), links, the phone
+    check and the explorer click-check of 0025. Verilator in the sandbox is 5.020, which
+    rejects the `ref` helpers of `tests/0025/tb.sv`; the page's SV classes alone compiled
+    and ran there with a duplicate-under-NAK_SCHEDULED check, and the old-base CI run
+    (same SV change) passed the full testbench. Also seen: GitHub's `ubuntu-latest` is
+    Ubuntu 26.04 now, where Playwright 1.56 cannot install Chromium; `main` already pins
+    `ubuntu-24.04`.
 ---
 
 ## In progress
@@ -2349,6 +2382,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   each), then 1 minute on `main` (the gate found the verified commit). The
   other three coding proposals (meeting rooms, topological sort, single number II) are
   open for the owner to pick.
+- Session 25: the eight review findings of 0025 and the `hl_lines` lint (item 46) are
+  on the branch `claude/ecstatic-cerf-wqi89q`, rebuilt on top of `main`; `main` when the
+  CI is green, as the owner asked.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
