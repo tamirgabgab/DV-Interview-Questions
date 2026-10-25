@@ -2343,8 +2343,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   branch; with it all seven parts of the plan are done. The topic names are approved and
   part 5 is on `main` (307a066).
 - Session 24: 0046 part c, the largest right triangle (item 41), question 0047, filling a
-  well (items 42 and 43), and the editing of the grid boxes are done on the branch;
-  `main` when the owner asks. The
+  well (items 42 and 43), the editing of the grid boxes, the short README (item 44) and
+  the shorter CI (item 45) are on `main` (c471167, 2026-10-25). The new CI's first runs:
+  9.5 minutes on the branch (was about 25; the four explorer shards about 3.5 minutes
+  each), then 1 minute on `main` (the gate found the verified commit). The
   other three coding proposals (meeting rooms, topological sort, single number II) are
   open for the owner to pick.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
