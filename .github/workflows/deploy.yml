@@ -5,9 +5,9 @@ name: Build and deploy site
 on:
   push:
     branches: ["**"]
-    paths-ignore: ["README.md", "CONTRIBUTING.md", "CATALOG.md", "HANDOFF.md", "CLAUDE.md"]
+    paths-ignore: ["README.md", "CONTRIBUTING.md", "CATALOG.md", "HANDOFF.md", "HANDOFF-archive.md", "CLAUDE.md"]
   pull_request:
-    paths-ignore: ["README.md", "CONTRIBUTING.md", "CATALOG.md", "HANDOFF.md", "CLAUDE.md"]
+    paths-ignore: ["README.md", "CONTRIBUTING.md", "CATALOG.md", "HANDOFF.md", "HANDOFF-archive.md", "CLAUDE.md"]
   workflow_dispatch:
     inputs:
       phone_dark:

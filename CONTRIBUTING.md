@@ -76,6 +76,7 @@ DV-Interview-Questions/
 ├── CATALOG.md                # Every question with its link (written by tools/catalog.py)
 ├── CLAUDE.md                   # Working rules for AI sessions (language, skeleton, tests, workflow)
 ├── HANDOFF.md                  # Task list: done / in progress / future work
+├── HANDOFF-archive.md          # The older work log (sessions 1 to 21) and finished rounds
 ├── mkdocs.yml                  # Site configuration
 ├── requirements.txt            # Pinned Python dependencies for building the site
 ├── requirements-dev.txt        # Test dependencies (pytest)
@@ -569,8 +570,8 @@ links and the phone check) beside `explorers` (the explorer check on four runner
 quarter of the boxes each, `--shard K/4`), then `deploy` on `main`. Two shortcuts keep it
 short, about 13 minutes on a work branch:
 
-- A push that changes only `README.md`, `CONTRIBUTING.md`, `CATALOG.md`, `HANDOFF.md` or
-  `CLAUDE.md` runs nothing (`paths-ignore`): none of them is part of the site.
+- A push that changes only `README.md`, `CONTRIBUTING.md`, `CATALOG.md`, `HANDOFF.md`,
+  `HANDOFF-archive.md` or `CLAUDE.md` runs nothing (`paths-ignore`): none of them is part of the site.
 - The `gate` job looks up the commit's runs: when `main` is fast-forwarded to a commit that
   already passed on a work branch, `main` only builds and deploys, in about 3 minutes.
 

@@ -4,8 +4,9 @@ This is a Hebrew, right-to-left MkDocs Material site of Design Verification inte
 questions, published to GitHub Pages from `main`. `README.md` has the links to the site;
 `CONTRIBUTING.md` documents the content format and the tooling; `CATALOG.md` lists the
 questions (written by `tools/catalog.py`); `HANDOFF.md` is the living task list and work
-log. Read `CONTRIBUTING.md` and `HANDOFF.md` before a work session, and update
-`HANDOFF.md` (work log, open items) at the end of every session.
+log (the older log is in `HANDOFF-archive.md`). Read `CONTRIBUTING.md` and `HANDOFF.md`
+before a work session, and update `HANDOFF.md` (work log, open items) at the end of every
+session.
 
 ## Language and RTL
 
@@ -14,8 +15,8 @@ log. Read `CONTRIBUTING.md` and `HANDOFF.md` before a work session, and update
   English appears only as relevant technical terms, identifiers and file names inside a
   Hebrew sentence. Question content is Hebrew. Code, comments, identifiers,
   commit messages, `README.md`, `CONTRIBUTING.md`, `HANDOFF.md` and this file are English.
-- Times shown to the owner are Israel time (Asia/Jerusalem: UTC+3 in summer time, UTC+2
-  in winter; summer time ends on 25 October 2026), never UTC. Tools report UTC: convert
+- Times shown to the owner are Israel time (Asia/Jerusalem: UTC+2 in winter time, which
+  runs from 25 October 2026 to 26 March 2027, and UTC+3 in summer time), never UTC. Tools report UTC: convert
   before writing, e.g. "23:31 (שעון ישראל)".
 - RTL safety: every paragraph, heading, list item and table cell starts with a Hebrew word.
   A line that must start with Latin text, inline code, a number followed by a period, or
@@ -82,7 +83,7 @@ in dark mode; CI runs it only on a manual run with `phone_dark`. Node runs the e
 tests (`docs/javascripts/*.js` against the Python reference).
 
 All seven run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
-CATALOG, HANDOFF or this file runs nothing, and `main` skips the checks for a commit that
+CATALOG, HANDOFF, its archive or this file runs nothing, and `main` skips the checks for a commit that
 already passed on its branch); a failure blocks the deploy. A new colour pair (a text
 or a mark on a fill) goes into the `PAIRS` list of `tools/check_contrast.py`. Verilator
 notes and simulator quirks are listed in `HANDOFF.md` under "Technical notes".
