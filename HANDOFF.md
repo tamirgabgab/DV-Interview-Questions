@@ -2281,6 +2281,17 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     four runners (`check_explorers.py --shard K/N`, pages dealt by box count, 20 boxes
     each; the shards build without social cards, `DVQ_SOCIAL_CARDS=false` in
     `mkdocs.yml`). The tests and the build were left in sequence (not picked).
+46. **The timeline keeps its place; reset draws; "ערך אתחול" (session 24).** The owner asked
+    that an edit no longer send a box back to its first step, in every box. `edits()` in
+    `core.js` tells edits (fields, non-playback buttons, slider points, figures marked
+    `data-edits`) from navigation (transport, scrubber, header, keys); after an edit that
+    sends a "k מתוך T" counter back or changes T, the scrubber's seek returns to the same
+    step, or the same place relative to the new T (the end stays the end), and a play the
+    edit stopped goes on. "איפוס הכול" draws a new example in a box with a seed (not
+    remembered; `halfcirc` and `metamc` opt out with `fresh: false`). The seed field and its
+    texts say "ערך אתחול". 0041's short answer showed raw TeX (display math run into the
+    next line); `lint_pages.py` now wants a blank line around display math. A sweep of the
+    31 boxes with a counter (3 steps, then a control changed) kept the place in all.
 ---
 
 ## In progress
@@ -2344,7 +2355,7 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   part 5 is on `main` (307a066).
 - Session 24: 0046 part c, the largest right triangle (item 41), question 0047, filling a
   well (items 42 and 43), the editing of the grid boxes, the short README (item 44) and
-  the shorter CI (item 45) are on `main` (c471167, 2026-10-25). The new CI's first runs:
+  the shorter CI (item 45) and the timeline's kept place (item 46) are on `main` (c471167, 2026-10-25). The new CI's first runs:
   9.5 minutes on the branch (was about 25; the four explorer shards about 3.5 minutes
   each), then 1 minute on `main` (the gate found the verified commit). The
   other three coding proposals (meeting rooms, topological sort, single number II) are
