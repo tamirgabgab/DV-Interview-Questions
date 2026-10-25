@@ -59,21 +59,21 @@ jobs:
     if: needs.gate.outputs.verified != 'true'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt -r requirements-dev.txt
       # Node runs the math of the interactive explorers against the Python reference
       # (tests/0026 to tests/0028 and the Josephus tests); without it those tests skip.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
       # Verilator built from source at a pinned commit (the apt package is 5.020, which
       # cannot run randomize() with constraints); the install tree is cached per commit.
       # z3 is the SMT solver Verilator calls for constrained randomization.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         id: verilator
         with:
           path: ~/verilator
@@ -99,7 +99,7 @@ jobs:
           echo "$HOME/verilator/bin" >> "$GITHUB_PATH"
       - run: verilator --version && z3 --version
       # Compiled testbenches are cached by content hash; only changed ones recompile.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: .cache/sv
           key: sv-${{ runner.os }}-${{ hashFiles('tests/**', 'docs/questions/**') }}
@@ -117,8 +117,8 @@ jobs:
     if: ${{ !cancelled() && needs.gate.result == 'success' && (needs.test.result == 'success' || needs.gate.outputs.verified == 'true') }}
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -126,7 +126,7 @@ jobs:
       # Social cards: libcairo for cairosvg (the logo on the card); the rendered cards and the
       # fonts downloaded from Google Fonts are cached, keyed on the pages and the layout.
       - run: sudo apt-get update -q && sudo apt-get install -y -q libcairo2
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: .cache/plugin/social
           key: social-${{ hashFiles('docs/**/*.md', 'layouts/**', 'mkdocs.yml') }}
@@ -147,7 +147,7 @@ jobs:
       - name: Check every page at phone width
         if: needs.gate.outputs.verified != 'true'
         run: python tools/check_phone.py site --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always() && needs.gate.outputs.verified != 'true'
         with:
           name: phone-screenshots
@@ -158,14 +158,14 @@ jobs:
       - name: Check every page at phone width in dark mode
         if: github.event_name == 'workflow_dispatch' && inputs.phone_dark
         run: python tools/check_phone.py site --scheme dark --shots phone-shots-dark --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always() && github.event_name == 'workflow_dispatch' && inputs.phone_dark
         with:
           name: phone-screenshots-dark
           path: phone-shots-dark
           retention-days: 7
           if-no-files-found: ignore
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:
           path: site
@@ -182,8 +182,8 @@ jobs:
       matrix:
         shard: [1, 2, 3, 4]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -204,4 +204,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
