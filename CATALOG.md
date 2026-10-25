@@ -47,7 +47,7 @@ All 46 questions, with links to their pages on the [live site](https://tamirgabg
 | 0041 | [כמה טסטים אקראיים סוגרים כיסוי – אספן הקופונים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0041-coverage-random-tests/) | junior (ג'וניור) |
 | 0042 | [הגמל והמים – כמה רחוק מגיעים עם 450 ליטר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0042-camel-water-depots/) | junior (ג'וניור) |
 | 0043 | [מרוצי סוסים בלי שעון – כמה תחרויות עד ארבעת המהירים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0043-horse-races-top-k/) | junior (ג'וניור) |
-| 0044 | [הספרות של קפרקר אחרי n פעולות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0044-kaprekar-after-n-steps/) | junior (ג'וניור) |
+| 0044 | [צעד קפרקר, hash והספרות אחרי n פעולות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0044-kaprekar-after-n-steps/) | junior (ג'וניור) |
 | 0045 | [הכדור החריג במאזניים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0045-odd-ball-balance/) | junior (ג'וניור) |
 | 0046 | [הריבוע, המלבן והמשולש הגדולים ביותר של אחדות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0046-largest-square-rectangle/) | junior (ג'וניור) |
 | 0047 | [מילוי מים בבאר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0047-filling-a-well/) | junior (ג'וניור) |

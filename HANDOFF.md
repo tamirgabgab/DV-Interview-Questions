@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-23 (session 22)_
+_Last updated: 2026-10-25 (session 26)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -2343,6 +2343,29 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     `fig-wrap--above` from the compared drawings, since they depend on the steps a box went
     through, not on its state. The jitter check the owner was offered (step every box and
     report a paragraph that outgrew its reservation) was not chosen.
+48. **0044 becomes a coding question: the Kaprekar step, a hash, then the closed form
+    (session 26, 2026-10-25).** From the owner's write-up (f(x, b, n) in Python and
+    SystemVerilog, a hash of the results over x = 0..999, the single-step table
+    6d(10 − d) with its inclusion-exclusion). Checked first: the example, the table, the
+    formula and the double loop's result hold; the owner's Python loop had inconsistent
+    indentation (an IndentationError), fixed and called out. The owner's choices: f is a new
+    part a, the old parts move to b, c, d; part b shows the double loop as code (1000 steps
+    on each x) and asks what the hash holds without running it ({0: 10, 495: 990}, step 8 of
+    its solution, from the existing proof); the single-step table is left out; `int`
+    instead of `longint`; the SV hash is `int hash[int]` (the Python keeps the owner's
+    `num`); title "צעד קפרקר, hash והספרות אחרי n פעולות", kind `code`, tags `sorting`,
+    `python`, `systemverilog` added. Anchors: part a `#kaprekar-step`, the base-10 and
+    base-5 parts keep their old ids `#10` and `#5`, the bonus `#base-b`. A trap on locals
+    that are not reset. Tests: pytest compares f with a digit count in every base 2..16 with
+    1..4 digits and checks the hash; `tests/0044/tb.sv` puts the page's f at `$unit` scope,
+    instantiates the page's `kaprekar_hash` module and checks in a `final` block (the
+    module calls `$finish` at time 0). Found on the way: in Verilator 5.020 a fixed-size
+    local array (`int cnt[16]`) of an automatic `$unit` function kept its values between
+    calls (the testbench's reference hung); explicit zeroing fixed it, and the page now
+    says the owner's explicit init is the portable choice (a queue and a scalar with a
+    declaration initializer were reset correctly in the small tests). `demo.py` added: the
+    run panel runs part b's million calls on load (2.2 s in CPython, a few seconds more in
+    Pyodide).
 
 
 ## In progress
@@ -2423,6 +2446,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   The live page was not checked from the sandbox (github.io is not reachable there):
   the owner should glance at 0025 part b, step 11 of the stepper (dashed arrows) and the
   highlighted lines of the four code blocks.
+- Session 26: question 0044 reworked into a coding question (item 48), on the branch;
+  `main` when the owner asks. Proposed fix rounds (not yet picked): axe warnings on six
+  pages, text under 9 px on six pages, the Node 20 actions in CI, HANDOFF and CLAUDE.md
+  upkeep, a SessionStart hook for the sandbox.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.
