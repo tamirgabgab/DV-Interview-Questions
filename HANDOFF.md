@@ -2447,8 +2447,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   The live page was not checked from the sandbox (github.io is not reachable there):
   the owner should glance at 0025 part b, step 11 of the stepper (dashed arrows) and the
   highlighted lines of the four code blocks.
-- Session 26: question 0044 reworked into a coding question (item 48), on the branch;
-  `main` when the owner asks. Proposed fix rounds (not yet picked): axe warnings on six
+- Session 26: question 0044 reworked into a coding question (item 48) is on `main`
+  (1e516ef, 2026-10-25; the branch CI was green, the `main` run only built and deployed).
+  The live page was not checked from the sandbox. Proposed fix rounds (not yet picked): axe warnings on six
   pages, text under 9 px on six pages, the Node 20 actions in CI, HANDOFF and CLAUDE.md
   upkeep, a SessionStart hook for the sandbox.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
