@@ -11,7 +11,7 @@ added: 2026-10-24
 
 ## השאלה
 
-נגדיר **צעד קפרקר** `f(x, b, n)` על מספר `x` שנכתב ב-`n` ספרות בבסיס `b` :
+נגדיר **צעד קפרקר** `kaprekar_step(x, b, n)` על מספר `x` שנכתב ב-`n` ספרות בבסיס `b` :
 
 1. **מחלצים ספרות :** כותבים את `x` בדיוק ב-`n` ספרות, כולל אפסים מובילים (למשל 5 בשלוש
    ספרות בבסיס 10 הוא 005).
@@ -19,11 +19,11 @@ added: 2026-10-24
 3. **מהקטנה לגדולה :** מסדרים את הספרות מהקטנה לגדולה, ומקבלים את המספר הקטן ביותר.
 4. **מחסרים :** הגדול פחות הקטן. זו התוצאה של הצעד.
 
-למשל, ‏`f(5, 10, 3)` הוא \( 500 - 005 = 495 \). התוצאה נכתבת שוב ב-`n` ספרות (99 נכתב 099),
+למשל, ‏`kaprekar_step(5, 10, 3)` הוא \( 500 - 005 = 495 \). התוצאה נכתבת שוב ב-`n` ספרות (99 נכתב 099),
 והצעד הבא מופעל עליה.
 
-- **סעיף א :** כתבו את הפונקציה `f(x, b, n)`.
-- **סעיף ב :** מפעילים את `f` 1000 פעמים ברצף על כל מספר מ-0 עד 999 בבסיס 10, וסופרים ב-hash
+- **סעיף א :** כתבו את הפונקציה `kaprekar_step(x, b, n)`.
+- **סעיף ב :** מפעילים את `kaprekar_step` 1000 פעמים ברצף על כל מספר מ-0 עד 999 בבסיס 10, וסופרים ב-hash
   את התוצאות. מה יש ב-hash בסוף? ומה הספרות של המספר אחרי \( n \) פעולות?
 - **סעיף ג :** אותה שאלה בבסיס 5.
 - **סעיף ד (בונוס) :** בסיס כללי \( B \).
@@ -66,19 +66,19 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
 
 ---
 
-### סעיף א – הפונקציה f { #kaprekar-step }
+### סעיף א – הפונקציה kaprekar_step { #kaprekar-step }
 
-כתבו את הפונקציה `f(x, b, n)` : היא מחלצת את `n` הספרות של `x` בבסיס `b`, ומחזירה את
+כתבו את הפונקציה `kaprekar_step(x, b, n)` : היא מחלצת את `n` הספרות של `x` בבסיס `b`, ומחזירה את
 ההפרש בין המספר שהן יוצרות בסדר יורד לבין המספר שהן יוצרות בסדר עולה. מספיק `int`.
 
 === "SystemVerilog"
-    ```systemverilog title="f"
-    // function automatic int f(int x, int b, int n);   // to write
+    ```systemverilog title="kaprekar_step"
+    // function automatic int kaprekar_step(int x, int b, int n);   // to write
     ```
 
 === "Python"
-    ```python title="f"
-    def f(x: int, b: int, n: int) -> int: ...
+    ```python title="kaprekar_step"
+    def kaprekar_step(x: int, b: int, n: int) -> int: ...
     ```
 
 ??? tip "רמז 1"
@@ -106,8 +106,8 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
     #### הקוד { .sol-code }
 
     === "SystemVerilog"
-        ```systemverilog title="f" linenums="1" hl_lines="12 13 17 20 21"
-        function automatic int f(int x, int b, int n);
+        ```systemverilog title="kaprekar_step" linenums="1" hl_lines="12 13 17 20 21"
+        function automatic int kaprekar_step(int x, int b, int n);
           int digits[$];     // queue holding the n digits
           int desc_val;
           int asc_val;
@@ -140,8 +140,8 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
            התור והמשתנים משותפים לכל הקריאות בכל סימולטור. האיפוס המפורש נכון בכל המקרים.
 
     === "Python"
-        ```python title="f" linenums="1"
-        def f(x, b, n):
+        ```python title="kaprekar_step" linenums="1"
+        def kaprekar_step(x, b, n):
             """Kaprekar step: sort the n base-b digits of x descending and ascending, subtract."""
             digits = []
             for _ in range(n):            # extract exactly n digits, leading zeros included
@@ -176,7 +176,7 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
 
 ### סעיף ב – בסיס 10 וה-hash { #10 }
 
-מריצים את הקוד הבא, עם `f` מסעיף א. כל מספר `x` מ-0 עד 999 עובר 1000 פעולות ברצף,
+מריצים את הקוד הבא, עם `kaprekar_step` מסעיף א. כל מספר `x` מ-0 עד 999 עובר 1000 פעולות ברצף,
 והתוצאה נספרת ב-hash. **בלי להריץ :** אילו מפתחות יש ב-hash בסוף, ומה הערך של כל אחד?
 
 === "SystemVerilog"
@@ -189,7 +189,7 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
         for (int x = 0; x <= 999; x++) begin
           y = x;
           for (int z = 0; z < 1000; z++)  // 1000 Kaprekar steps in a row
-            y = f(y, 10, 3);
+            y = kaprekar_step(y, 10, 3);
           if (hash.exists(y))
             hash[y]++;
           else
@@ -210,7 +210,7 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
     for x in range(1000):
         y = x
         for z in range(1000):         # 1000 Kaprekar steps in a row
-            y = f(y, 10, 3)
+            y = kaprekar_step(y, 10, 3)
         if y in num:
             num[y] += 1
         else:
@@ -762,7 +762,7 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
 
 ??? trap "מלכודת : משתנים מקומיים שלא מתאפסים"
     פונקציה בתוך `module` בלי `automatic` היא סטטית : יש לה עותק אחד של התור ושל המשתנים לכל
-    הקריאות, ואתחול בהצהרה (`int asc_val = 0;`) מתבצע פעם אחת בלבד. אז התור של `f` ממשיך
+    הקריאות, ואתחול בהצהרה (`int asc_val = 0;`) מתבצע פעם אחת בלבד. אז התור של `kaprekar_step` ממשיך
     לגדול מקריאה לקריאה, והתוצאות שגויות. גם עם `automatic` כדאי לאפס במפורש : ב-Verilator 5.020
     מערך מקומי שמר ערכים בין קריאות גם בפונקציה `automatic`. ותזכורת : תור, `sort()`
     ומערך אסוציאטיבי הם כלים של סביבת אימות, ואי אפשר לסנתז אותם לחומרה.

@@ -1,4 +1,4 @@
-"""Question 0044: the page's f (part a) against a digit count in every base from 2 to 16
+"""Question 0044: the page's kaprekar_step (part a) against a digit count in every base from 2 to 16
 with 1 to 4 digits, and the hash of part b's double loop; the numbers of the page against a
 direct simulation of the routine: the closed forms for the gap and for the digits after n
 steps in every base from 2 to 16 (every number, n up to 59, and n = 1000), the page's tables
@@ -14,7 +14,7 @@ import q0044  # noqa: E402
 
 
 ns = load_python(44)     # runs part b's loop: 1000 numbers, 1000 steps each
-f, num = ns["f"], ns["num"]
+kaprekar_step, num = ns["kaprekar_step"], ns["num"]
 
 
 def digits(x, B):
@@ -237,7 +237,7 @@ def test_explorer_state_diagram():
 
 
 def by_count(x, b, n):
-    """f by counting the digits: the largest number takes them from b - 1 down to 0."""
+    """kaprekar_step by counting the digits: the largest number takes them from b - 1 down to 0."""
     cnt = [0] * b
     for _ in range(n):
         cnt[x % b] += 1
@@ -253,11 +253,12 @@ def by_count(x, b, n):
 
 
 def test_page_f_every_base():
-    assert f(5, 10, 3) == 495 and f(211, 10, 3) == 99 and f(495, 10, 3) == 495
+    assert kaprekar_step(5, 10, 3) == 495 and kaprekar_step(211, 10, 3) == 99
+    assert kaprekar_step(495, 10, 3) == 495
     for b in range(2, 17):
         for n in range(1, 5):
             for x in range(b ** n):
-                got = f(x, b, n)
+                got = kaprekar_step(x, b, n)
                 assert got == by_count(x, b, n), (x, b, n)
                 if n == 3:
                     assert got == step(x, b), (x, b)

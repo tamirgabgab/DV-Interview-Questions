@@ -2365,7 +2365,8 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     says the owner's explicit init is the portable choice (a queue and a scalar with a
     declaration initializer were reset correctly in the small tests). `demo.py` added: the
     run panel runs part b's million calls on load (2.2 s in CPython, a few seconds more in
-    Pyodide).
+    Pyodide). At the owner's request the function is named `kaprekar_step` on the page,
+    in the tests and in the run panel (the write-up called it f).
 
 
 ## In progress

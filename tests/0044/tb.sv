@@ -1,4 +1,4 @@
-// Question 0044: the page's f (part a) against a digit count on every x in every base from
+// Question 0044: the page's kaprekar_step (part a) against a digit count on every x in every base from
 // 2 to 16 with 1 to 4 digits, and part b's module as published: its hash ends with two keys,
 // hash[0] = 10 and hash[495] = 990. The module calls $finish at time 0, so the checks run
 // in the final block of tb.
@@ -27,7 +27,7 @@ module tb;
 
   final begin
     int errors = 0, top;
-    if (f(5, 10, 3) != 495 || f(211, 10, 3) != 99) begin
+    if (kaprekar_step(5, 10, 3) != 495 || kaprekar_step(211, 10, 3) != 99) begin
       $display("FAIL page examples");
       errors++;
     end
@@ -36,9 +36,9 @@ module tb;
         top = 1;
         repeat (n) top *= b;
         for (int x = 0; x < top; x++)
-          if (f(x, b, n) != by_count(x, b, n)) begin
-            if (errors < 5) $display("FAIL f(%0d, %0d, %0d) = %0d, expected %0d", x, b, n,
-                                     f(x, b, n), by_count(x, b, n));
+          if (kaprekar_step(x, b, n) != by_count(x, b, n)) begin
+            if (errors < 5) $display("FAIL kaprekar_step(%0d, %0d, %0d) = %0d, expected %0d", x, b, n,
+                                     kaprekar_step(x, b, n), by_count(x, b, n));
             errors++;
           end
       end
