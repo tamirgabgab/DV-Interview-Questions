@@ -2203,6 +2203,27 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     axe on the open drawer, the topics panel, the empty state and the rows (390 and 1280
     px, light and dark): no violations. On `main` after a green CI run, with the topic
     names approved.
+41. **0046 part c, the largest right triangle of ones (the owner's request, session 24).**
+    The owner picked equal legs along the axes, the right angle in any of the four
+    directions, the area (the number of cells, k(k + 1)/2) with the three vertices as the
+    answer (`(area, corner, leg_col, leg_row)`, SV `tri_t` with -1 for no shape), and the
+    triangle as a third option of every box's select plus a third box in part c. The
+    solution is the square's dp without the diagonal: dp = 1 + min(the neighbour along
+    each leg), a pass per direction that starts from the side the legs point to, one row
+    of memory and a `prev`; O(m·n) time, O(n) memory. The example (5 × 7) has a leg-4
+    triangle (area 10) where the largest square is 4 and the largest rectangle 6, a
+    leg-3 triangle the other way and the owner's "010 / 111" shape (leg 2 only). Traps:
+    three neighbours (the owner's left triangle gives leg 2, not 3) and the scan order;
+    a follow-up on the pyramid (P = min(P above + 1, the run left, the run right), tested
+    against a brute force). The box draws a triangle as a staircase polygon in an SVG over
+    its bounding square, shows the dp of the pass being played, and has "the next
+    direction"; the tie count is the cells holding the best leg (any 1 for a leg of 1).
+    Tests: pytest (every grid up to 3 × 3, random grids, the page's tester, the numbers,
+    the explorer's four dp matrices, order and ties), Verilator (the examples, the edge
+    cases, 3,000 random grids against a brute force; a mutated min was caught). Found on
+    the way: `\text{top\_left}` showed its backslash (MathJax's `\text` is literal
+    without textmacros); 0046 and 0038 now write `\text{top_left}`. The page title says
+    "the square, the rectangle and the triangle"; the file name stays, so links hold.
 ---
 
 ## In progress
@@ -2262,8 +2283,10 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   the print and home-screen additions if the owner picks them) is next, then `main` when
   the owner asks. Still open after that: part 5 (UI322, UI323).
   Part 7 (item 39) is on `main` (deceb8e) with part 6. Part 5 (item 40) is done on the
-  branch; with it all seven parts of the plan are done. The owner still reviews the 39
-  Hebrew topic names (`TOPICS`).
+  branch; with it all seven parts of the plan are done. The topic names are approved and
+  part 5 is on `main` (307a066).
+- Session 24: 0046 part c, the largest right triangle (item 41), is done on the branch;
+  `main` when the owner asks.
 - Next: the owner's picks from the second series (rounds A to E on how answers are
   presented, rounds F to H on the explorer boxes, proposed 2026-10-23), the rest of
   round Q, the first series' open rounds E, F, I, L, N, O and S, or new questions.

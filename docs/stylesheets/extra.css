@@ -2853,6 +2853,10 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .mo-box--cand { border: 2.5px dashed var(--viz-s4); }
 .md-typeset .explorer .mo-box--sel { border: 2px dashed var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 14%, transparent); }
 .md-typeset .explorer .mo-box--win { border: 3px solid var(--viz-s3); }
+/* a triangle's outline (part c): a staircase polygon in an SVG over its bounding square */
+.md-typeset .explorer .mo-tri { z-index: 2; display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; fill: none; stroke-linejoin: miter; }
+.md-typeset .explorer .mo-tri--best { stroke: var(--viz-s2); stroke-width: 3px; }
+.md-typeset .explorer .mo-tri--win { stroke: var(--viz-s3); stroke-width: 3px; }
 .md-typeset .explorer .mo-edit-hint { margin: 0.2rem 0; color: var(--viz-text); font-size: 0.65rem; }
 .md-typeset .explorer :is(.mo-step, .mo-code) { margin: 0.3rem 0; font-size: 0.72rem; }
 .md-typeset .explorer .mo-step:empty, .md-typeset .explorer .mo-code:empty { display: none; }
