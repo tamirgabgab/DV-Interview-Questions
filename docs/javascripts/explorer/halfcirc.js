@@ -112,7 +112,7 @@
         r.a.forEach((v, i) => { counts.a[i] += v; });
         counts.inside += r.inside; counts.both += r.both; counts.n += r.n;
         setAngles(r.last); renderCounts();
-      });
+      }, { fresh: false });
       $(".ex-draw100").addEventListener("click", () => { batch = 100; seed.draw(); });
       $(".ex-draw1000").addEventListener("click", () => { batch = 1000; seed.draw(); });
       $(".ex-clear").addEventListener("click", () => { counts.a = [0, 0, 0]; counts.inside = counts.both = counts.n = 0; renderCounts(); });

@@ -108,3 +108,16 @@ def test_lint_topic_names(tmp_path):
     warnings = []
     assert lint_pages.lint(path, warnings) == []
     assert any("'no-such-topic'" in w for w in warnings)
+
+
+def test_display_math_is_a_paragraph_of_its_own(tmp_path):
+    """Display math run into the next line shows as raw TeX (0041's short answer did)."""
+    root = make_root(tmp_path)
+    new_question.create(root, "junior", "medium", "cake-split", "חלוקת עוגה", ["math"],
+                        figures=False, code=False, today="2026-10-20", kind="math")
+    path = root / "docs/questions/junior/0042-cake-split.md"
+    page = path.read_text(encoding="utf-8")
+    path.write_text(page.replace("## השאלה\n", "## השאלה\n\n\\[\nE = 1\n\\]\nול- הסכום.\n", 1), encoding="utf-8")
+    assert any("needs a blank line after it" in p for p in lint_pages.lint(path))
+    path.write_text(page.replace("## השאלה\n", "## השאלה\n\n\\[\nE = 1\n\\]\n\nול- הסכום.\n", 1), encoding="utf-8")
+    assert not any("display math" in p for p in lint_pages.lint(path))

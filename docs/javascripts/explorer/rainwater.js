@@ -217,7 +217,7 @@
       `<p class="ex-summary rw-sum" aria-live="polite"></p>` +
       `<span class="viz-legend"><span><i class="rw-key-ground"></i>עמוד</span><span><i class="rw-key-water"></i>מים שחושבו</span><span><i class="rw-key-cur"></i>העמודה של הצעד</span><span><i class="rw-key-sel"></i>מסומן</span></span>` +
       `<p class="rw-edit-hint">לחיצה על משבצת קובעת את גובה העמודה עד אליה, וגרירה מסמנת כמה עמודות. במקלדת${NB}: חיצים ימינה ושמאלה בין העמודות (עם Shift מסמנים), למעלה ולמטה משנים גובה, מספר קובע אותו, ו-Enter או לחיצה כפולה פותחים עריכה.</p>` +
-      `<div class="rw-bars" dir="ltr"></div><div class="rw-ptrs" dir="ltr" aria-hidden="true"></div>` +
+      `<div class="rw-bars" dir="ltr" data-edits></div><div class="rw-ptrs" dir="ltr" aria-hidden="true"></div>` +
       `<div class="rw-table-wrap" dir="ltr" tabindex="0" role="region" aria-label="טבלת maxL, maxR והמים"><table class="rw-table"></table></div>` +
       `<p class="rw-step" aria-live="polite"></p><p class="rw-code"></p>`;
     const $ = (s) => box.querySelector(s);
@@ -389,7 +389,7 @@
       `<p class="ex-summary rw-sum" aria-live="polite"></p>` +
       `<span class="viz-legend"><span><i class="rw-key-heap"></i>בערימה (הגבול)</span><span><i class="rw-key-cur"></i>יצא מהערימה</span><span><i class="rw-key-fill"></i>השכנים שהגיע אליהם</span><span><i class="rw-key-water"></i>מים</span><span><i class="rw-key-sel"></i>מסומן</span></span>` +
       `<p class="rw-edit-hint">לחיצה על תא מסמנת אותו, וגרירה מסמנת מלבן. מספר שמקלידים נכנס לכל התאים המסומנים, ו-Enter או לחיצה כפולה פותחים עריכה של תא. במקלדת${NB}: חיצים בין התאים, ו-Shift עם חץ מרחיב את הסימון.</p>` +
-      `<div class="rw-panels"><figure class="rw-panel"><figcaption>המפה${NB}: גובה, ו-${ltr("+")} מים</figcaption><div class="rw-map" role="grid" dir="ltr"></div></figure>` +
+      `<div class="rw-panels"><figure class="rw-panel"><figcaption>המפה${NB}: גובה, ו-${ltr("+")} מים</figcaption><div class="rw-map" role="grid" dir="ltr" data-edits></div></figure>` +
       `<figure class="rw-panel rw-heap-panel"><figcaption>הערימה, מהנמוך לגבוה</figcaption><ol class="rw-heap" dir="ltr"></ol></figure></div>` +
       `<p class="rw-step" aria-live="polite"></p><p class="rw-code"></p>`;
     const $ = (s) => box.querySelector(s);

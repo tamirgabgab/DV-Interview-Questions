@@ -113,12 +113,18 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
             continue
         if in_code:
             continue
-        # display math
-        if stripped.startswith("\\["):
+        # display math: a paragraph of its own, or Markdown eats the backslashes and the
+        # formula shows as raw TeX between [ and ]
+        if stripped.startswith("\\[") and not in_math:
             in_math = True
+            before = lines[n - 2].strip() if n > 1 else ""
+            if before and not re.match(r"^(!!!|\?\?\?\+?) ", before):
+                problems.append(f"{n}: display math \\[ needs a blank line before it")
         if in_math:
             if stripped.endswith("\\]"):
                 in_math = False
+                if n < len(lines) and lines[n].strip():
+                    problems.append(f"{n}: display math \\] needs a blank line after it")
             para_start = True
             continue
         # Markdown inside an HTML block (the steps timeline) is linted like the rest

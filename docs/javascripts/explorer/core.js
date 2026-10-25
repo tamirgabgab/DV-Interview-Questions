@@ -188,7 +188,9 @@
   // get() returns the box's own state as a payload (or null to fall back to the controls),
   // the link button of the header then writes `#state-<kind>.<payload>`, and set() reopens
   // it on load (true when the payload was valid). The field and the codec are kept on the
-  // box for the link and the remembered state (see "links" below).
+  // box for the link and the remembered state (see "links" below), and draw() for "reset
+  // everything", which draws a new example unless opts.fresh is false (a box whose draws
+  // add up, as the Monte Carlo counts).
   const SEED_HASH = /^#seed-([a-z0-9-]+)-(\d+)$/;
   const STATE_HASH = /^#state-([a-z0-9-]+)\.(.+)$/;
   let tick = 0;                      // orders a box's last seeded draw against its last control change
@@ -196,14 +198,14 @@
     const kind = box.dataset.kind;
     const label = document.createElement("label");
     label.className = "ex-seedlab";
-    label.innerHTML = `<span>זרע</span> <input type="number" class="ex-seed" min="1" max="${SEED_MAX}" step="1" dir="ltr" inputmode="numeric" aria-label="זרע ההגרלה, מספר לשחזור">`;
+    label.innerHTML = `<span>ערך אתחול</span> <input type="number" class="ex-seed" min="1" max="${SEED_MAX}" step="1" dir="ltr" inputmode="numeric" aria-label="ערך האתחול של ההגרלה, מספר לשחזור">`;
     after.after(label);
     const input = label.querySelector("input");
     if (opts.seed) input.value = opts.seed;
     const runSeed = (seed) => { input.value = seed; box.dvqSeedAt = ++tick; run(mulberry32(seed), seed); };
-    box.dvqSeed = { input, runSeed };
-    box.dvqState = opts.state || null;
     const draw = () => runSeed(newSeed());
+    box.dvqSeed = { input, runSeed, draw: opts.fresh === false ? null : draw };
+    box.dvqState = opts.state || null;
     input.addEventListener("change", () => { const v = Math.round(Number(input.value)); if (v >= 1 && v <= SEED_MAX) runSeed(v); else input.value = ""; });
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
     const first = box === document.querySelector(`.explorer[data-kind="${kind}"]`);
@@ -240,9 +242,9 @@
   };
   const randNote = (rd, seed, faults, names, checks) => {
     const v = rd.violation;
-    return `תנועה אקראית מהזרע ${ltr(seed)} : ${ltr(rd.count)} אירועים בשיעור ${ltr(`${Math.round(rd.rate * 100)}%`)}, ${faults}. ${checks} ` +
+    return `תנועה אקראית מערך האתחול ${ltr(seed)} : ${ltr(rd.count)} אירועים בשיעור ${ltr(`${Math.round(rd.rate * 100)}%`)}, ${faults}. ${checks} ` +
       (v ? `<span class="wv-bad">✗ אחרי אירוע ${ltr(v.index)} הופר : ${v.names.map((n) => names[n]).join(", ")}; התסריט נעצר שם.</span>` : `<span class="wv-ok">✓ אף אחד מהם לא הופר לאורך כל התסריט.</span>`) +
-      ` אותו זרע נותן את אותו תסריט; "הצעד הקודם" חוזר אחורה.`;
+      ` אותו ערך אתחול נותן את אותו תסריט; "הצעד הקודם" חוזר אחורה.`;
   };
   const speedSel = (slow, mid, fast) =>
     `<label>הקצב <select class="ex-speed"><option value="${slow}">איטי</option><option value="${mid}" selected>בינוני</option><option value="${fast}">מהיר</option></select></label>`;
@@ -354,12 +356,17 @@
 
   // The box's header (UI328): a title, and help, "reset everything" and "copy link" as
   // icon buttons (the word stays in the button as its name and shows as a tooltip).
+  // "Reset everything" builds the box again from its defaults and, in a box that draws
+  // its examples, draws a new one; the box is at its first step. That draw is the box's
+  // fresh state: it is not remembered, so a reload shows the page's example.
   const header = (box, helpOpen) => {
     const bar = document.createElement("div");
     bar.className = "ex-bar";
+    const resetTip = box.dvqSeed && box.dvqSeed.draw ? "איפוס הכול : הבקרות חוזרות לברירת המחדל, עם דוגמה אקראית חדשה מההתחלה"
+      : "איפוס הכול : כל הבקרות חוזרות לברירת המחדל";
     bar.innerHTML = `<span class="ex-bar-title"><i class="ui-ico ui-ico-gesture" aria-hidden="true"></i>נסו בעצמכם</span>` +
       `<button type="button" class="ex-help-btn ex-ibtn ui-ico-boxhelp" aria-expanded="false" aria-label="עזרה : מה התיבה מראה ומה הכפתורים עושים" data-tip="עזרה">עזרה</button>` +
-      `<button type="button" class="ex-reset-all ex-ibtn ui-ico-reset" data-tip="איפוס הכול : כל הבקרות חוזרות לברירת המחדל">איפוס הכול</button>` +
+      `<button type="button" class="ex-reset-all ex-ibtn ui-ico-reset" data-tip="${resetTip}">איפוס הכול</button>` +
       `<button type="button" class="ex-link ex-ibtn ui-ico-link" data-tip="העתקת קישור לתיבה עם אותן בחירות">העתקת קישור</button>` +
       `<p class="ex-help" hidden>${HELP[box.dataset.kind] || ""}</p>`;
     box.prepend(bar);
@@ -373,6 +380,10 @@
       if (/^#(seed|state|ctl)-/.test(location.hash)) history.replaceState(null, "", `${location.pathname}${location.search}`);
       store.drop(storeKey(box));
       setup(box, !help.hidden);
+      if (box.dvqSeed && box.dvqSeed.draw) {
+        box.dvqSeed.draw();
+        box.dvqFresh = JSON.stringify(stateOf(box));
+      }
     });
     const link = bar.querySelector(".ex-link");
     link.addEventListener("click", () => {
@@ -543,7 +554,7 @@
   const save = (box) => {
     if (box.dvqLinked || !box.dvqDefault) return;
     const now = stateOf(box);
-    if (JSON.stringify(now) === box.dvqDefault) store.drop(storeKey(box));
+    if (JSON.stringify(now) === box.dvqDefault || JSON.stringify(now) === box.dvqFresh) store.drop(storeKey(box));
     else store.set(storeKey(box), { sig: box.dvqSig, ...now });
   };
   const restore = (box) => {
@@ -596,6 +607,7 @@
   // behind three buttons beside the bar; a box with its own speed list keeps the select. A box with a "k מתוך T" counter gets a scrubber under the row: it
   // presses the box's own start / next buttons to reach a step, so every view keeps its
   // own stepping. The scrubber and the speed buttons are not controls of the link.
+  // The same seek keeps the place on the timeline through an edit (see edits below).
   const TRANSPORT = [["button.ex-start, button.ex-first", "first"], ["button.ex-prev", "prev"], ["button.ex-play", "play"],
     ["button.ex-next", "next"], ["button.ex-end, button.ex-last", "last"]];
   const SPEED_NAMES = ["×1", "×2", "×4"], SPEED_WORDS = "איטי,בינוני,מהיר";   // other speed lists stay a select
@@ -650,7 +662,8 @@
       }
       const posOf = () => [...box.querySelectorAll(".ex-pos")].find(own) || null;   // views may redraw the counter
       const next = found.find(([, icon]) => icon === "next"), first = found.find(([, icon]) => icon === "first");
-      const prev = found.find(([, icon]) => icon === "prev");
+      const prev = found.find(([, icon]) => icon === "prev"), last = found.find(([, icon]) => icon === "last");
+      const play = found.find(([, icon]) => icon === "play");
       if (!posOf() || !next) return;
       const wrap = document.createElement("div");
       wrap.className = "ex-scrubwrap";
@@ -667,17 +680,10 @@
         scrub.style.setProperty("--scrub", `${(100 * kt[0]) / kt[1]}%`);
         scrub.setAttribute("aria-valuetext", posOf().textContent.trim());
       };
-      let queued = false;
-      new MutationObserver((records) => {
-        if (queued || records.every((r) => wrap.contains(r.target))) return;
-        queued = true;
-        queueMicrotask(() => { queued = false; show(); });
-      }).observe(box, { childList: true, characterData: true, subtree: true });
-      show();
-      scrub.addEventListener("input", () => {
-        const goal = Number(scrub.value);
+      const seek = (goal) => {
         let kt = read();
         if (!kt) return;
+        if (goal >= kt[1] && kt[0] < kt[1] && last) { last[0].click(); kt = read(); if (!kt) return; }
         if (goal < kt[0]) {
           if (first) first[0].click();
           else for (let i = kt[0] - goal; i > 0 && prev; i--) prev[0].click();
@@ -689,9 +695,66 @@
           if (!now || now[0] === kt[0]) break;            // the box stopped advancing
           kt = now;
         }
-        show();
-      });
+      };
+      // After an edit (see edits), a counter that went back (the view started over) or kept
+      // its step while the number of steps changed returns to the same step, or to the same
+      // place relative to the new number of steps when it changed; the end stays the end. A
+      // play the edit stopped goes on.
+      let was = read();
+      const keep = () => {
+        const now = read(), old = was;
+        if (!now) return;
+        was = now;
+        if (box.dvqSeeking || box.dvqCause !== "edit" || performance.now() - box.dvqCauseAt > EDIT_MS || !old) return;
+        const restart = now[0] < old[0] || (now[1] !== old[1] && now[0] === old[0]);
+        const goal = old[0] >= old[1] ? now[1] : now[1] === old[1] ? old[0] : Math.round((old[0] * now[1]) / old[1]);
+        const resume = play && box.dvqPlaying && box.dvqPlaying.includes(play[0]);
+        if ((!restart || goal === now[0] || old[1] < 1 || now[1] > SCRUB_MAX) && !resume) return;
+        box.dvqSeeking = true;
+        try {
+          if (restart && old[1] >= 1 && now[1] <= SCRUB_MAX) seek(goal);
+          was = read();
+          if (resume && play[0].textContent.trim() !== "עצירה" && was && was[0] < was[1]) play[0].click();
+        } finally { box.dvqSeeking = false; }
+        if (resume) box.dvqPlaying = box.dvqPlaying.filter((b) => b !== play[0]);
+      };
+      let queued = false;
+      new MutationObserver((records) => {
+        if (queued || records.every((r) => wrap.contains(r.target))) return;
+        queued = true;
+        queueMicrotask(() => { queued = false; keep(); show(); });
+      }).observe(box, { childList: true, characterData: true, subtree: true });
+      show();
+      scrub.addEventListener("input", () => { seek(Number(scrub.value)); show(); });
     });
+  };
+
+  // Edits and navigation, for the place on the timeline (transport above): an event on a
+  // field, a button that is not playback, a slider point or a figure the view marks
+  // data-edits (cells typed, clicked or dragged) is an edit; the transport, the scrubber,
+  // the header, the keys of the box and a click elsewhere in a figure (which may pick a
+  // step) are navigation. The play buttons running at an edit are noted, to go on after it.
+  // An edit counts for EDIT_MS (the views redraw at once; a drag renews it), so a play
+  // that goes on after it is never taken for one. Clicks of the seek itself do not count.
+  const EDIT_MS = 600;
+  const NAV = `.ex-transport, .ex-scrubwrap, .ex-bar, .ex-restored, .ex-guide, select.ex-speed, ${PLAYBACK}`;
+  const causeOf = (e) => {
+    const t = e.target instanceof Element ? e.target : null;
+    if (!t || t.closest(NAV)) return "nav";
+    if (t.matches("input, select, textarea") || t.closest("[data-edits], [role=slider]")) return "edit";
+    return (e.type === "click" || e.type === "pointerdown") && t.closest("button, [role=button]") ? "edit" : "nav";
+  };
+  const edits = (box) => {
+    if (box.dvqEdits) return;                           // a rebuilt box keeps its listeners
+    box.dvqEdits = true;
+    const note = (e) => {
+      if (box.dvqSeeking) return;
+      box.dvqCause = causeOf(e);
+      box.dvqCauseAt = performance.now();
+      if (box.dvqCause === "edit") box.dvqPlaying = [...box.querySelectorAll("button.ex-play")].filter((b) => b.textContent.trim() === "עצירה");
+    };
+    ["pointerdown", "click", "keydown", "input", "change"].forEach((ev) => box.addEventListener(ev, note, true));
+    box.addEventListener("pointermove", (e) => { if (e.buttons && box.dvqCause === "edit") box.dvqCauseAt = performance.now(); }, true);
   };
 
   // Motion (UI329): once a person has touched the box (a trusted pointer or key event, so
@@ -891,9 +954,12 @@
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
     box.dvqSeedAt = box.dvqCtlAt = 0;                    // a rebuilt box has drawn nothing yet
+    box.dvqFresh = null;
+    box.dvqSeed = null;
     make(box).mount(box);
     layout(box);
     transport(box);
+    edits(box);
     header(box, helpOpen);
     keyboard(box);
     decorateLive(box);

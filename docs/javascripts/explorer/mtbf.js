@@ -172,7 +172,7 @@
       const redraw = () => { st.draw = metaDraw(st.count, 1e6 / FCLK, st.t0, st.tau, st.rnd()); draw(); };
       // a seeded draw: the phases and the settling times both come from one generator, so a
       // seed replays the same edges (a slider redraws from the same seed)
-      const seed = seedControls(box, $(".mc-1000"), (rng, sd) => { st.seed = sd; st.rnd = () => dvqExplorers.lib.mulberry32(sd); redraw(); });
+      const seed = seedControls(box, $(".mc-1000"), (rng, sd) => { st.seed = sd; st.rnd = () => dvqExplorers.lib.mulberry32(sd); redraw(); }, { fresh: false });
       $(".mc-100").addEventListener("click", () => { st.count = 100; seed.draw(); });
       $(".mc-1000").addEventListener("click", () => { st.count = 1000; seed.draw(); });
       ["tau", "t0"].forEach((k) => $(`.mc-${k}`).addEventListener("input", () => { st[k] = Number($(`.mc-${k}`).value); redraw(); }));

@@ -149,7 +149,7 @@
         `<span class="viz-legend"><span><i class="mo-key-one"></i>תא 1</span><span><i class="mo-key-cur"></i>התא הנוכחי</span><span class="mo-key-nb-wrap"><i class="mo-key-nb"></i>השכנים שנקראו</span>` +
         `<span class="mo-key-cand-wrap"><i class="mo-key-cand"></i>המלבן שנבדק</span><span><i class="mo-key-best"></i>הטוב עד עכשיו</span><span><i class="mo-key-win"></i>התשובה</span></span>` +
         `<p class="mo-edit-hint">לחיצה על תא הופכת אותו. גרירה מסמנת מלבן, ואז "הסימון ל-1" או "הסימון ל-0". במקלדת${NB}: חיצים בין התאים, רווח הופך תא, 0 או 1 קובעים אותו (או את כל הסימון), ו-Shift עם חץ מסמן. בשדה "הערכים" אפשר להדביק מערך שלם.</p>` +
-        `<div class="mo-panels"><figure class="mo-panel"><figcaption class="mo-cap-in"></figcaption><div class="mo-grid mo-in" role="grid" dir="ltr"></div></figure>` +
+        `<div class="mo-panels"><figure class="mo-panel"><figcaption class="mo-cap-in"></figcaption><div class="mo-grid mo-in" role="grid" dir="ltr" data-edits></div></figure>` +
         `<figure class="mo-panel"><figcaption class="mo-cap-dp"></figcaption><div class="mo-grid mo-dp" role="table" dir="ltr"></div></figure></div>` +
         `<p class="mo-step" aria-live="polite"></p><p class="mo-code"></p>`;
       const $ = (sel) => box.querySelector(sel);

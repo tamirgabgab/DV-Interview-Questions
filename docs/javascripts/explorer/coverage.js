@@ -127,7 +127,7 @@
           : `טסט ${ltr(k)} פגע בתא ${ltr(last)}${lastNew ? `, תא חדש${NB}: עכשיו כוסו ${ltr(cur)} מתוך ${ltr(n)}.` : `, שכבר כוסה.`} ` +
             (done ? `<span class="wv-ok">✓ כיסוי מלא אחרי ${ltr(total)} טסטים.</span>`
               : `בשלב ${ltr(`${cur} → ${cur + 1}`)} טסט מוצא תא חדש בהסתברות ${ltr(`${n - cur}/${n}`)}, ולכן ממתינים בממוצע ${ltr(`${n}/${n - cur} = ${exp[cur].toFixed(2)}`)} טסטים.`);
-        $(".sg-chart-title").innerHTML = st.avg ? `ההמתנה הממוצעת בכל שלב, ב-${ltr(AVG_RUNS)} ריצות מהזרע ${ltr(st.seed)}` : `ההמתנה בכל שלב של הריצה, מול התוחלת`;
+        $(".sg-chart-title").innerHTML = st.avg ? `ההמתנה הממוצעת בכל שלב, ב-${ltr(AVG_RUNS)} ריצות מערך האתחול ${ltr(st.seed)}` : `ההמתנה בכל שלב של הריצה, מול התוחלת`;
         $(".sg-chart").innerHTML = chart(exp, cur, partial);
         const sumDone = r.waits.slice(0, cur).reduce((a, b) => a + b, 0), expDone = exp.slice(0, cur).reduce((a, b) => a + b, 0);
         $(".sg-sum").innerHTML = st.avg
@@ -235,7 +235,7 @@
           `אחרי ${ltr(st.t)} טסטים חסרים עוד ${ltr(left)} ${left === 1 ? "תא" : "תאים"} (${ltr(st.hits.map((h, i) => (h < st.k ? i : null)).filter((v) => v !== null).join(", "))}); הסיכוי שהטסט הבא מתקדם : ${ltr(st.hits.reduce((acc, h, i) => acc + (h < st.k ? p[i] : 0), 0).toFixed(2))}.`;
         if (st.runs) {
           const m = st.runs.length, mean = st.runs.reduce((a, b) => a + b, 0) / m;
-          $(".cv-hist-title").innerHTML = `${ltr("1,000")} ריצות מהזרע ${ltr(st.seed)} : היסטוגרמה של מספר הטסטים עד הכיסוי`;
+          $(".cv-hist-title").innerHTML = `${ltr("1,000")} ריצות מערך האתחול ${ltr(st.seed)} : היסטוגרמה של מספר הטסטים עד הכיסוי`;
           $(".cv-hist").innerHTML = histSvg(exact);
           const sd = Math.sqrt(st.runs.reduce((a, v) => a + (v - mean) ** 2, 0) / m);
           $(".cv-hist-note").innerHTML = `הממוצע ${ltr(mean.toFixed(1))} לעומת התוחלת ${ltr(exact.toFixed(1))} (סטיית תקן ${ltr(sd.toFixed(1))}, שגיאת הממוצע כ-${ltr((sd / Math.sqrt(m)).toFixed(1))}); ` +
@@ -268,7 +268,7 @@
     views: { coverage: coverageView, stages: stagesView },
     help: {
       coverage: "בוחרים מספר תאים, משקל לכל תא ו-at_least : ״הטסט הבא״ ו״הפעלה״ מגרילים טסט אחרי טסט עד שכל התאים מכוסים, ו״1,000 ריצות״ מציירות היסטוגרמה של מספר הטסטים עם הממוצע וה-95% לעומת התוחלת המחושבת.",
-      stages: "״הטסט הבא״ ו״הפעלה״ מריצים טסטים על n תאים שווים : הסרט מחלק את הטסטים לשלבים, מ-i תאים מכוסים ל-i + 1, והעמודות מראות כמה טסטים לקח כל שלב מול התוחלת n/(n − i). ״ריצה חדשה״ מגרילה זרע חדש, ו״ממוצע של 500 ריצות״ מראה את ההמתנה הממוצעת בכל שלב.",
+      stages: "״הטסט הבא״ ו״הפעלה״ מריצים טסטים על n תאים שווים : הסרט מחלק את הטסטים לשלבים, מ-i תאים מכוסים ל-i + 1, והעמודות מראות כמה טסטים לקח כל שלב מול התוחלת n/(n − i). ״ריצה חדשה״ מגרילה ערך אתחול חדש, ו״ממוצע של 500 ריצות״ מראה את ההמתנה הממוצעת בכל שלב.",
     },
     models: { covProbs, covExpected, covK1, covCurve, covQuantile, covSimulate, covDraw, stageRun, stageExpect, stageAverage },
   });
