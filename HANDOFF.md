@@ -2412,10 +2412,11 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   other three coding proposals (meeting rooms, topological sort, single number II) are
   open for the owner to pick.
 - Session 25 (later): steady text heights in the boxes and the smaller, self-placing
-  enlarge button (item 47) are on the work branch `claude/ecstatic-cerf-wqi89q`, with
-  the new overlap failure of the phone check. The owner should look at the live boxes of
-  0018 and 0026 while playing (nothing under the text should move) and at the button on
-  the hourglass frames once the branch is on `main`.
+  enlarge button (item 47) are on `main` (4edb940, 2026-10-25; the branch CI was green,
+  the `main` run only built and deployed), with the new overlap failure of the phone
+  check. The live site was not checked from the sandbox: the owner should look at the
+  boxes of 0018 and 0026 while playing (nothing under the text should move) and at the
+  button on the hourglass frames.
 - Session 25: the eight review findings of 0025 and the `hl_lines` lint (item 46) are
   on `main` (0428b2a, 2026-10-25; the branch CI was green, the `main` run re-ran every
   check since the HANDOFF commit on top had no branch run, 12.5 minutes, then deployed).
