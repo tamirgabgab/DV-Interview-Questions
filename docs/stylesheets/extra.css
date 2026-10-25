@@ -1509,7 +1509,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .cake-gone { background: transparent; outline: 1px dashed var(--viz-text); outline-offset: -1px; }
 .md-typeset .explorer .ex-controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; align-items: center; }
 .md-typeset .explorer label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.5rem; }
-.md-typeset .explorer label[hidden] { display: none; }
+.md-typeset .explorer :is(label, button)[hidden] { display: none; }   /* the layout gives buttons a display; "the next direction" of 0046 hides */
 .md-typeset .explorer input[type="range"] { width: 11rem; max-width: 100%; accent-color: var(--viz-s1); }
 .md-typeset .explorer output {
   min-width: 3.2rem;
@@ -2859,14 +2859,14 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .mo-tri--win { stroke: var(--viz-s3); stroke-width: 3px; }
 
 /* rainwater (0047): part a's columns, pointers and table; part b's height map and heap.
-   The ground is shaded up to 29 % ink and the water up to 45 % blue, so the ink digits on
-   them stay readable (tools/check_contrast.py has both ends). */
+   The ground is shaded up to 29 % ink (height 20) and the water up to 45 % blue, so the
+   ink digits on them stay readable (tools/check_contrast.py has both ends). */
 .md-typeset .explorer :is(.rw-bars, .rw-ptrs) { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1.6rem)); gap: 2px; width: max-content; max-width: 100%; margin: 0 auto; }
 .md-typeset .explorer .rw-bars { align-items: end; margin-top: 0.5rem; }
 .md-typeset .explorer .rw-col { display: flex; flex-direction: column; gap: 2px; min-width: 0; border-radius: 3px; cursor: pointer; touch-action: manipulation; }
 .md-typeset .explorer .rw-col:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
 .md-typeset .explorer .rw-col.is-cur { box-shadow: 0 0 0 2.5px var(--viz-ink); }
-.md-typeset .explorer .rw-cell { aspect-ratio: 1; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--viz-grid); }
+.md-typeset .explorer .rw-cell { height: min(1.6rem, calc(14rem / var(--rows, 5))); border-radius: 2px; box-shadow: inset 0 0 0 1px var(--viz-grid); }
 .md-typeset .explorer .rw-cell.is-ground { background: color-mix(in srgb, var(--viz-ink) 55%, var(--md-default-bg-color)); box-shadow: none; }
 .md-typeset .explorer .rw-cell.is-water { background: color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color)); }
 .md-typeset .explorer .rw-idx { color: var(--viz-text); font-family: var(--md-code-font-family); font-size: 0.6rem; text-align: center; }
@@ -2885,7 +2885,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .rw-panel figcaption { margin: 0 auto 0.3rem; font-size: 0.68rem; text-align: center; }
 .md-typeset .explorer .rw-map { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 2rem)); gap: 2px; width: max-content; max-width: 100%; margin: 0 auto; }
 .md-typeset .explorer .rw-r { display: contents; }
-.md-typeset .explorer .rw-mcell { display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 1; min-width: 0; border-radius: 3px; background: color-mix(in srgb, var(--viz-ink) calc(var(--hgt) * 3.2%), var(--md-default-bg-color)); box-shadow: inset 0 0 0 1px var(--viz-grid); color: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 0.7rem; line-height: 1; cursor: pointer; user-select: none; touch-action: manipulation; }
+.md-typeset .explorer .rw-mcell { display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 1; min-width: 0; border-radius: 3px; background: color-mix(in srgb, var(--viz-ink) calc(var(--hgt) * 1.45%), var(--md-default-bg-color)); box-shadow: inset 0 0 0 1px var(--viz-grid); color: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 0.7rem; line-height: 1; cursor: pointer; user-select: none; touch-action: manipulation; }
 .md-typeset .explorer .rw-mcell.is-water { background: color-mix(in srgb, var(--viz-s1) min(45%, calc(17% + var(--dep) * 7%)), var(--md-default-bg-color)); }
 .md-typeset .explorer .rw-mcell .rw-w { font-size: 0.55rem; font-weight: 700; }
 .md-typeset .explorer .rw-mcell.is-heap { box-shadow: inset 0 0 0 2.5px var(--viz-s2); }
@@ -2901,6 +2901,19 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .rw-key-water { background: color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color)); }
 .md-typeset .viz-legend .rw-key-cur { background: transparent; outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; }
 .md-typeset .viz-legend .rw-key-heap { background: transparent; outline: 2.5px solid var(--viz-s2); outline-offset: -2.5px; }
+.md-typeset .explorer .rw-col.is-sel { background: color-mix(in srgb, var(--viz-s1) 14%, transparent); outline: 2px dashed var(--viz-s1); outline-offset: 1px; }
+.md-typeset .explorer .rw-mcell.is-sel:not(.is-fill) { outline: 2px dashed var(--viz-s1); outline-offset: -4px; }
+.md-typeset .explorer .rw-inline { width: 100%; min-width: 2.2rem; padding: 0; border: 2px solid var(--md-accent-fg-color); border-radius: 3px; background: var(--md-default-bg-color); color: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 0.7rem; text-align: center; }
+.md-typeset .explorer :is(.rw-textlab, .mo-textlab) { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+.md-typeset .explorer :is(.rw-text, .mo-text) { width: min(18rem, 100%); padding: 0.2rem 0.35rem; border: 1px solid var(--site-card-border); border-radius: 4px; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font-family: var(--md-code-font-family); font-size: 0.7rem; }
+.md-typeset .explorer input.rw-text { width: min(26rem, 100%); }
+.md-typeset .explorer textarea:is(.rw-text, .mo-text) { width: min(14rem, 100%); resize: vertical; }
+.md-typeset .explorer :is(.rw-err, .mo-err) { color: var(--viz-s2-text); font-size: 0.68rem; }
+.md-typeset .explorer :is(.rw-err, .mo-err):empty { display: none; }
+/* the final view (0046, 0047): only the result, so the run's controls and words go */
+.md-typeset .explorer.ex-final :is(.rw-play, .mo-play, .ex-scrubwrap, .rw-step, .rw-code, .rw-ptrs, .rw-heap-panel, .mo-step, .mo-code) { display: none; }
+.md-typeset .explorer.ex-final .viz-legend > span:has(> :is(.rw-key-cur, .rw-key-heap, .rw-key-fill, .mo-key-cur, .mo-key-nb, .mo-key-cand, .mo-key-best)) { display: none; }
+.md-typeset .viz-legend .rw-key-sel { background: color-mix(in srgb, var(--viz-s1) 14%, transparent); outline: 2px dashed var(--viz-s1); outline-offset: -2px; }
 .md-typeset .viz-legend .rw-key-fill { background: transparent; outline: 2px dashed var(--viz-s4); outline-offset: -2px; }
 .md-typeset .explorer .mo-edit-hint { margin: 0.2rem 0; color: var(--viz-text); font-size: 0.65rem; }
 .md-typeset .explorer :is(.mo-step, .mo-code) { margin: 0.3rem 0; font-size: 0.72rem; }

@@ -483,7 +483,8 @@
   // 0014) sets box.dvqExtra = { get() → text or "", set(text) → ok }: its text rides as a
   // last part "!<text>" and is applied after the controls.
   const CTL_HASH = /^#ctl-([a-z0-9-]+)-(\d+)\.(.*)$/;
-  const controlsOf = (box) => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed") && !el.classList.contains("ex-scrub"));
+  // A field marked data-nolink (an editing aid whose result rides in dvqExtra) is no control.
+  const controlsOf = (box) => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.classList.contains("ex-seed") && !el.classList.contains("ex-scrub") && !el.hasAttribute("data-nolink"));
   const valueOf = (el) => (el.type === "checkbox" || el.type === "radio" ? (el.checked ? "1" : "0") : el.value);
   const enc = (v) => encodeURIComponent(v).replace(/~/g, "%7E");
   const payloadOf = (box) => {
@@ -943,10 +944,33 @@
     Object.assign(HELP, help);
     Object.assign(models, own);
   };
+  // Editing a grid of numbers (0046, 0047): the view select (every step, or straight to the
+  // final result, which every later edit keeps), and the text of a grid: a row per line
+  // (or Python's [[...], [...]]), the numbers split by commas or spaces, or digit by digit
+  // when a line has neither and the values are single digits. parseGrid returns the grid
+  // or a Hebrew reason it was not taken.
+  const viewSel = () => `<label>תצוגה <select class="ex-view" aria-label="צעד אחרי צעד, או ישר לתוצאה הסופית"><option value="steps">צעד אחרי צעד</option><option value="final">התוצאה הסופית</option></select></label>`;
+  const parseGrid = (text, { max, rows, cols, row = false }) => {
+    let lines = text.trim();
+    if (!lines) return "השדה ריק.";
+    if (/^\[\s*\[/.test(lines)) lines = lines.replace(/\]\s*,?\s*\[/g, "\n");
+    lines = lines.replace(/[\[\]]/g, "").split(/\n|;/).map((l) => l.trim()).filter(Boolean);
+    if (row) lines = [lines.join(",")];
+    const grid = lines.map((l) => (/[\s,]/.test(l) ? l.split(/[\s,]+/).filter(Boolean) : max <= 9 ? [...l] : [l]));
+    if (grid.some((r) => r.some((v) => !/^\d+$/.test(v)))) return "יש בשדה משהו שהוא לא מספר שלם.";
+    const g = grid.map((r) => r.map(Number));
+    if (g.some((r) => r.some((v) => v > max))) return `הערכים הם 0 עד ${max}.`;
+    if (g.some((r) => r.length !== g[0].length)) return "לכל השורות צריך להיות אותו אורך.";
+    if (g.length > rows || g[0].length > cols) return row ? `עד ${cols} ערכים.` : `עד ${rows} שורות ועד ${cols} עמודות.`;
+    return g;
+  };
+  const gridText = (grid, row = false) => (row ? grid[0].join(", ") : grid.map((r) => r.join(" ")).join("\n"));
+
   const lib = {
     BASE, EPS, H, KB_DIGITS, RAND_HASH, RIGHT, SEED_MAX, STATE_CODECS, TOP, TRI_M, W, X0,
     answer, arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, f, floydParse, floydTrace, fmt, frame, hline,
-    ltr, mulberry32, newSeed, randNote, randomRow, seedControls, speedSel, stickyNames, triNorm, waveDromText, waveStrip,
+    gridText, ltr, mulberry32, newSeed, parseGrid, randNote, randomRow, seedControls, speedSel, stickyNames, triNorm, viewSel,
+    waveDromText, waveStrip,
   };
   globalThis.dvqExplorers = { lib, models, register, ready, linkOf };
   if (typeof document === "undefined") return;

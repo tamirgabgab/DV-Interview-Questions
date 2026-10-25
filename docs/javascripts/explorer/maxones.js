@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { answer, autoplay, ltr, seedControls, speedSel } = dvqExplorers.lib;
+  const { answer, autoplay, gridText, ltr, parseGrid, seedControls, speedSel, viewSel } = dvqExplorers.lib;
   const NB = " ";
   const MAX = 16;
 
@@ -131,22 +131,24 @@
     mount(box) {
       const mode0 = MODES[box.dataset.mode] ? box.dataset.mode : "square";
       const grid0 = moParse(box.dataset.grid || "") || [[1, 1], [1, 0]];
-      const st = { grid: grid0.map((r) => r.slice()), mode: mode0, p: 70, k: 0, sel: null, focus: [0, 0] };
+      const st = { grid: grid0.map((r) => r.slice()), mode: mode0, p: 70, k: 0, sel: null, focus: [0, 0], final: false };
       box.innerHTML =
         `<div class="ex-controls"><label>שורות <input type="number" class="ex-num mo-m" min="1" max="${MAX}" step="1" value="${grid0.length}" dir="ltr" aria-label="מספר השורות, עד ${MAX}"></label>` +
         `<label>עמודות <input type="number" class="ex-num mo-n" min="1" max="${MAX}" step="1" value="${grid0[0].length}" dir="ltr" aria-label="מספר העמודות, עד ${MAX}"></label>` +
         `<label>הסיכוי ל-1 <input type="range" class="mo-p" min="0" max="100" step="5" value="70" dir="ltr" aria-label="הסיכוי של תא להיות 1 במערך אקראי, באחוזים"><output class="mo-out-p">70%</output></label>` +
         `<button type="button" class="md-button md-button--primary mo-rand">מערך אקראי</button></div>` +
-        `<div class="ex-controls"><label>מחפשים <select class="mo-mode" aria-label="ריבוע, מלבן או משולש">${Object.entries(MODES).map(([v, w]) => `<option value="${v}">${w}</option>`).join("")}</select></label>` +
+        `<div class="ex-controls"><label>מחפשים <select class="mo-mode" aria-label="ריבוע, מלבן או משולש">${Object.entries(MODES).map(([v, w]) => `<option value="${v}">${w}</option>`).join("")}</select></label>${viewSel()}` +
         `<button type="button" class="md-button mo-set1" disabled>הסימון ל-1</button><button type="button" class="md-button mo-set0" disabled>הסימון ל-0</button></div>` +
-        `<div class="ex-controls"><button type="button" class="md-button ex-start">להתחלה</button><button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
+        `<div class="ex-controls mo-textrow"><label class="mo-textlab">הערכים <textarea class="mo-text" rows="${grid0.length}" dir="ltr" spellcheck="false" data-nolink aria-label="המערך כטקסט, שורה בכל שורה"></textarea></label>` +
+        `<button type="button" class="md-button mo-apply">עדכון מהטקסט</button><span class="mo-err" role="status"></span></div>` +
+        `<div class="ex-controls mo-play"><button type="button" class="md-button ex-start">להתחלה</button><button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-play">הפעלה</button><button type="button" class="md-button ex-next">הצעד הבא</button>` +
         `<button type="button" class="md-button ex-step mo-nextrow">השורה הבאה</button><button type="button" class="md-button ex-step mo-nextdir" hidden>הכיוון הבא</button><button type="button" class="md-button ex-end">עד הסוף</button>` +
         `${speedSel(600, 220, 50)}<span class="ex-pos" aria-live="off"></span></div>` +
         `<p class="ex-summary mo-sum" aria-live="polite"></p>` +
         `<span class="viz-legend"><span><i class="mo-key-one"></i>תא 1</span><span><i class="mo-key-cur"></i>התא הנוכחי</span><span class="mo-key-nb-wrap"><i class="mo-key-nb"></i>השכנים שנקראו</span>` +
         `<span class="mo-key-cand-wrap"><i class="mo-key-cand"></i>המלבן שנבדק</span><span><i class="mo-key-best"></i>הטוב עד עכשיו</span><span><i class="mo-key-win"></i>התשובה</span></span>` +
-        `<p class="mo-edit-hint">לחיצה על תא הופכת אותו. גרירה מסמנת מלבן, ואז "הסימון ל-1" או "הסימון ל-0". במקלדת${NB}: חיצים בין התאים, רווח הופך תא, ו-Shift עם חץ מסמן.</p>` +
+        `<p class="mo-edit-hint">לחיצה על תא הופכת אותו. גרירה מסמנת מלבן, ואז "הסימון ל-1" או "הסימון ל-0". במקלדת${NB}: חיצים בין התאים, רווח הופך תא, 0 או 1 קובעים אותו (או את כל הסימון), ו-Shift עם חץ מסמן. בשדה "הערכים" אפשר להדביק מערך שלם.</p>` +
         `<div class="mo-panels"><figure class="mo-panel"><figcaption class="mo-cap-in"></figcaption><div class="mo-grid mo-in" role="grid" dir="ltr"></div></figure>` +
         `<figure class="mo-panel"><figcaption class="mo-cap-dp"></figcaption><div class="mo-grid mo-dp" role="table" dir="ltr"></div></figure></div>` +
         `<p class="mo-step" aria-live="polite"></p><p class="mo-code"></p>`;
@@ -182,7 +184,7 @@
       const draw = () => {
         const m = st.grid.length, n = st.grid[0].length, T = total();
         const sq = st.mode === "square", rect = st.mode === "rect", tri = st.mode === "tri";
-        st.k = Math.min(Math.max(0, st.k), T);
+        st.k = st.final ? T : Math.min(Math.max(0, st.k), T);
         const done = st.k === T, ev = st.k ? (rect ? trace.events[st.k - 1] : trace.frames[st.k - 1]) : null;
         const res = trace.result, win = done ? res : null;
         const best = !ev ? null : sq ? sqShape(ev.side, ev.end) : tri ? (ev.side ? moTriShape(ev.side, ev.at, ev.pass) : null) : ev.best;
@@ -303,12 +305,47 @@
       };
 
       // every edit starts the run over
+      // (in the final view every edit shows the end, and the steps stay there)
       const stop = autoplay(play, speed, {
-        step: () => { st.k++; draw(); },
-        done: () => st.k >= total(),
-        restart: () => { st.k = 0; draw(); },
+        step: () => { if (!st.final) st.k++; draw(); },
+        done: () => st.final || st.k >= total(),
+        restart: () => { st.k = st.final ? total() : 0; draw(); },
       });
-      const edited = () => { stop(); st.k = 0; retrace(); draw(); };
+      const edited = (fromText = false) => {
+        stop();
+        retrace();
+        st.k = st.final ? total() : 0;
+        if (!fromText) {
+          if (document.activeElement !== $(".mo-text")) $(".mo-text").value = gridText(st.grid);
+          $(".mo-err").textContent = "";
+        }
+        $(".mo-text").rows = st.grid.length;
+        draw();
+      };
+      const applyText = () => {
+        const g = parseGrid($(".mo-text").value, { max: 1, rows: MAX, cols: MAX });
+        if (typeof g === "string") { $(".mo-err").textContent = g; return; }
+        $(".mo-err").textContent = "";
+        st.grid = g;
+        st.sel = null;
+        st.focus = [Math.min(st.focus[0], g.length - 1), Math.min(st.focus[1], g[0].length - 1)];
+        $(".mo-m").value = g.length;
+        $(".mo-n").value = g[0].length;
+        edited(true);
+      };
+      $(".mo-apply").addEventListener("click", applyText);
+      $(".mo-text").addEventListener("change", applyText);
+      $(".mo-text").addEventListener("keydown", (e) => {
+        e.stopPropagation();
+        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); applyText(); }
+      });
+      $(".ex-view").addEventListener("change", () => {
+        st.final = $(".ex-view").value === "final";
+        box.classList.toggle("ex-final", st.final);
+        stop();
+        if (st.final) st.k = total();
+        draw();
+      });
       const resize = () => {
         const m = Math.min(MAX, Math.max(1, Math.round(Number($(".mo-m").value)) || 1));
         const n = Math.min(MAX, Math.max(1, Math.round(Number($(".mo-n").value)) || 1));
@@ -337,11 +374,12 @@
       };
       $(".mo-set1").addEventListener("click", () => fill(1));
       $(".mo-set0").addEventListener("click", () => fill(0));
-      $(".ex-next").addEventListener("click", () => { stop(); st.k++; draw(); });
-      $(".ex-prev").addEventListener("click", () => { stop(); st.k--; draw(); });
-      $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
+      const guard = (f) => () => { if (!st.final) f(); };
+      $(".ex-next").addEventListener("click", guard(() => { stop(); st.k++; draw(); }));
+      $(".ex-prev").addEventListener("click", guard(() => { stop(); st.k--; draw(); }));
+      $(".ex-start").addEventListener("click", guard(() => { stop(); st.k = 0; draw(); }));
       $(".ex-end").addEventListener("click", () => { stop(); st.k = total(); draw(); });
-      $(".mo-nextrow").addEventListener("click", () => {
+      $(".mo-nextrow").addEventListener("click", guard(() => {
         stop();
         const n = st.grid[0].length, T = total();
         if (st.mode !== "rect") st.k = Math.min(T, (Math.floor(st.k / n) + 1) * n);
@@ -351,14 +389,14 @@
           st.k = k;
         }
         draw();
-      });
+      }));
 
-      $(".mo-nextdir").addEventListener("click", () => {
+      $(".mo-nextdir").addEventListener("click", guard(() => {
         stop();
         const mn = st.grid.length * st.grid[0].length;
         st.k = Math.min(total(), (Math.floor(st.k / mn) + 1) * mn);
         draw();
-      });
+      }));
 
       // the grid: a tap toggles a cell, a drag selects a rectangle; the arrow keys move
       // between the cells (Shift extends the selection), space or Enter toggles
@@ -414,6 +452,12 @@
           st.grid[r][c] ^= 1;
           st.sel = null;
           edited();
+        } else if (e.key === "0" || e.key === "1") {
+          e.preventDefault();
+          e.stopPropagation();
+          const v = Number(e.key);
+          if (st.sel && r >= Math.min(st.sel[0], st.sel[2]) && r <= Math.max(st.sel[0], st.sel[2]) && c >= Math.min(st.sel[1], st.sel[3]) && c <= Math.max(st.sel[1], st.sel[3])) fill(v);
+          else { st.grid[r][c] = v; st.sel = null; edited(); }
         } else if (e.key === "Escape" && st.sel) {
           st.sel = null;
           draw();
@@ -431,14 +475,14 @@
           st.sel = null;
           $(".mo-m").value = grid.length;
           $(".mo-n").value = grid[0].length;
-          retrace();
-          st.k = m[2] ? Number(m[2]) : 0;
+          edited();
+          if (!st.final) st.k = m[2] ? Number(m[2]) : 0;
           draw();
           return true;
         },
       };
       retrace();
-      draw();
+      edited();
     },
   });
 

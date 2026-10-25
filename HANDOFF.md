@@ -2245,6 +2245,25 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
     map with the heap outlined, the popped cell framed, the filled neighbours dashed,
     the water by depth and the heap list. New topics `two-pointers` (שני מצביעים) and
     `heap` (ערימה) in `TOPICS`; three new pairs in `tools/check_contrast.py`.
+43. **0047 renamed "מילוי מים בבאר", and editing in the grid boxes (0046, 0047).** The owner
+    renamed the question (file `0047-filling-a-well.md`, not yet published) and asked for
+    a straight-to-the-result option and easier editing, with multiple-choice answers:
+    a view select (`viewSel` in core: every step, or the final result, which every edit,
+    random fill and resize keeps; the run's row, the scrubber, the step words and their
+    legend keys hide), a drag that selects a range of columns or a rectangle of cells
+    with a value field, "apply to the selection" and ±1, digits typed on a cell (two
+    within 0.9 s make one number) or on the selection, an in-place editor on a double
+    tap or Enter, and a text field that takes the values or a pasted Python list
+    (`parseGrid` / `gridText` in core). Heights 0 to 20 with a "highest" field for the
+    random fill; the row's cells shrink with the tallest column. 0046's boxes got the
+    same view select, the text field and 0 / 1 typed on a cell or the selection. Editing
+    aids are marked `data-nolink`: core's `controlsOf` and `tools/check_explorers.py`
+    skip them, so links and saved states hold the grid in `dvqExtra` only (0046's view
+    select sits after its mode select, so an older saved state still maps). Found on the
+    way: a tap re-rendered the map under the pointer, which lost the double tap (the
+    selection is painted in place now, and the double tap finds the cell under the
+    pointer, since the pointer capture retargets it), and 0046's "the next direction"
+    showed in every mode (the layout's display beat `[hidden]` on buttons).
 ---
 
 ## In progress
@@ -2306,8 +2325,9 @@ sampling (bits tapped or drawn at random) and the FIFO flags.
   Part 7 (item 39) is on `main` (deceb8e) with part 6. Part 5 (item 40) is done on the
   branch; with it all seven parts of the plan are done. The topic names are approved and
   part 5 is on `main` (307a066).
-- Session 24: 0046 part c, the largest right triangle (item 41), and question 0047,
-  trapping rain water (item 42), are done on the branch; `main` when the owner asks. The
+- Session 24: 0046 part c, the largest right triangle (item 41), question 0047, filling a
+  well (items 42 and 43), and the editing of the grid boxes are done on the branch;
+  `main` when the owner asks. The
   other three coding proposals (meeting rooms, topological sort, single number II) are
   open for the owner to pick.
 - Next: the owner's picks from the second series (rounds A to E on how answers are

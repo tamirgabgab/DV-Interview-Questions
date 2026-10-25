@@ -73,12 +73,13 @@ RESET = """(b) => {
 WIDTH_NOW = "() => document.documentElement.scrollWidth"
 
 # Draw with seed 4242 where the box has a seed field, then change every control of box b in
-# document order (re-queried after each change); returns the number changed.
+# document order (re-queried after each change); returns the number changed. An editing aid
+# marked data-nolink is no control (see controlsOf in core.js).
 CHANGE = """(b) => {
   const box = document.querySelectorAll(".explorer")[b];
   const seed = box.querySelector(".ex-seed");
   if (seed) { seed.value = "4242"; seed.dispatchEvent(new Event("change", { bubbles: true })); }
-  const ctl = () => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.matches(".ex-seed, .ex-scrub"));
+  const ctl = () => [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.matches(".ex-seed, .ex-scrub, [data-nolink]"));
   let changed = 0;
   for (let i = 0; i < ctl().length; i++) {
     const el = ctl()[i];
@@ -108,7 +109,7 @@ CHANGE = """(b) => {
 # its own codec (`#state-`), whose data stands for the draw.
 SNAP = """([b, own]) => {
   const box = document.querySelectorAll(".explorer")[b];
-  const values = [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.matches(".ex-seed, .ex-scrub"))
+  const values = [...box.querySelectorAll("input, select, textarea")].filter((el) => !el.matches(".ex-seed, .ex-scrub, [data-nolink]"))
     .map((el) => el.type === "checkbox" ? el.checked : el.value);
   const seed = box.querySelector(".ex-seed");
   if (seed && !own) values.push(`seed ${seed.value}`);
