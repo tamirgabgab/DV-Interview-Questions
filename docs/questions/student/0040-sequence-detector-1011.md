@@ -259,7 +259,7 @@ added: 2026-10-22
     #### הקוד { .sol-code }
 
     === "SystemVerilog"
-        ```systemverilog title="module seq_detect (any pattern)" linenums="1" hl_lines="11 15 17 27 32"
+        ```systemverilog title="module seq_detect (any pattern)" linenums="1" hl_lines="15 19 20 38 43"
         module seq_detect #(
           parameter int L = 4,
           parameter bit [0:L-1] PATTERN = 4'b1011,   // PATTERN[0] arrives first

@@ -342,7 +342,7 @@ added: 2026-10-15
         ב-constraint. כל שאר ה-constraints כתובים על `a[i]` ו-`a[i+1]`, ולכן הם נכונים לכל
         \( n \).
 
-        ```systemverilog title="class circle_poly" linenums="1" hl_lines="17 18 19"
+        ```systemverilog title="class circle_poly" linenums="1" hl_lines="18 19 20"
         class circle_poly;
 
           localparam int  FULL = 360;          // full circle, 1 degree resolution

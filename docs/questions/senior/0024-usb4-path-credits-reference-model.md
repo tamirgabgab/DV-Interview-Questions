@@ -571,7 +571,7 @@ added: 2026-10-19
         4. רק עכשיו PCR מיושר ל-PCC. ה-Sync הבא ימדוד אובדנים מנקודה זו והלאה.
 
     === "Python"
-        ```python title="EgressSyncModel, IngressSyncModel" linenums="1" hl_lines="6 15 16 17"
+        ```python title="EgressSyncModel, IngressSyncModel" linenums="1" hl_lines="6 14 15 16"
         class EgressSyncModel(EgressCreditModel):
             """Part b adds the Path Credit Sync to both sides; everything else is inherited."""
 

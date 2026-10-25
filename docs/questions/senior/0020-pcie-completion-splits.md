@@ -126,7 +126,7 @@ added: 2026-10-18
     הפונקציה הראשית רק מאפסת את התוצאה וקוראת לה.
 
     === "SystemVerilog"
-        ```systemverilog title="function completion_splits" linenums="1" hl_lines="17 21 22 27"
+        ```systemverilog title="function completion_splits" linenums="1" hl_lines="18 22 23 28"
         // Every legal sequence of completion payload sizes for a read of `len` bytes from
         // `addr` (len <= MRRS, no 4 KB crossing). `splits` gets one queue of sizes per
         // split, in address order; the first split has the fewest completions.

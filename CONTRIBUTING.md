@@ -172,7 +172,9 @@ Conventions:
   key lines `hl_lines=`, and non-trivial lines carry Material **code annotations**: a
   `// (1)!` / `# (1)!` marker (or ` (1)` appended to an existing comment) and a numbered
   Hebrew list right after the block. Annotation markers are ignored by the testbench
-  fingerprints, so they can be added without touching the translations.
+  fingerprints, so they can be added without touching the translations. The lint checks
+  that every `hl_lines=` number lands on a code line of the dedented block (not a blank
+  line, a comment or a bare `end`), since editing a block shifts the numbers.
 - **Every code answer is tested automatically** (see [Tests](#tests) below): the tests run
   the code exactly as it appears on the page, and the site is only published when they pass.
 - **Questions with code get a "run" panel**: the page's Python code runs in the reader's

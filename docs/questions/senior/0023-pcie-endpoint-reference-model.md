@@ -341,7 +341,7 @@ added: 2026-10-19
         6. ‏`pop_front` תמיד : בתוך קריאה אחת הסדר הוא סדר הכתובות, בלי יוצא מן הכלל.
 
     === "Python"
-        ```python title="class EndpointRefModel" linenums="1" hl_lines="18 23 29 42 55 56"
+        ```python title="class EndpointRefModel" linenums="1" hl_lines="17 21 26 40 51 52"
         class EndpointRefModel:
             """Completer model for RCB-aligned traffic: writes and reads of whole 128-byte blocks."""
             MIN_DELAY, MAX_DELAY = 1, 20     # cycles before the first completion of a read

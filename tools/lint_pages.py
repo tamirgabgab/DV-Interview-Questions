@@ -19,6 +19,9 @@ Checks, per page:
 - One ``??? interviewer`` block right after the question, and the end-of-page blocks use
   the ``trap`` / ``followup`` types (a top-level ``note`` / ``warning`` titled like an
   interviewer / trap / follow-up block is reported; other notes may keep their type).
+- Code highlights: every line named in ``hl_lines=`` exists in the (dedented) block and is
+  a code line, not a blank line, a comment alone or a bare ``end`` / ``endfunction``, so the
+  highlights keep pointing at the code the explanation names after the block is edited.
 Warnings (printed, exit status unchanged): an inline SVG colour written as a literal
 (``fill="#..."``, ``stroke:#...``, ``fill="white"``) instead of a class whose colour is a CSS
 variable, since such a figure does not follow the light / dark switch.
@@ -29,10 +32,11 @@ from __future__ import annotations
 
 import re
 import sys
+import textwrap
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from extract_code import QUESTIONS, question_path  # noqa: E402
+from extract_code import FENCE, QUESTIONS, question_path  # noqa: E402
 
 LABELS = ["הרעיון", "השלבים", "הקוד", "למה זה נכון", "סיבוכיות"]
 CLASSES = ["sol-idea", "sol-steps", "sol-code", "sol-proof", "sol-cost"]
@@ -44,6 +48,31 @@ HEBREW_WORD = re.compile(r"^[\u05d0-\u05ea]")
 RLM = "‏"
 LITERAL_COLOUR = re.compile(r'(?:fill|stroke|color)\s*(?:=\s*"|:\s*)\s*(#[0-9a-fA-F]{3,8}|white|black|red|green|blue|gray|grey|orange)\b')
 LATIN_START = re.compile(r"^[A-Za-z`\\]")
+HL_LINES = re.compile(r'hl_lines="([^"]*)"')
+CLOSERS = {"end", "endfunction", "endtask", "endclass", "endmodule", "begin", "else", "}", "{", "pass"}
+
+
+def lint_highlights(text: str) -> list[str]:
+    """Every ``hl_lines`` entry must name a code line of its (dedented) block."""
+    problems = []
+    for m in FENCE.finditer(text):
+        header = text[m.start():text.find("\n", m.start())]
+        h = HL_LINES.search(header)
+        if not h:
+            continue
+        n = text.count("\n", 0, m.start()) + 1
+        body = textwrap.dedent(m.group("body")).splitlines()
+        wanted = []
+        for part in h.group(1).split():
+            a, _, b = part.partition("-")
+            wanted.extend(range(int(a), int(b or a) + 1))
+        for k in wanted:
+            line = body[k - 1].strip() if 0 < k <= len(body) else None
+            if line is None:
+                problems.append(f"{n}: hl_lines names line {k}, the block has {len(body)} lines")
+            elif not line or line.startswith(("//", "#")) or line in CLOSERS:
+                problems.append(f"{n}: hl_lines names line {k}, which is not code: {line[:40]!r}")
+    return problems
 
 
 def topic_names() -> dict[str, str]:
@@ -225,6 +254,7 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     if hint_numbers and hint_numbers != sorted(hint_numbers):
         pass  # numbering restarts per part; only the per-hint number check above matters
     problems.extend(leftovers)
+    problems.extend(lint_highlights(path.read_text(encoding="utf-8")))
     return problems
 
 

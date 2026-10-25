@@ -94,7 +94,7 @@ added: 2026-10-22
     #### הקוד { .sol-code }
 
     === "SystemVerilog"
-        ```systemverilog title="expected_uniform, cover_curve, tests_for" linenums="1" hl_lines="7 13 14 15 16"
+        ```systemverilog title="expected_uniform, cover_curve, tests_for" linenums="1" hl_lines="6 13 14 15 33"
         localparam int MAXB = 1024;      // bins
 
         // n H_n: the expected number of tests until every one of n equal bins is hit.
@@ -318,7 +318,7 @@ added: 2026-10-22
     #### הקוד { .sol-code }
 
     === "SystemVerilog"
-        ```systemverilog title="expected_tests, expected_k1, simulate_tests" linenums="1" hl_lines="9 10 19 20 21 22 33 44 45 46"
+        ```systemverilog title="expected_tests, expected_k1, simulate_tests" linenums="1" hl_lines="13 14 21 22 33 34 45 47"
         localparam int MAXN = 32;        // bins with their own probability
 
         // P(Poisson(lam) >= k).

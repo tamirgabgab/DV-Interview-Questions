@@ -41,7 +41,7 @@
         if (ev.how === "bad" && i === 0) t.crcOk = false;
         if (!t.crcOk) { s.badTlp += 1; log.items.push({ out: "badTlp", seq: t.seq }); scheduleNak(); }
         else if (t.seq === s.nrs) accept(t);
-        else if (isDup(t.seq)) { s.dups += 1; log.items.push({ out: "dup", seq: t.seq }); sendAck(); }
+        else if (isDup(t.seq)) { s.dups += 1; log.items.push({ out: "dup", seq: t.seq, ack: !s.nak }); if (!s.nak) sendAck(); }
         else { s.badTlp += 1; log.items.push({ out: "future", seq: t.seq, expected: s.nrs }); scheduleNak(); }
       }
     } else if (ev.type === "dllp") {
@@ -235,7 +235,8 @@
             case "nak": return `<span class="wv-bad">יוצא Nak ${ltr(it.seq)} : הכול עד ${ltr(it.seq)} התקבל, מה שאחריו לא. NAK_SCHEDULED נדלק.</span>`;
             case "nakHeld": return `‏Nak כבר נשלח על הפער הזה, ולכן לא יוצא עוד אחד (בלי סופת Nak-ים).`;
             case "badTlp": return `<span class="wv-bad">‏TLP ${ltr(it.seq)} הגיע עם LCRC שגוי : נזרק, המצב לא משתנה.</span>`;
-            case "dup": return `‏TLP ${ltr(it.seq)} ישן (כבר נמסר) : נזרק, ויוצא Ack חוזר כדי שהמשדר ינקה את ה-Retry Buffer.`;
+            case "dup": return it.ack ? `‏TLP ${ltr(it.seq)} ישן (כבר נמסר) : נזרק, ויוצא Ack חוזר כדי שהמשדר ינקה את ה-Retry Buffer.`
+              : `‏TLP ${ltr(it.seq)} ישן (כבר נמסר) : נזרק בלי Ack, כי Nak על הפער הזה כבר ממתין ומאשר את אותו מספר.`;
             case "future": return `<span class="wv-bad">‏TLP ${ltr(it.seq)} הגיע לפני זמנו (מצפים ל-${ltr(it.expected)})  : נזרק.</span>`;
             case "lost": return `${it.kind ? (it.kind === "ACK" ? "Ack" : "Nak") + " " + ltr(it.seq) : "‏TLP " + ltr(it.seq)} אבד על הקו : אף צד לא יודע על זה עדיין.`;
             case "badDllp": return `<span class="wv-bad">${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} הגיע עם CRC שגוי : לא סומכים לא על הסוג ולא על המספר, נזרק.</span>`;

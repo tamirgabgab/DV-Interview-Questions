@@ -96,7 +96,7 @@ added: 2026-10-21
     מודל הייחוס ב-Python עובר על אותן דגימות ומחזיר את המחזורים של כל הפרה.
 
     === "SystemVerilog"
-        ```systemverilog title="module handshake_checker" linenums="1" hl_lines="13 16 19 22"
+        ```systemverilog title="module handshake_checker" linenums="1" hl_lines="13 18 23 28"
         module handshake_checker #(int MAX_WAIT = 3) (
           input  logic clk,
           input  logic rst_n,

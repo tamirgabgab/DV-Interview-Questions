@@ -1,6 +1,7 @@
 # RC transmitter and EP receiver from Sequence Number 4094; the link damages TLP 4095 and
 # then the first Ack. Change the thresholds, the damaged packets or the order and press Run.
 rc, ep = TransmitterWithReplay(4094), ReceiverWithNak(4094, random.Random(5))
+ep.ack_threshold = 3                             # the first Ack only after the gap is closed
 
 def show(event):
     retry = ", ".join(str(t.seq) for t in rc.retry_buffer) or "-"

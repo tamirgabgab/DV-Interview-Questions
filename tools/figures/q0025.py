@@ -71,11 +71,11 @@ class Run:
                 "tx_dllps": [(d.kind.name, d.seq) for d in self.ep.tx_dllps],
                 "tx_tlps": [(t.seq, t.is_replay) for t in self.rc.tx_tlps]}
 
-    def step(self, kind, label, event, action):
+    def step(self, kind, label, event, action, **extra):
         before = self.state()
         action()
         after = self.state()
-        self.frames.append({"kind": kind, "label": label, "event": event, "before": before, "after": after})
+        self.frames.append({"kind": kind, "label": label, "event": event, "before": before, "after": after, **extra})
 
     def start(self):
         self.step("start", "initial state", "מצב התחלתי", lambda: None)
@@ -103,7 +103,7 @@ class Run:
                   "dup": f"{RLM}TLP {seqs} מגיע שוב (כפול)", None: f"{RLM}TLP {seqs} מגיע"}
         self.step(kind or ("replay" if replay else "tlp"), label,
                   events[kind] + (" (Replay)" if replay and kind != "dup" else ""),
-                  lambda: [self.ep.receive_tlp(t) for t in tlps])
+                  lambda: [self.ep.receive_tlp(t) for t in tlps], replay=replay)
 
     def deliver_dllp(self, corrupt=False, tamper=None, count=1):
         dllps = [self.ep.tx_dllps.pop(0) for _ in range(count)]
@@ -178,12 +178,11 @@ def row(p, x, y, name, before, after, text=None):
     p.append(f'<text class="st-text" x="{x + 214}" y="{y}" text-anchor="end">{text if text is not None else after}</text>')
 
 
-def seq_boxes(p, x, y, seqs, cls, faded=()):
+def seq_boxes(p, x, y, seqs, cls):
     for i, s in enumerate(seqs[-5:]):
         bx = x + 30 + i * 42
-        extra = " st-faded" if s in faded else ""
-        p.append(f'<rect class="{cls}{extra}" x="{bx}" y="{y}" width="38" height="24" rx="3"/>')
-        p.append(f'<text class="st-text st-sm{extra}" x="{bx + 19}" y="{y + 16.5}" text-anchor="middle">{s}</text>')
+        p.append(f'<rect class="{cls}" x="{bx}" y="{y}" width="38" height="24" rx="3"/>')
+        p.append(f'<text class="st-text st-sm" x="{bx + 19}" y="{y + 16.5}" text-anchor="middle">{s}</text>')
     if not seqs:
         p.append(f'<text class="tick" x="{x + 30}" y="{y + 16}">empty</text>')
 
@@ -237,6 +236,8 @@ def middle(p, f, uid):
              "timeout": ("replay everything", "unacknowledged")}
     if kind in right:
         cls, m = right[kind]
+        if f.get("replay"):
+            cls = "fc-replay"
         p.append(f'<line class="{cls}" x1="252" y1="118" x2="384" y2="118" marker-end="url(#{uid}-{m})"/>')
     elif kind in left:
         cls, m = left[kind]
@@ -292,7 +293,7 @@ def caption(k, f):
         return f"{head}{nak}. ‏NEXT_RCV_SEQ = {b['nrs']}, {b['pending']} ממתינים ל-Ack מול סף {b['threshold']}."
     if kind == "ack":
         if purged:
-            return (f"צעד {k} : {f['event']}. ה-RC מוצא את {a['tx_dllps'][len(a['tx_dllps']) - 1][1] if False else purged[-1]} "
+            return (f"צעד {k} : {f['event']}. ה-RC מוצא את {purged[-1]} "
                     f"ב-Retry Buffer ומוחק מהראש עד אליו : {fmt(purged)}. נשאר {fmt(b['retry'])}, ‏ACKD_SEQ = {b['ackd']}.")
         return (f"צעד {k} : {f['event']}. המספר הוא ACKD_SEQ עצמו : Ack חוזר בלי התקדמות, שום דבר לא משתנה.")
     if kind == "bad":

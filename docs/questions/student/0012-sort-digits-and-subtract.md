@@ -384,7 +384,7 @@ added: 2026-10-16
     #### הקוד { .sol-code }
 
     === "SystemVerilog"
-        ```systemverilog title="kaprekar_step_b, kaprekar_attractor_b" hl_lines="3 4 7 8"
+        ```systemverilog title="kaprekar_step_b, kaprekar_attractor_b" hl_lines="3 4 7 14"
         // One step in base b: three digits (leading zeros kept), sorted descending minus ascending.
         function automatic int kaprekar_step_b(int x, int b);
           int a = x / (b * b), m = (x / b) % b, c = x % b;   // (1)!

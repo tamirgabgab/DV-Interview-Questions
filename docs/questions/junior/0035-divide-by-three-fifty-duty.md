@@ -76,7 +76,7 @@ added: 2026-10-21
     #### הקוד { .sol-code }
 
     === "SystemVerilog"
-        ```systemverilog title="module div3_50" linenums="1" hl_lines="11 12 16 19"
+        ```systemverilog title="module div3_50" linenums="1" hl_lines="12 13 18 20"
         module div3_50 (
           input  logic clk,
           input  logic rst_n,
