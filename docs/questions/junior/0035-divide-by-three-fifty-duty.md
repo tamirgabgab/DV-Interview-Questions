@@ -11,11 +11,14 @@ added: 2026-10-21
 
 ## השאלה
 
-תכננו מעגל שמקבל שעון `clk` ומוציא שעון `clk_out` בתדר **שליש** מתדר הכניסה, עם
-**duty cycle של 50%** בדיוק : `clk_out` גבוה 1.5 מחזורים של `clk` ונמוך 1.5 מחזורים.
+תכננו מחלק שעון שמקבל שעון `clk` ומוציא שעון `clk_out` בתדר נמוך יותר, עם **duty cycle
+של 50%** בדיוק. לכל סעיף כתבו את המעגל ב-SystemVerilog, וכתבו מודל Python שמדמה אותו חצי
+מחזור אחר חצי מחזור כדי לבדוק את התקופה ואת ה-duty :
 
-הסבירו למה מונה רגיל לא מספיק, שרטטו דיאגרמת תזמון, כתבו את המעגל ב-SystemVerilog,
-וכתבו מודל Python שמדמה אותו חצי מחזור אחר חצי מחזור כדי לבדוק את התקופה ואת ה-duty.
+- **סעיף א – חלוקה ב-3 :** ‏`clk_out` בתדר **שליש** מתדר הכניסה, גבוה 1.5 מחזורים של
+  `clk` ונמוך 1.5 מחזורים. הסבירו למה מונה רגיל לא מספיק, ושרטטו דיאגרמת תזמון.
+- **סעיף ב – חלוקה ב-\( N \) אי-זוגי :** הכלילו למודול עם פרמטר \( N \), לכל \( N \)
+  אי-זוגי מ-3 ומעלה, שגבוה \( N/2 \) מחזורים ונמוך \( N/2 \) מחזורים.
 
 ??? interviewer "מה המראיין בודק"
     - **למה זה לא טריוויאלי :** עם מונה שמתקדם בעליית שעון בלבד כל האורכים הם מספר שלם
@@ -31,6 +34,8 @@ added: 2026-10-21
 
 ---
 
+### סעיף א – חלוקה ב-3
+
 ??? tip "רמז 1"
     פלופ שמתעדכן רק בעליית `clk` יכול לשנות את המוצא רק בעליות שעון, ולכן כל פולס שלו
     נמשך מספר **שלם** של מחזורים. מאיפה אפשר להשיג חצי מחזור?
@@ -39,7 +44,11 @@ added: 2026-10-21
     צרו שני אותות שכל אחד גבוה מחזור אחד מתוך שלושה, כשהשני מאוחר בחצי מחזור אחרי
     הראשון. מה נותן OR ביניהם?
 
-??? success "פתרון"
+??? tip "רמז 3"
+    ציירו את שני האותות על ציר של **חצאי** מחזורים. מתי הראשון עולה, מתי השני יורד, וכמה
+    חצאי מחזור ביניהם?
+
+??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
         מונה מודולו 3 בעליית השעון; אות `a` רשום בעליית השעון, גבוה במחזור שבו המונה 0;
         אות `b` הוא `a` דגום **בירידת** השעון, כלומר אותו פולס מוזז בחצי מחזור;
@@ -54,6 +63,18 @@ added: 2026-10-21
     "חצי" היא להשתמש גם בירידת השעון : לוקחים פולס של מחזור אחד, מעתיקים אותו עם פלופ
     שמתעדכן בירידת השעון, ומקבלים פולס זהה שמתחיל ונגמר חצי מחזור מאוחר יותר. OR של
     השניים הוא פולס שמתחיל עם הראשון ונגמר עם השני : מחזור ועוד חצי.
+
+    <!-- gen 0 -->
+
+    <svg class="figure" viewBox="0 0 640 210" style="max-width:40rem" role="img" aria-label="המעגל של סעיף א : מונה מודולו 3 בעליית השעון, השוואה cnt == 2 שנרשמת בפלופ a בעליית השעון, פלופ b שדוגם את a בירידת השעון, ושער OR של a ו-b שמוציא את clk_out"><rect class="box-face" x="30" y="30" width="110" height="80" rx="4"><title>מונה מודולו 3 : 0, 1, 2, 0, ...</title></rect><text class="legend" x="85.0" y="64.0" text-anchor="middle" style="font-size:15px">cnt</text><text class="legend" x="85.0" y="86.0" text-anchor="middle" style="font-size:13px">mod 3</text><rect class="box-face" x="175" y="45" width="80" height="34" rx="17"><title>השוואה צירופית</title></rect><text class="legend" x="215.0" y="67.0" text-anchor="middle" style="font-size:13px">cnt == 2</text><polyline class="ink-line" points="140,62 175,62" fill="none" stroke-width="1.8"/><rect class="box-face" x="290" y="30" width="70" height="80" rx="4"><title>פלופ בעליית השעון</title></rect><text class="legend" x="300.0" y="52.0" text-anchor="start" style="font-size:14px">D</text><text class="legend" x="350.0" y="52.0" text-anchor="end" style="font-size:14px">Q</text><polyline class="ink-line" points="290,82 302,90 290,98" fill="none" stroke-width="1.5"/><text class="legend" x="325.0" y="130.0" text-anchor="middle" style="font-size:15px">a</text><polyline class="ink-line" points="255,62 272,62 272,52 290,52" fill="none" stroke-width="1.8"/><rect class="box-face" x="420" y="30" width="70" height="80" rx="4"><title>פלופ בירידת השעון</title></rect><text class="legend" x="430.0" y="52.0" text-anchor="start" style="font-size:14px">D</text><text class="legend" x="480.0" y="52.0" text-anchor="end" style="font-size:14px">Q</text><polyline class="ink-line" points="420,82 432,90 420,98" fill="none" stroke-width="1.5"/><text class="legend" x="455.0" y="130.0" text-anchor="middle" style="font-size:15px">b</text><circle class="sch-bubble" cx="415" cy="90" r="5"/><polyline class="ink-line" points="360,52 420,52" fill="none" stroke-width="1.8"/><path class="box-face" d="M518,70 Q530,92 518,114 Q552,114 564,92 Q552,70 518,70 Z"><title>שער OR</title></path><text class="legend" x="538.0" y="97.0" text-anchor="middle" style="font-size:12px">OR</text><polyline class="ink-line" points="390,52 390,20 508,20 508,82 523,82" fill="none" stroke-width="1.8"/><circle class="ink-dot" cx="390" cy="52" r="3.5"/><polyline class="ink-line" points="490,52 498,52 498,102 523,102" fill="none" stroke-width="1.8"/><polyline class="box-path" points="564,92 634,92" fill="none" stroke-width="3"/><text class="legend" x="634.0" y="82.0" text-anchor="end" style="font-size:14px">clk_out</text><polyline class="s1-line" points="10,180 430,180" fill="none" stroke-width="2"/><polyline class="s1-line" points="85,180 85,110" fill="none" stroke-width="2"/><polyline class="s1-line" points="276,180 276,90 290,90" fill="none" stroke-width="2"/><polyline class="s1-line" points="406,180 406,90 410,90" fill="none" stroke-width="2"/><text class="legend" x="12.0" y="172.0" text-anchor="start" style="font-size:14px">clk</text><text class="legend" x="325.0" y="154.0" text-anchor="middle" style="font-size:15px">↑</text><text class="legend" x="455.0" y="154.0" text-anchor="middle" style="font-size:15px">↓</text></svg>
+
+    <!-- /gen -->
+
+    <!-- gen 1 -->
+
+    <span class="viz-legend"><span><i class="s1"></i>השעון clk</span><span><i class="box-face"></i>פלופים ולוגיקה</span><span><i class="ink"></i>עיגול בכניסת השעון : הפלופ מתעדכן בירידה</span><span><i class="box-path"></i>המוצא clk_out</span></span>
+
+    <!-- /gen -->
 
     #### השלבים { .sol-steps }
 
@@ -174,6 +195,119 @@ added: 2026-10-21
     אחד. המחיר שלא רואים : הנתיב מ-`a` ל-`b` צריך להיסגר בתוך **חצי** מחזור, ושער ה-OR יושב
     במסלול שעון, ולכן כלי הסינתזה צריכים לדעת שזה שעון (clock definition על `clk_out`).
 
+---
+
+### סעיף ב – חלוקה ב-N אי-זוגי { #odd-n }
+
+כתבו מודול `div_odd_50` עם פרמטר \( N \) (אי-זוגי, 3 ומעלה) שמוציא שעון בתדר
+\( 1/N \) מתדר הכניסה, גבוה \( N/2 \) מחזורים ונמוך \( N/2 \) מחזורים, ומודל Python
+שמתאים לו.
+
+??? tip "רמז 1"
+    ב-\( N \) אי-זוגי \( N/2 \) הוא מספר שלם ועוד חצי, בדיוק כמו 1.5 בסעיף א. כמה מחזורים
+    שלמים צריך `a` להיות גבוה?
+
+??? tip "רמז 2"
+    המונה הופך למונה מודולו \( N \), ו-`a` גבוה בסוף כל סיבוב שלו. מה משתנה ב-`b` וב-OR?
+
+??? success "פתרון סעיף ב"
+    !!! answer "תשובה בקצרה"
+        מונה מודולו \( N \); ‏`a` רשום בעליית השעון וגבוה \( H = (N - 1)/2 \) מחזורים בכל סיבוב;
+        ‏`b` הוא `a` דגום בירידת השעון; ‏`clk_out = a | b` גבוה \( H + 1/2 = N/2 \) מחזורים.
+
+    <!-- cost: פלופים \( \lceil \log_2 N \rceil + 2 \) | שערים 1 + השוואה -->
+
+    #### הרעיון { .sol-idea }
+
+    הטריק של סעיף א לא תלוי ב-3. ‏`a` גבוה מספר **שלם** של מחזורים, \( H \), ו-`b` מוסיף לו
+    חצי מחזור בסוף. כדי שהמוצא יהיה גבוה \( N/2 = H + 1/2 \) מחזורים בוחרים
+    \( H = (N - 1)/2 \). עבור \( N = 3 \) זה \( H = 1 \), בדיוק המודול של סעיף א.
+
+    #### השלבים { .sol-steps }
+
+    <div class="steps" markdown>
+
+    1. **מונה מודולו \( N \) :** ‏\( \lceil \log_2 N \rceil \) ביטים, סופר 0 עד \( N - 1 \) וחוזר ל-0.
+    2. **הפולס הבסיסי :** ‏`a` נרשם בעליית השעון, ושווה 1 כשהמונה **הישן** באחד מ-\( H \)
+       הערכים האחרונים, \( N - H \) עד \( N - 1 \). לכן הוא גבוה \( H \) מחזורים רצופים בכל
+       סיבוב, ויוצא ישירות מפלופ.
+    3. **ההזזה והחיבור :** ‏`b <= a` בירידת השעון, ו-`clk_out = a | b`, בדיוק כמו בסעיף א.
+    4. **הספירה :** המוצא עולה עם `a` ויורד עם `b`, חצי מחזור אחרי ש-`a` ירד. גבוה
+       \( H + 1/2 = N/2 \) מחזורים, ונמוך שאר \( N - N/2 = N/2 \) המחזורים.
+
+    </div>
+
+    #### הקוד { .sol-code }
+
+    === "SystemVerilog"
+        ```systemverilog title="module div_odd_50" linenums="1" hl_lines="7 16 17"
+        module div_odd_50 #(parameter int N = 5) (     // N odd, 3 or more
+          input  logic clk,
+          input  logic rst_n,
+          output logic clk_out
+        );
+          localparam int W = $clog2(N);
+          localparam int H = (N - 1) / 2;                // (1)!
+          localparam logic [W-1:0] LAST  = N - 1;
+          localparam logic [W-1:0] FIRST = N - H;        // a is high from FIRST to LAST
+          logic [W-1:0] cnt;
+          logic a, b;
+
+          always_ff @(posedge clk or negedge rst_n)
+            if (!rst_n) begin cnt <= '0; a <= 1'b0; end
+            else begin
+              cnt <= (cnt == LAST) ? '0 : cnt + 1'b1;
+              a   <= (cnt >= FIRST);                     // (2)!
+            end
+
+          always_ff @(negedge clk or negedge rst_n)
+            if (!rst_n) b <= 1'b0;
+            else        b <= a;
+
+          assign clk_out = a | b;
+        endmodule
+        ```
+
+        1. ‏`a` גבוה \( H \) מחזורים שלמים, ו-`b` מוסיף את החצי.
+        2. לפי המונה **הישן**, כמו בסעיף א : עבור \( N = 3 \) זה `cnt >= 2`, כלומר `cnt == 2`.
+
+    === "Python"
+        ```python title="div_odd_50 (half-cycle model)" linenums="1" hl_lines="4 8"
+        def div_odd_50(n: int, half_cycles: int) -> list[int]:
+            """clk_out after each clock edge of a divide by an odd n: edges 0, 2, 4, ...
+            are rising, 1, 3, 5, ... falling."""
+            h = (n - 1) // 2                        # (1)!
+            cnt = a = b = 0
+            out = []
+            for edge in range(half_cycles):
+                if edge % 2 == 0:                   # rising edge
+                    a = 1 if cnt >= n - h else 0
+                    cnt = 0 if cnt == n - 1 else cnt + 1
+                else:                               # falling edge
+                    b = a
+                out.append(a | b)
+            return out
+        ```
+
+        1. כמו במודול : `a` גבוה \( h \) מחזורים בכל סיבוב של המונה, ו-`div_odd_50(3, k)` הוא
+           `div3_50(k)` של סעיף א.
+
+    #### למה זה נכון { .sol-proof }
+
+    **ספירה בחצאי מחזורים.** תקופה אחת היא \( 2N \) חצאי מחזור. ‏`a` גבוה \( 2H = N - 1 \)
+    חצאים רצופים, החל מעליית שעון. ‏`b` גבוה אותו מספר חצאים, מוזז בחצי אחד. האיחוד שלהם
+    הוא \( N - 1 + 1 = N \) חצאים רצופים, כלומר חצי מהתקופה. אין גליץ' מאותה סיבה כמו
+    בסעיף א : `a` משתנה רק בעליות ו-`b` רק בירידות, וכשאחד מהם משתנה השני כבר מכסה אותו.
+    הטסטבנץ' מודד עם `$realtime` את התקופה ואת זמן הגובה עבור \( N = 3, 5, 7 \).
+
+    **בתיבה של סעיף א** הסליידר \( N \) מריץ את אותו מודל לכל \( N \) מ-2 עד 10.
+
+    #### סיבוכיות { .sol-cost }
+
+    ‏\( \lceil \log_2 N \rceil \) פלופים למונה, פלופ אחד ל-`a` בעלייה, פלופ אחד ל-`b` בירידה,
+    השוואה אחת ושער OR. אותו מחיר נסתר כמו בסעיף א : הנתיב מ-`a` ל-`b` צריך להיסגר בחצי
+    מחזור.
+
 ## נקודות חשובות ושאלות המשך
 
 ??? trap "מלכודת : לפענח את המוצא מהמונה"
@@ -187,10 +321,17 @@ added: 2026-10-21
     עד הירידה הראשונה אחרי ש-`a` ירד. זה לא שובר את המצב היציב, אבל זה פולס ראשון באורך
     לא ידוע, וטסטבנץ' שסופר מהשפה הראשונה ייכשל.
 
+??? trap "מלכודת : OR גם ב-N זוגי"
+    ב-\( N \) זוגי אפשר לקבל 50% בלי הטריק : `a` לבד גבוה \( N/2 \) מחזורים שלמים. מי
+    שמשאיר את `b` ואת ה-OR מוסיף חצי מחזור, ומקבל גובה של \( N/2 + 1/2 \), כלומר duty
+    גדול מ-50%.
+
+??? trap "מלכודת : ה-duty של שעון הכניסה"
+    המעגל מחבר זמן של עלייה לזמן של ירידה, ולכן ה"חצי מחזור" שלו הוא הזמן מעליית `clk`
+    לירידה שלו. אם ל-`clk` עצמו אין duty של 50% (למשל 40%), גם `clk_out` לא יהיה 50%. חלוקה
+    אי-זוגית עם 50% מדויק דורשת שעון כניסה עם 50%, או PLL.
+
 ??? followup "שאלות המשך"
-    - **חלוקה ב-5 עם 50% :** אותו טריק : מונה מודולו 5, `a` גבוה שני מחזורים, `b` מוזז בחצי,
-      והמוצא גבוה 2.5 מחזורים. באופן כללי לחלוקה ב-\( N \) אי-זוגי `a` גבוה
-      \( (N-1)/2 \) מחזורים.
     - **בלי פלופ בירידת השעון :** אפשר לקבל 50% עם שעון כפול או עם PLL; בלי אלה, עם
       פלופים בעליית השעון בלבד, 50% בחלוקה אי-זוגית בלתי אפשרי. למה?
     - **מה הטסטבנץ' צריך למדוד :** לא רק את התקופה אלא גם את ה-duty, ועל הרבה תקופות,

@@ -647,6 +647,58 @@ added: 2026-10-18
 
     </div>
 
+    #### הקוד { .sol-code }
+
+    שתי פונקציות לכל \( L \ge 2 \) : הנסיגה של שלב 1 לאורך השרשרת של \( N \) בלבד, והנוסחה
+    של שלב 5 עם לולאה שכופלת ב-\( L \) במקום לוגריתם.
+
+    === "SystemVerilog"
+        ```systemverilog title="josephus" linenums="1" hl_lines="5 6 14 15"
+        // the recurrence, along N's chain only: O(N / (L - 1)) steps
+        function automatic int josephus_chain(int n, int L);
+          int f = 0;                                   // F_L(r) = 0 at the chain's base
+          int r = 1 + (n - 1) % (L - 1);
+          for (int m = r + L - 1; m <= n; m += L - 1)
+            f = (f + L) % m;                           // (1)
+          return f;
+        endfunction
+
+        // the closed form: the zero point M below N on N's chain, then L / (L - 1) (N - M)
+        function automatic int josephus_closed(int n, int L);
+          int r = 1 + (n - 1) % (L - 1);
+          int m = r;
+          while (m * L <= n) m *= L;                   // (2)
+          return L * (n - m) / (L - 1);                // (3)
+        endfunction
+        ```
+
+        1. שלב 1 : ‏\( F_L(m) = (F_L(m - L + 1) + L) \bmod m \), והמודולו לפי הגודל **החדש** \( m \).
+        2. נקודות האפס של השרשרת הן \( r, rL, rL^2, \ldots \) : כופלים ב-\( L \) כל עוד לא עוברים את \( N \).
+        3. ההפרש \( N - M \) מתחלק ב-\( L - 1 \), ולכן החילוק מדויק.
+
+    === "Python"
+        ```python title="josephus" linenums="1" hl_lines="5 6 13 15"
+        def josephus_chain(n: int, L: int) -> int:
+            """The recurrence, along N's chain only: O(N / (L - 1)) steps."""
+            f = 0                          # F_L(r) = 0 at the chain's base
+            r = 1 + (n - 1) % (L - 1)
+            for m in range(r + L - 1, n + 1, L - 1):
+                f = (f + L) % m            # (1)!
+            return f
+
+
+        def josephus_closed(n: int, L: int) -> int:
+            """The closed form: the zero point M below N on N's chain."""
+            m = 1 + (n - 1) % (L - 1)
+            while m * L <= n:
+                m *= L                     # (2)!
+            return L * (n - m) // (L - 1)  # (3)!
+        ```
+
+        1. שלב 1 : ‏\( F_L(m) = (F_L(m - L + 1) + L) \bmod m \), והמודולו לפי הגודל **החדש** \( m \).
+        2. נקודות האפס של השרשרת הן \( r, rL, rL^2, \ldots \) : כופלים ב-\( L \) כל עוד לא עוברים את \( N \).
+        3. ההפרש \( N - M \) מתחלק ב-\( L - 1 \), ולכן החילוק מדויק.
+
     #### למה זה נכון { .sol-proof }
 
     **שלב 1 : צעד אחד.** במעגל של \( N \ge L \) אנשים, אדם 0 נשאר ו-\( 1, \ldots, L - 1 \)

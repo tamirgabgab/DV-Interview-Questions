@@ -120,3 +120,26 @@ def test_explorer_divide_by_n():
             assert all(v == 0 for v in g["woke"]["wide"]), N           # stuck above N - 1
             assert g["woke"]["wrap"][2 * bits:] == g["woke"]["guard"][2 * bits:] or N == 3, N
     assert [tuple(r) for r in got["3"]["rows"]] == [tuple(r) for r in model(3, 120)[0]]
+
+
+def test_part_b_odd_n():
+    """Part b's div_odd_50: for N = 3 it is part a's div3_50, and for every odd N up to 21,
+    after the first rise, every period is 2N half-cycles with N of them high, rises on
+    rising edges and falls on falling edges."""
+    div_odd_50 = ns["div_odd_50"]
+    assert div_odd_50(3, 240) == div3_50(240)
+    for N in range(3, 22, 2):
+        out = div_odd_50(N, 2 * N * 30)
+        first = out.index(1)
+        steady = out[first:]
+        whole = len(steady) // (2 * N) * (2 * N)
+        for i in range(0, whole, 2 * N):
+            assert steady[i:i + 2 * N] == [1] * N + [0] * N, (N, i)
+        changes = [i for i in range(1, len(out)) if out[i] != out[i - 1]]
+        assert all(i % 2 == (0 if out[i] else 1) for i in changes), N
+
+
+def test_figures_up_to_date():
+    from page_tests import assert_figures_match
+
+    assert_figures_match(35)

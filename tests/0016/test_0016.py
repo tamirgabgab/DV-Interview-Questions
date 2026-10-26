@@ -1,4 +1,4 @@
-"""Question 0016 has no code on the page; these tests check the closed forms for L = 2
+"""Question 0016: the page's two functions (part c) and the closed forms for L = 2
 (part a), L = 3 (part b) and any L (the bonus part) against an independent simulation, the
 zero-point characterization, the base-3 digit rule of part b, and that the figures and
 tables are the generator's output."""
@@ -261,3 +261,18 @@ def test_explorer_renumbering():
         assert even == [2 * v for v in range(k)]
         if odd is not None:
             assert odd == [2 * v + 2 for v in range(k)]
+
+
+def test_page_code():
+    """Part c's josephus_chain and josephus_closed against the simulation, every N up to
+    600 and L from 2 to 7, and the page's examples."""
+    from extract_code import load_python
+
+    ns = load_python(16)
+    chain, closed = ns["josephus_chain"], ns["josephus_closed"]
+    for L in range(2, 8):
+        for n in range(1, 601):
+            want = reference(n, L)
+            assert chain(n, L) == want == closed(n, L), (n, L)
+    assert (closed(20, 2), closed(30, 3), closed(20, 4), closed(41, 2)) == (8, 18, 16, 18)
+    assert closed(10 ** 9, 3) == chain(10 ** 9, 3)

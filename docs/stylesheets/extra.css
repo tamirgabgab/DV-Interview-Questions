@@ -1709,6 +1709,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .strip-wall svg { width: 100%; display: block; touch-action: none; cursor: grab; user-select: none; }
 .md-typeset .explorer .strip-wall svg.is-dragging { cursor: grabbing; }
 .md-typeset .explorer bdi.ex-nw { white-space: nowrap; }   /* ltr() in core.js: a short LTR span never breaks */
+.md-typeset .explorer td bdi.ex-nw, .md-typeset .explorer th bdi.ex-nw { white-space: normal; }   /* a table cell may wrap, or the table outgrows a phone */
+.md-typeset svg .sch-bubble { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }   /* 0035: the falling-edge clock input */
 /* 0048 (farm): the four corners of the strip, and the farmer, the cow or the two stops,
    dragged; the hit circles are wider than the dots for a finger */
 .md-typeset .explorer svg.farm-live { width: 100%; display: block; user-select: none; }
