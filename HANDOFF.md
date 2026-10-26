@@ -765,17 +765,39 @@ section below starts at session 22, whose numbered items run on through the late
     in the four explorer shards. Checks: the jump check (0 jumps in 160 boxes), the explorer
     click-check of every page (no problems; the Josephus link warnings are as on `main`),
     the phone check with `--axe-fail --small-fail`, the Python tests (405).
+54. **0048, the farmer, the food and the water (session 26, 2026-10-26).** A student
+    question (medium, math) from the owner's write-up: two parallel lines H apart (food on
+    top, water below), the farmer A at height a and the cow B at height b, L apart; the
+    path goes to the food line, then the water line, then the cow. Part a (a = H/3,
+    b = 2H/3) by two reflections: B' through the water line, B'' through the food line at
+    2H + b, so z = sqrt(L^2 + (2H + b - a)^2) with the stops in the ratio (H - a) : H : b
+    (2L/7, 3L/7, 2L/7). Part b is the inverse: stops at a third and two thirds give
+    a = 0, b = H. Checking the write-up found two things, told to the owner and fixed with
+    their picks: the answer of part b lies on the lines while the statement said "between
+    the lines" (now "between the lines or on them"), and the conditions of part b missed
+    b <= H, that is w <= y (the full condition: y is the longest of x, y, w; a trap now
+    says so). The page has no code (owner's pick). Figures (`tools/figures/q0048.py`):
+    the problem with a path that is not the shortest (x, y, w, z1, z2, z3), and the
+    unfolding of each part with the strips reflected below and above, B', B'', the
+    straight line and the three similar triangles. The box `farm` (`farm.js`, one box in
+    part a's solution with a part select; see CONTRIBUTING): drag the farmer and the cow
+    (part a) or the two stops (part b, the drag stopping at x = y or w = y with a line
+    that says why), the four corners for L and H, typed values checked, a seeded random
+    example, a Pythagoras table, and the reflection toggle (off by default). Tests: exact
+    arithmetic of both parts, the reflection against a search over the two stops, the
+    inverse on 200 random pairs, the follow-ups, the box's math against the generator.
 
 
 ## In progress
 
-- **State (2026-10-26, session 26):** `main` is bd64ec9 (fix rounds 1 to 6a), deployed. 46 questions (0022 was
+- **State (2026-10-26, session 26):** `main` is bd64ec9 (fix rounds 1 to 6a), deployed; 0048 is on the
+  work branch. 47 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
   and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
-  the cloud sandbox (item 52).
+  the cloud sandbox (item 52); question 0048, the farmer, the food and the water (item 54).
 - **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52), and round 6 part
   a, the jump check (item 53); part b, a visual diff of the phone screenshots, was not
   picked.
@@ -825,11 +847,11 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (46 questions)
+### Coverage today (47 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
-| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials |
+| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water) |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
 

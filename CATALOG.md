@@ -1,6 +1,6 @@
 # Catalog
 
-All 46 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 47 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -51,3 +51,4 @@ All 46 questions, with links to their pages on the [live site](https://tamirgabg
 | 0045 | [הכדור החריג במאזניים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0045-odd-ball-balance/) | junior (ג'וניור) |
 | 0046 | [הריבוע, המלבן והמשולש הגדולים ביותר של אחדות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0046-largest-square-rectangle/) | junior (ג'וניור) |
 | 0047 | [מילוי מים בבאר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0047-filling-a-well/) | junior (ג'וניור) |
+| 0048 | [החוואי, האוכל והמים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0048-farmer-food-and-water/) | student (סטודנט) |

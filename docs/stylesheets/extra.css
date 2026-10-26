@@ -1708,6 +1708,15 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .strip-wall p { margin: 0.2em 0; font-size: 0.7rem; }
 .md-typeset .explorer .strip-wall svg { width: 100%; display: block; touch-action: none; cursor: grab; user-select: none; }
 .md-typeset .explorer .strip-wall svg.is-dragging { cursor: grabbing; }
+/* 0048 (farm): the four corners of the strip, and the farmer, the cow or the two stops,
+   dragged; the hit circles are wider than the dots for a finger */
+.md-typeset .explorer svg.farm-live { width: 100%; display: block; user-select: none; }
+.md-typeset .explorer svg.farm-live.is-dragging { cursor: grabbing; }
+.md-typeset svg .farm-corner { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 2; cursor: nwse-resize; touch-action: none; }
+.md-typeset svg .farm-hit { fill: transparent; cursor: grab; touch-action: none; }
+.md-typeset svg .farm-handle-pt { cursor: grab; touch-action: none; }
+.md-typeset .explorer .farm-fields input { width: 4.5rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .farm-table tr.farm-total td { font-weight: 700; }
 .md-typeset .explorer .strip-coords input[type="number"] { width: 4.2rem; font: inherit; padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
 .md-typeset .explorer svg.strip-live { width: 100%; max-width: 40rem; display: block; }
 .md-typeset svg .strip-faint { stroke: var(--viz-text); stroke-opacity: 0.22; }

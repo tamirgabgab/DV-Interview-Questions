@@ -58,7 +58,7 @@ STEP = """async ([b, maxSteps, tol]) => {
       if (was === undefined || Math.abs(h - was - by) > 1.5 || !e.getClientRects().length) continue;
       if (!best || depth(e) > depth(best)) best = e;
     }
-    return best ? `${best.tagName.toLowerCase()}.${(best.getAttribute("class") || "").trim().split(/\s+/).join(".")}` : "";
+    return best ? `${best.tagName.toLowerCase()}.${(best.getAttribute("class") || "").trim().split(/\\s+/).join(".")}` : "";
   };
   const jumps = [];
   for (const row of box.querySelectorAll(".ex-controls")) {
