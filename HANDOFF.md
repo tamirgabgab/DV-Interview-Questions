@@ -1634,6 +1634,29 @@ came in). Effort: S under an hour, M a few hours, L a day or more.
 - **The heaviest pages** are 0016 (370 KB of HTML), 0025 (300 KB), 0023 and 0024 (240 KB),
   mostly inline SVG; fine on a phone today, worth watching.
 
+**Question findings, 0001 to 0024** (every box clicked at 1200 and 390 px; drags,
+fields and dark mode not covered in this pass)
+
+| Question | Finding | Proposal | Type | Effort |
+|---|---|---|---|---|
+| 0023 | **Bug, confirmed:** "שלח בקשה" then "מחזור" throws `Cannot read properties of undefined (reading 'cpls')` in `epNext` (`endpoint.js`); play at ×4 too | Drop the page example's scripted draws on a manual send (or range-check the pick); a Node test of send-then-step | bug | S |
+| 0002 | The part c box opens on the arithmetic version, not XOR | Open on XOR there without locking the select | box UX | S |
+| 0020, 0021 | The map of splits: tick labels collide at 390 px, long row labels run into the bars; 1,563 px tall in 0021 | Show the splits of one completion count, picked from the count table; collapsed by default | box UX | M |
+| 0004 | "גילוי התוכן" only changes small captions; the status line stays | Draw the contents in the boxes, update the status; a check-yourself step (assign the three labels, then reveal) | box UX, new aid | S–M |
+| 0003 | The page's trap (j = i + 1 sorts descending) cannot be tried; line 5 of the code cut at 390 px; the array wraps at 1200 px | A select "j from 0 / from i + 1" with both results; wrap the code panel | new aid, box UX | M |
+| 0010 | Part a's pass-by-pass pair deletion has no visual | A pair-deletion mode in `brackets` with the operation count against the stack's | new aid | M |
+| 0015 | Follow-ups ask for a simulation, the page has no code | A Monte Carlo tab (SV and Python) for 1/3 and 13/27 | content | M |
+| 0016 | A classic coding question with no code (`kind: math`) | SV and Python tabs: the O(N) recurrence and the closed form | content | M |
+| 0001 | SV only; no Python model, no SVA | A Python cycle model and `pulse \|=> !pulse` | consistency | S |
+| 0024 | 2,087 px tall on a phone (six stacked buttons); the four hand labels overlap at the start | Buttons in two columns; offset the labels | box UX | S–M |
+| 0018, 0019 | Event figures tiny at 390 px; labels in English ("flip A + B") | Stack before / after on phones; Hebrew labels | box UX | S–M |
+| 0013 | Path arrows of `kappairs` run over the numbers | Curved arrows, or under the cells | box UX | S |
+| 0015 | The 196-cell grid opens empty | Open on step 1 | box UX | S |
+| 0011, 0017 | Box content wider than the box at 390 px | Wrap or narrow | box UX | S |
+| 0009, 0013, 0016, 0024 | Boxes 1,600 to 2,100 px tall on phones, mostly the proof panels | Collapse the proof panel by default on narrow screens | box UX | M |
+| all | Follow-ups answered inline in 0001, bare in 0015 and 0016 | One pattern: a collapsible short answer per follow-up | consistency | M |
+| 0021 | The ladder works well | A "guess C(n) before revealing" step | new aid | S |
+
 **Rounds** (the per-question findings are added under V4 and V5)
 
 | Round | Content | Effort |
