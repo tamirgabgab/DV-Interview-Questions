@@ -786,6 +786,28 @@ section below starts at session 22, whose numbered items run on through the late
     example, a Pythagoras table, and the reflection toggle (off by default). Tests: exact
     arithmetic of both parts, the reflection against a search over the two stops, the
     inverse on 200 random pairs, the follow-ups, the box's math against the generator.
+55. **Review rounds V1, V5 and V7 (session 26, 2026-10-26).** The owner picked V1, then
+    V5, then V7, with a publish to `main` at the end. V1: the 0023 box error (a manual
+    request after the page's example used the example's scripted draws; the example now
+    stops there, the pick stays in range, a Node test), `ltr()` keeps a short LTR span on
+    one line (table cells may still wrap), 0002 part c opens on XOR (`data-start`), the
+    0045 beam, the 0039 label, the 0042 camel and phone price labels, 0026 numbers and the
+    A / B labels, the 0048 drag caption, the 0047 heap caption, superscripts in 0034 and
+    0037. V5: 0033, 0034 and 0036 to 0038 in the common layout (each part's heading before
+    its hints), a second hint where one was missing, four traps per page; 0035 in two parts
+    (part b divides by any odd N, `div_odd_50` in SV and Python, measured for N = 3, 5, 7),
+    a generated schematic (`tools/figures/q0035.py`), a third hint and two traps; 0016 part
+    c gets code (`josephus_chain`, `josephus_closed`, tested in pytest and Verilator; the
+    closed form tests `m <= n / L`, so it does not overflow a 32-bit int); every follow-up
+    on every page (199) has a short collapsed answer (`??? fu-answer`), written by five
+    agents in parallel with the numbers recomputed, and `lint_pages.py` now fails on a
+    follow-up without one and on a non-breaking space inside code. The answers corrected
+    three page claims: 0041 (90% of 16 bins needs about 38 tests, not 30), 0042 (two camels
+    are not explained by the price list alone), 0040 (the reversed pattern 1101 has its own
+    machine); answers to check against the specs: 0023 a write in the middle of a read,
+    0024 shared credits and Sync, 0025 the replay limits. V7: `timeout-minutes` on every CI
+    job, `docs/sw.js` for offline reading of visited pages (network first, a kill switch,
+    blocked in the page checks), the header tabs without the slide-in.
 
 
 ## In progress
@@ -798,7 +820,8 @@ section below starts at session 22, whose numbered items run on through the late
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
   and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
   the cloud sandbox (item 52); question 0048, the farmer, the food and the water (item 54).
-- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series** (owner picks).
+- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1, V5 and V7 are
+  done (work log item 55), V2, V3, V4 and V6 wait for the owner.
 - **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52), and round 6 part
   a, the jump check (item 53); part b, a visual diff of the phone screenshots, was not
   picked.
@@ -1690,13 +1713,13 @@ fields and dark mode not covered in this pass)
 
 | Round | Content | Effort |
 |-------|---------|--------|
-| V1 | **Bugs and quick fixes**: the 0023 box error, the 0002 default, `ltr()` without line breaks, the 0045 balls, the 0039 label, the 0042 camel, the 0048 drag caption, the 0047 caption, superscripts in 0034 and 0037, the 0026 number format | S–M |
+| V1 (done, item 55) | **Bugs and quick fixes**: the 0023 box error, the 0002 default, `ltr()` without line breaks, the 0045 balls, the 0039 label, the 0042 camel, the 0048 drag caption, the 0047 caption, superscripts in 0034 and 0037, the 0026 number format | S–M |
 | V2 | **Study paths for everything**: paths for the DV core, the protocol reference models, geometry and motion; 0044 to 0047 into the algorithms path; a lint check that names a question in no path | S–M |
 | V3 | **Boxes on a phone**: collapse the proof panels (0009, 0013, 0016, 0024) and the editing and random-run controls (0025, 0046, 0047); 0024 buttons in two columns; 0018 and 0019 stacked with Hebrew labels; the 0020 / 0021 split map by completion count; 0031, 0037, 0038, 0040, 0041; scroll areas instead of blank reservations (0027, 0028, 0042, 0043) | M–L |
 | V4 | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
-| V5 | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0015, 0016 and a Python model for 0001 | M–L |
+| V5 (done, item 55) | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0016 (the owner did not pick the 0015 simulation or the 0001 Python model) | M–L |
 | V6 | **Practice loop and glossary**: a "my progress" page, a self-rating after a solution, export / import of the progress; a glossary page with a tooltip on a term's first use | M |
-| V7 | **Robustness**: `timeout-minutes` on the CI jobs, a service worker for offline reading, the header tabs without the fade | S–M |
+| V7 (done, item 55) | **Robustness**: `timeout-minutes` on the CI jobs, a service worker for offline reading, the header tabs without the fade | S–M |
 
 ## Improvement ideas
 
