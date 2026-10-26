@@ -225,13 +225,14 @@
     return { draw };
   };
   // The random traffic row of the two protocol boxes (0025, 0024): how many events and
-  // the fault rate; the run button draws a new seed. `randNote` is the line under the box
-  // once a random script runs: the counts, and whether the invariants held.
+  // the fault rate; the run button draws a new seed. The row folds under its title (closed
+  // on a phone, see folds below). `randNote` is the line under the box once a random
+  // script runs: the counts, and whether the invariants held.
   const randomRow = (label, title) =>
-    `<div class="ex-controls an-free an-random"><span class="ex-title">${title}</span>` +
+    `<div class="ex-fold"><p class="ex-fold-title">${title}</p><div class="ex-controls an-free an-random">` +
     `<label>אירועים <select class="ex-count" aria-label="מספר האירועים">${[20, 50, 200].map((v) => `<option value="${v}"${v === 50 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
     `<label>${label} <input type="range" class="ex-rate" min="0" max="50" step="5" value="20" dir="ltr" aria-label="${label} באחוזים"><output class="out-rate">20%</output></label>` +
-    `<button type="button" class="md-button md-button--primary ex-run">הרצה אקראית</button></div>`;
+    `<button type="button" class="md-button md-button--primary ex-run">הרצה אקראית</button></div></div>`;
   const RAND_HASH = /^r(20|50|200)\.(\d+)\.(\d+)$/;
   // The event axis of 0025 / 0024: the states before every event in the history and the
   // current one, a column each (the last 64, ticks with the absolute event number).
@@ -1062,8 +1063,35 @@
       if (t.matches("input, select, textarea") && t.closest(".ex-controls") && !t.closest(".ex-play-row, .ex-scrub")) release();
     });
     box.addEventListener("click", (e) => { if (e.target.closest(".ex-reset")) release(); });
+    box.addEventListener("dvq-fold", schedule);              // an opened fold shows text not measured yet
     let timer = 0;
     window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(release, 150); }, { passive: true });
+  };
+
+  // Folds (V3): a proof panel (.ex-proof, under its .ex-proof-title) or a group of
+  // controls (.ex-fold, under its .ex-fold-title) opens and closes from its title, which
+  // becomes a button. It starts closed on a phone and open on a wider screen. Folded, only
+  // the title shows; the controls stay in the box in document order, so the link and the
+  // remembered state are the same either way. data-fold="closed" starts closed everywhere.
+  const FOLD_NARROW = "(max-width: 44.9375em)";
+  const folds = (box) => {
+    const closed = typeof matchMedia === "function" && matchMedia(FOLD_NARROW).matches;
+    box.querySelectorAll(".ex-proof, .ex-fold").forEach((panel) => {
+      const title = panel.querySelector(":scope > .ex-proof-title, :scope > .ex-fold-title");
+      if (!title || title.querySelector(".ex-fold-btn")) return;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "ex-fold-btn";
+      btn.append(...title.childNodes);
+      title.append(btn);
+      const set = (open) => {
+        panel.classList.toggle("is-folded", !open);
+        btn.setAttribute("aria-expanded", String(open));
+        box.dispatchEvent(new Event("dvq-fold"));
+      };
+      btn.addEventListener("click", () => set(panel.classList.contains("is-folded")));
+      set(!closed && panel.dataset.fold !== "closed");
+    });
   };
 
   const setup = (box, helpOpen = false) => {
@@ -1073,6 +1101,7 @@
     box.dvqFresh = null;
     box.dvqSeed = null;
     make(box).mount(box);
+    folds(box);
     layout(box);
     transport(box);
     edits(box);

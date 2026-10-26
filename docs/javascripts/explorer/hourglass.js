@@ -303,21 +303,36 @@
         return s;
       };
       const group = (x, y, tops) => tops.map((v, i) => glass(x + 64 * i, y, v, sizes()[i], "abc"[i])).join("");
+      // one event: the tops before it, an arrow with the action, and the tops after it; side
+      // by side on a wide box, one above the other on a narrow one (a phone), where the side
+      // by side frame would shrink the hourglasses to a third. The words are Hebrew (rtl).
+      const RTL = 'direction="rtl" unicode-bidi="embed"';
       const frameSvg = (ev, measuring, verdict) => {
-        const [t, act, before, after] = ev, cy = 12 + 25, n = sizes().length, gw = 64 * (n - 1) + 30;
-        const left = 92 - (n - 2) * 40, ax0 = left + gw + 22, ax1 = ax0 + 84, right = ax1 + 30, W = right + gw + 30;
+        const [t, act, before, after] = ev, n = sizes().length, gw = 64 * (n - 1) + 30;
+        if (box.clientWidth && box.clientWidth < 520) {
+          const W = Math.max(gw + 150, 260), gx = 40, axX = gx + gw / 2, H = 198, mid = (axX + 10 + W - 4) / 2;
+          let s = `<svg class="figure hourglass-fig hg-stacked" viewBox="0 0 ${W} ${H}" style="max-width:${(W / 16).toFixed(0)}rem" role="img" aria-label="אירוע ברגע ${t}">`;
+          if (measuring) s += `<rect class="measure" x="2" y="2" width="${W - 4}" height="${H - 4}" rx="6"/>`;
+          s += `<text class="legend" x="8" y="22" font-weight="700">t = ${t}</text>` +
+               `<text class="tick" x="${mid}" y="40" text-anchor="middle" ${RTL}>${verdict.event}</text>` + group(gx, 12, before);
+          if (after === null) s += `<text class="legend" x="${W / 2}" y="${H / 2 + 22}" text-anchor="middle" font-weight="700" ${RTL}>${verdict.text}</text>`;
+          else s += `<line class="ink-line" x1="${axX}" y1="88" x2="${axX}" y2="114" stroke-width="1.5"/><polygon class="ink-fill" points="${axX},121 ${axX - 4},113 ${axX + 4},113"/>` +
+                    `<text class="legend" x="${mid}" y="108" text-anchor="middle" ${RTL}>${verdict.text}</text>` + group(gx, 128, after);
+          return s + "</svg>";
+        }
+        const cy = 12 + 25, left = 104 - (n - 2) * 40, ax0 = left + gw + 22, ax1 = ax0 + 116, right = ax1 + 30, W = right + gw + 30;
         let s = `<svg class="figure hourglass-fig" viewBox="0 0 ${W} 92" style="max-width:${(W / 16).toFixed(0)}rem" role="img" aria-label="אירוע ברגע ${t}">`;
         if (measuring) s += `<rect class="measure" x="2" y="2" width="${W - 4}" height="88" rx="6"/>`;
-        s += `<text class="legend" x="10" y="${cy - 4}" font-weight="700">t = ${t}</text><text class="tick" x="10" y="${cy + 14}">${verdict.event}</text>` + group(left, 12, before);
-        if (after === null) s += `<text class="legend" x="${ax0 + 4}" y="${cy + 5}" font-weight="700">${verdict.text}</text>`;
+        s += `<text class="legend" x="${left / 2}" y="${cy - 4}" font-weight="700" text-anchor="middle">t = ${t}</text><text class="tick" x="${left / 2}" y="${cy + 14}" text-anchor="middle" ${RTL}>${verdict.event}</text>` + group(left, 12, before);
+        if (after === null) s += `<text class="legend" x="${(ax0 + ax1) / 2}" y="${cy + 5}" font-weight="700" text-anchor="middle" ${RTL}>${verdict.text}</text>`;
         else s += `<line class="ink-line" x1="${ax0}" y1="${cy}" x2="${ax1}" y2="${cy}" stroke-width="1.5"/><polygon class="ink-fill" points="${ax1 + 6},${cy} ${ax1 - 2},${cy - 4} ${ax1 - 2},${cy + 4}"/>` +
-                  `<text class="legend" x="${(ax0 + ax1) / 2}" y="${cy - 8}" text-anchor="middle">${verdict.text}</text>` + group(right, 12, after);
+                  `<text class="legend" x="${(ax0 + ax1) / 2}" y="${cy - 8}" text-anchor="middle" ${RTL}>${verdict.text}</text>` + group(right, 12, after);
         return s + "</svg>";
       };
       const axisSvg = (events, start, end, fork) => {
         const w = 640, x0 = 30, y = 40, last = Math.max(end, fork ? fork.flip : 1, 1);
         // the fork's labels sit right of their dots: the scale leaves them room inside the frame
-        const forkLabels = fork ? [[fork.keep, `no flip: ${fork.keep}`], [fork.flip, `flip ${fork.small}: ${fork.flip}`]] : [];
+        const forkLabels = fork ? [[fork.keep, `בלי היפוך : ${fork.keep}`], [fork.flip, `הופכים את ${fork.small} : ${fork.flip}`]] : [];
         const k = Math.min((610 - x0) / last, ...forkLabels.map(([t, lab]) => (w - 4 - 9 - 7.5 * lab.length - x0) / t));
         const X = (t) => x0 + t * k, x1 = X(last);
         let s = `<svg class="perf-chart hg-live" viewBox="0 0 ${w} ${fork ? 170 : 78}" role="img" aria-label="ציר הזמן של התוכנית : האירועים, ההיפוכים וחלון המדידה${fork ? ", ומתחתיו הרגעים שבהם כל שעון נגמר אם הופכים אותו תמיד, וההסתעפות" : ""}">`;
@@ -330,7 +345,7 @@
           const yf = 138, xs = X(fork.t);
           [[...forkLabels[0], "s1", yf - 8], [...forkLabels[1], "s2", yf + 18]].forEach(([t, lab, cls, yy]) => {
             s += `<path class="${cls}-line" d="M ${f(xs)} ${yf} L ${f(xs + 12)} ${yy} L ${f(X(t))} ${yy}" fill="none" stroke-width="2.5"/><circle class="${cls}-dot" cx="${f(X(t))}" cy="${yy}" r="5"/>` +
-                 `<text class="legend" x="${f(X(t) + 9)}" y="${yy + 4}">${lab}</text>`;
+                 `<text class="legend" x="${f(X(t) + 9 + 3.75 * lab.length)}" y="${yy + 4}" text-anchor="middle" ${RTL}>${lab}</text>`;
           });
           s += `<circle class="ink-dot" cx="${f(xs)}" cy="${yf}" r="4"/><text class="tick" x="${f(xs - 8)}" y="${yf + 4}" text-anchor="end">t = ${fork.t}</text>`;
         }
@@ -457,14 +472,16 @@
         const prevEv = st.s > 0 ? events[st.s - 1] : null;
         const out = [];
         if (prevEv) { const w = t - prevEv[0]; prevEv[3].forEach((v, i) => { if (v === w) out.push(LET[i]); }); }
-        const what = st.s === 0 ? "start" : `${out.join(" + ")} run${out.length === 1 ? "s" : ""} out`;
+        const what = st.s === 0 ? "התחלה" : `${out.join(" ו-")} ${out.length === 1 ? "נגמר" : "נגמרים"}`;
         const ran = st.s === 0 ? "התחלה" : out.length > 1 ? `שעונים ${out.join(" ו-")} נגמרים` : `שעון ${out[0]} נגמר`;
         const done = st.s === events.length - 1;
-        const flip = act ? `flip ${[...act].join(" + ")}` : "";
+        const flip = act ? `הופכים ${[...act].join(" ו-")}` : "";
+        // the math stays in its own ltr span inside the rtl text
+        const math = (m) => `<tspan direction="ltr" unicode-bidi="embed">${m}</tspan>`;
         let verdict;
-        if (done) verdict = { event: what, text: interval ? `STOP ✓ ${res.end} − ${res.start} = ${st.D}` : `✓ D = ${st.D}` };
-        else if (interval && t === res.start) verdict = { event: what, text: flip ? `START, ${flip}` : "START" };
-        else verdict = { event: what, text: flip || "wait" };
+        if (done) verdict = { event: what, text: interval ? `סוף ✓ ${math(`${res.end} − ${res.start} = ${st.D}`)}` : `✓ ${math(`D = ${st.D}`)}` };
+        else if (interval && t === res.start) verdict = { event: what, text: flip ? `מתחילים, ${flip}` : "מתחילים" };
+        else verdict = { event: what, text: flip || "ממתינים" };
         $(".hg-frame").innerHTML = frameSvg(ev, interval && t >= res.start, verdict);
         const tops = (arr) => ltr(arr.map((v, i) => `${LET[i]} = ${v}`).join(", "));
         $(".hg-caption").innerHTML = `רגע ${ltr(t)} : ${ran}. חול למעלה : ${tops(before)}. ` +

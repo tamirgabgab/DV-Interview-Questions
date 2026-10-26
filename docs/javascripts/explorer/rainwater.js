@@ -98,17 +98,20 @@
     `<div class="ex-controls rw-play"><button type="button" class="md-button ex-start">להתחלה</button><button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
     `<button type="button" class="md-button md-button--primary ex-play">הפעלה</button><button type="button" class="md-button ex-next">הצעד הבא</button>` +
     `<button type="button" class="md-button ex-end">עד הסוף</button>${speedSel(...n)}<span class="ex-pos" aria-live="off"></span></div>`;
+  // the editing rows fold under one title (closed on a phone, see core.js); the view
+  // select stays out, after them, so the link keeps its controls in the same order
   const editRows = (map, m) =>
-    `<div class="ex-controls"><label>${map ? "שורות" : "עמודות"} <input type="number" class="ex-num ${map ? "rw-m" : "rw-n"}" min="1" max="${map ? MAP_MAX : ROW_MAX}" step="1" dir="ltr" aria-label="מספר ה${map ? "שורות" : "עמודות"}, עד ${map ? MAP_MAX : ROW_MAX}"></label>` +
+    `<div class="ex-fold"><p class="ex-fold-title">עריכת ${map ? "המפה" : "המערך"}</p><div class="ex-controls"><label>${map ? "שורות" : "עמודות"} <input type="number" class="ex-num ${map ? "rw-m" : "rw-n"}" min="1" max="${map ? MAP_MAX : ROW_MAX}" step="1" dir="ltr" aria-label="מספר ה${map ? "שורות" : "עמודות"}, עד ${map ? MAP_MAX : ROW_MAX}"></label>` +
     (map ? `<label>עמודות <input type="number" class="ex-num rw-n" min="1" max="${MAP_MAX}" step="1" dir="ltr" aria-label="מספר העמודות, עד ${MAP_MAX}"></label>` : "") +
     `<label>גובה מרבי <input type="number" class="ex-num rw-top" min="1" max="${H_MAX}" step="1" value="9" dir="ltr" data-nolink aria-label="הגובה המרבי במילוי האקראי, עד ${H_MAX}"></label>` +
     `<button type="button" class="md-button md-button--primary rw-rand">${map ? "מפה אקראית" : "מערך אקראי"}</button></div>` +
-    `<div class="ex-controls">${viewSel()}<label>ערך <input type="number" class="ex-num rw-val" min="0" max="${H_MAX}" step="1" value="0" dir="ltr" data-nolink aria-label="ערך לכל הסימון, 0 עד ${H_MAX}"></label>` +
+    `<div class="ex-controls"><label>ערך <input type="number" class="ex-num rw-val" min="0" max="${H_MAX}" step="1" value="0" dir="ltr" data-nolink aria-label="ערך לכל הסימון, 0 עד ${H_MAX}"></label>` +
     `<button type="button" class="md-button rw-set" disabled>החלה על הסימון</button><button type="button" class="md-button rw-inc" disabled aria-label="הגדלה ב-1 של הסימון">+1</button>` +
     `<button type="button" class="md-button rw-dec" disabled aria-label="הקטנה ב-1 של הסימון">−1</button></div>` +
     `<div class="ex-controls rw-textrow"><label class="rw-textlab">הערכים ${map ? `<textarea class="rw-text" rows="${m}" dir="ltr" spellcheck="false" data-nolink aria-label="המפה כטקסט, שורה בכל שורה"></textarea>`
       : `<input type="text" class="rw-text" dir="ltr" spellcheck="false" data-nolink aria-label="הגבהים כטקסט, מופרדים בפסיקים">`}</label>` +
-    `<button type="button" class="md-button rw-apply">עדכון מהטקסט</button><span class="rw-err" role="status"></span></div>`;
+    `<button type="button" class="md-button rw-apply">עדכון מהטקסט</button><span class="rw-err" role="status"></span></div></div>` +
+    `<div class="ex-controls">${viewSel()}</div>`;
 
   // What the two boxes share: the final-result switch, the selection and the value
   // buttons, the text field, digits typed on a cell (two digits within TYPE_MS make one
@@ -552,7 +555,7 @@
   dvqExplorers.register({
     views: { rainwater: () => ({ mount: (box) => (box.dataset.mode === "map" ? mapView(box) : rowView(box)) }) },
     help: {
-      rainwater: "עורכים את הגבהים : לחיצה, גרירה שמסמנת כמה ערכים יחד (ואז \"ערך\" או ‎+1 ו-‎−1), מספר שמקלידים, לחיצה כפולה לעריכה במקום, או שדה הטקסט שאפשר להדביק לתוכו מערך. \"תצוגה\" בוחרת בין צעד אחרי צעד לבין התוצאה הסופית, שנשמרת גם אחרי כל עריכה ומילוי אקראי. בשורה רצים שני המצביעים, ובמפה כל צעד מוציא מהערימה את התא הנמוך בגבול וממלא את השכנים החדשים שלו.",
+      rainwater: "עורכים את הגבהים : לחיצה, גרירה שמסמנת כמה ערכים יחד (ואז \"ערך\" או ‎+1 ו-‎−1, בקבוצה \"עריכת המערך\"), מספר שמקלידים, לחיצה כפולה לעריכה במקום, או שדה הטקסט שבאותה קבוצה, שאפשר להדביק לתוכו מערך. \"תצוגה\" בוחרת בין צעד אחרי צעד לבין התוצאה הסופית, שנשמרת גם אחרי כל עריכה ומילוי אקראי. בשורה רצים שני המצביעים, ובמפה כל צעד מוציא מהערימה את התא הנמוך בגבול וממלא את השכנים החדשים שלו.",
     },
     models: { rwRow, rwMap, rwParse, rwText },
   });

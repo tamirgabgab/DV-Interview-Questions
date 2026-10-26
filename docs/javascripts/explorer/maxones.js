@@ -133,14 +133,15 @@
       const grid0 = moParse(box.dataset.grid || "") || [[1, 1], [1, 0]];
       const st = { grid: grid0.map((r) => r.slice()), mode: mode0, p: 70, k: 0, sel: null, focus: [0, 0], final: false };
       box.innerHTML =
-        `<div class="ex-controls"><label>שורות <input type="number" class="ex-num mo-m" min="1" max="${MAX}" step="1" value="${grid0.length}" dir="ltr" aria-label="מספר השורות, עד ${MAX}"></label>` +
+        `<div class="ex-fold"><p class="ex-fold-title">עריכת המערך</p><div class="ex-controls"><label>שורות <input type="number" class="ex-num mo-m" min="1" max="${MAX}" step="1" value="${grid0.length}" dir="ltr" aria-label="מספר השורות, עד ${MAX}"></label>` +
         `<label>עמודות <input type="number" class="ex-num mo-n" min="1" max="${MAX}" step="1" value="${grid0[0].length}" dir="ltr" aria-label="מספר העמודות, עד ${MAX}"></label>` +
         `<label>הסיכוי ל-1 <input type="range" class="mo-p" min="0" max="100" step="5" value="70" dir="ltr" aria-label="הסיכוי של תא להיות 1 במערך אקראי, באחוזים"><output class="mo-out-p">70%</output></label>` +
         `<button type="button" class="md-button md-button--primary mo-rand">מערך אקראי</button></div>` +
-        `<div class="ex-controls"><label>מחפשים <select class="mo-mode" aria-label="ריבוע, מלבן או משולש">${Object.entries(MODES).map(([v, w]) => `<option value="${v}">${w}</option>`).join("")}</select></label>${viewSel()}` +
-        `<button type="button" class="md-button mo-set1" disabled>הסימון ל-1</button><button type="button" class="md-button mo-set0" disabled>הסימון ל-0</button></div>` +
+        `<div class="ex-controls"><button type="button" class="md-button mo-set1" disabled>הסימון ל-1</button><button type="button" class="md-button mo-set0" disabled>הסימון ל-0</button></div>` +
         `<div class="ex-controls mo-textrow"><label class="mo-textlab">הערכים <textarea class="mo-text" rows="${grid0.length}" dir="ltr" spellcheck="false" data-nolink aria-label="המערך כטקסט, שורה בכל שורה"></textarea></label>` +
-        `<button type="button" class="md-button mo-apply">עדכון מהטקסט</button><span class="mo-err" role="status"></span></div>` +
+        `<button type="button" class="md-button mo-apply">עדכון מהטקסט</button><span class="mo-err" role="status"></span></div></div>` +
+        // the shape and the view stay out of the fold, after it: the link's controls keep their order
+        `<div class="ex-controls"><label>מחפשים <select class="mo-mode" aria-label="ריבוע, מלבן או משולש">${Object.entries(MODES).map(([v, w]) => `<option value="${v}">${w}</option>`).join("")}</select></label>${viewSel()}</div>` +
         `<div class="ex-controls mo-play"><button type="button" class="md-button ex-start">להתחלה</button><button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-play">הפעלה</button><button type="button" class="md-button ex-next">הצעד הבא</button>` +
         `<button type="button" class="md-button ex-step mo-nextrow">השורה הבאה</button><button type="button" class="md-button ex-step mo-nextdir" hidden>הכיוון הבא</button><button type="button" class="md-button ex-end">עד הסוף</button>` +
@@ -148,7 +149,7 @@
         `<p class="ex-summary mo-sum" aria-live="polite"></p>` +
         `<span class="viz-legend"><span><i class="mo-key-one"></i>תא 1</span><span><i class="mo-key-cur"></i>התא הנוכחי</span><span class="mo-key-nb-wrap"><i class="mo-key-nb"></i>השכנים שנקראו</span>` +
         `<span class="mo-key-cand-wrap"><i class="mo-key-cand"></i>המלבן שנבדק</span><span><i class="mo-key-best"></i>הטוב עד עכשיו</span><span><i class="mo-key-win"></i>התשובה</span></span>` +
-        `<p class="mo-edit-hint">לחיצה על תא הופכת אותו. גרירה מסמנת מלבן, ואז "הסימון ל-1" או "הסימון ל-0". במקלדת${NB}: חיצים בין התאים, רווח הופך תא, 0 או 1 קובעים אותו (או את כל הסימון), ו-Shift עם חץ מסמן. בשדה "הערכים" אפשר להדביק מערך שלם.</p>` +
+        `<p class="mo-edit-hint">לחיצה על תא הופכת אותו. גרירה מסמנת מלבן, ואז "הסימון ל-1" או "הסימון ל-0" שב"עריכת המערך". במקלדת${NB}: חיצים בין התאים, רווח הופך תא, 0 או 1 קובעים אותו (או את כל הסימון), ו-Shift עם חץ מסמן. בשדה "הערכים" אפשר להדביק מערך שלם.</p>` +
         `<div class="mo-panels"><figure class="mo-panel"><figcaption class="mo-cap-in"></figcaption><div class="mo-grid mo-in" role="grid" dir="ltr" data-edits></div></figure>` +
         `<figure class="mo-panel"><figcaption class="mo-cap-dp"></figcaption><div class="mo-grid mo-dp" role="table" dir="ltr"></div></figure></div>` +
         `<p class="mo-step" aria-live="polite"></p><p class="mo-code"></p>`;

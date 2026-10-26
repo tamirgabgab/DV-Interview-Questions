@@ -90,8 +90,8 @@ def frame(times, across, side, moving=(), forward=True, t=0, label=""):
          '<rect class="bank" x="450" y="20" width="190" height="150" rx="8"/>',
          '<rect class="river" x="190" y="20" width="260" height="150"/>',
          '<rect class="bridge" x="190" y="78" width="260" height="34" rx="4"/>',
-         '<text class="legend" x="95" y="160" text-anchor="middle">near</text>',
-         '<text class="legend" x="545" y="160" text-anchor="middle">far</text>']
+         '<text class="legend" x="95" y="160" text-anchor="middle" direction="rtl">הגדה הקרובה</text>',
+         '<text class="legend" x="545" y="160" text-anchor="middle" direction="rtl">הגדה הרחוקה</text>']
     n = len(times)
     near = [i for i in range(n) if not (across >> i) & 1 and i not in moving]
     far = [i for i in range(n) if (across >> i) & 1 and i not in moving]

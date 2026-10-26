@@ -100,8 +100,8 @@
         `<label>הגשר מחזיק <select class="ex-cap" aria-label="כמה אנשים הגשר מחזיק"><option value="2" selected>שניים</option><option value="3">שלושה</option></select></label>` +
         `<label>התוכנית <select class="ex-plan" aria-label="התוכנית שמוצגת">${Object.entries(PLANS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
-        `<p class="ex-summary" aria-live="polite"></p><div class="bridge-plans"></div>` +
-        `<label><input type="checkbox" class="ex-greedy" checked> הכלל החמדני, סיבוב אחרי סיבוב</label><div class="bridge-greedy"></div>` +
+        `<p class="ex-summary" aria-live="polite"></p><div class="bridge-tables"><div class="bridge-plans"></div>` +
+        `<label><input type="checkbox" class="ex-greedy" checked> הכלל החמדני, סיבוב אחרי סיבוב</label><div class="bridge-greedy"></div></div>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">החצייה הקודמת</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">החצייה הבאה</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1600, 1000, 400) + `<span class="ex-pos"></span></div>` +
@@ -119,7 +119,7 @@
         let s = `<svg class="figure bridge-fig" viewBox="0 0 640 190" style="max-width:40rem" role="img" aria-label="הגשר, שתי הגדות, הלפיד והאנשים בזמן ${t}">` +
           `<rect class="bank" x="0" y="20" width="190" height="150" rx="8"/><rect class="bank" x="450" y="20" width="190" height="150" rx="8"/>` +
           `<rect class="river" x="190" y="20" width="260" height="150"/><rect class="bridge" x="190" y="78" width="260" height="34" rx="4"/>` +
-          `<text class="legend" x="95" y="160" text-anchor="middle">near</text><text class="legend" x="545" y="160" text-anchor="middle">far</text>`;
+          `<text class="legend" x="95" y="160" text-anchor="middle" direction="rtl">הגדה הקרובה</text><text class="legend" x="545" y="160" text-anchor="middle" direction="rtl">הגדה הרחוקה</text>`;
         const person = (i, x, y, cls) => `<g><circle class="${cls}" cx="${f(x)}" cy="${y}" r="17"/><text class="st-text" x="${f(x)}" y="${y + 5}" text-anchor="middle">${times[i]}</text>` +
           `<text class="st-small" x="${f(x)}" y="${y + 30}" text-anchor="middle">${NAMES[i]}</text></g>`;
         const near = [], far = [];
@@ -147,7 +147,8 @@
         }
         return out;
       };
-      const planText = (moves) => moves.map((g, k) => `${g.map((i) => NAMES[i]).join("+")}${k % 2 ? "<" : ">"}`).join(" ");
+      // a crossing to the far bank (drawn on the right) as "A+B →", a return as "← A", apart by dots
+      const planText = (moves) => moves.map((g, k) => (k % 2 ? `← ${g.map((i) => NAMES[i]).join("+")}` : `${g.map((i) => NAMES[i]).join("+")} →`)).join(" · ");
       const draw = () => {
         const times = st.times;
         if (!times.length) { $(".ex-summary").textContent = "הקלידו זמני חצייה חיוביים, מופרדים ברווחים."; $(".bridge-plans").innerHTML = ""; $(".bridge-frame").innerHTML = ""; $(".bridge-caption").textContent = ""; $(".ex-pos").textContent = ""; return; }

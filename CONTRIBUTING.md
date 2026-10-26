@@ -518,6 +518,16 @@ under the figures; and a live figure whose labels reach the enlarge button only 
 steps sits in a container marked `data-fig-strip`, whose figures always have the button's
 strip above them. CI runs it in the four explorer shards.
 
+Folds keep a tall box short on a phone: a proof panel (`<section class="ex-proof">` with
+its `.ex-proof-title`) or a group of controls (`<div class="ex-fold">` whose first child is
+a `<p class="ex-fold-title">`) gets a button in its title that opens and closes it
+(`folds()` in `core.js`). It starts closed under 720 px and open above;
+`data-fold="closed"` starts it closed everywhere (the 0020 / 0021 map of splits). The
+controls stay in the box in document order, so a group folds only what comes before the
+controls that stay out (0046 and 0047 fold the editing rows and keep the shape and view
+selects after the fold): the link and the remembered state do not change. The page checks
+open every fold after the boxes are built.
+
 `check_contrast.py` reads the colour tokens (Material's own from the installed theme,
 overridden by `docs/stylesheets/extra.css`) for the light and the dark scheme, and checks a
 list of pairs as the site draws them (body text, links, chips on their tint, white on the

@@ -72,9 +72,11 @@
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span>` +
         `<label><input type="checkbox" class="cm-price" checked> המחירון על הדרך</label></div>` +
-        `<p class="ex-summary cm-sum" aria-live="polite"></p><p class="cm-step"></p><p class="ex-note cm-price-text"></p>` +
+        `<p class="ex-summary cm-sum" aria-live="polite"></p>` +
         `<span class="viz-legend"><span><i class="cm-key-depot"></i>מחסן : הליטרים שבו מעל הציר</span><span><i class="cm-key-camel"></i>הגמל והליטרים שעליו</span><span><i class="cm-key-pass"></i>המעבר האחרון : ליטרים ביציאה ← בהגעה</span><span><i class="cm-key-next"></i>המעבר הבא</span></span>` +
-        `<div class="cm-road"></div>` +
+        // the step's text under the road: it changes length with the steps, and above the road
+        // its kept height left a blank band between the summary and the figure
+        `<div class="cm-road"></div><p class="cm-step"></p><p class="ex-note cm-price-text"></p>` +
         (fixed ? "" : `<p class="ex-title">המרחק המקסימלי לפי כמות המים בהתחלה, עם הקירוב הלוגריתמי מקווקו</p><div class="cm-chart"></div>`);
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");

@@ -52,11 +52,13 @@ BOXES = """async () => {
 COUNT = """([b, sel]) => document.querySelectorAll(".explorer")[b].querySelectorAll(sel).length"""
 
 # Click the i-th button of box b if it is shown and enabled; close a lightbox it opened.
-# Returns the button's name, or null when it was skipped.
+# The box's folds are opened first (a reset closes them again on a phone), and their own
+# buttons are not clicked. Returns the button's name, or null when it was skipped.
 CLICK = """([b, i, sel]) => {
   const box = document.querySelectorAll(".explorer")[b];
+  if (box) box.querySelectorAll(".is-folded > .ex-proof-title .ex-fold-btn, .is-folded > .ex-fold-title .ex-fold-btn").forEach((f) => f.click());
   const el = box && box.querySelectorAll(sel)[i];
-  if (!el || el.disabled || el.getAttribute("aria-disabled") === "true" || !el.getClientRects().length) return null;
+  if (!el || el.classList.contains("ex-fold-btn") || el.disabled || el.getAttribute("aria-disabled") === "true" || !el.getClientRects().length) return null;
   const name = (el.getAttribute("aria-label") || el.textContent || el.getAttribute("title") || el.getAttribute("class") || "?").trim().replace(/\\s+/g, " ").slice(0, 50);
   if (typeof el.click === "function") el.click();           // an SVG button has no click()
   else el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));

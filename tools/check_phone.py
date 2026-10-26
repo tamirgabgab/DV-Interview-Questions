@@ -137,11 +137,12 @@ AXE = """async () => {
 }"""
 
 # Every collapsible block open, and every explorer box built (they are built lazily, when
-# they near the viewport).
+# they near the viewport) with its folds open (closed on a phone at first).
 OPEN_ALL = """async () => {
   document.querySelectorAll("details").forEach((d) => (d.open = true));
   document.querySelectorAll(".hint-locked").forEach((d) => d.classList.remove("hint-locked"));
   if (window.dvqExplorers) await window.dvqExplorers.ready();
+  document.querySelectorAll(".explorer").forEach((box) => box.querySelectorAll(".is-folded > .ex-proof-title .ex-fold-btn, .is-folded > .ex-fold-title .ex-fold-btn").forEach((f) => f.click()));
 }"""
 
 

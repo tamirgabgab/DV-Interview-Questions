@@ -100,9 +100,9 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(2200, 1200, 500) +
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
-        `<p class="ex-summary hr-sum" aria-live="polite"></p><p class="hr-step"></p>` +
+        `<p class="ex-summary hr-sum" aria-live="polite"></p>` +
         `<span class="viz-legend"><span><i class="hr-key-placed"></i>נקבע</span><span><i class="hr-key-cand"></i>מועמד</span><span><i class="hr-key-out"></i>נפסל (המספר : כמה מהירים ידועים)</span><span><i class="hr-key-now"></i>רץ בתחרות הזו</span></span>` +
-        `<div class="hr-gridbox"></div><p class="ex-title">התחרויות עד כה</p><div class="hr-table"></div>` +
+        `<div class="hr-gridbox"></div><p class="hr-step"></p><p class="ex-title">התחרויות עד כה</p><div class="hr-table"></div>` +
         `<section class="ex-proof hr-proof"><p class="ex-proof-title">שלב ההוכחה : השרשרת מאחורי ההכרעה</p><p class="hr-chain"></p></section>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");

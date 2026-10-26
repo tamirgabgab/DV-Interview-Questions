@@ -121,7 +121,7 @@
       const $ = (sel) => box.querySelector(sel);
       const hash = (i) => ((i * 0.6180339887) % 1);
       const phaseSvg = (T, d) => {
-        const W = 640, H = 120, X0 = 20, X1 = 620, Y0 = 14, Y1 = 92, X = (ph) => X0 + ((ph + T / 2) / T) * (X1 - X0);
+        const W = 640, H = 196, X0 = 20, X1 = 620, Y0 = 14, Y1 = 92, X = (ph) => X0 + ((ph + T / 2) / T) * (X1 - X0);
         const half = Math.max(1.5, (X(st.t0 / 2) - X(-st.t0 / 2)) / 2);
         let s = `<svg class="perf-chart mc-phasesvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${d.phases.length} קצוות של הנתונים סביב שפת השעון, ${d.meta.length} מהם בחלון">`;
         s += `<rect class="mc-window" x="${f(X(0) - half)}" y="${Y0}" width="${f(2 * half)}" height="${Y1 - Y0}"/>`;
@@ -132,6 +132,15 @@
         [[-T / 2, `−${fmt(T / 2000, 1)} ns`], [0, "שפת השעון"], [T / 2, `+${fmt(T / 2000, 1)} ns`]].forEach(([ph, lab], k) => {
           s += `<text class="tick" x="${f(X(ph))}" y="${Y1 + 20}" text-anchor="${k === 0 ? "start" : k === 2 ? "end" : "middle"}"${k === 1 ? ' direction="rtl"' : ""}>${lab}</text>`;
         });
+        // the zoom under the strip: three windows either side of the clock edge, where the
+        // window (a few pixels wide on the strip, on a phone) and its edges can be told apart
+        const Z = Math.min(3 * st.t0, T / 2), ZY0 = 128, ZY1 = 172, XZ = (ph) => X0 + ((ph + Z) / (2 * Z)) * (X1 - X0);
+        s += `<line class="grid" x1="${f(X(-Z))}" y1="${Y1 + 4}" x2="${X0}" y2="${ZY0}"/><line class="grid" x1="${f(X(Z))}" y1="${Y1 + 4}" x2="${X1}" y2="${ZY0}"/>` +
+             `<rect class="mc-window" x="${f(XZ(-st.t0 / 2))}" y="${ZY0}" width="${f(XZ(st.t0 / 2) - XZ(-st.t0 / 2))}" height="${ZY1 - ZY0}"/>`;
+        d.phases.forEach((ph, i) => { if (Math.abs(ph) <= Z) s += `<circle class="${inside.has(i) ? "mc-in" : "mc-out"}" cx="${f(XZ(ph))}" cy="${f(ZY0 + 4 + hash(i + 1) * (ZY1 - ZY0 - 8))}" r="${inside.has(i) ? 3.2 : 2}"/>`; });
+        s += `<line class="mc-clk" x1="${f(XZ(0))}" x2="${f(XZ(0))}" y1="${ZY0 - 4}" y2="${ZY1 + 4}"/><rect class="mc-zoom" x="${X0}" y="${ZY0}" width="${X1 - X0}" height="${ZY1 - ZY0}"/>`;
+        [[-Z, `−${Math.round(Z)} ps`, "start"], [Z, `+${Math.round(Z)} ps`, "end"]].forEach(([ph, lab, a]) => { s += `<text class="tick" x="${f(XZ(ph))}" y="${ZY1 + 18}" text-anchor="${a}">${lab}</text>`; });
+        s += `<text class="tick" x="${f(XZ(0))}" y="${ZY1 + 18}" text-anchor="middle">±${Math.round(st.t0 / 2)} ps</text>`;
         return s + "</svg>";
       };
       const histSvg = (d, r) => {
@@ -164,9 +173,9 @@
         $(".mc-t2").innerHTML = `כמה זמן לקח ל-${ltr(k)} הקצוות שבחלון להתייצב, מול ${ltr(`t_res = ${st.flops} · ${fmt(r.T / 1000, 1)} − ${OVER} = ${fmt(r.tRes / 1000, 2)} ns`)}`;
         $(".mc-hist").innerHTML = histSvg(d, r);
         $(".mc-table").innerHTML = `<table class="bridge-table mc-factors"><thead><tr><th>הגורם</th><th>בהגרלה</th><th>בנוסחה</th></tr></thead><tbody>` +
-          `<tr><td>חלק הקצוות שנופלים בחלון</td><td>${ltr(`${k}/${n} = ${fmt(k / n, 4)}`)}</td><td>${ltr(`T0 · f_clk = ${fmt(r.pEnter, 4)}`)}</td></tr>` +
-          `<tr><td>מהם, חלק שלא התייצב עד ${ltr("t_res")}</td><td>${ltr(k ? `${late}/${k}` : "—")}</td><td>${ltr(`e<sup>−t_res/τ</sup> = ${sci(r.pStay)}`)}</td></tr>` +
-          `<tr><td>כניסות ל-metastability בשנייה</td><td>${ltr(sci((k / n) * FDATA * 1e6))}</td><td>${ltr(`T0 · f_clk · f_data = ${sci(r.enterPerSec)}`)}</td></tr></tbody></table>`;
+          `<tr><td>חלק הקצוות שנופלים בחלון</td><td data-label="בהגרלה">${ltr(`${k}/${n} = ${fmt(k / n, 4)}`)}</td><td data-label="בנוסחה">${ltr(`T0 · f_clk = ${fmt(r.pEnter, 4)}`)}</td></tr>` +
+          `<tr><td>מהם, חלק שלא התייצב עד ${ltr("t_res")}</td><td data-label="בהגרלה">${ltr(k ? `${late}/${k}` : "—")}</td><td data-label="בנוסחה">${ltr(`e<sup>−t_res/τ</sup> = ${sci(r.pStay)}`)}</td></tr>` +
+          `<tr><td>כניסות ל-metastability בשנייה</td><td data-label="בהגרלה">${ltr(sci((k / n) * FDATA * 1e6))}</td><td data-label="בנוסחה">${ltr(`T0 · f_clk · f_data = ${sci(r.enterPerSec)}`)}</td></tr></tbody></table>`;
         $(".mc-sum").innerHTML = `ה-MTBF הוא ההופכי של המכפלה${NB}: ${ltr(`1 / (${sci(r.enterPerSec)} · ${sci(r.pStay)})`)}, כלומר ${mtbfHuman(r.mtbf)}. ` +
           (late ? `בהגרלה הזו ${ltr(late)} ${late === 1 ? "קצה לא התייצב" : "קצוות לא התייצבו"} בזמן, והם הכשלים.` : `אף קצה בהגרלה לא עבר את החתך, כי הזנב המעריכי דועך מהר.`) +
           ` כל פלופ נוסף מזיז את החתך ב-${ltr(`T_clk = ${fmt(r.T / 1000, 1)} ns`)} ימינה, ומכפיל את ה-MTBF ב-${ltr(`e<sup>T_clk/τ</sup> = ${sci(Math.exp(r.T / st.tau))}`)}.`;

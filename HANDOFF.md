@@ -817,6 +817,28 @@ section below starts at session 22, whose numbered items run on through the late
     coding path and 0044 last in the digits path. Twelve paths cover all 47 questions; the
     DV paths come first. `lint_pages.py` fails on a question in no path (a test checks it);
     the path front matter is quoted.
+57. **Review round V3, the boxes on a phone (session 26, 2026-10-26).** The owner's picks:
+    folds closed on a phone only, the split map only collapsed with short phone labels (not
+    split by completion count), an eight-row scroll for the growing table, V2 and V3 to
+    `main` together. `folds()` in `core.js`: a proof panel (`.ex-proof`) or a group
+    (`.ex-fold` with an `.ex-fold-title`) gets a title button, closed under 720 px;
+    `data-fold="closed"` everywhere (the 0020 / 0021 map). Folded: every proof panel (the nine
+    kinds with an `.ex-proof`: boxes, cake, eurovision, horses, hourglass, josephus, lfsr,
+    motorcycle, river), the editing rows of 0046 and
+    0047 (the shape and view selects moved after the fold, so the link payload keeps its
+    order), the random-run rows of 0024 and 0025, the 0013 base table. Layout: 0024 / 0025
+    free events in two columns on a phone and the 0024 hand labels beside their hands;
+    0018 / 0019 event frames stacked on a narrow box, all their figure words in Hebrew (the
+    fork labels too); 0031 and 0032 bank names in Hebrew, 0031 plans as "A+B → · ← A", the
+    bridge before the tables on a phone (CSS order); 0040 "הביט הבא" with its buttons and
+    the state meanings along the bottom of the graph; 0038 short headers; 0041 equal
+    sliders and Hebrew-first labels; 0037 the factor table as blocks on a phone and a zoom
+    of ±3 windows under the edge strip; 0027 / 0028 the table scrolls at eight rows; 0042
+    and 0043 the step text under the figure. Phone heights: 0009 1,873 → 1,393 px, 0016
+    1,564 → 1,350, 0024 2,087 → 1,877, 0025 1,837 → 1,751, 0027 2,093 → 1,655, 0046 1,500
+    → 1,145, 0047 1,619 → 1,235, 0020 1,413 → 1,021, 0021 map 1,813 → 1,092 (2,526 → 880
+    on a desktop). The page checks open every fold; `check_explorers.py` does not click the
+    fold buttons.
 
 
 ## In progress
@@ -829,8 +851,9 @@ section below starts at session 22, whose numbered items run on through the late
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
   and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
   the cloud sandbox (item 52); question 0048, the farmer, the food and the water (item 54).
-- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1, V2, V5 and V7 are
-  done (work log items 55, 56), V3, V4 and V6 wait for the owner.
+- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1, V2, V3, V5 and V7 are
+  done (work log items 55 to 57), V4 and V6 wait for the owner; the V3 split map by
+  completion count was not picked (only collapsed).
 - **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52), and round 6 part
   a, the jump check (item 53); part b, a visual diff of the phone screenshots, was not
   picked.
@@ -1724,7 +1747,7 @@ fields and dark mode not covered in this pass)
 |-------|---------|--------|
 | V1 (done, item 55) | **Bugs and quick fixes**: the 0023 box error, the 0002 default, `ltr()` without line breaks, the 0045 balls, the 0039 label, the 0042 camel, the 0048 drag caption, the 0047 caption, superscripts in 0034 and 0037, the 0026 number format | S–M |
 | V2 (done, item 56) | **Study paths for everything**: paths for the DV core, the protocol reference models, geometry and motion; 0044 to 0047 into the algorithms path; a lint check that names a question in no path | S–M |
-| V3 | **Boxes on a phone**: collapse the proof panels (0009, 0013, 0016, 0024) and the editing and random-run controls (0025, 0046, 0047); 0024 buttons in two columns; 0018 and 0019 stacked with Hebrew labels; the 0020 / 0021 split map by completion count; 0031, 0037, 0038, 0040, 0041; scroll areas instead of blank reservations (0027, 0028, 0042, 0043) | M–L |
+| V3 (done, item 57) | **Boxes on a phone**: collapse the proof panels (0009, 0013, 0016, 0024) and the editing and random-run controls (0025, 0046, 0047); 0024 buttons in two columns; 0018 and 0019 stacked with Hebrew labels; the 0020 / 0021 split map by completion count; 0031, 0037, 0038, 0040, 0041; scroll areas instead of blank reservations (0027, 0028, 0042, 0043) | M–L |
 | V4 | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
 | V5 (done, item 55) | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0016 (the owner did not pick the 0015 simulation or the 0001 Python model) | M–L |
 | V6 | **Practice loop and glossary**: a "my progress" page, a self-rating after a solution, export / import of the progress; a glossary page with a tooltip on a term's first use | M |

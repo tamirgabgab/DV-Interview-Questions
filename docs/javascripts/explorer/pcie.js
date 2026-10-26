@@ -96,7 +96,8 @@
         `<label>RCB <select class="ex-rcb">${[64, 128].map((v) => `<option value="${v}"${v === st.rcb ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button>` +
         `<label><input type="checkbox" class="ex-choose" checked> לבחור חיתוכים בעצמי</label></div>` +
-        `<p class="ex-summary" aria-live="polite"></p><div class="pcie-blocks"></div><p class="pcie-choose"></p><div class="pcie-counts"></div><div class="pcie-map"></div>`;
+        `<p class="ex-summary" aria-live="polite"></p><div class="pcie-blocks"></div><p class="pcie-choose"></p><div class="pcie-counts"></div>` +
+        `<div class="ex-fold" data-fold="closed"><p class="ex-fold-title">מפת הפיצולים</p><div class="pcie-map"></div></div>`;
       const $ = (sel) => box.querySelector(sel);
       const hex = (v) => "0x" + v.toString(16).toUpperCase();
       const big = (v) => v.toLocaleString("en-US");
@@ -112,9 +113,9 @@
         const span = endBlock + rcb - base;
         const sc = (x1 - x0) / span;
         const x = (a) => x0 + (a - base) * sc;
-        const grid = (y0, y1, labelsY = 16) => {
+        const grid = (y0, y1, labelsY = 16, thin = 1) => {
           let g = "";
-          const every = span <= 6 * rcb ? 1 : span <= 12 * rcb ? 2 : span <= 24 * rcb ? 4 : 8;
+          const every = (span <= 6 * rcb ? 1 : span <= 12 * rcb ? 2 : span <= 24 * rcb ? 4 : 8) * thin;
           for (let off = 0, i = 0; off <= span; off += rcb, i++) {
             g += `<line class="cs-rcb" x1="${f(x(base + off))}" y1="${y0}" x2="${f(x(base + off))}" y2="${y1}"/>`;
             if (i % every === 0) g += `<text class="coord halo" x="${f(x(base + off))}" y="${labelsY}" text-anchor="middle">${hex(base + off)}</text>`;
@@ -164,22 +165,26 @@
              `<text class="legend" x="40" y="${H - 12}">m = MPS / RCB = ${m}, δ = ${d}${d ? " (N = m + 1 and L ≤ MPS)" : ""}</text>`;
         return g + "</svg>";
       };
+      // On a phone (a narrow box) the rows drop their "48+64+64+64+16" labels, which ran into
+      // the bars there (the sizes are in the bars and their tooltips), and every other address.
       const mapSvg = (addr, len, mps, rcb, rows, total) => {
+        const narrow = box.clientWidth > 0 && box.clientWidth < 520;
         const labelW = Math.max(...rows.map((sp) => sp.join("+").length)) * 8.2 + 16;   // room for "48+64+64+64+16"
-        const x0 = Math.min(330, Math.max(128, Math.round(labelW)));
+        const x0 = narrow ? 12 : Math.min(330, Math.max(128, Math.round(labelW)));
         const ax = axis(addr, len, rcb, x0, 612);
         const row = 22, gap = 6, head = 24;
         const groups = new Map();
         rows.forEach((sp) => { if (!groups.has(sp.length)) groups.set(sp.length, []); groups.get(sp.length).push(sp); });
         let height = 30 + 4;
         groups.forEach((g) => { height += head + g.length * (row + gap); });
-        let g = `<svg class="figure cs-fig pcie-live" viewBox="0 0 640 ${height}" style="max-width:40rem" role="img" aria-label="${rows.length} מתוך ${total} הפיצולים, שורה לכל פיצול">${ax.grid(24, height - 4)}`;
+        let g = `<svg class="figure cs-fig pcie-live" viewBox="0 0 640 ${height}" style="max-width:40rem" role="img" aria-label="${rows.length} מתוך ${total} הפיצולים, שורה לכל פיצול">${ax.grid(24, height - 4, 16, narrow ? 2 : 1)}`;
         let y = 30;
         groups.forEach((list, n) => {
-          g += `<text class="legend halo" x="${x0 + 8}" y="${y + 15}" font-weight="700">${n} ${n === 1 ? "completion" : "completions"}: ${list.length}${rows.length < total ? "+" : ""} ${list.length === 1 && rows.length === total ? "split" : "splits"}</text>`;
+          const many = `${list.length}${rows.length < total ? "+" : ""}`;
+          g += `<text class="legend halo" x="${x0 + 8}" y="${y + 15}" font-weight="700" text-anchor="end" direction="rtl">${n === 1 ? "Completion אחד" : `${n} Completions`} : ${list.length === 1 && rows.length === total ? "פיצול אחד" : `${many} פיצולים`}</text>`;
           y += head;
           list.forEach((sp) => {
-            g += `<text class="coord halo" x="${x0 - 10}" y="${y + 15}" text-anchor="end">${sp.join("+")}</text>`;
+            if (!narrow) g += `<text class="coord halo" x="${x0 - 10}" y="${y + 15}" text-anchor="end">${sp.join("+")}</text>`;
             let pos = addr;
             sp.forEach((size, i) => {
               const r = sp.length === 1 ? "one" : i === 0 ? "first" : i === sp.length - 1 ? "last" : "mid";

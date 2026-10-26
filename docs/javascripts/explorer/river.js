@@ -82,7 +82,7 @@
       const frameSvg = (s, carried, moving, forward, unsafe) => {
         let out = `<svg class="figure river-fig" viewBox="0 0 640 190" style="max-width:40rem" role="img" aria-label="הנהר, שתי הגדות והסירה">` +
           `<rect class="bank" x="0" y="20" width="200" height="150" rx="8"/><rect class="bank" x="440" y="20" width="200" height="150" rx="8"/>` +
-          `<rect class="river" x="200" y="20" width="240" height="150"/><text class="legend" x="100" y="160" text-anchor="middle">near</text><text class="legend" x="540" y="160" text-anchor="middle">far</text>`;
+          `<rect class="river" x="200" y="20" width="240" height="150"/><text class="legend" x="100" y="160" text-anchor="middle" direction="rtl">הגדה הקרובה</text><text class="legend" x="540" y="160" text-anchor="middle" direction="rtl">הגדה הרחוקה</text>`;
         const who = (name, x, y, cls) => `<g><circle class="${cls}" cx="${x}" cy="${y}" r="18"/><text class="st-text" x="${x}" y="${y + 5}" text-anchor="middle">${LETTER[name]}</text></g>`;
         const onBoat = moving ? new Set(["farmer", ...(carried ? [carried] : [])]) : new Set();
         [[0, 45], [1, 485]].forEach(([side, x0]) => {

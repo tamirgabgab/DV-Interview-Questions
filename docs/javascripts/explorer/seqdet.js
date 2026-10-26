@@ -63,9 +63,9 @@
         `<label><span>הסתברות ל-1</span><input type="range" class="sq-p" min="0" max="100" step="5" value="50" dir="ltr" aria-label="ההסתברות שביט אקראי הוא 1, באחוזים"><output class="out-p">50%</output></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err sq-err"></span></div>` +
         `<div class="ex-controls ex-play-row">` +
-        `<span class="ex-title">הביט הבא :</span>` +
-        `<button type="button" class="md-button md-button--primary sq-bit" data-b="0">0</button>` +
-        `<button type="button" class="md-button md-button--primary sq-bit" data-b="1">1</button>` +
+        `<span class="sq-bits"><span class="ex-title">הביט הבא :</span> ` +
+        `<button type="button" class="md-button md-button--primary sq-bit" data-b="0">0</button> ` +
+        `<button type="button" class="md-button md-button--primary sq-bit" data-b="1">1</button></span>` +
         `<button type="button" class="md-button ex-next">ביט אקראי</button>` +
         `<button type="button" class="md-button ex-prev">ביטול הביט האחרון</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1200, 600, 250) +
@@ -100,7 +100,8 @@
         for (let s = 0; s < N; s++) {
           const out = st.moore && s === L;
           h += `<g class="fs-node${s === cur ? " is-cur" : ""}${out ? " is-out" : ""}"><circle cx="${f(xs[s])}" cy="${Y}" r="${R}"/><text x="${f(xs[s])}" y="${Y + 4}" text-anchor="middle">S${s}</text></g>` +
-               `<text class="fs-meaning" x="${f(xs[s])}" y="${Y + R + 14}" text-anchor="middle">${s === 0 ? "start" : st.pattern.slice(0, s).join("")}</text>`;
+               // what each state has seen, in a row along the bottom, clear of the arrows into the nodes
+               `<text class="fs-meaning halo" x="${f(xs[s])}" y="${H - 6}" text-anchor="middle">${s === 0 ? "start" : st.pattern.slice(0, s).join("")}</text>`;
         }
         labels.forEach(([x, y, lab, found, taken]) => { h += `<text class="fs-label halo${found ? " is-found" : ""}${taken ? " is-taken" : ""}" x="${f(x)}" y="${f(y)}" text-anchor="middle">${lab}</text>`; });
         return h + "</svg>";

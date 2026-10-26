@@ -1536,6 +1536,17 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .ex-proof[hidden] { display: none; }
 .md-typeset .explorer .ex-proof-title { margin: 0 0 0.4em; font-size: 0.75rem; font-weight: 700; }
 .md-typeset .explorer .ex-proof .ex-nowrap { white-space: nowrap; }
+/* Folds (core.js folds): a proof panel or a group of controls under its title, which is a
+   button; closed on a phone, open on a wider screen. Folded, only the title shows. */
+.md-typeset .explorer .ex-fold { margin-top: 0.5rem; }
+.md-typeset .explorer .ex-fold-title { margin: 0 0 0.2rem; font-size: 0.75rem; font-weight: 700; }
+.md-typeset .explorer .ex-fold-btn { display: inline-flex; align-items: center; gap: 0.45em; min-height: 1.6rem; padding: 0; border: none; background: none; color: var(--viz-ink); font: inherit; text-align: start; cursor: pointer; }
+.md-typeset .explorer .ex-fold-btn::before { content: ""; flex: none; width: 0.42em; height: 0.42em; margin: 0 0.15em; border: solid currentColor; border-width: 0 0.13em 0.13em 0; transform: translateY(-0.1em) rotate(45deg); }
+.md-typeset .explorer .is-folded > .ex-proof-title .ex-fold-btn::before,
+.md-typeset .explorer .is-folded > .ex-fold-title .ex-fold-btn::before { transform: rotate(135deg); }
+.md-typeset .explorer .ex-fold-btn:hover { color: var(--md-accent-fg-color); }
+.md-typeset .explorer .is-folded > :not(.ex-proof-title):not(.ex-fold-title) { display: none !important; }
+.md-typeset .explorer .is-folded > .ex-proof-title, .md-typeset .explorer .is-folded > .ex-fold-title { margin-bottom: 0; }
 .md-typeset svg .jos-new { fill: var(--viz-s3-text); font-size: 11px; font-family: var(--md-code-font-family); }
 .md-typeset svg .jos-new.is-win { font-weight: 700; font-size: 13px; }
 .md-typeset .explorer .bx-cut-row { display: flex; flex-wrap: wrap; gap: 0.25rem; direction: ltr; margin: 0.3rem 0; }
@@ -1676,7 +1687,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer svg.cake-live { width: 100%; display: block; }
 .md-typeset .explorer .cake-panel { flex: 1 1 15rem; min-width: 0; }
 .md-typeset .explorer .cake-panel p { margin: 0.2em 0 0.4em; }
-.md-typeset .explorer .cake-scroll { max-height: 19rem; overflow-y: auto; position: relative; }
+.md-typeset .explorer .cake-scroll { max-height: 12.75rem; overflow-y: auto; position: relative; }   /* eight rows under the header */
 .md-typeset .explorer .cake-scroll thead th { position: sticky; top: 0; background: var(--md-default-bg-color); }
 .md-typeset .explorer .cake-table { font-size: 0.7rem; margin: 0; }
 .md-typeset .explorer input.ex-num { width: 5.2rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; margin-inline-start: 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
@@ -2316,6 +2327,12 @@ body.practice-mode .md-typeset .question-tools {
 /* Protocol explorers (0025, 0024, 0023): the two sides, the queues, the circle, the block map */
 .md-typeset .explorer .an-free { margin-top: 0.4rem; }
 .md-typeset .explorer .an-free .ex-title { margin: 0; }
+/* the free events of 0024 and 0025 in two columns on a phone, under their title */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .an-free:not(.an-random) { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+  .md-typeset .explorer .an-free:not(.an-random) > .ex-title { grid-column: 1 / -1; order: 0; }
+  .md-typeset .explorer .an-free:not(.an-random) > button.md-button { width: 100%; padding-inline: 0.4rem; }
+}
 .md-typeset .explorer .an-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; margin-top: 0.6rem; align-items: stretch; }
 .md-typeset .explorer .an-side { flex: 1 1 15rem; min-width: 0; border: 1.5px solid var(--viz-grid); border-radius: 0.4rem; padding: 0.4rem 0.6rem; }
 .md-typeset .explorer .an-link { flex: 1 1 14rem; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem; justify-content: center; }
@@ -2761,6 +2778,15 @@ body.practice-mode .md-typeset .question-tools {
 /* Metastability Monte Carlo (0037 part a): edges around the clock edge, settling times */
 .md-typeset svg .mc-window { fill: var(--viz-s2); fill-opacity: 0.25; }
 .md-typeset svg .mc-clk { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .mc-zoom { fill: none; stroke: var(--viz-grid); stroke-width: 1.2; }
+/* 0037: the three-column factor table as one block per factor on a phone */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer table.mc-factors thead { display: none; }
+  .md-typeset .explorer table.mc-factors tr { display: block; padding: 0.35em 0; border-bottom: 1px solid var(--viz-grid); }
+  .md-typeset .explorer table.mc-factors td { display: block; padding: 0.1em 0.3em; border: none; }
+  .md-typeset .explorer table.mc-factors td:first-child { font-weight: 700; }
+  .md-typeset .explorer table.mc-factors td[data-label]::before { content: attr(data-label) "\00a0: "; color: var(--viz-text); }
+}
 .md-typeset svg .mc-in { fill: var(--viz-s2); }
 .md-typeset svg .mc-out { fill: var(--viz-text); fill-opacity: 0.35; }
 .md-typeset svg .mc-fail { fill: var(--viz-s2); fill-opacity: 0.1; }
@@ -3303,3 +3329,22 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 /* The header tabs appear at once: Material slides them in one by one, and on the home page
    the last ones stayed faint for a moment (review V7). */
 .md-tabs__link, .md-tabs__item { transition: none !important; transition-delay: 0s !important; }
+
+/* 0031 on a phone: the bridge and its steps come before the plan tables, so the animation
+   is in view without scrolling past them (CSS order: the controls keep their DOM order). */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer[data-kind="bridge"] { display: flex; flex-direction: column; }
+  .md-typeset .explorer[data-kind="bridge"] > .bridge-tables,
+  .md-typeset .explorer[data-kind="bridge"] > .ex-keys { order: 1; }
+}
+
+/* 0040: the "next bit" label stays with its 0 and 1 buttons, first in the row */
+.md-typeset .explorer .ex-controls > .sq-bits.ex-c-other { order: 0; display: inline-flex; align-items: center; gap: 0.4rem; }
+/* 0038: the count table fits a phone (short headers, cells on one line) */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer table.at-counts th, .md-typeset .explorer table.at-counts td { padding: 0.3em 0.45em; white-space: nowrap; }
+}
+/* 0041: the weight sliders in equal columns, every slider the same length */
+.md-typeset .explorer .cv-weights { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); }
+.md-typeset .explorer .cv-weights label { display: flex; }
+.md-typeset .explorer .cv-weights input[type="range"] { flex: 1 1 auto; width: auto; min-width: 0; margin: 0; }

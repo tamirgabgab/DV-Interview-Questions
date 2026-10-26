@@ -134,7 +134,7 @@
         `<button type="button" class="md-button cr-act" data-ev="receive" data-how="lose">הפקטה הבאה אבדה</button>` +
         `<button type="button" class="md-button cr-act" data-ev="dequeue">פקטה יוצאת מה-buffer</button>` +
         `<button type="button" class="md-button cr-act" data-ev="sync">Path Credit Sync</button></div>` +
-        randomRow("שיעור האובדן", "תנועה אקראית (כמו ה-test של העמוד, אירועים חוקיים בלבד) :") +
+        randomRow("שיעור האובדן", "תנועה אקראית (כמו ה-test של העמוד, אירועים חוקיים בלבד)") +
         `<div class="cr-box"><div class="cr-circle"></div><div class="cr-panel"><div class="cr-table"></div><p class="cr-buf"></p><p class="cr-link"></p></div></div>` +
         `<p class="ex-title">ציר האירועים : עמודה לכל אירוע, המונים אחריו, ו-✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
         `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p>`;
@@ -151,9 +151,14 @@
           `<circle class="cr-ring" cx="${C}" cy="${C}" r="${R}"/>`;
         for (let v = 0; v < CR_MOD; v += 32) { const [x1, y1] = pt(v, R - 5), [x2, y2] = pt(v, R + 5); g += `<line class="cr-tick" x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}"/><text class="cr-ticktext" x="${f(pt(v, R + 17)[0])}" y="${f(pt(v, R + 17)[1] + 4)}" text-anchor="middle">${v}</text>`; }
         g += arc(s.pcc, s.pcl, R - 14, "cr-arc cr-arc-credits") + arc(s.pcr, s.pca, R - 28, "cr-arc cr-arc-free");
-        // the labels sit at four different radii, so equal counters still read
-        const hand = (v, r, cls, name, lr) => { const [x, y] = pt(v, r), [lx, ly] = pt(v, lr); return `<line class="cr-hand ${cls}" x1="${C}" y1="${C}" x2="${f(x)}" y2="${f(y)}"/><circle class="cr-dot ${cls}" cx="${f(x)}" cy="${f(y)}" r="5"/><text class="cr-label ${cls}" x="${f(lx)}" y="${f(ly + 4)}" text-anchor="middle">${name}</text>`; };
-        g += hand(s.pcr, R - 28, "cr-pcr", "PCR", 24) + hand(s.pcc, R - 14, "cr-pcc", "PCC", 46) + hand(s.pcl, R - 14, "cr-pcl", "PCL", 68) + hand(s.pca, R - 28, "cr-pca", "PCA", 92);
+        // the labels sit at four different radii and alternate sides of their hand, so equal
+        // counters (all four at the start) still read and no label sits on a hand or a dot
+        const hand = (v, r, cls, name, lr, side) => {
+          const [x, y] = pt(v, r), [lx0, ly0] = pt(v, lr), a = -Math.PI / 2 + (v / CR_MOD) * 2 * Math.PI;
+          const lx = lx0 - Math.sin(a) * 15 * side, ly = ly0 + Math.cos(a) * 15 * side;
+          return `<line class="cr-hand ${cls}" x1="${C}" y1="${C}" x2="${f(x)}" y2="${f(y)}"/><circle class="cr-dot ${cls}" cx="${f(x)}" cy="${f(y)}" r="5"/><text class="cr-label ${cls}" x="${f(lx)}" y="${f(ly + 4)}" text-anchor="middle">${name}</text>`;
+        };
+        g += hand(s.pcr, R - 28, "cr-pcr", "PCR", 24, 1) + hand(s.pcc, R - 14, "cr-pcc", "PCC", 46, -1) + hand(s.pcl, R - 14, "cr-pcl", "PCL", 68, 1) + hand(s.pca, R - 28, "cr-pca", "PCA", 92, -1);
         return g + `</svg><p class="cr-legend"><span class="cr-lg cr-lg-s1">‏PCC מלא, ‏PCL מקווקו : ה-Egress</span> <span class="cr-lg cr-lg-s2">‏PCR מלא, ‏PCA מקווקו : ה-Ingress</span></p>`;
       };
       const render = () => {

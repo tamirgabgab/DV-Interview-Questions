@@ -106,8 +106,8 @@ def frame(state, carried=None, forward=True, moving=False, label="", unsafe=None
          '<rect class="bank" x="0" y="20" width="200" height="150" rx="8"/>',
          '<rect class="bank" x="440" y="20" width="200" height="150" rx="8"/>',
          '<rect class="river" x="200" y="20" width="240" height="150"/>',
-         '<text class="legend" x="100" y="160" text-anchor="middle">near</text>',
-         '<text class="legend" x="540" y="160" text-anchor="middle">far</text>']
+         '<text class="legend" x="100" y="160" text-anchor="middle" direction="rtl">הגדה הקרובה</text>',
+         '<text class="legend" x="540" y="160" text-anchor="middle" direction="rtl">הגדה הרחוקה</text>']
 
     def who(name, x, y, cls="st-cell"):
         p.append(f'<g><circle class="{cls}" cx="{x}" cy="{y}" r="18"/>'

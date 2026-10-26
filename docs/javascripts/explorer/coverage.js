@@ -70,7 +70,7 @@
       const N0 = Math.min(20, Math.max(2, Number(box.dataset.n || 16))), SEED0 = Number(box.dataset.seed || 37);
       const st = { n: N0, run: null, k: 0, seed: SEED0, avg: null };
       box.innerHTML =
-        `<div class="ex-controls"><label><span>‏n, מספר התאים</span><input type="range" class="sg-n" min="2" max="20" step="1" value="${N0}" dir="ltr" aria-label="מספר התאים"><output class="sg-out-n"></output></label>` +
+        `<div class="ex-controls"><label><span>מספר התאים, n</span><input type="range" class="sg-n" min="2" max="20" step="1" value="${N0}" dir="ltr" aria-label="מספר התאים"><output class="sg-out-n"></output></label>` +
         `<button type="button" class="md-button ex-random">ריצה חדשה</button>` +
         `<button type="button" class="md-button sg-avg">ממוצע של ${AVG_RUNS} ריצות</button>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
@@ -168,7 +168,7 @@
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>תאים <select class="cv-n" aria-label="מספר התאים">${Array.from({ length: NMAX - 1 }, (_, i) => `<option value="${i + 2}"${i + 2 === N0 ? " selected" : ""}>${i + 2}</option>`).join("")}</select></label>` +
-        `<label>‏at_least <select class="cv-k" aria-label="פגיעות נדרשות בכל תא">${Array.from({ length: KMAX }, (_, i) => `<option value="${i + 1}"${i + 1 === K0 ? " selected" : ""}>${i + 1}</option>`).join("")}</select></label>` +
+        `<label>פגיעות בכל תא, at_least <select class="cv-k" aria-label="פגיעות נדרשות בכל תא">${Array.from({ length: KMAX }, (_, i) => `<option value="${i + 1}"${i + 1 === K0 ? " selected" : ""}>${i + 1}</option>`).join("")}</select></label>` +
         `<span class="wv-presets">משקלים : ${presets.map(([v, t]) => `<button type="button" class="md-button ex-preset" data-w="${v}">${t}</button>`).join(" ")}</span>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button></div>` +
         `<div class="cv-weights" role="group" aria-label="המשקל של כל תא"></div>` +
