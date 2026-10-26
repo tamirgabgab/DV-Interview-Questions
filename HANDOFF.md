@@ -798,6 +798,7 @@ section below starts at session 22, whose numbered items run on through the late
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
   and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
   the cloud sandbox (item 52); question 0048, the farmer, the food and the water (item 54).
+- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series** (owner picks).
 - **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52), and round 6 part
   a, the jump check (item 53); part b, a visual diff of the phone screenshots, was not
   picked.
@@ -1604,7 +1605,7 @@ visible screens), then UI322 / UI323, then the boxes (UI327, UI328).
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
 
-### Fourth series, review rounds V1 to V6 (session 26, 2026-10-26, owner picks)
+### Fourth series, review rounds V1 to V7 (session 26, 2026-10-26, owner picks)
 
 A review of the whole project: the site-wide pages and tools (done by hand) and every
 question page with its box at 1200 and 390 px (two review passes, findings below as they
@@ -1657,16 +1658,45 @@ fields and dark mode not covered in this pass)
 | all | Follow-ups answered inline in 0001, bare in 0015 and 0016 | One pattern: a collapsible short answer per follow-up | consistency | M |
 | 0021 | The ladder works well | A "guess C(n) before revealing" step | new aid | S |
 
-**Rounds** (the per-question findings are added under V4 and V5)
+**Question findings, 0025 to 0048** (38 boxes stepped, played and preset at 1200 and
+390 px, drags in 0030 and 0048; no JS errors, no sideways scroll; dark mode not covered)
+
+| Question | Finding | Proposal | Type | Effort |
+|---|---|---|---|---|
+| 12 pages (0029, 0030, 0031, 0033, 0036, 0037, 0044, 0046, 0048...) | Short LTR spans of box text (formulas, coordinates) break across lines at 390 px and read in the wrong order | `white-space: nowrap` in `ltr()` of `core.js` for short spans; long formulas on their own line | box UX | S |
+| 0045 | At 390 px the end balls sit past the ends of the tilted beam | Scale the balls to the beam on narrow widths | bug | S |
+| 0039 | At 390 px the "21" next-drop label is clipped at the right edge | Move the label inside the figure | bug | S |
+| 0042 | The camel covers the "60" tick; segment labels collide on a phone; "0/3" unexplained | Camel above the axis, short labels on phones, a word for the ratio | bug | S |
+| 0040 | "הביט הבא" far from its 0 / 1 buttons; arrowheads cover the state labels | Group the label with the buttons; labels under the nodes | box UX | S |
+| 0038 | Rule table 27 px wider than its scroll box on a phone | Shorter headers | box UX | S |
+| 0048 | Dragging is mentioned only in the help | A visible "גררו את..." caption, as in 0030 | box UX | S |
+| 0046, 0047 | About ten controls above the grid; on a phone it starts 950 px down | Fold the editing controls into a closed group | box UX | M |
+| 0047 | Heap entries "(2, 1, 3)" have no field names | Caption "(גובה, שורה, עמודה)" | content | S |
+| 0027, 0028, 0042, 0043 | The steady reservation leaves large blank areas (230 px in 0027) | A fixed-height scroll area for the growing table | box UX | M |
+| 0029 | The first two rows of the 24-hour strips are solid bars | A one-hour window that can move, or the count only | box UX | S |
+| 0034, 0037 | Powers written with a caret ("2^4", "10^-8") | Superscripts, as in 0036 and 0048 | consistency | S |
+| 0031 | "A+B> A<" hard to read in RTL; the bridge strip sits under a long table on a phone | Arrows → ←; the bridge above the table | box UX | S |
+| 0037 | The three-column table wraps every value on a phone; the ±25 ps window invisible on the 1,000-edge strip | Stack the table on phones; a zoomed inset of the window | box UX | S |
+| 0026 | "ב-0.000" beside "2.50"; at t = 0 the dots cover the "A" label | One number format; offset the label | box UX | S |
+| 0025 | Box 1,837 px tall on a phone; a status line breaks after a comma | Collapse the random-run controls | box UX | S |
+| 0041 | Weight sliders of different lengths on a phone; a row starts with English | Equal widths; a Hebrew label first | box UX | S |
+| 0031 | The box replays three fixed plans only | A "your plan" mode (pick who crosses, the running total against 17), like the river box | new aid | M |
+| 0039 | The threshold is shown and the box plays the optimal plan | A guess mode: a hidden threshold, the reader picks floors, the worst case against f(k, n) | new aid | M |
+| 0036 | No picture of the register with its taps and XOR | A register row that shifts with the steps; the chord over the 0000 node | new aid | M |
+| 0035 | No schematic of the circuit; odd N never generalised; 3 cycles visible on a phone | A generated schematic, a third hint, a follow-up for odd N, a duty readout | content | M |
+| 0033 to 0038 | Parts listed at the top with hints after them; one hint in several parts; two traps per page (0035: no parts, no figure) | The layout of 0027 to 0032 and 0039 to 0048: a heading per part with two or three hints, four or five traps | consistency | M |
+
+**Rounds** (pick any; the earlier ones are smaller and fix what is broken)
 
 | Round | Content | Effort |
 |-------|---------|--------|
-| V1 | **Study paths for everything**: new paths for the DV core, the protocol reference models, geometry and motion (0026, 0029, 0030, 0048), and the coding questions 0044 to 0047 added to the algorithms path; a check in `lint_pages.py` that names a question in no path | S–M |
-| V2 | **Glossary**: a glossary page (Hebrew term, English term, one line, the questions that use it) and a tooltip on the first use of a term on a page, from one YAML file | M |
-| V3 | **Practice loop**: a "my progress" page (solved, favourites, a "come back to this" list), a self-rating after a solution (easy / took effort / need again) that orders the random question, and export / import of the progress as a short code or a file | M |
-| V4 | **Question boxes, fixes** (bugs and usability problems found in the review, per question) | see the review list |
-| V5 | **Question boxes, new aids** (check-yourself steps, missing steppers, proofs as steppers on chosen pages) | see the review list |
-| V6 | **Robustness**: `timeout-minutes` on every CI job, a service worker for offline reading of visited pages, the header tabs without the fade | S–M |
+| V1 | **Bugs and quick fixes**: the 0023 box error, the 0002 default, `ltr()` without line breaks, the 0045 balls, the 0039 label, the 0042 camel, the 0048 drag caption, the 0047 caption, superscripts in 0034 and 0037, the 0026 number format | S–M |
+| V2 | **Study paths for everything**: paths for the DV core, the protocol reference models, geometry and motion; 0044 to 0047 into the algorithms path; a lint check that names a question in no path | S–M |
+| V3 | **Boxes on a phone**: collapse the proof panels (0009, 0013, 0016, 0024) and the editing and random-run controls (0025, 0046, 0047); 0024 buttons in two columns; 0018 and 0019 stacked with Hebrew labels; the 0020 / 0021 split map by completion count; 0031, 0037, 0038, 0040, 0041; scroll areas instead of blank reservations (0027, 0028, 0042, 0043) | M–L |
+| V4 | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
+| V5 | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0015, 0016 and a Python model for 0001 | M–L |
+| V6 | **Practice loop and glossary**: a "my progress" page, a self-rating after a solution, export / import of the progress; a glossary page with a tooltip on a term's first use | M |
+| V7 | **Robustness**: `timeout-minutes` on the CI jobs, a service worker for offline reading, the header tabs without the fade | S–M |
 
 ## Improvement ideas
 
