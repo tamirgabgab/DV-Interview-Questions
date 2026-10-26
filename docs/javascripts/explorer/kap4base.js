@@ -69,9 +69,10 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) +
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
-        `<p class="ex-summary k4-sum" aria-live="polite"></p><div class="kp-table k4-table"></div><p class="kb-step k4-step"></p>` +
+        `<p class="ex-summary k4-sum" aria-live="polite"></p><p class="kb-step k4-step"></p>` +
         `<p class="ex-title">המפה של הזוגות (p, q)${NB}: כל משבצת צבועה לפי היעד של הערך שלה, והמסלול של המספר מודגש</p><div class="k4-map"></div>` +
         `<span class="viz-legend"><span><i class="kq-key-fixed"></i>נקודת שבת</span><span><i class="kq-key-cycle"></i>על מחזור</span><span><i class="kq-key-tofixed"></i>מגיעים לנקודת שבת</span><span><i class="kq-key-tocycle"></i>נכנסים למחזור</span><span><i class="kq-key-path"></i>המסלול</span></span>` +
+        `<div class="kp-table k4-table"></div>` +       // under the map: the table grows a row a step
         `<p class="ex-title k4-att-title"></p><div class="kp-table k4-att"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), input = $(".k4-x");

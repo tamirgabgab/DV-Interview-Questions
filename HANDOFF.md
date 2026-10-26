@@ -740,6 +740,31 @@ section below starts at session 22, whose numbered items run on through the late
     not routed in earlier local checks, so its diagrams were missing there. Checks: the
     hook run as a cloud session would, the strict build, `--local-cdn` phone and explorer
     checks on 0005, 0034 and 0044, `run_tests.py --sv-only` (all PASS).
+53. **Fix round 6 part a, figures that stay still while a box steps (session 26,
+    2026-10-26).** The owner picked part a only, as a CI failure once the boxes are fixed,
+    at 390 and 1200 px, a 2 px tolerance, and chose the fixes per kind after the findings.
+    `tools/check_jumps.py` steps every box with a step counter and a next button from the
+    first step to the last and fails on a figure that moves more than 2 px, naming the
+    element that grew. The first run found 113 jumps in 11 pages of four kinds: (a) a text
+    longer than every earlier one (0016, 0041, 0042, 0043); (b) the answer line appearing
+    at the end (0012, 0013, 0039, 0043); (c) a block above the figures that grows with the
+    steps (the step tables of 0012 and 0013, the cake table of 0027 and 0028, the zoom of
+    0039, the ribbon of 0041, the circle of 0016); (d) the two sides of the 0025 box. Fixes:
+    `steady()` in `core.js` primes the heights at mount and after every release, running
+    each timeline (a counter with previous and next buttons; a next without a previous
+    draws something new and is left alone) to its end and back synchronously, through the
+    previous button (a start button can clear a history), at most 150 steps and 250 ms,
+    with the save of the remembered state paused meanwhile; blocks marked `data-steady`
+    are held like paragraphs (the cake table, the 0039 zoom and its wrap, the Josephus
+    circle, the three parts of the 0025 box); `answer()` keeps a cleared answer line in
+    place (`ex-answer--off`, invisible); the step tables of 0012 (last in the box) and
+    0013 (under the map) and the ribbon of 0041 (under the chart) moved, and the page
+    texts of 0012 and 0013 describe the new order; `reading-tools.js` honours
+    `data-fig-strip` on a container (the 0039 zoom), whose figures always have the enlarge
+    button's strip, since its labels reach the button only at some steps. CI runs the check
+    in the four explorer shards. Checks: the jump check (0 jumps in 160 boxes), the explorer
+    click-check of every page (no problems; the Josephus link warnings are as on `main`),
+    the phone check with `--axe-fail --small-fail`, the Python tests (405).
 
 
 ## In progress
@@ -751,8 +776,9 @@ section below starts at session 22, whose numbered items run on through the late
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
   and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
   the cloud sandbox (item 52).
-- **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52); round 6 is still
-  open (a jump check of the box texts, a visual diff of the phone screenshots).
+- **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52), and round 6 part
+  a, the jump check (item 53); part b, a visual diff of the phone screenshots, was not
+  picked.
 - **Owner's checks on the live site (github.io is not reachable from the sandbox):** the
   WaveDrom diagrams of 0034, 0035 and 0038; dragging in the boxes on a real phone; the
   timing strips of 0001 and 0035 scrolled sideways; 0025 part b step 11 and its code
@@ -779,7 +805,7 @@ section below starts at session 22, whose numbered items run on through the late
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
-- [ ] Pick the next rounds from **Proposals and rounds**: the open rows of the first series (E, F, I, L, N, O, the rest of Q, S), the rest of the second series A to E, the deferred G222, H223, H224, the new questions of M to R and Z, and fix round 6 of session 26 (see **In progress**). Done: U to X (in the archive), I to L, the third series UI1 to UI5.
+- [ ] Pick the next rounds from **Proposals and rounds**: the open rows of the first series (E, F, I, L, N, O, the rest of Q, S), the rest of the second series A to E, the deferred G222, H223, H224, and the new questions of M to R and Z. Done: U to X (in the archive), I to L, the third series UI1 to UI5.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content

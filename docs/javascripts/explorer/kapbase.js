@@ -60,10 +60,11 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) +
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
-        `<p class="ex-summary kb-sum" aria-live="polite"></p><div class="kp-table kb-table"></div><p class="kb-step"></p>` +
+        `<p class="ex-summary kb-sum" aria-live="polite"></p><p class="kb-step"></p>` +
         `<p class="ex-title">המפה של d : מכל d חץ ל-max(b − d, d − 1), והמסלול של המספר מודגש</p><div class="kb-map"></div>` +
         `<span class="viz-legend"><span><i class="kb-key-arrow"></i>חץ מ-d ל-d'</span><span><i class="kb-key-fixed"></i>היעד : נקודת שבת או מחזור</span><span><i class="kb-key-path"></i>המסלול של המספר</span></span>` +
-        `<p class="ex-title kb-hist-title"></p><div class="kb-chart"></div>`;
+        `<p class="ex-title kb-hist-title"></p><div class="kb-chart"></div>` +
+        `<div class="kp-table kb-table"></div>`;     // last: the table grows a row a step
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), input = $(".kb-x");
       let H = null, Hb = 0;

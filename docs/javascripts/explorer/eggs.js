@@ -67,7 +67,7 @@
         `<label><input type="checkbox" class="eg-rec" checked> הנוסחה על הבניין</label></div>` +
         `<p class="ex-summary eg-sum" aria-live="polite"></p><p class="eg-step"></p><p class="eg-rec-text"></p>` +
         `<span class="viz-legend"><span><i class="eg-key-safe"></i>ידוע שלא נשברת</span><span><i class="eg-key-broke"></i>ידוע שנשברת</span><span><i class="eg-key-unknown"></i>עוד לא ידוע</span><span><i class="eg-key-thr"></i>הסף שבחרתם</span><span><i class="eg-key-next"></i>ההטלה הבאה</span></span>` +
-        `<div class="eg-box"><div class="eg-building"></div><div class="eg-zoomwrap"><p class="ex-title eg-zoomtitle"></p><div class="eg-zoom"></div>` +
+        `<div class="eg-box"><div class="eg-building"></div><div class="eg-zoomwrap" data-steady><p class="ex-title eg-zoomtitle"></p><div class="eg-zoom" data-steady data-fig-strip></div>` +
         `<label class="eg-winlab"><span>חלון התקריב</span><input type="range" class="eg-win" min="1" max="1" step="1" value="1" dir="ltr" aria-label="הקומה הראשונה בחלון התקריב"></label></div></div>` +
         `<p class="ex-title">מספר ההטלות של התוכנית לכל סף אפשרי</p><div class="eg-chart"></div>`;
       const $ = (sel) => box.querySelector(sel);

@@ -81,9 +81,10 @@
         `<button type="button" class="md-button ex-end">עד הכיסוי</button><span class="ex-pos"></span></div>` +
         `<div class="sg-bins box-grid" dir="ltr"></div>` +
         `<p class="wv-step sg-step" aria-live="polite"></p>` +
-        `<p class="ex-title">הסרט : כל טסט משבצת, מחולק לשלבים, והטסט שמצא תא חדש מודגש</p><div class="sg-ribbon" dir="ltr"></div>` +
         `<p class="ex-title sg-chart-title"></p><div class="sg-chart"></div>` +
         `<span class="viz-legend"><span><i class="by-multiples"></i>ההמתנה שנמדדה</span><span><i class="sg-key-now"></i>השלב הנוכחי, עד עכשיו</span><span><i class="ink"></i>‏n/(n − i), התוחלת</span></span>` +
+        // under the chart: the ribbon grows a row every few tests
+        `<p class="ex-title">הסרט : כל טסט משבצת, מחולק לשלבים, והטסט שמצא תא חדש מודגש</p><div class="sg-ribbon" dir="ltr"></div>` +
         `<p class="ex-summary sg-sum" aria-live="polite"></p>`;
       const $ = (sel) => box.querySelector(sel);
       // the stage of every test and whether it found a new bin

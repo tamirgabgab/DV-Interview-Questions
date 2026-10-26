@@ -194,6 +194,10 @@ jobs:
       - run: python -m playwright install --with-deps chromium
       - name: Click through the explorer boxes, part ${{ matrix.shard }} of 4
         run: python tools/check_explorers.py site --shard ${{ matrix.shard }}/4
+      # Every box stepped from its first step to its last at 390 and 1200 px: a figure that
+      # moves while the box steps fails (tools/check_jumps.py).
+      - name: Step the explorer boxes for jumping figures, part ${{ matrix.shard }} of 4
+        run: python tools/check_jumps.py site --shard ${{ matrix.shard }}/4
 
   deploy:
     needs: [gate, build, explorers]

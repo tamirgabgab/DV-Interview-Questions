@@ -87,7 +87,7 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1200, 700, 250) +
         `<button type="button" class="md-button ex-all">כולם</button>` +
         `<span class="ex-pos"></span></div>` +
-        `<div class="cake-box"><div class="cake-pie"></div><div class="cake-panel"><p class="cake-now"></p><div class="cake-scroll"><table class="cake-table"><thead><tr><th>האדם</th><th>השבר</th><th>נשאר לפניו</th><th>מקבל</th></tr></thead><tbody></tbody></table></div></div></div>` +
+        `<div class="cake-box"><div class="cake-pie"></div><div class="cake-panel"><p class="cake-now"></p><div class="cake-scroll" data-steady><table class="cake-table"><thead><tr><th>האדם</th><th>השבר</th><th>נשאר לפניו</th><th>מקבל</th></tr></thead><tbody></tbody></table></div></div></div>` +
         `<p class="ex-summary" aria-live="polite"></p><p class="ex-note cake-note"></p><div class="cake-charts"></div>` +
         `<section class="ex-proof cake-proof"><p class="ex-proof-title">שלב ההוכחה : הסף שבו נקבעת הפסגה</p>` +
         `<div class="cake-proof-chart"></div><span class="viz-legend cake-proof-legend"></span><p class="cake-proof-text"></p></section>`;

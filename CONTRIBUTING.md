@@ -88,6 +88,7 @@ DV-Interview-Questions/
 │   ├── check_links.py          # Internal link / anchor check of the built site (--external fetches the rest)
 │   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors, axe-core)
 │   ├── check_explorers.py      # Every explorer box: each button clicked, its link and remembered state
+│   ├── check_jumps.py          # Every explorer box stepped: no figure moves while it steps
 │   ├── check_contrast.py       # The site's colour pairs in both schemes against WCAG 2
 │   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
 │   ├── new_question.py         # Scaffold: page, tests folder, generator stub, catalog row
@@ -464,6 +465,7 @@ python tools/check_phone.py           # every built page at 390 px: no sideways 
 python tools/check_phone.py --scheme dark   # the same in dark mode (CI: manual run with phone_dark)
 python tools/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-core (npm install axe-core)
 python tools/check_explorers.py       # every explorer box clicked through, its link and remembered state
+python tools/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
 python tools/check_contrast.py        # every colour pair, light and dark (--all prints the passes)
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```
@@ -490,6 +492,18 @@ a fresh browser and reloads the page for the remembered state: different control
 fail, a different drawing is a warning (some boxes draw from their history), and "reset
 everything" must forget the state (`--no-links` skips this part). It takes the same
 `--offline`, `--route`, `--browser` and `--only` options as the phone check.
+
+`check_jumps.py` opens the same pages at 390 and at 1200 px and steps every box that has a
+step counter (`.ex-pos`, "k מתוך T" or a bare count) and a next button, from its first step
+to its last, measuring the top of every figure in the box; a figure that moves by more than
+2 px fails, with the step and the element that grew. What keeps the figures still:
+`steady()` in `core.js` holds every text paragraph, and every block marked `data-steady`,
+at the tallest height it has shown, and primes those heights at mount by running the
+steps once, synchronously, before the reader sees the box; the answer line keeps its
+place when it is cleared; a block that grows with the steps (a table of the steps) goes
+under the figures; and a live figure whose labels reach the enlarge button only at some
+steps sits in a container marked `data-fig-strip`, whose figures always have the button's
+strip above them. CI runs it in the four explorer shards.
 
 `check_contrast.py` reads the colour tokens (Material's own from the installed theme,
 overridden by `docs/stylesheets/extra.css`) for the light and the dark scheme, and checks a

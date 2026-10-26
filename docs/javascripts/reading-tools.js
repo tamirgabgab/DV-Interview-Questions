@@ -123,7 +123,9 @@
   // in a closed tab has no size yet), again after the phone fit enlarged the figure's text
   // (fitSvg below), and again when the window changes width. A live figure
   // that a box redraws gets a new wrap each time; the decision is kept on its container
-  // (data-fig-above), so the figure does not jump between the two layouts while playing.
+  // (data-fig-above), so the figure does not jump between the two layouts while playing. A
+  // container marked data-fig-strip always has the strip: a live figure whose labels reach
+  // the corner only at some steps (the 0039 zoom) would otherwise move down once.
   const ABOVE = "fig-wrap--above";
   const covers = (wrap, which = false) => {
     const btn = wrap.querySelector(":scope > .fig-enlarge"), svg = wrap.querySelector("svg");
@@ -148,6 +150,7 @@
     return { host, key: ` ${i} `, list: () => ` ${host.dataset.figAbove || ""} ` };
   };
   const decide = (wrap) => {
+    if (wrap.parentElement && wrap.parentElement.hasAttribute("data-fig-strip")) { wrap.classList.add(ABOVE); return true; }
     const at = slot(wrap);
     if (at && at.list().includes(at.key)) { wrap.classList.add(ABOVE); return true; }
     wrap.classList.remove(ABOVE);

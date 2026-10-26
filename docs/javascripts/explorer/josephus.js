@@ -95,7 +95,7 @@
         `<label>הקצב <select class="ex-speed"><option value="1200">איטי</option><option value="500" selected>בינוני</option><option value="150">מהיר</option></select></label>` +
         `<button type="button" class="md-button ex-start">להתחלה</button>` +
         `<span class="ex-pos"></span></div>` +
-        `<div class="jos-box"><div class="jos-circle"></div><div class="jos-panel"><p class="jos-now"></p><p class="jos-order"></p></div></div>` +
+        `<div class="jos-box"><div class="jos-circle" data-steady></div><div class="jos-panel"><p class="jos-now"></p><p class="jos-order"></p></div></div>` +
         `<p class="ex-summary" aria-live="polite"></p><p class="ex-note jos-seat"></p><p class="ex-title">השורד לכל N, עם N הנבחר מודגש; נקודות שחורות הן נקודות אפס</p><div class="jos-chart"></div>` +
         `<section class="ex-proof jos-proof"><p class="ex-proof-title">שלב ההוכחה : מספור מחדש</p>` +
         `<div class="ex-controls"><label><input type="checkbox" class="ex-renum" checked> המספר החדש ליד כל מי שנשאר</label>` +

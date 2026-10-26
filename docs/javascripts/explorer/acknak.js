@@ -177,7 +177,7 @@
         `<button type="button" class="md-button ex-flush">טיימר ה-Ack פג</button>` +
         `<button type="button" class="md-button ex-timeout">ה-REPLAY_TIMER פג</button></div>` +
         randomRow("שיעור התקלות", "תנועה אקראית (כמו ה-test של העמוד) :") +
-        `<div class="an-box"><div class="an-side an-rc"></div><div class="an-link"></div><div class="an-side an-ep"></div></div>` +
+        `<div class="an-box"><div class="an-side an-rc" data-steady></div><div class="an-link" data-steady></div><div class="an-side an-ep" data-steady></div></div>` +
         `<p class="ex-title">ציר האירועים : עמודה לכל אירוע, המונים אחריו, ו-✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
         `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p>`;
       const $ = (sel) => box.querySelector(sel);

@@ -333,12 +333,19 @@
   // The answer lights up (E199): when a box reaches its result, answer(box, text, marks)
   // outlines the elements that are the answer (an array, a NodeList or a selector inside
   // the box) and names it in one line under the box's summary; answer(box, null) clears
-  // both. A view calls it after every draw, so the marks follow the redrawn figure.
+  // both. A view calls it after every draw, so the marks follow the redrawn figure. A
+  // cleared line keeps its place (invisible, its last text kept), so the figures under it do
+  // not move when the answer comes back; steady() shows every step once at mount, so the
+  // line is there before the reader reaches the answer.
   const answer = (box, text, marks = []) => {
     box.querySelectorAll(".ex-answer-mark").forEach((el) => el.classList.remove("ex-answer-mark"));
     let line = box.querySelector(":scope > .ex-answer");
-    if (!text) { if (line) line.hidden = true; return; }
-    if ((!line || line.hidden) && box.dvqArmed && !reduced()) {      // reached just now: one pulse (UI329)
+    if (!text) {
+      if (line) { line.classList.add("ex-answer--off"); line.setAttribute("aria-hidden", "true"); }
+      return;
+    }
+    const off = !line || line.classList.contains("ex-answer--off");
+    if (off && box.dvqArmed && !box.dvqPriming && !reduced()) {   // reached just now: one pulse (UI329)
       box.classList.add("ex-answer-new");
       setTimeout(() => box.classList.remove("ex-answer-new"), 1000);
     }
@@ -349,7 +356,8 @@
       const at = box.querySelector(":scope > .ex-summary") || box.querySelector(":scope > .ex-controls:last-of-type");
       if (at) at.after(line); else box.append(line);
     }
-    line.hidden = false;
+    line.classList.remove("ex-answer--off");
+    line.removeAttribute("aria-hidden");
     line.innerHTML = `<span class="ex-answer__tag">התשובה</span> ${text}`;
     (typeof marks === "string" ? box.querySelectorAll(marks) : marks).forEach((el) => el && el.classList.add("ex-answer-mark"));
   };
@@ -577,7 +585,8 @@
     box.dvqWatched = true;
     box.addEventListener("input", (e) => { if (!e.target.matches(".ex-seed, .ex-scrub")) box.dvqCtlAt = ++tick; }, true);
     let timer = null;
-    const later = () => { clearTimeout(timer); timer = setTimeout(() => save(box), 300); };
+    // the steps steady() presses to measure the box are not the reader's changes
+    const later = () => { if (box.dvqPriming) return; clearTimeout(timer); timer = setTimeout(() => save(box), 300); };
     ["input", "change", "click", "pointerup", "keyup"].forEach((ev) => box.addEventListener(ev, later));
   };
 
@@ -956,8 +965,19 @@
   // tallest height it has shown: the height only grows, until a control changes a value,
   // "back to the question's values" is clicked, or the window changes width; then the
   // heights are released and measured again. A rebuilt box keeps its listeners, and a
-  // paragraph that is hidden or empty (display: none) reserves nothing.
-  const STEADY = "p, .ex-note, [aria-live]";
+  // paragraph that is hidden or empty (display: none) reserves nothing. A block of a view
+  // that grows with the steps above a figure (a zoom window, a scrolling table) is marked
+  // data-steady and kept the same way.
+  //
+  // The tallest heights are known before the reader steps: prime() runs every row that has
+  // a step counter ("k מתוך T", or a bare count), a previous and a next button from its
+  // first step to its last and back, measuring each step, at mount and whenever the
+  // heights are released. It runs
+  // synchronously, so the observers (the transport's keep, motion, steady itself) only see
+  // the step it returns to; it skips a box that is playing, a row of more than PRIME_MAX
+  // steps, and stops after PRIME_MS (the heights then still grow as before).
+  const STEADY = "p, .ex-note, [aria-live], [data-steady]";
+  const PRIME_MAX = 150, PRIME_MS = 250;
   const steady = (box) => {
     let queued = false;
     const fit = () => {
@@ -974,6 +994,48 @@
       });
     };
     const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(fit); } };
+    const prime = () => {
+      if (box.dvqPriming || !box.isConnected || !box.getClientRects().length) return;
+      if ([...box.querySelectorAll("button.ex-play")].some((b) => b.textContent.trim() === "עצירה")) return;
+      const t0 = performance.now(), seeking = box.dvqSeeking;
+      box.dvqPriming = box.dvqSeeking = true;
+      try {
+        box.querySelectorAll(".ex-controls").forEach((row) => {
+          const own = (el) => el && el.closest(".ex-controls") === row;
+          const find = (sel) => [...row.querySelectorAll(sel)].find(own);
+          const read = () => {                             // "k מתוך T", or a bare count ("52 טסטים")
+            const pos = [...box.querySelectorAll(".ex-pos")].find(own);
+            const m = pos && (POS.exec(pos.textContent) || /(\d+)/.exec(pos.textContent));
+            return m ? [Number(m[1]), m[2] === undefined ? Infinity : Number(m[2])] : null;
+          };
+          const step = (sel) => {                          // press, and say whether the counter moved
+            const b = find(sel), was = read();
+            if (!b || b.disabled || !was) return false;
+            b.click();
+            const now = read();
+            return Boolean(now) && now[0] !== was[0];
+          };
+          // back with the previous button only: a start button may also clear a history
+          const toFirst = () => { for (let i = 0; i < PRIME_MAX && step("button.ex-prev"); i++); };
+          const start = read();
+          // a timeline has both directions: a next without a previous draws something new
+          // (a random test), and that is the reader's to press
+          if (!start || (Number.isFinite(start[1]) && start[1] > PRIME_MAX) || !find("button.ex-next") || !find("button.ex-prev")) return;
+          toFirst();
+          fit();
+          for (let i = 0; i < PRIME_MAX && performance.now() - t0 < PRIME_MS; i++) {
+            const was = read();
+            if (!step("button.ex-next") || read()[0] < was[0]) break;
+            fit();
+          }
+          toFirst();
+          for (let i = 0; i < PRIME_MAX && read() && read()[0] < start[0] && step("button.ex-next"); i++);
+        });
+      } finally {
+        box.dvqPriming = false;
+        box.dvqSeeking = seeking;
+      }
+    };
     const release = () => {
       box.querySelectorAll(STEADY).forEach((el) => {
         if (!el.dvqSteady) return;
@@ -982,8 +1044,10 @@
         if (!el.getAttribute("style")) el.removeAttribute("style");
       });
       schedule();
+      setTimeout(prime, 0);                                // after the view and the transport settled
     };
     schedule();
+    prime();
     if (box.dvqSteadyOn) return;
     box.dvqSteadyOn = true;
     new MutationObserver(schedule).observe(box, { childList: true, characterData: true, subtree: true });

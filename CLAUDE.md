@@ -54,7 +54,9 @@ session.
   `docs/stylesheets/extra.css`, never hard-coded.
 - Start a question with `python tools/new_question.py` (see `CONTRIBUTING.md`). Interactive
   sliders are a `data-kind` with its own file in `docs/javascripts/explorer/` (the shared
-  code is `core.js`), tested under Node.
+  code is `core.js`), tested under Node. A box keeps its figures still while it steps
+  (`check_jumps.py`): a block that grows with the steps goes under the figures, or is
+  marked `data-steady` (see `CONTRIBUTING.md`).
 - The owner's own code is kept as sent; comments may be added, and bugs are called out to
   the owner rather than silently fixed.
 - A source file from the owner (a solution write-up with tables and formulas) is checked
@@ -69,8 +71,9 @@ python tools/lint_pages.py            # page skeleton and RTL rules
 python tools/run_tests.py             # pytest + Verilator (needs Verilator 5.052+ with z3)
 mkdocs build --strict                 # the build CI runs
 python tools/check_links.py           # internal links and anchors of the built site
-python tools/check_phone.py           # every page at 390 px (add --offline and --route in a sandbox)
+python tools/check_phone.py           # every page at 390 px (add --local-cdn in a sandbox)
 python tools/check_explorers.py       # every explorer box: buttons clicked, link and saved state
+python tools/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
 python tools/check_contrast.py        # the site's colour pairs, light and dark (WCAG 2)
 ```
 
@@ -82,7 +85,7 @@ on figure text under 9 px at 390 px and on serious axe findings (`--small-fail -
 in dark mode; CI runs it only on a manual run with `phone_dark`. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
-All seven run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
+All eight run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
 CATALOG, HANDOFF, its archive or this file runs nothing, and `main` skips the checks for a commit that
 already passed on its branch); a failure blocks the deploy. A new colour pair (a text
 or a mark on a fill) goes into the `PAIRS` list of `tools/check_contrast.py`. Verilator
