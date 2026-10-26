@@ -146,3 +146,39 @@ def test_explorer_recurrence_bands():
             assert sp["fBelow"] == min(n, f(eggs - 1, left - 1)) and sp["fAbove"] == min(n, f(eggs, left - 1))
             assert sp["below"] == min(sp["fBelow"], high - low - 2) and sp["above"] <= sp["fAbove"]
             assert sp["below"] + 1 + sp["above"] == high - low - 1
+
+
+def test_explorer_adversary_game():
+    """The hidden threshold game (V4): against the box's adversary, the page's plan needs
+    exactly the worst case f, and random play never needs fewer (or runs out of eggs)."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const play = (k, n, pick) => {{
+        const F = m.eggsTable(k, n);
+        let low = 0, high = n + 1, eggs = k, drops = 0;
+        while (high - low > 1) {{
+          if (!eggs) return Infinity;
+          const fl = pick(F, low, high, eggs);
+          const broke = m.eggsAdversary(F, low, high, eggs, fl);
+          drops++;
+          if (broke) {{ high = fl; eggs--; }} else low = fl;
+        }}
+        return drops;
+      }};
+      const plan = (F, low, high, eggs) => {{                 // the page's rule: low + f(e - 1, t - 1) + 1
+        const t = m.eggsNeed(F, eggs, high - low - 1);
+        return Math.min(low + F[eggs - 1][t - 1] + 1, high - 1);
+      }};
+      let seed = 7;
+      const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+      const random = (F, low, high) => low + 1 + Math.floor(rnd() * (high - low - 1));
+      const out = [];
+      for (let k = 1; k <= 4; k++) for (let n = 1; n <= 120; n += 7) out.push([k, n, m.eggsDrops(k, n), play(k, n, plan), play(k, n, random)]);
+      console.log(JSON.stringify(out.map((r) => r.map((v) => (v === Infinity ? -1 : v)))));""")
+    for k, n, worst, planned, rand in got:
+        assert planned == worst, (k, n)
+        assert rand == -1 or rand >= worst, (k, n)

@@ -302,39 +302,61 @@
   const ladderView = () => ({
     mount(box) {
       const D = { N: Number(box.dataset.n || 9), m: Number(box.dataset.m || 4), n: Number(box.dataset.pick || 8) };
-      const st = { ...D };
+      const st = { ...D, guess: false, shown: new Set() };
       box.innerHTML =
         `<div class="ex-controls"><label><span>‏N, מספר הבלוקים</span><input type="range" class="ld-N" min="1" max="16" step="1" value="${D.N}" dir="ltr" aria-label="מספר הבלוקים הגדול ביותר בשורה"><output class="ld-out-N"></output></label>` +
         `<label>‏m = MPS / RCB <select class="ld-m" aria-label="כמה בלוקים יכול Completion אחד להכיל">${[2, 3, 4].map((v) => `<option value="${v}">${v}</option>`).join("")}</select></label>` +
+        `<label><input type="checkbox" class="ld-guess"> לנחש את C(n) לפני החשיפה</label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">‏n הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">‏n הבא</button><span class="ex-pos"></span></div>` +
         `<div class="ld-row" dir="ltr" role="group" aria-label="הערכים C(0) עד C(N), לחיצה בוחרת ערך"></div>` +
+        // the guess (V4): C(n) and the values after it are hidden until the reader types C(n)
+        `<div class="ex-controls ld-guessrow" hidden><label><span class="ld-ask"></span> <input type="text" class="ld-in" inputmode="numeric" dir="ltr" size="6" data-nolink aria-label="הניחוש שלכם ל-C(n)"></label>` +
+        `<button type="button" class="md-button md-button--primary ld-check">בדיקה</button><button type="button" class="md-button ld-show" hidden>הצגת הערך</button></div>` +
+        `<p class="ld-msg" role="status"></p>` +
         `<p class="wv-step ld-eq" aria-live="polite"></p><div class="ld-strips"></div><p class="ex-summary ld-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const draw = () => {
         st.n = Math.max(1, Math.min(st.n, st.N));
         const c = ladderC(st.N, st.m), terms = ladderTerms(st.n, st.m), lit = new Map(terms.map((t) => [t.rest, t.i]));
+        const known = (k) => !st.guess || k < st.n || st.shown.has(k), cn = known(st.n) ? String(c[st.n]) : "?";
+        $(".ld-guessrow").hidden = !st.guess || known(st.n);
+        $(".ld-ask").innerHTML = `${ltr(`C(${st.n}) =`)}`;
+        if (!st.guess) $(".ld-msg").textContent = "";
         $(".ld-N").value = st.N; $(".ld-out-N").textContent = String(st.N); $(".ld-m").value = String(st.m);
         $(".ld-row").innerHTML = c.map((v, k) => `<button type="button" class="ld-cell${k === st.n ? " is-sel" : lit.has(k) ? " is-term" : ""}" data-n="${k}" aria-pressed="${k === st.n}"${k === 0 ? " disabled" : ""}>` +
-          `<small>C(${k})</small><b>${v}</b><small class="ld-i">${lit.has(k) ? `i = ${lit.get(k)}` : ""}</small></button>`).join("");
+          `<small>C(${k})</small><b>${known(k) ? v : "?"}</b><small class="ld-i">${lit.has(k) ? `i = ${lit.get(k)}` : ""}</small></button>`).join("");
         $(".ex-pos").textContent = `‏n = ${st.n}`;
         $(".ex-prev").disabled = st.n <= 1; $(".ex-next").disabled = st.n >= st.N;
         $(".ld-eq").innerHTML = `ה-Completion הראשון מכסה ${terms.length === 1 ? "בלוק אחד" : `בין 1 ל-${ltr(terms.length)} בלוקים`}, וכל מקרה משאיר את אותה בעיה על פחות בלוקים${NB}: ` +
-          `<span class="ld-math" dir="ltr">C(${st.n}) = ${terms.map((t) => `C(${t.rest})`).join(" + ")} = ${terms.map((t) => t.value).join(" + ")} = ${c[st.n]}</span>`;
+          `<span class="ld-math" dir="ltr">C(${st.n}) = ${terms.map((t) => `C(${t.rest})`).join(" + ")} = ${terms.map((t) => t.value).join(" + ")} = ${cn}</span>`;
         $(".ld-strips").innerHTML = terms.map((t) => `<div class="ld-line"><span class="ld-lab">‏i = ${t.i}</span><span class="ld-strip" dir="ltr">` +
           Array.from({ length: st.n }, (_, b) => `<i class="${b < t.i ? "ld-first" : "ld-rest"}${b === t.i - 1 ? " is-end" : ""}"></i>`).join("") +
           `</span><span class="ld-txt">${t.rest ? `ועוד ${ltr(`C(${t.rest}) = ${t.value}`)} ${t.value === 1 ? "דרך" : "דרכים"} לחלק את ${t.rest === 1 ? "הבלוק שנשאר" : `${ltr(t.rest)} הבלוקים שנשארו`}` : `Completion אחד לכל הבלוקים, ${ltr("C(0) = 1")}`}</span></div>`).join("");
-        const tag = st.m === 4 && st.n === 8 ? ` זו הבקשה המיושרת של העמוד, 108 פיצולים.` : st.m === 4 && st.n === 9 ? ` זו הבקשה הלא מיושרת של העמוד, 208 פיצולים.` : "";
+        const tag = !known(st.n) ? "" : st.m === 4 && st.n === 8 ? ` זו הבקשה המיושרת של העמוד, 108 פיצולים.` : st.m === 4 && st.n === 9 ? ` זו הבקשה הלא מיושרת של העמוד, 208 פיצולים.` : "";
         $(".ld-sum").innerHTML = `בלי MPS כל אחד מ-${ltr(st.n - 1)} הגבולות הפנימיים חותך או לא, ${ltr(`2^${st.n - 1} = ${2 ** (st.n - 1)}`)} פיצולים. ` +
-          (c[st.n] < 2 ** (st.n - 1) ? `עם Completion של עד ${ltr(st.m)} בלוקים נשארים ${ltr(c[st.n])}${NB}: הפיצולים שבהם Completion מכסה יותר מ-${ltr(st.m)} בלוקים נפסלים.` : `כאן ${ltr(`n ≤ ${st.m}`)}, ולכן אף פיצול לא נפסל.`) + tag;
+          (c[st.n] < 2 ** (st.n - 1) ? `עם Completion של עד ${ltr(st.m)} בלוקים נשארים ${ltr(cn)}${NB}: הפיצולים שבהם Completion מכסה יותר מ-${ltr(st.m)} בלוקים נפסלים.` : `כאן ${ltr(`n ≤ ${st.m}`)}, ולכן אף פיצול לא נפסל.`) + tag;
       };
       $(".ld-row").addEventListener("click", (e) => { const b = e.target.closest(".ld-cell"); if (b && !b.disabled) { st.n = Number(b.dataset.n); draw(); const again = box.querySelector(`.ld-cell[data-n="${st.n}"]`); if (again) again.focus(); } });
       $(".ld-N").addEventListener("input", () => { st.N = Number($(".ld-N").value); draw(); });
       $(".ld-m").addEventListener("change", () => { st.m = Number($(".ld-m").value); draw(); });
       $(".ex-next").addEventListener("click", () => { st.n++; draw(); });
       $(".ex-prev").addEventListener("click", () => { st.n--; draw(); });
-      $(".ex-reset").addEventListener("click", () => { Object.assign(st, D); draw(); });
+      $(".ex-reset").addEventListener("click", () => { Object.assign(st, D); st.shown.clear(); draw(); });
+      const say = (cls, html) => { const m = $(".ld-msg"); m.className = `ld-msg ${cls}`; m.innerHTML = html; };
+      $(".ld-guess").addEventListener("change", () => { st.guess = $(".ld-guess").checked; st.shown.clear(); $(".ld-msg").textContent = ""; draw(); });
+      const check = () => {
+        const v = $(".ld-in").value.trim(), c = ladderC(st.N, st.m)[st.n];
+        if (!/^\d+$/.test(v)) { say("", "הקלידו מספר שלם."); return; }
+        if (Number(v) === c) { st.shown.add(st.n); $(".ld-in").value = ""; say("wv-ok", `✓ נכון, ${ltr(`C(${st.n}) = ${c}`)}. "‏n הבא" ממשיך.`); draw(); return; }
+        say("wv-bad", `לא נכון. רמז${NB}: ${ltr(`C(${st.n})`)} הוא סכום ${terms(st.n)} הערכים המסומנים שלפניו.`);
+        $(".ld-show").hidden = false;
+      };
+      const terms = (n) => ladderTerms(n, st.m).length;
+      $(".ld-check").addEventListener("click", check);
+      $(".ld-in").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); check(); } });
+      $(".ld-show").addEventListener("click", () => { st.shown.add(st.n); $(".ld-show").hidden = true; say("", `${ltr(`C(${st.n}) = ${ladderC(st.N, st.m)[st.n]}`)}.`); draw(); });
       draw();
     },
   });
@@ -343,7 +365,7 @@
     views: { pcie: pcieView, ladder: ladderView },
     help: {
       pcie: "כתובת, אורך, MPS ו-RCB : התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד. עם ״לבחור חיתוכים בעצמי״ לוחצים על הגבולות כדי לחתוך או לא, ורואים את ה-Completions שנוצרים.",
-      ladder: "לחיצה על C(n) בשורה, או ״n הבא״, מדליקה את האיברים שהוא סוכם : לכל i, ה-Completion הראשון מכסה i בלוקים, ומה שנשאר הוא C(n − i). N ו-m משנים את השורה.",
+      ladder: "לחיצה על C(n) בשורה, או ״n הבא״, מדליקה את האיברים שהוא סוכם : לכל i, ה-Completion הראשון מכסה i בלוקים, ומה שנשאר הוא C(n − i). N ו-m משנים את השורה. ״לנחש את C(n)״ מסתיר את הערך עד שמקלידים אותו ובודקים.",
     },
     models: { pcieBoundaries, pcieBlocks, pcieSplitOf, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula, ladderC, ladderTerms },
   });

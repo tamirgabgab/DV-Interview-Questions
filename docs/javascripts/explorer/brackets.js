@@ -31,9 +31,26 @@
     return { frames, valid: !fail, fail, odd: s.length % 2 === 1 };
   };
 
+  // Part a's pair deletion (V4), as the page's Python does it: while a pair is left, one
+  // pass replaces every "()", then every "[]", then every "{}". Each replace reads the whole
+  // string, so `reads` counts the characters read; the stack reads each character once.
+  const PAIRS = ["()", "[]", "{}"];
+  const bracketsPasses = (s0) => {
+    const passes = [];
+    let s = s0, reads = 0;
+    while (PAIRS.some((p) => s.includes(p))) {
+      const before = s;
+      let pass = 0;
+      PAIRS.forEach((p) => { pass += s.length; s = s.split(p).join(""); });
+      reads += pass;
+      passes.push({ before, after: s, reads: pass });
+    }
+    return { passes, reads, valid: s === "", left: s };
+  };
+
   const bracketsView = () => ({
     mount(box) {
-      const PRESETS = ["()", "()[]{}", "{[()]}", "([]{})", "(]", "([)]", "(((", "())", ")("];
+      const PRESETS = ["()", "()[]{}", "{[()]}", "([]{})", "(((())))", "(]", "([)]", "(((", "())", ")("];
       const st = { s: box.dataset.s || "{[()]}", k: 0 };
       const NAMES = { "(": "עגול", "[": "מרובע", "{": "מסולסל" };
       const esc = (c) => c.replace(/</g, "&lt;");
@@ -50,7 +67,8 @@
         `<button type="button" class="md-button ex-end">לסוף</button><span class="ex-pos"></span></div>` +
         `<div class="br-box"><div class="br-main"><div class="br-chars" dir="ltr"></div><div class="br-chart"></div></div>` +
         `<div class="br-stackwrap"><p class="ex-title">המחסנית</p><div class="br-stack" dir="ltr"></div></div></div>` +
-        `<p class="br-step" aria-live="polite"></p><p class="ex-summary br-sum"></p>`;
+        `<p class="br-step" aria-live="polite"></p><p class="ex-summary br-sum"></p>` +
+        `<div class="ex-fold br-passes"><p class="ex-fold-title">סעיף א : מחיקת זוגות, מעבר אחרי מעבר</p><div class="br-passtable"></div><p class="br-passsum"></p></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), input = $(".ex-s");
       let timer = null;
@@ -90,6 +108,14 @@
         if (st.k >= total && tr.fail && tr.fail.kind === "unclosed") step += ` <span class="br-bad">✗ המחרוזת נגמרה והמחסנית לא ריקה : ${ltr(esc(tr.fail.left))} לא נסגרו.</span>`;
         if (st.k >= total && tr.valid && s.length) step += ` <span class="br-ok">✓ כל התווים נקראו והמחסנית ריקה : המחרוזת תקינה.</span>`;
         $(".br-step").innerHTML = step;
+        // part a on the same string: the passes, and the characters they read against the stack's
+        const ps = bracketsPasses(s), cell = (t) => (t ? `<code dir="ltr">${esc(t)}</code>` : "(ריקה)");
+        $(".br-passtable").innerHTML = !s.length ? "" : !ps.passes.length ? `<p class="ex-note">אין במחרוזת אף זוג צמוד, ולכן הלולאה לא מתחילה.</p>` :
+          `<div class="at-scroll" tabindex="0" role="region" aria-label="המעברים של מחיקת הזוגות"><table class="bridge-table"><thead><tr><th>מעבר</th><th>לפני</th><th>אחרי</th><th>תווים שנקראו</th></tr></thead><tbody>` +
+          ps.passes.map((p, i) => `<tr><td>${i + 1}</td><td>${cell(p.before)}</td><td>${cell(p.after)}</td><td>${ltr(p.reads)}</td></tr>`).join("") + `</tbody></table></div>`;
+        $(".br-passsum").innerHTML = !s.length ? "" : `${ps.valid ? "המחרוזת נמחקה כולה : תקינה ✓" : `נשאר ${cell(ps.left)} : לא תקינה ✗`}. ` +
+          `${ltr(ps.passes.length)} ${ps.passes.length === 1 ? "מעבר" : "מעברים"}, ${ltr(ps.reads)} תווים נקראו (שלוש קריאות של ${ltr("replace")} בכל מעבר), לעומת ${ltr(s.length)} במחסנית.` +
+          (ps.passes.length > 1 ? ` כל מעבר מוחק לפחות זוג אחד, ולכן במחרוזת מקוננת כמו ${ltr("(((())))")} המעברים מצטברים ל-${ltr("O(n²)")}.` : "");
         $(".br-sum").innerHTML = (tr.valid ? `<span class="br-ok">תקינה ✓</span>` : `<span class="br-bad">לא תקינה ✗</span>`) +
           (tr.odd ? `, ואפשר לדעת את זה מיד : האורך ${ltr(s.length)} אי-זוגי, והקוד עוצר לפני המחסנית.` : ".") +
           ` העומק המרבי של המחסנית : ${ltr(Math.max(0, ...depths))}.`;
@@ -119,8 +145,8 @@
   dvqExplorers.register({
     views: { brackets: bracketsView },
     help: {
-      brackets: "מקלידים מחרוזת סוגריים : ״הצעד הבא״ ו״הפעלה״ קוראים תו אחרי תו, המחסנית וגרף העומק מתעדכנים, והכישלון הראשון מסומן עם הסיבה.",
+      brackets: "מקלידים מחרוזת סוגריים : ״הצעד הבא״ ו״הפעלה״ קוראים תו אחרי תו, המחסנית וגרף העומק מתעדכנים, והכישלון הראשון מסומן עם הסיבה. מתחת, סעיף א : המחרוזת אחרי כל מעבר של מחיקת זוגות, ומספר התווים שנקראו מול המחסנית.",
     },
-    models: { bracketsClean, bracketsTrace },
+    models: { bracketsClean, bracketsTrace, bracketsPasses },
   });
 })();

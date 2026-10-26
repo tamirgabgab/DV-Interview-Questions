@@ -110,6 +110,33 @@ def lint_code_spaces(text: str) -> list[str]:
     return problems
 
 
+SELFCHECK = re.compile(r'<div class="selfcheck"([^>]*)>')
+NUMBER = re.compile(r"^-?\d*\.?\d+(/\d*\.?\d+)?$")
+
+
+def lint_selfchecks(text: str) -> list[str]:
+    """A self-check (docs/javascripts/selfcheck.js) has a numeric data-answer (a whole
+    number, a decimal or a fraction), a data-hint, and markdown, and it sits before a
+    solution block."""
+    problems = []
+    lines = text.split("\n")
+    for n, line in enumerate(lines, 1):
+        m = SELFCHECK.search(line)
+        if not m:
+            continue
+        attrs = dict(re.findall(r'(data-[a-z]+|markdown)(?:="([^"]*)")?', m.group(1)))
+        if not NUMBER.match(attrs.get("data-answer", "")):
+            problems.append(f"{n}: self-check without a numeric data-answer")
+        if not attrs.get("data-hint", "").strip():
+            problems.append(f"{n}: self-check without a data-hint")
+        if "markdown" not in attrs:
+            problems.append(f"{n}: self-check without the markdown attribute")
+        after = next((l for l in lines[n:] if l.startswith("??? success")), None)
+        if after is None:
+            problems.append(f"{n}: self-check after the last solution block")
+    return problems
+
+
 def topic_names() -> dict[str, str]:
     """The TOPICS table of hooks/questions.py (the Hebrew name of every topic), read
     without importing the hook."""
@@ -292,6 +319,7 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     problems.extend(lint_highlights(path.read_text(encoding="utf-8")))
     problems.extend(lint_followups(path.read_text(encoding="utf-8")))
     problems.extend(lint_code_spaces(path.read_text(encoding="utf-8")))
+    problems.extend(lint_selfchecks(path.read_text(encoding="utf-8")))
     return problems
 
 

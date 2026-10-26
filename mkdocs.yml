@@ -121,6 +121,7 @@ extra_javascript:
   - javascripts/question-tools.js
   - javascripts/run-python.js
   - javascripts/reading-tools.js
+  - javascripts/selfcheck.js
   # The explorer boxes (docs/javascripts/explorer/) are added per page by hooks/questions.py.
 
 

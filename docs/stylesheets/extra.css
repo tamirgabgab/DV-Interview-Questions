@@ -1515,7 +1515,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .cake-gone { background: transparent; outline: 1px dashed var(--viz-text); outline-offset: -1px; }
 .md-typeset .explorer .ex-controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; align-items: center; }
 .md-typeset .explorer label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.5rem; }
-.md-typeset .explorer :is(label, button)[hidden] { display: none; }   /* the layout gives buttons a display; "the next direction" of 0046 hides */
+.md-typeset .explorer :is(label, button, .ex-controls)[hidden] { display: none; }   /* the layout gives buttons a display; "the next direction" of 0046 hides */
 .md-typeset .explorer input[type="range"] { width: 11rem; max-width: 100%; accent-color: var(--viz-s1); }
 .md-typeset .explorer output {
   min-width: 3.2rem;
@@ -3356,3 +3356,29 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 /* 0013 kappairs: the path bows under the numbers, which keep a halo and let clicks through */
 .md-typeset svg .kpp-curve { fill: none; }
 .md-typeset svg .kpp-num { pointer-events: none; paint-order: stroke; stroke: var(--md-default-bg-color); stroke-width: 3px; stroke-linejoin: round; }
+/* Self-checks (selfcheck.js): a short question before the solution, a field and a check */
+.md-typeset .selfcheck { margin: 1em 0; padding: 0.55rem 0.8rem; border: 1px solid var(--viz-grid); border-inline-start: 0.2rem solid var(--md-accent-fg-color); border-radius: 0.3rem; background: var(--md-code-bg-color); }
+.md-typeset .selfcheck.is-done { border-inline-start-color: var(--diff-easy); }
+.md-typeset .selfcheck > p { margin: 0.3em 0; }
+.md-typeset .selfcheck .selfcheck__tag { margin: 0 0 0.2em; font-size: 0.7rem; font-weight: 700; color: var(--viz-text); }
+.md-typeset .selfcheck__row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; margin-top: 0.4rem; }
+.md-typeset .selfcheck__in { width: 8rem; max-width: 100%; box-sizing: border-box; padding: 0.25rem 0.45rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; font: inherit; font-family: var(--md-code-font-family); background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .selfcheck__row .md-button { margin: 0; padding: 0.2rem 0.75rem; font-size: 0.66rem; min-height: 1.8rem; }
+.md-typeset .selfcheck .selfcheck__msg:empty { display: none; }
+.md-typeset .selfcheck .selfcheck__msg.is-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .selfcheck .selfcheck__msg.is-bad { color: var(--diff-hard); }
+.md-typeset .selfcheck__row .md-button[hidden] { display: none; }
+.md-typeset .explorer .ld-msg:empty { display: none; }
+.md-typeset .explorer .ld-in { width: 5rem; font: inherit; font-family: var(--md-code-font-family); padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .b3-msg:empty { display: none; }
+/* 0036: the register row (lfsr.js regSvg) */
+.md-typeset svg.lf-regsvg { width: 100%; height: auto; display: block; margin: 0.3rem auto; }
+.md-typeset svg .lf-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .lf-cell.is-one { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); }
+.md-typeset svg .lf-cell.is-tap { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .lf-cellv { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 20px; font-weight: 700; }
+.md-typeset svg .lf-celli, .md-typeset svg .lf-regfb { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 12px; }
+.md-typeset svg .lf-wire { fill: none; stroke: var(--viz-s2); stroke-width: 1.8; }
+.md-typeset svg .lf-dot { fill: var(--viz-s2); }
+.md-typeset svg .lf-xor { fill: var(--md-default-bg-color); stroke: var(--viz-s2); stroke-width: 1.8; }
+.md-typeset svg.lf-regsvg .lf-head { fill: var(--viz-s2); }

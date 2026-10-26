@@ -38,6 +38,12 @@
   };
   const eggsRun = (k, n, T) => eggsRunOf(eggsTable(k, n), k, n, T);
   const eggsFirst = (k, n) => eggsRun(k, n, n).map((d) => d[0]);
+  // The hidden threshold game (V4): an adversary answers a drop so that the floors left need
+  // the most drops (a break leaves eggs − 1 on the floors below, a survival all the eggs on
+  // the floors above), which is the worst case the plan is built against. need(e, m) is the
+  // fewest drops that settle m unknown floors with e eggs.
+  const eggsNeed = (F, e, m) => { if (m <= 0) return 0; if (e <= 0) return Infinity; for (let t = 0; t < F[e].length; t++) if (F[e][t] >= m) return t; return Infinity; };
+  const eggsAdversary = (F, low, high, eggs, fl) => eggsNeed(F, eggs - 1, fl - low - 1) > eggsNeed(F, eggs, high - fl - 1);
   const eggsPerThreshold = (k, n) => { const F = eggsTable(k, n); return Array.from({ length: n + 1 }, (_, T) => eggsRunOf(F, k, n, T).length); };
 
   // The egg drop box (0039): k eggs and n floors, a threshold picked on the building or
@@ -69,7 +75,14 @@
         `<span class="viz-legend"><span><i class="eg-key-safe"></i>ידוע שלא נשברת</span><span><i class="eg-key-broke"></i>ידוע שנשברת</span><span><i class="eg-key-unknown"></i>עוד לא ידוע</span><span><i class="eg-key-thr"></i>הסף שבחרתם</span><span><i class="eg-key-next"></i>ההטלה הבאה</span></span>` +
         `<div class="eg-box"><div class="eg-building"></div><div class="eg-zoomwrap" data-steady><p class="ex-title eg-zoomtitle"></p><div class="eg-zoom" data-steady data-fig-strip></div>` +
         `<label class="eg-winlab"><span>חלון התקריב</span><input type="range" class="eg-win" min="1" max="1" step="1" value="1" dir="ltr" aria-label="הקומה הראשונה בחלון התקריב"></label></div></div>` +
-        `<p class="ex-title">מספר ההטלות של התוכנית לכל סף אפשרי</p><div class="eg-chart"></div>`;
+        `<p class="ex-title">מספר ההטלות של התוכנית לכל סף אפשרי</p><div class="eg-chart"></div>` +
+        // the game (V4): the threshold hidden, the reader drops, against the worst case
+        `<div class="ex-fold eg-game"><p class="ex-fold-title">משחק : הסף נסתר</p>` +
+        `<div class="ex-controls"><label>הסף <select class="eg-mode" data-nolink aria-label="איך נקבע הסף הנסתר"><option value="rand">אקראי</option><option value="adv">יריב, המקרה הגרוע</option></select></label>` +
+        `<label>קומה <input type="number" class="ex-num eg-gfloor" min="1" step="1" dir="ltr" inputmode="numeric" data-nolink aria-label="הקומה שממנה מטילים"></label>` +
+        `<button type="button" class="md-button md-button--primary eg-gdrop">הטלה</button><button type="button" class="md-button eg-new">משחק חדש</button>` +
+        `<button type="button" class="md-button eg-plan" hidden>הצגת התוכנית</button></div>` +
+        `<p class="eg-gtext" role="status"></p><ol class="eg-log"></ol></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       const compute = () => {
@@ -218,6 +231,46 @@
       const seed = seedControls(box, $(".ex-random"), (rng) => { setT(Math.floor(rng() * (st.n + 1)), true); });
       $(".ex-random").addEventListener("click", () => seed.draw());
       $(".ex-reset").addEventListener("click", () => { $(".ex-k").value = K0; st.T = T0; setKN(K0, N0); });
+      // the game: its own k and n (taken from the box when it starts), a hidden T or the adversary
+      let g = null;
+      const gsay = (cls, html) => { const m = $(".eg-gtext"); m.className = `eg-gtext ${cls}`; m.innerHTML = html; };
+      const newGame = () => {
+        const adv = $(".eg-mode").value === "adv";
+        g = { k: st.k, n: st.n, F: eggsTable(st.k, st.n), eggs: st.k, low: 0, high: st.n + 1, T: adv ? null : Math.floor(Math.random() * (st.n + 1)), drops: 0, over: false };
+        g.worst = eggsDropsOf(g.F, g.k, g.n);
+        $(".eg-gfloor").max = g.n; $(".eg-gfloor").value = ""; $(".eg-log").innerHTML = ""; $(".eg-plan").hidden = true;
+        gsay("", `${ltr(g.k)} ${g.k === 1 ? "ביצה" : "ביצים"} ו-${ltr(g.n)} קומות, הסף נסתר${adv ? " ונקבע כך שיידרשו הכי הרבה הטלות" : ""}. מאיזו קומה מטילים?`);
+      };
+      const dropAt = () => {
+        if (!g || g.over) newGame();
+        const fl = Math.round(Number($(".eg-gfloor").value));
+        if (!(fl > g.low && fl < g.high)) { gsay("", `הקומות שעוד לא ידועות הן ${ltr(`${g.low + 1} עד ${g.high - 1}`)}.`); return; }
+        const broke = g.T === null ? eggsAdversary(g.F, g.low, g.high, g.eggs, fl) : fl > g.T;
+        g.drops++;
+        if (broke) { g.high = fl; g.eggs--; } else g.low = fl;
+        $(".eg-log").insertAdjacentHTML("beforeend", `<li>מקומה ${ltr(fl)} : ${broke ? "נשברה" : "לא נשברה"}${broke ? `, נשארו ${ltr(g.eggs)}` : ""}</li>`);
+        if (g.high - g.low === 1) {
+          g.over = true;
+          const ok = g.drops <= g.worst;
+          gsay(ok ? "wv-ok" : "wv-bad", `${ok ? "✓ " : ""}הסף ידוע : הביצה ${g.low ? `שורדת בקומה ${ltr(g.low)}` : "נשברת כבר מהקומה הראשונה"}${g.high <= g.n ? ` ונשברת מקומה ${ltr(g.high)}` : " ושורדת בכל הקומות"}, אחרי ${ltr(g.drops)} הטלות. ` +
+            `התוכנית האופטימלית מבטיחה ${ltr(g.worst)} במקרה הגרוע${ok ? "." : `. רמז : בחרו את ההטלה הראשונה כך שאם הביצה נשברת, הביצים שנשארו יספיקו לקומות שמתחתיה.`}`);
+          if (!ok) $(".eg-plan").hidden = false;
+        } else if (!g.eggs) {
+          g.over = true;
+          gsay("wv-bad", `נגמרו הביצים, והסף עוד בין ${ltr(g.low)} ל-${ltr(g.high - 1)}. רמז : כשנשארת ביצה אחת אפשר רק לעלות קומה אחרי קומה מהקומה הנמוכה שעוד לא ידועה.`);
+          $(".eg-plan").hidden = false;
+        } else gsay("", `נשארו ${ltr(g.eggs)} ${g.eggs === 1 ? "ביצה" : "ביצים"}, ${ltr(g.drops)} הטלות עד עכשיו. הקומות שעוד לא ידועות : ${ltr(`${g.low + 1} עד ${g.high - 1}`)}.`);
+        $(".eg-gfloor").value = "";
+      };
+      $(".eg-gdrop").addEventListener("click", dropAt);
+      $(".eg-gfloor").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); dropAt(); } });
+      $(".eg-new").addEventListener("click", newGame);
+      $(".eg-mode").addEventListener("change", newGame);
+      $(".eg-plan").addEventListener("click", () => {
+        $(".eg-plan").hidden = true;
+        gsay("", `התוכנית האופטימלית ל-${ltr(g.k)} ביצים ו-${ltr(g.n)} קומות מטילה את הביצה הראשונה מקומות ${ltr(eggsFirst(g.k, g.n).join(", "))} כל עוד היא לא נשברת, ובכל שבירה ממשיכה באותו כלל על הקומות שמתחת. התיבה שלמעלה מריצה אותה.`);
+      });
+      newGame();
       $(".ex-next").addEventListener("click", () => { stop(); if (st.step < st.drops.length) { st.step++; st.win = null; draw(); } });
       $(".ex-prev").addEventListener("click", () => { stop(); if (st.step > 0) { st.step--; st.win = null; draw(); } });
       $(".ex-start").addEventListener("click", () => { stop(); st.step = 0; st.win = null; draw(); });
@@ -231,8 +284,8 @@
   dvqExplorers.register({
     views: { eggs: eggsView },
     help: {
-      eggs: "k ביצים ו-n קומות בבקרות, והסף נבחר בלחיצה על הבניין, על קומה בתקריב או בשדה. ״ההטלה הבאה״ ו״הפעלה״ מריצים את התוכנית : הבניין צובע את הקומות הידועות, התקריב מראה את הקומות הלא ידועות אחת-אחת, והגרף סופר את ההטלות לכל סף מתחת לקו של המקרה הגרוע. המתג ״הנוסחה על הבניין״ מסמן ליד הבניין את שני החלקים של ההטלה הבאה, f(k − 1, t − 1) מתחתיה ו-f(k, t − 1) מעליה.",
+      eggs: "k ביצים ו-n קומות בבקרות, והסף נבחר בלחיצה על הבניין, על קומה בתקריב או בשדה. ״ההטלה הבאה״ ו״הפעלה״ מריצים את התוכנית : הבניין צובע את הקומות הידועות, התקריב מראה את הקומות הלא ידועות אחת-אחת, והגרף סופר את ההטלות לכל סף מתחת לקו של המקרה הגרוע. המתג ״הנוסחה על הבניין״ מסמן ליד הבניין את שני החלקים של ההטלה הבאה, f(k − 1, t − 1) מתחתיה ו-f(k, t − 1) מעליה. ״משחק : הסף נסתר״ : מטילים מקומות לבחירתכם מול סף אקראי או יריב, ומשווים למקרה הגרוע.",
     },
-    models: { eggsTable, eggsSplitAt, eggsDrops, eggsRun, eggsFirst, eggsPerThreshold },
+    models: { eggsTable, eggsSplitAt, eggsDrops, eggsRun, eggsFirst, eggsPerThreshold, eggsNeed, eggsAdversary },
   });
 })();

@@ -853,6 +853,22 @@ section below starts at session 22, whose numbered items run on through the late
     the counts with the colon rule. 0012, 0013, 0039, 0041: four display formulas split
     with `aligned` (the phone check warned about them). 0026 needed nothing: V1 had moved
     the A and B labels beside the road.
+59. **Rounds V4a and V4b, try it yourself (session 26, 2026-10-26).** The owner's picks: a
+    wrong answer shows a hint, then a button with the answer; self-checks on about 15
+    pages with a numeric answer; a right answer is remembered but does not mark the
+    question solved; V4a and V4b go to `main` together. **Self-checks**
+    (`docs/javascripts/selfcheck.js`, CONTRIBUTING): 15 on 13 pages (0015 a and b, 0016,
+    0021 a and b, 0026, 0027, 0028, 0029, 0030, 0031, 0032, 0036, 0039, 0042), linted, and
+    every answer recomputed in `tests/tools/test_selfcheck.py`. **Boxes:** 0021 guesses
+    C(n) before it shows; 0004 names the three contents before the deduction (a right
+    answer the draws did not decide is called a guess; the reveal draws the balls); 0003
+    the trap j = i + 1 as a select (descending, n(n − 1)/2 comparisons, tested against
+    Python); 0031 "התוכנית שלי", crossings picked by hand, the best plan hidden until all
+    are across; 0039 a hidden-threshold game, random or an adversary (tested: the page's
+    plan needs exactly f against it, random play never fewer); 0010 part a's pair
+    deletion pass by pass with the characters read (tested against the page's Python);
+    0036 the register drawn with its taps, XOR and fb. 0043 got no self-check while a
+    minimality claim on its page is unchecked (review finding).
 
 
 ## In progress
@@ -865,8 +881,8 @@ section below starts at session 22, whose numbered items run on through the late
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
   and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
   the cloud sandbox (item 52); question 0048, the farmer, the food and the water (item 54).
-- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1, V2, V3, V3b, V5 and V7
-  are done (work log items 55 to 58), V4 and V6 wait for the owner; the V3 split map by
+- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1 to V5 (V3b, V4a and V4b
+  included) and V7 are done (work log items 55 to 59), V6 waits for the owner; the V3 split map by
   completion count was not picked (only collapsed).
 - **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52), and round 6 part
   a, the jump check (item 53); part b, a visual diff of the phone screenshots, was not
@@ -1763,7 +1779,7 @@ fields and dark mode not covered in this pass)
 | V2 (done, item 56) | **Study paths for everything**: paths for the DV core, the protocol reference models, geometry and motion; 0044 to 0047 into the algorithms path; a lint check that names a question in no path | S–M |
 | V3 (done, item 57) | **Boxes on a phone**: collapse the proof panels (0009, 0013, 0016, 0024) and the editing and random-run controls (0025, 0046, 0047); 0024 buttons in two columns; 0018 and 0019 stacked with Hebrew labels; the 0020 / 0021 split map by completion count; 0031, 0037, 0038, 0040, 0041; scroll areas instead of blank reservations (0027, 0028, 0042, 0043) | M–L |
 | V3b (done, item 58) | **The small box fixes**: 0013 (path arrows, histogram labels), 0015 on step 1, 0011 / 0017 widths, 0029 an hour window, four long formulas, and the 0044 state diagram as a ρ (owner request) | S–M |
-| V4 | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
+| V4 (done as V4a and V4b, item 59) | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
 | V5 (done, item 55) | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0016 (the owner did not pick the 0015 simulation or the 0001 Python model) | M–L |
 | V6 | **Practice loop and glossary**: a "my progress" page, a self-rating after a solution, export / import of the progress; a glossary page with a tooltip on a term's first use | M |
 | V7 (done, item 55) | **Robustness**: `timeout-minutes` on the CI jobs, a service worker for offline reading, the header tabs without the fade | S–M |
