@@ -95,7 +95,14 @@ hints and collapsed solution. A single-part question skips the part heading.)
 
 ??? followup "שאלות המשך"
     - **שאלה 1 :** ...
+
+        ??? fu-answer "תשובה"
+            תשובה קצרה, שורה עד שלוש.
+
     - **שאלה 2 :** ...
+
+        ??? fu-answer "תשובה"
+            תשובה קצרה.
 
 <!--
 If the question has code, also add tests/<id>/ (copy a similar question's folder):
