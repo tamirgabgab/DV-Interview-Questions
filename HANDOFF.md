@@ -769,7 +769,7 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## In progress
 
-- **State (2026-10-26, session 26):** `main` is 77659a7 (fix rounds 1 to 5), deployed. 46 questions (0022 was
+- **State (2026-10-26, session 26):** `main` is bd64ec9 (fix rounds 1 to 6a), deployed. 46 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
