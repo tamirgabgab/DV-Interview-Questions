@@ -75,6 +75,41 @@ def lint_highlights(text: str) -> list[str]:
     return problems
 
 
+def lint_followups(text: str) -> list[str]:
+    """Every item of the follow-up block has its short answer: a ``??? fu-answer`` block
+    nested under the item (CONTRIBUTING.md, "Follow-up questions")."""
+    lines = text.split("\n")
+    start = next((i for i, l in enumerate(lines) if l.startswith("??? followup")), None)
+    if start is None:
+        return []
+    problems, item = [], None
+    for i in range(start + 1, len(lines)):
+        line = lines[i]
+        if line.strip() and not line.startswith("    "):
+            break
+        if line.startswith("    - "):
+            if item is not None:
+                problems.append(f"{item + 1}: follow-up without a short answer (??? fu-answer under the item)")
+            item = i
+        elif line.strip().startswith("??? fu-answer"):
+            item = None
+    if item is not None:
+        problems.append(f"{item + 1}: follow-up without a short answer (??? fu-answer under the item)")
+    return problems
+
+
+def lint_code_spaces(text: str) -> list[str]:
+    """No non-breaking space inside a fenced code block (the colon rule is for Hebrew text;
+    in code it breaks the compiler)."""
+    problems, inside = [], False
+    for n, line in enumerate(text.split("\n"), 1):
+        if line.strip().startswith("```"):
+            inside = not inside
+        elif inside and "\u00a0" in line:
+            problems.append(f"{n}: non-breaking space inside a code block")
+    return problems
+
+
 def topic_names() -> dict[str, str]:
     """The TOPICS table of hooks/questions.py (the Hebrew name of every topic), read
     without importing the hook."""
@@ -255,6 +290,8 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
         pass  # numbering restarts per part; only the per-hint number check above matters
     problems.extend(leftovers)
     problems.extend(lint_highlights(path.read_text(encoding="utf-8")))
+    problems.extend(lint_followups(path.read_text(encoding="utf-8")))
+    problems.extend(lint_code_spaces(path.read_text(encoding="utf-8")))
     return problems
 
 

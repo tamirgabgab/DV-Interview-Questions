@@ -133,7 +133,7 @@ def main(argv: list[str]) -> int:
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
         for width in WIDTHS:
-            ctx = browser.new_context(viewport={"width": width, "height": HEIGHT}, device_scale_factor=1)
+            ctx = browser.new_context(viewport={"width": width, "height": HEIGHT}, device_scale_factor=1, service_workers="block")
             for spec in args.route:
                 pattern, file = spec.split("=", 1)
                 ctx.route(re.compile(pattern), functools.partial(lambda file, route: route.fulfill(path=file), file))

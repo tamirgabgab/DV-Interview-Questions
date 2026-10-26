@@ -153,7 +153,7 @@ def check_links(browser, routes, url: str) -> tuple[list[str], list[str]]:
     errors: list[str] = []
 
     def context():
-        ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1)
+        ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1, service_workers="block")
         for pattern, handler in routes:
             ctx.route(pattern, handler)
         return ctx
@@ -260,7 +260,7 @@ def main(argv: list[str]) -> int:
     failures = boxes_total = clicks_total = 0
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
-        ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1)
+        ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1, service_workers="block")
         routes = []
         for spec in args.route:
             pattern, file = spec.split("=", 1)

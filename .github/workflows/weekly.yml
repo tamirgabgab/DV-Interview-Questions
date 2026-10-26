@@ -18,9 +18,12 @@ env:
   # The release the pinned development commit in deploy.yml follows (VERILATOR_REF).
   VERILATOR_RELEASE: v5.052
 
+# Every job has a timeout of about twice its usual time, so a hung browser or simulator
+# fails the run instead of holding it for GitHub's six hours.
 jobs:
   external-links:
     runs-on: ubuntu-latest
+    timeout-minutes: 20   # usually a few minutes
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -35,6 +38,7 @@ jobs:
 
   verilator-release:
     runs-on: ubuntu-latest
+    timeout-minutes: 10   # usually under a minute
     steps:
       - name: Compare the latest Verilator release with the pinned one
         id: latest

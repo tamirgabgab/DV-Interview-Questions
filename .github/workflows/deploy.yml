@@ -32,12 +32,15 @@ env:
 
 # The runner image is pinned: ubuntu-latest moved to 26.04 (October 2026), where
 # Playwright 1.56 cannot install Chromium, and the Verilator cache was built on 24.04.
+# Every job has a timeout of about twice its usual time, so a hung browser or simulator
+# fails the run instead of holding it for GitHub's six hours.
 jobs:
   # main is fast-forwarded to a commit that passed every check on its work branch, so a push
   # to main whose commit already has a successful run on another branch only builds and
   # deploys (the tests, the phone check and the explorer check are skipped).
   gate:
     runs-on: ubuntu-24.04
+    timeout-minutes: 5   # usually a few seconds
     outputs:
       verified: ${{ steps.check.outputs.verified }}
     steps:
@@ -58,6 +61,7 @@ jobs:
     needs: gate
     if: needs.gate.outputs.verified != 'true'
     runs-on: ubuntu-24.04
+    timeout-minutes: 45   # usually 8 min, about 25 more when the Verilator cache misses and it is built
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -116,6 +120,7 @@ jobs:
     needs: [gate, test]
     if: ${{ !cancelled() && needs.gate.result == 'success' && (needs.test.result == 'success' || needs.gate.outputs.verified == 'true') }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 25   # usually 5 min, about 9 with the dark phone check
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -177,6 +182,7 @@ jobs:
     needs: [gate, test]
     if: needs.gate.outputs.verified != 'true'
     runs-on: ubuntu-24.04
+    timeout-minutes: 20   # usually 6 min
     strategy:
       fail-fast: false
       matrix:
@@ -203,6 +209,7 @@ jobs:
     needs: [gate, build, explorers]
     if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.explorers.result == 'success' || needs.gate.outputs.verified == 'true') }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 10   # usually 1 min
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

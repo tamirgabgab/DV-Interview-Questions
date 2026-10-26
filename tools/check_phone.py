@@ -217,7 +217,7 @@ def main(argv: list[str]) -> int:
     failures = warned = axe_pages = small_pages = 0
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
-        ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1,
+        ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1, service_workers="block",
                                   color_scheme=args.scheme)
         for spec in args.route:
             pattern, file = spec.split("=", 1)

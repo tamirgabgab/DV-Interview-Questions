@@ -48,6 +48,7 @@ PAIRS = [
     ("navy on amber (buttons)", "#1b2a4a", ["var(--md-accent-fg-color)"], TEXT),
     ("message and guide text", "#ffffff", [TOAST], TEXT),
     ("figure text", "var(--viz-text)", [PAGE], TEXT),
+    ("follow-up answer label", "var(--adm-followup)", [PAGE], TEXT),
     ("figure ink", "var(--viz-ink)", [PAGE], TEXT),
     ("orange running text", "var(--viz-s2-text)", [PAGE], TEXT),
     *[(f"series {n} text in a box", f"var(--viz-s{n}-text)", [CARD, PAGE], TEXT) for n in (1, 2, 3, 4)],

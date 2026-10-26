@@ -40,7 +40,8 @@ session.
 - One Markdown file per question: `docs/questions/<level>/<id>-<slug>.md`, zero-padded id
   unique across the repository, `level` equal to the folder. Start from
   `templates/question.md`; the skeleton (interviewer block, hint ladder, short answer,
-  solution blocks idea → steps → code → proof → cost, traps, follow-ups) is described in
+  solution blocks idea → steps → code → proof → cost, traps, follow-ups with a short
+  collapsed answer each) is described in
   `CONTRIBUTING.md` and enforced by `python tools/lint_pages.py`.
 - Code answers in SystemVerilog and Python as linked tabs, SystemVerilog first. The pages
   are the single source of truth: tests and the run panel execute the page code as is, so

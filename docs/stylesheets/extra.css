@@ -627,6 +627,11 @@
 /* ---------- Round B: clearer solutions ---------- */
 
 /* Custom admonition types: answer (amber), interviewer (navy), trap (red), followup (teal). */
+/* The short answer of a follow-up question: a quiet collapsible line under the item, no icon. */
+.md-typeset details.fu-answer { margin: 0.3em 0 0.6em; border: 0; border-inline-start: 0.15rem solid var(--adm-followup); border-radius: 0; box-shadow: none; font-size: 0.95em; background: transparent; }
+.md-typeset details.fu-answer > summary { background: transparent; font-weight: 600; color: var(--adm-followup); padding-inline-start: 1.6rem; min-height: 0; }
+.md-typeset details.fu-answer > summary::before { display: none; }
+.md-typeset details.fu-answer > summary::after { inset-inline-start: 0.2rem; inset-inline-end: auto; }
 :root {
   --md-admonition-icon--answer: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm0-13a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0-4.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>');
   --md-admonition-icon--interviewer: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 5C7 5 2.7 8.1 1 12c1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 11.5A4.5 4.5 0 1 1 12 7.5a4.5 4.5 0 0 1 0 9zm0-7a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>');
@@ -3294,3 +3299,7 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
   .md-typeset .questions-wrap td.q-title { width: auto; max-width: none; }
   .md-typeset .questions-wrap .q-line a { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 0.8rem; }
 }
+
+/* The header tabs appear at once: Material slides them in one by one, and on the home page
+   the last ones stayed faint for a moment (review V7). */
+.md-tabs__link, .md-tabs__item { transition: none !important; transition-delay: 0s !important; }
