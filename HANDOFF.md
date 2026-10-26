@@ -1604,6 +1604,47 @@ visible screens), then UI322 / UI323, then the boxes (UI327, UI328).
 The older idea list below is kept for reference; items covered by the rounds above are
 marked.
 
+### Fourth series, review rounds V1 to V6 (session 26, 2026-10-26, owner picks)
+
+A review of the whole project: the site-wide pages and tools (done by hand) and every
+question page with its box at 1200 and 390 px (two review passes, findings below as they
+came in). Effort: S under an hour, M a few hours, L a day or more.
+
+**Site-wide findings**
+
+- **Study paths cover 21 of 47 questions.** Not in any path: 0001, 0003, 0016, 0024, 0025,
+  0026, 0029 to 0048. There is no path for the DV core (FSM, FIFO, CDC, LFSR, SVA,
+  coverage: 0001, 0033 to 0036, 0038, 0040, 0041), for the protocol reference models
+  (0023 to 0025), or for geometry and motion (0026, 0029, 0030, 0048).
+- **No glossary** of DV terms (Hebrew and English: CDC, metastability, credit, TLP...);
+  a reader meets a term on one page and its explanation on another.
+- **Progress lives only in one browser** (localStorage): solved and favourite marks and
+  the remembered boxes are lost on another device, with no export or import.
+- **No review loop**: a solved question is never offered again; no "come back to this
+  one" list, no self-rating after solving.
+- **No interview simulation across questions**: practice mode times one page; there is
+  no "three random questions in 45 minutes" session with a summary at the end.
+- **No offline use**: a manifest exists but no service worker, so the site does not open
+  without a network (for example on a train before an interview).
+- **No check-yourself steps**: no page asks the reader for a number or a choice and
+  checks it (the "quick quiz" format of **New question formats** is still open).
+- **CI jobs have no `timeout-minutes`**: a hung browser check would run for six hours.
+- **The header tabs fade in** on the home page; for a moment the last tabs are hard to
+  read (cosmetic).
+- **The heaviest pages** are 0016 (370 KB of HTML), 0025 (300 KB), 0023 and 0024 (240 KB),
+  mostly inline SVG; fine on a phone today, worth watching.
+
+**Rounds** (the per-question findings are added under V4 and V5)
+
+| Round | Content | Effort |
+|-------|---------|--------|
+| V1 | **Study paths for everything**: new paths for the DV core, the protocol reference models, geometry and motion (0026, 0029, 0030, 0048), and the coding questions 0044 to 0047 added to the algorithms path; a check in `lint_pages.py` that names a question in no path | S–M |
+| V2 | **Glossary**: a glossary page (Hebrew term, English term, one line, the questions that use it) and a tooltip on the first use of a term on a page, from one YAML file | M |
+| V3 | **Practice loop**: a "my progress" page (solved, favourites, a "come back to this" list), a self-rating after a solution (easy / took effort / need again) that orders the random question, and export / import of the progress as a short code or a file | M |
+| V4 | **Question boxes, fixes** (bugs and usability problems found in the review, per question) | see the review list |
+| V5 | **Question boxes, new aids** (check-yourself steps, missing steppers, proofs as steppers on chosen pages) | see the review list |
+| V6 | **Robustness**: `timeout-minutes` on every CI job, a service worker for offline reading of visited pages, the header tabs without the fade | S–M |
+
 ## Improvement ideas
 
 Ordered roughly by value for effort. **S** = small (under an hour), **M** = a few hours,
