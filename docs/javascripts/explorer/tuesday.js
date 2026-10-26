@@ -34,7 +34,7 @@
   const kindName = (c) => `${c < 7 ? "בן" : "בת"}, יום ${DAYS[c % 7]}`;
   const tuesdayView = () => ({
     mount(box) {
-      const D = { info: "day", day: Number(box.dataset.day ?? 2), k: 0 };
+      const D = { info: "day", day: Number(box.dataset.day ?? 2), k: 1 };   // opens on step 1, the first child's row lit (step 0 is the empty grid)
       const st = { ...D, cell: null };
       box.innerHTML =
         `<div class="ex-controls"><label>המידע <select class="tu-info">${TU_INFOS.map((i) => `<option value="${i}">${INFO_NAME[i]}</option>`).join("")}</select></label>` +

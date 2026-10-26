@@ -1674,6 +1674,8 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .tl-name { flex: 0 0 9rem; font-size: 0.65rem; color: var(--viz-text); text-align: end; direction: rtl; }
 .md-typeset .explorer .tl-row svg { flex: 1 1 auto; height: 0.9rem; width: 100%; display: block; background: var(--md-code-bg-color); border-radius: 0.15rem; cursor: pointer; }
 .md-typeset .explorer .tl-row svg .tl-cursor { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset .explorer .tl-row svg .tl-window { fill: var(--viz-ink); fill-opacity: 0.12; stroke: var(--viz-ink); stroke-width: 1; }
+.md-typeset .explorer .clock-hour-title { margin: 0.6rem 0 0; }
 .md-typeset .explorer .tl-axis { display: flex; justify-content: space-between; margin-inline-start: 9.5rem; font-size: 0.6rem; color: var(--viz-text); font-family: var(--md-code-font-family); }
 @media screen and (max-width: 44.9375em) {
   .md-typeset .explorer .tl-name { flex-basis: 6rem; }
@@ -2082,7 +2084,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer .box-grid.fl-grid > span.is-slow { box-shadow: inset 0 0 0 3px var(--viz-s1); }
 .md-typeset .explorer .box-grid.fl-grid > span.is-fast { outline: 3px dashed var(--viz-s2); outline-offset: -1px; }
 .md-typeset .explorer .box-grid.fl-grid > span.is-slow.is-fast { box-shadow: inset 0 0 0 3px var(--viz-s1); }
-.md-typeset .explorer input.ex-nums { width: 16rem; max-width: 100%; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer input.ex-nums { width: 16rem; max-width: 100%; box-sizing: border-box; box-sizing: border-box; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
 .md-typeset .explorer .fl-err { color: var(--diff-hard); font-size: 0.7rem; }
 .md-typeset .explorer .fl-graph { margin-top: 0.5rem; }
 .md-typeset .explorer svg.fl-live { max-width: 34rem; width: 100%; }
@@ -3348,3 +3350,9 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer .cv-weights { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); }
 .md-typeset .explorer .cv-weights label { display: flex; }
 .md-typeset .explorer .cv-weights input[type="range"] { flex: 1 1 auto; width: auto; min-width: 0; margin: 0; }
+/* a label with a long field wraps inside the box on a phone (0011, 0017) */
+.md-typeset .explorer .ex-controls > label:has(input.ex-nums) { max-width: 100%; flex-wrap: wrap; min-width: 0; }
+.md-typeset .explorer .ex-controls > label:has(input.ex-nums) input.ex-nums { flex: 1 1 12rem; min-width: 0; }
+/* 0013 kappairs: the path bows under the numbers, which keep a halo and let clicks through */
+.md-typeset svg .kpp-curve { fill: none; }
+.md-typeset svg .kpp-num { pointer-events: none; paint-order: stroke; stroke: var(--md-default-bg-color); stroke-width: 3px; stroke-linejoin: round; }

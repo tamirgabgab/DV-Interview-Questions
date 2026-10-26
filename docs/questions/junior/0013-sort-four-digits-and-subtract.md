@@ -518,7 +518,10 @@ added: 2026-10-16
     **המקרה \( q \ge 1 \).** נקרא לארבע הספרות של \( F \) :
 
     \[
-    \alpha = p, \quad \beta = B - p, \quad \gamma = q - 1, \quad \delta = B - q - 1.
+    \begin{aligned}
+    \alpha &= p, & \beta &= B - p, \\
+    \gamma &= q - 1, & \delta &= B - q - 1.
+    \end{aligned}
     \]
 
     צריך לחלק אותן לזוג **קיצוני** (הגדולה והקטנה, עם הפרש \( p \)) ולזוג **אמצעי** (עם

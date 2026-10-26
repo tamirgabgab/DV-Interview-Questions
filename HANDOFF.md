@@ -839,11 +839,25 @@ section below starts at session 22, whose numbered items run on through the late
     → 1,145, 0047 1,619 → 1,235, 0020 1,413 → 1,021, 0021 map 1,813 → 1,092 (2,526 → 880
     on a desktop). The page checks open every fold; `check_explorers.py` does not click the
     fold buttons.
+58. **Round V3b, the small box fixes and a ρ for 0044 (session 26, 2026-10-26).** The
+    owner's picks: the 0044 state diagram as a ρ at every width, a movable hour in 0029,
+    long formulas split with `aligned`. 0044 `kapgraph`: the tail on a ring of cards from
+    the top, right to left, the fixed point in the middle with its loop under it, or the
+    two values of an odd base side by side with an arrow each way; smaller cards and short
+    tags under 520 px (base 10 from 211: about 1,000 px tall on a phone before, 347 now).
+    0013: the `kappairs` path bowed and drawn under the numbers (which keep a halo); the
+    `kaprekar` histogram with four to eight grid lines (it had 25 labels on top of each
+    other). 0015 opens on step 1. 0011 and 0017: a long number field wraps inside the box.
+    0029: under the day strip, the hour of the current time as the same three rows with a
+    tick per meeting (the hour shaded on the day strip; a click jumps to a meeting), and
+    the counts with the colon rule. 0012, 0013, 0039, 0041: four display formulas split
+    with `aligned` (the phone check warned about them). 0026 needed nothing: V1 had moved
+    the A and B labels beside the road.
 
 
 ## In progress
 
-- **State (2026-10-26, session 26):** `main` is 682f406 (fix rounds 1 to 6a, question 0048, review rounds V1, V5, V7), deployed.
+- **State (2026-10-26, session 26):** `main` is c5ea58a (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V5, V7), deployed; V3b (item 58) is on the work branch.
   47 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
@@ -851,8 +865,8 @@ section below starts at session 22, whose numbered items run on through the late
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
   and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
   the cloud sandbox (item 52); question 0048, the farmer, the food and the water (item 54).
-- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1, V2, V3, V5 and V7 are
-  done (work log items 55 to 57), V4 and V6 wait for the owner; the V3 split map by
+- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1, V2, V3, V3b, V5 and V7
+  are done (work log items 55 to 58), V4 and V6 wait for the owner; the V3 split map by
   completion count was not picked (only collapsed).
 - **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52), and round 6 part
   a, the jump check (item 53); part b, a visual diff of the phone screenshots, was not
@@ -1748,6 +1762,7 @@ fields and dark mode not covered in this pass)
 | V1 (done, item 55) | **Bugs and quick fixes**: the 0023 box error, the 0002 default, `ltr()` without line breaks, the 0045 balls, the 0039 label, the 0042 camel, the 0048 drag caption, the 0047 caption, superscripts in 0034 and 0037, the 0026 number format | S–M |
 | V2 (done, item 56) | **Study paths for everything**: paths for the DV core, the protocol reference models, geometry and motion; 0044 to 0047 into the algorithms path; a lint check that names a question in no path | S–M |
 | V3 (done, item 57) | **Boxes on a phone**: collapse the proof panels (0009, 0013, 0016, 0024) and the editing and random-run controls (0025, 0046, 0047); 0024 buttons in two columns; 0018 and 0019 stacked with Hebrew labels; the 0020 / 0021 split map by completion count; 0031, 0037, 0038, 0040, 0041; scroll areas instead of blank reservations (0027, 0028, 0042, 0043) | M–L |
+| V3b (done, item 58) | **The small box fixes**: 0013 (path arrows, histogram labels), 0015 on step 1, 0011 / 0017 widths, 0029 an hour window, four long formulas, and the 0044 state diagram as a ρ (owner request) | S–M |
 | V4 | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
 | V5 (done, item 55) | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0016 (the owner did not pick the 0015 simulation or the 0001 Python model) | M–L |
 | V6 | **Practice loop and glossary**: a "my progress" page, a self-rating after a solution, export / import of the progress; a glossary page with a tooltip on a term's first use | M |

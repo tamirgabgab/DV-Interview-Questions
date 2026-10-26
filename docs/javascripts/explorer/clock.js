@@ -103,6 +103,7 @@
         `<p class="clock-total"></p><ul class="clock-counts"></ul></div></div>` +
         `<label class="clock-day">היממה <input type="range" class="ex-day" min="0" max="${CLOCK_DAY - 1}" step="1" dir="ltr"></label>` +
         `<div class="clock-timeline" dir="ltr"></div>` +
+        `<p class="ex-title clock-hour-title"></p><div class="clock-timeline clock-hour" dir="ltr"></div>` +
         `<p class="ex-summary" aria-live="polite"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const svg = $("svg"), hands = {}, play = $(".ex-play"), speed = $(".ex-speed");
@@ -126,8 +127,33 @@
         }
         return `<div class="tl-row" data-pair="${n}"><span class="tl-name">${PAIR_NAME[n]}</span>` +
           `<svg viewBox="0 0 ${TL_W} 14" preserveAspectRatio="none" role="img" aria-label="הפגישות של ${PAIR_NAME[n]} לאורך היממה">${ticks}` +
-          `<line class="tl-cursor" x1="0" x2="0" y1="0" y2="14"/></svg></div>`;
+          `<rect class="tl-window" x="0" y="0" width="${(TL_W / 24).toFixed(1)}" height="14"/><line class="tl-cursor" x1="0" x2="0" y1="0" y2="14"/></svg></div>`;
       }).join("") + `<div class="tl-axis"><span>00:00</span><span class="tl-mid">06:00</span><span>12:00</span><span class="tl-mid">18:00</span><span>24:00</span></div>`;
+      // the hour around the current time, as the same rows: on the day's strip the first two
+      // pairs meet about once a minute and read as solid bars, here every meeting is a tick
+      const hourBox = $(".clock-hour");
+      let hourShown = -1;
+      const hourRows = (H) => {
+        const t0 = H * 3600, hx = (sec) => (((sec - t0) / 3600) * TL_W).toFixed(1), hh = (v) => String(v % 24).padStart(2, "0");
+        hourBox.innerHTML = CLOCK_PAIRS.map(([, , P, q], n) => {
+          let ticks = "";
+          for (let k = Math.ceil((t0 * q) / P); (k * P) / q < t0 + 3600; k++) ticks += `<line class="${TL_CLS[n]}" x1="${hx((k * P) / q)}" x2="${hx((k * P) / q)}" y1="1" y2="13" stroke-width="2"/>`;
+          return `<div class="tl-row" data-pair="${n}"><span class="tl-name">${PAIR_NAME[n]}</span>` +
+            `<svg viewBox="0 0 ${TL_W} 14" preserveAspectRatio="none" role="img" aria-label="הפגישות של ${PAIR_NAME[n]} בשעה ${hh(H)}:00 עד ${hh(H + 1)}:00">${ticks}` +
+            `<line class="tl-cursor" x1="0" x2="0" y1="0" y2="14"/></svg></div>`;
+        }).join("") + `<div class="tl-axis"><span>${hh(H)}:00</span><span class="tl-mid">${hh(H)}:15</span><span>${hh(H)}:30</span><span class="tl-mid">${hh(H)}:45</span><span>${hh(H + 1)}:00</span></div>`;
+        hourBox.querySelectorAll(".tl-row").forEach((row) => {
+          const n = Number(row.dataset.pair), rs = row.querySelector("svg");
+          rs.addEventListener("click", (e) => {
+            const r = rs.getBoundingClientRect(), at = t0 + ((e.clientX - r.left) / r.width) * 3600;
+            const [, , P, q] = CLOCK_PAIRS[n];
+            stop();
+            setTime(Math.min(Math.max((Math.round((at * q) / P) * P) / q, 0), LAST));
+          });
+        });
+        $(".clock-hour-title").textContent = `השעה ${hh(H)}:00 עד ${hh(H + 1)}:00 מקרוב : כל פגישה היא קו`;
+        hourShown = H;
+      };
       timeline.querySelectorAll(".tl-row").forEach((row) => {
         const n = Number(row.dataset.pair), svg = row.querySelector("svg");
         svg.addEventListener("click", (e) => {
@@ -159,16 +185,20 @@
         if (document.activeElement !== timeIn || running) timeIn.value = hms(sec);
         day.value = sec;
         const enabled = mask();
-        timeline.querySelectorAll(".tl-row").forEach((row) => {
+        const H = Math.min(23, Math.floor(t / 3600));
+        if (H !== hourShown) hourRows(H);
+        box.querySelectorAll(".clock-timeline .tl-row").forEach((row) => {
           row.classList.toggle("is-off", !enabled.includes(Number(row.dataset.pair)));
-          const x = tlX(t).toFixed(1);
+          const x = row.closest(".clock-hour") ? (((t - H * 3600) / 3600) * TL_W).toFixed(1) : tlX(t).toFixed(1);
           const c = row.querySelector(".tl-cursor");
           c.setAttribute("x1", x); c.setAttribute("x2", x);
+          const w = row.querySelector(".tl-window");
+          if (w) w.setAttribute("x", tlX(H * 3600).toFixed(1));
         });
         $(".clock-total").innerHTML = `מתחילת היממה : ${cnt.total === 1 ? "פגישה אחת" : `${ltr(cnt.total)} פגישות`}`;
         const hit = new Set(meets.map(([n]) => n));
         $(".clock-counts").innerHTML = PAIR_NAME.map((name, n) =>
-          `<li${hit.has(n) ? ' class="is-meet"' : ""}>${name}: ${ltr(cnt.pairs[n])}</li>`).join("") +
+          `<li${hit.has(n) ? ' class="is-meet"' : ""}>${name}\u00a0: ${ltr(cnt.pairs[n])}</li>`).join("") +
           `<li${sec % CLOCK_HALF === 0 ? ' class="is-meet"' : ""}>שלושתם יחד : ${ltr(cnt.triple)}, ` +
           `ולכן ${ltr(`${cnt.pairs.join(" + ")} − 2 · ${cnt.triple} = ${cnt.total}`)}</li>`;
         let text;

@@ -270,7 +270,10 @@ added: 2026-10-22
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"
         \[
-        E[T] = \int_0^\infty \left( 1 - \prod_{i=1}^{n} P\big(\mathrm{Poisson}(p_i t) \ge k\big) \right) dt
+        \begin{aligned}
+        E[T] &= \int_0^\infty \big( 1 - G(t) \big)\, dt, \\
+        G(t) &= \prod_{i=1}^{n} P\big(\mathrm{Poisson}(p_i t) \ge k\big)
+        \end{aligned}
         \]
 
         ול-\( k = 1 \) יש צורה סגורה, \( E[T] = \sum_{S \ne \emptyset} (-1)^{|S|+1} / p(S) \)

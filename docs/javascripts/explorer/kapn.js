@@ -1,6 +1,6 @@
 // kinds: kapn kapgraph
 //   kapn                   0044        three digits in a base from 2 to 16 and n up to 1000: the gap D_k against k with the fixed point or the cycle, and a table of the digits after each step, the closed form of the page beside the direct computation
-//   kapgraph               0044        three digits in a base from 2 to 20: the chain x -> y -> z as a state diagram (a snake of cards coloured by the gap d, the stage of the proof on each) closed by the fixed point's loop or the 2-cycle's back arrow, and the table of a_n, b_n, c_n, d_n
+//   kapgraph               0044        three digits in a base from 2 to 20: the chain x -> y -> z as a state diagram, a ρ (the tail on a ring of cards coloured by the gap d, the stage of the proof on each, and the fixed point with its loop or the 2-cycle in the middle), and the table of a_n, b_n, c_n, d_n
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -205,59 +205,68 @@
       // the stage shown on a card and in the table: the cycle (or the fixed point) once the
       // chain is in it, the row of the closed form before that
       const labelOf = (ch, d0, i) => (i === 0 ? "start" : d0 === 0 ? "zero" : i >= ch.cycleStart ? (ch.cycleLen === 1 ? "fixed" : "cycle") : kapgStage(d0, i, st.B));
+      // The diagram as a ρ: the tail (the numbers before the cycle) on a ring, from the top
+      // and counterclockwise (right to left along the top), and the cycle in the middle (the
+      // fixed point with its loop, or the two values of an odd base one above the other), so
+      // a chain of six or seven numbers stays about as tall as it is wide. On a narrow box
+      // (a phone) the cards are smaller and the tags short.
+      const SHORT = { start: "התחלה", zero: "הכול 0", first: "צעד ראשון", line: "ליניארי", fixed: "נקודת שבת", cycle: "מחזור" };
       const graph = (ch, d0) => {
         const B = st.B, n = ch.nodes.length, narrow = box.clientWidth > 0 && box.clientWidth < 520;
-        const cols = narrow ? 1 : 4, CW = 108, CH = 64, GX = 44, TAG = 18, GY = 58, PAD = 18;
-        // the slots: a 2-cycle keeps its two cards on one row
-        const slots = [];
-        let r = 0, c = 0;
-        ch.nodes.forEach((_, i) => {
-          if (cols > 1 && ch.cycleLen === 2 && i === ch.cycleStart && c === cols - 1) { r++; c = 0; }
-          slots.push([r, c]);
-          c++; if (c === cols) { r++; c = 0; }
-        });
-        const rows = slots[n - 1][0] + 1, W = 2 * PAD + cols * CW + (cols - 1) * GX + (cols === 1 ? 70 : 0);
-        const H = PAD + rows * (TAG + CH + GY) + 6;
-        const pos = slots.map(([rr, cc]) => {
-          const slot = rr % 2 === 0 ? cols - 1 - cc : cc;           // right to left on even rows
-          return { x: PAD + (cols === 1 ? 70 : 0) + slot * (CW + GX), y: PAD + rr * (TAG + CH + GY) + TAG, row: rr };
-        });
+        const CW = narrow ? 92 : 108, CH = narrow ? 58 : 64, TAG = 18, PAD = 14, k = ch.cycleStart, two = ch.cycleLen === 2;
+        // the ring: an even step of at most 72 degrees, and a radius that keeps neighbours apart
+        const step = k > 1 ? Math.min(72, 300 / (k - 1)) : 72, chord = CW + (narrow ? 26 : 44);
+        const R = Math.max(two ? (narrow ? 165 : 185) : narrow ? 140 : 150, k > 1 ? chord / (2 * Math.sin((step * Math.PI) / 360)) : 0);
+        const pos = [];
+        for (let i = 0; i < k; i++) {
+          const a = ((-90 - i * step) * Math.PI) / 180;
+          pos.push({ x: R * Math.cos(a) - CW / 2, y: R * Math.sin(a) - CH / 2 + TAG / 2 });
+        }
+        // the two values of a cycle side by side, the first on the side the tail comes in from
+        const side = k > 0 && pos[k - 1].x + CW / 2 < 0 ? -1 : 1;
+        if (two) pos.push({ x: side > 0 ? 22 : -22 - CW, y: -CH / 2 + TAG / 2 }, { x: side > 0 ? -22 - CW : 22, y: -CH / 2 + TAG / 2 });
+        else pos.push({ x: -CW / 2, y: -CH / 2 - TAG / 2 });
+        // the bounds of the cards and their tags, with room for the loop above the fixed point
+        const xs = pos.flatMap((p) => [p.x, p.x + CW]), ys = pos.flatMap((p) => [p.y - TAG, p.y + CH]);
+        const x0 = Math.min(...xs) - PAD, y0 = Math.min(...ys) - PAD;
+        const W = Math.max(...xs) + PAD - x0, H = Math.max(...ys, pos[k].y + CH + (two ? 0 : 44)) + PAD - y0;
         const head = `kg-ah-${uid}`;
-        let s = `<svg class="figure kg-svg" viewBox="0 0 ${W} ${H}" style="max-width:${W}px" role="group" aria-label="דיאגרמת המצבים של המספר ${txt(st.x)} בבסיס ${B}">` +
+        let s = `<svg class="figure kg-svg" viewBox="${f(x0)} ${f(y0)} ${f(W)} ${f(H)}" style="max-width:${Math.round(W)}px" role="group" aria-label="דיאגרמת המצבים של המספר ${txt(st.x)} בבסיס ${B}">` +
           `<defs><marker id="${head}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="kg-head"/></marker>` +
           `<marker id="${head}-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="kg-head-end"/></marker></defs>`;
         const arrow = (d, cls = "") => `<path class="kg-arrow${cls}" d="${d}" marker-end="url(#${head}${cls ? "-end" : ""})"/>`;
-        // the forward arrows
-        for (let i = 0; i + 1 < n; i++) {
-          const a = pos[i], b = pos[i + 1];
-          if (a.row === b.row) {
-            const left = b.x < a.x;
-            s += arrow(`M${left ? a.x : a.x + CW},${a.y + CH / 2} L${left ? b.x + CW + 2 : b.x - 2},${b.y + CH / 2}`);
-          } else {                                      // to the next row: down, across if needed, down
-            const mid = a.y + CH + (GY - 4) / 2;
-            s += arrow(`M${a.x + CW / 2},${a.y + CH} V${mid} H${b.x + CW / 2} V${b.y - TAG - 2}`);
-          }
-        }
-        // closing the cycle: a loop under the fixed point, a back arrow for the 2-cycle
-        const last = pos[n - 1];
-        if (ch.cycleLen === 1) {
-          s += arrow(`M${last.x + CW * 0.3},${last.y + CH} C${last.x + CW * 0.2},${last.y + CH + 40} ${last.x + CW * 0.8},${last.y + CH + 40} ${last.x + CW * 0.7},${last.y + CH + 2}`, " is-end");
-        } else {
-          const p = pos[ch.cycleStart];
-          if (p.row === last.row) s += arrow(`M${last.x + CW / 2},${last.y + CH} C${last.x + CW / 2},${last.y + CH + 44} ${p.x + CW / 2},${p.y + CH + 44} ${p.x + CW / 2},${p.y + CH + 2}`, " is-end");
-          else s += arrow(`M${last.x},${last.y + CH / 2} C${last.x - 60},${last.y + CH / 2} ${p.x - 60},${p.y + CH / 2} ${p.x - 2},${p.y + CH / 2}`, " is-end");
+        // where the line from the middle of card p towards (tx, ty) leaves the card and its tag
+        const centre = (p) => [p.x + CW / 2, p.y + (CH - TAG) / 2];
+        const edge = (p, tx, ty, gap = 3) => {
+          const [cx, cy] = centre(p), dx = tx - cx, dy = ty - cy, hw = CW / 2 + gap, hh = (CH + TAG) / 2 + gap;
+          const t = Math.min(dx ? hw / Math.abs(dx) : Infinity, dy ? hh / Math.abs(dy) : Infinity);
+          return [cx + dx * t, cy + dy * t];
+        };
+        const link = (a, b, ring) => {
+          const [bx, by] = centre(b), [ax, ay] = centre(a), [sx, sy] = edge(a, bx, by), [ex, ey] = edge(b, ax, ay);
+          return ring ? `M${f(sx)},${f(sy)} A${f(R)},${f(R)} 0 0 0 ${f(ex)},${f(ey)}` : `M${f(sx)},${f(sy)} L${f(ex)},${f(ey)}`;
+        };
+        for (let i = 0; i + 1 < k; i++) s += arrow(link(pos[i], pos[i + 1], true));
+        if (k > 0) s += arrow(link(pos[k - 1], pos[k], false));
+        const c0 = pos[k];
+        if (!two) {                                       // the fixed point's loop, under its card
+          const bot = c0.y + CH + 2, mx = c0.x + CW / 2;
+          s += arrow(`M${f(mx - 26)},${f(bot)} C${f(mx - 40)},${f(bot + 42)} ${f(mx + 40)},${f(bot + 42)} ${f(mx + 26)},${f(bot + 1)}`, " is-end");
+        } else {                                          // two arrows across the gap: there, and back
+          const c1 = pos[k + 1], ia = side > 0 ? c0.x - 2 : c0.x + CW + 2, ib = side > 0 ? c1.x + CW + 2 : c1.x - 2;
+          s += arrow(`M${f(ia)},${f(c0.y + CH * 0.3)} L${f(ib)},${f(c0.y + CH * 0.3)}`) + arrow(`M${f(ib)},${f(c0.y + CH * 0.7)} L${f(ia)},${f(c0.y + CH * 0.7)}`, " is-end");
         }
         ch.nodes.forEach((x, i) => {
           const { x: px, y: py } = pos[i], d = gapOf(x), stage = labelOf(ch, d0, i), end = i >= ch.cycleStart;
           const shade = Math.round(8 + (52 * d) / Math.max(1, B - 1));
           // the name starts with the card's visible text (tag, number, base, line under it); the
           // trailing spaces keep its parts apart in the text a screen reader or a checker reads
-          const tag = `${i === 0 ? "" : `n = ${i} · `}${STAGE_NAME[stage]}`, sub = `${B === 10 ? "" : `= ${x} · `}d = ${d}`;
+          const tag = `${i === 0 ? "" : `n = ${i} · `}${(narrow ? SHORT : STAGE_NAME)[stage]}`, sub = `${B === 10 || narrow ? "" : `= ${x} · `}d = ${d}`;
           s += `<g class="kg-node${end ? " is-end" : ""}${st.sel === i ? " is-sel" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="${tag} ${txt(x)}${B === 10 ? "" : B} ${sub}, צעד ${i}, ${txt(x)} בבסיס ${B}">` +
-            `<text class="kg-tag" x="${px + CW / 2}" y="${py - 6}" text-anchor="middle" direction="rtl">${tag} </text>` +
-            `<rect class="kg-card" x="${px}" y="${py}" width="${CW}" height="${CH}" rx="9" style="--kg-t:${shade}%"/>` +
-            `<text class="kg-num" x="${px + CW / 2}" y="${py + 29}" text-anchor="middle">${txt(x)}${B === 10 ? "" : `<tspan class="kg-base" dy="5">${B}</tspan>`} </text>` +
-            `<text class="kg-sub" x="${px + CW / 2}" y="${py + 52}" text-anchor="middle">${sub}</text></g>`;
+            `<text class="kg-tag" x="${f(px + CW / 2)}" y="${f(py - 6)}" text-anchor="middle" direction="rtl">${tag} </text>` +
+            `<rect class="kg-card" x="${f(px)}" y="${f(py)}" width="${CW}" height="${CH}" rx="9" style="--kg-t:${shade}%"/>` +
+            `<text class="kg-num" x="${f(px + CW / 2)}" y="${f(py + CH / 2 - 3)}" text-anchor="middle">${txt(x)}${B === 10 ? "" : `<tspan class="kg-base" dy="5">${B}</tspan>`} </text>` +
+            `<text class="kg-sub" x="${f(px + CW / 2)}" y="${f(py + CH - 12)}" text-anchor="middle">${sub}</text></g>`;
         });
         return s + "</svg>";
       };

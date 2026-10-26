@@ -106,7 +106,8 @@
         const n = Math.max(hist.length, hist0.length);
         const vals = Array.from({ length: n }, (_, k) => (hist[k] || 0) + (hist0[k] || 0));
         const ymax = Math.max(...vals), ticks = [];
-        const stepT = ymax > 4000 ? 1000 : ymax > 400 ? 100 : 50;
+        // four to eight grid lines: a step of 1, 2 or 5 times a power of ten
+        const mag = Math.max(1, 10 ** Math.floor(Math.log10(Math.max(ymax, 1) / 4))), stepT = [1, 2, 5, 10].map((m) => m * mag).find((v) => ymax / v <= 8);
         for (let v = 0; v <= ymax + stepT - 1; v += stepT) ticks.push(v);
         const fr = frame("התפלגות מספר הצעדים", n, ticks[ticks.length - 1], ticks, (v) => num(v));
         let s = fr.s;

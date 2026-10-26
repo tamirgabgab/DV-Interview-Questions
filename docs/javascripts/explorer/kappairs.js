@@ -64,6 +64,7 @@
       const cx = (q) => GX + q * CW + CW / 2, cy = (p) => GY + (p - 1) * CH + CH / 2;
       const grid = () => {
         const path = kapPairPath(st.p, st.q);
+        let nums = "";                                    // the numbers, drawn over the path with a halo
         let s = `<svg class="figure kpp-svg" viewBox="0 0 ${GX + 10 * CW + 6} ${GY + 9 * CH + 6}" role="group" aria-label="54 הזוגות, לחיצה על משבצת בוחרת אותה">`;
         for (let q = 0; q <= 9; q++) s += `<text class="tick" x="${cx(q)}" y="${GY - 9}" text-anchor="middle">q = ${q}</text>`;
         for (let p = 1; p <= 9; p++) {
@@ -74,18 +75,23 @@
             const cls = p === 6 && q === 2 ? "cell-s2" : q === 0 ? "cell-s1" : "";
             s += `<g class="kpp-cell${on ? " is-pick" : ""}" data-p="${p}" data-q="${q}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${String(v).padStart(4, "0")}, p = ${p}, q = ${q}">` +
                  `<rect class="box-node" x="${x}" y="${y}" width="${CW}" height="${CH}"/>` + (cls ? `<rect class="${cls}" x="${x}" y="${y}" width="${CW}" height="${CH}"/>` : "") +
-                 `<text class="box-num" x="${x + CW / 2}" y="${y + CH / 2 + 5}" text-anchor="middle">${String(v).padStart(4, "0")}</text></g>`;
+                 `</g>`;
+            nums += `<text class="box-num kpp-num" x="${x + CW / 2}" y="${y + CH / 2 + 5}" text-anchor="middle">${String(v).padStart(4, "0")}</text>`;
           }
         }
-        // the path: each arrow from a cell's edge toward the next cell's centre
+        // the path: each arrow bowed to one side, from a cell's edge to the next cell's edge,
+        // under the numbers (which keep a halo), so it never hides a value it passes
+        const rim = (x, y, dx, dy) => { const t = Math.min(dx ? (CW / 2) / Math.abs(dx) : Infinity, dy ? (CH / 2) / Math.abs(dy) : Infinity); return [x + dx * t, y + dy * t]; };
         path.forEach(([p, q], i) => {
           const [np, nq] = kapPair(p, q).next;
           if (np === p && nq === q) return;
-          const x1 = cx(q), y1 = cy(p), x2 = cx(nq), y2 = cy(np), len = Math.hypot(x2 - x1, y2 - y1), k = Math.min(1, 9 / len);
-          s += `<line class="kq-path${i ? " kpp-later" : ""}" x1="${f(x1 + (x2 - x1) * k)}" y1="${f(y1 + (y2 - y1) * k)}" x2="${f(x2 - (x2 - x1) * k)}" y2="${f(y2 - (y2 - y1) * k)}"/>` +
-               `<circle class="kq-head${i ? " kpp-later" : ""}" cx="${f(x2 - (x2 - x1) * k)}" cy="${f(y2 - (y2 - y1) * k)}" r="3.5"/>`;
+          const x1 = cx(q), y1 = cy(p), x2 = cx(nq), y2 = cy(np), len = Math.hypot(x2 - x1, y2 - y1);
+          const mx = (x1 + x2) / 2 - ((y2 - y1) / len) * len * 0.18, my = (y1 + y2) / 2 + ((x2 - x1) / len) * len * 0.18;
+          const [ax, ay] = rim(x1, y1, mx - x1, my - y1), [bx, by] = rim(x2, y2, mx - x2, my - y2);
+          s += `<path class="kq-path kpp-curve${i ? " kpp-later" : ""}" d="M${f(ax)},${f(ay)} Q${f(mx)},${f(my)} ${f(bx)},${f(by)}"/>` +
+               `<circle class="kq-head${i ? " kpp-later" : ""}" cx="${f(bx)}" cy="${f(by)}" r="3.5"/>`;
         });
-        return s + "</svg>";
+        return s + nums + "</svg>";
       };
       const text = () => {
         const r = kapPair(st.p, st.q), { p, q } = r, steps = kapPairPath(p, q).length - 1;
