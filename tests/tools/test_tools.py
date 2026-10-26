@@ -121,3 +121,17 @@ def test_display_math_is_a_paragraph_of_its_own(tmp_path):
     assert any("needs a blank line after it" in p for p in lint_pages.lint(path))
     path.write_text(page.replace("## השאלה\n", "## השאלה\n\n\\[\nE = 1\n\\]\n\nול- הסכום.\n", 1), encoding="utf-8")
     assert not any("display math" in p for p in lint_pages.lint(path))
+
+
+def test_every_question_in_a_study_path(monkeypatch, tmp_path):
+    """lint_pages names a question that is in no study path; today there is none."""
+    import lint_pages
+
+    assert lint_pages.lint_paths() == []
+    # a copy of the questions with an extra page that no path lists is named
+    q = tmp_path / "questions"
+    shutil.copytree(lint_pages.QUESTIONS, q)
+    shutil.copytree(lint_pages.QUESTIONS.parent / "paths", tmp_path / "paths")
+    (q / "student" / "0999-orphan.md").write_text("---\nid: 999\n---\n", encoding="utf-8")
+    monkeypatch.setattr(lint_pages, "QUESTIONS", q)
+    assert lint_pages.lint_paths() == ["0999-orphan.md: in no study path (add it to a docs/paths/*.md)"]

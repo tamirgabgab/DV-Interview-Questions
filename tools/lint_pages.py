@@ -295,6 +295,26 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     return problems
 
 
+def lint_paths() -> list[str]:
+    """Every question is in at least one study path (docs/paths/*.md), so a new question is
+    not left out of the paths (review V2)."""
+    import yaml
+
+    in_paths = set()
+    for f in sorted((QUESTIONS.parent / "paths").glob("*.md")):
+        text = f.read_text(encoding="utf-8")
+        if not text.startswith("---"):
+            continue
+        meta = yaml.safe_load(text.split("---")[1]) or {}
+        in_paths |= {int(step["id"]) for step in meta.get("steps", [])}
+    out = []
+    for path in sorted(QUESTIONS.glob("*/0*.md")):
+        qid = int(path.name[:4])
+        if qid not in in_paths:
+            out.append(f"{path.name}: in no study path (add it to a docs/paths/*.md)")
+    return out
+
+
 def main(argv: list[str]) -> int:
     paths = [question_path(a) for a in argv] if argv else sorted(QUESTIONS.glob("*/0*.md"))
     bad = warned = 0
@@ -310,7 +330,10 @@ def main(argv: list[str]) -> int:
         bad += bool(problems)
         warned += bool(warnings)
     print(f"{len(paths) - bad}/{len(paths)} pages clean" + (f", {warned} with warnings" if warned else ""))
-    return 1 if bad else 0
+    orphans = [] if argv else lint_paths()
+    for o in orphans:
+        print(f"  {o}")
+    return 1 if bad or orphans else 0
 
 
 if __name__ == "__main__":

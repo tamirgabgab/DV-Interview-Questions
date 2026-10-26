@@ -808,6 +808,15 @@ section below starts at session 22, whose numbered items run on through the late
     0024 shared credits and Sync, 0025 the replay limits. V7: `timeout-minutes` on every CI
     job, `docs/sw.js` for offline reading of visited pages (network first, a kill switch,
     blocked in the page checks), the header tabs without the slide-in.
+56. **Review round V2, study paths for every question (session 26, 2026-10-26).** The
+    owner's picks: two DV paths (logic design 0001, 0040, 0035, 0036; clock crossing and
+    verification 0033, 0034, 0037, 0038, 0041), the PCIe path extended into "protocols"
+    (0020, 0021, 0023, 0025, 0024), the puzzles split (logic puzzles get 0032, 0045, 0043;
+    a new "optimization puzzles" path 0031, 0039, 0042), a "geometry and motion" path (0026,
+    0029, 0030, 0048), an "advanced algorithms" path (0016, 0046, 0047), 0003 first in the
+    coding path and 0044 last in the digits path. Twelve paths cover all 47 questions; the
+    DV paths come first. `lint_pages.py` fails on a question in no path (a test checks it);
+    the path front matter is quoted.
 
 
 ## In progress
@@ -820,8 +829,8 @@ section below starts at session 22, whose numbered items run on through the late
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
   and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
   the cloud sandbox (item 52); question 0048, the farmer, the food and the water (item 54).
-- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1, V5 and V7 are
-  done (work log item 55), V2, V3, V4 and V6 wait for the owner.
+- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1, V2, V5 and V7 are
+  done (work log items 55, 56), V3, V4 and V6 wait for the owner.
 - **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52), and round 6 part
   a, the jump check (item 53); part b, a visual diff of the phone screenshots, was not
   picked.
@@ -1714,7 +1723,7 @@ fields and dark mode not covered in this pass)
 | Round | Content | Effort |
 |-------|---------|--------|
 | V1 (done, item 55) | **Bugs and quick fixes**: the 0023 box error, the 0002 default, `ltr()` without line breaks, the 0045 balls, the 0039 label, the 0042 camel, the 0048 drag caption, the 0047 caption, superscripts in 0034 and 0037, the 0026 number format | S–M |
-| V2 | **Study paths for everything**: paths for the DV core, the protocol reference models, geometry and motion; 0044 to 0047 into the algorithms path; a lint check that names a question in no path | S–M |
+| V2 (done, item 56) | **Study paths for everything**: paths for the DV core, the protocol reference models, geometry and motion; 0044 to 0047 into the algorithms path; a lint check that names a question in no path | S–M |
 | V3 | **Boxes on a phone**: collapse the proof panels (0009, 0013, 0016, 0024) and the editing and random-run controls (0025, 0046, 0047); 0024 buttons in two columns; 0018 and 0019 stacked with Hebrew labels; the 0020 / 0021 split map by completion count; 0031, 0037, 0038, 0040, 0041; scroll areas instead of blank reservations (0027, 0028, 0042, 0043) | M–L |
 | V4 | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
 | V5 (done, item 55) | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0016 (the owner did not pick the 0015 simulation or the 0001 Python model) | M–L |

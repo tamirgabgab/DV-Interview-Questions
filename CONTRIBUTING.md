@@ -340,7 +340,12 @@ A study path is a short ordered list of questions on one topic, one file per pat
 `{id, note}`; the note is one Hebrew sentence, with code in backticks). The page body is a
 short intro and the `<!-- path-steps -->` placeholder; `docs/paths/index.md` and the home
 page show the `<!-- path-cards -->`. The hook validates the ids, adds a "מסלולים" tab to the
-navigation and puts the path bar on each question of the path.
+navigation and puts the path bar on each question of the path. Every question is in at
+least one path: `lint_pages.py` (run on all pages) names a question in none. The values
+of the front matter are quoted (a Hebrew colon inside a note would break the YAML). Twelve
+paths today, in this order: logic design, clock crossing and verification, protocols
+(PCIe and USB4), constraints, coding, advanced algorithms, digits, probability, logic
+puzzles, optimization puzzles, geometry and motion, the cake.
 
 ### Search
 
