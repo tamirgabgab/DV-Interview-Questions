@@ -873,7 +873,7 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## In progress
 
-- **State (2026-10-26, session 26):** `main` is 0dd8e8f (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V5, V7), deployed.
+- **State (2026-10-26, session 26):** `main` is 5f94144 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7), deployed.
   47 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
