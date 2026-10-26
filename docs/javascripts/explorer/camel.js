@@ -98,6 +98,7 @@
         let h = `<svg class="figure cm-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="ציר הדרך מ-0 עד ${lit(st.d)} ק״מ : המחסנים עם הליטרים שבהם, הגמל במקומו ומה שעליו, והמעבר האחרון">` +
           `<line class="cm-axis" x1="${X0}" x2="${X1}" y1="${YA}" y2="${YA}"/>`;
         let lastLabel = -1e9, lastLitres = -1e9, lift = 0;
+        const camelX = X(s.pos);                                       // no km label under the camel
         pts.forEach((x, i) => {
           const v = s.depots[i], hb = st.w > 0 ? (Math.max(0, v) / st.w) * BAR : 0, xx = X(x);
           h += `<line class="cm-stop" x1="${f(xx)}" x2="${f(xx)}" y1="${YA - 6}" y2="${YA + 6}"/>`;
@@ -107,7 +108,7 @@
             h += `<rect class="cm-depot" x="${f(xx - 6)}" y="${f(YA - hb)}" width="12" height="${f(hb)}" rx="2"><title>מחסן ב-${lit(x)} ק״מ : ${lit(v)} ליטר</title></rect>` +
               `<text class="cm-litres" x="${f(xx)}" y="${f(YA - hb - 5 - 12 * lift)}" text-anchor="middle">${lit(v)}</text>`;
           }
-          if (xx - lastLabel >= 28 || i === pts.length - 1) { h += `<text class="cm-km" x="${f(xx)}" y="${YA + 19}" text-anchor="middle">${lit(x)}</text>`; lastLabel = xx; }
+          if ((xx - lastLabel >= 28 || i === pts.length - 1) && Math.abs(xx - camelX) >= 14) { h += `<text class="cm-km" x="${f(xx)}" y="${YA + 19}" text-anchor="middle">${lit(x)}</text>`; lastLabel = xx; }
         });
         const arrow = (p, cls, y) => {
           const sg = st.segs[p.seg], xa = X(p.back ? sg.x1 : sg.x0), xb = X(p.back ? sg.x0 : sg.x1), dir = xb >= xa ? 1 : -1;
@@ -124,7 +125,10 @@
           st.segs.forEach((sg, i) => {
             const xa = X(sg.x0), xb = X(sg.x1), cx = (xa + xb) / 2, c = cross[i], full = c.done === c.total;
             h += `<line class="cm-band${full ? " is-full" : ""}" x1="${f(xa + 2)}" x2="${f(xb - 2)}" y1="${y}" y2="${y}"><title>קטע ${i + 1} : ${c.done} מתוך ${c.total} מעברים, ${lit(c.total * st.a)} ליטר לק״מ</title></line>`;
-            if (xb - xa >= 30) h += `<text class="cm-price-lbl" x="${f(cx)}" y="${y + 15}" text-anchor="middle">${c.done}/${c.total}${xb - xa >= 62 ? ` · ${lit(c.total * st.a)}/km` : ""}</text>`;
+            // a phone shows the price per km only; the crossings so far are in the title and the line under the box
+            const narrow = box.clientWidth > 0 && box.clientWidth < 520;
+            const lbl = narrow ? (xb - xa >= 44 ? `${lit(c.total * st.a)}/km` : "") : xb - xa >= 30 ? `${c.done}/${c.total}${xb - xa >= 62 ? ` · ${lit(c.total * st.a)}/km` : ""}` : "";
+            if (lbl) h += `<text class="cm-price-lbl" x="${f(cx)}" y="${y + 15}" text-anchor="middle">${lbl}</text>`;
           });
         }
         const xc = X(s.pos);

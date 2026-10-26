@@ -393,3 +393,29 @@ def test_explorer_cycle_axis():
                 want[c] = 1
         assert r["ready"] == want, r["id"]
         assert all(r["ready"][c] for c in outs)       # a completion goes out only when ready
+
+
+def test_explorer_manual_read_after_example():
+    """A read of the reader's own sent after the page's example (whose scripted draws were
+    made for other moments) and then cycled to the end: no pick out of range, every
+    completion goes out (the box once threw here)."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+const m = {explorer_require()};
+const out = [];
+for (const name of ["a", "b"]) {{
+  for (let keep = 0; keep <= 13; keep++) {{
+    const script = m.EP_SCRIPTS[name], s = m.epInit();
+    const rng = m.epValueRng([...script.draws].slice(0, keep), m.epUnitRng([], () => 0.999));
+    m.epWrite(s, 0x10000, Array.from({{ length: 512 }}, (_, i) => i & 0xFF));
+    script.reads.forEach(([address, length, rid, tag]) => m.epRead(s, {{ address, length, rid, tag }}, rng));
+    m.epRead(s, {{ address: 0x10040, length: 200, rid: 0x0200, tag: 0x30 }}, rng);
+    let guard = 0;
+    while (s.pending.length && guard++ < 400) m.epCycle(s, rng);
+    out.push([s.pending.length, s.reads.reduce((n, r) => n + r.waits.length, 0) > 0, s.out.length]);
+  }}
+}}
+console.log(JSON.stringify(out));
+""")
+    assert all(pending == 0 and n > 0 for pending, _, n in got)

@@ -164,13 +164,13 @@
       const planOf = (s) => motorcycleRiders(s, alpha(), st.k);
       const plan = () => planOf(st.strategy);
       const who = (i) => (i === 0 ? "האופנוע" : st.k === 1 ? "הנוסע" : st.k === 2 ? ["הנוסע", "ההולך"][i - 1] : `נוסע ${i}`);
-      const dist = (v) => (st.km === null ? fmt(v) : `${fmt(v * st.km, 1)} ק"מ`);
+      const dist = (v) => (st.km === null ? fmt(v, 2) : `${fmt(v * st.km, 1)} ק"מ`);
       const roadSvg = (pos, pl) => {
         const w = 640, h = 96, x0 = 36, x1 = 604, yr = 58;
         const X = (v) => x0 + v * (x1 - x0);
         let s = `<svg class="figure road-live" viewBox="0 0 ${w} ${h}" role="img" aria-label="הדרך מ-A ל-B עם האופנוע והנוסעים במקומם בזמן הנוכחי">` +
           `<line class="axis-c" x1="${x0}" x2="${x1}" y1="${yr}" y2="${yr}" stroke-width="3"/>` +
-          `<text class="legend" x="${x0}" y="${yr + 24}" text-anchor="middle">A</text><text class="legend" x="${x1}" y="${yr + 24}" text-anchor="middle">B</text>`;
+          `<text class="legend" x="${x0 - 18}" y="${yr + 5}" text-anchor="middle">A</text><text class="legend" x="${x1 + 18}" y="${yr + 5}" text-anchor="middle">B</text>`;   // beside the road, clear of the travellers
         const marks = [];
         if (st.strategy === "optimal" && st.k === 2) {
           const p2 = motorcyclePlan(alpha());
@@ -254,7 +254,7 @@
         s += `<polyline class="ink-line" points="${maxPts}" fill="none" stroke-width="8" stroke-opacity="0.18" stroke-linejoin="round"/>`;
         s += `<polyline class="s1-line" points="${seg(pas, 0, 1)}" fill="none" stroke-width="2.5"/><polyline class="s2-line" points="${seg(wal, 0, 1)}" fill="none" stroke-width="2.5"/>`;
         s += `<line class="ink-line" x1="${f(X(best))}" x2="${f(X(best))}" y1="${f(Y(opt))}" y2="${base}" stroke-width="1" stroke-dasharray="3 3"/>` +
-             `<circle class="ink-dot" cx="${f(X(best))}" cy="${f(Y(opt))}" r="4"><title>המינימום : D = ${fmt(best)}, כולם מגיעים אחרי ${fmt(opt * st.t1, 2)} שעות</title></circle>` +
+             `<circle class="ink-dot" cx="${f(X(best))}" cy="${f(Y(opt))}" r="4"><title>המינימום : D = ${fmt(best, 2)}, כולם מגיעים אחרי ${fmt(opt * st.t1, 2)} שעות</title></circle>` +
              `<text class="legend" x="${f(X(best) - 6)}" y="${f(Y(opt) + 18)}" text-anchor="end">${fmt(opt * st.t1, 2)}</text>`;
         const cur = motorcycleDrop(a, d);
         s += `<line class="axis-c" x1="${f(X(d))}" x2="${f(X(d))}" y1="${top}" y2="${base}" stroke-width="1"/>`;

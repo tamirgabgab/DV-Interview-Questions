@@ -87,7 +87,7 @@
       };
       const clampWin = (s) => { const { low, high } = after(st.step); const len = Math.min(ZW, high - low - 1); return Math.max(low + 1, Math.min(s, high - len)); };
       const building = (s) => {
-        const W = 150, H = 380, X0 = 44, X1 = 112, TOP = 18, BOT = 362, n = st.n;
+        const W = 160, H = 380, X0 = 44, X1 = 112, TOP = 18, BOT = 362, n = st.n;
         const pitch = (BOT - TOP) / n, y = (fl) => BOT - fl * pitch;
         const next = st.step < st.drops.length ? st.drops[st.step][0] : null;
         const len = Math.min(ZW, s.high - s.low - 1), w0 = st.win, w1 = st.win + len - 1;
@@ -103,7 +103,7 @@
         st.drops.slice(0, st.step).forEach(([fl, broke], i) => {
           h += `<g class="eg-drop ${broke ? "is-broke" : "is-safe"}"><circle cx="${X1 + 16}" cy="${f(y(fl))}" r="7"/><text x="${X1 + 16}" y="${f(y(fl) + 3)}" text-anchor="middle">${i + 1}</text><title>הטלה ${i + 1} מקומה ${fl} : ${broke ? "נשברה" : "לא נשברה"}</title></g>`;
         });
-        if (next !== null) h += `<line class="eg-next" x1="${X0}" x2="${X1 + 8}" y1="${f(y(next))}" y2="${f(y(next))}"/><text class="eg-nextlbl" x="${X1 + 28}" y="${f(y(next) + 3)}">${next}</text>`;
+        if (next !== null) h += `<line class="eg-next" x1="${X0}" x2="${X1 + 8}" y1="${f(y(next))}" y2="${f(y(next))}"/><text class="eg-nextlbl" x="${W - 2}" y="${f(y(next) + 3)}" text-anchor="end" direction="ltr">${next}</text>`;
         if (next !== null && $(".eg-rec").checked) {
           // the next drop's split: the band below it (what the eggs left after a break
           // settle) and the band above (what all of them settle), beside the building

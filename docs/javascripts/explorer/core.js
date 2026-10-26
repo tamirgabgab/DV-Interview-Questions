@@ -145,7 +145,13 @@
 
   const f = (v, n = 1) => Number(v).toFixed(n);
   const attr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const ltr = (x) => `<bdi dir="ltr">${x}</bdi>`;   // math and numbers inside Hebrew text
+  // math and numbers inside Hebrew text; a short one (a number, a coordinate, a short
+  // formula) never breaks across lines, where its parts would read in the wrong order
+  const LTR_KEEP = 24;
+  const ltr = (x) => {
+    const plain = String(x).replace(/<[^>]*>/g, "").replace(/&[a-z#0-9]+;/gi, "x");
+    return `<bdi dir="ltr"${plain.length <= LTR_KEEP ? ' class="ex-nw"' : ""}>${x}</bdi>`;
+  };
   // Arrow keys on a focused point: +1 for right / up, -1 for left / down, ten times with Shift.
   const arrowStep = (e) => {
     const d = e.key === "ArrowRight" || e.key === "ArrowUp" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -1 : 0;

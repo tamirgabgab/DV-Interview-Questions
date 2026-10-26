@@ -52,6 +52,7 @@
         `</div>` +
         `<p class="ex-summary" aria-live="polite"></p>` +
         `<p class="ex-note farm-note" aria-live="polite"></p>` +
+        `<p class="ex-title farm-drag"></p>` +
         `<svg class="figure farm-live" role="img" aria-label="השטח בין קו האוכל לקו המים, החוואי, הפרה והמסלול הקצר ביותר"></svg>` +
         `<span class="viz-legend"><span><i class="s3"></i>קו האוכל</span><span><i class="s1"></i>קו המים</span>` +
         `<span><i class="ink"></i>החוואי A</span><span><i class="s2"></i>הפרה B</span>` +
@@ -162,6 +163,9 @@
         svg.setAttribute("viewBox", `0 0 ${layout.W} ${f(layout.Hh)}`);
         svg.innerHTML = picture(s);
         $(".farm-lg-copy").style.display = st.refl ? "" : "none";
+        $(".farm-drag").textContent = st.mode === "a"
+          ? "גררו את החוואי A ואת הפרה B לאורך הדפנות, ואת הפינות כדי לשנות את L ואת H."
+          : "גררו את נקודת האוכל ואת נקודת המים לאורך הקווים, ואת הפינות כדי לשנות את L ואת H.";
         sync(s);
         const sq = (v) => `${num(v)}²`;
         summary.innerHTML = (st.mode === "b"

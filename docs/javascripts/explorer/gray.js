@@ -132,7 +132,7 @@
         $(".gr-bin").innerHTML = bin + binV;
         $(".gr-gray").innerHTML = gray + grayV;
         const k = r.changedBin.length;
-        $(".gr-sum").innerHTML = `בצעד ${ltr(`${r.oldB} → ${r.newB}`)} משתנים ${ltr(k)} ביטים בבינארי : ${ltr(`2^${k} = ${1 << k}`)} צירופים של ישן/חדש, ${ltr(r.wrongCount)} מהם ערכים שגויים. ב-Gray משתנה ביט אחד : שני צירופים, שניהם ערכים שהמצביע עבר בהם.`;
+        $(".gr-sum").innerHTML = `בצעד ${ltr(`${r.oldB} → ${r.newB}`)} משתנים ${ltr(k)} ביטים בבינארי : ${ltr(`2<sup>${k}</sup> = ${1 << k}`)} צירופים של ישן/חדש, ${ltr(r.wrongCount)} מהם ערכים שגויים. ב-Gray משתנה ביט אחד : שני צירופים, שניהם ערכים שהמצביע עבר בהם.`;
       };
       const randomize = (rng) => {
         const r = graySample(st.b, BITS, {}, {});

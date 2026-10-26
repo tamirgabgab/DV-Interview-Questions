@@ -72,7 +72,8 @@
   const epNext = (s, rng) => {
     const ready = s.pending.filter((p) => p.ready <= s.cycle);
     if (!ready.length) return null;
-    const pick = ready[rng.choice(ready.length)], cpl = pick.cpls.shift();
+    // a scripted draw meant for another moment can be out of range: keep the pick inside
+    const pick = ready[Math.min(Math.max(rng.choice(ready.length), 0), ready.length - 1)], cpl = pick.cpls.shift();
     pick.sent += 1;
     if (pick.cpls.length) { pick.ready = s.cycle + rng.randint(1, EP_MAX_GAP); s.reads.find((r) => r.id === pick.id).waits.push([s.cycle, pick.ready]); }
     else s.pending.splice(s.pending.indexOf(pick), 1);
@@ -247,6 +248,10 @@
         else if (Math.floor(address / 4096) !== Math.floor((address + length - 1) / 4096)) st.err = "בקשה לא חוצה גבול של 4 KB.";
         if (st.err) { render(); return; }
         snap();
+        // a request of the reader's own ends the page's example: its scripted draws were
+        // made for the example's reads, so the rest of the draws come from the seed
+        const ended = st.values.length > 0;
+        st.values.length = 0;
         if ($(".ex-kind").value === "write") {
           const w = st.s.writes.length + 1;
           epWrite(st.s, address, Array.from({ length }, (_, i) => (i + 0x10 * w) & 0xFF));
@@ -256,6 +261,7 @@
           const p = epRead(st.s, { address, length, rid, tag }, st.rng);
           st.log = `קריאה Tag ${ltr(hex(tag, 2))} : ${ltr(length)} בתים מ-${ltr(hex(address))}. ה-Completions נבנו עכשיו, בסדר כתובות : ${ltr(p.cpls.map((c) => c.size).join(" + "))} (חיתוך אקראי על גבולות 128), ויחכו עד מחזור ${ltr(p.ready)}.`;
         }
+        if (ended) st.log += " הדוגמה שבעמוד נעצרה כאן : מעכשיו ההגרלות אקראיות.";
         render();
       });
       const cycle = () => {

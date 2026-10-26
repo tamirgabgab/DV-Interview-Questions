@@ -95,7 +95,7 @@
   // The tracer box (0002, 0003): the Python code of the page on the left with the current
   // line lit, the state on the right. data-mode="swap": a version select, a and b, the
   // same-variable and 8-bit toggles, the symbolic expressions in a0 and b0; data-version
-  // locks it on one version.
+  // locks it on one version, data-start only opens it there.
   // data-mode="loop": a typed or random array, one comparison per step, a jump to the end
   // of the outer iteration with the invariant, the counters.
   const traceView = (box) => ({
@@ -115,10 +115,13 @@
       if (mode === "swap") {
         // data-version="temp" or "arith" locks the box on one part's version (0002 parts a, b)
         const lock = ["temp", "arith"].includes(box.dataset.version) ? box.dataset.version : null;
-        const PAGE = { kind: lock || "arith", a: 5, b: 3, c: 7, same: false, bits: 0, k: 0 };
+        // data-start opens an unlocked box on a version (0002 part c opens on XOR)
+        const start = ["temp", "arith", "xor", "rot"].includes(box.dataset.start) ? box.dataset.start : "arith";
+        const PAGE = { kind: lock || start, a: 5, b: 3, c: 7, same: false, bits: 0, k: 0 };
         const st = { ...PAGE };
         box.innerHTML =
-          `<div class="ex-controls"><label>הגרסה <select class="ex-kind" aria-label="גרסת ההחלפה"><option value="temp">עם משתנה עזר (סעיף א)</option><option value="arith" selected>אריתמטיקה (סעיף ב)</option><option value="xor">XOR (סעיף ג)</option><option value="rot">סיבוב של שלושה ב-XOR (שאלת המשך)</option></select></label>` +
+          `<div class="ex-controls"><label>הגרסה <select class="ex-kind" aria-label="גרסת ההחלפה">` + [["temp", "עם משתנה עזר (סעיף א)"], ["arith", "אריתמטיקה (סעיף ב)"], ["xor", "XOR (סעיף ג)"], ["rot", "סיבוב של שלושה ב-XOR (שאלת המשך)"]]
+            .map(([v, t]) => `<option value="${v}"${v === PAGE.kind ? " selected" : ""}>${t}</option>`).join("") + `</select></label>` +
           `<label><span>a</span> <input type="number" class="ex-a" dir="ltr" value="5" aria-label="הערך של a"></label>` +
           `<label><span>b</span> <input type="number" class="ex-b" dir="ltr" value="3" aria-label="הערך של b"></label>` +
           `<label class="tr-c" hidden><span>c</span> <input type="number" class="ex-c" dir="ltr" value="7" aria-label="הערך של c"></label>` +

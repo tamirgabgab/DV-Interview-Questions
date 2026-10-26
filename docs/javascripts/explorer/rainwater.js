@@ -390,7 +390,7 @@
       `<span class="viz-legend"><span><i class="rw-key-heap"></i>בערימה (הגבול)</span><span><i class="rw-key-cur"></i>יצא מהערימה</span><span><i class="rw-key-fill"></i>השכנים שהגיע אליהם</span><span><i class="rw-key-water"></i>מים</span><span><i class="rw-key-sel"></i>מסומן</span></span>` +
       `<p class="rw-edit-hint">לחיצה על תא מסמנת אותו, וגרירה מסמנת מלבן. מספר שמקלידים נכנס לכל התאים המסומנים, ו-Enter או לחיצה כפולה פותחים עריכה של תא. במקלדת${NB}: חיצים בין התאים, ו-Shift עם חץ מרחיב את הסימון.</p>` +
       `<div class="rw-panels"><figure class="rw-panel"><figcaption>המפה${NB}: גובה, ו-${ltr("+")} מים</figcaption><div class="rw-map" role="grid" dir="ltr" data-edits></div></figure>` +
-      `<figure class="rw-panel rw-heap-panel"><figcaption>הערימה, מהנמוך לגבוה</figcaption><ol class="rw-heap" dir="ltr"></ol></figure></div>` +
+      `<figure class="rw-panel rw-heap-panel"><figcaption>הערימה, מהנמוך לגבוה : ‏(גובה, שורה, עמודה)</figcaption><ol class="rw-heap" dir="ltr"></ol></figure></div>` +
       `<p class="rw-step" aria-live="polite"></p><p class="rw-code"></p>`;
     const $ = (s) => box.querySelector(s);
     const play = $(".ex-play"), speed = $(".ex-speed");

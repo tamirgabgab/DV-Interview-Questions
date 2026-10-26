@@ -6,6 +6,8 @@
 // models for the question tests.
 (() => {
   const { f, fmt, ltr, seedControls } = dvqExplorers.lib;
+  // a number in scientific notation with a real superscript: 4.14·10<sup>-8</sup>
+  const sci10 = (v) => { const [m, e] = Number(v).toExponential(2).split("e"); return `${m}·10<sup>${Number(e)}</sup>`; };
   const NB = "\u00a0";
 
   // Synchronizer MTBF (0037): exp(t_res / tau) / (T0 f_clk f_data) with
@@ -20,7 +22,7 @@
     if (s <= 0) return "0";
     const units = [["שנים", YEAR], ["ימים", 86400], ["שעות", 3600], ["דקות", 60], ["שניות", 1], ["ms", 1e-3], ["µs", 1e-6]];
     for (const [name, u] of units) {
-      if (s >= u) { const v = s / u; return `${v < 1e6 ? Number(v.toPrecision(3)) : v.toExponential(2).replace("e+", "·10^")} ${name}`; }
+      if (s >= u) { const v = s / u; return `${v < 1e6 ? Number(v.toPrecision(3)) : sci10(v)} ${name}`; }
     }
     return `${s.toExponential(2)} s`;
   };
@@ -62,10 +64,10 @@
         const T = 1000 / st.fclk;
         const rows = [1, 2, 3].map((n) => {
           const tRes = n * T - st.overhead, v = mtbfSeconds(st.fclk, st.fdata, st.tau, st.t0, st.overhead, n);
-          return `<tr><td>${n}</td><td>${tRes > 0 ? fmt(tRes, 2) : "—"} ns</td><td>${tRes > 0 ? Math.exp(tRes / (st.tau / 1000)).toExponential(2).replace("e+", "·10^") : "—"}</td><td>${mtbfHuman(v)}</td></tr>`;
+          return `<tr><td>${n}</td><td>${tRes > 0 ? fmt(tRes, 2) : "—"} ns</td><td>${tRes > 0 ? sci10(Math.exp(tRes / (st.tau / 1000))) : "—"}</td><td>${mtbfHuman(v)}</td></tr>`;
         }).join("");
-        $(".ex-summary").innerHTML = `מחזור של ${ltr(`${fmt(T, 2)} ns`)}; כניסות ל-metastability בשנייה : ${ltr(`T0 · f_clk · f_data = ${(st.t0 * 1e-12 * st.fclk * 1e6 * st.fdata * 1e6).toExponential(2).replace("e+", "·10^")}`)}; כל פלופ נוסף מכפיל את ה-MTBF ב-${ltr(`e^(T/τ) = ${Math.exp(T / (st.tau / 1000)).toExponential(2).replace("e+", "·10^")}`)}.`;
-        $(".mtbf-table").innerHTML = `<table class="pcie-table" dir="ltr"><thead><tr><th>פלופים</th><th>t_res</th><th>e^(t_res/τ)</th><th>MTBF</th></tr></thead><tbody>${rows}</tbody></table>`;
+        $(".ex-summary").innerHTML = `מחזור של ${ltr(`${fmt(T, 2)} ns`)}; כניסות ל-metastability בשנייה : ${ltr(`T0 · f_clk · f_data = ${sci10(st.t0 * 1e-12 * st.fclk * 1e6 * st.fdata * 1e6)}`)}; כל פלופ נוסף מכפיל את ה-MTBF ב-${ltr(`e<sup>T/τ</sup> = ${sci10(Math.exp(T / (st.tau / 1000)))}`)}.`;
+        $(".mtbf-table").innerHTML = `<table class="pcie-table" dir="ltr"><thead><tr><th>פלופים</th><th>t_res</th><th>e<sup>t_res/τ</sup></th><th>MTBF</th></tr></thead><tbody>${rows}</tbody></table>`;
         $(".mtbf-chart").innerHTML = `<p class="ex-title">MTBF כפונקציה של תדר השעון, לפלופ אחד (כתום), שניים (כחול) ושלושה (ירוק); הנקודות הן התדר הנבחר</p>${chart()}`;
 
       };
@@ -114,7 +116,7 @@
         `<button type="button" class="md-button md-button--primary mc-1000">${ltr("1,000")} קצוות</button></div>` +
         `<p class="ex-title mc-t1"></p><div class="mc-phase"></div>` +
         `<p class="ex-title mc-t2"></p><div class="mc-hist"></div>` +
-        `<span class="viz-legend"><span><i class="mc-key-in"></i>נפל בחלון, metastable</span><span><i class="mc-key-out"></i>נפל מחוץ לחלון</span><span><i class="ink"></i>הצפוי לפי ${ltr("e^(−t/τ)")}</span><span><i class="mc-key-cut"></i>מעבר ל-${ltr("t_res")} : כשל</span></span>` +
+        `<span class="viz-legend"><span><i class="mc-key-in"></i>נפל בחלון, metastable</span><span><i class="mc-key-out"></i>נפל מחוץ לחלון</span><span><i class="ink"></i>הצפוי לפי ${ltr("e<sup>−t/τ</sup>")}</span><span><i class="mc-key-cut"></i>מעבר ל-${ltr("t_res")} : כשל</span></span>` +
         `<div class="mc-table"></div><p class="ex-summary mc-sum" aria-live="polite"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const hash = (i) => ((i * 0.6180339887) % 1);
@@ -151,7 +153,7 @@
         for (let b = 0; b <= 4; b++) { const t = (b * xmax) / 4; s += `<text class="tick" x="${f(X(t))}" y="${Y1 + 18}" text-anchor="${b === 4 ? "end" : "middle"}">${fmt(t / 1000, 2)} ns</text>`; }
         return s + `<line class="axis" x1="${X0}" x2="${X1}" y1="${Y1}" y2="${Y1}"/></svg>`;
       };
-      const sci = (v) => (v >= 0.01 && v < 1e4 ? Number(v.toPrecision(3)).toLocaleString("en-US") : v.toExponential(2).replace("e+", "·10^").replace("e-", "·10^-"));
+      const sci = (v) => (v >= 0.01 && v < 1e4 ? Number(v.toPrecision(3)).toLocaleString("en-US") : sci10(v));
       const draw = () => {
         const r = metaFactors(FCLK, FDATA, st.tau, st.t0, OVER, st.flops), d = st.draw, n = d.phases.length, k = d.settle.length;
         const late = d.settle.filter((t) => t >= r.tRes).length;
@@ -163,11 +165,11 @@
         $(".mc-hist").innerHTML = histSvg(d, r);
         $(".mc-table").innerHTML = `<table class="bridge-table mc-factors"><thead><tr><th>הגורם</th><th>בהגרלה</th><th>בנוסחה</th></tr></thead><tbody>` +
           `<tr><td>חלק הקצוות שנופלים בחלון</td><td>${ltr(`${k}/${n} = ${fmt(k / n, 4)}`)}</td><td>${ltr(`T0 · f_clk = ${fmt(r.pEnter, 4)}`)}</td></tr>` +
-          `<tr><td>מהם, חלק שלא התייצב עד ${ltr("t_res")}</td><td>${ltr(k ? `${late}/${k}` : "—")}</td><td>${ltr(`e^(−t_res/τ) = ${sci(r.pStay)}`)}</td></tr>` +
+          `<tr><td>מהם, חלק שלא התייצב עד ${ltr("t_res")}</td><td>${ltr(k ? `${late}/${k}` : "—")}</td><td>${ltr(`e<sup>−t_res/τ</sup> = ${sci(r.pStay)}`)}</td></tr>` +
           `<tr><td>כניסות ל-metastability בשנייה</td><td>${ltr(sci((k / n) * FDATA * 1e6))}</td><td>${ltr(`T0 · f_clk · f_data = ${sci(r.enterPerSec)}`)}</td></tr></tbody></table>`;
         $(".mc-sum").innerHTML = `ה-MTBF הוא ההופכי של המכפלה${NB}: ${ltr(`1 / (${sci(r.enterPerSec)} · ${sci(r.pStay)})`)}, כלומר ${mtbfHuman(r.mtbf)}. ` +
           (late ? `בהגרלה הזו ${ltr(late)} ${late === 1 ? "קצה לא התייצב" : "קצוות לא התייצבו"} בזמן, והם הכשלים.` : `אף קצה בהגרלה לא עבר את החתך, כי הזנב המעריכי דועך מהר.`) +
-          ` כל פלופ נוסף מזיז את החתך ב-${ltr(`T_clk = ${fmt(r.T / 1000, 1)} ns`)} ימינה, ומכפיל את ה-MTBF ב-${ltr(`e^(T_clk/τ) = ${sci(Math.exp(r.T / st.tau))}`)}.`;
+          ` כל פלופ נוסף מזיז את החתך ב-${ltr(`T_clk = ${fmt(r.T / 1000, 1)} ns`)} ימינה, ומכפיל את ה-MTBF ב-${ltr(`e<sup>T_clk/τ</sup> = ${sci(Math.exp(r.T / st.tau))}`)}.`;
       };
       const redraw = () => { st.draw = metaDraw(st.count, 1e6 / FCLK, st.t0, st.tau, st.rnd()); draw(); };
       // a seeded draw: the phases and the settling times both come from one generator, so a

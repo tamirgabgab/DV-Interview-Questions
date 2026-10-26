@@ -153,11 +153,11 @@
           return ballSvg(b, x, y, `${cls(b)}${removed.has(b) ? " is-helper" : ""}`, `כדור ${b}, מחוץ למאזניים${removed.has(b) ? " : כדור תקין שהוצא כדי לאזן" : ""}`);
         };
         const H = top + BEAM + 72 + (Math.max(offRows, 1) - 1) * STEP + R + 8;
-        const end = g.W - 70;
+        const reach = ((g.per - 1) / 2) * STEP + R + 4, start = g.left - reach, end = g.right + reach;   // the beam under the widest row of balls
         return `<svg class="figure ob-svg" viewBox="0 0 ${g.W} ${H.toFixed(0)}" role="img" aria-label="שקילה ${j + 1} : ${p.L.join(", ") || "אף כדור"} מול ${p.R.join(", ") || "אף כדור"}, ${WORD[out]}">` +
           `<g transform="translate(0 ${top})">` +
           `<path class="ob-stand" d="M${PIVOT - 30},${BEAM + 40} L${PIVOT},${BEAM + 4} L${PIVOT + 30},${BEAM + 40} Z"/>` +
-          `<line class="ob-beam" x1="70" y1="${beamY(70).toFixed(1)}" x2="${end}" y2="${beamY(end).toFixed(1)}"/>` +
+          `<line class="ob-beam" x1="${start.toFixed(1)}" y1="${beamY(start).toFixed(1)}" x2="${end.toFixed(1)}" y2="${beamY(end).toFixed(1)}"/>` +
           pan(p.L, g.left) + pan(p.R, g.right) +
           (off.length ? `<text class="ob-off-label" x="${g.W - 4}" y="${(BEAM + 50).toFixed(1)}" text-anchor="start" direction="rtl">בחוץ</text>` : "") +
           off.map(offBall).join("") +
