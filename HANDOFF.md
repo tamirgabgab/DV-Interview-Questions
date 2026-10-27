@@ -46,6 +46,7 @@ pushed to `main`, which publishes the site.
 | Run button            | Per question, Python only (Pyodide in a web worker); SV cannot run in a browser, the panel says it is checked in CI instead |
 | Position levels       | Student / Junior / Senior; the Staff level was removed on 2026-10-21 (owner: no staff questions planned) |
 | Look and feel         | Own navy + amber palette, logo and footer; level / difficulty as CSS chips; one header card per question (see **Site redesign plan**) |
+| Next rounds (2026-10-27) | Owner: no rounds of new questions for now; only improve the existing questions, the site and its interfaces (series S). The question proposals X360 to X410 stay listed for later |
 
 ---
 
@@ -1199,7 +1200,7 @@ section below starts at session 22, whose numbered items run on through the late
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
 - [ ] Fifth series: W1 to W4 done on the branch (W348's drawn check mark not picked); W5 not picked; `main` when the owner asks.
-- [ ] Pick rounds from **Proposals** (the sixth series X360 to X392, round Y's leftovers, the chat questions X399 to X410); the older proposals are in the archive.
+- [ ] Pick rounds from **Proposals**: the owner's current direction is the eighth series, S1 to S6 (improve what exists, no new questions); the question proposals X360 to X410 wait; the older proposals are in the archive.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
@@ -1409,6 +1410,61 @@ test before writing a page.
 X399 and X405 to X410 can form a "sliding window" study path in the order X410, X399,
 X406, X409, X408, X407, X405, with one shared box (the string as a row of cells, the window
 as a moving frame, the counter map beside it, left and right stepping).
+
+## Proposals — eighth series, rounds S1 to S6, improve what exists (session 27, 2026-10-27)
+
+At the owner's request: no new questions, only the existing 58 questions, the site and its
+interfaces. Numbers from the built site and the repository on 2026-10-27. Item numbers
+continue at 411.
+
+**Round S1 — the questions' practice tools (content, no new questions)**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S411 | 35 of the 49 starting scripts (`tests/<id>/demo.py`) have no expected value in their `print()` comments, so the run panel shows no ✓ / ✗ for them | add the expected value to every `print()` of those demos (the test already checks each one) | M |
+| S412 | 9 questions have no run panel: 0001, 0015, 0021, 0026, 0027, 0028, 0029, 0048, 0049 | a starting script for each whose page has Python code; 0049 (UVM) and any without Python get a note instead | M |
+| S413 | 36 questions have no "try it yourself" answer field (`selfcheck`, 22 have one) | a self-check field on every part whose answer is a number, a formula value or a short word | M |
+| S414 | 0001 is still the example question (owner decision open since session 1) | rewrite it as a full question, or drop it and renumber nothing (ids stay) | S |
+
+**Round S2 — figures where a page has none**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S415 | 11 pages have no static figure (0001, 0002, 0003, 0034, 0036, 0038, 0045, 0046, 0047, 0057, 0059); their only picture is the box | one generated figure each where it explains the idea at a glance (0046 the DP grid, 0047 the water profile, 0045 the weighing tree, 0038 the handshake waveform...), via `tools/figures/` | L |
+
+**Round S3 — the boxes: bugs and consistency**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S416 | `check_explorers.py` warns that a box link or the remembered state draws another box: 0016 (Josephus, 8 steps instead of 21) and the Floyd box (4 instead of 1) are real differences | fix the state codec of those boxes so a link and a reload restore the same box | M |
+| S417 | the same check warns on 0036, 0020 and the cake box only because attributes come back in another order (`style` and `data-fit-base`) | compare the boxes with attributes in a fixed order, so only real differences warn | S |
+| S418 | box controls on a phone: icon buttons without names, presets that wrap into several rows on some boxes | one review pass of every box at 390 px: names under the playback icons on touch, presets in one scrolling row | M |
+
+**Round S4 — the question page and navigation**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S419 | the path box shows the previous and next steps as ids only ("הקודם : 0002") | the title beside the id, cut with an ellipsis on a phone | S |
+| S420 | the page tools are five icons without names; a touch screen has no hover tooltip | a one-time row of names under the icons on a phone (dismissed and remembered), and the names in the toolbar's accessible labels as today | S |
+| S421 | the side navigation wraps long titles into two or three lines (0023: "Endpoint – כתיבה, קריאה ושידור Completions") | one line per question with an ellipsis and the full title as a tooltip, the current one highlighted | S |
+| S422 | a question cannot be printed or saved as a clean PDF (the toolbar, boxes and folds print as they are) | a print style: solutions open, boxes replaced by their figures, no toolbar or navigation | M |
+
+**Round S5 — speed and access**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S423 | the heaviest pages are 0016 (396 KB of HTML), 0025 (312 KB), 0023, 0024 (248 KB each) | find what makes them heavy (inline SVG repeated in tabs, long tables) and trim it; a page-weight line in the phone check | M |
+| S424 | the 404 page cannot be checked locally (its assets point at the site path) and was never looked at | a check of the live 404 at both widths, and a local check that serves the site under its path | S |
+| S425 | keyboard and screen-reader paths were checked by axe only | one manual pass: tab order on a question, the folds, the boxes, the run panel and the search | M |
+
+**Round S6 — the code behind the site**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S426 | `extra.css` is 3,970 lines written over many rounds; components are styled in several places (the question header at line 150 and again at 3090) | regroup it by component, drop rules that match nothing in the built site (a small script finds them), with the phone, jump and contrast checks proving nothing moved | L |
+
+Suggested order: S1 (the most use for a reader preparing), S4, S3, S2, S5, S6. Every round
+ends with the full check set and the owner's look at the live site.
 
 ## Technical notes for whoever continues this work
 
