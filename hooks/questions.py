@@ -803,17 +803,19 @@ def _run_panel(q: dict, markdown: str) -> str:
 
 <details class="example py-runner">
 <summary>▶ הרצת קוד ה-Python של השאלה</summary>
-<p class="py-runner-note">הפונקציות מהפתרון כבר טעונות. אפשר לשנות את הקוד שבתיבה ולהריץ שוב.
-ההרצה הראשונה טוענת את Python לדפדפן ולוקחת כמה שניות.</p>
+<p class="py-runner-note">הפונקציות מהפתרון כבר טעונות. אפשר לשנות את הקוד שבתיבה ולהריץ שוב
+(Ctrl+Enter). ליד כל <code>print</code> שבהערה שלו כתוב הערך הצפוי מופיע סימן אחרי ההרצה.</p>
 <script type="application/json" class="py-page-code">{json.dumps(page_code).replace("</", "<\\/")}</script>
-<textarea class="py-editor" aria-label="הקוד להרצה (Python)" spellcheck="false" dir="ltr" rows="{min(max(demo_code.count(chr(10)) + 1, 6), 22)}">{html.escape(demo_code)}</textarea>
+<div class="py-editor-wrap"><textarea class="py-editor" aria-label="הקוד להרצה (Python)" spellcheck="false" dir="ltr" rows="{min(max(demo_code.count(chr(10)) + 1, 6), 22)}">{html.escape(demo_code)}</textarea></div>
 <div class="py-buttons">
 <button type="button" class="md-button md-button--primary py-run">▶ הרץ</button>
 <button type="button" class="md-button py-stop" disabled>עצור</button>
 <button type="button" class="md-button py-reset">איפוס</button>
-<span class="py-status"></span>
+<span class="py-status" role="status" aria-live="polite"></span>
 </div>
-<pre class="py-output" dir="ltr"></pre>
+<ol class="py-stages" hidden aria-hidden="true"><li data-stage="download">מוריד את Python (פעם אחת)</li><li data-stage="run">טוען את הפתרון ומריץ</li></ol>
+<div class="py-output-wrap" hidden><button type="button" class="py-copy" title="העתקת הפלט" aria-label="העתקת הפלט"></button><pre class="py-output" dir="ltr"></pre></div>
+<div class="py-checks" hidden></div>
 {sv_note}
 </details>
 """

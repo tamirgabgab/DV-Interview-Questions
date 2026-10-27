@@ -577,7 +577,7 @@
 }
 
 .md-typeset .py-runner .py-output.py-failed {
-  border-inline-start: 0.2rem solid var(--md-typeset-del-color, #e34948);
+  border-inline-start: 0.2rem solid var(--adm-trap);
 }
 
 .md-typeset .py-runner-note {
@@ -3314,7 +3314,7 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
    no page tools, box controls, messages or comments; a box prints its figures and summary
    as they stand. */
 @media print {
-  .md-typeset :is(.question-tools, .part-nav, .ex-bar, .ex-controls, .ex-scrubwrap, .ex-keys, .ex-guide, .py-runner, .comments, .comments-note, .hh-tools),
+  .md-typeset :is(.question-tools, .part-nav, .ex-bar, .ex-controls, .ex-scrubwrap, .ex-keys, .ex-guide, .py-runner, .py-from-code, .comments, .comments-note, .hh-tools),
   .dvq-toast, .dvq-confetti, .md-content__button { display: none !important; }
   .md-typeset details.tip.hint-locked { display: block; }
   .md-typeset :is(.admonition, details) { page-break-inside: auto; break-inside: auto; }   /* the theme keeps each block whole, which leaves near-blank pages */
@@ -3473,3 +3473,56 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset details.question > summary { background-color: transparent; }
 .md-typeset details.question > summary::before { background-color: var(--md-typeset-a-color); }
 .md-typeset details.question > summary::after { color: var(--md-default-fg-color--light); }
+
+/* Round W4 (session 27): the run panel. */
+/* W349: the CodeMirror editor takes the textarea's place (both left to right). */
+.md-typeset .py-runner .py-editor-wrap { margin: var(--sp-2) 0; direction: ltr; text-align: left; }
+.md-typeset .py-runner .py-editor-wrap .cm-editor { border: 1px solid var(--site-card-border); }
+.md-typeset .py-runner .py-editor[hidden] { display: none; }
+
+/* W350: the status as a chip, and the stages as a line of steps while Python loads. */
+.md-typeset .py-runner .py-status:not(:empty) { display: inline-flex; align-items: center; gap: var(--sp-1); padding: 0.05rem 0.6rem; border-radius: 999px; background: var(--site-primary-soft); color: var(--md-default-fg-color); font-weight: 600; }
+.md-typeset .py-runner .py-status.is-ok { background: var(--diff-easy-bg); color: var(--diff-easy); }
+.md-typeset .py-runner .py-status.is-bad { background: color-mix(in srgb, var(--adm-trap) 14%, transparent); color: var(--adm-trap); }
+.md-typeset .py-runner .py-status.is-busy::before { content: ""; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--md-typeset-a-color); }
+.md-typeset ol.py-stages { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-3); margin: var(--sp-2) 0 0; padding: 0; list-style: none; font-size: 0.68rem; color: var(--md-default-fg-color--light); }
+.md-typeset ol.py-stages[hidden] { display: none; }
+.md-typeset ol.py-stages > li { position: relative; margin: 0; padding-inline-start: 1.1rem; }
+.md-typeset ol.py-stages > li::before { content: ""; position: absolute; inset-inline-start: 0; top: 50%; width: 0.6rem; height: 0.6rem; margin-top: -0.3rem; border: 2px solid var(--md-default-fg-color--lighter); border-radius: 50%; box-sizing: border-box; }
+.md-typeset ol.py-stages > li.is-now { color: var(--md-default-fg-color); font-weight: 600; }
+.md-typeset ol.py-stages > li.is-now::before { border-color: var(--md-typeset-a-color); border-inline-end-color: transparent; }
+.md-typeset ol.py-stages > li.is-done::before { border-color: var(--diff-easy); background: var(--diff-easy); }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .py-runner .py-status.is-busy::before { animation: py-pulse 1s ease-in-out infinite alternate; }
+  .md-typeset ol.py-stages > li.is-now::before { animation: py-spin 0.8s linear infinite; }
+  @keyframes py-pulse { from { opacity: 0.35; } }
+  @keyframes py-spin { to { transform: rotate(360deg); } }
+}
+
+/* W351: the output like a terminal in the site's code colours, a copy button, errors in
+   the trap colour and a traceback's line as a link into the editor. */
+.md-typeset .py-runner .py-output-wrap { position: relative; margin: var(--sp-2) 0 0; }
+.md-typeset .py-runner .py-output-wrap[hidden] { display: none; }
+.md-typeset .py-runner .py-output-wrap .py-output { margin: 0; padding: var(--sp-2) var(--sp-3); padding-right: 2.4rem; border: 1px solid var(--site-card-border); border-radius: var(--radius-s); }
+.md-typeset .py-runner .py-output-wrap.py-failed .py-output { border-inline-start: 0.2rem solid var(--adm-trap); }
+.md-typeset .py-runner .py-output .py-err { color: var(--adm-trap); }
+.md-typeset .py-runner .py-line-link { padding: 0; border: 0; background: none; color: var(--md-typeset-a-color); font: inherit; text-decoration: underline; cursor: pointer; }
+.md-typeset .py-runner .py-copy { position: absolute; z-index: 1; top: var(--sp-1); right: var(--sp-1); width: 1.6rem; height: 1.6rem; padding: 0; border: 0; border-radius: var(--radius-s); background: transparent; color: var(--md-default-fg-color--light); cursor: pointer; }
+.md-typeset .py-runner .py-copy::before { content: ""; display: block; width: 1rem; height: 1rem; margin: auto; background-color: currentColor; -webkit-mask: var(--md-clipboard-icon) center / contain no-repeat; mask: var(--md-clipboard-icon) center / contain no-repeat; }
+.md-typeset .py-runner .py-copy:is(:hover, :focus-visible) { color: var(--md-typeset-a-color); }
+.md-typeset .py-runner .py-copy.is-copied { color: var(--diff-easy); }
+
+/* W352: the output check under the output. */
+.md-typeset .py-runner .py-checks { margin: var(--sp-2) 0 0; font-size: 0.72rem; }
+.md-typeset .py-runner .py-checks[hidden] { display: none; }
+.md-typeset .py-runner .py-checks-head { margin: 0; font-weight: 600; }
+.md-typeset .py-runner .py-checks-head.is-ok { color: var(--diff-easy); }
+.md-typeset .py-runner .py-checks-head.is-bad { color: var(--adm-trap); }
+.md-typeset .py-runner .py-checks ul { margin: var(--sp-1) 0 0; padding: 0; list-style: none; }
+.md-typeset .py-runner .py-checks li { margin: 0; color: var(--adm-trap); }
+.md-typeset .py-runner .py-checks li code { color: var(--md-code-fg-color); }
+.md-typeset .py-runner .py-runner-note.is-flash { background: var(--md-accent-fg-color--transparent); border-radius: var(--radius-s); }
+
+/* W353: the run button under a code tab of the solution. */
+.md-typeset .py-from-code { display: inline-flex; align-items: center; margin: var(--sp-1) 0 0; padding: 0.1rem 0.7rem; border: 1px solid currentColor; border-radius: 999px; background: transparent; color: var(--md-typeset-a-color); font: inherit; font-size: 0.68rem; cursor: pointer; transition: background-color var(--dur-1) var(--ease); }
+.md-typeset .py-from-code:is(:hover, :focus-visible) { background: var(--site-primary-soft); }

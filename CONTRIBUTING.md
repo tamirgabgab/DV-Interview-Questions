@@ -94,6 +94,7 @@ DV-Interview-Questions/
 │   ├── new_question.py         # Scaffold: page, tests folder, generator stub, catalog row
 │   ├── catalog.py              # Writes CATALOG.md from the pages' front matter
 │   ├── page_tests.py           # Test helpers: Node runner, "page blocks match the generator"
+│   ├── codemirror/             # entry.js + build.sh: the run panel's editor bundle
 │   └── figures/                # Generators of the inline SVG figures (q<id>.py with blocks()),
 │                               # charts.py (shared chart helpers), fill.py (puts blocks on pages),
 │                               # stepper.py, cake.py
@@ -127,7 +128,8 @@ DV-Interview-Questions/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
 │   │   ├── images/             # Figures and screenshots referenced by questions
 │   │   └── spider-fly.html     # The owner's standalone spider-and-fly tool, embedded by 0030 (kept as sent)
-│   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner,
+│   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner
+│   │                           # (run-python.js, py-worker.js, py_run.py, vendor/codemirror.min.js), home.js,
 │   │                           # reading-tools.js (lightbox, tooltips, part bar), and explorer/:
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
 │   └── stylesheets/extra.css   # Palette, chips, question header, tables / cards, figures
@@ -183,7 +185,19 @@ Conventions:
 - **Every code answer is tested automatically** (see [Tests](#tests) below): the tests run
   the code exactly as it appears on the page, and the site is only published when they pass.
 - **Questions with code get a "run" panel**: the page's Python code runs in the reader's
-  browser (Pyodide), with an editable starting script from `tests/<id>/demo.py`.
+  browser (Pyodide), with an editable starting script from `tests/<id>/demo.py`. The page
+  code is importable as the module `solution` (`from solution import *`) and its names are
+  also in scope. A comment on a `print()` line is its expected value
+  (`print(trap([3, 0, 2, 0, 4]))  # 7`; a note may follow after two spaces and a
+  parenthesis, or after a colon and words): after a run the panel puts a ✓ or ✗ beside
+  that line and lists the mismatches, so do not put other remarks on a `print()` line.
+  `docs/javascripts/py_run.py` does the running and the check, in the browser and in
+  `tests/tools/test_run_panel.py`, which runs every demo against its page and fails on an
+  error or a comment that does not match. Opening a panel by hand starts downloading
+  Python and swaps the textarea for a CodeMirror editor (`docs/javascripts/vendor/
+  codemirror.min.js`, built by `tools/codemirror/build.sh` from `tools/codemirror/entry.js`
+  with pinned versions; never loaded from a CDN). Every Python and SystemVerilog tab of a
+  solution's code gets a "▶ להרצה" button that opens the panel.
 - **Math stays symbolic**: no Hebrew inside MathJax (`\text{...}` renders Hebrew reversed);
   Hebrew goes in the surrounding sentence.
 - **RTL-safe text:** every line, list item and table cell starts with a Hebrew word, or

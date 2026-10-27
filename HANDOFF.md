@@ -902,6 +902,32 @@ section below starts at session 22, whose numbered items run on through the late
     until something is solved (level cards too); the PCIe path renamed "פרוטוקולים ומודלי
     ייחוס". W343: six FAQ items at the end of the home page (DV, a DV interview, which
     level, how to practise, where progress is kept, offline), styled in the site's navy.
+62. **Round W4, the run panel (session 27, 2026-10-27).** The owner's picks: the output in
+    the site's code colours (not a dark terminal), Python fetched when the panel opens, a
+    mismatch shown with the expected value, a run button on the SystemVerilog tabs too.
+    **Bug found and fixed:** 16 starting scripts (0016, 0033 to 0047) begin with `from
+    solution import *`, but the worker never made a module `solution`, so their panels
+    failed at once with `ModuleNotFoundError` on the live site (reproduced in Pyodide 0.26.4
+    under Node). `docs/javascripts/py_run.py` now runs a panel: the page code as the module
+    `solution` and in scope, the reader's code as your_code.py, and the output check;
+    `py-worker.js` loads it, `tests/tools/test_run_panel.py` runs every demo (39) against
+    its page in CPython and fails on an error or a commented `print()` whose output differs;
+    all 39 also ran clean through `py_run.py` in Pyodide under Node (15 checks, 0 bad).
+    W349: CodeMirror 6 (Python, line numbers, the site's code colours, Ctrl+Enter runs)
+    bundled into `docs/javascripts/vendor/codemirror.min.js` (361 KB, 122 KB gzipped) by
+    `tools/codemirror/build.sh` from `tools/codemirror/entry.js`, loaded on the first open,
+    the textarea kept when it fails. W350: a reader's own opening of the panel (a trusted
+    click, or a run button; not "open all" or the page checks) starts the worker; stages
+    "מוריד את Python (פעם אחת)" → "טוען את הפתרון ומריץ" with a spinner, the status as a
+    chip (busy, done ✓ with the time, error). W351: the output with a copy button, stderr
+    and errors in the trap colour, `File "your_code.py", line N` a link that selects the
+    line. W352: ✓ / ✗ in the editor's gutter beside each commented `print()` that ran once,
+    and a line "בדיקת פלט : 5 מתוך 6 ..." with the mismatches (got, expected); only 0016,
+    0044, 0046 and 0047 have such comments today (15 prints). W353: "▶ להרצה בדפדפן" under
+    every Python tab of a solution, "▶ להרצה (גרסת ה-Python)" under every SystemVerilog tab
+    (it opens the panel and flashes its Verilator note). Local check: the worker bypasses
+    Playwright routing, so a test page builds it from its source with Pyodide and
+    `py_run.py` pointed at local copies (scratch script, not in the repository).
 
 ## In progress
 
@@ -929,8 +955,9 @@ section below starts at session 22, whose numbered items run on through the late
   `mkdocs.yml`; a look at the social card of a shared link; keep or replace 0001.
 - **Session 27:** a visual review and the fifth series W1 to W5 (look, motion, the run
   panel, practice tools); the owner picked W1 to W4 (catalog on its own page, amber traps,
-  off-white, CodeMirror). W1 and W2 are done on the branch (work log items 60, 61), not
-  yet on `main`; W3 and W4 are next, with multiple-choice questions before each round.
+  off-white, CodeMirror). W1, W2 and W4 are done on the branch (work log items 60 to 62), not
+  yet on `main`; W3 is next, with multiple-choice questions before it. Content idea: add
+  expected-value comments to the `print()` lines of more demos (only 4 of 39 have them).
 - **Next, the owner picks:** the fifth series W1 to W5, the rest of the second series A to E, the new questions of
   M to R and Z, the deferred G222, H223, H224 and E35, the three coding proposals of
   session 24 (meeting rooms, topological sort, single number II), the topic gaps under
@@ -948,7 +975,7 @@ section below starts at session 22, whose numbered items run on through the late
 
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
-- [ ] Fifth series: W1 and W2 done on the branch; W3 and W4 next; W5 not picked; `main` when the owner asks.
+- [ ] Fifth series: W1, W2 and W4 done on the branch; W3 next; W5 not picked; `main` when the owner asks.
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 - [ ] Pick the next rounds from **Proposals and rounds**: the open rows of the first series (E, F, I, L, N, O, the rest of Q, S), the rest of the second series A to E, the deferred G222, H223, H224, and the new questions of M to R and Z. Done: U to X (in the archive), I to L, the third series UI1 to UI5.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
@@ -1902,11 +1929,11 @@ Item numbers continue the global count (333 on).
 
 | Id | Idea | Size |
 |---|---|---|
-| W349 | **A real editor**: CodeMirror 6 loaded on the first open (syntax colours from the site's tokens, line numbers, Ctrl+Enter runs), the `textarea` as the fallback | M |
-| W350 | **Loading you can see** (the owner's skeleton-loading idea): Pyodide fetched when the panel opens, a progress line with stages (מוריד Python, פעם אחת → טוען את הפתרון → מריץ) instead of a grey sentence, the status as a coloured chip (running, done ✓ with the time, error) | S–M |
-| W351 | **Terminal-style output**: a dark panel, a copy button, an error's line number jumps to that line in the editor | S–M |
-| W352 | **Expected output checked**: the starter code's `# (9, (0, 2), (2, 4))` comments are compared with each printed line, ✓ or ✗ beside it (a check-yourself step for free) | M |
-| W353 | **Run from the code**: a "להרצה" button on the Python tab of a solution's code block opens the panel with that code and scrolls to it | S–M |
+| ~~W349~~ | ~~**A real editor**: CodeMirror 6 loaded on the first open (syntax colours from the site's tokens, line numbers, Ctrl+Enter runs), the `textarea` as the fallback~~ done (session 27) | M |
+| ~~W350~~ | ~~**Loading you can see** (the owner's skeleton-loading idea): Pyodide fetched when the panel opens, a progress line with stages (מוריד Python, פעם אחת → טוען את הפתרון → מריץ) instead of a grey sentence, the status as a coloured chip (running, done ✓ with the time, error)~~ done (session 27) | S–M |
+| ~~W351~~ | ~~**Terminal-style output**: a dark panel, a copy button, an error's line number jumps to that line in the editor~~ done (session 27) | S–M |
+| ~~W352~~ | ~~**Expected output checked**: the starter code's `# (9, (0, 2), (2, 4))` comments are compared with each printed line, ✓ or ✗ beside it (a check-yourself step for free)~~ done (session 27) | M |
+| ~~W353~~ | ~~**Run from the code**: a "להרצה" button on the Python tab of a solution's code block opens the panel with that code and scrolls to it~~ done (session 27) | S–M |
 
 **Round W5 — practice tools from the owner's list, for technical interviews**
 
