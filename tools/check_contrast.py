@@ -67,6 +67,7 @@ PAIRS = [
     ("ladder cell label, a term", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
     *[(f"code {k}", f"var(--md-code-hl-{k}-color)", ["var(--md-code-hl-color--light)", "var(--md-code-bg-color)"], TEXT)
       for k in ("function", "special", "constant", "number", "string", "variable", "generic", "operator")],
+    ("orange text, highlighted row", "var(--viz-s2-text)", ["var(--md-code-bg-color)"], TEXT),
     ("body text on a card", "var(--md-default-fg-color)", ["var(--site-surface)"], TEXT),
     ("trap group title", "var(--adm-trap)", ["var(--site-surface)"], TEXT),
     ("trap number", "var(--site-surface)", ["var(--adm-trap)"], TEXT),

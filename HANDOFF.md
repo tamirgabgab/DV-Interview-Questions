@@ -928,6 +928,29 @@ section below starts at session 22, whose numbered items run on through the late
     (it opens the panel and flashes its Verilator note). Local check: the worker bypasses
     Playwright routing, so a test page builds it from its source with Pyodide and
     `py_run.py` pointed at local copies (scratch script, not in the repository).
+63. **Round W3, motion and one sticky row (session 27, 2026-10-27).** The owner's picks:
+    one translucent row, "back to top" as a round button in the bottom corner, W344, W345
+    and W346 (not the drawn check mark of W348), and for a completed path a message with
+    confetti. W344: `home.js` gives the home page's headings, lists, cards and FAQ items
+    `.w-reveal` and an `IntersectionObserver` lifts each once (400 ms, a 40 ms stagger in a
+    row of cards); nothing hides without the script, under reduced motion or when
+    `navigator.webdriver` is set (the page checks). W345: level, path and step cards rise
+    2 px under a real pointer (`hover: hover`), buttons and chips press to 0.97, the arrow of
+    "להתחיל לתרגל" nudges. W346: `::details-content` with `interpolate-size: allow-keywords`
+    animates the opening of every details outside the boxes (300 ms; other browsers open at
+    once). W347: the solution map stays in its solution (no longer sticky); the part bar
+    holds `.pn-sol`, a copy of the map of the open solution whose own row has scrolled
+    above the bar, with the current block marked (`reading-tools.js`, `syncSlot`); the bar
+    is translucent with `backdrop-filter: blur(10px)` (solid where unsupported), and the
+    fixed bar of a page without parts becomes a full row while it holds a map; `.md-top` is
+    a 2.6 rem circle at the bottom left. W348 (part): the toolbar carries `data-paths` (the
+    question's paths, their ids and the next path); marking the last unsolved question of a
+    path shows "סיימת את המסלול ..." with a link to the next path, and confetti. Found by
+    the page checks on the way (W1 and W2 follow-ups): the path cards overflowed a phone
+    (a one-line title in a `1fr` grid column; now `minmax(0, 1fr)`, and the title wraps
+    under 45em), and the orange running text was under 4.5:1 on a highlighted table row of
+    0027, 0028 and 0031 (the row is the code background, now darker): `--viz-s2-text`
+    `#bf4a16` → `#ab4213`, with a new contrast pair.
 
 ## In progress
 
@@ -955,8 +978,8 @@ section below starts at session 22, whose numbered items run on through the late
   `mkdocs.yml`; a look at the social card of a shared link; keep or replace 0001.
 - **Session 27:** a visual review and the fifth series W1 to W5 (look, motion, the run
   panel, practice tools); the owner picked W1 to W4 (catalog on its own page, amber traps,
-  off-white, CodeMirror). W1, W2 and W4 are done on the branch (work log items 60 to 62), not
-  yet on `main`; W3 is next, with multiple-choice questions before it. Content idea: add
+  off-white, CodeMirror). W1 to W4 are done on the branch (work log items 60 to 63), not yet on
+  `main`; `main` when the owner asks. Content idea: add
   expected-value comments to the `print()` lines of more demos (only 4 of 39 have them).
 - **Next, the owner picks:** the fifth series W1 to W5, the rest of the second series A to E, the new questions of
   M to R and Z, the deferred G222, H223, H224 and E35, the three coding proposals of
@@ -975,7 +998,7 @@ section below starts at session 22, whose numbered items run on through the late
 
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
-- [ ] Fifth series: W1, W2 and W4 done on the branch; W3 next; W5 not picked; `main` when the owner asks.
+- [ ] Fifth series: W1 to W4 done on the branch (W348's drawn check mark not picked); W5 not picked; `main` when the owner asks.
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 - [ ] Pick the next rounds from **Proposals and rounds**: the open rows of the first series (E, F, I, L, N, O, the rest of Q, S), the rest of the second series A to E, the deferred G222, H223, H224, and the new questions of M to R and Z. Done: U to X (in the archive), I to L, the third series UI1 to UI5.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
@@ -1919,11 +1942,11 @@ Item numbers continue the global count (333 on).
 
 | Id | Idea | Size |
 |---|---|---|
-| W344 | **Fade and rise on scroll** for the home sections and cards (`IntersectionObserver`, a 40 ms stagger, content visible without JS) | S |
-| W345 | **Card hover and press**: level, path, recent and related cards rise 2 px with shadow 2; buttons press to 0.98; the arrow of "להתחיל לתרגל" nudges | S |
-| W346 | **Smooth opening** of hints, solutions, traps and follow-ups (`::details-content` with `interpolate-size`; browsers without it open at once) | S–M |
-| W347 | **One sticky row**: the part bar and the solution map merged, translucent with `backdrop-filter: blur` (the one glass element), "חזרה למעלה" moved off the text column | M |
-| W348 | **The check mark draws itself** when a question is marked solved; a small celebration when a path is completed | S |
+| ~~W344~~ | ~~**Fade and rise on scroll** for the home sections and cards (`IntersectionObserver`, a 40 ms stagger, content visible without JS)~~ done (session 27) | S |
+| ~~W345~~ | ~~**Card hover and press**: level, path, recent and related cards rise 2 px with shadow 2; buttons press to 0.98; the arrow of "להתחיל לתרגל" nudges~~ done (session 27) | S |
+| ~~W346~~ | ~~**Smooth opening** of hints, solutions, traps and follow-ups (`::details-content` with `interpolate-size`; browsers without it open at once)~~ done (session 27) | S–M |
+| ~~W347~~ | ~~**One sticky row**: the part bar and the solution map merged, translucent with `backdrop-filter: blur` (the one glass element), "חזרה למעלה" moved off the text column~~ done (session 27) | M |
+| W348 | **The check mark draws itself** when a question is marked solved; a small celebration when a path is completed — the path message and confetti done (session 27); the drawn check mark not picked | S |
 
 **Round W4 — the run panel**
 

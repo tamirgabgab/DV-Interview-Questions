@@ -23,7 +23,8 @@
 
   // Marking a question solved (UI326): a short message at the bottom of the screen with
   // the progress of its level and a link to the level's next question not solved yet; the
-  // check mark pops, and solving the level's last question drops a short confetti. Taking
+  // check mark pops, and solving the level's last question drops a short confetti; so does
+  // completing a study path, with its own message and a link to the next path. Taking
   // the mark off says so, with an undo. Under prefers-reduced-motion only the message shows.
   const still = () => Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const TOAST_MS = 7000;
@@ -109,6 +110,30 @@
     const done = ids.filter(solved).length, n = ids.length;
     const all = n > 0 && done === n;
     pop();
+    // a study path whose questions are now all solved (W348): its own message and confetti
+    const paths = JSON.parse(bar.dataset.paths || "[]");
+    const path = paths.find((p) => p.ids.length > 1 && p.ids.every(solved));
+    if (path) {
+      confetti();
+      toast((body) => {
+        const text = document.createElement("p");
+        text.className = "dt-text";
+        const b = document.createElement("b");
+        b.textContent = "כל הכבוד!";
+        text.append(b, ` סיימת את המסלול "${path.title}"\u00a0: כל ${path.ids.length} השאלות שלו פתורות.`);
+        const meter = document.createElement("span");
+        meter.className = "dt-bar";
+        meter.setAttribute("aria-hidden", "true");
+        meter.innerHTML = '<i style="width:100%"></i>';
+        body.append(text, meter);
+        const link = document.createElement("a");
+        link.className = "dt-action";
+        link.href = path.next ? path.next.href : path.href;
+        link.textContent = path.next ? `למסלול הבא\u00a0: ${path.next.title}` : "לדף המסלול";
+        body.append(link);
+      });
+      return;
+    }
     if (all) confetti();
     toast((body) => {
       const text = document.createElement("p");

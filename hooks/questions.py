@@ -417,6 +417,16 @@ def _tools(q: dict, page_url: str) -> str:
     level_data = (f' data-level-name="{html.escape(LEVELS[q["level"]])}" data-level-ids="{" ".join(o["id"] for o in level)}"'
                   f' data-level-hrefs="{html.escape(json.dumps([_href(o["src_uri"], page_url) for o in level]))}"'
                   f' data-level-page="{_href("questions/" + q["level"] + "/index.md", page_url)}"')
+    # the study paths of the question, for the message when one of them is completed (W348)
+    paths = []
+    for i, p in enumerate(_paths):
+        ids = [s["q"]["id"] for s in p["steps"]]
+        if q["id"] in ids:
+            nxt = _paths[(i + 1) % len(_paths)] if len(_paths) > 1 else None
+            paths.append({"title": p["title"], "ids": ids, "href": _href(p["src_uri"], page_url),
+                          "next": {"title": nxt["title"], "href": _href(nxt["src_uri"], page_url)} if nxt else None})
+    if paths:
+        level_data += f' data-paths="{html.escape(json.dumps(paths, ensure_ascii=False))}"'
     return (f'<div class="question-tools" role="toolbar" aria-label="כלי השאלה" data-search-exclude data-qid="{q["id"]}"{level_data}>'
             + _tool("qt-fold", "unfold-more", "פתח הכל")
             + _tool("qt-practice", "timer", "מצב תרגול", ' aria-pressed="false"')

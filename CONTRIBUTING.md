@@ -410,6 +410,16 @@ transparent); the dark scheme keeps the page colour for surfaces and outlines it
 The footer is the brand navy. The "edit on GitHub" link sits at the end of every page
 (`overrides/partials/content.html`), not beside the title.
 
+Motion (round W3) uses the same tokens and is off under reduced motion: home page sections
+and cards rise into view once (`home.js`, which skips it in an automated browser, so the
+page checks see everything), cards rise 2 px under a real pointer and buttons press to 0.97,
+and hints, solutions and traps open smoothly where the browser animates to `auto`
+(`::details-content`, `interpolate-size`; the explorer boxes are left out). On a question
+page the part bar is the only sticky row: translucent with a blur, it carries a copy of the
+map of the solution being read (`.pn-sol`, `reading-tools.js`); the map itself stays at
+the top of its solution. "Back to top" is a round button in the bottom corner. Completing a
+study path (its last question marked solved) shows its own message and confetti.
+
 ### Diagrams, formulas and figures
 
 | Kind of figure                   | How it is written                                                  |

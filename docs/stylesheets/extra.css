@@ -446,7 +446,7 @@
   --viz-grid: #e4e3df;
   --viz-text: #52514e;
   --viz-ink: #3b3a37;
-  --viz-s2-text: #bf4a16;         /* the orange as running text: 4.5:1 on the page background */
+  --viz-s2-text: #ab4213;         /* the orange as running text: 4.5:1 on the page and on a highlighted row (code background) */
 }
 
 [data-md-color-scheme="slate"] {
@@ -1100,7 +1100,7 @@ body.practice-mode .md-typeset .question-tools {
 }
 
 @media screen and (max-width: 44.9375em) {
-  .md-typeset .level-cards { grid-template-columns: 1fr; }
+  .md-typeset .level-cards { grid-template-columns: minmax(0, 1fr); }
 }
 
 .md-typeset .level-card {
@@ -3462,7 +3462,10 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 /* W342: path cards with the title on one line, the count beside the difficulty chips, the
    same height in every row, and the "solved" bar only once something is solved. */
 @media screen and (min-width: 45em) { .md-typeset .level-cards.path-cards { grid-auto-rows: 1fr; } }
-.md-typeset .path-card .lc-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.md-typeset .path-card .lc-head, .md-typeset .path-card .lc-name { min-width: 0; }
+@media screen and (min-width: 45em) {
+  .md-typeset .path-card .lc-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
 .md-typeset .path-card .lc-diff { align-items: center; margin-top: auto; }
 .md-typeset .path-card .lc-diff .lc-count { margin-inline-end: var(--sp-1); color: var(--md-default-fg-color--light); font-size: 0.7rem; }
 .md-typeset .level-card .mark-progress.is-empty { display: none; }
@@ -3526,3 +3529,69 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 /* W353: the run button under a code tab of the solution. */
 .md-typeset .py-from-code { display: inline-flex; align-items: center; margin: var(--sp-1) 0 0; padding: 0.1rem 0.7rem; border: 1px solid currentColor; border-radius: 999px; background: transparent; color: var(--md-typeset-a-color); font: inherit; font-size: 0.68rem; cursor: pointer; transition: background-color var(--dur-1) var(--ease); }
 .md-typeset .py-from-code:is(:hover, :focus-visible) { background: var(--site-primary-soft); }
+
+/* Round W3 (session 27): motion and one sticky row. */
+/* W347: the solution map stays at the top of its solution (no longer sticky); the part
+   bar is the one sticky row, translucent over the text, and carries a copy of the map of
+   the solution being read (.pn-sol, filled by reading-tools.js). */
+.md-typeset .sol-map { position: static; background: transparent; }
+.md-typeset .part-nav { gap: var(--sp-2); }
+.md-typeset .part-nav .pn-chips { flex: none; flex-wrap: nowrap; }
+.md-typeset .part-nav .pn-sol { display: none; flex: 0 1 auto; min-width: 0; gap: 0.3rem; margin-inline-start: auto; overflow-x: auto; scrollbar-width: none; }
+.md-typeset .part-nav .pn-sol::-webkit-scrollbar { display: none; }
+.md-typeset .part-nav.has-sol .pn-sol { display: flex; }
+.md-typeset .part-nav.has-sol .pn-solved { margin-inline-start: 0; }
+.md-typeset .part-nav .pn-sol .sol-map__chip { padding-block: 0.1rem; }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .md-typeset .part-nav:not(.pn-fixed), .md-typeset .part-nav.pn-fixed.has-sol {
+    background: color-mix(in srgb, var(--md-default-bg-color) 78%, transparent);
+    -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4);
+  }
+}
+/* without parts the fixed bar is only the progress line and the solved button, until a
+   solution's map moves into it: then it is a row like the bar with parts */
+.md-typeset .part-nav.pn-fixed.has-sol { padding: 0.35rem 0 0.4rem; border-bottom: 1px solid var(--site-card-border); pointer-events: auto; }
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .md-typeset .part-nav.pn-fixed.has-sol { background: var(--md-default-bg-color); }
+}
+.md-typeset .part-nav.pn-fixed.has-sol .pn-solved { box-shadow: none; background: transparent; }
+
+/* W347: "back to top" as a round button in the bottom corner, off the text column. */
+.md-top { top: auto; bottom: var(--sp-4); left: var(--sp-4); right: auto; margin: 0 !important; width: 2.6rem; height: 2.6rem; padding: 0; border-radius: 50%; font-size: 0; transform: none !important; box-shadow: var(--shadow-2); }
+.md-top svg { display: block; width: 1.2rem; height: 1.2rem; margin: auto; vertical-align: 0; }
+.md-top[hidden] { opacity: 0; transform: translateY(0.4rem) !important; }
+
+/* W345: cards rise a little under the pointer, buttons press; only with a real hover and
+   without reduced motion. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .md-typeset :is(a.level-card, .hw-step, .related-questions > li) { transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
+  .md-typeset a.level-card:hover { transform: translateY(-2px); }
+  .md-typeset .hw-step:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+  .md-typeset .home-hero .hh-start::after { content: "←"; display: inline-block; margin-inline-start: 0.4em; transition: transform var(--dur-1) var(--ease); }
+  .md-typeset .home-hero .hh-start:hover::after { transform: translateX(-0.25em); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset :is(.md-button, .qt-btn, .hh-chip, .filter-chip, .part-nav__chip, .sol-map__chip, .py-from-code, .ex-ibtn, .ex-tbtn):active:not(:disabled) { transform: scale(0.97); }
+  .md-typeset :is(.md-button, .hh-chip, .part-nav__chip, .sol-map__chip, .py-from-code) { transition: transform 120ms var(--ease), background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
+}
+
+/* W346: hints, solutions, traps and follow-ups open and close smoothly where the browser
+   can animate to "auto" (::details-content and interpolate-size); elsewhere they open at
+   once, as before. The explorer boxes are left alone. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (interpolate-size: allow-keywords) {
+    :root { interpolate-size: allow-keywords; }
+    .md-typeset details:not(.explorer details)::details-content {
+      block-size: 0; overflow-y: clip;
+      transition: block-size var(--dur-2) var(--ease), content-visibility var(--dur-2) allow-discrete;
+    }
+    .md-typeset details[open]:not(.explorer details)::details-content { block-size: auto; }
+  }
+}
+
+/* W344: the home page's sections rise into view once (home.js adds .w-reveal only when it
+   runs, so without the script nothing is hidden). */
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .w-reveal { opacity: 0; transform: translateY(12px); transition: opacity 400ms var(--ease), transform 400ms var(--ease); transition-delay: var(--w-delay, 0ms); }
+  .md-typeset .w-reveal.is-in { opacity: 1; transform: none; }
+}

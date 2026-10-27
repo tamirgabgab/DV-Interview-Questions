@@ -245,6 +245,10 @@
       return a;
     });
     nav.append(chips);
+    // W347: the map of the solution being read shows here, so one sticky row remains
+    const slot = document.createElement("span");
+    slot.className = "pn-sol";
+    nav.append(slot);
     const own = header && header.querySelector(".qt-solved");
     if (own) {
       const solved = own.cloneNode(true);
@@ -483,6 +487,43 @@
     return blocks;
   };
 
+  // The solution map (A181) is a row of chips at the top of a solution, one per block. While
+  // the reader is inside an open solution whose own row has scrolled away, a copy of it
+  // sits in the part bar (W347: one sticky row, not two), the current block marked.
+  const maps = [];
+  const readingLine = () => {
+    const bar = document.querySelector(".part-nav");
+    if (bar && (!bar.classList.contains("pn-fixed") || bar.classList.contains("is-stuck"))) {
+      return bar.getBoundingClientRect().bottom;
+    }
+    const site = document.querySelector(".md-header");
+    return site ? site.getBoundingClientRect().bottom : 0;
+  };
+  let shown = null;
+  const syncSlot = () => {
+    const bar = document.querySelector(".part-nav");
+    const slot = bar && bar.querySelector(".pn-sol");
+    if (!slot) return;
+    const line = readingLine();
+    const active = maps.find((m) => m.sol.open && m.nav.getBoundingClientRect().bottom < line
+      && m.sol.getBoundingClientRect().bottom > line + 40) || null;
+    if (active !== shown) {
+      shown = active;
+      slot.replaceChildren(...(active ? active.links.map((a) => a.cloneNode(true)) : []));
+      bar.classList.toggle("has-sol", Boolean(active));
+    }
+    if (!active) return;
+    Array.from(slot.children).forEach((c, i) => {
+      const on = active.links[i].classList.contains("is-current");
+      c.classList.toggle("is-current", on);
+      if (on) {
+        c.setAttribute("aria-current", "true");
+        const n = slot.getBoundingClientRect(), r = c.getBoundingClientRect();
+        if (r.left < n.left || r.right > n.right) slot.scrollLeft += r.left < n.left ? r.left - n.left - 8 : r.right - n.right + 8;
+      } else c.removeAttribute("aria-current");
+    });
+  };
+
   const solutionMap = (sol, blocks) => {
     if (blocks.length < 2) return;
     const nav = document.createElement("nav");
@@ -500,9 +541,10 @@
       return a;
     });
     blocks[0].before(nav);
+    maps.push({ sol, nav, links });
     const mark = () => {
       if (!sol.open) return;
-      const y = nav.getBoundingClientRect().bottom + 24;
+      const y = readingLine() + 24;
       let current = 0;
       blocks.forEach((b, i) => { if (b.getBoundingClientRect().top <= y) current = i; });
       if (links[current].classList.contains("is-current")) return;
@@ -515,7 +557,7 @@
       if (r.left < n.left || r.right > n.right) nav.scrollLeft += r.left < n.left ? r.left - n.left - 8 : r.right - n.right + 8;
     };
     window.addEventListener("scroll", mark, { passive: true });
-    sol.addEventListener("toggle", mark);
+    sol.addEventListener("toggle", () => { mark(); syncSlot(); });
     mark();
   };
 
@@ -532,6 +574,8 @@
       solutionMap(sol, solutionBlocks(sol));
     });
     partBarHeight();
+    window.addEventListener("scroll", syncSlot, { passive: true });
+    syncSlot();
     tables(document);
     watchFigures(document);
     document.querySelectorAll(".md-content .explorer").forEach((box) =>
