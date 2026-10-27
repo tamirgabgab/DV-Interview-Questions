@@ -7,8 +7,10 @@ puzzles that come up in the same interviews. Every question has a full solution 
 
 **<https://tamirgabgab.github.io/DV-Interview-Questions/>**
 
-- [All questions](https://tamirgabgab.github.io/DV-Interview-Questions/): the home page,
-  with a table you can filter by level, difficulty, kind and topic, and a random question
+- [Home page](https://tamirgabgab.github.io/DV-Interview-Questions/): how it works, the
+  newest questions, the levels, six study paths and the FAQ
+- [All questions](https://tamirgabgab.github.io/DV-Interview-Questions/all/): a table you
+  can filter by level, difficulty, kind and topic, and a random question
 - By level: [student](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/),
   [junior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/),
   [senior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/)

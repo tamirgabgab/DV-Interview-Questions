@@ -8,7 +8,7 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   # overrides/: main.html adds the web app manifest (home-screen icon), 404.html the
-  # Hebrew "page not found" page
+  # Hebrew "page not found" page, partials/content.html the edit link at the page end
   custom_dir: overrides
   language: he
   logo: assets/logo.svg
@@ -121,6 +121,7 @@ extra_javascript:
   - javascripts/question-tools.js
   - javascripts/run-python.js
   - javascripts/reading-tools.js
+  - javascripts/home.js
   # The explorer boxes (docs/javascripts/explorer/) are added per page by hooks/questions.py.
 
 

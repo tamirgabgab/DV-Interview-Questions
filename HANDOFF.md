@@ -866,6 +866,38 @@ section below starts at session 22, whose numbered items run on through the late
     every non-folding admonition ends half way on a wide screen (the home tip box; 48
     built pages have such a title). Nothing in the site was changed in this session.
 
+60. **Round W1, foundations (session 27, 2026-10-27).** The owner's picks: the traps in
+    one group, the edit link at the page end, a cool off-white, cards with a soft shadow
+    and no outline. W333: `.admonition-title` out of the 75ch cap. W334: the home page
+    without its TOC column. W335: tokens in `extra.css` (`--sp-1` to `--sp-6`,
+    `--radius-s/m/l`, `--shadow-1` to `--shadow-3` per scheme, `--dur-1/2`, `--ease`),
+    used by the cards, boxes, admonitions and the new rules. W336: the light page
+    `#f7f8fb`, code `#eef1f6`, white surfaces (`--site-surface`) for cards, boxes,
+    admonitions, tables and filter chips, `--site-card-edge` transparent in light and the
+    old outline in dark, the footer in the brand navy in both schemes. W337: `--adm-trap`
+    `#b45309` / `#fdba74` (amber-orange); `on_post_page` wraps each run of trap blocks in
+    `.trap-group` titled "מלכודות נפוצות (n)" with numbered rows (a solid circle, white
+    digit) and drops the "מלכודת :" prefix; every question page has one group (165 traps).
+    W338: `overrides/partials/content.html` drops the header action icon and adds "עריכת
+    העמוד ב-GitHub" at the end of every page. `check_contrast.py`: CARD is the surface,
+    six new pairs (card text, trap title and number, footer text, edit link).
+61. **Round W2, the home page (session 27, 2026-10-27).** The owner's picks: the audience
+    line "לסטודנטים ולמהנדסים בתחילת הדרך שמתכוננים לראיון DV", no rotating word, six
+    featured paths mixing DV and algorithms, the catalog as a tab after "ראשי". W339: the
+    audience line in amber under the title (`{ .hh-audience }`), the hero's waveform drawn
+    once (`pathLength="1"`, `stroke-dashoffset`, 2.4 s, staggered), the three numbers
+    counting up on first view (`docs/javascripts/home.js`); both off under reduced motion.
+    W340: "איך זה עובד", three step cards (`<!-- how-it-works -->`, `HOW_STEPS`) right
+    after the hero, in place of the tip box. W341: `docs/all.md` holds the table and the
+    difficulty legend, a "כל השאלות" tab, and the home page a "לכל 47 השאלות" button
+    (`<!-- catalog-link -->`); the home page is 2,757 px tall at 1280 px (was 7,456).
+    W342: `featured: true` on logic design, CDC and verification, protocols, interview
+    algorithms, logic puzzles and probability (`<!-- path-cards featured -->`; the paths
+    page shows all twelve); the card title on its own line, the count beside the
+    difficulty chips (no more ids), equal heights on wide screens, the "solved" bar hidden
+    until something is solved (level cards too); the PCIe path renamed "פרוטוקולים ומודלי
+    ייחוס". W343: six FAQ items at the end of the home page (DV, a DV interview, which
+    level, how to practise, where progress is kept, offline), styled in the site's navy.
 
 ## In progress
 
@@ -891,9 +923,10 @@ section below starts at session 22, whose numbered items run on through the late
   and the 0023 request figure on a phone.
 - **Waiting on the owner:** the giscus ids (README, Comments) in `extra.comments` of
   `mkdocs.yml`; a look at the social card of a shared link; keep or replace 0001.
-- **Session 27:** a visual review; the fifth series W1 to W5 (look, motion, the run
-  panel, practice tools) waits for the owner's picks and answers (questions listed
-  under the series).
+- **Session 27:** a visual review and the fifth series W1 to W5 (look, motion, the run
+  panel, practice tools); the owner picked W1 to W4 (catalog on its own page, amber traps,
+  off-white, CodeMirror). W1 and W2 are done on the branch (work log items 60, 61), not
+  yet on `main`; W3 and W4 are next, with multiple-choice questions before each round.
 - **Next, the owner picks:** the fifth series W1 to W5, the rest of the second series A to E, the new questions of
   M to R and Z, the deferred G222, H223, H224 and E35, the three coding proposals of
   session 24 (meeting rooms, topological sort, single number II), the topic gaps under
@@ -911,7 +944,7 @@ section below starts at session 22, whose numbered items run on through the late
 
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
-- [ ] Pick rounds from the fifth series W1 to W5 (session 27) and answer its open questions.
+- [ ] Fifth series: W1 and W2 done on the branch; W3 and W4 next; W5 not picked; `main` when the owner asks.
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 - [ ] Pick the next rounds from **Proposals and rounds**: the open rows of the first series (E, F, I, L, N, O, the rest of Q, S), the rest of the second series A to E, the deferred G222, H223, H224, and the new questions of M to R and Z. Done: U to X (in the archive), I to L, the third series UI1 to UI5.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
@@ -1833,22 +1866,22 @@ Item numbers continue the global count (333 on).
 
 | Id | Idea | Size |
 |---|---|---|
-| W333 | **Admonition title bug**: exclude `.admonition-title` from the 75ch cap | S |
-| W334 | **Home without the TOC column** (`hide: toc` on `index.md`): the hero and the cards use the full width | S |
-| W335 | **Design tokens** in `extra.css`: spacing 4 / 8 / 16 / 24 / 32 / 48 px, radius (6 / 10 / 16), shadows (1 to 3, soft, tinted with the navy), motion (200 / 300 ms, one easing); cards, boxes, chips and admonitions moved to them | S–M |
-| W336 | **Surfaces**: an off-white light page (about `#f7f8fb`) with white cards lifted by shadow 1 instead of a border, the footer in the brand navy; new pairs into `PAIRS` of `check_contrast.py` | S–M |
-| W337 | **Calmer traps**: a warm amber-orange instead of red, and all the traps of a page in one group "מלכודות נפוצות (5)" with a numbered list inside | S–M |
-| W338 | **Edit icon** out of the question header (to the footer, or off for readers: `content.action.edit`) | S |
+| ~~W333~~ | ~~**Admonition title bug**: exclude `.admonition-title` from the 75ch cap~~ done (session 27) | S |
+| ~~W334~~ | ~~**Home without the TOC column** (`hide: toc` on `index.md`): the hero and the cards use the full width~~ done (session 27) | S |
+| ~~W335~~ | ~~**Design tokens** in `extra.css`: spacing 4 / 8 / 16 / 24 / 32 / 48 px, radius (6 / 10 / 16), shadows (1 to 3, soft, tinted with the navy), motion (200 / 300 ms, one easing); cards, boxes, chips and admonitions moved to them~~ done (session 27) | S–M |
+| ~~W336~~ | ~~**Surfaces**: an off-white light page (about `#f7f8fb`) with white cards lifted by shadow 1 instead of a border, the footer in the brand navy; new pairs into `PAIRS` of `check_contrast.py`~~ done (session 27) | S–M |
+| ~~W337~~ | ~~**Calmer traps**: a warm amber-orange instead of red, and all the traps of a page in one group "מלכודות נפוצות (5)" with a numbered list inside~~ done (session 27) | S–M |
+| ~~W338~~ | ~~**Edit icon** out of the question header (to the footer, or off for readers: `content.action.edit`)~~ done (session 27) | S |
 
 **Round W2 — the home page**
 
 | Id | Idea | Size |
 |---|---|---|
-| W339 | **Hero with a signature**: one line for the audience ("לסטודנטים ולמהנדסים בתחילת הדרך שמתכוננים לראיון DV"), a rotating word "להתכונן לראיון ב-FIFO / CDC / SVA / הסתברות" (static under reduced motion), the waveform background drawn once as a travelling signal (`stroke-dashoffset`), the real stats counting up once on first view | M |
-| W340 | **"איך זה עובד" in three steps** with icons (בוחרים שאלה → פותרים עם רמזים → בודקים ומריצים) instead of the tip box; its details move to the FAQ | S–M |
-| W341 | **A shorter home page**: the catalog on its own page ("כל השאלות", the filters kept), the home keeps the recent list and a link; or the first ten rows and "להציג את כל 47" | S–M |
-| W342 | **Path cards**: six featured and "כל המסלולים"; equal heights and one-line titles (shorter names); for a new visitor "5 שאלות · כשעתיים" instead of "פתרת 0 מתוך 5", the progress ring after the first solve | S–M |
-| W343 | **FAQ** (folding): what DV is, what a DV interview looks like, which level fits me, how to practise here, does it work offline. No testimonials or "hired" counters until real ones exist | S |
+| ~~W339~~ | ~~**Hero with a signature**: one line for the audience ("לסטודנטים ולמהנדסים בתחילת הדרך שמתכוננים לראיון DV"), a rotating word "להתכונן לראיון ב-FIFO / CDC / SVA / הסתברות" (static under reduced motion), the waveform background drawn once as a travelling signal (`stroke-dashoffset`), the real stats counting up once on first view~~ done (session 27) | M |
+| ~~W340~~ | ~~**"איך זה עובד" in three steps** with icons (בוחרים שאלה → פותרים עם רמזים → בודקים ומריצים) instead of the tip box; its details move to the FAQ~~ done (session 27) | S–M |
+| ~~W341~~ | ~~**A shorter home page**: the catalog on its own page ("כל השאלות", the filters kept), the home keeps the recent list and a link; or the first ten rows and "להציג את כל 47"~~ done (session 27) | S–M |
+| ~~W342~~ | ~~**Path cards**: six featured and "כל המסלולים"; equal heights and one-line titles (shorter names); for a new visitor "5 שאלות · כשעתיים" instead of "פתרת 0 מתוך 5", the progress ring after the first solve~~ done (session 27) | S–M |
+| ~~W343~~ | ~~**FAQ** (folding): what DV is, what a DV interview looks like, which level fits me, how to practise here, does it work offline. No testimonials or "hired" counters until real ones exist~~ done (session 27) | S |
 
 **Round W3 — motion and micro-interactions** (each 200 to 300 ms, once, off under
 `prefers-reduced-motion`, never inside a box: `check_jumps.py` must stay clean)

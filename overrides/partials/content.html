@@ -1,0 +1,19 @@
+{#- The theme's content partial (Material 9.7) with the page actions moved (W338): the
+    "edit on GitHub" icon no longer sits beside the question title; a small text link at
+    the end of the page takes its place. -#}
+{% include "partials/tags.html" %}
+{% if "<h1" not in page.content %}
+  <h1>{{ page.title | d(config.site_name, true)}}</h1>
+{% endif %}
+{{ page.content }}
+{% if page.edit_url and "content.action.edit" in features %}
+  <p class="page-edit">
+    <a href="{{ page.edit_url }}" rel="edit">
+      {% include ".icons/material/file-edit-outline.svg" %}
+      <span>עריכת העמוד ב-GitHub</span>
+    </a>
+  </p>
+{% endif %}
+{% include "partials/source-file.html" %}
+{% include "partials/feedback.html" %}
+{% include "partials/comments.html" %}

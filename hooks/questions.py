@@ -126,7 +126,9 @@ PLACEHOLDER = re.compile(r"<!--\s*questions-table(?:\s+level=(\w+))?\s*-->")
 CARDS = re.compile(r"<!--\s*level-cards\s*-->")
 HERO = re.compile(r"<!--\s*hero\s*-->(.*?)<!--\s*/hero\s*-->", re.S)
 PATH_STEPS = re.compile(r"<!--\s*path-steps\s*-->")
-PATH_CARDS = re.compile(r"<!--\s*path-cards\s*-->")
+PATH_CARDS = re.compile(r"<!--\s*path-cards(\s+featured)?\s*-->")
+HOW_IT_WORKS = re.compile(r"<!--\s*how-it-works\s*-->")
+CATALOG_LINK = re.compile(r"<!--\s*catalog-link\s*-->")
 CONTINUE = re.compile(r"<!--\s*home-continue\s*-->")
 RECENT = re.compile(r"<!--\s*recent\s*-->")
 WHATS_NEW = re.compile(r"<!--\s*whats-new\s*-->")
@@ -227,7 +229,8 @@ def _load_paths(docs_dir: Path) -> list[dict]:
             errors.append(f"{src_uri}: a path needs a title and at least two steps")
         paths.append({"src_uri": src_uri, "title": str(meta.get("title", "")),
                       "description": str(meta.get("description", "")),
-                      "order": meta.get("order", 99), "steps": steps})
+                      "order": meta.get("order", 99), "featured": bool(meta.get("featured")),
+                      "steps": steps})
     if errors:
         raise PluginError("Invalid study paths:\n  " + "\n  ".join(errors))
     return sorted(paths, key=lambda p: (p["order"], p["src_uri"]))
@@ -257,7 +260,7 @@ def on_config(config, **kwargs):
     _comments = dict(config["extra"].get("comments") or {})
     _kind_files = _load_kind_files(Path(config["docs_dir"]))
 
-    nav: list = [{"ראשי": "index.md"}]
+    nav: list = [{"ראשי": "index.md"}, {"כל השאלות": "all.md"}]
     for level, label in LEVELS.items():
         pages = sorted(
             (q for q in _questions.values() if q["level"] == level),
@@ -473,20 +476,53 @@ def _path_steps(page) -> str:
     return _progress(ids) + '<ol class="path-steps">' + "".join(items) + "</ol>"
 
 
-def _path_cards(page_url: str) -> str:
+def _diff_chips(qs) -> str:
+    """The difficulty mix of some questions as chips ("2 קל", "3 בינוני")."""
+    counts = {d: sum(q["difficulty"] == d for q in qs) for d in DIFFICULTIES}
+    return "".join(f'<span class="chip chip-diff chip-diff-{d}">{n} {DIFFICULTIES[d]}</span>'
+                   for d, n in counts.items() if n)
+
+
+def _path_cards(page_url: str, featured: bool = False) -> str:
+    """A card per study path (only the paths marked `featured` on the home page, W342): the
+    title on its own line, the description, then the count and the difficulty mix; the "solved" bar shows once a
+    question of the path is solved (marks.js, `.is-empty` hides it before)."""
     cards = []
     for p in _paths:
+        if featured and not p["featured"]:
+            continue
         ids = [s["q"]["id"] for s in p["steps"]]
         kinds = [s["q"]["kind"] for s in p["steps"]]
         kind = max(KINDS, key=kinds.count)            # the kind most of its questions have
         cards.append(
             f'<a class="level-card path-card" href="{_href(p["src_uri"], page_url)}">'
-            f'<div class="lc-head"><span class="lc-name">{kind_icon(kind)}{html.escape(p["title"])}</span>'
-            f'<span class="lc-count">{len(ids)} שאלות</span></div>'
+            f'<div class="lc-head"><span class="lc-name">{kind_icon(kind)}{html.escape(p["title"])}</span></div>'
             f'<p class="lc-desc">{html.escape(p["description"])}</p>'
-            f'<div class="lc-diff"><span class="pc-ids">{" · ".join(ids)}</span></div>'
+            f'<div class="lc-diff"><span class="lc-count">{len(ids)} שאלות</span>'
+            f'{_diff_chips([s["q"] for s in p["steps"]])}</div>'
             f'{_progress(ids)}</a>')
-    return '<div class="level-cards">' + "".join(cards) + "</div>"
+    return '<div class="level-cards path-cards">' + "".join(cards) + "</div>"
+
+
+HOW_STEPS = [("search", "בוחרים שאלה", "לפי רמת משרה, נושא או מסלול לימוד, או שאלה אקראית."),
+             ("timer", "פותרים לבד", "עם רמזים שנפתחים בהדרגה, ובמצב תרגול עם שעון עצר."),
+             ("play", "בודקים ומריצים", "פתרון מלא עם הוכחה, קוד שנבדק אוטומטית והרצה בדפדפן.")]
+
+
+def _how_it_works() -> str:
+    """The home page's three steps (W340), in place of the old tip box."""
+    items = "".join(f'<li class="hw-step"><span class="hw-ico">{ui_icon(icon)}</span>'
+                    f'<span class="hw-num">{n}</span><b class="hw-title">{title}</b>'
+                    f'<span class="hw-text">{text}</span></li>'
+                    for n, (icon, title, text) in enumerate(HOW_STEPS, 1))
+    return f'<ol class="how-it-works">{items}</ol>'
+
+
+def _catalog_link(page_url: str) -> str:
+    """The home page's way into the catalog page (W341)."""
+    return (f'<p class="catalog-link"><a class="md-button md-button--primary" href="{_href("all.md", page_url)}">'
+            f'לכל {len(_questions)} השאלות</a>'
+            '<span>עם סינון לפי רמה, קושי, סוג ונושא, חיפוש ומיון.</span></p>')
 
 
 def _has_tests(q: dict) -> bool:
@@ -499,9 +535,7 @@ def _level_cards(page_url: str) -> str:
     for level, label in LEVELS.items():
         qs = [q for q in _questions.values() if q["level"] == level]
         href = posixpath.relpath(f"{QUESTIONS_DIR}/{level}/", base or ".") + "/"
-        counts = {d: sum(q["difficulty"] == d for q in qs) for d in DIFFICULTIES}
-        diff = "".join(f'<span class="chip chip-diff chip-diff-{d}">{n} {DIFFICULTIES[d]}</span>'
-                       for d, n in counts.items() if n)
+        diff = _diff_chips(qs)
         if not diff:
             diff = '<span class="lc-empty">עדיין אין שאלות ברמה הזו</span>'
         cards.append(
@@ -517,12 +551,13 @@ def _level_cards(page_url: str) -> str:
 
 HERO_SEARCHES = ["FIFO", "PCIe", "SVA", "הסתברות", "חידות", "Gray"]
 
-# The hero's background: a clock, a data bit and a bus, drawn as a quiet line pattern.
+# The hero's background: a clock, a data bit and a bus, drawn as a quiet line pattern
+# (pathLength 1, so the CSS can draw each line once from its start, W339).
 HERO_WAVES = (
     '<svg class="hh-waves" viewBox="0 0 640 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">'
-    '<path class="hh-w1" d="M0 30h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20"/>'
-    '<path class="hh-w2" d="M0 75h50v-20h90v20h40v-20h130v20h60v-20h40v20h110v-20h120"/>'
-    '<path class="hh-w3" d="M0 120h30l10-15h90l10 15-10 15h-90l-10-15M140 120l10-15h110l10 15-10 15h-110l-10-15M270 120l10-15h70l10 15-10 15h-70l-10-15M360 120l10-15h130l10 15-10 15h-130l-10-15M510 120l10-15h110l10 15"/>'
+    '<path class="hh-w1" pathLength="1" d="M0 30h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20"/>'
+    '<path class="hh-w2" pathLength="1" d="M0 75h50v-20h90v20h40v-20h130v20h60v-20h40v20h110v-20h120"/>'
+    '<path class="hh-w3" pathLength="1" d="M0 120h30l10-15h90l10 15-10 15h-90l-10-15M140 120l10-15h110l10 15-10 15h-110l-10-15M270 120l10-15h70l10 15-10 15h-70l-10-15M360 120l10-15h130l10 15-10 15h-130l-10-15M510 120l10-15h110l10 15"/>'
     '</svg>')
 
 
@@ -825,7 +860,9 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     markdown = CARDS.sub(lambda m: _level_cards(page.url), markdown)
     markdown = HERO.sub(lambda m: _hero(m.group(1), page.url), markdown)
     markdown = PATH_STEPS.sub(lambda m: _path_steps(page), markdown)
-    markdown = PATH_CARDS.sub(lambda m: _path_cards(page.url), markdown)
+    markdown = PATH_CARDS.sub(lambda m: _path_cards(page.url, bool(m.group(1))), markdown)
+    markdown = HOW_IT_WORKS.sub(lambda m: _how_it_works(), markdown)
+    markdown = CATALOG_LINK.sub(lambda m: _catalog_link(page.url), markdown)
     markdown = CONTINUE.sub(lambda m: _continue_card(), markdown)
     markdown = RECENT.sub(lambda m: _recent(page.url), markdown)
     markdown = WHATS_NEW.sub(lambda m: _whats_new(page.url), markdown)
@@ -863,9 +900,26 @@ def _tag_names(output: str) -> str:
     return TAG_TOC.sub(lambda m: m.group(1) + html.escape(topic_name(m.group(2))) + m.group(4), output)
 
 
+TRAP_RUN = re.compile(r'(?:<details class="trap">.*?</details>\s*)+', re.S)
+TRAP_PREFIX = "<summary>מלכודת\u00a0: "
+
+
+def _trap_group(m: re.Match) -> str:
+    """A run of trap blocks as one group (W337): a title with the count, then the traps,
+    each still folding on its own, without the "מלכודת :" prefix the title now carries."""
+    run = m.group(0)
+    count = run.count('<details class="trap">')
+    title = "מלכודת נפוצה" if count == 1 else f"מלכודות נפוצות ({count})"
+    return (f'<div class="trap-group" role="group" aria-label="{title}">'
+            f'<p class="trap-group-title">{title}</p>\n'
+            f'{run.replace(TRAP_PREFIX, "<summary>").rstrip()}</div>\n')
+
+
 def on_post_page(output, page, config, **kwargs):
     if page.file.src_uri == "tags.md":
         output = _tag_names(output)
+    if page.file.src_uri in _questions:
+        output = TRAP_RUN.sub(_trap_group, output)
     scripts = explorer_scripts(output, page.url)
     if not scripts:
         return output

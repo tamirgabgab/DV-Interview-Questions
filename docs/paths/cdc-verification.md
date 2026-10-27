@@ -1,6 +1,7 @@
 ---
 title: "חציית שעונים ואימות"
 description: "חמש שאלות מליבת ה-DV. FIFO בין שעונים, מצביעי Gray, MTBF של סנכרן, SVA לפרוטוקול, וכמה טסטים אקראיים סוגרים כיסוי."
+featured: true
 order: 2
 steps:
   - id: 33

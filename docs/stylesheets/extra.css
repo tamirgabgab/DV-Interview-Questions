@@ -18,6 +18,17 @@
   --site-label-color: #8a5300;      /* the amber of the id label, dark enough on white (4.5:1) */
   --site-mark-color: #b07d00;       /* amber marks on white (the star, the sort arrows): 3:1 */
   --site-focus-ring: #1b2a4a;
+  /* W336: an off-white page under white surfaces (cards, boxes, admonitions, tables). */
+  --md-default-bg-color: #f7f8fb;
+  --md-code-bg-color: #eef1f6;
+  --md-admonition-bg-color: var(--site-surface);
+  --site-surface: #ffffff;
+  --site-card-edge: transparent;
+  --md-footer-bg-color: var(--md-primary-fg-color);     /* the brand navy, not near-black */
+  --md-footer-bg-color--dark: var(--md-primary-fg-color--dark);
+  --shadow-1: 0 1px 2px rgba(27, 42, 74, 0.06), 0 2px 8px rgba(27, 42, 74, 0.06);
+  --shadow-2: 0 2px 4px rgba(27, 42, 74, 0.08), 0 8px 20px rgba(27, 42, 74, 0.1);
+  --shadow-3: 0 4px 8px rgba(27, 42, 74, 0.1), 0 16px 36px rgba(27, 42, 74, 0.14);
 }
 
 /* The dark scheme (UI331): a softer navy and a blue-grey page rather than near-black. */
@@ -42,7 +53,34 @@
   --site-label-color: #ffc233;
   --site-mark-color: #ffc233;
   --site-focus-ring: #ffc233;
+  /* The dark scheme keeps its outlined cards; the surface is the page. */
+  --site-surface: var(--md-default-bg-color);
+  --site-card-edge: var(--site-card-border);
+  --md-footer-bg-color: var(--md-primary-fg-color);
+  --md-footer-bg-color--dark: var(--md-primary-fg-color--dark);
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-2: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --shadow-3: 0 8px 28px rgba(0, 0, 0, 0.45);
 }
+
+/* W335: the design tokens. Spacing on a 4 px grid (the root font is 20 px), three radii,
+   three shadows (per scheme, above) and one motion speed and easing. New rules use these
+   rather than literal values. */
+:root {
+  --sp-1: 0.2rem;   /* 4 px */
+  --sp-2: 0.4rem;   /* 8 px */
+  --sp-3: 0.8rem;   /* 16 px */
+  --sp-4: 1.2rem;   /* 24 px */
+  --sp-5: 1.6rem;   /* 32 px */
+  --sp-6: 2.4rem;   /* 48 px */
+  --radius-s: 0.3rem;
+  --radius-m: 0.5rem;
+  --radius-l: 0.8rem;
+  --dur-1: 200ms;
+  --dur-2: 300ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
 
 .md-header__button.md-logo img,
 .md-header__button.md-logo svg {
@@ -237,7 +275,7 @@
   font-size: 0.68rem;
   line-height: 1.7;
   color: var(--md-default-fg-color);
-  background: var(--md-default-bg-color);
+  background: var(--site-surface);
   border: 1px solid var(--site-card-border);
   border-radius: 999px;
   cursor: pointer;
@@ -271,7 +309,7 @@
   font-weight: 400;
   padding: 0.25rem 0.6rem;
   color: var(--md-default-fg-color);
-  background: var(--md-default-bg-color);
+  background: var(--site-surface);
   border: 1px solid var(--site-card-border);
   border-radius: 999px;
 }
@@ -336,11 +374,11 @@
     padding: 0.6rem 0.8rem;
     border: 1px solid var(--site-card-border);
     border-radius: 0.4rem;
-    background: var(--md-default-bg-color);
+    background: var(--site-surface);
   }
 
   .md-typeset .questions-wrap table:not([class]) tr:hover {
-    background: var(--md-default-bg-color);
+    background: var(--site-surface);
   }
 
   .md-typeset .questions-wrap table:not([class]) td {
@@ -642,14 +680,14 @@
   --sol-icon-cost: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.8-13h-1.6v5.6l4.7 2.8.8-1.3-3.9-2.3V7z"/></svg>');
   --adm-answer: #d99a00;
   --adm-interviewer: #1b2a4a;
-  --adm-trap: #b4332c;
+  --adm-trap: #b45309;   /* W337: a warm amber-orange, calmer than red */
   --adm-followup: #0f766e;
 }
 
 [data-md-color-scheme="slate"] {
   --adm-answer: #ffc233;
   --adm-interviewer: #8db3ff;
-  --adm-trap: #ff7b72;
+  --adm-trap: #fdba74;
   --adm-followup: #5eead4;
 }
 
@@ -852,7 +890,7 @@
   position: sticky;
   top: calc(2.4rem + var(--part-nav-h, 0px));
   z-index: 1;
-  background: var(--md-default-bg-color);
+  background: var(--site-surface);
   box-shadow: inset 0 -1px 0 var(--site-card-border);
 }
 @media screen and (max-width: 30em) {
@@ -1021,7 +1059,7 @@
   font-size: 0.68rem;
   line-height: 1.8;
   color: var(--md-default-fg-color);
-  background: var(--md-default-bg-color);
+  background: var(--site-surface);
   border: 1px solid var(--site-card-border);
   border-radius: 999px;
   cursor: pointer;
@@ -1071,16 +1109,18 @@ body.practice-mode .md-typeset .question-tools {
   gap: 0.4rem;
   padding: 0.9rem 1rem;
   color: inherit;
-  border: 1px solid var(--site-card-border);
+  border: 1px solid var(--site-card-edge);
   border-top: 3px solid var(--md-primary-fg-color);
-  border-radius: 0.5rem;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  border-radius: var(--radius-m);
+  background: var(--site-surface);
+  box-shadow: var(--shadow-1);
+  transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
 }
 
 .md-typeset a.level-card:hover {
   color: inherit;
   border-color: var(--md-accent-fg-color);
-  box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-2);
 }
 
 .md-typeset .level-card .lc-head {
@@ -2993,7 +3033,7 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset h1 { font-weight: 600; letter-spacing: 0; }
 .md-typeset :is(h2, h3) { font-weight: 600; }
 .md-typeset :is(table, .chip, .lc-count, .ex-pos, .hh-stats) { font-variant-numeric: tabular-nums; }
-.md-typeset :is(p, ul:not([class]), ol:not([class]), dl):not(.explorer *):not(td *):not(th *) { max-width: 75ch; }
+.md-typeset :is(p, ul:not([class]), ol:not([class]), dl):not(.explorer *):not(td *):not(th *):not(.admonition-title) { max-width: 75ch; }
 
 /* An icon per question kind (UI330): line icons from Material Design Icons (Apache 2.0, the
    set the theme ships), drawn as a CSS mask in the text colour, so the hook's HTML and the
@@ -3140,7 +3180,8 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .ui-ico-gesture { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 9a1 1 0 0 1 1-1 1 1 0 0 1 1 1v4.47l1.21.13 4.94 2.19c.53.24.85.77.85 1.35v4.36c-.03.82-.68 1.47-1.5 1.5H11c-.38 0-.74-.15-1-.43l-4.9-4.2.74-.77c.19-.21.46-.32.74-.32h.22L10 19zm1-4a4 4 0 0 1 4 4c0 1.5-.8 2.77-2 3.46v-1.22c.61-.55 1-1.35 1-2.24a3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .89.39 1.69 1 2.24v1.22C7.8 11.77 7 10.5 7 9a4 4 0 0 1 4-4'/%3E%3C/svg%3E"); }
 .ui-ico-play.is-playing { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 19h4V5h-4M6 19h4V5H6z'/%3E%3C/svg%3E"); }
 .ui-ico-link.is-done { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z'/%3E%3C/svg%3E"); }
-.md-typeset .explorer { margin: 1.2em 0; padding: 0 1rem 0.7rem; border: 1px solid var(--site-card-border); border-radius: 0.8rem; background: color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color)); box-shadow: 0 0.1rem 0.6rem rgba(0, 0, 0, 0.05); }
+.md-typeset .explorer { margin: 1.2em 0; padding: 0 1rem 0.7rem; border: 1px solid var(--site-card-border); border-radius: var(--radius-l); background: color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color)); box-shadow: 0 0.1rem 0.6rem rgba(0, 0, 0, 0.05); }
+[data-md-color-scheme="default"] .md-typeset .explorer { border-color: var(--site-card-edge); background: var(--site-surface); box-shadow: var(--shadow-1); }
 .md-typeset .explorer .ex-bar { gap: 0.2rem 0.3rem; margin: 0 -1rem 0.6rem; padding: 0.35rem 0.8rem 0.35rem 0.6rem; border-bottom: 1px solid var(--site-card-border); border-radius: 0.8rem 0.8rem 0 0; background: color-mix(in srgb, var(--md-typeset-a-color) 7%, var(--md-default-bg-color)); }
 .md-typeset .explorer .ex-bar-title { display: inline-flex; align-items: center; gap: 0.35em; margin-inline-end: auto; color: var(--md-typeset-a-color); font-size: 0.72rem; font-weight: 700; }
 .md-typeset .explorer .ex-help { padding: 0.3rem 0 0.1rem; }
@@ -3356,3 +3397,67 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 /* 0013 kappairs: the path bows under the numbers, which keep a halo and let clicks through */
 .md-typeset svg .kpp-curve { fill: none; }
 .md-typeset svg .kpp-num { pointer-events: none; paint-order: stroke; stroke: var(--md-default-bg-color); stroke-width: 3px; stroke-linejoin: round; }
+
+/* Round W1 (session 27): white surfaces on the off-white page. Admonitions and tables take
+   the surface colour and the token radius; the theme's admonition shadow becomes shadow 1. */
+.md-typeset :is(.admonition, details) { border-radius: var(--radius-m); box-shadow: var(--shadow-1); }
+.md-typeset details.fu-answer { box-shadow: none; }
+.md-typeset table:not([class]) { background-color: var(--site-surface); border-radius: var(--radius-m); }
+
+/* W337: the traps of a page in one group (hooks/questions.py wraps each run of trap
+   blocks): one amber frame and title, the traps inside as numbered rows that still open
+   one by one. */
+.md-typeset .trap-group { margin: 1.2em 0; padding: var(--sp-2) var(--sp-3) var(--sp-3); border: 1px solid var(--site-card-edge); border-inline-start: 0.2rem solid var(--adm-trap); border-radius: var(--radius-m); background: var(--site-surface); box-shadow: var(--shadow-1); counter-reset: trap; }
+.md-typeset .trap-group > .trap-group-title { display: flex; align-items: center; gap: var(--sp-2); max-width: none; margin: 0 0 var(--sp-1); color: var(--adm-trap); font-weight: 700; }
+.md-typeset .trap-group > .trap-group-title::before { content: ""; flex: none; width: 1rem; height: 1rem; background-color: var(--adm-trap); -webkit-mask: var(--md-admonition-icon--warning) center / contain no-repeat; mask: var(--md-admonition-icon--warning) center / contain no-repeat; }
+.md-typeset .trap-group > details.trap { margin: 0; border: 0; border-top: 1px solid var(--site-card-border); border-radius: 0; box-shadow: none; background: transparent; counter-increment: trap; }
+.md-typeset .trap-group > details.trap > summary { padding-inline-start: 2rem; background: transparent; font-weight: 600; }
+.md-typeset .trap-group > details.trap > summary::before { content: counter(trap); top: 50%; inset-inline-start: 0.4rem; width: 1.15rem; height: 1.15rem; transform: translateY(-50%); border-radius: 50%; background-color: var(--adm-trap); color: var(--site-surface); font-size: 0.65rem; font-weight: 700; line-height: 1.15rem; text-align: center; -webkit-mask: none; mask: none; }
+
+/* W338: the "edit on GitHub" link moved from the question header to the end of the page. */
+.md-typeset .page-edit { margin: var(--sp-5) 0 0; font-size: 0.68rem; color: var(--md-default-fg-color--light); }
+.md-typeset .page-edit a { display: inline-flex; align-items: center; gap: var(--sp-1); color: inherit; }
+.md-typeset .page-edit a:is(:hover, :focus-visible) { color: var(--md-typeset-a-color); }
+.md-typeset .page-edit svg { width: 0.9rem; height: 0.9rem; fill: currentColor; }
+
+/* Round W2 (session 27): the home page. */
+/* W339: the audience line under the hero's title, and the waveform drawn once, each line
+   from its start (pathLength 1 on every path), only without reduced motion. */
+.md-typeset .home-hero p.hh-audience { margin: -0.2rem 0 var(--sp-3); color: var(--md-accent-fg-color); font-size: 0.85rem; font-weight: 600; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .home-hero .hh-waves path { stroke-dasharray: 1; animation: hh-draw 2.4s var(--ease) both; }
+  .md-typeset .home-hero .hh-waves .hh-w2 { animation-delay: 0.3s; }
+  .md-typeset .home-hero .hh-waves .hh-w3 { animation-delay: 0.6s; }
+  @keyframes hh-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+}
+
+/* W340: the three steps of "how it works". */
+.md-typeset ol.how-it-works { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); margin: var(--sp-3) 0 var(--sp-5); padding: 0; list-style: none; }
+.md-typeset ol.how-it-works > li.hw-step { position: relative; display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; gap: var(--sp-1) var(--sp-3); margin: 0; padding: var(--sp-3); border: 1px solid var(--site-card-edge); border-radius: var(--radius-m); background: var(--site-surface); box-shadow: var(--shadow-1); }
+.md-typeset .hw-step .hw-ico { grid-row: 1 / 3; display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--site-primary-soft); color: var(--md-typeset-a-color); font-size: 1.1rem; }
+.md-typeset .hw-step .hw-num { position: absolute; top: var(--sp-2); inset-inline-end: var(--sp-3); color: var(--md-default-fg-color--lighter); font-size: 1.4rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.md-typeset .hw-step .hw-title { font-size: 0.85rem; }
+.md-typeset .hw-step .hw-text { color: var(--md-default-fg-color--light); font-size: 0.72rem; line-height: 1.6; }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset ol.how-it-works { grid-template-columns: 1fr; gap: var(--sp-2); }
+}
+
+/* W341: the way into the catalog page. */
+.md-typeset .catalog-link { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); max-width: none; }
+.md-typeset .catalog-link .md-button { margin: 0; }
+.md-typeset .catalog-link span { color: var(--md-default-fg-color--light); font-size: 0.75rem; }
+
+/* W342: path cards with the title on one line, the count beside the difficulty chips, the
+   same height in every row, and the "solved" bar only once something is solved. */
+@media screen and (min-width: 45em) { .md-typeset .level-cards.path-cards { grid-auto-rows: 1fr; } }
+.md-typeset .path-card .lc-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.md-typeset .path-card .lc-diff { align-items: center; margin-top: auto; }
+.md-typeset .path-card .lc-diff .lc-count { margin-inline-end: var(--sp-1); color: var(--md-default-fg-color--light); font-size: 0.7rem; }
+.md-typeset .level-card .mark-progress.is-empty { display: none; }
+
+/* W343: the questions under "שאלות נפוצות", in the site's navy rather than the theme's
+   lime "question" colour. */
+.md-typeset details.question { margin: var(--sp-2) 0; border-color: var(--site-card-edge); border-inline-start: 0.2rem solid var(--md-typeset-a-color); }
+.md-typeset details.question > summary { background-color: transparent; }
+.md-typeset details.question > summary::before { background-color: var(--md-typeset-a-color); }
+.md-typeset details.question > summary::after { color: var(--md-default-fg-color--light); }

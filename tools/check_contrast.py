@@ -26,10 +26,10 @@ TEXT, UI = 4.5, 3.0
 
 # (what, foreground, background, minimum); a background is a list, top layer first, for a
 # translucent fill over another fill (a layer may differ by scheme: a dict). CARD is the
-# explorer box's surface.
+# explorer box's surface (white on the off-white page in the light scheme, W336).
 PAGE = "var(--md-default-bg-color)"
 TOAST = {"default": "var(--md-primary-fg-color)", "slate": "color-mix(in srgb, var(--md-primary-fg-color) 70%, #000)"}
-CARD = {"default": "color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color))",
+CARD = {"default": "var(--site-surface)",
         "slate": "color-mix(in srgb, var(--md-default-fg-color) 4%, var(--md-default-bg-color))"}
 PAIRS = [
     ("body text", "var(--md-default-fg-color)", [PAGE], TEXT),
@@ -65,6 +65,12 @@ PAIRS = [
     ("table text on water", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 20%, var(--md-default-bg-color))"], TEXT),
     ("ladder cell label, chosen", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
     ("ladder cell label, a term", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
+    ("body text on a card", "var(--md-default-fg-color)", ["var(--site-surface)"], TEXT),
+    ("trap group title", "var(--adm-trap)", ["var(--site-surface)"], TEXT),
+    ("trap number", "var(--site-surface)", ["var(--adm-trap)"], TEXT),
+    ("footer text", "var(--md-footer-fg-color)", ["var(--md-footer-bg-color)"], TEXT),
+    ("footer secondary text", "var(--md-footer-fg-color--light)", ["var(--md-footer-bg-color--dark)"], TEXT),
+    ("edit link", "var(--md-default-fg-color--light)", [PAGE], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

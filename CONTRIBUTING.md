@@ -113,7 +113,8 @@ DV-Interview-Questions/
 │   ├── main.html               # Adds the web app manifest (home-screen icon) and the offline worker
 │   └── 404.html                # Hebrew "page not found" with the question the address names
 ├── docs/                       # Site content
-│   ├── index.md                # Home page with the table of all questions
+│   ├── index.md                # Home page: hero, how it works, levels, featured paths, FAQ
+│   ├── all.md                  # "כל השאלות": the table of all questions with its filters
 │   ├── tags.md                 # Tag index
 │   ├── paths/                  # Study paths: index.md + one page per path
 │   ├── questions/
@@ -165,7 +166,9 @@ Conventions:
     value, chips separated by ` | `); the hook renders it as a row of chips, so the cost is
     seen without scrolling to the end of the solution;
   - steps are an ordered list inside `<div class="steps" markdown>`, drawn as a timeline;
-  - traps and follow-ups at the end use `??? trap "מלכודת: ..."` and `??? followup`.
+  - traps and follow-ups at the end use `??? trap "מלכודת: ..."` and `??? followup`. On
+    the built page the hook gathers the traps into one "מלכודות נפוצות (n)" group with
+    numbered rows and drops the "מלכודת :" prefix of each title (`.trap-group`).
 - **Code answers are given in SystemVerilog and Python**, as linked content tabs
   (`=== "SystemVerilog"` / `=== "Python"`, always in this order). Picking a language in one
   tab switches every tab on the site. Pure RTL design questions (like 0001) may be
@@ -366,12 +369,32 @@ The home page opens with a **hero** (`<!-- hero -->` … `<!-- /hero -->` around
 title and lead): a navy card with a quiet waveform pattern, "start practising" (pointed by
 `marks.js` at the first question, student to senior, not marked solved), a random question,
 a large field and ready searches that open the site search, and one line of numbers
-(questions, tested code, interactive boxes). It has a **"continue where you left off"** card (`<!-- home-continue -->`,
+(questions, tested code, interactive boxes), with a line for the audience under the title
+(`{ .hh-audience }`). The waveform is drawn once on load and the numbers count up the
+first time they are seen (`docs/javascripts/home.js`), both off under reduced motion.
+Under it come **"how it works"** (`<!-- how-it-works -->`, three steps from `HOW_STEPS` in
+the hook), the levels, the study paths whose front matter says `featured: true`
+(`<!-- path-cards featured -->`; `docs/paths/index.md` shows them all), a link to the
+catalog page `docs/all.md` (`<!-- catalog-link -->`, also a tab after "ראשי") and the
+FAQ. A path card shows its count and difficulty mix; its "solved" bar appears once one of
+its questions is solved. It has a **"continue where you left off"** card (`<!-- home-continue -->`,
 filled by `marks.js` from the last question page this browser opened, with its marks and
 how long ago) and a **"recently added"** list of the five newest questions by `added`
 (`<!-- recent -->`). `docs/new.md` (`<!-- whats-new -->`) lists every question by the day
 it was added, the newest day first; it is the last tab of the navigation and is linked
 from the footer of every page (the hook appends the link to `copyright`).
+
+### Design tokens and surfaces
+
+`extra.css` defines the tokens new rules use instead of literal values: spacing on a 4 px
+grid (`--sp-1` to `--sp-6`: 4, 8, 16, 24, 32, 48 px), three radii (`--radius-s/m/l`), three
+shadows (`--shadow-1` to `--shadow-3`, per scheme) and one motion speed and easing
+(`--dur-1`, `--dur-2`, `--ease`). In the light scheme the page is off-white
+(`--md-default-bg-color: #f7f8fb`) and cards, boxes, admonitions and tables are white
+surfaces (`--site-surface`) lifted by a shadow, with no outline (`--site-card-edge` is
+transparent); the dark scheme keeps the page colour for surfaces and outlines its cards.
+The footer is the brand navy. The "edit on GitHub" link sits at the end of every page
+(`overrides/partials/content.html`), not beside the title.
 
 ### Diagrams, formulas and figures
 
@@ -459,8 +482,8 @@ holds the same numbers.
    (below) and check the page at desktop and phone width, light and dark.
 5. Commit with a message like `Add question 0042: async FIFO depth`.
 
-The question automatically appears in the navigation, on its level page, on the home page
-table and in the tag index — no other file needs to change.
+The question automatically appears in the navigation, on its level page, in the table
+of `all.md` and in the tag index — no other file needs to change.
 
 ---
 

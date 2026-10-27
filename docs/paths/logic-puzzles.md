@@ -1,6 +1,7 @@
 ---
 title: "חידות היגיון"
 description: "חידות שבודקות חשיבה מסודרת על מקרים, על גבולות ועל מבנה נסתר."
+featured: true
 order: 9
 steps:
   - id: 4
