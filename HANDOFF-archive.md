@@ -4,6 +4,7 @@ Older parts of `HANDOFF.md`, moved here in session 26 (2026-10-25) to keep the l
 short: the work log of sessions 1 to 21, the "In progress" notes of sessions 20 to 26 as
 they were written, and the finished rounds U to X with the explorer survey. Nothing here
 is open; the current state, the open items and the proposals are in `HANDOFF.md`.
+Session 27 added the proposals that were never picked, at the end.
 
 ---
 
@@ -1867,3 +1868,967 @@ The owner's picks (session 20): the rows below are the whole of round W, to be i
 Suggested order (session 20): rounds V and W are done (W in three batches, the owner
 answering multiple-choice questions per batch). Round U134 to U139 is being done the same
 way (U134 to U139 done in three batches); round X with U133 done in three batches.
+
+---
+
+## Proposals archived in session 27 (2026-10-27, as written)
+
+The owner asked for fresh proposals, so every proposal section of `HANDOFF.md` moved
+here as it stood: the topic gaps and question formats, the first series (A1 to T132),
+the second series A to R and Z, the third series UI1 to UI5, the review rounds V1 to
+V7, the fifth series W1 to W5 and the old idea list. Done rows are struck through;
+the open rows (among them V4, V6, W5, A182, B185 to B188, C189, C193, D196, E198,
+M263 to R283 and Z202 to Z216) were not picked and are not proposed again.
+
+### (Question variety) Topic gaps worth filling
+
+| Topic | Example questions | Level |
+|-------|-------------------|-------|
+| FSM design | Sequence detector (Mealy vs. Moore) with a WaveDrom trace; a vending machine | student / junior |
+| FIFO | Synchronous FIFO with full / empty, then "how deep must the FIFO be" for a given burst | junior |
+| Clock domain crossing | Two-flop synchronizer and metastability; Gray-code pointers in an async FIFO | junior / senior |
+| SVA | Write the assertion: req → ack within 1–3 cycles, one-hot, no grant without request | junior / senior |
+| Functional coverage | Write a covergroup with crosses and illegal / ignore bins for an ALU or a packet | junior / senior |
+| Constraints | Unique values without `unique`, a sorted array, a weighted `dist`, a constraint that fails on purpose | junior / senior |
+| UVM | Phases, factory override, sequence / sequencer / driver handshake, a scoreboard for out-of-order responses | senior |
+| Protocols | Valid / ready handshake (AXI-stream) checker, APB transfer, arbiter fairness | senior |
+| Debug | "Find the bug" in a short RTL or testbench, or from a waveform | any |
+| Computer architecture | Cache hit / miss trace, LRU replacement, pipeline hazards | junior / senior |
+| Verification planning | Write a test plan for a FIFO / arbiter; what to measure for sign-off; regression strategy | staff |
+| Behavioral | A bug that escaped to silicon: what happened and what you changed | staff |
+
+### New question formats
+
+| Format | Why | How on the site |
+|--------|-----|-----------------|
+| **Find the bug** | Very common in DV interviews and quick to practise | Code with a hidden bug, the fix in the solution; the test proves the fix |
+| **Read the waveform** | Tests timing intuition | WaveDrom figure plus "what is the value of X at cycle 5?" |
+| **Write the assertion / covergroup** | Core DV skills with no coverage yet | SV only; check with Verilator `--assert` where it is supported |
+| **Mini-project** | Design + verify in one question (e.g. FIFO + scoreboard) | Several parts, each with its own collapsed solution |
+| **Quick quiz** | Short knowledge questions (blocking vs. non-blocking, `logic` vs. `wire`) | A short multiple-choice block, many per page |
+
+
+### Proposals and rounds
+
+Effort: **S** under an hour, **M** a few hours, **L** a day or more.
+
+**Round A — identity and mobile** (done in session 4):
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| A1 | Logo and favicon | S |
+| A2 | Own colour palette (navy + amber) in light and dark mode | S |
+| A3 | Styled level / difficulty chips (CSS) instead of emoji, used in tables, question header and legends | S |
+| A4 | Own footer | S |
+| A6 | One question header card: id label, clean title, level and difficulty chips, topics, added date, "code in SV + Python / tested in CI" badges; hide the duplicate Material tag chips | S–M |
+| A13 | Previous / next question links (`navigation.footer`) and "related questions" by shared tags | S |
+| A15 | Question tables become cards on narrow screens | S–M |
+| A16 | Chip filters instead of selects, with a result counter | S–M |
+
+**Round B — clearer explanations** (done in session 4 except B14; see the work log):
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| B5 | Home page redesign: one-line intro, four level cards with counts, a statistics strip (questions, by difficulty, "all code is tested"), a "how to practise" box, then the full table | M |
+| B7 | "Answer in short" line at the top of every solution | S per question |
+| B8 | Fixed structure inside solutions: idea → steps → code → why it is correct → complexity; numbered steps with a vertical timeline line | M, applied gradually |
+| B9 | Custom admonitions with own icons: "what the interviewer checks" (moved to the top of the solution area), "trap", "follow-up" | S–M |
+| B10 | More readable code: a title per block, line numbers on long blocks, highlighted key lines, Material **code annotations** (numbered circles that open a Hebrew explanation next to the line) | S infra, M per question |
+| B11 | Hint ladder: hint 1 light, hint 2 stronger, opened one after another | S |
+| B12 | "Open all / close all solutions" buttons and a practice mode (solutions hidden, optional timer) | S / M |
+| B14 | Step-through figures (next / previous) for the stack in 0010 and the cycles in 0009 | M |
+
+**Round C — navigation, discovery, sharing** (later):
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| C17 | ~~Phone check in CI: screenshot every page at 390 px and fail on horizontal scroll~~ — done in session 6 | M |
+| C18 | ~~Sortable table columns~~ — done in session 6 | S |
+| C19 | ~~Topic pages / study paths (e.g. constraints: 0007 → 0014 → 0011) with a short intro each~~ — done in session 6 | M |
+| C20 | ~~Random question button honouring the filters~~ — done in session 6 | S |
+| C21 | ~~Better Hebrew search (prefix letters ו/ה/ב/ל/מ/ש as separators)~~ — done in session 6 | M |
+| C22 | ~~Solved / favourite marks in the browser with a progress bar per level~~ — done in session 6 | M |
+| C23 | ~~Social preview cards per question~~ | S–M — **done** in session 16 (G45) |
+| C24 | ~~Comments per question via GitHub Discussions~~ | M — **done** in session 16 (G45), waits for the owner's ids |
+
+**Rounds D to G — proposed 2026-10-18, after 0020 / 0021** (not started; the owner picks):
+
+The two PCIe pages are the longest on the site (three parts, a proof, ten figures and
+tables) and showed where the interface strains: long pages have no in-page navigation,
+figures with 16 rows are unreadable at 390 px, and display math wider than the phone was
+found by hand. The proposals are grouped so a round can be done in one session.
+
+**Round D** — dropped by the owner in session 20 (2026-10-22). D25 and D26 had been done
+as H51 and H50; D27 and D28 live on as L69 and L71; D29 (a share button beside the
+existing heading anchors) and D30 (reading time, a `prerequisites:` line) were dropped.
+
+**Round E — discovery and navigation**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| ~~E31~~ | ~~**Question kind filter**: `kind:` front matter (puzzle / code / design / proof / knowledge) → a chip group in the tables and a badge in the header card (idea 7b)~~ done (session 22: puzzle / code / design / math / dv) | S–M |
+| E32 | **Explicit `related:` links** in front matter that take precedence over tag overlap, a "PCIe" study path 0020 → 0021 with a topic intro, and topic pages for the largest tags (idea 22) | S–M |
+| ~~E33~~ | ~~**Search results with context**: level / difficulty chips and a snippet per hit, and search by id ("0021")~~ done (session 22) | S–M |
+| ~~E34~~ | ~~**Home page memory**: a "continue where you left off" card (last visited question from localStorage) and a "recently added" strip~~ done (session 22) | S |
+| E35 | **Keyboard shortcuts** on desktop: n / p previous-next question, s open / close solutions, r random, ? help overlay | S |
+| ~~E36~~ | ~~**"מה חדש" changelog page** generated from the `added` dates (and the git log), linked from the footer~~ done from the `added` dates only (session 22) | S |
+
+**Round F — interactivity**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| F37 | ~~**Parameter explorer for 0020 / 0021**~~ (done as M73, session 17): sliders for address, length, MPS and RCB; the page draws the splits map and shows the count live (a JS port of the recursion, with a test that compares it to the Python output on a grid of cases) | M |
+| F38 | **Run panel presets**: a dropdown of example inputs per question, an "expected output" comparison, and a shareable link that carries the editor code | M |
+| F39 | **Quick quiz blocks**: multiple-choice self-checks (`??? quiz`) with instant feedback, counted in the marks (the "quick quiz" format of Question variety) | M |
+| F40 | **Side-by-side SystemVerilog / Python** on wide screens (a toggle next to the tabs) with matching line highlights | M |
+| F41 | **"Open in EDA Playground"**: copy the SV code and open the site in one click (idea 7c) | S |
+
+**Round G — infrastructure and quality**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| G42 | ~~**`tools/new_question.py`**: scaffold the page, `tests/<id>/`, a figure-generator stub and the README catalog row from the template (idea 12b)~~ | S–M — **done** as J60 |
+| G43 | ~~**Generators for the old figures** 0004–0007 in `tools/figures/` (idea 12a)~~ | S–M — **done** in session 16 |
+| G44 | ~~**Accessibility pass**: focus rings, aria labels on the toolbar and steppers, contrast of the amber chips in dark mode, `prefers-reduced-motion`; an axe / Lighthouse check in CI~~ | M — **done** in session 16 (axe warns in CI) |
+| G45 | ~~**Social preview cards** (C23) and **giscus comments** (C24)~~ | S–M / M — **done** in session 16 (comments wait for the owner's ids) |
+| G46 | ~~**Scheduled workflow**: a weekly external-link check and a reminder when a Verilator release newer than the pinned commit is out~~ | S — **done** in session 16 |
+| G47 | ~~**Display-math width in CI**: extend `check_phone.py` to report `mjx-container[display]` elements wider than the content box (the ten equations of 0021 were found with an ad-hoc script)~~ | S — **done** as K65 |
+
+Suggested order by value for effort: D26 and D25 (done as H50 and H51; round D since dropped),
+G47 (so the next proof page is caught by CI), F37 (the PCIe explorer), E31 and E32.
+
+**Rounds H to K — proposed 2026-10-19, after 0026 to 0028** (K, H and J done in session 13 except H49; I open):
+
+Session 12 added the first questions without code that lean on figures (0026 motion,
+0027 / 0028 cake split) and the first interactive component (`cake-explorer.js`). What it
+showed: charts with 11 to 13 bars and rows are small at 390 px, wide display math is still
+found by eye, the page linter skips indented lines and everything inside the steps
+timeline, and each new figure page repeats the same bar / stem / threshold code. Rounds D
+to G above are still open; H to K add to them.
+
+**Round H — interface, building on the explorer**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| H48 | **One explorer component**: turn `cake-explorer.js` into a small declarative widget (sliders from `data-*`, charts from a shared JS module) and reuse it: α for 0026 (the position-time chart moves), N for 0016 / 0022, address / MPS / RCB for 0020 / 0021 (this is F37) | M — **done** |
+| H49 | **Guess before you look**: in practice mode an input "your answer" above the solution (a number or a person), checked against an `answer:` front-matter field before the solution opens; counted in the marks | M — **deferred by the owner** |
+| H50 | **Figure lightbox** (D26), now more pressing: the cake rows, the 13-bar charts and the 0015 grid need pinch-zoom on a phone | M — **done** |
+| H51 | **Part navigation bar** (D25): every new page has two parts with long solutions | S–M — **done** |
+| H52 | **Theme check**: run the phone check in dark mode too (all screenshots today are light), and flag SVG text whose colour is not a CSS variable | S — **done (warn only; dark mode on a manual run)** |
+| H53 | **Chart hover values on touch**: tap a bar or dot to show its `<title>` as a small tooltip (phones have no hover) | S — **done** |
+
+**Round I — new questions, by theme** (each line is one or two pages)
+
+| # | Theme | Questions |
+|---|-------|-----------|
+| I54 | Motion and rates, after 0026 | bridge and torch (4 people, 17 minutes), the jeep / desert crossing, two trains and a fly, river boat up and down stream |
+| I55 | Quant brainteasers, after 0027 / 0028 | optimal stopping (secretary problem, 1/e), gambler's ruin, coupon collector, broken stick into a triangle; each with an explorer |
+| I56 | Owner's open list (Open items) | poisoned wine with 10 testers, 12 coins in 3 weighings, two eggs and 100 floors, 100 doors, Boyer–Moore majority |
+| I57 | Digital design for DV | Gray code and async FIFO pointers, divide-by-3 clock with 50% duty, maximal LFSR, Hamming (7,4), XOR from NAND only; WaveDrom and Verilator tests |
+| I58 | Core DV gaps | SVA req → ack in 1–3 cycles, a covergroup with crosses and illegal bins, FIFO depth for a burst, find-the-bug in a scoreboard, UVM sequence / driver handshake |
+| ~~I59~~ | Dropped, the Staff level was removed (session 19). Was: staff level | a verification plan for an arbiter, sign-off metrics, regression strategy; a written "what would you check" format |
+
+**Round J — adding questions faster**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| J60 | **`tools/new_question.py`** (G42): page, tests folder with the figures-up-to-date test, generator stub, README row | S–M — **done** |
+| J61 | **Shared chart helpers** `tools/figures/charts.py`: bars with a highlighted bar, stems against a threshold, ratio against y = 1, curve against a line; 0026–0028 and the older charts move onto it | M — **done for 0026–0028** |
+| J62 | **Fill script in the repo**: the page template with `{{B0}}` placeholders and the generator blocks (used by hand in session 12) as `tools/figures/fill.py`, so a page and its figures are regenerated in one command | S — **done (gen markers + fill.py)** |
+| J63 | **One test helper** for "figures and tables match the generator" (copied into every no-code test today) | S — **done** |
+
+**Round K — safety net**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| K64 | **Linter gaps**: check RTL on indented lines and inside `<div class="steps">` (paragraph starts only), and fail on a `\tag` inside a list item without `aligned` | S — **done** |
+| K65 | **Display-math width in CI** (G47): every equation split by hand in sessions 8–12 would have been caught | S — **done (warn only)** |
+| K66 | **Node in CI explicitly** (`actions/setup-node`), so the explorer tests can never be skipped silently | S — **done** |
+| K67 | **Owner-file check list**: when a source file arrives, recompute its tables and formulas in a test first (done by hand for 0026–0028; it found the capped-last-person gap and one rounding) | S per question — **done (CLAUDE.md, README)** |
+
+Suggested order: K64 + K65 + K66 (small, protect every next page), H51 + H50 (phone
+reading), J60 + J62 (faster batches), then H48 and a content round from I.
+
+**Rounds L to O — proposed 2026-10-19, after session 13** (not started; the owner picks):
+
+Session 13 gave every page a lightbox, tooltips and a part bar, one explorer component and
+authoring tools. The next gaps: practising (the site shows solutions but does not help to
+remember them), explorers on the rest of the "numbers" pages, the older figures still
+outside `fill.py`, and no visual or accessibility check in CI.
+
+**Round L — practising and remembering**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| L68 | **Review queue**: the "solved" mark keeps the date; the home page shows "to review" for questions solved more than 7 / 30 days ago (spaced repetition, localStorage only) | M |
+| L69 | **Progressive reveal** in practice mode (D27): idea → steps → proof one block at a time, with "show more" | M |
+| L70 | **Key-ideas page per study path**: the "answer in short" and "idea" blocks of each question on one page, for revision before an interview | S–M |
+| L71 | **Print / PDF of a path** (D28, idea 19): all blocks open, figures kept, one question per page | M |
+| L72 | **Guess before you look** (H49), kept for later: a typed answer checked against an `answer:` field | M |
+
+**Round M — more explorers and figures**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| M73 | ~~**PCIe split explorer** for 0020 / 0021 (F37): address, length, MPS, RCB → the splits map and the count~~ | M–L — **done** in session 17 |
+| M74 | **Hourglass explorer** for 0018 / 0019: pick the two glasses and the target, the BFS / Dijkstra path shown step by step | M |
+| M75 | **Probability explorer** for 0015: p, q and the number of children move the outcome grid and the answer | S–M |
+| M76 | ~~**Stepper upgrades**: autoplay with a speed control, a deep link to a step (`#step-5`), swipe on phones~~ | S–M — **done** in session 17 (deep link and swipe; autoplay lives in the explorers) |
+| M77 | ~~**"Interactive" badge** in the header card and a filter chip for pages with an explorer or a stepper~~ | S — **done** in session 17 |
+
+**Round N — finding questions**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| ~~N78~~ | done as E33: **Search by id and with context** (E33): "0027" finds the page; hits show level / difficulty chips | S–M |
+| ~~N79~~ | done as E34: **Home page memory** (E34): "continue where you left off" and a "recently added" strip | S |
+| ~~N80~~ | done as E36: **"מה חדש" page** (E36) generated from the `added` dates, linked from the footer | S |
+| N81 | **Keyboard shortcuts** (E35): n / p, s, r, ? help | S |
+
+**Round O — tooling and quality**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| O82 | **All generators on `blocks()` + `fill.py`** (0008–0025), dropping the per-test regex comparisons; generators for 0004–0007 (G43) end the literal-colour warning | M |
+| O83 | **Visual regression**: compare the CI phone screenshots with the last `main` run and list pages whose pixels changed | M |
+| O84 | **Accessibility check** (G44): axe in the phone check, focus rings, labels on the toolbar, lightbox and sliders | M |
+| O85 | **Browser tests of the reading tools** in `tests/tools/` (lightbox, part bar, tooltip, explorer sliders) with Playwright | S–M |
+| O86 | **Weekly scheduled workflow** (G46): external links and a newer Verilator release | S |
+
+Suggested order: O85 (protects what session 13 added), N78 + N79 (cheap and visible),
+M75 or M74 (one more explorer), L68 + L70 (practising), then O82 before the next large
+batch of figure pages.
+
+**Rounds P to S — proposed 2026-10-20, after 0029 and 0030**
+
+Session 14 added the first explorer with its own controls (the clock of 0029) and the
+first embedded standalone tool (the owner's spider-and-fly page of 0030). What it showed:
+a play button and a draggable figure explain motion better than a slider and a chart; a
+tool sent as a file can be embedded as is, but it does not follow the site's theme or
+language; the recent questions are all puzzles, and the senior / staff and DV-core shelves
+have not grown since 0025. Rounds D to G, I and L to O above stay open; P to S add to
+them, and P and R answer the owner's request for clearer graphics on specific questions
+and for new questions.
+
+**Round P — graphical explorers for specific questions**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| P87 | ~~**Strip explorer for 0030, in the site's style**: drag S on the wall x = 0 and F on x = a (two small wall panels), the periodic strip redraws with the eight images, the 48 lines faint, the valid ones solid and the shortest in orange; the exit point and the distance in the summary. Hebrew, follows light / dark. The owner's tool stays as the full 3D view~~ **Done** in session 15 | M |
+| P88 | ~~**Motorcycle animation for 0026**: a play button moves the three travellers along the road figure while the position-time chart draws itself; a scrubber for the time, the phase boundaries marked (the clock explorer's play loop reused)~~ **Done** in session 15 | M |
+| P89 | ~~**Cake cutting animation for 0027 / 0028**: the rows appear one person at a time with the slice highlighted, the bar chart grows with them; a toggle "arithmetic / geometric" on one page to compare the two laws with the same a~~ **Done** in session 15 | S–M |
+| P90 | ~~**Josephus circle animation for 0016 / 0022**: people leave the circle one by one at a chosen speed, the survivor highlighted, the binary of N shown rotating for L = 2; the survivor chart stays~~ **Done** in session 15 (without the rotating binary) | M |
+| P91 | ~~**Clock explorer additions for 0029**: a timeline strip under the day slider with a tick at every meeting (dense bands show where the pairs cluster), a pair filter, and a "next triple" jump~~ **Done** in session 15 | S–M |
+| P92 | ~~**Hourglass explorer for 0018 / 0019** (M74) and **probability explorer for 0015** (M75), both still open; the PCIe split explorer (M73) after them~~ **Done** in session 15 (hourglass and probability; M73 still open) | M each |
+
+**Round Q — new questions, puzzles in the style of 0026–0030**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| Q93 | **Ant on a can** (geodesics again): the shortest path on a cylinder from a point outside to a drop inside the rim, by unrolling the side and reflecting in the rim; junior / medium, no code, an unrolled-strip figure like 0030 | M |
+| Q94 | ~~**Bridge and torch**: four people, 1 / 2 / 5 / 10 minutes, two at a time, one torch; 17 minutes and why 19 is the trap; part b a BFS over states in SV + Python with a stepper of the crossings; junior / medium~~ **Done** in session 15 as 0031 (Dijkstra, not BFS: the crossings are weighted) | M |
+| Q95 | **Two trains and the fly**: the fly's total distance by the easy way and by the geometric series; student / easy, an animation of the fly bouncing (play button) | S–M |
+| Q96 | ~~**Wolf, goat and cabbage**: BFS over the eight bank states with the forbidden ones struck out; student / easy; a stepper and code~~ **Done** in session 15 as 0032 | S–M |
+| Q97 | **Clock angles** (0029 follow-ups made a question): when are the minute and hour hands opposite, at right angles, mirror images; student / easy; the clock explorer reused with a target angle | S |
+| Q98 | **Heron's shortest path** (reflection in a wall): the path from A to B that touches a line; student / easy, prepares 0030 and Q93 | S |
+| Q99 | **Rope around the Earth**: add one metre to the rope, how high does it lift; student / easy, mental arithmetic and a figure not to scale | S |
+
+**Round R — new questions, DV core (the shelves that did not grow)**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| R100 | ~~**Synchroniser MTBF**: two flops, τ, T0, the clock and data rates; compute the MTBF and how a third flop changes it; senior / medium; a small calculator explorer (sliders for the rates) and the formula in SV + Python~~ | M — **done** in session 18 as 0037 |
+| R101 | ~~**FIFO depth from rates and bursts**: write and read rates, a burst length, back-pressure; the depth formula and a simulation of the fill level; junior / medium; an explorer that plots the fill level over time for the chosen rates~~ | M — **done** in session 18 as 0033 |
+| R102 | ~~**Gray code pointers for an async FIFO**: why one bit changes, the conversion both ways, the full / empty test with the two top bits; junior / medium; SV + Python and a WaveDrom of the pointer crossing~~ | M — **done** in session 18 as 0034 |
+| R103 | ~~**Divide-by-3 clock with 50% duty**: the design with a negative-edge flop, a WaveDrom timing diagram, and the testbench that checks the duty; junior / medium~~ | S–M — **done** in session 18 as 0035 |
+| R104 | ~~**Maximal LFSR**: period of a 4-bit LFSR for two tap sets, why one is 15 and the other shorter; the sequence table from code; student / easy~~ | S — **done** in session 18 as 0036 |
+| ~~R105~~ | Dropped with the Staff level (session 19). Was: **staff level, first question**: reviewing a verification plan (a given feature list with holes: missing negative tests, no coverage goals, no reset / power scenarios); a rubric-style answer with no code; staff / medium | M |
+| R106 | ~~**SVA for a handshake**: req must hold until ack, ack within N cycles, no ack without req; the assertions, a WaveDrom with a passing and a failing trace; junior / medium; Verilator checks the assertions~~ | M — **done** in session 18 as 0038 |
+
+**Round S — clearer question pages**
+
+| # | Proposal | Effort |
+|---|----------|--------|
+| S107 | **Answer-at-a-glance card**: the first screen of every solution shows the final result, the one-line idea and a thumbnail of the key figure (the 40 net, the clock, the strategies bars), before the steps | S–M |
+| S108 | **Steps linked to figures**: a step in the timeline highlights its element in the figure on hover or tap (the triangle legs in step 3 of 0030, a phase in 0026, a band in 0029), with `data-step` attributes written by the generators | M |
+| S109 | **"Naive vs best" compare card**: the two routes, strategies or indices side by side with their numbers (0026 strategies, 0030 42 vs 40, 0027 person 3 vs 4), two columns on desktop and stacked on a phone | S |
+| S110 | **Embedded tools follow the site**: the iframe of 0030 gets `?theme=` and `?lang=` from the page; needs a few lines in the owner's file (the owner decides), otherwise a note on the page that the tool is English and dark by default | S |
+| S111 | **Numbered figure captions** ("איור 3") with the caption as the lightbox title, and cross-references from the text; the generators emit the caption | S–M |
+| S112 | **Full-screen explorer on phones**: an explorer box opens in the lightbox overlay with its charts at full width (the strip and the clock are cramped at 390 px) | M |
+
+Suggested order: P87 + S109 (0030 gets its own figure explorer and the 42-vs-40 card),
+R101 + R102 (two DV-core questions that share the FIFO theme and a path), Q94 (the bridge,
+with code), then P88 and S108, and R105 to open the staff shelf.
+
+**Round T — explorers for the existing questions, proposed 2026-10-21** (the owner picks)
+
+A survey of the pages that have no interactive component yet (the clock, strip, cake,
+motorcycle, Josephus, hourglass, probability, bridge and river explorers exist). Each
+proposal names the one thing the reader should be able to *do* that the static figures
+cannot show; the pattern (play loop, stepper, drag, "generate") is the one already in
+`explorer.js`. Effort as above.
+
+| # | Page | Explorer | Effort |
+|---|------|----------|--------|
+| ~~T113~~ | Done in session 19. Was: 0009 boxes and cycles | **Permutation lab**: N boxes (sliders 4..16), "shuffle" draws the permutation as arrows and colours its cycles; a stepper follows one prisoner box by box; "1,000 rounds" runs the strategy against random choice and shows the success rates side by side (≈ 31% against 1 / 2^N) | M |
+| ~~T114~~ | Done in session 19. Was: 0010 valid parentheses | **Stack animation**: type a string, the stack pushes and pops character by character, the depth chart draws itself, the first mismatch is circled; presets for the page examples and the traps (`([)]`, lone `)`) | S–M |
+| ~~T115~~ | Done in session 19. Was: 0017 duplicate number | **Tortoise and hare**: the array as nodes i → a[i] (type or shuffle an array), the two runners move at their speeds, the meeting and the second phase to the entry of the cycle (the duplicate); a second tab plays the binary-search-on-values method with the count per step | M |
+| ~~T116~~ | Done in session 19. Was: 0014 random shapes | **Generate**: a button draws N random squares or rectangles on the grid with the constraints of the page (a JS port of the rejection sampling), rejected attempts flashed in red; a heat map of where shapes land after 500 draws shows the bias the question asks about | M |
+| ~~T117~~ | Done in session 19. Was: 0011 tic-tac-toe | **Board builder**: tap cells to place X / O, the page's rules decide live whether the board is a legal final board and say why not (counts, two winners, play after a win); "random legal board" and the wrap-around variant of part b as a toggle | M |
+| ~~T118~~ | Done in session 19 (see the log). Was: 0007 triangle and centre | **Throw three points**: a button (or drag the points) on the unit circle, the arcs coloured, inside / outside decided; "1,000 throws" fills a running counter that converges to 1/4; an M slider for the discrete version with the formula beside it | S–M |
+| ~~T119~~ | Done in session 19. Was: 0005 smallest 0/1 multiple | **BFS on remainders**: x up to ~30, the x remainders as a ring, the queue and the visited set grow step by step, the path back to 0 spelled out as the answer; a step counter next to the enumeration count for the same x | M |
+| ~~T120~~ | Done in session 19. Was: 0012, 0013 Kaprekar | **Iterate**: type a number, sort-subtract step by step until 495 / 6174, the chain drawn; a histogram of the number of steps over all numbers (the page's part b) with the typed number highlighted | S–M |
+| ~~T121~~ | Done in session 19. Was: 0008 Eurovision | **Announcement slider**: the cups chart with a slider "countries announced so far"; the room left for Israel against the points left, the moment of certain loss marked; a "what if" box to change Israel's jury score and watch the moment move | S–M |
+| ~~T122~~ | Done in session 19. Was: 0004 three boxes | **Sample a ball**: tap a box to draw one ball (the hidden contents are random each time), the deduction appears line by line; "try the wrong box first" shows why one draw from "red" or "black" is not enough | S |
+| ~~T123~~ | Done in session 20. Was: 0001 edge detector | **Waveform lab**: click the input per cycle, the output and the flop values appear on a live WaveDrom-like strip with the two-flop diagram beside it; a toggle for the one-cycle-late variant of the follow-ups | S–M |
+| ~~T124~~ | Done in session 20. Was: 0002, 0003 swaps and loops | **Code tracer**: a step button runs the page's loop with a variable table and the current line highlighted (the swap variants, the double loop); one component reused by every short-code question | M |
+| ~~T125~~ | Done in session 20. Was: 0024 USB4 credits | **Credit flow**: sliders for the buffer size and the packet rate, the two modulo-256 counters and the credits in flight animated, a "lose a packet" button and the resynchronisation that follows, as in the page's step figures | M–L |
+| ~~T126~~ | Done in session 20. Was: 0025 PCIe Ack/Nak | **Sequence timeline**: send TLPs, press Ack / Nak at the receiver, watch the Retry Buffer fill and empty, a Replay after a Nak or a timeout; the page's error cases as presets | M–L |
+| ~~T127~~ | Done in session 20. Was: 0023 PCIe endpoint | **Request builder** on top of M73: address, length, MPS, RCB → the completions the model returns and the memory reads it performs, reusing the split explorer | L (after M73) |
+| ~~T128~~ | Done in session 20: 0036 LFSR | **Tap lab**: tick the taps, step or play on a ring of the 15 states, the output bits, the table of the eight polynomials | S–M |
+| ~~T129~~ | Done in session 20: 0035 divide by 3 | **Half-cycle stepper**: cnt, a, b and clk_out edge by edge, the overlap shaded, the duty measured; a wake-up in state 3 in three counter variants | S–M |
+| ~~T130~~ | Done in session 20: 0034 Gray pointers | **Sampled step and flags**: every changing bit arrived or not (binary against Gray); a 16-entry FIFO with 5-bit pointers and the full / empty rules | M |
+| ~~T131~~ | Done in session 20. Was: 0006 stock | **Scan lab**: an editable price chart (drag or random), the scan animated with the running minimum and the best trade so far, a long / short toggle for part b | M |
+| ~~T132~~ | Done in session 20. Was: 0038 handshake | **Rule checker**: draw req and ack on a timing strip (the `waveStrip` helper), the four rules evaluated every cycle, a violation marked with its rule, the three violations of the page as presets | M |
+
+Suggested order: T114, T118, T122 (small, each page gets its "try it" box in an hour),
+then T113 and T115 (the two algorithm animations that readers ask about most), T121 and
+T120, and the protocol trio T125 to T127 after M73. Session 19 did T118, T113, T115, T119
+and T114, then T117, T116, T120, T121 and T122. Session 20 did T123, T128 to T132, T125 to T127 and T124. Round T is closed.
+
+The finished rounds U to X and the explorer survey of session 20 are in
+[`HANDOFF-archive.md`](HANDOFF-archive.md).
+
+### Second series, rounds A to E — presenting the answers (proposed 2026-10-22, owner picks)
+
+The owner asked for new proposals on how answers are shown: clear, good-looking pages
+with visual explanations. The rounds restart at A; item numbers continue the global
+count (181 on), so they do not collide with the first series' A1 to D30.
+
+What the pages look like today (screenshots of 0020 at 1280 and 390 px, light): a long
+single column; each solution is a stack of blocks (short answer, idea, steps, code,
+proof, cost) that the reader scrolls through; figures are generated SVG with a separate
+legend under them, and on a phone the address-axis figures shrink until their labels are
+about 6 px high while the legend wraps to four or five lines; the table of contents lists
+only the top sections; the 34 explorer boxes each have their own control layout.
+
+What the short research found (sources in the chat summary of 2026-10-22):
+
+- Interactive diagrams should add to the text, never replace it: the reader learns without
+  touching anything, and a box is not dropped on the reader as a sandbox without guidance
+  (Red Blob Games). Diagrams work best interlinked with the text and annotations (UW
+  CSE442). Animation must reveal something, interactions must be discoverable, and a
+  reduced-motion path must exist.
+- Discrete states read better in an explicit stepper than in scroll-driven animation
+  (known length, direct access, replay, comparison); scrollytelling needs a stacked or
+  stepped fallback on phones (Kosara, "The scrollytelling scourge"; The Pudding's
+  responsive scrollytelling guide).
+- Program visualisation that steps forwards and backwards through real execution, with
+  the state beside the code, is the best-studied form for code answers (Python Tutor,
+  Guo, SIGCSE 2013). Diagrams should focus on the part of the code that matters for the
+  task (MIT thesis on code-comprehension diagrams).
+- Interview-prep products stage the answer: hints, then complexity, then patterns, then
+  code, each behind a toggle, and give every approach its complexity (AlgoExpert,
+  StreamPrep, AlgoMaster's animated visualisations).
+- Material for MkDocs is in maintenance mode (no new features since 9.7, end of life
+  announced for November 2026; the team moved to Zensical, which reads `mkdocs.yml`).
+  New interface work should therefore live in our own CSS / JS, not wait for theme
+  features; a move to Zensical is a separate decision for the owner.
+
+**Round A — the answer at a glance**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~A181~~ | ~~**Solution map**: a strip at the top of every solution with its blocks (idea → steps → code → proof → cost), one line each, clickable; the block in view is marked while scrolling~~ done (session 22, round 1 of the owner's interface plan) | S–M |
+| A182 | **Answer hero card**: the short answer with its key result set large (a number, a formula, a verdict), a thumbnail of the main figure beside it, and the hint ladder folded into a progress line above it | M |
+| ~~A183~~ | ~~**Cost as chips and a comparison**: time / space (and flops, gates, latency on design pages) as chips in the solution header; on pages with several approaches a small table or bar chart comparing them~~ done as chips only (session 22; the comparison part dropped with the owner's no-naive-comparison rule) | S–M |
+| A184 | **Approaches side by side**: where a page has a naive and a good solution, a two-column compare view (or tabs with a "what changed" note) instead of two blocks far apart | M |
+
+**Round B — code and figure linked**
+
+| Id | Idea | Size |
+|---|---|---|
+| B185 | **Linked highlighting**: tapping a code line, or one of its annotation markers, highlights the figure element it builds, and the other way round (ids emitted by the figure generators, a shared `data-link`) | M |
+| B186 | **Step-through of the page code beside its state** (the Python Tutor pattern) for the algorithm pages that have a trace-like box: the current line lit, the variables and data structures beside it, forward and back; generalises the 0002 / 0003 trace view to 0005, 0010, 0017 | M–L |
+| B187 | **Proofs as steppers**: each step of a proof block highlights the part of the figure it talks about, with the step text under it (the figure steppers of M76 applied to proofs) | M |
+| B188 | **Code and waveform side by side** on the DV pages: on a wide screen the SystemVerilog tab and its WaveDrom diagram in two columns, the waveform sticky while the code scrolls | S–M |
+
+**Round C — the reading surface**
+
+| Id | Idea | Size |
+|---|---|---|
+| C189 | **Sticky figure column on wide screens**: in long solutions the current figure stays beside the text while it scrolls (a stepper, not scroll-driven animation); one column with the figures inline on phones | M |
+| C190 | **Typography pass for Hebrew**: a Hebrew face with good digits (e.g. Assistant or Heebo), tabular numbers in tables, a line-length cap, more line height, styled LTR runs | S–M |
+| ~~C191~~ | ~~**One visual identity per block**: idea / steps / code / proof / cost / trap each with an icon, an accent colour and a side rail, the same in light and dark~~ done (session 22) | S |
+| ~~C192~~ | ~~**Tables that read**: sticky header, numbers aligned, the row the text refers to highlighted, and on phones long tables as cards~~ done without the row highlight (session 22) | S–M |
+| C193 | **Direct labels instead of separate legends** in the generated figures where there is room, and a colour-blind-safe palette checked by a script over every `--viz-*` pair | M |
+
+**Round D — figures made for the phone**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~D194~~ | ~~**Compact figure variants**: generators emit a narrow layout for phones (fewer ticks, larger text, stacked rows) shown under 480 px; today's address-axis figures fall to ~6 px labels~~ done as a phone layer in `reading-tools.js` (session 22, the owner's pick over a second SVG per figure) | M–L |
+| ~~D195~~ | ~~**Minimum text size check**: `check_phone.py` measures rendered SVG text at 390 px and warns below 9 px~~ done (session 22; 160 figures on 36 pages warned, the input of D194) | S |
+| D196 | **Controls in a bottom sheet** on phones for the explorer boxes: the figure stays in view while the controls sit at the bottom of the screen | M |
+| ~~D197~~ | ~~**Legend as chips** under a figure on phones (one row that scrolls) instead of a list of five lines~~ done as wrapping chips (session 22, the owner's pick) | S |
+
+**Round E — motion and consistency in the boxes**
+
+| Id | Idea | Size |
+|---|---|---|
+| E198 | **Purposeful transitions**: values and cells move between states (tweened bus values, sliding queue chips, growing arcs), off under `prefers-reduced-motion` | M |
+| ~~E199~~ | ~~**The answer lights up**: when a box reaches its result, the element that is the answer (the duplicate, the survivor, the maximal polynomial) is outlined and named in one line~~ done in 11 kinds (session 22) | S–M |
+| ~~E200~~ | ~~**One layout for all 34 boxes**: control groups in a fixed order (input, playback, output), a status line at the bottom, the same spacing and button sizes, documented once~~ done as a shared layer in `core.js` (session 22) | M |
+| ~~E201~~ | ~~**A first-visit guide** on one box per page: three dismissible hints pointing at the main control, the figure and the summary, remembered per browser~~ done (session 23, part 6: once per browser, on the page's first box) | S–M |
+
+Suggested order: A181 and C191 (small, visible on every page), D195 then D194 (the phone
+figures are the weakest point today), B185 (the largest gain in understanding), then A182
+and A183.
+
+### Second series, rounds F to H — the explorer boxes (proposed 2026-10-23, owner picks)
+
+The owner asked for proposals to improve the explorer boxes. A read of `explorer.js`
+(41 views, 8,114 lines) on 2026-10-23 found:
+
+- `explorer.js` is 631 KB unminified and is listed in `extra_javascript`, so every page
+  loads and parses it, the home page and the catalogs included; every box on a page is
+  built at `DOMContentLoaded`, also the ones far below the fold.
+- No test clicks the boxes: the Node tests compare each model's math with the Python
+  reference, and `check_phone.py` loads every page (axe, `pageerror`, width) without
+  pressing a control. The 8,000 lines of view code have no interaction test.
+- The copy link carries the box state (`seedControls` with `opts.state`) in 5 boxes
+  (boxes, floyd, stock, acknak, credits); the other seeded boxes (eggs, seqdet, coverage,
+  horses, kapbase, kap4base, triangle, polygon, trace, endpoint and more) carry only the
+  seed, and the boxes driven by typed fields (cake, motorcycle, josephus, clock,
+  hourglass, bridge, pcie, fifo, mtbf, bfs01, abmap, camel, brackets, lfsr, div3) have no
+  link at all.
+- No box remembers its state when the reader comes back (no `localStorage`); nothing
+  downloads a figure or a table (U133 covers the WaveDrom strips only).
+- A speed select exists on every play except the 0014 shapes flash (350 ms), so no
+  speed item is needed.
+
+Item numbers continue the global count; rounds F to H here are the second series and do
+not collide with the first series' F to H (items 37 to 53).
+
+**Round F — safety net and load time**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~F218~~ | ~~**Click-through test of every box**: a Playwright run over the built site that, in every box, presses each button, plays to the end, uses "reset everything", copies a link and reopens it; it fails on a JS error, a console error or a page wider than 390 px. Runs in CI next to `check_phone.py` (offline routes as there)~~ done (session 21) | M |
+| ~~F219~~ | ~~**Split and lazy-load `explorer.js`**: a small shared core (seed, strip, controls, header, keyboard) and one file per kind, loaded only on a page that has that kind; each box is built when it nears the viewport (IntersectionObserver); minified at build time. The Node tests keep requiring the same model exports~~ done (session 21) | M–L |
+
+**Round G — the same behaviour in every box**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~G220~~ | ~~**State in the copy link for every box**: a generic serializer of the box's inputs, selects and toggles (plus the step index where a box steps), written to `#state-<kind>.<payload>`; the 5 hand-written states stay, every other box gets a link without its own code~~ done (session 21) | M |
+| ~~G221~~ | ~~**The box remembers where the reader stopped**: the same payload saved per page and box in `localStorage` (wrapped in try / catch), restored on load, cleared by "reset everything"; a URL state wins over the saved one~~ done (session 21) | S |
+| ~~G222~~ | ~~**Download the figure and the table**: a button per box that saves the current SVG (and a PNG) and the box's table as CSV, next to the WaveDrom row of U133~~ deferred by the owner (session 21) | S |
+
+Pairs with E200 (one layout for all boxes): both touch every view, so they are best done
+in the same pass.
+
+**Round H — practice inside the boxes**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~H223~~ | ~~**"Guess before the step"**: an optional practice mode in the stepping boxes that asks for the next state or the result before showing it (who survives in Josephus, how many drops for the eggs, the next state of seqdet, the next chain value in kaprekar) and counts the hits. Not H49 / L72 (a typed answer checked before the solution opens, deferred by the owner): this one lives inside the box and checks a step~~ deferred by the owner (session 21) | M |
+| ~~H224~~ | ~~**"Open in the box" from the text**: a small button on a table row or a worked example that sets the box to those values and scrolls to it (a row of the k / n table of 0039, the base-7 example of 0012, the scripts of 0025); the page text and the box linked, as the second-series research recommends~~ deferred by the owner (session 21) | S–M |
+
+Pairs with E199 (the answer lights up) and E201 (a first-visit guide).
+
+Suggested order: F218 first (a safety net before changes that touch every box), then F219
+with G220 (both reshape the shared code), G221 and G222 with E200, then round H with E199.
+D196 (controls in a bottom sheet on phones) and B186 (the page code stepped beside its
+state) stay open in their rounds.
+
+### Second series, rounds I to L — boxes that show the solution (proposed 2026-10-23, revised, owner picks)
+
+A review of every page (session 21, three read-only passes over the pages and the kind
+files) asked of each box whether it shows the solution the page gives (its idea, the steps
+of the algorithm, the invariant or the proof) and which parts have no visual at all. Every
+page has a box, but 13 pages have a part (beyond the statement) with no visual, more have
+parts with static figures only, and most boxes show the answer rather than why it holds.
+
+The owner's direction (session 21): illustrate the solutions on the pages; no comparisons
+with a naive solution and no "trap failing on screen" views. This version replaces the
+first one (I225 to L262): the trap round and the naive comparisons were dropped, the trap
+toggles were removed from the items that stayed, and round K now shows the mechanism of the
+solution inside the existing boxes. Parameter knobs stay out (the owner turned them down
+in round W). Item numbers continue the global count, so these rounds do not collide with
+the first series' rounds of the same letters.
+
+**Round I — a visual in the parts that have none (puzzles and algorithms)**
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| ~~I284~~ | 0002 parts a, b | Done in session 22. **Each part with its own swap**: the existing `trace` box placed in part a (the temporary variable) and in part b (the sum and the XOR), each preset to its part's version, the values and the a0 / b0 expressions line by line | S |
+| ~~I285~~ | 0004 part b | Done in session 22. **The labels fix**: a `boxes3` mode with the labels array, k, same and other marked, and the two swaps drawn as a 3-cycle | M |
+| ~~I286~~ | 0006 part a | Done in session 22. **The scan in part a**: the `stock` box placed in part a in long-only mode, so the minimum so far and the best long sit beside the part that explains them | S |
+| ~~I287~~ | 0005 bonus | Done in session 22. **Pigeonhole on the repunits**: R1 … R(x+1) dropped into x remainder slots, the first collision lit, and R_i − R_j = 1…10…0 shown as the multiple | M |
+| ~~I288~~ | 0007 part c | Done in session 22. **Three half-circles**: for a drawn triangle, the half-circle that starts at each point; at most one holds the other two; seeded draws count A1, A2, A3 apart (about 1/4 each, never two at once) | M |
+| ~~I289~~ | 0011 part b | Done in session 22. **Any five cells hold a line**: pick cells on the wrap-around board; the 2-2-1 split per direction and the pair count are shown, and the fifth cell always completes a line | M |
+| ~~I290~~ | 0012 part b | Done in session 22. **The map of the proof**: `kapbase` with base 10 placed in part b: the map k → max(10 − k, k − 1) and the fixed point at 5 | S |
+| ~~I291~~ | 0013 part b | Done in session 22. **The 55 pairs, clickable**: a cell of the (p, q) grid shows its digits, the case of the analysis that applies and the arrow to the next pair; only 6174 points to itself | S–M |
+| ~~I292~~ | 0017 solution 3 | Done in session 22. **Binary search on values**: the histogram of 1..n with the count of values ≤ mid against y = mid, lo and hi narrowing with the invariant in colour, on the same array as the Floyd box | M |
+
+**Round J — a visual in the parts that have none (DV, math and probability)**
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| ~~J293~~ | 0033 part a | Done in session 22. **Written and read staircases**: the two cumulative step curves; the gap between them is the fill, and it peaks at the last write of the burst | S–M |
+| ~~J294~~ | 0034 part b | Done in session 22. **The conversions stepped**: binary, the shifted row, XOR gives Gray; back by a prefix XOR from the MSB one bit per step; a counter walk marks the one changing bit, the 15 → 0 wrap included | S |
+| ~~J295~~ | 0037 part a | Done in session 22. **Metastability by Monte Carlo**: data edges on a clock timeline, those in the T0 window settle after an exponential time; the histogram with the t_res cut, and a second flop moving the cut by Tclk, so the two factors of the formula are seen | M |
+| ~~J296~~ | 0038 part a | Done in session 22. **Attempt lanes**: one lane per property of the page, where the antecedent matched, the window as a bracket, and pass / fail / vacuous | M |
+| ~~J297~~ | 0041 part a | Done in session 22. **The stage ribbon**: equal bins played test by test, a bar per stage i → i + 1 with the measured wait against n / (n − i), the sum that makes n·H_n | S–M |
+| ~~J298~~ | 0029 part b | Done in session 22. **The gap line**: the unwrapped angle difference of a chosen pair against time with the integers as lines, each crossing a meeting; the interval ends switched between closed, open and half-open with the page's three counts | S |
+| ~~J299~~ | 0021 part b | Done in session 22. **The recurrence ladder**: C(0..N) as a row; a click on C(n) lights the m terms it sums and the block strip shows "the first completion takes i blocks" for each term | M |
+| ~~J300~~ | 0015 part b | Done in session 22. **The Tuesday grid**: the 14 × 14 grid of (child, weekday) pairs, the cross of the 27 families with a boy born on Tuesday lit, the shared cell counted once, and the 13 with two boys | S–M |
+
+**Round K — the mechanism of the solution, inside the existing boxes**
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| ~~K301~~ | 0039 | Done in session 22. **The recurrence on the building**: at every drop the band below is marked f(k − 1, t − 1), the drop floor 1 and the band above f(k, t − 1), with the matching cell of the table lit | M |
+| ~~K302~~ | 0040 | Done in session 22. **How the automaton is built**: the pattern slides under itself to show each state's fall-back (the longest suffix that is a prefix) and the edge it gives, state by state | M |
+| ~~K303~~ | 0042 | Done in session 22. **The price list on the road**: every stretch of road shows how many times the camel crosses it (5 / 3 / 1) as the passes play, so the litres per km of the solution appear on the road | S |
+| ~~K304~~ | 0020 | Done in session 22. **Splits are sets of boundaries**: click the RCB boundaries inside the request to cut or not; the split forms live, a gap above MPS is marked, and the count is the number of allowed subsets | S |
+| ~~K305~~ | 0014 | Done in session 22. **The projections**: two rectangles to drag, their projections on both axes and the page's four conditions turning true or false; in the main box a rejected candidate shades the shape and the projection that rejected it | M |
+| ~~K306~~ | 0031 | Done in session 22. **The greedy rule, round by round**: the two costs of moving the current slowest pair (escort by the fastest, or the two fastest shuttle) side by side, the cheaper one taken and the pair removed, ending at the plan's total | M |
+| ~~K307~~ | 0019 part a | Done in session 22. **The run that branches**: at t = 11 the timeline forks into "flip A" and "do not flip", the end times of each branch coloured, so the reader sees why 14 and 15 never share a run, with the 7k and 11k ticks | S |
+| ~~K308~~ | 0013 part b | Done in session 22. **Subtraction by columns**: the sorted digits of the typed number subtracted column by column with the borrows lit, as in the page's table | M |
+
+**Round L — the proof step, visible**
+
+| Id | Page | Idea | Size |
+|---|---|---|---|
+| ~~L309~~ | 0016 | Done in session 22. **Renumbering**: after each step every remaining person shows the old and the new label (new = old − L mod N), the survivor the same person under both, so F(N − 1) visibly becomes F(N); a "full round" button shrinks the circle by L | M |
+| ~~L310~~ | 0009 | Done in session 22. **Choose your cut**: tap any box of the long cycle to swap with c0; the two pieces h and L − h are shown, and only the middle range keeps both at 8 or less | M |
+| ~~L311~~ | 0026 | Done in session 22. **The drop point**: drag D; the passenger's and the walker's arrival times and the curve of T = max of both against D, its minimum where the two are equal (7/8) | S |
+| ~~L312~~ | 0027, 0028 | Done in session 22. **The live proof panel**: the f(p) = p²/(1 − p) curve (0027) or the q(1 − p) line (0028) with the people's p_k as dots and the threshold that moves with the slider; the single crossing is the peak | S |
+| ~~L313~~ | 0036 | Done in session 22. **All cycles**: every state's arrow, so the ring shows its cycles (6 + 6 + 3 and the 0 loop for x⁴ + x² + 1, one cycle of 15 for a primitive polynomial) | S–M |
+| ~~L314~~ | 0018, 0019 | Done in session 22. **The search itself**: one panel for both pages that steps through the queue (BFS in 0018, Dijkstra ordered by t in 0019), each state's four children marked new, seen or past D, until the goal is popped | M |
+| ~~L315~~ | 0008 | Done in session 22. **Pouring the points**: the points left fill the cups to the brim with nobody above Israel; after France 17 points spill over, which is the page's moment of certain loss | M |
+| ~~L316~~ | 0032 | Done in session 22. **BFS layers**: the state graph filled layer by layer (visited, frontier, parent arrows) until 1111 at depth 7 by the two mirror paths | S |
+| ~~L317~~ | 0043 | Done in session 22. **The chain behind a verdict**: clicking a horse lights the race results that prove its known-faster set | S |
+| ~~L318~~ | 0004, 0011 | Done in session 22. **Help lines that match the buttons**: `boxes3` names "סידור אחר", `ttt` names "הגרלה" and "הבורר", buttons that no longer exist | S |
+
+Suggested order (session 21): L first (the proofs are where a box teaches most, and L312,
+L311, L313 and L316 are small), then K (inside boxes that already exist, so the pages do
+not grow), then I and J. Within a round, the small items first in one batch. Shared work:
+L314 is one panel for two pages, L312 one panel for two pages.
+
+### Second series, rounds M to R — new questions (proposed 2026-10-23, owner picks)
+
+Ideas not already listed (Z202 to Z217, Q93 to Q99, I54 to I58, the open items and the
+topic gaps are not repeated); 0015, 0009 and 0041 are the nearest existing pages, and each
+idea here asks something they do not. Each is rewritten in our words with an original solution, a
+generalisation and an explorer; the `source` field names a classic when there is one.
+
+**Round M — logic with an invariant**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| M263 | **Hats in a line**: 100 prisoners in a row, black or white hats, each sees the ones in front and says one colour from the back; how many are certainly saved | junior / medium | k colours: the sum mod k; why 99 is the most | the line, the parity the last one announces, each guess explained from what he sees and hears | M |
+| M264 | **The mutilated chessboard**: an 8 × 8 board without two opposite corners, 31 dominoes | student / easy | which two removed squares leave a tileable board (Gomory: any two of opposite colours) | place dominoes by tap, the colour count shown; Gomory's cycle for two squares of opposite colours | S–M |
+| M265 | **Lights out**: a 5 × 5 grid, a tap toggles a cell and its neighbours; turn everything off | junior / medium | a linear system over GF(2): which boards are solvable, the solution by Gaussian elimination (XOR rows, as in hardware) | the board to tap, "solve" lights the cells to press, the matrix row operations stepped | M |
+| M266 | **Tower of Hanoi and Gray code**: the moves for n discs, and which disc moves at step k | student / easy | 2^n − 1 moves; the disc of step k is the lowest set bit of k, the reflected Gray code walks the same states | the pegs animated beside the Gray-code counter, the changing bit lit with the disc it moves | S–M |
+
+**Round N — logic about knowledge and choice**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| N267 | **Monty Hall with n doors**: the host opens k empty doors; stay or switch | student / easy | P(win by switching) = (n − 1) / (n (n − k − 1)); the "host who does not know" trap | a game to play and 1,000 seeded games, the two strategies' bars against the formula | S |
+| N268 | **Knights and knaves**: three islanders' statements, who lies | student / easy | any set of statements as a truth table, solved by trying all 2^n assignments (the same brute force as a formal tool) | statements built from blocks, the truth table with the consistent rows lit | S–M |
+| N269 | **The blue-eyed islanders**: n blue-eyed islanders and one public announcement | senior / hard | induction on n: everyone leaves on day n; what the announcement adds (common knowledge) | a day stepper with each islander's possible worlds shrinking | M–L |
+
+**Round O — probability for random stimulus**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| O270 | **Birthday paradox and transaction IDs**: n random 8-bit tags, the chance that two outstanding transactions share one | junior / easy | 1 − Π(1 − i/N) ≈ 1 − e^(−n²/2N); the n for 50 % and 1 %; why tags are allocated, not drawn | sliders n and N, the exact curve and the approximation, seeded draws with the first collision marked | S–M |
+| O271 | **The longest run**: in n random bits, how long is the longest run of ones | junior / medium | about log2 n; the exact probability by a run-length recursion; why random stimulus rarely makes a 20-cycle burst | n slider, the stream with its longest run framed, the distribution of the longest run over runs | M |
+| O272 | **The inspection paradox**: buses every 10 minutes on average, how long do you wait | junior / medium | E[wait] = E[T²] / 2E[T]: fixed, uniform and exponential gaps; the same bias in "average packet size seen by a monitor" | a timeline of arrivals with random riders, the gap each rider lands in coloured | M |
+| O273 | **Derangements**: n letters in n envelopes at random, the chance that none is right | junior / medium | D(n) = n! Σ(−1)^k/k!, the limit 1/e, the expected number of fixed points is 1 | shuffle and look, the cycle picture of the permutation (as 0009), the exact and simulated fractions | S–M |
+
+**Round P — geometry and counting**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| P274 | **Buffon's needle**: needles of length l on lines d apart, the chance to cross a line | junior / medium | 2l / (π d) for l ≤ d, the long-needle case, estimating π and its error | needles dropped one by one or a thousand at once, the running estimate of π | S–M |
+| P275 | **Paths that do not cross the diagonal**: monotone paths on an n × n grid that stay below the diagonal | junior / medium | the Catalan number by the reflection trick; the same count as 0010's valid bracket strings | a path to draw or draw at random, the first crossing reflected into a path to the mirrored corner | M |
+
+**Round Q — digital design and checking**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| Q276 | **Divisible by 3, one bit at a time**: an FSM that reads a binary number MSB first and says whether it divides by 3 | student / easy | any modulus m: state = remainder, next = (2r + b) mod m; LSB first needs the powers of 2 mod m | bits fed by hand, the remainder automaton with the taken edge lit (the seqdet view) | S |
+| Q277 | **A serial CRC**: CRC-8 computed bit by bit in an LFSR, then checked against a table-driven reference | junior / medium | any polynomial and width, reflected or not, the residue a receiver checks (the LCRC of 0025) | the register stepping bit by bit with the XOR taps lit, the byte-wise table result beside it | M |
+| Q278 | **A button debouncer**: a noisy input, a clean one-cycle pulse per press | student / easy | an N-cycle stability counter; the SVA that no pulse comes within N cycles of another | a bouncing waveform to draw, the counter and the output on a strip | S–M |
+
+**Round R — flow, performance and verification method**
+
+| Id | Question | Level | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|
+| R279 | **Outstanding requests to fill a link** (Little's law): latency L cycles, one request per cycle, how many tags | junior / medium | N = throughput × latency; with a reply size, a credit limit and a variable latency | a pipeline of requests with their tags, throughput against the number of tags | S–M |
+| R280 | **A skid buffer**: a valid / ready pipeline stage that registers ready without losing data | senior / medium | why one extra entry is enough; the SVA for "no data lost, no data duplicated" | a strip with valid / ready / data both sides, stalls drawn by tap, the buffer entry shown | M |
+| R281 | **Find the bug: a synchronous FIFO** whose full flag is one entry late | junior / medium | the count against the pointer compare, the test that finds it (fill to the brim), the assertion that would have caught it | the FIFO filled and drained on a strip, the buggy and fixed flags side by side | S–M |
+| R282 | **Why a constraint skews the distribution**: `x < y` on 8-bit values, how often is x = 0 | junior / medium | the solver is uniform over solutions, not per variable; `solve x before y` and `dist`; the histogram of both | the two histograms over seeded draws against the exact counts | M |
+| R283 | **Regression minimisation**: tests that each hit some coverage bins, the fewest tests that hit all | senior / medium | set cover is NP-hard; the greedy choice and its ln n bound; an exact search for small sets | a test × bin matrix, the greedy pick stepped, the exact optimum beside it | M |
+
+Suggested order: M and Q first (short pages with a strong picture: the hats, Hanoi and Gray
+code, the divisibility FSM, the serial CRC), then O (probability the DV pages lean on),
+then R, N and P. Round Z's open rows (Z202, Z204 to Z209, Z211 to Z216) stay open beside
+these.
+
+### Round Z — new questions from outside sources (proposed 2026-10-22, owner picks)
+
+Half logic and math, half electrical engineering for beginners. Each idea is rewritten in
+our words with an original solution and generalisation; the `source` field names where the
+idea came from. Not to repeat: the open Q93, Q95, Q97 to Q99 (ant on a can, trains and
+fly, clock angles, Heron, rope around the Earth).
+
+| # | Question | Level | Source | Generalisation | Explorer | Size |
+|---|---|---|---|---|---|---|
+| Z202 | **Two burning ropes, 45 minutes** | student / easy | Wu, Leino | which times n ropes can measure (sums of 60/2^k), a search over lighting states | ropes burning from one or both ends, a timeline | S–M |
+| ~~Z203~~ | Done as 0039. **Two eggs, 100 floors** | junior / medium | Leino, LeetCode 887 | k eggs and n floors: the DP and the binomial sum; 14 drops | sliders k and n, the drop tree and the table | M |
+| ~~Z204~~ | Done as 0045. **Twelve coins, one fake, three weighings** | senior / hard | Wu | (3^n − 3)/2 coins in n weighings, fake heavier or lighter | a balance: pick coins per pan, the tree of outcomes | M–L |
+| Z205 | **100 prisoners and a light bulb** | senior / hard | Wu | the counter protocol for n prisoners, the expected number of days | a simulation with a day counter and a histogram | M |
+| Z206 | **Pirates dividing gold** | junior / medium | Wu, Winkler | backward induction for n pirates; the twist past 200 | a stepper adding one pirate at a time | M |
+| Z207 | **Ants on a stick** | student / easy | Wu | n ants, any directions: collisions as passing through | an animation with the "swap labels" view | S–M |
+| Z208 | **HH or HT – expected flips** | junior / medium | Zhou | any pattern: the Markov chain and Conway's correlation formula | a pattern field, simulation and the chain | M |
+| Z209 | **Gambler's ruin** | junior / medium | Zhou | reach N before 0 with probability p, the closed form and the expected time | sliders p, N and the start, simulated paths | M |
+| ~~Z210~~ | Done as 0040. **Sequence detector 1011, overlapping** | student / easy | HDLBits, Harris & Harris | any pattern: the KMP automaton, Mealy against Moore | type a bit stream, the state graph lights up | M |
+| Z211 | **Setup and hold: the highest clock frequency** | junior / medium | Harris & Harris | clock skew both ways, hold violations, a path with several stages | sliders for t_cq, logic, t_su, skew, and a timing diagram | M |
+| Z212 | **Reset synchronizer: async assert, sync deassert** | junior / easy | Cummings | why two flops, what goes wrong without them | a waveform with the release edge near the clock | S–M |
+| Z213 | **A one-cycle pulse to a slower clock domain** | junior / medium | Cummings | the toggle synchronizer and the minimum spacing for any clock ratio | two clocks with a ratio slider, lost and kept pulses | M |
+| Z214 | **Glitch-free clock mux** | senior / medium | Cummings, ChipVerify | the two-flop handshake per clock, any two frequencies | a waveform where select switches at a random moment | M |
+| Z215 | **Round-robin arbiter** | junior / medium | ChipVerify, Verification Guide | N requesters, fairness as SVA, a weighted variant | request toggles, a grant pointer stepping round | M |
+| Z216 | **Priority encoder and leading zeros in log depth** | student / medium | HDLBits | a tree for N bits, depth log2 N against a chain | a bit field, the tree with the winning path marked | S–M |
+| ~~Z217~~ | Done as 0041. **How many random tests close coverage** | junior / medium | coupon collector, Zhou | n bins: n·H_n, the variance, unequal bin weights | a covergroup filling up, a histogram over runs | M |
+
+### Third series, rounds UI1 to UI5 — look and feel (proposed 2026-10-24, owner picks)
+
+The owner asked for UX / UI proposals that make the site prettier and friendlier. From
+screenshots of the home page, the junior catalog and the 0046 page at 1280 and 390 px
+(light) on 2026-10-24:
+
+- The home page opens with a plain title, a paragraph and four grey stat tiles; there
+  is no call to action, and "3/3 levels with questions" says little. On a phone the
+  tiles take most of the first screen.
+- Bug: in the study-path cards a long title squeezes the count, so "3 שאלות" breaks
+  letter by letter ("שאלו / ת") in the SystemVerilog and PCIe cards.
+- Every catalog row carries the "חדש" chip (all questions were added within 30 days),
+  so it says nothing; the title column wraps to three lines, and the topics column is
+  English monospace tags. The topic filter is four rows of chips.
+- The question header is busy: six chips, monospace topics, the source, two badges,
+  then two rows of tool buttons and the part bar before the statement.
+- Explorer controls are equal-weight outlined buttons that wrap to three or four rows.
+- Text uses the theme's Latin-first font; Hebrew has no face of its own (C190 open).
+
+Item numbers continue the global count (319 on).
+
+**Round UI1 — first impression**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~UI319~~ | ~~**A real hero**: a headline, one sentence, two buttons ("להתחיל לתרגל" to the next unsolved or a random question, "לכל השאלות"), a large search field; the stats as one slim row with icons~~ done (session 22, part 3) | S–M |
+| ~~UI320~~ | ~~**Path cards fixed and polished**: the count never wraps (the letter-by-letter bug), equal heights, a progress ring instead of a bar, an icon per path~~ done (session 22, part 1) | S |
+| ~~UI321~~ | ~~**Hebrew typography** (C190 promoted): a Hebrew face (Heebo or Assistant) for text and headings, tabular digits, a line-length cap near 70 characters, more line height~~ done (session 22, part 1 (Rubik kept)) | S–M |
+
+**Round UI2 — the catalog**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~UI322~~ | ~~**Compact rows or cards**: the title on one line, level / difficulty / kind as one row of chips, two topics and "+3"; "חדש" only for the newest five or the last 14 days~~ done (session 23, part 5: the newest five of 7 days) | S–M |
+| ~~UI323~~ | ~~**Folded filters**: level, difficulty and kind as segmented controls, topics behind "עוד נושאים" with a search field, the active filters as removable chips with the result count~~ done (session 23, part 5, with filters in the address, Hebrew topic names and an empty state) | M |
+
+**Round UI3 — the question page**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~UI324~~ | ~~**A calmer header**: id · level · difficulty · kind in one line, topics as quiet links, "interactive", "tested" and "new" as small icons with tooltips; the page tools (open / close all, practice, solved, favourite, random) in one icon toolbar, an overflow menu on phones~~ done (session 22, part 2 (icon-only tools)) | M |
+| ~~UI325~~ | ~~**A sticky mini-header** while scrolling: the title, the current part and the solved toggle, with a thin reading-progress line~~ done (session 22, part 2 (no title: the site header shows it)) | S–M |
+| ~~UI326~~ | ~~**Friendly feedback**: marking a question solved shows a short celebration (off under reduced motion) and the progress of its level ("5 of 27 in junior")~~ done (session 23, part 6) | S |
+
+**Round UI4 — the explorer boxes**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~UI327~~ | ~~**Playback as an icon bar**: start, back, play / pause, step, end as icons with tooltips and a scrub slider, the speed as a three-way segmented control; the edit controls on one row~~ done (session 22, part 4) | M |
+| ~~UI328~~ | ~~**Boxes as cards**: a soft background, rounded corners, a header with the kind's icon and name, one spacing scale~~ done (session 22, part 4) | S |
+| ~~UI329~~ | ~~**Purposeful micro-motion** (a first cut of E198): changed cells and values fade or slide, the answer appears with a short reveal; off under `prefers-reduced-motion`~~ done (session 23, part 6: a shared flash, tweens in six kinds) | M |
+
+**Round UI5 — identity and polish**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~UI330~~ | ~~**An icon per kind** (puzzle, code, design, math, dv) used in the chips, cards, headers and boxes; a friendly 404 page~~ done (session 22, part 1 (kinds); the 404 page in session 23, part 7) | S–M |
+| ~~UI331~~ | ~~**Dark mode tuning**: a contrast pass, a softer navy, the figure palette checked for colour-blind pairs (C193's script)~~ done (session 23, part 7: the contrast check in CI and softer dark; the colour-blind pass not picked) | S–M |
+| ~~UI332~~ | ~~**Social cards** for shared links (idea 17): the title, the chips and the logo as an image per question~~ done (G45 in session 16; session 23, part 7 added the kind and the counts) | S–M |
+
+Suggested order: UI320 (a bug) and UI321 first, then UI319 and UI324 (the two most
+visible screens), then UI322 / UI323, then the boxes (UI327, UI328).
+
+The older idea list below is kept for reference; items covered by the rounds above are
+marked.
+
+### Fourth series, review rounds V1 to V7 (session 26, 2026-10-26, owner picks)
+
+A review of the whole project: the site-wide pages and tools (done by hand) and every
+question page with its box at 1200 and 390 px (two review passes, findings below as they
+came in). Effort: S under an hour, M a few hours, L a day or more.
+
+**Site-wide findings**
+
+- **Study paths cover 21 of 47 questions.** Not in any path: 0001, 0003, 0016, 0024, 0025,
+  0026, 0029 to 0048. There is no path for the DV core (FSM, FIFO, CDC, LFSR, SVA,
+  coverage: 0001, 0033 to 0036, 0038, 0040, 0041), for the protocol reference models
+  (0023 to 0025), or for geometry and motion (0026, 0029, 0030, 0048).
+- **No glossary** of DV terms (Hebrew and English: CDC, metastability, credit, TLP...);
+  a reader meets a term on one page and its explanation on another.
+- **Progress lives only in one browser** (localStorage): solved and favourite marks and
+  the remembered boxes are lost on another device, with no export or import.
+- **No review loop**: a solved question is never offered again; no "come back to this
+  one" list, no self-rating after solving.
+- **No interview simulation across questions**: practice mode times one page; there is
+  no "three random questions in 45 minutes" session with a summary at the end.
+- **No offline use**: a manifest exists but no service worker, so the site does not open
+  without a network (for example on a train before an interview).
+- **No check-yourself steps**: no page asks the reader for a number or a choice and
+  checks it (the "quick quiz" format of **New question formats** is still open).
+- **CI jobs have no `timeout-minutes`**: a hung browser check would run for six hours.
+- **The header tabs fade in** on the home page; for a moment the last tabs are hard to
+  read (cosmetic).
+- **The heaviest pages** are 0016 (370 KB of HTML), 0025 (300 KB), 0023 and 0024 (240 KB),
+  mostly inline SVG; fine on a phone today, worth watching.
+
+**Question findings, 0001 to 0024** (every box clicked at 1200 and 390 px; drags,
+fields and dark mode not covered in this pass)
+
+| Question | Finding | Proposal | Type | Effort |
+|---|---|---|---|---|
+| 0023 | **Bug, confirmed:** "שלח בקשה" then "מחזור" throws `Cannot read properties of undefined (reading 'cpls')` in `epNext` (`endpoint.js`); play at ×4 too | Drop the page example's scripted draws on a manual send (or range-check the pick); a Node test of send-then-step | bug | S |
+| 0002 | The part c box opens on the arithmetic version, not XOR | Open on XOR there without locking the select | box UX | S |
+| 0020, 0021 | The map of splits: tick labels collide at 390 px, long row labels run into the bars; 1,563 px tall in 0021 | Show the splits of one completion count, picked from the count table; collapsed by default | box UX | M |
+| 0004 | "גילוי התוכן" only changes small captions; the status line stays | Draw the contents in the boxes, update the status; a check-yourself step (assign the three labels, then reveal) | box UX, new aid | S–M |
+| 0003 | The page's trap (j = i + 1 sorts descending) cannot be tried; line 5 of the code cut at 390 px; the array wraps at 1200 px | A select "j from 0 / from i + 1" with both results; wrap the code panel | new aid, box UX | M |
+| 0010 | Part a's pass-by-pass pair deletion has no visual | A pair-deletion mode in `brackets` with the operation count against the stack's | new aid | M |
+| 0015 | Follow-ups ask for a simulation, the page has no code | A Monte Carlo tab (SV and Python) for 1/3 and 13/27 | content | M |
+| 0016 | A classic coding question with no code (`kind: math`) | SV and Python tabs: the O(N) recurrence and the closed form | content | M |
+| 0001 | SV only; no Python model, no SVA | A Python cycle model and `pulse \|=> !pulse` | consistency | S |
+| 0024 | 2,087 px tall on a phone (six stacked buttons); the four hand labels overlap at the start | Buttons in two columns; offset the labels | box UX | S–M |
+| 0018, 0019 | Event figures tiny at 390 px; labels in English ("flip A + B") | Stack before / after on phones; Hebrew labels | box UX | S–M |
+| 0013 | Path arrows of `kappairs` run over the numbers | Curved arrows, or under the cells | box UX | S |
+| 0015 | The 196-cell grid opens empty | Open on step 1 | box UX | S |
+| 0011, 0017 | Box content wider than the box at 390 px | Wrap or narrow | box UX | S |
+| 0009, 0013, 0016, 0024 | Boxes 1,600 to 2,100 px tall on phones, mostly the proof panels | Collapse the proof panel by default on narrow screens | box UX | M |
+| all | Follow-ups answered inline in 0001, bare in 0015 and 0016 | One pattern: a collapsible short answer per follow-up | consistency | M |
+| 0021 | The ladder works well | A "guess C(n) before revealing" step | new aid | S |
+
+**Question findings, 0025 to 0048** (38 boxes stepped, played and preset at 1200 and
+390 px, drags in 0030 and 0048; no JS errors, no sideways scroll; dark mode not covered)
+
+| Question | Finding | Proposal | Type | Effort |
+|---|---|---|---|---|
+| 12 pages (0029, 0030, 0031, 0033, 0036, 0037, 0044, 0046, 0048...) | Short LTR spans of box text (formulas, coordinates) break across lines at 390 px and read in the wrong order | `white-space: nowrap` in `ltr()` of `core.js` for short spans; long formulas on their own line | box UX | S |
+| 0045 | At 390 px the end balls sit past the ends of the tilted beam | Scale the balls to the beam on narrow widths | bug | S |
+| 0039 | At 390 px the "21" next-drop label is clipped at the right edge | Move the label inside the figure | bug | S |
+| 0042 | The camel covers the "60" tick; segment labels collide on a phone; "0/3" unexplained | Camel above the axis, short labels on phones, a word for the ratio | bug | S |
+| 0040 | "הביט הבא" far from its 0 / 1 buttons; arrowheads cover the state labels | Group the label with the buttons; labels under the nodes | box UX | S |
+| 0038 | Rule table 27 px wider than its scroll box on a phone | Shorter headers | box UX | S |
+| 0048 | Dragging is mentioned only in the help | A visible "גררו את..." caption, as in 0030 | box UX | S |
+| 0046, 0047 | About ten controls above the grid; on a phone it starts 950 px down | Fold the editing controls into a closed group | box UX | M |
+| 0047 | Heap entries "(2, 1, 3)" have no field names | Caption "(גובה, שורה, עמודה)" | content | S |
+| 0027, 0028, 0042, 0043 | The steady reservation leaves large blank areas (230 px in 0027) | A fixed-height scroll area for the growing table | box UX | M |
+| 0029 | The first two rows of the 24-hour strips are solid bars | A one-hour window that can move, or the count only | box UX | S |
+| 0034, 0037 | Powers written with a caret ("2^4", "10^-8") | Superscripts, as in 0036 and 0048 | consistency | S |
+| 0031 | "A+B> A<" hard to read in RTL; the bridge strip sits under a long table on a phone | Arrows → ←; the bridge above the table | box UX | S |
+| 0037 | The three-column table wraps every value on a phone; the ±25 ps window invisible on the 1,000-edge strip | Stack the table on phones; a zoomed inset of the window | box UX | S |
+| 0026 | "ב-0.000" beside "2.50"; at t = 0 the dots cover the "A" label | One number format; offset the label | box UX | S |
+| 0025 | Box 1,837 px tall on a phone; a status line breaks after a comma | Collapse the random-run controls | box UX | S |
+| 0041 | Weight sliders of different lengths on a phone; a row starts with English | Equal widths; a Hebrew label first | box UX | S |
+| 0031 | The box replays three fixed plans only | A "your plan" mode (pick who crosses, the running total against 17), like the river box | new aid | M |
+| 0039 | The threshold is shown and the box plays the optimal plan | A guess mode: a hidden threshold, the reader picks floors, the worst case against f(k, n) | new aid | M |
+| 0036 | No picture of the register with its taps and XOR | A register row that shifts with the steps; the chord over the 0000 node | new aid | M |
+| 0035 | No schematic of the circuit; odd N never generalised; 3 cycles visible on a phone | A generated schematic, a third hint, a follow-up for odd N, a duty readout | content | M |
+| 0033 to 0038 | Parts listed at the top with hints after them; one hint in several parts; two traps per page (0035: no parts, no figure) | The layout of 0027 to 0032 and 0039 to 0048: a heading per part with two or three hints, four or five traps | consistency | M |
+
+**Rounds** (pick any; the earlier ones are smaller and fix what is broken)
+
+| Round | Content | Effort |
+|-------|---------|--------|
+| V1 (done, item 55) | **Bugs and quick fixes**: the 0023 box error, the 0002 default, `ltr()` without line breaks, the 0045 balls, the 0039 label, the 0042 camel, the 0048 drag caption, the 0047 caption, superscripts in 0034 and 0037, the 0026 number format | S–M |
+| V2 (done, item 56) | **Study paths for everything**: paths for the DV core, the protocol reference models, geometry and motion; 0044 to 0047 into the algorithms path; a lint check that names a question in no path | S–M |
+| V3 (done, item 57) | **Boxes on a phone**: collapse the proof panels (0009, 0013, 0016, 0024) and the editing and random-run controls (0025, 0046, 0047); 0024 buttons in two columns; 0018 and 0019 stacked with Hebrew labels; the 0020 / 0021 split map by completion count; 0031, 0037, 0038, 0040, 0041; scroll areas instead of blank reservations (0027, 0028, 0042, 0043) | M–L |
+| V3b (done, item 58) | **The small box fixes**: 0013 (path arrows, histogram labels), 0015 on step 1, 0011 / 0017 widths, 0029 an hour window, four long formulas, and the 0044 state diagram as a ρ (owner request) | S–M |
+| V4 | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
+| V5 (done, item 55) | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0016 (the owner did not pick the 0015 simulation or the 0001 Python model) | M–L |
+| V6 | **Practice loop and glossary**: a "my progress" page, a self-rating after a solution, export / import of the progress; a glossary page with a tooltip on a term's first use | M |
+| V7 (done, item 55) | **Robustness**: `timeout-minutes` on the CI jobs, a service worker for offline reading, the header tabs without the fade | S–M |
+
+### Fifth series, rounds W1 to W5 — a professional look (session 27, 2026-10-27, owner picks)
+
+The owner asked for proposals that make the site look more professional, with tasteful
+effects, and sent a list of ideas (an interview simulator, flip cards, a STAR answer
+builder, a preparation path and countdown, a confidence meter, a breathing exercise,
+micro-celebrations, company research, "what to wear", an interview-day checklist; Hebrew
+typography, one deep-blue primary and one accent, an off-white background, an 8 / 16 / 24
+/ 32 / 48 spacing scale, soft shadows, one icon set; a hero, "how it works", testimonials
+and an FAQ on the home page; ten effects: fade-in on scroll, card hover, a moving gradient,
+glassmorphism, counters, rotating text, parallax, micro-interactions, skeleton loading,
+Lottie; rule of thumb: three or four subtle effects, 200 to 400 ms). The audience is
+working students preparing for a technical DV / electrical engineering interview, so the
+list was adapted to technical questions.
+
+**What the site has today** (screenshots at 1280 and 390 px, light and dark; 0046 as
+the sample question page):
+
+- Already in line with the owner's list: Rubik for Hebrew, body text 16 px with a line
+  height of 1.7, a deep navy primary with one amber accent, a hero with two buttons, a
+  search field and stats, icons per kind, a celebration on "solved" (confetti at the end
+  of a level), motion in the boxes, everything off under `prefers-reduced-motion`.
+- **Bug:** `max-width: 75ch` on `p` (UI321) also hits `p.admonition-title`: the title bar of
+  a non-folding admonition stops half way on a wide screen (the home "איך מתאמנים באתר"
+  box; 48 built pages have such a title).
+- **Home page:** 7,456 px tall at 1280 px, because the whole 47-row catalog is on it; the
+  table-of-contents column takes a quarter of the width beside the hero; the hero does
+  not say who the site is for; the "how to practise" tip is six dense bullets; twelve path
+  cards of unequal height whose titles wrap to two or three lines, ids in monospace, and
+  "פתרת 0 מתוך 5" with an empty bar on every card for a new visitor; hover on the level
+  cards changes only the border and the shadow, the path cards and the rows have none.
+- **Surfaces:** the page is pure white, the cards are outlined (no shadow), the footer is
+  Material's near-black (`rgba(0,0,0,.87)`) rather than the brand navy; radius and
+  spacing values differ between cards, boxes, chips and admonitions.
+- **Question page:** on a phone the header is three rows of chips plus an unlabeled icon
+  row; the "edit on GitHub" icon stands alone at the far left; five red trap blocks in a
+  row at the end of 0046 (the owner wants calm colours, no red stress); while scrolling,
+  three sticky layers (the site header, the part bar, the solution map) plus the floating
+  "חזרה למעלה" cover about 150 px of text; hints, solutions and traps open with a jump.
+- **Run panel:** a plain `textarea` (no highlighting, no line numbers), a status in small
+  grey text ("טוען Python לדפדפן…" for the several seconds of the first load), the output
+  as a grey block with no success / failure look, and the panel only at the bottom of the
+  page; the starter code already writes the expected value of every `print` in a comment.
+
+Item numbers continue the global count (333 on).
+
+**Round W1 — foundations and quick fixes**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~W333~~ | ~~**Admonition title bug**: exclude `.admonition-title` from the 75ch cap~~ done (session 27) | S |
+| ~~W334~~ | ~~**Home without the TOC column** (`hide: toc` on `index.md`): the hero and the cards use the full width~~ done (session 27) | S |
+| ~~W335~~ | ~~**Design tokens** in `extra.css`: spacing 4 / 8 / 16 / 24 / 32 / 48 px, radius (6 / 10 / 16), shadows (1 to 3, soft, tinted with the navy), motion (200 / 300 ms, one easing); cards, boxes, chips and admonitions moved to them~~ done (session 27) | S–M |
+| ~~W336~~ | ~~**Surfaces**: an off-white light page (about `#f7f8fb`) with white cards lifted by shadow 1 instead of a border, the footer in the brand navy; new pairs into `PAIRS` of `check_contrast.py`~~ done (session 27) | S–M |
+| ~~W337~~ | ~~**Calmer traps**: a warm amber-orange instead of red, and all the traps of a page in one group "מלכודות נפוצות (5)" with a numbered list inside~~ done (session 27) | S–M |
+| ~~W338~~ | ~~**Edit icon** out of the question header (to the footer, or off for readers: `content.action.edit`)~~ done (session 27) | S |
+
+**Round W2 — the home page**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~W339~~ | ~~**Hero with a signature**: one line for the audience ("לסטודנטים ולמהנדסים בתחילת הדרך שמתכוננים לראיון DV"), a rotating word "להתכונן לראיון ב-FIFO / CDC / SVA / הסתברות" (static under reduced motion), the waveform background drawn once as a travelling signal (`stroke-dashoffset`), the real stats counting up once on first view~~ done (session 27) | M |
+| ~~W340~~ | ~~**"איך זה עובד" in three steps** with icons (בוחרים שאלה → פותרים עם רמזים → בודקים ומריצים) instead of the tip box; its details move to the FAQ~~ done (session 27) | S–M |
+| ~~W341~~ | ~~**A shorter home page**: the catalog on its own page ("כל השאלות", the filters kept), the home keeps the recent list and a link; or the first ten rows and "להציג את כל 47"~~ done (session 27) | S–M |
+| ~~W342~~ | ~~**Path cards**: six featured and "כל המסלולים"; equal heights and one-line titles (shorter names); for a new visitor "5 שאלות · כשעתיים" instead of "פתרת 0 מתוך 5", the progress ring after the first solve~~ done (session 27) | S–M |
+| ~~W343~~ | ~~**FAQ** (folding): what DV is, what a DV interview looks like, which level fits me, how to practise here, does it work offline. No testimonials or "hired" counters until real ones exist~~ done (session 27) | S |
+
+**Round W3 — motion and micro-interactions** (each 200 to 300 ms, once, off under
+`prefers-reduced-motion`, never inside a box: `check_jumps.py` must stay clean)
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~W344~~ | ~~**Fade and rise on scroll** for the home sections and cards (`IntersectionObserver`, a 40 ms stagger, content visible without JS)~~ done (session 27) | S |
+| ~~W345~~ | ~~**Card hover and press**: level, path, recent and related cards rise 2 px with shadow 2; buttons press to 0.98; the arrow of "להתחיל לתרגל" nudges~~ done (session 27) | S |
+| ~~W346~~ | ~~**Smooth opening** of hints, solutions, traps and follow-ups (`::details-content` with `interpolate-size`; browsers without it open at once)~~ done (session 27) | S–M |
+| ~~W347~~ | ~~**One sticky row**: the part bar and the solution map merged, translucent with `backdrop-filter: blur` (the one glass element), "חזרה למעלה" moved off the text column~~ done (session 27) | M |
+| W348 | **The check mark draws itself** when a question is marked solved; a small celebration when a path is completed — the path message and confetti done (session 27); the drawn check mark not picked | S |
+
+**Round W4 — the run panel**
+
+| Id | Idea | Size |
+|---|---|---|
+| ~~W349~~ | ~~**A real editor**: CodeMirror 6 loaded on the first open (syntax colours from the site's tokens, line numbers, Ctrl+Enter runs), the `textarea` as the fallback~~ done (session 27) | M |
+| ~~W350~~ | ~~**Loading you can see** (the owner's skeleton-loading idea): Pyodide fetched when the panel opens, a progress line with stages (מוריד Python, פעם אחת → טוען את הפתרון → מריץ) instead of a grey sentence, the status as a coloured chip (running, done ✓ with the time, error)~~ done (session 27) | S–M |
+| ~~W351~~ | ~~**Terminal-style output**: a dark panel, a copy button, an error's line number jumps to that line in the editor~~ done (session 27) | S–M |
+| ~~W352~~ | ~~**Expected output checked**: the starter code's `# (9, (0, 2), (2, 4))` comments are compared with each printed line, ✓ or ✗ beside it (a check-yourself step for free)~~ done (session 27) | M |
+| ~~W353~~ | ~~**Run from the code**: a "להרצה" button on the Python tab of a solution's code block opens the panel with that code and scrolls to it~~ done (session 27) | S–M |
+
+**Round W5 — practice tools from the owner's list, for technical interviews**
+
+| Id | Idea | Size |
+|---|---|---|
+| W354 | **Interview simulation**: a level and a length (30 / 45 / 60 minutes), two or three unsolved random questions, a timer ring, solutions locked until the end, a self-rating per question and a summary; optionally the spoken explanation recorded with the microphone (`MediaRecorder`, kept in the browser, played back, never uploaded) | M–L |
+| W355 | **Countdown to the interview**: the date and the level give a day-by-day plan from the paths, with a progress ring and "today: 2 questions" on the home page (localStorage) | M |
+| W356 | **Confidence meter**: a 1 to 5 rating before and after a question, the trend on a "ההתקדמות שלי" page (joins V6's self-rating and export / import) | M |
+| W357 | **Flip cards for review**: the statement on the front, the short answer and "מה המראיין בודק" on the back, a deck per path, solved questions coming back after a few days (V6's review loop) | M |
+| W358 | **How to answer a technical question** (in place of STAR): clarify, a small example, the approach, the cost, edge cases, how to test it; a card in practice mode with boxes to tick while answering | S |
+| W359 | **Interview day page**: a checklist (your own projects from the CV, questions to ask, whiteboard tips, a camera and microphone check for an online interview), a company research template, and the one-minute breathing circle as an optional widget there | S–M |
+
+**Not proposed, and why:** a "what to wear" gallery and stock photos (off-topic and the
+site is illustration-only); parallax (little value on a long reading page, motion
+sickness on phones); Lottie (a large dependency for icons the site already draws in CSS);
+testimonials and "1,200 hired" counters (no real data); a video-call screen for the
+simulator (the voice recording gives the practice without the gimmick); STAR (behavioural
+answers; only if the owner wants a behavioural section, see the topic gap "Behavioral").
+
+**Questions for the owner:** (1) a behavioural section with STAR, or technical only;
+(2) the simulator with voice recording, video, or neither; (3) the catalog on its own page
+or ten rows on the home page; (4) traps in amber, or keep red; (5) the off-white
+background; (6) CodeMirror (about 150 KB from jsdelivr on the first open of a run panel).
+
+Suggested order: W1 (a bug and the base every later item uses), then W2 with W344 and
+W345, then W4, then W3's rest, then W5.
+
+## Improvement ideas
+
+Ordered roughly by value for effort. **S** = small (under an hour), **M** = a few hours,
+**L** = a day or more.
+
+### Practice experience
+
+| # | Idea | Effort | Notes |
+|---|------|--------|-------|
+| 1 | ~~Previous / next question links~~ | S | **Done** in session 4 (round A) |
+| 2 | ~~"Open all / close all solutions" button~~ | S | **Done** in session 4 (round B) |
+| 3 | ~~Random question button, honouring the current filters~~ | S–M | **Done** in session 6 (C20) |
+| 4 | ~~Solved / favourite marks stored in the browser, with progress per level~~ | M | **Done** in session 6 (C22) |
+| 5 | ~~Interview mode~~ | M | **Done** in session 4 as "practice mode" (solutions hidden, stopwatch counting up) |
+| 6 | ~~**Sortable table columns** (id, level, difficulty); coloured chips~~ | S–M | Done: chips in session 4, sorting in session 6 (C18) |
+| 7 | ~~Related questions by shared tags~~ | S–M | **Done** in session 4 (round A) |
+| 7a | ~~Hint ladder~~ | S | **Done** in session 4 (round B) |
+| 7b | ~~**Question type filter** (puzzle / code / design / knowledge) next to level and difficulty~~ | S–M | **Done** as the `kind` field and its filter chips (E31, session 22) |
+| 7c | **"Open in EDA Playground"** link for SV code, so readers can run it on a commercial simulator | S–M | EDA Playground has no prefill API; a "copy code + open site" button is the simple version |
+| 7d | ~~Step-through figures with next / previous buttons~~ | M | **Done** in session 5 (B14) |
+
+### Content quality and safety net
+
+| # | Idea | Effort | Notes |
+|---|------|--------|-------|
+| 8 | ~~Keep the test harnesses in the repo and run them in CI~~ | M | **Done** in session 2 |
+| 9 | ~~Extract code from the pages for testing~~ | M | **Done** in session 2 (`tools/extract_code.py`) |
+| 9a | Show a "tested ✓" badge per question on the tables, from the last CI run | S–M | The header card shows "נבדק אוטומטית" since session 4 |
+| 9b | ~~Adopt a newer Verilator in CI to run constraints natively and drop translations~~ | M | **Done** in session 5 (pinned commit + z3) |
+| 10 | ~~Keep the figure generators in the repo~~ (`tools/figures/`) | S | **Done** for 0008–0011 in session 3; older figures (0005–0007) still have no generator |
+| 11 | ~~Broken link / image check in CI~~ | S | **Done** in session 5 (`tools/check_links.py`) |
+| 12 | ~~Repository `CLAUDE.md`~~ | S | **Done** in session 5 |
+| 12a | ~~Generators for the older figures (0004–0007) in `tools/figures/`~~ | S–M | **Done** in session 16 (G43) |
+| 12b | ~~A **"new question" script** that creates the page, `tests/<id>/` and the catalog row from the template~~ | S–M | **Done**: `tools/new_question.py` (G42, J60) |
+
+### Site polish
+
+| # | Idea | Effort | Notes |
+|---|------|--------|-------|
+| 13 | ~~Site logo and favicon~~ | S | **Done** in session 4 (round A) |
+| 14 | ~~Statistics on the home page~~ | S–M | **Done** in session 4 (round B) |
+| 15 | ~~Show the `added` date, `source` and a "new" badge~~ | S | **Done** (date in session 4, source and the 30-day "new" chip in session 5) |
+| 16 | ~~**Better Hebrew search**~~ (done, C21) | M | The built-in search splits Hebrew on whitespace only; evaluate the search `separator` setting or an alternative index |
+| 17 | ~~**Social preview cards** when sharing a question link~~ | S–M | **Done** in session 16 (G45) |
+| 18 | ~~**Comments / discussion** per question via GitHub Discussions (giscus)~~ | M | **Done** in session 16 (G45); waits for the owner's giscus ids |
+| 19 | **PDF export** of a filtered question set for offline practice | M–L | e.g. a print-site plugin |
+| 20 | Bilingual content (Hebrew / English) | L | Only if the audience grows beyond Hebrew readers |
+| 21 | ~~**Mobile check** of every page in CI~~ (done, C17) (screenshots at phone width) | M | Wide tables and figures were the main issue so far (see the 0009 box grid) |
+| 22 | **Topic pages**: a short intro per topic (FSM, SVA, coverage...) linking to its questions | M | Study paths done in C19; topic intros proposed again as E32 |
+| 23 | ~~Step-through figures (B14)~~ | M | **Done** in session 5 (0010 stack, 0009 walks) |
+
+---
