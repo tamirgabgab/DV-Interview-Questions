@@ -303,6 +303,16 @@ def coin_answers() -> list[int]:
     return [max(sum(row[0::2]), sum(row[1::2])), greedy_vs_best(row), best([1, 1, 9, 1, 1, 9]), best([1, 5, 1])]
 
 
+def popcount_answers() -> list[int]:
+    """Same number of ones: the next above 92 and the previous below 96 by a search number by
+    number; the next above 120 with as many zeros (no leading zeros), also by a search."""
+    k = lambda v: bin(v).count("1")  # noqa: E731
+    z = lambda v: v.bit_length() - k(v)  # noqa: E731
+    nxt = next(y for y in range(93, 256) if k(y) == k(92))
+    prv = next(y for y in range(95, 0, -1) if k(y) == k(96))
+    return [nxt, prv, next(y for y in range(121, 1024) if z(y) == z(120))]
+
+
 EXPECTED = {
     "0015": [two_children(False), two_children(True)],
     "0016": [josephus(20)],
@@ -325,6 +335,7 @@ EXPECTED = {
     "0056": ants_answers(),
     "0057": tag_answers(),
     "0058": coin_answers(),
+    "0059": popcount_answers(),
 }
 
 
