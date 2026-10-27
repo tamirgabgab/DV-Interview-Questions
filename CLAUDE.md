@@ -98,6 +98,16 @@ notes and simulator quirks are listed in `HANDOFF.md` under "Technical notes".
   with a short summary by sections.
 - Develop on the designated work branch. Push to `main` (which publishes the site) only
   when the owner asks. Fast-forward `main` to the branch; do not rewrite history.
+- Small, local fixes go to `main` without waiting for the branch CI (the owner's standing
+  permission): a bug fix or a tweak in one place (one page, one box, one hook function,
+  one config line), no new question and no change shared by many pages' layout. Run only
+  the checks that cover the change, about five minutes in all: `lint_pages.py` and
+  `run_tests.py` for the touched question, `mkdocs build --strict`, `check_links.py`, and
+  `check_phone.py` / `check_explorers.py` with `--only` on the touched pages. Commit on
+  the branch, fetch, and fast-forward `main` to it only if `main` is still its ancestor
+  (another session may have moved it; then merge `main` first). The `main` CI still runs
+  every check and blocks a broken deploy: if it fails, fix it on `main` at once. Anything
+  bigger keeps the full flow: branch CI green first, then fast-forward `main`.
 - Commit messages: English, imperative, with a short body for anything non-obvious. No
   model identifiers in commits, code or docs.
 - Check the live result after a deploy: desktop and phone width (390 px), light and dark
