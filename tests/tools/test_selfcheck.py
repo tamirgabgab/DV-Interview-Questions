@@ -282,6 +282,27 @@ def tag_answers() -> list[int]:
     return [a, 8 + 8 * 8, c]
 
 
+def coin_answers() -> list[int]:
+    """Coins in a row: the colour of 1, 2, 5, 3; greedy against the best reply on it; the best
+    play on 1, 1, 9, 1, 1, 9 and on 1, 5, 1 by minimax over (left, right) choices."""
+    def best(c):
+        if not c:
+            return 0
+        return max(c[0] + sum(c[1:]) - best(c[1:]), c[-1] + sum(c[:-1]) - best(c[:-1]))
+
+    def greedy_vs_best(c):
+        mine = 0
+        while c:
+            k = 0 if c[0] >= c[-1] else -1
+            mine += c[k]
+            c = c[1:] if k == 0 else c[:-1]
+            if c:                                  # the reply that leaves greedy the least
+                c = c[1:] if c[0] + sum(c[1:]) - best(c[1:]) >= c[-1] + sum(c[:-1]) - best(c[:-1]) else c[:-1]
+        return mine
+    row = [1, 2, 5, 3]
+    return [max(sum(row[0::2]), sum(row[1::2])), greedy_vs_best(row), best([1, 1, 9, 1, 1, 9]), best([1, 5, 1])]
+
+
 EXPECTED = {
     "0015": [two_children(False), two_children(True)],
     "0016": [josephus(20)],
@@ -303,6 +324,7 @@ EXPECTED = {
     "0055": fsm_answers(),
     "0056": ants_answers(),
     "0057": tag_answers(),
+    "0058": coin_answers(),
 }
 
 

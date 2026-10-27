@@ -70,6 +70,7 @@ PAIRS = [
     ("dead mouse number", "var(--md-default-bg-color)", ["var(--viz-ink)"], TEXT),
     ("tag on a doubled response", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
     ("tag fault badge", "var(--md-default-bg-color)", ["var(--viz-ink)"], TEXT),
+    ("coin of the first player", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("ladder cell label, a term", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
 ]
 

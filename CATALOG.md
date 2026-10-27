@@ -1,6 +1,6 @@
 # Catalog
 
-All 56 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 57 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -61,3 +61,4 @@ All 56 questions, with links to their pages on the [live site](https://tamirgabg
 | 0055 | [מכונת מצבים לחלוקה ב-3 – ביטים מה-MSB, מה-LSB ובכל בסיס](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0055-divisible-by-m-fsm/) | junior (ג'וניור) |
 | 0056 | [נמלים על מוט – מתי הנמלה האחרונה נופלת](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0056-ants-on-a-pole/) | junior (ג'וניור) |
 | 0057 | [ה-tag שלא חזר – XOR, חלוקה לפי ביט וסכומי חזקות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0057-missing-tags/) | senior (סניור) |
+| 0058 | [מטבעות בשורה – לוקחים מהקצוות, ומי מקבל יותר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0058-coins-in-a-row/) | junior (ג'וניור) |

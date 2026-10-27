@@ -3640,3 +3640,27 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer .tc-groups { color: var(--viz-text); }
 .md-typeset .explorer .tc-groups span { font-family: var(--md-code-font-family); }
 .md-typeset .explorer input.tc-guess, .md-typeset .explorer input.tc-gdup { width: 7rem; }
+
+/* Coins in a row (0058): the row by the parity of the place in the figure, the coinrow explorer's row and its table */
+.md-typeset svg .cr-coin circle { stroke-width: 3; }
+.md-typeset svg .cr-coin.cr-p0 circle { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .cr-coin.cr-p1 circle { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg .cr-coin text { fill: var(--viz-ink); font-size: 18px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .cr-key-p0, .md-typeset .viz-legend .cr-key-a { background: var(--viz-s1); opacity: 0.55; border-radius: 50%; }
+.md-typeset .viz-legend .cr-key-p1, .md-typeset .viz-legend .cr-key-b { background: var(--viz-s2); opacity: 0.6; border-radius: 50%; }
+.md-typeset .viz-legend .cr-key-end { background: none; border-radius: 50%; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .explorer .cr-row { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0; direction: ltr; }
+.md-typeset .explorer .cr-coin { position: relative; width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 2px solid var(--viz-grid); background: var(--md-default-bg-color);
+  color: var(--viz-ink); font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.8rem; }
+.md-typeset .explorer .cr-coin.is-end { border: 3px solid var(--viz-ink); }
+.md-typeset .explorer .cr-coin.is-end:not([disabled]) { cursor: pointer; box-shadow: 0 0 0 3px color-mix(in srgb, var(--viz-s2) 40%, transparent); }
+.md-typeset .explorer .cr-coin.cr-by0 { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset .explorer .cr-coin.cr-by1 { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset .explorer .cr-coin small { position: absolute; bottom: -0.15rem; inset-inline-end: -0.2rem; font-size: 0.55rem; padding: 0 0.15rem; border-radius: 0.2rem; background: var(--viz-ink); color: var(--md-default-bg-color); }
+.md-typeset .explorer .cr-coin:focus-visible { outline: 3px solid var(--site-focus-ring); }
+.md-typeset .explorer .cr-advice { font-size: 0.7rem; }
+.md-typeset .explorer .cr-dp { overflow-x: auto; }
+.md-typeset .explorer table.cr-table { font-size: 0.62rem; margin: 0.3rem 0; direction: ltr; }
+.md-typeset .explorer table.cr-table td, .md-typeset .explorer table.cr-table th { padding: 0.15em 0.45em; text-align: center; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer table.cr-table td.is-now { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); font-weight: 700; outline: 2px solid var(--viz-s2); }
+.md-typeset .explorer table.cr-table td.is-opt { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); }
