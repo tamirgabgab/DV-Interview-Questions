@@ -1,6 +1,6 @@
 # Catalog
 
-All 47 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 51 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -52,3 +52,7 @@ All 47 questions, with links to their pages on the [live site](https://tamirgabg
 | 0046 | [הריבוע, המלבן והמשולש הגדולים ביותר של אחדות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0046-largest-square-rectangle/) | junior (ג'וניור) |
 | 0047 | [מילוי מים בבאר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0047-filling-a-well/) | junior (ג'וניור) |
 | 0048 | [החוואי, האוכל והמים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0048-farmer-food-and-water/) | student (סטודנט) |
+| 0049 | [ארכיטקטורה של סביבת UVM – הרכיבים ומסלול הטרנזקציה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0049-uvm-testbench-architecture/) | junior (ג'וניור) |
+| 0050 | [Scoreboard לתשובות שלא לפי הסדר – תורים לפי ID](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0050-out-of-order-scoreboard/) | senior (סניור) |
+| 0051 | [בקבוק מורעל ועכברים – סבב אחד, שני סבבים, ו-b סבבים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0051-poisoned-bottles-mice/) | junior (ג'וניור) |
+| 0052 | [HH מול HT – כמה הטלות מטבע עד שהרצף מופיע](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0052-coin-pattern-waiting-time/) | senior (סניור) |

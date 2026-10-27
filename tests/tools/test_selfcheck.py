@@ -146,6 +146,33 @@ def camel(a: float, c: float, w: float, keep: float) -> float:
     return dist + (w - keep) / a
 
 
+def mice(n: int, rounds: int) -> int:
+    """Each mouse ends in one of rounds + 1 ways; the fewest mice whose outcomes cover n bottles."""
+    return next(m for m in range(64) if (rounds + 1) ** m >= n)
+
+
+def coin_runs(a: str, b: str = "", steps: int = 3000) -> tuple[float, float]:
+    """The mean wait until a (or b) shows, and the chance that a shows first, by pushing the
+    distribution of the last few tosses forward until almost nothing is left."""
+    keep = max(len(a), len(b)) - 1
+    now, mean, first = {"": 1.0}, 0.0, 0.0
+    for t in range(1, steps + 1):
+        nxt = {}
+        for seen, p in now.items():
+            for c in "HT":
+                s = seen + c
+                if s.endswith(a):
+                    mean += t * p / 2
+                    first += p / 2
+                elif b and s.endswith(b):
+                    mean += t * p / 2
+                else:
+                    k = s[-keep:] if keep else ""
+                    nxt[k] = nxt.get(k, 0.0) + p / 2
+        now = nxt
+    return mean, first
+
+
 EXPECTED = {
     "0015": [two_children(False), two_children(True)],
     "0016": [josephus(20)],
@@ -160,6 +187,8 @@ EXPECTED = {
     "0036": [lfsr_period()],
     "0039": [eggs(3, 100)],
     "0042": [camel(0.5, 150, 450, 30)],
+    "0051": [mice(1000, 1), mice(1000, 2), mice(1000, 3)],
+    "0052": [coin_runs("HH")[0], coin_runs("HHH")[0], coin_runs("HT", "HH")[1]],
 }
 
 

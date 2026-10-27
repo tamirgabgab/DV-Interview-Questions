@@ -3382,3 +3382,124 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset svg .lf-dot { fill: var(--viz-s2); }
 .md-typeset svg .lf-xor { fill: var(--md-default-bg-color); stroke: var(--viz-s2); stroke-width: 1.8; }
 .md-typeset svg.lf-regsvg .lf-head { fill: var(--viz-s2); }
+
+/* Poisoned bottles (0051): the mice of the figure and of the explorer, the cells of the rounds, the bottles still possible */
+.md-typeset svg .mc-mouse circle { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .mc-mouse text { fill: var(--viz-ink); font-size: 16px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .mc-mouse.is-dead circle { fill: var(--viz-ink); }
+.md-typeset svg .mc-mouse.is-dead text { fill: var(--md-default-bg-color); }
+.md-typeset svg .mc-rowlab { fill: var(--viz-text); font-size: 14px; }
+.md-typeset svg .mc-rowlab.is-now { fill: var(--viz-ink); font-weight: 700; }
+.md-typeset svg .mc-cell rect { fill: none; stroke: var(--viz-grid); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.md-typeset svg .mc-cell text { fill: var(--viz-text); font-size: 15px; font-family: var(--md-code-font-family); }
+.md-typeset svg .mc-cell.is-later text { opacity: 0.55; }
+.md-typeset svg .mc-cell.is-drink rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-dasharray: none; }
+.md-typeset svg .mc-cell.is-death rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2.5; stroke-dasharray: none; }
+.md-typeset svg .mc-cell.is-death text { fill: var(--viz-ink); font-weight: 700; }
+.md-typeset svg .mc-cell.is-gone rect { fill: var(--viz-grid); fill-opacity: 0.35; stroke: none; }
+.md-typeset svg .mc-digit { fill: var(--viz-text); font-size: 18px; font-family: var(--md-code-font-family); }
+.md-typeset svg .mc-digit.is-known { fill: var(--viz-s1-text); font-weight: 700; }
+.md-typeset .viz-legend .mc-key-dead { background: var(--viz-ink); }
+.md-typeset .viz-legend .mc-key-live { background: transparent; outline: 2px solid var(--viz-ink); outline-offset: -2px; }
+.md-typeset .explorer .viz-legend .mc-key-dead { background: var(--viz-s2); opacity: 0.6; }
+.md-typeset .viz-legend .mc-key-drink { background: var(--viz-s1); opacity: 0.45; }
+.md-typeset .viz-legend .mc-key-gone { background: var(--viz-grid); }
+.md-typeset .explorer svg.mc-live { width: 100%; max-width: 40rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer input.mc-n, .md-typeset .explorer input.mc-x, .md-typeset .explorer input.mc-guess { width: 5.5rem; }
+.md-typeset .explorer .mc-quizlab { display: block; margin: 0.4rem 0 0.2rem; font-size: 0.7rem; }
+.md-typeset .explorer .mc-bottles { display: flex; flex-wrap: wrap; gap: 0.15rem; max-width: 40rem; }
+.md-typeset .explorer .mc-bottle { min-width: 1.7rem; padding: 0.05rem 0.1rem; text-align: center; font-size: 0.6rem; font-family: var(--md-code-font-family); font-variant-numeric: tabular-nums;
+  color: var(--viz-ink); border: 1.5px solid var(--viz-s1); border-radius: 0.2rem; background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .mc-bottle.is-out { border-color: var(--viz-grid); background: none; color: var(--viz-text); opacity: 0.55; }
+.md-typeset .explorer .mc-bottle.is-bad { border-color: var(--viz-s2); border-width: 2.5px; }
+
+/* Coin patterns (0052): the two chains of HH and HT, the explorer's tosses and its histogram */
+.md-typeset svg .fs-edge.is-back { stroke: var(--viz-s3); stroke-width: 2.5; stroke-dasharray: 6 4; }
+.md-typeset svg .cp-exp { fill: var(--viz-ink); font-size: 18px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .cp-key-back { background: var(--viz-s3); }
+.md-typeset .explorer input.cn-a, .md-typeset .explorer input.cn-b { width: 6rem; letter-spacing: 0.15em; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .cn-toss { min-width: 2.4rem; font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset .explorer .cn-pats { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.4rem 0; }
+.md-typeset .explorer .cn-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.md-typeset .explorer .cn-name { min-width: 2.6rem; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .cn-cells { display: inline-flex; gap: 0.2rem; }
+.md-typeset .explorer .cn-cell { display: inline-block; min-width: 1.9rem; padding: 0.15rem 0; text-align: center; font-family: var(--md-code-font-family); font-weight: 700; color: var(--viz-ink);
+  border: 1.5px solid var(--viz-grid); border-radius: 0.25rem; background: var(--md-default-bg-color); }
+.md-typeset .explorer .cn-cell.is-match { border-color: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cn-row.is-won .cn-cell { border-color: var(--viz-s2); background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cn-state { font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .cn-strip { display: flex; flex-wrap: wrap; gap: 0.12rem; min-height: 1.6rem; max-width: 40rem; }
+.md-typeset .explorer .cn-strip .cn-chip { min-width: 1.3rem; padding: 0.05rem 0; text-align: center; font-size: 0.65rem; color: var(--viz-ink); border: 1px solid var(--viz-grid); border-radius: 0.2rem; }
+.md-typeset .explorer .cn-strip .cn-chip.is-hit { border-color: var(--viz-s2); border-width: 2px; background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cn-more { font-size: 0.65rem; color: var(--viz-text); align-self: center; }
+.md-typeset .explorer .cn-chart { max-width: 40rem; }
+.md-typeset .viz-legend .cn-key-exact { background: var(--viz-s2); border-radius: 50%; }
+
+/* Out-of-order scoreboard (0050): the per-ID queues figure, the explorer's events, queues and checker cards */
+.md-typeset svg .sb-item rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .sb-item text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .sb-item.sb-id0 rect { stroke: var(--viz-s1); }
+.md-typeset svg .sb-item.sb-id1 rect { stroke: var(--viz-s2); }
+.md-typeset svg .sb-item.sb-id2 rect { stroke: var(--viz-s3); }
+.md-typeset svg .sb-item.is-head rect { stroke-width: 3.5; fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset svg .sb-item.is-done rect { stroke-dasharray: 4 3; fill: var(--viz-grid); fill-opacity: 0.35; }
+.md-typeset svg .sb-item.is-rsp rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke-width: 2.5; }
+.md-typeset svg .sb-qname { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .sb-rail { stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .sb-arrow { fill: none; stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset .viz-legend .sb-key-head { background: var(--viz-s1); opacity: 0.45; outline: 2.5px solid var(--viz-s1); }
+.md-typeset .viz-legend .sb-key-done { background: var(--viz-grid); }
+.md-typeset .explorer .sb-events { display: flex; flex-wrap: wrap; gap: 0.2rem; margin: 0.4rem 0; max-width: 40rem; }
+.md-typeset .explorer .sb-ev { display: inline-flex; flex-direction: column; align-items: center; padding: 0.1rem 0.3rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem;
+  font-family: var(--md-code-font-family); font-size: 0.6rem; color: var(--viz-ink); background: var(--md-default-bg-color); }
+.md-typeset .explorer .sb-ev small { font-size: 0.55rem; color: var(--viz-text); opacity: 1; }
+.md-typeset .explorer .sb-ev.sb-req { border-color: var(--viz-s1); }
+.md-typeset .explorer .sb-ev.sb-rsp { border-color: var(--viz-s2); }
+.md-typeset .explorer .sb-ev.is-later { opacity: 0.5; }
+.md-typeset .explorer .sb-ev.is-now { border-width: 2.5px; background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .sb-queues { display: flex; flex-direction: column; gap: 0.2rem; max-width: 40rem; }
+.md-typeset .explorer .sb-q { display: flex; align-items: center; gap: 0.5rem; min-height: 1.7rem; }
+.md-typeset .explorer .sb-qname { min-width: 2.6rem; font-family: var(--md-code-font-family); font-size: 0.65rem; font-weight: 700; color: var(--viz-ink); }
+.md-typeset .explorer .sb-qitems { display: flex; gap: 0.2rem; overflow: hidden; }
+.md-typeset .explorer .sb-qi { min-width: 2.2rem; text-align: center; padding: 0.1rem 0.2rem; font-family: var(--md-code-font-family); font-size: 0.65rem; color: var(--viz-ink);
+  border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; }
+.md-typeset .explorer .sb-qi.is-head { border-color: var(--viz-s1); border-width: 2.5px; background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .sb-qi.is-late { border-color: var(--viz-s2); border-style: dashed; }
+.md-typeset .explorer .sb-qempty { font-size: 0.6rem; color: var(--viz-text); }
+.md-typeset .explorer .sb-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; margin-top: 0.5rem; max-width: 40rem; }
+.md-typeset .explorer .sb-card { padding: 0.3rem 0.5rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; font-size: 0.65rem; }
+.md-typeset .explorer .sb-card p { margin: 0.15em 0; }
+.md-typeset .explorer .sb-card.is-right { border-color: var(--diff-easy); }
+.md-typeset .explorer .sb-card.is-wrong { border-color: var(--diff-hard); border-width: 2.5px; }
+.md-typeset .explorer .sb-ctitle { font-weight: 700; color: var(--viz-ink); }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .sb-cards { grid-template-columns: 1fr; }
+}
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .sb-events { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.2rem; }
+  .md-typeset .explorer .sb-ev { flex: 0 0 auto; }
+}
+
+/* UVM architecture (0049): the testbench figure and the explorer's clickable copy */
+.md-typeset svg .uv-box rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.8; }
+.md-typeset svg .uv-box text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .uv-box.is-cont rect { fill: none; stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .uv-box.is-cont text { fill: var(--viz-text); font-size: 13px; font-weight: 400; }
+.md-typeset svg .uv-box.uv-dut rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .uv-box.uv-scoreboard rect, .md-typeset svg .uv-box.uv-coverage rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset svg .uv-arrow { stroke-width: 2; }
+.md-typeset svg .uv-arrow.uv-tlm { stroke: var(--viz-s1); }
+.md-typeset svg .uv-arrow.uv-pin { stroke: var(--viz-ink); stroke-dasharray: 6 4; }
+.md-typeset .viz-legend .uv-key-tlm { background: var(--viz-s1); }
+.md-typeset .viz-legend .uv-key-pin { background: var(--viz-ink); }
+.md-typeset .explorer svg.uv-live { width: 100%; max-width: 42rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer svg.uv-live [data-c] { cursor: pointer; }
+.md-typeset .explorer svg.uv-live [data-c]:focus-visible rect { outline: none; stroke: var(--site-focus-ring); stroke-width: 3.5; }
+.md-typeset .explorer svg.uv-live .uv-box.is-sel rect { stroke: var(--viz-s1); stroke-width: 3.5; }
+.md-typeset .explorer svg.uv-live .uv-box.is-cont.is-sel rect { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset .explorer svg.uv-live .uv-box.is-on rect { stroke: var(--viz-s2); stroke-width: 4; }
+.md-typeset .explorer svg.uv-live .uv-arrow.is-on { stroke: var(--viz-s2); stroke-width: 4.5; stroke-dasharray: none; }
+.md-typeset .explorer .uv-quizlab { display: block; margin: 0.4rem 0 0.2rem; font-size: 0.7rem; }
+.md-typeset .explorer .uv-card { max-width: 40rem; margin-top: 0.4rem; padding: 0.3rem 0.6rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; font-size: 0.7rem; min-height: 6.5rem; }
+.md-typeset .explorer .uv-card p { margin: 0.2em 0; }
+.md-typeset .explorer .uv-ctitle { font-weight: 700; }

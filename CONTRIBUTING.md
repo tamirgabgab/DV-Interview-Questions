@@ -120,8 +120,8 @@ DV-Interview-Questions/
 │   │   ├── student/
 │   │   │   ├── index.md        # Level page (generated question table)
 │   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…, 0032-…, 0036-…, 0040-…, 0048-…
-│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0031-…, 0033-… to 0035-…, 0038-…
-│   │   └── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0023-…, 0024-…, 0025-…, 0037-…
+│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0031-…, 0033-… to 0035-…, 0038-…, 0049-…, 0051-…
+│   │   └── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0023-…, 0024-…, 0025-…, 0037-…, 0050-…, 0052-…
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
 │   │   ├── images/             # Figures and screenshots referenced by questions
@@ -435,6 +435,10 @@ follow the light / dark switch automatically:
 | `fs-node`, `fs-edge` (`is-found`, `is-taken`), `fs-label`, `fs-meaning`, `fs-arrowhead`, `fs-key`, `fs-key-found` | State diagrams drawn as a row of states: nodes, transitions, the detecting transition, the taken one in the explorer (0040) |
 | `cm-axis`, `cm-stop`, `cm-depot`, `cm-litres`, `cm-km`, `cm-camel`, `cm-carry`, `cm-pass` / `cm-pass-head` / `cm-pass-lbl` (`is-next`), `cm-key-*` | The camel explorer's distance axis: the depots with their litres, the camel and what it carries, the last pass and the next one (0042) |
 | `hr-cell` (`is-cand`, `is-placed`, `is-out`, `is-now`), `hr-name`, `hr-count`, `hr-rank`, `hr-key-*`, `hr-races` | The grid of the horses by group (0043): candidate, settled or out, the horses of the current race framed, the count of known-faster horses, the revealed true rank; the race table of the explorer |
+| `uv-box` (`is-cont`, `uv-<component>`), `uv-arrow` (`uv-tlm`, `uv-pin`), `uv-key-*` | The UVM testbench of 0049 (drawn by `tools/figures/q0049.py`; the `uvmarch` explorer draws the same layout with `is-sel` and `is-on`) |
+| `sb-item` (`sb-id0`…`sb-id2`, `is-head`, `is-done`, `is-rsp`), `sb-qname`, `sb-rail`, `sb-arrow`, `sb-key-*` | The per-ID queues of the scoreboard (0050); the explorer uses HTML `sb-*` chips and cards |
+| `mc-mouse` (`is-dead`), `mc-cell` (`is-drink`, `is-death`, `is-gone`, `is-later`), `mc-digit`, `mc-rowlab`, `mc-key-*` | The mice of the bottles question (0051): one round in the figure, the rounds by mouse in the `mice` explorer |
+| `fs-edge.is-back`, `cp-exp`, `cp-key-back` | The chains of HH and HT (0052, with the `fs-*` state classes); the `coins` explorer uses HTML `cn-*` |
 
 Site-wide (HTML) classes in the same file: `chip`, `chip-level`, `chip-diff-*`, `chip-new`
 (level, difficulty and "new" chips), `question-header` (header card), `question-tools`

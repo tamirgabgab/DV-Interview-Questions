@@ -871,6 +871,36 @@ section below starts at session 22, whose numbered items run on through the late
     minimality claim on its page is unchecked (review finding).
 
 
+### Session 27 — 2026-10-27: four new questions (0049 to 0052)
+
+60. **New questions 0049 to 0052 (session 27, 2026-10-27).** The owner asked for four
+    extended questions, two on DV, for juniors and seniors; picked the UVM architecture,
+    the out-of-order scoreboard and HH against HT as proposed, and changed the bottles
+    question to one round, then two, then n bottles and b rounds (the owner's "three
+    rounds, base 3" was base 4: b rounds give b + 1 outcomes per mouse; said so before
+    writing); no code on the UVM page; all four published together. **0049** (junior, dv,
+    no code): the testbench figure from `tools/figures/q0049.py` (LAYOUT, ARROWS, PATH),
+    the components with what they do and do not do, the sequence / driver handshake, the
+    phases, passive agents and reuse; box `uvmarch` draws the same layout (tested to
+    agree), a click explains a component, the transaction is stepped along its arrows,
+    and a quiz asks "who does this?". **0050** (senior, dv): one queue per ID, the head
+    only, timeout, end check and reset, as a SystemVerilog class (an associative array of
+    queues, Verilator runs it) and Python; the scenario table against a single FIFO and
+    "search the ID's queue" (a false alarm on legal interleaving, a miss on a swap within
+    an ID); tested against the generator's checkers and random legal and mutated
+    streams; box `scoreboard` steps the scenarios or a seeded random stream with one
+    injected bug and shows the three verdicts. **0051** (junior, puzzle): 10, 7 and 5
+    mice for 1000 bottles in 1, 2 and 3 rounds, ⌈log_{b+1} n⌉ in general, digit d = the
+    round a mouse drinks and dies; every bottle of small cellars decoded in pytest and
+    Verilator; box `mice` steps the rounds with the bottles still possible, and a decoder
+    mode hides a bottle. **0052** (senior, math): 4 and 6 tosses, Conway's correlation and
+    the fair-casino proof, the race (HT against HH is 1/2; Penney's table of length 3),
+    the exact distributions; tested against exact Markov chains for every pattern up to
+    8 letters and every race up to 4; box `coins` tosses by hand or plays, with 1000
+    seeded games against the exact distribution. Self-checks on 0051 (a, b, c) and 0052
+    (a, b, c). New study path `testbench` (0049, 0050); 0051 in logic puzzles, 0052 in
+    probability. Topic names for `uvm` and `methodology`.
+
 ## In progress
 
 - **State (2026-10-26, session 26):** `main` is 5f94144 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7), deployed.
@@ -933,19 +963,21 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (47 questions)
+### Coverage today (51 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water) |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047) |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock
 divider, an LFSR, synchronizer MTBF and SVA; 0040 (a sequence detector FSM) and 0041
-(coverage closure of random tests) followed. **Still missing:** UVM, covergroups,
-debug ("find the bug") and verification planning.
+(coverage closure of random tests) followed, then 0049 (the UVM testbench) and 0050 (an
+out-of-order scoreboard). **Still missing:** UVM in depth (factory, RAL, virtual
+sequences as questions of their own), covergroups, debug ("find the bug") and
+verification planning.
 
 ### Topic gaps worth filling
 

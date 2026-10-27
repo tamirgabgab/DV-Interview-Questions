@@ -93,6 +93,7 @@ TOPICS = {
     "logic": "לוגיקה",
     "logic-puzzles": "חידות היגיון",
     "math": "מתמטיקה",
+    "methodology": "מתודולוגיה",
     "metastability": "מטא־יציבות",
     "number-bases": "בסיסי ספירה",
     "optimization": "אופטימיזציה",
@@ -110,6 +111,7 @@ TOPICS = {
     "systemverilog": "SystemVerilog",
     "two-pointers": "שני מצביעים",
     "usb4": "USB4",
+    "uvm": "UVM",
 }
 
 
