@@ -131,7 +131,7 @@ SNAP = """([b, own]) => {
   [copy, ...copy.querySelectorAll("*")].forEach((el) => {
     const attrs = [...el.attributes].map((a) => [a.name, a.value]).sort((x, y) => (x[0] < y[0] ? -1 : 1));
     attrs.forEach(([name]) => el.removeAttribute(name));
-    attrs.forEach(([name, value]) => el.setAttribute(name, value));
+    attrs.forEach(([name, value]) => { try { el.setAttribute(name, value); } catch (e) { /* not a valid name: dropped on both sides */ } });
   });
   return { values, html: copy.innerHTML, restored: !!box.querySelector(".ex-restored") };
 }"""

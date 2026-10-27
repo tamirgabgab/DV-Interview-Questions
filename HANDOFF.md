@@ -1191,7 +1191,10 @@ section below starts at session 22, whose numbered items run on through the late
     one run (`ex-btnrun`, core.js `layout`) that scrolls sideways on a phone, fading at its
     end, and lays out as before elsewhere (`display: contents`); a row a view lays out as a
     grid keeps it (0024's events). Nine runs on eight pages, each one line instead of two to
-    six at 390 px.
+    six at 390 px. The attribute order of S417 found a real bug on the first CI run: the
+    ants box (0056) put a `<bdi dir="ltr">` inside its pole's `aria-label`, so the quotes
+    broke the attribute and a screen reader read it garbled; the label is plain text now,
+    and the check drops an attribute whose name is not valid on both sides.
 78. **Round S2, figures where a page had none (session 27, 2026-10-27).** The owner's pick:
     only where a figure adds. Of the six pages first named, 0034 and 0038 have WaveDrom
     waveforms and 0057 generated tables, so the pages without a figure were 0045, 0046 and

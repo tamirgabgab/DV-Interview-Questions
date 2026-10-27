@@ -79,7 +79,7 @@
 
       const poleSvg = (frame) => {
         const W = 400, H = 92, Y = 50;
-        let s = `<svg class="figure an-live an-pole-svg" viewBox="0 0 ${W} ${H}" role="group" aria-label="המוט אחרי ${ltr(st.t2 / 2)} שניות : ${frame.filter((a) => !a.gone).length} נמלים עליו">` +
+        let s = `<svg class="figure an-live an-pole-svg" viewBox="0 0 ${W} ${H}" role="group" aria-label="המוט אחרי ${st.t2 / 2} שניות : ${frame.filter((a) => !a.gone).length} נמלים עליו">` +
           `<rect class="an-hit" x="${X0 - 8}" y="${Y - 26}" width="${LEN * SX + 16}" height="44"/>` +
           `<line class="an-pole" x1="${X0}" y1="${Y}" x2="${X(LEN)}" y2="${Y}"/>`;
         for (const v of [0, 25, 50, 75, 100]) s += `<text class="tick" x="${f(X(v))}" y="${Y + 30}" text-anchor="middle">${v}</text>`;
