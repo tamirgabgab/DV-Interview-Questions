@@ -1337,6 +1337,24 @@ proof panels inside boxes, a run panel for Python, study paths, marks and practi
 Suggested order: X364 and X361 (small, on pages that exist), X385 with X370, then X377 with
 X368 and X376 with X366 (a question and its tool together), then X372 before X367.
 
+## Proposals — seventh series, round Y, the reading experience (session 27, 2026-10-27)
+
+A third visual review, after work log item 72: the inside of a question (hints, an open
+solution, traps, follow-ups, the run panel), the level, tags and "what's new" pages and the
+search, desktop and 390 px, light and dark. Item numbers continue at 393. Size as above.
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| Y393 | Hints, solutions, traps and follow-ups are set at 12.8 px (Material's admonition size), the statement at 16 px: the core text of the site is the smallest, and on a phone it is small | body text of those blocks at the page size (0.8rem); titles, chips and code stay | S |
+| Y394 | On a phone a table of 5+ columns that does not fit becomes cards. A table whose rows are named in its first column (0047: i, height, maxL, maxR, water) turns into unreadable cards of number pairs, and a 4-row trace takes about 750 px | tighter cell padding on a phone, so short tables fit and stay tables; a table with row names in its first column scrolls sideways with that column sticky, never cards; cards only for wide tables of long text | M |
+| Y395 | An open solution shows a green frame, an amber short answer and five coloured side rails (idea, steps, code, proof, cost), next to teal hints, a teal follow-up box, a purple run panel and an amber trap group | one quiet rail colour for the solution blocks, the colour kept in each block's icon, title and map chip; the open solution's frame neutral | M |
+| Y396 | The search lists the catalog page as one run-together blob ("#שאלהמשרהקושי 0001גלאי..."), every tag of the tags page and every date of "what's new" ("27 באוקטובר 202611 שאלות"), above or between the questions | leave the catalog, tags and "what's new" pages out of the search index (front matter `search: exclude`), so a search finds questions and their sections | S |
+| Y397 | "What's new" and the tags page have a navigation sidebar with one link (the catalog's was hidden in item 72) | hide the navigation on those two pages too | S |
+| Y398 | The tags page is one long column of lists, about 17,800 px on a desktop and 24,000 px on a phone, with 40 tags in the contents sidebar | a compact grid of tag chips with counts at the top, each tag's list in two columns on a desktop | M |
+
+Not changed: the home page, the cards, the path box and the footer read well; the 404 page
+could not be judged locally (its assets point at the site path).
+
 ## Technical notes for whoever continues this work
 
 - SystemVerilog tests: Verilator must be newer than 5.052 (CI builds the commit in
