@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-25 (session 26)_
+_Last updated: 2026-10-27 (session 27)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -940,10 +940,37 @@ section below starts at session 22, whose numbered items run on through the late
     to the abmap box). Self-checks on both; 0053 in the testbench path, 0054 in logic
     design.
 
+63. **New questions 0055 and 0056 (session 27, 2026-10-27).** The owner turned down a
+    first set (solve-before, skid buffer, reservoir sampling, the light bulb) and a second
+    (the SV scheduler, hats, the sum of uniforms past 1), asked for interview questions in
+    the style of Nvidia and Apple, and picked the divisible-by-3 machine and the ants on a
+    pole (PLRU was picked first, then swapped for the ants). **0055** (junior, design): from
+    the MSB the state is the remainder, r' = 2r + b; from the LSB the naive machine keeps
+    the remainder and the position (6 states for 3, 20 for 5), but x = r * 2^-k is enough,
+    x' = (x + b) * 2^-1, so m states both ways for odd m (and for 3 it is the MSB machine with
+    1 and 2 swapped, since 2 = -1 mod 3). Part c: any base B coprime to m (k bits a cycle are
+    base 2^k, the multipliers B and B^-1 mod m; 1 means a digit sum), one parametrized
+    module. The generator builds the naive machines from the definition and minimizes them
+    by partition refinement: the table of fewest states for m = 2 to 16 (even m = 2^a m':
+    m' + a from the MSB, m' + a + 1 from the LSB, a follow-up). Box `divfsm`: one number fed
+    to both machines side by side (MSB from the left, LSB from the right), m, the base,
+    digits typed, added by buttons or drawn; each ring shows the current state, the edges
+    out of it (bent inward) and the edge just taken (bent outward). **0056** (junior,
+    puzzle): ghosts that walk through each other give the last fall (100 s at most), the
+    collisions (pairs going toward each other, 2500 at most for 100 ants) and the fall of
+    each ant (the order along the pole is kept: the leftmost ants, as many as go left,
+    fall left in the order of the left ghosts' times). The generator simulates in half
+    seconds on doubled coordinates. Box `ants`: ants placed and turned by a click on the
+    pole (its container has `data-fig-strip`, an ant reaches the corner of the enlarge
+    button only at some steps), drawn from a seed, played by half seconds on the pole and
+    on a space-time chart, a toggle between ants and ghosts, the fall of every ant as
+    chips; the ants ride in the link through `dvqExtra`. Self-checks on both; 0055 in the
+    logic-design path, 0056 in logic puzzles.
+
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is 1c33f66 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0054 with 0052 generalized), deployed.
-  53 questions (0022 was
+- **State (2026-10-27, session 27):** `main` is 1c33f66 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0054 with 0052 generalized), deployed; questions 0055 and 0056 on the branch.
+  55 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
@@ -1002,12 +1029,12 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (53 questions)
+### Coverage today (55 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water) |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.

@@ -215,6 +215,52 @@ def rr_bound(n: int, weights=None) -> int:
     return max(best) if weights == [1] * n else best[0]
 
 
+def fsm_answers() -> list[int]:
+    """The divisible-by-m machines: the remainder of 1011 read from the MSB; the fewest
+    states from the LSB for 3, counted as the prefixes with different futures (every suffix
+    up to 8 bits); and 10^-1 mod 7."""
+    def future(prefix):
+        k, v = len(prefix), sum(b << i for i, b in enumerate(prefix))
+        return tuple((v + (w << k)) % 3 == 0 for n in range(9) for w in range(1 << n))
+    prefixes = [[(x >> i) & 1 for i in range(n)] for n in range(7) for x in range(1 << n)]
+    return [int("1011", 2) % 3, len({future(p) for p in prefixes}), next(y for y in range(7) if 10 * y % 7 == 1)]
+
+
+def ants_answers() -> list[int]:
+    """Ants on a pole: the longest time, by every configuration of up to three ants on a pole
+    of 8 (it is the length) scaled to 100; the most collisions of 100 ants by a dynamic
+    program over the ants from the left (the number going right so far); and the page's six
+    ants simulated in half seconds, turning at every meeting."""
+    def run(pos, dirs, length):
+        x, d, t, last = [2 * p for p in pos], list(dirs), 0, 0
+        alive = set(range(len(x)))
+        while alive:
+            for k in [k for k in alive if (x[k] <= 0 and d[k] < 0) or (x[k] >= 2 * length and d[k] > 0)]:
+                alive.discard(k)
+                last = t
+            for k in alive:
+                x[k] += d[k]
+            t += 1
+            for a in alive:
+                for b in alive:
+                    if a < b and x[a] == x[b]:
+                        d[a], d[b] = -d[a], -d[b]
+        return last / 2
+    longest = 0
+    for n in (1, 2, 3):
+        for pos in __import__("itertools").combinations(range(9), n):
+            for dirs in __import__("itertools").product((1, -1), repeat=n):
+                longest = max(longest, run(pos, dirs, 8))
+    best = {0: 0}                                         # ants going right so far -> most pairs
+    for _ in range(100):
+        nxt = {}
+        for r, c in best.items():
+            nxt[r + 1] = max(nxt.get(r + 1, -1), c)        # this ant goes right
+            nxt[r] = max(nxt.get(r, -1), c + r)            # this ant goes left: meets them all
+        best = nxt
+    return [int(longest * 100 / 8), max(best.values()), int(run([10, 25, 40, 60, 75, 90], [1, -1, 1, -1, -1, 1], 100))]
+
+
 EXPECTED = {
     "0015": [two_children(False), two_children(True)],
     "0016": [josephus(20)],
@@ -233,6 +279,8 @@ EXPECTED = {
     "0052": [coin_runs("HH")[0], coin_runs("HHH")[0], coin_runs("HT", "HH")[1], coin_var("HH")],
     "0053": list(alu_bins()),
     "0054": [rr_bound(4), rr_bound(8), rr_bound(4, [1, 2, 3, 4])],
+    "0055": fsm_answers(),
+    "0056": ants_answers(),
 }
 
 

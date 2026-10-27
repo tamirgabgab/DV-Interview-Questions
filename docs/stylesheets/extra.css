@@ -3562,3 +3562,56 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer table.arb-tt td { padding: 0.15em 0.6em; }
 .md-typeset .explorer .arb-rule { margin: 0.15em 0; font-size: 0.7rem; }
 .md-typeset .explorer table.arb-tt code { white-space: nowrap; }
+
+/* Divisible-by-m machines (0055): the rings of the figures and the divfsm explorer (fs-* states), the digits read */
+.md-typeset .viz-legend .dv-key-acc { background: transparent; border-radius: 50%; outline: 2px solid var(--viz-ink); outline-offset: -2px; box-shadow: inset 0 0 0 4px var(--md-default-bg-color), inset 0 0 0 6px var(--viz-ink); }
+.md-typeset .viz-legend .dv-key-taken { background: var(--viz-ink); height: 0.25rem; }
+.md-typeset .viz-legend .dv-key-cur { background: var(--viz-s2); opacity: 0.5; outline: 2px solid var(--viz-s2); border-radius: 50%; }
+.md-typeset .explorer .dv-pair { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+.md-typeset .explorer .dv-side { flex: 1 1 17rem; min-width: 0; max-width: 24rem; }
+.md-typeset .explorer .dv-side .ex-title { margin: 0.4rem 0 0; }
+.md-typeset .explorer svg.dv-live { width: 100%; display: block; }
+.md-typeset .explorer .dv-read { font-size: 0.7rem; margin: 0 0 0.4rem; }
+.md-typeset .explorer .dv-digits { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; direction: ltr; margin: 0.4rem 0; }
+.md-typeset .explorer .dv-tag { font-size: 0.65rem; font-family: var(--md-code-font-family); color: var(--viz-text); }
+.md-typeset .explorer .dv-cells { display: inline-flex; flex-wrap: wrap; gap: 0.15rem; }
+.md-typeset .explorer .dv-cell { display: inline-block; min-width: 1.5rem; padding: 0.1rem 0; text-align: center; font-family: var(--md-code-font-family); font-weight: 700; color: var(--viz-ink);
+  border: 1.5px solid var(--viz-grid); border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-radius: 0.2rem; }
+.md-typeset .explorer .dv-cell.is-msb { border-top-color: var(--viz-s1); }
+.md-typeset .explorer .dv-cell.is-lsb { border-bottom-color: var(--viz-s2); }
+.md-typeset .explorer .dv-add .dv-push { min-width: 2.4rem; font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset .explorer input.dv-num { width: 11rem; letter-spacing: 0.08em; font-family: var(--md-code-font-family); }
+
+/* Ants on a pole (0056): the space-time figure and the ants explorer; one colour per ant (or ghost), six in turn */
+.md-typeset svg .an-c0 { --an: var(--viz-s1); }
+.md-typeset svg .an-c1 { --an: var(--viz-s2); }
+.md-typeset svg .an-c2 { --an: var(--viz-s3); }
+.md-typeset svg .an-c3 { --an: var(--viz-s4); }
+.md-typeset svg .an-c4 { --an: var(--viz-s5); }
+.md-typeset svg .an-c5 { --an: var(--viz-ink); }
+.md-typeset svg .an-path { fill: none; stroke: var(--an); stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round; }
+.md-typeset svg .an-start { fill: var(--an); stroke: var(--md-default-bg-color); stroke-width: 1.5; }
+.md-typeset svg .an-pole { stroke: var(--viz-ink); stroke-width: 4; stroke-linecap: round; }
+.md-typeset svg .an-title { fill: var(--viz-ink); font-size: 13px; font-weight: 700; }
+.md-typeset svg .an-now { stroke: var(--viz-ink); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.md-typeset svg .an-hit { fill: transparent; cursor: copy; }
+.md-typeset svg .an-ant { cursor: pointer; }
+.md-typeset svg .an-ant circle { fill: var(--md-default-bg-color); stroke: var(--an); stroke-width: 3.5; }
+.md-typeset svg .an-ant text { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); pointer-events: none; }
+.md-typeset svg .an-ant .an-dir { fill: var(--an); }
+.md-typeset svg .an-ant:focus-visible { outline: none; }
+.md-typeset svg .an-ant:focus-visible circle { stroke: var(--site-focus-ring); stroke-width: 4.5; }
+.md-typeset .viz-legend .an-key-path { background: linear-gradient(90deg, var(--viz-s1) 0 33%, var(--viz-s2) 33% 66%, var(--viz-s3) 66%); height: 0.25rem; }
+.md-typeset .viz-legend .an-key-start { background: var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .an-key-now { background: none; border-top: 2px dashed var(--viz-ink); height: 0; }
+.md-typeset .explorer svg.an-live { width: 100%; max-width: 30rem; display: block; }
+.md-typeset .explorer .an-st-wrap svg { max-width: 26rem; }
+.md-typeset .explorer .an-chips { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.md-typeset .explorer .an-chip { --an: var(--viz-s1); font-family: var(--md-text-font-family); font-size: 0.65rem; padding: 0.1rem 0.4rem; border: 1.5px solid var(--viz-grid); border-inline-start: 5px solid var(--an); border-radius: 0.2rem; color: var(--viz-ink); }
+.md-typeset .explorer .an-chip.an-c1 { --an: var(--viz-s2); }
+.md-typeset .explorer .an-chip.an-c2 { --an: var(--viz-s3); }
+.md-typeset .explorer .an-chip.an-c3 { --an: var(--viz-s4); }
+.md-typeset .explorer .an-chip.an-c4 { --an: var(--viz-s5); }
+.md-typeset .explorer .an-chip.an-c5 { --an: var(--viz-ink); }
+.md-typeset .explorer .an-chip.is-gone { background: color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color)); }
+.md-typeset svg .an-grid { stroke: var(--viz-grid); stroke-width: 1; }
