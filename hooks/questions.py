@@ -13,8 +13,10 @@ Responsibilities:
   file of each kind on the page (on_post_page).
 - The home page's "continue" card and "recently added" strip, and the "what's new" page
   (``<!-- home-continue -->``, ``<!-- recent -->``, ``<!-- whats-new -->``).
-- Add the prefix-stripped Hebrew words to the search index, and the id, level,
-  difficulty and kind to the result of a question page (on_post_build).
+- Keep only the questions in the search index, each with its statement and its parts'
+  statements (math in plain symbols, tools/search_text.py), and add the prefix-stripped
+  Hebrew words, and the id, level, difficulty and kind to the result of a question page
+  (on_post_build).
 """
 
 from __future__ import annotations
@@ -33,6 +35,7 @@ from mkdocs.utils.meta import get_data
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 import extract_code  # noqa: E402
+from search_text import STATEMENT, statement_sections  # noqa: E402
 
 LEVELS = {
     "student": "סטודנט",
@@ -165,6 +168,7 @@ _questions: dict[str, dict] = {}
 _paths: list[dict] = []
 _comments: dict = {}
 _kind_files: dict[str, str] = {}   # explorer kind -> its file name in EXPLORER_DIR
+_statements: dict[str, list] = {}  # question page url -> its statement and parts (search)
 
 
 def _load_questions(docs_dir: Path) -> dict[str, dict]:
@@ -912,9 +916,32 @@ TAG_TOC = re.compile(r'(href="#tag:([^"]+)" class="md-nav__link">\s*<span class=
 
 def _tag_names(output: str) -> str:
     """The tags page with the topics' Hebrew names, in its headings and its contents list
-    (the anchors keep the tags as written)."""
+    (the anchors keep the tags as written), and a grid of all tags with their counts above
+    the lists (Y398)."""
     output = TAG_CHIP.sub(lambda m: m.group(1) + html.escape(topic_name(html.unescape(m.group(2).strip()))) + m.group(3), output)
-    return TAG_TOC.sub(lambda m: m.group(1) + html.escape(topic_name(m.group(2))) + m.group(4), output)
+    output = TAG_TOC.sub(lambda m: m.group(1) + html.escape(topic_name(m.group(2))) + m.group(4), output)
+    return _tag_grid(output)
+
+
+TAG_SECTION = re.compile(r'(<h2 id="tag:([^"]+)">.*?<span class="md-tag">([^<]+)</span>.*?</h2>\s*)<ul>(.*?)</ul>', re.S)
+
+
+def _tag_grid(output: str) -> str:
+    """Every tag as a chip with its number of questions, linking to its list, and the lists
+    in columns (ul.tag-list)."""
+    chips = []
+
+    def section(m: re.Match) -> str:
+        count = m.group(4).count("<li>")
+        chips.append(f'<a class="tag-chip" href="#tag:{m.group(2)}">{m.group(3)}'
+                     f'<span class="tag-count" aria-label="{count} שאלות">{count}</span></a>')
+        return f'{m.group(1)}<ul class="tag-list">{m.group(4)}</ul>'
+
+    output = TAG_SECTION.sub(section, output)
+    at = output.find('<h2 id="tag:')
+    if at < 0 or not chips:
+        return output
+    return output[:at] + f'<nav class="tag-grid" aria-label="כל התגיות">{"".join(chips)}</nav>\n' + output[at:]
 
 
 TRAP_RUN = re.compile(r'(?:<details class="trap">.*?</details>\s*)+', re.S)
@@ -937,6 +964,7 @@ def on_post_page(output, page, config, **kwargs):
         output = _tag_names(output)
     if page.file.src_uri in _questions:
         output = TRAP_RUN.sub(_trap_group, output)
+        _statements[page.url] = statement_sections(output)
     scripts = explorer_scripts(output, page.url)
     if not scripts:
         return output
@@ -965,14 +993,30 @@ def _search_variants(raw_tokens: set[str], words: list[str], known: set[str]) ->
 def _search_question(doc: dict, q: dict) -> None:
     """A question page in the search results (E33): the id before the title (so "0021"
     ranks it first), the kind beside the level and difficulty in its tags (the results
-    show them as chips under the title, with the topics by their Hebrew names), no text instead of the header
-    card's run-together chips, and the id as written and without its zeros ("0021 21") in
-    its own field."""
+    show them as chips under the title, with the topics by their Hebrew names), and the id
+    as written and without its zeros ("0021 21") in its own field."""
     doc["title"] = f'{q["id"]} · {q["title"]}'
     doc["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], KINDS[q["kind"]],
                    *[topic_name(t) for t in doc.get("tags", []) if t not in (LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]])]]
-    doc["text"] = ""   # the tags, shown as chips under the title, are the topics already
     doc[ID_FIELD] = f'{q["id"]} {int(q["id"])}'
+
+
+def _question_docs(docs: list[dict], pages: dict) -> list[dict]:
+    """The search finds the questions themselves (Y396): one document per question page,
+    its text the statement, and one per part ("סעיף א ...") with the part's own statement.
+    Hints, solutions, code, traps and follow-ups, and every page that is not a question
+    (home, paths, catalog, tags, what's new), are left out; the math reads in plain symbols
+    (search_text.py)."""
+    out = []
+    for doc in docs:
+        if "#" in doc["location"] or doc["location"] not in pages:
+            continue
+        sections = _statements.get(doc["location"], [])
+        doc["text"] = next((text for _, title, text in sections if title == STATEMENT), "")
+        out.append(doc)
+        out += [{"location": f'{doc["location"]}#{anchor}', "title": title, "text": text}
+                for anchor, title, text in sections if title != STATEMENT]
+    return out
 
 
 def on_post_build(config, **kwargs):
@@ -980,6 +1024,8 @@ def on_post_build(config, **kwargs):
     if not path.exists():
         return
     index = json.loads(path.read_text(encoding="utf-8"))
+    pages = {q["src_uri"][: -len(".md")] + "/": q for q in _questions.values()}
+    index["docs"] = _question_docs(index["docs"], pages)
     sep = re.compile(index["config"].get("separator") or r"[\s\-]+")
     texts = []
     for doc in index["docs"]:
@@ -990,7 +1036,6 @@ def on_post_build(config, **kwargs):
         extra = _search_variants(raw, words, known)
         if extra:
             doc[SEARCH_FIELD] = " ".join(sorted(extra))
-    pages = {q["src_uri"][: -len(".md")] + "/": q for q in _questions.values()}
     for doc in index["docs"]:
         if doc["location"] in pages:
             _search_question(doc, pages[doc["location"]])

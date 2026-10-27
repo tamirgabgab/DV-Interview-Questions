@@ -1458,7 +1458,13 @@ body.practice-mode .md-typeset .question-tools {
   .md-typeset table:not([class]) th,
   .md-typeset table:not([class]) td { padding: 0.55em 0.6em; }
   .md-typeset table:not([class]) th { min-width: 3rem; }   /* Material: 5rem */
+  .md-typeset table[data-grid] :is(th, td) { padding: 0.45em 0.5em; }   /* a grid: tighter still */
 }
+/* A grid of short values (Y394): its columns as narrow as their values (the theme's 5rem
+   per header pushed a trace of seven columns out of its step), and when it still scrolls
+   sideways its first column, the row names, stays in place, with a line on its end side. */
+.md-typeset table[data-grid] th { min-width: 0; }
+.md-typeset table[data-grid][data-scrolls] :is(th, td):first-child { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--site-surface); box-shadow: inset 1px 0 0 var(--site-card-border); }
 
 /* Hourglass figures (questions 0018, 0019), drawn by tools/figures/hourglass.py */
 .md-typeset svg .sand-a { fill: var(--viz-s1); }
@@ -3926,3 +3932,20 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer input.gs-x { width: 6rem; }
 .md-typeset table.gs-bits td.gs-b.is-lead { border-style: dashed; background: none; }
 .md-typeset .viz-legend .gs-key-lead { background: none; outline: 1.5px dashed var(--viz-grid); outline-offset: -1.5px; }
+
+/* The tags page (Y398): every tag as a chip with its count above the lists, and each
+   tag's questions in columns on a wide screen. */
+.md-typeset .tag-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: var(--sp-3) 0 var(--sp-5); }
+.md-typeset .tag-grid .tag-chip { display: inline-flex; align-items: center; gap: 0.4em; padding: 0.15rem 0.65rem; border: 1px solid var(--site-card-border); border-radius: 1rem; background: var(--site-surface); color: var(--md-default-fg-color); font-size: 0.7rem; line-height: 1.6; text-decoration: none; }
+.md-typeset .tag-grid .tag-chip:is(:hover, :focus-visible) { border-color: var(--md-typeset-a-color); color: var(--md-typeset-a-color); }
+.md-typeset .tag-grid .tag-count { color: var(--md-default-fg-color--light); font-variant-numeric: tabular-nums; }
+.md-typeset ul.tag-list { columns: 2 18rem; column-gap: var(--sp-5); }
+.md-typeset ul.tag-list li { margin-bottom: 0.3em; break-inside: avoid; }
+
+/* Hints, solutions, traps and follow-ups (Y393) read at the page's own size, not the
+   theme's smaller box size; their titles stay compact, and an explorer box inside keeps
+   the size it was drawn for. */
+.md-typeset :is(.admonition, details) { font-size: 0.8rem; }
+.md-typeset :is(.admonition, details) :is(.admonition-title, summary) { font-size: 0.7rem; }
+.md-typeset :is(.admonition, details) :is(.admonition, details) { font-size: 1em; }
+.md-typeset :is(.admonition, details) .explorer { font-size: 0.64rem; }

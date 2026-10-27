@@ -81,6 +81,7 @@ PAIRS = [
     ("footer text", "var(--md-footer-fg-color)", ["var(--md-footer-bg-color)"], TEXT),
     ("footer secondary text", "var(--md-footer-fg-color--light)", ["var(--md-footer-bg-color--dark)"], TEXT),
     ("edit link", "var(--md-default-fg-color--light)", [PAGE], TEXT),
+    ("tag count on a tag chip", "var(--md-default-fg-color--light)", ["var(--site-surface)"], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

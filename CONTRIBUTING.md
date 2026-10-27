@@ -84,6 +84,7 @@ DV-Interview-Questions/
 │   └── questions.py            # Validation, navigation, tags, tables, run panels
 ├── tools/
 │   ├── extract_code.py         # Pulls the code blocks out of a question page
+│   ├── search_text.py          # A question's statement for the search, math in plain symbols
 │   ├── lint_pages.py           # Checks the page skeleton and the RTL rules
 │   ├── check_links.py          # Internal link / anchor check of the built site (--external fetches the rest)
 │   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors, axe-core)
@@ -100,7 +101,7 @@ DV-Interview-Questions/
 │                               # stepper.py, cake.py
 ├── tests/
 │   ├── conftest.py
-│   ├── hook/                   # Tests of the site hook (search variants, study paths)
+│   ├── hook/                   # Tests of the site hook (search variants and documents, study paths)
 │   ├── tools/                  # Tests of new_question.py, fill.py and charts.py
 │   └── <id>/                   # One folder per question with code, e.g. tests/0006/
 │       ├── test_<id>.py        # pytest tests of the page's Python code
@@ -333,7 +334,11 @@ inside the viewBox (a label marked `data-fit-drop`, like the size inside a narro
 PCIe box, is hidden when even that leaves it under 9 px; its tooltip stays), and a row of `tick` / `coord` labels that then overlaps is thinned
 (every k-th label kept, the first and the last always); this runs on every inline figure
 and on the live figures of the explorer boxes (refitted when a box redraws), and the
-lightbox copy keeps the original sizes. A content table of five or more columns and three
+lightbox copy keeps the original sizes. A content table of five or more columns whose
+values (all but the first column) are 14 characters or shorter is a grid (`data-grid`): a
+trace, or rows named in the first column; its columns are as narrow as their values, it is
+tighter on a phone, and when it still does not fit it scrolls sideways with its first
+column in place. Any other table of five or more columns and three
 or more rows that does not fit its column becomes compact cards under 30em (the first
 cell as the title, the others as "column value" pairs in two columns); a table of eight or
 more rows that fits keeps its header row in view while it scrolls; numbers in tables are
@@ -363,7 +368,8 @@ now, so the tables no longer mark it).
 Topics show by their Hebrew names (the `TOPICS` table in `hooks/questions.py`; terms that
 DV engineers say in English, such as FIFO, CDC, PCIe and SVA, stay so) in the tables, the
 filters, the header card, the tags page (its headings and contents list, rewritten after
-the build) and the search results; the tag as written stays in the files, the addresses
+the build, with a grid of every tag and its count above the lists, which run in two
+columns on a wide screen) and the search results; the tag as written stays in the files, the addresses
 and the anchors. `tools/lint_pages.py` warns about a topic without a name.
 
 ### Study paths
@@ -382,6 +388,16 @@ puzzles, optimization puzzles, geometry and motion, the cake.
 
 ### Search
 
+The search finds the questions themselves (Y396): after the build the hook keeps one
+document per question page, its text the statement (the "השאלה" section), and one per part
+("סעיף א ...") with that part's statement. Hints, solutions, code, figures, boxes, traps and
+follow-ups, and every page that is not a question (home, paths, catalog, tags, what's new),
+are left out. `tools/search_text.py` reads the statement out of the built page and writes
+its math in plain symbols ("O(n log n)", "2ⁿ − 1", "⌊log₂ n⌋"), each formula in a
+left-to-right isolate (U+2066 ... U+2069, as the results drop markup); a TeX command it
+does not know comes out as its name, never with a backslash
+(`tests/tools/test_search_text.py` checks every page).
+
 Material's search splits on whitespace only and has no Hebrew stemmer, so a word with a
 prefix letter (ו ה ב כ ל מ ש) or glued punctuation would not be found. After the build, the
 hook adds a hidden `alt` field to every search document with the clean words and their forms
@@ -389,7 +405,7 @@ without the prefix letters (one letter always, two or three letters when the res
 used on the site). The toolbar, filters and path bar carry `data-search-exclude`. A
 question page's own search document gets the id before its title ("0021 · ..."), its
 level, difficulty and kind first in its tags (shown as chips under the result, with the
-topics), no text (the header card's run-together chips were its text), and the id as
+topics), and the id as
 written and without its zeros in a field `qid` boosted above every other field, so
 typing "21" or "0021" puts that question first.
 
@@ -423,6 +439,9 @@ shadows (`--shadow-1` to `--shadow-3`, per scheme) and one motion speed and easi
 (`--md-default-bg-color: #f7f8fb`) and cards, boxes, admonitions and tables are white
 surfaces (`--site-surface`) lifted by a shadow, with no outline (`--site-card-edge` is
 transparent); the dark scheme keeps the page colour for surfaces and outlines its cards.
+Hints, solutions, traps and follow-ups set their text at the page size (0.8rem, not the
+theme's 0.64rem box size), their titles at 0.7rem, and an explorer box inside one keeps
+0.64rem, the size its figures were drawn for.
 The footer is the brand navy. The "edit on GitHub" link sits at the end of every page
 (`overrides/partials/content.html`), not beside the title.
 

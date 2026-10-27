@@ -422,17 +422,24 @@
 
   // A content table of CARD_COLS or more columns and CARD_ROWS or more rows that does not
   // fit its column becomes cards on a phone: every cell gets its column's name
-  // (data-label), shown before the value by the CSS. A long table that fits its column keeps
-  // its header row in view while it scrolls (the scroll wrapper would otherwise hold the
-  // sticky header). Data attributes, not classes: Material styles only tables without one.
-  const CARD_COLS = 5, CARD_ROWS = 3, STICKY_ROWS = 8;
+  // (data-label), shown before the value by the CSS. A table of short values (a trace, or
+  // rows named in the first column) is a grid instead (Y394): it stays a table, tighter,
+  // and when it still does not fit it scrolls sideways with its first column in place
+  // (data-scrolls). A long table that fits its column keeps its header row in view while
+  // it scrolls (the scroll wrapper would otherwise hold the sticky header). Data
+  // attributes, not classes: Material styles only tables without one.
+  const CARD_COLS = 5, CARD_ROWS = 3, STICKY_ROWS = 8, GRID_CELL = 14;
   const tables = (root) => {
-    const wide = [], long = [];
+    const wide = [], long = [], grids = [];
     root.querySelectorAll(".md-content .md-typeset__table > table:not([class])").forEach((table) => {
       if (table.closest(".questions-wrap, .explorer")) return;
       const heads = Array.from(table.querySelectorAll("thead th")).map((th) => th.textContent.trim());
       const rows = table.querySelectorAll("tbody tr");
-      if (heads.length >= CARD_COLS && rows.length >= CARD_ROWS) {   // a row-per-value table stays a table
+      const values = Array.from(rows).flatMap((tr) => Array.from(tr.children).slice(1).map((td) => td.textContent.trim().length));
+      if (heads.length >= CARD_COLS && Math.max(0, ...values, ...heads.slice(1).map((h) => h.length)) <= GRID_CELL) {
+        table.dataset.grid = "";
+        grids.push(table);
+      } else if (heads.length >= CARD_COLS && rows.length >= CARD_ROWS) {   // a row-per-value table stays a table
         rows.forEach((tr) => Array.from(tr.children).forEach((td, i) => {
           if (heads[i]) td.dataset.label = heads[i];
         }));
@@ -443,6 +450,11 @@
     // Cards only where the table does not fit its column (measured as a table), and a
     // sticky header only where it does.
     const layout = () => {
+      grids.forEach((table) => {
+        const wrap = table.closest(".md-typeset__scrollwrap");
+        delete table.dataset.scrolls;
+        if (wrap && wrap.clientWidth && table.offsetWidth > wrap.clientWidth + 1) table.dataset.scrolls = "";
+      });
       wide.forEach((table) => {
         const wrap = table.closest(".md-typeset__scrollwrap");
         delete table.dataset.cards;

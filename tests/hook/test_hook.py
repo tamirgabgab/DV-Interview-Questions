@@ -83,3 +83,23 @@ def test_cost_chips():
             '<span class="cost-chip"><b>זמן</b> \\( O(n) \\)</span>'
             '<span class="cost-chip"><b>פלופים</b> 2</span></div>\n') in out
     assert "<!--" not in out
+
+
+def test_search_keeps_only_the_questions():
+    hook._statements["q/a/"] = [("_1", "השאלה", "<p>ניסוח</p>"), ("_2", "סעיף א", "<p>חלק</p>")]
+    docs = [{"location": "", "title": "ראשי", "text": "x"},
+            {"location": "all/", "title": "כל השאלות", "text": "x"},
+            {"location": "q/a/", "title": "A", "text": "chips"},
+            {"location": "q/a/#_5", "title": "הרעיון", "text": "פתרון"}]
+    out = hook._question_docs(docs, {"q/a/": {}})
+    assert out == [{"location": "q/a/", "title": "A", "text": "<p>ניסוח</p>"},
+                   {"location": "q/a/#_2", "title": "סעיף א", "text": "<p>חלק</p>"}]
+
+
+def test_tag_grid_counts_each_tag():
+    page = ('<p>intro</p><h2 id="tag:bfs"><span class="md-tag">BFS</span></h2>\n<ul><li>a</li><li>b</li></ul>'
+            '<h2 id="tag:cdc"><span class="md-tag">CDC</span></h2>\n<ul><li>c</li></ul>')
+    out = hook._tag_grid(page)
+    assert out.index('<nav class="tag-grid"') < out.index('<h2 id="tag:bfs">')
+    assert '<a class="tag-chip" href="#tag:bfs">BFS<span class="tag-count" aria-label="2 שאלות">2</span></a>' in out
+    assert out.count('<ul class="tag-list">') == 2

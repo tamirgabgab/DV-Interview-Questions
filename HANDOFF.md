@@ -1122,10 +1122,26 @@ section below starts at session 22, whose numbered items run on through the late
     the text colour (Material greys it, so the paths, catalog, level and tag pages had a
     faint title), h1 and h2 wrap with `text-wrap: balance` (0050 left "ID" alone on a
     line), and the catalog page hides the navigation sidebar, which held one link.
+73. **Round Y, the reading experience (session 27, 2026-10-27).** The owner took Y393, Y394,
+    Y396, Y397 and Y398 (not Y395, the calmer solution colours), and asked during the round
+    that the search find only the questions themselves, with real symbols instead of TeX
+    source, and noticed run-together words ("השאלותעם"). Y396 became: the search index keeps
+    one document per question (its statement) and one per part (the part's statement);
+    hints, solutions, code, boxes, traps, follow-ups and every other page are gone (1117
+    documents to 194). `tools/search_text.py` reads the statement out of the built page and
+    writes the math in plain symbols (all 6989 formulas of the site, no backslash left),
+    each in a left-to-right isolate, since the results drop `<bdi>` and "O(n)" showed as
+    "(n)O". Y393: hints, solutions, traps and follow-ups at the page size (16 px instead
+    of 12.8 px), titles 14 px, explorer boxes inside unchanged. Y394: a table of short
+    values is a grid (24 tables): narrow columns (the theme's 5rem per header had pushed
+    0047's trace out of its step, hiding its last column on a desktop too), tighter on a
+    phone, a sticky first column when it scrolls; 0047's named-row table no longer becomes
+    cards. Y397: "what's new" and tags without the one-link sidebar. Y398: the tags page
+    opens with a grid of every tag and its count, the lists in two columns.
 
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) on the branch.
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) on the branch.
   58 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
@@ -1345,12 +1361,12 @@ search, desktop and 390 px, light and dark. Item numbers continue at 393. Size a
 
 | # | Finding | Proposal | Size |
 |---|---|---|---|
-| Y393 | Hints, solutions, traps and follow-ups are set at 12.8 px (Material's admonition size), the statement at 16 px: the core text of the site is the smallest, and on a phone it is small | body text of those blocks at the page size (0.8rem); titles, chips and code stay | S |
-| Y394 | On a phone a table of 5+ columns that does not fit becomes cards. A table whose rows are named in its first column (0047: i, height, maxL, maxR, water) turns into unreadable cards of number pairs, and a 4-row trace takes about 750 px | tighter cell padding on a phone, so short tables fit and stay tables; a table with row names in its first column scrolls sideways with that column sticky, never cards; cards only for wide tables of long text | M |
+| Y393 (done, item 73) | Hints, solutions, traps and follow-ups are set at 12.8 px (Material's admonition size), the statement at 16 px: the core text of the site is the smallest, and on a phone it is small | body text of those blocks at the page size (0.8rem); titles, chips and code stay | S |
+| Y394 (done, item 73) | On a phone a table of 5+ columns that does not fit becomes cards. A table whose rows are named in its first column (0047: i, height, maxL, maxR, water) turns into unreadable cards of number pairs, and a 4-row trace takes about 750 px | tighter cell padding on a phone, so short tables fit and stay tables; a table with row names in its first column scrolls sideways with that column sticky, never cards; cards only for wide tables of long text | M |
 | Y395 | An open solution shows a green frame, an amber short answer and five coloured side rails (idea, steps, code, proof, cost), next to teal hints, a teal follow-up box, a purple run panel and an amber trap group | one quiet rail colour for the solution blocks, the colour kept in each block's icon, title and map chip; the open solution's frame neutral | M |
-| Y396 | The search lists the catalog page as one run-together blob ("#שאלהמשרהקושי 0001גלאי..."), every tag of the tags page and every date of "what's new" ("27 באוקטובר 202611 שאלות"), above or between the questions | leave the catalog, tags and "what's new" pages out of the search index (front matter `search: exclude`), so a search finds questions and their sections | S |
-| Y397 | "What's new" and the tags page have a navigation sidebar with one link (the catalog's was hidden in item 72) | hide the navigation on those two pages too | S |
-| Y398 | The tags page is one long column of lists, about 17,800 px on a desktop and 24,000 px on a phone, with 40 tags in the contents sidebar | a compact grid of tag chips with counts at the top, each tag's list in two columns on a desktop | M |
+| Y396 (done, item 73) | The search lists the catalog page as one run-together blob ("#שאלהמשרהקושי 0001גלאי..."), every tag of the tags page and every date of "what's new" ("27 באוקטובר 202611 שאלות"), above or between the questions | leave the catalog, tags and "what's new" pages out of the search index (front matter `search: exclude`), so a search finds questions and their sections | S |
+| Y397 (done, item 73) | "What's new" and the tags page have a navigation sidebar with one link (the catalog's was hidden in item 72) | hide the navigation on those two pages too | S |
+| Y398 (done, item 73) | The tags page is one long column of lists, about 17,800 px on a desktop and 24,000 px on a phone, with 40 tags in the contents sidebar | a compact grid of tag chips with counts at the top, each tag's list in two columns on a desktop | M |
 
 Not changed: the home page, the cards, the path box and the footer read well; the 404 page
 could not be judged locally (its assets point at the site path).
