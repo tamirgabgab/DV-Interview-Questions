@@ -29,7 +29,7 @@ const theme = EditorView.theme({
   "&.cm-focused": { outline: "2px solid var(--site-focus-ring)", outlineOffset: "1px" },
   ".cm-scroller": { fontFamily: "var(--md-code-font-family)", lineHeight: "1.6", maxHeight: "26rem" },
   ".cm-content": { padding: "0.5rem 0", caretColor: "var(--md-code-fg-color)" },
-  ".cm-gutters": { backgroundColor: "transparent", color: "var(--md-default-fg-color--light)", border: "0" },
+  ".cm-gutters": { backgroundColor: "transparent", color: "var(--md-code-hl-comment-color)", border: "0" },
   ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: "var(--md-code-hl-color--light)" },
   ".cm-dvq-mark": { width: "1.1em", textAlign: "center", fontWeight: "700" },
   ".cm-dvq-ok": { color: "var(--diff-easy)" },
@@ -71,7 +71,9 @@ function create(parent, doc, { label, onRun }) {
         syntaxHighlighting(highlight), theme, EditorState.tabSize.of(4),
         keymap.of([{ key: "Mod-Enter", run: () => { onRun(); return true; } },
                    indentWithTab, ...defaultKeymap, ...historyKeymap]),
-        EditorView.contentAttributes.of({ "aria-label": label, dir: "ltr" }),
+        // tabindex 0 makes the editable content count as the scroll area's keyboard access
+        // for axe (scrollable-region-focusable); it is the editor's own tab stop anyway
+        EditorView.contentAttributes.of({ "aria-label": label, dir: "ltr", tabindex: "0" }),
       ],
     }),
   });
