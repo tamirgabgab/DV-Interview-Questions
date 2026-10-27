@@ -47,6 +47,7 @@ pushed to `main`, which publishes the site.
 | Position levels       | Student / Junior / Senior; the Staff level was removed on 2026-10-21 (owner: no staff questions planned) |
 | Look and feel         | Own navy + amber palette, logo and footer; level / difficulty as CSS chips; one header card per question (see **Site redesign plan**) |
 | Next rounds (2026-10-27) | Owner: no rounds of new questions for now; only improve the existing questions, the site and its interfaces (series S). The question proposals X360 to X410 stay listed for later |
+| Closed (2026-10-27) | Owner: no run panel for questions without Python code, no print style, and 0001 stays as it is; not to be proposed again |
 
 ---
 
@@ -1254,7 +1255,6 @@ section below starts at session 22, whose numbered items run on through the late
 
 ### Owner decisions
 
-- [x] Keep example question `0001` as it is (owner, session 27, S414).
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
 - [ ] Fifth series: W1 to W4 done on the branch (W348's drawn check mark not picked); W5 not picked; `main` when the owner asks.
 - [ ] Pick rounds from **Proposals**: the owner's current direction is the eighth series, S1 to S6 (improve what exists, no new questions); the question proposals X360 to X410 wait; the older proposals are in the archive.
@@ -1479,9 +1479,7 @@ continue at 411.
 | # | Finding | Proposal | Size |
 |---|---|---|---|
 | S411 (done, item 76) | 35 of the 49 starting scripts (`tests/<id>/demo.py`) have no expected value in their `print()` comments, so the run panel shows no ✓ / ✗ for them | add the expected value to every `print()` of those demos (the test already checks each one) | M |
-| S412 (not taken) | 9 questions have no run panel: 0001, 0015, 0021, 0026, 0027, 0028, 0029, 0048, 0049 | a starting script for each whose page has Python code; 0049 (UVM) and any without Python get a note instead | M |
 | S413 (done, item 76) | 36 questions have no "try it yourself" answer field (`selfcheck`, 22 have one) | a self-check field on every part whose answer is a number, a formula value or a short word | M |
-| S414 (kept, item 76) | 0001 is still the example question (owner decision open since session 1) | rewrite it as a full question, or drop it and renumber nothing (ids stay) | S |
 
 **Round S2 — figures where a page has none**
 
@@ -1504,7 +1502,6 @@ continue at 411.
 | S419 (done, item 75) | the path box shows the previous and next steps as ids only ("הקודם : 0002") | the title beside the id, cut with an ellipsis on a phone | S |
 | S420 (done, item 75) | the page tools are five icons without names; a touch screen has no hover tooltip | a one-time row of names under the icons on a phone (dismissed and remembered), and the names in the toolbar's accessible labels as today | S |
 | S421 (done, item 75) | the side navigation wraps long titles into two or three lines (0023: "Endpoint – כתיבה, קריאה ושידור Completions") | one line per question with an ellipsis and the full title as a tooltip, the current one highlighted | S |
-| S422 (not taken) | a question cannot be printed or saved as a clean PDF (the toolbar, boxes and folds print as they are) | a print style: solutions open, boxes replaced by their figures, no toolbar or navigation | M |
 
 **Round S5 — speed and access**
 
