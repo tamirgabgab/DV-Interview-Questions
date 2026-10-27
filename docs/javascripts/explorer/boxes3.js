@@ -39,19 +39,32 @@
   const boxes3View = () => ({
     mount(box) {
       const HE = { RED: "אדום", BLACK: "שחור", MIXED: "אדום ושחור" };
-      const st = { labels: ["RED", "BLACK", "MIXED"], content: null, draws: [], games: 0, solvedFirst: 0 };
+      // assign (V4): after a draw the reader names the three contents and checks them before
+      // the deduction is shown; answered once they are right, shown or revealed
+      const st = { labels: ["RED", "BLACK", "MIXED"], content: null, draws: [], games: 0, solvedFirst: 0, answered: false, revealed: false };
       const newGame = (keepStats = true, rnd = Math.random) => {
         const cases = boxesCases().filter((c) => c.labels.join() === st.labels.join());
         st.content = cases[Math.floor(rnd() * cases.length)].content;
         st.draws = [];
+        st.answered = st.revealed = false;
+        box.querySelectorAll(".b3-pick").forEach((sel) => { sel.value = ""; });
+        const why = box.querySelector(".b3-why"), msg = box.querySelector(".b3-msg");
+        if (why) why.hidden = true;
+        if (msg) msg.textContent = "";
         if (!keepStats) { st.games = 0; st.solvedFirst = 0; }
       };
       newGame(false);
       box.innerHTML =
         `<div class="ex-controls"><button type="button" class="md-button md-button--primary ex-new">משחק חדש</button>` +
         `<button type="button" class="md-button ex-shuffle">ערבוב התוויות</button>` +
-        `<button type="button" class="md-button ex-reveal">גילוי התוכן</button><span class="b3-stats"></span></div>` +
+        `<button type="button" class="md-button ex-reveal">גילוי התוכן</button><span class="b3-stats"></span>` +
+        `<label><input type="checkbox" class="b3-self" checked> לשייך בעצמי לפני ההסבר</label></div>` +
         `<div class="b3-crates" role="group" aria-label="שלוש קופסאות, לחיצה דוגמת כדור"></div>` +
+        `<div class="ex-controls b3-assign" hidden><span class="ex-title">מה בכל קופסה?</span>` +
+        [0, 1, 2].map((i) => `<label>קופסה ${i} <select class="b3-pick" data-i="${i}" data-nolink aria-label="התוכן של קופסה ${i}"><option value="">בחרו</option>` +
+          BOX_LABELS.map((c) => `<option value="${c}">${HE[c]}</option>`).join("") + `</select></label>`).join("") +
+        `<button type="button" class="md-button md-button--primary b3-check">בדיקת השיוך</button><button type="button" class="md-button b3-why" hidden>הצגת ההסבר</button></div>` +
+        `<p class="b3-msg" role="status"></p>` +
         `<p class="b3-step" aria-live="polite"></p><ol class="b3-lines"></ol><p class="ex-summary b3-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const crate = (i, label, balls, open) => {
@@ -64,6 +77,11 @@
           `<rect class="crate-front" x="${x}" y="50" width="150" height="100"/>`;
         s += `<text class="crate-text" x="${cx}" y="108" font-size="${label === "MIXED" ? 18 : 22}">${label === "MIXED" ? "אדום ושחור" : HE[label]}</text>`;
         s += `<text class="crate-text" x="${cx + 30}" y="42" font-size="20">${open ? "" : "?"}</text>`;
+        // revealed, the box shows what is in it: five balls of its colour, or mixed
+        if (open) for (let b = 0; b < 5; b++) {
+          const c = st.content[i] === "MIXED" ? (b % 2 ? "BLACK" : "RED") : st.content[i];
+          s += `<circle class="b3-ball b3-${c.toLowerCase()}" cx="${x + 35 + 20 * b}" cy="132" r="7"/>`;
+        }
         balls.forEach((b, k) => { s += `<circle class="b3-ball b3-${b.toLowerCase()}" cx="${x + 18 + 22 * k}" cy="166" r="8"><title>כדור ${HE[b]}</title></circle>`; });
         s += `<text class="tick" x="${cx}" y="192" font-size="13" direction="rtl" text-anchor="middle">קופסה ${i}${open ? ` : ${HE[st.content[i]]}` : ""}</text></g>`;
         return s;
@@ -76,8 +94,13 @@
         $(".b3-stats").textContent = st.games ? `${st.games} משחקים, ${st.solvedFirst} נפתרו בדגימה הראשונה` : "";
         const lines = [];
         let sum = "";
+        const self = $(".b3-self").checked, waiting = self && st.draws.length > 0 && !st.answered && !reveal;
+        $(".b3-assign").hidden = !waiting;
+        if (!waiting && !st.answered) $(".b3-msg").textContent = "";
         if (!st.draws.length) {
           $(".b3-step").innerHTML = `כל התוויות שגויות. בחרו קופסה ודגמו ממנה כדור.`;
+        } else if (waiting) {
+          $(".b3-step").innerHTML = `יצא כדור ${HE[st.draws[st.draws.length - 1].ball]}. מה יש בכל קופסה? בחרו ובדקו, או דגמו עוד.`;
         } else {
           const first = st.draws[0];
           const k = st.labels.indexOf("MIXED");
@@ -122,7 +145,26 @@
       const seed = seedControls(box, $(".ex-reveal"), (rng) => { newGame(true, rng); draw(); });
       $(".ex-new").addEventListener("click", seed.draw);
       $(".ex-shuffle").addEventListener("click", () => { st.labels = st.labels.slice().sort(() => Math.random() - 0.5); newGame(); draw(); });
-      $(".ex-reveal").addEventListener("click", () => draw(true));
+      $(".ex-reveal").addEventListener("click", () => { st.revealed = true; draw(true); });
+      $(".b3-self").addEventListener("change", () => draw(st.revealed));
+      const say = (cls, html) => { const m = $(".b3-msg"); m.className = `b3-msg ${cls}`; m.innerHTML = html; };
+      $(".b3-check").addEventListener("click", () => {
+        const pick = [...box.querySelectorAll(".b3-pick")].map((sel) => sel.value);
+        if (pick.some((v) => !v)) { say("", "בחרו תוכן לכל אחת משלוש הקופסאות."); return; }
+        if (pick.join() !== st.content.join()) {
+          say("b3-bad", `לא נכון. רמז${NB}: כל תווית שגויה. התחילו מהקופסה שדגמתם, ושאלו מה הכדור שיצא פוסל בה.`);
+          $(".b3-why").hidden = false;
+          return;
+        }
+        // right, but did the draws decide it, or was it a lucky guess?
+        const rest = boxesCases().filter((c) => c.labels.join() === st.labels.join() &&
+          st.draws.every((d) => c.content[d.i] === d.ball || c.content[d.i] === "MIXED"));
+        st.answered = true;
+        say(rest.length === 1 ? "b3-ok" : "", rest.length === 1 ? "✓ נכון, והדגימות הכריעו. ההסבר למטה."
+          : `נכון, אבל בניחוש${NB}: הדגימות השאירו ${ltr(rest.length)} סידורים אפשריים. ההסבר למטה.`);
+        draw();
+      });
+      $(".b3-why").addEventListener("click", () => { st.answered = true; $(".b3-why").hidden = true; say("", ""); draw(); });
       draw();
     },
   });
@@ -229,7 +271,7 @@
   dvqExplorers.register({
     views: { boxes3: boxes3View, labelfix: labelfixView },
     help: {
-      boxes3: "שלוש קופסאות עם תוויות שגויות : לוחצים על קופסה כדי להוציא כדור, וההיסק נכתב שורה אחרי שורה. ״משחק חדש״ מגריל תכולה חדשה לאותן תוויות, ״ערבוב התוויות״ מסדר את התוויות מחדש, ו״גילוי התוכן״ פותח את הקופסאות.",
+      boxes3: "שלוש קופסאות עם תוויות שגויות : לוחצים על קופסה כדי להוציא כדור. כש״לשייך בעצמי״ מסומן, בוחרים מה בכל קופסה ובודקים, ורק אז ההיסק נכתב שורה אחרי שורה; אחרת הוא נכתב מיד. ״משחק חדש״ מגריל תכולה חדשה לאותן תוויות, ״ערבוב התוויות״ מסדר את התוויות מחדש, ו״גילוי התוכן״ פותח את הקופסאות.",
       labelfix: "״השלב הבא״ ו״הפעלה״ מריצים את fix_labels : מוצאים את k ושולפים כדור, מזהים את same ואת other, ומבצעים את שתי ההחלפות. החצים מעל הקופסאות הם הסיבוב של שלוש התוויות, ובסוף מופיע התוכן האמיתי. ״סידור חדש״ מגריל אחד מ-12 המקרים.",
     },
     models: { boxesCases, boxesDraw, boxesFix, boxesDeduce, labelSwaps },

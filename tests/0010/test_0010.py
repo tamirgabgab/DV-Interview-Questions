@@ -102,3 +102,26 @@ def test_explorer_matches_page_code():
         if fail is None and stack:
             fail = {"i": len(s), "kind": "unclosed", "left": "".join(stack)}
         assert tr["frames"] == frames and tr["fail"] == fail, s
+
+
+def test_explorer_pair_passes():
+    """The box's part a (V4): the passes of the pair deletion and the characters they read,
+    against the page's Python loop with every replace counted."""
+    import json
+    import random
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(10)
+    cases = ["", "()", "(((())))", "([)]", "{[()]}", "()[]{}"] + ["".join(rng.choice("()[]{}") for _ in range(rng.randint(1, 20))) for _ in range(150)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map((s) => {{ const r = m.bracketsPasses(s); return [r.passes.map((p) => p.after), r.reads, r.valid]; }})));""")
+    for s, (afters, reads, valid) in zip(cases, got):
+        want, total = [], 0
+        while "()" in s or "[]" in s or "{}" in s:
+            for pair in ("()", "[]", "{}"):
+                total += len(s)
+                s = s.replace(pair, "")
+            want.append(s)
+        assert afters == want and reads == total and valid == (s == "")

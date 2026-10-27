@@ -853,7 +853,135 @@ section below starts at session 22, whose numbered items run on through the late
     the counts with the colon rule. 0012, 0013, 0039, 0041: four display formulas split
     with `aligned` (the phone check warned about them). 0026 needed nothing: V1 had moved
     the A and B labels beside the road.
-59. **Session 27, 2026-10-27: a visual review and the fifth series W1 to W5.** The owner
+59. **Rounds V4a and V4b, try it yourself (session 26, 2026-10-26).** The owner's picks: a
+    wrong answer shows a hint, then a button with the answer; self-checks on about 15
+    pages with a numeric answer; a right answer is remembered but does not mark the
+    question solved; V4a and V4b go to `main` together. **Self-checks**
+    (`docs/javascripts/selfcheck.js`, CONTRIBUTING): 15 on 13 pages (0015 a and b, 0016,
+    0021 a and b, 0026, 0027, 0028, 0029, 0030, 0031, 0032, 0036, 0039, 0042), linted, and
+    every answer recomputed in `tests/tools/test_selfcheck.py`. **Boxes:** 0021 guesses
+    C(n) before it shows; 0004 names the three contents before the deduction (a right
+    answer the draws did not decide is called a guess; the reveal draws the balls); 0003
+    the trap j = i + 1 as a select (descending, n(n − 1)/2 comparisons, tested against
+    Python); 0031 "התוכנית שלי", crossings picked by hand, the best plan hidden until all
+    are across; 0039 a hidden-threshold game, random or an adversary (tested: the page's
+    plan needs exactly f against it, random play never fewer); 0010 part a's pair
+    deletion pass by pass with the characters read (tested against the page's Python);
+    0036 the register drawn with its taps, XOR and fb. 0043 got no self-check while a
+    minimality claim on its page is unchecked (review finding).
+60. **New questions 0049 to 0052 (session 27, 2026-10-27).** The owner asked for four
+    extended questions, two on DV, for juniors and seniors; picked the UVM architecture,
+    the out-of-order scoreboard and HH against HT as proposed, and changed the bottles
+    question to one round, then two, then n bottles and b rounds (the owner's "three
+    rounds, base 3" was base 4: b rounds give b + 1 outcomes per mouse; said so before
+    writing); no code on the UVM page; all four published together. **0049** (junior, dv,
+    no code): the testbench figure from `tools/figures/q0049.py` (LAYOUT, ARROWS, PATH),
+    the components with what they do and do not do, the sequence / driver handshake, the
+    phases, passive agents and reuse; box `uvmarch` draws the same layout (tested to
+    agree), a click explains a component, the transaction is stepped along its arrows,
+    and a quiz asks "who does this?". **0050** (senior, dv): one queue per ID, the head
+    only, timeout, end check and reset, as a SystemVerilog class (an associative array of
+    queues, Verilator runs it) and Python; the scenario table against a single FIFO and
+    "search the ID's queue" (a false alarm on legal interleaving, a miss on a swap within
+    an ID); tested against the generator's checkers and random legal and mutated
+    streams; box `scoreboard` steps the scenarios or a seeded random stream with one
+    injected bug and shows the three verdicts. **0051** (junior, puzzle): 10, 7 and 5
+    mice for 1000 bottles in 1, 2 and 3 rounds, ⌈log_{b+1} n⌉ in general, digit d = the
+    round a mouse drinks and dies; every bottle of small cellars decoded in pytest and
+    Verilator; box `mice` steps the rounds with the bottles still possible, and a decoder
+    mode hides a bottle. **0052** (senior, math): 4 and 6 tosses, Conway's correlation and
+    the fair-casino proof, the race (HT against HH is 1/2; Penney's table of length 3),
+    the exact distributions; tested against exact Markov chains for every pattern up to
+    8 letters and every race up to 4; box `coins` tosses by hand or plays, with 1000
+    seeded games against the exact distribution. Self-checks on 0051 (a, b, c) and 0052
+    (a, b, c). New study path `testbench` (0049, 0050); 0051 in logic puzzles, 0052 in
+    probability. Topic names for `uvm` and `methodology`.
+
+61. **0052 generalized (session 27, 2026-10-27).** The owner's picks: a biased coin; races
+    of three patterns and more; the generating function; in the box a choice of q or a
+    die, and the state graph. Part b takes a probability per letter (each overlap adds 1
+    over the probability of its prefix; a table for q = 1/2, 2/3, 3/4, 9/10, where HH
+    overtakes HT); part c solves Conway's m + 1 equations (each pattern's chance and the
+    race's length; HHH, HTH and THH win 1/8, 5/12 and 11/24 in 16/3 tosses) in Python
+    with fractions and in SystemVerilog with reals (`$abs` is not in Verilator: squares
+    compared for the pivot); new part d, G(z) = P(A) z^L / (P(A) z^L + (1 − z) C(z)) with
+    its proof, the distribution by one recurrence and the variance (HH 22, a self-check).
+    The generator solves the chains (first and second moments, races of any number of
+    patterns, any alphabet) and the tests compare them for every pattern up to 8 letters,
+    biased coins, the die and every race of three and four patterns of length 3.
+
+62. **New questions 0053 and 0054 (session 27, 2026-10-27).** The owner picked 1 and 2 of
+    four proposals (covergroup, arbiter; not reservoir sampling or the skid-buffer bug)
+    and asked for boxes that show the solution well. **0053** (junior, dv): an ALU
+    covergroup, 15 coverpoint bins and a cross of 72 (80 less 8 ignored SHL cells), the
+    LRM's group coverage (24.28 % after one sample), and the closure time of the cross:
+    1,393,801 transactions with uniform stimulus against 534 with `dist` and 389 (80 H_72)
+    with equal classes, exact by inclusion-exclusion over three cell groups in the
+    generator and by a numeric integral on the page. Verilator 5.053 runs the covergroup
+    (cross, `ignore_bins` with `binsof ... ||`, `iff`, `sample` with arguments) and its
+    `get_inst_coverage()` follows the LRM; `get_coverage()` is the type's, merged over
+    instances. The testbench checks it against a reference model of the bins on random
+    runs. Box `covergroup`: stimulus and seed, +100 to "until closed", a hand sample, the
+    coverpoint bins, the cross as five maps (3 + 2 on a phone), the coverage curve on a
+    log axis with the expected closure, and the ignored cells counted on demand. **0054**
+    (senior, design): fixed priority and starvation, round robin by
+    `dbl & ~(dbl - pri)`, the checker (one-hot, no grant without a request, the hold rule
+    of the environment, fairness within N - 1) and weighted round robin (shares w_i over
+    the sum, longest wait the sum of the others). The testbench runs four lanes (the
+    arbiter and three buggy copies) and the checker's counters equal a procedural count;
+    samples are taken just after the falling-edge drive (at the rising edge the pointer
+    may have moved already). Box `arbiter`: a request grid drawn by click, the three
+    arbiters with wait/bound per requester, the trick at the chosen cycle, a bug select
+    and the failing assertions with their cycles. Its classes are `arb-*` (`ab-*` belongs
+    to the abmap box). Self-checks on both; 0053 in the testbench path, 0054 in logic
+    design.
+
+63. **New questions 0055 and 0056 (session 27, 2026-10-27).** The owner turned down a
+    first set (solve-before, skid buffer, reservoir sampling, the light bulb) and a second
+    (the SV scheduler, hats, the sum of uniforms past 1), asked for interview questions in
+    the style of Nvidia and Apple, and picked the divisible-by-3 machine and the ants on a
+    pole (PLRU was picked first, then swapped for the ants). **0055** (junior, design): from
+    the MSB the state is the remainder, r' = 2r + b; from the LSB the naive machine keeps
+    the remainder and the position (6 states for 3, 20 for 5), but x = r * 2^-k is enough,
+    x' = (x + b) * 2^-1, so m states both ways for odd m (and for 3 it is the MSB machine with
+    1 and 2 swapped, since 2 = -1 mod 3). Part c: any base B coprime to m (k bits a cycle are
+    base 2^k, the multipliers B and B^-1 mod m; 1 means a digit sum), one parametrized
+    module. The generator builds the naive machines from the definition and minimizes them
+    by partition refinement: the table of fewest states for m = 2 to 16 (even m = 2^a m':
+    m' + a from the MSB, m' + a + 1 from the LSB, a follow-up). Box `divfsm`: one number fed
+    to both machines side by side (MSB from the left, LSB from the right), m, the base,
+    digits typed, added by buttons or drawn; each ring shows the current state, the edges
+    out of it (bent inward) and the edge just taken (bent outward). **0056** (junior,
+    puzzle): ghosts that walk through each other give the last fall (100 s at most), the
+    collisions (pairs going toward each other, 2500 at most for 100 ants) and the fall of
+    each ant (the order along the pole is kept: the leftmost ants, as many as go left,
+    fall left in the order of the left ghosts' times); part d, added at the owner's pick, puts
+    the ants on a ring: after a lap of 100 s ant i stands where ant (i + R - L) mod n started,
+    and all are home after n / gcd(n, R - L) laps. The generator simulates in half seconds
+    on doubled coordinates (the pole and the ring). Box `ants`: ants placed and turned by a click on the
+    pole (its container has `data-fig-strip`, an ant reaches the corner of the enlarge
+    button only at some steps), drawn from a seed, played by half seconds on the pole and
+    on a space-time chart, a toggle between ants and ghosts, the fall of every ant as
+    chips; the ants ride in the link through `dvqExtra`. Self-checks on both; 0055 in the
+    logic-design path, 0056 in logic puzzles.
+
+64. **New questions 0057 and 0058 (session 27, 2026-10-27).** From four proposals (the missing
+    tag, a pulse synchronizer, coins in a row, a die from `% 6`) the owner picked the first
+    and the third, asked for a box each and for n coins with n even rather than 2n. **0057**
+    (senior, dv): a checker in constant memory on a tagged interface. One missing by XOR of
+    every tag sent and returned, with a count of the tags out (0 is also tag 0); two missing
+    by x = a ^ b and part[j], the XOR of the tags with bit j set, kept for every bit since
+    the bit is known only at the end (W + W^2 bits; sum and sum of squares need fewer); one
+    missing and one doubled fool XOR (it reads as two missing) and are found by s = a - d
+    and q = a^2 - d^2; k missing by power sums and Newton's identities, the roots among the
+    tags. Three page modules (`tag_xor`, `tag_xor2`, `tag_sums`) and `missing_k` run in
+    Verilator on random runs with a request and a response often in the same cycle. Box
+    `tagcheck`. **0058** (junior, code): the parity trick (the first player takes a whole
+    colour, at least half), greedy losing on 1, 2, 5, 3 (the first such row of four distinct
+    coins up to 5), the interval DP d[i][j] = max(c_i - d[i+1][j], c_j - d[i][j-1]), the
+    trick leaving 8 of 22 on 1, 1, 9, 1, 1, 9, and an odd row (1, 5, 1). Box `coinrow`. Self-
+    checks on both; 0057 in the testbench path, 0058 in advanced algorithms.
+65. **Session 27, 2026-10-27: a visual review and the fifth series W1 to W5.** The owner
     asked for UI / UX proposals that make the site look more professional (effects,
     typography, colour, spacing) and sent a list of ideas from a generic interview-prep
     site. Screenshots of the home page, a level catalog, 0046 (statement, an open
@@ -866,7 +994,7 @@ section below starts at session 22, whose numbered items run on through the late
     every non-folding admonition ends half way on a wide screen (the home tip box; 48
     built pages have such a title). Nothing in the site was changed in this session.
 
-60. **Round W1, foundations (session 27, 2026-10-27).** The owner's picks: the traps in
+66. **Round W1, foundations (session 27, 2026-10-27).** The owner's picks: the traps in
     one group, the edit link at the page end, a cool off-white, cards with a soft shadow
     and no outline. W333: `.admonition-title` out of the 75ch cap. W334: the home page
     without its TOC column. W335: tokens in `extra.css` (`--sp-1` to `--sp-6`,
@@ -885,7 +1013,7 @@ section below starts at session 22, whose numbered items run on through the late
     function, special, constant, variable and generic colours were darkened, the dark
     constant and number lifted (they failed on a highlighted line before), and eight
     code token pairs joined `check_contrast.py`.
-61. **Round W2, the home page (session 27, 2026-10-27).** The owner's picks: the audience
+67. **Round W2, the home page (session 27, 2026-10-27).** The owner's picks: the audience
     line "לסטודנטים ולמהנדסים בתחילת הדרך שמתכוננים לראיון DV", no rotating word, six
     featured paths mixing DV and algorithms, the catalog as a tab after "ראשי". W339: the
     audience line in amber under the title (`{ .hh-audience }`), the hero's waveform drawn
@@ -902,7 +1030,7 @@ section below starts at session 22, whose numbered items run on through the late
     until something is solved (level cards too); the PCIe path renamed "פרוטוקולים ומודלי
     ייחוס". W343: six FAQ items at the end of the home page (DV, a DV interview, which
     level, how to practise, where progress is kept, offline), styled in the site's navy.
-62. **Round W4, the run panel (session 27, 2026-10-27).** The owner's picks: the output in
+68. **Round W4, the run panel (session 27, 2026-10-27).** The owner's picks: the output in
     the site's code colours (not a dark terminal), Python fetched when the panel opens, a
     mismatch shown with the expected value, a run button on the SystemVerilog tabs too.
     **Bug found and fixed:** 16 starting scripts (0016, 0033 to 0047) begin with `from
@@ -928,7 +1056,7 @@ section below starts at session 22, whose numbered items run on through the late
     (it opens the panel and flashes its Verilator note). Local check: the worker bypasses
     Playwright routing, so a test page builds it from its source with Pyodide and
     `py_run.py` pointed at local copies (scratch script, not in the repository).
-63. **Round W3, motion and one sticky row (session 27, 2026-10-27).** The owner's picks:
+69. **Round W3, motion and one sticky row (session 27, 2026-10-27).** The owner's picks:
     one translucent row, "back to top" as a round button in the bottom corner, W344, W345
     and W346 (not the drawn check mark of W348), and for a completed path a message with
     confetti. W344: `home.js` gives the home page's headings, lists, cards and FAQ items
@@ -951,7 +1079,7 @@ section below starts at session 22, whose numbered items run on through the late
     under 45em), and the orange running text was under 4.5:1 on a highlighted table row of
     0027, 0028 and 0031 (the row is the code background, now darker): `--viz-s2-text`
     `#bf4a16` → `#ab4213`, with a new contrast pair.
-64. **Proposals replaced (session 27, 2026-10-27).** The owner asked for fresh proposals
+70. **Proposals replaced (session 27, 2026-10-27).** The owner asked for fresh proposals
     instead of the accumulated ones: every proposal section (the topic gaps and question
     formats, the first series A1 to T132, the second series A to R and Z, UI1 to UI5, V1 to
     V7, W1 to W5 and the old idea list) moved as written to the end of
@@ -961,18 +1089,21 @@ section below starts at session 22, whose numbered items run on through the late
     digital design and DV, EE basics, and algorithms and puzzles, none of them proposed
     before.
 
+### Session 27 — 2026-10-27: four new questions (0049 to 0052)
+
+
 ## In progress
 
-- **State (2026-10-26, session 26):** `main` is 0dd8e8f (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V5, V7), deployed.
-  47 questions (0022 was
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; the design rounds W1 to W4 on the branch.
+  57 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
 - **Done in session 26:** 0044 became a coding question (work log item 48); fix rounds 1
   and 2, axe and small text (item 49); fix round 4, the documents (item 50); fix round 3, the CI actions (item 51); fix round 5,
   the cloud sandbox (item 52); question 0048, the farmer, the food and the water (item 54).
-- **Review of session 26:** findings and rounds V1 to V7 under **Fourth series**; V1, V2, V3, V3b, V5 and V7
-  are done (work log items 55 to 58), V4 and V6 wait for the owner; the V3 split map by
+- **Review of session 26:** findings and rounds V1 to V7 (now in `HANDOFF-archive.md`); V1 to V5 (V3b, V4a and V4b
+  included) and V7 are done (work log items 55 to 59), V6 waits for the owner; the V3 split map by
   completion count was not picked (only collapsed).
 - **Fix rounds of session 26:** rounds 1 to 5 are done (items 49 to 52), and round 6 part
   a, the jump check (item 53); part b, a visual diff of the phone screenshots, was not
@@ -987,8 +1118,8 @@ section below starts at session 22, whose numbered items run on through the late
   `mkdocs.yml`; a look at the social card of a shared link; keep or replace 0001.
 - **Session 27:** a visual review and the fifth series W1 to W5 (look, motion, the run
   panel, practice tools); the owner picked W1 to W4 (catalog on its own page, amber traps,
-  off-white, CodeMirror). W1 to W4 are done on the branch (work log items 60 to 63), not yet on
-  `main`; `main` when the owner asks. Content idea: add
+  off-white, CodeMirror). W1 to W4 are done (work log items 65 to 70, merged with
+  `main`'s questions 0049 to 0058). Content idea: add
   expected-value comments to the `print()` lines of more demos (only 4 of 39 have them).
 - **Next, the owner picks:** a round of the sixth series under **Proposals** (new
   questions, interactive tools, visual aids), or questions the owner sends. Every earlier
@@ -1027,19 +1158,21 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (47 questions)
+### Coverage today (57 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water) |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047) |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056, 0058 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056), coins in a row by a parity trick and an interval DP (0058) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock
 divider, an LFSR, synchronizer MTBF and SVA; 0040 (a sequence detector FSM) and 0041
-(coverage closure of random tests) followed. **Still missing:** UVM, covergroups,
-debug ("find the bug") and verification planning.
+(coverage closure of random tests) followed, then 0049 (the UVM testbench) and 0050 (an
+out-of-order scoreboard). **Still missing:** UVM in depth (factory, RAL, virtual
+sequences as questions of their own), debug ("find the bug") and verification
+planning; covergroups since 0053.
 
 ### Sources for new questions
 

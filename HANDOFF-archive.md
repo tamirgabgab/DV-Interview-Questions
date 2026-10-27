@@ -2662,7 +2662,7 @@ fields and dark mode not covered in this pass)
 | V2 (done, item 56) | **Study paths for everything**: paths for the DV core, the protocol reference models, geometry and motion; 0044 to 0047 into the algorithms path; a lint check that names a question in no path | S–M |
 | V3 (done, item 57) | **Boxes on a phone**: collapse the proof panels (0009, 0013, 0016, 0024) and the editing and random-run controls (0025, 0046, 0047); 0024 buttons in two columns; 0018 and 0019 stacked with Hebrew labels; the 0020 / 0021 split map by completion count; 0031, 0037, 0038, 0040, 0041; scroll areas instead of blank reservations (0027, 0028, 0042, 0043) | M–L |
 | V3b (done, item 58) | **The small box fixes**: 0013 (path arrows, histogram labels), 0015 on step 1, 0011 / 0017 widths, 0029 an hour window, four long formulas, and the 0044 state diagram as a ρ (owner request) | S–M |
-| V4 | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
+| V4 (done as V4a and V4b, item 59) | **Try it yourself**: 0031 your own plan, 0039 a hidden threshold, 0004 assign the labels, 0003 the j = i + 1 trap, 0010 pair deletion, 0021 guess C(n), 0036 the register row, a check-yourself step (a number or a choice checked on the page) on chosen pages | M–L |
 | V5 (done, item 55) | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0016 (the owner did not pick the 0015 simulation or the 0001 Python model) | M–L |
 | V6 | **Practice loop and glossary**: a "my progress" page, a self-rating after a solution, export / import of the progress; a glossary page with a tooltip on a term's first use | M |
 | V7 (done, item 55) | **Robustness**: `timeout-minutes` on the CI jobs, a service worker for offline reading, the header tabs without the fade | S–M |
@@ -2830,5 +2830,3 @@ Ordered roughly by value for effort. **S** = small (under an hour), **M** = a fe
 | 21 | ~~**Mobile check** of every page in CI~~ (done, C17) (screenshots at phone width) | M | Wide tables and figures were the main issue so far (see the 0009 box grid) |
 | 22 | **Topic pages**: a short intro per topic (FSM, SVA, coverage...) linking to its questions | M | Study paths done in C19; topic intros proposed again as E32 |
 | 23 | ~~Step-through figures (B14)~~ | M | **Done** in session 5 (0010 stack, 0009 walks) |
-
----

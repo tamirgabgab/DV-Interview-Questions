@@ -48,3 +48,29 @@ def test_explorer_matches_page_code():
         assert swaps == count and ends == after
         for i, arr in enumerate(ends):
             assert arr[:i + 1] == sorted(arr[:i + 1]) and arr[i] == max(arr)
+
+
+def test_explorer_trap_from_next():
+    """The box's trap (V4): the inner loop from j = i + 1 against the same loop in Python,
+    which sorts in descending order with n(n - 1)/2 comparisons; the end of every i has
+    the maximum of the rest at i."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(30)
+    cases = [[3, 1, 4, 2], [1, 2, 3], [2, 2, 2]] + [[rng.randint(0, 20) for _ in range(rng.randint(3, 8))] for _ in range(100)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map((A) => {{ const t = m.loopTrace(A, true); return [t.result, t.comparisons, t.code[2], t.frames.filter((f) => f.endOfI).map((f) => f.after)]; }})));""")
+    for A, (result, comparisons, line, ends) in zip(cases, got):
+        b, after = list(A), []
+        for i in range(len(b)):
+            for j in range(i + 1, len(b)):
+                if b[i] < b[j]:
+                    b[i], b[j] = b[j], b[i]
+            if i + 1 < len(b):
+                after.append(list(b))
+        assert result == b == sorted(A, reverse=True)
+        assert comparisons == len(A) * (len(A) - 1) // 2 and line.strip() == "for j in range(i + 1, n):"
+        assert ends == after

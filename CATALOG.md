@@ -1,6 +1,6 @@
 # Catalog
 
-All 47 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 57 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -52,3 +52,13 @@ All 47 questions, with links to their pages on the [live site](https://tamirgabg
 | 0046 | [הריבוע, המלבן והמשולש הגדולים ביותר של אחדות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0046-largest-square-rectangle/) | junior (ג'וניור) |
 | 0047 | [מילוי מים בבאר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0047-filling-a-well/) | junior (ג'וניור) |
 | 0048 | [החוואי, האוכל והמים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0048-farmer-food-and-water/) | student (סטודנט) |
+| 0049 | [ארכיטקטורה של סביבת UVM – הרכיבים ומסלול הטרנזקציה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0049-uvm-testbench-architecture/) | junior (ג'וניור) |
+| 0050 | [Scoreboard לתשובות שלא לפי הסדר – תורים לפי ID](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0050-out-of-order-scoreboard/) | senior (סניור) |
+| 0051 | [בקבוק מורעל ועכברים – סבב אחד, שני סבבים, ו-b סבבים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0051-poisoned-bottles-mice/) | junior (ג'וניור) |
+| 0052 | [HH מול HT – כמה הטלות מטבע עד שהרצף מופיע](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0052-coin-pattern-waiting-time/) | senior (סניור) |
+| 0053 | [Covergroup ל-ALU – bins, cross ומתי הכיסוי נסגר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0053-alu-covergroup/) | junior (ג'וניור) |
+| 0054 | [Arbiter סבבי – הרעבה, טריק שני ה-encoders, SVA ומשקלים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0054-round-robin-arbiter/) | senior (סניור) |
+| 0055 | [מכונת מצבים לחלוקה ב-3 – ביטים מה-MSB, מה-LSB ובכל בסיס](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0055-divisible-by-m-fsm/) | junior (ג'וניור) |
+| 0056 | [נמלים על מוט – מתי הנמלה האחרונה נופלת](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0056-ants-on-a-pole/) | junior (ג'וניור) |
+| 0057 | [ה-tag שלא חזר – XOR, חלוקה לפי ביט וסכומי חזקות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0057-missing-tags/) | senior (סניור) |
+| 0058 | [מטבעות בשורה – לוקחים מהקצוות, ומי מקבל יותר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0058-coins-in-a-row/) | junior (ג'וניור) |

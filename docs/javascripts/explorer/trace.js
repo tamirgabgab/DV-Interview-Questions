@@ -77,19 +77,22 @@
   };
   // loopTrace: the page's mystery(A), one comparison per frame; `endOfI` marks the last
   // comparison of an outer iteration, with the sorted prefix and the maximum noted.
+  // `fromNext` runs the trap of the page instead (V4): the inner loop from j = i + 1, which
+  // sorts the array in descending order.
   const LOOP_CODE = ["n = len(A)", "for i in range(n):", "    for j in range(n):", "        if A[i] < A[j]:", "            A[i], A[j] = A[j], A[i]"];
-  const loopTrace = (A0) => {
+  const LOOP_CODE_NEXT = LOOP_CODE.map((l, k) => (k === 2 ? "    for j in range(i + 1, n):" : l));
+  const loopTrace = (A0, fromNext = false) => {
     const A = [...A0], n = A.length, frames = [];
     let comparisons = 0, swaps = 0;
     for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
+      for (let j = fromNext ? i + 1 : 0; j < n; j++) {
         const before = [...A], swapped = A[i] < A[j];
         comparisons += 1;
         if (swapped) { const t = A[i]; A[i] = A[j]; A[j] = t; swaps += 1; }
         frames.push({ i, j, before, after: [...A], swapped, comparisons, swaps, endOfI: j === n - 1 });
       }
     }
-    return { code: LOOP_CODE, frames, result: A, comparisons, swaps };
+    return { code: fromNext ? LOOP_CODE_NEXT : LOOP_CODE, frames, result: A, comparisons, swaps };
   };
 
   // The tracer box (0002, 0003): the Python code of the page on the left with the current
@@ -204,15 +207,17 @@
         return;
       }
       const PAGE = [3, 1, 4, 2];
-      const st = { A: PAGE.slice(), k: 0 };
+      const st = { A: PAGE.slice(), k: 0, next: false };
+      const trace = () => loopTrace(st.A, st.next);
       box.innerHTML =
         `<div class="ex-controls"><label><span>המערך</span><input type="text" class="ex-nums" dir="ltr" value="3, 1, 4, 2" spellcheck="false" aria-label="המערך, מספרים מופרדים בפסיקים"></label>` +
+        `<label>הלולאה הפנימית <select class="tr-from" aria-label="מאיפה הלולאה הפנימית מתחילה"><option value="0">מ-j = 0 (הקוד של העמוד)</option><option value="1">מ-j = i + 1 (המלכודת)</option></select></label>` +
         `<button type="button" class="md-button ex-page">דוגמת העמוד</button><button type="button" class="md-button ex-random">אקראי</button><span class="fl-err"></span></div>` +
         playRow("ההשוואה הבאה", "הקודמת", `<button type="button" class="md-button ex-endi">עד סוף i</button>`) +
         `<div class="tr-box"><div class="tr-left"></div><div class="tr-right"></div></div>` +
         `<p class="wv-step tr-step" aria-live="polite"></p><p class="ex-summary tr-sum"></p>`;
       const draw = () => {
-        const tr = loopTrace(st.A), total = tr.frames.length;
+        const tr = trace(), total = tr.frames.length;
         st.k = Math.min(st.k, total);
         const fr = st.k ? tr.frames[st.k - 1] : null, n = st.A.length;
         $(".tr-left").innerHTML = codeHtml(tr.code, fr ? 3 : 0, fr && fr.swapped ? 4 : -1);
@@ -220,21 +225,26 @@
         $(".tr-right").innerHTML = `<div class="tr-arr" dir="ltr">` + arr.map((v, x) => {
           const cls = [x <= sortedTo ? "is-done" : "", fr && x === fr.i ? "is-i" : "", fr && x === fr.j ? "is-j" : "", fr && fr.swapped && (x === fr.i || x === fr.j) ? "is-swapped" : ""].join(" ").trim();
           return `<span class="${cls}"><span class="tr-idx">${x}</span>${v}</span>`;
-        }).join("") + `</div><p class="tr-counts">${fr ? `${ltr("i")} = ${ltr(fr.i)}, ${ltr("j")} = ${ltr(fr.j)}. ` : ""}השוואות : ${ltr(fr ? fr.comparisons : 0)} מתוך ${ltr(n * n)}, החלפות : ${ltr(fr ? fr.swaps : 0)}.</p>` +
+        }).join("") + `</div><p class="tr-counts">${fr ? `${ltr("i")} = ${ltr(fr.i)}, ${ltr("j")} = ${ltr(fr.j)}. ` : ""}השוואות : ${ltr(fr ? fr.comparisons : 0)} מתוך ${ltr(total)}, החלפות : ${ltr(fr ? fr.swaps : 0)}.</p>` +
           `<p class="tr-legend"><span class="tr-lg-i">מסגרת כחולה : ${code("i")}</span> <span class="tr-lg-j">מסגרת כתומה מקווקוות : ${code("j")}</span> <span class="tr-lg-done">ירוק : ${code("A[0..i]")} ממוין</span></p>`;
         $(".ex-pos").textContent = `השוואה ${st.k} מתוך ${total}`;
         let step;
-        if (!fr) step = n ? `לפני הריצה : ${ltr(`A = [${st.A.join(", ")}]`)}, ${ltr(`n = ${n}`)}. הלולאה הפנימית מתחילה מ-${ltr("j = 0")}, לא מ-${ltr("j = i + 1")}.` : `מערך ריק : אין השוואות.`;
+        if (!fr) step = n ? `לפני הריצה : ${ltr(`A = [${st.A.join(", ")}]`)}, ${ltr(`n = ${n}`)}. ` + (st.next ? `הלולאה הפנימית מתחילה מ-${ltr("j = i + 1")}. מה ייצא עכשיו?` : `הלולאה הפנימית מתחילה מ-${ltr("j = 0")}, לא מ-${ltr("j = i + 1")}.`) : `מערך ריק : אין השוואות.`;
         else {
           const ai = fr.before[fr.i], aj = fr.before[fr.j];
           step = `${ltr(`i = ${fr.i}, j = ${fr.j}`)} : ${ltr(`A[i] < A[j]`)} הוא ${ltr(`${ai} < ${aj}`)}, ` + (fr.swapped ? `<span class="wv-ok">כן ⇒ החלפה</span> : ${ltr(`A = [${fr.after.join(", ")}]`)}.` : `לא ⇒ בלי שינוי.`);
-          if (fr.endOfI) step += ` <span class="wv-ok">סוף האיטרציה ${ltr(`i = ${fr.i}`)} : ${ltr(`A[0..${fr.i}]`)} ממוין בסדר עולה, והמקסימום של כל המערך (${ltr(Math.max(...fr.after))}) יושב במקום ${ltr(fr.i)}.</span>`;
+          if (fr.endOfI && st.next) step += ` <span class="wv-ok">סוף האיטרציה ${ltr(`i = ${fr.i}`)} : ${ltr(`A[${fr.i}]`)} הוא המקסימום של ${ltr(`A[${fr.i}..${n - 1}]`)}, ולכן ${ltr(`A[0..${fr.i}]`)} ממוין בסדר יורד.</span>`;
+          else if (fr.endOfI) step += ` <span class="wv-ok">סוף האיטרציה ${ltr(`i = ${fr.i}`)} : ${ltr(`A[0..${fr.i}]`)} ממוין בסדר עולה, והמקסימום של כל המערך (${ltr(Math.max(...fr.after))}) יושב במקום ${ltr(fr.i)}.</span>`;
           else if (fr.j < fr.i) step += ` ‏${ltr("j < i")} : החלפה כאן מזיזה את ${ltr("A[i]")} אחורה לתוך החלק הממוין.`;
         }
         $(".tr-step").innerHTML = step;
-        $(".tr-sum").innerHTML = st.k >= total && n ? `<span class="wv-ok">✓ ${ltr(`n² = ${n * n}`)} השוואות, ${ltr(tr.swaps)} החלפות, בלי יציאה מוקדמת. המערך ממוין בסדר עולה : ${ltr(`[${tr.result.join(", ")}]`)}.</span>` : "";
+        // at the end, both inner loops side by side: the page's sorts up, the trap sorts down
+        const other = loopTrace(st.A, !st.next).result, up = st.next ? other : tr.result, down = st.next ? tr.result : other;
+        $(".tr-sum").innerHTML = st.k >= total && n ? `<span class="wv-ok">✓ ${ltr(st.next ? `n(n − 1)/2 = ${total}` : `n² = ${n * n}`)} השוואות, ${ltr(tr.swaps)} החלפות. המערך ממוין בסדר ${st.next ? "יורד" : "עולה"}.</span> ` +
+          `מ-${ltr("j = 0")} יוצא ${ltr(`[${up.join(", ")}]`)}, ומ-${ltr("j = i + 1")} יוצא ${ltr(`[${down.join(", ")}]`)} : אותו תנאי, כיוון הפוך.` : "";
       };
-      const total = () => loopTrace(st.A).frames.length;
+      const total = () => trace().frames.length;
+      $(".tr-from").addEventListener("change", () => { stop(); st.next = $(".tr-from").value === "1"; st.k = 0; draw(); });
       const parse = () => {
         const parts = $(".ex-nums").value.split(/[,\s]+/).filter((t) => t.length);
         const nums = parts.map(Number);
@@ -248,7 +258,14 @@
       $(".ex-random").addEventListener("click", seed.draw);
       $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(st.k - 1, 0); draw(); });
-      $(".ex-endi").addEventListener("click", () => { stop(); const n = st.A.length; if (st.k < total()) st.k = Math.min(total(), (Math.floor((st.k) / n) + 1) * n); draw(); });
+      $(".ex-endi").addEventListener("click", () => {                 // to the last comparison of this i
+        stop();
+        const fr = trace().frames;
+        let k = st.k;
+        while (k < fr.length && !fr[k].endOfI) k++;
+        st.k = Math.min(fr.length, k + 1);
+        draw();
+      });
       $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
       $(".ex-end").addEventListener("click", () => { stop(); st.k = total(); draw(); });
       $(".ex-play").addEventListener("click", () => {
@@ -265,8 +282,8 @@
   dvqExplorers.register({
     views: { trace: traceView },
     help: {
-      trace: "הקוד של העמוד שורה אחרי שורה : ״הבא״ ו״הפעלה״ מריצים אותו עם הערכים והביטויים, הבורר מחליף בין הגרסאות, והשדות קובעים את הקלט.",
+      trace: "הקוד של העמוד שורה אחרי שורה : ״הבא״ ו״הפעלה״ מריצים אותו עם הערכים והביטויים, הבורר מחליף בין הגרסאות, והשדות קובעים את הקלט. בלולאה הכפולה, ״הלולאה הפנימית״ מריצה גם את המלכודת j = i + 1.",
     },
-    models: { SWAP_CODE, swapTrace, ROT_CODE, rotTrace, LOOP_CODE, loopTrace },
+    models: { SWAP_CODE, swapTrace, ROT_CODE, rotTrace, LOOP_CODE, LOOP_CODE_NEXT, loopTrace },
   });
 })();

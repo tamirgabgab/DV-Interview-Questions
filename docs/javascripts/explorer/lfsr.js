@@ -95,6 +95,7 @@
         `<div class="lf-box"><div class="lf-ring"></div><div class="lf-panel">` +
         `<p class="lf-poly"></p><p class="lf-state"></p><p class="lf-fb"></p>` +
         `<p class="ex-summary lf-sum" aria-live="polite"></p></div></div>` +
+        `<p class="ex-title">הרגיסטר עצמו : הביטים זזים ימינה, ${code("s[0]")} יוצא, וה-XOR של ה-taps נכנס משמאל</p><div class="lf-reg"></div>` +
         `<p class="ex-title">רצועת התזמון : המצב, הביט שיוצא (${code("s[0]")}) וביט ההיזון החוזר שנכנס, צעד אחרי צעד</p>` +
         `<div class="wv-wrap lf-strip" tabindex="0" role="group" aria-label="רצועת התזמון של ה-LFSR, גלילה אופקית"></div>` +
         `<p class="ex-title lf-table-title"></p><div class="lf-table" tabindex="0"></div>` +
@@ -203,6 +204,32 @@
             ? `<span class="lf-ok">מחזור אחד שעובר על כל ${ltr(n)} המצבים : הפולינום פרימיטיבי.</span>`
             : `המחזור של ${code(bits(SEED))} ${st.width <= RING_MAX ? " (עם המסגרת העבה)" : ""} הוא ${ltr(lens[0])}, ואף התחלה לא מגיעה ליותר מ-${ltr(Math.max(...lens))} מצבים.`);
       };
+      // The register (V4): s[width − 1] .. s[0] left to right, the taps outlined and wired to
+      // one XOR under the row, its output fb back into the left end, s[0] out at the right.
+      const regSvg = (cur, fb) => {
+        const n = st.width, CW = 40, X0 = 64, Y = 22, CH = 40, BUS = Y + CH + 34, W = X0 + n * (CW + 4) + 70, H = BUS + 38;
+        const cx = (b) => X0 + (n - 1 - b) * (CW + 4) + CW / 2;
+        let s = `<svg class="figure lf-regsvg" viewBox="0 0 ${W} ${H}" style="max-width:${(W / 16).toFixed(1)}rem" role="img" aria-label="הרגיסטר במצב ${bits(cur)}, היזון חוזר ${fb}">` +
+          `<defs><marker id="lf-arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="lf-head"/></marker></defs>`;
+        const taps = [];
+        for (let b = 0; b < n; b++) if ((st.mask >> b) & 1) taps.push(b);
+        // the wires: down from every tap to the bus, along it to the XOR, up and into the left end
+        taps.forEach((b) => { s += `<line class="lf-wire" x1="${cx(b)}" y1="${Y + CH}" x2="${cx(b)}" y2="${BUS}"/><circle class="lf-dot" cx="${cx(b)}" cy="${BUS}" r="3"/>`; });
+        const xorX = 26;
+        s += `<line class="lf-wire" x1="${xorX + 12}" y1="${BUS}" x2="${Math.max(...taps.map(cx))}" y2="${BUS}"/>` +
+             `<circle class="lf-xor" cx="${xorX}" cy="${BUS}" r="12"/><path class="lf-wire" d="M${xorX - 8},${BUS} H${xorX + 8} M${xorX},${BUS - 8} V${BUS + 8}"/>` +
+             `<path class="lf-wire" d="M${xorX},${BUS - 12} V${Y + CH / 2} H${X0 - 2}" fill="none" marker-end="url(#lf-arrow3)"/>` +
+             `<text class="lf-regfb" x="${xorX + 4}" y="${BUS + 30}" text-anchor="middle">fb = ${fb}</text>`;
+        for (let b = 0; b < n; b++) {
+          const x = cx(b) - CW / 2, v = (cur >> b) & 1, tap = taps.includes(b);
+          s += `<rect class="lf-cell${v ? " is-one" : ""}${tap ? " is-tap" : ""}" x="${x}" y="${Y}" width="${CW}" height="${CH}" rx="4"/>` +
+               `<text class="lf-cellv" x="${cx(b)}" y="${Y + CH / 2 + 7}" text-anchor="middle">${v}</text>` +
+               `<text class="lf-celli" x="${cx(b)}" y="${Y - 6}" text-anchor="middle">s[${b}]</text>`;
+        }
+        const ox = cx(0) + CW / 2;
+        s += `<path class="lf-wire" d="M${ox + 2},${Y + CH / 2} H${ox + 34}" marker-end="url(#lf-arrow3)"/><text class="lf-regfb" x="${ox + 48}" y="${Y + CH / 2 + 5}" text-anchor="middle">${cur & 1}</text>`;
+        return s + "</svg>";
+      };
       const draw = () => {
         const walk = lfsrWalk(st.mask, st.width, SEED), total = walk.period, n = states();
         st.k = Math.min(st.k, total);
@@ -221,6 +248,7 @@
         $(".lf-state").innerHTML = `המצב אחרי ${ltr(st.k)} צעדים : ${code(bits(cur))}` + (st.k === total ? ` — חזר למצב ההתחלה.` : ".");
         $(".lf-fb").innerHTML = `הצעד הבא : ${ltr(`${code("fb")} = ${code(tapsIdx.map((i) => `s[${i}]`).join(" ^ "))} = ${tapsIdx.map((i) => (cur >> i) & 1).join(" ^ ")} = ${fb}`)}, ` +
           `ואז ${ltr(`${code(`(${bits(cur)} >> 1) | (${fb} << ${st.width - 1})`)} = ${code(bits(next))}`)}.`;
+        $(".lf-reg").innerHTML = regSvg(cur, fb);
         const wrap = $(".lf-strip");
         wrap.innerHTML = stripHtml();
         wrap.scrollLeft = wrap.scrollWidth;                // the current step in view
@@ -271,7 +299,7 @@
   dvqExplorers.register({
     views: { lfsr: lfsrView },
     help: {
-      lfsr: "מסמנים taps ובוחרים רוחב : ״צעד״ ו״הפעלה״ מריצים את המצב מ-0…01 על טבעת המצבים (עד 6 ביטים), רצועת התזמון מראה את המצב, הביט שיוצא וביט ההיזון בכל צעד, והטבלה נותנת את אורך המחזור של כל פולינום. שלב ההוכחה מצייר את כל המחזורים של הפולינום, טבעת קטנה לכל מחזור.",
+      lfsr: "מסמנים taps ובוחרים רוחב : ״צעד״ ו״הפעלה״ מריצים את המצב מ-0…01 על טבעת המצבים (עד 6 ביטים), רצועת התזמון מראה את המצב, הביט שיוצא וביט ההיזון בכל צעד, והטבלה נותנת את אורך המחזור של כל פולינום. שלב ההוכחה מצייר את כל המחזורים של הפולינום, טבעת קטנה לכל מחזור. הרגיסטר עצמו מצויר מתחת לטבעת : הביטים, ה-taps וה-XOR שמחזיר את fb.",
     },
     models: { lfsrNext, lfsrWalk, lfsrPeriod, lfsrPoly, lfsrTable, lfsrPrimitiveCount, lfsrStrip, lfsrCycles },
   });

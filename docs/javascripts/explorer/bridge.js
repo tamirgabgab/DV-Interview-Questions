@@ -93,8 +93,9 @@
     mount(box) {
       const NAMES = "ABCDEFGH";
       const defaults = box.dataset.times || "1 2 5 10";
-      const PLANS = { best: "החיפוש (הקצרה ביותר)", escort: "המהיר מלווה את כולם", pair: "שני האיטיים חוצים יחד" };
-      const st = { times: [], s: 0, cap: 2, plan: "best" };
+      const PLANS = { best: "החיפוש (הקצרה ביותר)", escort: "המהיר מלווה את כולם", pair: "שני האיטיים חוצים יחד", mine: "התוכנית שלי" };
+      // mine (V4): the reader's own crossings, picked from the torch's bank one at a time
+      const st = { times: [], s: 0, cap: 2, plan: "best", mine: [], pick: [], tries: 0 };
       box.innerHTML =
         `<div class="ex-controls"><label>הזמנים (עד שמונה) <input type="text" class="ex-times" value="${defaults}" size="22" dir="ltr" inputmode="numeric" aria-label="זמני החצייה, מופרדים ברווחים"></label>` +
         `<label>הגשר מחזיק <select class="ex-cap" aria-label="כמה אנשים הגשר מחזיק"><option value="2" selected>שניים</option><option value="3">שלושה</option></select></label>` +
@@ -105,6 +106,9 @@
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">החצייה הקודמת</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">החצייה הבאה</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1600, 1000, 400) + `<span class="ex-pos"></span></div>` +
+        `<div class="ex-controls br-mine" hidden><span class="ex-title">מי חוצה עכשיו?</span><span class="br-who" role="group" aria-label="האנשים בגדה של הלפיד"></span>` +
+        `<button type="button" class="md-button md-button--primary br-go">חצייה</button><button type="button" class="md-button br-undo">ביטול החצייה האחרונה</button>` +
+        `<button type="button" class="md-button br-show" hidden>הצגת התוכנית הקצרה</button></div><p class="br-msg" role="status"></p>` +
         `<div class="bridge-frame"></div><p class="bridge-caption"></p>` +
         `<span class="viz-legend"><span><i class="st-cell"></i>על הגדה הקרובה</span><span><i class="st-stack"></i>חוצים עכשיו</span><span><i class="st-ok"></i>כבר על הגדה הרחוקה</span><span><i class="torch"></i>הלפיד</span></span>`;
       const $ = (sel) => box.querySelector(sel);
@@ -140,7 +144,7 @@
       // bridge of two, the two classic plans of the page
       const plansOf = () => {
         const times = st.times, best = bridgeSolve(times, st.cap);
-        const out = { best };
+        const out = { best, mine: { moves: st.mine, time: bridgeTime(times, st.mine) } };
         if (st.cap === 2) {
           out.escort = { moves: bridgeEscortMoves(times) }; out.escort.time = bridgeTime(times, out.escort.moves);
           out.pair = { moves: bridgePairMoves(times) }; out.pair.time = bridgeTime(times, out.pair.moves);
@@ -157,13 +161,19 @@
         const r = plans[st.plan], best = plans.best;
         st.s = Math.min(Math.max(st.s, 0), r.moves.length);
         const names = (g) => g.map((i) => `${NAMES[i]} (${times[i]})`).join(" ו-");
-        $(".ex-summary").innerHTML = `${times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`} על גשר של ${st.cap === 2 ? "שניים" : "שלושה"} : הזמן הקצר ביותר הוא ${ltr(best.time)} דקות ב-${ltr(best.moves.length)} חציות, ${ltr(planText(best.moves))}.` +
-          (st.plan === "best" ? "" : ` מוצגת התוכנית "${PLANS[st.plan]}" : ${ltr(r.time)} דקות${r.time > best.time ? `, ${ltr(r.time - best.time)} יותר מהקצרה ביותר` : ", בדיוק כמו הקצרה ביותר"}.`);
+        // the reader's own plan hides the best one (the summary, the tables) until everyone is across
+        const mineAcross = st.mine.reduce((m, g) => m ^ g.reduce((u, i) => u | (1 << i), 0), 0), hide = st.plan === "mine" && mineAcross !== (1 << times.length) - 1;
+        $(".bridge-tables").hidden = hide;
+        if (hide) $(".ex-summary").innerHTML = `${times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`} על גשר של ${st.cap === 2 ? "שניים" : "שלושה"} : בנו תוכנית משלכם. הזמן הקצר ביותר יופיע כשכולם יעברו.`;
+        else $(".ex-summary").innerHTML = `${times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`} על גשר של ${st.cap === 2 ? "שניים" : "שלושה"} : הזמן הקצר ביותר הוא ${ltr(best.time)} דקות ב-${ltr(best.moves.length)} חציות, ${ltr(planText(best.moves))}.` +
+          (st.plan === "best" || st.plan === "mine" ? "" : ` מוצגת התוכנית "${PLANS[st.plan]}" : ${ltr(r.time)} דקות${r.time > best.time ? `, ${ltr(r.time - best.time)} יותר מהקצרה ביותר` : ", בדיוק כמו הקצרה ביותר"}.`);
         $(".bridge-plans").innerHTML = st.cap === 2 && times.length >= 2
           ? `<table class="bridge-table"><thead><tr><th>התוכנית</th><th>החציות</th><th>הזמן</th></tr></thead><tbody>` +
-            Object.keys(PLANS).map((k) => `<tr${k === st.plan ? ' class="is-now"' : ""}${plans[k].time === best.time ? ' data-best="1"' : ""}><td>${PLANS[k]}</td><td>${ltr(planText(plans[k].moves))}</td><td>${ltr(plans[k].time)}</td></tr>`).join("") + `</tbody></table>`
+            Object.keys(PLANS).filter((k) => k !== "mine" || st.mine.length).map((k) => `<tr${k === st.plan ? ' class="is-now"' : ""}${plans[k].time === best.time ? ' data-best="1"' : ""}><td>${PLANS[k]}</td><td>${ltr(planText(plans[k].moves))}</td><td>${ltr(plans[k].time)}</td></tr>`).join("") + `</tbody></table>`
           : st.cap === 3 ? `<p class="ex-note">שתי התוכניות הקלאסיות מוגדרות לגשר של שניים; לגשר של שלושה מוצג החיפוש בלבד${times.length >= 3 ? `, לעומת ${ltr(bridgeSolve(times, 2).time)} דקות על גשר של שניים` : ""}.</p>` : "";
         $(".ex-plan").querySelectorAll("option").forEach((o) => { o.disabled = !plans[o.value]; });
+        if (st.plan === "mine") mineDraw(plans);
+        else { $(".br-mine").hidden = true; $(".br-msg").textContent = ""; }
         // the greedy rule: each round the two slowest leave by the cheaper of the two ways
         $(".ex-greedy").disabled = st.cap !== 2;
         const gr = st.cap === 2 && times.length >= 2 && $(".ex-greedy").checked ? bridgeGreedy(times) : null;
@@ -187,6 +197,44 @@
         $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = st.s >= r.moves.length;
 
       };
+      // the reader's plan: the people on the torch's bank as toggles, a crossing takes the
+      // picked ones (one to cap forward, one to cap back), and the total runs against the best
+      const mineDraw = (plans) => {
+        const times = st.times, n = times.length, side = st.mine.length % 2;
+        let across = 0;
+        st.mine.forEach((g) => { across ^= g.reduce((m, i) => m | (1 << i), 0); });
+        const done = across === (1 << n) - 1, bank = times.map((_, i) => i).filter((i) => ((across >> i) & 1) === side);
+        st.pick = st.pick.filter((i) => bank.includes(i));
+        $(".br-mine").hidden = false;
+        $(".br-who").innerHTML = done ? "" : bank.map((i) => `<button type="button" class="md-button br-p" data-i="${i}" aria-pressed="${st.pick.includes(i)}">${NAMES[i]} (${times[i]})</button>`).join("");
+        $(".br-go").disabled = done || !st.pick.length || st.pick.length > st.cap;
+        $(".br-go").hidden = done;
+        $(".br-mine .ex-title").textContent = done ? "התוכנית הושלמה" : "מי חוצה עכשיו?";
+        $(".br-go").textContent = side === 0 ? "חצייה קדימה" : "חזרה עם הלפיד";
+        $(".br-undo").disabled = !st.mine.length;
+        const t = plans.mine.time, best = plans.best.time;
+        const say = (cls, html) => { const m = $(".br-msg"); m.className = `br-msg ${cls}`; m.innerHTML = html; };
+        if (!done) say("", st.mine.length ? `עד עכשיו ${ltr(t)} דקות ב-${ltr(st.mine.length)} חציות. ${side === 0 ? `בחרו עד ${st.cap === 2 ? "שניים" : "שלושה"} שחוצים קדימה.` : "בחרו מי מחזיר את הלפיד."}`
+          : `בחרו עד ${st.cap === 2 ? "שניים" : "שלושה"} מהגדה הקרובה ולחצו "חצייה קדימה". הזמן של חצייה הוא הזמן של האיטי שבה.`);
+        else if (t === best) say("wv-ok", `✓ כולם בצד השני אחרי ${ltr(t)} דקות : הזמן הקצר ביותר.`);
+        else {
+          say("wv-bad", `כולם בצד השני אחרי ${ltr(t)} דקות, ${ltr(t - best)} יותר מהקצר ביותר. רמז : נסו לשלוח את שני האיטיים יחד, כך שמשלמים על האיטי מביניהם פעם אחת.`);
+          $(".br-show").hidden = false;
+        }
+      };
+      $(".br-who").addEventListener("click", (e) => {
+        const b = e.target.closest(".br-p");
+        if (!b) return;
+        const i = Number(b.dataset.i);
+        st.pick = st.pick.includes(i) ? st.pick.filter((j) => j !== i) : st.pick.length < st.cap ? [...st.pick, i] : st.pick;
+        draw();
+      });
+      $(".br-go").addEventListener("click", () => {
+        if (!st.pick.length || st.pick.length > st.cap) return;
+        st.mine.push([...st.pick].sort((u, v) => u - v)); st.pick = []; st.s = st.mine.length; draw();
+      });
+      $(".br-undo").addEventListener("click", () => { st.mine.pop(); st.pick = []; st.s = st.mine.length; $(".br-show").hidden = true; draw(); });
+      $(".br-show").addEventListener("click", () => { $(".br-show").hidden = true; st.plan = "best"; $(".ex-plan").value = "best"; st.s = 0; draw(); });
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
       const total = () => (st.times.length ? plansOf()[st.plan].moves.length : 0);
       $(".ex-next").addEventListener("click", () => { stop(); st.s += 1; draw(); });
@@ -200,12 +248,12 @@
         st.s += 1; draw();
       });
       $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); play.click(); } });
-      input.addEventListener("change", () => { stop(); st.times = parse(); st.s = 0; draw(); });
+      input.addEventListener("change", () => { stop(); st.times = parse(); st.s = 0; st.mine = []; st.pick = []; draw(); });
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
       $(".ex-greedy").addEventListener("change", draw);
-      $(".ex-cap").addEventListener("change", () => { stop(); st.cap = Number($(".ex-cap").value); st.s = 0; draw(); });
-      $(".ex-plan").addEventListener("change", () => { stop(); st.plan = $(".ex-plan").value; st.s = 0; draw(); });
-      $(".ex-reset").addEventListener("click", () => { stop(); input.value = defaults; st.times = parse(); st.cap = 2; st.plan = "best"; $(".ex-cap").value = "2"; $(".ex-plan").value = "best"; st.s = 0; draw(); });
+      $(".ex-cap").addEventListener("change", () => { stop(); st.cap = Number($(".ex-cap").value); st.s = 0; st.mine = []; st.pick = []; draw(); });
+      $(".ex-plan").addEventListener("change", () => { stop(); st.plan = $(".ex-plan").value; st.s = st.plan === "mine" ? st.mine.length : 0; draw(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); input.value = defaults; st.times = parse(); st.cap = 2; st.plan = "best"; $(".ex-cap").value = "2"; $(".ex-plan").value = "best"; st.s = 0; st.mine = []; st.pick = []; draw(); });
       st.times = parse();
       draw();
     },
@@ -214,7 +262,7 @@
   dvqExplorers.register({
     views: { bridge: bridgeView },
     help: {
-      bridge: "זמני החצייה בשדה, קיבולת הגשר ובורר התכנית : ״הבא״ ו״הפעלה״ מעבירים חצייה אחרי חצייה, והטבלה משווה את שלוש התכניות. המתג ״הכלל החמדני״ מראה בכל סיבוב את שתי הדרכים להעביר את שני האיטיים ואת הזולה מביניהן.",
+      bridge: "זמני החצייה בשדה, קיבולת הגשר ובורר התכנית : ״הבא״ ו״הפעלה״ מעבירים חצייה אחרי חצייה, והטבלה משווה את שלוש התכניות. המתג ״הכלל החמדני״ מראה בכל סיבוב את שתי הדרכים להעביר את שני האיטיים ואת הזולה מביניהן. ״התוכנית שלי״ בבורר התוכנית : בוחרים מי חוצה בכל פעם, והזמן נבדק מול הקצר ביותר בסוף.",
     },
     models: { bridgeSolve, bridgeEscort, bridgeTime, bridgeEscortMoves, bridgePairMoves, bridgeGreedy },
   });
