@@ -100,6 +100,6 @@ def test_tag_grid_counts_each_tag():
     page = ('<p>intro</p><h2 id="tag:bfs"><span class="md-tag">BFS</span></h2>\n<ul><li>a</li><li>b</li></ul>'
             '<h2 id="tag:cdc"><span class="md-tag">CDC</span></h2>\n<ul><li>c</li></ul>')
     out = hook._tag_grid(page)
-    assert out.index('<nav class="tag-grid"') < out.index('<h2 id="tag:bfs">')
+    assert out.index('<nav class="tag-grid"') < out.index('<details class="tag-section" id="tag:bfs">')
     assert '<a class="tag-chip" href="#tag:bfs">BFS<span class="tag-count" aria-label="2 שאלות">2</span></a>' in out
-    assert out.count('<ul class="tag-list">') == 2
+    assert out.count('<ul class="tag-list">') == 2 and "<h2" not in out

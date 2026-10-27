@@ -927,18 +927,21 @@ TAG_SECTION = re.compile(r'(<h2 id="tag:([^"]+)">.*?<span class="md-tag">([^<]+)
 
 
 def _tag_grid(output: str) -> str:
-    """Every tag as a chip with its number of questions, linking to its list, and the lists
-    in columns (ul.tag-list)."""
+    """Every tag as a chip with its number of questions, linking to its list, and each list
+    folded under its tag's name (a link to "#tag:..." opens it, reading-tools.js), in
+    columns when open (ul.tag-list)."""
     chips = []
 
     def section(m: re.Match) -> str:
         count = m.group(4).count("<li>")
-        chips.append(f'<a class="tag-chip" href="#tag:{m.group(2)}">{m.group(3)}'
-                     f'<span class="tag-count" aria-label="{count} שאלות">{count}</span></a>')
-        return f'{m.group(1)}<ul class="tag-list">{m.group(4)}</ul>'
+        count_html = f'<span class="tag-count" aria-label="{count} שאלות">{count}</span>'
+        chips.append(f'<a class="tag-chip" href="#tag:{m.group(2)}">{m.group(3)}{count_html}</a>')
+        return (f'<details class="tag-section" id="tag:{m.group(2)}"><summary>'
+                f'<span class="md-tag">{m.group(3)}</span>{count_html}</summary>\n'
+                f'<ul class="tag-list">{m.group(4)}</ul></details>\n')
 
     output = TAG_SECTION.sub(section, output)
-    at = output.find('<h2 id="tag:')
+    at = output.find('<details class="tag-section"')
     if at < 0 or not chips:
         return output
     return output[:at] + f'<nav class="tag-grid" aria-label="כל התגיות">{"".join(chips)}</nav>\n' + output[at:]

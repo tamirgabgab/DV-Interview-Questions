@@ -334,7 +334,9 @@ inside the viewBox (a label marked `data-fit-drop`, like the size inside a narro
 PCIe box, is hidden when even that leaves it under 9 px; its tooltip stays), and a row of `tick` / `coord` labels that then overlaps is thinned
 (every k-th label kept, the first and the last always); this runs on every inline figure
 and on the live figures of the explorer boxes (refitted when a box redraws), and the
-lightbox copy keeps the original sizes. A content table of five or more columns whose
+lightbox copy keeps the original sizes. Whether a table fits is the scroll box's own overflow (so the theme's padding
+around the table counts), measured again once the fonts have loaded. A content table of
+five or more columns whose
 values (all but the first column) are 14 characters or shorter is a grid (`data-grid`): a
 trace, or rows named in the first column; its columns are as narrow as their values, it is
 tighter on a phone, and when it still does not fit it scrolls sideways with its first
@@ -368,7 +370,8 @@ now, so the tables no longer mark it).
 Topics show by their Hebrew names (the `TOPICS` table in `hooks/questions.py`; terms that
 DV engineers say in English, such as FIFO, CDC, PCIe and SVA, stay so) in the tables, the
 filters, the header card, the tags page (its headings and contents list, rewritten after
-the build, with a grid of every tag and its count above the lists, which run in two
+the build, with a grid of every tag and its count above the lists; each list is folded
+under its tag's name, a link to `tags/#tag:...` opens it, and an open list runs in two
 columns on a wide screen) and the search results; the tag as written stays in the files, the addresses
 and the anchors. `tools/lint_pages.py` warns about a topic without a name.
 

@@ -448,26 +448,28 @@
       if (rows.length >= STICKY_ROWS) { table.dataset.long = ""; long.push(table); }
     });
     // Cards only where the table does not fit its column (measured as a table), and a
-    // sticky header only where it does.
+    // sticky header only where it does. "Fits" is the scroll box's own overflow, which
+    // counts the theme's padding around the table (a table 1 px narrower than the box
+    // could still stick out by that padding), measured again once the fonts are in.
+    const overflows = (wrap) => wrap && wrap.clientWidth && wrap.scrollWidth > wrap.clientWidth + 1;
     const layout = () => {
       grids.forEach((table) => {
-        const wrap = table.closest(".md-typeset__scrollwrap");
         delete table.dataset.scrolls;
-        if (wrap && wrap.clientWidth && table.offsetWidth > wrap.clientWidth + 1) table.dataset.scrolls = "";
+        if (overflows(table.closest(".md-typeset__scrollwrap"))) table.dataset.scrolls = "";
       });
       wide.forEach((table) => {
-        const wrap = table.closest(".md-typeset__scrollwrap");
         delete table.dataset.cards;
-        if (wrap && wrap.clientWidth && table.offsetWidth > wrap.clientWidth + 1) table.dataset.cards = "";
+        if (overflows(table.closest(".md-typeset__scrollwrap"))) table.dataset.cards = "";
       });
       long.forEach((table) => {
         const wrap = table.closest(".md-typeset__scrollwrap");
         if (!wrap) return;
         wrap.classList.remove("table-fits");
-        wrap.classList.toggle("table-fits", "cards" in table.dataset ? false : table.offsetWidth <= wrap.clientWidth + 1);
+        wrap.classList.toggle("table-fits", "cards" in table.dataset ? false : !overflows(wrap));
       });
     };
     layout();
+    if (document.fonts) document.fonts.ready.then(layout);
     window.addEventListener("resize", layout, { passive: true });
     document.addEventListener("toggle", layout, true);
     document.addEventListener("change", (e) => { if (e.target.closest && e.target.closest(".tabbed-set")) layout(); });
@@ -573,6 +575,16 @@
     mark();
   };
 
+  // A link to a closed fold (the tags page's lists, Y398) opens it and shows it.
+  const openTarget = () => {
+    let target = null;
+    try { target = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch (e) { return; }
+    if (target && target.matches("details") && !target.open) {
+      target.open = true;
+      target.scrollIntoView();
+    }
+  };
+
   // The sticky solution map sits under the part bar when the page has one.
   const partBarHeight = () => {
     const bar = document.querySelector(".part-nav");
@@ -593,5 +605,7 @@
     document.querySelectorAll(".md-content .explorer").forEach((box) =>
       boxObserver.observe(box, { childList: true, subtree: true, characterData: true }));
     window.addEventListener("resize", partBarHeight, { passive: true });
+    openTarget();
+    window.addEventListener("hashchange", openTarget);
   });
 })();
