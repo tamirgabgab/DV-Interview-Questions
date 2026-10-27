@@ -575,6 +575,19 @@
     mark();
   };
 
+  // A one-line title that does not fit its box: drop whole words from its end and add an
+  // ellipsis. The CSS ellipsis alone cuts inside a word, and in a Hebrew line with English
+  // words it cut the English one in the middle ("PCIe" read "Cle").
+  const fitWords = (text, box) => {
+    if (!box || !box.clientWidth || box.scrollWidth <= box.clientWidth + 1) return;
+    const words = text.textContent.trim().split(/\s+/);
+    while (words.length > 1 && box.scrollWidth > box.clientWidth + 1) {
+      words.pop();
+      while (words.length > 1 && /^[–\-·•:]+$/.test(words[words.length - 1])) words.pop();   // no dangling dash
+      text.textContent = `${words.join(" ").replace(/[,;:]$/, "")} …`;
+    }
+  };
+
   // A link to a closed fold (the tags page's lists, Y398) opens it and shows it.
   const openTarget = () => {
     let target = null;
@@ -607,5 +620,14 @@
     window.addEventListener("resize", partBarHeight, { passive: true });
     openTarget();
     window.addEventListener("hashchange", openTarget);
+    // a side navigation title (S421) and a path step's title (S419) that do not fit lose
+    // whole words from their end, the full title stays as the link's tooltip
+    document.querySelectorAll(".md-sidebar--primary .md-nav__link .md-ellipsis").forEach((span) => {
+      const link = span.closest("a");
+      if (!link || link.classList.contains("md-nav__link--active")) return;
+      if (!link.title) link.title = span.textContent.trim();
+      fitWords(span, span);
+    });
+    document.querySelectorAll(".path-nav .pn-title").forEach((t) => fitWords(t, t.closest("a")));
   });
 })();

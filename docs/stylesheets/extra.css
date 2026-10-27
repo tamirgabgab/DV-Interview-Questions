@@ -1396,7 +1396,12 @@ body.practice-mode .md-typeset .question-tools {
 }
 .md-typeset .path-nav .pn-path { color: var(--md-default-fg-color); opacity: 0.85; }
 .md-typeset .path-nav .pn-path a { font-weight: 600; }
-.md-typeset .path-nav .pn-next { margin-inline-start: auto; }
+/* the previous and the next step side by side under the path line, each with its id and
+   its title cut to one line (S419) */
+.md-typeset .path-nav .pn-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.2rem 0.9rem; flex-basis: 100%; }
+.md-typeset .path-nav :is(.pn-prev, .pn-next) { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.md-typeset .path-nav .pn-next { grid-column: 2; text-align: end; }
+.md-typeset .path-nav .pn-label { color: var(--md-default-fg-color); opacity: 0.85; }
 
 .md-typeset ol.path-steps {
   margin: 1rem 0;
@@ -3968,3 +3973,18 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset :is(.admonition, details) :is(.arithmatex, mjx-container) { font-size: 0.8em; }
 .md-typeset :is(.admonition, details) :is(.arithmatex, mjx-container) :is(.arithmatex, mjx-container) { font-size: 1em; }
 .md-typeset :is(.admonition, details) :is(.sol-map, .cost-chips) { font-size: 0.64rem; }
+
+/* The page tools on a touch screen (S420): no hover, so no tooltip; each icon has its
+   short name under it instead. */
+.md-typeset .question-tools .qt-name { display: none; }
+@media (hover: none) {
+  .md-typeset .question-header .question-tools { gap: 0.3rem; }
+  .md-typeset .question-header .question-tools .qt-btn { flex-direction: column; gap: 0.1rem; width: auto; min-width: 2.7rem; height: auto; padding: 0.2rem 0.3rem; border-radius: var(--radius-m); }
+  .md-typeset .question-header .question-tools .qt-name { display: block; font-size: 0.55rem; line-height: 1.2; white-space: nowrap; }
+  .md-typeset .question-header .question-tools .qt-btn[data-tip]:is(:hover, :focus-visible)::after { content: none; }
+}
+
+/* The side navigation (S421): one line per question, cut with an ellipsis (the full title
+   is the link's tooltip, reading-tools.js); the current question shows in full. */
+.md-sidebar--primary .md-nav__link .md-ellipsis { display: block; white-space: nowrap; }
+.md-sidebar--primary .md-nav__link--active .md-ellipsis { white-space: normal; }

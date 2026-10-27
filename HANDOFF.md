@@ -1152,10 +1152,22 @@ section below starts at session 22, whose numbered items run on through the late
     not the scoreboard strip but a proof table 357 px wide in a 356 px scroll box, called
     "fits" although the theme's padding pushed it out; a table now fits when its scroll box
     does not overflow, measured again when the fonts load. The local phone check is clean.
+75. **Round S4, the question page and navigation (session 27, 2026-10-27).** The owner's
+    picks: the id and the title in the path bar, the tool names always under the icons on a
+    touch screen, one line per question in the side navigation; no print style (S422 not
+    taken). S419: the path bar's previous and next steps sit side by side with id and
+    title. S420: `qt-name` under each icon under `hover: none` (the fold name follows its
+    state), the hover tooltip off there. S421: one line per question in the side
+    navigation, the current one in full, the full title as the tooltip. A CSS ellipsis cut
+    English words inside Hebrew titles ("PCIe" read "Cle", "Sequence" "ence"), so
+    reading-tools.js `fitWords` drops whole words from the end instead, for the side
+    navigation and the path bar. Before the round, `main` had moved again (the other
+    session's search list cleanup, no search highlight, and the CLAUDE.md rule for small
+    fixes); merged without conflicts.
 
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) on the branch.
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4 (item 75) and S1 (item 76) on the branch.
   58 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
@@ -1444,10 +1456,10 @@ continue at 411.
 
 | # | Finding | Proposal | Size |
 |---|---|---|---|
-| S419 | the path box shows the previous and next steps as ids only ("הקודם : 0002") | the title beside the id, cut with an ellipsis on a phone | S |
-| S420 | the page tools are five icons without names; a touch screen has no hover tooltip | a one-time row of names under the icons on a phone (dismissed and remembered), and the names in the toolbar's accessible labels as today | S |
-| S421 | the side navigation wraps long titles into two or three lines (0023: "Endpoint – כתיבה, קריאה ושידור Completions") | one line per question with an ellipsis and the full title as a tooltip, the current one highlighted | S |
-| S422 | a question cannot be printed or saved as a clean PDF (the toolbar, boxes and folds print as they are) | a print style: solutions open, boxes replaced by their figures, no toolbar or navigation | M |
+| S419 (done, item 75) | the path box shows the previous and next steps as ids only ("הקודם : 0002") | the title beside the id, cut with an ellipsis on a phone | S |
+| S420 (done, item 75) | the page tools are five icons without names; a touch screen has no hover tooltip | a one-time row of names under the icons on a phone (dismissed and remembered), and the names in the toolbar's accessible labels as today | S |
+| S421 (done, item 75) | the side navigation wraps long titles into two or three lines (0023: "Endpoint – כתיבה, קריאה ושידור Completions") | one line per question with an ellipsis and the full title as a tooltip, the current one highlighted | S |
+| S422 (not taken) | a question cannot be printed or saved as a clean PDF (the toolbar, boxes and folds print as they are) | a print style: solutions open, boxes replaced by their figures, no toolbar or navigation | M |
 
 **Round S5 — speed and access**
 

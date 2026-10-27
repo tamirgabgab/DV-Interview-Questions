@@ -410,9 +410,12 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
     )
 
 
-def _tool(cls: str, icon: str, tip: str, extra: str = "") -> str:
+def _tool(cls: str, icon: str, tip: str, extra: str = "", name: str = "") -> str:
+    """An icon button; its short name shows under the icon on a touch screen (S420), where
+    there is no hover tooltip."""
+    label = f'<span class="qt-name" aria-hidden="true">{name}</span>' if name else ""
     return (f'<button type="button" class="qt-btn {cls}" aria-label="{tip}" data-tip="{tip}"{extra}>'
-            f'{ui_icon(icon)}</button>')
+            f'{ui_icon(icon)}{label}</button>')
 
 
 def _tools(q: dict, page_url: str) -> str:
@@ -426,7 +429,7 @@ def _tools(q: dict, page_url: str) -> str:
     random_btn = ""
     if same:
         hrefs = json.dumps([_href(o["src_uri"], page_url) for o in sorted(same, key=lambda o: o["id"])])
-        random_btn = _tool("qt-random", "random", "שאלה אקראית מאותה רמה", f' data-hrefs="{html.escape(hrefs)}"')
+        random_btn = _tool("qt-random", "random", "שאלה אקראית מאותה רמה", f' data-hrefs="{html.escape(hrefs)}"', "אקראית")
     # the level's questions in order, for the "solved n of m" message (UI326)
     level = sorted((o for o in _questions.values() if o["level"] == q["level"]), key=lambda o: o["id"])
     level_data = (f' data-level-name="{html.escape(LEVELS[q["level"]])}" data-level-ids="{" ".join(o["id"] for o in level)}"'
@@ -443,11 +446,11 @@ def _tools(q: dict, page_url: str) -> str:
     if paths:
         level_data += f' data-paths="{html.escape(json.dumps(paths, ensure_ascii=False))}"'
     return (f'<div class="question-tools" role="toolbar" aria-label="כלי השאלה" data-search-exclude data-qid="{q["id"]}"{level_data}>'
-            + _tool("qt-fold", "unfold-more", "פתח הכל")
-            + _tool("qt-practice", "timer", "מצב תרגול", ' aria-pressed="false"')
+            + _tool("qt-fold", "unfold-more", "פתח הכל", "", "פתח הכל")
+            + _tool("qt-practice", "timer", "מצב תרגול", ' aria-pressed="false"', "תרגול")
             + '<span class="qt-clock" hidden></span>'
-            + _tool("qt-mark qt-solved", "solved", "סמן כפתורה", ' data-mark="solved" aria-pressed="false"')
-            + _tool("qt-mark qt-star", "star", "הוסף למועדפים", ' data-mark="star" aria-pressed="false"')
+            + _tool("qt-mark qt-solved", "solved", "סמן כפתורה", ' data-mark="solved" aria-pressed="false"', "פתרתי")
+            + _tool("qt-mark qt-star", "star", "הוסף למועדפים", ' data-mark="star" aria-pressed="false"', "מועדף")
             + random_btn
             + '</div>')
 
@@ -459,7 +462,9 @@ def _progress(ids) -> str:
 
 
 def _path_nav(q: dict, page_url: str) -> str:
-    """One line per study path that contains the question: step n of m, previous and next."""
+    """One block per study path that contains the question: the path and step n of m, then
+    the previous and the next step with their ids and titles (S419; a long title is cut
+    with an ellipsis, the full one in the tooltip)."""
     lines = []
     for p in _paths:
         ids = [s["q"]["id"] for s in p["steps"]]
@@ -468,11 +473,16 @@ def _path_nav(q: dict, page_url: str) -> str:
         i = ids.index(q["id"])
         parts = [f'<span class="pn-path">מסלול <a href="{_href(p["src_uri"], page_url)}">{html.escape(p["title"])}</a></span>'
                  f'<span class="pn-step">שלב {i + 1} מתוך {len(ids)}</span>']
+        links = []
         for label, cls, k in (("הקודם", "pn-prev", i - 1), ("הבא", "pn-next", i + 1)):
             if 0 <= k < len(ids):
                 other = p["steps"][k]["q"]
-                parts.append(f'<a class="{cls}" href="{_href(other["src_uri"], page_url)}" '
-                             f'title="{html.escape(str(other["title"]))}">{label} : <span class="pn-id">{other["id"]}</span></a>')
+                title = html.escape(str(other["title"]))
+                links.append(f'<a class="{cls}" href="{_href(other["src_uri"], page_url)}" title="{title}">'
+                             f'<span class="pn-label">{label}\u00a0:</span> <span class="pn-id">{other["id"]}</span> '
+                             f'<span class="pn-title">{title}</span></a>')
+        if links:
+            parts.append(f'<span class="pn-links">{"".join(links)}</span>')
         lines.append('<div class="path-nav-line">' + "".join(parts) + "</div>")
     if not lines:
         return ""
