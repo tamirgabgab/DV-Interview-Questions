@@ -1925,6 +1925,18 @@ body.practice-mode .md-typeset .question-tools {
   --md-code-hl-operator-color: #5f5f5f;
   --md-code-hl-punctuation-color: #5f5f5f;
   --md-code-hl-string-color: #186b42;            /* 4.5:1 also on a highlighted line */
+  /* W336: the code background is #eef1f6 on the off-white page, so the theme's lighter
+     token colours are darkened to keep 4.5:1 */
+  --md-code-hl-function-color: #8e3a9c;
+  --md-code-hl-special-color: #b0103f;
+  --md-code-hl-constant-color: #5a45c4;
+  --md-code-hl-variable-color: #5f5f5f;
+  --md-code-hl-generic-color: #5f5f5f;
+}
+/* the dark scheme's constant and number tokens, lifted to 4.5:1 on a highlighted line */
+[data-md-color-scheme="slate"] {
+  --md-code-hl-constant-color: #a497ec;
+  --md-code-hl-number-color: #f07d70;
 }
 [data-md-color-scheme="default"] .md-typeset .highlight .hll {
   background-color: rgba(27, 42, 74, 0.06);

@@ -880,7 +880,11 @@ section below starts at session 22, whose numbered items run on through the late
     digit) and drops the "מלכודת :" prefix; every question page has one group (165 traps).
     W338: `overrides/partials/content.html` drops the header action icon and adds "עריכת
     העמוד ב-GitHub" at the end of every page. `check_contrast.py`: CARD is the surface,
-    six new pairs (card text, trap title and number, footer text, edit link).
+    six new pairs (card text, trap title and number, footer text, edit link). axe then
+    found code tokens under 4.5:1 on the new code background (13 pages): the light
+    function, special, constant, variable and generic colours were darkened, the dark
+    constant and number lifted (they failed on a highlighted line before), and eight
+    code token pairs joined `check_contrast.py`.
 61. **Round W2, the home page (session 27, 2026-10-27).** The owner's picks: the audience
     line "לסטודנטים ולמהנדסים בתחילת הדרך שמתכוננים לראיון DV", no rotating word, six
     featured paths mixing DV and algorithms, the catalog as a tab after "ראשי". W339: the
