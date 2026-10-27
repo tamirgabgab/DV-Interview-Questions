@@ -914,6 +914,32 @@ section below starts at session 22, whose numbered items run on through the late
     patterns, any alphabet) and the tests compare them for every pattern up to 8 letters,
     biased coins, the die and every race of three and four patterns of length 3.
 
+62. **New questions 0053 and 0054 (session 27, 2026-10-27).** The owner picked 1 and 2 of
+    four proposals (covergroup, arbiter; not reservoir sampling or the skid-buffer bug)
+    and asked for boxes that show the solution well. **0053** (junior, dv): an ALU
+    covergroup, 15 coverpoint bins and a cross of 72 (80 less 8 ignored SHL cells), the
+    LRM's group coverage (24.28 % after one sample), and the closure time of the cross:
+    1,393,801 transactions with uniform stimulus against 534 with `dist` and 389 (80 H_72)
+    with equal classes, exact by inclusion-exclusion over three cell groups in the
+    generator and by a numeric integral on the page. Verilator 5.053 runs the covergroup
+    (cross, `ignore_bins` with `binsof ... ||`, `iff`, `sample` with arguments) and its
+    `get_inst_coverage()` follows the LRM; `get_coverage()` is the type's, merged over
+    instances. The testbench checks it against a reference model of the bins on random
+    runs. Box `covergroup`: stimulus and seed, +100 to "until closed", a hand sample, the
+    coverpoint bins, the cross as five maps (3 + 2 on a phone), the coverage curve on a
+    log axis with the expected closure, and the ignored cells counted on demand. **0054**
+    (senior, design): fixed priority and starvation, round robin by
+    `dbl & ~(dbl - pri)`, the checker (one-hot, no grant without a request, the hold rule
+    of the environment, fairness within N - 1) and weighted round robin (shares w_i over
+    the sum, longest wait the sum of the others). The testbench runs four lanes (the
+    arbiter and three buggy copies) and the checker's counters equal a procedural count;
+    samples are taken just after the falling-edge drive (at the rising edge the pointer
+    may have moved already). Box `arbiter`: a request grid drawn by click, the three
+    arbiters with wait/bound per requester, the trick at the chosen cycle, a bug select
+    and the failing assertions with their cycles. Its classes are `arb-*` (`ab-*` belongs
+    to the abmap box). Self-checks on both; 0053 in the testbench path, 0054 in logic
+    design.
+
 ## In progress
 
 - **State (2026-10-27, session 27):** `main` is e2f6311 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0052 with 0052 generalized), deployed.
@@ -976,21 +1002,21 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (51 questions)
+### Coverage today (53 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water) |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051) |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock
 divider, an LFSR, synchronizer MTBF and SVA; 0040 (a sequence detector FSM) and 0041
 (coverage closure of random tests) followed, then 0049 (the UVM testbench) and 0050 (an
 out-of-order scoreboard). **Still missing:** UVM in depth (factory, RAL, virtual
-sequences as questions of their own), covergroups, debug ("find the bug") and
-verification planning.
+sequences as questions of their own), debug ("find the bug") and verification
+planning; covergroups since 0053.
 
 ### Topic gaps worth filling
 

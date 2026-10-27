@@ -3505,3 +3505,60 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer .uv-ctitle { font-weight: 700; }
 .md-typeset .explorer svg.cn-live { width: 100%; max-width: 40rem; display: block; margin-top: 0.4rem; }
 .md-typeset .explorer .cn-note { font-size: 0.65rem; color: var(--viz-text); margin: 0.1em 0 0.4em; }
+
+/* ALU covergroup (0053): the cross maps of the figure and the explorer, the coverpoint bins, the coverage curve */
+.md-typeset svg .cg-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.2; }
+.md-typeset svg .cg-cell.is-r2 { fill: var(--viz-s2); fill-opacity: 0.85; }
+.md-typeset svg .cg-cell.is-r1 { fill: var(--viz-s2); fill-opacity: 0.35; }
+.md-typeset svg .cg-cell.is-r0 { fill: var(--md-default-bg-color); }
+.md-typeset svg .cg-cell.is-ign { fill: url(#cg-hatch); stroke: var(--viz-grid); }
+.md-typeset svg.cg-live .cg-cell.is-ign { fill: url(#cv-hatch); }
+.md-typeset svg .cg-hatch-line { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .cg-cell.is-h1 { fill: var(--viz-s1); fill-opacity: 0.3; }
+.md-typeset svg .cg-cell.is-h2 { fill: var(--viz-s1); fill-opacity: 0.5; }
+.md-typeset svg .cg-cell.is-h3 { fill: var(--viz-s1); fill-opacity: 0.7; }
+.md-typeset svg .cg-cell.is-h4 { fill: var(--viz-s1); fill-opacity: 0.9; }
+.md-typeset svg .cg-cell.is-last { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg .cg-op { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .cg-key-r2 { background: var(--viz-s2); opacity: 0.85; }
+.md-typeset .viz-legend .cg-key-r1 { background: var(--viz-s2); opacity: 0.35; }
+.md-typeset .viz-legend .cg-key-r0 { background: transparent; outline: 1.5px solid var(--viz-grid); outline-offset: -1.5px; }
+.md-typeset .viz-legend .cg-key-ign { background: repeating-linear-gradient(45deg, var(--viz-text) 0 1.5px, transparent 1.5px 5px); }
+.md-typeset .viz-legend .cg-key-hit { background: var(--viz-s1); opacity: 0.7; }
+.md-typeset .viz-legend .cg-key-last { background: transparent; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .explorer svg.cg-live { width: 100%; max-width: 41rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer .cv-ignlab { display: block; margin: 0.4rem 0 0.2rem; font-size: 0.7rem; }
+.md-typeset .explorer input.cv-a, .md-typeset .explorer input.cv-b { width: 4.5rem; }
+.md-typeset .explorer .cv-points { display: flex; flex-direction: column; gap: 0.25rem; margin: 0.4rem 0; }
+.md-typeset .explorer .cv-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; }
+.md-typeset .explorer .cv-name { min-width: 5.2rem; }
+.md-typeset .explorer .cv-bin { display: inline-flex; flex-direction: column; align-items: center; min-width: 2.8rem; padding: 0.05rem 0.25rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem;
+  font-family: var(--md-code-font-family); font-size: 0.6rem; color: var(--viz-ink); }
+.md-typeset .explorer .cv-bin small { font-size: 0.55rem; color: var(--viz-text); opacity: 1; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer .cv-bin.is-hit { border-color: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cv-curve { max-width: 40rem; }
+
+/* Round-robin arbiter (0054): the grant grids of the figure and the explorer, the trick table, the rules */
+.md-typeset svg .arb-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.2; }
+.md-typeset svg .arb-cell.is-gnt { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg .arb-cell.is-wait { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg .arb-cell.is-bad { stroke: var(--diff-hard); stroke-width: 3; }
+.md-typeset svg .arb-cell.arb-req { cursor: pointer; }
+.md-typeset svg .arb-cell.arb-req.is-on { fill: var(--viz-ink); fill-opacity: 0.75; stroke: var(--viz-ink); }
+.md-typeset svg .arb-cell.arb-req:focus-visible { outline: none; stroke: var(--site-focus-ring); stroke-width: 3; }
+.md-typeset svg .arb-mark { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); pointer-events: none; }
+.md-typeset svg .arb-name { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .arb-wait { fill: var(--viz-text); font-size: 13px; font-family: var(--md-code-font-family); }
+.md-typeset svg .arb-wait.is-over { fill: var(--viz-s2-text); font-weight: 700; }
+.md-typeset svg .arb-cursor { fill: var(--viz-s1); fill-opacity: 0.12; stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset .viz-legend .arb-key-gnt { background: var(--viz-s1); opacity: 0.45; outline: 2px solid var(--viz-s1); }
+.md-typeset .viz-legend .arb-key-wait { background: var(--viz-s2); opacity: 0.45; }
+.md-typeset .viz-legend .arb-key-req { background: var(--viz-ink); opacity: 0.75; }
+.md-typeset .viz-legend .arb-key-bad { background: transparent; outline: 3px solid var(--diff-hard); outline-offset: -3px; }
+.md-typeset .explorer svg.arb-live { width: 100%; max-width: 42rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer .arb-weights { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; font-size: 0.7rem; }
+.md-typeset .explorer .arb-weights label { display: inline-flex; align-items: center; gap: 0.15rem; }
+.md-typeset .explorer table.arb-tt { font-size: 0.65rem; margin: 0.3rem 0; }
+.md-typeset .explorer table.arb-tt td { padding: 0.15em 0.6em; }
+.md-typeset .explorer .arb-rule { margin: 0.15em 0; font-size: 0.7rem; }
+.md-typeset .explorer table.arb-tt code { white-space: nowrap; }

@@ -1,6 +1,6 @@
 # Catalog
 
-All 51 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 53 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -56,3 +56,5 @@ All 51 questions, with links to their pages on the [live site](https://tamirgabg
 | 0050 | [Scoreboard לתשובות שלא לפי הסדר – תורים לפי ID](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0050-out-of-order-scoreboard/) | senior (סניור) |
 | 0051 | [בקבוק מורעל ועכברים – סבב אחד, שני סבבים, ו-b סבבים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0051-poisoned-bottles-mice/) | junior (ג'וניור) |
 | 0052 | [HH מול HT – כמה הטלות מטבע עד שהרצף מופיע](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0052-coin-pattern-waiting-time/) | senior (סניור) |
+| 0053 | [Covergroup ל-ALU – bins, cross ומתי הכיסוי נסגר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0053-alu-covergroup/) | junior (ג'וניור) |
+| 0054 | [Arbiter סבבי – הרעבה, טריק שני ה-encoders, SVA ומשקלים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0054-round-robin-arbiter/) | senior (סניור) |

@@ -190,6 +190,31 @@ def coin_var(a: str, steps: int = 3000) -> float:
     return m2 - m1 * m1
 
 
+def alu_bins() -> tuple[int, int, int]:
+    """The ALU covergroup: the coverpoint bins, the cross cells kept, and 1 over the rarest
+    cell's probability with uniform operands."""
+    ops, classes = 5, 4                                       # zero, max, msb, mid
+    cross = sum(1 for o in range(ops) for a in range(classes) for b in range(classes) if not (o == 4 and b in (1, 2)))
+    return ops + classes + classes + 2, cross, ops * 256 * 256
+
+
+def rr_bound(n: int, weights=None) -> int:
+    """The longest wait of a requester under full load, by running the arbiter."""
+    weights = weights or [1] * n
+    ptr, used, run, best = 0, 0, [0] * n, [0] * n
+    for _ in range(50 * sum(weights)):
+        win = ptr
+        for i in range(n):
+            if i != win:
+                run[i] += 1
+                best[i] = max(best[i], run[i])
+        run[win] = 0
+        used += 1
+        if used == weights[win]:
+            ptr, used = (ptr + 1) % n, 0
+    return max(best) if weights == [1] * n else best[0]
+
+
 EXPECTED = {
     "0015": [two_children(False), two_children(True)],
     "0016": [josephus(20)],
@@ -206,6 +231,8 @@ EXPECTED = {
     "0042": [camel(0.5, 150, 450, 30)],
     "0051": [mice(1000, 1), mice(1000, 2), mice(1000, 3)],
     "0052": [coin_runs("HH")[0], coin_runs("HHH")[0], coin_runs("HT", "HH")[1], coin_var("HH")],
+    "0053": list(alu_bins()),
+    "0054": [rr_bound(4), rr_bound(8), rr_bound(4, [1, 2, 3, 4])],
 }
 
 
