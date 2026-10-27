@@ -1459,6 +1459,9 @@ body.practice-mode .md-typeset .question-tools {
   .md-typeset table:not([class]) td { padding: 0.55em 0.6em; }
   .md-typeset table:not([class]) th { min-width: 3rem; }   /* Material: 5rem */
   .md-typeset table[data-grid] :is(th, td) { padding: 0.45em 0.5em; }   /* a grid: tighter still */
+  /* and inside its column: the theme pulls a table's scroll box out to the screen edge,
+     which inside a solution reaches past it */
+  .md-typeset .md-typeset__scrollwrap:has(> .md-typeset__table > table[data-grid]) { margin-inline: 0; }
 }
 /* A grid of short values (Y394): its columns as narrow as their values (the theme's 5rem
    per header pushed a trace of seven columns out of its step), and when it still scrolls
@@ -3949,3 +3952,9 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset :is(.admonition, details) :is(.admonition-title, summary) { font-size: 0.7rem; }
 .md-typeset :is(.admonition, details) :is(.admonition, details) { font-size: 1em; }
 .md-typeset :is(.admonition, details) .explorer { font-size: 0.64rem; }
+/* what was laid out for the box size keeps it, so nothing grows wider on a phone: the
+   math (MathJax scales with the text; 0.8em of 0.8rem is the old 0.64rem), the solution
+   map and the cost chips */
+.md-typeset :is(.admonition, details) :is(.arithmatex, mjx-container) { font-size: 0.8em; }
+.md-typeset :is(.admonition, details) :is(.arithmatex, mjx-container) :is(.arithmatex, mjx-container) { font-size: 1em; }
+.md-typeset :is(.admonition, details) :is(.sol-map, .cost-chips) { font-size: 0.64rem; }
