@@ -986,10 +986,25 @@ section below starts at session 22, whose numbered items run on through the late
     trick leaving 8 of 22 on 1, 1, 9, 1, 1, 9, and an odd row (1, 5, 1). Box `coinrow`. Self-
     checks on both; 0057 in the testbench path, 0058 in advanced algorithms.
 
+65. **New question 0059, the next number with as many ones (session 27, 2026-10-27).** The
+    owner did not take four proposals (reservoir sampling, rand5 to rand7, Boyer-Moore, the
+    prisoners and the bulb), then picked Gosper's hack from the second four and asked for
+    three parts: the next number, the previous one, and a third left to me (the place in the
+    sorted list). Junior, code. Part a: c = x & -x, r = x + c, r | (((x ^ r) >> 2) / c),
+    with a proof by the highest differing bit and the edges (x = 0, the block at the top).
+    Part b: prev(x) = ~next(~x) in w bits, the complement reversing the order (a table of the
+    10 numbers with two ones in 5 bits). Part c: rank = sum of C(p_i, i) over the ones, and
+    the greedy inverse. SV functions (`next_same`, `prev_same`, `binom`, `rank_same`,
+    `unrank_same`) run in Verilator against a search on every 10-bit number and random
+    32-bit numbers; the Python against a search in widths 1 to 10. Box `popnext` (the rows
+    of the formula step by step, for the next or the previous through the complement; the
+    first / previous / next / last buttons; the place as a sum of binomials). Self-checks
+    99, 80 and 24; 0059 in the coding path.
+
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is c38ce28 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0056 with 0052 generalized and 0056 part d), deployed; questions 0057 and 0058 on the branch.
-  57 questions (0022 was
+- **State (2026-10-27, session 27):** `main` is c38ce28 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0056 with 0052 generalized and 0056 part d), deployed; questions 0057, 0058 and 0059 on the branch.
+  58 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
@@ -1048,12 +1063,12 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (57 questions)
+### Coverage today (58 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water) |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056, 0058 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056), coins in a row by a parity trick and an interval DP (0058) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056, 0058, 0059 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056), coins in a row by a parity trick and an interval DP (0058), the next number with as many ones by Gosper's hack, the previous by the complement and the place by binomials (0059) |
 | Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.

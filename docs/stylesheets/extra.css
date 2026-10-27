@@ -3664,3 +3664,18 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer table.cr-table td, .md-typeset .explorer table.cr-table th { padding: 0.15em 0.45em; text-align: center; font-variant-numeric: tabular-nums; }
 .md-typeset .explorer table.cr-table td.is-now { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); font-weight: 700; outline: 2px solid var(--viz-s2); }
 .md-typeset .explorer table.cr-table td.is-opt { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); }
+
+/* The next number with as many ones (0059): the rows of bits of the figures and of the popnext explorer */
+.md-typeset .gs-scroll { overflow-x: auto; margin: 0.6rem 0; }
+.md-typeset table.gs-bits { border-collapse: separate; border-spacing: 2px; direction: ltr; font-family: var(--md-code-font-family); font-size: 0.75rem; margin: 0 auto; }
+.md-typeset table.gs-bits th { font-weight: 400; color: var(--viz-text); text-align: right; padding: 0 0.6em 0 0; white-space: nowrap; border: 0; background: none; }
+.md-typeset table.gs-bits td { padding: 0; border: 0; text-align: center; }
+.md-typeset table.gs-bits td.gs-b { width: 1.45rem; height: 1.45rem; border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; color: var(--viz-text); }
+.md-typeset table.gs-bits td.gs-b.is-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); color: var(--viz-ink); font-weight: 700; }
+.md-typeset table.gs-bits td.gs-b.is-one.is-mark { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border: 2.5px solid var(--viz-s2); }
+.md-typeset table.gs-bits td.gs-val { color: var(--viz-ink); padding-left: 0.7em; text-align: left; font-variant-numeric: tabular-nums; min-width: 3.2em; }
+.md-typeset table.gs-bits tr.is-off { visibility: hidden; }
+.md-typeset .viz-legend .gs-key-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
+.md-typeset .viz-legend .gs-key-mark { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .explorer .gs-note { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer input.gs-x { width: 7rem; }
