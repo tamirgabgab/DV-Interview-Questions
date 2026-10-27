@@ -3678,4 +3678,6 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .viz-legend .gs-key-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
 .md-typeset .viz-legend .gs-key-mark { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
 .md-typeset .explorer .gs-note { font-size: 0.7rem; margin: 0.3em 0; }
-.md-typeset .explorer input.gs-x { width: 7rem; }
+.md-typeset .explorer input.gs-x { width: 6rem; }
+.md-typeset table.gs-bits td.gs-b.is-lead { border-style: dashed; background: none; }
+.md-typeset .viz-legend .gs-key-lead { background: none; outline: 1.5px dashed var(--viz-grid); outline-offset: -1.5px; }

@@ -305,11 +305,12 @@ def coin_answers() -> list[int]:
 
 def popcount_answers() -> list[int]:
     """Same number of ones: the next above 92 and the previous below 96 by a search number by
-    number, and how many numbers with four ones are below 92 by a count."""
+    number; the next above 120 with as many zeros (no leading zeros), also by a search."""
     k = lambda v: bin(v).count("1")  # noqa: E731
+    z = lambda v: v.bit_length() - k(v)  # noqa: E731
     nxt = next(y for y in range(93, 256) if k(y) == k(92))
     prv = next(y for y in range(95, 0, -1) if k(y) == k(96))
-    return [nxt, prv, sum(1 for y in range(92) if k(y) == 4)]
+    return [nxt, prv, next(y for y in range(121, 1024) if z(y) == z(120))]
 
 
 EXPECTED = {

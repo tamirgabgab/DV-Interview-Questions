@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 """Figures and tables of question 0059 (the next number with as many ones: Gosper's step,
-the previous one through the complement, and the place of a number in the sorted list).
+the previous one through the complement, and the same for zeros, counted without the
+leading ones, where the length of the number may change).
 
     python tools/figures/fill.py 59        # put the blocks on the page
 
-The reference here is independent of the page code: brute_next / brute_prev search
-number by number, and brute_rank counts the smaller numbers with as many ones. gosper()
-gives the rows of the formula, the same rows the box draws. blocks() returns, in page
-order: the steps of next(92) in 8 bits, their legend, the numbers with two ones in 5 bits
-next to their complements, the steps of prev(99), and the sum that gives the place of 92.
+The reference here is independent of the page code: brute_next / brute_prev and
+brute_next0 / brute_prev0 search number by number. gosper() gives the rows of the
+formula, the same rows the box draws. blocks() returns, in page order: the steps of
+next(92) in 8 bits, their legend, the numbers with two ones in 5 bits next to their
+complements, the steps of prev(99), the numbers with three zeros by length, and the
+rows of the next number after 120 with three zeros (a longer one).
 """
 
 from html import escape
-from math import comb
 
 RLM = "‏"
 X_A, W_A = 92, 8            # 0101_1100 -> 0110_0011 = 99
 X_B = 99                    # prev(99) = 92
 W_C, K_C = 5, 2             # the complement table
+X_C = 120                   # 111_1000, three zeros -> 1000_1111 = 143
 
 
 def ones(x):
@@ -35,9 +37,21 @@ def brute_prev(x, w):
     return next((y for y in range(x - 1, 0, -1) if ones(y) == k), 0) if x else 0
 
 
-def brute_rank(x):
-    k = ones(x)
-    return sum(1 for y in range(x) if ones(y) == k)
+def zeros(x):
+    """The zeros of x from its top one down (no leading zeros)."""
+    return x.bit_length() - ones(x)
+
+
+def brute_next0(x):
+    """The smallest number above x with as many zeros (any length); x >= 1."""
+    z = zeros(x)
+    return next(y for y in range(x + 1, 1 << (x.bit_length() + 2)) if zeros(y) == z)
+
+
+def brute_prev0(x):
+    """The largest number below x with as many zeros; 0 if there is none."""
+    z = zeros(x)
+    return next((y for y in range(x - 1, 0, -1) if zeros(y) == z), 0)
 
 
 def set_bits(v):
@@ -79,10 +93,10 @@ def complement_table(w, k):
     """The numbers with k ones in w bits in order, next to their complements."""
     xs = [y for y in range(1 << w) if ones(y) == k]
     mask = (1 << w) - 1
-    rows = ["| המקום של x | ‏x | ‏~x | המקום של ~x |", "|:-:|:-:|:-:|:-:|"]
-    for i, x in enumerate(xs):
+    rows = ["| ‏x, עולה | ‏~x, יורד |", "|:-:|:-:|"]
+    for x in xs:
         y = ~x & mask
-        rows.append(f"| {RLM}{i} | {RLM}`{x:0{w}b}` ({x}) | {RLM}`{y:0{w}b}` ({y}) | {RLM}{brute_rank(y)} |")
+        rows.append(f"| {RLM}`{x:0{w}b}` ({x}) | {RLM}`{y:0{w}b}` ({y}) |")
     return "\n".join(rows)
 
 
@@ -92,25 +106,34 @@ def prev_rows(x, w):
     return [("x", x, set()), ("~x", ~x & mask, set()), ("next(~x)", y, set()), ("~next(~x)", ~y & mask, set())]
 
 
-def rank_table(x):
-    rows = ["| ‏i (האחד ה-i מלמטה) | המקום שלו \\( p_i \\) | ‏\\( \\binom{p_i}{i} \\) |", "|:-:|:-:|:-:|"]
-    total, i = 0, 0
-    for p in range(x.bit_length()):
-        if (x >> p) & 1:
-            i += 1
-            total += comb(p, i)
-            rows.append(f"| {RLM}{i} | {RLM}{p} | {RLM}{comb(p, i)} |")
-    rows.append(f"| **סך הכול** | | **{RLM}{total}** |")
+def zeros_table(z, lengths):
+    """The numbers with z zeros, by length: within a length they are the numbers with as
+    many ones, and the next length starts with 1 0..0 1..1."""
+    rows = ["| האורך | המספרים עם שלושה אפסים, לפי הסדר |", "|:-:|:-:|"]
+    for L in lengths:
+        xs = [y for y in range(1 << (L - 1), 1 << L) if zeros(y) == z]
+        rows.append(f"| {RLM}{L} | " + ", ".join(f"{RLM}`{y:b}` ({y})" for y in xs) + " |")
     return "\n".join(rows)
+
+
+def next0_rows(x):
+    """The rows of the next number with as many zeros when the length runs out."""
+    L, z = x.bit_length(), zeros(x)
+    rows, nxt = gosper(x, L)
+    if nxt:
+        return rows + [], nxt
+    y = (1 << L) + (1 << (L - z)) - 1
+    return rows + [("1 0…0 1…1", y, {L} | set(range(L - z)))], y
 
 
 def blocks():
     """The generated blocks, in page order."""
     rows, _ = gosper(X_A, W_A)
     return [bits_table(rows, W_A, "השלבים של הנוסחה על 92 ב-8 ביטים"), legend(), complement_table(W_C, K_C),
-            bits_table(prev_rows(X_B, W_A), W_A, "הקודם של 99 דרך המשלים"), rank_table(X_A)]
+            bits_table(prev_rows(X_B, W_A), W_A, "הקודם של 99 דרך המשלים"), zeros_table(3, [4, 5, 6]),
+            bits_table(next0_rows(X_C)[0], X_C.bit_length() + 1, "הבא אחרי 120 עם שלושה אפסים")]
 
 
 if __name__ == "__main__":
-    print(brute_next(X_A, W_A), brute_prev(X_B, W_A), brute_rank(X_A), brute_prev(96, 8), comb(8, 4))
+    print(brute_next(X_A, W_A), brute_prev(X_B, W_A), brute_prev(96, 8), brute_next0(X_C), brute_prev0(143))
     print("\n\n".join(blocks()))

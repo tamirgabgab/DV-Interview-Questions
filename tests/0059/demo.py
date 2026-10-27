@@ -3,7 +3,7 @@ from solution import *  # noqa: F401,F403
 
 x = 92
 print(f"{x:08b} -> next {next_same(x, 8):08b} ({next_same(x, 8)}), prev {prev_same(x, 8):08b} ({prev_same(x, 8)})")
-print("smaller with four ones:", rank_same(x), "| the 25th of them:", unrank_same(24, 4))
+print("three zeros after 120:", next_zeros(120), f"= {next_zeros(120):b}", "| before 143:", prev_zeros(143))
 y, out = 0b111, []
 while y and y < 1 << 5:                  # every 3 of 5, in order
     out.append(f"{y:05b}")
