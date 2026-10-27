@@ -9,4 +9,4 @@ for a, c, w, T in ((0.5, 150, 450, 30), (0.5, 150, 250, 30), (1, 100, 1000, 0)):
 for s, back, start, end, depots in camel_passes(0.5, 150, 450, 30):
     print(f"segment {s + 1} {'back' if back else 'out '}: {start:5.0f} -> {end:5.0f} litres, depots {[round(v) for v in depots]}")
 
-print("burned, delivered:", camel_check(0.5, 150, 450, 30))
+print("burned, delivered:", camel_check(0.5, 150, 450, 30))  # (420.0, 30.0)

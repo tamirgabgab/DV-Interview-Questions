@@ -190,8 +190,12 @@ Conventions:
   code is importable as the module `solution` (`from solution import *`) and its names are
   also in scope. A comment on a `print()` line is its expected value
   (`print(trap([3, 0, 2, 0, 4]))  # 7`; a note may follow after two spaces and a
-  parenthesis, or after a colon and words): after a run the panel puts a ✓ or ✗ beside
-  that line and lists the mismatches, so do not put other remarks on a `print()` line.
+  parenthesis, or after a colon and words). A print with a label ending in ":" or "="
+  may give the value alone (`print("long only:", f(prices))  # (6, 2, 3)`). After a run
+  the panel puts a ✓ or ✗ beside that line and lists the mismatches, so do not put other
+  remarks on a `print()` line. Only a print that runs once is checked (not one in a
+  loop); every such print of a result, one short line that is the same on every run,
+  carries its value (S411), an echo of the input does not.
   `docs/javascripts/py_run.py` does the running and the check, in the browser and in
   `tests/tools/test_run_panel.py`, which runs every demo against its page and fails on an
   error or a comment that does not match. Opening a panel by hand starts downloading

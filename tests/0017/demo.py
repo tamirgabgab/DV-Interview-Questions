@@ -9,4 +9,4 @@ x, path = 0, [0]
 for _ in range(10):
     x = nums[x]
     path.append(x)
-print("walk from 0:", " -> ".join(map(str, path)))
+print("walk from 0:", " -> ".join(map(str, path)))  # 0 -> 3 -> 6 -> 1 -> 9 -> 4 -> 7 -> 1 -> 9 -> 4 -> 7

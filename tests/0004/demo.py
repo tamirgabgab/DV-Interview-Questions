@@ -13,6 +13,6 @@ def draw(i):
 
 
 print("labels:           ", labels)
-print("fix_labels_simple:", fix_labels_simple(list(labels)))
-print("fix_labels:       ", fix_labels(list(labels)))
+print("fix_labels_simple:", fix_labels_simple(list(labels)))  # ['BLACK', 'MIXED', 'RED']
+print("fix_labels:       ", fix_labels(list(labels)))  # ['BLACK', 'MIXED', 'RED']
 print("real content:     ", content)
