@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-10-25 (session 26)_
+_Last updated: 2026-10-27 (session 27)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -853,6 +853,18 @@ section below starts at session 22, whose numbered items run on through the late
     the counts with the colon rule. 0012, 0013, 0039, 0041: four display formulas split
     with `aligned` (the phone check warned about them). 0026 needed nothing: V1 had moved
     the A and B labels beside the road.
+59. **Session 27, 2026-10-27: a visual review and the fifth series W1 to W5.** The owner
+    asked for UI / UX proposals that make the site look more professional (effects,
+    typography, colour, spacing) and sent a list of ideas from a generic interview-prep
+    site. Screenshots of the home page, a level catalog, 0046 (statement, an open
+    solution, the box, the run panel with a mocked output, since Pyodide's CDN is blocked
+    in the sandbox) at 1280 and 390 px, light and dark. The owner's list was checked
+    against what exists and against the audience (working students preparing for a DV /
+    electrical engineering interview); what fits became rounds W1 to W5 under **Fifth
+    series**, with the items that do not fit and why. Found on the way: the line-length cap
+    of UI321 (`max-width: 75ch` on `p`) also caps `p.admonition-title`, so the title bar of
+    every non-folding admonition ends half way on a wide screen (the home tip box; 48
+    built pages have such a title). Nothing in the site was changed in this session.
 
 
 ## In progress
@@ -879,7 +891,10 @@ section below starts at session 22, whose numbered items run on through the late
   and the 0023 request figure on a phone.
 - **Waiting on the owner:** the giscus ids (README, Comments) in `extra.comments` of
   `mkdocs.yml`; a look at the social card of a shared link; keep or replace 0001.
-- **Next, the owner picks:** the rest of the second series A to E, the new questions of
+- **Session 27:** a visual review; the fifth series W1 to W5 (look, motion, the run
+  panel, practice tools) waits for the owner's picks and answers (questions listed
+  under the series).
+- **Next, the owner picks:** the fifth series W1 to W5, the rest of the second series A to E, the new questions of
   M to R and Z, the deferred G222, H223, H224 and E35, the three coding proposals of
   session 24 (meeting rooms, topological sort, single number II), the topic gaps under
   **Question variety**, or questions the owner sends.
@@ -896,6 +911,7 @@ section below starts at session 22, whose numbered items run on through the late
 
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
+- [ ] Pick rounds from the fifth series W1 to W5 (session 27) and answer its open questions.
 - [ ] Pick the next topic gaps to fill from **Question variety** below.
 - [ ] Pick the next rounds from **Proposals and rounds**: the open rows of the first series (E, F, I, L, N, O, the rest of Q, S), the rest of the second series A to E, the deferred G222, H223, H224, and the new questions of M to R and Z. Done: U to X (in the archive), I to L, the third series UI1 to UI5.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
@@ -1767,6 +1783,119 @@ fields and dark mode not covered in this pass)
 | V5 (done, item 55) | **Content and consistency**: 0033 to 0038 in the common layout with more hints and traps; 0035 schematic and odd N; one follow-up pattern (a collapsible short answer); code tabs for 0016 (the owner did not pick the 0015 simulation or the 0001 Python model) | M–L |
 | V6 | **Practice loop and glossary**: a "my progress" page, a self-rating after a solution, export / import of the progress; a glossary page with a tooltip on a term's first use | M |
 | V7 (done, item 55) | **Robustness**: `timeout-minutes` on the CI jobs, a service worker for offline reading, the header tabs without the fade | S–M |
+
+### Fifth series, rounds W1 to W5 — a professional look (session 27, 2026-10-27, owner picks)
+
+The owner asked for proposals that make the site look more professional, with tasteful
+effects, and sent a list of ideas (an interview simulator, flip cards, a STAR answer
+builder, a preparation path and countdown, a confidence meter, a breathing exercise,
+micro-celebrations, company research, "what to wear", an interview-day checklist; Hebrew
+typography, one deep-blue primary and one accent, an off-white background, an 8 / 16 / 24
+/ 32 / 48 spacing scale, soft shadows, one icon set; a hero, "how it works", testimonials
+and an FAQ on the home page; ten effects: fade-in on scroll, card hover, a moving gradient,
+glassmorphism, counters, rotating text, parallax, micro-interactions, skeleton loading,
+Lottie; rule of thumb: three or four subtle effects, 200 to 400 ms). The audience is
+working students preparing for a technical DV / electrical engineering interview, so the
+list was adapted to technical questions.
+
+**What the site has today** (screenshots at 1280 and 390 px, light and dark; 0046 as
+the sample question page):
+
+- Already in line with the owner's list: Rubik for Hebrew, body text 16 px with a line
+  height of 1.7, a deep navy primary with one amber accent, a hero with two buttons, a
+  search field and stats, icons per kind, a celebration on "solved" (confetti at the end
+  of a level), motion in the boxes, everything off under `prefers-reduced-motion`.
+- **Bug:** `max-width: 75ch` on `p` (UI321) also hits `p.admonition-title`: the title bar of
+  a non-folding admonition stops half way on a wide screen (the home "איך מתאמנים באתר"
+  box; 48 built pages have such a title).
+- **Home page:** 7,456 px tall at 1280 px, because the whole 47-row catalog is on it; the
+  table-of-contents column takes a quarter of the width beside the hero; the hero does
+  not say who the site is for; the "how to practise" tip is six dense bullets; twelve path
+  cards of unequal height whose titles wrap to two or three lines, ids in monospace, and
+  "פתרת 0 מתוך 5" with an empty bar on every card for a new visitor; hover on the level
+  cards changes only the border and the shadow, the path cards and the rows have none.
+- **Surfaces:** the page is pure white, the cards are outlined (no shadow), the footer is
+  Material's near-black (`rgba(0,0,0,.87)`) rather than the brand navy; radius and
+  spacing values differ between cards, boxes, chips and admonitions.
+- **Question page:** on a phone the header is three rows of chips plus an unlabeled icon
+  row; the "edit on GitHub" icon stands alone at the far left; five red trap blocks in a
+  row at the end of 0046 (the owner wants calm colours, no red stress); while scrolling,
+  three sticky layers (the site header, the part bar, the solution map) plus the floating
+  "חזרה למעלה" cover about 150 px of text; hints, solutions and traps open with a jump.
+- **Run panel:** a plain `textarea` (no highlighting, no line numbers), a status in small
+  grey text ("טוען Python לדפדפן…" for the several seconds of the first load), the output
+  as a grey block with no success / failure look, and the panel only at the bottom of the
+  page; the starter code already writes the expected value of every `print` in a comment.
+
+Item numbers continue the global count (333 on).
+
+**Round W1 — foundations and quick fixes**
+
+| Id | Idea | Size |
+|---|---|---|
+| W333 | **Admonition title bug**: exclude `.admonition-title` from the 75ch cap | S |
+| W334 | **Home without the TOC column** (`hide: toc` on `index.md`): the hero and the cards use the full width | S |
+| W335 | **Design tokens** in `extra.css`: spacing 4 / 8 / 16 / 24 / 32 / 48 px, radius (6 / 10 / 16), shadows (1 to 3, soft, tinted with the navy), motion (200 / 300 ms, one easing); cards, boxes, chips and admonitions moved to them | S–M |
+| W336 | **Surfaces**: an off-white light page (about `#f7f8fb`) with white cards lifted by shadow 1 instead of a border, the footer in the brand navy; new pairs into `PAIRS` of `check_contrast.py` | S–M |
+| W337 | **Calmer traps**: a warm amber-orange instead of red, and all the traps of a page in one group "מלכודות נפוצות (5)" with a numbered list inside | S–M |
+| W338 | **Edit icon** out of the question header (to the footer, or off for readers: `content.action.edit`) | S |
+
+**Round W2 — the home page**
+
+| Id | Idea | Size |
+|---|---|---|
+| W339 | **Hero with a signature**: one line for the audience ("לסטודנטים ולמהנדסים בתחילת הדרך שמתכוננים לראיון DV"), a rotating word "להתכונן לראיון ב-FIFO / CDC / SVA / הסתברות" (static under reduced motion), the waveform background drawn once as a travelling signal (`stroke-dashoffset`), the real stats counting up once on first view | M |
+| W340 | **"איך זה עובד" in three steps** with icons (בוחרים שאלה → פותרים עם רמזים → בודקים ומריצים) instead of the tip box; its details move to the FAQ | S–M |
+| W341 | **A shorter home page**: the catalog on its own page ("כל השאלות", the filters kept), the home keeps the recent list and a link; or the first ten rows and "להציג את כל 47" | S–M |
+| W342 | **Path cards**: six featured and "כל המסלולים"; equal heights and one-line titles (shorter names); for a new visitor "5 שאלות · כשעתיים" instead of "פתרת 0 מתוך 5", the progress ring after the first solve | S–M |
+| W343 | **FAQ** (folding): what DV is, what a DV interview looks like, which level fits me, how to practise here, does it work offline. No testimonials or "hired" counters until real ones exist | S |
+
+**Round W3 — motion and micro-interactions** (each 200 to 300 ms, once, off under
+`prefers-reduced-motion`, never inside a box: `check_jumps.py` must stay clean)
+
+| Id | Idea | Size |
+|---|---|---|
+| W344 | **Fade and rise on scroll** for the home sections and cards (`IntersectionObserver`, a 40 ms stagger, content visible without JS) | S |
+| W345 | **Card hover and press**: level, path, recent and related cards rise 2 px with shadow 2; buttons press to 0.98; the arrow of "להתחיל לתרגל" nudges | S |
+| W346 | **Smooth opening** of hints, solutions, traps and follow-ups (`::details-content` with `interpolate-size`; browsers without it open at once) | S–M |
+| W347 | **One sticky row**: the part bar and the solution map merged, translucent with `backdrop-filter: blur` (the one glass element), "חזרה למעלה" moved off the text column | M |
+| W348 | **The check mark draws itself** when a question is marked solved; a small celebration when a path is completed | S |
+
+**Round W4 — the run panel**
+
+| Id | Idea | Size |
+|---|---|---|
+| W349 | **A real editor**: CodeMirror 6 loaded on the first open (syntax colours from the site's tokens, line numbers, Ctrl+Enter runs), the `textarea` as the fallback | M |
+| W350 | **Loading you can see**: Pyodide fetched when the panel opens, a progress line with stages (מוריד Python, פעם אחת → טוען את הפתרון → מריץ) instead of a grey sentence, the status as a coloured chip (running, done ✓ with the time, error) | S–M |
+| W351 | **Terminal-style output**: a dark panel, a copy button, an error's line number jumps to that line in the editor | S–M |
+| W352 | **Expected output checked**: the starter code's `# (9, (0, 2), (2, 4))` comments are compared with each printed line, ✓ or ✗ beside it (a check-yourself step for free) | M |
+| W353 | **Run from the code**: a "להרצה" button on the Python tab of a solution's code block opens the panel with that code and scrolls to it | S–M |
+
+**Round W5 — practice tools from the owner's list, for technical interviews**
+
+| Id | Idea | Size |
+|---|---|---|
+| W354 | **Interview simulation**: a level and a length (30 / 45 / 60 minutes), two or three unsolved random questions, a timer ring, solutions locked until the end, a self-rating per question and a summary; optionally the spoken explanation recorded with the microphone (`MediaRecorder`, kept in the browser, played back, never uploaded) | M–L |
+| W355 | **Countdown to the interview**: the date and the level give a day-by-day plan from the paths, with a progress ring and "today: 2 questions" on the home page (localStorage) | M |
+| W356 | **Confidence meter**: a 1 to 5 rating before and after a question, the trend on a "ההתקדמות שלי" page (joins V6's self-rating and export / import) | M |
+| W357 | **Flip cards for review**: the statement on the front, the short answer and "מה המראיין בודק" on the back, a deck per path, solved questions coming back after a few days (V6's review loop) | M |
+| W358 | **How to answer a technical question** (in place of STAR): clarify, a small example, the approach, the cost, edge cases, how to test it; a card in practice mode with boxes to tick while answering | S |
+| W359 | **Interview day page**: a checklist (your own projects from the CV, questions to ask, whiteboard tips, a camera and microphone check for an online interview), a company research template, and the one-minute breathing circle as an optional widget there | S–M |
+
+**Not proposed, and why:** a "what to wear" gallery and stock photos (off-topic and the
+site is illustration-only); parallax (little value on a long reading page, motion
+sickness on phones); Lottie (a large dependency for icons the site already draws in CSS);
+testimonials and "1,200 hired" counters (no real data); a video-call screen for the
+simulator (the voice recording gives the practice without the gimmick); STAR (behavioural
+answers; only if the owner wants a behavioural section, see the topic gap "Behavioral").
+
+**Questions for the owner:** (1) a behavioural section with STAR, or technical only;
+(2) the simulator with voice recording, video, or neither; (3) the catalog on its own page
+or ten rows on the home page; (4) traps in amber, or keep red; (5) the off-white
+background; (6) CodeMirror (about 150 KB from jsdelivr on the first open of a run panel).
+
+Suggested order: W1 (a bug and the base every later item uses), then W2 with W344 and
+W345, then W4, then W3's rest, then W5.
 
 ## Improvement ideas
 
