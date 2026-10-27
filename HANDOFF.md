@@ -916,8 +916,8 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## In progress
 
-- **State (2026-10-26, session 26):** `main` is 5f94144 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7), deployed.
-  47 questions (0022 was
+- **State (2026-10-27, session 27):** `main` is e2f6311 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0052 with 0052 generalized), deployed.
+  51 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
