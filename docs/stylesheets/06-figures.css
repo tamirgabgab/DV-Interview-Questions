@@ -1,0 +1,329 @@
+/* The site's styles, part 6 of 12: the figures of 0018 to 0048 (hourglass, PCIe, credits, cake, clock, box nets, farm).
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* Hourglass figures (questions 0018, 0019), drawn by tools/figures/hourglass.py */
+.md-typeset svg .sand-a { fill: var(--viz-s1); }
+.md-typeset svg .sand-b { fill: var(--viz-s2); }
+.md-typeset svg .stream-a { stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: 2 2; }
+.md-typeset svg .stream-b { stroke: var(--viz-s2); stroke-width: 2; stroke-dasharray: 2 2; }
+.md-typeset svg .sand-c { fill: var(--viz-s3); }
+.md-typeset svg .stream-c { stroke: var(--viz-s3); stroke-width: 2; stroke-dasharray: 2 2; }
+.md-typeset svg .glass { fill: none; stroke: var(--viz-ink); stroke-width: 1.5; stroke-linejoin: round; }
+.md-typeset svg .frame { stroke: var(--viz-ink); stroke-width: 3; stroke-linecap: round; }
+.md-typeset svg .ink-fill { fill: var(--viz-ink); }
+.md-typeset svg .measure { fill: var(--viz-s3); fill-opacity: 0.12; stroke: var(--viz-s3); stroke-width: 1.5; }
+.md-typeset svg .pruned { opacity: 0.4; }
+.md-typeset svg.hourglass-fig .tick { font-size: 12px; }
+.md-typeset .viz-legend .s3 { background: var(--viz-s3); }
+/* Material gives figures width: fit-content, so a frame with a short caption shrank its SVG */
+.md-typeset .stepper-frame { width: auto; }
+
+/* PCIe completion splits (question 0020), drawn by tools/figures/q0020.py */
+.md-typeset svg .cs-rcb { stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.md-typeset svg .cs-req { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .cs-first { fill: var(--viz-s1); fill-opacity: 0.28; stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg .cs-one { fill: var(--viz-s1); fill-opacity: 0.28; stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg .cs-mid { fill: var(--viz-grid); fill-opacity: 0.7; stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .cs-last { fill: var(--viz-s3); fill-opacity: 0.3; stroke: var(--viz-s3); stroke-width: 1.5; }
+.md-typeset svg .cs-bad { fill: var(--viz-s2); fill-opacity: 0.4; stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg .cs-can { fill: var(--viz-s3); stroke: var(--md-default-bg-color); stroke-width: 1.5; }
+.md-typeset svg .cs-no { fill: var(--viz-s2); font-size: 13px; font-weight: 700; font-family: var(--md-text-font-family); }
+.md-typeset svg .cs-size { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .cs-rcb { background: transparent; border-top: 2px dashed var(--viz-text); height: 0; }
+.md-typeset .viz-legend .cs-req { background: var(--viz-ink); width: 0.2rem; }
+.md-typeset svg .cs-bad { fill: var(--diff-hard); fill-opacity: 0.3; stroke: var(--diff-hard); stroke-width: 2; }
+.md-typeset svg .cs-pick { cursor: pointer; }
+.md-typeset svg .cs-pick .cs-can { fill: var(--md-default-bg-color); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .cs-pick.is-cut .cs-can { fill: var(--viz-s3); }
+.md-typeset svg .cs-pick-line { stroke: transparent; stroke-width: 1.5; }
+.md-typeset svg .cs-pick.is-cut .cs-pick-line { stroke: var(--viz-s3); stroke-dasharray: 4 3; }
+.md-typeset svg .cs-pick:focus-visible .cs-can { outline: none; stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset .viz-legend .cs-can { background: var(--viz-s3); border-radius: 50%; }
+.md-typeset .viz-legend .cs-first { background: var(--viz-s1); opacity: 0.5; }
+.md-typeset .viz-legend .cs-mid { background: var(--viz-grid); outline: 1px solid var(--viz-text); }
+.md-typeset .viz-legend .cs-last { background: var(--viz-s3); opacity: 0.55; }
+.md-typeset .viz-legend .cs-bad { background: var(--viz-s2); opacity: 0.6; }
+
+/* 0023: memory blocks of the endpoint reference model, and the queues of the stepper */
+.md-typeset svg .cs-blk { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .cs-new { fill: var(--viz-s1); fill-opacity: 0.3; stroke: var(--viz-s1); stroke-width: 1; }
+.md-typeset svg .cs-keep { fill: var(--viz-grid); fill-opacity: 0.7; }
+.md-typeset .viz-legend .cs-blk { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-ink); }
+.md-typeset .viz-legend .cs-new { background: var(--viz-s1); opacity: 0.5; }
+.md-typeset .viz-legend .cs-keep { background: var(--viz-grid); }
+.md-typeset .viz-legend .cs-one { background: var(--viz-s1); opacity: 0.5; }
+.md-typeset .viz-legend .st-done { background: var(--viz-grid); opacity: 0.7; }
+
+/* 0024: USB4 credit counters on the modulo-256 circle, and the two adapters of the stepper */
+.md-typeset svg .fc-ring { fill: none; stroke: var(--viz-grid); stroke-width: 2; }
+.md-typeset svg .fc-tick { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg .fc-window { fill: none; stroke: var(--viz-s1); stroke-opacity: 0.2; stroke-width: 14; }
+.md-typeset svg .fc-ahead { fill: none; stroke: var(--viz-s3); stroke-width: 6; stroke-linecap: round; }
+.md-typeset svg .fc-pkt { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .fc-grant { stroke: var(--viz-s3); stroke-width: 2.5; }
+.md-typeset svg .fc-sync { stroke: var(--viz-ink); stroke-width: 2.5; stroke-dasharray: 7 4; }
+.md-typeset svg .fc-drop { stroke: var(--viz-s2); stroke-width: 2.5; stroke-dasharray: 3 4; }
+.md-typeset svg .fc-slot { fill: var(--md-default-bg-color); stroke: var(--viz-text); stroke-width: 1.2; }
+.md-typeset svg .fc-full { fill: var(--viz-s1); fill-opacity: 0.45; stroke: var(--viz-s1); stroke-width: 1.2; }
+.md-typeset .viz-legend .fc-window { background: var(--viz-s1); opacity: 0.3; }
+.md-typeset .viz-legend .fc-ahead { background: var(--viz-s3); }
+.md-typeset .viz-legend .fc-pkt { background: var(--viz-s1); height: 0.2rem; }
+.md-typeset .viz-legend .fc-grant { background: var(--viz-s3); height: 0.2rem; }
+.md-typeset .viz-legend .fc-sync { background: transparent; border-top: 2px dashed var(--viz-ink); height: 0; }
+.md-typeset .viz-legend .fc-drop { background: transparent; border-top: 2px dotted var(--viz-s2); height: 0; }
+.md-typeset .viz-legend .fc-slot { background: var(--md-default-bg-color); outline: 1.2px solid var(--viz-text); }
+.md-typeset .viz-legend .fc-full { background: var(--viz-s1); opacity: 0.6; }
+.md-typeset .viz-legend .st-cur { background: var(--viz-s2); opacity: 0.45; }
+
+/* 0025: the Ack/Nak stepper reuses the fc-* arrows and adds a Nak and a replayed TLP */
+.md-typeset svg .fc-nak { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .fc-replay { stroke: var(--viz-s1); stroke-width: 2.5; stroke-dasharray: 7 4; }
+.md-typeset .viz-legend .fc-nak { background: var(--viz-s2); height: 0.2rem; }
+.md-typeset .viz-legend .fc-replay { background: transparent; border-top: 2px dashed var(--viz-s1); height: 0; }
+
+/* 0027, 0028: the cake split (rows per person, one strip); the interactive explorers (explorer/) */
+.md-typeset svg .cake-slice { fill: var(--viz-s1); fill-opacity: 0.85; }
+.md-typeset svg .cake-slice2 { fill: var(--viz-s3); fill-opacity: 0.85; }
+.md-typeset svg .cake-peak { fill: var(--viz-s2); }
+.md-typeset svg .cake-rest { fill: var(--viz-grid); }
+.md-typeset svg .cake-tiny { fill: var(--viz-text); fill-opacity: 0.35; }
+.md-typeset svg .cake-gone { fill: none; stroke: var(--viz-text); stroke-opacity: 0.45; stroke-width: 1; stroke-dasharray: 4 3; }
+.md-typeset svg .cake-edge { fill: none; stroke: var(--viz-ink); stroke-width: 1.2; }
+.md-typeset .viz-legend .cake-slice { background: var(--viz-s1); opacity: 0.85; margin-inline-end: 0.1rem; }
+.md-typeset .viz-legend .cake-slice2 { background: var(--viz-s3); opacity: 0.85; }
+.md-typeset .viz-legend .cake-peak { background: var(--viz-s2); }
+.md-typeset .viz-legend .cake-rest { background: var(--viz-grid); outline: 1px solid var(--viz-text); }
+.md-typeset .viz-legend .cake-gone { background: transparent; outline: 1px dashed var(--viz-text); outline-offset: -1px; }
+.md-typeset .explorer .ex-controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; align-items: center; }
+.md-typeset .explorer label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.5rem; }
+.md-typeset .explorer :is(label, button, .ex-controls)[hidden] { display: none; }   /* the layout gives buttons a display; "the next direction" of 0046 hides */
+.md-typeset .explorer input[type="range"] { width: 11rem; max-width: 100%; accent-color: var(--viz-s1); }
+.md-typeset .explorer output {
+  min-width: 3.2rem;
+  font-family: var(--md-code-font-family);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.md-typeset .explorer .ex-reset { padding: 0.2rem 0.7rem; font-size: 0.65rem; }
+.md-typeset .explorer .ex-summary { font-weight: 600; }
+/* Steady heights: the text under the controls changes at every step, and a line more moved
+   the figure under it. These lines reserve two lines from the start; core.js then keeps
+   every text paragraph of a box at the tallest height it has shown (see steady()). */
+.md-typeset .explorer :is(.ex-summary, .hg-caption, .bridge-caption) { min-height: 3.2em; min-height: 2lh; }
+.md-typeset .explorer .ex-title { margin: 0.6em 0 0; font-size: 0.7rem; color: var(--viz-text); }
+/* the proof panel inside a box: the step of the page's proof, driven by the same controls */
+.md-typeset .explorer .ex-proof { margin-top: 0.9rem; padding-top: 0.5rem; border-top: 1px dashed var(--viz-grid); }
+.md-typeset .explorer .ex-proof[hidden] { display: none; }
+.md-typeset .explorer .ex-proof-title { margin: 0 0 0.4em; font-size: 0.75rem; font-weight: 700; }
+.md-typeset .explorer .ex-proof .ex-nowrap { white-space: nowrap; }
+/* Folds (core.js folds): a proof panel or a group of controls under its title, which is a
+   button; closed on a phone, open on a wider screen. Folded, only the title shows. */
+.md-typeset .explorer .ex-fold { margin-top: 0.5rem; }
+.md-typeset .explorer .ex-fold-title { margin: 0 0 0.2rem; font-size: 0.75rem; font-weight: 700; }
+.md-typeset .explorer .ex-fold-btn { display: inline-flex; align-items: center; gap: 0.45em; min-height: 1.6rem; padding: 0; border: none; background: none; color: var(--viz-ink); font: inherit; text-align: start; cursor: pointer; }
+.md-typeset .explorer .ex-fold-btn::before { content: ""; flex: none; width: 0.42em; height: 0.42em; margin: 0 0.15em; border: solid currentColor; border-width: 0 0.13em 0.13em 0; transform: translateY(-0.1em) rotate(45deg); }
+.md-typeset .explorer .is-folded > .ex-proof-title .ex-fold-btn::before,
+.md-typeset .explorer .is-folded > .ex-fold-title .ex-fold-btn::before { transform: rotate(135deg); }
+.md-typeset .explorer .ex-fold-btn:hover { color: var(--md-accent-fg-color); }
+.md-typeset .explorer .is-folded > :not(.ex-proof-title):not(.ex-fold-title) { display: none !important; }
+.md-typeset .explorer .is-folded > .ex-proof-title, .md-typeset .explorer .is-folded > .ex-fold-title { margin-bottom: 0; }
+.md-typeset svg .jos-new { fill: var(--viz-s3-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg .jos-new.is-win { font-weight: 700; font-size: 13px; }
+.md-typeset .explorer .bx-cut-row { display: flex; flex-wrap: wrap; gap: 0.25rem; direction: ltr; margin: 0.3rem 0; }
+.md-typeset .explorer .bx-cut-cell { min-width: 2rem; padding: 0.15rem 0.3rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font: inherit; font-family: var(--md-code-font-family); font-size: 0.75rem; text-align: center; cursor: pointer; }
+.md-typeset .explorer .bx-cut-cell.is-first { border-color: var(--viz-ink); font-weight: 700; cursor: default; }
+.md-typeset .explorer .bx-cut-cell.is-a { border-color: var(--viz-s1); }
+.md-typeset .explorer .bx-cut-cell.is-b { border-color: var(--viz-s3); }
+.md-typeset .explorer .bx-cut-cell.is-cut { background: var(--viz-s2); color: var(--md-default-bg-color); border-color: var(--viz-s2); font-weight: 700; }
+
+/* Box nets (0030): faces of the unfolded box, the path, and the embedded tool */
+.md-typeset svg .box-face { fill: var(--viz-s1); fill-opacity: 0.14; stroke: var(--viz-ink); stroke-width: 1.2; }
+.md-typeset svg .box-end { fill: var(--viz-s2); fill-opacity: 0.18; stroke: var(--viz-ink); stroke-width: 1.2; }
+.md-typeset svg .box-copy { fill: var(--viz-grid); fill-opacity: 0.35; stroke: var(--viz-text); stroke-width: 1; stroke-dasharray: 4 3; }
+.md-typeset svg .box-edge { stroke: var(--viz-ink); stroke-width: 1.6; }
+.md-typeset svg .box-path { stroke: var(--viz-s2); stroke-linecap: round; }
+.md-typeset .viz-legend .box-face { background: var(--viz-s1); opacity: 0.35; outline: 1px solid var(--viz-ink); }
+.md-typeset .viz-legend .box-end { background: var(--viz-s2); opacity: 0.4; outline: 1px solid var(--viz-ink); }
+.md-typeset .viz-legend .box-copy { background: var(--viz-grid); outline: 1px dashed var(--viz-text); outline-offset: -1px; }
+.md-typeset .viz-legend .box-path { background: var(--viz-s2); height: 0.2rem; border-radius: 0.1rem; }
+.md-typeset iframe.tool-frame {
+  display: block;
+  width: 100%;
+  height: 48rem;
+  border: 1px solid var(--viz-grid);
+  border-radius: 0.4rem;
+  background: var(--md-default-bg-color);
+}
+@media screen and (max-width: 44.9375em) {
+  .md-typeset iframe.tool-frame { height: 40rem; }
+}
+
+/* Clock (0029): the face in the figures and in the explorer; hands that meet turn orange */
+.md-typeset svg .clock-face { fill: none; stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .clock-tick { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg .clock-tick5 { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset .explorer .clock-box { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.4rem; margin-top: 0.6rem; }
+.md-typeset .explorer svg.clock-live { width: 15rem; max-width: 100%; touch-action: none; cursor: grab; user-select: none; }
+.md-typeset .explorer svg.clock-live.is-dragging { cursor: grabbing; }
+.md-typeset .explorer svg .hand.is-meet { stroke: var(--viz-s2); }
+.md-typeset .explorer .clock-panel { flex: 1 1 14rem; min-width: 0; }
+.md-typeset .explorer .clock-panel p { margin: 0.3em 0; }
+.md-typeset .explorer .clock-time {
+  font-family: var(--md-code-font-family);
+  font-size: 1.4rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.md-typeset .explorer .clock-total { font-weight: 700; font-size: 0.95rem; }
+.md-typeset .explorer .clock-counts { margin: 0.2em 0; padding-inline-start: 1.1rem; }
+.md-typeset .explorer .clock-counts li { margin: 0.1em 0; }
+.md-typeset .explorer .clock-counts li.is-meet { color: var(--viz-s2-text); font-weight: 700; }
+.md-typeset .explorer input.ex-time,
+.md-typeset .explorer select {
+  font: inherit;
+  font-family: var(--md-code-font-family);
+  color: inherit;
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--viz-grid);
+  border-radius: 0.2rem;
+  padding: 0.1rem 0.3rem;
+}
+.md-typeset .explorer select { font-family: inherit; }
+.md-typeset .explorer .clock-day { display: flex; margin-top: 0.4rem; }
+.md-typeset .explorer .clock-day input[type="range"] { flex: 1 1 auto; width: auto; }
+.md-typeset .explorer .ex-controls .md-button { padding: 0.2rem 0.7rem; font-size: 0.65rem; margin: 0; }
+.md-typeset .explorer .md-button:not(.md-button--primary),
+.md-typeset .py-runner .md-button:not(.md-button--primary) { color: var(--md-typeset-a-color); border-color: currentColor; }
+
+/* the bridge figure of 0031 */
+.md-typeset svg .bank { fill: var(--viz-s3); fill-opacity: 0.12; stroke: var(--viz-s3); stroke-width: 1; }
+.md-typeset svg .river { fill: var(--viz-s1); fill-opacity: 0.12; }
+.md-typeset svg .bridge { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .torch { fill: var(--viz-s2); }
+.md-typeset .viz-legend .st-cell { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-grid); }
+.md-typeset .viz-legend .st-stack { background: var(--viz-s1); opacity: 0.5; }
+.md-typeset .viz-legend .st-ok { background: var(--viz-s3); opacity: 0.6; }
+.md-typeset .viz-legend .torch { background: var(--viz-s2); clip-path: polygon(50% 0, 100% 60%, 50% 100%, 0 60%); }
+.md-typeset .explorer input.ex-times { font: inherit; font-family: var(--md-code-font-family); padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .ex-note { margin: 0.2em 0 0.4em; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .ex-note:empty { display: none; }
+.md-typeset .explorer .bridge-caption { margin: 0.2em 0 0.4em; font-size: 0.75rem; }
+.md-typeset .explorer .bridge-table { font-size: 0.7rem; margin: 0.2em 0 0.5em; }
+.md-typeset .explorer .bridge-table td, .md-typeset .explorer .bridge-table th { padding: 0.15em 0.6em; }
+.md-typeset .explorer .bridge-table tr[data-best] td:last-child { font-weight: 700; color: var(--viz-s2-text); }
+.md-typeset .explorer .bridge-table tr.is-now td { background: var(--md-code-bg-color); }
+.md-typeset .explorer .bridge-table td.is-take { font-weight: 700; color: var(--viz-s3-text); }
+
+/* the river figure and state graph of 0032 */
+.md-typeset svg .boat { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset .viz-legend .boat { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-ink); border-radius: 0.4rem; }
+.md-typeset svg .st-cur { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 3; }
+
+/* the hourglass explorer of 0018 / 0019 and the probability explorer of 0015 */
+.md-typeset .explorer svg.hg-live { width: 100%; max-width: 40rem; display: block; }
+.md-typeset .explorer .hg-frame svg.figure { margin: 0.3rem 0; }
+.md-typeset .explorer .hg-caption { margin: 0.2em 0 0; font-size: 0.75rem; }
+.md-typeset .explorer .hg-q-kids { max-width: 100%; overflow-x: auto; }
+.md-typeset .explorer table.hg-kids { font-size: 0.7rem; margin: 0.2em 0 0.4em; }
+.md-typeset .explorer table.hg-kids td:nth-child(2) { white-space: nowrap; }
+.md-typeset .explorer table.hg-kids td, .md-typeset .explorer table.hg-kids th { padding: 0.15em 0.6em; }
+.md-typeset .explorer table.hg-kids tr.is-new td:last-child, .md-typeset .explorer table.hg-kids tr.is-better td:last-child { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer table.hg-kids tr.is-past td, .md-typeset .explorer table.hg-kids tr.is-stuck td, .md-typeset .explorer table.hg-kids tr.is-seen td { color: var(--viz-text); }
+.md-typeset .explorer .hg-q-list { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.2rem 0 0.4rem; }
+.md-typeset .explorer .hg-chip { padding: 0.05rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.3rem; font-family: var(--md-code-font-family); font-size: 0.65rem; }
+.md-typeset .explorer svg.hg-tree { width: 100%; max-width: 40rem; display: block; }
+.md-typeset svg .hg-node circle { fill: var(--md-default-bg-color); stroke: var(--viz-s1); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.md-typeset svg .hg-node.is-done circle { fill: var(--viz-s1); fill-opacity: 0.25; stroke-dasharray: none; }
+.md-typeset svg .hg-node.is-now circle { fill: var(--viz-s2); fill-opacity: 0.35; stroke: var(--viz-s2); stroke-width: 3; stroke-dasharray: none; }
+.md-typeset svg .hg-node.is-path circle { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .hg-node text { fill: var(--viz-ink); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .hg-key-done { background: var(--viz-s1); opacity: 0.4; }
+.md-typeset .viz-legend .hg-key-now { background: var(--viz-s2); opacity: 0.55; }
+.md-typeset .viz-legend .hg-key-wait { background: transparent; outline: 1.5px dashed var(--viz-s1); outline-offset: -1px; }
+.md-typeset .explorer .prob-box { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; align-items: flex-start; }
+.md-typeset .explorer .prob-grid { flex: 0 1 21rem; max-width: 100%; }
+.md-typeset .explorer .prob-chart { flex: 1 1 18rem; min-width: 0; }
+.md-typeset .explorer svg.prob-live { width: 100%; display: block; }
+
+/* the clock timeline of 0029: a row per pair, a tick per meeting, a cursor */
+.md-typeset .explorer .clock-filter { margin-top: 0.4rem; font-size: 0.7rem; gap: 0.3rem 1rem; }
+.md-typeset .explorer .clock-filter label { gap: 0.3rem; }
+.md-typeset .explorer .clock-timeline { margin-top: 0.4rem; }
+.md-typeset .explorer .tl-row { display: flex; align-items: center; gap: 0.5rem; margin: 0.15rem 0; }
+.md-typeset .explorer .tl-row.is-off { opacity: 0.3; }
+.md-typeset .explorer .tl-name { flex: 0 0 9rem; font-size: 0.65rem; color: var(--viz-text); text-align: end; direction: rtl; }
+.md-typeset .explorer .tl-row svg { flex: 1 1 auto; height: 0.9rem; width: 100%; display: block; background: var(--md-code-bg-color); border-radius: 0.15rem; cursor: pointer; }
+.md-typeset .explorer .tl-row svg .tl-cursor { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset .explorer .tl-row svg .tl-window { fill: var(--viz-ink); fill-opacity: 0.12; stroke: var(--viz-ink); stroke-width: 1; }
+.md-typeset .explorer .clock-hour-title { margin: 0.6rem 0 0; }
+.md-typeset .explorer .tl-axis { display: flex; justify-content: space-between; margin-inline-start: 9.5rem; font-size: 0.6rem; color: var(--viz-text); font-family: var(--md-code-font-family); }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .tl-name { flex-basis: 6rem; }
+  .md-typeset .explorer .tl-axis { margin-inline-start: 6.5rem; }
+  .md-typeset .explorer .tl-axis .tl-mid { display: none; }
+}
+
+/* the cake explorer of 0027 / 0028: the cake and the growing table */
+.md-typeset .explorer .cake-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .cake-pie { flex: 0 1 13rem; }
+.md-typeset .explorer svg.cake-live { width: 100%; display: block; }
+.md-typeset .explorer .cake-panel { flex: 1 1 15rem; min-width: 0; }
+.md-typeset .explorer .cake-panel p { margin: 0.2em 0 0.4em; }
+.md-typeset .explorer .cake-scroll { max-height: 12.75rem; overflow-y: auto; position: relative; }   /* eight rows under the header */
+.md-typeset .explorer .cake-scroll thead th { position: sticky; top: 0; background: var(--md-default-bg-color); }
+.md-typeset .explorer .cake-table { font-size: 0.7rem; margin: 0; }
+.md-typeset .explorer input.ex-num { width: 5.2rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; margin-inline-start: 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .cake-table td, .md-typeset .explorer .cake-table th { padding: 0.15em 0.6em; }
+.md-typeset .explorer .cake-table tr.is-best td { font-weight: 700; color: var(--viz-s2-text); }
+.md-typeset .explorer .cake-table tr[data-now] td { background: var(--md-code-bg-color); }
+.md-typeset svg .cake-peak.is-now, .md-typeset svg .cake-slice.is-now, .md-typeset svg .cake-slice2.is-now { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset .explorer .ex-pos { font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .ex-controls label:has(input[type="checkbox"]) { gap: 0.3rem; }
+
+/* the Josephus explorer of 0016 / 0022: the circle and the order of leaving */
+.md-typeset svg .jos-seat-ring { fill: none; stroke: var(--viz-s3); stroke-width: 2.5; }
+.md-typeset .explorer .jos-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .jos-circle { flex: 0 1 19rem; }
+.md-typeset .explorer svg.jos-live { width: 100%; display: block; margin: 0; }
+.md-typeset .explorer .jos-panel { flex: 1 1 14rem; min-width: 0; }
+.md-typeset .explorer .jos-panel p { margin: 0.2em 0 0.5em; }
+.md-typeset .explorer .jos-chip { display: inline-block; min-width: 1.5em; padding: 0 0.3em; margin: 0.1em 0; text-align: center; font-family: var(--md-code-font-family); font-size: 0.65rem; border: 1px solid var(--viz-grid); border-radius: 0.3em; }
+.md-typeset .explorer .jos-chip.is-now { background: var(--viz-s2); color: var(--md-primary-bg-color); border-color: var(--viz-s2); font-weight: 700; }
+
+/* the motorcycle explorer of 0026: the play row, the road and the scrubber */
+.md-typeset .explorer .ex-play-row { margin-top: 0.5rem; }
+.md-typeset .explorer:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 3px; }
+.md-typeset .explorer .ex-seedlab { gap: 0.3rem; }
+.md-typeset .explorer input.ex-seed { width: 4.6rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .ex-keys { margin: 0.5rem 0 0; font-size: 0.6rem; color: var(--viz-text); }
+.md-typeset .explorer .ex-scrub { flex: 1 1 14rem; }
+.md-typeset .explorer .ex-scrub input[type="range"] { flex: 1 1 auto; width: auto; }
+.md-typeset .explorer svg.road-live { width: 100%; max-width: 40rem; display: block; margin-top: 0.4rem; }
+
+/* the strip explorer of 0030: two wall panels to drag S and F, and the live strip */
+.md-typeset .explorer .strip-walls { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .strip-wall { flex: 0 1 13rem; max-width: 100%; }
+.md-typeset .explorer .strip-wall p { margin: 0.2em 0; font-size: 0.7rem; }
+.md-typeset .explorer .strip-wall svg { width: 100%; display: block; touch-action: none; cursor: grab; user-select: none; }
+.md-typeset .explorer .strip-wall svg.is-dragging { cursor: grabbing; }
+.md-typeset .explorer bdi.ex-nw { white-space: nowrap; }   /* ltr() in core.js: a short LTR span never breaks */
+.md-typeset .explorer td bdi.ex-nw, .md-typeset .explorer th bdi.ex-nw { white-space: normal; }   /* a table cell may wrap, or the table outgrows a phone */
+.md-typeset svg .sch-bubble { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }   /* 0035: the falling-edge clock input */
+/* 0048 (farm): the four corners of the strip, and the farmer, the cow or the two stops,
+   dragged; the hit circles are wider than the dots for a finger */
+.md-typeset .explorer svg.farm-live { width: 100%; display: block; user-select: none; }
+.md-typeset .explorer svg.farm-live.is-dragging { cursor: grabbing; }
+.md-typeset svg .farm-corner { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 2; cursor: nwse-resize; touch-action: none; }
+.md-typeset svg .farm-hit { fill: transparent; cursor: grab; touch-action: none; }
+.md-typeset svg .farm-handle-pt { cursor: grab; touch-action: none; }
+.md-typeset .explorer .farm-fields input { width: 4.5rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .farm-table tr.farm-total td { font-weight: 700; }
+.md-typeset .explorer .strip-coords input[type="number"] { width: 4.2rem; font: inherit; padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer svg.strip-live { width: 100%; max-width: 40rem; display: block; }
+.md-typeset svg .strip-faint { stroke: var(--viz-text); stroke-opacity: 0.22; }
+.md-typeset svg .strip-valid { stroke: var(--viz-ink); stroke-opacity: 0.55; }
+.md-typeset .viz-legend .strip-faint { background: var(--viz-text); opacity: 0.3; height: 0.1rem; border-radius: 0; }
+.md-typeset .viz-legend .strip-valid { background: var(--viz-ink); opacity: 0.6; height: 0.12rem; border-radius: 0; }
+.md-typeset .explorer .strip-segments table { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer .strip-segments td, .md-typeset .explorer .strip-segments th { padding: 0.15em 0.6em; }

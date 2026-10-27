@@ -1,0 +1,108 @@
+/* The site's styles, part 1 of 12: the palette of both schemes, the design tokens, left-to-right code and math.
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* Site palette: navy + amber (theme palette is "custom", so every colour is defined here). */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #1b2a4a;
+  --md-primary-fg-color--light: #2d4370;
+  --md-primary-fg-color--dark: #121d33;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
+  --md-accent-fg-color: #d99a00;
+  --md-accent-fg-color--transparent: rgba(217, 154, 0, 0.12);
+  --md-accent-bg-color: #ffffff;
+  --md-accent-bg-color--light: rgba(255, 255, 255, 0.7);
+  --md-typeset-a-color: #1f4e9c;
+  --site-primary-soft: rgba(27, 42, 74, 0.09);
+  --site-card-border: rgba(27, 42, 74, 0.16);
+  --diff-easy: #176a42;   --diff-easy-bg: rgba(30, 125, 79, 0.12);
+  --diff-medium: #8a5300; --diff-medium-bg: rgba(217, 154, 0, 0.16);
+  --diff-hard: #a32a23;   --diff-hard-bg: rgba(180, 51, 44, 0.12);
+  --site-label-color: #8a5300;      /* the amber of the id label, dark enough on white (4.5:1) */
+  --site-mark-color: #b07d00;       /* amber marks on white (the star, the sort arrows): 3:1 */
+  --site-focus-ring: #1b2a4a;
+  /* W336: an off-white page under white surfaces (cards, boxes, admonitions, tables). */
+  --md-default-bg-color: #f7f8fb;
+  --md-code-bg-color: #eef1f6;
+  --md-admonition-bg-color: var(--site-surface);
+  --site-surface: #ffffff;
+  --site-card-edge: transparent;
+  --md-footer-bg-color: var(--md-primary-fg-color);     /* the brand navy, not near-black */
+  --md-footer-bg-color--dark: var(--md-primary-fg-color--dark);
+  --shadow-1: 0 1px 2px rgba(27, 42, 74, 0.06), 0 2px 8px rgba(27, 42, 74, 0.06);
+  --shadow-2: 0 2px 4px rgba(27, 42, 74, 0.08), 0 8px 20px rgba(27, 42, 74, 0.1);
+  --shadow-3: 0 4px 8px rgba(27, 42, 74, 0.1), 0 16px 36px rgba(27, 42, 74, 0.14);
+}
+
+/* The dark scheme (UI331): a softer navy and a blue-grey page rather than near-black. */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #2a3d66;
+  --md-primary-fg-color--light: #2d4370;
+  --md-primary-fg-color--dark: #121d33;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
+  --md-accent-fg-color: #ffc233;
+  --md-accent-fg-color--transparent: rgba(255, 194, 51, 0.12);
+  --md-accent-bg-color: #1b2a4a;
+  --md-accent-bg-color--light: rgba(27, 42, 74, 0.7);
+  --md-typeset-a-color: #8db3ff;
+  --md-default-bg-color: #171f2d;
+  --md-code-bg-color: #1b2231;
+  --site-primary-soft: rgba(141, 179, 255, 0.14);
+  --site-card-border: rgba(141, 179, 255, 0.22);
+  --diff-easy: #5fd39a;   --diff-easy-bg: rgba(95, 211, 154, 0.14);
+  --diff-medium: #ffc233; --diff-medium-bg: rgba(255, 194, 51, 0.14);
+  --diff-hard: #ff7b72;   --diff-hard-bg: rgba(255, 123, 114, 0.14);
+  --site-label-color: #ffc233;
+  --site-mark-color: #ffc233;
+  --site-focus-ring: #ffc233;
+  /* The dark scheme keeps its outlined cards; the surface is the page. */
+  --site-surface: var(--md-default-bg-color);
+  --site-card-edge: var(--site-card-border);
+  --md-footer-bg-color: var(--md-primary-fg-color);
+  --md-footer-bg-color--dark: var(--md-primary-fg-color--dark);
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-2: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --shadow-3: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* W335: the design tokens. Spacing on a 4 px grid (the root font is 20 px), three radii,
+   three shadows (per scheme, above) and one motion speed and easing. New rules use these
+   rather than literal values. */
+:root {
+  --sp-1: 0.2rem;   /* 4 px */
+  --sp-2: 0.4rem;   /* 8 px */
+  --sp-3: 0.8rem;   /* 16 px */
+  --sp-4: 1.2rem;   /* 24 px */
+  --sp-5: 1.6rem;   /* 32 px */
+  --sp-6: 2.4rem;   /* 48 px */
+  --radius-s: 0.3rem;
+  --radius-m: 0.5rem;
+  --radius-l: 0.8rem;
+  --dur-1: 200ms;
+  --dur-2: 300ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+/* Keep code, math and diagrams left-to-right inside the RTL (Hebrew) layout. */
+.md-typeset pre,
+.md-typeset code,
+.md-typeset .arithmatex,
+.md-typeset .mermaid,
+.md-typeset [id^="WaveDrom_Display_"] {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.md-typeset .arithmatex,
+.md-typeset [id^="WaveDrom_Display_"] {
+  text-align: center;
+  overflow-x: auto;
+}

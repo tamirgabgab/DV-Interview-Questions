@@ -1,0 +1,1044 @@
+/* The site's styles, part 8 of 12: the explorer boxes of 0004 to 0047.
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* Triangle explorer (0007): green with the centre inside, amber on an edge (or no
+   triangle), red outside; the longest arc takes the same colour. */
+.md-typeset .explorer .tri-box { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.4rem; }
+.md-typeset .explorer svg.tri-live { width: 17rem; max-width: 100%; touch-action: none; cursor: grab; user-select: none; }
+.md-typeset .explorer svg.tri-live.is-dragging { cursor: grabbing; }
+.md-typeset .explorer .tri-panel { flex: 1 1 14rem; min-width: 0; }
+.md-typeset .explorer .tri-panel p { margin: 0.3em 0; }
+.md-typeset .explorer .tri-angles { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; }
+.md-typeset .explorer input.ex-deg { width: 4.2rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset svg .tri-arc { stroke: var(--viz-s1); stroke-width: 3; }
+.md-typeset svg .tri-arc.is-max { stroke-width: 6; }
+.md-typeset svg .tri-max-label { font-weight: 700; }
+.md-typeset svg .tri-pt { fill: var(--viz-ink); stroke: var(--md-default-bg-color); stroke-width: 2; cursor: grab; }
+.md-typeset svg .tri-shape { stroke-width: 2.5; stroke-linejoin: round; fill-opacity: 0.2; }
+.md-typeset svg.is-in .tri-shape { fill: var(--diff-easy); stroke: var(--diff-easy); }
+.md-typeset svg.is-out .tri-shape { fill: var(--diff-hard); stroke: var(--diff-hard); }
+.md-typeset svg.is-edge .tri-shape,
+.md-typeset svg.is-degenerate .tri-shape { fill: var(--md-accent-fg-color); stroke: var(--md-accent-fg-color); }
+.md-typeset svg.is-in .tri-arc.is-max { stroke: var(--diff-easy); }
+.md-typeset svg.is-out .tri-arc.is-max { stroke: var(--diff-hard); }
+.md-typeset svg.is-edge .tri-arc.is-max { stroke: var(--md-accent-fg-color); }
+.md-typeset .explorer .tri-kind { font-weight: 700; }
+.md-typeset .explorer .is-in.tri-kind, .md-typeset .explorer .tri-counts .is-in { color: var(--diff-easy); }
+.md-typeset .explorer .is-out.tri-kind, .md-typeset .explorer .tri-counts .is-out { color: var(--diff-hard); }
+.md-typeset .explorer .is-edge.tri-kind, .md-typeset .explorer .is-degenerate.tri-kind,
+.md-typeset .explorer .tri-counts .is-edge { color: var(--diff-medium); }
+.md-typeset .explorer .tri-run { margin-top: 0.8rem; }
+/* The half-circles box (0007 part c): one arc per half outside the circle, its half-disc when it holds. */
+.md-typeset svg .hc-arc { fill: none; stroke-width: 4; stroke-linecap: round; opacity: 0.55; }
+.md-typeset svg .hc-arc.is-holds { stroke-width: 7; opacity: 1; }
+.md-typeset svg .hc-arc.hc-s1 { stroke: var(--viz-s1); }
+.md-typeset svg .hc-arc.hc-s2 { stroke: var(--viz-s2); }
+.md-typeset svg .hc-arc.hc-s3 { stroke: var(--viz-s3); }
+.md-typeset svg .hc-disc { stroke: none; fill-opacity: 0.18; }
+.md-typeset svg .hc-disc.hc-s1 { fill: var(--viz-s1); }
+.md-typeset svg .hc-disc.hc-s2 { fill: var(--viz-s2); }
+.md-typeset svg .hc-disc.hc-s3 { fill: var(--viz-s3); }
+.md-typeset .explorer .hc-key { display: inline-block; width: 0.8rem; height: 0.35rem; margin-inline-end: 0.3rem; border-radius: 0.15rem; vertical-align: middle; }
+.md-typeset .explorer .hc-key-s1 { background: var(--viz-s1); }
+.md-typeset .explorer .hc-key-s2 { background: var(--viz-s2); }
+.md-typeset .explorer .hc-key-s3 { background: var(--viz-s3); }
+.md-typeset .explorer .hc-events { margin: 0.3em 0; padding-inline-start: 0.4rem; list-style: none; }
+.md-typeset .explorer .hc-events li { margin: 0.15em 0; }
+.md-typeset .explorer .hc-events li.is-holds { font-weight: 700; }
+.md-typeset .explorer .hc-run { margin-top: 0.8rem; }
+.md-typeset svg .tri-pt.hc-pt-s1 { fill: var(--viz-s1); }
+.md-typeset svg .tri-pt.hc-pt-s2 { fill: var(--viz-s2); }
+.md-typeset svg .tri-pt.hc-pt-s3 { fill: var(--viz-s3); }
+.md-typeset .explorer .hc-table tr.is-in td { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .tri-frames { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem; }
+.md-typeset .explorer .tri-frames input { flex: 1 1 auto; min-width: 0; }
+.md-typeset .explorer .tri-counts { margin: 0.2em 0; padding-inline-start: 1.1rem; font-weight: 600; }
+.md-typeset .explorer .tri-counts li { margin: 0.1em 0; }
+.md-typeset .explorer .tri-panel bdi { white-space: nowrap; }
+
+/* Boxes explorer (0009): one colour per cycle, the long cycle red, the walk in blue badges */
+:root { --viz-s4: #8a5cc9; --viz-s5: #c2185b; --viz-s1-text: #1f63b5; --viz-s3-text: #157a52; --viz-s4-text: #6f42b0; }   /* the series as text: 4.5:1 on white */
+[data-md-color-scheme="slate"] { --viz-s4: #b394e6; --viz-s5: #f06292; --viz-s1-text: #5a9cf0; --viz-s3-text: #24b583; --viz-s4-text: var(--viz-s4); }   /* lighter than the marks: 4.5:1 on a dark box */
+.md-typeset .explorer .bx-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .bx-ring { flex: 0 1 20rem; }
+.md-typeset .explorer svg.bx-live { width: 20rem; max-width: 100%; user-select: none; }
+.md-typeset .explorer .bx-panel { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .bx-panel p { margin: 0.3em 0; }
+.md-typeset svg .bx-arrow { stroke-width: 2.2; }
+.md-typeset svg .bx-arrow.is-walked { stroke-width: 4; }
+.md-typeset svg .bx-c0, .md-typeset .explorer .bx-chip.bx-c0 { stroke: var(--viz-s1); color: var(--viz-s1-text); }
+.md-typeset svg .bx-c1, .md-typeset .explorer .bx-chip.bx-c1 { stroke: var(--viz-s3); color: var(--viz-s3-text); }
+.md-typeset svg .bx-c2, .md-typeset .explorer .bx-chip.bx-c2 { stroke: var(--viz-s4); color: var(--viz-s4-text); }
+.md-typeset svg .bx-c3, .md-typeset .explorer .bx-chip.bx-c3 { stroke: var(--site-label-color); color: var(--site-label-color); }
+.md-typeset svg .bx-c4, .md-typeset .explorer .bx-chip.bx-c4 { stroke: var(--viz-ink); color: var(--viz-ink); }
+.md-typeset svg .bx-long, .md-typeset .explorer .bx-chip.bx-long { stroke: var(--diff-hard); color: var(--diff-hard); }
+.md-typeset svg .bx-long.bx-arrow { stroke-width: 3.2; }
+.md-typeset svg .bx-head.bx-c0 { fill: var(--viz-s1); } .md-typeset svg .bx-head.bx-c1 { fill: var(--viz-s3); }
+.md-typeset svg .bx-head.bx-c2 { fill: var(--viz-s4); } .md-typeset svg .bx-head.bx-c3 { fill: var(--site-label-color); }
+.md-typeset svg .bx-head.bx-c4 { fill: var(--viz-ink); } .md-typeset svg .bx-head.bx-long { fill: var(--diff-hard); }
+.md-typeset svg .bx-head { stroke: none; }
+.md-typeset svg .bx-node { fill: var(--md-default-bg-color); stroke-width: 2; cursor: pointer; }
+.md-typeset svg .bx-node.is-cut { stroke-dasharray: 4 3; }
+.md-typeset svg .bx-node.is-open { fill: var(--site-primary-soft); }
+.md-typeset svg .bx-node.is-cur { stroke-width: 4; }
+.md-typeset svg .bx-node.is-me { fill: var(--diff-medium-bg); }
+.md-typeset svg .bx-g:focus-visible { outline: none; }
+.md-typeset svg .bx-g:focus-visible .bx-node { stroke: var(--site-focus-ring); stroke-width: 4; }
+.md-typeset svg .bx-num { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); pointer-events: none; }
+.md-typeset svg .bx-badge { fill: var(--viz-s1); }
+.md-typeset svg .bx-badge-num { fill: #fff; font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .bx-chip { font-weight: 700; white-space: nowrap; }
+.md-typeset svg .cm-band { stroke: var(--viz-s1); stroke-width: 6; stroke-opacity: 0.35; stroke-linecap: round; }
+.md-typeset svg .cm-band.is-full { stroke-opacity: 0.85; }
+.md-typeset svg .cm-price-lbl { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg .eg-band-below { fill: var(--viz-s3); fill-opacity: 0.75; }
+.md-typeset svg .eg-band-above { fill: var(--viz-s1); fill-opacity: 0.75; }
+.md-typeset .explorer .eg-below-txt { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer .eg-above-txt { color: var(--viz-s1-text); font-weight: 700; }
+.md-typeset .explorer .sq-build-toggle { margin-top: 0.4rem; }
+.md-typeset .explorer .sq-slide-case p { margin: 0.4em 0 0.2em; }
+.md-typeset .explorer .sq-grid { font-family: var(--md-code-font-family); font-size: 0.75rem; line-height: 1.9; overflow-x: auto; white-space: nowrap; }
+.md-typeset .explorer .sq-lab { display: inline-block; width: 4.2rem; color: var(--viz-text); font-size: 0.65rem; }
+.md-typeset .explorer .sq-c { display: inline-block; width: 1.3rem; text-align: center; border: 1px solid var(--viz-grid); margin-right: 1px; }
+.md-typeset .explorer .sq-c.is-pad { border-color: transparent; }
+.md-typeset .explorer .sq-c.is-bit { border-color: var(--viz-s2); font-weight: 700; }
+.md-typeset .explorer .sq-c.is-match { background: var(--viz-s3); color: var(--md-default-bg-color); border-color: var(--viz-s3); font-weight: 700; }
+.md-typeset .explorer .sq-c.is-rest { color: var(--viz-text); border-style: dashed; }
+.md-typeset .explorer table.kp-sub { direction: ltr; font-family: var(--md-code-font-family); font-size: 0.8rem; margin: 0.3em 0; }
+.md-typeset .explorer table.kp-sub td { padding: 0.05em 0.7em; text-align: center; border: none; }
+.md-typeset .explorer table.kp-sub .kp-col-name { font-family: var(--md-text-font-family); font-size: 0.6rem; color: var(--viz-text); }
+.md-typeset .explorer table.kp-sub .kp-borrow { color: var(--viz-s2-text); font-weight: 700; font-size: 0.65rem; }
+.md-typeset .explorer table.kp-sub tr.kp-res td { border-top: 1.5px solid var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer table.kp-sub td.kp-lent { color: var(--viz-s2-text); }
+.md-typeset svg .sh-pa { stroke: var(--viz-s1); stroke-width: 4; stroke-linecap: round; }
+.md-typeset svg .sh-pb { stroke: var(--viz-s2); stroke-width: 4; stroke-linecap: round; }
+.md-typeset svg .sh-pmeet { fill: var(--diff-hard); fill-opacity: 0.25; }
+.md-typeset svg .sh-drag { cursor: grab; touch-action: none; }
+.md-typeset svg .sh-drag:focus-visible rect { outline: none; stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset .explorer .sh-sandbox { max-width: 20rem; touch-action: none; }
+.md-typeset .explorer .sh-conds { margin: 0.2em 0 0.4em; font-size: 0.75rem; list-style: none; padding: 0; }
+.md-typeset .explorer .sh-conds li { margin: 0.1em 0; color: var(--viz-text); }
+.md-typeset .explorer .sh-conds li.is-true { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer .bx-chip.bx-long { white-space: normal; }   /* a cycle longer than N / 2 can be wider than a phone */
+.md-typeset .explorer .bx-chip bdi { font-family: var(--md-code-font-family); font-size: 0.7rem; }
+.md-typeset .explorer .bx-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .bx-bad { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer input.ex-me { width: 3.6rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .bx-walk-row, .md-typeset .explorer .bx-stats-row { margin-top: 0.5rem; }
+.md-typeset .explorer .bx-runs { font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .bx-bars { margin-top: 0.4rem; }
+.md-typeset .explorer .bx-bar { display: grid; grid-template-columns: minmax(8rem, 14rem) minmax(5rem, 1fr) auto; gap: 0.6rem; align-items: center; margin: 0.25rem 0; font-size: 0.72rem; }
+.md-typeset .explorer .bx-bar-track { display: block; height: 0.7rem; background: var(--site-primary-soft); border-radius: 0.2rem; overflow: hidden; direction: ltr; }
+.md-typeset .explorer .bx-bar-fill { display: block; height: 100%; background: var(--viz-s1); }
+.md-typeset .explorer .bx-bar-val { font-variant-numeric: tabular-nums; }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .bx-bar { grid-template-columns: 1fr; gap: 0.15rem; }
+}
+
+/* Floyd explorer (0017): the cells row with the two runners, the rho graph */
+.md-typeset .explorer .fl-cells { margin-top: 0.6rem; }
+.md-typeset .explorer .box-grid.fl-grid { max-width: 100%; }
+.md-typeset .explorer .box-grid.fl-grid > span { position: relative; }
+.md-typeset .explorer .box-grid.fl-grid > span.is-slow { box-shadow: inset 0 0 0 3px var(--viz-s1); }
+.md-typeset .explorer .box-grid.fl-grid > span.is-fast { outline: 3px dashed var(--viz-s2); outline-offset: -1px; }
+.md-typeset .explorer .box-grid.fl-grid > span.is-slow.is-fast { box-shadow: inset 0 0 0 3px var(--viz-s1); }
+.md-typeset .explorer input.ex-nums { width: 16rem; max-width: 100%; box-sizing: border-box; box-sizing: border-box; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .fl-err { color: var(--diff-hard); font-size: 0.7rem; }
+.md-typeset .explorer .fl-graph { margin-top: 0.5rem; }
+.md-typeset .explorer svg.fl-live { max-width: 34rem; width: 100%; }
+.md-typeset .explorer .fl-step { margin: 0.4em 0; }
+
+/* Remainders explorer (0005): the ring and the BFS tree */
+.md-typeset .explorer .bf-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.4rem; }
+.md-typeset .explorer .bf-ring { flex: 0 1 20rem; }
+.md-typeset .explorer svg.bf-live { width: 20rem; max-width: 100%; }
+.md-typeset .explorer .bf-panel { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .bf-panel p { margin: 0.3em 0; }
+.md-typeset .explorer .bf-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0 0.1rem; }
+.md-typeset svg .st-stack.is-cur { stroke-width: 4; }
+.md-typeset svg .st-text.bf-xs { font-size: 10px; }
+.md-typeset svg .bf-layer { font-size: 10px; font-weight: 700; fill: var(--viz-s2-text); }
+.md-typeset .explorer input.ex-digits { width: 4.5rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset svg circle.is-path { stroke: var(--viz-s3); stroke-width: 3; }
+
+/* Brackets explorer (0010): the characters row, the stack column, the depth chart */
+.md-typeset .explorer input.ex-s { width: 14rem; max-width: 100%; font: inherit; font-family: var(--md-code-font-family); font-size: 0.8rem; letter-spacing: 0.15em; padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .br-presets .md-button { padding: 0.1rem 0.45rem; font-size: 0.65rem; margin: 0.1rem; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .br-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .br-main { flex: 1 1 18rem; min-width: 0; }
+.md-typeset .explorer .br-chars { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.md-typeset .explorer .br-chars > span { display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem; font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.85rem; color: var(--viz-text); background: var(--md-default-bg-color); }
+.md-typeset .explorer .br-chars > span.is-done { color: var(--viz-ink); border-color: var(--viz-ink); }
+.md-typeset .explorer .br-chars > span.is-cur { box-shadow: inset 0 0 0 3px var(--viz-s1); color: var(--viz-ink); }
+.md-typeset .explorer .br-chars > span.is-fail { border: 3px solid var(--diff-hard); color: var(--diff-hard); border-radius: 50%; }
+.md-typeset .explorer .br-chars > span.is-end { font-size: 0.7rem; }
+.md-typeset .explorer .br-chars .br-empty, .md-typeset .explorer .br-stack .br-empty { width: auto; height: auto; border: 0; font-family: inherit; font-weight: 400; color: var(--viz-text); }
+.md-typeset .explorer .br-chart { margin-top: 0.4rem; max-width: 24rem; }
+.md-typeset .explorer .br-stackwrap { flex: 0 0 auto; min-width: 4rem; }
+.md-typeset .explorer .br-stackwrap .ex-title { margin: 0 0 0.3rem; }
+.md-typeset .explorer .br-stack { display: flex; flex-direction: column-reverse; align-items: center; gap: 0.2rem; min-height: 5rem; padding: 0.3rem; border: 1.5px solid var(--viz-grid); border-top: 0; border-radius: 0 0 0.3rem 0.3rem; width: 3rem; justify-content: flex-start; }
+.md-typeset .explorer .br-stack > span { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 1.6rem; border-radius: 0.25rem; font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.85rem; background: var(--site-primary-soft); color: var(--viz-ink); }
+.md-typeset .explorer .br-stack > span.is-top { box-shadow: inset 0 0 0 2px var(--viz-s1); }
+.md-typeset .explorer .br-step { margin: 0.4em 0; }
+.md-typeset .explorer .br-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .br-bad { color: var(--diff-hard); font-weight: 700; }
+
+/* Tic-tac-toe explorer (0011) */
+.md-typeset .explorer .ttt-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .ttt-board { flex: 0 0 auto; }
+.md-typeset .explorer svg.ttt-live { width: 11rem; max-width: 100%; user-select: none; }
+.md-typeset .explorer .ttt-panel { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .ttt-panel p { margin: 0.3em 0; }
+.md-typeset svg .ttt-empty { fill: var(--md-default-bg-color); }
+.md-typeset svg .ttt-cell { cursor: pointer; }
+.md-typeset svg .ttt-cell:focus-visible { outline: none; }
+.md-typeset svg .ttt-cell:focus-visible rect { stroke: var(--site-focus-ring); stroke-width: 3; }
+.md-typeset svg .ttt-idx { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); opacity: 0.6; }
+/* The five cells box (0011 part b): the picked cells, a full line, the cells that would complete one. */
+.md-typeset svg .tf-mark { fill: var(--viz-s1); fill-opacity: 0.85; }
+.md-typeset svg .tf-cell.is-full .ttt-empty { fill: var(--viz-s2); fill-opacity: 0.3; }
+.md-typeset svg .tf-star { fill: var(--viz-s2); font-size: 22px; }
+.md-typeset .explorer .tf-dirs tr.is-full td { font-weight: 700; color: var(--viz-s2-text); }
+.md-typeset .explorer .ttt-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .ttt-bad { color: var(--diff-hard); font-weight: 700; }
+
+/* Shapes explorer (0014): the grid, the flashed candidate, the heat map */
+.md-typeset .explorer .sh-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .sh-grid, .md-typeset .explorer .sh-heat { flex: 1 1 18rem; min-width: 0; max-width: 24rem; }
+.md-typeset .explorer svg.sh-live { width: 100%; }
+.md-typeset svg .sh-reject { fill: var(--diff-hard); fill-opacity: 0.25; stroke: var(--diff-hard); stroke-width: 2.5; stroke-dasharray: 5 3; }
+.md-typeset svg .sh-accept { fill: var(--diff-easy); fill-opacity: 0.3; stroke: var(--diff-easy); stroke-width: 3; }
+.md-typeset svg .sh-cell { fill: var(--viz-s2); stroke: none; }
+.md-typeset .explorer .sh-sides { font-size: 0.72rem; margin: 0.3em 0; }
+.md-typeset .explorer .sh-step { margin: 0.4em 0; }
+.md-typeset .explorer .sh-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .sh-bad { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer .sh-note { font-size: 0.7rem; color: var(--viz-text); }
+
+/* Kaprekar explorer (0012, 0013) */
+.md-typeset .explorer input.ex-x { width: 5rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .kp-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0 0.1rem; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .kp-table { margin-top: 0.5rem; overflow-x: auto; }
+.md-typeset .explorer .kp-table table { font-size: 0.72rem; margin: 0; }
+.md-typeset .explorer .kp-table td, .md-typeset .explorer .kp-table th { padding: 0.25em 0.7em; }
+.md-typeset .explorer .kp-table tr.is-last td { font-weight: 700; }
+.md-typeset .explorer .kp-chain { margin: 0.5em 0; }
+.md-typeset .explorer .kp-chart svg { max-width: 30rem; }
+
+/* Eurovision explorer (0008) and the three boxes explorer (0004) */
+.md-typeset .explorer .eu-what { margin-top: 0.5rem; }
+.md-typeset .explorer .eu-what input { width: 4.2rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .eu-chart { margin-top: 0.5rem; }
+.md-typeset .explorer .eu-chart svg { max-width: 34rem; }
+.md-typeset .explorer .eu-step { margin: 0.4em 0; }
+.md-typeset .explorer .eu-ok, .md-typeset .explorer .b3-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .eu-bad, .md-typeset .explorer .b3-bad { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer svg.b3-live { width: 100%; max-width: 34rem; user-select: none; }
+.md-typeset svg .b3-crate { cursor: pointer; }
+.md-typeset svg .b3-crate:focus-visible { outline: none; }
+.md-typeset svg .b3-crate:focus-visible .crate-front { stroke: var(--site-focus-ring); stroke-width: 4; }
+.md-typeset svg .b3-ball { stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .b3-red { fill: #d33a2f; }
+.md-typeset svg .b3-black { fill: #2b2b2b; }
+.md-typeset .explorer .b3-stats { font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .b3-step { margin: 0.5em 0 0.2em; }
+.md-typeset .explorer .b3-lines { margin: 0.2em 0; padding-inline-start: 1.3rem; }
+.md-typeset .explorer .b3-lines li { margin: 0.1em 0; }
+/* The labels fix box (0004 part b): the arcs of the 3-cycle, the swapped crates. */
+.md-typeset svg .lf-arc { fill: none; stroke: var(--viz-grid); stroke-width: 2.5; stroke-dasharray: 6 4; }
+.md-typeset svg .lf-arc.is-done { stroke: var(--viz-s2); stroke-dasharray: none; }
+.md-typeset svg .lf-head { fill: var(--viz-grid); }
+.md-typeset svg .lf-head.is-done { fill: var(--viz-s2); }
+.md-typeset svg .lf-crate.is-changed .crate-front { stroke: var(--viz-s2); stroke-width: 4; }
+.md-typeset svg .lf-label { font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset svg .lf-true { font-family: var(--md-code-font-family); fill: var(--diff-hard); }
+.md-typeset svg .lf-true.is-ok { fill: var(--diff-easy); }
+.md-typeset .explorer .lf-arr { margin: 0.3em 0; font-family: var(--md-code-font-family); font-size: 0.75rem; text-align: left; }
+
+/* Timing strips (0001, 0035): a scrollable strip of rows over clock cycles */
+.md-typeset .explorer .wv-wrap { overflow-x: auto; margin-top: 0.5rem; direction: ltr; padding-bottom: 0.2rem; }
+.md-typeset .explorer .wv-wrap:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer svg.wave-strip { display: block; max-width: none; }
+.md-typeset .explorer .wv-wrap .fig-wrap { padding-top: 1.8rem; }   /* the enlarge button above the strip, not over the first row name */
+.md-typeset svg .wv-grid { stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .wv-grid-half { stroke-dasharray: 2 3; }
+.md-typeset svg .wv-name { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg .wv-tick { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .wv-line { fill: none; stroke: var(--viz-ink); stroke-width: 2; stroke-linejoin: round; }
+.md-typeset svg .wv-line.wv-dim { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .wv-line.wv-s1 { stroke: var(--viz-s1); }
+.md-typeset svg .wv-line.wv-s2 { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .wv-line.wv-s3 { stroke: var(--viz-s3); }
+.md-typeset svg .wv-high { fill: var(--viz-ink); fill-opacity: 0.08; }
+.md-typeset svg .wv-high.wv-s1 { fill: var(--viz-s1); fill-opacity: 0.14; }
+.md-typeset svg .wv-high.wv-s2 { fill: var(--viz-s2); fill-opacity: 0.16; }
+.md-typeset svg .wv-high.wv-s3 { fill: var(--viz-s3); fill-opacity: 0.14; }
+.md-typeset svg .wv-high.wv-dim { fill-opacity: 0.04; }
+.md-typeset svg .wv-mark { fill: var(--viz-s3); fill-opacity: 0.22; }
+.md-typeset svg .wv-bus { fill: var(--site-primary-soft); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .wv-val { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg .wv-cursor { fill: var(--viz-s2); fill-opacity: 0.1; stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.md-typeset svg .wv-cell { fill: transparent; cursor: pointer; }
+.md-typeset svg .wv-cell:hover { fill: var(--viz-s1); fill-opacity: 0.1; }
+.md-typeset svg .wv-cell:focus-visible { outline: none; stroke: var(--site-focus-ring); stroke-width: 2.5; }
+.md-typeset .explorer .wv-hint { margin: 0.4em 0 0; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .wv-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0.1rem; }
+.md-typeset .explorer .wv-step { margin: 0.4em 0; }
+.md-typeset .explorer .wv-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .wv-bad { color: var(--diff-hard); font-weight: 700; }
+
+/* LFSR explorer (0036): the taps, the ring of states, the output bits, the table */
+.md-typeset .explorer .lf-taps { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.5rem; font-family: var(--md-code-font-family); font-size: 0.75rem; }
+.md-typeset .explorer .lf-taps label { gap: 0.2rem; }
+.md-typeset .explorer .lf-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0.1rem; }
+.md-typeset .explorer .lf-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .lf-ring { flex: 0 1 19rem; }
+.md-typeset .explorer svg.lf-live { width: 19rem; max-width: 100%; display: block; }
+.md-typeset .explorer .lf-panel { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .lf-panel p { margin: 0.3em 0; }
+.md-typeset svg .lf-node circle { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .lf-node text { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .lf-node.is-seen circle { fill: var(--viz-s1); fill-opacity: 0.18; stroke: var(--viz-s1); }
+.md-typeset svg .lf-node.is-seen text { fill: var(--viz-ink); }
+.md-typeset svg .lf-node.is-seed circle { stroke-width: 3; }
+.md-typeset svg .lf-node.is-cur circle { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .lf-node.lf-zero circle { stroke-dasharray: 3 3; }
+.md-typeset svg .lf-edge { stroke: var(--viz-s1); stroke-width: 1.5; stroke-opacity: 0.7; }
+.md-typeset svg .lf-edge.is-cur { stroke: var(--viz-s2); stroke-width: 2.5; stroke-opacity: 1; }
+.md-typeset svg .lf-arrowhead { fill: var(--viz-ink); }
+/* the cycles of the proof panel: a colour per cycle, in turn */
+.md-typeset .explorer svg.lf-all { width: 100%; max-width: 40rem; display: block; }
+.md-typeset svg .lf-node.lf-c0 circle { fill: var(--viz-s1); fill-opacity: 0.16; stroke: var(--viz-s1); }
+.md-typeset svg .lf-node.lf-c1 circle { fill: var(--viz-s3); fill-opacity: 0.16; stroke: var(--viz-s3); }
+.md-typeset svg .lf-node.lf-c2 circle { fill: var(--viz-s2); fill-opacity: 0.12; stroke: var(--viz-s2); }
+.md-typeset svg .lf-edge.lf-c1 { stroke: var(--viz-s3); }
+.md-typeset svg .lf-edge.lf-c2 { stroke: var(--viz-s2); }
+.md-typeset svg .lf-all .lf-node.is-cur circle { fill: var(--viz-ink); fill-opacity: 0.3; stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg .lf-loop { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 3 2; }
+.md-typeset .explorer .lf-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .lf-bad { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer .lf-table { margin-top: 0.3rem; overflow-x: auto; }
+.md-typeset .explorer .lf-table table { font-size: 0.72rem; margin: 0; }
+.md-typeset .explorer .lf-table td, .md-typeset .explorer .lf-table th { padding: 0.2em 0.7em; }
+.md-typeset .explorer .lf-table tr.is-max td { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer .lf-table tr.is-cur td { background: var(--md-code-bg-color); }
+
+/* Gray pointers explorer (0034): the sampled bits, the FIFO slots, the pointer table */
+.md-typeset .explorer .gr-box { display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; align-items: flex-start; margin-top: 0.4rem; }
+.md-typeset .explorer .gr-side { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .gr-side p { margin: 0.3em 0; }
+.md-typeset .explorer .gr-row { display: flex; align-items: center; gap: 0.6rem; margin: 0.2rem 0; }
+.md-typeset .explorer .gr-label { flex: 0 0 3rem; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .gr-bits { display: inline-flex; gap: 0.2rem; }
+.md-typeset .explorer .gr-bit { display: inline-flex; align-items: center; justify-content: center; width: 1.7rem; height: 1.7rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem; font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.85rem; color: var(--viz-ink); background: var(--md-default-bg-color); }
+.md-typeset .explorer .gr-bit.is-changed { border-color: var(--viz-s2); border-width: 2.5px; }
+.md-typeset .explorer button.gr-btn { cursor: pointer; padding: 0; font: inherit; font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset .explorer button.gr-btn.is-old { background: var(--viz-s2); background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset .explorer button.gr-btn.is-new { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset .explorer button.gr-btn:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer .gr-dec { font-variant-numeric: tabular-nums; font-size: 0.75rem; color: var(--viz-text); }
+.md-typeset .explorer .gr-ok { color: var(--diff-easy); font-weight: 700; }
+.md-typeset .explorer .gr-bad { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer .gr-bit.gr-in { border-style: dashed; color: var(--viz-text); }
+.md-typeset .explorer .gr-bit.gr-res { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .gr-bit.gr-cur { outline: 2.5px solid var(--viz-s2); outline-offset: 1px; }
+.md-typeset .explorer .gr-bit.gr-unk { color: var(--viz-text); border-style: dotted; }
+.md-typeset .explorer .gr-slots { display: grid; grid-template-columns: repeat(var(--gr-cols, 16), minmax(0, 1fr)); gap: 0.15rem; margin-top: 0.6rem; max-width: 36rem; }
+.md-typeset .explorer .gr-slot { display: flex; flex-direction: column; align-items: center; font-family: var(--md-code-font-family); font-size: 0.6rem; color: var(--viz-text); }
+.md-typeset .explorer .gr-slot .gr-idx { display: block; width: 100%; text-align: center; padding: 0.35rem 0; border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--viz-ink); }
+.md-typeset .explorer .gr-slot.is-full .gr-idx { background: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset .explorer .gr-slot .gr-w, .md-typeset .explorer .gr-slot .gr-r { height: 1rem; font-weight: 700; }
+.md-typeset .explorer .gr-slot .gr-w { color: var(--viz-s2-text); }
+.md-typeset .explorer .gr-slot .gr-r { color: var(--viz-s3-text); }
+.md-typeset .explorer .gr-ptrs { margin-top: 0.4rem; overflow-x: auto; }
+.md-typeset .explorer .gr-ptrs table { font-size: 0.72rem; margin: 0; }
+.md-typeset .explorer .gr-ptrs td, .md-typeset .explorer .gr-ptrs th { padding: 0.2em 0.7em; }
+.md-typeset .explorer .gr-ptrs td[dir="ltr"] { font-family: var(--md-code-font-family); letter-spacing: 0.1em; }
+.md-typeset .explorer .gr-top { color: var(--viz-s2-text); font-weight: 700; }
+.md-typeset .explorer .gr-top2 { color: var(--viz-s2-text); font-weight: 700; margin-inline-end: 0.2em; border-inline-end: 1.5px solid var(--viz-grid); padding-inline-end: 0.15em; }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .gr-slots { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  .md-typeset .explorer .gr-bit { width: 1.5rem; height: 1.5rem; }
+}
+
+/* Stock explorer (0006): the price chart with draggable points, the running lines */
+.md-typeset .explorer .st-chart { margin-top: 0.5rem; max-width: 40rem; touch-action: none; }
+.md-typeset .explorer .st-chart svg { width: 100%; display: block; user-select: none; }
+.md-typeset .explorer .st-chart.is-dragging { cursor: grabbing; }
+.md-typeset svg .st-price { fill: none; stroke: var(--viz-ink); stroke-width: 1.5; stroke-opacity: 0.6; }
+.md-typeset svg .st-run { fill: none; stroke-width: 2.5; stroke-dasharray: 6 4; }
+.md-typeset svg .st-run.st-min { stroke: var(--viz-s1); }
+.md-typeset svg .st-run.st-max { stroke: var(--viz-s2); }
+.md-typeset svg .st-trade { stroke-width: 5; stroke-linecap: round; stroke-opacity: 0.85; }
+.md-typeset svg .st-trade.st-min { stroke: var(--viz-s1); }
+.md-typeset svg .st-trade.st-max { stroke: var(--viz-s2); }
+.md-typeset svg .st-cursor { fill: var(--viz-s3); fill-opacity: 0.12; }
+.md-typeset svg .st-pt { cursor: grab; }
+.md-typeset svg .st-pt circle { fill: var(--md-default-bg-color); stroke: var(--viz-text); stroke-width: 2; }
+.md-typeset svg .st-pt.is-seen circle { stroke: var(--viz-ink); fill: var(--viz-ink); }
+.md-typeset svg .st-pt.is-cur circle { stroke: var(--viz-s3); stroke-width: 4; }
+.md-typeset svg .st-pt text { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg .st-pt:focus-visible { outline: none; }
+.md-typeset svg .st-pt:focus-visible circle { stroke: var(--site-focus-ring); stroke-width: 4; }
+/* Handshake explorer (0038): the assertion rows */
+.md-typeset svg .wv-fail circle { fill: var(--diff-hard-bg); stroke: var(--diff-hard); stroke-width: 2; }
+.md-typeset svg .wv-fail text { fill: var(--diff-hard); font-size: 12px; font-weight: 700; }
+
+/* Protocol explorers (0025, 0024, 0023): the two sides, the queues, the circle, the block map */
+.md-typeset .explorer .an-free { margin-top: 0.4rem; }
+.md-typeset .explorer .an-free .ex-title { margin: 0; }
+/* the free events of 0024 and 0025 in two columns on a phone, under their title */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .an-free:not(.an-random) { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+  .md-typeset .explorer .an-free:not(.an-random) > .ex-title { grid-column: 1 / -1; order: 0; }
+  .md-typeset .explorer .an-free:not(.an-random) > button.md-button { width: 100%; padding-inline: 0.4rem; }
+}
+.md-typeset .explorer .an-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; margin-top: 0.6rem; align-items: stretch; }
+.md-typeset .explorer .an-side { flex: 1 1 15rem; min-width: 0; border: 1.5px solid var(--viz-grid); border-radius: 0.4rem; padding: 0.4rem 0.6rem; }
+.md-typeset .explorer .an-link { flex: 1 1 14rem; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem; justify-content: center; }
+.md-typeset .explorer .an-title { margin: 0 0 0.3em; font-weight: 700; }
+.md-typeset .explorer .an-field { display: flex; flex-wrap: wrap; gap: 0.2rem 0.6rem; align-items: center; margin: 0.15rem 0; padding: 0.1rem 0.3rem; border-radius: 0.2rem; font-size: 0.72rem; }
+.md-typeset .explorer .an-field.is-changed { background: var(--diff-medium-bg); }
+.md-typeset .explorer .an-name { font-family: var(--md-code-font-family); color: var(--viz-text); }
+.md-typeset .explorer .an-val { font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset .explorer .an-chips { display: inline-flex; flex-wrap: wrap; gap: 0.2rem; vertical-align: middle; }
+.md-typeset .explorer .an-chip { display: inline-flex; align-items: center; justify-content: center; padding: 0 0.4rem; min-width: 1.6rem; height: 1.4rem; border: 1.5px solid var(--viz-s1); border-radius: 0.25rem; font-family: var(--md-code-font-family); font-size: 0.7rem; color: var(--viz-ink); background: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); }
+.md-typeset .explorer .an-chip.is-head { box-shadow: inset 0 0 0 2px var(--viz-s2); }
+.md-typeset .explorer .an-chip.is-replay { border-style: dashed; }
+.md-typeset .explorer .an-chip.is-nak { border-color: var(--diff-hard); background: var(--diff-hard-bg); }
+.md-typeset .explorer .an-chip.is-done { border-color: var(--viz-s3); background: color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color)); }
+.md-typeset .explorer .an-empty { color: var(--viz-text); font-size: 0.7rem; }
+.md-typeset .explorer .an-queue { border: 1.5px dashed var(--viz-grid); border-radius: 0.4rem; padding: 0.3rem 0.5rem; }
+.md-typeset .explorer .an-qtitle { margin: 0 0 0.2em; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .an-head-btns { display: flex; flex-wrap: wrap; gap: 0.2rem; margin-top: 0.3rem; }
+.md-typeset .explorer .an-head-btns .md-button { padding: 0.1rem 0.45rem; font-size: 0.6rem; margin: 0; }
+.md-typeset .explorer .an-counts { margin: 0.3em 0 0; font-size: 0.68rem; color: var(--viz-text); }
+.md-typeset .explorer .cr-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .cr-circle { flex: 0 1 19rem; }
+.md-typeset .explorer svg.cr-live { width: 19rem; max-width: 100%; display: block; }
+.md-typeset .explorer .cr-panel { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .cr-panel p { margin: 0.4em 0; }
+.md-typeset .explorer .cr-meaning { font-size: 0.68rem; color: var(--viz-text); }
+.md-typeset .explorer .cr-derived { font-size: 0.72rem; margin: 0.4em 0; }
+.md-typeset .explorer .cr-legend { margin: 0.2em 0 0; font-size: 0.65rem; color: var(--viz-text); display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; }
+.md-typeset .explorer .cr-lg-s1 { color: var(--viz-s1-text); }
+.md-typeset .explorer .cr-lg-s2 { color: var(--viz-s2-text); }
+.md-typeset svg .cr-ring { fill: none; stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .cr-tick { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg .cr-ticktext { fill: var(--viz-text); font-size: 9px; font-family: var(--md-code-font-family); }
+.md-typeset svg .cr-arc { fill: none; stroke-width: 8; stroke-opacity: 0.45; }
+.md-typeset svg .cr-arc-credits { stroke: var(--viz-s1); }
+.md-typeset svg .cr-arc-free { stroke: var(--viz-s2); }
+.md-typeset svg .cr-hand { stroke-width: 2; }
+.md-typeset svg .cr-hand.cr-pcc, .md-typeset svg .cr-dot.cr-pcc { stroke: var(--viz-s1); fill: var(--viz-s1); }
+.md-typeset svg .cr-hand.cr-pcl, .md-typeset svg .cr-dot.cr-pcl { stroke: var(--viz-s1); fill: var(--md-default-bg-color); stroke-dasharray: 4 3; }
+.md-typeset svg .cr-dot.cr-pcl { stroke-dasharray: none; }
+.md-typeset svg .cr-hand.cr-pcr, .md-typeset svg .cr-dot.cr-pcr { stroke: var(--viz-s2); fill: var(--viz-s2); }
+.md-typeset svg .cr-hand.cr-pca, .md-typeset svg .cr-dot.cr-pca { stroke: var(--viz-s2); fill: var(--md-default-bg-color); stroke-dasharray: 4 3; }
+.md-typeset svg .cr-dot.cr-pca { stroke-dasharray: none; }
+.md-typeset svg .cr-label { font-size: 10px; font-family: var(--md-code-font-family); font-weight: 700; stroke: none; }
+.md-typeset svg .cr-label.cr-pcc, .md-typeset svg .cr-label.cr-pcl { fill: var(--viz-s1-text); }
+.md-typeset svg .cr-label.cr-pcr, .md-typeset svg .cr-label.cr-pca { fill: var(--viz-s2-text); }
+.md-typeset .explorer .cr-slots { display: inline-flex; gap: 0.15rem; vertical-align: middle; }
+.md-typeset .explorer .cr-slot { width: 1rem; height: 1rem; border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; }
+.md-typeset .explorer .cr-slot.is-full { background: var(--viz-s1); border-color: var(--viz-s1); }
+.md-typeset .explorer .ep-form input { font: inherit; font-family: var(--md-code-font-family); font-size: 0.75rem; padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .ep-form input.ex-addr { width: 6.5rem; }
+.md-typeset .explorer .ep-form input.ex-len { width: 4.5rem; }
+.md-typeset .explorer .ep-err { color: var(--diff-hard); font-size: 0.7rem; font-weight: 700; }
+.md-typeset .explorer .ep-mem { direction: ltr; }
+.md-typeset .explorer .ep-mem svg.ep-live { width: 100%; max-width: 34rem; display: block; }
+.md-typeset svg .ep-block { fill: var(--md-code-bg-color); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .ep-written { fill-opacity: 0.6; }
+.md-typeset svg .ep-written.ep-c0, .md-typeset .explorer .ep-pend.ep-c0 .ep-swatch { fill: var(--viz-s1); background: var(--viz-s1); }
+.md-typeset svg .ep-written.ep-c1, .md-typeset .explorer .ep-pend.ep-c1 .ep-swatch { fill: var(--viz-s2); background: var(--viz-s2); }
+.md-typeset svg .ep-written.ep-c2, .md-typeset .explorer .ep-pend.ep-c2 .ep-swatch { fill: var(--viz-s3); background: var(--viz-s3); }
+.md-typeset svg .ep-written.ep-c3, .md-typeset .explorer .ep-pend.ep-c3 .ep-swatch { fill: var(--viz-s4); background: var(--viz-s4); }
+.md-typeset svg .ep-read { fill: none; stroke-width: 2.5; stroke-dasharray: 5 3; }
+.md-typeset svg .ep-read.ep-c0 { stroke: var(--viz-s1); }
+.md-typeset svg .ep-read.ep-c1 { stroke: var(--viz-s2); }
+.md-typeset svg .ep-read.ep-c2 { stroke: var(--viz-s3); }
+.md-typeset svg .ep-read.ep-c3 { stroke: var(--viz-s4); }
+.md-typeset .explorer .ep-pend { margin: 0.2em 0; font-size: 0.72rem; }
+.md-typeset .explorer .ep-swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 0.15rem; margin-inline-end: 0.3rem; vertical-align: middle; }
+.md-typeset .explorer .ep-table { overflow-x: auto; }
+.md-typeset .explorer .ep-table table { font-size: 0.7rem; margin: 0; }
+.md-typeset .explorer .ep-table td, .md-typeset .explorer .ep-table th { padding: 0.2em 0.6em; }
+.md-typeset .explorer .ep-table tr.ep-c0 td:nth-child(3) { color: var(--viz-s1-text); font-weight: 700; }
+.md-typeset .explorer .ep-table tr.ep-c1 td:nth-child(3) { color: var(--viz-s2-text); font-weight: 700; }
+.md-typeset .explorer .ep-table tr.ep-c2 td:nth-child(3) { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer .ep-table tr.ep-c3 td:nth-child(3) { color: var(--viz-s4-text); font-weight: 700; }
+
+/* Code tracer (0002, 0003): the code with the current line lit, the variables, the array */
+.md-typeset .explorer .tr-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .tr-left { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer .tr-right { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .explorer pre.tr-code { margin: 0; padding: 0.4rem 0; font-size: 0.72rem; line-height: 1.6; background: var(--md-code-bg-color); border-radius: 0.3rem; overflow-x: auto; }
+.md-typeset .explorer .tr-line { display: block; padding: 0 0.6rem; white-space: pre; }
+.md-typeset .explorer .tr-ln { display: inline-block; width: 1.4rem; color: var(--viz-text); user-select: none; }
+.md-typeset .explorer .tr-line.is-cur { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-code-bg-color)); box-shadow: inset 3px 0 0 var(--viz-s1); }
+.md-typeset .explorer .tr-line.is-swap { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-code-bg-color)); box-shadow: inset 3px 0 0 var(--viz-s2); }
+.md-typeset .explorer table.tr-vars { font-size: 0.72rem; margin: 0; }
+.md-typeset .explorer table.tr-vars td, .md-typeset .explorer table.tr-vars th { padding: 0.2em 0.6em; }
+.md-typeset .explorer table.tr-vars tr.is-changed td { background: var(--diff-medium-bg); font-weight: 700; }
+.md-typeset .explorer input.ex-a, .md-typeset .explorer input.ex-b, .md-typeset .explorer input.ex-c { width: 5rem; font: inherit; font-family: var(--md-code-font-family); padding: 0 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer .tr-arr { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.md-typeset .explorer .tr-arr > span { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.2rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.9rem; background: var(--md-default-bg-color); color: var(--viz-ink); }
+.md-typeset .explorer .tr-arr > span .tr-idx { position: absolute; top: -0.9rem; left: 0; right: 0; text-align: center; font-size: 0.6rem; font-weight: 400; color: var(--viz-text); }
+.md-typeset .explorer .tr-arr { padding-top: 0.9rem; }
+.md-typeset .explorer .tr-arr > span.is-done { background: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset .explorer .tr-arr > span.is-i { box-shadow: inset 0 0 0 3px var(--viz-s1); }
+.md-typeset .explorer .tr-arr > span.is-j { outline: 3px dashed var(--viz-s2); outline-offset: -1px; }
+.md-typeset .explorer .tr-arr > span.is-swapped { animation: tr-flash 0.6s ease-out; }
+@keyframes tr-flash { from { background: var(--diff-medium-bg); } }
+.md-typeset .explorer .tr-counts { margin: 0.5em 0 0.2em; font-size: 0.75rem; }
+.md-typeset .explorer .tr-legend { margin: 0; font-size: 0.65rem; color: var(--viz-text); display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; }
+.md-typeset .explorer .tr-lg-i { color: var(--viz-s1-text); }
+.md-typeset .explorer .tr-lg-j { color: var(--viz-s2-text); }
+.md-typeset .explorer .tr-lg-done { color: var(--viz-s3-text); }
+.md-typeset .explorer .tr-step { margin: 0.4em 0; }
+
+/* 0023: the timeline of the reads (U136) */
+.md-typeset .explorer .ep-gantt { direction: ltr; margin-top: 0.3rem; }
+.md-typeset .explorer .ep-gantt svg.ep-live { width: 100%; max-width: 34rem; display: block; }
+.md-typeset svg .ep-wait { fill: none; stroke-width: 2.5; stroke-dasharray: 5 3; opacity: 0.8; }
+.md-typeset svg .ep-ready { fill: none; stroke-width: 6; opacity: 0.45; }
+.md-typeset svg .ep-cpl { stroke: var(--md-default-bg-color); stroke-width: 1.5; }
+.md-typeset svg .ep-now { stroke: var(--viz-s3); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.md-typeset svg :is(.ep-wait, .ep-ready).ep-c0 { stroke: var(--viz-s1); }
+.md-typeset svg :is(.ep-wait, .ep-ready).ep-c1 { stroke: var(--viz-s2); }
+.md-typeset svg :is(.ep-wait, .ep-ready).ep-c2 { stroke: var(--viz-s3); }
+.md-typeset svg :is(.ep-wait, .ep-ready).ep-c3 { stroke: var(--viz-s4); }
+.md-typeset svg .ep-cpl.ep-c0 { fill: var(--viz-s1); }
+.md-typeset svg .ep-cpl.ep-c1 { fill: var(--viz-s2); }
+.md-typeset svg .ep-cpl.ep-c2 { fill: var(--viz-s3); }
+.md-typeset svg .ep-cpl.ep-c3 { fill: var(--viz-s4); }
+.md-typeset .explorer .ep-legend { direction: rtl; }
+.md-typeset .explorer .ep-legend i.ep-lg-wait { background: none; border-top: 2px dashed var(--viz-ink); height: 0; }
+.md-typeset .explorer .ep-legend i.ep-lg-ready { background: var(--viz-ink); opacity: 0.45; height: 0.4rem; }
+.md-typeset .explorer .ep-legend i.ep-lg-cpl { background: var(--viz-ink); border-radius: 50%; }
+.md-typeset .explorer .ep-legend i.ep-lg-now { background: none; border-left: 2px dashed var(--viz-s3); width: 0; }
+
+/* 0007: a focused point of the triangle and polygon boxes (U137) */
+.md-typeset svg .tri-pt:focus-visible { outline: none; stroke: var(--viz-s3); stroke-width: 4; }
+
+/* every box: the help button, the help line and "reset everything" (U138) */
+.md-typeset .explorer .ex-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.6rem; margin: -0.2rem 0 0.4rem; }
+.md-typeset .explorer .ex-help-btn { width: 1.35rem; height: 1.35rem; padding: 0; border-radius: 50%; border: 1px solid var(--viz-grid); background: var(--md-default-bg-color); color: var(--viz-ink); font: inherit; font-size: 0.7rem; font-weight: 700; line-height: 1; cursor: pointer; }
+.md-typeset .explorer .ex-help-btn[aria-expanded="true"] { background: var(--viz-s1); border-color: var(--viz-s1); color: var(--md-default-bg-color); }
+.md-typeset .explorer .ex-reset-all,
+.md-typeset .explorer .ex-link,
+.md-typeset .explorer .ex-restart { border: none; background: none; padding: 0; color: var(--viz-text); font: inherit; font-size: 0.65rem; text-decoration: underline dotted; cursor: pointer; }
+.md-typeset .explorer .ex-reset-all:hover,
+.md-typeset .explorer .ex-link:hover,
+.md-typeset .explorer .ex-restart:hover { color: var(--md-accent-fg-color); }
+/* G221: the line under the header of a box that got its remembered state back */
+.md-typeset .explorer .ex-restored { margin: 0 0 0.5rem; padding: 0.25rem 0.5rem; border-inline-start: 3px solid var(--viz-s1); font-size: 0.65rem; color: var(--viz-text); background: var(--md-code-bg-color); }
+.md-typeset .explorer .ex-help { flex-basis: 100%; margin: 0; font-size: 0.7rem; line-height: 1.5; color: var(--viz-text); }
+.md-typeset .explorer .ex-help[hidden] { display: none; }
+
+/* every timing strip: copy as WaveDrom, open in the editor (U133) */
+.md-typeset .explorer .wv-export { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1rem; margin: 0.3rem 0 0; font-size: 0.68rem; }
+.md-typeset .explorer .wv-export .md-button { padding: 0.1rem 0.6rem; font-size: 0.65rem; margin: 0; }
+
+/* 0033: the window of the wr / rd strip on the fill chart (X147) */
+.md-typeset svg .fifo-win { fill: var(--viz-s3); fill-opacity: 0.12; stroke: var(--viz-s3); stroke-width: 1; stroke-dasharray: 4 3; }
+.md-typeset .explorer .fifo-winlab input[type="range"] { width: 14rem; }
+.md-typeset .explorer .fifo-wintext { font-size: 0.7rem; color: var(--viz-text); }
+
+/* every timing strip: the row names stick to the left edge while the strip scrolls */
+.md-typeset .explorer .wv-row { display: flex; align-items: flex-start; width: max-content; }
+.md-typeset .explorer .wv-names { position: sticky; left: 0; z-index: 1; flex: none; box-sizing: border-box; padding-right: 8px; text-align: right; background: var(--md-default-bg-color); font-family: var(--md-code-font-family); font-size: 12px; color: var(--viz-text); white-space: nowrap; overflow: hidden; }
+.md-typeset .explorer .wv-row:has(> .fig-wrap) .wv-names { margin-top: 1.8rem; }
+
+/* the 45 digit pairs of the 0005 follow-up: rows a = 0..8, columns b = 1..9 */
+.md-typeset .explorer .ab-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 0.15rem; margin-top: 0.5rem; max-width: 30rem; }
+.md-typeset .explorer .ab-head { align-self: center; text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--viz-text); }
+.md-typeset .explorer .ab-corner { font-weight: 400; font-size: 0.6rem; white-space: nowrap; }
+.md-typeset .explorer .ab-cell { min-height: 2rem; padding: 0; border-radius: 0.2rem; border: 1px solid transparent; font: inherit; font-size: 0.7rem; font-variant-numeric: tabular-nums; cursor: pointer; overflow: hidden; }
+.md-typeset .explorer .ab-cell.ab-ok { background: var(--diff-easy-bg); color: var(--diff-easy); border-color: var(--diff-easy-bg); }
+.md-typeset .explorer .ab-cell.ab-no { background: var(--diff-hard-bg); color: var(--diff-hard); border-color: var(--diff-hard-bg); }
+.md-typeset .explorer .ab-cell.is-sel { border-color: currentColor; box-shadow: 0 0 0 1px currentColor; font-weight: 700; }
+.md-typeset .explorer .ab-cell:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 1px; }
+.md-typeset .explorer .viz-legend .ab-ok-key { background: var(--diff-easy); }
+.md-typeset .explorer .viz-legend .ab-no-key { background: var(--diff-hard); }
+.md-typeset .explorer .ab-ans { display: inline-block; max-width: 100%; max-height: 6rem; overflow-y: auto; vertical-align: top; word-break: break-all; font-family: var(--md-code-font-family); font-size: 0.75rem; }
+
+/* Egg drop (0039): the page's building figure, and the explorer with the building, the zoom and the chart */
+.md-typeset svg .egg-wall { fill: var(--md-code-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .egg-floor { stroke: var(--viz-grid); stroke-width: 0.8; }
+.md-typeset svg .egg-band0 { fill: var(--viz-s1); fill-opacity: 0.1; }
+.md-typeset svg .egg-band1 { fill: var(--viz-s1); fill-opacity: 0.22; }
+.md-typeset svg .egg-drop1 { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .egg-drop2 { stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg .egg-drop3 { stroke: var(--viz-s3); stroke-width: 1.5; }
+.md-typeset svg .egg-lbl1 { fill: var(--viz-s1-text); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .egg-lbl2 { fill: var(--viz-s2-text); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .egg-lbl3 { fill: var(--viz-s3-text); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .egg-key1 { background: var(--viz-s1); }
+.md-typeset .viz-legend .egg-key2 { background: var(--viz-s2); }
+.md-typeset .viz-legend .egg-key3 { background: var(--viz-s3); }
+.md-typeset .explorer .eg-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
+.md-typeset .explorer .eg-building { flex: 0 0 9.5rem; }
+.md-typeset .explorer svg.eg-live { width: 9.5rem; max-width: 100%; display: block; }
+.md-typeset .explorer .eg-zoomwrap { flex: 1 1 14rem; min-width: 0; max-width: 20rem; }
+.md-typeset .explorer .eg-zoomwrap .ex-title { margin: 0 0 0.3rem; }
+.md-typeset .explorer svg.eg-zoomsvg { width: 100%; max-width: 16rem; display: block; }
+.md-typeset .explorer .eg-winlab { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .eg-winlab input[type="range"] { flex: 1 1 6rem; }
+.md-typeset .explorer .eg-step { margin: 0.3em 0 0.5em; }
+.md-typeset svg .eg-wall { fill: var(--md-code-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .eg-safe { fill: var(--diff-easy); fill-opacity: 0.28; }
+.md-typeset svg .eg-broke { fill: var(--diff-hard); fill-opacity: 0.28; }
+.md-typeset svg .eg-win { fill: none; stroke: var(--viz-ink); stroke-width: 1.2; stroke-dasharray: 3 2; }
+.md-typeset svg .eg-floor { stroke: var(--viz-grid); stroke-width: 0.8; }
+.md-typeset svg .eg-tick { fill: var(--viz-text); font-size: 9px; font-family: var(--md-code-font-family); }
+.md-typeset svg .eg-thr { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .eg-next { stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: 5 3; }
+.md-typeset svg .eg-nextlbl { fill: var(--viz-s1-text); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .eg-drop circle { fill: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .eg-drop text { font-size: 9px; font-weight: 700; font-family: var(--md-code-font-family); fill: var(--viz-ink); }
+.md-typeset svg .eg-drop.is-safe circle { stroke: var(--diff-easy); }
+.md-typeset svg .eg-drop.is-broke circle { stroke: var(--diff-hard); }
+.md-typeset svg .eg-hit { fill: transparent; cursor: pointer; }
+.md-typeset svg .eg-row rect { fill: var(--md-code-bg-color); stroke: var(--viz-grid); stroke-width: 1; cursor: pointer; }
+.md-typeset svg .eg-row:hover rect { fill: var(--viz-s1); fill-opacity: 0.18; }
+.md-typeset svg .eg-row:focus-visible { outline: none; }
+.md-typeset svg .eg-row:focus-visible rect { stroke: var(--site-focus-ring); stroke-width: 2.5; }
+.md-typeset svg .eg-row.is-thr rect { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg .eg-row.is-next rect { stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: 4 2; }
+.md-typeset svg .eg-rownum { fill: var(--viz-ink); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .eg-rowtxt { fill: var(--viz-text); font-size: 9px; }
+.md-typeset svg .eg-chart-thr { fill: var(--viz-s2); fill-opacity: 0.25; }
+.md-typeset .viz-legend .eg-key-safe { background: var(--diff-easy); opacity: 0.6; }
+.md-typeset .viz-legend .eg-key-broke { background: var(--diff-hard); opacity: 0.6; }
+.md-typeset .viz-legend .eg-key-unknown { background: var(--md-code-bg-color); outline: 1.5px solid var(--viz-grid); }
+.md-typeset .viz-legend .eg-key-thr { background: var(--viz-s2); }
+.md-typeset .viz-legend .eg-key-next { background: var(--viz-s1); }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .eg-building { flex: 0 0 7.5rem; }
+  .md-typeset .explorer svg.eg-live { width: 7.5rem; }
+}
+
+/* Sequence detector (0040): the state diagram figure and the explorer's live graph */
+.md-typeset svg .fs-node circle { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .fs-node text { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .fs-node.is-start circle { stroke-width: 3.5; }
+.md-typeset svg .fs-node.is-cur circle { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 3.5; }
+.md-typeset svg .fs-node.is-out circle { stroke-dasharray: 4 3; }
+.md-typeset svg .fs-meaning { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg .fs-edge { fill: none; stroke: var(--viz-s1); stroke-width: 1.8; }
+.md-typeset svg .fs-edge.is-found { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .fs-edge.is-taken { stroke: var(--viz-ink); stroke-width: 3.5; }
+.md-typeset svg .fs-arrowhead { fill: var(--viz-ink); }
+.md-typeset svg .fs-label { fill: var(--viz-s1-text); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .fs-label.is-found { fill: var(--viz-s2-text); }
+.md-typeset svg .fs-label.is-taken { fill: var(--viz-ink); font-size: 14px; }
+.md-typeset .viz-legend .fs-key { background: var(--viz-s1); }
+.md-typeset .viz-legend .fs-key-found { background: var(--viz-s2); }
+.md-typeset .viz-legend .sq-key-cur { background: var(--viz-s2); opacity: 0.5; outline: 2px solid var(--viz-s2); }
+.md-typeset .explorer .sq-graph { margin-top: 0.4rem; }
+.md-typeset .explorer svg.sq-live { width: 100%; max-width: 41rem; display: block; }
+.md-typeset .explorer input.sq-pat { width: 7rem; letter-spacing: 0.15em; }
+.md-typeset .explorer .sq-next { margin: 0.2em 0 0.4em; }
+.md-typeset .explorer .sq-bit { min-width: 2.4rem; font-family: var(--md-code-font-family); font-weight: 700; }
+
+/* Coverage explorer (0041): the weight sliders, the bins, the histogram */
+.md-typeset .explorer .cv-weights { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin-top: 0.4rem; }
+.md-typeset .explorer .cv-weights label { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; }
+.md-typeset .explorer .cv-weights input[type="range"] { width: 5.5rem; }
+.md-typeset .explorer .cv-weights output { min-width: 1.2rem; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer .cv-bins { margin-top: 0.4rem; max-width: 40rem; }
+.md-typeset .explorer .cv-hist { max-width: 40rem; }
+.md-typeset .explorer .cv-run { margin: 0.2em 0 0.4em; }
+
+/* The camel and the water (0042): the explorer's distance axis with the depots, the camel and the passes */
+.md-typeset .explorer .cm-road { margin-top: 0.4rem; }
+.md-typeset .explorer svg.cm-live { width: 100%; max-width: 40rem; display: block; }
+.md-typeset .explorer .cm-chart { max-width: 40rem; }
+.md-typeset .explorer .cm-step { margin: 0.3em 0 0.5em; }
+.md-typeset .explorer input.cm-w, .md-typeset .explorer input.cm-t { width: 5rem; }
+.md-typeset svg .cm-axis { stroke: var(--viz-text); stroke-width: 2.5; }
+.md-typeset svg .cm-stop { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .cm-depot { fill: var(--viz-s1); fill-opacity: 0.55; stroke: var(--viz-s1); stroke-width: 1; }
+.md-typeset svg .cm-litres { fill: var(--viz-s1-text); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .cm-km { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg .cm-camel { font-size: 26px; }
+.md-typeset svg .cm-carry { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .cm-pass { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .cm-pass-head { fill: var(--viz-s2); }
+.md-typeset svg .cm-pass-lbl { fill: var(--viz-s2-text); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .cm-pass.is-next { stroke: var(--viz-s3); stroke-dasharray: 5 3; stroke-width: 2; }
+.md-typeset svg .cm-pass-head.is-next { fill: var(--viz-s3); }
+.md-typeset svg .cm-pass-lbl.is-next { fill: var(--viz-s3-text); }
+.md-typeset .viz-legend .cm-key-depot { background: var(--viz-s1); opacity: 0.7; }
+.md-typeset .viz-legend .cm-key-camel { background: var(--viz-ink); }
+.md-typeset .viz-legend .cm-key-pass { background: var(--viz-s2); }
+.md-typeset .viz-legend .cm-key-next { background: var(--viz-s3); }
+
+/* Horse races (0043): the page's grid figure and the explorer's grid and race table */
+.md-typeset svg .hr-cell rect { fill: var(--md-code-bg-color); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .hr-cell.is-cand rect { fill: var(--viz-s1); fill-opacity: 0.22; stroke: var(--viz-s1); }
+.md-typeset svg .hr-cell.is-placed rect { fill: var(--viz-s3); fill-opacity: 0.35; stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .hr-cell.is-out rect { fill: var(--viz-grid); fill-opacity: 0.35; }
+.md-typeset svg .hr-cell.is-now rect { stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .hr-cell { cursor: pointer; }
+.md-typeset svg .hr-cell:focus-visible rect { outline: none; stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg .hr-cell.is-chain rect { stroke: var(--viz-ink); stroke-width: 2.5; stroke-dasharray: 5 3; }
+.md-typeset svg .hr-cell.is-pick rect { stroke: var(--viz-ink); stroke-width: 4; }
+.md-typeset svg .hr-link { stroke: var(--viz-ink); stroke-width: 1.8; stroke-opacity: 0.75; }
+.md-typeset svg .hr-name { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .hr-cell.is-out .hr-name { fill: var(--viz-text); font-weight: 400; }
+.md-typeset svg .hr-count { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .hr-rank { fill: var(--viz-s2-text); font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .hr-key-placed { background: var(--viz-s3); opacity: 0.7; }
+.md-typeset .viz-legend .hr-key-cand { background: var(--viz-s1); opacity: 0.5; }
+.md-typeset .viz-legend .hr-key-out { background: var(--viz-grid); }
+.md-typeset .viz-legend .hr-key-now { background: transparent; outline: 2.5px solid var(--viz-s2); }
+.md-typeset .explorer .hr-gridbox { margin-top: 0.4rem; }
+.md-typeset .explorer svg.hr-live { display: block; width: 100%; }
+.md-typeset .explorer .hr-step { margin: 0.3em 0 0.5em; }
+.md-typeset .explorer .hr-reveal { display: inline-flex; align-items: center; gap: 0.3rem; }
+.md-typeset .explorer input.hr-a { width: 4.5rem; }
+.md-typeset .explorer .hr-table { max-width: 100%; overflow-x: auto; }
+.md-typeset .explorer table.hr-races { font-size: 0.7rem; margin: 0; }
+.md-typeset .explorer table.hr-races td, .md-typeset .explorer table.hr-races th { padding: 0.2em 0.5em; }
+.md-typeset .explorer table.hr-races tr.is-now td { background: var(--diff-medium-bg); font-weight: 700; }
+.md-typeset .explorer table.hr-races tr.is-proof td { background: var(--md-code-bg-color); box-shadow: inset 0 -2px var(--viz-ink); }
+.md-typeset .explorer table.hr-races tr.is-proof td:first-child { font-weight: 700; }
+.md-typeset .explorer table.hr-races td:nth-child(3) { white-space: nowrap; }
+
+/* Kaprekar in base b (0012 part c): the map of d and the explorer */
+.md-typeset svg .kb-axis { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .kb-tick { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg path.kb-arrow { fill: none; stroke: var(--viz-s1); stroke-width: 1.6; stroke-opacity: 0.75; }
+.md-typeset svg circle.kb-arrow { fill: var(--viz-s1); }
+.md-typeset svg path.kb-arrow.is-cycle { stroke: var(--viz-s3); stroke-width: 2.2; stroke-opacity: 1; }
+.md-typeset svg circle.kb-arrow.is-cycle { fill: var(--viz-s3); }
+.md-typeset svg path.kb-arrow.is-path { stroke: var(--viz-s2); stroke-width: 3; stroke-opacity: 1; }
+.md-typeset svg circle.kb-arrow.is-path { fill: var(--viz-s2); }
+.md-typeset svg .kb-fixed { fill: var(--viz-s3); fill-opacity: 0.35; stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .kb-cur { fill: none; stroke: var(--viz-s2); stroke-width: 2.5; stroke-dasharray: 4 3; }
+.md-typeset .viz-legend .kb-key-arrow { background: var(--viz-s1); }
+.md-typeset .viz-legend .kb-key-fixed { background: var(--viz-s3); opacity: 0.7; }
+.md-typeset .viz-legend .kb-key-path { background: var(--viz-s2); }
+.md-typeset .explorer svg.kb-live { width: 100%; max-width: 40rem; display: block; }
+.md-typeset .explorer input.kb-x { width: 4.5rem; letter-spacing: 0.15em; font-family: var(--md-code-font-family); text-transform: uppercase; }
+.md-typeset .explorer .kb-dec { font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .kb-step { margin: 0.4em 0 0.6em; }
+.md-typeset .explorer .kb-chart svg { max-width: 30rem; }
+.md-typeset .explorer .kb-table td.kb-diff { white-space: nowrap; }
+
+/* Kaprekar with four digits in base B (0013 bonus): the map of the pairs (p, q) */
+.md-typeset svg .kq-tick { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .kq-cell { stroke: var(--md-default-bg-color); stroke-width: 1; }
+.md-typeset svg .kq-cell.is-fixed { fill: var(--viz-s3); }
+.md-typeset svg .kq-cell.is-cycle { fill: var(--viz-s1); }
+.md-typeset svg .kq-cell.to-fixed { fill: var(--viz-s3); fill-opacity: 0.35; }
+.md-typeset svg .kq-cell.to-cycle { fill: var(--viz-s1); fill-opacity: 0.25; }
+.md-typeset svg .kq-path { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .kq-head { fill: var(--viz-s2); }
+.md-typeset svg .kq-start { fill: none; stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset .viz-legend .kq-key-fixed { background: var(--viz-s3); }
+.md-typeset .viz-legend .kq-key-cycle { background: var(--viz-s1); }
+.md-typeset .viz-legend .kq-key-tofixed { background: var(--viz-s3); opacity: 0.4; }
+.md-typeset .viz-legend .kq-key-tocycle { background: var(--viz-s1); opacity: 0.3; }
+.md-typeset .viz-legend .kq-key-path { background: var(--viz-s2); }
+/* The pigeonhole box (0005 bonus): the remainder slots, the repunits dropped in them. */
+.md-typeset svg .rp-slot { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .rp-slot.is-hit { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .rp-chip { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .rp-chip.is-new { fill: var(--viz-s1); }
+.md-typeset .viz-legend .rp-key-new { background: var(--viz-s1); }
+.md-typeset .viz-legend .rp-key-hit { background: var(--viz-s2); opacity: 0.5; }
+/* The binary search box (0017 solution 3): counted cells, the range, mid, the line y = v. */
+.md-typeset .explorer .db-cells .box-grid > span.is-counted { background: color-mix(in srgb, var(--viz-s1) 22%, transparent); border-color: var(--viz-s1); }
+.md-typeset svg .db-range { fill: var(--viz-s3); fill-opacity: 0.14; }
+.md-typeset svg .db-bar { fill: var(--viz-s1); }
+.md-typeset svg .db-bar.is-out { fill-opacity: 0.3; }
+.md-typeset svg .db-bar.is-mid { fill: var(--viz-s2); fill-opacity: 1; }
+.md-typeset svg .db-line { stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 6 4; }
+.md-typeset .viz-legend .db-key-range { background: var(--viz-s3); opacity: 0.35; }
+.md-typeset .viz-legend .db-key-mid { background: var(--viz-s2); }
+.md-typeset .viz-legend .db-key-line { background: var(--viz-ink); height: 2px; }
+/* The pairs box (0013 part b): the picked cell, the later arrows of the path. */
+.md-typeset svg .kpp-cell { cursor: pointer; }
+.md-typeset svg .kpp-cell.is-pick .box-node { stroke: var(--viz-ink); stroke-width: 4; }
+.md-typeset svg .kpp-later { opacity: 0.4; }
+.md-typeset .viz-legend .kpp-key-q0 { background: var(--viz-s1); opacity: 0.4; }
+.md-typeset .viz-legend .kpp-key-fixed { background: var(--viz-s2); opacity: 0.4; }
+.md-typeset .explorer .kpp-text p { margin: 0.3em 0; }
+.md-typeset .explorer svg.k4-live { width: 100%; max-width: 28rem; display: block; }
+.md-typeset .explorer input.k4-x { width: 5rem; letter-spacing: 0.15em; font-family: var(--md-code-font-family); text-transform: uppercase; }
+
+/* Gap line explorer (0029 part b): the angle difference against time, the integers, the meetings */
+.md-typeset svg .gl-int { stroke: var(--viz-grid); stroke-width: 1; stroke-dasharray: 5 4; }
+.md-typeset svg .gl-span { fill: var(--viz-s3); fill-opacity: 0.1; }
+.md-typeset svg .gl-line { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .gl-tickline { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg .gl-in { fill: var(--viz-s2); stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg .gl-out { fill: var(--md-default-bg-color); stroke: var(--viz-text); stroke-width: 2; }
+.md-typeset svg .gl-ends { stroke: var(--viz-s3); stroke-width: 3; }
+.md-typeset svg .gl-end-in { fill: var(--viz-s3); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .gl-end-out { fill: var(--md-default-bg-color); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset .viz-legend .gl-key-line { background: var(--viz-s1); height: 3px; }
+.md-typeset .viz-legend .gl-key-in { background: var(--viz-s2); border-radius: 50%; }
+.md-typeset .viz-legend .gl-key-out { background: transparent; border: 2px solid var(--viz-text); border-radius: 50%; box-sizing: border-box; }
+
+/* Tuesday grid explorer (0015 part b): the families counted step by step */
+.md-typeset svg .tu-a { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 1.2; }
+.md-typeset svg .tu-two { fill: var(--viz-s2); fill-opacity: 0.8; stroke: var(--viz-s2); stroke-width: 1.2; }
+.md-typeset .explorer svg .tu-c { cursor: pointer; }
+.md-typeset .explorer svg .tu-c.is-sel { stroke: var(--viz-ink); stroke-width: 2.5; }
+.md-typeset .viz-legend .tu-key-a { background: var(--viz-s2); opacity: 0.4; }
+.md-typeset .viz-legend .tu-key-two { background: var(--viz-s2); opacity: 0.85; }
+.md-typeset .explorer .tu-cell { min-height: 1.4em; margin: 0.2em 0; }
+
+/* FIFO staircases (0033 part a): written and read words, the gap between them */
+.md-typeset svg .fs-gap { fill: var(--viz-s2); fill-opacity: 0.22; stroke: none; }
+.md-typeset svg .fs-cursor { stroke: var(--viz-s2); stroke-width: 4; stroke-linecap: round; }
+.md-typeset .viz-legend .fs-key-gap { background: var(--viz-s2); opacity: 0.45; }
+
+/* Stage ribbon (0041 part a): the tests cut into stages i -> i + 1 */
+.md-typeset .explorer .sg-bins { gap: 0.15rem; margin: 0.5rem 0 0; max-width: 40rem; }
+.md-typeset .explorer .sg-bins > span.is-counted { background: color-mix(in srgb, var(--viz-s3) 22%, transparent); border-color: var(--viz-s3); }
+.md-typeset .explorer .sg-bins > span.sg-new { outline: 2.5px solid var(--viz-s3); outline-offset: 1px; }
+.md-typeset .explorer .sg-bins > span.sg-again { outline: 2.5px solid var(--viz-s2); outline-offset: 1px; }
+.md-typeset .explorer .sg-ribbon { display: flex; flex-wrap: wrap; gap: 0.35rem 0.3rem; min-height: 1rem; margin: 0.3rem 0 0.6rem; }
+.md-typeset .explorer .sg-stage { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 2px; border-radius: 3px; background: color-mix(in srgb, var(--viz-s1) 12%, transparent); }
+.md-typeset .explorer .sg-stage.is-odd { background: color-mix(in srgb, var(--viz-s3) 12%, transparent); }
+.md-typeset .explorer .sg-stage > i { display: block; width: 0.6rem; height: 0.6rem; border-radius: 2px; background: var(--viz-grid); }
+.md-typeset .explorer .sg-stage > i.is-new { background: var(--viz-s3); }
+.md-typeset .explorer .sg-stage > i.is-last { outline: 2px solid var(--viz-ink); outline-offset: 1px; }
+.md-typeset svg .sg-now { fill: var(--viz-s2); fill-opacity: 0.45; }
+.md-typeset .viz-legend .sg-key-now { background: var(--viz-s2); opacity: 0.55; }
+
+/* Recurrence ladder (0021 part b): C(0..N), the terms of C(n), a block strip per term */
+.md-typeset .explorer .ld-row { display: flex; flex-wrap: wrap; gap: 0.2rem; margin: 0.6rem 0 0.3rem; }
+.md-typeset .explorer .ld-cell { display: flex; flex-direction: column; align-items: center; min-width: 2.6rem; padding: 0.15rem 0.2rem; font: inherit; font-family: var(--md-code-font-family); color: var(--viz-ink); background: var(--md-default-bg-color); border: 1.5px solid var(--viz-grid); border-radius: 0.25rem; cursor: pointer; }
+.md-typeset .explorer .ld-cell:disabled { cursor: default; }
+.md-typeset .explorer .ld-cell small { font-size: 0.55rem; color: var(--viz-text); min-height: 0.8em; opacity: 1; }  /* Material dims <small> to 0.75 */
+.md-typeset .explorer .ld-cell b { font-size: 0.8rem; }
+.md-typeset .explorer .ld-cell.is-sel { border-color: var(--viz-s2); background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .ld-cell.is-term { border-color: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .ld-cell:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer .ld-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.6rem; margin: 0.25rem 0; font-size: 0.75rem; }
+.md-typeset .explorer .ld-lab { flex: 0 0 2.8rem; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .ld-strip { display: inline-flex; gap: 2px; }
+.md-typeset .explorer .ld-strip > i { display: block; width: 1.05rem; height: 1rem; border-radius: 2px; }
+.md-typeset .explorer .ld-strip > i.ld-first { background: var(--viz-s3); }
+.md-typeset .explorer .ld-strip > i.ld-first.is-end { margin-right: 0.35rem; }
+.md-typeset .explorer .ld-strip > i.ld-rest { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); border: 1px solid var(--viz-s1); }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .ld-cell { min-width: 2.1rem; }
+  .md-typeset .explorer .ld-strip > i { width: 0.75rem; }
+}
+.md-typeset .explorer .ld-math { display: inline-block; font-family: var(--md-code-font-family); font-size: 0.8em; }
+
+/* Metastability Monte Carlo (0037 part a): edges around the clock edge, settling times */
+.md-typeset svg .mc-window { fill: var(--viz-s2); fill-opacity: 0.25; }
+.md-typeset svg .mc-clk { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .mc-zoom { fill: none; stroke: var(--viz-grid); stroke-width: 1.2; }
+/* 0037: the three-column factor table as one block per factor on a phone */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer table.mc-factors thead { display: none; }
+  .md-typeset .explorer table.mc-factors tr { display: block; padding: 0.35em 0; border-bottom: 1px solid var(--viz-grid); }
+  .md-typeset .explorer table.mc-factors td { display: block; padding: 0.1em 0.3em; border: none; }
+  .md-typeset .explorer table.mc-factors td:first-child { font-weight: 700; }
+  .md-typeset .explorer table.mc-factors td[data-label]::before { content: attr(data-label) "\00a0: "; color: var(--viz-text); }
+}
+.md-typeset svg .mc-in { fill: var(--viz-s2); }
+.md-typeset svg .mc-out { fill: var(--viz-text); fill-opacity: 0.35; }
+.md-typeset svg .mc-fail { fill: var(--viz-s2); fill-opacity: 0.1; }
+.md-typeset svg .mc-cut { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .mc-failed { fill: var(--viz-s2); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset .viz-legend .mc-key-in { background: var(--viz-s2); border-radius: 50%; }
+.md-typeset .viz-legend .mc-key-out { background: var(--viz-text); opacity: 0.45; border-radius: 50%; }
+.md-typeset .viz-legend .mc-key-cut { background: var(--viz-s2); opacity: 0.3; }
+
+/* SVA attempt lanes (0038 part a): a lane per property under the timing strip */
+.md-typeset svg .at-sep { stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .at-vac { fill: var(--viz-text); fill-opacity: 0.45; }
+.md-typeset svg .at-bracket { fill: none; stroke-width: 2; }
+.md-typeset svg .at-pass .at-bracket, .md-typeset svg .at-pass .at-start { stroke: var(--diff-easy); }
+.md-typeset svg .at-fail .at-bracket, .md-typeset svg .at-fail .at-start { stroke: var(--diff-hard); }
+.md-typeset svg .at-open .at-bracket, .md-typeset svg .at-open .at-start { stroke: var(--viz-text); stroke-dasharray: 3 2; }
+.md-typeset svg .at-start { fill: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .at-mark { font-size: 13px; font-weight: 700; }
+.md-typeset svg .at-pass .at-mark { fill: var(--diff-easy); }
+.md-typeset svg .at-fail .at-mark { fill: var(--diff-hard); }
+.md-typeset svg .at-open .at-mark { fill: var(--viz-text); }
+.md-typeset .viz-legend .at-key-start { background: transparent; border: 2px solid var(--viz-ink); border-radius: 50%; box-sizing: border-box; }
+.md-typeset .viz-legend .at-key-pass { background: var(--diff-easy); }
+.md-typeset .viz-legend .at-key-fail { background: var(--diff-hard); }
+.md-typeset .viz-legend .at-key-vac { background: var(--viz-text); opacity: 0.5; border-radius: 50%; }
+.md-typeset .explorer .at-scroll { overflow-x: auto; }
+
+/* Kaprekar after n steps (0044): the gap chart with the line part shaded */
+.md-typeset svg .kn-line { fill: var(--viz-s3); fill-opacity: 0.12; }
+.md-typeset .viz-legend .kn-key-line { background: var(--viz-s3); opacity: 0.3; }
+
+/* Kaprekar state diagram (0044): cards shaded by the gap d, arrows, the closing loop */
+.md-typeset .explorer .kg-graph { margin-top: 0.4rem; }
+.md-typeset .explorer svg.kg-svg { width: 100%; height: auto; display: block; margin: 0 auto; }
+.md-typeset svg .kg-card { fill: color-mix(in srgb, var(--viz-s1) var(--kg-t, 20%), var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg .kg-node { cursor: pointer; }
+.md-typeset svg .kg-node.is-end .kg-card { stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .kg-node.is-sel .kg-card { stroke: var(--viz-ink); stroke-width: 3.5; }
+.md-typeset svg .kg-node:focus-visible { outline: none; }
+.md-typeset svg .kg-node:focus-visible .kg-card { stroke: var(--site-focus-ring); stroke-width: 3.5; }
+.md-typeset svg .kg-num { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 19px; font-weight: 700; }
+.md-typeset svg .kg-base { font-size: 10px; font-weight: 400; }
+.md-typeset svg .kg-sub { fill: var(--viz-ink); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg .kg-tag { fill: var(--viz-text); font-size: 11px; font-family: var(--md-text-font-family); }
+.md-typeset svg .kg-arrow { fill: none; stroke: var(--viz-ink); stroke-width: 1.8; }
+.md-typeset svg .kg-arrow.is-end { stroke: var(--viz-s2); stroke-width: 2.4; }
+.md-typeset svg .kg-head { fill: var(--viz-ink); }
+.md-typeset svg .kg-head-end { fill: var(--viz-s2); }
+.md-typeset .explorer .kg-steps tr[data-i] { cursor: pointer; }
+.md-typeset .explorer .kg-steps tr.kg-repeat td { color: var(--viz-text); font-style: italic; }
+.md-typeset .viz-legend .kg-key-lo { background: color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s1); }
+.md-typeset .viz-legend .kg-key-hi { background: color-mix(in srgb, var(--viz-s1) 60%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .kg-key-end { background: transparent; outline: 2.5px solid var(--viz-s2); outline-offset: -2px; }
+
+/* The odd ball on a balance (0045): a row per weighing with its outcome beside the
+   balance; the odd ball red when heavy and blue when light, genuine balls moved to even
+   the pans dashed; the decision table with a colour per outcome of weighing 1. */
+.md-typeset .explorer .ob-row { display: flex; align-items: center; gap: 0.6rem; margin: 0.3rem 0; padding-bottom: 0.3rem; border-bottom: 1px dashed var(--viz-grid); }
+.md-typeset .explorer .ob-tag { flex: none; display: flex; flex-direction: column; align-items: center; min-width: 4.6rem; font-size: 0.65rem; }
+.md-typeset .explorer .ob-tag b { font-size: 1.5rem; line-height: 1.1; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .ob-tag small { color: var(--md-default-fg-color); text-align: center; }
+.md-typeset .explorer .ob-row > :not(.ob-tag) { flex: 1 1 auto; min-width: 0; }   /* the svg, or the enlarge wrapper around it */
+.md-typeset .explorer .ob-svg { width: 100%; max-width: 40rem; margin: 0.2rem auto; }
+.md-typeset .explorer .ob-beam { stroke: var(--viz-ink); stroke-width: 6; stroke-linecap: round; }
+.md-typeset .explorer .ob-stand { fill: var(--viz-ink); }
+.md-typeset .explorer .ob-off-label { fill: var(--viz-text); font-size: 14px; font-family: var(--md-text-font-family); }
+.md-typeset .explorer .ob-ball circle { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset .explorer .ob-ball .ob-num { fill: var(--viz-ink); font-size: 14px; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .ob-ball.is-heavy circle { fill: var(--diff-hard); stroke: var(--diff-hard); }
+.md-typeset .explorer .ob-ball.is-light circle { fill: var(--viz-s1); stroke: var(--viz-s1); }
+.md-typeset .explorer .ob-ball:is(.is-heavy, .is-light) .ob-num { fill: var(--md-default-bg-color); font-weight: 700; }
+.md-typeset .explorer .ob-ball.is-helper circle { stroke-dasharray: 3 2; stroke: var(--viz-text); }
+.md-typeset .viz-legend .ob-key-normal { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-ink); border-radius: 50%; }
+.md-typeset .viz-legend .ob-key-heavy { background: var(--diff-hard); border-radius: 50%; }
+.md-typeset .viz-legend .ob-key-light { background: var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .ob-key-helper { background: transparent; outline: 1.5px dashed var(--viz-text); border-radius: 50%; }
+.md-typeset .explorer .ob-table { max-height: 22rem; overflow-y: auto; margin-top: 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.3rem; }
+.md-typeset .explorer table.ob-decide { margin: 0; font-size: 0.68rem; border-collapse: collapse; width: 100%; }
+.md-typeset .explorer table.ob-decide th { position: sticky; top: 0; z-index: 1; background: var(--md-default-bg-color); padding: 0.25em 0.6em; text-align: center; box-shadow: inset 0 -1px 0 var(--viz-grid); }
+.md-typeset .explorer table.ob-decide td { padding: 0.15em 0.6em; text-align: center; border-top: 1px solid var(--viz-grid); cursor: pointer; }
+.md-typeset .explorer table.ob-decide td.ob-o { font-family: var(--md-code-font-family); }
+.md-typeset .explorer table.ob-decide td.ob-first.ob-oL { background: color-mix(in srgb, var(--viz-s3) 22%, transparent); }
+.md-typeset .explorer table.ob-decide td.ob-first.ob-oE { background: color-mix(in srgb, var(--viz-s2) 22%, transparent); }
+.md-typeset .explorer table.ob-decide td.ob-first.ob-oR { background: color-mix(in srgb, var(--viz-s1) 22%, transparent); }
+.md-typeset .explorer table.ob-decide td.ob-h { color: var(--diff-hard); font-weight: 700; }
+.md-typeset .explorer table.ob-decide td.ob-l { color: var(--viz-s1-text); font-weight: 700; }
+.md-typeset .explorer table.ob-decide tr.is-none td { color: var(--viz-text); font-style: italic; }
+.md-typeset .explorer table.ob-decide tr.is-now td { background: color-mix(in srgb, var(--md-accent-fg-color) 28%, transparent); color: var(--md-default-fg-color); font-weight: 700; }   /* the kind keeps 4.5:1 on the lit row */
+@media screen and (max-width: 30em) {
+  .md-typeset .explorer .ob-row { flex-direction: column; align-items: stretch; gap: 0.2rem; }
+  .md-typeset .explorer .ob-tag { flex-direction: row; justify-content: flex-start; gap: 0.5rem; }
+  .md-typeset .explorer .ob-tag b { font-size: 1.1rem; }
+}
+
+/* The largest square and rectangle of ones (0046): the grid to edit and the dp (or heights)
+   matrix side by side, both left to right as matrices are; the current cell framed, the
+   neighbours dp read tinted, the stack's columns underlined, the best shape so far outlined
+   in orange, the rectangle being checked dashed, a dragged selection dashed in blue and
+   the answer green at the end. The boxes are grid items over the cells they cover. */
+.md-typeset .explorer .mo-panels { display: flex; flex-wrap: wrap; gap: 0.8rem 1.6rem; justify-content: center; margin: 0.5rem 0; }
+.md-typeset .explorer .mo-panel { flex: 0 1 auto; min-width: 0; max-width: 100%; margin: 0; }
+.md-typeset .explorer .mo-panel figcaption { margin: 0 auto 0.3rem; max-width: 22rem; font-size: 0.68rem; text-align: center; }
+.md-typeset .explorer .mo-grid { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1.75rem)); gap: 2px; width: max-content; max-width: 100%; margin: 0 auto; }
+.md-typeset .explorer .mo-r { display: contents; }
+.md-typeset .explorer .mo-cell { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; min-width: 0; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--viz-grid); background: var(--md-default-bg-color); color: var(--viz-text); font-family: var(--md-code-font-family); font-size: 0.7rem; line-height: 1; user-select: none; }
+.md-typeset .explorer .mo-dense .mo-cell { border-radius: 2px; font-size: 0.6rem; }
+.md-typeset .explorer .mo-in { touch-action: none; }
+.md-typeset .explorer .mo-in .mo-cell { cursor: pointer; }
+.md-typeset .explorer .mo-in .mo-cell.is-1 { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .mo-in .mo-cell:focus-visible { position: relative; z-index: 3; outline: 2px solid var(--md-accent-fg-color); outline-offset: 1px; }
+.md-typeset .explorer .mo-dp .mo-cell.is-wait { background: transparent; }
+.md-typeset .explorer .mo-dp .mo-cell.is-pos { background: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .mo-cell.is-row { box-shadow: inset 0 0 0 1px var(--viz-text); }
+.md-typeset .explorer .mo-cell.is-cur { box-shadow: inset 0 0 0 2.5px var(--viz-ink); }
+.md-typeset .explorer .mo-dp .mo-cell:is(.is-nb, .is-pop) { background: color-mix(in srgb, var(--viz-s4) 32%, var(--md-default-bg-color)); }
+.md-typeset .explorer .mo-dp .mo-cell.is-stack { background-image: linear-gradient(to top, var(--viz-s4) 3px, transparent 3px); }
+.md-typeset .explorer .mo-cell.is-win { background: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .mo-box { z-index: 2; margin: -2px; border-radius: 4px; pointer-events: none; }
+.md-typeset .explorer .mo-box--best { border: 3px solid var(--viz-s2); }
+.md-typeset .explorer .mo-box--cand { border: 2.5px dashed var(--viz-s4); }
+.md-typeset .explorer .mo-box--sel { border: 2px dashed var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 14%, transparent); }
+.md-typeset .explorer .mo-box--win { border: 3px solid var(--viz-s3); }
+/* a triangle's outline (part c): a staircase polygon in an SVG over its bounding square */
+.md-typeset .explorer .mo-tri { z-index: 2; display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; fill: none; stroke-linejoin: miter; }
+.md-typeset .explorer .mo-tri--best { stroke: var(--viz-s2); stroke-width: 3px; }
+.md-typeset .explorer .mo-tri--win { stroke: var(--viz-s3); stroke-width: 3px; }
+
+/* rainwater (0047): part a's columns, pointers and table; part b's height map and heap.
+   The ground is shaded up to 29 % ink (height 20) and the water up to 45 % blue, so the
+   ink digits on them stay readable (tools/check_contrast.py has both ends). */
+.md-typeset .explorer :is(.rw-bars, .rw-ptrs) { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1.6rem)); gap: 2px; width: max-content; max-width: 100%; margin: 0 auto; }
+.md-typeset .explorer .rw-bars { align-items: end; margin-top: 0.5rem; }
+.md-typeset .explorer .rw-col { display: flex; flex-direction: column; gap: 2px; min-width: 0; border-radius: 3px; cursor: pointer; touch-action: manipulation; }
+.md-typeset .explorer .rw-col:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.md-typeset .explorer .rw-col.is-cur { box-shadow: 0 0 0 2.5px var(--viz-ink); }
+.md-typeset .explorer .rw-cell { height: min(1.6rem, calc(14rem / var(--rows, 5))); border-radius: 2px; box-shadow: inset 0 0 0 1px var(--viz-grid); }
+.md-typeset .explorer .rw-cell.is-ground { background: color-mix(in srgb, var(--viz-ink) 55%, var(--md-default-bg-color)); box-shadow: none; }
+.md-typeset .explorer .rw-cell.is-water { background: color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color)); }
+.md-typeset .explorer .rw-idx { color: var(--viz-text); font-family: var(--md-code-font-family); font-size: 0.6rem; text-align: center; }
+.md-typeset .explorer .rw-ptrs span { min-height: 1.1em; color: var(--viz-s2-text); font-family: var(--md-code-font-family); font-size: 0.7rem; font-weight: 700; text-align: center; white-space: nowrap; }
+.md-typeset .explorer .rw-table-wrap { max-width: 100%; margin: 0.4rem 0; overflow-x: auto; }
+.md-typeset .explorer .rw-table { margin: 0 auto; border-collapse: collapse; font-family: var(--md-code-font-family); font-size: 0.62rem; }
+.md-typeset .explorer .rw-table :is(th, td) { min-width: 1.3rem; padding: 0.1rem 0.2rem; border: 1px solid var(--viz-grid); text-align: center; }
+.md-typeset .explorer .rw-table th { color: var(--viz-text); font-weight: 500; text-align: start; }
+.md-typeset .explorer .rw-table td.is-water { background: color-mix(in srgb, var(--viz-s1) 20%, var(--md-default-bg-color)); font-weight: 700; }
+.md-typeset .explorer .rw-table td.is-cur { box-shadow: inset 0 0 0 2px var(--viz-ink); }
+.md-typeset .explorer .rw-edit-hint { margin: 0.2rem 0; color: var(--viz-text); font-size: 0.65rem; }
+.md-typeset .explorer :is(.rw-step, .rw-code) { margin: 0.3rem 0; font-size: 0.72rem; }
+.md-typeset .explorer :is(.rw-step, .rw-code):empty { display: none; }
+.md-typeset .explorer .rw-panels { display: flex; flex-wrap: wrap; gap: 0.8rem 1.6rem; justify-content: center; margin: 0.5rem 0; }
+.md-typeset .explorer .rw-panel { flex: 0 1 auto; min-width: 0; max-width: 100%; margin: 0; }
+.md-typeset .explorer .rw-panel figcaption { margin: 0 auto 0.3rem; font-size: 0.68rem; text-align: center; }
+.md-typeset .explorer .rw-map { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 2rem)); gap: 2px; width: max-content; max-width: 100%; margin: 0 auto; }
+.md-typeset .explorer .rw-r { display: contents; }
+.md-typeset .explorer .rw-mcell { display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 1; min-width: 0; border-radius: 3px; background: color-mix(in srgb, var(--viz-ink) calc(var(--hgt) * 1.45%), var(--md-default-bg-color)); box-shadow: inset 0 0 0 1px var(--viz-grid); color: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 0.7rem; line-height: 1; cursor: pointer; user-select: none; touch-action: manipulation; }
+.md-typeset .explorer .rw-mcell.is-water { background: color-mix(in srgb, var(--viz-s1) min(45%, calc(17% + var(--dep) * 7%)), var(--md-default-bg-color)); }
+.md-typeset .explorer .rw-mcell .rw-w { font-size: 0.55rem; font-weight: 700; }
+.md-typeset .explorer .rw-mcell.is-heap { box-shadow: inset 0 0 0 2.5px var(--viz-s2); }
+.md-typeset .explorer .rw-mcell.is-fill { outline: 2px dashed var(--viz-s4); outline-offset: -4px; }
+.md-typeset .explorer .rw-mcell.is-cur { box-shadow: inset 0 0 0 3px var(--viz-ink); }
+.md-typeset .explorer .rw-mcell:focus-visible { position: relative; z-index: 3; outline: 2px solid var(--md-accent-fg-color); outline-offset: 1px; }
+.md-typeset .explorer .rw-heap { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; font-family: var(--md-code-font-family); font-size: 0.65rem; list-style: none; }
+.md-typeset .explorer .rw-heap li { margin: 0; padding: 0.05rem 0.4rem; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--viz-grid); }
+.md-typeset .explorer .rw-heap li.is-next { box-shadow: inset 0 0 0 2px var(--viz-s2); font-weight: 700; }
+.md-typeset .explorer .rw-heap :is(.rw-heap-more, .rw-heap-empty) { box-shadow: none; color: var(--viz-text); }
+.md-typeset .viz-legend :is(.rw-key-ground, .rw-key-water, .rw-key-cur, .rw-key-heap, .rw-key-fill) { border-radius: 3px; }
+.md-typeset .viz-legend .rw-key-ground { background: color-mix(in srgb, var(--viz-ink) 55%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .rw-key-water { background: color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .rw-key-cur { background: transparent; outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; }
+.md-typeset .viz-legend .rw-key-heap { background: transparent; outline: 2.5px solid var(--viz-s2); outline-offset: -2.5px; }
+.md-typeset .explorer .rw-col.is-sel { background: color-mix(in srgb, var(--viz-s1) 14%, transparent); outline: 2px dashed var(--viz-s1); outline-offset: 1px; }
+.md-typeset .explorer .rw-mcell.is-sel:not(.is-fill) { outline: 2px dashed var(--viz-s1); outline-offset: -4px; }
+.md-typeset .explorer .rw-inline { width: 100%; min-width: 2.2rem; padding: 0; border: 2px solid var(--md-accent-fg-color); border-radius: 3px; background: var(--md-default-bg-color); color: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 0.7rem; text-align: center; }
+.md-typeset .explorer :is(.rw-textlab, .mo-textlab) { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+.md-typeset .explorer :is(.rw-text, .mo-text) { width: min(18rem, 100%); padding: 0.2rem 0.35rem; border: 1px solid var(--site-card-border); border-radius: 4px; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font-family: var(--md-code-font-family); font-size: 0.7rem; }
+.md-typeset .explorer input.rw-text { width: min(26rem, 100%); }
+.md-typeset .explorer textarea:is(.rw-text, .mo-text) { width: min(14rem, 100%); resize: vertical; }
+.md-typeset .explorer :is(.rw-err, .mo-err) { color: var(--viz-s2-text); font-size: 0.68rem; }
+.md-typeset .explorer :is(.rw-err, .mo-err):empty { display: none; }
+/* the final view (0046, 0047): only the result, so the run's controls and words go */
+.md-typeset .explorer.ex-final :is(.rw-play, .mo-play, .ex-scrubwrap, .rw-step, .rw-code, .rw-ptrs, .rw-heap-panel, .mo-step, .mo-code) { display: none; }
+.md-typeset .explorer.ex-final .viz-legend > span:has(> :is(.rw-key-cur, .rw-key-heap, .rw-key-fill, .mo-key-cur, .mo-key-nb, .mo-key-cand, .mo-key-best)) { display: none; }
+.md-typeset .viz-legend .rw-key-sel { background: color-mix(in srgb, var(--viz-s1) 14%, transparent); outline: 2px dashed var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .rw-key-fill { background: transparent; outline: 2px dashed var(--viz-s4); outline-offset: -2px; }
+.md-typeset .explorer .mo-edit-hint { margin: 0.2rem 0; color: var(--viz-text); font-size: 0.65rem; }
+.md-typeset .explorer :is(.mo-step, .mo-code) { margin: 0.3rem 0; font-size: 0.72rem; }
+.md-typeset .explorer .mo-step:empty, .md-typeset .explorer .mo-code:empty { display: none; }
+.md-typeset .viz-legend :is(.mo-key-one, .mo-key-cur, .mo-key-nb, .mo-key-cand, .mo-key-best, .mo-key-win) { border-radius: 3px; }
+.md-typeset .viz-legend .mo-key-one { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); }
+.md-typeset .viz-legend .mo-key-cur { background: transparent; outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; }
+.md-typeset .viz-legend .mo-key-nb { background: color-mix(in srgb, var(--viz-s4) 32%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .mo-key-cand { background: transparent; outline: 2px dashed var(--viz-s4); outline-offset: -2px; }
+.md-typeset .viz-legend .mo-key-best { background: transparent; outline: 3px solid var(--viz-s2); outline-offset: -3px; }
+.md-typeset .viz-legend .mo-key-win { background: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
+.md-typeset .explorer.mo-is-rect .mo-key-nb-wrap, .md-typeset .explorer:not(.mo-is-rect) .mo-key-cand-wrap { display: none; }

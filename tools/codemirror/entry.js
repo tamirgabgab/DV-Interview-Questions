@@ -9,7 +9,7 @@ import { HighlightStyle, syntaxHighlighting, indentOnInput, bracketMatching } fr
 import { python } from "@codemirror/lang-python";
 import { tags as t } from "@lezer/highlight";
 
-// The site's code colours (Material's variables, overridden in extra.css), so the editor
+// The site's code colours (Material's variables, overridden in docs/stylesheets/), so the editor
 // matches the code blocks in both schemes.
 const v = (name) => `var(--md-code-hl-${name}-color)`;
 const highlight = HighlightStyle.define([

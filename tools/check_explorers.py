@@ -119,12 +119,20 @@ SNAP = """([b, own]) => {
   const seed = box.querySelector(".ex-seed");
   if (seed && !own) values.push(`seed ${seed.value}`);
   const copy = box.cloneNode(true);
-  copy.querySelectorAll(".ex-bar, .ex-restored, .ex-keys, [hidden]").forEach((el) => el.remove());
+  // an answer line that is off keeps its last text only to hold its height (core.js answer)
+  copy.querySelectorAll(".ex-bar, .ex-restored, .ex-keys, [hidden], .ex-answer--off").forEach((el) => el.remove());
   // the steady heights (core.js) and the enlarge button moved above a figure (reading-tools.js)
   // depend on the steps the box went through, not on its state
   copy.querySelectorAll("[style]").forEach((el) => { el.style.minHeight = ""; if (!el.getAttribute("style")) el.removeAttribute("style"); });
   copy.querySelectorAll("[data-fig-above]").forEach((el) => el.removeAttribute("data-fig-above"));
   copy.querySelectorAll(".fig-wrap--above").forEach((el) => el.classList.remove("fig-wrap--above"));
+  // attributes in one order: a figure refitted on another path sets the same attributes in
+  // another order (style before data-fit-base), which is the same drawing
+  [copy, ...copy.querySelectorAll("*")].forEach((el) => {
+    const attrs = [...el.attributes].map((a) => [a.name, a.value]).sort((x, y) => (x[0] < y[0] ? -1 : 1));
+    attrs.forEach(([name]) => el.removeAttribute(name));
+    attrs.forEach(([name, value]) => el.setAttribute(name, value));
+  });
   return { values, html: copy.innerHTML, restored: !!box.querySelector(".ex-restored") };
 }"""
 

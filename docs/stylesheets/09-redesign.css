@@ -1,0 +1,381 @@
+/* The site's styles, part 9 of 12: the redesign: typography, icons, the header and toolbar, the hero, box cards, the 404 page, print, question tables.
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* Typography (UI321): Rubik stays the text face; a little more line height for Hebrew,
+   firmer headings in the text colour on every page (Material greys the h1), tabular digits in tables and chips, and paragraphs and lists capped
+   near 75 characters so long lines stay readable on wide screens (code, tables, figures
+   and the boxes keep the full column). */
+.md-typeset { line-height: 1.7; }
+.md-typeset h1 { font-weight: 600; letter-spacing: 0; color: var(--md-default-fg-color); }
+.md-typeset :is(h2, h3) { font-weight: 600; }
+/* a long title splits into even lines, never one word left alone on the last */
+.md-typeset :is(h1, h2) { text-wrap: balance; }
+.md-typeset :is(table, .chip, .lc-count, .ex-pos, .hh-stats) { font-variant-numeric: tabular-nums; }
+.md-typeset :is(p, ul:not([class]), ol:not([class]), dl):not(.explorer *):not(td *):not(th *):not(.admonition-title) { max-width: 75ch; }
+
+/* An icon per question kind (UI330): line icons from Material Design Icons (Apache 2.0, the
+   set the theme ships), drawn as a CSS mask in the text colour, so the hook's HTML and the
+   explorer scripts use the same <i class="kind-ico kind-ico-<kind>">. */
+.kind-ico { display: inline-block; flex: none; width: 1.15em; height: 1.15em; vertical-align: -0.2em; background-color: currentColor; -webkit-mask: var(--kind-ico) center / contain no-repeat; mask: var(--kind-ico) center / contain no-repeat; }
+.kind-ico-puzzle { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22 13.5c0 1.76-1.3 3.22-3 3.46V20a2 2 0 0 1-2 2h-3.8v-.3a2.7 2.7 0 0 0-2.7-2.7c-1.5 0-2.7 1.21-2.7 2.7v.3H4a2 2 0 0 1-2-2v-3.8h.3C3.79 16.2 5 15 5 13.5s-1.21-2.7-2.7-2.7H2V7a2 2 0 0 1 2-2h3.04c.24-1.7 1.7-3 3.46-3s3.22 1.3 3.46 3H17a2 2 0 0 1 2 2v3.04c1.7.24 3 1.7 3 3.46M17 15h1.5a1.5 1.5 0 0 0 1.5-1.5 1.5 1.5 0 0 0-1.5-1.5H17V7h-5V5.5A1.5 1.5 0 0 0 10.5 4 1.5 1.5 0 0 0 9 5.5V7H4v2.12c1.76.68 3 2.38 3 4.38s-1.25 3.7-3 4.38V20h2.12a4.7 4.7 0 0 1 4.38-3c2 0 3.7 1.25 4.38 3H17z'/%3E%3C/svg%3E"); }
+.kind-ico-code { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 3a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2H3v2h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2v-2H8v-5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V5h2V3m6 0a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1v2h-1a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2v-2h2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5h-2V3z'/%3E%3C/svg%3E"); }
+.kind-ico-design { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 4h12v1h3v2h-3v2h3v2h-3v2h3v2h-3v2h3v2h-3v1H6v-1H3v-2h3v-2H3v-2h3v-2H3V9h3V7H3V5h3zm5 11v3h1v-3zm2 0v3h1v-3zm2 0v3h1v-3z'/%3E%3C/svg%3E"); }
+.kind-ico-math { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18 6H8.83l6 6-6 6H18v2H6v-2l6-6-6-6V4h12z'/%3E%3C/svg%3E"); }
+.kind-ico-dv { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9'/%3E%3C/svg%3E"); }
+.md-typeset .chip-kind { display: inline-flex; align-items: center; gap: 0.25em; }
+
+/* Path cards (UI320): the count never wraps, the name carries the icon of the kind most of
+   the path's questions have. */
+.md-typeset .level-card .lc-count { flex: none; white-space: nowrap; }
+.md-typeset .level-card .lc-name { display: inline-flex; align-items: baseline; gap: 0.35em; }
+.md-typeset .level-card .lc-name .kind-ico { align-self: center; color: var(--md-accent-fg-color); }
+
+/* Interface icons (UI324, UI325): Material Design Icons as CSS masks in the text colour,
+   <i class="ui-ico ui-ico-<name>">, from the hook's HTML and the scripts alike. */
+.ui-ico { display: inline-block; flex: none; width: 1.2em; height: 1.2em; vertical-align: -0.22em; background-color: currentColor; -webkit-mask: var(--ui-ico) center / contain no-repeat; mask: var(--ui-ico) center / contain no-repeat; }
+.ui-ico-unfold-more { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 18.17 8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15M12 5.83 15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9z'/%3E%3C/svg%3E"); }
+.ui-ico-unfold-less { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16.59 5.41 15.17 4 12 7.17 8.83 4 7.41 5.41 12 10m-4.59 8.59L8.83 20 12 16.83 15.17 20l1.41-1.41L12 14z'/%3E%3C/svg%3E"); }
+.ui-ico-timer { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20a7 7 0 0 1-7-7 7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7m7.03-12.61 1.42-1.42c-.45-.51-.9-.97-1.41-1.41L17.62 6c-1.55-1.26-3.5-2-5.62-2a9 9 0 0 0-9 9 9 9 0 0 0 9 9c5 0 9-4.03 9-9 0-2.12-.74-4.07-1.97-5.61M11 14h2V8h-2m4-7H9v2h6z'/%3E%3C/svg%3E"); }
+.ui-ico-solved { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z'/%3E%3C/svg%3E"); }
+.ui-ico-solved-on { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z'/%3E%3C/svg%3E"); }
+.ui-ico-star { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 15.39-3.76 2.27.99-4.28-3.32-2.88 4.38-.37L12 6.09l1.71 4.04 4.38.37-3.32 2.88.99 4.28M22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.45 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03z'/%3E%3C/svg%3E"); }
+.ui-ico-star-on { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.45 4.73L5.82 21z'/%3E%3C/svg%3E"); }
+.ui-ico-random { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 8c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1m-2 4v7H5v-7zm.78-2H4.22C3.55 10 3 10.55 3 11.22v8.56c0 .67.55 1.22 1.22 1.22h8.56c.67 0 1.22-.55 1.22-1.22v-8.56c0-.67-.55-1.22-1.22-1.22m7-7h-8.56C10.55 3 10 3.55 10 4.22V8h2V5h7v7h-3v2h3.78c.67 0 1.22-.55 1.22-1.22V4.22C21 3.55 20.45 3 19.78 3M17 8c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1m0 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1M7 15c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1m3 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1'/%3E%3C/svg%3E"); }
+.ui-ico-interactive { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m-2 14.5 6-4.5-6-4.5z'/%3E%3C/svg%3E"); }
+.ui-ico-code { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m14.6 16.6 4.6-4.6-4.6-4.6L16 6l6 6-6 6zm-5.2 0L4.8 12l4.6-4.6L8 6l-6 6 6 6z'/%3E%3C/svg%3E"); }
+.ui-ico-tested { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m23 12-2.4-2.8.3-3.7-3.6-.8-1.9-3.2L12 3 8.6 1.5 6.7 4.7l-3.6.8.3 3.7L1 12l2.4 2.8-.3 3.7 3.6.8 1.9 3.2L12 21l3.4 1.5 1.9-3.2 3.6-.8-.3-3.7zm-4.3 4.9-2.7.6-1.4 2.4-2.6-1.1-2.6 1.1L8 17.5l-2.7-.6.2-2.8L3.7 12l1.8-2.1-.2-2.8L8 6.5l1.4-2.4L12 5.2l2.6-1.1L16 6.5l2.7.6-.2 2.8 1.8 2.1-1.8 2.1zm-2.1-9.3L18 9l-8 8-4-4 1.4-1.4 2.6 2.6z'/%3E%3C/svg%3E"); }
+.ui-ico-new { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m9 4 2.5 5.5L17 12l-5.5 2.5L9 20l-2.5-5.5L1 12l5.5-2.5zm0 4.83L8 11l-2.17 1L8 13l1 2.17L10 13l2.17-1L10 11zM19 9l-1.26-2.74L15 5l2.74-1.25L19 1l1.25 2.75L23 5l-2.75 1.26zm0 14-1.26-2.74L15 19l2.74-1.25L19 15l1.25 2.75L23 19l-2.75 1.26z'/%3E%3C/svg%3E"); }
+.ui-ico-help { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4v3a1 1 0 0 0 1 1h.5c.25 0 .5-.1.7-.29L13.9 18H20a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 2h16v12h-6.92L10 19.08V16H4zm8.19 1.5c-.89 0-1.6.18-2.14.54-.55.36-.83.96-.78 1.65h1.97c0-.28.1-.49.26-.63.2-.14.42-.21.69-.21.31 0 .58.08.76.26.18.17.27.39.27.69 0 .28-.08.53-.22.74-.17.22-.38.4-.64.54-.52.32-.86.6-1.07.84-.19.24-.29.58-.29 1.08h2c0-.28.05-.5.14-.68.09-.17.26-.32.52-.47.46-.21.84-.49 1.13-.85.29-.37.44-.76.44-1.2q0-1.05-.81-1.68c-.54-.41-1.29-.62-2.23-.62M11 12v2h2v-2z'/%3E%3C/svg%3E"); }
+.ui-ico-search { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5'/%3E%3C/svg%3E"); }
+
+/* The question header (UI324): the title first with the page tools as icon buttons at its
+   far end, one row of chips (id, level, difficulty, kind, then small badges with an icon
+   and a word), and one quiet line of topics, date and source. A phone puts the tools in a
+   row of their own under the chips. */
+.md-typeset .question-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title tools" "chips chips" "meta meta"; column-gap: 0.8rem; align-items: start; }
+.md-typeset .question-header > h1 { grid-area: title; }
+.md-typeset .question-header > .question-tools { grid-area: tools; }
+.md-typeset .question-header > .qh-top { grid-area: chips; row-gap: 0.45rem; margin-bottom: 0.45rem; }
+.md-typeset .question-header > .qh-bottom { grid-area: meta; }
+.md-typeset .question-header:has(+ .part-nav, + .path-nav) { margin-bottom: 0.4rem; border-bottom: 0; }
+.md-typeset .question-header .qh-badge { gap: 0.25em; padding: 0 0.45em; font-size: 0.66rem; line-height: 1.75; color: var(--md-default-fg-color--light); }
+.md-typeset .question-header .qh-badge .ui-ico { width: 1.1em; height: 1.1em; }
+.md-typeset .question-header .qh-badge-ok { color: var(--diff-easy); border-color: color-mix(in srgb, currentColor 45%, transparent); }
+.md-typeset .question-header .qh-badge-play { color: var(--md-typeset-a-color); }
+.md-typeset .question-header .qh-badge-new { color: #1b2a4a; background: var(--md-accent-fg-color); border-color: var(--md-accent-fg-color); }   /* the navy of the practice button: 4.5:1 on the accent */
+.md-typeset .question-header h1 { margin: 0 0 0.5rem; font-weight: 700; line-height: 1.3; }
+.md-typeset .question-header .qh-bottom { gap: 0.2rem 0.45rem; font-size: 0.68rem; }
+.md-typeset .question-header .qh-bottom a { text-decoration: underline dotted color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 0.2em; }
+
+/* The page tools as icon buttons with a tooltip (the accessible name, shown on hover and
+   on keyboard focus); pressed marks get the filled icon. */
+.md-typeset .question-header .question-tools { flex: none; flex-wrap: nowrap; gap: 0.15rem; margin: 0; font-size: 0.7rem; }
+.md-typeset :is(.question-tools, .part-nav) .qt-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; padding: 0; border-radius: 50%; border-color: transparent; background: transparent; color: var(--md-default-fg-color--light); font-size: 0.9rem; }
+.md-typeset :is(.question-tools, .part-nav) .qt-btn:hover, .md-typeset :is(.question-tools, .part-nav) .qt-btn:focus-visible { color: var(--md-default-fg-color); background: var(--md-default-fg-color--lightest); border-color: transparent; }
+.md-typeset :is(.question-tools, .part-nav) .qt-btn[aria-pressed="true"] { color: var(--md-typeset-a-color); background: var(--site-primary-soft); }
+.md-typeset .question-tools .qt-star[aria-pressed="true"] { color: var(--diff-medium); background: var(--diff-medium-bg); }
+.md-typeset .question-tools .qt-practice.is-active { color: #1b2a4a; background: var(--md-accent-fg-color); }
+.md-typeset .question-tools .qt-mark.is-active, [data-md-color-scheme="slate"] .md-typeset .question-tools .qt-mark.is-active { border-color: transparent; }
+.md-typeset :is(.question-tools, .part-nav) .qt-btn[data-tip]:is(:hover, :focus-visible)::after {
+  content: attr(data-tip); position: absolute; top: calc(100% + 0.35rem); inset-inline-end: 0; z-index: 5;
+  padding: 0.2rem 0.5rem; border-radius: 0.3rem; background: var(--md-default-fg-color); color: var(--md-default-bg-color);
+  font-size: 0.62rem; line-height: 1.5; white-space: nowrap; pointer-events: none;
+}
+.md-typeset .question-tools .qt-clock { font-size: 0.66rem; }
+.md-typeset .question-tools .qt-clock:not([hidden]) { padding-inline: 0.3rem; }
+body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1rem 0.3rem; border-radius: 1rem; }
+@media screen and (max-width: 30em) {
+  /* the toolbar starts at the right edge here: its first tooltips open leftwards */
+  .md-typeset .question-tools .qt-btn:nth-child(-n+3)[data-tip]:is(:hover, :focus-visible)::after { inset-inline: 0 auto; }
+  .md-typeset .question-header { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "chips" "tools" "meta"; }
+  .md-typeset .question-header .question-tools { margin: -0.2rem -0.4rem 0.2rem; }
+}
+
+/* The sticky bar (UI325): the part chips, and once the header has scrolled away the solved
+   toggle (the site header shows the title by then), with a reading-progress line along its
+   bottom. A page
+   without parts gets the bar fixed under the site header, shown only after the header. */
+.md-typeset .part-nav { flex-wrap: nowrap; align-items: center; padding: 0.35rem 0 0.4rem; border-bottom-color: var(--site-card-border); }
+.md-typeset .part-nav .pn-solved { display: none; margin-inline-start: auto; }
+.md-typeset .part-nav.is-stuck .pn-solved { display: inline-flex; }
+.md-typeset .part-nav .pn-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.md-typeset .part-nav .pn-progress { position: absolute; inset-inline: 0; bottom: -1px; height: 2px; background: transparent; }
+.md-typeset .part-nav .pn-progress i { display: block; height: 100%; width: var(--pn-read, 0%); margin-inline-start: 0; background: var(--md-accent-fg-color); }
+/* without parts the bar is only the progress line along the top and the solved toggle as a
+   floating round button at its end; the script sets its left edge and width to the column */
+.md-typeset .part-nav.pn-fixed { position: fixed; top: 2.4rem; left: 0; right: auto; z-index: 3; margin: 0; padding: 0.35rem 0 0; background: transparent; border: 0; pointer-events: none; transform: translateY(-120%); visibility: hidden; transition: transform 0.2s, visibility 0.2s; }
+.md-typeset .part-nav.pn-fixed .pn-progress { top: 0; bottom: auto; }
+.md-typeset .part-nav.pn-fixed .pn-solved { pointer-events: auto; background: var(--md-default-bg-color); box-shadow: 0 0.1rem 0.45rem rgba(0, 0, 0, 0.18); }
+.md-typeset .part-nav.pn-fixed.is-stuck { transform: none; visibility: visible; }
+@media (prefers-reduced-motion: reduce) { .md-typeset .part-nav.pn-fixed { transition: none; } }
+
+/* The home page's hero (UI319): a navy card with a quiet waveform pattern (a clock, a data
+   bit and a bus), the title and the lead, "start practising" and a random question, a large
+   search field that opens the site search, ready searches, and one slim line of numbers. */
+.md-typeset .home-hero { position: relative; overflow: hidden; margin: 0 0 1.2rem; padding: 1.6rem 1.6rem 1.2rem; border-radius: 0.8rem; background: var(--md-primary-fg-color); color: #fff; }
+[data-md-color-scheme="slate"] .md-typeset .home-hero { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
+.md-typeset .home-hero > :not(.hh-bg) { position: relative; }
+.md-typeset .home-hero .hh-bg { position: absolute; inset: auto 0 0 0; height: 8rem; opacity: 0.12; pointer-events: none; }
+.md-typeset .home-hero .hh-waves { display: block; width: 100%; height: 100%; }
+.md-content:has(.home-hero) .md-content__button { display: none; }   /* the hero takes the full column on the home page */
+.md-typeset .home-hero .hh-waves path { fill: none; stroke: #fff; stroke-width: 2; stroke-linejoin: round; }
+.md-typeset .home-hero .hh-waves .hh-w2 { stroke: var(--md-accent-fg-color); }
+.md-typeset .home-hero h1 { margin: 0 0 0.5rem; color: #fff; font-size: 1.9rem; font-weight: 700; line-height: 1.2; }
+.md-typeset .home-hero p { max-width: 42rem; margin: 0 0 1rem; color: rgba(255, 255, 255, 0.88); font-size: 0.82rem; }
+.md-typeset .home-hero strong { color: #fff; }
+.md-typeset .home-hero .hh-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.9rem; }
+.md-typeset .home-hero .md-button { margin: 0; display: inline-flex; align-items: center; gap: 0.35em; border-color: rgba(255, 255, 255, 0.7); color: #fff; }
+.md-typeset .home-hero .md-button:hover { border-color: var(--md-accent-fg-color); background: rgba(255, 255, 255, 0.08); color: #fff; }
+.md-typeset .home-hero .md-button--primary { border-color: var(--md-accent-fg-color); background: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .home-hero .md-button--primary:hover { background: var(--md-accent-fg-color); color: #1b2a4a; filter: brightness(1.06); }
+.md-typeset .home-hero .hh-search { display: flex; align-items: center; gap: 0.6rem; width: 100%; max-width: 34rem; padding: 0.65rem 0.9rem; border: 0; border-radius: 0.5rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color--light); font: inherit; font-size: 0.8rem; text-align: start; cursor: text; box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2); }
+.md-typeset .home-hero .hh-search span { flex: 1; }
+.md-typeset .home-hero .hh-search kbd { padding: 0 0.4em; border: 1px solid var(--site-card-border); border-radius: 0.25rem; font-size: 0.65rem; color: var(--md-default-fg-color--light); }
+.md-typeset .home-hero .hh-search:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.md-typeset .home-hero .hh-suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin: 0.6rem 0 1rem; font-size: 0.68rem; color: rgba(255, 255, 255, 0.85); }
+.md-typeset .home-hero .hh-chip { padding: 0.05rem 0.6rem; border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 1rem; background: transparent; color: #fff; font: inherit; cursor: pointer; }
+.md-typeset .home-hero .hh-chip:is(:hover, :focus-visible) { border-color: var(--md-accent-fg-color); background: rgba(255, 255, 255, 0.1); }
+.md-typeset .home-hero .hh-stats { display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; padding-top: 0.7rem; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.7rem; color: rgba(255, 255, 255, 0.88); }
+.md-typeset .home-hero .hh-stats span { display: inline-flex; align-items: center; gap: 0.3em; }
+.md-typeset .home-hero .hh-stats b { color: #fff; font-size: 0.85rem; }
+@media screen and (max-width: 30em) {
+  .md-typeset .home-hero { margin-inline: -0.8rem; padding: 1.2rem 1rem 1rem; border-radius: 0; }
+  .md-typeset .home-hero h1 { font-size: 1.45rem; }
+  .md-typeset .home-hero .hh-actions .md-button { flex: 1 1 auto; justify-content: center; }
+  .md-typeset .home-hero .hh-search kbd { display: none; }
+}
+
+/* The explorer boxes as cards (UI328, UI327): a soft card with a header (a title, and help,
+   reset and copy link as icon buttons), playback as one icon bar laid out left to right with
+   a large round play button, three speed buttons beside it, and a scrubber under the row.
+   Icon buttons keep their word as the accessible name: the text is zero-sized and the
+   ::before draws the icon, the ::after the tooltip; :not(#_) outranks the shared button
+   sizes of E200 and the views' md-button classes. */
+.ui-ico-first { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 18V6h2v12zm3.5-6L18 6v12z'/%3E%3C/svg%3E"); }
+.ui-ico-prev { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 5v14h-3V5m-2 0v14L3 12'/%3E%3C/svg%3E"); }
+.ui-ico-play { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5.14v14l11-7z'/%3E%3C/svg%3E"); }
+.ui-ico-next { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5v14h3V5m2 0v14l11-7'/%3E%3C/svg%3E"); }
+.ui-ico-last { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16 18h2V6h-2M6 18l8.5-6L6 6z'/%3E%3C/svg%3E"); }
+.ui-ico-boxhelp { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 18h2v-2h-2zm1-16A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m0-14a4 4 0 0 0-4 4h2a2 2 0 0 1 2-2 2 2 0 0 1 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4'/%3E%3C/svg%3E"); }
+.ui-ico-reset { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.9 8.9 0 0 0 13 21a9 9 0 0 0 9-9 9 9 0 0 0-9-9'/%3E%3C/svg%3E"); }
+.ui-ico-link { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10.59 13.41c.41.39.41 1.03 0 1.42-.39.39-1.03.39-1.42 0a5.003 5.003 0 0 1 0-7.07l3.54-3.54a5.003 5.003 0 0 1 7.07 0 5.003 5.003 0 0 1 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48a2.98 2.98 0 0 0 0-4.24 2.98 2.98 0 0 0-4.24 0l-3.53 3.53a2.98 2.98 0 0 0 0 4.24m2.82-4.24c.39-.39 1.03-.39 1.42 0a5.003 5.003 0 0 1 0 7.07l-3.54 3.54a5.003 5.003 0 0 1-7.07 0 5.003 5.003 0 0 1 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47a2.98 2.98 0 0 0 0 4.24 2.98 2.98 0 0 0 4.24 0l3.53-3.53a2.98 2.98 0 0 0 0-4.24.973.973 0 0 1 0-1.42'/%3E%3C/svg%3E"); }
+.ui-ico-gesture { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 9a1 1 0 0 1 1-1 1 1 0 0 1 1 1v4.47l1.21.13 4.94 2.19c.53.24.85.77.85 1.35v4.36c-.03.82-.68 1.47-1.5 1.5H11c-.38 0-.74-.15-1-.43l-4.9-4.2.74-.77c.19-.21.46-.32.74-.32h.22L10 19zm1-4a4 4 0 0 1 4 4c0 1.5-.8 2.77-2 3.46v-1.22c.61-.55 1-1.35 1-2.24a3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .89.39 1.69 1 2.24v1.22C7.8 11.77 7 10.5 7 9a4 4 0 0 1 4-4'/%3E%3C/svg%3E"); }
+.ui-ico-play.is-playing { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 19h4V5h-4M6 19h4V5H6z'/%3E%3C/svg%3E"); }
+.ui-ico-link.is-done { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z'/%3E%3C/svg%3E"); }
+.md-typeset .explorer { margin: 1.2em 0; padding: 0 1rem 0.7rem; border: 1px solid var(--site-card-border); border-radius: var(--radius-l); background: color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color)); box-shadow: 0 0.1rem 0.6rem rgba(0, 0, 0, 0.05); }
+[data-md-color-scheme="default"] .md-typeset .explorer { border-color: var(--site-card-edge); background: var(--site-surface); box-shadow: var(--shadow-1); }
+.md-typeset .explorer .ex-bar { gap: 0.2rem 0.3rem; margin: 0 -1rem 0.6rem; padding: 0.35rem 0.8rem 0.35rem 0.6rem; border-bottom: 1px solid var(--site-card-border); border-radius: 0.8rem 0.8rem 0 0; background: color-mix(in srgb, var(--md-typeset-a-color) 7%, var(--md-default-bg-color)); }
+.md-typeset .explorer .ex-bar-title { display: inline-flex; align-items: center; gap: 0.35em; margin-inline-end: auto; color: var(--md-typeset-a-color); font-size: 0.72rem; font-weight: 700; }
+.md-typeset .explorer .ex-help { padding: 0.3rem 0 0.1rem; }
+.md-typeset .explorer :is(.ex-ibtn, .ex-tbtn):not(#_) { position: relative; display: inline-flex; align-items: center; justify-content: center; flex: none; width: 1.8rem; height: 1.8rem; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--viz-ink); font-size: 0; line-height: 0; text-decoration: none; cursor: pointer; }
+.md-typeset .explorer :is(.ex-ibtn, .ex-tbtn)::before { content: ""; width: 0.95rem; height: 0.95rem; background-color: currentColor; -webkit-mask: var(--ui-ico) center / contain no-repeat; mask: var(--ui-ico) center / contain no-repeat; }
+.md-typeset .explorer :is(.ex-ibtn, .ex-tbtn):not(#_):is(:hover, :focus-visible) { background: var(--md-default-fg-color--lightest); color: var(--md-default-fg-color); }
+.md-typeset .explorer .ex-help-btn[aria-expanded="true"]:not(#_) { background: var(--viz-s1); color: var(--md-default-bg-color); }
+.md-typeset .explorer .ex-link.is-done { color: var(--viz-s3-text); }
+.md-typeset .explorer :is(.ex-ibtn, .ex-tbtn, .ex-speedbtn)[data-tip]:is(:hover, :focus-visible)::after {
+  content: attr(data-tip); position: absolute; top: calc(100% + 0.3rem); left: 50%; z-index: 6; transform: translateX(-50%);
+  padding: 0.2rem 0.5rem; border-radius: 0.3rem; background: var(--md-default-fg-color); color: var(--md-default-bg-color);
+  font-size: 0.6rem; font-weight: 400; line-height: 1.5; white-space: nowrap; pointer-events: none;
+}
+.md-typeset .explorer .ex-bar .ex-ibtn[data-tip]:is(:hover, :focus-visible)::after { left: auto; right: 0; transform: none; }
+.md-typeset .explorer .ex-transport { direction: ltr; display: inline-flex; align-items: center; gap: 0.15rem; padding: 0.15rem; border: 1px solid var(--site-card-border); border-radius: 2rem; background: var(--md-default-bg-color); }
+.md-typeset .explorer .ex-transport .ex-tbtn:not(#_) { width: 1.9rem; height: 1.9rem; }
+.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_) { width: 2.4rem; height: 2.4rem; background: var(--md-typeset-a-color); color: var(--md-default-bg-color); }
+.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play::before { width: 1.25rem; height: 1.25rem; }
+.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_):is(:hover, :focus-visible) { background: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .explorer .ex-transport .ex-tbtn:disabled { opacity: 0.35; cursor: default; }
+.md-typeset .explorer .ex-speed-kept { display: none; }
+.md-typeset .explorer .ex-speedseg { display: inline-flex; margin-inline-start: 0.35rem; padding-inline-start: 0.35rem; border-inline-start: 1px solid var(--site-card-border); }
+.md-typeset .explorer .ex-speedbtn { position: relative; padding: 0.15rem 0.4rem; border: 0; border-radius: 1rem; background: transparent; color: var(--viz-text); font: inherit; font-family: var(--md-code-font-family); font-size: 0.62rem; cursor: pointer; }
+.md-typeset .explorer .ex-speedbtn[aria-pressed="true"] { background: var(--site-primary-soft); color: var(--md-typeset-a-color); font-weight: 700; }
+.md-typeset .explorer .ex-scrubwrap { margin: -0.1rem 0 0.4rem; }
+.md-typeset .explorer .ex-scrubwrap[hidden] { display: none; }
+.md-typeset .explorer input.ex-scrub { display: block; width: 100%; max-width: 30rem; height: 1.1rem; margin: 0; accent-color: var(--md-typeset-a-color); cursor: pointer; }
+@media screen and (max-width: 30em) {
+  .md-typeset .explorer { padding-inline: 0.7rem; border-radius: 0.6rem; }
+  .md-typeset .explorer .ex-bar { margin-inline: -0.7rem; border-radius: 0.6rem 0.6rem 0 0; }
+  .md-typeset .explorer .ex-transport .ex-tbtn:not(#_):not(.ui-ico-play) { width: 1.65rem; height: 1.65rem; }
+  .md-typeset .explorer .ex-speedbtn { padding-inline: 0.3rem; }
+}
+
+/* Marking a question solved (UI326): the message at the bottom of the screen (navy, like
+   the home hero), the check mark's pop and the confetti of a finished level. The motion
+   is defined only without prefers-reduced-motion (and the script skips it there). */
+.dvq-toast { position: fixed; z-index: 5; inset: auto 1rem 1rem; display: flex; align-items: flex-start; gap: 0.4rem; max-width: 24rem; margin-inline: auto; padding: 0.7rem 0.8rem 0.75rem 0.5rem; border-radius: 0.8rem; background: var(--md-primary-fg-color); color: #fff; box-shadow: 0 0.4rem 1.4rem rgba(0, 0, 0, 0.28); font-size: 0.74rem; line-height: 1.55; }
+[data-md-color-scheme="slate"] .dvq-toast { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
+.dvq-toast[hidden] { display: none; }
+.dvq-toast .dt-body { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 0.45rem; }
+.dvq-toast .dt-text { margin: 0; }
+.dvq-toast .dt-bar { display: block; width: 100%; height: 0.3rem; border-radius: 0.15rem; background: rgba(255, 255, 255, 0.2); overflow: hidden; }
+.dvq-toast .dt-bar i { display: block; height: 100%; border-radius: inherit; background: var(--md-accent-fg-color); }
+.dvq-toast .dt-action { padding: 0.25rem 0.75rem; border: 0; border-radius: 1rem; background: var(--md-accent-fg-color); color: #1b2a4a; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+.dvq-toast .dt-action:is(:hover, :focus-visible) { background: #fff; color: #1b2a4a; }
+.dvq-toast .dt-close { flex: none; width: 1.6rem; height: 1.6rem; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #fff; font-size: 1.1rem; line-height: 1; cursor: pointer; }
+.dvq-toast .dt-close:is(:hover, :focus-visible) { background: rgba(255, 255, 255, 0.16); }
+.dvq-toast :focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.dvq-confetti { position: fixed; z-index: 6; inset: 0; overflow: hidden; pointer-events: none; }
+.dvq-confetti i { position: absolute; top: -1rem; left: var(--x); width: 0.45rem; height: 0.7rem; border-radius: 0.1rem; opacity: 0; }
+.dvq-confetti .dc-0 { background: var(--md-accent-fg-color); }
+.dvq-confetti .dc-1 { background: var(--diff-easy); }
+.dvq-confetti .dc-2 { background: var(--diff-hard); }
+.dvq-confetti .dc-3 { background: var(--md-typeset-a-color); }
+@media (prefers-reduced-motion: no-preference) {
+  .dvq-toast.is-in { animation: dt-in 0.25s ease-out; }
+  @keyframes dt-in { from { opacity: 0; transform: translateY(0.8rem); } }
+  .md-typeset .qt-btn.is-pop { animation: qt-pop 0.45s ease-out; }
+  @keyframes qt-pop { 40% { transform: scale(1.35); } }
+  .dvq-confetti i { animation: dc-fall 2.1s cubic-bezier(0.3, 0.6, 0.5, 1) var(--d) forwards; }
+  @keyframes dc-fall {
+    0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+    85% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), 105vh) rotate(var(--r)); }
+  }
+}
+
+/* Motion in the boxes (UI329, core.js `motion`): a value the last step changed flashes
+   amber for --ex-flash (shorter in a fast play); an SVG label gets an amber halo. When the
+   box reaches its answer, the marks pulse once. */
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .explorer .ex-changed:not(svg *) { animation: ex-changed var(--ex-flash, 600ms) ease-out; }
+  .md-typeset .explorer svg .ex-changed { animation: ex-changed-svg var(--ex-flash, 600ms) ease-out; }
+  @keyframes ex-changed { from { background-color: color-mix(in srgb, var(--md-accent-fg-color) 42%, transparent); box-shadow: 0 0 0 2px var(--md-accent-fg-color); } }
+  @keyframes ex-changed-svg { from { stroke: var(--md-accent-fg-color); stroke-width: 4px; paint-order: stroke; } }
+  .md-typeset .explorer.ex-answer-new .ex-answer-mark { animation: ex-answer-pulse 0.9s ease-out; }
+  @keyframes ex-answer-pulse { 30% { filter: drop-shadow(0 0 0.35rem var(--viz-s3)); } }
+}
+
+/* The first-visit guide (E201, core.js `guide`): a navy bubble under its target (inside
+   the figure for the figure's hint) with an arrow at --ax, and the target outlined. */
+.md-typeset .explorer.has-guide { position: relative; }
+.md-typeset .explorer .ex-guide { position: absolute; z-index: 4; width: min(17rem, calc(100% - 1rem)); padding: 0.55rem 0.7rem 0.5rem; border-radius: 0.6rem; background: var(--md-primary-fg-color); color: #fff; box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.25); font-size: 0.7rem; line-height: 1.55; }
+[data-md-color-scheme="slate"] .md-typeset .explorer .ex-guide { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
+.md-typeset .explorer .ex-guide::before { content: ""; position: absolute; top: -0.35rem; left: calc(var(--ax, 50%) - 0.35rem); width: 0.7rem; height: 0.7rem; background: inherit; transform: rotate(45deg); }
+.md-typeset .explorer .ex-guide.is-inside::before { display: none; }
+.md-typeset .explorer .ex-guide .exg-text { margin: 0 0 0.4rem; }
+.md-typeset .explorer .ex-guide .exg-foot { display: flex; align-items: center; gap: 0.4rem; }
+.md-typeset .explorer .ex-guide .exg-pos { margin-inline-end: auto; opacity: 0.8; font-size: 0.62rem; }
+.md-typeset .explorer .ex-guide button { padding: 0.15rem 0.65rem; border: 0; border-radius: 1rem; font: inherit; font-weight: 600; cursor: pointer; }
+.md-typeset .explorer .ex-guide .exg-skip { background: transparent; color: #fff; text-decoration: underline; }
+.md-typeset .explorer .ex-guide .exg-next { background: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .explorer .ex-guide button:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.md-typeset .explorer .ex-guide-target { outline: 2px dashed var(--md-accent-fg-color); outline-offset: 3px; border-radius: 0.3rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .explorer .ex-guide { animation: dt-in 0.25s ease-out; }
+}
+
+/* Dark scheme cards (UI331): a lighter surface and a shadow that shows on a dark page. */
+[data-md-color-scheme="slate"] .md-typeset .explorer { background: color-mix(in srgb, var(--md-default-fg-color) 4%, var(--md-default-bg-color)); box-shadow: 0 0.2rem 0.9rem rgba(0, 0, 0, 0.35); }
+
+/* The 404 page (overrides/404.html): a navy card like the home hero. */
+.md-typeset .not-found { margin: 0.5rem 0 1.5rem; padding: 1.4rem 1.6rem 1.2rem; border-radius: 0.8rem; background: var(--md-primary-fg-color); color: #fff; }
+[data-md-color-scheme="slate"] .md-typeset .not-found { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
+.md-typeset .not-found .nf-code { margin: 0; color: var(--md-accent-fg-color); font-size: 2.6rem; font-weight: 700; line-height: 1; }
+.md-typeset .not-found h1 { margin: 0.3rem 0 0.6rem; color: #fff; }
+.md-typeset .not-found p { margin: 0.4rem 0; }
+.md-typeset .not-found a:not(.md-button) { color: #fff; text-decoration: underline; }
+.md-typeset .not-found .nf-guess { font-size: 0.85rem; }
+.md-typeset .not-found .nf-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.9rem 0; }
+.md-typeset .not-found .md-button { margin: 0; color: #fff; border-color: rgba(255, 255, 255, 0.6); }
+.md-typeset .not-found .md-button--primary { background: var(--md-accent-fg-color); border-color: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .not-found .md-button:is(:hover, :focus-visible) { background: #fff; border-color: #fff; color: #1b2a4a; }
+
+/* Printing a question (or "save as PDF"): every block opened by question-tools.js (the
+   solutions stay hidden in practice mode, for a practice sheet), the light scheme, and
+   no page tools, box controls, messages or comments; a box prints its figures and summary
+   as they stand. */
+@media print {
+  .md-typeset :is(.question-tools, .part-nav, .ex-bar, .ex-controls, .ex-scrubwrap, .ex-keys, .ex-guide, .py-runner, .py-from-code, .comments, .comments-note, .hh-tools),
+  .dvq-toast, .dvq-confetti, .md-content__button { display: none !important; }
+  .md-typeset details.tip.hint-locked { display: block; }
+  .md-typeset :is(.admonition, details) { page-break-inside: auto; break-inside: auto; }   /* the theme keeps each block whole, which leaves near-blank pages */
+  .md-typeset :is(.admonition-title, summary) { break-after: avoid; }
+  .md-typeset .explorer { box-shadow: none; break-inside: avoid; }
+  .md-typeset :is(figure, svg.figure, svg.perf-chart, table) { break-inside: avoid; }
+  .md-typeset pre > code { white-space: pre-wrap; word-break: break-word; }
+  .md-typeset h2, .md-typeset h3 { break-after: avoid; }
+}
+
+/* Question tables (UI322, UI323). Above the table: the search, "filter (n)" (phones only),
+   the sort select (phones only) and a random question; the filters as segmented groups
+   and the topics with "more topics"; the active filters as chips with the count. A row
+   is two lines: the title (one line, cut with an ellipsis) and under it the kind and the
+   first topics as small buttons. On phones the filters fold behind the button and the
+   rows are cards. */
+.md-typeset .question-filter { gap: 0.5rem; }
+.md-typeset .filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.md-typeset .filter-bar .filter-search { flex: 1 1 14rem; max-width: 24rem; }
+.md-typeset .filter-bar .filter-search input { max-width: none; }
+.md-typeset .filter-search-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.md-typeset .filter-toggle { display: none; align-items: center; gap: 0.3rem; padding: 0.2rem 0.75rem; border: 1px solid var(--site-card-border); border-radius: 999px; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font: inherit; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+.md-typeset .filter-toggle[aria-expanded="true"] { border-color: var(--md-primary-fg-color); }
+.ui-ico-filter { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 13h12v-2H6M3 6v2h18V6M10 18h4v-2h-4z'/%3E%3C/svg%3E"); }
+.md-typeset .filter-panel { display: flex; flex-direction: column; gap: 0.4rem; }
+.md-typeset .filter-seg .seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 2px; border: 1px solid var(--site-card-border); border-radius: 0.9rem; background: color-mix(in srgb, var(--md-default-fg-color) 3%, var(--md-default-bg-color)); }
+.md-typeset .filter-seg .filter-chip { border-color: transparent; background: transparent; }
+.md-typeset .filter-seg .filter-chip:not(.is-active):hover { background: var(--md-default-fg-color--lightest); border-color: transparent; }
+.md-typeset .filter-seg .filter-chip.is-active { background: var(--md-primary-fg-color); border-color: var(--md-primary-fg-color); }
+.md-typeset .filter-topics .topics-inline { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; }
+.md-typeset .topics-toggle { padding: 0.05em 0.4em; border: 0; background: none; color: var(--md-typeset-a-color); font: inherit; font-size: 0.68rem; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.md-typeset .topics-more:not([hidden]) { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; flex-basis: 100%; padding: 0.5rem; border: 1px solid var(--site-card-border); border-radius: 0.5rem; background: color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color)); }
+.md-typeset .topics-more .topics-search { flex: 0 0 100%; padding: 0.2rem 0.6rem; border: 1px solid var(--site-card-border); border-radius: 999px; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font: inherit; font-size: 0.68rem; }
+.md-typeset .topics-more .topics-none { margin: 0; font-size: 0.66rem; color: var(--md-default-fg-color--light); }
+.md-typeset .filter-active { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.5rem; min-height: 1.4rem; }
+.md-typeset .filter-active .fa-chip { padding: 0.05em 0.7em; border: 1px solid var(--md-accent-fg-color); border-radius: 999px; background: var(--md-accent-fg-color--transparent); color: var(--md-default-fg-color); font: inherit; font-size: 0.66rem; cursor: pointer; }
+.md-typeset .filter-active .fa-chip:is(:hover, :focus-visible) { background: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .filter-active .fa-clear { padding: 0; border: 0; background: none; color: var(--md-typeset-a-color); font: inherit; font-size: 0.66rem; text-decoration: underline; cursor: pointer; }
+.md-typeset .filter-active .filter-count { margin-inline-start: auto; font-size: 0.68rem; color: var(--md-default-fg-color--light); }
+.md-typeset .questions-none:not([hidden]) { margin: 0.5rem 0 1rem; padding: 1rem 1.2rem; border: 1px dashed var(--site-card-border); border-radius: 0.6rem; text-align: center; }
+.md-typeset .questions-none .qn-text { margin: 0 0 0.6rem; font-weight: 600; }
+.md-typeset .questions-none .qn-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; }
+.md-typeset .questions-none .qn-btn { padding: 0.2rem 0.8rem; border: 1px solid var(--site-card-border); border-radius: 999px; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font: inherit; font-size: 0.7rem; cursor: pointer; }
+.md-typeset .questions-none .qn-best { border-color: var(--md-primary-fg-color); background: var(--md-primary-fg-color); color: var(--md-primary-bg-color); font-weight: 600; }
+.md-typeset .questions-wrap .md-typeset__table { display: block; }   /* the theme's wrapper shrinks to the content */
+.md-typeset .questions-wrap td.q-title { width: 100%; max-width: 0; }
+.md-typeset .questions-wrap .q-line { display: flex; align-items: center; gap: 0.35rem; min-width: 0; }
+.md-typeset .questions-wrap .q-line a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.76rem; }
+.md-typeset .questions-wrap .q-line .chip, .md-typeset .questions-wrap .q-marks { flex: none; }
+.md-typeset .questions-wrap .q-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.4rem; margin-top: 0.25rem; }
+.md-typeset .questions-wrap .q-topics { display: inline-flex; flex-wrap: wrap; gap: 0.25rem; }
+.md-typeset .questions-wrap .q-rest:not([hidden]) { display: contents; }
+.md-typeset .questions-wrap :is(.q-topic, .q-more) { padding: 0 0.55em; border: 1px solid var(--site-card-border); border-radius: 999px; background: transparent; color: var(--md-default-fg-color--light); font: inherit; font-size: 0.62rem; line-height: 1.6; cursor: pointer; }
+.md-typeset .questions-wrap :is(.q-topic, .q-more):is(:hover, :focus-visible) { border-color: var(--md-typeset-a-color); color: var(--md-typeset-a-color); }
+.md-typeset .questions-wrap .q-more { direction: ltr; unicode-bidi: isolate; }   /* "+3", not "3+" */
+.md-typeset .questions-wrap td.q-diff { white-space: nowrap; }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .filter-bar .filter-search { flex-basis: 100%; max-width: none; }
+  .md-typeset .filter-toggle { display: inline-flex; }
+  .md-typeset .question-filter:not(.is-open) .filter-panel { display: none; }
+  .md-typeset .question-filter.is-open .filter-panel { padding: 0.6rem; border: 1px solid var(--site-card-border); border-radius: 0.6rem; }
+  .md-typeset .filter-active .filter-count { margin-inline-start: 0; flex-basis: 100%; }
+  .md-typeset .questions-wrap td.q-title { width: auto; max-width: none; }
+  .md-typeset .questions-wrap .q-line a { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 0.8rem; }
+}
+
+/* The header tabs appear at once: Material slides them in one by one, and on the home page
+   the last ones stayed faint for a moment (review V7). */
+.md-tabs__link, .md-tabs__item { transition: none !important; transition-delay: 0s !important; }
+
+/* 0031 on a phone: the bridge and its steps come before the plan tables, so the animation
+   is in view without scrolling past them (CSS order: the controls keep their DOM order). */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer[data-kind="bridge"] { display: flex; flex-direction: column; }
+  .md-typeset .explorer[data-kind="bridge"] > .bridge-tables,
+  .md-typeset .explorer[data-kind="bridge"] > .ex-keys { order: 1; }
+}
+
+/* 0040: the "next bit" label stays with its 0 and 1 buttons, first in the row */
+.md-typeset .explorer .ex-controls > .sq-bits.ex-c-other { order: 0; display: inline-flex; align-items: center; gap: 0.4rem; }
+/* 0038: the count table fits a phone (short headers, cells on one line) */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer table.at-counts th, .md-typeset .explorer table.at-counts td { padding: 0.3em 0.45em; white-space: nowrap; }
+}
+/* 0041: the weight sliders in equal columns, every slider the same length */
+.md-typeset .explorer .cv-weights { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); }
+.md-typeset .explorer .cv-weights label { display: flex; }
+.md-typeset .explorer .cv-weights input[type="range"] { flex: 1 1 auto; width: auto; min-width: 0; margin: 0; }
+/* a label with a long field wraps inside the box on a phone (0011, 0017) */
+.md-typeset .explorer .ex-controls > label:has(input.ex-nums) { max-width: 100%; flex-wrap: wrap; min-width: 0; }
+.md-typeset .explorer .ex-controls > label:has(input.ex-nums) input.ex-nums { flex: 1 1 12rem; min-width: 0; }
+/* 0013 kappairs: the path bows under the numbers, which keep a halo and let clicks through */
+.md-typeset svg .kpp-curve { fill: none; }
+.md-typeset svg .kpp-num { pointer-events: none; paint-order: stroke; stroke: var(--md-default-bg-color); stroke-width: 3px; stroke-linejoin: round; }

@@ -5,7 +5,7 @@
 
 blocks() returns the one figure of the statement: three closed crates with the labels
 "red", "black" and "red and black", each with a question mark on its lid. Colours come
-from the crate-* CSS classes in docs/stylesheets/extra.css.
+from the crate-* CSS classes in docs/stylesheets/.
 """
 
 LABELS = [("אדום",), ("שחור",), ("אדום", "ושחור")]

@@ -1,0 +1,140 @@
+/* The site's styles, part 3 of 12: the first Python runner and the figures of 0008 to 0014.
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* In-browser Python runner */
+.md-typeset .py-runner .py-editor {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0.6rem 0;
+  padding: 0.6rem;
+  font-family: var(--md-code-font-family);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: left;
+  color: var(--md-code-fg-color);
+  background: var(--md-code-bg-color);
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+  resize: vertical;
+  tab-size: 4;
+}
+
+.md-typeset .py-runner .py-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.md-typeset .py-runner .md-button {
+  padding: 0.3em 1.2em;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.md-typeset .py-runner .md-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.md-typeset .py-runner .py-status {
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .py-runner .py-output:not(:empty) {
+  margin: 0.6rem 0 0;
+  padding: 0.6rem;
+  font-size: 0.72rem;
+  white-space: pre-wrap;
+  text-align: left;
+  background: var(--md-code-bg-color);
+  border-radius: 0.2rem;
+}
+
+.md-typeset .py-runner .py-output.py-failed {
+  border-inline-start: 0.2rem solid var(--adm-trap);
+}
+
+.md-typeset .py-runner-note {
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+
+/* Question 0008: "cups" chart (room up to Israel's total) and the crossing chart */
+.md-typeset svg .s3-line { stroke: var(--viz-s3); }
+.md-typeset svg .s4-line { stroke: var(--viz-s4); }
+.md-typeset svg .s5-line { stroke: var(--viz-s5); }
+.md-typeset svg .s4-dot { fill: var(--viz-s4); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .s5-dot { fill: var(--viz-s5); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset .viz-legend .s4 { background: var(--viz-s4); }
+.md-typeset .viz-legend .s5 { background: var(--viz-s5); }
+.perf-chart .cup-room { fill: var(--viz-s2); fill-opacity: 0.14; stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.perf-chart .left-bar { fill: var(--viz-ink); fill-opacity: 0.7; }
+.perf-chart .overflow { fill: var(--viz-s2); }
+.perf-chart .pour-water { fill: var(--viz-s3); fill-opacity: 0.7; }
+.md-typeset .viz-legend .pour-water { background: var(--viz-s3); opacity: 0.7; }
+.md-typeset .viz-legend .overflow { background: var(--viz-s2); }
+.perf-chart .israel-line { stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 6 4; }
+.perf-chart .lost-zone { fill: var(--viz-s2); fill-opacity: 0.08; }
+.md-typeset .viz-legend .cup-room { background: var(--viz-s2); opacity: 0.35; outline: 1px dashed var(--viz-s2); }
+.md-typeset .viz-legend .left-bar { background: var(--viz-ink); opacity: 0.7; }
+.md-typeset .viz-legend .s3 { background: var(--viz-s3); }
+
+/* Question 0009: boxes as graph nodes, an arrow from each box to the box named on its note */
+.md-typeset svg .box-node { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .box-node.box-hl { stroke: var(--viz-s2); stroke-width: 4; }
+.md-typeset svg .box-num { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .ink-fill { fill: var(--viz-ink); }
+.md-typeset svg .s1-fill { fill: var(--viz-s1); }
+.md-typeset svg .s2-fill { fill: var(--viz-s2); }
+.md-typeset svg .s3-fill { fill: var(--viz-s3); }
+.md-typeset .box-grid {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin: 1rem 0;
+  direction: ltr;
+}
+@media screen and (max-width: 44em) {
+  .md-typeset .box-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+}
+.md-typeset .box-grid > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.2rem 0;
+  font-family: var(--md-code-font-family);
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+}
+.md-typeset .box-grid small { font-size: 0.6rem; color: var(--md-default-fg-color); opacity: 0.8; }
+.md-typeset .box-grid b { font-size: 0.85rem; }
+.md-typeset .box-grid > span.hl { border: 2px solid var(--viz-s2); }
+
+/* Question 0011: tic-tac-toe boards */
+.md-typeset svg .ttt-grid { stroke: var(--viz-ink); stroke-width: 2; stroke-linecap: round; }
+.md-typeset svg .ttt-ghost { opacity: 0.35; }
+.md-typeset svg .mark { fill: none; stroke: var(--viz-ink); stroke-width: 3; stroke-linecap: round; }
+.md-typeset svg .mark-new { stroke: var(--viz-s2); }
+.md-typeset svg .cell-s1 { fill: var(--viz-s1); fill-opacity: 0.3; }
+.md-typeset svg .cell-s2 { fill: var(--viz-s2); fill-opacity: 0.3; }
+.md-typeset svg .cell-s3 { fill: var(--viz-s3); fill-opacity: 0.3; }
+
+/* Question 0014: shapes on a grid of points */
+.md-typeset svg .gp-line { stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .gp-dot { fill: var(--viz-text); }
+.md-typeset svg .shp-1 { fill: var(--viz-s1); fill-opacity: 0.22; stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg .shp-2 { fill: var(--viz-s3); fill-opacity: 0.22; stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .shp-3 { fill: var(--viz-ink); fill-opacity: 0.14; stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .shp-bad { fill: var(--viz-s2); fill-opacity: 0.75; }
+.md-typeset svg .shp-num { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .sep-zone { fill: var(--viz-s3); fill-opacity: 0.12; }
+.md-typeset svg .dash { stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.md-typeset svg .coord { fill: var(--viz-ink); font-size: 13px; font-family: var(--md-code-font-family); }
+.md-typeset svg .zone-label { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-text-font-family); }
+.md-typeset svg .shp-num,
+.md-typeset svg .zone-label,
+.md-typeset svg .coord,
+.md-typeset svg .halo { paint-order: stroke; stroke: var(--md-default-bg-color); stroke-width: 4px; stroke-linejoin: round; }

@@ -284,3 +284,18 @@ def test_explorer_matches_the_page():
                     if (r2 - r1 + 1) * (c2 - c1 + 1) == area and (not sq or r2 - r1 == c2 - c1) and ones(g, (r1, c1), (r2, c2)))
                 assert d[key] == want
     assert data[0]["countSq"] == 2            # the page's two 3 x 3 squares
+
+
+def test_figure():
+    """The figure of part a: the generator's dp table and square are the page's, and the
+    page copy is up to date."""
+    import sys
+    from extract_code import ROOT
+    from page_tests import assert_figures_match
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0046
+
+    k, top_left, bottom_right = q0046.best(q0046.grid())
+    assert ns["largest_square"](q0046.grid()) == (k * k, top_left, bottom_right) == (9, (0, 2), (2, 4))
+    assert_figures_match(46)

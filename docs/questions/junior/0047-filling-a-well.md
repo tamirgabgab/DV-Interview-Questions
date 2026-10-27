@@ -21,13 +21,17 @@ added: 2026-10-25
 
 למשל, בשורה `[3, 0, 2, 0, 4]` נשארות 7 יחידות :
 
-```text
-level 4:  .  .  .  .  #
-level 3:  #  ~  ~  ~  #
-level 2:  #  ~  #  ~  #
-level 1:  #  ~  #  ~  #
-height:   3  0  2  0  4
-```
+<!-- gen 0 -->
+
+<svg class="figure" viewBox="0 0 232 210" style="max-width:14.5rem" role="img" aria-label="העמודים 3, 0, 2, 0, 4 : נשארות 7 יחידות מים"><rect class="fig-ground" x="8" y="144" width="40" height="40" rx="3"/><rect class="fig-ground" x="8" y="100" width="40" height="40" rx="3"/><rect class="fig-ground" x="8" y="56" width="40" height="40" rx="3"/><rect class="st-cell" x="8" y="12" width="40" height="40" rx="3"/><text class="st-text" x="28" y="204" text-anchor="middle">3</text><rect class="fig-water" x="52" y="144" width="40" height="40" rx="3"/><rect class="fig-water" x="52" y="100" width="40" height="40" rx="3"/><rect class="fig-water" x="52" y="56" width="40" height="40" rx="3"/><rect class="st-cell" x="52" y="12" width="40" height="40" rx="3"/><text class="st-text" x="72" y="204" text-anchor="middle">0</text><rect class="fig-ground" x="96" y="144" width="40" height="40" rx="3"/><rect class="fig-ground" x="96" y="100" width="40" height="40" rx="3"/><rect class="fig-water" x="96" y="56" width="40" height="40" rx="3"/><rect class="st-cell" x="96" y="12" width="40" height="40" rx="3"/><text class="st-text" x="116" y="204" text-anchor="middle">2</text><rect class="fig-water" x="140" y="144" width="40" height="40" rx="3"/><rect class="fig-water" x="140" y="100" width="40" height="40" rx="3"/><rect class="fig-water" x="140" y="56" width="40" height="40" rx="3"/><rect class="st-cell" x="140" y="12" width="40" height="40" rx="3"/><text class="st-text" x="160" y="204" text-anchor="middle">0</text><rect class="fig-ground" x="184" y="144" width="40" height="40" rx="3"/><rect class="fig-ground" x="184" y="100" width="40" height="40" rx="3"/><rect class="fig-ground" x="184" y="56" width="40" height="40" rx="3"/><rect class="fig-ground" x="184" y="12" width="40" height="40" rx="3"/><text class="st-text" x="204" y="204" text-anchor="middle">4</text></svg>
+
+<!-- /gen -->
+
+<!-- gen 1 -->
+
+<span class="viz-legend"><span><i class="fig-key-ground"></i>עמוד</span><span><i class="fig-key-water"></i>מים שנשארים, 7 יחידות</span></span>
+
+<!-- /gen -->
 
 === "SystemVerilog"
     ```systemverilog title="trap, trap_2d"

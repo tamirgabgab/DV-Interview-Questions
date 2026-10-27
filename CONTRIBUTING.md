@@ -133,7 +133,7 @@ DV-Interview-Questions/
 │   │                           # (run-python.js, py-worker.js, py_run.py, vendor/codemirror.min.js), home.js,
 │   │                           # reading-tools.js (lightbox, tooltips, part bar), and explorer/:
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
-│   └── stylesheets/extra.css   # Palette, chips, question header, tables / cards, figures
+│   └── stylesheets/            # The styles in 12 parts loaded in order (README.md lists them)
 └── .github/workflows/
     ├── deploy.yml              # Test + build on every push (explorers on 4 runners), deploy main; every job has a timeout
     └── weekly.yml              # Mondays: external links of the site, newer Verilator release
@@ -351,7 +351,10 @@ column in place. Any other table of five or more columns and three
 or more rows that does not fit its column becomes compact cards under 30em (the first
 cell as the title, the others as "column value" pairs in two columns); a table of eight or
 more rows that fits keeps its header row in view while it scrolls; numbers in tables are
-tabular. Under 30em the figure legends (`viz-legend`) are compact chips that wrap.
+tabular. Under 30em the figure legends (`viz-legend`) are compact chips that wrap. In a box, three or
+more action buttons side by side in a flex row (examples, moves, amounts) go into one run
+(`ex-btnrun`, core.js `layout`) that is a single line scrolling sideways under 30em, fading
+at its end; elsewhere it lays out as if it were not there.
 
 The question tables on the home and level pages (UI322, UI323) have a search field (the
 title, the topics in both names and the id: "46" finds 0046), **segmented filters** (one
@@ -369,7 +372,7 @@ replaced and not pushed, so "back" leaves the page; not `q`, which opens the the
 search), so a filtered table can be linked and survives a reload. When no row is left, a
 note offers the filter whose removal brings back the most rows ("בלי "קשה" יש 2 שאלות"),
 the last filter chosen, and clearing them all (`docs/javascripts/question-filter.js`,
-`.question-filter` and `.questions-wrap` in `extra.css`). The level cards and path cards
+`.question-filter` and `.questions-wrap` in `docs/stylesheets/`). The level cards and path cards
 show a "solved n of m" bar from the same marks. Pages with an explorer, a step figure or
 an embedded tool carry an "אינטראקטיבי" badge in the header card (every question has one
 now, so the tables no longer mark it).
@@ -442,7 +445,7 @@ from the footer of every page (the hook appends the link to `copyright`).
 
 ### Design tokens and surfaces
 
-`extra.css` defines the tokens new rules use instead of literal values: spacing on a 4 px
+`01-base.css` defines the tokens new rules use instead of literal values: spacing on a 4 px
 grid (`--sp-1` to `--sp-6`: 4, 8, 16, 24, 32, 48 px), three radii (`--radius-s/m/l`), three
 shadows (`--shadow-1` to `--shadow-3`, per scheme) and one motion speed and easing
 (`--dur-1`, `--dur-2`, `--ease`). In the light scheme the page is off-white
@@ -484,7 +487,7 @@ study path (its last question marked solved) shows its own message and confetti.
 
 Prefer text-based diagrams (Mermaid / WaveDrom) over images so they stay editable.
 
-Inline SVG colours come from CSS variables in `docs/stylesheets/extra.css`, so figures
+Inline SVG colours come from CSS variables in `docs/stylesheets/` (defined in `01-base.css`), so figures
 follow the light / dark switch automatically:
 
 | Class | Use |
@@ -609,7 +612,8 @@ clicks every visible button once in document order, then "reset everything"; an 
 error, a console error or a page wider than the screen fails it, and the report names the
 box and the button. Then, per box, it changes every control, opens the box's copied link in
 a fresh browser and reloads the page for the remembered state: different control values
-fail, a different drawing is a warning (some boxes draw from their history), and "reset
+fail, a different drawing is a warning (some boxes draw from their history; an answer line
+that is off and the order of an element's attributes do not count), and "reset
 everything" must forget the state (`--no-links` skips this part). It takes the same
 `--offline`, `--route`, `--browser` and `--only` options as the phone check.
 
@@ -636,7 +640,7 @@ selects after the fold): the link and the remembered state do not change. The pa
 open every fold after the boxes are built.
 
 `check_contrast.py` reads the colour tokens (Material's own from the installed theme,
-overridden by `docs/stylesheets/extra.css`) for the light and the dark scheme, and checks a
+overridden by the parts of `docs/stylesheets/`) for the light and the dark scheme, and checks a
 list of pairs as the site draws them (body text, links, chips on their tint, white on the
 navy header and message, navy on amber buttons, figure text, chart marks, the focus ring),
 compositing translucent colours over the page: text needs 4.5:1, marks 3:1. It runs in the

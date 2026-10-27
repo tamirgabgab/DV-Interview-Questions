@@ -134,3 +134,19 @@ def test_explorer_matches_the_page():
         assert len(named) == 2 * n and len({(w["ball"], w["heavy"]) for w in named}) == 2 * n
     unused12 = [out for out, who in data["12"]["rows"] if not who]
     assert sorted(map(tuple, unused12)) == [(-1, 1, -1), (0, 0, 0), (1, -1, 1)]
+
+
+def test_figure():
+    """The figure of part a: eight cases are left after every result of the first weighing,
+    and the page copy is up to date."""
+    import sys
+    from extract_code import ROOT
+    from page_tests import assert_figures_match
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0045
+
+    for res, _ in q0045.RESULTS:
+        left = q0045.candidates(res).values()
+        assert sum((v == "both") + (v is not None) for v in left) == 8, res
+    assert_figures_match(45)

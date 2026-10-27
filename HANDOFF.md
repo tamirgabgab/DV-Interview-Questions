@@ -1178,10 +1178,41 @@ section below starts at session 22, whose numbered items run on through the late
     (59 fields on 33 pages now, from 45 on 22). The other parts answer with code, an explanation or a general formula, or
     already have one (0058 d's value is its part c check); 0033 a was left out, since the
     page gives 24 by the formula and 25 by the simulation.
+77. **Round S3, the boxes (session 27, 2026-10-27).** The owner's picks: presets in one
+    scrolling row, no names under the playback icons. S416: the Josephus box (0016) kept the
+    step counter of its last small circle when N grew past 128 (no circle, the play row
+    hidden), so the scrubber read "0 of 23" and, after a reload, "0 of 63"; the counter is
+    emptied there, which hides the scrubber. The Floyd warning was no bug: an answer line
+    that is off keeps its last text only to hold its height. S417: `check_explorers.py`
+    leaves off answer lines out of its comparison and puts every element's attributes in
+    one order (a refitted figure set `style` and `data-fit-base` in either order), so it
+    warns only about real differences. S418: three or more action buttons in a row go into
+    one run (`ex-btnrun`, core.js `layout`) that scrolls sideways on a phone, fading at its
+    end, and lays out as before elsewhere (`display: contents`); a row a view lays out as a
+    grid keeps it (0024's events). Nine runs on eight pages, each one line instead of two to
+    six at 390 px.
+78. **Round S2, figures where a page had none (session 27, 2026-10-27).** The owner's pick:
+    only where a figure adds. Of the six pages first named, 0034 and 0038 have WaveDrom
+    waveforms and 0057 generated tables, so the pages without a figure were 0045, 0046 and
+    0047. New generators `tools/figures/q0045.py` (what the first weighing leaves for each
+    result: the twelve balls as maybe heavy, maybe light, either or good, eight cases each),
+    `q0046.py` (the grid of part a beside its dp table, the first 3 x 3 square marked in
+    both; replaces the text drawing of step 4) and `q0047.py` (the columns of [3, 0, 2, 0, 4]
+    with the 7 units of water; replaces the text drawing of the statement), each
+    independent of the page code, with a legend, five new contrast pairs (64 in all) and a
+    test per question that compares the generator with the page code and the page copy.
+79. **Round S6, the styles in parts (session 27, 2026-10-27).** The owner's pick: a file per
+    part. `extra.css` (4,020 lines) became twelve parts, `docs/stylesheets/01-base.css` to
+    `12-rounds-y-s.css`, cut at top-level sections in the original order and loaded in that
+    order, so the cascade is unchanged; `docs/stylesheets/README.md` lists them (excluded
+    from the site). `check_contrast.py` reads every part in order. A regrouping by component
+    was not done: later rounds refine earlier rules across components, so moving a rule
+    between parts can change what wins. Checked by the computed style of every element on
+    every page (390 px light and dark, 1280 px light) before and after the split.
 
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4 (item 75) and S1 (item 76) on the branch.
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) on the branch, for one CI run and one push to `main` (the owner's request).
   58 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
@@ -1456,15 +1487,15 @@ continue at 411.
 
 | # | Finding | Proposal | Size |
 |---|---|---|---|
-| S415 | 11 pages have no static figure (0001, 0002, 0003, 0034, 0036, 0038, 0045, 0046, 0047, 0057, 0059); their only picture is the box | one generated figure each where it explains the idea at a glance (0046 the DP grid, 0047 the water profile, 0045 the weighing tree, 0038 the handshake waveform...), via `tools/figures/` | L |
+| S415 (done for 0045 to 0047, item 78) | 11 pages have no static figure (0001, 0002, 0003, 0034, 0036, 0038, 0045, 0046, 0047, 0057, 0059); their only picture is the box | one generated figure each where it explains the idea at a glance (0046 the DP grid, 0047 the water profile, 0045 the weighing tree, 0038 the handshake waveform...), via `tools/figures/` | L |
 
 **Round S3 — the boxes: bugs and consistency**
 
 | # | Finding | Proposal | Size |
 |---|---|---|---|
-| S416 | `check_explorers.py` warns that a box link or the remembered state draws another box: 0016 (Josephus, 8 steps instead of 21) and the Floyd box (4 instead of 1) are real differences | fix the state codec of those boxes so a link and a reload restore the same box | M |
-| S417 | the same check warns on 0036, 0020 and the cake box only because attributes come back in another order (`style` and `data-fit-base`) | compare the boxes with attributes in a fixed order, so only real differences warn | S |
-| S418 | box controls on a phone: icon buttons without names, presets that wrap into several rows on some boxes | one review pass of every box at 390 px: names under the playback icons on touch, presets in one scrolling row | M |
+| S416 (done, item 77) | `check_explorers.py` warns that a box link or the remembered state draws another box: 0016 (Josephus, 8 steps instead of 21) and the Floyd box (4 instead of 1) are real differences | fix the state codec of those boxes so a link and a reload restore the same box | M |
+| S417 (done, item 77) | the same check warns on 0036, 0020 and the cake box only because attributes come back in another order (`style` and `data-fit-base`) | compare the boxes with attributes in a fixed order, so only real differences warn | S |
+| S418 (done, item 77) | box controls on a phone: icon buttons without names, presets that wrap into several rows on some boxes | one review pass of every box at 390 px: names under the playback icons on touch, presets in one scrolling row | M |
 
 **Round S4 — the question page and navigation**
 
@@ -1487,7 +1518,7 @@ continue at 411.
 
 | # | Finding | Proposal | Size |
 |---|---|---|---|
-| S426 | `extra.css` is 3,970 lines written over many rounds; components are styled in several places (the question header at line 150 and again at 3090) | regroup it by component, drop rules that match nothing in the built site (a small script finds them), with the phone, jump and contrast checks proving nothing moved | L |
+| S426 (done as parts, item 79) | `extra.css` is 3,970 lines written over many rounds; components are styled in several places (the question header at line 150 and again at 3090) | regroup it by component, drop rules that match nothing in the built site (a small script finds them), with the phone, jump and contrast checks proving nothing moved | L |
 
 Suggested order: S1 (the most use for a reader preparing), S4, S3, S2, S5, S6. Every round
 ends with the full check set and the owner's look at the live site.
