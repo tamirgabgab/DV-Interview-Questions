@@ -3615,3 +3615,28 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer .an-chip.an-c5 { --an: var(--viz-ink); }
 .md-typeset .explorer .an-chip.is-gone { background: color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color)); }
 .md-typeset svg .an-grid { stroke: var(--viz-grid); stroke-width: 1; }
+
+/* Missing tags (0057): the tag cells and the accumulators of the tagcheck explorer */
+.md-typeset .explorer .tc-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.5rem 0; direction: ltr; }
+.md-typeset .explorer .tc-tag { position: relative; display: inline-flex; flex-direction: column; align-items: center; min-width: 2.6rem; padding: 0.15rem 0.2rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem;
+  background: var(--md-default-bg-color); color: var(--viz-ink); font-family: var(--md-code-font-family); cursor: pointer; }
+.md-typeset .explorer .tc-tag[disabled] { cursor: default; }
+.md-typeset .explorer .tc-tag b { font-size: 0.75rem; }
+.md-typeset .explorer .tc-tag small { font-size: 0.55rem; }
+.md-typeset .explorer .tc-tag.is-out { border-style: dashed; }
+.md-typeset .explorer .tc-tag.is-back { border-color: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); }
+.md-typeset .explorer .tc-tag.is-twice { border-color: var(--viz-s2); background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .tc-tag.is-last { outline: 3px solid var(--viz-ink); outline-offset: 1px; }
+.md-typeset .explorer .tc-tag:focus-visible { outline: 3px solid var(--site-focus-ring); }
+.md-typeset .explorer .tc-f { position: absolute; top: -0.45rem; inset-inline-end: -0.3rem; font-size: 0.6rem; font-weight: 700; padding: 0 0.15rem; border-radius: 0.2rem; background: var(--viz-ink); color: var(--md-default-bg-color); }
+.md-typeset .viz-legend .tc-key-out { background: none; border: 1.5px dashed var(--viz-grid); }
+.md-typeset .viz-legend .tc-key-back { background: var(--viz-s1); opacity: 0.45; }
+.md-typeset .viz-legend .tc-key-twice { background: var(--viz-s2); opacity: 0.6; }
+.md-typeset .viz-legend .tc-key-last { background: none; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .explorer table.tc-table { font-size: 0.65rem; margin: 0.3rem 0; }
+.md-typeset .explorer table.tc-table td { padding: 0.1em 0.6em; }
+.md-typeset .explorer table.tc-table tr.is-hit td { background: color-mix(in srgb, var(--viz-s2) 14%, var(--md-default-bg-color)); }
+.md-typeset .explorer .tc-decode p { margin: 0.2em 0; font-size: 0.7rem; }
+.md-typeset .explorer .tc-groups { color: var(--viz-text); }
+.md-typeset .explorer .tc-groups span { font-family: var(--md-code-font-family); }
+.md-typeset .explorer input.tc-guess, .md-typeset .explorer input.tc-gdup { width: 7rem; }

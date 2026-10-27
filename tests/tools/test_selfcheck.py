@@ -274,6 +274,14 @@ def ants_answers() -> list[int]:
             ring_home([10, 25, 40, 60, 75, 90], [1, 1, 1, -1, -1, 1], 100)]
 
 
+def tag_answers() -> list[int]:
+    """Missing tags: part a's missing tag by a set difference; part b's register bits for 8-bit
+    tags (x plus one per bit); part c's missing tag by trying every pair (a, d) of 0..9."""
+    a = sorted(set(range(8)) - {3, 0, 6, 1, 7, 2, 5})[0]
+    c = next(m for m in range(10) for d in range(10) if m != d and m - d == 4 and m * m - d * d == 40)
+    return [a, 8 + 8 * 8, c]
+
+
 EXPECTED = {
     "0015": [two_children(False), two_children(True)],
     "0016": [josephus(20)],
@@ -294,6 +302,7 @@ EXPECTED = {
     "0054": [rr_bound(4), rr_bound(8), rr_bound(4, [1, 2, 3, 4])],
     "0055": fsm_answers(),
     "0056": ants_answers(),
+    "0057": tag_answers(),
 }
 
 
