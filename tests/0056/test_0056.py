@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0056  # noqa: E402
 
 ns = load_python(56)
-last_fall, collisions, fall_times = (ns[k] for k in ("last_fall", "collisions", "fall_times"))
+last_fall, collisions, fall_times, ring_after = (ns[k] for k in ("last_fall", "collisions", "fall_times", "ring_after"))
 
 
 def random_pole(rng, n_max=14, length=100):
@@ -60,6 +60,22 @@ def test_bounds():
     n = 6
     total = sum(collisions(list(range(n)), [1 if m >> i & 1 else -1 for i in range(n)]) for m in range(1 << n))
     assert total * 8 == n * (n - 1) * (1 << n)
+
+
+def test_ring():
+    """Part d: after each lap of 100 s ant i stands where ant (i + s) % n started, with its
+    direction; every ant is home first after n / gcd(n, s) laps (simulated lap by lap)."""
+    assert ring_after(q0056.RING_DIRS) == (2, 300) and ring_after(q0056.DIRS) == (0, 100)
+    rng = random.Random(59)
+    for _ in range(150):
+        pos, dirs = random_pole(rng, 8, 99)
+        n = len(pos)
+        s, home = ring_after(dirs)
+        start = list(zip(pos, dirs))
+        lap = q0056.ring(pos, dirs, 100, 100)
+        assert lap == [(float(pos[(i + s) % n]), dirs[(i + s) % n]) for i in range(n)], (pos, dirs)
+        laps = next(k for k in range(1, n + 1) if q0056.ring(pos, dirs, 100, 100 * k) == [(float(p), d) for p, d in start])
+        assert home == 100 * laps, (pos, dirs)
 
 
 def test_explorer_matches_the_simulation():

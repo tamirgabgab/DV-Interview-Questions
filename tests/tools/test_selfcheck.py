@@ -258,7 +258,20 @@ def ants_answers() -> list[int]:
             nxt[r + 1] = max(nxt.get(r + 1, -1), c)        # this ant goes right
             nxt[r] = max(nxt.get(r, -1), c + r)            # this ant goes left: meets them all
         best = nxt
-    return [int(longest * 100 / 8), max(best.values()), int(run([10, 25, 40, 60, 75, 90], [1, -1, 1, -1, -1, 1], 100))]
+    def ring_home(pos, dirs, length):
+        """Laps of the ring simulated until every ant is back at its start with its direction."""
+        x, d, ticks = [2 * p for p in pos], list(dirs), 0
+        while True:
+            x = [(v + dd) % (2 * length) for v, dd in zip(x, d)]
+            ticks += 1
+            for a in range(len(x)):
+                for b in range(a + 1, len(x)):
+                    if x[a] == x[b]:
+                        d[a], d[b] = -d[a], -d[b]
+            if ticks % (2 * length) == 0 and x == [2 * p for p in pos] and d == list(dirs):
+                return ticks // 2
+    return [int(longest * 100 / 8), max(best.values()), int(run([10, 25, 40, 60, 75, 90], [1, -1, 1, -1, -1, 1], 100)),
+            ring_home([10, 25, 40, 60, 75, 90], [1, 1, 1, -1, -1, 1], 100)]
 
 
 EXPECTED = {

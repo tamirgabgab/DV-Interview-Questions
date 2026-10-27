@@ -6,6 +6,7 @@ module tb;
   //@page function automatic int last_fall
   //@page function automatic int collisions
   //@page function automatic void fall_times
+  //@page function automatic int ring_shift
 
   int errors = 0;
 
@@ -57,6 +58,22 @@ module tb;
         if (fall2[i] > worst) worst = fall2[i];
       end
       if (2 * last_fall(pos, dirs) != worst || collisions(pos, dirs) != hits) begin errors++; $display("run %0d: last or hits", r); end
+    end
+    // part d: the shift and the first return on the ring, against counts made here
+    dirs = '{1, 1, 1, -1, -1, 1};
+    if (ring_shift(dirs) != 2 || ring_home(dirs) != 300) begin errors++; $display("ring example: %0d %0d", ring_shift(dirs), ring_home(dirs)); end
+    for (int r = 0; r < 200; r++) begin
+      int right, s, k;
+      n = $urandom_range(1, 9);
+      dirs = new[n];
+      right = 0;
+      foreach (dirs[i]) begin dirs[i] = $urandom_range(0, 1) ? 1 : -1; if (dirs[i] > 0) right++; end
+      s = right - (n - right);
+      while (s < 0) s += n;
+      s = s % n;
+      k = 1;
+      while ((k * s) % n != 0) k++;
+      if (ring_shift(dirs) != s || ring_home(dirs, 100) != 100 * k) begin errors++; $display("ring run %0d", r); end
     end
     if (errors == 0) $display("PASS"); else $display("FAIL: %0d errors", errors);
     $finish;

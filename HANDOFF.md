@@ -959,8 +959,10 @@ section below starts at session 22, whose numbered items run on through the late
     puzzle): ghosts that walk through each other give the last fall (100 s at most), the
     collisions (pairs going toward each other, 2500 at most for 100 ants) and the fall of
     each ant (the order along the pole is kept: the leftmost ants, as many as go left,
-    fall left in the order of the left ghosts' times). The generator simulates in half
-    seconds on doubled coordinates. Box `ants`: ants placed and turned by a click on the
+    fall left in the order of the left ghosts' times); part d, added at the owner's pick, puts
+    the ants on a ring: after a lap of 100 s ant i stands where ant (i + R - L) mod n started,
+    and all are home after n / gcd(n, R - L) laps. The generator simulates in half seconds
+    on doubled coordinates (the pole and the ring). Box `ants`: ants placed and turned by a click on the
     pole (its container has `data-fig-strip`, an ant reaches the corner of the enlarge
     button only at some steps), drawn from a seed, played by half seconds on the pole and
     on a space-time chart, a toggle between ants and ghosts, the fall of every ant as

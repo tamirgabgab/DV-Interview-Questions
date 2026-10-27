@@ -125,9 +125,40 @@ def pairs_table():
     return "\n".join(rows)
 
 
+RING_DIRS = [1, 1, 1, -1, -1, 1]
+
+
+def ring(pos, dirs, length, seconds):
+    """The ants on a ring after the given seconds (half-second steps, doubled coordinates):
+    each ant's position and direction, the ants in their starting order."""
+    order = sorted(range(len(pos)), key=lambda i: pos[i])
+    x, d = [2 * pos[i] for i in order], [dirs[i] for i in order]
+    for _ in range(2 * seconds):
+        x = [(v + dd) % (2 * length) for v, dd in zip(x, d)]
+        at = {}
+        for k, v in enumerate(x):
+            at.setdefault(v, []).append(k)
+        for ks in at.values():
+            assert len(ks) <= 2
+            if len(ks) == 2:
+                for k in ks:
+                    d[k] = -d[k]
+    return [(v / 2, dd) for v, dd in zip(x, d)]
+
+
+def ring_table():
+    arrow = {1: "→", -1: "←"}
+    laps = [ring(POS, RING_DIRS, L, 100 * k) for k in range(4)]
+    rows = ["| הנמלה | בהתחלה | אחרי 100 שניות | אחרי 200 | אחרי 300 |", "|:-:|:-:|:-:|:-:|:-:|"]
+    for k in range(len(POS)):
+        cells = " | ".join(f"{RLM}{lap[k][0]:g} {arrow[lap[k][1]]}" for lap in laps)
+        rows.append(f"| {RLM}{k} | {cells} |")
+    return "\n".join(rows)
+
+
 def blocks():
     """The generated blocks, in page order."""
-    return [spacetime(), legend(), pairs_table(), fall_table()]
+    return [spacetime(), legend(), pairs_table(), fall_table(), ring_table()]
 
 
 if __name__ == "__main__":
