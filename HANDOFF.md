@@ -1866,7 +1866,7 @@ Item numbers continue the global count (333 on).
 | Id | Idea | Size |
 |---|---|---|
 | W349 | **A real editor**: CodeMirror 6 loaded on the first open (syntax colours from the site's tokens, line numbers, Ctrl+Enter runs), the `textarea` as the fallback | M |
-| W350 | **Loading you can see**: Pyodide fetched when the panel opens, a progress line with stages (מוריד Python, פעם אחת → טוען את הפתרון → מריץ) instead of a grey sentence, the status as a coloured chip (running, done ✓ with the time, error) | S–M |
+| W350 | **Loading you can see** (the owner's skeleton-loading idea): Pyodide fetched when the panel opens, a progress line with stages (מוריד Python, פעם אחת → טוען את הפתרון → מריץ) instead of a grey sentence, the status as a coloured chip (running, done ✓ with the time, error) | S–M |
 | W351 | **Terminal-style output**: a dark panel, a copy button, an error's line number jumps to that line in the editor | S–M |
 | W352 | **Expected output checked**: the starter code's `# (9, (0, 2), (2, 4))` comments are compared with each printed line, ✓ or ✗ beside it (a check-yourself step for free) | M |
 | W353 | **Run from the code**: a "להרצה" button on the Python tab of a solution's code block opens the panel with that code and scrolls to it | S–M |
