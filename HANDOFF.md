@@ -1199,7 +1199,7 @@ section below starts at session 22, whose numbered items run on through the late
 - [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
 - [ ] Fifth series: W1 to W4 done on the branch (W348's drawn check mark not picked); W5 not picked; `main` when the owner asks.
-- [ ] Pick rounds from **Proposals** (the sixth series, session 27); the older proposals are in the archive.
+- [ ] Pick rounds from **Proposals** (the sixth series X360 to X392, round Y's leftovers, the chat questions X399 to X410); the older proposals are in the archive.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
@@ -1383,6 +1383,32 @@ search, desktop and 390 px, light and dark. Item numbers continue at 393. Size a
 
 Not changed: the home page, the cards, the path box and the footer read well; the 404 page
 could not be judged locally (its assets point at the site path).
+
+## Proposals — questions given in chat (session 27, 2026-10-27, owner picks)
+
+The owner asked for puzzles and LeetCode-style coding with less hardware; these were
+explained in the chat (problem, a short solution, the trap) and are recorded here so they
+are not lost. Item numbers continue at 399. None is on the site; check each example in a
+test before writing a page.
+
+| # | Question | Level | Idea | Size |
+|---|---|---|---|---|
+| X399 | Longest substring without a repeated character | junior / medium | sliding window, last index of each character | M |
+| X400 | Number of subarrays with sum k (negatives allowed) | junior / medium | prefix sums and a counter; why a window fails with negatives | M |
+| X401 | Number of islands as land is added one cell at a time | senior / hard | union-find with path compression, the count after each step | L |
+| X402 | Cheryl's birthday | student / medium | elimination from what each person knows, as a table | M |
+| X403 | The sack of fake coins (ten sacks, one weighing) | student / easy | take i coins from sack i, the missing weight names the sack | S |
+| X404 | How many squares and rectangles on a chessboard | student / easy to medium | Σk² and C(9, 2)² | S |
+| X405 | Smallest window that contains every character of t | senior / hard | variable window with a "missing" counter, repeats in t | M |
+| X406 | Longest substring with at most k distinct characters | junior / medium | window with a counter map, delete keys at zero | M |
+| X407 | Longest run of one letter with k replacements | junior / medium | window length − max count ≤ k; why max count never needs to shrink | M |
+| X408 | All anagrams of p in s | junior / medium | fixed window, 26 counts and a "matched" counter | M |
+| X409 | Shortest subarray with sum at least target (positive numbers) | junior / medium | shrinking window; follow-up with negatives (prefix sums and a monotonic deque) | M |
+| X410 | Longest run of ones with k flips | student / medium | window with a zero counter | S |
+
+X399 and X405 to X410 can form a "sliding window" study path in the order X410, X399,
+X406, X409, X408, X407, X405, with one shared box (the string as a row of cells, the window
+as a moving frame, the counter map beside it, left and right stepping).
 
 ## Technical notes for whoever continues this work
 
