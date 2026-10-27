@@ -173,6 +173,23 @@ def coin_runs(a: str, b: str = "", steps: int = 3000) -> tuple[float, float]:
     return mean, first
 
 
+def coin_var(a: str, steps: int = 3000) -> float:
+    """The variance of the wait for a, from the same push of the distribution forward."""
+    keep, now, m1, m2 = len(a) - 1, {"": 1.0}, 0.0, 0.0
+    for t in range(1, steps + 1):
+        nxt = {}
+        for seen, p in now.items():
+            for c in "HT":
+                s = seen + c
+                if s.endswith(a):
+                    m1, m2 = m1 + t * p / 2, m2 + t * t * p / 2
+                else:
+                    k = s[-keep:] if keep else ""
+                    nxt[k] = nxt.get(k, 0.0) + p / 2
+        now = nxt
+    return m2 - m1 * m1
+
+
 EXPECTED = {
     "0015": [two_children(False), two_children(True)],
     "0016": [josephus(20)],
@@ -188,7 +205,7 @@ EXPECTED = {
     "0039": [eggs(3, 100)],
     "0042": [camel(0.5, 150, 450, 30)],
     "0051": [mice(1000, 1), mice(1000, 2), mice(1000, 3)],
-    "0052": [coin_runs("HH")[0], coin_runs("HHH")[0], coin_runs("HT", "HH")[1]],
+    "0052": [coin_runs("HH")[0], coin_runs("HHH")[0], coin_runs("HT", "HH")[1], coin_var("HH")],
 }
 
 

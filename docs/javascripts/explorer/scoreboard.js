@@ -107,7 +107,7 @@
         `<button type="button" class="md-button md-button--primary ex-next">האירוע הבא</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
         `<p class="ex-summary sb-sum" aria-live="polite"></p>` +
-        `<div class="sb-events" dir="ltr"></div>` +
+        `<div class="sb-events" dir="ltr" tabindex="0" role="group" aria-label="האירועים לפי הסדר, גלילה אופקית בטלפון"></div>` +
         `<p class="ex-title">התורים של הבודק "תור לכל ID" : הראש מימין, התשובה הבאה של ה-ID</p><div class="sb-queues" dir="ltr"></div>` +
         `<div class="sb-cards"></div>`;
       const $ = (sel) => box.querySelector(sel);

@@ -3455,7 +3455,7 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer .sb-ev small { font-size: 0.55rem; color: var(--viz-text); opacity: 1; }
 .md-typeset .explorer .sb-ev.sb-req { border-color: var(--viz-s1); }
 .md-typeset .explorer .sb-ev.sb-rsp { border-color: var(--viz-s2); }
-.md-typeset .explorer .sb-ev.is-later { opacity: 0.5; }
+.md-typeset .explorer .sb-ev.is-later { border-style: dashed; border-color: var(--viz-grid); background: none; }
 .md-typeset .explorer .sb-ev.is-now { border-width: 2.5px; background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
 .md-typeset .explorer .sb-queues { display: flex; flex-direction: column; gap: 0.2rem; max-width: 40rem; }
 .md-typeset .explorer .sb-q { display: flex; align-items: center; gap: 0.5rem; min-height: 1.7rem; }
@@ -3503,3 +3503,5 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .explorer .uv-card { max-width: 40rem; margin-top: 0.4rem; padding: 0.3rem 0.6rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; font-size: 0.7rem; min-height: 6.5rem; }
 .md-typeset .explorer .uv-card p { margin: 0.2em 0; }
 .md-typeset .explorer .uv-ctitle { font-weight: 700; }
+.md-typeset .explorer svg.cn-live { width: 100%; max-width: 40rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer .cn-note { font-size: 0.65rem; color: var(--viz-text); margin: 0.1em 0 0.4em; }

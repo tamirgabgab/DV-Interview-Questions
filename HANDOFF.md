@@ -901,6 +901,19 @@ section below starts at session 22, whose numbered items run on through the late
     (a, b, c). New study path `testbench` (0049, 0050); 0051 in logic puzzles, 0052 in
     probability. Topic names for `uvm` and `methodology`.
 
+61. **0052 generalized (session 27, 2026-10-27).** The owner's picks: a biased coin; races
+    of three patterns and more; the generating function; in the box a choice of q or a
+    die, and the state graph. Part b takes a probability per letter (each overlap adds 1
+    over the probability of its prefix; a table for q = 1/2, 2/3, 3/4, 9/10, where HH
+    overtakes HT); part c solves Conway's m + 1 equations (each pattern's chance and the
+    race's length; HHH, HTH and THH win 1/8, 5/12 and 11/24 in 16/3 tosses) in Python
+    with fractions and in SystemVerilog with reals (`$abs` is not in Verilator: squares
+    compared for the pivot); new part d, G(z) = P(A) z^L / (P(A) z^L + (1 − z) C(z)) with
+    its proof, the distribution by one recurrence and the variance (HH 22, a self-check).
+    The generator solves the chains (first and second moments, races of any number of
+    patterns, any alphabet) and the tests compare them for every pattern up to 8 letters,
+    biased coins, the die and every race of three and four patterns of length 3.
+
 ## In progress
 
 - **State (2026-10-26, session 26):** `main` is 5f94144 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7), deployed.
