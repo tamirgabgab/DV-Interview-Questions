@@ -1211,12 +1211,15 @@ section below starts at session 22, whose numbered items run on through the late
     order, so the cascade is unchanged; `docs/stylesheets/README.md` lists them (excluded
     from the site). `check_contrast.py` reads every part in order. A regrouping by component
     was not done: later rounds refine earlier rules across components, so moving a rule
-    between parts can change what wins. Checked by the computed style of every element on
-    every page (390 px light and dark, 1280 px light) before and after the split.
+    between parts can change what wins. Checked: every built page is the same before and
+    after apart from its stylesheet links, and the parts joined in order are the old file,
+    so the cascade is the same. A computed-style fingerprint of every element was too noisy
+    to prove it (the custom properties come back in a changing order, the repository widget
+    loads its facts from the network, the hero animates).
 
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) on the branch, for one CI run and one push to `main` (the owner's request).
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); S5 is the one S round left.
   58 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
