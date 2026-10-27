@@ -1108,10 +1108,24 @@ section below starts at session 22, whose numbered items run on through the late
     (a bit select, the rows of the formula step by step for the next or the previous, the
     jump to another length for zeros, previous / next). Self-checks 99, 80 and 143; 0059 in
     the coding path.
+72. **A second visual review, five fixes (session 27, 2026-10-27).** The owner asked for
+    only the changes that are really needed after the W rounds. Screenshots of the home
+    page, the paths, the catalog and two questions (desktop and 390 px, light and dark)
+    found five; the owner took all of them and logo option c. The logo is now the letters
+    DV with the V an amber check (`logo.svg`, `favicon.svg`, the app icons from
+    `make_icons.py`): the old two-pulse waveform read as Hebrew letters at header size and
+    as a smudge in a browser tab. The question header puts the title first with the page
+    tools beside it, then the chips and badges; on a phone the tools move to their own row
+    under the chips, so the title opens the screen (it started about 210 px down, the
+    statement about 540 px). "SV + Python" and "tested" are one badge, "קוד נבדק" (the
+    languages in its tooltip; untested code keeps the language badge). Every page h1 takes
+    the text colour (Material greys it, so the paths, catalog, level and tag pages had a
+    faint title), h1 and h2 wrap with `text-wrap: balance` (0050 left "ID" alone on a
+    line), and the catalog page hides the navigation sidebar, which held one link.
 
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main`.
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) on the branch.
   58 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
@@ -1237,7 +1251,7 @@ generic look, with clearer and better explained answers. Findings that drove the
 | Topic | Decision |
 |-------|----------|
 | Colour palette | **Navy + amber** (variant 1 of three mock-ups: navy + amber, forest + gold, charcoal + teal). Light: primary `#1b2a4a`, accent `#d99a00`, links `#1f4e9c`. Dark: primary `#2a3d66` (was `#243760`), accent `#ffc233`, links `#8db3ff`, page background `#171f2d` (was `#141a26`), code background `#1b2231`; every pair is checked by `tools/check_contrast.py` |
-| Logo / favicon | A drawn SVG: digital waveform ending in an amber check mark (white on the navy header; navy rounded square for the favicon) |
+| Logo / favicon | A drawn SVG: the letters DV, the V an amber check mark (white D on the navy header; navy rounded square for the favicon); until session 27 a waveform ending in a check |
 | Question id | A small label above a clean title; the id stays in the side navigation and the tables |
 | Footer | Site name + link to the repository, no personal name; the Material generator line is off |
 | Table filters | Chip buttons, single choice per group (level, difficulty, topic), plus the text search |

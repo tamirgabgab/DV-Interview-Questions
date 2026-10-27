@@ -3038,12 +3038,14 @@ body.practice-mode .md-typeset .question-tools {
 .md-typeset .explorer.mo-is-rect .mo-key-nb-wrap, .md-typeset .explorer:not(.mo-is-rect) .mo-key-cand-wrap { display: none; }
 
 /* Typography (UI321): Rubik stays the text face; a little more line height for Hebrew,
-   firmer headings, tabular digits in tables and chips, and paragraphs and lists capped
+   firmer headings in the text colour on every page (Material greys the h1), tabular digits in tables and chips, and paragraphs and lists capped
    near 75 characters so long lines stay readable on wide screens (code, tables, figures
    and the boxes keep the full column). */
 .md-typeset { line-height: 1.7; }
-.md-typeset h1 { font-weight: 600; letter-spacing: 0; }
+.md-typeset h1 { font-weight: 600; letter-spacing: 0; color: var(--md-default-fg-color); }
 .md-typeset :is(h2, h3) { font-weight: 600; }
+/* a long title splits into even lines, never one word left alone on the last */
+.md-typeset :is(h1, h2) { text-wrap: balance; }
 .md-typeset :is(table, .chip, .lc-count, .ex-pos, .hh-stats) { font-variant-numeric: tabular-nums; }
 .md-typeset :is(p, ul:not([class]), ol:not([class]), dl):not(.explorer *):not(td *):not(th *):not(.admonition-title) { max-width: 75ch; }
 
@@ -3082,24 +3084,28 @@ body.practice-mode .md-typeset .question-tools {
 .ui-ico-help { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4v3a1 1 0 0 0 1 1h.5c.25 0 .5-.1.7-.29L13.9 18H20a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 2h16v12h-6.92L10 19.08V16H4zm8.19 1.5c-.89 0-1.6.18-2.14.54-.55.36-.83.96-.78 1.65h1.97c0-.28.1-.49.26-.63.2-.14.42-.21.69-.21.31 0 .58.08.76.26.18.17.27.39.27.69 0 .28-.08.53-.22.74-.17.22-.38.4-.64.54-.52.32-.86.6-1.07.84-.19.24-.29.58-.29 1.08h2c0-.28.05-.5.14-.68.09-.17.26-.32.52-.47.46-.21.84-.49 1.13-.85.29-.37.44-.76.44-1.2q0-1.05-.81-1.68c-.54-.41-1.29-.62-2.23-.62M11 12v2h2v-2z'/%3E%3C/svg%3E"); }
 .ui-ico-search { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5'/%3E%3C/svg%3E"); }
 
-/* The question header (UI324): one row of chips (id, level, difficulty, kind, then small
-   badges with an icon and a word) with the page tools as icon buttons at its far end, the
-   title, and one quiet line of topics, date and source. */
-.md-typeset .question-header .qh-row { display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 0.3rem; }
-.md-typeset .question-header .qh-top { flex: 1 1 auto; min-width: 0; row-gap: 0.45rem; margin-bottom: 0; }
+/* The question header (UI324): the title first with the page tools as icon buttons at its
+   far end, one row of chips (id, level, difficulty, kind, then small badges with an icon
+   and a word), and one quiet line of topics, date and source. A phone puts the tools in a
+   row of their own under the chips. */
+.md-typeset .question-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title tools" "chips chips" "meta meta"; column-gap: 0.8rem; align-items: start; }
+.md-typeset .question-header > h1 { grid-area: title; }
+.md-typeset .question-header > .question-tools { grid-area: tools; }
+.md-typeset .question-header > .qh-top { grid-area: chips; row-gap: 0.45rem; margin-bottom: 0.45rem; }
+.md-typeset .question-header > .qh-bottom { grid-area: meta; }
 .md-typeset .question-header:has(+ .part-nav, + .path-nav) { margin-bottom: 0.4rem; border-bottom: 0; }
 .md-typeset .question-header .qh-badge { gap: 0.25em; padding: 0 0.45em; font-size: 0.66rem; line-height: 1.75; color: var(--md-default-fg-color--light); }
 .md-typeset .question-header .qh-badge .ui-ico { width: 1.1em; height: 1.1em; }
 .md-typeset .question-header .qh-badge-ok { color: var(--diff-easy); border-color: color-mix(in srgb, currentColor 45%, transparent); }
 .md-typeset .question-header .qh-badge-play { color: var(--md-typeset-a-color); }
 .md-typeset .question-header .qh-badge-new { color: #1b2a4a; background: var(--md-accent-fg-color); border-color: var(--md-accent-fg-color); }   /* the navy of the practice button: 4.5:1 on the accent */
-.md-typeset .question-header h1 { margin: 0.1rem 0 0.4rem; font-weight: 700; line-height: 1.3; }
+.md-typeset .question-header h1 { margin: 0 0 0.5rem; font-weight: 700; line-height: 1.3; }
 .md-typeset .question-header .qh-bottom { gap: 0.2rem 0.45rem; font-size: 0.68rem; }
 .md-typeset .question-header .qh-bottom a { text-decoration: underline dotted color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 0.2em; }
 
 /* The page tools as icon buttons with a tooltip (the accessible name, shown on hover and
    on keyboard focus); pressed marks get the filled icon. */
-.md-typeset .question-header .question-tools { flex: none; flex-wrap: nowrap; gap: 0.15rem; margin: -0.3rem 0 0; font-size: 0.7rem; }
+.md-typeset .question-header .question-tools { flex: none; flex-wrap: nowrap; gap: 0.15rem; margin: 0; font-size: 0.7rem; }
 .md-typeset :is(.question-tools, .part-nav) .qt-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; padding: 0; border-radius: 50%; border-color: transparent; background: transparent; color: var(--md-default-fg-color--light); font-size: 0.9rem; }
 .md-typeset :is(.question-tools, .part-nav) .qt-btn:hover, .md-typeset :is(.question-tools, .part-nav) .qt-btn:focus-visible { color: var(--md-default-fg-color); background: var(--md-default-fg-color--lightest); border-color: transparent; }
 .md-typeset :is(.question-tools, .part-nav) .qt-btn[aria-pressed="true"] { color: var(--md-typeset-a-color); background: var(--site-primary-soft); }
@@ -3117,8 +3123,8 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 @media screen and (max-width: 30em) {
   /* the toolbar starts at the right edge here: its first tooltips open leftwards */
   .md-typeset .question-tools .qt-btn:nth-child(-n+3)[data-tip]:is(:hover, :focus-visible)::after { inset-inline: 0 auto; }
-  .md-typeset .question-header .qh-row { flex-wrap: wrap; row-gap: 0.2rem; }
-  .md-typeset .question-header .question-tools { flex-basis: 100%; margin: 0 -0.4rem; }
+  .md-typeset .question-header { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "chips" "tools" "meta"; }
+  .md-typeset .question-header .question-tools { margin: -0.2rem -0.4rem 0.2rem; }
 }
 
 /* The sticky bar (UI325): the part chips, and once the header has scrolled away the solved

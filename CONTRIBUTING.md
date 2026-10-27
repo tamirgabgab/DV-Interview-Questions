@@ -125,7 +125,7 @@ DV-Interview-Questions/
 │   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0031-…, 0033-… to 0035-…, 0038-…, 0049-…, 0051-…, 0053-…, 0055-…, 0056-…, 0058-…, 0059-…
 │   │   └── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0023-…, 0024-…, 0025-…, 0037-…, 0050-…, 0052-…, 0054-…, 0057-…
 │   ├── assets/
-│   │   ├── logo.svg, favicon.svg  # Site mark: waveform + amber check
+│   │   ├── logo.svg, favicon.svg  # Site mark: DV, the V an amber check
 │   │   ├── images/             # Figures and screenshots referenced by questions
 │   │   └── spider-fly.html     # The owner's standalone spider-and-fly tool, embedded by 0030 (kept as sent)
 │   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner
@@ -288,16 +288,17 @@ The build hook validates the front matter and **fails the build** on a missing f
 unknown level, difficulty or kind, a level that does not match the folder, a file name that does
 not start with the id, or a duplicate id. It also generates, per question page:
 
-- the **header card**: one row of chips (id label, level, difficulty, kind with its icon)
-  and small badges with an icon and a word ("interactive", the code languages, "tested"
-  when the page has a `tests/<id>/` folder, "new" for the newest five questions added in
-  the last 7 days (`NEW_DAYS`, `NEW_MAX`); the full text
-  is a tooltip), the page tools beside them, the title, and one quiet line of topic links,
+- the **header card**: the title first with the page tools beside it (under the chips on
+  a phone), one row of chips (id label, level, difficulty, kind with its icon)
+  and small badges with an icon and a word ("interactive", "tested code" when the page has
+  a `tests/<id>/` folder or else the code languages, "new" for the newest five questions
+  added in the last 7 days (`NEW_DAYS`, `NEW_MAX`); the full text
+  is a tooltip), and one quiet line of topic links,
   the `added` date in Hebrew and `source` when filled; the page's own title comes from
   `title`, so the Markdown must not start with a `#` heading;
 - the Material tags (level, difficulty, topics) for the tag index, with the tag chips above
   the title hidden because the header card shows them;
-- the **page tools** as icon buttons with tooltips, beside the header's chips (open or close
+- the **page tools** as icon buttons with tooltips, beside the title (open or close
   every block as one toggle, practice mode that hides the solutions and starts a
   stopwatch; "solved" and "favourite" marks; a random question of the same level). Practice
   mode and the marks are kept in the browser's localStorage (`docs/javascripts/marks.js`),

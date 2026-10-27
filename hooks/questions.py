@@ -364,9 +364,10 @@ def _badge(icon: str, text: str, title: str, cls: str = "") -> str:
 
 
 def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
-    """Header card (UI324): one row of chips (id, level, difficulty, kind) and small badges
-    (interactive, code, tested, new) with the page tools beside it, the title, and one
-    quiet line of topics, date and source."""
+    """Header card (UI324): the title first with the page tools beside it, then one row of
+    chips (id, level, difficulty, kind) and small badges (interactive, tested code, new),
+    and one quiet line of topics, date and source. On a phone the tools go under the
+    chips, so the title opens the page."""
     base = posixpath.dirname(page_url) + "/" if page_url else ""
     langs = [name for name, fence in (("SV", "systemverilog"), ("Python", "python"))
              if extract_code.blocks_from_text(markdown, fence)]
@@ -375,9 +376,10 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
         badges.append(_badge("interactive", "אינטראקטיבי", "יש בדף ממשק אינטראקטיבי : סליידרים, אנימציה או איור צעד-צעד", " qh-badge-play"))
     if langs:
         full = " ו-".join("SystemVerilog" if n == "SV" else n for n in langs)
-        badges.append(_badge("code", f'<bdi dir="ltr">{" + ".join(langs)}</bdi>', f"פתרון בקוד {full}"))
-        if _has_tests(q):
-            badges.append(_badge("tested", "נבדק", "הקוד בדף רץ ונבדק אוטומטית בכל עדכון של האתר", " qh-badge-ok"))
+        if _has_tests(q):    # one badge for the code and its tests
+            badges.append(_badge("tested", "קוד נבדק", f"פתרון בקוד {full}, שרץ ונבדק אוטומטית בכל עדכון של האתר", " qh-badge-ok"))
+        else:
+            badges.append(_badge("code", f'<bdi dir="ltr">{" + ".join(langs)}</bdi>', f"פתרון בקוד {full}"))
     if _is_new(q):
         badges.append(_badge("new", "חדש", "מהשאלות החדשות ביותר באתר : נוספה בשבוע האחרון", " qh-badge-new"))
     topics = ", ".join(_tag_link(t, base) for t in q["tags"])
@@ -389,9 +391,10 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
         bottom.append(f'<span class="qh-sep"></span><span>מקור : {html.escape(str(q["source"]))}</span>')
     return (
         '<div class="question-header">\n'
-        f'<div class="qh-row"><div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
-        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{"".join(badges)}</div>{tools}</div>\n'
         f'<h1>{html.escape(str(q["title"]))}</h1>\n'
+        f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
+        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{"".join(badges)}</div>\n'
+        f'{tools}\n'
         f'<div class="qh-bottom">{"".join(bottom)}</div>\n'
         '</div>\n\n'
     )

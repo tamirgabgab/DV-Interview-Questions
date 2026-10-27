@@ -1,5 +1,5 @@
 """The home-screen icons of the web app manifest (docs/manifest.webmanifest): the site logo
-(docs/assets/logo.svg, a white waveform ending in an amber check) on the navy of the
+(docs/assets/logo.svg, the letters DV, the V an amber check) on the navy of the
 header. The plain icons fill a navy square with the logo at 70 %; the maskable one keeps
 the logo inside the central 60 % that every launcher mask leaves visible.
 
