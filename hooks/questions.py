@@ -321,20 +321,26 @@ def new_chip(q: dict) -> str:
     return '<span class="chip chip-new">חדש</span>' if _is_new(q) else ""
 
 
-def level_chip(level: str) -> str:
-    return f'<span class="chip chip-level">{LEVELS[level]}</span>'
+# A chip in a list of questions (a path, related questions, what's new) is left out of the
+# site search (quiet=True): the search shows a section's text with the tags stripped, and
+# the chips glued to the title ("…ומחסריםסטודנטבינוני") only made the result harder to read.
+QUIET = " data-search-exclude"
 
 
-def difficulty_chip(difficulty: str) -> str:
-    return f'<span class="chip chip-diff chip-diff-{difficulty}">{DIFFICULTIES[difficulty]}</span>'
+def level_chip(level: str, quiet: bool = False) -> str:
+    return f'<span class="chip chip-level"{QUIET if quiet else ""}>{LEVELS[level]}</span>'
+
+
+def difficulty_chip(difficulty: str, quiet: bool = False) -> str:
+    return f'<span class="chip chip-diff chip-diff-{difficulty}"{QUIET if quiet else ""}>{DIFFICULTIES[difficulty]}</span>'
 
 
 def kind_icon(kind: str) -> str:
     return f'<i class="kind-ico kind-ico-{kind}" aria-hidden="true"></i>'
 
 
-def kind_chip(kind: str) -> str:
-    return f'<span class="chip chip-kind chip-kind-{kind}">{kind_icon(kind)}{KINDS[kind]}</span>'
+def kind_chip(kind: str, quiet: bool = False) -> str:
+    return f'<span class="chip chip-kind chip-kind-{kind}"{QUIET if quiet else ""}>{kind_icon(kind)}{KINDS[kind]}</span>'
 
 
 def _base(page_url: str) -> str:
@@ -482,10 +488,10 @@ def _path_steps(page) -> str:
     for n, s in enumerate(p["steps"], 1):
         q = s["q"]
         items.append(
-            f'<li class="path-step" data-id="{q["id"]}"><span class="ps-num">{n}</span>'
-            f'<div class="ps-body"><div class="ps-head"><span class="ps-id">{q["id"]}</span>'
+            f'<li class="path-step" data-id="{q["id"]}"><span class="ps-num" data-search-exclude>{n}</span>'
+            f'<div class="ps-body"><div class="ps-head"><span class="ps-id">{q["id"]}</span> '
             f'<a class="ps-title" href="{_href(q["src_uri"], page.url)}">{html.escape(str(q["title"]))}</a>'
-            f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}<span class="ps-mark"></span></div>'
+            f'{level_chip(q["level"], True)}{difficulty_chip(q["difficulty"], True)}<span class="ps-mark"></span></div>'
             f'<p class="ps-note">{_inline_code(s["note"])}</p></div></li>')
     ids = [s["q"]["id"] for s in p["steps"]]
     return _progress(ids) + '<ol class="path-steps">' + "".join(items) + "</ol>"
@@ -624,9 +630,9 @@ def _related(q: dict, page_url: str) -> str:
     for *_, other in scored[:RELATED_MAX]:
         href = posixpath.relpath(other["src_uri"][: -len(".md")] + "/", base or ".") + "/"
         items.append(
-            f'<li><span class="rq-id">{other["id"]}</span>'
+            f'<li><span class="rq-id">{other["id"]}</span> '
             f'<a class="rq-title" href="{href}">{html.escape(str(other["title"]))}</a>'
-            f'{level_chip(other["level"])}{difficulty_chip(other["difficulty"])}</li>'
+            f'{level_chip(other["level"], True)}{difficulty_chip(other["difficulty"], True)}</li>'
         )
     return "\n\n## שאלות קשורות\n\n<ul class=\"related-questions\">\n" + "\n".join(items) + "\n</ul>\n"
 
@@ -648,9 +654,9 @@ def _date_he(d: dt.date) -> str:
 
 
 def _question_item(q: dict, page_url: str) -> str:
-    return (f'<li><span class="rq-id">{q["id"]}</span>'
+    return (f'<li><span class="rq-id">{q["id"]}</span> '
             f'<a class="rq-title" href="{_href(q["src_uri"], page_url)}">{html.escape(str(q["title"]))}</a>'
-            f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}</li>')
+            f'{level_chip(q["level"], True)}{difficulty_chip(q["difficulty"], True)}{kind_chip(q["kind"], True)}</li>')
 
 
 def _continue_card() -> str:
@@ -676,7 +682,7 @@ def _whats_new(page_url: str) -> str:
                 out.append("</ul>")
             day = _added(q)
             n = sum(_added(o) == day for o in _questions.values())
-            out.append(f'<h2 class="new-day" id="d{day.isoformat()}">\u200f{_date_he(day)}'
+            out.append(f'<h2 class="new-day" id="d{day.isoformat()}">\u200f{_date_he(day)} '
                        f'<span class="new-count">{n} {"שאלה" if n == 1 else "שאלות"}</span></h2>\n<ul class="related-questions">')
         out.append(_question_item(q, page_url))
     if out:
@@ -736,7 +742,11 @@ def _table(level: str | None, page_url: str) -> str:
 
     sorts = [("id", "מספר"), ("title", "שם")] + ([("level", "משרה")] if level is None else []) + [("difficulty", "קושי")]
     panel_id = f"qf-{level or 'all'}"
-    out = ['<div class="question-filter" markdown="0" data-search-exclude>']
+    # The filter and the table stay out of the site search, under one <section>: the search
+    # plugin of Material ends an exclusion at the first closing tag of the same name inside
+    # it (a nested </div>), so the excluded element must be a tag that is not nested in it.
+    out = ['<section class="q-noindex" markdown="0" data-search-exclude>',
+           '<div class="question-filter" markdown="0">']
     out.append('<div class="filter-bar">'
                '<label class="filter-search"><span class="filter-search-label">חיפוש</span>'
                '<input type="search" data-filter="text" placeholder="שם, נושא או מספר"></label>'
@@ -791,6 +801,7 @@ def _table(level: str | None, page_url: str) -> str:
         )
     out.append("</tbody></table></div>")
     out.append('<div class="questions-none" hidden></div>')
+    out.append('</section>')
     return "\n".join(out)
 
 
