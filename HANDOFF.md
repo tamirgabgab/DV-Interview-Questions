@@ -1216,10 +1216,27 @@ section below starts at session 22, whose numbered items run on through the late
     so the cascade is the same. A computed-style fingerprint of every element was too noisy
     to prove it (the custom properties come back in a changing order, the repository widget
     loads its facts from the network, the hero animates).
+80. **The question map, a knowledge graph (session 28, 2026-10-28).** The owner asked to
+    try three Claude Code add-ons (Caveman, Claude-mem, Graphify) and then to run Graphify.
+    Its code-only pass (tree-sitter, no LLM) mapped the infrastructure but not the
+    questions (only the page headings), so the semantic pass was run on the 58 pages alone:
+    six readers wrote, per question, its core concepts, secondary ones and related
+    questions (every page read to its last line), merged into `tools/graph_concepts.json`
+    (115 concepts in seven groups; `systemverilog` dropped as a secondary concept, it was a
+    hub on 23 questions). `tools/graph.py` builds `docs/graph.html` with graphify (vis-network
+    from unpkg): titles and levels from the front matter, the canvas and the side panel
+    right to left, a Hebrew header with a link back to the site, the panel under the graph
+    below 700 px, and a link to the question's page in the panel. `README.md` links it
+    under the site link. Not in the navigation, not part of CI (graphify is not a site
+    dependency); add a new question's entry to the JSON and rerun the script. What the map
+    shows: math (36 questions with a core concept there) and algorithms (32) dominate;
+    probability (5), puzzles as such (6) and digital design (10) are thin; no question is
+    about debugging or a sliding window, and UVM, covergroups, async FIFO, clock dividers
+    and credit flow control have one question each.
 
 ### Session 28 — 2026-10-28: code review fixes
 
-80. **Code review of the S rounds, eight fixes (session 28, 2026-10-28).** A review of
+81. **Code review of the S rounds, eight fixes (session 28, 2026-10-28).** A review of
     `docs/javascripts`, `hooks/questions.py` and `tools/check_explorers.py`; the owner took
     eight of its ten findings (not the cached "new" set or the computed-style read in
     `layout`):
@@ -1238,7 +1255,7 @@ section below starts at session 22, whose numbered items run on through the late
     - `_header`, `_level_cards` and `_related` use `_base` and `_href` instead of building
       relative links inline.
     - `josephus.js`: the counter of a big circle is the else branch of the small one.
-81. **Questions 0060 and 0061, from the owner's chat (session 28, 2026-10-28).** The owner
+82. **Questions 0060 and 0061, from the owner's chat (session 28, 2026-10-28).** The owner
     picked two LeetCode-shaped questions asked at Meta and Google and asked for a part b
     that generalizes each; the generalizations were picked from multiple-choice questions.
     - **0060, the longest run of ones with up to k flips** (Max Consecutive Ones III):
@@ -1258,7 +1275,10 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 80) and questions 0060 and 0061 (item 81, session 28) on the branch; S5 is the one S round left.
+- **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
+  linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
+  and run `python tools/graph.py` (needs `pip install graphifyy`).
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81) and questions 0060 and 0061 (item 82, session 28) on the branch; S5 is the one S round left.
   60 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check

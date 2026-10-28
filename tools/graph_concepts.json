@@ -1,0 +1,1618 @@
+{
+ "concepts": {
+  "adversary_argument": {
+   "label": "Adversary argument",
+   "group": "algorithms"
+  },
+  "arbiter": {
+   "label": "Arbiter",
+   "group": "digital design"
+  },
+  "arithmetic_series": {
+   "label": "Arithmetic series",
+   "group": "math"
+  },
+  "async_fifo": {
+   "label": "Async FIFO",
+   "group": "digital design"
+  },
+  "backtracking": {
+   "label": "Backtracking",
+   "group": "algorithms"
+  },
+  "bfs": {
+   "label": "BFS",
+   "group": "algorithms"
+  },
+  "binary_search": {
+   "label": "Binary search",
+   "group": "algorithms"
+  },
+  "bit_manipulation": {
+   "label": "Bit manipulation",
+   "group": "algorithms"
+  },
+  "brute_force_enumeration": {
+   "label": "Brute-force enumeration",
+   "group": "algorithms"
+  },
+  "cdc": {
+   "label": "CDC",
+   "group": "digital design"
+  },
+  "clock_divider": {
+   "label": "Clock divider",
+   "group": "digital design"
+  },
+  "closed_form": {
+   "label": "Closed form",
+   "group": "math"
+  },
+  "combinational_logic": {
+   "label": "Combinational logic",
+   "group": "digital design"
+  },
+  "combinatorics": {
+   "label": "Combinatorics",
+   "group": "math"
+  },
+  "conditional_probability": {
+   "label": "Conditional probability",
+   "group": "probability"
+  },
+  "constrained_random": {
+   "label": "Constrained random",
+   "group": "verification"
+  },
+  "constraint_override": {
+   "label": "Constraint override",
+   "group": "verification"
+  },
+  "counter": {
+   "label": "Counter",
+   "group": "digital design"
+  },
+  "counting_bijection": {
+   "label": "Bijection counting",
+   "group": "math"
+  },
+  "coupon_collector": {
+   "label": "Coupon collector",
+   "group": "probability"
+  },
+  "covergroup": {
+   "label": "Covergroup",
+   "group": "verification"
+  },
+  "credit_flow_control": {
+   "label": "Credit flow control",
+   "group": "protocols"
+  },
+  "cycle_detection": {
+   "label": "Cycle detection",
+   "group": "algorithms"
+  },
+  "decision_tree": {
+   "label": "Decision tree",
+   "group": "algorithms"
+  },
+  "derangement": {
+   "label": "Derangements",
+   "group": "math"
+  },
+  "digit_manipulation": {
+   "label": "Digit manipulation",
+   "group": "math"
+  },
+  "dijkstra": {
+   "label": "Dijkstra",
+   "group": "algorithms"
+  },
+  "divide_and_conquer": {
+   "label": "Divide and conquer",
+   "group": "algorithms"
+  },
+  "dual_edge_clocking": {
+   "label": "Dual-edge clocking",
+   "group": "digital design"
+  },
+  "dynamic_programming": {
+   "label": "Dynamic programming",
+   "group": "algorithms"
+  },
+  "edge_detection": {
+   "label": "Edge detection",
+   "group": "digital design"
+  },
+  "encoding_identity": {
+   "label": "Encoding identity",
+   "group": "puzzles"
+  },
+  "expected_value": {
+   "label": "Expected value",
+   "group": "probability"
+  },
+  "fifo": {
+   "label": "FIFO",
+   "group": "digital design"
+  },
+  "finite_field_polynomials": {
+   "label": "Polynomials over GF(2)",
+   "group": "math"
+  },
+  "fixed_point": {
+   "label": "Fixed point",
+   "group": "math"
+  },
+  "fsm": {
+   "label": "FSM",
+   "group": "digital design"
+  },
+  "functional_coverage": {
+   "label": "Functional coverage",
+   "group": "verification"
+  },
+  "game_theory_minimax": {
+   "label": "Minimax",
+   "group": "algorithms"
+  },
+  "generating_function": {
+   "label": "Generating function",
+   "group": "math"
+  },
+  "geometric_probability": {
+   "label": "Geometric probability",
+   "group": "probability"
+  },
+  "geometric_series": {
+   "label": "Geometric series",
+   "group": "math"
+  },
+  "geometry": {
+   "label": "Geometry",
+   "group": "math"
+  },
+  "graph_search": {
+   "label": "Graph search",
+   "group": "algorithms"
+  },
+  "gray_code": {
+   "label": "Gray code",
+   "group": "digital design"
+  },
+  "greedy": {
+   "label": "Greedy",
+   "group": "algorithms"
+  },
+  "handshake": {
+   "label": "Handshake",
+   "group": "digital design"
+  },
+  "harmonic_series": {
+   "label": "Harmonic series",
+   "group": "math"
+  },
+  "hash_map": {
+   "label": "Hash map",
+   "group": "algorithms"
+  },
+  "inclusion_exclusion": {
+   "label": "Inclusion-exclusion",
+   "group": "math"
+  },
+  "induction_proof": {
+   "label": "Induction proof",
+   "group": "math"
+  },
+  "information_theory_bound": {
+   "label": "Information bound",
+   "group": "math"
+  },
+  "invariant": {
+   "label": "Invariant",
+   "group": "math"
+  },
+  "kmp_automaton": {
+   "label": "KMP automaton",
+   "group": "algorithms"
+  },
+  "lateral_thinking": {
+   "label": "Lateral thinking",
+   "group": "puzzles"
+  },
+  "lfsr": {
+   "label": "LFSR",
+   "group": "digital design"
+  },
+  "markov_chain": {
+   "label": "Markov chain",
+   "group": "probability"
+  },
+  "martingale": {
+   "label": "Martingale",
+   "group": "probability"
+  },
+  "mealy_moore": {
+   "label": "Mealy / Moore",
+   "group": "digital design"
+  },
+  "measuring_time": {
+   "label": "Measuring time",
+   "group": "puzzles"
+  },
+  "memoization": {
+   "label": "Memoization",
+   "group": "algorithms"
+  },
+  "memory_model": {
+   "label": "Memory model",
+   "group": "verification"
+  },
+  "metastability_mtbf": {
+   "label": "Metastability / MTBF",
+   "group": "digital design"
+  },
+  "modular_arithmetic": {
+   "label": "Modular arithmetic",
+   "group": "math"
+  },
+  "monotonic_stack": {
+   "label": "Monotonic stack",
+   "group": "algorithms"
+  },
+  "monotonicity": {
+   "label": "Monotonicity",
+   "group": "math"
+  },
+  "monte_carlo": {
+   "label": "Monte Carlo",
+   "group": "probability"
+  },
+  "non_blocking_assignment": {
+   "label": "Non-blocking assignment",
+   "group": "digital design"
+  },
+  "number_bases": {
+   "label": "Number bases",
+   "group": "math"
+  },
+  "number_theory": {
+   "label": "Number theory",
+   "group": "math"
+  },
+  "optimization": {
+   "label": "Optimization",
+   "group": "math"
+  },
+  "parity_argument": {
+   "label": "Parity coloring argument",
+   "group": "math"
+  },
+  "pcie": {
+   "label": "PCIe",
+   "group": "protocols"
+  },
+  "pcie_ack_nak": {
+   "label": "PCIe Ack/Nak",
+   "group": "protocols"
+  },
+  "pcie_completion": {
+   "label": "PCIe completions",
+   "group": "protocols"
+  },
+  "permutation_cycles": {
+   "label": "Permutation cycles",
+   "group": "math"
+  },
+  "pigeonhole": {
+   "label": "Pigeonhole",
+   "group": "math"
+  },
+  "poisson_process": {
+   "label": "Poisson process",
+   "group": "probability"
+  },
+  "popcount": {
+   "label": "Popcount",
+   "group": "algorithms"
+  },
+  "power_sums_newton": {
+   "label": "Power sums (Newton)",
+   "group": "math"
+  },
+  "priority_queue": {
+   "label": "Priority queue",
+   "group": "algorithms"
+  },
+  "queue": {
+   "label": "Queue",
+   "group": "algorithms"
+  },
+  "rate_balance": {
+   "label": "Rate balance",
+   "group": "digital design"
+  },
+  "recurrence_relation": {
+   "label": "Recurrence relation",
+   "group": "math"
+  },
+  "recursion": {
+   "label": "Recursion",
+   "group": "algorithms"
+  },
+  "reference_model": {
+   "label": "Reference model",
+   "group": "verification"
+  },
+  "relative_motion": {
+   "label": "Relative speed",
+   "group": "math"
+  },
+  "retry_buffer": {
+   "label": "Retry buffer",
+   "group": "protocols"
+  },
+  "river_crossing": {
+   "label": "River crossing",
+   "group": "puzzles"
+  },
+  "running_sum": {
+   "label": "Running sums",
+   "group": "algorithms"
+  },
+  "scoreboard": {
+   "label": "Scoreboard",
+   "group": "verification"
+  },
+  "sequence_numbers": {
+   "label": "Sequence numbers",
+   "group": "protocols"
+  },
+  "shift_register": {
+   "label": "Shift register",
+   "group": "digital design"
+  },
+  "simulation": {
+   "label": "Simulation",
+   "group": "algorithms"
+  },
+  "sorting": {
+   "label": "Sorting",
+   "group": "algorithms"
+  },
+  "stack": {
+   "label": "Stack",
+   "group": "algorithms"
+  },
+  "starvation_fairness": {
+   "label": "Starvation and fairness",
+   "group": "digital design"
+  },
+  "state_minimization": {
+   "label": "State minimization",
+   "group": "digital design"
+  },
+  "state_space_search": {
+   "label": "State space search",
+   "group": "algorithms"
+  },
+  "sva_assertions": {
+   "label": "SVA",
+   "group": "verification"
+  },
+  "symmetry_argument": {
+   "label": "Symmetry argument",
+   "group": "math"
+  },
+  "systemverilog": {
+   "label": "SystemVerilog",
+   "group": "verification"
+  },
+  "tags_ids": {
+   "label": "Tags / IDs",
+   "group": "protocols"
+  },
+  "testbench_architecture": {
+   "label": "Testbench architecture",
+   "group": "verification"
+  },
+  "timing_waveform": {
+   "label": "Timing waveform",
+   "group": "digital design"
+  },
+  "transaction_ordering": {
+   "label": "Transaction ordering",
+   "group": "verification"
+  },
+  "transitive_closure": {
+   "label": "Transitive closure",
+   "group": "algorithms"
+  },
+  "two_flop_synchronizer": {
+   "label": "Two-flop synchronizer",
+   "group": "digital design"
+  },
+  "two_pointers": {
+   "label": "Two pointers",
+   "group": "algorithms"
+  },
+  "unfolding_reflection": {
+   "label": "Unfolding and reflection",
+   "group": "math"
+  },
+  "uniform_random_sampling": {
+   "label": "Uniform random sampling",
+   "group": "probability"
+  },
+  "usb4": {
+   "label": "USB4",
+   "group": "protocols"
+  },
+  "uvm": {
+   "label": "UVM",
+   "group": "verification"
+  },
+  "weighing_puzzle": {
+   "label": "Weighing puzzle",
+   "group": "puzzles"
+  },
+  "xor_trick": {
+   "label": "XOR trick",
+   "group": "algorithms"
+  },
+  "sliding_window": {
+   "label": "Sliding window",
+   "group": "algorithms"
+  },
+  "sweep_line": {
+   "label": "Event sweep",
+   "group": "algorithms"
+  }
+ },
+ "questions": {
+  "0001": {
+   "core": [
+    "edge_detection",
+    "timing_waveform",
+    "combinational_logic"
+   ],
+   "secondary": [
+    "cdc",
+    "two_flop_synchronizer",
+    "counter"
+   ],
+   "related": []
+  },
+  "0002": {
+   "core": [
+    "xor_trick",
+    "bit_manipulation",
+    "modular_arithmetic"
+   ],
+   "secondary": [
+    "non_blocking_assignment",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0057",
+     "explicit": false,
+     "why": "both rely on x XOR x = 0 to cancel values without extra storage"
+    }
+   ]
+  },
+  "0003": {
+   "core": [
+    "sorting",
+    "invariant",
+    "simulation"
+   ],
+   "secondary": [
+    "induction_proof",
+    "combinational_logic"
+   ],
+   "related": []
+  },
+  "0004": {
+   "core": [
+    "lateral_thinking",
+    "derangement",
+    "combinatorics",
+    "modular_arithmetic"
+   ],
+   "secondary": [
+    "pigeonhole",
+    "information_theory_bound",
+    "brute_force_enumeration",
+    "inclusion_exclusion"
+   ],
+   "related": []
+  },
+  "0005": {
+   "core": [
+    "bfs",
+    "modular_arithmetic",
+    "state_space_search",
+    "pigeonhole"
+   ],
+   "secondary": [
+    "brute_force_enumeration",
+    "queue",
+    "number_theory",
+    "induction_proof"
+   ],
+   "related": [
+    {
+     "id": "0017",
+     "explicit": false,
+     "why": "both use the pigeonhole principle to prove existence"
+    }
+   ]
+  },
+  "0006": {
+   "core": [
+    "greedy",
+    "dynamic_programming",
+    "symmetry_argument"
+   ],
+   "secondary": [
+    "brute_force_enumeration",
+    "reference_model",
+    "invariant"
+   ],
+   "related": []
+  },
+  "0007": {
+   "core": [
+    "geometry",
+    "constrained_random",
+    "geometric_probability",
+    "combinatorics"
+   ],
+   "secondary": [
+    "monte_carlo",
+    "uniform_random_sampling",
+    "functional_coverage",
+    "reference_model",
+    "symmetry_argument"
+   ],
+   "related": []
+  },
+  "0008": {
+   "core": [
+    "pigeonhole",
+    "optimization",
+    "running_sum"
+   ],
+   "secondary": [
+    "simulation",
+    "greedy"
+   ],
+   "related": []
+  },
+  "0009": {
+   "core": [
+    "permutation_cycles",
+    "pigeonhole",
+    "cycle_detection"
+   ],
+   "secondary": [
+    "combinatorics",
+    "simulation",
+    "lateral_thinking"
+   ],
+   "related": []
+  },
+  "0010": {
+   "core": [
+    "stack",
+    "invariant"
+   ],
+   "secondary": [
+    "brute_force_enumeration",
+    "hash_map",
+    "simulation",
+    "fsm",
+    "counter"
+   ],
+   "related": []
+  },
+  "0011": {
+   "core": [
+    "constrained_random",
+    "systemverilog",
+    "combinatorics",
+    "brute_force_enumeration"
+   ],
+   "secondary": [
+    "uniform_random_sampling",
+    "reference_model",
+    "symmetry_argument"
+   ],
+   "related": []
+  },
+  "0012": {
+   "core": [
+    "digit_manipulation",
+    "number_bases",
+    "fixed_point",
+    "sorting"
+   ],
+   "secondary": [
+    "closed_form",
+    "cycle_detection",
+    "brute_force_enumeration",
+    "combinational_logic",
+    "modular_arithmetic"
+   ],
+   "related": [
+    {
+     "id": "0044",
+     "explicit": true,
+     "why": "iterating the sort-and-subtract step n times"
+    }
+   ]
+  },
+  "0013": {
+   "core": [
+    "digit_manipulation",
+    "sorting",
+    "number_bases",
+    "closed_form",
+    "fixed_point"
+   ],
+   "secondary": [
+    "brute_force_enumeration",
+    "cycle_detection",
+    "combinational_logic",
+    "simulation"
+   ],
+   "related": [
+    {
+     "id": "0012",
+     "explicit": true,
+     "why": "three-digit version of the same sort-and-subtract question"
+    },
+    {
+     "id": "0044",
+     "explicit": false,
+     "why": "same Kaprekar routine, fixed points and cycles by base"
+    }
+   ]
+  },
+  "0014": {
+   "core": [
+    "constrained_random",
+    "systemverilog",
+    "geometry"
+   ],
+   "secondary": [
+    "constraint_override",
+    "uniform_random_sampling",
+    "brute_force_enumeration",
+    "reference_model",
+    "combinatorics"
+   ],
+   "related": []
+  },
+  "0015": {
+   "core": [
+    "conditional_probability",
+    "inclusion_exclusion",
+    "combinatorics"
+   ],
+   "secondary": [
+    "closed_form",
+    "uniform_random_sampling",
+    "constrained_random",
+    "monte_carlo"
+   ],
+   "related": []
+  },
+  "0016": {
+   "core": [
+    "recurrence_relation",
+    "closed_form",
+    "induction_proof",
+    "bit_manipulation"
+   ],
+   "secondary": [
+    "simulation",
+    "number_bases",
+    "modular_arithmetic",
+    "symmetry_argument",
+    "combinational_logic"
+   ],
+   "related": []
+  },
+  "0017": {
+   "core": [
+    "pigeonhole",
+    "binary_search",
+    "cycle_detection"
+   ],
+   "secondary": [
+    "sorting",
+    "two_pointers",
+    "invariant",
+    "xor_trick",
+    "hash_map"
+   ],
+   "related": [
+    {
+     "id": "0009",
+     "explicit": true,
+     "why": "array values as pointers form permutation cycles vs tail and cycle"
+    },
+    {
+     "id": "0005",
+     "explicit": false,
+     "why": "both use the pigeonhole principle to prove existence"
+    },
+    {
+     "id": "0036",
+     "explicit": false,
+     "why": "both find the cycle of a deterministic sequence"
+    }
+   ]
+  },
+  "0018": {
+   "core": [
+    "measuring_time",
+    "state_space_search",
+    "bfs"
+   ],
+   "secondary": [
+    "graph_search",
+    "dijkstra",
+    "queue",
+    "hash_map",
+    "number_theory"
+   ],
+   "related": [
+    {
+     "id": "0019",
+     "explicit": true,
+     "why": "measuring an interval not starting at zero, solved with Dijkstra"
+    },
+    {
+     "id": "0031",
+     "explicit": false,
+     "why": "both model a puzzle as a state graph and search it"
+    }
+   ]
+  },
+  "0019": {
+   "core": [
+    "dijkstra",
+    "state_space_search",
+    "measuring_time"
+   ],
+   "secondary": [
+    "number_theory",
+    "bfs",
+    "priority_queue",
+    "hash_map"
+   ],
+   "related": [
+    {
+     "id": "0018",
+     "explicit": true,
+     "why": "same hourglass puzzle, measuring from time zero with BFS"
+    },
+    {
+     "id": "0032",
+     "explicit": false,
+     "why": "both search a small puzzle state graph for the best plan"
+    }
+   ]
+  },
+  "0020": {
+   "core": [
+    "pcie",
+    "pcie_completion",
+    "recursion",
+    "backtracking"
+   ],
+   "secondary": [
+    "greedy",
+    "combinatorics",
+    "dynamic_programming",
+    "reference_model",
+    "scoreboard",
+    "functional_coverage"
+   ],
+   "related": [
+    {
+     "id": "0021",
+     "explicit": true,
+     "why": "closed-form count of the same completion splits"
+    }
+   ]
+  },
+  "0021": {
+   "core": [
+    "combinatorics",
+    "recurrence_relation",
+    "generating_function",
+    "closed_form",
+    "pcie_completion"
+   ],
+   "secondary": [
+    "pcie",
+    "inclusion_exclusion",
+    "counting_bijection",
+    "dynamic_programming",
+    "functional_coverage"
+   ],
+   "related": [
+    {
+     "id": "0020",
+     "explicit": true,
+     "why": "same PCIe completion splitting rules, listing instead of counting"
+    }
+   ]
+  },
+  "0023": {
+   "core": [
+    "reference_model",
+    "pcie_completion",
+    "transaction_ordering"
+   ],
+   "secondary": [
+    "pcie",
+    "scoreboard",
+    "constrained_random",
+    "tags_ids",
+    "memory_model",
+    "bit_manipulation"
+   ],
+   "related": [
+    {
+     "id": "0020",
+     "explicit": true,
+     "why": "defines the legal completion splits at RCB boundaries that this model generates"
+    },
+    {
+     "id": "0021",
+     "explicit": true,
+     "why": "counts the legal completion splits that the model's coverage targets"
+    }
+   ]
+  },
+  "0024": {
+   "core": [
+    "credit_flow_control",
+    "modular_arithmetic",
+    "reference_model",
+    "usb4"
+   ],
+   "secondary": [
+    "scoreboard",
+    "counter",
+    "invariant",
+    "fifo"
+   ],
+   "related": []
+  },
+  "0025": {
+   "core": [
+    "reference_model",
+    "pcie_ack_nak",
+    "retry_buffer",
+    "sequence_numbers"
+   ],
+   "secondary": [
+    "pcie",
+    "modular_arithmetic",
+    "fsm",
+    "scoreboard",
+    "queue"
+   ],
+   "related": []
+  },
+  "0026": {
+   "core": [
+    "optimization",
+    "closed_form",
+    "relative_motion",
+    "symmetry_argument"
+   ],
+   "secondary": [
+    "lateral_thinking"
+   ],
+   "related": []
+  },
+  "0027": {
+   "core": [
+    "recurrence_relation",
+    "closed_form",
+    "optimization",
+    "arithmetic_series"
+   ],
+   "secondary": [
+    "monotonicity",
+    "geometric_series",
+    "simulation"
+   ],
+   "related": [
+    {
+     "id": "0028",
+     "explicit": true,
+     "why": "same cake split with geometric fractions"
+    }
+   ]
+  },
+  "0028": {
+   "core": [
+    "geometric_series",
+    "optimization",
+    "closed_form",
+    "recurrence_relation"
+   ],
+   "secondary": [],
+   "related": [
+    {
+     "id": "0027",
+     "explicit": true,
+     "why": "same cake-sharing game with arithmetic instead of geometric fractions"
+    }
+   ]
+  },
+  "0029": {
+   "core": [
+    "relative_motion",
+    "inclusion_exclusion",
+    "number_theory"
+   ],
+   "secondary": [
+    "closed_form",
+    "modular_arithmetic",
+    "geometry",
+    "simulation"
+   ],
+   "related": []
+  },
+  "0030": {
+   "core": [
+    "geometry",
+    "unfolding_reflection",
+    "optimization",
+    "brute_force_enumeration"
+   ],
+   "secondary": [
+    "modular_arithmetic",
+    "symmetry_argument",
+    "lateral_thinking"
+   ],
+   "related": [
+    {
+     "id": "0048",
+     "explicit": false,
+     "why": "both turn a shortest path into a straight line by unfolding or reflecting"
+    }
+   ]
+  },
+  "0031": {
+   "core": [
+    "dijkstra",
+    "state_space_search",
+    "greedy",
+    "bit_manipulation"
+   ],
+   "secondary": [
+    "bfs",
+    "graph_search",
+    "sorting",
+    "closed_form",
+    "optimization"
+   ],
+   "related": [
+    {
+     "id": "0019",
+     "explicit": true,
+     "why": "Dijkstra over states where time is the path cost, not part of the state"
+    },
+    {
+     "id": "0018",
+     "explicit": false,
+     "why": "both model a puzzle as a state graph and search it"
+    }
+   ]
+  },
+  "0032": {
+   "core": [
+    "river_crossing",
+    "bfs",
+    "state_space_search",
+    "bit_manipulation"
+   ],
+   "secondary": [
+    "graph_search",
+    "queue",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0031",
+     "explicit": true,
+     "why": "shortest plan search with unequal edge costs, Dijkstra instead of BFS"
+    },
+    {
+     "id": "0019",
+     "explicit": false,
+     "why": "both search a small puzzle state graph for the best plan"
+    }
+   ]
+  },
+  "0033": {
+   "core": [
+    "fifo",
+    "rate_balance",
+    "closed_form",
+    "simulation"
+   ],
+   "secondary": [
+    "async_fifo",
+    "cdc",
+    "gray_code",
+    "two_flop_synchronizer",
+    "timing_waveform"
+   ],
+   "related": [
+    {
+     "id": "0034",
+     "explicit": true,
+     "why": "async FIFO with Gray-code pointers sets the same depth constraints"
+    }
+   ]
+  },
+  "0034": {
+   "core": [
+    "gray_code",
+    "cdc",
+    "async_fifo",
+    "two_flop_synchronizer"
+   ],
+   "secondary": [
+    "fifo",
+    "metastability_mtbf",
+    "xor_trick",
+    "bit_manipulation",
+    "timing_waveform"
+   ],
+   "related": [
+    {
+     "id": "0033",
+     "explicit": true,
+     "why": "FIFO depth sizing, the latency of the synchronized pointers matters"
+    },
+    {
+     "id": "0037",
+     "explicit": true,
+     "why": "why two synchronizer flops, MTBF"
+    }
+   ]
+  },
+  "0035": {
+   "core": [
+    "clock_divider",
+    "dual_edge_clocking",
+    "counter",
+    "timing_waveform"
+   ],
+   "secondary": [
+    "combinational_logic",
+    "simulation",
+    "fsm"
+   ],
+   "related": []
+  },
+  "0036": {
+   "core": [
+    "lfsr",
+    "finite_field_polynomials",
+    "shift_register",
+    "cycle_detection"
+   ],
+   "secondary": [
+    "bit_manipulation",
+    "number_theory",
+    "simulation",
+    "fixed_point",
+    "hash_map"
+   ],
+   "related": [
+    {
+     "id": "0017",
+     "explicit": false,
+     "why": "both find the cycle of a deterministic sequence"
+    }
+   ]
+  },
+  "0037": {
+   "core": [
+    "metastability_mtbf",
+    "two_flop_synchronizer",
+    "cdc"
+   ],
+   "secondary": [
+    "gray_code",
+    "handshake",
+    "closed_form",
+    "fifo"
+   ],
+   "related": [
+    {
+     "id": "0034",
+     "explicit": true,
+     "why": "multi-bit values cross domains with Gray code instead of per-bit synchronizers"
+    }
+   ]
+  },
+  "0038": {
+   "core": [
+    "sva_assertions",
+    "systemverilog",
+    "handshake",
+    "timing_waveform"
+   ],
+   "secondary": [
+    "reference_model",
+    "functional_coverage",
+    "constrained_random",
+    "testbench_architecture"
+   ],
+   "related": []
+  },
+  "0039": {
+   "core": [
+    "dynamic_programming",
+    "recurrence_relation",
+    "information_theory_bound",
+    "combinatorics"
+   ],
+   "secondary": [
+    "closed_form",
+    "binary_search",
+    "induction_proof",
+    "game_theory_minimax",
+    "expected_value",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0045",
+     "explicit": false,
+     "why": "both bound a worst-case decision tree by counting leaves"
+    }
+   ]
+  },
+  "0040": {
+   "core": [
+    "fsm",
+    "kmp_automaton",
+    "mealy_moore"
+   ],
+   "secondary": [
+    "shift_register",
+    "timing_waveform",
+    "combinational_logic"
+   ],
+   "related": [
+    {
+     "id": "0052",
+     "explicit": false,
+     "why": "waiting time for a pattern uses the same overlap/suffix automaton"
+    }
+   ]
+  },
+  "0041": {
+   "core": [
+    "coupon_collector",
+    "expected_value",
+    "markov_chain",
+    "poisson_process"
+   ],
+   "secondary": [
+    "functional_coverage",
+    "monte_carlo",
+    "inclusion_exclusion",
+    "constrained_random",
+    "covergroup"
+   ],
+   "related": [
+    {
+     "id": "0053",
+     "explicit": false,
+     "why": "applies the same coupon-collector expectation to closing an ALU cross coverage"
+    }
+   ]
+  },
+  "0042": {
+   "core": [
+    "optimization",
+    "greedy",
+    "closed_form",
+    "harmonic_series"
+   ],
+   "secondary": [
+    "simulation",
+    "invariant",
+    "brute_force_enumeration",
+    "arithmetic_series"
+   ],
+   "related": []
+  },
+  "0043": {
+   "core": [
+    "transitive_closure",
+    "adversary_argument",
+    "greedy",
+    "sorting"
+   ],
+   "secondary": [
+    "information_theory_bound",
+    "brute_force_enumeration",
+    "bit_manipulation",
+    "combinatorics",
+    "simulation"
+   ],
+   "related": []
+  },
+  "0044": {
+   "core": [
+    "digit_manipulation",
+    "closed_form",
+    "recurrence_relation",
+    "number_bases",
+    "fixed_point"
+   ],
+   "secondary": [
+    "cycle_detection",
+    "sorting",
+    "hash_map",
+    "simulation",
+    "modular_arithmetic"
+   ],
+   "related": [
+    {
+     "id": "0012",
+     "explicit": true,
+     "why": "finds the fixed point and cycle of the three-digit routine"
+    },
+    {
+     "id": "0013",
+     "explicit": true,
+     "why": "four-digit Kaprekar routine with two gap parameters"
+    }
+   ]
+  },
+  "0045": {
+   "core": [
+    "weighing_puzzle",
+    "information_theory_bound",
+    "encoding_identity",
+    "number_bases"
+   ],
+   "secondary": [
+    "decision_tree",
+    "modular_arithmetic",
+    "symmetry_argument",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0051",
+     "explicit": false,
+     "why": "fixed ternary codes per item decoded from three-valued outcomes"
+    },
+    {
+     "id": "0039",
+     "explicit": false,
+     "why": "both bound a worst-case decision tree by counting leaves"
+    }
+   ]
+  },
+  "0046": {
+   "core": [
+    "dynamic_programming",
+    "monotonic_stack"
+   ],
+   "secondary": [
+    "stack",
+    "brute_force_enumeration",
+    "geometry"
+   ],
+   "related": [
+    {
+     "id": "0058",
+     "explicit": false,
+     "why": "both fill an O(n^2)-or-better DP table over sub-regions"
+    }
+   ]
+  },
+  "0047": {
+   "core": [
+    "two_pointers",
+    "priority_queue",
+    "dijkstra",
+    "greedy"
+   ],
+   "secondary": [
+    "graph_search",
+    "invariant",
+    "queue",
+    "brute_force_enumeration"
+   ],
+   "related": []
+  },
+  "0048": {
+   "core": [
+    "unfolding_reflection",
+    "geometry",
+    "optimization"
+   ],
+   "secondary": [
+    "closed_form",
+    "symmetry_argument"
+   ],
+   "related": [
+    {
+     "id": "0030",
+     "explicit": false,
+     "why": "both turn a shortest path into a straight line by unfolding or reflecting"
+    }
+   ]
+  },
+  "0049": {
+   "core": [
+    "uvm",
+    "testbench_architecture",
+    "scoreboard",
+    "reference_model"
+   ],
+   "secondary": [
+    "functional_coverage",
+    "covergroup",
+    "constrained_random",
+    "handshake"
+   ],
+   "related": []
+  },
+  "0050": {
+   "core": [
+    "scoreboard",
+    "transaction_ordering",
+    "queue",
+    "hash_map",
+    "tags_ids"
+   ],
+   "secondary": [
+    "reference_model",
+    "functional_coverage",
+    "uvm",
+    "testbench_architecture"
+   ],
+   "related": []
+  },
+  "0051": {
+   "core": [
+    "encoding_identity",
+    "number_bases",
+    "information_theory_bound"
+   ],
+   "secondary": [
+    "bit_manipulation",
+    "pigeonhole",
+    "digit_manipulation",
+    "combinatorics"
+   ],
+   "related": [
+    {
+     "id": "0045",
+     "explicit": false,
+     "why": "fixed ternary codes per item decoded from three-valued outcomes"
+    }
+   ]
+  },
+  "0052": {
+   "core": [
+    "expected_value",
+    "markov_chain",
+    "martingale",
+    "generating_function"
+   ],
+   "secondary": [
+    "fsm",
+    "recurrence_relation",
+    "kmp_automaton",
+    "conditional_probability",
+    "constrained_random",
+    "monte_carlo"
+   ],
+   "related": [
+    {
+     "id": "0040",
+     "explicit": true,
+     "why": "states = how much of the pattern is matched, like a sequence detector"
+    }
+   ]
+  },
+  "0053": {
+   "core": [
+    "covergroup",
+    "functional_coverage",
+    "constrained_random",
+    "coupon_collector"
+   ],
+   "secondary": [
+    "expected_value",
+    "poisson_process",
+    "inclusion_exclusion",
+    "combinatorics",
+    "reference_model"
+   ],
+   "related": [
+    {
+     "id": "0041",
+     "explicit": true,
+     "why": "closing the cross is the coupon collector problem solved in that question"
+    }
+   ]
+  },
+  "0054": {
+   "core": [
+    "arbiter",
+    "bit_manipulation",
+    "sva_assertions",
+    "starvation_fairness"
+   ],
+   "secondary": [
+    "combinational_logic",
+    "counter",
+    "functional_coverage",
+    "reference_model"
+   ],
+   "related": []
+  },
+  "0055": {
+   "core": [
+    "fsm",
+    "modular_arithmetic",
+    "state_minimization",
+    "number_bases"
+   ],
+   "secondary": [
+    "induction_proof",
+    "number_theory",
+    "digit_manipulation",
+    "combinational_logic"
+   ],
+   "related": []
+  },
+  "0056": {
+   "core": [
+    "symmetry_argument",
+    "invariant",
+    "combinatorics",
+    "sorting"
+   ],
+   "secondary": [
+    "modular_arithmetic",
+    "number_theory",
+    "expected_value",
+    "lateral_thinking"
+   ],
+   "related": []
+  },
+  "0057": {
+   "core": [
+    "xor_trick",
+    "bit_manipulation",
+    "tags_ids",
+    "scoreboard"
+   ],
+   "secondary": [
+    "power_sums_newton",
+    "counter",
+    "transaction_ordering",
+    "divide_and_conquer",
+    "modular_arithmetic"
+   ],
+   "related": [
+    {
+     "id": "0002",
+     "explicit": false,
+     "why": "both rely on x XOR x = 0 to cancel values without extra storage"
+    }
+   ]
+  },
+  "0058": {
+   "core": [
+    "dynamic_programming",
+    "game_theory_minimax",
+    "parity_argument"
+   ],
+   "secondary": [
+    "greedy",
+    "invariant",
+    "induction_proof",
+    "memoization",
+    "recursion"
+   ],
+   "related": [
+    {
+     "id": "0046",
+     "explicit": false,
+     "why": "both are interval/region DP tables filled by increasing size"
+    }
+   ]
+  },
+  "0059": {
+   "core": [
+    "bit_manipulation",
+    "popcount",
+    "symmetry_argument"
+   ],
+   "secondary": [
+    "xor_trick",
+    "combinatorics",
+    "brute_force_enumeration",
+    "combinational_logic",
+    "number_bases"
+   ],
+   "related": []
+  },
+  "0060": {
+   "core": [
+    "sliding_window",
+    "two_pointers",
+    "invariant"
+   ],
+   "secondary": [
+    "hash_map",
+    "counter",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0047",
+     "explicit": false,
+     "why": "both move two indexes inward or forward over an array in one pass"
+    },
+    {
+     "id": "0006",
+     "explicit": false,
+     "why": "both keep a running best over one pass of an array"
+    }
+   ]
+  },
+  "0061": {
+   "core": [
+    "sweep_line",
+    "sorting",
+    "tags_ids",
+    "counter"
+   ],
+   "secondary": [
+    "priority_queue",
+    "scoreboard",
+    "transaction_ordering",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0050",
+     "explicit": false,
+     "why": "both are about transactions that are outstanding at once and the ids that track them"
+    },
+    {
+     "id": "0033",
+     "explicit": false,
+     "why": "both size a resource (tags, FIFO depth) from the peak occupancy of a trace"
+    }
+   ]
+  }
+ }
+}

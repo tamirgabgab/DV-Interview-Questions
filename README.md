@@ -7,6 +7,10 @@ puzzles that come up in the same interviews. Every question has a full solution 
 
 **<https://tamirgabgab.github.io/DV-Interview-Questions/>**
 
+**[Question map](https://tamirgabgab.github.io/DV-Interview-Questions/graph.html)**: an
+interactive knowledge graph of every question and the techniques its solution uses (made
+with [graphify](https://pypi.org/project/graphifyy/)); click a question for a link to its page
+
 - [Home page](https://tamirgabgab.github.io/DV-Interview-Questions/): how it works, the
   newest questions, the levels, six study paths and the FAQ
 - [All questions](https://tamirgabgab.github.io/DV-Interview-Questions/all/): a table you
