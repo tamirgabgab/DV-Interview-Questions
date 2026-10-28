@@ -665,6 +665,13 @@ compositing translucent colours over the page: text needs 4.5:1, marks 3:1. It r
 test job of CI, so a colour that reads badly stops the deploy. A new pair goes into
 `PAIRS`.
 
+`check_phone.py` also loads every page a second time with its text enlarged 1.3 times
+(`--font-scale`, 0 skips it), as a phone's text-size setting enlarges it, and fails when the
+page is then wider than the screen: Android Chrome zooms such a page out and shows the
+navigation drawer beside it. A row of buttons or chips wraps or scrolls (`overflow-x: auto`)
+rather than holding its width, and an inline formula wider than its line scrolls on its own
+(`reading-tools.js` marks it `.is-wide`).
+
 `check_phone.py` also prints every page's weight (the HTML in KB, the bytes the browser
 fetched and the requests) and warns over `--weight-warn` KB of HTML (400); its summary names
 the three heaviest pages. What keeps the pages light (S423): the twelve stylesheet parts of

@@ -1309,12 +1309,23 @@ section below starts at session 22, whose numbered items run on through the late
       a tab stop (hundreds on a math-heavy page), now off in `mathjax.js` (the assistive
       MathML stays). Both checks run in the CI build job. CLAUDE.md lists ten checks now.
 
+85. **The phone's enlarged text (session 28, 2026-10-28).** The owner saw every page
+    zoomed out on Android Chrome, cut at the sides with the navigation drawer beside it.
+    The phone's text scaling was on: at 1.3 times the text, some rows grew wider than the
+    screen and Chrome zoomed the page out to fit them (44 pages). Fixed: the part bar's
+    chips scroll, the box's playback bar and the tools under the title wrap, an inline
+    formula wider than its line scrolls on its own (`reading-tools.js` marks it `.is-wide`
+    by its line's content box, both sides), the fields of a box shrink to it, and the
+    tables of the 0031 and 0037 boxes scroll. `check_phone.py` loads every page a second
+    time with the text enlarged 1.3 times (`--font-scale`) and fails when it is wider than
+    the screen. Published (`main` 2c04376); the owner checks the phone.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84, session 28) on the branch, the last S round.
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done.
   60 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
