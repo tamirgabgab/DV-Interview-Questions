@@ -28,7 +28,6 @@ import posixpath
 import re
 import sys
 from pathlib import Path
-from urllib.parse import urlparse
 
 from mkdocs.exceptions import PluginError
 from mkdocs.utils.meta import get_data
@@ -295,10 +294,6 @@ def on_config(config, **kwargs):
     nav.append({"תגיות": "tags.md"})
     nav.append({"מה חדש": "new.md"})
     config["nav"] = nav
-    # the "what's new" page linked from the footer of every page (an absolute path, since
-    # the footer is the same on pages at every depth)
-    root = urlparse(config.get("site_url") or "/").path or "/"
-    config["copyright"] = (config.get("copyright") or "") + f' &middot; <a href="{root.rstrip("/")}/new/">מה חדש</a>'
     # the social cards (layouts/dvq.yml) read the kind names and the counts from here
     config["extra"]["dvq_cards"] = {
         "kinds": KINDS,
@@ -377,9 +372,10 @@ def _href(src_uri: str, page_url: str) -> str:
     return posixpath.relpath(target or ".", _base(page_url) or ".") + "/"
 
 
-def _tag_link(tag: str, base: str) -> str:
+def _tag_link(tag: str, base: str, cls: str = "") -> str:
     href = posixpath.relpath("tags/", base or ".") + "/#tag:" + tag
-    return f'<a href="{html.escape(href)}">{html.escape(topic_name(tag))}</a>'
+    attr = f' class="{cls}"' if cls else ""
+    return f'<a{attr} href="{html.escape(href)}">{html.escape(topic_name(tag))}</a>'
 
 
 def ui_icon(name: str) -> str:
@@ -409,8 +405,8 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
             badges.append(_badge("code", f'<bdi dir="ltr">{" + ".join(langs)}</bdi>', f"פתרון בקוד {full}"))
     if _is_new(q):
         badges.append(_badge("new", "חדש", "מהשאלות החדשות ביותר באתר : נוספה בשבוע האחרון", " qh-badge-new"))
-    topics = ", ".join(_tag_link(t, base) for t in q["tags"])
-    bottom = [f"<span>נושאים : {topics}</span>"]
+    topics = "".join(_tag_link(t, base, "qh-tag") for t in q["tags"])     # M5: the topics as chips
+    bottom = [f'<span class="qh-topics"><span class="qh-topics-name">נושאים :</span>{topics}</span>']
     added = _added_date(q)
     if added:
         bottom.append(f'<span class="qh-sep"></span><span>נוספה ב-{_date_he(added)}</span>')
@@ -604,13 +600,56 @@ def _level_cards(page_url: str) -> str:
 HERO_SEARCHES = ["FIFO", "PCIe", "SVA", "הסתברות", "חידות", "Gray"]
 
 # The hero's background: a clock, a data bit and a bus, drawn as a quiet line pattern
-# (pathLength 1, so the CSS can draw each line once from its start, W339).
+# (pathLength 1, so the CSS can draw each line once from its start, W339). The pattern is
+# there twice, side by side, so the stylesheet can roll it along one width without a seam,
+# and an amber cursor sweeps across it, like a logic analyzer (M1, 13-motion.css).
+HERO_WAVE_PATHS = (
+    '<path class="hh-w1" pathLength="1" d="M0 30h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20"/>'
+    '<path class="hh-w2" pathLength="1" d="M0 75h50v-20h90v20h40v-20h130v20h60v-20h40v20h110v-20h120"/>'
+    '<path class="hh-w3" pathLength="1" d="M0 120h30l10-15h90l10 15-10 15h-90l-10-15M140 120l10-15h110l10 15-10 15h-110l-10-15M270 120l10-15h70l10 15-10 15h-70l-10-15M360 120l10-15h130l10 15-10 15h-130l-10-15M510 120l10-15h110l10 15"/>')
 HERO_WAVES = (
     '<svg class="hh-waves" viewBox="0 0 640 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">'
-    '<path class="hh-w1" pathLength="1" d="M0 30h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20"/>'
-    '<path class="hh-w2" pathLength="1" d="M0 75h50v-20h90v20h40v-20h130v20h60v-20h40v20h110v-20h120"/>'
-    '<path class="hh-w3" pathLength="1" d="M0 120h30l10-15h90l10 15-10 15h-90l-10-15M140 120l10-15h110l10 15-10 15h-110l-10-15M270 120l10-15h70l10 15-10 15h-70l-10-15M360 120l10-15h130l10 15-10 15h-130l-10-15M510 120l10-15h110l10 15"/>'
+    f'<g class="hh-roll"><g>{HERO_WAVE_PATHS}</g><g transform="translate(640 0)">{HERO_WAVE_PATHS}</g></g>'
+    '<line class="hh-cursor" x1="0" y1="2" x2="0" y2="148"/>'
     '</svg>')
+
+# The live example beside the hero's text on a wide screen (M2): the machine of 0055 part a
+# (the bits arrive MSB first, r -> (2r + b) mod 3) on three states in a row, and home.js
+# feeds it numbers bit by bit. The page shows the last frame of the first number as it
+# is (27 = 11011, back in the state 0), so nothing is missing without the script.
+HERO_FSM_NUMBER = 27
+HERO_FSM_NODES = [(62, 0), (150, 1), (238, 2)]
+# (from, bit, to, path, label x, label y)
+HERO_FSM_EDGES = [
+    (0, 1, 1, "M78 53Q106 26 134 53", 106, 31), (1, 1, 0, "M134 75Q106 102 78 75", 106, 109),
+    (1, 0, 2, "M166 53Q194 26 222 53", 194, 31), (2, 0, 1, "M222 75Q194 102 166 75", 194, 109),
+    (0, 0, 0, "M45 55C12 34 12 94 45 73", 9, 68), (2, 1, 2, "M255 55C288 34 288 94 255 73", 291, 68),
+]
+
+
+def _hero_fsm(href: str) -> str:
+    bits = bin(HERO_FSM_NUMBER)[2:]
+    edges = "".join(
+        f'<path class="hf-edge{" is-taken" if (a, b) == (1, 1) else ""}" data-e="{a}{b}" d="{d}" marker-end="url(#hf-arrow)"/>'
+        f'<text class="hf-label" x="{x}" y="{y}" text-anchor="middle">{b}</text>'
+        for a, b, _, d, x, y in HERO_FSM_EDGES)
+    nodes = "".join(
+        f'<g class="hf-node{" is-now" if r == 0 else ""}" data-r="{r}"><circle cx="{x}" cy="64" r="19"/>'
+        + (f'<circle cx="{x}" cy="64" r="14"/>' if r == 0 else "")
+        + f'<text x="{x}" y="69" text-anchor="middle">{r}</text></g>'
+        for x, r in HERO_FSM_NODES)
+    svg = ('<svg class="hf-svg" viewBox="0 0 300 120" aria-hidden="true" focusable="false">'
+           '<defs><marker id="hf-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
+           '<path d="M0,0 L10,5 L0,10 Z" class="hf-head"/></marker></defs>' + edges + nodes + '</svg>')
+    bit_spans = "".join(f'<span class="hf-bit is-read">{b}</span>' for b in bits)
+    return (
+        f'<div class="hh-fsm" data-search-exclude data-number="{HERO_FSM_NUMBER}">'
+        '<p class="hf-title">דוגמה חיה\u00a0: חלוקה ב-3, ביט אחרי ביט</p>'
+        f'{svg}'
+        f'<p class="hf-stream"><span class="hf-bits" dir="ltr">{bit_spans}</span></p>'
+        f'<p class="hf-read" aria-live="off">המספר <bdi dir="ltr">{HERO_FSM_NUMBER}</bdi> מתחלק ב-3 ✓</p>'
+        f'<a class="hf-go" href="{href}">לשאלה 0055 ←</a>'
+        '</div>')
 
 
 def _hero(inner: str, page_url: str) -> str:
@@ -626,10 +665,13 @@ def _hero(inner: str, page_url: str) -> str:
     boxes = sum(q.get("boxes", 0) for q in qs)
     stats = [("help", len(qs), "שאלות עם פתרון מלא"), ("tested", tested, "עם קוד שנבדק אוטומטית"),
              ("interactive", boxes, "תיבות אינטראקטיביות")]
+    fsm = next((q for q in qs if q["id"] == "0055"), order[0])
+    fsm_href = _href(fsm["src_uri"], page_url)
     searches = "".join(f'<button type="button" class="hh-chip" data-q="{html.escape(t)}">{html.escape(t)}</button>' for t in HERO_SEARCHES)
     return (
         '<div class="home-hero" markdown>\n'
-        f'<div class="hh-bg" aria-hidden="true">{HERO_WAVES}</div>\n\n{inner.strip()}\n\n'
+        f'<div class="hh-bg" aria-hidden="true">{HERO_WAVES}</div>\n'
+        f'{_hero_fsm(fsm_href)}\n\n{inner.strip()}\n\n'
         '<div class="hh-tools" data-search-exclude>'
         '<div class="hh-actions">'
         f'<a class="md-button md-button--primary hh-start" href="{hrefs[0]}" data-hrefs="{html.escape(json.dumps(hrefs))}" data-ids="{" ".join(ids)}">להתחיל לתרגל</a>'

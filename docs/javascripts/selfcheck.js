@@ -6,10 +6,21 @@
 // and this file adds a field, a check button, the reply and, after a wrong answer, the
 // hint and a button that shows the answer. A right answer is remembered per page in the
 // browser (a ✓ on the next visit); it does not mark the question solved. tools/lint_pages.py
-// checks the attributes, and tests/tools/test_selfcheck.py checks every answer.
+// checks the attributes, and tests/tools/test_selfcheck.py checks every answer. The reply
+// moves a little (M7, 13-motion.css, only without reduced motion): a right answer draws its
+// check mark, a wrong one shakes the field.
 (() => {
   const STORE = "dvq-check";
   const NB = " ";
+  const TICK = '<svg class="selfcheck__tick" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path pathLength="1" d="M4 12.5l5 5L20 6.5"/></svg>';
+  // restart a one-off animation class (it goes again after a moment, with or without the
+  // animation, which exists only without reduced motion)
+  const pulse = (el, cls) => {
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+    setTimeout(() => el.classList.remove(cls), 700);
+  };
   // "17", "2.5", "2,872", "1/3", "−0.5" -> a number, or NaN
   const parse = (text) => {
     const t = String(text).trim().replace(/[\s,]/g, "").replace(/[−–]/g, "-");
@@ -45,19 +56,20 @@
       const got = parse(input.value);
       if (Number.isNaN(got)) { say("is-info", "הקלידו מספר, למשל ‎17‎, ‎2.5‎ או ‎1/3‎."); return; }
       if (same(got, want)) {
-        say("is-ok", `✓ נכון. ההסבר בפתרון שלמטה.`);
+        say("is-ok", `${TICK}נכון. ההסבר בפתרון שלמטה.`);
         box.classList.add("is-done");
         reveal.hidden = true;
         store.set(key);
         return;
       }
       say("is-bad", `לא נכון. רמז${NB}: ${box.dataset.hint}`);
+      pulse(input, "is-shake");
       reveal.hidden = false;
     };
     go.addEventListener("click", check);
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); check(); } });
     reveal.addEventListener("click", () => say("is-info", `התשובה${NB}: <bdi dir="ltr">${show}</bdi>. ההסבר בפתרון שלמטה.`));
-    if (store.get(key)) { box.classList.add("is-done"); say("is-ok", "✓ עניתם נכון בביקור קודם."); }
+    if (store.get(key)) { box.classList.add("is-done"); say("is-ok", `${TICK}עניתם נכון בביקור קודם.`); }
   };
   document.addEventListener("DOMContentLoaded", () => document.querySelectorAll(".selfcheck").forEach(mount));
 })();

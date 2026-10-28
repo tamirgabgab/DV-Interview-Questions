@@ -134,6 +134,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/10-rounds-w.css
   - stylesheets/11-questions.css
   - stylesheets/12-rounds-y-s.css
+  - stylesheets/13-motion.css
 
 extra_javascript:
   - javascripts/mathjax.js
@@ -147,6 +148,7 @@ extra_javascript:
   - javascripts/reading-tools.js
   - javascripts/home.js
   - javascripts/selfcheck.js
+  - javascripts/motion.js
   # The explorer boxes (docs/javascripts/explorer/) are added per page by hooks/questions.py.
 
 

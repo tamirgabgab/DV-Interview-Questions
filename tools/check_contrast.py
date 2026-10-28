@@ -88,6 +88,16 @@ PAIRS = [
     ("trap number", "var(--site-surface)", ["var(--adm-trap)"], TEXT),
     ("footer text", "var(--md-footer-fg-color)", ["var(--md-footer-bg-color)"], TEXT),
     ("footer secondary text", "var(--md-footer-fg-color--light)", ["var(--md-footer-bg-color--dark)"], TEXT),
+    # round M (13-motion.css): the logo's check, the hero's live example, the footer's
+    # counts, the question header's topic chips and the 404 page's waveform
+    ("logo check on the header", "var(--site-logo-v)", ["var(--md-primary-fg-color)"], UI),
+    ("hero example bits", "rgba(255, 255, 255, 0.72)", ["rgba(255, 255, 255, 0.08)", "rgba(255, 255, 255, 0.05)", TOAST], TEXT),
+    ("hero example title", "rgba(255, 255, 255, 0.78)", ["rgba(255, 255, 255, 0.05)", TOAST], TEXT),
+    ("amber on the navy card", "var(--md-accent-fg-color)", ["rgba(255, 255, 255, 0.05)", TOAST], TEXT),
+    ("footer count", "var(--md-footer-fg-color--light)", ["rgba(255, 255, 255, 0.1)", "var(--md-footer-bg-color--dark)"], TEXT),
+    ("topic chip", "var(--md-default-fg-color--light)", [CARD, PAGE], TEXT),
+    ("404 unknown state", "var(--site-x-state)", [TOAST], TEXT),
+    ("404 signal names", "rgba(255, 255, 255, 0.62)", [TOAST], TEXT),
     ("edit link", "var(--md-default-fg-color--light)", [PAGE], TEXT),
     ("tag count on a tag chip", "var(--md-default-fg-color--light)", ["var(--site-surface)"], TEXT),
 ]

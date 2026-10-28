@@ -1366,12 +1366,47 @@ section below starts at session 22, whose numbered items run on through the late
     next digit marked "הבאה". A click, or Enter / space, on a state of the ring shows its
     moves in the table and its edges dashed; a second click or any step goes back.
 
+91. **Round M, motion and finish (session 28, 2026-10-28).** The owner asked for a UI/UX
+    review with more motion and a more professional look (logo, home, question pages,
+    404). Fourteen proposals in four groups; the owner took twelve (not the animated
+    light / dark switch nor the 404 as a typed log) and asked for one push of all of them.
+    A new part, `13-motion.css`, and a new script, `motion.js`; every movement is off under
+    reduced motion, and the scripts skip it in an automated browser.
+    - M3, logo: the mark is inline (`overrides/partials/logo.html`, the paths of
+      `logo.svg`), drawn on the first page of a visit (sessionStorage) and under the
+      pointer. Its amber is `--site-logo-v`.
+    - M4, header: a shadow once it scrolls (Material's `md-header--shadow`), and an amber
+      bar sliding along the table of contents to the active link. The reading progress
+      line was already in the part bar, so no second one was added.
+    - M1 and M2, hero: the waves roll by one width (drawn twice side by side) with a
+      sweeping amber cursor; on 76.25em and up a live example beside the text runs the
+      machine of 0055 part a over 27, 10, 21, 14, 6 and 13 (`_hero_fsm` in the hook draws
+      the last frame of 27, `home.js` runs it, both pause off screen).
+    - M12, cards: the top edge fills with amber under the pointer, the icon tilts, the
+      progress bar fills in.
+    - M5, question header: a card; the topics as chips (`qh-tag`); the tools along the
+      card's foot with their names on a pointer screen (touch keeps S420's layout).
+    - M7 and M8: a self-check's right answer draws its check mark, a wrong one shakes the
+      field and colours its border; a row of dots above a run of two hints or more.
+    - M9: `.explorer:empty` is a skeleton with a sheen until the box is built.
+    - M6: `@view-transition` cross-fade; the followed question link and the page's `h1`
+      share the name `dvq-title`, so the title moves into place.
+    - M13: buttons get a raised shadow, the header buttons press, and the focus ring
+      settles in (only its offset moves).
+    - M10: the footer (`overrides/partials/footer.html`): the mark, the name and the
+      numbers, the levels with their counts, the site's pages, then the copyright line
+      (the hook no longer appends "מה חדש" to the copyright; the footer lists it).
+    - M11, 404: 404 on a seven-segment display and a waveform whose bus reads question ids
+      until the cursor at 404 ns, where it turns to the unknown state X
+      (`--site-x-state`); drawn once, the display flickers on, the X pulses.
+    Eight colour pairs were added to `check_contrast.py`.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done; a slider and its value on one row (item 86) published (`main` a4e0b47); the renumbering (item 87), the 0055 list (item 88) and question 0056 (item 89) published (`main` 905863d); the formula steps and the moves table in both boxes (item 90) published (`main` 8d8bd24).
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done; a slider and its value on one row (item 86) published (`main` a4e0b47); the renumbering (item 87), the 0055 list (item 88) and question 0056 (item 89) published (`main` 905863d); the formula steps and the moves table in both boxes (item 90) published (`main` 8d8bd24); round M, motion and finish (item 91), on the branch.
   61 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check

@@ -116,7 +116,9 @@ DV-Interview-Questions/
 │   └── dvq.yml                 # Social preview card layout (RTL) for Material's social plugin
 ├── overrides/                  # Theme overrides (custom_dir)
 │   ├── main.html               # Adds the web app manifest (home-screen icon) and the offline worker
-│   └── 404.html                # Hebrew "page not found" with the question the address names
+│   ├── 404.html                # Hebrew "page not found" with the question the address names
+│   └── partials/               # content.html (the edit link at the end), logo.html (the mark inline,
+│                               # so it can be drawn), footer.html (the site's footer columns)
 ├── docs/                       # Site content
 │   ├── index.md                # Home page: hero, how it works, levels, featured paths, FAQ
 │   ├── all.md                  # "כל השאלות": the table of all questions with its filters
@@ -134,9 +136,10 @@ DV-Interview-Questions/
 │   │   └── spider-fly.html     # The owner's standalone spider-and-fly tool, embedded by 0030 (kept as sent)
 │   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner
 │   │                           # (run-python.js, py-worker.js, py_run.py, vendor/codemirror.min.js), home.js,
-│   │                           # reading-tools.js (lightbox, tooltips, part bar), and explorer/:
+│   │                           # reading-tools.js (lightbox, tooltips, part bar), motion.js (the drawn logo,
+│   │                           # the table of contents marker, page transitions), and explorer/:
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
-│   └── stylesheets/            # The styles in 12 parts loaded in order (README.md lists them)
+│   └── stylesheets/            # The styles in 13 parts loaded in order (README.md lists them)
 └── .github/workflows/
     ├── deploy.yml              # Test + build on every push (explorers on 4 runners), deploy main; every job has a timeout
     └── weekly.yml              # Mondays: external links of the site, newer Verilator release
@@ -436,6 +439,11 @@ a large field and ready searches that open the site search, and one line of numb
 (questions, tested code, interactive boxes), with a line for the audience under the title
 (`{ .hh-audience }`). The waveform is drawn once on load and the numbers count up the
 first time they are seen (`docs/javascripts/home.js`), both off under reduced motion.
+After the drawing the waves roll slowly and an amber cursor sweeps across them, and on a
+wide screen (76.25em and up) a **live example** sits beside the text: the machine of 0055
+part a reading numbers bit by bit (`_hero_fsm` in the hook draws it with the last frame
+of 27, `home.js` runs it; both stop while the hero is off screen, and in an automated
+browser or under reduced motion it stays on that frame).
 Under it come **"how it works"** (`<!-- how-it-works -->`, three steps from `HOW_STEPS` in
 the hook), the levels, the study paths whose front matter says `featured: true`
 (`<!-- path-cards featured -->`; `docs/paths/index.md` shows them all), a link to the
@@ -446,7 +454,7 @@ filled by `marks.js` from the last question page this browser opened, with its m
 how long ago) and a **"recently added"** list of the five newest questions by `added`
 (`<!-- recent -->`). `docs/new.md` (`<!-- whats-new -->`) lists every question by the day
 it was added, the newest day first; it is the last tab of the navigation and is linked
-from the footer of every page (the hook appends the link to `copyright`).
+from the footer of every page.
 
 ### Design tokens and surfaces
 
@@ -460,7 +468,9 @@ transparent); the dark scheme keeps the page colour for surfaces and outlines it
 Hints, solutions, traps and follow-ups set their text at the page size (0.8rem, not the
 theme's 0.64rem box size), their titles at 0.7rem, and an explorer box inside one keeps
 0.64rem, the size its figures were drawn for.
-The footer is the brand navy. The "edit on GitHub" link sits at the end of every page
+The footer is the brand navy (`overrides/partials/footer.html`): under the theme's previous
+and next links, the mark with the site name and the numbers, the levels with their counts,
+the site's pages, and the copyright line. The "edit on GitHub" link sits at the end of every page
 (`overrides/partials/content.html`), not beside the title.
 
 Motion (round W3) uses the same tokens and is off under reduced motion: home page sections
@@ -472,6 +482,21 @@ page the part bar is the only sticky row: translucent with a blur, it carries a 
 map of the solution being read (`.pn-sol`, `reading-tools.js`); the map itself stays at
 the top of its solution. "Back to top" is a round button in the bottom corner. Completing a
 study path (its last question marked solved) shows its own message and confetti.
+
+Round M (`13-motion.css`, `motion.js`) adds, again only without reduced motion: the site
+mark (inline from `overrides/partials/logo.html`) drawn on the first page of a visit and
+under the pointer; a shadow under the header once the page scrolls and an amber bar that
+slides along the table of contents to the section being read; a short cross-fade between
+pages (`@view-transition`, where the browser has it) in which a question's title moves
+from the link that was followed into the page (`motion.js` names that one link
+`dvq-title`, the page's `h1` has the same name); cards whose top edge fills with amber
+under the pointer; a self-check whose right answer draws its check mark and whose wrong
+answer shakes the field; a row of dots above a run of hints, one per hint, filled once it
+is opened (`question-tools.js`); a box not built yet shown as a skeleton (`.explorer:empty`);
+and buttons with a raised shadow and a focus ring that settles in (only its offset moves,
+so the ring is there from the first frame). The question header is a card: the title, one
+row of chips, the topics as chips (`.qh-tag`) with the date and the source, and the page
+tools along its foot with their names on a screen with a pointer.
 
 ### Diagrams, formulas and figures
 
@@ -810,7 +835,9 @@ network access, put any Hebrew-capable TTF there as `fonts/Rubik/Regular.ttf` an
 ### The 404 page, the home-screen icon and printing
 
 `overrides/404.html` is the page GitHub Pages serves for a missing address: "הדף לא נמצא"
-in a navy card with the site search, a random question, the home page and the levels; when
+in a navy card with the site search, a random question, the home page and the levels, under
+a "lost signal": 404 on a seven-segment display and a waveform whose bus turns to the unknown
+state X at the cursor (drawn once, the X pulses); when
 the address holds a question's id (`/0046-old-name/`) or its slug, it offers that question
 (the list comes from the hook, `config.extra.dvq_404`). `docs/manifest.webmanifest`, linked
 from `overrides/main.html`, lets a phone add the site to its home screen (Hebrew name, RTL,
