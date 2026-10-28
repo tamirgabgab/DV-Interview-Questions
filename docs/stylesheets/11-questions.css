@@ -222,6 +222,26 @@
 .md-typeset .explorer .wf-io.is-idle .dv-cell { border-style: dotted; color: var(--viz-text); }
 .md-typeset .explorer .wf-rem { font-size: 0.7rem; margin: 0.2rem 0 0.4rem; text-align: center; }
 .md-typeset .explorer input.wf-init { width: 7rem; letter-spacing: 0.08em; font-family: var(--md-code-font-family); }
+/* the way to the formula (an ordered list under the summary) and the table of the moves out
+   of a state, the row of the next digit marked; a state clicked on the ring shows its edges
+   dashed (0055, 0056) */
+.md-typeset .explorer .dv-derive { font-size: 0.7rem; margin: 0.2rem 0 0.5rem; padding-inline-start: 1.4rem; }
+.md-typeset .explorer .dv-derive li { margin: 0.15rem 0; }
+/* a long formula wraps as one left-to-right block, so its parts never swap places */
+.md-typeset .explorer :is(.dv-derive, .dv-moves-table) bdi[dir=ltr]:not(.ex-nw) { display: inline-block; max-width: 100%; vertical-align: top; }
+.md-typeset .explorer .dv-moves { margin-top: 0.5rem; }
+.md-typeset .explorer .dv-moves-title { font-size: 0.7rem; font-weight: 700; margin: 0 0 0.2rem; }
+.md-typeset .explorer .dv-moves-body { overflow-x: auto; }
+.md-typeset .explorer table.dv-moves-table { font-size: 0.68rem; margin: 0; }
+.md-typeset .explorer table.dv-moves-table :is(td, th) { padding: 0.15em 0.6em; }
+.md-typeset .explorer table.dv-moves-table tr.is-next td { background: var(--md-code-bg-color); font-weight: 700; }
+.md-typeset .explorer .dv-next { font-size: 0.6rem; color: var(--viz-s2-text); font-weight: 700; }
+.md-typeset svg .fs-edge.is-peek { stroke: var(--viz-s3); stroke-width: 2.2; stroke-dasharray: 6 4; }
+.md-typeset svg .fs-label.is-peek { fill: var(--viz-s3-text); }
+.md-typeset svg .fs-node.is-peek circle { stroke: var(--viz-s3); stroke-width: 3; stroke-dasharray: 5 3; }
+.md-typeset svg .fs-node[role=button] { cursor: pointer; }
+.md-typeset svg .fs-node[role=button]:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .viz-legend .dv-key-peek { background: transparent; border-radius: 50%; outline: 2px dashed var(--viz-s3); outline-offset: -2px; }
 .md-typeset .explorer input.wf-num { width: 11rem; letter-spacing: 0.08em; font-family: var(--md-code-font-family); }
 
 /* Ants on a pole (0057): the space-time figure and the ants explorer; one colour per ant (or ghost), six in turn */

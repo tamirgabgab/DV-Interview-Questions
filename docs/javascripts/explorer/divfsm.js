@@ -63,14 +63,16 @@
   // A machine on a ring: state 0 on top, the current state lit, the edges out of it (one
   // per target, with the digits that lead there) and the edge just taken. o: { n, b, t
   // (next[s][d]), cur, prev, last (the digit just read), label(s), title(s), accept(s), mk,
-  // aria }. An edge out of the current state bends toward the centre, the edge just taken
-  // away from it (or further in, on a ring of more than 6), so the two never overlap.
+  // aria, peek }. An edge out of the current state bends toward the centre, the edge just
+  // taken away from it (or further in, on a ring of more than 6), so the two never overlap.
+  // peek: a state clicked to see its edges, drawn dashed beside the current state's; with
+  // o.peek defined every state is a button (role and tab stop) that box views listen to.
   const ring = (o) => {
-    const { n, b, t, cur, prev, last, mk } = o;
+    const { n, b, t, cur, prev, last, mk } = o, peek = o.peek ?? null, buttons = o.peek !== undefined;
     const R = n <= 5 ? 92 : n <= 9 ? 104 : 112, r = n <= 7 ? 22 : n <= 11 ? 18 : 19, loop = r + 34;
     const W = n > 11 ? 380 : 360, cx = W / 2, cy = loop + r + 22 + R, H = Math.round(cy + R + loop + 12);
     const pos = Array.from({ length: n }, (_, i) => [cx + R * Math.sin((2 * Math.PI * i) / n), cy - R * Math.cos((2 * Math.PI * i) / n)]);
-    let s = `<svg class="figure dv-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.aria}">` +
+    let s = `<svg class="figure dv-live" viewBox="0 0 ${W} ${H}" role="${buttons ? "group" : "img"}" aria-label="${o.aria}">` +
       `<defs><marker id="${mk}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs>`;
     const labels = [];
     const edge = (i, j, cls, lab, lcls, inward = true) => {
@@ -102,9 +104,15 @@
       edge(cur, j, `fs-edge${one ? " is-found" : ""}${taken ? " is-taken" : ""}`, dg.map((d) => DIG[d]).join(","), `fs-label halo${one ? " is-found" : ""}${taken ? " is-taken" : ""}`);
     });
     if (prev !== null && !loopTaken) edge(prev, cur, "fs-edge is-taken", DIG[last], "fs-label halo is-taken", false);
+    if (peek !== null && peek !== cur) {
+      const pg = new Map();
+      for (let d = 0; d < b; d++) { const j = t[peek][d]; if (!pg.has(j)) pg.set(j, []); pg.get(j).push(d); }
+      pg.forEach((dg, j) => edge(peek, j, "fs-edge is-peek", dg.map((d) => DIG[d]).join(","), "fs-label halo is-peek"));
+    }
     pos.forEach(([x, y], i) => {
       const acc = o.accept(i);
-      s += `<g class="fs-node${i === cur ? " is-cur" : ""}${acc ? " is-start" : ""}" data-s="${i}"><title>${o.title(i)}</title><circle cx="${f(x)}" cy="${f(y)}" r="${r}"/>` +
+      const btn = buttons ? ` tabindex="0" role="button" aria-pressed="${i === peek}" aria-label="${o.title(i)} : להראות את המעברים שלו"` : "";
+      s += `<g class="fs-node${i === cur ? " is-cur" : ""}${i === peek ? " is-peek" : ""}${acc ? " is-start" : ""}" data-s="${i}"${btn}><title>${o.title(i)}</title><circle cx="${f(x)}" cy="${f(y)}" r="${r}"/>` +
         (acc ? `<circle cx="${f(x)}" cy="${f(y)}" r="${r - 5}"/>` : "") +
         `<text x="${f(x)}" y="${f(y + 4.5)}" text-anchor="middle">${o.label(i)}</text></g>`;
     });
@@ -116,6 +124,35 @@
     : `<span><i class="fs-key"></i>הספרות שמובילות לכל מצב</span>`) +
     `<span><i class="dv-key-taken"></i>המעבר האחרון</span><span><i class="dv-key-cur"></i>המצב הנוכחי</span><span><i class="dv-key-acc"></i>${acc}</span>`;
 
+  // The way to a box's formula and the moves out of one state (0055, 0056): the steps as a
+  // list with the box's numbers put in, and a table with a row per digit, the formula of
+  // that digit with the numbers put in, the row of the next digit marked. peekRing makes
+  // the states of a ring buttons: a click (or Enter / space) shows the moves of that state
+  // in the table and its edges dashed on the ring, a second click goes back to the current
+  // state, and any other change of the box (a step, a control) clears it.
+  const stepsList = (items) => items.map((t) => `<li>${t}</li>`).join("");
+  const movesTable = (head, rows, next) => `<table class="dv-moves-table"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>` +
+    rows.map((cells, d) => `<tr${d === next ? ' class="is-next"' : ""}>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("") + `</tbody></table>`;
+  const peekRing = (holder, st, draw) => {
+    const pick = (node) => {
+      const s = Number(node.dataset.s);
+      st.peek = st.peek === s ? null : s;
+      draw(true);
+      // the ring was drawn anew: the same state takes the focus back, once the box has settled
+      const back = () => { const again = holder.querySelector(`.fs-node[data-s="${s}"]`); if (again && document.activeElement !== again) again.focus({ preventScroll: true }); };
+      back();
+      requestAnimationFrame(back);
+    };
+    holder.addEventListener("click", (e) => { const node = e.target.closest(".fs-node[role=button]"); if (node) pick(node); });
+    holder.addEventListener("keydown", (e) => {
+      const node = e.target.closest(".fs-node[role=button]");
+      if (node && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); pick(node); }
+    });
+  };
+  // "= 5 mod 3 = 2", or only "= 2" when the sum is already below m
+  const modTail = (raw, m) => (raw === ((raw % m) + m) % m ? `= ${raw}` : `= ${raw} mod ${m} = ${((raw % m) + m) % m}`);
+  const nextMark = (d, next) => `${ltr(DIG[d])}${d === next ? " <span class=\"dv-next\">הבאה</span>" : ""}`;
+
   // The box (0055): one number read by one machine, chosen in a list. Concatenated at the
   // LSB, each new digit is the number's new lowest digit: the number is read from its MSB
   // and the state is the remainder. Concatenated at the MSB, each new digit is the new
@@ -124,7 +161,7 @@
   const divfsmView = () => ({
     mount(box) {
       const d0 = { m: Number(box.dataset.m || 3), b: Number(box.dataset.base || 2), num: box.dataset.num || "1011", dir: box.dataset.dir === "msb" ? "msb" : "lsb" };
-      const st = { m: d0.m, b: d0.b, ds: parse(d0.num, d0.b) || [1, 0, 1, 1], k: 0, dir: d0.dir };
+      const st = { m: d0.m, b: d0.b, ds: parse(d0.num, d0.b) || [1, 0, 1, 1], k: 0, dir: d0.dir, peek: null };
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>מחלקים ב-m <select class="dv-m" aria-label="המחלק m">${MS.map((v) => `<option value="${v}">${v}</option>`).join("")}</select></label>` +
@@ -142,16 +179,19 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 350) +
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary dv-sum" aria-live="polite"></p>` +
+        `<ol class="dv-derive" data-steady></ol>` +
         `<div class="dv-digits"></div>` +
         `<div class="dv-pair"><div class="dv-side"><p class="ex-title dv-head"></p><div class="dv-ring"></div><p class="dv-read"></p></div></div>` +
-        `<span class="viz-legend dv-legend"></span>`;
+        `<span class="viz-legend dv-legend"></span>` +
+        `<div class="dv-moves"><p class="dv-moves-title"></p><div class="dv-moves-body"></div></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       const n = () => st.ds.length;
 
-      const draw = () => {
+      const draw = (keep = false) => {
         const m = st.m, b = st.b, N = n(), inv = divInv(b % m, m), lsb = st.dir === "msb";   // a digit at the MSB: read from the LSB
         st.k = Math.min(st.k, N);
+        if (!keep) st.peek = null;
         $(".dv-m").value = String(m); $(".dv-b").value = String(b); $(".dv-dir").value = st.dir;
         [...$(".dv-m").options].forEach((o) => { o.disabled = gcd(Number(o.value), b) !== 1; });
         const states = divRun(st.ds, m, b, lsb), k = st.k;
@@ -160,8 +200,19 @@
         $(".ex-prev").disabled = $(".ex-start").disabled = k === 0;
         $(".ex-next").disabled = $(".ex-end").disabled = k === N;
         $(".dv-sum").innerHTML = `${code(digitText(st.ds))} בבסיס ${ltr(b)} הוא ${ltr(all.toLocaleString("en-US"))}. ` + (lsb
-          ? `כל ספרה חדשה נכנסת כ-MSB, ולכן המכונה קוראת את המספר מה-LSB : ${ltr(`x' = (x + d)·${inv} mod ${m}`)}, כי ${ltr(`${b}⁻¹ = ${inv}`)} מודולו ${ltr(m)}` + (inv === 1 ? " : המכונה רק מחברת ספרות." : ".")
-          : `כל ספרה חדשה נכנסת כ-LSB, ולכן המכונה קוראת את המספר מה-MSB : ${ltr(`r' = (${b}·r + d) mod ${m}`)}` + (b % m === 1 ? " : המכונה רק מחברת ספרות." : "."));
+          ? "כל ספרה חדשה נכנסת כ-MSB, ולכן המכונה קוראת את המספר מה-LSB. הדרך לנוסחה של החצים :"
+          : "כל ספרה חדשה נכנסת כ-LSB, ולכן המכונה קוראת את המספר מה-MSB. הדרך לנוסחה של החצים :");
+        $(".dv-derive").innerHTML = stepsList(lsb ? [
+          `אחרי ${ltr("k")} ספרות המספר הוא ${ltr("v")}. ספרה חדשה ${ltr("d")} נכנסת כ-MSB, במשקל ${ltr("B^k")} : ${ltr("v' = v + d·B^k")}.`,
+          `המשקל משתנה עם ${ltr("k")}, ולכן שומרים ${ltr("x = v·B^(−k) mod m")} : ${ltr("x' = (v + d·B^k)·B^(−(k+1)) = (x + d)·B^(−1)")}.`,
+          `כאן ${ltr(`B = ${b}`)} ו-${ltr(`m = ${m}`)}, ו-${ltr(`${b}⁻¹ mod ${m} = ${inv}`)}, כי ${ltr(`${b}·${inv} = ${b * inv} ≡ 1`)}. לכן כל חץ הוא ${ltr(`x' = (x + d)·${inv} mod ${m}`)}` + (inv === 1 ? " : המכונה רק מחברת ספרות." : "."),
+          `מצב לכל ${ltr("x")} מ-0 עד ${ltr(m - 1)}. המספר מתחלק בדיוק כש-${ltr("x = 0")} (עיגול כפול), כי ${ltr("B^k")} הפיך מודולו ${ltr(m)}.`,
+        ] : [
+          `המספר עד עכשיו הוא ${ltr("v")}. ספרה חדשה ${ltr("d")} נכנסת כ-LSB, והמספר הופך ל-${ltr("v' = B·v + d")}.`,
+          `את ${ltr("v")} אי אפשר לשמור, אבל מודולו ${ltr("m")} מספיקה השארית ${ltr("r = v mod m")} : ${ltr("(B·v + d) mod m = (B·r + d) mod m")}.`,
+          `כאן ${ltr(`B = ${b}`)} ו-${ltr(`m = ${m}`)}, ולכן כל חץ הוא ${ltr(`r' = (${b}·r + d) mod ${m}`)}` + (b % m === 1 ? ` : ${ltr(`${b} ≡ 1`)}, והמכונה רק מחברת ספרות.` : "."),
+          `מצב לכל שארית מ-0 עד ${ltr(m - 1)}, והמספר מתחלק כשהמצב 0 (עיגול כפול).`,
+        ]);
         // the digits: the machine has read the k on the left (from the MSB) or on the right (from the LSB)
         $(".dv-digits").innerHTML = `<span class="dv-tag">MSB →</span><span class="dv-cells">` +
           st.ds.map((d, i) => `<span class="dv-cell${!lsb && i < k ? " is-msb" : ""}${lsb && i >= N - k ? " is-lsb" : ""}">${DIG[d]}</span>`).join("") +
@@ -169,7 +220,7 @@
         $(".dv-head").textContent = lsb ? "שרשור ל-MSB : המצב הוא ‎x = r · B⁻ᵏ‎" : "שרשור ל-LSB : המצב הוא השארית";
         const seq = lsb ? [...st.ds].reverse() : st.ds;
         $(".dv-ring").innerHTML = ring({
-          n: m, b, t: divTable(m, b, lsb), cur: states[k], prev: k ? states[k - 1] : null, last: k ? seq[k - 1] : null,
+          n: m, b, t: divTable(m, b, lsb), cur: states[k], prev: k ? states[k - 1] : null, last: k ? seq[k - 1] : null, peek: st.peek,
           mk: `dv-arrow-${box.dataset.dvqIndex || 0}`, label: (i) => i, title: (i) => `${lsb ? "x" : "r"} = ${i}`, accept: (i) => i === 0,
           aria: `${lsb ? "המכונה של שרשור ל-MSB" : "המכונה של שרשור ל-LSB"} : ${m} מצבים, המצב הנוכחי ${states[k]}`,
         });
@@ -179,7 +230,17 @@
             ? `הצעד האחרון ${ltr(`(${states[k - 1]} + ${d})·${inv} mod ${m} = ${states[k]}`)}; השארית ${ltr(`x·${b}^${k} mod ${m} = ${Number(v % BigInt(m))}`)}.`
             : `הצעד האחרון ${ltr(`(${b}·${states[k - 1]} + ${d}) mod ${m} = ${states[k]}`)}, וזו השארית.`) +
             (states[k] === 0 ? ` <span class="wv-ok">מתחלק ✓</span>` : "");
-        $(".dv-legend").innerHTML = legendOf(b, "עיגול כפול : המספר מתחלק (ומשם מתחילים)");
+        $(".dv-legend").innerHTML = legendOf(b, "עיגול כפול : המספר מתחלק (ומשם מתחילים)") + (st.peek !== null ? `<span><i class="dv-key-peek"></i>המעברים של המצב שנבחר</span>` : "");
+        // the moves out of the current state, or of a state clicked on the ring
+        const from = st.peek ?? states[k], name = lsb ? "x" : "r", next = st.peek === null && k < N ? seq[k] : null;
+        $(".dv-moves-title").innerHTML = `המעברים מהמצב ${ltr(`${name} = ${from}`)}` + (st.peek === null
+          ? ` (המצב הנוכחי). לחיצה על מצב בגרף מראה את המעברים שלו.`
+          : ` (נבחר בלחיצה). לחיצה נוספת עליו חוזרת למצב הנוכחי.`);
+        $(".dv-moves-body").innerHTML = movesTable(["הספרה d", "הנוסחה עם המספרים", "המצב הבא"], Array.from({ length: b }, (_, dd) => {
+          const raw = lsb ? (from + dd) * inv : b * from + dd;
+          return [nextMark(dd, next), ltr(lsb ? `(${from} + ${dd})·${inv} mod ${m} ${modTail(raw, m)}` : `(${b}·${from} + ${dd}) mod ${m} ${modTail(raw, m)}`),
+            ltr(`${name} = ${raw % m}`) + (raw % m === 0 ? " ✓" : "")];
+        }), next);
         $(".dv-add").innerHTML = b <= 4
           ? `<span class="ex-title">${lsb ? "שרשור ספרה משמאל (MSB) :" : "שרשור ספרה מימין (LSB) :"}</span> ` + Array.from({ length: b }, (_, dd) => `<button type="button" class="md-button md-button--primary dv-push" data-d="${dd}">${dd}</button>`).join(" ") +
             ` <button type="button" class="md-button dv-pop">מחיקת הספרה האחרונה</button>`
@@ -227,6 +288,7 @@
       $(".ex-reset").addEventListener("click", () => {
         stop(); Object.assign(st, { m: d0.m, b: d0.b, k: 0, dir: d0.dir }); setNum(parse(d0.num, d0.b) || [1, 0, 1, 1]); draw();
       });
+      peekRing($(".dv-ring"), st, draw);
       setNum(st.ds);
       draw();
     },
@@ -241,7 +303,7 @@
     mount(box) {
       const d0 = { m: Number(box.dataset.m || 3), b: Number(box.dataset.base || 2), L: Number(box.dataset.len || 3), init: box.dataset.init || "000",
         bits: box.dataset.num || "1101", dir: box.dataset.dir === "msb" ? "msb" : "lsb" };
-      const st = { m: d0.m, b: d0.b, L: d0.L, init: [], ds: [], k: 0, dir: d0.dir };
+      const st = { m: d0.m, b: d0.b, L: d0.L, init: [], ds: [], k: 0, dir: d0.dir, peek: null };
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>מחלקים ב-m <select class="wf-m" aria-label="המחלק m">${MS.map((v) => `<option value="${v}">${v}</option>`).join("")}</select></label>` +
@@ -261,18 +323,21 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 350) +
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary wf-sum" aria-live="polite"></p>` +
+        `<ol class="dv-derive" data-steady></ol>` +
         `<div class="wf-path" data-steady></div><p class="wf-rem"></p>` +
         `<div class="dv-pair"><div class="dv-side"><p class="ex-title wf-head"></p><div class="dv-ring wf-ring"></div></div></div>` +
         `<p class="dv-read wf-read"></p>` +
-        `<span class="viz-legend dv-legend wf-legend"></span>`;
+        `<span class="viz-legend dv-legend wf-legend"></span>` +
+        `<div class="dv-moves"><p class="dv-moves-title"></p><div class="dv-moves-body"></div></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       const n = () => st.ds.length;
       const fit = (ds) => { const pad = Array(Math.max(0, st.L - ds.length)).fill(0); return [...pad, ...ds].slice(-st.L); };
 
-      const draw = () => {
+      const draw = (keep = false) => {
         const { m, b, L } = st, N = n(), msb = st.dir === "msb", inv = divInv(b % m, m), size = b ** L;
         st.k = Math.min(st.k, N);
+        if (!keep || size > WMAX) st.peek = null;
         $(".wf-m").value = String(m); $(".wf-b").value = String(b); $(".wf-dir").value = st.dir;
         $(".wf-L").value = String(L); $(".wf-out-L").textContent = String(L);
         [...$(".wf-m").options].forEach((o) => { o.disabled = gcd(Number(o.value), b) !== 1; });
@@ -281,9 +346,21 @@
         $(".ex-pos").textContent = `ספרה ${k} מתוך ${N}`;
         $(".ex-prev").disabled = $(".ex-start").disabled = k === 0;
         $(".ex-next").disabled = $(".ex-end").disabled = k === N;
+        const wText = (w) => digitText(fit(toDigits(BigInt(w), b, L)));
         $(".wf-sum").innerHTML = msb
-          ? `ספרה נכנסת כ-MSB והספרה הנמוכה יוצאת : ${ltr(`w' = d·${b}^${L - 1} + ⌊w / ${b}⌋`)}. השארית בלי החלון : ${ltr(`r' = ((r − out)·${inv} + d·${ch}) mod ${m}`)}, כי ${ltr(`${b}⁻¹ = ${inv}`)} ו-${ltr(`${b}^${L - 1} mod ${m} = ${ch}`)}.`
-          : `ספרה נכנסת כ-LSB והספרה הגבוהה יוצאת : ${ltr(`w' = (${b}·w + d) mod ${b}^${L}`)}. השארית בלי החלון : ${ltr(`r' = (${b}·r + d − out·${cl}) mod ${m}`)}, כי ${ltr(`${b}^${L} mod ${m} = ${cl}`)}.`;
+          ? "ספרה נכנסת כ-MSB, והספרה הנמוכה יוצאת. הדרך לנוסחאות של החצים ושל השארית :"
+          : "ספרה נכנסת כ-LSB, והספרה הגבוהה יוצאת. הדרך לנוסחאות של החצים ושל השארית :";
+        $(".dv-derive").innerHTML = stepsList(msb ? [
+          `החלון ${ltr("w")} הוא ${ltr(L)} ספרות. ספרה ${ltr("d")} נכנסת כ-MSB, הכול זז ימינה, והספרה הנמוכה ${ltr("out = w mod B")} יוצאת : ${ltr("w' = d·B^(L−1) + ⌊w / B⌋")}.`,
+          `המצב הוא החלון כולו, ${ltr(`${b}^${L} = ${size.toLocaleString("en-US")}`)} מצבים. כאן כל חץ הוא ${ltr(`w' = d·${b ** (L - 1)} + ⌊w / ${b}⌋`)}.`,
+          `השארית בלי לחשב את החלון מחדש : ${ltr("⌊w / B⌋ = (w − out) / B ≡ (r − out)·B⁻¹")}, והספרה החדשה שווה ${ltr("B^(L−1)")}. לכן ${ltr("r' = ((r − out)·B⁻¹ + d·C) mod m")}, ${ltr("C = B^(L−1) mod m")}.`,
+          `כאן ${ltr(`${b}⁻¹ mod ${m} = ${inv}`)} ו-${ltr(`C = ${b}^${L - 1} mod ${m} = ${ch}`)} : ${ltr(`r' = ((r − out)·${inv} + d·${ch}) mod ${m}`)}. עיגול כפול : חלון ש-${ltr(`w mod ${m} = 0`)}.`,
+        ] : [
+          `החלון ${ltr("w")} הוא ${ltr(L)} ספרות. ספרה ${ltr("d")} נכנסת כ-LSB, הכול זז שמאלה, והספרה הגבוהה ${ltr("out")} יוצאת : ${ltr("w' = (B·w + d) mod B^L = B·w + d − out·B^L")}.`,
+          `המצב הוא החלון כולו, ${ltr(`${b}^${L} = ${size.toLocaleString("en-US")}`)} מצבים. כאן כל חץ הוא ${ltr(`w' = (${b}·w + d) mod ${size}`)}.`,
+          `השארית בלי לחשב את החלון מחדש : מודולו ${ltr("m")}, ${ltr("r' = (B·r + d − out·C) mod m")}, כאשר ${ltr("C = B^L mod m")} הוא מה ששווה הספרה שיוצאת.`,
+          `כאן ${ltr(`C = ${b}^${L} mod ${m} = ${cl}`)} : ${ltr(`r' = (${b}·r + d − out·${cl}) mod ${m}`)}. עיגול כפול : חלון ש-${ltr(`w mod ${m} = 0`)}.`,
+        ]);
         // the data path: the window's cells (the highest on the left), the digit in at one end, the digit out at the other
         const cells = toDigits(BigInt(now.w), b, L), pad = Array(L - cells.length).fill(0), win = [...pad, ...cells];
         const din = k ? st.ds[k - 1] : null, gone = k ? now.out : null;
@@ -303,13 +380,25 @@
         $(".wf-head").textContent = size <= WMAX ? `המכונה : מצב לכל חלון, ${size} מצבים` : `המכונה : ${size} חלונות, יותר מדי לציור`;
         $(".wf-ring").innerHTML = size <= WMAX ? ring({
           n: size, b, t: Array.from({ length: size }, (_, w) => Array.from({ length: b }, (_, d) => winStep(w, d, b, L, msb))),
-          cur: now.w, prev: k ? run[k - 1].w : null, last: din, mk: `wf-arrow-${box.dataset.dvqIndex || 0}`,
-          label: (w) => digitText(fit(toDigits(BigInt(w), b, L))), title: (w) => `${digitText(fit(toDigits(BigInt(w), b, L)))} = ${w}`, accept: (w) => w % m === 0,
+          cur: now.w, prev: k ? run[k - 1].w : null, last: din, mk: `wf-arrow-${box.dataset.dvqIndex || 0}`, peek: st.peek,
+          label: wText, title: (w) => `${wText(w)} = ${w}`, accept: (w) => w % m === 0,
           aria: `המכונה של החלון : ${size} מצבים, החלון הנוכחי ${digitText(win)}`,
         }) : `<p class="ex-note">‏${ltr(`${b}^${L} = ${size.toLocaleString("en-US")}`)} חלונות. נתיב הנתונים למעלה הוא אותה מכונה : רגיסטר הזזה של ${ltr(L)} ספרות ורגיסטר שארית.</p>`;
         $(".wf-read").innerHTML = `החלון ${code(digitText(win))} ` + (now.r === 0 ? `<span class="wv-ok">מתחלק ב-${ltr(m)} ✓</span>` : `לא מתחלק ב-${ltr(m)} (שארית ${ltr(now.r)})`) +
           (k ? `. ${msb ? "הספרה נכנסה משמאל, והימנית יצאה" : "הספרה נכנסה מימין, והשמאלית יצאה"}.` : ".");
-        $(".wf-legend").innerHTML = size <= WMAX ? legendOf(b, "עיגול כפול : החלון מתחלק") : "";
+        $(".wf-legend").innerHTML = size <= WMAX ? legendOf(b, "עיגול כפול : החלון מתחלק") + (st.peek !== null ? `<span><i class="dv-key-peek"></i>המעברים של החלון שנבחר</span>` : "") : "";
+        // the moves out of the current window, or of a window clicked on the ring: the next
+        // window and the remainder, each with the numbers put in
+        const from = st.peek ?? now.w, fr = from % m, fo = msb ? from % b : Math.floor(from / b ** (L - 1)), next = st.peek === null && k < N ? st.ds[k] : null;
+        $(".dv-moves-title").innerHTML = `המעברים מהחלון ${code(wText(from))} = ${ltr(from)} (שארית ${ltr(fr)}, הספרה שתצא ${ltr(DIG[fo])})` + (st.peek === null
+          ? `, החלון הנוכחי.${size <= WMAX ? " לחיצה על חלון בגרף מראה את המעברים שלו." : ""}`
+          : `, נבחר בלחיצה. לחיצה נוספת עליו חוזרת לחלון הנוכחי.`);
+        $(".dv-moves-body").innerHTML = movesTable(["הספרה d", "החלון הבא", "השארית הבאה"], Array.from({ length: b }, (_, dd) => {
+          const w2 = winStep(from, dd, b, L, msb), raw = msb ? (fr - fo) * inv + dd * ch : b * fr + dd - fo * cl, r2 = ((raw % m) + m) % m;
+          return [nextMark(dd, next),
+            ltr(msb ? `${dd}·${b ** (L - 1)} + ⌊${from} / ${b}⌋ = ${w2}` : `(${b}·${from} + ${dd}) mod ${size} = ${w2}`) + ` → ${code(wText(w2))}`,
+            ltr(msb ? `((${fr} − ${fo})·${inv} + ${dd}·${ch}) mod ${m} ${modTail(raw, m)}` : `(${b}·${fr} + ${dd} − ${fo}·${cl}) mod ${m} ${modTail(raw, m)}`) + (r2 === 0 ? " ✓" : "")];
+        }), next);
         $(".wf-add").innerHTML = b <= 4
           ? `<span class="ex-title">${msb ? "ספרה נכנסת משמאל (MSB) :" : "ספרה נכנסת מימין (LSB) :"}</span> ` + Array.from({ length: b }, (_, dd) => `<button type="button" class="md-button md-button--primary wf-push" data-d="${dd}">${dd}</button>`).join(" ") +
             ` <button type="button" class="md-button wf-pop">מחיקת הספרה האחרונה</button>`
@@ -363,6 +452,7 @@
         setInit(parse(d0.init, d0.b, LMAX) || []); setNum(parse(d0.bits, d0.b) || [1, 1, 0, 1]);
       };
       $(".ex-reset").addEventListener("click", () => { stop(); reset(); draw(); });
+      peekRing($(".wf-ring"), st, draw);
       reset();
       draw();
     },
