@@ -1,4 +1,4 @@
-/* The site's styles, part 11 of 12: the figures and boxes of 0036 and of 0049 to 0059.
+/* The site's styles, part 11 of 12: the figures and boxes of 0036 and of 0049 to 0061.
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
 /* 0036: the register row (lfsr.js regSvg) */
@@ -311,3 +311,51 @@
 .md-typeset .explorer input.gs-x { width: 6rem; }
 .md-typeset table.gs-bits td.gs-b.is-lead { border-style: dashed; background: none; }
 .md-typeset .viz-legend .gs-key-lead { background: none; outline: 1.5px dashed var(--viz-grid); outline-offset: -1.5px; }
+
+/* The longest run of ones (0060): the strip of cells of the figures and of the onesk explorer */
+.md-typeset svg.ok-fig .ok-cell rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg.ok-fig .ok-cell text { fill: var(--viz-text); font-size: 15px; font-family: var(--md-code-font-family); }
+.md-typeset svg.ok-fig .ok-cell.is-one rect { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg.ok-fig .ok-cell.is-flip rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg.ok-fig .ok-cell.is-one text, .md-typeset svg.ok-fig .ok-cell.is-flip text { fill: var(--viz-ink); font-weight: 700; }
+.md-typeset svg.ok-fig .ok-win { fill: none; stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 6 4; }
+.md-typeset .viz-legend .ok-key-one, .md-typeset .viz-legend .ok-key-in { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
+.md-typeset .viz-legend .ok-key-flip { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .viz-legend .ok-key-win, .md-typeset .viz-legend .ok-key-best { background: none; outline: 2px dashed var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .ok-key-cur { background: none; border-bottom: 0.2rem solid var(--viz-ink); }
+.md-typeset .explorer .ok-strip { display: flex; flex-wrap: wrap; gap: 0.3rem 0.25rem; margin: 0.5rem 0 0.7rem; direction: ltr; }
+.md-typeset .explorer .ok-c { position: relative; display: flex; align-items: center; justify-content: center; width: 1.9rem; height: 2.3rem; padding-bottom: 0.4rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem;
+  background: var(--md-default-bg-color); color: var(--viz-text); font-family: var(--md-code-font-family); font-size: 0.8rem; }
+.md-typeset .explorer .ok-c small { position: absolute; left: 0; right: 0; bottom: 0.05rem; font-size: 0.5rem; line-height: 1; color: var(--viz-text); text-align: center; opacity: 1; }
+.md-typeset .explorer .ok-c.is-wait { border-style: dashed; }
+.md-typeset .explorer .ok-c.is-in { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .ok-c.is-flip { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border: 2.5px solid var(--viz-s2); }
+.md-typeset .explorer .ok-c.is-best { outline: 2px dashed var(--viz-ink); outline-offset: 1px; }
+.md-typeset .explorer .ok-c.is-cur::after { content: ""; position: absolute; left: 0.2rem; right: 0.2rem; bottom: -0.4rem; height: 0.2rem; border-radius: 1px; background: var(--viz-ink); }
+.md-typeset .explorer .ok-note, .md-typeset .explorer .ok-counts { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer input.ok-seq { width: 14rem; max-width: 100%; }
+.md-typeset .explorer input.ok-k { width: 3.6rem; }
+
+/* How many tags (0061): the timeline of the figures and of the tagpool explorer */
+.md-typeset svg.tp-fig .tp-bar { fill: color-mix(in srgb, var(--viz-s1) 35%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.tp-fig .tp-bar.is-w { fill: color-mix(in srgb, var(--viz-s2) 35%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg.tp-fig .tp-bar.is-open { stroke-width: 3; }
+.md-typeset svg.tp-fig .tp-bar.is-done { opacity: 0.45; }
+.md-typeset svg.tp-fig .tp-bar.is-peak { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg.tp-fig .tp-name { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.tp-fig .tp-count { fill: none; stroke: var(--viz-ink); stroke-width: 2.5; stroke-linejoin: round; }
+.md-typeset svg.tp-fig .tp-max { stroke: var(--viz-s3); stroke-width: 2; stroke-dasharray: 6 4; }
+.md-typeset svg.tp-fig .tp-cursor { stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset .viz-legend .tp-key-bar, .md-typeset .viz-legend .tp-key-r { background: var(--viz-s1); opacity: 0.6; }
+.md-typeset .viz-legend .tp-key-w { background: var(--viz-s2); opacity: 0.6; }
+.md-typeset .viz-legend .tp-key-open { background: none; outline: 3px solid var(--viz-s1); outline-offset: -3px; }
+.md-typeset .viz-legend .tp-key-count { background: none; border-top: 3px solid var(--viz-ink); height: 0.45em; }
+.md-typeset .viz-legend .tp-key-max { background: none; border-top: 3px dashed var(--viz-s3); height: 0.45em; }
+.md-typeset .viz-legend .tp-key-cursor { background: none; border-left: 3px solid var(--viz-s2); width: 0.45em; }
+.md-typeset .explorer .tp-wrap { margin: 0.5rem 0; overflow-x: auto; }
+.md-typeset .explorer .tp-wrap svg { min-width: 30rem; }
+.md-typeset .explorer .tp-note { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer .tp-two, .md-typeset .explorer.tp-is-two .tp-one { display: none; }
+.md-typeset .explorer.tp-is-two .tp-two { display: inline-flex; }
+.md-typeset .explorer input.tp-txns { width: 13rem; max-width: 100%; }
+@media screen and (min-width: 45em) { .md-typeset .explorer input.tp-txns { width: 18rem; } }

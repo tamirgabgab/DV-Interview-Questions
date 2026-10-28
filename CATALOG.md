@@ -1,6 +1,6 @@
 # Catalog
 
-All 58 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 60 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -63,3 +63,5 @@ All 58 questions, with links to their pages on the [live site](https://tamirgabg
 | 0057 | [ה-tag שלא חזר – XOR, חלוקה לפי ביט וסכומי חזקות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0057-missing-tags/) | senior (סניור) |
 | 0058 | [מטבעות בשורה – לוקחים מהקצוות, ומי מקבל יותר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0058-coins-in-a-row/) | junior (ג'וניור) |
 | 0059 | [המספר הבא עם אותו מספר של אחדות – Gosper, הקודם, ואפסים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0059-next-same-popcount/) | junior (ג'וניור) |
+| 0060 | [הרצף הארוך ביותר של אחדות – עד k היפוכים, ואז כל ערך על ה-bus](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0060-longest-ones-with-k-flips/) | junior (ג'וניור) |
+| 0061 | [כמה tags צריך – טרנזקציות חופפות, ומאגר אחד מול שניים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0061-how-many-tags/) | junior (ג'וניור) |

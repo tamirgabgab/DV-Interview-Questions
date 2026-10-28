@@ -372,6 +372,30 @@ def kaprekar_keys() -> int:
     return len(keys)
 
 
+def ones_answers() -> list:
+    """0060: the longest window with at most k zeros (part a), and with at most k cells that
+    are not its most frequent value (part b), every window tried."""
+    def longest(seq, k, same):
+        best = 0
+        for i in range(len(seq)):
+            for j in range(i, len(seq)):
+                w = seq[i:j + 1]
+                bad = len(w) - max(w.count(c) for c in set(w)) if same else w.count(0)
+                if bad <= k:
+                    best = max(best, len(w))
+        return best
+    return [longest([1, 0, 1, 1, 0, 1, 0, 1, 1, 1], 1, False), longest("ABAACAAB", 2, True)]
+
+
+def tag_pool_answers() -> list:
+    """0061: the most transactions open at once (open from the send up to the response), and
+    what one shared pool saves against a pool per kind."""
+    def most(txns):
+        return max(sum(1 for s, e in txns if s <= t < e) for t, _ in txns)
+    reads, writes = [(0, 10), (2, 12)], [(20, 30), (22, 32)]
+    return [most([(0, 10), (10, 20), (5, 15)]), most(reads) + most(writes) - most(reads + writes)]
+
+
 EXPECTED = {
     "0003": [comparisons(5)],
     "0004": [mislabeled_samples()],
@@ -406,6 +430,8 @@ EXPECTED = {
     "0057": tag_answers(),
     "0058": coin_answers(),
     "0059": popcount_answers(),
+    "0060": ones_answers(),
+    "0061": tag_pool_answers(),
 }
 
 

@@ -17,7 +17,7 @@ refine one in an earlier part, and moving a rule between parts can change what w
 | `08-explorers.css` | the explorer boxes of 0004 to 0047 |
 | `09-redesign.css` | the redesign: typography, icons, the header and toolbar, the hero, box cards, the 404 page, print, question tables |
 | `10-rounds-w.css` | rounds W1 to W4: surfaces, traps, the home page, the run panel, motion, self-checks |
-| `11-questions.css` | the figures and boxes of 0036 and of 0049 to 0059 |
+| `11-questions.css` | the figures and boxes of 0036 and of 0049 to 0061 |
 | `12-rounds-y-s.css` | rounds Y and S: the tags page, box text size, touch tools, side navigation, button runs, S2 figures |
 
 Colours are CSS variables, defined for both schemes in `01-base.css` (the palette) and used
