@@ -1,5 +1,5 @@
 // kinds: endpoint
-//   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table; a timeline of every read's waits and completions; a cycle axis of the completions and the ready reads
+//   endpoint               0023        a request builder on the block map, reads cut at RCB boundaries and interleaved cycle by cycle, the completions table; a timeline of every read's waits and completions; a read's interior boundaries and its number of legal splits; a cycle axis of the completions and the ready reads
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -189,7 +189,7 @@
           const W = 520, L = 86, RH = 22, last = Math.max(s.cycle, ...reads.flatMap((r) => r.waits.map((w) => w[1]))) + 1;
           const X = (c) => L + (c / last) * (W - L - 10), H = reads.length * RH + 22;
           const step = last > 60 ? 20 : last > 30 ? 10 : last > 12 ? 5 : 1;
-          let g = `<svg class="ep-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="ציר המחזורים : לכל קריאה ההמתנות שלה וה-Completions שיצאו">`;
+          let g = `<svg class="ep-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="ציר ההמתנות : לכל קריאה ההמתנות שלה וה-Completions שיצאו">`;
           for (let c = 0; c <= last; c += step) g += `<line class="grid" x1="${f(X(c))}" x2="${f(X(c))}" y1="2" y2="${H - 18}"/><text class="tick" x="${f(X(c))}" y="${H - 5}" text-anchor="middle">${c}</text>`;
           reads.forEach((r, i) => {
             const y = 2 + i * RH + RH / 2, outs = s.out.filter((c) => c.read === r.id);
@@ -259,7 +259,17 @@
         } else {
           const tag = st.s.nextTag++, rid = 0x0200;
           const p = epRead(st.s, { address, length, rid, tag }, st.rng);
-          st.log = `קריאה Tag ${ltr(hex(tag, 2))} : ${ltr(length)} בתים מ-${ltr(hex(address))}. ה-Completions נבנו עכשיו, בסדר כתובות : ${ltr(p.cpls.map((c) => c.size).join(" + "))} (חיתוך אקראי על גבולות 128), ויחכו עד מחזור ${ltr(p.ready)}.`;
+          // part b's idea: the legal splits are exactly the subsets of the interior boundaries
+          const inner = [];
+          for (let b = (Math.floor(address / EP_RCB) + 1) * EP_RCB; b < address + length; b += EP_RCB) inner.push(b);
+          const cuts = p.cpls.slice(1).map((c) => hex(c.address)), splits = 2 ** inner.length;
+          const list = (a) => a.map((x) => ltr(x)).join(a.length === 2 ? " ו-" : ", ");
+          st.log = `קריאה Tag ${ltr(hex(tag, 2))} : ${ltr(length)} בתים מ-${ltr(hex(address))}. ` +
+            (inner.length
+              ? `גבולות RCB בתוך הקריאה : ${list(inner.map((b) => hex(b)))}, כלומר ${inner.length === 1 ? "גבול אחד" : `${ltr(inner.length)} גבולות`} ו-${ltr(splits)} פיצולים חוקיים, אחד לכל תת-קבוצה שלהם. ` +
+                (cuts.length ? `ההגרלה חתכה ב-${list(cuts)}` : `ההגרלה לא חתכה באף גבול`) + (p.cpls.length > 1 ? `, ולכן ה-Completions, בסדר כתובות, הם ${ltr(p.cpls.map((c) => c.size).join(" + "))}` : `, ולכן יוצא Completion יחיד של ${ltr(length)} בתים`)
+              : `אין גבול RCB בתוך הקריאה, ולכן יש פיצול אחד : Completion יחיד של ${ltr(length)} בתים`) +
+            `. ${p.cpls.length > 1 ? "הם יחכו" : "הוא יחכה"} עד מחזור ${ltr(p.ready)}.`;
         }
         if (ended) st.log += " הדוגמה שבעמוד נעצרה כאן : מעכשיו ההגרלות אקראיות.";
         render();

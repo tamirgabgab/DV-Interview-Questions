@@ -397,5 +397,10 @@
 /* R: 0009 and 0027 */
 /* R: 0020 and 0026 */
 /* R: 0023 and 0059 */
+.md-typeset .explorer .cr-coin.cr-p0 { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset .explorer .cr-coin.cr-p1 { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset .explorer .cr-coin.is-end { border-color: var(--viz-ink); }
+.md-typeset .explorer .cr-coin.is-taken { background: var(--md-default-bg-color); border-style: dashed; color: var(--viz-text); }
+.md-typeset .viz-legend .cr-key-taken { background: none; border-radius: 50%; outline: 2px dashed var(--viz-text); outline-offset: -2px; }
 /* R: 0039 and 0037 */
 /* R: 0061 and 0012 */

@@ -1,5 +1,5 @@
 // kinds: coinrow
-//   coinrow                0059        coins in a row, each player takes an end: a player per side (me by a click on an end, greedy, the parity trick, optimal), played move by move with the totals; the table of d[i][j] with the interval of the moment and the move it recommends
+//   coinrow                0059        coins in a row, each player takes an end: a player per side (me by a click on an end, greedy, the parity trick, optimal), played move by move with the totals; the coins coloured by the parity of the place with the two colour sums, the colour the trick committed to, and the lead turned into what the mover collects; the table of d[i][j] with the interval of the moment and the move it recommends
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -30,6 +30,7 @@
         let s0 = 0, s1 = 0;
         for (let k = i; k <= j; k++) if (k % 2 === 0) s0 += c[k]; else s1 += c[k];
         st.want = s0 >= s1 ? 0 : 1;
+        st.sums = [s0, s1];               // the two colour sums it compared, for the box
       }
       return i % 2 === st.want ? "L" : "R";
     },
@@ -48,7 +49,7 @@
       if (side === "L") i++; else j--;
       who ^= 1;
     }
-    return { moves, tot, i, j, who, d };
+    return { moves, tot, i, j, who, d, states };
   };
   const crPlay = (c, a, b) => { const r = crRun(c, [a, b]); return { moves: r.moves.map(([w, s, coin]) => [w, s, coin]), tot: r.tot }; };
 
@@ -80,7 +81,7 @@
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary cr-sum" aria-live="polite"></p>` +
         `<div class="cr-row" role="group" aria-label="השורה : לוקחים מטבע מאחד הקצוות"></div>` +
-        `<span class="viz-legend"><span><i class="cr-key-a"></i>של הראשון</span><span><i class="cr-key-b"></i>של השני</span><span><i class="cr-key-end"></i>קצה שאפשר לקחת</span></span>` +
+        `<span class="viz-legend"><span><i class="cr-key-p0"></i>מקום אי-זוגי (1, 3, ...)</span><span><i class="cr-key-p1"></i>מקום זוגי (2, 4, ...)</span><span><i class="cr-key-taken"></i>נלקח (א הראשון, ב השני, ומספר המהלך)</span><span><i class="cr-key-end"></i>קצה שאפשר לקחת</span></span>` +
         `<p class="cr-advice"></p>` +
         `<div class="cr-dp" data-steady></div>`;
       const $ = (sel2) => box.querySelector(sel2);
@@ -99,13 +100,18 @@
         const owner = new Map(cur.moves.map(([w, , , idx], m) => [idx, [w, m + 1]]));
         $(".cr-row").innerHTML = c.map((v, idx) => {
           const o = owner.get(idx), end = !done && (idx === cur.i || idx === cur.j);
-          const cls = o ? ` is-taken cr-by${o[0]}` : end ? " is-end" : "";
+          // the colour of the place, as in the page's figure: cr-p0 = places 1, 3, ...
+          const cls = ` cr-p${idx % 2}` + (o ? ` is-taken cr-by${o[0]}` : end ? " is-end" : "");
           const lab = o ? `<small>${o[0] === 0 ? "א" : "ב"}${o[1]}</small>` : "";
           return `<button type="button" class="cr-coin${cls}" data-idx="${idx}"${waiting && end ? "" : " disabled"} title="place ${idx + 1}">${v}${lab}</button>`;
         }).join("");
         const sum = c.reduce((a, b) => a + b, 0), left = sum - cur.tot[0] - cur.tot[1];
-        $(".cr-sum").innerHTML = `${ltr(n)} מטבעות, סכום ${ltr(sum)}. ` +
-          `הראשון (${NAMES[st.players[0]]}) : ${ltr(cur.tot[0])}, השני (${NAMES[st.players[1]]}) : ${ltr(cur.tot[1])}` +
+        const odd = c.reduce((a, v, k) => a + (k % 2 ? 0 : v), 0), even = sum - odd;
+        const colour = (w) => (w ? "זוגיים" : "אי-זוגיים");
+        // the colour a parity player committed to, once it has
+        const name = (w) => NAMES[st.players[w]] + (st.players[w] === "parity" && cur.states[w].want !== undefined ? `, מחויב ל${colour(cur.states[w].want)}` : "");
+        $(".cr-sum").innerHTML = `${ltr(n)} מטבעות, סכום ${ltr(sum)} (אי-זוגיים ${ltr(odd)}, זוגיים ${ltr(even)}). ` +
+          `הראשון (${name(0)}) : ${ltr(cur.tot[0])}, השני (${name(1)}) : ${ltr(cur.tot[1])}` +
           (done ? "." : `, ועוד ${ltr(left)} על השולחן. ${waiting ? "<b>תורך : לחצו על אחד הקצוות.</b>" : `התור של ${cur.who === 0 ? "הראשון" : "השני"}.`}`);
         // the advice of the table on the interval of the moment
         const d = cur.d;
@@ -113,9 +119,20 @@
         else {
           const i = cur.i, j = cur.j;
           const l = i === j ? c[i] : c[i] - d[i + 1][j], r = i === j ? c[j] : c[j] - d[i][j - 1];
+          // the lead d and what it means: the mover collects (S + d) / 2 of the S on the table
+          const lead = Math.max(l, r), gets = (left + lead) / 2, mine = cur.tot[cur.who];
+          const formula = `(${left} ${lead < 0 ? "−" : "+"} ${Math.abs(lead)}) / 2 = ${gets}`;
+          let note = "";
+          if (st.players[cur.who] === "parity") {
+            const ps = { ...cur.states[cur.who] }, side = STRATS.parity(c, i, j, ps) === "L" ? "שמאל" : "ימין";
+            note = (j - i + 1) % 2 ? ` שני הקצוות באותו צבע : הטריק של הזוגיות לא חל, ולכן הוא משחק חמדן (${side}).`
+              : cur.states[cur.who].want === undefined ? ` הטריק של הזוגיות בוחר צבע עכשיו : בקטע אי-זוגיים ${ltr(ps.sums[0])} מול זוגיים ${ltr(ps.sums[1])}, ולכן הוא מתחייב ל${colour(ps.want)} ולוקח את הקצה בצבע הזה (${side}).`
+              : ` הטריק של הזוגיות מחויב ל${colour(ps.want)}, ולוקח את הקצה בצבע הזה (${side}).`;
+          }
           $(".cr-advice").innerHTML = i === j ? `נשאר מטבע אחד, ${ltr(c[i])}.` :
             `הטבלה : לקחת ${ltr(c[i])} משמאל נותן יתרון ${ltr(`${c[i]} − ${d[i + 1][j]} = ${l}`)}, לקחת ${ltr(c[j])} מימין נותן ${ltr(`${c[j]} − ${d[i][j - 1]} = ${r}`)}. ` +
-            `הכי טוב : <b>${l >= r ? "שמאל" : "ימין"}</b>, יתרון ${ltr(Math.max(l, r))} ל${cur.who === 0 ? "ראשון" : "שני"} מכאן והלאה.`;
+            `הכי טוב : <b>${l >= r ? "שמאל" : "ימין"}</b>, יתרון ${ltr(lead)} ל${cur.who === 0 ? "ראשון" : "שני"} מכאן והלאה, ולכן מתוך ${ltr(left)} שעל השולחן הוא יאסוף ${ltr(formula)}` +
+            (mine ? `, ובסך הכול ${ltr(`${mine} + ${gets} = ${mine + gets}`)}.` : ".") + note;
         }
         // the table d[i][j], the interval of the moment and the two it compares
         const at = done ? null : [cur.i, cur.j];
@@ -132,7 +149,8 @@
         $(".cr-dp").innerHTML = `<p class="ex-title">‏${code("d[i][j]")} : היתרון של מי שתורו בקטע i..j (מסומן הקטע של הרגע, ובצבע אחר שני הקטעים שהוא בוחר ביניהם)</p>` + t + "</tbody></table>";
         if (done) {
           const best = (sum + d[0][n - 1]) / 2;
-          answer(box, `הראשון קיבל ${ltr(cur.tot[0])} והשני ${ltr(cur.tot[1])}. במשחק הטוב ביותר של שניהם הראשון מקבל ${ltr(best)}.`, box.querySelectorAll(".cr-coin"));
+          const trick = n % 2 ? `כש-${ltr("n")} אי-זוגי הטריק של הזוגיות לא מבטיח לראשון דבר` : `הטריק של הזוגיות מבטיח לראשון ${ltr(`max(${odd}, ${even}) = ${Math.max(odd, even)}`)}`;
+          answer(box, `הראשון קיבל ${ltr(cur.tot[0])} והשני ${ltr(cur.tot[1])}. ${trick}, ובמשחק הטוב ביותר של שניהם הראשון מקבל ${ltr(best)}.`, box.querySelectorAll(".cr-coin"));
         } else answer(box, null);
       };
       const stop = autoplay(play, speed, { step: () => { st.k++; draw(); }, done: () => st.k >= full().moves.length, restart: () => { st.k = 0; draw(); } });
