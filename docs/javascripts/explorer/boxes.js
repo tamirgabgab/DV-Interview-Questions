@@ -1,5 +1,5 @@
 // kinds: boxes
-//   boxes                  0009        N boxes on a ring with their cycles, person 0's cut, a walk box by box, rounds without person 0; the copy link carries the arrangement and the walk; the proof panel: any cut of the long cycle
+//   boxes                  0009        N boxes on a ring with their cycles, person 0's cut, a walk box by box (and the same person's walk without person 0), rounds with and without person 0 and person 0's swaps; the copy link carries the arrangement and the walk; the proof panel: any cut of the long cycle
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -44,6 +44,11 @@
     return { opened, found: false };
   };
   const permAllWin = (notes, maxOpens) => permCycles(notes).every((c) => c.length <= maxOpens);
+  // one round with person 0: the swaps he makes (0 or 1) and whether everybody then wins
+  const permHelped = (notes, maxOpens) => {
+    const cut = permHelper(notes, maxOpens);
+    return { swaps: cut ? 1 : 0, win: permAllWin(cut ? permSwap(notes, cut[0], cut[1]) : notes, maxOpens) };
+  };
   const permShuffle = (n, rnd = Math.random) => {
     const p = Array.from({ length: n }, (_, i) => i + 1);
     for (let i = n - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
@@ -69,14 +74,14 @@
   // The boxes box (0009): N boxes on a ring with an arrow from every box to the box its
   // note names, one colour per cycle and the long cycle in red; person 0's cut as two
   // dashed arrows; a person's walk played opening by opening; and a counter of rounds
-  // that compares the strategy without person 0 with random picks.
+  // that compares the strategy with person 0 and without him with random picks.
   const boxesView = () => ({
     mount(box) {
       const EXAMPLE = [0, 7, 11, 15, 16, 13, 2, 12, 14, 4, 5, 6, 3, 1, 8, 9, 10];
       const nmax = Number(box.dataset.nmax || 16);
       const W = 360, C = 180, R = 138, NODE = 15, CYC = 5;    // CYC colours for the cycles
       const num = (v) => Number(v).toLocaleString("en-US");
-      const st = { n: nmax, notes: EXAMPLE, helper: true, me: 13, step: 0, runs: 0, strat: 0, rand: 0, h: null };   // h: the proof's cut, null = the middle
+      const st = { n: nmax, notes: EXAMPLE, helper: true, me: 13, step: 0, runs: 0, helped: 0, noSwap: 0, strat: 0, rand: 0, h: null };   // h: the proof's cut, null = the middle
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label><span>מספר הקופסאות N</span><input type="range" class="ex-n" min="4" max="${nmax}" step="2" value="${st.n}" dir="ltr"><output class="out-n"></output></label>` +
@@ -91,11 +96,11 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1500, 700, 250) +
         `<button type="button" class="md-button ex-all">עד הסוף</button>` +
         `<button type="button" class="md-button ex-start">מההתחלה</button></div>` +
-        `<p class="bx-walk" aria-live="polite"></p></div></div>` +
+        `<p class="bx-walk" aria-live="polite"></p><p class="bx-alone"></p></div></div>` +
         `<div class="ex-controls bx-stats-row">` +
-        `<button type="button" class="md-button ex-rounds">1,000 סיבובים בלי אדם 0</button>` +
+        `<button type="button" class="md-button ex-rounds">1,000 סיבובים</button>` +
         `<button type="button" class="md-button ex-rounds-reset">איפוס המונים</button><span class="bx-runs"></span></div>` +
-        `<div class="bx-bars"></div><p class="ex-summary bx-formula"></p>` +
+        `<div class="bx-bars"></div><p class="ex-note bx-swaps"></p><p class="ex-summary bx-formula"></p>` +
         `<section class="ex-proof bx-proof"><p class="ex-proof-title">שלב ההוכחה : איפה לחתוך</p>` +
         `<p class="bx-cut-help"></p><div class="bx-cut-row" role="group" aria-label="הקופסאות של המעגל הארוך לפי הסדר; לחיצה בוחרת את הקופסה שאדם 0 מחליף עם הראשונה"></div>` +
         `<div class="bx-cut-chart"></div><p class="bx-cut-text"></p></section>`;
@@ -213,6 +218,12 @@
             : ` <span class="bx-bad">✗ ${ltr(m)} פתיחות נגמרו ואדם ${ltr(st.me)} לא מצא את הפתק שלו : הוא על מעגל באורך ${ltr(cycles.find((c) => c.includes(st.me)).length)}.</span>`;
         }
         $(".bx-walk").innerHTML = `אדם ${ltr(st.me)} מתחיל בקופסה ${ltr(st.me)}.` + (line.length ? " " + line.join(", ") + "." : "") + end;
+        // a person on the long cycle: the same walk without person 0, so the toggle need not be replayed
+        const longBefore = permCycles(st.notes).find((c) => c.length > m);
+        const alone = st.helper && longBefore && longBefore.includes(st.me) ? permWalk(st.notes, st.me, m) : null;
+        $(".bx-alone").innerHTML = alone
+          ? `בלי אדם 0 : <span class="ex-nowrap">${ltr(alone.opened.join(" → "))}</span>, ${ltr(m)} פתיחות, <span class="bx-bad">נכשל</span>, כי המעגל שלו באורך ${ltr(longBefore.length)}.`
+          : "";
         // the rounds so far
         $(".bx-runs").textContent = st.runs ? `${num(st.runs)} סיבובים עד כה` : "";
         const pStrat = permStrategyProb(st.n, m), pRand = permRandomProb(st.n, m);
@@ -221,7 +232,11 @@
           return `<div class="bx-bar"><span class="bx-bar-label">${label}</span><span class="bx-bar-track"><span class="bx-bar-fill" style="width:${f(Math.min(100, pct))}%"></span></span>` +
                  `<span class="bx-bar-val">${st.runs ? `${ltr(num(wins))} (${ltr(f(pct, 1) + "%")})` : "—"}, צפוי ${ltr(f(100 * p, p < 0.01 ? 4 : 1) + "%")}</span></div>`;
         };
-        $(".bx-bars").innerHTML = bar("האסטרטגיה בלי אדם 0", st.strat, pStrat) + bar(`כל אחד פותח ${ltr(m)} קופסאות אקראיות`, st.rand, pRand);
+        $(".bx-bars").innerHTML = bar("האסטרטגיה עם אדם 0", st.helped, 1) + bar("האסטרטגיה בלי אדם 0", st.strat, pStrat) + bar(`כל אחד פותח ${ltr(m)} קופסאות אקראיות`, st.rand, pRand);
+        const pct = (v) => ltr(f((100 * v) / st.runs, 1) + "%");
+        $(".bx-swaps").innerHTML = st.runs
+          ? `ההחלפות של אדם 0 : אף החלפה ב-${ltr(num(st.noSwap))} סיבובים (${pct(st.noSwap)}, אין מעגל ארוך), החלפה אחת ב-${ltr(num(st.runs - st.noSwap))} (${pct(st.runs - st.noSwap)}), ואף פעם לא יותר.`
+          : `ההחלפות של אדם 0 : צפוי שלא יחליף כלום בכ-${ltr(f(100 * pStrat, 1) + "%")} מהסיבובים, כשאין מעגל ארוך, ויחליף פעם אחת בכל השאר.`;
         const terms = []; for (let j = m + 1; j <= st.n; j++) terms.push(`1/${j}`);
         $(".bx-formula").innerHTML = `הצפי : האסטרטגיה מצליחה כשאין מעגל ארוך מ-${ltr(m)}, בהסתברות ${ltr(`1 − (${terms.join(" + ")}) ≈ ${fmt(pStrat, 4)}`)}; ` +
           `בחירה אקראית מצליחה לכל אחד בהסתברות ${ltr(`1/2`)}, ולכולם ${ltr(`(1/2)^${st.n} ≈ ${pRand < 1e-3 ? pRand.toExponential(2).replace("e-", "·10^−") : fmt(pRand, 4)}`)}. עם אדם 0 האסטרטגיה מצליחה תמיד.`;
@@ -232,7 +247,7 @@
         done: () => st.step >= steps(),
         restart: () => { st.step = 0; draw(); },
       });
-      const setN = (n) => { stop(); st.h = null; st.n = n; st.notes = permShuffle(n); st.me = Math.min(st.me, n); st.step = 0; st.runs = st.strat = st.rand = 0; draw(); };
+      const setN = (n) => { stop(); st.h = null; st.n = n; st.notes = permShuffle(n); st.me = Math.min(st.me, n); st.step = 0; st.runs = st.helped = st.noSwap = st.strat = st.rand = 0; draw(); };
       $(".ex-n").addEventListener("input", () => setN(Number($(".ex-n").value)));
       const seed = seedControls(box, $(".ex-example"), (rng) => { stop(); st.h = null; st.notes = permShuffle(st.n, rng); st.step = 0; draw(); }, { state: {
         get: () => STATE_CODECS.boxes.enc({ notes: st.notes, me: st.me, helper: st.helper, step: st.step }),
@@ -275,14 +290,16 @@
       $(".ex-rounds").addEventListener("click", () => {
         const m = maxOpens();
         for (let r = 0; r < 1000; r++) {
-          const notes = permShuffle(st.n);
+          const notes = permShuffle(st.n), withHelper = permHelped(notes, m);
+          if (withHelper.win) st.helped++;
+          if (withHelper.swaps === 0) st.noSwap++;
           if (permAllWin(notes, m)) st.strat++;
           if (permRandomPicks(notes, m)) st.rand++;
         }
         st.runs += 1000;
         draw();
       });
-      $(".ex-rounds-reset").addEventListener("click", () => { st.runs = st.strat = st.rand = 0; draw(); });
+      $(".ex-rounds-reset").addEventListener("click", () => { st.runs = st.helped = st.noSwap = st.strat = st.rand = 0; draw(); });
       draw();
     },
   });
@@ -290,8 +307,8 @@
   dvqExplorers.register({
     views: { boxes: boxesView },
     help: {
-      boxes: "N קופסאות במעגל עם המעגלים שלהן בצבעים : ״ערבוב״ מגריל סידור, בוחרים אדם ועוקבים אחרי הפתיחות שלו, ו״1,000 סיבובים״ משווה את האסטרטגיה לבחירה אקראית. ״העתקת קישור״ שומר את המצב. בשלב ההוכחה בוחרים בעצמכם איפה אדם 0 חותך את המעגל הארוך, ורואים מתי שתי החתיכות קצרות מספיק.",
+      boxes: "N קופסאות במעגל עם המעגלים שלהן בצבעים : ״ערבוב״ מגריל סידור, בוחרים אדם ועוקבים אחרי הפתיחות שלו, ו״1,000 סיבובים״ משווה את האסטרטגיה עם אדם 0 ובלעדיו לבחירה אקראית, וסופר כמה החלפות אדם 0 עשה. ״העתקת קישור״ שומר את המצב. בשלב ההוכחה בוחרים בעצמכם איפה אדם 0 חותך את המעגל הארוך, ורואים מתי שתי החתיכות קצרות מספיק.",
     },
-    models: { permCycles, permHelper, permCutAt, permSwap, permWalk, permAllWin, permShuffle, permRandomPicks, permStrategyProb, permRandomProb },
+    models: { permCycles, permHelper, permCutAt, permSwap, permWalk, permAllWin, permHelped, permShuffle, permRandomPicks, permStrategyProb, permRandomProb },
   });
 })();

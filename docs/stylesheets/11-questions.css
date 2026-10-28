@@ -395,6 +395,11 @@
 /* Review round R (session 28): the ten reviewed questions. Each pair keeps its rules under
    its own heading. */
 /* R: 0009 and 0027 */
+.md-typeset .explorer .bx-alone .ex-nowrap { white-space: nowrap; }   /* at most N / 2 = 8 boxes: one line on a phone */
+.md-typeset .explorer .cake-table td.cake-ratio bdi { white-space: nowrap; }   /* "1.699 > 1" reads as one mark */
+@media screen and (max-width: 30em) {
+  .md-typeset .explorer .cake-table td, .md-typeset .explorer .cake-table th { padding: 0.15em 0.3em; }   /* five columns on a phone */
+}
 /* R: 0020 and 0026 */
 /* R: 0023 and 0059 */
 .md-typeset .explorer .cr-coin.cr-p0 { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); }

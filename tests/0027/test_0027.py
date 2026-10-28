@@ -50,7 +50,7 @@ def test_part_a():
     T = (math.sqrt(0.41) - 0.1) / 2
     assert f"{T:.4f}" == "0.2702"
     assert Fr(21, 100) < T <= Fr(31, 100)
-    assert math.ceil((T - 0.01) / 0.1) + 1 == 4 and f"{(T - 0.01) / 0.1:.2f}" == "2.60"
+    assert Fr(11, 100) < T and math.ceil((T - 0.01) / 0.1) + 1 == 4   # p_1, p_2, p_3 below T; part b's formula agrees
     assert cake.dec(Fr(99, 100) * Fr(89, 100) * Fr(79, 100)) == "0.6961"
     assert cake.dec(s[-1]) == "0.0003"
     # the ratio chart starts at 10.89
@@ -86,6 +86,18 @@ def test_closed_form_and_single_peak():
             assert all(s[i] >= s[i + 1] for i in range(peak - 1, len(s) - 1))
             assert cake.formula(A, a, d) == k
             assert len(s) == math.ceil((1 - a) / d) + 1
+
+
+def test_rounding_trap():
+    """The trap "rounding the threshold too early": a = 0.27, d = 0.1, T = 0.27016..."""
+    a, d = Fr(27, 100), Fr(1, 10)
+    T = cake.threshold(A, d)
+    assert f"{T:.5f}" == "0.27016" and a < T
+    assert max(1, math.ceil((0.27 - 0.27) / 0.1) + 1) == 1         # T rounded to 0.27: person 1
+    assert a * a + d * a - d == Fr(-1, 10000)                      # the exact sign: the next gets more
+    s = shares(a, d)
+    assert s[0] == Fr(27, 100) and s[1] == Fr(2701, 10000) and max(s) == s[1]
+    assert closed_form(a, d) == (2, False)
 
 
 def test_follow_ups():
@@ -138,6 +150,26 @@ def test_js_proof_condition():
             if s[k + 1] != s[k]:
                 assert more[k] == (s[k + 1] > s[k]), (a, d, k + 1)
         assert abs(at["g"] - at["level"]) < 1e-9
+
+
+def test_js_trend_column():
+    """The box's column "מול הקודם": every share's ratio to the one before and its side of
+    1 (steps 2 and 3 of part a), against the exact split, ties included, for both laws."""
+    from page_tests import explorer_require, node_json
+
+    params = [(a / 1000, d / 100) for a in range(5, 600, 37) for d in range(1, 51, 3)] + [(1 / 12, 1 / 12), (0.27, 0.1)]
+    got = node_json(f"const m = {explorer_require()}; const ps = {json.dumps(params)};"
+                    "console.log(JSON.stringify(ps.map(([a, d]) => m.cakeTrend(m.cakeSplit('arith', a, d)))));")
+    for (a, d), trend in zip(params, got):
+        s = shares(Fr(a).limit_denominator(10 ** 6), Fr(d).limit_denominator(10 ** 6))
+        assert len(trend) == len(s) and trend[0] is None
+        for k in range(1, len(s)):
+            assert trend[k]["dir"] == (s[k] > s[k - 1]) - (s[k] < s[k - 1]), (a, d, k + 1)
+            assert abs(trend[k]["ratio"] - float(s[k] / s[k - 1])) < 1e-9 * float(s[k] / s[k - 1])
+    assert got[-2][3]["dir"] == 0                   # a = d = 1/12: the tie of persons 3 and 4
+    # part a: 10.89 for the second person, then above 1 up to the fourth and below 1 after
+    part_a = node_json(f"const m = {explorer_require()}; console.log(JSON.stringify(m.cakeTrend(m.cakeSplit('arith', 0.01, 0.1))));")
+    assert abs(part_a[1]["ratio"] - 10.89) < 1e-12 and [t["dir"] for t in part_a[1:]] == [1, 1, 1] + [-1] * 7
 
 
 def test_js_wide_ranges():
