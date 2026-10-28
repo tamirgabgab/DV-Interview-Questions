@@ -1491,6 +1491,26 @@
    ],
    "related": []
   },
+  "0056": {
+   "core": [
+    "fsm",
+    "modular_arithmetic",
+    "sliding_window",
+    "state_minimization"
+   ],
+   "secondary": [
+    "shift_register",
+    "number_bases",
+    "induction_proof"
+   ],
+   "related": [
+    {
+     "id": "0055",
+     "explicit": true,
+     "why": "the same machine with a window of the last L bits"
+    }
+   ]
+  },
   "0057": {
    "core": [
     "symmetry_argument",

@@ -1329,14 +1329,41 @@ section below starts at session 22, whose numbered items run on through the late
     phone the value takes only its own width. The number field of the 0016 box moved to
     its own `<label>`. `check_phone.py` fails, at both text sizes, when a slider's value
     sits on another row or a slider's label is cut off at the box's edge.
+87. **Questions 0056 to 0061 renumbered to 0057 to 0062 (session 28, 2026-10-28).** The
+    owner wanted the windowed version of 0055 next to it, as 0056. The pages, tests,
+    figure generators, study paths, the question map and every reference moved together
+    (the work log above keeps the old numbers). An old address goes on to the new page:
+    `dvq_renumbered` in `mkdocs.yml` maps the old ids, and the 404 page replaces the location
+    with the same level and slug under the new id, the anchor kept (`check_404.py` opens one).
+    `marks.js` moves what a browser saved, once (`dvq-renumbered-<date>`): the marks by id,
+    the last question opened, and the self-checks and the boxes' saved states by the page's
+    path. Its `RENUMBERED` list and the one in `mkdocs.yml` must agree (a hook test checks).
+88. **One machine at a time in the 0055 box (session 28, 2026-10-28).** The owner did not
+    want two state diagrams. The `divfsm` box has a list, "שרשור ל-LSB" (read from the MSB,
+    part a) or "שרשור ל-MSB" (read from the LSB, part b), and draws one ring; the buttons
+    concatenate a digit at the chosen end. The ring is now a shared `ring()` in
+    `divfsm.js`.
+89. **Question 0056, divisible by 3 in a window of L bits (session 28, 2026-10-28).** The
+    owner's question: 0055 with the number a window of the last L bits, zeros after reset;
+    part a a bit entering as the LSB (the highest leaves), part b as the MSB (the lowest
+    leaves), part c any m, base, L and start window (`INIT`). The answer: a shift register
+    and the remainder updated by the bit in and the bit out, r' = (2r + b − 2^L·out) mod 3 and
+    r' = (2(r − out) + 2^(L−1)·b) mod 3 (the MSB way divides by B, so it needs gcd(B, m) = 1).
+    The minimal machines were counted by refinement: 2, 4, 7, 14, 27, 54, 107, 214 states
+    for L = 1 to 8, the same both ways, above 2^(L−1) from L = 3, so L flip-flops at least;
+    the page proves 2^(L−2). The `winfsm` box: m, base, L, the direction, the start window
+    and the digits; the data path every step, and the ring of the direct machine up to 16
+    windows. Tests: every bit string and start window up to L = 6, random digits in six
+    bases, the proof's distinguishing bits, the explorer against the page, and a testbench
+    of nine parameter sets (run here with the pip Verilator, below).
 
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done; a slider and its value on one row (item 86).
-  60 questions (0022 was
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done; a slider and its value on one row (item 86) published (`main` a4e0b47); the renumbering (item 87), the 0055 list (item 88) and question 0056 (item 89) on the branch.
+  61 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
@@ -1398,7 +1425,7 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (60 questions)
+### Coverage today (61 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
@@ -1648,6 +1675,10 @@ ends with the full check set and the owner's look at the live site.
   `VERILATOR_REF`; the same recipe is in `README.md`) and `z3` must be on the PATH. The
   5.052 release crashes on 0011 and mis-randomizes the 0014 subclass; the apt package
   (5.020) has no constraint support. `run_tests.py` refuses older versions.
+- In a cloud sandbox without flex, `pip install verilator` (5.048, in a venv) runs most
+  testbenches: wrap the binary so the C++ build gets `-CFLAGS -fcoroutines -CFLAGS
+  -std=c++20`, and call `run_sv()` of `run_tests.py` directly (its version check asks for
+  5.053+, and the classes with constraints need the CI's build). 0055 to 0062 pass this way.
 - Build: `pip install -r requirements.txt && mkdocs build --strict`. Versions are pinned
   (MkDocs 1.6.1, Material 9.7.7). Material warns about MkDocs 2.0 — do not upgrade MkDocs
   to 2.x, its plugin system (and therefore the hook and the tags plugin) is gone.

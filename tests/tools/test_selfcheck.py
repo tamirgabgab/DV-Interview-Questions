@@ -226,6 +226,19 @@ def fsm_answers() -> list[int]:
     return [int("1011", 2) % 3, len({future(p) for p in prefixes}), next(y for y in range(7) if 10 * y % 7 == 1)]
 
 
+def window_answers() -> list[int]:
+    """The divisible window of L digits: the window of 3 bits after 1, 1, 0, 1 entered at the
+    LSB (its remainder by 3) and 1, 0, 1, 1 entered at the MSB (its value), shifted as bit
+    strings; and 10^4 mod 7, the weight of a decimal digit that leaves a window of 4."""
+    lsb = "000"
+    for b in "1101":
+        lsb = (lsb + b)[1:]
+    msb = "000"
+    for b in "1011":
+        msb = (b + msb)[:-1]
+    return [int(lsb, 2) % 3, int(msb, 2), 10 ** 4 % 7]
+
+
 def ants_answers() -> list[int]:
     """Ants on a pole: the longest time, by every configuration of up to three ants on a pole
     of 8 (it is the length) scaled to 100; the most collisions of 100 ants by a dynamic
@@ -426,6 +439,7 @@ EXPECTED = {
     "0053": list(alu_bins()),
     "0054": [rr_bound(4), rr_bound(8), rr_bound(4, [1, 2, 3, 4])],
     "0055": fsm_answers(),
+    "0056": window_answers(),
     "0057": ants_answers(),
     "0058": tag_answers(),
     "0059": coin_answers(),

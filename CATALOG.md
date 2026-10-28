@@ -1,6 +1,6 @@
 # Catalog
 
-All 60 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 61 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -59,6 +59,7 @@ All 60 questions, with links to their pages on the [live site](https://tamirgabg
 | 0053 | [Covergroup ל-ALU – bins, cross ומתי הכיסוי נסגר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0053-alu-covergroup/) | junior (ג'וניור) |
 | 0054 | [Arbiter סבבי – הרעבה, טריק שני ה-encoders, SVA ומשקלים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0054-round-robin-arbiter/) | senior (סניור) |
 | 0055 | [מכונת מצבים לחלוקה ב-3 – ביטים מה-MSB, מה-LSB ובכל בסיס](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0055-divisible-by-m-fsm/) | junior (ג'וניור) |
+| 0056 | [חלוקה ב-3 בחלון של L ביטים – שרשור ל-LSB, שרשור ל-MSB ובכל בסיס](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0056-divisible-window-fsm/) | junior (ג'וניור) |
 | 0057 | [נמלים על מוט – מתי הנמלה האחרונה נופלת](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0057-ants-on-a-pole/) | junior (ג'וניור) |
 | 0058 | [ה-tag שלא חזר – XOR, חלוקה לפי ביט וסכומי חזקות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0058-missing-tags/) | senior (סניור) |
 | 0059 | [מטבעות בשורה – לוקחים מהקצוות, ומי מקבל יותר](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0059-coins-in-a-row/) | junior (ג'וניור) |

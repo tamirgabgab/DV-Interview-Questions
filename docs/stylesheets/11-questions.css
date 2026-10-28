@@ -211,6 +211,18 @@
 .md-typeset .explorer .dv-cell.is-lsb { border-bottom-color: var(--viz-s2); }
 .md-typeset .explorer .dv-add .dv-push { min-width: 2.4rem; font-family: var(--md-code-font-family); font-weight: 700; }
 .md-typeset .explorer input.dv-num { width: 11rem; letter-spacing: 0.08em; font-family: var(--md-code-font-family); }
+/* the window box of 0056 (winfsm): the digits that enter (read ones marked above, the last one
+   below), the window's register between the digit in and the digit out, and the remainder */
+.md-typeset .explorer :is(.wf-stream, .wf-reg) { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.5rem; margin: 0.3rem 0; }
+.md-typeset .explorer .wf-reg { justify-content: center; }
+.md-typeset .explorer .wf-io { display: inline-flex; flex-direction: column; align-items: center; gap: 0.1rem; }
+.md-typeset .explorer .dv-cell.is-read { border-top-color: var(--viz-s1); }
+.md-typeset .explorer .dv-cell.is-now, .md-typeset .explorer .dv-cell.is-in { border-bottom-color: var(--viz-s2); }
+.md-typeset .explorer .dv-cell.is-gone { border-style: dashed; color: var(--viz-text); }
+.md-typeset .explorer .wf-io.is-idle .dv-cell { border-style: dotted; color: var(--viz-text); }
+.md-typeset .explorer .wf-rem { font-size: 0.7rem; margin: 0.2rem 0 0.4rem; text-align: center; }
+.md-typeset .explorer input.wf-init { width: 7rem; letter-spacing: 0.08em; font-family: var(--md-code-font-family); }
+.md-typeset .explorer input.wf-num { width: 11rem; letter-spacing: 0.08em; font-family: var(--md-code-font-family); }
 
 /* Ants on a pole (0057): the space-time figure and the ants explorer; one colour per ant (or ghost), six in turn */
 .md-typeset svg .an-c0 { --an: var(--viz-s1); }
