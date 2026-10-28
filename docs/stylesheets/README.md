@@ -20,6 +20,10 @@ refine one in an earlier part, and moving a rule between parts can change what w
 | `11-questions.css` | the figures and boxes of 0036 and of 0049 to 0061 |
 | `12-rounds-y-s.css` | rounds Y and S: the tags page, box text size, touch tools, side navigation, button runs, S2 figures |
 
+The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
+`stylesheets/site.css` at the end of the build and links that file from every page and from
+the 404 page (S423). The parts are the source; the joined file is never edited.
+
 Colours are CSS variables, defined for both schemes in `01-base.css` (the palette) and used
 everywhere else; figures and boxes never hard-code a colour. A new rule goes into the part
 of its component, at its end, or into the last part when it overrides rules of several

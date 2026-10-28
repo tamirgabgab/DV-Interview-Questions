@@ -159,6 +159,16 @@ EXPLORER_DIR = "javascripts/explorer"
 EXPLORER_BOX = re.compile(r"<div\b[^>]*\bclass=\"explorer\"[^>]*>")
 EXPLORER_KIND = re.compile(r"\bdata-kind=\"([\w-]+)\"")
 KINDS_LINE = re.compile(r"^// kinds: ([\w -]+)$")
+# Page weight (S423): WaveDrom loads only on the pages that draw a ```wavedrom block, and
+# the stylesheet parts of extra_css reach the browser as one file, written at the end of the
+# build; the 404 page (a template, not a page) gets the same link in on_post_build.
+WAVEDROM_CDN = ["https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/skins/default.js",
+                "https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/wavedrom.min.js"]
+WAVEDROM_INIT = "javascripts/wavedrom-init.js"
+WAVEDROM_BLOCK = '<pre class="wavedrom">'
+JOINED_CSS = "stylesheets/site.css"
+CSS_LINK = re.compile(r'<link rel="stylesheet" href="([^"]*?)stylesheets/\d\d-[\w-]+\.css">\n?')
+_css_parts: list[str] = []      # the parts of extra_css, in order; filled in on_config
 # The cost chips of a solution (A183): one comment line under its answer block,
 # "<!-- cost: זמן \( O(n) \) | זיכרון \( O(1) \) -->", each chip a label word and a value.
 COST_LINE = re.compile(r"^([ \t]*)<!--\s*cost:\s*(.+?)\s*-->[ \t]*$", re.M)
@@ -260,8 +270,11 @@ def _load_kind_files(docs_dir: Path) -> dict[str, str]:
 
 
 def on_config(config, **kwargs):
-    global _questions, _paths, _comments, _kind_files
+    global _questions, _paths, _comments, _kind_files, _css_parts
     _questions = _load_questions(Path(config["docs_dir"]))
+    _css_parts = [str(c) for c in (config.get("extra_css") or [])]
+    if any(not CSS_LINK.match(f'<link rel="stylesheet" href="{c}">') for c in _css_parts):
+        raise PluginError(f"extra_css must be the parts stylesheets/NN-name.css, got {_css_parts}")
     _paths = _load_paths(Path(config["docs_dir"]))
     _comments = dict(config["extra"].get("comments") or {})
     _kind_files = _load_kind_files(Path(config["docs_dir"]))
@@ -927,6 +940,25 @@ def explorer_scripts(output: str, page_url: str) -> str:
                    for name in ["core.js", *files])
 
 
+def wavedrom_scripts(output: str, page_url: str) -> str:
+    """The WaveDrom scripts and the init script for a built page with a ```wavedrom block,
+    or "" for every other page."""
+    if WAVEDROM_BLOCK not in output:
+        return ""
+    base = _base(page_url) or "."
+    return "".join(f'<script src="{src}"></script>' for src in [*WAVEDROM_CDN, posixpath.relpath(WAVEDROM_INIT, base)])
+
+
+def one_stylesheet(output: str) -> str:
+    """The links of the stylesheet parts replaced by one link to the joined file, in the
+    place of the first and with its base."""
+    m = CSS_LINK.search(output)
+    if not m:
+        return output
+    output = CSS_LINK.sub("", output)
+    return output[:m.start()] + f'<link rel="stylesheet" href="{m.group(1)}{JOINED_CSS}">\n' + output[m.start():]
+
+
 TAG_CHIP = re.compile(r'(<span class="md-tag">)([^<]+)(</span>)')
 TAG_TOC = re.compile(r'(href="#tag:([^"]+)" class="md-nav__link">\s*<span class="md-ellipsis">\s*)([^<]+?)(\s*</span>)')
 
@@ -985,7 +1017,8 @@ def on_post_page(output, page, config, **kwargs):
     if page.file.src_uri in _questions:
         output = TRAP_RUN.sub(_trap_group, output)
         _statements[page.url] = statement_sections(output)
-    scripts = explorer_scripts(output, page.url)
+    output = one_stylesheet(output)
+    scripts = wavedrom_scripts(output, page.url) + explorer_scripts(output, page.url)
     if not scripts:
         return output
     at = output.rfind("</body>")
@@ -1040,7 +1073,16 @@ def _question_docs(docs: list[dict], pages: dict) -> list[dict]:
 
 
 def on_post_build(config, **kwargs):
-    path = Path(config["site_dir"]) / "search" / "search_index.json"
+    site, docs = Path(config["site_dir"]), Path(config["docs_dir"])
+    joined = ("/* The site's styles: the parts of docs/stylesheets/ joined in this order at build time\n"
+              "   (hooks/questions.py); edit the parts, never this file. */\n")
+    for part in _css_parts:
+        joined += f"\n/* ---- {part} ---- */\n" + (docs / part).read_text(encoding="utf-8")
+    (site / JOINED_CSS).write_text(joined, encoding="utf-8")
+    not_found = site / "404.html"
+    if not_found.exists():
+        not_found.write_text(one_stylesheet(not_found.read_text(encoding="utf-8")), encoding="utf-8")
+    path = site / "search" / "search_index.json"
     if not path.exists():
         return
     index = json.loads(path.read_text(encoding="utf-8"))

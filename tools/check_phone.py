@@ -25,6 +25,11 @@ In a sandbox without access to the CDNs, --offline ignores errors of external sc
 as on the live site). --local-cdn does both for the copies tools/dev_setup.sh keeps in
 .cache/cdn (MathJax, Mermaid, WaveDrom) and runs axe-core from there unless --axe is given.
 
+Every page's line also gives its weight: the HTML in KB, and what the browser fetched for it
+in all (the HTML, the styles, the scripts, the fonts) in KB and requests, so a page that
+grows heavy is seen; a page whose HTML is over --weight-warn KB (400) gets a warning, and the
+summary names the three heaviest pages.
+
 --axe PATH runs axe-core (its axe.min.js, e.g. from npm) on every page and warns about
 serious and critical violations without failing: the count per page is printed with the
 rule id and the first element, so the next accessibility regression is visible in the CI
@@ -195,6 +200,7 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--small-fail", action="store_true", help=f"count SVG text under {MIN_TEXT} px as a failure")
     ap.add_argument("--local-cdn", action="store_true",
                     help="--offline with the CDN copies of .cache/cdn (tools/dev_setup.sh), axe-core included")
+    ap.add_argument("--weight-warn", type=int, default=400, metavar="KB", help="warn about a page whose HTML is heavier than this (400)")
     args = ap.parse_args(argv)
     if args.local_cdn:
         args.offline = True
@@ -215,7 +221,8 @@ def main(argv: list[str]) -> int:
     shots.mkdir(parents=True, exist_ok=True)
     server, base = serve(site)
 
-    failures = warned = axe_pages = small_pages = 0
+    failures = warned = axe_pages = small_pages = heavy = 0
+    weights: list[tuple[float, str]] = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
         ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1, service_workers="block",
@@ -227,7 +234,9 @@ def main(argv: list[str]) -> int:
             url = base + rel[: -len("index.html")]
             page = ctx.new_page()
             errors: list[str] = []
+            fetched: list[int] = []
             page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
+            page.on("response", lambda r, fetched=fetched: fetched.append(int(r.headers.get("content-length") or 0)))
             try:
                 page.goto(url, wait_until="networkidle", timeout=60_000)
             except Exception as e:   # a CDN that never answers: check what has loaded
@@ -251,7 +260,13 @@ def main(argv: list[str]) -> int:
             bad = info["scrollWidth"] > WIDTH + 1 or errors or covered or (args.axe_fail and axe) or (args.small_fail and small_text)
             failures += bool(bad)
             status = "FAIL" if bad else "ok"
-            print(f"{status:4}  {rel[: -len('index.html')] or '/'}  width {info['scrollWidth']}")
+            html_kb = (site / rel).stat().st_size / 1024
+            weights.append((html_kb, rel[: -len("/index.html")] or "/"))
+            print(f"{status:4}  {rel[: -len('index.html')] or '/'}  width {info['scrollWidth']}  "
+                  f"{html_kb:.0f} KB html, {sum(fetched) / 1024:.0f} KB in {len(fetched)} requests")
+            if html_kb > args.weight_warn:
+                heavy += 1
+                print(f"        warn heavy page: {html_kb:.0f} KB of HTML, over {args.weight_warn} KB")
             if info["scrollWidth"] > WIDTH + 1:
                 for w in info["wide"] or ["(no single element found; check the screenshot)"]:
                     print(f"        too wide: {w}")
@@ -271,8 +286,10 @@ def main(argv: list[str]) -> int:
             axe_pages += bool(axe)
         browser.close()
     server.shutdown()
+    heaviest = ", ".join(f"{name} ({kb:.0f} KB)" for kb, name in sorted(weights, reverse=True)[:3])
     print(f"{len(pages)} pages checked at {WIDTH} px ({args.scheme}), {failures} with problems, "
-          f"{warned} with wide math warnings, {small_pages} with text under {MIN_TEXT} px, {axe_pages} with axe violations; screenshots in {shots}")
+          f"{warned} with wide math warnings, {small_pages} with text under {MIN_TEXT} px, {axe_pages} with axe violations, "
+          f"{heavy} over {args.weight_warn} KB of HTML (the heaviest: {heaviest}); screenshots in {shots}")
     return 1 if failures else 0
 
 

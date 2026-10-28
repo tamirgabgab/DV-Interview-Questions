@@ -76,6 +76,24 @@ def test_explorer_scripts_per_page():
         raise AssertionError("an unknown kind must fail the build")
 
 
+def test_wavedrom_only_where_drawn():
+    page = '<p>x</p><pre class="wavedrom">{signal: []}</pre>'
+    tags = re.findall(r'src="([^"]+)"', hook.wavedrom_scripts(page, "questions/junior/0034-x/"))
+    assert tags == [*hook.WAVEDROM_CDN, "../../../javascripts/wavedrom-init.js"]
+    assert hook.wavedrom_scripts("<p>no diagram</p>", "questions/junior/0034-x/") == ""
+
+
+def test_one_stylesheet_link():
+    head = ('<link rel="stylesheet" href="../../assets/stylesheets/main.css">\n'
+            '<link rel="stylesheet" href="../../stylesheets/01-base.css">\n'
+            '<link rel="stylesheet" href="../../stylesheets/02-pages.css">\n'
+            '<link rel="stylesheet" href="../../stylesheets/12-rounds-y-s.css">\n<script></script>')
+    out = hook.one_stylesheet(head)
+    assert out == ('<link rel="stylesheet" href="../../assets/stylesheets/main.css">\n'
+                   '<link rel="stylesheet" href="../../stylesheets/site.css">\n<script></script>')
+    assert hook.one_stylesheet("<p>no links</p>") == "<p>no links</p>"
+
+
 def test_cost_chips():
     md = "??? success \"x\"\n    !!! answer \"y\"\n        z\n\n    <!-- cost: זמן \\( O(n) \\) | פלופים 2 -->\n"
     out = hook.COST_LINE.sub(hook._cost_chips, md)

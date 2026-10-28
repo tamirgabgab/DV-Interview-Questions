@@ -88,6 +88,8 @@ DV-Interview-Questions/
 │   ├── lint_pages.py           # Checks the page skeleton and the RTL rules
 │   ├── check_links.py          # Internal link / anchor check of the built site (--external fetches the rest)
 │   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors, axe-core)
+│   ├── check_404.py            # The 404 page under the site's path, at both widths
+│   ├── check_keyboard.py       # A keyboard pass: tab order, focus rings, names, the components' keys
 │   ├── check_explorers.py      # Every explorer box: each button clicked, its link and remembered state
 │   ├── check_jumps.py          # Every explorer box stepped: no figure moves while it steps
 │   ├── check_contrast.py       # The site's colour pairs in both schemes against WCAG 2
@@ -593,6 +595,8 @@ python tools/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-
 python tools/check_explorers.py       # every explorer box clicked through, its link and remembered state
 python tools/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
 python tools/check_contrast.py        # every colour pair, light and dark (--all prints the passes)
+python tools/check_404.py             # the 404 page as GitHub Pages serves it, at 390 and 1200 px
+python tools/check_keyboard.py        # a keyboard pass over a few pages: tab order, focus, names, the components' keys
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```
 
@@ -660,6 +664,33 @@ navy header and message, navy on amber buttons, figure text, chart marks, the fo
 compositing translucent colours over the page: text needs 4.5:1, marks 3:1. It runs in the
 test job of CI, so a colour that reads badly stops the deploy. A new pair goes into
 `PAIRS`.
+
+`check_phone.py` also prints every page's weight (the HTML in KB, the bytes the browser
+fetched and the requests) and warns over `--weight-warn` KB of HTML (400); its summary names
+the three heaviest pages. What keeps the pages light (S423): the twelve stylesheet parts of
+`extra_css` reach the browser as one file, `stylesheets/site.css`, that the hook joins at the
+end of the build (the pages and the 404 page link it; edit the parts, never the joined file),
+and WaveDrom with its init script load only on the pages that have a ```` ```wavedrom ````
+block (the hook adds the tags, like the explorer scripts). The explorer scripts load per
+page as well, and CodeMirror and Pyodide only when a run panel is opened.
+
+`check_404.py` serves the built site under the path of `site_url` (`/DV-Interview-Questions/`),
+answers every missing address with `404.html` and the status 404 as GitHub Pages does, and
+opens a missing page, an address with a question's id and one with its slug, at 390 and at
+1200 px: the custom page must answer with its styles and scripts loaded, no sideways scroll
+and no script error, the guess must name the right question, the level links must stay
+under the path, "שאלה אקראית" must open a question and "חיפוש באתר" must focus the search;
+`--axe` (or `--local-cdn`) runs axe-core on it too.
+
+`check_keyboard.py` walks a few pages (the home page, the all-questions table, the tags
+page, a study path and question 0060) with Tab at 1200 px: every stop must be visible, every
+interactive stop must have a name and a focus ring while `:focus-visible`, the first stop
+must be the skip link and the walk must end; the theme's header, drawer, search and footer
+are walked but not judged. On the question page it presses the keys of the components:
+Enter on a hint and on a fold, the arrows in a box, Enter and Escape on the enlarge button
+and the lightbox, Enter in a self-check field and on "▶ להרצה", and "/" for the search. A
+new keyboard behaviour of a component belongs there. MathJax's contextual menu is off
+(`docs/javascripts/mathjax.js`): with it every formula was a tab stop.
 
 `check_phone.py` needs Playwright (`requirements-dev.txt`) and its Chromium
 (`python -m playwright install chromium`). It writes a screenshot of each page to

@@ -1285,12 +1285,36 @@ section below starts at session 22, whose numbered items run on through the late
     `longest_same`, `tags_needed` / `pools`). Two contrast pairs for the chips. Not yet
     on the older boxes: the owner wants to see it on the two pages first.
 
+84. **Round S5, speed and access (session 28, 2026-10-28).** The owner's picks: loading by
+    need and a weight report, a fixed check of the 404 page, and a scripted keyboard pass
+    that stays as a check.
+    - **S423 :** WaveDrom and its init script load only on the five pages with a
+      ```` ```wavedrom ```` block (the hook adds the tags, as it adds the explorer scripts);
+      the twelve stylesheet parts reach the browser as one `stylesheets/site.css` that the
+      hook joins at the end of the build and links from every page and the 404 page (12
+      requests become 1; the parts stay the source). The phone check prints every page's
+      weight (HTML KB, bytes fetched, requests), warns over 400 KB of HTML and names the three
+      heaviest pages. The heaviest stay as they were: 0016 (378 KB, 230 KB of them its SVG
+      figures), 0025, 0023, 0024 (the reference-model code and tables); the owner chose not
+      to trim them.
+    - **S424 :** `tools/check_404.py` serves the site under `/DV-Interview-Questions/` and
+      answers a missing address with 404.html as Pages does; six views (three addresses at
+      390 and 1200 px) check the page, its assets, the guess, the level links, the random
+      question, the search button and axe. All clean on the first run.
+    - **S425 :** `tools/check_keyboard.py` walks five pages with Tab (visible stops, names,
+      focus rings, the skip link first, no trap) and presses the keys of the components on
+      0060. Findings: the trap and lightbox reports of the first run were the check's own
+      mistakes (same-looking elements counted as repeats; the lightbox stays in the DOM when
+      closed); the one real finding was MathJax's contextual menu, which made every formula
+      a tab stop (hundreds on a math-heavy page), now off in `mathjax.js` (the assistive
+      MathML stays). Both checks run in the CI build job. CLAUDE.md lists ten checks now.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83, session 28) on the branch; S5 is the one S round left.
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84, session 28) on the branch, the last S round.
   60 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
@@ -1584,9 +1608,9 @@ continue at 411.
 
 | # | Finding | Proposal | Size |
 |---|---|---|---|
-| S423 | the heaviest pages are 0016 (396 KB of HTML), 0025 (312 KB), 0023, 0024 (248 KB each) | find what makes them heavy (inline SVG repeated in tabs, long tables) and trim it; a page-weight line in the phone check | M |
-| S424 | the 404 page cannot be checked locally (its assets point at the site path) and was never looked at | a check of the live 404 at both widths, and a local check that serves the site under its path | S |
-| S425 | keyboard and screen-reader paths were checked by axe only | one manual pass: tab order on a question, the folds, the boxes, the run panel and the search | M |
+| S423 (done as loading by need and a weight report, item 84) | the heaviest pages are 0016 (396 KB of HTML), 0025 (312 KB), 0023, 0024 (248 KB each) | find what makes them heavy (inline SVG repeated in tabs, long tables) and trim it; a page-weight line in the phone check | M |
+| S424 (done, item 84) | the 404 page cannot be checked locally (its assets point at the site path) and was never looked at | a check of the live 404 at both widths, and a local check that serves the site under its path | S |
+| S425 (done as a check, item 84) | keyboard and screen-reader paths were checked by axe only | one manual pass: tab order on a question, the folds, the boxes, the run panel and the search | M |
 
 **Round S6 — the code behind the site**
 

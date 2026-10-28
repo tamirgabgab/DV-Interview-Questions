@@ -76,6 +76,8 @@ python tools/check_phone.py           # every page at 390 px (add --local-cdn in
 python tools/check_explorers.py       # every explorer box: buttons clicked, link and saved state
 python tools/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
 python tools/check_contrast.py        # the site's colour pairs, light and dark (WCAG 2)
+python tools/check_404.py             # the 404 page under the site's path, both widths
+python tools/check_keyboard.py        # a keyboard pass: tab order, focus rings, names, the components' keys
 ```
 
 The linter checks RTL at every paragraph start (indented blocks and the steps timeline
@@ -83,10 +85,12 @@ included) and warns about literal SVG colours; the phone check also warns about 
 math wider than its column (split it with `aligned`), and fails when the enlarge button of a
 figure covers SVG text (reading-tools.js moves it above such a figure). In CI it also fails
 on figure text under 9 px at 390 px and on serious axe findings (`--small-fail --axe-fail`). `--scheme dark` runs the phone check
-in dark mode; CI runs it only on a manual run with `phone_dark`. Node runs the explorer
+in dark mode; CI runs it only on a manual run with `phone_dark`. Every page's line of the
+phone check also gives its weight (HTML KB, bytes fetched, requests); over 400 KB of HTML is
+a warning. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
-All eight run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
+All ten run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
 CATALOG, HANDOFF, its archive or this file runs nothing, and `main` skips the checks for a commit that
 already passed on its branch); a failure blocks the deploy. A new colour pair (a text
 or a mark on a fill) goes into the `PAIRS` list of `tools/check_contrast.py`. Verilator

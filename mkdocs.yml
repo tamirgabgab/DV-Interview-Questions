@@ -110,7 +110,8 @@ exclude_docs: |   # notes for whoever edits the site, not pages; Python's cache 
   stylesheets/README.md
   __pycache__/
 
-extra_css:   # the site's styles in parts, loaded in this order (see docs/stylesheets/README.md)
+extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/README.md); the hook
+             # joins them into stylesheets/site.css at build time, and the pages load that one file
   - stylesheets/01-base.css
   - stylesheets/02-pages.css
   - stylesheets/03-runner-figures.css
@@ -127,9 +128,8 @@ extra_css:   # the site's styles in parts, loaded in this order (see docs/styles
 extra_javascript:
   - javascripts/mathjax.js
   - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
-  - https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/skins/default.js
-  - https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/wavedrom.min.js
-  - javascripts/wavedrom-init.js
+  # WaveDrom and its init script are added by hooks/questions.py to the pages that have a
+  # ```wavedrom block only (S423).
   - javascripts/marks.js
   - javascripts/question-filter.js
   - javascripts/question-tools.js
