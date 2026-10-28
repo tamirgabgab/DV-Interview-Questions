@@ -495,7 +495,7 @@
    ],
    "related": [
     {
-     "id": "0057",
+     "id": "0058",
      "explicit": false,
      "why": "both rely on x XOR x = 0 to cancel values without extra storage"
     }
@@ -1326,7 +1326,7 @@
    ],
    "related": [
     {
-     "id": "0058",
+     "id": "0059",
      "explicit": false,
      "why": "both fill an O(n^2)-or-better DP table over sub-regions"
     }
@@ -1491,7 +1491,7 @@
    ],
    "related": []
   },
-  "0056": {
+  "0057": {
    "core": [
     "symmetry_argument",
     "invariant",
@@ -1506,7 +1506,7 @@
    ],
    "related": []
   },
-  "0057": {
+  "0058": {
    "core": [
     "xor_trick",
     "bit_manipulation",
@@ -1528,7 +1528,7 @@
     }
    ]
   },
-  "0058": {
+  "0059": {
    "core": [
     "dynamic_programming",
     "game_theory_minimax",
@@ -1549,7 +1549,7 @@
     }
    ]
   },
-  "0059": {
+  "0060": {
    "core": [
     "bit_manipulation",
     "popcount",
@@ -1564,7 +1564,7 @@
    ],
    "related": []
   },
-  "0060": {
+  "0061": {
    "core": [
     "sliding_window",
     "two_pointers",
@@ -1588,7 +1588,7 @@
     }
    ]
   },
-  "0061": {
+  "0062": {
    "core": [
     "sweep_line",
     "sorting",

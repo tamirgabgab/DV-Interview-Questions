@@ -1,5 +1,5 @@
 ---
-id: 57
+id: 58
 title: ה-tag שלא חזר – XOR, חלוקה לפי ביט וסכומי חזקות
 level: senior
 difficulty: hard

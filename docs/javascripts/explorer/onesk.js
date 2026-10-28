@@ -1,5 +1,5 @@
 // kinds: onesk
-//   onesk                  0060        a vector of bits (or letters on a bus) and k: the sliding window step by step, the right end one cell per step, the zeros (or the cells that are not the most frequent value) counted, the left end moved when they are more than k, the best window so far outlined and the answer at the end
+//   onesk                  0061        a vector of bits (or letters on a bus) and k: the sliding window step by step, the right end one cell per step, the zeros (or the cells that are not the most frequent value) counted, the left end moved when they are more than k, the best window so far outlined and the answer at the end
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.

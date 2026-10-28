@@ -49,6 +49,16 @@ copyright: >
 
 extra:
   generator: false
+  # Questions moved to a new number: the 404 page sends an old address to the new one (the
+  # same level and slug, the new id), and docs/javascripts/marks.js moves the marks saved in
+  # the browser once (keep its RENUMBERED list in step with this one).
+  dvq_renumbered:
+    "0056": "0057"
+    "0057": "0058"
+    "0058": "0059"
+    "0059": "0060"
+    "0060": "0061"
+    "0061": "0062"
   # Comments per question through GitHub Discussions (giscus). Empty ids keep the section
   # off; CONTRIBUTING.md ("Comments") says how to fill them in once Discussions is enabled.
   comments:

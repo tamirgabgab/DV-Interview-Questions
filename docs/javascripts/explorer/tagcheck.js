@@ -1,12 +1,12 @@
 // kinds: tagcheck
-//   tagcheck               0057        n tags sent, the responses back in a seeded order with tags dropped or doubled (a click on a tag, or a preset); the accumulators (XOR, XOR per bit, sum, sum of squares, the count out) updated response by response; at the end what each method finds and where it is wrong; a quiz that hides the fault
+//   tagcheck               0058        n tags sent, the responses back in a seeded order with tags dropped or doubled (a click on a tag, or a preset); the accumulators (XOR, XOR per bit, sum, sum of squares, the count out) updated response by response; at the end what each method finds and where it is wrong; a quiz that hides the fault
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
   const { answer, autoplay, code, ltr, seedControls, speedSel } = dvqExplorers.lib;
 
-  // Missing tags (0057): the accumulators of every tag sent and returned, and what each
+  // Missing tags (0058): the accumulators of every tag sent and returned, and what each
   // method of the page reads from them: XOR (one missing), the split on the lowest bit of
   // x (two missing), the sums (one missing, one twice), the power sums with k = the count
   // still out (Newton's identities, the roots among 0..n-1).

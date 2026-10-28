@@ -1,5 +1,5 @@
 // kinds: tagpool
-//   tagpool                0061        transactions as bars over time (typed as "0-30 5-10", or "R0-10 W20-30" for reads and writes) and the sweep over their events step by step: the open count after each event as a step line under the bars, the maximum so far, and with two pools the counters of the reads, the writes and the shared pool
+//   tagpool                0062        transactions as bars over time (typed as "0-30 5-10", or "R0-10 W20-30" for reads and writes) and the sweep over their events step by step: the open count after each event as a step line under the bars, the maximum so far, and with two pools the counters of the reads, the writes and the shared pool
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -16,7 +16,7 @@
 
   // The sorted events of the transactions (a response before a send at one time, then the
   // reads before the writes, then the list order) with the counters after each, as
-  // tools/figures/q0061.py sweep(): the open reads, the open writes, their total and the
+  // tools/figures/q0062.py sweep(): the open reads, the open writes, their total and the
   // maxima so far. A transaction is [send, response, kind], the kind "R" or "W".
   const tpSweep = (txns) => {
     const ev = [];

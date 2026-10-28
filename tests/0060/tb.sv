@@ -1,64 +1,51 @@
-// Question 0060: the page's longest_ones and longest_same against every window, on the
-// page's examples and the self-checks, and on random vectors and bus strings of up to 14
-// cells with k up to 4.
+// Question 0060: the page's next_same / prev_same against a search number by number (every
+// number of 10 bits, and random 32-bit numbers), next_zeros / prev_zeros against a search
+// over lengths; the page's numbers (99, 80, 143).
 module tb;
-  //@page function automatic int longest_ones
-  //@page function automatic int longest_same
+  //@page function automatic logic [31:0] next_same
+  //@page function automatic logic [31:0] prev_same
+  //@page function automatic logic [31:0] next_zeros
 
   int errors = 0;
 
-  // every window: the longest with at most k zeros
-  function automatic int brute_ones(bit bits[], int k);
-    int best = 0, zeros;
-    for (int i = 0; i < bits.size(); i++) begin
-      zeros = 0;
-      for (int j = i; j < bits.size(); j++) begin
-        if (!bits[j]) zeros++;
-        if (zeros <= k && j - i + 1 > best) best = j - i + 1;
-      end
-    end
-    return best;
+  function automatic logic [31:0] search_next(logic [31:0] x, int w);
+    for (longint y = longint'(x) + 1; y < (64'd1 << w); y++)
+      if ($countones(32'(y)) == $countones(x)) return 32'(y);
+    return '0;
   endfunction
 
-  // every window: the longest whose length minus its most frequent value is at most k
-  function automatic int brute_same(string s, int k);
-    int best = 0, cnt[byte], most;
-    for (int i = 0; i < s.len(); i++) begin
-      cnt.delete();
-      for (int j = i; j < s.len(); j++) begin
-        cnt[s[j]]++;
-        most = 0;
-        foreach (cnt[c]) if (cnt[c] > most) most = cnt[c];
-        if (j - i + 1 - most <= k && j - i + 1 > best) best = j - i + 1;
-      end
-    end
-    return best;
+  function automatic int zeros_of(longint unsigned v);
+    int L = 0;
+    for (int p = 0; p < 64; p++) if (v[p]) L = p + 1;
+    return L - $countones(v);
   endfunction
 
   initial begin
-    bit bits[];
-    string s;
-    int n;
-    bits = '{1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0};
-    if (longest_ones(bits, 2) != 6) begin errors++; $display("page example: %0d", longest_ones(bits, 2)); end
-    if (longest_ones(bits, 0) != 4 || longest_ones(bits, 3) != 10 || longest_ones(bits, 11) != 11) begin errors++; $display("k = 0, 3, 11"); end
-    bits = '{1, 0, 1, 1, 0, 1, 0, 1, 1, 1};
-    if (longest_ones(bits, 1) != 5) begin errors++; $display("self-check a: %0d", longest_ones(bits, 1)); end
-    if (longest_same("AAABBCBABA", 2) != 6) begin errors++; $display("bus example: %0d", longest_same("AAABBCBABA", 2)); end
-    if (longest_same("AAABBCBABA", 0) != 3 || longest_same("AAABBCBABA", 1) != 4) begin errors++; $display("bus k = 0, 1"); end
-    if (longest_same("ABAACAAB", 2) != 7 || longest_same("ABAACAAB", 1) != 5) begin errors++; $display("self-check b"); end
-    bits = new[0];
-    if (longest_ones(bits, 1) != 0 || longest_same("", 1) != 0) begin errors++; $display("empty"); end
-    for (int r = 0; r < 300; r++) begin
-      n = $urandom_range(0, 14);
-      bits = new[n];
-      foreach (bits[i]) bits[i] = ($urandom_range(0, 9) < 6);
-      s = "";
-      for (int i = 0; i < n; i++) s = {s, $sformatf("%c", "A" + $urandom_range(0, 2))};
-      for (int k = 0; k <= 4; k++) begin
-        if (longest_ones(bits, k) != brute_ones(bits, k)) begin errors++; $display("run %0d k %0d: %0d vs %0d", r, k, longest_ones(bits, k), brute_ones(bits, k)); end
-        if (longest_same(s, k) != brute_same(s, k)) begin errors++; $display("bus run %0d k %0d (%s): %0d vs %0d", r, k, s, longest_same(s, k), brute_same(s, k)); end
-      end
+    logic [31:0] x, y, z;
+    longint unsigned v2, want;
+    if (next_same(92) != 99 || prev_same(96) != 80 || next_zeros(120) != 143 || prev_zeros(143) != 120) begin
+      errors++; $display("page numbers: %0d %0d %0d", next_same(92), prev_same(96), next_zeros(120));
+    end
+    if (next_same(0) != 0 || prev_same(0) != 0 || next_same(32'hF000_0000) != 0) begin errors++; $display("edges"); end
+    // every number of 10 bits: next is the search, prev inverts it; the zeros by a search
+    for (int v = 1; v < 1024; v++) begin
+      x = 32'(v);
+      z = search_next(x, 10);
+      y = next_same(x);
+      if (z != 0 && y != z) begin errors++; $display("next %0d: %0d vs %0d", v, y, z); end
+      if (z != 0 && prev_same(z) != x) begin errors++; $display("prev %0d", z); end
+      want = 0;
+      for (v2 = longint'(v) + 1; want == 0; v2++) if (zeros_of(v2) == zeros_of(v)) want = v2;
+      if (next_zeros(x) != 32'(want)) begin errors++; $display("next_zeros %0d: %0d vs %0d", v, next_zeros(x), want); end
+      want = 0;
+      for (v2 = longint'(v) - 1; v2 > 0 && want == 0; v2--) if (zeros_of(v2) == zeros_of(v)) want = v2;
+      if (prev_zeros(x) != 32'(want)) begin errors++; $display("prev_zeros %0d: %0d vs %0d", v, prev_zeros(x), want); end
+    end
+    // random 32-bit numbers: a neighbour with as many ones, and back
+    for (int r = 0; r < 2000; r++) begin
+      x = $urandom;
+      y = next_same(x);
+      if (y != 0 && (y <= x || $countones(y) != $countones(x) || prev_same(y) != x)) begin errors++; $display("rand %h -> %h", x, y); end
     end
     if (errors == 0) $display("PASS"); else $display("FAIL: %0d errors", errors);
     $finish;

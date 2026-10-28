@@ -12,7 +12,8 @@ slug, at 390 and at 1200 px, and fails when: the answer is not the custom page, 
 script of the page (its own, not the theme's repository facts) did not load, a script threw, the page scrolls sideways, the guess
 ("אולי חיפשת את שאלה 0046") is missing or points elsewhere, the level links point outside
 the site's path, "שאלה אקראית" does not open a question, or "חיפוש באתר" does not focus the
-search. --axe PATH (or --local-cdn) runs axe-core on the page as check_phone.py does;
+search; and an old address of a renumbered question (dvq_renumbered in mkdocs.yml) must
+go to its new page. --axe PATH (or --local-cdn) runs axe-core on the page as check_phone.py does;
 --offline, --route and --browser are the phone check's.
 """
 
@@ -107,6 +108,8 @@ def main(argv: list[str]) -> int:
         print(f"question {GUESS_ID} is not on the all-questions page")
         return 1
     slug = guess_path.split("/")[2][5:]
+    m = re.search(r"^  dvq_renumbered:\n((?:    \"\d{4}\": \"\d{4}\"\n)+)", (ROOT / "mkdocs.yml").read_text(encoding="utf-8"), re.M)
+    renumbered = dict(re.findall(r'"(\d{4})": "(\d{4})"', m.group(1))) if m else {}
     cases = [("a missing page", f"{prefix}no-such-page/", None),
              ("a missing address with an id", f"{prefix}questions/{GUESS_ID}/", guess_path),
              ("a missing address with a slug", f"{prefix}questions/senior/{slug}/", guess_path)]
@@ -177,6 +180,24 @@ def main(argv: list[str]) -> int:
                 for f in found:
                     print(f"        {f}")
                 page.close()
+            # a question moved to a new number (dvq_renumbered in mkdocs.yml): its old address
+            # goes straight to the new page, with the anchor
+            for old_id, new_id in renumbered.items():
+                new_path = questions.get(new_id)
+                if not new_path:
+                    continue
+                level, slug = new_path.split("/")[1], new_path.split("/")[2][5:]
+                page = ctx.new_page()
+                old = f"{prefix}questions/{level}/{old_id}-{slug}/#x"
+                try:
+                    page.goto(origin + old, wait_until="networkidle", timeout=60_000)
+                    page.wait_for_url(re.compile(re.escape(origin + prefix + new_path) + "#x$"), timeout=10_000)
+                    print(f"ok    a renumbered question at {width} px  {old} -> {new_path}")
+                except Exception:
+                    problems += 1
+                    print(f"FAIL  a renumbered question at {width} px  {old}: at {page.url}, not {new_path}")
+                page.close()
+                break                                # one moved question is enough
             ctx.close()
         browser.close()
     server.shutdown()

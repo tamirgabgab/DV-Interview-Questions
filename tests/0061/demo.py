@@ -1,7 +1,9 @@
-# How many tags the transactions need, with one pool and with two
+# The longest run of ones with up to k zeros flipped, and the longest window of one value
 from solution import *  # noqa: F401,F403
 
-print("one pool:", tags_needed([(0, 30), (5, 10), (15, 20)]))  # 2
-print("a response and a send at 10:", tags_needed([(0, 10), (10, 20)]))  # 1
-print("peaks apart (reads, writes, shared):", pools([(0, 10, "R"), (2, 12, "R"), (20, 30, "W"), (22, 32, "W")]))  # (2, 2, 2)
-print("peaks together:", pools([(0, 10, "R"), (2, 12, "R"), (3, 13, "W"), (5, 15, "W")]))  # (2, 2, 4)
+bits = [1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0]
+print("k = 2:", longest_ones(bits, 2))  # 6
+print("k = 0:", longest_ones(bits, 0))  # 4
+print("k = 3:", longest_ones(bits, 3))  # 10
+print("bus AAABBCBABA, k = 2:", longest_same("AAABBCBABA", 2))  # 6
+print("bus ABAACAAB, k = 1:", longest_same("ABAACAAB", 1))  # 5

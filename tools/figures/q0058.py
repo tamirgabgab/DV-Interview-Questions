@@ -1,142 +1,113 @@
 #!/usr/bin/env python3
-"""Figures and tables of question 0058 (coins in a row, each player takes an end: the
-parity trick, the greedy player that loses, the optimal play by intervals, how much the
-trick gives away, and an odd number of coins).
+"""Figures and tables of question 0058 (the tags that did not come back: one missing by
+XOR, two missing by a split on a bit, one missing and one duplicated by sums, k missing
+by power sums).
 
     python tools/figures/fill.py 58        # put the blocks on the page
 
-The reference here is independent of the page code: best() is a plain minimax over the
-remaining interval (memoized), and play() runs two strategies against each other move by
-move. blocks() returns, in page order: the row of part a coloured by the parity of the
-place, its legend, the moves of the greedy player against the optimal one and of the
-parity trick, the table of the interval values of part c, and the moves of the trick
-against the optimal play on the row of part d.
+The reference here is independent of the page code: the missing and duplicated tags are
+found by counting (a multiset difference), and the accumulators are written from their
+definitions. blocks() returns, in page order: the running XOR of part a's example, the
+split table of part b, the sums of part c, and the memory of each method for 8-bit tags.
+tests/0058 checks the page code against these.
 """
 
-from functools import lru_cache
+from collections import Counter
 
 RLM = "‏"
-ROW_A = [1, 2, 5, 3]
-ROW_D = [1, 1, 9, 1, 1, 9]
-ROW_E = [1, 5, 1]
+
+# part a: tags 0..7, tag 4 never comes back
+A_SENT = list(range(8))
+A_RET = [3, 0, 6, 1, 7, 2, 5]
+# part b: tags 0..15, tags 5 and 12 never come back
+B_N, B_W, B_MISS = 16, 4, (5, 12)
+# part c: tags 0..9, tag 7 missing and tag 3 twice
+C_N, C_MISS, C_DUP = 10, 7, 3
 
 
-def best(coins):
-    """The most the player to move collects from the whole row, both sides playing their best."""
-    c = tuple(coins)
-
-    @lru_cache(maxsize=None)
-    def gain(i, j):                       # the most the mover collects on c[i..j]
-        if i > j:
-            return 0
-        rest = sum(c[i:j + 1])
-        return max(c[i] + (rest - c[i]) - gain(i + 1, j), c[j] + (rest - c[j]) - gain(i, j - 1))
-    return gain(0, len(c) - 1)
+def truth(sent, returned):
+    """(the tags missing, the tags returned too often), by counting."""
+    c = Counter(sent)
+    c.subtract(returned)
+    return sorted(t for t, v in c.items() if v > 0), sorted(t for t, v in c.items() if v < 0)
 
 
-def diff_table(coins):
-    """d[i][j]: the mover's best lead (own minus the other's) on coins i..j, by minimax."""
-    n = len(coins)
-    return [[(2 * best(coins[i:j + 1]) - sum(coins[i:j + 1])) if j >= i else None for j in range(n)] for i in range(n)]
+def accumulators(sent, returned, width):
+    """The checker's registers: the XOR of all, the XOR per bit, the sum and the sum of
+    squares of sent minus returned, and the count still out."""
+    x, part = 0, [0] * width
+    for t in sent + returned:
+        x ^= t
+        for j in range(width):
+            if t >> j & 1:
+                part[j] ^= t
+    s = sum(sent) - sum(returned)
+    q = sum(t * t for t in sent) - sum(t * t for t in returned)
+    return x, part, s, q, len(sent) - len(returned)
 
 
-# --- strategies: (coins, i, j, state) -> "L" or "R" ------------------------------------------
-
-def greedy(c, i, j, st):
-    return "L" if c[i] >= c[j] else "R"
-
-
-def optimal(c, i, j, st):
-    """The move that keeps the most, left on a tie."""
-    left = c[i] + sum(c[i + 1:j + 1]) - best(c[i + 1:j + 1])
-    right = c[j] + sum(c[i:j]) - best(c[i:j])
-    return "L" if left >= right else "R"
-
-
-def parity(c, i, j, st):
-    """The parity trick: on the first even row this player sees, fix the parity of the places
-    that sum more (0, 2, 4, ... or 1, 3, 5, ...) and always take the end of that parity; on
-    an odd row the two ends share a parity, so take the larger end."""
-    if (j - i + 1) % 2:
-        return greedy(c, i, j, st)
-    if "want" not in st:
-        st["want"] = 0 if sum(c[k] for k in range(i, j + 1) if k % 2 == 0) >= sum(c[k] for k in range(i, j + 1) if k % 2 == 1) else 1
-    return "L" if i % 2 == st["want"] else "R"
-
-
-STRATS = {"greedy": greedy, "parity": parity, "optimal": optimal}
-
-
-def play(coins, first, second):
-    """Run two strategies; returns the moves as (player, side, coin) and the two totals."""
-    i, j, tot, moves, states = 0, len(coins) - 1, [0, 0], [], [{}, {}]
-    who = 0
-    while i <= j:
-        side = STRATS[(first, second)[who]](coins, i, j, states[who])
-        coin = coins[i] if side == "L" else coins[j]
-        if side == "L":
-            i += 1
-        else:
-            j -= 1
-        tot[who] += coin
-        moves.append((who, side, coin))
-        who ^= 1
-    return moves, tot
+def bits(v, w):
+    return format(v, f"0{w}b")
 
 
 # --- blocks ------------------------------------------------------------------------------
 
-def row_svg(coins):
-    """The row of part a: each coin by the parity of its place."""
-    W, R, gap = 400, 26, 70
-    x0 = W / 2 - gap * (len(coins) - 1) / 2
-    s = (f'<svg class="figure cr-fig" viewBox="0 0 {W} 110" style="max-width:26rem" role="img" '
-         f'aria-label="השורה {", ".join(map(str, coins))} : המקומות הזוגיים בצבע אחד והאי-זוגיים בצבע אחר">')
-    for k, v in enumerate(coins):
-        x = x0 + k * gap
-        s += (f'<g class="cr-coin cr-p{k % 2}"><title>place {k + 1}, value {v}</title><circle cx="{x:g}" cy="50" r="{R}"/>'
-              f'<text x="{x:g}" y="57" text-anchor="middle">{v}</text></g>'
-              f'<text class="tick" x="{x:g}" y="100" text-anchor="middle">{k + 1}</text>')
-    return s + "</svg>"
-
-
-def legend():
-    return ('<span class="viz-legend"><span><i class="cr-key-p0"></i>מקום אי-זוגי (1, 3, ...)</span>'
-            '<span><i class="cr-key-p1"></i>מקום זוגי (2, 4, ...)</span></span>')
-
-
-def moves_table(coins, pairs):
-    """The moves of two games side by side on the same row."""
-    side = {"L": "שמאל", "R": "ימין"}
-    name = {"greedy": "חמדן", "parity": "זוגיות", "optimal": "אופטימלי"}
-    games = [play(coins, a, b) for a, b in pairs]
-    head = " | ".join(f"{name[a]} מול {name[b]}" for a, b in pairs)
-    rows = [f"| המהלך | {head} |", "|:-:|" + ":-:|" * len(pairs)]
-    for k in range(len(coins)):
-        cells = []
-        for moves, _ in games:
-            who, sd, coin = moves[k]
-            cells.append(f"{'הראשון' if who == 0 else 'השני'} : {side[sd]}, {RLM}{coin}")
-        rows.append(f"| {RLM}{k + 1} | " + " | ".join(cells) + " |")
-    rows.append("| **סך הכול** | " + " | ".join(f"**{RLM}{t[0]} מול {t[1]}**" for _, t in games) + " |")
+def xor_table():
+    rows = ["| הצעד | ה-tag | בבינארי | ה-XOR עד עכשיו |", "|:-:|:-:|:-:|:-:|"]
+    acc = 0
+    for t in A_SENT:
+        acc ^= t
+    rows.append(f"| נשלחו 0 עד 7 | | | {RLM}`{bits(acc, 3)}` = {RLM}{acc} |")
+    for k, t in enumerate(A_RET, 1):
+        acc ^= t
+        rows.append(f"| {RLM}{k} | {RLM}{t} | {RLM}`{bits(t, 3)}` | {RLM}`{bits(acc, 3)}` = {RLM}{acc} |")
     return "\n".join(rows)
 
 
-def dp_table(coins):
-    d = diff_table(coins)
-    n = len(coins)
-    rows = ["| ‏i \\\\ j | " + " | ".join(f"{RLM}{j + 1} ({coins[j]})" for j in range(n)) + " |", "|:-:|" + ":-:|" * n]
-    for i in range(n):
-        rows.append(f"| {RLM}{i + 1} ({coins[i]}) | " + " | ".join("" if d[i][j] is None else f"{RLM}{d[i][j]}" for j in range(n)) + " |")
+def split_table():
+    sent = list(range(B_N))
+    ret = [t for t in sent if t not in B_MISS]
+    x, part, _, _, _ = accumulators(sent, ret, B_W)
+    rows = ["| הביט j | ה-tags החסרים שהביט j שלהם 1 | ‏`part[j]` | ‏`x` בביט j |", "|:-:|:-:|:-:|:-:|"]
+    for j in range(B_W):
+        has = [t for t in B_MISS if t >> j & 1]
+        rows.append(f"| {RLM}{j} | {RLM}{', '.join(map(str, has)) or '—'} | {RLM}`{bits(part[j], B_W)}` = {RLM}{part[j]} | {RLM}{x >> j & 1} |")
+    return "\n".join(rows)
+
+
+def sums_table():
+    sent = list(range(C_N))
+    ret = [t for t in sent if t != C_MISS] + [C_DUP]
+    _, _, s, q, out = accumulators(sent, ret, 4)
+    rows = ["| המצבר | נשלחו | חזרו | ההפרש | מה זה |", "|:-:|:-:|:-:|:-:|---|"]
+    rows.append(f"| ‏`s` : סכום | {RLM}{sum(sent)} | {RLM}{sum(ret)} | {RLM}{s} | ‏\\( a - d \\) |")
+    rows.append(f"| ‏`q` : סכום ריבועים | {RLM}{sum(t * t for t in sent)} | {RLM}{sum(t * t for t in ret)} | {RLM}{q} | ‏\\( a^2 - d^2 \\) |")
+    rows.append(f"| ‏XOR | | | {RLM}{C_MISS ^ C_DUP} | ‏\\( a \\oplus d \\), כמו שני חסרים |")
+    rows.append(f"| מונה | {RLM}{len(sent)} | {RLM}{len(ret)} | {RLM}{out} | אף אחד לא \"בחוץ\" |")
+    return "\n".join(rows)
+
+
+def memory_table(width=8):
+    """Bits of each method for tags of `width` bits, all 2^width of them sent once: the
+    largest value each register holds, plus a sign bit for the differences of part c."""
+    n = 1 << width
+    top = lambda i: sum(t ** i for t in range(n))
+    rows = ["| השיטה | מה היא מוצאת | הרגיסטרים | ביטים ל-tags של 8 ביטים |", "|---|---|---|:-:|"]
+    rows.append(f"| ‏XOR | חסר אחד | ‏`x` | {RLM}{width} |")
+    rows.append(f"| ‏XOR לפי ביט | שני חסרים | ‏`x` ו-`part[0..W-1]` | {RLM}{width + width * width} |")
+    c = 1 + top(1).bit_length() + 1 + top(2).bit_length()
+    rows.append(f"| סכום וסכום ריבועים | חסר אחד וכפול אחד | ‏`s` ו-`q`, עם סימן | {RLM}{c} |")
+    for k in (2, 3, 4):
+        pk = sum(top(i).bit_length() for i in range(1, k + 1))
+        rows.append(f"| סכומי חזקות עד {k} | עד {k} חסרים | ‏\\( p_1, \\dots, p_{{{k}}} \\) | {RLM}{pk} |")
+    rows.append(f"| טבלה של ביט לכל tag | הכול | ‏{n} ביטים | {RLM}{n} |")
     return "\n".join(rows)
 
 
 def blocks():
     """The generated blocks, in page order."""
-    return [row_svg(ROW_A), legend(), moves_table(ROW_A, [("greedy", "optimal"), ("parity", "optimal")]),
-            dp_table(ROW_A), moves_table(ROW_D, [("parity", "optimal"), ("optimal", "optimal")])]
+    return [xor_table(), split_table(), sums_table(), memory_table()]
 
 
 if __name__ == "__main__":
-    print(best(ROW_A), best(ROW_D), best(ROW_E), play(ROW_A, "greedy", "optimal")[1], play(ROW_D, "parity", "optimal")[1])
     print("\n\n".join(blocks()))

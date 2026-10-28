@@ -129,3 +129,15 @@ def test_added_date_quoted_or_not():
         assert hook._added_date({"added": added}) == day, added
     for added in (None, "", 20261028):
         assert hook._added_date({"added": added}) is None, added
+
+
+def test_renumbered_lists_agree():
+    """The renumbered questions of mkdocs.yml (the 404 page's redirects) and of marks.js
+    (the marks moved in the browser) are the same list."""
+    yml = re.search(r"^  dvq_renumbered:\n((?:    \"\d{4}\": \"\d{4}\"\n)+)", (ROOT / "mkdocs.yml").read_text(encoding="utf-8"), re.M)
+    js = re.search(r"RENUMBERED = \[\[\"[\d-]+\", (\{[^}]*\})\]\]", (DOCS / "javascripts" / "marks.js").read_text(encoding="utf-8"))
+    assert yml and js
+    assert dict(re.findall(r'"(\d{4})": "(\d{4})"', yml.group(1))) == dict(re.findall(r'"(\d{4})": "(\d{4})"', js.group(1)))
+    moved = dict(re.findall(r'"(\d{4})": "(\d{4})"', yml.group(1)))
+    ids = {p.name[:4] for p in (DOCS / "questions").rglob("*.md") if p.name[:4].isdigit()}
+    assert set(moved.values()) <= ids

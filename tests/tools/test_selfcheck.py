@@ -373,7 +373,7 @@ def kaprekar_keys() -> int:
 
 
 def ones_answers() -> list:
-    """0060: the longest window with at most k zeros (part a), and with at most k cells that
+    """0061: the longest window with at most k zeros (part a), and with at most k cells that
     are not its most frequent value (part b), every window tried."""
     def longest(seq, k, same):
         best = 0
@@ -388,7 +388,7 @@ def ones_answers() -> list:
 
 
 def tag_pool_answers() -> list:
-    """0061: the most transactions open at once (open from the send up to the response), and
+    """0062: the most transactions open at once (open from the send up to the response), and
     what one shared pool saves against a pool per kind."""
     def most(txns):
         return max(sum(1 for s, e in txns if s <= t < e) for t, _ in txns)
@@ -426,12 +426,12 @@ EXPECTED = {
     "0053": list(alu_bins()),
     "0054": [rr_bound(4), rr_bound(8), rr_bound(4, [1, 2, 3, 4])],
     "0055": fsm_answers(),
-    "0056": ants_answers(),
-    "0057": tag_answers(),
-    "0058": coin_answers(),
-    "0059": popcount_answers(),
-    "0060": ones_answers(),
-    "0061": tag_pool_answers(),
+    "0057": ants_answers(),
+    "0058": tag_answers(),
+    "0059": coin_answers(),
+    "0060": popcount_answers(),
+    "0061": ones_answers(),
+    "0062": tag_pool_answers(),
 }
 
 

@@ -1,5 +1,5 @@
 ---
-id: 60
+id: 61
 title: הרצף הארוך ביותר של אחדות – עד k היפוכים, ואז כל ערך על ה-bus
 level: junior
 difficulty: medium

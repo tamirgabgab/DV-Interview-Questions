@@ -1,51 +1,43 @@
-// Question 0059: the page's next_same / prev_same against a search number by number (every
-// number of 10 bits, and random 32-bit numbers), next_zeros / prev_zeros against a search
-// over lengths; the page's numbers (99, 80, 143).
+// Question 0059: the page's best_total against a minimax written here on random rows of 1 to
+// 9 coins, the page's numbers (6, 19, 2), and parity_move as the first player against random
+// replies: it always collects its whole colour, at least half the sum.
 module tb;
-  //@page function automatic logic [31:0] next_same
-  //@page function automatic logic [31:0] prev_same
-  //@page function automatic logic [31:0] next_zeros
+  //@page function automatic bit parity_move
+  //@page function automatic int best_total
 
   int errors = 0;
 
-  function automatic logic [31:0] search_next(logic [31:0] x, int w);
-    for (longint y = longint'(x) + 1; y < (64'd1 << w); y++)
-      if ($countones(32'(y)) == $countones(x)) return 32'(y);
-    return '0;
-  endfunction
-
-  function automatic int zeros_of(longint unsigned v);
-    int L = 0;
-    for (int p = 0; p < 64; p++) if (v[p]) L = p + 1;
-    return L - $countones(v);
+  // the most the player to move collects on coins[i..j]
+  function automatic int gain(int coins[], int i, int j);
+    int rest = 0, a, b;
+    if (i > j) return 0;
+    for (int k = i; k <= j; k++) rest += coins[k];
+    a = rest - gain(coins, i + 1, j);
+    b = rest - gain(coins, i, j - 1);
+    return a > b ? a : b;
   endfunction
 
   initial begin
-    logic [31:0] x, y, z;
-    longint unsigned v2, want;
-    if (next_same(92) != 99 || prev_same(96) != 80 || next_zeros(120) != 143 || prev_zeros(143) != 120) begin
-      errors++; $display("page numbers: %0d %0d %0d", next_same(92), prev_same(96), next_zeros(120));
-    end
-    if (next_same(0) != 0 || prev_same(0) != 0 || next_same(32'hF000_0000) != 0) begin errors++; $display("edges"); end
-    // every number of 10 bits: next is the search, prev inverts it; the zeros by a search
-    for (int v = 1; v < 1024; v++) begin
-      x = 32'(v);
-      z = search_next(x, 10);
-      y = next_same(x);
-      if (z != 0 && y != z) begin errors++; $display("next %0d: %0d vs %0d", v, y, z); end
-      if (z != 0 && prev_same(z) != x) begin errors++; $display("prev %0d", z); end
-      want = 0;
-      for (v2 = longint'(v) + 1; want == 0; v2++) if (zeros_of(v2) == zeros_of(v)) want = v2;
-      if (next_zeros(x) != 32'(want)) begin errors++; $display("next_zeros %0d: %0d vs %0d", v, next_zeros(x), want); end
-      want = 0;
-      for (v2 = longint'(v) - 1; v2 > 0 && want == 0; v2--) if (zeros_of(v2) == zeros_of(v)) want = v2;
-      if (prev_zeros(x) != 32'(want)) begin errors++; $display("prev_zeros %0d: %0d vs %0d", v, prev_zeros(x), want); end
-    end
-    // random 32-bit numbers: a neighbour with as many ones, and back
-    for (int r = 0; r < 2000; r++) begin
-      x = $urandom;
-      y = next_same(x);
-      if (y != 0 && (y <= x || $countones(y) != $countones(x) || prev_same(y) != x)) begin errors++; $display("rand %h -> %h", x, y); end
+    int coins[], n, i, j, mine, odd_s, even_s, k;
+    coins = '{1, 2, 5, 3};          if (best_total(coins) != 6)  begin errors++; $display("1253"); end
+    coins = '{1, 1, 9, 1, 1, 9};    if (best_total(coins) != 19) begin errors++; $display("119119"); end
+    coins = '{1, 5, 1};             if (best_total(coins) != 2)  begin errors++; $display("151"); end
+    for (int r = 0; r < 300; r++) begin
+      n = $urandom_range(1, 9);
+      coins = new[n];
+      foreach (coins[m]) coins[m] = $urandom_range(1, 30);
+      if (best_total(coins) != gain(coins, 0, n - 1)) begin errors++; $display("run %0d: %0d vs %0d", r, best_total(coins), gain(coins, 0, n - 1)); end
+      if (n % 2 == 0) begin
+        i = 0; j = n - 1; mine = 0; odd_s = 0; even_s = 0;
+        foreach (coins[m]) if (m % 2 == 0) odd_s += coins[m]; else even_s += coins[m];
+        while (i <= j) begin
+          k = parity_move(coins, i, j) ? j : i;          // the trick
+          mine += coins[k];
+          if (k == i) i++; else j--;
+          if (i <= j) begin if ($urandom_range(0, 1)) i++; else j--; end   // any reply
+        end
+        if (mine != (odd_s > even_s ? odd_s : even_s)) begin errors++; $display("parity run %0d: %0d", r, mine); end
+      end
     end
     if (errors == 0) $display("PASS"); else $display("FAIL: %0d errors", errors);
     $finish;

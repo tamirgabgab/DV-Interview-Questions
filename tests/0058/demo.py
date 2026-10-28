@@ -1,6 +1,10 @@
-# The trick and the best play on the page's rows
+# The page's four checkers on 16 tags returned out of order
+import random
 from solution import *  # noqa: F401,F403
 
-for coins in ([1, 2, 5, 3], [1, 1, 9, 1, 1, 9], [1, 5, 1]):
-    print(coins, "best:", best_total(coins), "of", sum(coins))
-print("first move of the trick on 1, 2, 5, 3:", parity_move([1, 2, 5, 3], 0, 3))  # L
+sent = list(range(16))
+ret = [t for t in sent if t not in (5, 12)]
+random.shuffle(ret)
+print("two missing:", missing_two(sent, ret, 4))  # [5, 12]
+print("one missing, one twice:", missing_and_dup(sent, [t for t in sent if t != 7] + [3]))  # (7, 3)
+print("three missing:", missing_k(sent, [t for t in sent if t not in (1, 8, 14)], 3, 16))  # [1, 8, 14]

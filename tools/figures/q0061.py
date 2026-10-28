@@ -1,125 +1,143 @@
 #!/usr/bin/env python3
-"""Figures and tables of question 0061 (how many tags a list of transactions needs: the
-most open at once, with one pool and with a pool for reads and one for writes).
+"""Figures and tables of question 0061 (the longest run of ones with up to k zeros flipped,
+and the longest window of one value on a bus with up to k replacements).
 
     python tools/figures/fill.py 61        # put the blocks on the page
 
-The reference here is independent of the page code: brute_tags() counts the open
-transactions at every send time, sweep() replays the sorted events with the counters (the
-rows of the table and what the tagpool explorer draws). blocks() returns, in page order:
-the timeline of part a with its counter, its legend, the table of its events, the timeline
-of part b with reads and writes, and its legend.
+The reference here is independent of the page code: brute_ones() and brute_same() try every
+window, trace_ones() and trace_same() replay the sliding window step by step (the rows of
+the table and what the onesk explorer draws). blocks() returns, in page order: the strip of
+part a with its best window, its legend, the table of the window's steps on the page's
+example, the strip of part b and its legend.
 """
 
 RLM = "‏"
-TXNS = [(0, 30), (5, 10), (15, 20)]
-# part b: reads and writes whose peaks are apart (a shared pool saves two tags)
-TXNS_B = [(0, 10, "R"), (2, 12, "R"), (20, 30, "W"), (22, 32, "W")]
-# and whose peaks coincide (no saving)
-TXNS_C = [(0, 10, "R"), (2, 12, "R"), (3, 13, "W"), (5, 15, "W")]
+BITS = [1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0]
+K = 2
+BUS = "AAABBCBABA"
+K_BUS = 2
 
 
-def brute_tags(txns):
-    """The most transactions open at once: a transaction is open from its send up to, not
-    including, its response, so the count is checked at every send time."""
-    return max((sum(1 for s, e, *_ in txns if s <= t < e) for t, *_ in txns), default=0)
+def brute_ones(bits, k):
+    """The longest window with at most k zeros, every window tried."""
+    best = 0
+    for i in range(len(bits)):
+        for j in range(i, len(bits)):
+            if bits[i:j + 1].count(0) <= k:
+                best = max(best, j - i + 1)
+    return best
 
 
-def sweep(txns):
-    """The sorted events of the transactions (a response before a send at the same time)
-    with the counters after each: the open reads, the open writes, the open total and the
-    maxima so far. A transaction without a kind counts as a read; i is its place in the list."""
-    events = []
-    for i, (s, e, *kind) in enumerate(txns):
-        kind = kind[0] if kind else "R"
-        events.append((s, 1, kind, i))
-        events.append((e, -1, kind, i))
-    events.sort()                     # the time, then the responses, then the reads, then the list order
-    rows, open_, best = [], {"R": 0, "W": 0}, {"R": 0, "W": 0, "all": 0}
-    for t, d, kind, i in events:
-        open_[kind] += d
-        best[kind] = max(best[kind], open_[kind])
-        best["all"] = max(best["all"], open_["R"] + open_["W"])
-        rows.append({"t": t, "d": d, "kind": kind, "i": i, "open": dict(open_), "total": open_["R"] + open_["W"], "best": dict(best)})
+def brute_same(values, k):
+    """The longest window that is one value after at most k replacements, every window tried."""
+    best = 0
+    for i in range(len(values)):
+        for j in range(i, len(values)):
+            w = values[i:j + 1]
+            if len(w) - max(w.count(v) for v in set(w)) <= k:
+                best = max(best, j - i + 1)
+    return best
+
+
+def trace_ones(bits, k):
+    """The sliding window of part a, one row per step: the right end just added, the zeros
+    in the window, the left end after the window shrank, the best so far and its window."""
+    rows, left, zeros, best, win = [], 0, 0, 0, None
+    for right, b in enumerate(bits):
+        zeros += b == 0
+        moved = 0
+        while zeros > k:
+            zeros -= bits[left] == 0
+            left += 1
+            moved += 1
+        if right - left + 1 > best:
+            best, win = right - left + 1, (left, right)
+        rows.append({"right": right, "bit": b, "zeros": zeros, "left": left, "moved": moved, "best": best, "win": win})
     return rows
 
 
-def pools(txns):
-    """(reads alone, writes alone, one shared pool)."""
-    last = sweep(txns)[-1]["best"]
-    return last["R"], last["W"], last["all"]
+def trace_same(values, k):
+    """The sliding window of part b, one row per step: the counts in the window, the most
+    frequent value, the left end after the window shrank, the best so far and its window."""
+    rows, left, best, win, count = [], 0, 0, None, {}
+    for right, v in enumerate(values):
+        count[v] = count.get(v, 0) + 1
+        moved = 0
+        while right - left + 1 - max(count.values()) > k:
+            count[values[left]] -= 1
+            left += 1
+            moved += 1
+        if right - left + 1 > best:
+            best, win = right - left + 1, (left, right)
+        window = values[left:right + 1]
+        top = max(window, key=lambda c: (count[c], -window.index(c)))      # the first in the window on a tie
+        rows.append({"right": right, "value": v, "count": dict(count), "top": top, "left": left, "moved": moved, "best": best, "win": win})
+    return rows
+
+
+def best_window(rows):
+    """The best window of a trace and the places in it that are flipped or replaced."""
+    last = rows[-1]
+    return last["win"], last["best"]
 
 
 # --- blocks ------------------------------------------------------------------------------
 
-def timeline_svg(txns, label, kinds=False):
-    """The transactions as bars over time (a row each, top to bottom in list order), the
-    time axis, and under them the number open at every moment as a step line with its
-    maximum marked."""
-    T = max(e for _, e, *_ in txns)
-    L, R, W = 64, 16, 640
-    bar, gap, top = 16, 8, 14
-    x = lambda t: L + (W - L - R) * t / T
-    rows = sweep(txns)
-    peak = rows[-1]["best"]["all"]
-    y_axis = top + len(txns) * (bar + gap) + 6
-    ch, cy0 = 22 * max(peak, 1), y_axis + 42
-    H = cy0 + ch + 30
-    s = f'<svg class="figure tp-fig" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">'
-    step = 5 if T <= 40 else 10
-    for t in range(0, T + 1, step):
-        s += f'<line class="grid" x1="{x(t):g}" x2="{x(t):g}" y1="{top - 4}" y2="{cy0 + ch}"/>'
-        s += f'<text class="tick" x="{x(t):g}" y="{y_axis + 14}" text-anchor="middle">{t}</text>'
-    for i, (a, e, *kind) in enumerate(txns):
-        y = top + i * (bar + gap)
-        cls = f" is-{kind[0].lower()}" if kinds and kind else ""
-        name = f"{kind[0]}{i + 1}" if kinds and kind else f"T{i + 1}"
-        s += (f'<text class="tp-name" x="{L - 8}" y="{y + bar - 3}" text-anchor="end">{name}</text>'
-              f'<rect class="tp-bar{cls}" x="{x(a):g}" y="{y}" width="{x(e) - x(a):g}" height="{bar}" rx="3"><title>{name}: {a}–{e}</title></rect>')
-    s += f'<line class="axis" x1="{L}" x2="{W - R}" y1="{y_axis}" y2="{y_axis}"/>'
-    # the count as a step line: level 0 before the first event, then the total after each
-    yc = lambda c: cy0 + ch - ch * c / max(peak, 1)
-    pts, level = [f"M{L},{yc(0):g}"], 0
-    for r in rows:
-        pts.append(f"H{x(r['t']):g} V{yc(r['total']):g}")
-        level = r["total"]
-    pts.append(f"H{W - R}")
-    for c in range(peak + 1):
-        s += f'<text class="tick" x="{L - 8}" y="{yc(c) + 4:g}" text-anchor="end">{c}</text>'
-    s += f'<line class="tp-max" x1="{L}" x2="{W - R}" y1="{yc(peak):g}" y2="{yc(peak):g}"/>'
-    s += f'<path class="tp-count" d="{" ".join(pts)}"/>'
-    s += f'<text class="legend" x="{W - R}" y="{yc(peak) - 7:g}" text-anchor="end">max = {peak}</text>'
-    s += f'<text class="tp-name" x="{L - 8}" y="{cy0 - 10}" text-anchor="end">open</text>'
+def strip_svg(values, win, flips, label, cell=34):
+    """A row of cells, drawn left to right: the best window outlined, the cells that are
+    flipped (or replaced) in orange, the cells that already hold the value in blue."""
+    n = len(values)
+    W, H, top = n * cell + 16, 92, 22
+    s = (f'<svg class="figure ok-fig" viewBox="0 0 {W} {H}" style="max-width:{W / 16:g}rem" role="img" aria-label="{label}">')
+    i, j = win
+    s += f'<rect class="ok-win" x="{8 + i * cell - 4}" y="{top - 5}" width="{(j - i + 1) * cell + 8}" height="{cell + 10}" rx="6"/>'
+    for p, v in enumerate(values):
+        x = 8 + p * cell
+        kind = "is-flip" if p in flips else "is-one" if i <= p <= j else "is-off"
+        s += (f'<g class="ok-cell {kind}"><title>place {p}, value {v}</title>'
+              f'<rect x="{x + 2}" y="{top}" width="{cell - 4}" height="{cell}" rx="4"/>'
+              f'<text x="{x + cell / 2:g}" y="{top + cell / 2 + 6}" text-anchor="middle">{v}</text></g>'
+              f'<text class="tick" x="{x + cell / 2:g}" y="{H - 8}" text-anchor="middle">{p}</text>')
     return s + "</svg>"
 
 
-def legend_a():
-    return ('<span class="viz-legend"><span><i class="tp-key-bar"></i>טרנזקציה פתוחה, מהשליחה עד התשובה</span>'
-            '<span><i class="tp-key-count"></i>כמה פתוחות בכל רגע</span><span><i class="tp-key-max"></i>המקסימום, מספר ה-tags</span></span>')
+def legend(flip_text):
+    return ('<span class="viz-legend"><span><i class="ok-key-one"></i>כבר בערך הרצוי</span>'
+            f'<span><i class="ok-key-flip"></i>{flip_text}</span>'
+            '<span><i class="ok-key-win"></i>החלון הארוך ביותר</span></span>')
 
 
-def legend_b():
-    return ('<span class="viz-legend"><span><i class="tp-key-r"></i>קריאה</span><span><i class="tp-key-w"></i>כתיבה</span>'
-            '<span><i class="tp-key-count"></i>כמה פתוחות יחד</span><span><i class="tp-key-max"></i>המקסימום של המאגר המשותף</span></span>')
+def strip_a():
+    rows = trace_ones(BITS, K)
+    win, best = best_window(rows)
+    flips = [p for p in range(win[0], win[1] + 1) if BITS[p] == 0]
+    return strip_svg(BITS, win, flips, f"הווקטור {''.join(map(str, BITS))} : החלון הארוך ביותר עם לכל היותר {K} אפסים הוא באורך {best}")
 
 
-def events_table(txns):
-    rows = sweep(txns)
-    out = ["| הזמן | האירוע | פתוחות אחריו | המקסימום עד עכשיו |", "|:-:|:-:|:-:|:-:|"]
+def strip_b():
+    rows = trace_same(BUS, K_BUS)
+    win, best = best_window(rows)
+    i, j = win
+    w = BUS[i:j + 1]
+    top = max(set(w), key=w.count)
+    flips = [p for p in range(i, j + 1) if BUS[p] != top]
+    return strip_svg(list(BUS), win, flips, f"הערכים {' '.join(BUS)} על ה-bus : החלון הארוך ביותר של ערך אחד אחרי לכל היותר {K_BUS} החלפות הוא באורך {best}")
+
+
+def steps_table(bits, k):
+    rows = trace_ones(bits, k)
+    out = ["| הצעד | הביט שנכנס | אפסים בחלון | הקצה השמאלי | החלון | הטוב עד עכשיו |", "|:-:|:-:|:-:|:-:|:-:|:-:|"]
     for r in rows:
-        what = "שליחה, ‏+1" if r["d"] > 0 else "תשובה, ‏−1"
-        out.append(f"| {RLM}{r['t']} | {what} | {RLM}{r['total']} | **{RLM}{r['best']['all']}** |")
+        moved = f" (זז {RLM}{r['moved']})" if r["moved"] else ""
+        out.append(f"| {RLM}{r['right']} | {RLM}{r['bit']} | {RLM}{r['zeros']} | {RLM}{r['left']}{moved} | {RLM}{r['left']}..{r['right']} | **{RLM}{r['best']}** |")
     return "\n".join(out)
 
 
 def blocks():
     """The generated blocks, in page order."""
-    return [timeline_svg(TXNS, "שלוש טרנזקציות : 0 עד 30, 5 עד 10 ו-15 עד 20, ומתחתן כמה פתוחות בכל רגע, לכל היותר 2"),
-            legend_a(), events_table(TXNS),
-            timeline_svg(TXNS_B, "שתי קריאות ב-0 עד 12 ושתי כתיבות ב-20 עד 32 : שני מאגרים צריכים 4 tags, מאגר משותף 2", kinds=True),
-            legend_b()]
+    return [strip_a(), legend("אפס שהופך לאחד"), steps_table(BITS, K), strip_b(), legend("ערך שמוחלף")]
 
 
 if __name__ == "__main__":
-    print(brute_tags(TXNS), pools(TXNS), pools(TXNS_B), pools(TXNS_C))
+    print(brute_ones(BITS, K), trace_ones(BITS, K)[-1]["best"], brute_same(BUS, K_BUS), trace_same(BUS, K_BUS)[-1]["best"])
     print("\n\n".join(blocks()))

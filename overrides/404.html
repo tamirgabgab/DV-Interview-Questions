@@ -23,6 +23,11 @@
   (() => {
     const base = {{ base_url | tojson }}, list = {{ config.extra.dvq_404 | tojson }};
     const path = decodeURIComponent(location.pathname);
+    // a question moved to a new number: its old address goes straight to the new one
+    const renumbered = {{ (config.extra.dvq_renumbered or {}) | tojson }};
+    const old = /questions\/(\w+)\/(\d{4})-([\w-]+)\/?$/.exec(path);
+    const moved = old && renumbered[old[2]] && list.find((q) => q[2] === `questions/${old[1]}/${renumbered[old[2]]}-${old[3]}/`);
+    if (moved) { location.replace(base + moved[2] + location.search + location.hash); return; }
     const id = (/(?:^|[\/-])(\d{4})(?=[\/-]|$)/.exec(path) || [])[1];
     const slug = path.split("/").filter(Boolean).pop() || "";
     const words = slug.replace(/^\d+-?/, "");

@@ -1,5 +1,5 @@
 ---
-id: 58
+id: 59
 title: מטבעות בשורה – לוקחים מהקצוות, ומי מקבל יותר
 level: junior
 difficulty: medium

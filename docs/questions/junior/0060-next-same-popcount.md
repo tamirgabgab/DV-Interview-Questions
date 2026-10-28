@@ -1,5 +1,5 @@
 ---
-id: 59
+id: 60
 title: המספר הבא עם אותו מספר של אחדות – Gosper, הקודם, ואפסים
 level: junior
 difficulty: medium

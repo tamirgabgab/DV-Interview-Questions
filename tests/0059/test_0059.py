@@ -1,8 +1,10 @@
-"""Question 0059: the page's next_same / prev_same against a search number by number, for
-every number in a few widths; next_zeros / prev_zeros against a search over lengths; the
-page's numbers (99 after 92, 80 before 96, 143 after 120 with three zeros); the
-explorer's JavaScript; and the page copies of the blocks."""
+"""Question 0059: the page's best_total against the generator's minimax and parity_move as
+the first player against every reply (it collects exactly its colour, at least half); the
+page's examples (6 by the trick and 5 by greedy on 1, 2, 5, 3; 19 against 11 on
+1, 1, 9, 1, 1, 9; 2 on 1, 5, 1) and that 1, 2, 5, 3 is the first row of four distinct coins
+up to 5 where greedy loses; the explorer's JavaScript; and the page copies of the blocks."""
 
+import itertools
 import json
 import random
 import sys
@@ -13,58 +15,61 @@ sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0059  # noqa: E402
 
 ns = load_python(59)
-next_same, prev_same, next_zeros, prev_zeros = ns["next_same"], ns["prev_same"], ns["next_zeros"], ns["prev_zeros"]
+parity_move, best_total = ns["parity_move"], ns["best_total"]
 
 
 def test_page_examples():
-    assert next_same(92, 8) == 99 and q0059.brute_next(92, 8) == 99
-    assert prev_same(99, 8) == 92 and prev_same(96) == 80 == q0059.brute_prev(96, 8)
-    assert next_zeros(120) == 143 == q0059.brute_next0(120) and prev_zeros(143) == 120
-    assert next_zeros(92) == 99 and next_zeros(7) == 15 and prev_zeros(8) == 0 and prev_zeros(2) == 0
-    assert [y for y in range(1, 40) if q0059.zeros(y) == 3][:5] == [8, 17, 18, 20, 24]
-    assert next_same(0) == 0 and prev_same(0) == 0
-    assert next_same(0b11100000, 8) == 0 and prev_same(0b00000111, 8) == 0
-    assert next_same(0b0111111100000000, 16) == 0b1000000000111111      # the trap: 319 numbers apart
+    assert best_total([1, 2, 5, 3]) == 6 and q0059.play([1, 2, 5, 3], "greedy", "optimal")[1] == [5, 6]
+    assert max(1 + 5, 2 + 3) == 6 and q0059.play([1, 2, 5, 3], "parity", "optimal")[1] == [6, 5]
+    assert best_total([1, 1, 9, 1, 1, 9]) == 19 and q0059.play([1, 1, 9, 1, 1, 9], "parity", "optimal")[1] == [11, 11]
+    assert best_total([1, 5, 1]) == 2
+    first = next(c for c in itertools.permutations(range(1, 6), 4) if 2 * q0059.play(list(c), "greedy", "optimal")[1][0] < sum(c))
+    assert first == (1, 2, 5, 3)
+    assert all(2 * q0059.play(list(c), "greedy", "optimal")[1][0] >= sum(c) for c in itertools.product(range(1, 6), repeat=2))
+    assert best_total([5]) == 5
 
 
-def test_against_search():
-    for w in range(1, 11):
-        for x in range(1 << w):
-            assert next_same(x, w) == q0059.brute_next(x, w), (x, w)
-            assert prev_same(x, w) == q0059.brute_prev(x, w), (x, w)
+def test_against_minimax():
+    rng = random.Random(58)
+    for _ in range(400):
+        coins = [rng.randint(1, 30) for _ in range(rng.randint(1, 11))]
+        assert best_total(coins) == q0059.best(coins), coins
+
+
+def test_parity_against_every_reply():
+    """The trick as the first player collects its whole colour whatever the second does."""
     rng = random.Random(59)
-    for _ in range(300):                                  # 32 bits by default, near the top
-        x = rng.getrandbits(32)
-        y = next_same(x)
-        assert y == 0 or (y > x and bin(y).count("1") == bin(x).count("1") and prev_same(y) == x)
+    for _ in range(60):
+        n = rng.choice([2, 4, 6, 8])
+        coins = [rng.randint(1, 20) for _ in range(n)]
+        colour = max(sum(coins[0::2]), sum(coins[1::2]))
 
-
-def test_zeros():
-    for x in range(1, 1 << 11):
-        assert next_zeros(x) == q0059.brute_next0(x), x
-        assert prev_zeros(x) == q0059.brute_prev0(x), x
-    assert q0059.next0_rows(120)[1] == 143
-
-
-def test_rows_of_the_formula():
-    rows, nxt = q0059.gosper(92, 8)
-    assert [v for _, v, _ in rows] == [92, 4, 96, 60, 15, 3, 99] and nxt == 99
-    assert q0059.gosper(0b11100000, 8)[1] == 0
+        def worst(i, j, mine):              # the first player's total against the worst replies
+            if i > j:
+                return mine
+            k = i if parity_move(coins, i, j) in ("L", 0) else j
+            mine += coins[k]
+            i, j = (i + 1, j) if k == i else (i, j - 1)
+            if i > j:
+                return mine
+            return min(worst(i + 1, j, mine), worst(i, j - 1, mine))
+        assert worst(0, n - 1, 0) == colour >= sum(coins) / 2
 
 
 def test_explorer_matches_the_reference():
     from page_tests import explorer_require, node_json
 
-    cases = [(x, w) for w in (3, 5, 8) for x in range(1, 1 << w)] + [(x, 16) for x in random.Random(60).sample(range(1, 1 << 16), 200)]
+    rng = random.Random(60)
+    rows = [[1, 2, 5, 3], [1, 1, 9, 1, 1, 9], [1, 5, 1]] + [[rng.randint(1, 20) for _ in range(rng.randint(1, 10))] for _ in range(40)]
+    pairs = [(a, b) for a in ("greedy", "parity", "optimal") for b in ("greedy", "parity", "optimal")]
     got = node_json(f"""
       const m = {explorer_require()};
-      console.log(JSON.stringify({json.dumps(cases)}.map(([x, w]) => [m.gsNext(x, w), m.gsPrev(x, w), m.gsNext0(x), m.gsPrev0(x),
-        m.gsSteps(x, w).rows.map((r) => [r.v, r.marks]), m.gsSteps(x, w).next])));""")
-    for (x, w), (nx, pv, nz, pz, rows, nx2) in zip(cases, got):
-        assert nx == nx2 == q0059.brute_next(x, w) and pv == q0059.brute_prev(x, w), (x, w)
-        assert nz == q0059.brute_next0(x) and pz == q0059.brute_prev0(x), x
-        ref, _ = q0059.gosper(x, w)
-        assert rows == [[v, sorted(m)] for _, v, m in ref], (x, w)
+      console.log(JSON.stringify({json.dumps(rows)}.map((c) => [m.crDiff(c), {json.dumps(pairs)}.map(([a, b]) => m.crPlay(c, a, b))])));""")
+    for coins, (d, games) in zip(rows, got):
+        assert d == q0059.diff_table(coins)
+        for (a, b), g in zip(pairs, games):
+            moves, tot = q0059.play(coins, a, b)
+            assert g["tot"] == tot and [[w, s, c] for w, s, c in moves] == g["moves"], (coins, a, b)
 
 
 def test_figures_up_to_date():

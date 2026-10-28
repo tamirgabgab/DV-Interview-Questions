@@ -1,12 +1,12 @@
 // kinds: coinrow
-//   coinrow                0058        coins in a row, each player takes an end: a player per side (me by a click on an end, greedy, the parity trick, optimal), played move by move with the totals; the table of d[i][j] with the interval of the moment and the move it recommends
+//   coinrow                0059        coins in a row, each player takes an end: a player per side (me by a click on an end, greedy, the parity trick, optimal), played move by move with the totals; the table of d[i][j] with the interval of the moment and the move it recommends
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
   const { answer, autoplay, code, ltr, seedControls, speedSel } = dvqExplorers.lib;
 
-  // Coins in a row (0058). d[i][j]: the lead of the player to move on coins i..j, both
+  // Coins in a row (0059). d[i][j]: the lead of the player to move on coins i..j, both
   // playing their best (null below the diagonal). The strategies pick "L" or "R" on the
   // interval i..j: greedy the larger end (left on a tie); optimal the end with the larger
   // c - d of the rest (left on a tie); parity fixes, on the first even interval it sees, the

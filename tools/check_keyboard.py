@@ -31,8 +31,8 @@ from check_phone import local_cdn_routes, serve  # noqa: E402
 
 WIDTH, HEIGHT = 1200, 900
 MAX_STOPS = 900
-DEFAULT_PAGES = r"^index\.html$|^all/|^tags/|^paths/coding/|0060-longest-ones"
-QUESTION = r"0060-longest-ones"
+DEFAULT_PAGES = r"^index\.html$|^all/|^tags/|^paths/coding/|0061-longest-ones"
+QUESTION = r"0061-longest-ones"
 
 # the focused element: where it is, whether it can be seen, its name, and its focus ring
 DESCRIBE = """() => {
