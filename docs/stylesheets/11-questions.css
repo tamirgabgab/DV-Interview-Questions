@@ -404,3 +404,6 @@
 .md-typeset .viz-legend .cr-key-taken { background: none; border-radius: 50%; outline: 2px dashed var(--viz-text); outline-offset: -2px; }
 /* R: 0039 and 0037 */
 /* R: 0061 and 0012 */
+.md-typeset .explorer .ok-c.is-gone, .md-typeset .viz-legend .ok-key-gone { background: linear-gradient(to top right, transparent calc(50% - 1px), var(--viz-ink) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)); }
+.md-typeset .viz-legend .ok-key-gone { outline: 1.5px solid var(--viz-grid); outline-offset: -1.5px; }
+.md-typeset .explorer .ok-tally { font-size: 0.7rem; margin: 0.3em 0; }

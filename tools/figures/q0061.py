@@ -111,7 +111,7 @@ def strip_a():
     rows = trace_ones(BITS, K)
     win, best = best_window(rows)
     flips = [p for p in range(win[0], win[1] + 1) if BITS[p] == 0]
-    return strip_svg(BITS, win, flips, f"הווקטור {''.join(map(str, BITS))} : החלון הארוך ביותר עם לכל היותר {K} אפסים הוא באורך {best}")
+    return strip_svg(BITS, win, flips, f"הווקטור {''.join(map(str, BITS))} : החלון הארוך ביותר עם לכל היותר {K} אפסים הוא באורך {best}")
 
 
 def strip_b():
@@ -121,7 +121,7 @@ def strip_b():
     w = BUS[i:j + 1]
     top = max(set(w), key=w.count)
     flips = [p for p in range(i, j + 1) if BUS[p] != top]
-    return strip_svg(list(BUS), win, flips, f"הערכים {' '.join(BUS)} על ה-bus : החלון הארוך ביותר של ערך אחד אחרי לכל היותר {K_BUS} החלפות הוא באורך {best}")
+    return strip_svg(list(BUS), win, flips, f"הערכים {' '.join(BUS)} על ה-bus : החלון הארוך ביותר של ערך אחד אחרי לכל היותר {K_BUS} החלפות הוא באורך {best}")
 
 
 def steps_table(bits, k):
@@ -129,7 +129,10 @@ def steps_table(bits, k):
     out = ["| הצעד | הביט שנכנס | אפסים בחלון | הקצה השמאלי | החלון | הטוב עד עכשיו |", "|:-:|:-:|:-:|:-:|:-:|:-:|"]
     for r in rows:
         moved = f" (זז {RLM}{r['moved']})" if r["moved"] else ""
-        out.append(f"| {RLM}{r['right']} | {RLM}{r['bit']} | {RLM}{r['zeros']} | {RLM}{r['left']}{moved} | {RLM}{r['left']}..{r['right']} | **{RLM}{r['best']}** |")
+        # a step that shrank the window shows the count that set it off, then the count after
+        peak = r["zeros"] + bits[r["left"] - r["moved"]:r["left"]].count(0)
+        zeros = f'<span dir="ltr">{peak} → {r["zeros"]}</span>' if r["moved"] else str(r["zeros"])
+        out.append(f"| {RLM}{r['right']} | {RLM}{r['bit']} | {RLM}{zeros} | {RLM}{r['left']}{moved} | {RLM}{r['left']}..{r['right']} | **{RLM}{r['best']}** |")
     return "\n".join(out)
 
 
