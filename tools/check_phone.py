@@ -25,6 +25,10 @@ In a sandbox without access to the CDNs, --offline ignores errors of external sc
 as on the live site). --local-cdn does both for the copies tools/dev_setup.sh keeps in
 .cache/cdn (MathJax, Mermaid, WaveDrom) and runs axe-core from there unless --axe is given.
 
+Every page is also measured again with its text enlarged 1.3 times (--font-scale), as a
+phone's font-size setting enlarges it: a row that then widens the page fails, since Android
+Chrome zooms such a page out and shows the navigation drawer beside it.
+
 Every page's line also gives its weight: the HTML in KB, and what the browser fetched for it
 in all (the HTML, the styles, the scripts, the fonts) in KB and requests, so a page that
 grows heavy is seen; a page whose HTML is over --weight-warn KB (400) gets a warning, and the
@@ -141,6 +145,15 @@ AXE = """async () => {
                    help: v.help.slice(0, 70) }));
 }"""
 
+# The text enlarged, as a phone's font-size setting enlarges it (Android Chrome scales the
+# font sizes, so a row that fits at 1x can widen the page at 1.3x, and the browser then
+# zooms out and shows the navigation drawer beside the page): the root font size times s,
+# set before the page's scripts lay anything out, as the phone does.
+def scale_text_script(s: float) -> str:
+    css = f"html {{ font-size: calc(125% * {s}) !important; }}"
+    return ("new MutationObserver((m, o) => { if (document.head) { const st = document.createElement('style'); "
+            f"st.textContent = {css!r}; document.head.prepend(st); o.disconnect(); }} }}).observe(document, {{ childList: true, subtree: true }})")
+
 # Every collapsible block open, and every explorer box built (they are built lazily, when
 # they near the viewport) with its folds open (closed on a phone at first).
 OPEN_ALL = """async () => {
@@ -201,6 +214,7 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--local-cdn", action="store_true",
                     help="--offline with the CDN copies of .cache/cdn (tools/dev_setup.sh), axe-core included")
     ap.add_argument("--weight-warn", type=int, default=400, metavar="KB", help="warn about a page whose HTML is heavier than this (400)")
+    ap.add_argument("--font-scale", type=float, default=1.3, metavar="S", help="also measure the width with the text enlarged S times, as a phone's font setting does (1.3; 0 skips it)")
     args = ap.parse_args(argv)
     if args.local_cdn:
         args.offline = True
@@ -230,6 +244,14 @@ def main(argv: list[str]) -> int:
         for spec in args.route:
             pattern, file = spec.split("=", 1)
             ctx.route(re.compile(pattern), functools.partial(lambda file, route: route.fulfill(path=file), file))
+        big_ctx = None
+        if args.font_scale and args.font_scale != 1:
+            big_ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1, service_workers="block",
+                                          color_scheme=args.scheme)
+            big_ctx.add_init_script(scale_text_script(args.font_scale))
+            for spec in args.route:
+                pattern, file = spec.split("=", 1)
+                big_ctx.route(re.compile(pattern), functools.partial(lambda file, route: route.fulfill(path=file), file))
         for rel in pages:
             url = base + rel[: -len("index.html")]
             page = ctx.new_page()
@@ -247,6 +269,17 @@ def main(argv: list[str]) -> int:
             wide_math = page.evaluate(WIDE_MATH)
             small_text = page.evaluate(SMALL_TEXT, MIN_TEXT)
             covered = page.evaluate(ENLARGE_COVERS)
+            big = None
+            if big_ctx:                          # the same page loaded with the text enlarged
+                bp = big_ctx.new_page()
+                try:
+                    bp.goto(url, wait_until="networkidle", timeout=60_000)
+                    bp.evaluate(OPEN_ALL)
+                    bp.wait_for_timeout(800)
+                    big = bp.evaluate(INSPECT, WIDTH)
+                except Exception as e:
+                    errors.append(f"load with the text enlarged: {e}")
+                bp.close()
             axe = []
             if args.axe:
                 page.add_script_tag(path=args.axe)
@@ -257,7 +290,8 @@ def main(argv: list[str]) -> int:
             page.screenshot(path=str(shots / f"{name}.png"), full_page=True)
             page.close()
 
-            bad = info["scrollWidth"] > WIDTH + 1 or errors or covered or (args.axe_fail and axe) or (args.small_fail and small_text)
+            too_big = big is not None and big["scrollWidth"] > WIDTH + 1
+            bad = info["scrollWidth"] > WIDTH + 1 or too_big or errors or covered or (args.axe_fail and axe) or (args.small_fail and small_text)
             failures += bool(bad)
             status = "FAIL" if bad else "ok"
             html_kb = (site / rel).stat().st_size / 1024
@@ -270,6 +304,9 @@ def main(argv: list[str]) -> int:
             if info["scrollWidth"] > WIDTH + 1:
                 for w in info["wide"] or ["(no single element found; check the screenshot)"]:
                     print(f"        too wide: {w}")
+            if too_big:
+                for w in big["wide"] or ["(no single element found)"]:
+                    print(f"        too wide with the text x{args.font_scale:g} ({big['scrollWidth']} px): {w}")
             for e in errors:
                 print(f"        script error: {e[:200]}")
             for w in covered:

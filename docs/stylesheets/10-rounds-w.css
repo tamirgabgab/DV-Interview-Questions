@@ -127,7 +127,8 @@
    the solution being read (.pn-sol, filled by reading-tools.js). */
 .md-typeset .sol-map { position: static; background: transparent; }
 .md-typeset .part-nav { gap: var(--sp-2); }
-.md-typeset .part-nav .pn-chips { flex: none; flex-wrap: nowrap; }
+.md-typeset .part-nav .pn-chips { flex: 0 1 auto; min-width: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }   /* a row too long for the screen scrolls, never widens the page */
+.md-typeset .part-nav .pn-chips::-webkit-scrollbar { display: none; }
 .md-typeset .part-nav .pn-sol { display: none; flex: 0 1 auto; min-width: 0; gap: 0.3rem; margin-inline-start: auto; overflow-x: auto; scrollbar-width: none; }
 .md-typeset .part-nav .pn-sol::-webkit-scrollbar { display: none; }
 .md-typeset .part-nav.has-sol .pn-sol { display: flex; }

@@ -588,6 +588,24 @@
     }
   };
 
+  // An inline formula wider than its line (a long chain, or the text enlarged by the phone)
+  // scrolls on its own instead of widening the page: marked .is-wide, and focusable so the
+  // keyboard can scroll it. Measured once MathJax is done and again on a resize.
+  const wideMath = () => {
+    document.querySelectorAll(".md-typeset mjx-container:not([display='true'])").forEach((m) => {
+      const box = m.parentElement && m.parentElement.closest("p, li, td, th, dd, div, span.arithmatex");
+      const line = box && box.matches("span.arithmatex") ? box.parentElement : box;
+      if (!line) return;
+      m.classList.remove("is-wide");
+      if (m.getBoundingClientRect().width > line.clientWidth + 1) {
+        m.classList.add("is-wide");
+        m.tabIndex = 0;
+      } else if (m.tabIndex === 0 && !m.classList.contains("is-wide")) m.removeAttribute("tabindex");
+    });
+  };
+  let wideTimer = null;
+  const wideLater = () => { clearTimeout(wideTimer); wideTimer = setTimeout(wideMath, 150); };
+
   // A link to a closed fold (the tags page's lists, Y398) opens it and shows it.
   const openTarget = () => {
     let target = null;
@@ -629,5 +647,9 @@
       fitWords(span, span);
     });
     document.querySelectorAll(".path-nav .pn-title").forEach((t) => fitWords(t, t.closest("a")));
+    const mj = window.MathJax && window.MathJax.startup && window.MathJax.startup.promise;
+    (mj || Promise.resolve()).then(wideMath, wideMath);
+    document.addEventListener("toggle", wideLater, true);           // a solution opened: its math is laid out now
+    window.addEventListener("resize", wideLater, { passive: true });
   });
 })();
