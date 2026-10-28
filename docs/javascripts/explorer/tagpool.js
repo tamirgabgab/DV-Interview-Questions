@@ -4,9 +4,15 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { answer, autoplay, ltr, seedControls, speedSel } = dvqExplorers.lib;
+  const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
   const NB = " ";
   const NMAX = 12, TMAX = 99;
+  // the solution's steps, as chips of the explanation panel, and a variable's change
+  const STEPS = {
+    one: ["שני אירועים לטרנזקציה", "מיון לפי זמן, תשובה לפני שליחה", "סריקה : המונה והשיא", "התשובה : השיא"],
+    two: ["שני אירועים לטרנזקציה, עם הסוג", "מיון לפי זמן, תשובה לפני שליחה", "סריקה : מונה לכל סוג, והסכום", "התשובה : שלושת השיאים"],
+  };
+  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
 
   // The sorted events of the transactions (a response before a send at one time, then the
   // reads before the writes, then the list order) with the counters after each, as
@@ -100,6 +106,7 @@
         `<span class="viz-legend"><span class="tp-one"><i class="tp-key-bar"></i>טרנזקציה</span><span class="tp-two"><i class="tp-key-r"></i>קריאה</span><span class="tp-two"><i class="tp-key-w"></i>כתיבה</span>` +
         `<span><i class="tp-key-open"></i>פתוחה עכשיו</span><span><i class="tp-key-count"></i>כמה פתוחות</span><span><i class="tp-key-max"></i>המקסימום עד עכשיו</span><span><i class="tp-key-cursor"></i>האירוע הנוכחי</span></span>` +
         `<p class="tp-note"></p>`;
+      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       const rows = () => tpSweep(st.txns);
@@ -127,6 +134,22 @@
         $(".tp-note").innerHTML = !cur ? "" :
           `${ltr(`t = ${cur.t}`)}${NB}: ${cur.d > 0 ? "שליחה" : "תשובה"} של ${ltr(`${two ? cur.kind : "T"}${cur.i + 1}`)} (${ltr(`${st.txns[cur.i][0]}–${st.txns[cur.i][1]}`)}), המונה ${cur.d > 0 ? "עולה" : "יורד"} ל-${ltr(cur.total)}.` +
           (cur.total === cur.best.all && cur.d > 0 && (st.s === 1 || R[st.s - 2].best.all < cur.best.all) ? ` <b>שיא חדש${NB}: ${ltr(cur.total)} ✓</b>` : "");
+        // the explanation panel: the steps of the moment, the lines they ran, the variables
+        const prev = st.s > 1 ? R[st.s - 2] : null;
+        let lit, lines, vars;
+        if (!cur) {
+          lit = [1, 2];
+          lines = two ? { py: [4, 5, 6], sv: [6, 7, 8, 9, 10, 11, 12] } : { py: [4, 5], sv: [4, 5, 6, 7, 8, 9] };
+          vars = `${ltr(N)} אירועים ממוינים, ${ltr(two ? "open_r = open_w = 0" : "open_now = 0, best = 0")}`;
+        } else {
+          lit = [3, ...(done ? [4] : [])];
+          lines = two ? { py: [7, 8, 9, 10, ...(done ? [11] : [])], sv: [13, 14, 15, 16, 17, 18] } : { py: [6, 7, 8, ...(done ? [9] : [])], sv: [10, 11, 12, ...(done ? [14] : [])] };
+          const d = ltr(`d = ${cur.d > 0 ? "+1" : "−1"}`);
+          vars = two ? [ltr(`t = ${cur.t}`), d, ltr(cur.kind === "R" ? "read" : "write"), V("open_r", prev ? prev.open.R : 0, cur.open.R), V("open_w", prev ? prev.open.W : 0, cur.open.W),
+            ltr(`reads = ${cur.best.R}`), ltr(`writes = ${cur.best.W}`), V("shared", prev ? prev.best.all : 0, cur.best.all)].join(" · ")
+            : [ltr(`t = ${cur.t}`), d, V("open_now", prev ? prev.total : 0, cur.total), V("best", prev ? prev.best.all : 0, cur.best.all)].join(" · ");
+        }
+        show({ code: two ? "pools" : "tags_needed", steps: STEPS[two ? "two" : "one"], lit, lines, vars });
         if (done) {
           const b = last.best;
           answer(box, two ? `קריאות לבד ${ltr(b.R)}, כתיבות לבד ${ltr(b.W)}, יחד ${ltr(b.R + b.W)} tags בשני מאגרים. מאגר משותף${NB}: ${ltr(b.all)} tags, ${b.R + b.W > b.all ? `חיסכון של ${ltr(b.R + b.W - b.all)}` : "בלי חיסכון, כי שני השיאים נופלים יחד"}.`

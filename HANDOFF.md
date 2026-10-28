@@ -1273,12 +1273,24 @@ section below starts at session 22, whose numbered items run on through the late
       demos with expected values and two self-checks each. Verilator could not be built in
       the sandbox (`flex` is not installable), so the SystemVerilog ran in CI only.
 
+83. **The explanation panel of a box (session 28, 2026-10-28).** The owner asked for an
+    interface that explains and illustrates the solution of every part; picked from
+    multiple-choice questions: the solution's steps lit and the code synced to the steps,
+    inside the existing box, for 0060 and 0061 first. `explain()` in `core.js` appends a
+    fold "הסבר" with the steps as chips (the step of the moment lit), a line of the
+    variables (before → after) and the page's own code (read from the page's tabbed block
+    that names the function, in the language of the open tab, the annotation markers
+    stripped) with the lines the step ran lit as `.hll`. The `onesk` and `tagpool` views
+    call it after every draw, with the function of their mode (`longest_ones` /
+    `longest_same`, `tags_needed` / `pools`). Two contrast pairs for the chips. Not yet
+    on the older boxes: the owner wants to see it on the two pages first.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81) and questions 0060 and 0061 (item 82, session 28) on the branch; S5 is the one S round left.
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83, session 28) on the branch; S5 is the one S round left.
   60 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check

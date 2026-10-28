@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { answer, autoplay, ltr, seedControls, speedSel } = dvqExplorers.lib;
+  const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
   const NB = " ";
   const NMAX = 40;
 
@@ -47,6 +47,12 @@
   // window so far outlined, and the right end underlined. Under it the step in words, and
   // with values the counters of the window.
   const MODES = { bits: "ביטים (סעיף א)", values: "ערכים על ה-bus (סעיף ב)" };
+  // the solution's steps, as chips of the explanation panel, and a variable's change
+  const STEPS = {
+    bits: ["הקצה הימני מתקדם", "יותר מ-k אפסים : השמאלי מתקדם", "הטוב עד עכשיו", "הסוף : הטוב הוא התשובה"],
+    values: ["הקצה הימני מתקדם, והמונה שלו גדל", "יותר מ-k להחלפה : השמאלי מתקדם", "הטוב עד עכשיו", "הסוף : הטוב הוא התשובה"],
+  };
+  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
   const onesView = () => ({
     mount(box) {
       const d0 = { mode: box.dataset.mode === "values" ? "values" : "bits", bits: box.dataset.bits || "11100011110", values: box.dataset.values || "AAABBCBABA", k: Number(box.dataset.k) || 2 };
@@ -72,6 +78,7 @@
         `<span class="viz-legend"><span><i class="ok-key-in"></i>בחלון</span><span><i class="ok-key-flip"></i>תא שצריך להפוך או להחליף</span>` +
         `<span><i class="ok-key-best"></i>החלון הטוב עד עכשיו</span><span><i class="ok-key-cur"></i>הקצה הימני</span></span>` +
         `<p class="ok-note"></p><p class="ok-counts"></p>`;
+      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       const bits = () => st.mode === "bits";
@@ -119,6 +126,21 @@
         }
         $(".ok-note").innerHTML = note;
         $(".ok-counts").innerHTML = counts;
+        // the explanation panel: the steps of the moment, the lines they ran, the variables
+        const prev = st.s > 1 ? F[st.s - 2] : null;
+        let lit = [], lines, vars;
+        if (!fr) {
+          lines = bits() ? { py: [3], sv: [4] } : { py: [4, 5], sv: [5] };
+          vars = ltr(bits() ? "best = 0, left = 0, zeros = 0" : "best = 0, left = 0, count = {}");
+        } else {
+          const moved = fr.moved > 0;
+          lit = [1, ...(moved ? [2] : []), 3, ...(done ? [4] : [])];
+          lines = bits() ? { py: [5, 6, ...(moved ? [7, 8] : []), 9, ...(done ? [10] : [])], sv: [6, 7, ...(moved ? [8, 9] : []), 11, ...(done ? [13] : [])] }
+            : { py: [7, 8, ...(moved ? [9, 10] : []), 11, ...(done ? [12] : [])], sv: [7, 8, 9, 10, ...(moved ? [11, 12, 13, 14] : []), 16, ...(done ? [18] : [])] };
+          vars = [ltr(`right = ${fr.right}`), V("left", prev ? prev.left : 0, fr.left),
+            bits() ? V("zeros", prev ? prev.zeros : 0, fr.zeros) : ltr(`most = ${fr.most}`), V("best", prev ? prev.best : 0, fr.best)].join(" · ");
+        }
+        show({ code: bits() ? "longest_ones" : "longest_same", steps: STEPS[st.mode], lit, lines, vars });
         if (done && fr) {
           answer(box, fr.best ? `${bits() ? "רצף האחדות הארוך ביותר" : "החלון הארוך ביותר של ערך אחד"} הוא באורך ${ltr(fr.best)}${NB}: המקומות ${ltr(fr.win[0])} עד ${ltr(fr.win[1])}.` : "הרצף ריק.", ".ok-strip .is-best");
         } else answer(box, null);

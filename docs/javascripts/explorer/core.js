@@ -369,6 +369,58 @@
     (typeof marks === "string" ? box.querySelectorAll(marks) : marks).forEach((el) => el && el.classList.add("ex-answer-mark"));
   };
 
+  // An explanation panel (session 28): the solution's steps as chips, the ones of the
+  // moment lit; the values of the code's variables; and the page's own code with the lines
+  // the step ran lit, as the page lights its key lines. The code is read from the page (the
+  // tabbed block whose title names the function, in the language of the open tab, which
+  // follows the site's tab choice), so the box never holds a second copy of it.
+  // explain(box, title) appends the panel (a fold, closed on a phone) and returns
+  // show({ code, steps, lit, lines, vars }): code names the function, steps are the chip
+  // texts, lit the chips to light (from 1), lines the line numbers per language
+  // ({ py, sv }, from 1), and vars an HTML line of the variables.
+  const CODE_LINE = /<a id="__codelineno-\d+-\d+"[^>]*><\/a>/;
+  const codeSetOf = (name) => [...document.querySelectorAll(".tabbed-set")]
+    .find((set) => [...set.querySelectorAll(".filename")].some((f) => f.textContent.trim().split(/\s+/).pop() === name));
+  const PANELS = new Set();
+  const explain = (box, title) => {
+    const panel = document.createElement("section");
+    panel.className = "ex-proof ex-explain";
+    panel.innerHTML = `<p class="ex-proof-title">${title}</p><ol class="ex-stepchips"></ol><p class="ex-vars"></p>` +
+      `<div class="highlight ex-codewrap"><pre class="ex-codeview"><code dir="ltr" tabindex="0" aria-label="הקוד של הפתרון, השורות של הצעד מודגשות"></code></pre></div>`;
+    box.append(panel);
+    let st = null;
+    const render = () => {
+      if (!st) return;
+      panel.querySelector(".ex-stepchips").innerHTML = st.steps.map((s, i) => `<li${st.lit.includes(i + 1) ? ' class="is-lit"' : ""}>${s}</li>`).join("");
+      panel.querySelector(".ex-vars").innerHTML = st.vars || "";
+      const set = codeSetOf(st.code), code = panel.querySelector("code");
+      if (!set) { code.innerHTML = ""; return; }
+      const inputs = [...set.querySelectorAll(":scope > input")], labels = [...set.querySelectorAll(".tabbed-labels label")];
+      const i = Math.max(0, inputs.findIndex((r) => r.checked));
+      const lang = /python/i.test(labels[i] ? labels[i].textContent : "") ? "py" : "sv";
+      const src = set.querySelectorAll(".tabbed-block")[i], el = src && src.querySelector("pre code");
+      let lines = [];
+      if (el) {                              // without the annotation markers the theme adds
+        const clone = el.cloneNode(true);
+        clone.querySelectorAll(".md-annotation").forEach((a) => a.remove());
+        lines = clone.innerHTML.split(CODE_LINE).slice(1);
+      }
+      const lit = new Set(st.lines[lang] || []);
+      code.innerHTML = lines.map((h, n) => {
+        let t = h.replace(/\n$/, "");
+        if (/^<span class="hll">/.test(t)) t = t.replace(/^<span class="hll">/, "").replace(/\n?<\/span>$/, "");   // the page's own key lines
+        return `<span class="ex-line${lit.has(n + 1) ? " hll" : ""}" data-n="${n + 1}">${t}\n</span>`;
+      }).join("");
+    };
+    PANELS.add(render);
+    if (PANELS.size === 1) {                 // the language of every panel follows the tabs
+      document.addEventListener("change", (e) => {
+        if (e.target.closest && e.target.closest(".tabbed-set")) setTimeout(() => PANELS.forEach((r) => r()), 0);
+      });
+    }
+    return (state) => { st = state; render(); };
+  };
+
   // The box's header (UI328): a title, and help, "reset everything" and "copy link" as
   // icon buttons (the word stays in the button as its name and shows as a tooltip).
   // "Reset everything" builds the box again from its defaults and, in a box that draws
@@ -1200,7 +1252,7 @@
 
   const lib = {
     BASE, EPS, H, KB_DIGITS, RAND_HASH, RIGHT, SEED_MAX, STATE_CODECS, TOP, TRI_M, W, X0,
-    answer, arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, f, floydParse, floydTrace, fmt, frame, hline,
+    answer, arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, explain, f, floydParse, floydTrace, fmt, frame, hline,
     gridText, ltr, mulberry32, newSeed, parseGrid, randNote, randomRow, seedControls, speedSel, stickyNames, triNorm, viewSel,
     waveDromText, waveStrip,
   };

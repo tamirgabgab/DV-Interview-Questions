@@ -643,6 +643,16 @@ controls that stay out (0046 and 0047 fold the editing rows and keep the shape a
 selects after the fold): the link and the remembered state do not change. The page checks
 open every fold after the boxes are built.
 
+An **explanation panel** (`explain()` in `core.js`, a fold titled "הסבר") ties a box to
+the solution it sits in: the solution's steps as chips with the step of the moment lit,
+one line of the code's variables (before → after), and the page's own code with the lines
+the step ran lit the way the page lights its key lines. The panel reads the code from the
+page, the tabbed block whose title names the function, in the language of the open tab
+(the site's tab choice), so the box never holds a copy of it; a view calls
+`show({ code, steps, lit, lines, vars })` after every draw with the function's name, the
+chip texts, the chips to light, the line numbers per language (`{ py, sv }`) and the
+variables. 0060 and 0061 have it; a box with two modes names the function of each mode.
+
 `check_contrast.py` reads the colour tokens (Material's own from the installed theme,
 overridden by the parts of `docs/stylesheets/`) for the light and the dark scheme, and checks a
 list of pairs as the site draws them (body text, links, chips on their tint, white on the
