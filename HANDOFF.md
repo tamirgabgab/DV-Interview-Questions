@@ -1429,9 +1429,18 @@ section below starts at session 22, whose numbered items run on through the late
     (S + d) / 2 and a worked cell; 0061 the left end frame by frame with a move counter,
     the invalid-window fact, the real `best`-before-`while` trap, the edge cases. Left as
     they were: the figures of 0027 that looked duplicated (they show different values or
-    the two forms of the condition), the mermaid colour of 0020 (no theming hook; 0005,
-    0018 and 0019 share it). 0062 still has ordinary spaces before its colons (seen while
-    fixing 0061).
+    the two forms of the condition). The mermaid colour and the colons of 0062 were done
+    in item 93.
+93. **Two leftovers of round R (session 28, 2026-10-28).** 0062: a non-breaking space
+    before every colon of Hebrew text (48 on the page, two figure labels in `q0062.py`,
+    five strings of `tagpool.js`; the C ternary in the code is untouched). The found node of the mermaid
+    searches (0005, 0018, 0019, 0020) had a literal `#1baf7a`: Mermaid's `classDef` rejects
+    `var(...)` and `rgb(...)` with a parse error and leaves the diagram unrendered (the
+    phone check does not notice), so the node takes `stroke:currentColor` and
+    `.md-typeset .mermaid { color: var(--viz-s3) }` in `01-base.css` supplies the colour,
+    which the closed shadow root inherits from its host. Checked by rendering all 14
+    diagrams with the host colour red and blue in both schemes: only the found nodes
+    change (the rest differs no more than two renders of one colour).
 
 ## In progress
 

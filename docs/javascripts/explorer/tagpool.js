@@ -9,8 +9,8 @@
   const NMAX = 12, TMAX = 99;
   // the solution's steps, as chips of the explanation panel, and a variable's change
   const STEPS = {
-    one: ["שני אירועים לטרנזקציה", "מיון לפי זמן, תשובה לפני שליחה", "סריקה : המונה והשיא", "התשובה : השיא"],
-    two: ["שני אירועים לטרנזקציה, עם הסוג", "מיון לפי זמן, תשובה לפני שליחה", "סריקה : מונה לכל סוג, והסכום", "התשובה : שלושת השיאים"],
+    one: ["שני אירועים לטרנזקציה", "מיון לפי זמן, תשובה לפני שליחה", "סריקה : המונה והשיא", "התשובה : השיא"],
+    two: ["שני אירועים לטרנזקציה, עם הסוג", "מיון לפי זמן, תשובה לפני שליחה", "סריקה : מונה לכל סוג, והסכום", "התשובה : שלושת השיאים"],
   };
   const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
 
@@ -106,7 +106,7 @@
         `<span class="viz-legend"><span class="tp-one"><i class="tp-key-bar"></i>טרנזקציה</span><span class="tp-two"><i class="tp-key-r"></i>קריאה</span><span class="tp-two"><i class="tp-key-w"></i>כתיבה</span>` +
         `<span><i class="tp-key-open"></i>פתוחה עכשיו</span><span><i class="tp-key-count"></i>כמה פתוחות</span><span><i class="tp-key-max"></i>המקסימום עד עכשיו</span><span><i class="tp-key-cursor"></i>האירוע הנוכחי</span></span>` +
         `<p class="tp-note"></p>`;
-      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
+      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       const rows = () => tpSweep(st.txns);

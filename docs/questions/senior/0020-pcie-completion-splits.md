@@ -291,7 +291,7 @@ added: 2026-10-18
         c -- "128 → 0x1100" --> c2["pos = 0x1100<br/>sizes = [112, 128]"]
         c2 -- "16 → 0x1110" --> c3["[112, 128, 16] ✓"]
         classDef pruned stroke-dasharray: 5 4,opacity:0.55;
-        classDef found stroke:#1baf7a,stroke-width:3px;
+        classDef found stroke:currentColor,stroke-width:3px;
         class a,b,b1,c1 pruned;
         class c3 found;
     ```

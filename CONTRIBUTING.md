@@ -502,7 +502,7 @@ tools along its foot with their names on a screen with a pointer.
 
 | Kind of figure                   | How it is written                                                  |
 |----------------------------------|--------------------------------------------------------------------|
-| Block diagrams, flows, FSMs      | ` ```mermaid ` fenced blocks ([Mermaid](https://mermaid.js.org/); 0024 has a sequence diagram)  |
+| Block diagrams, flows, FSMs      | ` ```mermaid ` fenced blocks ([Mermaid](https://mermaid.js.org/); 0024 has a sequence diagram; a node to highlight takes `classDef found stroke:currentColor,stroke-width:3px`, and `01-base.css` gives it the chart green: Mermaid does not parse `var()` in a `classDef`, and the diagram renders in a closed shadow root that site CSS does not reach)  |
 | Timing diagrams / waveforms      | ` ```wavedrom ` fenced blocks ([WaveDrom](https://wavedrom.com/))  |
 | Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax)           |
 | Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |

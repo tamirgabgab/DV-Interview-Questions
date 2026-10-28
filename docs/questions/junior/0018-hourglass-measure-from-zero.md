@@ -281,7 +281,7 @@ added: 2026-10-18
         s6 -- "AB" --> s9["t=15<br/>A=0, B=7"]
         s7 -- "any" --> x6["> 15 ✗"]
         classDef pruned stroke-dasharray: 5 4,opacity:0.6;
-        classDef found stroke:#1baf7a,stroke-width:3px;
+        classDef found stroke:currentColor,stroke-width:3px;
         class x1,x2,x3,x4,x5,x6 pruned;
         class s8 found;
     ```

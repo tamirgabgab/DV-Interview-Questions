@@ -295,7 +295,7 @@ added: 2026-10-15
         n100 -- "+0" --> n1000["1000<br/>r = 6 ✗"]
         n100 -- "+1" --> n1001["1001<br/>r = 0 ✓"]
         classDef pruned stroke-dasharray: 5 4,opacity:0.6;
-        classDef found stroke:#1baf7a,stroke-width:3px;
+        classDef found stroke:currentColor,stroke-width:3px;
         class n101,n1000 pruned;
         class n1001 found;
     ```
@@ -326,7 +326,7 @@ added: 2026-10-15
     ```mermaid
     flowchart LR
         a["1<br/>r=1"] -- "+1" --> b["11<br/>r=2"] -- "+1" --> c["111<br/>r=3"] -- "+1" --> d["…"] -- "+1" --> e["11111111<br/>r=8"] -- "+1" --> f["111111111<br/>r=0 ✓"]
-        classDef found stroke:#1baf7a,stroke-width:3px;
+        classDef found stroke:currentColor,stroke-width:3px;
         class f found;
     ```
 

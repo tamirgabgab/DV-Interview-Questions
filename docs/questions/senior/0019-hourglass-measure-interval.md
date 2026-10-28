@@ -362,7 +362,7 @@ added: 2026-10-18
         s4 -- "start, +0" --> s5["t=21<br/>(0, 1, 0)"]
         s5 -- "wait, +1" --> s6["t=22<br/>(0, 0, 1) ✓"]
         classDef pruned stroke-dasharray: 5 4,opacity:0.6;
-        classDef found stroke:#1baf7a,stroke-width:3px;
+        classDef found stroke:currentColor,stroke-width:3px;
         class p1,p2,d0,d1,d2,d3 pruned;
         class s6 found;
     ```

@@ -114,9 +114,9 @@ def events_table(txns):
 
 def blocks():
     """The generated blocks, in page order."""
-    return [timeline_svg(TXNS, "שלוש טרנזקציות : 0 עד 30, 5 עד 10 ו-15 עד 20, ומתחתן כמה פתוחות בכל רגע, לכל היותר 2"),
+    return [timeline_svg(TXNS, "שלוש טרנזקציות : 0 עד 30, 5 עד 10 ו-15 עד 20, ומתחתן כמה פתוחות בכל רגע, לכל היותר 2"),
             legend_a(), events_table(TXNS),
-            timeline_svg(TXNS_B, "שתי קריאות ב-0 עד 12 ושתי כתיבות ב-20 עד 32 : שני מאגרים צריכים 4 tags, מאגר משותף 2", kinds=True),
+            timeline_svg(TXNS_B, "שתי קריאות ב-0 עד 12 ושתי כתיבות ב-20 עד 32 : שני מאגרים צריכים 4 tags, מאגר משותף 2", kinds=True),
             legend_b()]
 
 

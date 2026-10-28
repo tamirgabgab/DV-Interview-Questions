@@ -109,6 +109,13 @@
   unicode-bidi: isolate;
 }
 
+/* Mermaid's classDef takes no var(), and the diagram sits in a closed shadow root: a node
+   class marked `stroke:currentColor` (the found node of a search) takes this colour, which
+   the shadow tree inherits from its host. Nothing else in Material's diagram CSS uses it. */
+.md-typeset .mermaid {
+  color: var(--viz-s3);
+}
+
 .md-typeset .arithmatex,
 .md-typeset [id^="WaveDrom_Display_"] {
   text-align: center;
