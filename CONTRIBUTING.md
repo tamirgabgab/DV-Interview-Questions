@@ -93,6 +93,7 @@ DV-Interview-Questions/
 │   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
 │   ├── new_question.py         # Scaffold: page, tests folder, generator stub, catalog row
 │   ├── catalog.py              # Writes CATALOG.md from the pages' front matter
+│   ├── graph.py                # Writes docs/graph.html (the question map) from graph_concepts.json
 │   ├── page_tests.py           # Test helpers: Node runner, "page blocks match the generator"
 │   ├── codemirror/             # entry.js + build.sh: the run panel's editor bundle
 │   └── figures/                # Generators of the inline SVG figures (q<id>.py with blocks()),
@@ -732,6 +733,19 @@ workers, so their routes to the local CDN copies still apply. Printing a questio
 solutions stay hidden in practice mode, for a practice sheet), prints the dark scheme
 light, lets long blocks run across pages, and leaves out the page tools, the box controls,
 the run panel and the comments; each box prints its figures and summary as they stand.
+
+### The question map
+
+`docs/graph.html` is a standalone page (not in the navigation, linked from `README.md`): an
+interactive knowledge graph of every question and the techniques its solution uses, drawn
+by [graphify](https://pypi.org/project/graphifyy/) with vis-network from unpkg. The data is
+`tools/graph_concepts.json`: per question its core concepts (2 to 5), its secondary ones,
+and its related questions (`explicit` when the page links to it). It was written by reading
+every page; when a question is added, add its entry (and any new concept with a label and a
+group), then run `pip install graphifyy` and `python tools/graph.py`, which takes titles and
+levels from the front matter, colours the groups graphify finds, makes the canvas and the
+side panel right to left, stacks the panel under the graph below 700 px, and turns a
+question's source into a link to its page. graphify is not a site dependency.
 
 ### Comments
 

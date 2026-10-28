@@ -1122,6 +1122,23 @@ section below starts at session 22, whose numbered items run on through the late
     the text colour (Material greys it, so the paths, catalog, level and tag pages had a
     faint title), h1 and h2 wrap with `text-wrap: balance` (0050 left "ID" alone on a
     line), and the catalog page hides the navigation sidebar, which held one link.
+73. **The question map, a knowledge graph (session 28, 2026-10-28).** The owner asked to
+    try three Claude Code add-ons (Caveman, Claude-mem, Graphify) and then to run Graphify.
+    Its code-only pass (tree-sitter, no LLM) mapped the infrastructure but not the
+    questions (only the page headings), so the semantic pass was run on the 58 pages alone:
+    six readers wrote, per question, its core concepts, secondary ones and related
+    questions (every page read to its last line), merged into `tools/graph_concepts.json`
+    (115 concepts in seven groups; `systemverilog` dropped as a secondary concept, it was a
+    hub on 23 questions). `tools/graph.py` builds `docs/graph.html` with graphify (vis-network
+    from unpkg): titles and levels from the front matter, the canvas and the side panel
+    right to left, a Hebrew header with a link back to the site, the panel under the graph
+    below 700 px, and a link to the question's page in the panel. `README.md` links it
+    under the site link. Not in the navigation, not part of CI (graphify is not a site
+    dependency); add a new question's entry to the JSON and rerun the script. What the map
+    shows: math (36 questions with a core concept there) and algorithms (32) dominate;
+    probability (5), puzzles as such (6) and digital design (10) are thin; no question is
+    about debugging or a sliding window, and UVM, covergroups, async FIFO, clock dividers
+    and credit flow control have one question each.
 
 ## In progress
 
