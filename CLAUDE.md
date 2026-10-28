@@ -88,7 +88,8 @@ on figure text under 9 px at 390 px and on serious axe findings (`--small-fail -
 in dark mode; CI runs it only on a manual run with `phone_dark`. Every page's line of the
 phone check also gives its weight (HTML KB, bytes fetched, requests); over 400 KB of HTML is
 a warning. Every page is also loaded with its text enlarged 1.3 times (a phone's text size), and
-fails if it is then wider than the screen. Node runs the explorer
+fails if it is then wider than the screen; at both sizes a box's slider and its value must
+sit on one row. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
 All ten run in CI on every push that touches the site (a push of only README, CONTRIBUTING,

@@ -1319,13 +1319,23 @@ section below starts at session 22, whose numbered items run on through the late
     tables of the 0031 and 0037 boxes scroll. `check_phone.py` loads every page a second
     time with the text enlarged 1.3 times (`--font-scale`) and fails when it is wider than
     the screen. Published (`main` 2c04376); the owner checks the phone.
+86. **A slider and its value on one row (session 28, 2026-10-28).** The owner saw the
+    value of the base slider of 0044 on a row under the slider on the phone. A slider's
+    label wrapped freely and the slider kept its 11rem, so the value dropped to the next
+    row: 30 pages had it, some at the normal text size too (0013, 0014, 0017, 0035, 0043,
+    0044). Fixed for every box, at every width (`12-rounds-y-s.css`): a label of a
+    `<span>`, a slider and an `<output>` does not wrap, the slider shrinks first (down to
+    3rem), the label keeps up to 40% of the row and wraps its words beyond that, and on a
+    phone the value takes only its own width. The number field of the 0016 box moved to
+    its own `<label>`. `check_phone.py` fails, at both text sizes, when a slider's value
+    sits on another row or a slider's label is cut off at the box's edge.
 
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done.
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done; a slider and its value on one row (item 86).
   60 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check

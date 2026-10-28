@@ -145,6 +145,25 @@ AXE = """async () => {
                    help: v.help.slice(0, 70) }));
 }"""
 
+# A slider of a box and its value on one row (the slider shrinks first; a long label wraps its
+# own words): one entry per slider whose value sits on another row, or
+# whose label is wider than its room (a part of it cut off at the box's edge).
+SLIDER_ROWS = """() => {
+  const out = [];
+  for (const r of document.querySelectorAll(".md-content .explorer input[type='range']")) {
+    const v = r.nextElementSibling;
+    const a = r.getBoundingClientRect();
+    if (a.width === 0 || !v || v.tagName !== "OUTPUT" || !v.getBoundingClientRect().width) continue;
+    const b = v.getBoundingClientRect();
+    const label = r.closest("label");
+    const spill = label && label.scrollWidth > label.clientWidth + 1;               // a part cut off at the label's edge
+    if (!spill && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 0) continue;   // the rows overlap
+    const box = r.closest(".explorer");
+    out.push(`box ${box.dataset.kind}${spill ? ", cut off" : ""}: "${(label ? label.textContent : "").trim().replace(/\\s+/g, " ").slice(0, 40)}"`);
+  }
+  return out;
+}"""
+
 # The text enlarged, as a phone's font-size setting enlarges it (Android Chrome scales the
 # font sizes, so a row that fits at 1x can widen the page at 1.3x, and the browser then
 # zooms out and shows the navigation drawer beside the page): the root font size times s,
@@ -269,6 +288,7 @@ def main(argv: list[str]) -> int:
             wide_math = page.evaluate(WIDE_MATH)
             small_text = page.evaluate(SMALL_TEXT, MIN_TEXT)
             covered = page.evaluate(ENLARGE_COVERS)
+            split = page.evaluate(SLIDER_ROWS)
             big = None
             if big_ctx:                          # the same page loaded with the text enlarged
                 bp = big_ctx.new_page()
@@ -277,6 +297,7 @@ def main(argv: list[str]) -> int:
                     bp.evaluate(OPEN_ALL)
                     bp.wait_for_timeout(800)
                     big = bp.evaluate(INSPECT, WIDTH)
+                    split += [f"{w} (the text x{args.font_scale:g})" for w in bp.evaluate(SLIDER_ROWS)]
                 except Exception as e:
                     errors.append(f"load with the text enlarged: {e}")
                 bp.close()
@@ -291,7 +312,7 @@ def main(argv: list[str]) -> int:
             page.close()
 
             too_big = big is not None and big["scrollWidth"] > WIDTH + 1
-            bad = info["scrollWidth"] > WIDTH + 1 or too_big or errors or covered or (args.axe_fail and axe) or (args.small_fail and small_text)
+            bad = info["scrollWidth"] > WIDTH + 1 or too_big or errors or covered or split or (args.axe_fail and axe) or (args.small_fail and small_text)
             failures += bool(bad)
             status = "FAIL" if bad else "ok"
             html_kb = (site / rel).stat().st_size / 1024
@@ -311,6 +332,8 @@ def main(argv: list[str]) -> int:
                 print(f"        script error: {e[:200]}")
             for w in covered:
                 print(f"        enlarge button covers text: {w}")
+            for w in split:
+                print(f"        a slider's value on another row: {w}")
             for w in wide_math:
                 print(f"        warn wide math {w}")
             for w in small_text:

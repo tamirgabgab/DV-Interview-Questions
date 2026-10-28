@@ -670,7 +670,10 @@ test job of CI, so a colour that reads badly stops the deploy. A new pair goes i
 page is then wider than the screen: Android Chrome zooms such a page out and shows the
 navigation drawer beside it. A row of buttons or chips wraps or scrolls (`overflow-x: auto`)
 rather than holding its width, and an inline formula wider than its line scrolls on its own
-(`reading-tools.js` marks it `.is-wide`).
+(`reading-tools.js` marks it `.is-wide`). At both text sizes it also fails when a box's slider and its
+value (`<label><span>…</span><input type="range"><output>`) sit on two rows, or a label is
+cut off at the box's edge: the slider shrinks first (down to 3rem), so keep a slider's label to
+a `<span>`, the slider and its `<output>`, and give any other field its own `<label>`.
 
 `check_phone.py` also prints every page's weight (the HTML in KB, the bytes the browser
 fetched and the requests) and warns over `--weight-warn` KB of HTML (400); its summary names

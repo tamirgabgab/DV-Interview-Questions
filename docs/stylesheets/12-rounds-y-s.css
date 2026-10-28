@@ -89,4 +89,12 @@
 /* a field of a box never wider than the box: its label wraps, the field shrinks */
 .md-typeset .explorer .ex-controls > label { max-width: 100%; }
 .md-typeset .explorer .ex-controls > label :is(input, select, textarea) { max-width: 100%; min-width: 0; box-sizing: border-box; }
+/* a slider and its value stay on one row: the slider shrinks (down to 3rem), the label keeps
+   its width up to 40% of the row and wraps its words beyond that, and on a phone the value takes
+   only what it needs (check_phone.py measures every slider) */
+.md-typeset .explorer label:has(> input[type="range"] + output:last-child) { flex-wrap: nowrap; }
+.md-typeset .explorer label > input[type="range"] { flex: 0 100 auto; min-width: 3rem; }
+.md-typeset .explorer label:has(> input[type="range"] + output:last-child) > span { flex-shrink: 0; max-width: 40%; }
+.md-typeset .explorer label > input[type="range"] + output { flex: none; }
+@media (max-width: 600px) { .md-typeset .explorer label > input[type="range"] + output { min-width: 3ch; } }
 .md-typeset .explorer :is(.bridge-greedy, .mtbf-table) { overflow-x: auto; }

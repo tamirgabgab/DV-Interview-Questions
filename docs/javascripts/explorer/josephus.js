@@ -82,8 +82,8 @@
       const runFast = (n) => josephusSurvivor(n, st.l);
       box.innerHTML =
         `<div class="ex-controls">` +
-        `<label><span>מספר האנשים N</span><input type="range" class="ex-n" min="1" max="${nmax}" step="1" value="${st.n}" dir="ltr"><output class="out-n"></output>` +
-        `<input type="number" class="ex-num ex-nbig" min="1" max="${NBIG}" step="1" value="${st.n}" dir="ltr" aria-label="מספר האנשים, עד מיליון"></label>` +
+        `<label><span>מספר האנשים N</span><input type="range" class="ex-n" min="1" max="${nmax}" step="1" value="${st.n}" dir="ltr"><output class="out-n"></output></label>` +
+        `<label><input type="number" class="ex-num ex-nbig" min="1" max="${NBIG}" step="1" value="${st.n}" dir="ltr" aria-label="מספר האנשים, עד מיליון"></label>` +
         `<label><span>הכלל ${ltr("L")} : אחד נשאר, ${ltr("L − 1")} יוצאים</span><input type="range" class="ex-l" min="2" max="${lmax}" step="1" value="${st.l}" dir="ltr"><output class="out-l"></output></label>` +
         `<label><input type="checkbox" class="ex-mark" checked> להדגיש את השורד מההתחלה</label>` +
         `<label>המושב <input type="number" class="ex-num ex-seat" min="0" step="1" dir="ltr" placeholder="s" aria-label="מושב לחיפוש הפוך : לאילו N הוא שורד"></label>` +
