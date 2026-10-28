@@ -615,13 +615,14 @@
       // three or more action buttons in a row (examples, moves, amounts) go into one run
       // that scrolls sideways on a phone instead of wrapping into several lines (S418);
       // the order stays, and elsewhere the run lays out as if it were not there; a row a
-      // view lays out as a grid (0024's events, one per cell) keeps its grid
+      // view lays out as a grid (0024's events, one per cell) keeps its grid; the run is
+      // not tagged as an action itself, so the button size and padding stay on its buttons
       if (!getComputedStyle(row).display.includes("flex")) return;
       let run = [];
       const close = () => {
         if (run.length >= 3) {
           const wrap = document.createElement("span");
-          wrap.className = "ex-btnrun ex-c-action";
+          wrap.className = "ex-btnrun";
           run[0].before(wrap);
           wrap.append(...run);
         }

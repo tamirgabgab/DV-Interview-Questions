@@ -127,14 +127,26 @@ SNAP = """([b, own]) => {
   copy.querySelectorAll("[data-fig-above]").forEach((el) => el.removeAttribute("data-fig-above"));
   copy.querySelectorAll(".fig-wrap--above").forEach((el) => el.classList.remove("fig-wrap--above"));
   // attributes in one order: a figure refitted on another path sets the same attributes in
-  // another order (style before data-fit-base), which is the same drawing
+  // another order (style before data-fit-base), which is the same drawing; a name that is
+  // not valid comes from a quote that broke an attribute (a view's markup), and is reported
+  const bad = [];
   [copy, ...copy.querySelectorAll("*")].forEach((el) => {
     const attrs = [...el.attributes].map((a) => [a.name, a.value]).sort((x, y) => (x[0] < y[0] ? -1 : 1));
     attrs.forEach(([name]) => el.removeAttribute(name));
-    attrs.forEach(([name, value]) => { try { el.setAttribute(name, value); } catch (e) { /* not a valid name: dropped on both sides */ } });
+    attrs.forEach(([name, value]) => {
+      try { el.setAttribute(name, value); } catch (e) { bad.push(`<${el.localName}> ${name}`); }
+    });
   });
-  return { values, html: copy.innerHTML, restored: !!box.querySelector(".ex-restored") };
+  return { values, html: copy.innerHTML, restored: !!box.querySelector(".ex-restored"), bad };
 }"""
+
+
+def broken_markup(kind: str, b: int, snap: dict, where: str) -> list[str]:
+    """A problem for the attribute names of the box that are not valid (a quote inside an
+    attribute's value split it)."""
+    if not snap["bad"]:
+        return []
+    return [f"{kind} {b}: broken attributes {where} (a quote in a value?): {', '.join(snap['bad'][:5])}"]
 
 
 def first_difference(a: str, b: str) -> str:
@@ -182,11 +194,13 @@ def check_links(browser, routes, url: str) -> tuple[list[str], list[str]]:
         link = page.evaluate("(b) => dvqExplorers.linkOf(document.querySelectorAll('.explorer')[b])", b)
         own = link.startswith("#state-")
         want = page.evaluate(SNAP, [b, own])
+        problems += broken_markup(kind, b, want, "after the clicks")
         page.close()
 
         fresh = context()
         other = open_page(fresh, url + link, errors)
         got = other.evaluate(SNAP, [b, own])
+        problems += broken_markup(kind, b, got, "from the link")
         other.close()
         fresh.close()
         if got["values"] != want["values"]:
@@ -196,6 +210,7 @@ def check_links(browser, routes, url: str) -> tuple[list[str], list[str]]:
 
         page = open_page(ctx, url, errors)
         got = page.evaluate(SNAP, [b, own])
+        problems += broken_markup(kind, b, got, "after a reload")
         if not got["restored"]:
             problems.append(f"{kind} {b}: no remembered state after a reload")
         elif got["values"] != want["values"]:

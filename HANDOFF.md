@@ -1217,9 +1217,31 @@ section below starts at session 22, whose numbered items run on through the late
     to prove it (the custom properties come back in a changing order, the repository widget
     loads its facts from the network, the hero animates).
 
+### Session 28 — 2026-10-28: code review fixes
+
+80. **Code review of the S rounds, eight fixes (session 28, 2026-10-28).** A review of
+    `docs/javascripts`, `hooks/questions.py` and `tools/check_explorers.py`; the owner took
+    eight of its ten findings (not the cached "new" set or the computed-style read in
+    `layout`):
+    - The button run (`ex-btnrun`) no longer carries `ex-c-action`: as `display: contents`
+      on a desktop its buttons were not children of the row any more, lost the actions'
+      `order: 2` and showed before the inputs (0004, 0007, 0011, 0014, 0034, 0039, 0047,
+      0053, 0059); and on a phone the button padding of `ex-c-action` (stronger selector)
+      cut the run's end padding to 0.75rem, so the last button stayed under the fade. The
+      run and its buttons now get `order: 2` in `12-rounds-y-s.css`.
+    - `py_run.matches` takes one label only (`is_label`): "5 != 7", "5 <= 7" and
+      "a = 5, b = 7" no longer match the comment "7"; "N = 5: 0110" still does.
+    - `check_explorers.py` reports an attribute name that is not valid (a broken quote, the
+      0056 bug) instead of dropping it.
+    - The hook has one `_added_date`, which also reads a quoted date ("2026-10-28"), used by
+      the header, the "new" chip, the recent strip and the what's-new page (`_added` gone).
+    - `_header`, `_level_cards` and `_related` use `_base` and `_href` instead of building
+      relative links inline.
+    - `josephus.js`: the counter of a big circle is the else branch of the small one.
+
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); S5 is the one S round left.
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 80, session 28) on the branch; S5 is the one S round left.
   58 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check

@@ -190,8 +190,9 @@ Conventions:
   code is importable as the module `solution` (`from solution import *`) and its names are
   also in scope. A comment on a `print()` line is its expected value
   (`print(trap([3, 0, 2, 0, 4]))  # 7`; a note may follow after two spaces and a
-  parenthesis, or after a colon and words). A print with a label ending in ":" or "="
-  may give the value alone (`print("long only:", f(prices))  # (6, 2, 3)`). After a run
+  parenthesis, or after a colon and words). A print with one label ending in ":" or "="
+  may give the value alone (`print("long only:", f(prices))  # (6, 2, 3)`); a comparison
+  ("5 != 7") or a second label of the same kind ("a = 5, b = 7") is not a label. After a run
   the panel puts a ✓ or ✗ beside that line and lists the mismatches, so do not put other
   remarks on a `print()` line. Only a print that runs once is checked (not one in a
   loop); every such print of a result, one short line that is the same on every run,
@@ -354,7 +355,8 @@ more rows that fits keeps its header row in view while it scrolls; numbers in ta
 tabular. Under 30em the figure legends (`viz-legend`) are compact chips that wrap. In a box, three or
 more action buttons side by side in a flex row (examples, moves, amounts) go into one run
 (`ex-btnrun`, core.js `layout`) that is a single line scrolling sideways under 30em, fading
-at its end; elsewhere it lays out as if it were not there.
+at its end; elsewhere it lays out as if it were not there (its buttons keep the actions'
+place in the row's order).
 
 The question tables on the home and level pages (UI322, UI323) have a search field (the
 title, the topics in both names and the id: "46" finds 0046), **segmented filters** (one
@@ -613,7 +615,8 @@ error, a console error or a page wider than the screen fails it, and the report 
 box and the button. Then, per box, it changes every control, opens the box's copied link in
 a fresh browser and reloads the page for the remembered state: different control values
 fail, a different drawing is a warning (some boxes draw from their history; an answer line
-that is off and the order of an element's attributes do not count), and "reset
+that is off and the order of an element's attributes do not count), an attribute name
+that is not valid (a quote inside a value split the attribute) fails, and "reset
 everything" must forget the state (`--no-links` skips this part). It takes the same
 `--offline`, `--route`, `--browser` and `--only` options as the phone check.
 

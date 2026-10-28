@@ -106,8 +106,9 @@ markdown_extensions:
           class: wavedrom
           format: !!python/name:pymdownx.superfences.fence_code_format
 
-exclude_docs: |   # notes for whoever edits the site, not pages
+exclude_docs: |   # notes for whoever edits the site, not pages; Python's cache of py_run.py (the tests)
   stylesheets/README.md
+  __pycache__/
 
 extra_css:   # the site's styles in parts, loaded in this order (see docs/stylesheets/README.md)
   - stylesheets/01-base.css

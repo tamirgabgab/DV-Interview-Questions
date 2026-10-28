@@ -302,10 +302,14 @@ def on_config(config, **kwargs):
 
 
 def _added_date(q: dict) -> dt.date | None:
+    """The date in the front matter's `added`: YAML gives a date, or a string when the
+    date is quoted ("2026-10-28"), which counts the same."""
     added = q.get("added")
     if isinstance(added, dt.datetime):
-        added = added.date()
-    return added if isinstance(added, dt.date) else None
+        return added.date()
+    if isinstance(added, dt.date):
+        return added
+    return dt.date.fromisoformat(added.strip()) if isinstance(added, str) and added.strip() else None
 
 
 def _new_ids() -> set[str]:
@@ -378,7 +382,7 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
     chips (id, level, difficulty, kind) and small badges (interactive, tested code, new),
     and one quiet line of topics, date and source. On a phone the tools go under the
     chips, so the title opens the page."""
-    base = posixpath.dirname(page_url) + "/" if page_url else ""
+    base = _base(page_url)
     langs = [name for name, fence in (("SV", "systemverilog"), ("Python", "python"))
              if extract_code.blocks_from_text(markdown, fence)]
     badges = []
@@ -394,8 +398,8 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
         badges.append(_badge("new", "חדש", "מהשאלות החדשות ביותר באתר : נוספה בשבוע האחרון", " qh-badge-new"))
     topics = ", ".join(_tag_link(t, base) for t in q["tags"])
     bottom = [f"<span>נושאים : {topics}</span>"]
-    if q.get("added"):
-        added = q["added"] if isinstance(q["added"], dt.date) else dt.date.fromisoformat(str(q["added"]))
+    added = _added_date(q)
+    if added:
         bottom.append(f'<span class="qh-sep"></span><span>נוספה ב-{_date_he(added)}</span>')
     if q.get("source"):
         bottom.append(f'<span class="qh-sep"></span><span>מקור : {html.escape(str(q["source"]))}</span>')
@@ -565,7 +569,7 @@ def _has_tests(q: dict) -> bool:
 
 
 def _level_cards(page_url: str) -> str:
-    base = posixpath.dirname(page_url) + "/" if page_url else ""
+    base = _base(page_url)
     cards = []
     for level, label in LEVELS.items():
         qs = [q for q in _questions.values() if q["level"] == level]
@@ -628,7 +632,6 @@ def _hero(inner: str, page_url: str) -> str:
 def _related(q: dict, page_url: str) -> str:
     """Up to RELATED_MAX other questions that share the most (non-generic) tags."""
     mine = set(q["tags"]) - GENERIC_TAGS
-    base = posixpath.dirname(page_url) + "/" if page_url else ""
     scored = []
     for other in _questions.values():
         if other["id"] == q["id"]:
@@ -642,7 +645,7 @@ def _related(q: dict, page_url: str) -> str:
         return ""
     items = []
     for *_, other in scored[:RELATED_MAX]:
-        href = posixpath.relpath(other["src_uri"][: -len(".md")] + "/", base or ".") + "/"
+        href = _href(other["src_uri"], page_url)
         items.append(
             f'<li><span class="rq-id">{other["id"]}</span> '
             f'<a class="rq-title" href="{href}">{html.escape(str(other["title"]))}</a>'
@@ -651,16 +654,9 @@ def _related(q: dict, page_url: str) -> str:
     return "\n\n## שאלות קשורות\n\n<ul class=\"related-questions\">\n" + "\n".join(items) + "\n</ul>\n"
 
 
-def _added(q: dict) -> dt.date | None:
-    added = q.get("added")
-    if isinstance(added, dt.datetime):
-        added = added.date()
-    return added if isinstance(added, dt.date) else None
-
-
 def _by_added() -> list[dict]:
     """The questions with an added date, the newest first (a later id first on one day)."""
-    return sorted((q for q in _questions.values() if _added(q)), key=lambda q: (_added(q), q["id"]), reverse=True)
+    return sorted((q for q in _questions.values() if _added_date(q)), key=lambda q: (_added_date(q), q["id"]), reverse=True)
 
 
 def _date_he(d: dt.date) -> str:
@@ -691,11 +687,11 @@ def _whats_new(page_url: str) -> str:
     """Every question by the day it was added, the newest day first."""
     out, day = [], None
     for q in _by_added():
-        if _added(q) != day:
+        if _added_date(q) != day:
             if day is not None:
                 out.append("</ul>")
-            day = _added(q)
-            n = sum(_added(o) == day for o in _questions.values())
+            day = _added_date(q)
+            n = sum(_added_date(o) == day for o in _questions.values())
             out.append(f'<h2 class="new-day" id="d{day.isoformat()}">\u200f{_date_he(day)} '
                        f'<span class="new-count">{n} {"שאלה" if n == 1 else "שאלות"}</span></h2>\n<ul class="related-questions">')
         out.append(_question_item(q, page_url))

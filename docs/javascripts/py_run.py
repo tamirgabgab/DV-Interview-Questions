@@ -29,17 +29,26 @@ def value_of(expected: str) -> str:
     return ANNOTATION.sub("", expected.strip()).rstrip()
 
 
+def is_label(head: str) -> bool:
+    """One label before a value: it ends with ":" or "=" and a space ("long only: ",
+    "f(2) = ", "N = 5: "), but is not a comparison ("5 != 7", "a <= 3") and holds no other
+    label of its kind with its value ("a = 1, b = 3", "x: 1, y: 3")."""
+    sep = head.rstrip()
+    if sep == head or not sep.endswith((":", "=")):
+        return False
+    label = sep[:-1]
+    return (not label.endswith(("!", "<", ">", "=", ":"))
+            and not re.search(re.escape(sep[-1]) + r"\s", label))
+
+
 def matches(expected: str, got: str) -> bool:
-    """The whole printed line, or what follows its label ("long only: (6, 2, 3)" matches the
-    comment "(6, 2, 3)"; the label ends with ":" or "=" and a space)."""
+    """The whole printed line, or what follows its one label ("long only: (6, 2, 3)" matches
+    the comment "(6, 2, 3)", see is_label)."""
     got = got.rstrip()
     for e in (expected.strip(), value_of(expected)):
         if not e:
             continue
-        if got == e:
-            return True
-        head = got[: -len(e)]
-        if got.endswith(e) and head != head.rstrip() and head.rstrip().endswith((":", "=")):
+        if got == e or got.endswith(e) and is_label(got[: -len(e)]):
             return True
     return False
 

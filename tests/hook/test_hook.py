@@ -103,3 +103,11 @@ def test_tag_grid_counts_each_tag():
     assert out.index('<nav class="tag-grid"') < out.index('<details class="tag-section" id="tag:bfs">')
     assert '<a class="tag-chip" href="#tag:bfs">BFS<span class="tag-count" aria-label="2 שאלות">2</span></a>' in out
     assert out.count('<ul class="tag-list">') == 2 and "<h2" not in out
+
+
+def test_added_date_quoted_or_not():
+    day = hook.dt.date(2026, 10, 28)
+    for added in (day, hook.dt.datetime(2026, 10, 28, 9, 30), "2026-10-28", " 2026-10-28 "):
+        assert hook._added_date({"added": added}) == day, added
+    for added in (None, "", 20261028):
+        assert hook._added_date({"added": added}) is None, added

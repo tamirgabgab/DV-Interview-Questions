@@ -43,6 +43,11 @@ def test_values_and_notes():
     assert py_run.matches("(6, 2, 3)", "long only, fast:  (6, 2, 3)")
     assert not py_run.matches("3)", "long only: (6, 2, 3)")
     assert not py_run.matches("3", "x: 13")
+    assert py_run.matches("0.5", "P(X=1) = 0.5")
+    assert py_run.matches("0110", "N = 5:   0110")
+    # a comparison or a second label is not a label
+    for got in ("5 != 7", "5 == 7", "5 <= 7", "5 >= 7", "a = 5 b = 7", "a = 5, b = 7", "x: 5, y: 7"):
+        assert not py_run.matches("7", got), got
 
 
 def test_checks_by_line():
