@@ -597,7 +597,11 @@
       const line = box && box.matches("span.arithmatex") ? box.parentElement : box;
       if (!line) return;
       m.classList.remove("is-wide");
-      if (m.getBoundingClientRect().width > line.clientWidth + 1) {
+      // past the line's content box on either side (an RTL line overflows to the left)
+      const r = m.getBoundingClientRect(), l = line.getBoundingClientRect(), cs = getComputedStyle(line);
+      const left = l.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth);
+      const right = l.right - parseFloat(cs.paddingRight) - parseFloat(cs.borderRightWidth);
+      if (r.width && (r.left < left - 0.5 || r.right > right + 0.5)) {
         m.classList.add("is-wide");
         m.tabIndex = 0;
       } else if (m.tabIndex === 0 && !m.classList.contains("is-wide")) m.removeAttribute("tabindex");
