@@ -9,7 +9,7 @@ serves the site under that path (read from site_url in mkdocs.yml, or --prefix) 
 every missing address with 404.html and the status 404, as Pages does. It then opens a
 missing page, a missing address that holds a question's id, and one that holds a question's
 slug, at 390 and at 1200 px, and fails when: the answer is not the custom page, a style or a
-script of the page did not load, a script threw, the page scrolls sideways, the guess
+script of the page (its own, not the theme's repository facts) did not load, a script threw, the page scrolls sideways, the guess
 ("אולי חיפשת את שאלה 0046") is missing or points elsewhere, the level links point outside
 the site's path, "שאלה אקראית" does not open a question, or "חיפוש באתר" does not focus the
 search. --axe PATH (or --local-cdn) runs axe-core on the page as check_phone.py does;
@@ -124,8 +124,11 @@ def main(argv: list[str]) -> int:
                 errors: list[str] = []
                 failed: list[str] = []
                 page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
-                page.on("response", lambda r, failed=failed: failed.append(f"{r.status} {r.url}") if r.status >= 400 and r.request.resource_type != "document" else None)
-                page.on("requestfailed", lambda r, failed=failed: failed.append(f"failed {r.url}"))
+                # the page's own assets only: the theme's repository facts come from api.github.com,
+                # which answers 403 to a runner, and a blocked CDN is --offline's business
+                page.on("response", lambda r, failed=failed: failed.append(f"{r.status} {r.url}")
+                        if r.status >= 400 and r.request.resource_type != "document" and r.url.startswith(origin) else None)
+                page.on("requestfailed", lambda r, failed=failed: failed.append(f"failed {r.url}") if r.url.startswith(origin) else None)
                 try:
                     resp = page.goto(origin + path, wait_until="networkidle", timeout=60_000)
                     status = resp.status if resp else 0
@@ -134,7 +137,6 @@ def main(argv: list[str]) -> int:
                     status = 0
                 if args.offline:
                     errors = [e for e in errors if not re.search(r"https?://(?!127\.0\.0\.1)", e)]
-                    failed = [f for f in failed if re.search(r"https?://127\.0\.0\.1", f)]
                 found: list[str] = []
                 if status != 404:
                     found.append(f"status {status}, not 404")
