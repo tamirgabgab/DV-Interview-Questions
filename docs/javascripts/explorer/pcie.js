@@ -86,6 +86,9 @@
                        ["0x1010", 512, 256, 64, "0021 ב : ‏0x1010, ‏512 B"], ["0x1020", 128, 128, 64, "0021 ג : ‏0x1020, ‏128 B, ‏MPS 128 (δ = 1)"]];
       const defaults = { addr: box.dataset.addr || "0x1010", len: Number(box.dataset.len || 256), mps: Number(box.dataset.mps || 256), rcb: Number(box.dataset.rcb || 64) };
       const st = { ...defaults, cuts: null, shown: null };   // cuts: the boundaries chosen by hand, null = the greedy split's; shown: the cuts drawn
+      // data-notation="c" (0020): that page's own symbol, c inner boundaries and 2^c subsets;
+      // without it the box speaks 0021's N, |B|, f, e, m and delta
+      const own = box.dataset.notation === "c";
       const MAX_ROWS = 40;
       box.innerHTML =
         `<div class="ex-controls">` +
@@ -161,8 +164,14 @@
           });
         } else pcieBoundaries(addr, len, rcb).forEach((b) => { g += `<circle class="cs-can" cx="${f(ax.x(b))}" cy="50" r="4"><title>boundary ${hex(b)}</title></circle>`; });
         // two lines: one line wider than the figure would be shrunk below 9 px on a phone
-        g += `<text class="legend" x="40" y="${H - 36}">N = ${N}, |B| = ${N - 1}, f = ${sizes[0]}, e = ${sizes[N - 1]}</text>` +
-             `<text class="legend" x="40" y="${H - 12}">m = MPS / RCB = ${m}, δ = ${d}${d ? " (N = m + 1 and L ≤ MPS)" : ""}</text>`;
+        if (own) {
+          const c = N - 1, subsets = 1n << BigInt(c);
+          g += `<text class="legend" x="40" y="${H - 36}">c = ${c} ${c === 1 ? "boundary" : "boundaries"} inside the request, ${N} ${N === 1 ? "block" : "blocks"}</text>` +
+               `<text class="legend" x="40" y="${H - 12}">2^c = ${big(subsets)} ${subsets === 1n ? "subset" : "subsets"} of the boundaries</text>`;
+        } else {
+          g += `<text class="legend" x="40" y="${H - 36}">N = ${N}, |B| = ${N - 1}, f = ${sizes[0]}, e = ${sizes[N - 1]}</text>` +
+               `<text class="legend" x="40" y="${H - 12}">m = MPS / RCB = ${m}, δ = ${d}${d ? " (N = m + 1 and L ≤ MPS)" : ""}</text>`;
+        }
         return g + "</svg>";
       };
       // On a phone (a narrow box) the rows drop their "48+64+64+64+16" labels, which ran into
@@ -208,8 +217,12 @@
         const crosses = (addr % 4096) + len > 4096;
         const first = pcieSplits(addr, len, mps, rcb, 1)[0];
         const blocksText = N === 1 ? `בלוק אחד של ${sizes[0]}` : `${sizes[0]}` + (N > 2 ? ` + ${N - 2} × ${rcb}` : "") + ` + ${sizes[N - 1]}`;
+        const c = N - 1;
+        const grid = own
+          ? (c === 0 ? `‏${ltr("c = 0")}, אין גבול בתוך הבקשה (${ltr(blocksText)})` : `‏${ltr(`c = ${c}`)} ${c === 1 ? "גבול" : "גבולות"} בתוך הבקשה, ${c === 1 ? "שמחלק" : "שמחלקים"} אותה ל-${ltr(N)} בלוקים (${ltr(blocksText)})`)
+          : `‏${ltr(`N = ${N}`)} בלוקים (${ltr(blocksText)}), ‏${ltr(`m = ${m}`)}`;
         $(".ex-summary").innerHTML =
-          `בקשה של ${ltr(`${len} B`)} מכתובת ${ltr(hex(addr))} על רשת ${ltr(`RCB = ${rcb}`)} : ‏${ltr(`N = ${N}`)} בלוקים (${ltr(blocksText)}), ‏${ltr(`m = ${m}`)}. ` +
+          `בקשה של ${ltr(`${len} B`)} מכתובת ${ltr(hex(addr))} על רשת ${ltr(`RCB = ${rcb}`)} : ${grid}. ` +
           `מספר הפיצולים החוקיים עם ${ltr(`MPS = ${mps}`)} : <b>${ltr(big(total))}</b>` +
           (total === formula ? ` (הנוסחה הסגורה נותנת אותו מספר).` : ` (הנוסחה הסגורה נותנת ${ltr(big(formula))}!).`) +
           (first ? ` הפיצול החמדני, עם הכי פחות Completions : ${ltr(first.join("+"))}.` : " אין פיצול חוקי.") +
@@ -226,7 +239,7 @@
           const sp = pcieSplitOf(addr, len, mps, rcb, cuts), all = 1n << BigInt(B.length), over = sp.sizes.filter((v) => v > mps);
           $(".pcie-choose").innerHTML = `החיתוכים שבחרתם : ${ltr(sp.sizes.join("+"))}, ${ltr(sp.sizes.length)} Completions. ` +
             (sp.ok ? `<span class="eu-ok">✓ כולם עד ${ltr(`MPS = ${mps}`)}.</span> ` : `<span class="eu-bad">✗ ${ltr(over.join(", "))} גדול מ-${ltr(`MPS = ${mps}`)}.</span> `) +
-            `פיצול הוא בדיוק בחירה של תת-קבוצה של ${ltr(`|B| = ${B.length}`)} הגבולות : יש ${ltr(`2^${B.length} = ${big(all)}`)} תת-קבוצות, ומהן ${ltr(big(total))} לא משאירות קטע ארוך מ-MPS. זה מספר הפיצולים.`;
+            `פיצול הוא בדיוק בחירה של תת-קבוצה של ${ltr(`${own ? "c" : "|B|"} = ${B.length}`)} הגבולות : יש ${ltr(`2^${B.length} = ${big(all)}`)} תת-קבוצות, ומהן ${ltr(big(total))} לא משאירות קטע ארוך מ-MPS. זה מספר הפיצולים.`;
         } else $(".pcie-choose").innerHTML = "";
         const counts = byK.map((w, k) => (k && w ? `<tr><td>${k}</td><td>${big(w)}</td></tr>` : "")).join("");
         $(".pcie-counts").innerHTML = total > 1n ? `<p class="ex-title">כמה פיצולים יש לכל מספר Completions</p><table class="pcie-table" dir="ltr"><thead><tr><th>Completions</th><th>פיצולים</th></tr></thead><tbody>${counts}</tbody></table>` : "";
