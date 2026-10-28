@@ -1401,12 +1401,44 @@ section below starts at session 22, whose numbered items run on through the late
       (`--site-x-state`); drawn once, the display flickers on, the X pulses.
     Eight colour pairs were added to `check_contrast.py`.
 
+92. **A review of ten random questions, round R (session 28, 2026-10-28).** The owner asked
+    for a pass over ten random questions with proposals for the explanations and the
+    boxes: 0009, 0012, 0020, 0023, 0026, 0027, 0037, 0039, 0059 and 0061, one reviewer
+    agent per pair. Seven statements were wrong and were fixed first, straight to `main`
+    (f397198): 0037 three flops at 1 GHz with τ = 50 ps give 1.1·10^17 seconds, not years;
+    0039 the n-versus-n + 1 trap flips at n = 2^t, eight drops tell 93 thresholds apart,
+    five eggs already reach seven drops; 0009 the swaps are summed over the cycles; 0020
+    the greedy proof's monotone quantity; 0023 a later posted write may pass the read;
+    0059 `parity_move` costs O(n) per move as written. The owner then took the
+    explanations and traps and the boxes that show the key idea (not presets, not new
+    modes), and for 0037 kept the model with a note and a follow-up on the per-stage form.
+    One agent per pair made the changes on disjoint files, each under its own heading in
+    `11-questions.css`; every claim was checked by exact computation, and new tests cover
+    the new numbers. Per question: 0009 a bar with person 0, his swap count and the walk
+    without him, follow-ups on the 231 cycle types and the unchecked box range; 0012 one
+    difference per d in the step line, d throughout part b, the boxes swapped, the e = ±1/2
+    case, a follow-up on 5 to 7 digits; 0020 its own notation in the pcie box
+    (`data-notation="c"`), RCB facts, a uniformly random split; 0023 the split count of a
+    sent read, a follow-up for MPS below MRRS; 0026 a bound proving 2.5 h optimal for any
+    plan, the points defined first, the drop point argued in the text, fractions and the
+    wait in the box; 0027 the ratio column, the peak named only once reached, the rounding
+    trap's example, d ≤ 0; 0037 why settling is exponential, the model's assumption, the
+    per-stage follow-up (15 years instead of 297), the f_data trap, the tail on a log scale
+    in metamc; 0039 the first floor is not unique (8 to 37), the padded lower bound, all 46
+    worst-case dots; 0059 the parity colours, sums and fallback in the box, the proof's
+    (S + d) / 2 and a worked cell; 0061 the left end frame by frame with a move counter,
+    the invalid-window fact, the real `best`-before-`while` trap, the edge cases. Left as
+    they were: the figures of 0027 that looked duplicated (they show different values or
+    the two forms of the condition), the mermaid colour of 0020 (no theming hook; 0005,
+    0018 and 0019 share it). 0062 still has ordinary spaces before its colons (seen while
+    fixing 0061).
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done; a slider and its value on one row (item 86) published (`main` a4e0b47); the renumbering (item 87), the 0055 list (item 88) and question 0056 (item 89) published (`main` 905863d); the formula steps and the moves table in both boxes (item 90) published (`main` 8d8bd24); round M, motion and finish (item 91) published (`main` 3c31a22 and this log).
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done; a slider and its value on one row (item 86) published (`main` a4e0b47); the renumbering (item 87), the 0055 list (item 88) and question 0056 (item 89) published (`main` 905863d); the formula steps and the moves table in both boxes (item 90) published (`main` 8d8bd24); round M, motion and finish (item 91) published (`main` 3c31a22 and this log); the review of ten questions (item 92): the fixes published (`main` f397198), the improvements on the branch.
   61 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
