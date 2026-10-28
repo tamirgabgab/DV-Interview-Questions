@@ -85,6 +85,14 @@ def test_plan_is_optimal_on_small_cases():
             assert min_drops(k, n) == optimum(k, n), (k, n)
 
 
+def test_first_floor_is_not_unique():
+    """The trap: any first floor from 8 to 37 still settles 100 floors with three eggs in 9
+    drops (x - 1 <= f(2, 8) = 36 below, 100 - x <= f(3, 8) = 92 above), and no other does."""
+    good = [x for x in range(1, 101) if 1 + max(optimum(2, x - 1), optimum(3, 100 - x)) == 9]
+    assert good == list(range(8, 38))
+    assert all((x - 1 <= q0039.covered(2, 8) and 100 - x <= q0039.covered(3, 8)) == (x in good) for x in range(1, 101))
+
+
 def test_tables():
     rows = q0039.covered_table().splitlines()[2:]
     assert len(rows) == 9 and rows[-1].endswith("| ‏9 | ‏45 | ‏**129** ✓ |")
