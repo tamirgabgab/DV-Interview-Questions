@@ -46,6 +46,8 @@ pushed to `main`, which publishes the site.
 | Run button            | Per question, Python only (Pyodide in a web worker); SV cannot run in a browser, the panel says it is checked in CI instead |
 | Position levels       | Student / Junior / Senior; the Staff level was removed on 2026-10-21 (owner: no staff questions planned) |
 | Look and feel         | Own navy + amber palette, logo and footer; level / difficulty as CSS chips; one header card per question (see **Site redesign plan**) |
+| Next rounds (2026-10-27) | Owner: no rounds of new questions for now; only improve the existing questions, the site and its interfaces (series S). The question proposals X360 to X410 stay listed for later |
+| Closed (2026-10-27) | Owner: no run panel for questions without Python code, no print style, and 0001 stays as it is; not to be proposed again |
 
 ---
 
@@ -1122,7 +1124,99 @@ section below starts at session 22, whose numbered items run on through the late
     the text colour (Material greys it, so the paths, catalog, level and tag pages had a
     faint title), h1 and h2 wrap with `text-wrap: balance` (0050 left "ID" alone on a
     line), and the catalog page hides the navigation sidebar, which held one link.
-73. **The question map, a knowledge graph (session 28, 2026-10-28).** The owner asked to
+73. **Round Y, the reading experience (session 27, 2026-10-27).** The owner took Y393, Y394,
+    Y396, Y397 and Y398 (not Y395, the calmer solution colours), and asked during the round
+    that the search find only the questions themselves, with real symbols instead of TeX
+    source, and noticed run-together words ("השאלותעם"). Y396 became: the search index keeps
+    one document per question (its statement) and one per part (the part's statement);
+    hints, solutions, code, boxes, traps, follow-ups and every other page are gone (1117
+    documents to 194). `tools/search_text.py` reads the statement out of the built page and
+    writes the math in plain symbols (all 6989 formulas of the site, no backslash left),
+    each in a left-to-right isolate, since the results drop `<bdi>` and "O(n)" showed as
+    "(n)O". Y393: hints, solutions, traps and follow-ups at the page size (16 px instead
+    of 12.8 px), titles 14 px, explorer boxes inside unchanged. Y394: a table of short
+    values is a grid (24 tables): narrow columns (the theme's 5rem per header had pushed
+    0047's trace out of its step, hiding its last column on a desktop too), tighter on a
+    phone, a sticky first column when it scrolls; 0047's named-row table no longer becomes
+    cards. Y397: "what's new" and tags without the one-link sidebar. Y398: the tags page
+    opens with a grid of every tag and its count, the lists in two columns. The bigger box
+    text first made twelve pages wider than a phone (MathJax and the solution map scaled
+    with it, and a grid kept the theme's negative scroll-box margin): math inside a box is
+    0.8em (its old pixel size), the map and cost chips 0.64rem, a grid's scroll box stays in
+    its column.
+74. **Loose ends (session 27, 2026-10-27).** The owner's picks: Y395 as one grey rail with
+    the colour in each label, folded tag lists, and the local 0050 failure fixed. Y395: the
+    solution blocks share one quiet rail (`--sol-rail`), the kind's colour stays in its
+    label, icon and map chip, and an open solution's frame is neutral. Tags: each tag's
+    list folds under its name and count (the phone page from about 24,000 px to 3,300);
+    a link to `#tag:...` opens its fold (reading-tools.js `openTarget`). 0050: the cause was
+    not the scoreboard strip but a proof table 357 px wide in a 356 px scroll box, called
+    "fits" although the theme's padding pushed it out; a table now fits when its scroll box
+    does not overflow, measured again when the fonts load. The local phone check is clean.
+75. **Round S4, the question page and navigation (session 27, 2026-10-27).** The owner's
+    picks: the id and the title in the path bar, the tool names always under the icons on a
+    touch screen, one line per question in the side navigation; no print style (S422 not
+    taken). S419: the path bar's previous and next steps sit side by side with id and
+    title. S420: `qt-name` under each icon under `hover: none` (the fold name follows its
+    state), the hover tooltip off there. S421: one line per question in the side
+    navigation, the current one in full, the full title as the tooltip. A CSS ellipsis cut
+    English words inside Hebrew titles ("PCIe" read "Cle", "Sequence" "ence"), so
+    reading-tools.js `fitWords` drops whole words from the end instead, for the side
+    navigation and the path bar. Before the round, `main` had moved again (the other
+    session's search list cleanup, no search highlight, and the CLAUDE.md rule for small
+    fixes); merged without conflicts.
+76. **Round S1, the questions' practice tools (session 27, 2026-10-27).** The owner's picks:
+    expected values on every deterministic print, a self-check on every part with a short
+    answer, no run panel for the nine questions without Python (S412 not taken), 0001 kept
+    as it is (S414: the owner decision is closed). S411: 59 prints of 26 demos gained their
+    value (29 of the 49 demos check their output now, 74 prints; before 14 and 15). The
+    annotation ran each demo twice in separate processes and took only a print that runs
+    once, gives the same short line both times and calls something (an echo of the input
+    gets none). `py_run.matches` takes the value after a label ending in ":" or "=", so a
+    comment holds the value alone. The other 20 demos print in loops only. S413: 14 new
+    self-checks (0003, 0004 a, 0007 c and d, 0012 b, 0013 b, 0016 part b 1, 0023 b, 0033 b,
+    0040 a, 0041 a, 0043 a and b, 0044 b), each recomputed in `tests/tools/test_selfcheck.py`
+    (59 fields on 33 pages now, from 45 on 22). The other parts answer with code, an explanation or a general formula, or
+    already have one (0058 d's value is its part c check); 0033 a was left out, since the
+    page gives 24 by the formula and 25 by the simulation.
+77. **Round S3, the boxes (session 27, 2026-10-27).** The owner's picks: presets in one
+    scrolling row, no names under the playback icons. S416: the Josephus box (0016) kept the
+    step counter of its last small circle when N grew past 128 (no circle, the play row
+    hidden), so the scrubber read "0 of 23" and, after a reload, "0 of 63"; the counter is
+    emptied there, which hides the scrubber. The Floyd warning was no bug: an answer line
+    that is off keeps its last text only to hold its height. S417: `check_explorers.py`
+    leaves off answer lines out of its comparison and puts every element's attributes in
+    one order (a refitted figure set `style` and `data-fit-base` in either order), so it
+    warns only about real differences. S418: three or more action buttons in a row go into
+    one run (`ex-btnrun`, core.js `layout`) that scrolls sideways on a phone, fading at its
+    end, and lays out as before elsewhere (`display: contents`); a row a view lays out as a
+    grid keeps it (0024's events). Nine runs on eight pages, each one line instead of two to
+    six at 390 px. The attribute order of S417 found a real bug on the first CI run: the
+    ants box (0056) put a `<bdi dir="ltr">` inside its pole's `aria-label`, so the quotes
+    broke the attribute and a screen reader read it garbled; the label is plain text now,
+    and the check drops an attribute whose name is not valid on both sides.
+78. **Round S2, figures where a page had none (session 27, 2026-10-27).** The owner's pick:
+    only where a figure adds. Of the six pages first named, 0034 and 0038 have WaveDrom
+    waveforms and 0057 generated tables, so the pages without a figure were 0045, 0046 and
+    0047. New generators `tools/figures/q0045.py` (what the first weighing leaves for each
+    result: the twelve balls as maybe heavy, maybe light, either or good, eight cases each),
+    `q0046.py` (the grid of part a beside its dp table, the first 3 x 3 square marked in
+    both; replaces the text drawing of step 4) and `q0047.py` (the columns of [3, 0, 2, 0, 4]
+    with the 7 units of water; replaces the text drawing of the statement), each
+    independent of the page code, with a legend, five new contrast pairs (64 in all) and a
+    test per question that compares the generator with the page code and the page copy.
+79. **Round S6, the styles in parts (session 27, 2026-10-27).** The owner's pick: a file per
+    part. `extra.css` (4,020 lines) became twelve parts, `docs/stylesheets/01-base.css` to
+    `12-rounds-y-s.css`, cut at top-level sections in the original order and loaded in that
+    order, so the cascade is unchanged; `docs/stylesheets/README.md` lists them (excluded
+    from the site). `check_contrast.py` reads every part in order. A regrouping by component
+    was not done: later rounds refine earlier rules across components, so moving a rule
+    between parts can change what wins. Checked: every built page is the same before and
+    after apart from its stylesheet links, and the parts joined in order are the old file,
+    so the cascade is the same. A computed-style fingerprint of every element was too noisy
+    to prove it (the custom properties come back in a changing order, the repository widget
+    loads its facts from the network, the hero animates).
+80. **The question map, a knowledge graph (session 28, 2026-10-28).** The owner asked to
     try three Claude Code add-ons (Caveman, Claude-mem, Graphify) and then to run Graphify.
     Its code-only pass (tree-sitter, no LLM) mapped the infrastructure but not the
     questions (only the page headings), so the semantic pass was run on the 58 pages alone:
@@ -1142,7 +1236,10 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## In progress
 
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) on the branch.
+- **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
+  linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
+  and run `python tools/graph.py` (needs `pip install graphifyy`).
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); S5 is the one S round left.
   58 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
@@ -1184,10 +1281,9 @@ section below starts at session 22, whose numbered items run on through the late
 
 ### Owner decisions
 
-- [ ] Keep example question `0001` or replace it with real content.
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
 - [ ] Fifth series: W1 to W4 done on the branch (W348's drawn check mark not picked); W5 not picked; `main` when the owner asks.
-- [ ] Pick rounds from **Proposals** (the sixth series, session 27); the older proposals are in the archive.
+- [ ] Pick rounds from **Proposals**: the owner's current direction is the eighth series, S1 to S6 (improve what exists, no new questions); the question proposals X360 to X410 wait; the older proposals are in the archive.
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
@@ -1353,6 +1449,102 @@ proof panels inside boxes, a run panel for Python, study paths, marks and practi
 
 Suggested order: X364 and X361 (small, on pages that exist), X385 with X370, then X377 with
 X368 and X376 with X366 (a question and its tool together), then X372 before X367.
+
+## Proposals — seventh series, round Y, the reading experience (session 27, 2026-10-27)
+
+A third visual review, after work log item 72: the inside of a question (hints, an open
+solution, traps, follow-ups, the run panel), the level, tags and "what's new" pages and the
+search, desktop and 390 px, light and dark. Item numbers continue at 393. Size as above.
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| Y393 (done, item 73) | Hints, solutions, traps and follow-ups are set at 12.8 px (Material's admonition size), the statement at 16 px: the core text of the site is the smallest, and on a phone it is small | body text of those blocks at the page size (0.8rem); titles, chips and code stay | S |
+| Y394 (done, item 73) | On a phone a table of 5+ columns that does not fit becomes cards. A table whose rows are named in its first column (0047: i, height, maxL, maxR, water) turns into unreadable cards of number pairs, and a 4-row trace takes about 750 px | tighter cell padding on a phone, so short tables fit and stay tables; a table with row names in its first column scrolls sideways with that column sticky, never cards; cards only for wide tables of long text | M |
+| Y395 (done, item 74) | An open solution shows a green frame, an amber short answer and five coloured side rails (idea, steps, code, proof, cost), next to teal hints, a teal follow-up box, a purple run panel and an amber trap group | one quiet rail colour for the solution blocks, the colour kept in each block's icon, title and map chip; the open solution's frame neutral | M |
+| Y396 (done, item 73) | The search lists the catalog page as one run-together blob ("#שאלהמשרהקושי 0001גלאי..."), every tag of the tags page and every date of "what's new" ("27 באוקטובר 202611 שאלות"), above or between the questions | leave the catalog, tags and "what's new" pages out of the search index (front matter `search: exclude`), so a search finds questions and their sections | S |
+| Y397 (done, item 73) | "What's new" and the tags page have a navigation sidebar with one link (the catalog's was hidden in item 72) | hide the navigation on those two pages too | S |
+| Y398 (done, item 73) | The tags page is one long column of lists, about 17,800 px on a desktop and 24,000 px on a phone, with 40 tags in the contents sidebar | a compact grid of tag chips with counts at the top, each tag's list in two columns on a desktop | M |
+
+Not changed: the home page, the cards, the path box and the footer read well; the 404 page
+could not be judged locally (its assets point at the site path).
+
+## Proposals — questions given in chat (session 27, 2026-10-27, owner picks)
+
+The owner asked for puzzles and LeetCode-style coding with less hardware; these were
+explained in the chat (problem, a short solution, the trap) and are recorded here so they
+are not lost. Item numbers continue at 399. None is on the site; check each example in a
+test before writing a page.
+
+| # | Question | Level | Idea | Size |
+|---|---|---|---|---|
+| X399 | Longest substring without a repeated character | junior / medium | sliding window, last index of each character | M |
+| X400 | Number of subarrays with sum k (negatives allowed) | junior / medium | prefix sums and a counter; why a window fails with negatives | M |
+| X401 | Number of islands as land is added one cell at a time | senior / hard | union-find with path compression, the count after each step | L |
+| X402 | Cheryl's birthday | student / medium | elimination from what each person knows, as a table | M |
+| X403 | The sack of fake coins (ten sacks, one weighing) | student / easy | take i coins from sack i, the missing weight names the sack | S |
+| X404 | How many squares and rectangles on a chessboard | student / easy to medium | Σk² and C(9, 2)² | S |
+| X405 | Smallest window that contains every character of t | senior / hard | variable window with a "missing" counter, repeats in t | M |
+| X406 | Longest substring with at most k distinct characters | junior / medium | window with a counter map, delete keys at zero | M |
+| X407 | Longest run of one letter with k replacements | junior / medium | window length − max count ≤ k; why max count never needs to shrink | M |
+| X408 | All anagrams of p in s | junior / medium | fixed window, 26 counts and a "matched" counter | M |
+| X409 | Shortest subarray with sum at least target (positive numbers) | junior / medium | shrinking window; follow-up with negatives (prefix sums and a monotonic deque) | M |
+| X410 | Longest run of ones with k flips | student / medium | window with a zero counter | S |
+
+X399 and X405 to X410 can form a "sliding window" study path in the order X410, X399,
+X406, X409, X408, X407, X405, with one shared box (the string as a row of cells, the window
+as a moving frame, the counter map beside it, left and right stepping).
+
+## Proposals — eighth series, rounds S1 to S6, improve what exists (session 27, 2026-10-27)
+
+At the owner's request: no new questions, only the existing 58 questions, the site and its
+interfaces. Numbers from the built site and the repository on 2026-10-27. Item numbers
+continue at 411.
+
+**Round S1 — the questions' practice tools (content, no new questions)**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S411 (done, item 76) | 35 of the 49 starting scripts (`tests/<id>/demo.py`) have no expected value in their `print()` comments, so the run panel shows no ✓ / ✗ for them | add the expected value to every `print()` of those demos (the test already checks each one) | M |
+| S413 (done, item 76) | 36 questions have no "try it yourself" answer field (`selfcheck`, 22 have one) | a self-check field on every part whose answer is a number, a formula value or a short word | M |
+
+**Round S2 — figures where a page has none**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S415 (done for 0045 to 0047, item 78) | 11 pages have no static figure (0001, 0002, 0003, 0034, 0036, 0038, 0045, 0046, 0047, 0057, 0059); their only picture is the box | one generated figure each where it explains the idea at a glance (0046 the DP grid, 0047 the water profile, 0045 the weighing tree, 0038 the handshake waveform...), via `tools/figures/` | L |
+
+**Round S3 — the boxes: bugs and consistency**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S416 (done, item 77) | `check_explorers.py` warns that a box link or the remembered state draws another box: 0016 (Josephus, 8 steps instead of 21) and the Floyd box (4 instead of 1) are real differences | fix the state codec of those boxes so a link and a reload restore the same box | M |
+| S417 (done, item 77) | the same check warns on 0036, 0020 and the cake box only because attributes come back in another order (`style` and `data-fit-base`) | compare the boxes with attributes in a fixed order, so only real differences warn | S |
+| S418 (done, item 77) | box controls on a phone: icon buttons without names, presets that wrap into several rows on some boxes | one review pass of every box at 390 px: names under the playback icons on touch, presets in one scrolling row | M |
+
+**Round S4 — the question page and navigation**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S419 (done, item 75) | the path box shows the previous and next steps as ids only ("הקודם : 0002") | the title beside the id, cut with an ellipsis on a phone | S |
+| S420 (done, item 75) | the page tools are five icons without names; a touch screen has no hover tooltip | a one-time row of names under the icons on a phone (dismissed and remembered), and the names in the toolbar's accessible labels as today | S |
+| S421 (done, item 75) | the side navigation wraps long titles into two or three lines (0023: "Endpoint – כתיבה, קריאה ושידור Completions") | one line per question with an ellipsis and the full title as a tooltip, the current one highlighted | S |
+
+**Round S5 — speed and access**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S423 | the heaviest pages are 0016 (396 KB of HTML), 0025 (312 KB), 0023, 0024 (248 KB each) | find what makes them heavy (inline SVG repeated in tabs, long tables) and trim it; a page-weight line in the phone check | M |
+| S424 | the 404 page cannot be checked locally (its assets point at the site path) and was never looked at | a check of the live 404 at both widths, and a local check that serves the site under its path | S |
+| S425 | keyboard and screen-reader paths were checked by axe only | one manual pass: tab order on a question, the folds, the boxes, the run panel and the search | M |
+
+**Round S6 — the code behind the site**
+
+| # | Finding | Proposal | Size |
+|---|---|---|---|
+| S426 (done as parts, item 79) | `extra.css` is 3,970 lines written over many rounds; components are styled in several places (the question header at line 150 and again at 3090) | regroup it by component, drop rules that match nothing in the built site (a small script finds them), with the phone, jump and contrast checks proving nothing moved | L |
+
+Suggested order: S1 (the most use for a reader preparing), S4, S3, S2, S5, S6. Every round
+ends with the full check set and the owner's look at the live site.
 
 ## Technical notes for whoever continues this work
 

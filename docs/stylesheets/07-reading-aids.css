@@ -1,0 +1,210 @@
+/* The site's styles, part 7 of 12: reading aids (enlarge, lightbox, part bar), focus rings, code in dark mode, comments.
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* Reading aids (reading-tools.js): enlarge button and lightbox, tap tooltip, part bar */
+.md-typeset .fig-wrap { position: relative; }
+/* The enlarge button sits in the top inline-start corner of the figure, small and faint
+   until the pointer is over the figure. A figure with text in that corner gets
+   .fig-wrap--above from reading-tools.js: the button moves to a strip above the drawing. */
+.md-typeset .fig-enlarge {
+  position: absolute;
+  inset-block-start: 0.15rem;
+  inset-inline-start: 0.15rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  padding: 0;
+  border: 1px solid var(--viz-grid);
+  border-radius: 0.25rem;
+  background: var(--md-default-bg-color);
+  color: var(--viz-text);
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: zoom-in;
+  opacity: 0.45;
+  transition: opacity 0.15s;
+}
+.md-typeset .fig-wrap:hover .fig-enlarge, .md-typeset .fig-enlarge:focus-visible { opacity: 1; color: var(--md-accent-fg-color); }
+@media (hover: none) { .md-typeset .fig-enlarge { opacity: 0.6; } }
+.md-typeset .fig-wrap--above { padding-top: 1.4rem; }
+.md-typeset .fig-wrap--above > .fig-enlarge { inset-block-start: 0; }
+.fig-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: none;
+  flex-direction: column;
+  background: var(--md-default-bg-color);
+}
+.fig-lightbox.is-open { display: flex; }
+.fig-lightbox-open, .fig-lightbox-open body { overflow: hidden; }
+.fig-lightbox__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1px solid var(--viz-grid);
+}
+.fig-lightbox__bar button {
+  min-width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid var(--viz-grid);
+  border-radius: 0.3rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.fig-lightbox__hint { font-size: 0.7rem; color: var(--viz-text); }
+.fig-lightbox__view {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  cursor: grab;
+}
+.fig-lightbox__stage { width: min(96vw, 70rem); transform-origin: center center; }
+.fig-lightbox__stage svg { width: 100%; height: auto; max-height: 85vh; }
+.fig-tip {
+  position: fixed;
+  z-index: 11;
+  max-width: 16rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.3rem;
+  background: var(--md-default-fg-color);
+  color: var(--md-default-bg-color);
+  font-size: 0.7rem;
+  direction: ltr;
+  unicode-bidi: plaintext;
+  pointer-events: none;
+}
+.md-typeset .part-nav {
+  position: sticky;
+  top: 2.4rem;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.6rem 0 0;
+  padding: 0.35rem 0;
+  background: var(--md-default-bg-color);
+  border-bottom: 1px solid var(--viz-grid);
+}
+.md-typeset .part-nav__chip {
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--viz-grid);
+  border-radius: 1rem;
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color);
+}
+.md-typeset .part-nav__chip.is-current {
+  border-color: var(--md-accent-fg-color);
+  background: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color);
+}
+@media print { .md-typeset .fig-enlarge, .md-typeset .part-nav { display: none; } }
+
+/* Accessibility (G44): a visible focus ring on every control of the site's own components,
+   links in running text underlined (not told apart by colour alone), and no motion for
+   readers who asked for less of it. */
+.md-typeset :is(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--site-focus-ring);
+  outline-offset: 2px;
+}
+
+.md-typeset :is(p, li, td, dd) > a:not(.md-button):not(.headerlink):not(.level-card) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+/* Line numbers of code blocks and the highlighted lines in dark mode: the theme's defaults
+   fall short of 4.5:1 against the code background. */
+.md-typeset .highlighttable .linenos,
+.md-typeset .highlighttable .linenos a,
+.md-typeset .highlight [data-linenos]::before { color: #5f5f5f; }
+[data-md-color-scheme="slate"] .md-typeset .highlighttable .linenos,
+[data-md-color-scheme="slate"] .md-typeset .highlighttable .linenos a,
+[data-md-color-scheme="slate"] .md-typeset .highlight [data-linenos]::before { color: #a7a6a0; }
+[data-md-color-scheme="slate"] .md-typeset .highlight .hll {
+  background-color: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 3px 0 0 var(--md-accent-fg-color);
+}
+[data-md-color-scheme="default"] {
+  --md-code-hl-comment-color: #616161;
+  --md-code-hl-keyword-color: #2f5ead;
+  --md-code-hl-number-color: #b31f1f;
+  --md-code-hl-operator-color: #5f5f5f;
+  --md-code-hl-punctuation-color: #5f5f5f;
+  --md-code-hl-string-color: #186b42;            /* 4.5:1 also on a highlighted line */
+  /* W336: the code background is #eef1f6 on the off-white page, so the theme's lighter
+     token colours are darkened to keep 4.5:1 */
+  --md-code-hl-function-color: #8e3a9c;
+  --md-code-hl-special-color: #b0103f;
+  --md-code-hl-constant-color: #5a45c4;
+  --md-code-hl-variable-color: #5f5f5f;
+  --md-code-hl-generic-color: #5f5f5f;
+}
+/* the dark scheme's constant and number tokens, lifted to 4.5:1 on a highlighted line */
+[data-md-color-scheme="slate"] {
+  --md-code-hl-constant-color: #a497ec;
+  --md-code-hl-number-color: #f07d70;
+}
+[data-md-color-scheme="default"] .md-typeset .highlight .hll {
+  background-color: rgba(27, 42, 74, 0.06);
+  box-shadow: inset 3px 0 0 var(--md-accent-fg-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset *,
+  .fig-lightbox,
+  .fig-lightbox * {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Comments (giscus, GitHub Discussions) at the end of a question page. */
+.md-typeset .comments-note { font-size: 0.7rem; color: var(--md-default-fg-color--light); }
+.md-typeset .comments { margin: 0.6rem 0 1.5rem; }
+
+/* PCIe split explorer (0020, 0021) */
+.md-typeset .explorer input.ex-addr { font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0.1rem 0.4rem; border: 1px solid var(--md-default-fg-color--lighter); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); width: 6.5rem; }
+.md-typeset .explorer .pcie-table { font-size: 0.65rem; margin: 0.3rem 0 0.8rem; }
+.md-typeset .explorer .pcie-table td, .md-typeset .explorer .pcie-table th { padding: 0.1em 0.8em; text-align: center; }
+
+/* M77: pages with an explorer, a step figure or an embedded tool */
+
+/* E31: the kind of a question, a quiet chip in the header card and the tables */
+.md-typeset .chip-kind { color: var(--md-default-fg-color--light); background: transparent; border: 1px dashed var(--site-card-border); }
+.md-typeset .q-diff .chip-kind { margin-inline-start: 0.25rem; }
+
+/* E34 / E36: the home page's "continue" card, the "recently added" list and the "what's
+   new" page (the lists reuse .related-questions). */
+.md-typeset .continue-card { margin: 0.8rem 0 0.4rem; }
+.md-typeset .continue-card .cc-link {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--site-card-border);
+  border-inline-start: 4px solid var(--md-accent-fg-color);
+  border-radius: 0.4rem;
+  background: var(--site-primary-soft);
+  color: var(--md-default-fg-color);
+  text-decoration: none;
+}
+.md-typeset .continue-card .cc-link:hover { border-color: var(--md-accent-fg-color); }
+.md-typeset .continue-card .cc-label { font-size: 0.65rem; font-weight: 700; color: var(--site-label-color); }
+.md-typeset .continue-card .cc-title { font-weight: 700; }
+.md-typeset .continue-card .cc-meta { font-size: 0.65rem; color: var(--md-default-fg-color--light); }
+.md-typeset .recent-more { margin-top: 0.3rem; font-size: 0.7rem; }
+.md-typeset h2.new-day { display: flex; align-items: baseline; gap: 0.6rem; margin-top: 1.4rem; }
+.md-typeset h2.new-day .new-count { font-size: 0.65rem; font-weight: 400; color: var(--md-default-fg-color--light); }
+
+/* M76: swipe on step figures, and the copy-link button */
+.md-typeset .stepper { touch-action: pan-y; }
+.md-typeset .stepper-link { min-width: 0; padding-inline: 0.6em; }
+.md-typeset .stepper-pos { min-width: 5.5rem; }

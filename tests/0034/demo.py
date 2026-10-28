@@ -6,4 +6,4 @@ for b in range(16):
 
 BITS = 5
 w, r = 23, 7                     # 16 words apart: full
-print("full:", fifo_full(bin2gray(w), bin2gray(r), BITS), "empty:", fifo_empty(bin2gray(w), bin2gray(r)))
+print("full:", fifo_full(bin2gray(w), bin2gray(r), BITS), "empty:", fifo_empty(bin2gray(w), bin2gray(r)))  # True empty: False

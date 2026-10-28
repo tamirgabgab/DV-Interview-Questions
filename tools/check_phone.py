@@ -16,7 +16,7 @@ and explorer boxes that shrink to fit the phone): one line per figure with its s
 size. --scheme dark runs the same check in dark mode (CI runs it on manual request).
 
 It fails when the enlarge button of a figure covers SVG text: reading-tools.js moves the
-button above a drawing whose corner holds text (see `fig-wrap--above` in extra.css), and
+button above a drawing whose corner holds text (see `fig-wrap--above` in docs/stylesheets/), and
 this check runs the same test on every figure of the open page, the live figures of the
 explorer boxes included, one line per covered figure.
 

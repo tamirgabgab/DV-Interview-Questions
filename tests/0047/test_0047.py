@@ -162,3 +162,17 @@ def test_explorer_matches_the_page():
         assert d["total"] == trap_2d(h) and d["water"] == water_map(h) and d["pops"] == len(h) * len(h[0])
     assert [(tuple(a), b, tuple(c), e, f) for a, b, c, e, f in data["maps"][0]["log"]] == flood(MAP)[1]
     assert data["back"] == MAP
+
+
+def test_figure():
+    """The figure of the statement: the generator's water is the page's, and the page copy
+    is up to date."""
+    import sys
+    from extract_code import ROOT
+    from page_tests import assert_figures_match
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0047
+
+    assert sum(q0047.water(q0047.HEIGHTS)) == trap(list(q0047.HEIGHTS)) == 7
+    assert_figures_match(47)

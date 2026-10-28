@@ -52,7 +52,7 @@ session.
   the generator output (tests check it). New generators define `blocks()`, use
   `tools/figures/charts.py`, and their blocks sit between `<!-- gen n -->` markers that
   `python tools/figures/fill.py <id>` rewrites. Colours come from CSS variables in
-  `docs/stylesheets/extra.css`, never hard-coded.
+  the stylesheets in `docs/stylesheets/` (the palette in `01-base.css`), never hard-coded.
 - Start a question with `python tools/new_question.py` (see `CONTRIBUTING.md`). Interactive
   sliders are a `data-kind` with its own file in `docs/javascripts/explorer/` (the shared
   code is `core.js`), tested under Node. A box keeps its figures still while it steps

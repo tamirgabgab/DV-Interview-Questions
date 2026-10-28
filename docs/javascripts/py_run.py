@@ -8,7 +8,8 @@ run(solution, code) runs the page's Python code as solution.py, makes it importa
 module `solution` (the starting code says `from solution import *`) and leaves its names in
 the namespace too, then runs the reader's code as your_code.py. It returns the output check
 of W352: every print() whose line carries a comment is compared with that comment, the
-expected value ("print(f(3))  # 7"). A note after the value is allowed: two spaces and a
+expected value ("print(f(3))  # 7"); a print with a label before the value may give only the
+value ("print("max:", f(3))  # 7"). A note after the value is allowed: two spaces and a
 parenthesis ("# 8   (part a)") or a colon and words ("# (3, 1): no pyramids").
 """
 
@@ -29,8 +30,18 @@ def value_of(expected: str) -> str:
 
 
 def matches(expected: str, got: str) -> bool:
+    """The whole printed line, or what follows its label ("long only: (6, 2, 3)" matches the
+    comment "(6, 2, 3)"; the label ends with ":" or "=" and a space)."""
     got = got.rstrip()
-    return got in (expected.strip(), value_of(expected))
+    for e in (expected.strip(), value_of(expected)):
+        if not e:
+            continue
+        if got == e:
+            return True
+        head = got[: -len(e)]
+        if got.endswith(e) and head != head.rstrip() and head.rstrip().endswith((":", "=")):
+            return True
+    return False
 
 
 def expected_values(code: str) -> list[tuple[int, int, int, str]]:

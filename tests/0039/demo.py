@@ -8,4 +8,4 @@ for k, n in ((3, 100), (2, 100), (4, 1000)):
 
 print("threshold 36:", egg_run(3, 100, 36))
 used = [len(egg_run(3, 100, T)) for T in range(101)]
-print("worst over every threshold:", max(used), "- thresholds at the worst case:", used.count(max(used)))
+print("worst over every threshold:", max(used), "- thresholds at the worst case:", used.count(max(used)))  # 9 - thresholds at the worst case: 46

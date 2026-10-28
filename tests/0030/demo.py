@@ -8,4 +8,4 @@ for z1 in (1, 3, 5, 6, 8, 11):
     print(f"fly at z = {z1:2}: distance {d:7.4f}, exit at (0, {y:.2f}, {z:.2f})")
 
 # A cube, centre of one face to the centre of the opposite face
-print("cube:", shortest_path(1, 1, 1, 0.5, 0.5, 0.5, 0.5))
+print("cube:", shortest_path(1, 1, 1, 0.5, 0.5, 0.5, 0.5))  # (2.0, (0.0, 0.5, 0.0))

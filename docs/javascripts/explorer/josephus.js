@@ -163,6 +163,9 @@
         const left = big ? [] : josephusRenumber(n, L, st.s), renum = new Map(left.map((p, k) => [p, k]));
         const showNew = $(".ex-renum").checked && st.s > 0 && n <= 40 && left.length > 1;
         $(".ex-play-row").hidden = big;
+        // no circle, no steps: an empty counter hides the scrubber, which would keep the
+        // number of steps of the last small circle (and differ after a reload)
+        if (big) $(".ex-pos").textContent = "";
         if (!big) {
           const stays = cur ? [cur[0]] : [];
           $(".jos-circle").innerHTML = circleSvg(n, out, stays, cur ? cur[1] : [], winner, showNew ? renum : null);

@@ -1,0 +1,76 @@
+/* The site's styles, part 12 of 12: rounds Y and S: the tags page, box text size, touch tools, side navigation, button runs, S2 figures.
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* The tags page (Y398): every tag as a chip with its count above the lists, and each
+   tag's questions in columns on a wide screen. */
+.md-typeset .tag-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: var(--sp-3) 0 var(--sp-5); }
+.md-typeset .tag-grid .tag-chip { display: inline-flex; align-items: center; gap: 0.4em; padding: 0.15rem 0.65rem; border: 1px solid var(--site-card-border); border-radius: 1rem; background: var(--site-surface); color: var(--md-default-fg-color); font-size: 0.7rem; line-height: 1.6; text-decoration: none; }
+.md-typeset .tag-grid .tag-chip:is(:hover, :focus-visible) { border-color: var(--md-typeset-a-color); color: var(--md-typeset-a-color); }
+.md-typeset .tag-grid .tag-count { color: var(--md-default-fg-color--light); font-variant-numeric: tabular-nums; }
+.md-typeset ul.tag-list { columns: 2 18rem; column-gap: var(--sp-5); margin-top: 0.2rem; }
+.md-typeset ul.tag-list li { margin-bottom: 0.3em; break-inside: avoid; }
+/* each tag's list folded under its name: a plain row with the count, no box */
+.md-typeset details.tag-section { margin: 0; border: 0; border-bottom: 1px solid var(--site-card-border); border-radius: 0; box-shadow: none; background: none; }
+.md-typeset details.tag-section > summary { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; padding-inline-end: 1.8rem; background: none; font-size: 0.75rem; scroll-margin-top: 4rem; }
+.md-typeset details.tag-section > summary::before { display: none; }
+.md-typeset details.tag-section > summary .md-tag { margin: 0; }
+.md-typeset details.tag-section > summary .tag-count { color: var(--md-default-fg-color--light); font-weight: 400; font-variant-numeric: tabular-nums; }
+.md-typeset details.tag-section { scroll-margin-top: 4rem; }
+
+/* Hints, solutions, traps and follow-ups (Y393) read at the page's own size, not the
+   theme's smaller box size; their titles stay compact, and an explorer box inside keeps
+   the size it was drawn for. */
+.md-typeset :is(.admonition, details) { font-size: 0.8rem; }
+.md-typeset :is(.admonition, details) :is(.admonition-title, summary) { font-size: 0.7rem; }
+.md-typeset :is(.admonition, details) :is(.admonition, details) { font-size: 1em; }
+.md-typeset :is(.admonition, details) .explorer { font-size: 0.64rem; }
+/* what was laid out for the box size keeps it, so nothing grows wider on a phone: the
+   math (MathJax scales with the text; 0.8em of 0.8rem is the old 0.64rem), the solution
+   map and the cost chips */
+.md-typeset :is(.admonition, details) :is(.arithmatex, mjx-container) { font-size: 0.8em; }
+.md-typeset :is(.admonition, details) :is(.arithmatex, mjx-container) :is(.arithmatex, mjx-container) { font-size: 1em; }
+.md-typeset :is(.admonition, details) :is(.sol-map, .cost-chips) { font-size: 0.64rem; }
+
+/* The page tools on a touch screen (S420): no hover, so no tooltip; each icon has its
+   short name under it instead. */
+.md-typeset .question-tools .qt-name { display: none; }
+@media (hover: none) {
+  .md-typeset .question-header .question-tools { gap: 0.3rem; }
+  .md-typeset .question-header .question-tools .qt-btn { flex-direction: column; gap: 0.1rem; width: auto; min-width: 2.7rem; height: auto; padding: 0.2rem 0.3rem; border-radius: var(--radius-m); }
+  .md-typeset .question-header .question-tools .qt-name { display: block; font-size: 0.55rem; line-height: 1.2; white-space: nowrap; }
+  .md-typeset .question-header .question-tools .qt-btn[data-tip]:is(:hover, :focus-visible)::after { content: none; }
+}
+
+/* The side navigation (S421): one line per question, cut with an ellipsis (the full title
+   is the link's tooltip, reading-tools.js); the current question shows in full. */
+.md-sidebar--primary .md-nav__link .md-ellipsis { display: block; white-space: nowrap; }
+.md-sidebar--primary .md-nav__link--active .md-ellipsis { white-space: normal; }
+
+/* A run of action buttons in a box (S418, core.js layout): elsewhere it lays out as if it
+   were not there; on a phone it is one line that scrolls sideways, fading out at its end
+   so more buttons read as there, with end padding that lets the last button scroll clear
+   of the fade. */
+.md-typeset .explorer .ex-btnrun { display: contents; }
+@media screen and (max-width: 30em) {
+  .md-typeset .explorer .ex-btnrun { display: flex; flex: 1 1 100%; flex-wrap: nowrap; gap: inherit; min-width: 0; overflow-x: auto; scrollbar-width: none; padding-inline-end: 1.6rem; -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 1.6rem), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 1.6rem), transparent); }
+  .md-typeset .explorer .ex-btnrun::-webkit-scrollbar { display: none; }
+  .md-typeset .explorer .ex-btnrun > * { flex: none; }
+}
+
+/* Figures of S2: the columns and water of 0047, the ones of 0046's grid, and the balls of
+   0045 by what the first weighing leaves (heavy, light, either); keys in the legends. */
+.md-typeset svg .fig-ground { fill: color-mix(in srgb, var(--viz-ink) 55%, var(--md-default-bg-color)); }
+.md-typeset svg .fig-water { fill: color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1; }
+.md-typeset svg .fig-one { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg :is(.fig-heavy, .fig-light, .fig-both) { stroke-width: 2; }
+.md-typeset svg .fig-heavy { fill: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg .fig-light { fill: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .fig-both { fill: color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color)); stroke: var(--viz-s4); }
+.md-typeset .viz-legend .fig-key-ground { background: color-mix(in srgb, var(--viz-ink) 55%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .fig-key-water { background: color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .fig-key-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); }
+.md-typeset .viz-legend .fig-key-square { background: color-mix(in srgb, var(--viz-s3) 45%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); }
+.md-typeset .viz-legend .fig-key-heavy { background: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); border-radius: 50%; }
+.md-typeset .viz-legend .fig-key-light { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .fig-key-both { background: color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s4); border-radius: 50%; }
+.md-typeset .viz-legend .fig-key-good { background: color-mix(in srgb, var(--viz-grid) 50%, var(--md-default-bg-color)); border-radius: 50%; }

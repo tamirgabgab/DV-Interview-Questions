@@ -6,4 +6,4 @@ for _ in range(4):
     print(f"result: {result}")
     print(show(board), "\n")
 
-print({result: len(boards) for result, boards in final_boards(lines).items()})
+print({result: len(boards) for result, boards in final_boards(lines).items()})  # {'X': 626, 'O': 316, 'draw': 16}

@@ -18,5 +18,5 @@ def play(events, timeout=100):
 
 legal = [(0, "req", 0, 10), (1, "req", 1, 20), (2, "req", 0, 11), (3, "rsp", 1, 20), (4, "rsp", 0, 10), (5, "rsp", 0, 11)]
 swapped = legal[:4] + [(4, "rsp", 0, 11), (5, "rsp", 0, 10)]
-print("legal:  ", play(legal))
+print("legal:  ", play(legal))  # ['no errors']
 print("swapped:", play(swapped))

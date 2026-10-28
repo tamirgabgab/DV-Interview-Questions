@@ -6,7 +6,7 @@
 action and the two hourglasses after it. ``branches`` draws one state and its four options.
 The page scripts (``q0018.py``, ``q0019.py``) put the frames in a step-through figure.
 Colours come from the ``sand-a`` / ``sand-b`` / ``glass`` / ``frame`` / ``measure`` classes
-in ``docs/stylesheets/extra.css``. Text inside the SVG stays English; the Hebrew goes in
+in ``docs/stylesheets/``. Text inside the SVG stays English; the Hebrew goes in
 the captions and tables next to the figure.
 """
 

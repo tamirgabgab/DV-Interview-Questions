@@ -4,7 +4,7 @@
     html = stepper([(svg_1, "caption 1"), (svg_2, "caption 2")], aria="...")
 
 The page gets one line of HTML (a ``div.stepper``); ``docs/javascripts/question-tools.js``
-adds the navigation and ``extra.css`` hides every frame but the active one. Captions are
+adds the navigation and the site's CSS hides every frame but the active one. Captions are
 HTML, so Hebrew text in them is laid out right-to-left like the rest of the page.
 """
 

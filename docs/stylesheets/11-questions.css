@@ -1,0 +1,313 @@
+/* The site's styles, part 11 of 12: the figures and boxes of 0036 and of 0049 to 0059.
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* 0036: the register row (lfsr.js regSvg) */
+.md-typeset svg.lf-regsvg { width: 100%; height: auto; display: block; margin: 0.3rem auto; }
+.md-typeset svg .lf-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .lf-cell.is-one { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); }
+.md-typeset svg .lf-cell.is-tap { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .lf-cellv { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 20px; font-weight: 700; }
+.md-typeset svg .lf-celli, .md-typeset svg .lf-regfb { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 12px; }
+.md-typeset svg .lf-wire { fill: none; stroke: var(--viz-s2); stroke-width: 1.8; }
+.md-typeset svg .lf-dot { fill: var(--viz-s2); }
+.md-typeset svg .lf-xor { fill: var(--md-default-bg-color); stroke: var(--viz-s2); stroke-width: 1.8; }
+.md-typeset svg.lf-regsvg .lf-head { fill: var(--viz-s2); }
+
+/* Poisoned bottles (0051): the mice of the figure and of the explorer, the cells of the rounds, the bottles still possible */
+.md-typeset svg .mc-mouse circle { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .mc-mouse text { fill: var(--viz-ink); font-size: 16px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .mc-mouse.is-dead circle { fill: var(--viz-ink); }
+.md-typeset svg .mc-mouse.is-dead text { fill: var(--md-default-bg-color); }
+.md-typeset svg .mc-rowlab { fill: var(--viz-text); font-size: 14px; }
+.md-typeset svg .mc-rowlab.is-now { fill: var(--viz-ink); font-weight: 700; }
+.md-typeset svg .mc-cell rect { fill: none; stroke: var(--viz-grid); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.md-typeset svg .mc-cell text { fill: var(--viz-text); font-size: 15px; font-family: var(--md-code-font-family); }
+.md-typeset svg .mc-cell.is-later text { opacity: 0.55; }
+.md-typeset svg .mc-cell.is-drink rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-dasharray: none; }
+.md-typeset svg .mc-cell.is-death rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2.5; stroke-dasharray: none; }
+.md-typeset svg .mc-cell.is-death text { fill: var(--viz-ink); font-weight: 700; }
+.md-typeset svg .mc-cell.is-gone rect { fill: var(--viz-grid); fill-opacity: 0.35; stroke: none; }
+.md-typeset svg .mc-digit { fill: var(--viz-text); font-size: 18px; font-family: var(--md-code-font-family); }
+.md-typeset svg .mc-digit.is-known { fill: var(--viz-s1-text); font-weight: 700; }
+.md-typeset .viz-legend .mc-key-dead { background: var(--viz-ink); }
+.md-typeset .viz-legend .mc-key-live { background: transparent; outline: 2px solid var(--viz-ink); outline-offset: -2px; }
+.md-typeset .explorer .viz-legend .mc-key-dead { background: var(--viz-s2); opacity: 0.6; }
+.md-typeset .viz-legend .mc-key-drink { background: var(--viz-s1); opacity: 0.45; }
+.md-typeset .viz-legend .mc-key-gone { background: var(--viz-grid); }
+.md-typeset .explorer svg.mc-live { width: 100%; max-width: 40rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer input.mc-n, .md-typeset .explorer input.mc-x, .md-typeset .explorer input.mc-guess { width: 5.5rem; }
+.md-typeset .explorer .mc-quizlab { display: block; margin: 0.4rem 0 0.2rem; font-size: 0.7rem; }
+.md-typeset .explorer .mc-bottles { display: flex; flex-wrap: wrap; gap: 0.15rem; max-width: 40rem; }
+.md-typeset .explorer .mc-bottle { min-width: 1.7rem; padding: 0.05rem 0.1rem; text-align: center; font-size: 0.6rem; font-family: var(--md-code-font-family); font-variant-numeric: tabular-nums;
+  color: var(--viz-ink); border: 1.5px solid var(--viz-s1); border-radius: 0.2rem; background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .mc-bottle.is-out { border-color: var(--viz-grid); background: none; color: var(--viz-text); opacity: 0.55; }
+.md-typeset .explorer .mc-bottle.is-bad { border-color: var(--viz-s2); border-width: 2.5px; }
+
+/* Coin patterns (0052): the two chains of HH and HT, the explorer's tosses and its histogram */
+.md-typeset svg .fs-edge.is-back { stroke: var(--viz-s3); stroke-width: 2.5; stroke-dasharray: 6 4; }
+.md-typeset svg .cp-exp { fill: var(--viz-ink); font-size: 18px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .cp-key-back { background: var(--viz-s3); }
+.md-typeset .explorer input.cn-a, .md-typeset .explorer input.cn-b { width: 6rem; letter-spacing: 0.15em; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .cn-toss { min-width: 2.4rem; font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset .explorer .cn-pats { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.4rem 0; }
+.md-typeset .explorer .cn-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.md-typeset .explorer .cn-name { min-width: 2.6rem; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .cn-cells { display: inline-flex; gap: 0.2rem; }
+.md-typeset .explorer .cn-cell { display: inline-block; min-width: 1.9rem; padding: 0.15rem 0; text-align: center; font-family: var(--md-code-font-family); font-weight: 700; color: var(--viz-ink);
+  border: 1.5px solid var(--viz-grid); border-radius: 0.25rem; background: var(--md-default-bg-color); }
+.md-typeset .explorer .cn-cell.is-match { border-color: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cn-row.is-won .cn-cell { border-color: var(--viz-s2); background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cn-state { font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .cn-strip { display: flex; flex-wrap: wrap; gap: 0.12rem; min-height: 1.6rem; max-width: 40rem; }
+.md-typeset .explorer .cn-strip .cn-chip { min-width: 1.3rem; padding: 0.05rem 0; text-align: center; font-size: 0.65rem; color: var(--viz-ink); border: 1px solid var(--viz-grid); border-radius: 0.2rem; }
+.md-typeset .explorer .cn-strip .cn-chip.is-hit { border-color: var(--viz-s2); border-width: 2px; background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cn-more { font-size: 0.65rem; color: var(--viz-text); align-self: center; }
+.md-typeset .explorer .cn-chart { max-width: 40rem; }
+.md-typeset .viz-legend .cn-key-exact { background: var(--viz-s2); border-radius: 50%; }
+
+/* Out-of-order scoreboard (0050): the per-ID queues figure, the explorer's events, queues and checker cards */
+.md-typeset svg .sb-item rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .sb-item text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .sb-item.sb-id0 rect { stroke: var(--viz-s1); }
+.md-typeset svg .sb-item.sb-id1 rect { stroke: var(--viz-s2); }
+.md-typeset svg .sb-item.sb-id2 rect { stroke: var(--viz-s3); }
+.md-typeset svg .sb-item.is-head rect { stroke-width: 3.5; fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset svg .sb-item.is-done rect { stroke-dasharray: 4 3; fill: var(--viz-grid); fill-opacity: 0.35; }
+.md-typeset svg .sb-item.is-rsp rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke-width: 2.5; }
+.md-typeset svg .sb-qname { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .sb-rail { stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .sb-arrow { fill: none; stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset .viz-legend .sb-key-head { background: var(--viz-s1); opacity: 0.45; outline: 2.5px solid var(--viz-s1); }
+.md-typeset .viz-legend .sb-key-done { background: var(--viz-grid); }
+.md-typeset .explorer .sb-events { display: flex; flex-wrap: wrap; gap: 0.2rem; margin: 0.4rem 0; max-width: 40rem; }
+.md-typeset .explorer .sb-ev { display: inline-flex; flex-direction: column; align-items: center; padding: 0.1rem 0.3rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem;
+  font-family: var(--md-code-font-family); font-size: 0.6rem; color: var(--viz-ink); background: var(--md-default-bg-color); }
+.md-typeset .explorer .sb-ev small { font-size: 0.55rem; color: var(--viz-text); opacity: 1; }
+.md-typeset .explorer .sb-ev.sb-req { border-color: var(--viz-s1); }
+.md-typeset .explorer .sb-ev.sb-rsp { border-color: var(--viz-s2); }
+.md-typeset .explorer .sb-ev.is-later { border-style: dashed; border-color: var(--viz-grid); background: none; }
+.md-typeset .explorer .sb-ev.is-now { border-width: 2.5px; background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .sb-queues { display: flex; flex-direction: column; gap: 0.2rem; max-width: 40rem; }
+.md-typeset .explorer .sb-q { display: flex; align-items: center; gap: 0.5rem; min-height: 1.7rem; }
+.md-typeset .explorer .sb-qname { min-width: 2.6rem; font-family: var(--md-code-font-family); font-size: 0.65rem; font-weight: 700; color: var(--viz-ink); }
+.md-typeset .explorer .sb-qitems { display: flex; gap: 0.2rem; overflow: hidden; }
+.md-typeset .explorer .sb-qi { min-width: 2.2rem; text-align: center; padding: 0.1rem 0.2rem; font-family: var(--md-code-font-family); font-size: 0.65rem; color: var(--viz-ink);
+  border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; }
+.md-typeset .explorer .sb-qi.is-head { border-color: var(--viz-s1); border-width: 2.5px; background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .sb-qi.is-late { border-color: var(--viz-s2); border-style: dashed; }
+.md-typeset .explorer .sb-qempty { font-size: 0.6rem; color: var(--viz-text); }
+.md-typeset .explorer .sb-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; margin-top: 0.5rem; max-width: 40rem; }
+.md-typeset .explorer .sb-card { padding: 0.3rem 0.5rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; font-size: 0.65rem; }
+.md-typeset .explorer .sb-card p { margin: 0.15em 0; }
+.md-typeset .explorer .sb-card.is-right { border-color: var(--diff-easy); }
+.md-typeset .explorer .sb-card.is-wrong { border-color: var(--diff-hard); border-width: 2.5px; }
+.md-typeset .explorer .sb-ctitle { font-weight: 700; color: var(--viz-ink); }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .sb-cards { grid-template-columns: 1fr; }
+}
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .explorer .sb-events { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.2rem; }
+  .md-typeset .explorer .sb-ev { flex: 0 0 auto; }
+}
+
+/* UVM architecture (0049): the testbench figure and the explorer's clickable copy */
+.md-typeset svg .uv-box rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.8; }
+.md-typeset svg .uv-box text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .uv-box.is-cont rect { fill: none; stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .uv-box.is-cont text { fill: var(--viz-text); font-size: 13px; font-weight: 400; }
+.md-typeset svg .uv-box.uv-dut rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .uv-box.uv-scoreboard rect, .md-typeset svg .uv-box.uv-coverage rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset svg .uv-arrow { stroke-width: 2; }
+.md-typeset svg .uv-arrow.uv-tlm { stroke: var(--viz-s1); }
+.md-typeset svg .uv-arrow.uv-pin { stroke: var(--viz-ink); stroke-dasharray: 6 4; }
+.md-typeset .viz-legend .uv-key-tlm { background: var(--viz-s1); }
+.md-typeset .viz-legend .uv-key-pin { background: var(--viz-ink); }
+.md-typeset .explorer svg.uv-live { width: 100%; max-width: 42rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer svg.uv-live [data-c] { cursor: pointer; }
+.md-typeset .explorer svg.uv-live [data-c]:focus-visible rect { outline: none; stroke: var(--site-focus-ring); stroke-width: 3.5; }
+.md-typeset .explorer svg.uv-live .uv-box.is-sel rect { stroke: var(--viz-s1); stroke-width: 3.5; }
+.md-typeset .explorer svg.uv-live .uv-box.is-cont.is-sel rect { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset .explorer svg.uv-live .uv-box.is-on rect { stroke: var(--viz-s2); stroke-width: 4; }
+.md-typeset .explorer svg.uv-live .uv-arrow.is-on { stroke: var(--viz-s2); stroke-width: 4.5; stroke-dasharray: none; }
+.md-typeset .explorer .uv-quizlab { display: block; margin: 0.4rem 0 0.2rem; font-size: 0.7rem; }
+.md-typeset .explorer .uv-card { max-width: 40rem; margin-top: 0.4rem; padding: 0.3rem 0.6rem; border: 1.5px solid var(--viz-grid); border-radius: 0.3rem; font-size: 0.7rem; min-height: 6.5rem; }
+.md-typeset .explorer .uv-card p { margin: 0.2em 0; }
+.md-typeset .explorer .uv-ctitle { font-weight: 700; }
+.md-typeset .explorer svg.cn-live { width: 100%; max-width: 40rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer .cn-note { font-size: 0.65rem; color: var(--viz-text); margin: 0.1em 0 0.4em; }
+
+/* ALU covergroup (0053): the cross maps of the figure and the explorer, the coverpoint bins, the coverage curve */
+.md-typeset svg .cg-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.2; }
+.md-typeset svg .cg-cell.is-r2 { fill: var(--viz-s2); fill-opacity: 0.85; }
+.md-typeset svg .cg-cell.is-r1 { fill: var(--viz-s2); fill-opacity: 0.35; }
+.md-typeset svg .cg-cell.is-r0 { fill: var(--md-default-bg-color); }
+.md-typeset svg .cg-cell.is-ign { fill: url(#cg-hatch); stroke: var(--viz-grid); }
+.md-typeset svg.cg-live .cg-cell.is-ign { fill: url(#cv-hatch); }
+.md-typeset svg .cg-hatch-line { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .cg-cell.is-h1 { fill: var(--viz-s1); fill-opacity: 0.3; }
+.md-typeset svg .cg-cell.is-h2 { fill: var(--viz-s1); fill-opacity: 0.5; }
+.md-typeset svg .cg-cell.is-h3 { fill: var(--viz-s1); fill-opacity: 0.7; }
+.md-typeset svg .cg-cell.is-h4 { fill: var(--viz-s1); fill-opacity: 0.9; }
+.md-typeset svg .cg-cell.is-last { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg .cg-op { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .cg-key-r2 { background: var(--viz-s2); opacity: 0.85; }
+.md-typeset .viz-legend .cg-key-r1 { background: var(--viz-s2); opacity: 0.35; }
+.md-typeset .viz-legend .cg-key-r0 { background: transparent; outline: 1.5px solid var(--viz-grid); outline-offset: -1.5px; }
+.md-typeset .viz-legend .cg-key-ign { background: repeating-linear-gradient(45deg, var(--viz-text) 0 1.5px, transparent 1.5px 5px); }
+.md-typeset .viz-legend .cg-key-hit { background: var(--viz-s1); opacity: 0.7; }
+.md-typeset .viz-legend .cg-key-last { background: transparent; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .explorer svg.cg-live { width: 100%; max-width: 41rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer .cv-ignlab { display: block; margin: 0.4rem 0 0.2rem; font-size: 0.7rem; }
+.md-typeset .explorer input.cv-a, .md-typeset .explorer input.cv-b { width: 4.5rem; }
+.md-typeset .explorer .cv-points { display: flex; flex-direction: column; gap: 0.25rem; margin: 0.4rem 0; }
+.md-typeset .explorer .cv-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; }
+.md-typeset .explorer .cv-name { min-width: 5.2rem; }
+.md-typeset .explorer .cv-bin { display: inline-flex; flex-direction: column; align-items: center; min-width: 2.8rem; padding: 0.05rem 0.25rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem;
+  font-family: var(--md-code-font-family); font-size: 0.6rem; color: var(--viz-ink); }
+.md-typeset .explorer .cv-bin small { font-size: 0.55rem; color: var(--viz-text); opacity: 1; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer .cv-bin.is-hit { border-color: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cv-curve { max-width: 40rem; }
+
+/* Round-robin arbiter (0054): the grant grids of the figure and the explorer, the trick table, the rules */
+.md-typeset svg .arb-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.2; }
+.md-typeset svg .arb-cell.is-gnt { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg .arb-cell.is-wait { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg .arb-cell.is-bad { stroke: var(--diff-hard); stroke-width: 3; }
+.md-typeset svg .arb-cell.arb-req { cursor: pointer; }
+.md-typeset svg .arb-cell.arb-req.is-on { fill: var(--viz-ink); fill-opacity: 0.75; stroke: var(--viz-ink); }
+.md-typeset svg .arb-cell.arb-req:focus-visible { outline: none; stroke: var(--site-focus-ring); stroke-width: 3; }
+.md-typeset svg .arb-mark { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); pointer-events: none; }
+.md-typeset svg .arb-name { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .arb-wait { fill: var(--viz-text); font-size: 13px; font-family: var(--md-code-font-family); }
+.md-typeset svg .arb-wait.is-over { fill: var(--viz-s2-text); font-weight: 700; }
+.md-typeset svg .arb-cursor { fill: var(--viz-s1); fill-opacity: 0.12; stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset .viz-legend .arb-key-gnt { background: var(--viz-s1); opacity: 0.45; outline: 2px solid var(--viz-s1); }
+.md-typeset .viz-legend .arb-key-wait { background: var(--viz-s2); opacity: 0.45; }
+.md-typeset .viz-legend .arb-key-req { background: var(--viz-ink); opacity: 0.75; }
+.md-typeset .viz-legend .arb-key-bad { background: transparent; outline: 3px solid var(--diff-hard); outline-offset: -3px; }
+.md-typeset .explorer svg.arb-live { width: 100%; max-width: 42rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer .arb-weights { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; font-size: 0.7rem; }
+.md-typeset .explorer .arb-weights label { display: inline-flex; align-items: center; gap: 0.15rem; }
+.md-typeset .explorer table.arb-tt { font-size: 0.65rem; margin: 0.3rem 0; }
+.md-typeset .explorer table.arb-tt td { padding: 0.15em 0.6em; }
+.md-typeset .explorer .arb-rule { margin: 0.15em 0; font-size: 0.7rem; }
+.md-typeset .explorer table.arb-tt code { white-space: nowrap; }
+
+/* Divisible-by-m machines (0055): the rings of the figures and the divfsm explorer (fs-* states), the digits read */
+.md-typeset .viz-legend .dv-key-acc { background: transparent; border-radius: 50%; outline: 2px solid var(--viz-ink); outline-offset: -2px; box-shadow: inset 0 0 0 4px var(--md-default-bg-color), inset 0 0 0 6px var(--viz-ink); }
+.md-typeset .viz-legend .dv-key-taken { background: var(--viz-ink); height: 0.25rem; }
+.md-typeset .viz-legend .dv-key-cur { background: var(--viz-s2); opacity: 0.5; outline: 2px solid var(--viz-s2); border-radius: 50%; }
+.md-typeset .explorer .dv-pair { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+.md-typeset .explorer .dv-side { flex: 1 1 17rem; min-width: 0; max-width: 24rem; }
+.md-typeset .explorer .dv-side .ex-title { margin: 0.4rem 0 0; }
+.md-typeset .explorer svg.dv-live { width: 100%; display: block; }
+.md-typeset .explorer .dv-read { font-size: 0.7rem; margin: 0 0 0.4rem; }
+.md-typeset .explorer .dv-digits { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; direction: ltr; margin: 0.4rem 0; }
+.md-typeset .explorer .dv-tag { font-size: 0.65rem; font-family: var(--md-code-font-family); color: var(--viz-text); }
+.md-typeset .explorer .dv-cells { display: inline-flex; flex-wrap: wrap; gap: 0.15rem; }
+.md-typeset .explorer .dv-cell { display: inline-block; min-width: 1.5rem; padding: 0.1rem 0; text-align: center; font-family: var(--md-code-font-family); font-weight: 700; color: var(--viz-ink);
+  border: 1.5px solid var(--viz-grid); border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-radius: 0.2rem; }
+.md-typeset .explorer .dv-cell.is-msb { border-top-color: var(--viz-s1); }
+.md-typeset .explorer .dv-cell.is-lsb { border-bottom-color: var(--viz-s2); }
+.md-typeset .explorer .dv-add .dv-push { min-width: 2.4rem; font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset .explorer input.dv-num { width: 11rem; letter-spacing: 0.08em; font-family: var(--md-code-font-family); }
+
+/* Ants on a pole (0056): the space-time figure and the ants explorer; one colour per ant (or ghost), six in turn */
+.md-typeset svg .an-c0 { --an: var(--viz-s1); }
+.md-typeset svg .an-c1 { --an: var(--viz-s2); }
+.md-typeset svg .an-c2 { --an: var(--viz-s3); }
+.md-typeset svg .an-c3 { --an: var(--viz-s4); }
+.md-typeset svg .an-c4 { --an: var(--viz-s5); }
+.md-typeset svg .an-c5 { --an: var(--viz-ink); }
+.md-typeset svg .an-path { fill: none; stroke: var(--an); stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round; }
+.md-typeset svg .an-start { fill: var(--an); stroke: var(--md-default-bg-color); stroke-width: 1.5; }
+.md-typeset svg .an-pole { stroke: var(--viz-ink); stroke-width: 4; stroke-linecap: round; }
+.md-typeset svg .an-title { fill: var(--viz-ink); font-size: 13px; font-weight: 700; }
+.md-typeset svg .an-now { stroke: var(--viz-ink); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.md-typeset svg .an-hit { fill: transparent; cursor: copy; }
+.md-typeset svg .an-ant { cursor: pointer; }
+.md-typeset svg .an-ant circle { fill: var(--md-default-bg-color); stroke: var(--an); stroke-width: 3.5; }
+.md-typeset svg .an-ant text { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); pointer-events: none; }
+.md-typeset svg .an-ant .an-dir { fill: var(--an); }
+.md-typeset svg .an-ant:focus-visible { outline: none; }
+.md-typeset svg .an-ant:focus-visible circle { stroke: var(--site-focus-ring); stroke-width: 4.5; }
+.md-typeset .viz-legend .an-key-path { background: linear-gradient(90deg, var(--viz-s1) 0 33%, var(--viz-s2) 33% 66%, var(--viz-s3) 66%); height: 0.25rem; }
+.md-typeset .viz-legend .an-key-start { background: var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .an-key-now { background: none; border-top: 2px dashed var(--viz-ink); height: 0; }
+.md-typeset .explorer svg.an-live { width: 100%; max-width: 30rem; display: block; }
+.md-typeset .explorer .an-st-wrap svg { max-width: 26rem; }
+.md-typeset .explorer .an-chips { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.md-typeset .explorer .an-chip { --an: var(--viz-s1); font-family: var(--md-text-font-family); font-size: 0.65rem; padding: 0.1rem 0.4rem; border: 1.5px solid var(--viz-grid); border-inline-start: 5px solid var(--an); border-radius: 0.2rem; color: var(--viz-ink); }
+.md-typeset .explorer .an-chip.an-c1 { --an: var(--viz-s2); }
+.md-typeset .explorer .an-chip.an-c2 { --an: var(--viz-s3); }
+.md-typeset .explorer .an-chip.an-c3 { --an: var(--viz-s4); }
+.md-typeset .explorer .an-chip.an-c4 { --an: var(--viz-s5); }
+.md-typeset .explorer .an-chip.an-c5 { --an: var(--viz-ink); }
+.md-typeset .explorer .an-chip.is-gone { background: color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color)); }
+.md-typeset svg .an-grid { stroke: var(--viz-grid); stroke-width: 1; }
+
+/* Missing tags (0057): the tag cells and the accumulators of the tagcheck explorer */
+.md-typeset .explorer .tc-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.5rem 0; direction: ltr; }
+.md-typeset .explorer .tc-tag { position: relative; display: inline-flex; flex-direction: column; align-items: center; min-width: 2.6rem; padding: 0.15rem 0.2rem; border: 1.5px solid var(--viz-grid); border-radius: 0.25rem;
+  background: var(--md-default-bg-color); color: var(--viz-ink); font-family: var(--md-code-font-family); cursor: pointer; }
+.md-typeset .explorer .tc-tag[disabled] { cursor: default; }
+.md-typeset .explorer .tc-tag b { font-size: 0.75rem; }
+.md-typeset .explorer .tc-tag small { font-size: 0.55rem; }
+.md-typeset .explorer .tc-tag.is-out { border-style: dashed; }
+.md-typeset .explorer .tc-tag.is-back { border-color: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); }
+.md-typeset .explorer .tc-tag.is-twice { border-color: var(--viz-s2); background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .tc-tag.is-last { outline: 3px solid var(--viz-ink); outline-offset: 1px; }
+.md-typeset .explorer .tc-tag:focus-visible { outline: 3px solid var(--site-focus-ring); }
+.md-typeset .explorer .tc-f { position: absolute; top: -0.45rem; inset-inline-end: -0.3rem; font-size: 0.6rem; font-weight: 700; padding: 0 0.15rem; border-radius: 0.2rem; background: var(--viz-ink); color: var(--md-default-bg-color); }
+.md-typeset .viz-legend .tc-key-out { background: none; border: 1.5px dashed var(--viz-grid); }
+.md-typeset .viz-legend .tc-key-back { background: var(--viz-s1); opacity: 0.45; }
+.md-typeset .viz-legend .tc-key-twice { background: var(--viz-s2); opacity: 0.6; }
+.md-typeset .viz-legend .tc-key-last { background: none; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .explorer table.tc-table { font-size: 0.65rem; margin: 0.3rem 0; }
+.md-typeset .explorer table.tc-table td { padding: 0.1em 0.6em; }
+.md-typeset .explorer table.tc-table tr.is-hit td { background: color-mix(in srgb, var(--viz-s2) 14%, var(--md-default-bg-color)); }
+.md-typeset .explorer .tc-decode p { margin: 0.2em 0; font-size: 0.7rem; }
+.md-typeset .explorer .tc-groups { color: var(--viz-text); }
+.md-typeset .explorer .tc-groups span { font-family: var(--md-code-font-family); }
+.md-typeset .explorer input.tc-guess, .md-typeset .explorer input.tc-gdup { width: 7rem; }
+
+/* Coins in a row (0058): the row by the parity of the place in the figure, the coinrow explorer's row and its table */
+.md-typeset svg .cr-coin circle { stroke-width: 3; }
+.md-typeset svg .cr-coin.cr-p0 circle { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .cr-coin.cr-p1 circle { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg .cr-coin text { fill: var(--viz-ink); font-size: 18px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .cr-key-p0, .md-typeset .viz-legend .cr-key-a { background: var(--viz-s1); opacity: 0.55; border-radius: 50%; }
+.md-typeset .viz-legend .cr-key-p1, .md-typeset .viz-legend .cr-key-b { background: var(--viz-s2); opacity: 0.6; border-radius: 50%; }
+.md-typeset .viz-legend .cr-key-end { background: none; border-radius: 50%; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .explorer .cr-row { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0; direction: ltr; }
+.md-typeset .explorer .cr-coin { position: relative; width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 2px solid var(--viz-grid); background: var(--md-default-bg-color);
+  color: var(--viz-ink); font-family: var(--md-code-font-family); font-weight: 700; font-size: 0.8rem; }
+.md-typeset .explorer .cr-coin.is-end { border: 3px solid var(--viz-ink); }
+.md-typeset .explorer .cr-coin.is-end:not([disabled]) { cursor: pointer; box-shadow: 0 0 0 3px color-mix(in srgb, var(--viz-s2) 40%, transparent); }
+.md-typeset .explorer .cr-coin.cr-by0 { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset .explorer .cr-coin.cr-by1 { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset .explorer .cr-coin small { position: absolute; bottom: -0.15rem; inset-inline-end: -0.2rem; font-size: 0.55rem; padding: 0 0.15rem; border-radius: 0.2rem; background: var(--viz-ink); color: var(--md-default-bg-color); }
+.md-typeset .explorer .cr-coin:focus-visible { outline: 3px solid var(--site-focus-ring); }
+.md-typeset .explorer .cr-advice { font-size: 0.7rem; }
+.md-typeset .explorer .cr-dp { overflow-x: auto; }
+.md-typeset .explorer table.cr-table { font-size: 0.62rem; margin: 0.3rem 0; direction: ltr; }
+.md-typeset .explorer table.cr-table td, .md-typeset .explorer table.cr-table th { padding: 0.15em 0.45em; text-align: center; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer table.cr-table td.is-now { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); font-weight: 700; outline: 2px solid var(--viz-s2); }
+.md-typeset .explorer table.cr-table td.is-opt { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); }
+
+/* The next number with as many ones (0059): the rows of bits of the figures and of the popnext explorer */
+.md-typeset .gs-scroll { overflow-x: auto; margin: 0.6rem 0; }
+.md-typeset table.gs-bits { border-collapse: separate; border-spacing: 2px; direction: ltr; font-family: var(--md-code-font-family); font-size: 0.75rem; margin: 0 auto; }
+.md-typeset table.gs-bits th { font-weight: 400; color: var(--viz-text); text-align: right; padding: 0 0.6em 0 0; white-space: nowrap; border: 0; background: none; }
+.md-typeset table.gs-bits td { padding: 0; border: 0; text-align: center; }
+.md-typeset table.gs-bits td.gs-b { width: 1.45rem; height: 1.45rem; border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; color: var(--viz-text); }
+.md-typeset table.gs-bits td.gs-b.is-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); color: var(--viz-ink); font-weight: 700; }
+.md-typeset table.gs-bits td.gs-b.is-one.is-mark { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border: 2.5px solid var(--viz-s2); }
+.md-typeset table.gs-bits td.gs-val { color: var(--viz-ink); padding-left: 0.7em; text-align: left; font-variant-numeric: tabular-nums; min-width: 3.2em; }
+.md-typeset table.gs-bits tr.is-off { visibility: hidden; }
+.md-typeset .viz-legend .gs-key-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
+.md-typeset .viz-legend .gs-key-mark { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .explorer .gs-note { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer input.gs-x { width: 6rem; }
+.md-typeset table.gs-bits td.gs-b.is-lead { border-style: dashed; background: none; }
+.md-typeset .viz-legend .gs-key-lead { background: none; outline: 1.5px dashed var(--viz-grid); outline-offset: -1.5px; }

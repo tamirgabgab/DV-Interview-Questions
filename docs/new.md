@@ -1,5 +1,7 @@
 ---
 description: השאלות שנוספו לאתר, מהחדשה לישנה
+hide:
+  - navigation
 ---
 
 # מה חדש

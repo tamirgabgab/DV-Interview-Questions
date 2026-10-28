@@ -1,7 +1,7 @@
 """Contrast of the site's colour pairs in the light and the dark scheme (WCAG 2).
 
 The colours are the CSS custom properties: Material's own (read from the installed theme's
-stylesheets) overridden by `docs/stylesheets/extra.css` (`:root`, then
+stylesheets) overridden by the site's own, `docs/stylesheets/NN-*.css` in order (`:root`, then
 `[data-md-color-scheme="default"]` or `[data-md-color-scheme="slate"]`). Each pair below is
 a text or a mark on a background as the site draws it; a translucent colour is composited
 over what lies under it. Text needs 4.5:1, marks and controls (icons, bars, focus rings)
@@ -20,7 +20,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-EXTRA = ROOT / "docs" / "stylesheets" / "extra.css"
+# the site's stylesheets in their load order (mkdocs.yml lists the same parts)
+STYLES = sorted((ROOT / "docs" / "stylesheets").glob("[0-9][0-9]-*.css"))
 
 TEXT, UI = 4.5, 3.0
 
@@ -71,6 +72,11 @@ PAIRS = [
     ("tag on a doubled response", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
     ("tag fault badge", "var(--md-default-bg-color)", ["var(--viz-ink)"], TEXT),
     ("coin of the first player", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("figure digit on the found square", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 45%, var(--md-default-bg-color))"], TEXT),
+    ("ball number, maybe heavy", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], TEXT),
+    ("ball number, maybe light", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))"], TEXT),
+    ("ball number, either", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color))"], TEXT),
+    ("ball number, known good", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-grid) 50%, var(--md-default-bg-color))"], TEXT),
     ("ladder cell label, a term", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
     *[(f"code {k}", f"var(--md-code-hl-{k}-color)", ["var(--md-code-hl-color--light)", "var(--md-code-bg-color)"], TEXT)
       for k in ("function", "special", "constant", "number", "string", "variable", "generic", "operator")],
@@ -81,6 +87,7 @@ PAIRS = [
     ("footer text", "var(--md-footer-fg-color)", ["var(--md-footer-bg-color)"], TEXT),
     ("footer secondary text", "var(--md-footer-fg-color--light)", ["var(--md-footer-bg-color--dark)"], TEXT),
     ("edit link", "var(--md-default-fg-color--light)", [PAGE], TEXT),
+    ("tag count on a tag chip", "var(--md-default-fg-color--light)", ["var(--site-surface)"], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
@@ -104,7 +111,7 @@ def material_css() -> str:
 
 
 def schemes() -> dict[str, dict[str, str]]:
-    mat, extra = material_css(), EXTRA.read_text()
+    mat, extra = material_css(), "\n".join(p.read_text(encoding="utf-8") for p in STYLES)
     base = {**blocks(mat, ":root"), **blocks(mat, "[data-md-color-scheme=default]")}
     light = {**base, **blocks(extra, ":root"), **blocks(extra, "[data-md-color-scheme=default]")}
     dark = {**base, **blocks(mat, "[data-md-color-scheme=slate]"), **blocks(extra, ":root"),

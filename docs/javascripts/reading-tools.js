@@ -422,17 +422,24 @@
 
   // A content table of CARD_COLS or more columns and CARD_ROWS or more rows that does not
   // fit its column becomes cards on a phone: every cell gets its column's name
-  // (data-label), shown before the value by the CSS. A long table that fits its column keeps
-  // its header row in view while it scrolls (the scroll wrapper would otherwise hold the
-  // sticky header). Data attributes, not classes: Material styles only tables without one.
-  const CARD_COLS = 5, CARD_ROWS = 3, STICKY_ROWS = 8;
+  // (data-label), shown before the value by the CSS. A table of short values (a trace, or
+  // rows named in the first column) is a grid instead (Y394): it stays a table, tighter,
+  // and when it still does not fit it scrolls sideways with its first column in place
+  // (data-scrolls). A long table that fits its column keeps its header row in view while
+  // it scrolls (the scroll wrapper would otherwise hold the sticky header). Data
+  // attributes, not classes: Material styles only tables without one.
+  const CARD_COLS = 5, CARD_ROWS = 3, STICKY_ROWS = 8, GRID_CELL = 14;
   const tables = (root) => {
-    const wide = [], long = [];
+    const wide = [], long = [], grids = [];
     root.querySelectorAll(".md-content .md-typeset__table > table:not([class])").forEach((table) => {
       if (table.closest(".questions-wrap, .explorer")) return;
       const heads = Array.from(table.querySelectorAll("thead th")).map((th) => th.textContent.trim());
       const rows = table.querySelectorAll("tbody tr");
-      if (heads.length >= CARD_COLS && rows.length >= CARD_ROWS) {   // a row-per-value table stays a table
+      const values = Array.from(rows).flatMap((tr) => Array.from(tr.children).slice(1).map((td) => td.textContent.trim().length));
+      if (heads.length >= CARD_COLS && Math.max(0, ...values, ...heads.slice(1).map((h) => h.length)) <= GRID_CELL) {
+        table.dataset.grid = "";
+        grids.push(table);
+      } else if (heads.length >= CARD_COLS && rows.length >= CARD_ROWS) {   // a row-per-value table stays a table
         rows.forEach((tr) => Array.from(tr.children).forEach((td, i) => {
           if (heads[i]) td.dataset.label = heads[i];
         }));
@@ -441,21 +448,28 @@
       if (rows.length >= STICKY_ROWS) { table.dataset.long = ""; long.push(table); }
     });
     // Cards only where the table does not fit its column (measured as a table), and a
-    // sticky header only where it does.
+    // sticky header only where it does. "Fits" is the scroll box's own overflow, which
+    // counts the theme's padding around the table (a table 1 px narrower than the box
+    // could still stick out by that padding), measured again once the fonts are in.
+    const overflows = (wrap) => wrap && wrap.clientWidth && wrap.scrollWidth > wrap.clientWidth + 1;
     const layout = () => {
+      grids.forEach((table) => {
+        delete table.dataset.scrolls;
+        if (overflows(table.closest(".md-typeset__scrollwrap"))) table.dataset.scrolls = "";
+      });
       wide.forEach((table) => {
-        const wrap = table.closest(".md-typeset__scrollwrap");
         delete table.dataset.cards;
-        if (wrap && wrap.clientWidth && table.offsetWidth > wrap.clientWidth + 1) table.dataset.cards = "";
+        if (overflows(table.closest(".md-typeset__scrollwrap"))) table.dataset.cards = "";
       });
       long.forEach((table) => {
         const wrap = table.closest(".md-typeset__scrollwrap");
         if (!wrap) return;
         wrap.classList.remove("table-fits");
-        wrap.classList.toggle("table-fits", "cards" in table.dataset ? false : table.offsetWidth <= wrap.clientWidth + 1);
+        wrap.classList.toggle("table-fits", "cards" in table.dataset ? false : !overflows(wrap));
       });
     };
     layout();
+    if (document.fonts) document.fonts.ready.then(layout);
     window.addEventListener("resize", layout, { passive: true });
     document.addEventListener("toggle", layout, true);
     document.addEventListener("change", (e) => { if (e.target.closest && e.target.closest(".tabbed-set")) layout(); });
@@ -561,6 +575,29 @@
     mark();
   };
 
+  // A one-line title that does not fit its box: drop whole words from its end and add an
+  // ellipsis. The CSS ellipsis alone cuts inside a word, and in a Hebrew line with English
+  // words it cut the English one in the middle ("PCIe" read "Cle").
+  const fitWords = (text, box) => {
+    if (!box || !box.clientWidth || box.scrollWidth <= box.clientWidth + 1) return;
+    const words = text.textContent.trim().split(/\s+/);
+    while (words.length > 1 && box.scrollWidth > box.clientWidth + 1) {
+      words.pop();
+      while (words.length > 1 && /^[–\-·•:]+$/.test(words[words.length - 1])) words.pop();   // no dangling dash
+      text.textContent = `${words.join(" ").replace(/[,;:]$/, "")} …`;
+    }
+  };
+
+  // A link to a closed fold (the tags page's lists, Y398) opens it and shows it.
+  const openTarget = () => {
+    let target = null;
+    try { target = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch (e) { return; }
+    if (target && target.matches("details") && !target.open) {
+      target.open = true;
+      target.scrollIntoView();
+    }
+  };
+
   // The sticky solution map sits under the part bar when the page has one.
   const partBarHeight = () => {
     const bar = document.querySelector(".part-nav");
@@ -581,5 +618,16 @@
     document.querySelectorAll(".md-content .explorer").forEach((box) =>
       boxObserver.observe(box, { childList: true, subtree: true, characterData: true }));
     window.addEventListener("resize", partBarHeight, { passive: true });
+    openTarget();
+    window.addEventListener("hashchange", openTarget);
+    // a side navigation title (S421) and a path step's title (S419) that do not fit lose
+    // whole words from their end, the full title stays as the link's tooltip
+    document.querySelectorAll(".md-sidebar--primary .md-nav__link .md-ellipsis").forEach((span) => {
+      const link = span.closest("a");
+      if (!link || link.classList.contains("md-nav__link--active")) return;
+      if (!link.title) link.title = span.textContent.trim();
+      fitWords(span, span);
+    });
+    document.querySelectorAll(".path-nav .pn-title").forEach((t) => fitWords(t, t.closest("a")));
   });
 })();

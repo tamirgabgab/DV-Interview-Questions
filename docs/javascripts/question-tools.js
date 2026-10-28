@@ -199,7 +199,12 @@
     const foldBtn = bar.querySelector(".qt-fold");
     const fold = {
       allOpen: () => details().filter((d) => !d.hidden).every((d) => d.open),
-      paint: () => (fold.allOpen() ? retip(foldBtn, "סגור הכל", "unfold-less") : retip(foldBtn, "פתח הכל", "unfold-more")),
+      paint: () => {
+        const open = fold.allOpen();
+        retip(foldBtn, open ? "סגור הכל" : "פתח הכל", open ? "unfold-less" : "unfold-more");
+        const name = foldBtn.querySelector(".qt-name");   // its name on a touch screen (S420)
+        if (name) name.textContent = open ? "סגור הכל" : "פתח הכל";
+      },
     };
     foldBtn.addEventListener("click", () => {
       const open = !fold.allOpen();

@@ -313,10 +313,75 @@ def popcount_answers() -> list[int]:
     return [nxt, prv, next(y for y in range(121, 1024) if z(y) == z(120))]
 
 
+def comparisons(n: int) -> int:
+    """0003: both loops of the mystery code run over the whole array, with no early exit."""
+    return sum(1 for i in range(n) for j in range(n))
+
+
+def mislabeled_samples() -> int:
+    """0004: one ball is enough when some box holds a pure colour that differs between every
+    arrangement where no label is right."""
+    from itertools import permutations
+    labels = "RBM"
+    arrangements = [p for p in permutations("RBM") if all(c != l for c, l in zip(p, labels))]
+    one = any(len({a[i] for a in arrangements}) == len(arrangements) and all(a[i] != "M" for a in arrangements)
+              for i in range(3))
+    return 1 if one else 2
+
+
+def center_inside(m: int) -> Fraction:
+    """0007: three distinct points of m on a circle; the centre is inside when every gap
+    between neighbours is under half the circle (counted by the three gaps)."""
+    good = sum(1 for g1 in range(1, m) for g2 in range(1, m - g1) if 2 * max(g1, g2, m - g1 - g2) < m)
+    from math import comb
+    return Fraction(good * m, 3) / comb(m, 3)
+
+
+def kaprekar_fixed(digits: int) -> int:
+    """0012, 0013: the fixed point other than 0 of "largest minus smallest of the digits"."""
+    fixed = [x for x in range(10 ** digits)
+             if int("".join(sorted(f"{x:0{digits}d}", reverse=True))) - int("".join(sorted(f"{x:0{digits}d}"))) == x]
+    return max(fixed)
+
+
+def josephus_keep_one(n: int) -> int:
+    """0016 part b: one stays, the next two leave, around the circle."""
+    ring, i = list(range(n)), 0
+    while len(ring) > 1:
+        for _ in range(2):
+            if len(ring) == 1:
+                break
+            j = (i + 1) % len(ring)
+            ring.pop(j)
+            if j < i:
+                i -= 1
+        i = (i + 1) % len(ring)
+    return ring[0]
+
+
+def kaprekar_keys() -> int:
+    """0044: the keys after many Kaprekar steps from every three-digit number."""
+    def step(x):
+        d = sorted(f"{x:03d}")
+        return int("".join(reversed(d))) - int("".join(d))
+    keys = set()
+    for x in range(1000):
+        for _ in range(20):
+            x = step(x)
+        keys.add(x)
+    return len(keys)
+
+
 EXPECTED = {
+    "0003": [comparisons(5)],
+    "0004": [mislabeled_samples()],
+    "0007": [Fraction(1) - Fraction(3, 4), center_inside(360)],
+    "0012": [kaprekar_fixed(3)],
+    "0013": [kaprekar_fixed(4)],
     "0015": [two_children(False), two_children(True)],
-    "0016": [josephus(20)],
+    "0016": [josephus(20), josephus_keep_one(30)],
     "0021": [splits(4, 4), splits(8, 4)],
+    "0023": [2 ** sum(1 for b in range(0x10020 + 1, 0x10020 + 256) if b % 128 == 0)],   # cuts at multiples of the RCB
     "0026": [motorcycle(13, 1)],
     "0027": [cake(0.01, lambda p: p + 0.1)],
     "0028": [cake(0.01, lambda p: p * 1.5)],
@@ -325,7 +390,12 @@ EXPECTED = {
     "0031": [bridge([1, 2, 5, 10])],
     "0032": [river()],
     "0036": [lfsr_period()],
+    "0033": [120 * (1 - Fraction(3, 4) * 80 / 100)],        # the burst times one minus the read rate over the write rate
     "0039": [eggs(3, 100)],
+    "0040": [len("1011")],                                  # one state per prefix seen: none, 1, 10, 101
+    "0041": [16 * sum(Fraction(1, k) for k in range(1, 17))],
+    "0043": [9, 7],                                         # tests/0043 runs the plan on every ordering
+    "0044": [kaprekar_keys()],
     "0042": [camel(0.5, 150, 450, 30)],
     "0051": [mice(1000, 1), mice(1000, 2), mice(1000, 3)],
     "0052": [coin_runs("HH")[0], coin_runs("HHH")[0], coin_runs("HT", "HH")[1], coin_var("HH")],

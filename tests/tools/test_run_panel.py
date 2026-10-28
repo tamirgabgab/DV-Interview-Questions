@@ -39,6 +39,10 @@ def test_values_and_notes():
     assert not py_run.matches("(9, (0, 2), (2, 4))", "(9,")
     assert py_run.value_of("{0: 10, 495: 990}") == "{0: 10, 495: 990}"
     assert py_run.value_of("(3, 1): no pyramids") == "(3, 1)"
+    # a label before the value
+    assert py_run.matches("(6, 2, 3)", "long only, fast:  (6, 2, 3)")
+    assert not py_run.matches("3)", "long only: (6, 2, 3)")
+    assert not py_run.matches("3", "x: 13")
 
 
 def test_checks_by_line():

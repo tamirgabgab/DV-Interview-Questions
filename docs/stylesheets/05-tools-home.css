@@ -1,0 +1,433 @@
+/* The site's styles, part 5 of 12: the toolbar, the hint ladder, the first home page, step-through figures, marks and study paths.
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* Toolbar under the question header: open / close all, practice mode, stopwatch. */
+.md-typeset .question-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -0.8rem 0 1.4rem;
+  font-size: 0.7rem;
+}
+
+.md-typeset .question-tools .qt-btn {
+  padding: 0.05em 0.75em;
+  font: inherit;
+  font-size: 0.68rem;
+  line-height: 1.8;
+  color: var(--md-default-fg-color);
+  background: var(--site-surface);
+  border: 1px solid var(--site-card-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.md-typeset .question-tools .qt-btn:hover {
+  border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .question-tools .qt-practice.is-active {
+  color: #1b2a4a;
+  background: var(--md-accent-fg-color);
+  border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .question-tools .qt-clock {
+  font-family: var(--md-code-font-family);
+  color: var(--md-default-fg-color--light);
+}
+
+body.practice-mode .md-typeset .question-tools {
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.4rem;
+  background: var(--md-accent-fg-color--transparent);
+}
+
+/* Hint ladder: a hint stays hidden until the previous hint is open. */
+.md-typeset details.tip.hint-locked {
+  display: none;
+}
+
+/* Home page: level cards, statistics strip. */
+.md-typeset .level-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));   /* one card per level */
+  gap: 0.8rem;
+  margin: 1rem 0 1.4rem;
+}
+
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .level-cards { grid-template-columns: minmax(0, 1fr); }
+}
+
+.md-typeset .level-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem 1rem;
+  color: inherit;
+  border: 1px solid var(--site-card-edge);
+  border-top: 3px solid var(--md-primary-fg-color);
+  border-radius: var(--radius-m);
+  background: var(--site-surface);
+  box-shadow: var(--shadow-1);
+  transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+
+.md-typeset a.level-card:hover {
+  color: inherit;
+  border-color: var(--md-accent-fg-color);
+  box-shadow: var(--shadow-2);
+}
+
+.md-typeset .level-card .lc-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.md-typeset .level-card .lc-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--md-primary-fg-color);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .level-card .lc-name {
+  color: var(--md-typeset-a-color);
+}
+
+.md-typeset .level-card .lc-count {
+  font-family: var(--md-code-font-family);
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .level-card .lc-desc {
+  flex: 1;
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .level-card .lc-diff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.md-typeset .level-card .lc-empty {
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--md-default-fg-color);
+  opacity: 0.7;
+}
+
+/* Step-through figures (B14): one frame at a time, previous / next buttons. */
+.md-typeset .stepper {
+  margin: 1rem 0 1.4rem;
+  padding: 0.6rem 0.8rem 0.5rem;
+  border: 1px solid var(--site-card-border);
+  border-radius: 0.5rem;
+  outline: none;
+}
+
+.md-typeset .stepper:focus-visible {
+  border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .stepper-frame {
+  display: none;
+  margin: 0;
+}
+
+.md-typeset .stepper-frame.is-active {
+  display: block;
+}
+
+.md-typeset .stepper-frame svg.figure {
+  margin: 0.2rem auto 0.4rem;
+}
+
+.md-typeset .stepper-frame figcaption {
+  min-height: 2.4em;
+  margin: 0;
+  font-size: 0.72rem;
+  font-style: normal;
+  line-height: 1.5;
+  text-align: start;
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset .stepper-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.8rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--site-card-border);
+}
+
+.md-typeset .stepper-btn {
+  min-width: 4.6rem;
+  padding: 0.1em 0.9em;
+  font: inherit;
+  font-size: 0.7rem;
+  line-height: 1.8;
+  color: var(--md-primary-bg-color);
+  background: var(--md-primary-fg-color);
+  border: 1px solid var(--md-primary-fg-color);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.md-typeset .stepper-btn:disabled {
+  color: var(--md-default-fg-color--light);
+  background: transparent;
+  border-color: var(--site-card-border);
+  cursor: default;
+}
+
+.md-typeset .stepper-pos {
+  min-width: 6.5rem;
+  font-size: 0.7rem;
+  text-align: center;
+  color: var(--md-default-fg-color--light);
+}
+
+/* Cells of the step-through figures: input characters, stack cells, opened boxes */
+.md-typeset svg .st-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .st-done { fill: var(--viz-grid); fill-opacity: 0.5; stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .st-cur { fill: var(--viz-s2); fill-opacity: 0.25; stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .st-stack { fill: var(--viz-s1); fill-opacity: 0.18; stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg .st-top { fill: var(--viz-s1); fill-opacity: 0.45; stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .st-bad { fill: var(--viz-s2); fill-opacity: 0.45; stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg .st-ok { fill: var(--viz-s3); fill-opacity: 0.45; stroke: var(--viz-s3); stroke-width: 2.5; }
+.md-typeset svg .st-text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .st-small { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg .st-faded { opacity: 0.35; }
+.md-typeset svg .st-text.st-sm { font-size: 12px; }
+.md-typeset svg .st-path { fill: none; stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .st-order { fill: var(--md-default-bg-color); font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .st-order-bg { fill: var(--viz-s1); }
+
+/* Probability grids (question 0015): equally likely outcomes, the condition, the target */
+.md-typeset svg .pg-out { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.2; }
+.md-typeset svg .pg-cond { fill: var(--viz-s1); fill-opacity: 0.3; stroke: var(--viz-s1); stroke-width: 1.2; }
+.md-typeset svg .pg-hit { fill: var(--viz-s3); fill-opacity: 0.65; stroke: var(--viz-s3); stroke-width: 1.2; }
+.md-typeset svg .pg-twice { fill: none; stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .pg-quad { fill: none; stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 6 4; }
+.md-typeset svg .pg-split { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .pg-strike { stroke: var(--viz-s2); stroke-opacity: 0.6; stroke-width: 2.5; stroke-linecap: round; }
+.md-typeset svg .pg-head { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-text-font-family); }
+.md-typeset svg .pg-label { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-text-font-family); }
+.md-typeset svg .pg-small { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg .pg-day { fill: var(--viz-text); font-size: 11px; font-family: var(--md-text-font-family); }
+.md-typeset svg .pg-day-hl { fill: var(--viz-s2); font-weight: 700; }
+.md-typeset .viz-legend .pg-hit { background: var(--viz-s3); opacity: 0.75; }
+.md-typeset .viz-legend .pg-cond { background: var(--viz-s1); opacity: 0.4; }
+.md-typeset .viz-legend .pg-out { background: var(--md-default-bg-color); outline: 1px solid var(--viz-grid); }
+.md-typeset .viz-legend .pg-quad { background: transparent; outline: 2px dashed var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .pg-twice { background: transparent; border: 2px solid var(--viz-ink); border-radius: 50%; }
+
+/* Round C: marks, random question, sorting, study paths, progress bars */
+.md-typeset .question-tools .qt-spacer { flex: 1 1 0; }
+.md-typeset .question-tools .qt-mark.is-active {
+  color: var(--md-primary-bg-color);
+  background: var(--md-primary-fg-color);
+  border-color: var(--md-primary-fg-color);
+}
+[data-md-color-scheme="slate"] .md-typeset .question-tools .qt-mark.is-active {
+  color: #1b2a4a;
+  background: var(--md-typeset-a-color);
+  border-color: var(--md-typeset-a-color);
+}
+
+.md-typeset .filter-sort {
+  display: none;               /* phones only: the table headers sort on wide screens */
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .filter-sort select,
+.md-typeset .filter-random {
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 400;
+  padding: 0.2rem 0.6rem;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--site-card-border);
+  border-radius: 999px;
+}
+.md-typeset .filter-random {
+  margin-inline-start: auto;
+  font-weight: 600;
+  cursor: pointer;
+}
+.md-typeset .filter-random:hover:not(:disabled) { border-color: var(--md-accent-fg-color); }
+.md-typeset .filter-random:disabled { opacity: 0.5; cursor: default; }
+
+.md-typeset .questions-wrap th[data-sort] { padding: 0; }
+.md-typeset .questions-wrap .th-sort {
+  width: 100%;
+  padding: 0.9375em 1.25em;
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  text-align: start;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.md-typeset .questions-wrap .th-sort::after {
+  content: "";
+  margin-inline-start: 0.35em;
+  color: var(--md-default-fg-color--lighter);
+}
+.md-typeset .questions-wrap th[aria-sort="ascending"] .th-sort::after { content: "▲"; color: var(--site-mark-color); }
+.md-typeset .questions-wrap th[aria-sort="descending"] .th-sort::after { content: "▼"; color: var(--site-mark-color); }
+.md-typeset .questions-wrap .th-sort:hover { color: var(--md-accent-fg-color); }
+
+.md-typeset .q-marks { margin-inline-start: 0.3em; }
+.md-typeset .q-mark { margin-inline-start: 0.2em; font-weight: 700; }
+.md-typeset .q-mark-solved { color: var(--viz-s3); }
+.md-typeset .q-mark-star { color: var(--site-mark-color); }
+
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .filter-sort { display: flex; }
+}
+
+.md-typeset .mark-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.66rem;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .mark-progress[hidden] { display: none; }
+.md-typeset .mark-progress .mp-bar {
+  flex: 1 1 auto;
+  height: 0.3rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--site-card-border);
+}
+.md-typeset .mark-progress .mp-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--viz-s3);
+  transition: width 0.3s;
+}
+.md-typeset .mark-progress .mp-text { white-space: nowrap; }
+.md-typeset .path-card .pc-ids {
+  font-family: var(--md-code-font-family);
+  font-size: 0.66rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .path-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: -0.6rem 0 1.2rem;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.68rem;
+  border-inline-start: 3px solid var(--md-accent-fg-color);
+  border-radius: 0.3rem;
+  background: var(--site-primary-soft);
+}
+.md-typeset .path-nav-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.9rem;
+}
+.md-typeset .path-nav .pn-path { color: var(--md-default-fg-color); opacity: 0.85; }
+.md-typeset .path-nav .pn-path a { font-weight: 600; }
+/* the previous and the next step side by side under the path line, each with its id and
+   its title cut to one line (S419) */
+.md-typeset .path-nav .pn-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.2rem 0.9rem; flex-basis: 100%; }
+.md-typeset .path-nav :is(.pn-prev, .pn-next) { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.md-typeset .path-nav .pn-next { grid-column: 2; text-align: end; }
+.md-typeset .path-nav .pn-label { color: var(--md-default-fg-color); opacity: 0.85; }
+
+.md-typeset ol.path-steps {
+  margin: 1rem 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+.md-typeset ol.path-steps > li.path-step {
+  display: flex;
+  gap: 0.8rem;
+  margin: 0 0 0.8rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--site-card-border);
+  border-radius: 0.5rem;
+}
+.md-typeset .path-step .ps-num {
+  flex: 0 0 1.6rem;
+  height: 1.6rem;
+  line-height: 1.6rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--md-primary-bg-color);
+  background: var(--md-primary-fg-color);
+  border-radius: 50%;
+}
+.md-typeset .path-step.is-solved .ps-num { background: var(--viz-s3); }
+.md-typeset .path-step .ps-body { flex: 1 1 auto; min-width: 0; }
+.md-typeset .path-step .ps-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.5rem;
+}
+.md-typeset .path-step .ps-id {
+  font-family: var(--md-code-font-family);
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .path-step .ps-title { font-weight: 700; }
+.md-typeset .path-step .ps-mark { color: var(--viz-s3); font-weight: 700; }
+.md-typeset .path-step .ps-note {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .path-nav .pn-step { white-space: nowrap; color: var(--md-default-fg-color); opacity: 0.85; }
+.md-typeset .path-nav .pn-id { font-family: var(--md-code-font-family); }
+
+/* Floyd's tortoise and hare (question 0017) */
+.md-typeset svg .fl-slow { fill: none; stroke: var(--viz-s1); stroke-width: 3.5; }
+.md-typeset svg .fl-fast { fill: none; stroke: var(--viz-s2); stroke-width: 3; stroke-dasharray: 6 4; }
+.md-typeset .viz-legend .fl-slow { background: transparent; border: 3px solid var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .fl-fast { background: transparent; border: 3px dashed var(--viz-s2); border-radius: 50%; }
+.md-typeset .box-grid.bg-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); max-width: 26rem; }
+@media screen and (max-width: 44em) {
+  .md-typeset .box-grid.bg-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+}
+
+/* Tables on phones: less padding, so four or five columns fit at 390 px */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset table:not([class]) th,
+  .md-typeset table:not([class]) td { padding: 0.55em 0.6em; }
+  .md-typeset table:not([class]) th { min-width: 3rem; }   /* Material: 5rem */
+  .md-typeset table[data-grid] :is(th, td) { padding: 0.45em 0.5em; }   /* a grid: tighter still */
+  /* and inside its column: the theme pulls a table's scroll box out to the screen edge,
+     which inside a solution reaches past it */
+  .md-typeset .md-typeset__scrollwrap:has(> .md-typeset__table > table[data-grid]) { margin-inline: 0; }
+}
+/* A grid of short values (Y394): its columns as narrow as their values (the theme's 5rem
+   per header pushed a trace of seven columns out of its step), and when it still scrolls
+   sideways its first column, the row names, stays in place, with a line on its end side. */
+.md-typeset table[data-grid] th { min-width: 0; }
+.md-typeset table[data-grid][data-scrolls] :is(th, td):first-child { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--site-surface); box-shadow: inset 1px 0 0 var(--site-card-border); }

@@ -13,8 +13,10 @@ Responsibilities:
   file of each kind on the page (on_post_page).
 - The home page's "continue" card and "recently added" strip, and the "what's new" page
   (``<!-- home-continue -->``, ``<!-- recent -->``, ``<!-- whats-new -->``).
-- Add the prefix-stripped Hebrew words to the search index, and the id, level,
-  difficulty and kind to the result of a question page (on_post_build).
+- Keep only the questions in the search index, each with its statement and its parts'
+  statements (math in plain symbols, tools/search_text.py), and add the prefix-stripped
+  Hebrew words, and the id, level, difficulty and kind to the result of a question page
+  (on_post_build).
 """
 
 from __future__ import annotations
@@ -33,6 +35,7 @@ from mkdocs.utils.meta import get_data
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 import extract_code  # noqa: E402
+from search_text import STATEMENT, statement_sections  # noqa: E402
 
 LEVELS = {
     "student": "סטודנט",
@@ -165,6 +168,7 @@ _questions: dict[str, dict] = {}
 _paths: list[dict] = []
 _comments: dict = {}
 _kind_files: dict[str, str] = {}   # explorer kind -> its file name in EXPLORER_DIR
+_statements: dict[str, list] = {}  # question page url -> its statement and parts (search)
 
 
 def _load_questions(docs_dir: Path) -> dict[str, dict]:
@@ -406,9 +410,12 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
     )
 
 
-def _tool(cls: str, icon: str, tip: str, extra: str = "") -> str:
+def _tool(cls: str, icon: str, tip: str, extra: str = "", name: str = "") -> str:
+    """An icon button; its short name shows under the icon on a touch screen (S420), where
+    there is no hover tooltip."""
+    label = f'<span class="qt-name" aria-hidden="true">{name}</span>' if name else ""
     return (f'<button type="button" class="qt-btn {cls}" aria-label="{tip}" data-tip="{tip}"{extra}>'
-            f'{ui_icon(icon)}</button>')
+            f'{ui_icon(icon)}{label}</button>')
 
 
 def _tools(q: dict, page_url: str) -> str:
@@ -422,7 +429,7 @@ def _tools(q: dict, page_url: str) -> str:
     random_btn = ""
     if same:
         hrefs = json.dumps([_href(o["src_uri"], page_url) for o in sorted(same, key=lambda o: o["id"])])
-        random_btn = _tool("qt-random", "random", "שאלה אקראית מאותה רמה", f' data-hrefs="{html.escape(hrefs)}"')
+        random_btn = _tool("qt-random", "random", "שאלה אקראית מאותה רמה", f' data-hrefs="{html.escape(hrefs)}"', "אקראית")
     # the level's questions in order, for the "solved n of m" message (UI326)
     level = sorted((o for o in _questions.values() if o["level"] == q["level"]), key=lambda o: o["id"])
     level_data = (f' data-level-name="{html.escape(LEVELS[q["level"]])}" data-level-ids="{" ".join(o["id"] for o in level)}"'
@@ -439,11 +446,11 @@ def _tools(q: dict, page_url: str) -> str:
     if paths:
         level_data += f' data-paths="{html.escape(json.dumps(paths, ensure_ascii=False))}"'
     return (f'<div class="question-tools" role="toolbar" aria-label="כלי השאלה" data-search-exclude data-qid="{q["id"]}"{level_data}>'
-            + _tool("qt-fold", "unfold-more", "פתח הכל")
-            + _tool("qt-practice", "timer", "מצב תרגול", ' aria-pressed="false"')
+            + _tool("qt-fold", "unfold-more", "פתח הכל", "", "פתח הכל")
+            + _tool("qt-practice", "timer", "מצב תרגול", ' aria-pressed="false"', "תרגול")
             + '<span class="qt-clock" hidden></span>'
-            + _tool("qt-mark qt-solved", "solved", "סמן כפתורה", ' data-mark="solved" aria-pressed="false"')
-            + _tool("qt-mark qt-star", "star", "הוסף למועדפים", ' data-mark="star" aria-pressed="false"')
+            + _tool("qt-mark qt-solved", "solved", "סמן כפתורה", ' data-mark="solved" aria-pressed="false"', "פתרתי")
+            + _tool("qt-mark qt-star", "star", "הוסף למועדפים", ' data-mark="star" aria-pressed="false"', "מועדף")
             + random_btn
             + '</div>')
 
@@ -455,7 +462,9 @@ def _progress(ids) -> str:
 
 
 def _path_nav(q: dict, page_url: str) -> str:
-    """One line per study path that contains the question: step n of m, previous and next."""
+    """One block per study path that contains the question: the path and step n of m, then
+    the previous and the next step with their ids and titles (S419; a long title is cut
+    with an ellipsis, the full one in the tooltip)."""
     lines = []
     for p in _paths:
         ids = [s["q"]["id"] for s in p["steps"]]
@@ -464,11 +473,16 @@ def _path_nav(q: dict, page_url: str) -> str:
         i = ids.index(q["id"])
         parts = [f'<span class="pn-path">מסלול <a href="{_href(p["src_uri"], page_url)}">{html.escape(p["title"])}</a></span>'
                  f'<span class="pn-step">שלב {i + 1} מתוך {len(ids)}</span>']
+        links = []
         for label, cls, k in (("הקודם", "pn-prev", i - 1), ("הבא", "pn-next", i + 1)):
             if 0 <= k < len(ids):
                 other = p["steps"][k]["q"]
-                parts.append(f'<a class="{cls}" href="{_href(other["src_uri"], page_url)}" '
-                             f'title="{html.escape(str(other["title"]))}">{label} : <span class="pn-id">{other["id"]}</span></a>')
+                title = html.escape(str(other["title"]))
+                links.append(f'<a class="{cls}" href="{_href(other["src_uri"], page_url)}" title="{title}">'
+                             f'<span class="pn-label">{label}\u00a0:</span> <span class="pn-id">{other["id"]}</span> '
+                             f'<span class="pn-title">{title}</span></a>')
+        if links:
+            parts.append(f'<span class="pn-links">{"".join(links)}</span>')
         lines.append('<div class="path-nav-line">' + "".join(parts) + "</div>")
     if not lines:
         return ""
@@ -923,9 +937,35 @@ TAG_TOC = re.compile(r'(href="#tag:([^"]+)" class="md-nav__link">\s*<span class=
 
 def _tag_names(output: str) -> str:
     """The tags page with the topics' Hebrew names, in its headings and its contents list
-    (the anchors keep the tags as written)."""
+    (the anchors keep the tags as written), and a grid of all tags with their counts above
+    the lists (Y398)."""
     output = TAG_CHIP.sub(lambda m: m.group(1) + html.escape(topic_name(html.unescape(m.group(2).strip()))) + m.group(3), output)
-    return TAG_TOC.sub(lambda m: m.group(1) + html.escape(topic_name(m.group(2))) + m.group(4), output)
+    output = TAG_TOC.sub(lambda m: m.group(1) + html.escape(topic_name(m.group(2))) + m.group(4), output)
+    return _tag_grid(output)
+
+
+TAG_SECTION = re.compile(r'(<h2 id="tag:([^"]+)">.*?<span class="md-tag">([^<]+)</span>.*?</h2>\s*)<ul>(.*?)</ul>', re.S)
+
+
+def _tag_grid(output: str) -> str:
+    """Every tag as a chip with its number of questions, linking to its list, and each list
+    folded under its tag's name (a link to "#tag:..." opens it, reading-tools.js), in
+    columns when open (ul.tag-list)."""
+    chips = []
+
+    def section(m: re.Match) -> str:
+        count = m.group(4).count("<li>")
+        count_html = f'<span class="tag-count" aria-label="{count} שאלות">{count}</span>'
+        chips.append(f'<a class="tag-chip" href="#tag:{m.group(2)}">{m.group(3)}{count_html}</a>')
+        return (f'<details class="tag-section" id="tag:{m.group(2)}"><summary>'
+                f'<span class="md-tag">{m.group(3)}</span>{count_html}</summary>\n'
+                f'<ul class="tag-list">{m.group(4)}</ul></details>\n')
+
+    output = TAG_SECTION.sub(section, output)
+    at = output.find('<details class="tag-section"')
+    if at < 0 or not chips:
+        return output
+    return output[:at] + f'<nav class="tag-grid" aria-label="כל התגיות">{"".join(chips)}</nav>\n' + output[at:]
 
 
 TRAP_RUN = re.compile(r'(?:<details class="trap">.*?</details>\s*)+', re.S)
@@ -948,6 +988,7 @@ def on_post_page(output, page, config, **kwargs):
         output = _tag_names(output)
     if page.file.src_uri in _questions:
         output = TRAP_RUN.sub(_trap_group, output)
+        _statements[page.url] = statement_sections(output)
     scripts = explorer_scripts(output, page.url)
     if not scripts:
         return output
@@ -976,14 +1017,30 @@ def _search_variants(raw_tokens: set[str], words: list[str], known: set[str]) ->
 def _search_question(doc: dict, q: dict) -> None:
     """A question page in the search results (E33): the id before the title (so "0021"
     ranks it first), the kind beside the level and difficulty in its tags (the results
-    show them as chips under the title, with the topics by their Hebrew names), no text instead of the header
-    card's run-together chips, and the id as written and without its zeros ("0021 21") in
-    its own field."""
+    show them as chips under the title, with the topics by their Hebrew names), and the id
+    as written and without its zeros ("0021 21") in its own field."""
     doc["title"] = f'{q["id"]} · {q["title"]}'
     doc["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], KINDS[q["kind"]],
                    *[topic_name(t) for t in doc.get("tags", []) if t not in (LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]])]]
-    doc["text"] = ""   # the tags, shown as chips under the title, are the topics already
     doc[ID_FIELD] = f'{q["id"]} {int(q["id"])}'
+
+
+def _question_docs(docs: list[dict], pages: dict) -> list[dict]:
+    """The search finds the questions themselves (Y396): one document per question page,
+    its text the statement, and one per part ("סעיף א ...") with the part's own statement.
+    Hints, solutions, code, traps and follow-ups, and every page that is not a question
+    (home, paths, catalog, tags, what's new), are left out; the math reads in plain symbols
+    (search_text.py)."""
+    out = []
+    for doc in docs:
+        if "#" in doc["location"] or doc["location"] not in pages:
+            continue
+        sections = _statements.get(doc["location"], [])
+        doc["text"] = next((text for _, title, text in sections if title == STATEMENT), "")
+        out.append(doc)
+        out += [{"location": f'{doc["location"]}#{anchor}', "title": title, "text": text}
+                for anchor, title, text in sections if title != STATEMENT]
+    return out
 
 
 def on_post_build(config, **kwargs):
@@ -991,6 +1048,8 @@ def on_post_build(config, **kwargs):
     if not path.exists():
         return
     index = json.loads(path.read_text(encoding="utf-8"))
+    pages = {q["src_uri"][: -len(".md")] + "/": q for q in _questions.values()}
+    index["docs"] = _question_docs(index["docs"], pages)
     sep = re.compile(index["config"].get("separator") or r"[\s\-]+")
     texts = []
     for doc in index["docs"]:
@@ -1001,7 +1060,6 @@ def on_post_build(config, **kwargs):
         extra = _search_variants(raw, words, known)
         if extra:
             doc[SEARCH_FIELD] = " ".join(sorted(extra))
-    pages = {q["src_uri"][: -len(".md")] + "/": q for q in _questions.values()}
     for doc in index["docs"]:
         if doc["location"] in pages:
             _search_question(doc, pages[doc["location"]])

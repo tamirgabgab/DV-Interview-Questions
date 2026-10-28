@@ -84,6 +84,7 @@ DV-Interview-Questions/
 │   └── questions.py            # Validation, navigation, tags, tables, run panels
 ├── tools/
 │   ├── extract_code.py         # Pulls the code blocks out of a question page
+│   ├── search_text.py          # A question's statement for the search, math in plain symbols
 │   ├── lint_pages.py           # Checks the page skeleton and the RTL rules
 │   ├── check_links.py          # Internal link / anchor check of the built site (--external fetches the rest)
 │   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors, axe-core)
@@ -101,7 +102,7 @@ DV-Interview-Questions/
 │                               # stepper.py, cake.py
 ├── tests/
 │   ├── conftest.py
-│   ├── hook/                   # Tests of the site hook (search variants, study paths)
+│   ├── hook/                   # Tests of the site hook (search variants and documents, study paths)
 │   ├── tools/                  # Tests of new_question.py, fill.py and charts.py
 │   └── <id>/                   # One folder per question with code, e.g. tests/0006/
 │       ├── test_<id>.py        # pytest tests of the page's Python code
@@ -133,7 +134,7 @@ DV-Interview-Questions/
 │   │                           # (run-python.js, py-worker.js, py_run.py, vendor/codemirror.min.js), home.js,
 │   │                           # reading-tools.js (lightbox, tooltips, part bar), and explorer/:
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
-│   └── stylesheets/extra.css   # Palette, chips, question header, tables / cards, figures
+│   └── stylesheets/            # The styles in 12 parts loaded in order (README.md lists them)
 └── .github/workflows/
     ├── deploy.yml              # Test + build on every push (explorers on 4 runners), deploy main; every job has a timeout
     └── weekly.yml              # Mondays: external links of the site, newer Verilator release
@@ -190,8 +191,12 @@ Conventions:
   code is importable as the module `solution` (`from solution import *`) and its names are
   also in scope. A comment on a `print()` line is its expected value
   (`print(trap([3, 0, 2, 0, 4]))  # 7`; a note may follow after two spaces and a
-  parenthesis, or after a colon and words): after a run the panel puts a ✓ or ✗ beside
-  that line and lists the mismatches, so do not put other remarks on a `print()` line.
+  parenthesis, or after a colon and words). A print with a label ending in ":" or "="
+  may give the value alone (`print("long only:", f(prices))  # (6, 2, 3)`). After a run
+  the panel puts a ✓ or ✗ beside that line and lists the mismatches, so do not put other
+  remarks on a `print()` line. Only a print that runs once is checked (not one in a
+  loop); every such print of a result, one short line that is the same on every run,
+  carries its value (S411), an echo of the input does not.
   `docs/javascripts/py_run.py` does the running and the check, in the browser and in
   `tests/tools/test_run_panel.py`, which runs every demo against its page and fails on an
   error or a comment that does not match. Opening a panel by hand starts downloading
@@ -299,7 +304,9 @@ not start with the id, or a duplicate id. It also generates, per question page:
   `title`, so the Markdown must not start with a `#` heading;
 - the Material tags (level, difficulty, topics) for the tag index, with the tag chips above
   the title hidden because the header card shows them;
-- the **page tools** as icon buttons with tooltips, beside the title (open or close
+- the **page tools** as icon buttons with tooltips, beside the title; on a touch screen
+  (`hover: none`), which has no tooltip, each icon shows its short name under it (`qt-name`:
+  פתח הכל, תרגול, פתרתי, מועדף, אקראית) (open or close
   every block as one toggle, practice mode that hides the solutions and starts a
   stopwatch; "solved" and "favourite" marks; a random question of the same level). Practice
   mode and the marks are kept in the browser's localStorage (`docs/javascripts/marks.js`),
@@ -309,7 +316,8 @@ not start with the id, or a duplicate id. It also generates, per question page:
   level's last question drops a short confetti (both off under reduced motion). Taking the
   mark off says so, with an undo;
 - a **study path bar** under the toolbar for every path that contains the question (step n
-  of m, previous and next in the path);
+  of m, then the previous and the next step with their ids and titles side by side, a long
+  title shortened by whole words with an ellipsis and the full one as the tooltip);
 - a **related questions** list at the end (up to three questions sharing the most topic
   tags, `python` and `systemverilog` not counted), and the previous / next links come from
   Material's `navigation.footer`.
@@ -334,11 +342,20 @@ inside the viewBox (a label marked `data-fit-drop`, like the size inside a narro
 PCIe box, is hidden when even that leaves it under 9 px; its tooltip stays), and a row of `tick` / `coord` labels that then overlaps is thinned
 (every k-th label kept, the first and the last always); this runs on every inline figure
 and on the live figures of the explorer boxes (refitted when a box redraws), and the
-lightbox copy keeps the original sizes. A content table of five or more columns and three
+lightbox copy keeps the original sizes. Whether a table fits is the scroll box's own overflow (so the theme's padding
+around the table counts), measured again once the fonts have loaded. A content table of
+five or more columns whose
+values (all but the first column) are 14 characters or shorter is a grid (`data-grid`): a
+trace, or rows named in the first column; its columns are as narrow as their values, it is
+tighter on a phone, and when it still does not fit it scrolls sideways with its first
+column in place. Any other table of five or more columns and three
 or more rows that does not fit its column becomes compact cards under 30em (the first
 cell as the title, the others as "column value" pairs in two columns); a table of eight or
 more rows that fits keeps its header row in view while it scrolls; numbers in tables are
-tabular. Under 30em the figure legends (`viz-legend`) are compact chips that wrap.
+tabular. Under 30em the figure legends (`viz-legend`) are compact chips that wrap. In a box, three or
+more action buttons side by side in a flex row (examples, moves, amounts) go into one run
+(`ex-btnrun`, core.js `layout`) that is a single line scrolling sideways under 30em, fading
+at its end; elsewhere it lays out as if it were not there.
 
 The question tables on the home and level pages (UI322, UI323) have a search field (the
 title, the topics in both names and the id: "46" finds 0046), **segmented filters** (one
@@ -356,7 +373,7 @@ replaced and not pushed, so "back" leaves the page; not `q`, which opens the the
 search), so a filtered table can be linked and survives a reload. When no row is left, a
 note offers the filter whose removal brings back the most rows ("בלי "קשה" יש 2 שאלות"),
 the last filter chosen, and clearing them all (`docs/javascripts/question-filter.js`,
-`.question-filter` and `.questions-wrap` in `extra.css`). The level cards and path cards
+`.question-filter` and `.questions-wrap` in `docs/stylesheets/`). The level cards and path cards
 show a "solved n of m" bar from the same marks. Pages with an explorer, a step figure or
 an embedded tool carry an "אינטראקטיבי" badge in the header card (every question has one
 now, so the tables no longer mark it).
@@ -364,7 +381,9 @@ now, so the tables no longer mark it).
 Topics show by their Hebrew names (the `TOPICS` table in `hooks/questions.py`; terms that
 DV engineers say in English, such as FIFO, CDC, PCIe and SVA, stay so) in the tables, the
 filters, the header card, the tags page (its headings and contents list, rewritten after
-the build) and the search results; the tag as written stays in the files, the addresses
+the build, with a grid of every tag and its count above the lists; each list is folded
+under its tag's name, a link to `tags/#tag:...` opens it, and an open list runs in two
+columns on a wide screen) and the search results; the tag as written stays in the files, the addresses
 and the anchors. `tools/lint_pages.py` warns about a topic without a name.
 
 ### Study paths
@@ -383,6 +402,16 @@ puzzles, optimization puzzles, geometry and motion, the cake.
 
 ### Search
 
+The search finds the questions themselves (Y396): after the build the hook keeps one
+document per question page, its text the statement (the "השאלה" section), and one per part
+("סעיף א ...") with that part's statement. Hints, solutions, code, figures, boxes, traps and
+follow-ups, and every page that is not a question (home, paths, catalog, tags, what's new),
+are left out. `tools/search_text.py` reads the statement out of the built page and writes
+its math in plain symbols ("O(n log n)", "2ⁿ − 1", "⌊log₂ n⌋"), each formula in a
+left-to-right isolate (U+2066 ... U+2069, as the results drop markup); a TeX command it
+does not know comes out as its name, never with a backslash
+(`tests/tools/test_search_text.py` checks every page).
+
 Material's search splits on whitespace only and has no Hebrew stemmer, so a word with a
 prefix letter (ו ה ב כ ל מ ש) or glued punctuation would not be found. After the build, the
 hook adds a hidden `alt` field to every search document with the clean words and their forms
@@ -390,7 +419,7 @@ without the prefix letters (one letter always, two or three letters when the res
 used on the site). The toolbar, filters and path bar carry `data-search-exclude`. A
 question page's own search document gets the id before its title ("0021 · ..."), its
 level, difficulty and kind first in its tags (shown as chips under the result, with the
-topics), no text (the header card's run-together chips were its text), and the id as
+topics), and the id as
 written and without its zeros in a field `qid` boosted above every other field, so
 typing "21" or "0021" puts that question first.
 
@@ -417,13 +446,16 @@ from the footer of every page (the hook appends the link to `copyright`).
 
 ### Design tokens and surfaces
 
-`extra.css` defines the tokens new rules use instead of literal values: spacing on a 4 px
+`01-base.css` defines the tokens new rules use instead of literal values: spacing on a 4 px
 grid (`--sp-1` to `--sp-6`: 4, 8, 16, 24, 32, 48 px), three radii (`--radius-s/m/l`), three
 shadows (`--shadow-1` to `--shadow-3`, per scheme) and one motion speed and easing
 (`--dur-1`, `--dur-2`, `--ease`). In the light scheme the page is off-white
 (`--md-default-bg-color: #f7f8fb`) and cards, boxes, admonitions and tables are white
 surfaces (`--site-surface`) lifted by a shadow, with no outline (`--site-card-edge` is
 transparent); the dark scheme keeps the page colour for surfaces and outlines its cards.
+Hints, solutions, traps and follow-ups set their text at the page size (0.8rem, not the
+theme's 0.64rem box size), their titles at 0.7rem, and an explorer box inside one keeps
+0.64rem, the size its figures were drawn for.
 The footer is the brand navy. The "edit on GitHub" link sits at the end of every page
 (`overrides/partials/content.html`), not beside the title.
 
@@ -456,7 +488,7 @@ study path (its last question marked solved) shows its own message and confetti.
 
 Prefer text-based diagrams (Mermaid / WaveDrom) over images so they stay editable.
 
-Inline SVG colours come from CSS variables in `docs/stylesheets/extra.css`, so figures
+Inline SVG colours come from CSS variables in `docs/stylesheets/` (defined in `01-base.css`), so figures
 follow the light / dark switch automatically:
 
 | Class | Use |
@@ -505,6 +537,10 @@ filters), `questions-wrap` (table that becomes cards on phones), the admonition 
 `sol-block` wrappers, `sol-map` and `cost-chips` (colours `--sol-c-*`), `steps` and
 `stepper` (with the `st-*` SVG cell classes). The palette lives in the `[data-md-color-scheme]` blocks at the top:
 Material's `primary` / `accent` are set to `custom`, so every colour is defined there.
+The side navigation shows one line per question: a title that does not fit loses whole
+words from its end and gets an ellipsis (`fitWords` in reading-tools.js; the CSS ellipsis
+alone cut English words inside a Hebrew title), the full title is the link's tooltip, and
+the current question shows in full.
 
 Figures generated by a script keep the script in `tools/figures/q<id>.py`, so they can be
 regenerated when numbers change (`python tools/figures/q0008.py` prints the SVG to paste).
@@ -577,7 +613,8 @@ clicks every visible button once in document order, then "reset everything"; an 
 error, a console error or a page wider than the screen fails it, and the report names the
 box and the button. Then, per box, it changes every control, opens the box's copied link in
 a fresh browser and reloads the page for the remembered state: different control values
-fail, a different drawing is a warning (some boxes draw from their history), and "reset
+fail, a different drawing is a warning (some boxes draw from their history; an answer line
+that is off and the order of an element's attributes do not count), and "reset
 everything" must forget the state (`--no-links` skips this part). It takes the same
 `--offline`, `--route`, `--browser` and `--only` options as the phone check.
 
@@ -604,7 +641,7 @@ selects after the fold): the link and the remembered state do not change. The pa
 open every fold after the boxes are built.
 
 `check_contrast.py` reads the colour tokens (Material's own from the installed theme,
-overridden by `docs/stylesheets/extra.css`) for the light and the dark scheme, and checks a
+overridden by the parts of `docs/stylesheets/`) for the light and the dark scheme, and checks a
 list of pairs as the site draws them (body text, links, chips on their tint, white on the
 navy header and message, navy on amber buttons, figure text, chart marks, the focus ring),
 compositing translucent colours over the page: text needs 4.5:1, marks 3:1. It runs in the
