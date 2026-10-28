@@ -57,12 +57,21 @@
   const nameTitles = () => {
     if (quiet || !("onpagereveal" in window)) return;
     let named = null;
+    const titles = () => document.querySelectorAll(".question-header > h1");
     document.addEventListener("click", (e) => {
       const a = e.target.closest && e.target.closest(".md-content a[href]");
       if (!a || a.closest(".question-header") || !QUESTION.test(new URL(a.href, location.href).pathname)) return;
       if (named) named.style.viewTransitionName = "";
+      titles().forEach((h) => (h.style.viewTransitionName = "none"));   // a question page: the link, not its own title
       a.style.viewTransitionName = "dvq-title";
       named = a;
+    });
+    // back to this page from the cache: the names as they were before the click
+    window.addEventListener("pageshow", (e) => {
+      if (!e.persisted) return;
+      if (named) named.style.viewTransitionName = "";
+      named = null;
+      titles().forEach((h) => (h.style.viewTransitionName = ""));
     });
   };
 
