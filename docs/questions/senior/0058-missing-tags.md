@@ -80,6 +80,18 @@ tag** : הבודק רואה כל בקשה וכל תשובה פעם אחת, וז
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="missing_one" linenums="1" hl_lines="5"
+        def missing_one(sent: list[int], returned: list[int]) -> int:
+            """One tag never came back: the XOR of every tag sent and every tag returned."""
+            acc = 0
+            for t in sent + returned:
+                acc ^= t                      # (1)!
+            return acc
+        ```
+
+        1. כל tag שחזר מופיע פעמיים ומתבטל. נשאר רק ה-tag שהופיע פעם אחת.
+
     === "SystemVerilog"
         ```systemverilog title="module tag_xor" linenums="1" hl_lines="14 15"
         // the XOR of the tags still out, and how many are out
@@ -102,18 +114,6 @@ tag** : הבודק רואה כל בקשה וכל תשובה פעם אחת, וז
         ```
 
         1. בקשה ותשובה באותו מחזור נכנסות שתיהן לאותו עדכון. ‏XOR חילופי, ולכן הסדר לא משנה.
-
-    === "Python"
-        ```python title="missing_one" linenums="1" hl_lines="5"
-        def missing_one(sent: list[int], returned: list[int]) -> int:
-            """One tag never came back: the XOR of every tag sent and every tag returned."""
-            acc = 0
-            for t in sent + returned:
-                acc ^= t                      # (1)!
-            return acc
-        ```
-
-        1. כל tag שחזר מופיע פעמיים ומתבטל. נשאר רק ה-tag שהופיע פעם אחת.
 
     #### למה זה נכון { .sol-proof }
 
@@ -172,6 +172,23 @@ tag** : הבודק רואה כל בקשה וכל תשובה פעם אחת, וז
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="missing_two" linenums="1" hl_lines="7 8 9"
+        def missing_two(sent: list[int], returned: list[int], width: int) -> list[int]:
+            """Two tags never came back: split them by a bit where they differ."""
+            x, part = 0, [0] * width
+            for t in sent + returned:
+                x ^= t
+                for j in range(width):
+                    if t >> j & 1: part[j] ^= t      # (1)!
+            j = (x & -x).bit_length() - 1            # (2)!
+            a = part[j]
+            return sorted((a, x ^ a))
+        ```
+
+        1. ‏`part[j]` : ה-XOR של ה-tags שהביט \( j \) שלהם 1, שליחה וחזרה.
+        2. הביט הנמוך ביותר שדולק ב-\( x = a \oplus b \) : שם \( a \) ו-\( b \) שונים.
+
     === "SystemVerilog"
         ```systemverilog title="module tag_xor2" linenums="1" hl_lines="14 15 20 21"
         // two tags missing: the XOR of all, and per bit the XOR of the tags with that bit set
@@ -201,23 +218,6 @@ tag** : הבודק רואה כל בקשה וכל תשובה פעם אחת, וז
 
         1. החלוקה לכל ביט נשמרת מראש, כי את הביט שיבדיל בין שני החסרים יודעים רק בסוף.
         2. כל ביט דולק ב-\( x \) מתאים. הלולאה יורדת, ולכן הביט הנמוך ביותר קובע.
-
-    === "Python"
-        ```python title="missing_two" linenums="1" hl_lines="7 8 9"
-        def missing_two(sent: list[int], returned: list[int], width: int) -> list[int]:
-            """Two tags never came back: split them by a bit where they differ."""
-            x, part = 0, [0] * width
-            for t in sent + returned:
-                x ^= t
-                for j in range(width):
-                    if t >> j & 1: part[j] ^= t      # (1)!
-            j = (x & -x).bit_length() - 1            # (2)!
-            a = part[j]
-            return sorted((a, x ^ a))
-        ```
-
-        1. ‏`part[j]` : ה-XOR של ה-tags שהביט \( j \) שלהם 1, שליחה וחזרה.
-        2. הביט הנמוך ביותר שדולק ב-\( x = a \oplus b \) : שם \( a \) ו-\( b \) שונים.
 
     #### למה זה נכון { .sol-proof }
 
@@ -278,6 +278,18 @@ tag** : הבודק רואה כל בקשה וכל תשובה פעם אחת, וז
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="missing_and_dup" linenums="1" hl_lines="3 4 5"
+        def missing_and_dup(sent: list[int], returned: list[int]) -> tuple[int, int]:
+            """One tag missing (a) and one returned twice (d): s = a - d and q = a^2 - d^2."""
+            s = sum(sent) - sum(returned)
+            q = sum(t * t for t in sent) - sum(t * t for t in returned)
+            total = q // s                                # (1)!
+            return (total + s) // 2, (total - s) // 2
+        ```
+
+        1. ‏\( a^2 - d^2 = (a - d)(a + d) \), ולכן \( a + d = q / s \), והחילוק מדויק.
+
     === "SystemVerilog"
         ```systemverilog title="module tag_sums" linenums="1" hl_lines="14 15 18 19 20"
         // one tag missing (a) and one returned twice (d): s = a - d, q = a^2 - d^2
@@ -306,18 +318,6 @@ tag** : הבודק רואה כל בקשה וכל תשובה פעם אחת, וז
 
         1. ‏`longint` : הסכומים רחבים מ-\( W \) ועם סימן. ההקשר של 64 ביט מרחיב את `req_tag` לפני הכפל.
         2. ‏\( a = ((a + d) + (a - d)) / 2 \). החילוק מתאים לבודק בסוף הטסט, לא לנתיב קריטי.
-
-    === "Python"
-        ```python title="missing_and_dup" linenums="1" hl_lines="3 4 5"
-        def missing_and_dup(sent: list[int], returned: list[int]) -> tuple[int, int]:
-            """One tag missing (a) and one returned twice (d): s = a - d and q = a^2 - d^2."""
-            s = sum(sent) - sum(returned)
-            q = sum(t * t for t in sent) - sum(t * t for t in returned)
-            total = q // s                                # (1)!
-            return (total + s) // 2, (total - s) // 2
-        ```
-
-        1. ‏\( a^2 - d^2 = (a - d)(a + d) \), ולכן \( a + d = q / s \), והחילוק מדויק.
 
     #### למה זה נכון { .sol-proof }
 
@@ -377,6 +377,21 @@ tag** : הבודק רואה כל בקשה וכל תשובה פעם אחת, וז
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="missing_k" linenums="1" hl_lines="4 7 9"
+        def missing_k(sent: list[int], returned: list[int], k: int, n: int) -> list[int]:
+            """Exactly k tags missing: power sums of the missing set, Newton's identities,
+            then the roots of prod(z - a) among the tags 0..n-1."""
+            p = [sum(t ** i for t in sent) - sum(t ** i for t in returned) for i in range(k + 1)]
+            e = [1] + [0] * k
+            for i in range(1, k + 1):
+                e[i] = sum((-1) ** (j - 1) * e[i - j] * p[j] for j in range(1, i + 1)) // i   # (1)!
+            poly = lambda z: sum((-1) ** i * e[i] * z ** (k - i) for i in range(k + 1))
+            return [z for z in range(n) if poly(z) == 0]
+        ```
+
+        1. זהויות ניוטון : ‏\( i \, e_i = \sum_j (-1)^{j-1} e_{i-j} p_j \).
+
     === "SystemVerilog"
         ```systemverilog title="function missing_k" linenums="1" hl_lines="8 13 14 20"
         // up to k tags missing: power sums, Newton's identities, then the roots among 0..n-1
@@ -406,21 +421,6 @@ tag** : הבודק רואה כל בקשה וכל תשובה פעם אחת, וז
         1. ‏\( p_i \) של החסרים : כל tag שחזר מתבטל.
         2. זהות ניוטון. החילוק ב-\( i \) תמיד מדויק.
         3. ‏הורנר על \( z^k - e_1 z^{k-1} + e_2 z^{k-2} - \dots \) : שורש הוא tag חסר. עם פחות מ-\( k \) חסרים, ‏\( e_i \) העליונים 0 והשורש 0 נוסף. לכן משתמשים במונה כדי לדעת את \( k \).
-
-    === "Python"
-        ```python title="missing_k" linenums="1" hl_lines="4 7 9"
-        def missing_k(sent: list[int], returned: list[int], k: int, n: int) -> list[int]:
-            """Exactly k tags missing: power sums of the missing set, Newton's identities,
-            then the roots of prod(z - a) among the tags 0..n-1."""
-            p = [sum(t ** i for t in sent) - sum(t ** i for t in returned) for i in range(k + 1)]
-            e = [1] + [0] * k
-            for i in range(1, k + 1):
-                e[i] = sum((-1) ** (j - 1) * e[i - j] * p[j] for j in range(1, i + 1)) // i   # (1)!
-            poly = lambda z: sum((-1) ** i * e[i] * z ** (k - i) for i in range(k + 1))
-            return [z for z in range(n) if poly(z) == 0]
-        ```
-
-        1. זהויות ניוטון : ‏\( i \, e_i = \sum_j (-1)^{j-1} e_{i-j} p_j \).
 
     #### למה זה נכון { .sol-proof }
 

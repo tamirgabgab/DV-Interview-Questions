@@ -84,6 +84,19 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="isValid_brute" hl_lines="2 3"
+        def isValid_brute(s: str) -> bool:
+            while "()" in s or "[]" in s or "{}" in s:   # (1)!
+                s = s.replace("()", "").replace("[]", "").replace("{}", "")   # (2)!
+            return s == ""
+        ```
+
+        1. תנאי הלולאה הוא "יש עוד זוג צמוד למחוק", ולא "המחרוזת לא ריקה" : על `([)]` הלולאה
+           לא נכנסת בכלל, ובלי זה היא הייתה אינסופית.
+        2. ‏`replace` מוחק את כל המופעים הלא חופפים במעבר אחד, אבל זוג חדש שנוצר מהמחיקה
+           (למשל `()` מתוך `(())`) מטופל רק במעבר הבא.
+
     === "SystemVerilog"
         ```systemverilog title="functions remove_pair and is_valid_brute" linenums="1" hl_lines="24 25"
         // Remove every non-overlapping occurrence of `pair`, scanning left to right
@@ -122,19 +135,6 @@ added: 2026-10-16
         3. התנאי לעצירה הוא "מעבר שלם לא שינה כלום", ולא "המחרוזת ריקה" : מחרוזת לא תקינה
            כמו `([)]` לעולם לא תתרוקן, ובלי התנאי הזה הלולאה הייתה אינסופית.
         4. מחרוזת שנשארו בה תווים היא לא תקינה, גם אם היא קצרה : למשל `(` או `)(`.
-
-    === "Python"
-        ```python title="isValid_brute" hl_lines="2 3"
-        def isValid_brute(s: str) -> bool:
-            while "()" in s or "[]" in s or "{}" in s:   # (1)!
-                s = s.replace("()", "").replace("[]", "").replace("{}", "")   # (2)!
-            return s == ""
-        ```
-
-        1. תנאי הלולאה הוא "יש עוד זוג צמוד למחוק", ולא "המחרוזת לא ריקה" : על `([)]` הלולאה
-           לא נכנסת בכלל, ובלי זה היא הייתה אינסופית.
-        2. ‏`replace` מוחק את כל המופעים הלא חופפים במעבר אחד, אבל זוג חדש שנוצר מהמחיקה
-           (למשל `()` מתוך `(())`) מטופל רק במעבר הבא.
 
     #### למה זה נכון { .sol-proof }
 
@@ -204,6 +204,32 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="isValid" linenums="1" hl_lines="10 16"
+        def isValid(s: str) -> bool:
+            if len(s) % 2 == 1:          # odd length -> can never be valid
+                return False
+
+            pairs = {")": "(", "]": "[", "}": "{"}   # (1)!
+            stack = []
+
+            for ch in s:
+                if ch in pairs:                              # closing bracket
+                    if not stack or stack[-1] != pairs[ch]:  # empty or mismatch (2)
+                        return False
+                    stack.pop()
+                else:                                        # opening bracket
+                    stack.append(ch)
+
+            return not stack             # valid only if every opener was closed (3)
+        ```
+
+        1. מילון מסוגר סוגר לפותח שלו עושה שתי עבודות : `ch in pairs` מזהה שזה סוגר סוגר,
+           ו-`pairs[ch]` נותן את הפותח שצריך להיות בראש המחסנית.
+        2. ‏`not stack` נבדק ראשון, ולכן `stack[-1]` לא ניגש לרשימה ריקה.
+        3. רשימה ריקה היא `False`, ולכן `not stack` הוא בדיוק "כל הפותחים נסגרו". בלי השורה
+           הזו `(((` הייתה עוברת.
+
     === "SystemVerilog"
         ```systemverilog title="function is_valid" linenums="1" hl_lines="15 22"
         function automatic bit is_valid(string s);
@@ -241,32 +267,6 @@ added: 2026-10-16
            במפורש שהערך נזרק, ומונעת אזהרה של הכלים.
         5. מקרה הכישלון השלישי, שקל לשכוח : `(((` עובר את כל הלולאה בלי תקלה, ורק כאן
            מתגלה שנשארו פותחים בלי סוגרים.
-
-    === "Python"
-        ```python title="isValid" linenums="1" hl_lines="10 16"
-        def isValid(s: str) -> bool:
-            if len(s) % 2 == 1:          # odd length -> can never be valid
-                return False
-
-            pairs = {")": "(", "]": "[", "}": "{"}   # (1)!
-            stack = []
-
-            for ch in s:
-                if ch in pairs:                              # closing bracket
-                    if not stack or stack[-1] != pairs[ch]:  # empty or mismatch (2)
-                        return False
-                    stack.pop()
-                else:                                        # opening bracket
-                    stack.append(ch)
-
-            return not stack             # valid only if every opener was closed (3)
-        ```
-
-        1. מילון מסוגר סוגר לפותח שלו עושה שתי עבודות : `ch in pairs` מזהה שזה סוגר סוגר,
-           ו-`pairs[ch]` נותן את הפותח שצריך להיות בראש המחסנית.
-        2. ‏`not stack` נבדק ראשון, ולכן `stack[-1]` לא ניגש לרשימה ריקה.
-        3. רשימה ריקה היא `False`, ולכן `not stack` הוא בדיוק "כל הפותחים נסגרו". בלי השורה
-           הזו `(((` הייתה עוברת.
 
     #### למה זה נכון { .sol-proof }
 

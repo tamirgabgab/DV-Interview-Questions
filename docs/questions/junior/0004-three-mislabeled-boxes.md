@@ -102,18 +102,18 @@ added: 2026-10-15
 
 לרשותכם API נתון, `draw(i)`, ששולף כדור אקראי מקופסה `i` ומחזיר `"RED"` או `"BLACK"`.
 
+=== "Python"
+    ```python
+    # Provided API: draws one random ball from box i and returns "RED" or "BLACK".
+    def draw(i): ...
+    ```
+
 === "SystemVerilog"
     ```systemverilog
     typedef string labels_t[3];
 
     // Provided API: draws one random ball from box i and returns "RED" or "BLACK".
     function automatic string draw(int i);
-    ```
-
-=== "Python"
-    ```python
-    # Provided API: draws one random ball from box i and returns "RED" or "BLACK".
-    def draw(i): ...
     ```
 
 ??? success "פתרון 1 – פשוט וישיר"
@@ -139,6 +139,41 @@ added: 2026-10-15
     </div>
 
     #### הקוד { .sol-code }
+
+    === "Python"
+        ```python title="fix_labels_simple" linenums="1" hl_lines="8 13"
+        def fix_labels_simple(labels):
+            fixed = ["", "", ""]
+
+            # 1. Find the box labelled MIXED and draw one ball from it.
+            for i in range(3):
+                if labels[i] == "MIXED":
+                    k = i
+            ball = draw(k)   # (1)!
+
+            # 2. That box really holds only `ball`-coloured balls.
+            if ball == "RED":
+                other = "BLACK"
+            else:
+                other = "RED"
+            fixed[k] = ball   # (2)!
+
+            # 3. The box labelled `ball` cannot hold `ball` -> it holds `other`.
+            for i in range(3):
+                if labels[i] == ball:
+                    fixed[i] = other
+
+            # 4. The box labelled `other` holds the mix.
+            for i in range(3):
+                if labels[i] == other:
+                    fixed[i] = "MIXED"
+
+            return fixed
+        ```
+
+        1. הדגימה היחידה בכל הפונקציה, מהקופסה שתוויתה `"MIXED"`. ב-Python אפשר לקצר
+           ל-`k = labels.index("MIXED")`.
+        2. ‏`fixed` הוא מערך חדש, ולכן הכלל ממולא בלי לדרוס תוויות שעוד צריך לקרוא.
 
     === "SystemVerilog"
         ```systemverilog title="function fix_labels_simple" linenums="1" hl_lines="9 14"
@@ -175,41 +210,6 @@ added: 2026-10-15
            שעוד צריך לקרוא מ-`labels`.
         3. הקופסה שתוויתה כצבע הכדור לא יכולה להכיל את הצבע הזה (התווית שגויה) ולא את
            התערובת (היא ב-`k`), ולכן נשאר לה הצבע השני.
-
-    === "Python"
-        ```python title="fix_labels_simple" linenums="1" hl_lines="8 13"
-        def fix_labels_simple(labels):
-            fixed = ["", "", ""]
-
-            # 1. Find the box labelled MIXED and draw one ball from it.
-            for i in range(3):
-                if labels[i] == "MIXED":
-                    k = i
-            ball = draw(k)   # (1)!
-
-            # 2. That box really holds only `ball`-coloured balls.
-            if ball == "RED":
-                other = "BLACK"
-            else:
-                other = "RED"
-            fixed[k] = ball   # (2)!
-
-            # 3. The box labelled `ball` cannot hold `ball` -> it holds `other`.
-            for i in range(3):
-                if labels[i] == ball:
-                    fixed[i] = other
-
-            # 4. The box labelled `other` holds the mix.
-            for i in range(3):
-                if labels[i] == other:
-                    fixed[i] = "MIXED"
-
-            return fixed
-        ```
-
-        1. הדגימה היחידה בכל הפונקציה, מהקופסה שתוויתה `"MIXED"`. ב-Python אפשר לקצר
-           ל-`k = labels.index("MIXED")`.
-        2. ‏`fixed` הוא מערך חדש, ולכן הכלל ממולא בלי לדרוס תוויות שעוד צריך לקרוא.
 
     #### סיבוכיות { .sol-cost }
 
@@ -258,6 +258,27 @@ added: 2026-10-15
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="fix_labels" hl_lines="10 11"
+        def fix_labels(labels):
+            k = labels.index("MIXED")
+            ball = draw(k)                      # the true colour of box k
+
+            n1, n2 = (k + 1) % 3, (k + 2) % 3   # the two other boxes (1)
+            same = n1 if labels[n1] == ball else n2
+            other = n2 if same == n1 else n1
+
+            # Rotate the three labels with two swaps.
+            labels[k], labels[same] = labels[same], labels[k]   # (2)!
+            labels[same], labels[other] = labels[other], labels[same]
+            return labels
+        ```
+
+        1. ב-Python דווקא `(k - 1) % 3` היה נותן 2 עבור `k = 0`, אבל הקוד נשמר זהה לגרסת
+           ה-SystemVerilog כדי שאותו נימוק יעבוד בשתי השפות.
+        2. החלפה ב-Python היא השמה מרובה, בלי משתנה עזר. שתי ההחלפות יחד הן סיבוב של
+           שלוש התוויות.
+
     === "SystemVerilog"
         ```systemverilog title="function fix_labels" hl_lines="15 16"
         function automatic void fix_labels(ref labels_t labels);
@@ -286,27 +307,6 @@ added: 2026-10-15
            `same`, והשנייה היא `other`.
         3. ההחלפה דרך `tmp` היא הדרך של SystemVerilog להחליף שני איברים במערך. אחרי
            ההחלפה הראשונה `k` כבר נכונה, ואחרי השנייה גם `same` ו-`other`.
-
-    === "Python"
-        ```python title="fix_labels" hl_lines="10 11"
-        def fix_labels(labels):
-            k = labels.index("MIXED")
-            ball = draw(k)                      # the true colour of box k
-
-            n1, n2 = (k + 1) % 3, (k + 2) % 3   # the two other boxes (1)
-            same = n1 if labels[n1] == ball else n2
-            other = n2 if same == n1 else n1
-
-            # Rotate the three labels with two swaps.
-            labels[k], labels[same] = labels[same], labels[k]   # (2)!
-            labels[same], labels[other] = labels[other], labels[same]
-            return labels
-        ```
-
-        1. ב-Python דווקא `(k - 1) % 3` היה נותן 2 עבור `k = 0`, אבל הקוד נשמר זהה לגרסת
-           ה-SystemVerilog כדי שאותו נימוק יעבוד בשתי השפות.
-        2. החלפה ב-Python היא השמה מרובה, בלי משתנה עזר. שתי ההחלפות יחד הן סיבוב של
-           שלוש התוויות.
 
     #### למה זה נכון { .sol-proof }
 

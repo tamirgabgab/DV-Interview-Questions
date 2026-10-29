@@ -96,6 +96,48 @@ added: 2026-10-27
     הפונקציות הראשונות הן ה-`write` של שני `uvm_analysis_imp` (עם `` `uvm_analysis_imp_decl ``),
     ו-`final_check` נקראת מ-`check_phase`.
 
+    === "Python"
+        ```python title="class OooScoreboard" linenums="1" hl_lines="7 16 18 25 30"
+        from collections import defaultdict, deque
+
+
+        class OooScoreboard:
+            def __init__(self, timeout: int = 1000):
+                self.timeout = timeout
+                self.pending = defaultdict(deque)   # (1)!
+                self.errors: list[str] = []
+
+            def on_request(self, id: int, data: int, now: int) -> None:
+                self.pending[id].append([data, now, False])   # expected data, time, reported late
+
+            def on_response(self, id: int, data: int, now: int) -> None:
+                q = self.pending.get(id)
+                if not q:
+                    self.errors.append(f"unexpected response id={id} at {now}")   # (2)!
+                    return
+                exp, _, _ = q.popleft()                         # (3)!
+                if exp != data:
+                    self.errors.append(f"mismatch id={id}: got {data}, expected {exp}")
+
+            def check_timeouts(self, now: int) -> None:
+                for id, q in self.pending.items():
+                    for e in q:
+                        if not e[2] and now - e[1] > self.timeout:
+                            e[2] = True
+                            self.errors.append(f"timeout id={id}: waiting since {e[1]}")
+
+            def on_reset(self) -> None:
+                self.pending.clear()
+
+            def final_check(self) -> None:
+                for id, q in self.pending.items():
+                    self.errors += [f"missing response id={id}, requested at {t}" for _, t, _ in q]
+        ```
+
+        1. תור לכל `id`, שנוצר בפעם הראשונה שה-`id` מופיע.
+        2. ‏`get` לא יוצר תור חדש, ותור ריק הוא `False` : תשובה בלי בקשה.
+        3. רק ראש התור של ה-`id`, כמו בגרסת ה-SystemVerilog.
+
     === "SystemVerilog"
         ```systemverilog title="class ooo_scoreboard" linenums="1" hl_lines="3 15 22 25 34 40"
         class ooo_scoreboard;
@@ -153,48 +195,6 @@ added: 2026-10-27
         3. רק ראש התור. זה מה שהופך "בסדר בתוך `id`" לבדיקה, ולא להנחה.
         4. הדגל מונע דיווח חוזר בכל מחזור. אפשר גם לעצור את הטסט כאן (`uvm_fatal`).
         5. כל מה שחיכה לפני האיפוס לא יקבל תשובה. ראו סעיף ג.
-
-    === "Python"
-        ```python title="class OooScoreboard" linenums="1" hl_lines="7 16 18 25 30"
-        from collections import defaultdict, deque
-
-
-        class OooScoreboard:
-            def __init__(self, timeout: int = 1000):
-                self.timeout = timeout
-                self.pending = defaultdict(deque)   # (1)!
-                self.errors: list[str] = []
-
-            def on_request(self, id: int, data: int, now: int) -> None:
-                self.pending[id].append([data, now, False])   # expected data, time, reported late
-
-            def on_response(self, id: int, data: int, now: int) -> None:
-                q = self.pending.get(id)
-                if not q:
-                    self.errors.append(f"unexpected response id={id} at {now}")   # (2)!
-                    return
-                exp, _, _ = q.popleft()                         # (3)!
-                if exp != data:
-                    self.errors.append(f"mismatch id={id}: got {data}, expected {exp}")
-
-            def check_timeouts(self, now: int) -> None:
-                for id, q in self.pending.items():
-                    for e in q:
-                        if not e[2] and now - e[1] > self.timeout:
-                            e[2] = True
-                            self.errors.append(f"timeout id={id}: waiting since {e[1]}")
-
-            def on_reset(self) -> None:
-                self.pending.clear()
-
-            def final_check(self) -> None:
-                for id, q in self.pending.items():
-                    self.errors += [f"missing response id={id}, requested at {t}" for _, t, _ in q]
-        ```
-
-        1. תור לכל `id`, שנוצר בפעם הראשונה שה-`id` מופיע.
-        2. ‏`get` לא יוצר תור חדש, ותור ריק הוא `False` : תשובה בלי בקשה.
-        3. רק ראש התור של ה-`id`, כמו בגרסת ה-SystemVerilog.
 
     #### למה זה נכון { .sol-proof }
 

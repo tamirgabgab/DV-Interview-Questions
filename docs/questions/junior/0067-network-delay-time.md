@@ -134,6 +134,38 @@ reset או עדכון של credits מגיעים לכל בלוק ב-NoC או בר
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="delay_bfs" linenums="1" hl_lines="15 17 21"
+        from collections import deque
+
+
+        def delay_bfs(n: int, edges: list[list[int]], k: int) -> int:
+            """The time until every node has the signal when every link takes one time unit:
+            BFS from k; t[v] is the time node v receives the signal, -1 while it has none."""
+            adj = [[] for _ in range(n + 1)]
+            for u, v in edges:
+                adj[u].append(v)                   # (1)!
+                adj[v].append(u)
+            t = [-1] * (n + 1)
+            t[k] = 0
+            q = deque([k])
+            while q:
+                u = q.popleft()                    # (2)!
+                for v in adj[u]:
+                    if t[v] < 0:                   # (3)!
+                        t[v] = t[u] + 1
+                        q.append(v)
+            if min(t[1:]) < 0:
+                return -1                          # (4)!
+            return max(t[1:])
+        ```
+
+        1. קישור דו-כיווני נרשם בשתי הרשימות. המקום 0 של המערכים אינו בשימוש, כי הצמתים ממוספרים
+           מ-1.
+        2. ‏`popleft` מוציא מהראש ב-\( O(1) \) ; ‏`list.pop(0)` היה \( O(n) \).
+        3. רק שכן בלי זמן מקבל זמן ונכנס לתור, פעם אחת בחייו.
+        4. צומת שנשאר עם <span dir="ltr">−1</span> לא מחובר ל-\( k \).
+
     === "SystemVerilog"
         ```systemverilog title="function delay_bfs" linenums="1" hl_lines="15 17 24"
         // the time until every node has the signal, every link one time unit: BFS from k;
@@ -171,38 +203,6 @@ reset או עדכון של credits מגיעים לכל בלוק ב-NoC או בר
         2. הראש של התור יוצא. ‏`dist` היא מילה שמורה ב-SystemVerilog (אילוצים), ולכן המערך נקרא `t`.
         3. רק שכן בלי זמן מקבל זמן ונכנס לתור. כך כל צומת נכנס לתור פעם אחת לכל היותר.
         4. צומת שנשאר בלי זמן לא מחובר ל-\( k \) : התשובה <span dir="ltr">−1</span>, לפני המקסימום.
-
-    === "Python"
-        ```python title="delay_bfs" linenums="1" hl_lines="15 17 21"
-        from collections import deque
-
-
-        def delay_bfs(n: int, edges: list[list[int]], k: int) -> int:
-            """The time until every node has the signal when every link takes one time unit:
-            BFS from k; t[v] is the time node v receives the signal, -1 while it has none."""
-            adj = [[] for _ in range(n + 1)]
-            for u, v in edges:
-                adj[u].append(v)                   # (1)!
-                adj[v].append(u)
-            t = [-1] * (n + 1)
-            t[k] = 0
-            q = deque([k])
-            while q:
-                u = q.popleft()                    # (2)!
-                for v in adj[u]:
-                    if t[v] < 0:                   # (3)!
-                        t[v] = t[u] + 1
-                        q.append(v)
-            if min(t[1:]) < 0:
-                return -1                          # (4)!
-            return max(t[1:])
-        ```
-
-        1. קישור דו-כיווני נרשם בשתי הרשימות. המקום 0 של המערכים אינו בשימוש, כי הצמתים ממוספרים
-           מ-1.
-        2. ‏`popleft` מוציא מהראש ב-\( O(1) \) ; ‏`list.pop(0)` היה \( O(n) \).
-        3. רק שכן בלי זמן מקבל זמן ונכנס לתור, פעם אחת בחייו.
-        4. צומת שנשאר עם <span dir="ltr">−1</span> לא מחובר ל-\( k \).
 
     #### למה זה נכון { .sol-proof }
 
@@ -364,6 +364,45 @@ reset או עדכון של credits מגיעים לכל בלוק ב-NoC או בר
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="delay_dijkstra" linenums="1" hl_lines="19 21 24 28"
+        import heapq
+
+
+        def delay_dijkstra(n: int, edges: list[list[int]], k: int, directed: bool = False) -> int:
+            """The time until every node has the signal when link [u, v, w] takes w time units
+            (both ways, or u -> v only when directed): Dijkstra from k with a min-heap of
+            (time, node) and lazy deletion of stale entries."""
+            adj = [[] for _ in range(n + 1)]
+            for u, v, w in edges:
+                adj[u].append((v, w))
+                if not directed:
+                    adj[v].append((u, w))          # (1)!
+            inf = float("inf")
+            t = [inf] * (n + 1)
+            t[k] = 0
+            heap = [(0, k)]
+            settled = 0
+            while heap:
+                d, u = heapq.heappop(heap)         # (2)!
+                if d > t[u]:
+                    continue                       # (3)!
+                settled += 1
+                for v, w in adj[u]:
+                    if d + w < t[v]:               # (4)!
+                        t[v] = d + w
+                        heapq.heappush(heap, (d + w, v))
+            if settled < n:
+                return -1                          # (5)!
+            return max(t[1:])
+        ```
+
+        1. בסעיף ב הקישור נרשם בשתי הרשימות ; בסעיף ג (`directed=True`) רק אצל \( u \).
+        2. הזוג עם הזמן הקטן ביותר ; בשוויון של זמנים הצומת הקטן יותר, כי `heapq` משווה את הזוג כולו.
+        3. רשומה ישנה : הצומת כבר נסגר בזמן קטן יותר. מדלגים בלי לחפש ולמחוק בתוך הערימה.
+        4. השחרור : רק זמן קטן ממש נכתב ונדחף. לכן כל צומת נסגר פעם אחת בדיוק, ו-`settled` סופר צמתים.
+        5. פחות מ-\( n \) צמתים נסגרו : יש צומת שאף מסלול לא מגיע אליו, ו-\( t \) שלו נשאר \( \infty \).
+
     === "SystemVerilog"
         ```systemverilog title="function delay_dijkstra" linenums="1" hl_lines="19 20 24 32"
         typedef struct { int v; int w; } link_t;             // a link out of a node
@@ -412,45 +451,6 @@ reset או עדכון של credits מגיעים לכל בלוק ב-NoC או בר
            לגרף של כמה מאות צמתים זה מספיק ; הסיבוכיות בפועל \( O(E \cdot |pq|) \), עד \( O(E^2) \),
            וערימה בינארית בכ-20 שורות מחזירה את \( O((V + E) \log V) \).
         6. פחות מ-\( n \) צמתים נסגרו : יש צומת שאף מסלול לא מגיע אליו.
-
-    === "Python"
-        ```python title="delay_dijkstra" linenums="1" hl_lines="19 21 24 28"
-        import heapq
-
-
-        def delay_dijkstra(n: int, edges: list[list[int]], k: int, directed: bool = False) -> int:
-            """The time until every node has the signal when link [u, v, w] takes w time units
-            (both ways, or u -> v only when directed): Dijkstra from k with a min-heap of
-            (time, node) and lazy deletion of stale entries."""
-            adj = [[] for _ in range(n + 1)]
-            for u, v, w in edges:
-                adj[u].append((v, w))
-                if not directed:
-                    adj[v].append((u, w))          # (1)!
-            inf = float("inf")
-            t = [inf] * (n + 1)
-            t[k] = 0
-            heap = [(0, k)]
-            settled = 0
-            while heap:
-                d, u = heapq.heappop(heap)         # (2)!
-                if d > t[u]:
-                    continue                       # (3)!
-                settled += 1
-                for v, w in adj[u]:
-                    if d + w < t[v]:               # (4)!
-                        t[v] = d + w
-                        heapq.heappush(heap, (d + w, v))
-            if settled < n:
-                return -1                          # (5)!
-            return max(t[1:])
-        ```
-
-        1. בסעיף ב הקישור נרשם בשתי הרשימות ; בסעיף ג (`directed=True`) רק אצל \( u \).
-        2. הזוג עם הזמן הקטן ביותר ; בשוויון של זמנים הצומת הקטן יותר, כי `heapq` משווה את הזוג כולו.
-        3. רשומה ישנה : הצומת כבר נסגר בזמן קטן יותר. מדלגים בלי לחפש ולמחוק בתוך הערימה.
-        4. השחרור : רק זמן קטן ממש נכתב ונדחף. לכן כל צומת נסגר פעם אחת בדיוק, ו-`settled` סופר צמתים.
-        5. פחות מ-\( n \) צמתים נסגרו : יש צומת שאף מסלול לא מגיע אליו, ו-\( t \) שלו נשאר \( \infty \).
 
     #### למה זה נכון { .sol-proof }
 
@@ -588,6 +588,15 @@ reset או עדכון של credits מגיעים לכל בלוק ב-NoC או בר
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="delay_directed"
+        def delay_directed(n: int, edges: list[list[int]], k: int) -> int:
+            """LeetCode 743 exactly: every link [u, v, w] goes from u to v only."""
+            return delay_dijkstra(n, edges, k, directed=True)   # (1)!
+        ```
+
+        1. הדגל משאיר את `adj[v].append((u, w))` בחוץ ; זה כל ההבדל.
+
     === "SystemVerilog"
         ```systemverilog title="function delay_directed"
         // LeetCode 743 exactly: every link [u, v, w] goes from u to v only
@@ -597,15 +606,6 @@ reset או עדכון של credits מגיעים לכל בלוק ב-NoC או בר
         ```
 
         1. הדגל `directed` משאיר את השורה `adj[edges[i][1]].push_back(...)` בחוץ ; זה כל ההבדל.
-
-    === "Python"
-        ```python title="delay_directed"
-        def delay_directed(n: int, edges: list[list[int]], k: int) -> int:
-            """LeetCode 743 exactly: every link [u, v, w] goes from u to v only."""
-            return delay_dijkstra(n, edges, k, directed=True)   # (1)!
-        ```
-
-        1. הדגל משאיר את `adj[v].append((u, w))` בחוץ ; זה כל ההבדל.
 
     #### למה זה נכון { .sol-proof }
 

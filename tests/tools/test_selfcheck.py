@@ -434,6 +434,7 @@ EXPECTED = {
     "0043": [9, 7],                                         # tests/0043 runs the plan on every ordering
     "0044": [kaprekar_keys()],
     "0042": [camel(0.5, 150, 450, 30)],
+    "0048": [(-5 - 0) ** 2 + (10 - 1) ** 2],                 # part c at 45 degrees: B2 = (0, 3) + (7, 5) turned by 90, z^2 = |A B2|^2
     "0051": [mice(1000, 1), mice(1000, 2), mice(1000, 3)],
     "0052": [coin_runs("HH")[0], coin_runs("HHH")[0], coin_runs("HT", "HH")[1], coin_var("HH")],
     "0053": list(alu_bins()),

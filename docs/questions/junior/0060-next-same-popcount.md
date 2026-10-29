@@ -98,6 +98,21 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="next_same" linenums="1" hl_lines="5 6 9"
+        def next_same(x: int, w: int = 32) -> int:
+            """The smallest number above x with as many ones, in w bits; 0 when there is none."""
+            if x == 0:
+                return 0
+            c = x & -x                       # the lowest one
+            r = x + c                        # the carry clears the lowest block
+            if r >> w:
+                return 0                     # the block was at the top
+            return r | (((x ^ r) >> 2) // c)  # (1)!
+        ```
+
+        1. ב-Python ‏`//` קודם ל-`>>`, ולכן כל הסוגריים. בלעדיהם ‏`(x ^ r) >> 2 // c` מזיז ב-\( 2 / c \).
+
     === "SystemVerilog"
         ```systemverilog title="function next_same" linenums="1" hl_lines="6 7 9 10"
         // the smallest number above x with as many ones; 0 when there is none in 32 bits
@@ -116,21 +131,6 @@ added: 2026-10-27
         1. האחד הנמוך ביותר, \( c = 2^t \).
         2. ה-carry מכבה את הבלוק הנמוך ומדליק את הביט שמעליו. הביט ה-33 תופס גלישה.
         3. הבלוק היה בראש המילה : אין מספר גדול יותר עם אותן אחדות ב-32 ביטים.
-
-    === "Python"
-        ```python title="next_same" linenums="1" hl_lines="5 6 9"
-        def next_same(x: int, w: int = 32) -> int:
-            """The smallest number above x with as many ones, in w bits; 0 when there is none."""
-            if x == 0:
-                return 0
-            c = x & -x                       # the lowest one
-            r = x + c                        # the carry clears the lowest block
-            if r >> w:
-                return 0                     # the block was at the top
-            return r | (((x ^ r) >> 2) // c)  # (1)!
-        ```
-
-        1. ב-Python ‏`//` קודם ל-`>>`, ולכן כל הסוגריים. בלעדיהם ‏`(x ^ r) >> 2 // c` מזיז ב-\( 2 / c \).
 
     #### למה זה נכון { .sol-proof }
 
@@ -198,6 +198,17 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="prev_same" linenums="1" hl_lines="4 5"
+        def prev_same(x: int, w: int = 32) -> int:
+            """The largest number below x with as many ones, in w bits; 0 when there is none."""
+            mask = (1 << w) - 1
+            y = next_same(~x & mask, w)      # (1)!
+            return 0 if y == 0 else ~y & mask
+        ```
+
+        1. ב-Python ‏`~x` הוא \( -x - 1 \), מספר שלילי. המסכה מחזירה אותו לרוחב \( w \).
+
     === "SystemVerilog"
         ```systemverilog title="function prev_same" linenums="1" hl_lines="4 5"
         // the largest number below x with as many ones; 0 when there is none
@@ -209,17 +220,6 @@ added: 2026-10-27
         ```
 
         1. ‏`~x` הוא ברוחב 32 ביטים בדיוק, כמו המשתנה. אם אין הבא ל-\( \sim x \), אין קודם ל-\( x \).
-
-    === "Python"
-        ```python title="prev_same" linenums="1" hl_lines="4 5"
-        def prev_same(x: int, w: int = 32) -> int:
-            """The largest number below x with as many ones, in w bits; 0 when there is none."""
-            mask = (1 << w) - 1
-            y = next_same(~x & mask, w)      # (1)!
-            return 0 if y == 0 else ~y & mask
-        ```
-
-        1. ב-Python ‏`~x` הוא \( -x - 1 \), מספר שלילי. המסכה מחזירה אותו לרוחב \( w \).
 
     #### למה זה נכון { .sol-proof }
 
@@ -300,6 +300,29 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="next_zeros, prev_zeros" linenums="1" hl_lines="5 6 13 14 15"
+        def next_zeros(x: int) -> int:
+            """The smallest number above x (x >= 1) with as many zeros below its top one."""
+            length = x.bit_length()
+            z = length - bin(x).count("1")
+            y = next_same(x, length)          # (1)!
+            return y if y else (1 << length) | ((1 << (length - z)) - 1)
+
+
+        def prev_zeros(x: int) -> int:
+            """The largest number below x with as many zeros below its top one; 0 when there is none."""
+            length = x.bit_length()
+            z = length - bin(x).count("1")
+            y = prev_same(x, length)
+            if y >> (length - 1):            # (2)!
+                return y
+            return ((1 << (length - 1 - z)) - 1) << z if length - 1 - z >= 1 else 0
+        ```
+
+        1. ברוחב האורך של \( x \) : ‏0 אומר שהאורך נגמר.
+        2. הביט העליון של האורך דולק : אותו אורך, ולכן אותם אפסים.
+
     === "SystemVerilog"
         ```systemverilog title="functions next_zeros, prev_zeros" linenums="1" hl_lines="9 11 21 23"
         // the smallest number above x (x >= 1) with as many zeros below its top one;
@@ -330,29 +353,6 @@ added: 2026-10-27
 
         1. ‏`next_same` ברוחב 32 מוצא את הבא עם אותן אחדות. אם הוא עדיין באורך \( L \), יש לו גם אותם אפסים.
         2. הקודם עם אותן אחדות קטן מ-\( x \), ולכן לא ארוך ממנו. אם הביט העליון של האורך דולק, הוא באותו אורך.
-
-    === "Python"
-        ```python title="next_zeros, prev_zeros" linenums="1" hl_lines="5 6 13 14 15"
-        def next_zeros(x: int) -> int:
-            """The smallest number above x (x >= 1) with as many zeros below its top one."""
-            length = x.bit_length()
-            z = length - bin(x).count("1")
-            y = next_same(x, length)          # (1)!
-            return y if y else (1 << length) | ((1 << (length - z)) - 1)
-
-
-        def prev_zeros(x: int) -> int:
-            """The largest number below x with as many zeros below its top one; 0 when there is none."""
-            length = x.bit_length()
-            z = length - bin(x).count("1")
-            y = prev_same(x, length)
-            if y >> (length - 1):            # (2)!
-                return y
-            return ((1 << (length - 1 - z)) - 1) << z if length - 1 - z >= 1 else 0
-        ```
-
-        1. ברוחב האורך של \( x \) : ‏0 אומר שהאורך נגמר.
-        2. הביט העליון של האורך דולק : אותו אורך, ולכן אותם אפסים.
 
     #### למה זה נכון { .sol-proof }
 

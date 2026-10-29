@@ -95,6 +95,19 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="div3_msb" linenums="1" hl_lines="5"
+        def div3_msb(bits: list[int]) -> list[bool]:
+            """After each bit (MSB first): is the number read so far divisible by 3?"""
+            r, out = 0, []
+            for b in bits:
+                r = (2 * r + b) % 3                    # (1)!
+                out.append(r == 0)
+            return out
+        ```
+
+        1. המספר הופך ל-\( 2v + b \), והשארית שלו תלויה רק בשארית של \( v \).
+
     === "SystemVerilog"
         ```systemverilog title="module div3_msb" linenums="1" hl_lines="10 11"
         // bits MSB first: the state is the remainder of the number read so far
@@ -112,19 +125,6 @@ added: 2026-10-27
         ```
 
         1. ‏\( 2r + b \) הוא לכל היותר 5, והסינתזה הופכת את הביטוי לטבלה של שש שורות.
-
-    === "Python"
-        ```python title="div3_msb" linenums="1" hl_lines="5"
-        def div3_msb(bits: list[int]) -> list[bool]:
-            """After each bit (MSB first): is the number read so far divisible by 3?"""
-            r, out = 0, []
-            for b in bits:
-                r = (2 * r + b) % 3                    # (1)!
-                out.append(r == 0)
-            return out
-        ```
-
-        1. המספר הופך ל-\( 2v + b \), והשארית שלו תלויה רק בשארית של \( v \).
 
     #### למה זה נכון { .sol-proof }
 
@@ -214,6 +214,19 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="div3_lsb" linenums="1" hl_lines="5"
+        def div3_lsb(bits: list[int]) -> list[bool]:
+            """After each bit (LSB first): is the number read so far divisible by 3?"""
+            x, out = 0, []                             # x = remainder * 2^-k mod 3
+            for b in bits:
+                x = 2 * (x + b) % 3                    # (1)!
+                out.append(x == 0)
+            return out
+        ```
+
+        1. ‏\( x' = (x + b) \cdot 2^{-1} \bmod 3 \), ו-\( 2^{-1} = 2 \).
+
     === "SystemVerilog"
         ```systemverilog title="module div3_lsb" linenums="1" hl_lines="10 11"
         // bits LSB first: the state is x = remainder * 2^-k mod 3 (k bits read so far)
@@ -231,19 +244,6 @@ added: 2026-10-27
         ```
 
         1. ‏\( x' = (x + b) \cdot 2^{-1} \), ומודולו 3 ‏\( 2^{-1} = 2 \). המיקום \( k \) לא מופיע.
-
-    === "Python"
-        ```python title="div3_lsb" linenums="1" hl_lines="5"
-        def div3_lsb(bits: list[int]) -> list[bool]:
-            """After each bit (LSB first): is the number read so far divisible by 3?"""
-            x, out = 0, []                             # x = remainder * 2^-k mod 3
-            for b in bits:
-                x = 2 * (x + b) % 3                    # (1)!
-                out.append(x == 0)
-            return out
-        ```
-
-        1. ‏\( x' = (x + b) \cdot 2^{-1} \bmod 3 \), ו-\( 2^{-1} = 2 \).
 
     #### למה זה נכון { .sol-proof }
 
@@ -339,6 +339,21 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="div_fsm" linenums="1" hl_lines="4 7"
+        def div_fsm(digits: list[int], m: int, base: int = 2, lsb: bool = False) -> list[bool]:
+            """After each digit: is the number read so far divisible by m? (gcd(base, m) = 1)
+            From the MSB the state is the remainder; from the LSB it is remainder * base^-k."""
+            inv = pow(base, -1, m)                     # (1)!
+            s, out = 0, []
+            for d in digits:
+                s = (s + d) * inv % m if lsb else (s * base + d) % m
+                out.append(s == 0)
+            return out
+        ```
+
+        1. ‏\( B^{-1} \bmod m \). ‏`pow` מעלה שגיאה כש-\( B \) ו-\( m \) לא זרים.
+
     === "SystemVerilog"
         ```systemverilog title="module div_fsm" linenums="1" hl_lines="16 20 21"
         // divisible by M, one base-B digit a cycle, from the MSB or from the LSB (gcd(B, M) = 1)
@@ -368,21 +383,6 @@ added: 2026-10-27
 
         1. לא קורה כש-\( B \) ו-\( M \) זרים. ‏`inverse` רץ בזמן ה-elaboration, ו-`BINV` הוא קבוע.
         2. אותו כלל של סעיף ב : ‏\( x' = (x + d) \cdot B^{-1} \).
-
-    === "Python"
-        ```python title="div_fsm" linenums="1" hl_lines="4 7"
-        def div_fsm(digits: list[int], m: int, base: int = 2, lsb: bool = False) -> list[bool]:
-            """After each digit: is the number read so far divisible by m? (gcd(base, m) = 1)
-            From the MSB the state is the remainder; from the LSB it is remainder * base^-k."""
-            inv = pow(base, -1, m)                     # (1)!
-            s, out = 0, []
-            for d in digits:
-                s = (s + d) * inv % m if lsb else (s * base + d) % m
-                out.append(s == 0)
-            return out
-        ```
-
-        1. ‏\( B^{-1} \bmod m \). ‏`pow` מעלה שגיאה כש-\( B \) ו-\( m \) לא זרים.
 
     #### למה זה נכון { .sol-proof }
 

@@ -191,6 +191,50 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="class Fenwick, ranks, passed" linenums="1" hl_lines="12 18 33 34"
+        class Fenwick:
+            """A binary indexed tree over 1..n: add(i) counts one more at i, prefix(i) is the
+            count at 1..i. Both walk O(log n) cells, moving by the lowest set bit i & -i."""
+
+            def __init__(self, n: int):
+                self.n = n
+                self.tree = [0] * (n + 1)          # (1)!
+
+            def add(self, i: int) -> None:
+                while i <= self.n:
+                    self.tree[i] += 1
+                    i += i & -i                    # (2)!
+
+            def prefix(self, i: int) -> int:
+                s = 0
+                while i > 0:
+                    s += self.tree[i]
+                    i -= i & -i                    # (3)!
+                return s
+
+
+        def ranks(done: list[int]) -> dict[int, int]:
+            """Every value to its rank among the distinct values, 1 for the smallest."""
+            return {v: r for r, v in enumerate(sorted(set(done)), start=1)}
+
+
+        def passed(done: list[int]) -> list[int]:
+            """passed[i]: how many later requests were answered before request i."""
+            rk = ranks(done)
+            ft = Fenwick(len(rk))
+            out = [0] * len(done)
+            for i in range(len(done) - 1, -1, -1):
+                out[i] = ft.prefix(rk[done[i]] - 1)   # (4)!
+                ft.add(rk[done[i]])
+            return out
+        ```
+
+        1. ‏\( n + 1 \) תאים, כדי שהאינדקסים יהיו \( 1 \dots n \). התא 0 לא בשימוש.
+        2. הביט הדולק הנמוך של \( i \). ב-Python המספרים אינם מוגבלים ברוחב, ובכל זאת `i & -i` נותן את הביט הנמוך, כי \( -i \) מתנהג כמשלים ל-2 אינסופי.
+        3. החיסור מכבה את הביט הנמוך, וקופץ לתא שלפני הבלוק שנקרא.
+        4. השאילתה לפני ההוספה, על "דרגה קטנה ממש" : זמן שווה אינו נספר.
+
     === "SystemVerilog"
         ```systemverilog title="class Fenwick, function passed" linenums="1" hl_lines="14 21 44 45"
         // a binary indexed tree over 1..n: add(i) counts one more at i, prefix(i) is the count
@@ -247,56 +291,40 @@ added: 2026-10-29
         3. החיסור מכבה אותו, וקופץ לתא שלפני הבלוק שנקרא.
         4. השאילתה לפני ההוספה : הבקשה לא סופרת את עצמה. ‏`rk[done[i]] - 1` הוא "דרגה קטנה ממש", ולכן זמן שווה אינו נספר.
 
-    === "Python"
-        ```python title="class Fenwick, ranks, passed" linenums="1" hl_lines="12 18 33 34"
-        class Fenwick:
-            """A binary indexed tree over 1..n: add(i) counts one more at i, prefix(i) is the
-            count at 1..i. Both walk O(log n) cells, moving by the lowest set bit i & -i."""
-
-            def __init__(self, n: int):
-                self.n = n
-                self.tree = [0] * (n + 1)          # (1)!
-
-            def add(self, i: int) -> None:
-                while i <= self.n:
-                    self.tree[i] += 1
-                    i += i & -i                    # (2)!
-
-            def prefix(self, i: int) -> int:
-                s = 0
-                while i > 0:
-                    s += self.tree[i]
-                    i -= i & -i                    # (3)!
-                return s
-
-
-        def ranks(done: list[int]) -> dict[int, int]:
-            """Every value to its rank among the distinct values, 1 for the smallest."""
-            return {v: r for r, v in enumerate(sorted(set(done)), start=1)}
-
-
-        def passed(done: list[int]) -> list[int]:
-            """passed[i]: how many later requests were answered before request i."""
-            rk = ranks(done)
-            ft = Fenwick(len(rk))
-            out = [0] * len(done)
-            for i in range(len(done) - 1, -1, -1):
-                out[i] = ft.prefix(rk[done[i]] - 1)   # (4)!
-                ft.add(rk[done[i]])
-            return out
-        ```
-
-        1. ‏\( n + 1 \) תאים, כדי שהאינדקסים יהיו \( 1 \dots n \). התא 0 לא בשימוש.
-        2. הביט הדולק הנמוך של \( i \). ב-Python המספרים אינם מוגבלים ברוחב, ובכל זאת `i & -i` נותן את הביט הנמוך, כי \( -i \) מתנהג כמשלים ל-2 אינסופי.
-        3. החיסור מכבה את הביט הנמוך, וקופץ לתא שלפני הבלוק שנקרא.
-        4. השאילתה לפני ההוספה, על "דרגה קטנה ממש" : זמן שווה אינו נספר.
-
     **פתרון שני : מיון-מיזוג שסופר.** ממיינים את **האינדקסים** לפי הזמן שלהם במיון-מיזוג.
     במיזוג של שני חצאים ממוינים, כשמניחים אינדקס \( i \) מהחצי השמאלי, כל אינדקס מהחצי הימני
     שכבר הונח הוא בקשה מאוחרת יותר (הימני כולו אחרי השמאלי) עם זמן קטן יותר, כלומר
     עקיפה של \( i \) : מוסיפים את מספרם ל-\( \text{passed}[i] \). כל זוג נפגש במיזוג אחד
     בדיוק, ברמה שבה שני האינדקסים נפרדו לחצאים שונים, ולכן כל עקיפה נספרת פעם אחת. ערך
     שווה בחצי הימני לא נלקח לפני השמאלי (`<` ממש), ולכן אינו נספר :
+
+    === "Python"
+        ```python title="passed_merge" linenums="1" hl_lines="13 14"
+        def passed_merge(done: list[int]) -> list[int]:
+            """The same by merge sort: the indices sorted by their time; when an index of the
+            left half is placed, every right-half index already placed was answered before it."""
+            out = [0] * len(done)
+
+            def sort(idx: list[int]) -> list[int]:
+                if len(idx) <= 1:
+                    return idx
+                mid = len(idx) // 2
+                left, right = sort(idx[:mid]), sort(idx[mid:])
+                merged, j = [], 0
+                for i in left:
+                    while j < len(right) and done[right[j]] < done[i]:
+                        merged.append(right[j])
+                        j += 1
+                    out[i] += j                    # (1)!
+                    merged.append(i)
+                merged.extend(right[j:])
+                return merged
+
+            sort(list(range(len(done))))
+            return out
+        ```
+
+        1. ‏`j` אינדקסים מהחצי הימני כבר הונחו לפני \( i \) : כולם מאוחרים ממנו ונענו לפניו.
 
     === "SystemVerilog"
         ```systemverilog title="function passed_merge" linenums="1" hl_lines="13 14"
@@ -328,34 +356,6 @@ added: 2026-10-29
         ```
 
         1. ‏`j` אינדקסים מהחצי הימני כבר הונחו לפני `left[a]` : כולם מאוחרים ממנו ונענו לפניו.
-
-    === "Python"
-        ```python title="passed_merge" linenums="1" hl_lines="13 14"
-        def passed_merge(done: list[int]) -> list[int]:
-            """The same by merge sort: the indices sorted by their time; when an index of the
-            left half is placed, every right-half index already placed was answered before it."""
-            out = [0] * len(done)
-
-            def sort(idx: list[int]) -> list[int]:
-                if len(idx) <= 1:
-                    return idx
-                mid = len(idx) // 2
-                left, right = sort(idx[:mid]), sort(idx[mid:])
-                merged, j = [], 0
-                for i in left:
-                    while j < len(right) and done[right[j]] < done[i]:
-                        merged.append(right[j])
-                        j += 1
-                    out[i] += j                    # (1)!
-                    merged.append(i)
-                merged.extend(right[j:])
-                return merged
-
-            sort(list(range(len(done))))
-            return out
-        ```
-
-        1. ‏`j` אינדקסים מהחצי הימני כבר הונחו לפני \( i \) : כולם מאוחרים ממנו ונענו לפניו.
 
     **השוואה.** שניהם \( O(n \log n) \) זמן ו-\( O(n) \) זיכרון. מיון-מיזוג לא צריך דחיסה
     לדרגות ולא מבנה נוסף, אבל הוא רקורסיבי, סופר רק אחרי שכל הקלט ידוע, ומתאים לסעיף א
@@ -498,6 +498,21 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="overtook" linenums="1" hl_lines="7 8"
+        def overtook(done: list[int]) -> list[int]:
+            """overtook[i]: how many earlier requests were answered after request i."""
+            rk = ranks(done)
+            ft = Fenwick(len(rk))
+            out = []
+            for i, v in enumerate(done):
+                out.append(i - ft.prefix(rk[v]))   # (1)!
+                ft.add(rk[v])
+            return out
+        ```
+
+        1. ‏`i` דרגות כבר בעץ, ‏`prefix(r)` מהן עד הדרגה \( r \) ועד בכלל. השאר, עם זמן גדול ממש, נענו אחרי \( i \).
+
     === "SystemVerilog"
         ```systemverilog title="function overtook" linenums="1" hl_lines="9 10"
         // overtook[i]: how many earlier requests were answered after request i
@@ -515,21 +530,6 @@ added: 2026-10-29
         ```
 
         1. ‏`i` דרגות כבר בעץ (הבקשות 0 עד \( i - 1 \)), ‏`prefix(r)` מהן עד הדרגה \( r \) ועד בכלל. השאר נענו אחרי \( i \).
-
-    === "Python"
-        ```python title="overtook" linenums="1" hl_lines="7 8"
-        def overtook(done: list[int]) -> list[int]:
-            """overtook[i]: how many earlier requests were answered after request i."""
-            rk = ranks(done)
-            ft = Fenwick(len(rk))
-            out = []
-            for i, v in enumerate(done):
-                out.append(i - ft.prefix(rk[v]))   # (1)!
-                ft.add(rk[v])
-            return out
-        ```
-
-        1. ‏`i` דרגות כבר בעץ, ‏`prefix(r)` מהן עד הדרגה \( r \) ועד בכלל. השאר, עם זמן גדול ממש, נענו אחרי \( i \).
 
     #### למה זה נכון { .sol-proof }
 
@@ -655,6 +655,45 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="inversions, disorder, arrival_order, live_overtakes" linenums="1" hl_lines="7 30 31"
+        def inversions(done: list[int]) -> int:
+            """The number of overtakes, every pair counted once: one pass of part b, summed."""
+            rk = ranks(done)
+            ft = Fenwick(len(rk))
+            total = 0
+            for i, v in enumerate(done):
+                total += i - ft.prefix(rk[v])
+                ft.add(rk[v])
+            return total
+
+
+        def disorder(done: list[int]) -> float:
+            """The overtakes as a share of the n(n - 1) / 2 pairs: 0 in order, 1 fully reversed."""
+            pairs = len(done) * (len(done) - 1) // 2
+            return inversions(done) / pairs if pairs else 0.0
+
+
+        def arrival_order(done: list[int]) -> list[int]:
+            """The requests in the order their responses arrive (an equal time keeps the send order)."""
+            return sorted(range(len(done)), key=lambda i: (done[i], i))
+
+
+        def live_overtakes(order: list[int], n: int) -> list[int]:
+            """The responses as they arrive: order[k] is the request answered k-th. For each
+            arrival, how many later-sent requests were answered before it: a tree over the
+            send indices 1..n, no compression, updated online."""
+            ft = Fenwick(n)
+            out = []
+            for k, i in enumerate(order):
+                out.append(k - ft.prefix(i + 1))   # (1)!
+                ft.add(i + 1)                      # (2)!
+            return out
+        ```
+
+        1. ‏`k` בקשות כבר נענו, ‏`prefix(i + 1)` מהן נשלחו עד \( i \) ועד בכלל. השאר נשלחו אחרי \( i \) ונענו לפניה : העקיפות שספגה.
+        2. העדכון אחרי השאילתה, באינדקס \( i + 1 \) : העץ מתחיל מ-1.
+
     === "SystemVerilog"
         ```systemverilog title="function inversions, disorder, arrival_order, live_overtakes" linenums="1" hl_lines="8 24 33 34"
         // the number of overtakes, every pair counted once: one pass of part b, summed
@@ -698,45 +737,6 @@ added: 2026-10-29
 
         1. המפתח הוא הזמן ואחריו האינדקס, כך שזמנים שווים נשארים בסדר השליחה ואינם נספרים כעקיפה. הזמנים אי-שליליים, ולכן השרשור ממוין נכון.
         2. ‏`k` בקשות כבר נענו, ‏`prefix(order[k] + 1)` מהן נשלחו עד הבקשה הזו ועד בכלל. השאר נשלחו אחריה ונענו לפניה.
-
-    === "Python"
-        ```python title="inversions, disorder, arrival_order, live_overtakes" linenums="1" hl_lines="7 30 31"
-        def inversions(done: list[int]) -> int:
-            """The number of overtakes, every pair counted once: one pass of part b, summed."""
-            rk = ranks(done)
-            ft = Fenwick(len(rk))
-            total = 0
-            for i, v in enumerate(done):
-                total += i - ft.prefix(rk[v])
-                ft.add(rk[v])
-            return total
-
-
-        def disorder(done: list[int]) -> float:
-            """The overtakes as a share of the n(n - 1) / 2 pairs: 0 in order, 1 fully reversed."""
-            pairs = len(done) * (len(done) - 1) // 2
-            return inversions(done) / pairs if pairs else 0.0
-
-
-        def arrival_order(done: list[int]) -> list[int]:
-            """The requests in the order their responses arrive (an equal time keeps the send order)."""
-            return sorted(range(len(done)), key=lambda i: (done[i], i))
-
-
-        def live_overtakes(order: list[int], n: int) -> list[int]:
-            """The responses as they arrive: order[k] is the request answered k-th. For each
-            arrival, how many later-sent requests were answered before it: a tree over the
-            send indices 1..n, no compression, updated online."""
-            ft = Fenwick(n)
-            out = []
-            for k, i in enumerate(order):
-                out.append(k - ft.prefix(i + 1))   # (1)!
-                ft.add(i + 1)                      # (2)!
-            return out
-        ```
-
-        1. ‏`k` בקשות כבר נענו, ‏`prefix(i + 1)` מהן נשלחו עד \( i \) ועד בכלל. השאר נשלחו אחרי \( i \) ונענו לפניה : העקיפות שספגה.
-        2. העדכון אחרי השאילתה, באינדקס \( i + 1 \) : העץ מתחיל מ-1.
 
     #### למה זה נכון { .sol-proof }
 

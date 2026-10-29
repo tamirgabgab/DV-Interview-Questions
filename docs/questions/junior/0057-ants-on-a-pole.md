@@ -96,6 +96,15 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="last_fall" linenums="1" hl_lines="3"
+        def last_fall(pos: list[int], dirs: list[int], length: int = 100) -> int:
+            """When the last ant falls; dirs: +1 right, -1 left; speed 1."""
+            return max(p if d < 0 else length - p for p, d in zip(pos, dirs))   # (1)!
+        ```
+
+        1. כל רוח יוצאת אחרי \( p \) או \( 100 - p \) שניות, והמוט מתרוקן עם האחרונה.
+
     === "SystemVerilog"
         ```systemverilog title="function last_fall" linenums="1" hl_lines="5"
         // the ghosts walk through each other: the pole is empty when the last ghost is off
@@ -110,15 +119,6 @@ added: 2026-10-27
         ```
 
         1. הזמן של הרוח : עד הקצה השמאלי אם היא פונה שמאלה, עד הימני אם ימינה.
-
-    === "Python"
-        ```python title="last_fall" linenums="1" hl_lines="3"
-        def last_fall(pos: list[int], dirs: list[int], length: int = 100) -> int:
-            """When the last ant falls; dirs: +1 right, -1 left; speed 1."""
-            return max(p if d < 0 else length - p for p, d in zip(pos, dirs))   # (1)!
-        ```
-
-        1. כל רוח יוצאת אחרי \( p \) או \( 100 - p \) שניות, והמוט מתרוקן עם האחרונה.
 
     #### למה זה נכון { .sol-proof }
 
@@ -184,20 +184,6 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="function collisions" linenums="1" hl_lines="6"
-        // pos ascending: every ant going left meets every ant going right on its left
-        function automatic int collisions(int pos[], int dirs[]);
-          int count = 0, right = 0;
-          foreach (dirs[i])
-            if (dirs[i] > 0) right++;
-            else count += right;                    // (1)!
-          return count;
-        endfunction
-        ```
-
-        1. הרוח הזאת פוגשת את כל הרוחות שהולכות ימינה ונמצאות משמאלה.
-
     === "Python"
         ```python title="collisions" linenums="1" hl_lines="8"
         def collisions(pos: list[int], dirs: list[int]) -> int:
@@ -209,6 +195,20 @@ added: 2026-10-27
                 else:
                     count += right                  # (1)!
             return count
+        ```
+
+        1. הרוח הזאת פוגשת את כל הרוחות שהולכות ימינה ונמצאות משמאלה.
+
+    === "SystemVerilog"
+        ```systemverilog title="function collisions" linenums="1" hl_lines="6"
+        // pos ascending: every ant going left meets every ant going right on its left
+        function automatic int collisions(int pos[], int dirs[]);
+          int count = 0, right = 0;
+          foreach (dirs[i])
+            if (dirs[i] > 0) right++;
+            else count += right;                    // (1)!
+          return count;
+        endfunction
         ```
 
         1. הרוח הזאת פוגשת את כל הרוחות שהולכות ימינה ונמצאות משמאלה.
@@ -290,6 +290,18 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="fall_times" linenums="1" hl_lines="3 4 5"
+        def fall_times(pos: list[int], dirs: list[int], length: int = 100) -> list[int]:
+            """When each ant falls, the ants in their order along the pole (pos ascending)."""
+            left = sorted(p for p, d in zip(pos, dirs) if d < 0)            # (1)!
+            right = sorted(length - p for p, d in zip(pos, dirs) if d > 0)
+            return left + right[::-1]                                        # (2)!
+        ```
+
+        1. הזמנים של הרוחות שיוצאות משמאל, ושל אלה שיוצאות מימין.
+        2. השמאליות קודם, מהזמן הקטן; מימין הסדר הפוך, כי הנמלה הימנית ביותר נופלת ראשונה.
+
     === "SystemVerilog"
         ```systemverilog title="function fall_times" linenums="1" hl_lines="7 8 9"
         // pos ascending; t[k] is when the k-th ant from the left falls
@@ -306,18 +318,6 @@ added: 2026-10-27
 
         1. הנמלים השמאליות נופלות משמאל, לפי הסדר, בזמני הרוחות שהולכות שמאלה מהקטן לגדול.
         2. מימין הנמלה הימנית ביותר נופלת ראשונה, ולכן מהגדול לקטן כשסופרים משמאל.
-
-    === "Python"
-        ```python title="fall_times" linenums="1" hl_lines="3 4 5"
-        def fall_times(pos: list[int], dirs: list[int], length: int = 100) -> list[int]:
-            """When each ant falls, the ants in their order along the pole (pos ascending)."""
-            left = sorted(p for p, d in zip(pos, dirs) if d < 0)            # (1)!
-            right = sorted(length - p for p, d in zip(pos, dirs) if d > 0)
-            return left + right[::-1]                                        # (2)!
-        ```
-
-        1. הזמנים של הרוחות שיוצאות משמאל, ושל אלה שיוצאות מימין.
-        2. השמאליות קודם, מהזמן הקטן; מימין הסדר הפוך, כי הנמלה הימנית ביותר נופלת ראשונה.
 
     #### למה זה נכון { .sol-proof }
 
@@ -411,6 +411,22 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="ring_after" linenums="1" hl_lines="8 9"
+        from math import gcd
+
+
+        def ring_after(dirs: list[int], length: int = 100) -> tuple[int, int]:
+            """Ants on a ring, in their order: after `length` seconds ant i stands where ant
+            (i + s) % n started. Returns s and when every ant is first home (whole laps)."""
+            n = len(dirs)
+            s = (dirs.count(1) - dirs.count(-1)) % n          # (1)!
+            return s, length * n // gcd(n, s)                # (2)!
+        ```
+
+        1. ההולכות ימינה פחות ההולכות שמאלה : בכמה מקומות הסידור זז בכל סיבוב.
+        2. ‏\( k s \) מתחלק ב-\( n \) לראשונה ב-\( k = n / \gcd(n, s) \); ‏`gcd(n, 0)` הוא \( n \).
+
     === "SystemVerilog"
         ```systemverilog title="ring_shift, ring_home" linenums="1" hl_lines="5 11"
         // ants on a ring, in their order: after len seconds ant i stands where ant (i + s) % n started
@@ -430,22 +446,6 @@ added: 2026-10-27
 
         1. ‏\( R - L \) מודולו \( n \), בין 0 ל-\( n - 1 \) (ב-SystemVerilog ‏`%` של מספר שלילי הוא שלילי).
         2. ‏\( \gcd(n, s) \) של אוקלידס. כש-\( s = 0 \) הלולאה לא רצה, ‏\( a = n \), וזה סיבוב אחד.
-
-    === "Python"
-        ```python title="ring_after" linenums="1" hl_lines="8 9"
-        from math import gcd
-
-
-        def ring_after(dirs: list[int], length: int = 100) -> tuple[int, int]:
-            """Ants on a ring, in their order: after `length` seconds ant i stands where ant
-            (i + s) % n started. Returns s and when every ant is first home (whole laps)."""
-            n = len(dirs)
-            s = (dirs.count(1) - dirs.count(-1)) % n          # (1)!
-            return s, length * n // gcd(n, s)                # (2)!
-        ```
-
-        1. ההולכות ימינה פחות ההולכות שמאלה : בכמה מקומות הסידור זז בכל סיבוב.
-        2. ‏\( k s \) מתחלק ב-\( n \) לראשונה ב-\( k = n / \gcd(n, s) \); ‏`gcd(n, 0)` הוא \( n \).
 
     #### למה זה נכון { .sol-proof }
 

@@ -92,6 +92,7 @@ DV-Interview-Questions/
 │   ├── check_keyboard.py       # A keyboard pass: tab order, focus rings, names, the components' keys
 │   ├── check_explorers.py      # Every explorer box: each button clicked, its link and remembered state
 │   ├── check_jumps.py          # Every explorer box stepped: no figure moves while it steps
+│   ├── check_inputs.py         # Every number and text field of every box: typed, Enter / Tab, the box changes
 │   ├── check_contrast.py       # The site's colour pairs in both schemes against WCAG 2
 │   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
 │   ├── new_question.py         # Scaffold: page, tests folder, generator stub, catalog row
@@ -137,9 +138,10 @@ DV-Interview-Questions/
 │   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner
 │   │                           # (run-python.js, py-worker.js, py_run.py, vendor/codemirror.min.js), home.js,
 │   │                           # reading-tools.js (lightbox, tooltips, part bar), motion.js (the drawn logo,
-│   │                           # the table of contents marker, page transitions), and explorer/:
+│   │                           # the table of contents marker, page transitions), layout.js (the folded
+│   │                           # level list, the column grips), and explorer/:
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
-│   └── stylesheets/            # The styles in 13 parts loaded in order (README.md lists them)
+│   └── stylesheets/            # The styles in 14 parts loaded in order (README.md lists them)
 └── .github/workflows/
     ├── deploy.yml              # Test + build on every push (explorers on 4 runners), deploy main; every job has a timeout
     └── weekly.yml              # Mondays: external links of the site, newer Verilator release
@@ -178,8 +180,9 @@ Conventions:
   - traps and follow-ups at the end use `??? trap "מלכודת: ..."` and `??? followup`. On
     the built page the hook gathers the traps into one "מלכודות נפוצות (n)" group with
     numbered rows and drops the "מלכודת :" prefix of each title (`.trap-group`).
-- **Code answers are given in SystemVerilog and Python**, as linked content tabs
-  (`=== "SystemVerilog"` / `=== "Python"`, always in this order). Picking a language in one
+- **Code answers are given in Python and SystemVerilog**, as linked content tabs
+  (`=== "Python"` / `=== "SystemVerilog"`, always in this order: the first tab is the one a
+  page opens on). Picking a language in one
   tab switches every tab on the site. Pure RTL design questions (like 0001) may be
   SystemVerilog only.
 - **Readable code blocks:** every block has a `title=`, long blocks `linenums="1"`, the
@@ -498,6 +501,15 @@ so the ring is there from the first frame). The question header is a card: the t
 row of chips, the topics as chips (`.qh-tag`) with the date and the source, and the page
 tools along its foot with their names on a screen with a pointer.
 
+The desktop layout (`14-layout.css`, `layout.js`, from 76.25em; the table of contents grip
+from 60em): the grid is at least 61rem and up to 80% of the screen wide; the side list of a
+level's questions is folded to the page's own question behind a button with the count and
+an arrow (`.nav-fold`; open or folded is remembered, `dvq-nav-open`); and a grip on the inner
+edge of each sidebar (`.col-grip`, a separator that takes the arrow keys) resizes it between
+10 and 24 rem, never leaving the page under 30 rem. The widths go into `--dvq-nav-w` and
+`--dvq-toc-w`, are remembered (`dvq-col-nav`, `dvq-col-toc`), and a double click or Home
+gives a column back its default width.
+
 ### Diagrams, formulas and figures
 
 | Kind of figure                   | How it is written                                                  |
@@ -619,6 +631,7 @@ python tools/check_phone.py --scheme dark   # the same in dark mode (CI: manual 
 python tools/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-core (npm install axe-core)
 python tools/check_explorers.py       # every explorer box clicked through, its link and remembered state
 python tools/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
+python tools/check_inputs.py          # every box field typed into: Enter, Tab and an input method apply it
 python tools/check_contrast.py        # every colour pair, light and dark (--all prints the passes)
 python tools/check_404.py             # the 404 page as GitHub Pages serves it, at 390 and 1200 px
 python tools/check_keyboard.py        # a keyboard pass over a few pages: tab order, focus, names, the components' keys
@@ -649,6 +662,22 @@ that is off and the order of an element's attributes do not count), an attribute
 that is not valid (a quote inside a value split the attribute) fails, and "reset
 everything" must forget the state (`--no-links` skips this part). It takes the same
 `--offline`, `--route`, `--browser` and `--only` options as the phone check.
+
+`check_inputs.py` types into every visible number and text field of every box at 1200 px
+(a mouse click, select all, the keys one by one) a different valid value, within min, max
+and step or derived from the text, and presses Enter; then, from the box reset, another
+value left with Tab, and one through an input method (a composition ended by Enter, whose
+keydown is "Process": Windows' text suggestions and the IMEs). The box must change
+somewhere other than the field (a redraw, another control, a line that refuses the value,
+a seed taken), at its first step or at the end of its steps, or it fails. core.js
+(`fields`) is what makes this hold for every box: the keyup Enter of an input method is
+given to the field as a keydown Enter, and Enter (after the view's own Enter handler; one
+that prevents the default applied the value itself) and leaving the field fire the field's
+change when its value is not the one last applied; a native change that follows for the
+same value is dropped. A view only listens to `change` (or `input` for live updates) and
+needs no Enter handler of its own. A textarea is tried with Tab only; a `data-nolink` field
+(a guess, the operands or the brush of a button) with Enter only, and nothing changing is
+then a warning.
 
 `check_jumps.py` opens the same pages at 390 and at 1200 px and steps every box that has a
 step counter (`.ex-pos`, "k מתוך T" or a bare count) and a next button, from its first step

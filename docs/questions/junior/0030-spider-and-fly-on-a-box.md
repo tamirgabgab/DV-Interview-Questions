@@ -303,6 +303,62 @@ added: 2026-10-20
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="shortest_path" linenums="1" hl_lines="28 29 30 31 32 33 34 35 36"
+        from math import hypot
+
+        EPS = 1e-9   # a line through a corner still counts as inside
+
+
+        def edge_images(y, z, b, h):
+            """The four images of a point (y, z) of an end face, one per edge it can leave
+            through: (edge, distance to the edge, p of the foot on the edge, p-range of the edge)."""
+            return [("bottom", z,     y,                   0,         b),          # (1)!
+                    ("sideB",  b - y, b + z,               b,         b + h),
+                    ("top",    h - z, b + h + (b - y),     b + h,     2 * b + h),
+                    ("side0",  y,     2 * b + h + (h - z), 2 * b + h, 2 * (b + h))]
+
+
+        def edge_point(edge, p, b, h):
+            """The point (y, z) of an end face at perimeter coordinate p of its edge."""
+            return {"bottom": (p, 0.0), "sideB": (b, p - b), "top": (b - (p - b - h), h),
+                    "side0": (0.0, h - (p - 2 * b - h))}[edge]
+
+
+        def shortest_path(a, b, h, y0, z0, y1, z1):
+            """The shortest surface distance from the spider (0, y0, z0) to the fly (a, y1, z1),
+            and the point (0, y, z) where the spider leaves its wall."""
+            period = 2 * (b + h)
+            best = None
+            for s_edge, ds, ps, s_lo, s_hi in edge_images(y0, z0, b, h):
+                for f_edge, df, pf, f_lo, f_hi in edge_images(y1, z1, b, h):
+                    for k in (-1, 0, 1):                        # the fly one turn down, here, one turn up (2)
+                        dx = ds + a + df                        # from x = -ds to x = a + df
+                        dp = pf + k * period - ps
+                        p_exit = ps + dp * ds / dx              # where the line crosses x = 0
+                        p_enter = ps + dp * (ds + a) / dx       # where it crosses x = a
+                        if not (s_lo - EPS <= p_exit <= s_hi + EPS):
+                            continue                            # leaves the wall through another edge (3)
+                        if not (f_lo + k * period - EPS <= p_enter <= f_hi + k * period + EPS):
+                            continue                            # enters the fly's wall through another edge
+                        d = hypot(dx, dp)
+                        if best is None or d < best[0]:         # (4)!
+                            best = (d, s_edge, p_exit)
+            d, edge, p = best
+            y, z = edge_point(edge, p, b, h)
+            return d, (0.0, y, z)
+        ```
+
+        1. ארבע הצלעות של קיר קצה, בסדר הרצועה : רצפה, קיר רחוק, תקרה, קיר קרוב. לכל אחת
+           המרחק של הנקודה ממנה, ה-\( p \) של הנקודה הקרובה ביותר עליה, והטווח של הצלע עצמה.
+           אותה פונקציה משמשת לעכביש ולזבוב, כי שני הקירות חופפים.
+        2. ‏\( k \) מזיז את דמות הזבוב מחזור אחד למטה, משאיר אותה במקום, או מזיז מחזור אחד
+           למעלה. הזזה גדולה יותר היא הקפה שלמה סביב התיבה, ואף פעם לא קצרה יותר.
+        3. שתי הבדיקות של שלב 4 : הקו חייב לצאת מהקיר דרך הצלע שקיפלנו סביבה, ולהיכנס לקיר
+           של הזבוב דרך הצלע שלו. ‏`continue` מדלג על קו שאינו מסלול אמיתי.
+        4. תמיד יש לפחות קו חוקי אחד, כי הקו דרך התקרה או דרך הרצפה בלי הזזה תמיד חוקי,
+           ולכן `best` לא נשאר `None`.
+
     === "SystemVerilog"
         ```systemverilog title="shortest_path" linenums="1" hl_lines="44 45 46 47 48 49 50 51"
         localparam real EPS = 1e-9;   // a line through a corner still counts as inside
@@ -377,62 +433,6 @@ added: 2026-10-20
            של הזבוב דרך הצלע שלו. ‏`continue` מדלג על קו שאינו מסלול אמיתי.
         4. ‏`best < 0.0` מסמן שעוד אין מועמד. תמיד יש לפחות קו חוקי אחד, כי הקו דרך התקרה או
            דרך הרצפה בלי הזזה תמיד חוקי.
-
-    === "Python"
-        ```python title="shortest_path" linenums="1" hl_lines="28 29 30 31 32 33 34 35 36"
-        from math import hypot
-
-        EPS = 1e-9   # a line through a corner still counts as inside
-
-
-        def edge_images(y, z, b, h):
-            """The four images of a point (y, z) of an end face, one per edge it can leave
-            through: (edge, distance to the edge, p of the foot on the edge, p-range of the edge)."""
-            return [("bottom", z,     y,                   0,         b),          # (1)!
-                    ("sideB",  b - y, b + z,               b,         b + h),
-                    ("top",    h - z, b + h + (b - y),     b + h,     2 * b + h),
-                    ("side0",  y,     2 * b + h + (h - z), 2 * b + h, 2 * (b + h))]
-
-
-        def edge_point(edge, p, b, h):
-            """The point (y, z) of an end face at perimeter coordinate p of its edge."""
-            return {"bottom": (p, 0.0), "sideB": (b, p - b), "top": (b - (p - b - h), h),
-                    "side0": (0.0, h - (p - 2 * b - h))}[edge]
-
-
-        def shortest_path(a, b, h, y0, z0, y1, z1):
-            """The shortest surface distance from the spider (0, y0, z0) to the fly (a, y1, z1),
-            and the point (0, y, z) where the spider leaves its wall."""
-            period = 2 * (b + h)
-            best = None
-            for s_edge, ds, ps, s_lo, s_hi in edge_images(y0, z0, b, h):
-                for f_edge, df, pf, f_lo, f_hi in edge_images(y1, z1, b, h):
-                    for k in (-1, 0, 1):                        # the fly one turn down, here, one turn up (2)
-                        dx = ds + a + df                        # from x = -ds to x = a + df
-                        dp = pf + k * period - ps
-                        p_exit = ps + dp * ds / dx              # where the line crosses x = 0
-                        p_enter = ps + dp * (ds + a) / dx       # where it crosses x = a
-                        if not (s_lo - EPS <= p_exit <= s_hi + EPS):
-                            continue                            # leaves the wall through another edge (3)
-                        if not (f_lo + k * period - EPS <= p_enter <= f_hi + k * period + EPS):
-                            continue                            # enters the fly's wall through another edge
-                        d = hypot(dx, dp)
-                        if best is None or d < best[0]:         # (4)!
-                            best = (d, s_edge, p_exit)
-            d, edge, p = best
-            y, z = edge_point(edge, p, b, h)
-            return d, (0.0, y, z)
-        ```
-
-        1. ארבע הצלעות של קיר קצה, בסדר הרצועה : רצפה, קיר רחוק, תקרה, קיר קרוב. לכל אחת
-           המרחק של הנקודה ממנה, ה-\( p \) של הנקודה הקרובה ביותר עליה, והטווח של הצלע עצמה.
-           אותה פונקציה משמשת לעכביש ולזבוב, כי שני הקירות חופפים.
-        2. ‏\( k \) מזיז את דמות הזבוב מחזור אחד למטה, משאיר אותה במקום, או מזיז מחזור אחד
-           למעלה. הזזה גדולה יותר היא הקפה שלמה סביב התיבה, ואף פעם לא קצרה יותר.
-        3. שתי הבדיקות של שלב 4 : הקו חייב לצאת מהקיר דרך הצלע שקיפלנו סביבה, ולהיכנס לקיר
-           של הזבוב דרך הצלע שלו. ‏`continue` מדלג על קו שאינו מסלול אמיתי.
-        4. תמיד יש לפחות קו חוקי אחד, כי הקו דרך התקרה או דרך הרצפה בלי הזזה תמיד חוקי,
-           ולכן `best` לא נשאר `None`.
 
     #### למה זה נכון { .sol-proof }
 

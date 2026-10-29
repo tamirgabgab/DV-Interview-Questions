@@ -163,21 +163,6 @@ added: 2026-10-21
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="function sync_mtbf" hl_lines="3 5"
-        function automatic real sync_mtbf(real f_clk, real f_data, real tau, real t0,
-                                          real t_overhead, int flops);
-          real t_res = flops / f_clk - t_overhead;     // (1)!
-          if (t_res <= 0.0) return 0.0;
-          return $exp(t_res / tau) / (t0 * f_clk * f_data);   // (2)!
-        endfunction
-        ```
-
-        1. הזמן שנשאר לפלופ הראשון להתייצב : \( N \) מחזורים פחות ה-setup של הדוגם
-           וה-clock-to-q. כל הזמנים בשניות, התדרים בהרץ.
-        2. המונה : ההופכי של ההסתברות לא להתייצב; המכנה : כניסות ל-metastability בשנייה.
-           התוצאה בשניות.
-
     === "Python"
         ```python title="sync_mtbf" hl_lines="7 9"
         import math
@@ -195,6 +180,21 @@ added: 2026-10-21
         1. הזמן שנשאר לפלופ הראשון להתייצב : \( N \) מחזורים פחות ה-setup של הדוגם
            וה-clock-to-q. כל הזמנים בשניות, התדרים בהרץ.
         2. המונה : ההופכי של ההסתברות לא להתייצב; המכנה : כניסות ל-metastability בשנייה.
+
+    === "SystemVerilog"
+        ```systemverilog title="function sync_mtbf" hl_lines="3 5"
+        function automatic real sync_mtbf(real f_clk, real f_data, real tau, real t0,
+                                          real t_overhead, int flops);
+          real t_res = flops / f_clk - t_overhead;     // (1)!
+          if (t_res <= 0.0) return 0.0;
+          return $exp(t_res / tau) / (t0 * f_clk * f_data);   // (2)!
+        endfunction
+        ```
+
+        1. הזמן שנשאר לפלופ הראשון להתייצב : \( N \) מחזורים פחות ה-setup של הדוגם
+           וה-clock-to-q. כל הזמנים בשניות, התדרים בהרץ.
+        2. המונה : ההופכי של ההסתברות לא להתייצב; המכנה : כניסות ל-metastability בשנייה.
+           התוצאה בשניות.
 
     #### למה זה נכון { .sol-proof }
 

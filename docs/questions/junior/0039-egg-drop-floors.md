@@ -241,6 +241,44 @@ added: 2026-10-22
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="egg_table, min_drops, egg_run" linenums="1" hl_lines="6 12 20 21 24 25"
+        def egg_table(k: int, n: int) -> list[list[int]]:
+            """F[e][t]: how many floors e eggs settle in t drops, capped at n so the numbers stay small."""
+            F = [[0] * (n + 1) for _ in range(k + 1)]
+            for e in range(1, k + 1):
+                for t in range(1, n + 1):
+                    F[e][t] = min(n, F[e - 1][t - 1] + 1 + F[e][t - 1])   # (1)!
+            return F
+
+
+        def min_drops(k: int, n: int) -> int:
+            F = egg_table(k, n)
+            return next(t for t in range(n + 1) if F[k][t] >= n)       # (2)!
+
+
+        def egg_run(k: int, n: int, threshold: int) -> list[tuple[int, bool]]:
+            """The plan against a threshold (the egg breaks from floor threshold + 1): the drops as (floor, broke)."""
+            F = egg_table(k, n)
+            t, low, high, eggs, drops = min_drops(k, n), 0, n + 1, k, []
+            while high - low > 1:
+                floor = min(low + F[eggs - 1][t - 1] + 1, high - 1)       # (3)!
+                broke = floor > threshold
+                drops.append((floor, broke))
+                t -= 1
+                if broke:                                               # (4)!
+                    high, eggs = floor, eggs - 1
+                else:
+                    low = floor
+            return drops
+        ```
+
+        1. נוסחת הנסיגה עם תקרה : מעל \( n \) הערך המדויק לא משנה דבר.
+        2. ה-\( t \) הראשון שמכסה את כל \( n \) הקומות; ‏\( t = n \) תמיד מספיק.
+        3. הקומה הבאה : משאירים מתחתיה בדיוק מה שהביצים שיישארו מספיקות לו, ולא עוברים
+           את הקומה הנמוכה ביותר שכבר ידוע ששוברת.
+        4. שבירה מורידה ביצה ומעלה את התקרה הידועה; הישרדות מעלה את הרצפה הידועה.
+
     === "SystemVerilog"
         ```systemverilog title="egg_table, min_drops, egg_run" linenums="1" hl_lines="9 15 26 27 30 31"
         localparam int MAXK = 10;
@@ -284,44 +322,6 @@ added: 2026-10-22
            אחת, קומה אחר קומה), ולכן הלולאה תמיד מוצאת.
         3. הקומה הבאה : משאירים מתחתיה בדיוק מה שהביצים שיישארו מספיקות לו. עם ביצה אחת
            ‏\( F[0][\cdot] = 0 \), והקומה היא \( low + 1 \).
-        4. שבירה מורידה ביצה ומעלה את התקרה הידועה; הישרדות מעלה את הרצפה הידועה.
-
-    === "Python"
-        ```python title="egg_table, min_drops, egg_run" linenums="1" hl_lines="6 12 20 21 24 25"
-        def egg_table(k: int, n: int) -> list[list[int]]:
-            """F[e][t]: how many floors e eggs settle in t drops, capped at n so the numbers stay small."""
-            F = [[0] * (n + 1) for _ in range(k + 1)]
-            for e in range(1, k + 1):
-                for t in range(1, n + 1):
-                    F[e][t] = min(n, F[e - 1][t - 1] + 1 + F[e][t - 1])   # (1)!
-            return F
-
-
-        def min_drops(k: int, n: int) -> int:
-            F = egg_table(k, n)
-            return next(t for t in range(n + 1) if F[k][t] >= n)       # (2)!
-
-
-        def egg_run(k: int, n: int, threshold: int) -> list[tuple[int, bool]]:
-            """The plan against a threshold (the egg breaks from floor threshold + 1): the drops as (floor, broke)."""
-            F = egg_table(k, n)
-            t, low, high, eggs, drops = min_drops(k, n), 0, n + 1, k, []
-            while high - low > 1:
-                floor = min(low + F[eggs - 1][t - 1] + 1, high - 1)       # (3)!
-                broke = floor > threshold
-                drops.append((floor, broke))
-                t -= 1
-                if broke:                                               # (4)!
-                    high, eggs = floor, eggs - 1
-                else:
-                    low = floor
-            return drops
-        ```
-
-        1. נוסחת הנסיגה עם תקרה : מעל \( n \) הערך המדויק לא משנה דבר.
-        2. ה-\( t \) הראשון שמכסה את כל \( n \) הקומות; ‏\( t = n \) תמיד מספיק.
-        3. הקומה הבאה : משאירים מתחתיה בדיוק מה שהביצים שיישארו מספיקות לו, ולא עוברים
-           את הקומה הנמוכה ביותר שכבר ידוע ששוברת.
         4. שבירה מורידה ביצה ומעלה את התקרה הידועה; הישרדות מעלה את הרצפה הידועה.
 
     #### למה זה נכון { .sol-proof }

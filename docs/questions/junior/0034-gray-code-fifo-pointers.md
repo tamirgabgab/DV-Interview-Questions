@@ -165,6 +165,24 @@ added: 2026-10-21
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="bin2gray, gray2bin" hl_lines="2 9 10"
+        def bin2gray(b: int) -> int:
+            return b ^ (b >> 1)                 # (1)!
+
+
+        def gray2bin(g: int, bits: int) -> int:
+            b = acc = 0
+            for i in range(bits - 1, -1, -1):
+                acc ^= (g >> i) & 1             # (2)!
+                b |= acc << i
+            return b
+        ```
+
+        1. כל ביט הוא XOR של השכן העליון שלו ושל עצמו; הביט העליון נשאר כמו בבינארי.
+        2. ‏XOR מצטבר מהביט העליון כלפי מטה : `acc` הוא ביט \( i \) של הבינארי אחרי שספג
+           את \( g_i \).
+
     === "SystemVerilog"
         ```systemverilog title="function bin2gray, gray2bin" hl_lines="2 9 10"
         function automatic int bin2gray(int b);
@@ -180,24 +198,6 @@ added: 2026-10-21
           end
           return b;
         endfunction
-        ```
-
-        1. כל ביט הוא XOR של השכן העליון שלו ושל עצמו; הביט העליון נשאר כמו בבינארי.
-        2. ‏XOR מצטבר מהביט העליון כלפי מטה : `acc` הוא ביט \( i \) של הבינארי אחרי שספג
-           את \( g_i \).
-
-    === "Python"
-        ```python title="bin2gray, gray2bin" hl_lines="2 9 10"
-        def bin2gray(b: int) -> int:
-            return b ^ (b >> 1)                 # (1)!
-
-
-        def gray2bin(g: int, bits: int) -> int:
-            b = acc = 0
-            for i in range(bits - 1, -1, -1):
-                acc ^= (g >> i) & 1             # (2)!
-                b |= acc << i
-            return b
         ```
 
         1. כל ביט הוא XOR של השכן העליון שלו ושל עצמו; הביט העליון נשאר כמו בבינארי.
@@ -304,6 +304,24 @@ added: 2026-10-21
     שתי הפונקציות מקבלות את שני המצביעים כמו שהצד הבודק רואה אותם : את שלו עדכני, את של
     הצד השני אחרי הסנכרן.
 
+    === "Python"
+        ```python title="fifo_empty, fifo_full" hl_lines="2 8 9"
+        def fifo_empty(wgray: int, rgray: int) -> bool:
+            return wgray == rgray                                  # (1)!
+
+
+        def fifo_full(wgray: int, rgray: int, bits: int) -> bool:
+            top = 3 << (bits - 2)                                  # (2)!
+            rest = (1 << (bits - 2)) - 1
+            return (wgray & top) == (~rgray & top) and \
+                   (wgray & rest) == (rgray & rest)                # (3)!
+        ```
+
+        1. הפרש 0 מודולו \( 2^{N+1} \) : אותו מספר כתיבות וקריאות.
+        2. ‏`bits` הוא \( N + 1 \); המסכה `top` מכסה את שני הביטים העליונים, `rest` את כל
+           השאר.
+        3. שני העליונים הפוכים, כל השאר שווים : הפרש של בדיוק \( 2^N \) מילים.
+
     === "SystemVerilog"
         ```systemverilog title="function fifo_empty, fifo_full" hl_lines="2 8 9"
         function automatic bit fifo_empty(int wgray, int rgray);
@@ -316,24 +334,6 @@ added: 2026-10-21
           return ((wgray & top) == (~rgray & top)) &&
                  ((wgray & rest) == (rgray & rest));              // (3)!
         endfunction
-        ```
-
-        1. הפרש 0 מודולו \( 2^{N+1} \) : אותו מספר כתיבות וקריאות.
-        2. ‏`bits` הוא \( N + 1 \); המסכה `top` מכסה את שני הביטים העליונים, `rest` את כל
-           השאר.
-        3. שני העליונים הפוכים, כל השאר שווים : הפרש של בדיוק \( 2^N \) מילים.
-
-    === "Python"
-        ```python title="fifo_empty, fifo_full" hl_lines="2 8 9"
-        def fifo_empty(wgray: int, rgray: int) -> bool:
-            return wgray == rgray                                  # (1)!
-
-
-        def fifo_full(wgray: int, rgray: int, bits: int) -> bool:
-            top = 3 << (bits - 2)                                  # (2)!
-            rest = (1 << (bits - 2)) - 1
-            return (wgray & top) == (~rgray & top) and \
-                   (wgray & rest) == (rgray & rest)                # (3)!
         ```
 
         1. הפרש 0 מודולו \( 2^{N+1} \) : אותו מספר כתיבות וקריאות.

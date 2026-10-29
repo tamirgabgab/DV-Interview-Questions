@@ -213,6 +213,10 @@ jobs:
       # moves while the box steps fails (tools/check_jumps.py).
       - name: Step the explorer boxes for jumping figures, part ${{ matrix.shard }} of 4
         run: python tools/check_jumps.py site --shard ${{ matrix.shard }}/4
+      # Every number and text field of every box typed into: Enter, Tab and an input
+      # method's Enter must apply the value (tools/check_inputs.py).
+      - name: Type into the explorer boxes' fields, part ${{ matrix.shard }} of 4
+        run: python tools/check_inputs.py site --shard ${{ matrix.shard }}/4
 
   deploy:
     needs: [gate, build, explorers]

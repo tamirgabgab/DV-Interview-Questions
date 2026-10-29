@@ -60,19 +60,19 @@ hints and collapsed solution. A single-part question skips the part heading.)
     right after the block. Use `title=` on every block, `linenums="1"` on long blocks and
     `hl_lines=` for the key lines. -->
 
+    === "Python"
+        ```python title="my_function"
+        def my_function(x: int) -> int:
+            return x + 1   # (1)!
+        ```
+
+        1. הסבר בעברית לשורה הזו.
+
     === "SystemVerilog"
         ```systemverilog title="function my_function" hl_lines="2"
         function automatic int my_function(int x);
           return x + 1;   // (1)!
         endfunction
-        ```
-
-        1. הסבר בעברית לשורה הזו.
-
-    === "Python"
-        ```python title="my_function"
-        def my_function(x: int) -> int:
-            return x + 1   # (1)!
         ```
 
         1. הסבר בעברית לשורה הזו.

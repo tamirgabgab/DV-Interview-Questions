@@ -33,16 +33,16 @@ added: 2026-10-25
 
 <!-- /gen -->
 
-=== "SystemVerilog"
-    ```systemverilog title="trap, trap_2d"
-    // function automatic int trap(int height[]);        // to write
-    // function automatic int trap_2d(int height[][]);   // to write
-    ```
-
 === "Python"
     ```python title="trap, trap_2d"
     def trap(height: list[int]) -> int: ...
     def trap_2d(height: list[list[int]]) -> int: ...
+    ```
+
+=== "SystemVerilog"
+    ```systemverilog title="trap, trap_2d"
+    // function automatic int trap(int height[]);        // to write
+    // function automatic int trap_2d(int height[][]);   // to write
     ```
 
 ??? interviewer "מה המראיין בודק"
@@ -134,6 +134,23 @@ added: 2026-10-25
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="trap" linenums="1"
+        def trap(height):
+            l, r = 0, len(height) - 1
+            left_max = right_max = water = 0
+            while l < r:
+                if height[l] < height[r]:
+                    left_max = max(left_max, height[l])
+                    water += left_max - height[l]
+                    l += 1
+                else:
+                    right_max = max(right_max, height[r])
+                    water += right_max - height[r]
+                    r -= 1
+            return water
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="trap" linenums="1"
         // Part a: two pointers; the lower side's own maximum is the lower wall of its column.
@@ -152,23 +169,6 @@ added: 2026-10-25
           end
           return water;
         endfunction
-        ```
-
-    === "Python"
-        ```python title="trap" linenums="1"
-        def trap(height):
-            l, r = 0, len(height) - 1
-            left_max = right_max = water = 0
-            while l < r:
-                if height[l] < height[r]:
-                    left_max = max(left_max, height[l])
-                    water += left_max - height[l]
-                    l += 1
-                else:
-                    right_max = max(right_max, height[r])
-                    water += right_max - height[r]
-                    r -= 1
-            return water
         ```
 
     #### למה זה נכון { .sol-proof }
@@ -293,6 +293,32 @@ added: 2026-10-25
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="trap_2d" linenums="1"
+        import heapq
+
+        def trap_2d(height):
+            if not height or not height[0]:
+                return 0
+            m, n = len(height), len(height[0])
+            seen = [[False] * n for _ in range(m)]
+            heap = []                                # (water level, row, col) of the boundary
+            for i in range(m):
+                for j in range(n):
+                    if i in (0, m - 1) or j in (0, n - 1):   # the border spills out
+                        heapq.heappush(heap, (height[i][j], i, j))
+                        seen[i][j] = True
+            water = 0
+            while heap:
+                level, i, j = heapq.heappop(heap)    # the lowest point of the wall
+                for a, b in ((i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)):
+                    if 0 <= a < m and 0 <= b < n and not seen[a][b]:
+                        seen[a][b] = True
+                        water += max(0, level - height[a][b])
+                        heapq.heappush(heap, (max(level, height[a][b]), a, b))   # the new wall
+            return water
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="min_heap, trap_2d" linenums="1"
         // Part b: a cell of the boundary, by the level of its water surface.
@@ -357,32 +383,6 @@ added: 2026-10-25
           end
           return water;
         endfunction
-        ```
-
-    === "Python"
-        ```python title="trap_2d" linenums="1"
-        import heapq
-
-        def trap_2d(height):
-            if not height or not height[0]:
-                return 0
-            m, n = len(height), len(height[0])
-            seen = [[False] * n for _ in range(m)]
-            heap = []                                # (water level, row, col) of the boundary
-            for i in range(m):
-                for j in range(n):
-                    if i in (0, m - 1) or j in (0, n - 1):   # the border spills out
-                        heapq.heappush(heap, (height[i][j], i, j))
-                        seen[i][j] = True
-            water = 0
-            while heap:
-                level, i, j = heapq.heappop(heap)    # the lowest point of the wall
-                for a, b in ((i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)):
-                    if 0 <= a < m and 0 <= b < n and not seen[a][b]:
-                        seen[a][b] = True
-                        water += max(0, level - height[a][b])
-                        heapq.heappush(heap, (max(level, height[a][b]), a, b))   # the new wall
-            return water
         ```
 
     #### למה זה נכון { .sol-proof }

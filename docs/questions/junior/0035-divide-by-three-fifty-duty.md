@@ -96,6 +96,29 @@ added: 2026-10-21
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="div3_50 (half-cycle model)" linenums="1" hl_lines="9 10 12 13"
+        def div3_50(half_cycles: int) -> list[int]:
+            """clk_out after each clock edge: edges 0, 2, 4, ... are rising, 1, 3, 5, ...
+            falling. Models the two flops of the module: cnt and a on rising edges, b on
+            falling edges."""
+            cnt = a = b = 0
+            out = []
+            for edge in range(half_cycles):
+                if edge % 2 == 0:                       # rising edge
+                    a = 1 if cnt == 2 else 0            # (1)!
+                    cnt = 0 if cnt == 2 else cnt + 1
+                else:                                   # falling edge
+                    b = a                               # (2)!
+                out.append(a | b)                       # (3)!
+            return out
+        ```
+
+        1. בעליית שעון : `a` מקבל את הערך לפי המונה **הישן**, ואז המונה מתקדם, בדיוק כמו
+           שני המשפטים הלא-חוסמים במודול (שניהם קוראים את `cnt` מלפני השפה).
+        2. בירידת שעון : `b` דוגם את `a`.
+        3. אחרי כל שפה דוגמים את המוצא; רשימת הדגימות היא הגל בחצאי מחזורים.
+
     === "SystemVerilog"
         ```systemverilog title="module div3_50" linenums="1" hl_lines="12 13 18 20"
         module div3_50 (
@@ -128,29 +151,6 @@ added: 2026-10-21
         3. הפלופ היחיד בירידת השעון : `b` הוא `a` מוזז בחצי מחזור.
         4. המוצא הוא OR של שני פלופים. זה שער אחד במסלול השעון של הצרכנים, וצריך לשים
            לב לכך באילוצי התזמון.
-
-    === "Python"
-        ```python title="div3_50 (half-cycle model)" linenums="1" hl_lines="9 10 12 13"
-        def div3_50(half_cycles: int) -> list[int]:
-            """clk_out after each clock edge: edges 0, 2, 4, ... are rising, 1, 3, 5, ...
-            falling. Models the two flops of the module: cnt and a on rising edges, b on
-            falling edges."""
-            cnt = a = b = 0
-            out = []
-            for edge in range(half_cycles):
-                if edge % 2 == 0:                       # rising edge
-                    a = 1 if cnt == 2 else 0            # (1)!
-                    cnt = 0 if cnt == 2 else cnt + 1
-                else:                                   # falling edge
-                    b = a                               # (2)!
-                out.append(a | b)                       # (3)!
-            return out
-        ```
-
-        1. בעליית שעון : `a` מקבל את הערך לפי המונה **הישן**, ואז המונה מתקדם, בדיוק כמו
-           שני המשפטים הלא-חוסמים במודול (שניהם קוראים את `cnt` מלפני השפה).
-        2. בירידת שעון : `b` דוגם את `a`.
-        3. אחרי כל שפה דוגמים את המוצא; רשימת הדגימות היא הגל בחצאי מחזורים.
 
     #### למה זה נכון { .sol-proof }
 
@@ -239,6 +239,27 @@ added: 2026-10-21
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="div_odd_50 (half-cycle model)" linenums="1" hl_lines="4 8"
+        def div_odd_50(n: int, half_cycles: int) -> list[int]:
+            """clk_out after each clock edge of a divide by an odd n: edges 0, 2, 4, ...
+            are rising, 1, 3, 5, ... falling."""
+            h = (n - 1) // 2                        # (1)!
+            cnt = a = b = 0
+            out = []
+            for edge in range(half_cycles):
+                if edge % 2 == 0:                   # rising edge
+                    a = 1 if cnt >= n - h else 0
+                    cnt = 0 if cnt == n - 1 else cnt + 1
+                else:                               # falling edge
+                    b = a
+                out.append(a | b)
+            return out
+        ```
+
+        1. כמו במודול : `a` גבוה \( h \) מחזורים בכל סיבוב של המונה, ו-`div_odd_50(3, k)` הוא
+           `div3_50(k)` של סעיף א.
+
     === "SystemVerilog"
         ```systemverilog title="module div_odd_50" linenums="1" hl_lines="7 16 17"
         module div_odd_50 #(parameter int N = 5) (     // N odd, 3 or more
@@ -270,27 +291,6 @@ added: 2026-10-21
 
         1. ‏`a` גבוה \( H \) מחזורים שלמים, ו-`b` מוסיף את החצי.
         2. לפי המונה **הישן**, כמו בסעיף א : עבור \( N = 3 \) זה `cnt >= 2`, כלומר `cnt == 2`.
-
-    === "Python"
-        ```python title="div_odd_50 (half-cycle model)" linenums="1" hl_lines="4 8"
-        def div_odd_50(n: int, half_cycles: int) -> list[int]:
-            """clk_out after each clock edge of a divide by an odd n: edges 0, 2, 4, ...
-            are rising, 1, 3, 5, ... falling."""
-            h = (n - 1) // 2                        # (1)!
-            cnt = a = b = 0
-            out = []
-            for edge in range(half_cycles):
-                if edge % 2 == 0:                   # rising edge
-                    a = 1 if cnt >= n - h else 0
-                    cnt = 0 if cnt == n - 1 else cnt + 1
-                else:                               # falling edge
-                    b = a
-                out.append(a | b)
-            return out
-        ```
-
-        1. כמו במודול : `a` גבוה \( h \) מחזורים בכל סיבוב של המונה, ו-`div_odd_50(3, k)` הוא
-           `div3_50(k)` של סעיף א.
 
     #### למה זה נכון { .sol-proof }
 

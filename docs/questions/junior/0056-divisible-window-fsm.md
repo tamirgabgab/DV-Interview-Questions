@@ -112,6 +112,23 @@ added: 2026-10-28
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="win3_lsb" linenums="1" hl_lines="8 9"
+        def win3_lsb(bits: list[int], L: int, init: int = 0) -> list[bool]:
+            """A window of the last L bits, each new bit entering as its LSB: after each bit,
+            is the window divisible by 3?"""
+            w, r, out = init, init % 3, []
+            c = pow(2, L, 3)                           # what the bit that leaves weighs, mod 3
+            for b in bits:
+                top = w >> (L - 1)                     # the bit that leaves
+                w = (w << 1 | b) & ((1 << L) - 1)
+                r = (2 * r + b - c * top) % 3          # (1)!
+                out.append(r == 0)
+            return out
+        ```
+
+        1. השארית בלי לקרוא את החלון : מה שנכנס, פחות מה שיצא. ב-Python ‏`%` תמיד מחזיר 0 עד 2.
+
     === "SystemVerilog"
         ```systemverilog title="module win3_lsb" linenums="1" hl_lines="18 19"
         // a window of the last L bits, a new bit entering as its LSB: is the window divisible by 3?
@@ -140,23 +157,6 @@ added: 2026-10-28
 
         1. ‏`{w, din}` הוא \( L + 1 \) ביטים, וההמרה ל-\( L \) ביטים זורקת את הביט השמאלי, הביט שיוצא.
         2. ‏\( 2w + b - 2^L \cdot out \) מודולו 3. ‏\( 3C \) שומר את הביטוי חיובי, ואינו משנה את השארית.
-
-    === "Python"
-        ```python title="win3_lsb" linenums="1" hl_lines="8 9"
-        def win3_lsb(bits: list[int], L: int, init: int = 0) -> list[bool]:
-            """A window of the last L bits, each new bit entering as its LSB: after each bit,
-            is the window divisible by 3?"""
-            w, r, out = init, init % 3, []
-            c = pow(2, L, 3)                           # what the bit that leaves weighs, mod 3
-            for b in bits:
-                top = w >> (L - 1)                     # the bit that leaves
-                w = (w << 1 | b) & ((1 << L) - 1)
-                r = (2 * r + b - c * top) % 3          # (1)!
-                out.append(r == 0)
-            return out
-        ```
-
-        1. השארית בלי לקרוא את החלון : מה שנכנס, פחות מה שיצא. ב-Python ‏`%` תמיד מחזיר 0 עד 2.
 
     #### למה זה נכון { .sol-proof }
 
@@ -255,6 +255,23 @@ added: 2026-10-28
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="win3_msb" linenums="1" hl_lines="8 9"
+        def win3_msb(bits: list[int], L: int, init: int = 0) -> list[bool]:
+            """A window of the last L bits, each new bit entering as its MSB: after each bit,
+            is the window divisible by 3?"""
+            w, r, out = init, init % 3, []
+            t = pow(2, L - 1, 3)                       # what the bit that enters weighs, mod 3
+            for b in bits:
+                low = w & 1                            # the bit that leaves
+                w = b << (L - 1) | w >> 1
+                r = (2 * (r - low) + t * b) % 3        # (1)!
+                out.append(r == 0)
+            return out
+        ```
+
+        1. ‏\( \lfloor w / 2 \rfloor = (w - low) / 2 \), ומודולו 3 חילוק ב-2 הוא כפל ב-2.
+
     === "SystemVerilog"
         ```systemverilog title="module win3_msb" linenums="1" hl_lines="18 19"
         // a window of the last L bits, a new bit entering as its MSB: is the window divisible by 3?
@@ -283,23 +300,6 @@ added: 2026-10-28
 
         1. ‏`{din, w} >> 1` שם את `din` במקום \( L - 1 \) וזורק את `w[0]`, הביט שיוצא.
         2. ‏\( (w - out) / 2 \equiv 2(r - out) \), כי \( 2^{-1} = 2 \) מודולו 3. ה-3 שומר את הביטוי חיובי.
-
-    === "Python"
-        ```python title="win3_msb" linenums="1" hl_lines="8 9"
-        def win3_msb(bits: list[int], L: int, init: int = 0) -> list[bool]:
-            """A window of the last L bits, each new bit entering as its MSB: after each bit,
-            is the window divisible by 3?"""
-            w, r, out = init, init % 3, []
-            t = pow(2, L - 1, 3)                       # what the bit that enters weighs, mod 3
-            for b in bits:
-                low = w & 1                            # the bit that leaves
-                w = b << (L - 1) | w >> 1
-                r = (2 * (r - low) + t * b) % 3        # (1)!
-                out.append(r == 0)
-            return out
-        ```
-
-        1. ‏\( \lfloor w / 2 \rfloor = (w - low) / 2 \), ומודולו 3 חילוק ב-2 הוא כפל ב-2.
 
     #### למה זה נכון { .sol-proof }
 
@@ -366,6 +366,32 @@ added: 2026-10-28
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="win_div" linenums="1" hl_lines="13 17"
+        def win_div(digits: list[int], m: int, base: int = 2, L: int = 8,
+                    msb: bool = False, init: int = 0) -> list[bool]:
+            """A window of the last L base-`base` digits, starting as init: after each digit, is
+            the window divisible by m? msb=False: a digit enters as the lowest and the highest
+            leaves; msb=True: it enters as the highest and the lowest leaves (gcd(base, m) = 1)."""
+            cl, ch = pow(base, L, m), pow(base, L - 1, m)
+            inv = pow(base, -1, m) if msb else 0
+            w, r, out = init, init % m, []
+            for d in digits:
+                if msb:
+                    low = w % base                     # the digit that leaves
+                    w = d * base ** (L - 1) + w // base
+                    r = ((r - low) * inv + ch * d) % m   # (1)!
+                else:
+                    top = w // base ** (L - 1)         # the digit that leaves
+                    w = (w * base + d) % base ** L
+                    r = (r * base + d - cl * top) % m    # (2)!
+                out.append(r == 0)
+            return out
+        ```
+
+        1. ‏\( \lfloor w / B \rfloor = (w - low) / B \), ומודולו \( m \) חילוק ב-\( B \) הוא כפל ב-\( B^{-1} \).
+        2. הספרה שיוצאת שווה \( B^L \) אחרי ההזזה, ומודולו \( m \) זה \( C_L \).
+
     === "SystemVerilog"
         ```systemverilog title="module win_div" linenums="1" hl_lines="39 43"
         // divisible by M over a window of the last L base-B digits; MSB = 0: a digit enters as the
@@ -418,32 +444,6 @@ added: 2026-10-28
 
         1. ‏\( (w - out) \cdot B^{-1} + B^{L-1} d \). ‏\( M \cdot B \) הוא כפולה של \( M \) שגדולה מכל ספרה, ושומר את הביטוי חיובי.
         2. ‏\( Bw + d - B^L \cdot out \). ‏\( out \cdot C_L < B \cdot M \), ולכן גם כאן הביטוי חיובי.
-
-    === "Python"
-        ```python title="win_div" linenums="1" hl_lines="13 17"
-        def win_div(digits: list[int], m: int, base: int = 2, L: int = 8,
-                    msb: bool = False, init: int = 0) -> list[bool]:
-            """A window of the last L base-`base` digits, starting as init: after each digit, is
-            the window divisible by m? msb=False: a digit enters as the lowest and the highest
-            leaves; msb=True: it enters as the highest and the lowest leaves (gcd(base, m) = 1)."""
-            cl, ch = pow(base, L, m), pow(base, L - 1, m)
-            inv = pow(base, -1, m) if msb else 0
-            w, r, out = init, init % m, []
-            for d in digits:
-                if msb:
-                    low = w % base                     # the digit that leaves
-                    w = d * base ** (L - 1) + w // base
-                    r = ((r - low) * inv + ch * d) % m   # (1)!
-                else:
-                    top = w // base ** (L - 1)         # the digit that leaves
-                    w = (w * base + d) % base ** L
-                    r = (r * base + d - cl * top) % m    # (2)!
-                out.append(r == 0)
-            return out
-        ```
-
-        1. ‏\( \lfloor w / B \rfloor = (w - low) / B \), ומודולו \( m \) חילוק ב-\( B \) הוא כפל ב-\( B^{-1} \).
-        2. הספרה שיוצאת שווה \( B^L \) אחרי ההזזה, ומודולו \( m \) זה \( C_L \).
 
     #### למה זה נכון { .sol-proof }
 

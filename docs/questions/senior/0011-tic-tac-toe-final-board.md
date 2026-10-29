@@ -85,6 +85,80 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ב-Python אין solver, אבל הלוח קטן : יש רק \( 3^9 = 19{,}683 \) מילויים אפשריים. עוברים על
+        כולם פעם אחת, שומרים את החוקיים לפי תוצאה, ובוחרים מהם. זה בדיוק מה ש-`randomize()` עם
+        `solve result before board` מבטיח : קודם תוצאה אפשרית בהסתברות שווה, ואחר כך לוח אחיד מבין
+        הלוחות עם התוצאה הזו.
+
+        ```python title="randomize" linenums="1" hl_lines="48 49"
+        import random
+        from functools import cache
+        from itertools import product
+
+        X, O, EMPTY = "X", "O", "."
+
+        # Cells are numbered 0..8 row by row:   0 1 2 / 3 4 5 / 6 7 8
+        LINES = ((0, 1, 2), (3, 4, 5), (6, 7, 8),     # rows
+                 (0, 3, 6), (1, 4, 7), (2, 5, 8),     # columns
+                 (0, 4, 8), (2, 4, 6))                # diagonals
+
+
+        def count_lines(board, player, lines):
+            return sum(all(board[i] == player for i in line) for line in lines)
+
+
+        def final_result(board, lines=LINES):
+            """"X", "O" or "draw" when `board` can be the end of a game that X started, else None."""
+            n_x, n_o = board.count(X), board.count(O)
+            x_lines, o_lines = count_lines(board, X, lines), count_lines(board, O, lines)
+
+            if n_x not in (n_o, n_o + 1):                 # X starts and the players alternate
+                return None
+            if x_lines > 0 and o_lines == 0 and n_x == n_o + 1:  # (1)!
+                return "X"                                # X made the last move
+            if o_lines > 0 and x_lines == 0 and n_x == n_o:
+                return "O"                                # O made the last move
+            if x_lines == 0 and o_lines == 0 and n_x + n_o == 9:
+                return "draw"                             # full board, nobody won
+            return None
+
+
+        @cache  # (2)!
+        def final_boards(lines=LINES):
+            """Every legal final board (out of all 3^9 fillings), grouped by result."""
+            groups = {"X": [], "O": [], "draw": []}
+            for board in product((X, O, EMPTY), repeat=9):  # (3)!
+                result = final_result(board, lines)
+                if result:
+                    groups[result].append(board)
+            return groups
+
+
+        def randomize(lines=LINES, rng=random):
+            """Like SV randomize() with "solve result before board": first a result that has at
+            least one board, uniformly, then a board with that result, uniformly."""
+            groups = final_boards(lines)
+            result = rng.choice([r for r in groups if groups[r]])  # (4)!
+            return result, rng.choice(groups[result])  # (5)!
+
+
+        def show(board):
+            return "\n".join(" ".join(board[r * 3:r * 3 + 3]) for r in range(3))
+        ```
+
+        1. הסדר של הבדיקות חשוב : קודם ספירה, ואז ניצחון של X עם \( n_X = n_O + 1 \). שלישייה
+           של X על לוח עם \( n_X = n_O \) נופלת לתנאי הבא, נכשלת שם כי \( L_X \ne 0 \), ומגיעה
+           ל-`None` : O שיחק אחרי הניצחון.
+        2. ‏`@cache` שומר את תוצאת הסריקה לכל קבוצת קווים, ולכן 19,683 הלוחות נבדקים פעם אחת
+           בלבד. בגלל זה `lines` חייב להיות tuple ולא רשימה : ארגומנט של פונקציה עם cache חייב
+           להיות hashable.
+        3. ‏`product` מייצר את כל \( 3^9 \) המילויים, כולל לא חוקיים, ו-`final_result` מסננת.
+           זה המקביל הישיר ל"מרחב הפתרונות" שה-solver עובר עליו.
+        4. בוחרים רק מבין תוצאות שיש להן לפחות לוח אחד. זה בדיוק `solve result before board`,
+           ובסעיף ב זה גם מה שמשמיט את התיקו מעצמו, בלי קוד מיוחד.
+        5. לוח אחיד מבין הלוחות של התוצאה שנבחרה : השלב השני של `solve ... before`.
+
     === "SystemVerilog"
         כל תנאי הופך ל-constraint. משתני העזר (`n_x`, `x_line` וכו') הם גם `rand`, וה-constraints
         מחייבים אותם להיות שווים לספירה האמיתית על הלוח :
@@ -218,80 +292,6 @@ added: 2026-10-16
         5. תיקו הוא לוח מלא בלי אף שלישייה. לוח **לא** מלא בלי שלישיות הוא משחק באמצע, ולכן
            התוצאה כאן 0.
 
-    === "Python"
-        ב-Python אין solver, אבל הלוח קטן : יש רק \( 3^9 = 19{,}683 \) מילויים אפשריים. עוברים על
-        כולם פעם אחת, שומרים את החוקיים לפי תוצאה, ובוחרים מהם. זה בדיוק מה ש-`randomize()` עם
-        `solve result before board` מבטיח : קודם תוצאה אפשרית בהסתברות שווה, ואחר כך לוח אחיד מבין
-        הלוחות עם התוצאה הזו.
-
-        ```python title="randomize" linenums="1" hl_lines="48 49"
-        import random
-        from functools import cache
-        from itertools import product
-
-        X, O, EMPTY = "X", "O", "."
-
-        # Cells are numbered 0..8 row by row:   0 1 2 / 3 4 5 / 6 7 8
-        LINES = ((0, 1, 2), (3, 4, 5), (6, 7, 8),     # rows
-                 (0, 3, 6), (1, 4, 7), (2, 5, 8),     # columns
-                 (0, 4, 8), (2, 4, 6))                # diagonals
-
-
-        def count_lines(board, player, lines):
-            return sum(all(board[i] == player for i in line) for line in lines)
-
-
-        def final_result(board, lines=LINES):
-            """"X", "O" or "draw" when `board` can be the end of a game that X started, else None."""
-            n_x, n_o = board.count(X), board.count(O)
-            x_lines, o_lines = count_lines(board, X, lines), count_lines(board, O, lines)
-
-            if n_x not in (n_o, n_o + 1):                 # X starts and the players alternate
-                return None
-            if x_lines > 0 and o_lines == 0 and n_x == n_o + 1:  # (1)!
-                return "X"                                # X made the last move
-            if o_lines > 0 and x_lines == 0 and n_x == n_o:
-                return "O"                                # O made the last move
-            if x_lines == 0 and o_lines == 0 and n_x + n_o == 9:
-                return "draw"                             # full board, nobody won
-            return None
-
-
-        @cache  # (2)!
-        def final_boards(lines=LINES):
-            """Every legal final board (out of all 3^9 fillings), grouped by result."""
-            groups = {"X": [], "O": [], "draw": []}
-            for board in product((X, O, EMPTY), repeat=9):  # (3)!
-                result = final_result(board, lines)
-                if result:
-                    groups[result].append(board)
-            return groups
-
-
-        def randomize(lines=LINES, rng=random):
-            """Like SV randomize() with "solve result before board": first a result that has at
-            least one board, uniformly, then a board with that result, uniformly."""
-            groups = final_boards(lines)
-            result = rng.choice([r for r in groups if groups[r]])  # (4)!
-            return result, rng.choice(groups[result])  # (5)!
-
-
-        def show(board):
-            return "\n".join(" ".join(board[r * 3:r * 3 + 3]) for r in range(3))
-        ```
-
-        1. הסדר של הבדיקות חשוב : קודם ספירה, ואז ניצחון של X עם \( n_X = n_O + 1 \). שלישייה
-           של X על לוח עם \( n_X = n_O \) נופלת לתנאי הבא, נכשלת שם כי \( L_X \ne 0 \), ומגיעה
-           ל-`None` : O שיחק אחרי הניצחון.
-        2. ‏`@cache` שומר את תוצאת הסריקה לכל קבוצת קווים, ולכן 19,683 הלוחות נבדקים פעם אחת
-           בלבד. בגלל זה `lines` חייב להיות tuple ולא רשימה : ארגומנט של פונקציה עם cache חייב
-           להיות hashable.
-        3. ‏`product` מייצר את כל \( 3^9 \) המילויים, כולל לא חוקיים, ו-`final_result` מסננת.
-           זה המקביל הישיר ל"מרחב הפתרונות" שה-solver עובר עליו.
-        4. בוחרים רק מבין תוצאות שיש להן לפחות לוח אחד. זה בדיוק `solve result before board`,
-           ובסעיף ב זה גם מה שמשמיט את התיקו מעצמו, בלי קוד מיוחד.
-        5. לוח אחיד מבין הלוחות של התוצאה שנבחרה : השלב השני של `solve ... before`.
-
     !!! note "איך נבדק הקוד"
         ‏`final_result` נבדקה מול סריקה מלאה של עץ המשחק, גם ב-Python וגם ב-SystemVerilog
         ב-Verilator : היא מקבלת בדיוק את 958 לוחות הסיום (ו-1,314 בסעיף ב), ופוסלת את כל
@@ -395,6 +395,17 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="WRAP_LINES"
+            WRAP_LINES = LINES + ((1, 5, 6), (2, 3, 7),   # wrap-around diagonals (part b) (1)
+                                  (0, 5, 7), (1, 3, 8))
+
+            # randomize(WRAP_LINES) never returns "draw": final_boards(WRAP_LINES)["draw"] is empty
+        ```
+
+        1. יוצרים tuple חדש ולא רשימה שמוסיפים אליה : `final_boards` משתמשת ב-`@cache`, ולכן
+           קבוצת הקווים חייבת להיות hashable. כל קבוצה מקבלת סריקה משלה, פעם אחת.
+
     === "SystemVerilog"
         ```systemverilog title="usage, part b"
             ttt_end t = new();
@@ -409,17 +420,6 @@ added: 2026-10-16
            אחת ב-constraints.
         2. ‏`randomize() with { ... }` מוסיף constraint זמני לקריאה הזו בלבד. כשאין אף פתרון הוא
            מחזיר 0 ולא משנה את האובייקט, ולכן זו דרך נוחה לתת ל-solver "להוכיח" שאין תיקו.
-
-    === "Python"
-        ```python title="WRAP_LINES"
-            WRAP_LINES = LINES + ((1, 5, 6), (2, 3, 7),   # wrap-around diagonals (part b) (1)
-                                  (0, 5, 7), (1, 3, 8))
-
-            # randomize(WRAP_LINES) never returns "draw": final_boards(WRAP_LINES)["draw"] is empty
-        ```
-
-        1. יוצרים tuple חדש ולא רשימה שמוסיפים אליה : `final_boards` משתמשת ב-`@cache`, ולכן
-           קבוצת הקווים חייבת להיות hashable. כל קבוצה מקבלת סריקה משלה, פעם אחת.
 
     #### למה זה נכון { .sol-proof }
 

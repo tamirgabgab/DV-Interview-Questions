@@ -78,6 +78,16 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="parity_move" linenums="1" hl_lines="3 4"
+        def parity_move(coins: list[int], i: int, j: int) -> str:
+            """The first player's move on coins[i..j] (n even): the end on the richer parity."""
+            want = 0 if sum(coins[0::2]) >= sum(coins[1::2]) else 1     # (1)!
+            return "L" if i % 2 == want else "R"
+        ```
+
+        1. ‏`coins[0::2]` הם המקומות 1, 3, 5, ... (האינדקסים 0, 2, 4, ...).
+
     === "SystemVerilog"
         ```systemverilog title="function parity_move" linenums="1" hl_lines="4 5"
         // the first player's move on coins[i..j] (n even): 0 = the left end, 1 = the right end
@@ -89,16 +99,6 @@ added: 2026-10-27
         ```
 
         1. הצבע נבחר לפי השורה כולה, פעם אחת. בכל תור של הראשון \( i \) ו-\( j \) בצבעים שונים, והוא לוקח את הקצה בצבע שלו.
-
-    === "Python"
-        ```python title="parity_move" linenums="1" hl_lines="3 4"
-        def parity_move(coins: list[int], i: int, j: int) -> str:
-            """The first player's move on coins[i..j] (n even): the end on the richer parity."""
-            want = 0 if sum(coins[0::2]) >= sum(coins[1::2]) else 1     # (1)!
-            return "L" if i % 2 == want else "R"
-        ```
-
-        1. ‏`coins[0::2]` הם המקומות 1, 3, 5, ... (האינדקסים 0, 2, 4, ...).
 
     #### למה זה נכון { .sol-proof }
 
@@ -213,6 +213,23 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="best_total" linenums="1" hl_lines="10 11"
+        def best_total(coins: list[int]) -> int:
+            """The most the first player collects when both play their best (any n)."""
+            n = len(coins)
+            d = [[0] * n for _ in range(n)]          # d[i][j]: the mover's lead on coins i..j
+            for i in range(n):
+                d[i][i] = coins[i]
+            for length in range(2, n + 1):
+                for i in range(n - length + 1):
+                    j = i + length - 1
+                    d[i][j] = max(coins[i] - d[i + 1][j], coins[j] - d[i][j - 1])   # (1)!
+            return (sum(coins) + d[0][n - 1]) // 2
+        ```
+
+        1. כל קטע תלוי רק בשני קטעים קצרים ממנו באחד, ולכן מספיק למלא לפי אורך.
+
     === "SystemVerilog"
         ```systemverilog title="function best_total" linenums="1" hl_lines="11 12 13 15"
         // the most the first player collects when both play their best; d[i * n + j] is the
@@ -235,23 +252,6 @@ added: 2026-10-27
 
         1. לוקח את \( c_i \), והיריב מוביל ב-\( d \) של הקטע שנשאר.
         2. ‏`d[n - 1]` הוא \( d[0][n-1] \). ‏\( \text{mine} - \text{other} = d \) ו-\( \text{mine} + \text{other} = \text{sum} \).
-
-    === "Python"
-        ```python title="best_total" linenums="1" hl_lines="10 11"
-        def best_total(coins: list[int]) -> int:
-            """The most the first player collects when both play their best (any n)."""
-            n = len(coins)
-            d = [[0] * n for _ in range(n)]          # d[i][j]: the mover's lead on coins i..j
-            for i in range(n):
-                d[i][i] = coins[i]
-            for length in range(2, n + 1):
-                for i in range(n - length + 1):
-                    j = i + length - 1
-                    d[i][j] = max(coins[i] - d[i + 1][j], coins[j] - d[i][j - 1])   # (1)!
-            return (sum(coins) + d[0][n - 1]) // 2
-        ```
-
-        1. כל קטע תלוי רק בשני קטעים קצרים ממנו באחד, ולכן מספיק למלא לפי אורך.
 
     #### למה זה נכון { .sol-proof }
 

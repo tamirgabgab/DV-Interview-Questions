@@ -89,6 +89,35 @@ added: 2026-10-21
     המודול הבודק (checker) מצורף לממשק; `fails` הוא סך ההפרות, לכל חוק מונה משלו.
     מודל הייחוס ב-Python עובר על אותן דגימות ומחזיר את המחזורים של כל הפרה.
 
+    === "Python"
+        ```python title="check_handshake" linenums="1" hl_lines="10 14 17 19"
+        def check_handshake(req: list[int], ack: list[int], max_wait: int = 3) -> dict[str, list[int]]:
+            """The four rules on sampled values (index = clock cycle). Returns the cycles at
+            which each rule is violated, the cycle at which the SVA reports the failure."""
+            n = len(req)
+            fails = {"hold": [], "late": [], "orphan": [], "drop": []}
+            for t in range(n):
+                prev_req = req[t - 1] if t else 0
+                prev_ack = ack[t - 1] if t else 0
+                if t and prev_req and not prev_ack and not req[t]:
+                    fails["hold"].append(t)                           # (1)!
+                if req[t] and not prev_req:                           # $rose(req)
+                    window = ack[t + 1:t + 1 + max_wait]
+                    if len(window) == max_wait and not any(window):
+                        fails["late"].append(t + max_wait)            # (2)!
+                if ack[t] and not req[t]:
+                    fails["orphan"].append(t)                         # (3)!
+                if t and prev_ack and req[t]:
+                    fails["drop"].append(t)                           # (4)!
+            return fails
+        ```
+
+        1. ‏`req` היה גבוה בלי `ack` ונפל : ההפרה נרשמת במחזור הנפילה, כמו `|=>`.
+        2. אין `ack` באף אחד משלושת המחזורים שאחרי העלייה : ההפרה נרשמת בסוף החלון. חלון
+           שנחתך בסוף הרצף לא נספר, כמו property שעדיין פתוחה בסוף הסימולציה.
+        3. ‏`ack` בלי `req` באותה דגימה.
+        4. ‏`req` עדיין גבוה במחזור שאחרי `ack`.
+
     === "SystemVerilog"
         ```systemverilog title="module handshake_checker" linenums="1" hl_lines="13 18 23 28"
         module handshake_checker #(int MAX_WAIT = 3) (
@@ -130,35 +159,6 @@ added: 2026-10-21
            `ack` אחד בתוכו, והכישלון מדווח רק כשהחלון נסגר בלי `ack`.
         3. ‏Implication חופפת : שני האותות באותה דגימה.
         4. במחזור שאחרי `ack` ה-`req` נמוך. עם `|->` זה היה סותר את חוק 3.
-
-    === "Python"
-        ```python title="check_handshake" linenums="1" hl_lines="10 14 17 19"
-        def check_handshake(req: list[int], ack: list[int], max_wait: int = 3) -> dict[str, list[int]]:
-            """The four rules on sampled values (index = clock cycle). Returns the cycles at
-            which each rule is violated, the cycle at which the SVA reports the failure."""
-            n = len(req)
-            fails = {"hold": [], "late": [], "orphan": [], "drop": []}
-            for t in range(n):
-                prev_req = req[t - 1] if t else 0
-                prev_ack = ack[t - 1] if t else 0
-                if t and prev_req and not prev_ack and not req[t]:
-                    fails["hold"].append(t)                           # (1)!
-                if req[t] and not prev_req:                           # $rose(req)
-                    window = ack[t + 1:t + 1 + max_wait]
-                    if len(window) == max_wait and not any(window):
-                        fails["late"].append(t + max_wait)            # (2)!
-                if ack[t] and not req[t]:
-                    fails["orphan"].append(t)                         # (3)!
-                if t and prev_ack and req[t]:
-                    fails["drop"].append(t)                           # (4)!
-            return fails
-        ```
-
-        1. ‏`req` היה גבוה בלי `ack` ונפל : ההפרה נרשמת במחזור הנפילה, כמו `|=>`.
-        2. אין `ack` באף אחד משלושת המחזורים שאחרי העלייה : ההפרה נרשמת בסוף החלון. חלון
-           שנחתך בסוף הרצף לא נספר, כמו property שעדיין פתוחה בסוף הסימולציה.
-        3. ‏`ack` בלי `req` באותה דגימה.
-        4. ‏`req` עדיין גבוה במחזור שאחרי `ack`.
 
     #### למה זה נכון { .sol-proof }
 

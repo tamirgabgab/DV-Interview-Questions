@@ -40,31 +40,6 @@ added: 2026-10-19
 מגיעה לפניו, או אובדת); פקטה שאבדה או שהגיעה פגומה אינה נספרת ב-Ingress; פרטי ה-Link Layer
 (ECC, ‏HEC, תזמונים) מחוץ לשאלה. מחלקות הפקטים נתונות :
 
-=== "SystemVerilog"
-    ```systemverilog title="given classes"
-    typedef bit [7:0] credit_t;      // every counter is 8 bits wide and wraps
-    typedef bit [6:0] hop_id_t;
-
-    class tunneled_packet;
-      hop_id_t     hop_id;
-      int unsigned packet_id;
-      function new(hop_id_t hop_id = 0, int unsigned packet_id = 0);
-        this.hop_id    = hop_id;
-        this.packet_id = packet_id;
-      endfunction
-    endclass
-
-    class credit_grant_packet;
-      hop_id_t hop_id;
-      credit_t credits;              // the Ingress Adapter's PCA, cumulative
-    endclass
-
-    class credit_sync_packet;
-      hop_id_t hop_id;
-      credit_t pcc;                  // the Egress Adapter's PCC, cumulative
-    endclass
-    ```
-
 === "Python"
     ```python title="given classes"
     from dataclasses import dataclass
@@ -88,6 +63,31 @@ added: 2026-10-19
     class CreditSync:
         hop_id: int
         pcc: int                     # the Egress Adapter's PCC, cumulative
+    ```
+
+=== "SystemVerilog"
+    ```systemverilog title="given classes"
+    typedef bit [7:0] credit_t;      // every counter is 8 bits wide and wraps
+    typedef bit [6:0] hop_id_t;
+
+    class tunneled_packet;
+      hop_id_t     hop_id;
+      int unsigned packet_id;
+      function new(hop_id_t hop_id = 0, int unsigned packet_id = 0);
+        this.hop_id    = hop_id;
+        this.packet_id = packet_id;
+      endfunction
+    endclass
+
+    class credit_grant_packet;
+      hop_id_t hop_id;
+      credit_t credits;              // the Ingress Adapter's PCA, cumulative
+    endclass
+
+    class credit_sync_packet;
+      hop_id_t hop_id;
+      credit_t pcc;                  // the Egress Adapter's PCC, cumulative
+    endclass
     ```
 
 ??? interviewer "מה המראיין בודק"
@@ -206,6 +206,91 @@ added: 2026-10-19
     שתי מחלקות קטנות ופונקציית עזר אחת למרחק על המעגל. ההפרש מחושב בטיפוס רחב וחתום ורק
     אז נחתך ל-8 ביט, כדי שגלישה לא תהיה מקרה מיוחד.
 
+    === "Python"
+        ```python title="EgressCreditModel, IngressCreditModel" linenums="1" hl_lines="3 23 34 48 54 65 68"
+        def forward_distance(a: int, b: int) -> int:
+            """How far b is ahead of a on the modulo-256 circle: 0..255."""
+            return (b - a) % MOD                                             # (1)!
+
+
+        def check_hop(hop_id: int, pkt) -> None:
+            """Every packet of the Path carries its Hop ID; anything else is an environment bug."""
+            if pkt.hop_id != hop_id:
+                raise ValueError(f"hop {hop_id}: packet of hop {pkt.hop_id}")
+
+
+        class EgressCreditModel:
+            """The transmitting side of one Path: what it consumed, and the limit it was granted."""
+
+            def __init__(self, hop_id: int):
+                self.hop_id = hop_id
+                self.pcc = 0             # Path Credits Consumed: packets actually transmitted
+                self.pcl = 0             # Path Credit Limit: the latest Credit Grant
+
+            def can_transmit(self) -> bool:
+                """The limit is 1..127 steps ahead of the consumed counter on the circle."""
+                ahead = forward_distance(self.pcc, self.pcl)
+                return 0 < ahead < 128                                       # (2)!
+
+            def on_packet_transmitted(self) -> None:
+                """Called for a packet that really went out, after can_transmit() said yes."""
+                if not self.can_transmit():
+                    raise ValueError(f"hop {self.hop_id}: transmission without a Path credit "
+                                     f"(PCC={self.pcc}, PCL={self.pcl})")
+                self.pcc = (self.pcc + 1) % MOD
+
+            def consume_credit_grant(self, grant: CreditGrant) -> None:
+                check_hop(self.hop_id, grant)
+                self.pcl = grant.credits                                     # (3)!
+
+
+        class IngressCreditModel:
+            """The receiving side of one Path: a dedicated buffer, what it received, what it freed."""
+
+            def __init__(self, hop_id: int, initial_credits: int):
+                if not 0 < initial_credits < MOD:
+                    raise ValueError(f"hop {hop_id}: {initial_credits} initial credits do not fit "
+                                     "an 8-bit counter")
+                self.hop_id = hop_id
+                self.buffer_size = initial_credits   # slots of the dedicated RX buffer
+                self.rx_occupancy = 0
+                self.pcr = 0                         # Path Credits Received: packets accepted
+                self.pca = initial_credits           # Path Credits Allocated: slots ever handed out  (4)
+
+            def on_packet_received(self, pkt: TunneledPacket, accepted: bool = True) -> None:
+                """`accepted` comes from the receiver: a corrupted packet never enters the buffer."""
+                check_hop(self.hop_id, pkt)
+                if not accepted:
+                    return                                                   # (5)!
+                if self.rx_occupancy >= self.buffer_size:
+                    raise ValueError(f"hop {self.hop_id}: dedicated RX buffer overflow")
+                self.pcr = (self.pcr + 1) % MOD
+                self.rx_occupancy += 1
+
+            def on_packet_dequeued(self) -> None:
+                """A packet left the buffer: its slot is free again, so one more credit, cumulative."""
+                if self.rx_occupancy == 0:
+                    raise ValueError(f"hop {self.hop_id}: dequeue from an empty RX buffer")
+                self.rx_occupancy -= 1
+                self.pca = (self.pca + 1) % MOD                              # (6)!
+
+            def build_credit_grant(self) -> CreditGrant:
+                return CreditGrant(self.hop_id, self.pca)                    # (7)!
+        ```
+
+        1. ‏`%` של Python מחזיר תמיד ערך בין 0 ל-255, גם להפרש שלילי : \( (2 - 254) \bmod 256 = 4 \).
+        2. תנאי אחד לשני המקרים של המפרט : מרחק 1 עד 127 קדימה. ‏0 פירושו שהקרדיטים נגמרו,
+           ו-128 ומעלה פירושו ש-PCL מאחורי PCC, כלומר Credit Grant ישן או מושחת.
+        3. החלפה, לא חיבור : ‏Credit Grant נושא ערך מצטבר. חיבור היה מכפיל קרדיטים בכל Grant
+           חוזר.
+        4. ‏PCA מתחיל מגודל ה-buffer : אלה התאים שהוקצו לנתיב בהקמה, ואותם ה-Ingress יפרסם
+           ב-Credit Grant הראשון.
+        5. פקטה שלא נכנסה ל-buffer לא משנה אף מונה. ה-Egress כן ספר אותה ב-PCC, וזה הפער
+           שסעיף ב מתקן.
+        6. ‏PCA עולה כשהתא **מתפנה**, לא כשהפקטה **מתקבלת** : הקבלה תופסת תא, ההוצאה
+           משחררת אותו.
+        7. הערך המצטבר, לא מספר התאים הפנויים ולא כמה תאים התפנו מאז ה-Grant הקודם.
+
     === "SystemVerilog"
         ```systemverilog title="egress_credit_model, ingress_credit_model" linenums="1" hl_lines="3 21 38 57 66 82 88"
         // How far b is ahead of a on the modulo-256 circle: 0..255.
@@ -304,91 +389,6 @@ added: 2026-10-19
         1. ההפרש מחושב ב-`int` חתום, למשל \( 2 - 254 = -252 \), והחיתוך ל-8 ביט נותן
            \( -252 \bmod 256 = 4 \). בלי ההרחבה ל-`int` התוצאה זהה, אבל הכוונה פחות
            ברורה.
-        2. תנאי אחד לשני המקרים של המפרט : מרחק 1 עד 127 קדימה. ‏0 פירושו שהקרדיטים נגמרו,
-           ו-128 ומעלה פירושו ש-PCL מאחורי PCC, כלומר Credit Grant ישן או מושחת.
-        3. החלפה, לא חיבור : ‏Credit Grant נושא ערך מצטבר. חיבור היה מכפיל קרדיטים בכל Grant
-           חוזר.
-        4. ‏PCA מתחיל מגודל ה-buffer : אלה התאים שהוקצו לנתיב בהקמה, ואותם ה-Ingress יפרסם
-           ב-Credit Grant הראשון.
-        5. פקטה שלא נכנסה ל-buffer לא משנה אף מונה. ה-Egress כן ספר אותה ב-PCC, וזה הפער
-           שסעיף ב מתקן.
-        6. ‏PCA עולה כשהתא **מתפנה**, לא כשהפקטה **מתקבלת** : הקבלה תופסת תא, ההוצאה
-           משחררת אותו.
-        7. הערך המצטבר, לא מספר התאים הפנויים ולא כמה תאים התפנו מאז ה-Grant הקודם.
-
-    === "Python"
-        ```python title="EgressCreditModel, IngressCreditModel" linenums="1" hl_lines="3 23 34 48 54 65 68"
-        def forward_distance(a: int, b: int) -> int:
-            """How far b is ahead of a on the modulo-256 circle: 0..255."""
-            return (b - a) % MOD                                             # (1)!
-
-
-        def check_hop(hop_id: int, pkt) -> None:
-            """Every packet of the Path carries its Hop ID; anything else is an environment bug."""
-            if pkt.hop_id != hop_id:
-                raise ValueError(f"hop {hop_id}: packet of hop {pkt.hop_id}")
-
-
-        class EgressCreditModel:
-            """The transmitting side of one Path: what it consumed, and the limit it was granted."""
-
-            def __init__(self, hop_id: int):
-                self.hop_id = hop_id
-                self.pcc = 0             # Path Credits Consumed: packets actually transmitted
-                self.pcl = 0             # Path Credit Limit: the latest Credit Grant
-
-            def can_transmit(self) -> bool:
-                """The limit is 1..127 steps ahead of the consumed counter on the circle."""
-                ahead = forward_distance(self.pcc, self.pcl)
-                return 0 < ahead < 128                                       # (2)!
-
-            def on_packet_transmitted(self) -> None:
-                """Called for a packet that really went out, after can_transmit() said yes."""
-                if not self.can_transmit():
-                    raise ValueError(f"hop {self.hop_id}: transmission without a Path credit "
-                                     f"(PCC={self.pcc}, PCL={self.pcl})")
-                self.pcc = (self.pcc + 1) % MOD
-
-            def consume_credit_grant(self, grant: CreditGrant) -> None:
-                check_hop(self.hop_id, grant)
-                self.pcl = grant.credits                                     # (3)!
-
-
-        class IngressCreditModel:
-            """The receiving side of one Path: a dedicated buffer, what it received, what it freed."""
-
-            def __init__(self, hop_id: int, initial_credits: int):
-                if not 0 < initial_credits < MOD:
-                    raise ValueError(f"hop {hop_id}: {initial_credits} initial credits do not fit "
-                                     "an 8-bit counter")
-                self.hop_id = hop_id
-                self.buffer_size = initial_credits   # slots of the dedicated RX buffer
-                self.rx_occupancy = 0
-                self.pcr = 0                         # Path Credits Received: packets accepted
-                self.pca = initial_credits           # Path Credits Allocated: slots ever handed out  (4)
-
-            def on_packet_received(self, pkt: TunneledPacket, accepted: bool = True) -> None:
-                """`accepted` comes from the receiver: a corrupted packet never enters the buffer."""
-                check_hop(self.hop_id, pkt)
-                if not accepted:
-                    return                                                   # (5)!
-                if self.rx_occupancy >= self.buffer_size:
-                    raise ValueError(f"hop {self.hop_id}: dedicated RX buffer overflow")
-                self.pcr = (self.pcr + 1) % MOD
-                self.rx_occupancy += 1
-
-            def on_packet_dequeued(self) -> None:
-                """A packet left the buffer: its slot is free again, so one more credit, cumulative."""
-                if self.rx_occupancy == 0:
-                    raise ValueError(f"hop {self.hop_id}: dequeue from an empty RX buffer")
-                self.rx_occupancy -= 1
-                self.pca = (self.pca + 1) % MOD                              # (6)!
-
-            def build_credit_grant(self) -> CreditGrant:
-                return CreditGrant(self.hop_id, self.pca)                    # (7)!
-        ```
-
-        1. ‏`%` של Python מחזיר תמיד ערך בין 0 ל-255, גם להפרש שלילי : \( (2 - 254) \bmod 256 = 4 \).
         2. תנאי אחד לשני המקרים של המפרט : מרחק 1 עד 127 קדימה. ‏0 פירושו שהקרדיטים נגמרו,
            ו-128 ומעלה פירושו ש-PCL מאחורי PCC, כלומר Credit Grant ישן או מושחת.
         3. החלפה, לא חיבור : ‏Credit Grant נושא ערך מצטבר. חיבור היה מכפיל קרדיטים בכל Grant
@@ -526,6 +526,34 @@ added: 2026-10-19
 
     שתי מחלקות יורשות שמוסיפות פונקציה אחת כל אחת; הקוד של סעיף א נשאר כפי שהוא.
 
+    === "Python"
+        ```python title="EgressSyncModel, IngressSyncModel" linenums="1" hl_lines="6 14 15 16"
+        class EgressSyncModel(EgressCreditModel):
+            """Part b adds the Path Credit Sync to both sides; everything else is inherited."""
+
+            def build_credit_sync(self) -> CreditSync:
+                """Carries PCC as it is now: packets already on the link, not packets waiting to go."""
+                return CreditSync(self.hop_id, self.pcc)                     # (1)!
+
+
+        class IngressSyncModel(IngressCreditModel):
+
+            def consume_credit_sync(self, sync: CreditSync) -> None:
+                """Packets the Egress transmitted and we never received: their credits come back."""
+                check_hop(self.hop_id, sync)
+                missing = forward_distance(self.pcr, sync.pcc)               # (2)!
+                self.pca = (self.pca + missing) % MOD                        # (3)!
+                self.pcr = sync.pcc                                          # (4)!
+        ```
+
+        1. ‏PCC מונה רק פקטות ששודרו בפועל, ולכן הערך ב-Sync כולל בדיוק את הפקטות שהגיעו
+           לפניו או אבדו. פקטה שמחכה לשידור הייתה נספרת כ"אבדה" ומחזירה קרדיט לתא שהיא
+           עוד תתפוס.
+        2. עם PCR **הישן** : המרחק קדימה מ-PCR אל PCC שהגיע הוא מספר הפקטות שלא התקבלו, גם
+           כשהמונים גלשו (‏\( (1 - 253) \bmod 256 = 4 \)).
+        3. התאים של הפקטות האלה מעולם לא נתפסו, ולכן הקרדיטים שלהן חוזרים להקצאה.
+        4. רק עכשיו PCR מיושר ל-PCC. ה-Sync הבא ימדוד אובדנים מנקודה זו והלאה.
+
     === "SystemVerilog"
         ```systemverilog title="egress_sync_model, ingress_sync_model" linenums="1" hl_lines="11 28 29 30"
         // Part b adds the Path Credit Sync to both sides; everything else is inherited.
@@ -560,34 +588,6 @@ added: 2026-10-19
             pcr     = sync.pcc;                                                // (4)!
           endfunction
         endclass
-        ```
-
-        1. ‏PCC מונה רק פקטות ששודרו בפועל, ולכן הערך ב-Sync כולל בדיוק את הפקטות שהגיעו
-           לפניו או אבדו. פקטה שמחכה לשידור הייתה נספרת כ"אבדה" ומחזירה קרדיט לתא שהיא
-           עוד תתפוס.
-        2. עם PCR **הישן** : המרחק קדימה מ-PCR אל PCC שהגיע הוא מספר הפקטות שלא התקבלו, גם
-           כשהמונים גלשו (‏\( (1 - 253) \bmod 256 = 4 \)).
-        3. התאים של הפקטות האלה מעולם לא נתפסו, ולכן הקרדיטים שלהן חוזרים להקצאה.
-        4. רק עכשיו PCR מיושר ל-PCC. ה-Sync הבא ימדוד אובדנים מנקודה זו והלאה.
-
-    === "Python"
-        ```python title="EgressSyncModel, IngressSyncModel" linenums="1" hl_lines="6 14 15 16"
-        class EgressSyncModel(EgressCreditModel):
-            """Part b adds the Path Credit Sync to both sides; everything else is inherited."""
-
-            def build_credit_sync(self) -> CreditSync:
-                """Carries PCC as it is now: packets already on the link, not packets waiting to go."""
-                return CreditSync(self.hop_id, self.pcc)                     # (1)!
-
-
-        class IngressSyncModel(IngressCreditModel):
-
-            def consume_credit_sync(self, sync: CreditSync) -> None:
-                """Packets the Egress transmitted and we never received: their credits come back."""
-                check_hop(self.hop_id, sync)
-                missing = forward_distance(self.pcr, sync.pcc)               # (2)!
-                self.pca = (self.pca + missing) % MOD                        # (3)!
-                self.pcr = sync.pcc                                          # (4)!
         ```
 
         1. ‏PCC מונה רק פקטות ששודרו בפועל, ולכן הערך ב-Sync כולל בדיוק את הפקטות שהגיעו

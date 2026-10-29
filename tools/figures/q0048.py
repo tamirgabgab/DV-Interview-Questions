@@ -11,10 +11,19 @@ through the food line gives B'' = (L, 2H + b): every path has the length of a br
 from A to B'', so the shortest one is the straight line, of length sqrt(L^2 + D^2) with
 D = 2H + b - a.
 
-blocks() returns, in page order: the problem with a path that is not the shortest (the
-statement), its legend, the unfolding of part a (a = H/3, b = 2H/3), the unfolding of part
-b (a = 0, b = H) and their legend. tests/0048 checks the numbers and that the page copies
-match.
+Part c tilts the food line: it passes through (0, H) at an angle theta above the
+horizontal (0 to 60 degrees), and meets the water line at O = (-H / tan theta, 0), left of
+A. Both lines are rays from O. The two reflections are a rotation by 2 theta about O, so
+B2 = (0, H) + R(2 theta)(L, H + b), and the shortest path is |A B2|: seen from O the
+straight line from A to B2 turns by 2 theta + beta - alpha <= 3 theta <= 180 degrees, so it
+crosses the food line and then the image of the water line, and the reflection is valid
+for every theta up to 60 degrees (tilted() and tilted_cs()).
+
+blocks() returns: the problem with a path that is not the shortest (the statement), its
+legend, the unfolding of part a (a = H/3, b = 2H/3), the unfolding of part b (a = 0,
+b = H), their legend; then part c with theta = 15 degrees: its statement, its legend, the
+unfolding with the rotation about O, its legend and the table of the three legs.
+tests/0048 checks the numbers and that the page copies match.
 """
 
 import math
@@ -53,6 +62,59 @@ def heights(L, H, x, y):
 def length(L, H, a, b, p1, p2):
     """The length of the path that takes food at p1 and water at p2 (horizontal positions)."""
     return math.hypot(p1, H - a) + math.hypot(p2 - p1, H) + math.hypot(L - p2, b)
+
+
+TH0 = 15                                  # part c's example: L = 7, H = 3, a = 1, b = 2, theta = 15
+
+
+def reflect(p, q, c, s):
+    """The point p reflected through the line through q with direction (c, s), c^2 + s^2 = 1:
+    move q to the origin, flip y, rotate by twice the angle."""
+    dx, dy = p[0] - q[0], -(p[1] - q[1])
+    c2, s2 = c * c - s * s, 2 * c * s
+    return (q[0] + c2 * dx - s2 * dy, q[1] + s2 * dx + c2 * dy)
+
+
+def tilted_cs(L, H, a, b, c, s):
+    """Part c with cos theta = c and sin theta = s (Fractions give exact values): B1, B2, the
+    food stop P (at distance sf from (0, H) along the food line), the water stop Q, the image
+    Qs of Q in the food line, the square of the length z_sq (the legs and z as floats)."""
+    c2, s2 = c * c - s * s, 2 * c * s
+    u, v = H + b, H - a
+    B1 = (L, -b)
+    B2 = (L * c2 - u * s2, H + L * s2 + u * c2)
+    z_sq = B2[0] ** 2 + (B2[1] - a) ** 2
+    sf = v * (L * c2 - u * s2) / (L * s + (2 * H + b - a) * c)
+    P = (sf * c, H + sf * s)
+    qx = P[0] + (L - P[0]) * P[1] / (P[1] + b)
+    Q = (qx, 0 * qx)
+    Qs = reflect(Q, (0, H), c, s)
+    legs = (math.dist((0, a), P), math.dist(P, Q), math.dist(Q, (L, b)))
+    return {"B1": B1, "B2": B2, "z_sq": z_sq, "sf": sf, "P": P, "Q": Q, "Qs": Qs,
+            "z1": legs[0], "z2": legs[1], "z3": legs[2], "z": math.sqrt(z_sq)}
+
+
+def tilted(L, H, a, b, theta):
+    """Part c in floats, theta in degrees, with the meeting point O (None at theta = 0), the
+    angles alpha and beta of A and B seen from O and the turn 2 theta + beta - alpha of the
+    straight line, in degrees (the reflection is valid when it is at most 180)."""
+    t = math.radians(theta)
+    r = tilted_cs(*map(float, (L, H, a, b)), math.cos(t), math.sin(t))
+    if theta == 0:
+        r.update(O=None, alpha=0.0, beta=0.0, turn=0.0)
+    else:
+        ox = -H / math.tan(t)
+        al, be = math.degrees(math.atan2(a, -ox)), math.degrees(math.atan2(b, L - ox))
+        r.update(O=(ox, 0.0), alpha=al, beta=be, turn=2 * theta + be - al)
+    return r
+
+
+def tilted_length(L, H, a, b, theta, sf, qx):
+    """The length of the path that takes food at distance sf from (0, H) along the tilted food
+    line and water at (qx, 0)."""
+    t = math.radians(theta)
+    P = (sf * math.cos(t), H + sf * math.sin(t))
+    return math.dist((0, a), P) + math.dist(P, (qx, 0)) + math.hypot(L - qx, b)
 
 
 # --- drawings ---------------------------------------------------------------------------
@@ -170,6 +232,158 @@ def unfold_legend():
             '<span><i class="box-path"></i>המסלול הקצר ביותר, והקו הישר מ-A ל-B″</span></span>')
 
 
+# --- part c: the tilted food line ---------------------------------------------------------
+
+def clip(poly, q, d, keep_left):
+    """The convex polygon cut by the line through q with direction d: the part on its left
+    (keep_left) or on its right (Sutherland-Hodgman)."""
+    side = lambda p: (d[0] * (p[1] - q[1]) - d[1] * (p[0] - q[0])) * (1 if keep_left else -1)
+    out = []
+    for i, p in enumerate(poly):
+        r = poly[i - 1]
+        sp, sr = side(p), side(r)
+        if (sp >= 0) != (sr >= 0):
+            k = sr / (sr - sp)
+            out.append((r[0] + k * (p[0] - r[0]), r[1] + k * (p[1] - r[1])))
+        if sp >= 0:
+            out.append(p)
+    return out
+
+
+def ray_end(o, d, box):
+    """Where the ray from o in direction d leaves the rectangle box = (x0, x1, y0, y1)."""
+    x0, x1, y0, y1 = box
+    ts = [(x1 - o[0]) / d[0] if d[0] > 1e-12 else math.inf, (x0 - o[0]) / d[0] if d[0] < -1e-12 else math.inf,
+          (y1 - o[1]) / d[1] if d[1] > 1e-12 else math.inf, (y0 - o[1]) / d[1] if d[1] < -1e-12 else math.inf]
+    t = min(ts)
+    return (o[0] + t * d[0], o[1] + t * d[1])
+
+
+def polygon(n, pts, cls):
+    n.add(f'<polygon class="{cls}" points="{" ".join(f"{n.X(x):.1f},{n.Y(y):.1f}" for x, y in pts)}"/>')
+    return n
+
+
+def arc(n, o, r, a0, a1, cls="farm-arc", width=1.5, dash=None):
+    """An arc about o of radius r (units) from angle a0 to a1 (degrees, counterclockwise)."""
+    p0 = (o[0] + r * math.cos(math.radians(a0)), o[1] + r * math.sin(math.radians(a0)))
+    p1 = (o[0] + r * math.cos(math.radians(a1)), o[1] + r * math.sin(math.radians(a1)))
+    R = r * n.scale
+    d = f' stroke-dasharray="{dash}"' if dash else ""
+    n.add(f'<path class="{cls}" d="M {n.X(p0[0]):.1f} {n.Y(p0[1]):.1f} A {R:.1f} {R:.1f} 0 0 0 {n.X(p1[0]):.1f} '
+          f'{n.Y(p1[1]):.1f}" stroke-width="{width}"{d}/>')
+    return n
+
+
+def wedge(o, k0, k1, theta, box):
+    """The copy of the field between the rays from o at angles k0 theta and k1 theta, inside box."""
+    x0, x1, y0, y1 = box
+    poly = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    t0, t1 = math.radians(k0 * theta), math.radians(k1 * theta)
+    poly = clip(poly, o, (math.cos(t0), math.sin(t0)), True)
+    return clip(poly, o, (math.cos(t1), math.sin(t1)), False)
+
+
+def tilt_problem_svg():
+    """Part c's statement: the wedge between the water line and the tilted food line, from
+    their meeting point O, with A, B, the heights a, b and H, the angle theta and a path."""
+    L, H, a, b, th = L0, H0, 1, 2, TH0
+    t = math.radians(th)
+    o = (-H / math.tan(t), 0.0)
+    box = (o[0], L + 0.9, -0.1, H + (L + 0.9) * math.tan(t))
+    n = Net(o[0] - 0.6, L + 1.5, -1.5, box[3] + 0.4, 26, pad=(10, 10, 10, 6), max_rem=32,
+            label="סעיף ג : קו המים אופקי, וקו האוכל עובר דרך (0, H) ונוטה כלפי מעלה בזווית θ. הקווים נפגשים "
+                  "בנקודה O משמאל לחוואי ומתרחקים זה מזה לכיוון הפרה. החוואי A בגובה a על הקו x = 0, הפרה B "
+                  "בגובה b על הקו x = L, ומסלול לדוגמה : מ-A לקו האוכל, משם לקו המים ומשם לפרה")
+    polygon(n, [o, (box[1], 0), (box[1], box[3])], "box-face")
+    n.line(o[0], 0, box[1] + 0.4, 0, "s1-line", 3, "9 6")
+    n.line(o[0], 0, box[1] + 0.4, H + (box[1] + 0.4) * math.tan(t), "s3-line", 3, "9 6")
+    arc(n, o, 3.2, 0, th)
+    n.label(o[0] + 3.6 * math.cos(t / 2), 3.6 * math.sin(t / 2), "θ", dx=6, dy=5, size=16, anchor="start")
+    n.line(0, 0, 0, H, "ink-line", 1, "2 3").line(L, 0, L, H + L * math.tan(t), "ink-line", 1, "2 3")
+    # a path that is not the shortest: food at x = 3, water at x = 5
+    pf = (3, H + 3 * math.tan(t))
+    n.line(0, a, *pf, "box-path", 3).line(*pf, 5, 0, "box-path", 3).line(5, 0, L, b, "box-path", 3)
+    n.line(-0.35, 0, -0.35, a, "ink-line", 1.2).label(-0.35, a / 2, "a", dx=-8, dy=5, size=15, anchor="end")
+    n.line(-1.1, 0, -1.1, H, "ink-line", 1.2).label(-1.1, H / 2, "H", dx=-8, dy=5, size=15, anchor="end")
+    n.line(L + 0.35, 0, L + 0.35, b, "ink-line", 1.2).label(L + 0.35, b / 2, "b", dx=8, dy=5, size=15, anchor="start")
+    n.line(0, -0.55, L, -0.55, "ink-line", 1.2).line(0, -0.4, 0, -0.7, "ink-line", 1.2).line(L, -0.4, L, -0.7, "ink-line", 1.2)
+    n.label(L / 2, -0.55, "L", dy=17, size=15)
+    n.point(*pf, "s3", r=5, title="נקודת האוכל").point(5, 0, "s1", r=5, title="נקודת המים")
+    n.point(*o, "ink", "O", dx=0, dy=20, r=5, title="O : נקודת המפגש של הקווים, (−H/tanθ, 0)")
+    n.point(0, a, "ink", "A", dx=13, dy=-7, r=6, title="החוואי A = (0, a)")
+    n.point(L, b, "s2", "B", dx=-13, dy=-7, r=6, title="הפרה B = (L, b)")
+    return n.svg()
+
+
+def tilt_problem_legend():
+    return ('<span class="viz-legend"><span><i class="s3"></i>קו האוכל, בזווית θ</span><span><i class="s1"></i>קו המים</span>'
+            '<span><i class="box-face"></i>השטח בין הקווים</span><span><i class="ink"></i>החוואי A ונקודת המפגש O</span>'
+            '<span><i class="s2"></i>הפרה B</span><span><i class="box-path"></i>מסלול לדוגמה, לא הקצר ביותר</span></span>')
+
+
+def tilt_unfold_svg():
+    """Part c's unfolding: the field, its copy through the water line (with B1) and two copies
+    through the food line (the image of the water line at 2 theta, B2 at 2 theta + beta); the
+    rotation of B about O by 2 theta, the straight line from A to B2 and the real path."""
+    L, H, a, b, th = L0, H0, 1, 2, TH0
+    r = tilted(L, H, a, b, th)
+    o, B1, B2, P, Q, Qs = r["O"], r["B1"], r["B2"], r["P"], r["Q"], r["Qs"]
+    box = (o[0], L + 0.8, -2.9, 12.0)
+    n = Net(o[0] - 0.7, L + 1.5, box[2] - 0.5, box[3] + 0.3, 24, pad=(10, 10, 10, 8), max_rem=30,
+            label="סעיף ג עם L = 7, H = 3, a = 1, b = 2, θ = 15° : השטח בין הקווים, השיקוף שלו דרך קו המים עם B1, "
+                  "ושני שיקופים דרך קו האוכל, עם תמונת קו המים בזווית 2θ ועם B2. B2 הוא B מסובב ב-2θ = 30° סביב O. "
+                  "הקו הישר מ-A ל-B2 חוצה את קו האוכל בנקודת האוכל ואת תמונת קו המים בתמונה של נקודת המים")
+    for k0, k1, cls in ((-1, 0, "box-copy"), (0, 1, "box-face"), (1, 2, "box-copy"), (2, 3, "box-copy")):
+        polygon(n, wedge(o, k0, k1, th, box), cls)
+    for k, cls, w in ((-1, "s3-line", 2), (0, "s1-line", 3), (1, "s3-line", 3), (2, "s1-line", 2), (3, "s3-line", 2)):
+        tk = math.radians(k * th)
+        e = ray_end(o, (math.cos(tk), math.sin(tk)), box)
+        n.line(*o, *e, cls, w, "9 6")
+    # the rotation: B to B2 about O by 2 theta, and the angle theta at O
+    rb = math.dist(o, (L, b))
+    arc(n, o, rb, r["beta"], r["beta"] + 2 * th, "farm-arc", 1.5, "5 4")
+    am = math.radians(r["beta"] + th)
+    n.label(o[0] + rb * math.cos(am), rb * math.sin(am), "2θ", dx=8, dy=0, size=16, anchor="start")
+    arc(n, o, 2.6, 0, th)
+    n.label(o[0] + 3.0 * math.cos(math.radians(th / 2)), 3.0 * math.sin(math.radians(th / 2)), "θ", dx=4, dy=5, size=15, anchor="start")
+    # the two reflections of the cow, each perpendicular to its line
+    n.line(L, b, *B1, "ink-line", 1, "2 3").line(*B1, *B2, "ink-line", 1, "2 3")
+    # the real path, the last leg reflected to B1, and the straight line A -> B2
+    n.line(0, a, *P, "box-path", 3).line(*P, *Q, "box-path", 3).line(*Q, L, b, "box-path", 3)
+    n.line(*Q, *B1, "ink-line", 1.5, "4 3")
+    n.line(0, a, *B2, "box-path", 3, "8 5")
+    n.point(*P, "s3", r=5, title="נקודת האוכל P").label(*P, "P", dx=-10, dy=-8, size=15, anchor="end")
+    n.point(*Q, "s1", r=5, title="נקודת המים Q").label(*Q, "Q", dx=0, dy=20, size=15)
+    n.point(*Qs, "s1", r=4, title="Q* : התמונה של Q דרך קו האוכל").label(*Qs, "Q*", dx=10, dy=4, size=15, anchor="start")
+    n.point(*o, "ink", "O", dx=0, dy=20, r=5, title="O : נקודת המפגש של הקווים")
+    n.point(0, a, "ink", "A", dx=-12, dy=-6, r=6, title="החוואי A")
+    n.point(L, b, "s2", "B", dx=13, dy=-6, r=6, title="הפרה B")
+    n.point(*B1, "ink", "B1", dx=16, dy=6, r=4, title="B1 : השיקוף של B דרך קו המים")
+    n.point(*B2, "s2", "B2", dx=0, dy=-12, r=6, title="B2 : השיקוף של B1 דרך קו האוכל, B מסובב ב-2θ סביב O")
+    return n.svg()
+
+
+def tilt_unfold_legend():
+    return ('<span class="viz-legend"><span><i class="s3"></i>קו האוכל ושיקופיו</span><span><i class="s1"></i>קו המים ושיקופיו</span>'
+            '<span><i class="box-face"></i>השטח עצמו</span><span><i class="box-copy"></i>השיקופים שלו</span>'
+            '<span><i class="farm-arc"></i>הסיבוב של B סביב O</span>'
+            '<span><i class="box-path"></i>המסלול הקצר ביותר, והקו הישר מ-A ל-B2</span></span>')
+
+
+def tilt_table():
+    """Part c's example: the three legs, each with the point it ends at and its length, and the
+    straight line A -> B2 that they add up to (A = (0, 1) is where the first leg starts)."""
+    L, H, a, b = L0, H0, 1, 2
+    r = tilted(L, H, a, b, TH0)
+    rows = [("מהחוואי \\( A \\) לאוכל", "P", r["P"], "z1", r["z1"]), ("מהאוכל למים", "Q", r["Q"], "z2", r["z2"]),
+            ("מהמים לפרה", "B", (L, b), "z3", r["z3"]), ("הקו הישר מ-\\( A \\) ל-\\( B_2 \\)", "B2", r["B2"], "z", r["z"])]
+    out = ["| הקטע | עד הנקודה | האורך |", "|---|:-:|:-:|"]
+    for name, pn, q, zn, z in rows:
+        out.append(f'| {name} | ‏<span dir="ltr">{pn} = ({q[0]:.2f}, {q[1]:.2f})</span> | ‏<span dir="ltr">{zn} ≈ {z:.3f}</span> |')
+    return "\n".join(out)
+
+
 def blocks():
     """The generated blocks, in page order."""
     return [
@@ -178,6 +392,11 @@ def blocks():
         part_a_svg(),
         part_b_svg(),
         unfold_legend(),
+        tilt_problem_svg(),
+        tilt_problem_legend(),
+        tilt_unfold_svg(),
+        tilt_unfold_legend(),
+        tilt_table(),
     ]
 
 

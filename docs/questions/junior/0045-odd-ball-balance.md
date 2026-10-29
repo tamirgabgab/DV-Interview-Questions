@@ -18,20 +18,6 @@ added: 2026-10-24
 כף, ולכן אם שמים מספר שונה של כדורים בכל צד, התוצאה לא תגיד הרבה. אסור לשים אותו כדור
 בשתי הכפות באותה שקילה. עליך לממש פונקציה שמחזירה את מספר הכדור החריג ואת סוגו :
 
-=== "SystemVerilog"
-    ```systemverilog title="scale, odd_t"
-    // The balance: weigh() puts the balls of `left` on the left pan and those of `right` on
-    // the right pan, and returns +1 when the left pan is heavier, -1 when the right pan is,
-    // and 0 when they balance. A ball may not be on both pans.
-    virtual class scale;
-      pure virtual function int weigh(int left[$], int right[$]);
-    endclass
-
-    typedef struct { int ball; bit heavy; } odd_t;     // the odd ball, and whether it is heavy
-
-    // function automatic odd_t odd_ball(int n, scale s);   // to write
-    ```
-
 === "Python"
     ```python title="weigh, find_odd_ball"
     def weigh(left: list[int], right: list[int]) -> str:
@@ -46,6 +32,20 @@ added: 2026-10-24
 
     def find_odd_ball(n: int, weigh) -> tuple[int, str]:
         """מחזירה (מספר הכדור, "heavy" או "light")"""
+    ```
+
+=== "SystemVerilog"
+    ```systemverilog title="scale, odd_t"
+    // The balance: weigh() puts the balls of `left` on the left pan and those of `right` on
+    // the right pan, and returns +1 when the left pan is heavier, -1 when the right pan is,
+    // and 0 when they balance. A ball may not be on both pans.
+    virtual class scale;
+      pure virtual function int weigh(int left[$], int right[$]);
+    endclass
+
+    typedef struct { int ball; bit heavy; } odd_t;     // the odd ball, and whether it is heavy
+
+    // function automatic odd_t odd_ball(int n, scale s);   // to write
     ```
 
 ??? interviewer "מה המראיין בודק"
@@ -137,6 +137,38 @@ added: 2026-10-24
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="find_odd_ball_12_tree" linenums="1"
+        def find_odd_ball_12_tree(weigh):
+            r1 = weigh([1, 2, 3, 4], [5, 6, 7, 8])
+            if r1 == "equal":
+                r2 = weigh([9, 10, 11], [1, 2, 3])
+                if r2 == "equal":
+                    return 12, ("heavy" if weigh([12], [1]) == "left" else "light")
+                kind = "heavy" if r2 == "left" else "light"
+                r3 = weigh([9], [10])
+                if r3 == "equal":
+                    return 11, kind
+                heavier, lighter = (9, 10) if r3 == "left" else (10, 9)
+                return (heavier if kind == "heavy" else lighter), kind
+
+            h, l = ([1, 2, 3, 4], [5, 6, 7, 8]) if r1 == "left" else ([5, 6, 7, 8], [1, 2, 3, 4])
+            r2 = weigh([h[0], h[1], l[0]], [h[2], l[1], 9])  # (1)!
+            if r2 == "left":
+                r3 = weigh([h[0]], [h[1]])
+                if r3 == "equal":
+                    return l[1], "light"
+                return (h[0] if r3 == "left" else h[1]), "heavy"
+            if r2 == "right":
+                return (h[2], "heavy") if weigh([h[2]], [9]) == "left" else (l[0], "light")
+            r3 = weigh([l[2]], [l[3]])
+            if r3 == "equal":
+                return h[3], "heavy"
+            return (l[3] if r3 == "left" else l[2]), "light"
+        ```
+
+        1. ‏\( h_1, h_2 \) נשארים בשמאל, \( h_3 \) עובר לימין, \( l_1 \) עובר לשמאל, \( l_2 \) נשאר בימין, ו-9 התקין משלים את הכף הימנית לשלושה כדורים. \( h_4, l_3, l_4 \) יוצאים.
+
     === "SystemVerilog"
         ```systemverilog title="odd_ball_12_tree" linenums="1"
         // Part a: the decision tree, three weighings at most.
@@ -166,38 +198,6 @@ added: 2026-10-24
           if (r3 == 0) return '{h[3], 1};
           return '{(r3 == 1) ? l[3] : l[2], 0};
         endfunction
-        ```
-
-        1. ‏\( h_1, h_2 \) נשארים בשמאל, \( h_3 \) עובר לימין, \( l_1 \) עובר לשמאל, \( l_2 \) נשאר בימין, ו-9 התקין משלים את הכף הימנית לשלושה כדורים. \( h_4, l_3, l_4 \) יוצאים.
-
-    === "Python"
-        ```python title="find_odd_ball_12_tree" linenums="1"
-        def find_odd_ball_12_tree(weigh):
-            r1 = weigh([1, 2, 3, 4], [5, 6, 7, 8])
-            if r1 == "equal":
-                r2 = weigh([9, 10, 11], [1, 2, 3])
-                if r2 == "equal":
-                    return 12, ("heavy" if weigh([12], [1]) == "left" else "light")
-                kind = "heavy" if r2 == "left" else "light"
-                r3 = weigh([9], [10])
-                if r3 == "equal":
-                    return 11, kind
-                heavier, lighter = (9, 10) if r3 == "left" else (10, 9)
-                return (heavier if kind == "heavy" else lighter), kind
-
-            h, l = ([1, 2, 3, 4], [5, 6, 7, 8]) if r1 == "left" else ([5, 6, 7, 8], [1, 2, 3, 4])
-            r2 = weigh([h[0], h[1], l[0]], [h[2], l[1], 9])  # (1)!
-            if r2 == "left":
-                r3 = weigh([h[0]], [h[1]])
-                if r3 == "equal":
-                    return l[1], "light"
-                return (h[0] if r3 == "left" else h[1]), "heavy"
-            if r2 == "right":
-                return (h[2], "heavy") if weigh([h[2]], [9]) == "left" else (l[0], "light")
-            r3 = weigh([l[2]], [l[3]])
-            if r3 == "equal":
-                return h[3], "heavy"
-            return (l[3] if r3 == "left" else l[2]), "light"
         ```
 
         1. ‏\( h_1, h_2 \) נשארים בשמאל, \( h_3 \) עובר לימין, \( l_1 \) עובר לשמאל, \( l_2 \) נשאר בימין, ו-9 התקין משלים את הכף הימנית לשלושה כדורים. \( h_4, l_3, l_4 \) יוצאים.
@@ -300,6 +300,23 @@ added: 2026-10-24
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="CODES, find_odd_ball_12" linenums="1"
+        CODES = {1: (1, 1, 0),  2: (1, 0, 1),   3: (1, -1, 0),   4: (1, 1, -1),
+                 5: (-1, 0, 0), 6: (-1, -1, -1), 7: (-1, 0, 1),  8: (-1, 1, 1),
+                 9: (0, 1, 0),  10: (0, -1, 1),  11: (0, -1, -1), 12: (0, 0, -1)}
+        S = {"left": 1, "right": -1, "equal": 0}
+
+        def find_odd_ball_12(weigh):
+            out = tuple(S[weigh([b for b, c in CODES.items() if c[j] == 1],
+                                [b for b, c in CODES.items() if c[j] == -1])] for j in range(3))
+            for b, c in CODES.items():
+                if c == out:
+                    return b, "heavy"
+                if c == tuple(-x for x in out):
+                    return b, "light"
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="CODES, odd_ball_12" linenums="1"
         // Part b: three weighings fixed in advance; ball b + 1 sits on the left pan (+1), on the
@@ -324,23 +341,6 @@ added: 2026-10-24
           end
           return '{0, 0};                                       // no ball gives these outcomes
         endfunction
-        ```
-
-    === "Python"
-        ```python title="CODES, find_odd_ball_12" linenums="1"
-        CODES = {1: (1, 1, 0),  2: (1, 0, 1),   3: (1, -1, 0),   4: (1, 1, -1),
-                 5: (-1, 0, 0), 6: (-1, -1, -1), 7: (-1, 0, 1),  8: (-1, 1, 1),
-                 9: (0, 1, 0),  10: (0, -1, 1),  11: (0, -1, -1), 12: (0, 0, -1)}
-        S = {"left": 1, "right": -1, "equal": 0}
-
-        def find_odd_ball_12(weigh):
-            out = tuple(S[weigh([b for b, c in CODES.items() if c[j] == 1],
-                                [b for b, c in CODES.items() if c[j] == -1])] for j in range(3))
-            for b, c in CODES.items():
-                if c == out:
-                    return b, "heavy"
-                if c == tuple(-x for x in out):
-                    return b, "light"
         ```
 
     #### למה זה נכון { .sol-proof }
@@ -456,6 +456,57 @@ added: 2026-10-24
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="find_odd_ball" linenums="1"
+        from itertools import product
+
+        S = {"left": 1, "right": -1, "equal": 0}
+
+        def find_odd_ball(n, weigh):
+            k = 2
+            while (3 ** k - 3) // 2 < n:
+                k += 1
+
+            def correct(c):  # the first change between neighbours goes up by 1 (mod 3)
+                i = next((i for i in range(k - 1) if c[i] != c[i + 1]), None)
+                return i is not None and (c[i + 1] - c[i]) % 3 == 1
+
+            # one representative per orbit: a correct code whose first digit is 1 (off the scale)
+            leaders = [c for c in product(range(3), repeat=k) if c[0] == 1 and correct(c)]
+            q, extra = -(-n // 3), -n % 3
+            codes = []
+            for c in leaders[:q]:
+                codes += [tuple((d + s) % 3 - 1 for d in c) for s in (1, 2, 0)]  # first digits +1, -1, 0
+            if extra == 1:
+                codes.pop()          # drop the member that is off the scale in weighing 1
+            elif extra == 2:
+                del codes[-3:-1]     # drop the +1/-1 pair, they cancel in weighing 1
+            ball = {b + 1: c for b, c in enumerate(codes)}
+
+            out = []
+            for j in range(k):
+                L = [b for b, c in ball.items() if c[j] == 1]
+                R = [b for b, c in ball.items() if c[j] == -1]
+                if j:  # fix the pan counts with balls known to be genuine after weighing 1
+                    genuine = [b for b, c in ball.items() if out[0] not in (c[0], -c[0])]
+                    for g in genuine:
+                        if len(L) == len(R):
+                            break
+                        big, small = (L, R) if len(L) > len(R) else (R, L)
+                        if g in big:
+                            big.remove(g)
+                        elif g not in small:
+                            small.append(g)
+                out.append(S[weigh(L, R)])
+
+            out = tuple(out)
+            for b, c in ball.items():
+                if c == out:
+                    return b, "heavy"
+                if c == tuple(-x for x in out):
+                    return b, "light"
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="correct, odd_ball" linenums="1"
         localparam int MAXK = 6, MAXN = 363;      // six weighings handle up to 363 balls
@@ -523,57 +574,6 @@ added: 2026-10-24
           foreach (q[i]) if (q[i] == x) return i;
           return -1;
         endfunction
-        ```
-
-    === "Python"
-        ```python title="find_odd_ball" linenums="1"
-        from itertools import product
-
-        S = {"left": 1, "right": -1, "equal": 0}
-
-        def find_odd_ball(n, weigh):
-            k = 2
-            while (3 ** k - 3) // 2 < n:
-                k += 1
-
-            def correct(c):  # the first change between neighbours goes up by 1 (mod 3)
-                i = next((i for i in range(k - 1) if c[i] != c[i + 1]), None)
-                return i is not None and (c[i + 1] - c[i]) % 3 == 1
-
-            # one representative per orbit: a correct code whose first digit is 1 (off the scale)
-            leaders = [c for c in product(range(3), repeat=k) if c[0] == 1 and correct(c)]
-            q, extra = -(-n // 3), -n % 3
-            codes = []
-            for c in leaders[:q]:
-                codes += [tuple((d + s) % 3 - 1 for d in c) for s in (1, 2, 0)]  # first digits +1, -1, 0
-            if extra == 1:
-                codes.pop()          # drop the member that is off the scale in weighing 1
-            elif extra == 2:
-                del codes[-3:-1]     # drop the +1/-1 pair, they cancel in weighing 1
-            ball = {b + 1: c for b, c in enumerate(codes)}
-
-            out = []
-            for j in range(k):
-                L = [b for b, c in ball.items() if c[j] == 1]
-                R = [b for b, c in ball.items() if c[j] == -1]
-                if j:  # fix the pan counts with balls known to be genuine after weighing 1
-                    genuine = [b for b, c in ball.items() if out[0] not in (c[0], -c[0])]
-                    for g in genuine:
-                        if len(L) == len(R):
-                            break
-                        big, small = (L, R) if len(L) > len(R) else (R, L)
-                        if g in big:
-                            big.remove(g)
-                        elif g not in small:
-                            small.append(g)
-                out.append(S[weigh(L, R)])
-
-            out = tuple(out)
-            for b, c in ball.items():
-                if c == out:
-                    return b, "heavy"
-                if c == tuple(-x for x in out):
-                    return b, "light"
         ```
 
     #### למה זה נכון { .sol-proof }

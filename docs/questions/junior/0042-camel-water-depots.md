@@ -253,68 +253,6 @@ added: 2026-10-23
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="camel_segments, camel_distance, camel_passes" linenums="1" hl_lines="13 16 17 39 40 41"
-        localparam int MAXS = 32;        // segments: at most one per load
-        localparam int MAXP = 1024;      // passes: MAXS squared
-
-        // The route as segments: the water in motion drops from w to every multiple of c above T
-        // and then to T; with j loads every km costs (2j - 1) a litres. Returns the segment count.
-        function automatic int camel_segments(real a, real c, real w, real T, output real x0[MAXS], output real x1[MAXS], output int loads[MAXS]);
-          real level[MAXS + 1];
-          real x = 0.0;
-          int k = int'($ceil(w / c)), m = 0, n = 0;
-          level[m] = w; m++;
-          for (int j = k - 1; j >= 1; j--) if (j * c > T) begin level[m] = j * c; m++; end
-          level[m] = T; m++;
-          for (int i = 0; i + 1 < m; i++) begin                            // (1)!
-            int j = int'($ceil(level[i] / c));
-            x0[n] = x;
-            x1[n] = x + (level[i] - level[i + 1]) / ((2 * j - 1) * a);     // (2)!
-            loads[n] = j;
-            x = x1[n]; n++;
-          end
-          return n;
-        endfunction
-
-        // The closed form for T <= c: (1/a) [c (1 + 1/3 + ... + 1/(2k - 3)) + r / (2k - 1) - T].
-        function automatic real camel_distance(real a, real c, real w, real T);
-          int k = int'($ceil(w / c));
-          real s = 0.0;
-          for (int j = 1; j < k; j++) s += 1.0 / (2 * j - 1);
-          return (c * s + (w - (k - 1) * c) / (2 * k - 1) - T) / a;
-        endfunction
-
-        // Every pass of the camel, full loads first and the partial load last: the segment, out or
-        // back, the litres when it leaves and when it arrives. depots[i] is the water at the start
-        // of segment i (depots[n] at the far end). Returns the number of passes.
-        function automatic int camel_passes(real a, real c, real w, real T, output int seg[MAXP], output bit back[MAXP], output real carry0[MAXP], output real carry1[MAXP], output real depots[MAXS + 1]);
-          real x0[MAXS], x1[MAXS];
-          int loads[MAXS];
-          int n = camel_segments(a, c, w, T, x0, x1, loads), p = 0;
-          foreach (depots[i]) depots[i] = 0.0;
-          depots[0] = w;
-          for (int s = 0; s < n; s++) begin
-            real cost = a * (x1[s] - x0[s]);
-            for (int i = 0; i < loads[s]; i++) begin
-              real take = (depots[s] < c) ? depots[s] : c;                  // (3)!
-              real keep = (i == loads[s] - 1) ? 0.0 : cost;                 // (4)!
-              depots[s] -= take;
-              depots[s + 1] += take - cost - keep;                           // (5)!
-              seg[p] = s; back[p] = 0; carry0[p] = take; carry1[p] = take - cost; p++;
-              if (keep > 0.0) begin seg[p] = s; back[p] = 1; carry0[p] = keep; carry1[p] = 0.0; p++; end
-            end
-          end
-          return p;
-        endfunction
-        ```
-
-        1. קטע לכל זוג רמות סמוכות; עם \( w \le c \) יש רמה אחת בלבד מעל \( T \), וקטע אחד.
-        2. אורך הקטע : הירידה במים חלקי המחיר של המטענים שבו.
-        3. מטען מלא כל עוד יש, והשארית בהליכה האחרונה.
-        4. בהליכה שאינה האחרונה הגמל שומר בדיוק את מה שהדרך חזרה שורפת.
-        5. מה שנשאר אחרי השריפה והשמירה יורד במחסן הרחוק; בסוף הקטע הוא מסתכם ברמה הבאה.
-
     === "Python"
         ```python title="camel_segments, camel_distance, camel_passes, camel_check" linenums="1" hl_lines="8 15 36 37 38"
         from math import ceil
@@ -378,6 +316,68 @@ added: 2026-10-23
         ```
 
         1. הרמות : \( w \), הכפולות של \( c \) שמעל \( T \) ומתחת ל-\( w \), ו-\( T \).
+        2. אורך הקטע : הירידה במים חלקי המחיר של המטענים שבו.
+        3. מטען מלא כל עוד יש, והשארית בהליכה האחרונה.
+        4. בהליכה שאינה האחרונה הגמל שומר בדיוק את מה שהדרך חזרה שורפת.
+        5. מה שנשאר אחרי השריפה והשמירה יורד במחסן הרחוק; בסוף הקטע הוא מסתכם ברמה הבאה.
+
+    === "SystemVerilog"
+        ```systemverilog title="camel_segments, camel_distance, camel_passes" linenums="1" hl_lines="13 16 17 39 40 41"
+        localparam int MAXS = 32;        // segments: at most one per load
+        localparam int MAXP = 1024;      // passes: MAXS squared
+
+        // The route as segments: the water in motion drops from w to every multiple of c above T
+        // and then to T; with j loads every km costs (2j - 1) a litres. Returns the segment count.
+        function automatic int camel_segments(real a, real c, real w, real T, output real x0[MAXS], output real x1[MAXS], output int loads[MAXS]);
+          real level[MAXS + 1];
+          real x = 0.0;
+          int k = int'($ceil(w / c)), m = 0, n = 0;
+          level[m] = w; m++;
+          for (int j = k - 1; j >= 1; j--) if (j * c > T) begin level[m] = j * c; m++; end
+          level[m] = T; m++;
+          for (int i = 0; i + 1 < m; i++) begin                            // (1)!
+            int j = int'($ceil(level[i] / c));
+            x0[n] = x;
+            x1[n] = x + (level[i] - level[i + 1]) / ((2 * j - 1) * a);     // (2)!
+            loads[n] = j;
+            x = x1[n]; n++;
+          end
+          return n;
+        endfunction
+
+        // The closed form for T <= c: (1/a) [c (1 + 1/3 + ... + 1/(2k - 3)) + r / (2k - 1) - T].
+        function automatic real camel_distance(real a, real c, real w, real T);
+          int k = int'($ceil(w / c));
+          real s = 0.0;
+          for (int j = 1; j < k; j++) s += 1.0 / (2 * j - 1);
+          return (c * s + (w - (k - 1) * c) / (2 * k - 1) - T) / a;
+        endfunction
+
+        // Every pass of the camel, full loads first and the partial load last: the segment, out or
+        // back, the litres when it leaves and when it arrives. depots[i] is the water at the start
+        // of segment i (depots[n] at the far end). Returns the number of passes.
+        function automatic int camel_passes(real a, real c, real w, real T, output int seg[MAXP], output bit back[MAXP], output real carry0[MAXP], output real carry1[MAXP], output real depots[MAXS + 1]);
+          real x0[MAXS], x1[MAXS];
+          int loads[MAXS];
+          int n = camel_segments(a, c, w, T, x0, x1, loads), p = 0;
+          foreach (depots[i]) depots[i] = 0.0;
+          depots[0] = w;
+          for (int s = 0; s < n; s++) begin
+            real cost = a * (x1[s] - x0[s]);
+            for (int i = 0; i < loads[s]; i++) begin
+              real take = (depots[s] < c) ? depots[s] : c;                  // (3)!
+              real keep = (i == loads[s] - 1) ? 0.0 : cost;                 // (4)!
+              depots[s] -= take;
+              depots[s + 1] += take - cost - keep;                           // (5)!
+              seg[p] = s; back[p] = 0; carry0[p] = take; carry1[p] = take - cost; p++;
+              if (keep > 0.0) begin seg[p] = s; back[p] = 1; carry0[p] = keep; carry1[p] = 0.0; p++; end
+            end
+          end
+          return p;
+        endfunction
+        ```
+
+        1. קטע לכל זוג רמות סמוכות; עם \( w \le c \) יש רמה אחת בלבד מעל \( T \), וקטע אחד.
         2. אורך הקטע : הירידה במים חלקי המחיר של המטענים שבו.
         3. מטען מלא כל עוד יש, והשארית בהליכה האחרונה.
         4. בהליכה שאינה האחרונה הגמל שומר בדיוק את מה שהדרך חזרה שורפת.

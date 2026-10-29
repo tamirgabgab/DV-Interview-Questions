@@ -36,7 +36,7 @@ pushed to `main`, which publishes the site.
 | Difficulty scale      | 3 levels: easy / medium / hard, relative to the position level           |
 | Multi-level questions | One file in one level folder                                             |
 | Source field          | Optional `source` field, empty by default                                |
-| Code languages        | SystemVerilog + Python, as linked tabs (SystemVerilog first)             |
+| Code languages        | Python + SystemVerilog, as linked tabs (Python first since 2026-10-29)    |
 | Solutions             | Collapsed by default (practice mode); one collapsed solution per sub-part |
 | Multi-part questions  | One file, `### סעיף א/ב/ג` with a solution after each part               |
 | Owner's own code      | Kept as sent (comments added, minimal bug fixes called out to the owner) |

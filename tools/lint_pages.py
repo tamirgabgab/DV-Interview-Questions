@@ -110,6 +110,28 @@ def lint_code_spaces(text: str) -> list[str]:
     return problems
 
 
+TAB = re.compile(r'^(\s*)=== "([^"]+)"')
+
+
+def lint_tab_order(text: str) -> list[str]:
+    """Code tabs are Python first, then SystemVerilog (the owner's choice, 2026-10-29): the
+    first tab is the one a page opens on. A SystemVerilog tab followed, at its own indent,
+    by a Python tab of the same set is out of order."""
+    problems, open_sv = [], {}
+    for n, line in enumerate(text.split("\n"), 1):
+        m = TAB.match(line)
+        if m:
+            ind, name = len(m.group(1)), m.group(2)
+            if name == "Python" and open_sv.get(ind):
+                problems.append(f"{n}: the Python tab comes after the SystemVerilog tab of line {open_sv[ind]} (Python first)")
+            open_sv = {k: v for k, v in open_sv.items() if k < ind}
+            if name == "SystemVerilog":
+                open_sv[ind] = n
+        elif line.strip() and len(line) - len(line.lstrip(" ")) <= min(open_sv, default=10**6):
+            open_sv = {k: v for k, v in open_sv.items() if k < len(line) - len(line.lstrip(" "))}
+    return problems
+
+
 SELFCHECK = re.compile(r'<div class="selfcheck"([^>]*)>')
 NUMBER = re.compile(r"^-?\d*\.?\d+(/\d*\.?\d+)?$")
 
@@ -319,6 +341,7 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     problems.extend(lint_highlights(path.read_text(encoding="utf-8")))
     problems.extend(lint_followups(path.read_text(encoding="utf-8")))
     problems.extend(lint_code_spaces(path.read_text(encoding="utf-8")))
+    problems.extend(lint_tab_order(path.read_text(encoding="utf-8")))
     problems.extend(lint_selfchecks(path.read_text(encoding="utf-8")))
     return problems
 

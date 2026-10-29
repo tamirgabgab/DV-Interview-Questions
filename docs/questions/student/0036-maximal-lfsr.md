@@ -74,6 +74,27 @@ added: 2026-10-21
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="lfsr_next, lfsr_period" hl_lines="2 3 11"
+        def lfsr_next(state: int, mask: int, width: int) -> int:
+            fb = bin(state & mask).count("1") & 1          # (1)!
+            return (state >> 1) | (fb << (width - 1))      # (2)!
+
+
+        def lfsr_period(mask: int, width: int, seed: int = 1) -> int:
+            """Steps from `seed` until a state repeats: the length of the cycle reached."""
+            seen, s, k = {}, seed, 0
+            while s not in seen:
+                seen[s] = k
+                s = lfsr_next(s, mask, width)
+                k += 1
+            return k - seen[s]                             # (3)!
+        ```
+
+        1. הזוגיות של הביטים שה-taps בוחרים.
+        2. הזזה ימינה, והביט החדש נכנס למקום העליון.
+        3. ההפרש בין הצעד הנוכחי לצעד שבו המצב נראה לראשונה הוא אורך המחזור.
+
     === "SystemVerilog"
         ```systemverilog title="function lfsr_next, lfsr_period" hl_lines="2 3 12"
         function automatic int lfsr_next(int state, int mask, int width);
@@ -99,27 +120,6 @@ added: 2026-10-21
            ה-LFSR.
         3. מערך אסוציאטיבי : מצב → באיזה צעד ראינו אותו. ההפרש בין הצעד הנוכחי לצעד
            שבו המצב נראה לראשונה הוא אורך המחזור (זנב לפני המחזור, אם יש, לא נספר).
-
-    === "Python"
-        ```python title="lfsr_next, lfsr_period" hl_lines="2 3 11"
-        def lfsr_next(state: int, mask: int, width: int) -> int:
-            fb = bin(state & mask).count("1") & 1          # (1)!
-            return (state >> 1) | (fb << (width - 1))      # (2)!
-
-
-        def lfsr_period(mask: int, width: int, seed: int = 1) -> int:
-            """Steps from `seed` until a state repeats: the length of the cycle reached."""
-            seen, s, k = {}, seed, 0
-            while s not in seen:
-                seen[s] = k
-                s = lfsr_next(s, mask, width)
-                k += 1
-            return k - seen[s]                             # (3)!
-        ```
-
-        1. הזוגיות של הביטים שה-taps בוחרים.
-        2. הזזה ימינה, והביט החדש נכנס למקום העליון.
-        3. ההפרש בין הצעד הנוכחי לצעד שבו המצב נראה לראשונה הוא אורך המחזור.
 
     #### למה זה נכון { .sol-proof }
 

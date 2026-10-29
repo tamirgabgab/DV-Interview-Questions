@@ -233,6 +233,50 @@ added: 2026-10-16
 
     **החדר וה-API.**
 
+    === "Python"
+        ```python title="class Room" linenums="1" hl_lines="10 21 31"
+        N = 16               # people and boxes
+        MAX_OPENS = N // 2   # boxes each person may open
+        MAX_SWAPS = 4        # swaps person 0 may make
+
+
+        class Room:
+            """notes[b] is the note in box b (1..N); notes[0] is unused."""
+
+            def __init__(self, notes):
+                self._notes = list(notes)    # hidden: only the API below can read it (1)
+                self.swaps_left = MAX_SWAPS
+                self.opens_left = 0
+                self.helper_done = False     # set when the first of persons 1..N walks in
+
+            # ---- person 0 only ----
+            def look_all(self):
+                assert not self.helper_done, "only person 0 may look at all the boxes"
+                return list(self._notes)   # (2)!
+
+            def swap(self, a, b):
+                assert not self.helper_done and self.swaps_left > 0, "no swaps allowed"   # (3)!
+                self.swaps_left -= 1
+                self._notes[a], self._notes[b] = self._notes[b], self._notes[a]
+
+            # ---- persons 1..N, one at a time ----
+            def enter(self):
+                self.helper_done = True
+                self.opens_left = MAX_OPENS   # (4)!
+
+            def open_box(self, box):
+                assert self.opens_left > 0, "no opens left"
+                self.opens_left -= 1
+                return self._notes[box]
+        ```
+
+        1. ‏`list(notes)` מעתיק את הקלט, כדי שמי שבנה את החדר לא יוכל לשנות את הפתקים
+           דרך הרשימה המקורית. הקו התחתון מסמן שהשדה פרטי.
+        2. גם כאן מוחזר עותק ולא הרשימה עצמה. אחרת אדם 0 היה יכול "להחליף" כמה שהוא רוצה
+           בלי לעבור דרך `swap`.
+        3. שתי המגבלות של אדם 0 במקום אחד : אחרי שהאדם הראשון נכנס, ולא יותר מ-4 פעמים.
+        4. המונה מתאפס בכל כניסה, כי 8 הפתיחות הן לכל אדם בנפרד.
+
     === "SystemVerilog"
         ```systemverilog title="class room_c" linenums="1" hl_lines="8 25 39"
         localparam int N         = 16;      // people and boxes
@@ -289,53 +333,61 @@ added: 2026-10-16
         4. כל כניסה מאפסת את מונה הפתיחות, כי המגבלה היא 8 פתיחות **לכל אדם** ולא לכולם
            יחד.
 
-    === "Python"
-        ```python title="class Room" linenums="1" hl_lines="10 21 31"
-        N = 16               # people and boxes
-        MAX_OPENS = N // 2   # boxes each person may open
-        MAX_SWAPS = 4        # swaps person 0 may make
-
-
-        class Room:
-            """notes[b] is the note in box b (1..N); notes[0] is unused."""
-
-            def __init__(self, notes):
-                self._notes = list(notes)    # hidden: only the API below can read it (1)
-                self.swaps_left = MAX_SWAPS
-                self.opens_left = 0
-                self.helper_done = False     # set when the first of persons 1..N walks in
-
-            # ---- person 0 only ----
-            def look_all(self):
-                assert not self.helper_done, "only person 0 may look at all the boxes"
-                return list(self._notes)   # (2)!
-
-            def swap(self, a, b):
-                assert not self.helper_done and self.swaps_left > 0, "no swaps allowed"   # (3)!
-                self.swaps_left -= 1
-                self._notes[a], self._notes[b] = self._notes[b], self._notes[a]
-
-            # ---- persons 1..N, one at a time ----
-            def enter(self):
-                self.helper_done = True
-                self.opens_left = MAX_OPENS   # (4)!
-
-            def open_box(self, box):
-                assert self.opens_left > 0, "no opens left"
-                self.opens_left -= 1
-                return self._notes[box]
-        ```
-
-        1. ‏`list(notes)` מעתיק את הקלט, כדי שמי שבנה את החדר לא יוכל לשנות את הפתקים
-           דרך הרשימה המקורית. הקו התחתון מסמן שהשדה פרטי.
-        2. גם כאן מוחזר עותק ולא הרשימה עצמה. אחרת אדם 0 היה יכול "להחליף" כמה שהוא רוצה
-           בלי לעבור דרך `swap`.
-        3. שתי המגבלות של אדם 0 במקום אחד : אחרי שהאדם הראשון נכנס, ולא יותר מ-4 פעמים.
-        4. המונה מתאפס בכל כניסה, כי 8 הפתיחות הן לכל אדם בנפרד.
-
     **האסטרטגיה.** `cycle_from` הולכת לפי הפתקים מקופסה מסוימת עד שחוזרים אליה. אדם 0
     משתמש בה כדי למצוא את המעגל הארוך, וכל אחד מהאחרים עושה את אותו הילוך בדיוק, אבל
     דרך `open_box` ועם מגבלה של 8 פתיחות.
+
+    === "Python"
+        ```python title="cycle_from, helper, find_my_note, play" linenums="1" hl_lines="21 22 28"
+        def cycle_from(notes, start):
+            """The boxes met when following the notes from box `start` until back at `start`."""
+            cycle = [start]
+            box = notes[start]
+            while box != start:   # (1)!
+                cycle.append(box)
+                box = notes[box]
+            return cycle
+
+
+        def helper(room):
+            """Person 0: find the one cycle longer than MAX_OPENS (if any) and cut it in half."""
+            notes = room.look_all()
+            seen = set()
+            for start in range(1, N + 1):
+                if start in seen:
+                    continue
+                cycle = cycle_from(notes, start)
+                seen.update(cycle)
+                if len(cycle) > MAX_OPENS:
+                    room.swap(cycle[0], cycle[len(cycle) // 2])   # -> cycles of L/2 and L - L/2 (2)
+                    return                                        # there is at most one long cycle (3)
+
+
+        def find_my_note(room, me):
+            """Person `me`: open my own box, then always the box whose number is on the note."""
+            room.enter()
+            box = me   # (4)!
+            for _ in range(MAX_OPENS):
+                note = room.open_box(box)
+                if note == me:
+                    return True
+                box = note
+            return False
+
+
+        def play(notes):
+            """The whole game: person 0 first, then persons 1..N. True when everybody wins."""
+            room = Room(notes)
+            helper(room)
+            winners = [me for me in range(1, N + 1) if find_my_note(room, me)]
+            return len(winners) == N
+        ```
+
+        1. הלולאה מסתיימת תמיד, כי הפתקים הם תמורה וההילוך מ-`start` חייב לחזור אליו.
+        2. ‏`cycle[0]` ו-`cycle[L // 2]` הם \( c_0 \) ו-\( c_h \) מההוכחה : החלקים באורך
+           \( \lfloor L/2 \rfloor \) ו-\( \lceil L/2 \rceil \), שניהם עד 8.
+        3. החלפה אחת ויוצאים. אין מעגל ארוך שני ב-16 קופסאות.
+        4. מתחילים מהקופסה **שלי**, וכך מובטח שאני על המעגל שמכיל את הפתק שלי.
 
     === "SystemVerilog"
         ```systemverilog title="cycle_from, helper, find_my_note, play" linenums="1" hl_lines="25 26 33"
@@ -405,58 +457,6 @@ added: 2026-10-16
            הפתק שלי.
         6. המגבלה נאכפת פעמיים : כאן, כדי שהאסטרטגיה לא תנסה פתיחה תשיעית, ובתוך `open_box`,
            כדי שאף אסטרטגיה אחרת לא תוכל לרמות.
-
-    === "Python"
-        ```python title="cycle_from, helper, find_my_note, play" linenums="1" hl_lines="21 22 28"
-        def cycle_from(notes, start):
-            """The boxes met when following the notes from box `start` until back at `start`."""
-            cycle = [start]
-            box = notes[start]
-            while box != start:   # (1)!
-                cycle.append(box)
-                box = notes[box]
-            return cycle
-
-
-        def helper(room):
-            """Person 0: find the one cycle longer than MAX_OPENS (if any) and cut it in half."""
-            notes = room.look_all()
-            seen = set()
-            for start in range(1, N + 1):
-                if start in seen:
-                    continue
-                cycle = cycle_from(notes, start)
-                seen.update(cycle)
-                if len(cycle) > MAX_OPENS:
-                    room.swap(cycle[0], cycle[len(cycle) // 2])   # -> cycles of L/2 and L - L/2 (2)
-                    return                                        # there is at most one long cycle (3)
-
-
-        def find_my_note(room, me):
-            """Person `me`: open my own box, then always the box whose number is on the note."""
-            room.enter()
-            box = me   # (4)!
-            for _ in range(MAX_OPENS):
-                note = room.open_box(box)
-                if note == me:
-                    return True
-                box = note
-            return False
-
-
-        def play(notes):
-            """The whole game: person 0 first, then persons 1..N. True when everybody wins."""
-            room = Room(notes)
-            helper(room)
-            winners = [me for me in range(1, N + 1) if find_my_note(room, me)]
-            return len(winners) == N
-        ```
-
-        1. הלולאה מסתיימת תמיד, כי הפתקים הם תמורה וההילוך מ-`start` חייב לחזור אליו.
-        2. ‏`cycle[0]` ו-`cycle[L // 2]` הם \( c_0 \) ו-\( c_h \) מההוכחה : החלקים באורך
-           \( \lfloor L/2 \rfloor \) ו-\( \lceil L/2 \rceil \), שניהם עד 8.
-        3. החלפה אחת ויוצאים. אין מעגל ארוך שני ב-16 קופסאות.
-        4. מתחילים מהקופסה **שלי**, וכך מובטח שאני על המעגל שמכיל את הפתק שלי.
 
     #### למה זה נכון { .sol-proof }
 

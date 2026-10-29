@@ -95,6 +95,21 @@ added: 2026-10-28
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="tags_needed" linenums="1" hl_lines="4 8"
+        def tags_needed(txns: list[tuple[int, int]]) -> int:
+            """The most transactions open at once: +1 at a send, -1 at a response, and a
+            response before a send at the same time."""
+            events = sorted((t, d) for s, e in txns for t, d in ((s, 1), (e, -1)))   # (1)!
+            open_now = best = 0
+            for _, d in events:
+                open_now += d
+                best = max(best, open_now)
+            return best
+        ```
+
+        1. זוגות \( (t, d) \) ממוינים לפי הזמן, ובזמן שווה לפי \( d \) : ‏\( -1 \) לפני \( +1 \), כלומר התשובה לפני השליחה.
+
     === "SystemVerilog"
         ```systemverilog title="function tags_needed" linenums="1" hl_lines="6 9 11"
         // the most transactions open at once: every send and every response is one event,
@@ -116,21 +131,6 @@ added: 2026-10-28
 
         1. האירוע הוא מספר אחד : הזמן כפול 2, ועוד 1 לשליחה. כך מיון של מספרים ממיין לפי זמן, ובזמן שווה התשובה (זוגי) באה לפני השליחה (אי-זוגי).
         2. הביט הנמוך אומר מה האירוע : שליחה מעלה את המונה, תשובה מורידה.
-
-    === "Python"
-        ```python title="tags_needed" linenums="1" hl_lines="4 8"
-        def tags_needed(txns: list[tuple[int, int]]) -> int:
-            """The most transactions open at once: +1 at a send, -1 at a response, and a
-            response before a send at the same time."""
-            events = sorted((t, d) for s, e in txns for t, d in ((s, 1), (e, -1)))   # (1)!
-            open_now = best = 0
-            for _, d in events:
-                open_now += d
-                best = max(best, open_now)
-            return best
-        ```
-
-        1. זוגות \( (t, d) \) ממוינים לפי הזמן, ובזמן שווה לפי \( d \) : ‏\( -1 \) לפני \( +1 \), כלומר התשובה לפני השליחה.
 
     #### למה זה נכון { .sol-proof }
 
@@ -219,6 +219,23 @@ added: 2026-10-28
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="pools" linenums="1" hl_lines="4 10"
+        def pools(txns: list[tuple[int, int, str]]) -> tuple[int, int, int]:
+            """Tags for the reads alone, the writes alone and one shared pool, in one sweep: a
+            counter per kind, and the shared pool follows their sum."""
+            events = sorted((t, d, kind) for s, e, kind in txns for t, d in ((s, 1), (e, -1)))
+            open_now = {"R": 0, "W": 0}
+            best = {"R": 0, "W": 0, "shared": 0}
+            for _, d, kind in events:
+                open_now[kind] += d
+                best[kind] = max(best[kind], open_now[kind])
+                best["shared"] = max(best["shared"], open_now["R"] + open_now["W"])   # (1)!
+            return best["R"], best["W"], best["shared"]
+        ```
+
+        1. המאגר המשותף עוקב אחרי הסכום של שני המונים. הסוג נמצא במקום השלישי של האירוע, אחרי \( d \), ולכן התשובות עדיין קודמות לשליחות.
+
     === "SystemVerilog"
         ```systemverilog title="function pools" linenums="1" hl_lines="9 10 18"
         // one sweep with a counter per kind: the pool of the reads, the pool of the writes and
@@ -245,23 +262,6 @@ added: 2026-10-28
 
         1. שני הביטים הנמוכים : ביט 1 לשליחה (אפס לתשובה), ביט 0 לקריאה. בזמן שווה כל התשובות, של שני הסוגים, באות לפני כל השליחות.
         2. המאגר המשותף עוקב אחרי הסכום של שני המונים.
-
-    === "Python"
-        ```python title="pools" linenums="1" hl_lines="4 10"
-        def pools(txns: list[tuple[int, int, str]]) -> tuple[int, int, int]:
-            """Tags for the reads alone, the writes alone and one shared pool, in one sweep: a
-            counter per kind, and the shared pool follows their sum."""
-            events = sorted((t, d, kind) for s, e, kind in txns for t, d in ((s, 1), (e, -1)))
-            open_now = {"R": 0, "W": 0}
-            best = {"R": 0, "W": 0, "shared": 0}
-            for _, d, kind in events:
-                open_now[kind] += d
-                best[kind] = max(best[kind], open_now[kind])
-                best["shared"] = max(best["shared"], open_now["R"] + open_now["W"])   # (1)!
-            return best["R"], best["W"], best["shared"]
-        ```
-
-        1. המאגר המשותף עוקב אחרי הסכום של שני המונים. הסוג נמצא במקום השלישי של האירוע, אחרי \( d \), ולכן התשובות עדיין קודמות לשליחות.
 
     #### למה זה נכון { .sol-proof }
 

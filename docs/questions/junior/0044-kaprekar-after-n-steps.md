@@ -71,14 +71,14 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
 כתבו את הפונקציה `kaprekar_step(x, b, n)` : היא מחלצת את `n` הספרות של `x` בבסיס `b`, ומחזירה את
 ההפרש בין המספר שהן יוצרות בסדר יורד לבין המספר שהן יוצרות בסדר עולה. מספיק `int`.
 
-=== "SystemVerilog"
-    ```systemverilog title="kaprekar_step"
-    // function automatic int kaprekar_step(int x, int b, int n);   // to write
-    ```
-
 === "Python"
     ```python title="kaprekar_step"
     def kaprekar_step(x: int, b: int, n: int) -> int: ...
+    ```
+
+=== "SystemVerilog"
+    ```systemverilog title="kaprekar_step"
+    // function automatic int kaprekar_step(int x, int b, int n);   // to write
     ```
 
 ??? tip "רמז 1"
@@ -104,6 +104,20 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
     `n` פעמים.
 
     #### הקוד { .sol-code }
+
+    === "Python"
+        ```python title="kaprekar_step" linenums="1"
+        def kaprekar_step(x, b, n):
+            """Kaprekar step: sort the n base-b digits of x descending and ascending, subtract."""
+            digits = []
+            for _ in range(n):            # extract exactly n digits, leading zeros included
+                digits.append(x % b)
+                x //= b
+            asc = sorted(digits)          # low to high
+            desc = asc[::-1]              # high to low
+            to_num = lambda ds: sum(d * b**i for i, d in enumerate(reversed(ds)))
+            return to_num(desc) - to_num(asc)
+        ```
 
     === "SystemVerilog"
         ```systemverilog title="kaprekar_step" linenums="1" hl_lines="12 13 17 20 21"
@@ -139,20 +153,6 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
            שמר את הערכים שלו מקריאה לקריאה. ובפונקציה בלי `automatic` בתוך `module`, שהיא סטטית,
            התור והמשתנים משותפים לכל הקריאות בכל סימולטור. האיפוס המפורש נכון בכל המקרים.
 
-    === "Python"
-        ```python title="kaprekar_step" linenums="1"
-        def kaprekar_step(x, b, n):
-            """Kaprekar step: sort the n base-b digits of x descending and ascending, subtract."""
-            digits = []
-            for _ in range(n):            # extract exactly n digits, leading zeros included
-                digits.append(x % b)
-                x //= b
-            asc = sorted(digits)          # low to high
-            desc = asc[::-1]              # high to low
-            to_num = lambda ds: sum(d * b**i for i, d in enumerate(reversed(ds)))
-            return to_num(desc) - to_num(asc)
-        ```
-
     #### למה זה נכון { .sol-proof }
 
     - **האפסים המובילים :** הלולאה רצה בדיוק `n` פעמים, ולכן גם `x` קטן מקבל `n` ספרות. ל-5
@@ -179,6 +179,19 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
 מריצים את הקוד הבא, עם `kaprekar_step` מסעיף א. כל מספר `x` מ-0 עד 999 עובר 1000 פעולות ברצף,
 והתוצאה נספרת ב-hash. **בלי להריץ :** אילו מפתחות יש ב-hash בסוף, ומה הערך של כל אחד?
 
+=== "Python"
+    ```python title="kaprekar_hash"
+    num = {}
+    for x in range(1000):
+        y = x
+        for z in range(1000):         # 1000 Kaprekar steps in a row
+            y = kaprekar_step(y, 10, 3)
+        if y in num:
+            num[y] += 1
+        else:
+            num[y] = 1
+    ```
+
 === "SystemVerilog"
     ```systemverilog title="kaprekar_hash"
     module kaprekar_hash;
@@ -202,19 +215,6 @@ d_0 = \max(a_0, b_0, c_0) - \min(a_0, b_0, c_0)
         $finish;
       end
     endmodule
-    ```
-
-=== "Python"
-    ```python title="kaprekar_hash"
-    num = {}
-    for x in range(1000):
-        y = x
-        for z in range(1000):         # 1000 Kaprekar steps in a row
-            y = kaprekar_step(y, 10, 3)
-        if y in num:
-            num[y] += 1
-        else:
-            num[y] = 1
     ```
 
 כדי להסביר את התוצאה : מצאו נוסחה מפורשת ל-\( a_n \), ‏\( b_n \) ו-\( c_n \) כפונקציה של

@@ -127,6 +127,44 @@ added: 2026-10-18
     הפונקציה הראשית רק מאפסת את התוצאה וקוראת לה. ב-Python הפרמטר נקרא `length` ולא `len`,
     כי `len` הוא שם של פונקציה מובנית.
 
+    === "Python"
+        ```python title="completion_splits" linenums="1" hl_lines="10 14 16 20"
+        def completion_splits(addr: int, length: int, mps: int, rcb: int) -> list[list[int]]:
+            """Every legal sequence of completion payload sizes for a read of `length` bytes
+            from `addr` (length <= MRRS, no 4 KB crossing), in address order. Each split is
+            a list of sizes; the first split has the fewest completions, the last the most."""
+            end = addr + length
+            splits = []
+
+            def extend(pos, sizes):
+                """`pos` is the first byte not covered yet, `sizes` the completions so far."""
+                if pos == end:                                  # (1)!
+                    splits.append(sizes)
+                    return
+                cuts = []
+                if pos + mps >= end:                            # (2)!
+                    cuts.append(end)
+                boundary = (pos // rcb + 1) * rcb               # (3)!
+                while boundary < end and boundary <= pos + mps:
+                    cuts.append(boundary)
+                    boundary += rcb
+                for cut in sorted(cuts, reverse=True):          # (4)!
+                    extend(cut, sizes + [cut - pos])
+
+            extend(addr, [])
+            return splits
+        ```
+
+        1. תנאי העצירה : כל הבתים כוסו, והרשימה שנצברה היא פיצול חוקי. `sizes + [...]`
+           יוצר רשימה חדשה בכל קריאה, ולכן כל ענף של הרקורסיה מחזיק רשימה משלו.
+        2. סוף הבקשה הוא סיום אפשרי רק אם הוא במרחק של עד MPS מ-`pos`. בלי התנאי הזה
+           הפונקציה הייתה מחזירה גם `[256]` כש-MPS הוא 128.
+        3. הגבול הראשון אחרי `pos` : חילוק שלם, ועוד אחד, כפול RCB. אם `pos` עצמו על גבול
+           (כמו באמצע הבקשה) מקבלים את הגבול הבא, לא את `pos`. הלולאה עוצרת בסוף הבקשה או
+           כשהגבול רחוק מ-MPS.
+        4. מיון יורד : הסיום הרחוק קודם. כך `splits[0]` הוא הפיצול החמדני (הכי פחות
+           Completions) ו-`splits[-1]` הוא זה שחותך בכל גבול.
+
     === "SystemVerilog"
         ```systemverilog title="function completion_splits" linenums="1" hl_lines="18 22 23 28"
         // Every legal sequence of completion payload sizes for a read of `len` bytes from
@@ -174,44 +212,6 @@ added: 2026-10-18
            כשהגבול רחוק מ-MPS.
         4. מיון יורד : הסיום הרחוק קודם. כך `splits[0]` הוא הפיצול החמדני (הכי פחות
            Completions) ו-`splits[$]` הוא זה שחותך בכל גבול.
-
-    === "Python"
-        ```python title="completion_splits" linenums="1" hl_lines="10 14 16 20"
-        def completion_splits(addr: int, length: int, mps: int, rcb: int) -> list[list[int]]:
-            """Every legal sequence of completion payload sizes for a read of `length` bytes
-            from `addr` (length <= MRRS, no 4 KB crossing), in address order. Each split is
-            a list of sizes; the first split has the fewest completions, the last the most."""
-            end = addr + length
-            splits = []
-
-            def extend(pos, sizes):
-                """`pos` is the first byte not covered yet, `sizes` the completions so far."""
-                if pos == end:                                  # (1)!
-                    splits.append(sizes)
-                    return
-                cuts = []
-                if pos + mps >= end:                            # (2)!
-                    cuts.append(end)
-                boundary = (pos // rcb + 1) * rcb               # (3)!
-                while boundary < end and boundary <= pos + mps:
-                    cuts.append(boundary)
-                    boundary += rcb
-                for cut in sorted(cuts, reverse=True):          # (4)!
-                    extend(cut, sizes + [cut - pos])
-
-            extend(addr, [])
-            return splits
-        ```
-
-        1. תנאי העצירה : כל הבתים כוסו, והרשימה שנצברה היא פיצול חוקי. `sizes + [...]`
-           יוצר רשימה חדשה בכל קריאה, ולכן כל ענף של הרקורסיה מחזיק רשימה משלו.
-        2. סוף הבקשה הוא סיום אפשרי רק אם הוא במרחק של עד MPS מ-`pos`. בלי התנאי הזה
-           הפונקציה הייתה מחזירה גם `[256]` כש-MPS הוא 128.
-        3. הגבול הראשון אחרי `pos` : חילוק שלם, ועוד אחד, כפול RCB. אם `pos` עצמו על גבול
-           (כמו באמצע הבקשה) מקבלים את הגבול הבא, לא את `pos`. הלולאה עוצרת בסוף הבקשה או
-           כשהגבול רחוק מ-MPS.
-        4. מיון יורד : הסיום הרחוק קודם. כך `splits[0]` הוא הפיצול החמדני (הכי פחות
-           Completions) ו-`splits[-1]` הוא זה שחותך בכל גבול.
 
     #### למה זה נכון { .sol-proof }
 

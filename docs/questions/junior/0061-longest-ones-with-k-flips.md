@@ -94,6 +94,23 @@ added: 2026-10-28
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="longest_ones" linenums="1" hl_lines="5 6 9"
+        def longest_ones(bits: list[int], k: int) -> int:
+            """The longest run of ones after flipping at most k zeros: a sliding window."""
+            best = left = zeros = 0
+            for right, b in enumerate(bits):
+                zeros += b == 0                      # (1)!
+                while zeros > k:                     # (2)!
+                    zeros -= bits[left] == 0
+                    left += 1
+                best = max(best, right - left + 1)
+            return best
+        ```
+
+        1. ‏`b == 0` הוא `True` או `False`, כלומר 1 או 0 בחיבור.
+        2. החלון ארוך מדי : הקצה השמאלי מתקדם עד שהמונה חוזר ל-\( k \).
+
     === "SystemVerilog"
         ```systemverilog title="function longest_ones" linenums="1" hl_lines="6 7 11"
         // the longest run of ones after flipping at most k zeros: a sliding window over the
@@ -114,23 +131,6 @@ added: 2026-10-28
 
         1. הביט החדש נכנס לחלון. רק אפס משנה את המונה.
         2. החלון ארוך מדי : הקצה השמאלי מתקדם עד שהמונה חוזר ל-\( k \). הוא לעולם לא חוזר אחורה.
-
-    === "Python"
-        ```python title="longest_ones" linenums="1" hl_lines="5 6 9"
-        def longest_ones(bits: list[int], k: int) -> int:
-            """The longest run of ones after flipping at most k zeros: a sliding window."""
-            best = left = zeros = 0
-            for right, b in enumerate(bits):
-                zeros += b == 0                      # (1)!
-                while zeros > k:                     # (2)!
-                    zeros -= bits[left] == 0
-                    left += 1
-                best = max(best, right - left + 1)
-            return best
-        ```
-
-        1. ‏`b == 0` הוא `True` או `False`, כלומר 1 או 0 בחיבור.
-        2. החלון ארוך מדי : הקצה השמאלי מתקדם עד שהמונה חוזר ל-\( k \).
 
     #### למה זה נכון { .sol-proof }
 
@@ -230,6 +230,24 @@ added: 2026-10-28
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="longest_same" linenums="1" hl_lines="8 11"
+        def longest_same(values, k: int) -> int:
+            """The longest window that is one value after at most k replacements: a sliding
+            window with a counter per value in it (values is a string or a list)."""
+            count: dict = {}
+            best = left = 0
+            for right, v in enumerate(values):
+                count[v] = count.get(v, 0) + 1
+                while right - left + 1 - max(count.values()) > k:    # (1)!
+                    count[values[left]] -= 1
+                    left += 1
+                best = max(best, right - left + 1)
+            return best
+        ```
+
+        1. התאים שצריך להחליף הם האורך פחות המונה הגדול ביותר. יותר מ-\( k \) : הקצה השמאלי מתקדם.
+
     === "SystemVerilog"
         ```systemverilog title="function longest_same" linenums="1" hl_lines="9 10 16"
         // the longest window that is one value after at most k replacements: s[i] is the value
@@ -255,24 +273,6 @@ added: 2026-10-28
 
         1. המונה הגדול ביותר, על כל הערכים שבחלון. ‏`count` הוא מערך אסוציאטיבי שהמפתח שלו הוא הערך.
         2. התאים שצריך להחליף הם האורך פחות המונה הגדול ביותר. יותר מ-\( k \) : הקצה השמאלי מתקדם.
-
-    === "Python"
-        ```python title="longest_same" linenums="1" hl_lines="8 11"
-        def longest_same(values, k: int) -> int:
-            """The longest window that is one value after at most k replacements: a sliding
-            window with a counter per value in it (values is a string or a list)."""
-            count: dict = {}
-            best = left = 0
-            for right, v in enumerate(values):
-                count[v] = count.get(v, 0) + 1
-                while right - left + 1 - max(count.values()) > k:    # (1)!
-                    count[values[left]] -= 1
-                    left += 1
-                best = max(best, right - left + 1)
-            return best
-        ```
-
-        1. התאים שצריך להחליף הם האורך פחות המונה הגדול ביותר. יותר מ-\( k \) : הקצה השמאלי מתקדם.
 
     #### למה זה נכון { .sol-proof }
 

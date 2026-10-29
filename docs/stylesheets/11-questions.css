@@ -1,4 +1,4 @@
-/* The site's styles, part 11 of 13: the figures and boxes of 0036 and of 0049 to 0062.
+/* The site's styles, part 11 of 14: the figures and boxes of 0036 and of 0049 to 0062.
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
 /* 0036: the register row (lfsr.js regSvg) */
@@ -711,3 +711,11 @@
 .md-typeset .explorer table.nd-etab { font-size: 0.7rem; margin: 0; }
 .md-typeset .explorer table.nd-etab :is(td, th) { padding: 0.15em 0.5em; text-align: center; font-variant-numeric: tabular-nums; }
 .md-typeset .explorer input.nd-w-in { width: 3.4rem; }
+
+/* 0048 c: tilted food line */
+/* the rotation of the cow about O and the angle theta at O (figures and box), and the theta
+   control of the farm box: a slider and its number field on one row */
+.md-typeset svg .farm-arc { fill: none; stroke: var(--viz-ink); stroke-linecap: round; }
+.md-typeset .viz-legend .farm-arc { background: none; border-top: 0.15rem dashed var(--viz-ink); height: 0; }
+.md-typeset .explorer .farm-th { display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+.md-typeset .explorer .farm-fields .farm-th input[type="range"] { width: 7.5rem; min-width: 4rem; flex: 0 1 auto; padding: 0; border: 0; background: none; }

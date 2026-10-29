@@ -134,6 +134,24 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="merge" linenums="1" hl_lines="5 6 7"
+        def merge(intervals: list[tuple[int, int]]) -> list[tuple[int, int]]:
+            """Merge the closed intervals [start, end] that overlap or touch: sorted by start,
+            an interval that starts at or before the end of the last merged one extends it."""
+            out: list[list[int]] = []
+            for s, e in sorted(intervals):                 # (1)!
+                if out and s <= out[-1][1]:                # (2)!
+                    out[-1][1] = max(out[-1][1], e)        # (3)!
+                else:
+                    out.append([s, e])
+            return [(s, e) for s, e in out]
+        ```
+
+        1. ‏`sorted` ממיין זוגות לפי ההתחלה, ובהתחלה שווה לפי הסוף.
+        2. ‏`out[-1]` הוא הקטע הממוזג האחרון. ‏`<=` ולא `<`, כי קטעים סגורים שנוגעים חופפים.
+        3. הסוף הופך למקסימום של שני הסופים : קטע שכולו בפנים משאיר אותו כמו שהוא.
+
     === "SystemVerilog"
         ```systemverilog title="function merge" linenums="1" hl_lines="9 11 12"
         // merge the closed intervals [s, e] that overlap or touch: sorted by start, an interval
@@ -156,24 +174,6 @@ added: 2026-10-29
         1. מיון של התור לפי ההתחלה. שני קטעים עם אותה התחלה יכולים לבוא בכל סדר : השני מהם תמיד מאריך את הראשון.
         2. ‏`out[$]` הוא הקטע הממוזג האחרון. ‏`<=` ולא `<`, כי קטעים סגורים שנוגעים חופפים.
         3. הסוף גדל רק אם הקטע החדש נגמר אחרי האחרון. קטע שכולו בפנים לא משנה דבר.
-
-    === "Python"
-        ```python title="merge" linenums="1" hl_lines="5 6 7"
-        def merge(intervals: list[tuple[int, int]]) -> list[tuple[int, int]]:
-            """Merge the closed intervals [start, end] that overlap or touch: sorted by start,
-            an interval that starts at or before the end of the last merged one extends it."""
-            out: list[list[int]] = []
-            for s, e in sorted(intervals):                 # (1)!
-                if out and s <= out[-1][1]:                # (2)!
-                    out[-1][1] = max(out[-1][1], e)        # (3)!
-                else:
-                    out.append([s, e])
-            return [(s, e) for s, e in out]
-        ```
-
-        1. ‏`sorted` ממיין זוגות לפי ההתחלה, ובהתחלה שווה לפי הסוף.
-        2. ‏`out[-1]` הוא הקטע הממוזג האחרון. ‏`<=` ולא `<`, כי קטעים סגורים שנוגעים חופפים.
-        3. הסוף הופך למקסימום של שני הסופים : קטע שכולו בפנים משאיר אותו כמו שהוא.
 
     #### למה זה נכון { .sol-proof }
 
@@ -295,6 +295,31 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="skyline" linenums="1" hl_lines="5 9 11 14"
+        def skyline(triples: list[tuple[int, int, int]]) -> list[tuple[int, int, int]]:
+            """The pieces (start, end, total) of constant total height, half-open; a gap of total 0
+            is skipped and adjacent pieces of one total are joined. An event is +h at a start and
+            -h at an end; before the events of a position, the piece up to it is emitted."""
+            events = sorted((p, d) for s, e, h in triples for p, d in ((s, h), (e, -h)))   # (1)!
+            out: list[list[int]] = []
+            total, prev = 0, None
+            for p, d in events:
+                if prev is not None and p > prev and total != 0:          # (2)!
+                    if out and out[-1][1] == prev and out[-1][2] == total:
+                        out[-1][1] = p                                     # (3)!
+                    else:
+                        out.append([prev, p, total])
+                total += d                                                 # (4)!
+                prev = p
+            return [(s, e, t) for s, e, t in out]
+        ```
+
+        1. זוגות \( (p, d) \) ממוינים לפי המיקום, ובמיקום שווה לפי \( d \) : הירידות לפני העליות.
+        2. מיקום חדש וסכום שאינו 0 : יש חתיכה לפלוט. באירוע השני באותו מיקום `p == prev`, ואין פליטה כפולה.
+        3. החתיכה הקודמת נגמרת כאן ובאותו גובה : מאריכים אותה במקום לפתוח חדשה.
+        4. רק אחרי הפליטה הסכום משתנה.
+
     === "SystemVerilog"
         ```systemverilog title="function skyline" linenums="1" hl_lines="16 18 19 22"
         // the pieces [s, e) of constant total height: an event is +h at a start and -h at an end,
@@ -328,31 +353,6 @@ added: 2026-10-29
         1. מיון לפי המיקום בלבד. הסדר בין אירועים באותו מיקום לא משנה, כי הפליטה באה לפני כולם.
         2. מיקום חדש וסכום שאינו 0 : יש חתיכה לפלוט. באירוע השני באותו מיקום `ev[i].p == prev`, ואין פליטה כפולה.
         3. החתיכה הקודמת נגמרת כאן ובאותו גובה : מאריכים אותה. כך שני קטעים שנוגעים באותו גובה נותנים חתיכה אחת.
-        4. רק אחרי הפליטה הסכום משתנה.
-
-    === "Python"
-        ```python title="skyline" linenums="1" hl_lines="5 9 11 14"
-        def skyline(triples: list[tuple[int, int, int]]) -> list[tuple[int, int, int]]:
-            """The pieces (start, end, total) of constant total height, half-open; a gap of total 0
-            is skipped and adjacent pieces of one total are joined. An event is +h at a start and
-            -h at an end; before the events of a position, the piece up to it is emitted."""
-            events = sorted((p, d) for s, e, h in triples for p, d in ((s, h), (e, -h)))   # (1)!
-            out: list[list[int]] = []
-            total, prev = 0, None
-            for p, d in events:
-                if prev is not None and p > prev and total != 0:          # (2)!
-                    if out and out[-1][1] == prev and out[-1][2] == total:
-                        out[-1][1] = p                                     # (3)!
-                    else:
-                        out.append([prev, p, total])
-                total += d                                                 # (4)!
-                prev = p
-            return [(s, e, t) for s, e, t in out]
-        ```
-
-        1. זוגות \( (p, d) \) ממוינים לפי המיקום, ובמיקום שווה לפי \( d \) : הירידות לפני העליות.
-        2. מיקום חדש וסכום שאינו 0 : יש חתיכה לפלוט. באירוע השני באותו מיקום `p == prev`, ואין פליטה כפולה.
-        3. החתיכה הקודמת נגמרת כאן ובאותו גובה : מאריכים אותה במקום לפתוח חדשה.
         4. רק אחרי הפליטה הסכום משתנה.
 
     #### למה זה נכון { .sol-proof }
@@ -492,32 +492,6 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="function above" linenums="1" hl_lines="6 7 15"
-        // the ranges where the total is at least t (adjacent pieces joined), and the peak: the
-        // largest total with the ranges that hold it
-        function automatic void above(input piece_t pieces[$], input int t, output span_t out[$]);
-          out = {};
-          foreach (pieces[j]) begin
-            if (pieces[j].h >= t) begin                                            // (1)!
-              if (out.size() > 0 && out[$].e == pieces[j].s) out[$].e = pieces[j].e;   // (2)!
-              else out.push_back('{pieces[j].s, pieces[j].e});
-            end
-          end
-        endfunction
-
-        function automatic int peak(input piece_t pieces[$], output span_t where[$]);
-          int top = 0;
-          foreach (pieces[j]) if (pieces[j].h > top) top = pieces[j].h;          // (3)!
-          above(pieces, top, where);
-          return top;
-        endfunction
-        ```
-
-        1. החתיכה מגיעה לסף. ‏`span_t` של סעיף א משמש כאן לטווח \( [s, e) \).
-        2. הטווח האחרון נגמר בדיוק בהתחלה של החתיכה : מדביקים, גם כשהגבהים שונים.
-        3. השיא הוא המקסימום של הגבהים, וברשימה ריקה 0 : ‏`above` עם \( T = 0 \) על רשימה ריקה מחזיר רשימה ריקה.
-
     === "Python"
         ```python title="above" linenums="1" hl_lines="5 7 17"
         def above(pieces: list[tuple[int, int, int]], t: int) -> list[tuple[int, int]]:
@@ -543,6 +517,32 @@ added: 2026-10-29
         1. החתיכה מגיעה לסף.
         2. הטווח האחרון נגמר בדיוק בהתחלה של החתיכה : מדביקים, גם כשהגבהים שונים.
         3. השיא הוא המקסימום של הגבהים, והטווחים שלו הם `above` עם הסף שווה לשיא.
+
+    === "SystemVerilog"
+        ```systemverilog title="function above" linenums="1" hl_lines="6 7 15"
+        // the ranges where the total is at least t (adjacent pieces joined), and the peak: the
+        // largest total with the ranges that hold it
+        function automatic void above(input piece_t pieces[$], input int t, output span_t out[$]);
+          out = {};
+          foreach (pieces[j]) begin
+            if (pieces[j].h >= t) begin                                            // (1)!
+              if (out.size() > 0 && out[$].e == pieces[j].s) out[$].e = pieces[j].e;   // (2)!
+              else out.push_back('{pieces[j].s, pieces[j].e});
+            end
+          end
+        endfunction
+
+        function automatic int peak(input piece_t pieces[$], output span_t where[$]);
+          int top = 0;
+          foreach (pieces[j]) if (pieces[j].h > top) top = pieces[j].h;          // (3)!
+          above(pieces, top, where);
+          return top;
+        endfunction
+        ```
+
+        1. החתיכה מגיעה לסף. ‏`span_t` של סעיף א משמש כאן לטווח \( [s, e) \).
+        2. הטווח האחרון נגמר בדיוק בהתחלה של החתיכה : מדביקים, גם כשהגבהים שונים.
+        3. השיא הוא המקסימום של הגבהים, וברשימה ריקה 0 : ‏`above` עם \( T = 0 \) על רשימה ריקה מחזיר רשימה ריקה.
 
     #### למה זה נכון { .sol-proof }
 

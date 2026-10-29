@@ -82,6 +82,8 @@ PAIRS = [
     ("land not yet flooded", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 16%, var(--md-default-bg-color))"], TEXT),
     ("settled node time", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color))"], TEXT),
     ("corner link and relaxed edge", "var(--viz-s2)", [PAGE], UI),
+    ("question count on the fold button", "var(--md-default-fg-color)", ["var(--site-primary-soft)", "var(--site-surface)"], TEXT),
+    ("column grip line", "var(--site-mark-color)", [PAGE], UI),
     ("negative digit, current conversion row", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color))", CARD, PAGE], TEXT),
     ("explanation step chip, lit", "var(--md-default-fg-color)", ["var(--md-accent-fg-color--transparent)", PAGE], TEXT),
     ("explanation step chip", "var(--viz-text)", [PAGE], TEXT),

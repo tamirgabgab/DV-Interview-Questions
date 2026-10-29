@@ -272,6 +272,57 @@ added: 2026-10-23
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="horses_plan" linenums="1" hl_lines="11 12 13 32 33 36 37 38"
+        def horses_plan(a: int, b: int, c: int, race) -> tuple[list[int], list[list[int]]]:
+            """The c fastest of a horses in order, b per race, without a stopwatch: race(horses)
+            returns them fastest first. Returns the ranking and every race in finishing order."""
+            faster = [set() for _ in range(a)]              # horses known to beat x
+            slower = [set() for _ in range(a)]
+            log = []
+
+            def beats(x, y):
+                if y in slower[x]:
+                    return
+                for u in faster[x] | {x}:                   # (1)!
+                    for v in slower[y] | {y}:
+                        slower[u].add(v); faster[v].add(u)
+
+            def run(group):
+                order = race(group)
+                log.append(order)
+                for i, x in enumerate(order):
+                    for y in order[i + 1:]:
+                        beats(x, y)
+
+            def rank(x):                                    # the exact rank once both sets are complete
+                return len(faster[x]) + 1 if len(faster[x]) + len(slower[x]) == a - 1 else None
+
+            groups = [list(range(k, min(k + b, a))) for k in range(0, a, b)]
+            for g in groups:
+                run(g)
+            if len(groups) > 1:
+                run([log[k][0] for k in range(len(groups))])
+            while any(all(rank(x) != r for x in range(a)) for r in range(1, c + 1)):
+                pool = [x for x in range(a) if len(faster[x]) < c and rank(x) is None]      # (2)!
+                pool.sort(key=lambda x: (len(faster[x]), -len(slower[x]), x))             # (3)!
+                chosen = []
+                while len(chosen) < b and pool:
+                    best = max(pool, key=lambda x: (sum(1 for y in chosen if y not in faster[x] and y not in slower[x]),
+                                                    -len(faster[x]), len(slower[x]), -x))  # (4)!
+                    pool.remove(best)
+                    chosen.append(best)
+                run(chosen)
+            return [x for r in range(1, c + 1) for x in range(a) if rank(x) == r], log
+        ```
+
+        1. הסגירות : מי שמעל \( x \) (כולל \( x \)) מקבל את כל מי שמתחת ל-\( y \) (כולל \( y \))
+           כאיטיים, ולהפך.
+        2. המועמד הפתוח : פחות מ-\( c \) מהירים ידועים, והדירוג עדיין לא ידוע.
+        3. המיון : מעט מהירים ידועים קודם, ובשוויון הרבה איטיים ידועים קודם.
+        4. הבחירה החמדנית : הסוס שמוסיף הכי הרבה זוגות שעוד לא הושוו לנבחרים עד כה; בשוויון
+           הראשון ברשימה הממוינת.
+
     === "SystemVerilog"
         ```systemverilog title="hr_beats, hr_race, horses_plan" linenums="1" hl_lines="10 11 12 42 43 51 52 53 54"
         localparam int MAXA = 64;       // horses: the known sets are 64-bit masks
@@ -351,57 +402,6 @@ added: 2026-10-23
             for (int x = 0; x < a; x++) if ($countones(faster[x]) == r - 1 && $countones(faster[x] | slower[x]) == a - 1) ranking[r - 1] = x;
           return n;
         endfunction
-        ```
-
-        1. הסגירות : מי שמעל \( x \) (כולל \( x \)) מקבל את כל מי שמתחת ל-\( y \) (כולל \( y \))
-           כאיטיים, ולהפך.
-        2. המועמד הפתוח : פחות מ-\( c \) מהירים ידועים, והדירוג עדיין לא ידוע.
-        3. המיון : מעט מהירים ידועים קודם, ובשוויון הרבה איטיים ידועים קודם.
-        4. הבחירה החמדנית : הסוס שמוסיף הכי הרבה זוגות שעוד לא הושוו לנבחרים עד כה; בשוויון
-           הראשון ברשימה הממוינת.
-
-    === "Python"
-        ```python title="horses_plan" linenums="1" hl_lines="11 12 13 32 33 36 37 38"
-        def horses_plan(a: int, b: int, c: int, race) -> tuple[list[int], list[list[int]]]:
-            """The c fastest of a horses in order, b per race, without a stopwatch: race(horses)
-            returns them fastest first. Returns the ranking and every race in finishing order."""
-            faster = [set() for _ in range(a)]              # horses known to beat x
-            slower = [set() for _ in range(a)]
-            log = []
-
-            def beats(x, y):
-                if y in slower[x]:
-                    return
-                for u in faster[x] | {x}:                   # (1)!
-                    for v in slower[y] | {y}:
-                        slower[u].add(v); faster[v].add(u)
-
-            def run(group):
-                order = race(group)
-                log.append(order)
-                for i, x in enumerate(order):
-                    for y in order[i + 1:]:
-                        beats(x, y)
-
-            def rank(x):                                    # the exact rank once both sets are complete
-                return len(faster[x]) + 1 if len(faster[x]) + len(slower[x]) == a - 1 else None
-
-            groups = [list(range(k, min(k + b, a))) for k in range(0, a, b)]
-            for g in groups:
-                run(g)
-            if len(groups) > 1:
-                run([log[k][0] for k in range(len(groups))])
-            while any(all(rank(x) != r for x in range(a)) for r in range(1, c + 1)):
-                pool = [x for x in range(a) if len(faster[x]) < c and rank(x) is None]      # (2)!
-                pool.sort(key=lambda x: (len(faster[x]), -len(slower[x]), x))             # (3)!
-                chosen = []
-                while len(chosen) < b and pool:
-                    best = max(pool, key=lambda x: (sum(1 for y in chosen if y not in faster[x] and y not in slower[x]),
-                                                    -len(faster[x]), len(slower[x]), -x))  # (4)!
-                    pool.remove(best)
-                    chosen.append(best)
-                run(chosen)
-            return [x for r in range(1, c + 1) for x in range(a) if rank(x) == r], log
         ```
 
         1. הסגירות : מי שמעל \( x \) (כולל \( x \)) מקבל את כל מי שמתחת ל-\( y \) (כולל \( y \))

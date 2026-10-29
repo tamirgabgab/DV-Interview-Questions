@@ -121,6 +121,20 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="one_pan" linenums="1" hl_lines="6 7"
+        def one_pan(n: int, k: int) -> list[int] | None:
+            """The bits of n, lowest first: bit i puts the weight 2**i on the pan opposite the
+            load. None when n needs more than k weights (n > 2**k - 1)."""
+            digits = []
+            for _ in range(k):
+                digits.append(n % 2)   # (1)!
+                n //= 2
+            return digits if n == 0 else None
+        ```
+
+        1. הביט הנמוך של \( n \) אומר אם המשקולת של המקום הזה בכף.
+
     === "SystemVerilog"
         ```systemverilog title="function one_pan" linenums="1" hl_lines="6 7"
         // the bits of n, lowest first: bit i puts the weight 2^i on the pan opposite the load;
@@ -133,20 +147,6 @@ added: 2026-10-29
           end
           return n == 0;
         endfunction
-        ```
-
-        1. הביט הנמוך של \( n \) אומר אם המשקולת של המקום הזה בכף.
-
-    === "Python"
-        ```python title="one_pan" linenums="1" hl_lines="6 7"
-        def one_pan(n: int, k: int) -> list[int] | None:
-            """The bits of n, lowest first: bit i puts the weight 2**i on the pan opposite the
-            load. None when n needs more than k weights (n > 2**k - 1)."""
-            digits = []
-            for _ in range(k):
-                digits.append(n % 2)   # (1)!
-                n //= 2
-            return digits if n == 0 else None
         ```
 
         1. הביט הנמוך של \( n \) אומר אם המשקולת של המקום הזה בכף.
@@ -273,6 +273,24 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="two_pans" linenums="1" hl_lines="6 8 10"
+        def two_pans(n: int, k: int) -> list[int] | None:
+            """Balanced ternary of n, lowest digit first: +1 puts 3**i on the pan opposite the
+            load, -1 beside the load, 0 leaves it off. None when n > (3**k - 1) / 2."""
+            digits = []
+            for _ in range(k):
+                r = n % 3
+                if r == 2:
+                    r = -1   # (1)!
+                digits.append(r)
+                n = (n - r) // 3   # (2)!
+            return digits if n == 0 else None
+        ```
+
+        1. ‏\( 2 = 3 - 1 \) : משקולת אחת ליד המשא, ו-1 עובר למשקולת הבאה.
+        2. ‏\( n - r \) מתחלק ב-3. כש-\( r = -1 \) זה \( n + 1 \) : ההעברה.
+
     === "SystemVerilog"
         ```systemverilog title="function two_pans" linenums="1" hl_lines="7 8 10"
         // balanced ternary of n, lowest digit first: +1 puts 3^i on the pan opposite the
@@ -288,24 +306,6 @@ added: 2026-10-29
           end
           return n == 0;
         endfunction
-        ```
-
-        1. ‏\( 2 = 3 - 1 \) : משקולת אחת ליד המשא, ו-1 עובר למשקולת הבאה.
-        2. ‏\( n - r \) מתחלק ב-3. כש-\( r = -1 \) זה \( n + 1 \) : ההעברה.
-
-    === "Python"
-        ```python title="two_pans" linenums="1" hl_lines="6 8 10"
-        def two_pans(n: int, k: int) -> list[int] | None:
-            """Balanced ternary of n, lowest digit first: +1 puts 3**i on the pan opposite the
-            load, -1 beside the load, 0 leaves it off. None when n > (3**k - 1) / 2."""
-            digits = []
-            for _ in range(k):
-                r = n % 3
-                if r == 2:
-                    r = -1   # (1)!
-                digits.append(r)
-                n = (n - r) // 3   # (2)!
-            return digits if n == 0 else None
         ```
 
         1. ‏\( 2 = 3 - 1 \) : משקולת אחת ליד המשא, ו-1 עובר למשקולת הבאה.
@@ -443,6 +443,36 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="placement, balances" linenums="1" hl_lines="8 10 12 23"
+        def placement(n: int, k: int, c: int, two: bool = True) -> list[int] | None:
+            """How many copies of the weight base**i go where, lowest first: on two pans the base
+            is 2c + 1 and a digit runs from -c (beside the load) to c (the other pan); on one pan
+            the base is c + 1 and a digit runs from 0 to c. None when n does not fit."""
+            base = 2 * c + 1 if two else c + 1
+            digits = []
+            for _ in range(k):
+                r = n % base
+                if two and r > c:
+                    r -= base   # (1)!
+                digits.append(r)
+                n = (n - r) // base
+            return digits if n == 0 else None
+
+
+        def balances(n: int, c: int, two: bool, digits: list[int]) -> bool:
+            """The check: at most c copies of each weight, none beside the load on one pan, and
+            the load plus the weights beside it equal the weights on the other pan."""
+            base = 2 * c + 1 if two else c + 1
+            beside = sum(-d * base**i for i, d in enumerate(digits) if d < 0)
+            other = sum(d * base**i for i, d in enumerate(digits) if d > 0)
+            legal = all((-c if two else 0) <= d <= c for d in digits)
+            return legal and n + beside == other   # (2)!
+        ```
+
+        1. שארית גדולה מ-\( c \) הופכת לספרה שלילית, \( r - B \), ו-\( n - r \) גדל ב-\( B \) : ההעברה.
+        2. המאזניים : המשא ועוד המשקולות שלידו, מול המשקולות שבכף השנייה.
+
     === "SystemVerilog"
         ```systemverilog title="function placement, function balances" linenums="1" hl_lines="7 8 10 24"
         // how many copies of the weight base^i go where, lowest first: two pans have the base
@@ -470,36 +500,6 @@ added: 2026-10-29
           end
           return n + beside == other;                 // (2)!
         endfunction
-        ```
-
-        1. שארית גדולה מ-\( c \) הופכת לספרה שלילית, \( r - B \), ו-\( n - r \) גדל ב-\( B \) : ההעברה.
-        2. המאזניים : המשא ועוד המשקולות שלידו, מול המשקולות שבכף השנייה.
-
-    === "Python"
-        ```python title="placement, balances" linenums="1" hl_lines="8 10 12 23"
-        def placement(n: int, k: int, c: int, two: bool = True) -> list[int] | None:
-            """How many copies of the weight base**i go where, lowest first: on two pans the base
-            is 2c + 1 and a digit runs from -c (beside the load) to c (the other pan); on one pan
-            the base is c + 1 and a digit runs from 0 to c. None when n does not fit."""
-            base = 2 * c + 1 if two else c + 1
-            digits = []
-            for _ in range(k):
-                r = n % base
-                if two and r > c:
-                    r -= base   # (1)!
-                digits.append(r)
-                n = (n - r) // base
-            return digits if n == 0 else None
-
-
-        def balances(n: int, c: int, two: bool, digits: list[int]) -> bool:
-            """The check: at most c copies of each weight, none beside the load on one pan, and
-            the load plus the weights beside it equal the weights on the other pan."""
-            base = 2 * c + 1 if two else c + 1
-            beside = sum(-d * base**i for i, d in enumerate(digits) if d < 0)
-            other = sum(d * base**i for i, d in enumerate(digits) if d > 0)
-            legal = all((-c if two else 0) <= d <= c for d in digits)
-            return legal and n + beside == other   # (2)!
         ```
 
         1. שארית גדולה מ-\( c \) הופכת לספרה שלילית, \( r - B \), ו-\( n - r \) גדל ב-\( B \) : ההעברה.

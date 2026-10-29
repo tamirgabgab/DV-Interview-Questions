@@ -20,6 +20,7 @@ refine one in an earlier part, and moving a rule between parts can change what w
 | `11-questions.css` | the figures and boxes of 0036 and of 0049 to 0062 |
 | `12-rounds-y-s.css` | rounds Y and S: the tags page, box text size, touch tools, side navigation, button runs, S2 figures |
 | `13-motion.css` | round M: the drawn logo, the header and table of contents, the hero's live waves and example, cards, the question header card, self-check and hint feedback, the box skeleton, page transitions, the footer, the 404 page |
+| `14-layout.css` | the desktop layout: the wider grid, the folded level list in the side navigation, the grips that resize the three columns (`layout.js`) |
 
 The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
 `stylesheets/site.css` at the end of the build and links that file from every page and from

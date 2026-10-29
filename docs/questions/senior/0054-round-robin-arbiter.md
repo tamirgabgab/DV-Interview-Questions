@@ -84,19 +84,19 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="fixed_priority"
+        def fixed_priority(req: int) -> int:
+            """The lowest requester wins: the lowest set bit."""
+            return req & -req
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="function fixed_priority"
         // the lowest requester wins
         function automatic logic [N-1:0] fixed_priority(logic [N-1:0] req);
           return req & (~req + 1'b1);
         endfunction
-        ```
-
-    === "Python"
-        ```python title="fixed_priority"
-        def fixed_priority(req: int) -> int:
-            """The lowest requester wins: the lowest set bit."""
-            return req & -req
         ```
 
     #### למה זה נכון { .sol-proof }
@@ -174,6 +174,29 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="rr_pick, rr_run" linenums="1" hl_lines="5 6 14"
+        def rr_pick(req: int, pri: int, n: int) -> int:
+            """The grant of the round robin: the first request at or after the one-hot pri."""
+            mask = (1 << 2 * n) - 1
+            dbl = req << n | req
+            sel = dbl & ~(dbl - pri) & mask       # (1)!
+            return (sel | sel >> n) & ((1 << n) - 1)
+
+
+        def rr_run(reqs: list[int], n: int) -> list[int]:
+            pri, grants = 1, []
+            for req in reqs:
+                gnt = rr_pick(req, pri, n)
+                if gnt:
+                    pri = (gnt << 1 | gnt >> (n - 1)) & ((1 << n) - 1)   # (2)!
+                grants.append(gnt)
+            return grants
+        ```
+
+        1. ב-Python מספרים לא מוגבלים, ולכן המסכה שומרת על \( 2N \) ביטים.
+        2. סיבוב שמאלה של המענק : המבקש שאחריו.
+
     === "SystemVerilog"
         ```systemverilog title="module rr_arbiter" linenums="1" hl_lines="13 14 15 20"
         module rr_arbiter #(
@@ -202,29 +225,6 @@ added: 2026-10-27
         1. הבקשות פעמיים : החיפוש ממשיך מעבר למבקש \( N - 1 \) אל מבקש 0.
         2. הבקשה הראשונה מ-`pri` והלאה : החיסור מאפס אותה, וההיפוך וה-AND משאירים רק אותה.
         3. המבקש שאחרי המנצח מקבל עדיפות. בלי מענק המצביע לא זז.
-
-    === "Python"
-        ```python title="rr_pick, rr_run" linenums="1" hl_lines="5 6 14"
-        def rr_pick(req: int, pri: int, n: int) -> int:
-            """The grant of the round robin: the first request at or after the one-hot pri."""
-            mask = (1 << 2 * n) - 1
-            dbl = req << n | req
-            sel = dbl & ~(dbl - pri) & mask       # (1)!
-            return (sel | sel >> n) & ((1 << n) - 1)
-
-
-        def rr_run(reqs: list[int], n: int) -> list[int]:
-            pri, grants = 1, []
-            for req in reqs:
-                gnt = rr_pick(req, pri, n)
-                if gnt:
-                    pri = (gnt << 1 | gnt >> (n - 1)) & ((1 << n) - 1)   # (2)!
-                grants.append(gnt)
-            return grants
-        ```
-
-        1. ב-Python מספרים לא מוגבלים, ולכן המסכה שומרת על \( 2N \) ביטים.
-        2. סיבוב שמאלה של המענק : המבקש שאחריו.
 
     #### למה זה נכון { .sol-proof }
 
@@ -291,6 +291,23 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="check_trace" linenums="1" hl_lines="6 7 8 9"
+        def check_trace(reqs: list[int], grants: list[int], n: int, max_wait: int) -> dict:
+            """How many times each rule fails on a trace, counted as the assertions count them."""
+            T = len(reqs)
+            got = lambda t, i: grants[t] >> i & 1   # noqa: E731
+            asked = lambda t, i: reqs[t] >> i & 1   # noqa: E731
+            onehot = sum(1 for g in grants if g & (g - 1))
+            spurious = sum(1 for r, g in zip(reqs, grants) if g & ~r)
+            hold = sum(1 for t in range(T - 1) for i in range(n) if asked(t, i) and not got(t, i) and not asked(t + 1, i))
+            fair = sum(1 for i in range(n) for t in range(T - max_wait)
+                       if asked(t, i) and not any(got(u, i) for u in range(t, t + max_wait + 1)))   # (1)!
+            return {"onehot": onehot, "spurious": spurious, "hold": hold, "fair": fair}
+        ```
+
+        1. ניסיון שהחלון שלו עובר את סוף הטרייס לא נספר, כמו ב-assertion שעוד לא הסתיימה.
+
     === "SystemVerilog"
         ```systemverilog title="module arb_checker" linenums="1" hl_lines="11 13 17 19"
         module arb_checker #(
@@ -318,23 +335,6 @@ added: 2026-10-27
         ```
 
         1. ניסיון חדש מתחיל בכל מחזור שבו `req[i]` דולק, וכל אחד צריך מענק בחלון של \( N \) מחזורים.
-
-    === "Python"
-        ```python title="check_trace" linenums="1" hl_lines="6 7 8 9"
-        def check_trace(reqs: list[int], grants: list[int], n: int, max_wait: int) -> dict:
-            """How many times each rule fails on a trace, counted as the assertions count them."""
-            T = len(reqs)
-            got = lambda t, i: grants[t] >> i & 1   # noqa: E731
-            asked = lambda t, i: reqs[t] >> i & 1   # noqa: E731
-            onehot = sum(1 for g in grants if g & (g - 1))
-            spurious = sum(1 for r, g in zip(reqs, grants) if g & ~r)
-            hold = sum(1 for t in range(T - 1) for i in range(n) if asked(t, i) and not got(t, i) and not asked(t + 1, i))
-            fair = sum(1 for i in range(n) for t in range(T - max_wait)
-                       if asked(t, i) and not any(got(u, i) for u in range(t, t + max_wait + 1)))   # (1)!
-            return {"onehot": onehot, "spurious": spurious, "hold": hold, "fair": fair}
-        ```
-
-        1. ניסיון שהחלון שלו עובר את סוף הטרייס לא נספר, כמו ב-assertion שעוד לא הסתיימה.
 
     #### למה זה נכון { .sol-proof }
 
@@ -399,6 +399,25 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="wrr_run" linenums="1" hl_lines="7 8 9"
+        def wrr_run(reqs: list[int], weights: list[int]) -> list[int]:
+            n, pri, used, grants = len(weights), 1, 0, []
+            for req in reqs:
+                gnt = rr_pick(req, pri, n)
+                if gnt:
+                    i = gnt.bit_length() - 1
+                    used = used + 1 if gnt == pri else 1          # (1)!
+                    if used == weights[i]:
+                        pri, used = (gnt << 1 | gnt >> (n - 1)) & ((1 << n) - 1), 0
+                    else:
+                        pri = gnt
+                grants.append(gnt)
+            return grants
+        ```
+
+        1. בעל המצביע ממשיך את התור שלו; מנצח אחר (בעל המצביע לא ביקש) מתחיל תור חדש.
+
     === "SystemVerilog"
         ```systemverilog title="module wrr_arbiter" linenums="1" hl_lines="17 20 28 31"
         module wrr_arbiter #(
@@ -439,25 +458,6 @@ added: 2026-10-27
 
         1. המענק הזה סוגר את התור : \( w_i \) מענקים ברצף. המצביע עובר למבקש שאחרי המנצח.
         2. התור נמשך : המצביע נשאר על המנצח. מנצח חדש מתחיל תור עם `used = 1`.
-
-    === "Python"
-        ```python title="wrr_run" linenums="1" hl_lines="7 8 9"
-        def wrr_run(reqs: list[int], weights: list[int]) -> list[int]:
-            n, pri, used, grants = len(weights), 1, 0, []
-            for req in reqs:
-                gnt = rr_pick(req, pri, n)
-                if gnt:
-                    i = gnt.bit_length() - 1
-                    used = used + 1 if gnt == pri else 1          # (1)!
-                    if used == weights[i]:
-                        pri, used = (gnt << 1 | gnt >> (n - 1)) & ((1 << n) - 1), 0
-                    else:
-                        pri = gnt
-                grants.append(gnt)
-            return grants
-        ```
-
-        1. בעל המצביע ממשיך את התור שלו; מנצח אחר (בעל המצביע לא ביקש) מתחיל תור חדש.
 
     #### למה זה נכון { .sol-proof }
 

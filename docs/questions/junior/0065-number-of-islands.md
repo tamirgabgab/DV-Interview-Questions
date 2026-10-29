@@ -162,6 +162,52 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="count_islands" linenums="1" hl_lines="10 19 33"
+        from collections import deque
+
+        DIRS4 = [(-1, 0), (1, 0), (0, -1), (0, 1)]        # up, down, left, right
+
+
+        def flood(grid: list[str], seen: list[list[bool]], r: int, c: int, dirs=DIRS4) -> int:
+            """BFS from the land cell (r, c): marks every land cell of its island in seen, each
+            when it is pushed, and returns the island's size."""
+            m, n = len(grid), len(grid[0])
+            seen[r][c] = True                              # (1)!
+            q = deque([(r, c)])
+            size = 0
+            while q:
+                i, j = q.popleft()
+                size += 1
+                for di, dj in dirs:
+                    a, b = i + di, j + dj
+                    if 0 <= a < m and 0 <= b < n and grid[a][b] == "1" and not seen[a][b]:   # (2)!
+                        seen[a][b] = True
+                        q.append((a, b))
+            return size
+
+
+        def count_islands(grid: list[str]) -> int:
+            """The number of islands: every land cell the scan meets before any flood reached it
+            starts a new island."""
+            m, n = len(grid), len(grid[0]) if grid else 0
+            seen = [[False] * n for _ in range(m)]
+            count = 0
+            for r in range(m):
+                for c in range(n):
+                    if grid[r][c] == "1" and not seen[r][c]:
+                        count += 1                         # (3)!
+                        flood(grid, seen, r, c)
+            return count
+        ```
+
+        1. הסימון ברגע הכניסה לתור, גם של התא הראשון. ‏`seen` הוא רשימה של רשימות, ולכן
+           הסימונים נשארים אצל הקורא.
+        2. הבדיקה `0 <= a < m` נחוצה גם ב-Python : בלעדיה `grid[-1]` הוא השורה **האחרונה**,
+           בלי שגיאה, והאיים "מתחברים" דרך הקצה.
+        3. תא יבשה שהסריקה פוגשת לפני שאיזו הצפה הגיעה אליו : אי חדש. את הגודל שההצפה
+           מחזירה סעיף ג ינצל.
+
     === "SystemVerilog"
         ```systemverilog title="function count_islands" linenums="1" hl_lines="10 18 36"
         typedef struct { int r, c; } cell_t;
@@ -212,52 +258,6 @@ added: 2026-10-29
            ‏`getc(b)` הוא התו ה-`b` של שורה `a`.
         3. תא יבשה שהסריקה פוגשת לפני שאיזו הצפה הגיעה אליו : אי חדש. ההצפה מסמנת את שאר
            האי, ואת הגודל שהיא מחזירה סעיף ג ינצל.
-
-    === "Python"
-        ```python title="count_islands" linenums="1" hl_lines="10 19 33"
-        from collections import deque
-
-        DIRS4 = [(-1, 0), (1, 0), (0, -1), (0, 1)]        # up, down, left, right
-
-
-        def flood(grid: list[str], seen: list[list[bool]], r: int, c: int, dirs=DIRS4) -> int:
-            """BFS from the land cell (r, c): marks every land cell of its island in seen, each
-            when it is pushed, and returns the island's size."""
-            m, n = len(grid), len(grid[0])
-            seen[r][c] = True                              # (1)!
-            q = deque([(r, c)])
-            size = 0
-            while q:
-                i, j = q.popleft()
-                size += 1
-                for di, dj in dirs:
-                    a, b = i + di, j + dj
-                    if 0 <= a < m and 0 <= b < n and grid[a][b] == "1" and not seen[a][b]:   # (2)!
-                        seen[a][b] = True
-                        q.append((a, b))
-            return size
-
-
-        def count_islands(grid: list[str]) -> int:
-            """The number of islands: every land cell the scan meets before any flood reached it
-            starts a new island."""
-            m, n = len(grid), len(grid[0]) if grid else 0
-            seen = [[False] * n for _ in range(m)]
-            count = 0
-            for r in range(m):
-                for c in range(n):
-                    if grid[r][c] == "1" and not seen[r][c]:
-                        count += 1                         # (3)!
-                        flood(grid, seen, r, c)
-            return count
-        ```
-
-        1. הסימון ברגע הכניסה לתור, גם של התא הראשון. ‏`seen` הוא רשימה של רשימות, ולכן
-           הסימונים נשארים אצל הקורא.
-        2. הבדיקה `0 <= a < m` נחוצה גם ב-Python : בלעדיה `grid[-1]` הוא השורה **האחרונה**,
-           בלי שגיאה, והאיים "מתחברים" דרך הקצה.
-        3. תא יבשה שהסריקה פוגשת לפני שאיזו הצפה הגיעה אליו : אי חדש. את הגודל שההצפה
-           מחזירה סעיף ג ינצל.
 
     #### למה זה נכון { .sol-proof }
 
@@ -392,6 +392,27 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="count_islands8" linenums="1" hl_lines="1 14"
+        DIRS8 = DIRS4 + [(-1, -1), (-1, 1), (1, -1), (1, 1)]      # and the four corners
+
+
+        def count_islands8(grid: list[str]) -> int:
+            """The number of islands when a corner also joins: the same scan, the flood with
+            eight directions."""
+            m, n = len(grid), len(grid[0]) if grid else 0
+            seen = [[False] * n for _ in range(m)]
+            count = 0
+            for r in range(m):
+                for c in range(n):
+                    if grid[r][c] == "1" and not seen[r][c]:
+                        count += 1
+                        flood(grid, seen, r, c, DIRS8)   # (1)!
+            return count
+        ```
+
+        1. ההבדל היחיד מסעיף א : הטבלה של שמונה כיוונים. ‏`flood` עצמה לא משתנה.
+
     === "SystemVerilog"
         ```systemverilog title="function count_islands8" linenums="1" hl_lines="1 2 15"
         localparam int DR8[8] = '{-1, 1, 0, 0, -1, -1, 1, 1};   // the four of part a, then the corners
@@ -412,27 +433,6 @@ added: 2026-10-29
               end
           return count;
         endfunction
-        ```
-
-        1. ההבדל היחיד מסעיף א : הטבלה של שמונה כיוונים. ‏`flood` עצמה לא משתנה.
-
-    === "Python"
-        ```python title="count_islands8" linenums="1" hl_lines="1 14"
-        DIRS8 = DIRS4 + [(-1, -1), (-1, 1), (1, -1), (1, 1)]      # and the four corners
-
-
-        def count_islands8(grid: list[str]) -> int:
-            """The number of islands when a corner also joins: the same scan, the flood with
-            eight directions."""
-            m, n = len(grid), len(grid[0]) if grid else 0
-            seen = [[False] * n for _ in range(m)]
-            count = 0
-            for r in range(m):
-                for c in range(n):
-                    if grid[r][c] == "1" and not seen[r][c]:
-                        count += 1
-                        flood(grid, seen, r, c, DIRS8)   # (1)!
-            return count
         ```
 
         1. ההבדל היחיד מסעיף א : הטבלה של שמונה כיוונים. ‏`flood` עצמה לא משתנה.
@@ -541,6 +541,26 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="island_sizes" linenums="1" hl_lines="11 12"
+        def island_sizes(grid: list[str], diag: bool = False) -> list[int]:
+            """The size of every island, largest first; diag=True joins across corners too. The
+            length of the list is the number of islands, and its sum the number of land cells."""
+            m, n = len(grid), len(grid[0]) if grid else 0
+            dirs = DIRS8 if diag else DIRS4
+            seen = [[False] * n for _ in range(m)]
+            sizes = []
+            for r in range(m):
+                for c in range(n):
+                    if grid[r][c] == "1" and not seen[r][c]:
+                        sizes.append(flood(grid, seen, r, c, dirs))   # (1)!
+            return sorted(sizes, reverse=True)                         # (2)!
+        ```
+
+        1. אותה סריקה, רק שהגודל שההצפה מחזירה נשמר ברשימה.
+        2. מיון אחד בסוף, בסדר יורד. ‏`len(sizes)` הוא מספר האיים, ו-`sum(sizes)` מספר תאי
+           היבשה.
+
     === "SystemVerilog"
         ```systemverilog title="function island_sizes" linenums="1" hl_lines="12 13"
         // the size of every island, largest first; diag joins across corners too. The length of
@@ -561,26 +581,6 @@ added: 2026-10-29
 
         1. אותה סריקה, רק שהגודל שההצפה מחזירה נשמר בתור של התוצאות.
         2. ‏`rsort` ממיין תור בסדר יורד. ‏`sizes.size()` הוא מספר האיים, ו-`sizes.sum()` מספר תאי
-           היבשה.
-
-    === "Python"
-        ```python title="island_sizes" linenums="1" hl_lines="11 12"
-        def island_sizes(grid: list[str], diag: bool = False) -> list[int]:
-            """The size of every island, largest first; diag=True joins across corners too. The
-            length of the list is the number of islands, and its sum the number of land cells."""
-            m, n = len(grid), len(grid[0]) if grid else 0
-            dirs = DIRS8 if diag else DIRS4
-            seen = [[False] * n for _ in range(m)]
-            sizes = []
-            for r in range(m):
-                for c in range(n):
-                    if grid[r][c] == "1" and not seen[r][c]:
-                        sizes.append(flood(grid, seen, r, c, dirs))   # (1)!
-            return sorted(sizes, reverse=True)                         # (2)!
-        ```
-
-        1. אותה סריקה, רק שהגודל שההצפה מחזירה נשמר ברשימה.
-        2. מיון אחד בסוף, בסדר יורד. ‏`len(sizes)` הוא מספר האיים, ו-`sum(sizes)` מספר תאי
            היבשה.
 
     #### למה זה נכון { .sol-proof }

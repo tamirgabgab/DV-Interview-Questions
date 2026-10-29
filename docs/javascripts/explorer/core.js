@@ -545,6 +545,58 @@
     });
   };
 
+  // Typed values: a number or text field of a box applies its value on Enter and when it
+  // is left, whatever the view listens to (most views apply on change, some blur the field
+  // on Enter to get one, a few act on Enter themselves). The browser's own events do not
+  // always come: an input method (an IME, or the text suggestions of Windows) takes the
+  // Enter that ends its composition, so that keydown is "Process" (keyCode 229) and only
+  // the keyup says Enter; no view handler and no change follow. So, once per box: such a
+  // keyup is given to the field as a keydown Enter, for the view's own handler; after an
+  // Enter keydown (once the view's handlers ran: one that prevents the default applied the
+  // value itself) and when the field is left, the field's change event is fired if its
+  // value is not the one last applied. A native change that comes after one of these, for
+  // the same value, is dropped, so a value is applied once. A textarea keeps Enter for its
+  // new lines and is only applied when left.
+  const TYPED = "input[type=number], input[type=text], input:not([type]), textarea";
+  const fields = (box) => {
+    if (box.dvqFields) return;                           // a rebuilt box keeps its listeners
+    box.dvqFields = true;
+    const typed = (t) => t instanceof Element && t.matches(TYPED) && !t.readOnly && !t.disabled;
+    const apply = (t) => {
+      if (!t.isConnected || t.disabled || t.value === t.dvqApplied) return;
+      t.dvqApplied = t.value;
+      t.dvqSent = true;
+      t.dispatchEvent(new Event("change", { bubbles: true }));
+      t.dvqApplied = t.value;                            // as the view left it
+    };
+    box.addEventListener("focusin", (e) => { if (typed(e.target)) { e.target.dvqApplied = e.target.value; e.target.dvqSent = false; } }, true);
+    box.addEventListener("change", (e) => {
+      const t = e.target;
+      if (!typed(t) || !e.isTrusted) return;
+      if (t.dvqSent && t.value === t.dvqApplied) { e.stopImmediatePropagation(); t.dvqSent = false; return; }
+      t.dvqSent = false;
+      t.dvqApplied = t.value;
+    }, true);
+    box.addEventListener("change", (e) => { if (typed(e.target)) e.target.dvqApplied = e.target.value; });
+    box.addEventListener("keydown", (e) => {
+      const t = e.target;
+      if (!typed(t) || t.localName === "textarea") return;
+      t.dvqIme = e.isComposing || e.keyCode === 229;     // the input method's key
+      if (e.key !== "Enter" || t.dvqIme) return;
+      setTimeout(() => {                                 // after the view's own handlers
+        if (e.defaultPrevented) { t.dvqApplied = t.value; return; }
+        apply(t);
+      }, 0);
+    }, true);
+    box.addEventListener("keyup", (e) => {
+      const t = e.target;
+      if (e.key !== "Enter" || !typed(t) || !t.dvqIme || t.localName === "textarea") return;
+      t.dvqIme = false;
+      t.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", bubbles: true, cancelable: true }));
+    }, true);
+    box.addEventListener("focusout", (e) => { if (typed(e.target)) apply(e.target); }, true);
+  };
+
   // --- links and the remembered state ---------------------------------------------------
 
   // The controls of a box are its inputs, selects and textareas in document order, the
@@ -1179,6 +1231,7 @@
     edits(box);
     header(box, helpOpen);
     keyboard(box);
+    fields(box);
     decorateLive(box);
     steady(box);
     watch(box);

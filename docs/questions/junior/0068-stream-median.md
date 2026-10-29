@@ -177,6 +177,47 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="class StreamMedian" linenums="1" hl_lines="14 15 16"
+        from heapq import heappush, heappop
+
+
+        class StreamMedian:
+            """The median of every prefix of a stream: low is a max-heap of the smaller half
+            (negated values, since heapq is a min-heap) and high a min-heap of the larger
+            half, with len(low) == len(high) or len(low) == len(high) + 1."""
+
+            def __init__(self):
+                self.low: list[int] = []        # the smaller half, negated: -low[0] is its largest
+                self.high: list[int] = []       # the larger half: high[0] is its smallest
+
+            def add(self, x: int) -> None:
+                heappush(self.low, -x)                          # (1)!
+                heappush(self.high, -heappop(self.low))         # (2)!
+                if len(self.high) > len(self.low):              # (3)!
+                    heappush(self.low, -heappop(self.high))
+
+            def median(self) -> float:
+                if len(self.low) > len(self.high):
+                    return -self.low[0]                         # (4)!
+                return (-self.low[0] + self.high[0]) / 2
+
+
+        def stream_medians(nums: list[int]) -> list[float]:
+            """The median after every value."""
+            sm = StreamMedian()
+            out = []
+            for x in nums:
+                sm.add(x)
+                out.append(sm.median())
+            return out
+        ```
+
+        1. ‏`low` מחזיקה ערכים שליליים, ולכן הראש שלה, `low[0]`, הוא מינוס המקסימום.
+        2. הדחיפה דרך `low` : הראש שלה יוצא (`heappop`), חוזר לסימן חיובי ונכנס ל-`high`.
+        3. ‏`high` נעשתה גדולה יותר : הראש שלה חוזר ל-`low`, שוב עם הסימן ההפוך.
+        4. מספר אי-זוגי של ערכים : החציון הוא הראש של `low`. שימו לב לסימן.
+
     === "SystemVerilog"
         ```systemverilog title="class heap_t, StreamMedian" linenums="1" hl_lines="41 42 43"
         // a value with its arrival number, so equal values are told apart (part c needs it)
@@ -236,47 +277,6 @@ added: 2026-10-29
         3. הערך עם מספר ההגעה שלו. בשני הסעיפים הראשונים המספר רק מכריע בין ערכים שווים.
         4. הדחיפה דרך `low` : הראש שלה, המקסימום של `low` אחרי ההכנסה, עובר ל-`high`. הסדר נשמר.
         5. ‏`high` נעשתה גדולה יותר : הראש שלה, המינימום של `high`, חוזר. הגדלים חוזרים לשמורה.
-
-    === "Python"
-        ```python title="class StreamMedian" linenums="1" hl_lines="14 15 16"
-        from heapq import heappush, heappop
-
-
-        class StreamMedian:
-            """The median of every prefix of a stream: low is a max-heap of the smaller half
-            (negated values, since heapq is a min-heap) and high a min-heap of the larger
-            half, with len(low) == len(high) or len(low) == len(high) + 1."""
-
-            def __init__(self):
-                self.low: list[int] = []        # the smaller half, negated: -low[0] is its largest
-                self.high: list[int] = []       # the larger half: high[0] is its smallest
-
-            def add(self, x: int) -> None:
-                heappush(self.low, -x)                          # (1)!
-                heappush(self.high, -heappop(self.low))         # (2)!
-                if len(self.high) > len(self.low):              # (3)!
-                    heappush(self.low, -heappop(self.high))
-
-            def median(self) -> float:
-                if len(self.low) > len(self.high):
-                    return -self.low[0]                         # (4)!
-                return (-self.low[0] + self.high[0]) / 2
-
-
-        def stream_medians(nums: list[int]) -> list[float]:
-            """The median after every value."""
-            sm = StreamMedian()
-            out = []
-            for x in nums:
-                sm.add(x)
-                out.append(sm.median())
-            return out
-        ```
-
-        1. ‏`low` מחזיקה ערכים שליליים, ולכן הראש שלה, `low[0]`, הוא מינוס המקסימום.
-        2. הדחיפה דרך `low` : הראש שלה יוצא (`heappop`), חוזר לסימן חיובי ונכנס ל-`high`.
-        3. ‏`high` נעשתה גדולה יותר : הראש שלה חוזר ל-`low`, שוב עם הסימן ההפוך.
-        4. מספר אי-זוגי של ערכים : החציון הוא הראש של `low`. שימו לב לסימן.
 
     #### למה זה נכון { .sol-proof }
 
@@ -434,29 +434,6 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="class StreamQuantile" linenums="1" hl_lines="8 10 12"
-        class StreamQuantile;                   // the p-quantile, p = num / den, by the nearest rank
-          heap_t low = new(1), high = new(0);   // low holds the ceil(p n) smallest values
-          int num, den, n = 0;
-          function new(int num, int den); this.num = num; this.den = den; endfunction
-          function void add(int x);
-            int target;
-            low.push('{x, n});
-            high.push(low.pop());                                  // (1)!
-            n++;
-            target = (num * n + den - 1) / den;                    // (2)!
-            if (target < 1) target = 1;
-            if (low.size() < target) low.push(high.pop());         // (3)!
-          endfunction
-          function int quantile(); return low.top().v; endfunction
-        endclass
-        ```
-
-        1. הדחיפה דרך `low` של סעיף א. ‏`low` באותו גודל כמו לפני ההכנסה.
-        2. ‏\( \lceil \text{num} \cdot n / \text{den} \rceil \) בחשבון שלם, בלי נקודה צפה.
-        3. היעד גדל לכל היותר ב-1, ולכן `if` מספיק : מעבר אחד חזרה, או כלום.
-
     === "Python"
         ```python title="class StreamQuantile" linenums="1" hl_lines="12 14 15"
         class StreamQuantile:
@@ -492,6 +469,29 @@ added: 2026-10-29
 
         1. הדחיפה דרך `low` של סעיף א. ‏`low` באותו גודל כמו לפני ההכנסה.
         2. ‏`-(-a // b)` הוא \( \lceil a / b \rceil \) בחשבון שלם : החלוקה השלמה של Python מעגלת כלפי מטה.
+        3. היעד גדל לכל היותר ב-1, ולכן `if` מספיק : מעבר אחד חזרה, או כלום.
+
+    === "SystemVerilog"
+        ```systemverilog title="class StreamQuantile" linenums="1" hl_lines="8 10 12"
+        class StreamQuantile;                   // the p-quantile, p = num / den, by the nearest rank
+          heap_t low = new(1), high = new(0);   // low holds the ceil(p n) smallest values
+          int num, den, n = 0;
+          function new(int num, int den); this.num = num; this.den = den; endfunction
+          function void add(int x);
+            int target;
+            low.push('{x, n});
+            high.push(low.pop());                                  // (1)!
+            n++;
+            target = (num * n + den - 1) / den;                    // (2)!
+            if (target < 1) target = 1;
+            if (low.size() < target) low.push(high.pop());         // (3)!
+          endfunction
+          function int quantile(); return low.top().v; endfunction
+        endclass
+        ```
+
+        1. הדחיפה דרך `low` של סעיף א. ‏`low` באותו גודל כמו לפני ההכנסה.
+        2. ‏\( \lceil \text{num} \cdot n / \text{den} \rceil \) בחשבון שלם, בלי נקודה צפה.
         3. היעד גדל לכל היותר ב-1, ולכן `if` מספיק : מעבר אחד חזרה, או כלום.
 
     #### למה זה נכון { .sol-proof }
@@ -628,55 +628,6 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="class WindowQuantile" linenums="1" hl_lines="10 17 31 36 37"
-        class WindowQuantile;                   // the p-quantile of the last w values, lazy deletion
-          heap_t low = new(1), high = new(0);
-          int w, num, den, n = 0;
-          int side[int];                        // arrival -> 0 (low) or 1 (high), for every live value
-          int live[2];                          // live values in low and in high
-          function new(int w, int num, int den); this.w = w; this.num = num; this.den = den; endfunction
-          function heap_t heap(int s); return s ? high : low; endfunction
-          function void prune(int s);           // dead values on top are thrown away
-            heap_t h = heap(s);
-            while (h.size() > 0 && !side.exists(h.top().id)) void'(h.pop());   // (1)!
-          endfunction
-          function void move(int src, int dst); // the live top of src goes to dst
-            item_t x;
-            prune(src);
-            x = heap(src).pop();
-            heap(dst).push(x);
-            side[x.id] = dst; live[src]--; live[dst]++;
-          endfunction
-          function void rebuild(int s);         // more dead than live: keep only the live values
-            item_t keep[$];
-            heap_t h = heap(s);
-            if (h.size() <= 2 * live[s]) return;
-            foreach (h.a[i]) if (side.exists(h.a[i].id)) keep.push_back(h.a[i]);
-            h.a = {};
-            foreach (keep[i]) h.push(keep[i]);
-          endfunction
-          function void add(int x);
-            int m, target;
-            low.push('{x, n}); side[n] = 0; live[0]++;
-            move(0, 1);
-            if (n >= w) begin live[side[n - w]]--; side.delete(n - w); end   // (2)!
-            n++;
-            m = n < w ? n : w;
-            target = (num * m + den - 1) / den;
-            if (target < 1) target = 1;
-            if (live[0] < target) move(1, 0);                      // (3)!
-            else if (live[0] > target) move(0, 1);
-            rebuild(0); rebuild(1);
-          endfunction
-          function int quantile(); prune(0); return low.top().v; endfunction
-        endclass
-        ```
-
-        1. ערך בלי רשומה ב-`side` מת. ראש מת נזרק, עד שהראש חי (או הערימה ריקה).
-        2. הערך \( n - w \) יוצא מהחלון : החיים בערימה שלו יורדים ב-1, הרשומה נמחקת, ושום דבר לא זז.
-        3. היעד על החיים. כשהחלון מלא, \( m = w \) קבוע, והיציאה יכולה להשאיר ל-`low` חסר או עודף של אחד.
-
     === "Python"
         ```python title="class WindowQuantile" linenums="1" hl_lines="18 37 39 42 46"
         from heapq import heapify
@@ -748,6 +699,55 @@ added: 2026-10-29
         2. הערך \( i - w \) יוצא מהחלון : הרשומה שלו נמחקת, והחיים בערימה שלו יורדים ב-1. שום דבר לא זז.
         3. היעד על החיים. כשהחלון מלא היציאה יכולה להשאיר ל-`low` חסר או עודף של ערך אחד.
         4. יותר מתים מחיים : הערימה נבנית מחדש מהחיים בלבד, \( O(W) \), לעיתים רחוקות.
+
+    === "SystemVerilog"
+        ```systemverilog title="class WindowQuantile" linenums="1" hl_lines="10 17 31 36 37"
+        class WindowQuantile;                   // the p-quantile of the last w values, lazy deletion
+          heap_t low = new(1), high = new(0);
+          int w, num, den, n = 0;
+          int side[int];                        // arrival -> 0 (low) or 1 (high), for every live value
+          int live[2];                          // live values in low and in high
+          function new(int w, int num, int den); this.w = w; this.num = num; this.den = den; endfunction
+          function heap_t heap(int s); return s ? high : low; endfunction
+          function void prune(int s);           // dead values on top are thrown away
+            heap_t h = heap(s);
+            while (h.size() > 0 && !side.exists(h.top().id)) void'(h.pop());   // (1)!
+          endfunction
+          function void move(int src, int dst); // the live top of src goes to dst
+            item_t x;
+            prune(src);
+            x = heap(src).pop();
+            heap(dst).push(x);
+            side[x.id] = dst; live[src]--; live[dst]++;
+          endfunction
+          function void rebuild(int s);         // more dead than live: keep only the live values
+            item_t keep[$];
+            heap_t h = heap(s);
+            if (h.size() <= 2 * live[s]) return;
+            foreach (h.a[i]) if (side.exists(h.a[i].id)) keep.push_back(h.a[i]);
+            h.a = {};
+            foreach (keep[i]) h.push(keep[i]);
+          endfunction
+          function void add(int x);
+            int m, target;
+            low.push('{x, n}); side[n] = 0; live[0]++;
+            move(0, 1);
+            if (n >= w) begin live[side[n - w]]--; side.delete(n - w); end   // (2)!
+            n++;
+            m = n < w ? n : w;
+            target = (num * m + den - 1) / den;
+            if (target < 1) target = 1;
+            if (live[0] < target) move(1, 0);                      // (3)!
+            else if (live[0] > target) move(0, 1);
+            rebuild(0); rebuild(1);
+          endfunction
+          function int quantile(); prune(0); return low.top().v; endfunction
+        endclass
+        ```
+
+        1. ערך בלי רשומה ב-`side` מת. ראש מת נזרק, עד שהראש חי (או הערימה ריקה).
+        2. הערך \( n - w \) יוצא מהחלון : החיים בערימה שלו יורדים ב-1, הרשומה נמחקת, ושום דבר לא זז.
+        3. היעד על החיים. כשהחלון מלא, \( m = w \) קבוע, והיציאה יכולה להשאיר ל-`low` חסר או עודף של אחד.
 
     #### למה זה נכון { .sol-proof }
 

@@ -77,6 +77,20 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="is_special"
+        def is_special(x: int) -> int:
+            digits = sorted(f"{x:03d}")              # three digits, leading zeros included (1)
+            smallest = int("".join(digits))           # ascending order
+            largest = int("".join(reversed(digits)))  # descending order (2)
+            return int(largest - smallest == x)
+        ```
+
+        1. ‏`f"{x:03d}"` מרפדת באפסים משמאל לשלוש ספרות, ו-`sorted` על המחרוזת מחזירה
+           רשימה של תווים בסדר עולה. מיון של ספרות כתווים זהה למיון שלהן כמספרים, כי כולן
+           באותו אורך.
+        2. ‏`reversed` הופכת את הסדר העולה ליורד, בלי מיון שני.
+
     === "SystemVerilog"
         ```systemverilog title="function is_special" hl_lines="6 7 8"
         function automatic bit is_special(int x);
@@ -105,20 +119,6 @@ added: 2026-10-16
         5. אותן ספרות בסדר הפוך. הספרה האמצעית `b` נשארת במקומה בשני המספרים.
 
         בחומרה שלוש ההשוואות הן מעגל צירופי של שלושה משווים, בלי לולאה.
-
-    === "Python"
-        ```python title="is_special"
-        def is_special(x: int) -> int:
-            digits = sorted(f"{x:03d}")              # three digits, leading zeros included (1)
-            smallest = int("".join(digits))           # ascending order
-            largest = int("".join(reversed(digits)))  # descending order (2)
-            return int(largest - smallest == x)
-        ```
-
-        1. ‏`f"{x:03d}"` מרפדת באפסים משמאל לשלוש ספרות, ו-`sorted` על המחרוזת מחזירה
-           רשימה של תווים בסדר עולה. מיון של ספרות כתווים זהה למיון שלהן כמספרים, כי כולן
-           באותו אורך.
-        2. ‏`reversed` הופכת את הסדר העולה ליורד, בלי מיון שני.
 
     #### סיבוכיות { .sol-cost }
 
@@ -155,6 +155,12 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="find_special"
+        def find_special() -> list[int]:
+            return [x for x in range(1000) if is_special(x)]
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="function find_special"
         function automatic void find_special(ref int special[$]);
@@ -166,12 +172,6 @@ added: 2026-10-16
 
         1. התור מגיע מהקורא (`ref`), ולכן מרוקנים אותו קודם : אחרת קריאה שנייה הייתה
            מוסיפה את התוצאות פעם נוספת.
-
-    === "Python"
-        ```python title="find_special"
-        def find_special() -> list[int]:
-            return [x for x in range(1000) if is_special(x)]
-        ```
 
     #### למה זה נכון { .sol-proof }
 
@@ -390,33 +390,6 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="kaprekar_step_b, kaprekar_attractor_b" hl_lines="3 4 7 14"
-        // One step in base b: three digits (leading zeros kept), sorted descending minus ascending.
-        function automatic int kaprekar_step_b(int x, int b);
-          int a = x / (b * b), m = (x / b) % b, c = x % b;   // (1)!
-          if (a < m) {a, m} = {m, a};
-          if (m < c) {m, c} = {c, m};
-          if (a < m) {a, m} = {m, a};
-          return (a * b * b + m * b + c) - (c * b * b + m * b + a);   // (2)!
-        endfunction
-
-        // Where every number with two different digits ends: the fixed point of an even base
-        // (returns 1, in x1), the two values of the cycle of an odd base (returns 2, in x1 and x2).
-        function automatic int kaprekar_attractor_b(int b, output int x1, output int x2);
-          int k = b / 2;
-          x1 = k * (b * b - 1);                                      // (3)!
-          x2 = (k + 1) * (b * b - 1);
-          return (b % 2 == 0) ? 1 : 2;
-        endfunction
-        ```
-
-        1. אותו פירוק כמו בסעיף א, עם \( b \) במקום 10. עבור \( x < b^2 \) מתקבל \( a = 0 \),
-           כלומר אפס משלים.
-        2. הגדול פחות הקטן; לפי ההוכחה זה \( (a - c)(b^2 - 1) \).
-        3. ‏\( k = \lfloor b / 2 \rfloor \) : בבסיס זוגי \( x_1 = (b/2)(b^2 - 1) \) היא נקודת
-           השבת; באי-זוגי \( x_1 \) ו-\( x_2 \) הם שני ערכי המחזור.
-
     === "Python"
         ```python title="kaprekar_step_b, kaprekar_attractor_b, kaprekar_chain_b"
         def kaprekar_step_b(x: int, b: int) -> int:
@@ -443,6 +416,33 @@ added: 2026-10-16
         1. ‏`sorted` של שלוש הספרות; `lo` ו-`hi` בונים את שני המספרים, ו-`mid` משותף.
         2. השרשרת נעצרת ברגע שנכנסים ליעד : בבסיס אי-זוגי זה אחד משני ערכי המחזור, ומשם
            מתנדנדים לנצח.
+
+    === "SystemVerilog"
+        ```systemverilog title="kaprekar_step_b, kaprekar_attractor_b" hl_lines="3 4 7 14"
+        // One step in base b: three digits (leading zeros kept), sorted descending minus ascending.
+        function automatic int kaprekar_step_b(int x, int b);
+          int a = x / (b * b), m = (x / b) % b, c = x % b;   // (1)!
+          if (a < m) {a, m} = {m, a};
+          if (m < c) {m, c} = {c, m};
+          if (a < m) {a, m} = {m, a};
+          return (a * b * b + m * b + c) - (c * b * b + m * b + a);   // (2)!
+        endfunction
+
+        // Where every number with two different digits ends: the fixed point of an even base
+        // (returns 1, in x1), the two values of the cycle of an odd base (returns 2, in x1 and x2).
+        function automatic int kaprekar_attractor_b(int b, output int x1, output int x2);
+          int k = b / 2;
+          x1 = k * (b * b - 1);                                      // (3)!
+          x2 = (k + 1) * (b * b - 1);
+          return (b % 2 == 0) ? 1 : 2;
+        endfunction
+        ```
+
+        1. אותו פירוק כמו בסעיף א, עם \( b \) במקום 10. עבור \( x < b^2 \) מתקבל \( a = 0 \),
+           כלומר אפס משלים.
+        2. הגדול פחות הקטן; לפי ההוכחה זה \( (a - c)(b^2 - 1) \).
+        3. ‏\( k = \lfloor b / 2 \rfloor \) : בבסיס זוגי \( x_1 = (b/2)(b^2 - 1) \) היא נקודת
+           השבת; באי-זוגי \( x_1 \) ו-\( x_2 \) הם שני ערכי המחזור.
 
     #### למה זה נכון { .sol-proof }
 

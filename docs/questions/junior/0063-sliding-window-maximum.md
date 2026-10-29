@@ -135,26 +135,6 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="function window_max" linenums="1" hl_lines="7 8 10"
-        // the maximum of every window of k values: q is a deque of indices, front first, whose
-        // values decrease from the front to the back
-        function automatic void window_max(input int nums[], input int k, output int out[$]);
-          int q[$];
-          out = {};
-          foreach (nums[i]) begin
-            if (q.size() > 0 && q[0] == i - k) void'(q.pop_front());               // (1)!
-            while (q.size() > 0 && nums[q[$]] <= nums[i]) void'(q.pop_back());     // (2)!
-            q.push_back(i);
-            if (i >= k - 1) out.push_back(nums[q[0]]);                             // (3)!
-          end
-        endfunction
-        ```
-
-        1. ‏`q[0]` הוא הראש. רק המקום \( i - k \) יכול לצאת מהחלון בצעד הזה, ולכן `if` ולא `while`.
-        2. ‏`q[$]` הוא הזנב. ערך שאינו גדול מהחדש לא יהיה מקסימום יותר.
-        3. החלון המלא הראשון נגמר ב-\( k - 1 \). מאז, בכל צעד יוצא ערך אחד.
-
     === "Python"
         ```python title="window_max" linenums="1" hl_lines="10 12 16"
         from collections import deque
@@ -179,6 +159,26 @@ added: 2026-10-29
         1. ‏`q[0]` הוא הראש. רק המקום \( i - k \) יכול לצאת מהחלון בצעד הזה.
         2. ‏`q[-1]` הוא הזנב. ערך שאינו גדול מ-\( x \) לא יהיה מקסימום יותר.
         3. מהחלון המלא הראשון והלאה, הראש הוא המקסימום.
+
+    === "SystemVerilog"
+        ```systemverilog title="function window_max" linenums="1" hl_lines="7 8 10"
+        // the maximum of every window of k values: q is a deque of indices, front first, whose
+        // values decrease from the front to the back
+        function automatic void window_max(input int nums[], input int k, output int out[$]);
+          int q[$];
+          out = {};
+          foreach (nums[i]) begin
+            if (q.size() > 0 && q[0] == i - k) void'(q.pop_front());               // (1)!
+            while (q.size() > 0 && nums[q[$]] <= nums[i]) void'(q.pop_back());     // (2)!
+            q.push_back(i);
+            if (i >= k - 1) out.push_back(nums[q[0]]);                             // (3)!
+          end
+        endfunction
+        ```
+
+        1. ‏`q[0]` הוא הראש. רק המקום \( i - k \) יכול לצאת מהחלון בצעד הזה, ולכן `if` ולא `while`.
+        2. ‏`q[$]` הוא הזנב. ערך שאינו גדול מהחדש לא יהיה מקסימום יותר.
+        3. החלון המלא הראשון נגמר ב-\( k - 1 \). מאז, בכל צעד יוצא ערך אחד.
 
     #### למה זה נכון { .sol-proof }
 
@@ -298,31 +298,6 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="function longest_within" linenums="1" hl_lines="7 10 15"
-        // the longest window whose max - min is at most limit: hi keeps the window's maximum at
-        // its front (values decreasing), lo its minimum (values increasing)
-        function automatic int longest_within(int nums[], int limit);
-          int hi[$], lo[$], left = 0, best = 0;
-          foreach (nums[right]) begin
-            while (hi.size() > 0 && nums[hi[$]] <= nums[right]) void'(hi.pop_back());
-            while (lo.size() > 0 && nums[lo[$]] >= nums[right]) void'(lo.pop_back());   // (1)!
-            hi.push_back(right);
-            lo.push_back(right);
-            while (nums[hi[0]] - nums[lo[0]] > limit) begin                          // (2)!
-              if (hi[0] == left) void'(hi.pop_front());
-              if (lo[0] == left) void'(lo.pop_front());
-              left++;
-            end
-            if (right - left + 1 > best) best = right - left + 1;
-          end
-          return best;
-        endfunction
-        ```
-
-        1. המינימום : אותו ניקוי עם הסימן ההפוך. ב-`lo` הערכים עולים מהראש לזנב.
-        2. החלון לא חוקי : הקצה השמאלי מתקדם, ומקום שבראש ושווה ל-`left` יוצא. הלולאה נעצרת, כי חלון של תא אחד חוקי.
-
     === "Python"
         ```python title="longest_within" linenums="1" hl_lines="13 17 23"
         from collections import deque
@@ -353,6 +328,31 @@ added: 2026-10-29
 
         1. המינימום : אותו ניקוי עם הסימן ההפוך. ב-`lo` הערכים עולים מהראש לזנב.
         2. החלון לא חוקי : הקצה השמאלי מתקדם, ומקום שבראש ושווה ל-`left` יוצא.
+
+    === "SystemVerilog"
+        ```systemverilog title="function longest_within" linenums="1" hl_lines="7 10 15"
+        // the longest window whose max - min is at most limit: hi keeps the window's maximum at
+        // its front (values decreasing), lo its minimum (values increasing)
+        function automatic int longest_within(int nums[], int limit);
+          int hi[$], lo[$], left = 0, best = 0;
+          foreach (nums[right]) begin
+            while (hi.size() > 0 && nums[hi[$]] <= nums[right]) void'(hi.pop_back());
+            while (lo.size() > 0 && nums[lo[$]] >= nums[right]) void'(lo.pop_back());   // (1)!
+            hi.push_back(right);
+            lo.push_back(right);
+            while (nums[hi[0]] - nums[lo[0]] > limit) begin                          // (2)!
+              if (hi[0] == left) void'(hi.pop_front());
+              if (lo[0] == left) void'(lo.pop_front());
+              left++;
+            end
+            if (right - left + 1 > best) best = right - left + 1;
+          end
+          return best;
+        endfunction
+        ```
+
+        1. המינימום : אותו ניקוי עם הסימן ההפוך. ב-`lo` הערכים עולים מהראש לזנב.
+        2. החלון לא חוקי : הקצה השמאלי מתקדם, ומקום שבראש ושווה ל-`left` יוצא. הלולאה נעצרת, כי חלון של תא אחד חוקי.
 
     #### למה זה נכון { .sol-proof }
 
@@ -491,6 +491,44 @@ added: 2026-10-29
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="class WinMax" linenums="1" hl_lines="12 18 22"
+        class WinMax:
+            """The module win_max cycle by cycle: k entries, front first, each a value, its age
+            and a valid bit; clock(x) is one rising edge and returns max_out after it."""
+
+            def __init__(self, k: int):
+                self.k = k
+                self.slots = [(0, 0, False)] * k               # (value, age, valid)
+
+            def clock(self, x: int) -> int:
+                k, slots = self.k, self.slots
+                # k comparators at once: the entries larger than x, ones then zeros
+                keep = [ok and v > x for v, _, ok in slots]     # (1)!
+                nxt = []
+                for j, (v, age, ok) in enumerate(slots):
+                    if keep[j]:
+                        nxt.append((v, age + 1, True))          # kept, one cycle older
+                    elif j == 0 or keep[j - 1]:
+                        nxt.append((x, 0, True))                # (2)!
+                    else:
+                        nxt.append((0, 0, False))
+                nxt.append((x, 0, keep[-1]))                    # all k kept: the spare slot
+                drop = nxt[0][2] and nxt[0][1] == k             # (3)!
+                self.slots = nxt[1:] if drop else nxt[:k]
+                return self.slots[0][0]
+
+
+        def win_max_run(samples: list[int], k: int) -> list[int]:
+            """max_out after every sample, one sample a cycle."""
+            hw = WinMax(k)
+            return [hw.clock(x) for x in samples]
+        ```
+
+        1. המשווים של המודול. ‏`keep` היא המסכה, אחדות ואחריהם אפסים.
+        2. האפס הראשון של המסכה, היציאה של מקודד העדיפות : שם נכתבת \( x \) עם גיל 0.
+        3. הראש נשאר והגיע לגיל \( k \) : כל הכניסות זזות מקום אחד לכיוון הראש.
+
     === "SystemVerilog"
         ```systemverilog title="module win_max" linenums="1" hl_lines="23 29 35 43"
         // the maximum of the last K samples, every cycle: K entries, front first, whose values
@@ -548,44 +586,6 @@ added: 2026-10-29
         2. ‏`kp[j] && !keep[j]` הוא האפס הראשון של המסכה : היציאה של מקודד העדיפות, one-hot. שם נכתבת \( x \).
         3. הראש נשאר והגיע לגיל \( K \) : הוא כבר מחוץ לחלון. רק הראש יכול להגיע לגיל הזה.
         4. ההזזה לכיוון הראש : מרבב אחד לכל כניסה, בין המקום שלה למקום שאחריה.
-
-    === "Python"
-        ```python title="class WinMax" linenums="1" hl_lines="12 18 22"
-        class WinMax:
-            """The module win_max cycle by cycle: k entries, front first, each a value, its age
-            and a valid bit; clock(x) is one rising edge and returns max_out after it."""
-
-            def __init__(self, k: int):
-                self.k = k
-                self.slots = [(0, 0, False)] * k               # (value, age, valid)
-
-            def clock(self, x: int) -> int:
-                k, slots = self.k, self.slots
-                # k comparators at once: the entries larger than x, ones then zeros
-                keep = [ok and v > x for v, _, ok in slots]     # (1)!
-                nxt = []
-                for j, (v, age, ok) in enumerate(slots):
-                    if keep[j]:
-                        nxt.append((v, age + 1, True))          # kept, one cycle older
-                    elif j == 0 or keep[j - 1]:
-                        nxt.append((x, 0, True))                # (2)!
-                    else:
-                        nxt.append((0, 0, False))
-                nxt.append((x, 0, keep[-1]))                    # all k kept: the spare slot
-                drop = nxt[0][2] and nxt[0][1] == k             # (3)!
-                self.slots = nxt[1:] if drop else nxt[:k]
-                return self.slots[0][0]
-
-
-        def win_max_run(samples: list[int], k: int) -> list[int]:
-            """max_out after every sample, one sample a cycle."""
-            hw = WinMax(k)
-            return [hw.clock(x) for x in samples]
-        ```
-
-        1. המשווים של המודול. ‏`keep` היא המסכה, אחדות ואחריהם אפסים.
-        2. האפס הראשון של המסכה, היציאה של מקודד העדיפות : שם נכתבת \( x \) עם גיל 0.
-        3. הראש נשאר והגיע לגיל \( k \) : כל הכניסות זזות מקום אחד לכיוון הראש.
 
     #### למה זה נכון { .sol-proof }
 

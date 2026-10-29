@@ -154,6 +154,47 @@ added: 2026-10-18
     וב-SystemVerilog מחרוזת `"0:AB 7:A 11:A"`. פעולה ריקה (`''` ב-Python, `-` ב-SystemVerilog)
     פירושה "לא להפוך כלום, רק לחכות לשעון הבא".
 
+    === "Python"
+        ```python title="solve" linenums="1" hl_lines="18 23 27"
+        from collections import deque
+
+
+        def solve(A, B, D):
+            """Return {time: action} for a plan that ends exactly at D, or None."""
+            # State: (time, sand on top of A, sand on top of B). At t=0 all sand is at the bottom.
+            start = (0, 0, 0)
+            queue = deque([(start, {})])
+            seen = {start}
+
+            while queue:
+                (t, a, b), plan = queue.popleft()
+                if t == D:
+                    return plan
+
+                for flip_a in (False, True):
+                    for flip_b in (False, True):
+                        a2 = A - a if flip_a else a   # (1)!
+                        b2 = B - b if flip_b else b
+                        running = [sand for sand in (a2, b2) if sand > 0]
+                        if not running:
+                            continue                # nothing flows, nothing will happen
+                        wait = min(running)         # until the next hourglass runs out (2)
+                        if t + wait > D:
+                            continue                # would overshoot D
+
+                        new_state = (t + wait, max(a2 - wait, 0), max(b2 - wait, 0))
+                        if new_state not in seen:   # (3)!
+                            seen.add(new_state)
+                            action = ("A" if flip_a else "") + ("B" if flip_b else "")
+                            queue.append((new_state, {**plan, t: action}))
+            return None
+        ```
+
+        1. היפוך : החול שלמעלה הופך להיות \( A - a \). בלי היפוך הכמות נשארת.
+        2. ההמתנה היא המינימום בין הכמויות **החיוביות** שלמעלה : שעון ריק למעלה לא משתתף.
+        3. הגיזום : מצב שכבר נראה לא נכנס שוב. בלי זה החיפוש עדיין מסתיים (כי \( t \) גדל
+           בכל צעד ונחסם על ידי \( D \)), אבל הוא אקספוננציאלי.
+
     === "SystemVerilog"
         ```systemverilog title="function measure_from_zero" linenums="1" hl_lines="27 30 32"
         typedef struct { int t; int a; int b; } hg_state_t;   // time, sand on top of A, sand on top of B
@@ -208,47 +249,6 @@ added: 2026-10-18
            ההמתנה נקרא כאן `delay`.
         3. היפוך : החול שלמעלה הופך להיות \( A - a \). בלי היפוך הכמות נשארת.
         4. ההמתנה היא המינימום בין הכמויות **החיוביות** שלמעלה : שעון ריק למעלה לא משתתף.
-
-    === "Python"
-        ```python title="solve" linenums="1" hl_lines="18 23 27"
-        from collections import deque
-
-
-        def solve(A, B, D):
-            """Return {time: action} for a plan that ends exactly at D, or None."""
-            # State: (time, sand on top of A, sand on top of B). At t=0 all sand is at the bottom.
-            start = (0, 0, 0)
-            queue = deque([(start, {})])
-            seen = {start}
-
-            while queue:
-                (t, a, b), plan = queue.popleft()
-                if t == D:
-                    return plan
-
-                for flip_a in (False, True):
-                    for flip_b in (False, True):
-                        a2 = A - a if flip_a else a   # (1)!
-                        b2 = B - b if flip_b else b
-                        running = [sand for sand in (a2, b2) if sand > 0]
-                        if not running:
-                            continue                # nothing flows, nothing will happen
-                        wait = min(running)         # until the next hourglass runs out (2)
-                        if t + wait > D:
-                            continue                # would overshoot D
-
-                        new_state = (t + wait, max(a2 - wait, 0), max(b2 - wait, 0))
-                        if new_state not in seen:   # (3)!
-                            seen.add(new_state)
-                            action = ("A" if flip_a else "") + ("B" if flip_b else "")
-                            queue.append((new_state, {**plan, t: action}))
-            return None
-        ```
-
-        1. היפוך : החול שלמעלה הופך להיות \( A - a \). בלי היפוך הכמות נשארת.
-        2. ההמתנה היא המינימום בין הכמויות **החיוביות** שלמעלה : שעון ריק למעלה לא משתתף.
-        3. הגיזום : מצב שכבר נראה לא נכנס שוב. בלי זה החיפוש עדיין מסתיים (כי \( t \) גדל
-           בכל צעד ונחסם על ידי \( D \)), אבל הוא אקספוננציאלי.
 
     #### למה זה נכון { .sol-proof }
 
