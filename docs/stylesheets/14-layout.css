@@ -33,6 +33,10 @@
 }
 @media screen and (min-width: 76.25em) {
   .md-sidebar--primary { width: var(--dvq-nav-w, 12.1rem); }
+  /* Material keeps the list 11.5rem wide inside a wider sidebar (a padding of the rest):
+     a widened column gives its whole width to the titles, which end in "…" only at its edge */
+  [dir=rtl] .md-sidebar--primary .md-sidebar__inner { padding-left: 0; }
+  [dir=ltr] .md-sidebar--primary .md-sidebar__inner { padding-right: 0; }
   .md-sidebar--primary .col-grip--nav { display: block; inset-inline-end: -0.35rem; }
 }
 .col-grip {

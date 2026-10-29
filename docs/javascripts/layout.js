@@ -38,6 +38,7 @@
       const open = nav.classList.contains("is-folded");
       store.set(FOLD_KEY, open ? "1" : null);
       set(open);
+      window.dispatchEvent(new Event("resize"));   // the titles now shown are fitted to the column
     });
     list.before(btn);
   };

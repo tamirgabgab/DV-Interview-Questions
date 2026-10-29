@@ -215,6 +215,11 @@
 }
 .md-typeset .cost-chip > b { font-weight: 700; }
 .md-typeset .cost-chip .arithmatex { direction: ltr; unicode-bidi: isolate; }   /* a flex item: keep the formula LTR */
+/* A chip grows with its formula and never scrolls: the formula's own sideways scroll (01-base)
+   showed a useless scrollbar under a formula a pixel too wide. A chip wider than its row takes
+   a row of its own, and on a phone its label and formula may stack. */
+.md-typeset .cost-chip { flex-wrap: wrap; max-width: 100%; }
+.md-typeset .cost-chip .arithmatex { overflow: visible; }
 
 @media print { .md-typeset .sol-map { display: none; } }
 

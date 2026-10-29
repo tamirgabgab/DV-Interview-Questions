@@ -643,13 +643,20 @@
     openTarget();
     window.addEventListener("hashchange", openTarget);
     // a side navigation title (S421) and a path step's title (S419) that do not fit lose
-    // whole words from their end, the full title stays as the link's tooltip
-    document.querySelectorAll(".md-sidebar--primary .md-nav__link .md-ellipsis").forEach((span) => {
+    // whole words from their end, the full title stays as the link's tooltip; fitted again
+    // from the whole title when the column changes width (a grip, a resize, the fold button)
+    const fitNav = () => document.querySelectorAll(".md-sidebar--primary .md-nav__link .md-ellipsis").forEach((span) => {
       const link = span.closest("a");
       if (!link || link.classList.contains("md-nav__link--active")) return;
-      if (!link.title) link.title = span.textContent.trim();
+      if (!span.dataset.full) span.dataset.full = span.textContent.trim();
+      if (!link.title) link.title = span.dataset.full;
+      span.textContent = span.dataset.full;
       fitWords(span, span);
     });
+    let navFrame = 0;
+    const fitNavLater = () => { cancelAnimationFrame(navFrame); navFrame = requestAnimationFrame(fitNav); };
+    requestAnimationFrame(fitNav);   // after layout.js has put back a remembered column width
+    window.addEventListener("resize", fitNavLater, { passive: true });
     document.querySelectorAll(".path-nav .pn-title").forEach((t) => fitWords(t, t.closest("a")));
     const mj = window.MathJax && window.MathJax.startup && window.MathJax.startup.promise;
     (mj || Promise.resolve()).then(wideMath, wideMath);
