@@ -306,6 +306,8 @@
         } else st.log = "";
         render();
       };
+      // Enter in the address or the length sends the request, as the button does
+      [".ex-addr", ".ex-len"].forEach((s) => $(s).addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); $(".ex-send").click(); } }));
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => load(EP_SCRIPTS[b.dataset.p])));
       $(".ex-reset").addEventListener("click", () => seed.draw());
       load(EP_SCRIPTS.b);
