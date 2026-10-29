@@ -21,6 +21,11 @@ refine one in an earlier part, and moving a rule between parts can change what w
 | `12-rounds-y-s.css` | rounds Y and S: the tags page, box text size, touch tools, side navigation, button runs, S2 figures |
 | `13-motion.css` | round M: the drawn logo, the header and table of contents, the hero's live waves and example, cards, the question header card, self-check and hint feedback, the box skeleton, page transitions, the footer, the 404 page |
 | `14-layout.css` | the desktop layout: the wider grid, the folded level list in the side navigation, the grips that resize the three columns (`layout.js`) |
+| `15-home.css` | round V: the home page's navy band, the live level cards, the question of the day (`home-extras.js`) |
+| `16-maps.css` | round V: the study-path metro map and the tag graph (tokens `--mm-*`, `--tg-*`; `maps.js`) |
+| `17-lists.css` | round V: the level pages' header band with progress, the question table rows (stripe, kind tile, marks, whole-row link, cards on phones; `level-page.js`) |
+| `18-question.css` | round V: the question header card's pattern and kind icon, the part timeline, the code window (`question-page.js`) |
+| `19-details.css` | round V: the success pulse, the content icons (kinds, levels, paths), the box loading wave (`details.js`) |
 
 The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
 `stylesheets/site.css` at the end of the build and links that file from every page and from

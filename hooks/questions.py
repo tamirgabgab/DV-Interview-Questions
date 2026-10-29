@@ -353,7 +353,29 @@ def difficulty_chip(difficulty: str, quiet: bool = False) -> str:
 
 
 def kind_icon(kind: str) -> str:
+    """The icon of a question kind (round V: thin strokes like the site mark, 19-details.css)."""
     return f'<i class="kind-ico kind-ico-{kind}" aria-hidden="true"></i>'
+
+
+def level_icon(level: str) -> str:
+    """The icon of a level (student, junior, senior), in the family of kind_icon."""
+    return f'<i class="kind-ico lvl-ico lvl-ico-{level}" aria-hidden="true"></i>'
+
+
+# The study paths with an icon of their own in 19-details.css (.path-ico-<slug>); any other
+# path shows the icon of the kind most of its questions have.
+PATH_ICONS = {"advanced-algorithms", "cake", "cdc-verification", "coding", "constraints", "digits",
+              "geometry-motion", "logic-design", "logic-puzzles", "optimization-puzzles", "pcie",
+              "probability", "testbench"}
+
+
+def path_icon(p: dict) -> str:
+    """The icon of a study path (an entry of _paths)."""
+    slug = posixpath.basename(p["src_uri"])[: -len(".md")]
+    if slug in PATH_ICONS:
+        return f'<i class="kind-ico path-ico path-ico-{slug}" aria-hidden="true"></i>'
+    kinds = [s["q"]["kind"] for s in p["steps"]]
+    return kind_icon(max(KINDS, key=kinds.count))
 
 
 def kind_chip(kind: str, quiet: bool = False) -> str:
@@ -413,8 +435,11 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
         bottom.append(f'<span class="qh-sep"></span><span>נוספה ב-{_date_he(added)}</span>')
     if q.get("source"):
         bottom.append(f'<span class="qh-sep"></span><span>מקור : {html.escape(str(q["source"]))}</span>')
+    # V11: the card carries its difficulty and kind (18-question.css tints a quiet trace
+    # pattern along its top edge by the difficulty) and a large kind icon at its corner
     return (
-        '<div class="question-header">\n'
+        f'<div class="question-header qh-diff-{q["difficulty"]} qh-kind-{q["kind"]}">\n'
+        f'<span class="qh-emblem" aria-hidden="true">{kind_icon(q["kind"])}</span>\n'
         f'<h1>{html.escape(str(q["title"]))}</h1>\n'
         f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
         f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{"".join(badges)}</div>\n'
@@ -541,11 +566,9 @@ def _path_cards(page_url: str, featured: bool = False) -> str:
         if featured and not p["featured"]:
             continue
         ids = [s["q"]["id"] for s in p["steps"]]
-        kinds = [s["q"]["kind"] for s in p["steps"]]
-        kind = max(KINDS, key=kinds.count)            # the kind most of its questions have
         cards.append(
             f'<a class="level-card path-card" href="{_href(p["src_uri"], page_url)}">'
-            f'<div class="lc-head"><span class="lc-name">{kind_icon(kind)}{html.escape(p["title"])}</span></div>'
+            f'<div class="lc-head"><span class="lc-name">{path_icon(p)}{html.escape(p["title"])}</span></div>'
             f'<p class="lc-desc">{html.escape(p["description"])}</p>'
             f'<div class="lc-diff"><span class="lc-count">{len(ids)} שאלות</span>'
             f'{_diff_chips([s["q"] for s in p["steps"]])}</div>'
@@ -578,24 +601,218 @@ def _has_tests(q: dict) -> bool:
     return (extract_code.ROOT / "tests" / q["id"]).exists()
 
 
+# The level cards' pictures (round V, 15-home.css): drawn still, and moving only while a
+# card is hovered or focused (home-extras.js turns the motion on outside an automated
+# browser and reduced motion). student: an AND gate whose inputs count 00 to 11; junior: a
+# FIFO that fills and drains; senior: a four-stage pipeline with two tokens in flight. The
+# data flows right to left, the reading direction of the page.
+HOME_LEVEL_ART = {
+    "student": (
+        '<g class="la-in la-a"><line x1="10" y1="18" x2="44" y2="18"/><rect x="2" y="14" width="8" height="8" rx="2"/></g>'
+        '<g class="la-in la-b"><line x1="10" y1="38" x2="44" y2="38"/><rect x="2" y="34" width="8" height="8" rx="2"/></g>'
+        '<path class="la-gate" d="M44 8h18a20 20 0 0 1 0 40h-18z"/>'
+        '<g class="la-in la-y"><line x1="82" y1="28" x2="108" y2="28"/><circle cx="113" cy="28" r="5"/></g>'),
+    "junior": (
+        '<path class="la-wire" d="M118 28h-8M8 28H2"/><path class="la-head" d="M2 28l5-3.5v7z"/>'
+        + "".join(f'<rect class="la-slot{" is-full" if i < 3 else ""}" style="--i:{i}" x="{93 - 16 * i}" y="16" width="13" height="24" rx="2"/>'
+                  for i in range(6))
+        + '<rect class="la-box" x="10" y="12" width="100" height="32" rx="4"/>'),
+    "senior": (
+        '<path class="la-wire" d="M118 28h-4M92 28h-7M63 28h-7M34 28h-7M5 28H2"/>'
+        + "".join(f'<rect class="la-stage{" is-lit" if i in (1, 3) else ""}" style="--i:{i}" x="{92 - 29 * i}" y="17" width="22" height="22" rx="3"/>'
+                  for i in range(4))
+        + '<circle class="la-token la-t1" cx="103" cy="28" r="5"/><circle class="la-token la-t2" cx="103" cy="28" r="5"/>'),
+}
+
+
+def home_level_art(level: str) -> str:
+    return (f'<svg class="lc-art lc-art-{level}" viewBox="0 0 120 56" aria-hidden="true" focusable="false">'
+            f'{HOME_LEVEL_ART[level]}</svg>')
+
+
+def home_diff_mix(qs) -> str:
+    """The difficulty mix of a level as one stacked bar (easy, medium, hard shares, the
+    --diff-* colours) and a legend of counts under it, which is what a screen reader reads."""
+    counts = {d: sum(q["difficulty"] == d for q in qs) for d in DIFFICULTIES}
+    bar = "".join(f'<i class="lc-seg lc-seg-{d}" style="flex-grow:{n}"></i>' for d, n in counts.items() if n)
+    legend = "".join(f'<span class="lc-leg lc-leg-{d}"><b>{n}</b> {DIFFICULTIES[d]}</span>'
+                     for d, n in counts.items() if n)
+    return (f'<div class="lc-mix"><span class="lc-bar" aria-hidden="true">{bar}</span>'
+            f'<span class="lc-legend"><span class="lc-sr">לפי קושי : </span>{legend}</span></div>')
+
+
 def _level_cards(page_url: str) -> str:
+    """A card per level: its name and count, a small moving picture (still until hovered or
+    focused), the description, the difficulty mix as a stacked bar, and the "solved" bar."""
     base = _base(page_url)
     cards = []
     for level, label in LEVELS.items():
         qs = [q for q in _questions.values() if q["level"] == level]
         href = posixpath.relpath(f"{QUESTIONS_DIR}/{level}/", base or ".") + "/"
-        diff = _diff_chips(qs)
-        if not diff:
-            diff = '<span class="lc-empty">עדיין אין שאלות ברמה הזו</span>'
+        mix = home_diff_mix(qs) if qs else '<span class="lc-empty">עדיין אין שאלות ברמה הזו</span>'
         cards.append(
             f'<a class="level-card" href="{href}">'
-            f'<div class="lc-head"><span class="lc-name">{label}</span>'
-            f'<span class="lc-count">{len(qs)} שאלות</span></div>'
+            f'<div class="lc-head"><span class="lc-title"><span class="lc-name">{label}</span>'
+            f'<span class="lc-count">{len(qs)} שאלות</span></span>{home_level_art(level)}</div>'
             f'<p class="lc-desc">{LEVEL_DESC[level]}</p>'
-            f'<div class="lc-diff">{diff}</div>'
+            f'<div class="lc-diff">{mix}</div>'
             f'{_progress(sorted(q["id"] for q in qs)) if qs else ""}</a>'
         )
     return '<div class="level-cards">' + "".join(cards) + "</div>"
+
+
+# The home page's dark band (round V): the level cards and the question of the day on a
+# navy card like the hero, over a quiet pattern of board traces that ends in hexagonal pads.
+# A few amber pulses run along the traces while the band is on screen (home-extras.js
+# adds .is-live, never in an automated browser or under reduced motion).
+HOME_BAND = re.compile(r"<!--\s*home-band\s*-->(.*?)<!--\s*/home-band\s*-->", re.S)
+HOME_DAILY = re.compile(r"<!--\s*home-daily\s*-->")
+HOME_TRACES = [
+    "M0 40h180l30 30h170l20-20h120",
+    "M0 120h90l40-40h110l30 30h60",
+    "M1200 60h-160l-30 30h-140l-25-25h-95",
+    "M1200 150h-90l-40 40h-150l-30-30h-70",
+    "M0 250h140l35-35h120l25 25h90",
+    "M1200 270h-200l-30-30h-110l-20 20h-60",
+    "M560 0v40l30 30v60",
+    "M700 320v-50l-30-30v-40",
+]
+
+
+def _hex(x: float, y: float, r: float = 7) -> str:
+    pts = " ".join(f"{x + r * c:.1f},{y + r * s:.1f}" for c, s in
+                   ((1, 0), (0.5, 0.866), (-0.5, 0.866), (-1, 0), (-0.5, -0.866), (0.5, -0.866)))
+    return f'<polygon class="hb-pad" points="{pts}"/>'
+
+
+def _trace_end(d: str) -> tuple[float, float]:
+    """The last point of a trace written as M x y then h, v and l steps."""
+    tokens = re.findall(r"[MhvlHVL]|-?\d+(?:\.\d+)?", d)
+    x = y = 0.0
+    i = 0
+    while i < len(tokens):
+        t = tokens[i]
+        if t == "M":
+            x, y = float(tokens[i + 1]), float(tokens[i + 2]); i += 3
+        elif t == "h":
+            x += float(tokens[i + 1]); i += 2
+        elif t == "v":
+            y += float(tokens[i + 1]); i += 2
+        elif t == "l":
+            x += float(tokens[i + 1]); y += float(tokens[i + 2]); i += 3
+        else:
+            i += 1
+    return x, y
+
+
+def home_band_bg() -> str:
+    traces = "".join(f'<path class="hb-trace" d="{d}"/>' for d in HOME_TRACES)
+    pads = "".join(_hex(*_trace_end(d)) for d in HOME_TRACES)
+    pulses = "".join(f'<path class="hb-pulse" style="--k:{k}" pathLength="1" d="{HOME_TRACES[i]}"/>'
+                     for k, i in enumerate((0, 3, 4, 6)))
+    svg = ('<svg class="hb-{}" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMin slice" focusable="false">'
+           f'{traces}{pads}{pulses}</svg>')
+    return f'<div class="hb-bg" aria-hidden="true">{svg.format("top")}{svg.format("bottom")}</div>'
+
+
+def home_band(output: str) -> str:
+    """The band around a built page's part between <!-- home-band --> and <!-- /home-band -->
+    (on_post_page: the cards are raw HTML, which a Markdown div would parse again)."""
+    return HOME_BAND.sub(lambda m: f'<div class="home-band">{home_band_bg()}{m.group(1)}</div>', output)
+
+
+HOME_EPOCH = dt.date(2026, 1, 1)   # day 0 of the question of the day (home-extras.js)
+_home_teasers: dict[str, str] = {}
+
+
+def home_teaser(q: dict, limit: int = 170) -> str:
+    """The first sentence of a question's statement ("## השאלה") as plain text: math in
+    plain symbols, no Markdown marks; cut at a word with "…" past `limit` characters."""
+    if q["src_uri"] in _home_teasers:
+        return _home_teasers[q["src_uri"]]
+    from search_text import tex_to_text   # noqa: PLC0415 (the round V teaser only)
+    text = (extract_code.ROOT / "docs" / q["src_uri"]).read_text(encoding="utf-8")
+    para, inside = [], False
+    for line in text.split("\n"):
+        if line.startswith("## "):
+            if inside:
+                break
+            inside = line[3:].strip() == STATEMENT
+            continue
+        if not inside:
+            continue
+        if not line.strip():
+            if para:
+                break
+            continue
+        if not para and re.match(r"\s|[<!?{|*`-]|\d+\.", line.replace("‏", "")):
+            continue
+        para.append(line.strip())
+    s = " ".join(para).replace("‏", "")
+    s = re.sub(r"\\\((.+?)\\\)", lambda m: tex_to_text(m.group(1)), s)
+    s = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", s)
+    s = re.sub(r"\*\*|`", "", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    m = re.search(r"[.?!](?=\s|$)", s)
+    if m and m.end() >= 40:
+        s = s[: m.end()]
+    if len(s) > limit:
+        s = s[:limit].rsplit(" ", 1)[0].rstrip(",;:  ") + "…"
+    if s and not re.match(r"[א-ת]", s):
+        s = "‏" + s
+    _home_teasers[q["src_uri"]] = s
+    return s
+
+
+def _home_daily_list() -> list[dict]:
+    return sorted(_questions.values(), key=lambda q: q["id"])
+
+
+def home_daily_stride(n: int) -> int:
+    """A step coprime with n near 0.618 n, so day after day jumps across the list and
+    still visits every question once in n days."""
+    import math   # noqa: PLC0415
+    k = max(1, round(n * 0.618))
+    while math.gcd(k, n) != 1:
+        k += 1
+    return k
+
+
+def home_daily_index(day: dt.date, n: int) -> int:
+    return ((day - HOME_EPOCH).days * home_daily_stride(n)) % n
+
+
+def _home_daily_inner(q: dict, page_url: str) -> str:
+    href = _href(q["src_uri"], page_url)
+    box = '<span class="dc-box">תיבה אינטראקטיבית</span>' if q.get("interactive") else ""
+    return (f'<div class="dc-art">{kind_icon(q["kind"])}{box}</div>'
+            '<div class="dc-body">'
+            '<p class="dc-label"><span class="dc-kicker">שאלת היום</span><span class="dc-date"></span><span class="dc-solved" hidden>✓ פתרת</span></p>'
+            f'<p class="dc-title"><span class="dc-id">{q["id"]}</span> <a href="{href}">{html.escape(str(q["title"]))}</a></p>'
+            f'<p class="dc-chips">{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}</p>'
+            f'<p class="dc-teaser">{html.escape(home_teaser(q))}</p>'
+            '</div>'
+            f'<a class="md-button md-button--primary dc-go" href="{href}">לפתור עכשיו</a>')
+
+
+def home_daily(page_url: str) -> str:
+    """The question of the day: the same for every reader, picked in the browser from the
+    reader's local date (home-extras.js, the list is in the page as JSON); the page holds
+    the pick of the build day, so it shows a valid question without the script."""
+    qs = _home_daily_list()
+    if not qs:
+        return ""
+    q = qs[home_daily_index(dt.date.today(), len(qs))]
+    data = {
+        "epoch": HOME_EPOCH.isoformat(), "stride": home_daily_stride(len(qs)),
+        "levels": LEVELS, "diffs": DIFFICULTIES, "kinds": KINDS,
+        "icons": {k: kind_icon(k) for k in KINDS},
+        "qs": [[o["id"], str(o["title"]), o["level"], o["difficulty"], o["kind"], home_teaser(o),
+                _href(o["src_uri"], page_url), int(bool(o.get("interactive")))] for o in qs],
+    }
+    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    return (f'<div class="daily-card" data-id="{q["id"]}" data-search-exclude>{_home_daily_inner(q, page_url)}'
+            f'<script type="application/json" class="dc-data">{payload}</script></div>')
 
 
 HERO_SEARCHES = ["FIFO", "PCIe", "SVA", "הסתברות", "חידות", "Gray"]
@@ -765,9 +982,10 @@ def _table(level: str | None, page_url: str) -> str:
     topics in both names, id), a "filter (n)" button that opens the filters on phones,
     and the filters as segmented groups (level on the all-questions table, difficulty,
     kind, the reader's marks) with the topics behind "more topics"; under them the
-    active filters as chips with the count. Each row has the id, the title on one line
-    with the kind and the first topics under it (a topic filters the table; "+n" shows
-    the rest), the level on the all-questions table, and the difficulty.
+    active filters as chips with the count. Each row has the id, the kind's icon and the
+    title on one line with the reader's marks, the kind and the first topics under it (a
+    topic filters the table; "+n" shows the rest), the level on the all-questions table,
+    and the difficulty, which also colours the row's start edge (17-lists.css).
     question-filter.js keeps the filters in the address and says what to do when no
     row is left."""
     rows = sorted(
@@ -858,7 +1076,8 @@ def _table(level: str | None, page_url: str) -> str:
             f'data-level-rank="{LEVEL_RANK[q["level"]]}" data-diff-rank="{DIFF_RANK[q["difficulty"]]}" '
             f'data-tags="{html.escape(" ".join(q["tags"]))}" data-search="{html.escape(search.lower())}">'
             f'<td class="q-id">{q["id"]}</td>'
-            f'<td class="q-title"><div class="q-line"><a href="{href}" title="{title}">{title}</a>'
+            f'<td class="q-title"><div class="q-line"><span class="q-kind q-kind-{q["kind"]}" title="{KINDS[q["kind"]]}">{kind_icon(q["kind"])}</span>'
+            f'<a href="{href}" title="{title}">{title}</a>'
             f'{new_chip(q) if q["id"] in new else ""}<span class="q-marks"></span></div>'
             f'<div class="q-meta">{kind_chip(q["kind"])}<span class="q-topics">{topics_html}</span></div></td>'
             f"{level_td}"
@@ -869,6 +1088,56 @@ def _table(level: str | None, page_url: str) -> str:
     out.append('<div class="questions-none" hidden></div>')
     out.append('</section>')
     return "\n".join(out)
+
+
+# The header band of a level page and of the all-questions page (round V, 17-lists.css,
+# level-page.js): the page's own title and lead on a navy band with a quiet circuit-trace
+# background, the level's icon, the number of questions, the difficulty mix as a stacked
+# bar and the reader's progress. The pattern is there twice, side by side, so the stylesheet
+# can roll it along one width without a seam (only while level-page.js sets .is-live).
+LISTS_TOP = re.compile(r"^# (?P<title>[^\n]+)\n\n(?P<lead>(?:(?!<!--)[^\n]+\n)+)\n*"
+                       r"(?P<ph><!--\s*questions-table(?:\s+level=(?P<level>\w+))?\s*-->)", re.M)
+LISTS_TRACE_PATHS = (
+    '<path d="M0 20h90l12 12h120l12-12h110l12 12h70l12-12h42M400 32v14"/>'
+    '<path class="lb-t2" d="M0 60h40l14-14h80l14 14h150l14 14h60l14-14h94"/>'
+    '<path d="M0 100h130l12-12h90l12 12h236M260 100v-18M70 60v18"/>'
+    '<circle cx="400" cy="46" r="3"/><circle cx="260" cy="82" r="3"/><circle cx="70" cy="78" r="3"/>'
+    '<circle cx="222" cy="32" r="2.5"/><circle cx="298" cy="60" r="2.5"/><circle cx="142" cy="88" r="2.5"/>')
+LISTS_TRACES = (
+    '<svg class="lb-traces" viewBox="0 0 480 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
+    f'<g class="lb-roll"><g>{LISTS_TRACE_PATHS}</g><g transform="translate(480 0)">{LISTS_TRACE_PATHS}</g></g></svg>')
+
+
+def _lists_band(level: str | None, title: str, lead: str) -> str:
+    qs = [q for q in _questions.values() if level is None or q["level"] == level]
+    ids = sorted(q["id"] for q in qs)
+    counts = {d: sum(q["difficulty"] == d for q in qs) for d in DIFFICULTIES}
+    segs = "".join(f'<i class="lb-seg lb-seg-{d}" style="flex-grow:{n}"></i>' for d, n in counts.items() if n)
+    legend = "".join(f'<span class="lb-key lb-key-{d}"><i aria-hidden="true"></i>{DIFFICULTIES[d]} <b>{n}</b></span>'
+                     for d, n in counts.items() if n)
+    icon = level or "all"
+    kind = "lb-level" if level else "lb-all"
+    return (
+        f'<div class="list-band {kind}" markdown>\n'
+        f'<div class="lb-bg" aria-hidden="true">{LISTS_TRACES}</div>\n'
+        f'<div class="lb-icon" aria-hidden="true"><span class="lvl-icon lvl-icon-{icon}"></span></div>\n\n'
+        f'# {title}\n\n{lead.strip()}\n{{ .lb-lead }}\n\n'
+        '<div class="lb-side" data-search-exclude>'
+        f'<p class="lb-count">\u200f<b>{len(qs)}</b> שאלות</p>'
+        f'<div class="lb-diff"><span class="lb-bar" aria-hidden="true">{segs}</span>'
+        f'<span class="lb-legend">{legend}</span></div>'
+        f'<div class="lb-progress is-empty" data-ids="{" ".join(ids)}">'
+        '<span class="lb-ptext">עוד לא סימנת שאלות כפתורות</span>'
+        '<span class="lb-pbar" aria-hidden="true"><i></i></span></div>'
+        '</div>\n'
+        '</div>\n\n'
+        f'{"<!-- questions-table" + (" level=" + level if level else "") + " -->"}'
+    )
+
+
+def _lists_top(markdown: str) -> str:
+    """The title and the lead right before a questions table become its header band."""
+    return LISTS_TOP.sub(lambda m: _lists_band(m.group("level"), m.group("title"), m.group("lead")), markdown, count=1)
 
 
 def _run_panel(q: dict, markdown: str) -> str:
@@ -952,14 +1221,17 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
 
     markdown = COST_LINE.sub(_cost_chips, markdown)
     markdown = CARDS.sub(lambda m: _level_cards(page.url), markdown)
+    markdown = HOME_DAILY.sub(lambda m: home_daily(page.url), markdown)
     markdown = HERO.sub(lambda m: _hero(m.group(1), page.url), markdown)
     markdown = PATH_STEPS.sub(lambda m: _path_steps(page), markdown)
     markdown = PATH_CARDS.sub(lambda m: _path_cards(page.url, bool(m.group(1))), markdown)
+    markdown = MAPS_METRO.sub(lambda m: maps_metro(page.url, bool(m.group(1))), markdown)
     markdown = HOW_IT_WORKS.sub(lambda m: _how_it_works(), markdown)
     markdown = CATALOG_LINK.sub(lambda m: _catalog_link(page.url), markdown)
     markdown = CONTINUE.sub(lambda m: _continue_card(), markdown)
     markdown = RECENT.sub(lambda m: _recent(page.url), markdown)
     markdown = WHATS_NEW.sub(lambda m: _whats_new(page.url), markdown)
+    markdown = _lists_top(markdown)
     return PLACEHOLDER.sub(lambda m: _table(m.group(1), page.url), markdown)
 
 
@@ -1012,7 +1284,9 @@ def _tag_names(output: str) -> str:
     the lists (Y398)."""
     output = TAG_CHIP.sub(lambda m: m.group(1) + html.escape(topic_name(html.unescape(m.group(2).strip()))) + m.group(3), output)
     output = TAG_TOC.sub(lambda m: m.group(1) + html.escape(topic_name(m.group(2))) + m.group(4), output)
-    return _tag_grid(output)
+    output = _tag_grid(output)
+    at = output.find('<nav class="tag-grid"')     # V10: the relation graph above the grid
+    return output[:at] + maps_tag_graph() + output[at:] if at >= 0 else output
 
 
 TAG_SECTION = re.compile(r'(<h2 id="tag:([^"]+)">.*?<span class="md-tag">([^<]+)</span>.*?</h2>\s*)<ul>(.*?)</ul>', re.S)
@@ -1039,6 +1313,299 @@ def _tag_grid(output: str) -> str:
     return output[:at] + f'<nav class="tag-grid" aria-label="כל התגיות">{"".join(chips)}</nav>\n' + output[at:]
 
 
+
+# Round V: the study-path metro map (paths page and home page) and the tag graph (tags
+# page). Both layouts are computed here at build time, deterministically; maps.js only adds
+# the solved marks, the tooltip and the highlight on hover / focus (16-maps.css).
+MAPS_METRO = re.compile(r"<!--\s*metro-map(\s+compact)?\s*-->")
+MAPS_COLOURS = 13     # line colour tokens --mm-1 .. --mm-13 in 16-maps.css (both schemes)
+
+
+def maps_metro_layout(paths: list[dict]) -> dict:
+    """Lay the study paths out as metro lines on a grid: {"cols", "rows", "lines": [{"path",
+    "cells": [(col, row) per station], "badge": (col, row)}], "shared": {ids on two or more
+    lines}}, a line's "n" being its index in paths. Column 0 is the right edge (RTL) and columns grow
+    to the left, rows grow downwards. A component of lines that share questions is laid out
+    from its longest line, horizontal; a line that crosses a placed line goes through the
+    shared station on a 45-degree diagonal (one station either side of it) and then
+    vertically, so it bends like a metro line. A line that would land on a placed station
+    tries the other diagonal, then a straight vertical, else it stands apart (its shared
+    station drawn again, still as an interchange). Components are packed in shelves."""
+    ids_of = [[s["q"]["id"] for s in p["steps"]] for p in paths]
+    count: dict[str, int] = {}
+    for ids in ids_of:
+        for i in set(ids):
+            count[i] = count.get(i, 0) + 1
+    shared = {i for i, n in count.items() if n > 1}
+
+    def shape(ids, k, anchor, mode):
+        """Cells of a line whose station k sits at anchor; mode h, d (diagonal to the
+        reading direction), e (the other diagonal) or v (vertical)."""
+        c0, r0 = anchor
+        cells = []
+        for j in range(len(ids)):
+            t = j - k
+            if mode == "h":
+                cells.append((c0 + t, r0))
+            else:
+                step = 0 if mode == "v" else max(-1, min(1, t))
+                cells.append((c0 + (step if mode == "d" else -step), r0 + t))
+        return cells
+
+    def badge_of(cells, mode):
+        (c, r), (c2, r2) = cells[0], cells[1]
+        return (c - (c2 - c), r - (r2 - r)) if mode == "h" else (c, r - 1)
+
+    comps: list[list[int]] = []    # line indexes, union by shared stations, in path order
+    for n, ids in enumerate(ids_of):
+        joined = [c for c in comps if any(set(ids) & set(ids_of[m]) for m in c)]
+        merged = sorted([n] + [m for c in joined for m in c])
+        comps = [c for c in comps if c not in joined] + [merged]
+    comps.sort(key=lambda c: c[0])
+
+    placed = []    # (component lines, {id: cell}, occupied cells)
+    for comp in comps:
+        todo = sorted(comp, key=lambda m: (-len(ids_of[m]), m))
+        root = todo.pop(0)
+        cells = shape(ids_of[root], 0, (1, 0), "h")
+        lines = {root: (cells, badge_of(cells, "h"), "h")}
+        where = dict(zip(ids_of[root], cells))
+        busy = set(cells) | {lines[root][1]}
+        apart = []
+        while todo:
+            m = next((m for m in todo if set(ids_of[m]) & set(where)), todo[0])
+            todo.remove(m)
+            ids = ids_of[m]
+            k = next((j for j, i in enumerate(ids) if i in where), None)
+            fit = None
+            if k is not None:
+                host = next(h for h in lines if ids[k] in ids_of[h])
+                modes = ("d", "e", "v") if lines[host][2] == "h" else ("h",)
+                for mode in modes:
+                    cs = shape(ids, k, where[ids[k]], mode)
+                    bd = badge_of(cs, mode)
+                    own = {c for j, c in enumerate(cs) if j != k}
+                    if len(own | {bd}) == len(ids) and not (own | {bd}) & busy:
+                        fit = (cs, bd, mode)
+                        break
+            if fit is None:
+                apart.append(m)
+                continue
+            lines[m] = fit
+            busy |= set(fit[0]) | {fit[1]}
+            for i, c in zip(ids, fit[0]):
+                where.setdefault(i, c)
+        placed.append((lines, busy))
+        for m in apart:      # a line that did not fit stands as a component of its own
+            cs = shape(ids_of[m], 0, (1, 0), "h")
+            placed.append(({m: (cs, badge_of(cs, "h"), "h")}, set(cs) | {badge_of(cs, "h")}))
+
+    # packing: the largest component first, each at the first place (top row, then the
+    # right) where its cells keep two free columns and one free row from every placed cell
+    width = max(max(c for c, _ in busy) - min(c for c, _ in busy) + 1 for _, busy in placed)
+    order = sorted(range(len(placed)), key=lambda b: (-len(placed[b][1]), min(placed[b][0])))
+    taken: set = set()
+    out_lines = []
+    for b in order:
+        lines, busy = placed[b]
+        cmin, rmin = min(c for c, _ in busy), min(r for _, r in busy)
+        cells = {(c - cmin, r - rmin) for c, r in busy}
+        w = max(c for c, _ in cells) + 1
+        dr = 0
+        while True:
+            dc = next((dc for dc in range(width - w + 1)
+                       if not any((c + dc + i, r + dr + j) in taken for c, r in cells for i in (-2, -1, 0, 1, 2) for j in (-1, 0, 1))), None)
+            if dc is not None:
+                break
+            dr += 1
+        taken |= {(c + dc, r + dr) for c, r in cells}
+        for m in sorted(lines):
+            cs, bd, _ = lines[m]
+            out_lines.append({"n": m, "cells": [(c - cmin + dc, r - rmin + dr) for c, r in cs],
+                              "badge": (bd[0] - cmin + dc, bd[1] - rmin + dr)})
+    rows = max(r for _, r in taken) + 1
+    out_lines.sort(key=lambda ln: ln["n"])
+    return {"cols": width, "rows": rows, "lines": out_lines, "shared": shared}
+
+
+def maps_metro(page_url: str, compact: bool = False) -> str:
+    """The metro map of the study paths (V7): an SVG of coloured lines with a station per
+    question (its number inside; a link to the question, named by its id and title), a
+    badge with the line's number at its start, and a legend of the lines (links to the path
+    pages). compact: the featured paths only (the home page) on a tighter grid. The box
+    scrolls sideways on a narrow screen; the page itself does not."""
+    chosen = [(n, p) for n, p in enumerate(_paths) if not compact or p["featured"]]
+    if not chosen:
+        return ""
+    lay = maps_metro_layout([p for _, p in chosen])
+    g, pad, r = (46, 26, 12) if compact else (54, 30, 13)
+    width = pad * 2 + (lay["cols"] - 1) * g
+    height = pad * 2 + (lay["rows"] - 1) * g
+
+    def xy(cell):
+        return pad + (lay["cols"] - 1 - cell[0]) * g, pad + cell[1] * g
+
+    tracks, stops, badges, legend, seen = [], [], [], [], set()
+    for ln in lay["lines"]:
+        n, p = chosen[ln["n"]]
+        colour = n % MAPS_COLOURS + 1
+        pts = [xy(c) for c in ln["cells"]]
+        d = "M" + " L".join(f"{x},{y}" for x, y in pts)
+        tracks.append(f'<path class="mm-line mm-c{colour}" data-line="{n + 1}" d="{d}"/>')
+        bx, by = xy(ln["badge"])
+        x0, y0 = pts[0]
+        href = _href(p["src_uri"], page_url)
+        badges.append(f'<path class="mm-stub mm-c{colour}" data-line="{n + 1}" d="M{bx},{by} L{x0},{y0}"/>'
+                      f'<a class="mm-badge" href="{href}" tabindex="-1" aria-hidden="true" data-line="{n + 1}">'
+                      f'<rect class="mm-c{colour}" x="{bx - 12}" y="{by - 12}" width="24" height="24" rx="6"/>'
+                      f'<text x="{bx}" y="{by}">{n + 1}</text></a>')
+        for (x, y), s in zip(pts, p["steps"]):
+            q = s["q"]
+            key = (q["id"], x, y)
+            if key in seen:          # an interchange is drawn once, by its first line
+                continue
+            seen.add(key)
+            inter = q["id"] in lay["shared"]
+            name = f'שאלה {int(q["id"])} : {q["title"]}'   # with the number it shows (axe)
+            lines_of = " ".join(str(m + 1) for m, o in chosen if q["id"] in [t["q"]["id"] for t in o["steps"]])
+            stops.append(f'<a class="mm-st{" is-x" if inter else ""}" href="{_href(q["src_uri"], page_url)}" '
+                         f'data-id="{q["id"]}" data-lines="{lines_of}" aria-label="{html.escape(name)}">'
+                         f'<circle class="mm-dot mm-c{colour}" cx="{x}" cy="{y}" r="{r + 2 if inter else r}"/>'
+                         f'<text x="{x}" y="{y}">{int(q["id"])}</text></a>')
+        ids = " ".join(s["q"]["id"] for s in p["steps"])
+        legend.append(f'<li><a class="mm-key" href="{href}" data-line="{n + 1}">'
+                      f'<span class="mm-num mm-c{colour}" aria-hidden="true">{n + 1}</span>'
+                      f'<span class="mm-name">{html.escape(p["title"])}</span>'
+                      f'<span class="mm-count" data-ids="{ids}">{len(ids.split())} שאלות</span></a></li>')
+    label = "מפת מסלולי הלימוד" + (" המומלצים" if compact else "")
+    svg = (f'<svg class="mm-svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
+           f'role="group" aria-label="{label}">' + "".join(tracks + badges + stops) + "</svg>")
+    return (f'<div class="metro{" metro-compact" if compact else ""}" data-search-exclude>'
+            f'<div class="mm-scroll" style="--mm-w:{width}px;--mm-h:{height}px">{svg}</div>'
+            '<div class="mm-tip" hidden></div>'
+            f'<ol class="mm-legend" aria-label="קווי המפה">{"".join(legend)}</ol></div>')
+
+
+def maps_tag_layout(nodes: dict[str, int], edges: dict[tuple, int], w: int, h: int, seed: int = 7) -> dict:
+    """A force layout of the tag graph in a w by h box (Fruchterman-Reingold with a fixed
+    seed, then a pass that pulls apart the circles and their labels): {tag: (x, y, radius)}."""
+    import math
+    import random
+
+    rnd = random.Random(seed)
+    tags = sorted(nodes)
+    rad = {t: 9 + 3.2 * math.sqrt(nodes[t]) for t in tags}
+    label = {t: max(2 * rad[t], 7.2 * len(topic_name(t)) + 6) for t in tags}
+    pos = {t: [w / 2 + (rnd.random() - 0.5) * w * 0.8, h / 2 + (rnd.random() - 0.5) * h * 0.8] for t in tags}
+    k = math.sqrt(w * h / max(1, len(tags))) * 0.8
+    heavy = max(edges.values(), default=1)
+    steps = 420
+    for it in range(steps):
+        temp = (w / 8) * (1 - it / steps) + 0.5
+        disp = {t: [0.0, 0.0] for t in tags}
+        for i, a in enumerate(tags):
+            for b in tags[i + 1:]:
+                dx, dy = pos[a][0] - pos[b][0], pos[a][1] - pos[b][1]
+                dist = math.hypot(dx, dy) or 0.01
+                f = k * k / dist
+                disp[a][0] += dx / dist * f; disp[a][1] += dy / dist * f
+                disp[b][0] -= dx / dist * f; disp[b][1] -= dy / dist * f
+        for (a, b), wt in edges.items():
+            dx, dy = pos[a][0] - pos[b][0], pos[a][1] - pos[b][1]
+            dist = math.hypot(dx, dy) or 0.01
+            f = dist * dist / k * (0.6 + 0.8 * wt / heavy)
+            disp[a][0] -= dx / dist * f; disp[a][1] -= dy / dist * f
+            disp[b][0] += dx / dist * f; disp[b][1] += dy / dist * f
+        for t in tags:      # a weak pull to the centre keeps the lone tags in the box
+            disp[t][0] += (w / 2 - pos[t][0]) * 0.012 * k
+            disp[t][1] += (h / 2 - pos[t][1]) * 0.012 * k
+            dx, dy = disp[t]
+            dist = math.hypot(dx, dy) or 0.01
+            pos[t][0] += dx / dist * min(dist, temp)
+            pos[t][1] += dy / dist * min(dist, temp)
+            pos[t][0] = min(w - label[t] / 2 - 4, max(label[t] / 2 + 4, pos[t][0]))
+            pos[t][1] = min(h - rad[t] - 22, max(rad[t] + 4, pos[t][1]))
+
+    def box(t):      # the circle and the name under it
+        x, y = pos[t]
+        return x - label[t] / 2 - 3, y - rad[t] - 3, x + label[t] / 2 + 3, y + rad[t] + 19
+
+    for _ in range(300):
+        moved = False
+        for i, a in enumerate(tags):
+            for b in tags[i + 1:]:
+                ax0, ay0, ax1, ay1 = box(a)
+                bx0, by0, bx1, by1 = box(b)
+                ox, oy = min(ax1, bx1) - max(ax0, bx0), min(ay1, by1) - max(ay0, by0)
+                if ox <= 0 or oy <= 0:
+                    continue
+                moved = True
+                if ox < oy:
+                    s = 1 if pos[a][0] >= pos[b][0] else -1
+                    pos[a][0] += s * ox / 2; pos[b][0] -= s * ox / 2
+                else:
+                    s = 1 if pos[a][1] >= pos[b][1] else -1
+                    pos[a][1] += s * oy / 2; pos[b][1] -= s * oy / 2
+        for t in tags:
+            pos[t][0] = min(w - label[t] / 2 - 4, max(label[t] / 2 + 4, pos[t][0]))
+            pos[t][1] = min(h - rad[t] - 22, max(rad[t] + 4, pos[t][1]))
+        if not moved:
+            break
+    return {t: (round(pos[t][0], 1), round(pos[t][1], 1), round(rad[t], 1)) for t in tags}
+
+
+def maps_tag_graph() -> str:
+    """The relation graph of the topics (V10): a circle per topic sized by its number of
+    questions (the number inside, the Hebrew name under it), and a line between two topics
+    that share questions, wider for more. Only the links of two or more shared questions
+    are kept, and a topic left without one keeps its strongest; python and systemverilog
+    (on almost every question) stay out. Each circle links to its list below; maps.js
+    turns the click into a filter of that list. Two layouts, wide and narrow; the CSS shows
+    the one that fits the column."""
+    nodes: dict[str, int] = {}
+    pairs: dict[tuple, int] = {}
+    for q in _questions.values():
+        ts = sorted(set(q["tags"]) - GENERIC_TAGS)
+        for t in ts:
+            nodes[t] = nodes.get(t, 0) + 1
+        for i, a in enumerate(ts):
+            for b in ts[i + 1:]:
+                pairs[(a, b)] = pairs.get((a, b), 0) + 1
+    if len(nodes) < 2:
+        return ""
+    edges = {e: n for e, n in pairs.items() if n >= 2}
+    for t in sorted(nodes):
+        if not any(t in e for e in edges):
+            best = min(((-n, e) for e, n in pairs.items() if t in e), default=None)
+            if best:
+                edges[best[1]] = -best[0]
+    nb = {t: sorted({b if a == t else a for a, b in edges if t in (a, b)}) for t in nodes}
+
+    def one(w, h, cls):
+        pos = maps_tag_layout(nodes, edges, w, h)
+        lines = [f'<line class="tg-edge" data-a="{a}" data-b="{b}" x1="{pos[a][0]}" y1="{pos[a][1]}" '
+                 f'x2="{pos[b][0]}" y2="{pos[b][1]}" stroke-width="{min(8, 1 + 0.9 * (n - 1)):.1f}"/>'
+                 for (a, b), n in sorted(edges.items())]
+        dots = []
+        for t in sorted(nodes, key=lambda t: (-nodes[t], t)):
+            x, y, r = pos[t]
+            name = html.escape(topic_name(t))
+            dots.append(f'<a class="tg-node" href="#tag:{t}" data-tag="{t}" data-nb="{" ".join(nb[t])}" '
+                        '>'      # named by its texts, the name and the count (axe: no label that differs)
+                        f'<circle cx="{x}" cy="{y}" r="{r}"/>'
+                        f'<text class="tg-name" x="{x}" y="{y + r + 13}" direction="rtl">{name}</text>'
+                        f'<text class="tg-n" x="{x}" y="{y}">{nodes[t]}</text></a>')
+        return (f'<svg class="tg-svg {cls}" viewBox="0 0 {w} {h}" role="group" aria-label="קשרים בין התגיות">'
+                + "".join(lines + dots) + "</svg>")
+
+    return ('<div class="tag-graph" data-search-exclude>'
+            + one(920, 560, "tg-wide") + one(360, 760, "tg-narrow")
+            + '<p class="tg-help">כל עיגול הוא נושא, וגודלו לפי מספר השאלות. קו מחבר שני נושאים שיש להם שאלות משותפות, ועובי הקו לפי מספרן. '
+              'לחיצה על נושא מסננת את הרשימה שמתחת.</p>'
+            + '<p class="tg-status" hidden><span class="tg-status-text"></span> '
+              '<button type="button" class="tg-reset">הצג את כל התגיות</button></p></div>\n')
+
+
 TRAP_RUN = re.compile(r'(?:<details class="trap">.*?</details>\s*)+', re.S)
 TRAP_PREFIX = "<summary>מלכודת\u00a0: "
 
@@ -1057,15 +1624,60 @@ def _trap_group(m: re.Match) -> str:
 def on_post_page(output, page, config, **kwargs):
     if page.file.src_uri == "tags.md":
         output = _tag_names(output)
+    if "home-band" in output:
+        output = home_band(output)
     if page.file.src_uri in _questions:
         output = TRAP_RUN.sub(_trap_group, output)
         _statements[page.url] = statement_sections(output)
+        output = qp_parts(output)
     output = one_stylesheet(output)
     scripts = wavedrom_scripts(output, page.url) + explorer_scripts(output, page.url)
     if not scripts:
         return output
     at = output.rfind("</body>")
     return output[:at] + scripts + output[at:] if at >= 0 else output + scripts
+
+
+QP_PART = re.compile(r'<h3 id="([^"]+)">(סעיף\s+([א-ת]))')
+QP_END = re.compile(r'<h[23][\s>]')
+QP_TAG = re.compile(r'<(/?)([a-zA-Z][a-zA-Z0-9-]*)\b(?:[^>"\']|"[^"]*"|\'[^\']*\')*?(/?)>')
+QP_VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
+
+
+def _qp_balanced(chunk: str) -> bool:
+    """True when every element opened in chunk is closed in it (and none closed that was not
+    opened), so the chunk can be wrapped in one element."""
+    depth = 0
+    for m in QP_TAG.finditer(chunk):
+        if m.group(2).lower() in QP_VOID or m.group(3):
+            continue
+        depth += -1 if m.group(1) else 1
+        if depth < 0:
+            return False
+    return depth == 0
+
+
+def qp_parts(output: str) -> str:
+    """The parts timeline (V12): on a question page with two or more parts ("### סעיף א –
+    ..."), each part heading gets class qp-part and its letter in data-part (18-question.css
+    draws it in a circle), and the parts, from the first heading to the heading that ends the
+    last part, go into one <div class="qp-parts">, along whose start edge the stylesheet draws
+    the line that question-page.js fills while reading. Done in the built page, so the circles
+    and the line are there before any script runs; a page whose parts do not sit at one level
+    of the article is left as it is."""
+    parts = list(QP_PART.finditer(output))
+    if len(parts) < 2:
+        return output
+    end = QP_END.search(output, parts[-1].end())
+    if not end:
+        return output
+    start = parts[0].start()
+    if not _qp_balanced(output[start:end.start()]):
+        return output
+    chunk = QP_PART.sub(lambda m: f'<h3 id="{m.group(1)}" class="qp-part" data-part="{m.group(3)}">{m.group(2)}',
+                        output[start:end.start()])
+    return (output[:start] + f'<div class="qp-parts" style="--qp-n: {len(parts)}">\n' + chunk
+            + '</div>\n' + output[end.start():])
 
 
 def _search_variants(raw_tokens: set[str], words: list[str], known: set[str]) -> set[str]:

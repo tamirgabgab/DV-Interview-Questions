@@ -1505,6 +1505,23 @@ section below starts at session 22, whose numbered items run on through the late
     theta slider, generator, tests and testbench. Two contrast pairs added (the fold count,
     the grip line).
 
+97. **Visual round V (session 28, 2026-10-29).** The owner picked 13 of 17 proposals (4 to 17
+    without 13), answered the style questions (subtle motion, personal progress everywhere,
+    one question of the day for all, the metro map on the paths page and the home page, a
+    tag relation graph, a filling part timeline, content icons only, all at once) and five
+    agents built them in parallel, each in its own CSS part (15 to 19) and script. Home: a
+    navy band around the level cards and the question of the day; level cards with a live
+    SVG per level (on hover) and a difficulty bar; the question of the day by date. Maps: the
+    study paths as a metro map (full on paths/, compact on the home page, solved stations
+    filled) and a seeded force graph of the tags above the tag grid. Level pages: a navy band
+    with the count, the difficulty mix and the reader's progress; table rows with a
+    difficulty stripe, a kind tile, marks and a whole-row link. Question page: the header
+    card's trace pattern and large kind icon, the part timeline (`qp_parts`), the code
+    window for the solution tabs. Details: the success pulse, 22 stroked content icons
+    (`kind_icon`, `level_icon`, `path_icon`), the box loading wave. 68 contrast pairs added
+    (154 in all). Also fixed: 0042's chart aria-label had an unescaped quote (ק"מ) that
+    printed the SVG as text; `charts.py` now escapes it.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),

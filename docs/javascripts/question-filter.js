@@ -11,7 +11,7 @@
 // - sorting by a column (header buttons on wide screens, a select on phones, kept in sync);
 // - a topic in a row filters the table by it, "+n" shows the row's other topics;
 // - a "random question" button that opens one of the rows left after filtering;
-// - the solved / favourite marks next to each title.
+// - the solved / favourite marks next to each title, and on the row as classes.
 document.addEventListener("DOMContentLoaded", () => {
   const marks = window.dvqMarks || { has: () => false };
   const collator = new Intl.Collator("he");
@@ -60,14 +60,21 @@ document.addEventListener("DOMContentLoaded", () => {
       if (value) order.push(name);
     };
 
+    // The reader's marks of a row: a check in a green disc and an amber star, named for a
+    // screen reader; the row also carries .is-solved / .is-star (17-lists.css)
+    const SOLVED = '<span class="q-mark q-mark-solved" role="img" aria-label="סימנת כפתורה" title="סימנת כפתורה">' +
+      '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 8.4l2.6 2.6L12 5.6"/></svg></span>';
+    const STAR = '<span class="q-mark q-mark-star" role="img" aria-label="מועדף" title="מועדף">' +
+      '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.6l1.9 4 4.4.5-3.3 3 .9 4.3L8 11.2l-3.9 2.2.9-4.3-3.3-3 4.4-.5z"/></svg></span>';
     const paintMarks = () => {
       rows.forEach((row) => {
         const slot = row.querySelector(".q-marks");
         if (!slot) return;
         const id = row.dataset.id;
-        slot.innerHTML =
-          (marks.has(id, "solved") ? '<span class="q-mark q-mark-solved" title="סימנת כפתורה">✓</span>' : "") +
-          (marks.has(id, "star") ? '<span class="q-mark q-mark-star" title="מועדף">★</span>' : "");
+        const solved = marks.has(id, "solved"), star = marks.has(id, "star");
+        row.classList.toggle("is-solved", solved);
+        row.classList.toggle("is-star", star);
+        slot.innerHTML = (solved ? SOLVED : "") + (star ? STAR : "");
       });
     };
 

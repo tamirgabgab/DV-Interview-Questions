@@ -28,15 +28,21 @@ hide:
 
 <!-- recent -->
 
+<!-- home-band -->
+
 ## לפי רמת משרה
 
 <!-- level-cards -->
+
+<!-- home-daily -->
+
+<!-- /home-band -->
 
 ## מסלולי לימוד
 
 כמה שאלות באותו נושא, בסדר שבו כדאי לפתור אותן. כאן שישה מהם, [וכל המסלולים בעמוד שלהם](paths/index.md).
 
-<!-- path-cards featured -->
+<!-- metro-map compact -->
 
 ## כל השאלות
 

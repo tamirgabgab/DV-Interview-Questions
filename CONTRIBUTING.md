@@ -139,9 +139,12 @@ DV-Interview-Questions/
 │   │                           # (run-python.js, py-worker.js, py_run.py, vendor/codemirror.min.js), home.js,
 │   │                           # reading-tools.js (lightbox, tooltips, part bar), motion.js (the drawn logo,
 │   │                           # the table of contents marker, page transitions), layout.js (the folded
-│   │                           # level list, the column grips), and explorer/:
+│   │                           # level list, the column grips), round V's home-extras.js (the band, the
+│   │                           # question of the day), maps.js (the metro map, the tag graph), level-page.js
+│   │                           # (the level band's progress), question-page.js (the part timeline), details.js
+│   │                           # (the success pulse, the box loading wave), and explorer/:
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
-│   └── stylesheets/            # The styles in 14 parts loaded in order (README.md lists them)
+│   └── stylesheets/            # The styles in 19 parts loaded in order (README.md lists them)
 └── .github/workflows/
     ├── deploy.yml              # Test + build on every push (explorers on 4 runners), deploy main; every job has a timeout
     └── weekly.yml              # Mondays: external links of the site, newer Verilator release
@@ -509,6 +512,46 @@ edge of each sidebar (`.col-grip`, a separator that takes the arrow keys) resize
 10 and 24 rem, never leaving the page under 30 rem. The widths go into `--dvq-nav-w` and
 `--dvq-toc-w`, are remembered (`dvq-col-nav`, `dvq-col-toc`), and a double click or Home
 gives a column back its default width.
+
+The visual round V (parts 15 to 19, each with its own script):
+
+- **Home page (`15-home.css`, `home-extras.js`).** `docs/index.md` marks a navy band with
+  `<!-- home-band -->` … `<!-- /home-band -->`; the hook wraps it in `on_post_page`
+  (`home_band`), because a Markdown div would re-parse the cards' HTML. The band holds the
+  level cards (`_level_cards`: an inline SVG per level that moves on hover or focus only,
+  and a stacked difficulty bar) and the question of the day at `<!-- home-daily -->`
+  (`home_daily`).
+  - The day's pick is (days since 2026-01-01 × a stride coprime with n) mod n over the
+    questions by id, so every question comes once in n days.
+  - The page holds the build day's pick; the script swaps in the reader's local day.
+- **Metro map (`16-maps.css`, `maps.js`).** `<!-- metro-map -->` on the paths page and
+  `<!-- metro-map compact -->` on the home page (the featured paths) draw the study paths as
+  lines and the questions as stations (`maps_metro`, laid out at build time by
+  `maps_metro_layout`). A shared question is an interchange. The line colours `--mm-1` …
+  `--mm-13` follow the path order; a 14th path would reuse the first colour.
+- **Tag graph.** It sits above the tag grid (`maps_tag_graph`): a seeded force layout,
+  Python and SystemVerilog left out, and a link only for two shared questions or more.
+- **Level pages (`17-lists.css`, `level-page.js`).** `_lists_top` turns a level page's title
+  and lead (the ones before `<!-- questions-table -->`) into a navy band with the count, the
+  difficulty mix and the reader's progress. The table rows get a difficulty stripe, a kind
+  tile, the solved and favourite marks (`paintMarks` in `question-filter.js`), and a link
+  over the whole row.
+- **Question page (`18-question.css`, `question-page.js`).**
+  - The header card (`_header`) carries `qh-diff-<d> qh-kind-<k>`: a faint trace pattern in
+    the difficulty's colour, and the kind icon large, on a desktop with a pointer only.
+  - On a page of two parts or more, `qp_parts` marks each part heading (`.qp-part`,
+    `data-part`) and wraps the parts in `.qp-parts`: numbered circles joined by a line that
+    fills while reading, and a check for a solved part.
+  - The code tabs inside a solution (`details.success .tabbed-block > .highlight`, only
+    those) are drawn as an editor window with the file name and the copy button in its bar.
+- **Details (`19-details.css`, `details.js`).**
+  - A short green pulse when a question is marked solved or a self-check answer is right.
+  - A clock-and-data wave in a box's reserved space while it loads.
+  - The content icons, stroked like the logo: one per kind (`kind_icon`), per level
+    (`level_icon`) and per study path (`path_icon`). A new path needs an entry in
+    `PATH_ICONS` and a `.path-ico-<slug>` rule, or it falls back to its kind's icon.
+
+All the motion stops under reduced motion and in an automated browser.
 
 ### Diagrams, formulas and figures
 
