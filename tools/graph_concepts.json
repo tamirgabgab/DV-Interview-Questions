@@ -467,6 +467,18 @@
   "sweep_line": {
    "label": "Event sweep",
    "group": "algorithms"
+  },
+  "monotonic_deque": {
+   "label": "Monotonic deque",
+   "group": "algorithms"
+  },
+  "balanced_ternary": {
+   "label": "Balanced ternary",
+   "group": "math"
+  },
+  "parallel_compare": {
+   "label": "Parallel compare and priority encoder",
+   "group": "digital design"
   }
  },
  "questions": {
@@ -1631,6 +1643,56 @@
      "id": "0033",
      "explicit": false,
      "why": "both size a resource (tags, FIFO depth) from the peak occupancy of a trace"
+    }
+   ]
+  },
+  "0063": {
+   "core": [
+    "monotonic_deque",
+    "sliding_window",
+    "invariant"
+   ],
+   "secondary": [
+    "two_pointers",
+    "parallel_compare",
+    "information_theory_bound",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0061",
+     "explicit": true,
+     "why": "the same variable window with a left end that only moves forward"
+    },
+    {
+     "id": "0047",
+     "explicit": false,
+     "why": "both track running maxima over an array in one pass"
+    }
+   ]
+  },
+  "0064": {
+   "core": [
+    "number_bases",
+    "balanced_ternary",
+    "information_theory_bound"
+   ],
+   "secondary": [
+    "weighing_puzzle",
+    "symmetry_argument",
+    "induction_proof",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0045",
+     "explicit": true,
+     "why": "both count the states a balance can take to get a lower bound"
+    },
+    {
+     "id": "0051",
+     "explicit": false,
+     "why": "both read each item as a digit, and the number of states per item is the base"
     }
    ]
   }

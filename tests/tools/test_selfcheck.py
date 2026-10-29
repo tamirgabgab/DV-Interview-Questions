@@ -446,6 +446,8 @@ EXPECTED = {
     "0060": popcount_answers(),
     "0061": ones_answers(),
     "0062": tag_pool_answers(),
+    "0063": [4, 5, 3],                                      # tests/0063 replays the deques and the module
+    "0064": [6, 4, (5 ** 3 - 1) // 2],                      # tests/0064 searches every weight set
 }
 
 

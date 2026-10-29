@@ -24,6 +24,7 @@ A, C, W, T = F(1, 2), 150, 450, 30
 GAMMA = 0.5772156649015329
 APPROX_CONST = 2 * log(2) + GAMMA                      # 1.9635..., the "1.96" of the page
 RLM = "‏"
+LTR = '<span dir="ltr">'   # a signed number: after an RLM its sign would read after the digits
 
 
 # --- the model --------------------------------------------------------------------------
@@ -181,7 +182,7 @@ def approx_table(a=A, c=C, T=T):
     for n in APPROX_NS:
         w = n * c
         exact, ap = distance(a, c, w, T), approx(a, c, w, T)
-        lines.append(f"| {RLM}{w:,} | {RLM}{n} | {RLM}{num(exact)} | {RLM}{ap:,.1f} | {RLM}{float(exact) - ap:+.2f} |")
+        lines.append(f"| {RLM}{w:,} | {RLM}{n} | {RLM}{num(exact)} | {RLM}{ap:,.1f} | {RLM}{LTR}{float(exact) - ap:+.2f}</span> |")
     return "\n".join(lines)
 
 

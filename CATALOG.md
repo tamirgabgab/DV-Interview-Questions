@@ -1,6 +1,6 @@
 # Catalog
 
-All 61 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 63 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -66,3 +66,5 @@ All 61 questions, with links to their pages on the [live site](https://tamirgabg
 | 0060 | [המספר הבא עם אותו מספר של אחדות – Gosper, הקודם, ואפסים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0060-next-same-popcount/) | junior (ג'וניור) |
 | 0061 | [הרצף הארוך ביותר של אחדות – עד k היפוכים, ואז כל ערך על ה-bus](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0061-longest-ones-with-k-flips/) | junior (ג'וניור) |
 | 0062 | [כמה tags צריך – טרנזקציות חופפות, ומאגר אחד מול שניים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0062-how-many-tags/) | junior (ג'וניור) |
+| 0063 | [המקסימום בחלון נע – deque, החלון הארוך עם max − min ≤ limit, ובחומרה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0063-sliding-window-maximum/) | junior (ג'וניור) |
+| 0064 | [משקולות לכל משקל – כף אחת, שתי כפות, ו-c עותקים מכל משקולת](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0064-weights-for-every-load/) | student (סטודנט) |

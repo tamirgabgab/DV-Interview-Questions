@@ -107,6 +107,7 @@ TOPICS = {
     "randomization": "רנדומיזציה",
     "recursion": "רקורסיה",
     "sequences": "סדרות",
+    "sliding-window": "חלון נע",
     "sorting": "מיון",
     "stack": "מחסנית",
     "sva": "SVA",

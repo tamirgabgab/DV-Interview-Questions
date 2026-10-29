@@ -77,6 +77,8 @@ PAIRS = [
     ("ball number, maybe light", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))"], TEXT),
     ("ball number, either", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color))"], TEXT),
     ("ball number, known good", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-grid) 50%, var(--md-default-bg-color))"], TEXT),
+    ("load number on the balance", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 14%, var(--md-default-bg-color))"], TEXT),
+    ("negative digit, current conversion row", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color))", CARD, PAGE], TEXT),
     ("explanation step chip, lit", "var(--md-default-fg-color)", ["var(--md-accent-fg-color--transparent)", PAGE], TEXT),
     ("explanation step chip", "var(--viz-text)", [PAGE], TEXT),
     ("ladder cell label, a term", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),

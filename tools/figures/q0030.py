@@ -367,7 +367,7 @@ def images_table(a=A, b=B, h=H, s=S, f=F):
     rows = ["| הנקודה | הצלע | המרחק לצלע | ‏\\( x \\) של הדמות | ‏\\( p \\) של הדמות | טווח ה-\\( p \\) של הצלע |", "|---|---|---|---|---|---|"]
     for who, (x, y, z), sign in (("S", s, -1), ("F", f, 1)):
         for edge, d, p, lo, hi in images(y, z, b, h):
-            xi = f"−{num(d)}" if sign < 0 else num(a + d)
+            xi = f'<span dir="ltr">−{num(d)}</span>' if sign < 0 else num(a + d)   # a leading minus after an RLM reads "11−"
             rows.append(f"| ‏{who} | ‏{edge} | ‏{num(d)} | ‏{xi} | ‏{num(p)} | ‏{num(lo)} עד {num(hi)} |")
     return "\n".join(rows)
 

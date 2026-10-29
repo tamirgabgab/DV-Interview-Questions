@@ -107,7 +107,7 @@ def events_table(txns):
     rows = sweep(txns)
     out = ["| הזמן | האירוע | פתוחות אחריו | המקסימום עד עכשיו |", "|:-:|:-:|:-:|:-:|"]
     for r in rows:
-        what = "שליחה, ‏+1" if r["d"] > 0 else "תשובה, ‏−1"
+        what = 'שליחה, <span dir="ltr">+1</span>' if r["d"] > 0 else 'תשובה, <span dir="ltr">−1</span>'
         out.append(f"| {RLM}{r['t']} | {what} | {RLM}{r['total']} | **{RLM}{r['best']['all']}** |")
     return "\n".join(out)
 

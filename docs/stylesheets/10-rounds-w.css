@@ -134,6 +134,8 @@
 .md-typeset .part-nav.has-sol .pn-sol { display: flex; }
 .md-typeset .part-nav.has-sol .pn-solved { margin-inline-start: 0; }
 .md-typeset .part-nav .pn-sol .sol-map__chip { padding-block: 0.1rem; }
+.md-typeset .part-nav :is(.part-nav__chip, .sol-map__chip) { flex: none; white-space: nowrap; }   /* a chip keeps its one line; the row around it scrolls */
+.md-typeset .part-nav .qt-name { display: none; }   /* the solved button is a copy of the header's: its name stays there, the round button here */
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .md-typeset .part-nav:not(.pn-fixed), .md-typeset .part-nav.pn-fixed.has-sol {
     background: color-mix(in srgb, var(--md-default-bg-color) 78%, transparent);
