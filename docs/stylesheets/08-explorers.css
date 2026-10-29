@@ -362,6 +362,11 @@
 }
 
 /* Stock explorer (0006): the price chart with draggable points, the running lines */
+.md-typeset .explorer input.st-n { width: 3.6rem; }
+.md-typeset .explorer .st-plab { flex: 1 1 16rem; min-width: 0; display: inline-flex; align-items: center; }
+.md-typeset .explorer input.st-prices { flex: 1 1 auto; width: 14rem; min-width: 0; max-width: 24rem; }
+/* the refusal line of the typed fields, one line kept from the start so nothing moves */
+.md-typeset .explorer .st-err { margin: 0.2rem 0 0; min-height: 1.5em; line-height: 1.5; }
 .md-typeset .explorer .st-chart { margin-top: 0.5rem; max-width: 40rem; touch-action: none; }
 .md-typeset .explorer .st-chart svg { width: 100%; display: block; user-select: none; }
 .md-typeset .explorer .st-chart.is-dragging { cursor: grabbing; }

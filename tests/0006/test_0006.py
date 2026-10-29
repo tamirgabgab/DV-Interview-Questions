@@ -86,15 +86,15 @@ def test_explorer_state_link():
     """The copy link of the box carries the prices, the day reached and the mode as
     `#state-stock.<payload>`: the codec round-trips the page example and random boxes,
     clamps the day to the number of prices, and rejects prices outside 1..20, a single
-    price or a malformed payload."""
+    price, more than 30 or a malformed payload."""
     import json
 
     from page_tests import explorer_require, node_json
 
     rng = random.Random(60)
     states = [{"prices": [5, 8, 3, 9, 2, 6], "k": 3, "both": True}]
-    states += [{"prices": [rng.randint(1, 20) for _ in range(rng.randint(2, 16))], "k": rng.randint(0, 16), "both": rng.random() < 0.5} for _ in range(40)]
-    bad = ["5.8.0-1-both", "5.8.21-1-both", "5-1-both", "5.8-1-short", "5.8-x-both", "", "5.8.3.9.2.6-3", "5..8-1-both"]
+    states += [{"prices": [rng.randint(1, 20) for _ in range(rng.randint(2, 30))], "k": rng.randint(0, 30), "both": rng.random() < 0.5} for _ in range(40)]
+    bad = ["5.8.0-1-both", "5.8.21-1-both", "5-1-both", "5.8-1-short", "5.8-x-both", "", "5.8.3.9.2.6-3", "5..8-1-both", ".".join(["5"] * 31) + "-1-both"]
     got = node_json(f"""
       const m = {explorer_require()};
       const C = m.STATE_CODECS.stock;
@@ -103,3 +103,20 @@ def test_explorer_state_link():
         assert payload == ".".join(map(str, s["prices"])) + f"-{s['k']}-" + ("both" if s["both"] else "long")
         assert back == {"prices": s["prices"], "k": min(s["k"], len(s["prices"])), "both": s["both"]}, s
     assert got["bad"] == [None] * len(bad)
+
+
+def test_explorer_typed_prices():
+    """The box's price field: whole numbers split by spaces or commas, 2 to 30 of them,
+    each 1..20; anything else is refused with a Hebrew reason (a string)."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    ok = {"7 1 5 3 6 4": [7, 1, 5, 3, 6, 4], " 5,8, 3 ,9  2,6 ": [5, 8, 3, 9, 2, 6], "1 20": [1, 20],
+          " ".join(["3"] * 30): [3] * 30}
+    bad = ["", "7", "7 x 5", "7 1.5", "7 -1", "0 5", "5 21", " ".join(["3"] * 31), "7;1"]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(list(ok) + bad)}.map((t) => m.stockParse(t))));""")
+    assert got[:len(ok)] == list(ok.values())
+    assert all(isinstance(r, str) and r for r in got[len(ok):]), got[len(ok):]

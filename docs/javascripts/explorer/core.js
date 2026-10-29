@@ -73,7 +73,7 @@
       dec: (text) => {
         const m = /^([\d.]+)-(\d+)-(both|long)$/.exec(text);
         const prices = m && intList(m[1], 1, 20);
-        if (!prices || prices.length < 2 || prices.length > 20) return null;
+        if (!prices || prices.length < 2 || prices.length > 30) return null;
         return { prices, k: Math.min(Number(m[2]), prices.length), both: m[3] === "both" };
       },
     },
