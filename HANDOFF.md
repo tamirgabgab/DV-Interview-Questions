@@ -1522,6 +1522,15 @@ section below starts at session 22, whose numbered items run on through the late
     (154 in all). Also fixed: 0042's chart aria-label had an unescaped quote (ק"מ) that
     printed the SVG as text; `charts.py` now escapes it.
 
+98. **Owner fixes after round V (session 28, 2026-10-29).** The side list's titles were cut
+    to words once at the default width and Material kept the list 11.5rem wide in a widened
+    column: the list now takes the column and the titles are fitted again on a resize, a
+    grip and the fold button. Cost chips grow with their formula (no scrollbar). 0006: a
+    day count (2 to 30) and a typed price list in both boxes, the state link up to 30 days.
+    0018/0019: the hourglass box plays continuously (sand drains with a grain stream, a
+    glass turns 180° at a flip, a clock), with play/pause and a speed choice; steps animate
+    to the next event, and reduced motion jumps to the event frames.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
