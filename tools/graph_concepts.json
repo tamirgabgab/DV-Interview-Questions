@@ -479,6 +479,26 @@
   "parallel_compare": {
    "label": "Parallel compare and priority encoder",
    "group": "digital design"
+  },
+  "flood_fill": {
+   "label": "Flood fill",
+   "group": "algorithms"
+  },
+  "union_find": {
+   "label": "Union-find",
+   "group": "algorithms"
+  },
+  "fenwick_tree": {
+   "label": "Fenwick tree",
+   "group": "algorithms"
+  },
+  "inversion_count": {
+   "label": "Inversion count",
+   "group": "algorithms"
+  },
+  "quantile": {
+   "label": "Quantile",
+   "group": "probability"
   }
  },
  "questions": {
@@ -1693,6 +1713,126 @@
      "id": "0051",
      "explicit": false,
      "why": "both read each item as a digit, and the number of states per item is the base"
+    }
+   ]
+  },
+  "0065": {
+   "core": [
+    "flood_fill",
+    "bfs",
+    "graph_search"
+   ],
+   "secondary": [
+    "union_find",
+    "sorting",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0046",
+     "explicit": false,
+     "why": "both scan a 0/1 grid and measure groups of ones"
+    },
+    {
+     "id": "0032",
+     "explicit": false,
+     "why": "both are a BFS with a visited set"
+    }
+   ]
+  },
+  "0066": {
+   "core": [
+    "sorting",
+    "sweep_line",
+    "running_sum"
+   ],
+   "secondary": [
+    "invariant",
+    "greedy",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0062",
+     "explicit": true,
+     "why": "the same event sweep over intervals, and the peak of the sum"
+    },
+    {
+     "id": "0033",
+     "explicit": true,
+     "why": "the peak of an occupancy over time"
+    }
+   ]
+  },
+  "0067": {
+   "core": [
+    "dijkstra",
+    "bfs",
+    "graph_search"
+   ],
+   "secondary": [
+    "priority_queue",
+    "invariant",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0019",
+     "explicit": false,
+     "why": "Dijkstra on a state graph"
+    },
+    {
+     "id": "0031",
+     "explicit": false,
+     "why": "Dijkstra with a heap and lazy deletion"
+    }
+   ]
+  },
+  "0068": {
+   "core": [
+    "priority_queue",
+    "quantile",
+    "invariant"
+   ],
+   "secondary": [
+    "sliding_window",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0063",
+     "explicit": false,
+     "why": "a streaming structure over a window"
+    },
+    {
+     "id": "0047",
+     "explicit": false,
+     "why": "a heap that keeps its top in order"
+    }
+   ]
+  },
+  "0069": {
+   "core": [
+    "fenwick_tree",
+    "inversion_count",
+    "sorting"
+   ],
+   "secondary": [
+    "scoreboard",
+    "transaction_ordering",
+    "bit_manipulation",
+    "divide_and_conquer"
+   ],
+   "related": [
+    {
+     "id": "0050",
+     "explicit": true,
+     "why": "responses out of order and the scoreboard that tolerates them"
+    },
+    {
+     "id": "0009",
+     "explicit": true,
+     "why": "the fewest swaps by the cycles of a permutation"
     }
    ]
   }

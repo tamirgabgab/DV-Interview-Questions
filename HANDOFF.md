@@ -1463,6 +1463,25 @@ section below starts at session 22, whose numbered items run on through the late
     `10-rounds-w.css`); a signed number after an RLM reads with its sign after the digits
     ("1−"), in tables of 0030, 0042, 0062 and 0063 and a line of 0018: now in an LTR span
     (the generators of 0030, 0042, 0062 and 0063 changed, and the 0030 test).
+95. **Questions 0065 to 0069, round N2 (session 28, 2026-10-29).** The owner picked five of
+    the fifteen Google coding problems shown in the chat, each with a generalisation of
+    their own, and answered the clarifying questions (input formats, part c of each, the
+    boxes). Written by five agents in parallel (one restart after a usage limit), reviewed
+    and integrated here. 0065 islands (junior): four directions, eight directions (two
+    islands become one at a corner, the diagonal-line paradox), the sizes sorted
+    descending; box `islands` (click cells, a 4 / 8 switch, the flood queue). 0066 merge
+    intervals (junior): merge, then the owner's heights: triples (start, end, height) over
+    half-open ranges, the total height per piece by an event sweep ([1,7,7] and [2,6,4] give
+    7, 11, 7), then the peak and the ranges above a threshold; box `intervals`. 0067
+    network delay (junior): BFS without weights, Dijkstra with weights (lazy deletion), and
+    one-way links (LC 743: a node becomes unreachable, another slower); box `netdelay`.
+    0068 stream median (junior): two heaps, the nearest-rank p-quantile with
+    |low| = max(1, ceil(p · n)), and the window of the last W values by lazy deletion; box
+    `twoheaps`. 0069 overtakes (senior): per request how many later ones were answered
+    first (LC 315, a Fenwick tree and merge sort), how many earlier ones it passed, the
+    total and the normalised disorder, and a live version over send indices; box
+    `overtakes`. Added here: the study paths (coding, advanced algorithms, testbench), the
+    question map with five new concepts, eight contrast pairs.
 
 ## In progress
 
@@ -1470,7 +1489,7 @@ section below starts at session 22, whose numbered items run on through the late
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
 - **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done; a slider and its value on one row (item 86) published (`main` a4e0b47); the renumbering (item 87), the 0055 list (item 88) and question 0056 (item 89) published (`main` 905863d); the formula steps and the moves table in both boxes (item 90) published (`main` 8d8bd24); round M, motion and finish (item 91) published (`main` 3c31a22 and this log); the review of ten questions (item 92): the fixes (`main` f397198) and the improvements published.
-  63 questions (0022 was
+  68 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
@@ -1532,13 +1551,13 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (63 questions)
+### Coverage today (68 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048, 0064 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water), weights for every load in base 2, balanced base 3 and balanced base 2c + 1 (0064) |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056, 0058, 0059, 0060, 0061, 0062, 0063 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056), coins in a row by a parity trick and an interval DP (0058), the next number with as many ones by Gosper's hack, the previous by the complement, and the same for zeros across lengths (0059), the longest run of ones with k flips by a sliding window, and of one value on a bus (0060), the tags a list of transactions needs by an event sweep, one pool and two (0061), the sliding-window maximum by a monotonic deque, the window with max − min <= limit, and the same in hardware (0063) |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056, 0058, 0059, 0060, 0061, 0062, 0063, 0065, 0066, 0067, 0068 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056), coins in a row by a parity trick and an interval DP (0058), the next number with as many ones by Gosper's hack, the previous by the complement, and the same for zeros across lengths (0059), the longest run of ones with k flips by a sliding window, and of one value on a bus (0060), the tags a list of transactions needs by an event sweep, one pool and two (0061), the sliding-window maximum by a monotonic deque, the window with max − min <= limit, and the same in hardware (0063), islands in four and eight directions (0065), merged intervals and the total height per piece (0066), BFS and Dijkstra for a broadcast time (0067), the median and the p-quantile of a stream by two heaps (0068) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057, 0069 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057), overtakes in a stream of responses by a Fenwick tree (0069) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock
@@ -1786,6 +1805,12 @@ ends with the full check set and the owner's look at the live site.
   testbenches: wrap the binary so the C++ build gets `-CFLAGS -fcoroutines -CFLAGS
   -std=c++20`, and call `run_sv()` of `run_tests.py` directly (its version check asks for
   5.053+, and the classes with constraints need the CI's build). 0055 to 0062 pass this way.
+- Verilator on a fresh cloud sandbox: `apt-get install -y flex bison help2man libfl-dev z3`,
+  then `bash tools/dev_setup.sh --verilator` builds the pinned commit into `~/verilator` (about
+  15 minutes; it reports chromium missing, which is fine: the checks use
+  `/opt/pw-browsers/chromium`). Found with it: `sort()` on an `int` queue orders negative
+  values as if unsigned (0068's testbench sorts by hand); `dist` and `before` are keywords,
+  not usable as names.
 - Build: `pip install -r requirements.txt && mkdocs build --strict`. Versions are pinned
   (MkDocs 1.6.1, Material 9.7.7). Material warns about MkDocs 2.0 — do not upgrade MkDocs
   to 2.x, its plugin system (and therefore the hook and the tags plugin) is gone.

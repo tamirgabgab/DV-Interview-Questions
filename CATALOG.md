@@ -1,6 +1,6 @@
 # Catalog
 
-All 63 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 68 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -68,3 +68,8 @@ All 63 questions, with links to their pages on the [live site](https://tamirgabg
 | 0062 | [כמה tags צריך – טרנזקציות חופפות, ומאגר אחד מול שניים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0062-how-many-tags/) | junior (ג'וניור) |
 | 0063 | [המקסימום בחלון נע – deque, החלון הארוך עם max − min ≤ limit, ובחומרה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0063-sliding-window-maximum/) | junior (ג'וניור) |
 | 0064 | [משקולות לכל משקל – כף אחת, שתי כפות, ו-c עותקים מכל משקולת](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0064-weights-for-every-load/) | student (סטודנט) |
+| 0065 | [כמה איים – ארבעה כיוונים, שמונה כיוונים, וגודל כל אי](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0065-number-of-islands/) | junior (ג'וניור) |
+| 0066 | [מיזוג קטעים – קטעים חופפים, הגובה הכולל בכל נקודה, והשיא מול סף](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0066-merge-intervals/) | junior (ג'וניור) |
+| 0067 | [זמן השידור ברשת – BFS בלי משקלים, Dijkstra עם משקלים, וקשתות חד-כיווניות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0067-network-delay-time/) | junior (ג'וניור) |
+| 0068 | [החציון של זרם – שתי ערימות, אחוזון p, וחלון נע](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0068-stream-median/) | junior (ג'וניור) |
+| 0069 | [עקיפות בזרם תשובות – כמה עקפו כל בקשה, כמה היא עקפה, וסך העקיפות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0069-out-of-order-overtakes/) | senior (סניור) |

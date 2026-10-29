@@ -448,6 +448,11 @@ EXPECTED = {
     "0062": tag_pool_answers(),
     "0063": [4, 5, 3],                                      # tests/0063 replays the deques and the module
     "0064": [6, 4, (5 ** 3 - 1) // 2],                      # tests/0064 searches every weight set
+    "0067": [3, 4, 6],                                      # tests/0067 checks them against every simple path
+    "0068": [6, 15, 9],                                     # tests/0068 sorts the prefix and the window
+    "0065": [5, 1, 5],                                      # tests/0065 floods the X and the self-check grids
+    "0066": [3, 3, 6],                                      # tests/0066 merges, cuts the pieces and reads the peak
+    "0069": [2, 3, 5],                                      # tests/0069 counts the pairs of 7 3 9 2 8
 }
 
 

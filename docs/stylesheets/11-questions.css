@@ -499,3 +499,215 @@
 .md-typeset .explorer :is(input.sm-k, input.sm-limit) { width: 3.6rem; }
 .md-typeset .explorer .sm-only-b, .md-typeset .explorer .sm-only-c, .md-typeset .explorer.sm-is-c .sm-not-c { display: none; }
 .md-typeset .explorer.sm-is-b .sm-only-b, .md-typeset .explorer.sm-is-c .sm-only-c { display: inline-flex; }
+
+/* 0066: merge intervals (the figures and the intervals explorer): bars over an axis, the merged row, the stacked heights and the total line */
+.md-typeset svg.iv-fig .iv-bar { fill: color-mix(in srgb, var(--viz-s1) 35%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.iv-fig .iv-bar.iv-c1 { fill: color-mix(in srgb, var(--viz-s2) 35%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg.iv-fig .iv-bar.iv-c2 { fill: color-mix(in srgb, var(--viz-s3) 35%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg.iv-fig .iv-bar.iv-c3 { fill: color-mix(in srgb, var(--viz-s4) 35%, var(--md-default-bg-color)); stroke: var(--viz-s4); }
+.md-typeset svg.iv-fig .iv-bar.is-wait { stroke-dasharray: 4 3; fill: none; }
+.md-typeset svg.iv-fig .iv-bar.is-done { opacity: 0.5; }
+.md-typeset svg.iv-fig .iv-bar.is-cur { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg.iv-fig .iv-merged { fill: color-mix(in srgb, var(--viz-s3) 35%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg.iv-fig .iv-merged.is-now { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg.iv-fig .iv-blk { fill: color-mix(in srgb, var(--viz-s1) 35%, var(--md-default-bg-color)); stroke: var(--md-default-bg-color); stroke-width: 1; }
+.md-typeset svg.iv-fig .iv-blk.iv-c1 { fill: color-mix(in srgb, var(--viz-s2) 35%, var(--md-default-bg-color)); }
+.md-typeset svg.iv-fig .iv-blk.iv-c2 { fill: color-mix(in srgb, var(--viz-s3) 35%, var(--md-default-bg-color)); }
+.md-typeset svg.iv-fig .iv-blk.iv-c3 { fill: color-mix(in srgb, var(--viz-s4) 35%, var(--md-default-bg-color)); }
+.md-typeset svg.iv-fig .iv-line { fill: none; stroke: var(--viz-ink); stroke-width: 2.5; stroke-linejoin: round; }
+.md-typeset svg.iv-fig .iv-piece { fill: none; stroke: var(--viz-ink); stroke-width: 1; stroke-dasharray: 3 3; }
+.md-typeset svg.iv-fig .iv-piece.is-ok { fill: color-mix(in srgb, var(--viz-s3) 22%, transparent); stroke-dasharray: none; stroke: var(--viz-s3); }
+.md-typeset svg.iv-fig .iv-piece.is-now { stroke: var(--viz-s2); stroke-width: 3; stroke-dasharray: none; }
+.md-typeset svg.iv-fig .iv-thr { stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.iv-fig .iv-peak { stroke: var(--viz-s3); stroke-width: 2; stroke-dasharray: 6 4; }
+.md-typeset svg.iv-fig .iv-top { fill: var(--viz-s3); }
+.md-typeset svg.iv-fig .iv-range { fill: color-mix(in srgb, var(--viz-s3) 35%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg.iv-fig .iv-range.is-now { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg.iv-fig .iv-cursor { stroke: var(--viz-s2); stroke-width: 2; stroke-dasharray: 5 3; }
+.md-typeset svg.iv-fig .iv-name, .md-typeset svg.iv-fig .iv-h { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .iv-key-bar { background: var(--viz-s1); opacity: 0.6; }
+.md-typeset .viz-legend .iv-key-merged, .md-typeset .viz-legend .iv-key-range { background: color-mix(in srgb, var(--viz-s3) 35%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
+.md-typeset .viz-legend .iv-key-blk { background: linear-gradient(to left, var(--viz-s1) 50%, var(--viz-s2) 50%); opacity: 0.6; }
+.md-typeset .viz-legend .iv-key-line { background: none; border-top: 3px solid var(--viz-ink); height: 0.45em; }
+.md-typeset .viz-legend .iv-key-piece { background: none; outline: 1.5px dashed var(--viz-ink); outline-offset: -1.5px; }
+.md-typeset .viz-legend .iv-key-thr { background: none; border-top: 2px solid var(--viz-s2); height: 0.45em; }
+.md-typeset .viz-legend .iv-key-peak { background: none; border-top: 3px dashed var(--viz-s3); height: 0.45em; }
+.md-typeset .viz-legend .iv-key-cur { background: none; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .explorer .iv-wrap { margin: 0.5rem 0; overflow-x: auto; direction: ltr; }
+.md-typeset .explorer .iv-wrap svg { min-width: 30rem; }
+.md-typeset .explorer .iv-note { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer input.iv-ivs { width: 13rem; max-width: 100%; }
+@media screen and (min-width: 45em) { .md-typeset .explorer input.iv-ivs { width: 18rem; } }
+.md-typeset .explorer .iv-only-a, .md-typeset .explorer .iv-only-b, .md-typeset .explorer .iv-only-c, .md-typeset .explorer.iv-is-a .iv-not-a { display: none; }
+.md-typeset .explorer.iv-is-a .iv-only-a, .md-typeset .explorer.iv-is-b .iv-only-b, .md-typeset .explorer.iv-is-c .iv-only-c { display: inline-flex; }
+
+/* 0069: overtakes in a stream of responses (the figures and the overtakes explorer) */
+.md-typeset svg.ov-fig .ov-lab { fill: var(--viz-text); font-size: 11.5px; font-family: var(--md-code-font-family); }
+.md-typeset svg.ov-fig .ov-cell rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg.ov-fig .ov-cell text { fill: var(--viz-ink); font-size: 14px; font-family: var(--md-code-font-family); }
+.md-typeset svg.ov-fig .ov-cell.is-rsp rect { stroke: var(--viz-text); stroke-dasharray: 3 3; }
+.md-typeset svg.ov-fig .ov-cell.is-later { opacity: 0.45; }
+.md-typeset svg.ov-fig .ov-cell.is-cur rect { stroke: var(--viz-s2); stroke-width: 2.5; stroke-dasharray: none; fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset svg.ov-fig .ov-cell.is-counted rect { stroke: var(--viz-s2); stroke-width: 2; stroke-dasharray: none; }
+.md-typeset svg.ov-fig .ov-cell:is(.is-cur, .is-counted) text { font-weight: 700; }
+.md-typeset svg.ov-fig .ov-line { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg.ov-fig .ov-line.is-cross { stroke: var(--viz-ink); }
+.md-typeset svg.ov-fig .ov-line.is-later { opacity: 0.35; }
+.md-typeset svg.ov-fig .ov-line.is-counted { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg.ov-fig .ov-line.is-cur { stroke: var(--viz-s2); stroke-width: 3.5; }
+.md-typeset svg.ov-fig .ov-cnt rect { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.ov-fig .ov-cnt text { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.ov-fig .ov-cnt.is-zero text { font-weight: 400; fill: var(--viz-text); }
+.md-typeset svg.ov-fig .ov-cnt.is-empty rect { fill: none; stroke: var(--viz-grid); stroke-dasharray: 3 3; }
+.md-typeset svg.ov-fig .ov-cnt.is-cur rect { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg.ov-fig .ov-bar rect { fill: color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color)); stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg.ov-fig .ov-bar text { fill: var(--viz-ink); font-size: 10.5px; font-family: var(--md-code-font-family); }
+.md-typeset svg.ov-fig .ov-tc rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg.ov-fig .ov-tc text { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.ov-fig .ov-bin { fill: var(--viz-text); font-size: 9.5px; font-family: var(--md-code-font-family); }
+.md-typeset svg.ov-fig :is(.ov-bar, .ov-tc).is-q rect { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.ov-fig :is(.ov-bar, .ov-tc).is-u rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.ov-fig .tick:is(.is-q, .is-u) { fill: var(--viz-ink); font-weight: 700; }
+.md-typeset .viz-legend .ov-key-req { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-grid); outline-offset: -1.5px; }
+.md-typeset .viz-legend .ov-key-rsp { background: var(--md-default-bg-color); outline: 1.5px dashed var(--viz-text); outline-offset: -1.5px; }
+.md-typeset .viz-legend .ov-key-cross { background: linear-gradient(to top right, transparent calc(50% - 1px), var(--viz-ink) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)), linear-gradient(to top left, transparent calc(50% - 1px), var(--viz-ink) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)); }
+.md-typeset .viz-legend .ov-key-cnt { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
+.md-typeset .viz-legend .ov-key-cur { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s2); outline-offset: -2.5px; }
+.md-typeset .viz-legend .ov-key-counted { background: none; outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .viz-legend .ov-key-later { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-grid); outline-offset: -1.5px; opacity: 0.45; }
+.md-typeset .viz-legend .ov-key-bar { background: color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color)); outline: 1px solid var(--viz-text); outline-offset: -1px; }
+.md-typeset .viz-legend .ov-key-q { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .ov-key-u { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .explorer .ov-wrap { margin: 0.5rem 0; overflow-x: auto; direction: ltr; }
+.md-typeset .explorer .ov-wrap svg { width: 100%; }
+.md-typeset .explorer .ov-note, .md-typeset .explorer .ov-tally { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer input.ov-done { width: 14rem; max-width: 100%; }
+
+/* 0065: number of islands (the grid figures and the islands explorer) */
+.md-typeset svg.il-fig .il-cell rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg.il-fig .il-cell text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.il-fig .il-link { stroke: var(--viz-s2); stroke-width: 3; stroke-linecap: round; }
+.md-typeset :is(svg.il-fig .il-cell.il-i1 rect, .explorer .il-cell.il-i1, .viz-legend .il-key.il-i1) { fill: color-mix(in srgb, var(--viz-s1) 40%, var(--md-default-bg-color)); background: color-mix(in srgb, var(--viz-s1) 40%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset :is(svg.il-fig .il-cell.il-i2 rect, .explorer .il-cell.il-i2) { fill: color-mix(in srgb, var(--viz-s2) 40%, var(--md-default-bg-color)); background: color-mix(in srgb, var(--viz-s2) 40%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset :is(svg.il-fig .il-cell.il-i3 rect, .explorer .il-cell.il-i3) { fill: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); background: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset :is(svg.il-fig .il-cell.il-i4 rect, .explorer .il-cell.il-i4) { fill: color-mix(in srgb, var(--viz-s4) 40%, var(--md-default-bg-color)); background: color-mix(in srgb, var(--viz-s4) 40%, var(--md-default-bg-color)); stroke: var(--viz-s4); }
+.md-typeset :is(svg.il-fig .il-cell.il-i5 rect, .explorer .il-cell.il-i5) { fill: color-mix(in srgb, var(--viz-s5) 40%, var(--md-default-bg-color)); background: color-mix(in srgb, var(--viz-s5) 40%, var(--md-default-bg-color)); stroke: var(--viz-s5); }
+.md-typeset .viz-legend .il-key { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-grid); outline-offset: -1.5px; }
+.md-typeset .viz-legend .il-key.il-i2 { background: color-mix(in srgb, var(--viz-s2) 40%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .il-key.il-i3 { background: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .il-key.is-land, .md-typeset .explorer .il-cell.is-land { background: color-mix(in srgb, var(--viz-ink) 16%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .il-key-link { background: none; border-top: 3px solid var(--viz-s2); height: 0.45em; }
+.md-typeset .viz-legend .il-key-q { background: none; outline: 2px dashed var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .il-key-cur { background: none; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .viz-legend .il-key-new { background: none; outline: 2.5px solid var(--viz-s2); outline-offset: -2.5px; }
+.md-typeset .explorer .il-panels { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin: 0.5rem 0; }
+.md-typeset .explorer .il-panel { flex: 0 1 auto; min-width: 0; max-width: 100%; margin: 0; }
+.md-typeset .explorer .il-panel figcaption { margin: 0 0 0.3rem; font-size: 0.68rem; text-align: center; }
+.md-typeset .explorer .il-grid { --n: 6; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1.9rem)); gap: 2px; width: max-content; max-width: 100%; margin: 0 auto; touch-action: manipulation; }
+.md-typeset .explorer .il-r { display: contents; }
+.md-typeset .explorer .il-cell { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; min-width: 0; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--viz-grid); background: var(--md-default-bg-color); color: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 0.7rem; font-weight: 700; line-height: 1; user-select: none; cursor: pointer; }
+.md-typeset .explorer .il-cell.is-q { outline: 2px dashed var(--viz-ink); outline-offset: -2px; }
+.md-typeset .explorer .il-cell.is-new { outline: 2.5px solid var(--viz-s2); outline-offset: -2.5px; }
+.md-typeset .explorer .il-cell.is-cur { outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .explorer .il-cell:focus-visible { position: relative; z-index: 3; outline: 2px solid var(--md-accent-fg-color); outline-offset: 1px; }
+.md-typeset .explorer .il-queue { display: flex; flex-wrap: wrap; gap: 0.25rem; direction: ltr; justify-content: flex-start; max-width: 13rem; min-height: 1.6rem; }
+.md-typeset .explorer .il-q { font-family: var(--md-code-font-family); font-size: 0.65rem; padding: 0.15em 0.4em; border-radius: 4px; box-shadow: inset 0 0 0 1.5px var(--viz-ink); background: var(--md-default-bg-color); color: var(--viz-ink); }
+.md-typeset .explorer .il-q.is-head { background: color-mix(in srgb, var(--viz-ink) 14%, var(--md-default-bg-color)); font-weight: 700; }
+.md-typeset .explorer .il-q.is-new { box-shadow: inset 0 0 0 2px var(--viz-s2); }
+.md-typeset .explorer .il-q.is-empty { box-shadow: inset 0 0 0 1.5px var(--viz-grid); color: var(--viz-text); font-family: inherit; }
+.md-typeset .explorer :is(.il-note, .il-sizes) { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer .il-edit-hint { margin: 0.2rem 0; color: var(--viz-text); font-size: 0.65rem; }
+.md-typeset .explorer .il-sizes .is-run { color: var(--viz-s2-text); }
+
+/* 0068: the median of a stream (the heap figures and the twoheaps explorer) */
+.md-typeset svg.th-fig .th-node circle { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.th-fig .th-node text { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.th-fig .th-node.is-top circle { stroke: var(--viz-ink); stroke-width: 2.5; }
+.md-typeset svg.th-fig .th-node.is-new circle { stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg.th-fig .th-node.is-moved circle { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.th-fig .th-node.is-dead circle { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-dasharray: 3 3; }
+.md-typeset svg.th-fig .th-node.is-dead text { fill: var(--viz-text); font-weight: 400; }
+.md-typeset svg.th-fig .th-strike { stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.th-fig .th-edge { stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg.th-fig .th-mid { stroke: var(--viz-ink); stroke-width: 1.5; stroke-dasharray: 5 3; }
+.md-typeset svg.th-fig .th-lab { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.th-fig .th-ans-bg { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.th-fig .th-ans { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.th-fig .th-cell rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg.th-fig .th-cell text { fill: var(--viz-text); font-size: 14px; font-family: var(--md-code-font-family); }
+.md-typeset svg.th-fig .th-cell.is-top rect { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-ink); stroke-width: 2.5; }
+.md-typeset svg.th-fig .th-cell.is-top text { fill: var(--viz-ink); font-weight: 700; }
+.md-typeset svg.th-fig .th-cell.is-wait rect { stroke-dasharray: 3 3; }
+.md-typeset svg.th-fig .th-cell.is-gone { opacity: 0.55; }
+.md-typeset svg.th-fig .th-cell.is-cur rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset svg.th-fig .th-cell.is-cur text { fill: var(--viz-ink); font-weight: 700; }
+.md-typeset svg.th-fig .th-win { fill: none; stroke: var(--viz-ink); stroke-width: 1.5; stroke-dasharray: 5 3; }
+.md-typeset .viz-legend .th-key-in { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; border-radius: 50%; }
+.md-typeset .viz-legend .th-key-top { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; border-radius: 50%; }
+.md-typeset .viz-legend .th-key-new { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s2); outline-offset: -2.5px; border-radius: 50%; }
+.md-typeset .viz-legend .th-key-moved { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; border-radius: 50%; }
+.md-typeset .viz-legend .th-key-dead { background: linear-gradient(to top right, transparent calc(50% - 1px), var(--viz-s2) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)), var(--md-default-bg-color); outline: 1.5px dashed var(--viz-grid); outline-offset: -1.5px; border-radius: 50%; }
+.md-typeset .viz-legend .th-key-win { background: none; outline: 1.5px dashed var(--viz-ink); outline-offset: -1.5px; }
+.md-typeset .explorer .th-wrap { margin: 0.5rem 0; }
+.md-typeset .explorer .th-streamwrap { overflow-x: auto; direction: ltr; margin-bottom: 0.4rem; }
+.md-typeset .explorer .th-streamwrap svg { width: 100%; min-width: 15rem; display: block; margin: 0 auto; }
+.md-typeset .explorer .th-twowrap svg { width: 100%; max-width: 22rem; display: block; margin: 0 auto; }
+.md-typeset .explorer .th-note, .md-typeset .explorer .th-tally { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer input.th-nums { width: 14rem; max-width: 100%; }
+.md-typeset .explorer input.th-w { width: 3.6rem; }
+.md-typeset .explorer .th-only-c { display: none; }
+.md-typeset .explorer.th-is-c .th-only-c { display: inline-flex; }
+
+/* 0067: network delay time (the graph figures and the netdelay explorer) */
+.md-typeset svg.nd-fig .nd-edge line { stroke: var(--viz-grid); stroke-width: 2; }
+.md-typeset svg.nd-fig .nd-edge.is-tree line { stroke: var(--viz-s1); stroke-width: 4; }
+.md-typeset svg.nd-fig .nd-edge.is-relax line { stroke: var(--viz-s2); stroke-width: 4.5; stroke-dasharray: 7 3; }
+.md-typeset svg.nd-fig .nd-edge.is-relax.is-better line { stroke-dasharray: none; }
+.md-typeset svg.nd-fig .nd-head { fill: var(--viz-text); }
+.md-typeset svg.nd-fig .nd-edge.is-tree .nd-head { fill: var(--viz-s1); }
+.md-typeset svg.nd-fig .nd-edge.is-relax .nd-head { fill: var(--viz-s2); }
+.md-typeset svg.nd-fig .nd-wbox { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg.nd-fig .nd-edge.is-relax .nd-wbox { stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.nd-fig .nd-w { fill: var(--viz-ink); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.nd-fig .nd-node circle { fill: var(--md-default-bg-color); stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg.nd-fig .nd-node text { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.nd-fig .nd-node.is-none circle { stroke-dasharray: 3 3; }
+.md-typeset svg.nd-fig .nd-node.is-open circle { fill: color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-dasharray: 4 2; }
+.md-typeset svg.nd-fig .nd-node.is-set circle { fill: color-mix(in srgb, var(--viz-s1) 26%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.nd-fig .nd-node.is-src circle { fill: color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2.5; }
+.md-typeset svg.nd-fig .nd-node.is-far circle { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2; stroke-dasharray: 4 3; }
+.md-typeset svg.nd-fig .nd-node.is-cur circle { stroke: var(--viz-ink); stroke-width: 3.5; }
+.md-typeset svg.nd-fig .nd-time rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1; }
+.md-typeset svg.nd-fig .nd-time text { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.nd-fig .nd-time.is-tent rect { fill: var(--md-default-bg-color); stroke-dasharray: 3 2; }
+.md-typeset svg.nd-fig .nd-time.is-empty rect { fill: none; stroke: none; }
+.md-typeset svg.nd-fig .nd-time.is-far rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg.nd-fig .nd-time.is-max rect { stroke: var(--viz-ink); stroke-width: 2.5; }
+.md-typeset svg.nd-fig .nd-lab { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg.nd-fig :is(.nd-slot, .nd-row) rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg.nd-fig :is(.nd-slot, .nd-row) text { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.nd-fig .nd-row:not(.is-empty) rect { fill: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg.nd-fig .nd-row.is-empty rect { stroke-dasharray: 3 3; }
+.md-typeset svg.nd-fig .nd-row.is-old rect { fill: var(--md-default-bg-color); stroke: var(--viz-s2); stroke-dasharray: 4 2; }
+.md-typeset svg.nd-fig .nd-slot.is-now rect { stroke: var(--viz-ink); stroke-width: 2.5; }
+.md-typeset svg.nd-fig .nd-slot.is-now text { font-weight: 700; }
+.md-typeset svg.nd-fig .nd-slot.is-stale rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.nd-fig .nd-slot.is-off rect { stroke-dasharray: 3 3; }
+.md-typeset svg.nd-fig .nd-strike { stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset .viz-legend .nd-key-src { background: color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s3); outline-offset: -2.5px; border-radius: 50%; }
+.md-typeset .viz-legend :is(.nd-key-node, .nd-key-set) { background: color-mix(in srgb, var(--viz-s1) 26%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); outline-offset: -2px; border-radius: 50%; }
+.md-typeset .viz-legend .nd-key-open { background: color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color)); outline: 1.5px dashed var(--viz-s1); outline-offset: -1.5px; border-radius: 50%; }
+.md-typeset .viz-legend .nd-key-cur { background: none; outline: 3px solid var(--viz-ink); outline-offset: -3px; border-radius: 50%; }
+.md-typeset .viz-legend .nd-key-far { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px dashed var(--viz-s2); outline-offset: -2px; border-radius: 50%; }
+.md-typeset .viz-legend .nd-key-tree { background: var(--viz-s1); height: 4px; }
+.md-typeset .viz-legend .nd-key-relax { background: var(--viz-s2); height: 4px; }
+.md-typeset .viz-legend .nd-key-w { background: var(--md-default-bg-color); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .nd-key-old { background: var(--md-default-bg-color); outline: 1.5px dashed var(--viz-s2); outline-offset: -1.5px; }
+.md-typeset .explorer .nd-wrap { margin: 0.5rem 0; overflow-x: auto; direction: ltr; }
+.md-typeset .explorer .nd-wrap svg { width: 100%; }
+.md-typeset .explorer .nd-note, .md-typeset .explorer .nd-tally { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer input.nd-k { width: 3.6rem; }
+.md-typeset .explorer.nd-is-a :is(.nd-not-a, .nd-wcol) { display: none; }
+.md-typeset .explorer table.nd-etab { font-size: 0.7rem; margin: 0; }
+.md-typeset .explorer table.nd-etab :is(td, th) { padding: 0.15em 0.5em; text-align: center; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer input.nd-w-in { width: 3.4rem; }
