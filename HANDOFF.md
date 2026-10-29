@@ -1483,6 +1483,28 @@ section below starts at session 22, whose numbered items run on through the late
     `overtakes`. Added here: the study paths (coding, advanced algorithms, testbench), the
     question map with five new concepts, eight contrast pairs.
 
+96. **The layout round (session 28, 2026-10-29).** Six owner asks, after clarifying questions.
+    The level's question list in the desktop sidebar is folded to the current question
+    behind a button with the count and an arrow, remembered in localStorage
+    (`javascripts/layout.js`, `stylesheets/14-layout.css`). The Python tab is first and
+    selected on every page (139 tab pairs swapped, the template too); `lint_pages.py` now
+    fails a Python tab after a SystemVerilog one. The desktop grid is up to 80vw (at least
+    61rem). Grips between the three columns resize the navigation and the table of
+    contents (pointer or arrow keys, 10 to 24 rem, the page never under 30 rem), remembered,
+    and a double click or Home resets. Enter in box fields: the owner's 0048 fields did not
+    apply on Enter in Chrome. Not reproducible with plain keys; it reproduces when typing
+    goes through an input method (Windows text suggestions, an IME), where the Enter that
+    ends the composition comes as keydown "Process" (keyCode 229) and only the keyup says
+    Enter. `core.js` `fields(box)` now turns that keyup into a keydown Enter, fires the
+    field's change after Enter and on leaving the field when the value was not applied yet,
+    and drops the duplicate native change; covergroup.js and endpoint.js send on Enter. New
+    check `tools/check_inputs.py` (in CI with the explorer shards) types into every box
+    field and presses Enter, Tab and an input-method Enter: 49 pages failed before, none
+    after. 0048 part c: the food line tilted at angle theta (0 to 60 degrees) through
+    (0, H), a closed form for the shortest path and its validity check, box mode c with a
+    theta slider, generator, tests and testbench. Two contrast pairs added (the fold count,
+    the grip line).
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
