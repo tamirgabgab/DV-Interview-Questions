@@ -1540,6 +1540,15 @@ section below starts at session 22, whose numbered items run on through the late
     (lazy deletion never fires there, proved on the page). Box `gridpath`: paint walls or
     costs, drag S and T, size, k, step and play the search.
 
+100. **The tutorial videos, planned (session 28, 2026-10-30).** The owner wants a tutorial
+    video per question, a chapter per part, and answered the clarifying questions: Manim to
+    MP4, captions only for now as a separate Hebrew WebVTT (the Hebrew stays out of the
+    frame), YouTube hosting, the site's navy, 1–3 minutes per part, pilots 0002 and 0004.
+    `VIDEOS.md` holds the plan: the structure (opening, per part the problem, idea, steps,
+    code, proof, cost, trap, closing), the files under `videos/`, captions recorded while
+    the scene plays, the page's facade dialog, `check_videos.py`, and the order V0 to V6.
+    Waiting for the owner's approval of the plan (V0).
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),

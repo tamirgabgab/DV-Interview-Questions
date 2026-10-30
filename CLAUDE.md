@@ -4,7 +4,8 @@ This is a Hebrew, right-to-left MkDocs Material site of Design Verification inte
 questions, published to GitHub Pages from `main`. `README.md` has the links to the site;
 `CONTRIBUTING.md` documents the content format and the tooling; `CATALOG.md` lists the
 questions (written by `tools/catalog.py`); `HANDOFF.md` is the living task list and work
-log (the older log is in `HANDOFF-archive.md`). Read `CONTRIBUTING.md` and `HANDOFF.md`
+log (the older log is in `HANDOFF-archive.md`). `VIDEOS.md` is the plan of the tutorial videos
+(Manim, one per question, a chapter per part). Read `CONTRIBUTING.md` and `HANDOFF.md`
 before a work session, and update `HANDOFF.md` (work log, open items) at the end of every
 session.
 
