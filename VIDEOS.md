@@ -15,7 +15,11 @@ Once their structure is approved, the rest follow it question by question.
 | Hebrew text | Kept out of the picture as far as possible. The Hebrew captions are a separate WebVTT file shown by the player |
 | Hosting | YouTube, on the owner's channel. The site embeds the video |
 | Look | The site's navy (the hero's) with amber marks, one version for both schemes |
-| On the page | One video per question, a chapter per part, 1–3 minutes each |
+| On the page | One video per question, a chapter per part: 1–3 minutes, 2–4 for a complex part (2026-10-30) |
+| Pace | Calm, in the style of 3Blue1Brown: animations of 1–2 s, every picture held 2–4 s for its caption |
+| Code beat | Python only |
+| Opening and closing | The drawn DV mark, the question's id and parts; the closing has the site's address and the question's id |
+| Review | The pilots are scripted and rendered in one go; the owner reviews the videos |
 | Pilots | 0002 (swap two variables) and 0004 (three mislabeled boxes) |
 
 ## Why the Hebrew stays out of the frame
@@ -41,14 +45,14 @@ Hebrew words.
 ## The structure of a video
 
 A video is one file per question, with chapters. Each part of the question is one
-chapter of 1–3 minutes, and a short opening and closing frame the chapters. The same
+chapter of 1–3 minutes (2–4 for a complex part), and a short opening and closing frame the chapters. The same
 skeleton serves every question; the beats inside a chapter follow the page's solution
 blocks (idea → steps → code → proof → cost), so the video and the page tell the same story
 in the same order.
 
 ```
-0:00  Opening (5–10 s)  — the site mark, the question's id, the level and the parts as chips
-      Chapter א (1–3 min)
+0:00  Opening (5–10 s)  — the DV mark drawn as on the site, the question's id, the level and the parts as chips
+      Chapter א (1–3 min, 2–4 for a complex part)
         1. The problem   — the part's setting drawn (the objects, the input, what is asked)
         2. The idea      — one picture of the key insight (the "aha"), held still for a moment
         3. The steps     — the page's worked example, animated step by step
@@ -59,7 +63,8 @@ in the same order.
         7. One trap      — the most common mistake, shown failing on a small input
       Chapter ב …        — the same beats; it opens with what changed from the previous part
                            (the new constraint), so the ladder of the question is visible
-      Closing (5–10 s)  — the parts side by side in one line each, and "try it in the box"
+      Closing (5–10 s)  — the parts side by side in one line each, the site's address and the
+                          question's id ("try it in the box")
 ```
 
 Rules for every video:
@@ -229,6 +234,10 @@ videos/
 - **Closing.** One draw from the "mixed" box fixes all three labels.
 
 ## Open points for later
+
+- **Review.** The pilots skip the separate script review: script and video are made in
+  one go and the owner reviews the video. Whether later rounds keep this is decided after
+  V5.
 
 - **Voice.** Each caption is a full sentence, so a recorded voice (the owner's, or a
   generated one) can be added later. The captions become its script, and the timing
