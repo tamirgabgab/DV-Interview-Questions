@@ -3,3 +3,7 @@ __pycache__/
 .venv/
 .cache/
 node_modules/
+
+# Tutorial videos: renders, Manim media and caches (videos/render.py)
+videos/*/out/
+media/

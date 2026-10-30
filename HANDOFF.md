@@ -1549,6 +1549,20 @@ section below starts at session 22, whose numbered items run on through the late
     the scene plays, the page's facade dialog, `check_videos.py`, and the order V0 to V6.
     Waiting for the owner's approval of the plan (V0).
 
+101. **Tutorial videos V1 to V4 (session 28, 2026-10-30).** The owner asked for V1–V4 and
+    answered: parts of 2–4 minutes when complex, Python only, a calm pace, the DV mark and
+    the site's address, one review of the finished pilots. Manim 0.22.1 runs in its own venv
+    (`~/.venvs/manim`; `requirements-video.txt`, apart from CI). `videos/lib` (palette from
+    the CSS, Hebrew only as Chromium-drawn PNG labels, captions recorded per beat, the code
+    beat traced on the page's own Python), `videos/render.py` (checks the captions against
+    script.md, renders, concatenates, writes video.mp4, captions.vtt with Unicode isolates
+    around math, chapters.txt; `--preview` burns the captions in). Pilots: 0002 (5:55,
+    parts at 0, 108, 234 s) and 0004 (4:50, parts at 0, 124 s). Site side (V3): `video` and
+    `video_parts` in the front matter, the "סרטון הסבר" page tool, a link per part, a
+    modal dialog with a CSS poster that loads youtube-nocookie only on play, and
+    `check_videos.py` in CI. Waiting for the owner's review and the YouTube upload; then
+    the ids go into 0002 and 0004.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),

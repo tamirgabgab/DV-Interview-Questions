@@ -30,7 +30,8 @@ punctuation. The video therefore carries only what reads the same in any directi
 
 - code, numbers, formulas, bits and arrows;
 - boxes, balls and the other objects of the question;
-- the part's letter (א, ב, ג) as a single glyph in the chapter card.
+- nothing in Hebrew drawn by Manim: even the part's letter on the chapter card is a
+  label PNG (below).
 
 Everything said in words goes into the captions. The browser and YouTube lay out
 Hebrew captions correctly, a screen reader reads them, and a wording fix needs no
@@ -40,7 +41,11 @@ A label that must be in Hebrew inside the frame (rare: a name on a box, "אדו�
 once by the browser. Playwright renders the label to a transparent PNG, and the scene
 loads it as an `ImageMobject`. That is the same route the site's own figures take, so
 the text is shaped right. The pilot of 0004 tests this route, because its labels are
-Hebrew words.
+Hebrew words. `videos/lib/he_label.py` draws each label in Rubik (the site's text font,
+fetched once from Google Fonts into `videos/.cache/fonts`, with DejaVu Sans as the
+fallback) at twice the frame's pixels, and caches it by text, size, colour and weight in
+`videos/.cache/labels`. The pilots use it for the opening's title, level and part chips,
+the chapter cards, the closing's part letters, and 0004's box labels and stamp.
 
 ## The structure of a video
 
@@ -51,7 +56,7 @@ blocks (idea → steps → code → proof → cost), so the video and the page t
 in the same order.
 
 ```
-0:00  Opening (5–10 s)  — the DV mark drawn as on the site, the question's id, the level and the parts as chips
+0:00  Opening (15–25 s) — the DV mark drawn as on the site, the question's id, the level and the parts as chips
       Chapter א (1–3 min, 2–4 for a complex part)
         1. The problem   — the part's setting drawn (the objects, the input, what is asked)
         2. The idea      — one picture of the key insight (the "aha"), held still for a moment
@@ -63,9 +68,12 @@ in the same order.
         7. One trap      — the most common mistake, shown failing on a small input
       Chapter ב …        — the same beats; it opens with what changed from the previous part
                            (the new constraint), so the ladder of the question is visible
-      Closing (5–10 s)  — the parts side by side in one line each, the site's address and the
+      Closing (10–15 s) — the parts side by side in one line each, the site's address and the
                           question's id ("try it in the box")
 ```
+
+YouTube ignores a chapter shorter than 10 s, so the opening and the closing, which are
+chapters of their own in `chapters.txt`, last at least 10 s (render.py checks it).
 
 Rules for every video:
 
@@ -74,13 +82,31 @@ Rules for every video:
 - **One idea per beat.** A beat ends on a still frame that holds for at least two
   seconds, so a pause lands on a readable picture.
 - **The code is the page's code.** The code beat loads the code from the page's Python
-  tab, so it never drifts from the tested code. Python only: the SystemVerilog stays on
-  the page.
-- **A caption per beat**, about 1–2 lines: 12 words per line at most, 2–6 s on screen.
+  tab (`tools/extract_code.py`, without the annotation markers), so it never drifts from
+  the tested code. Python only: the SystemVerilog stays on the page. The library runs the
+  page's function on the example under a line tracer, so the lines are lit in the order
+  they really ran, with the locals after each line beside the code; the scene only groups
+  the traced lines under its captions, and the render fails if the groups differ from the
+  trace. A long function may leave its comment and blank lines out of the picture (0004's
+  first solution), never its code.
+- **A caption per beat**, 1–2 lines: 12 words per line at most, 1.5–7 s on screen. The
+  still after a beat's animations is held long enough to read its caption at about 14
+  characters a second, between 2 and 4 s.
 - **Colours** come from the site's palette, read from `docs/stylesheets/01-base.css` by
-  the shared library, so the video matches the site.
+  the shared library (and the figure colours of `02-pages.css` and `08-explorers.css`:
+  the crates and the balls of 0004), so the video matches the site. The marks on the navy
+  take the dark scheme's values, made for a dark surface.
+- **Fonts.** Inter for Latin text and math (its sub- and superscripts sit tight:
+  `a₀`, `2³¹`), DejaVu Sans Mono for code and numbers, Rubik for the Hebrew labels.
 - **The frame** is 1280×720 at 30 fps. Text is at least 28 px high, so it can be read
-  on a phone.
+  on a phone. The bottom 1.5 units (about 135 px) are the captions' zone: the player
+  draws the captions there, so the picture stays above it (`dvq.SAFE_BOTTOM`).
+- **Math in the captions.** `captions.vtt` wraps every code or math expression of a
+  caption in Unicode isolates (LRI … PDI, added by `captions.isolate()` when the file is
+  written; `script.md` stays as typed). Without them a right-to-left line reorders
+  expressions around their parentheses and numbers: Chromium showed `[3, 5]` as `[5 ,3]`
+  and `(k + 1) % 3` with its parenthesis moved. Both the browser and libass (the burned
+  preview) honour the isolates.
 
 ## The files
 
@@ -96,7 +122,8 @@ videos/
 ├── 0002/
 │   ├── script.md       # the storyboard: per chapter, per beat, the picture and the caption (Hebrew)
 │   ├── scene.py        # the Manim scenes, one class per chapter + Opening + Closing
-│   └── out/            # rendered, not committed: video.mp4, captions.vtt, chapters.txt
+│   └── out/            # rendered, not committed: video.mp4, captions.vtt, chapters.txt,
+│                       # parts/ (each scene's recorded captions), media/ (Manim's files)
 └── 0004/ …
 ```
 
@@ -120,7 +147,7 @@ videos/
 
 ## Opening
 
-> שתי קופסאות : a = 6 ו-b = 9.
+> שתי קופסאות : a = 5 ו-b = 3.
 
 ## Chapter א — with a temp variable
 
@@ -158,11 +185,33 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
     requirements so CI does not install it).
   - `ffmpeg`.
   - The Code mobject (Pygments) for the code beats.
-  - Math as `MathTex` needs LaTeX (`texlive-latex-base` and a few packages). The pilots
-    check whether plain `Text` with Unicode math is enough for the easy questions.
-- **The command.** `python videos/render.py 0002` renders the chapters at 720p30, chains
-  them, and writes `video.mp4`, `captions.vtt` and `chapters.txt` to `videos/0002/out/`.
-  The flag `--draft` renders at 480p15 for a quick look.
+  - No LaTeX. The pilots showed that `Text` with Unicode math (`a₀`, `2³¹`, `−`, `≡`) is
+    enough, so nothing installs it. The Manim parts that call LaTeX are avoided:
+    `MathTex`, `Tex`, the numbers of a `NumberLine`, `DecimalNumber`, `MathTable`,
+    `BraceLabel`.
+- **The command.** `~/.venvs/manim/bin/python videos/render.py 0002` (any Python with
+  `requirements-video.txt`) renders the chapters at 720p30, chains them, and writes
+  `video.mp4`, `captions.vtt` and `chapters.txt` to `videos/0002/out/`. The flag
+  `--draft` renders at 480p15 for a quick look, and `--preview` also writes
+  `preview.mp4` with the captions burned in (libass, Rubik, `Encoding=-1` so the base
+  direction is right to left) for a review in a plain player. The steps:
+  1. **Read** `scene.py`'s `SCENES` (the scene classes in order, each with its chapter
+     title for `chapters.txt`) and `script.md`'s captions, and fail early when a literal
+     caption of `scene.py` is not in the script or breaks a caption rule.
+  2. **Labels.** A Manim `--dry_run` lists the Hebrew labels, and `he_label.py` draws the
+     missing ones in one browser session, with a Python that has Playwright
+     (`--label-python`, default `python3`).
+  3. **Render** every scene, then chain them with ffmpeg's concat demuxer: a stream copy
+     when the scenes' parameters match (they do), a re-encode otherwise.
+  4. **Captions.** Each scene's recorded captions are shifted by the real duration of the
+     scene files before it.
+  5. **Fail** on a caption under 1.5 s or over 7 s, a line that breaks the RTL or colon
+     rules, a beat whose still is under 2 s, a chapter under 10 s, captions that differ
+     from `script.md` (text, line breaks or order), or a scene whose recorded length
+     differs from its file. It prints the length, the size, the chapters and the
+     `video_parts` for the front matter (the first part at 0, as the checks want: the
+     link to part א plays the opening too).
+  A pilot renders in about 2–3 minutes as a draft and 4–6 minutes at 720p30.
 - **Rendering stays local.** It does not run in CI: Manim and LaTeX are heavy, and the
   MP4 is not served from the site.
 
@@ -231,8 +280,9 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
   video: Enter opens it with the focus inside, Tab and Shift+Tab stay in it, its buttons
   are named, Esc closes it and gives the focus back, and play makes a titled iframe that
   the close button removes.
-- **`render.py`** stops on a caption shorter than 1.5 s or longer than 7 s, and on a
-  beat with no still frame at its end.
+- **`render.py`** stops on a caption shorter than 1.5 s or longer than 7 s, on a beat
+  with no still frame of 2 s at its end, on a chapter under 10 s, and on captions that
+  differ from `script.md` (see "Rendering").
 
 ## Order of work
 
@@ -250,7 +300,8 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
 
 **0002 — swap two variables (three parts, ~5 min in all)**
 
-- **Opening.** Two registers `a = 6` and `b = 9`, shown as boxes with their bits.
+- **Opening.** Two registers `a = 5` and `b = 3` (the page's example), shown as boxes with
+  their bits.
 - **Chapter א — with a temp variable.**
   - A third box `t`; the three moves animated; the values travel as cards.
   - Code: three lines, lit in turn.
