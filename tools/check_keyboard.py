@@ -14,7 +14,12 @@ components: Enter opens a hint and toggles a fold of a box, the arrow keys step 
 box, Enter on the enlarge button opens the lightbox and Escape closes it and gives the
 focus back, a wrong self-check answer entered with Enter gets a message, Enter on "▶ להרצה"
 opens the run panel, and "/" opens the search, typing finds a question and Escape closes
-it. A failure in any of these fails the check. --offline, --route, --browser and --local-cdn
+it. The first question page with a tutorial video (``video:``, VIDEOS.md) is walked too, and
+its dialog is checked as a component: Enter on the "סרטון הסבר" tool opens it with the focus
+inside, Tab and Shift+Tab stay in it, every button in it has a name, Escape closes it and
+gives the focus back; play makes a titled player (the request to YouTube is cut off, so the
+check stays offline) and the close button removes it. A failure in any of these fails the
+check. --offline, --route, --browser and --local-cdn
 are the phone check's.
 """
 
@@ -186,6 +191,51 @@ def press_keys(page) -> list[str]:
     return out
 
 
+def video_keys(page) -> list[str]:
+    """The video dialog of a page with a tutorial video (video.js), by keyboard only."""
+    out: list[str] = []
+    inside = "() => !!(document.activeElement && document.activeElement.closest('dialog.vd'))"
+    tool = page.locator(".question-tools .qt-video").first
+    tool.focus()
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(400)
+    if not page.evaluate("() => { const d = document.querySelector('dialog.vd'); return !!(d && d.open); }"):
+        return ["Enter on the video tool does not open the dialog"]
+    if not page.evaluate(inside):
+        out.append("the focus does not move into the video dialog")
+    if not page.evaluate("() => (document.getElementById(document.querySelector('dialog.vd').getAttribute('aria-labelledby')) || {}).textContent"):
+        out.append("the video dialog has no title")
+    unnamed = page.evaluate("() => Array.from(document.querySelectorAll('dialog.vd button')).filter((b) => !(b.getAttribute('aria-label') || b.textContent.trim())).length")
+    if unnamed:
+        out.append(f"{unnamed} buttons in the video dialog have no name")
+    for key in ["Tab"] * 6 + ["Shift+Tab"] * 6:
+        page.keyboard.press(key)
+        if not page.evaluate(inside):
+            out.append(f"{key} leaves the video dialog")
+            break
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(200)
+    if page.evaluate("() => document.querySelector('dialog.vd').open"):
+        return out + ["Escape does not close the video dialog"]
+    if not page.evaluate("() => document.activeElement && document.activeElement.classList.contains('qt-video')"):
+        out.append("the focus does not come back to the video tool")
+    page.route(re.compile(r"youtube|ytimg|googlevideo"), lambda route: route.abort())
+    tool.focus()
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(300)
+    page.locator("dialog.vd .vd-poster").focus()
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(300)
+    if not page.evaluate("() => { const f = document.querySelector('dialog.vd iframe'); return !!(f && f.title.trim()); }"):
+        out.append("play does not make a titled player")
+    page.locator("dialog.vd .vd-close").focus()
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(200)
+    if page.evaluate("() => !!document.querySelector('dialog.vd iframe') || document.querySelector('dialog.vd').open"):
+        out.append("the close button does not close the dialog and remove the player")
+    return out
+
+
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("site", nargs="?", default="site")
@@ -206,6 +256,11 @@ def main(argv: list[str]) -> int:
         print(f"site directory not found: {site}")
         return 1
     pages = sorted(p.relative_to(site).as_posix() for p in site.rglob("index.html") if re.search(args.only, p.relative_to(site).as_posix()))
+    if args.only == DEFAULT_PAGES:      # and the first question page with a tutorial video, if any
+        video = next((p.relative_to(site).as_posix() for p in sorted((site / "questions").rglob("index.html"))
+                      if 'class="qt-btn qt-video"' in p.read_text(encoding="utf-8")), None)
+        if video and video not in pages:
+            pages.append(video)
     server, base = serve(site)
     failures = 0
     with sync_playwright() as pw:
@@ -224,6 +279,8 @@ def main(argv: list[str]) -> int:
                 errors.append(f"load: {e}")
             stops, problems = walk(page)
             keys = press_keys(page) if re.search(QUESTION, rel) else []
+            if page.locator(".question-tools .qt-video").count():
+                keys += video_keys(page)
             if args.offline:
                 errors = [e for e in errors if not re.search(r"https?://(?!127\.0\.0\.1)", e)]
             problems += keys + [f"script error: {e[:160]}" for e in errors]

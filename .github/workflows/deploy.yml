@@ -110,6 +110,9 @@ jobs:
           restore-keys: sv-${{ runner.os }}-
       - name: Lint the question pages (structure and RTL rules)
         run: python tools/lint_pages.py
+      # The tutorial videos' fields on the pages and the captions of videos/*/script.md.
+      - name: Check the video fields and the script captions
+        run: python tools/check_videos.py
       # Every text and mark colour pair of the site, light and dark, against WCAG 2.
       - name: Check the colour contrast of both schemes
         run: python tools/check_contrast.py

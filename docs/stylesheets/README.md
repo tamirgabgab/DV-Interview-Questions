@@ -26,6 +26,7 @@ refine one in an earlier part, and moving a rule between parts can change what w
 | `17-lists.css` | round V: the level pages' header band with progress, the question table rows (stripe, kind tile, marks, whole-row link, cards on phones; `level-page.js`) |
 | `18-question.css` | round V: the question header card's pattern and kind icon, the part timeline, the code window (`question-page.js`) |
 | `19-details.css` | round V: the success pulse, the content icons (kinds, levels, paths), the box loading wave (`details.js`) |
+| `20-video.css` | the tutorial video (V3): the page tool's play icon, the chapter links at the top of the solutions, the dialog with its navy poster (tokens `--vd-*`, one version for both schemes; `video.js`) |
 
 The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
 `stylesheets/site.css` at the end of the build and links that file from every page and from

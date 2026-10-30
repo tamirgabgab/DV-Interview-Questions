@@ -102,7 +102,8 @@ videos/
 
 - **The script** (`script.md`, Hebrew captions and English notes) is written first and
   reviewed by the owner before any animation is built. A video is cheap to rework at
-  the script stage and expensive after the render.
+  the script stage and expensive after the render. Its format is fixed, because
+  `tools/check_videos.py` reads it (see "The script's format" below).
 - **The captions are recorded while the scene plays.** Each beat calls
   `self.say("…", hold=…)`. The library writes the caption with its exact start and end
   times, as the animation really ran. Captions are therefore in sync by construction,
@@ -111,6 +112,44 @@ videos/
   video's description.
 - **The scenes** are chained into one video with ffmpeg's concat (no re-encode), so a
   fix to chapter ב re-renders chapter ב only.
+
+### The script's format
+
+```markdown
+# 0002 — swap two variables
+
+## Opening
+
+> שתי קופסאות : a = 6 ו-b = 9.
+
+## Chapter א — with a temp variable
+
+Beat 1, the problem: two boxes and a third one, t (English notes are plain lines).
+
+> משתנה עזר שומר את הערך שהיה ב-a.
+> ‏temp = a, ואז a = b, ואז b = temp.
+
+## Chapter ב — no temp, arithmetic
+...
+
+## Closing
+```
+
+- **Chapters.** One `## Chapter …` heading per part of the question, in the page's order.
+  `## Opening` and `## Closing` are not chapters. Any other heading level is free for
+  notes (`### Beat 1`). The number of `## Chapter` headings must equal the page's parts.
+- **Captions.** A caption line starts with `> ` (a Markdown quote), one line of the
+  caption per `> ` line, so a two-line caption is two consecutive `> ` lines. Every other
+  line is a note in English, and a note is never a quote. Lines inside a fenced code block
+  are neither captions nor chapters.
+- **Caption rules** (CLAUDE.md's RTL rules, checked line by line):
+  - the text after `> ` starts with a Hebrew letter, or with the RLM mark (U+200F) when it
+    must start with code, a number or Latin text;
+  - every colon has a non-breaking space (U+00A0) before it and an ordinary space (or the
+    end of the line) after it; a time or a ratio (1:35, 3:2), a URL and `code` in
+    backticks are exempt;
+  - at most 12 words per line (a word is a run of characters with a letter or a digit
+    in it, so a lone colon or dash does not count).
 
 ## Rendering
 
@@ -141,35 +180,57 @@ videos/
    video_parts: [0, 95, 210]   # the start of each part's chapter, in seconds
    ```
 
+   The id is quoted when YAML would read it as a number or a boolean. A page with one
+   part may leave `video_parts` out. The build, `lint_pages.py` and `check_videos.py`
+   all reject a bad id, a missing time, a count that differs from the page's
+   `### סעיף` headings, a first time other than 0, or times that do not rise.
 4. **The hook** (`hooks/questions.py`) does the rest:
-   - It adds a "סרטון הסבר" button to the question's header card, and a "לפרק בסרטון"
-     link at the top of each part's solution, which starts the video at that part's
-     chapter.
-   - The video opens in a dialog above the page.
-   - It is a light facade, with no YouTube code until the click: a still image and a
-     play button. The click loads the player from `youtube-nocookie.com` with
-     `cc_load_policy=1` (captions on) and `start=<part>`.
-   - The page keeps its weight and no cookies are set before the reader chooses to
-     watch.
-   - The page checks run offline, so they never load YouTube.
+   - **The page tool.** A "סרטון הסבר" icon button (a screen with a play triangle) first
+     among the page tools of the header card. Practice mode hides it with the solutions.
+   - **The chapter links.** A "לפרק בסרטון 1:35" pill at the top of the first solution
+     block of each part, right under its summary, so it shows only to a reader who
+     opened the solution. On a page without parts the one link reads "לסרטון ההסבר".
+     Its `href` is the video on youtube.com at that time, for a reader without the script
+     or one who opens it in a new tab.
+5. **The dialog** (`docs/javascripts/video.js`, `docs/stylesheets/20-video.css`):
+   - **A native `<dialog>`, modal.** It is titled "סרטון הסבר : <the question's title>"
+     and the focus moves to the play button. Tab and Shift+Tab cycle inside it. Esc,
+     the × button and a click on the backdrop close it, and the focus returns to the
+     button or link that opened it.
+   - **The poster.** The site's navy with a faint grid, two amber traces and the
+     question's id and title, an amber play disc and the start ("הפעלה מסעיף ב · 1:35").
+     It is CSS only, the same in both schemes. Nothing comes from YouTube until the
+     reader presses play: no request, no thumbnail, no cookie, and the page keeps its
+     weight.
+   - **Chapter buttons.** Above the stage, one per part ("סעיף ב 1:35"), the chosen one
+     amber. Before play they move the poster's start; while playing they restart the
+     player at that part.
+   - **The player.** Play puts an iframe in the poster's place:
+     `https://www.youtube-nocookie.com/embed/<id>?start=<s>&cc_load_policy=1&cc_lang_pref=he&hl=he&rel=0&modestbranding=1&autoplay=1`,
+     titled like the dialog, with `allow="autoplay; encrypted-media; picture-in-picture; fullscreen"`
+     and `allowfullscreen`. Closing removes the iframe, which stops the video.
+   - **The size.** The stage is 16:9, as wide as the screen allows up to 60rem and short
+     enough for a landscape phone. Under 30em the dialog runs edge to edge.
+   - The page checks run offline, so they never load YouTube; `check_keyboard.py` cuts
+     the player's request off when it presses play.
 
 ## Checks
 
-- **`tools/check_videos.py`** (new, runs in CI with the tests, needs no video). For every
-  question with a `video:` field:
+- **`tools/check_videos.py`** runs in CI's test job, after the lint, and needs no video.
+  For every question with a `video:` field:
   - the id has the YouTube form;
   - `video_parts` has one time per part, rising from 0;
-  - the folder `videos/<id>/` exists, with a `script.md` whose chapter count equals the
-    page's parts.
+  - `videos/<id>/script.md` has one `## Chapter` heading per part of the page. A page
+    whose script does not exist yet gets a warning, not a failure.
 
-  For every `script.md`, every caption follows the RTL rules of CLAUDE.md:
-
-  - it starts with a Hebrew word or an RLM;
-  - a colon has a non-breaking space before it;
-  - lines are at most 12 words.
+  For every `videos/*/script.md`, every caption line (`> …`) follows the caption rules
+  above. Its tests are in `tests/tools/test_check_videos.py`, and the hook's in
+  `tests/hook/test_hook.py` (a page with a fake id, never a real page).
 - **The page checks** must stay green: `check_phone`, `check_keyboard` and axe. The dialog
-  is checked as a component: focus trapped, Esc closes, the button named, and the
-  iframe titled.
+  is checked as a component by `check_keyboard.py`, on the first question page with a
+  video: Enter opens it with the focus inside, Tab and Shift+Tab stay in it, its buttons
+  are named, Esc closes it and gives the focus back, and play makes a titled iframe that
+  the close button removes.
 - **`render.py`** stops on a caption shorter than 1.5 s or longer than 7 s, and on a
   beat with no still frame at its end.
 

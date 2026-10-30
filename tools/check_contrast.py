@@ -179,6 +179,19 @@ PAIRS = [
     ("404 signal names", "rgba(255, 255, 255, 0.62)", [TOAST], TEXT),
     ("edit link", "var(--md-default-fg-color--light)", [PAGE], TEXT),
     ("tag count on a tag chip", "var(--md-default-fg-color--light)", ["var(--site-surface)"], TEXT),
+    # the tutorial video (20-video.css): the chapter link in a solution, the dialog's navy
+    ("video chapter link", "var(--md-typeset-a-color)", ["var(--site-surface)"], TEXT),
+    ("video chapter time", "var(--md-default-fg-color--light)", ["var(--site-surface)"], TEXT),
+    ("video dialog title", "var(--vd-ink)", ["var(--vd-bg)"], TEXT),
+    ("video poster kicker", "var(--vd-accent)", ["var(--vd-bg)"], TEXT),
+    ("video poster start line", "var(--vd-ink-2)", ["var(--vd-glow)", "var(--vd-bg)"], TEXT),
+    ("video chapter button", "var(--vd-ink-2)", ["var(--vd-bg)"], TEXT),
+    ("video chapter button, hovered", "var(--vd-ink)", ["var(--vd-soft)", "var(--vd-bg)"], TEXT),
+    ("video chapter button, chosen", "var(--vd-on-accent)", ["var(--vd-accent)"], TEXT),
+    ("video note", "var(--vd-ink-3)", ["var(--vd-bg)"], TEXT),
+    ("video play disc", "var(--vd-accent)", ["var(--vd-glow)", "var(--vd-bg)"], UI),
+    ("video play triangle", "var(--vd-on-accent)", ["var(--vd-accent)"], UI),
+    ("video focus ring", "var(--vd-accent)", ["var(--vd-bg)"], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

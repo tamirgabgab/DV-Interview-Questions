@@ -94,6 +94,7 @@ DV-Interview-Questions/
 │   ├── check_jumps.py          # Every explorer box stepped: no figure moves while it steps
 │   ├── check_inputs.py         # Every number and text field of every box: typed, Enter / Tab, the box changes
 │   ├── check_contrast.py       # The site's colour pairs in both schemes against WCAG 2
+│   ├── check_videos.py         # The video fields of the pages and the captions of videos/*/script.md
 │   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
 │   ├── new_question.py         # Scaffold: page, tests folder, generator stub, catalog row
 │   ├── catalog.py              # Writes CATALOG.md from the pages' front matter
@@ -106,7 +107,7 @@ DV-Interview-Questions/
 ├── tests/
 │   ├── conftest.py
 │   ├── hook/                   # Tests of the site hook (search variants and documents, study paths)
-│   ├── tools/                  # Tests of new_question.py, fill.py and charts.py
+│   ├── tools/                  # Tests of new_question.py, fill.py, charts.py, check_videos.py ...
 │   └── <id>/                   # One folder per question with code, e.g. tests/0006/
 │       ├── test_<id>.py        # pytest tests of the page's Python code
 │       ├── tb.sv               # SystemVerilog testbench of the page's SV code
@@ -142,9 +143,10 @@ DV-Interview-Questions/
 │   │                           # level list, the column grips), round V's home-extras.js (the band, the
 │   │                           # question of the day), maps.js (the metro map, the tag graph), level-page.js
 │   │                           # (the level band's progress), question-page.js (the part timeline), details.js
-│   │                           # (the success pulse, the box loading wave), and explorer/:
+│   │                           # (the success pulse, the box loading wave), video.js (the tutorial
+│   │                           # video's dialog), and explorer/:
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
-│   └── stylesheets/            # The styles in 19 parts loaded in order (README.md lists them)
+│   └── stylesheets/            # The styles in 20 parts loaded in order (README.md lists them)
 └── .github/workflows/
     ├── deploy.yml              # Test + build on every push (explorers on 4 runners), deploy main; every job has a timeout
     └── weekly.yml              # Mondays: external links of the site, newer Verilator release
@@ -233,6 +235,8 @@ kind: design             # puzzle | code | design | math | dv
 tags: [fifo, clock-domain-crossing]
 source: ""               # optional: company / interview round
 added: 2026-10-15
+# video: dQw4w9WgXcQ     # optional, once the video is on YouTube: its id (VIDEOS.md)
+# video_parts: [0, 95]   # optional: each part's chapter start in seconds, one per part
 ---
 
 ## השאלה
@@ -327,6 +331,21 @@ not start with the id, or a duplicate id. It also generates, per question page:
   and a link to the level's next question not solved yet; the check mark pops and the
   level's last question drops a short confetti (both off under reduced motion). Taking the
   mark off says so, with an undo;
+- the **tutorial video** of a question whose front matter has `video:` (VIDEOS.md): a
+  "סרטון הסבר" tool first among the page tools (hidden in practice mode, like the
+  solutions), and a "לפרק בסרטון 1:35" pill at the top of the first solution block of
+  every part ("לסרטון ההסבר" on a page without parts), its `href` the video on YouTube at
+  that time. `docs/javascripts/video.js` opens the video in a modal `<dialog>`: a title,
+  a navy CSS poster (the question's id and title, a play disc, the start) and a button per
+  chapter, with nothing loaded from YouTube until play; play puts a
+  `youtube-nocookie.com` player in the poster's place, at the chapter, with the Hebrew
+  captions on. Tab stays in the dialog; Esc, the × button and the backdrop close it,
+  which removes the player and gives the focus back. The styles are
+  `docs/stylesheets/20-video.css` (tokens `--vd-*`, one version for both schemes).
+  `video` is an 11-character YouTube id (quoted when YAML would read a number or a
+  boolean); `video_parts` lists one start time in whole seconds per `### סעיף` heading,
+  from 0 and rising, and may be left out on a page with one part. The build, the lint and
+  `check_videos.py` reject anything else;
 - a **study path bar** under the toolbar for every path that contains the question (step n
   of m, then the previous and the next step with their ids and titles side by side, a long
   title shortened by whole words with an ellipsis and the full one as the tooltip);
@@ -678,6 +697,7 @@ python tools/check_inputs.py          # every box field typed into: Enter, Tab a
 python tools/check_contrast.py        # every colour pair, light and dark (--all prints the passes)
 python tools/check_404.py             # the 404 page as GitHub Pages serves it, at 390 and 1200 px
 python tools/check_keyboard.py        # a keyboard pass over a few pages: tab order, focus, names, the components' keys
+python tools/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```
 
@@ -797,7 +817,20 @@ are walked but not judged. On the question page it presses the keys of the compo
 Enter on a hint and on a fold, the arrows in a box, Enter and Escape on the enlarge button
 and the lightbox, Enter in a self-check field and on "▶ להרצה", and "/" for the search. A
 new keyboard behaviour of a component belongs there. MathJax's contextual menu is off
-(`docs/javascripts/mathjax.js`): with it every formula was a tab stop.
+(`docs/javascripts/mathjax.js`): with it every formula was a tab stop. The first question
+page with a tutorial video is walked too, and its dialog checked by keyboard: Enter on the
+tool opens it with the focus inside, Tab and Shift+Tab stay in it, its buttons are named,
+Escape closes it and gives the focus back, and play makes a titled player (its request to
+YouTube is cut off) that the close button removes.
+
+`check_videos.py` (CI's test job, after the lint; no video or network needed) checks
+every page with a `video:` field: the id's form, one rising `video_parts` time per part
+from 0, and `videos/<id>/script.md` with one `## Chapter` heading per part (a warning
+while the script does not exist yet). In every `videos/*/script.md` each caption line,
+a line that starts with `> `, must start with a Hebrew letter or the RLM mark, have a
+U+00A0 before every colon (times, URLs and `code` exempt) and at most 12 words. The format
+of a script is in VIDEOS.md ("The script's format"); the lint and the build hook run the
+same field checks (`video_problems`).
 
 `check_phone.py` needs Playwright (`requirements-dev.txt`) and its Chromium
 (`python -m playwright install chromium`). It writes a screenshot of each page to

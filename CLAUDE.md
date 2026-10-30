@@ -71,6 +71,7 @@ session.
 
 ```bash
 python tools/lint_pages.py            # page skeleton and RTL rules
+python tools/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
 python tools/run_tests.py             # pytest + Verilator (needs Verilator 5.052+ with z3)
 mkdocs build --strict                 # the build CI runs
 python tools/check_links.py           # internal links and anchors of the built site
@@ -95,7 +96,7 @@ fails if it is then wider than the screen; at both sizes a box's slider and its 
 sit on one row. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
-All eleven run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
+All twelve run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
 CATALOG, HANDOFF, its archive or this file runs nothing, and `main` skips the checks for a commit that
 already passed on its branch); a failure blocks the deploy. A new colour pair (a text
 or a mark on a fill) goes into the `PAIRS` list of `tools/check_contrast.py`. Verilator

@@ -13,6 +13,9 @@ Responsibilities:
   file of each kind on the page (on_post_page).
 - The home page's "continue" card and "recently added" strip, and the "what's new" page
   (``<!-- home-continue -->``, ``<!-- recent -->``, ``<!-- whats-new -->``).
+- The tutorial video of a question (front matter ``video`` and ``video_parts``, VIDEOS.md):
+  a "סרטון הסבר" page tool and a "לפרק בסרטון" link at the top of each part's solution;
+  docs/javascripts/video.js opens the video in a dialog.
 - Keep only the questions in the search index, each with its statement and its parts'
   statements (math in plain symbols, tools/search_text.py), and add the prefix-stripped
   Hebrew words, and the id, level, difficulty and kind to the result of a question page
@@ -34,6 +37,7 @@ from mkdocs.utils.meta import get_data
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 import extract_code  # noqa: E402
+from check_videos import part_letters, video_problems  # noqa: E402
 from search_text import STATEMENT, statement_sections  # noqa: E402
 
 LEVELS = {
@@ -215,11 +219,15 @@ def _load_questions(docs_dir: Path) -> dict[str, dict]:
         if qid in seen_ids:
             errors.append(f"{src_uri}: duplicate id {qid} (also in {seen_ids[qid]})")
         seen_ids[qid] = src_uri
+        errors += [f"{src_uri}: {p}" for p in video_problems(meta, body)]
 
         has_code = any(extract_code.blocks_from_text(body, f) for f in ("systemverilog", "python"))
         interactive = 'class="explorer"' in body or 'class="stepper"' in body or "<iframe" in body
         questions[src_uri] = {**meta, "id": qid, "src_uri": src_uri, "has_code": has_code,
                               "interactive": interactive, "boxes": body.count('class="explorer"')}
+        if meta.get("video"):
+            letters = part_letters(body)
+            questions[src_uri]["video_chapters"] = list(zip(letters or [""], meta.get("video_parts") or [0]))
 
     if errors:
         raise PluginError("Invalid question files:\n  " + "\n  ".join(errors))
@@ -485,6 +493,7 @@ def _tools(q: dict, page_url: str) -> str:
     if paths:
         level_data += f' data-paths="{html.escape(json.dumps(paths, ensure_ascii=False))}"'
     return (f'<div class="question-tools" role="toolbar" aria-label="כלי השאלה" data-search-exclude data-qid="{q["id"]}"{level_data}>'
+            + _video_tool(q)
             + _tool("qt-fold", "unfold-more", "פתח הכל", "", "פתח הכל")
             + _tool("qt-practice", "timer", "מצב תרגול", ' aria-pressed="false"', "תרגול")
             + '<span class="qt-clock" hidden></span>'
@@ -492,6 +501,62 @@ def _tools(q: dict, page_url: str) -> str:
             + _tool("qt-mark qt-star", "star", "הוסף למועדפים", ' data-mark="star" aria-pressed="false"', "מועדף")
             + random_btn
             + '</div>')
+
+
+def video_clock(seconds: int) -> str:
+    """A chapter's start as the player shows it: 0:00, 1:35, 1:02:05."""
+    h, rest = divmod(int(seconds), 3600)
+    m, s = divmod(rest, 60)
+    return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+
+
+def _video_attrs(q: dict) -> str:
+    """The data video.js reads: the YouTube id and the chapters as [letter, start] pairs."""
+    chapters = json.dumps(q["video_chapters"], ensure_ascii=False)
+    return f' data-video="{html.escape(q["video"])}" data-video-chapters="{html.escape(chapters)}" aria-haspopup="dialog"'
+
+
+def _video_tool(q: dict) -> str:
+    """The "סרטון הסבר" page tool (V3), or "" for a question without a video."""
+    if not q.get("video"):
+        return ""
+    return _tool("qt-video", "play", "סרטון הסבר", _video_attrs(q), "סרטון")
+
+
+VIDEO_SOLUTION = re.compile(r'<details class="success"[^>]*>\s*<summary>.*?</summary>\n?', re.S)
+
+
+def _video_link(q: dict, letter: str, start: int) -> str:
+    """The link at the top of a part's solution: it opens the video's dialog at the part's
+    chapter (video.js), or YouTube itself at that time without the script. A div, not a
+    paragraph: the pill's border marks it as a link, without the underline of a link in
+    running text."""
+    href = f"https://www.youtube.com/watch?v={q['video']}&t={int(start)}s"
+    label = ("לפרק בסרטון" + f'<span class="vc-time" dir="ltr">{video_clock(start)}</span>') if letter else "לסרטון ההסבר"
+    return (f'<div class="video-chapter" data-search-exclude><a class="vc-link" href="{html.escape(href)}"'
+            f'{_video_attrs(q)} data-video-start="{int(start)}" data-video-part="{letter}">'
+            f'{ui_icon("play")}{label}</a></div>\n')
+
+
+def video_links(output: str, q: dict) -> str:
+    """A "לפרק בסרטון" link at the top of the first solution of every part (V3); on a page
+    without parts, a "לסרטון ההסבר" link at the top of its first solution."""
+    chapters = q.get("video_chapters")
+    if not chapters:
+        return output
+    heads = list(QP_PART.finditer(output))
+    if chapters[0][0] and len(heads) != len(chapters):
+        raise PluginError(f'{q["src_uri"]}: {len(heads)} part headings in the built page, {len(chapters)} video chapters')
+    starts = [h.end() for h in heads] if chapters[0][0] else [0]
+    ends = starts[1:] + [len(output)]
+    out, at = [], 0
+    for (letter, start), lo, hi in zip(chapters, starts, ends):
+        m = VIDEO_SOLUTION.search(output, lo, hi)
+        if not m:
+            raise PluginError(f'{q["src_uri"]}: no solution block for the video link of part {letter or "the question"}')
+        out += [output[at:m.end()], _video_link(q, letter, start)]
+        at = m.end()
+    return "".join(out) + output[at:]
 
 
 def _progress(ids) -> str:
@@ -1629,7 +1694,7 @@ def on_post_page(output, page, config, **kwargs):
     if page.file.src_uri in _questions:
         output = TRAP_RUN.sub(_trap_group, output)
         _statements[page.url] = statement_sections(output)
-        output = qp_parts(output)
+        output = qp_parts(video_links(output, _questions[page.file.src_uri]))
     output = one_stylesheet(output)
     scripts = wavedrom_scripts(output, page.url) + explorer_scripts(output, page.url)
     if not scripts:

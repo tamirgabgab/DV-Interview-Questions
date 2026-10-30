@@ -141,3 +141,116 @@ def test_renumbered_lists_agree():
     moved = dict(re.findall(r'"(\d{4})": "(\d{4})"', yml.group(1)))
     ids = {p.name[:4] for p in (DOCS / "questions").rglob("*.md") if p.name[:4].isdigit()}
     assert set(moved.values()) <= ids
+
+
+VIDEO_PAGE = """---
+id: 999
+title: שאלת ניסיון
+level: student
+difficulty: easy
+kind: code
+tags: [math]
+added: 2026-10-30
+video: abcdefghijk
+video_parts: [0, 95, 3725]
+---
+
+## השאלה
+
+ניסוח.
+
+### סעיף א – ראשון
+
+??? success "פתרון סעיף א"
+    !!! answer "תשובה בקצרה"
+        א.
+
+### סעיף ב – שני
+
+??? success "פתרון סעיף ב"
+    !!! answer "תשובה בקצרה"
+        ב.
+
+??? success "פתרון שני לסעיף ב"
+    !!! answer "תשובה בקצרה"
+        ב2.
+
+### סעיף ג – שלישי
+
+??? success "פתרון סעיף ג"
+    !!! answer "תשובה בקצרה"
+        ג.
+"""
+
+
+def video_docs(tmp_path, page=VIDEO_PAGE):
+    (tmp_path / "questions" / "student").mkdir(parents=True)
+    (tmp_path / "questions" / "student" / "0999-try.md").write_text(page, encoding="utf-8")
+    return tmp_path
+
+
+def test_video_tool_and_chapter_links(tmp_path):
+    """A page with a (fake) video gets the "סרטון הסבר" tool and one "לפרק בסרטון" link at
+    the top of each part's first solution, with the chapter's start (V3)."""
+    hook._questions = hook._load_questions(video_docs(tmp_path))
+    hook._paths = []
+    q = hook._questions["questions/student/0999-try.md"]
+    assert q["video_chapters"] == [("א", 0), ("ב", 95), ("ג", 3725)]
+    tools = hook._tools(q, "questions/student/0999-try/")
+    btn = re.search(r'<button type="button" class="qt-btn qt-video"[^>]*>', tools).group(0)
+    assert 'aria-label="סרטון הסבר"' in btn and 'data-video="abcdefghijk"' in btn and 'aria-haspopup="dialog"' in btn
+    assert html_unescape(re.search(r'data-video-chapters="([^"]*)"', btn).group(1)) == '[["א", 0], ["ב", 95], ["ג", 3725]]'
+    assert tools.index("qt-video") < tools.index("qt-fold")         # the first tool
+    built = "".join(f'<h3 id="_{i}">סעיף {k} – x</h3>\n<details class="success">\n<summary>פתרון סעיף {k}</summary>\n<p>תשובה</p>\n</details>\n'
+                    for i, k in enumerate("אבג"))
+    built = built.replace("</details>\n<h3 id=\"_2\"", '</details>\n<details class="success">\n<summary>פתרון שני</summary>\n</details>\n<h3 id="_2"')
+    out = hook.video_links(built, q)
+    links = re.findall(r'<div class="video-chapter".*?</div>', out)
+    assert len(links) == 3
+    assert [re.search(r'data-video-start="(\d+)"', a).group(1) for a in links] == ["0", "95", "3725"]
+    assert [re.search(r'<span class="vc-time" dir="ltr">([^<]+)</span>', a).group(1) for a in links] == ["0:00", "1:35", "1:02:05"]
+    assert 'href="https://www.youtube.com/watch?v=abcdefghijk&amp;t=95s"' in links[1]
+    assert all(HEBREW.match(re.sub(r"<[^>]+>", "", a)) for a in links)            # RTL: the words first
+    assert out.count('<summary>פתרון סעיף ב</summary>\n<div class="video-chapter"') == 1
+    assert '<summary>פתרון שני</summary>\n<div class="video-chapter"' not in out    # one link per part
+    assert hook.video_links(built, {"src_uri": "x"}) == built                    # no video, no change
+    try:
+        hook.video_links(built.replace("סעיף ג", "סעיף"), q)
+    except hook.PluginError as e:
+        assert "video chapters" in str(e)
+    else:
+        raise AssertionError("a part count that differs from video_parts must fail the build")
+
+
+def test_video_on_a_page_without_parts(tmp_path):
+    page = VIDEO_PAGE.split("### סעיף א")[0].replace("video_parts: [0, 95, 3725]\n", "") + (
+        '??? success "פתרון"\n    !!! answer "תשובה בקצרה"\n        כן.\n')
+    hook._questions = hook._load_questions(video_docs(tmp_path, page))
+    q = hook._questions["questions/student/0999-try.md"]
+    assert q["video_chapters"] == [("", 0)]
+    out = hook.video_links('<h2 id="_1">השאלה</h2>\n<details class="success">\n<summary>פתרון</summary>\n</details>\n', q)
+    assert '<summary>פתרון</summary>\n<div class="video-chapter"' in out and "לסרטון ההסבר" in out and "vc-time" not in out
+
+
+def test_video_fields_fail_the_build(tmp_path):
+    for bad, says in (("video: abc", "not a YouTube id"), ("video_parts: [0, 95]", "2 times but the page has 3 parts"),
+                      ("video_parts: [5, 95, 210]", "must start at 0"), ("video_parts: [0, 95, 95]", "must rise")):
+        field = "video: abcdefghijk" if bad.startswith("video:") else "video_parts: [0, 95, 3725]"
+        page = VIDEO_PAGE.replace(field, bad)
+        root = tmp_path / str(len(says))
+        try:
+            hook._load_questions(video_docs(root, page))
+        except hook.PluginError as e:
+            assert says in str(e), (bad, str(e))
+        else:
+            raise AssertionError(f"{bad} must fail the build")
+
+
+def test_no_real_page_has_a_fake_video():
+    for page in (DOCS / "questions").rglob("*.md"):
+        assert "abcdefghijk" not in page.read_text(encoding="utf-8"), page.name
+
+
+def html_unescape(s):
+    import html
+    return html.unescape(s)

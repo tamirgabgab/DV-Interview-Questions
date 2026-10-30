@@ -141,6 +141,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/17-lists.css
   - stylesheets/18-question.css
   - stylesheets/19-details.css
+  - stylesheets/20-video.css
 
 extra_javascript:
   - javascripts/mathjax.js
@@ -161,6 +162,7 @@ extra_javascript:
   - javascripts/level-page.js
   - javascripts/question-page.js
   - javascripts/details.js
+  - javascripts/video.js           # the tutorial video's dialog (pages with a video: field)
   # The explorer boxes (docs/javascripts/explorer/) are added per page by hooks/questions.py.
 
 

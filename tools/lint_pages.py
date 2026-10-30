@@ -19,6 +19,8 @@ Checks, per page:
 - One ``??? interviewer`` block right after the question, and the end-of-page blocks use
   the ``trap`` / ``followup`` types (a top-level ``note`` / ``warning`` titled like an
   interviewer / trap / follow-up block is reported; other notes may keep their type).
+- Video fields: ``video`` is a YouTube id and ``video_parts`` has one rising start time
+  per part from 0 (``video_problems`` of tools/check_videos.py, which the hook runs too).
 - Code highlights: every line named in ``hl_lines=`` exists in the (dedented) block and is
   a code line, not a blank line, a comment alone or a bare ``end`` / ``endfunction``, so the
   highlights keep pointing at the code the explanation names after the block is edited.
@@ -36,6 +38,7 @@ import textwrap
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from check_videos import split_front_matter, video_problems  # noqa: E402
 from extract_code import FENCE, QUESTIONS, question_path  # noqa: E402
 
 LABELS = ["הרעיון", "השלבים", "הקוד", "למה זה נכון", "סיבוכיות"]
@@ -343,6 +346,7 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     problems.extend(lint_code_spaces(path.read_text(encoding="utf-8")))
     problems.extend(lint_tab_order(path.read_text(encoding="utf-8")))
     problems.extend(lint_selfchecks(path.read_text(encoding="utf-8")))
+    problems.extend(f"front matter: {p}" for p in video_problems(*split_front_matter(text)))
     return problems
 
 
