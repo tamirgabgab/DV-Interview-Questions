@@ -1835,6 +1835,37 @@
      "why": "the fewest swaps by the cycles of a permutation"
     }
    ]
+  },
+  "0070": {
+   "core": [
+    "bfs",
+    "state_space_search",
+    "dijkstra",
+    "graph_search"
+   ],
+   "secondary": [
+    "priority_queue",
+    "queue",
+    "invariant",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0067",
+     "explicit": true,
+     "why": "BFS without weights and Dijkstra with them, the same lazy heap"
+    },
+    {
+     "id": "0065",
+     "explicit": true,
+     "why": "a BFS over the cells of a grid with four or eight directions"
+    },
+    {
+     "id": "0005",
+     "explicit": false,
+     "why": "a BFS over a state that is more than the position"
+    }
+   ]
   }
  }
 }

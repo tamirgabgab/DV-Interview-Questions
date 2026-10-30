@@ -454,6 +454,7 @@ EXPECTED = {
     "0065": [5, 1, 5],                                      # tests/0065 floods the X and the self-check grids
     "0066": [3, 3, 6],                                      # tests/0066 merges, cuts the pieces and reads the peak
     "0069": [2, 3, 5],                                      # tests/0069 counts the pairs of 7 3 9 2 8
+    "0070": [9, 3, 6],                                      # tests/0070 checks them against the brute-force searches
 }
 
 

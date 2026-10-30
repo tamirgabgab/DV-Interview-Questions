@@ -1531,6 +1531,15 @@ section below starts at session 22, whose numbered items run on through the late
     glass turns 180° at a flip, a clock), with play/pause and a speed choice; steps animate
     to the next event, and reduced motion jumps to the event frames.
 
+99. **Question 0070, the shortest path in a grid (session 28, 2026-10-30).** The owner picked
+    proposal 11 and answered the clarifying questions (a 4 / 8 switch in every part, part b
+    the shortest path with at most k walls broken, part c entry costs 1 to 9, a box to draw
+    and step). Part a BFS with the path rebuilt (diagonal steps between two walls touching
+    at a corner are forbidden), part b BFS over (cell, breaks left) with the per-cell best
+    (LC 1293) and a 3×3 counterexample to one visit per cell, part c Dijkstra on entry costs
+    (lazy deletion never fires there, proved on the page). Box `gridpath`: paint walls or
+    costs, drag S and T, size, k, step and play the search.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),

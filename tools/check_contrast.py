@@ -82,6 +82,9 @@ PAIRS = [
     ("land not yet flooded", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 16%, var(--md-default-bg-color))"], TEXT),
     ("settled node time", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color))"], TEXT),
     ("corner link and relaxed edge", "var(--viz-s2)", [PAGE], UI),
+    ("grid wall (0070)", "color-mix(in srgb, var(--viz-ink) 72%, var(--md-default-bg-color))", [CARD, PAGE], UI),
+    *[(f"grid value, {what} cell on {ground} (0070)", "var(--viz-ink)", [f"color-mix(in srgb, var(--viz-{s}) 30%, transparent)", f"color-mix(in srgb, var(--viz-{g}) {p}%, var(--md-default-bg-color))"], TEXT)
+      for what, s in (("visited", "s1"), ("frontier", "s3")) for ground, g, p in (("mud", "s2", 22), ("mountain", "ink", 29))],
     ("question count on the fold button", "var(--md-default-fg-color)", ["var(--site-primary-soft)", "var(--site-surface)"], TEXT),
     ("column grip line", "var(--site-mark-color)", [PAGE], UI),
     ("home band heading", "var(--hb-ink)", ["var(--hb-bg)"], TEXT),
