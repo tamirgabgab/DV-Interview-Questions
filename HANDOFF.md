@@ -1715,11 +1715,22 @@ section below starts at session 22, whose numbered items run on through the late
     להוסיף למועדפים", and the pressed states likewise; "שפתרתי" or "כמועדף" do not count,
     a Hebrew prefix glues to the word); the current chip of the part bar is navy on the
     amber (white was 2.5:1 in the light scheme), a new pair in `check_contrast.py`.
+115. **A figure beside the steps, on 0055 (session 31, 2026-10-31).** The owner chose 0055
+    for the pilot; side by side on a wide screen and not sticky on a phone (a tap lights a
+    step there); scroll, click, tap and focus switch the step; the step's parts in amber and
+    the rest dimmed. The machine's figure moved from "the idea" into "the steps" in parts a
+    and b (the idea now points to it), part a got a fourth step, an example (13 = `1101`:
+    r goes 1, 0, 0, 1), whose walk lights arc after arc, as part b's example of 6 does.
+    `q0055.py` keys every state and arc (`data-fig`); `div.steps-fig[data-fig-steps]` lists
+    per step what it lights (CONTRIBUTING, "the solution blocks"); `question-page.js` does
+    the rest. The test checks the keys and that both walks follow the machine. If the owner
+    likes it, the next candidates are 0040 (the 1011 detector) and 0031 (bridge and torch).
 
 ## In progress
 
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
-  viewer (item 113), shipped one after the other; the sticky figure last.
+  viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
+  the figure beside the steps on 0055 (item 115).
 - **Session 30 (2026-10-31):** interview mode, the builder, my map and the quick jump (work
   log item 109) published (`main` df3f829, deploy green); then the hero's chip (item 111).
   The owner checks the live site (desktop and phone, light and dark).

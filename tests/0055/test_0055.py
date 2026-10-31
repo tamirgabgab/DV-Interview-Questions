@@ -1,8 +1,8 @@
 """Question 0055: the page's div3_msb, div3_lsb and div_fsm against the value itself on every
 bit string up to 12 bits and on random digit strings in several bases; the generator's
 minimized machines (the state counts on the page, the LSB machine of 3 being the MSB one
-with 1 and 2 swapped); the page's numbers; the explorer's JavaScript; and the page copies
-of the generated blocks."""
+with 1 and 2 swapped); the page's numbers; the explorer's JavaScript; the page copies
+of the generated blocks; and the keys the steps light in the figure beside them."""
 
 import itertools
 import json
@@ -34,6 +34,7 @@ def test_every_bit_string():
 
 def test_page_examples():
     assert div3_msb([1, 1, 0]) == [False, True, True]           # 1, 3, 6
+    assert div3_msb([1, 1, 0, 1]) == [False, True, True, False]  # 1, 3, 6, 13 (part a, step 4)
     assert div3_lsb([0, 1, 1]) == [True, False, True]           # 0, 2, 6
     assert int("1011", 2) == 11 and 11 % 3 == 2
     assert pow(10, -1, 7) == 5 and pow(2, -1, 3) == 2
@@ -101,6 +102,28 @@ def test_explorer_matches_the_page_code():
             seq = list(reversed(digits)) if lsb else digits      # the box feeds the number's digits
             assert [s == 0 for s in run[1:]] == div_fsm(seq, m, base, lsb)
             assert run[0] == 0 and len(run) == len(digits) + 1
+
+
+def test_steps_light_the_right_parts():
+    """Each figure beside the steps (div.steps-fig): every key a step lights exists in the
+    figure, and the example step walks the machine's own arcs, ending in the states the
+    text names."""
+    import re
+
+    page = next((ROOT / "docs" / "questions").rglob("0055-*.md")).read_text(encoding="utf-8")
+    plans = [json.loads(m) for m in re.findall(r"data-fig-steps='([^']+)'", page)]
+    assert len(plans) == 2
+    for plan, (fig, lsb, bits, path) in zip(plans, ((0, False, [1, 1, 0, 1], [1, 0, 0, 1]), (4, True, [0, 1, 1], [0, 2, 0]))):
+        keys = set(re.findall(r'data-fig="([^"]+)"', q0055.blocks()[fig]))
+        lit = {k for step in plan for group in step.split(">") for k in group.split()}
+        assert lit <= keys, lit - keys
+        nxt, state, walk = q0055.table(3, 2, lsb), 0, []
+        for b in bits:
+            j = nxt[state][b]
+            walk.append(f"e{state}-{b}-{j} n{j}")
+            state = j
+        assert plan[3].split(">") == walk
+        assert [int(g.split()[1][1:]) for g in walk] == path
 
 
 def test_figures_up_to_date():

@@ -182,6 +182,15 @@ Conventions:
     value, chips separated by ` | `); the hook renders it as a row of chips, so the cost is
     seen without scrolling to the end of the solution;
   - steps are an ordered list inside `<div class="steps" markdown>`, drawn as a timeline;
+  - a figure can stand beside its steps (session 31, 0055 first): wrap the figure in
+    `<div class="sf-fig" markdown>` and it and the steps in `<div class="steps-fig"
+    data-fig-steps='[...]' markdown>`, one string per step with the keys of the figure's
+    parts it lights (the generator puts them in `data-fig`: `n<i>` for a state,
+    `e<i>-<bit>-<j>` for an arc and its label); `"a b>c d"` lights a and b, then c and d (a
+    walk). The active step lights its parts in amber and dims the rest; from 60em up the
+    figure sticks beside the steps and the step at the middle of the window is active, and
+    a click, a tap or the focus on a step makes it active everywhere (`question-page.js`).
+    The question's test checks the keys against the generator (see `tests/0055`);
   - traps and follow-ups at the end use `??? trap "מלכודת: ..."` and `??? followup`. On
     the built page the hook gathers the traps into one "מלכודות נפוצות (n)" group with
     numbered rows and drops the "מלכודת :" prefix of each title (`.trap-group`).

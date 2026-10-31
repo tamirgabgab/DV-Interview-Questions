@@ -239,3 +239,26 @@ html.qj-open { overflow: hidden; }
 @media print {
   .md-typeset :is(.wv-tools, .wv-log, .wv-layer) { display: none; }
 }
+
+/* ---- session 31: a figure beside a solution's steps (question-page.js; 0055 first): the
+   active step lights its parts of the figure in amber and dims the rest; on a wide screen
+   the figure sticks beside the steps, which get room to scroll through ---- */
+.md-typeset .steps-fig .sf-fig { text-align: center; }
+.md-typeset .steps-fig .steps > ol > li { border-radius: var(--radius-s); cursor: pointer; }
+.md-typeset .steps-fig .steps > ol > li.is-active { background: var(--md-accent-fg-color--transparent); box-shadow: 0 0 0 0.3rem var(--md-accent-fg-color--transparent); }
+.md-typeset .steps-fig svg.sf-live [data-fig] { opacity: 0.4; }
+.md-typeset .steps-fig svg.sf-live [data-fig].sf-on { opacity: 1; }
+.md-typeset .steps-fig svg .fs-edge.sf-on { stroke: var(--site-mark-color); stroke-width: 3.5; }   /* the amber that reads 3:1 on the page */
+.md-typeset .steps-fig svg .fs-label.sf-on { fill: var(--site-label-color); font-size: 14px; }
+.md-typeset .steps-fig svg .fs-node.sf-on circle { stroke: var(--site-mark-color); stroke-width: 3.5; fill: var(--md-accent-fg-color--transparent); }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .steps-fig svg [data-fig] { transition: opacity var(--dur-1) var(--ease); }
+  .md-typeset .steps-fig svg :is(.fs-edge, .fs-node circle) { transition: stroke var(--dur-1) var(--ease), stroke-width var(--dur-1) var(--ease); }
+  .md-typeset .steps-fig .steps > ol > li { transition: background-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease); }
+}
+@media screen and (min-width: 60em) {
+  .md-typeset .steps-fig { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-areas: "steps fig"; column-gap: var(--sp-5); align-items: start; }
+  .md-typeset .steps-fig > .sf-fig { grid-area: fig; position: sticky; top: var(--sf-top, 6rem); }
+  .md-typeset .steps-fig > .steps { grid-area: steps; }
+  .md-typeset .steps-fig .steps > ol > li { margin-bottom: 2.4rem; }
+}

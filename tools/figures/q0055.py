@@ -73,7 +73,9 @@ def table(m, base, lsb):
 
 def diagram(m, lsb, label):
     """The machine of m (bits) on a ring: state 0 on top, a curved arrow per transition,
-    a loop outside the ring for a state that stays."""
+    a loop outside the ring for a state that stays. Every node and arc carries a key in
+    data-fig (`n<i>`, `e<i>-<bit>-<j>`, an arc's label too), which a sticky figure's steps
+    light (question-page.js)."""
     nxt = table(m, 2, lsb)
     W, H, R, r = 360, 272, 92, 24
     cx, cy = W / 2, 166
@@ -86,6 +88,7 @@ def diagram(m, lsb, label):
     for i in range(m):
         for d in (0, 1):
             j, cls = nxt[i][d], "fs-edge" + (" is-found" if d else "")
+            key = f'data-fig="e{i}-{d}-{j}"'
             lcls = "fs-label halo" + (" is-found" if d else "")
             (x0, y0), (x1, y1) = pos[i], pos[j]
             if i == j:
@@ -95,9 +98,9 @@ def diagram(m, lsb, label):
                 b = (x0 + r * (ux * 0.8 + tx * 0.6), y0 + r * (uy * 0.8 + ty * 0.6))
                 c1 = (x0 + ux * (r + 36) - tx * 22, y0 + uy * (r + 36) - ty * 22)
                 c2 = (x0 + ux * (r + 36) + tx * 22, y0 + uy * (r + 36) + ty * 22)
-                s += (f'<path class="{cls}" d="M{f(a[0])},{f(a[1])} C{f(c1[0])},{f(c1[1])} {f(c2[0])},{f(c2[1])} {f(b[0])},{f(b[1])}" '
+                s += (f'<path class="{cls}" {key} d="M{f(a[0])},{f(a[1])} C{f(c1[0])},{f(c1[1])} {f(c2[0])},{f(c2[1])} {f(b[0])},{f(b[1])}" '
                       f'marker-end="url(#{mk})"><title>{i} --{d}--> {j}</title></path>')
-                s += f'<text class="{lcls}" x="{f(x0 + ux * (r + 36))}" y="{f(y0 + uy * (r + 36) + 4)}" text-anchor="middle">{d}</text>'
+                s += f'<text class="{lcls}" {key} x="{f(x0 + ux * (r + 36))}" y="{f(y0 + uy * (r + 36) + 4)}" text-anchor="middle">{d}</text>'
                 continue
             dx, dy = x1 - x0, y1 - y0
             dist = math.hypot(dx, dy)
@@ -110,11 +113,11 @@ def diagram(m, lsb, label):
                 return px + vx / n * k, py + vy / n * k
             a, b = trim(x0, y0, r), trim(x1, y1, r + 2)
             q = (0.25 * a[0] + 0.5 * c[0] + 0.25 * b[0] + nx * 11, 0.25 * a[1] + 0.5 * c[1] + 0.25 * b[1] + ny * 11 + 4)
-            s += (f'<path class="{cls}" d="M{f(a[0])},{f(a[1])} Q{f(c[0])},{f(c[1])} {f(b[0])},{f(b[1])}" '
+            s += (f'<path class="{cls}" {key} d="M{f(a[0])},{f(a[1])} Q{f(c[0])},{f(c[1])} {f(b[0])},{f(b[1])}" '
                   f'marker-end="url(#{mk})"><title>{i} --{d}--> {j}</title></path>')
-            s += f'<text class="{lcls}" x="{f(q[0])}" y="{f(q[1])}" text-anchor="middle">{d}</text>'
+            s += f'<text class="{lcls}" {key} x="{f(q[0])}" y="{f(q[1])}" text-anchor="middle">{d}</text>'
     for i, (x, y) in enumerate(pos):
-        s += f'<g class="fs-node{" is-start" if i == 0 else ""}"><circle cx="{f(x)}" cy="{f(y)}" r="{r}"/>'
+        s += f'<g class="fs-node{" is-start" if i == 0 else ""}" data-fig="n{i}"><circle cx="{f(x)}" cy="{f(y)}" r="{r}"/>'
         if i == 0:
             s += f'<circle cx="{f(x)}" cy="{f(y)}" r="{r - 5}"/>'
         s += f'<text x="{f(x)}" y="{f(y + 5)}" text-anchor="middle">{"x" if lsb else "r"}={i}</text></g>'

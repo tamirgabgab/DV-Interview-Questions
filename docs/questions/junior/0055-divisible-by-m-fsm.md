@@ -55,11 +55,17 @@ added: 2026-10-27
 
     המספר גדל בלי סוף, אבל השארית שלו ב-3 היא רק אחד משלושה ערכים, והיא כל מה שצריך :
     כשנכנס ביט, המספר הופך ל-\( 2v + b \), והשארית שלו נקבעת לפי השארית של \( v \)
-    לבד. לכן המצב הוא השארית, ויש שלושה מצבים :
+    לבד. לכן המצב הוא השארית, ויש שלושה מצבים. התרשים שלהם נמצא בשלבים, ליד הצעדים.
+
+    #### השלבים { .sol-steps }
+
+    <div class="steps-fig" data-fig-steps='["n0 n1 n2", "e0-0-0 e0-1-1 e1-0-2 e1-1-0 e2-0-1 e2-1-2", "n0", "e0-1-1 n1>e1-1-0 n0>e0-0-0 n0>e0-1-1 n1"]' markdown>
+
+    <div class="sf-fig" markdown>
 
     <!-- gen 0 -->
 
-    <svg class="figure dv-fig" viewBox="0 0 360 272" style="max-width:24rem" role="img" aria-label="מכונת המצבים של 3 מה-MSB : שלושה מצבים, השארית של המספר עד עכשיו"><defs><marker id="dv-arrow-m3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" d="M165.6,54.8 C158,14 202,14 194.4,54.8" marker-end="url(#dv-arrow-m3)"><title>0 --0--> 0</title></path><text class="fs-label halo" x="180" y="18" text-anchor="middle">0</text><path class="fs-edge is-found" d="M199.4,88.2 Q250.2,125.5 256.8,186.2" marker-end="url(#dv-arrow-m3)"><title>0 --1--> 1</title></path><text class="fs-label halo is-found" x="248.7" y="129.8" text-anchor="middle">1</text><path class="fs-edge" d="M237.7,221.7 Q180,247.1 124.1,222.5" marker-end="url(#dv-arrow-m3)"><title>1 --0--> 2</title></path><text class="fs-label halo" x="180.5" y="249.6" text-anchor="middle">0</text><path class="fs-edge is-found" d="M240.3,197.8 Q189.5,160.5 182.8,99.8" marker-end="url(#dv-arrow-m3)"><title>1 --1--> 0</title></path><text class="fs-label halo is-found" x="191" y="164.2" text-anchor="middle">1</text><path class="fs-edge" d="M122.3,202.3 Q180,176.9 235.9,201.5" marker-end="url(#dv-arrow-m3)"><title>2 --0--> 1</title></path><text class="fs-label halo" x="179.5" y="182.4" text-anchor="middle">0</text><path class="fs-edge is-found" d="M90.9,234.1 C59.4,261.1 37.4,222.9 76.5,209.1" marker-end="url(#dv-arrow-m3)"><title>2 --1--> 2</title></path><text class="fs-label halo is-found" x="48.4" y="246" text-anchor="middle">1</text><g class="fs-node is-start"><circle cx="180" cy="74" r="24"/><circle cx="180" cy="74" r="19"/><text x="180" y="79" text-anchor="middle">r=0</text></g><g class="fs-node"><circle cx="259.7" cy="212" r="24"/><text x="259.7" y="217" text-anchor="middle">r=1</text></g><g class="fs-node"><circle cx="100.3" cy="212" r="24"/><text x="100.3" y="217" text-anchor="middle">r=2</text></g></svg>
+    <svg class="figure dv-fig" viewBox="0 0 360 272" style="max-width:24rem" role="img" aria-label="מכונת המצבים של 3 מה-MSB : שלושה מצבים, השארית של המספר עד עכשיו"><defs><marker id="dv-arrow-m3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" data-fig="e0-0-0" d="M165.6,54.8 C158,14 202,14 194.4,54.8" marker-end="url(#dv-arrow-m3)"><title>0 --0--> 0</title></path><text class="fs-label halo" data-fig="e0-0-0" x="180" y="18" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e0-1-1" d="M199.4,88.2 Q250.2,125.5 256.8,186.2" marker-end="url(#dv-arrow-m3)"><title>0 --1--> 1</title></path><text class="fs-label halo is-found" data-fig="e0-1-1" x="248.7" y="129.8" text-anchor="middle">1</text><path class="fs-edge" data-fig="e1-0-2" d="M237.7,221.7 Q180,247.1 124.1,222.5" marker-end="url(#dv-arrow-m3)"><title>1 --0--> 2</title></path><text class="fs-label halo" data-fig="e1-0-2" x="180.5" y="249.6" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e1-1-0" d="M240.3,197.8 Q189.5,160.5 182.8,99.8" marker-end="url(#dv-arrow-m3)"><title>1 --1--> 0</title></path><text class="fs-label halo is-found" data-fig="e1-1-0" x="191" y="164.2" text-anchor="middle">1</text><path class="fs-edge" data-fig="e2-0-1" d="M122.3,202.3 Q180,176.9 235.9,201.5" marker-end="url(#dv-arrow-m3)"><title>2 --0--> 1</title></path><text class="fs-label halo" data-fig="e2-0-1" x="179.5" y="182.4" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e2-1-2" d="M90.9,234.1 C59.4,261.1 37.4,222.9 76.5,209.1" marker-end="url(#dv-arrow-m3)"><title>2 --1--> 2</title></path><text class="fs-label halo is-found" data-fig="e2-1-2" x="48.4" y="246" text-anchor="middle">1</text><g class="fs-node is-start" data-fig="n0"><circle cx="180" cy="74" r="24"/><circle cx="180" cy="74" r="19"/><text x="180" y="79" text-anchor="middle">r=0</text></g><g class="fs-node" data-fig="n1"><circle cx="259.7" cy="212" r="24"/><text x="259.7" y="217" text-anchor="middle">r=1</text></g><g class="fs-node" data-fig="n2"><circle cx="100.3" cy="212" r="24"/><text x="100.3" y="217" text-anchor="middle">r=2</text></g></svg>
 
     <!-- /gen -->
 
@@ -69,7 +75,7 @@ added: 2026-10-27
 
     <!-- /gen -->
 
-    #### השלבים { .sol-steps }
+    </div>
 
     <div class="steps" markdown>
 
@@ -77,6 +83,10 @@ added: 2026-10-27
        ביט, והמספר הוא 0).
     2. **המעבר :** ‏\( r' = (2r + b) \bmod 3 \). שישה מעברים בסך הכול, בטבלה למטה.
     3. **היציאה :** ‏`div = (r == 0)`. היא תלויה רק במצב, כלומר מכונת Moore.
+    4. **דוגמה :** ‏13 הוא `1101`, והביטים מגיעים מה-MSB : 1, 1, 0, 1. ‏\( r \) עובר
+       1, 0, 0, 1, ולכן `div` הוא 0, 1, 1, 0 : מתחלקים 3 (`11`) ו-6 (`110`), ולא 1 ו-13.
+
+    </div>
 
     </div>
 
@@ -187,19 +197,26 @@ added: 2026-10-27
     <!-- /gen -->
 
     **המעבר.** ‏\( x' = (v + b \cdot 2^k) \cdot 2^{-(k+1)} = (x + b) \cdot 2^{-1} \), כלומר
-    ‏\( x' = 2(x + b) \bmod 3 \). המיקום \( k \) נעלם מהנוסחה, ולכן אין צורך לזכור אותו :
-
-    <!-- gen 4 -->
-
-    <svg class="figure dv-fig" viewBox="0 0 360 272" style="max-width:24rem" role="img" aria-label="מכונת המצבים של 3 מה-LSB : שלושה מצבים, x הוא השארית כפול 2 בחזקת מינוס k"><defs><marker id="dv-arrow-l3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" d="M165.6,54.8 C158,14 202,14 194.4,54.8" marker-end="url(#dv-arrow-l3)"><title>0 --0--> 0</title></path><text class="fs-label halo" x="180" y="18" text-anchor="middle">0</text><path class="fs-edge is-found" d="M177.4,97.9 Q170.5,160.5 121.3,196.6" marker-end="url(#dv-arrow-l3)"><title>0 --1--> 2</title></path><text class="fs-label halo is-found" x="169.5" y="163.4" text-anchor="middle">1</text><path class="fs-edge" d="M237.7,221.7 Q180,247.1 124.1,222.5" marker-end="url(#dv-arrow-l3)"><title>1 --0--> 2</title></path><text class="fs-label halo" x="180.5" y="249.6" text-anchor="middle">0</text><path class="fs-edge is-found" d="M283.5,209.1 C322.6,222.9 300.6,261.1 269.1,234.1" marker-end="url(#dv-arrow-l3)"><title>1 --1--> 1</title></path><text class="fs-label halo is-found" x="311.6" y="246" text-anchor="middle">1</text><path class="fs-edge" d="M122.3,202.3 Q180,176.9 235.9,201.5" marker-end="url(#dv-arrow-l3)"><title>2 --0--> 1</title></path><text class="fs-label halo" x="179.5" y="182.4" text-anchor="middle">0</text><path class="fs-edge is-found" d="M102.9,188.1 Q109.8,125.5 159,89.4" marker-end="url(#dv-arrow-l3)"><title>2 --1--> 0</title></path><text class="fs-label halo is-found" x="110.9" y="130.6" text-anchor="middle">1</text><g class="fs-node is-start"><circle cx="180" cy="74" r="24"/><circle cx="180" cy="74" r="19"/><text x="180" y="79" text-anchor="middle">x=0</text></g><g class="fs-node"><circle cx="259.7" cy="212" r="24"/><text x="259.7" y="217" text-anchor="middle">x=1</text></g><g class="fs-node"><circle cx="100.3" cy="212" r="24"/><text x="100.3" y="217" text-anchor="middle">x=2</text></g></svg>
-
-    <!-- /gen -->
+    ‏\( x' = 2(x + b) \bmod 3 \). המיקום \( k \) נעלם מהנוסחה, ולכן אין צורך לזכור אותו. המכונה
+    בשלבים, ליד הצעדים.
 
     **הפתעה.** זו בדיוק המכונה של סעיף א, עם 1 ו-2 בתפקידים הפוכים. הסיבה : ‏\( 2 \equiv -1
     \pmod 3 \), ולכן היפוך סדר הביטים רק מחליף את סימן השארית, ו-0 נשאר 0. ב-5 זה כבר לא
     כך : לשני הכיוונים יש חמישה מצבים, אבל המכונות שונות.
 
     #### השלבים { .sol-steps }
+
+    <div class="steps-fig" data-fig-steps='["n0 n1 n2", "e0-0-0 e0-1-2 e1-0-2 e1-1-1 e2-0-1 e2-1-0", "n0", "e0-0-0 n0>e0-1-2 n2>e2-1-0 n0"]' markdown>
+
+    <div class="sf-fig" markdown>
+
+    <!-- gen 4 -->
+
+    <svg class="figure dv-fig" viewBox="0 0 360 272" style="max-width:24rem" role="img" aria-label="מכונת המצבים של 3 מה-LSB : שלושה מצבים, x הוא השארית כפול 2 בחזקת מינוס k"><defs><marker id="dv-arrow-l3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" data-fig="e0-0-0" d="M165.6,54.8 C158,14 202,14 194.4,54.8" marker-end="url(#dv-arrow-l3)"><title>0 --0--> 0</title></path><text class="fs-label halo" data-fig="e0-0-0" x="180" y="18" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e0-1-2" d="M177.4,97.9 Q170.5,160.5 121.3,196.6" marker-end="url(#dv-arrow-l3)"><title>0 --1--> 2</title></path><text class="fs-label halo is-found" data-fig="e0-1-2" x="169.5" y="163.4" text-anchor="middle">1</text><path class="fs-edge" data-fig="e1-0-2" d="M237.7,221.7 Q180,247.1 124.1,222.5" marker-end="url(#dv-arrow-l3)"><title>1 --0--> 2</title></path><text class="fs-label halo" data-fig="e1-0-2" x="180.5" y="249.6" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e1-1-1" d="M283.5,209.1 C322.6,222.9 300.6,261.1 269.1,234.1" marker-end="url(#dv-arrow-l3)"><title>1 --1--> 1</title></path><text class="fs-label halo is-found" data-fig="e1-1-1" x="311.6" y="246" text-anchor="middle">1</text><path class="fs-edge" data-fig="e2-0-1" d="M122.3,202.3 Q180,176.9 235.9,201.5" marker-end="url(#dv-arrow-l3)"><title>2 --0--> 1</title></path><text class="fs-label halo" data-fig="e2-0-1" x="179.5" y="182.4" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e2-1-0" d="M102.9,188.1 Q109.8,125.5 159,89.4" marker-end="url(#dv-arrow-l3)"><title>2 --1--> 0</title></path><text class="fs-label halo is-found" data-fig="e2-1-0" x="110.9" y="130.6" text-anchor="middle">1</text><g class="fs-node is-start" data-fig="n0"><circle cx="180" cy="74" r="24"/><circle cx="180" cy="74" r="19"/><text x="180" y="79" text-anchor="middle">x=0</text></g><g class="fs-node" data-fig="n1"><circle cx="259.7" cy="212" r="24"/><text x="259.7" y="217" text-anchor="middle">x=1</text></g><g class="fs-node" data-fig="n2"><circle cx="100.3" cy="212" r="24"/><text x="100.3" y="217" text-anchor="middle">x=2</text></g></svg>
+
+    <!-- /gen -->
+
+    </div>
 
     <div class="steps" markdown>
 
@@ -209,6 +226,8 @@ added: 2026-10-27
     3. **היציאה :** ‏`div = (x == 0)`, כי \( v \equiv 0 \) אם ורק אם \( x \equiv 0 \).
     4. **דוגמה :** ‏6 מגיע כ-0, 1, 1. ‏\( x \) עובר 0, 2, 0 (‏\( 2 \cdot 0 = 0 \), ‏\( 2 \cdot 1 = 2 \),
        ‏\( 2 \cdot 3 = 6 \equiv 0 \)), ולכן `div` הוא 1, 0, 1 : המספרים 0, 2 ו-6.
+
+    </div>
 
     </div>
 
