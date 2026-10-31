@@ -3,6 +3,7 @@
     python videos/render.py 0002            # 720p30 (1280x720), the version to upload
     python videos/render.py 0002 --draft    # 480p15, a quick look
     python videos/render.py 0002 --captions-only   # only out/captions.en.vtt, no render
+    python videos/render.py 0002 --music-only      # only the music, remuxed into out/*.mp4
 
 Run it with the Python that has Manim (requirements-video.txt). The Hebrew labels are drawn
 first by videos/lib/he_label.py with a Python that has Playwright (`--label-python`, or
@@ -20,14 +21,22 @@ Steps:
 5. Shift each scene's recorded captions by its offset (the real duration of the scene files
    before it) and write captions.vtt and chapters.txt (lib/captions.py), and
    captions.en.vtt: the same cues with the English of `videos/<id>/captions.en.md`.
-6. Fail on a caption shorter than 1.5 s or longer than 7 s, a caption that breaks the RTL or
+6. Generate the music (lib/music.py, seeded by the question's id or scene.py's
+   MUSIC_SEED) for the video's exact length, write out/music.wav, and mux it into
+   video.mp4: the video stream copied, the music as AAC at 160 kbps.
+7. Fail on a caption shorter than 1.5 s or longer than 7 s, a caption that breaks the RTL or
    colon rules, a beat with no still frame at its end, captions that differ from
    script.md, or a translation file that misses a caption or has an entry for one that no
    longer exists (checked in step 1 too, before the long render). A video with no
    captions.en.md yet gets a warning and no English track.
 
-Output: videos/<id>/out/video.mp4, captions.vtt, captions.en.vtt, chapters.txt; with
---preview also preview.mp4, the captions burned in, for review in a plain player.
+Output: videos/<id>/out/video.mp4 (with the music), music.wav, captions.vtt,
+captions.en.vtt, chapters.txt; with --preview also preview.mp4, the captions burned in and
+the same music, for review in a plain player. `--no-music` leaves the video silent.
+
+`--music-only` renders no scene: it regenerates out/music.wav for the length of the existing
+out/video.mp4 and remuxes it into video.mp4 and, when it exists, preview.mp4 (their video
+streams copied, any old soundtrack replaced).
 
 `--captions-only` renders nothing: it writes out/captions.en.vtt from the existing
 out/captions.vtt (its cues and times) and captions.en.md, so a wording fix of the English
@@ -51,6 +60,8 @@ VIDEOS = Path(__file__).resolve().parent
 sys.path.insert(0, str(VIDEOS / "lib"))
 
 import captions as caps  # noqa: E402
+
+MUSIC_BITRATE = "160k"
 
 QUALITY = {False: ("-qm", "720p30"), True: ("-ql", "480p15")}
 
@@ -140,6 +151,51 @@ def captions_only(folder: Path) -> int:
     return 0
 
 
+def video_seconds(path: Path) -> float:
+    """The length of a file's video stream (the soundtrack, once muxed, does not count)."""
+    out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                          "stream=duration", "-of", "csv=p=0", str(path)],
+                         check=True, capture_output=True, text=True).stdout.strip()
+    return float(out)
+
+
+def mux_music(movie: Path, wav: Path) -> None:
+    """Replace `movie`'s soundtrack with `wav`: the video stream copied, the music as AAC."""
+    tmp = movie.with_suffix(".tmp.mp4")
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(movie), "-i", str(wav),
+                    "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy", "-c:a", "aac",
+                    "-b:a", MUSIC_BITRATE, "-ar", "48000",
+                    "-movflags", "+faststart", str(tmp)], check=True)
+    os.replace(tmp, movie)
+
+
+def add_music(out: Path, seed: int, movies: list[Path]) -> None:
+    """Generate out/music.wav for the length of out/video.mp4 and mux it into `movies`."""
+    import music  # numpy, only needed here
+
+    seconds = video_seconds(out / "video.mp4")
+    wav = out / "music.wav"
+    info = music.make(seed, seconds, wav)
+    print(f"music: {info['piece']}")
+    print(f"music: {info['seconds']:.2f} s, {info['lufs']:.1f} LUFS, true peak "
+          f"{info['true_peak']:.1f} dBTP, largest step {info['max_step_over_rms']:.2f} x RMS, "
+          f"{info['spikes']} click(s)")
+    for movie in movies:
+        mux_music(movie, wav)
+        print(f"music: muxed into {movie.relative_to(VIDEOS.parent)}")
+
+
+def music_only(folder: Path, seed: int) -> int:
+    out = folder / "out"
+    video = out / "video.mp4"
+    if not video.exists():
+        print(f"{video.relative_to(VIDEOS.parent)} does not exist: render the video first",
+              file=sys.stderr)
+        return 1
+    add_music(out, seed, [m for m in (video, out / "preview.mp4") if m.exists()])
+    return 0
+
+
 def ffprobe(path: Path) -> dict:
     out = subprocess.run(
         ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
@@ -165,6 +221,10 @@ def main() -> int:
     ap.add_argument("--captions-only", action="store_true",
                     help="render nothing: write out/captions.en.vtt from out/captions.vtt "
                          "and captions.en.md")
+    ap.add_argument("--music-only", action="store_true",
+                    help="render no scene: regenerate out/music.wav and remux it into "
+                         "out/video.mp4 (and out/preview.mp4)")
+    ap.add_argument("--no-music", action="store_true", help="leave the video silent")
     args = ap.parse_args()
 
     qid = f"{int(args.qid):04d}"
@@ -174,6 +234,9 @@ def main() -> int:
     scene_py = folder / "scene.py"
     out = folder / "out"
     lits = module_literals(scene_py)
+    seed = int(lits.get("MUSIC_SEED", int(qid)))   # scene.py may pick another piece
+    if args.music_only:
+        return music_only(folder, seed)
     scenes = lits["SCENES"]                     # [(class, chapter title), ...]
     problems: list[str] = []
 
@@ -272,6 +335,8 @@ def main() -> int:
         (out / "chapters.txt").write_text(chapters, encoding="utf-8")
         if vtt_en:
             (out / "captions.en.vtt").write_text(vtt_en, encoding="utf-8")
+    if not args.no_music:
+        add_music(out, seed, [video])
     if args.preview and (not problems or args.keep_going):
         burn_preview(out)
     size = video.stat().st_size / 1e6
@@ -297,11 +362,13 @@ def burn_preview(out: Path) -> None:
     """out/preview.mp4: the video with its captions burned in by libass, for watching in a
     plain player. Encoding=-1 makes libass pick the base direction from the text (right to
     left here); the default left-to-right base puts a caption's colon and full stop at the
-    wrong end. Rubik comes from he_label.py's font cache (videos/.cache/fonts)."""
+    wrong end. Rubik comes from he_label.py's font cache (videos/.cache/fonts). The
+    soundtrack of video.mp4, the music, is copied as it is."""
     fonts = VIDEOS / ".cache" / "fonts"
     vf = (f"subtitles={out / 'captions.vtt'}:fontsdir={fonts}:force_style='{PREVIEW_STYLE}'")
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(out / "video.mp4"), "-vf", vf,
-                    "-c:v", "libx264", "-crf", "21", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+                    "-c:v", "libx264", "-crf", "21", "-pix_fmt", "yuv420p", "-c:a", "copy",
+                    "-movflags", "+faststart",
                     str(out / "preview.mp4")], check=True)
     print(f"preview: {out / 'preview.mp4'}")
 

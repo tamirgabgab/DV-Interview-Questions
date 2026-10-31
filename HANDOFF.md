@@ -1571,6 +1571,15 @@ section below starts at session 22, whose numbered items run on through the late
     Narration is the next step: a five-minute reading text for the owner's voice samples was
     sent (not in the repo).
 
+103. **Background music for the videos (session 28, 2026-10-31).** The owner asked for calm
+    music in the 3Blue1Brown spirit, a different piece per video, under the coming narration.
+    The music sites are blocked here and borrowed music risks Content ID, so
+    `videos/lib/music.py` composes it: one of 9 progressions in Ionian, Lydian or Dorian, a
+    pad, a soft additive piano, a synthetic reverb, two-pass loudnorm to -24 LUFS. The seed
+    is the question id (`MUSIC_SEED` in scene.py picks another). render.py muxes it in;
+    `--music-only` and `--no-music`. 0002 plays Bb Lydian, 0004 A Dorian. VIDEOS.md has the
+    narration mix (sidechain ducking). Waiting for the owner's opinion.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
