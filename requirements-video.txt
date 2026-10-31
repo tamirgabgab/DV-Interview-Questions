@@ -1,6 +1,8 @@
 # The tutorial videos (VIDEOS.md): rendered locally, never in CI. Install into its own
 # environment (e.g. python -m venv ~/.venvs/manim) and run videos/render.py with it.
-# Manim also needs ffmpeg, Cairo and Pango from the system; no LaTeX is used.
+# Manim also needs ffmpeg, Cairo and Pango from the system, and LaTeX for the math (dvq.TX):
+# apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-extra
+#   texlive-fonts-recommended texlive-science dvisvgm cm-super-minimal
 # The Hebrew labels (videos/lib/he_label.py) run with a Python that has Playwright and its
 # Chromium (requirements-dev.txt); render.py --label-python picks it (default python3).
 manim==0.22.1
