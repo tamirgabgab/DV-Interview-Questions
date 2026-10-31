@@ -118,7 +118,9 @@ def patterns_table():
 
 def diagram(pattern=PATTERN):
     """Mealy states in a row: the advancing edges on the line, the self loops above, the
-    fall-back edges below, the detecting edge marked."""
+    fall-back edges below, the detecting edge marked. Every state and edge carries a key in
+    data-fig (`n<s>`, `e<s>-<bit>-<target>`, an edge's label too), which the steps beside
+    the figure light (question-page.js)."""
     L, nxt = len(pattern), table(pattern)
     W, H, Y, R = 660, 240, 118, 26
     xs = [70 + k * (W - 140) / (L - 1) for k in range(L)]
@@ -132,23 +134,24 @@ def diagram(pattern=PATTERN):
             target = rest(pattern) if found else n
             lab = f"{b} / 1" if found else str(b)
             cls = "fs-edge is-found" if found else "fs-edge"
+            key = f'data-fig="e{s}-{b}-{target}"'
             x0, x1 = xs[s], xs[target]
             if target == s + 1:                                     # forward, on the line
-                p.append(f'<line class="{cls}" x1="{x0 + R:.1f}" y1="{Y}" x2="{x1 - R - 2:.1f}" y2="{Y}" marker-end="url(#fs-arrow)"/>')
-                labels.append((f"{(x0 + x1) / 2:.1f}", Y - 8, lab, found))
+                p.append(f'<line class="{cls}" {key} x1="{x0 + R:.1f}" y1="{Y}" x2="{x1 - R - 2:.1f}" y2="{Y}" marker-end="url(#fs-arrow)"/>')
+                labels.append((f"{(x0 + x1) / 2:.1f}", Y - 8, lab, found, key))
             elif target == s:                                       # a self loop above
-                p.append(f'<path class="{cls}" d="M{x0 - 10:.1f},{Y - R + 4} C{x0 - 34:.1f},{Y - R - 44} {x0 + 34:.1f},{Y - R - 44} {x0 + 10:.1f},{Y - R + 2}" marker-end="url(#fs-arrow)"/>')
-                labels.append((f"{x0:.1f}", Y - R - 32, lab, found))
+                p.append(f'<path class="{cls}" {key} d="M{x0 - 10:.1f},{Y - R + 4} C{x0 - 34:.1f},{Y - R - 44} {x0 + 34:.1f},{Y - R - 44} {x0 + 10:.1f},{Y - R + 2}" marker-end="url(#fs-arrow)"/>')
+                labels.append((f"{x0:.1f}", Y - R - 32, lab, found, key))
             else:                                                   # back (or far forward), below
                 depth = 34 + 22 * abs(s - target)
-                p.append(f'<path class="{cls}" d="M{x0:.1f},{Y + R} Q{(x0 + x1) / 2:.1f},{Y + R + depth} {x1:.1f},{Y + R + 2}" marker-end="url(#fs-arrow)"/>')
-                labels.append((f"{(x0 + x1) / 2:.1f}", Y + R + depth / 2 + 16, lab, found))
+                p.append(f'<path class="{cls}" {key} d="M{x0:.1f},{Y + R} Q{(x0 + x1) / 2:.1f},{Y + R + depth} {x1:.1f},{Y + R + 2}" marker-end="url(#fs-arrow)"/>')
+                labels.append((f"{(x0 + x1) / 2:.1f}", Y + R + depth / 2 + 16, lab, found, key))
     for s in range(L):
-        p.append(f'<g class="fs-node{" is-start" if s == 0 else ""}"><circle cx="{xs[s]:.1f}" cy="{Y}" r="{R}"/>'
+        p.append(f'<g class="fs-node{" is-start" if s == 0 else ""}" data-fig="n{s}"><circle cx="{xs[s]:.1f}" cy="{Y}" r="{R}"/>'
                  f'<text x="{xs[s]:.1f}" y="{Y + 5}" text-anchor="middle">S{s}</text></g>'
-                 f'<text class="fs-meaning" x="{xs[s]:.1f}" y="{Y + R + 16}" text-anchor="middle">{"start" if s == 0 else pattern[:s]}</text>')
-    for x, y, lab, found in labels:
-        p.append(f'<text class="fs-label{" is-found" if found else ""} halo" x="{x}" y="{y}" text-anchor="middle">{lab}</text>')
+                 f'<text class="fs-meaning" data-fig="n{s}" x="{xs[s]:.1f}" y="{Y + R + 16}" text-anchor="middle">{"start" if s == 0 else pattern[:s]}</text>')
+    for x, y, lab, found, key in labels:
+        p.append(f'<text class="fs-label{" is-found" if found else ""} halo" {key} x="{x}" y="{y}" text-anchor="middle">{lab}</text>')
     p.append(f'<text class="legend" x="{W - 8}" y="{H - 8}" text-anchor="end">{pattern}, Mealy</text></svg>')
     return "".join(p)
 

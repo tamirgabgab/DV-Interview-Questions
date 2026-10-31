@@ -39,3 +39,22 @@ def assert_figures_match(qid: int) -> None:
 
     stale = fill.check(qid)
     assert not stale, f"blocks out of date on page {qid:04d}: {stale} (run python tools/figures/fill.py {qid})"
+
+
+def fig_steps(qid: int) -> list[tuple[list[str], set[str]]]:
+    """The figures beside the steps on a question's page (div.steps-fig): per box, what each
+    step lights (one string per step, "a b>c d" for a walk) and the keys (data-fig) of the
+    figure in the box."""
+    import re
+
+    page = next((ROOT / "docs" / "questions").rglob(f"{qid:04d}-*.md")).read_text(encoding="utf-8")
+    out = []
+    for m in re.finditer(r"<div class=\"steps-fig\" data-fig-steps='([^']+)' markdown>(.*?)<div class=\"steps\"", page, re.S):
+        out.append((json.loads(m.group(1)), set(re.findall(r'data-fig="([^"]+)"', m.group(2)))))
+    return out
+
+
+def lit(plan: list[str]) -> set[str]:
+    """Every key a list of steps lights."""
+    return {k for step in plan for group in step.split(">") for k in group.split()}
+

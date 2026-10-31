@@ -251,6 +251,8 @@ html.qj-open { overflow: hidden; }
 .md-typeset .steps-fig svg .fs-edge.sf-on { stroke: var(--site-mark-color); stroke-width: 3.5; }   /* the amber that reads 3:1 on the page */
 .md-typeset .steps-fig svg .fs-label.sf-on { fill: var(--site-label-color); font-size: 14px; }
 .md-typeset .steps-fig svg .fs-node.sf-on circle { stroke: var(--site-mark-color); stroke-width: 3.5; fill: var(--md-accent-fg-color--transparent); }
+.md-typeset .steps-fig svg g.sf-on > rect { stroke: var(--site-mark-color); stroke-width: 3; }   /* a state box (0032's graph) */
+.md-typeset .steps-fig svg line.sf-on:not(.fs-edge) { stroke: var(--site-mark-color); stroke-width: 3.5; stroke-opacity: 1; }   /* a crossing (0032's graph) */
 @media (prefers-reduced-motion: no-preference) {
   .md-typeset .steps-fig svg [data-fig] { transition: opacity var(--dur-1) var(--ease); }
   .md-typeset .steps-fig svg :is(.fs-edge, .fs-node circle) { transition: stroke var(--dur-1) var(--ease), stroke-width var(--dur-1) var(--ease); }
@@ -261,4 +263,10 @@ html.qj-open { overflow: hidden; }
   .md-typeset .steps-fig > .sf-fig { grid-area: fig; position: sticky; top: var(--sf-top, 6rem); }
   .md-typeset .steps-fig > .steps { grid-area: steps; }
   .md-typeset .steps-fig .steps > ol > li { margin-bottom: 2.4rem; }
+  /* a wide, low figure sticks above the steps instead, on the surface, the steps scrolling under it */
+  .md-typeset .steps-fig.sf-top { display: block; }
+  .md-typeset .steps-fig.sf-top > .sf-fig { z-index: 2; margin: 0 calc(-1 * var(--sp-2)); padding: var(--sp-2) var(--sp-2) var(--sp-1); background: var(--site-surface); border-bottom: 1px solid var(--site-card-border); }
+  .md-typeset .steps-fig.sf-top > .sf-fig svg { max-width: min(24rem, 100%) !important; }
+  .md-typeset .steps-fig.sf-top > .sf-fig .viz-legend { margin-top: 0; font-size: 0.6rem; }
+  .md-typeset .steps-fig.sf-top > .steps { margin-top: var(--sp-3); }
 }

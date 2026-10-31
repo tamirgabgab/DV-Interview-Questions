@@ -144,29 +144,32 @@ def overlaps(p):
 # --- blocks ------------------------------------------------------------------------------
 
 def chain_svg(pattern, y, mid):
-    """One row of the state diagram: start, H, the pattern; the arrows and their tosses."""
+    """One row of the state diagram: start, H, the pattern; the arrows and their tosses. Every
+    state and arrow carries a key in data-fig, `<pattern>-n<i>` and `<pattern>-e<i>-<toss>-<j>`
+    (an arrow's label too), which the steps beside the figure light (question-page.js)."""
     xs = [80, 270, 460]
     s = ""
     names = ["start", pattern[0], pattern]
-    s += f'<line class="fs-edge" x1="{xs[0] + 26}" y1="{y}" x2="{xs[1] - 28}" y2="{y}" marker-end="url(#cp-arrow)"/>'
-    s += f'<text class="fs-label halo" x="{(xs[0] + xs[1]) / 2}" y="{y - 8}" text-anchor="middle">H</text>'
-    s += f'<line class="fs-edge is-found" x1="{xs[1] + 26}" y1="{y}" x2="{xs[2] - 28}" y2="{y}" marker-end="url(#cp-arrow)"/>'
-    s += f'<text class="fs-label is-found halo" x="{(xs[1] + xs[2]) / 2}" y="{y - 8}" text-anchor="middle">{pattern[1]}</text>'
+    k = lambda i, c, j: f'data-fig="{pattern}-e{i}-{c}-{j}"'
+    s += f'<line class="fs-edge" {k(0, "H", 1)} x1="{xs[0] + 26}" y1="{y}" x2="{xs[1] - 28}" y2="{y}" marker-end="url(#cp-arrow)"/>'
+    s += f'<text class="fs-label halo" {k(0, "H", 1)} x="{(xs[0] + xs[1]) / 2}" y="{y - 8}" text-anchor="middle">H</text>'
+    s += f'<line class="fs-edge is-found" {k(1, pattern[1], 2)} x1="{xs[1] + 26}" y1="{y}" x2="{xs[2] - 28}" y2="{y}" marker-end="url(#cp-arrow)"/>'
+    s += f'<text class="fs-label is-found halo" {k(1, pattern[1], 2)} x="{(xs[1] + xs[2]) / 2}" y="{y - 8}" text-anchor="middle">{pattern[1]}</text>'
     x = xs[0]
-    s += f'<path class="fs-edge" d="M{x - 9},{y - 23} C{x - 30},{y - 64} {x + 30},{y - 64} {x + 9},{y - 24}" marker-end="url(#cp-arrow)"/>'
-    s += f'<text class="fs-label halo" x="{x}" y="{y - 54}" text-anchor="middle">T</text>'
+    s += f'<path class="fs-edge" {k(0, "T", 0)} d="M{x - 9},{y - 23} C{x - 30},{y - 64} {x + 30},{y - 64} {x + 9},{y - 24}" marker-end="url(#cp-arrow)"/>'
+    s += f'<text class="fs-label halo" {k(0, "T", 0)} x="{x}" y="{y - 54}" text-anchor="middle">T</text>'
     other = "T" if pattern[1] == "H" else "H"
     x = xs[1]
     if step(pattern, 1, other) == 1:          # HT: an H after H keeps the H
-        s += f'<path class="fs-edge" d="M{x - 9},{y - 23} C{x - 30},{y - 64} {x + 30},{y - 64} {x + 9},{y - 24}" marker-end="url(#cp-arrow)"/>'
-        s += f'<text class="fs-label halo" x="{x}" y="{y - 54}" text-anchor="middle">H</text>'
+        s += f'<path class="fs-edge" {k(1, other, 1)} d="M{x - 9},{y - 23} C{x - 30},{y - 64} {x + 30},{y - 64} {x + 9},{y - 24}" marker-end="url(#cp-arrow)"/>'
+        s += f'<text class="fs-label halo" {k(1, other, 1)} x="{x}" y="{y - 54}" text-anchor="middle">H</text>'
     else:                                     # HH: a T after H goes back to the start
-        s += f'<path class="fs-edge is-back" d="M{x},{y + 26} Q{(xs[0] + x) / 2},{y + 70} {xs[0]},{y + 28}" marker-end="url(#cp-arrow)"/>'
-        s += f'<text class="fs-label halo" x="{(xs[0] + x) / 2}" y="{y + 62}" text-anchor="middle">T</text>'
+        s += f'<path class="fs-edge is-back" {k(1, other, 0)} d="M{x},{y + 26} Q{(xs[0] + x) / 2},{y + 70} {xs[0]},{y + 28}" marker-end="url(#cp-arrow)"/>'
+        s += f'<text class="fs-label halo" {k(1, other, 0)} x="{(xs[0] + x) / 2}" y="{y + 62}" text-anchor="middle">T</text>'
     for i, x in enumerate(xs):
         cls = " is-start" if i == 0 else " is-out" if i == 2 else ""
         size = ' style="font-size:11px"' if i == 0 else ""
-        s += f'<g class="fs-node{cls}"><circle cx="{x}" cy="{y}" r="26"/><text x="{x}" y="{y + 4}" text-anchor="middle"{size}>{names[i]}</text></g>'
+        s += f'<g class="fs-node{cls}" data-fig="{pattern}-n{i}"><circle cx="{x}" cy="{y}" r="26"/><text x="{x}" y="{y + 4}" text-anchor="middle"{size}>{names[i]}</text></g>'
     s += f'<text class="cp-exp" x="{600}" y="{y + 6}" text-anchor="middle">E = {mid}</text>'
     return s
 

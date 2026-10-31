@@ -63,7 +63,8 @@
   // the keys of the figure's parts (data-fig on the SVG's nodes and arcs, from the figure's
   // generator). The active step lights its parts in amber and dims the rest; "a b>c d"
   // lights a, b, then c, d, one group after the other (a walk along a path). On a wide
-  // screen the figure sticks beside the steps (CSS) and the step at the middle of the
+  // screen the figure sticks beside the steps, or above them when it is wide and low
+  // (wider than 1.8 times its height: .sf-top), and the step at the middle of the
   // window is the active one; everywhere a click, a tap or the focus on a step makes it
   // active (on a phone the figure stays above the steps). Under reduced motion a walk is
   // lit at once.
@@ -75,6 +76,8 @@
     const items = [...box.querySelectorAll(".steps > ol > li")];
     if (!svg || !items.length) return;
     const parts = [...svg.querySelectorAll("[data-fig]")];
+    const vb = svg.viewBox && svg.viewBox.baseVal;
+    if (vb && vb.height && vb.width / vb.height > 1.8) box.classList.add("sf-top");
     const wide = window.matchMedia("(min-width: 60em)");
     let active = -1, timers = [];
     const light = (keys) => parts.forEach((el) => { if (keys.has(el.dataset.fig)) el.classList.add("sf-on"); });
@@ -102,7 +105,7 @@
       const io = new IntersectionObserver((entries) => {
         if (!wide.matches) return;
         entries.forEach((e) => { if (e.isIntersecting) show(items.indexOf(e.target)); });
-      }, { rootMargin: "-45% 0px -45% 0px" });
+      }, { rootMargin: box.classList.contains("sf-top") ? "-62% 0px -32% 0px" : "-45% 0px -45% 0px" });   // under a figure above, the line is lower
       items.forEach((li) => io.observe(li));
     }
   };

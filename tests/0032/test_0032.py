@@ -86,3 +86,21 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(32)
+
+
+def test_steps_light_the_right_parts():
+    """The state graph beside part b's steps: every key a step lights is in the figure; the
+    expansion step lights the start, its four crossings' states and the one safe crossing;
+    the path step walks part a's plan, and the step before it walks it backwards."""
+    from page_tests import fig_steps, lit
+
+    ((plan, keys),) = fig_steps(32)
+    assert lit(plan) <= keys, lit(plan) - keys
+    assert plan[0] == "n0" and plan[1] == "n15"
+    near = [t for _, t in q0032.moves(0)]
+    assert set(plan[2].split()) == {"n0"} | {f"n{t}" for t in near} | {f"e0-{t}" for t in near if q0032.safe(t)}
+    states = q0032.replay(["goat", None, "wolf", "goat", "cabbage", None, "goat"])
+    fwd = ["n0"] + [f"e{min(a, b)}-{max(a, b)} n{b}" for a, b in zip(states, states[1:])]
+    assert plan[4].split(">") == fwd
+    back = states[::-1]
+    assert plan[3].split(">") == ["n15"] + [f"e{min(a, b)}-{max(a, b)} n{b}" for a, b in zip(back, back[1:])]

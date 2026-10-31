@@ -64,11 +64,17 @@ added: 2026-10-22
     מתאימה. זה בדיוק מה שנותן את החפיפה בלי שום מנגנון נוסף.
 
     המוצא הוא מסוג **Mealy** : הוא תלוי במצב ובביט הנוכחי, ולכן עולה **באותו מחזור** שבו
-    הביט הרביעי מגיע.
+    הביט הרביעי מגיע. המכונה בשלבים, ליד הצעדים.
+
+    #### השלבים { .sol-steps }
+
+    <div class="steps-fig" data-fig-steps='["n0 n1 n2 n3", "e0-1-1 e1-0-2 e2-1-3", "e0-0-0 e1-1-1 e2-0-0 e3-0-2", "e3-1-1 n3 n1", "n0", "e0-1-1 n1>e1-0-2 n2>e2-1-3 n3>e3-1-1 n1>e1-0-2 n2>e2-1-3 n3>e3-1-1 n1"]' markdown>
+
+    <div class="sf-fig" markdown>
 
     <!-- gen 0 -->
 
-    <svg class="figure fs-fig" viewBox="0 0 660 240" style="max-width:41rem" role="img" aria-label="דיאגרמת המצבים של גלאי 1011 : 4 מצבים, הקשתות מסומנות בביט ובפלט"><defs><marker id="fs-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" d="M60.0,96 C36.0,48 104.0,48 80.0,94" marker-end="url(#fs-arrow)"/><line class="fs-edge" x1="96.0" y1="118" x2="215.3" y2="118" marker-end="url(#fs-arrow)"/><line class="fs-edge" x1="269.3" y1="118" x2="388.7" y2="118" marker-end="url(#fs-arrow)"/><path class="fs-edge" d="M233.3,96 C209.3,48 277.3,48 253.3,94" marker-end="url(#fs-arrow)"/><path class="fs-edge" d="M416.7,144 Q243.3,222 70.0,146" marker-end="url(#fs-arrow)"/><line class="fs-edge" x1="442.7" y1="118" x2="562.0" y2="118" marker-end="url(#fs-arrow)"/><path class="fs-edge" d="M590.0,144 Q503.3,200 416.7,146" marker-end="url(#fs-arrow)"/><path class="fs-edge is-found" d="M590.0,144 Q416.7,222 243.3,146" marker-end="url(#fs-arrow)"/><g class="fs-node is-start"><circle cx="70.0" cy="118" r="26"/><text x="70.0" y="123" text-anchor="middle">S0</text></g><text class="fs-meaning" x="70.0" y="160" text-anchor="middle">start</text><g class="fs-node"><circle cx="243.3" cy="118" r="26"/><text x="243.3" y="123" text-anchor="middle">S1</text></g><text class="fs-meaning" x="243.3" y="160" text-anchor="middle">1</text><g class="fs-node"><circle cx="416.7" cy="118" r="26"/><text x="416.7" y="123" text-anchor="middle">S2</text></g><text class="fs-meaning" x="416.7" y="160" text-anchor="middle">10</text><g class="fs-node"><circle cx="590.0" cy="118" r="26"/><text x="590.0" y="123" text-anchor="middle">S3</text></g><text class="fs-meaning" x="590.0" y="160" text-anchor="middle">101</text><text class="fs-label halo" x="70.0" y="60" text-anchor="middle">0</text><text class="fs-label halo" x="156.7" y="110" text-anchor="middle">1</text><text class="fs-label halo" x="330.0" y="110" text-anchor="middle">0</text><text class="fs-label halo" x="243.3" y="60" text-anchor="middle">1</text><text class="fs-label halo" x="243.3" y="199.0" text-anchor="middle">0</text><text class="fs-label halo" x="503.3" y="110" text-anchor="middle">1</text><text class="fs-label halo" x="503.3" y="188.0" text-anchor="middle">0</text><text class="fs-label is-found halo" x="416.7" y="199.0" text-anchor="middle">1 / 1</text><text class="legend" x="652" y="232" text-anchor="end">1011, Mealy</text></svg>
+    <svg class="figure fs-fig" viewBox="0 0 660 240" style="max-width:41rem" role="img" aria-label="דיאגרמת המצבים של גלאי 1011 : 4 מצבים, הקשתות מסומנות בביט ובפלט"><defs><marker id="fs-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" data-fig="e0-0-0" d="M60.0,96 C36.0,48 104.0,48 80.0,94" marker-end="url(#fs-arrow)"/><line class="fs-edge" data-fig="e0-1-1" x1="96.0" y1="118" x2="215.3" y2="118" marker-end="url(#fs-arrow)"/><line class="fs-edge" data-fig="e1-0-2" x1="269.3" y1="118" x2="388.7" y2="118" marker-end="url(#fs-arrow)"/><path class="fs-edge" data-fig="e1-1-1" d="M233.3,96 C209.3,48 277.3,48 253.3,94" marker-end="url(#fs-arrow)"/><path class="fs-edge" data-fig="e2-0-0" d="M416.7,144 Q243.3,222 70.0,146" marker-end="url(#fs-arrow)"/><line class="fs-edge" data-fig="e2-1-3" x1="442.7" y1="118" x2="562.0" y2="118" marker-end="url(#fs-arrow)"/><path class="fs-edge" data-fig="e3-0-2" d="M590.0,144 Q503.3,200 416.7,146" marker-end="url(#fs-arrow)"/><path class="fs-edge is-found" data-fig="e3-1-1" d="M590.0,144 Q416.7,222 243.3,146" marker-end="url(#fs-arrow)"/><g class="fs-node is-start" data-fig="n0"><circle cx="70.0" cy="118" r="26"/><text x="70.0" y="123" text-anchor="middle">S0</text></g><text class="fs-meaning" data-fig="n0" x="70.0" y="160" text-anchor="middle">start</text><g class="fs-node" data-fig="n1"><circle cx="243.3" cy="118" r="26"/><text x="243.3" y="123" text-anchor="middle">S1</text></g><text class="fs-meaning" data-fig="n1" x="243.3" y="160" text-anchor="middle">1</text><g class="fs-node" data-fig="n2"><circle cx="416.7" cy="118" r="26"/><text x="416.7" y="123" text-anchor="middle">S2</text></g><text class="fs-meaning" data-fig="n2" x="416.7" y="160" text-anchor="middle">10</text><g class="fs-node" data-fig="n3"><circle cx="590.0" cy="118" r="26"/><text x="590.0" y="123" text-anchor="middle">S3</text></g><text class="fs-meaning" data-fig="n3" x="590.0" y="160" text-anchor="middle">101</text><text class="fs-label halo" data-fig="e0-0-0" x="70.0" y="60" text-anchor="middle">0</text><text class="fs-label halo" data-fig="e0-1-1" x="156.7" y="110" text-anchor="middle">1</text><text class="fs-label halo" data-fig="e1-0-2" x="330.0" y="110" text-anchor="middle">0</text><text class="fs-label halo" data-fig="e1-1-1" x="243.3" y="60" text-anchor="middle">1</text><text class="fs-label halo" data-fig="e2-0-0" x="243.3" y="199.0" text-anchor="middle">0</text><text class="fs-label halo" data-fig="e2-1-3" x="503.3" y="110" text-anchor="middle">1</text><text class="fs-label halo" data-fig="e3-0-2" x="503.3" y="188.0" text-anchor="middle">0</text><text class="fs-label is-found halo" data-fig="e3-1-1" x="416.7" y="199.0" text-anchor="middle">1 / 1</text><text class="legend" x="652" y="232" text-anchor="end">1011, Mealy</text></svg>
 
     <!-- /gen -->
 
@@ -78,7 +84,7 @@ added: 2026-10-22
 
     <!-- /gen -->
 
-    #### השלבים { .sol-steps }
+    </div>
 
     <div class="steps" markdown>
 
@@ -88,6 +94,11 @@ added: 2026-10-22
        חוזר ל-`S0` (`100` לא מסתיים בשום התחלה); `S3` עם `0` ל-`S2` (`1010` מסתיים ב-`10`).
     4. **זיהוי :** ‏`S3` עם `1` מוציא 1 ועובר ל-`S1`, כי `1011` מסתיים ב-`1`.
     5. **איפוס :** המצב ההתחלתי `S0`, והמוצא נמוך בו.
+    6. **דוגמה :** ‏`1011011`. אחרי `101` המכונה ב-`S3`, וה-`1` הרביעי מזהה (הפלט 1) ומחזיר
+       ל-`S1`. ‏`0` ו-`1` מביאים שוב ל-`S3`, וה-`1` האחרון מזהה שוב : שני זיהויים, והשני משתמש
+       ב-`1` האחרון של הראשון.
+
+    </div>
 
     </div>
 

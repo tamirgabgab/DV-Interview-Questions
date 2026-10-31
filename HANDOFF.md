@@ -1723,14 +1723,25 @@ section below starts at session 22, whose numbered items run on through the late
     r goes 1, 0, 0, 1), whose walk lights arc after arc, as part b's example of 6 does.
     `q0055.py` keys every state and arc (`data-fig`); `div.steps-fig[data-fig-steps]` lists
     per step what it lights (CONTRIBUTING, "the solution blocks"); `question-page.js` does
-    the rest. The test checks the keys and that both walks follow the machine. If the owner
-    likes it, the next candidates are 0040 (the 1011 detector) and 0031 (bridge and torch).
+    the rest. The test checks the keys and that both walks follow the machine.
+116. **The figure beside the steps on three more questions (session 31, 2026-10-31).** The
+    owner asked which questions with a state diagram could have it: 0040, 0032 and 0052 fit
+    (0056 less so; 0018 and 0063 do not; the Mermaid diagrams cannot be lit, Mermaid draws
+    in a closed shadow root). The owner's choices: 0040 part a with a sixth step, an example
+    (`1011011`, two detections, the second on the first one's last `1`, walked arc by arc);
+    0032 with the state graph moved into part b's steps (the BFS steps light the start, the
+    goal, the four crossings out of the start, the way back, and a new fifth step walks part
+    a's seven crossings); 0052 part a, each equation's step lighting its state and the
+    arrows out of it. Their figures are wide and low, so from 60em up such a figure sticks
+    above the steps (24rem wide, on the surface) instead of beside them, and the reading
+    line is lower there (the owner's choice). Keys in q0040, q0052 and q0032; a test per
+    question; `page_tests.fig_steps` and `lit` for them.
 
 ## In progress
 
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
-  the figure beside the steps on 0055 (item 115).
+  the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
 - **Session 30 (2026-10-31):** interview mode, the builder, my map and the quick jump (work
   log item 109) published (`main` df3f829, deploy green); then the hero's chip (item 111).
   The owner checks the live site (desktop and phone, light and dark).

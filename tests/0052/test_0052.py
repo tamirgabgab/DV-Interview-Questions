@@ -157,3 +157,14 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(52)
+
+
+def test_steps_light_the_right_parts():
+    """The two chains beside part a's steps: every key a step lights is in the figure, and
+    each step lights one state and exactly the arrows out of it (its equation's terms)."""
+    from page_tests import fig_steps, lit
+
+    ((plan, keys),) = fig_steps(52)
+    assert lit(plan) <= keys, lit(plan) - keys
+    for text, (pattern, s) in zip(plan, (("HT", 1), ("HT", 0), ("HH", 1), ("HH", 0))):
+        assert set(text.split()) == {f"{pattern}-n{s}"} | {f"{pattern}-e{s}-{c}-{q0052.step(pattern, s, c)}" for c in "HT"}

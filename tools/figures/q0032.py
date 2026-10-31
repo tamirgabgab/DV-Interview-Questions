@@ -181,7 +181,9 @@ def plan_table():
 
 def graph_svg():
     """Sixteen states in two rows (the farmer near, the farmer far), the six unsafe ones
-    struck out, the legal crossings as edges and the two shortest paths highlighted."""
+    struck out, the legal crossings as edges and the two shortest paths highlighted. Every
+    state and crossing carries a key in data-fig (`n<state>`, `e<low>-<high>` for the two
+    states a crossing joins), which the steps beside the figure light (question-page.js)."""
     w, h = 640, 250
     col = lambda s: (s >> 1) & 7                      # the item mask
     X = lambda s: 48 + col(s) * 78
@@ -198,16 +200,17 @@ def graph_svg():
         for item, t in moves(s):
             if safe(t):
                 cls = "box-path" if frozenset((s, t)) in on_path else "ink-line"
-                p.append(f'<line class="{cls}" x1="{X(s)}" y1="{Y(s) + 20}" x2="{X(t)}" y2="{Y(t) - 20}" '
+                p.append(f'<line class="{cls}" data-fig="e{min(s, t)}-{max(s, t)}" x1="{X(s)}" y1="{Y(s) + 20}" x2="{X(t)}" y2="{Y(t) - 20}" '
                          f'stroke-width="{3 if cls == "box-path" else 1}" {"" if cls == "box-path" else "stroke-opacity=\"0.4\""}/>')
     for s in range(16):
         ok = safe(s)
         cls = "st-ok" if s in (0, 15) else "st-cell" if ok else "st-bad"
-        p.append(f'<rect class="{cls}" x="{X(s) - 32}" y="{Y(s) - 20}" width="64" height="40" rx="6"/>')
+        p.append(f'<g data-fig="n{s}"><rect class="{cls}" x="{X(s) - 32}" y="{Y(s) - 20}" width="64" height="40" rx="6"/>')
         p.append(f'<text class="st-text st-sm" x="{X(s)}" y="{Y(s) - 4}" text-anchor="middle">{bank_text(s, 0)}</text>'
                  f'<text class="st-text st-sm" x="{X(s)}" y="{Y(s) + 14}" text-anchor="middle">{bank_text(s, 1)}</text>')
         if not ok:
             p.append(f'<line class="pg-strike" x1="{X(s) - 26}" y1="{Y(s) + 16}" x2="{X(s) + 26}" y2="{Y(s) - 16}"/>')
+        p.append("</g>")
     p.append('<text class="legend" x="8" y="16">farmer near: near bank / far bank</text>')
     p.append('<text class="legend" x="8" y="240">farmer far</text>')
     p.append("</svg>")

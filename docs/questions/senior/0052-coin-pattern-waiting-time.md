@@ -63,11 +63,20 @@ added: 2026-10-27
 
     המצב הוא **כמה מהרצף נמצא עכשיו בסוף ההטלות**, בדיוק כמו בגלאי רצף בחומרה
     ([שאלה 0040](../student/0040-sequence-detector-1011.md)). לשני הרצפים יש שלושה מצבים :
-    התחלה, `H` בסוף, והרצף שלם. המעברים זהים חוץ ממעבר אחד :
+    התחלה, `H` בסוף, והרצף שלם. המעברים זהים חוץ ממעבר אחד, והשרשראות בשלבים, ליד הצעדים.
+
+    ב-`HT`, אחרי `H` כל המשך טוב לנו : `T` מסיים, ו-`H` משאיר `H` בסוף. ב-`HH`, אחרי
+    `H` ההטלה `T` שולחת להתחלה, ומשם צריך שוב לחכות ל-`H`. זה כל ההבדל.
+
+    #### השלבים { .sol-steps }
+
+    <div class="steps-fig" data-fig-steps='["HT-n1 HT-e1-T-2 HT-e1-H-1", "HT-n0 HT-e0-H-1 HT-e0-T-0", "HH-n1 HH-e1-H-2 HH-e1-T-0", "HH-n0 HH-e0-H-1 HH-e0-T-0"]' markdown>
+
+    <div class="sf-fig" markdown>
 
     <!-- gen 0 -->
 
-    <svg class="figure cp-fig" viewBox="0 0 660 300" style="max-width:41rem" role="img" aria-label="שרשראות המצבים של HH ושל HT : שלושה מצבים כל אחת, החצים מסומנים בהטלה"><defs><marker id="cp-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><line class="fs-edge" x1="106" y1="92" x2="242" y2="92" marker-end="url(#cp-arrow)"/><text class="fs-label halo" x="175.0" y="84" text-anchor="middle">H</text><line class="fs-edge is-found" x1="296" y1="92" x2="432" y2="92" marker-end="url(#cp-arrow)"/><text class="fs-label is-found halo" x="365.0" y="84" text-anchor="middle">T</text><path class="fs-edge" d="M71,69 C50,28 110,28 89,68" marker-end="url(#cp-arrow)"/><text class="fs-label halo" x="80" y="38" text-anchor="middle">T</text><path class="fs-edge" d="M261,69 C240,28 300,28 279,68" marker-end="url(#cp-arrow)"/><text class="fs-label halo" x="270" y="38" text-anchor="middle">H</text><g class="fs-node is-start"><circle cx="80" cy="92" r="26"/><text x="80" y="96" text-anchor="middle" style="font-size:11px">start</text></g><g class="fs-node"><circle cx="270" cy="92" r="26"/><text x="270" y="96" text-anchor="middle">H</text></g><g class="fs-node is-out"><circle cx="460" cy="92" r="26"/><text x="460" y="96" text-anchor="middle">HT</text></g><text class="cp-exp" x="600" y="98" text-anchor="middle">E = 4</text><line class="fs-edge" x1="106" y1="222" x2="242" y2="222" marker-end="url(#cp-arrow)"/><text class="fs-label halo" x="175.0" y="214" text-anchor="middle">H</text><line class="fs-edge is-found" x1="296" y1="222" x2="432" y2="222" marker-end="url(#cp-arrow)"/><text class="fs-label is-found halo" x="365.0" y="214" text-anchor="middle">H</text><path class="fs-edge" d="M71,199 C50,158 110,158 89,198" marker-end="url(#cp-arrow)"/><text class="fs-label halo" x="80" y="168" text-anchor="middle">T</text><path class="fs-edge is-back" d="M270,248 Q175.0,292 80,250" marker-end="url(#cp-arrow)"/><text class="fs-label halo" x="175.0" y="284" text-anchor="middle">T</text><g class="fs-node is-start"><circle cx="80" cy="222" r="26"/><text x="80" y="226" text-anchor="middle" style="font-size:11px">start</text></g><g class="fs-node"><circle cx="270" cy="222" r="26"/><text x="270" y="226" text-anchor="middle">H</text></g><g class="fs-node is-out"><circle cx="460" cy="222" r="26"/><text x="460" y="226" text-anchor="middle">HH</text></g><text class="cp-exp" x="600" y="228" text-anchor="middle">E = 6</text></svg>
+    <svg class="figure cp-fig" viewBox="0 0 660 300" style="max-width:41rem" role="img" aria-label="שרשראות המצבים של HH ושל HT : שלושה מצבים כל אחת, החצים מסומנים בהטלה"><defs><marker id="cp-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><line class="fs-edge" data-fig="HT-e0-H-1" x1="106" y1="92" x2="242" y2="92" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HT-e0-H-1" x="175.0" y="84" text-anchor="middle">H</text><line class="fs-edge is-found" data-fig="HT-e1-T-2" x1="296" y1="92" x2="432" y2="92" marker-end="url(#cp-arrow)"/><text class="fs-label is-found halo" data-fig="HT-e1-T-2" x="365.0" y="84" text-anchor="middle">T</text><path class="fs-edge" data-fig="HT-e0-T-0" d="M71,69 C50,28 110,28 89,68" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HT-e0-T-0" x="80" y="38" text-anchor="middle">T</text><path class="fs-edge" data-fig="HT-e1-H-1" d="M261,69 C240,28 300,28 279,68" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HT-e1-H-1" x="270" y="38" text-anchor="middle">H</text><g class="fs-node is-start" data-fig="HT-n0"><circle cx="80" cy="92" r="26"/><text x="80" y="96" text-anchor="middle" style="font-size:11px">start</text></g><g class="fs-node" data-fig="HT-n1"><circle cx="270" cy="92" r="26"/><text x="270" y="96" text-anchor="middle">H</text></g><g class="fs-node is-out" data-fig="HT-n2"><circle cx="460" cy="92" r="26"/><text x="460" y="96" text-anchor="middle">HT</text></g><text class="cp-exp" x="600" y="98" text-anchor="middle">E = 4</text><line class="fs-edge" data-fig="HH-e0-H-1" x1="106" y1="222" x2="242" y2="222" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HH-e0-H-1" x="175.0" y="214" text-anchor="middle">H</text><line class="fs-edge is-found" data-fig="HH-e1-H-2" x1="296" y1="222" x2="432" y2="222" marker-end="url(#cp-arrow)"/><text class="fs-label is-found halo" data-fig="HH-e1-H-2" x="365.0" y="214" text-anchor="middle">H</text><path class="fs-edge" data-fig="HH-e0-T-0" d="M71,199 C50,158 110,158 89,198" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HH-e0-T-0" x="80" y="168" text-anchor="middle">T</text><path class="fs-edge is-back" data-fig="HH-e1-T-0" d="M270,248 Q175.0,292 80,250" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HH-e1-T-0" x="175.0" y="284" text-anchor="middle">T</text><g class="fs-node is-start" data-fig="HH-n0"><circle cx="80" cy="222" r="26"/><text x="80" y="226" text-anchor="middle" style="font-size:11px">start</text></g><g class="fs-node" data-fig="HH-n1"><circle cx="270" cy="222" r="26"/><text x="270" y="226" text-anchor="middle">H</text></g><g class="fs-node is-out" data-fig="HH-n2"><circle cx="460" cy="222" r="26"/><text x="460" y="226" text-anchor="middle">HH</text></g><text class="cp-exp" x="600" y="228" text-anchor="middle">E = 6</text></svg>
 
     <!-- /gen -->
 
@@ -77,10 +86,7 @@ added: 2026-10-27
 
     <!-- /gen -->
 
-    ב-`HT`, אחרי `H` כל המשך טוב לנו : `T` מסיים, ו-`H` משאיר `H` בסוף. ב-`HH`, אחרי
-    `H` ההטלה `T` שולחת להתחלה, ומשם צריך שוב לחכות ל-`H`. זה כל ההבדל.
-
-    #### השלבים { .sol-steps }
+    </div>
 
     <div class="steps" markdown>
 
@@ -90,6 +96,8 @@ added: 2026-10-27
     3. **‏HH, ממצב `H` :** ‏\( E_1 = 1 + \tfrac12 \cdot 0 + \tfrac12 E_0 \).
     4. **‏HH, מההתחלה :** ‏\( E_0 = 1 + \tfrac12 E_1 + \tfrac12 E_0 \), כלומר
        \( E_0 = 2 + E_1 = 3 + \tfrac12 E_0 \), ולכן \( E_0 = 6 \).
+
+    </div>
 
     </div>
 

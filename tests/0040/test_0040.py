@@ -137,3 +137,27 @@ def test_explorer_fallback():
                 assert fb["text"] == text and fb["target"] == want and fb["shift"] == len(text) - want
                 if s < len(p):
                     assert fb["target"] == nxt[s][b], (p, s, b)
+
+
+def test_steps_light_the_right_parts():
+    """The machine beside part a's steps: every key a step lights is in the figure, the
+    example step walks the machine on 1011011 (a detection goes back to rest), and the
+    advancing, falling-back and detecting steps light exactly those edges."""
+    from page_tests import fig_steps, lit
+
+    ((plan, keys),) = fig_steps(40)
+    assert lit(plan) <= keys, lit(plan) - keys
+    nxt, L, rest = q0040.table("1011"), 4, q0040.rest("1011")
+    walk, s = [], 0
+    for b in map(int, "1011011"):
+        t = nxt[s][b]
+        t = rest if t == L else t
+        walk.append(f"e{s}-{b}-{t} n{t}")
+        s = t
+    assert plan[5].split(">") == walk
+    edges = {(s, b): (rest if nxt[s][b] == L else nxt[s][b]) for s in range(L) for b in (0, 1)}
+    kind = lambda s, b: "found" if nxt[s][b] == L else "on" if edges[s, b] == s + 1 else "back"
+    for i, want in ((1, "on"), (2, "back")):
+        got = {k for k in plan[i].split() if k.startswith("e")}
+        assert got == {f"e{s}-{b}-{edges[s, b]}" for (s, b) in edges if kind(s, b) == want}
+    assert {k for k in plan[3].split() if k.startswith("e")} == {f"e{s}-{b}-{edges[s, b]}" for (s, b) in edges if kind(s, b) == "found"}

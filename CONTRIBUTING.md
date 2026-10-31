@@ -188,9 +188,11 @@ Conventions:
     parts it lights (the generator puts them in `data-fig`: `n<i>` for a state,
     `e<i>-<bit>-<j>` for an arc and its label); `"a b>c d"` lights a and b, then c and d (a
     walk). The active step lights its parts in amber and dims the rest; from 60em up the
-    figure sticks beside the steps and the step at the middle of the window is active, and
-    a click, a tap or the focus on a step makes it active everywhere (`question-page.js`).
-    The question's test checks the keys against the generator (see `tests/0055`);
+    figure sticks beside the steps (above them when it is wider than 1.8 times its height,
+    `.sf-top`) and the step at the reading line is active, and a click, a tap or the focus
+    on a step makes it active everywhere (`question-page.js`). Pages with one: 0055, 0040,
+    0052, 0032. The question's test checks the keys against the generator
+    (`page_tests.fig_steps` and `lit`);
   - traps and follow-ups at the end use `??? trap "מלכודת: ..."` and `??? followup`. On
     the built page the hook gathers the traps into one "מלכודות נפוצות (n)" group with
     numbered rows and drops the "מלכודת :" prefix of each title (`.trap-group`).
