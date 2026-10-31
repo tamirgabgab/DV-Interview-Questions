@@ -25,8 +25,8 @@ The piece:
 - a reverb: the sum convolved with a synthetic impulse response (decaying noise, 2.6-3.4 s,
   the highs decaying faster, a different noise for each ear, which gives the width);
 - a 3 s fade-in and a 4 s fade-out that end exactly at the video's length;
-- loudness: ffmpeg's loudnorm in two passes (measure, then a linear gain) to -24 LUFS
-  integrated, true peak under -2 dBTP. The narration will sit near -16 LUFS, about 8 dB
+- loudness: ffmpeg's loudnorm in two passes (measure, then a linear gain) to -28 LUFS
+  integrated, true peak under -2 dBTP. The narration will sit near -16 LUFS, about 12 dB
   above, and duck the music a few dB more (VIDEOS.md has the filter graph).
 
 The seed picks the progression (and with it the mode), the key, the arpeggio pattern by
@@ -50,7 +50,7 @@ from pathlib import Path
 import numpy as np
 
 SR = 48000
-TARGET_LUFS = -24.0
+TARGET_LUFS = -28.0   # the owner, 2026-10-31: softer than the first -24
 TARGET_TP = -2.0
 FADE_IN = 3.0
 FADE_OUT = 4.0
@@ -182,10 +182,10 @@ def plan(seed: int) -> Plan:
         seed=seed, key=KEYS[(seed * 3) % len(KEYS)], mode=mode, prog_name=name,
         prog=list(prog), pattern=pats[(seed * 3) % len(pats)],
         bpm=float(rng.uniform(66, 88)),
-        saw=float(rng.uniform(0.25, 0.8)), cutoff=float(rng.uniform(900, 1600)),
+        saw=float(rng.uniform(0.25, 0.8)), cutoff=float(rng.uniform(700, 1100)),
         detune=float(rng.uniform(4, 9)), spread=float(rng.uniform(0.3, 0.55)),
-        piano=float(rng.uniform(0.95, 1.25)),
-        sub=float(rng.uniform(0.25, 0.4)) if rng.random() < 0.75 else 0.0,
+        piano=float(rng.uniform(2.2, 2.7)),   # the piano leads; the pad sits behind it
+        sub=float(rng.uniform(0.08, 0.14)) if rng.random() < 0.5 else 0.0,   # a hint of bass at most
         rt60=float(rng.uniform(2.6, 3.4)), wet=float(rng.uniform(0.45, 0.6)),
         arp_low=int(rng.integers(58, 63)),
     )
@@ -439,7 +439,7 @@ def render(seed: int, seconds: float) -> tuple[np.ndarray, Plan]:
     if p.sub:
         sub_buf *= p.sub / rms(sub_buf)
     dry = pad_buf + piano_buf + sub_buf
-    send = 0.65 * pad_buf + 0.6 * piano_buf + 0.1 * sub_buf
+    send = 0.5 * pad_buf + 0.6 * piano_buf + 0.05 * sub_buf
     wet = reverb(send, p.rt60, rng)
     mix = dry + p.wet * wet[:, :dry.shape[1]]
     mix = mix[:, :total]

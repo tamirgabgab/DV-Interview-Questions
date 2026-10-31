@@ -3,7 +3,7 @@
     python videos/render.py 0002            # 720p30 (1280x720), the version to upload
     python videos/render.py 0002 --draft    # 480p15, a quick look
     python videos/render.py 0002 --captions-only   # only out/captions.en.vtt, no render
-    python videos/render.py 0002 --music-only      # only the music, remuxed into out/*.mp4
+    python videos/render.py 0002 --music-only      # only the music: out/music.wav and music.mp3
 
 Run it with the Python that has Manim (requirements-video.txt). The Hebrew labels are drawn
 first by videos/lib/he_label.py with a Python that has Playwright (`--label-python`, or
@@ -22,21 +22,24 @@ Steps:
    before it) and write captions.vtt and chapters.txt (lib/captions.py), and
    captions.en.vtt: the same cues with the English of `videos/<id>/captions.en.md`.
 6. Generate the music (lib/music.py, seeded by the question's id or scene.py's
-   MUSIC_SEED) for the video's exact length, write out/music.wav, and mux it into
-   video.mp4: the video stream copied, the music as AAC at 160 kbps.
+   MUSIC_SEED) for the video's exact length and write it beside the video, as
+   out/music.wav and out/music.mp3. The video stays silent: the owner edits the two
+   together himself (2026-10-31). `--mux-music` puts the music into video.mp4 instead
+   (the video stream copied, the music as AAC at 160 kbps).
 7. Fail on a caption shorter than 1.5 s or longer than 7 s, a caption that breaks the RTL or
    colon rules, a beat with no still frame at its end, captions that differ from
    script.md, or a translation file that misses a caption or has an entry for one that no
    longer exists (checked in step 1 too, before the long render). A video with no
    captions.en.md yet gets a warning and no English track.
 
-Output: videos/<id>/out/video.mp4 (with the music), music.wav, captions.vtt,
+Output: videos/<id>/out/video.mp4 (silent), music.wav, music.mp3, captions.vtt,
 captions.en.vtt, chapters.txt; with --preview also preview.mp4, the captions burned in and
-the same music, for review in a plain player. `--no-music` leaves the video silent.
+the same soundtrack as video.mp4, for review in a plain player. `--no-music` makes no
+music at all.
 
-`--music-only` renders no scene: it regenerates out/music.wav for the length of the existing
-out/video.mp4 and remuxes it into video.mp4 and, when it exists, preview.mp4 (their video
-streams copied, any old soundtrack replaced).
+`--music-only` renders no scene: it regenerates out/music.wav and music.mp3 for the length
+of the existing out/video.mp4, leaving the video silent (or, with `--mux-music`, remuxing the
+music into video.mp4 and preview.mp4, their video streams copied).
 
 `--captions-only` renders nothing: it writes out/captions.en.vtt from the existing
 out/captions.vtt (its cues and times) and captions.en.md, so a wording fix of the English
@@ -169,8 +172,18 @@ def mux_music(movie: Path, wav: Path) -> None:
     os.replace(tmp, movie)
 
 
-def add_music(out: Path, seed: int, movies: list[Path]) -> None:
-    """Generate out/music.wav for the length of out/video.mp4 and mux it into `movies`."""
+def strip_audio(movie: Path) -> None:
+    """Drop any soundtrack from `movie`, the video stream copied."""
+    tmp = movie.with_suffix(".tmp.mp4")
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(movie), "-map", "0:v:0",
+                    "-c:v", "copy", "-an", "-movflags", "+faststart", str(tmp)], check=True)
+    os.replace(tmp, movie)
+
+
+def add_music(out: Path, seed: int, movies: list[Path], mux: bool = False) -> None:
+    """Generate out/music.wav and out/music.mp3 for the length of out/video.mp4. With
+    `mux`, put the music into `movies`; without, leave them silent (any old soundtrack is
+    dropped), the music a file of its own beside them."""
     import music  # numpy, only needed here
 
     seconds = video_seconds(out / "video.mp4")
@@ -180,19 +193,26 @@ def add_music(out: Path, seed: int, movies: list[Path]) -> None:
     print(f"music: {info['seconds']:.2f} s, {info['lufs']:.1f} LUFS, true peak "
           f"{info['true_peak']:.1f} dBTP, largest step {info['max_step_over_rms']:.2f} x RMS, "
           f"{info['spikes']} click(s)")
+    mp3 = out / "music.mp3"
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(wav), "-c:a", "libmp3lame",
+                    "-b:a", "320k", str(mp3)], check=True)
+    print(f"music: {wav.relative_to(VIDEOS.parent)} and {mp3.name}")
     for movie in movies:
-        mux_music(movie, wav)
-        print(f"music: muxed into {movie.relative_to(VIDEOS.parent)}")
+        if mux:
+            mux_music(movie, wav)
+            print(f"music: muxed into {movie.relative_to(VIDEOS.parent)}")
+        else:
+            strip_audio(movie)
 
 
-def music_only(folder: Path, seed: int) -> int:
+def music_only(folder: Path, seed: int, mux: bool = False) -> int:
     out = folder / "out"
     video = out / "video.mp4"
     if not video.exists():
         print(f"{video.relative_to(VIDEOS.parent)} does not exist: render the video first",
               file=sys.stderr)
         return 1
-    add_music(out, seed, [m for m in (video, out / "preview.mp4") if m.exists()])
+    add_music(out, seed, [m for m in (video, out / "preview.mp4") if m.exists()], mux)
     return 0
 
 
@@ -222,9 +242,11 @@ def main() -> int:
                     help="render nothing: write out/captions.en.vtt from out/captions.vtt "
                          "and captions.en.md")
     ap.add_argument("--music-only", action="store_true",
-                    help="render no scene: regenerate out/music.wav and remux it into "
-                         "out/video.mp4 (and out/preview.mp4)")
-    ap.add_argument("--no-music", action="store_true", help="leave the video silent")
+                    help="render no scene: regenerate out/music.wav and music.mp3 for the "
+                         "existing out/video.mp4 (with --mux-music, remux it in)")
+    ap.add_argument("--no-music", action="store_true", help="make no music at all")
+    ap.add_argument("--mux-music", action="store_true",
+                    help="put the music into video.mp4 instead of a file beside it")
     args = ap.parse_args()
 
     qid = f"{int(args.qid):04d}"
@@ -236,7 +258,7 @@ def main() -> int:
     lits = module_literals(scene_py)
     seed = int(lits.get("MUSIC_SEED", int(qid)))   # scene.py may pick another piece
     if args.music_only:
-        return music_only(folder, seed)
+        return music_only(folder, seed, args.mux_music)
     scenes = lits["SCENES"]                     # [(class, chapter title), ...]
     problems: list[str] = []
 
@@ -336,7 +358,7 @@ def main() -> int:
         if vtt_en:
             (out / "captions.en.vtt").write_text(vtt_en, encoding="utf-8")
     if not args.no_music:
-        add_music(out, seed, [video])
+        add_music(out, seed, [video], args.mux_music)
     if args.preview and (not problems or args.keep_going):
         burn_preview(out)
     size = video.stat().st_size / 1e6
