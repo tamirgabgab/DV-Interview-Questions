@@ -1,0 +1,392 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0006: the maximum profit from a stock,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:08.100
+Two parts: first long trades only,
+then short trades too.
+
+3
+00:00:08.900 --> 00:00:13.933
+An array prices holds the stock's price on each day.
+One trade is allowed.
+
+4
+00:00:14.733 --> 00:00:19.633
+Part A: buy on one day,
+sell on a later day. A long trade.
+
+5
+00:00:20.333 --> 00:00:24.633
+The page's prices: 5, 8, 3, 9, 2, 6,
+one price per day.
+
+6
+00:00:24.633 --> 00:00:29.733
+Buy on day i, sell on day j > i.
+The profit: prices[j] − prices[i].
+
+7
+00:00:29.733 --> 00:00:34.767
+The direct way checks every pair of days:
+15 pairs here, O(n²) time in general.
+
+8
+00:00:34.767 --> 00:00:40.367
+The idea: when selling on day j, the best buy
+is at the lowest price up to that day.
+
+9
+00:00:40.367 --> 00:00:45.167
+So it is enough to remember the minimum so far
+and scan the array once.
+
+10
+00:00:45.967 --> 00:00:51.467
+This is the page's box, on the same prices.
+The blue line is the minimum so far.
+
+11
+00:00:51.467 --> 00:00:55.700
+Day 0: the price is 5. There is no earlier day,
+so 5 is the minimum.
+
+12
+00:00:55.700 --> 00:00:59.933
+Day 1: 8 − 5 = 3.
+The best long so far earns 3.
+
+13
+00:00:59.933 --> 00:01:04.467
+Day 2: 3 − 5 is negative, no profit.
+But 3 is the new minimum.
+
+14
+00:01:04.467 --> 00:01:09.133
+Day 3: 9 − 3 = 6. A new best long:
+buy on day 2, sell on day 3.
+
+15
+00:01:09.133 --> 00:01:12.667
+Day 4: 2 − 3 is negative.
+The new minimum is 2.
+
+16
+00:01:12.667 --> 00:01:17.333
+Day 5: 6 − 2 = 4, less than 6.
+The answer: profit 6, days 2 and 3.
+
+17
+00:01:18.133 --> 00:01:21.800
+Now let's write it in Python, line by line.
+
+18
+00:01:23.433 --> 00:01:27.933
+max_long_fast takes the list of prices and returns
+the profit, the buy day and the sell day.
+
+19
+00:01:30.433 --> 00:01:33.967
+Line 2: no trade yet.
+Profit 0, and no days.
+
+20
+00:01:36.967 --> 00:01:41.467
+Lines 3–4: an empty list returns
+"no trade" right away.
+
+21
+00:01:43.600 --> 00:01:48.100
+Line 5: the minimum so far starts
+at the first day's price, day 0.
+
+22
+00:01:50.400 --> 00:01:54.900
+Line 6: go over the days in order.
+i is the day, p its price.
+
+23
+00:01:59.100 --> 00:02:03.600
+Lines 7–8: sell today, bought at the minimum.
+A larger profit is saved with both days.
+
+24
+00:02:06.267 --> 00:02:10.767
+Lines 9–10: update the minimum only after the check,
+so we never buy and sell on the same day.
+
+25
+00:02:12.600 --> 00:02:16.000
+Line 11: return the best trade.
+
+26
+00:02:16.700 --> 00:02:21.167
+Let's run the code on the example,
+with the page's box stepping along.
+
+27
+00:02:21.167 --> 00:02:25.567
+Lines 2–5: no trade yet,
+and the minimum is 5, from day 0.
+
+28
+00:02:25.567 --> 00:02:31.100
+Day 0: 5 − 5 = 0, not more than 0.
+The minimum stays 5.
+
+29
+00:02:31.100 --> 00:02:36.633
+Day 1: 8 − 5 = 3. Line 8 saves profit 3,
+buy on day 0, sell on day 1.
+
+30
+00:02:36.633 --> 00:02:42.167
+Day 2: 3 − 5 is negative, and line 10
+moves the minimum to 3, on day 2.
+
+31
+00:02:42.167 --> 00:02:47.700
+Day 3: 9 − 3 = 6, more than 3.
+The new trade: days 2 and 3.
+
+32
+00:02:47.700 --> 00:02:53.233
+Day 4: 2 − 3 is negative.
+The minimum drops to 2, on day 4.
+
+33
+00:02:53.233 --> 00:02:58.767
+Day 5: 6 − 2 = 4, less than 6.
+Nothing changes.
+
+34
+00:02:58.767 --> 00:03:03.500
+The loop is done. The answer:
+profit 6, buy on day 2, sell on day 3.
+
+35
+00:03:04.300 --> 00:03:09.700
+Why it works: for each sell day j, the best buy
+is at the minimum of the days before it.
+
+36
+00:03:09.700 --> 00:03:15.500
+The loop checks exactly that value for every day,
+so its maximum is the maximum over all pairs.
+
+37
+00:03:16.300 --> 00:03:21.467
+The trap: the highest price minus
+the lowest price of the whole array.
+
+38
+00:03:21.467 --> 00:03:26.967
+For 9, 1 the difference is 8, but the buy must come
+before the sale: no long makes a profit.
+
+39
+00:03:27.767 --> 00:03:33.267
+The cost: one pass, O(n) time, and O(1) memory,
+instead of O(n²) for all pairs.
+
+40
+00:03:34.065 --> 00:03:37.265
+Part B: the twist. Short selling is allowed too.
+
+41
+00:03:38.765 --> 00:03:43.165
+A short: sell on day i,
+buy it back on a later day j.
+
+42
+00:03:43.165 --> 00:03:47.165
+The short's profit: prices[i] − prices[j].
+It earns when the price falls.
+
+43
+00:03:47.165 --> 00:03:52.199
+In the example, the best long earns 6,
+and the best short earns 7.
+
+44
+00:03:52.199 --> 00:03:55.699
+So the answer: short, profit 7, days 3 and 4.
+
+45
+00:03:56.299 --> 00:04:00.599
+The idea: a short's profit is minus
+the long's profit on the same days.
+
+46
+00:04:00.599 --> 00:04:05.999
+So for the short we remember the maximum so far,
+and both run in the same loop.
+
+47
+00:04:06.799 --> 00:04:11.965
+In the box: the blue line is the minimum so far,
+the orange one the maximum so far.
+
+48
+00:04:11.965 --> 00:04:15.099
+Day 0: the minimum and the maximum are 5.
+
+49
+00:04:15.099 --> 00:04:18.699
+Day 1: long 8 − 5 = 3.
+The maximum rises to 8.
+
+50
+00:04:18.699 --> 00:04:22.299
+Day 2: short 8 − 3 = 5.
+The minimum drops to 3.
+
+51
+00:04:22.299 --> 00:04:25.899
+Day 3: long 9 − 3 = 6.
+The maximum rises to 9.
+
+52
+00:04:25.899 --> 00:04:29.499
+Day 4: short 9 − 2 = 7.
+The minimum drops to 2.
+
+53
+00:04:29.499 --> 00:04:34.532
+Day 5: long 4, short 3, no improvement.
+The short, 7, beats the long, 6.
+
+54
+00:04:35.332 --> 00:04:38.732
+In Python it is the same loop, with two candidates.
+
+55
+00:04:40.699 --> 00:04:45.199
+max_profit_fast returns the profit, the trade's type,
+and its opening and closing days.
+
+56
+00:04:48.665 --> 00:04:53.165
+Lines 2–3: a trade needs two days.
+With fewer than two prices there is none.
+
+57
+00:04:57.565 --> 00:05:02.065
+Lines 5–6: the minimum and maximum so far,
+both start at day 0's price.
+
+58
+00:05:08.999 --> 00:05:13.499
+Lines 8–9: two candidates, long and short,
+each with profit 0 and no days.
+
+59
+00:05:15.832 --> 00:05:18.732
+Line 11: one loop over all the days.
+
+60
+00:05:24.599 --> 00:05:29.099
+Lines 12–14: the long check, as in part A,
+against the minimum of the earlier days.
+
+61
+00:05:35.432 --> 00:05:39.932
+Lines 16–18: the mirror image for the short:
+the maximum so far minus today's price.
+
+62
+00:05:45.965 --> 00:05:50.465
+Lines 20–23: only after both checks
+are the minimum and maximum updated.
+
+63
+00:05:56.632 --> 00:06:01.032
+Lines 25–26: if the short beats the long,
+return it.
+
+64
+00:06:08.265 --> 00:06:12.765
+Lines 27–29: otherwise the long, if it earns.
+If not, there is no trade.
+
+65
+00:06:13.465 --> 00:06:17.432
+Let's run it on the example, day by day,
+beside the page's box.
+
+66
+00:06:17.432 --> 00:06:22.465
+Lines 2–9: the minimum and maximum are 5,
+and both candidates have profit 0.
+
+67
+00:06:22.465 --> 00:06:28.632
+Day 0: no profit either way.
+
+68
+00:06:28.632 --> 00:06:34.865
+Day 1: long 8 − 5 = 3, and line 23
+raises the maximum to 8.
+
+69
+00:06:34.865 --> 00:06:40.399
+Day 2: short 8 − 3 = 5, and line 21
+lowers the minimum to 3.
+
+70
+00:06:40.399 --> 00:06:45.932
+Day 3: long 9 − 3 = 6,
+and the maximum rises to 9.
+
+71
+00:06:45.932 --> 00:06:51.465
+Day 4: short 9 − 2 = 7,
+and the minimum drops to 2.
+
+72
+00:06:51.465 --> 00:06:56.932
+Day 5: long 4, short 3, no improvement.
+
+73
+00:06:56.932 --> 00:07:01.465
+The loop is done: the best long is 6,
+the best short 7.
+
+74
+00:07:01.465 --> 00:07:06.199
+Line 25: 7 is more than 6, so it returns
+short, profit 7, days 3 and 4.
+
+75
+00:07:06.999 --> 00:07:12.032
+The cost: still one pass, O(n) time,
+and constant extra memory, O(1).
+
+76
+00:07:12.032 --> 00:07:17.332
+For a million days: about 500 billion pairs,
+against only a million steps.
+
+77
+00:07:18.132 --> 00:07:23.032
+A trap: a tie between long and short.
+For 1, 4, 1: long 3 and short 3.
+
+78
+00:07:23.032 --> 00:07:28.532
+The strict comparison on line 25 returns the long.
+Any pair with the maximum profit is correct.
+
+79
+00:07:29.327 --> 00:07:34.860
+In short: the minimum so far gives the long,
+and the maximum so far gives the short.
+
+80
+00:07:34.860 --> 00:07:38.894
+Try your own prices in the box
+on the page of question 0006.
