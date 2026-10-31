@@ -83,3 +83,36 @@ def test_check_over_a_tree(tmp_path):
     assert problems == ["docs/questions/student/0002-swap.md: videos/0002/script.md has 2 '## Chapter' headings, the page has 3 parts",
                         "videos/0002/script.md:9: starts with neither a Hebrew letter nor the RLM mark (U+200F): 'bad start'"]
 
+
+
+def test_english_captions(tmp_path):
+    script = ("## Opening\n\n> שלב 1" + NB + ": temp = a.\n\n## Chapter א\n\n"
+              "> שלב 2" + NB + ": a = b. עכשיו a מחזיק 3,\n> וה-5 המקורי שמור.\n\n## Closing\n")
+    assert cv.caption_texts(script) == ["שלב 1" + NB + ": temp = a.",
+                                        "שלב 2" + NB + ": a = b. עכשיו a מחזיק 3,\nוה-5 המקורי שמור."]
+    one = "he: שלב 1" + NB + ": temp = a.\nen: Step 1: temp = a.\n"
+    two = ("he: שלב 2" + NB + ": a = b. עכשיו a מחזיק 3,\nhe: וה-5 המקורי שמור.\n"
+           "en: Step 2: a = b. Now a holds 3,\nen: and the original 5 is saved.\n")
+    good = "# 0002: the English captions\n\n" + one + "\n" + two
+    assert cv.translation_problems(script, good) == []
+
+    def says(translations, text):
+        got = cv.translation_problems(script, translations)
+        assert any(text in p for p in got), got
+
+    says(one, "no English entry for the caption")                              # a caption left out
+    says(good + "\nhe: שלב 3" + NB + ": נמחק.\nen: Step 3: gone.\n", "no longer exists")
+    says(two + "\n" + one, "not in the captions' order")
+    says(one + "\n" + two.replace("en: and", "en: and the value five, which was, until now, saved in temp, is still"),
+         "words in an English line")
+    says(one + "\n" + two + "en: a third line.\n", "3 English lines")
+    says(one.replace("Step 1", "שלב 1") + "\n" + two, "Hebrew in an English line")
+    says(one.split("en:")[0] + "\n" + two, "no 'en:' line")
+    says(one + "\nhello\n" + two, "neither 'he:', 'en:'")
+
+    write(tmp_path, "videos/0002/script.md", script)
+    write(tmp_path, "videos/0002/captions.en.md", one)
+    problems, _ = cv.check(tmp_path)
+    assert len(problems) == 1 and problems[0].startswith("videos/0002/captions.en.md: no English entry"), problems
+    write(tmp_path, "videos/0002/captions.en.md", good)
+    assert cv.check(tmp_path)[0] == []

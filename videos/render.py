@@ -2,6 +2,7 @@
 
     python videos/render.py 0002            # 720p30 (1280x720), the version to upload
     python videos/render.py 0002 --draft    # 480p15, a quick look
+    python videos/render.py 0002 --captions-only   # only out/captions.en.vtt, no render
 
 Run it with the Python that has Manim (requirements-video.txt). The Hebrew labels are drawn
 first by videos/lib/he_label.py with a Python that has Playwright (`--label-python`, or
@@ -17,13 +18,21 @@ Steps:
 4. Chain the scene files with ffmpeg's concat demuxer; streams with the same parameters are
    copied with no re-encode.
 5. Shift each scene's recorded captions by its offset (the real duration of the scene files
-   before it) and write captions.vtt and chapters.txt (lib/captions.py).
+   before it) and write captions.vtt and chapters.txt (lib/captions.py), and
+   captions.en.vtt: the same cues with the English of `videos/<id>/captions.en.md`.
 6. Fail on a caption shorter than 1.5 s or longer than 7 s, a caption that breaks the RTL or
-   colon rules, a beat with no still frame at its end, or captions that differ from
-   script.md.
+   colon rules, a beat with no still frame at its end, captions that differ from
+   script.md, or a translation file that misses a caption or has an entry for one that no
+   longer exists (checked in step 1 too, before the long render). A video with no
+   captions.en.md yet gets a warning and no English track.
 
-Output: videos/<id>/out/video.mp4, captions.vtt, chapters.txt; with --preview also
-preview.mp4, the captions burned in, for review in a plain player.
+Output: videos/<id>/out/video.mp4, captions.vtt, captions.en.vtt, chapters.txt; with
+--preview also preview.mp4, the captions burned in, for review in a plain player.
+
+`--captions-only` renders nothing: it writes out/captions.en.vtt from the existing
+out/captions.vtt (its cues and times) and captions.en.md, so a wording fix of the English
+needs no render. It fails when captions.vtt no longer matches script.md (render again) or
+when the translation file does not match the captions.
 """
 
 from __future__ import annotations
@@ -90,6 +99,47 @@ def norm(s: str) -> str:
     return "\n".join(caps.wrap(s))
 
 
+def read_english(folder: Path, captions: list[str], required: bool) -> tuple[list[str] | None, list[str]]:
+    """The English of the Hebrew captions from videos/<id>/captions.en.md, in order, and the
+    problems. With no translation file: (None, []) and a warning, or a problem if required."""
+    path = folder / caps.TRANSLATIONS
+    rel = path.relative_to(VIDEOS.parent).as_posix()
+    if not path.exists():
+        msg = f"{rel} does not exist, so there is no English track (see VIDEOS.md)"
+        if required:
+            return None, [msg]
+        print(f"warn {msg}", file=sys.stderr)
+        return None, []
+    entries, problems = caps.read_translations(path.read_text(encoding="utf-8"))
+    english, more = caps.translate(captions, entries)
+    problems = [f"{rel}: {p}" for p in problems + more]
+    return (None if problems else english), problems
+
+
+def captions_only(folder: Path) -> int:
+    """Write out/captions.en.vtt from out/captions.vtt and captions.en.md, rendering nothing."""
+    out = folder / "out"
+    src = out / "captions.vtt"
+    if not src.exists():
+        print(f"{src.relative_to(VIDEOS.parent)} does not exist: render the video first", file=sys.stderr)
+        return 1
+    cues = caps.parse_vtt(src.read_text(encoding="utf-8"))
+    texts = ["\n".join(caps.strip_isolates(line) for line in c["lines"]) for c in cues]
+    problems = []
+    if [caps.key(t) for t in texts] != [norm(c) for c in script_captions(folder / "script.md")]:
+        problems.append("out/captions.vtt differs from script.md: render the video again "
+                        "(the English track copies the cues of captions.vtt)")
+    english, more = read_english(folder, texts, required=True)
+    problems += more
+    if problems:
+        print("\n".join(f"  - {p}" for p in problems), file=sys.stderr)
+        return 1
+    dst = out / "captions.en.vtt"
+    dst.write_text(caps.english_vtt(cues, english), encoding="utf-8")
+    print(f"{dst.relative_to(VIDEOS.parent)}: {len(cues)} cues, the times of captions.vtt")
+    return 0
+
+
 def ffprobe(path: Path) -> dict:
     out = subprocess.run(
         ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
@@ -112,10 +162,15 @@ def main() -> int:
                     help="also write out/preview.mp4 with the captions burned in (for review)")
     ap.add_argument("--keep-going", action="store_true",
                     help="write the outputs even when a caption check fails (exit 1 still)")
+    ap.add_argument("--captions-only", action="store_true",
+                    help="render nothing: write out/captions.en.vtt from out/captions.vtt "
+                         "and captions.en.md")
     args = ap.parse_args()
 
     qid = f"{int(args.qid):04d}"
     folder = VIDEOS / qid
+    if args.captions_only:
+        return captions_only(folder)
     scene_py = folder / "scene.py"
     out = folder / "out"
     lits = module_literals(scene_py)
@@ -123,7 +178,9 @@ def main() -> int:
     problems: list[str] = []
 
     # 1. the captions in scene.py against script.md (before the long render)
-    script = [norm(c) for c in script_captions(folder / "script.md")]
+    script_raw = script_captions(folder / "script.md")
+    script = [norm(c) for c in script_raw]
+    english, problems = read_english(folder, script_raw, required=False)
     for text in literal_says(scene_py):
         if norm(text) not in script:
             problems.append(f"scene.py caption not in script.md: {text!r}")
@@ -205,9 +262,16 @@ def main() -> int:
                         + "".join(f"\n    video only:  {c}" for c in extra)
                         + ("" if missing or extra else "\n    (same captions, different order)"))
 
+    vtt_en = None
+    if english is not None:
+        english, more = read_english(folder, [c["text"] for c in cues], required=True)
+        problems += more
+        vtt_en = english and caps.english_vtt(cues, english)
     if not problems or args.keep_going:
         (out / "captions.vtt").write_text(vtt, encoding="utf-8")
         (out / "chapters.txt").write_text(chapters, encoding="utf-8")
+        if vtt_en:
+            (out / "captions.en.vtt").write_text(vtt_en, encoding="utf-8")
     if args.preview and (not problems or args.keep_going):
         burn_preview(out)
     size = video.stat().st_size / 1e6

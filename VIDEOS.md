@@ -19,7 +19,7 @@ Once their structure is approved, the rest follow it question by question.
 | Pace | Calm, in the style of 3Blue1Brown: animations of 1–2 s, every picture held 2–4 s for its caption |
 | Code beat | Python only |
 | Opening and closing | The drawn DV mark, the question's id and parts; the closing has the site's address and the question's id |
-| Captions (2026-10-31) | The pilots go up without our Hebrew captions: they covered the middle of the picture. YouTube's own captions are relied on, and the player does not force captions on. `render.py` still writes `captions.vtt`, kept for later |
+| Captions (2026-10-31) | Two caption tracks go up with every video: Hebrew (`captions.vtt`) and English (`captions.en.vtt`, for viewers who are not Israeli). Neither is on by default, on YouTube or in the site's player: shown, they cover part of the picture, so the viewer turns them on |
 | Review | The pilots are scripted and rendered in one go; the owner reviews the videos |
 | Pilots | 0002 (swap two variables) and 0004 (three mislabeled boxes) |
 
@@ -122,9 +122,10 @@ videos/
 │   └── he_label.py     # renders a Hebrew label to a transparent PNG with Playwright
 ├── 0002/
 │   ├── script.md       # the storyboard: per chapter, per beat, the picture and the caption (Hebrew)
+│   ├── captions.en.md  # the English captions: each Hebrew caption of script.md with its translation
 │   ├── scene.py        # the Manim scenes, one class per chapter + Opening + Closing
-│   └── out/            # rendered, not committed: video.mp4, captions.vtt, chapters.txt,
-│                       # parts/ (each scene's recorded captions), media/ (Manim's files)
+│   └── out/            # rendered, not committed: video.mp4, captions.vtt, captions.en.vtt,
+│                       # chapters.txt, parts/ (each scene's recorded captions), media/ (Manim's files)
 └── 0004/ …
 ```
 
@@ -140,6 +141,9 @@ videos/
   video's description.
 - **The scenes** are chained into one video with ffmpeg's concat (no re-encode), so a
   fix to chapter ב re-renders chapter ב only.
+- **The English captions** (`captions.en.md`) are written once the Hebrew captions are
+  final. `render.py` turns them into `captions.en.vtt`: the cues of `captions.vtt`, same
+  numbers and times, with the English text (see "The translation file" below).
 
 ### The script's format
 
@@ -179,6 +183,39 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
   - at most 12 words per line (a word is a run of characters with a letter or a digit
     in it, so a lone colon or dash does not count).
 
+### The translation file
+
+`videos/<id>/captions.en.md` pairs every caption of `script.md`, in the script's order,
+with its English translation:
+
+```text
+# 0002 — swap two variables: the English captions (lines starting with "#" are comments)
+
+he: שלב 1 : temp = a. הערך 5 נשמר ב-temp.
+en: Step 1: temp = a. The value 5 is saved in temp.
+
+he: שלב 2 : a = b. עכשיו a מחזיק 3,
+he: וה-5 המקורי עדיין שמור ב-temp.
+en: Step 2: a = b. Now a holds 3,
+en: and the original 5 is still saved in temp.
+```
+
+- **An entry** is the caption's `he:` lines, exactly as `script.md` has them (one `he:`
+  line per `> ` line), then the English cue's `en:` lines. A blank line ends it. Any
+  other line is an error, so a typo cannot hide.
+- **The English** is natural and technically precise, the DV and CS terms as an engineer
+  says them. It has one or two lines of at most 12 words and 60 characters, so it fits the
+  cue's time, with no Hebrew and no direction marks. Code and math stay as they are
+  (`v[i]`, `2³¹ − 1`, `(k + 1) % 3`); the parts are "Part A, B, C"; a Hebrew label drawn in
+  the frame is named in English, in quotes (the box "Red and Black" of 0004).
+- **The meaning** follows the page and the picture, not only the Hebrew words: the
+  translator reads the page and watches the beat.
+- **A change to a Hebrew caption** changes its `he:` lines too. `render.py` and
+  `check_videos.py` fail when a caption has no entry, when an entry is left for a caption
+  that no longer exists, or when the entries are out of order.
+- **The parser and the rules** live in `videos/lib/captions.py` (`read_translations`,
+  `translate`, `check_english`, `english_vtt`); `check_videos.py` loads the same module.
+
 ## Rendering
 
 - **Tools.**
@@ -192,20 +229,22 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
     `BraceLabel`.
 - **The command.** `~/.venvs/manim/bin/python videos/render.py 0002` (any Python with
   `requirements-video.txt`) renders the chapters at 720p30, chains them, and writes
-  `video.mp4`, `captions.vtt` and `chapters.txt` to `videos/0002/out/`. The flag
+  `video.mp4`, `captions.vtt`, `captions.en.vtt` and `chapters.txt` to `videos/0002/out/`. The flag
   `--draft` renders at 480p15 for a quick look, and `--preview` also writes
   `preview.mp4` with the captions burned in (libass, Rubik, `Encoding=-1` so the base
   direction is right to left) for a review in a plain player. The steps:
   1. **Read** `scene.py`'s `SCENES` (the scene classes in order, each with its chapter
      title for `chapters.txt`) and `script.md`'s captions, and fail early when a literal
-     caption of `scene.py` is not in the script or breaks a caption rule.
+     caption of `scene.py` is not in the script or breaks a caption rule, or when
+     `captions.en.md` does not match the script. A video with no `captions.en.md` yet gets
+     a warning and no English track.
   2. **Labels.** A Manim `--dry_run` lists the Hebrew labels, and `he_label.py` draws the
      missing ones in one browser session, with a Python that has Playwright
      (`--label-python`, default `python3`).
   3. **Render** every scene, then chain them with ffmpeg's concat demuxer: a stream copy
      when the scenes' parameters match (they do), a re-encode otherwise.
   4. **Captions.** Each scene's recorded captions are shifted by the real duration of the
-     scene files before it.
+     scene files before it. `captions.en.vtt` takes the same cues with the English text.
   5. **Fail** on a caption under 1.5 s or over 7 s, a line that breaks the RTL or colon
      rules, a beat whose still is under 2 s, a chapter under 10 s, captions that differ
      from `script.md` (text, line breaks or order), or a scene whose recorded length
@@ -213,6 +252,11 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
      `video_parts` for the front matter (the first part at 0, as the checks want: the
      link to part א plays the opening too).
   A pilot renders in about 2–3 minutes as a draft and 4–6 minutes at 720p30.
+- **The English track alone.** `python videos/render.py 0002 --captions-only` renders
+  nothing: it writes `out/captions.en.vtt` from the existing `out/captions.vtt` (its cues
+  and times) and `captions.en.md`, in a second, with any Python. It is the command after
+  a fix to the English. It fails when `captions.vtt` no longer matches `script.md` (render
+  the video again first) or when the translation file does not match the captions.
 - **Rendering stays local.** It does not run in CI: Manim and LaTeX are heavy, and the
   MP4 is not served from the site.
 
@@ -220,9 +264,13 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
 
 1. **Upload.** The owner uploads `video.mp4` to the YouTube channel. Unlisted or public
    is the owner's call per video.
-2. **Captions and chapters.** The owner adds `captions.vtt` as the Hebrew captions,
-   pastes `chapters.txt` into the description (YouTube makes chapters from it), and
-   turns captions on by default.
+2. **Captions and chapters.** In YouTube Studio, under the video's Subtitles:
+   - set the video's language to Hebrew;
+   - add a language, Hebrew, and upload `captions.vtt` as a file "with timing";
+   - add a language, English, and upload `captions.en.vtt` the same way;
+   - leave both tracks off by default: do not set either one as the default track, and do
+     not turn captions on for the video. The viewer picks a track in the player's settings;
+   - paste `chapters.txt` into the description (YouTube makes chapters from it).
 3. **The page.** The video id and the chapter times go into the page's front matter:
 
    ```yaml
@@ -277,7 +325,11 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
     whose script does not exist yet gets a warning, not a failure.
 
   For every `videos/*/script.md`, every caption line (`> …`) follows the caption rules
-  above. Its tests are in `tests/tools/test_check_videos.py`, and the hook's in
+  above. When `captions.en.md` exists beside it, every caption has an English entry
+  there, in order, no entry is left for a caption that no longer exists, and the English
+  follows its rules (two lines of 12 words at most, no Hebrew).
+
+  Its tests are in `tests/tools/test_check_videos.py`, and the hook's in
   `tests/hook/test_hook.py` (a page with a fake id, never a real page).
 - **The page checks** must stay green: `check_phone`, `check_keyboard` and axe. The dialog
   is checked as a component by `check_keyboard.py`, on the first question page with a
@@ -286,7 +338,8 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
   the close button removes.
 - **`render.py`** stops on a caption shorter than 1.5 s or longer than 7 s, on a beat
   with no still frame of 2 s at its end, on a chapter under 10 s, and on captions that
-  differ from `script.md` (see "Rendering").
+  differ from `script.md`, and on a `captions.en.md` that misses a caption or keeps an entry
+  for one that no longer exists (see "Rendering").
 
 ## Order of work
 
@@ -358,6 +411,7 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
 - **Voice.** Each caption is a full sentence, so a recorded voice (the owner's, or a
   generated one) can be added later. The captions become its script, and the timing
   moves to the voice track.
-- **An English version.** Only the captions file changes: a second `captions.en.vtt`.
+- **An English version.** Done for the captions (2026-10-31): `captions.en.md` and
+  `captions.en.vtt`. A voice in English would follow the same file.
 - **Long questions.** The protocol questions, 0020 to 0025, may need 4–5 minutes per
   part. Splitting a part into two chapters is allowed there.

@@ -1563,6 +1563,14 @@ section below starts at session 22, whose numbered items run on through the late
     `check_videos.py` in CI. Waiting for the owner's review and the YouTube upload; then
     the ids go into 0002 and 0004.
 
+102. **Video captions settled (session 28, 2026-10-31).** The owner found our Hebrew captions,
+    shown by default, distracting; the player no longer forces captions on. The Hebrew and
+    an English track (`videos/<id>/captions.en.md`, written to `captions.en.vtt`, also by
+    `render.py --captions-only` without a render) are uploaded to YouTube, both off by
+    default. The README has a "Tutorial videos" table written by `tools/catalog.py`.
+    Narration is the next step: a five-minute reading text for the owner's voice samples was
+    sent (not in the repo).
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),

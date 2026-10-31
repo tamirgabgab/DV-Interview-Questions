@@ -7,7 +7,9 @@ offset in the chained video and writes
 - `captions.vtt`: WebVTT, a cue per caption, wrapped to at most two lines, every code or
   math expression wrapped in Unicode isolates (`isolate()`);
 - `chapters.txt`: YouTube's chapter list for the description ("0:00 פתיחה", one line per
-  scene, the first at 0:00).
+  scene, the first at 0:00);
+- `captions.en.vtt`: the English track, the same cues and times with the English text of
+  `videos/<id>/captions.en.md` (`read_translations()`, `translate()`, `english_vtt()`).
 
 `check_caption()` holds the rules of CLAUDE.md and VIDEOS.md for a caption: every line
 starts with a Hebrew letter or an RLM, a colon has a no-break space before it, at most 12
@@ -17,6 +19,7 @@ words a line and 2 lines, and 1.5–7 s on screen.
 from __future__ import annotations
 
 import re
+from collections import Counter
 
 RLM = "‏"
 NBSP = " "
@@ -186,7 +189,8 @@ def build(parts: list[dict]) -> tuple[str, str, list[dict], list[str]]:
 
 
 def parse_vtt(text: str) -> list[dict]:
-    """A small WebVTT reader for the checks: the cues with their times and lines."""
+    """A small WebVTT reader for the checks: the cues with their times and lines (and the
+    timing line as written, so a second track can copy it exactly)."""
     if not text.startswith("WEBVTT"):
         raise ValueError("no WEBVTT header")
     cues = []
@@ -199,5 +203,133 @@ def parse_vtt(text: str) -> list[dict]:
         def sec(s):
             h, m, rest = s.split(":")
             return int(h) * 3600 + int(m) * 60 + float(rest)
-        cues.append({"id": lines[0], "start": sec(a), "end": sec(b), "lines": lines[2:]})
+        cues.append({"id": lines[0], "start": sec(a), "end": sec(b), "lines": lines[2:],
+                     "timing": lines[1]})
     return cues
+
+
+# --- The English track ----------------------------------------------------------------------
+#
+# videos/<id>/captions.en.md pairs every Hebrew caption of script.md, in order, with its
+# English translation:
+#
+#     # comment lines start with "#"
+#
+#     he: שלב 1 : temp = a. הערך 5 נשמר ב-temp.
+#     en: Step 1: temp = a. The value 5 is saved in temp.
+#
+#     he: שלב 2 : a = b. עכשיו a מחזיק 3,
+#     he: וה-5 המקורי עדיין שמור ב-temp.
+#     en: Step 2: a = b. Now a holds 3,
+#     en: and the original 5 is still saved in temp.
+#
+# An entry is its "he:" lines (the caption's lines, exactly as script.md has them) and then
+# its "en:" lines (the English cue's lines, one or two); a blank line ends it.
+
+TRANSLATIONS = "captions.en.md"
+EN_MAX_WORDS = 12
+EN_MAX_LINES = 2
+EN_MAX_CHARS = 60
+BIDI_MARKS = re.compile("[\u200e\u200f\u2066-\u2069\u202a-\u202e]")
+
+
+def strip_isolates(line: str) -> str:
+    """A caption line of captions.vtt without the isolates isolate() added."""
+    return line.replace(LRI, "").replace(PDI, "")
+
+
+def key(text: str) -> str:
+    """A caption as its lines in the video, for matching script.md, scene.py, captions.vtt
+    and the translation file."""
+    return "\n".join(wrap(text))
+
+
+def read_translations(text: str) -> tuple[list[dict], list[str]]:
+    """The entries of a captions.en.md, [{he, en, line}] in file order, and the problems of
+    its format ("line N: ...")."""
+    entries, problems = [], []
+    he, en, start = [], [], 0
+    for n, raw in enumerate(text.splitlines() + [""], 1):
+        line = raw.rstrip()
+        if line.startswith("#"):
+            continue
+        if not line:
+            if he and en:
+                entries.append({"he": "\n".join(he), "en": "\n".join(en), "line": start})
+            elif he:
+                problems.append(f"line {start}: no 'en:' line for the caption {he[0]!r}")
+            elif en:
+                problems.append(f"line {n - len(en)}: 'en:' lines with no 'he:' line before them")
+            he, en = [], []
+            continue
+        tag, _, rest = line.partition(":")
+        rest = rest[1:] if rest.startswith(" ") else rest
+        if tag == "he" and not en:
+            start = start if he else n
+            he.append(rest)
+        elif tag == "he":
+            problems.append(f"line {n}: a 'he:' line after the 'en:' lines (a blank line ends an entry)")
+        elif tag == "en":
+            en.append(rest)
+        else:
+            problems.append(f"line {n}: neither 'he:', 'en:', a '#' comment nor a blank line: {line[:40]!r}")
+    return entries, problems
+
+
+def check_english(en: str) -> list[str]:
+    """The rules of an English cue: one or two lines of at most 12 words and 60 characters,
+    no Hebrew and no direction marks (a left-to-right track needs none)."""
+    problems = []
+    lines = en.split("\n")
+    if len(lines) > EN_MAX_LINES:
+        problems.append(f"{len(lines)} English lines (at most {EN_MAX_LINES})")
+    for line in lines:
+        if not line.strip():
+            problems.append("an empty English line")
+            continue
+        n = count_words(line)
+        if n > EN_MAX_WORDS:
+            problems.append(f"{n} words in an English line (at most {EN_MAX_WORDS}): {line!r}")
+        if len(line) > EN_MAX_CHARS:
+            problems.append(f"English line of {len(line)} characters (at most {EN_MAX_CHARS}): {line!r}")
+        if HEBREW.search(line):
+            problems.append(f"Hebrew in an English line: {line!r}")
+        if BIDI_MARKS.search(line) or NBSP in line:
+            problems.append(f"a direction mark or a no-break space in an English line: {line!r}")
+    return problems
+
+
+def translate(captions: list[str], entries: list[dict]) -> tuple[list[str], list[str]]:
+    """The English of every Hebrew caption, in order, and the problems: a caption with no
+    entry, an entry for a caption that no longer exists, entries out of order, and English
+    that breaks check_english(). `captions` are the Hebrew captions in video order."""
+    want = [key(c) for c in captions]
+    have = [key(e["he"]) for e in entries]
+    problems = []
+    for e in entries:
+        problems += [f"line {e['line']}: {p}" for p in check_english(e["en"])]
+    if have != want:
+        counts, seen, order = Counter(have), Counter(), len(problems)
+        for c in dict.fromkeys(want):
+            if counts[c] < want.count(c):
+                problems.append(f"no English entry for the caption {c!r}")
+        for e, h in zip(entries, have):
+            seen[h] += 1
+            if seen[h] > want.count(h):
+                problems.append(f"line {e['line']}: " + (
+                    "a second entry for the caption" if h in want
+                    else "an entry for a caption that no longer exists") + f" {e['he']!r}")
+        if len(problems) == order:
+            first = next(i for i, (a, b) in enumerate(zip(want, have)) if a != b)
+            problems.append(f"line {entries[first]['line']}: the entries are not in the captions' order "
+                            f"(caption {first + 1} is {want[first]!r})")
+    return [e["en"] for e in entries], problems
+
+
+def english_vtt(cues: list[dict], english: list[str]) -> str:
+    """The English WebVTT: the cues of captions.vtt (same numbers and times), English text."""
+    out = ["WEBVTT", ""]
+    for i, (c, en) in enumerate(zip(cues, english, strict=True), start=1):
+        timing = c.get("timing") or f"{vtt_time(c['start'])} --> {vtt_time(c['end'])}"
+        out += [str(i), timing, *en.split("\n"), ""]
+    return "\n".join(out)

@@ -16,7 +16,11 @@ For every ``videos/*/script.md``, every caption line (a line that starts with ``
 VIDEOS.md) follows the RTL rules of CLAUDE.md: it starts with a Hebrew letter or the RLM
 mark (U+200F), every colon has a non-breaking space (U+00A0) before it and an ordinary
 space or the end of the line after it (times such as 1:35, URLs and `code` are exempt),
-and it has at most 12 words.
+and it has at most 12 words. When ``videos/<id>/captions.en.md`` (the English track) exists,
+every caption of the script has an entry there, in order, with its Hebrew lines as the
+script has them, no entry is left for a caption that no longer exists, and the English
+has one or two lines of at most 12 words (the parser and the rules are
+``videos/lib/captions.py``'s, the ones render.py uses).
 
 The same field checks run in tools/lint_pages.py and in the build hook, which import
 ``video_problems`` from here. Exit status 1 on a problem; a missing script is a warning.
@@ -24,6 +28,7 @@ The same field checks run in tools/lint_pages.py and in the build hook, which im
 
 from __future__ import annotations
 
+import importlib.util
 import re
 import sys
 from pathlib import Path
@@ -43,6 +48,11 @@ HEBREW_START = re.compile(r"^[א-ת]")
 RLM = "‏"
 NBSP = " "
 MAX_WORDS = 12
+
+# videos/lib/captions.py: the translation file's parser and rules (pure Python, no Manim)
+_spec = importlib.util.spec_from_file_location("dvq_captions", VIDEOS / "lib" / "captions.py")
+vcaps = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(vcaps)
 
 
 def split_front_matter(text: str) -> tuple[dict, str]:
@@ -109,6 +119,29 @@ def captions(text: str) -> list[tuple[int, str]]:
     return [(n, m.group(1).rstrip()) for n, line in _outside_fences(text) if (m := CAPTION.match(line))]
 
 
+def caption_texts(text: str) -> list[str]:
+    """The captions of a script.md as render.py reads them: a run of consecutive ``> ``
+    lines is one caption, its lines joined by a newline."""
+    out: list[list[str]] = []
+    last = None
+    for n, line in captions(text):
+        if last is not None and n == last + 1:
+            out[-1].append(line)
+        else:
+            out.append([line])
+        last = n
+    return ["\n".join(lines) for lines in out]
+
+
+def translation_problems(script_text: str, translations: str) -> list[str]:
+    """What is wrong with a captions.en.md against its script.md: its format, a caption
+    with no English entry, an entry for a caption that no longer exists, the order, and
+    English longer than two lines of 12 words."""
+    entries, problems = vcaps.read_translations(translations)
+    _, more = vcaps.translate(caption_texts(script_text), entries)
+    return problems + more
+
+
 def caption_problems(line: str) -> list[str]:
     """What breaks the RTL rules in one caption line."""
     out = []
@@ -156,8 +189,13 @@ def check(root: Path = ROOT) -> tuple[list[str], list[str]]:
             problems.append(f"{name}: videos/{qid}/script.md has {chapters} '## Chapter' headings, the page has {parts} part{'s' * (parts > 1)}")
     for script in sorted((root / "videos").glob("*/script.md")):
         name = script.relative_to(root).as_posix()
-        for n, line in captions(script.read_text(encoding="utf-8")):
+        text = script.read_text(encoding="utf-8")
+        for n, line in captions(text):
             problems += [f"{name}:{n}: {p}: {line[:50]!r}" for p in caption_problems(line)]
+        english = script.with_name(vcaps.TRANSLATIONS)
+        if english.exists():
+            en_name = english.relative_to(root).as_posix()
+            problems += [f"{en_name}: {p}" for p in translation_problems(text, english.read_text(encoding="utf-8"))]
     return problems, warnings
 
 
