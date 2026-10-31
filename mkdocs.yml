@@ -157,6 +157,7 @@ extra_javascript:
   - javascripts/run-python.js
   - javascripts/reading-tools.js
   - javascripts/home.js
+  - javascripts/hero-board.js     # the hero's chip and electrons (session 30)
   - javascripts/selfcheck.js
   - javascripts/motion.js
   - javascripts/layout.js

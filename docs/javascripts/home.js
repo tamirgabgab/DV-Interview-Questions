@@ -2,8 +2,8 @@
 // view (W339), and the sections and cards under the hero rise into view once (W344, a 40 ms
 // stagger along a row of cards). The real numbers and the content are in the page; without
 // the script, under reduced motion or in an automated browser (the page checks), nothing
-// moves or hides. The hero's waves stop while it is off screen, and beside its text sits
-// the interview builder (session 30; it replaced round M's live example of 0055).
+// moves or hides. Beside the hero's text sits the interview builder (session 30; it
+// replaced round M's live example of 0055); hero-board.js draws the hero's background.
 (() => {
   const COUNT_MS = 900;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -104,10 +104,6 @@
     const hero = document.querySelector(".home-hero");
     if (!hero || !("IntersectionObserver" in window)) return;
     builder(hero.querySelector(".hh-builder"));
-    // the hero's rolling waves run only while it is on screen
-    new IntersectionObserver((entries) => {
-      hero.classList.toggle("is-paused", !entries.some((e) => e.isIntersecting));
-    }).observe(hero);
   });
 
   document.addEventListener("DOMContentLoaded", () => {

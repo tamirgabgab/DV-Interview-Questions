@@ -1664,11 +1664,22 @@ section below starts at session 22, whose numbered items run on through the late
     findings that were there before: Material's search dialog has no name, and the grey
     `.cc-meta` line of the "continue" card is under 4.5:1 (not fixed, a separate change).
 
+110. **The hero's chip (session 30, 2026-10-31).** The owner found the rolling waves basic
+    (the amber cursor never met the waves' edges). Two rounds of live proposals (five
+    backgrounds, then four chip-and-wire ones); the owner picked the chip with its fan-out,
+    with no marking on the chip, in a column between the text and the builder on a wide
+    screen (the text column narrows to make room, from 76.25em up), a small chip in a strip
+    under the numbers otherwise, electrons as in the proposal, and the waves gone.
+    `docs/javascripts/hero-board.js` draws it on a canvas in `.hh-bg` (`HERO_BOARD` in the
+    hook; `.hh-chip-slot` keeps its place); the waves (`HERO_WAVES`, their styles in 09, 10
+    and 13, and home.js's pause) are removed. Checked: it moves on screen, stops off
+    screen, and is one still frame under reduced motion; phone and keyboard checks clean.
+
 ## In progress
 
 - **Session 30 (2026-10-31):** interview mode, the builder, my map and the quick jump (work
-  log item 109), on `claude/vibrant-ritchie-8ju107`; `main` after a green branch CI, then
-  the owner checks the live site (desktop and phone, light and dark).
+  log item 109) published (`main` df3f829, deploy green); then the hero's chip (item 110).
+  The owner checks the live site (desktop and phone, light and dark).
 - **Session 29 (2026-10-31):** question 0071, the three-wizard duel (work log item 107),
   written as 0060 and renumbered when `main` had moved on to 0070; published (`main`
   046c236, deploy green). The live page was not checked from the cloud sandbox (its proxy

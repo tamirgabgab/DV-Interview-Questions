@@ -163,3 +163,14 @@ html.qj-open { overflow: hidden; }
   .md-typeset .my-map .mm-cell { width: 1.2rem; height: 1.2rem; }
 }
 .md-typeset .home-hero .hb-start[hidden] { display: none; }
+
+/* ---- the home page: the place of the hero's chip (hero-board.js draws it on the canvas
+   under the hero) ---- */
+.md-typeset .home-hero .hh-bg canvas { display: block; width: 100%; height: 100%; }
+.md-typeset .home-hero .hh-chip-slot { height: 7rem; margin-top: var(--sp-2); }
+/* a wide screen: a column of its own between the text and the builder */
+@media screen and (min-width: 76.25em) {
+  .md-typeset .home-hero:has(.hh-builder:not([hidden])) { grid-template-columns: minmax(0, 1fr) 8.5rem 16rem; }
+  .md-typeset .home-hero:has(.hh-builder:not([hidden])) > .hh-chip-slot { grid-column: 2; grid-row: 1 / span 8; height: auto; min-height: 12rem; margin: 0; }
+  .md-typeset .home-hero .hh-builder { grid-column: 3; }
+}

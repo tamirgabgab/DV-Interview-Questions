@@ -27,22 +27,6 @@
   .md-sidebar--secondary .toc-marker.is-moving { transition: transform var(--dur-2) var(--ease), height var(--dur-2) var(--ease), opacity var(--dur-1); }
 }
 
-/* M1: the hero's waves roll by one width at a time (the pattern is there twice) and an
-   amber cursor sweeps across them, after the lines have been drawn; both stop while the
-   hero is off screen (home.js sets .is-paused). */
-.md-typeset .home-hero .hh-bg { opacity: 0.14; }
-.md-typeset .home-hero .hh-waves .hh-cursor { stroke: var(--md-accent-fg-color); stroke-width: 3; stroke-dasharray: 5 6; opacity: 0; }
-@media (prefers-reduced-motion: no-preference) {
-  .md-typeset .home-hero .hh-roll { animation: hh-roll 60s linear 2.4s infinite; }
-  .md-typeset .home-hero .hh-waves .hh-cursor { animation: hh-sweep 11s ease-in-out 2.6s infinite; }
-  .md-typeset .home-hero.is-paused :is(.hh-roll, .hh-cursor) { animation-play-state: paused; }
-  @keyframes hh-roll { to { transform: translateX(-640px); } }
-  @keyframes hh-sweep {
-    0% { opacity: 0; transform: translateX(-10px); }
-    12%, 88% { opacity: 1; }
-    100% { opacity: 0; transform: translateX(650px); }
-  }
-}
 
 
 /* M12: cards answer the pointer: the top edge fills with amber from the start, the icon

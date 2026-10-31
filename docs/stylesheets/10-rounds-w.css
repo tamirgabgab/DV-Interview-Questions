@@ -24,15 +24,8 @@
 .md-typeset .page-edit svg { width: 0.9rem; height: 0.9rem; fill: currentColor; }
 
 /* Round W2 (session 27): the home page. */
-/* W339: the audience line under the hero's title, and the waveform drawn once, each line
-   from its start (pathLength 1 on every path), only without reduced motion. */
+/* W339: the audience line under the hero's title. */
 .md-typeset .home-hero p.hh-audience { margin: -0.2rem 0 var(--sp-3); color: var(--md-accent-fg-color); font-size: 0.85rem; font-weight: 600; }
-@media (prefers-reduced-motion: no-preference) {
-  .md-typeset .home-hero .hh-waves path { stroke-dasharray: 1; animation: hh-draw 2.4s var(--ease) both; }
-  .md-typeset .home-hero .hh-waves .hh-w2 { animation-delay: 0.3s; }
-  .md-typeset .home-hero .hh-waves .hh-w3 { animation-delay: 0.6s; }
-  @keyframes hh-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-}
 
 /* W340: the three steps of "how it works". */
 .md-typeset ol.how-it-works { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); margin: var(--sp-3) 0 var(--sp-5); padding: 0; list-style: none; }

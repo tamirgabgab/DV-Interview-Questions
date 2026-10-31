@@ -480,10 +480,17 @@ title and lead): a navy card with a quiet waveform pattern, "start practising" (
 `marks.js` at the first question, student to senior, not marked solved), a random question,
 a large field and ready searches that open the quick jump, and one line of numbers
 (questions, tested code, interactive boxes), with a line for the audience under the title
-(`{ .hh-audience }`). The waveform is drawn once on load and the numbers count up the
-first time they are seen (`docs/javascripts/home.js`), both off under reduced motion.
-After the drawing the waves roll slowly and an amber cursor sweeps across them (they stop
-while the hero is off screen). Beside the text (under it on a narrow screen) sits the
+(`{ .hh-audience }`). The numbers count up the first time they are seen
+(`docs/javascripts/home.js`, off under reduced motion). The background (session 30, in
+place of the rolling waves) is a canvas that `docs/javascripts/hero-board.js` fills with a
+chip and its fan-out, as on a real board: seven pins a side, each wire stepping out (the
+outer pins turn first, so no wire crosses another), spreading and running to the edge,
+only across or up and down with small round corners; amber electrons run out of the chip
+and into it, and a pin lights when one arrives. The chip sits in `.hh-chip-slot`, a column
+between the text and the builder from 76.25em up and a strip under the numbers otherwise
+(`21-interview.css`); the wires are not drawn in the builder's box and fade on the text's
+side. It runs only while the hero is on screen, and is one still frame under reduced
+motion and in an automated browser. Beside the text (under it on a narrow screen) sits the
 **interview builder** (session 30, `_hero_builder` in the hook, `home.js`; it replaced the
 live example of 0055): a level, a length (20, 40 or 60 minutes) and kinds give a series
 that fits the time (`dvqInterview.buildPlan`: a seeded shuffle of the level's questions

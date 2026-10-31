@@ -891,19 +891,11 @@ def home_daily(page_url: str) -> str:
 
 HERO_SEARCHES = ["FIFO", "PCIe", "SVA", "הסתברות", "חידות", "Gray"]
 
-# The hero's background: a clock, a data bit and a bus, drawn as a quiet line pattern
-# (pathLength 1, so the CSS can draw each line once from its start, W339). The pattern is
-# there twice, side by side, so the stylesheet can roll it along one width without a seam,
-# and an amber cursor sweeps across it, like a logic analyzer (M1, 13-motion.css).
-HERO_WAVE_PATHS = (
-    '<path class="hh-w1" pathLength="1" d="M0 30h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20v-20h20v20h20"/>'
-    '<path class="hh-w2" pathLength="1" d="M0 75h50v-20h90v20h40v-20h130v20h60v-20h40v20h110v-20h120"/>'
-    '<path class="hh-w3" pathLength="1" d="M0 120h30l10-15h90l10 15-10 15h-90l-10-15M140 120l10-15h110l10 15-10 15h-110l-10-15M270 120l10-15h70l10 15-10 15h-70l-10-15M360 120l10-15h130l10 15-10 15h-130l-10-15M510 120l10-15h110l10 15"/>')
-HERO_WAVES = (
-    '<svg class="hh-waves" viewBox="0 0 640 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">'
-    f'<g class="hh-roll"><g>{HERO_WAVE_PATHS}</g><g transform="translate(640 0)">{HERO_WAVE_PATHS}</g></g>'
-    '<line class="hh-cursor" x1="0" y1="2" x2="0" y2="148"/>'
-    '</svg>')
+# The hero's background (session 30, in place of the rolling waves): a canvas that
+# hero-board.js fills with a chip and its fan-out, electrons running on the wires; the chip
+# sits in .hh-chip-slot, a column between the text and the builder on a wide screen and a
+# strip under the numbers otherwise (21-interview.css).
+HERO_BOARD = '<canvas class="hh-board" aria-hidden="true"></canvas>'
 
 # The interview builder beside the hero's text (session 30, replacing the live example of
 # M2): the reader picks a level, a length and kinds, and home.js fills a series of
@@ -950,7 +942,7 @@ def _hero(inner: str, page_url: str) -> str:
     searches = "".join(f'<button type="button" class="hh-chip" data-q="{html.escape(t)}">{html.escape(t)}</button>' for t in HERO_SEARCHES)
     return (
         '<div class="home-hero" markdown>\n'
-        f'<div class="hh-bg" aria-hidden="true">{HERO_WAVES}</div>\n'
+        f'<div class="hh-bg" aria-hidden="true">{HERO_BOARD}</div>\n'
         f'{inner.strip()}\n\n'
         '<div class="hh-tools" data-search-exclude>'
         '<div class="hh-actions">'
@@ -960,6 +952,7 @@ def _hero(inner: str, page_url: str) -> str:
         f'<div class="hh-suggest"><span>למשל\u00a0:</span>{searches}</div>'
         '<div class="hh-stats">' + "".join(f'<span>{ui_icon(i)}<b>{n}</b> {label}</span>' for i, n, label in stats) + '</div>'
         '</div>\n'
+        '<div class="hh-chip-slot" aria-hidden="true"></div>\n'
         f'{_hero_builder()}\n'
         '</div>\n'
     )
