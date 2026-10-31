@@ -1,7 +1,7 @@
-/* The site's styles, part 5 of 20: the toolbar, the hint ladder, the first home page, step-through figures, marks and study paths.
+/* The site's styles, part 5 of 21: the toolbar, the hint ladder, the first home page, step-through figures, marks and study paths.
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
-/* Toolbar under the question header: open / close all, practice mode, stopwatch. */
+/* Toolbar under the question header: open / close all, interview mode (21-interview.css has its bar). */
 .md-typeset .question-tools {
   display: flex;
   flex-wrap: wrap;
@@ -33,12 +33,7 @@
   border-color: var(--md-accent-fg-color);
 }
 
-.md-typeset .question-tools .qt-clock {
-  font-family: var(--md-code-font-family);
-  color: var(--md-default-fg-color--light);
-}
-
-body.practice-mode .md-typeset .question-tools {
+body.interview-mode .md-typeset .question-tools {
   padding: 0.3rem 0.6rem;
   border-radius: 0.4rem;
   background: var(--md-accent-fg-color--transparent);

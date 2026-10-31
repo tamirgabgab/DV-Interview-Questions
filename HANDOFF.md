@@ -1643,8 +1643,32 @@ section below starts at session 22, whose numbered items run on through the late
     the triple-meeting proof. `box_shots.py` gained a `set` action for a select or a slider.
     Waiting on the owner: watch them, upload, send the YouTube ids.
 
+109. **Interview mode, the interview builder, my map and the quick jump (session 30,
+    2026-10-31).** The owner used the new design skills (frontend-design and VectorLab's UI/UX
+    skills): a UX audit of the site, three mockups that were too far from the site, then
+    three closer ones (D playground, E interview mode, F explore and compare); the owner
+    picked E with F's quick jump and answered eight questions: practice mode becomes
+    interview mode; a follow-up after every self-check answered right, from the page's own
+    list; the target by difficulty (10, 15, 25 minutes, 3 more per part beyond the third);
+    the builder in the hero, in place of 0055's live example; my map on the home page; the
+    quick jump beside the site search ("/" moves to it); the last interview of each question
+    kept; everything in one change. New: `docs/javascripts/interview.js` (the shared
+    functions, tested under Node in `tests/tools/test_interview.py`), `quick-jump.js`,
+    `docs/stylesheets/21-interview.css`; `questions.json` at the site root (`on_post_build`);
+    `data-difficulty` and `data-parts` on the toolbar; `_hero_builder` and `_my_map` (and
+    `<!-- my-map -->` in `docs/index.md`) in the hook; `selfcheck.js` sends `dvq-selfcheck`;
+    the hero's field and ready searches open the quick jump. `check_keyboard.py` now checks
+    "/", Tab, Escape and Ctrl+K in the quick jump, its row to the site search, and interview
+    mode by keyboard; 16 new contrast pairs. axe on the new states (interview running, the
+    summary, the quick jump, the home page with the map), light and dark: clean, except two
+    findings that were there before: Material's search dialog has no name, and the grey
+    `.cc-meta` line of the "continue" card is under 4.5:1 (not fixed, a separate change).
+
 ## In progress
 
+- **Session 30 (2026-10-31):** interview mode, the builder, my map and the quick jump (work
+  log item 109), on `claude/vibrant-ritchie-8ju107`; `main` after a green branch CI, then
+  the owner checks the live site (desktop and phone, light and dark).
 - **Session 29 (2026-10-31):** question 0071, the three-wizard duel (work log item 107),
   written as 0060 and renumbered when `main` had moved on to 0070; published (`main`
   046c236, deploy green). The live page was not checked from the cloud sandbox (its proxy

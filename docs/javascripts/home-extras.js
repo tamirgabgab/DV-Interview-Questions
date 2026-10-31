@@ -64,3 +64,67 @@
   solved();
   document.addEventListener("dvq-marks", solved);
 })();
+
+// My map (session 30): a square per question, a row per level (the hook draws them as
+// links), painted from this browser: solved and favourite marks (marks.js), and started
+// (a self-check answered, or an interview done, interview mode). Hidden until there is
+// something to show. One square is in the tab order; the arrows move between squares
+// (left is forward on this page), up and down between the levels, Home and End.
+(() => {
+  const map = document.querySelector(".my-map");
+  if (!map) return;
+  const cells = Array.from(map.querySelectorAll(".mm-cell"));
+  const rows = Array.from(map.querySelectorAll(".mm-cells")).map((r) => Array.from(r.children));
+  const peek = map.querySelector(".mm-peek"), stats = map.querySelector(".mm-stats");
+  const keys = () => {
+    const out = [];
+    try { for (let i = 0; i < localStorage.length; i++) out.push(localStorage.key(i)); } catch (e) { /* storage off */ }
+    return out;
+  };
+  const state = (cell, all) => {
+    const id = cell.dataset.id, path = new URL(cell.href).pathname;
+    const marks = window.dvqMarks;
+    if (marks && marks.has(id, "solved")) return "solved";
+    if (all.some((k) => k === `dvq-interview:${id}` || k.startsWith(`dvq-check:${path}:`))) return "started";
+    return "";
+  };
+  const say = { solved: "פתרתם", started: "התחלתם", "": "עוד לא" };
+  const paint = () => {
+    const all = keys();
+    let solved = 0, started = 0, starred = 0;
+    cells.forEach((c) => {
+      const s = state(c, all), star = Boolean(window.dvqMarks && window.dvqMarks.has(c.dataset.id, "star"));
+      c.dataset.state = s;
+      c.classList.toggle("is-solved", s === "solved");
+      c.classList.toggle("is-started", s === "started");
+      c.classList.toggle("is-star", star);
+      solved += s === "solved"; started += s === "started"; starred += star;
+    });
+    map.hidden = !(solved || started || starred);
+    stats.textContent = `פתרתם ${solved} מתוך ${cells.length} שאלות` + (started ? `, והתחלתם עוד ${started}.` : ".");
+  };
+  const show = (c) => {
+    const [id, ...title] = c.getAttribute("aria-label").split(" ");
+    peek.textContent = `${id} ${title.join(" ")}. ${say[c.dataset.state || ""]}${c.classList.contains("is-star") ? ", במועדפים" : ""}.`;
+  };
+  if (cells.length) cells[0].tabIndex = 0;
+  const focus = (c) => { cells.forEach((x) => { x.tabIndex = x === c ? 0 : -1; }); c.focus(); show(c); };
+  map.addEventListener("keydown", (e) => {
+    const c = e.target.closest(".mm-cell");
+    if (!c) return;
+    const r = rows.findIndex((row) => row.includes(c)), i = rows[r].indexOf(c);
+    let to = null;
+    if (e.key === "ArrowLeft") to = rows[r][i + 1] || (rows[r + 1] && rows[r + 1][0]);
+    else if (e.key === "ArrowRight") to = rows[r][i - 1] || (rows[r - 1] && rows[r - 1][rows[r - 1].length - 1]);
+    else if (e.key === "ArrowDown" && rows[r + 1]) to = rows[r + 1][Math.min(i, rows[r + 1].length - 1)];
+    else if (e.key === "ArrowUp" && rows[r - 1]) to = rows[r - 1][Math.min(i, rows[r - 1].length - 1)];
+    else if (e.key === "Home") to = cells[0];
+    else if (e.key === "End") to = cells[cells.length - 1];
+    if (to) { e.preventDefault(); focus(to); }
+  });
+  map.addEventListener("focusin", (e) => { const c = e.target.closest(".mm-cell"); if (c) show(c); });
+  map.addEventListener("mouseover", (e) => { const c = e.target.closest(".mm-cell"); if (c) show(c); });
+  document.addEventListener("dvq-marks", paint);
+  document.addEventListener("DOMContentLoaded", paint);
+  if (document.readyState !== "loading") paint();
+})();

@@ -1,9 +1,10 @@
 // Question page tools, icon buttons at the end of the header's chip row (UI324): open or
-// close every collapsible block (one toggle), practice mode (solutions hidden, with a
-// stopwatch), solved / favourite marks (marks.js), a random question of the same level, and
-// the hint ladder (hint n+1 appears once hint n is open). A button's name is its
-// aria-label and its tooltip (data-tip); `retip` changes both, and the icon with them.
-// Practice mode is remembered across pages in localStorage; the stopwatch is per page.
+// close every collapsible block (one toggle), interview mode (session 30, it replaced
+// practice mode: see `interview` below), solved / favourite marks (marks.js), a random
+// question of the same level, and the hint ladder (hint n+1 appears once hint n is open).
+// A button's name is its aria-label and its tooltip (data-tip); `retip` changes both, and
+// the icon with them. Interview mode is remembered across pages in localStorage (the key
+// kept its old name); the clock is per page.
 // Marking a question solved shows a short message with the level's progress (UI326).
 (() => {
   const KEY = "dvq-practice";
@@ -171,34 +172,13 @@
     const details = () => Array.from(article.querySelectorAll("details"));
     const solutions = () => Array.from(article.querySelectorAll(SOLUTION));
     const practiceBtn = bar.querySelector(".qt-practice");
-    const clock = bar.querySelector(".qt-clock");
-    let start = null, timer = null;
-
-    const setPractice = (on, remember = true) => {
-      document.body.classList.toggle("practice-mode", on);
-      practiceBtn.classList.toggle("is-active", on);
-      practiceBtn.setAttribute("aria-pressed", String(on));
-      retip(practiceBtn, on ? "יציאה ממצב תרגול : הצג פתרונות" : "מצב תרגול : הפתרונות מוסתרים ושעון רץ");
-      solutions().forEach((d) => { d.hidden = on; if (on) d.open = false; });
-      if (remember) {
-        try { localStorage.setItem(KEY, on ? "1" : "0"); } catch (e) { /* private mode */ }
-      }
-      clearInterval(timer);
-      if (on) {
-        start = Date.now();
-        clock.hidden = false;
-        clock.textContent = "00:00";
-        timer = setInterval(() => { clock.textContent = fmt(Date.now() - start); }, 1000);
-      } else if (start) {
-        clock.textContent = fmt(Date.now() - start);
-      }
-      fold.paint();
-    };
-
+    const iv = interview(bar, article, practiceBtn, () => fold.paint());
     // one toggle for every block: it opens all while any visible block is closed
     const foldBtn = bar.querySelector(".qt-fold");
     const fold = {
-      allOpen: () => details().filter((d) => !d.hidden).every((d) => d.open),
+      // in interview mode a solution opens only through its confidence question
+      shown: () => details().filter((d) => !d.hidden && !(iv.on() && d.matches(SOLUTION))),
+      allOpen: () => fold.shown().every((d) => d.open),
       paint: () => {
         const open = fold.allOpen();
         retip(foldBtn, open ? "סגור הכל" : "פתח הכל", open ? "unfold-less" : "unfold-more");
@@ -208,12 +188,12 @@
     };
     foldBtn.addEventListener("click", () => {
       const open = !fold.allOpen();
-      details().forEach((d) => { if (!d.hidden) d.open = open; });
+      fold.shown().forEach((d) => { d.open = open; });
       fold.paint();
     });
     article.addEventListener("toggle", () => fold.paint(), true);
     fold.paint();
-    practiceBtn.addEventListener("click", () => setPractice(!document.body.classList.contains("practice-mode")));
+    practiceBtn.addEventListener("click", () => (iv.on() ? iv.end() : iv.start(true)));
 
     // Solved / favourite marks
     const qid = bar.dataset.qid;
@@ -246,9 +226,227 @@
       });
     }
 
+    // a series from the home page's interview builder, or the mode left on: start at once
     let remembered = false;
     try { remembered = localStorage.getItem(KEY) === "1"; } catch (e) { /* ignore */ }
-    if (remembered) setPractice(true, false);
+    if (iv.inPlan() || remembered) iv.start(false);
+  };
+
+  // Interview mode (session 30): a bar at the foot of the screen with a clock against the
+  // question's target time (dvqInterview.targetMinutes: by difficulty, more for every part
+  // beyond the third), the hints opened and the self-checks answered right; a solution
+  // opens only after "how sure are you?"; a right self-check brings the next of the page's
+  // follow-up questions as the interviewer's question, its short answer folded; "end"
+  // shows a summary beside the last interview of this question (kept in the browser), and
+  // within a series from the home page's builder, a link to the series' next question.
+  const CONF = ["מנחשים", "די בטוחים", "בטוחים"];
+  const interview = (bar, article, btn, repaint) => {
+    const I = window.dvqInterview;
+    const qid = bar.dataset.qid;
+    const target = I ? I.targetMinutes(bar.dataset.difficulty, bar.dataset.parts) : 15;
+    let on = false, running = false, startAt = 0, acc = 0, ticker = null;
+    let hints = new Set(), right = new Set(), conf = [], asked = new WeakSet(), fuNext = 0;
+    let ui = null;
+    const secs = () => Math.floor((acc + (running ? Date.now() - startAt : 0)) / 1000);
+    const followups = () => {
+      const f = article.querySelector("details.followup");
+      return f ? Array.from(f.querySelectorAll(":scope > ul > li")) : [];
+    };
+    const checks = () => article.querySelectorAll(".selfcheck").length;
+    const planNow = () => {
+      const p = I && I.plan.get();
+      if (!p || !Array.isArray(p.ids)) return null;
+      const i = p.ids.indexOf(qid);
+      return i < 0 ? null : { ...p, i };
+    };
+
+    const makeBar = () => {
+      const el = document.createElement("div");
+      el.className = "iv-bar";
+      el.hidden = true;
+      el.setAttribute("role", "region");
+      el.setAttribute("aria-label", "מצב ראיון");
+      el.setAttribute("data-search-exclude", "");
+      el.innerHTML = '<div class="iv-in">' +
+        '<span class="iv-step" hidden></span>' +
+        '<span class="iv-clock" role="timer" aria-label="הזמן שעבר">00:00</span>' +
+        '<span class="iv-gauge" aria-hidden="true"><i></i></span>' +
+        `<span class="iv-stat">יעד <b>${target}</b> דקות</span>` +
+        '<span class="iv-stat">רמזים <b class="iv-hints">0</b></span>' +
+        `<span class="iv-stat iv-stat-right">נכונות <b class="iv-right">0</b>${checks() ? ` מתוך ${checks()}` : ""}</span>` +
+        '<button type="button" class="iv-btn iv-pause">השהיה</button>' +
+        '<button type="button" class="iv-btn iv-end">סיום הראיון</button></div>';
+      document.body.append(el);
+      el.querySelector(".iv-pause").addEventListener("click", pause);
+      el.querySelector(".iv-end").addEventListener("click", end);
+      return el;
+    };
+    const tick = () => {
+      const s = secs();
+      ui.querySelector(".iv-clock").textContent = I ? I.fmt(s) : String(s);
+      ui.querySelector(".iv-clock").classList.toggle("is-over", s > target * 60);
+      ui.querySelector(".iv-gauge i").style.transform = `scaleX(${Math.min(1, s / (target * 60))})`;
+    };
+    const count = () => {
+      ui.querySelector(".iv-hints").textContent = hints.size;
+      ui.querySelector(".iv-right").textContent = right.size;
+    };
+    const pause = () => {
+      const b = ui.querySelector(".iv-pause");
+      if (running) { acc += Date.now() - startAt; running = false; b.textContent = "להמשיך"; }
+      else { startAt = Date.now(); running = true; b.textContent = "השהיה"; }
+      tick();
+    };
+    const paintBtn = () => {
+      document.body.classList.toggle("interview-mode", on);
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-pressed", String(on));
+      retip(btn, on ? "סיום הראיון : סיכום של הזמן, הרמזים והתשובות" : "מצב ראיון : שעון מול יעד, רמזים נספרים ושאלות המשך");
+      repaint();
+    };
+    const start = (remember) => {
+      if (on) return;
+      if (!ui) ui = makeBar();
+      on = true; running = true; startAt = Date.now(); acc = 0;
+      hints = new Set(); right = new Set(); conf = []; asked = new WeakSet(); fuNext = 0;
+      article.querySelectorAll(".iv-follow, .iv-conf").forEach((el) => el.remove());
+      article.querySelectorAll(SOLUTION).forEach((d) => { d.open = false; });
+      const p = planNow(), step = ui.querySelector(".iv-step");
+      step.hidden = !p;
+      if (p) step.textContent = `שאלה ${p.i + 1} מתוך ${p.ids.length}`;
+      ui.querySelector(".iv-pause").textContent = "השהיה";
+      ui.hidden = false;
+      if (remember) { try { localStorage.setItem(KEY, "1"); } catch (e) { /* private mode */ } }
+      count(); tick();
+      clearInterval(ticker);
+      ticker = setInterval(tick, 1000);
+      paintBtn();
+    };
+    const plural = (n, one, many) => (n === 1 ? one : `${n} ${many}`);
+    const summary = (rec, prev) => {
+      const old = article.querySelector(".iv-summary");
+      if (old) old.remove();
+      const box = document.createElement("section");
+      box.className = "iv-summary";
+      box.tabIndex = -1;
+      box.setAttribute("aria-labelledby", "iv-sum-title");
+      box.setAttribute("data-search-exclude", "");
+      const over = rec.secs > rec.target * 60;
+      const confText = rec.conf.length ? rec.conf.map((c) => CONF[c] || "בלי תשובה").join(", ") : "–";
+      let advice;
+      if (over) advice = "עברתם את היעד. בראיון, תנו קודם תשובה חלקית שעובדת, ואחר כך שפרו אותה.";
+      else if (rec.hints) advice = "בזמן, עם רמזים. בראיון, אמרו בקול מה ניסיתם לפני שאתם מבקשים רמז.";
+      else advice = "בזמן ובלי רמזים. נסו עכשיו את שאלות ההמשך בסוף הדף.";
+      let html = '<p class="iv-sum-title" id="iv-sum-title" role="heading" aria-level="2">סיכום הראיון</p>' +
+        '<dl class="iv-sum-grid">' +
+        `<div><dt>זמן</dt><dd>${I.fmt(rec.secs)}<span class="iv-of"> מתוך ${rec.target} דקות</span></dd></div>` +
+        `<div><dt>רמזים</dt><dd>${rec.hints}</dd></div>` +
+        `<div><dt>בדיקות נכונות</dt><dd>${rec.right}${rec.checks ? `<span class="iv-of"> מתוך ${rec.checks}</span>` : ""}</dd></div>` +
+        `<div><dt>ביטחון לפני הפתרון</dt><dd class="iv-conf-list">${confText}</dd></div></dl>` +
+        `<p class="iv-advice">${advice}</p>`;
+      if (prev && Number.isFinite(prev.secs)) {
+        const when = new Date(prev.at || Date.now()).toLocaleDateString("he-IL", { day: "numeric", month: "long" });
+        html += `<p class="iv-prev">בפעם הקודמת (${when}) : ${I.fmt(prev.secs)}, ${plural(prev.hints, "רמז אחד", "רמזים")}` +
+          `${prev.checks ? `, ${prev.right} מתוך ${prev.checks} נכונות` : ""}.</p>`;
+      }
+      const p = planNow();
+      html += '<p class="iv-sum-actions">';
+      if (p && p.i + 1 < p.ids.length) {
+        html += `<a class="md-button md-button--primary iv-next" href="${p.urls[p.i + 1]}">לשאלה הבאה בראיון (${p.i + 2} מתוך ${p.ids.length})</a>` +
+          '<button type="button" class="md-button iv-stop">לעצור את הסדרה</button>';
+      } else if (p) {
+        html += '<span class="iv-done">סיימתם את כל הסדרה. כל הכבוד!</span>';
+        I.plan.clear();
+      }
+      html += '<button type="button" class="md-button iv-close">סגירת הסיכום</button></p>';
+      box.innerHTML = html;
+      const header = article.querySelector(".question-header");
+      (header || article.firstElementChild).after(box);
+      const stop = box.querySelector(".iv-stop");
+      if (stop) stop.addEventListener("click", () => { I.plan.clear(); stop.closest(".iv-sum-actions").querySelector(".iv-next").remove(); stop.remove(); });
+      box.querySelector(".iv-close").addEventListener("click", () => { box.remove(); btn.focus(); });
+      box.focus({ preventScroll: true });
+      box.scrollIntoView({ block: "start", behavior: still() ? "auto" : "smooth" });
+    };
+    const end = () => {
+      if (!on) return;
+      const rec = { at: Date.now(), secs: secs(), target, hints: hints.size, right: right.size, checks: checks(), conf };
+      clearInterval(ticker);
+      on = false; running = false;
+      ui.hidden = true;
+      article.querySelectorAll(".iv-conf").forEach((el) => el.remove());
+      try { localStorage.setItem(KEY, "0"); } catch (e) { /* private mode */ }
+      paintBtn();
+      if (!I) return;
+      const prev = I.last.get(qid);
+      I.last.set(qid, rec);
+      summary(rec, prev);
+    };
+
+    // hints opened while the interview runs, each once
+    article.addEventListener("toggle", (e) => {
+      const d = e.target;
+      if (!on || !d.open || !d.matches || !d.matches("details.tip")) return;
+      const s = d.querySelector("summary");
+      if (s && s.textContent.trim().startsWith("רמז") && !hints.has(d)) { hints.add(d); count(); }
+    }, true);
+
+    // a solution: "how sure are you?" first
+    article.addEventListener("click", (e) => {
+      const summaryEl = e.target.closest("summary");
+      const d = summaryEl && summaryEl.parentElement;
+      if (!on || !d || !d.matches(SOLUTION) || d.open || asked.has(d)) return;
+      e.preventDefault();
+      if (d.previousElementSibling && d.previousElementSibling.classList.contains("iv-conf")) {
+        d.previousElementSibling.querySelector("button").focus();
+        return;
+      }
+      const ask = document.createElement("div");
+      ask.className = "iv-conf";
+      ask.setAttribute("role", "group");
+      const id = `iv-conf-${Math.random().toString(36).slice(2, 8)}`;
+      ask.setAttribute("aria-labelledby", id);
+      ask.innerHTML = `<p id="${id}">לפני הפתרון : כמה אתם בטוחים בתשובה שלכם?</p><p class="iv-conf-opts">` +
+        CONF.map((c, i) => `<button type="button" class="md-button" data-c="${i}">${c}</button>`).join("") +
+        '<button type="button" class="md-button iv-conf-none" data-c="3">עוד אין לי תשובה</button></p>';
+      d.before(ask);
+      ask.querySelector("button").focus();
+      ask.addEventListener("click", (ev) => {
+        const b = ev.target.closest("button[data-c]");
+        if (!b) return;
+        conf.push(Number(b.dataset.c));
+        asked.add(d);
+        ask.remove();
+        d.open = true;
+        d.querySelector("summary").focus();
+      });
+    }, true);
+
+    // a right self-check: the interviewer asks the next follow-up
+    document.addEventListener("dvq-selfcheck", (e) => {
+      const { box, ok } = e.detail || {};
+      if (!on || !ok || !box || !article.contains(box) || right.has(box)) return;
+      right.add(box);
+      count();
+      const items = followups();
+      if (fuNext >= items.length) return;
+      const li = items[fuNext++];
+      const say = document.createElement("div");
+      say.className = "iv-follow";
+      say.setAttribute("data-search-exclude", "");
+      const bubble = document.createElement("div");
+      bubble.className = "iv-bubble";
+      bubble.innerHTML = '<p class="iv-who-name">המראיין שואל</p>';
+      Array.from(li.children).forEach((c) => bubble.append(c.cloneNode(true)));
+      bubble.querySelectorAll("details").forEach((d) => { d.open = false; });
+      say.innerHTML = '<span class="iv-who" aria-hidden="true">מ</span>';
+      say.append(bubble);
+      box.after(say);
+      // math in a copy that MathJax had not reached yet (the copy of typeset math is left as it is)
+      if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise([bubble]).catch(() => {});
+    });
+
+    return { on: () => on, start, end, inPlan: () => Boolean(planNow()) };
   };
 
   // Hint ladder: consecutive hint blocks (details.tip whose title starts with "רמז")
@@ -376,7 +574,7 @@
     frame.contentWindow.postMessage({ giscus: { setConfig: { theme } } }, "https://giscus.app");
   };
 
-  // Printing: every closed block opens (blocks hidden by practice mode stay hidden) and
+  // Printing: every closed block opens (hidden blocks stay hidden) and
   // the dark scheme prints light; both are put back afterwards. The boxes are built by
   // core.js on the same event.
   let printed = null;

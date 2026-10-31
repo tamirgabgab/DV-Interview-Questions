@@ -146,7 +146,7 @@ DV-Interview-Questions/
 │   │                           # (the success pulse, the box loading wave), video.js (the tutorial
 │   │                           # video's dialog), and explorer/:
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
-│   └── stylesheets/            # The styles in 20 parts loaded in order (README.md lists them)
+│   └── stylesheets/            # The styles in 21 parts loaded in order (README.md lists them)
 └── .github/workflows/
     ├── deploy.yml              # Test + build on every push (explorers on 4 runners), deploy main; every job has a timeout
     └── weekly.yml              # Mondays: external links of the site, newer Verilator release
@@ -322,18 +322,36 @@ not start with the id, or a duplicate id. It also generates, per question page:
   the title hidden because the header card shows them;
 - the **page tools** as icon buttons with tooltips, beside the title; on a touch screen
   (`hover: none`), which has no tooltip, each icon shows its short name under it (`qt-name`:
-  פתח הכל, תרגול, פתרתי, מועדף, אקראית) (open or close
-  every block as one toggle, practice mode that hides the solutions and starts a
-  stopwatch; "solved" and "favourite" marks; a random question of the same level). Practice
-  mode and the marks are kept in the browser's localStorage (`docs/javascripts/marks.js`),
-  so they are per browser and are not sent anywhere. Marking a question solved shows a
+  פתח הכל, ראיון, פתרתי, מועדף, אקראית) (open or close
+  every block as one toggle, interview mode; "solved" and "favourite" marks; a random
+  question of the same level). Interview mode and the marks are kept in the browser's
+  localStorage (`docs/javascripts/marks.js`), so they are per browser and are not sent
+  anywhere. **Interview mode** (session 30, `question-tools.js`, it replaced practice
+  mode): a bar at the foot of the screen with a clock against the question's target
+  (`dvqInterview.targetMinutes` in `docs/javascripts/interview.js`: 10, 15 or 25 minutes
+  by difficulty, 3 more for every part beyond the third; the hook puts `data-difficulty`
+  and `data-parts`, the `### סעיף` headings, on the toolbar), the hints opened and the
+  self-checks answered right (`selfcheck.js` sends a `dvq-selfcheck` event); a solution
+  opens only after "how sure are you?"; after a right self-check the next item of the
+  page's follow-up list appears as the interviewer's question, its short answer folded;
+  "end" shows a summary beside the last interview of that question (`dvq-interview:<id>`
+  in localStorage), and within a series from the home page's builder (`dvq-plan`), a link
+  to the series' next question, where the mode starts by itself. "Open all" leaves the
+  solutions closed while it runs. The styles are in `21-interview.css`.
+- the **quick jump** (`docs/javascripts/quick-jump.js`): Ctrl+K (Cmd+K) or "/" on any
+  page, a "#" button beside the header's search, the hero's large field and its ready
+  searches open a small window that finds a question by number, title or topic
+  (`dvqInterview.match`) over `questions.json`, the index the hook writes at the site root
+  in `on_post_build` (id, title, level, difficulty, kind, topic names, address, parts);
+  its last row sends the words to the site search, which stays as it was. The window keeps
+  the focus inside (the field and the close button), the arrows move the choice
+  (`aria-activedescendant`), Enter opens and Esc closes and returns the focus; Marking a question solved shows a
   short message at the bottom of the screen (UI326): the level's progress ("n of m"), a bar
   and a link to the level's next question not solved yet; the check mark pops and the
   level's last question drops a short confetti (both off under reduced motion). Taking the
   mark off says so, with an undo;
 - the **tutorial video** of a question whose front matter has `video:` (VIDEOS.md): a
-  "סרטון הסבר" tool first among the page tools (hidden in practice mode, like the
-  solutions), and a "לפרק בסרטון 1:35" pill at the top of the first solution block of
+  "סרטון הסבר" tool first among the page tools (hidden in interview mode), and a "לפרק בסרטון 1:35" pill at the top of the first solution block of
   every part ("לסרטון ההסבר" on a page without parts), its `href` the video on YouTube at
   that time. `docs/javascripts/video.js` opens the video in a modal `<dialog>`: a title,
   a navy CSS poster (the question's id and title, a play disc, the start) and a button per
@@ -460,15 +478,22 @@ typing "21" or "0021" puts that question first.
 The home page opens with a **hero** (`<!-- hero -->` … `<!-- /hero -->` around the page's
 title and lead): a navy card with a quiet waveform pattern, "start practising" (pointed by
 `marks.js` at the first question, student to senior, not marked solved), a random question,
-a large field and ready searches that open the site search, and one line of numbers
+a large field and ready searches that open the quick jump, and one line of numbers
 (questions, tested code, interactive boxes), with a line for the audience under the title
 (`{ .hh-audience }`). The waveform is drawn once on load and the numbers count up the
 first time they are seen (`docs/javascripts/home.js`), both off under reduced motion.
-After the drawing the waves roll slowly and an amber cursor sweeps across them, and on a
-wide screen (76.25em and up) a **live example** sits beside the text: the machine of 0055
-part a reading numbers bit by bit (`_hero_fsm` in the hook draws it with the last frame
-of 27, `home.js` runs it; both stop while the hero is off screen, and in an automated
-browser or under reduced motion it stays on that frame).
+After the drawing the waves roll slowly and an amber cursor sweeps across them (they stop
+while the hero is off screen). Beside the text (under it on a narrow screen) sits the
+**interview builder** (session 30, `_hero_builder` in the hook, `home.js`; it replaced the
+live example of 0055): a level, a length (20, 40 or 60 minutes) and kinds give a series
+that fits the time (`dvqInterview.buildPlan`: a seeded shuffle of the level's questions
+of those kinds, the ones not solved yet first, taken while they fit), "another series"
+draws again, and "start" keeps the series (`dvq-plan`) and opens its first question. It
+stays hidden when `questions.json` does not load. Under the "continue" card, **my map**
+(`<!-- my-map -->`, `_my_map` in the hook, `home-extras.js`): a square per question, a
+row per level, painted solved, started (a self-check answered or an interview done) or
+not yet, hidden until the reader has one of these; one square is in the tab order and the
+arrows move between them.
 Under it come **"how it works"** (`<!-- how-it-works -->`, three steps from `HOW_STEPS` in
 the hook), the levels, the study paths whose front matter says `featured: true`
 (`<!-- path-cards featured -->`; `docs/paths/index.md` shows them all), a link to the
@@ -953,7 +978,7 @@ site), the last copy without a network, a short "no connection" page for a page 
 opened, at most 400 entries; `ENABLED = false` in it is the kill switch (every worker deletes
 its copies and unregisters on its next update check). The page checks block service
 workers, so their routes to the local CDN copies still apply. Printing a question (or saving it as PDF) opens every block (the
-solutions stay hidden in practice mode, for a practice sheet), prints the dark scheme
+interview mode's bar and questions are left out), prints the dark scheme
 light, lets long blocks run across pages, and leaves out the page tools, the box controls,
 the run panel and the comments; each box prints its figures and summary as they stand.
 

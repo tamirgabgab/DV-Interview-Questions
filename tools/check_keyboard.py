@@ -13,8 +13,11 @@ walked but not judged (axe covers them in the phone check). On the question page
 components: Enter opens a hint and toggles a fold of a box, the arrow keys step a focused
 box, Enter on the enlarge button opens the lightbox and Escape closes it and gives the
 focus back, a wrong self-check answer entered with Enter gets a message, Enter on "▶ להרצה"
-opens the run panel, and "/" opens the search, typing finds a question and Escape closes
-it. The first question page with a tutorial video (``video:``, VIDEOS.md) is walked too, and
+opens the run panel, "/" opens the quick jump (session 30): typing finds a question, Tab
+stays in the window, Escape closes it and gives the focus back, and Ctrl+K opens it again,
+whose last row (the up arrow wraps to it) sends the words to the site search, which finds
+them; Enter on the interview tool starts interview mode (its bar shows) and Enter on the
+bar's "end" shows the summary with the focus on it. The first question page with a tutorial video (``video:``, VIDEOS.md) is walked too, and
 its dialog is checked as a component: Enter on the "סרטון הסבר" tool opens it with the focus
 inside, Tab and Shift+Tab stay in it, every button in it has a name, Escape closes it and
 gives the focus back; play makes a titled player (the request to YouTube is cut off, so the
@@ -172,22 +175,63 @@ def press_keys(page) -> list[str]:
         page.wait_for_timeout(600)
         if not page.locator("details.py-runner[open]").count():
             out.append("Enter on the run button does not open the run panel")
-    # the search: "/" opens it, typing finds a question, Escape closes it
+    # the quick jump: "/" opens it, typing finds a question, Tab stays inside, Escape
+    # closes it; Ctrl+K opens it again and its last row opens the site search with the words
+    focused = lambda cls: page.evaluate(f"() => !!document.activeElement && document.activeElement.classList.contains('{cls}')")  # noqa: E731
     page.evaluate("() => { document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0); }")
     page.keyboard.press("/")
     page.wait_for_timeout(200)
-    if not page.evaluate("() => document.activeElement && document.activeElement.classList.contains('md-search__input')"):
-        out.append("\"/\" does not focus the search")
+    if not focused("qj-input"):
+        out.append("\"/\" does not open the quick jump")
     else:
         page.keyboard.type("0046")
         try:
-            page.wait_for_selector(".md-search-result__item", timeout=10_000)
+            page.wait_for_selector(".qj-list li.qj-q", timeout=10_000)
         except Exception:
-            out.append("typing in the search finds nothing")
+            out.append("typing in the quick jump finds nothing")
+        page.keyboard.press("Tab")
+        page.keyboard.press("Tab")
+        if not focused("qj-input"):
+            out.append("Tab leaves the quick jump")
         page.keyboard.press("Escape")
         page.wait_for_timeout(200)
-        if page.evaluate("() => document.activeElement && document.activeElement.classList.contains('md-search__input')"):
-            out.append("Escape does not leave the search")
+        if focused("qj-input") or page.locator(".qj:not([hidden])").count():
+            out.append("Escape does not close the quick jump")
+        page.keyboard.press("Control+k")
+        page.wait_for_timeout(200)
+        if not focused("qj-input"):
+            out.append("Ctrl+K does not open the quick jump")
+        else:
+            page.keyboard.type("FIFO")
+            page.wait_for_timeout(200)
+            page.keyboard.press("ArrowUp")
+            page.keyboard.press("Enter")
+            page.wait_for_timeout(300)
+            if not focused("md-search__input"):
+                out.append("the quick jump's last row does not open the site search")
+            else:
+                try:
+                    page.wait_for_selector(".md-search-result__item", timeout=10_000)
+                except Exception:
+                    out.append("the site search finds nothing")
+                page.keyboard.press("Escape")
+                page.wait_for_timeout(200)
+                if focused("md-search__input"):
+                    out.append("Escape does not leave the search")
+    # interview mode: Enter on the tool starts it, Enter on "end" shows the summary
+    tool = page.locator(".question-tools .qt-practice").first
+    if tool.count():
+        tool.focus()
+        page.keyboard.press("Enter")
+        page.wait_for_timeout(300)
+        if not page.locator(".iv-bar:not([hidden])").count():
+            out.append("Enter on the interview tool does not start interview mode")
+        else:
+            page.locator(".iv-bar .iv-end").focus()
+            page.keyboard.press("Enter")
+            page.wait_for_timeout(400)
+            if not page.evaluate("() => !!document.activeElement && document.activeElement.classList.contains('iv-summary')"):
+                out.append("ending the interview does not show its summary with the focus on it")
     return out
 
 

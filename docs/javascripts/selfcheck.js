@@ -8,7 +8,9 @@
 // browser (a ✓ on the next visit); it does not mark the question solved. tools/lint_pages.py
 // checks the attributes, and tests/tools/test_selfcheck.py checks every answer. The reply
 // moves a little (M7, 13-motion.css, only without reduced motion): a right answer draws its
-// check mark, a wrong one shakes the field.
+// check mark, a wrong one shakes the field. Every check also tells the page
+// (a "dvq-selfcheck" event on document, {box, ok}): interview mode counts the right
+// answers and asks a follow-up after each one (question-tools.js).
 (() => {
   const STORE = "dvq-check";
   const NB = " ";
@@ -52,16 +54,19 @@
     box.append(row, msg);
     const input = row.querySelector("input"), go = row.querySelector(".selfcheck__go"), reveal = row.querySelector(".selfcheck__show");
     const say = (cls, html) => { msg.className = `selfcheck__msg ${cls}`; msg.innerHTML = html; };
+    const tell = (ok) => document.dispatchEvent(new CustomEvent("dvq-selfcheck", { detail: { box, ok } }));
     const check = () => {
       const got = parse(input.value);
       if (Number.isNaN(got)) { say("is-info", "הקלידו מספר, למשל ‎17‎, ‎2.5‎ או ‎1/3‎."); return; }
       if (same(got, want)) {
+        tell(true);
         say("is-ok", `${TICK}נכון. ההסבר בפתרון שלמטה.`);
         box.classList.add("is-done");
         reveal.hidden = true;
         store.set(key);
         return;
       }
+      tell(false);
       say("is-bad", `לא נכון. רמז${NB}: ${box.dataset.hint}`);
       pulse(input, "is-shake");
       reveal.hidden = false;

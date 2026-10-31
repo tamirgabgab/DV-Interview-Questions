@@ -108,7 +108,7 @@
 
   // The home page's hero (UI319): "start practising" goes to the first question (student
   // to senior) not marked solved, and says so once some are; a random question; the large
-  // field and the ready searches open the site search (with the query typed in).
+  // field and the ready searches open the quick jump (with the query typed in).
   const hero = () => {
     const start = document.querySelector(".hh-start");
     if (!start) return;
@@ -140,9 +140,12 @@
         input.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true }));
       }
     };
+    // the large field and the ready searches open the quick jump (quick-jump.js), whose last
+    // row sends the words to the site search; without it, the site search itself
+    const jump = (q) => (window.dvqQuickJump ? window.dvqQuickJump.open(q) : search(q));
     const field = document.querySelector(".hh-search");
-    if (field) field.addEventListener("click", () => search(""));
-    document.querySelectorAll(".hh-chip[data-q]").forEach((b) => b.addEventListener("click", () => search(b.dataset.q)));
+    if (field) field.addEventListener("click", () => jump(""));
+    document.querySelectorAll(".hh-chip[data-q]").forEach((b) => b.addEventListener("click", () => jump(b.dataset.q)));
   };
 
   // Another tab changed the marks
