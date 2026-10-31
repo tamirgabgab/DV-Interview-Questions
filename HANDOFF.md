@@ -1697,11 +1697,22 @@ section below starts at session 22, whose numbered items run on through the late
     "measure" with cursors A and B in cycles, and in ns where a diagram declares its clock;
     "play" with a time line and a log of changes written from the waves). Last: a figure
     that stays beside the steps of a solution (sticky), tried on one question first.
+113. **The waveform viewer (session 31, 2026-10-31).** The owner's choices: on the six
+    WaveDrom diagrams only (0001, 0034, 0035, 0038 twice, 0040), two buttons off by default,
+    a play that sweeps and lights a log written from the waves, and cycles with ns only
+    where a diagram declares its clock (`dvq: { mhz: ... }` in its source; none does yet).
+    `docs/javascripts/wave-viewer.js` (added by the hook beside `wavedrom-init.js`, which
+    now keeps the sources and hands each rendered diagram to it) reads the period marks
+    (`gmark_*`) and the lanes' offset from WaveDrom's SVG; the log's pure part runs under
+    Node (`tests/tools/test_wave_viewer.py`). Seen while checking: axe at 1200 px reports,
+    on 0038, Material's search dialog without a name, the page tools' "solved" and "star"
+    buttons whose names do not contain their visible text, and the current part chip's
+    contrast in the light scheme; all from before, not fixed here.
 
 ## In progress
 
-- **Session 31 (2026-10-31):** the home page touches (work log item 112); then the
-  waveform viewer; the sticky figure last.
+- **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
+  viewer (item 113), shipped one after the other; the sticky figure last.
 - **Session 30 (2026-10-31):** interview mode, the builder, my map and the quick jump (work
   log item 109) published (`main` df3f829, deploy green); then the hero's chip (item 111).
   The owner checks the live site (desktop and phone, light and dark).

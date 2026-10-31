@@ -199,3 +199,43 @@ html.qj-open { overflow: hidden; }
 .md-typeset .home-hero .hh-fix.is-live > :is(.hh-new, .hh-old) { grid-area: 1 / 1; text-align: start; }
 .md-typeset .home-hero .hh-fix .hh-slash { position: absolute; inset: -0.08em -0.12em; width: calc(100% + 0.24em); height: calc(100% + 0.16em); overflow: visible; opacity: 0; pointer-events: none; }
 .md-typeset .home-hero .hh-fix .hh-slash line { stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+
+/* ---- session 31: the waveform viewer under every WaveDrom diagram (wave-viewer.js): the
+   two buttons, the cursors A and B with the dimension line, the time line and its log ---- */
+.md-typeset .wv-host { position: relative; }
+.md-typeset .wv-host.wv-measuring { padding-bottom: 3rem; cursor: crosshair; }   /* room for the knobs and the dimension line */
+.md-typeset .wv-layer { position: absolute; pointer-events: none; }
+.md-typeset .wv-layer [hidden] { display: none; }
+.md-typeset .wv-cur, .md-typeset .wv-guide, .md-typeset .wv-now { position: absolute; top: var(--wv-y0); height: calc(var(--wv-y1) - var(--wv-y0) + 0.4rem); width: 0; }
+.md-typeset .wv-cur { border-left: 2px solid var(--wv-c); }
+.md-typeset .wv-a { --wv-c: var(--md-typeset-a-color); }
+.md-typeset .wv-b { --wv-c: var(--site-mark-color); }   /* the amber that reads 3:1 on white */
+.md-typeset .wv-guide { border-left: 1px dashed var(--md-default-fg-color--light); }
+.md-typeset .wv-guide span { position: absolute; bottom: 100%; left: 0.2rem; color: var(--md-default-fg-color--light); font-size: 0.55rem; white-space: nowrap; }
+.md-typeset .wv-knob { position: absolute; top: calc(var(--wv-y1) + 0.45rem); width: 1.15rem; height: 1.15rem; margin-left: -0.575rem; padding: 0; border: 0; border-radius: var(--radius-s); background: var(--wv-c); color: var(--md-default-bg-color); font: 600 0.6rem/1.15rem var(--md-code-font-family); text-align: center; cursor: grab; pointer-events: auto; touch-action: none; }
+.md-typeset .wv-knob.wv-b { border: 1px solid var(--site-mark-color); background: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .wv-knob:active { cursor: grabbing; }
+.md-typeset .wv-dim { position: absolute; top: calc(var(--wv-y1) + 1.85rem); height: 0; border-top: 1.5px solid var(--md-default-fg-color); }
+.md-typeset .wv-dim::before, .md-typeset .wv-dim::after { content: ""; position: absolute; top: -0.25rem; height: 0.45rem; border-left: 1.5px solid var(--md-default-fg-color); }
+.md-typeset .wv-dim::before { left: 0; }
+.md-typeset .wv-dim::after { right: 0; }
+.md-typeset .wv-dim span { position: absolute; top: 0.2rem; left: 50%; transform: translateX(-50%); direction: rtl; padding: 0 0.35rem; border-radius: var(--radius-s); background: var(--md-default-fg-color); color: var(--md-default-bg-color); font-size: 0.55rem; white-space: nowrap; }
+.md-typeset .wv-dim.is-zero::before, .md-typeset .wv-dim.is-zero::after { display: none; }
+.md-typeset .wv-veil { position: absolute; top: calc(var(--wv-y0) - 0.2rem); height: calc(var(--wv-y1) - var(--wv-y0) + 0.4rem); background: color-mix(in srgb, var(--wv-ground, var(--md-default-bg-color)) 72%, transparent); }
+.md-typeset .sol-block .wv-veil { --wv-ground: var(--site-surface); }
+.md-typeset .wv-now { border-left: 2px solid var(--md-accent-fg-color); }
+.md-typeset .wv-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1) var(--sp-2); margin: var(--sp-1) 0 0; }
+.md-typeset .wv-btn { display: inline-flex; align-items: center; gap: 0.3em; min-height: 1.6rem; padding: 0 var(--sp-2); border: 1px solid var(--site-card-border); border-radius: var(--radius-m); background: var(--site-surface); color: var(--md-default-fg-color); font: inherit; font-size: 0.65rem; cursor: pointer; }
+.md-typeset .wv-btn svg { width: 0.9rem; height: 0.9rem; fill: currentColor; }
+.md-typeset .wv-btn:hover { border-color: var(--md-typeset-a-color); }
+.md-typeset .wv-btn[aria-pressed="true"] { border-color: var(--md-typeset-a-color); background: var(--site-primary-soft); color: var(--md-typeset-a-color); font-weight: 600; }
+.md-typeset .wv-read { flex: 1 1 14rem; margin: 0; color: var(--md-default-fg-color--light); font-size: 0.65rem; }
+.md-typeset ol.wv-log { margin: var(--sp-2) 0 0; padding-inline-start: 0; list-style: none; font-size: 0.65rem; }
+.md-typeset ol.wv-log li { margin: 0.1rem 0; }
+.md-typeset ol.wv-log.is-playing li:not(.is-on) { opacity: 0.35; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset ol.wv-log li { transition: opacity var(--dur-1) var(--ease); }
+}
+@media print {
+  .md-typeset :is(.wv-tools, .wv-log, .wv-layer) { display: none; }
+}

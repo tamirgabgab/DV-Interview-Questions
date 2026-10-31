@@ -176,6 +176,7 @@ KINDS_LINE = re.compile(r"^// kinds: ([\w -]+)$")
 WAVEDROM_CDN = ["https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/skins/default.js",
                 "https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/wavedrom.min.js"]
 WAVEDROM_INIT = "javascripts/wavedrom-init.js"
+WAVE_VIEWER = "javascripts/wave-viewer.js"     # measure and play under each diagram (session 31)
 WAVEDROM_BLOCK = '<pre class="wavedrom">'
 JOINED_CSS = "stylesheets/site.css"
 CSS_LINK = re.compile(r'<link rel="stylesheet" href="([^"]*?)stylesheets/\d\d-[\w-]+\.css">\n?')
@@ -1333,12 +1334,13 @@ def explorer_scripts(output: str, page_url: str) -> str:
 
 
 def wavedrom_scripts(output: str, page_url: str) -> str:
-    """The WaveDrom scripts and the init script for a built page with a ```wavedrom block,
-    or "" for every other page."""
+    """The WaveDrom scripts, the waveform viewer and the init script for a built page with a
+    ```wavedrom block, or "" for every other page."""
     if WAVEDROM_BLOCK not in output:
         return ""
     base = _base(page_url) or "."
-    return "".join(f'<script src="{src}"></script>' for src in [*WAVEDROM_CDN, posixpath.relpath(WAVEDROM_INIT, base)])
+    local = [posixpath.relpath(WAVE_VIEWER, base), posixpath.relpath(WAVEDROM_INIT, base)]
+    return "".join(f'<script src="{src}"></script>' for src in [*WAVEDROM_CDN, *local])
 
 
 def one_stylesheet(output: str) -> str:

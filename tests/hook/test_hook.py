@@ -79,7 +79,7 @@ def test_explorer_scripts_per_page():
 def test_wavedrom_only_where_drawn():
     page = '<p>x</p><pre class="wavedrom">{signal: []}</pre>'
     tags = re.findall(r'src="([^"]+)"', hook.wavedrom_scripts(page, "questions/junior/0034-x/"))
-    assert tags == [*hook.WAVEDROM_CDN, "../../../javascripts/wavedrom-init.js"]
+    assert tags == [*hook.WAVEDROM_CDN, "../../../javascripts/wave-viewer.js", "../../../javascripts/wavedrom-init.js"]
     assert hook.wavedrom_scripts("<p>no diagram</p>", "questions/junior/0034-x/") == ""
 
 
