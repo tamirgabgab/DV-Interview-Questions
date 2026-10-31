@@ -480,22 +480,33 @@ title and lead): a navy card with a quiet waveform pattern, "start practising" (
 `marks.js` at the first question, student to senior, not marked solved), a random question,
 a large field and ready searches that open the quick jump, and one line of numbers
 (questions, tested code, interactive boxes), with a line for the audience under the title
-(`{ .hh-audience }`). The numbers count up the first time they are seen
+(`{ .hh-audience }`) and the motto under it (`{ .hh-audience .hh-motto }`): its last word,
+`<span class="hh-fix">להבין</span>`, corrects itself once a browser session (`home.js`:
+"לשנן" struck through in white, "להבין" written small above it and set in its place; the
+old word exists only in the script, and nothing moves under reduced motion or in an
+automated browser). The numbers count up the first time they are seen
 (`docs/javascripts/home.js`, off under reduced motion). The background (session 30, in
 place of the rolling waves) is a canvas that `docs/javascripts/hero-board.js` fills with a
 chip and its fan-out, as on a real board: seven pins a side, each wire stepping out (the
 outer pins turn first, so no wire crosses another), spreading and running to the edge,
 only across or up and down with small round corners; amber electrons run out of the chip
-and into it, and a pin lights when one arrives. The chip sits in `.hh-chip-slot`, a column
+and into it, and a pin lights when one arrives; every few seconds a burst of three or four
+faster white electrons runs along one wire (session 31). The chip sits in `.hh-chip-slot`, a column
 between the text and the builder from 76.25em up and a strip under the numbers otherwise
-(`21-interview.css`); the wires are not drawn in the builder's box and fade on the text's
-side. It runs only while the hero is on screen, and is one still frame under reduced
+(`21-interview.css`); the wires are not drawn in the builder's box, run on to the edge on
+the text's side, and pass under a soft calm patch of the hero's colour under every line of
+text and every control (measured once per layout, again when the web font arrives). It runs only while the hero is on screen, and is one still frame under reduced
 motion and in an automated browser. Beside the text (under it on a narrow screen) sits the
 **interview builder** (session 30, `_hero_builder` in the hook, `home.js`; it replaced the
 live example of 0055): a level, a length (20, 40 or 60 minutes) and kinds give a series
 that fits the time (`dvqInterview.buildPlan`: a seeded shuffle of the level's questions
 of those kinds, the ones not solved yet first, taken while they fit), "another series"
-draws again, and "start" keeps the series (`dvq-plan`) and opens its first question. It
+draws again, and "start" keeps the series (`dvq-plan`) and opens its first question. The
+series is a fan of small cards (session 31; the first on the right), each the question's
+link with its id, difficulty (`--hh-easy`, `--hh-medium`, `--hh-hard`: light colours, the
+hero is navy in both schemes) and minutes; the title of the card under the pointer or the
+focus shows in the line under the fan (`.hb-peek`). A new series gathers the cards into a
+pile and deals the new ones (still under reduced motion and in an automated browser). It
 stays hidden when `questions.json` does not load. Under the "continue" card, **my map**
 (`<!-- my-map -->`, `_my_map` in the hook, `home-extras.js`): a square per question, a
 row per level, painted solved, started (a self-check answered or an interview done) or

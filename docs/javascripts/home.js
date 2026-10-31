@@ -3,10 +3,15 @@
 // stagger along a row of cards). The real numbers and the content are in the page; without
 // the script, under reduced motion or in an automated browser (the page checks), nothing
 // moves or hides. Beside the hero's text sits the interview builder (session 30; it
-// replaced round M's live example of 0055); hero-board.js draws the hero's background.
+// replaced round M's live example of 0055), whose series is dealt as a fan of small cards
+// (session 31); hero-board.js draws the hero's background. The hero's motto corrects
+// itself once a visit: "לשנן" struck through, "להבין" written above it and set in its
+// place (session 31, after Hallmark's headline); the page itself holds only "להבין".
 (() => {
   const COUNT_MS = 900;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const still = reduce || navigator.webdriver;
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   const countUp = (el) => {
     const target = Number(el.textContent);
@@ -47,6 +52,12 @@
   // series" draws again; "start" keeps the series in the browser and opens its first
   // question, where interview mode starts by itself (question-tools.js). The last choice
   // is remembered.
+  //
+  // The series is a fan of small cards (the first on the right): each holds the id, the
+  // difficulty and the minutes, and the title of the card under the pointer or the focus
+  // shows in the line under the fan (the first card's title otherwise). A new series
+  // gathers the cards into a pile and deals the new ones; nothing moves under reduced
+  // motion or in an automated browser.
   const PICK = "dvq-builder";
   const builder = (panel) => {
     const I = window.dvqInterview;
@@ -55,7 +66,56 @@
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(PICK) || "null"); } catch (e) { /* none */ }
     const st = { level: "junior", minutes: 40, kinds: [...panel.querySelectorAll(".hb-topic")].map((b) => b.dataset.kind), seed: 1, ...(saved || {}) };
-    let data = null, current = [];
+    let data = null, current = [], turn = 0;
+    const peek = panel.querySelector(".hb-peek");
+    const cards = () => [...plan.querySelectorAll(".hb-card")];
+    // each card's place along a shallow arc, the first on the right
+    const place = () => {
+      const all = cards(), n = all.length;
+      if (!n) return;
+      const W = plan.clientWidth, cw = all[0].parentElement.offsetWidth, mid = (n - 1) / 2;
+      const step = n > 1 ? Math.min(cw * 0.92, (W - cw) / (n - 1)) : 0;
+      all.forEach((a, k) => {
+        const u = mid - k;
+        a.parentElement.style.transform = `translate(${((W - cw) / 2 + u * step).toFixed(1)}px, ${(u * u * 3).toFixed(1)}px) rotate(${(u * 4).toFixed(1)}deg)`;
+        a.parentElement.style.zIndex = String(k + 1);
+      });
+    };
+    const pile = () => {
+      const li = plan.querySelector("li");
+      return `translate(${((plan.clientWidth - (li ? li.offsetWidth : 0)) / 2).toFixed(1)}px, 1.6rem) rotate(0deg) scale(0.9)`;
+    };
+    const show = (a) => {
+      cards().forEach((c) => c.classList.toggle("is-peek", c === a));
+      const first = a || cards()[0];
+      if (peek) peek.innerHTML = first ? `<b>${first.querySelector(".hb-id").textContent}</b> ${first.dataset.title}` : "";
+    };
+    // gather the old cards into the pile, put the new ones in and deal them
+    const deal = (html) => {
+      const mine = ++turn;
+      const lis = [...plan.querySelectorAll("li")].filter((li) => li.querySelector(".hb-card"));
+      const gather = still || !lis.length ? Promise.resolve() : Promise.all(lis.map((li, k) =>
+        li.animate([{ transform: li.style.transform, opacity: 1 }, { transform: pile(), opacity: 0 }],
+          { duration: 200, delay: (lis.length - 1 - k) * 35, easing: "cubic-bezier(.4, 0, 1, 1)", fill: "forwards" }).finished)).catch(() => {});
+      gather.then(() => {
+        if (mine !== turn) return;
+        plan.innerHTML = html;
+        place();
+        show(null);
+        if (still) return;
+        const from = pile();
+        plan.querySelectorAll("li").forEach((li, k) => {
+          if (!li.querySelector(".hb-card")) return;
+          li.animate([{ transform: from, opacity: 0 }, { transform: li.style.transform, opacity: 1 }],
+            { duration: 420, delay: k * 80, easing: "cubic-bezier(.2, .8, .2, 1)", fill: "backwards" });
+        });
+      });
+    };
+    plan.addEventListener("pointerover", (e) => { const a = e.target.closest(".hb-card"); if (a) show(a); });
+    plan.addEventListener("pointerleave", () => { if (!plan.contains(document.activeElement)) show(null); });
+    plan.addEventListener("focusin", (e) => { const a = e.target.closest(".hb-card"); if (a) show(a); });
+    plan.addEventListener("focusout", (e) => { if (!plan.contains(e.relatedTarget)) show(null); });
+    if ("ResizeObserver" in window) new ResizeObserver(place).observe(plan);
     const paint = () => {
       panel.querySelectorAll("[data-level]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.level === st.level)));
       panel.querySelectorAll("[data-minutes]").forEach((b) => b.setAttribute("aria-pressed", String(Number(b.dataset.minutes) === st.minutes)));
@@ -68,15 +128,17 @@
       const solved = data.qs.filter((q) => window.dvqMarks && window.dvqMarks.has(q[I.ID], "solved")).map((q) => q[I.ID]);
       const res = I.buildPlan(data.qs, { level: st.level, minutes: st.minutes, kinds: st.kinds, solved, seed: st.seed });
       current = res.plan;
-      plan.classList.remove("is-new");
-      void plan.offsetWidth;
-      if (!reduce) plan.classList.add("is-new");
-      plan.innerHTML = current.length
-        ? current.map((q) => `<li><span class="hb-id">${q[I.ID]}</span><a href="${I.siteUrl(q[I.URL])}">${q[I.TITLE].replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]))}</a>` +
-          `<span class="hb-min">${I.targetMinutes(q[I.DIFF], q[I.PARTS])} דק'</span></li>`).join("")
-        : '<li class="hb-empty">אין שאלות ברמה ובנושאים האלה. בחרו עוד נושא.</li>';
       const n = current.length;
       sum.textContent = n ? `${n === 1 ? "שאלה אחת" : `${n} שאלות`}, כ-${res.minutes} דקות. השעון בכל שאלה רץ מול הזמן שלה.` : "";
+      const html = n
+        ? current.map((q) => {
+          const d = q[I.DIFF], m = I.targetMinutes(d, q[I.PARTS]), t = esc(q[I.TITLE]);
+          // the link's name is its text: the id, the title (for screen readers only), the difficulty, the minutes
+          return `<li><a class="hb-card" href="${I.siteUrl(q[I.URL])}" data-title="${t}">` +
+            `<span class="hb-id">${q[I.ID]}</span><span class="hb-sr"> ${t}, </span><span class="hb-diff hb-${d}">${esc(data.diffs[d])}</span><span class="hb-min">${m} דק'</span></a></li>`;
+        }).join("")
+        : '<li class="hb-empty">אין שאלות ברמה ובנושאים האלה. בחרו עוד נושא.</li>';
+      deal(html);
       go.hidden = !n;
       if (n) go.href = I.siteUrl(current[0][I.URL]);
     };
@@ -104,6 +166,43 @@
     const hero = document.querySelector(".home-hero");
     if (!hero || !("IntersectionObserver" in window)) return;
     builder(hero.querySelector(".hh-builder"));
+  });
+
+  // The motto's correction (once a browser session): the old word is put in by this script
+  // only, so the page, its search index and a reader without the script see "להבין".
+  const MOTTO = "dvq-motto";
+  const motto = (fix) => {
+    let seen = false;
+    try { seen = sessionStorage.getItem(MOTTO) === "1"; sessionStorage.setItem(MOTTO, "1"); } catch (e) { /* none */ }
+    if (seen || still || !fix.animate) return;
+    const word = fix.textContent;
+    fix.innerHTML = `<span class="hh-new">${esc(word)}</span><span class="hh-old" aria-hidden="true">לשנן</span>` +
+      '<svg class="hh-slash" viewBox="0 0 20 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><line x1="19" y1="8" x2="1" y2="32" pathLength="1"/></svg>';
+    fix.classList.add("is-live");
+    const [nw, old, slash] = [fix.querySelector(".hh-new"), fix.querySelector(".hh-old"), fix.querySelector(".hh-slash")];
+    const line = slash.querySelector("line");
+    // one animation per element, as a timeline of [ms, keyframe], after a short pause (the
+    // first keyframe holds through it)
+    const track = (el, frames) => {
+      const end = frames[frames.length - 1][0];
+      return el.animate(frames.map(([t, k]) => ({ offset: t / end, ...k })), { duration: end, delay: 450, fill: "both" });
+    };
+    const UP = "translateY(-0.95em) scale(0.5)";
+    const run = [
+      track(old, [[0, { opacity: 1, transform: "none" }], [1150, { opacity: 1, transform: "none" }], [1550, { opacity: 0, transform: "translateY(0.4em) rotate(9deg)" }], [2300, { opacity: 0, transform: "translateY(0.4em) rotate(9deg)" }]]),
+      track(slash, [[0, { opacity: 0 }], [260, { opacity: 0 }], [300, { opacity: 1 }], [1150, { opacity: 1 }], [1450, { opacity: 0 }], [2300, { opacity: 0 }]]),
+      track(line, [[0, { strokeDashoffset: 1 }], [300, { strokeDashoffset: 1 }], [560, { strokeDashoffset: 0 }], [2300, { strokeDashoffset: 0 }]]),
+      track(nw, [[0, { opacity: 0, transform: UP, color: "#ffffff" }], [620, { opacity: 0, transform: UP, color: "#ffffff" }], [820, { opacity: 1, transform: UP, color: "#ffffff" }],
+        [1150, { opacity: 1, transform: UP, color: "#ffffff" }], [1650, { opacity: 1, transform: "none", color: "#ffffff" }], [1800, { opacity: 1, transform: "none", color: "#ffffff" }],
+        [2300, { opacity: 1, transform: "none", color: getComputedStyle(fix).color }]]),
+    ];
+    // the plain word again once the edit is done
+    Promise.all(run.map((an) => an.finished)).then(() => { fix.classList.remove("is-live"); fix.textContent = word; }).catch(() => {});
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const fix = document.querySelector(".home-hero .hh-fix");
+    if (fix) motto(fix);                       // the old word at once; the edit starts a moment later
   });
 
   document.addEventListener("DOMContentLoaded", () => {

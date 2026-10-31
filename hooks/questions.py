@@ -920,6 +920,7 @@ def _hero_builder() -> str:
             + seg("minutes", "אורך", [(m, f"{m} דקות") for m in INTERVIEW_LENGTHS], 40)
             + f'<div class="hb-group" role="group" aria-labelledby="hb-kinds"><span class="hb-label" id="hb-kinds">נושאים</span><span class="hb-topics">{kinds}</span></div>'
             '<ol class="hb-plan" aria-live="polite"></ol>'
+            '<p class="hb-peek" aria-hidden="true"></p>'
             '<p class="hb-sum"></p>'
             '<div class="hb-actions"><a class="md-button md-button--primary hb-start" href="#">להתחיל את הראיון</a>'
             '<button type="button" class="hb-shuffle">סדרה אחרת</button></div>'

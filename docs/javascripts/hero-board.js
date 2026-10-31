@@ -2,17 +2,21 @@
 // the middle with its fan-out, as on a real board. A pin's wire leaves the chip, steps out
 // (the outer pins turn first, so no wire crosses another), spreads and runs to the edge;
 // wires only run across and up or down, with small round corners. Amber electrons run
-// out of the chip and into it, and a pin lights when one arrives.
+// out of the chip and into it, and a pin lights when one arrives. Every few seconds a
+// burst of three or four faster white electrons runs along one wire, like a packet.
 //
 // The chip sits in .hh-chip-slot, a place the page keeps for it (21-interview.css): a
 // column between the text and the interview builder on a wide screen, a strip under the
 // numbers otherwise. The wires pass under the builder (they are not drawn in its box) and
-// fade under the text. One still frame under reduced motion and in an automated browser
+// run on to the edge on the text's side, where a soft calm patch under every line of text
+// and every control keeps the text clear (drawn once per layout, then stamped each frame). One still frame under reduced motion and in an automated browser
 // (the page checks see a still page); the animation runs only while the hero is on screen.
 (() => {
   const AMBER = "255,194,51", WHITE = "255,255,255";
   const SPEED = 120;            // pixels per second
   const EVERY = 0.16;           // a new electron every so many seconds
+  const BURST = [2.6, 4.2];     // a white burst every so many seconds (a random time between)
+  const FAST = 1.7;             // a burst runs this many times faster
   const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.webdriver;
 
   // a polyline of horizontal and vertical steps, with its length
@@ -58,8 +62,7 @@
       wires.push(route([p, [p[0], p[1] + step(i)], [cx + spread(i), p[1] + step(i)], [cx + spread(i), h + 20]]));
       p = [cx + half, cy + o];                                            // the text's side
       pins.push({ p, horiz: true });
-      const end = Math.min(w + 20, cx + half + S * 1.2 + (i % 3) * S * 0.3);
-      wires.push(route([p, [p[0] + step(i), p[1]], [p[0] + step(i), cy + spread(i) * 0.8], [end, cy + spread(i) * 0.8]]));
+      wires.push(route([p, [p[0] + step(i), p[1]], [p[0] + step(i), cy + spread(i) * 0.8], [w + 20, cy + spread(i) * 0.8]]));
     }
     return { wires, pins, cx, cy, S };
   };
@@ -77,8 +80,8 @@
 
   const board = (hero, canvas, slot) => {
     const ctx = canvas.getContext("2d");
-    let W = 0, H = 0, geo = null, hide = null, quiet = null, bg = "rgb(27,42,74)", rgb = "27,42,74";
-    let flows = [], lit = new Map(), t = 0, last = 0, spawned = 0, running = false, frame = 0;
+    let W = 0, H = 0, geo = null, hide = null, calm = null, bg = "rgb(27,42,74)", rgb = "27,42,74";
+    let flows = [], lit = new Map(), t = 0, last = 0, spawned = 0, nextBurst = 1.2, running = false, frame = 0;
 
     const measure = () => {
       const hr = hero.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
@@ -94,8 +97,9 @@
       geo = layout(s.x + s.w / 2, s.y + s.h / 2, S, W, H);
       const builder = hero.querySelector(".hh-builder:not([hidden])");
       hide = builder ? local(builder.getBoundingClientRect()) : null;
-      // the text stays readable: the wires fade on its side
-      quiet = column ? { x0: s.x + s.w, x1: s.x + s.w + 70, horiz: true } : { y0: s.y, y1: s.y - 60, horiz: false };
+      // the text stays readable: a soft patch of the hero's colour under each line of text and
+      // each control, drawn once here on a canvas of its own
+      calm = calmMask(hero, hr, d);
       flows = [];
       if (still || !running) seed();
       draw();
@@ -104,6 +108,27 @@
     // a few electrons already on their way, for the still frame and the first one
     const seed = () => {
       for (let k = 0; k < 9; k++) flows.push({ i: (k * 11 + 3) % geo.wires.length, t0: t - 0.35 - k * 0.27, dir: k % 2 ? 1 : -1 });
+      burst(5, -1, t - 0.6);                                              // and one packet on its way in
+    };
+    // three or four white electrons close together on one wire, faster than the rest
+    const burst = (i, dir, t0) => {
+      const n = 3 + (Math.random() < 0.5 ? 1 : 0);
+      for (let k = 0; k < n; k++) flows.push({ i, t0: t0 + k * 0.075, dir, v: FAST, white: true });
+    };
+    const calmMask = (root, hr, d) => {
+      const c = document.createElement("canvas");
+      c.width = canvas.width; c.height = canvas.height;
+      const x = c.getContext("2d");
+      x.setTransform(d, 0, 0, d, 0, 0);
+      x.fillStyle = `rgb(${rgb})`; x.shadowColor = `rgb(${rgb})`; x.shadowBlur = 14;
+      const patch = (r, px, py) => { x.beginPath(); x.roundRect(r.left - hr.left - px, r.top - hr.top - py, r.width + 2 * px, r.height + 2 * py, 6); x.fill(); };
+      root.querySelectorAll(":scope > :is(h1, p)").forEach((el) => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        Array.from(range.getClientRects()).forEach((r) => patch(r, 8, 3));
+      });
+      root.querySelectorAll(".hh-tools :is(.hh-actions > *, .hh-search, .hh-suggest > *, .hh-stats > *)").forEach((el) => patch(el.getBoundingClientRect(), 6, 4));
+      return c;
     };
 
     const stroke = (pts) => {
@@ -113,18 +138,18 @@
       ctx.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
       ctx.stroke();
     };
-    const electron = (r, d, dir) => {
+    const electron = (r, d, dir, col) => {
       const head = at(r, d);
       const g = ctx.createRadialGradient(head[0], head[1], 0, head[0], head[1], 9);
-      g.addColorStop(0, `rgba(${AMBER},0.45)`);
-      g.addColorStop(1, `rgba(${AMBER},0)`);
+      g.addColorStop(0, `rgba(${col},0.45)`);
+      g.addColorStop(1, `rgba(${col},0)`);
       ctx.fillStyle = g;
       ctx.beginPath(); ctx.arc(head[0], head[1], 9, 0, 7); ctx.fill();
       for (let k = 14; k >= 0; k--) {
         const dd = d - dir * k * 2.6;
         if (dd < 0 || dd > r.L) continue;
         const p = at(r, dd);
-        ctx.fillStyle = `rgba(${AMBER},${(Math.pow(1 - k / 15, 1.6) * 0.95).toFixed(3)})`;
+        ctx.fillStyle = `rgba(${col},${(Math.pow(1 - k / 15, 1.6) * 0.95).toFixed(3)})`;
         ctx.beginPath(); ctx.arc(p[0], p[1], 2.3 - k * 0.09, 0, 7); ctx.fill();
       }
     };
@@ -148,11 +173,13 @@
       });
       // electrons
       flows = flows.filter((f) => {
-        const r = geo.wires[f.i], s = (t - f.t0) * SPEED;
+        const r = geo.wires[f.i], s = (t - f.t0) * SPEED * (f.v || 1);
         if (s > r.L) { if (f.dir < 0) lit.set(f.i, t + 0.6); return false; }
-        if (s >= 0) electron(r, f.dir > 0 ? s : r.L - s, f.dir);
+        if (s >= 0) electron(r, f.dir > 0 ? s : r.L - s, f.dir, f.white ? WHITE : AMBER);
         return true;
       });
+      // the calm patches under the text, then the chip over everything
+      if (calm) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(calm, 0, 0); ctx.restore(); }
       // the pins, then the chip (no marking on it)
       geo.pins.forEach(({ p, horiz }, i) => {
         const l = Math.max(0, (lit.get(i) || 0) - t);
@@ -173,16 +200,6 @@
         ctx.beginPath(); ctx.roundRect(x - 1, y - 1, S + 2, S + 2, 6); ctx.stroke();
       }
       ctx.restore();
-      // the text's side: the wires fade into the hero's colour
-      {
-        const solid = `rgba(${rgb},0.82)`, clear = `rgba(${rgb},0)`;
-        const g = quiet.horiz ? ctx.createLinearGradient(quiet.x0, 0, quiet.x1, 0) : ctx.createLinearGradient(0, quiet.y0, 0, quiet.y1);
-        g.addColorStop(0, clear);
-        g.addColorStop(1, solid);
-        ctx.fillStyle = g;
-        if (quiet.horiz) ctx.fillRect(quiet.x0, 0, W - quiet.x0, H);
-        else ctx.fillRect(0, 0, W, quiet.y0);
-      }
     };
 
     const tick = (now) => {
@@ -193,6 +210,10 @@
       if (t - spawned > EVERY) {
         spawned = t;
         flows.push({ i: Math.floor(Math.random() * geo.wires.length), t0: t, dir: Math.random() < 0.5 ? 1 : -1 });
+      }
+      if (t > nextBurst) {
+        nextBurst = t + BURST[0] + Math.random() * (BURST[1] - BURST[0]);
+        burst(Math.floor(Math.random() * geo.wires.length), Math.random() < 0.6 ? -1 : 1, t);
       }
       draw();
       frame = requestAnimationFrame(tick);
@@ -212,6 +233,8 @@
     // the hero's colour follows the light / dark switch
     new MutationObserver(measure).observe(document.body, { attributes: true, attributeFilter: ["data-md-color-scheme"] });
     new IntersectionObserver((entries) => play(entries.some((e) => e.isIntersecting))).observe(hero);
+    // the calm patches follow the text, whose lines move once the web font is in
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
     measure();
   };
 

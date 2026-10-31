@@ -1683,9 +1683,25 @@ section below starts at session 22, whose numbered items run on through the late
     hook; `.hh-chip-slot` keeps its place); the waves (`HERO_WAVES`, their styles in 09, 10
     and 13, and home.js's pause) are removed. Checked: it moves on screen, stops off
     screen, and is one still frame under reduced motion; phone and keyboard checks clean.
+112. **Three touches on the home page, after Hallmark (session 31, 2026-10-31).** The owner
+    asked what to take from Hallmark (usehallmark.com, github.com/Nutlope/hallmark): its
+    elements, not its colours. A survey of its site and its fifty themes and a page of
+    seven live demos in the site's look; the owner chose, for the home page: the motto that
+    corrects itself (a new amber line, "פתרון מלא לכל שאלה, כדי להבין", whose last word
+    replaces a struck "לשנן" once a browser session), the builder's series as a dealt fan
+    of small cards (id, difficulty, minutes; the title of the card under the pointer or
+    the focus in a line under it), and the chip with a calm patch under every line of text
+    (the text side's wires now run to the edge) and bursts of fast white electrons (no red
+    "failed" electrons: the owner did not want a chip that looks broken). Next, as a second
+    change: a waveform viewer on the six WaveDrom diagrams (two buttons under each,
+    "measure" with cursors A and B in cycles, and in ns where a diagram declares its clock;
+    "play" with a time line and a log of changes written from the waves). Last: a figure
+    that stays beside the steps of a solution (sticky), tried on one question first.
 
 ## In progress
 
+- **Session 31 (2026-10-31):** the home page touches (work log item 112); then the
+  waveform viewer; the sticky figure last.
 - **Session 30 (2026-10-31):** interview mode, the builder, my map and the quick jump (work
   log item 109) published (`main` df3f829, deploy green); then the hero's chip (item 111).
   The owner checks the live site (desktop and phone, light and dark).

@@ -114,23 +114,31 @@ html.qj-open { overflow: hidden; }
 .md-typeset .home-hero .hb-topic { min-height: 1.5rem; padding: 0 var(--sp-2); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 1rem; background: transparent; color: #fff; font: inherit; font-size: 0.6rem; cursor: pointer; }
 .md-typeset .home-hero .hb-topic[aria-pressed="true"] { border-color: var(--md-accent-fg-color); background: var(--md-accent-fg-color); color: #1b2a4a; font-weight: 600; }
 .md-typeset .home-hero :is(.hb-opt, .hb-topic, .hb-shuffle):focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
-.md-typeset .home-hero .hb-plan { display: flex; flex-direction: column; gap: 3px; min-height: 3.6rem; margin: var(--sp-1) 0 0; padding: 0; list-style: none; }
-.md-typeset .home-hero .hb-plan li { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) auto; gap: var(--sp-2); align-items: baseline; margin: 0; padding: 0.25rem var(--sp-2); border-radius: var(--radius-s); background: rgba(255, 255, 255, 0.08); font-size: 0.65rem; }
-.md-typeset .home-hero .hb-plan a { color: #fff; text-decoration: none; }
-.md-typeset .home-hero .hb-plan a:is(:hover, :focus-visible) { text-decoration: underline; }
-.md-typeset .home-hero .hb-plan .hb-id { color: var(--site-logo-v); font-family: var(--md-code-font-family); font-weight: 600; }
-.md-typeset .home-hero .hb-plan .hb-min { color: rgba(255, 255, 255, 0.82); white-space: nowrap; }
-.md-typeset .home-hero .hb-plan li.hb-empty { display: block; color: rgba(255, 255, 255, 0.82); background: none; }
+.md-typeset .home-hero .hb-plan { position: relative; display: block; height: 5.6rem; margin: var(--sp-1) 0 0; padding: 0; list-style: none; direction: ltr; }
+/* session 31: the series as a fan of small cards (home.js places each one); the card under
+   the pointer or the focus rises, and its title shows in the line under the fan */
+.md-typeset .home-hero .hb-plan li { position: absolute; left: 0; bottom: 0.4rem; width: 3.4rem; height: 4.4rem; margin: 0; padding: 0; transform-origin: 50% 125%; }
+.md-typeset .home-hero .hb-plan li:has(.hb-card:is(:hover, :focus-visible, .is-peek)) { z-index: 20 !important; }
+.md-typeset .home-hero .hb-card { direction: rtl; display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 0.3rem 0.35rem; border: 1px solid rgba(255, 255, 255, 0.24); border-radius: var(--radius-m);
+  background: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)), linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)), var(--hh-ground);
+  box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.28); color: #fff; font-size: 0.55rem; line-height: 1.25; text-decoration: none; transition: translate var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
+.md-typeset .home-hero .hb-card:is(:hover, :focus-visible, .is-peek) { translate: 0 -0.45rem; border-color: var(--site-logo-v); text-decoration: none; }
+.md-typeset .home-hero .hb-plan li > a.hb-card { text-decoration: none; }   /* over 07's underline of a link in a list item */
+.md-typeset .home-hero .hb-card:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.md-typeset .home-hero .hb-card .hb-id { color: var(--site-logo-v); font-family: var(--md-code-font-family); font-size: 0.65rem; font-weight: 600; }
+.md-typeset .home-hero .hb-card .hb-diff { font-weight: 600; }
+.md-typeset .home-hero .hb-card .hb-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.md-typeset .home-hero .hb-card .hb-easy { color: var(--hh-easy); }
+.md-typeset .home-hero .hb-card .hb-medium { color: var(--hh-medium); }
+.md-typeset .home-hero .hb-card .hb-hard { color: var(--hh-hard); }
+.md-typeset .home-hero .hb-card .hb-min { color: rgba(255, 255, 255, 0.82); white-space: nowrap; }
+.md-typeset .home-hero .hb-plan li.hb-empty { position: static; width: auto; height: auto; padding-top: var(--sp-2); color: rgba(255, 255, 255, 0.82); font-size: 0.65rem; direction: rtl; }
+.md-typeset .home-hero .hb-peek { min-height: 1.6rem; color: #fff; font-size: 0.6rem; line-height: 1.35; }
+.md-typeset .home-hero .hb-peek b { margin-inline-end: 0.3em; color: var(--site-logo-v); font-family: var(--md-code-font-family); }
 .md-typeset .home-hero .hb-sum { color: rgba(255, 255, 255, 0.82); font-size: 0.6rem; min-height: 0.9rem; }
 .md-typeset .home-hero .hb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
 .md-typeset .home-hero .hb-actions .md-button { margin: 0; padding: 0.4em 1em; font-size: 0.7rem; }
 .md-typeset .home-hero .hb-shuffle { padding: 0.3rem var(--sp-2); border: 0; background: none; color: #fff; font: inherit; font-size: 0.65rem; text-decoration: underline; cursor: pointer; }
-@media (prefers-reduced-motion: no-preference) {
-  .md-typeset .home-hero .hb-plan.is-new li { animation: iv-in var(--dur-1) var(--ease) both; }
-  .md-typeset .home-hero .hb-plan.is-new li:nth-child(2) { animation-delay: 30ms; }
-  .md-typeset .home-hero .hb-plan.is-new li:nth-child(3) { animation-delay: 60ms; }
-  .md-typeset .home-hero .hb-plan.is-new li:nth-child(4) { animation-delay: 90ms; }
-}
 /* on a wide screen the builder sits beside the hero's text, where the live example was */
 @media screen and (min-width: 60em) {
   .md-typeset .home-hero:has(.hh-builder:not([hidden])) { display: grid; grid-template-columns: minmax(0, 1fr) 16rem; column-gap: var(--sp-5); align-content: start; }
@@ -174,3 +182,20 @@ html.qj-open { overflow: hidden; }
   .md-typeset .home-hero:has(.hh-builder:not([hidden])) > .hh-chip-slot { grid-column: 2; grid-row: 1 / span 8; height: auto; min-height: 12rem; margin: 0; }
   .md-typeset .home-hero .hh-builder { grid-column: 3; }
 }
+
+/* ---- session 31: the hero's ground and the cards' difficulty colours (the hero is navy in
+   both schemes, so the dark scheme's light difficulty colours serve both; the red is a
+   lighter one, which reads 4.5:1 on a card) ---- */
+:root { --hh-easy: #5fd39a; --hh-medium: #ffc233; --hh-hard: #ffaba5; }
+[data-md-color-scheme="default"] { --hh-ground: var(--md-primary-fg-color); }
+[data-md-color-scheme="slate"] { --hh-ground: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); }
+
+/* the motto under the audience line; home.js strikes "לשנן" and sets "להבין" in its place
+   once a visit (the slash is the hero's white, the new word is written in white and takes
+   the line's amber as it lands) */
+.md-typeset .home-hero p.hh-audience:has(+ p.hh-motto) { margin-bottom: 0.1rem; }
+.md-typeset .home-hero p.hh-motto { font-weight: 500; }
+.md-typeset .home-hero .hh-fix.is-live { position: relative; display: inline-grid; vertical-align: bottom; }
+.md-typeset .home-hero .hh-fix.is-live > :is(.hh-new, .hh-old) { grid-area: 1 / 1; text-align: start; }
+.md-typeset .home-hero .hh-fix .hh-slash { position: absolute; inset: -0.08em -0.12em; width: calc(100% + 0.24em); height: calc(100% + 0.16em); overflow: visible; opacity: 0; pointer-events: none; }
+.md-typeset .home-hero .hh-fix .hh-slash line { stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
