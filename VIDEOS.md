@@ -19,6 +19,7 @@ Once their structure is approved, the rest follow it question by question.
 | Pace | Calm, in the style of 3Blue1Brown: animations of 1–2 s, every picture held 2–4 s for its caption |
 | Code beat | Python only |
 | Opening and closing | The drawn DV mark, the question's id and parts; the closing has the site's address and the question's id |
+| Captions (2026-10-31) | The pilots go up without our Hebrew captions: they covered the middle of the picture. YouTube's own captions are relied on, and the player does not force captions on. `render.py` still writes `captions.vtt`, kept for later |
 | Review | The pilots are scripted and rendered in one go; the owner reviews the videos |
 | Pilots | 0002 (swap two variables) and 0004 (three mislabeled boxes) |
 
@@ -258,7 +259,7 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
      amber. Before play they move the poster's start; while playing they restart the
      player at that part.
    - **The player.** Play puts an iframe in the poster's place:
-     `https://www.youtube-nocookie.com/embed/<id>?start=<s>&cc_load_policy=1&cc_lang_pref=he&hl=he&rel=0&modestbranding=1&autoplay=1`,
+     `https://www.youtube-nocookie.com/embed/<id>?start=<s>&hl=he&rel=0&modestbranding=1&autoplay=1`,
      titled like the dialog, with `allow="autoplay; encrypted-media; picture-in-picture; fullscreen"`
      and `allowfullscreen`. Closing removes the iframe, which stops the video.
    - **The size.** The stage is 16:9, as wide as the screen allows up to 60rem and short

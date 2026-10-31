@@ -10,7 +10,7 @@
 // that opened the dialog. Tab cycles inside the dialog.
 (() => {
   const EMBED = "https://www.youtube-nocookie.com/embed/";
-  const PARAMS = "cc_load_policy=1&cc_lang_pref=he&hl=he&rel=0&modestbranding=1&autoplay=1";
+  const PARAMS = "hl=he&rel=0&modestbranding=1&autoplay=1";   // captions: YouTube's own, off by default (the owner, 2026-10-31)
   const NB = " ";
 
   const clock = (s) => {
@@ -103,7 +103,7 @@
     const chapters = el("div", "vd-chapters");
     chapters.setAttribute("role", "group");
     chapters.setAttribute("aria-label", "פרקי הסרטון");
-    const note = el("p", "vd-note", "הסרטון נטען מ-YouTube רק אחרי הלחיצה על הפעלה, עם כתוביות בעברית.");
+    const note = el("p", "vd-note", "הסרטון נטען מ-YouTube רק אחרי הלחיצה על הפעלה.");
     dialog.append(head, chapters, el("div", "vd-stage"), note);
     dialog.addEventListener("close", () => {
       stage().replaceChildren();                      // the player goes, and the sound with it
