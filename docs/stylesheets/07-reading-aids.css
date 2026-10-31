@@ -102,7 +102,7 @@
 .md-typeset .part-nav__chip.is-current {
   border-color: var(--md-accent-fg-color);
   background: var(--md-accent-fg-color);
-  color: var(--md-accent-bg-color);
+  color: var(--md-primary-fg-color--dark);   /* navy on the amber in both schemes (white was 2.5:1 in the light one) */
 }
 @media print { .md-typeset .fig-enlarge, .md-typeset .part-nav { display: none; } }
 

@@ -174,8 +174,11 @@
     }
   }, true);
 
-  // a button beside the header's search
+  // a button beside the header's search; and a name for Material's search dialog, which
+  // has role="dialog" and no name of its own
   document.addEventListener("DOMContentLoaded", () => {
+    const dialog = document.querySelector(".md-search[role=dialog]");
+    if (dialog && !dialog.hasAttribute("aria-label") && !dialog.hasAttribute("aria-labelledby")) dialog.setAttribute("aria-label", "חיפוש באתר");
     const anchor = document.querySelector('.md-header__inner label.md-header__button[for="__search"]');
     if (!anchor) return;
     const btn = document.createElement("button");

@@ -1707,7 +1707,14 @@ section below starts at session 22, whose numbered items run on through the late
     Node (`tests/tools/test_wave_viewer.py`). Seen while checking: axe at 1200 px reports,
     on 0038, Material's search dialog without a name, the page tools' "solved" and "star"
     buttons whose names do not contain their visible text, and the current part chip's
-    contrast in the light scheme; all from before, not fixed here.
+    contrast in the light scheme; all from before, fixed in item 114.
+114. **Three accessibility fixes (session 31, 2026-10-31).** The owner asked to fix what axe
+    found at 1200 px: Material's search dialog (`role="dialog"`, no name) is named "חיפוש
+    באתר" by `quick-jump.js`; the names of the "solved" and "star" page tools now start with
+    the word shown under their icons as a word of its own ("פתרתי : לסמן כפתורה", "מועדף :
+    להוסיף למועדפים", and the pressed states likewise; "שפתרתי" or "כמועדף" do not count,
+    a Hebrew prefix glues to the word); the current chip of the part bar is navy on the
+    amber (white was 2.5:1 in the light scheme), a new pair in `check_contrast.py`.
 
 ## In progress
 

@@ -507,8 +507,8 @@ def _tools(q: dict, page_url: str) -> str:
             + _video_tool(q)
             + _tool("qt-fold", "unfold-more", "פתח הכל", "", "פתח הכל")
             + _tool("qt-practice", "timer", "מצב ראיון", ' aria-pressed="false"', "ראיון")
-            + _tool("qt-mark qt-solved", "solved", "סמן כפתורה", ' data-mark="solved" aria-pressed="false"', "פתרתי")
-            + _tool("qt-mark qt-star", "star", "הוסף למועדפים", ' data-mark="star" aria-pressed="false"', "מועדף")
+            + _tool("qt-mark qt-solved", "solved", "פתרתי : לסמן כפתורה", ' data-mark="solved" aria-pressed="false"', "פתרתי")
+            + _tool("qt-mark qt-star", "star", "מועדף : להוסיף למועדפים", ' data-mark="star" aria-pressed="false"', "מועדף")
             + random_btn
             + '</div>')
 

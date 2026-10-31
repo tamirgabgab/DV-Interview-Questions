@@ -121,6 +121,7 @@ PAIRS = [
     ("wave viewer knob B letter", "#1b2a4a", ["var(--md-accent-fg-color)"], TEXT),
     ("wave viewer dimension label", "var(--md-default-bg-color)", ["var(--md-default-fg-color)"], TEXT),
     ("wave viewer button, on", "var(--md-typeset-a-color)", ["var(--site-primary-soft)", CARD], TEXT),
+    ("part bar, the current part", "var(--md-primary-fg-color--dark)", ["var(--md-accent-fg-color)"], TEXT),
     ("quick jump row, chosen", "var(--md-default-fg-color)", ["var(--site-primary-soft)", CARD], TEXT),
     ("quick jump match, chosen", "var(--md-typeset-a-color)", ["var(--site-primary-soft)", CARD], TEXT),
     ("quick jump details, chosen", "var(--md-default-fg-color)", ["var(--site-primary-soft)", CARD], TEXT),

@@ -197,7 +197,10 @@
 
     // Solved / favourite marks
     const qid = bar.dataset.qid;
-    const LABEL = { solved: ["סמן כפתורה", "סומנה כפתורה : לחיצה מבטלת"], star: ["הוסף למועדפים", "במועדפים : לחיצה מסירה"] };
+    // each name starts with the word shown under the icon on a touch screen ("פתרתי",
+    // "מועדף") as a word of its own, so a voice command with that word finds the button
+    // (WCAG 2.5.3; a Hebrew prefix such as "כ" glued to it would not count)
+    const LABEL = { solved: ["פתרתי : לסמן כפתורה", "פתרתי : מסומנת, לחיצה מבטלת"], star: ["מועדף : להוסיף למועדפים", "מועדף : במועדפים, לחיצה מסירה"] };
     const ICON = { solved: ["solved", "solved-on"], star: ["star", "star-on"] };
     const paint = () => {
       bar.querySelectorAll(".qt-mark").forEach((b) => {
