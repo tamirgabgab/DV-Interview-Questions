@@ -19,7 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
 from manim import *  # noqa: E402,F403
-from dvq import MIN_BOX_SCALE, C, BoxView, DVQScene, M, X, he  # noqa: E402
+from dvq import MIN_BOX_SCALE, TX, C, BoxView, DVQScene, M, T, he  # noqa: E402
 
 QID = 15
 SCENES = [
@@ -78,51 +78,34 @@ DIM = 0.35            # the opacity of a proof's earlier lines
 
 
 # --------------------------------------------------------------------------------------
-# Math from text pieces (no LaTeX here): fractions, powers, equation rows
+# Math, set by LaTeX (dvq.TX)
 # --------------------------------------------------------------------------------------
 
-
-def frac(a, b, size: float = 38, color: str | None = None) -> VGroup:
-    """a over b, a rule between them."""
-    n = a if isinstance(a, Mobject) else X(a, size, color)
-    d = b if isinstance(b, Mobject) else X(b, size, color)
-    w = max(n.width, d.width) + 0.14
-    bar = Line(LEFT * w / 2, RIGHT * w / 2, stroke_width=2.6, color=color or C.WHITE)
-    return VGroup(n, bar, d).arrange(DOWN, buff=0.1)
+FORMULA = r"\frac{p^C\left(1-(1-q)^C\right)}{1-(1-pq)^C}"
 
 
-def pw(base, exp: str, size: float = 34, color: str | None = None) -> VGroup:
-    """base to the power exp, the exponent small and raised."""
-    b = base if isinstance(base, Mobject) else X(base, size, color)
-    e = X(exp, size * 0.62, color)
-    e.next_to(b, RIGHT, buff=0.04).align_to(b, UP).shift(UP * 0.12)
-    return VGroup(b, e)
+def tx(*parts, size: float = 38) -> VGroup:
+    """One LaTeX line from parts: a str is white, (str, colour) coloured. LaTeX's strokes
+    are lighter than Inter's, so a line is set a little larger than the text was."""
+    texs = [p[0] if isinstance(p, tuple) else p for p in parts]
+    m = TX(*texs, size=size * 1.12)
+    for k, p in enumerate(parts):
+        if isinstance(p, tuple):
+            m[k].set_color(p[1])
+    return m
+
+
+def tfrac(v: str) -> str:
+    """"13/27" as \\tfrac{13}{27}; anything else as it is."""
+    if "/" in v:
+        a, b = v.split("/")
+        return rf"\tfrac{{{a}}}{{{b}}}"
+    return v
 
 
 def fade_to(group: Mobject, op: float) -> list:
     """Animations taking every part of a Group (shapes and labels) to opacity op."""
     return [m.animate.set_opacity(op) for m in group.submobjects]
-
-
-def formula(size: float = 40, color: str | None = None) -> VGroup:
-    """The answer of part ג: p^C (1 − (1 − q)^C) over 1 − (1 − pq)^C."""
-    top = eq(pw(X("p", size, color), "C", size, color), X("(1 −", size, color),
-             pw(X("(1 − q)", size, color), "C", size, color), X(")", size, color), buff=0.14)
-    bottom = eq(X("1 −", size, color), pw(X("(1 − pq)", size, color), "C", size, color), buff=0.14)
-    return frac(top, bottom, color=color)
-
-
-def eq(*parts, size: float = 38, buff: float = 0.16) -> VGroup:
-    """A row of math: a str is text, (str, colour) coloured text, a Mobject itself."""
-    mobs = []
-    for p in parts:
-        if isinstance(p, str):
-            mobs.append(X(p, size))
-        elif isinstance(p, tuple):
-            mobs.append(X(p[0], size, p[1]))
-        else:
-            mobs.append(p)
-    return VGroup(*mobs).arrange(RIGHT, buff=buff)
 
 
 class ProofScene(DVQScene):
@@ -171,8 +154,8 @@ class Families(Group):
                 box = RoundedRectangle(width=w, height=h, corner_radius=0.14, stroke_color=C.FAINT,
                                        stroke_width=3, fill_color=C.NAVY_LIGHT, fill_opacity=1)
                 box.move_to([-(c * (w + 0.18)), -r * (h + 0.18), 0])
-                name = he(f"{SEX[s1]}, {SEX[s2]}", 38, C.WHITE, 500).move_to(box).shift(UP * 0.18)
-                prob = M("1/4", 26, C.MUTED).next_to(name, DOWN, buff=0.12)
+                name = he(f"{SEX[s1]}, {SEX[s2]}", 38, C.WHITE, 500).move_to(box).shift(UP * 0.24)
+                prob = TX(r"\frac{1}{4}", size=19, color=C.MUTED).next_to(name, DOWN, buff=0.07)
                 cell = Group(box, name, prob)
                 self.cells[s1 + s2] = cell
                 self.add(cell)
@@ -281,8 +264,8 @@ class Opening(ProofScene):
         self.say("ליוסי יש שני ילדים. שאלנו אותו : האם\nלפחות אחד מהם בן? והוא ענה כן.",
                  FadeIn(kids, lag_ratio=0.3), run_time=1.4)
         self.say("מה ההסתברות ששני הילדים בנים?", FadeIn(yes_chip, shift=0.2 * UP))
-        rules = VGroup(eq("P(boy) = P(girl) =", ("1/2", C.AMBER), size=34),
-                       eq("P(any weekday) =", ("1/7", C.AMBER), size=34)) \
+        rules = VGroup(tx(r"P(\text{boy}) = P(\text{girl}) =", (r"\frac{1}{2}", C.AMBER), size=34),
+                       tx(r"P(\text{any weekday}) =", (r"\frac{1}{7}", C.AMBER), size=34)) \
             .arrange(DOWN, buff=0.35).next_to(yes_chip, DOWN, buff=0.6)
         self.say("ההנחות : כל ילד בן או בת בחצי, וכל\nיום בשבוע שווה הסתברות, בלי תלות.",
                  FadeIn(rules, lag_ratio=0.3))
@@ -293,7 +276,7 @@ class ChapterA(ProofScene):
     def construct(self):
         self.chapter_card("סעיף א", "לפחות אחד בן",
                           "מה ההסתברות ששני הילדים בנים?\nהתשובה המהירה היא חצי. האם היא נכונה?")
-        guess = eq("P = ", ("1/2 ?", C.RED), size=52).move_to(UP * 1.0)
+        guess = tx("P =", (r"\tfrac{1}{2}\,?", C.RED), size=52).move_to(UP * 1.0)
         self.say("הניחוש : יש בן אחד, והילד השני הוא\nבן או בת בחצי. אז חצי?", FadeIn(guess))
         self.play(FadeOut(guess), run_time=0.6)
 
@@ -320,17 +303,17 @@ class ChapterA(ProofScene):
         self.play(Group(fam, strike).animate.scale(0.68).to_edge(LEFT, buff=0.5).shift(UP * 0.35),
                   run_time=1.0)
         self.proof_start(np.array([0.3, 3.3, 0]))
-        self.proof_line(VGroup(eq(("A", C.GREEN), "= both boys", size=36),
-                               eq(("B", C.BLUE), "= at least one boy", size=36))
+        self.proof_line(VGroup(tx(("A", C.GREEN), r"= \text{both boys}", size=36),
+                               tx(("B", C.BLUE), r"= \text{at least one boy}", size=36))
                         .arrange(DOWN, buff=0.2, aligned_edge=LEFT),
                         "נסמן : A הוא שני הילדים בנים,\nו-B הוא לפחות אחד בן.")
-        self.proof_line(eq("A ∩ B = A", size=40),
+        self.proof_line(tx(r"A \cap B = A", size=40),
                         "כל משפחה עם שני בנים מקיימת גם את B,\nולכן החיתוך הוא A עצמו.")
-        self.proof_line(eq("P(A | B) =", frac("P(A ∩ B)", "P(B)", 40), size=40),
+        self.proof_line(tx(r"P(A \mid B) = \frac{P(A \cap B)}{P(B)}", size=40),
                         "ההסתברות המותנית : ההסתברות של\nהחיתוך, חלקי ההסתברות של התנאי.")
-        self.proof_line(eq("=", frac("1/4", "3/4", 40), size=40),
+        self.proof_line(tx(r"= \frac{1/4}{3/4}", size=40),
                         "מציבים : 1/4 בשביל שני בנים,\nו-3/4 בשביל שלוש המשפחות שנשארו.")
-        self.proof_line(eq("=", frac(X("1", 40, C.AMBER), X("3", 40, C.AMBER), color=C.AMBER), size=40),
+        self.proof_line(tx("=", (r"\frac{1}{3}", C.AMBER), size=40),
                         "ומקבלים שליש, ולא חצי.", beside=True)
         self.fade_all()
 
@@ -341,7 +324,7 @@ class ChapterA(ProofScene):
                                      buff=0.1, corner_radius=0.18, stroke_width=6)
         self.say("אם המידע היה \"הבכור הוא בן\", נשארת\nרק השורה העליונה : בן ובן, ובן ובת.",
                  Create(elder), *fade_to(fam2.cells["GB"], 0.3), *fade_to(fam2.cells["GG"], 0.3))
-        half = eq("P =", frac("1", "2", color=C.AMBER), size=40).next_to(fam2, LEFT, buff=0.5)
+        half = tx("P =", (r"\frac{1}{2}", C.AMBER), size=40).next_to(fam2, LEFT, buff=0.5)
         self.say("אז התשובה הייתה חצי : המידע\nמצביע על ילד מסוים.", FadeIn(half))
         self.play(FadeOut(elder), FadeOut(half), *fade_to(fam2.cells["GB"], 1), run_time=0.8)
         both = [fam2.box(k) for k in ("BG", "GB")]
@@ -356,7 +339,7 @@ class ChapterB(ProofScene):
     def construct(self):
         self.chapter_card("סעיף ב", "בן שנולד ביום שלישי",
                           "עכשיו יוסי עונה כן לשאלה : יש לך בן\nשנולד ביום שלישי? מה ההסתברות עכשיו?")
-        ask = eq("P( both boys  |  a boy born on Tuesday ) =", ("?", C.AMBER), size=40).move_to(UP * 0.9)
+        ask = tx(r"P(\text{both boys} \mid \text{a boy born on Tuesday}) =", (r"\;?", C.AMBER), size=40).move_to(UP * 0.9)
         self.say("נראה שיום הלידה לא אמור לשנות כלום.\nבואו נספור.", FadeIn(ask))
         self.play(FadeOut(ask), run_time=0.5)
 
@@ -377,7 +360,7 @@ class ChapterB(ProofScene):
                       he("בת", 34, C.ORANGE, 600).next_to(Group(*strip[7:]), UP, buff=0.3))
         self.say("כל ילד הוא אחד מ-14 סוגים שווי הסתברות :\nבן או בת, כפול שבעה ימים.",
                  FadeIn(strip, lag_ratio=0.06), FadeIn(heads), run_time=1.8)
-        tue = M("1/14", 34, C.AMBER).next_to(strip[TUE], DOWN, buff=0.3)
+        tue = TX(r"\frac{1}{14}", size=34, color=C.AMBER).next_to(strip[TUE], DOWN, buff=0.3)
         self.say("בן שנולד ביום שלישי הוא סוג אחד מהם,\nבהסתברות 1/14.", FadeIn(tue))
         self.fade_all()
 
@@ -392,27 +375,27 @@ class ChapterB(ProofScene):
 
         row = grid.row(TUE)
         self.proof_start(np.array([0.6, 3.4, 0]), gap=0.3)
-        self.proof_line(eq("first child:", ("14", C.AMBER), size=36),
+        self.proof_line(tx(r"\text{first child:}\;", ("14", C.AMBER), size=36),
                         "הילד הראשון בן מיום שלישי : זו שורה\nאחת של 14 זוגות, השני הוא כל סוג.",
                         row.animate.set_fill(C.AMBER, opacity=0.55))
         col = grid.col(TUE)
-        self.proof_line(eq("second child:", ("14", C.AMBER), size=36),
+        self.proof_line(tx(r"\text{second child:}\;", ("14", C.AMBER), size=36),
                         "גם הילד השני יכול להיות בן מיום שלישי :\nעמודה אחת, עוד 14 זוגות.",
                         col.animate.set_fill(C.AMBER, opacity=0.55))
         both = Circle(radius=0.12, stroke_color=C.RED, stroke_width=5).move_to(grid.sq[(TUE, TUE)])
-        self.proof_line(eq("counted twice:", ("1", C.RED), size=36),
+        self.proof_line(tx(r"\text{counted twice:}\;", ("1", C.RED), size=36),
                         "המשבצת שבהצטלבות, שני בנים מיום שלישי,\nנספרה פעמיים. מורידים אותה פעם אחת.",
                         Create(both))
         cross = grid.cells(CROSS_KEYS)
-        self.proof_line(eq("|T| = 14 + 14 − 1 =", ("27", C.AMBER), size=38),
+        self.proof_line(tx(r"|T| = 14 + 14 - 1 =", ("27", C.AMBER), size=38),
                         "לכן התנאי מתקיים ב-27 זוגות,\nולא ב-28.",
                         cross.animate.set_fill(C.BLUE, opacity=0.6))
         quad = grid.quad()
         hit = grid.cells(HIT_KEYS)
-        self.proof_line(eq("|A ∩ T| = 7 + 7 − 1 =", ("13", C.GREEN), size=38),
+        self.proof_line(tx(r"|A \cap T| = 7 + 7 - 1 =", ("13", C.GREEN), size=38),
                         "מתוכם, שני בנים : הריבוע המקווקו.\nשבעה בשורה, שבעה בעמודה, פחות הכפולה.",
                         Create(quad), hit.animate.set_fill(C.GREEN, opacity=0.75))
-        self.proof_line(eq("P(A | T) =", frac("13", "27", color=C.AMBER), "≈ 0.481", size=36),
+        self.proof_line(tx(r"P(A \mid T) =", (r"\frac{13}{27}", C.AMBER), r"\approx 0.481", size=36),
                         "כל הזוגות שווי הסתברות, ולכן ההסתברות\nהיא 13 חלקי 27, בערך 0.481.")
         self.say("כמעט חצי, ורחוק מהשליש של סעיף א.\nהמידע הספציפי שינה את התשובה.")
         self.say("בלי ההורדה של המשבצת הכפולה היינו\nמקבלים 14 חלקי 28, כלומר חצי. וזו טעות.",
@@ -422,15 +405,15 @@ class ChapterB(ProofScene):
 
         # The same through Bayes, read off the grid.
         self.proof_start(np.array([0.6, 3.4, 0]), gap=0.42)
-        self.proof_line(eq("P(A) =", frac("49", "196", 34), "=", frac("1", "4", 34), size=34),
+        self.proof_line(tx(r"P(A) = \frac{49}{196} = \frac{1}{4}", size=34),
                         "אותה תשובה דרך בייס. הריבוע של שני\nבנים : 49 משבצות מתוך 196, רבע.",
                         Indicate(quad, color=C.WHITE, scale_factor=1.03))
-        self.proof_line(eq("P(T | A) = 1 −", pw(X("(6/7)", 34), "2", 34), "=", frac("13", "49", 34), size=34),
+        self.proof_line(tx(r"P(T \mid A) = 1 - \left(\tfrac{6}{7}\right)^2 = \frac{13}{49}", size=34),
                         "בתוך הריבוע, אף בן לא נולד ביום\nשלישי בהסתברות (6/7)². המשלים 13/49.")
-        self.proof_line(eq("P(T) = 1 −", pw(X("(13/14)", 34), "2", 34), "=", frac("27", "196", 34), size=34),
+        self.proof_line(tx(r"P(T) = 1 - \left(\tfrac{13}{14}\right)^2 = \frac{27}{196}", size=34),
                         "כל ילד הוא בן מיום שלישי ב-1/14,\nולכן התנאי קורה ב-1 פחות (13/14)².")
-        self.proof_line(eq("P(A | T) =", frac("(13/49) · (1/4)", "27/196", 30), "=",
-                           frac(X("13", 36, C.AMBER), X("27", 36, C.AMBER), color=C.AMBER), size=30),
+        self.proof_line(tx(r"P(A \mid T) = \frac{(13/49) \cdot (1/4)}{27/196} =",
+                           (r"\frac{13}{27}", C.AMBER), size=34),
                         "מציבים בנוסחת בייס :\n‏13/196 חלקי 27/196, שוב 13/27.")
         self.fade_all()
 
@@ -463,45 +446,41 @@ class ChapterC(ProofScene):
         self.chapter_card("סעיף ג", "הנוסחה הכללית",
                           "עכשיו בכלליות : C ילדים, כל אחד בן\nבהסתברות p, ועם התכונה בהסתברות q.")
         self.proof_start(np.array([-6.4, 3.45, 0]), gap=0.36)
-        self.proof_line(eq(("A", C.GREEN), "= all C children are boys", size=36),
+        self.proof_line(tx(("A", C.GREEN), r"= \text{all } C \text{ children are boys}", size=36),
                         "נסמן : A הוא כל הילדים בנים, ו-T הוא\nלפחות ילד אחד שהוא בן עם התכונה.")
-        self.proof_line(eq(("T", C.BLUE), "= at least one is a boy with the trait", size=36),
+        self.proof_line(tx(("T", C.BLUE), r"= \text{at least one is a boy with the trait}", size=36),
                         "שניהם מאורעות של \"לפחות אחד\", ואת\nשניהם הכי קל לחשב דרך המשלים : \"אף אחד\".",
                         dim=False)
-        self.proof_line(eq("P(a child is a boy with the trait) = pq", size=36),
+        self.proof_line(tx(r"P(\text{a child is a boy with the trait}) = pq", size=36),
                         "ילד אחד הוא בן עם התכונה בהסתברות pq,\nואיננו כזה בהסתברות 1 − pq.")
-        self.proof_line(eq("P(no child is) =", pw(X("(1 − pq)", 36), "C", 36), size=36),
+        self.proof_line(tx(r"P(\text{no child is}) = (1 - pq)^C", size=36),
                         "הילדים בלתי תלויים, ולכן אף אחד מהם\nאיננו כזה בהסתברות (1 − pq) בחזקת C.")
-        den = self.proof_line(eq("P(T) = 1 −", pw(X("(1 − pq)", 36, C.AMBER), "C", 36, C.AMBER), size=36),
+        den = self.proof_line(tx(r"P(T) =", (r"1 - (1 - pq)^C", C.AMBER), size=36),
                               "המכנה הוא המשלים : 1 פחות\nהחזקה הזו. זו ההסתברות של T.")
         self.play(*[FadeOut(m) for m in self.proof_lines[:-1]],
                   den.animate.move_to(self.proof_corner, aligned_edge=UL), run_time=0.9)
         self.proof_lines = VGroup(den)
-        self.proof_line(eq("P(A) =", pw(X("p", 36), "C", 36), size=36),
+        self.proof_line(tx(r"P(A) = p^C", size=36),
                         "המונה : כל הילדים בנים\nבהסתברות p בחזקת C.")
-        self.proof_line(eq("P(T | A) = 1 −", pw(X("(1 − q)", 36), "C", 36), size=36),
+        self.proof_line(tx(r"P(T \mid A) = 1 - (1 - q)^C", size=36),
                         "אם כולם בנים, T אומר רק שלפחות לאחד\nיש את התכונה : אחד פחות (1 − q) בחזקת C.")
-        num = self.proof_line(eq("P(A ∩ T) =", pw(X("p", 36, C.AMBER), "C", 36, C.AMBER),
-                                 X("·", 36, C.AMBER), X("(1 −", 36, C.AMBER),
-                                 pw(X("(1 − q)", 36, C.AMBER), "C", 36, C.AMBER), X(")", 36, C.AMBER),
-                                 size=36),
+        num = self.proof_line(tx(r"P(A \cap T) =", (r"p^C \left(1 - (1 - q)^C\right)", C.AMBER), size=36),
                               "לכן החיתוך הוא המכפלה : ההסתברות\nשכולם בנים, כפול זו של התכונה.")
         self.fade_all()
         del num
 
-        big = eq("P(A | T) =", formula(40), size=40)
+        big = tx(r"P(A \mid T) =", FORMULA, size=40)
         big.move_to(UP * 1.4)
         box = SurroundingRectangle(big, color=C.AMBER, buff=0.3, corner_radius=0.15, stroke_width=4)
         self.say("מחלקים את המונה במכנה,\nומקבלים את הנוסחה הכללית.", FadeIn(big), Create(box))
         self.play(VGroup(big, box).animate.scale(0.75).move_to(UP * 2.75), run_time=0.9)
 
         self.proof_start(np.array([-6.0, 1.45, 0]), gap=0.42)
-        self.proof_line(eq("C = 2, p = 1/2, q = 1:", frac("1/4", "1 − 1/4", 34), "=", ("1/3", C.AMBER), size=34),
+        self.proof_line(tx(r"C = 2,\ p = \tfrac{1}{2},\ q = 1:\quad \frac{1/4}{1 - 1/4} =", (r"\frac{1}{3}", C.AMBER), size=34),
                         "בדיקה : בלי תכונה, q = 1, הנוסחה\nנותנת רבע חלקי שלושה רבעים, שליש.")
-        self.proof_line(eq("q = 1/7:", frac("(1/4) · (13/49)", "27/196", 34), "=", ("13/27", C.AMBER), size=34),
+        self.proof_line(tx(r"q = \tfrac{1}{7}:\quad \frac{(1/4) \cdot (13/49)}{27/196} =", (r"\frac{13}{27}", C.AMBER), size=34),
                         "יום בשבוע, q = 1/7 : המונה 13/196,\nהמכנה 27/196, ושוב 13/27.")
-        self.proof_line(eq("q → 0:", "P(A | T) →", pw(X("p", 34, C.AMBER), "C − 1", 34, C.AMBER), "=",
-                           ("1/2", C.AMBER), size=34),
+        self.proof_line(tx(r"q \to 0:\quad P(A \mid T) \to", (r"p^{C-1} = \tfrac{1}{2}", C.AMBER), size=34),
                         "תכונה נדירה מאוד, q שואף ל-0 :\nהתשובה שואפת ל-p בחזקת C − 1.")
         self.say("עם שני ילדים זה חצי : המידע מצביע\nכמעט בוודאות על בן אחד מסוים.")
         self.fade_all()
@@ -516,10 +495,13 @@ class ChapterC(ProofScene):
             assert answer(3, HALF, qq) == Fraction(v3) and f"{float(Fraction(v3)):.3f}" == d3
         xs = (-4.6, -0.9, 3.6)
         tbl = VGroup()
-        head = VGroup(X("p = 1/2", 32, C.MUTED), X("C = 2", 32, C.MUTED), X("C = 3", 32, C.MUTED))
+        head = VGroup(TX(r"p = \tfrac{1}{2}", size=32, color=C.MUTED), TX("C = 2", size=32, color=C.MUTED),
+                      TX("C = 3", size=32, color=C.MUTED))
         tbl.add(head)
         for q, v2, d2, v3, d3 in rows:
-            tbl.add(VGroup(X(q, 34), X(f"{v2} ≈ {d2}", 34, C.AMBER), X(f"≈ {d3}", 34, C.BLUE)))
+            qv = q.split("= ")[1]
+            tbl.add(VGroup(TX(f"q = {tfrac(qv)}", size=34), TX(rf"{tfrac(v2)} \approx {d2}", size=34, color=C.AMBER),
+                           TX(rf"\approx {d3}", size=34, color=C.BLUE)))
         tbl.arrange(DOWN, buff=0.42).move_to(UP * 0.9)
         for r in tbl:
             for m, x in zip(r, xs):
@@ -549,10 +531,10 @@ class ChapterC(ProofScene):
         self.box_beat(cv, [(1, "עם שלושה ילדים, C = 3 : התשובה 0.2322,\nכלומר 127/547, והגבול הוא רבע.")])
         self.fade_all()
 
-        asked = VGroup(X("we asked: \"a Tuesday boy?\"  yes", 36),
-                       eq("P =", ("13/27", C.AMBER), size=40)).arrange(DOWN, buff=0.3)
-        told = VGroup(X("he picked a child and told us about it", 36),
-                      eq("P =", ("1/2", C.AMBER), size=40)).arrange(DOWN, buff=0.3)
+        asked = VGroup(T("we asked: \"a Tuesday boy?\"  yes", 36),
+                       tx("P =", (r"\frac{13}{27}", C.AMBER), size=40)).arrange(DOWN, buff=0.3)
+        told = VGroup(T("he picked a child and told us about it", 36),
+                      tx("P =", (r"\frac{1}{2}", C.AMBER), size=40)).arrange(DOWN, buff=0.3)
         VGroup(asked, told).arrange(DOWN, buff=0.9).move_to(UP * 0.8)
         self.say("מלכודת אחרונה : התשובה תלויה בדרך\nשבה התקבל המידע. שאלנו שאלה של כן או לא.",
                  FadeIn(asked))
@@ -563,9 +545,9 @@ class ChapterC(ProofScene):
 
 class Closing(ProofScene):
     def construct(self):
-        self.closing(QID, [("א", X("1/3", 36)),
-                           ("ב", X("13/27 ≈ 0.481", 36)),
-                           ("ג", formula(28))],
+        self.closing(QID, [("א", TX(r"\frac{1}{3}", size=36)),
+                           ("ב", TX(r"\frac{13}{27} \approx 0.481", size=36)),
+                           ("ג", TX(FORMULA, size=30))],
                      ["לסיכום : שליש, 13/27, ונוסחה אחת\nשמחזירה את שניהם.",
                       "נסו ערכים משלכם בתיבות\nשבעמוד של שאלה 0015 באתר."],
                      holds=(3.4, 3.6))
