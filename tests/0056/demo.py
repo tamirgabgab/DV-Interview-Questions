@@ -1,8 +1,7 @@
-# The page's six ants: when the last falls, how many collisions, and when each one falls
+# The window of 3 bits both ways, and the general one: 4 decimal digits by 7
 from solution import *  # noqa: F401,F403
 
-pos, dirs = [10, 25, 40, 60, 75, 90], [1, -1, 1, -1, -1, 1]
-print("last ant off after", last_fall(pos, dirs), "s")  # last ant off after 90 s
-print("collisions:", collisions(pos, dirs))  # 5
-print("fall times, ants from the left:", fall_times(pos, dirs))  # [25, 60, 75, 90, 60, 10]
-print("on a ring with four going right:", ring_after([1, 1, 1, -1, -1, 1]))  # (2, 300)
+print("LSB 1,1,0,1 (001, 011, 110, 101):", win3_lsb([1, 1, 0, 1], 3))  # [False, True, True, False]
+print("MSB 1,0,1,1 (100, 010, 101, 110):", win3_msb([1, 0, 1, 1], 3))  # [False, False, False, True]
+digits = [7, 0, 0, 7]                    # 1234 -> 2347, 3470, 4700, 7007 = 7 * 1001
+print("window of 4 from 1234, by 7:", win_div(digits, 7, base=10, L=4, init=1234))  # [False, False, False, True]

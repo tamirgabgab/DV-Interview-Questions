@@ -1,5 +1,5 @@
 ---
-id: 60
+id: 71
 title: דו-קרב שלושה קוסמים – איזה שרביט לבחור
 level: senior
 difficulty: medium
@@ -139,6 +139,47 @@ added: 2026-10-31
     הקוד פותר את הסבב הראשון לאחור, בדיוק כמו השלבים, ובודק את כל השרביטים בקפיצות של
     0.001, וגם את הנקודות שממש מתחת ליריבים ומתחת ל-0.5 :
 
+    === "Python"
+        ```python title="first_round, best_wand" linenums="1" hl_lines="14 16 18 19"
+        def duel(x: float, y: float) -> float:
+            """A duel to the end: the chance that the opener (x) beats the second (y)."""
+            return x / (x + y - x * y)
+
+
+        def first_round(p: list[float]) -> list[float]:
+            """The win chances of wizards 1, 2, 3 (p in turn order) when all play their best."""
+            after = [0.0, 0.0, 0.0]                      # (1)!
+            for w in (2, 1, 0):                          # backward: the last wizard first
+                best = after                             # aim at the air
+                for t in range(3):
+                    if t == w:
+                        continue
+                    o = 3 - w - t                        # (2)!
+                    hit = [0.0, 0.0, 0.0]
+                    hit[o] = duel(p[o], p[w])
+                    hit[w] = 1.0 - hit[o]
+                    v = [p[w] * h + (1 - p[w]) * a for h, a in zip(hit, after)]
+                    if v[w] > best[w] + 1e-12:           # (3)!
+                        best = v
+                after = best
+            return after
+
+
+        def best_wand(me: int, rivals: list[float]) -> tuple[float, float]:
+            """My best chance and wand at position me (1..3), the rivals in turn order."""
+            def chance(q: float) -> float:
+                p = list(rivals)
+                p.insert(me - 1, q)
+                return first_round(p)[me - 1]
+            wands = [k / 1000 for k in range(1, 1001)] + [r - 1e-9 for r in rivals] + [0.5 - 1e-9]   # (4)!
+            return max((chance(q), q) for q in wands)
+        ```
+
+        1. אם אף אחד לא נפגע עד סוף התור של קוסם 3, כולם חתולים : ‏0 לכל אחד.
+        2. השניים שנשארים הם \( w \) ו-\( o \). התור הבא שייך ל-\( o \), ולכן הוא פותח את הדו-קרב.
+        3. כישוף מחליף את "באוויר" רק אם הוא טוב יותר באמת. בשוויון הקוסם מחטיא בכוונה.
+        4. השרביט הטוב ביותר הוא בדרך כלל "ממש מתחת" ליריב, ולכן בודקים את הנקודה הזו במפורש.
+
     === "SystemVerilog"
         ```systemverilog title="function first_round, best_wand" linenums="1" hl_lines="15 17 19 20"
         // a duel to the end: the chance that the opener (hit chance x) beats the second (y)
@@ -186,47 +227,6 @@ added: 2026-10-31
           end
           return best;
         endfunction
-        ```
-
-        1. אם אף אחד לא נפגע עד סוף התור של קוסם 3, כולם חתולים : ‏0 לכל אחד.
-        2. השניים שנשארים הם \( w \) ו-\( o \). התור הבא שייך ל-\( o \), ולכן הוא פותח את הדו-קרב.
-        3. כישוף מחליף את "באוויר" רק אם הוא טוב יותר באמת. בשוויון הקוסם מחטיא בכוונה.
-        4. השרביט הטוב ביותר הוא בדרך כלל "ממש מתחת" ליריב, ולכן בודקים את הנקודה הזו במפורש.
-
-    === "Python"
-        ```python title="first_round, best_wand" linenums="1" hl_lines="14 16 18 19"
-        def duel(x: float, y: float) -> float:
-            """A duel to the end: the chance that the opener (x) beats the second (y)."""
-            return x / (x + y - x * y)
-
-
-        def first_round(p: list[float]) -> list[float]:
-            """The win chances of wizards 1, 2, 3 (p in turn order) when all play their best."""
-            after = [0.0, 0.0, 0.0]                      # (1)!
-            for w in (2, 1, 0):                          # backward: the last wizard first
-                best = after                             # aim at the air
-                for t in range(3):
-                    if t == w:
-                        continue
-                    o = 3 - w - t                        # (2)!
-                    hit = [0.0, 0.0, 0.0]
-                    hit[o] = duel(p[o], p[w])
-                    hit[w] = 1.0 - hit[o]
-                    v = [p[w] * h + (1 - p[w]) * a for h, a in zip(hit, after)]
-                    if v[w] > best[w] + 1e-12:           # (3)!
-                        best = v
-                after = best
-            return after
-
-
-        def best_wand(me: int, rivals: list[float]) -> tuple[float, float]:
-            """My best chance and wand at position me (1..3), the rivals in turn order."""
-            def chance(q: float) -> float:
-                p = list(rivals)
-                p.insert(me - 1, q)
-                return first_round(p)[me - 1]
-            wands = [k / 1000 for k in range(1, 1001)] + [r - 1e-9 for r in rivals] + [0.5 - 1e-9]   # (4)!
-            return max((chance(q), q) for q in wands)
         ```
 
         1. אם אף אחד לא נפגע עד סוף התור של קוסם 3, כולם חתולים : ‏0 לכל אחד.

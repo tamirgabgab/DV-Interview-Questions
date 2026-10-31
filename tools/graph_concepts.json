@@ -459,6 +459,46 @@
   "xor_trick": {
    "label": "XOR trick",
    "group": "algorithms"
+  },
+  "sliding_window": {
+   "label": "Sliding window",
+   "group": "algorithms"
+  },
+  "sweep_line": {
+   "label": "Event sweep",
+   "group": "algorithms"
+  },
+  "monotonic_deque": {
+   "label": "Monotonic deque",
+   "group": "algorithms"
+  },
+  "balanced_ternary": {
+   "label": "Balanced ternary",
+   "group": "math"
+  },
+  "parallel_compare": {
+   "label": "Parallel compare and priority encoder",
+   "group": "digital design"
+  },
+  "flood_fill": {
+   "label": "Flood fill",
+   "group": "algorithms"
+  },
+  "union_find": {
+   "label": "Union-find",
+   "group": "algorithms"
+  },
+  "fenwick_tree": {
+   "label": "Fenwick tree",
+   "group": "algorithms"
+  },
+  "inversion_count": {
+   "label": "Inversion count",
+   "group": "algorithms"
+  },
+  "quantile": {
+   "label": "Quantile",
+   "group": "probability"
   }
  },
  "questions": {
@@ -487,7 +527,7 @@
    ],
    "related": [
     {
-     "id": "0057",
+     "id": "0058",
      "explicit": false,
      "why": "both rely on x XOR x = 0 to cancel values without extra storage"
     }
@@ -1318,7 +1358,7 @@
    ],
    "related": [
     {
-     "id": "0058",
+     "id": "0059",
      "explicit": false,
      "why": "both fill an O(n^2)-or-better DP table over sub-regions"
     }
@@ -1485,6 +1525,26 @@
   },
   "0056": {
    "core": [
+    "fsm",
+    "modular_arithmetic",
+    "sliding_window",
+    "state_minimization"
+   ],
+   "secondary": [
+    "shift_register",
+    "number_bases",
+    "induction_proof"
+   ],
+   "related": [
+    {
+     "id": "0055",
+     "explicit": true,
+     "why": "the same machine with a window of the last L bits"
+    }
+   ]
+  },
+  "0057": {
+   "core": [
     "symmetry_argument",
     "invariant",
     "combinatorics",
@@ -1498,7 +1558,7 @@
    ],
    "related": []
   },
-  "0057": {
+  "0058": {
    "core": [
     "xor_trick",
     "bit_manipulation",
@@ -1520,7 +1580,7 @@
     }
    ]
   },
-  "0058": {
+  "0059": {
    "core": [
     "dynamic_programming",
     "game_theory_minimax",
@@ -1541,7 +1601,7 @@
     }
    ]
   },
-  "0059": {
+  "0060": {
    "core": [
     "bit_manipulation",
     "popcount",
@@ -1556,7 +1616,258 @@
    ],
    "related": []
   },
-  "0060": {
+  "0061": {
+   "core": [
+    "sliding_window",
+    "two_pointers",
+    "invariant"
+   ],
+   "secondary": [
+    "hash_map",
+    "counter",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0047",
+     "explicit": false,
+     "why": "both move two indexes inward or forward over an array in one pass"
+    },
+    {
+     "id": "0006",
+     "explicit": false,
+     "why": "both keep a running best over one pass of an array"
+    }
+   ]
+  },
+  "0062": {
+   "core": [
+    "sweep_line",
+    "sorting",
+    "tags_ids",
+    "counter"
+   ],
+   "secondary": [
+    "priority_queue",
+    "scoreboard",
+    "transaction_ordering",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0050",
+     "explicit": false,
+     "why": "both are about transactions that are outstanding at once and the ids that track them"
+    },
+    {
+     "id": "0033",
+     "explicit": false,
+     "why": "both size a resource (tags, FIFO depth) from the peak occupancy of a trace"
+    }
+   ]
+  },
+  "0063": {
+   "core": [
+    "monotonic_deque",
+    "sliding_window",
+    "invariant"
+   ],
+   "secondary": [
+    "two_pointers",
+    "parallel_compare",
+    "information_theory_bound",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0061",
+     "explicit": true,
+     "why": "the same variable window with a left end that only moves forward"
+    },
+    {
+     "id": "0047",
+     "explicit": false,
+     "why": "both track running maxima over an array in one pass"
+    }
+   ]
+  },
+  "0064": {
+   "core": [
+    "number_bases",
+    "balanced_ternary",
+    "information_theory_bound"
+   ],
+   "secondary": [
+    "weighing_puzzle",
+    "symmetry_argument",
+    "induction_proof",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0045",
+     "explicit": true,
+     "why": "both count the states a balance can take to get a lower bound"
+    },
+    {
+     "id": "0051",
+     "explicit": false,
+     "why": "both read each item as a digit, and the number of states per item is the base"
+    }
+   ]
+  },
+  "0065": {
+   "core": [
+    "flood_fill",
+    "bfs",
+    "graph_search"
+   ],
+   "secondary": [
+    "union_find",
+    "sorting",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0046",
+     "explicit": false,
+     "why": "both scan a 0/1 grid and measure groups of ones"
+    },
+    {
+     "id": "0032",
+     "explicit": false,
+     "why": "both are a BFS with a visited set"
+    }
+   ]
+  },
+  "0066": {
+   "core": [
+    "sorting",
+    "sweep_line",
+    "running_sum"
+   ],
+   "secondary": [
+    "invariant",
+    "greedy",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0062",
+     "explicit": true,
+     "why": "the same event sweep over intervals, and the peak of the sum"
+    },
+    {
+     "id": "0033",
+     "explicit": true,
+     "why": "the peak of an occupancy over time"
+    }
+   ]
+  },
+  "0067": {
+   "core": [
+    "dijkstra",
+    "bfs",
+    "graph_search"
+   ],
+   "secondary": [
+    "priority_queue",
+    "invariant",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0019",
+     "explicit": false,
+     "why": "Dijkstra on a state graph"
+    },
+    {
+     "id": "0031",
+     "explicit": false,
+     "why": "Dijkstra with a heap and lazy deletion"
+    }
+   ]
+  },
+  "0068": {
+   "core": [
+    "priority_queue",
+    "quantile",
+    "invariant"
+   ],
+   "secondary": [
+    "sliding_window",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0063",
+     "explicit": false,
+     "why": "a streaming structure over a window"
+    },
+    {
+     "id": "0047",
+     "explicit": false,
+     "why": "a heap that keeps its top in order"
+    }
+   ]
+  },
+  "0069": {
+   "core": [
+    "fenwick_tree",
+    "inversion_count",
+    "sorting"
+   ],
+   "secondary": [
+    "scoreboard",
+    "transaction_ordering",
+    "bit_manipulation",
+    "divide_and_conquer"
+   ],
+   "related": [
+    {
+     "id": "0050",
+     "explicit": true,
+     "why": "responses out of order and the scoreboard that tolerates them"
+    },
+    {
+     "id": "0009",
+     "explicit": true,
+     "why": "the fewest swaps by the cycles of a permutation"
+    }
+   ]
+  },
+  "0070": {
+   "core": [
+    "bfs",
+    "state_space_search",
+    "dijkstra",
+    "graph_search"
+   ],
+   "secondary": [
+    "priority_queue",
+    "queue",
+    "invariant",
+    "brute_force_enumeration"
+   ],
+   "related": [
+    {
+     "id": "0067",
+     "explicit": true,
+     "why": "BFS without weights and Dijkstra with them, the same lazy heap"
+    },
+    {
+     "id": "0065",
+     "explicit": true,
+     "why": "a BFS over the cells of a grid with four or eight directions"
+    },
+    {
+     "id": "0005",
+     "explicit": false,
+     "why": "a BFS over a state that is more than the position"
+    }
+   ]
+  },
+  "0071": {
    "core": [
     "game_theory_minimax",
     "conditional_probability",
@@ -1569,7 +1880,7 @@
    ],
    "related": [
     {
-     "id": "0058",
+     "id": "0059",
      "explicit": false,
      "why": "both are games solved backward, where every player plays its best"
     },

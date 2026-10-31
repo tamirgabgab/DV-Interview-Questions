@@ -1,15 +1,15 @@
 // kinds: popnext
-//   popnext                0059        the next number with as many ones (or zeros, without the leading ones): a bit, a width and a number, the rows of Gosper's formula (or of the previous one through the complement) step by step, with the jump to the next or previous length for zeros, and the next / previous buttons
+//   popnext                0060        the next number with as many ones (or zeros, without the leading ones): a bit, a width and a number, the rows of Gosper's formula (or of the previous one through the complement) step by step, with the jump to the next or previous length for zeros, and the next / previous buttons
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
   const { answer, autoplay, code, ltr, speedSel } = dvqExplorers.lib;
 
-  // The next number with as many ones (0059), for widths up to 16 bits (plain JS numbers).
+  // The next number with as many ones (0060), for widths up to 16 bits (plain JS numbers).
   // gsNext / gsPrev return 0 when there is none; gsNext0 / gsPrev0 do the same for the zeros
   // below the top one (any length); gsSteps gives the rows of Gosper's formula, each with
-  // the bits the step is about (as in tools/figures/q0059.py).
+  // the bits the step is about (as in tools/figures/q0060.py).
   const ones = (v) => { let n = 0; for (; v; v >>>= 1) n += v & 1; return n; };
   const bitsOf = (v) => { const out = []; for (let p = 0; v; p++, v >>>= 1) if (v & 1) out.push(p); return out; };
   const range = (a, b) => Array.from({ length: Math.max(0, b - a) }, (_, i) => a + i);

@@ -1,5 +1,5 @@
 // kinds: kapbase
-//   kapbase                0012        three digits in a base from 2 to 16: the chain to the fixed point (even base) or the 2-cycle (odd), each step explained by d = max − min, the map d → max(b − d, d − 1) with the path, the histogram of chain lengths over all b³ numbers
+//   kapbase                0012        three digits in a base from 2 to 16: the chain to the fixed point (even base) or the 2-cycle (odd), each step explained by d = max − min, how many numbers share each d (and so the difference), the map d → max(b − d, d − 1) with the path, the histogram of chain lengths over all b³ numbers
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -36,6 +36,13 @@
     for (let i = 0; i < hist.length; i++) hist[i] = hist[i] || 0;
     return { hist, zeros };
   };
+  // How many of the b³ numbers have each d: F(X) depends only on d, so they all give the
+  // same difference (6d(b − d) of them for d ≥ 1, the b numbers with equal digits for d = 0)
+  const kbSpreadCounts = (b) => {
+    const n = Array(b).fill(0);
+    for (let x = 0; x < b * b * b; x++) n[kbStep(x, b).d]++;
+    return n;
+  };
 
   // The base-b Kaprekar box (0012 part c): a base from 2 to 16 and three digits typed in
   // that base; the chain played step by step in a table (the sort, the subtraction, the
@@ -67,10 +74,13 @@
         `<div class="kp-table kb-table"></div>`;     // last: the table grows a row a step
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), input = $(".kb-x");
-      let H = null, Hb = 0;
+      let H = null, Hb = 0, Nd = null;
       const chainOf = () => kbChain(st.x, st.b);
       const draw = () => {
         const b = st.b, chain = chainOf(), att = kbAttractor(b), total = chain.length - 1;
+        if (Hb !== b) { H = kbHistogram(b); Nd = kbSpreadCounts(b); Hb = b; }
+        // the key fact: every number with this d gives this same difference
+        const same = (sp) => ` כל ${ltr(Nd[sp.d])} המספרים עם ${ltr(`d = ${sp.d}`)} נותנים אותו הפרש ${ltr(sp.diff)}.`;
         st.step = Math.min(st.step, total);
         const done = st.step === total;
         $(".out-b").textContent = String(b);
@@ -93,10 +103,10 @@
         let text;
         if (st.step === 0) {
           const sp = kbStep(st.x, b);
-          text = sp.d === 0 ? `כל הספרות שוות, ולכן d = 0 וההפרש יהיה 0.` : `הספרה הגדולה פחות הקטנה : d = ${ltr(sp.d)}. ההפרש יהיה ${ltr(`d · (b² − 1) = ${sp.d} · ${b * b - 1} = ${sp.diff}`)}, עם הספרות ${ltr(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)}.`;
+          text = (sp.d === 0 ? `כל הספרות שוות, ולכן d = 0 וההפרש יהיה 0.` : `הספרה הגדולה פחות הקטנה : d = ${ltr(sp.d)}. ההפרש יהיה ${ltr(`d · (b² − 1) = ${sp.d} · ${b * b - 1} = ${sp.diff}`)}, עם הספרות ${ltr(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)}.`) + same(sp);
         } else {
           const sp = kbStep(chain[st.step - 1], b);
-          text = `צעד ${ltr(st.step)} : ‏d = ${ltr(sp.d)}, ולכן ${ltr(`F(X) = ${sp.d} · ${b * b - 1} = ${sp.diff}`)} = ${ltr(kbText(sp.diff, b))}, הספרות ${ltr(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)}; ` +
+          text = `צעד ${ltr(st.step)} : ‏d = ${ltr(sp.d)}, ולכן ${ltr(`F(X) = ${sp.d} · ${b * b - 1} = ${sp.diff}`)} = ${ltr(kbText(sp.diff, b))}, הספרות ${ltr(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)};${same(sp).slice(0, -1)}; ` +
             (sp.d === 0 ? `ההפרש 0 ושם זה נגמר.` : `ה-d הבא הוא ${ltr(`max(b − d, d − 1) = max(${b - sp.d}, ${sp.d - 1}) = ${sp.dNext}`)}.`) +
             (done ? (att.includes(sp.diff) ? ` <b>${ltr(kbText(sp.diff, b))} ${b % 2 === 0 ? "היא נקודת השבת" : "במחזור"}</b>${b % 2 === 0 ? " : הצעד הבא מחזיר אותה לעצמה ✓" : ` : הצעד הבא נותן ${ltr(kbText(kbStep(sp.diff, b).diff, b))}, ואז שוב ${ltr(kbText(sp.diff, b))} ✓`}` : "") : "");
         }
@@ -125,7 +135,6 @@
         if (cur) m += `<circle class="kb-cur" cx="${f(X(cur))}" cy="${YA}" r="10"><title>d של המספר הנוכחי = ${cur}</title></circle>`;
         $(".kb-map").innerHTML = m + "</svg>";
         // the histogram of chain lengths over every number of the base
-        if (Hb !== b) { H = kbHistogram(b); Hb = b; }
         const n = H.hist.length, ymax = Math.max(...H.hist), stepT = ymax > 2000 ? 500 : ymax > 400 ? 100 : ymax > 80 ? 20 : 5, ticks = [];
         for (let v = 0; v <= ymax + stepT - 1; v += stepT) ticks.push(v);
         const fr = frame("התפלגות מספר הצעדים עד היעד", n, ticks[ticks.length - 1], ticks, (v) => String(v));
@@ -163,8 +172,8 @@
   dvqExplorers.register({
     views: { kapbase: kapbaseView },
     help: {
-      kapbase: "בוחרים בסיס ומקלידים שלוש ספרות בו : ״הצעד הבא״ ו״הפעלה״ ממיינים ומחסרים צעד אחרי צעד, הטבלה מראה את ההפרש בבסיס ובעשרוני, השורה מתחת מסבירה את הספרות (d − 1, b − 1, b − d) ואת המעבר d → max(b − d, d − 1), המפה מראה את המסלול, וההיסטוגרמה סופרת את הצעדים של כל מספרי הבסיס.",
+      kapbase: "בוחרים בסיס ומקלידים שלוש ספרות בו : ״הצעד הבא״ ו״הפעלה״ ממיינים ומחסרים צעד אחרי צעד, הטבלה מראה את ההפרש בבסיס ובעשרוני, השורה מתחת מסבירה את הספרות (d − 1, b − 1, b − d), כמה מספרים חולקים את אותו d ולכן את אותו הפרש, ואת המעבר d → max(b − d, d − 1), המפה מראה את המסלול, וההיסטוגרמה סופרת את הצעדים של כל מספרי הבסיס.",
     },
-    models: { kbDigits, kbText, kbParse, kbStep, kbAttractor, kbChain, kbHistogram },
+    models: { kbDigits, kbText, kbParse, kbStep, kbAttractor, kbChain, kbHistogram, kbSpreadCounts },
   });
 })();

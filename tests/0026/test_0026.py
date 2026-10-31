@@ -271,3 +271,67 @@ def test_explorer_riders_follow_up():
         if r["two"] is not None:
             for row, ref in zip(pos, r["two"]):
                 assert all(abs(u - v) < 1e-9 for u, v in zip(row[1:], ref)), (a, s)
+
+
+def test_drop_point_in_the_text():
+    """The proof's drop-point paragraph: with the drop at d the passenger arrives at
+    d + alpha (1 - d) (falling in d), the walker at 1 + 2 (alpha - 1) d / (alpha + 1)
+    (rising in d), and they meet at d = (alpha + 1) / (alpha + 3), 7/8 and 2.5 h for 13."""
+    for alpha in (Fr(3, 2), 2, 4, 13, 30):
+        a = Fr(alpha)
+        for i in range(0, 41):
+            d = Fr(i, 40)
+            dt = meet(d, d / a, a)
+            walker = d + dt + (1 - (d - dt))
+            assert walker == 1 + 2 * (a - 1) / (a + 1) * d
+        d = (a + 1) / (a + 3)
+        assert d + a * (1 - d) == 1 + 2 * (a - 1) / (a + 1) * d == formula(a)
+    assert (Fr(14, 16), formula(13)) == (Fr(7, 8), Fr(5, 2))
+
+
+def test_lower_bound_in_the_text():
+    """The general bound of the proof (AB = 1, t1 = 1): per person T >= f + b + alpha (1 - f + b),
+    sum f <= 2 Mf, sum b >= Mb >= Mf - 1, Mf + Mb <= T, so (alpha + 3) T >= 3 alpha + 1 for
+    alpha >= 3. The chain is exact algebra, and the page's plan meets every step with equality."""
+    for alpha in (3, Fr(7, 2), 4, 13, 30, 1000):
+        a = Fr(alpha)
+        p = q0026.plan(a)
+        T = p["T"]
+        # the chain at T: 3T >= 2 alpha - 1 + (3 - alpha) (T + 1) / 2  <=>  (alpha + 3) T >= 3 alpha + 1
+        assert (3 * T - (2 * a - 1 + (3 - a) * (T + 1) / 2)) * 2 == (a + 3) * T - (3 * a + 1)
+        assert (a + 3) * T == 3 * a + 1
+        # who rides what in the plan: driver A -> D -> C -> B, passenger A -> D, walker C -> B
+        f = {"driver": p["D"] + (1 - p["C"]), "passenger": p["D"], "walker": 1 - p["C"]}
+        b = {"driver": p["D"] - p["C"], "passenger": 0, "walker": 0}
+        Mf, Mb = p["D"] + (1 - p["C"]), p["D"] - p["C"]
+        for who in f:
+            assert T == f[who] + b[who] + a * (1 - f[who] + b[who]), who
+        assert sum(f.values()) == 2 * Mf and sum(b.values()) == Mb == Mf - 1 and Mf + Mb == T
+        assert 3 * T == 3 * a + (1 - a) * sum(f.values()) + (1 + a) * sum(b.values())
+        assert 3 * T == 2 * a - 1 + (3 - a) * Mf and Mf == (T + 1) / 2
+
+
+def test_explorer_waits_and_numbers():
+    """The box's comparison text: who reaches B early in a plan and how long he waits there,
+    and the plan's points written as 7/8 (a fraction up to sixteenths) or three decimals."""
+    from page_tests import explorer_require, node_json
+
+    alphas = [2, 4, 13, 30]
+    got = node_json(f"const m = {explorer_require()}; const out = [];"
+                    f"for (const a of {alphas}) for (const k of [1, 2, 3]) for (const s of ['wait', 'meanwhile', 'optimal'])"
+                    "  out.push({ a, k, s, w: m.motorcycleWaits(m.motorcycleRiders(s, a, k)) });"
+                    "console.log(JSON.stringify(out));")
+    for r in got:
+        a, k, s, w = Fr(r["a"]), r["k"], r["s"], r["w"]
+        assert len(w) == k and abs(w[-1]["wait"]) < 1e-9          # the last rider never waits
+        if s == "optimal":
+            assert all(abs(x["wait"]) < 1e-9 for x in w)
+        if s == "wait":                                           # rider i at 2i + 1, the last at 2k - 1
+            assert [round(x["at"], 9) for x in w] == [2 * i + 1 for i in range(k)]
+        if s == "meanwhile" and k == 2:
+            assert abs(w[0]["at"] - 1) < 1e-12 and abs(w[0]["wait"] - float(2 * (a - 1) / (a + 1))) < 1e-12
+    # 13: the passenger of "the second walks meanwhile" waits 12/7 h at B
+    assert 2 * (Fr(13) - 1) / (13 + 1) == Fr(12, 7)
+    nums = node_json(f"const m = {explorer_require()};"
+                     "console.log(JSON.stringify([7 / 8, 1 / 8, 2 / 14, 31 / 41, 2.5, 1, 0, 19 / 7, 0.9876].map((v) => m.motorcycleExact(v))));")
+    assert nums == ["7/8", "1/8", "1/7", "0.756", "5/2", "1", "0", "19/7", "0.988"]

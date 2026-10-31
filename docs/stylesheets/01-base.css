@@ -1,4 +1,4 @@
-/* The site's styles, part 1 of 12: the palette of both schemes, the design tokens, left-to-right code and math.
+/* The site's styles, part 1 of 20: the palette of both schemes, the design tokens, left-to-right code and math.
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
 /* Site palette: navy + amber (theme palette is "custom", so every colour is defined here). */
@@ -21,6 +21,10 @@
   --site-label-color: #8a5300;      /* the amber of the id label, dark enough on white (4.5:1) */
   --site-mark-color: #b07d00;       /* amber marks on white (the star, the sort arrows): 3:1 */
   --site-focus-ring: #1b2a4a;
+  /* M: the check of the site mark (the logo's amber in both schemes, on the navy header)
+     and the unknown state X of the 404 page's waveform (on the navy card) */
+  --site-logo-v: #ffc233;
+  --site-x-state: #ff7b72;
   /* W336: an off-white page under white surfaces (cards, boxes, admonitions, tables). */
   --md-default-bg-color: #f7f8fb;
   --md-code-bg-color: #eef1f6;
@@ -56,6 +60,10 @@
   --site-label-color: #ffc233;
   --site-mark-color: #ffc233;
   --site-focus-ring: #ffc233;
+  /* M: the check of the site mark (the logo's amber in both schemes, on the navy header)
+     and the unknown state X of the 404 page's waveform (on the navy card) */
+  --site-logo-v: #ffc233;
+  --site-x-state: #ff7b72;
   /* The dark scheme keeps its outlined cards; the surface is the page. */
   --site-surface: var(--md-default-bg-color);
   --site-card-edge: var(--site-card-border);
@@ -99,6 +107,13 @@
 .md-typeset [id^="WaveDrom_Display_"] {
   direction: ltr;
   unicode-bidi: isolate;
+}
+
+/* Mermaid's classDef takes no var(), and the diagram sits in a closed shadow root: a node
+   class marked `stroke:currentColor` (the found node of a search) takes this colour, which
+   the shadow tree inherits from its host. Nothing else in Material's diagram CSS uses it. */
+.md-typeset .mermaid {
+  color: var(--viz-s3);
 }
 
 .md-typeset .arithmatex,

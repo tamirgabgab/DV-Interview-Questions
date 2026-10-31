@@ -25,6 +25,15 @@ In a sandbox without access to the CDNs, --offline ignores errors of external sc
 as on the live site). --local-cdn does both for the copies tools/dev_setup.sh keeps in
 .cache/cdn (MathJax, Mermaid, WaveDrom) and runs axe-core from there unless --axe is given.
 
+Every page is also measured again with its text enlarged 1.3 times (--font-scale), as a
+phone's font-size setting enlarges it: a row that then widens the page fails, since Android
+Chrome zooms such a page out and shows the navigation drawer beside it.
+
+Every page's line also gives its weight: the HTML in KB, and what the browser fetched for it
+in all (the HTML, the styles, the scripts, the fonts) in KB and requests, so a page that
+grows heavy is seen; a page whose HTML is over --weight-warn KB (400) gets a warning, and the
+summary names the three heaviest pages.
+
 --axe PATH runs axe-core (its axe.min.js, e.g. from npm) on every page and warns about
 serious and critical violations without failing: the count per page is printed with the
 rule id and the first element, so the next accessibility regression is visible in the CI
@@ -136,6 +145,34 @@ AXE = """async () => {
                    help: v.help.slice(0, 70) }));
 }"""
 
+# A slider of a box and its value on one row (the slider shrinks first; a long label wraps its
+# own words): one entry per slider whose value sits on another row, or
+# whose label is wider than its room (a part of it cut off at the box's edge).
+SLIDER_ROWS = """() => {
+  const out = [];
+  for (const r of document.querySelectorAll(".md-content .explorer input[type='range']")) {
+    const v = r.nextElementSibling;
+    const a = r.getBoundingClientRect();
+    if (a.width === 0 || !v || v.tagName !== "OUTPUT" || !v.getBoundingClientRect().width) continue;
+    const b = v.getBoundingClientRect();
+    const label = r.closest("label");
+    const spill = label && label.scrollWidth > label.clientWidth + 1;               // a part cut off at the label's edge
+    if (!spill && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 0) continue;   // the rows overlap
+    const box = r.closest(".explorer");
+    out.push(`box ${box.dataset.kind}${spill ? ", cut off" : ""}: "${(label ? label.textContent : "").trim().replace(/\\s+/g, " ").slice(0, 40)}"`);
+  }
+  return out;
+}"""
+
+# The text enlarged, as a phone's font-size setting enlarges it (Android Chrome scales the
+# font sizes, so a row that fits at 1x can widen the page at 1.3x, and the browser then
+# zooms out and shows the navigation drawer beside the page): the root font size times s,
+# set before the page's scripts lay anything out, as the phone does.
+def scale_text_script(s: float) -> str:
+    css = f"html {{ font-size: calc(125% * {s}) !important; }}"
+    return ("new MutationObserver((m, o) => { if (document.head) { const st = document.createElement('style'); "
+            f"st.textContent = {css!r}; document.head.prepend(st); o.disconnect(); }} }}).observe(document, {{ childList: true, subtree: true }})")
+
 # Every collapsible block open, and every explorer box built (they are built lazily, when
 # they near the viewport) with its folds open (closed on a phone at first).
 OPEN_ALL = """async () => {
@@ -195,6 +232,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--small-fail", action="store_true", help=f"count SVG text under {MIN_TEXT} px as a failure")
     ap.add_argument("--local-cdn", action="store_true",
                     help="--offline with the CDN copies of .cache/cdn (tools/dev_setup.sh), axe-core included")
+    ap.add_argument("--weight-warn", type=int, default=400, metavar="KB", help="warn about a page whose HTML is heavier than this (400)")
+    ap.add_argument("--font-scale", type=float, default=1.3, metavar="S", help="also measure the width with the text enlarged S times, as a phone's font setting does (1.3; 0 skips it)")
     args = ap.parse_args(argv)
     if args.local_cdn:
         args.offline = True
@@ -215,7 +254,8 @@ def main(argv: list[str]) -> int:
     shots.mkdir(parents=True, exist_ok=True)
     server, base = serve(site)
 
-    failures = warned = axe_pages = small_pages = 0
+    failures = warned = axe_pages = small_pages = heavy = 0
+    weights: list[tuple[float, str]] = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
         ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1, service_workers="block",
@@ -223,11 +263,21 @@ def main(argv: list[str]) -> int:
         for spec in args.route:
             pattern, file = spec.split("=", 1)
             ctx.route(re.compile(pattern), functools.partial(lambda file, route: route.fulfill(path=file), file))
+        big_ctx = None
+        if args.font_scale and args.font_scale != 1:
+            big_ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1, service_workers="block",
+                                          color_scheme=args.scheme)
+            big_ctx.add_init_script(scale_text_script(args.font_scale))
+            for spec in args.route:
+                pattern, file = spec.split("=", 1)
+                big_ctx.route(re.compile(pattern), functools.partial(lambda file, route: route.fulfill(path=file), file))
         for rel in pages:
             url = base + rel[: -len("index.html")]
             page = ctx.new_page()
             errors: list[str] = []
+            fetched: list[int] = []
             page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
+            page.on("response", lambda r, fetched=fetched: fetched.append(int(r.headers.get("content-length") or 0)))
             try:
                 page.goto(url, wait_until="networkidle", timeout=60_000)
             except Exception as e:   # a CDN that never answers: check what has loaded
@@ -238,6 +288,19 @@ def main(argv: list[str]) -> int:
             wide_math = page.evaluate(WIDE_MATH)
             small_text = page.evaluate(SMALL_TEXT, MIN_TEXT)
             covered = page.evaluate(ENLARGE_COVERS)
+            split = page.evaluate(SLIDER_ROWS)
+            big = None
+            if big_ctx:                          # the same page loaded with the text enlarged
+                bp = big_ctx.new_page()
+                try:
+                    bp.goto(url, wait_until="networkidle", timeout=60_000)
+                    bp.evaluate(OPEN_ALL)
+                    bp.wait_for_timeout(800)
+                    big = bp.evaluate(INSPECT, WIDTH)
+                    split += [f"{w} (the text x{args.font_scale:g})" for w in bp.evaluate(SLIDER_ROWS)]
+                except Exception as e:
+                    errors.append(f"load with the text enlarged: {e}")
+                bp.close()
             axe = []
             if args.axe:
                 page.add_script_tag(path=args.axe)
@@ -248,17 +311,29 @@ def main(argv: list[str]) -> int:
             page.screenshot(path=str(shots / f"{name}.png"), full_page=True)
             page.close()
 
-            bad = info["scrollWidth"] > WIDTH + 1 or errors or covered or (args.axe_fail and axe) or (args.small_fail and small_text)
+            too_big = big is not None and big["scrollWidth"] > WIDTH + 1
+            bad = info["scrollWidth"] > WIDTH + 1 or too_big or errors or covered or split or (args.axe_fail and axe) or (args.small_fail and small_text)
             failures += bool(bad)
             status = "FAIL" if bad else "ok"
-            print(f"{status:4}  {rel[: -len('index.html')] or '/'}  width {info['scrollWidth']}")
+            html_kb = (site / rel).stat().st_size / 1024
+            weights.append((html_kb, rel[: -len("/index.html")] or "/"))
+            print(f"{status:4}  {rel[: -len('index.html')] or '/'}  width {info['scrollWidth']}  "
+                  f"{html_kb:.0f} KB html, {sum(fetched) / 1024:.0f} KB in {len(fetched)} requests")
+            if html_kb > args.weight_warn:
+                heavy += 1
+                print(f"        warn heavy page: {html_kb:.0f} KB of HTML, over {args.weight_warn} KB")
             if info["scrollWidth"] > WIDTH + 1:
                 for w in info["wide"] or ["(no single element found; check the screenshot)"]:
                     print(f"        too wide: {w}")
+            if too_big:
+                for w in big["wide"] or ["(no single element found)"]:
+                    print(f"        too wide with the text x{args.font_scale:g} ({big['scrollWidth']} px): {w}")
             for e in errors:
                 print(f"        script error: {e[:200]}")
             for w in covered:
                 print(f"        enlarge button covers text: {w}")
+            for w in split:
+                print(f"        a slider's value on another row: {w}")
             for w in wide_math:
                 print(f"        warn wide math {w}")
             for w in small_text:
@@ -271,8 +346,10 @@ def main(argv: list[str]) -> int:
             axe_pages += bool(axe)
         browser.close()
     server.shutdown()
+    heaviest = ", ".join(f"{name} ({kb:.0f} KB)" for kb, name in sorted(weights, reverse=True)[:3])
     print(f"{len(pages)} pages checked at {WIDTH} px ({args.scheme}), {failures} with problems, "
-          f"{warned} with wide math warnings, {small_pages} with text under {MIN_TEXT} px, {axe_pages} with axe violations; screenshots in {shots}")
+          f"{warned} with wide math warnings, {small_pages} with text under {MIN_TEXT} px, {axe_pages} with axe violations, "
+          f"{heavy} over {args.weight_warn} KB of HTML (the heaviest: {heaviest}); screenshots in {shots}")
     return 1 if failures else 0
 
 

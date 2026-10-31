@@ -1,5 +1,5 @@
 // kinds: wizards
-//   wizards                0060        the three-wizard duel with the cat rule: my position, the two rivals and my wand; the first round solved backward with the value of every option of every wizard, my chance, and the chart of my chance against my wand with the best wand
+//   wizards                0071        the three-wizard duel with the cat rule: my position, the two rivals and my wand; the first round solved backward with the value of every option of every wizard, my chance, and the chart of my chance against my wand with the best wand
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -7,7 +7,7 @@
   const { BASE, RIGHT, TOP, W, X0, f, fmt, ltr } = dvqExplorers.lib;
   const NB = "\u00a0";
 
-  // The model (0060): p in turn order. A duel to the end, the opener first; after a kill
+  // The model (0071): p in turn order. A duel to the end, the opener first; after a kill
   // in the first round the survivor is next in turn, so it opens against the killer. The
   // first round backward: each wizard keeps the air unless a target is better by more
   // than 1e-12 (the page's rule), targets in order 1, 2, 3.

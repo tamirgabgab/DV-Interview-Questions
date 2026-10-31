@@ -99,6 +99,10 @@ def test_room_enforces_the_rules():
         room.open_box(1)                                   # a ninth box
     room.enter()
     room.open_box(1)                                       # the next person starts fresh
+    # the follow-up "what does the room not check": the box number's range
+    room = Room(EXAMPLE)
+    room.enter()
+    assert room.open_box(0) == 0 and room.open_box(-1) == EXAMPLE[16]
 
 
 def test_figures_up_to_date():
@@ -115,7 +119,8 @@ def test_figures_up_to_date():
 
 def test_explorer_matches_page_code():
     """The boxes explorer: its cycles, person 0's cut and the walks against the page's
-    cycle_from, helper and find_my_note on the example and random arrangements; the two
+    cycle_from, helper and find_my_note on the example and random arrangements; a round
+    with person 0 (his swaps, and everybody wins) against the page's Room and play; the two
     closed-form rates against the page's test value and a simulation."""
     import json
 
@@ -136,10 +141,11 @@ def test_explorer_matches_page_code():
         walks: arr.map((a) => {{ const c = m.permHelper(a, 8); const n = c ? m.permSwap(a, c[0], c[1]) : a;
           return Array.from({{length: 16}}, (_, i) => m.permWalk(n, i + 1, 8)); }}),
         before: arr.map((a) => Array.from({{length: 16}}, (_, i) => m.permWalk(a, i + 1, 8).found)),
+        helped: arr.map((a) => m.permHelped(a, 8)),
         pStrat: m.permStrategyProb(16, 8), pRand: m.permRandomProb(16, 8), wins, randWins,
         small: [4, 6, 8].map((n) => [m.permStrategyProb(n, n / 2), m.permRandomProb(n, n / 2)]),
       }}));""")
-    for notes, cycles, cut, walks, before in zip(arrangements, got["cycles"], got["cut"], got["walks"], got["before"]):
+    for notes, cycles, cut, walks, before, helped in zip(arrangements, got["cycles"], got["cut"], got["walks"], got["before"], got["helped"]):
         seen = set()
         for c in cycles:
             assert c == ns["cycle_from"](notes, c[0]) and c[0] == min(c) and not seen & set(c)
@@ -169,6 +175,8 @@ def test_explorer_matches_page_code():
             assert walk["opened"] == opened
         plain = Room(notes)
         assert before == [ns["find_my_note"](plain, me) for me in range(1, N + 1)]
+        assert helped == {"swaps": ns["MAX_SWAPS"] - room.swaps_left, "win": ns["play"](notes)} and helped["win"]
+        assert helped["swaps"] == (0 if all(before) else 1)   # no swap exactly when nobody would fail
     assert abs(got["pStrat"] - 0.3371) < 1e-4 and got["pRand"] == 2 ** -16
     assert abs(got["wins"] / 4000 - got["pStrat"]) < 0.05
     assert got["randWins"] <= 3                     # expected 0.06 of 4000 rounds

@@ -97,6 +97,39 @@ added: 2026-10-22
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="expected_uniform, cover_curve, tests_for" linenums="1" hl_lines="3 8 21"
+        def expected_uniform(n: int) -> float:
+            """n H_n: the expected number of tests until every one of n equal bins is hit."""
+            return sum(n / (n - i) for i in range(n))                         # (1)!
+
+
+        def cover_step(prob: list[float], n: int) -> list[float]:
+            """One more test: the distribution of the number of covered bins (prob[c], c = 0..n)."""
+            return [prob[c] * c / n + (prob[c - 1] * (n - c + 1) / n if c else 0.0) for c in range(n + 1)]   # (2)!
+
+
+        def cover_curve(n: int, tmax: int) -> list[float]:
+            """P(all n bins covered within t tests) for t = 0..tmax."""
+            prob, out = [1.0] + [0.0] * n, []
+            for _ in range(tmax + 1):
+                out.append(prob[n])
+                prob = cover_step(prob, n)
+            return out
+
+
+        def tests_for(n: int, q: float) -> int:
+            """The fewest tests that cover all n bins with probability at least q."""
+            prob, t = [1.0] + [0.0] * n, 0
+            while prob[n] < q:                                                # (3)!
+                prob, t = cover_step(prob, n), t + 1
+            return t
+        ```
+
+        1. ההמתנה לתא חדש כשכבר כוסו \( i \) : ‏\( n / (n - i) \) טסטים בממוצע.
+        2. בכל טסט \( c \) נשאר (פגיעה בתא שכבר כוסה) או עולה באחד (תא חדש).
+        3. מגלגלים את השרשרת עד שההסתברות לכיסוי מלא עוברת את \( q \).
+
     === "SystemVerilog"
         ```systemverilog title="expected_uniform, cover_curve, tests_for" linenums="1" hl_lines="6 13 14 15 33"
         localparam int MAXB = 1024;      // bins
@@ -134,39 +167,6 @@ added: 2026-10-22
           while (prob[n] < q) begin cover_step(n, prob); t++; end   // (3)!
           return t;
         endfunction
-        ```
-
-        1. ההמתנה לתא חדש כשכבר כוסו \( i \) : ‏\( n / (n - i) \) טסטים בממוצע.
-        2. בכל טסט \( c \) נשאר (פגיעה בתא שכבר כוסה) או עולה באחד (תא חדש).
-        3. מגלגלים את השרשרת עד שההסתברות לכיסוי מלא עוברת את \( q \).
-
-    === "Python"
-        ```python title="expected_uniform, cover_curve, tests_for" linenums="1" hl_lines="3 8 21"
-        def expected_uniform(n: int) -> float:
-            """n H_n: the expected number of tests until every one of n equal bins is hit."""
-            return sum(n / (n - i) for i in range(n))                         # (1)!
-
-
-        def cover_step(prob: list[float], n: int) -> list[float]:
-            """One more test: the distribution of the number of covered bins (prob[c], c = 0..n)."""
-            return [prob[c] * c / n + (prob[c - 1] * (n - c + 1) / n if c else 0.0) for c in range(n + 1)]   # (2)!
-
-
-        def cover_curve(n: int, tmax: int) -> list[float]:
-            """P(all n bins covered within t tests) for t = 0..tmax."""
-            prob, out = [1.0] + [0.0] * n, []
-            for _ in range(tmax + 1):
-                out.append(prob[n])
-                prob = cover_step(prob, n)
-            return out
-
-
-        def tests_for(n: int, q: float) -> int:
-            """The fewest tests that cover all n bins with probability at least q."""
-            prob, t = [1.0] + [0.0] * n, 0
-            while prob[n] < q:                                                # (3)!
-                prob, t = cover_step(prob, n), t + 1
-            return t
         ```
 
         1. ההמתנה לתא חדש כשכבר כוסו \( i \) : ‏\( n / (n - i) \) טסטים בממוצע.
@@ -324,6 +324,64 @@ added: 2026-10-22
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="expected_tests, expected_k1, simulate_tests" linenums="1" hl_lines="20 21 22 31 32 40 41"
+        import math
+
+
+        def poisson_at_least(lam: float, k: int) -> float:
+            """P(Poisson(lam) >= k)."""
+            term, below = math.exp(-lam), 0.0
+            for j in range(k):
+                below += term
+                term *= lam / (j + 1)
+            return 1.0 - below
+
+
+        def expected_tests(p: list[float], k: int, h: float = 0.02) -> float:
+            """E[tests] until every bin i (probability p[i]) has at least k hits: the integral over t
+            of 1 - prod_i P(Poisson(p_i t) >= k), by Simpson's rule until the integrand vanishes."""
+            def uncovered(t):
+                prod = 1.0
+                for pi in p:
+                    prod *= poisson_at_least(pi * t, k)
+                return 1.0 - prod
+            total, t = 0.0, 0.0
+            while True:
+                a, m, b = uncovered(t), uncovered(t + h / 2), uncovered(t + h)
+                total += h * (a + 4 * m + b) / 6                                # (1)!
+                t += h
+                if t > 1 and b < 1e-12:
+                    return total
+
+
+        def expected_k1(p: list[float]) -> float:
+            """k = 1 in closed form: over the non-empty subsets, (-1)^(|S|+1) / p(S)."""
+            total = 0.0
+            for mask in range(1, 1 << len(p)):
+                s = sum(pi for i, pi in enumerate(p) if mask >> i & 1)
+                total += (1 if bin(mask).count("1") % 2 else -1) / s           # (2)!
+            return total
+
+
+        def simulate_tests(p: list[float], k: int, rng) -> int:
+            """One run: tests drawn by p until every bin has k hits; the number of tests."""
+            hits, left, t = [0] * len(p), len(p), 0
+            while left:
+                r, i = rng.random(), 0                                           # (3)!
+                while i < len(p) - 1 and r >= p[i]:
+                    r, i = r - p[i], i + 1
+                hits[i] += 1
+                t += 1
+                if hits[i] == k:
+                    left -= 1
+            return t
+        ```
+
+        1. כלל סימפסון על קטע באורך \( h \) : ‏\( h (a + 4m + b) / 6 \).
+        2. הסימן לפי גודל תת-הקבוצה : חיובי לאי-זוגי, שלילי לזוגי.
+        3. מספר אקראי ב-\( [0, 1) \), והתא נבחר לפי ההסתברויות המצטברות.
+
     === "SystemVerilog"
         ```systemverilog title="expected_tests, expected_k1, simulate_tests" linenums="1" hl_lines="13 14 21 22 33 34 45 47"
         localparam int MAXN = 32;        // bins with their own probability
@@ -383,64 +441,6 @@ added: 2026-10-22
         1. כלל סימפסון על קטע באורך \( h \) : ‏\( h (a + 4m + b) / 6 \).
         2. הסימן לפי גודל תת-הקבוצה : חיובי לאי-זוגי, שלילי לזוגי.
         3. ‏`$urandom` ל-\( [0, 1) \), והתא נבחר לפי ההסתברויות המצטברות.
-
-    === "Python"
-        ```python title="expected_tests, expected_k1, simulate_tests" linenums="1" hl_lines="20 21 22 31 32 40 41"
-        import math
-
-
-        def poisson_at_least(lam: float, k: int) -> float:
-            """P(Poisson(lam) >= k)."""
-            term, below = math.exp(-lam), 0.0
-            for j in range(k):
-                below += term
-                term *= lam / (j + 1)
-            return 1.0 - below
-
-
-        def expected_tests(p: list[float], k: int, h: float = 0.02) -> float:
-            """E[tests] until every bin i (probability p[i]) has at least k hits: the integral over t
-            of 1 - prod_i P(Poisson(p_i t) >= k), by Simpson's rule until the integrand vanishes."""
-            def uncovered(t):
-                prod = 1.0
-                for pi in p:
-                    prod *= poisson_at_least(pi * t, k)
-                return 1.0 - prod
-            total, t = 0.0, 0.0
-            while True:
-                a, m, b = uncovered(t), uncovered(t + h / 2), uncovered(t + h)
-                total += h * (a + 4 * m + b) / 6                                # (1)!
-                t += h
-                if t > 1 and b < 1e-12:
-                    return total
-
-
-        def expected_k1(p: list[float]) -> float:
-            """k = 1 in closed form: over the non-empty subsets, (-1)^(|S|+1) / p(S)."""
-            total = 0.0
-            for mask in range(1, 1 << len(p)):
-                s = sum(pi for i, pi in enumerate(p) if mask >> i & 1)
-                total += (1 if bin(mask).count("1") % 2 else -1) / s           # (2)!
-            return total
-
-
-        def simulate_tests(p: list[float], k: int, rng) -> int:
-            """One run: tests drawn by p until every bin has k hits; the number of tests."""
-            hits, left, t = [0] * len(p), len(p), 0
-            while left:
-                r, i = rng.random(), 0                                           # (3)!
-                while i < len(p) - 1 and r >= p[i]:
-                    r, i = r - p[i], i + 1
-                hits[i] += 1
-                t += 1
-                if hits[i] == k:
-                    left -= 1
-            return t
-        ```
-
-        1. כלל סימפסון על קטע באורך \( h \) : ‏\( h (a + 4m + b) / 6 \).
-        2. הסימן לפי גודל תת-הקבוצה : חיובי לאי-זוגי, שלילי לזוגי.
-        3. מספר אקראי ב-\( [0, 1) \), והתא נבחר לפי ההסתברויות המצטברות.
 
     #### למה זה נכון { .sol-proof }
 

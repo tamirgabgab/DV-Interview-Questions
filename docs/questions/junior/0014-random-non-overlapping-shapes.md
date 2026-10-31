@@ -96,6 +96,61 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="random_shapes" linenums="1" hl_lines="8 26 27"
+        import random
+
+
+        def overlap(a, b):
+            """Do shapes a and b share area? Sharing an edge or a corner is fine."""
+            ax1, ay1, ax2, ay2 = a
+            bx1, by1, bx2, by2 = b
+            return ax1 < bx2 and bx1 < ax2 and ay1 < by2 and by1 < ay2   # (1)!
+
+
+        def candidates(N, M, squares):
+            """Every shape (x1, y1, x2, y2) that fits on the grid."""
+            for x1 in range(1, N):
+                for x2 in range(x1 + 1, N + 1):
+                    for y1 in range(1, M):
+                        for y2 in range(y1 + 1, M + 1):
+                            if not squares or x2 - x1 == y2 - y1:   # (2)!
+                                yield (x1, y1, x2, y2)
+
+
+        def random_shapes(N, M, max_shapes, squares=True, rng=random):
+            n = rng.randint(1, max_shapes)                  # how many shapes
+            while True:                                     # retry until all n fit (3)
+                shapes = []
+                for _ in range(n):
+                    free = [c for c in candidates(N, M, squares)
+                            if not any(overlap(c, s) for s in shapes)]
+                    if not free:
+                        break                               # no room left: start over (4)
+                    shapes.append(rng.choice(free))
+                if len(shapes) == n:
+                    return shapes
+        ```
+
+        1. זו צורת ה-"וגם" של תנאי החפיפה : חפיפה בציר \( x \) **וגם** בציר \( y \), עם
+           \( < \) חזק. השלילה שלה היא בדיוק ארבעת המקרים עם \( \le \) שב-constraint.
+        2. אותו תנאי "רוחב שווה לגובה", אבל כפרמטר : כך סעיף ב משתמש באותה פונקציה בלי
+           להעתיק אותה.
+        3. אין solver, ולכן אין הבטחה שכל \( n \) הצורות ייכנסו בניסיון הראשון. הלולאה
+           החיצונית מנסה שוב עם אותו \( n \), כדי שההתפלגות של \( n \) לא תוטה לכמויות
+           קטנות.
+        4. כשלא נשאר מקום לצורה הבאה, לא מוותרים על צורה אחת אלא זורקים את כל הקבוצה.
+           אחרת הקבוצות הצפופות היו מקבלות פחות צורות ממה שהוגרל.
+
+        ב-Python אין solver, ולכן בונים את הקבוצה צורה אחרי צורה :
+
+        - **מגרילים את \( n \).**
+        - **בכל שלב :** עוברים על כל הצורות שנכנסות ל-grid (`candidates`), משאירים רק את אלה
+          שלא חופפות לאף צורה שכבר נבחרה, ומגרילים אחת מהן.
+        - **אם נתקעים :** כלומר לא נשאר מקום לצורה הבאה, מתחילים מחדש עם אותו \( n \).
+
+        עם \( N = 10 \) ו-\( M = 8 \) יש 196 ריבועים אפשריים, ולכן הסריקה בכל שלב מהירה.
+
     === "SystemVerilog"
         ```systemverilog title="class square_set" linenums="1" hl_lines="31 32 33"
         class square_set;
@@ -157,64 +212,25 @@ added: 2026-10-16
         - **בלי סדר בין הצורות :** לא צריך להחליט מי ממוקמת ראשונה. ה-solver מוצא פתרון לכל
           התנאים יחד.
 
-    === "Python"
-        ```python title="random_shapes" linenums="1" hl_lines="8 26 27"
-        import random
-
-
-        def overlap(a, b):
-            """Do shapes a and b share area? Sharing an edge or a corner is fine."""
-            ax1, ay1, ax2, ay2 = a
-            bx1, by1, bx2, by2 = b
-            return ax1 < bx2 and bx1 < ax2 and ay1 < by2 and by1 < ay2   # (1)!
-
-
-        def candidates(N, M, squares):
-            """Every shape (x1, y1, x2, y2) that fits on the grid."""
-            for x1 in range(1, N):
-                for x2 in range(x1 + 1, N + 1):
-                    for y1 in range(1, M):
-                        for y2 in range(y1 + 1, M + 1):
-                            if not squares or x2 - x1 == y2 - y1:   # (2)!
-                                yield (x1, y1, x2, y2)
-
-
-        def random_shapes(N, M, max_shapes, squares=True, rng=random):
-            n = rng.randint(1, max_shapes)                  # how many shapes
-            while True:                                     # retry until all n fit (3)
-                shapes = []
-                for _ in range(n):
-                    free = [c for c in candidates(N, M, squares)
-                            if not any(overlap(c, s) for s in shapes)]
-                    if not free:
-                        break                               # no room left: start over (4)
-                    shapes.append(rng.choice(free))
-                if len(shapes) == n:
-                    return shapes
-        ```
-
-        1. זו צורת ה-"וגם" של תנאי החפיפה : חפיפה בציר \( x \) **וגם** בציר \( y \), עם
-           \( < \) חזק. השלילה שלה היא בדיוק ארבעת המקרים עם \( \le \) שב-constraint.
-        2. אותו תנאי "רוחב שווה לגובה", אבל כפרמטר : כך סעיף ב משתמש באותה פונקציה בלי
-           להעתיק אותה.
-        3. אין solver, ולכן אין הבטחה שכל \( n \) הצורות ייכנסו בניסיון הראשון. הלולאה
-           החיצונית מנסה שוב עם אותו \( n \), כדי שההתפלגות של \( n \) לא תוטה לכמויות
-           קטנות.
-        4. כשלא נשאר מקום לצורה הבאה, לא מוותרים על צורה אחת אלא זורקים את כל הקבוצה.
-           אחרת הקבוצות הצפופות היו מקבלות פחות צורות ממה שהוגרל.
-
-        ב-Python אין solver, ולכן בונים את הקבוצה צורה אחרי צורה :
-
-        - **מגרילים את \( n \).**
-        - **בכל שלב :** עוברים על כל הצורות שנכנסות ל-grid (`candidates`), משאירים רק את אלה
-          שלא חופפות לאף צורה שכבר נבחרה, ומגרילים אחת מהן.
-        - **אם נתקעים :** כלומר לא נשאר מקום לצורה הבאה, מתחילים מחדש עם אותו \( n \).
-
-        עם \( N = 10 \) ו-\( M = 8 \) יש 196 ריבועים אפשריים, ולכן הסריקה בכל שלב מהירה.
-
     **בודק : אותם תנאים כקוד רגיל.** ב-DV לא סומכים על `randomize()` בלי לבדוק : בודקים
     שהוא החזיר 1, ומריצים בודק שכתוב בנפרד מה-constraints. כאן הבודק משתמש בצורת ה-"וגם"
     של תנאי החפיפה :
+
+    === "Python"
+        ```python title="shapes_ok"
+        def shapes_ok(N, M, shapes, squares=True):
+            for k, (x1, y1, x2, y2) in enumerate(shapes):
+                if not (1 <= x1 < x2 <= N and 1 <= y1 < y2 <= M):     # on the grid
+                    return False
+                if squares and x2 - x1 != y2 - y1:                    # a square
+                    return False
+                if any(overlap(shapes[k], s) for s in shapes[:k]):    # every earlier shape (1)
+                    return False
+            return True
+        ```
+
+        1. ‏`shapes[:k]` הן רק הצורות שלפני \( k \), ולכן כל זוג נבדק פעם אחת. הבודק משתמש
+           ב-`overlap`, צורת ה-"וגם" של התנאי.
 
     === "SystemVerilog"
         ```systemverilog title="function shapes_ok" linenums="1" hl_lines="9 10"
@@ -241,22 +257,6 @@ added: 2026-10-16
         1. ‏`j < i` ולא `j != i` : כל זוג נבדק פעם אחת, בדיוק כמו `i < j` ב-constraint.
         2. הבודק כתוב בצורת ה-"וגם" ולא ב-"או" של ה-constraint. שתי צורות שונות של אותו
            תנאי הן בדיוק מה שרוצים מבודק בלתי תלוי : טעות בניסוח אחד לא תעבור בשני.
-
-    === "Python"
-        ```python title="shapes_ok"
-        def shapes_ok(N, M, shapes, squares=True):
-            for k, (x1, y1, x2, y2) in enumerate(shapes):
-                if not (1 <= x1 < x2 <= N and 1 <= y1 < y2 <= M):     # on the grid
-                    return False
-                if squares and x2 - x1 != y2 - y1:                    # a square
-                    return False
-                if any(overlap(shapes[k], s) for s in shapes[:k]):    # every earlier shape (1)
-                    return False
-            return True
-        ```
-
-        1. ‏`shapes[:k]` הן רק הצורות שלפני \( k \), ולכן כל זוג נבדק פעם אחת. הבודק משתמש
-           ב-`overlap`, צורת ה-"וגם" של התנאי.
 
     #### למה זה נכון { .sol-proof }
 
@@ -355,6 +355,15 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="random_rectangles"
+        def random_rectangles(N, M, max_shapes, rng=random):
+            return random_shapes(N, M, max_shapes, squares=False, rng=rng)
+        ```
+
+        הפרמטר `squares=False` מוריד את התנאי מ-`candidates`, ועכשיו יש 1,260 מלבנים
+        אפשריים במקום 196 ריבועים.
+
     === "SystemVerilog"
         ```systemverilog title="class rect_set"
         class rect_set extends square_set;
@@ -375,15 +384,6 @@ added: 2026-10-16
         s.c_square.constraint_mode(0);    // now s draws rectangles
         void'(s.randomize());
         ```
-
-    === "Python"
-        ```python title="random_rectangles"
-        def random_rectangles(N, M, max_shapes, rng=random):
-            return random_shapes(N, M, max_shapes, squares=False, rng=rng)
-        ```
-
-        הפרמטר `squares=False` מוריד את התנאי מ-`candidates`, ועכשיו יש 1,260 מלבנים
-        אפשריים במקום 196 ריבועים.
 
     #### למה זה נכון { .sol-proof }
 

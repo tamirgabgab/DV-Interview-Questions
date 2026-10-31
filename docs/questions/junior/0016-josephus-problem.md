@@ -660,6 +660,29 @@ added: 2026-10-18
     שתי פונקציות לכל \( L \ge 2 \) : הנסיגה של שלב 1 לאורך השרשרת של \( N \) בלבד, והנוסחה
     של שלב 5 עם לולאה שכופלת ב-\( L \) במקום לוגריתם.
 
+    === "Python"
+        ```python title="josephus" linenums="1" hl_lines="5 6 13 15"
+        def josephus_chain(n: int, L: int) -> int:
+            """The recurrence, along N's chain only: O(N / (L - 1)) steps."""
+            f = 0                          # F_L(r) = 0 at the chain's base
+            r = 1 + (n - 1) % (L - 1)
+            for m in range(r + L - 1, n + 1, L - 1):
+                f = (f + L) % m            # (1)!
+            return f
+
+
+        def josephus_closed(n: int, L: int) -> int:
+            """The closed form: the zero point M below N on N's chain."""
+            m = 1 + (n - 1) % (L - 1)
+            while m <= n // L:
+                m *= L                     # (2)!
+            return L * (n - m) // (L - 1)  # (3)!
+        ```
+
+        1. שלב 1 : ‏\( F_L(m) = (F_L(m - L + 1) + L) \bmod m \), והמודולו לפי הגודל **החדש** \( m \).
+        2. נקודות האפס של השרשרת הן \( r, rL, rL^2, \ldots \) : כופלים ב-\( L \) כל עוד לא עוברים את \( N \). התנאי \( m \le \lfloor N / L \rfloor \) שקול ל-\( mL \le N \), בלי גלישה של \( mL \) ב-32 ביט.
+        3. ההפרש \( N - M \) מתחלק ב-\( L - 1 \), ולכן החילוק מדויק.
+
     === "SystemVerilog"
         ```systemverilog title="josephus" linenums="1" hl_lines="5 6 14 15"
         // the recurrence, along N's chain only: O(N / (L - 1)) steps
@@ -678,29 +701,6 @@ added: 2026-10-18
           while (m <= n / L) m *= L;                   // (2)
           return L * (n - m) / (L - 1);                // (3)
         endfunction
-        ```
-
-        1. שלב 1 : ‏\( F_L(m) = (F_L(m - L + 1) + L) \bmod m \), והמודולו לפי הגודל **החדש** \( m \).
-        2. נקודות האפס של השרשרת הן \( r, rL, rL^2, \ldots \) : כופלים ב-\( L \) כל עוד לא עוברים את \( N \). התנאי \( m \le \lfloor N / L \rfloor \) שקול ל-\( mL \le N \), בלי גלישה של \( mL \) ב-32 ביט.
-        3. ההפרש \( N - M \) מתחלק ב-\( L - 1 \), ולכן החילוק מדויק.
-
-    === "Python"
-        ```python title="josephus" linenums="1" hl_lines="5 6 13 15"
-        def josephus_chain(n: int, L: int) -> int:
-            """The recurrence, along N's chain only: O(N / (L - 1)) steps."""
-            f = 0                          # F_L(r) = 0 at the chain's base
-            r = 1 + (n - 1) % (L - 1)
-            for m in range(r + L - 1, n + 1, L - 1):
-                f = (f + L) % m            # (1)!
-            return f
-
-
-        def josephus_closed(n: int, L: int) -> int:
-            """The closed form: the zero point M below N on N's chain."""
-            m = 1 + (n - 1) % (L - 1)
-            while m <= n // L:
-                m *= L                     # (2)!
-            return L * (n - m) // (L - 1)  # (3)!
         ```
 
         1. שלב 1 : ‏\( F_L(m) = (F_L(m - L + 1) + L) \bmod m \), והמודולו לפי הגודל **החדש** \( m \).

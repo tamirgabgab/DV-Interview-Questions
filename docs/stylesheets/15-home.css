@@ -1,0 +1,223 @@
+/* The site's styles, part 15 of 20: the home page: the dark band, the live level cards, the question of the day (round V). */
+
+/* The band's own colours (both schemes): white ink and bright amber on navy, glass cards,
+   and the difficulty colours of the dark scheme, which read on navy in either scheme. */
+[data-md-color-scheme="default"] {
+  --hb-bg: #1b2a4a;
+  --hb-bg-deep: #14203a;
+  --hb-edge: transparent;
+  --hb-glow: rgba(255, 194, 51, 0.1);
+  --hb-ink: #ffffff;
+  --hb-ink-2: rgba(255, 255, 255, 0.88);
+  --hb-ink-3: rgba(255, 255, 255, 0.74);
+  --hb-link: #a9c4ff;
+  --hb-accent: #ffc233;
+  --hb-accent-soft: rgba(255, 194, 51, 0.22);
+  --hb-card: color-mix(in srgb, #ffffff 6%, #1b2a4a);
+  --hb-card-hover: color-mix(in srgb, #ffffff 9%, #1b2a4a);
+  --hb-soft: rgba(169, 196, 255, 0.14);
+  --hb-line: rgba(255, 255, 255, 0.16);
+  --hb-line-strong: rgba(255, 255, 255, 0.34);
+  --hb-pattern: rgba(255, 255, 255, 0.13);
+  --hb-art-line: rgba(255, 255, 255, 0.55);
+  --hb-art-fill: rgba(255, 255, 255, 0.08);
+  --hb-easy: #5fd39a;   --hb-easy-bg: rgba(95, 211, 154, 0.16);
+  --hb-medium: #ffc233; --hb-medium-bg: rgba(255, 194, 51, 0.16);
+  --hb-hard: #ffa198;   --hb-hard-bg: rgba(255, 123, 114, 0.12);
+  --hb-on-accent: #1b2a4a;
+}
+[data-md-color-scheme="slate"] {
+  --hb-bg: #1d2b48;
+  --hb-bg-deep: #141d31;
+  --hb-edge: rgba(141, 179, 255, 0.22);
+  --hb-glow: rgba(255, 194, 51, 0.08);
+  --hb-ink: #ffffff;
+  --hb-ink-2: rgba(255, 255, 255, 0.86);
+  --hb-ink-3: rgba(255, 255, 255, 0.72);
+  --hb-link: #a9c4ff;
+  --hb-accent: #ffc233;
+  --hb-accent-soft: rgba(255, 194, 51, 0.2);
+  --hb-card: color-mix(in srgb, #ffffff 5%, #1d2b48);
+  --hb-card-hover: color-mix(in srgb, #ffffff 8%, #1d2b48);
+  --hb-soft: rgba(169, 196, 255, 0.14);
+  --hb-line: rgba(255, 255, 255, 0.14);
+  --hb-line-strong: rgba(255, 255, 255, 0.3);
+  --hb-pattern: rgba(255, 255, 255, 0.11);
+  --hb-art-line: rgba(255, 255, 255, 0.5);
+  --hb-art-fill: rgba(255, 255, 255, 0.07);
+  --hb-easy: #5fd39a;   --hb-easy-bg: rgba(95, 211, 154, 0.14);
+  --hb-medium: #ffc233; --hb-medium-bg: rgba(255, 194, 51, 0.14);
+  --hb-hard: #ffa198;   --hb-hard-bg: rgba(255, 123, 114, 0.12);
+  --hb-on-accent: #1b2a4a;
+}
+
+/* V4: the band (hook's home_band, around "לפי רמת משרה" and the question of the day): a navy
+   card like the hero, and inside it the site's tokens are those of a dark surface, so the
+   chips, the bars and the focus rings that use them read on navy. */
+.md-typeset .home-band {
+  --md-default-fg-color: var(--hb-ink-2);
+  --md-default-fg-color--light: var(--hb-ink-3);
+  --md-typeset-a-color: var(--hb-link);
+  --site-card-border: var(--hb-line);
+  --site-card-edge: var(--hb-line);
+  --site-surface: var(--hb-card);
+  --site-primary-soft: var(--hb-soft);
+  --site-focus-ring: var(--hb-accent);
+  --site-label-color: var(--hb-accent);
+  --diff-easy: var(--hb-easy);     --diff-easy-bg: var(--hb-easy-bg);
+  --diff-medium: var(--hb-medium); --diff-medium-bg: var(--hb-medium-bg);
+  --diff-hard: var(--hb-hard);     --diff-hard-bg: var(--hb-hard-bg);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: var(--sp-5) 0;
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  border: 1px solid var(--hb-edge);
+  border-radius: var(--radius-l);
+  color: var(--hb-ink-2);
+  background: radial-gradient(ellipse 60% 70% at 85% 0%, var(--hb-glow), transparent 70%),
+              linear-gradient(170deg, var(--hb-bg) 40%, var(--hb-bg-deep));
+}
+.md-typeset .home-band > :not(.hb-bg) { position: relative; }
+.md-typeset .home-band > h2 { margin: 0 0 var(--sp-1); color: var(--hb-ink); }
+.md-typeset .home-band > h2 .headerlink { color: var(--hb-ink-3); }
+.md-typeset .home-band > h2 .headerlink:is(:hover, :focus-visible) { color: var(--hb-accent); }
+.md-typeset .home-band .level-cards { margin: var(--sp-3) 0 var(--sp-4); }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .home-band { margin-inline: -0.8rem; padding: var(--sp-4) var(--sp-3); border-radius: 0; border-inline: 0; }
+}
+
+/* The background: board traces that end in hexagonal pads, and amber pulses along four of
+   them while the band is on screen (.is-live, home-extras.js). */
+.md-typeset .home-band .hb-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.md-typeset .home-band .hb-bg svg { position: absolute; inset-inline: 0; width: 100%; height: min(50%, 16rem); }
+.md-typeset .home-band .hb-bg .hb-top { top: 0; }
+.md-typeset .home-band .hb-bg .hb-bottom { bottom: 0; transform: rotate(180deg); }
+.md-typeset .home-band .hb-bg :is(.hb-trace, .hb-pad) { fill: none; stroke: var(--hb-pattern); stroke-width: 2; stroke-linejoin: round; }
+.md-typeset .home-band .hb-pulse { fill: none; stroke: var(--hb-accent); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 0.05 1; stroke-dashoffset: 0.05; opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .home-band.is-live .hb-pulse { opacity: 0.45; animation: hb-pulse 9s linear calc(var(--k) * -2.3s) infinite; }
+  @keyframes hb-pulse { from { stroke-dashoffset: 0.05; } to { stroke-dashoffset: -1; } }
+}
+
+/* V5: the level cards on the band: glass cards with white ink, a picture at the end of the
+   head, and the difficulty mix as one stacked bar with its counts under it. */
+.md-typeset .home-band .level-card { border-color: var(--hb-line); border-top: 3px solid var(--hb-line-strong); background: var(--hb-card); box-shadow: none; }
+.md-typeset .home-band a.level-card:is(:hover, :focus-visible) { border-color: var(--hb-accent); border-top-color: var(--hb-line-strong); background: var(--hb-card-hover); box-shadow: var(--shadow-2); }
+.md-typeset .home-band .level-card .lc-head { align-items: center; }
+.md-typeset .level-card .lc-title { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.md-typeset .home-band .level-card .lc-name { color: var(--hb-ink); font-size: 1.05rem; }
+.md-typeset .home-band .level-card .lc-count { color: var(--hb-ink-3); }
+.md-typeset .home-band .level-card .lc-desc { color: var(--hb-ink-3); }
+.md-typeset .level-card .lc-art { flex: none; width: 6rem; height: 2.8rem; overflow: visible; }
+.md-typeset .lc-art :is(line, path, rect, circle) { fill: none; stroke: var(--hb-art-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.md-typeset .lc-art .la-gate { fill: var(--hb-art-fill); }
+.md-typeset .lc-art .la-in line { stroke: var(--hb-accent); }
+.md-typeset .lc-art .la-in :is(rect, circle) { fill: var(--hb-accent); stroke: var(--hb-accent); }
+.md-typeset .lc-art .la-head { fill: var(--hb-art-line); stroke: none; }
+.md-typeset .lc-art :is(.la-slot, .la-stage) { fill: var(--hb-art-fill); stroke-width: 1.5; }
+.md-typeset .lc-art .la-slot.is-full { fill: var(--hb-accent); stroke: var(--hb-accent); }
+.md-typeset .lc-art .la-stage.is-lit { fill: var(--hb-accent-soft); stroke: var(--hb-accent); }
+.md-typeset .lc-art .la-token { fill: var(--hb-accent); stroke: var(--hb-bg); stroke-width: 1.5; }
+.md-typeset .lc-art .la-t1 { transform: translateX(-29px); }
+.md-typeset .lc-art .la-t2 { transform: translateX(-87px); }
+
+.md-typeset .level-card .lc-mix { display: flex; flex-direction: column; gap: var(--sp-2); width: 100%; }
+.md-typeset .level-card .lc-bar { display: flex; gap: 2px; height: 0.42rem; overflow: hidden; border-radius: 999px; background: var(--hb-art-fill); }
+.md-typeset .level-card .lc-seg { display: block; flex-basis: 0; min-width: 0.3rem; }
+.md-typeset .level-card .lc-seg-easy { background: var(--diff-easy); }
+.md-typeset .level-card .lc-seg-medium { background: var(--diff-medium); }
+.md-typeset .level-card .lc-seg-hard { background: var(--diff-hard); }
+.md-typeset .level-card .lc-legend { display: flex; flex-wrap: wrap; gap: 0.2rem 0.9rem; font-size: 0.68rem; color: var(--md-default-fg-color--light); }
+.md-typeset .level-card .lc-leg { display: inline-flex; align-items: center; gap: 0.3em; white-space: nowrap; }
+.md-typeset .level-card .lc-leg::before { content: ""; width: 0.5em; height: 0.5em; border-radius: 50%; background: var(--lc-c); }
+.md-typeset .level-card .lc-leg b { color: var(--hb-ink); font-variant-numeric: tabular-nums; }
+.md-typeset .level-card .lc-leg-easy { --lc-c: var(--diff-easy); }
+.md-typeset .level-card .lc-leg-medium { --lc-c: var(--diff-medium); }
+.md-typeset .level-card .lc-leg-hard { --lc-c: var(--diff-hard); }
+.md-typeset .lc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.md-typeset .home-band .mark-progress .mp-bar { background: var(--hb-art-fill); }
+.md-typeset .home-band .mark-progress .mp-bar i { background: var(--hb-accent); }
+
+/* The pictures move only while their card is hovered or focused, and only once the script
+   says motion is welcome (.is-motion: no automated browser, no reduced motion). */
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .home-band.is-motion .level-card:is(:hover, :focus-visible) .lc-art-student .la-a :is(line, rect) { animation: la-a 4s step-end infinite; }
+  .md-typeset .home-band.is-motion .level-card:is(:hover, :focus-visible) .lc-art-student .la-b :is(line, rect) { animation: la-b 4s step-end infinite; }
+  .md-typeset .home-band.is-motion .level-card:is(:hover, :focus-visible) .lc-art-student .la-y :is(line, circle) { animation: la-y 4s step-end infinite; }
+  .md-typeset .home-band.is-motion .level-card:is(:hover, :focus-visible) .lc-art-junior .la-slot { animation: la-slot 3.6s var(--ease) calc(var(--i) * 0.18s) infinite backwards; }
+  .md-typeset .home-band.is-motion .level-card:is(:hover, :focus-visible) .lc-art-senior .la-token { animation: la-token 3.2s var(--ease) infinite; }
+  .md-typeset .home-band.is-motion .level-card:is(:hover, :focus-visible) .lc-art-senior .la-t2 { animation-delay: -1.6s; }
+  .md-typeset .home-band.is-motion .level-card:is(:hover, :focus-visible) .lc-art-senior .la-stage { animation: la-stage 1.6s linear calc(var(--i) * 0.8s - 3.2s) infinite; }
+  @keyframes la-a { 0% { stroke: var(--hb-art-line); fill: var(--hb-art-fill); } 50%, 100% { stroke: var(--hb-accent); fill: var(--hb-accent); } }
+  @keyframes la-b {
+    0%, 50% { stroke: var(--hb-art-line); fill: var(--hb-art-fill); }
+    25%, 75%, 100% { stroke: var(--hb-accent); fill: var(--hb-accent); }
+  }
+  @keyframes la-y { 0% { stroke: var(--hb-art-line); fill: var(--hb-art-fill); } 75%, 100% { stroke: var(--hb-accent); fill: var(--hb-accent); } }
+  @keyframes la-slot {
+    0%, 67%, 100% { fill: var(--hb-art-fill); stroke: var(--hb-art-line); }
+    12%, 55% { fill: var(--hb-accent); stroke: var(--hb-accent); }
+  }
+  @keyframes la-token {
+    0% { transform: translateX(0); opacity: 0; }
+    5% { opacity: 1; }
+    20% { transform: translateX(0); }
+    25%, 45% { transform: translateX(-29px); }
+    50%, 70% { transform: translateX(-58px); }
+    75%, 92% { transform: translateX(-87px); opacity: 1; }
+    100% { transform: translateX(-104px); opacity: 0; }
+  }
+  @keyframes la-stage {
+    0%, 40% { fill: var(--hb-accent-soft); stroke: var(--hb-accent); }
+    50%, 100% { fill: var(--hb-art-fill); stroke: var(--hb-art-line); }
+  }
+}
+
+/* V6: the question of the day (hook's home_daily, home-extras.js): the kind's icon large on
+   a tile, the label and the date, the title, the chips, a teaser and "לפתור עכשיו". Every
+   row has a fixed height (the title and the teaser are clamped), so the day's question
+   takes exactly the place of the build's. */
+.md-typeset .daily-card {
+  display: grid;
+  grid-template-columns: 5.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3) var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--hb-line);
+  border-inline-start: 3px solid var(--hb-accent);
+  border-radius: var(--radius-m);
+  background: var(--hb-card);
+}
+.md-typeset .daily-card p { margin: 0; }
+.md-typeset .daily-card .dc-art { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1); height: 5.6rem; border-radius: var(--radius-m); background: var(--hb-soft); color: var(--hb-accent); }
+.md-typeset .daily-card .dc-art .kind-ico { width: 2.4rem; height: 2.4rem; }
+.md-typeset .daily-card .dc-box { padding: 0 var(--sp-1); color: var(--hb-ink-2); font-size: 0.56rem; line-height: 1.3; text-align: center; }
+.md-typeset .daily-card .dc-body { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+.md-typeset .daily-card .dc-label { display: flex; align-items: center; gap: var(--sp-2); height: 1.1rem; overflow: hidden; color: var(--hb-ink-3); font-size: 0.66rem; white-space: nowrap; }
+.md-typeset .daily-card .dc-kicker { color: var(--hb-accent); font-weight: 700; letter-spacing: 0.02em; }
+.md-typeset .daily-card .dc-date:not(:empty)::before { content: "·"; margin-inline-end: var(--sp-2); }
+.md-typeset .daily-card .dc-solved { color: var(--hb-easy); font-weight: 600; }
+.md-typeset .daily-card .dc-title { display: -webkit-box; height: 2.7em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--hb-ink); font-size: 0.92rem; font-weight: 700; line-height: 1.35; }
+.md-typeset .daily-card .dc-id { margin-inline-end: 0.2em; color: var(--hb-accent); font-family: var(--md-code-font-family); font-size: 0.78em; font-weight: 600; }
+.md-typeset .daily-card p.dc-title > a:not(.md-button):not(.headerlink):not(.level-card) { color: inherit; text-decoration: none; }
+.md-typeset .daily-card p.dc-title > a:not(.md-button):not(.headerlink):not(.level-card):is(:hover, :focus-visible) { color: var(--hb-ink); text-decoration: underline; text-decoration-color: var(--hb-accent); text-underline-offset: 0.2em; }
+.md-typeset .daily-card .dc-chips { display: flex; flex-wrap: nowrap; gap: var(--sp-1); height: 1.25rem; overflow: hidden; }
+.md-typeset .daily-card .chip-level { color: var(--hb-link); }
+.md-typeset .daily-card .dc-teaser { display: -webkit-box; height: 3em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--hb-ink-3); font-size: 0.72rem; line-height: 1.5; }
+.md-typeset .daily-card .dc-go { margin: 0; white-space: nowrap; border-color: var(--hb-accent); background: var(--hb-accent); color: var(--hb-on-accent); }
+.md-typeset .daily-card .dc-go:is(:hover, :focus-visible) { border-color: var(--hb-accent); background: var(--hb-accent); color: var(--hb-on-accent); filter: brightness(1.06); }
+.md-typeset .daily-card .dc-go::after { content: "←"; display: inline-block; margin-inline-start: 0.4em; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .home-band.is-motion .daily-card .dc-go::after { transition: transform var(--dur-1) var(--ease); }
+  .md-typeset .home-band.is-motion .daily-card .dc-go:hover::after { transform: translateX(-0.25em); }
+}
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .daily-card { position: relative; grid-template-columns: minmax(0, 1fr); padding: var(--sp-3); }
+  .md-typeset .daily-card .dc-art { position: absolute; top: var(--sp-3); inset-inline-end: var(--sp-3); width: 3rem; height: 3rem; }
+  .md-typeset .daily-card .dc-art .kind-ico { width: 1.6rem; height: 1.6rem; }
+  .md-typeset .daily-card .dc-box { display: none; }
+  .md-typeset .daily-card :is(.dc-label, .dc-title) { padding-inline-end: 3.6rem; }
+  .md-typeset .daily-card .dc-teaser { height: 4.5em; -webkit-line-clamp: 3; }
+  .md-typeset .daily-card .dc-go { grid-column: 1 / -1; justify-content: center; text-align: center; }
+}

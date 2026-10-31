@@ -1,0 +1,124 @@
+/* The site's styles, part 20 of 20: the tutorial video: the page tool, the chapter links in the solutions, the dialog with its poster (V3, video.js). */
+
+/* The dialog's own colours, one version for both schemes (VIDEOS.md: the hero's navy with
+   amber marks): white ink and bright amber on navy. */
+:root {
+  --vd-bg: #1b2a4a;
+  --vd-bg-deep: #121d33;
+  --vd-ink: #ffffff;
+  --vd-ink-2: rgba(255, 255, 255, 0.86);
+  --vd-ink-3: rgba(255, 255, 255, 0.74);
+  --vd-accent: #ffc233;
+  --vd-on-accent: #1b2a4a;
+  --vd-line: rgba(255, 255, 255, 0.22);
+  --vd-grid: rgba(255, 255, 255, 0.06);
+  --vd-trace: rgba(255, 194, 51, 0.28);
+  --vd-glow: rgba(255, 194, 51, 0.16);
+  --vd-soft: rgba(255, 255, 255, 0.1);
+  --vd-backdrop: rgba(8, 13, 25, 0.78);
+}
+
+/* The video icon of the page tool and the chapter links: a screen with a play triangle,
+   drawn like Material Design Icons (the play disc is the "interactive" badge's). The
+   triangle points right in both directions, as a player's does. */
+.ui-ico-play { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 4h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3m0 2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm4.5 2.5 6 3.5-6 3.5z'/%3E%3C/svg%3E"); }
+
+/* Practice mode hides the solutions, and the video tells them: its tool goes too. */
+body.practice-mode .md-typeset .question-tools .qt-video { display: none; }
+
+/* The chapter link at the top of a part's solution: a quiet pill, the time in tabular
+   figures after the words. */
+.md-typeset .video-chapter { margin: 0 0 var(--sp-2); }
+.md-typeset .video-chapter .vc-link {
+  display: inline-flex; align-items: center; gap: var(--sp-1);
+  padding: 0.15rem 0.6rem 0.15rem 0.5rem; border: 1px solid var(--site-card-border); border-radius: 1rem;
+  background: var(--site-surface); color: var(--md-typeset-a-color);
+  font-size: 0.72rem; font-weight: 600; line-height: 1.5; text-decoration: none;
+  transition: border-color var(--dur-1) var(--ease);
+}
+.md-typeset .video-chapter .vc-link:hover { border-color: var(--md-typeset-a-color); }   /* the fill stays: the time's grey needs the surface */
+.md-typeset .video-chapter .vc-link:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .video-chapter .ui-ico { width: 1.1em; height: 1.1em; vertical-align: 0; }
+.md-typeset .video-chapter .vc-time { margin-inline-start: 0.15rem; color: var(--md-default-fg-color--light); font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* The dialog: a navy card over a dark backdrop, 16:9 player, as wide as the screen allows
+   (and short enough for a landscape phone); edge to edge on a phone. */
+html.vd-open { overflow: hidden; }
+.vd {
+  box-sizing: border-box;
+  width: min(60rem, calc(100vw - 2rem), calc((100dvh - 8.5rem) * 16 / 9));
+  max-width: none; max-height: none; margin: auto; padding: var(--sp-3);
+  border: 1px solid var(--vd-line); border-radius: var(--radius-l);
+  background: var(--vd-bg); color: var(--vd-ink); box-shadow: var(--shadow-3);
+  font-size: 0.8rem; direction: rtl;
+}
+.vd::backdrop { background: var(--vd-backdrop); }
+.vd[open] { animation: vd-in var(--dur-2) var(--ease); }
+@keyframes vd-in { from { opacity: 0; transform: translateY(0.6rem) scale(0.98); } }
+.vd :focus-visible { outline: 2px solid var(--vd-accent); outline-offset: 2px; }
+
+.vd-head { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-2); }
+.vd-title { flex: 1; min-width: 0; margin: 0; color: var(--vd-ink); font-size: 0.9rem; font-weight: 700; line-height: 1.35; }
+.vd-close {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; padding: 0; border: 1px solid var(--vd-line); border-radius: 50%;
+  background: transparent; color: var(--vd-ink); font: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer;
+}
+.vd-close:hover { background: var(--vd-soft); }
+
+.vd-chapters { display: flex; flex-wrap: wrap; gap: var(--sp-1); margin-bottom: var(--sp-2); }
+.vd-chapters[hidden] { display: none; }
+.vd-chapter {
+  display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.15rem 0.6rem;
+  border: 1px solid var(--vd-line); border-radius: 1rem; background: transparent; color: var(--vd-ink-2);
+  font: inherit; font-size: 0.7rem; font-weight: 600; cursor: pointer;
+}
+.vd-chapter:hover { background: var(--vd-soft); color: var(--vd-ink); }
+.vd-chapter[aria-pressed="true"] { border-color: var(--vd-accent); background: var(--vd-accent); color: var(--vd-on-accent); }
+.vd-time { font-variant-numeric: tabular-nums; }
+
+/* The stage keeps 16:9 whether it holds the poster or the player. */
+.vd-stage { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius-m); background: var(--vd-bg-deep); }
+.vd-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* The poster: the site's navy with a faint grid, two amber traces and a glow behind the
+   play disc; the question's id and title over it. Nothing here comes from YouTube. */
+.vd-poster {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--sp-2); width: 100%; padding: var(--sp-4); border: 0; color: var(--vd-ink); font: inherit; text-align: center; cursor: pointer;
+  background:
+    radial-gradient(circle at 50% 56%, var(--vd-glow), transparent 38%),
+    linear-gradient(var(--vd-trace), var(--vd-trace)) 0 93% / 34% 2px no-repeat,
+    linear-gradient(var(--vd-trace), var(--vd-trace)) 100% 7% / 28% 2px no-repeat,
+    repeating-linear-gradient(0deg, var(--vd-grid) 0 1px, transparent 1px 1.6rem),
+    repeating-linear-gradient(90deg, var(--vd-grid) 0 1px, transparent 1px 1.6rem),
+    var(--vd-bg);
+}
+.vd-poster:focus-visible { outline-offset: -4px; }
+.vd-kicker { color: var(--vd-accent); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; }
+.vd-name { max-width: 30em; color: var(--vd-ink); font-size: 1.15rem; font-weight: 700; line-height: 1.3; }
+.vd-disc {
+  position: relative; width: 3.6rem; height: 3.6rem; margin: var(--sp-1) 0; border-radius: 50%;
+  background: var(--vd-accent); box-shadow: 0 0 0 0.45rem var(--vd-glow);
+  transition: transform var(--dur-1) var(--ease);
+}
+.vd-disc::before {        /* the triangle points right in both directions, as a player's does */
+  content: ""; position: absolute; inset: 0; margin: auto; width: 1.15rem; height: 1.3rem; transform: translateX(0.12rem);
+  background: var(--vd-on-accent); clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+.vd-poster:hover .vd-disc, .vd-poster:focus-visible .vd-disc { transform: scale(1.06); }
+.vd-from { color: var(--vd-ink-2); font-size: 0.75rem; font-weight: 600; }
+.vd-note { margin: var(--sp-2) 0 0; color: var(--vd-ink-3); font-size: 0.66rem; line-height: 1.5; }
+
+@media screen and (max-width: 30em) {
+  .vd { width: 100vw; margin-inline: 0; padding: var(--sp-2); border-inline: 0; border-radius: 0; }
+  .vd-poster { gap: var(--sp-1); padding: var(--sp-2); }
+  .vd-name { font-size: 0.9rem; }
+  .vd-disc { width: 2.8rem; height: 2.8rem; }
+  .vd-disc::before { width: 0.9rem; height: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vd[open] { animation: none; }
+  .vd-disc, .md-typeset .video-chapter .vc-link { transition: none; }
+}
+@media print { .md-typeset .qt-video, .md-typeset .video-chapter, .vd { display: none; } }

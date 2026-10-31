@@ -73,6 +73,21 @@ added: 2026-10-15
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="by_enumeration" hl_lines="4"
+        def by_enumeration(x):
+            i = 1
+            while True:
+                y = int(format(i, "b"))      # i = 5 -> "101" -> 101 (read as decimal) (1)
+                if y % x == 0:   # (2)!
+                    return str(y)
+                i += 1
+        ```
+
+        1. ‏`format(i, "b")` נותנת את המחרוזת הבינארית של `i`, ו-`int` קוראת אותה בבסיס 10.
+           ב-Python אין גלישה, ולכן הגרסה הזו נכונה לכל \( x \), רק איטית.
+        2. ההתאמה הראשונה היא הקטנה ביותר, כי המספרים נבדקים בסדר עולה.
+
     === "SystemVerilog"
         ```systemverilog title="function by_enumeration" hl_lines="8 9"
         function automatic longint unsigned by_enumeration(int x);
@@ -97,21 +112,6 @@ added: 2026-10-15
            10, 100, ... כך הביט ה-\( k \) של `i` הופך לספרה ה-\( k \) של `y`.
         3. הבדיקה הראשונה שמצליחה היא התשובה, כי `i` עולה ולכן גם `y` עולה (ראו "למה זה
            נכון").
-
-    === "Python"
-        ```python title="by_enumeration" hl_lines="4"
-        def by_enumeration(x):
-            i = 1
-            while True:
-                y = int(format(i, "b"))      # i = 5 -> "101" -> 101 (read as decimal) (1)
-                if y % x == 0:   # (2)!
-                    return str(y)
-                i += 1
-        ```
-
-        1. ‏`format(i, "b")` נותנת את המחרוזת הבינארית של `i`, ו-`int` קוראת אותה בבסיס 10.
-           ב-Python אין גלישה, ולכן הגרסה הזו נכונה לכל \( x \), רק איטית.
-        2. ההתאמה הראשונה היא הקטנה ביותר, כי המספרים נבדקים בסדר עולה.
 
     #### למה זה נכון { .sol-proof }
 
@@ -174,6 +174,48 @@ added: 2026-10-15
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="smallest_01_multiple" linenums="1" hl_lines="17 18"
+        from collections import deque
+
+
+        def smallest_01_multiple(x):
+            parent = [-1] * x                # remainder we came from
+            digit = [""] * x                 # digit appended to reach this remainder
+            visited = [False] * x
+
+            start = 1 % x                    # the number "1" (1)
+            visited[start] = True
+            digit[start] = "1"
+            queue = deque([start])
+
+            while not visited[0]:            # stop once remainder 0 is reached
+                r = queue.popleft()
+                for d in (0, 1):             # 0 first -> smaller numbers first (2)
+                    nr = (r * 10 + d) % x
+                    if not visited[nr]:   # (3)!
+                        visited[nr] = True
+                        parent[nr] = r
+                        digit[nr] = str(d)
+                        queue.append(nr)
+
+            # Walk back from remainder 0 to the start and read the digits in reverse.
+            digits = []
+            r = 0
+            while r != -1:
+                digits.append(digit[r])
+                r = parent[r]
+            return "".join(reversed(digits))   # (4)!
+        ```
+
+        1. עבור \( x = 1 \) השארית ההתחלתית היא כבר 0 : הלולאה לא רצה, והשחזור מחזיר "1".
+           ‏`parent` מאותחל ל-`-1` לכל הצמתים, ולכן הצומת ההתחלתי כבר מסומן כסוף השחזור.
+        2. הסדר "+0" לפני "+1" הוא מה שמבטיח שבין מספרים באותו אורך הקטן מתגלה קודם.
+           היפוך הסדר נותן תשובה שגויה (ראו המלכודת בסוף העמוד).
+        3. הגיזום : שארית שכבר נראתה לא נכנסת שוב, ולכן כל שארית מטופלת לכל היותר פעם
+           אחת.
+        4. הספרות נאספות מהסוף להתחלה, ולכן הופכים אותן לפני שמחברים למחרוזת.
+
     === "SystemVerilog"
         ```systemverilog title="function smallest_01_multiple" linenums="1" hl_lines="22 23"
         function automatic string smallest_01_multiple(int x);
@@ -224,48 +266,6 @@ added: 2026-10-15
         4. ההליכה היא מהסוף להתחלה, ולכן כל ספרה מתווספת **משמאל** למחרוזת. התוצאה היא
            מחרוזת, כי התשובה לא נכנסת ב-64 ביט.
 
-    === "Python"
-        ```python title="smallest_01_multiple" linenums="1" hl_lines="17 18"
-        from collections import deque
-
-
-        def smallest_01_multiple(x):
-            parent = [-1] * x                # remainder we came from
-            digit = [""] * x                 # digit appended to reach this remainder
-            visited = [False] * x
-
-            start = 1 % x                    # the number "1" (1)
-            visited[start] = True
-            digit[start] = "1"
-            queue = deque([start])
-
-            while not visited[0]:            # stop once remainder 0 is reached
-                r = queue.popleft()
-                for d in (0, 1):             # 0 first -> smaller numbers first (2)
-                    nr = (r * 10 + d) % x
-                    if not visited[nr]:   # (3)!
-                        visited[nr] = True
-                        parent[nr] = r
-                        digit[nr] = str(d)
-                        queue.append(nr)
-
-            # Walk back from remainder 0 to the start and read the digits in reverse.
-            digits = []
-            r = 0
-            while r != -1:
-                digits.append(digit[r])
-                r = parent[r]
-            return "".join(reversed(digits))   # (4)!
-        ```
-
-        1. עבור \( x = 1 \) השארית ההתחלתית היא כבר 0 : הלולאה לא רצה, והשחזור מחזיר "1".
-           ‏`parent` מאותחל ל-`-1` לכל הצמתים, ולכן הצומת ההתחלתי כבר מסומן כסוף השחזור.
-        2. הסדר "+0" לפני "+1" הוא מה שמבטיח שבין מספרים באותו אורך הקטן מתגלה קודם.
-           היפוך הסדר נותן תשובה שגויה (ראו המלכודת בסוף העמוד).
-        3. הגיזום : שארית שכבר נראתה לא נכנסת שוב, ולכן כל שארית מטופלת לכל היותר פעם
-           אחת.
-        4. הספרות נאספות מהסוף להתחלה, ולכן הופכים אותן לפני שמחברים למחרוזת.
-
     הלולאה מסתיימת תמיד, כי לפי שאלת הבונוס השארית 0 תמיד נגישה. במקרה \( x = 1 \) השארית
     ההתחלתית היא כבר 0, הלולאה לא רצה בכלל, והתשובה היא "1".
 
@@ -295,7 +295,7 @@ added: 2026-10-15
         n100 -- "+0" --> n1000["1000<br/>r = 6 ✗"]
         n100 -- "+1" --> n1001["1001<br/>r = 0 ✓"]
         classDef pruned stroke-dasharray: 5 4,opacity:0.6;
-        classDef found stroke:#1baf7a,stroke-width:3px;
+        classDef found stroke:currentColor,stroke-width:3px;
         class n101,n1000 pruned;
         class n1001 found;
     ```
@@ -326,7 +326,7 @@ added: 2026-10-15
     ```mermaid
     flowchart LR
         a["1<br/>r=1"] -- "+1" --> b["11<br/>r=2"] -- "+1" --> c["111<br/>r=3"] -- "+1" --> d["…"] -- "+1" --> e["11111111<br/>r=8"] -- "+1" --> f["111111111<br/>r=0 ✓"]
-        classDef found stroke:#1baf7a,stroke-width:3px;
+        classDef found stroke:currentColor,stroke-width:3px;
         class f found;
     ```
 
@@ -490,6 +490,71 @@ added: 2026-10-15
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="smallest_ab_multiple, has_ab_solution" linenums="1" hl_lines="11 16 26 27"
+        from collections import deque
+
+
+        def smallest_ab_multiple(x, a, b):
+            parent = [-1] * x                # remainder we came from
+            digit = [""] * x                 # digit appended to reach this remainder
+            visited = [False] * x
+            queue = deque()
+
+            for d in (a, b):                 # the one-digit numbers, smaller first (1)
+                if d > 0 and not visited[d % x]:
+                    visited[d % x] = True
+                    digit[d % x] = str(d)
+                    queue.append(d % x)
+
+            while queue and not visited[0]:  # stop at remainder 0 or an empty queue (2)
+                r = queue.popleft()
+                for d in (a, b):             # a < b: the smaller digit first
+                    nr = (r * 10 + d) % x
+                    if not visited[nr]:
+                        visited[nr] = True
+                        parent[nr] = r
+                        digit[nr] = str(d)
+                        queue.append(nr)
+
+            if not visited[0]:
+                return None                  # no multiple of x over these digits (3)
+            digits = []
+            r = 0
+            while r != -1:
+                digits.append(digit[r])
+                r = parent[r]
+            return "".join(reversed(digits))
+
+
+        def has_ab_solution(x, a, b):
+            s = t = 0
+            while x % 2 == 0:                # x = 2^s * 5^t * m, m coprime to 10 (4)
+                x, s = x // 2, s + 1
+            while x % 5 == 0:
+                x, t = x // 5, t + 1
+            if a == 0:
+                return True                  # b followed by zeros
+            if s > 0 and t > 0:
+                return False                 # a multiple of 10 ends in 0
+            if t > 0:                        # the last digits must be 5, 25 or 75 (5)
+                return 5 in (a, b) and (t == 1 or (t == 2 and (a, b) in ((2, 5), (5, 7))))
+            while s > 0 and a % 2 == 0 and b % 2 == 0:
+                a, b, s = a // 2, b // 2, s - 1   # both even: halve every digit (6)
+            return s == 0 or a % 2 != b % 2
+        ```
+
+        1. ספרה 0 לא פותחת מספר, ולכן היא לא צומת התחלה. כששתי הספרות נותנות אותה שארית,
+           השנייה כבר מסומנת ולא נכנסת.
+        2. ‏`while queue` הוא התנאי החדש לעומת פתרון 2 : כשאין פתרון, התור מתרוקן והלולאה
+           נעצרת במקום להוציא איבר מתור ריק.
+        3. ‏`None` מסמן "אין פתרון", ו-`has_ab_solution` צופה אותו מראש בלי חיפוש.
+        4. בסוף שתי הלולאות נשאר ב-`x` החלק \( m \), שלא משפיע על הקיום (שלב 3 בהוכחה).
+        5. ‏\( 5^1 \) צריך את הספרה 5, ‏\( 5^2 \) את הסיומת 25 או 75, ו-\( 5^3 \) אף פעם לא
+           מתאפשר בשתי ספרות (שלב 6 בהוכחה).
+        6. מספר מספרות זוגיות הוא פעמיים מספר מהספרות החצויות, ולכן אפשר לחצות את הספרות
+           ולהוריד את \( s \) באחד (שלב 5 בהוכחה).
+
     === "SystemVerilog"
         ```systemverilog title="function smallest_ab_multiple, has_ab_solution" linenums="1" hl_lines="15 23 37"
         function automatic string smallest_ab_multiple(int x, int a, int b);
@@ -561,71 +626,6 @@ added: 2026-10-15
            אין סיומת שבנויה משתי ספרות בלבד (שלב 6 בהוכחה).
         6. כששתי הספרות זוגיות, כל מספר מהן הוא פעמיים מספר מהספרות \( a/2 \) ו-\( b/2 \). לכן
            מחלקים את הספרות ב-2 ומורידים את \( s \) באחד (שלב 5 בהוכחה).
-
-    === "Python"
-        ```python title="smallest_ab_multiple, has_ab_solution" linenums="1" hl_lines="11 16 26 27"
-        from collections import deque
-
-
-        def smallest_ab_multiple(x, a, b):
-            parent = [-1] * x                # remainder we came from
-            digit = [""] * x                 # digit appended to reach this remainder
-            visited = [False] * x
-            queue = deque()
-
-            for d in (a, b):                 # the one-digit numbers, smaller first (1)
-                if d > 0 and not visited[d % x]:
-                    visited[d % x] = True
-                    digit[d % x] = str(d)
-                    queue.append(d % x)
-
-            while queue and not visited[0]:  # stop at remainder 0 or an empty queue (2)
-                r = queue.popleft()
-                for d in (a, b):             # a < b: the smaller digit first
-                    nr = (r * 10 + d) % x
-                    if not visited[nr]:
-                        visited[nr] = True
-                        parent[nr] = r
-                        digit[nr] = str(d)
-                        queue.append(nr)
-
-            if not visited[0]:
-                return None                  # no multiple of x over these digits (3)
-            digits = []
-            r = 0
-            while r != -1:
-                digits.append(digit[r])
-                r = parent[r]
-            return "".join(reversed(digits))
-
-
-        def has_ab_solution(x, a, b):
-            s = t = 0
-            while x % 2 == 0:                # x = 2^s * 5^t * m, m coprime to 10 (4)
-                x, s = x // 2, s + 1
-            while x % 5 == 0:
-                x, t = x // 5, t + 1
-            if a == 0:
-                return True                  # b followed by zeros
-            if s > 0 and t > 0:
-                return False                 # a multiple of 10 ends in 0
-            if t > 0:                        # the last digits must be 5, 25 or 75 (5)
-                return 5 in (a, b) and (t == 1 or (t == 2 and (a, b) in ((2, 5), (5, 7))))
-            while s > 0 and a % 2 == 0 and b % 2 == 0:
-                a, b, s = a // 2, b // 2, s - 1   # both even: halve every digit (6)
-            return s == 0 or a % 2 != b % 2
-        ```
-
-        1. ספרה 0 לא פותחת מספר, ולכן היא לא צומת התחלה. כששתי הספרות נותנות אותה שארית,
-           השנייה כבר מסומנת ולא נכנסת.
-        2. ‏`while queue` הוא התנאי החדש לעומת פתרון 2 : כשאין פתרון, התור מתרוקן והלולאה
-           נעצרת במקום להוציא איבר מתור ריק.
-        3. ‏`None` מסמן "אין פתרון", ו-`has_ab_solution` צופה אותו מראש בלי חיפוש.
-        4. בסוף שתי הלולאות נשאר ב-`x` החלק \( m \), שלא משפיע על הקיום (שלב 3 בהוכחה).
-        5. ‏\( 5^1 \) צריך את הספרה 5, ‏\( 5^2 \) את הסיומת 25 או 75, ו-\( 5^3 \) אף פעם לא
-           מתאפשר בשתי ספרות (שלב 6 בהוכחה).
-        6. מספר מספרות זוגיות הוא פעמיים מספר מהספרות החצויות, ולכן אפשר לחצות את הספרות
-           ולהוריד את \( s \) באחד (שלב 5 בהוכחה).
 
     **דוגמאות :**
 

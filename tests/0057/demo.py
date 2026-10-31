@@ -1,10 +1,8 @@
-# The page's four checkers on 16 tags returned out of order
-import random
+# The page's six ants: when the last falls, how many collisions, and when each one falls
 from solution import *  # noqa: F401,F403
 
-sent = list(range(16))
-ret = [t for t in sent if t not in (5, 12)]
-random.shuffle(ret)
-print("two missing:", missing_two(sent, ret, 4))  # [5, 12]
-print("one missing, one twice:", missing_and_dup(sent, [t for t in sent if t != 7] + [3]))  # (7, 3)
-print("three missing:", missing_k(sent, [t for t in sent if t not in (1, 8, 14)], 3, 16))  # [1, 8, 14]
+pos, dirs = [10, 25, 40, 60, 75, 90], [1, -1, 1, -1, -1, 1]
+print("last ant off after", last_fall(pos, dirs), "s")  # last ant off after 90 s
+print("collisions:", collisions(pos, dirs))  # 5
+print("fall times, ants from the left:", fall_times(pos, dirs))  # [25, 60, 75, 90, 60, 10]
+print("on a ring with four going right:", ring_after([1, 1, 1, -1, -1, 1]))  # (2, 300)

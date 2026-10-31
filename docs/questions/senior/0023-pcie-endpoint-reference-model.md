@@ -43,6 +43,43 @@ added: 2026-10-19
 המחזורים, ו-`get_next_completion()` שהסביבה קוראת לה פעם במחזור ומקבלת Completion מוכן
 או null. המחלקות של הבקשות ושל ה-Completion נתונות :
 
+=== "Python"
+    ```python title="given classes"
+    import random
+    from dataclasses import dataclass, field
+
+    MRRS, MPS, RCB = 256, 256, 128   # max read request, max payload, read completion boundary
+
+
+    @dataclass
+    class MemWriteReq:
+        address: int
+        data: bytes                  # len(data) is the length in bytes
+
+
+    @dataclass
+    class MemReadReq:
+        address: int
+        length_bytes: int
+        requester_id: int
+        tag: int
+
+
+    @dataclass
+    class Completion:
+        requester_id: int
+        tag: int
+        start_address: int           # model-internal: where the payload starts
+        byte_count: int              # bytes still to return, this payload included
+        data: bytes
+
+
+    @dataclass
+    class PendingRead:               # one read waiting to be answered
+        cpls: list = field(default_factory=list)   # its completions, in address order
+        ready_cycle: int = 0         # the next one may go out from this cycle on
+    ```
+
 === "SystemVerilog"
     ```systemverilog title="given classes"
     localparam int MRRS = 256;   // max read request size, bytes
@@ -81,43 +118,6 @@ added: 2026-10-19
       completion   cpls[$];          // its completions, in address order
       int unsigned ready_cycle;      // the next one may go out from this cycle on
     endclass
-    ```
-
-=== "Python"
-    ```python title="given classes"
-    import random
-    from dataclasses import dataclass, field
-
-    MRRS, MPS, RCB = 256, 256, 128   # max read request, max payload, read completion boundary
-
-
-    @dataclass
-    class MemWriteReq:
-        address: int
-        data: bytes                  # len(data) is the length in bytes
-
-
-    @dataclass
-    class MemReadReq:
-        address: int
-        length_bytes: int
-        requester_id: int
-        tag: int
-
-
-    @dataclass
-    class Completion:
-        requester_id: int
-        tag: int
-        start_address: int           # model-internal: where the payload starts
-        byte_count: int              # bytes still to return, this payload included
-        data: bytes
-
-
-    @dataclass
-    class PendingRead:               # one read waiting to be answered
-        cpls: list = field(default_factory=list)   # its completions, in address order
-        ready_cycle: int = 0         # the next one may go out from this cycle on
     ```
 
 הפשטות : אין Byte Enables ואין שדה Lower Address, כל Completion מצליח (אין UR או CA),
@@ -234,6 +234,78 @@ added: 2026-10-19
     בסעיף ב נחליף בדיוק אותן. ב-Python המודל מקבל מופע של `random.Random`, כדי שבדיקה
     תוכל לקבע seed.
 
+    === "Python"
+        ```python title="class EndpointRefModel" linenums="1" hl_lines="17 21 26 40 51 52"
+        class EndpointRefModel:
+            """Completer model for RCB-aligned traffic: writes and reads of whole 128-byte blocks."""
+            MIN_DELAY, MAX_DELAY = 1, 20     # cycles before the first completion of a read
+            MAX_GAP = 10                     # cycles between two completions of one read
+
+            def __init__(self, rng: random.Random | None = None):
+                self.memory: dict[int, bytearray] = {}        # key: block address (a multiple of RCB)
+                self.pending_reads: list[PendingRead] = []    # one entry per read not fully answered yet
+                self.current_cycle = 0
+                self.rng = rng or random.Random()
+
+            def process_write(self, req: MemWriteReq) -> None:
+                """Posted write: replace whole blocks, no completion."""
+                if req.address % RCB or len(req.data) % RCB:
+                    raise ValueError(f"aligned model: write of {len(req.data)} bytes at {req.address:#x}")
+                for k in range(0, len(req.data), RCB):
+                    self.memory[req.address + k] = bytearray(req.data[k:k + RCB])   # (1)!
+
+            def read_bytes(self, address: int, length_bytes: int) -> bytes:
+                """The bytes of a read, block by block; a block never written reads as zeros."""
+                return b"".join(bytes(self.memory.get(address + k, bytes(RCB)))     # (2)!
+                                for k in range(0, length_bytes, RCB))
+
+            def create_fragments(self, address: int, length_bytes: int) -> list[int]:
+                """Payload sizes of the completions: 256 bytes may be cut at the one interior boundary."""
+                if length_bytes == 2 * RCB and self.rng.randint(0, 1):              # (3)!
+                    return [RCB, RCB]
+                return [length_bytes]
+
+            def process_read(self, req: MemReadReq) -> None:
+                """Build every completion of the read now, in address order, and park them until ready."""
+                if not 0 < req.length_bytes <= MRRS:
+                    raise ValueError(f"read of {req.length_bytes} bytes exceeds MRRS")
+                data = self.read_bytes(req.address, req.length_bytes)
+                pending = PendingRead()
+                address, remaining = req.address, req.length_bytes
+                for size in self.create_fragments(req.address, req.length_bytes):
+                    offset = address - req.address
+                    pending.cpls.append(Completion(req.requester_id, req.tag, address,
+                                                   remaining, data[offset:offset + size]))   # (4)!
+                    address += size
+                    remaining -= size
+                pending.ready_cycle = self.current_cycle + self.rng.randint(self.MIN_DELAY, self.MAX_DELAY)
+                self.pending_reads.append(pending)
+
+            def get_next_completion(self) -> Completion | None:
+                """Called once per cycle: a random ready read sends its next completion, or None."""
+                ready = [p for p in self.pending_reads if p.ready_cycle <= self.current_cycle]
+                if not ready:
+                    return None
+                pick = self.rng.choice(ready)                                       # (5)!
+                cpl = pick.cpls.pop(0)                                              # (6)!
+                if pick.cpls:
+                    pick.ready_cycle = self.current_cycle + self.rng.randint(1, self.MAX_GAP)
+                else:
+                    self.pending_reads.remove(pick)
+                return cpl
+
+            def tick(self) -> None:
+                self.current_cycle += 1
+        ```
+
+        1. המפתח הוא כתובת הבלוק. בכתיבה מיושרת זו בדיוק כתובת הבקשה ועוד כפולות של 128,
+           והבלוק הישן מוחלף כולו.
+        2. בלוק שלא נכתב מעולם תורם `bytes(RCB)`, כלומר 128 אפסים.
+        3. ההטלה היחידה שקובעת את צורת הפיצול. בקשה של 128 בתים לעולם לא מתפצלת.
+        4. ‏Byte Count הוא היתרה **לפני** ה-Completion : 256 ואז 128, לא גודל ה-payload.
+        5. הבחירה בין קריאות מוכנות היא החופש היחיד בסדר השידור; מכאן ה-interleaving.
+        6. תמיד הראשון : בתוך קריאה אחת הסדר הוא סדר הכתובות, בלי יוצא מן הכלל.
+
     === "SystemVerilog"
         ```systemverilog title="class endpoint_ref_model" linenums="1" hl_lines="19 28 36 63 83 84"
         // Completer model for RCB-aligned traffic: writes and reads of whole 128-byte blocks.
@@ -339,78 +411,6 @@ added: 2026-10-19
         4. ‏Byte Count הוא היתרה **לפני** ה-Completion : 256 ואז 128, לא גודל ה-payload.
         5. הבחירה בין קריאות מוכנות היא החופש היחיד בסדר השידור; מכאן ה-interleaving.
         6. ‏`pop_front` תמיד : בתוך קריאה אחת הסדר הוא סדר הכתובות, בלי יוצא מן הכלל.
-
-    === "Python"
-        ```python title="class EndpointRefModel" linenums="1" hl_lines="17 21 26 40 51 52"
-        class EndpointRefModel:
-            """Completer model for RCB-aligned traffic: writes and reads of whole 128-byte blocks."""
-            MIN_DELAY, MAX_DELAY = 1, 20     # cycles before the first completion of a read
-            MAX_GAP = 10                     # cycles between two completions of one read
-
-            def __init__(self, rng: random.Random | None = None):
-                self.memory: dict[int, bytearray] = {}        # key: block address (a multiple of RCB)
-                self.pending_reads: list[PendingRead] = []    # one entry per read not fully answered yet
-                self.current_cycle = 0
-                self.rng = rng or random.Random()
-
-            def process_write(self, req: MemWriteReq) -> None:
-                """Posted write: replace whole blocks, no completion."""
-                if req.address % RCB or len(req.data) % RCB:
-                    raise ValueError(f"aligned model: write of {len(req.data)} bytes at {req.address:#x}")
-                for k in range(0, len(req.data), RCB):
-                    self.memory[req.address + k] = bytearray(req.data[k:k + RCB])   # (1)!
-
-            def read_bytes(self, address: int, length_bytes: int) -> bytes:
-                """The bytes of a read, block by block; a block never written reads as zeros."""
-                return b"".join(bytes(self.memory.get(address + k, bytes(RCB)))     # (2)!
-                                for k in range(0, length_bytes, RCB))
-
-            def create_fragments(self, address: int, length_bytes: int) -> list[int]:
-                """Payload sizes of the completions: 256 bytes may be cut at the one interior boundary."""
-                if length_bytes == 2 * RCB and self.rng.randint(0, 1):              # (3)!
-                    return [RCB, RCB]
-                return [length_bytes]
-
-            def process_read(self, req: MemReadReq) -> None:
-                """Build every completion of the read now, in address order, and park them until ready."""
-                if not 0 < req.length_bytes <= MRRS:
-                    raise ValueError(f"read of {req.length_bytes} bytes exceeds MRRS")
-                data = self.read_bytes(req.address, req.length_bytes)
-                pending = PendingRead()
-                address, remaining = req.address, req.length_bytes
-                for size in self.create_fragments(req.address, req.length_bytes):
-                    offset = address - req.address
-                    pending.cpls.append(Completion(req.requester_id, req.tag, address,
-                                                   remaining, data[offset:offset + size]))   # (4)!
-                    address += size
-                    remaining -= size
-                pending.ready_cycle = self.current_cycle + self.rng.randint(self.MIN_DELAY, self.MAX_DELAY)
-                self.pending_reads.append(pending)
-
-            def get_next_completion(self) -> Completion | None:
-                """Called once per cycle: a random ready read sends its next completion, or None."""
-                ready = [p for p in self.pending_reads if p.ready_cycle <= self.current_cycle]
-                if not ready:
-                    return None
-                pick = self.rng.choice(ready)                                       # (5)!
-                cpl = pick.cpls.pop(0)                                              # (6)!
-                if pick.cpls:
-                    pick.ready_cycle = self.current_cycle + self.rng.randint(1, self.MAX_GAP)
-                else:
-                    self.pending_reads.remove(pick)
-                return cpl
-
-            def tick(self) -> None:
-                self.current_cycle += 1
-        ```
-
-        1. המפתח הוא כתובת הבלוק. בכתיבה מיושרת זו בדיוק כתובת הבקשה ועוד כפולות של 128,
-           והבלוק הישן מוחלף כולו.
-        2. בלוק שלא נכתב מעולם תורם `bytes(RCB)`, כלומר 128 אפסים.
-        3. ההטלה היחידה שקובעת את צורת הפיצול. בקשה של 128 בתים לעולם לא מתפצלת.
-        4. ‏Byte Count הוא היתרה **לפני** ה-Completion : 256 ואז 128, לא גודל ה-payload.
-        5. הבחירה בין קריאות מוכנות היא החופש היחיד בסדר השידור; מכאן ה-interleaving.
-        6. תמיד הראשון : בתוך קריאה אחת הסדר הוא סדר הכתובות, בלי יוצא מן הכלל.
 
     #### למה זה נכון { .sol-proof }
 
@@ -548,6 +548,56 @@ added: 2026-10-19
     מחלקה יורשת שמחליפה את שלוש הפונקציות; בניית ה-Completions והשידור עוברים בירושה.
     מי שכתב בסעיף א את הפיצול הכללי כבר בהתחלה, נשאר רק עם הזיכרון.
 
+    === "Python"
+        ```python title="class UnalignedEndpointModel" linenums="1" hl_lines="9 11 25 29 33"
+        class UnalignedEndpointModel(EndpointRefModel):
+            """Any byte address and any length up to MRRS: a request touches one block or more,
+            and the first and last of them only partly. Everything else is inherited."""
+
+            def process_write(self, req: MemWriteReq) -> None:
+                """Posted write, block by block: patch only the touched bytes of each block."""
+                done = 0
+                while done < len(req.data):
+                    block, off = divmod(req.address + done, RCB)                    # (1)!
+                    n = min(RCB - off, len(req.data) - done)
+                    blk = self.memory.setdefault(block * RCB, bytearray(RCB))       # (2)!
+                    blk[off:off + n] = req.data[done:done + n]
+                    done += n
+
+            def read_bytes(self, address: int, length_bytes: int) -> bytes:
+                """The same walk gathers the bytes of a read."""
+                out, done = bytearray(), 0
+                while done < length_bytes:
+                    block, off = divmod(address + done, RCB)
+                    n = min(RCB - off, length_bytes - done)
+                    out += self.memory.get(block * RCB, bytes(RCB))[off:off + n]
+                    done += n
+                return bytes(out)
+
+            def create_fragments(self, address: int, length_bytes: int) -> list[int]:
+                """Every RCB boundary strictly inside the read is a possible cut; pick a random subset."""
+                end_address = address + length_bytes
+                sizes, last = [], address
+                boundary = (address // RCB + 1) * RCB                               # (3)!
+                while boundary < end_address:
+                    if self.rng.randint(0, 1):                                      # (4)!
+                        sizes.append(boundary - last)
+                        last = boundary
+                    boundary += RCB
+                sizes.append(end_address - last)                                    # (5)!
+                return sizes
+        ```
+
+        1. מספר הבלוק וההיסט של הבית הבא, בפעולה אחת. המפתח במילון הוא כתובת הבלוק,
+           `block * RCB`, כמו ב-SystemVerilog.
+        2. ‏`setdefault` מחזיר את הבלוק הקיים או יוצר בלוק אפסים, ואז מתעדכנים רק \( n \)
+           בתים מההיסט. בלי זה כתיבה של בית אחד הייתה מאפסת 127 שכנים.
+        3. הגבול הראשון **אחרי** הכתובת, גם כשהכתובת עצמה מיושרת (אז זה `address + 128`).
+        4. מטבע לכל גבול פנימי : תת-קבוצה אקראית. בלי גבולות פנימיים הלולאה לא רצה, ויש
+           Completion אחד.
+        5. הקטע האחרון, מהחיתוך האחרון עד סוף הבקשה, נכנס תמיד; לכן סכום הגדלים הוא
+           האורך.
+
     === "SystemVerilog"
         ```systemverilog title="class unaligned_endpoint_model" linenums="1" hl_lines="11 14 15 43 46 52"
         // Any byte address and any length up to MRRS: a request touches one block or more, and
@@ -615,56 +665,6 @@ added: 2026-10-19
         5. הקטע האחרון, מהחיתוך האחרון עד סוף הבקשה, נכנס תמיד; לכן סכום הגדלים הוא
            האורך.
 
-    === "Python"
-        ```python title="class UnalignedEndpointModel" linenums="1" hl_lines="9 11 25 29 33"
-        class UnalignedEndpointModel(EndpointRefModel):
-            """Any byte address and any length up to MRRS: a request touches one block or more,
-            and the first and last of them only partly. Everything else is inherited."""
-
-            def process_write(self, req: MemWriteReq) -> None:
-                """Posted write, block by block: patch only the touched bytes of each block."""
-                done = 0
-                while done < len(req.data):
-                    block, off = divmod(req.address + done, RCB)                    # (1)!
-                    n = min(RCB - off, len(req.data) - done)
-                    blk = self.memory.setdefault(block * RCB, bytearray(RCB))       # (2)!
-                    blk[off:off + n] = req.data[done:done + n]
-                    done += n
-
-            def read_bytes(self, address: int, length_bytes: int) -> bytes:
-                """The same walk gathers the bytes of a read."""
-                out, done = bytearray(), 0
-                while done < length_bytes:
-                    block, off = divmod(address + done, RCB)
-                    n = min(RCB - off, length_bytes - done)
-                    out += self.memory.get(block * RCB, bytes(RCB))[off:off + n]
-                    done += n
-                return bytes(out)
-
-            def create_fragments(self, address: int, length_bytes: int) -> list[int]:
-                """Every RCB boundary strictly inside the read is a possible cut; pick a random subset."""
-                end_address = address + length_bytes
-                sizes, last = [], address
-                boundary = (address // RCB + 1) * RCB                               # (3)!
-                while boundary < end_address:
-                    if self.rng.randint(0, 1):                                      # (4)!
-                        sizes.append(boundary - last)
-                        last = boundary
-                    boundary += RCB
-                sizes.append(end_address - last)                                    # (5)!
-                return sizes
-        ```
-
-        1. מספר הבלוק וההיסט של הבית הבא, בפעולה אחת. המפתח במילון הוא כתובת הבלוק,
-           `block * RCB`, כמו ב-SystemVerilog.
-        2. ‏`setdefault` מחזיר את הבלוק הקיים או יוצר בלוק אפסים, ואז מתעדכנים רק \( n \)
-           בתים מההיסט. בלי זה כתיבה של בית אחד הייתה מאפסת 127 שכנים.
-        3. הגבול הראשון **אחרי** הכתובת, גם כשהכתובת עצמה מיושרת (אז זה `address + 128`).
-        4. מטבע לכל גבול פנימי : תת-קבוצה אקראית. בלי גבולות פנימיים הלולאה לא רצה, ויש
-           Completion אחד.
-        5. הקטע האחרון, מהחיתוך האחרון עד סוף הבקשה, נכנס תמיד; לכן סכום הגדלים הוא
-           האורך.
-
     #### למה זה נכון { .sol-proof }
 
     **הזיכרון.** בכל סיבוב של ההליכה \( n \ge 1 \), ו-\( off + n \le RCB \), ולכן הסיבוב
@@ -697,12 +697,13 @@ added: 2026-10-19
     הבקשה, השאר על גבולות RCB. הבית הראשון של כל אחד הוא בדיוק הבית שנכתב לכתובת הזו.
 
     **לנסות בעצמכם.** בתיבה הבאה בונים בקשות : כתיבה צובעת את הבתים שלה במפת הבלוקים,
-    וקריאה נחתכת בגבולות RCB אקראיים ומחכה זמן אקראי. "מחזור" מריץ את הלולאה של המודל
-    (`tick` ואז `get_next_completion`), וה-Completions של קריאות שונות משתלבים. שתי הדוגמאות
-    שבעמוד טעונות עם ההגרלות המדויקות שלהן. מתחת לקריאות הפתוחות יש ציר מחזורים : לכל קריאה
-    ההמתנה האקראית מקווקוות, הזמן שבו היא מוכנה ומחכה לתורה מלא, ועיגול בכל Completion
-    שיצא; קו אנכי מסמן את המחזור הנוכחי. מתחתיו ציר המחזורים : לכל מחזור ה-Completion שיצא
-    בו (Tag, גודל ו-Byte Count), ולכל קריאה שורה שגבוהה כשהיא מוכנה ומחכה לתורה.
+    וקריאה נחתכת בגבולות RCB אקראיים ומחכה זמן אקראי. כששולחים קריאה, שורת ההסבר מונה את
+    הגבולות שבתוכה ואת הפיצולים החוקיים, תת-קבוצה אחת של הגבולות לכל פיצול, ומראה איזה מהם
+    הוגרל. "מחזור" מריץ את הלולאה של המודל (`tick` ואז `get_next_completion`), וה-Completions
+    של קריאות שונות משתלבים. שתי הדוגמאות שבעמוד טעונות עם ההגרלות המדויקות שלהן. ציר
+    ההמתנות מראה לכל קריאה את ההמתנה האקראית (מקווקוות), את הזמן שבו היא מוכנה ומחכה לתורה
+    (קו מלא) ועיגול בכל Completion שיצא. ציר המחזורים שמתחתיו הוא אותו מידע כצורת גל :
+    השדות של ה-Completion שיצא בכל מחזור, ושורת `ready` לכל קריאה.
 
     <div class="explorer" data-kind="endpoint"></div>
 
@@ -739,15 +740,17 @@ added: 2026-10-19
 
 ??? followup "שאלות המשך"
     - **כתיבה באמצע :** מה אם מגיעה כתיבה לאותה כתובת בין קבלת הקריאה לשידור
-      ה-Completions שלה? במודל הנתונים נלקחים ברגע הבקשה, כפי שכללי הסדר של PCIe דורשים :
-      קריאה לא עוקפת כתיבה posted שהגיעה לפניה, וכתיבה שהגיעה אחריה לא אמורה להשתקף
-      בתשובה. מה ה-DUT עושה, ואיך בודקים את זה?
+      ה-Completions שלה? במודל הנתונים נלקחים ברגע הבקשה : קריאה לא עוקפת כתיבה posted
+      שהגיעה לפניה. כתיבה שהגיעה אחריה, לעומת זאת, מותר לה לעקוף את הקריאה לפי כללי הסדר של
+      PCIe, ולכן ייתכן שהיא תשתקף בתשובה. מה ה-DUT עושה, ואיך בודקים את זה?
 
         ??? fu-answer "תשובה"
             במודל הקריאה מעתיקה את הנתונים כבר ב-`process_read`, ולכן כתיבה מאוחרת לא משנה את
             ה-Completions שלה. DUT שקורא מהזיכרון רק ברגע השידור יחזיר את הנתונים החדשים. בודקים
             בבדיקה מכוונת : קריאה, מיד אחריה כתיבה לאותה כתובת עם תבנית אחרת והמתנה ארוכה,
-            וה-scoreboard משווה כל בית לתמונת הזיכרון מרגע הקריאה.
+            וה-scoreboard משווה כל בית לתמונת הזיכרון מרגע הקריאה. מכיוון שמותר לכתיבה לעקוף את
+            הקריאה, בבתים שהכתיבה נוגעת בהם ה-scoreboard מקבל גם את הערך הישן וגם את החדש, אלא
+            אם המפרט של ה-DUT קובע אחד מהם, ואז בודקים אותו.
 
     - **איך בודקים את המודל עצמו :** הפלט שלו אקראי. איך בודקים מודל כזה?
 
@@ -766,6 +769,20 @@ added: 2026-10-19
             תת-קבוצה של הגבולות הפנימיים היא פיצול חוקי : \( 2^{N-1} \) פיצולים,
             כש-\( N = \lceil (a + L) / RCB \rceil \) הוא מספר הבלוקים ו-\( a \) ההיסט בבלוק
             הראשון, כלומר לכל היותר 4.
+
+    - **‏MPS קטן מ-MRRS :** מה משתנה כש-`MPS = 128` ו-`MRRS = 256`? האם כל תת-קבוצה של
+      הגבולות הפנימיים עדיין פיצול חוקי?
+
+        ??? fu-answer "תשובה"
+            לא. ‏Completion גדול מ-MPS פסול, ולכן חלק מהחיתוכים נעשים חובה : מותר לדלג על גבול
+            רק אם ה-Completion הנוכחי, מהחיתוך האחרון עד נקודת החיתוך האפשרית הבאה (הגבול הבא
+            או סוף הבקשה), לא עובר את MPS. ב-`create_fragments` המטבע נשאר, אבל לפניו בודקים
+            את התנאי הזה, וכשהוא לא מתקיים חותכים בלי להטיל. כך כל פלט עדיין חוקי, וכל פיצול
+            חוקי עדיין מתקבל בהסתברות חיובית. בקריאה של 256 בתים מ-`0x10020` שני החיתוכים
+            חובה (‏96 + 160 ו-224 + 32 עוברים את 128), ונשאר פיצול אחד : ‏96 + 128 + 32. גם
+            בקריאה המיושרת של סעיף א נשאר רק 128 + 128, וקריאה קצרה, למשל 64 בתים
+            מ-`0x10060`, עדיין חופשית : ‏32 + 32 או 64. מספר הפיצולים כבר אינו \( 2^c \); את
+            הספירה עם MPS ואת הגיזום ראו בשאלה [0020](0020-pcie-completion-splits.md).
 
     - **השדות שהשמטנו :** איך מוסיפים Lower Address (7 הביטים התחתונים של כתובת ההתחלה)
       ו-First/Last DW Byte Enable? מה משתנה כשהאורך נתון ב-DW?

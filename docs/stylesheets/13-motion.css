@@ -1,0 +1,211 @@
+/* The site's styles, part 13 of 20: round M (session 28), motion and finish: the drawn logo, the
+   header and the table of contents, the home hero's live waves and example, the cards, the
+   question header card, self-check and hint feedback, the box skeleton, page transitions,
+   the footer and the 404 page. Every movement is defined only without reduced motion.
+   The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
+
+/* M3: the site mark inline (overrides/partials/logo.html): a white D and an amber check.
+   motion.js adds .is-drawing on the first page of a visit; the pointer draws it again. */
+.dvq-logo { display: block; overflow: visible; }
+.dvq-logo path { fill: none; stroke-linejoin: round; }
+.dvq-logo .lg-d { stroke: var(--md-primary-bg-color); stroke-width: 7; }
+.dvq-logo .lg-v { stroke: var(--site-logo-v); stroke-width: 8; stroke-linecap: round; }
+@media (prefers-reduced-motion: no-preference) {
+  .dvq-logo.is-drawing path, :is(.md-logo, .df-home):hover .dvq-logo path { stroke-dasharray: 1; animation: lg-draw 0.6s var(--ease) both; }
+  .dvq-logo.is-drawing .lg-v, :is(.md-logo, .df-home):hover .dvq-logo .lg-v { animation-duration: 0.45s; animation-delay: 0.4s; }
+  @keyframes lg-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+}
+
+/* M4: the header lifts off the page once it scrolls (Material sets md-header--shadow), and
+   a bar slides along the table of contents to the section being read (motion.js). */
+.md-header { transition: box-shadow var(--dur-2) var(--ease); }
+.md-header--shadow { box-shadow: 0 0.15rem 0.6rem rgba(0, 0, 0, 0.2); }
+.md-sidebar--secondary .md-nav--secondary { position: relative; }
+.md-sidebar--secondary .toc-marker { position: absolute; top: 0; inset-inline-start: 0.1rem; width: 2px; height: 1rem; border-radius: 1px; background: var(--md-accent-fg-color); opacity: 0; pointer-events: none; }
+.md-sidebar--secondary .toc-marker.is-on { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-sidebar--secondary .toc-marker.is-moving { transition: transform var(--dur-2) var(--ease), height var(--dur-2) var(--ease), opacity var(--dur-1); }
+}
+
+/* M1: the hero's waves roll by one width at a time (the pattern is there twice) and an
+   amber cursor sweeps across them, after the lines have been drawn; both stop while the
+   hero is off screen (home.js sets .is-paused). */
+.md-typeset .home-hero .hh-bg { opacity: 0.14; }
+.md-typeset .home-hero .hh-waves .hh-cursor { stroke: var(--md-accent-fg-color); stroke-width: 3; stroke-dasharray: 5 6; opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .home-hero .hh-roll { animation: hh-roll 60s linear 2.4s infinite; }
+  .md-typeset .home-hero .hh-waves .hh-cursor { animation: hh-sweep 11s ease-in-out 2.6s infinite; }
+  .md-typeset .home-hero.is-paused :is(.hh-roll, .hh-cursor) { animation-play-state: paused; }
+  @keyframes hh-roll { to { transform: translateX(-640px); } }
+  @keyframes hh-sweep {
+    0% { opacity: 0; transform: translateX(-10px); }
+    12%, 88% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(650px); }
+  }
+}
+
+/* M2: the live example (hook's _hero_fsm, home.js) beside the hero's text on a wide
+   screen: the machine of 0055 part a reading a number bit by bit. */
+.md-typeset .home-hero .hh-fsm { display: none; }
+@media screen and (min-width: 76.25em) {
+  .md-typeset .home-hero .hh-fsm { position: absolute; top: 1.6rem; inset-inline-end: 1.6rem; display: flex; flex-direction: column; gap: var(--sp-1); width: 15rem; padding: var(--sp-2) var(--sp-3) var(--sp-3); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: var(--radius-l); background: rgba(255, 255, 255, 0.05); box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.18); }
+  .md-typeset .home-hero:has(.hh-fsm) > :is(h1, p) { max-width: min(42rem, calc(100% - 17rem)); }
+}
+.md-typeset .home-hero .hh-fsm p { max-width: none; margin: 0; }
+.md-typeset .home-hero .hh-fsm .hf-title { color: rgba(255, 255, 255, 0.78); font-size: 0.64rem; font-weight: 600; }
+.md-typeset .home-hero .hf-svg { display: block; width: 100%; height: auto; }
+.md-typeset .home-hero .hf-edge { fill: none; stroke: rgba(255, 255, 255, 0.4); stroke-width: 1.6; transition: stroke var(--dur-1), stroke-width var(--dur-1); }
+.md-typeset .home-hero .hf-edge.is-taken { stroke: var(--md-accent-fg-color); stroke-width: 2.6; }
+.md-typeset .home-hero .hf-head { fill: rgba(255, 255, 255, 0.7); }
+.md-typeset .home-hero .hf-label { fill: rgba(255, 255, 255, 0.82); font-family: var(--md-code-font-family); font-size: 12px; }
+.md-typeset .home-hero .hf-node circle { fill: rgba(255, 255, 255, 0.06); stroke: rgba(255, 255, 255, 0.75); stroke-width: 1.6; transition: fill var(--dur-2) var(--ease), stroke var(--dur-2) var(--ease); }
+.md-typeset .home-hero .hf-node text { fill: #fff; font-family: var(--md-code-font-family); font-size: 15px; font-weight: 700; transition: fill var(--dur-2); }
+.md-typeset .home-hero .hf-node.is-now circle { fill: var(--md-accent-fg-color); stroke: var(--md-accent-fg-color); }
+.md-typeset .home-hero .hf-node.is-now circle + circle { fill: none; stroke: var(--md-primary-fg-color); }
+.md-typeset .home-hero .hf-node.is-now text { fill: #1b2a4a; }
+.md-typeset .home-hero .hh-fsm .hf-stream { min-height: 1.3rem; }
+.md-typeset .home-hero .hf-bits { display: flex; justify-content: center; gap: 0.2rem; font-family: var(--md-code-font-family); }
+.md-typeset .home-hero .hf-bit { width: 1.1rem; border-radius: var(--radius-s); background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.72); font-size: 0.7rem; line-height: 1.3rem; text-align: center; transition: background-color var(--dur-1), color var(--dur-1); }
+.md-typeset .home-hero .hf-bit.is-read { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.md-typeset .home-hero .hf-bit.is-now { background: var(--md-accent-fg-color); color: #1b2a4a; }
+.md-typeset .home-hero .hh-fsm .hf-read { min-height: 1.1rem; color: rgba(255, 255, 255, 0.88); font-size: 0.64rem; text-align: center; }
+.md-typeset .home-hero .hh-fsm:not(.is-no) .hf-read:not(:empty) { font-weight: 600; }
+.md-typeset .home-hero .hh-fsm.is-yes .hf-read { color: var(--md-accent-fg-color); }
+.md-typeset .home-hero .hh-fsm .hf-go { align-self: flex-start; color: var(--md-accent-fg-color); font-size: 0.64rem; font-weight: 600; }
+.md-typeset .home-hero .hh-fsm .hf-go:is(:hover, :focus-visible) { color: #fff; text-decoration: underline; }
+
+/* M12: cards answer the pointer: the top edge fills with amber from the start, the icon
+   tilts, and a level's progress bar fills in. */
+.md-typeset .level-card { position: relative; }
+.md-typeset .level-card::before { content: ""; position: absolute; top: -3px; inset-inline: -1px; height: 3px; border-radius: var(--radius-m) var(--radius-m) 0 0; background: var(--md-accent-fg-color); transform: scaleX(0); transform-origin: right; pointer-events: none; }
+.md-typeset a.level-card:hover { border-top-color: var(--md-primary-fg-color); }
+.md-typeset a.level-card:is(:hover, :focus-visible)::before { transform: scaleX(1); }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .level-card::before { transition: transform 0.35s var(--ease); }
+  .md-typeset .level-card .kind-ico { transition: transform var(--dur-2) var(--ease); }
+  .md-typeset a.level-card:hover .kind-ico { transform: rotate(-10deg) scale(1.12); }
+  .md-typeset .mark-progress .mp-bar i { transition: width 0.9s var(--ease) 0.15s; }
+}
+
+/* M5: the question header as a card: the title, one row of chips, the topics as chips with
+   the date and the source under them, and the page tools along the card's foot with their
+   names (a touch screen keeps its own layout, 12-rounds-y-s.css). */
+.md-typeset .question-header, .md-typeset .question-header:has(+ .part-nav, + .path-nav) { margin-bottom: var(--sp-3); padding: var(--sp-4) var(--sp-4) var(--sp-3); border: 1px solid var(--site-card-edge); border-radius: var(--radius-l); background: var(--site-surface); box-shadow: var(--shadow-1); }
+.md-typeset .question-header .qh-topics { display: flex; flex-wrap: wrap; flex-basis: 100%; align-items: center; gap: 0.25rem 0.3rem; }
+.md-typeset .question-header .qh-topics + .qh-sep { display: none; }
+.md-typeset .question-header .qh-topics-name { margin-inline-end: 0.15rem; }
+.md-typeset .question-header .qh-bottom a.qh-tag { padding: 0 0.55em; border: 1px solid var(--site-card-border); border-radius: 1rem; line-height: 1.65; text-decoration: none; }
+.md-typeset .question-header .qh-bottom a.qh-tag:is(:hover, :focus-visible) { border-color: var(--md-typeset-a-color); color: var(--md-typeset-a-color); }
+@media screen and (min-width: 30em) and (hover: hover) {
+  .md-typeset .question-header { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "chips" "meta" "tools"; }
+  .md-typeset .question-header .question-tools, body.practice-mode .md-typeset .question-header .question-tools { flex-wrap: wrap; gap: var(--sp-1); margin: var(--sp-3) calc(-1 * var(--sp-4)) calc(-1 * var(--sp-3)); padding: var(--sp-2) var(--sp-4); border-top: 1px solid var(--site-card-border); border-radius: 0 0 var(--radius-l) var(--radius-l); }
+  .md-typeset .question-header .question-tools .qt-btn { gap: 0.35rem; width: auto; height: 1.75rem; padding: 0 0.65rem; border-radius: 1rem; }
+  .md-typeset .question-header .question-tools .qt-name { display: inline; font-size: 0.66rem; font-weight: 600; white-space: nowrap; }
+  .md-typeset .question-header .question-tools .qt-btn[data-tip]:is(:hover, :focus-visible)::after { content: none; }
+}
+@media screen and (max-width: 29.9375em) {
+  .md-typeset .question-header, .md-typeset .question-header:has(+ .part-nav, + .path-nav) { padding: var(--sp-3); }
+}
+
+/* M7: a self-check's reply: the check mark of a right answer is drawn, a wrong answer
+   shakes the field and gives it the trap colour. */
+.md-typeset .selfcheck__tick { width: 1.05em; height: 1.05em; margin-inline-end: 0.25em; vertical-align: -0.18em; }
+.md-typeset .selfcheck__tick path { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.md-typeset .selfcheck:has(.selfcheck__msg.is-bad) .selfcheck__in { border-color: var(--diff-hard); }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .selfcheck__tick path { stroke-dasharray: 1; animation: lg-draw 0.45s var(--ease) 0.05s both; }
+  .md-typeset .selfcheck__in.is-shake { animation: sc-shake 0.4s var(--ease); }
+  @keyframes sc-shake { 20% { transform: translateX(-5px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+}
+
+/* M8: the dots above a run of hints (question-tools.js), one per hint, filled once opened. */
+.md-typeset p.hint-dots { display: flex; align-items: center; gap: 0.3rem; margin: 1em 0 -0.5em; color: var(--md-default-fg-color--light); font-size: 0.62rem; }
+.md-typeset p.hint-dots span { margin-inline-end: 0.15rem; }
+.md-typeset p.hint-dots i { width: 0.5rem; height: 0.5rem; border: 1.5px solid var(--adm-followup); border-radius: 50%; box-sizing: border-box; }
+.md-typeset p.hint-dots i.is-on { background: var(--adm-followup); }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset p.hint-dots i { transition: background-color var(--dur-1); }
+  .md-typeset p.hint-dots i.is-on { animation: qt-pop 0.4s ease-out; }
+}
+
+/* M9: a box not built yet (core.js builds a box as it nears the screen) holds its place
+   as a skeleton: a bar for its title and a soft sheen. */
+.md-typeset .explorer:empty { min-height: 12rem; background-image: linear-gradient(var(--site-primary-soft) 0 0); background-size: 100% 2rem; background-repeat: no-repeat; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .explorer:empty { background-image: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--md-default-fg-color) 5%, transparent) 50%, transparent 70%), linear-gradient(var(--site-primary-soft) 0 0); background-size: 200% 100%, 100% 2rem; animation: ex-sheen 1.4s linear infinite; }
+  @keyframes ex-sheen { from { background-position: 150% 0, 0 0; } to { background-position: -50% 0, 0 0; } }
+}
+
+/* M6: a page opens with a short cross-fade (where the browser can), the header stays put,
+   and a question's title moves from the link that was followed into the page's title
+   (motion.js names that link). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-group(root) { animation-duration: 220ms; }
+  .md-header { view-transition-name: dvq-header; }
+  .md-typeset .question-header > h1 { view-transition-name: dvq-title; }
+  ::view-transition-group(dvq-title) { animation-duration: 340ms; animation-timing-function: var(--ease); }
+  ::view-transition-old(dvq-title), ::view-transition-new(dvq-title) { height: 100%; object-fit: none; object-position: right top; }
+}
+
+/* M13: buttons answer the pointer: a raised shadow under it, a press, and a focus ring that
+   settles in (the ring is there from the first frame; only its offset moves). */
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .md-button { transition: transform 120ms var(--ease), box-shadow var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
+  .md-typeset .md-button:hover { box-shadow: var(--shadow-2); }
+  :is(.md-top, .md-header__button, .md-footer__link):active { transform: scale(0.96) !important; }
+  :is(a, button, summary, input, select, [tabindex]):focus-visible { animation: focus-in 0.18s var(--ease); }
+  @keyframes focus-in { from { outline-offset: 5px; } }
+}
+
+/* M10: the footer (overrides/partials/footer.html): the mark, the name and the numbers,
+   the levels with their counts and the site's pages, then the copyright line. */
+.md-footer-meta .dvq-foot { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-4); padding: var(--sp-5) var(--sp-3) var(--sp-4); }
+.md-footer-meta .df-home { display: inline-flex; align-items: center; gap: var(--sp-2); color: var(--md-footer-fg-color); font-size: 0.85rem; font-weight: 700; }
+.md-footer-meta .df-home .dvq-logo { width: 1.6rem; height: 1.6rem; }
+.md-footer-meta.md-typeset .df-brand p { max-width: 24rem; margin: var(--sp-2) 0 0; color: var(--md-footer-fg-color--light); font-size: 0.68rem; line-height: 1.6; }
+.md-footer-meta.md-typeset .df-title { margin: 0 0 var(--sp-2); color: var(--md-footer-fg-color); font-size: 0.7rem; font-weight: 700; }
+.md-footer-meta.md-typeset .df-col ul { margin: 0; padding: 0; list-style: none; }
+.md-footer-meta.md-typeset .df-col li { margin: 0 0 var(--sp-1); font-size: 0.68rem; }
+.md-footer-meta.md-typeset .df-col li > a:not(.md-button) { color: var(--md-footer-fg-color--light); text-decoration: none; }
+.md-footer-meta.md-typeset .df-col li > a:not(.md-button):is(:hover, :focus-visible) { color: var(--md-footer-fg-color); text-decoration: underline; }
+.md-footer-meta .df-count { padding: 0 0.4em; border-radius: 1rem; background: rgba(255, 255, 255, 0.1); color: var(--md-footer-fg-color--light); font-family: var(--md-code-font-family); font-size: 0.6rem; }
+.md-footer-meta .df-bottom { border-top: 1px solid rgba(255, 255, 255, 0.12); }
+@media screen and (max-width: 44.9375em) {
+  .md-footer-meta .dvq-foot { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-3) var(--sp-4); padding: var(--sp-4) var(--sp-3) var(--sp-3); }
+  .md-footer-meta .df-brand { grid-column: 1 / -1; }
+}
+
+/* M11: the 404 page: 404 on a seven-segment display, and a waveform whose bus reads
+   question ids until the cursor at 404 ns, where it turns to the unknown state X. The
+   lines are drawn once, the display flickers on, and the X pulses. */
+.md-typeset .not-found .nf-display { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3) var(--sp-5); margin-bottom: var(--sp-2); }
+.md-typeset .not-found .nf-digits { flex: none; width: 6.4rem; height: auto; transform: skewX(-6deg); }
+.md-typeset .not-found .ss-on { fill: var(--md-accent-fg-color); }
+.md-typeset .not-found .ss-off { fill: rgba(255, 255, 255, 0.07); }
+.md-typeset .not-found .nf-wave { flex: 1 1 15rem; max-width: 24rem; height: auto; direction: ltr; }
+.md-typeset .not-found .nf-wave text { font-family: var(--md-code-font-family); font-size: 12px; }
+.md-typeset .not-found .nf-name { fill: rgba(255, 255, 255, 0.62); }
+.md-typeset .not-found :is(.nf-clk, .nf-bus) { fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 1.6; stroke-linejoin: round; }
+.md-typeset .not-found .nf-val { fill: #fff; }
+.md-typeset .not-found .nf-hatch { stroke: var(--site-x-state); stroke-width: 1.6; opacity: 0.55; }
+.md-typeset .not-found .nf-x-band { fill: url(#nf-hatch); stroke: var(--site-x-state); stroke-width: 1.6; stroke-linejoin: round; }
+.md-typeset .not-found .nf-x-text { fill: var(--site-x-state); font-weight: 700; stroke: var(--md-primary-fg-color); stroke-width: 4px; paint-order: stroke; }
+.md-typeset .not-found .nf-cursor { stroke: var(--md-accent-fg-color); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.md-typeset .not-found .nf-time { fill: var(--md-accent-fg-color); }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .not-found :is(.nf-clk, .nf-bus) { stroke-dasharray: 1; animation: lg-draw 1.1s linear both; }
+  .md-typeset .not-found .nf-bus { animation-duration: 0.36s; }
+  .md-typeset .not-found .nf-bus:nth-of-type(3) { animation-delay: 0.36s; }
+  .md-typeset .not-found .nf-bus:nth-of-type(4) { animation-delay: 0.72s; }
+  .md-typeset .not-found .nf-val { animation: nf-fade 0.3s 0.3s both; }
+  .md-typeset .not-found .nf-mark { animation: nf-fade 0.3s 1.05s both; }
+  .md-typeset .not-found .nf-x { animation: nf-fade 0.3s 1.15s both, nf-pulse 1.6s ease-in-out 1.6s infinite alternate; }
+  .md-typeset .not-found .ss-on { animation: nf-flicker 0.9s 1.2s both; }
+  @keyframes nf-fade { from { opacity: 0; } }
+  @keyframes nf-pulse { to { opacity: 0.45; } }
+  @keyframes nf-flicker { 0% { opacity: 0.12; } 18% { opacity: 1; } 28% { opacity: 0.25; } 42% { opacity: 1; } 52% { opacity: 0.5; } 100% { opacity: 1; } }
+}
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .not-found .nf-wave { flex-basis: 100%; max-width: none; }
+}

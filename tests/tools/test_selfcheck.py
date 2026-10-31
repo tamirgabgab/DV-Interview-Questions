@@ -226,6 +226,19 @@ def fsm_answers() -> list[int]:
     return [int("1011", 2) % 3, len({future(p) for p in prefixes}), next(y for y in range(7) if 10 * y % 7 == 1)]
 
 
+def window_answers() -> list[int]:
+    """The divisible window of L digits: the window of 3 bits after 1, 1, 0, 1 entered at the
+    LSB (its remainder by 3) and 1, 0, 1, 1 entered at the MSB (its value), shifted as bit
+    strings; and 10^4 mod 7, the weight of a decimal digit that leaves a window of 4."""
+    lsb = "000"
+    for b in "1101":
+        lsb = (lsb + b)[1:]
+    msb = "000"
+    for b in "1011":
+        msb = (b + msb)[:-1]
+    return [int(lsb, 2) % 3, int(msb, 2), 10 ** 4 % 7]
+
+
 def ants_answers() -> list[int]:
     """Ants on a pole: the longest time, by every configuration of up to three ants on a pole
     of 8 (it is the length) scaled to 100; the most collisions of 100 ants by a dynamic
@@ -373,7 +386,7 @@ def kaprekar_keys() -> int:
 
 
 def wizard_answers() -> list:
-    """0060: the best chance of the three-wizard duel (cat rule after the first round) at
+    """0071: the best chance of the three-wizard duel (cat rule after the first round) at
     positions 1, 2, 3 against 0.6 then 0.8, and at position 1 against 0.8 then 0.4; the
     first round solved backward with exact fractions (a target or the air at each turn), a
     wand just under a rival standing for the limit."""
@@ -413,6 +426,30 @@ def wizard_answers() -> list:
     return [best(0, a), best(1, a), best(2, a), best(0, (Fraction(4, 5), Fraction(2, 5)))]
 
 
+def ones_answers() -> list:
+    """0061: the longest window with at most k zeros (part a), and with at most k cells that
+    are not its most frequent value (part b), every window tried."""
+    def longest(seq, k, same):
+        best = 0
+        for i in range(len(seq)):
+            for j in range(i, len(seq)):
+                w = seq[i:j + 1]
+                bad = len(w) - max(w.count(c) for c in set(w)) if same else w.count(0)
+                if bad <= k:
+                    best = max(best, len(w))
+        return best
+    return [longest([1, 0, 1, 1, 0, 1, 0, 1, 1, 1], 1, False), longest("ABAACAAB", 2, True)]
+
+
+def tag_pool_answers() -> list:
+    """0062: the most transactions open at once (open from the send up to the response), and
+    what one shared pool saves against a pool per kind."""
+    def most(txns):
+        return max(sum(1 for s, e in txns if s <= t < e) for t, _ in txns)
+    reads, writes = [(0, 10), (2, 12)], [(20, 30), (22, 32)]
+    return [most([(0, 10), (10, 20), (5, 15)]), most(reads) + most(writes) - most(reads + writes)]
+
+
 EXPECTED = {
     "0003": [comparisons(5)],
     "0004": [mislabeled_samples()],
@@ -438,16 +475,28 @@ EXPECTED = {
     "0043": [9, 7],                                         # tests/0043 runs the plan on every ordering
     "0044": [kaprekar_keys()],
     "0042": [camel(0.5, 150, 450, 30)],
+    "0048": [(-5 - 0) ** 2 + (10 - 1) ** 2],                 # part c at 45 degrees: B2 = (0, 3) + (7, 5) turned by 90, z^2 = |A B2|^2
     "0051": [mice(1000, 1), mice(1000, 2), mice(1000, 3)],
     "0052": [coin_runs("HH")[0], coin_runs("HHH")[0], coin_runs("HT", "HH")[1], coin_var("HH")],
     "0053": list(alu_bins()),
     "0054": [rr_bound(4), rr_bound(8), rr_bound(4, [1, 2, 3, 4])],
     "0055": fsm_answers(),
-    "0056": ants_answers(),
-    "0057": tag_answers(),
-    "0058": coin_answers(),
-    "0059": popcount_answers(),
-    "0060": wizard_answers(),
+    "0056": window_answers(),
+    "0057": ants_answers(),
+    "0058": tag_answers(),
+    "0059": coin_answers(),
+    "0060": popcount_answers(),
+    "0061": ones_answers(),
+    "0062": tag_pool_answers(),
+    "0063": [4, 5, 3],                                      # tests/0063 replays the deques and the module
+    "0064": [6, 4, (5 ** 3 - 1) // 2],                      # tests/0064 searches every weight set
+    "0067": [3, 4, 6],                                      # tests/0067 checks them against every simple path
+    "0068": [6, 15, 9],                                     # tests/0068 sorts the prefix and the window
+    "0065": [5, 1, 5],                                      # tests/0065 floods the X and the self-check grids
+    "0066": [3, 3, 6],                                      # tests/0066 merges, cuts the pieces and reads the peak
+    "0069": [2, 3, 5],                                      # tests/0069 counts the pairs of 7 3 9 2 8
+    "0070": [9, 3, 6],                                      # tests/0070 checks them against the brute-force searches
+    "0071": wizard_answers(),
 }
 
 

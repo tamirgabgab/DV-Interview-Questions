@@ -90,35 +90,6 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="covergroup alu_cg" linenums="1" hl_lines="6 9 16 18"
-        typedef enum logic [2:0] {ADD, SUB, AND, OR, SHL} alu_op_e;
-
-        covergroup alu_cg with function sample(alu_op_e op, logic [7:0] a, logic [7:0] b, logic carry);
-          cp_op: coverpoint op {
-            bins add = {ADD}; bins sub = {SUB}; bins and_ = {AND}; bins or_ = {OR}; bins shl = {SHL};
-            illegal_bins undefined = {[5:7]};                       // (1)!
-          }
-          cp_a: coverpoint a {
-            bins zero = {8'h00}; bins max = {8'hFF}; bins msb = {8'h80};   // (2)!
-            bins mid  = {[8'h01:8'h7F], [8'h81:8'hFE]};
-          }
-          cp_b: coverpoint b {
-            bins zero = {8'h00}; bins max = {8'hFF}; bins msb = {8'h80};
-            bins mid  = {[8'h01:8'h7F], [8'h81:8'hFE]};
-          }
-          cp_carry: coverpoint carry iff (op inside {ADD, SUB, SHL});   // (3)!
-          x_op_a_b: cross cp_op, cp_a, cp_b {
-            ignore_bins shl_out = binsof(cp_op.shl) && (binsof(cp_b.max) || binsof(cp_b.msb));   // (4)!
-          }
-        endgroup
-        ```
-
-        1. קוד לא מוגדר הוא שגיאה, לא חור בכיסוי : הסימולטור מדווח עליו ברגע שהוא מופיע.
-        2. ערכי הקצה, כל אחד bin משלו. ‏`mid` הוא bin אחד של שני טווחים.
-        3. ‏`iff` : בפעולות `AND` ו-`OR` הדגימה של `carry` לא נספרת בכלל.
-        4. סעיף ב : הזזה ב-0x80 או ב-0xFF מוציאה את כל הביטים, והתוצאה תמיד אפס. התאים האלה לא נספרים.
-
     === "Python"
         ```python title="value_bin, AluCoverage" linenums="1" hl_lines="6 16 23 29 34"
         OPS = ("ADD", "SUB", "AND", "OR", "SHL")
@@ -160,6 +131,35 @@ added: 2026-10-27
         1. אותן ארבע מחלקות כמו ב-covergroup.
         2. ‏`illegal_bins` : קוד לא מוגדר הוא שגיאה.
         3. ‏`iff` : רק בפעולות שיש בהן carry.
+
+    === "SystemVerilog"
+        ```systemverilog title="covergroup alu_cg" linenums="1" hl_lines="6 9 16 18"
+        typedef enum logic [2:0] {ADD, SUB, AND, OR, SHL} alu_op_e;
+
+        covergroup alu_cg with function sample(alu_op_e op, logic [7:0] a, logic [7:0] b, logic carry);
+          cp_op: coverpoint op {
+            bins add = {ADD}; bins sub = {SUB}; bins and_ = {AND}; bins or_ = {OR}; bins shl = {SHL};
+            illegal_bins undefined = {[5:7]};                       // (1)!
+          }
+          cp_a: coverpoint a {
+            bins zero = {8'h00}; bins max = {8'hFF}; bins msb = {8'h80};   // (2)!
+            bins mid  = {[8'h01:8'h7F], [8'h81:8'hFE]};
+          }
+          cp_b: coverpoint b {
+            bins zero = {8'h00}; bins max = {8'hFF}; bins msb = {8'h80};
+            bins mid  = {[8'h01:8'h7F], [8'h81:8'hFE]};
+          }
+          cp_carry: coverpoint carry iff (op inside {ADD, SUB, SHL});   // (3)!
+          x_op_a_b: cross cp_op, cp_a, cp_b {
+            ignore_bins shl_out = binsof(cp_op.shl) && (binsof(cp_b.max) || binsof(cp_b.msb));   // (4)!
+          }
+        endgroup
+        ```
+
+        1. קוד לא מוגדר הוא שגיאה, לא חור בכיסוי : הסימולטור מדווח עליו ברגע שהוא מופיע.
+        2. ערכי הקצה, כל אחד bin משלו. ‏`mid` הוא bin אחד של שני טווחים.
+        3. ‏`iff` : בפעולות `AND` ו-`OR` הדגימה של `carry` לא נספרת בכלל.
+        4. סעיף ב : הזזה ב-0x80 או ב-0xFF מוציאה את כל הביטים, והתוצאה תמיד אפס. התאים האלה לא נספרים.
 
     #### למה זה נכון { .sol-proof }
 
@@ -300,32 +300,6 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="expected_closure" linenums="1" hl_lines="10 13"
-        // E[transactions until every cell is hit], p[] the probability of each cell:
-        // the integral of 1 - prod(1 - exp(-p t)), on a logarithmic grid of t
-        function automatic real expected_closure(real p[$]);
-          real pmin = p[0], lo, hi, du, e, t, f, prev = 1.0, prod;
-          int  steps = 20000;
-          foreach (p[i]) if (p[i] < pmin) pmin = p[i];
-          lo = 1e-3; hi = (60.0 + $ln(p.size())) / pmin;
-          du = ($ln(hi) - $ln(lo)) / steps;
-          e = lo;                                                  // the integrand is 1 near 0
-          for (int k = 1; k <= steps; k++) begin
-            t = lo * $exp(k * du);
-            prod = 1.0;
-            foreach (p[i]) prod *= 1.0 - $exp(-p[i] * t);          // (1)!
-            f = 1.0 - prod;
-            e += 0.5 * (prev * t * $exp(-du) + f * t) * du;        // (2)!
-            prev = f;
-          end
-          return e;
-        endfunction
-        ```
-
-        1. ההסתברות שכל התאים כבר נפגעו עד הזמן \( t \) (בתהליך פואסון).
-        2. טרפז על \( u = \ln t \) : ‏\( dt = t \, du \).
-
     === "Python"
         ```python title="cell_probs, expected_closure" linenums="1" hl_lines="7 18 19"
         import math
@@ -352,6 +326,32 @@ added: 2026-10-27
 
         1. כל תא שאינו מושמט : פעולה (1/5), מחלקה של `a` ומחלקה של `b`.
         2. טרפז על \( u = \ln t \).
+
+    === "SystemVerilog"
+        ```systemverilog title="expected_closure" linenums="1" hl_lines="10 13"
+        // E[transactions until every cell is hit], p[] the probability of each cell:
+        // the integral of 1 - prod(1 - exp(-p t)), on a logarithmic grid of t
+        function automatic real expected_closure(real p[$]);
+          real pmin = p[0], lo, hi, du, e, t, f, prev = 1.0, prod;
+          int  steps = 20000;
+          foreach (p[i]) if (p[i] < pmin) pmin = p[i];
+          lo = 1e-3; hi = (60.0 + $ln(p.size())) / pmin;
+          du = ($ln(hi) - $ln(lo)) / steps;
+          e = lo;                                                  // the integrand is 1 near 0
+          for (int k = 1; k <= steps; k++) begin
+            t = lo * $exp(k * du);
+            prod = 1.0;
+            foreach (p[i]) prod *= 1.0 - $exp(-p[i] * t);          // (1)!
+            f = 1.0 - prod;
+            e += 0.5 * (prev * t * $exp(-du) + f * t) * du;        // (2)!
+            prev = f;
+          end
+          return e;
+        endfunction
+        ```
+
+        1. ההסתברות שכל התאים כבר נפגעו עד הזמן \( t \) (בתהליך פואסון).
+        2. טרפז על \( u = \ln t \) : ‏\( dt = t \, du \).
 
     #### למה זה נכון { .sol-proof }
 

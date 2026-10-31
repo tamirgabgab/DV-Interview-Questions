@@ -1,4 +1,4 @@
-/* The site's styles, part 6 of 12: the figures of 0018 to 0048 (hourglass, PCIe, credits, cake, clock, box nets, farm).
+/* The site's styles, part 6 of 20: the figures of 0018 to 0048 (hourglass, PCIe, credits, cake, clock, box nets, farm).
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
 /* Hourglass figures (questions 0018, 0019), drawn by tools/figures/hourglass.py */
@@ -14,6 +14,12 @@
 .md-typeset svg .measure { fill: var(--viz-s3); fill-opacity: 0.12; stroke: var(--viz-s3); stroke-width: 1.5; }
 .md-typeset svg .pruned { opacity: 0.4; }
 .md-typeset svg.hourglass-fig .tick { font-size: 12px; }
+/* The live scene of the hourglass box (explorer/hourglass.js): the clock beside the glasses
+   (its elapsed sector and hand), and the stream of grains, round dots that move down the neck */
+.md-typeset svg .hg-dial { fill: none; stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .hg-dial-fill { fill: var(--viz-s3); fill-opacity: 0.22; }
+.md-typeset svg line.hg-grains { stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 0.01 3.6; }
+.md-typeset svg .hg-t { font-variant-numeric: tabular-nums; }
 .md-typeset .viz-legend .s3 { background: var(--viz-s3); }
 /* Material gives figures width: fit-content, so a frame with a short caption shrank its SVG */
 .md-typeset .stepper-frame { width: auto; }

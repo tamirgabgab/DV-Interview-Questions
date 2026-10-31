@@ -36,7 +36,7 @@ pushed to `main`, which publishes the site.
 | Difficulty scale      | 3 levels: easy / medium / hard, relative to the position level           |
 | Multi-level questions | One file in one level folder                                             |
 | Source field          | Optional `source` field, empty by default                                |
-| Code languages        | SystemVerilog + Python, as linked tabs (SystemVerilog first)             |
+| Code languages        | Python + SystemVerilog, as linked tabs (Python first since 2026-10-29)    |
 | Solutions             | Collapsed by default (practice mode); one collapsed solution per sub-part |
 | Multi-part questions  | One file, `### סעיף א/ב/ג` with a solution after each part               |
 | Owner's own code      | Kept as sent (comments added, minimal bug fixes called out to the owner) |
@@ -1234,33 +1234,413 @@ section below starts at session 22, whose numbered items run on through the late
     about debugging or a sliding window, and UVM, covergroups, async FIFO, clock dividers
     and credit flow control have one question each.
 
-81. **New question 0060, the three-wizard duel (session 29, 2026-10-31).** The owner sent a
-    summary of a truel with a cat rule (if all three live after the first round, all
-    lose) and a free choice of my wand, and asked for four parts: me first against 0.6 and
-    0.8, me second, me third (the rivals keep their order), and rivals of the owner's
-    pick (0.8 then 0.4) where the sniper wins at position 1 and the weak wand at 2 and 3.
-    Every part derives the general case backward with the inequality of each decision,
-    then the numbers (513/805 twice, 13101/20125; 91/220 against 0.6, 233/550, 1187/2750).
-    The source was checked first by exact backward induction on a grid: everything held
-    except the 80% row of the original table (32.3% only without deliberate misses; with
-    them wizard 2 passes and the chance is 20.4%, now a trap) and one interior optimum of
-    position 3 (a = 0.05, b = 0.925). The owner picked senior / medium and every extra:
-    `tools/figures/q0060.py` (exact reference, a decision table per part, three charts),
-    the `wizards` explorer (position, rivals and wand; the first round's options and the
-    chance against the wand), follow-ups on the original wands, the rule variants, the
-    narrow band of position 2 and the economic reading. New topic `game-theory`; the page
-    is in the probability path and on the question map. SV note: `wand` is a keyword
-    (a net type) in SystemVerilog, so the page's output argument is `wand_out`.
+### Session 28 — 2026-10-28: code review fixes
+
+81. **Code review of the S rounds, eight fixes (session 28, 2026-10-28).** A review of
+    `docs/javascripts`, `hooks/questions.py` and `tools/check_explorers.py`; the owner took
+    eight of its ten findings (not the cached "new" set or the computed-style read in
+    `layout`):
+    - The button run (`ex-btnrun`) no longer carries `ex-c-action`: as `display: contents`
+      on a desktop its buttons were not children of the row any more, lost the actions'
+      `order: 2` and showed before the inputs (0004, 0007, 0011, 0014, 0034, 0039, 0047,
+      0053, 0059); and on a phone the button padding of `ex-c-action` (stronger selector)
+      cut the run's end padding to 0.75rem, so the last button stayed under the fade. The
+      run and its buttons now get `order: 2` in `12-rounds-y-s.css`.
+    - `py_run.matches` takes one label only (`is_label`): "5 != 7", "5 <= 7" and
+      "a = 5, b = 7" no longer match the comment "7"; "N = 5: 0110" still does.
+    - `check_explorers.py` reports an attribute name that is not valid (a broken quote, the
+      0056 bug) instead of dropping it.
+    - The hook has one `_added_date`, which also reads a quoted date ("2026-10-28"), used by
+      the header, the "new" chip, the recent strip and the what's-new page (`_added` gone).
+    - `_header`, `_level_cards` and `_related` use `_base` and `_href` instead of building
+      relative links inline.
+    - `josephus.js`: the counter of a big circle is the else branch of the small one.
+82. **Questions 0060 and 0061, from the owner's chat (session 28, 2026-10-28).** The owner
+    picked two LeetCode-shaped questions asked at Meta and Google and asked for a part b
+    that generalizes each; the generalizations were picked from multiple-choice questions.
+    - **0060, the longest run of ones with up to k flips** (Max Consecutive Ones III):
+      part a the sliding window on bits, part b the same window on any value of a bus with
+      a counter per value (Longest Repeating Character Replacement, the \(O(n |\Sigma|)\)
+      form with the proper shrink; the stale-maximum \(O(n)\) trick is a follow-up). The
+      `onesk` box plays the window one cell per step in both modes.
+    - **0061, how many tags** (Meeting Rooms II as outstanding transactions): part a the
+      event sweep with the response-before-send rule at equal times, part b a pool for
+      reads and one for writes against a shared pool, \(\max(R, W) \le S \le R + W\), in one
+      sweep with two counters. The `tagpool` box steps the events over a timeline with the
+      count as a step line.
+    - Both junior, medium, kind code, in the coding study path, with figure generators
+      (`q0060.py`, `q0061.py`), tests against every window / every moment, testbenches,
+      demos with expected values and two self-checks each. Verilator could not be built in
+      the sandbox (`flex` is not installable), so the SystemVerilog ran in CI only.
+
+83. **The explanation panel of a box (session 28, 2026-10-28).** The owner asked for an
+    interface that explains and illustrates the solution of every part; picked from
+    multiple-choice questions: the solution's steps lit and the code synced to the steps,
+    inside the existing box, for 0060 and 0061 first. `explain()` in `core.js` appends a
+    fold "הסבר" with the steps as chips (the step of the moment lit), a line of the
+    variables (before → after) and the page's own code (read from the page's tabbed block
+    that names the function, in the language of the open tab, the annotation markers
+    stripped) with the lines the step ran lit as `.hll`. The `onesk` and `tagpool` views
+    call it after every draw, with the function of their mode (`longest_ones` /
+    `longest_same`, `tags_needed` / `pools`). Two contrast pairs for the chips. Not yet
+    on the older boxes: the owner wants to see it on the two pages first.
+
+84. **Round S5, speed and access (session 28, 2026-10-28).** The owner's picks: loading by
+    need and a weight report, a fixed check of the 404 page, and a scripted keyboard pass
+    that stays as a check.
+    - **S423 :** WaveDrom and its init script load only on the five pages with a
+      ```` ```wavedrom ```` block (the hook adds the tags, as it adds the explorer scripts);
+      the twelve stylesheet parts reach the browser as one `stylesheets/site.css` that the
+      hook joins at the end of the build and links from every page and the 404 page (12
+      requests become 1; the parts stay the source). The phone check prints every page's
+      weight (HTML KB, bytes fetched, requests), warns over 400 KB of HTML and names the three
+      heaviest pages. The heaviest stay as they were: 0016 (378 KB, 230 KB of them its SVG
+      figures), 0025, 0023, 0024 (the reference-model code and tables); the owner chose not
+      to trim them.
+    - **S424 :** `tools/check_404.py` serves the site under `/DV-Interview-Questions/` and
+      answers a missing address with 404.html as Pages does; six views (three addresses at
+      390 and 1200 px) check the page, its assets, the guess, the level links, the random
+      question, the search button and axe. All clean on the first run.
+    - **S425 :** `tools/check_keyboard.py` walks five pages with Tab (visible stops, names,
+      focus rings, the skip link first, no trap) and presses the keys of the components on
+      0060. Findings: the trap and lightbox reports of the first run were the check's own
+      mistakes (same-looking elements counted as repeats; the lightbox stays in the DOM when
+      closed); the one real finding was MathJax's contextual menu, which made every formula
+      a tab stop (hundreds on a math-heavy page), now off in `mathjax.js` (the assistive
+      MathML stays). Both checks run in the CI build job. CLAUDE.md lists ten checks now.
+
+85. **The phone's enlarged text (session 28, 2026-10-28).** The owner saw every page
+    zoomed out on Android Chrome, cut at the sides with the navigation drawer beside it.
+    The phone's text scaling was on: at 1.3 times the text, some rows grew wider than the
+    screen and Chrome zoomed the page out to fit them (44 pages). Fixed: the part bar's
+    chips scroll, the box's playback bar and the tools under the title wrap, an inline
+    formula wider than its line scrolls on its own (`reading-tools.js` marks it `.is-wide`
+    by its line's content box, both sides), the fields of a box shrink to it, and the
+    tables of the 0031 and 0037 boxes scroll. `check_phone.py` loads every page a second
+    time with the text enlarged 1.3 times (`--font-scale`) and fails when it is wider than
+    the screen. Published (`main` 2c04376); the owner checks the phone.
+86. **A slider and its value on one row (session 28, 2026-10-28).** The owner saw the
+    value of the base slider of 0044 on a row under the slider on the phone. A slider's
+    label wrapped freely and the slider kept its 11rem, so the value dropped to the next
+    row: 30 pages had it, some at the normal text size too (0013, 0014, 0017, 0035, 0043,
+    0044). Fixed for every box, at every width (`12-rounds-y-s.css`): a label of a
+    `<span>`, a slider and an `<output>` does not wrap, the slider shrinks first (down to
+    3rem), the label keeps up to 40% of the row and wraps its words beyond that, and on a
+    phone the value takes only its own width. The number field of the 0016 box moved to
+    its own `<label>`. `check_phone.py` fails, at both text sizes, when a slider's value
+    sits on another row or a slider's label is cut off at the box's edge.
+87. **Questions 0056 to 0061 renumbered to 0057 to 0062 (session 28, 2026-10-28).** The
+    owner wanted the windowed version of 0055 next to it, as 0056. The pages, tests,
+    figure generators, study paths, the question map and every reference moved together
+    (the work log above keeps the old numbers). An old address goes on to the new page:
+    `dvq_renumbered` in `mkdocs.yml` maps the old ids, and the 404 page replaces the location
+    with the same level and slug under the new id, the anchor kept (`check_404.py` opens one).
+    `marks.js` moves what a browser saved, once (`dvq-renumbered-<date>`): the marks by id,
+    the last question opened, and the self-checks and the boxes' saved states by the page's
+    path. Its `RENUMBERED` list and the one in `mkdocs.yml` must agree (a hook test checks).
+88. **One machine at a time in the 0055 box (session 28, 2026-10-28).** The owner did not
+    want two state diagrams. The `divfsm` box has a list, "שרשור ל-LSB" (read from the MSB,
+    part a) or "שרשור ל-MSB" (read from the LSB, part b), and draws one ring; the buttons
+    concatenate a digit at the chosen end. The ring is now a shared `ring()` in
+    `divfsm.js`.
+89. **Question 0056, divisible by 3 in a window of L bits (session 28, 2026-10-28).** The
+    owner's question: 0055 with the number a window of the last L bits, zeros after reset;
+    part a a bit entering as the LSB (the highest leaves), part b as the MSB (the lowest
+    leaves), part c any m, base, L and start window (`INIT`). The answer: a shift register
+    and the remainder updated by the bit in and the bit out, r' = (2r + b − 2^L·out) mod 3 and
+    r' = (2(r − out) + 2^(L−1)·b) mod 3 (the MSB way divides by B, so it needs gcd(B, m) = 1).
+    The minimal machines were counted by refinement: 2, 4, 7, 14, 27, 54, 107, 214 states
+    for L = 1 to 8, the same both ways, above 2^(L−1) from L = 3, so L flip-flops at least;
+    the page proves 2^(L−2). The `winfsm` box: m, base, L, the direction, the start window
+    and the digits; the data path every step, and the ring of the direct machine up to 16
+    windows. Tests: every bit string and start window up to L = 6, random digits in six
+    bases, the proof's distinguishing bits, the explorer against the page, and a testbench
+    of nine parameter sets (run here with the pip Verilator, below).
+90. **How the formula is built, in the boxes of 0055 and 0056 (session 28, 2026-10-28).**
+    The owner wanted the box itself to show how each part reaches the formula that draws
+    the diagram, with the numbers put in, so the moves between states are easy to follow.
+    Under the summary, the way to the formula in four steps for the chosen direction, with
+    the box's m, base and L put in (0056: the window's arrow and the remainder's update).
+    Under the ring, a table of the moves out of the current state: a row per digit with the
+    formula and its numbers (0056: the next window and the next remainder), the row of the
+    next digit marked "הבאה". A click, or Enter / space, on a state of the ring shows its
+    moves in the table and its edges dashed; a second click or any step goes back.
+
+91. **Round M, motion and finish (session 28, 2026-10-28).** The owner asked for a UI/UX
+    review with more motion and a more professional look (logo, home, question pages,
+    404). Fourteen proposals in four groups; the owner took twelve (not the animated
+    light / dark switch nor the 404 as a typed log) and asked for one push of all of them.
+    A new part, `13-motion.css`, and a new script, `motion.js`; every movement is off under
+    reduced motion, and the scripts skip it in an automated browser.
+    - M3, logo: the mark is inline (`overrides/partials/logo.html`, the paths of
+      `logo.svg`), drawn on the first page of a visit (sessionStorage) and under the
+      pointer. Its amber is `--site-logo-v`.
+    - M4, header: a shadow once it scrolls (Material's `md-header--shadow`), and an amber
+      bar sliding along the table of contents to the active link. The reading progress
+      line was already in the part bar, so no second one was added.
+    - M1 and M2, hero: the waves roll by one width (drawn twice side by side) with a
+      sweeping amber cursor; on 76.25em and up a live example beside the text runs the
+      machine of 0055 part a over 27, 10, 21, 14, 6 and 13 (`_hero_fsm` in the hook draws
+      the last frame of 27, `home.js` runs it, both pause off screen).
+    - M12, cards: the top edge fills with amber under the pointer, the icon tilts, the
+      progress bar fills in.
+    - M5, question header: a card; the topics as chips (`qh-tag`); the tools along the
+      card's foot with their names on a pointer screen (touch keeps S420's layout).
+    - M7 and M8: a self-check's right answer draws its check mark, a wrong one shakes the
+      field and colours its border; a row of dots above a run of two hints or more.
+    - M9: `.explorer:empty` is a skeleton with a sheen until the box is built.
+    - M6: `@view-transition` cross-fade; the followed question link and the page's `h1`
+      share the name `dvq-title`, so the title moves into place.
+    - M13: buttons get a raised shadow, the header buttons press, and the focus ring
+      settles in (only its offset moves).
+    - M10: the footer (`overrides/partials/footer.html`): the mark, the name and the
+      numbers, the levels with their counts, the site's pages, then the copyright line
+      (the hook no longer appends "מה חדש" to the copyright; the footer lists it).
+    - M11, 404: 404 on a seven-segment display and a waveform whose bus reads question ids
+      until the cursor at 404 ns, where it turns to the unknown state X
+      (`--site-x-state`); drawn once, the display flickers on, the X pulses.
+    Eight colour pairs were added to `check_contrast.py`.
+
+92. **A review of ten random questions, round R (session 28, 2026-10-28).** The owner asked
+    for a pass over ten random questions with proposals for the explanations and the
+    boxes: 0009, 0012, 0020, 0023, 0026, 0027, 0037, 0039, 0059 and 0061, one reviewer
+    agent per pair. Seven statements were wrong and were fixed first, straight to `main`
+    (f397198): 0037 three flops at 1 GHz with τ = 50 ps give 1.1·10^17 seconds, not years;
+    0039 the n-versus-n + 1 trap flips at n = 2^t, eight drops tell 93 thresholds apart,
+    five eggs already reach seven drops; 0009 the swaps are summed over the cycles; 0020
+    the greedy proof's monotone quantity; 0023 a later posted write may pass the read;
+    0059 `parity_move` costs O(n) per move as written. The owner then took the
+    explanations and traps and the boxes that show the key idea (not presets, not new
+    modes), and for 0037 kept the model with a note and a follow-up on the per-stage form.
+    One agent per pair made the changes on disjoint files, each under its own heading in
+    `11-questions.css`; every claim was checked by exact computation, and new tests cover
+    the new numbers. Per question: 0009 a bar with person 0, his swap count and the walk
+    without him, follow-ups on the 231 cycle types and the unchecked box range; 0012 one
+    difference per d in the step line, d throughout part b, the boxes swapped, the e = ±1/2
+    case, a follow-up on 5 to 7 digits; 0020 its own notation in the pcie box
+    (`data-notation="c"`), RCB facts, a uniformly random split; 0023 the split count of a
+    sent read, a follow-up for MPS below MRRS; 0026 a bound proving 2.5 h optimal for any
+    plan, the points defined first, the drop point argued in the text, fractions and the
+    wait in the box; 0027 the ratio column, the peak named only once reached, the rounding
+    trap's example, d ≤ 0; 0037 why settling is exponential, the model's assumption, the
+    per-stage follow-up (15 years instead of 297), the f_data trap, the tail on a log scale
+    in metamc; 0039 the first floor is not unique (8 to 37), the padded lower bound, all 46
+    worst-case dots; 0059 the parity colours, sums and fallback in the box, the proof's
+    (S + d) / 2 and a worked cell; 0061 the left end frame by frame with a move counter,
+    the invalid-window fact, the real `best`-before-`while` trap, the edge cases. Left as
+    they were: the figures of 0027 that looked duplicated (they show different values or
+    the two forms of the condition). The mermaid colour and the colons of 0062 were done
+    in item 93.
+93. **Two leftovers of round R (session 28, 2026-10-28).** 0062: a non-breaking space
+    before every colon of Hebrew text (48 on the page, two figure labels in `q0062.py`,
+    five strings of `tagpool.js`; the C ternary in the code is untouched). The found node of the mermaid
+    searches (0005, 0018, 0019, 0020) had a literal `#1baf7a`: Mermaid's `classDef` rejects
+    `var(...)` and `rgb(...)` with a parse error and leaves the diagram unrendered (the
+    phone check does not notice), so the node takes `stroke:currentColor` and
+    `.md-typeset .mermaid { color: var(--viz-s3) }` in `01-base.css` supplies the colour,
+    which the closed shadow root inherits from its host. Checked by rendering all 14
+    diagrams with the host colour red and blue in both schemes: only the found nodes
+    change (the rest differs no more than two renders of one colour).
+94. **Questions 0063 and 0064, round N (session 28, 2026-10-29).** The owner asked for new
+    questions built as a ladder of generalisations, picked the sliding-window maximum and
+    the weights puzzle from sixteen proposals (none of the DV ones this time), one round for
+    both, and asked for detailed explanations and an interactive box for every part. 0063
+    (junior / medium): a the maximum of every window by a monotonic deque of indices (the
+    invariant, at most 2n operations, `<=` against `<`); b the longest window with
+    max − min <= limit by two deques (linked to 0061); c the same in hardware, `win_max`
+    (K entries with an age, K comparators in parallel, a thermometer mask and a priority
+    encoder, a spare slot), with the lower bound log2 C(2^W, K) bits; box `slidemax` with
+    a mode per part. 0064 (student / medium): Bachet's weights; a one pan (6 weights,
+    2^k − 1), b two pans (1, 3, 9, 27, the bound (3^k − 1) / 2, balanced ternary, and the
+    proof that the set is the only one), c c copies of each weight (balanced base 2c + 1,
+    ((2c + 1)^k − 1) / 2; one pan base c + 1); box `weights` with the balance, the digits
+    and the conversion step by step. Both written by agents, reviewed here; the SV tests ran
+    on the pinned Verilator built in this sandbox (it needed `flex`, `bison`, `help2man`
+    and `z3` from apt first). Added here: the tag name "חלון נע", both questions in a
+    study path (coding, logic puzzles), the question map, two contrast pairs. Found on the
+    way and fixed: on a phone the stuck part bar squeezed each part chip into a column of
+    letters and showed the copied solved button's name outside its circle (both rules in
+    `10-rounds-w.css`); a signed number after an RLM reads with its sign after the digits
+    ("1−"), in tables of 0030, 0042, 0062 and 0063 and a line of 0018: now in an LTR span
+    (the generators of 0030, 0042, 0062 and 0063 changed, and the 0030 test).
+95. **Questions 0065 to 0069, round N2 (session 28, 2026-10-29).** The owner picked five of
+    the fifteen Google coding problems shown in the chat, each with a generalisation of
+    their own, and answered the clarifying questions (input formats, part c of each, the
+    boxes). Written by five agents in parallel (one restart after a usage limit), reviewed
+    and integrated here. 0065 islands (junior): four directions, eight directions (two
+    islands become one at a corner, the diagonal-line paradox), the sizes sorted
+    descending; box `islands` (click cells, a 4 / 8 switch, the flood queue). 0066 merge
+    intervals (junior): merge, then the owner's heights: triples (start, end, height) over
+    half-open ranges, the total height per piece by an event sweep ([1,7,7] and [2,6,4] give
+    7, 11, 7), then the peak and the ranges above a threshold; box `intervals`. 0067
+    network delay (junior): BFS without weights, Dijkstra with weights (lazy deletion), and
+    one-way links (LC 743: a node becomes unreachable, another slower); box `netdelay`.
+    0068 stream median (junior): two heaps, the nearest-rank p-quantile with
+    |low| = max(1, ceil(p · n)), and the window of the last W values by lazy deletion; box
+    `twoheaps`. 0069 overtakes (senior): per request how many later ones were answered
+    first (LC 315, a Fenwick tree and merge sort), how many earlier ones it passed, the
+    total and the normalised disorder, and a live version over send indices; box
+    `overtakes`. Added here: the study paths (coding, advanced algorithms, testbench), the
+    question map with five new concepts, eight contrast pairs.
+
+96. **The layout round (session 28, 2026-10-29).** Six owner asks, after clarifying questions.
+    The level's question list in the desktop sidebar is folded to the current question
+    behind a button with the count and an arrow, remembered in localStorage
+    (`javascripts/layout.js`, `stylesheets/14-layout.css`). The Python tab is first and
+    selected on every page (139 tab pairs swapped, the template too); `lint_pages.py` now
+    fails a Python tab after a SystemVerilog one. The desktop grid is up to 80vw (at least
+    61rem). Grips between the three columns resize the navigation and the table of
+    contents (pointer or arrow keys, 10 to 24 rem, the page never under 30 rem), remembered,
+    and a double click or Home resets. Enter in box fields: the owner's 0048 fields did not
+    apply on Enter in Chrome. Not reproducible with plain keys; it reproduces when typing
+    goes through an input method (Windows text suggestions, an IME), where the Enter that
+    ends the composition comes as keydown "Process" (keyCode 229) and only the keyup says
+    Enter. `core.js` `fields(box)` now turns that keyup into a keydown Enter, fires the
+    field's change after Enter and on leaving the field when the value was not applied yet,
+    and drops the duplicate native change; covergroup.js and endpoint.js send on Enter. New
+    check `tools/check_inputs.py` (in CI with the explorer shards) types into every box
+    field and presses Enter, Tab and an input-method Enter: 49 pages failed before, none
+    after. 0048 part c: the food line tilted at angle theta (0 to 60 degrees) through
+    (0, H), a closed form for the shortest path and its validity check, box mode c with a
+    theta slider, generator, tests and testbench. Two contrast pairs added (the fold count,
+    the grip line).
+
+97. **Visual round V (session 28, 2026-10-29).** The owner picked 13 of 17 proposals (4 to 17
+    without 13), answered the style questions (subtle motion, personal progress everywhere,
+    one question of the day for all, the metro map on the paths page and the home page, a
+    tag relation graph, a filling part timeline, content icons only, all at once) and five
+    agents built them in parallel, each in its own CSS part (15 to 19) and script. Home: a
+    navy band around the level cards and the question of the day; level cards with a live
+    SVG per level (on hover) and a difficulty bar; the question of the day by date. Maps: the
+    study paths as a metro map (full on paths/, compact on the home page, solved stations
+    filled) and a seeded force graph of the tags above the tag grid. Level pages: a navy band
+    with the count, the difficulty mix and the reader's progress; table rows with a
+    difficulty stripe, a kind tile, marks and a whole-row link. Question page: the header
+    card's trace pattern and large kind icon, the part timeline (`qp_parts`), the code
+    window for the solution tabs. Details: the success pulse, 22 stroked content icons
+    (`kind_icon`, `level_icon`, `path_icon`), the box loading wave. 68 contrast pairs added
+    (154 in all). Also fixed: 0042's chart aria-label had an unescaped quote (ק"מ) that
+    printed the SVG as text; `charts.py` now escapes it.
+
+98. **Owner fixes after round V (session 28, 2026-10-29).** The side list's titles were cut
+    to words once at the default width and Material kept the list 11.5rem wide in a widened
+    column: the list now takes the column and the titles are fitted again on a resize, a
+    grip and the fold button. Cost chips grow with their formula (no scrollbar). 0006: a
+    day count (2 to 30) and a typed price list in both boxes, the state link up to 30 days.
+    0018/0019: the hourglass box plays continuously (sand drains with a grain stream, a
+    glass turns 180° at a flip, a clock), with play/pause and a speed choice; steps animate
+    to the next event, and reduced motion jumps to the event frames.
+
+99. **Question 0070, the shortest path in a grid (session 28, 2026-10-30).** The owner picked
+    proposal 11 and answered the clarifying questions (a 4 / 8 switch in every part, part b
+    the shortest path with at most k walls broken, part c entry costs 1 to 9, a box to draw
+    and step). Part a BFS with the path rebuilt (diagonal steps between two walls touching
+    at a corner are forbidden), part b BFS over (cell, breaks left) with the per-cell best
+    (LC 1293) and a 3×3 counterexample to one visit per cell, part c Dijkstra on entry costs
+    (lazy deletion never fires there, proved on the page). Box `gridpath`: paint walls or
+    costs, drag S and T, size, k, step and play the search.
+
+100. **The tutorial videos, planned (session 28, 2026-10-30).** The owner wants a tutorial
+    video per question, a chapter per part, and answered the clarifying questions: Manim to
+    MP4, captions only for now as a separate Hebrew WebVTT (the Hebrew stays out of the
+    frame), YouTube hosting, the site's navy, 1–3 minutes per part, pilots 0002 and 0004.
+    `VIDEOS.md` holds the plan: the structure (opening, per part the problem, idea, steps,
+    code, proof, cost, trap, closing), the files under `videos/`, captions recorded while
+    the scene plays, the page's facade dialog, `check_videos.py`, and the order V0 to V6.
+    Waiting for the owner's approval of the plan (V0).
+
+101. **Tutorial videos V1 to V4 (session 28, 2026-10-30).** The owner asked for V1–V4 and
+    answered: parts of 2–4 minutes when complex, Python only, a calm pace, the DV mark and
+    the site's address, one review of the finished pilots. Manim 0.22.1 runs in its own venv
+    (`~/.venvs/manim`; `requirements-video.txt`, apart from CI). `videos/lib` (palette from
+    the CSS, Hebrew only as Chromium-drawn PNG labels, captions recorded per beat, the code
+    beat traced on the page's own Python), `videos/render.py` (checks the captions against
+    script.md, renders, concatenates, writes video.mp4, captions.vtt with Unicode isolates
+    around math, chapters.txt; `--preview` burns the captions in). Pilots: 0002 (5:55,
+    parts at 0, 108, 234 s) and 0004 (4:50, parts at 0, 124 s). Site side (V3): `video` and
+    `video_parts` in the front matter, the "סרטון הסבר" page tool, a link per part, a
+    modal dialog with a CSS poster that loads youtube-nocookie only on play, and
+    `check_videos.py` in CI. Waiting for the owner's review and the YouTube upload; then
+    the ids go into 0002 and 0004.
+
+102. **Video captions settled (session 28, 2026-10-31).** The owner found our Hebrew captions,
+    shown by default, distracting; the player no longer forces captions on. The Hebrew and
+    an English track (`videos/<id>/captions.en.md`, written to `captions.en.vtt`, also by
+    `render.py --captions-only` without a render) are uploaded to YouTube, both off by
+    default. The README has a "Tutorial videos" table written by `tools/catalog.py`.
+    Narration is the next step: a five-minute reading text for the owner's voice samples was
+    sent (not in the repo).
+
+103. **Background music for the videos (session 28, 2026-10-31).** The owner asked for calm
+    music in the 3Blue1Brown spirit, a different piece per video, under the coming narration.
+    The music sites are blocked here and borrowed music risks Content ID, so
+    `videos/lib/music.py` composes it: one of 9 progressions in Ionian, Lydian or Dorian, a
+    pad, a soft additive piano, a synthetic reverb, two-pass loudnorm to -24 LUFS. The seed
+    is the question id (`MUSIC_SEED` in scene.py picks another). render.py muxes it in;
+    `--music-only` and `--no-music`. 0002 plays Bb Lydian, 0004 A Dorian. VIDEOS.md has the
+    narration mix (sidechain ducking). Waiting for the owner's opinion.
+
+104. **Typed code in the videos (session 28, 2026-10-31).** The owner wants the code beat
+    typed live, character by character, with a caption per line or group, before the traced
+    run. `DVQScene.type_code(panel, groups, ...)` in videos/lib/dvq.py (about 16 chars/s, an
+    amber cursor, a highlight per explained group, the panel reserved so nothing moves; the
+    render fails when the groups miss a line or the code is under 23 px). 0002 is now 7:26
+    (`video_parts` [0, 135, 294]) and 0004 6:54 ([0, 124]). Found on the way: 0004's SV
+    annotation 3 said the mix is in box `k`; it is in the box labelled `other`. Fixed.
+
+105. **The page's box in the videos, a release folder, 0006 and 0011 (session 28,
+    2026-10-31).** The owner: no YouTube upload from here; every video's files in the
+    repository with a README link; the page's interactive box in each chapter (in the idea,
+    and on a split screen beside the code); two more videos, 0006 (O(n) code only) and 0011
+    (the SV class typed). `videos/lib/box_shots.py` captures a box step by step from the
+    built site (Playwright, dark scheme, a cropped region, an optional CSS width), and
+    `dvq.BoxView`, `box_step`, `box_beat`, `split`, `run_code(view=)` and `walk_code` show it;
+    a `CodePanel` can be a scrolling window (`rows`) and read SystemVerilog (`page_code`).
+    `render.py --release` writes `videos/<id>/release/` (silent mp4, the music as mp3 (no muxed video, the owner asked),
+    he/en VTT, chapters, info.json) and `tools/catalog.py` links the files from the README.
+    Released: 0002 8:29, 0004 7:30, 0006 7:40, 0011 7:01 (the chapters and `video_parts` in
+    VIDEOS.md). Waiting on the owner: watch them, upload, send the YouTube ids.
+
+106. **Videos 0003 and 0010, the first V7 round (session 28, 2026-10-31).** The owner
+    picked the two simplest student questions without a video. 0003 (3:57, one part,
+    `video_parts` [0]): the question's code shown whole (it is the question, not the
+    answer), the trace box stepped through i = 0 and then to the end of each i, the split
+    screen stopping on every swap, the invariant step by step, the cost and the j = i + 1
+    trap. 0010 (7:19, [0, 182]): part א drawn in Manim (pairs deleted pass after pass, beside
+    the typed `isValid_brute`) with the box's pass table for (((()))); part ב the stack box
+    on {[()]}, ([)] and ((( (the code stops at the odd-length check; the box shows the
+    openers left), plus (([] for the final `return not stack`. `captions.py` now isolates a
+    left-to-right run that starts with `{`, `)`, `]` or `}`. Found on the way: the trace
+    box's loop counter read "3 = j ,0 = i" in RTL; fixed in trace.js (one `ltr()` run) and
+    published. Waiting on the owner: watch them, upload, send the YouTube ids.
+
+107. **New question 0071, the three-wizard duel (session 29, 2026-10-31).** The owner sent a
+     summary of a truel with a cat rule (if all three live after the first round, all
+     lose) and a free choice of my wand, and asked for four parts: me first against 0.6 and
+     0.8, me second, me third (the rivals keep their order), and rivals of the owner's
+     pick (0.8 then 0.4) where the sniper wins at position 1 and the weak wand at 2 and 3.
+     Every part derives the general case backward with the inequality of each decision,
+     then the numbers (513/805 twice, 13101/20125; 91/220 against 0.6, 233/550, 1187/2750).
+     The source was checked first by exact backward induction on a grid: everything held
+     except the 80% row of the original table (32.3% only without deliberate misses; with
+     them wizard 2 passes and the chance is 20.4%, now a trap) and one interior optimum of
+     position 3 (a = 0.05, b = 0.925). The owner picked senior / medium and every extra:
+     `tools/figures/q0071.py` (exact reference, a decision table per part, three charts),
+     the `wizards` explorer (position, rivals and wand; the first round's options and the
+     chance against the wand), follow-ups on the original wands, the rule variants, the
+     narrow band of position 2 and the economic reading. New topic `game-theory`; the page
+     is in the probability path and on the question map. SV note: `wand` is a keyword
+     (a net type) in SystemVerilog, so the page's output argument is `wand_out`.
 
 ## In progress
 
-- **Session 29 (2026-10-31):** question 0060, the three-wizard duel (work log item 81), on
-  the work branch; `main` when the owner asks (a new question: branch CI first).
+- **Session 29 (2026-10-31):** question 0071, the three-wizard duel (work log item 107),
+  written as 0060 and renumbered when `main` had moved on to 0070.
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
-- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); S5 is the one S round left.
-  58 questions (0022 was
+- **State (2026-10-27, session 27):** `main` is 84ae476 (fix rounds 1 to 6a, question 0048, review rounds V1, V2, V3, V3b, V4a, V4b, V5, V7, questions 0049 to 0058 with 0052 generalized and 0056 part d), deployed; then question 0059 (work log item 71) and the design rounds W1 to W4 (items 65 to 70), merged on the design branch and published to `main` (4186f5a); the second visual review (item 72) published; round Y (item 73) and the loose ends (item 74) published (`main` 7f3770b, with the other session's search cleanup merged); S4, S1, S3, S2 and S6 (items 75 to 79) published together after one green CI run (`main` 59ceca4, 2026-10-28); the code review fixes (item 81), questions 0060 and 0061 (item 82) and the explanation panel (item 83) published (`main` 82b60f4); round S5 (item 84) and the fix for the phone's enlarged text (item 85) published (`main` 2c04376); the S series is done; a slider and its value on one row (item 86) published (`main` a4e0b47); the renumbering (item 87), the 0055 list (item 88) and question 0056 (item 89) published (`main` 905863d); the formula steps and the moves table in both boxes (item 90) published (`main` 8d8bd24); round M, motion and finish (item 91) published (`main` 3c31a22 and this log); the review of ten questions (item 92): the fixes (`main` f397198) and the improvements published.
+  68 questions (0022 was
   merged into 0016), every one with an explorer box. CI runs the lint, the contrast check,
   the tests (pytest and Verilator), the strict build, the link check, the phone check
   (axe findings and figure text under 9 px fail) and the explorer click-check.
@@ -1304,6 +1684,7 @@ section below starts at session 22, whose numbered items run on through the late
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
 - [ ] Fifth series: W1 to W4 done on the branch (W348's drawn check mark not picked); W5 not picked; `main` when the owner asks.
 - [ ] Pick rounds from **Proposals**: the owner's current direction is the eighth series, S1 to S6 (improve what exists, no new questions); the question proposals X360 to X410 wait; the older proposals are in the archive.
+- [ ] Colons: many pages and explorer strings put a plain space before a colon in Hebrew text (0065 to 0067 and their boxes have no NBSP at all), and the linter does not check it. The owner chose not to fix it for now (2026-10-30).
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
@@ -1322,13 +1703,13 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (59 questions)
+### Coverage today (69 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
-| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water) |
-| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056, 0058, 0059 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056), coins in a row by a parity trick and an interval DP (0058), the next number with as many ones by Gosper's hack, the previous by the complement, and the same for zeros across lengths (0059) |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057, 0060 | a three-wizard duel solved backward (0060), synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057) |
+| Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048, 0064 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water), weights for every load in base 2, balanced base 3 and balanced base 2c + 1 (0064) |
+| Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056, 0058, 0059, 0060, 0061, 0062, 0063, 0065, 0066, 0067, 0068 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056), coins in a row by a parity trick and an interval DP (0058), the next number with as many ones by Gosper's hack, the previous by the complement, and the same for zeros across lengths (0059), the longest run of ones with k flips by a sliding window, and of one value on a bus (0060), the tags a list of transactions needs by an event sweep, one pool and two (0061), the sliding-window maximum by a monotonic deque, the window with max − min <= limit, and the same in hardware (0063), islands in four and eight directions (0065), merged intervals and the total height per piece (0066), BFS and Dijkstra for a broadcast time (0067), the median and the p-quantile of a stream by two heaps (0068) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057, 0069, 0071 | a three-wizard duel solved backward (0071), synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057), overtakes in a stream of responses by a Fenwick tree (0069) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock
@@ -1553,9 +1934,9 @@ continue at 411.
 
 | # | Finding | Proposal | Size |
 |---|---|---|---|
-| S423 | the heaviest pages are 0016 (396 KB of HTML), 0025 (312 KB), 0023, 0024 (248 KB each) | find what makes them heavy (inline SVG repeated in tabs, long tables) and trim it; a page-weight line in the phone check | M |
-| S424 | the 404 page cannot be checked locally (its assets point at the site path) and was never looked at | a check of the live 404 at both widths, and a local check that serves the site under its path | S |
-| S425 | keyboard and screen-reader paths were checked by axe only | one manual pass: tab order on a question, the folds, the boxes, the run panel and the search | M |
+| S423 (done as loading by need and a weight report, item 84) | the heaviest pages are 0016 (396 KB of HTML), 0025 (312 KB), 0023, 0024 (248 KB each) | find what makes them heavy (inline SVG repeated in tabs, long tables) and trim it; a page-weight line in the phone check | M |
+| S424 (done, item 84) | the 404 page cannot be checked locally (its assets point at the site path) and was never looked at | a check of the live 404 at both widths, and a local check that serves the site under its path | S |
+| S425 (done as a check, item 84) | keyboard and screen-reader paths were checked by axe only | one manual pass: tab order on a question, the folds, the boxes, the run panel and the search | M |
 
 **Round S6 — the code behind the site**
 
@@ -1572,6 +1953,16 @@ ends with the full check set and the owner's look at the live site.
   `VERILATOR_REF`; the same recipe is in `README.md`) and `z3` must be on the PATH. The
   5.052 release crashes on 0011 and mis-randomizes the 0014 subclass; the apt package
   (5.020) has no constraint support. `run_tests.py` refuses older versions.
+- In a cloud sandbox without flex, `pip install verilator` (5.048, in a venv) runs most
+  testbenches: wrap the binary so the C++ build gets `-CFLAGS -fcoroutines -CFLAGS
+  -std=c++20`, and call `run_sv()` of `run_tests.py` directly (its version check asks for
+  5.053+, and the classes with constraints need the CI's build). 0055 to 0062 pass this way.
+- Verilator on a fresh cloud sandbox: `apt-get install -y flex bison help2man libfl-dev z3`,
+  then `bash tools/dev_setup.sh --verilator` builds the pinned commit into `~/verilator` (about
+  15 minutes; it reports chromium missing, which is fine: the checks use
+  `/opt/pw-browsers/chromium`). Found with it: `sort()` on an `int` queue orders negative
+  values as if unsigned (0068's testbench sorts by hand); `dist` and `before` are keywords,
+  not usable as names.
 - Build: `pip install -r requirements.txt && mkdocs build --strict`. Versions are pinned
   (MkDocs 1.6.1, Material 9.7.7). Material warns about MkDocs 2.0 — do not upgrade MkDocs
   to 2.x, its plugin system (and therefore the hook and the tags plugin) is gone.

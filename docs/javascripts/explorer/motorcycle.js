@@ -100,6 +100,21 @@
   };
   const motorcycleAt = (plan, t) => [motorcycleInterp(plan.bike, t), ...plan.riders.map((r) => motorcycleInterp(r, t))];
   const motorcycleTimeK = (alpha, k) => ((2 * k - 1) * alpha + 1) / (alpha + 2 * k - 1);
+  // When each rider of a plan reaches B and how long he then waits there for the last one
+  // (the driver always arrives last, with the last rider).
+  const motorcycleWaits = (plan) => plan.riders.map((r) => {
+    const at = r.find(([, v]) => v >= 1 - 1e-12)[0];
+    return { at, wait: plan.T - at };
+  });
+  // A number for the reader: a fraction with a denominator up to 16 when it is one (7/8 as
+  // on the page), otherwise three decimals without trailing zeros.
+  const motorcycleExact = (v) => {
+    for (let q = 1; q <= 16; q++) {
+      const p = Math.round(v * q);
+      if (Math.abs(p / q - v) < 1e-9) return q === 1 ? String(p) : `${p}/${q}`;
+    }
+    return String(Number(v.toFixed(3)));
+  };
   // The drop point of the proof (two need a ride): the passenger rides to d and walks on,
   // the motorcycle rides back to meet the walker, who left A at time 0, and drives him to
   // B. Both arrival times are linear in d, the passenger's falling and the walker's rising,
@@ -164,7 +179,12 @@
       const planOf = (s) => motorcycleRiders(s, alpha(), st.k);
       const plan = () => planOf(st.strategy);
       const who = (i) => (i === 0 ? "האופנוע" : st.k === 1 ? "הנוסע" : st.k === 2 ? ["הנוסע", "ההולך"][i - 1] : `נוסע ${i}`);
-      const dist = (v) => (st.km === null ? fmt(v, 2) : `${fmt(v * st.km, 1)} ק"מ`);
+      // a live position (three fixed decimals, so the text keeps its width while it plays),
+      // a point of the plan (7/8 as on the page), and hours (2.5, 2.714)
+      const dist = (v) => (st.km === null ? fmt(v, 3) : `${fmt(v * st.km, 1)} ק"מ`);
+      const exact = (v) => (st.km === null ? motorcycleExact(v) : `${fmt(v * st.km, 1)} ק"מ`);
+      const hr = (t) => String(Number((t * st.t1).toFixed(3)));
+      const hours = (t) => (hr(t) === "1" ? "שעה" : `${hr(t)} שעות`);
       const roadSvg = (pos, pl) => {
         const w = 640, h = 96, x0 = 36, x1 = 604, yr = 58;
         const X = (v) => x0 + v * (x1 - x0);
@@ -196,8 +216,8 @@
         const Y = (v) => base - v * (base - top);
         let s = `<svg class="perf-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="המקום של האופנוע ושל הנוסעים לאורך הזמן, עד הזמן הנוכחי${other ? ", והתוכנית להשוואה מקווקות" : ""}">`;
         const yt = [[0, "0"], [1, st.km === null ? "1" : `${st.km}`]];
-        if (st.strategy === "optimal" && st.k === 2) { const p2 = motorcyclePlan(alpha()); yt.push([p2.C, dist(p2.C)], [p2.D, dist(p2.D)]); }
-        if (st.strategy === "meanwhile" && st.k === 2) yt.push([2 / (alpha() + 1), dist(2 / (alpha() + 1))]);
+        if (st.strategy === "optimal" && st.k === 2) { const p2 = motorcyclePlan(alpha()); yt.push([p2.C, exact(p2.C)], [p2.D, exact(p2.D)]); }
+        if (st.strategy === "meanwhile" && st.k === 2) yt.push([2 / (alpha() + 1), exact(2 / (alpha() + 1))]);
         yt.forEach(([v, lab]) => {
           s += `<line class="grid" x1="${x0}" x2="${w - right}" y1="${f(Y(v))}" y2="${f(Y(v))}"/>` +
                `<text class="tick" x="${x0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${lab}</text>`;
@@ -206,7 +226,7 @@
         const xt = pl.times.length <= 8 ? pl.times : Array.from({ length: Math.floor(Tmax * st.t1) + 1 }, (_, h) => h / st.t1).filter((t) => Math.abs(t - pl.T) * st.t1 > 0.4).concat([pl.T]);
         xt.forEach((t) => {
           s += `<line class="grid" x1="${f(X(t))}" x2="${f(X(t))}" y1="${top - 6}" y2="${base}" stroke-dasharray="4 4"/>` +
-               `<text class="tick" x="${f(X(t))}" y="${base + 18}" text-anchor="middle">${fmt(t * st.t1, 2)}</text>`;
+               `<text class="tick" x="${f(X(t))}" y="${base + 18}" text-anchor="middle">${hr(t)}</text>`;
         });
         const poly = (knots, cls, width, upTo, extra = "") => {
           const ts = knots.map(([u]) => u).filter((u) => u < upTo - 1e-12).concat([upTo]);
@@ -217,7 +237,7 @@
           s += poly(other.bike, "ink-line", 4, other.T, ' stroke-opacity="0.35" stroke-dasharray="7 5"');
           other.riders.forEach((r, i) => { s += poly(r, `${CLS[i]}-line`, 2, other.T, ' stroke-opacity="0.7" stroke-dasharray="7 5"'); });
           s += `<line class="ink-line" x1="${f(X(other.T))}" x2="${f(X(other.T))}" y1="${top - 6}" y2="${base}" stroke-width="1.5" stroke-dasharray="3 3"/>` +
-               `<text class="legend" x="${f(X(other.T) - 5)}" y="${base - 8}" text-anchor="end">${fmt(other.T * st.t1, 2)}</text>`;
+               `<text class="legend" x="${f(X(other.T) - 5)}" y="${base - 8}" text-anchor="end">${hr(other.T)}</text>`;
         }
         s += poly(pl.bike, "ink-line", 7, pl.T, ' stroke-opacity="0.1"');
         pl.riders.forEach((r, i) => { s += poly(r, `${CLS[i]}-line`, 2.5, pl.T, ' stroke-opacity="0.2"'); });
@@ -254,8 +274,8 @@
         s += `<polyline class="ink-line" points="${maxPts}" fill="none" stroke-width="8" stroke-opacity="0.18" stroke-linejoin="round"/>`;
         s += `<polyline class="s1-line" points="${seg(pas, 0, 1)}" fill="none" stroke-width="2.5"/><polyline class="s2-line" points="${seg(wal, 0, 1)}" fill="none" stroke-width="2.5"/>`;
         s += `<line class="ink-line" x1="${f(X(best))}" x2="${f(X(best))}" y1="${f(Y(opt))}" y2="${base}" stroke-width="1" stroke-dasharray="3 3"/>` +
-             `<circle class="ink-dot" cx="${f(X(best))}" cy="${f(Y(opt))}" r="4"><title>המינימום : D = ${fmt(best, 2)}, כולם מגיעים אחרי ${fmt(opt * st.t1, 2)} שעות</title></circle>` +
-             `<text class="legend" x="${f(X(best) - 6)}" y="${f(Y(opt) + 18)}" text-anchor="end">${fmt(opt * st.t1, 2)}</text>`;
+             `<circle class="ink-dot" cx="${f(X(best))}" cy="${f(Y(opt))}" r="4"><title>המינימום : D = ${exact(best)}, כולם מגיעים אחרי ${hours(opt)}</title></circle>` +
+             `<text class="legend" x="${f(X(best) - 6)}" y="${f(Y(opt) + 18)}" text-anchor="end">${hr(opt)}</text>`;
         const cur = motorcycleDrop(a, d);
         s += `<line class="axis-c" x1="${f(X(d))}" x2="${f(X(d))}" y1="${top}" y2="${base}" stroke-width="1"/>`;
         [["s1", cur.passenger], ["s2", cur.walker]].forEach(([c, t]) => { if (t <= ymax) s += `<circle class="${c}-dot" cx="${f(X(d))}" cy="${f(Y(t))}" r="5.5"/>`; });
@@ -270,13 +290,13 @@
         $(".out-drop").textContent = fmt(d);
         $(".road-drop-title").textContent = `זמן ההגעה בשעות מול נקודת הירידה D, מ-A עד B${st.km === null ? "" : ` (${st.km} ק"מ)`}`;
         $(".road-drop").innerHTML = dropSvg(a, d, best);
-        const cur = motorcycleDrop(a, d), opt = motorcycleDrop(a, best).T, hr = (t) => fmt(t * st.t1, 2);
+        const cur = motorcycleDrop(a, d), opt = motorcycleDrop(a, best).T;
         const at = Math.abs(d - best) < 1e-9;
         const late = cur.passenger > cur.walker + 1e-9 ? "הנוסע" : "ההולך";
         $(".road-drop-text").innerHTML = (at
-          ? `ב-D = ${ltr(dist(best))} הנוסע וההולך מגיעים יחד, אחרי ${hr(opt)} שעות : זה המינימום. `
+          ? `ב-D = ${ltr(exact(best))} הנוסע וההולך מגיעים יחד, אחרי ${hr(opt)} שעות : זה המינימום. `
           : `ב-D = ${ltr(dist(d))} הנוסע מגיע אחרי ${hr(cur.passenger)} שעות וההולך אחרי ${hr(cur.walker)}. ${late} מאחר, ולכן כולם מגיעים אחרי ${hr(cur.T)} שעות, ${hr(cur.T - opt)} יותר מהתוכנית. `) +
-          `הזזת D לכיוון B מקצרת את ההליכה של הנוסע, אבל מאריכה את הדרך שהאופנוע חוזר אל ההולך. קו אחד יורד והשני עולה, ולכן המאוחר מהשניים הכי קטן בדיוק כשהם שווים, ב-D = ${ltr(dist(best))}.`;
+          `הזזת D לכיוון B מקצרת את ההליכה של הנוסע, אבל מאריכה את הדרך שהאופנוע חוזר אל ההולך. קו אחד יורד והשני עולה, ולכן המאוחר מהשניים הכי קטן בדיוק כשהם שווים, ב-D = ${ltr(exact(best))}.`;
       };
       const draw = () => {
         drawDrop();
@@ -301,16 +321,21 @@
         chart.innerHTML = chartSvg(pl, pos, other);
         const T = Object.fromEntries(Object.keys(NAMES).map((s) => [s, planOf(s).T]));
         const people = st.k === 1 ? "שניהם" : st.k === 2 ? "שלושתם" : `כל ${ltr(st.k + 1)}`;
-        let text = `יחס המהירויות ${ltr(`α = ${f(a, 2)}`)}${st.k === 2 ? "" : `, ${ltr(st.k)} צריכים הסעה`}. בתוכנית "${name(st.strategy)}" ${people} מגיעים אחרי ${fmt(T[st.strategy] * st.t1, 2)} שעות ` +
-          `(להשוואה : ${Object.keys(NAMES).map((s) => `${name(s)} ${fmt(T[s] * st.t1, 2)}`).join(", ")}). `;
+        let text = `יחס המהירויות ${ltr(`α = ${f(a, 2)}`)}${st.k === 2 ? "" : `, ${ltr(st.k)} צריכים הסעה`}. בתוכנית "${name(st.strategy)}" ${people} מגיעים אחרי ${hours(T[st.strategy])} ` +
+          `(להשוואה : ${Object.keys(NAMES).map((s) => `${name(s)} ${hr(T[s])}`).join(", ")}). `;
         if (st.strategy === "optimal") {
           const ride = pl.ride;
           text += st.k === 2
-            ? `הנוסע יורד אחרי ${ltr(dist(motorcyclePlan(a).D))} מהדרך, וכל אחד מהשניים הולך ${ltr(dist(motorcyclePlan(a).y + motorcyclePlan(a).x))} ממנה. `
-            : `הנוסחה : ${ltr(`((2n − 1)α + 1) / (α + 2n − 1) · t1 = ${fmt(motorcycleTimeK(a, st.k) * st.t1, 2)}`)} שעות עם ${ltr(`n = ${st.k}`)}; כל נוסע נוסע ${ltr(dist(ride))} והולך ${ltr(dist(1 - ride))}. `;
+            ? `הנוסע יורד אחרי ${ltr(exact(motorcyclePlan(a).D))} מהדרך, וכל אחד מהשניים הולך ${ltr(exact(motorcyclePlan(a).y + motorcyclePlan(a).x))} ממנה. `
+            : `הנוסחה : ${ltr(`((2n − 1)α + 1) / (α + 2n − 1) · t1 = ${hr(motorcycleTimeK(a, st.k))}`)} שעות עם ${ltr(`n = ${st.k}`)}; כל נוסע נוסע ${ltr(exact(ride))} והולך ${ltr(exact(1 - ride))}. `;
         }
         if (st.km !== null) text += `מהירויות : הליכה ${ltr(fmt(st.km / st.t0, 1))} קמ"ש, נסיעה ${ltr(fmt(st.km / st.t1, 1))} קמ"ש. `;
-        if (other) text += `בתוכנית להשוואה (מקווקו) ${people} מגיעים אחרי ${fmt(other.T * st.t1, 2)} שעות, ${other.T > pl.T ? `${fmt((other.T - pl.T) * st.t1, 2)} שעות יותר` : other.T < pl.T ? `${fmt((pl.T - other.T) * st.t1, 2)} שעות פחות` : "אותו זמן"}. `;
+        if (other) {
+          // who reaches B early in the compared plan, and how long he waits there
+          const waits = motorcycleWaits(other).map((w, i) => ({ ...w, i })).filter((w) => w.wait > 1e-9);
+          text += `בתוכנית להשוואה (מקווקו) ${people} מגיעים אחרי ${hours(other.T)}, ${other.T > pl.T + 1e-12 ? `${hours(other.T - pl.T)} יותר` : other.T < pl.T - 1e-12 ? `${hours(pl.T - other.T)} פחות` : "אותו זמן"}; ` +
+            (waits.length ? waits.map((w) => `${who(w.i + 1)} מגיע ל-B אחרי ${hours(w.at)} ומחכה שם ${hours(w.wait)}`).join(", ") : "אף אחד לא מחכה ב-B") + ". ";
+        }
         const seg = pl.times.filter((u) => u <= st.t + 1e-12).length;
         text += `עכשיו (שלב ${ltr(Math.max(1, Math.min(seg, pl.times.length - 1)))}) : ${pos.map((v, i) => `${who(i)} ב-${ltr(dist(v))}`).join(", ")}.`;
         summary.innerHTML = text;
@@ -356,6 +381,6 @@
     help: {
       motorcycle: "הציור מראה את הנוסעים על הדרך והגרף את מיקומם בזמן. הסליידרים קובעים את מהירויות ההליכה והרכיבה, בורר האסטרטגיה ומספר הרוכבים את התכנית, ״הפעלה״ מריץ אותה, ו״להשוואה עם״ מצייר תכנית שנייה מקווקוות. בשלב ההוכחה מזיזים את נקודת הירידה D ורואים את זמני ההגעה של הנוסע ושל ההולך : המאוחר מהשניים הכי קטן כשהם שווים.",
     },
-    models: { motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, motorcycleRiders, motorcycleAt, motorcycleTimeK, motorcycleDrop, josephusRun },
+    models: { motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, motorcycleRiders, motorcycleAt, motorcycleTimeK, motorcycleWaits, motorcycleExact, motorcycleDrop, josephusRun },
   });
 })();

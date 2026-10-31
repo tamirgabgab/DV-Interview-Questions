@@ -588,6 +588,28 @@
     }
   };
 
+  // An inline formula wider than its line (a long chain, or the text enlarged by the phone)
+  // scrolls on its own instead of widening the page: marked .is-wide, and focusable so the
+  // keyboard can scroll it. Measured once MathJax is done and again on a resize.
+  const wideMath = () => {
+    document.querySelectorAll(".md-typeset mjx-container:not([display='true'])").forEach((m) => {
+      const box = m.parentElement && m.parentElement.closest("p, li, td, th, dd, div, span.arithmatex");
+      const line = box && box.matches("span.arithmatex") ? box.parentElement : box;
+      if (!line) return;
+      m.classList.remove("is-wide");
+      // past the line's content box on either side (an RTL line overflows to the left)
+      const r = m.getBoundingClientRect(), l = line.getBoundingClientRect(), cs = getComputedStyle(line);
+      const left = l.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth);
+      const right = l.right - parseFloat(cs.paddingRight) - parseFloat(cs.borderRightWidth);
+      if (r.width && (r.left < left - 0.5 || r.right > right + 0.5)) {
+        m.classList.add("is-wide");
+        m.tabIndex = 0;
+      } else if (m.tabIndex === 0 && !m.classList.contains("is-wide")) m.removeAttribute("tabindex");
+    });
+  };
+  let wideTimer = null;
+  const wideLater = () => { clearTimeout(wideTimer); wideTimer = setTimeout(wideMath, 150); };
+
   // A link to a closed fold (the tags page's lists, Y398) opens it and shows it.
   const openTarget = () => {
     let target = null;
@@ -621,13 +643,24 @@
     openTarget();
     window.addEventListener("hashchange", openTarget);
     // a side navigation title (S421) and a path step's title (S419) that do not fit lose
-    // whole words from their end, the full title stays as the link's tooltip
-    document.querySelectorAll(".md-sidebar--primary .md-nav__link .md-ellipsis").forEach((span) => {
+    // whole words from their end, the full title stays as the link's tooltip; fitted again
+    // from the whole title when the column changes width (a grip, a resize, the fold button)
+    const fitNav = () => document.querySelectorAll(".md-sidebar--primary .md-nav__link .md-ellipsis").forEach((span) => {
       const link = span.closest("a");
       if (!link || link.classList.contains("md-nav__link--active")) return;
-      if (!link.title) link.title = span.textContent.trim();
+      if (!span.dataset.full) span.dataset.full = span.textContent.trim();
+      if (!link.title) link.title = span.dataset.full;
+      span.textContent = span.dataset.full;
       fitWords(span, span);
     });
+    let navFrame = 0;
+    const fitNavLater = () => { cancelAnimationFrame(navFrame); navFrame = requestAnimationFrame(fitNav); };
+    requestAnimationFrame(fitNav);   // after layout.js has put back a remembered column width
+    window.addEventListener("resize", fitNavLater, { passive: true });
     document.querySelectorAll(".path-nav .pn-title").forEach((t) => fitWords(t, t.closest("a")));
+    const mj = window.MathJax && window.MathJax.startup && window.MathJax.startup.promise;
+    (mj || Promise.resolve()).then(wideMath, wideMath);
+    document.addEventListener("toggle", wideLater, true);           // a solution opened: its math is laid out now
+    window.addEventListener("resize", wideLater, { passive: true });
   });
 })();

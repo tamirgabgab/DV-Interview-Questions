@@ -172,9 +172,9 @@ def threshold_chart(k=K, n=N):
     # a step line: hold each value over its threshold
     path = " ".join(f"{c.X(T):.1f},{c.Y(d):.1f} {c.X(T + 1):.1f},{c.Y(d):.1f}" for T, d in pts)
     c.add(f'<polyline class="s1-line" points="{path}" fill="none" stroke-width="2"/>')
-    worst = [T for T, d in enumerate(used) if d == t]
-    for T in worst[:1] + worst[-1:]:
-        c.dot(T + 0.5, used[T], "s2", r=4, title=f"סף {T} : {used[T]} הטלות")
+    for T, d in enumerate(used):                         # every threshold that reaches the worst case
+        if d == t:
+            c.dot(T + 0.5, d, "s2", r=2.6, title=f"סף {T} : {d} הטלות")
     c.axis("הסף")
     return c.svg()
 

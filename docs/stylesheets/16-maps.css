@@ -1,0 +1,346 @@
+/* The site's styles, part 16 of 20: the study-path metro map and the tag graph (round V). */
+
+/* The tokens of both maps. The thirteen line colours carry white text (a line's badge, a
+   solved station) at 4.5:1 in the light scheme and the page colour as text in the dark
+   one, and stand 3:1 or more from the map's surface as marks. */
+[data-md-color-scheme="default"] {
+  --mm-1: #1f5fbf;  --mm-2: #b5470b;  --mm-3: #17784a;  --mm-4: #b3261e;  --mm-5: #6b3fb8;
+  --mm-6: #0a6f82;  --mm-7: #7d5a1e;  --mm-8: #a5307a;  --mm-9: #56680f;  --mm-10: #36468f;
+  --mm-11: #4b5563; --mm-12: #c0174f; --mm-13: #8a6100;
+  --mm-on: #ffffff;                 /* text on a line colour */
+  --mm-ink: #1b2a4a;                /* an interchange's ring, and its fill when solved */
+  --mm-grid: rgba(27, 42, 74, 0.09);
+  --tg-fill: #e6ecf7;               /* a topic's circle */
+  --tg-stroke: #2d4370;
+  --tg-edge: #8794ad;               /* a link between two topics: 3:1 on the surface */
+  --tg-on-accent: #1b2a4a;          /* the count in a picked (amber) circle */
+}
+
+[data-md-color-scheme="slate"] {
+  --mm-1: #7eaaff;  --mm-2: #ff9a5c;  --mm-3: #5fd39a;  --mm-4: #ff8a80;  --mm-5: #c3a3ff;
+  --mm-6: #4fd0e0;  --mm-7: #e0b878;  --mm-8: #ff8fd0;  --mm-9: #bcd65a;  --mm-10: #a3b1ff;
+  --mm-11: #c0c8d4; --mm-12: #ff7aa8; --mm-13: #ffc233;
+  --mm-on: var(--md-default-bg-color);
+  --mm-ink: #e8ecf4;
+  --mm-grid: rgba(141, 179, 255, 0.1);
+  --tg-fill: #24324f;
+  --tg-stroke: #8db3ff;
+  --tg-edge: #6c7ea3;
+  --tg-on-accent: #1b2a4a;
+}
+
+.mm-c1 { --mm: var(--mm-1); }   .mm-c2 { --mm: var(--mm-2); }   .mm-c3 { --mm: var(--mm-3); }
+.mm-c4 { --mm: var(--mm-4); }   .mm-c5 { --mm: var(--mm-5); }   .mm-c6 { --mm: var(--mm-6); }
+.mm-c7 { --mm: var(--mm-7); }   .mm-c8 { --mm: var(--mm-8); }   .mm-c9 { --mm: var(--mm-9); }
+.mm-c10 { --mm: var(--mm-10); } .mm-c11 { --mm: var(--mm-11); } .mm-c12 { --mm: var(--mm-12); }
+.mm-c13 { --mm: var(--mm-13); }
+
+/* V7: the metro map. A card like the site's boxes, with a faint grid of dots; the map
+   keeps its size and scrolls sideways inside the card on a narrow screen (RTL: it opens
+   at the right, where the lines start), so the page never does. */
+.md-typeset .metro {
+  position: relative;
+  margin: var(--sp-4) 0;
+  border: 1px solid var(--site-card-border);
+  border-radius: var(--radius-l);
+  background: var(--site-surface);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+.md-typeset .mm-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--sp-2) var(--sp-2) 0;
+  background-image: radial-gradient(var(--mm-grid) 1.2px, transparent 1.4px);
+  background-size: 18px 18px;
+  scrollbar-width: thin;
+}
+
+.md-typeset .mm-svg {
+  display: block;
+  width: var(--mm-w);
+  height: var(--mm-h);
+  max-width: none;
+  margin-inline: auto;
+  font-family: var(--md-text-font-family);
+}
+
+.mm-svg .mm-line,
+.mm-svg .mm-stub {
+  fill: none;
+  stroke: var(--mm);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.metro-compact .mm-svg .mm-line { stroke-width: 6; }
+.mm-svg .mm-stub { stroke-width: 4; }
+
+.mm-svg .mm-badge rect { fill: var(--mm); }
+
+.mm-svg text {
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.mm-svg .mm-badge text {
+  fill: var(--mm-on);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mm-svg .mm-st { cursor: pointer; }
+
+.mm-svg .mm-dot {
+  fill: var(--site-surface);
+  stroke: var(--mm);
+  stroke-width: 3.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--dur-1) var(--ease);
+}
+
+.mm-svg .mm-st text { fill: var(--md-default-fg-color); }
+
+.mm-svg .mm-st.is-x .mm-dot {
+  stroke: var(--mm-ink);
+  stroke-width: 4;
+}
+
+/* a solved station is filled with its line's colour (an interchange with the ink) */
+.mm-svg .mm-st.is-solved .mm-dot { fill: var(--mm); }
+.mm-svg .mm-st.is-solved text { fill: var(--mm-on); }
+.mm-svg .mm-st.is-x.is-solved .mm-dot { fill: var(--mm-ink); }
+.mm-svg .mm-st.is-x.is-solved text { fill: var(--site-surface); }
+
+.mm-svg .mm-st:hover .mm-dot,
+.mm-svg .mm-st:focus-visible .mm-dot { transform: scale(1.18); }
+
+.mm-svg .mm-st:focus-visible,
+.mm-svg .mm-badge:focus-visible {
+  outline: 2px solid var(--site-focus-ring);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* a hovered station or legend entry picks out its lines; the rest fade */
+.mm-svg .mm-line,
+.mm-svg .mm-stub,
+.mm-svg .mm-badge,
+.mm-svg .mm-st { transition: opacity var(--dur-1) var(--ease); }
+
+.metro.is-hl .mm-svg [data-line]:not(.is-on),
+.metro.is-hl .mm-svg .mm-st:not(.is-on) { opacity: 0.22; }
+
+/* the tooltip: the id and title of the station under the pointer or the focus */
+.md-typeset .mm-tip {
+  position: absolute;
+  z-index: 2;
+  max-width: min(22rem, calc(100% - 8px));
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-s);
+  background: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  box-shadow: var(--shadow-2);
+  pointer-events: none;
+}
+
+.md-typeset .mm-tip[hidden] { display: none; }
+
+/* the legend: a line's badge, its name (the link to its page) and its count */
+.md-typeset ol.mm-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+  gap: var(--sp-1) var(--sp-3);
+  margin: 0;
+  padding: var(--sp-3);
+  border-top: 1px solid var(--site-card-border);
+  list-style: none;
+}
+
+.md-typeset .mm-legend li { margin: 0; }
+
+.md-typeset .mm-legend li > a.mm-key:not(.md-button):not(.headerlink) {
+  display: flex;
+  text-decoration: none;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 2rem;
+  padding: 0 var(--sp-1);
+  border-radius: var(--radius-s);
+  color: var(--md-default-fg-color);
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.md-typeset .mm-key:hover,
+.md-typeset .mm-key:focus-visible {
+  background: var(--site-primary-soft);
+  color: var(--md-typeset-a-color);
+}
+
+.md-typeset .mm-num {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 0.3rem;
+  background: var(--mm);
+  color: var(--mm-on);
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.md-typeset .mm-name { flex: 1; font-weight: 500; }
+
+.md-typeset .mm-count {
+  flex: none;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.62rem;
+  white-space: nowrap;
+}
+
+.md-typeset .mm-count.is-done { color: var(--diff-easy); font-weight: 600; }
+
+/* V10: the tag graph. Two layouts are built (wide and narrow); the one that fits the
+   column shows, at a size that keeps its text at 10 px or more. */
+.md-typeset .tag-graph {
+  container-type: inline-size;
+  margin: var(--sp-3) 0 var(--sp-4);
+  padding: var(--sp-2) var(--sp-2) var(--sp-3);
+  border: 1px solid var(--site-card-border);
+  border-radius: var(--radius-l);
+  background-color: var(--site-surface);
+  background-image: radial-gradient(var(--mm-grid) 1.2px, transparent 1.4px);
+  background-size: 18px 18px;
+  box-shadow: var(--shadow-1);
+}
+
+.md-typeset .tg-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-inline: auto;
+  font-family: var(--md-text-font-family);
+}
+
+.md-typeset .tg-narrow { display: none; max-width: 440px; }
+
+@container (max-width: 760px) {
+  .md-typeset .tg-wide { display: none; }
+  .md-typeset .tg-narrow { display: block; }
+}
+
+.tg-svg .tg-edge {
+  stroke: var(--tg-edge);
+  stroke-linecap: round;
+  transition: opacity var(--dur-1) var(--ease), stroke var(--dur-1) var(--ease);
+}
+
+.tg-svg .tg-node { cursor: pointer; transition: opacity var(--dur-1) var(--ease); }
+
+.tg-svg .tg-node circle {
+  fill: var(--tg-fill);
+  stroke: var(--tg-stroke);
+  stroke-width: 1.5;
+  transition: fill var(--dur-1) var(--ease);
+}
+
+.tg-svg text {
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.tg-svg .tg-n {
+  dominant-baseline: central;
+  fill: var(--md-default-fg-color);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tg-svg .tg-name {
+  fill: var(--md-default-fg-color);
+  paint-order: stroke;
+  stroke: var(--site-surface);      /* a halo over the links that pass under the name */
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tg-svg .tg-node:focus-visible {
+  outline: 2px solid var(--site-focus-ring);
+  outline-offset: 2px;
+}
+
+.tg-svg.is-hl .tg-node:not(.is-on) { opacity: 0.28; }
+.tg-svg.is-hl .tg-edge:not(.is-on) { opacity: 0.12; }
+.tg-svg.is-hl .tg-edge.is-on { stroke: var(--md-accent-fg-color); }
+
+.tg-svg .tg-node.is-focus circle,
+.tg-svg .tg-node[aria-current="true"] circle {
+  fill: var(--md-accent-fg-color);
+  stroke: var(--md-primary-fg-color);
+}
+
+.tg-svg .tg-node.is-focus .tg-n,
+.tg-svg .tg-node[aria-current="true"] .tg-n { fill: var(--tg-on-accent); }
+
+.tg-svg .tg-node.is-focus .tg-name { font-weight: 700; }
+
+.md-typeset .tg-help {
+  margin: var(--sp-2) var(--sp-2) 0;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.68rem;
+}
+
+.md-typeset .tg-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-2) var(--sp-2) 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.md-typeset .tg-status[hidden] { display: none; }
+
+.md-typeset .tg-reset {
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--site-card-border);
+  border-radius: 999px;
+  background: var(--site-primary-soft);
+  color: var(--md-typeset-a-color);
+  font: inherit;
+  cursor: pointer;
+}
+
+.md-typeset .tg-reset:hover { background: var(--md-accent-fg-color--transparent); }
+
+.md-typeset .tg-reset:focus-visible {
+  outline: 2px solid var(--site-focus-ring);
+  outline-offset: 2px;
+}
+
+.md-typeset .tag-section[hidden],
+.md-typeset .tag-grid[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mm-svg .mm-dot,
+  .mm-svg [data-line],
+  .mm-svg .mm-st,
+  .tg-svg .tg-edge,
+  .tg-svg .tg-node,
+  .tg-svg .tg-node circle { transition: none; }
+}

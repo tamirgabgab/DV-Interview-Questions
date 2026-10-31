@@ -1,0 +1,400 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.967
+Question 0004: three boxes with wrong labels,
+a junior-level question.
+
+2
+00:00:04.967 --> 00:00:09.367
+Two parts: how many draws are needed,
+and how to write it in code.
+
+3
+00:00:10.167 --> 00:00:15.400
+One box holds only red balls, another only black,
+and the third holds both.
+
+4
+00:00:15.400 --> 00:00:19.633
+Each box has a label on it:
+"Red", "Black", and "Red and Black".
+
+5
+00:00:19.633 --> 00:00:22.533
+And the only rule: every label is wrong.
+
+6
+00:00:23.333 --> 00:00:28.533
+Part A: what is the minimum number of draws
+that guarantees we can fix all the labels?
+
+7
+00:00:29.233 --> 00:00:33.700
+A draw: you point at a box,
+and get one random ball from it.
+
+8
+00:00:34.300 --> 00:00:38.833
+There are six ways to assign the three kinds of content
+to the three boxes.
+
+9
+00:00:38.833 --> 00:00:44.233
+But every label is wrong, so we rule out
+any arrangement where a box's content matches its label.
+
+10
+00:00:44.233 --> 00:00:48.467
+Only two possible arrangements remain,
+and we must decide between them.
+
+11
+00:00:48.467 --> 00:00:53.567
+The "Red" box holds black or the mix.
+A black ball fits both arrangements.
+
+12
+00:00:53.567 --> 00:00:58.233
+The "Black" box holds the mix or red,
+and a red ball fits both.
+
+13
+00:00:58.233 --> 00:01:02.967
+Only in the "Red and Black" box
+do the arrangements differ: red in one, black in the other.
+
+14
+00:01:02.967 --> 00:01:08.433
+The idea: the "Red and Black" label is wrong,
+so this box holds a single color only.
+
+15
+00:01:10.033 --> 00:01:15.433
+Case one: the "Red and Black" box gives a red ball.
+So it is the red box.
+
+16
+00:01:15.433 --> 00:01:20.933
+The "Black" box is not black, since its label is wrong,
+and not red either. So it holds the mix.
+
+17
+00:01:20.933 --> 00:01:24.433
+And the "Red" box is left with black.
+
+18
+00:01:24.433 --> 00:01:28.933
+Case two: a black ball comes out.
+Then this is the black box.
+
+19
+00:01:28.933 --> 00:01:34.433
+The "Red" box is neither red nor black,
+so it holds the mix, and "Black" is left with red.
+
+20
+00:01:35.233 --> 00:01:40.733
+The rule: color c came out? The box labeled c
+holds the other color, and the third holds the mix.
+
+21
+00:01:40.733 --> 00:01:45.967
+And why not zero? With no draw, two arrangements remain,
+and there is no way to choose between them.
+
+22
+00:01:46.567 --> 00:01:50.867
+So the answer: one draw,
+and it must be from the "Red and Black" box.
+
+23
+00:01:51.667 --> 00:01:56.567
+In the page's box you can try it:
+click a box to draw a ball from it.
+
+24
+00:01:56.567 --> 00:02:00.367
+We draw from the box "Red and Black",
+and a red ball comes out.
+
+25
+00:02:00.367 --> 00:02:04.867
+Revealing the contents shows exactly what we deduced:
+all three labels, from one draw.
+
+26
+00:02:06.467 --> 00:02:12.433
+The trap: drawing from the "Red" box.
+A black ball from it leaves both arrangements open.
+
+27
+00:02:12.433 --> 00:02:17.400
+The same goes for the "Black" box.
+Only "Red and Black" is known in advance to hold one color.
+
+28
+00:02:18.200 --> 00:02:21.400
+Part B: turning the solution into a function.
+
+29
+00:02:22.100 --> 00:02:27.600
+The input: an array labels of three labels,
+that is, RED, BLACK and MIXED, in some order.
+
+30
+00:02:27.600 --> 00:02:32.800
+The API: draw(i) takes a random ball from box i,
+and returns RED or BLACK.
+
+31
+00:02:32.800 --> 00:02:38.300
+The page's example uses arrangement 1 from part A,
+so the ball from box 2 is red.
+
+32
+00:02:39.100 --> 00:02:44.100
+The first solution translates part A almost word for word,
+and builds a new array, fixed.
+
+33
+00:02:46.100 --> 00:02:50.600
+The function takes the array of labels
+and returns the correct labels.
+
+34
+00:02:52.300 --> 00:02:56.800
+The array fixed will hold the corrected labels.
+For now, three empty strings.
+
+35
+00:03:00.800 --> 00:03:05.300
+First loop: find the box labelled MIXED
+and keep its index in k.
+
+36
+00:03:06.633 --> 00:03:11.133
+The only draw in the function, from box k.
+That box holds one colour, so ball is its colour.
+
+37
+00:03:15.466 --> 00:03:19.966
+The if sets the second colour, other:
+BLACK if ball is RED, and RED otherwise.
+
+38
+00:03:21.300 --> 00:03:25.533
+Box k gets the label ball,
+the only colour inside it.
+
+39
+00:03:30.200 --> 00:03:34.700
+Second loop: the box labelled ball
+gets other, by the rule of Part A.
+
+40
+00:03:39.400 --> 00:03:43.900
+Third loop: the box labelled other holds
+neither other nor ball, so it is MIXED.
+
+41
+00:03:45.066 --> 00:03:48.966
+And return fixed.
+The array labels itself is unchanged.
+
+42
+00:03:49.666 --> 00:03:53.966
+We run it on the page's example, beside the box,
+with draw returning RED.
+
+43
+00:03:53.966 --> 00:03:58.966
+The first pass looks for MIXED.
+It is on box 2, so k = 2.
+
+44
+00:03:58.966 --> 00:04:03.100
+One draw from box 2: it gives RED.
+
+45
+00:04:03.100 --> 00:04:08.100
+The other color, other, is BLACK,
+and box 2 gets RED.
+
+46
+00:04:08.100 --> 00:04:13.033
+The second pass: the box labeled RED
+gets other, that is, BLACK.
+
+47
+00:04:13.033 --> 00:04:17.966
+The third pass: the box labeled BLACK
+gets MIXED.
+
+48
+00:04:17.966 --> 00:04:21.566
+The result: BLACK, MIXED, RED.
+Exactly arrangement 1.
+
+49
+00:04:22.366 --> 00:04:28.966
+And if the ball is black? other is RED,
+and box 2 gets BLACK.
+
+50
+00:04:28.966 --> 00:04:34.866
+Box 1 gets RED, and box 0 gets MIXED.
+That is arrangement 2.
+
+51
+00:04:35.666 --> 00:04:40.900
+Correct and readable, but it makes three passes
+over the array and keeps an extra array.
+
+52
+00:04:41.700 --> 00:04:46.600
+The second solution starts from an observation:
+the fix is a rotation of the three labels.
+
+53
+00:04:46.600 --> 00:04:51.500
+Call same the box labeled with the ball's color,
+and other the third box.
+
+54
+00:04:51.500 --> 00:04:56.600
+The ball's color moves to k, MIXED moves to other,
+and the other color moves to same.
+
+55
+00:04:56.600 --> 00:05:00.333
+And a rotation of three elements
+is exactly two swaps.
+
+56
+00:05:01.133 --> 00:05:05.866
+In the page's box, fix_labels runs step by step
+on the page's example.
+
+57
+00:05:05.866 --> 00:05:11.000
+The arrows over the boxes are the rotation
+of the three labels; same and other are marked.
+
+58
+00:05:11.000 --> 00:05:16.133
+At the end the box reveals the contents:
+all three labels are right, after two swaps.
+
+59
+00:05:16.933 --> 00:05:21.333
+The code: after the draw there is no second search,
+and no new array.
+
+60
+00:05:22.833 --> 00:05:27.333
+This time the function fixes labels in place
+and returns the same array.
+
+61
+00:05:30.600 --> 00:05:35.100
+The index method finds MIXED in one line,
+and the only draw is again from box k.
+
+62
+00:05:37.533 --> 00:05:41.633
+The neighbours of k on the circle, n1 and n2,
+with no loop and no search.
+
+63
+00:05:46.666 --> 00:05:51.166
+One check: the neighbour labelled with the ball's colour
+is same, and the other one is other.
+
+64
+00:05:54.533 --> 00:05:59.033
+The first swap, by multiple assignment, with no tmp:
+box k gets the ball's colour.
+
+65
+00:06:03.166 --> 00:06:07.666
+The second swap, between same and other.
+Together the two swaps are the rotation.
+
+66
+00:06:08.933 --> 00:06:11.833
+And return labels, fixed in place.
+
+67
+00:06:12.533 --> 00:06:16.566
+And now the run beside the page's box,
+again with a red ball.
+
+68
+00:06:16.566 --> 00:06:21.700
+Again k = 2, and the ball that comes out is red.
+
+69
+00:06:21.700 --> 00:06:26.600
+The neighbors of k: (k + 1) % 3, that is, 0,
+and (k + 2) % 3, that is, 1.
+
+70
+00:06:26.600 --> 00:06:31.200
+Box 0 says RED, like the ball,
+so same = 0 and other = 1.
+
+71
+00:06:31.200 --> 00:06:36.866
+First swap, k with same: box 2 is now correct,
+and MIXED moves to 0 for the moment.
+
+72
+00:06:36.866 --> 00:06:42.000
+Second swap, same with other:
+the result is BLACK, MIXED, RED.
+
+73
+00:06:42.000 --> 00:06:46.033
+The same result as the first solution,
+with two swaps in place.
+
+74
+00:06:46.833 --> 00:06:52.333
+And why (k + 2) % 3 and not (k − 1) % 3?
+Both should give the previous neighbor on the circle.
+
+75
+00:06:52.333 --> 00:06:57.566
+In Python, (0 − 1) % 3 is 2,
+because there the result of % is never negative.
+
+76
+00:06:57.566 --> 00:07:03.066
+In SystemVerilog and C, % keeps the sign of the dividend:
+it gives −1, an invalid index.
+
+77
+00:07:03.066 --> 00:07:08.566
+Adding 2 equals subtracting 1 modulo 3, and stays positive.
+So the code is the same in both languages.
+
+78
+00:07:09.366 --> 00:07:13.100
+The cost: both solutions are O(1),
+with a single draw.
+
+79
+00:07:13.100 --> 00:07:17.400
+The second makes one pass and two swaps in place,
+with no extra array.
+
+80
+00:07:18.187 --> 00:07:23.220
+To sum up: one draw from the "Red and Black" box
+fixes all three labels.
+
+81
+00:07:23.220 --> 00:07:28.620
+In code, the fix is a rotation: two swaps in place.
+Try it in the box on the page of question 0004.

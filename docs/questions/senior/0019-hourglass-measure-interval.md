@@ -169,6 +169,64 @@ added: 2026-10-18
     התחלה ב-21 והתוכנית `{0: 'AB', 7: 'A', 11: 'B', 14: 'A', 21: ''}`, כאשר הפעולה הריקה ב-21
     היא "לא להפוך, רק לחכות". ב-SystemVerilog : `"0:AB 7:A 11:B 14:A 21:-"`.
 
+    === "Python"
+        ```python title="solve" linenums="1" hl_lines="15 22 33 41"
+        import heapq
+        from itertools import count
+
+
+        def solve(A, B, D):
+            """Return (start, plan) for the measurement that ends earliest, or None."""
+            # State: (sand on top of A, sand on top of B, minutes measured; -1 = not started yet)
+            first = (0, 0, -1)
+            best = {first: 0}
+            tie = count()  # tie-breaker so the queue never compares dicts (1)
+            queue = [(0, next(tie), first, None, {})]
+
+            while queue:
+                t, _, state, start, plan = heapq.heappop(queue)
+                if t > best[state]:
+                    continue                        # stale entry, a faster way here was found (2)
+                a, b, measured = state
+                if measured == D:
+                    return start, plan
+
+                options = []                        # (new state, new time, start, plan)
+                if measured == -1:                  # start measuring right now (takes no time) (3)
+                    options.append(((a, b, 0), t, t, plan))
+
+                for flip_a in (False, True):
+                    for flip_b in (False, True):
+                        a2 = A - a if flip_a else a
+                        b2 = B - b if flip_b else b
+                        running = [sand for sand in (a2, b2) if sand > 0]
+                        if not running:
+                            continue                # nothing flows, nothing will happen
+                        wait = min(running)         # until the next hourglass runs out
+                        m2 = -1 if measured == -1 else measured + wait   # (4)!
+                        if m2 > D:
+                            continue                # would overshoot D
+                        action = ("A" if flip_a else "") + ("B" if flip_b else "")
+                        new_state = (max(a2 - wait, 0), max(b2 - wait, 0), m2)
+                        options.append((new_state, t + wait, start, {**plan, t: action}))
+
+                for new_state, new_t, new_start, new_plan in options:
+                    if new_state not in best or new_t < best[new_state]:   # (5)!
+                        best[new_state] = new_t
+                        heapq.heappush(queue, (new_t, next(tie), new_state, new_start, new_plan))
+            return None
+        ```
+
+        1. הערימה משווה tuples איבר-איבר. כששני \( t \) שווים היא הייתה מגיעה להשוואה של
+           מילונים, שלא מוגדרת. המונה `count()` באיבר השני מונע את זה, וגם שומר על סדר FIFO
+           בין שוויונות.
+        2. רשומה ישנה : המצב כבר הושג בזמן קטן יותר. הבדיקה זורקת אותה בלי לחפש בתוך
+           הערימה.
+        3. הקשת "מתחילים למדוד" : אותו מצב פיזי, \( m \) הופך ל-0, ורגע ההתחלה נשמר. המחיר
+           0, ולכן \( t \) לא משתנה.
+        4. ‏\( m \) גדל בזמן ההמתנה רק אחרי שהמדידה התחילה.
+        5. השחרור (relax) של Dijkstra : רק מצב שמושג בזמן קטן יותר נכנס לערימה.
+
     === "SystemVerilog"
         ```systemverilog title="function measure_interval" linenums="1" hl_lines="27 35 47 58"
         // One entry of the priority queue: the state (a, b, measured) plus the path that reached it.
@@ -252,64 +310,6 @@ added: 2026-10-18
         4. ‏\( m \) גדל בזמן ההמתנה רק אחרי שהמדידה התחילה. אם עוברים את \( D \), הקשת נפסלת.
         5. השחרור (relax) של Dijkstra : רק מצב שמושג בזמן קטן יותר נכנס לתור.
 
-    === "Python"
-        ```python title="solve" linenums="1" hl_lines="15 22 33 41"
-        import heapq
-        from itertools import count
-
-
-        def solve(A, B, D):
-            """Return (start, plan) for the measurement that ends earliest, or None."""
-            # State: (sand on top of A, sand on top of B, minutes measured; -1 = not started yet)
-            first = (0, 0, -1)
-            best = {first: 0}
-            tie = count()  # tie-breaker so the queue never compares dicts (1)
-            queue = [(0, next(tie), first, None, {})]
-
-            while queue:
-                t, _, state, start, plan = heapq.heappop(queue)
-                if t > best[state]:
-                    continue                        # stale entry, a faster way here was found (2)
-                a, b, measured = state
-                if measured == D:
-                    return start, plan
-
-                options = []                        # (new state, new time, start, plan)
-                if measured == -1:                  # start measuring right now (takes no time) (3)
-                    options.append(((a, b, 0), t, t, plan))
-
-                for flip_a in (False, True):
-                    for flip_b in (False, True):
-                        a2 = A - a if flip_a else a
-                        b2 = B - b if flip_b else b
-                        running = [sand for sand in (a2, b2) if sand > 0]
-                        if not running:
-                            continue                # nothing flows, nothing will happen
-                        wait = min(running)         # until the next hourglass runs out
-                        m2 = -1 if measured == -1 else measured + wait   # (4)!
-                        if m2 > D:
-                            continue                # would overshoot D
-                        action = ("A" if flip_a else "") + ("B" if flip_b else "")
-                        new_state = (max(a2 - wait, 0), max(b2 - wait, 0), m2)
-                        options.append((new_state, t + wait, start, {**plan, t: action}))
-
-                for new_state, new_t, new_start, new_plan in options:
-                    if new_state not in best or new_t < best[new_state]:   # (5)!
-                        best[new_state] = new_t
-                        heapq.heappush(queue, (new_t, next(tie), new_state, new_start, new_plan))
-            return None
-        ```
-
-        1. הערימה משווה tuples איבר-איבר. כששני \( t \) שווים היא הייתה מגיעה להשוואה של
-           מילונים, שלא מוגדרת. המונה `count()` באיבר השני מונע את זה, וגם שומר על סדר FIFO
-           בין שוויונות.
-        2. רשומה ישנה : המצב כבר הושג בזמן קטן יותר. הבדיקה זורקת אותה בלי לחפש בתוך
-           הערימה.
-        3. הקשת "מתחילים למדוד" : אותו מצב פיזי, \( m \) הופך ל-0, ורגע ההתחלה נשמר. המחיר
-           0, ולכן \( t \) לא משתנה.
-        4. ‏\( m \) גדל בזמן ההמתנה רק אחרי שהמדידה התחילה.
-        5. השחרור (relax) של Dijkstra : רק מצב שמושג בזמן קטן יותר נכנס לערימה.
-
     #### למה זה נכון { .sol-proof }
 
     **‏Dijkstra מחזיר את המינימום.** כל הקשתות במחיר \( \ge 0 \), ולכן Dijkstra מוציא את
@@ -362,7 +362,7 @@ added: 2026-10-18
         s4 -- "start, +0" --> s5["t=21<br/>(0, 1, 0)"]
         s5 -- "wait, +1" --> s6["t=22<br/>(0, 0, 1) ✓"]
         classDef pruned stroke-dasharray: 5 4,opacity:0.6;
-        classDef found stroke:#1baf7a,stroke-width:3px;
+        classDef found stroke:currentColor,stroke-width:3px;
         class p1,p2,d0,d1,d2,d3 pruned;
         class s6 found;
     ```

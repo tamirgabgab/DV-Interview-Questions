@@ -93,6 +93,25 @@ added: 2026-10-22
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="detect_1011" hl_lines="2 11 12"
+        # the next state per state and bit: (on 0, on 1); the names are what was seen so far
+        NEXT_1011 = {"S0": ("S0", "S1"), "S1": ("S10", "S1"), "S10": ("S0", "S101"), "S101": ("S10", "S1")}   # (1)!
+
+
+        def detect_1011(bits: list[int]) -> tuple[list[str], list[int]]:
+            """The Mealy machine on a bit stream: the state before each bit, and the output per bit."""
+            state, states, out = "S0", [], []
+            for b in bits:
+                states.append(state)
+                out.append(int(state == "S101" and b == 1))   # (2)!
+                state = NEXT_1011[state][b]
+            return states, out
+        ```
+
+        1. אותה טבלת מעברים כמו ב-`case` של המודול.
+        2. הפלט של Mealy : המצב `101` והביט `1` ביחד.
+
     === "SystemVerilog"
         ```systemverilog title="module seq_detect_1011" linenums="1" hl_lines="8 16 17"
         module seq_detect_1011 (
@@ -124,25 +143,6 @@ added: 2026-10-22
         1. שמות המצבים הם מה שנראה עד כה. שני ביטים מספיקים לארבעה מצבים.
         2. הזיהוי : הפלט תלוי במצב ובביט (Mealy). עם `1` עוברים ל-`S1`, כי ה-`1` האחרון
            הוא גם ה-`1` הראשון של התאמה חופפת; עם `0` ל-`S10`, כי `1010` מסתיים ב-`10`.
-
-    === "Python"
-        ```python title="detect_1011" hl_lines="2 11 12"
-        # the next state per state and bit: (on 0, on 1); the names are what was seen so far
-        NEXT_1011 = {"S0": ("S0", "S1"), "S1": ("S10", "S1"), "S10": ("S0", "S101"), "S101": ("S10", "S1")}   # (1)!
-
-
-        def detect_1011(bits: list[int]) -> tuple[list[str], list[int]]:
-            """The Mealy machine on a bit stream: the state before each bit, and the output per bit."""
-            state, states, out = "S0", [], []
-            for b in bits:
-                states.append(state)
-                out.append(int(state == "S101" and b == 1))   # (2)!
-                state = NEXT_1011[state][b]
-            return states, out
-        ```
-
-        1. אותה טבלת מעברים כמו ב-`case` של המודול.
-        2. הפלט של Mealy : המצב `101` והביט `1` ביחד.
 
     #### למה זה נכון { .sol-proof }
 
@@ -262,6 +262,42 @@ added: 2026-10-22
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="fsm_table, run_fsm" linenums="1" hl_lines="6 8 10 17 22 23"
+        def fsm_table(pattern: list[int]) -> list[list[int]]:
+            """nxt[s][b] of the KMP automaton: state s means "the last s bits are the first s of the pattern"."""
+            L = len(pattern)
+            nxt = [[0, 0] for _ in range(L + 1)]
+            nxt[0][pattern[0]] = 1
+            fail = 0                                                        # (1)!
+            for s in range(1, L + 1):
+                for b in (0, 1):
+                    nxt[s][b] = s + 1 if s < L and pattern[s] == b else nxt[fail][b]   # (2)!
+                if s < L:
+                    fail = nxt[fail][pattern[s]]                            # (3)!
+            return nxt
+
+
+        def run_fsm(pattern: list[int], bits: list[int], moore: bool = False) -> tuple[list[int], list[int]]:
+            """The state before every bit and the output per bit; Mealy merges the full-match state into its equivalent."""
+            L, nxt = len(pattern), fsm_table(pattern)
+            rest = next(s for s in range(L) if nxt[s] == nxt[L])          # (4)!
+            state, states, out = 0, [], []
+            for b in bits:
+                states.append(state)
+                nstate = nxt[state][b]
+                out.append(int(state == L) if moore else int(nstate == L))   # (5)!
+                state = nstate if moore or nstate < L else rest
+            return states, out
+        ```
+
+        1. ‏`fail` הוא מצב הכישלון של המצב הנוכחי.
+        2. התקדמות על התאמה, ואחרת המעבר של מצב הכישלון עם אותו ביט.
+        3. הכישלון של המצב הבא, מהטבלה שכבר קיימת.
+        4. ‏Mealy : המצב ששקול למצב המלא, זה עם אותם שני מעברים. תמיד קיים, כי
+           \( next[L] = next[fail(L)] \).
+        5. ‏Moore מוציא מהמצב, מחזור אחרי הביט האחרון; Mealy מוציא על המעבר.
+
     === "SystemVerilog"
         ```systemverilog title="module seq_detect (any pattern)" linenums="1" hl_lines="15 19 20 38 43"
         module seq_detect #(
@@ -316,42 +352,6 @@ added: 2026-10-22
         4. ‏Moore : הפלט שייך למצב `L`; Mealy : הפלט שייך למעבר שנכנס אליו, באותו מחזור.
         5. ב-Mealy המצב `L` לא קיים : אחרי זיהוי עוברים למצב השקול לו. הפונקציה היא
            פונקציית קבועים (הפרמטרים ידועים), וכלי סינתזה מקפל אותה לטבלה קבועה.
-
-    === "Python"
-        ```python title="fsm_table, run_fsm" linenums="1" hl_lines="6 8 10 17 22 23"
-        def fsm_table(pattern: list[int]) -> list[list[int]]:
-            """nxt[s][b] of the KMP automaton: state s means "the last s bits are the first s of the pattern"."""
-            L = len(pattern)
-            nxt = [[0, 0] for _ in range(L + 1)]
-            nxt[0][pattern[0]] = 1
-            fail = 0                                                        # (1)!
-            for s in range(1, L + 1):
-                for b in (0, 1):
-                    nxt[s][b] = s + 1 if s < L and pattern[s] == b else nxt[fail][b]   # (2)!
-                if s < L:
-                    fail = nxt[fail][pattern[s]]                            # (3)!
-            return nxt
-
-
-        def run_fsm(pattern: list[int], bits: list[int], moore: bool = False) -> tuple[list[int], list[int]]:
-            """The state before every bit and the output per bit; Mealy merges the full-match state into its equivalent."""
-            L, nxt = len(pattern), fsm_table(pattern)
-            rest = next(s for s in range(L) if nxt[s] == nxt[L])          # (4)!
-            state, states, out = 0, [], []
-            for b in bits:
-                states.append(state)
-                nstate = nxt[state][b]
-                out.append(int(state == L) if moore else int(nstate == L))   # (5)!
-                state = nstate if moore or nstate < L else rest
-            return states, out
-        ```
-
-        1. ‏`fail` הוא מצב הכישלון של המצב הנוכחי.
-        2. התקדמות על התאמה, ואחרת המעבר של מצב הכישלון עם אותו ביט.
-        3. הכישלון של המצב הבא, מהטבלה שכבר קיימת.
-        4. ‏Mealy : המצב ששקול למצב המלא, זה עם אותם שני מעברים. תמיד קיים, כי
-           \( next[L] = next[fail(L)] \).
-        5. ‏Moore מוציא מהמצב, מחזור אחרי הביט האחרון; Mealy מוציא על המעבר.
 
     #### למה זה נכון { .sol-proof }
 

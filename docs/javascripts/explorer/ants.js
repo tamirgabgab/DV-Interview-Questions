@@ -1,12 +1,12 @@
 // kinds: ants
-//   ants                   0056        ants on a pole of 100 cm: placed by a click (a click on an ant turns it, a second click removes it) or drawn from a seed; played half a second a step on the pole and on a space-time chart; a toggle between ants that turn and ghosts that walk through; the collisions so far and when each ant falls
+//   ants                   0057        ants on a pole of 100 cm: placed by a click (a click on an ant turns it, a second click removes it) or drawn from a seed; played half a second a step on the pole and on a space-time chart; a toggle between ants that turn and ghosts that walk through; the collisions so far and when each ant falls
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
   const { answer, autoplay, code, f, ltr, seedControls, speedSel } = dvqExplorers.lib;
 
-  // Ants on a pole (0056), the ants at distinct integer positions (ascending), dirs +1 / -1,
+  // Ants on a pole (0057), the ants at distinct integer positions (ascending), dirs +1 / -1,
   // speed 1. The ghosts walk straight: ghost i is at p + d t until it is off (t >= p going
   // left, t >= len - p going right). The ants keep their order, so at time t the fl
   // leftmost ants have fallen left, the fr rightmost fallen right, and the k-th ant between
@@ -44,7 +44,7 @@
     return ants;
   };
 
-  // The box (0056): the pole at the current half second, the space-time chart drawn up to
+  // The box (0057): the pole at the current half second, the space-time chart drawn up to
   // it, the collisions so far and the fall of every ant; ants or ghosts.
   const antsView = () => ({
     mount(box) {

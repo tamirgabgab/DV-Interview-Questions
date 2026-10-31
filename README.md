@@ -23,6 +23,29 @@ with [graphify](https://pypi.org/project/graphifyy/)); click a question for a li
 - [Topics](https://tamirgabgab.github.io/DV-Interview-Questions/tags/) and
   [what's new](https://tamirgabgab.github.io/DV-Interview-Questions/new/)
 - [`CATALOG.md`](CATALOG.md): every question with a direct link
+- [Tutorial videos](#tutorial-videos): a video per question, a chapter per part
+
+## Tutorial videos
+
+A video walks through a question's solution step by step, a chapter per part, with Hebrew
+and English captions (off by default) and the page's own interactive box shown beside the
+code. The finished files of each video are kept in `videos/<id>/release/`: the silent video,
+its background music as a separate file (to put together in an editor), the two caption
+tracks and the chapter list for a YouTube description. Download them from the links below.
+Once a video is on YouTube, its page gets a "סרטון הסבר" button and a link to each part's
+chapter. The plan and the tools: [`VIDEOS.md`](VIDEOS.md). This table is written by
+`python tools/catalog.py`.
+
+<!-- videos -->
+| Id | Question | Chapters | Length | Download |
+|----|----------|----------|--------|----------|
+| 0002 | [החלפת ערכים בין שני משתנים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0002-swap-two-variables/) | 3 | 8:29 | [video](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0002/release/0002.mp4) · [music](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0002/release/0002-music.mp3) · [Hebrew captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0002/release/0002.he.vtt) · [English captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0002/release/0002.en.vtt) · [chapters](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0002/release/0002-chapters.txt) |
+| 0003 | [מה עושה הקוד? (לולאה כפולה עם swap)](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0003-what-does-this-code-do/) | 1 | 3:57 | [video](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0003/release/0003.mp4) · [music](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0003/release/0003-music.mp3) · [Hebrew captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0003/release/0003.he.vtt) · [English captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0003/release/0003.en.vtt) · [chapters](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0003/release/0003-chapters.txt) |
+| 0004 | [שלוש קופסאות עם תוויות שגויות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0004-three-mislabeled-boxes/) | 2 | 7:30 | [video](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0004/release/0004.mp4) · [music](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0004/release/0004-music.mp3) · [Hebrew captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0004/release/0004.he.vtt) · [English captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0004/release/0004.en.vtt) · [chapters](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0004/release/0004-chapters.txt) |
+| 0006 | [רווח מקסימלי ממניה – לונג או שורט](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0006-stock-max-profit-long-short/) | 2 | 7:40 | [video](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0006/release/0006.mp4) · [music](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0006/release/0006-music.mp3) · [Hebrew captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0006/release/0006.he.vtt) · [English captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0006/release/0006.en.vtt) · [chapters](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0006/release/0006-chapters.txt) |
+| 0010 | [סוגריים תקינים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0010-valid-parentheses/) | 2 | 7:19 | [video](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0010/release/0010.mp4) · [music](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0010/release/0010-music.mp3) · [Hebrew captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0010/release/0010.he.vtt) · [English captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0010/release/0010.en.vtt) · [chapters](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0010/release/0010-chapters.txt) |
+| 0011 | [לוח סיום אקראי של איקס-עיגול](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0011-tic-tac-toe-final-board/) | 2 | 7:01 | [video](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0011/release/0011.mp4) · [music](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0011/release/0011-music.mp3) · [Hebrew captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0011/release/0011.he.vtt) · [English captions](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0011/release/0011.en.vtt) · [chapters](https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/videos/0011/release/0011-chapters.txt) |
+<!-- /videos -->
 
 ## What is on the site
 

@@ -140,7 +140,7 @@ def test_base_b_explorer_matches_page_code():
       for (let b = 2; b <= 16; b++) {{
         const chains = [], steps = [];
         for (let x = 0; x < b * b * b; x++) {{ chains.push(m.kbChain(x, b)); const s = m.kbStep(x, b); steps.push([s.diff, s.d, s.dNext, s.digits]); }}
-        out[b] = {{ att: m.kbAttractor(b), chains, steps, hist: m.kbHistogram(b), text: m.kbText(m.kbAttractor(b)[0], b), parse: [m.kbParse("610", b), m.kbParse("1F0", b), m.kbParse("12", b)] }};
+        out[b] = {{ att: m.kbAttractor(b), chains, steps, hist: m.kbHistogram(b), text: m.kbText(m.kbAttractor(b)[0], b), parse: [m.kbParse("610", b), m.kbParse("1F0", b), m.kbParse("12", b)], spread: m.kbSpreadCounts(b) }};
       }}
       console.log(JSON.stringify(out));""")
     for b in range(2, 17):
@@ -155,3 +155,6 @@ def test_base_b_explorer_matches_page_code():
         hist = q0012.chain_lengths(b)
         assert r["hist"]["hist"] == [hist.get(k, 0) for k in range(max(hist) + 1)]
         assert r["hist"]["zeros"] == b
+        # the step line: every number with d gives the same difference, 6d(b - d) of them (b for d = 0)
+        assert r["spread"] == [sum(1 for x in range(b ** 3) if q0012.spread(x, b) == d) for d in range(b)]
+        assert r["spread"] == [b] + [6 * d * (b - d) for d in range(1, b)]

@@ -169,43 +169,6 @@ added: 2026-10-21
     שתי פונקציות : `fifo_depth` היא הנוסחה, `fifo_fill` היא הסימולציה. הזמנים
     בסימולציה הם מספרים שלמים של צעדים, כדי שלא יהיו שגיאות עיגול של נקודה צפה.
 
-    === "SystemVerilog"
-        ```systemverilog title="function fifo_depth, fifo_fill" linenums="1" hl_lines="3 5 15 16 19"
-        function automatic int fifo_depth(int burst, real f_write, real f_read,
-                                          real read_duty = 1.0);
-          real rate = f_read * read_duty / f_write;    // (1)!
-          if (rate >= 1.0) return 1;
-          return int'($ceil(burst * (1.0 - rate)));    // (2)!
-        endfunction
-
-        // Cycle simulation on an integer time axis: a write lands every t_write steps,
-        // a read is taken every t_read steps (from step t_read on) unless that read slot
-        // is the one in idle_every that the reader skips. Returns the largest fill.
-        function automatic int fifo_fill(int burst, int t_write, int t_read,
-                                         int idle_every = 0);
-          int count = 0, written = 0, slot = 0, t = 0, max_fill = 0;
-          while (written < burst || count > 0) begin
-            if (t % t_write == 0 && written < burst) begin count++; written++; end
-            if (count > max_fill) max_fill = count;    // (3)!
-            if (t > 0 && t % t_read == 0) begin
-              slot++;
-              if (!(idle_every != 0 && slot % idle_every == 0) && count > 0) count--;   // (4)!
-            end
-            t++;
-          end
-          return max_fill;
-        endfunction
-        ```
-
-        1. הקצב היחסי של הקורא : `read_duty` הוא החלק מהמחזורים שבהם הוא באמת קורא
-           (‏`0.75` בסעיף ב).
-        2. ‏`$ceil` מחזירה `real`; ההמרה ל-`int` מפורשת. קורא מהיר מהכותב משאיר לכל היותר
-           מילה אחת.
-        3. המדידה אחרי הכתיבה ולפני הקריאה של אותו צעד : המילה שזה עתה נכתבה כבר תופסת
-           מקום, והקריאה של אותו רגע עוד לא פינתה אותו.
-        4. המשבצת המדולגת : משבצת הקריאה ה-`idle_every`, ה-`2 * idle_every` וכן הלאה. אם
-           ה-FIFO ריק הקריאה פשוט לא קורית.
-
     === "Python"
         ```python title="fifo_depth, fifo_fill" linenums="1" hl_lines="7 9 22 23 26"
         import math
@@ -246,6 +209,43 @@ added: 2026-10-21
         3. המדידה אחרי הכתיבה ולפני הקריאה של אותו צעד, כדי לראות את המקסימום האמיתי.
         4. המשבצת המדולגת : משבצת הקריאה ה-`idle_every`, ה-`2 * idle_every` וכן הלאה.
            ה-`trace` שומר כל שינוי, בשביל הגרף.
+
+    === "SystemVerilog"
+        ```systemverilog title="function fifo_depth, fifo_fill" linenums="1" hl_lines="3 5 15 16 19"
+        function automatic int fifo_depth(int burst, real f_write, real f_read,
+                                          real read_duty = 1.0);
+          real rate = f_read * read_duty / f_write;    // (1)!
+          if (rate >= 1.0) return 1;
+          return int'($ceil(burst * (1.0 - rate)));    // (2)!
+        endfunction
+
+        // Cycle simulation on an integer time axis: a write lands every t_write steps,
+        // a read is taken every t_read steps (from step t_read on) unless that read slot
+        // is the one in idle_every that the reader skips. Returns the largest fill.
+        function automatic int fifo_fill(int burst, int t_write, int t_read,
+                                         int idle_every = 0);
+          int count = 0, written = 0, slot = 0, t = 0, max_fill = 0;
+          while (written < burst || count > 0) begin
+            if (t % t_write == 0 && written < burst) begin count++; written++; end
+            if (count > max_fill) max_fill = count;    // (3)!
+            if (t > 0 && t % t_read == 0) begin
+              slot++;
+              if (!(idle_every != 0 && slot % idle_every == 0) && count > 0) count--;   // (4)!
+            end
+            t++;
+          end
+          return max_fill;
+        endfunction
+        ```
+
+        1. הקצב היחסי של הקורא : `read_duty` הוא החלק מהמחזורים שבהם הוא באמת קורא
+           (‏`0.75` בסעיף ב).
+        2. ‏`$ceil` מחזירה `real`; ההמרה ל-`int` מפורשת. קורא מהיר מהכותב משאיר לכל היותר
+           מילה אחת.
+        3. המדידה אחרי הכתיבה ולפני הקריאה של אותו צעד : המילה שזה עתה נכתבה כבר תופסת
+           מקום, והקריאה של אותו רגע עוד לא פינתה אותו.
+        4. המשבצת המדולגת : משבצת הקריאה ה-`idle_every`, ה-`2 * idle_every` וכן הלאה. אם
+           ה-FIFO ריק הקריאה פשוט לא קורית.
 
     #### למה זה נכון { .sol-proof }
 

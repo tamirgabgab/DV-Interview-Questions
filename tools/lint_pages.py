@@ -19,6 +19,8 @@ Checks, per page:
 - One ``??? interviewer`` block right after the question, and the end-of-page blocks use
   the ``trap`` / ``followup`` types (a top-level ``note`` / ``warning`` titled like an
   interviewer / trap / follow-up block is reported; other notes may keep their type).
+- Video fields: ``video`` is a YouTube id and ``video_parts`` has one rising start time
+  per part from 0 (``video_problems`` of tools/check_videos.py, which the hook runs too).
 - Code highlights: every line named in ``hl_lines=`` exists in the (dedented) block and is
   a code line, not a blank line, a comment alone or a bare ``end`` / ``endfunction``, so the
   highlights keep pointing at the code the explanation names after the block is edited.
@@ -36,6 +38,7 @@ import textwrap
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from check_videos import split_front_matter, video_problems  # noqa: E402
 from extract_code import FENCE, QUESTIONS, question_path  # noqa: E402
 
 LABELS = ["הרעיון", "השלבים", "הקוד", "למה זה נכון", "סיבוכיות"]
@@ -107,6 +110,28 @@ def lint_code_spaces(text: str) -> list[str]:
             inside = not inside
         elif inside and "\u00a0" in line:
             problems.append(f"{n}: non-breaking space inside a code block")
+    return problems
+
+
+TAB = re.compile(r'^(\s*)=== "([^"]+)"')
+
+
+def lint_tab_order(text: str) -> list[str]:
+    """Code tabs are Python first, then SystemVerilog (the owner's choice, 2026-10-29): the
+    first tab is the one a page opens on. A SystemVerilog tab followed, at its own indent,
+    by a Python tab of the same set is out of order."""
+    problems, open_sv = [], {}
+    for n, line in enumerate(text.split("\n"), 1):
+        m = TAB.match(line)
+        if m:
+            ind, name = len(m.group(1)), m.group(2)
+            if name == "Python" and open_sv.get(ind):
+                problems.append(f"{n}: the Python tab comes after the SystemVerilog tab of line {open_sv[ind]} (Python first)")
+            open_sv = {k: v for k, v in open_sv.items() if k < ind}
+            if name == "SystemVerilog":
+                open_sv[ind] = n
+        elif line.strip() and len(line) - len(line.lstrip(" ")) <= min(open_sv, default=10**6):
+            open_sv = {k: v for k, v in open_sv.items() if k < len(line) - len(line.lstrip(" "))}
     return problems
 
 
@@ -319,7 +344,9 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     problems.extend(lint_highlights(path.read_text(encoding="utf-8")))
     problems.extend(lint_followups(path.read_text(encoding="utf-8")))
     problems.extend(lint_code_spaces(path.read_text(encoding="utf-8")))
+    problems.extend(lint_tab_order(path.read_text(encoding="utf-8")))
     problems.extend(lint_selfchecks(path.read_text(encoding="utf-8")))
+    problems.extend(f"front matter: {p}" for p in video_problems(*split_front_matter(text)))
     return problems
 
 

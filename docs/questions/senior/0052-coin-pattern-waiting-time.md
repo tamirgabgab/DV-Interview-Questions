@@ -234,33 +234,6 @@ added: 2026-10-27
     הפונקציות מקבלות את ההסתברות של כל אות : ‏`{H: 1/2, T: 1/2}` למטבע הוגן,
     ‏`{H: q, T: 1 - q}` למטבע לא הוגן, או שש אותיות לקובייה.
 
-    === "SystemVerilog"
-        ```systemverilog title="prob, corr, expected_tosses" linenums="1" hl_lines="11 12"
-        // the probability of the letters w[from .. to-1], p[c] the probability of the letter c
-        function automatic real prob(string w, int from, int to, real p[byte]);
-          real r = 1.0;
-          for (int i = from; i < to; i++) r *= p[w[i]];
-          return r;
-        endfunction
-
-        // Conway's correlation of a over b: 1 / P(the first k letters of b) for every k
-        // for which the last k letters of a are the first k letters of b
-        function automatic real corr(string a, string b, real p[byte]);
-          real v = 0.0;
-          for (int k = 1; k <= a.len() && k <= b.len(); k++)
-            if (a.substr(a.len() - k, a.len() - 1) == b.substr(0, k - 1)) v += 1.0 / prob(b, 0, k, p);   // (1)!
-          return v;
-        endfunction
-
-        // the expected number of tosses until the pattern first appears
-        function automatic real expected_tosses(string w, real p[byte]);
-          return corr(w, w, p);                                   // (2)!
-        endfunction
-        ```
-
-        1. ‏`substr(i, j)` כולל את שני הקצוות : הסיומת באורך \( k \) של `a` מול התחילית באורך \( k \) של `b`.
-        2. הרצף מול עצמו : כל חפיפה באורך \( k \) היא מהמר שעוד במשחק.
-
     === "Python"
         ```python title="prob, corr, expected_tosses" linenums="1" hl_lines="17 21"
         from fractions import Fraction
@@ -287,6 +260,33 @@ added: 2026-10-27
         ```
 
         1. ‏`a[-k:]` היא הסיומת באורך \( k \) ו-`b[:k]` התחילית באורך \( k \).
+        2. הרצף מול עצמו : כל חפיפה באורך \( k \) היא מהמר שעוד במשחק.
+
+    === "SystemVerilog"
+        ```systemverilog title="prob, corr, expected_tosses" linenums="1" hl_lines="11 12"
+        // the probability of the letters w[from .. to-1], p[c] the probability of the letter c
+        function automatic real prob(string w, int from, int to, real p[byte]);
+          real r = 1.0;
+          for (int i = from; i < to; i++) r *= p[w[i]];
+          return r;
+        endfunction
+
+        // Conway's correlation of a over b: 1 / P(the first k letters of b) for every k
+        // for which the last k letters of a are the first k letters of b
+        function automatic real corr(string a, string b, real p[byte]);
+          real v = 0.0;
+          for (int k = 1; k <= a.len() && k <= b.len(); k++)
+            if (a.substr(a.len() - k, a.len() - 1) == b.substr(0, k - 1)) v += 1.0 / prob(b, 0, k, p);   // (1)!
+          return v;
+        endfunction
+
+        // the expected number of tosses until the pattern first appears
+        function automatic real expected_tosses(string w, real p[byte]);
+          return corr(w, w, p);                                   // (2)!
+        endfunction
+        ```
+
+        1. ‏`substr(i, j)` כולל את שני הקצוות : הסיומת באורך \( k \) של `a` מול התחילית באורך \( k \) של `b`.
         2. הרצף מול עצמו : כל חפיפה באורך \( k \) היא מהמר שעוד במשחק.
 
     #### למה זה נכון { .sol-proof }
@@ -372,6 +372,30 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="race" linenums="1" hl_lines="7 9"
+        def race(pats: list[str], p: dict = FAIR) -> tuple[list[Fraction], Fraction]:
+            """The chance that each pattern appears first, and the expected length of the race
+            (Conway's equations; no pattern inside another)."""
+            m = len(pats)
+            rows = []
+            for j in range(m):
+                rows.append([corr(pats[i], pats[j], p) for i in range(m)] + [Fraction(-1), Fraction(0)])   # (1)!
+            rows.append([Fraction(1)] * m + [Fraction(0), Fraction(1)])
+            for c in range(m + 1):                                  # (2)!
+                piv = next(i for i in range(c, m + 1) if rows[i][c] != 0)
+                rows[c], rows[piv] = rows[piv], rows[c]
+                for i in range(m + 1):
+                    if i != c and rows[i][c] != 0:
+                        f = rows[i][c] / rows[c][c]
+                        rows[i] = [x - f * y for x, y in zip(rows[i], rows[c])]
+            x = [rows[i][m + 1] / rows[i][i] for i in range(m + 1)]
+            return x[:m], x[m]
+        ```
+
+        1. לכל \( j \) : ‏\( \sum_i p_i \cdot \mathrm{corr}(A_i, A_j) - E = 0 \).
+        2. אלימינציה של גאוס-ז'ורדן בשברים מדויקים.
+
     === "SystemVerilog"
         ```systemverilog title="race" linenums="1" hl_lines="10 11 13 14"
         // the chance that each pattern appears first (win) and the expected length of the
@@ -406,30 +430,6 @@ added: 2026-10-27
 
         1. כשהמירוץ נגמר ב-\( A_i \), הקבוצה שמהמרת על \( A_j \) מחזיקה `corr(A_i, A_j)`.
         2. השורה האחרונה : הסיכויים מסתכמים ל-1.
-
-    === "Python"
-        ```python title="race" linenums="1" hl_lines="7 9"
-        def race(pats: list[str], p: dict = FAIR) -> tuple[list[Fraction], Fraction]:
-            """The chance that each pattern appears first, and the expected length of the race
-            (Conway's equations; no pattern inside another)."""
-            m = len(pats)
-            rows = []
-            for j in range(m):
-                rows.append([corr(pats[i], pats[j], p) for i in range(m)] + [Fraction(-1), Fraction(0)])   # (1)!
-            rows.append([Fraction(1)] * m + [Fraction(0), Fraction(1)])
-            for c in range(m + 1):                                  # (2)!
-                piv = next(i for i in range(c, m + 1) if rows[i][c] != 0)
-                rows[c], rows[piv] = rows[piv], rows[c]
-                for i in range(m + 1):
-                    if i != c and rows[i][c] != 0:
-                        f = rows[i][c] / rows[c][c]
-                        rows[i] = [x - f * y for x, y in zip(rows[i], rows[c])]
-            x = [rows[i][m + 1] / rows[i][i] for i in range(m + 1)]
-            return x[:m], x[m]
-        ```
-
-        1. לכל \( j \) : ‏\( \sum_i p_i \cdot \mathrm{corr}(A_i, A_j) - E = 0 \).
-        2. אלימינציה של גאוס-ז'ורדן בשברים מדויקים.
 
     #### למה זה נכון { .sol-proof }
 
@@ -545,32 +545,6 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="wait_dist" linenums="1" hl_lines="9 10 15 16"
-        // P(T = t) for t = 0 .. n-1, from D(z) G(z) = P(w) z^L
-        function automatic void wait_dist(string w, real p[byte], int n, ref real g[$]);
-          int  L = w.len();
-          real c[$], d[$], s;
-          c = {}; repeat (L + 1) c.push_back(0.0);
-          d = {}; repeat (L + 2) d.push_back(0.0);
-          for (int k = 1; k <= L; k++)
-            if (w.substr(L - k, L - 1) == w.substr(0, k - 1))
-              c[L - k] += prob(w, k, L, p);                       // (1)!
-          for (int i = 0; i <= L; i++) begin d[i] += c[i]; d[i + 1] -= c[i]; end
-          d[L] += prob(w, 0, L, p);
-          g = {};                                                 // (2)!
-          for (int t = 0; t < n; t++) begin
-            s = (t == L) ? prob(w, 0, L, p) : 0.0;
-            for (int j = 1; j <= L + 1 && j <= t; j++) s -= d[j] * g[t - j];
-            g.push_back(s / d[0]);                                // (3)!
-          end
-        endfunction
-        ```
-
-        1. האיבר של החפיפה באורך \( k \) ב-\( C(z) \) : מה שנשאר מ-\( A \), כפול \( z^{L-k} \).
-        2. ‏\( D(z) = P(A) z^L + (1 - z) C(z) \) נבנה בשתי השורות שלמעלה.
-        3. ‏\( d_0 = 1 \), אבל החלוקה משאירה את הקוד נכון גם בלי לסמוך על זה.
-
     === "Python"
         ```python title="generating, wait_dist, wait_moments" linenums="1" hl_lines="7 13 22 32 33"
         def generating(w: str, p: dict = FAIR) -> tuple[list[Fraction], list[Fraction]]:
@@ -620,6 +594,32 @@ added: 2026-10-27
         1. האיבר של החפיפה באורך \( k \) : ההסתברות של מה שנשאר מ-\( A \), כפול \( z^{L-k} \).
         2. המונה \( P(A) z^L \), והמכנה \( P(A) z^L + (1 - z) C(z) \).
         3. נגזרת של מנה, ב-\( z = 1 \), שם \( G(1) = 1 \).
+
+    === "SystemVerilog"
+        ```systemverilog title="wait_dist" linenums="1" hl_lines="9 10 15 16"
+        // P(T = t) for t = 0 .. n-1, from D(z) G(z) = P(w) z^L
+        function automatic void wait_dist(string w, real p[byte], int n, ref real g[$]);
+          int  L = w.len();
+          real c[$], d[$], s;
+          c = {}; repeat (L + 1) c.push_back(0.0);
+          d = {}; repeat (L + 2) d.push_back(0.0);
+          for (int k = 1; k <= L; k++)
+            if (w.substr(L - k, L - 1) == w.substr(0, k - 1))
+              c[L - k] += prob(w, k, L, p);                       // (1)!
+          for (int i = 0; i <= L; i++) begin d[i] += c[i]; d[i + 1] -= c[i]; end
+          d[L] += prob(w, 0, L, p);
+          g = {};                                                 // (2)!
+          for (int t = 0; t < n; t++) begin
+            s = (t == L) ? prob(w, 0, L, p) : 0.0;
+            for (int j = 1; j <= L + 1 && j <= t; j++) s -= d[j] * g[t - j];
+            g.push_back(s / d[0]);                                // (3)!
+          end
+        endfunction
+        ```
+
+        1. האיבר של החפיפה באורך \( k \) ב-\( C(z) \) : מה שנשאר מ-\( A \), כפול \( z^{L-k} \).
+        2. ‏\( D(z) = P(A) z^L + (1 - z) C(z) \) נבנה בשתי השורות שלמעלה.
+        3. ‏\( d_0 = 1 \), אבל החלוקה משאירה את הקוד נכון גם בלי לסמוך על זה.
 
     #### למה זה נכון { .sol-proof }
 

@@ -252,6 +252,22 @@ added: 2026-10-16
     **הבדיקה ברגע אחד, \( O(k) \).** סוכמים את המקום הפנוי של כל המדינות שמעל ישראל,
     ומשווים לנקודות שנותרו. אם מדינה כבר עברה את ישראל רק עם ניקוד השופטים, ההפסד ודאי מיד.
 
+    === "Python"
+        ```python title="israel_cannot_win" hl_lines="8 9"
+        def israel_cannot_win(israel_total, jury_above, points_left):
+            """True when the public points still to come cannot be shared among the countries
+            above Israel without at least one of them passing Israel's total."""
+            room = 0                                   # points they can take and stay <= Israel
+            for jury in jury_above:
+                if jury > israel_total:                # already ahead before any public points (1)
+                    return True
+                room += israel_total - jury
+            return points_left > room                  # pigeonhole: someone must pass Israel (2)
+        ```
+
+        1. מדינה שכבר מעל ישראל לא תורמת מקום פנוי שלילי; ההפסד ודאי מיד.
+        2. ‏`>` ולא `>=`, כי בתיקו ישראל מנצחת.
+
     === "SystemVerilog"
         ```systemverilog title="function israel_cannot_win" hl_lines="7 9"
         // True when the public points still to come cannot be shared among the countries
@@ -271,26 +287,37 @@ added: 2026-10-16
         2. ההשוואה היא `>` ולא `>=` : מילוי כוס בדיוק עד השפה הוא תיקו, ובתיקו ישראל מנצחת
            (ראו סעיף א). אם שובר השוויון היה הפוך, היה צריך להקטין כל כוס ב-1.
 
-    === "Python"
-        ```python title="israel_cannot_win" hl_lines="8 9"
-        def israel_cannot_win(israel_total, jury_above, points_left):
-            """True when the public points still to come cannot be shared among the countries
-            above Israel without at least one of them passing Israel's total."""
-            room = 0                                   # points they can take and stay <= Israel
-            for jury in jury_above:
-                if jury > israel_total:                # already ahead before any public points (1)
-                    return True
-                room += israel_total - jury
-            return points_left > room                  # pigeonhole: someone must pass Israel (2)
-        ```
-
-        1. מדינה שכבר מעל ישראל לא תורמת מקום פנוי שלילי; ההפסד ודאי מיד.
-        2. ‏`>` ולא `>=`, כי בתיקו ישראל מנצחת.
-
     **הסריקה על ההכרזות, גם היא \( O(k) \).** אפשר לקרוא לבדיקה מחדש אחרי כל הכרזה, אבל
     זה \( O(k^2) \). במקום זה מעדכנים את שני הסכומים : כשמדינה מקבלת `public` נקודות,
     הנקודות שנותרו יורדות ב-`public`, והמקום הפנוי יורד במקום של הכוס שלה, \( 343 - jury \).
     צריך לבדוק גם מקרה אחד נוסף : אם המדינה שהוכרזה עברה את ישראל, ההפסד ודאי.
+
+    === "Python"
+        ```python title="earliest_certain_loss" linenums="1" hl_lines="14 15 16"
+        def earliest_certain_loss(israel_total, above, points_left):
+            """above: (country, jury, public) for the countries ranked above Israel by the jury,
+            in announcement order. Returns how many of them had been announced when Israel's
+            loss became certain (0 = right after Israel's own turn), or None when Israel won."""
+            room = 0
+            for _, jury, _ in above:
+                if jury > israel_total:
+                    return 0
+                room += israel_total - jury
+            if points_left > room:   # (1)!
+                return 0
+
+            for k, (_, jury, public) in enumerate(above, start=1):
+                points_left -= public                  # this country got its public points,
+                room -= israel_total - jury            # so its room is no longer free (2)
+                if jury + public > israel_total or points_left > room:   # (3)!
+                    return k
+            return None                                # nobody passed Israel: Israel won
+        ```
+
+        1. הבדיקה ברגע אפס, לפני הסריקה.
+        2. יורדת הכוס כולה, לא רק הנקודות שהתקבלו בפועל.
+        3. שני התנאים : מדינה שעברה את ישראל, או יותר מים מנפח. כאן `enumerate` מתחיל מ-1,
+           ולכן `k` הוא כבר מספר ההכרזה.
 
     === "SystemVerilog"
         ```systemverilog title="function earliest_certain_loss" linenums="1" hl_lines="20 21 22"
@@ -330,33 +357,6 @@ added: 2026-10-16
            גם כשהחשבון של הנפח עדיין נראה בסדר, כי הנקודות העודפות שלה כבר לא "במים".
         4. ‏`k` מתחיל מ-0, והשאלה סופרת הכרזות, ולכן מחזירים `k + 1`. עבור נתוני 2026 צרפת
            היא `above[3]`, והתשובה 4.
-
-    === "Python"
-        ```python title="earliest_certain_loss" linenums="1" hl_lines="14 15 16"
-        def earliest_certain_loss(israel_total, above, points_left):
-            """above: (country, jury, public) for the countries ranked above Israel by the jury,
-            in announcement order. Returns how many of them had been announced when Israel's
-            loss became certain (0 = right after Israel's own turn), or None when Israel won."""
-            room = 0
-            for _, jury, _ in above:
-                if jury > israel_total:
-                    return 0
-                room += israel_total - jury
-            if points_left > room:   # (1)!
-                return 0
-
-            for k, (_, jury, public) in enumerate(above, start=1):
-                points_left -= public                  # this country got its public points,
-                room -= israel_total - jury            # so its room is no longer free (2)
-                if jury + public > israel_total or points_left > room:   # (3)!
-                    return k
-            return None                                # nobody passed Israel: Israel won
-        ```
-
-        1. הבדיקה ברגע אפס, לפני הסריקה.
-        2. יורדת הכוס כולה, לא רק הנקודות שהתקבלו בפועל.
-        3. שני התנאים : מדינה שעברה את ישראל, או יותר מים מנפח. כאן `enumerate` מתחיל מ-1,
-           ולכן `k` הוא כבר מספר ההכרזה.
 
     #### למה זה נכון { .sol-proof }
 

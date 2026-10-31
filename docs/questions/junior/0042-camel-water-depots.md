@@ -153,7 +153,7 @@ added: 2026-10-23
 
     <!-- gen 4 -->
 
-    <svg class="perf-chart" viewBox="0 0 640 250" role="img" aria-label="המים בתנועה לאורך הדרך : מ-450 ליטר ב-0 ל-30 ב-400 ק"מ, קטע לכל מחיר"><line class="grid" x1="46" x2="628" y1="210.0" y2="210.0"/><text class="tick" x="38" y="214.0" text-anchor="end">0</text><line class="grid" x1="46" x2="628" y1="145.3" y2="145.3"/><text class="tick" x="38" y="149.3" text-anchor="end">150</text><line class="grid" x1="46" x2="628" y1="80.7" y2="80.7"/><text class="tick" x="38" y="84.7" text-anchor="end">300</text><line class="grid" x1="46" x2="628" y1="16.0" y2="16.0"/><text class="tick" x="38" y="20.0" text-anchor="end">450</text><line class="grid" x1="133.3" x2="133.3" y1="10" y2="210" stroke-dasharray="4 4"/><text class="tick" x="133.3" y="228" text-anchor="middle"></text><line class="grid" x1="278.8" x2="278.8" y1="10" y2="210" stroke-dasharray="4 4"/><text class="tick" x="278.8" y="228" text-anchor="middle"></text><text class="tick" x="46.0" y="228" text-anchor="middle">0</text><text class="tick" x="133.3" y="228" text-anchor="middle">60</text><text class="tick" x="278.8" y="228" text-anchor="middle">160</text><text class="tick" x="628.0" y="228" text-anchor="middle">400</text><line class="ink-line" x1="46" x2="628" y1="197.1" y2="197.1" stroke-width="1.5" stroke-dasharray="6 4"/><text class="legend" x="624" y="191.1" text-anchor="end">30 ליטר מגיעים ליעד</text><polyline class="s1-line" points="46.0,16.0 133.3,80.7 278.8,145.3 628.0,197.1" fill="none" stroke-width="2.5"/><text class="legend" x="89.7" y="38.3" text-anchor="middle" direction="rtl">2.5 ליטר לק"מ</text><text class="legend" x="206.1" y="103.0" text-anchor="middle" direction="rtl">1.5 ליטר לק"מ</text><text class="legend" x="453.4" y="161.2" text-anchor="middle" direction="rtl">0.5 ליטר לק"מ</text><circle class="s2-dot" cx="133.3" cy="80.7" r="5"><title>עצירה ב-60 ק"מ : נשארו 300 ליטר, 2 מטענים</title></circle><circle class="s2-dot" cx="278.8" cy="145.3" r="5"><title>עצירה ב-160 ק"מ : נשארו 150 ליטר, 1 מטענים</title></circle><circle class="ink-dot" cx="628.0" cy="197.1" r="5"><title>היעד ב-400 ק"מ עם 30 ליטר</title></circle><line class="axis" x1="46" x2="628" y1="210" y2="210"/><text class="tick" x="38" y="228" text-anchor="end">ק"מ</text></svg>
+    <svg class="perf-chart" viewBox="0 0 640 250" role="img" aria-label="המים בתנועה לאורך הדרך : מ-450 ליטר ב-0 ל-30 ב-400 ק&quot;מ, קטע לכל מחיר"><line class="grid" x1="46" x2="628" y1="210.0" y2="210.0"/><text class="tick" x="38" y="214.0" text-anchor="end">0</text><line class="grid" x1="46" x2="628" y1="145.3" y2="145.3"/><text class="tick" x="38" y="149.3" text-anchor="end">150</text><line class="grid" x1="46" x2="628" y1="80.7" y2="80.7"/><text class="tick" x="38" y="84.7" text-anchor="end">300</text><line class="grid" x1="46" x2="628" y1="16.0" y2="16.0"/><text class="tick" x="38" y="20.0" text-anchor="end">450</text><line class="grid" x1="133.3" x2="133.3" y1="10" y2="210" stroke-dasharray="4 4"/><text class="tick" x="133.3" y="228" text-anchor="middle"></text><line class="grid" x1="278.8" x2="278.8" y1="10" y2="210" stroke-dasharray="4 4"/><text class="tick" x="278.8" y="228" text-anchor="middle"></text><text class="tick" x="46.0" y="228" text-anchor="middle">0</text><text class="tick" x="133.3" y="228" text-anchor="middle">60</text><text class="tick" x="278.8" y="228" text-anchor="middle">160</text><text class="tick" x="628.0" y="228" text-anchor="middle">400</text><line class="ink-line" x1="46" x2="628" y1="197.1" y2="197.1" stroke-width="1.5" stroke-dasharray="6 4"/><text class="legend" x="624" y="191.1" text-anchor="end">30 ליטר מגיעים ליעד</text><polyline class="s1-line" points="46.0,16.0 133.3,80.7 278.8,145.3 628.0,197.1" fill="none" stroke-width="2.5"/><text class="legend" x="89.7" y="38.3" text-anchor="middle" direction="rtl">2.5 ליטר לק"מ</text><text class="legend" x="206.1" y="103.0" text-anchor="middle" direction="rtl">1.5 ליטר לק"מ</text><text class="legend" x="453.4" y="161.2" text-anchor="middle" direction="rtl">0.5 ליטר לק"מ</text><circle class="s2-dot" cx="133.3" cy="80.7" r="5"><title>עצירה ב-60 ק"מ : נשארו 300 ליטר, 2 מטענים</title></circle><circle class="s2-dot" cx="278.8" cy="145.3" r="5"><title>עצירה ב-160 ק"מ : נשארו 150 ליטר, 1 מטענים</title></circle><circle class="ink-dot" cx="628.0" cy="197.1" r="5"><title>היעד ב-400 ק"מ עם 30 ליטר</title></circle><line class="axis" x1="46" x2="628" y1="210" y2="210"/><text class="tick" x="38" y="228" text-anchor="end">ק"מ</text></svg>
 
     <!-- /gen -->
 
@@ -253,68 +253,6 @@ added: 2026-10-23
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="camel_segments, camel_distance, camel_passes" linenums="1" hl_lines="13 16 17 39 40 41"
-        localparam int MAXS = 32;        // segments: at most one per load
-        localparam int MAXP = 1024;      // passes: MAXS squared
-
-        // The route as segments: the water in motion drops from w to every multiple of c above T
-        // and then to T; with j loads every km costs (2j - 1) a litres. Returns the segment count.
-        function automatic int camel_segments(real a, real c, real w, real T, output real x0[MAXS], output real x1[MAXS], output int loads[MAXS]);
-          real level[MAXS + 1];
-          real x = 0.0;
-          int k = int'($ceil(w / c)), m = 0, n = 0;
-          level[m] = w; m++;
-          for (int j = k - 1; j >= 1; j--) if (j * c > T) begin level[m] = j * c; m++; end
-          level[m] = T; m++;
-          for (int i = 0; i + 1 < m; i++) begin                            // (1)!
-            int j = int'($ceil(level[i] / c));
-            x0[n] = x;
-            x1[n] = x + (level[i] - level[i + 1]) / ((2 * j - 1) * a);     // (2)!
-            loads[n] = j;
-            x = x1[n]; n++;
-          end
-          return n;
-        endfunction
-
-        // The closed form for T <= c: (1/a) [c (1 + 1/3 + ... + 1/(2k - 3)) + r / (2k - 1) - T].
-        function automatic real camel_distance(real a, real c, real w, real T);
-          int k = int'($ceil(w / c));
-          real s = 0.0;
-          for (int j = 1; j < k; j++) s += 1.0 / (2 * j - 1);
-          return (c * s + (w - (k - 1) * c) / (2 * k - 1) - T) / a;
-        endfunction
-
-        // Every pass of the camel, full loads first and the partial load last: the segment, out or
-        // back, the litres when it leaves and when it arrives. depots[i] is the water at the start
-        // of segment i (depots[n] at the far end). Returns the number of passes.
-        function automatic int camel_passes(real a, real c, real w, real T, output int seg[MAXP], output bit back[MAXP], output real carry0[MAXP], output real carry1[MAXP], output real depots[MAXS + 1]);
-          real x0[MAXS], x1[MAXS];
-          int loads[MAXS];
-          int n = camel_segments(a, c, w, T, x0, x1, loads), p = 0;
-          foreach (depots[i]) depots[i] = 0.0;
-          depots[0] = w;
-          for (int s = 0; s < n; s++) begin
-            real cost = a * (x1[s] - x0[s]);
-            for (int i = 0; i < loads[s]; i++) begin
-              real take = (depots[s] < c) ? depots[s] : c;                  // (3)!
-              real keep = (i == loads[s] - 1) ? 0.0 : cost;                 // (4)!
-              depots[s] -= take;
-              depots[s + 1] += take - cost - keep;                           // (5)!
-              seg[p] = s; back[p] = 0; carry0[p] = take; carry1[p] = take - cost; p++;
-              if (keep > 0.0) begin seg[p] = s; back[p] = 1; carry0[p] = keep; carry1[p] = 0.0; p++; end
-            end
-          end
-          return p;
-        endfunction
-        ```
-
-        1. קטע לכל זוג רמות סמוכות; עם \( w \le c \) יש רמה אחת בלבד מעל \( T \), וקטע אחד.
-        2. אורך הקטע : הירידה במים חלקי המחיר של המטענים שבו.
-        3. מטען מלא כל עוד יש, והשארית בהליכה האחרונה.
-        4. בהליכה שאינה האחרונה הגמל שומר בדיוק את מה שהדרך חזרה שורפת.
-        5. מה שנשאר אחרי השריפה והשמירה יורד במחסן הרחוק; בסוף הקטע הוא מסתכם ברמה הבאה.
-
     === "Python"
         ```python title="camel_segments, camel_distance, camel_passes, camel_check" linenums="1" hl_lines="8 15 36 37 38"
         from math import ceil
@@ -378,6 +316,68 @@ added: 2026-10-23
         ```
 
         1. הרמות : \( w \), הכפולות של \( c \) שמעל \( T \) ומתחת ל-\( w \), ו-\( T \).
+        2. אורך הקטע : הירידה במים חלקי המחיר של המטענים שבו.
+        3. מטען מלא כל עוד יש, והשארית בהליכה האחרונה.
+        4. בהליכה שאינה האחרונה הגמל שומר בדיוק את מה שהדרך חזרה שורפת.
+        5. מה שנשאר אחרי השריפה והשמירה יורד במחסן הרחוק; בסוף הקטע הוא מסתכם ברמה הבאה.
+
+    === "SystemVerilog"
+        ```systemverilog title="camel_segments, camel_distance, camel_passes" linenums="1" hl_lines="13 16 17 39 40 41"
+        localparam int MAXS = 32;        // segments: at most one per load
+        localparam int MAXP = 1024;      // passes: MAXS squared
+
+        // The route as segments: the water in motion drops from w to every multiple of c above T
+        // and then to T; with j loads every km costs (2j - 1) a litres. Returns the segment count.
+        function automatic int camel_segments(real a, real c, real w, real T, output real x0[MAXS], output real x1[MAXS], output int loads[MAXS]);
+          real level[MAXS + 1];
+          real x = 0.0;
+          int k = int'($ceil(w / c)), m = 0, n = 0;
+          level[m] = w; m++;
+          for (int j = k - 1; j >= 1; j--) if (j * c > T) begin level[m] = j * c; m++; end
+          level[m] = T; m++;
+          for (int i = 0; i + 1 < m; i++) begin                            // (1)!
+            int j = int'($ceil(level[i] / c));
+            x0[n] = x;
+            x1[n] = x + (level[i] - level[i + 1]) / ((2 * j - 1) * a);     // (2)!
+            loads[n] = j;
+            x = x1[n]; n++;
+          end
+          return n;
+        endfunction
+
+        // The closed form for T <= c: (1/a) [c (1 + 1/3 + ... + 1/(2k - 3)) + r / (2k - 1) - T].
+        function automatic real camel_distance(real a, real c, real w, real T);
+          int k = int'($ceil(w / c));
+          real s = 0.0;
+          for (int j = 1; j < k; j++) s += 1.0 / (2 * j - 1);
+          return (c * s + (w - (k - 1) * c) / (2 * k - 1) - T) / a;
+        endfunction
+
+        // Every pass of the camel, full loads first and the partial load last: the segment, out or
+        // back, the litres when it leaves and when it arrives. depots[i] is the water at the start
+        // of segment i (depots[n] at the far end). Returns the number of passes.
+        function automatic int camel_passes(real a, real c, real w, real T, output int seg[MAXP], output bit back[MAXP], output real carry0[MAXP], output real carry1[MAXP], output real depots[MAXS + 1]);
+          real x0[MAXS], x1[MAXS];
+          int loads[MAXS];
+          int n = camel_segments(a, c, w, T, x0, x1, loads), p = 0;
+          foreach (depots[i]) depots[i] = 0.0;
+          depots[0] = w;
+          for (int s = 0; s < n; s++) begin
+            real cost = a * (x1[s] - x0[s]);
+            for (int i = 0; i < loads[s]; i++) begin
+              real take = (depots[s] < c) ? depots[s] : c;                  // (3)!
+              real keep = (i == loads[s] - 1) ? 0.0 : cost;                 // (4)!
+              depots[s] -= take;
+              depots[s + 1] += take - cost - keep;                           // (5)!
+              seg[p] = s; back[p] = 0; carry0[p] = take; carry1[p] = take - cost; p++;
+              if (keep > 0.0) begin seg[p] = s; back[p] = 1; carry0[p] = keep; carry1[p] = 0.0; p++; end
+            end
+          end
+          return p;
+        endfunction
+        ```
+
+        1. קטע לכל זוג רמות סמוכות; עם \( w \le c \) יש רמה אחת בלבד מעל \( T \), וקטע אחד.
         2. אורך הקטע : הירידה במים חלקי המחיר של המטענים שבו.
         3. מטען מלא כל עוד יש, והשארית בהליכה האחרונה.
         4. בהליכה שאינה האחרונה הגמל שומר בדיוק את מה שהדרך חזרה שורפת.
@@ -535,13 +535,13 @@ added: 2026-10-23
 
     | מים בהתחלה w | מטענים n = w / c | המרחק המדויק | הקירוב | ההפרש |
     |:-:|:-:|:-:|:-:|:-:|
-    | ‏150 | ‏1 | ‏240 | ‏234.5 | ‏+5.47 |
-    | ‏300 | ‏2 | ‏340 | ‏338.5 | ‏+1.50 |
-    | ‏450 | ‏3 | ‏400 | ‏399.3 | ‏+0.68 |
-    | ‏750 | ‏5 | ‏476.2 | ‏475.9 | ‏+0.25 |
-    | ‏1,500 | ‏10 | ‏580.0 | ‏579.9 | ‏+0.06 |
-    | ‏3,000 | ‏20 | ‏683.9 | ‏683.9 | ‏+0.02 |
-    | ‏15,000 | ‏100 | ‏925.3 | ‏925.3 | ‏+0.00 |
+    | ‏150 | ‏1 | ‏240 | ‏234.5 | ‏<span dir="ltr">+5.47</span> |
+    | ‏300 | ‏2 | ‏340 | ‏338.5 | ‏<span dir="ltr">+1.50</span> |
+    | ‏450 | ‏3 | ‏400 | ‏399.3 | ‏<span dir="ltr">+0.68</span> |
+    | ‏750 | ‏5 | ‏476.2 | ‏475.9 | ‏<span dir="ltr">+0.25</span> |
+    | ‏1,500 | ‏10 | ‏580.0 | ‏579.9 | ‏<span dir="ltr">+0.06</span> |
+    | ‏3,000 | ‏20 | ‏683.9 | ‏683.9 | ‏<span dir="ltr">+0.02</span> |
+    | ‏15,000 | ‏100 | ‏925.3 | ‏925.3 | ‏<span dir="ltr">+0.00</span> |
 
     <!-- /gen -->
 

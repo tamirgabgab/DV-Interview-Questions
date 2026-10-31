@@ -1,6 +1,6 @@
 // kinds: mtbf metamc
 //   mtbf                   0037        clock and data rates, tau, T0 and overhead: the MTBF of one to three flops
-//   metamc                 0037        part a by Monte Carlo: data edges folded onto one clock period with the T0 window, the settling times of those inside it against the exponential, and the t_res cut that each flop moves by T_clk
+//   metamc                 0037        part a by Monte Carlo: data edges folded onto one clock period with the T0 window, the share of those inside it still unsettled after a time t on a log scale against the line e^(-t/tau), and the t_res cut that each flop moves by T_clk
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -99,8 +99,8 @@
 
   // The Monte Carlo box (0037 part a): tau, T0 and the number of flops, the page's clock,
   // data rate and overhead; 100 or 1,000 seeded data edges folded onto one clock period
-  // with the window shaded, a histogram of the settling times of the edges inside it
-  // against the exponential, the cut at t_res (one T_clk further per flop) with the edges
+  // with the window shaded, the share of the edges inside it still unsettled after a time
+  // t (log scale) against the line exp(−t / tau), the cut at t_res (one T_clk further per flop) with the edges
   // beyond it, and the two factors measured against the formula.
   const FCLK = 500, FDATA = 50, OVER = 0.3;
   const metamcView = () => ({
@@ -116,7 +116,7 @@
         `<button type="button" class="md-button md-button--primary mc-1000">${ltr("1,000")} קצוות</button></div>` +
         `<p class="ex-title mc-t1"></p><div class="mc-phase"></div>` +
         `<p class="ex-title mc-t2"></p><div class="mc-hist"></div>` +
-        `<span class="viz-legend"><span><i class="mc-key-in"></i>נפל בחלון, metastable</span><span><i class="mc-key-out"></i>נפל מחוץ לחלון</span><span><i class="ink"></i>הצפוי לפי ${ltr("e<sup>−t/τ</sup>")}</span><span><i class="mc-key-cut"></i>מעבר ל-${ltr("t_res")} : כשל</span></span>` +
+        `<span class="viz-legend"><span><i class="mc-key-in"></i>נפל בחלון, metastable</span><span><i class="mc-key-out"></i>נפל מחוץ לחלון</span><span><i class="s1"></i>בהגרלה : החלק שעוד לא התייצב</span><span><i class="ink"></i>הצפוי לפי ${ltr("e<sup>−t/τ</sup>")}</span><span><i class="mc-key-cut"></i>מעבר ל-${ltr("t_res")} : כשל</span></span>` +
         `<div class="mc-table"></div><p class="ex-summary mc-sum" aria-live="polite"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const hash = (i) => ((i * 0.6180339887) % 1);
@@ -143,22 +143,36 @@
         s += `<text class="tick" x="${f(XZ(0))}" y="${ZY1 + 18}" text-anchor="middle">±${Math.round(st.t0 / 2)} ps</text>`;
         return s + "</svg>";
       };
-      const histSvg = (d, r) => {
-        const W = 640, H = 240, X0 = 44, X1 = 620, Y0 = 16, Y1 = 200, tRes = r.tRes;
-        const xmax = Math.max(tRes * 1.08, 6 * st.tau), B = 40, bw = xmax / B, k = d.settle.length;
-        const counts = new Array(B).fill(0);
-        d.settle.forEach((t) => { if (t < xmax) counts[Math.floor(t / bw)]++; });
-        const expect = Array.from({ length: B }, (_, b) => k * (Math.exp(-(b * bw) / st.tau) - Math.exp(-((b + 1) * bw) / st.tau)));
-        const top = Math.max(1, ...counts, ...expect) * 1.1, X = (t) => X0 + (t / xmax) * (X1 - X0), Y = (v) => Y1 - (v / top) * (Y1 - Y0);
-        let s = `<svg class="perf-chart mc-histsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="היסטוגרמה של זמני ההתייצבות של ${k} הקצוות שנפלו בחלון, והחתך t_res">`;
-        const step = top > 40 ? 10 : top > 16 ? 5 : top > 6 ? 2 : 1;
-        for (let v = 0; v <= top; v += step) s += `<line class="grid" x1="${X0}" x2="${X1}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 6}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`;
+      // the settling times of the edges inside the window as the share still unsettled after
+      // a time t, on a log scale: the draw follows the straight line e^(−t/τ) down to about
+      // 1/k, and the same line carried on to the cut gives e^(−t_res/τ), far below what any
+      // draw can reach (the tail is extrapolated, as when tau is measured on silicon)
+      const survSvg = (d, r) => {
+        const W = 640, H = 240, X0 = 52, X1 = 620, Y0 = 16, Y1 = 200, tRes = r.tRes, k = d.settle.length;
+        const xmax = Math.max(tRes * 1.08, 6 * st.tau), lStay = -tRes / st.tau / Math.LN10;
+        const eMin = Math.max(-40, Math.min(-2, Math.floor(Math.min(lStay, k ? -Math.log10(k) : 0)) - 1));
+        const X = (t) => X0 + (Math.min(t, xmax) / xmax) * (X1 - X0), Y = (l) => Y0 + (Math.max(l, eMin) / eMin) * (Y1 - Y0);
+        let s = `<svg class="perf-chart mc-survsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="החלק מ-${k} הקצוות שבחלון שעוד לא התייצב אחרי זמן t, בסקאלה לוגריתמית, מול e^(−t/τ) והחתך t_res">`;
+        const step = [1, 2, 5, 10].find((v) => -eMin / v <= 6) || 10;
+        for (let e = 0; e >= eMin; e -= step) s += `<line class="grid" x1="${X0}" x2="${X1}" y1="${f(Y(e))}" y2="${f(Y(e))}"/><text class="tick" x="${X0 - 6}" y="${f(Y(e) + 4)}" text-anchor="end">10<tspan dy="-6" font-size="9">${e}</tspan></text>`;
         if (tRes < xmax) s += `<rect class="mc-fail" x="${f(X(tRes))}" y="${Y0}" width="${f(X1 - X(tRes))}" height="${Y1 - Y0}"/>`;
-        counts.forEach((c, b) => { if (c) s += `<rect class="bar by-multiples" x="${f(X(b * bw) + 0.5)}" y="${f(Y(c))}" width="${f(Math.max(1, X(bw) - X0 - 1))}" height="${f(Y1 - Y(c))}"><title>${fmt(b * bw / 1000, 2)}–${fmt((b + 1) * bw / 1000, 2)} ns : ${c}</title></rect>`; });
-        s += `<polyline class="ink-line" fill="none" stroke-width="1.8" points="${expect.map((v, b) => `${f(X((b + 0.5) * bw))},${f(Y(v))}`).join(" ")}"/>`;
-        // the edges that did not settle by t_res, as marks on the axis
-        d.settle.forEach((t) => { if (t >= tRes) s += `<circle class="mc-failed" cx="${f(X(Math.min(t, xmax)))}" cy="${Y1}" r="5"><title>${fmt(t / 1000, 2)} ns, אחרי t_res</title></circle>`; });
-        s += `<line class="mc-cut" x1="${f(X(Math.min(tRes, xmax)))}" x2="${f(X(Math.min(tRes, xmax)))}" y1="${Y0 - 4}" y2="${Y1}"/><text class="legend halo" x="${f(X(Math.min(tRes, xmax)) - 5)}" y="${Y0 + 10}" text-anchor="end">t_res = ${fmt(tRes / 1000, 2)} ns</text>`;
+        const tEnd = Math.min(xmax, -eMin * Math.LN10 * st.tau);
+        s += `<line class="ink-line" x1="${X0}" y1="${f(Y(0))}" x2="${f(X(tEnd))}" y2="${f(Y(-tEnd / st.tau / Math.LN10))}" stroke-width="1.8"/>`;
+        // the measured share: a step down by 1/k at every settling time, up to the last one
+        const sorted = [...d.settle].sort((a, b) => a - b), pts = [`${X0},${f(Y(0))}`], late = [];
+        sorted.forEach((t, i) => {
+          const lv = Math.log10((k - i) / k);
+          pts.push(`${f(X(t))},${f(Y(lv))}`);
+          if (i < k - 1) pts.push(`${f(X(t))},${f(Y(Math.log10((k - i - 1) / k)))}`);
+          if (t >= tRes) late.push([t, lv]);
+        });
+        if (k) s += `<polyline class="s1-line" fill="none" stroke-width="2" points="${pts.join(" ")}"/>`;
+        late.forEach(([t, lv]) => { s += `<circle class="mc-failed" cx="${f(X(t))}" cy="${f(Y(lv))}" r="4.5"><title>${fmt(t / 1000, 2)} ns, אחרי t_res</title></circle>`; });
+        // the extrapolated point on the cut, labelled under the line (which comes down from the left)
+        const xc = f(X(tRes)), yc = f(Y(lStay));
+        s += `<line class="mc-cut" x1="${xc}" x2="${xc}" y1="${Y0 - 4}" y2="${Y1}"/><text class="legend halo" x="${f(X(tRes) - 5)}" y="${Y0 + 10}" text-anchor="end">t_res = ${fmt(tRes / 1000, 2)} ns</text>`;
+        s += `<circle class="s2-dot" cx="${xc}" cy="${yc}" r="5"><title>e^(−t_res/τ) = ${sci(r.pStay)}</title></circle>` +
+          `<text class="legend halo" x="${f(X(tRes) - 8)}" y="${f(lStay < eMin ? Y1 - 8 : Y(lStay) + 15)}" text-anchor="end">${lStay < eMin ? "↓ " : ""}e<tspan dy="-6" font-size="10">−t_res/τ</tspan><tspan dy="6"> = ${sci(r.pStay).replace(/<sup>(.*)<\/sup>/, '<tspan dy="-6" font-size="10">$1</tspan>')}</tspan></text>`;
         for (let b = 0; b <= 4; b++) { const t = (b * xmax) / 4; s += `<text class="tick" x="${f(X(t))}" y="${Y1 + 18}" text-anchor="${b === 4 ? "end" : "middle"}">${fmt(t / 1000, 2)} ns</text>`; }
         return s + `<line class="axis" x1="${X0}" x2="${X1}" y1="${Y1}" y2="${Y1}"/></svg>`;
       };
@@ -170,14 +184,14 @@
         $(".mc-t0").value = st.t0; $(".mc-out-t0").textContent = String(st.t0); $(".mc-flops").value = String(st.flops);
         $(".mc-t1").innerHTML = `הגרלה של ${ltr(n.toLocaleString("en-US"))} קצוות של הנתונים, כל אחד במקום שלו ביחס לשפת השעון הקרובה (מחזור של ${ltr(`${fmt(r.T / 1000, 1)} ns`)}), ובאמצע החלון של ${ltr(`T0 = ${st.t0} ps`)}`;
         $(".mc-phase").innerHTML = phaseSvg(r.T, d);
-        $(".mc-t2").innerHTML = `כמה זמן לקח ל-${ltr(k)} הקצוות שבחלון להתייצב, מול ${ltr(`t_res = ${st.flops} · ${fmt(r.T / 1000, 1)} − ${OVER} = ${fmt(r.tRes / 1000, 2)} ns`)}`;
-        $(".mc-hist").innerHTML = histSvg(d, r);
+        $(".mc-t2").innerHTML = `איזה חלק מ-${ltr(k)} הקצוות שבחלון עוד לא התייצב אחרי זמן t, בסקאלה לוגריתמית, מול ${ltr(`t_res = ${st.flops} · ${fmt(r.T / 1000, 1)} − ${OVER} = ${fmt(r.tRes / 1000, 2)} ns`)}`;
+        $(".mc-hist").innerHTML = survSvg(d, r);
         $(".mc-table").innerHTML = `<table class="bridge-table mc-factors"><thead><tr><th>הגורם</th><th>בהגרלה</th><th>בנוסחה</th></tr></thead><tbody>` +
           `<tr><td>חלק הקצוות שנופלים בחלון</td><td data-label="בהגרלה">${ltr(`${k}/${n} = ${fmt(k / n, 4)}`)}</td><td data-label="בנוסחה">${ltr(`T0 · f_clk = ${fmt(r.pEnter, 4)}`)}</td></tr>` +
           `<tr><td>מהם, חלק שלא התייצב עד ${ltr("t_res")}</td><td data-label="בהגרלה">${ltr(k ? `${late}/${k}` : "—")}</td><td data-label="בנוסחה">${ltr(`e<sup>−t_res/τ</sup> = ${sci(r.pStay)}`)}</td></tr>` +
           `<tr><td>כניסות ל-metastability בשנייה</td><td data-label="בהגרלה">${ltr(sci((k / n) * FDATA * 1e6))}</td><td data-label="בנוסחה">${ltr(`T0 · f_clk · f_data = ${sci(r.enterPerSec)}`)}</td></tr></tbody></table>`;
         $(".mc-sum").innerHTML = `ה-MTBF הוא ההופכי של המכפלה${NB}: ${ltr(`1 / (${sci(r.enterPerSec)} · ${sci(r.pStay)})`)}, כלומר ${mtbfHuman(r.mtbf)}. ` +
-          (late ? `בהגרלה הזו ${ltr(late)} ${late === 1 ? "קצה לא התייצב" : "קצוות לא התייצבו"} בזמן, והם הכשלים.` : `אף קצה בהגרלה לא עבר את החתך, כי הזנב המעריכי דועך מהר.`) +
+          (late ? `בהגרלה הזו ${ltr(late)} ${late === 1 ? "קצה לא התייצב" : "קצוות לא התייצבו"} בזמן, והם הכשלים.` : `אף קצה בהגרלה לא עבר את החתך : ההגרלה רואה את הזנב רק עד חלק של בערך ${ltr(`1/${k || 1}`)}, ואת ההמשך עד ${ltr("t_res")} נותן הקו הישר ${ltr("e<sup>−t/τ</sup>")} בסקאלה הלוגריתמית.`) +
           ` כל פלופ נוסף מזיז את החתך ב-${ltr(`T_clk = ${fmt(r.T / 1000, 1)} ns`)} ימינה, ומכפיל את ה-MTBF ב-${ltr(`e<sup>T_clk/τ</sup> = ${sci(Math.exp(r.T / st.tau))}`)}.`;
       };
       const redraw = () => { st.draw = metaDraw(st.count, 1e6 / FCLK, st.t0, st.tau, st.rnd()); draw(); };
@@ -197,7 +211,7 @@
     views: { mtbf: mtbfView, metamc: metamcView },
     help: {
       mtbf: "תדר השעון והנתונים, tau, T0 ו-overhead : התיבה מחשבת את ה-MTBF של פלופ אחד עד שלושה ביחידות קריאות, ומציירת אותו כנגד תדר השעון.",
-      metamc: "״100 קצוות״ ו״1,000 קצוות״ מגרילים קצוות של הנתונים : למעלה כל קצה במקומו ביחס לשפת השעון, ומי שנפל בחלון T0 נכנס ל-metastability. למטה זמני ההתייצבות שלהם מול הזנב המעריכי, והחתך t_res, שכל פלופ מזיז ב-T_clk. ‏τ ו-T0 בסליידרים.",
+      metamc: "״100 קצוות״ ו״1,000 קצוות״ מגרילים קצוות של הנתונים : למעלה כל קצה במקומו ביחס לשפת השעון, ומי שנפל בחלון T0 נכנס ל-metastability. למטה החלק מהם שעוד לא התייצב אחרי זמן t, בסקאלה לוגריתמית, מול הקו הישר e^(−t/τ), והחתך t_res, שכל פלופ מזיז ב-T_clk. ‏τ ו-T0 בסליידרים.",
     },
     models: { mtbfSeconds, mtbfHuman, metaDraw, metaFactors },
   });

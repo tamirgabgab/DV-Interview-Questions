@@ -67,7 +67,7 @@ def test_images_table():
     assert f == {"bottom": (1, 6, 0, 12), "sideB": (6, 13, 12, 24), "top": (11, 30, 24, 36), "side0": (6, 47, 36, 48)}
     assert q0030.period() == 48
     rows = q0030.images_table().splitlines()[2:]
-    assert rows[2] == "| ‏S | ‏top | ‏1 | ‏−1 | ‏30 | ‏24 עד 36 |" and rows[4] == "| ‏F | ‏bottom | ‏1 | ‏31 | ‏6 | ‏0 עד 12 |"
+    assert rows[2] == "| ‏S | ‏top | ‏1 | ‏<span dir=\"ltr\">−1</span> | ‏30 | ‏24 עד 36 |" and rows[4] == "| ‏F | ‏bottom | ‏1 | ‏31 | ‏6 | ‏0 עד 12 |"
     # the page's worked example of the two tests
     assert Fr(30) - 24 * Fr(1, 32) == Fr(117, 4) == 29.25 and Fr(30) - 24 * Fr(31, 32) == Fr(27, 4)
     assert 12 - (29.25 - 24) == 6.75

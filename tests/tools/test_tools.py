@@ -50,6 +50,7 @@ def test_new_question_with_figures_and_code(tmp_path):
 
 def test_catalog_is_up_to_date():
     assert (ROOT / "CATALOG.md").read_text(encoding="utf-8") == catalog.render(ROOT), "run python tools/catalog.py"
+    assert (ROOT / "README.md").read_text(encoding="utf-8") == catalog.render_readme(ROOT), "run python tools/catalog.py"
 
 
 def test_new_question_refuses_to_overwrite(tmp_path):

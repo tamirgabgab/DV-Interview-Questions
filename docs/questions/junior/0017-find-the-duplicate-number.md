@@ -58,6 +58,19 @@ added: 2026-10-18
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="find_duplicate_sort" linenums="1" hl_lines="2 4"
+        def find_duplicate_sort(nums: list[int]) -> int:
+            s = sorted(nums)   # (1)!
+            for i in range(1, len(s)):
+                if s[i] == s[i - 1]:   # equal neighbours: a duplicate
+                    return s[i]
+            return -1   # never reached for a valid input
+        ```
+
+        1. ‏`sorted` מחזיר רשימה חדשה ולא נוגע ב-`nums`. ‏`nums.sort()` היה ממיין במקום, בלי
+           זיכרון נוסף, אבל משנה את הקלט של מי שקרא לפונקציה.
+
     === "SystemVerilog"
         ```systemverilog title="function find_duplicate_sort" linenums="1" hl_lines="2 5"
         function automatic int find_duplicate_sort(const ref int nums[]);   // (1)!
@@ -73,19 +86,6 @@ added: 2026-10-18
            ל-`nums` היא שגיאת קומפילציה. כל ארבעת הפתרונות מקבלים את הקלט כך.
         2. ‏`s.sort()` ממיין במקום. בגלל `const ref` אי אפשר למיין את `nums` עצמו, ולכן ממיינים
            עותק, וזה הזיכרון הנוסף של \( O(n) \).
-
-    === "Python"
-        ```python title="find_duplicate_sort" linenums="1" hl_lines="2 4"
-        def find_duplicate_sort(nums: list[int]) -> int:
-            s = sorted(nums)   # (1)!
-            for i in range(1, len(s)):
-                if s[i] == s[i - 1]:   # equal neighbours: a duplicate
-                    return s[i]
-            return -1   # never reached for a valid input
-        ```
-
-        1. ‏`sorted` מחזיר רשימה חדשה ולא נוגע ב-`nums`. ‏`nums.sort()` היה ממיין במקום, בלי
-           זיכרון נוסף, אבל משנה את הקלט של מי שקרא לפונקציה.
 
     #### סיבוכיות { .sol-cost }
 
@@ -106,6 +106,20 @@ added: 2026-10-18
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="find_duplicate_seen" linenums="1" hl_lines="4"
+        def find_duplicate_seen(nums: list[int]) -> int:
+            seen = [False] * len(nums)   # (1)!
+            for v in nums:
+                if seen[v]:              # the second time we meet this value
+                    return v
+                seen[v] = True
+            return -1
+        ```
+
+        1. אפשר גם `set()`, אבל רשימה באורך \( n + 1 \) מראה שהזיכרון הוא בדיוק ביט, או בית,
+           לכל ערך אפשרי.
+
     === "SystemVerilog"
         ```systemverilog title="function find_duplicate_seen" linenums="1" hl_lines="4"
         function automatic int find_duplicate_seen(const ref int nums[]);
@@ -120,20 +134,6 @@ added: 2026-10-18
 
         1. ‏\( n + 1 \) משבצות, באינדקסים 0 עד \( n \), בדיוק כמו גודל הקלט. ערך תמיד בין 1
            ל-\( n \), ולכן `seen[0]` לא בשימוש וכל גישה חוקית.
-
-    === "Python"
-        ```python title="find_duplicate_seen" linenums="1" hl_lines="4"
-        def find_duplicate_seen(nums: list[int]) -> int:
-            seen = [False] * len(nums)   # (1)!
-            for v in nums:
-                if seen[v]:              # the second time we meet this value
-                    return v
-                seen[v] = True
-            return -1
-        ```
-
-        1. אפשר גם `set()`, אבל רשימה באורך \( n + 1 \) מראה שהזיכרון הוא בדיוק ביט, או בית,
-           לכל ערך אפשרי.
 
     #### סיבוכיות { .sol-cost }
 
@@ -187,6 +187,22 @@ added: 2026-10-18
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="find_duplicate_binary" linenums="1" hl_lines="5 6"
+        def find_duplicate_binary(nums: list[int]) -> int:
+            lo, hi = 1, len(nums) - 1          # the answer is a value in lo..hi
+            while lo < hi:
+                mid = (lo + hi) // 2
+                count = sum(1 for v in nums if v <= mid)   # (1)!
+                if count > mid:
+                    hi = mid
+                else:
+                    lo = mid + 1
+            return lo
+        ```
+
+        1. ביטוי generator שסופר בלי לבנות רשימה, ולכן הזיכרון נשאר \( O(1) \).
+
     === "SystemVerilog"
         ```systemverilog title="function find_duplicate_binary" linenums="1" hl_lines="7 8"
         function automatic int find_duplicate_binary(const ref int nums[]);
@@ -205,22 +221,6 @@ added: 2026-10-18
         1. יותר מ-\( mid \) מספרים בתוך \( mid \) ערכים : לפי עקרון שובך היונים יש כפול בין 1
            ל-\( mid \). חשוב : סופרים את **כל** המספרים שקטנים או שווים ל-\( mid \), ולא רק
            את אלה שבטווח \( lo..mid \).
-
-    === "Python"
-        ```python title="find_duplicate_binary" linenums="1" hl_lines="5 6"
-        def find_duplicate_binary(nums: list[int]) -> int:
-            lo, hi = 1, len(nums) - 1          # the answer is a value in lo..hi
-            while lo < hi:
-                mid = (lo + hi) // 2
-                count = sum(1 for v in nums if v <= mid)   # (1)!
-                if count > mid:
-                    hi = mid
-                else:
-                    lo = mid + 1
-            return lo
-        ```
-
-        1. ביטוי generator שסופר בלי לבנות רשימה, ולכן הזיכרון נשאר \( O(1) \).
 
     #### למה זה נכון { .sol-proof }
 
@@ -294,6 +294,25 @@ added: 2026-10-18
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="find_duplicate_floyd" linenums="1" hl_lines="5 10 11"
+        def find_duplicate_floyd(nums: list[int]) -> int:
+            slow = fast = 0
+            while True:                   # phase 1: meet inside the cycle (1)
+                slow = nums[slow]
+                fast = nums[nums[fast]]   # two steps
+                if slow == fast:
+                    break
+            slow = 0                      # phase 2: back to the start, one step each
+            while slow != fast:
+                slow = nums[slow]
+                fast = nums[fast]
+            return slow                   # the entry of the cycle = the duplicate value
+        ```
+
+        1. ל-Python אין `do ... while`, ולכן `while True` עם `break` אחרי הצעד : גם כאן הצעד
+           הראשון קורה לפני הבדיקה, כי בהתחלה שניהם ב-0.
+
     === "SystemVerilog"
         ```systemverilog title="function find_duplicate_floyd" linenums="1" hl_lines="5 9 10"
         function automatic int find_duplicate_floyd(const ref int nums[]);
@@ -315,25 +334,6 @@ added: 2026-10-18
            ולולאת `while` רגילה לא הייתה נכנסת בכלל.
         2. שלב 2 : הצב חוזר להתחלה, הארנב נשאר בנקודת המפגש, ומעכשיו שניהם צועדים צעד אחד. הם
            נפגשים בדיוק בכניסה למעגל, וההוכחה למטה.
-
-    === "Python"
-        ```python title="find_duplicate_floyd" linenums="1" hl_lines="5 10 11"
-        def find_duplicate_floyd(nums: list[int]) -> int:
-            slow = fast = 0
-            while True:                   # phase 1: meet inside the cycle (1)
-                slow = nums[slow]
-                fast = nums[nums[fast]]   # two steps
-                if slow == fast:
-                    break
-            slow = 0                      # phase 2: back to the start, one step each
-            while slow != fast:
-                slow = nums[slow]
-                fast = nums[fast]
-            return slow                   # the entry of the cycle = the duplicate value
-        ```
-
-        1. ל-Python אין `do ... while`, ולכן `while True` עם `break` אחרי הצעד : גם כאן הצעד
-           הראשון קורה לפני הבדיקה, כי בהתחלה שניהם ב-0.
 
     #### למה זה נכון { .sol-proof }
 

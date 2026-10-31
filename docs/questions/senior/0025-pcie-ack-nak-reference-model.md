@@ -41,6 +41,35 @@ added: 2026-10-19
 ‏Flow Control, ‏Nullified TLPs או LTSSM. המודל מוציא פקטים לתור שידור (`tx_tlps`, ‏`tx_dllps`)
 שהסביבה מרוקנת אל הקישור. מחלקות הפקטים נתונות :
 
+=== "Python"
+    ```python title="given classes"
+    import random
+    from dataclasses import dataclass, replace
+    from enum import Enum
+
+    SEQ_MOD = 4096                   # Sequence Numbers are 12 bits wide and wrap
+
+
+    class DllpKind(Enum):
+        ACK = "ACK"
+        NAK = "NAK"
+
+
+    @dataclass
+    class Tlp:
+        payload: int
+        seq: int = 0
+        crc_ok: bool = True          # stands in for the LCRC check
+        is_replay: bool = False
+
+
+    @dataclass
+    class Dllp:
+        kind: DllpKind
+        seq: int                     # AckNak_Seq_Num: everything through seq arrived
+        crc_ok: bool = True
+    ```
+
 === "SystemVerilog"
     ```systemverilog title="given classes"
     typedef bit [11:0] seq_t;                  // Sequence Numbers are 12 bits wide and wrap
@@ -73,35 +102,6 @@ added: 2026-10-19
         this.crc_ok = crc_ok;
       endfunction
     endclass
-    ```
-
-=== "Python"
-    ```python title="given classes"
-    import random
-    from dataclasses import dataclass, replace
-    from enum import Enum
-
-    SEQ_MOD = 4096                   # Sequence Numbers are 12 bits wide and wrap
-
-
-    class DllpKind(Enum):
-        ACK = "ACK"
-        NAK = "NAK"
-
-
-    @dataclass
-    class Tlp:
-        payload: int
-        seq: int = 0
-        crc_ok: bool = True          # stands in for the LCRC check
-        is_replay: bool = False
-
-
-    @dataclass
-    class Dllp:
-        kind: DllpKind
-        seq: int                     # AckNak_Seq_Num: everything through seq arrived
-        crc_ok: bool = True
     ```
 
 ??? interviewer "מה המראיין בודק"
@@ -205,6 +205,106 @@ added: 2026-10-19
     שתי מחלקות קטנות. הפונקציות שסעיף ב ירחיב (`receive_dllp` ו-`receive_tlp`) מוגדרות
     כ-virtual, ושני צעדי העבודה שלהן (`purge_through` ו-`accept`) נפרדים כדי שסעיף ב יוכל
     להשתמש בהם כפי שהם. ב-Python המקבל מקבל `random.Random`, כדי שבדיקה תוכל לקבע seed.
+
+    === "Python"
+        ```python title="DllTransmitter, DllReceiver" linenums="1" hl_lines="17 18 19 30 31 51 64 65 66 67 84"
+        class DllTransmitter:
+            """The transmit side of a Data Link Layer: numbers the TLPs and keeps every one of
+            them until the other side acknowledges it."""
+
+            def __init__(self, start_seq: int = 0):
+                self.next_transmit_seq = start_seq % SEQ_MOD      # NEXT_TRANSMIT_SEQ
+                self.ackd_seq = (start_seq - 1) % SEQ_MOD         # ACKD_SEQ: 4095 before the first TLP  (1)
+                self.retry_buffer: list[Tlp] = []                 # transmitted, not yet acknowledged, in order
+                self.tx_tlps: list[Tlp] = []                      # what went to the link, in order
+                self.bad_dllp_count = 0
+                self.protocol_error_count = 0
+                self.replay_count = 0
+
+            def send_tlp(self, tlp: Tlp) -> None:
+                """A new TLP from the Transaction Layer: number it, keep a copy, put a copy on the link."""
+                stored = replace(tlp, seq=self.next_transmit_seq, crc_ok=True, is_replay=False)
+                self.retry_buffer.append(stored)                  # (2)!
+                self.tx_tlps.append(replace(stored))
+                self.next_transmit_seq = (self.next_transmit_seq + 1) % SEQ_MOD
+
+            def find_in_retry_buffer(self, seq: int) -> int:
+                """Position of the entry numbered seq, or -1. A search, so the wrap costs nothing."""
+                for i, tlp in enumerate(self.retry_buffer):
+                    if tlp.seq == seq:
+                        return i
+                return -1
+
+            def purge_through(self, index: int, seq: int) -> None:
+                """Ack and Nak are cumulative: everything up to and including index goes."""
+                del self.retry_buffer[:index + 1]                 # (3)!
+                self.ackd_seq = seq
+
+            def receive_dllp(self, dllp: Dllp) -> None:
+                """Part a: the link is perfect, so every DLLP is an Ack for an outstanding TLP."""
+                index = self.find_in_retry_buffer(dllp.seq)
+                if index < 0:
+                    raise ValueError(f"Ack {dllp.seq} does not name an outstanding TLP")
+                self.purge_through(index, dllp.seq)
+
+
+        class DllReceiver:
+            """The receive side: delivers the TLPs in order and answers with cumulative Acks,
+            one Ack per a random number (1..MAX_ACK_COALESCE) of TLPs."""
+            MAX_ACK_COALESCE = 4
+
+            def __init__(self, start_seq: int = 0, rng: random.Random | None = None):
+                self.rng = rng or random.Random()
+                self.next_rcv_seq = start_seq % SEQ_MOD           # NEXT_RCV_SEQ: the number we wait for
+                self.nak_scheduled = False                        # NAK_SCHEDULED (part b): one Nak per gap
+                self.accepted_since_ack = 0                       # delivered TLPs not yet covered by an Ack
+                self.ack_threshold = self.rng.randint(1, self.MAX_ACK_COALESCE)   # (4)!
+                self.received_tlps: list[Tlp] = []                # delivered to the Transaction Layer
+                self.tx_dllps: list[Dllp] = []                    # Acks and Naks put on the link
+                self.bad_tlp_count = 0
+                self.duplicate_count = 0
+
+            def last_accepted(self) -> int:
+                return (self.next_rcv_seq - 1) % SEQ_MOD          # (5)!
+
+            def accept(self, tlp: Tlp) -> None:
+                """The TLP we waited for: deliver it, expect the next one, count it towards an Ack."""
+                self.received_tlps.append(tlp)
+                self.next_rcv_seq = (self.next_rcv_seq + 1) % SEQ_MOD
+                self.nak_scheduled = False
+                self.accepted_since_ack += 1
+                if self.accepted_since_ack >= self.ack_threshold:
+                    self.send_ack()                               # (6)!
+
+            def send_ack(self) -> None:
+                """One cumulative Ack for everything delivered so far, then a new random threshold."""
+                self.tx_dllps.append(Dllp(DllpKind.ACK, self.last_accepted()))
+                self.accepted_since_ack = 0
+                self.ack_threshold = self.rng.randint(1, self.MAX_ACK_COALESCE)
+
+            def flush_ack(self) -> None:
+                """The environment's Ack timer: acknowledge whatever is pending."""
+                if self.accepted_since_ack and not self.nak_scheduled:
+                    self.send_ack()
+
+            def receive_tlp(self, tlp: Tlp) -> None:
+                """Part a: the link is perfect, so every TLP is the one we wait for."""
+                if not tlp.crc_ok or tlp.seq != self.next_rcv_seq:
+                    raise ValueError(f"part a assumes an error-free, in-order link (got {tlp})")
+                self.accept(tlp)                                  # (7)!
+        ```
+
+        1. ‏`(start_seq - 1) % SEQ_MOD` : מ-0 מקבלים 4095, "לפני הראשון", בדיוק הערך ההתחלתי
+           שהמפרט דורש ל-ACKD_SEQ.
+        2. ‏`replace` יוצר אובייקט חדש : אחד ל-Retry Buffer ואחד לקישור. מי שמכניס את אותו
+           אובייקט לשני המקומות ייתן לסביבה (בסעיף ב) להשחית את העותק השמור.
+        3. מחיקה לפי **אינדקס** : הקידומת של הרשימה עד הרשומה שנמצאה. גם כשהרשימה היא
+           \( [4094, 4095, 0, 1, 2] \) ו-Ack 1 מגיע, נמחקות ארבע הראשונות.
+        4. הסף הראשון מוגרל כבר בהקמה, ולכן ה-Ack הראשון יכול לבוא אחרי TLP אחד או אחרי
+           ארבעה.
+        5. כש-NEXT_RCV_SEQ הוא 0, האחרון שהתקבל הוא 4095.
+        6. ה-Ack יוצא **בתוך** הקבלה כשהספירה מגיעה לסף; `flush_ack` משלים מה שנשאר.
+        7. בסעיף א כל TLP הוא הצפוי; סעיף ב מחליף את הפונקציה ומשאיר את `accept` כפי שהיא.
 
     === "SystemVerilog"
         ```systemverilog title="dll_transmitter, dll_receiver" linenums="1" hl_lines="18 19 20 32 33 61 72 73 74 96"
@@ -317,106 +417,6 @@ added: 2026-10-19
         4. הסף הראשון מוגרל כבר בהקמה, ולכן ה-Ack הראשון יכול לבוא אחרי TLP אחד או אחרי
            ארבעה.
         5. ‏`next_rcv_seq - 1` ב-12 ביט : כש-NEXT_RCV_SEQ הוא 0, האחרון שהתקבל הוא 4095.
-        6. ה-Ack יוצא **בתוך** הקבלה כשהספירה מגיעה לסף; `flush_ack` משלים מה שנשאר.
-        7. בסעיף א כל TLP הוא הצפוי; סעיף ב מחליף את הפונקציה ומשאיר את `accept` כפי שהיא.
-
-    === "Python"
-        ```python title="DllTransmitter, DllReceiver" linenums="1" hl_lines="17 18 19 30 31 51 64 65 66 67 84"
-        class DllTransmitter:
-            """The transmit side of a Data Link Layer: numbers the TLPs and keeps every one of
-            them until the other side acknowledges it."""
-
-            def __init__(self, start_seq: int = 0):
-                self.next_transmit_seq = start_seq % SEQ_MOD      # NEXT_TRANSMIT_SEQ
-                self.ackd_seq = (start_seq - 1) % SEQ_MOD         # ACKD_SEQ: 4095 before the first TLP  (1)
-                self.retry_buffer: list[Tlp] = []                 # transmitted, not yet acknowledged, in order
-                self.tx_tlps: list[Tlp] = []                      # what went to the link, in order
-                self.bad_dllp_count = 0
-                self.protocol_error_count = 0
-                self.replay_count = 0
-
-            def send_tlp(self, tlp: Tlp) -> None:
-                """A new TLP from the Transaction Layer: number it, keep a copy, put a copy on the link."""
-                stored = replace(tlp, seq=self.next_transmit_seq, crc_ok=True, is_replay=False)
-                self.retry_buffer.append(stored)                  # (2)!
-                self.tx_tlps.append(replace(stored))
-                self.next_transmit_seq = (self.next_transmit_seq + 1) % SEQ_MOD
-
-            def find_in_retry_buffer(self, seq: int) -> int:
-                """Position of the entry numbered seq, or -1. A search, so the wrap costs nothing."""
-                for i, tlp in enumerate(self.retry_buffer):
-                    if tlp.seq == seq:
-                        return i
-                return -1
-
-            def purge_through(self, index: int, seq: int) -> None:
-                """Ack and Nak are cumulative: everything up to and including index goes."""
-                del self.retry_buffer[:index + 1]                 # (3)!
-                self.ackd_seq = seq
-
-            def receive_dllp(self, dllp: Dllp) -> None:
-                """Part a: the link is perfect, so every DLLP is an Ack for an outstanding TLP."""
-                index = self.find_in_retry_buffer(dllp.seq)
-                if index < 0:
-                    raise ValueError(f"Ack {dllp.seq} does not name an outstanding TLP")
-                self.purge_through(index, dllp.seq)
-
-
-        class DllReceiver:
-            """The receive side: delivers the TLPs in order and answers with cumulative Acks,
-            one Ack per a random number (1..MAX_ACK_COALESCE) of TLPs."""
-            MAX_ACK_COALESCE = 4
-
-            def __init__(self, start_seq: int = 0, rng: random.Random | None = None):
-                self.rng = rng or random.Random()
-                self.next_rcv_seq = start_seq % SEQ_MOD           # NEXT_RCV_SEQ: the number we wait for
-                self.nak_scheduled = False                        # NAK_SCHEDULED (part b): one Nak per gap
-                self.accepted_since_ack = 0                       # delivered TLPs not yet covered by an Ack
-                self.ack_threshold = self.rng.randint(1, self.MAX_ACK_COALESCE)   # (4)!
-                self.received_tlps: list[Tlp] = []                # delivered to the Transaction Layer
-                self.tx_dllps: list[Dllp] = []                    # Acks and Naks put on the link
-                self.bad_tlp_count = 0
-                self.duplicate_count = 0
-
-            def last_accepted(self) -> int:
-                return (self.next_rcv_seq - 1) % SEQ_MOD          # (5)!
-
-            def accept(self, tlp: Tlp) -> None:
-                """The TLP we waited for: deliver it, expect the next one, count it towards an Ack."""
-                self.received_tlps.append(tlp)
-                self.next_rcv_seq = (self.next_rcv_seq + 1) % SEQ_MOD
-                self.nak_scheduled = False
-                self.accepted_since_ack += 1
-                if self.accepted_since_ack >= self.ack_threshold:
-                    self.send_ack()                               # (6)!
-
-            def send_ack(self) -> None:
-                """One cumulative Ack for everything delivered so far, then a new random threshold."""
-                self.tx_dllps.append(Dllp(DllpKind.ACK, self.last_accepted()))
-                self.accepted_since_ack = 0
-                self.ack_threshold = self.rng.randint(1, self.MAX_ACK_COALESCE)
-
-            def flush_ack(self) -> None:
-                """The environment's Ack timer: acknowledge whatever is pending."""
-                if self.accepted_since_ack and not self.nak_scheduled:
-                    self.send_ack()
-
-            def receive_tlp(self, tlp: Tlp) -> None:
-                """Part a: the link is perfect, so every TLP is the one we wait for."""
-                if not tlp.crc_ok or tlp.seq != self.next_rcv_seq:
-                    raise ValueError(f"part a assumes an error-free, in-order link (got {tlp})")
-                self.accept(tlp)                                  # (7)!
-        ```
-
-        1. ‏`(start_seq - 1) % SEQ_MOD` : מ-0 מקבלים 4095, "לפני הראשון", בדיוק הערך ההתחלתי
-           שהמפרט דורש ל-ACKD_SEQ.
-        2. ‏`replace` יוצר אובייקט חדש : אחד ל-Retry Buffer ואחד לקישור. מי שמכניס את אותו
-           אובייקט לשני המקומות ייתן לסביבה (בסעיף ב) להשחית את העותק השמור.
-        3. מחיקה לפי **אינדקס** : הקידומת של הרשימה עד הרשומה שנמצאה. גם כשהרשימה היא
-           \( [4094, 4095, 0, 1, 2] \) ו-Ack 1 מגיע, נמחקות ארבע הראשונות.
-        4. הסף הראשון מוגרל כבר בהקמה, ולכן ה-Ack הראשון יכול לבוא אחרי TLP אחד או אחרי
-           ארבעה.
-        5. כש-NEXT_RCV_SEQ הוא 0, האחרון שהתקבל הוא 4095.
         6. ה-Ack יוצא **בתוך** הקבלה כשהספירה מגיעה לסף; `flush_ack` משלים מה שנשאר.
         7. בסעיף א כל TLP הוא הצפוי; סעיף ב מחליף את הפונקציה ומשאיר את `accept` כפי שהיא.
 
@@ -573,6 +573,81 @@ added: 2026-10-19
 
     שתי מחלקות יורשות. `accept`, ‏`send_ack` ו-`purge_through` של סעיף א נשארים כפי שהם.
 
+    === "Python"
+        ```python title="TransmitterWithReplay, ReceiverWithNak" linenums="1" hl_lines="6 8 12 15 26 35 44 46 47 49 56"
+        class TransmitterWithReplay(DllTransmitter):
+            """Part b: the transmitter learns to distrust DLLPs and to replay."""
+
+            def receive_dllp(self, dllp: Dllp) -> None:
+                if not dllp.crc_ok:
+                    self.bad_dllp_count += 1                      # (1)!
+                    return
+                index = self.find_in_retry_buffer(dllp.seq)
+                if index >= 0:
+                    self.purge_through(index, dllp.seq)
+                elif dllp.seq != self.ackd_seq:
+                    self.protocol_error_count += 1                # (2)!
+                    return
+                if dllp.kind is DllpKind.NAK:
+                    self.replay()                                 # (3)!
+
+            def on_replay_timeout(self) -> None:
+                """The replay timer (kept by the environment) expired with TLPs still unacknowledged."""
+                self.replay()
+
+            def replay(self) -> None:
+                """Every unacknowledged TLP again, oldest first, with its original Sequence Number."""
+                if not self.retry_buffer:
+                    return
+                for tlp in self.retry_buffer:
+                    self.tx_tlps.append(replace(tlp, is_replay=True))   # (4)!
+                self.replay_count += 1
+
+
+        class ReceiverWithNak(DllReceiver):
+            """Part b: the receiver sorts every TLP into expected, old or future, and answers each."""
+
+            def is_duplicate(self, seq: int) -> bool:
+                """An old one: up to half the sequence space behind the number we wait for."""
+                behind = (self.next_rcv_seq - seq) % SEQ_MOD      # (5)!
+                return 0 < behind <= SEQ_MOD // 2
+
+            def receive_tlp(self, tlp: Tlp) -> None:
+                if not tlp.crc_ok:
+                    self.bad_tlp_count += 1
+                    self.schedule_nak()
+                elif tlp.seq == self.next_rcv_seq:
+                    self.accept(tlp)
+                elif self.is_duplicate(tlp.seq):
+                    self.duplicate_count += 1
+                    if not self.nak_scheduled:
+                        self.send_ack()                           # (6)!
+                else:
+                    self.bad_tlp_count += 1                       # (7)!
+                    self.schedule_nak()
+
+            def schedule_nak(self) -> None:
+                """One Nak per gap: the next one only after the expected TLP arrived."""
+                if self.nak_scheduled:
+                    return
+                self.tx_dllps.append(Dllp(DllpKind.NAK, self.last_accepted()))
+                self.nak_scheduled = True                         # (8)!
+                self.accepted_since_ack = 0
+        ```
+
+        1. פקט עם CRC שגוי : גם הסוג וגם המספר עלולים להיות שגויים, ולכן שום דבר בו לא
+           משפיע על המצב.
+        2. לא ב-Retry Buffer ולא ACKD_SEQ : המקבל "אישר" משהו שלא שודר. זורקים וסופרים.
+        3. ‏Nak הוא Ack ועוד Replay; Nak עם ACKD_SEQ (אין התקדמות) מגיע לכאן בלי מחיקה.
+        4. עותק מהרשומה השמורה, שהקישור לא נגע בה : גם אם העותק הקודם הושחת על הקו, ה-Replay
+           תקין.
+        5. המרחק אחורה על המעגל : 1 עד 2048 הוא ישן, 2049 ומעלה הוא "מהעתיד" (מרחק קדימה של
+           1 עד 2047).
+        6. כפול : כבר נמסר, לא מוסרים שוב, ועונים ב-Ack חוזר כדי שהמשדר יוכל לנקות. אם Nak
+           כבר ממתין, הוא מאשר את אותו מספר, ואין Ack כל עוד NAK_SCHEDULED דולק.
+        7. מהעתיד : ה-TLP הזה אולי תקין, אבל מה שלפניו חסר, ולכן זורקים ומבקשים Replay.
+        8. הדגל שמונע סופת Nak-ים; `accept` של סעיף א מכבה אותו כשהפער נסגר.
+
     === "SystemVerilog"
         ```systemverilog title="dll_transmitter_with_replay, dll_receiver_with_nak" linenums="1" hl_lines="10 13 17 20 32 33 48 58 60 62 71"
         // Part b: the transmitter learns to distrust DLLPs and to replay.
@@ -661,81 +736,6 @@ added: 2026-10-19
            תקין.
         5. ‏`next_rcv_seq - seq` ב-12 ביט הוא המרחק אחורה על המעגל : 1 עד 2048 הוא ישן,
            2049 ומעלה הוא "מהעתיד" (מרחק קדימה של 1 עד 2047).
-        6. כפול : כבר נמסר, לא מוסרים שוב, ועונים ב-Ack חוזר כדי שהמשדר יוכל לנקות. אם Nak
-           כבר ממתין, הוא מאשר את אותו מספר, ואין Ack כל עוד NAK_SCHEDULED דולק.
-        7. מהעתיד : ה-TLP הזה אולי תקין, אבל מה שלפניו חסר, ולכן זורקים ומבקשים Replay.
-        8. הדגל שמונע סופת Nak-ים; `accept` של סעיף א מכבה אותו כשהפער נסגר.
-
-    === "Python"
-        ```python title="TransmitterWithReplay, ReceiverWithNak" linenums="1" hl_lines="6 8 12 15 26 35 44 46 47 49 56"
-        class TransmitterWithReplay(DllTransmitter):
-            """Part b: the transmitter learns to distrust DLLPs and to replay."""
-
-            def receive_dllp(self, dllp: Dllp) -> None:
-                if not dllp.crc_ok:
-                    self.bad_dllp_count += 1                      # (1)!
-                    return
-                index = self.find_in_retry_buffer(dllp.seq)
-                if index >= 0:
-                    self.purge_through(index, dllp.seq)
-                elif dllp.seq != self.ackd_seq:
-                    self.protocol_error_count += 1                # (2)!
-                    return
-                if dllp.kind is DllpKind.NAK:
-                    self.replay()                                 # (3)!
-
-            def on_replay_timeout(self) -> None:
-                """The replay timer (kept by the environment) expired with TLPs still unacknowledged."""
-                self.replay()
-
-            def replay(self) -> None:
-                """Every unacknowledged TLP again, oldest first, with its original Sequence Number."""
-                if not self.retry_buffer:
-                    return
-                for tlp in self.retry_buffer:
-                    self.tx_tlps.append(replace(tlp, is_replay=True))   # (4)!
-                self.replay_count += 1
-
-
-        class ReceiverWithNak(DllReceiver):
-            """Part b: the receiver sorts every TLP into expected, old or future, and answers each."""
-
-            def is_duplicate(self, seq: int) -> bool:
-                """An old one: up to half the sequence space behind the number we wait for."""
-                behind = (self.next_rcv_seq - seq) % SEQ_MOD      # (5)!
-                return 0 < behind <= SEQ_MOD // 2
-
-            def receive_tlp(self, tlp: Tlp) -> None:
-                if not tlp.crc_ok:
-                    self.bad_tlp_count += 1
-                    self.schedule_nak()
-                elif tlp.seq == self.next_rcv_seq:
-                    self.accept(tlp)
-                elif self.is_duplicate(tlp.seq):
-                    self.duplicate_count += 1
-                    if not self.nak_scheduled:
-                        self.send_ack()                           # (6)!
-                else:
-                    self.bad_tlp_count += 1                       # (7)!
-                    self.schedule_nak()
-
-            def schedule_nak(self) -> None:
-                """One Nak per gap: the next one only after the expected TLP arrived."""
-                if self.nak_scheduled:
-                    return
-                self.tx_dllps.append(Dllp(DllpKind.NAK, self.last_accepted()))
-                self.nak_scheduled = True                         # (8)!
-                self.accepted_since_ack = 0
-        ```
-
-        1. פקט עם CRC שגוי : גם הסוג וגם המספר עלולים להיות שגויים, ולכן שום דבר בו לא
-           משפיע על המצב.
-        2. לא ב-Retry Buffer ולא ACKD_SEQ : המקבל "אישר" משהו שלא שודר. זורקים וסופרים.
-        3. ‏Nak הוא Ack ועוד Replay; Nak עם ACKD_SEQ (אין התקדמות) מגיע לכאן בלי מחיקה.
-        4. עותק מהרשומה השמורה, שהקישור לא נגע בה : גם אם העותק הקודם הושחת על הקו, ה-Replay
-           תקין.
-        5. המרחק אחורה על המעגל : 1 עד 2048 הוא ישן, 2049 ומעלה הוא "מהעתיד" (מרחק קדימה של
-           1 עד 2047).
         6. כפול : כבר נמסר, לא מוסרים שוב, ועונים ב-Ack חוזר כדי שהמשדר יוכל לנקות. אם Nak
            כבר ממתין, הוא מאשר את אותו מספר, ואין Ack כל עוד NAK_SCHEDULED דולק.
         7. מהעתיד : ה-TLP הזה אולי תקין, אבל מה שלפניו חסר, ולכן זורקים ומבקשים Replay.

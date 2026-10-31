@@ -1,221 +1,139 @@
 #!/usr/bin/env python3
-"""Figures and tables of question 0060 (the three-wizard duel with the cat rule).
+"""Figures and tables of question 0060 (the next number with as many ones: Gosper's step,
+the previous one through the complement, and the same for zeros, counted without the
+leading ones, where the length of the number may change).
 
     python tools/figures/fill.py 60        # put the blocks on the page
 
-The reference here is independent of the page code: the first round is solved by backward
-induction with exact fractions, every option of every wizard kept, so the tables can show
-the value of each option. Turn order 1 -> 2 -> 3; if all three are alive after wizard 3's
-first turn, all three lose. After the first death the two survivors duel to the end, and
-the survivor moves first (it is next in turn after the killer). A limit from below (a wand
-"just under" a rival) is taken as the value at x - 10^-18, which agrees with the exact limit
-to far more than the three places shown.
-
-blocks() returns, in page order: the decision table of part a, the part a chart and its
-legend, the decision tables of parts b and c, the chart of the three positions, its legend
-and its table, the table of part d, and the part d chart with its legend. tests/0060 checks
-the page's numbers and code against this module.
+The reference here is independent of the page code: brute_next / brute_prev and
+brute_next0 / brute_prev0 search number by number. gosper() gives the rows of the
+formula, the same rows the box draws. blocks() returns, in page order: the steps of
+next(92) in 8 bits, their legend, the numbers with two ones in 5 bits next to their
+complements, the steps of prev(99), the numbers with three zeros by length, and the
+rows of the next number after 120 with three zeros (a longer one).
 """
 
-from __future__ import annotations
-
-import sys
-from fractions import Fraction as Fr
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from charts import Chart  # noqa: E402
+from html import escape
 
 RLM = "‏"
-EPS = Fr(1, 10**18)
-HALF = Fr(1, 2)
-RIVALS = (Fr(6, 10), Fr(8, 10))        # parts a to c: the rivals in turn order
-RIVALS_D = (Fr(8, 10), Fr(4, 10))      # part d
+X_A, W_A = 92, 8            # 0101_1100 -> 0110_0011 = 99
+X_B = 99                    # prev(99) = 92
+W_C, K_C = 5, 2             # the complement table
+X_C = 120                   # 111_1000, three zeros -> 1000_1111 = 143
 
 
-# --- the model --------------------------------------------------------------------------
-
-def F(x, y):
-    """The opener of a duel to the end wins (opener x, second y)."""
-    return x / (x + y - x * y)
+def ones(x):
+    return bin(x).count("1")
 
 
-def G(x, y):
-    """The second wizard of the duel wins."""
-    return (1 - x) * y / (x + y - x * y)
+def brute_next(x, w):
+    """The smallest number above x in w bits with as many ones; 0 if there is none."""
+    k = ones(x)
+    return next((y for y in range(x + 1, 1 << w) if ones(y) == k), 0) if x else 0
 
 
-def round_options(p):
-    """Backward induction over the first round. p = [p1, p2, p3] in turn order.
-
-    Returns (values, trace): the win chances of the three wizards from the first turn, and
-    for each wizard in turn (3, 2, 1) a dict option -> own value, with the option taken.
-    Options are the target 1, 2, 3 or "air". Ties keep the air, then the lower target."""
-    after = [Fr(0)] * 3                         # nobody hit in the round: three cats
-    trace = []
-    for w in (2, 1, 0):
-        opts = {"air": after}
-        for t in range(3):
-            if t == w:
-                continue
-            o = 3 - w - t                       # the survivor moves next and opens the duel
-            hit = [Fr(0)] * 3
-            hit[o], hit[w] = F(p[o], p[w]), G(p[o], p[w])
-            opts[t + 1] = [p[w] * h + (1 - p[w]) * a for h, a in zip(hit, after)]
-        best = "air"
-        for k in (1, 2, 3):
-            if k in opts and opts[k][w] > opts[best][w]:
-                best = k
-        trace.append((w + 1, {k: v[w] for k, v in opts.items()}, best))
-        after = opts[best]
-    return after, trace
+def brute_prev(x, w):
+    k = ones(x)
+    return next((y for y in range(x - 1, 0, -1) if ones(y) == k), 0) if x else 0
 
 
-def place(me, own, rivals):
-    """The three chances with my wand `own` at position `me` (1..3), rivals in turn order."""
-    p = list(rivals)
-    p.insert(me - 1, own)
-    return p
+def zeros(x):
+    """The zeros of x from its top one down (no leading zeros)."""
+    return x.bit_length() - ones(x)
 
 
-def win(me, own, rivals):
-    return round_options(place(me, own, rivals))[0][me - 1]
+def brute_next0(x):
+    """The smallest number above x with as many zeros (any length); x >= 1."""
+    z = zeros(x)
+    return next(y for y in range(x + 1, 1 << (x.bit_length() + 2)) if zeros(y) == z)
 
 
-def weak(rivals):
-    """A wand just under the weaker rival."""
-    return min(rivals) - EPS
+def brute_prev0(x):
+    """The largest number below x with as many zeros; 0 if there is none."""
+    z = zeros(x)
+    return next((y for y in range(x - 1, 0, -1) if zeros(y) == z), 0)
 
 
-def candidates(me, rivals):
-    """(name, wand, chance) of the weak wand, the sniper and, when it applies, 0.5-."""
-    out = [("weak", weak(rivals), win(me, weak(rivals), rivals)), ("sniper", Fr(1), win(me, Fr(1), rivals))]
-    if me == 3 and min(rivals) > HALF:
-        out.append(("half", HALF - EPS, win(me, HALF - EPS, rivals)))
-    return out
+def set_bits(v):
+    return {p for p in range(v.bit_length()) if (v >> p) & 1}
 
 
-def best_on_grid(me, rivals, n=1000):
-    """The best chance over the wands k/n and the points just under the rivals and 0.5."""
-    pts = [Fr(k, n) for k in range(1, n + 1)] + [r - EPS for r in rivals] + [HALF - EPS]
-    return max((win(me, q, rivals), q) for q in pts)
+def gosper(x, w):
+    """The rows of next(x): (label, value, marked bits). The last row is the answer, or the
+    overflow when the block of ones is already at the top."""
+    c = x & -x
+    r = x + c
+    t = c.bit_length() - 1                       # the lowest one
+    m = ((x >> t) ^ ((x >> t) + 1)).bit_length() - 1   # the length of the lowest block
+    rows = [("x", x, set(range(t, t + m))), ("c = x & −x", c, {t}), ("r = x + c", r, {t + m})]
+    if r >> w:
+        return rows, 0
+    s = ((x ^ r) >> 2) // c
+    rows += [("x ^ r", x ^ r, set(range(t, t + m + 1))), ("(x ^ r) >> 2", (x ^ r) >> 2, set_bits((x ^ r) >> 2)),
+             ("s = … / c", s, set(range(m - 1))), ("r | s", r | s, set(range(m - 1)) | {t + m})]
+    return rows, r | s
 
 
-# --- tables -------------------------------------------------------------------------------
-
-def pct(v):
-    return f"{float(v) * 100:.1f}%"
-
-
-def num(v):
-    return f"{float(v):.3f}"
-
-
-def decision_table(me, rivals):
-    """Per strategy, the wizards in backward order with the value of each option to the
-    wizard in turn; the option taken in bold."""
-    head = "| התור | על 1 | על 2 | על 3 | באוויר | הבחירה |"
-    lines = [head, "|---|:-:|:-:|:-:|:-:|:-:|"]
-    for label, own in (("חלש", weak(rivals)), ("צלף", Fr(1))):
-        _, trace = round_options(place(me, own, rivals))
-        for w, opts, best in trace:
-            who = f"קוסם {w}" + (" (אני)" if w == me else "")
-            cells = []
-            for k in (1, 2, 3, "air"):
-                if k not in opts:
-                    cells.append("—")
-                else:
-                    s = f"{RLM}{num(opts[k])}"
-                    cells.append(f"**{s}**" if k == best else s)
-            choice = "באוויר" if best == "air" else f"על {best}"
-            lines.append(f"| {label} · {who} | " + " | ".join(cells) + f" | {choice} |")
-    return "\n".join(lines)
+def bits_table(rows, w, label):
+    """An HTML table of bit rows: the name, the w bits (most significant on the left), the value."""
+    h = f'<div class="gs-scroll"><table class="gs-bits" dir="ltr" aria-label="{label}"><tbody>'
+    for name, v, marks in rows:
+        cells = "".join(f'<td class="gs-b{" is-one" if (v >> p) & 1 else ""}{" is-mark" if p in marks else ""}">{(v >> p) & 1}</td>'
+                        for p in range(w - 1, -1, -1))
+        h += f'<tr><th>{escape(name)}</th>{cells}<td class="gs-val">{v}</td></tr>'
+    return h + "</tbody></table></div>"
 
 
-def positions_table(rivals):
-    lines = ["| המיקום שלי | השרביט החלש | הצלף | הבחירה |", "|---|:-:|:-:|:-:|"]
-    names = {1: "ראשון", 2: "שני", 3: "שלישי"}
-    for me in (1, 2, 3):
-        p = place(me, Fr(0), rivals)
-        who = ", ".join(f"קוסם {i + 1} = {float(p[i]):g}" for i in range(3) if i != me - 1)
-        c = {n: v for n, _, v in candidates(me, rivals)}
-        m = float(min(rivals))
-        choice = f"{RLM}{m:g}⁻" if c["weak"] >= c["sniper"] else f"{RLM}1"
-        w, s = f"{RLM}{pct(c['weak'])}", f"{RLM}{pct(c['sniper'])}"
-        w, s = (f"**{w}**", s) if c["weak"] >= c["sniper"] else (w, f"**{s}**")
-        lines.append(f"| {names[me]} ({who}) | {w} | {s} | {choice} |")
-    return "\n".join(lines)
+def legend():
+    return ('<span class="viz-legend"><span><i class="gs-key-one"></i>ביט דולק</span>'
+            '<span><i class="gs-key-mark"></i>הביטים שהשלב עוסק בהם</span></span>')
 
 
-# --- charts -------------------------------------------------------------------------------
-
-def curve(me, rivals, n=200):
-    """Pieces of the chance against my wand, split where it jumps (at a rival or 0.5)."""
-    breaks = sorted({float(r) for r in rivals} | ({0.5} if me == 3 else set()))
-    xs = sorted({k / n for k in range(1, n + 1)} | {b - 1e-6 for b in breaks} | {b + 1e-6 for b in breaks if b < 1})
-    pieces, cur, prev = [], [], None
+def complement_table(w, k):
+    """The numbers with k ones in w bits in order, next to their complements."""
+    xs = [y for y in range(1 << w) if ones(y) == k]
+    mask = (1 << w) - 1
+    rows = ["| ‏x, עולה | ‏~x, יורד |", "|:-:|:-:|"]
     for x in xs:
-        v = float(win(me, Fr(x), rivals))
-        if prev is not None and abs(v - prev) > 0.04:      # a jump: a decision changed
-            pieces.append(cur)
-            cur = []
-        cur.append((x, v))
-        prev = v
-    pieces.append(cur)
-    return pieces
+        y = ~x & mask
+        rows.append(f"| {RLM}`{x:0{w}b}` ({x}) | {RLM}`{y:0{w}b}` ({y}) |")
+    return "\n".join(rows)
 
 
-STYLE = {1: ("s1-line", ""), 2: ("s2-line", ' stroke-dasharray="7 5"'), 3: ("ink-line", "")}
-NAME = {1: "ראשון", 2: "שני", 3: "שלישי"}
+def prev_rows(x, w):
+    mask = (1 << w) - 1
+    y = brute_next(~x & mask, w)
+    return [("x", x, set()), ("~x", ~x & mask, set()), ("next(~x)", y, set()), ("~next(~x)", ~y & mask, set())]
 
 
-def chart(positions, rivals, label, y_max=0.8):
-    c = Chart(label, x_max=1, y_max=y_max, h=250, base=216)
-    c.grid_y([k / 10 for k in range(0, int(y_max * 10) + 1, 2)], labels=[f"{k * 10}%" for k in range(0, int(y_max * 10) + 1, 2)])
-    c.grid_x([0, 0.2, 0.4, 0.6, 0.8, 1])
-    for me in positions:
-        cls, extra = STYLE[me]
-        for piece in curve(me, rivals):
-            c.path(piece, cls, width=2.5, extra=extra)
-    for me in positions:
-        cand = max(candidates(me, rivals), key=lambda t: t[2])
-        cls = {1: "s1", 2: "s2", 3: "ink"}[me]
-        x = float(cand[1])
-        c.dot(x, cand[2], cls, title=f"{NAME[me]}: {pct(cand[2])} at {x:.3g}")
-    c.axis()
-    return c.svg()
+def zeros_table(z, lengths):
+    """The numbers with z zeros, by length: within a length they are the numbers with as
+    many ones, and the next length starts with 1 0..0 1..1."""
+    rows = ["| האורך | המספרים עם שלושה אפסים, לפי הסדר |", "|:-:|:-:|"]
+    for L in lengths:
+        xs = [y for y in range(1 << (L - 1), 1 << L) if zeros(y) == z]
+        rows.append(f"| {RLM}{L} | " + ", ".join(f"{RLM}`{y:b}` ({y})" for y in xs) + " |")
+    return "\n".join(rows)
 
 
-def legend(positions):
-    keys = {1: '<i class="s1"></i>', 2: '<i class="s2"></i>', 3: '<i class="ink"></i>'}
-    items = "".join(f"<span>{keys[me]}אני {NAME[me]}</span>" for me in positions)
-    return f'<span class="viz-legend">{items}<span>הנקודה\u00a0: הסיכוי הטוב ביותר; הציר האופקי\u00a0: השרביט שלי</span></span>'
-
-
-def chart_a():
-    return chart([1], RIVALS, "הסיכוי שלי לנצח כפונקציה של השרביט, כשאני ראשון והיריבים 0.6 ו-0.8 : עולה עד 63.7% ממש לפני 0.6, צונח, ועולה שוב עד 40% ב-1")
-
-
-def chart_abc():
-    return chart([1, 2, 3], RIVALS, "הסיכוי שלי לנצח כפונקציה של השרביט בשלושת המיקומים, היריבים 0.6 ואחריו 0.8")
-
-
-def chart_d():
-    return chart([1, 2, 3], RIVALS_D, "הסיכוי שלי לנצח כפונקציה של השרביט בשלושת המיקומים, היריבים 0.8 ואחריו 0.4", y_max=0.6)
+def next0_rows(x):
+    """The rows of the next number with as many zeros when the length runs out."""
+    L, z = x.bit_length(), zeros(x)
+    rows, nxt = gosper(x, L)
+    if nxt:
+        return rows + [], nxt
+    y = (1 << L) + (1 << (L - z)) - 1
+    return rows + [("1 0…0 1…1", y, {L} | set(range(L - z)))], y
 
 
 def blocks():
     """The generated blocks, in page order."""
-    return [
-        decision_table(1, RIVALS), chart_a(), legend([1]),
-        decision_table(2, RIVALS), decision_table(3, RIVALS),
-        chart_abc(), legend([1, 2, 3]), positions_table(RIVALS),
-        positions_table(RIVALS_D), chart_d(), legend([1, 2, 3]),
-    ]
+    rows, _ = gosper(X_A, W_A)
+    return [bits_table(rows, W_A, "השלבים של הנוסחה על 92 ב-8 ביטים"), legend(), complement_table(W_C, K_C),
+            bits_table(prev_rows(X_B, W_A), W_A, "הקודם של 99 דרך המשלים"), zeros_table(3, [4, 5, 6]),
+            bits_table(next0_rows(X_C)[0], X_C.bit_length() + 1, "הבא אחרי 120 עם שלושה אפסים")]
 
 
 if __name__ == "__main__":
-    for me in (1, 2, 3):
-        for rv in (RIVALS, RIVALS_D):
-            print(me, [float(x) for x in rv], [(n, float(q), float(v)) for n, q, v in candidates(me, rv)])
+    print(brute_next(X_A, W_A), brute_prev(X_B, W_A), brute_prev(96, 8), brute_next0(X_C), brute_prev0(143))
     print("\n\n".join(blocks()))

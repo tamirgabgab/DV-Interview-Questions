@@ -1,79 +1,83 @@
-// Question 0056: the page's last_fall, collisions and fall_times on the page's six ants
-// (90 s, 5 collisions, the fall times 25 60 75 90 60 10), 100 ants at the bounds (100 s,
-// 2500 collisions), and random poles against a half-second simulation written here (ants
-// on doubled coordinates that turn at every meeting).
-module tb;
-  //@page function automatic int last_fall
-  //@page function automatic int collisions
-  //@page function automatic void fall_times
-  //@page function automatic int ring_shift
+//@flags --timing
+// Question 0056: the page's win3_lsb, win3_msb and win_div (several parameter sets, start
+// windows and both directions) clocked on random bits and digits; every cycle each div is
+// compared with the window kept here as a value, stepped by the definition (at the LSB:
+// w = (B*w + d) mod B^L; at the MSB: w = d*B^(L-1) + w / B) and divided by m afresh.
+//@page module win3_lsb
+//@page module win3_msb
+//@page module win_div
 
+module tb;
+  logic clk = 0, rst_n = 0;
+  always #5 clk = ~clk;
+
+  logic b1, b2, b3, b4;
+  logic [3:0] d1, d2, d3, d4, d5;
+  logic o1, o2, o3, o4, g1, g2, g3, g4, g5;
   int errors = 0;
 
-  // the simulation: returns each ant's fall time in half seconds and the collisions
-  function automatic void simulate(int pos[], int dirs[], int len, ref int fall2[], ref int hits);
-    int x[], d[];
-    int n = pos.size(), left = pos.size(), tick = 0;
-    x = new[n]; d = new[n]; fall2 = new[n];
-    foreach (pos[i]) begin x[i] = 2 * pos[i]; d[i] = dirs[i]; fall2[i] = -1; end
-    hits = 0;
-    while (left > 0) begin
-      foreach (x[i]) if (fall2[i] < 0 && ((x[i] <= 0 && d[i] < 0) || (x[i] >= 2 * len && d[i] > 0))) begin
-        fall2[i] = tick; left--;
-      end
-      if (left == 0) break;
-      foreach (x[i]) if (fall2[i] < 0) x[i] += d[i];
-      tick++;
-      for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++)
-        if (fall2[i] < 0 && fall2[j] < 0 && x[i] == x[j]) begin d[i] = -d[i]; d[j] = -d[j]; hits++; end
-    end
+  win3_lsb #(.L(1))                     u1 (.clk, .rst_n, .din(b1), .div(o1));
+  win3_lsb #(.L(5), .INIT(5'b10110))    u2 (.clk, .rst_n, .din(b2), .div(o2));
+  win3_msb #(.L(1))                     u3 (.clk, .rst_n, .din(b3), .div(o3));
+  win3_msb #(.L(6), .INIT(6'b100101))   u4 (.clk, .rst_n, .din(b4), .div(o4));
+  win_div #(.M(7), .B(8),  .L(3), .MSB(0))              v1 (.clk, .rst_n, .d(d1[2:0]), .div(g1));
+  win_div #(.M(7), .B(10), .L(4), .MSB(1), .INIT(1234)) v2 (.clk, .rst_n, .d(d2), .div(g2));
+  win_div #(.M(9), .B(2),  .L(6), .MSB(1), .INIT(37))   v3 (.clk, .rst_n, .d(d3[0]), .div(g3));
+  win_div #(.M(5), .B(16), .L(2), .MSB(0), .INIT(200))  v4 (.clk, .rst_n, .d(d4), .div(g4));
+  win_div #(.M(3), .B(10), .L(1), .MSB(1), .INIT(7))    v5 (.clk, .rst_n, .d(d5), .div(g5));
+
+  // the reference windows, as values
+  longint w1, w2, w3, w4, x1, x2, x3, x4, x5;
+
+  function automatic longint lsb_in(longint w, longint d, longint b, int L);
+    return (w * b + d) % (b ** L);
   endfunction
+  function automatic longint msb_in(longint w, longint d, longint b, int L);
+    return d * (b ** (L - 1)) + w / b;
+  endfunction
+  task automatic check(string what, logic got, longint w, longint m);
+    if (got !== (w % m == 0)) begin errors++; $display("%s: div=%0b, window %0d", what, got, w); end
+  endtask
+  task automatic start();
+    w1 = 0; w2 = 5'b10110; w3 = 0; w4 = 6'b100101;
+    x1 = 0; x2 = 1234; x3 = 37; x4 = 200; x5 = 7;
+  endtask
 
   initial begin
-    int pos[], dirs[], t[$], fall2[], hits, n, worst;
-    int want[6] = '{25, 60, 75, 90, 60, 10};
-    pos = '{10, 25, 40, 60, 75, 90};
-    dirs = '{1, -1, 1, -1, -1, 1};
-    if (last_fall(pos, dirs) != 90 || collisions(pos, dirs) != 5) begin errors++; $display("example: %0d %0d", last_fall(pos, dirs), collisions(pos, dirs)); end
-    fall_times(pos, dirs, 100, t);
-    foreach (want[i]) if (t[i] != want[i]) begin errors++; $display("fall_times[%0d] = %0d", i, t[i]); end
-    pos = new[100]; dirs = new[100];
-    foreach (pos[i]) begin pos[i] = i + 1; dirs[i] = i < 50 ? 1 : -1; end
-    if (collisions(pos, dirs) != 2500) begin errors++; $display("2500: %0d", collisions(pos, dirs)); end
-    pos[0] = 0;
-    if (last_fall(pos, dirs) != 100) begin errors++; $display("100: %0d", last_fall(pos, dirs)); end
-    for (int r = 0; r < 300; r++) begin
-      n = $urandom_range(1, 12);
-      pos = new[n]; dirs = new[n];
-      for (int i = 0; i < n; i++) begin                    // distinct positions, ascending
-        pos[i] = (i == 0 ? 0 : pos[i - 1] + 1) + $urandom_range(0, 8);
-        dirs[i] = $urandom_range(0, 1) ? 1 : -1;
+    start();
+    {b1, b2, b3, b4, d1, d2, d3, d4, d5} = '0;
+    repeat (2) @(posedge clk);
+    for (int t = 0; t < 6000; t++) begin
+      @(negedge clk);
+      if (t % 700 == 0) begin                // reset now and then: the start windows again
+        rst_n = 0; #1 rst_n = 1;
+        start();
+        #1;
+        check("reset L=5 LSB", o2, w2, 3);
+        check("reset L=6 MSB", o4, w4, 3);
+        check("reset M=7 B=10 MSB", g2, x2, 7);
+        check("reset M=9 B=2 MSB", g3, x3, 9);
+        check("reset M=5 B=16 LSB", g4, x4, 5);
+        check("reset M=3 B=10 L=1", g5, x5, 3);
       end
-      if (pos[n - 1] > 100) continue;
-      simulate(pos, dirs, 100, fall2, hits);
-      fall_times(pos, dirs, 100, t);
-      worst = 0;
-      foreach (fall2[i]) begin
-        if (2 * t[i] != fall2[i]) begin errors++; $display("run %0d ant %0d: %0d vs %0d/2", r, i, t[i], fall2[i]); end
-        if (fall2[i] > worst) worst = fall2[i];
-      end
-      if (2 * last_fall(pos, dirs) != worst || collisions(pos, dirs) != hits) begin errors++; $display("run %0d: last or hits", r); end
-    end
-    // part d: the shift and the first return on the ring, against counts made here
-    dirs = '{1, 1, 1, -1, -1, 1};
-    if (ring_shift(dirs) != 2 || ring_home(dirs) != 300) begin errors++; $display("ring example: %0d %0d", ring_shift(dirs), ring_home(dirs)); end
-    for (int r = 0; r < 200; r++) begin
-      int right, s, k;
-      n = $urandom_range(1, 9);
-      dirs = new[n];
-      right = 0;
-      foreach (dirs[i]) begin dirs[i] = $urandom_range(0, 1) ? 1 : -1; if (dirs[i] > 0) right++; end
-      s = right - (n - right);
-      while (s < 0) s += n;
-      s = s % n;
-      k = 1;
-      while ((k * s) % n != 0) k++;
-      if (ring_shift(dirs) != s || ring_home(dirs, 100) != 100 * k) begin errors++; $display("ring run %0d", r); end
+      b1 = 1'($urandom); b2 = 1'($urandom); b3 = 1'($urandom); b4 = 1'($urandom);
+      d1 = 4'($urandom_range(0, 7)); d2 = 4'($urandom_range(0, 9)); d3 = 4'($urandom_range(0, 1));
+      d4 = 4'($urandom_range(0, 15)); d5 = 4'($urandom_range(0, 9));
+      @(posedge clk);
+      w1 = lsb_in(w1, b1, 2, 1); w2 = lsb_in(w2, b2, 2, 5);
+      w3 = msb_in(w3, b3, 2, 1); w4 = msb_in(w4, b4, 2, 6);
+      x1 = lsb_in(x1, d1, 8, 3); x2 = msb_in(x2, d2, 10, 4); x3 = msb_in(x3, d3, 2, 6);
+      x4 = lsb_in(x4, d4, 16, 2); x5 = msb_in(x5, d5, 10, 1);
+      #1;
+      check("win3_lsb L=1", o1, w1, 3);
+      check("win3_lsb L=5", o2, w2, 3);
+      check("win3_msb L=1", o3, w3, 3);
+      check("win3_msb L=6", o4, w4, 3);
+      check("M=7 B=8 L=3 LSB", g1, x1, 7);
+      check("M=7 B=10 L=4 MSB", g2, x2, 7);
+      check("M=9 B=2 L=6 MSB", g3, x3, 9);
+      check("M=5 B=16 L=2 LSB", g4, x4, 5);
+      check("M=3 B=10 L=1 MSB", g5, x5, 3);
     end
     if (errors == 0) $display("PASS"); else $display("FAIL: %0d errors", errors);
     $finish;

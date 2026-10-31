@@ -1,10 +1,10 @@
 // kinds: hourglass
-//   hourglass              0018, 0019  A, B (and C) and D: the plan on a time axis and event by event (BFS or Dijkstra), the page's objective or the fewest flips; the proof panel: the page's search pop by pop, the queue and the tree; on 0019 a toggle for the fork at the first run-out of the larger glass
+//   hourglass              0018, 0019  A, B (and C) and D: the plan on a time axis and an animated scene, event by event (BFS or Dijkstra), the page's objective or the fewest flips; the proof panel: the page's search pop by pop, the queue and the tree; on 0019 a toggle for the fork at the first run-out of the larger glass
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { H, W, f, frame, ltr, speedSel } = dvqExplorers.lib;
+  const { f, ltr } = dvqExplorers.lib;
 
   // Hourglasses (0018, 0019): A and B minutes, flipped only when one runs out. A plan is a
   // list of events [t, action] (action "", "A", "B" or "AB"). hourglassSolve is the BFS of
@@ -269,7 +269,9 @@
         `<div class="hg-axis"></div><p class="hg-fork"></p>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">האירוע הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">האירוע הבא</button>` +
-        `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1100, 400) + `<span class="ex-pos"></span></div>` +
+        `<button type="button" class="md-button ex-play">הפעלה</button>` +
+        `<label>הקצב <select class="ex-speed" aria-label="הקצב, כמה זמן נמשכת דקה של שעון החול"><option value="250">דקה = 0.25 שנייה</option><option value="500" selected>דקה = 0.5 שנייה</option><option value="1000">דקה = שנייה</option></select></label>` +
+        `<span class="ex-pos"></span></div>` +
         `<div class="hg-frame"></div><p class="hg-caption"></p><p class="ex-note hg-compare"></p>` +
         `<section class="ex-proof hg-proof"><p class="ex-proof-title">שלב ההוכחה : החיפוש עצמו</p>` +
         `<div class="ex-controls"><button type="button" class="md-button md-button--primary ex-q-next">השליפה הבאה</button>` +
@@ -280,55 +282,174 @@
         `<span class="viz-legend"><span><i class="hg-key-done"></i>נשלף</span><span><i class="hg-key-now"></i>נשלף עכשיו</span><span><i class="hg-key-wait"></i>בתור</span><span><i class="box-path"></i>הדרך למטרה</span></span>` +
         `<p class="hg-q-text"></p></section>`;
       const $ = (sel) => box.querySelector(sel);
-      const play = $(".ex-play");
-      let timer = null, uid = 0;
+      const play = $(".ex-play"), speed = $(".ex-speed");
       const HEB = (act) => (act ? `הופכים את ${[...act].join(" ואת ")}` : "לא הופכים כלום");
       const plus = (act) => [...act].join("+");
-      // one hourglass glyph, as tools/figures/hourglass.py draws it
-      const glass = (x, y, top, total, kind) => {
-        const W = 30, H = 50, NECK = 3, cx = x + W / 2, mid = y + H / 2;
-        uid += 1;
-        const id = `exhg${uid}`;
-        const bt = `${x},${y} ${x + W},${y} ${cx + NECK},${mid} ${cx - NECK},${mid}`;
-        const bb = `${cx - NECK},${mid} ${cx + NECK},${mid} ${x + W},${y + H} ${x},${y + H}`;
-        const th = (H / 2) * top / total, bh = (H / 2) * (total - top) / total;
-        let s = `<clipPath id="${id}t"><polygon points="${bt}"/></clipPath><clipPath id="${id}b"><polygon points="${bb}"/></clipPath>`;
-        if (top) s += `<rect class="sand-${kind}" clip-path="url(#${id}t)" x="${x}" y="${f(mid - th)}" width="${W}" height="${f(th)}"/>` +
-                      `<line class="stream-${kind}" x1="${cx}" y1="${mid}" x2="${cx}" y2="${f(y + H - bh - 1)}"/>`;
-        if (total - top) s += `<rect class="sand-${kind}" clip-path="url(#${id}b)" x="${x}" y="${f(y + H - bh)}" width="${W}" height="${f(bh)}"/>`;
-        s += `<polygon class="glass" points="${bt}"/><polygon class="glass" points="${bb}"/>` +
-             `<line class="frame" x1="${x - 4}" y1="${y}" x2="${x + W + 4}" y2="${y}"/><line class="frame" x1="${x - 4}" y1="${y + H}" x2="${x + W + 4}" y2="${y + H}"/>` +
-             `<text class="tick" x="${x + W + 7}" y="${y + 12}">${top}</text><text class="tick" x="${x + W + 7}" y="${y + H - 2}">${total - top}</text>` +
-             `<text class="legend" x="${cx}" y="${y + H + 15}" text-anchor="middle">${kind.toUpperCase()}</text>`;
-        return s;
-      };
-      const group = (x, y, tops) => tops.map((v, i) => glass(x + 64 * i, y, v, sizes()[i], "abc"[i])).join("");
-      // one event: the tops before it, an arrow with the action, and the tops after it; side
-      // by side on a wide box, one above the other on a narrow one (a phone), where the side
-      // by side frame would shrink the hourglasses to a third. The words are Hebrew (rtl).
       const RTL = 'direction="rtl" unicode-bidi="embed"';
-      const frameSvg = (ev, measuring, verdict) => {
-        const [t, act, before, after] = ev, n = sizes().length, gw = 64 * (n - 1) + 30;
-        if (box.clientWidth && box.clientWidth < 520) {
-          const W = Math.max(gw + 150, 260), gx = 40, axX = gx + gw / 2, H = 198, mid = (axX + 10 + W - 4) / 2;
-          let s = `<svg class="figure hourglass-fig hg-stacked" viewBox="0 0 ${W} ${H}" style="max-width:${(W / 16).toFixed(0)}rem" role="img" aria-label="אירוע ברגע ${t}">`;
-          if (measuring) s += `<rect class="measure" x="2" y="2" width="${W - 4}" height="${H - 4}" rx="6"/>`;
-          s += `<text class="legend" x="8" y="22" font-weight="700">t = ${t}</text>` +
-               `<text class="tick" x="${mid}" y="40" text-anchor="middle" ${RTL}>${verdict.event}</text>` + group(gx, 12, before);
-          if (after === null) s += `<text class="legend" x="${W / 2}" y="${H / 2 + 22}" text-anchor="middle" font-weight="700" ${RTL}>${verdict.text}</text>`;
-          else s += `<line class="ink-line" x1="${axX}" y1="88" x2="${axX}" y2="114" stroke-width="1.5"/><polygon class="ink-fill" points="${axX},121 ${axX - 4},113 ${axX + 4},113"/>` +
-                    `<text class="legend" x="${mid}" y="108" text-anchor="middle" ${RTL}>${verdict.text}</text>` + group(gx, 128, after);
-          return s + "</svg>";
+      // The live scene: a clock and the hourglasses at a moment t, redrawn by attributes only
+      // while it plays (no text or node changes, so the box's observers stay quiet). A step
+      // from event k to k + 1 flips the glasses of event k (each turns 180°, then its sand
+      // falls to its new end) and runs the sand until t of event k + 1. The frame of an event
+      // is the moment it happens, before its flips; under reduced motion and in an automated
+      // browser every step goes straight to that frame. The size depends only on the number
+      // of glasses and the width of the box, so nothing moves while it plays.
+      const GW = 34, GH = 60, NECK = 3, SP = 78, GY = 22;
+      let uid = 0, scene = null, events = [], meta = null;
+      const still = () => navigator.webdriver === true || (typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches);
+      const sceneSvg = () => {
+        const n = sizes().length, narrow = box.clientWidth && box.clientWidth < 520, key = `${sizes().join()}|${narrow}`;
+        if (scene && key === scene.key && scene.svg.isConnected) return;
+        let W, H, gx0, ck, lab;
+        if (narrow) {
+          const cw = 84 + SP * (n - 1) + GW + 22, ox = Math.max((Math.max(cw + 6, 280) - cw) / 2, 3);
+          W = Math.max(cw + 6, 280); H = 156; gx0 = ox + 84; ck = [ox + 30, 46, 22, 92]; lab = [W / 2, 124, 146];
+        } else {
+          gx0 = 104;
+          const lx0 = gx0 + SP * (n - 1) + GW + 30;
+          W = lx0 + 206; H = 108; ck = [44, 48, 24, 96]; lab = [lx0 + 100, 44, 68];
         }
-        const cy = 12 + 25, left = 104 - (n - 2) * 40, ax0 = left + gw + 22, ax1 = ax0 + 116, right = ax1 + 30, W = right + gw + 30;
-        let s = `<svg class="figure hourglass-fig" viewBox="0 0 ${W} 92" style="max-width:${(W / 16).toFixed(0)}rem" role="img" aria-label="אירוע ברגע ${t}">`;
-        if (measuring) s += `<rect class="measure" x="2" y="2" width="${W - 4}" height="88" rx="6"/>`;
-        s += `<text class="legend" x="${left / 2}" y="${cy - 4}" font-weight="700" text-anchor="middle">t = ${t}</text><text class="tick" x="${left / 2}" y="${cy + 14}" text-anchor="middle" ${RTL}>${verdict.event}</text>` + group(left, 12, before);
-        if (after === null) s += `<text class="legend" x="${(ax0 + ax1) / 2}" y="${cy + 5}" font-weight="700" text-anchor="middle" ${RTL}>${verdict.text}</text>`;
-        else s += `<line class="ink-line" x1="${ax0}" y1="${cy}" x2="${ax1}" y2="${cy}" stroke-width="1.5"/><polygon class="ink-fill" points="${ax1 + 6},${cy} ${ax1 - 2},${cy - 4} ${ax1 - 2},${cy + 4}"/>` +
-                  `<text class="legend" x="${(ax0 + ax1) / 2}" y="${cy - 8}" text-anchor="middle" ${RTL}>${verdict.text}</text>` + group(right, 12, after);
-        return s + "</svg>";
+        const [cx0, cy0, r] = ck;
+        let s = `<svg class="figure hourglass-fig hg-scene${narrow ? " hg-stacked" : ""}" viewBox="0 0 ${W} ${H}" style="max-width:${(W / 16).toFixed(0)}rem" role="img" aria-label="שעוני החול והשעון">` +
+          `<rect class="measure hg-meas" x="2" y="2" width="${W - 4}" height="${H - 4}" rx="6" visibility="hidden"/>` +
+          `<circle class="hg-dial" cx="${cx0}" cy="${cy0}" r="${r}"/><path class="hg-dial-fill" d="M ${cx0} ${cy0}"/>` +
+          [0, 90, 180, 270].map((a) => `<line class="ink-line" x1="${cx0}" y1="${cy0 - r + 1}" x2="${cx0}" y2="${cy0 - r + 5}" stroke-width="1.5" transform="rotate(${a} ${cx0} ${cy0})"/>`).join("") +
+          `<line class="ink-line hg-hand" x1="${cx0}" y1="${cy0 + 3}" x2="${cx0}" y2="${cy0 - r + 6}" stroke-width="2.2" stroke-linecap="round"/><circle class="ink-dot" cx="${cx0}" cy="${cy0}" r="2.6"/>` +
+          `<text class="legend hg-t" x="${cx0}" y="${ck[3]}" text-anchor="middle" font-weight="700">t = 0</text>`;
+        const glasses = sizes().map((total, i) => {
+          const x = gx0 + SP * i, y = GY, cx = x + GW / 2, mid = y + GH / 2, k = "abc"[i], id = `exhg${++uid}`;
+          const bt = `${x},${y} ${x + GW},${y} ${cx + NECK},${mid} ${cx - NECK},${mid}`;
+          const bb = `${cx - NECK},${mid} ${cx + NECK},${mid} ${x + GW},${y + GH} ${x},${y + GH}`;
+          s += `<g class="hg-g"><clipPath id="${id}t"><polygon points="${bt}"/></clipPath><clipPath id="${id}b"><polygon points="${bb}"/></clipPath>` +
+            `<rect class="sand-${k} hg-top" clip-path="url(#${id}t)" x="${x}" y="${mid}" width="${GW}" height="0"/>` +
+            `<rect class="sand-${k} hg-bot" clip-path="url(#${id}b)" x="${x}" y="${y + GH}" width="${GW}" height="0"/>` +
+            `<line class="stream-${k} hg-grains" x1="${cx}" x2="${cx}" y1="${mid}" y2="${mid}"/>` +
+            `<polygon class="glass" points="${bt}"/><polygon class="glass" points="${bb}"/>` +
+            `<line class="frame" x1="${x - 4}" y1="${y}" x2="${x + GW + 4}" y2="${y}"/><line class="frame" x1="${x - 4}" y1="${y + GH}" x2="${x + GW + 4}" y2="${y + GH}"/></g>` +
+            `<g class="hg-mark" visibility="hidden"><path class="ink-line" d="M ${cx - 9} ${y - 5} A 10 7 0 0 1 ${cx + 8} ${y - 7}" fill="none" stroke-width="1.6"/>` +
+            `<polygon class="ink-fill" points="${cx + 11},${y - 2} ${cx + 4},${y - 6} ${cx + 11},${y - 10}"/></g>` +
+            `<text class="tick hg-n" x="${x + GW + 5}" y="${y + 12}">0</text><text class="tick hg-n" x="${x + GW + 5}" y="${y + GH - 2}">0</text>` +
+            `<text class="legend" x="${cx}" y="${y + GH + 19}" text-anchor="middle">${k.toUpperCase()}</text>`;
+          return { total, x, y, cx, mid };
+        });
+        s += `<text class="tick hg-l1" x="${lab[0]}" y="${lab[1]}" text-anchor="middle" ${RTL}></text>` +
+             `<text class="legend hg-l2" x="${lab[0]}" y="${lab[2]}" text-anchor="middle" font-weight="700" ${RTL}></text></svg>`;
+        $(".hg-frame").innerHTML = s;
+        const svg = $(".hg-frame svg"), all = (sel) => [...svg.querySelectorAll(sel)];
+        const gs = all(".hg-g"), tops = all(".hg-top"), bots = all(".hg-bot"), grains = all(".hg-grains"), marks = all(".hg-mark"), nums = all(".hg-n");
+        glasses.forEach((g, i) => Object.assign(g, { g: gs[i], top: tops[i], bot: bots[i], grain: grains[i], mark: marks[i], nums: [nums[2 * i], nums[2 * i + 1]] }));
+        scene = { key, svg, glasses, clock: { cx: cx0, cy: cy0, r, fill: svg.querySelector(".hg-dial-fill"), hand: svg.querySelector(".hg-hand"), t: svg.querySelector(".hg-t") },
+          meas: svg.querySelector(".hg-meas"), l1: svg.querySelector(".hg-l1"), l2: svg.querySelector(".hg-l2"), texts: new Map() };
       };
+      // a text of the scene changes only when its words do; the motion watch of core.js
+      // skips an element whose dvqTo is set (its own counters), so a running clock does not flash
+      const setText = (el, v, html) => {
+        if (scene.texts.get(el) === v) return;
+        scene.texts.set(el, v);
+        el.dvqTo = html ? "" : v;
+        if (html) el.innerHTML = v; else el.textContent = v;
+      };
+      const lerp = (a, b, u) => a + (b - a) * u;
+      const ease = (u) => (u < 0.5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u));
+      // one moment: T, and per glass the sand on top, its turn (degrees) and how far the
+      // sand that a flip carried to the far ends has fallen back (1 = at rest)
+      const paint = (m) => {
+        if (!scene) return;
+        const { clock } = scene, mins = ((m.T % 60) + 60) % 60, full = m.T > 0 && mins === 0;
+        const ang = (mins / 60) * 2 * Math.PI, ex = clock.cx + clock.r * Math.sin(ang), ey = clock.cy - clock.r * Math.cos(ang);
+        clock.fill.setAttribute("d", full ? `M ${clock.cx} ${clock.cy - clock.r} A ${clock.r} ${clock.r} 0 1 1 ${clock.cx} ${clock.cy + clock.r} A ${clock.r} ${clock.r} 0 1 1 ${clock.cx} ${clock.cy - clock.r} Z`
+          : mins ? `M ${clock.cx} ${clock.cy} L ${clock.cx} ${clock.cy - clock.r} A ${clock.r} ${clock.r} 0 ${mins > 30 ? 1 : 0} 1 ${f(ex)} ${f(ey)} Z` : `M ${clock.cx} ${clock.cy}`);
+        clock.hand.setAttribute("transform", `rotate(${f((mins / 60) * 360)} ${clock.cx} ${clock.cy})`);
+        setText(clock.t, `t = ${Number.isInteger(m.T) ? m.T : m.T.toFixed(1)}`);
+        scene.glasses.forEach((g, i) => {
+          const q = m.g[i], th = (GH / 2) * q.top / g.total, bh = (GH / 2) * (g.total - q.top) / g.total;
+          g.g.setAttribute("transform", `rotate(${f(q.rot)} ${g.cx} ${g.mid})`);
+          g.top.setAttribute("y", f(lerp(g.y, g.mid - th, q.settle))); g.top.setAttribute("height", f(th));
+          g.bot.setAttribute("y", f(lerp(g.mid, g.y + GH - bh, q.settle))); g.bot.setAttribute("height", f(bh));
+          const y1 = g.mid + 1.5, y2 = g.y + GH - bh - 1, flows = q.top > 0 && !q.rot && q.settle === 1 && y2 - y1 > 2;
+          g.grain.setAttribute("visibility", flows ? "visible" : "hidden");
+          if (flows) { g.grain.setAttribute("y1", f(y1)); g.grain.setAttribute("y2", f(y2)); g.grain.setAttribute("stroke-dashoffset", f(-3.6 * m.grain)); }
+          const up = Math.ceil(q.top - 1e-9), calm = !q.rot && q.settle === 1;
+          g.nums.forEach((el, j) => { el.setAttribute("visibility", calm ? "visible" : "hidden"); setText(el, String(j ? g.total - up : up)); });
+          g.mark.setAttribute("visibility", m.marks.includes(i) ? "visible" : "hidden");
+        });
+        scene.meas.setAttribute("visibility", m.measuring ? "visible" : "hidden");
+        setText(scene.l1, m.l1, true); setText(scene.l2, m.l2, true);
+        if (axisX) {
+          const x = axisX(Math.min(m.T, axisEnd));
+          axisHead.forEach((el) => (el.localName === "line" ? el.setAttribute("x2", f(x)) : el.setAttribute("cx", f(x))));
+        }
+      };
+      // the moments: event k as it happens (before its flips), its flips at progress p, and
+      // the sand running from event k to event k + 1 at progress u
+      const LET_I = (act) => [...act].map((c) => LET.indexOf(c));
+      const measuring = (T) => meta.interval && T >= meta.start;
+      const arrival = (k) => {
+        const [t, act, before, after] = events[k];
+        return { T: t, g: before.map((v) => ({ top: v, rot: 0, settle: 1 })), marks: after === null ? [] : LET_I(act), measuring: measuring(t), grain: grain, ...meta.verdict(k) };
+      };
+      const flipAt = (k, p) => {
+        const [t, act, before, after] = events[k], turn = LET_I(act);
+        return { T: t, marks: [], measuring: measuring(t), grain, ...meta.verdict(k),
+          g: before.map((v, i) => (!turn.includes(i) ? { top: v, rot: 0, settle: 1 }
+            : p < 0.75 ? { top: v, rot: 180 * ease(p / 0.75), settle: 1 } : { top: after[i], rot: 0, settle: ease((p - 0.75) / 0.25) })) };
+      };
+      const drainAt = (k, u) => {
+        const [t, , , after] = events[k], t2 = events[k + 1][0], T = u >= 1 ? t2 : t + (t2 - t) * u;
+        return { T, g: after.map((v) => ({ top: Math.max(v - (T - t), 0), rot: 0, settle: 1 })), marks: [], measuring: measuring(T), grain,
+          l1: "החול זורם", l2: `עד רגע <tspan direction="ltr" unicode-bidi="embed">${t2}</tspan>` };
+      };
+      // the step being shown (event anim.k to anim.k + 1): its parts and how far it went
+      let anim = null, raf = 0, last = 0, grain = 0, playing = false, timer = null;
+      const mpm = () => Number(speed.value);              // ms per minute of the hourglasses
+      const partMs = (part) => (part === "hold" ? Math.min(900, Math.max(300, 0.8 * mpm())) : part === "flip" ? 350 + 0.5 * mpm()
+        : (events[anim.k + 1][0] - events[anim.k][0]) * mpm());
+      const momentOf = () => {
+        const part = anim.parts[anim.i];
+        return part === "hold" ? arrival(anim.k) : part === "flip" ? flipAt(anim.k, anim.u) : drainAt(anim.k, anim.u);
+      };
+      const shown = () => (anim ? momentOf() : arrival(st.s));
+      const finish = () => { anim = null; if (raf) cancelAnimationFrame(raf); raf = 0; paint(arrival(st.s)); caption(st.s); };
+      const loop = (now) => {
+        raf = 0;
+        if (!anim) return;
+        const dt = Math.min(100, Math.max(0, now - last));
+        last = now; grain = (grain + dt / 420) % 1;
+        let left = dt;
+        while (anim && left > 0) {
+          const ms = partMs(anim.parts[anim.i]), need = (1 - anim.u) * ms;
+          if (ms <= 0 || need <= left) { left -= Math.max(need, 0); anim.u = 0; anim.i += 1; if (anim.i >= anim.parts.length) { finish(); break; } }
+          else { anim.u += left / ms; left = 0; }
+        }
+        if (!anim) { if (playing) { if (st.s < events.length - 1) step(true); else stop(); } return; }
+        paint(momentOf());
+        raf = requestAnimationFrame(loop);
+      };
+      const run = () => { if (!raf && anim) { last = performance.now(); raf = requestAnimationFrame(loop); } };
+      // one step forward: animated from the moment shown, or straight to the next event
+      const step = (hold) => {
+        if (anim) finish();
+        if (st.s >= events.length - 1) return;
+        const k = st.s, act = events[k][1];
+        if (!still() && !box.dvqPriming && !box.dvqSeeking) {
+          anim = { k, i: 0, u: 0, parts: [...(hold ? ["hold"] : []), ...(act ? ["flip"] : []), "drain"] };
+        }
+        st.s += 1;
+        draw();
+        run();
+      };
+      const pause = () => { if (raf) cancelAnimationFrame(raf); raf = 0; };
+      const stop = () => { playing = false; pause(); if (timer) clearTimeout(timer); timer = null; play.textContent = "הפעלה"; };
+      const halt = () => { stop(); anim = null; };          // a jump, a reset or a new plan
+      // under reduced motion the play goes event by event, a pause as long as the wait
+      const stillPlay = () => {
+        timer = setTimeout(() => {
+          timer = null;
+          if (!playing || st.s >= events.length - 1) { stop(); return; }
+          step(true);
+          if (st.s >= events.length - 1) stop(); else stillPlay();
+        }, Math.min(5000, Math.max(500, (events[Math.min(st.s + 1, events.length - 1)][0] - events[st.s][0]) * mpm())));
+      };
+      let axisX = null, axisEnd = 0, axisHead = [], shownAxis = null, caption = () => {};
       const axisSvg = (events, start, end, fork) => {
         const w = 640, x0 = 30, y = 40, last = Math.max(end, fork ? fork.flip : 1, 1);
         // the fork's labels sit right of their dots: the scale leaves them room inside the frame
@@ -350,14 +471,15 @@
           s += `<circle class="ink-dot" cx="${f(xs)}" cy="${yf}" r="4"/><text class="tick" x="${f(xs - 8)}" y="${yf + 4}" text-anchor="end">t = ${fork.t}</text>`;
         }
         if (start !== null) s += `<rect class="measure" x="${f(X(start))}" y="${y - 22}" width="${f(X(end) - X(start))}" height="44" rx="4"/>`;
-        s += `<line class="axis" x1="${x0}" x2="${f(x1)}" y1="${y}" y2="${y}"/>`;
+        s += `<line class="axis" x1="${x0}" x2="${f(x1)}" y1="${y}" y2="${y}"/>` +
+             `<line class="s2-line hg-head" x1="${x0}" x2="${x0}" y1="${y}" y2="${y}" stroke-width="3"/>`;
+        axisX = X; axisEnd = last;
         events.forEach(([t, act], i) => {
-          const cur = i === st.s;
-          s += `<line class="${cur ? "s2-line" : "ink-line"}" x1="${f(X(t))}" x2="${f(X(t))}" y1="${y - 10}" y2="${y + 10}" stroke-width="${cur ? 3 : 1.5}"/>` +
+          s += `<line class="ink-line hg-ev" x1="${f(X(t))}" x2="${f(X(t))}" y1="${y - 10}" y2="${y + 10}" stroke-width="1.5"/>` +
                `<text class="tick" x="${f(X(t))}" y="${y + 26}" text-anchor="middle">${t}</text>` +
                (act ? `<text class="legend" x="${f(X(t))}" y="${y - 14}" text-anchor="middle" style="font-size:11px">${plus(act)}</text>` : "");
         });
-        return s + "</svg>";
+        return s + `<circle class="s2-dot hg-head" cx="${x0}" cy="${y}" r="4"/></svg>`;
       };
       // the page's code for two hourglasses and the page's objective; the general search otherwise
       const solveFor = (objective) => {
@@ -444,11 +566,12 @@
           summary.innerHTML = `עם שעונים של ${sizesText} דקות אי אפשר למדוד ${ltr(st.D)} דקות${interval ? "" : " מרגע 0"}` +
             (st.D % gAll ? ` : ‏${ltr(st.D)} איננו כפולה של ${ltr(`gcd(${sz.join(", ")}) = ${gAll}`)}.` : ".") +
             (interval ? "" : ` מרגע 0 אפשר למדוד : ${ltr(reach().join(", "))} (עד 60).`);
+          halt(); events = []; scene = null; axisX = null; axisHead = []; shownAxis = null;
           $(".hg-axis").innerHTML = ""; $(".hg-fork").innerHTML = ""; $(".hg-frame").innerHTML = ""; $(".hg-caption").textContent = ""; $(".ex-pos").textContent = ""; $(".hg-compare").textContent = "";
           $(".ex-prev").disabled = $(".ex-next").disabled = true;
           return;
         }
-        const events = replay(res);
+        events = replay(res);
         st.s = Math.min(Math.max(st.s, 0), events.length - 1);
         const flips = res.plan.map(([t, act]) => `${ltr(t)}: ${HEB(act)}`).join("; ");
         summary.innerHTML = (interval ? `${st.objective === "page" ? "המדידה שמסתיימת הכי מוקדם" : "המדידה עם הכי מעט היפוכים"} : מרגע ${ltr(res.start)} עד רגע ${ltr(res.end)}, ‏${ltr(`${res.end} − ${res.start} = ${st.D}`)}. ` : `מודדים ${ltr(st.D)} דקות מרגע 0 ב-${ltr(events.length - 1)} אירועים${st.objective === "page" ? "" : ` ו-${ltr(res.flips)} היפוכים`}. `) +
@@ -461,61 +584,75 @@
           (res.explored !== null ? ` החיפוש בדק ${ltr(res.explored)} מצבים${sz.length === 3 ? " (עם שעון שלישי: 8 אפשרויות בכל אירוע)" : ""}.` : "");
         if (interval) $(".ex-fork").disabled = st.C !== null;
         const fork = interval && st.C === null && $(".ex-fork").checked ? hourglassFork(st.A, st.B) : null;
-        $(".hg-axis").innerHTML = axisSvg(events, interval ? res.start : null, res.end, fork);
+        // the axis and the scene are drawn again only when they change (a new plan, a new
+        // width): a figure drawn again gets a new enlarge button, placed a frame later
+        const axisKey = JSON.stringify([events, interval ? res.start : null, res.end, fork, st.A, st.B]);
+        if (axisKey !== shownAxis || !$(".hg-axis svg")) { $(".hg-axis").innerHTML = axisSvg(events, interval ? res.start : null, res.end, fork); shownAxis = axisKey; }
+        $(".hg-axis").querySelectorAll(".hg-ev").forEach((el, i) => { el.setAttribute("class", `${i === st.s ? "s2-line" : "ink-line"} hg-ev`); el.setAttribute("stroke-width", i === st.s ? "3" : "1.5"); });
         $(".hg-fork").innerHTML = interval && st.C !== null ? `<span class="ex-note">ההסתעפות מוגדרת לשני שעונים, ולכן היא כבויה כשיש שעון שלישי.</span>` : fork
           ? `ההסתעפות : ברגע ${ltr(fork.t)} השעון הגדול נגמר בפעם הראשונה, וב-${ltr(fork.small)} נשארו ${ltr(fork.top)} דקות. אם לא הופכים אותו הוא נגמר ברגע ${ltr(fork.keep)}, ואם הופכים ברגע ${ltr(fork.flip)}. ` +
             (Math.abs(fork.flip - fork.keep) === st.D ? `ההפרש ביניהם הוא בדיוק ${ltr(st.D)}, אבל אלה שתי ריצות שונות : בכל ריצה קורה רק אחד מהם, ולכן הם לא נותנים מדידה.` : `שני הרגעים שייכים לשתי ריצות שונות, ובכל ריצה קורה רק אחד מהם.`) +
             ` שתי השורות שמעל ההסתעפות הן הרגעים שבהם כל שעון נגמר אם הופכים אותו תמיד : כפולות של ${ltr(st.A)} ושל ${ltr(st.B)}.`
           : "";
-        const ev = events[st.s], [t, act, before, after] = ev;
-        // which hourglasses ran out: those whose sand on top after the previous action equals the wait
-        const prevEv = st.s > 0 ? events[st.s - 1] : null;
-        const out = [];
-        if (prevEv) { const w = t - prevEv[0]; prevEv[3].forEach((v, i) => { if (v === w) out.push(LET[i]); }); }
-        const what = st.s === 0 ? "התחלה" : `${out.join(" ו-")} ${out.length === 1 ? "נגמר" : "נגמרים"}`;
-        const ran = st.s === 0 ? "התחלה" : out.length > 1 ? `שעונים ${out.join(" ו-")} נגמרים` : `שעון ${out[0]} נגמר`;
-        const done = st.s === events.length - 1;
-        const flip = act ? `הופכים ${[...act].join(" ו-")}` : "";
+        // the words of event k: which glasses ran out, and what is done
+        const outOf = (k) => {
+          const out = [];
+          if (k > 0) { const w = events[k][0] - events[k - 1][0]; events[k - 1][3].forEach((v, i) => { if (v === w) out.push(LET[i]); }); }
+          return out;
+        };
         // the math stays in its own ltr span inside the rtl text
         const math = (m) => `<tspan direction="ltr" unicode-bidi="embed">${m}</tspan>`;
-        let verdict;
-        if (done) verdict = { event: what, text: interval ? `סוף ✓ ${math(`${res.end} − ${res.start} = ${st.D}`)}` : `✓ ${math(`D = ${st.D}`)}` };
-        else if (interval && t === res.start) verdict = { event: what, text: flip ? `מתחילים, ${flip}` : "מתחילים" };
-        else verdict = { event: what, text: flip || "ממתינים" };
-        $(".hg-frame").innerHTML = frameSvg(ev, interval && t >= res.start, verdict);
+        const verdict = (k) => {
+          const [t, act] = events[k], out = outOf(k), done = k === events.length - 1;
+          const what = k === 0 ? "התחלה" : `${out.join(" ו-")} ${out.length === 1 ? "נגמר" : "נגמרים"}`;
+          const flip = act ? `הופכים ${[...act].join(" ו-")}` : "";
+          if (done) return { l1: what, l2: interval ? `סוף ✓ ${math(`${res.end} − ${res.start} = ${st.D}`)}` : `✓ ${math(`D = ${st.D}`)}` };
+          if (interval && t === res.start) return { l1: what, l2: flip ? `מתחילים, ${flip}` : "מתחילים" };
+          return { l1: what, l2: flip || "ממתינים" };
+        };
+        meta = { interval, start: interval ? res.start : 0, verdict };
         const tops = (arr) => ltr(arr.map((v, i) => `${LET[i]} = ${v}`).join(", "));
-        $(".hg-caption").innerHTML = `רגע ${ltr(t)} : ${ran}. חול למעלה : ${tops(before)}. ` +
-          (done ? (interval ? `מסיימים : נמדדו ${ltr(st.D)} דקות מרגע ${ltr(res.start)}.` : `עברו בדיוק ${ltr(st.D)} דקות מרגע 0.`)
-            : `${interval && t === res.start ? "מתחילים למדוד, ו" : ""}${HEB(act)}${act ? `; אחרי ההיפוך למעלה ${tops(after)}` : ""}.`);
+        caption = (k) => {
+          const [t, act, before, after] = events[k], out = outOf(k), done = k === events.length - 1;
+          const ran = k === 0 ? "התחלה" : out.length > 1 ? `שעונים ${out.join(" ו-")} נגמרים` : `שעון ${out[0]} נגמר`;
+          $(".hg-caption").innerHTML = `רגע ${ltr(t)} : ${ran}. חול למעלה : ${tops(before)}. ` +
+            (done ? (interval ? `מסיימים : נמדדו ${ltr(st.D)} דקות מרגע ${ltr(res.start)}.` : `עברו בדיוק ${ltr(st.D)} דקות מרגע 0.`)
+              : `${interval && t === res.start ? "מתחילים למדוד, ו" : ""}${HEB(act)}${act ? `; אחרי ההיפוך למעלה ${tops(after)}` : ""}.`);
+        };
+        // the live scene shows the moment of the step being animated, or the event itself;
+        // the caption tells the event the step starts from, and the event reached at its end
+        sceneSvg();
+        axisHead = [...$(".hg-axis").querySelectorAll(".hg-head")];
+        paint(shown());
+        caption(anim ? anim.k : st.s);
         void names;
+        const done = st.s === events.length - 1;
         $(".ex-pos").textContent = `אירוע ${st.s + 1} מתוך ${events.length}`;
         $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = done;
       };
-      const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
-      const count = () => { const r = solve(); return r ? replay(r).length : 0; };
-      $(".ex-next").addEventListener("click", () => { stop(); st.s += 1; draw(); });
-      $(".ex-prev").addEventListener("click", () => { stop(); st.s -= 1; draw(); });
+      $(".ex-next").addEventListener("click", () => { stop(); step(false); });
+      $(".ex-prev").addEventListener("click", () => { halt(); st.s -= 1; draw(); });
       play.addEventListener("click", () => {
-        if (timer) { stop(); return; }
-        if (!count()) return;
-        if (st.s >= count() - 1) st.s = 0;
+        if (playing) { stop(); return; }                  // a pause: the step goes on from here
+        if (!events.length) return;
+        if (!anim && st.s >= events.length - 1) { st.s = 0; draw(); }
+        playing = true;
         play.textContent = "עצירה";
-        timer = setInterval(() => { if (st.s >= count() - 1) { stop(); return; } st.s += 1; draw(); }, Number($(".ex-speed").value));
-        draw();
+        if (still()) { if (anim) finish(); stillPlay(); return; }
+        if (anim) run(); else step(false);
       });
-      $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); play.click(); } });
       $(".ex-q-next").addEventListener("click", () => { st.q += 1; drawQueue(); });
       $(".ex-q-end").addEventListener("click", () => { st.q = traceOf().pops.length; drawQueue(); });
       $(".ex-q-start").addEventListener("click", () => { st.q = 0; drawQueue(); });
-      ["A", "B", "D"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { stop(); st[k] = Number($(`.ex-${k}`).value); st.s = 0; st.q = 0; draw(); }));
+      ["A", "B", "D"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { halt(); st[k] = Number($(`.ex-${k}`).value); st.s = 0; st.q = 0; draw(); }));
       $(".ex-C").addEventListener("change", () => {
         const v = Math.round(Number($(".ex-C").value));
-        stop(); st.C = $(".ex-C").value.trim() === "" || !Number.isFinite(v) || v < 1 ? null : Math.min(30, v); $(".ex-C").value = st.C === null ? "" : st.C; st.s = 0; draw();
+        halt(); st.C = $(".ex-C").value.trim() === "" || !Number.isFinite(v) || v < 1 ? null : Math.min(30, v); $(".ex-C").value = st.C === null ? "" : st.C; st.s = 0; draw();
       });
       $(".ex-C").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".ex-C").blur(); });
       if (interval) $(".ex-fork").addEventListener("change", draw);
-      $(".ex-obj").addEventListener("change", () => { stop(); st.objective = $(".ex-obj").value; st.s = 0; draw(); });
-      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0, q: 0 }); ["A", "B", "D"].forEach((k) => { $(`.ex-${k}`).value = st[k]; }); $(".ex-C").value = ""; $(".ex-obj").value = "page"; draw(); });
+      $(".ex-obj").addEventListener("change", () => { halt(); st.objective = $(".ex-obj").value; st.s = 0; draw(); });
+      $(".ex-reset").addEventListener("click", () => { halt(); Object.assign(st, defaults, { s: 0, q: 0 }); ["A", "B", "D"].forEach((k) => { $(`.ex-${k}`).value = st[k]; }); $(".ex-C").value = ""; $(".ex-obj").value = "page"; draw(); });
       draw();
     },
   });
@@ -523,7 +660,7 @@
   dvqExplorers.register({
     views: { hourglass: hourglassView },
     help: {
-      hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן, ״הצעד הבא״ ו״הפעלה״ עוברים אירוע אחרי אירוע, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר. בתיבה של 0019 המתג ״ההסתעפות״ מראה את שתי הריצות שמתפצלות ברגע שהשעון הגדול נגמר. בשלב ההוכחה ״השליפה הבאה״ מריץ את החיפוש של העמוד מצב אחרי מצב, עם התור ועץ החיפוש.",
+      hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן. ״האירוע הבא״ הופך את השעונים של האירוע ומריץ את החול עד האירוע הבא, ״הפעלה״ מריצה את כל התכנית ברצף (ועוצרת באמצע), והקצב קובע כמה זמן נמשכת דקה של שעון. השעון שבצד מראה את הזמן t, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר. בתיבה של 0019 המתג ״ההסתעפות״ מראה את שתי הריצות שמתפצלות ברגע שהשעון הגדול נגמר. בשלב ההוכחה ״השליפה הבאה״ מריץ את החיפוש של העמוד מצב אחרי מצב, עם התור ועץ החיפוש.",
     },
     models: { hourglassSolve, hourglassInterval, hourglassSolveTrace, hourglassIntervalTrace, hourglassFork, hourglassReplay, hourglassReachable, hourglassStepN, hourglassSearch, hourglassReplayN, hourglassReachableN },
   });

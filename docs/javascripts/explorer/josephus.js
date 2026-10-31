@@ -82,8 +82,8 @@
       const runFast = (n) => josephusSurvivor(n, st.l);
       box.innerHTML =
         `<div class="ex-controls">` +
-        `<label><span>מספר האנשים N</span><input type="range" class="ex-n" min="1" max="${nmax}" step="1" value="${st.n}" dir="ltr"><output class="out-n"></output>` +
-        `<input type="number" class="ex-num ex-nbig" min="1" max="${NBIG}" step="1" value="${st.n}" dir="ltr" aria-label="מספר האנשים, עד מיליון"></label>` +
+        `<label><span>מספר האנשים N</span><input type="range" class="ex-n" min="1" max="${nmax}" step="1" value="${st.n}" dir="ltr"><output class="out-n"></output></label>` +
+        `<label><input type="number" class="ex-num ex-nbig" min="1" max="${NBIG}" step="1" value="${st.n}" dir="ltr" aria-label="מספר האנשים, עד מיליון"></label>` +
         `<label><span>הכלל ${ltr("L")} : אחד נשאר, ${ltr("L − 1")} יוצאים</span><input type="range" class="ex-l" min="2" max="${lmax}" step="1" value="${st.l}" dir="ltr"><output class="out-l"></output></label>` +
         `<label><input type="checkbox" class="ex-mark" checked> להדגיש את השורד מההתחלה</label>` +
         `<label>המושב <input type="number" class="ex-num ex-seat" min="0" step="1" dir="ltr" placeholder="s" aria-label="מושב לחיפוש הפוך : לאילו N הוא שורד"></label>` +
@@ -163,9 +163,6 @@
         const left = big ? [] : josephusRenumber(n, L, st.s), renum = new Map(left.map((p, k) => [p, k]));
         const showNew = $(".ex-renum").checked && st.s > 0 && n <= 40 && left.length > 1;
         $(".ex-play-row").hidden = big;
-        // no circle, no steps: an empty counter hides the scrubber, which would keep the
-        // number of steps of the last small circle (and differ after a reload)
-        if (big) $(".ex-pos").textContent = "";
         if (!big) {
           const stays = cur ? [cur[0]] : [];
           $(".jos-circle").innerHTML = circleSvg(n, out, stays, cur ? cur[1] : [], winner, showNew ? renum : null);
@@ -182,6 +179,10 @@
             order.map((p, i) => `<span class="jos-chip${i >= order.length - (cur ? cur[1].length : 0) ? " is-now" : ""}">${p}</span>`).join(" ") : "עוד אף אחד לא יצא.";
           $(".ex-pos").textContent = `צעד ${st.s} מתוך ${steps.length}`;
           $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = done;
+        } else {
+          // no circle, no steps: an empty counter hides the scrubber, which would keep the
+          // number of steps of the last small circle (and differ after a reload)
+          $(".ex-pos").textContent = "";
         }
         answer(box, done ? `השורד הוא אדם ${ltr(survivor)}${big ? "" : `, אחרי ${ltr(steps.length)} צעדים`}.` : null, ".jos-circle circle.st-ok");
         const sim = survivor, how = big ? "בסימולציה ברשימה מקושרת" : "בסימולציה";

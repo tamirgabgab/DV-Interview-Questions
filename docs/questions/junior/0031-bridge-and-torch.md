@@ -197,6 +197,48 @@ added: 2026-10-20
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="bridge" linenums="1" hl_lines="17 18 19 20 21 22 23 24"
+        import heapq
+        from itertools import combinations
+
+
+        def bridge(times):
+            """The least time for everyone to cross, and the crossings as tuples of indices."""
+            n = len(times)
+            everyone = (1 << n) - 1
+            start = (0, 0)                          # (who is across, torch side: 0 near, 1 far)
+            best = {start: 0}
+            parent = {start: None}
+            queue = [(0, start)]
+            while queue:
+                t, state = heapq.heappop(queue)
+                if t > best[state]:
+                    continue                        # a stale entry: this state was reached faster (1)
+                across, side = state
+                if across == everyone:
+                    break
+                bank = [i for i in range(n) if ((across >> i) & 1) == side]     # (2)!
+                for group in [(i,) for i in bank] + list(combinations(bank, 2)):
+                    cost = t + max(times[i] for i in group)                      # (3)!
+                    new = (across ^ sum(1 << i for i in group), 1 - side)
+                    if cost < best.get(new, float("inf")):                       # (4)!
+                        best[new] = cost
+                        parent[new] = (state, group)
+                        heapq.heappush(queue, (cost, new))
+            moves, state = [], (everyone, 1)
+            while parent[state] is not None:                                     # (5)!
+                state, group = parent[state]
+                moves.append(group)
+            return best[(everyone, 1)], moves[::-1]
+        ```
+
+        1. רשומה ישנה בערימה : המצב כבר הושג בזמן קטן יותר, וזורקים אותה.
+        2. מי נמצא בגדה של הלפיד : הביט שלו במסכה שווה לצד של הלפיד.
+        3. המחיר של קבוצה הוא הזמן של האיטי בה.
+        4. השחרור של Dijkstra : רק דרך זולה יותר נכנסת לערימה, עם ההורה ומי חצה.
+        5. השחזור : מהמצב הסופי אחורה עד ההתחלה, ואז הופכים.
+
     === "SystemVerilog"
         ```systemverilog title="bridge_time" linenums="1" hl_lines="22 23 24 25 26 27 28 29 30 31 32 33"
         localparam int MAXN   = 8;
@@ -255,48 +297,6 @@ added: 2026-10-20
         2. הלולאה הפנימית מתחילה מ-\( j = i \) : כש-\( j = i \) אדם אחד חוצה, אחרת שניים.
            המסכה \( (1 \ll i) \mid (1 \ll j) \) נכונה בשני המקרים.
         3. השחרור (relax) : רק דרך זולה יותר מעדכנת את המרחק, ההורה ומי חצה.
-
-    === "Python"
-        ```python title="bridge" linenums="1" hl_lines="17 18 19 20 21 22 23 24"
-        import heapq
-        from itertools import combinations
-
-
-        def bridge(times):
-            """The least time for everyone to cross, and the crossings as tuples of indices."""
-            n = len(times)
-            everyone = (1 << n) - 1
-            start = (0, 0)                          # (who is across, torch side: 0 near, 1 far)
-            best = {start: 0}
-            parent = {start: None}
-            queue = [(0, start)]
-            while queue:
-                t, state = heapq.heappop(queue)
-                if t > best[state]:
-                    continue                        # a stale entry: this state was reached faster (1)
-                across, side = state
-                if across == everyone:
-                    break
-                bank = [i for i in range(n) if ((across >> i) & 1) == side]     # (2)!
-                for group in [(i,) for i in bank] + list(combinations(bank, 2)):
-                    cost = t + max(times[i] for i in group)                      # (3)!
-                    new = (across ^ sum(1 << i for i in group), 1 - side)
-                    if cost < best.get(new, float("inf")):                       # (4)!
-                        best[new] = cost
-                        parent[new] = (state, group)
-                        heapq.heappush(queue, (cost, new))
-            moves, state = [], (everyone, 1)
-            while parent[state] is not None:                                     # (5)!
-                state, group = parent[state]
-                moves.append(group)
-            return best[(everyone, 1)], moves[::-1]
-        ```
-
-        1. רשומה ישנה בערימה : המצב כבר הושג בזמן קטן יותר, וזורקים אותה.
-        2. מי נמצא בגדה של הלפיד : הביט שלו במסכה שווה לצד של הלפיד.
-        3. המחיר של קבוצה הוא הזמן של האיטי בה.
-        4. השחרור של Dijkstra : רק דרך זולה יותר נכנסת לערימה, עם ההורה ומי חצה.
-        5. השחזור : מהמצב הסופי אחורה עד ההתחלה, ואז הופכים.
 
     #### למה זה נכון { .sol-proof }
 

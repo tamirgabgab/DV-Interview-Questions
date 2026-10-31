@@ -1,10 +1,8 @@
-"""Question 0058: the page's best_total against the generator's minimax and parity_move as
-the first player against every reply (it collects exactly its colour, at least half); the
-page's examples (6 by the trick and 5 by greedy on 1, 2, 5, 3; 19 against 11 on
-1, 1, 9, 1, 1, 9; 2 on 1, 5, 1) and that 1, 2, 5, 3 is the first row of four distinct coins
-up to 5 where greedy loses; the explorer's JavaScript; and the page copies of the blocks."""
+"""Question 0058: the page's missing_one, missing_two, missing_and_dup and missing_k against
+the generator's counting reference (tools/figures/q0058.py) on random runs with tags out of
+order; the page's numbers (tag 4, the split of 5 and 12, tag 7 and duplicate 3, 72 bits);
+XOR fooled by a duplicate; the explorer's JavaScript; and the page copies of the blocks."""
 
-import itertools
 import json
 import random
 import sys
@@ -15,61 +13,91 @@ sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0058  # noqa: E402
 
 ns = load_python(58)
-parity_move, best_total = ns["parity_move"], ns["best_total"]
+missing_one, missing_two, missing_and_dup, missing_k = (ns[k] for k in ("missing_one", "missing_two", "missing_and_dup", "missing_k"))
+
+
+def run(rng, n, missing=(), dup=()):
+    sent = list(range(n))
+    ret = [t for t in sent if t not in missing] + list(dup)
+    rng.shuffle(ret)
+    return sent, ret
 
 
 def test_page_examples():
-    assert best_total([1, 2, 5, 3]) == 6 and q0058.play([1, 2, 5, 3], "greedy", "optimal")[1] == [5, 6]
-    assert max(1 + 5, 2 + 3) == 6 and q0058.play([1, 2, 5, 3], "parity", "optimal")[1] == [6, 5]
-    assert best_total([1, 1, 9, 1, 1, 9]) == 19 and q0058.play([1, 1, 9, 1, 1, 9], "parity", "optimal")[1] == [11, 11]
-    assert best_total([1, 5, 1]) == 2
-    first = next(c for c in itertools.permutations(range(1, 6), 4) if 2 * q0058.play(list(c), "greedy", "optimal")[1][0] < sum(c))
-    assert first == (1, 2, 5, 3)
-    assert all(2 * q0058.play(list(c), "greedy", "optimal")[1][0] >= sum(c) for c in itertools.product(range(1, 6), repeat=2))
-    assert best_total([5]) == 5
+    assert missing_one(q0058.A_SENT, q0058.A_RET) == 4
+    sent, ret = list(range(16)), [t for t in range(16) if t not in (5, 12)]
+    assert missing_two(sent, ret, 4) == [5, 12]
+    sent, ret = list(range(10)), [t for t in range(10) if t != 7] + [3]
+    assert missing_and_dup(sent, ret) == (7, 3)
+    assert sum(sent) - sum(ret) == 4 and sum(t * t for t in sent) - sum(t * t for t in ret) == 40
+    assert missing_one(sent, ret) == 4                          # XOR names a tag that came back
+    assert 8 + 8 * 8 == 72
 
 
-def test_against_minimax():
+def test_against_counting():
+    rng = random.Random(57)
+    for _ in range(300):
+        w = rng.randint(2, 8)
+        n = 1 << w
+        a, b = rng.sample(range(n), 2)
+        sent, ret = run(rng, n, (a,))
+        assert missing_one(sent, ret) == a == q0058.truth(sent, ret)[0][0]
+        sent, ret = run(rng, n, (a, b))
+        assert missing_two(sent, ret, w) == sorted((a, b)) == q0058.truth(sent, ret)[0]
+        sent, ret = run(rng, n, (a,), (b,))
+        assert missing_and_dup(sent, ret) == (a, b)
+        assert q0058.truth(sent, ret) == ([a], [b])
+        k = rng.randint(1, min(5, n - 1))
+        miss = rng.sample(range(n), k)
+        sent, ret = run(rng, n, miss)
+        assert missing_k(sent, ret, k, n) == sorted(miss)
+
+
+def test_reused_tags():
+    """Tags sent again after they come back: the accumulators describe what is out now."""
     rng = random.Random(58)
-    for _ in range(400):
-        coins = [rng.randint(1, 30) for _ in range(rng.randint(1, 11))]
-        assert best_total(coins) == q0058.best(coins), coins
+    for _ in range(100):
+        n = 32
+        sent, ret = [], []
+        for _ in range(5):
+            s, r = run(rng, n)
+            sent += s
+            ret += r
+        a = rng.randrange(n)
+        sent.append(a)
+        assert missing_one(sent, ret) == a
 
 
-def test_parity_against_every_reply():
-    """The trick as the first player collects its whole colour whatever the second does."""
-    rng = random.Random(59)
-    for _ in range(60):
-        n = rng.choice([2, 4, 6, 8])
-        coins = [rng.randint(1, 20) for _ in range(n)]
-        colour = max(sum(coins[0::2]), sum(coins[1::2]))
-
-        def worst(i, j, mine):              # the first player's total against the worst replies
-            if i > j:
-                return mine
-            k = i if parity_move(coins, i, j) in ("L", 0) else j
-            mine += coins[k]
-            i, j = (i + 1, j) if k == i else (i, j - 1)
-            if i > j:
-                return mine
-            return min(worst(i + 1, j, mine), worst(i, j - 1, mine))
-        assert worst(0, n - 1, 0) == colour >= sum(coins) / 2
+def test_memory_table():
+    assert "| ‏72 |" in q0058.memory_table() and "| ‏40 |" in q0058.memory_table()
 
 
-def test_explorer_matches_the_reference():
+def test_explorer_matches_the_page_code():
     from page_tests import explorer_require, node_json
 
-    rng = random.Random(60)
-    rows = [[1, 2, 5, 3], [1, 1, 9, 1, 1, 9], [1, 5, 1]] + [[rng.randint(1, 20) for _ in range(rng.randint(1, 10))] for _ in range(40)]
-    pairs = [(a, b) for a in ("greedy", "parity", "optimal") for b in ("greedy", "parity", "optimal")]
+    rng = random.Random(59)
+    cases = []
+    for _ in range(60):
+        w = rng.choice([3, 4, 5])
+        n = 1 << w
+        miss = rng.sample(range(n), rng.randint(0, 3))
+        dup = rng.sample([t for t in range(n) if t not in miss], rng.randint(0, 1))
+        sent, ret = run(rng, n, miss, dup)
+        cases.append([n, w, sent, ret])
     got = node_json(f"""
       const m = {explorer_require()};
-      console.log(JSON.stringify({json.dumps(rows)}.map((c) => [m.crDiff(c), {json.dumps(pairs)}.map(([a, b]) => m.crPlay(c, a, b))])));""")
-    for coins, (d, games) in zip(rows, got):
-        assert d == q0058.diff_table(coins)
-        for (a, b), g in zip(pairs, games):
-            moves, tot = q0058.play(coins, a, b)
-            assert g["tot"] == tot and [[w, s, c] for w, s, c in moves] == g["moves"], (coins, a, b)
+      console.log(JSON.stringify({json.dumps(cases)}.map(([n, w, s, r]) => m.tcDecode(s, r, w, n))));""")
+    for (n, w, sent, ret), res in zip(cases, got):
+        x, part, s, q, out = q0058.accumulators(sent, ret, w)
+        assert [res["x"], res["part"], res["s"], res["q"], res["out"]] == [x, part, s, q, out]
+        assert res["one"] == missing_one(sent, ret)
+        miss, dup = q0058.truth(sent, ret)
+        if x:
+            assert res["two"] == missing_two(sent, ret, w)
+        if s:
+            assert res["sums"] == list(missing_and_dup(sent, ret))
+        if out > 0:
+            assert res["k"] == missing_k(sent, ret, out, n)
 
 
 def test_figures_up_to_date():

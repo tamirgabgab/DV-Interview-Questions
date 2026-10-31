@@ -21,6 +21,13 @@ added: 2026-10-24
 בסעיפים א ו-ב יש להחזיר את השטח ואת שתי הפינות שמגדירות את הצורה, ובסעיף ג את השטח
 ואת שלושת הקודקודים :
 
+=== "Python"
+    ```python title="largest_square, largest_rectangle, largest_triangle"
+    def largest_square(grid: list[list[int]]) -> tuple[int, tuple[int, int], tuple[int, int]]: ...
+    def largest_rectangle(grid: list[list[int]]) -> tuple[int, tuple[int, int], tuple[int, int]]: ...
+    def largest_triangle(grid: list[list[int]]) -> tuple[int, tuple[int, int], tuple[int, int], tuple[int, int]]: ...
+    ```
+
 === "SystemVerilog"
     ```systemverilog title="shape_t"
     // The answer: the area, the top-left corner (r1, c1) and the bottom-right corner (r2, c2),
@@ -35,13 +42,6 @@ added: 2026-10-24
     // function automatic shape_t largest_square(bit grid[][]);      // to write
     // function automatic shape_t largest_rectangle(bit grid[][]);   // to write
     // function automatic tri_t largest_triangle(bit grid[][]);      // to write
-    ```
-
-=== "Python"
-    ```python title="largest_square, largest_rectangle, largest_triangle"
-    def largest_square(grid: list[list[int]]) -> tuple[int, tuple[int, int], tuple[int, int]]: ...
-    def largest_rectangle(grid: list[list[int]]) -> tuple[int, tuple[int, int], tuple[int, int]]: ...
-    def largest_triangle(grid: list[list[int]]) -> tuple[int, tuple[int, int], tuple[int, int], tuple[int, int]]: ...
     ```
 
 הפלט הוא `(area, top_left, bottom_right)`, כאשר כל פינה היא `(row, col)` והאינדקסים
@@ -254,6 +254,31 @@ added: 2026-10-24
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="largest_square" linenums="1"
+        def largest_square(grid):
+            if not grid or not grid[0]:
+                return 0, None, None
+            n = len(grid[0])
+            dp = [0] * (n + 1)          # dp[j + 1] = the value for column j
+            side, end = 0, None
+            for i, row in enumerate(grid):
+                diag = 0                # dp of the cell up-left
+                for j in range(1, n + 1):
+                    top = dp[j]
+                    if row[j - 1] == 1:
+                        dp[j] = min(top, dp[j - 1], diag) + 1
+                        if dp[j] > side:
+                            side, end = dp[j], (i, j - 1)
+                    else:
+                        dp[j] = 0
+                    diag = top
+            if side == 0:
+                return 0, None, None
+            r, c = end
+            return side * side, (r - side + 1, c - side + 1), end
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="largest_square" linenums="1"
         function automatic int min3(int a, int b, int c);
@@ -282,31 +307,6 @@ added: 2026-10-24
           if (side == 0) return '{0, -1, -1, -1, -1};
           return '{side * side, ei - side + 1, ej - side + 1, ei, ej};
         endfunction
-        ```
-
-    === "Python"
-        ```python title="largest_square" linenums="1"
-        def largest_square(grid):
-            if not grid or not grid[0]:
-                return 0, None, None
-            n = len(grid[0])
-            dp = [0] * (n + 1)          # dp[j + 1] = the value for column j
-            side, end = 0, None
-            for i, row in enumerate(grid):
-                diag = 0                # dp of the cell up-left
-                for j in range(1, n + 1):
-                    top = dp[j]
-                    if row[j - 1] == 1:
-                        dp[j] = min(top, dp[j - 1], diag) + 1
-                        if dp[j] > side:
-                            side, end = dp[j], (i, j - 1)
-                    else:
-                        dp[j] = 0
-                    diag = top
-            if side == 0:
-                return 0, None, None
-            r, c = end
-            return side * side, (r - side + 1, c - side + 1), end
         ```
 
     #### למה זה נכון { .sol-proof }
@@ -433,6 +433,31 @@ added: 2026-10-24
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="largest_rectangle" linenums="1"
+        def largest_rectangle(grid):
+            if not grid or not grid[0]:
+                return 0, None, None
+            n = len(grid[0])
+            heights = [0] * n
+            best, top_left, bottom_right = 0, None, None
+            for i, row in enumerate(grid):
+                for j in range(n):
+                    heights[j] = heights[j] + 1 if row[j] == 1 else 0
+                stack = []                           # column indices with increasing heights
+                for j in range(n + 1):
+                    h = heights[j] if j < n else 0   # a zero at the end empties the stack
+                    while stack and heights[stack[-1]] >= h:
+                        height = heights[stack.pop()]
+                        left = stack[-1] + 1 if stack else 0
+                        area = height * (j - left)
+                        if area > best:
+                            best = area
+                            top_left, bottom_right = (i - height + 1, left), (i, j - 1)
+                    stack.append(j)
+            return best, top_left, bottom_right
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="largest_rectangle" linenums="1"
         // Part b: every row as a histogram of the ones that end in it, and the largest
@@ -459,31 +484,6 @@ added: 2026-10-24
           end
           return best;
         endfunction
-        ```
-
-    === "Python"
-        ```python title="largest_rectangle" linenums="1"
-        def largest_rectangle(grid):
-            if not grid or not grid[0]:
-                return 0, None, None
-            n = len(grid[0])
-            heights = [0] * n
-            best, top_left, bottom_right = 0, None, None
-            for i, row in enumerate(grid):
-                for j in range(n):
-                    heights[j] = heights[j] + 1 if row[j] == 1 else 0
-                stack = []                           # column indices with increasing heights
-                for j in range(n + 1):
-                    h = heights[j] if j < n else 0   # a zero at the end empties the stack
-                    while stack and heights[stack[-1]] >= h:
-                        height = heights[stack.pop()]
-                        left = stack[-1] + 1 if stack else 0
-                        area = height * (j - left)
-                        if area > best:
-                            best = area
-                            top_left, bottom_right = (i - height + 1, left), (i, j - 1)
-                    stack.append(j)
-            return best, top_left, bottom_right
         ```
 
     #### למה זה נכון { .sol-proof }
@@ -611,6 +611,30 @@ added: 2026-10-24
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="largest_triangle" linenums="1"
+        def largest_triangle(grid):
+            if not grid or not grid[0]:
+                return 0, None, None, None
+            m, n = len(grid), len(grid[0])
+            side, corner, legs = 0, None, None
+            for dv, dh in ((-1, -1), (-1, 1), (1, -1), (1, 1)):   # the legs: up or down, left or right
+                rows = range(m) if dv < 0 else range(m - 1, -1, -1)   # the rows the legs point to first
+                cols = range(n) if dh < 0 else range(n - 1, -1, -1)
+                dp = [0] * n            # dp[j] = the leg for column j of the current row
+                for i in rows:
+                    prev = 0            # dp of the neighbour along the row
+                    for j in cols:
+                        dp[j] = min(dp[j], prev) + 1 if grid[i][j] == 1 else 0
+                        if dp[j] > side:
+                            side, corner = dp[j], (i, j)
+                            legs = (i + dv * (side - 1), j), (i, j + dh * (side - 1))
+                        prev = dp[j]
+            if side == 0:
+                return 0, None, None, None
+            return side * (side + 1) // 2, corner, *legs
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="largest_triangle" linenums="1"
         // Part c: a pass for each direction of the legs; dp[j] is the leg of the largest
@@ -640,30 +664,6 @@ added: 2026-10-24
             end
           return best;
         endfunction
-        ```
-
-    === "Python"
-        ```python title="largest_triangle" linenums="1"
-        def largest_triangle(grid):
-            if not grid or not grid[0]:
-                return 0, None, None, None
-            m, n = len(grid), len(grid[0])
-            side, corner, legs = 0, None, None
-            for dv, dh in ((-1, -1), (-1, 1), (1, -1), (1, 1)):   # the legs: up or down, left or right
-                rows = range(m) if dv < 0 else range(m - 1, -1, -1)   # the rows the legs point to first
-                cols = range(n) if dh < 0 else range(n - 1, -1, -1)
-                dp = [0] * n            # dp[j] = the leg for column j of the current row
-                for i in rows:
-                    prev = 0            # dp of the neighbour along the row
-                    for j in cols:
-                        dp[j] = min(dp[j], prev) + 1 if grid[i][j] == 1 else 0
-                        if dp[j] > side:
-                            side, corner = dp[j], (i, j)
-                            legs = (i + dv * (side - 1), j), (i, j + dh * (side - 1))
-                        prev = dp[j]
-            if side == 0:
-                return 0, None, None, None
-            return side * (side + 1) // 2, corner, *legs
         ```
 
     #### למה זה נכון { .sol-proof }

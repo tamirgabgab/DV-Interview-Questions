@@ -1,12 +1,15 @@
-"""Question 0056: the page's last_fall, collisions and fall_times against the generator's
-half-second simulation (tools/figures/q0056.py, ants that turn at every meeting) on random
-poles; the page's numbers (90 s and 5 collisions for the six ants, 100 s and 2500 at most
-for 100 ants); the explorer's JavaScript at every half second; and the page copies of the
+"""Question 0056: the page's win3_lsb, win3_msb and win_div against the window itself (kept
+as a value and stepped by the definition) on every bit string up to 10 bits for every L up
+to 6 and every start window, and on random digit strings in several bases; the generator's
+minimized machines (the state counts on the page, the same both ways, above 2^(L-1) from
+L = 3); the page's examples; the explorer's JavaScript; and the page copies of the
 generated blocks."""
 
+import itertools
 import json
 import random
 import sys
+from math import gcd
 
 from extract_code import ROOT, load_python
 
@@ -14,102 +17,95 @@ sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0056  # noqa: E402
 
 ns = load_python(56)
-last_fall, collisions, fall_times, ring_after = (ns[k] for k in ("last_fall", "collisions", "fall_times", "ring_after"))
+win3_lsb, win3_msb, win_div = (ns[k] for k in ("win3_lsb", "win3_msb", "win_div"))
 
 
-def random_pole(rng, n_max=14, length=100):
-    n = rng.randint(1, min(n_max, length + 1))
-    pos = sorted(rng.sample(range(length + 1), n))
-    return pos, [rng.choice((1, -1)) for _ in pos]
+def truth(digits, m, base, L, msb, init=0):
+    """After each digit, does the window (by the definition) divide by m."""
+    return [w % m == 0 for w in q0056.windows(digits, base, L, msb, init)[1:]]
 
 
-def test_page_example():
-    pos, dirs = q0056.POS, q0056.DIRS
-    assert last_fall(pos, dirs) == 90 and collisions(pos, dirs) == 5
-    assert fall_times(pos, dirs) == [25, 60, 75, 90, 60, 10]
-    fall, hits, _ = q0056.simulate(pos, dirs)
-    assert hits == 5 and [t for t, _ in fall] == [25, 60, 75, 90, 60, 10]
-    assert [s for _, s in fall] == ["L", "L", "L", "R", "R", "R"]
+def test_every_bit_string():
+    for L in range(1, 7):
+        for init in range(2 ** L):
+            for n in range(1, 11 if L <= 3 else 8):
+                for bits in itertools.product((0, 1), repeat=n):
+                    bits = list(bits)
+                    assert win3_lsb(bits, L, init) == truth(bits, 3, 2, L, False, init), (bits, L, init)
+                    assert win3_msb(bits, L, init) == truth(bits, 3, 2, L, True, init), (bits, L, init)
 
 
-def test_against_the_simulation():
+def test_page_examples():
+    assert q0056.windows([1], 2, 3, False, 0b011)[-1] == 0b111      # 011 and 1 at the LSB: 111
+    assert q0056.windows([1], 2, 3, True, 0b011)[-1] == 0b101       # 011 and 1 at the MSB: 101
+    assert [q0056.text(w, 2, 3) for w in q0056.windows([1, 1, 0, 1], 2, 3, False)] == ["000", "001", "011", "110", "101"]
+    assert [q0056.text(w, 2, 3) for w in q0056.windows([1, 0, 1, 1], 2, 3, True)] == ["000", "100", "010", "101", "110"]
+    assert win3_lsb([1, 1, 0, 1], 3) == [False, True, True, False]
+    assert win3_msb([1, 0, 1, 1], 3) == [False, False, False, True]
+    # the trap: 011 and 110 both divide, and differ after a 0 at the LSB
+    assert q0056.windows([0], 2, 3, False, 0b011)[-1] == 6 and q0056.windows([0], 2, 3, False, 0b110)[-1] == 4
+    # the constants: 2^L mod 3 is 1 for L even, 2^(L-1) mod 3 is 1 for L odd; 10^4 mod 7 = 4
+    assert all(pow(2, L, 3) == (1 if L % 2 == 0 else 2) and pow(2, L - 1, 3) == (1 if L % 2 else 2) for L in range(1, 20))
+    assert pow(10, 4, 7) == 4 and pow(2, -1, 3) == 2
+
+
+def test_general_machine():
     rng = random.Random(56)
-    for _ in range(400):
-        length = rng.choice([10, 37, 100])
-        pos, dirs = random_pole(rng, 14, length)
-        fall, hits, _ = q0056.simulate(pos, dirs, length)
-        assert fall_times(pos, dirs, length) == [t for t, _ in fall], (pos, dirs)
-        assert last_fall(pos, dirs, length) == max(t for t, _ in fall)
-        assert collisions(pos, dirs) == hits
-        # the ants that fall to the left are the leftmost ones, as many as go left
-        ell = sum(1 for d in dirs if d < 0)
-        assert [s for _, s in fall] == ["L"] * ell + ["R"] * (len(pos) - ell)
+    for _ in range(600):
+        base = rng.choice([2, 3, 4, 8, 10, 16])
+        m = rng.choice([x for x in range(2, 20) if gcd(x, base) == 1])
+        L = rng.randint(1, 6)
+        init = rng.randrange(base ** L)
+        digits = [rng.randrange(base) for _ in range(rng.randint(1, 40))]
+        for msb in (False, True):
+            assert win_div(digits, m, base, L, msb, init) == truth(digits, m, base, L, msb, init), (digits, m, base, L, msb, init)
+    # at the LSB the rule needs no inverse: any m, even sharing a factor with the base
+    for m in (2, 4, 6, 10, 12):
+        digits = [rng.randrange(10) for _ in range(30)]
+        assert win_div(digits, m, 10, 3, False, 123) == truth(digits, m, 10, 3, False, 123)
+    assert win_div([1, 1, 0, 1], 3, 2, 3) == win3_lsb([1, 1, 0, 1], 3)
+    assert win_div([1, 0, 1, 1], 3, 2, 3, msb=True) == win3_msb([1, 0, 1, 1], 3)
 
 
-def test_bounds():
-    # 100 s at most, reached only with an ant at an end facing in
-    assert last_fall([0], [1]) == 100 == last_fall([3, 100], [1, -1]) and last_fall([1, 99], [1, -1]) == 99
-    rng = random.Random(57)
-    for _ in range(300):
-        pos, dirs = random_pole(rng, 30)
-        assert last_fall(pos, dirs) <= 100
-        assert collisions(pos, dirs) <= len(pos) ** 2 // 4
-    half = list(range(1, 101))
-    assert collisions(half, [1] * 50 + [-1] * 50) == 2500
-    # random directions: n(n - 1)/8 collisions on average (the follow-up), exactly by symmetry
-    n = 6
-    total = sum(collisions(list(range(n)), [1 if m >> i & 1 else -1 for i in range(n)]) for m in range(1 << n))
-    assert total * 8 == n * (n - 1) * (1 << n)
+def test_state_counts():
+    counts = [q0056.fewest_states(3, 2, L, False) for L in range(1, 9)]
+    assert counts == [2, 4, 7, 14, 27, 54, 107, 214]
+    assert counts == [q0056.fewest_states(3, 2, L, True) for L in range(1, 9)]       # the same both ways
+    assert all(c >= 2 ** (L - 2) for L, c in enumerate(counts, 1))                    # the proof's bound
+    assert all(c > 2 ** (L - 1) for L, c in enumerate(counts, 1) if L >= 3)           # so L flip-flops at least
+    # the proof: two windows that differ in the low L - 2 bits are told apart by some bits after
+    for L in range(3, 8):
+        for w, v in itertools.combinations(range(2 ** L), 2):
+            if (w ^ v) % 2 ** (L - 2) == 0:
+                continue
+            i = ((w ^ v) & -(w ^ v)).bit_length() - 1
+            j = L - 1 - i
+            told = any((q0056.windows(u, 2, L, False, w)[-1] % 3 == 0) != (q0056.windows(u, 2, L, False, v)[-1] % 3 == 0)
+                       for u in ([(x >> k) & 1 for k in reversed(range(j))] for x in range(2 ** j)))
+            assert told, (L, w, v)
 
 
-def test_ring():
-    """Part d: after each lap of 100 s ant i stands where ant (i + s) % n started, with its
-    direction; every ant is home first after n / gcd(n, s) laps (simulated lap by lap)."""
-    assert ring_after(q0056.RING_DIRS) == (2, 300) and ring_after(q0056.DIRS) == (0, 100)
-    rng = random.Random(59)
-    for _ in range(150):
-        pos, dirs = random_pole(rng, 8, 99)
-        n = len(pos)
-        s, home = ring_after(dirs)
-        start = list(zip(pos, dirs))
-        lap = q0056.ring(pos, dirs, 100, 100)
-        assert lap == [(float(pos[(i + s) % n]), dirs[(i + s) % n]) for i in range(n)], (pos, dirs)
-        laps = next(k for k in range(1, n + 1) if q0056.ring(pos, dirs, 100, 100 * k) == [(float(p), d) for p, d in start])
-        assert home == 100 * laps, (pos, dirs)
-
-
-def test_explorer_matches_the_simulation():
+def test_explorer_matches_the_page_code():
     from page_tests import explorer_require, node_json
 
-    rng = random.Random(58)
-    cases = [(q0056.POS, q0056.DIRS)] + [random_pole(rng, 12) for _ in range(40)]
+    rng = random.Random(57)
+    cases = []
+    for _ in range(80):
+        base = rng.choice([2, 4, 8, 10, 16])
+        m = rng.choice([x for x in range(3, 16, 2) if gcd(x, base) == 1])
+        L = rng.randint(1, 8 if base == 2 else 4)
+        cases.append([m, base, L, rng.randrange(base ** L), [rng.randrange(base) for _ in range(rng.randint(1, 16))]])
     got = node_json(f"""
       const m = {explorer_require()};
-      console.log(JSON.stringify({json.dumps(cases)}.map(([p, d]) => {{
-        const T = 2 * m.antsEnd(p, d, 100);
-        return {{ fall: m.antsFall(p, d, 100), hits: m.antsHits(p, d, T), frames: [...Array(T + 1).keys()].map((t) => m.antsAt(p, d, 100, t)) }};
-      }})));""")
-    for (pos, dirs), res in zip(cases, got):
-        fall, hits, paths = q0056.simulate(pos, dirs)
-        assert res["fall"] == [[t, s] for t, s in fall] and res["hits"] == hits
-        # every ant at every half second: on the turning path of the simulation
-        for t2, frame in enumerate(res["frames"]):
-            for k, ant in enumerate(frame):
-                want = position(paths[k], t2 / 2)
-                if want is None:
-                    assert ant["gone"] in ("L", "R"), (pos, dirs, t2, k)
-                else:
-                    assert ant["gone"] is None and abs(ant["x"] - want) < 1e-9, (pos, dirs, t2, k, ant, want)
-
-
-def position(path, t):
-    """Where an ant is at time t on its path of (t, x) corners, None once it fell (the last
-    corner is the fall)."""
-    if t >= path[-1][0]:
-        return None
-    for (t0, x0), (t1, x1) in zip(path, path[1:]):
-        if t0 <= t <= t1:
-            return x0 + (x1 - x0) * (t - t0) / (t1 - t0)
+      console.log(JSON.stringify({json.dumps(cases)}.map(([mm, b, L, init, ds]) => [
+        m.winRun(ds, mm, b, L, init, false), m.winRun(ds, mm, b, L, init, true)])));""")
+    for (m, base, L, init, digits), runs in zip(cases, got):
+        for run, msb in zip(runs, (False, True)):
+            ws = q0056.windows(digits, base, L, msb, init)
+            assert [s["w"] for s in run] == ws
+            assert [s["r"] for s in run] == [w % m for w in ws]
+            assert [s["out"] for s in run[1:]] == [q0056.leaving(w, base, L, msb) for w in ws[:-1]]
+            assert [s["r"] == 0 for s in run[1:]] == win_div(digits, m, base, L, msb, init)
 
 
 def test_figures_up_to_date():

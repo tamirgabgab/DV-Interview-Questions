@@ -73,7 +73,7 @@
       dec: (text) => {
         const m = /^([\d.]+)-(\d+)-(both|long)$/.exec(text);
         const prices = m && intList(m[1], 1, 20);
-        if (!prices || prices.length < 2 || prices.length > 20) return null;
+        if (!prices || prices.length < 2 || prices.length > 30) return null;
         return { prices, k: Math.min(Number(m[2]), prices.length), both: m[3] === "both" };
       },
     },
@@ -369,6 +369,58 @@
     (typeof marks === "string" ? box.querySelectorAll(marks) : marks).forEach((el) => el && el.classList.add("ex-answer-mark"));
   };
 
+  // An explanation panel (session 28): the solution's steps as chips, the ones of the
+  // moment lit; the values of the code's variables; and the page's own code with the lines
+  // the step ran lit, as the page lights its key lines. The code is read from the page (the
+  // tabbed block whose title names the function, in the language of the open tab, which
+  // follows the site's tab choice), so the box never holds a second copy of it.
+  // explain(box, title) appends the panel (a fold, closed on a phone) and returns
+  // show({ code, steps, lit, lines, vars }): code names the function, steps are the chip
+  // texts, lit the chips to light (from 1), lines the line numbers per language
+  // ({ py, sv }, from 1), and vars an HTML line of the variables.
+  const CODE_LINE = /<a id="__codelineno-\d+-\d+"[^>]*><\/a>/;
+  const codeSetOf = (name) => [...document.querySelectorAll(".tabbed-set")]
+    .find((set) => [...set.querySelectorAll(".filename")].some((f) => f.textContent.trim().split(/\s+/).pop() === name));
+  const PANELS = new Set();
+  const explain = (box, title) => {
+    const panel = document.createElement("section");
+    panel.className = "ex-proof ex-explain";
+    panel.innerHTML = `<p class="ex-proof-title">${title}</p><ol class="ex-stepchips"></ol><p class="ex-vars"></p>` +
+      `<div class="highlight ex-codewrap"><pre class="ex-codeview"><code dir="ltr" tabindex="0" aria-label="הקוד של הפתרון, השורות של הצעד מודגשות"></code></pre></div>`;
+    box.append(panel);
+    let st = null;
+    const render = () => {
+      if (!st) return;
+      panel.querySelector(".ex-stepchips").innerHTML = st.steps.map((s, i) => `<li${st.lit.includes(i + 1) ? ' class="is-lit"' : ""}>${s}</li>`).join("");
+      panel.querySelector(".ex-vars").innerHTML = st.vars || "";
+      const set = codeSetOf(st.code), code = panel.querySelector("code");
+      if (!set) { code.innerHTML = ""; return; }
+      const inputs = [...set.querySelectorAll(":scope > input")], labels = [...set.querySelectorAll(".tabbed-labels label")];
+      const i = Math.max(0, inputs.findIndex((r) => r.checked));
+      const lang = /python/i.test(labels[i] ? labels[i].textContent : "") ? "py" : "sv";
+      const src = set.querySelectorAll(".tabbed-block")[i], el = src && src.querySelector("pre code");
+      let lines = [];
+      if (el) {                              // without the annotation markers the theme adds
+        const clone = el.cloneNode(true);
+        clone.querySelectorAll(".md-annotation").forEach((a) => a.remove());
+        lines = clone.innerHTML.split(CODE_LINE).slice(1);
+      }
+      const lit = new Set(st.lines[lang] || []);
+      code.innerHTML = lines.map((h, n) => {
+        let t = h.replace(/\n$/, "");
+        if (/^<span class="hll">/.test(t)) t = t.replace(/^<span class="hll">/, "").replace(/\n?<\/span>$/, "");   // the page's own key lines
+        return `<span class="ex-line${lit.has(n + 1) ? " hll" : ""}" data-n="${n + 1}">${t}\n</span>`;
+      }).join("");
+    };
+    PANELS.add(render);
+    if (PANELS.size === 1) {                 // the language of every panel follows the tabs
+      document.addEventListener("change", (e) => {
+        if (e.target.closest && e.target.closest(".tabbed-set")) setTimeout(() => PANELS.forEach((r) => r()), 0);
+      });
+    }
+    return (state) => { st = state; render(); };
+  };
+
   // The box's header (UI328): a title, and help, "reset everything" and "copy link" as
   // icon buttons (the word stays in the button as its name and shows as a tooltip).
   // "Reset everything" builds the box again from its defaults and, in a box that draws
@@ -493,6 +545,58 @@
     });
   };
 
+  // Typed values: a number or text field of a box applies its value on Enter and when it
+  // is left, whatever the view listens to (most views apply on change, some blur the field
+  // on Enter to get one, a few act on Enter themselves). The browser's own events do not
+  // always come: an input method (an IME, or the text suggestions of Windows) takes the
+  // Enter that ends its composition, so that keydown is "Process" (keyCode 229) and only
+  // the keyup says Enter; no view handler and no change follow. So, once per box: such a
+  // keyup is given to the field as a keydown Enter, for the view's own handler; after an
+  // Enter keydown (once the view's handlers ran: one that prevents the default applied the
+  // value itself) and when the field is left, the field's change event is fired if its
+  // value is not the one last applied. A native change that comes after one of these, for
+  // the same value, is dropped, so a value is applied once. A textarea keeps Enter for its
+  // new lines and is only applied when left.
+  const TYPED = "input[type=number], input[type=text], input:not([type]), textarea";
+  const fields = (box) => {
+    if (box.dvqFields) return;                           // a rebuilt box keeps its listeners
+    box.dvqFields = true;
+    const typed = (t) => t instanceof Element && t.matches(TYPED) && !t.readOnly && !t.disabled;
+    const apply = (t) => {
+      if (!t.isConnected || t.disabled || t.value === t.dvqApplied) return;
+      t.dvqApplied = t.value;
+      t.dvqSent = true;
+      t.dispatchEvent(new Event("change", { bubbles: true }));
+      t.dvqApplied = t.value;                            // as the view left it
+    };
+    box.addEventListener("focusin", (e) => { if (typed(e.target)) { e.target.dvqApplied = e.target.value; e.target.dvqSent = false; } }, true);
+    box.addEventListener("change", (e) => {
+      const t = e.target;
+      if (!typed(t) || !e.isTrusted) return;
+      if (t.dvqSent && t.value === t.dvqApplied) { e.stopImmediatePropagation(); t.dvqSent = false; return; }
+      t.dvqSent = false;
+      t.dvqApplied = t.value;
+    }, true);
+    box.addEventListener("change", (e) => { if (typed(e.target)) e.target.dvqApplied = e.target.value; });
+    box.addEventListener("keydown", (e) => {
+      const t = e.target;
+      if (!typed(t) || t.localName === "textarea") return;
+      t.dvqIme = e.isComposing || e.keyCode === 229;     // the input method's key
+      if (e.key !== "Enter" || t.dvqIme) return;
+      setTimeout(() => {                                 // after the view's own handlers
+        if (e.defaultPrevented) { t.dvqApplied = t.value; return; }
+        apply(t);
+      }, 0);
+    }, true);
+    box.addEventListener("keyup", (e) => {
+      const t = e.target;
+      if (e.key !== "Enter" || !typed(t) || !t.dvqIme || t.localName === "textarea") return;
+      t.dvqIme = false;
+      t.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", bubbles: true, cancelable: true }));
+    }, true);
+    box.addEventListener("focusout", (e) => { if (typed(e.target)) apply(e.target); }, true);
+  };
+
   // --- links and the remembered state ---------------------------------------------------
 
   // The controls of a box are its inputs, selects and textareas in document order, the
@@ -615,13 +719,14 @@
       // three or more action buttons in a row (examples, moves, amounts) go into one run
       // that scrolls sideways on a phone instead of wrapping into several lines (S418);
       // the order stays, and elsewhere the run lays out as if it were not there; a row a
-      // view lays out as a grid (0024's events, one per cell) keeps its grid
+      // view lays out as a grid (0024's events, one per cell) keeps its grid; the run is
+      // not tagged as an action itself, so the button size and padding stay on its buttons
       if (!getComputedStyle(row).display.includes("flex")) return;
       let run = [];
       const close = () => {
         if (run.length >= 3) {
           const wrap = document.createElement("span");
-          wrap.className = "ex-btnrun ex-c-action";
+          wrap.className = "ex-btnrun";
           run[0].before(wrap);
           wrap.append(...run);
         }
@@ -1126,6 +1231,7 @@
     edits(box);
     header(box, helpOpen);
     keyboard(box);
+    fields(box);
     decorateLive(box);
     steady(box);
     watch(box);
@@ -1199,7 +1305,7 @@
 
   const lib = {
     BASE, EPS, H, KB_DIGITS, RAND_HASH, RIGHT, SEED_MAX, STATE_CODECS, TOP, TRI_M, W, X0,
-    answer, arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, f, floydParse, floydTrace, fmt, frame, hline,
+    answer, arrowStep, attr, autoplay, bigComb, bitsOf, code, eventStrip, explain, f, floydParse, floydTrace, fmt, frame, hline,
     gridText, ltr, mulberry32, newSeed, parseGrid, randNote, randomRow, seedControls, speedSel, stickyNames, triNorm, viewSel,
     waveDromText, waveStrip,
   };

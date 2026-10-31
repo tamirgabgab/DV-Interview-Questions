@@ -1,4 +1,4 @@
-/* The site's styles, part 4 of 12: admonition types, solution blocks and map, cost chips, content tables, the shared box layout, step timelines.
+/* The site's styles, part 4 of 20: admonition types, solution blocks and map, cost chips, content tables, the shared box layout, step timelines.
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
 /* ---------- Round B: clearer solutions ---------- */
@@ -215,6 +215,11 @@
 }
 .md-typeset .cost-chip > b { font-weight: 700; }
 .md-typeset .cost-chip .arithmatex { direction: ltr; unicode-bidi: isolate; }   /* a flex item: keep the formula LTR */
+/* A chip grows with its formula and never scrolls: the formula's own sideways scroll (01-base)
+   showed a useless scrollbar under a formula a pixel too wide. A chip wider than its row takes
+   a row of its own, and on a phone its label and formula may stack. */
+.md-typeset .cost-chip { flex-wrap: wrap; max-width: 100%; }
+.md-typeset .cost-chip .arithmatex { overflow: visible; }
 
 @media print { .md-typeset .sol-map { display: none; } }
 
@@ -384,3 +389,17 @@
 .md-typeset .steps > ol > li > :last-child {
   margin-bottom: 0;
 }
+
+/* The explanation panel of a box (session 28, core.js explain): the solution's steps as
+   chips with the step of the moment lit, the variables, and the page's code with the lines
+   the step ran lit the way the page lights its key lines (.hll). */
+.md-typeset .explorer .ex-explain .ex-stepchips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0 0 0.4rem; padding: 0; list-style: none; counter-reset: exstep; }
+.md-typeset .explorer .ex-explain .ex-stepchips li { counter-increment: exstep; margin: 0; padding: 0.1rem 0.5rem 0.1rem 0.4rem; border: 1.5px solid var(--viz-grid); border-radius: 1rem; font-size: 0.65rem; color: var(--viz-text); }
+.md-typeset .explorer .ex-explain .ex-stepchips li::before { content: counter(exstep); display: inline-block; min-width: 1.1em; margin-inline-end: 0.3em; font-weight: 700; text-align: center; }
+.md-typeset .explorer .ex-explain .ex-stepchips li.is-lit { border-color: var(--md-accent-fg-color); background: var(--md-accent-fg-color--transparent); color: var(--md-default-fg-color); font-weight: 600; }
+.md-typeset .explorer .ex-explain .ex-vars { margin: 0.2rem 0 0.4rem; font-size: 0.7rem; }
+.md-typeset .explorer .ex-codewrap { margin: 0; }
+.md-typeset .explorer pre.ex-codeview { margin: 0; font-size: 0.6rem; line-height: 1.5; direction: ltr; }
+.md-typeset .explorer pre.ex-codeview > code { display: block; padding: 0.4rem 0; overflow-x: auto; }   /* the code scrolls, as the theme's code blocks do, and is focusable */
+.md-typeset .explorer pre.ex-codeview .ex-line { position: relative; display: block; margin: 0; padding: 0 0.6rem 0 2.8em; white-space: pre; }
+.md-typeset .explorer pre.ex-codeview .ex-line::before { content: attr(data-n); position: absolute; left: 0.5em; width: 1.8em; text-align: right; color: var(--md-default-fg-color--light); }

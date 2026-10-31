@@ -4,7 +4,8 @@ This is a Hebrew, right-to-left MkDocs Material site of Design Verification inte
 questions, published to GitHub Pages from `main`. `README.md` has the links to the site;
 `CONTRIBUTING.md` documents the content format and the tooling; `CATALOG.md` lists the
 questions (written by `tools/catalog.py`); `HANDOFF.md` is the living task list and work
-log (the older log is in `HANDOFF-archive.md`). Read `CONTRIBUTING.md` and `HANDOFF.md`
+log (the older log is in `HANDOFF-archive.md`). `VIDEOS.md` is the plan of the tutorial videos
+(Manim, one per question, a chapter per part). Read `CONTRIBUTING.md` and `HANDOFF.md`
 before a work session, and update `HANDOFF.md` (work log, open items) at the end of every
 session.
 
@@ -43,7 +44,8 @@ session.
   solution blocks idea → steps → code → proof → cost, traps, follow-ups with a short
   collapsed answer each) is described in
   `CONTRIBUTING.md` and enforced by `python tools/lint_pages.py`.
-- Code answers in SystemVerilog and Python as linked tabs, SystemVerilog first. The pages
+- Code answers in Python and SystemVerilog as linked tabs, Python first (the owner's choice,
+  2026-10-29). The pages
   are the single source of truth: tests and the run panel execute the page code as is, so
   never change code on a page without running its tests. Annotation markers (`// (1)!`,
   `# (1)!`, or ` (1)` at the end of a comment) are the only decoration allowed on code
@@ -69,13 +71,17 @@ session.
 
 ```bash
 python tools/lint_pages.py            # page skeleton and RTL rules
+python tools/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
 python tools/run_tests.py             # pytest + Verilator (needs Verilator 5.052+ with z3)
 mkdocs build --strict                 # the build CI runs
 python tools/check_links.py           # internal links and anchors of the built site
 python tools/check_phone.py           # every page at 390 px (add --local-cdn in a sandbox)
 python tools/check_explorers.py       # every explorer box: buttons clicked, link and saved state
 python tools/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
+python tools/check_inputs.py          # every box field typed into: Enter, Tab and an input method apply it
 python tools/check_contrast.py        # the site's colour pairs, light and dark (WCAG 2)
+python tools/check_404.py             # the 404 page under the site's path, both widths
+python tools/check_keyboard.py        # a keyboard pass: tab order, focus rings, names, the components' keys
 ```
 
 The linter checks RTL at every paragraph start (indented blocks and the steps timeline
@@ -83,10 +89,14 @@ included) and warns about literal SVG colours; the phone check also warns about 
 math wider than its column (split it with `aligned`), and fails when the enlarge button of a
 figure covers SVG text (reading-tools.js moves it above such a figure). In CI it also fails
 on figure text under 9 px at 390 px and on serious axe findings (`--small-fail --axe-fail`). `--scheme dark` runs the phone check
-in dark mode; CI runs it only on a manual run with `phone_dark`. Node runs the explorer
+in dark mode; CI runs it only on a manual run with `phone_dark`. Every page's line of the
+phone check also gives its weight (HTML KB, bytes fetched, requests); over 400 KB of HTML is
+a warning. Every page is also loaded with its text enlarged 1.3 times (a phone's text size), and
+fails if it is then wider than the screen; at both sizes a box's slider and its value must
+sit on one row. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
-All eight run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
+All twelve run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
 CATALOG, HANDOFF, its archive or this file runs nothing, and `main` skips the checks for a commit that
 already passed on its branch); a failure blocks the deploy. A new colour pair (a text
 or a mark on a fill) goes into the `PAIRS` list of `tools/check_contrast.py`. Verilator

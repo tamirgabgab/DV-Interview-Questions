@@ -259,36 +259,6 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
-    === "SystemVerilog"
-        ```systemverilog title="mice_needed, drink_round, find_bottle" linenums="1" hl_lines="4 13 20"
-        // the fewest mice: the smallest m with (rounds + 1)^m >= n
-        function automatic int mice_needed(int n, int rounds);
-          int m = 0;
-          longint reach = 1;                                   // (1)!
-          while (reach < n) begin reach *= rounds + 1; m++; end
-          return m;
-        endfunction
-
-        // the round in which mouse i drinks from bottle x; 0: it never drinks from x
-        function automatic int drink_round(int x, int i, int rounds);
-          int d = x;
-          repeat (i) d /= rounds + 1;
-          return d % (rounds + 1);                              // (2)!
-        endfunction
-
-        // death[i] is the round mouse i died in, 0 if it lived: the poisoned bottle
-        function automatic int find_bottle(int death[], int rounds);
-          int x = 0;
-          for (int i = death.size() - 1; i >= 0; i--)
-            x = x * (rounds + 1) + death[i];                    // (3)!
-          return x;
-        endfunction
-        ```
-
-        1. ‏`longint` כדי ש-\( (b + 1)^m \) לא יגלוש כשהוא עובר את \( n \).
-        2. הספרה ה-\( i \) של \( x \) בבסיס \( b + 1 \) היא הסבב שבו עכבר \( i \) שותה ממנו.
-        3. הסבב שבו העכבר מת הוא הספרה שלו; קוראים את המספר מהספרה העליונה, כמו בשיטת הורנר.
-
     === "Python"
         ```python title="mice_needed, drink_round, experiment, find_bottle" linenums="1" hl_lines="10 19 26"
         def mice_needed(n: int, rounds: int) -> int:
@@ -325,6 +295,36 @@ added: 2026-10-27
            (0 : אף פעם).
         2. רק עכבר חי שותה. עכבר מת רק מהבקבוק המורעל, ולכן מספיק לבדוק אותו.
         3. הסבב שבו העכבר מת הוא הספרה שלו בבקבוק המורעל.
+
+    === "SystemVerilog"
+        ```systemverilog title="mice_needed, drink_round, find_bottle" linenums="1" hl_lines="4 13 20"
+        // the fewest mice: the smallest m with (rounds + 1)^m >= n
+        function automatic int mice_needed(int n, int rounds);
+          int m = 0;
+          longint reach = 1;                                   // (1)!
+          while (reach < n) begin reach *= rounds + 1; m++; end
+          return m;
+        endfunction
+
+        // the round in which mouse i drinks from bottle x; 0: it never drinks from x
+        function automatic int drink_round(int x, int i, int rounds);
+          int d = x;
+          repeat (i) d /= rounds + 1;
+          return d % (rounds + 1);                              // (2)!
+        endfunction
+
+        // death[i] is the round mouse i died in, 0 if it lived: the poisoned bottle
+        function automatic int find_bottle(int death[], int rounds);
+          int x = 0;
+          for (int i = death.size() - 1; i >= 0; i--)
+            x = x * (rounds + 1) + death[i];                    // (3)!
+          return x;
+        endfunction
+        ```
+
+        1. ‏`longint` כדי ש-\( (b + 1)^m \) לא יגלוש כשהוא עובר את \( n \).
+        2. הספרה ה-\( i \) של \( x \) בבסיס \( b + 1 \) היא הסבב שבו עכבר \( i \) שותה ממנו.
+        3. הסבב שבו העכבר מת הוא הספרה שלו; קוראים את המספר מהספרה העליונה, כמו בשיטת הורנר.
 
     #### למה זה נכון { .sol-proof }
 

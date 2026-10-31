@@ -65,6 +65,19 @@ added: 2026-10-15
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="swap_temp" hl_lines="2"
+        def swap_temp(v, i, j):
+            temp = v[i]   # (1)!
+            v[i] = v[j]
+            v[j] = temp
+        ```
+
+        1. ‏`v[i]` משחק את התפקיד של `a`. הרשימה `v` היא אובייקט שאפשר לשנות, ולכן הכתיבה
+           לתוכה נראית אצל הקורא, בניגוד להשמה למשתנה `int` מקומי.
+
+        ב-Python הדרך המקובלת היא פשוט `v[i], v[j] = v[j], v[i]`.
+
     === "SystemVerilog"
         ```systemverilog title="function swap_temp" hl_lines="3"
         function automatic void swap_temp(ref int a, ref int b);   // (1)!
@@ -79,19 +92,6 @@ added: 2026-10-15
            למשתנה של הקורא, ולכן השינוי בתוך הפונקציה נראה גם בחוץ. בלי `ref` הפונקציה
            הייתה מחליפה בין שני עותקים מקומיים ולא עושה כלום.
         2. השמירה חייבת לבוא לפני ההשמה `a = b`. זו הסיבה היחידה שצריך משתנה עזר.
-
-    === "Python"
-        ```python title="swap_temp" hl_lines="2"
-        def swap_temp(v, i, j):
-            temp = v[i]   # (1)!
-            v[i] = v[j]
-            v[j] = temp
-        ```
-
-        1. ‏`v[i]` משחק את התפקיד של `a`. הרשימה `v` היא אובייקט שאפשר לשנות, ולכן הכתיבה
-           לתוכה נראית אצל הקורא, בניגוד להשמה למשתנה `int` מקומי.
-
-        ב-Python הדרך המקובלת היא פשוט `v[i], v[j] = v[j], v[i]`.
 
     **נסו בעצמכם.** התיבה מריצה את שלוש ההשמות שורה אחרי שורה : בכל שורה רואים את הערכים
     של `a`, `b` ו-`temp`, וליד כל ערך את הביטוי שלו ב-\( a_0 \) וב-\( b_0 \). המתג "אותו
@@ -143,6 +143,17 @@ added: 2026-10-15
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="swap_arith" hl_lines="2"
+        def swap_arith(v, i, j):
+            v[i] = v[i] + v[j]   # a = a0 + b0 (1)
+            v[j] = v[i] - v[j]   # b = (a0 + b0) - b0 = a0
+            v[i] = v[i] - v[j]   # a = (a0 + b0) - a0 = b0
+        ```
+
+        1. אותו מבנה בדיוק, כש-`v[i]` הוא `a` ו-`v[j]` הוא `b`. ב-Python הסכום אף פעם לא
+           גולש, כי מספרים שלמים הם בגודל לא מוגבל.
+
     === "SystemVerilog"
         ```systemverilog title="function swap_arith" hl_lines="2"
         function automatic void swap_arith(ref int a, ref int b);
@@ -156,17 +167,6 @@ added: 2026-10-15
            יכול לגלוש, וזה לא מפריע (ראו "למה זה נכון").
         2. הסדר חשוב : `b` משוחזר קודם, כי בשלב הזה `b` עדיין מחזיק את \( b_0 \), ורק אותו
            אפשר להחסיר מהסכום.
-
-    === "Python"
-        ```python title="swap_arith" hl_lines="2"
-        def swap_arith(v, i, j):
-            v[i] = v[i] + v[j]   # a = a0 + b0 (1)
-            v[j] = v[i] - v[j]   # b = (a0 + b0) - b0 = a0
-            v[i] = v[i] - v[j]   # a = (a0 + b0) - a0 = b0
-        ```
-
-        1. אותו מבנה בדיוק, כש-`v[i]` הוא `a` ו-`v[j]` הוא `b`. ב-Python הסכום אף פעם לא
-           גולש, כי מספרים שלמים הם בגודל לא מוגבל.
 
     #### למה זה נכון { .sol-proof }
 
@@ -247,6 +247,17 @@ added: 2026-10-15
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="swap_xor" hl_lines="2"
+        def swap_xor(v, i, j):
+            v[i] = v[i] ^ v[j]   # a = a0 ^ b0 (1)
+            v[j] = v[i] ^ v[j]   # b = a0 ^ b0 ^ b0 = a0
+            v[i] = v[i] ^ v[j]   # a = a0 ^ b0 ^ a0 = b0
+        ```
+
+        1. ב-Python `^` על `int` פועל על ייצוג two's complement באורך לא מוגבל, ולכן
+           הטריק עובד גם על מספרים שליליים.
+
     === "SystemVerilog"
         ```systemverilog title="function swap_xor" hl_lines="2"
         function automatic void swap_xor(ref int a, ref int b);
@@ -260,17 +271,6 @@ added: 2026-10-15
            היו שונים יש 1. ממנו ועוד אחד מהערכים המקוריים אפשר לשחזר את השני.
         2. אותן שלוש שורות בדיוק כמו בסעיף ב, כש-`^` מחליף גם את `+` וגם את `-`. אין כאן
            גלישה, כי XOR לא מייצר נשא בין ביטים.
-
-    === "Python"
-        ```python title="swap_xor" hl_lines="2"
-        def swap_xor(v, i, j):
-            v[i] = v[i] ^ v[j]   # a = a0 ^ b0 (1)
-            v[j] = v[i] ^ v[j]   # b = a0 ^ b0 ^ b0 = a0
-            v[i] = v[i] ^ v[j]   # a = a0 ^ b0 ^ a0 = b0
-        ```
-
-        1. ב-Python `^` על `int` פועל על ייצוג two's complement באורך לא מוגבל, ולכן
-           הטריק עובד גם על מספרים שליליים.
 
     #### למה זה נכון { .sol-proof }
 

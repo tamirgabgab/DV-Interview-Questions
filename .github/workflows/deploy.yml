@@ -110,6 +110,9 @@ jobs:
           restore-keys: sv-${{ runner.os }}-
       - name: Lint the question pages (structure and RTL rules)
         run: python tools/lint_pages.py
+      # The tutorial videos' fields on the pages and the captions of videos/*/script.md.
+      - name: Check the video fields and the script captions
+        run: python tools/check_videos.py
       # Every text and mark colour pair of the site, light and dark, against WCAG 2.
       - name: Check the colour contrast of both schemes
         run: python tools/check_contrast.py
@@ -152,6 +155,15 @@ jobs:
       - name: Check every page at phone width
         if: needs.gate.outputs.verified != 'true'
         run: python tools/check_phone.py site --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
+      # The 404 page as GitHub Pages serves it (under the site's path), at both widths, and a
+      # keyboard pass over a few pages: the tab order, visible focus, names, and the keys of
+      # the hints, folds, boxes, figures, self-checks, the run panel and the search.
+      - name: Check the 404 page under the site's path
+        if: needs.gate.outputs.verified != 'true'
+        run: python tools/check_404.py site --axe node_modules/axe-core/axe.min.js
+      - name: Check the keyboard paths
+        if: needs.gate.outputs.verified != 'true'
+        run: python tools/check_keyboard.py site
       - uses: actions/upload-artifact@v7
         if: always() && needs.gate.outputs.verified != 'true'
         with:
@@ -204,6 +216,10 @@ jobs:
       # moves while the box steps fails (tools/check_jumps.py).
       - name: Step the explorer boxes for jumping figures, part ${{ matrix.shard }} of 4
         run: python tools/check_jumps.py site --shard ${{ matrix.shard }}/4
+      # Every number and text field of every box typed into: Enter, Tab and an input
+      # method's Enter must apply the value (tools/check_inputs.py).
+      - name: Type into the explorer boxes' fields, part ${{ matrix.shard }} of 4
+        run: python tools/check_inputs.py site --shard ${{ matrix.shard }}/4
 
   deploy:
     needs: [gate, build, explorers]

@@ -76,6 +76,53 @@ added: 2026-10-15
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        מגרילים שלוש זוויות רציפות, ואם התנאי לא מתקיים מגרילים מחדש (rejection sampling).
+        בנוסף, פונקציה עצמאית בודקת את התוצאה בעזרת מכפלה וקטורית (ראו "למה זה נכון") :
+
+        ```python title="random_triangle_with_center" linenums="1" hl_lines="7 8"
+        import math
+        import random
+
+
+        def contains_center(angles):
+            a = sorted(angles)
+            gaps = [a[1] - a[0], a[2] - a[1], 2 * math.pi - (a[2] - a[0])]  # (1)!
+            return all(g < math.pi for g in gaps)  # (2)!
+
+
+        def random_triangle_with_center():
+            while True:
+                angles = [random.uniform(0, 2 * math.pi) for _ in range(3)]
+                if contains_center(angles):  # (3)!
+                    return [(math.cos(t), math.sin(t)) for t in angles]
+
+
+        # Independent check using cross products: the center (0, 0) must be on the
+        # same side of all three edges.
+        def center_inside(points):
+            s = []
+            for i in range(3):
+                (x0, y0), (x1, y1) = points[i], points[(i + 1) % 3]
+                s.append((x1 - x0) * (0.0 - y0) - (y1 - y0) * (0.0 - x0))
+            return all(v > 0 for v in s) or all(v < 0 for v in s)  # (4)!
+
+
+        print(random_triangle_with_center())
+        ```
+
+        1. הקשת השלישית סוגרת את המעגל מהזווית הגדולה ביותר חזרה לקטנה ביותר, ולכן אורכה הוא
+           ההשלמה ל-\( 2\pi \). זו הקשת שקל לשכוח.
+        2. אי-שוויון חזק : קשת של בדיוק \( \pi \) פירושה שהצלע שמולה היא קוטר והמרכז נמצא
+           **על** הצלע, ולא בתוך המשולש.
+        3. לולאת הדחייה : כל ניסיון בלתי תלוי בקודמיו, ולכן המשולשים שמתקבלים מתפלגים בדיוק
+           כמו ההתפלגות המותנית "משולש אקראי שמכיל את המרכז".
+        4. שלושת הסימנים שווים, בלי להניח כיוון : הפונקציה נכונה גם כשהנקודות לא ממוינות,
+           ולכן היא בודק עצמאי אמיתי ל-`random_triangle_with_center`.
+
+        לפי סעיף ג, רק \( \tfrac14 \) מההגרלות עוברות את התנאי, ולכן הלולאה מבצעת **בממוצע
+        4 ניסיונות**.
+
     === "SystemVerilog"
         ב-SystemVerilog לא צריך לולאת דחייה : מתארים את התנאי כ-constraints, וה-solver מוצא
         פתרון שמקיים אותם בקריאה אחת ל-`randomize()`.
@@ -178,53 +225,6 @@ added: 2026-10-15
           וממירים אותן.
         - **‏`center_inside()` :** בדיקה **עצמאית**, בשיטה גאומטרית אחרת, שמוודאת שה-constraints
           נכונים. זה בדיוק התפקיד של checker מול generator.
-
-    === "Python"
-        מגרילים שלוש זוויות רציפות, ואם התנאי לא מתקיים מגרילים מחדש (rejection sampling).
-        בנוסף, פונקציה עצמאית בודקת את התוצאה בעזרת מכפלה וקטורית (ראו "למה זה נכון") :
-
-        ```python title="random_triangle_with_center" linenums="1" hl_lines="7 8"
-        import math
-        import random
-
-
-        def contains_center(angles):
-            a = sorted(angles)
-            gaps = [a[1] - a[0], a[2] - a[1], 2 * math.pi - (a[2] - a[0])]  # (1)!
-            return all(g < math.pi for g in gaps)  # (2)!
-
-
-        def random_triangle_with_center():
-            while True:
-                angles = [random.uniform(0, 2 * math.pi) for _ in range(3)]
-                if contains_center(angles):  # (3)!
-                    return [(math.cos(t), math.sin(t)) for t in angles]
-
-
-        # Independent check using cross products: the center (0, 0) must be on the
-        # same side of all three edges.
-        def center_inside(points):
-            s = []
-            for i in range(3):
-                (x0, y0), (x1, y1) = points[i], points[(i + 1) % 3]
-                s.append((x1 - x0) * (0.0 - y0) - (y1 - y0) * (0.0 - x0))
-            return all(v > 0 for v in s) or all(v < 0 for v in s)  # (4)!
-
-
-        print(random_triangle_with_center())
-        ```
-
-        1. הקשת השלישית סוגרת את המעגל מהזווית הגדולה ביותר חזרה לקטנה ביותר, ולכן אורכה הוא
-           ההשלמה ל-\( 2\pi \). זו הקשת שקל לשכוח.
-        2. אי-שוויון חזק : קשת של בדיוק \( \pi \) פירושה שהצלע שמולה היא קוטר והמרכז נמצא
-           **על** הצלע, ולא בתוך המשולש.
-        3. לולאת הדחייה : כל ניסיון בלתי תלוי בקודמיו, ולכן המשולשים שמתקבלים מתפלגים בדיוק
-           כמו ההתפלגות המותנית "משולש אקראי שמכיל את המרכז".
-        4. שלושת הסימנים שווים, בלי להניח כיוון : הפונקציה נכונה גם כשהנקודות לא ממוינות,
-           ולכן היא בודק עצמאי אמיתי ל-`random_triangle_with_center`.
-
-        לפי סעיף ג, רק \( \tfrac14 \) מההגרלות עוברות את התנאי, ולכן הלולאה מבצעת **בממוצע
-        4 ניסיונות**.
 
     !!! note "איך נבדק הקוד"
         קוד ה-Python הורץ על 20,000 משולשים, וכולם עברו את בדיקת המכפלה הווקטורית. המחלקה
@@ -337,6 +337,46 @@ added: 2026-10-15
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        אותה לולאת דחייה, עם `n` כפרמטר. הבדיקה העצמאית עוברת על \( n \) צלעות :
+
+        ```python title="random_polygon_with_center" linenums="1" hl_lines="4 5"
+        def contains_center_poly(angles):
+            a = sorted(angles)
+            n = len(a)
+            gaps = [a[i + 1] - a[i] for i in range(n - 1)]   # (1)!
+            gaps.append(2 * math.pi - (a[-1] - a[0]))       # the arc that closes the circle
+            return all(g < math.pi for g in gaps)
+
+
+        def random_polygon_with_center(n):
+            while True:
+                angles = [random.uniform(0, 2 * math.pi) for _ in range(n)]
+                if contains_center_poly(angles):
+                    return [(math.cos(t), math.sin(t)) for t in sorted(angles)]   # (2)!
+
+
+        def center_inside_poly(points):
+            s = []
+            n = len(points)
+            for i in range(n):
+                (x0, y0), (x1, y1) = points[i], points[(i + 1) % n]
+                s.append((x1 - x0) * (0.0 - y0) - (y1 - y0) * (0.0 - x0))
+            return all(v > 0 for v in s) or all(v < 0 for v in s)
+
+
+        print(random_polygon_with_center(5))
+        ```
+
+        1. ‏\( n - 1 \) קשתות בין שכנים ועוד הקשת הסוגרת : בדיוק \( n \) קשתות, כמו \( n \)
+           צלעות במצולע.
+        2. הנקודות מוחזרות **ממוינות** לפי הזווית, כי המצולע מוגדר לפי הסדר על המעגל.
+           בלי המיון, `center_inside_poly` הייתה בודקת מצולע אחר, עם צלעות חוצות.
+
+        לפי סעיף ג, ההסתברות שהגרלה אחת עוברת היא \( 1 - \tfrac{n}{2^{n-1}} \) : \( \tfrac14 \)
+        למשולש, \( \tfrac12 \) למרובע, ו-\( \tfrac{247}{256} \approx 0.96 \) לעשר נקודות. ככל
+        ש-\( n \) גדל, הלולאה כמעט לא דוחה.
+
     === "SystemVerilog"
         ‏`n` אינו `rand` : קובעים אותו לפני `randomize()`, והמערך `a` מקבל את הגודל שלו
         ב-constraint. כל שאר ה-constraints כתובים על `a[i]` ו-`a[i+1]`, ולכן הם נכונים לכל
@@ -421,46 +461,6 @@ added: 2026-10-15
           p.print();
         end
         ```
-
-    === "Python"
-        אותה לולאת דחייה, עם `n` כפרמטר. הבדיקה העצמאית עוברת על \( n \) צלעות :
-
-        ```python title="random_polygon_with_center" linenums="1" hl_lines="4 5"
-        def contains_center_poly(angles):
-            a = sorted(angles)
-            n = len(a)
-            gaps = [a[i + 1] - a[i] for i in range(n - 1)]   # (1)!
-            gaps.append(2 * math.pi - (a[-1] - a[0]))       # the arc that closes the circle
-            return all(g < math.pi for g in gaps)
-
-
-        def random_polygon_with_center(n):
-            while True:
-                angles = [random.uniform(0, 2 * math.pi) for _ in range(n)]
-                if contains_center_poly(angles):
-                    return [(math.cos(t), math.sin(t)) for t in sorted(angles)]   # (2)!
-
-
-        def center_inside_poly(points):
-            s = []
-            n = len(points)
-            for i in range(n):
-                (x0, y0), (x1, y1) = points[i], points[(i + 1) % n]
-                s.append((x1 - x0) * (0.0 - y0) - (y1 - y0) * (0.0 - x0))
-            return all(v > 0 for v in s) or all(v < 0 for v in s)
-
-
-        print(random_polygon_with_center(5))
-        ```
-
-        1. ‏\( n - 1 \) קשתות בין שכנים ועוד הקשת הסוגרת : בדיוק \( n \) קשתות, כמו \( n \)
-           צלעות במצולע.
-        2. הנקודות מוחזרות **ממוינות** לפי הזווית, כי המצולע מוגדר לפי הסדר על המעגל.
-           בלי המיון, `center_inside_poly` הייתה בודקת מצולע אחר, עם צלעות חוצות.
-
-        לפי סעיף ג, ההסתברות שהגרלה אחת עוברת היא \( 1 - \tfrac{n}{2^{n-1}} \) : \( \tfrac14 \)
-        למשולש, \( \tfrac12 \) למרובע, ו-\( \tfrac{247}{256} \approx 0.96 \) לעשר נקודות. ככל
-        ש-\( n \) גדל, הלולאה כמעט לא דוחה.
 
     !!! note "איך נבדק הקוד"
         הפונקציות ב-Python רצו על 20,000 מצולעים לכל \( n \) בין 3 ל-10, וכולם עברו את

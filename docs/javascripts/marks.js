@@ -6,6 +6,34 @@
 (() => {
   const KEY = "dvq-marks";
 
+  // Questions moved to a new number (the same list as dvq_renumbered in mkdocs.yml, which
+  // the 404 page uses to send an old address to the new one). Once per browser, before
+  // anything reads them: the marks of a moved question go to its new id, the last question
+  // opened follows it, and the self-checks answered and the boxes' saved states (kept by the
+  // page's path) follow its new path. All the ids of one move are mapped at once (0056 ->
+  // 0057 while 0057 -> 0058).
+  const RENUMBERED = [["2026-10-28", { "0056": "0057", "0057": "0058", "0058": "0059", "0059": "0060", "0060": "0061", "0061": "0062" }]];
+  const movePath = (path, map) => path.replace(/\/(\d{4})-/, (all, id) => (map[id] ? `/${map[id]}-` : all));
+  try {
+    for (const [tag, map] of RENUMBERED) {
+      const done = `dvq-renumbered-${tag}`;
+      if (localStorage.getItem(done)) continue;
+      const old = JSON.parse(localStorage.getItem(KEY) || "{}") || {}, moved = {};
+      for (const [id, m] of Object.entries(old)) moved[map[id] || id] = m;
+      localStorage.setItem(KEY, JSON.stringify(moved));
+      const last = JSON.parse(localStorage.getItem("dvq-last") || "null");
+      if (last && map[last.id]) localStorage.setItem("dvq-last", JSON.stringify({ ...last, id: map[last.id], url: movePath(last.url, map) }));
+      const keyed = [];   // dvq-check (selfcheck.js) and dvq-box (explorer/core.js), by path
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (/^dvq-(check|box):/.test(k) && movePath(k, map) !== k) keyed.push([k, localStorage.getItem(k)]);
+      }
+      keyed.forEach(([k]) => localStorage.removeItem(k));
+      keyed.forEach(([k, v]) => localStorage.setItem(movePath(k, map), v));
+      localStorage.setItem(done, "1");
+    }
+  } catch (e) { /* storage off */ }
+
   const load = () => {
     try { return JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { return {}; }
   };

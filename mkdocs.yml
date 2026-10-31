@@ -49,6 +49,16 @@ copyright: >
 
 extra:
   generator: false
+  # Questions moved to a new number: the 404 page sends an old address to the new one (the
+  # same level and slug, the new id), and docs/javascripts/marks.js moves the marks saved in
+  # the browser once (keep its RENUMBERED list in step with this one).
+  dvq_renumbered:
+    "0056": "0057"
+    "0057": "0058"
+    "0058": "0059"
+    "0059": "0060"
+    "0060": "0061"
+    "0061": "0062"
   # Comments per question through GitHub Discussions (giscus). Empty ids keep the section
   # off; CONTRIBUTING.md ("Comments") says how to fill them in once Discussions is enabled.
   comments:
@@ -106,10 +116,12 @@ markdown_extensions:
           class: wavedrom
           format: !!python/name:pymdownx.superfences.fence_code_format
 
-exclude_docs: |   # notes for whoever edits the site, not pages
+exclude_docs: |   # notes for whoever edits the site, not pages; Python's cache of py_run.py (the tests)
   stylesheets/README.md
+  __pycache__/
 
-extra_css:   # the site's styles in parts, loaded in this order (see docs/stylesheets/README.md)
+extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/README.md); the hook
+             # joins them into stylesheets/site.css at build time, and the pages load that one file
   - stylesheets/01-base.css
   - stylesheets/02-pages.css
   - stylesheets/03-runner-figures.css
@@ -122,13 +134,20 @@ extra_css:   # the site's styles in parts, loaded in this order (see docs/styles
   - stylesheets/10-rounds-w.css
   - stylesheets/11-questions.css
   - stylesheets/12-rounds-y-s.css
+  - stylesheets/13-motion.css
+  - stylesheets/14-layout.css
+  - stylesheets/15-home.css
+  - stylesheets/16-maps.css
+  - stylesheets/17-lists.css
+  - stylesheets/18-question.css
+  - stylesheets/19-details.css
+  - stylesheets/20-video.css
 
 extra_javascript:
   - javascripts/mathjax.js
   - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
-  - https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/skins/default.js
-  - https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/wavedrom.min.js
-  - javascripts/wavedrom-init.js
+  # WaveDrom and its init script are added by hooks/questions.py to the pages that have a
+  # ```wavedrom block only (S423).
   - javascripts/marks.js
   - javascripts/question-filter.js
   - javascripts/question-tools.js
@@ -136,6 +155,14 @@ extra_javascript:
   - javascripts/reading-tools.js
   - javascripts/home.js
   - javascripts/selfcheck.js
+  - javascripts/motion.js
+  - javascripts/layout.js
+  - javascripts/home-extras.js
+  - javascripts/maps.js
+  - javascripts/level-page.js
+  - javascripts/question-page.js
+  - javascripts/details.js
+  - javascripts/video.js           # the tutorial video's dialog (pages with a video: field)
   # The explorer boxes (docs/javascripts/explorer/) are added per page by hooks/questions.py.
 
 

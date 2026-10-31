@@ -1,0 +1,134 @@
+/* The site's styles, part 17 of 20: the level pages: the header band with progress, the question table rows (round V). */
+
+/* V8, V9: the tokens of the band and the rows. The band is navy in both schemes (the
+   hero's), so its text and marks are the same light colours in both. */
+[data-md-color-scheme="default"] {
+  --lst-band-bg: var(--md-primary-fg-color);
+  --lst-band-edge: transparent;
+  --lst-kind-fg: var(--md-primary-fg-color);
+  --lst-solved-bg: #176a42;
+  --lst-solved-fg: #ffffff;
+}
+[data-md-color-scheme="slate"] {
+  --lst-band-bg: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000);
+  --lst-band-edge: var(--site-card-border);
+  --lst-kind-fg: #8db3ff;
+  --lst-solved-bg: #5fd39a;
+  --lst-solved-fg: #10261a;
+}
+[data-md-color-scheme="default"], [data-md-color-scheme="slate"] {
+  --lst-fg: #ffffff;
+  --lst-fg-soft: rgba(255, 255, 255, 0.86);
+  --lst-fg-mute: rgba(255, 255, 255, 0.72);
+  --lst-line: rgba(255, 255, 255, 0.16);
+  --lst-panel: rgba(255, 255, 255, 0.06);
+  --lst-track: rgba(255, 255, 255, 0.14);
+  --lst-easy: #5fd39a;   --lst-easy-bg: rgba(95, 211, 154, 0.16);
+  --lst-medium: #ffc233; --lst-medium-bg: rgba(255, 194, 51, 0.16);
+  --lst-hard: #ff7b72;   --lst-hard-bg: rgba(255, 123, 114, 0.1);
+}
+
+/* V8: the header band (hook's _lists_band): the icon, the page's title and lead, and a side
+   panel with the count, the difficulty mix and the reader's progress (level-page.js). */
+.md-typeset .list-band { position: relative; overflow: hidden; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "icon title" "icon lead" "side side"; align-items: center; gap: var(--sp-1) var(--sp-4); margin: 0 0 var(--sp-4); padding: var(--sp-4) var(--sp-5); border: 1px solid var(--lst-band-edge); border-radius: var(--radius-l); background: var(--lst-band-bg); color: var(--lst-fg); }
+.md-typeset .list-band > :not(.lb-bg) { position: relative; }
+.md-typeset .list-band .lb-bg { position: absolute; inset: 0; opacity: 0.11; pointer-events: none; }
+.md-typeset .list-band .lb-traces { display: block; width: 100%; height: 100%; }
+.md-typeset .list-band .lb-traces path { fill: none; stroke: var(--lst-fg); stroke-width: 1.5; stroke-linejoin: round; }
+.md-typeset .list-band .lb-traces .lb-t2 { stroke: var(--md-accent-fg-color); stroke-width: 2; }
+.md-typeset .list-band .lb-traces circle { fill: var(--lst-fg); }
+.md-typeset .list-band .lb-icon { grid-area: icon; align-self: center; display: grid; place-items: center; width: 3.2rem; height: 3.2rem; border: 1px solid var(--lst-line); border-radius: var(--radius-l); background: var(--lst-panel); color: var(--md-accent-fg-color); }
+/* The level icon itself is another part's (.lvl-icon-<level>); until it is drawn, signal
+   bars stand in for it, at no specificity so that part's rules win. */
+:where(.list-band .lvl-icon:empty) { display: block; width: 1.7rem; height: 1.7rem; background-color: currentColor; -webkit-mask: var(--lvl-ico) center / contain no-repeat; mask: var(--lvl-ico) center / contain no-repeat; }
+:where(.lvl-icon-student) { --lvl-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 15h4v6H3z'/%3E%3Cpath d='M10 9h4v12h-4zM17 3h4v18h-4z' opacity='.3'/%3E%3C/svg%3E"); }
+:where(.lvl-icon-junior) { --lvl-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 15h4v6H3zM10 9h4v12h-4z'/%3E%3Cpath d='M17 3h4v18h-4z' opacity='.3'/%3E%3C/svg%3E"); }
+:where(.lvl-icon-senior) { --lvl-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 15h4v6H3zM10 9h4v12h-4zM17 3h4v18h-4z'/%3E%3C/svg%3E"); }
+:where(.lvl-icon-all) { --lvl-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 4h4v4H3zm6 1h12v2H9zM3 10h4v4H3zm6 1h12v2H9zm-6 5h4v4H3zm6 1h12v2H9z'/%3E%3C/svg%3E"); }
+.md-typeset .list-band h1 { grid-area: title; align-self: end; margin: 0; color: var(--lst-fg); font-size: 1.75rem; font-weight: 700; line-height: 1.2; letter-spacing: 0; }
+.md-typeset .list-band .lb-lead { grid-area: lead; align-self: start; max-width: 40rem; margin: 0; color: var(--lst-fg-soft); font-size: 0.78rem; line-height: 1.6; }
+.md-typeset .list-band .lb-lead strong { color: var(--lst-fg); }
+.md-typeset .list-band .chip-diff-easy { color: var(--lst-easy); background: var(--lst-easy-bg); }
+.md-typeset .list-band .chip-diff-medium { color: var(--lst-medium); background: var(--lst-medium-bg); }
+.md-typeset .list-band .chip-diff-hard { color: var(--lst-hard); background: var(--lst-hard-bg); }
+.md-typeset .list-band .lb-side { grid-area: side; display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: var(--sp-2) var(--sp-5); margin-top: var(--sp-3); padding-top: var(--sp-3); border-top: 1px solid var(--lst-line); }
+.md-typeset .list-band .lb-count { margin: 0; color: var(--lst-fg-soft); font-size: 0.74rem; }
+.md-typeset .list-band .lb-count b { margin-inline-end: 0.2em; color: var(--lst-fg); font-size: 1.5rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.md-typeset .list-band .lb-bar { display: flex; gap: 2px; height: 0.42rem; overflow: hidden; border-radius: 1rem; }
+.md-typeset .list-band .lb-seg { flex-basis: 0; min-width: 0.3rem; }
+.md-typeset .list-band :is(.lb-seg-easy, .lb-key-easy i) { background: var(--lst-easy); }
+.md-typeset .list-band :is(.lb-seg-medium, .lb-key-medium i) { background: var(--lst-medium); }
+.md-typeset .list-band :is(.lb-seg-hard, .lb-key-hard i) { background: var(--lst-hard); }
+.md-typeset .list-band .lb-legend { display: flex; flex-wrap: wrap; gap: 0.1rem 0.7rem; margin-top: 0.35rem; color: var(--lst-fg-soft); font-size: 0.64rem; }
+.md-typeset .list-band .lb-key { display: inline-flex; align-items: center; gap: 0.3em; }
+.md-typeset .list-band .lb-key i { width: 0.45rem; height: 0.45rem; border-radius: 50%; }
+.md-typeset .list-band .lb-key b { color: var(--lst-fg); font-variant-numeric: tabular-nums; }
+.md-typeset .list-band .lb-progress { display: flex; flex-direction: column; gap: 0.3rem; }
+.md-typeset .list-band .lb-ptext { min-height: 1.1rem; color: var(--lst-fg-soft); font-size: 0.66rem; line-height: 1.1rem; }
+.md-typeset .list-band .lb-progress:not(.is-empty) .lb-ptext { color: var(--lst-fg); font-weight: 600; }
+.md-typeset .list-band .lb-progress.is-empty .lb-ptext { color: var(--lst-fg-mute); }
+.md-typeset .list-band .lb-pbar { display: block; height: 0.3rem; overflow: hidden; border-radius: 1rem; background: var(--lst-track); }
+.md-typeset .list-band .lb-progress.is-empty .lb-pbar { visibility: hidden; }
+.md-typeset .list-band .lb-pbar i { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--md-accent-fg-color); }
+.md-typeset .list-band .lb-progress.is-done .lb-pbar i { background: var(--lst-easy); }
+.md-content:has(.list-band) .md-content__button { display: none; }
+/* The all-questions page: a lower band, the lead is the note on the difficulty chips. */
+.md-typeset .list-band.lb-all { padding-block: var(--sp-3); }
+.md-typeset .list-band.lb-all h1 { font-size: 1.45rem; }
+.md-typeset .list-band.lb-all .lb-icon { width: 2.6rem; height: 2.6rem; }
+.md-typeset .list-band.lb-all .lb-lead { font-size: 0.72rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .list-band.is-live .lb-roll { animation: lb-roll 120s linear infinite; }
+  .md-typeset .list-band.is-paused .lb-roll { animation-play-state: paused; }
+  .md-typeset .list-band .lb-pbar i { transition: width 0.9s var(--ease) 0.15s; }
+  @keyframes lb-roll { to { transform: translateX(-480px); } }
+}
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .list-band { margin-inline: -0.8rem; padding: var(--sp-3); border-inline: 0; border-radius: 0; grid-template-areas: "icon title" "lead lead" "side side"; column-gap: var(--sp-3); }
+  .md-typeset .list-band h1, .md-typeset .list-band.lb-all h1 { align-self: center; font-size: 1.4rem; }
+  .md-typeset .list-band .lb-icon, .md-typeset .list-band.lb-all .lb-icon { width: 2.4rem; height: 2.4rem; }
+  .md-typeset .list-band .lb-lead { margin-top: var(--sp-1); font-size: 0.74rem; }
+  .md-typeset .list-band .lb-side { grid-template-columns: auto minmax(0, 1fr); gap: var(--sp-2) var(--sp-4); }
+  .md-typeset .list-band .lb-progress { grid-column: 1 / -1; }
+}
+
+/* V9: the rows of a question table: the difficulty colours the start edge (the page is
+   right to left, so the edge is on the right), the kind's icon sits in a tile before the
+   title, the reader's marks after it (question-filter.js), the whole row opens the
+   question (the title's link covers it; the topic buttons stay above), and the row lifts
+   under the pointer or the keyboard. */
+.md-typeset .questions-wrap tr[data-difficulty="easy"] { --lst-diff: var(--diff-easy); }
+.md-typeset .questions-wrap tr[data-difficulty="medium"] { --lst-diff: var(--diff-medium); }
+.md-typeset .questions-wrap tr[data-difficulty="hard"] { --lst-diff: var(--diff-hard); }
+.md-typeset .questions-wrap tbody tr { position: relative; }
+.md-typeset .questions-wrap tbody td.q-id { box-shadow: inset -3px 0 0 var(--lst-diff, transparent); }
+.md-typeset .questions-wrap .q-line a::after { content: ""; position: absolute; inset: 0; }
+.md-typeset .questions-wrap :is(.q-topic, .q-more) { position: relative; z-index: 1; }
+.md-typeset .questions-wrap .q-kind { display: inline-grid; flex: none; place-items: center; width: 1.45rem; height: 1.45rem; border-radius: var(--radius-s); background: var(--site-primary-soft); color: var(--lst-kind-fg); font-size: 0.72rem; }
+.md-typeset .questions-wrap .q-meta .chip-kind .kind-ico { display: none; }   /* the tile shows it */
+.md-typeset .questions-wrap .q-marks { display: inline-flex; align-items: center; gap: 0.25rem; margin-inline-start: 0.1rem; }
+.md-typeset .questions-wrap .q-marks:empty { display: none; }
+.md-typeset .questions-wrap .q-mark { display: inline-grid; place-items: center; width: 1.05rem; height: 1.05rem; margin: 0; }
+.md-typeset .questions-wrap .q-mark svg { width: 100%; height: 100%; }
+.md-typeset .questions-wrap .q-mark-solved { border-radius: 50%; background: var(--lst-solved-bg); }
+.md-typeset .questions-wrap .q-mark-solved svg { width: 0.8rem; height: 0.8rem; }
+.md-typeset .questions-wrap .q-mark-solved path { fill: none; stroke: var(--lst-solved-fg); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.md-typeset .questions-wrap .q-mark-star path { fill: var(--site-mark-color); }
+.md-typeset .questions-wrap tbody tr:is(:hover, :focus-within) { z-index: 1; background-color: var(--site-primary-soft); box-shadow: var(--shadow-2); }
+.md-typeset .questions-wrap tbody tr:is(:hover, :focus-within) td.q-id { box-shadow: inset -5px 0 0 var(--lst-diff, transparent); }
+.md-typeset .questions-wrap tbody tr:is(:hover, :focus-within) .q-line a { text-decoration: underline; text-underline-offset: 0.2em; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .questions-wrap tbody tr { transition: background-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), transform var(--dur-1) var(--ease); }
+  .md-typeset .questions-wrap tbody td.q-id { transition: box-shadow var(--dur-1) var(--ease); }
+}
+
+/* Phones: each row is a card with the difficulty along its start edge. */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .questions-wrap table:not([class]) tr { border-inline-start: 4px solid var(--lst-diff, var(--site-card-border)); border-radius: var(--radius-m); box-shadow: var(--shadow-1); }
+  .md-typeset .questions-wrap tbody td.q-id, .md-typeset .questions-wrap tbody tr:is(:hover, :focus-within) td.q-id { box-shadow: none; }
+  .md-typeset .questions-wrap table:not([class]) tr:is(:hover, :focus-within) { background: var(--site-surface); box-shadow: var(--shadow-2); }
+  .md-typeset .questions-wrap .q-line { align-items: flex-start; }
+}
+@media screen and (max-width: 44.9375em) and (prefers-reduced-motion: no-preference) {
+  .md-typeset .questions-wrap table:not([class]) tr:hover { transform: translateY(-1px); }
+}

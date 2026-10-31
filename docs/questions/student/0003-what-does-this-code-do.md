@@ -14,6 +14,16 @@ added: 2026-10-15
 נתון הקוד הבא. `A` הוא queue של מספרים שלמים, ו-`n` הוא מספר האיברים בו.
 הפונקציה `swap` מקבלת שני משתנים **by reference** ומחליפה ביניהם.
 
+=== "Python"
+    ```python
+    def mystery(A):
+        n = len(A)
+        for i in range(n):
+            for j in range(n):
+                if A[i] < A[j]:
+                    A[i], A[j] = A[j], A[i]   # swap
+    ```
+
 === "SystemVerilog"
     ```systemverilog
     function automatic void swap(ref int x, ref int y);
@@ -29,16 +39,6 @@ added: 2026-10-15
           if (A[i] < A[j])
             swap(A[i], A[j]);
     endfunction
-    ```
-
-=== "Python"
-    ```python
-    def mystery(A):
-        n = len(A)
-        for i in range(n):
-            for j in range(n):
-                if A[i] < A[j]:
-                    A[i], A[j] = A[j], A[i]   # swap
     ```
 
 מה הקוד עושה? הדגימו על מערך לא ממוין בגודל 4, שלב אחרי שלב.

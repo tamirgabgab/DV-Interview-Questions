@@ -1,5 +1,5 @@
 ---
-id: 58
+id: 59
 title: מטבעות בשורה – לוקחים מהקצוות, ומי מקבל יותר
 level: junior
 difficulty: medium
@@ -78,6 +78,16 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="parity_move" linenums="1" hl_lines="3 4"
+        def parity_move(coins: list[int], i: int, j: int) -> str:
+            """The first player's move on coins[i..j] (n even): the end on the richer parity."""
+            want = 0 if sum(coins[0::2]) >= sum(coins[1::2]) else 1     # (1)!
+            return "L" if i % 2 == want else "R"
+        ```
+
+        1. ‏`coins[0::2]` הם המקומות 1, 3, 5, ... (האינדקסים 0, 2, 4, ...).
+
     === "SystemVerilog"
         ```systemverilog title="function parity_move" linenums="1" hl_lines="4 5"
         // the first player's move on coins[i..j] (n even): 0 = the left end, 1 = the right end
@@ -90,22 +100,14 @@ added: 2026-10-27
 
         1. הצבע נבחר לפי השורה כולה, פעם אחת. בכל תור של הראשון \( i \) ו-\( j \) בצבעים שונים, והוא לוקח את הקצה בצבע שלו.
 
-    === "Python"
-        ```python title="parity_move" linenums="1" hl_lines="3 4"
-        def parity_move(coins: list[int], i: int, j: int) -> str:
-            """The first player's move on coins[i..j] (n even): the end on the richer parity."""
-            want = 0 if sum(coins[0::2]) >= sum(coins[1::2]) else 1     # (1)!
-            return "L" if i % 2 == want else "R"
-        ```
-
-        1. ‏`coins[0::2]` הם המקומות 1, 3, 5, ... (האינדקסים 0, 2, 4, ...).
-
     #### למה זה נכון { .sol-proof }
 
     **שמורה :** בתחילת כל תור של הראשון נשארו מספר זוגי של מטבעות, \( i..j \), ולכן \( i \)
     ו-\( j \) בזוגיות שונה. הוא לוקח את הקצה שהזוגיות שלו היא הצבע שבחר. נשאר קטע באורך
     אי-זוגי ששני קצותיו באותה זוגיות, הצבע השני, ולכן השני לוקח מטבע מהצבע השני בכל מקרה.
-    אחרי תורו השמורה חוזרת. בסוף הראשון לקח את כל הצבע שלו, שסכומו לפחות חצי.
+    אחרי תורו השמורה חוזרת. בסוף הראשון לקח את כל הצבע שלו, שסכומו לפחות חצי. אם סכומי
+    שני הצבעים שונים, הצבע שבחר שווה יותר מחצי והראשון מנצח ממש; רק כשהם שווים ההבטחה
+    היא חצי בדיוק.
 
 ---
 
@@ -211,6 +213,23 @@ added: 2026-10-27
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="best_total" linenums="1" hl_lines="10 11"
+        def best_total(coins: list[int]) -> int:
+            """The most the first player collects when both play their best (any n)."""
+            n = len(coins)
+            d = [[0] * n for _ in range(n)]          # d[i][j]: the mover's lead on coins i..j
+            for i in range(n):
+                d[i][i] = coins[i]
+            for length in range(2, n + 1):
+                for i in range(n - length + 1):
+                    j = i + length - 1
+                    d[i][j] = max(coins[i] - d[i + 1][j], coins[j] - d[i][j - 1])   # (1)!
+            return (sum(coins) + d[0][n - 1]) // 2
+        ```
+
+        1. כל קטע תלוי רק בשני קטעים קצרים ממנו באחד, ולכן מספיק למלא לפי אורך.
+
     === "SystemVerilog"
         ```systemverilog title="function best_total" linenums="1" hl_lines="11 12 13 15"
         // the most the first player collects when both play their best; d[i * n + j] is the
@@ -234,32 +253,32 @@ added: 2026-10-27
         1. לוקח את \( c_i \), והיריב מוביל ב-\( d \) של הקטע שנשאר.
         2. ‏`d[n - 1]` הוא \( d[0][n-1] \). ‏\( \text{mine} - \text{other} = d \) ו-\( \text{mine} + \text{other} = \text{sum} \).
 
-    === "Python"
-        ```python title="best_total" linenums="1" hl_lines="10 11"
-        def best_total(coins: list[int]) -> int:
-            """The most the first player collects when both play their best (any n)."""
-            n = len(coins)
-            d = [[0] * n for _ in range(n)]          # d[i][j]: the mover's lead on coins i..j
-            for i in range(n):
-                d[i][i] = coins[i]
-            for length in range(2, n + 1):
-                for i in range(n - length + 1):
-                    j = i + length - 1
-                    d[i][j] = max(coins[i] - d[i + 1][j], coins[j] - d[i][j - 1])   # (1)!
-            return (sum(coins) + d[0][n - 1]) // 2
-        ```
-
-        1. כל קטע תלוי רק בשני קטעים קצרים ממנו באחד, ולכן מספיק למלא לפי אורך.
-
     #### למה זה נכון { .sol-proof }
 
-    באינדוקציה על אורך הקטע. אם מי שתורו לוקח את \( c_i \), מכאן והלאה היריב הוא "מי שתורו"
-    בקטע \( i+1..j \), ולפי ההנחה הוא מוביל שם ב-\( d[i+1][j] \) בדיוק, כשהוא משחק הכי טוב
-    והשחקן הראשון משחק הכי טוב נגדו. היתרון הכולל הוא \( c_i - d[i+1][j] \). אותו דבר עם \( c_j \),
-    ומי שתורו בוחר את הטוב מהשניים.
+    **יתרון במקום סכום.** הסכום \( S \) של הקטע קבוע : מה שמי שתורו אוסף ועוד מה שהיריב
+    אוסף. לכן מה שהוא אוסף, \( (S + d) / 2 \), גדל עם היתרון \( d \), ולמקסם את היתרון זה בדיוק
+    למקסם את מה שהוא אוסף.
+
+    **אינדוקציה על אורך הקטע.** אם מי שתורו לוקח את \( c_i \), מכאן והלאה היריב הוא "מי שתורו"
+    בקטע \( i+1..j \), ולפי הנחת האינדוקציה, כששניהם משחקים הכי טוב, הוא מוביל שם
+    ב-\( d[i+1][j] \) בדיוק. היתרון הכולל הוא \( c_i - d[i+1][j] \). אותו דבר עם \( c_j \), ומי
+    שתורו בוחר את הטוב מהשניים. תא אחד מהטבלה, הקטע 1, 2, 5 (המקומות 1 עד 3) :
+
+    \[
+    \begin{aligned}
+    d[1][3] &= \max(c_1 - d[2][3],\; c_3 - d[1][2]) \\
+            &= \max(1 - 3,\; 5 - 1) = 4
+    \end{aligned}
+    \]
+
+    לקחת את 1 משאיר ליריב את 2, 5, שבהם הוא מוביל ב-3; לקחת את 5 משאיר לו את 1, 2, שבהם הוא
+    מוביל רק ב-1. מי שתורו לוקח את 5 ומוביל ב-4 : מתוך 8 הוא אוסף \( (8 + 4) / 2 = 6 \), כלומר 5
+    ועוד 1.
 
     **נסו בעצמכם.** משחקים נגד המחשב, או בוחרים אסטרטגיה לכל שחקן ומריצים מהלך אחרי מהלך.
-    הטבלה מתחת מראה את \( d \) של כל הקטעים, את הקטע של הרגע ואת המהלך שהיא ממליצה עליו :
+    המטבעות צבועים לפי זוגיות המקום, כמו באיור של סעיף א, והסיכום מראה את סכומי שני הצבעים.
+    הטבלה מתחת מראה את \( d \) של כל הקטעים, את הקטע של הרגע ואת המהלך שהיא ממליצה עליו,
+    והשורה שמעליה מתרגמת את היתרון למה שמי שתורו יאסוף :
 
     <div class="explorer" data-kind="coinrow" data-coins="1,2,5,3" data-first="me" data-second="optimal"></div>
 
@@ -337,7 +356,8 @@ added: 2026-10-27
 
     #### סיבוכיות { .sol-cost }
 
-    - **הטריק :** ‏\( O(n) \) פעם אחת לבחור צבע, ו-\( O(1) \) לכל מהלך.
+    - **הטריק :** ‏\( O(n) \) לבחור צבע. הקוד בדף מחשב את שני הסכומים מחדש בכל קריאה
+      ל-`parity_move`, כלומר \( O(n) \) למהלך. מי שזוכר את הצבע שבחר בהתחלה משחק כל מהלך ב-\( O(1) \).
     - **המשחק הטוב ביותר :** ‏\( O(n^2) \) זמן וזיכרון לטבלה. אם צריך רק את הערך, מספיקה שורה אחת
       של הטבלה בכל פעם, ‏\( O(n) \) זיכרון.
 

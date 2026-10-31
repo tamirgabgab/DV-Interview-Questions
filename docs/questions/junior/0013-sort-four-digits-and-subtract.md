@@ -86,6 +86,20 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="is_special_4"
+        def is_special_4(x: int) -> int:
+            digits = sorted(f"{x:04d}")              # four digits, leading zeros included (1)
+            smallest = int("".join(digits))           # ascending order
+            largest = int("".join(reversed(digits)))  # descending order (2)
+            return int(largest - smallest == x)
+        ```
+
+        1. ‏`f"{x:04d}"` מרפדת באפסים משמאל לארבע ספרות, ו-`sorted` על המחרוזת מחזירה
+           רשימה של תווים בסדר עולה. מיון של ספרות כתווים זהה למיון שלהן כמספרים, כי כולן
+           באותו אורך.
+        2. ‏`reversed` הופכת את הסדר העולה ליורד, בלי מיון שני.
+
     === "SystemVerilog"
         ```systemverilog title="function is_special_4" linenums="1" hl_lines="8 9 10"
         function automatic bit is_special_4(int x);
@@ -127,20 +141,6 @@ added: 2026-10-16
         בחומרה זה מעגל צירופי של חמישה משווים בשלוש שכבות : את שתי ההשוואות הראשונות אפשר
         לעשות במקביל, וגם את השלישית והרביעית.
 
-    === "Python"
-        ```python title="is_special_4"
-        def is_special_4(x: int) -> int:
-            digits = sorted(f"{x:04d}")              # four digits, leading zeros included (1)
-            smallest = int("".join(digits))           # ascending order
-            largest = int("".join(reversed(digits)))  # descending order (2)
-            return int(largest - smallest == x)
-        ```
-
-        1. ‏`f"{x:04d}"` מרפדת באפסים משמאל לארבע ספרות, ו-`sorted` על המחרוזת מחזירה
-           רשימה של תווים בסדר עולה. מיון של ספרות כתווים זהה למיון שלהן כמספרים, כי כולן
-           באותו אורך.
-        2. ‏`reversed` הופכת את הסדר העולה ליורד, בלי מיון שני.
-
     #### סיבוכיות { .sol-cost }
 
     ‏\( O(1) \) : תמיד ארבע ספרות, חמש השוואות ושני מספרים להרכיב.
@@ -178,6 +178,12 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="find_special_4"
+        def find_special_4() -> list[int]:
+            return [x for x in range(10000) if is_special_4(x)]
+        ```
+
     === "SystemVerilog"
         ```systemverilog title="function find_special_4"
         function automatic void find_special_4(ref int special[$]);
@@ -189,12 +195,6 @@ added: 2026-10-16
 
         1. התור מגיע מהקורא (`ref`), ולכן מרוקנים אותו קודם : אחרת קריאה שנייה הייתה
            מוסיפה את התוצאות פעם נוספת.
-
-    === "Python"
-        ```python title="find_special_4"
-        def find_special_4() -> list[int]:
-            return [x for x in range(10000) if is_special_4(x)]
-        ```
 
     בדיקה : הספרות של 6174 ממוינות הן 7, 6, 4, 1, ו-\( 7641 - 1467 = 6174 \).
 
@@ -451,6 +451,35 @@ added: 2026-10-16
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="kaprekar4_step_b, kaprekar4_fixed_b, kaprekar4_orbit_b"
+        def kaprekar4_step_b(x: int, B: int) -> int:
+            """One step in base B: four digits (leading zeros kept), sorted descending minus ascending."""
+            a, b, c, d = sorted((x // B**3, x // B**2 % B, x // B % B, x % B), reverse=True)
+            return (a * B**3 + b * B**2 + c * B + d) - (d * B**3 + c * B**2 + b * B + a)
+
+
+        def kaprekar4_fixed_b(B: int) -> list[int]:
+            """The fixed points with two different digits, by the theorem."""
+            out = [7, 9] if B == 2 else [201] if B == 4 else []          # 0111, 1001; 3021 (1)
+            if B % 5 == 0:
+                out.append(B * (B - 1) * (3 * B * B + 4 * B + 3) // 5)  # (3k, k-1, 4k-1, 2k) (2)
+            return out
+
+
+        def kaprekar4_orbit_b(x: int, B: int) -> tuple[list[int], int]:
+            """The values from x until one repeats, and the index where the cycle starts."""
+            values = [x]
+            while (y := kaprekar4_step_b(values[-1], B)) not in values:
+                values.append(y)
+            return values, values.index(y)                                # (3)!
+        ```
+
+        1. החריגים של הבסיסים 2 ו-4.
+        2. המשפחה \( B = 5k \).
+        3. אורך המחזור הוא `len(values) - start`; נקודת שבת היא מחזור באורך 1. בבסיס אי-מתחלק
+           ב-5 (חוץ מ-2 ו-4) הלולאה תמיד מסתיימת במחזור ארוך מ-1.
+
     === "SystemVerilog"
         ```systemverilog title="kaprekar4_step_b, kaprekar4_fixed_b" hl_lines="3 4 5 6 7 8 15 16"
         // One step in base B: four digits (leading zeros kept), sorted descending minus ascending.
@@ -480,35 +509,6 @@ added: 2026-10-16
         3. החריגים : 0111 ו-1001 בבסיס 2 (7 ו-9), ו-3021 בבסיס 4 (201).
         4. המשפחה \( B = 5k \) : הספרות \( (3k, k - 1, 4k - 1, 2k) \). המכפלה מתחלקת ב-5 כי
            \( B \) מתחלק.
-
-    === "Python"
-        ```python title="kaprekar4_step_b, kaprekar4_fixed_b, kaprekar4_orbit_b"
-        def kaprekar4_step_b(x: int, B: int) -> int:
-            """One step in base B: four digits (leading zeros kept), sorted descending minus ascending."""
-            a, b, c, d = sorted((x // B**3, x // B**2 % B, x // B % B, x % B), reverse=True)
-            return (a * B**3 + b * B**2 + c * B + d) - (d * B**3 + c * B**2 + b * B + a)
-
-
-        def kaprekar4_fixed_b(B: int) -> list[int]:
-            """The fixed points with two different digits, by the theorem."""
-            out = [7, 9] if B == 2 else [201] if B == 4 else []          # 0111, 1001; 3021 (1)
-            if B % 5 == 0:
-                out.append(B * (B - 1) * (3 * B * B + 4 * B + 3) // 5)  # (3k, k-1, 4k-1, 2k) (2)
-            return out
-
-
-        def kaprekar4_orbit_b(x: int, B: int) -> tuple[list[int], int]:
-            """The values from x until one repeats, and the index where the cycle starts."""
-            values = [x]
-            while (y := kaprekar4_step_b(values[-1], B)) not in values:
-                values.append(y)
-            return values, values.index(y)                                # (3)!
-        ```
-
-        1. החריגים של הבסיסים 2 ו-4.
-        2. המשפחה \( B = 5k \).
-        3. אורך המחזור הוא `len(values) - start`; נקודת שבת היא מחזור באורך 1. בבסיס אי-מתחלק
-           ב-5 (חוץ מ-2 ו-4) הלולאה תמיד מסתיימת במחזור ארוך מ-1.
 
     #### למה זה נכון { .sol-proof }
 

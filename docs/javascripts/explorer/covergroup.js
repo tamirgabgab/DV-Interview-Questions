@@ -182,6 +182,8 @@
         note(); st.curve.push([st.cg.n, cgCoverage(st.cg, st.ign)]);
         draw();
       });
+      // Enter in a or b samples the transaction, as the button does
+      [".cv-a", ".cv-b"].forEach((s) => $(s).addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); $(".cv-one").click(); } }));
       $(".ex-reset").addEventListener("click", () => { reset(); st.rng = mulberry32(Number(box.querySelector(".ex-seed").value) || 1); draw(); });
       void seed;
       draw();

@@ -58,8 +58,9 @@ added: 2026-10-18
         שלושת החוקים הראשונים שקולים לתנאי אחד : **כל נקודת חיתוך בין שני Completions היא
         כפולה של RCB**. לכן בונים את הפיצולים ברקורסיה : מהמיקום הנוכחי מנסים כל גבול RCB
         שבתוך הבקשה ובמרחק של עד MPS, וגם את סוף הבקשה אם הוא בהישג יד. כל מסלול שמגיע
-        לסוף הבקשה הוא פיצול חוקי. בדוגמה יש 4 גבולות בתוך הבקשה, ולכן \( 2^4 = 16 \)
-        פיצולים.
+        לסוף הבקשה הוא פיצול חוקי. בדוגמה יש 4 גבולות בתוך הבקשה, ו-\( MPS = 256 \ge len \),
+        כך שאף תת-קבוצה של הגבולות לא נפסלת : \( 2^4 = 16 \) פיצולים. עם `MPS = 128` נשארים
+        רק 8 (ראו "איך MPS גוזם" בהמשך).
 
     <!-- cost: זמן \( O(c \cdot 2^c) \) | עומק \( c + 1 \) -->
 
@@ -123,7 +124,46 @@ added: 2026-10-18
 
     בדוגמה הפונקציה מחזירה 16 רשימות, מ-`[256]` ועד `[48, 64, 64, 64, 16]`. ב-SystemVerilog
     התוצאה היא תור של תורים (`int splits[$][$]`), והרקורסיה יושבת בפונקציית עזר כי
-    הפונקציה הראשית רק מאפסת את התוצאה וקוראת לה.
+    הפונקציה הראשית רק מאפסת את התוצאה וקוראת לה. ב-Python הפרמטר נקרא `length` ולא `len`,
+    כי `len` הוא שם של פונקציה מובנית.
+
+    === "Python"
+        ```python title="completion_splits" linenums="1" hl_lines="10 14 16 20"
+        def completion_splits(addr: int, length: int, mps: int, rcb: int) -> list[list[int]]:
+            """Every legal sequence of completion payload sizes for a read of `length` bytes
+            from `addr` (length <= MRRS, no 4 KB crossing), in address order. Each split is
+            a list of sizes; the first split has the fewest completions, the last the most."""
+            end = addr + length
+            splits = []
+
+            def extend(pos, sizes):
+                """`pos` is the first byte not covered yet, `sizes` the completions so far."""
+                if pos == end:                                  # (1)!
+                    splits.append(sizes)
+                    return
+                cuts = []
+                if pos + mps >= end:                            # (2)!
+                    cuts.append(end)
+                boundary = (pos // rcb + 1) * rcb               # (3)!
+                while boundary < end and boundary <= pos + mps:
+                    cuts.append(boundary)
+                    boundary += rcb
+                for cut in sorted(cuts, reverse=True):          # (4)!
+                    extend(cut, sizes + [cut - pos])
+
+            extend(addr, [])
+            return splits
+        ```
+
+        1. תנאי העצירה : כל הבתים כוסו, והרשימה שנצברה היא פיצול חוקי. `sizes + [...]`
+           יוצר רשימה חדשה בכל קריאה, ולכן כל ענף של הרקורסיה מחזיק רשימה משלו.
+        2. סוף הבקשה הוא סיום אפשרי רק אם הוא במרחק של עד MPS מ-`pos`. בלי התנאי הזה
+           הפונקציה הייתה מחזירה גם `[256]` כש-MPS הוא 128.
+        3. הגבול הראשון אחרי `pos` : חילוק שלם, ועוד אחד, כפול RCB. אם `pos` עצמו על גבול
+           (כמו באמצע הבקשה) מקבלים את הגבול הבא, לא את `pos`. הלולאה עוצרת בסוף הבקשה או
+           כשהגבול רחוק מ-MPS.
+        4. מיון יורד : הסיום הרחוק קודם. כך `splits[0]` הוא הפיצול החמדני (הכי פחות
+           Completions) ו-`splits[-1]` הוא זה שחותך בכל גבול.
 
     === "SystemVerilog"
         ```systemverilog title="function completion_splits" linenums="1" hl_lines="18 22 23 28"
@@ -172,44 +212,6 @@ added: 2026-10-18
            כשהגבול רחוק מ-MPS.
         4. מיון יורד : הסיום הרחוק קודם. כך `splits[0]` הוא הפיצול החמדני (הכי פחות
            Completions) ו-`splits[$]` הוא זה שחותך בכל גבול.
-
-    === "Python"
-        ```python title="completion_splits" linenums="1" hl_lines="10 14 16 20"
-        def completion_splits(addr: int, length: int, mps: int, rcb: int) -> list[list[int]]:
-            """Every legal sequence of completion payload sizes for a read of `length` bytes
-            from `addr` (length <= MRRS, no 4 KB crossing), in address order. Each split is
-            a list of sizes; the first split has the fewest completions, the last the most."""
-            end = addr + length
-            splits = []
-
-            def extend(pos, sizes):
-                """`pos` is the first byte not covered yet, `sizes` the completions so far."""
-                if pos == end:                                  # (1)!
-                    splits.append(sizes)
-                    return
-                cuts = []
-                if pos + mps >= end:                            # (2)!
-                    cuts.append(end)
-                boundary = (pos // rcb + 1) * rcb               # (3)!
-                while boundary < end and boundary <= pos + mps:
-                    cuts.append(boundary)
-                    boundary += rcb
-                for cut in sorted(cuts, reverse=True):          # (4)!
-                    extend(cut, sizes + [cut - pos])
-
-            extend(addr, [])
-            return splits
-        ```
-
-        1. תנאי העצירה : כל הבתים כוסו, והרשימה שנצברה היא פיצול חוקי. `sizes + [...]`
-           יוצר רשימה חדשה בכל קריאה, ולכן כל ענף של הרקורסיה מחזיק רשימה משלו.
-        2. סוף הבקשה הוא סיום אפשרי רק אם הוא במרחק של עד MPS מ-`pos`. בלי התנאי הזה
-           הפונקציה הייתה מחזירה גם `[256]` כש-MPS הוא 128.
-        3. הגבול הראשון אחרי `pos` : חילוק שלם, ועוד אחד, כפול RCB. אם `pos` עצמו על גבול
-           (כמו באמצע הבקשה) מקבלים את הגבול הבא, לא את `pos`. הלולאה עוצרת בסוף הבקשה או
-           כשהגבול רחוק מ-MPS.
-        4. מיון יורד : הסיום הרחוק קודם. כך `splits[0]` הוא הפיצול החמדני (הכי פחות
-           Completions) ו-`splits[-1]` הוא זה שחותך בכל גבול.
 
     #### למה זה נכון { .sol-proof }
 
@@ -289,7 +291,7 @@ added: 2026-10-18
         c -- "128 → 0x1100" --> c2["pos = 0x1100<br/>sizes = [112, 128]"]
         c2 -- "16 → 0x1110" --> c3["[112, 128, 16] ✓"]
         classDef pruned stroke-dasharray: 5 4,opacity:0.55;
-        classDef found stroke:#1baf7a,stroke-width:3px;
+        classDef found stroke:currentColor,stroke-width:3px;
         class a,b,b1,c1 pruned;
         class c3 found;
     ```
@@ -315,7 +317,7 @@ added: 2026-10-18
     הירוקים : כל לחיצה חותכת שם או מבטלת, השורה שמתחת מראה את ה-Completions שנוצרים, וחתיכה
     גדולה מ-MPS מסומנת. כל פיצול הוא תת-קבוצה של הגבולות, והמספר הוא כמה מהן מותרות.
 
-    <div class="explorer" data-kind="pcie" data-addr="0x1010" data-len="256" data-mps="256" data-rcb="64"></div>
+    <div class="explorer" data-kind="pcie" data-notation="c" data-addr="0x1010" data-len="256" data-mps="256" data-rcb="64"></div>
 
 ## נקודות חשובות ושאלות המשך
 
@@ -353,8 +355,8 @@ added: 2026-10-18
 
         ??? fu-answer "תשובה"
             המקסימום הוא \( c + 1 \). המינימום הוא החמדני, בכל צעד הסיום הרחוק ביותר שבהישג יד :
-            קבוצת הסיומים המותרים רק גדלה כש-`pos` מתקדם, ולכן באינדוקציה אחרי \( k \) צעדים
-            החמדני רחוק לפחות כמו כל פיצול אחר.
+            הסיום הרחוק ביותר שבהישג יד, הגבול האחרון עד \( pos + MPS \), רק מתקדם כש-`pos` מתקדם,
+            ולכן באינדוקציה אחרי \( k \) צעדים החמדני רחוק לפחות כמו כל פיצול אחר.
 
     - **שדות ה-header :** לכל Completion יש `Length` ב-DW, `Byte Count` (כמה בתים נשארו כולל
       הנוכחי) ו-`Lower Address` (7 הביטים התחתונים של הבית הראשון). כתבו את שלושתם עבור
@@ -378,5 +380,21 @@ added: 2026-10-18
       לדעת את ה-RCB של ה-Completer?
 
         ??? fu-answer "תשובה"
-            כי הוא קובע כמה Completions יכולים לחזור על בקשה אחת, עד \( c + 1 \), וה-Requester
-            צריך להקצות באפרים ל-\( c + 1 \) headers לכל בקשה לפני שהוא שולח אותה.
+            כי הוא קובע כמה Completions יכולים לחזור על בקשה אחת, עד \( c + 1 \). רק
+            ה-Root Complex עונה עם RCB של 64 או 128; כל Completer אחר, למשל Endpoint, משתמש
+            תמיד ב-`RCB = 128`. ולמה זה חשוב במיוחד : Endpoint מפרסם קרדיטים אינסופיים ל-Completions
+            (CplH ו-CplD), כלומר אין flow control שיעצור Completion בדרך אליו. לכן ה-Requester
+            חייב לשמור מקום ל-\( c + 1 \) headers (ולכל המידע) לפני שהוא שולח את הבקשה.
+
+    - **פיצול אקראי ל-BFM :** ב-BFM של Completer רוצים להגריל פיצול חוקי אחד, כך שכל
+      הפיצולים יוצאים באותה הסתברות. למה לא מספיק לבחור בכל צעד סיום מותר באקראי, ואיך
+      עושים את זה נכון?
+
+        ??? fu-answer "תשובה"
+            בחירה אחידה בכל צעד מעדיפה פיצולים עם מעט Completions : בדוגמה יש מ-`0x1010` חמישה
+            סיומים מותרים, ולכן `[256]` יוצא בהסתברות \( 1/5 \) במקום \( 1/16 \). הדרך הנכונה :
+            מחשבים את \( ways \) של התכנון הדינמי (משאלת ההמשך הראשונה), ומכל `pos` בוחרים את
+            הסיום `cut` בהסתברות \( ways(cut) / ways(pos) \). המכפלה לאורך מסלול מצטמצמת
+            ל-\( 1 / ways(addr) \), אותה הסתברות לכל פיצול. ב-SystemVerilog אפשר גם מערך
+            `rand bit cut[c]` עם constraint שהמרחק בין חיתוכים עוקבים לא עולה על MPS : לפי
+            ה-LRM, בלי `solve ... before` ובלי `dist`, כל צירוף חוקי יוצא באותה הסתברות.

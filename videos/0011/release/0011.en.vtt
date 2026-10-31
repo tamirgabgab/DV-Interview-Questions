@@ -1,0 +1,317 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.733
+Question 0011: a random final tic-tac-toe board,
+a senior-level question.
+
+2
+00:00:04.733 --> 00:00:09.200
+Two parts: the regular board,
+and diagonals that wrap around to the other side.
+
+3
+00:00:10.000 --> 00:00:15.233
+Generate a board where a game has ended,
+together with its result: X, O or a draw.
+
+4
+00:00:16.033 --> 00:00:21.233
+Part A: what are all the conditions of a final board,
+and how do we write them as constraints?
+
+5
+00:00:21.933 --> 00:00:27.433
+The cells are numbered 0 to 8, row by row.
+X always starts, and the players alternate.
+
+6
+00:00:28.233 --> 00:00:33.333
+This is the box from the page, with the question's board:
+X has two lines, and X won.
+
+7
+00:00:33.333 --> 00:00:38.633
+Condition 1, the count: X starts and the players alternate.
+Three X and no O never happens in a game.
+
+8
+00:00:38.633 --> 00:00:43.667
+Condition 2: there are no two winners.
+The game stops the moment someone completes a line.
+
+9
+00:00:43.667 --> 00:00:48.800
+The condition most candidates forget: X has a line,
+but n_X = n_O. So O moved after the win.
+
+10
+00:00:48.800 --> 00:00:53.767
+Without the last O, n_X = n_O + 1.
+The winner is the one who moved last.
+
+11
+00:00:53.767 --> 00:00:58.800
+The same for O: a line of O,
+no line of X, and n_X = n_O.
+
+12
+00:00:58.800 --> 00:01:03.100
+And a draw: a full board, five X and four O,
+with no line at all.
+
+13
+00:01:03.900 --> 00:01:09.433
+Four conditions: the count, and one per result.
+Each one will become a constraint.
+
+14
+00:01:10.233 --> 00:01:14.533
+Now let's write the class in SystemVerilog,
+piece by piece.
+
+15
+00:01:23.000 --> 00:01:27.500
+Three types: a cell is EMPTY, X or O,
+and the result is one of three.
+
+16
+00:01:27.500 --> 00:01:31.300
+The board is an array of 9 cells,
+numbered 0 to 8.
+
+17
+00:01:32.600 --> 00:01:37.100
+The class ttt_end. Every call to randomize()
+gives a final board and a matching result.
+
+18
+00:01:49.467 --> 00:01:53.967
+The table of lines: rows, columns and two diagonals.
+The last four are kept for part B.
+
+19
+00:01:55.400 --> 00:01:59.900
+n_lines = 8 on the regular board. It is not rand,
+so the solver treats it as a constant.
+
+20
+00:02:03.233 --> 00:02:07.400
+The board and the result are rand:
+the solver picks both together.
+
+21
+00:02:14.933 --> 00:02:19.433
+And helper variables, rand as well:
+how many X and O, and which lines are complete.
+
+22
+00:02:29.933 --> 00:02:34.433
+c_count: the helpers equal the count on the board,
+and n_x is n_o or n_o + 1.
+
+23
+00:02:53.367 --> 00:02:57.867
+c_lines: x_line[l] is 1 exactly when the line is active
+and all three of its cells are X.
+
+24
+00:03:04.900 --> 00:03:09.400
+x_lines and o_lines count the complete lines.
+The int' cast widens the sum beyond one bit.
+
+25
+00:03:25.600 --> 00:03:30.100
+c_result: each result implies its own conditions,
+exactly the conditions from the box.
+
+26
+00:03:30.100 --> 00:03:34.100
+An implication, not an equality: the cases are disjoint,
+so every board determines one result.
+
+27
+00:03:37.333 --> 00:03:41.833
+solve result before board: first a result,
+with equal probability, and only then a board.
+
+28
+00:03:43.500 --> 00:03:48.000
+And the class closes. The page also has show(),
+which only prints the board, so it is left out.
+
+29
+00:03:49.500 --> 00:03:54.467
+In c_count: three X and zero O.
+No n_o satisfies that, so the board is rejected.
+
+30
+00:03:54.467 --> 00:03:59.567
+In c_lines: the question's board has two complete X lines,
+so x_lines = 2.
+
+31
+00:03:59.567 --> 00:04:04.867
+X_WINS requires n_x == n_o + 1.
+Here n_x == n_o: O moved after the win.
+
+32
+00:04:04.867 --> 00:04:10.033
+O_WINS: a line of O, none of X,
+and n_x == n_o, because O moved last.
+
+33
+00:04:10.033 --> 00:04:16.000
+DRAW: a full board with no lines. Without n_x + n_o == 9
+a board in mid-game would also be a draw.
+
+34
+00:04:16.000 --> 00:04:21.100
+With solve before, the solver picks the result first.
+This draw came out X_WINS.
+
+35
+00:04:21.100 --> 00:04:23.600
+The next draw came out O_WINS.
+
+36
+00:04:23.600 --> 00:04:26.767
+And the third: a draw,
+which now comes out a third of the time.
+
+37
+00:04:27.567 --> 00:04:33.167
+958 final boards: 626 for X, 316 for O, 16 draws.
+Without solve before, every board is equally likely.
+
+38
+00:04:33.167 --> 00:04:38.767
+Then X wins 65% of the draws, and a draw only 1.7%.
+With solve before, each result gets a third.
+
+39
+00:04:38.767 --> 00:04:42.767
+The same 958 boards, with a different distribution:
+the rare case, the draw, gets tested far more.
+
+40
+00:04:43.567 --> 00:04:48.800
+The solution space is small: 3 to the power of 9 fillings,
+and only 958 of them are final boards.
+
+41
+00:04:49.600 --> 00:04:55.100
+A trap: requiring exactly one line for the winner.
+Here X closed two lines in one move, at cell 0.
+
+42
+00:04:55.100 --> 00:04:59.100
+A constraint that is too strong hides legal boards,
+and no test will complain about it.
+
+43
+00:04:59.883 --> 00:05:05.050
+Part B: a diagonal continues on the other side of the board,
+as if the board were glued to itself.
+
+44
+00:05:05.750 --> 00:05:10.983
+For example cells 0, 5 and 7:
+go down-left, leave the board and come back on the right.
+
+45
+00:05:11.783 --> 00:05:17.783
+Four new lines, 12 lines in all:
+four directions, each with three parallel lines.
+
+46
+00:05:17.783 --> 00:05:21.783
+The conditions do not change, only the set of lines.
+In the class it is one variable: n_lines.
+
+47
+00:05:22.583 --> 00:05:25.583
+This is how the class is used with the 12 lines.
+
+48
+00:05:26.916 --> 00:05:29.883
+Create an object of the class from part A.
+
+49
+00:05:31.250 --> 00:05:35.750
+n_lines = 12 turns on the four new lines.
+Not one line of the constraints changes.
+
+50
+00:05:39.683 --> 00:05:43.350
+A regular draw: X or O,
+each in half of the draws.
+
+51
+00:05:49.450 --> 00:05:53.950
+randomize() with adds a temporary constraint.
+Here it always fails, because there is no draw.
+
+52
+00:05:55.450 --> 00:05:59.350
+In the box: a full board with no line,
+a draw with the 8 lines.
+
+53
+00:05:59.350 --> 00:06:04.316
+Turn on the wrap-around diagonals:
+now both X and O have a line.
+
+54
+00:06:05.116 --> 00:06:09.116
+A draw needs a full board: five X with no line.
+Let's show that every 5 cells contain a line.
+
+55
+00:06:09.116 --> 00:06:14.616
+Assume no line. Each direction splits the cells 2, 2, 1,
+so it has 2 pairs on a line.
+
+56
+00:06:14.616 --> 00:06:19.083
+Over the four directions: 8 pairs.
+But 5 cells have 10 pairs.
+
+57
+00:06:19.083 --> 00:06:24.316
+And every pair of cells lies on exactly one line.
+A contradiction: no 5 cells without a line.
+
+58
+00:06:25.116 --> 00:06:30.583
+In the box: a square of 4 cells with no line.
+The stars: every empty cell completes a line.
+
+59
+00:06:30.583 --> 00:06:35.550
+Cell 8 completes two lines: the diagonal 0, 4, 8,
+and 1, 3, 8, which wraps around.
+
+60
+00:06:35.550 --> 00:06:38.683
+And cell 2 completes the top row.
+
+61
+00:06:39.483 --> 00:06:44.716
+With the 12 lines there are 1,314 final boards:
+882 for X, 432 for O, and no draw.
+
+62
+00:06:44.716 --> 00:06:48.716
+The solver finds no solution with DRAW:
+it proves the theorem for us.
+
+63
+00:06:49.514 --> 00:06:55.114
+To sum up: four conditions, each one a constraint.
+The winner is the one who moved last.
+
+64
+00:06:55.114 --> 00:07:00.014
+And with the wrap-around diagonals there is no draw.
+Try it in the box on the page of question 0011.

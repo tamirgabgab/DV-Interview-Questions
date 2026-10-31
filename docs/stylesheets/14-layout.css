@@ -1,0 +1,51 @@
+/* The site's styles, part 14 of 20: the desktop layout (session 28, 2026-10-29): a wider page
+   on large screens, the level's question list folded to the current question, and the grips
+   that resize the three columns (javascripts/layout.js). Phones and tablets are unchanged. */
+
+/* A wider grid: at least 61rem as before, up to 80% of the screen, so a wide screen keeps
+   about a tenth of its width on each side. */
+@media screen and (min-width: 76.25em) {
+  .md-grid { max-width: max(61rem, 80vw); }
+}
+
+/* The folded list: only the page's own question stays; the button shows the count and opens
+   the whole level. In the drawer of a small screen the list is always whole. */
+.md-typeset .nav-fold, .nav-fold { display: none; }
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary .nav-fold {
+    display: flex; align-items: center; gap: 0.35rem; width: 100%; margin: 0.1rem 0 0.35rem; padding: 0.3rem 0.6rem;
+    border: 1px solid var(--site-card-border); border-radius: var(--radius-m); background: var(--site-surface);
+    color: var(--md-default-fg-color); font: inherit; font-size: 0.68rem; font-weight: 600; text-align: start; cursor: pointer;
+  }
+  .md-sidebar--primary .nav-fold:hover { border-color: var(--md-typeset-a-color); color: var(--md-typeset-a-color); }
+  .md-sidebar--primary .nav-fold:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+  .md-sidebar--primary .nav-fold__n { padding: 0 0.4em; border-radius: 1rem; background: var(--site-primary-soft); color: var(--md-default-fg-color); font-variant-numeric: tabular-nums; }
+  .md-sidebar--primary .nav-fold__arrow { width: 0.45rem; height: 0.45rem; margin-inline-start: auto; border: solid currentColor; border-width: 0 0.12rem 0.12rem 0; transform: rotate(45deg); transition: transform var(--dur-1); }
+  .md-sidebar--primary .nav-fold[aria-expanded="false"] .nav-fold__arrow { transform: rotate(135deg); }
+  .md-sidebar--primary .md-nav.is-folded > .md-nav__list > .md-nav__item:not(.md-nav__item--active) { display: none; }
+}
+
+/* The grips: a thin band on the inner edge of each sidebar, a line under the pointer. */
+.col-grip { display: none; }
+@media screen and (min-width: 60em) {
+  .md-sidebar--secondary { width: var(--dvq-toc-w, 12.1rem); }
+  .md-sidebar--secondary .col-grip--toc { display: block; inset-inline-start: -0.35rem; }
+}
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary { width: var(--dvq-nav-w, 12.1rem); }
+  /* Material keeps the list 11.5rem wide inside a wider sidebar (a padding of the rest):
+     a widened column gives its whole width to the titles, which end in "…" only at its edge */
+  [dir=rtl] .md-sidebar--primary .md-sidebar__inner { padding-left: 0; }
+  [dir=ltr] .md-sidebar--primary .md-sidebar__inner { padding-right: 0; }
+  .md-sidebar--primary .col-grip--nav { display: block; inset-inline-end: -0.35rem; }
+}
+.col-grip {
+  position: absolute; top: 0; height: calc(100vh - 4.8rem); z-index: 2; width: 0.7rem; cursor: col-resize; touch-action: none;   /* the height of the screen, also beside a short sidebar */
+}
+.col-grip::after {
+  content: ""; position: absolute; top: 1.2rem; bottom: 1.2rem; left: 50%; width: 2px; margin-left: -1px; border-radius: 1px;
+  background: transparent; transition: background-color var(--dur-1);
+}
+.col-grip:hover::after, .col-grip:focus-visible::after, .is-col-dragging .col-grip::after { background: var(--site-mark-color); }
+.col-grip:focus-visible { outline: none; }
+.is-col-dragging, .is-col-dragging * { cursor: col-resize !important; user-select: none !important; }

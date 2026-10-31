@@ -1,0 +1,492 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.667
+Question 0002: swapping the values of two variables,
+a student-level question.
+
+2
+00:00:04.667 --> 00:00:10.167
+Three parts, and each part adds a constraint:
+with a temp variable, without one, and bits only.
+
+3
+00:00:10.967 --> 00:00:15.867
+The function swap takes two variables, a and b,
+and swaps them in place.
+
+4
+00:00:15.867 --> 00:00:20.600
+At the end, a holds the original value of b,
+and b holds the original value of a.
+
+5
+00:00:21.400 --> 00:00:24.933
+Part A: the simplest way, with a temp variable.
+
+6
+00:00:25.633 --> 00:00:29.167
+We have two variables: a equals 5, and b equals 3.
+
+7
+00:00:29.167 --> 00:00:32.667
+The goal: a should hold 3, and b should hold 5.
+
+8
+00:00:32.667 --> 00:00:37.767
+The idea: an extra variable, temp,
+that saves the value of a before it is overwritten.
+
+9
+00:00:37.767 --> 00:00:41.967
+Step 1: temp = a. The value 5 is saved in temp.
+
+10
+00:00:41.967 --> 00:00:47.000
+Step 2: a = b. Now a holds 3,
+and the original 5 is still saved in temp.
+
+11
+00:00:47.000 --> 00:00:51.800
+Step 3: b = temp, and b gets 5.
+The swap is complete.
+
+12
+00:00:52.600 --> 00:00:57.267
+The same example in the page's box:
+the code, and under it the value of every variable.
+
+13
+00:00:57.267 --> 00:01:01.233
+temp keeps a0, the value 5,
+before v[i] is overwritten.
+
+14
+00:01:01.233 --> 00:01:06.200
+v[i] gets b0, and the symbolic column
+shows a0 is kept only in temp.
+
+15
+00:01:06.200 --> 00:01:10.100
+v[j] gets a0 from temp.
+At the end a = b0 and b = a0.
+
+16
+00:01:10.900 --> 00:01:14.567
+Now let's write it in Python, line by line.
+
+17
+00:01:16.067 --> 00:01:20.567
+Python cannot pass an int by reference,
+so we pass a list v and two indices, i and j.
+
+18
+00:01:20.567 --> 00:01:24.867
+Here v[i] plays the role of a,
+and v[j] plays the role of b.
+
+19
+00:01:25.967 --> 00:01:30.467
+Line 2: save v[i], the value of a, in temp,
+before it is overwritten.
+
+20
+00:01:31.567 --> 00:01:36.067
+Line 3: now v[i] may be overwritten,
+and it gets the value of b.
+
+21
+00:01:37.200 --> 00:01:41.600
+Line 4: v[j] gets the original value of a,
+which is saved in temp.
+
+22
+00:01:42.300 --> 00:01:47.700
+On the right, the page's box runs the same code
+on [5, 3], with i = 0 and j = 1.
+
+23
+00:01:47.700 --> 00:01:51.833
+First temp gets v[i], that is 5.
+
+24
+00:01:51.833 --> 00:01:55.967
+Then v[i] gets v[j], that is 3.
+
+25
+00:01:55.967 --> 00:02:00.133
+Finally v[j] gets temp,
+and the list is now [3, 5].
+
+26
+00:02:00.933 --> 00:02:06.167
+Why it works: let's follow 5 and 3,
+and see where they are after each step.
+
+27
+00:02:06.167 --> 00:02:11.567
+In every row, each of them is in at least one variable.
+No value is ever lost.
+
+28
+00:02:12.367 --> 00:02:17.867
+The cost: three assignments, so O(1) time,
+and extra memory of one int variable.
+
+29
+00:02:18.667 --> 00:02:22.167
+The trap: writing a = b before saving a.
+
+30
+00:02:22.167 --> 00:02:26.167
+The value 5 is erased.
+Now both a and b hold 3.
+
+31
+00:02:26.167 --> 00:02:30.967
+The assignment b = a no longer helps:
+both variables end up with 3.
+
+32
+00:02:30.967 --> 00:02:35.067
+So saving into temp must come
+before the first overwrite.
+
+33
+00:02:35.867 --> 00:02:41.067
+Part B: the same swap, with no temp variable at all.
+Arithmetic operations are allowed.
+
+34
+00:02:41.767 --> 00:02:46.867
+There is no temp. So the first value we write
+must keep information about both values.
+
+35
+00:02:46.867 --> 00:02:50.467
+The idea: the sum, 8, holds both values together.
+
+36
+00:02:50.467 --> 00:02:54.700
+Knowing the sum and one of the values,
+a subtraction gives back the other.
+
+37
+00:02:55.900 --> 00:03:00.200
+Step 1: a = a + b, and now a holds 8,
+the sum of both.
+
+38
+00:03:00.200 --> 00:03:04.100
+Step 2: b = a − b, that is, 8 minus 3,
+and b gets 5.
+
+39
+00:03:04.100 --> 00:03:09.067
+Step 3: a = a − b, that is, 8 minus 5,
+and a gets 3. The values are swapped.
+
+40
+00:03:09.867 --> 00:03:15.267
+In the page's box, the same three lines,
+and a symbolic column that follows a0 and b0.
+
+41
+00:03:15.267 --> 00:03:18.933
+v[i] gets the sum, 8,
+symbolically a0 + b0.
+
+42
+00:03:18.933 --> 00:03:23.400
+v[j] gets the sum minus b0,
+that is 8 − 3 = 5, which is a0.
+
+43
+00:03:23.400 --> 00:03:27.867
+v[i] gets the sum minus a0,
+that is 8 − 5 = 3, which is b0.
+
+44
+00:03:28.667 --> 00:03:32.400
+The page's code: the same three lines, on v[i] and v[j].
+
+45
+00:03:34.033 --> 00:03:38.533
+The same signature as in Part A:
+a list v and two indices, with no temp.
+
+46
+00:03:41.133 --> 00:03:45.633
+Line 2: v[i] is overwritten with the sum of both,
+and the comment notes a = a0 + b0.
+
+47
+00:03:49.033 --> 00:03:53.533
+Line 3: the sum minus b0 leaves a0,
+and that is the new value of v[j].
+
+48
+00:03:56.867 --> 00:04:01.367
+Line 4: the sum minus a0 leaves b0,
+and that is the new value of v[i].
+
+49
+00:04:02.067 --> 00:04:06.233
+And we run it beside the page's box,
+on the same example, v = [5, 3].
+
+50
+00:04:06.233 --> 00:04:10.367
+First v[i] gets the sum, 8.
+
+51
+00:04:10.367 --> 00:04:14.500
+Then v[j] gets 8 minus 3, that is 5.
+
+52
+00:04:14.500 --> 00:04:18.633
+Finally v[i] gets 8 minus 5, that is 3.
+
+53
+00:04:18.633 --> 00:04:22.633
+In Python the sum never overflows,
+because Python integers are unbounded.
+
+54
+00:04:23.433 --> 00:04:28.400
+Why it works: on the number line,
+going back 3 steps from 8 lands on 5.
+
+55
+00:04:28.400 --> 00:04:32.500
+And going back 5 steps from 8 lands on 3.
+No information is lost.
+
+56
+00:04:33.300 --> 00:04:38.333
+And in general, with a₀ and b₀:
+at the end a = b₀ and b = a₀, for any two values.
+
+57
+00:04:39.133 --> 00:04:44.633
+What about overflow? In SystemVerilog, int is 32 bits,
+and the arithmetic is modulo 2³².
+
+58
+00:04:44.633 --> 00:04:48.733
+The values sit on a wheel:
+right after 2³¹ − 1 comes −2³¹.
+
+59
+00:04:48.733 --> 00:04:53.533
+Say a = 2³¹ − 1 and b = 1.
+The sum crosses the seam and wraps around to −2³¹.
+
+60
+00:04:53.533 --> 00:04:58.033
+Step 2: the subtraction turns the wheel back,
+and b gets 2³¹ − 1.
+
+61
+00:04:58.033 --> 00:05:02.533
+Step 3: a gets 1.
+The swap is correct, even though the sum overflowed.
+
+62
+00:05:02.533 --> 00:05:07.133
+All the equalities also hold modulo 2³²,
+so the overflow does no harm.
+
+63
+00:05:07.933 --> 00:05:13.033
+The cost: O(1) time and zero extra memory,
+which is the whole point of this part.
+
+64
+00:05:13.833 --> 00:05:18.800
+The trap: calling swap with the same variable twice,
+for example swap(x, x).
+
+65
+00:05:18.800 --> 00:05:24.100
+Here a and b are two names for the same variable.
+Step 1: x gets 5 + 5, that is, 10.
+
+66
+00:05:24.100 --> 00:05:28.067
+Step 2: x gets x − x, that is, 0.
+The original value is lost.
+
+67
+00:05:28.067 --> 00:05:31.667
+Step 3 leaves 0.
+The temp version is not affected by this.
+
+68
+00:05:31.667 --> 00:05:36.467
+In Python, the function is guarded by a check:
+if i == j, return at once.
+
+69
+00:05:37.267 --> 00:05:41.800
+Part C: no temp variable and no arithmetic.
+Only &, |, ^ and ~ are allowed.
+
+70
+00:05:42.500 --> 00:05:47.600
+Let's write both values in bits:
+5 is 0101, and 3 is 0011.
+
+71
+00:05:47.600 --> 00:05:51.267
+The idea: XOR, which gives 1 exactly when the bits differ.
+
+72
+00:05:51.267 --> 00:05:56.767
+So x ^ x = 0 and x ^ 0 = x.
+XOR is thus both the addition and the subtraction of part B.
+
+73
+00:05:57.767 --> 00:06:02.500
+Step 1: a = a ^ b. A bit of a flips
+in every column where b has a 1.
+
+74
+00:06:02.500 --> 00:06:07.733
+Now a is 0110, that is, 6:
+it marks the columns where 5 and 3 differ.
+
+75
+00:06:08.233 --> 00:06:13.400
+Step 2: b = a ^ b, and b flips where a is 1.
+The result is 0101, that is, 5.
+
+76
+00:06:13.800 --> 00:06:18.967
+Step 3: a = a ^ b, and a flips where b is 1.
+The result is 0011, that is, 3.
+
+77
+00:06:19.767 --> 00:06:24.000
+And the page's box, this time with XOR:
+the same three lines, with ^.
+
+78
+00:06:24.000 --> 00:06:27.900
+v[i] gets 5 ^ 3, that is 6,
+symbolically a0 ^ b0.
+
+79
+00:06:27.900 --> 00:06:31.933
+v[j] gets 6 ^ 3, that is 5:
+b0 cancels out and a0 is left.
+
+80
+00:06:31.933 --> 00:06:35.967
+v[i] gets 6 ^ 5, that is 3:
+a0 cancels out and b0 is left.
+
+81
+00:06:36.767 --> 00:06:40.800
+The code from the page: the same three lines,
+with ^ instead of + and −.
+
+82
+00:06:42.333 --> 00:06:45.733
+Again the same signature: a list v and two indices.
+
+83
+00:06:48.267 --> 00:06:52.767
+Line 2: v[i] gets a0 ^ b0,
+the columns where the two values differ.
+
+84
+00:06:55.967 --> 00:07:00.467
+Line 3: an XOR with b0 cancels it,
+leaving a0, the new value of v[j].
+
+85
+00:07:03.633 --> 00:07:08.133
+Line 4: an XOR with a0 cancels it,
+leaving b0, the new value of v[i].
+
+86
+00:07:08.833 --> 00:07:12.300
+And now the run on 5 and 3,
+beside the page's box.
+
+87
+00:07:12.300 --> 00:07:16.433
+First v[i] gets 5 ^ 3, that is 6.
+
+88
+00:07:16.433 --> 00:07:20.567
+Then v[j] gets 6 ^ 3, that is 5.
+
+89
+00:07:20.567 --> 00:07:24.700
+Finally v[i] gets 6 ^ 5, that is 3.
+
+90
+00:07:25.500 --> 00:07:31.000
+Why it works: XOR acts on each column alone,
+with no carry, so checking one bit is enough.
+
+91
+00:07:31.000 --> 00:07:36.100
+There are only four combinations of a₀ and b₀.
+We run the three steps on each one.
+
+92
+00:07:36.100 --> 00:07:40.267
+In all four, step 2 gives back a₀,
+and step 3 gives back b₀.
+
+93
+00:07:40.267 --> 00:07:43.767
+And in algebra: b₀ ^ b₀ cancels to 0, leaving a₀.
+
+94
+00:07:44.567 --> 00:07:48.967
+The cost: O(1) time and zero memory,
+with no carry and no overflow.
+
+95
+00:07:48.967 --> 00:07:54.433
+The three steps depend on each other, so they run serially.
+It is a trick, not an optimization.
+
+96
+00:07:55.233 --> 00:08:00.833
+First trap: the same variable again.
+Since x ^ x is 0, step 1 already erases the value.
+
+97
+00:08:01.433 --> 00:08:05.467
+Second trap: why not & or |?
+Because they lose information.
+
+98
+00:08:05.467 --> 00:08:10.500
+Where b is 0, a & b comes out 0
+whether a was 0 or 1.
+
+99
+00:08:10.500 --> 00:08:15.100
+The same with | when b is 1.
+After that, a can no longer be recovered.
+
+100
+00:08:15.100 --> 00:08:18.700
+Only with XOR, when b is known,
+can a always be recovered.
+
+101
+00:08:19.500 --> 00:08:23.900
+To sum up: a temp variable, a sum and subtractions,
+or three XOR operations.
+
+102
+00:08:23.900 --> 00:08:28.133
+Try all three versions in the box
+on the page of question 0002 on the site.

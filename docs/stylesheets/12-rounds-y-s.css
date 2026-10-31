@@ -1,4 +1,4 @@
-/* The site's styles, part 12 of 12: rounds Y and S: the tags page, box text size, touch tools, side navigation, button runs, S2 figures.
+/* The site's styles, part 12 of 20: rounds Y and S: the tags page, box text size, touch tools, side navigation, button runs, S2 figures.
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
 /* The tags page (Y398): every tag as a chip with its count above the lists, and each
@@ -36,6 +36,7 @@
 .md-typeset .question-tools .qt-name { display: none; }
 @media (hover: none) {
   .md-typeset .question-header .question-tools { gap: 0.3rem; }
+  .md-typeset .question-header .question-tools { flex-wrap: wrap; justify-content: center; }   /* one line at the usual text size; a second one when the phone enlarges the text */
   .md-typeset .question-header .question-tools .qt-btn { flex-direction: column; gap: 0.1rem; width: auto; min-width: 2.7rem; height: auto; padding: 0.2rem 0.3rem; border-radius: var(--radius-m); }
   .md-typeset .question-header .question-tools .qt-name { display: block; font-size: 0.55rem; line-height: 1.2; white-space: nowrap; }
   .md-typeset .question-header .question-tools .qt-btn[data-tip]:is(:hover, :focus-visible)::after { content: none; }
@@ -49,8 +50,11 @@
 /* A run of action buttons in a box (S418, core.js layout): elsewhere it lays out as if it
    were not there; on a phone it is one line that scrolls sideways, fading out at its end
    so more buttons read as there, with end padding that lets the last button scroll clear
-   of the fade. */
+   of the fade. The run and its buttons keep the actions' place in the row (order 2):
+   without a box of its own the run's buttons are the row's flex items. */
 .md-typeset .explorer .ex-btnrun { display: contents; }
+.md-typeset .explorer .ex-controls > .ex-btnrun,
+.md-typeset .explorer .ex-btnrun > .ex-c-action { order: 2; }
 @media screen and (max-width: 30em) {
   .md-typeset .explorer .ex-btnrun { display: flex; flex: 1 1 100%; flex-wrap: nowrap; gap: inherit; min-width: 0; overflow-x: auto; scrollbar-width: none; padding-inline-end: 1.6rem; -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 1.6rem), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 1.6rem), transparent); }
   .md-typeset .explorer .ex-btnrun::-webkit-scrollbar { display: none; }
@@ -74,3 +78,23 @@
 .md-typeset .viz-legend .fig-key-light { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); border-radius: 50%; }
 .md-typeset .viz-legend .fig-key-both { background: color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s4); border-radius: 50%; }
 .md-typeset .viz-legend .fig-key-good { background: color-mix(in srgb, var(--viz-grid) 50%, var(--md-default-bg-color)); border-radius: 50%; }
+
+/* Text enlarged by the phone (Android Chrome's text scaling): nothing may widen the page,
+   or the browser zooms it out and the navigation drawer shows beside it. The playback bar
+   wraps its speed buttons to a second row; an inline formula wider than its line scrolls
+   on its own (reading-tools.js marks it .is-wide); the tools under the title wrap too. */
+.md-typeset .explorer .ex-transport { flex-wrap: wrap; justify-content: center; max-width: 100%; }
+.md-typeset .explorer .ex-transport:has(.ex-speedseg) { border-radius: 1.2rem; }
+.md-typeset mjx-container.is-wide { display: inline-block; max-width: 100%; overflow-x: auto; overflow-y: hidden; vertical-align: middle; }
+/* a field of a box never wider than the box: its label wraps, the field shrinks */
+.md-typeset .explorer .ex-controls > label { max-width: 100%; }
+.md-typeset .explorer .ex-controls > label :is(input, select, textarea) { max-width: 100%; min-width: 0; box-sizing: border-box; }
+/* a slider and its value stay on one row: the slider shrinks (down to 3rem), the label keeps
+   its width up to 40% of the row and wraps its words beyond that, and on a phone the value takes
+   only what it needs (check_phone.py measures every slider) */
+.md-typeset .explorer label:has(> input[type="range"] + output:last-child) { flex-wrap: nowrap; }
+.md-typeset .explorer label > input[type="range"] { flex: 0 100 auto; min-width: 3rem; }
+.md-typeset .explorer label:has(> input[type="range"] + output:last-child) > span { flex-shrink: 0; max-width: 40%; }
+.md-typeset .explorer label > input[type="range"] + output { flex: none; }
+@media (max-width: 600px) { .md-typeset .explorer label > input[type="range"] + output { min-width: 3ch; } }
+.md-typeset .explorer :is(.bridge-greedy, .mtbf-table) { overflow-x: auto; }

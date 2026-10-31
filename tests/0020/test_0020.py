@@ -171,3 +171,55 @@ def test_explorer_cuts_by_hand():
             valid.setdefault((addr, length, mps, rcb), set()).add(tuple(out["sizes"]))
     for case in cases:
         assert valid.get(case, set()) == reference(*case), case
+
+
+def test_random_split_follow_up():
+    """The follow-up on a uniform random split: a uniform choice at every step favours few
+    completions ([256] comes out with 1/5, not 1/16), while choosing the cut with probability
+    ways(cut) / ways(pos) gives every legal split exactly 1 / ways(addr)."""
+    from fractions import Fraction as Fr
+
+    def cuts_from(pos, end, mps, rcb):
+        out = [end] if pos + mps >= end else []
+        b = (pos // rcb + 1) * rcb
+        while b < end and b <= pos + mps:
+            out.append(b)
+            b += rcb
+        return out
+
+    def ways(pos, end, mps, rcb):
+        return 1 if pos == end else sum(ways(c, end, mps, rcb) for c in cuts_from(pos, end, mps, rcb))
+
+    def probabilities(addr, length, mps, rcb, weighted):
+        end, out = addr + length, {}
+
+        def walk(pos, sizes, p):
+            if pos == end:
+                out[tuple(sizes)] = p
+                return
+            cuts = cuts_from(pos, end, mps, rcb)
+            for c in cuts:
+                q = Fr(ways(c, end, mps, rcb), ways(pos, end, mps, rcb)) if weighted else Fr(1, len(cuts))
+                walk(c, sizes + [c - pos], p * q)
+
+        walk(addr, [], Fr(1))
+        return out
+
+    naive = probabilities(ADDR, LEN, MPS, RCB, weighted=False)
+    assert len(cuts_from(ADDR, ADDR + LEN, MPS, RCB)) == 5 and naive[(256,)] == Fr(1, 5)
+    assert ways(ADDR, ADDR + LEN, MPS, RCB) == 16
+    for addr, length, mps, rcb in [(ADDR, LEN, MPS, RCB), (ADDR, LEN, 128, RCB), (0x1004, 300, 128, 128), (0x1000, 512, 256, 64)]:
+        fair = probabilities(addr, length, mps, rcb, weighted=True)
+        total = ways(addr, length + addr, mps, rcb)
+        assert set(fair) == reference(addr, length, mps, rcb)
+        assert set(fair.values()) == {Fr(1, total)} and sum(fair.values()) == 1
+
+
+def test_explorer_notation():
+    """0020's box speaks the page's c (data-notation="c"); 0021's keeps N, |B| and delta."""
+    page20 = question_path(20).read_text(encoding="utf-8")
+    page21 = question_path(21).read_text(encoding="utf-8")
+    assert re.search(r'data-kind="pcie" data-notation="c"', page20)
+    assert 'data-kind="pcie" data-notation' not in page21
+    js = (ROOT / "docs" / "javascripts" / "explorer" / "pcie.js").read_text(encoding="utf-8")
+    assert 'box.dataset.notation === "c"' in js and "2^c = " in js

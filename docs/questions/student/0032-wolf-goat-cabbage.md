@@ -181,6 +181,47 @@ added: 2026-10-20
 
     #### הקוד { .sol-code }
 
+    === "Python"
+        ```python title="river_plan" linenums="1" hl_lines="9 10 11 23 24 25 26"
+        from collections import deque
+
+        FARMER, WOLF, GOAT, CABBAGE = 1, 2, 4, 8          # the bit of each one in the state
+        EVERYONE = FARMER | WOLF | GOAT | CABBAGE
+        CARGO = {None: 0, "wolf": WOLF, "goat": GOAT, "cabbage": CABBAGE}
+
+
+        def river_safe(state):
+            """Nobody is eaten: the goat is with the farmer, or away from both the wolf and the cabbage."""
+            f, w, g, c = (bool(state & b) for b in (FARMER, WOLF, GOAT, CABBAGE))
+            return g == f or (g != w and g != c)
+
+
+        def river_plan():
+            """What the farmer takes on each crossing (None = alone), from everyone near to everyone far."""
+            parent = {0: None}
+            queue = deque([0])
+            while queue:
+                s = queue.popleft()
+                if s == EVERYONE:
+                    break
+                for item, bit in CARGO.items():
+                    if bit and bool(s & bit) != bool(s & FARMER):
+                        continue                              # that item is on the other bank (1)
+                    nxt = s ^ FARMER ^ bit                    # (2)!
+                    if river_safe(nxt) and nxt not in parent:
+                        parent[nxt] = (s, item)
+                        queue.append(nxt)
+            plan, s = [], EVERYONE
+            while parent[s] is not None:                      # (3)!
+                s, item = parent[s]
+                plan.append(item)
+            return plan[::-1]
+        ```
+
+        1. פריט שנמצא בצד השני מהאיכר לא יכול לעלות לסירה.
+        2. החצייה הופכת את הביט של האיכר ואת הביט של מה שהוא לוקח (0 כשהוא לבד).
+        3. השחזור : מהסיום אחורה לפי ההורים, ואז הופכים.
+
     === "SystemVerilog"
         ```systemverilog title="river_plan" linenums="1" hl_lines="6 7 28 29 30 31 32"
         localparam int FARMER = 1, WOLF = 2, GOAT = 4, CABBAGE = 8;   // the bit of each one
@@ -230,47 +271,6 @@ added: 2026-10-20
         1. פריט שנמצא בצד השני מהאיכר לא יכול לעלות לסירה.
         2. החצייה הופכת את הביט של האיכר ואת הביט של מה שהוא לוקח (0 כשהוא לבד).
         3. השחזור : מהסיום אחורה, כל פעם מוסיפים את החצייה **לפני** מה שכבר נאסף.
-
-    === "Python"
-        ```python title="river_plan" linenums="1" hl_lines="9 10 11 23 24 25 26"
-        from collections import deque
-
-        FARMER, WOLF, GOAT, CABBAGE = 1, 2, 4, 8          # the bit of each one in the state
-        EVERYONE = FARMER | WOLF | GOAT | CABBAGE
-        CARGO = {None: 0, "wolf": WOLF, "goat": GOAT, "cabbage": CABBAGE}
-
-
-        def river_safe(state):
-            """Nobody is eaten: the goat is with the farmer, or away from both the wolf and the cabbage."""
-            f, w, g, c = (bool(state & b) for b in (FARMER, WOLF, GOAT, CABBAGE))
-            return g == f or (g != w and g != c)
-
-
-        def river_plan():
-            """What the farmer takes on each crossing (None = alone), from everyone near to everyone far."""
-            parent = {0: None}
-            queue = deque([0])
-            while queue:
-                s = queue.popleft()
-                if s == EVERYONE:
-                    break
-                for item, bit in CARGO.items():
-                    if bit and bool(s & bit) != bool(s & FARMER):
-                        continue                              # that item is on the other bank (1)
-                    nxt = s ^ FARMER ^ bit                    # (2)!
-                    if river_safe(nxt) and nxt not in parent:
-                        parent[nxt] = (s, item)
-                        queue.append(nxt)
-            plan, s = [], EVERYONE
-            while parent[s] is not None:                      # (3)!
-                s, item = parent[s]
-                plan.append(item)
-            return plan[::-1]
-        ```
-
-        1. פריט שנמצא בצד השני מהאיכר לא יכול לעלות לסירה.
-        2. החצייה הופכת את הביט של האיכר ואת הביט של מה שהוא לוקח (0 כשהוא לבד).
-        3. השחזור : מהסיום אחורה לפי ההורים, ואז הופכים.
 
     #### למה זה נכון { .sol-proof }
 

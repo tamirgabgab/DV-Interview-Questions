@@ -72,6 +72,20 @@ added: 2026-10-15
 
     **פתרון לא יעיל, \( O(n^2) \).** בודקים כל זוג ימים \( i < j \) :
 
+    === "Python"
+        ```python title="max_long_brute" hl_lines="5 6"
+        def max_long_brute(prices):
+            best, buy, sell = 0, None, None   # (1)!
+            for i in range(len(prices)):
+                for j in range(i + 1, len(prices)):
+                    if prices[j] - prices[i] > best:   # (2)!
+                        best, buy, sell = prices[j] - prices[i], i, j
+            return best, buy, sell
+        ```
+
+        1. ‏"אין עסקה" הוא רווח 0 ו-`None` לשני הימים.
+        2. ההשוואה החדה שומרת את הזוג הראשון מבין זוגות עם אותו רווח.
+
     === "SystemVerilog"
         ```systemverilog title="function max_long_brute" linenums="1" hl_lines="12 13"
         typedef struct {
@@ -96,22 +110,27 @@ added: 2026-10-15
         2. ההשוואה היא `>` ולא `>=`, ולכן מבין כמה זוגות עם אותו רווח נשמר הראשון לפי
            הסדר \( (i, j) \). הלולאה הפנימית מתחילה מ-`i + 1`, כך ש-\( j > i \) תמיד.
 
+    **פתרון יעיל, \( O(n) \).** עוברים על המערך פעם אחת, וזוכרים את המינימום עד כה ואת
+    היום שבו הוא הופיע :
+
     === "Python"
-        ```python title="max_long_brute" hl_lines="5 6"
-        def max_long_brute(prices):
-            best, buy, sell = 0, None, None   # (1)!
-            for i in range(len(prices)):
-                for j in range(i + 1, len(prices)):
-                    if prices[j] - prices[i] > best:   # (2)!
-                        best, buy, sell = prices[j] - prices[i], i, j
+        ```python title="max_long_fast" hl_lines="7 8"
+        def max_long_fast(prices):
+            best, buy, sell = 0, None, None
+            if not prices:
+                return best, buy, sell
+            min_p, min_i = prices[0], 0              # cheapest price seen so far
+            for i, p in enumerate(prices):
+                if p - min_p > best:                 # sell today, bought at the cheapest day (1)
+                    best, buy, sell = p - min_p, min_i, i
+                if p < min_p:   # (2)!
+                    min_p, min_i = p, i
             return best, buy, sell
         ```
 
-        1. ‏"אין עסקה" הוא רווח 0 ו-`None` לשני הימים.
-        2. ההשוואה החדה שומרת את הזוג הראשון מבין זוגות עם אותו רווח.
-
-    **פתרון יעיל, \( O(n) \).** עוברים על המערך פעם אחת, וזוכרים את המינימום עד כה ואת
-    היום שבו הוא הופיע :
+        1. הבדיקה מול המינימום של הימים הקודמים באה **לפני** העדכון, ולכן יום הקנייה
+           תמיד מוקדם מיום המכירה.
+        2. העדכון ב-`<` שומר את היום הראשון שבו הופיע המינימום.
 
     === "SystemVerilog"
         ```systemverilog title="function max_long_fast" linenums="1" hl_lines="8 9"
@@ -139,25 +158,6 @@ added: 2026-10-15
            `min_p` הוא תמיד המינימום של הימים **הקודמים**, כי העדכון בא אחרי הבדיקה.
         3. העדכון אחרי הבדיקה. הוא ב-`<` ולא ב-`<=`, ולכן `min_i` נשאר היום **הראשון**
            שבו הופיע המחיר הנמוך.
-
-    === "Python"
-        ```python title="max_long_fast" hl_lines="7 8"
-        def max_long_fast(prices):
-            best, buy, sell = 0, None, None
-            if not prices:
-                return best, buy, sell
-            min_p, min_i = prices[0], 0              # cheapest price seen so far
-            for i, p in enumerate(prices):
-                if p - min_p > best:                 # sell today, bought at the cheapest day (1)
-                    best, buy, sell = p - min_p, min_i, i
-                if p < min_p:   # (2)!
-                    min_p, min_i = p, i
-            return best, buy, sell
-        ```
-
-        1. הבדיקה מול המינימום של הימים הקודמים באה **לפני** העדכון, ולכן יום הקנייה
-           תמיד מוקדם מיום המכירה.
-        2. העדכון ב-`<` שומר את היום הראשון שבו הופיע המינימום.
 
     #### למה זה נכון { .sol-proof }
 
@@ -236,6 +236,27 @@ added: 2026-10-15
     **פתרון לא יעיל, \( O(n^2) \).** לכל זוג ימים \( i < j \) מחשבים גם את רווח הלונג וגם
     את רווח השורט :
 
+    === "Python"
+        ```python title="max_profit_brute" hl_lines="6 7"
+        def max_profit_brute(prices):
+            best, kind, first, second = 0, None, None, None
+
+            for i in range(len(prices)):
+                for j in range(i + 1, len(prices)):
+                    long_profit = prices[j] - prices[i]     # buy at i, sell at j
+                    short_profit = prices[i] - prices[j]    # sell at i, buy back at j (1)
+
+                    if long_profit > best:
+                        best, kind, first, second = long_profit, "long", i, j
+                    if short_profit > best:   # (2)!
+                        best, kind, first, second = short_profit, "short", i, j
+
+            return best, kind, first, second
+        ```
+
+        1. אותו זוג ימים בסימן הפוך.
+        2. ההשוואה החדה אחרי בדיקת הלונג : בתיקו בין לונג לשורט מוחזר הלונג.
+
     === "SystemVerilog"
         ```systemverilog title="function max_profit_brute" linenums="1" hl_lines="7 8"
         function automatic trade_t max_profit_brute(int prices[$]);
@@ -262,33 +283,50 @@ added: 2026-10-15
         2. הלונג נבדק קודם, וההשוואה חדה. לכן כשללונג ולשורט יש אותו רווח מקסימלי, מוחזר
            הלונג, בדיוק כמו בפתרון היעיל.
 
-    === "Python"
-        ```python title="max_profit_brute" hl_lines="6 7"
-        def max_profit_brute(prices):
-            best, kind, first, second = 0, None, None, None
-
-            for i in range(len(prices)):
-                for j in range(i + 1, len(prices)):
-                    long_profit = prices[j] - prices[i]     # buy at i, sell at j
-                    short_profit = prices[i] - prices[j]    # sell at i, buy back at j (1)
-
-                    if long_profit > best:
-                        best, kind, first, second = long_profit, "long", i, j
-                    if short_profit > best:   # (2)!
-                        best, kind, first, second = short_profit, "short", i, j
-
-            return best, kind, first, second
-        ```
-
-        1. אותו זוג ימים בסימן הפוך.
-        2. ההשוואה החדה אחרי בדיקת הלונג : בתיקו בין לונג לשורט מוחזר הלונג.
-
     **פתרון יעיל, \( O(n) \).** מריצים "שני סעיפי א" במקביל, באותה לולאה :
 
     - **בשביל הלונג :** זוכרים את **המינימום עד כה**, כי הכי טוב לקנות בזול ביותר.
     - **בשביל השורט :** זוכרים את **המקסימום עד כה**, כי הכי טוב למכור ביקר ביותר.
 
     בסוף מחזירים את הטוב מבין השניים :
+
+    === "Python"
+        ```python title="max_profit_fast" linenums="1" hl_lines="12 16"
+        def max_profit_fast(prices):
+            if len(prices) < 2:   # (1)!
+                return 0, None, None, None
+
+            min_p, min_i = prices[0], 0     # cheapest price so far  -> best day to open a long
+            max_p, max_i = prices[0], 0     # highest price so far   -> best day to open a short
+
+            long_best, long_open, long_close = 0, None, None
+            short_best, short_open, short_close = 0, None, None
+
+            for i, p in enumerate(prices):
+                if p - min_p > long_best:
+                    long_best = p - min_p
+                    long_open, long_close = min_i, i
+
+                if max_p - p > short_best:   # (2)!
+                    short_best = max_p - p
+                    short_open, short_close = max_i, i
+
+                if p < min_p:   # (3)!
+                    min_p, min_i = p, i
+                if p > max_p:
+                    max_p, max_i = p, i
+
+            if short_best > long_best:   # (4)!
+                return short_best, "short", short_open, short_close
+            if long_best > 0:
+                return long_best, "long", long_open, long_close
+            return 0, None, None, None
+        ```
+
+        1. עם פחות משני מחירים אין עסקה אפשרית.
+        2. תמונת ראי של בדיקת הלונג, עם המקסימום של הימים הקודמים.
+        3. העדכונים באים אחרי שתי הבדיקות, בהשוואות חדות.
+        4. בתיקו מוחזר הלונג; לונג ברווח 0 הוא "אין עסקה".
 
     === "SystemVerilog"
         ```systemverilog title="function max_profit_fast" linenums="1" hl_lines="13 19"
@@ -334,44 +372,6 @@ added: 2026-10-15
            **הראשונים** שבהם הופיעו הקיצונים.
         4. בחירה חדה : בתיקו בין שורט ללונג מוחזר הלונג, ואם גם הלונג ברווח 0 מוחזר "אין
            עסקה" עם ימים `-1`.
-
-    === "Python"
-        ```python title="max_profit_fast" linenums="1" hl_lines="12 16"
-        def max_profit_fast(prices):
-            if len(prices) < 2:   # (1)!
-                return 0, None, None, None
-
-            min_p, min_i = prices[0], 0     # cheapest price so far  -> best day to open a long
-            max_p, max_i = prices[0], 0     # highest price so far   -> best day to open a short
-
-            long_best, long_open, long_close = 0, None, None
-            short_best, short_open, short_close = 0, None, None
-
-            for i, p in enumerate(prices):
-                if p - min_p > long_best:
-                    long_best = p - min_p
-                    long_open, long_close = min_i, i
-
-                if max_p - p > short_best:   # (2)!
-                    short_best = max_p - p
-                    short_open, short_close = max_i, i
-
-                if p < min_p:   # (3)!
-                    min_p, min_i = p, i
-                if p > max_p:
-                    max_p, max_i = p, i
-
-            if short_best > long_best:   # (4)!
-                return short_best, "short", short_open, short_close
-            if long_best > 0:
-                return long_best, "long", long_open, long_close
-            return 0, None, None, None
-        ```
-
-        1. עם פחות משני מחירים אין עסקה אפשרית.
-        2. תמונת ראי של בדיקת הלונג, עם המקסימום של הימים הקודמים.
-        3. העדכונים באים אחרי שתי הבדיקות, בהשוואות חדות.
-        4. בתיקו מוחזר הלונג; לונג ברווח 0 הוא "אין עסקה".
 
     #### למה זה נכון { .sol-proof }
 

@@ -26,7 +26,7 @@ class Chart:
         self.slots, self.x_min, self.x_max = slots, x_min, x_max
         self.y_min, self.y_max, self.log = y_min, y_max, log
         style = f' style="{style}"' if style else ""
-        self.parts = [f'<svg class="perf-chart" viewBox="0 0 {w} {h}"{style} role="img" aria-label="{label}">']
+        self.parts = [f'<svg class="perf-chart" viewBox="0 0 {w} {h}"{style} role="img" aria-label="{label.replace(chr(34), "&quot;")}">']
 
     # --- mapping ---------------------------------------------------------------------------
 
