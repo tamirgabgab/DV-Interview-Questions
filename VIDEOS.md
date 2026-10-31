@@ -597,6 +597,18 @@ the typing adds about 1.5 minutes to 0002 (three 4-line functions) and 2 minutes
 | 0002, 7:26 | 0:00 opening, 0:21 א (1:54), 2:15 ב (2:39), 4:54 ג (2:22), 7:16 closing | `[0, 135, 294]` |
 | 0004, 6:54 | 0:00 opening, 0:23 א (1:41), 2:04 ב (4:37), 6:41 closing | `[0, 124]` |
 
+### With the page's box (2026-10-31)
+
+The box beats and the split screen added about a minute to each pilot. The four released
+videos (`videos/<id>/release/`):
+
+| Video | Chapters | `video_parts` |
+|---|---|---|
+| 0002, 8:29 | 0:00 opening, 0:21 א, 2:35 ב, 5:37 ג, 8:19 closing | `[0, 155, 337]` |
+| 0004, 7:30 | 0:00 opening, 0:23 א, 2:18 ב, 7:18 closing | `[0, 138]` |
+| 0006, 7:40 | 0:00 opening, 0:14 א, 3:34 ב, 7:29 closing | `[0, 214]` |
+| 0011 | see `videos/0011/release/0011-chapters.txt` | see its `info.json` |
+
 The `video_parts` go into the pages' front matter with the YouTube id, once the videos
 are uploaded (see "Publishing and linking").
 
