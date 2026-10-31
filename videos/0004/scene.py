@@ -317,8 +317,18 @@ class ChapterB(BoxScene):
         vp = VarPanel(["i", "k", "ball", "other", "fixed[0]", "fixed[1]", "fixed[2]"], fmt=fmt,
                       size=32, buff=0.35).set_state({})
         self.place_code(panel, vp, vp_width=vp.keys["fixed[0]"].width + 2.2)
-        self.say("הפתרון הראשון מתרגם את סעיף א כמעט מילה במילה,\nובונה מערך fixed חדש.",
-                 FadeIn(panel), FadeIn(vp))
+        self.type_code(panel, [
+            (1, "הפונקציה מקבלת את מערך התוויות,\nומחזירה את התוויות הנכונות."),
+            (2, "המערך fixed יקבל את התוויות המתוקנות.\nבינתיים שלוש מחרוזות ריקות."),
+            (range(5, 8), "לולאה ראשונה : מחפשים את הקופסה\nשתוויתה MIXED, ושומרים את האינדקס שלה ב-k."),
+            (8, "הדגימה היחידה בפונקציה, מקופסה k.\nהיא חד-צבעית, ולכן ball הוא הצבע שלה."),
+            (range(11, 15), "התנאי קובע את הצבע השני, other :\nאם ball הוא RED אז BLACK, ואחרת RED."),
+            (15, "קופסה k מקבלת את התווית ball,\nכי זה הצבע היחיד שבה."),
+            (range(18, 21), "לולאה שנייה : הקופסה שתוויתה ball\nמקבלת other, לפי הכלל של סעיף א."),
+            (range(23, 26), "לולאה שלישית : בקופסה שתוויתה other\nאין other ואין ball, ולכן היא MIXED."),
+            (27, "ומחזירים את fixed.\nהמערך labels עצמו לא השתנה."),
+        ], intro="הפתרון הראשון מתרגם את סעיף א כמעט מילה במילה,\nובונה מערך fixed חדש.")
+        self.say("נריץ על הדוגמה מהעמוד,\nכש-draw מחזיר RED.", FadeIn(vp))
         steps, result = trace(code, "fix_labels_simple", ([EN[k] for k in LABELS],),
                               {"draw": lambda i: "RED"})
         assert result == [EN[k] for k in ARR1]
@@ -389,7 +399,16 @@ class ChapterB(BoxScene):
                       cols=3, slot=3.7)
         vp.set_state({"labels": [EN[k] for k in LABELS]})
         self.place_code(panel, vp)
-        self.say("הקוד : אחרי הדגימה לא מחפשים שוב,\nולא בונים מערך חדש.", FadeIn(panel), FadeIn(vp))
+        self.type_code(panel, [
+            (1, "הפעם הפונקציה מתקנת את labels במקום,\nומחזירה את אותו מערך."),
+            ([2, 3], "המתודה index מוצאת את MIXED בשורה אחת,\nוהדגימה היחידה היא שוב מקופסה k."),
+            (5, "השכנים של k במעגל, n1 ו-n2,\nבלי לולאה ובלי חיפוש."),
+            ([6, 7], "בדיקה אחת : השכן שתוויתו כצבע הכדור\nהוא same, והשני הוא other."),
+            (10, "החלפה ראשונה, בהשמה מרובה ובלי tmp :\nקופסה k מקבלת את צבע הכדור."),
+            (11, "החלפה שנייה, בין same ל-other.\nשתי ההחלפות יחד הן הסיבוב."),
+            (12, "ומחזירים את labels, מתוקן במקום."),
+        ], intro="הקוד : אחרי הדגימה לא מחפשים שוב,\nולא בונים מערך חדש.")
+        self.say("ועכשיו הריצה, שוב עם כדור אדום.", FadeIn(vp))
         steps, result = trace(code, "fix_labels", ([EN[k] for k in LABELS],), {"draw": lambda i: "RED"})
         assert result == [EN[k] for k in ARR1]
         self.run_code(panel, vp, steps, [

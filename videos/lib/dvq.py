@@ -9,9 +9,11 @@ A question's `videos/<id>/scene.py` builds its chapters from these parts:
 - `DVQScene`: the base scene. `say()` / `beat()` play a beat under its caption and record
   the caption's real start and end, `opening()`, `chapter_card()` and `closing()` are the
   frames every video shares, and `tear_down()` writes the record for captions.py;
-- `CodePanel`, `VarPanel` and `trace()`: the code beat. The code is read from the page's
-  Python tab (tools/extract_code.py, the parser the tests use), run on the example with a
-  line tracer, and its lines are lit in the order they ran, the variables beside it;
+- `CodePanel`, `VarPanel`, `trace()`, `DVQScene.type_code()` and `DVQScene.run_code()`: the
+  code beat. The code is read from the page's Python tab (tools/extract_code.py, the
+  parser the tests use) and typed into its panel character by character, a caption after
+  each line or group of lines (`type_code`); then it is run on the example with a line
+  tracer, and its lines are lit in the order they ran, the variables beside it (`run_code`);
 - small parts: `Cell` (a named value), `chip()`, `cost_chips()`.
 """
 
@@ -22,6 +24,7 @@ import copy
 import inspect
 import json
 import os
+import random
 import re
 import subprocess
 import sys
@@ -29,9 +32,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-from manim import (DOWN, Group, LEFT, ORIGIN, RIGHT, UP, Code, Create, FadeIn, FadeOut,
-                   ImageMobject, Line, Mobject, Rectangle, RoundedRectangle, Scene, Text,
-                   Transform, VGroup, VMobject, config, rate_functions)
+from manim import (DOWN, Animation, Group, LEFT, ORIGIN, RIGHT, UP, Code, Create, FadeIn,
+                   FadeOut, ImageMobject, Line, Mobject, Rectangle, RoundedRectangle, Scene,
+                   Text, Transform, VGroup, VMobject, config, rate_functions)
 from manim.constants import CapStyleType, LineJointType
 from manim.mobject.svg.svg_mobject import SVGMobject
 from pygments.style import Style
@@ -53,6 +56,14 @@ HEBREW = re.compile("[֐-׿]")
 PX = 90.0          # frame pixels (720p) per Manim unit: 720 px / 8 units
 SAFE_BOTTOM = -2.5 # the player draws the captions below this line: keep the picture above it
 MIN_HOLD = 2.0     # every beat ends in a still frame held at least this long
+
+# The typed code beat (DVQScene.type_code)
+TYPE_CPS = 16.0        # typing speed, characters a second (the owner: about 12-20)
+EOL_PAUSE = 0.3        # the pause at the end of a typed line inside a group
+BAND_OPACITY = 0.13    # the soft highlight of the group under its caption
+BLINK = 1.0            # the cursor's blink period while the typing pauses, on for 60 %
+MONO_ADVANCE = 0.602   # DejaVu Sans Mono's advance width, in em
+MIN_CODE_EM = 23.0     # the code's em in frame px at 720p: about 24 px, or the render fails
 
 # --------------------------------------------------------------------------------------
 # The palette, read from the site's stylesheets
@@ -407,6 +418,114 @@ class CodePanel(VGroup):
         tick.move_to([bg.get_left()[0] + 0.1, y, 0])
         return VGroup(rect, tick)
 
+    # -- typing (DVQScene.type_code) ---------------------------------------------------------
+
+    def text_of(self, page_line: int) -> str:
+        return self.lines_text[self.index[page_line]]
+
+    def shown(self) -> list[int]:
+        """The page lines in the picture that hold code (not blank), in order."""
+        return [n for n in self.index if self.text_of(n).strip()]
+
+    def glyphs(self, page_line: int) -> dict[int, VMobject]:
+        """The glyphs of a line by their column (a space has no glyph)."""
+        text = self.text_of(page_line)
+        cols = [c for c, ch in enumerate(text) if not ch.isspace()]
+        line = self.code.code_lines[self.index[page_line]]
+        if len(cols) != len(line):
+            raise RuntimeError(f"line {page_line}: {len(cols)} characters, {len(line)} glyphs")
+        return dict(zip(cols, line))
+
+    def grid(self) -> tuple[float, float]:
+        """(x0, pitch): the left edge of column 0 and the column width, as the panel is
+        placed now. The font is monospace, so the centre of column c is x0 + (c + ½) pitch;
+        the two are fitted to every glyph's centre (a glyph's ink sits near its cell's
+        middle), and the fit is checked."""
+        cs, xs = [], []
+        for n in self.shown():
+            for c, g in self.glyphs(n).items():
+                cs.append(c)
+                xs.append(g.get_center()[0])
+        pitch, a = np.polyfit(cs, xs, 1)
+        worst = max(abs(x - (a + pitch * c)) for c, x in zip(cs, xs))
+        if worst > 0.4 * pitch:
+            raise RuntimeError(f"the code's glyphs are not on a monospace grid (off by {worst / pitch:.2f})")
+        return a - pitch / 2, pitch
+
+    def em_px(self) -> float:
+        """The code's font size (em) in frame pixels at 720p, as placed now."""
+        return self.grid()[1] * PX / MONO_ADVANCE
+
+    def caret(self, pitch: float) -> Rectangle:
+        """The typing cursor: an amber bar of about a line's height."""
+        h = self._pitch * self._s * 0.82
+        return Rectangle(width=max(0.045, 0.16 * pitch), height=h, stroke_width=0,
+                         fill_color=C.AMBER, fill_opacity=1)
+
+    def band(self, lines: list[int]) -> Rectangle:
+        """A soft highlight over `lines` (page lines), drawn under the text: it sits in the
+        code group between the background and the text, invisible until faded in."""
+        bg = self.background
+        top = self.line_y(lines[0]) + self._pitch * self._s * 0.5
+        bottom = self.line_y(lines[-1]) - self._pitch * self._s * 0.5
+        rect = Rectangle(width=bg.width - 0.12, height=top - bottom, stroke_width=0,
+                         fill_color=C.AMBER, fill_opacity=0)
+        rect.move_to([bg.get_center()[0], (top + bottom) / 2, 0])
+        self.code.submobjects.insert(self.code.submobjects.index(bg) + 1, rect)
+        return rect
+
+    def hide_text(self) -> None:
+        for line in self.code.code_lines:
+            for g in line:
+                g.set_fill(opacity=0)
+
+
+class _Typing(Animation):
+    """One line typed: `events` is [(t, glyph or None, caret point)], the glyph shown and the
+    caret moved at time t (seconds from the start). The animation's mobject is the code's
+    text, so the renderer redraws it on every frame."""
+
+    def __init__(self, text: Mobject, caret: Mobject, events: list, total: float):
+        self.caret, self.events, self.total = caret, events, total
+        super().__init__(text, run_time=total, rate_func=rate_functions.linear)
+
+    def interpolate_mobject(self, alpha: float) -> None:
+        t = alpha * self.total + 1e-9
+        point = self.events[0][2]
+        for te, glyph, p in self.events:
+            if te <= t:
+                point = p
+            if glyph is not None:
+                glyph.set_fill(opacity=1 if te <= t else 0)
+        self.caret.move_to(point)
+        self.caret.set_fill(opacity=1)
+
+
+class _Blink(Animation):
+    """The caret blinks while the typing pauses: on for 60 % of every BLINK seconds."""
+
+    def __init__(self, caret: Mobject, total: float):
+        self.total = total
+        super().__init__(caret, run_time=total, rate_func=rate_functions.linear)
+
+    def interpolate_mobject(self, alpha: float) -> None:
+        on = (alpha * self.total) % BLINK < 0.6 * BLINK or alpha >= 1
+        self.mobject.set_fill(opacity=1 if on else 0)
+
+
+def _lines_of(spec) -> list[int]:
+    if isinstance(spec, int):
+        return [spec]
+    return list(spec)
+
+
+def _captions_of(spec) -> list[tuple[str, list]]:
+    """A group's captions: "text", ("text", [anims]) or a list of those."""
+    if isinstance(spec, str) or (isinstance(spec, tuple) and isinstance(spec[0], str)
+                                 and len(spec) == 2 and isinstance(spec[1], list)):
+        spec = [spec]
+    return [(c, []) if isinstance(c, str) else (c[0], list(c[1])) for c in spec]
+
 
 def baseline_text(s: str, size: float = 28, color: str | None = None) -> Text:
     """Monospace text that starts with an invisible "|", which spans the font's full
@@ -498,6 +617,7 @@ class DVQScene(Scene):
         self.camera.background_color = C.NAVY
         self.captions: list[dict] = []
         self.problems: list[str] = []
+        self.code_ems: list[float] = []      # the typed code's em in px at 720p, per panel
         self._in_beat = False
 
     # -- the clock -------------------------------------------------------------------------
@@ -560,7 +680,8 @@ class DVQScene(Scene):
         out = Path(inspect.getfile(type(self))).resolve().parent / "out" / "parts"
         out.mkdir(parents=True, exist_ok=True)
         record = {"scene": type(self).__name__, "duration": round(self.time, 4),
-                  "fps": config.frame_rate, "captions": self.captions, "problems": self.problems}
+                  "fps": config.frame_rate, "captions": self.captions, "problems": self.problems,
+                  "code_em_px": [round(e, 1) for e in self.code_ems]}
         (out / f"{type(self).__name__}.json").write_text(
             json.dumps(record, ensure_ascii=False, indent=1), encoding="utf-8")
 
@@ -589,6 +710,77 @@ class DVQScene(Scene):
         if side:   # centre the widest the variables get, not the empty panel
             group.shift(LEFT * (vw - vp.width) * k / 2)
         return group
+
+    def type_code(self, panel: "CodePanel", groups: list, intro: str | None = None,
+                  intro_anims: tuple = (), cps: float = TYPE_CPS, seed: int = 0):
+        """The code beat's first half: the page's code typed into its panel as if someone
+        wrote it live, a pause and a caption after each line or group of lines.
+
+        `panel` is the CodePanel of the page's code (`page_python`), already placed for the
+        whole code (`place_code`, with the variables' room kept free), so nothing moves
+        while it fills; the traced run (`run_code`) reuses it. `groups` is
+        [(lines, caption), ...]: `lines` a page line, a range or a list of page lines, the
+        groups covering every line in the picture in order; `caption` a text, a pair
+        (text, [animations played as it appears]) or a list of those (several beats in
+        one pause). `intro` is a caption for the empty panel as it appears.
+
+        Each character appears at about `cps` a second (a seeded jitter of ±30 %), the
+        amber caret just after it; the indentation appears at once, a line inside a group
+        ends with a short pause, and after a group the typing stops: its lines are lit
+        softly under the caption, held for reading (`reading_hold`, 2-4 s) while the caret
+        blinks. Fails when the groups do not cover the code, and records a problem when the
+        code's text is under MIN_CODE_EM px."""
+        shown = panel.shown()
+        plan = [(_lines_of(lines), _captions_of(cap)) for lines, cap in groups]
+        planned = [n for lines, _ in plan for n in lines]
+        if planned != shown:
+            raise RuntimeError(f"the groups type lines {planned}, the panel shows {shown}")
+        x0, pitch = panel.grid()
+        em = pitch * PX / MONO_ADVANCE
+        if em < MIN_CODE_EM:
+            self.problems.append(f"code text {em:.1f} px high at 720p (at least {MIN_CODE_EM})")
+        self.code_ems.append(em)
+        rng = random.Random(seed or len(shown) * 7919 + len(panel.lines_text[0]))
+
+        def point(n: int, col: int):
+            return np.array([x0 + col * pitch + caret.width / 2, panel.line_y(n), 0.0])
+
+        def indent(n: int) -> int:
+            text = panel.text_of(n)
+            return len(text) - len(text.lstrip())
+
+        panel.hide_text()
+        caret = panel.caret(pitch)
+        caret.move_to(point(shown[0], indent(shown[0])))
+        start = self.time
+        self.play(FadeIn(panel), FadeIn(caret), *intro_anims, run_time=1.0)
+        if intro:
+            hold = self.reading_hold(intro, self.time - start)
+            self.play(_Blink(caret, hold), run_time=hold)
+            self._record(intro, start, self.time, hold)
+        for lines, captions in plan:
+            for li, n in enumerate(lines):
+                text, glyphs = panel.text_of(n), panel.glyphs(n)
+                t = 0.0
+                events = [(0.0, None, point(n, indent(n)))]
+                for col in range(indent(n), len(text)):
+                    t += rng.uniform(0.7, 1.3) / cps
+                    events.append((t, glyphs.get(col), point(n, col + 1)))
+                total = t + (EOL_PAUSE if li < len(lines) - 1 else 0.15)
+                self.play(_Typing(panel.code.code_lines, caret, events, total),
+                          Animation(caret), run_time=total)
+            band = panel.band(lines)
+            for k, (text, anims) in enumerate(captions):
+                start = self.time
+                light = [band.animate.set_fill(opacity=BAND_OPACITY)] if k == 0 else []
+                if light or anims:
+                    self.play(*light, *anims, run_time=1.0 if anims else 0.5)
+                hold = self.reading_hold(text, self.time - start)
+                self.play(_Blink(caret, hold), run_time=hold)
+                self._record(text, start, self.time, hold)
+            self.play(band.animate.set_fill(opacity=0), run_time=0.3)
+            panel.code.remove(band)
+        self.play(FadeOut(caret), run_time=0.4)
 
     def run_code(self, panel: "CodePanel", vp: "VarPanel", steps: list, groups: list,
                  step_time: float = 2.4):

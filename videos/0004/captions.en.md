@@ -144,6 +144,56 @@ he: ובונה מערך fixed חדש.
 en: The first solution translates part A almost word for word,
 en: and builds a new array, fixed.
 
+he: הפונקציה מקבלת את מערך התוויות,
+he: ומחזירה את התוויות הנכונות.
+en: The function takes the array of labels
+en: and returns the correct labels.
+
+he: המערך fixed יקבל את התוויות המתוקנות.
+he: בינתיים שלוש מחרוזות ריקות.
+en: The array fixed will hold the corrected labels.
+en: For now, three empty strings.
+
+he: לולאה ראשונה : מחפשים את הקופסה
+he: שתוויתה MIXED, ושומרים את האינדקס שלה ב-k.
+en: First loop: find the box labelled MIXED
+en: and keep its index in k.
+
+he: הדגימה היחידה בפונקציה, מקופסה k.
+he: היא חד-צבעית, ולכן ball הוא הצבע שלה.
+en: The only draw in the function, from box k.
+en: That box holds one colour, so ball is its colour.
+
+he: התנאי קובע את הצבע השני, other :
+he: אם ball הוא RED אז BLACK, ואחרת RED.
+en: The if sets the second colour, other:
+en: BLACK if ball is RED, and RED otherwise.
+
+he: קופסה k מקבלת את התווית ball,
+he: כי זה הצבע היחיד שבה.
+en: Box k gets the label ball,
+en: the only colour inside it.
+
+he: לולאה שנייה : הקופסה שתוויתה ball
+he: מקבלת other, לפי הכלל של סעיף א.
+en: Second loop: the box labelled ball
+en: gets other, by the rule of Part A.
+
+he: לולאה שלישית : בקופסה שתוויתה other
+he: אין other ואין ball, ולכן היא MIXED.
+en: Third loop: the box labelled other holds
+en: neither other nor ball, so it is MIXED.
+
+he: ומחזירים את fixed.
+he: המערך labels עצמו לא השתנה.
+en: And return fixed.
+en: The array labels itself is unchanged.
+
+he: נריץ על הדוגמה מהעמוד,
+he: כש-draw מחזיר RED.
+en: Let's run it on the page's example,
+en: with draw returning RED.
+
 he: המעבר הראשון מחפש את MIXED.
 he: הוא בקופסה 2, ולכן k = 2.
 en: The first pass looks for MIXED.
@@ -211,6 +261,42 @@ he: הקוד : אחרי הדגימה לא מחפשים שוב,
 he: ולא בונים מערך חדש.
 en: The code: after the draw there is no second search,
 en: and no new array.
+
+he: הפעם הפונקציה מתקנת את labels במקום,
+he: ומחזירה את אותו מערך.
+en: This time the function fixes labels in place
+en: and returns the same array.
+
+he: המתודה index מוצאת את MIXED בשורה אחת,
+he: והדגימה היחידה היא שוב מקופסה k.
+en: The index method finds MIXED in one line,
+en: and the only draw is again from box k.
+
+he: השכנים של k במעגל, n1 ו-n2,
+he: בלי לולאה ובלי חיפוש.
+en: The neighbours of k on the circle, n1 and n2,
+en: with no loop and no search.
+
+he: בדיקה אחת : השכן שתוויתו כצבע הכדור
+he: הוא same, והשני הוא other.
+en: One check: the neighbour labelled with the ball's colour
+en: is same, and the other one is other.
+
+he: החלפה ראשונה, בהשמה מרובה ובלי tmp :
+he: קופסה k מקבלת את צבע הכדור.
+en: The first swap, by multiple assignment, with no tmp:
+en: box k gets the ball's colour.
+
+he: החלפה שנייה, בין same ל-other.
+he: שתי ההחלפות יחד הן הסיבוב.
+en: The second swap, between same and other.
+en: Together the two swaps are the rotation.
+
+he: ומחזירים את labels, מתוקן במקום.
+en: And return labels, fixed in place.
+
+he: ועכשיו הריצה, שוב עם כדור אדום.
+en: Now the run, again with a red ball.
 
 he: שוב k = 2, והכדור שיוצא אדום.
 en: Again k = 2, and the ball that comes out is red.

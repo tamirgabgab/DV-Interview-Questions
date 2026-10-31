@@ -52,6 +52,9 @@ he: ההחלפה הושלמה.
 en: Step 3: b = temp, and b gets 5.
 en: The swap is complete.
 
+he: עכשיו נכתוב את זה ב-Python, שורה אחרי שורה.
+en: Now let's write it in Python, line by line.
+
 he: ב-Python אין העברה של int by reference,
 he: ולכן מעבירים רשימה v ושני אינדקסים, i ו-j.
 en: Python cannot pass an int by reference,
@@ -61,6 +64,26 @@ he: כאן v[i] משחק את התפקיד של a,
 he: ו-v[j] את התפקיד של b.
 en: Here v[i] plays the role of a,
 en: and v[j] plays the role of b.
+
+he: שורה 2 : שומרים ב-temp את v[i],
+he: הערך של a, לפני שדורסים אותו.
+en: Line 2: save v[i], the value of a, in temp,
+en: before it is overwritten.
+
+he: שורה 3 : עכשיו מותר לדרוס את v[i],
+he: והוא מקבל את הערך של b.
+en: Line 3: now v[i] may be overwritten,
+en: and it gets the value of b.
+
+he: שורה 4 : v[j] מקבל את הערך המקורי של a,
+he: ששמור ב-temp.
+en: Line 4: v[j] gets the original value of a,
+en: which is saved in temp.
+
+he: נריץ על הדוגמה מהעמוד :
+he: הרשימה [5, 3], עם i = 0 ו-j = 1.
+en: Let's run it on the page's example:
+en: the list [5, 3], with i = 0 and j = 1.
 
 he: שורה 2 : temp מקבל את v[i], כלומר 5.
 en: Line 2: temp gets v[i], that is, 5.
@@ -141,6 +164,29 @@ en: and a gets 3. The values are swapped.
 
 he: בקוד מהעמוד אותן שלוש שורות, על v[i] ו-v[j].
 en: The page's code: the same three lines, on v[i] and v[j].
+
+he: אותה חתימה כמו בסעיף א :
+he: רשימה v ושני אינדקסים, בלי temp.
+en: The same signature as in Part A:
+en: a list v and two indices, with no temp.
+
+he: שורה 2 : v[i] נדרס בסכום של שניהם,
+he: וההערה רושמת a = a0 + b0.
+en: Line 2: v[i] is overwritten with the sum of both,
+en: and the comment notes a = a0 + b0.
+
+he: שורה 3 : הסכום פחות b0 משאיר את a0,
+he: וזה הערך החדש של v[j].
+en: Line 3: the sum minus b0 leaves a0,
+en: and that is the new value of v[j].
+
+he: שורה 4 : הסכום פחות a0 משאיר את b0,
+he: וזה הערך החדש של v[i].
+en: Line 4: the sum minus a0 leaves b0,
+en: and that is the new value of v[i].
+
+he: ונריץ על אותה דוגמה, v = [5, 3].
+en: And let's run it on the same example, v = [5, 3].
 
 he: שורה 2 : v[i] מקבל את הסכום, 8.
 en: Line 2: v[i] gets the sum, 8.
@@ -273,6 +319,27 @@ he: הקוד מהעמוד : אותן שלוש שורות,
 he: עם ^ במקום + ו-−.
 en: The code from the page: the same three lines,
 en: with ^ instead of + and −.
+
+he: שוב אותה חתימה : רשימה v ושני אינדקסים.
+en: Again the same signature: a list v and two indices.
+
+he: שורה 2 : v[i] מקבל a0 ^ b0,
+he: העמודות שבהן שני הערכים שונים.
+en: Line 2: v[i] gets a0 ^ b0,
+en: the columns where the two values differ.
+
+he: שורה 3 : XOR עם b0 מבטל אותו,
+he: ונשאר a0, הערך החדש של v[j].
+en: Line 3: an XOR with b0 cancels it,
+en: leaving a0, the new value of v[j].
+
+he: שורה 4 : XOR עם a0 מבטל אותו,
+he: ונשאר b0, הערך החדש של v[i].
+en: Line 4: an XOR with a0 cancels it,
+en: leaving b0, the new value of v[i].
+
+he: ועכשיו הריצה על 5 ו-3, גם בביטים.
+en: Now the run on 5 and 3, in bits as well.
 
 he: שורה 2 : v[i] מקבל 5 ^ 3, כלומר 6.
 en: Line 2: v[i] gets 5 ^ 3, that is, 6.

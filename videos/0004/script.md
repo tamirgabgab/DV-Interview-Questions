@@ -6,9 +6,10 @@ exactly what the video shows; `videos/render.py` fails when scene.py's captions 
 
 The example is the page's: the labels `RED, BLACK, MIXED` on boxes 0, 1, 2, and the true
 contents of arrangement 1 (black, mixed, red), so the ball drawn from box 2 is red. The
-code beats load the Python tab of the page (`fix_labels_simple`, `fix_labels`) and run it
-with `draw()` returning the ball of the example; the lines are lit in the order the tracer
-saw them run. The Hebrew words in the frame (the box labels, the chapter cards, the stamp)
+code beats load the Python tab of the page (`fix_labels_simple`, `fix_labels`). Each one is
+first typed into its panel character by character (`DVQScene.type_code`), a caption after
+every line or group of lines that make one step, then run with `draw()` returning the ball
+of the example; the lines are lit in the order the tracer saw them run. The Hebrew words in the frame (the box labels, the chapter cards, the stamp)
 are PNG labels drawn by the browser (`lib/he_label.py`).
 
 ## Opening
@@ -153,11 +154,63 @@ with a question mark.
 > בדוגמה מהעמוד, התוכן האמיתי הוא סידור 1 מסעיף א,
 > ולכן הכדור מקופסה 2 אדום.
 
-**Solution 1.** `fix_labels_simple` from the page (the comment lines and blank lines left
-out of the picture), the variables `i`, `k`, `ball`, `other`, `fixed` beside it.
+**Solution 1, typed.** The empty panel of `fix_labels_simple`, laid out for the whole
+function (the comment lines and blank lines left out of the picture, the code at about
+25 px at 720p), the right side kept free for the variables. The amber caret types it.
 
 > הפתרון הראשון מתרגם את סעיף א כמעט מילה במילה,
 > ובונה מערך fixed חדש.
+
+- Line 1 typed, then lit softly under its caption.
+
+> הפונקציה מקבלת את מערך התוויות,
+> ומחזירה את התוויות הנכונות.
+
+- Line 2.
+
+> המערך fixed יקבל את התוויות המתוקנות.
+> בינתיים שלוש מחרוזות ריקות.
+
+- Lines 5–7, the first loop.
+
+> לולאה ראשונה : מחפשים את הקופסה
+> שתוויתה MIXED, ושומרים את האינדקס שלה ב-k.
+
+- Line 8, `ball = draw(k)`.
+
+> הדגימה היחידה בפונקציה, מקופסה k.
+> היא חד-צבעית, ולכן ball הוא הצבע שלה.
+
+- Lines 11–14, the `if` / `else`.
+
+> התנאי קובע את הצבע השני, other :
+> אם ball הוא RED אז BLACK, ואחרת RED.
+
+- Line 15, `fixed[k] = ball`.
+
+> קופסה k מקבלת את התווית ball,
+> כי זה הצבע היחיד שבה.
+
+- Lines 18–20, the second loop.
+
+> לולאה שנייה : הקופסה שתוויתה ball
+> מקבלת other, לפי הכלל של סעיף א.
+
+- Lines 23–25, the third loop.
+
+> לולאה שלישית : בקופסה שתוויתה other
+> אין other ואין ball, ולכן היא MIXED.
+
+- Line 27, `return fixed`.
+
+> ומחזירים את fixed.
+> המערך labels עצמו לא השתנה.
+
+**Solution 1, run.** The variables `i`, `k`, `ball`, `other`, `fixed` appear beside the
+panel.
+
+> נריץ על הדוגמה מהעמוד,
+> כש-draw מחזיר RED.
 
 - Lines 2, 5–7 run (the first loop).
 
@@ -220,11 +273,49 @@ below; three curved arrows of the cycle above.
 > וסיבוב של שלושה איברים
 > הוא בדיוק שתי החלפות.
 
-**Solution 2, the code.** `fix_labels` from the page (comments left out of the picture),
-the variables under it.
+**Solution 2, typed.** The empty panel of `fix_labels` (comments left out of the picture),
+the room under it kept free for the variables.
 
 > הקוד : אחרי הדגימה לא מחפשים שוב,
 > ולא בונים מערך חדש.
+
+- Line 1 typed.
+
+> הפעם הפונקציה מתקנת את labels במקום,
+> ומחזירה את אותו מערך.
+
+- Lines 2–3.
+
+> המתודה index מוצאת את MIXED בשורה אחת,
+> והדגימה היחידה היא שוב מקופסה k.
+
+- Line 5, `n1, n2 = (k + 1) % 3, (k + 2) % 3`.
+
+> השכנים של k במעגל, n1 ו-n2,
+> בלי לולאה ובלי חיפוש.
+
+- Lines 6–7.
+
+> בדיקה אחת : השכן שתוויתו כצבע הכדור
+> הוא same, והשני הוא other.
+
+- Line 10, the first swap.
+
+> החלפה ראשונה, בהשמה מרובה ובלי tmp :
+> קופסה k מקבלת את צבע הכדור.
+
+- Line 11, the second swap.
+
+> החלפה שנייה, בין same ל-other.
+> שתי ההחלפות יחד הן הסיבוב.
+
+- Line 12.
+
+> ומחזירים את labels, מתוקן במקום.
+
+**Solution 2, run.** The variables appear under the panel.
+
+> ועכשיו הריצה, שוב עם כדור אדום.
 
 - Lines 2–3.
 

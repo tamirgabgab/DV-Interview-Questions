@@ -50,16 +50,18 @@ class SwapScene(DVQScene):
         dst.value = card
         dst.add(card)
 
-    def code(self, marker: str, func: str, names, fmt, groups, intro, size=34, extra=None, **vp):
-        """The code beat: the page's function run on the example, its lines lit in order."""
+    def code(self, marker: str, func: str, names, fmt, typed, run, groups, intro=None, size=34,
+             extra=None, **vp):
+        """The code beat: the page's function typed line by line under its captions
+        (`typed`), then run on the example (`run`, the variables appear), its lines lit in
+        the order they ran (`groups`)."""
         code = page_python(QID, marker)
         steps, _ = trace(code, func, ([A0, B0], 0, 1))
         panel = CodePanel(code, font_size=size)
         vars_ = VarPanel(names, fmt=fmt, size=34, **vp).set_state({"v": [A0, B0], "i": 0, "j": 1})
         self.place_code(panel, vars_, extra)
-        self.say(intro[0], FadeIn(panel), FadeIn(vars_))
-        if len(intro) > 1:
-            self.say(intro[1], *([FadeIn(extra)] if extra is not None else []))
+        self.type_code(panel, typed, intro=intro)
+        self.say(run, FadeIn(vars_))
         self.run_code(panel, vars_, steps, groups)
 
 
@@ -125,14 +127,18 @@ class ChapterA(SwapScene):
         def fmt(n, s):
             return "" if n not in s else str(s[n])
 
+        extra = VGroup(M("a ≡ v[i]", 34, C.MUTED), M("b ≡ v[j]", 34, C.MUTED)).arrange(RIGHT, buff=1.4)
         self.code("def swap_temp", "swap_temp", ["v", "i", "j", "temp"], fmt,
+                  [(1, ["ב-Python אין העברה של int by reference,\nולכן מעבירים רשימה v ושני אינדקסים, i ו-j.",
+                        ("כאן v[i] משחק את התפקיד של a,\nו-v[j] את התפקיד של b.", [FadeIn(extra)])]),
+                   (2, "שורה 2 : שומרים ב-temp את v[i],\nהערך של a, לפני שדורסים אותו."),
+                   (3, "שורה 3 : עכשיו מותר לדרוס את v[i],\nוהוא מקבל את הערך של b."),
+                   (4, "שורה 4 : v[j] מקבל את הערך המקורי של a,\nששמור ב-temp.")],
+                  "נריץ על הדוגמה מהעמוד :\nהרשימה [5, 3], עם i = 0 ו-j = 1.",
                   [([2], "שורה 2 : temp מקבל את v[i], כלומר 5."),
                    ([3], "שורה 3 : v[i] מקבל את v[j], כלומר 3."),
                    ([4], "שורה 4 : v[j] מקבל את temp,\nוהרשימה היא עכשיו [3, 5].")],
-                  ["ב-Python אין העברה של int by reference,\nולכן מעבירים רשימה v ושני אינדקסים, i ו-j.",
-                   "כאן v[i] משחק את התפקיד של a,\nו-v[j] את התפקיד של b."],
-                  extra=VGroup(M("a ≡ v[i]", 34, C.MUTED), M("b ≡ v[j]", 34, C.MUTED))
-                  .arrange(RIGHT, buff=1.4))
+                  intro="עכשיו נכתוב את זה ב-Python, שורה אחרי שורה.", extra=extra)
         self.fade_all()
 
         # Why it works: where the two values are after every step.
@@ -249,10 +255,15 @@ class ChapterB(SwapScene):
             return "" if n not in s else str(s[n])
 
         self.code("def swap_arith", "swap_arith", ["v", "i", "j"], fmt,
+                  [(1, "אותה חתימה כמו בסעיף א :\nרשימה v ושני אינדקסים, בלי temp."),
+                   (2, "שורה 2 : v[i] נדרס בסכום של שניהם,\nוההערה רושמת a = a0 + b0."),
+                   (3, "שורה 3 : הסכום פחות b0 משאיר את a0,\nוזה הערך החדש של v[j]."),
+                   (4, "שורה 4 : הסכום פחות a0 משאיר את b0,\nוזה הערך החדש של v[i].")],
+                  "ונריץ על אותה דוגמה, v = [5, 3].",
                   [([2], "שורה 2 : v[i] מקבל את הסכום, 8."),
                    ([3], "שורה 3 : v[j] מקבל 8 פחות 3, כלומר 5."),
                    ([4], "שורה 4 : v[i] מקבל 8 פחות 5, כלומר 3.")],
-                  ["בקוד מהעמוד אותן שלוש שורות, על v[i] ו-v[j]."], size=30, cols=3, slot=3.6)
+                  intro="בקוד מהעמוד אותן שלוש שורות, על v[i] ו-v[j].", size=30, cols=3, slot=3.6)
         self.say("ב-Python הסכום אף פעם לא גולש,\nכי מספרים שלמים הם בגודל לא מוגבל.")
         self.fade_all()
 
@@ -500,10 +511,15 @@ class ChapterC(SwapScene):
             return f"{s['v'][k]} ({bits(s['v'][k])})"
 
         self.code("def swap_xor", "swap_xor", ["v[0]", "v[1]"], fmt,
+                  [(1, "שוב אותה חתימה : רשימה v ושני אינדקסים."),
+                   (2, "שורה 2 : v[i] מקבל a0 ^ b0,\nהעמודות שבהן שני הערכים שונים."),
+                   (3, "שורה 3 : XOR עם b0 מבטל אותו,\nונשאר a0, הערך החדש של v[j]."),
+                   (4, "שורה 4 : XOR עם a0 מבטל אותו,\nונשאר b0, הערך החדש של v[i].")],
+                  "ועכשיו הריצה על 5 ו-3, גם בביטים.",
                   [([2], "שורה 2 : v[i] מקבל 5 ^ 3, כלומר 6."),
                    ([3], "שורה 3 : v[j] מקבל 6 ^ 3, כלומר 5."),
                    ([4], "שורה 4 : v[i] מקבל 6 ^ 5, כלומר 3.")],
-                  ["הקוד מהעמוד : אותן שלוש שורות,\nעם ^ במקום + ו-−."], size=30, cols=2, slot=5.0)
+                  intro="הקוד מהעמוד : אותן שלוש שורות,\nעם ^ במקום + ו-−.", size=30, cols=2, slot=5.0)
         self.fade_all()
 
         # Why it works: one bit column, all four cases.

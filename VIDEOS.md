@@ -15,9 +15,10 @@ Once their structure is approved, the rest follow it question by question.
 | Hebrew text | Kept out of the picture as far as possible. The Hebrew captions are a separate WebVTT file shown by the player |
 | Hosting | YouTube, on the owner's channel. The site embeds the video |
 | Look | The site's navy (the hero's) with amber marks, one version for both schemes |
-| On the page | One video per question, a chapter per part: 1–3 minutes, 2–4 for a complex part (2026-10-30) |
+| On the page | One video per question, a chapter per part: 1–3 minutes for a part without code; 2–4 minutes for a part with code, more when the code is long (2026-10-31, with the typed code beat) |
 | Pace | Calm, in the style of 3Blue1Brown: animations of 1–2 s, every picture held 2–4 s for its caption |
 | Code beat | Python only |
+| Typed code (2026-10-31) | The code beat types the answer live: character by character, line by line, with a blinking amber cursor, and pauses after each line, or a small group of lines that make one operation, for a caption that says what it does and why. Only then the traced run on the page's example follows, in the same panel. A video gets 2–3 minutes longer, which the owner accepts |
 | Opening and closing | The drawn DV mark, the question's id and parts; the closing has the site's address and the question's id |
 | Captions (2026-10-31) | Two caption tracks go up with every video: Hebrew (`captions.vtt`) and English (`captions.en.vtt`, for viewers who are not Israeli). Neither is on by default, on YouTube or in the site's player: shown, they cover part of the picture, so the viewer turns them on |
 | Music delivery (2026-10-31) | The video and the music are two files: `out/video.mp4` stays silent, the music is `out/music.wav` and `out/music.mp3` beside it, and the owner puts them together in an editor (CapCut or another). `render.py --mux-music` still makes a video with the music in it |
@@ -53,19 +54,22 @@ the chapter cards, the closing's part letters, and 0004's box labels and stamp.
 ## The structure of a video
 
 A video is one file per question, with chapters. Each part of the question is one
-chapter of 1–3 minutes (2–4 for a complex part), and a short opening and closing frame the chapters. The same
+chapter: 1–3 minutes for a part without code, 2–4 for a part with code, more when the code
+is long (0004's part ב, two solutions, runs about 4.5). A short opening and closing frame the chapters. The same
 skeleton serves every question; the beats inside a chapter follow the page's solution
 blocks (idea → steps → code → proof → cost), so the video and the page tell the same story
 in the same order.
 
 ```
 0:00  Opening (15–25 s) — the DV mark drawn as on the site, the question's id, the level and the parts as chips
-      Chapter א (1–3 min, 2–4 for a complex part)
+      Chapter א (1–3 min; 2–4 with code, more when the code is long)
         1. The problem   — the part's setting drawn (the objects, the input, what is asked)
         2. The idea      — one picture of the key insight (the "aha"), held still for a moment
         3. The steps     — the page's worked example, animated step by step
-        4. The code      — the Python answer, lines lit in the order they run on the example,
-                           the variables beside it
+        4. The code      — typed, explained, traced: the Python answer typed live into an
+                           empty panel, a caption after each line or group of lines (what
+                           it does and why); then run on the example, its lines lit in the
+                           order they run, the variables beside it
         5. Why it works  — the proof as a picture (an invariant, a table, a case split)
         6. The cost      — time and memory as two chips, and where they come from
         7. One trap      — the most common mistake, shown failing on a small input
@@ -86,12 +90,37 @@ Rules for every video:
   seconds, so a pause lands on a readable picture.
 - **The code is the page's code.** The code beat loads the code from the page's Python
   tab (`tools/extract_code.py`, without the annotation markers), so it never drifts from
-  the tested code. Python only: the SystemVerilog stays on the page. The library runs the
-  page's function on the example under a line tracer, so the lines are lit in the order
-  they really ran, with the locals after each line beside the code; the scene only groups
-  the traced lines under its captions, and the render fails if the groups differ from the
-  trace. A long function may leave its comment and blank lines out of the picture (0004's
-  first solution), never its code.
+  the tested code. Python only: the SystemVerilog stays on the page. A long function may
+  leave its comment and blank lines out of the picture (0004's first solution), never its
+  code.
+- **The code is typed, explained, then traced** (the owner, 2026-10-31). The code beat
+  has two halves in one panel:
+  1. **Typed.** `DVQScene.type_code(panel, groups)` types the function into an empty
+     panel, character by character at about 16 characters a second (a seeded jitter of
+     ±30 %, in the 12–20 the owner asked for), the indentation at once, a short pause at
+     the end of a line. An amber bar cursor moves with the characters and blinks while
+     the typing pauses. `groups` is `[(lines, caption), ...]`: a line or a few lines that
+     make one operation (a loop with its body, an `if`/`else`), and a caption that says
+     what it does and why; the groups cover every line in the picture, in order, or the
+     render fails. After each group the typing stops, the group's lines are lit softly
+     (amber, under the text), and the caption holds for reading (2–4 s, as below). A
+     caption may carry animations (0002's `a ≡ v[i]`), and a group may have several
+     captions.
+  2. **Traced.** `run_code` runs the page's function on the example under a line tracer,
+     so the lines are lit in the order they really ran, with the locals after each line
+     beside the code. The variables appear only now, with a caption that names the
+     example. The scene groups the traced lines under its captions, and the render fails
+     if the groups differ from the trace.
+
+  The panel never moves: `place_code` lays it out for the whole function, with the
+  variables' room kept free, before the first character, and the traced run reuses it.
+  A long function stays one panel, not split or scrolled, because the trace jumps between
+  its loops and needs all of it in view: comment and blank lines leave the picture, and
+  the code's text must be at least about 24 px (its em at 720p, `MIN_CODE_EM` = 23; the
+  render fails under it). 0004's first solution, 18 lines, comes out at 24.6 px, the
+  size the trace had before; the record of each scene (`out/parts/<Scene>.json`) has
+  `code_em_px`. Splitting it into two panels was weighed and left out: the second half
+  would hide the first while the trace still runs through it.
 - **A caption per beat**, 1–2 lines: 12 words per line at most, 1.5–7 s on screen. The
   still after a beat's animations is held long enough to read its caption at about 14
   characters a second, between 2 and 4 s.
@@ -119,7 +148,7 @@ Everything for one question lives in its own folder. Shared code sits in `videos
 videos/
 ├── lib/
 │   ├── dvq.py          # the shared Manim library: palette, fonts, opening/closing, chapter card,
-│   │                   # code beat (from the page), chips, still-frame helper, caption recorder
+│   │                   # code beat (typed from the page, then traced), chips, caption recorder
 │   ├── captions.py     # writes captions.vtt and chapters.txt from the recorded captions
 │   ├── he_label.py     # renders a Hebrew label to a transparent PNG with Playwright
 │   └── music.py        # generates the video's background music from a seed (numpy + ffmpeg)
@@ -258,7 +287,9 @@ en: and the original 5 is still saved in temp.
      differs from its file. It prints the length, the size, the chapters and the
      `video_parts` for the front matter (the first part at 0, as the checks want: the
      link to part א plays the opening too).
-  A pilot renders in about 2–3 minutes as a draft and 4–6 minutes at 720p30.
+  A pilot renders in about 3–5 minutes as a draft and 15–20 minutes at 720p30 since the
+  code is typed (every typed character is a frame Manim draws; the two pilots in
+  parallel on four cores).
 - **The English track alone.** `python videos/render.py 0002 --captions-only` renders
   nothing: it writes `out/captions.en.vtt` from the existing `out/captions.vtt` (its cues
   and times) and `captions.en.md`, in a second, with any Python. It is the command after
@@ -446,13 +477,13 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
 
 ## The pilots' storyboards (outline; the full scripts are step V2 and V4)
 
-**0002 — swap two variables (three parts, ~5 min in all)**
+**0002 — swap two variables (three parts, 7:26 in all)**
 
 - **Opening.** Two registers `a = 5` and `b = 3` (the page's example), shown as boxes with
   their bits.
 - **Chapter א — with a temp variable.**
   - A third box `t`; the three moves animated; the values travel as cards.
-  - Code: three lines, lit in turn.
+  - Code: the three lines typed one by one, each with its caption, then lit in turn.
   - Why it works: each value always sits in at least one box.
   - Cost: O(1) time and one word of memory.
   - Trap: the order of the moves, shown failing when the first move is lost.
@@ -470,7 +501,7 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
     no longer be undone).
 - **Closing.** Three lines side by side: temp / sum / XOR.
 
-**0004 — three mislabeled boxes (two parts, ~4 min in all)**
+**0004 — three mislabeled boxes (two parts, 6:54 in all)**
 
 - **Opening.** The three boxes with their Hebrew labels (`he_label.py`) and the rule "all
   labels are wrong" as a red stamp.
@@ -484,14 +515,30 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
 - **Chapter ב — the code.**
   - `draw(i)` as a hand taking one ball.
   - The first solution: find the box labelled MIXED, draw once, and fill a new label
-    array in three passes by part א's rule. Its lines are lit for a red result, then for
-    a black one.
+    array in three passes by part א's rule. It is typed group by group (a caption per
+    loop, the draw, the `if`/`else`), then its lines are lit for a red result, then for a
+    black one.
   - The page's second solution: the fix is a rotation of the three labels, shown as the
-    labels sliding one box over. Two swaps in place do it, with no new array.
+    labels sliding one box over. Two swaps in place do it, with no new array. The code is
+    typed the same way, then traced with a red ball.
   - The index arithmetic: `(k + 1) % 3` and `(k + 2) % 3`, and why `(k - 1) % 3` differs
     between Python and SystemVerilog for k = 0.
   - Cost: O(1).
 - **Closing.** One draw from the "mixed" box fixes all three labels.
+
+### The pilots' lengths with the typed code (2026-10-31)
+
+Rendered at 720p30 after the code beats were typed. Before, 0002 ran 5:55 and 0004 4:50;
+the typing adds about 1.5 minutes to 0002 (three 4-line functions) and 2 minutes to 0004
+(an 18-line and a 9-line function).
+
+| Video | Chapters (`chapters.txt`) | `video_parts` |
+|---|---|---|
+| 0002, 7:26 | 0:00 opening, 0:21 א (1:54), 2:15 ב (2:39), 4:54 ג (2:22), 7:16 closing | `[0, 135, 294]` |
+| 0004, 6:54 | 0:00 opening, 0:23 א (1:41), 2:04 ב (4:37), 6:41 closing | `[0, 124]` |
+
+The `video_parts` go into the pages' front matter with the YouTube id, once the videos
+are uploaded (see "Publishing and linking").
 
 ## Open points for later
 

@@ -6,8 +6,9 @@ exactly what the video shows; `videos/render.py` fails when scene.py's captions 
 
 The example is the page's: `a = 5`, `b = 3` (`0101` and `0011` in part ג), and the
 overflow example of part ב, `a = 2³¹ − 1`, `b = 1`. The code beats load the Python tab of
-the page (`swap_temp`, `swap_arith`, `swap_xor`) and run it on `v = [5, 3]`, `i = 0`,
-`j = 1`; the lines are lit in the order the tracer saw them run.
+the page (`swap_temp`, `swap_arith`, `swap_xor`). Each one is first typed into its panel
+character by character (`DVQScene.type_code`), a caption after every line, then run on
+`v = [5, 3]`, `i = 0`, `j = 1`; the lines are lit in the order the tracer saw them run.
 
 ## Opening
 
@@ -62,13 +63,40 @@ as a card from its source cell to its target.
 > שלב 3 : b = temp, ו-b מקבל 5.
 > ההחלפה הושלמה.
 
-**The code.** `swap_temp` from the page, the variables `v[0]`, `v[1]`, `temp` beside it.
+**The code, typed.** The empty panel of `swap_temp` appears, the amber caret at its first
+line; the right side stays free for the variables.
+
+> עכשיו נכתוב את זה ב-Python, שורה אחרי שורה.
+
+- Line 1 typed, `def swap_temp(v, i, j):`; it is lit softly while the caption shows.
 
 > ב-Python אין העברה של int by reference,
 > ולכן מעבירים רשימה v ושני אינדקסים, i ו-j.
 
+- `a ≡ v[i]` and `b ≡ v[j]` appear under the panel.
+
 > כאן v[i] משחק את התפקיד של a,
 > ו-v[j] את התפקיד של b.
+
+- Line 2 typed, `temp = v[i]`.
+
+> שורה 2 : שומרים ב-temp את v[i],
+> הערך של a, לפני שדורסים אותו.
+
+- Line 3 typed, `v[i] = v[j]`.
+
+> שורה 3 : עכשיו מותר לדרוס את v[i],
+> והוא מקבל את הערך של b.
+
+- Line 4 typed, `v[j] = temp`.
+
+> שורה 4 : v[j] מקבל את הערך המקורי של a,
+> ששמור ב-temp.
+
+**The code, run.** The variables `v`, `i`, `j`, `temp` appear beside the panel.
+
+> נריץ על הדוגמה מהעמוד :
+> הרשימה [5, 3], עם i = 0 ו-j = 1.
 
 - Line 2 lit, `temp = 5`.
 
@@ -151,9 +179,34 @@ fades away.
 > שלב 3 : a = a − b, כלומר 8 פחות 5,
 > ו-a מקבל 3. הערכים הוחלפו.
 
-**The code.** `swap_arith` from the page, `v[0]` and `v[1]` beside it.
+**The code, typed.** The empty panel of `swap_arith`; each line is typed with its
+comment (`# a = a0 + b0` ...).
 
 > בקוד מהעמוד אותן שלוש שורות, על v[i] ו-v[j].
+
+- Line 1 typed.
+
+> אותה חתימה כמו בסעיף א :
+> רשימה v ושני אינדקסים, בלי temp.
+
+- Line 2 typed, with its comment.
+
+> שורה 2 : v[i] נדרס בסכום של שניהם,
+> וההערה רושמת a = a0 + b0.
+
+- Line 3 typed.
+
+> שורה 3 : הסכום פחות b0 משאיר את a0,
+> וזה הערך החדש של v[j].
+
+- Line 4 typed.
+
+> שורה 4 : הסכום פחות a0 משאיר את b0,
+> וזה הערך החדש של v[i].
+
+**The code, run.** `v`, `i`, `j` appear under the panel; the lines are lit as they run.
+
+> ונריץ על אותה דוגמה, v = [5, 3].
 
 > שורה 2 : v[i] מקבל את הסכום, 8.
 
@@ -274,10 +327,33 @@ there flip.
 > שלב 3 : a = a ^ b, ו-a מתהפך היכן ש-b הוא 1.
 > יוצא 0011, כלומר 3.
 
-**The code.** `swap_xor` from the page; `v[0]` and `v[1]` in decimal and in bits.
+**The code, typed.** The empty panel of `swap_xor`, typed line by line with its comments.
 
 > הקוד מהעמוד : אותן שלוש שורות,
 > עם ^ במקום + ו-−.
+
+- Line 1 typed.
+
+> שוב אותה חתימה : רשימה v ושני אינדקסים.
+
+- Line 2 typed.
+
+> שורה 2 : v[i] מקבל a0 ^ b0,
+> העמודות שבהן שני הערכים שונים.
+
+- Line 3 typed.
+
+> שורה 3 : XOR עם b0 מבטל אותו,
+> ונשאר a0, הערך החדש של v[j].
+
+- Line 4 typed.
+
+> שורה 4 : XOR עם a0 מבטל אותו,
+> ונשאר b0, הערך החדש של v[i].
+
+**The code, run.** `v[0]` and `v[1]` appear under the panel, in decimal and in bits.
+
+> ועכשיו הריצה על 5 ו-3, גם בביטים.
 
 > שורה 2 : v[i] מקבל 5 ^ 3, כלומר 6.
 

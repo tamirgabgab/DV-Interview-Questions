@@ -1580,6 +1580,14 @@ section below starts at session 22, whose numbered items run on through the late
     `--music-only` and `--no-music`. 0002 plays Bb Lydian, 0004 A Dorian. VIDEOS.md has the
     narration mix (sidechain ducking). Waiting for the owner's opinion.
 
+104. **Typed code in the videos (session 28, 2026-10-31).** The owner wants the code beat
+    typed live, character by character, with a caption per line or group, before the traced
+    run. `DVQScene.type_code(panel, groups, ...)` in videos/lib/dvq.py (about 16 chars/s, an
+    amber cursor, a highlight per explained group, the panel reserved so nothing moves; the
+    render fails when the groups miss a line or the code is under 23 px). 0002 is now 7:26
+    (`video_parts` [0, 135, 294]) and 0004 6:54 ([0, 124]). Found on the way: 0004's SV
+    annotation 3 said the mix is in box `k`; it is in the box labelled `other`. Fixed.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
