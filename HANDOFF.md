@@ -1588,6 +1588,19 @@ section below starts at session 22, whose numbered items run on through the late
     (`video_parts` [0, 135, 294]) and 0004 6:54 ([0, 124]). Found on the way: 0004's SV
     annotation 3 said the mix is in box `k`; it is in the box labelled `other`. Fixed.
 
+105. **The page's box in the videos, a release folder, 0006 and 0011 (session 28,
+    2026-10-31).** The owner: no YouTube upload from here; every video's files in the
+    repository with a README link; the page's interactive box in each chapter (in the idea,
+    and on a split screen beside the code); two more videos, 0006 (O(n) code only) and 0011
+    (the SV class typed). `videos/lib/box_shots.py` captures a box step by step from the
+    built site (Playwright, dark scheme, a cropped region, an optional CSS width), and
+    `dvq.BoxView`, `box_step`, `box_beat`, `split`, `run_code(view=)` and `walk_code` show it;
+    a `CodePanel` can be a scrolling window (`rows`) and read SystemVerilog (`page_code`).
+    `render.py --release` writes `videos/<id>/release/` (silent mp4, mp4 with music, mp3,
+    he/en VTT, chapters, info.json) and `tools/catalog.py` links the files from the README.
+    Released: 0002 8:29, 0004 7:30, 0006 7:40, 0011 7:01 (the chapters and `video_parts` in
+    VIDEOS.md). Waiting on the owner: watch them, upload, send the YouTube ids.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
