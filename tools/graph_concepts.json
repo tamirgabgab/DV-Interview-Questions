@@ -1866,6 +1866,30 @@
      "why": "a BFS over a state that is more than the position"
     }
    ]
+  },
+  "0071": {
+   "core": [
+    "game_theory_minimax",
+    "conditional_probability",
+    "optimization"
+   ],
+   "secondary": [
+    "recurrence_relation",
+    "induction_proof",
+    "monte_carlo"
+   ],
+   "related": [
+    {
+     "id": "0059",
+     "explicit": false,
+     "why": "both are games solved backward, where every player plays its best"
+    },
+    {
+     "id": "0015",
+     "explicit": false,
+     "why": "probabilities built from conditional branches of a tree"
+    }
+   ]
   }
  }
 }

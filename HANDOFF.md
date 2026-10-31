@@ -1614,7 +1614,25 @@ section below starts at session 22, whose numbered items run on through the late
     box's loop counter read "3 = j ,0 = i" in RTL; fixed in trace.js (one `ltr()` run) and
     published. Waiting on the owner: watch them, upload, send the YouTube ids.
 
-107. **Videos 0015 and 0029, proofs without code (session 28, 2026-10-31).** The owner
+107. **New question 0071, the three-wizard duel (session 29, 2026-10-31).** The owner sent a
+     summary of a truel with a cat rule (if all three live after the first round, all
+     lose) and a free choice of my wand, and asked for four parts: me first against 0.6 and
+     0.8, me second, me third (the rivals keep their order), and rivals of the owner's
+     pick (0.8 then 0.4) where the sniper wins at position 1 and the weak wand at 2 and 3.
+     Every part derives the general case backward with the inequality of each decision,
+     then the numbers (513/805 twice, 13101/20125; 91/220 against 0.6, 233/550, 1187/2750).
+     The source was checked first by exact backward induction on a grid: everything held
+     except the 80% row of the original table (32.3% only without deliberate misses; with
+     them wizard 2 passes and the chance is 20.4%, now a trap) and one interior optimum of
+     position 3 (a = 0.05, b = 0.925). The owner picked senior / medium and every extra:
+     `tools/figures/q0071.py` (exact reference, a decision table per part, three charts),
+     the `wizards` explorer (position, rivals and wand; the first round's options and the
+     chance against the wand), follow-ups on the original wands, the rule variants, the
+     narrow band of position 2 and the economic reading. New topic `game-theory`; the page
+     is in the probability path and on the question map. SV note: `wand` is a keyword
+     (a net type) in SystemVerilog, so the page's output argument is `wand_out`.
+
+108. **Videos 0015 and 0029, proofs without code (session 28, 2026-10-31).** The owner
     picked two questions with no code, the first videos built only on step-by-step proofs.
     0015 (6:13, `video_parts` [0, 108, 240]): a Manim 2×2 grid of the families (1/3), a
     14×14 grid of child kinds then the tuesday box (13/27), the general formula derived
@@ -1627,6 +1645,10 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## In progress
 
+- **Session 29 (2026-10-31):** question 0071, the three-wizard duel (work log item 107),
+  written as 0060 and renumbered when `main` had moved on to 0070; published (`main`
+  046c236, deploy green). The live page was not checked from the cloud sandbox (its proxy
+  refuses github.io): look at it at 390 px and on a desktop, light and dark.
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
@@ -1694,13 +1716,13 @@ section below starts at session 22, whose numbered items run on through the late
 
 ## Question variety
 
-### Coverage today (68 questions)
+### Coverage today (69 questions)
 
 | Level | Questions | Main topics covered |
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048, 0064 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water), weights for every load in base 2, balanced base 3 and balanced base 2c + 1 (0064) |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056, 0058, 0059, 0060, 0061, 0062, 0063, 0065, 0066, 0067, 0068 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056), coins in a row by a parity trick and an interval DP (0058), the next number with as many ones by Gosper's hack, the previous by the complement, and the same for zeros across lengths (0059), the longest run of ones with k flips by a sliding window, and of one value on a bus (0060), the tags a list of transactions needs by an event sweep, one pool and two (0061), the sliding-window maximum by a monotonic deque, the window with max − min <= limit, and the same in hardware (0063), islands in four and eight directions (0065), merged intervals and the total height per piece (0066), BFS and Dijkstra for a broadcast time (0067), the median and the p-quantile of a stream by two heaps (0068) |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057, 0069 | synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057), overtakes in a stream of responses by a Fenwick tree (0069) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057, 0069, 0071 | a three-wizard duel solved backward (0071), synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057), overtakes in a stream of responses by a Fenwick tree (0069) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock

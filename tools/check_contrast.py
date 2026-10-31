@@ -72,6 +72,7 @@ PAIRS = [
     ("tag on a doubled response", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
     ("tag fault badge", "var(--md-default-bg-color)", ["var(--viz-ink)"], TEXT),
     ("coin of the first player", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("wizards box, the option taken", "var(--md-default-fg-color)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("figure digit on the found square", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 45%, var(--md-default-bg-color))"], TEXT),
     ("ball number, maybe heavy", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], TEXT),
     ("ball number, maybe light", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))"], TEXT),

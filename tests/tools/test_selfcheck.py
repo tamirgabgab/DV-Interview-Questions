@@ -385,6 +385,47 @@ def kaprekar_keys() -> int:
     return len(keys)
 
 
+def wizard_answers() -> list:
+    """0071: the best chance of the three-wizard duel (cat rule after the first round) at
+    positions 1, 2, 3 against 0.6 then 0.8, and at position 1 against 0.8 then 0.4; the
+    first round solved backward with exact fractions (a target or the air at each turn), a
+    wand just under a rival standing for the limit."""
+    def duel(x, y):                         # the opener wins
+        return x / (x + y - x * y)
+
+    def chances(p):
+        def node(w):                        # chances from wizard w's turn, all alive
+            if w == 3:
+                return (Fraction(0),) * 3
+            rest, best = node(w + 1), None
+            for t in [None] + [k for k in range(3) if k != w]:
+                if t is None:
+                    v = rest
+                else:
+                    o = 3 - w - t
+                    hit = [Fraction(0)] * 3
+                    hit[o] = duel(p[o], p[w])
+                    hit[w] = 1 - hit[o]
+                    v = tuple(p[w] * h + (1 - p[w]) * r for h, r in zip(hit, rest))
+                if best is None or v[w] > best[w]:
+                    best = v
+            return best
+        return node(0)
+
+    eps = Fraction(1, 10**15)
+
+    def best(me, rivals):
+        out = Fraction(0)
+        for q in [Fraction(k, 200) for k in range(1, 201)] + [r - eps for r in rivals]:
+            p = list(rivals)
+            p.insert(me, q)
+            out = max(out, chances(p)[me])
+        return out
+
+    a = (Fraction(3, 5), Fraction(4, 5))
+    return [best(0, a), best(1, a), best(2, a), best(0, (Fraction(4, 5), Fraction(2, 5)))]
+
+
 def ones_answers() -> list:
     """0061: the longest window with at most k zeros (part a), and with at most k cells that
     are not its most frequent value (part b), every window tried."""
@@ -455,6 +496,7 @@ EXPECTED = {
     "0066": [3, 3, 6],                                      # tests/0066 merges, cuts the pieces and reads the peak
     "0069": [2, 3, 5],                                      # tests/0069 counts the pairs of 7 3 9 2 8
     "0070": [9, 3, 6],                                      # tests/0070 checks them against the brute-force searches
+    "0071": wizard_answers(),
 }
 
 

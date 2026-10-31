@@ -1,6 +1,6 @@
 # Catalog
 
-All 69 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 70 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -74,3 +74,4 @@ All 69 questions, with links to their pages on the [live site](https://tamirgabg
 | 0068 | [החציון של זרם – שתי ערימות, אחוזון p, וחלון נע](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0068-stream-median/) | junior (ג'וניור) |
 | 0069 | [עקיפות בזרם תשובות – כמה עקפו כל בקשה, כמה היא עקפה, וסך העקיפות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0069-out-of-order-overtakes/) | senior (סניור) |
 | 0070 | [המסלול הקצר ביותר בלוח – BFS, שבירת עד k קירות, ועלות כניסה לכל תא](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0070-grid-shortest-path/) | junior (ג'וניור) |
+| 0071 | [דו-קרב שלושה קוסמים – איזה שרביט לבחור](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0071-three-wizards-duel/) | senior (סניור) |
