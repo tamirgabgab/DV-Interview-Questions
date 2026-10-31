@@ -1635,7 +1635,9 @@ section below starts at session 22, whose numbered items run on through the late
 ## In progress
 
 - **Session 29 (2026-10-31):** question 0071, the three-wizard duel (work log item 107),
-  written as 0060 and renumbered when `main` had moved on to 0070.
+  written as 0060 and renumbered when `main` had moved on to 0070; published (`main`
+  046c236, deploy green). The live page was not checked from the cloud sandbox (its proxy
+  refuses github.io): look at it at 390 px and on a desktop, light and dark.
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),
   linked from `README.md`; when a question is added, add it to `tools/graph_concepts.json`
   and run `python tools/graph.py` (needs `pip install graphifyy`).
