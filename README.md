@@ -58,8 +58,11 @@ chapter. The plan and the tools: [`VIDEOS.md`](VIDEOS.md). This table is written
   in the browser.
 - An interactive box in every question: edit the input, then play the solution step by
   step or jump to the result.
-- Practice mode with a stopwatch, "solved" and "favourite" marks kept in the browser,
-  search, light and dark themes, and a layout that works on a phone.
+- Interview mode (a clock against a target time, hints counted, a confidence question
+  before a solution, the interviewer's follow-up questions and a summary), an interview
+  builder on the home page, a quick jump to any question (Ctrl K or /), "solved" and
+  "favourite" marks kept in the browser, search, light and dark themes, and a layout that
+  works on a phone.
 
 ## Running it locally
 

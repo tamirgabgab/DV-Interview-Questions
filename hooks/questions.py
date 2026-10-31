@@ -140,6 +140,12 @@ PATH_CARDS = re.compile(r"<!--\s*path-cards(\s+featured)?\s*-->")
 HOW_IT_WORKS = re.compile(r"<!--\s*how-it-works\s*-->")
 CATALOG_LINK = re.compile(r"<!--\s*catalog-link\s*-->")
 CONTINUE = re.compile(r"<!--\s*home-continue\s*-->")
+MY_MAP = re.compile(r"<!--\s*my-map\s*-->")
+# A part of a question: a "### סעיף א – ..." heading (interview mode's time target counts them).
+PART_HEADING = re.compile(r"^###\s+סעיף\s+[א-ת]", re.M)
+# The question index for the quick jump and the interview builder (questions.json at the
+# site root, written in on_post_build; quick-jump.js and home.js fetch it).
+INDEX_FILE = "questions.json"
 RECENT = re.compile(r"<!--\s*recent\s*-->")
 WHATS_NEW = re.compile(r"<!--\s*whats-new\s*-->")
 RECENT_MAX = 5
@@ -225,7 +231,8 @@ def _load_questions(docs_dir: Path) -> dict[str, dict]:
         has_code = any(extract_code.blocks_from_text(body, f) for f in ("systemverilog", "python"))
         interactive = 'class="explorer"' in body or 'class="stepper"' in body or "<iframe" in body
         questions[src_uri] = {**meta, "id": qid, "src_uri": src_uri, "has_code": has_code,
-                              "interactive": interactive, "boxes": body.count('class="explorer"')}
+                              "interactive": interactive, "boxes": body.count('class="explorer"'),
+                              "parts": len(PART_HEADING.findall(body))}
         if meta.get("video"):
             letters = part_letters(body)
             questions[src_uri]["video_chapters"] = list(zip(letters or [""], meta.get("video_parts") or [0]))
@@ -468,7 +475,8 @@ def _tool(cls: str, icon: str, tip: str, extra: str = "", name: str = "") -> str
 
 def _tools(q: dict, page_url: str) -> str:
     """The page tools as icon buttons (UI324): open or close every block (one toggle),
-    practice mode with a stopwatch, solved / favourite marks (kept in the browser) and a
+    interview mode (question-tools.js: a clock against the difficulty's target, hints and
+    answers counted, a follow-up after each right self-check), solved / favourite marks (kept in the browser) and a
     random question of the same level. They sit beside the header's chip row; the toolbar
     carries the level's ids and links for the message shown when a question is marked
     solved."""
@@ -493,11 +501,11 @@ def _tools(q: dict, page_url: str) -> str:
                           "next": {"title": nxt["title"], "href": _href(nxt["src_uri"], page_url)} if nxt else None})
     if paths:
         level_data += f' data-paths="{html.escape(json.dumps(paths, ensure_ascii=False))}"'
+    level_data += f' data-difficulty="{q["difficulty"]}" data-parts="{q.get("parts", 0)}"'
     return (f'<div class="question-tools" role="toolbar" aria-label="כלי השאלה" data-search-exclude data-qid="{q["id"]}"{level_data}>'
             + _video_tool(q)
             + _tool("qt-fold", "unfold-more", "פתח הכל", "", "פתח הכל")
-            + _tool("qt-practice", "timer", "מצב תרגול", ' aria-pressed="false"', "תרגול")
-            + '<span class="qt-clock" hidden></span>'
+            + _tool("qt-practice", "timer", "מצב ראיון", ' aria-pressed="false"', "ראיון")
             + _tool("qt-mark qt-solved", "solved", "סמן כפתורה", ' data-mark="solved" aria-pressed="false"', "פתרתי")
             + _tool("qt-mark qt-star", "star", "הוסף למועדפים", ' data-mark="star" aria-pressed="false"', "מועדף")
             + random_btn
@@ -643,7 +651,7 @@ def _path_cards(page_url: str, featured: bool = False) -> str:
 
 
 HOW_STEPS = [("search", "בוחרים שאלה", "לפי רמת משרה, נושא או מסלול לימוד, או שאלה אקראית."),
-             ("timer", "פותרים לבד", "עם רמזים שנפתחים בהדרגה, ובמצב תרגול עם שעון עצר."),
+             ("timer", "פותרים לבד", "עם רמזים שנפתחים בהדרגה, ובמצב ראיון עם שעון ושאלות המשך."),
              ("play", "בודקים ומריצים", "פתרון מלא עם הוכחה, קוד שנבדק אוטומטית והרצה בדפדפן.")]
 
 
@@ -897,43 +905,33 @@ HERO_WAVES = (
     '<line class="hh-cursor" x1="0" y1="2" x2="0" y2="148"/>'
     '</svg>')
 
-# The live example beside the hero's text on a wide screen (M2): the machine of 0055 part a
-# (the bits arrive MSB first, r -> (2r + b) mod 3) on three states in a row, and home.js
-# feeds it numbers bit by bit. The page shows the last frame of the first number as it
-# is (27 = 11011, back in the state 0), so nothing is missing without the script.
-HERO_FSM_NUMBER = 27
-HERO_FSM_NODES = [(62, 0), (150, 1), (238, 2)]
-# (from, bit, to, path, label x, label y)
-HERO_FSM_EDGES = [
-    (0, 1, 1, "M78 53Q106 26 134 53", 106, 31), (1, 1, 0, "M134 75Q106 102 78 75", 106, 109),
-    (1, 0, 2, "M166 53Q194 26 222 53", 194, 31), (2, 0, 1, "M222 75Q194 102 166 75", 194, 109),
-    (0, 0, 0, "M45 55C12 34 12 94 45 73", 9, 68), (2, 1, 2, "M255 55C288 34 288 94 255 73", 291, 68),
-]
+# The interview builder beside the hero's text (session 30, replacing the live example of
+# M2): the reader picks a level, a length and kinds, and home.js fills a series of
+# questions that fits the time (dvqInterview.buildPlan, from questions.json); "start"
+# keeps the series in the browser, and interview mode walks through it question by
+# question. Hidden until the script fills it.
+INTERVIEW_LENGTHS = (20, 40, 60)
 
 
-def _hero_fsm(href: str) -> str:
-    bits = bin(HERO_FSM_NUMBER)[2:]
-    edges = "".join(
-        f'<path class="hf-edge{" is-taken" if (a, b) == (1, 1) else ""}" data-e="{a}{b}" d="{d}" marker-end="url(#hf-arrow)"/>'
-        f'<text class="hf-label" x="{x}" y="{y}" text-anchor="middle">{b}</text>'
-        for a, b, _, d, x, y in HERO_FSM_EDGES)
-    nodes = "".join(
-        f'<g class="hf-node{" is-now" if r == 0 else ""}" data-r="{r}"><circle cx="{x}" cy="64" r="19"/>'
-        + (f'<circle cx="{x}" cy="64" r="14"/>' if r == 0 else "")
-        + f'<text x="{x}" y="69" text-anchor="middle">{r}</text></g>'
-        for x, r in HERO_FSM_NODES)
-    svg = ('<svg class="hf-svg" viewBox="0 0 300 120" aria-hidden="true" focusable="false">'
-           '<defs><marker id="hf-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
-           '<path d="M0,0 L10,5 L0,10 Z" class="hf-head"/></marker></defs>' + edges + nodes + '</svg>')
-    bit_spans = "".join(f'<span class="hf-bit is-read">{b}</span>' for b in bits)
-    return (
-        f'<div class="hh-fsm" data-search-exclude data-number="{HERO_FSM_NUMBER}">'
-        '<p class="hf-title">דוגמה חיה\u00a0: חלוקה ב-3, ביט אחרי ביט</p>'
-        f'{svg}'
-        f'<p class="hf-stream"><span class="hf-bits" dir="ltr">{bit_spans}</span></p>'
-        f'<p class="hf-read" aria-live="off">המספר <bdi dir="ltr">{HERO_FSM_NUMBER}</bdi> מתחלק ב-3 ✓</p>'
-        f'<a class="hf-go" href="{href}">לשאלה 0055 ←</a>'
-        '</div>')
+def _hero_builder() -> str:
+    def seg(name: str, label: str, items, pressed) -> str:
+        buttons = "".join(f'<button type="button" class="hb-opt" data-{name}="{v}" aria-pressed="{str(v == pressed).lower()}">{html.escape(t)}</button>'
+                          for v, t in items)
+        return (f'<div class="hb-group" role="group" aria-labelledby="hb-{name}"><span class="hb-label" id="hb-{name}">{label}</span>'
+                f'<span class="hb-seg">{buttons}</span></div>')
+    kinds = "".join(f'<button type="button" class="hb-topic" data-kind="{k}" aria-pressed="true">{html.escape(t)}</button>'
+                    for k, t in KINDS.items())
+    return ('<div class="hh-builder" data-search-exclude hidden>'
+            '<p class="hb-title">להרכיב ראיון</p>'
+            '<p class="hb-note">בוחרים רמה, אורך ונושאים, ומקבלים סדרת שאלות שמתאימה לזמן.</p>'
+            + seg("level", "רמה", LEVELS.items(), "junior")
+            + seg("minutes", "אורך", [(m, f"{m} דקות") for m in INTERVIEW_LENGTHS], 40)
+            + f'<div class="hb-group" role="group" aria-labelledby="hb-kinds"><span class="hb-label" id="hb-kinds">נושאים</span><span class="hb-topics">{kinds}</span></div>'
+            '<ol class="hb-plan" aria-live="polite"></ol>'
+            '<p class="hb-sum"></p>'
+            '<div class="hb-actions"><a class="md-button md-button--primary hb-start" href="#">להתחיל את הראיון</a>'
+            '<button type="button" class="hb-shuffle">סדרה אחרת</button></div>'
+            '</div>')
 
 
 def _hero(inner: str, page_url: str) -> str:
@@ -949,13 +947,11 @@ def _hero(inner: str, page_url: str) -> str:
     boxes = sum(q.get("boxes", 0) for q in qs)
     stats = [("help", len(qs), "שאלות עם פתרון מלא"), ("tested", tested, "עם קוד שנבדק אוטומטית"),
              ("interactive", boxes, "תיבות אינטראקטיביות")]
-    fsm = next((q for q in qs if q["id"] == "0055"), order[0])
-    fsm_href = _href(fsm["src_uri"], page_url)
     searches = "".join(f'<button type="button" class="hh-chip" data-q="{html.escape(t)}">{html.escape(t)}</button>' for t in HERO_SEARCHES)
     return (
         '<div class="home-hero" markdown>\n'
         f'<div class="hh-bg" aria-hidden="true">{HERO_WAVES}</div>\n'
-        f'{_hero_fsm(fsm_href)}\n\n{inner.strip()}\n\n'
+        f'{inner.strip()}\n\n'
         '<div class="hh-tools" data-search-exclude>'
         '<div class="hh-actions">'
         f'<a class="md-button md-button--primary hh-start" href="{hrefs[0]}" data-hrefs="{html.escape(json.dumps(hrefs))}" data-ids="{" ".join(ids)}">להתחיל לתרגל</a>'
@@ -964,6 +960,7 @@ def _hero(inner: str, page_url: str) -> str:
         f'<div class="hh-suggest"><span>למשל\u00a0:</span>{searches}</div>'
         '<div class="hh-stats">' + "".join(f'<span>{ui_icon(i)}<b>{n}</b> {label}</span>' for i, n, label in stats) + '</div>'
         '</div>\n'
+        f'{_hero_builder()}\n'
         '</div>\n'
     )
 
@@ -1011,6 +1008,25 @@ def _question_item(q: dict, page_url: str) -> str:
 def _continue_card() -> str:
     """Filled by marks.js from the last question this browser opened; hidden until then."""
     return '<div class="continue-card" hidden data-search-exclude></div>'
+
+
+def _my_map(page_url: str) -> str:
+    """My map (session 30): a square per question, a row per level, painted by home-extras.js
+    from this browser's marks (solved, started: a self-check answered or an interview done);
+    hidden until the reader has marked or started a question."""
+    rows = []
+    for lv, name in LEVELS.items():
+        qs = sorted((q for q in _questions.values() if q["level"] == lv), key=lambda q: q["id"])
+        cells = "".join(f'<a class="mm-cell" href="{_href(q["src_uri"], page_url)}" data-id="{q["id"]}" tabindex="-1" '
+                        f'aria-label="{q["id"]} {html.escape(str(q["title"]))}"></a>' for q in qs)
+        rows.append(f'<div class="mm-row"><span class="mm-level">{name}</span><div class="mm-cells">{cells}</div></div>')
+    legend = ('<p class="mm-legend" aria-hidden="true"><span><i class="mm-k-solved"></i>פתרתם</span>'
+              '<span><i class="mm-k-started"></i>התחלתם</span><span><i></i>עוד לא</span></p>')
+    return ('<section class="my-map" hidden data-search-exclude aria-labelledby="my-map-title">'
+            '<h2 id="my-map-title">המפה שלי</h2>'
+            '<p class="mm-stats"></p>'
+            f'<div class="mm-grid" role="group" aria-label="השאלות לפי רמה">{"".join(rows)}</div>'
+            f'{legend}<p class="mm-peek" aria-live="polite">החצים עוברים בין הריבועים, ו-Enter פותח שאלה.</p></section>')
 
 
 def _recent(page_url: str) -> str:
@@ -1295,6 +1311,7 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     markdown = HOW_IT_WORKS.sub(lambda m: _how_it_works(), markdown)
     markdown = CATALOG_LINK.sub(lambda m: _catalog_link(page.url), markdown)
     markdown = CONTINUE.sub(lambda m: _continue_card(), markdown)
+    markdown = MY_MAP.sub(lambda m: _my_map(page.url), markdown)
     markdown = RECENT.sub(lambda m: _recent(page.url), markdown)
     markdown = WHATS_NEW.sub(lambda m: _whats_new(page.url), markdown)
     markdown = _lists_top(markdown)
@@ -1800,6 +1817,12 @@ def on_post_build(config, **kwargs):
     for part in _css_parts:
         joined += f"\n/* ---- {part} ---- */\n" + (docs / part).read_text(encoding="utf-8")
     (site / JOINED_CSS).write_text(joined, encoding="utf-8")
+    order = sorted(_questions.values(), key=lambda q: q["id"])
+    index_data = {"levels": LEVELS, "diffs": DIFFICULTIES, "kinds": KINDS,
+                  "qs": [[q["id"], str(q["title"]), q["level"], q["difficulty"], q["kind"],
+                          [topic_name(t) for t in q["tags"]], q["src_uri"][: -len(".md")] + "/", q.get("parts", 0)]
+                         for q in order]}
+    (site / INDEX_FILE).write_text(json.dumps(index_data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     not_found = site / "404.html"
     if not_found.exists():
         not_found.write_text(one_stylesheet(not_found.read_text(encoding="utf-8")), encoding="utf-8")

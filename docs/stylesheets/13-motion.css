@@ -1,4 +1,4 @@
-/* The site's styles, part 13 of 20: round M (session 28), motion and finish: the drawn logo, the
+/* The site's styles, part 13 of 21: round M (session 28), motion and finish: the drawn logo, the
    header and the table of contents, the home hero's live waves and example, the cards, the
    question header card, self-check and hint feedback, the box skeleton, page transitions,
    the footer and the 404 page. Every movement is defined only without reduced motion.
@@ -44,35 +44,6 @@
   }
 }
 
-/* M2: the live example (hook's _hero_fsm, home.js) beside the hero's text on a wide
-   screen: the machine of 0055 part a reading a number bit by bit. */
-.md-typeset .home-hero .hh-fsm { display: none; }
-@media screen and (min-width: 76.25em) {
-  .md-typeset .home-hero .hh-fsm { position: absolute; top: 1.6rem; inset-inline-end: 1.6rem; display: flex; flex-direction: column; gap: var(--sp-1); width: 15rem; padding: var(--sp-2) var(--sp-3) var(--sp-3); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: var(--radius-l); background: rgba(255, 255, 255, 0.05); box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.18); }
-  .md-typeset .home-hero:has(.hh-fsm) > :is(h1, p) { max-width: min(42rem, calc(100% - 17rem)); }
-}
-.md-typeset .home-hero .hh-fsm p { max-width: none; margin: 0; }
-.md-typeset .home-hero .hh-fsm .hf-title { color: rgba(255, 255, 255, 0.78); font-size: 0.64rem; font-weight: 600; }
-.md-typeset .home-hero .hf-svg { display: block; width: 100%; height: auto; }
-.md-typeset .home-hero .hf-edge { fill: none; stroke: rgba(255, 255, 255, 0.4); stroke-width: 1.6; transition: stroke var(--dur-1), stroke-width var(--dur-1); }
-.md-typeset .home-hero .hf-edge.is-taken { stroke: var(--md-accent-fg-color); stroke-width: 2.6; }
-.md-typeset .home-hero .hf-head { fill: rgba(255, 255, 255, 0.7); }
-.md-typeset .home-hero .hf-label { fill: rgba(255, 255, 255, 0.82); font-family: var(--md-code-font-family); font-size: 12px; }
-.md-typeset .home-hero .hf-node circle { fill: rgba(255, 255, 255, 0.06); stroke: rgba(255, 255, 255, 0.75); stroke-width: 1.6; transition: fill var(--dur-2) var(--ease), stroke var(--dur-2) var(--ease); }
-.md-typeset .home-hero .hf-node text { fill: #fff; font-family: var(--md-code-font-family); font-size: 15px; font-weight: 700; transition: fill var(--dur-2); }
-.md-typeset .home-hero .hf-node.is-now circle { fill: var(--md-accent-fg-color); stroke: var(--md-accent-fg-color); }
-.md-typeset .home-hero .hf-node.is-now circle + circle { fill: none; stroke: var(--md-primary-fg-color); }
-.md-typeset .home-hero .hf-node.is-now text { fill: #1b2a4a; }
-.md-typeset .home-hero .hh-fsm .hf-stream { min-height: 1.3rem; }
-.md-typeset .home-hero .hf-bits { display: flex; justify-content: center; gap: 0.2rem; font-family: var(--md-code-font-family); }
-.md-typeset .home-hero .hf-bit { width: 1.1rem; border-radius: var(--radius-s); background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.72); font-size: 0.7rem; line-height: 1.3rem; text-align: center; transition: background-color var(--dur-1), color var(--dur-1); }
-.md-typeset .home-hero .hf-bit.is-read { background: rgba(255, 255, 255, 0.16); color: #fff; }
-.md-typeset .home-hero .hf-bit.is-now { background: var(--md-accent-fg-color); color: #1b2a4a; }
-.md-typeset .home-hero .hh-fsm .hf-read { min-height: 1.1rem; color: rgba(255, 255, 255, 0.88); font-size: 0.64rem; text-align: center; }
-.md-typeset .home-hero .hh-fsm:not(.is-no) .hf-read:not(:empty) { font-weight: 600; }
-.md-typeset .home-hero .hh-fsm.is-yes .hf-read { color: var(--md-accent-fg-color); }
-.md-typeset .home-hero .hh-fsm .hf-go { align-self: flex-start; color: var(--md-accent-fg-color); font-size: 0.64rem; font-weight: 600; }
-.md-typeset .home-hero .hh-fsm .hf-go:is(:hover, :focus-visible) { color: #fff; text-decoration: underline; }
 
 /* M12: cards answer the pointer: the top edge fills with amber from the start, the icon
    tilts, and a level's progress bar fills in. */
@@ -98,7 +69,7 @@
 .md-typeset .question-header .qh-bottom a.qh-tag:is(:hover, :focus-visible) { border-color: var(--md-typeset-a-color); color: var(--md-typeset-a-color); }
 @media screen and (min-width: 30em) and (hover: hover) {
   .md-typeset .question-header { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "chips" "meta" "tools"; }
-  .md-typeset .question-header .question-tools, body.practice-mode .md-typeset .question-header .question-tools { flex-wrap: wrap; gap: var(--sp-1); margin: var(--sp-3) calc(-1 * var(--sp-4)) calc(-1 * var(--sp-3)); padding: var(--sp-2) var(--sp-4); border-top: 1px solid var(--site-card-border); border-radius: 0 0 var(--radius-l) var(--radius-l); }
+  .md-typeset .question-header .question-tools, body.interview-mode .md-typeset .question-header .question-tools { flex-wrap: wrap; gap: var(--sp-1); margin: var(--sp-3) calc(-1 * var(--sp-4)) calc(-1 * var(--sp-3)); padding: var(--sp-2) var(--sp-4); border-top: 1px solid var(--site-card-border); border-radius: 0 0 var(--radius-l) var(--radius-l); }
   .md-typeset .question-header .question-tools .qt-btn { gap: 0.35rem; width: auto; height: 1.75rem; padding: 0 0.65rem; border-radius: 1rem; }
   .md-typeset .question-header .question-tools .qt-name { display: inline; font-size: 0.66rem; font-weight: 600; white-space: nowrap; }
   .md-typeset .question-header .question-tools .qt-btn[data-tip]:is(:hover, :focus-visible)::after { content: none; }

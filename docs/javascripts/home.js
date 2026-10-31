@@ -2,9 +2,8 @@
 // view (W339), and the sections and cards under the hero rise into view once (W344, a 40 ms
 // stagger along a row of cards). The real numbers and the content are in the page; without
 // the script, under reduced motion or in an automated browser (the page checks), nothing
-// moves or hides. Round M adds the hero's live example (M2): the machine of 0055 part a
-// reads numbers bit by bit (the page holds its last frame for 27), and the waves and the
-// example stop while the hero is off screen.
+// moves or hides. The hero's waves stop while it is off screen, and beside its text sits
+// the interview builder (session 30; it replaced round M's live example of 0055).
 (() => {
   const COUNT_MS = 900;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -42,67 +41,72 @@
     });
   };
 
-  // M2: a number's bits, MSB first, through r -> (2r + b) mod 3: the edge taken and the
-  // bit read light up, the state moves; at the end the verdict stays for a moment.
-  const FSM_NUMBERS = [27, 10, 21, 14, 6, 13];
-  const STEP_MS = 750, HOLD_MS = 2000;
-  const NB = " ";
-  const fsmDemo = (hero) => {
-    const panel = hero.querySelector(".hh-fsm");
-    if (!panel) return null;
-    const nodes = [...panel.querySelectorAll(".hf-node")], edges = [...panel.querySelectorAll(".hf-edge")];
-    const bitsEl = panel.querySelector(".hf-bits"), read = panel.querySelector(".hf-read");
-    let k = 0, n = 0, bits = [], i = 0, r = 0, timer = 0;
-    const show = () => nodes.forEach((el) => el.classList.toggle("is-now", Number(el.dataset.r) === r));
-    const begin = () => {
-      n = FSM_NUMBERS[k];
-      bits = [...n.toString(2)].map(Number);
-      i = 0; r = 0;
-      bitsEl.innerHTML = bits.map((b) => `<span class="hf-bit">${b}</span>`).join("");
-      edges.forEach((el) => el.classList.remove("is-taken"));
-      panel.classList.remove("is-yes", "is-no");
-      read.textContent = `מתחילים בשארית 0`;
-      show();
+  // The interview builder in the hero (session 30, in place of M2's live example): a
+  // level, a length and kinds give a series of questions that fits the time
+  // (dvqInterview.buildPlan over questions.json, the ones not solved yet first); "another
+  // series" draws again; "start" keeps the series in the browser and opens its first
+  // question, where interview mode starts by itself (question-tools.js). The last choice
+  // is remembered.
+  const PICK = "dvq-builder";
+  const builder = (panel) => {
+    const I = window.dvqInterview;
+    if (!panel || !I) return;
+    const plan = panel.querySelector(".hb-plan"), sum = panel.querySelector(".hb-sum"), go = panel.querySelector(".hb-start");
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(PICK) || "null"); } catch (e) { /* none */ }
+    const st = { level: "junior", minutes: 40, kinds: [...panel.querySelectorAll(".hb-topic")].map((b) => b.dataset.kind), seed: 1, ...(saved || {}) };
+    let data = null, current = [];
+    const paint = () => {
+      panel.querySelectorAll("[data-level]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.level === st.level)));
+      panel.querySelectorAll("[data-minutes]").forEach((b) => b.setAttribute("aria-pressed", String(Number(b.dataset.minutes) === st.minutes)));
+      panel.querySelectorAll(".hb-topic").forEach((b) => b.setAttribute("aria-pressed", String(st.kinds.includes(b.dataset.kind))));
     };
-    const tick = () => {
-      if (i < bits.length) {
-        const b = bits[i];
-        edges.forEach((el) => el.classList.toggle("is-taken", el.dataset.e === `${r}${b}`));
-        r = (2 * r + b) % 3;
-        [...bitsEl.children].forEach((el, j) => { el.classList.toggle("is-read", j < i); el.classList.toggle("is-now", j === i); });
-        i += 1;
-        const prefix = bits.slice(0, i).join("");
-        read.innerHTML = `עד עכשיו <bdi dir="ltr">${prefix}</bdi> = ${parseInt(prefix, 2)}, שארית${NB}: ${r}`;
-        show();
-        timer = setTimeout(tick, STEP_MS);
-        return;
-      }
-      [...bitsEl.children].forEach((el) => { el.classList.add("is-read"); el.classList.remove("is-now"); });
-      panel.classList.add(r === 0 ? "is-yes" : "is-no");
-      read.innerHTML = r === 0 ? `המספר <bdi dir="ltr">${n}</bdi> מתחלק ב-3 ✓`
-        : `המספר <bdi dir="ltr">${n}</bdi> לא מתחלק ב-3 (שארית ${r})`;
-      timer = setTimeout(() => { k = (k + 1) % FSM_NUMBERS.length; begin(); timer = setTimeout(tick, STEP_MS); }, HOLD_MS);
+    const fill = () => {
+      paint();
+      try { localStorage.setItem(PICK, JSON.stringify({ level: st.level, minutes: st.minutes, kinds: st.kinds })); } catch (e) { /* none */ }
+      if (!data) return;
+      const solved = data.qs.filter((q) => window.dvqMarks && window.dvqMarks.has(q[I.ID], "solved")).map((q) => q[I.ID]);
+      const res = I.buildPlan(data.qs, { level: st.level, minutes: st.minutes, kinds: st.kinds, solved, seed: st.seed });
+      current = res.plan;
+      plan.classList.remove("is-new");
+      void plan.offsetWidth;
+      if (!reduce) plan.classList.add("is-new");
+      plan.innerHTML = current.length
+        ? current.map((q) => `<li><span class="hb-id">${q[I.ID]}</span><a href="${I.siteUrl(q[I.URL])}">${q[I.TITLE].replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]))}</a>` +
+          `<span class="hb-min">${I.targetMinutes(q[I.DIFF], q[I.PARTS])} דק'</span></li>`).join("")
+        : '<li class="hb-empty">אין שאלות ברמה ובנושאים האלה. בחרו עוד נושא.</li>';
+      const n = current.length;
+      sum.textContent = n ? `${n === 1 ? "שאלה אחת" : `${n} שאלות`}, כ-${res.minutes} דקות. השעון בכל שאלה רץ מול הזמן שלה.` : "";
+      go.hidden = !n;
+      if (n) go.href = I.siteUrl(current[0][I.URL]);
     };
-    let started = false;
-    return {
-      play() {
-        if (timer) return;
-        if (!started) { started = true; begin(); }
-        timer = setTimeout(tick, STEP_MS);
-      },
-      pause() { clearTimeout(timer); timer = 0; },
-    };
+    panel.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      if (b.dataset.level) st.level = b.dataset.level;
+      else if (b.dataset.minutes) st.minutes = Number(b.dataset.minutes);
+      else if (b.dataset.kind) {
+        const on = st.kinds.includes(b.dataset.kind);
+        st.kinds = on ? st.kinds.filter((k) => k !== b.dataset.kind) : [...st.kinds, b.dataset.kind];
+      } else if (b.classList.contains("hb-shuffle")) st.seed = (st.seed % 100000) + 1 + Math.floor(Math.random() * 1000);
+      else return;
+      fill();
+    });
+    go.addEventListener("click", () => {
+      if (!current.length) return;
+      I.plan.set({ ids: current.map((q) => q[I.ID]), urls: current.map((q) => I.siteUrl(q[I.URL])), minutes: current.reduce((m, q) => m + I.targetMinutes(q[I.DIFF], q[I.PARTS]), 0), at: Date.now() });
+    });
+    document.addEventListener("dvq-marks", fill);
+    I.loadIndex().then((d) => { data = d; panel.hidden = false; fill(); }).catch(() => { /* no list: the builder stays hidden */ });
   };
 
   document.addEventListener("DOMContentLoaded", () => {
     const hero = document.querySelector(".home-hero");
     if (!hero || !("IntersectionObserver" in window)) return;
-    const demo = reduce || navigator.webdriver ? null : fsmDemo(hero);
-    // the hero's rolling waves and the example run only while it is on screen
+    builder(hero.querySelector(".hh-builder"));
+    // the hero's rolling waves run only while it is on screen
     new IntersectionObserver((entries) => {
-      const on = entries.some((e) => e.isIntersecting);
-      hero.classList.toggle("is-paused", !on);
-      if (demo) { if (on) demo.play(); else demo.pause(); }
+      hero.classList.toggle("is-paused", !entries.some((e) => e.isIntersecting));
     }).observe(hero);
   });
 

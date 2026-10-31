@@ -1,4 +1,4 @@
-/* The site's styles, part 9 of 20: the redesign: typography, icons, the header and toolbar, the hero, box cards, the 404 page, print, question tables.
+/* The site's styles, part 9 of 21: the redesign: typography, icons, the header and toolbar, the hero, box cards, the 404 page, print, question tables.
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
 /* Typography (UI321): Rubik stays the text face; a little more line height for Hebrew,
@@ -62,7 +62,7 @@
 .md-typeset .question-header .qh-badge .ui-ico { width: 1.1em; height: 1.1em; }
 .md-typeset .question-header .qh-badge-ok { color: var(--diff-easy); border-color: color-mix(in srgb, currentColor 45%, transparent); }
 .md-typeset .question-header .qh-badge-play { color: var(--md-typeset-a-color); }
-.md-typeset .question-header .qh-badge-new { color: #1b2a4a; background: var(--md-accent-fg-color); border-color: var(--md-accent-fg-color); }   /* the navy of the practice button: 4.5:1 on the accent */
+.md-typeset .question-header .qh-badge-new { color: #1b2a4a; background: var(--md-accent-fg-color); border-color: var(--md-accent-fg-color); }   /* the navy of the interview button: 4.5:1 on the accent */
 .md-typeset .question-header h1 { margin: 0 0 0.5rem; font-weight: 700; line-height: 1.3; }
 .md-typeset .question-header .qh-bottom { gap: 0.2rem 0.45rem; font-size: 0.68rem; }
 .md-typeset .question-header .qh-bottom a { text-decoration: underline dotted color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 0.2em; }
@@ -81,9 +81,7 @@
   padding: 0.2rem 0.5rem; border-radius: 0.3rem; background: var(--md-default-fg-color); color: var(--md-default-bg-color);
   font-size: 0.62rem; line-height: 1.5; white-space: nowrap; pointer-events: none;
 }
-.md-typeset .question-tools .qt-clock { font-size: 0.66rem; }
-.md-typeset .question-tools .qt-clock:not([hidden]) { padding-inline: 0.3rem; }
-body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1rem 0.3rem; border-radius: 1rem; }
+body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1rem 0.3rem; border-radius: 1rem; }
 @media screen and (max-width: 30em) {
   /* the toolbar starts at the right edge here: its first tooltips open leftwards */
   .md-typeset .question-tools .qt-btn:nth-child(-n+3)[data-tip]:is(:hover, :focus-visible)::after { inset-inline: 0 auto; }
@@ -280,12 +278,12 @@ body.practice-mode .md-typeset .question-header .question-tools { padding: 0.1re
 .md-typeset .not-found .md-button:is(:hover, :focus-visible) { background: #fff; border-color: #fff; color: #1b2a4a; }
 
 /* Printing a question (or "save as PDF"): every block opened by question-tools.js (the
-   solutions stay hidden in practice mode, for a practice sheet), the light scheme, and
+   interview mode's bar and questions are left out), the light scheme, and
    no page tools, box controls, messages or comments; a box prints its figures and summary
    as they stand. */
 @media print {
   .md-typeset :is(.question-tools, .part-nav, .ex-bar, .ex-controls, .ex-scrubwrap, .ex-keys, .ex-guide, .py-runner, .py-from-code, .comments, .comments-note, .hh-tools),
-  .dvq-toast, .dvq-confetti, .md-content__button { display: none !important; }
+  .dvq-toast, .dvq-confetti, .md-content__button, .iv-bar, .iv-conf, .qj { display: none !important; }
   .md-typeset details.tip.hint-locked { display: block; }
   .md-typeset :is(.admonition, details) { page-break-inside: auto; break-inside: auto; }   /* the theme keeps each block whole, which leaves near-blank pages */
   .md-typeset :is(.admonition-title, summary) { break-after: avoid; }
