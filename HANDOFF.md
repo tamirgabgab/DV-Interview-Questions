@@ -1664,7 +1664,16 @@ section below starts at session 22, whose numbered items run on through the late
     findings that were there before: Material's search dialog has no name, and the grey
     `.cc-meta` line of the "continue" card is under 4.5:1 (not fixed, a separate change).
 
-110. **The hero's chip (session 30, 2026-10-31).** The owner found the rolling waves basic
+110. **LaTeX math in the videos (session 28, 2026-10-31).** The owner wanted the equations
+    to look like LaTeX, as in 3Blue1Brown's videos, in every video, with code kept in the
+    code font. `dvq.TX()` sets math with `MathTex` in the palette, a cost chip's value in
+    `$...$` is math, and `render.py` stops with the apt line when `latex` or `dvisvgm` is
+    missing (the sandbox starts without them; the packages are in VIDEOS.md "Rendering"
+    and requirements-video.txt). Re-rendered with LaTeX: 0002, 0003, 0006, 0010, 0011,
+    0015, 0029 (0004 has no math, only code). Lengths and chapters are unchanged. Small
+    thing left: in `cost_chips` the word sits a little higher than a LaTeX value (centred,
+    not on one baseline).
+111. **The hero's chip (session 30, 2026-10-31).** The owner found the rolling waves basic
     (the amber cursor never met the waves' edges). Two rounds of live proposals (five
     backgrounds, then four chip-and-wire ones); the owner picked the chip with its fan-out,
     with no marking on the chip, in a column between the text and the builder on a wide
@@ -1678,7 +1687,7 @@ section below starts at session 22, whose numbered items run on through the late
 ## In progress
 
 - **Session 30 (2026-10-31):** interview mode, the builder, my map and the quick jump (work
-  log item 109) published (`main` df3f829, deploy green); then the hero's chip (item 110).
+  log item 109) published (`main` df3f829, deploy green); then the hero's chip (item 111).
   The owner checks the live site (desktop and phone, light and dark).
 - **Session 29 (2026-10-31):** question 0071, the three-wizard duel (work log item 107),
   written as 0060 and renumbered when `main` had moved on to 0070; published (`main`

@@ -4,8 +4,9 @@ A question's `videos/<id>/scene.py` builds its chapters from these parts:
 
 - `C`: the site's palette, read from the stylesheets in docs/stylesheets/ (no colour is
   typed here), with the navy of the home page's hero as the background;
-- `T()` (Latin text, Inter), `M()` (code and numbers, a monospace font) and `he()` (a Hebrew
-  label: a PNG drawn by the browser through he_label.py, since Manim draws no Hebrew);
+- `T()` (Latin text, Inter), `M()` (code and numbers, a monospace font), `TX()` (math, set
+  by LaTeX as in 3Blue1Brown's videos) and `he()` (a Hebrew label: a PNG drawn by the
+  browser through he_label.py, since Manim draws no Hebrew);
 - `DVQScene`: the base scene. `say()` / `beat()` play a beat under its caption and record
   the caption's real start and end, `opening()`, `chapter_card()` and `closing()` are the
   frames every video shares, and `tear_down()` writes the record for captions.py;
@@ -26,6 +27,7 @@ import json
 import os
 import random
 import re
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -33,8 +35,8 @@ from pathlib import Path
 
 import numpy as np
 from manim import (DOWN, Animation, Group, LEFT, ORIGIN, RIGHT, UP, Code, Create, FadeIn,
-                   FadeOut, ImageMobject, Line, Mobject, Rectangle, RoundedRectangle, Scene,
-                   Text, Transform, VGroup, VMobject, config, rate_functions)
+                   FadeOut, ImageMobject, Line, MathTex, Mobject, Rectangle, RoundedRectangle,
+                   Scene, Text, Transform, VGroup, VMobject, config, rate_functions)
 from manim.constants import CapStyleType, LineJointType
 from manim.mobject.svg.svg_mobject import SVGMobject
 from pygments.style import Style
@@ -191,6 +193,31 @@ def M(s: str, size: float = 32, color: str | None = None, weight: str = "NORMAL"
     return Text(s, font=MONO, font_size=size, color=color or C.WHITE, weight=weight, **kw)
 
 
+LATEX_PACKAGES = ("texlive-latex-base texlive-latex-extra texlive-fonts-recommended "
+                  "texlive-science dvisvgm cm-super-minimal")
+
+
+def latex_missing() -> list[str]:
+    """The LaTeX tools `TX()` needs that are not on the PATH (render.py checks first)."""
+    return [t for t in ("latex", "dvisvgm") if shutil.which(t) is None]
+
+
+def TX(*tex: str, size: float = 32, color: str | None = None, **kw) -> MathTex:
+    """Math set by LaTeX (Computer Modern, as in 3Blue1Brown's videos): `TX(r"\\frac{1}{3}")`.
+    Several strings make separately colourable parts (`TX("a", "=", "b")[2]`). Code stays in
+    `M()`; words stay in `T()`; no Hebrew here (it would come out reversed)."""
+    for t in tex:
+        _no_hebrew(t)
+    return MathTex(*tex, font_size=size * 1.25, color=color or C.WHITE, **kw)
+
+
+def math_or_mono(value: str, size: float, color: str) -> Mobject:
+    """`$...$` is LaTeX math (`TX`), anything else monospace (`M`)."""
+    if len(value) > 1 and value.startswith("$") and value.endswith("$"):
+        return TX(value[1:-1], size=size, color=color)
+    return M(value, size, color)
+
+
 def X(s: str, size: float = 32, color: str | None = None, **kw) -> Text:
     """Math (a₀, 2³¹, ⊕) in Inter: its sub- and superscripts sit tight, unlike a
     monospace font's."""
@@ -245,11 +272,11 @@ def _Group(*mobs):
 
 
 def cost_chips(*pairs: tuple, notes: tuple = ()) -> VGroup:
-    """The cost as chips, ("time", "O(1)"), ("memory", "0"), ..., each with an optional
-    note under it (Latin: where the cost comes from)."""
+    """The cost as chips, ("time", "$O(1)$"), ("memory", "0"), ..., each with an optional
+    note under it (Latin: where the cost comes from). A value in `$...$` is LaTeX math."""
     items = VGroup()
     for k, (key, value) in enumerate(pairs):
-        g = VGroup(T(key, 32, C.MUTED), M(value, 46, C.AMBER)).arrange(RIGHT, buff=0.3)
+        g = VGroup(T(key, 32, C.MUTED), math_or_mono(value, 46, C.AMBER)).arrange(RIGHT, buff=0.3)
         c = chip(g, color=C.AMBER, buff=0.25)
         if k < len(notes) and notes[k]:
             c = VGroup(c, T(notes[k], 28, C.MUTED).next_to(c, DOWN, buff=0.35))

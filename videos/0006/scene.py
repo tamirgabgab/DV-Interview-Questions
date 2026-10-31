@@ -14,7 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
 from manim import *  # noqa: E402,F403
-from dvq import (C, BoxView, CodePanel, DVQScene, M, VarPanel, cost_chips,  # noqa: E402
+from dvq import (C, TX, BoxView, CodePanel, DVQScene, M, VarPanel, cost_chips,  # noqa: E402
                  page_python, trace)
 
 QID = 6
@@ -126,7 +126,7 @@ class ChapterA(StockScene):
         self.say("המחירים מהעמוד : 5, 8, 3, 9, 2, 6,\nמחיר אחד לכל יום.",
                  FadeIn(ch, lag_ratio=0.05), run_time=1.4)
         trade = ch.seg(2, 3, C.BLUE)
-        lab = M("9 − 3 = 6", 36, C.BLUE).move_to(UP * 3.05)
+        lab = TX("9 - 3 = 6", size=42, color=C.BLUE).move_to(UP * 3.05)
         self.say("קונים ביום i ומוכרים ביום j > i.\nהרווח : prices[j] − prices[i].",
                  Create(trade), FadeIn(lab))
         pairs = VGroup(*[Line(ch.pt(i), ch.pt(j), stroke_color=C.FAINT, stroke_width=2)
@@ -209,16 +209,16 @@ class ChapterA(StockScene):
 
         # The trap: the highest price minus the lowest one.
         tr = PriceChart([9, 1], width=4.0, height=3.4)
-        wrong = M("max − min = 9 − 1 = 8", 38, C.RED).move_to(UP * 3.05)
+        wrong = TX(r"\max - \min = 9 - 1 = 8", size=44, color=C.RED).move_to(UP * 3.05)
         self.say("המלכודת : לחשב את המחיר הגבוה ביותר\nפחות הנמוך ביותר, בכל המערך.",
                  FadeIn(tr), FadeIn(wrong))
         cross = Cross(wrong, stroke_color=C.RED, stroke_width=5)
-        fix = M("best long = 0", 38, C.GREEN).move_to(DOWN * 2.15 + RIGHT * 4.2)
+        fix = TX(r"\text{best long} = 0", size=44, color=C.GREEN).move_to(DOWN * 2.15 + RIGHT * 4.2)
         self.say("עבור 9, 1 ההפרש הוא 8, אבל הקנייה חייבת\nלבוא לפני המכירה : אין לונג שמרוויח.",
                  Create(cross), FadeIn(fix))
         self.fade_all()
 
-        chips = cost_chips(("time", "O(n)"), ("memory", "O(1)"),
+        chips = cost_chips(("time", "$O(n)$"), ("memory", "$O(1)$"),
                            notes=("one pass", "min_p, min_i"))
         self.say("הסיבוכיות : מעבר אחד, זמן O(n),\nוזיכרון O(1), במקום O(n²) של כל הזוגות.",
                  FadeIn(chips, lag_ratio=0.3))
@@ -232,16 +232,16 @@ class ChapterB(StockScene):
         ch = self.chart()
         self.play(FadeIn(ch), run_time=0.8)
         short = ch.seg(3, 4, C.ORANGE)
-        lab = M("9 − 2 = 7", 36, C.ORANGE).move_to(UP * 3.05)
+        lab = TX("9 - 2 = 7", size=42, color=C.ORANGE).move_to(UP * 3.05)
         self.say("שורט : מוכרים ביום i, וקונים בחזרה\nביום מאוחר יותר j.",
                  Create(short), FadeIn(lab))
         self.say("הרווח בשורט : prices[i] − prices[j].\nמרוויחים כשהמחיר יורד.")
         long_ = ch.seg(2, 3, C.BLUE)
-        lab2 = VGroup(M("long +6", 34, C.BLUE), M("short +7", 34, C.ORANGE)).arrange(RIGHT, buff=1.2)
+        lab2 = VGroup(TX(r"\text{long}\ \ {+}6", size=40, color=C.BLUE), TX(r"\text{short}\ \ {+}7", size=40, color=C.ORANGE)).arrange(RIGHT, buff=1.2)
         lab2.move_to(UP * 3.05)
         self.say("בדוגמה, הלונג הטוב ביותר מרוויח 6,\nוהשורט הטוב ביותר מרוויח 7.",
                  Create(long_), Transform(lab, lab2))
-        ans = M("short, 7, days 3 → 4", 34, C.AMBER).move_to(DOWN * 2.2 + RIGHT * 3.4)
+        ans = TX(r"\text{short},\ 7,\ \text{days } 3 \to 4", size=40, color=C.AMBER).move_to(UP * 2.0 + RIGHT * 4.4)
         self.say("לכן התשובה : שורט, רווח 7, ימים 3 ו-4.", FadeIn(ans))
         self.play(FadeOut(long_), FadeOut(short), FadeOut(lab), FadeOut(ans), run_time=0.6)
 
@@ -304,13 +304,13 @@ class ChapterB(StockScene):
         ], view=view)
         self.fade_all()
 
-        chips = cost_chips(("time", "O(n)"), ("memory", "O(1)"),
+        chips = cost_chips(("time", "$O(n)$"), ("memory", "$O(1)$"),
                            notes=("one pass", "min, max, two trades"))
         self.say("הסיבוכיות : עדיין מעבר אחד, זמן O(n),\nוזיכרון נוסף קבוע, O(1).",
                  FadeIn(chips, lag_ratio=0.3))
-        scale = VGroup(M("n = 10⁶", 34, C.MUTED),
-                       M("all pairs ≈ 5·10¹¹", 34, C.RED),
-                       M("one pass = 10⁶", 34, C.GREEN)).arrange(RIGHT, buff=0.8).move_to(DOWN * 2.0)
+        scale = VGroup(TX("n = 10^6", size=38, color=C.MUTED),
+                       TX(r"\text{all pairs} \approx 5 \cdot 10^{11}", size=38, color=C.RED),
+                       TX(r"\text{one pass} = 10^6", size=38, color=C.GREEN)).arrange(RIGHT, buff=0.8).move_to(DOWN * 2.0)
         self.say("עבור מיליון ימים : כחמש מאות מיליארד זוגות,\nמול מיליון צעדים בלבד.",
                  FadeIn(scale, lag_ratio=0.3))
         self.fade_all()
@@ -318,7 +318,7 @@ class ChapterB(StockScene):
         # The trap: a tie between the best long and the best short.
         tie = PriceChart([1, 4, 1], width=5.0, height=3.2, top=5)
         l2, s2 = tie.seg(0, 1, C.BLUE), tie.seg(1, 2, C.ORANGE)
-        lab = VGroup(M("long +3", 34, C.BLUE), M("short +3", 34, C.ORANGE)).arrange(RIGHT, buff=1.2)
+        lab = VGroup(TX(r"\text{long}\ \ {+}3", size=40, color=C.BLUE), TX(r"\text{short}\ \ {+}3", size=40, color=C.ORANGE)).arrange(RIGHT, buff=1.2)
         lab.move_to(UP * 3.05)
         self.say("מלכודת : תיקו בין לונג לשורט.\nלמשל 1, 4, 1 : לונג 3 ושורט 3.",
                  FadeIn(tie), Create(l2), Create(s2), FadeIn(lab))

@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
 from manim import *  # noqa: E402,F403
 from dvq import (C, MIN_BOX_SCALE, MIN_SPLIT_EM, SAFE_BOTTOM, BoxView, CodePanel,  # noqa: E402
-                 DVQScene, M, T, X, cost_chips, he, page_code)
+                 DVQScene, M, T, TX, cost_chips, he, page_code)
 
 QID = 11
 SCENES = [
@@ -292,10 +292,10 @@ class ChapterA(TTTScene):
         self.fade_all()
 
         rules = VGroup(
-            M("n_x ∈ {n_o, n_o + 1}", 32, C.WHITE),
-            M("X_WINS : x_lines > 0, o_lines = 0, n_x = n_o + 1", 30, C.AMBER),
-            M("O_WINS : o_lines > 0, x_lines = 0, n_x = n_o", 30, C.BLUE),
-            M("DRAW   : x_lines = 0, o_lines = 0, n_x + n_o = 9", 30, C.GREEN),
+            TX(r"n_X \in \{\, n_O,\ n_O + 1 \,\}", size=36, color=C.WHITE),
+            TX(r"\texttt{X\_WINS}:\ \ \texttt{x\_lines} > 0,\ \ \texttt{o\_lines} = 0,\ \ n_X = n_O + 1", size=34, color=C.AMBER),
+            TX(r"\texttt{O\_WINS}:\ \ \texttt{o\_lines} > 0,\ \ \texttt{x\_lines} = 0,\ \ n_X = n_O", size=34, color=C.BLUE),
+            TX(r"\texttt{DRAW}:\ \ \texttt{x\_lines} = 0,\ \ \texttt{o\_lines} = 0,\ \ n_X + n_O = 9", size=34, color=C.GREEN),
         ).arrange(DOWN, buff=0.45, aligned_edge=LEFT).move_to(UP * 0.6)
         self.say("ארבעה תנאים : הספירה, ותנאי לכל תוצאה.\nכל אחד מהם יהפוך ל-constraint.",
                  FadeIn(rules, lag_ratio=0.25), run_time=2.0)
@@ -349,7 +349,7 @@ class ChapterA(TTTScene):
         self.say("אותם 958 לוחות, בהתפלגות אחרת :\nהמקרה הנדיר, התיקו, נבדק הרבה יותר.")
         self.fade_all()
 
-        chips = cost_chips(("fillings", "3⁹ = 19,683"), ("final", "958"),
+        chips = cost_chips(("fillings", "$3^9 = 19{,}683$"), ("final", "958"),
                            notes=("every board of 9 cells", "626 X · 316 O · 16 draw"))
         self.say("מרחב הפתרונות קטן : 3 בחזקת 9 מילויים,\nומהם רק 958 הם לוחות סיום.",
                  FadeIn(chips, lag_ratio=0.3))
@@ -408,11 +408,11 @@ class ChapterB(TTTScene):
 
         # The proof: every 5 cells contain a line.
         steps = VGroup(
-            X("5 cells, no line:  every direction splits them 2 + 2 + 1", 30),
-            X("2 + 2 + 1  →  2 pairs on a line per direction", 30),
-            X("4 directions × 2 = 8 pairs", 30, C.AMBER),
-            X("5 cells:  C(5, 2) = 10 pairs, each on exactly one line", 30, C.BLUE),
-            X("8 ≠ 10", 40, C.RED),
+            TX(r"\text{5 cells, no line: every direction splits them } 2 + 2 + 1", size=34),
+            TX(r"2 + 2 + 1 \;\to\; 2 \text{ pairs on a line per direction}", size=34),
+            TX(r"4 \text{ directions} \times 2 = 8 \text{ pairs}", size=34, color=C.AMBER),
+            TX(r"5 \text{ cells: } \binom{5}{2} = 10 \text{ pairs, each on exactly one line}", size=34, color=C.BLUE),
+            TX(r"8 \neq 10", size=46, color=C.RED),
         ).arrange(DOWN, buff=0.4, aligned_edge=LEFT).move_to(UP * 0.6)
         self.say("תיקו דורש לוח מלא : חמישה X בלי שלישייה.\nנראה שכל 5 משבצות מכילות קו.")
         self.say("נניח שאין קו. בכל כיוון המשבצות מתחלקות 2, 2, 1,\nולכן יש בו 2 זוגות על קו.",

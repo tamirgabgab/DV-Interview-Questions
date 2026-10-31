@@ -196,8 +196,8 @@ pictures.
   one (0010's pass table).
 - **A part with no code.** The proof beat takes the code beat's place: one equation line
   at a time with its own caption, the earlier lines dimmed, the key numbers amber, and the
-  box (alone) where the page has one (0015, 0029). There is no LaTeX in the sandbox, so the
-  math is set in Inter text (fractions and powers built in the scene), never Hebrew.
+  box (alone) where the page has one (0015, 0029). The math is set by LaTeX (`TX`), never
+  with Hebrew in it.
 - **Selects and sliders.** `["set", sel, value]` sets a `<select>` or a slider and fires its
   `input` and `change` events (0029's gapline box: the interval type and its length).
 - **Bidi in the pictures.** A lone bracket inside the box's `ltr()` renders the right way
@@ -323,10 +323,14 @@ en: and the original 5 is still saved in temp.
     requirements so CI does not install it).
   - `ffmpeg`.
   - The Code mobject (Pygments) for the code beats.
-  - No LaTeX. The pilots showed that `Text` with Unicode math (`a₀`, `2³¹`, `−`, `≡`) is
-    enough, so nothing installs it. The Manim parts that call LaTeX are avoided:
-    `MathTex`, `Tex`, the numbers of a `NumberLine`, `DecimalNumber`, `MathTable`,
-    `BraceLabel`.
+  - LaTeX for the math (the owner, 2026-10-31: equations as in 3Blue1Brown's videos).
+    `dvq.TX(r"...")` sets a formula with `MathTex` (Computer Modern); a cost chip's value
+    in `$...$` is set the same way. Code stays in the code font (`M()`, `a = a ^ b`,
+    `A[i] < A[j]`), words in Inter (`T()`), Hebrew in `he()`. The sandbox has no LaTeX at
+    the start of a session: `apt-get install -y --no-install-recommends texlive-latex-base
+    texlive-latex-extra texlive-fonts-recommended texlive-science dvisvgm cm-super-minimal`
+    (about two minutes; `render.py` stops with this line when a scene uses `TX` and
+    `latex` or `dvisvgm` is missing).
 - **The command.** `~/.venvs/manim/bin/python videos/render.py 0002` (any Python with
   `requirements-video.txt`) renders the chapters at 720p30, chains them, and writes
   `video.mp4`, `captions.vtt`, `captions.en.vtt` and `chapters.txt` to `videos/0002/out/`. The flag

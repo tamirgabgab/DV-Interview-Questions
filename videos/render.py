@@ -62,6 +62,7 @@ import argparse
 import ast
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -285,6 +286,15 @@ def main() -> int:
     if problems:
         print("\n".join(problems), file=sys.stderr)
         return 1
+
+    # the math is set by LaTeX (dvq.TX): say what to install rather than fail mid-render
+    if re.search(r"\bTX\(|\$[^\"']+\$", scene_py.read_text(encoding="utf-8")):
+        sys.path.insert(0, str(VIDEOS / "lib"))
+        from dvq import LATEX_PACKAGES, latex_missing
+        if latex_missing():
+            print(f"LaTeX is missing ({', '.join(latex_missing())}): apt-get install -y "
+                  f"--no-install-recommends {LATEX_PACKAGES}", file=sys.stderr)
+            return 1
 
     flag, qdir = QUALITY[args.draft]
     media = out / "media"

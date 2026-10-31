@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
 from manim import *  # noqa: E402,F403
-from dvq import (C, BoxView, CodePanel, DVQScene, M, VarPanel, cost_chips,  # noqa: E402
+from dvq import (C, TX, BoxView, CodePanel, DVQScene, M, VarPanel, cost_chips,  # noqa: E402
                  page_python, trace)
 
 QID = 10
@@ -275,7 +275,7 @@ class ChapterA(BracketScene):
         self.say("במחרוזת מקוננת באורך n יש n/2 מעברים,\nוכל מעבר עולה O(n) : בסך הכול O(n²).")
         self.fade_all()
 
-        chips = cost_chips(("time", "O(n²)"), ("memory", "O(n)"),
+        chips = cost_chips(("time", "$O(n^2)$"), ("memory", "$O(n)$"),
                            notes=("a pass per pair", "a new string each pass"))
         self.say("הסיבוכיות : זמן O(n²), וזיכרון O(n)\nלמחרוזות החדשות. אפשר לעשות יותר טוב.",
                  FadeIn(chips, lag_ratio=0.3))
@@ -401,7 +401,7 @@ class ChapterB(BracketScene):
         ], view=view)
         self.fade_all()
 
-        chips = cost_chips(("time", "O(n)"), ("memory", "O(n)"),
+        chips = cost_chips(("time", "$O(n)$"), ("memory", "$O(n)$"),
                            notes=("each character once", "the stack, at worst"))
         self.say("הסיבוכיות : כל תו נקרא פעם אחת, זמן O(n),\nוזיכרון O(n) למחסנית במקרה הגרוע.",
                  FadeIn(chips, lag_ratio=0.3))
@@ -411,7 +411,7 @@ class ChapterB(BracketScene):
         steps, result = trace(code, "isValid", (")(",))
         assert result is False and [s.line for s in steps] == [2, 5, 6, 8, 9, 10, 11], steps
         row = Row(")(", UP * 1.0)
-        counts = M("opened = 1,  closed = 1", 36, C.MUTED).move_to(DOWN * 0.5)
+        counts = TX(r"\text{opened} = 1,\quad \text{closed} = 1", size=40, color=C.MUTED).move_to(DOWN * 0.5)
         self.say("מלכודת : לא מספיק לספור פותחים וסוגרים.\nב-)( יש אחד מכל סוג.",
                  FadeIn(row, lag_ratio=0.2), FadeIn(counts))
         bad = self.verdict(False, DOWN * 1.5)

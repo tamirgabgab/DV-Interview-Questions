@@ -3,7 +3,8 @@ script.md).
 
 Render with `python videos/render.py 0029` (see VIDEOS.md). The question has no code, so
 each part is a proof step by step (the owner, 2026-10-31): one line of the argument at a
-time under its caption, the earlier lines dimmed, the key numbers in amber.
+time under its caption, the earlier lines dimmed, the key numbers in amber. The math is set
+by LaTeX (`TX`, as in 3Blue1Brown's videos); words stay in Inter.
 
 Part א counts each pair of hands on its own (the fast hand laps the slow one, so a pair
 meets as often as their turns a day differ: 1,416, 1,438 and 22), then removes what was
@@ -25,7 +26,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
 from manim import *  # noqa: E402,F403
-from dvq import C, BoxView, DVQScene, M, X, read_palette  # noqa: E402
+from dvq import C, TX, BoxView, DVQScene, M, X, read_palette  # noqa: E402
 
 QID = 29
 SCENES = [
@@ -168,37 +169,55 @@ class Clock(VGroup):
         return [h.animate.set_stroke(color=base[k]) for k, h in self.hands.items()]
 
 
-def line(s: str, size: float = 40, color: str | None = None, amber: tuple = (), **kw) -> Text:
-    """One line of a proof: math in Inter, the substrings in `amber` coloured."""
-    return X(s, size, color, t2c={a: C.AMBER for a in amber}, disable_ligatures=True, **kw)
+def line(parts, size: float = 40, amber: tuple = (), color: str | None = None) -> VMobject:
+    """One line of a proof, set by LaTeX: `parts` are TeX strings (one, or several so that
+    parts can be coloured); the parts whose index is in `amber` are amber."""
+    if isinstance(parts, str):
+        parts = [parts]
+    m = TX(*parts, size=size, color=color)
+    for i in amber:
+        m[i].set_color(C.AMBER)
+    return m
 
 
-def lines(*specs, size: float = 40, buff: float = 0.32, align_eq: bool = True) -> VGroup:
-    """The lines of a proof screen, top to bottom, their "=" signs one under the other."""
-    group = VGroup(*[line(s, size, amber=amber) for s, amber in specs])
+def lines(*specs, size: float = 40, buff: float = 0.32, align_eq: bool = True,
+          max_height: float = 5.7) -> VGroup:
+    """The lines of a proof screen, top to bottom; with `align_eq`, the first part that is a
+    lone "=" of each line sits under the others'."""
+    group = VGroup(*[line(p, size, amber=a) for p, a in specs])
     group.arrange(DOWN, buff=buff, aligned_edge=LEFT)
     if align_eq:
         xs = []
-        for (s, _), ln in zip(specs, group):
-            glyphs = [c for c in s if not c.isspace()]
-            xs.append(ln[glyphs.index("=")].get_center()[0] if "=" in glyphs else None)
-        target = max(x for x in xs if x is not None)
-        for x, ln in zip(xs, group):
-            if x is not None:
-                ln.shift(RIGHT * (target - x))
+        for (p, _), ln in zip(specs, group):
+            parts = [p] if isinstance(p, str) else list(p)
+            xs.append(ln[parts.index("=")].get_center()[0] if "=" in parts else None)
+        if any(x is not None for x in xs):
+            target = max(x for x in xs if x is not None)
+            for x, ln in zip(xs, group):
+                if x is not None:
+                    ln.shift(RIGHT * (target - x))
     if group.width > 13.0:
         group.scale_to_fit_width(13.0)
+    if group.height > max_height:
+        group.scale_to_fit_height(max_height)
     return group
+
+
+def cell(s: str, size: float, colour: str) -> VMobject:
+    """A table cell: `$...$` is math (LaTeX), anything else a word in Inter."""
+    if len(s) > 1 and s.startswith("$") and s.endswith("$"):
+        return TX(s[1:-1], size=size, color=colour)
+    return X(s, size, colour, disable_ligatures=True)
 
 
 def grid(rows: list[list[str]], size: float = 30, head: bool = True, hbuff: float = 0.6,
          vbuff: float = 0.22, colors: dict | None = None, align: str | None = None) -> VGroup:
-    """A table of Latin cells; the first row muted (a header)."""
+    """A table of Latin cells (`$...$` cells are math); the first row muted (a header)."""
     cells = VGroup()
     for r, row in enumerate(rows):
         for c, s in enumerate(row):
             col = C.MUTED if head and r == 0 else (colors or {}).get((r, c), C.WHITE)
-            cells.add(X(s, size, col, disable_ligatures=True))
+            cells.add(cell(s, size, col))
     cells.arrange_in_grid(rows=len(rows), cols=len(rows[0]), buff=(hbuff, vbuff), col_alignments=align or "r" * len(rows[0]))
     return cells
 
@@ -215,7 +234,9 @@ class S29(DVQScene):
 
     def reveal(self, group: VGroup, k: int, caption: str, *anims, run_time: float = 1.0):
         """Line k of a proof screen appears under its caption; the earlier lines dim."""
-        dim = [group[j].animate.set_opacity(0.4) for j in range(k) if group[j].get_fill_opacity() > 0.5]
+        dim = [group[j].animate.set_opacity(0.4) for j in range(k) if not getattr(group[j], "dimmed", False)]
+        for j in range(k):
+            group[j].dimmed = True
         self.say(caption, FadeIn(group[k], shift=0.15 * UP), *dim, *anims, run_time=run_time)
 
 
@@ -230,10 +251,11 @@ class Opening(S29):
         self.fade_all()
         clock = Clock(2.3).move_to(LEFT * 2.6 + CENTRE)
         keys = VGroup()
-        for k, name, per in (("s", "seconds", "60 s"), ("m", "minutes", "3,600 s"), ("h", "hours", "43,200 s")):
+        for k, name, per in (("s", "seconds", "60"), ("m", "minutes", "3{,}600"), ("h", "hours", "43{,}200")):
             colour = {"s": SECOND, "m": MINUTE, "h": HOUR}[k]
             keys.add(VGroup(Line(ORIGIN, RIGHT * 0.6, stroke_color=colour, stroke_width=8),
-                            X(name, 32, C.WHITE), X("1 turn = " + per, 30, C.MUTED)).arrange(RIGHT, buff=0.3))
+                            X(name, 32, C.WHITE), TX(r"1\ \text{turn} = " + per + r"\,\text{s}", size=34,
+                                                     color=C.MUTED)).arrange(RIGHT, buff=0.3))
         keys.arrange(DOWN, buff=0.45, aligned_edge=LEFT).move_to(RIGHT * 3.3 + CENTRE)
         with self.beat("לשעון שלושה מחוגים, וכולם זזים ברציפות.\nגם מחוג השניות מחליק ולא קופץ."):
             self.play(FadeIn(clock), run_time=0.8)
@@ -253,8 +275,9 @@ class ChapterA(S29):
         self.chapter_card("סעיף א", "כמה פגישות ביממה",
                           "סעיף א : כמה פעמים ביממה\nנפגשים לפחות שני מחוגים?")
 
-        rules = lines(("day:  00:00:00 ≤ t ≤ 23:59:59", ()), ("24:00:00  →  the next day", ()),
-                      ("all three at once  =  1 meeting", ()), size=38, align_eq=False)
+        rules = lines((r"\text{day:}\quad 00{:}00{:}00 \le t \le 23{:}59{:}59", ()),
+                      (r"24{:}00{:}00 \;\rightarrow\; \text{the next day}", ()),
+                      (r"\text{all three at once} \;=\; 1\ \text{meeting}", ()), size=38, align_eq=False)
         rules.move_to(CENTRE)
         rules[1].set_color(C.MUTED)
         self.say("היממה : מ-00:00:00 ועד 23:59:59, כולל.\nחצות של סוף היממה שייכת ליממה הבאה.",
@@ -276,10 +299,10 @@ class ChapterA(S29):
         self.fade_all()
 
         # Step 1: turns a day.
-        s1 = lines(("day = 86,400 s", ("86,400",)),
-                   ("nₛ = 86,400 / 60 = 1,440", ("1,440",)),
-                   ("nₘ = 86,400 / 3,600 = 24", ("24",)),
-                   ("nₕ = 86,400 / 43,200 = 2", ("= 2",)), size=48).move_to(CENTRE)
+        s1 = lines(([r"\text{day}", "=", r"86{,}400", r"\,\text{s}"], (2,)),
+                   ([r"n_s", "=", r"\frac{86{,}400}{60}", "=", r"1{,}440"], (4,)),
+                   ([r"n_m", "=", r"\frac{86{,}400}{3{,}600}", "=", r"24"], (4,)),
+                   ([r"n_h", "=", r"\frac{86{,}400}{43{,}200}", "=", r"2"], (4,)), size=44).move_to(CENTRE)
         self.reveal(s1, 0, "שלב 1 : ביממה יש 86,400 שניות.\nכמה סיבובים מסיים בה כל מחוג?")
         self.reveal(s1, 1, "מחוג השניות : 86,400 חלקי 60,\nכלומר 1,440 סיבובים ביממה.")
         with self.beat("מחוג הדקות מסיים 24 סיבובים,\nומחוג השעות רק 2."):
@@ -309,8 +332,8 @@ class ChapterA(S29):
         side = VGroup(
             VGroup(Dot(radius=0.14, color=MINUTE), X("minutes: 1 turn / hour", 30)).arrange(RIGHT, buff=0.25),
             VGroup(Dot(radius=0.14, color=HOUR), X("hours: 1 turn / 12 h", 30)).arrange(RIGHT, buff=0.25),
-            VGroup(X("t =", 34, C.MUTED), anchor).arrange(RIGHT, buff=0.25),
-            VGroup(X("meetings in [0, t]:", 34, C.MUTED), slot).arrange(RIGHT, buff=0.25),
+            VGroup(TX(r"t =", size=34, color=C.MUTED), anchor).arrange(RIGHT, buff=0.25),
+            VGroup(TX(r"\text{meetings in } [0, t]:", size=34, color=C.MUTED), slot).arrange(RIGHT, buff=0.25),
         ).arrange(DOWN, buff=0.45, aligned_edge=LEFT).move_to(RIGHT * 3.4 + CENTRE)
         count = always_redraw(lambda: M(str(math.floor(t.get_value() / T + 1e-6) + 1), 52, C.AMBER)
                               .move_to(slot, aligned_edge=LEFT))
@@ -329,12 +352,13 @@ class ChapterA(S29):
             m.clear_updaters()
         self.fade_all()
 
-        s2 = lines(("gap:  0  →  n(fast) − n(slow)  turns", ()),
-                   ("meet at gap 0, 1, 2, …, n(fast) − n(slow) − 1", ()),
-                   ("N = n(fast) − n(slow)", ()),
-                   ("Nₛₘ = 1,440 − 24 = 1,416", ("1,416",)),
-                   ("Nₛₕ = 1,440 − 2 = 1,438", ("1,438",)),
-                   ("Nₘₕ = 24 − 2 = 22", ("22",)), size=42).move_to(CENTRE)
+        nf, ns = r"n_{\text{fast}}", r"n_{\text{slow}}"
+        s2 = lines((r"\text{gap:}\quad 0 \;\rightarrow\; " + nf + " - " + ns + r"\ \ \text{turns}", ()),
+                   (r"\text{meet at gap}\ \ 0, 1, 2, \dots, " + nf + " - " + ns + " - 1", ()),
+                   ([r"N", "=", nf + " - " + ns], ()),
+                   ([r"N_{sm}", "=", r"1{,}440 - 24", "=", r"1{,}416"], (4,)),
+                   ([r"N_{sh}", "=", r"1{,}440 - 2", "=", r"1{,}438"], (4,)),
+                   ([r"N_{mh}", "=", r"24 - 2", "=", r"22"], (4,)), size=42).move_to(CENTRE)
         self.reveal(s2, 0, "ביממה הפער בין שני מחוגים גדל\nבקצב קבוע, מ-0 עד הפרש הסיבובים.")
         self.reveal(s2, 1, "הם נפגשים בכל פעם שהפער שלם.\nהפער הסופי מגיע רק בחצות של סוף היממה.")
         self.reveal(s2, 2, "ולכן לכל זוג : מספר הפגישות ביממה\nהוא ההפרש בין מספרי הסיבובים.")
@@ -378,15 +402,16 @@ class ChapterA(S29):
         self.say("ביממה יש שני רגעים כאלה, 00:00 ו-12:00.\nמורידים 2 על כל אחד.")
         self.fade_all()
 
-        s4 = lines(("Nₛₘ + Nₛₕ + Nₘₕ = 1,416 + 1,438 + 22 = 2,876", ("2,876",)),
-                   ("N = 2,876 − 2 · 2 = 2,872", ("2,872",)), size=46).move_to(CENTRE)
+        s4 = lines(([r"N_{sm} + N_{sh} + N_{mh}", "=", r"1{,}416 + 1{,}438 + 22", "=", r"2{,}876"], (4,)),
+                   ([r"N", "=", r"2{,}876 - 2 \cdot 2", "=", r"2{,}872"], (4,)), size=46).move_to(CENTRE)
         self.reveal(s4, 0, "סכום הזוגות : 2,876.")
         self.reveal(s4, 1, "התשובה : 2,876 פחות 2 כפול 2,\nכלומר 2,872 פגישות ביממה.")
         self.fade_all()
 
         # Why only 00:00 and 12:00: the seconds hand at every meeting of minutes and hours.
-        head = ["k", "time", "m & h", "s"]
-        body = [[str(k), lab, f"{float(a):.2f}", f"{float(b):.2f}"] for k, lab, a, b in TICKS]
+        head = ["$k$", "time", "m & h", "s"]
+        body = [[f"${k}$", "$" + lab.replace(":", "{:}") + "$", f"${float(a):.2f}$", f"${float(b):.2f}$"]
+                for k, lab, a, b in TICKS]
         left = grid([head] + body[:6], size=28, hbuff=0.45)
         right = grid([head] + body[6:], size=28, hbuff=0.45)
         tables = VGroup(left, right).arrange(RIGHT, buff=1.3, aligned_edge=UP)
@@ -406,9 +431,9 @@ class ChapterA(S29):
         self.fade_all()
 
         # The trap.
-        trap = lines(("12 h, no ends:  N = 707 + 718 + 10 = 1,435", ()),
-                     ("2 · 1,435 = 2,870", ()),
-                     ("2 · 1,435 + 2 = 2,872", ("2,872",)), size=44).move_to(CENTRE)
+        trap = lines(([r"12\,\text{h, no ends:}\quad N", "=", r"707 + 718 + 10", "=", r"1{,}435"], ()),
+                     ([r"2 \cdot 1{,}435", "=", r"2{,}870"], ()),
+                     ([r"2 \cdot 1{,}435 + 2", "=", r"2{,}872"], (2,)), size=44).move_to(CENTRE)
         trap[1].set_color(C.RED)
         self.reveal(trap, 0, "המלכודת : לספור 12 שעות ולהכפיל.\nבלי הקצוות, ב-12 שעות יש 1,435 פגישות.")
         self.reveal(trap, 1, "פי 2 זה 2,870, וחסרים\nהרגעים 00:00 ו-12:00 עצמם.")
@@ -422,9 +447,10 @@ class ChapterB(S29):
                           "סעיף ב, בונוס : נוסחה לכל שני מחוגים,\nוהוכחה מתי שלושתם נפגשים.")
 
         # Steps 1-2: the gap grows linearly; it crosses an integer every T.
-        s1 = lines(("two hands:  tᵢ < tⱼ   (seconds a turn)", ()),
-                   ("θᵢ(t) = t / tᵢ   (turns)", ()),
-                   ("ωᵢ − ωⱼ = 1/tᵢ − 1/tⱼ = (tⱼ − tᵢ) / (tᵢ tⱼ)", ("(tⱼ − tᵢ) / (tᵢ tⱼ)",)),
+        s1 = lines((r"\text{two hands:}\quad t_i < t_j \quad (\text{seconds a turn})", ()),
+                   (r"\theta_i(t) = \frac{t}{t_i} \quad (\text{turns})", ()),
+                   ([r"\omega_i - \omega_j", "=", r"\frac{1}{t_i} - \frac{1}{t_j}", "=",
+                     r"\frac{t_j - t_i}{t_i\, t_j}"], (4,)),
                    size=44, align_eq=False).move_to(CENTRE)
         self.reveal(s1, 0, "שני מחוגים, עם זמני סיבוב t_i < t_j.\nכל כמה זמן הם נפגשים?")
         self.reveal(s1, 1, "מודדים זוויות בסיבובים. מחוג עם זמן\nסיבוב t_i עושה 1/t_i סיבובים בשנייה.")
@@ -437,11 +463,11 @@ class ChapterB(S29):
         dashes = VGroup(*[DashedLine(ax.c2p(0, k), ax.c2p(3.6, k), color=C.MUTED, stroke_width=2.5,
                                      stroke_opacity=0.7)
                           for k in (1, 2, 3)])
-        ylab = VGroup(*[X(str(k), 28, C.MUTED).next_to(ax.c2p(0, k), LEFT, buff=0.2) for k in range(4)])
-        xlab = VGroup(*[X(s, 28, C.MUTED).next_to(ax.c2p(k, 0), DOWN, buff=0.2)
+        ylab = VGroup(*[TX(str(k), size=30, color=C.MUTED).next_to(ax.c2p(0, k), LEFT, buff=0.2) for k in range(4)])
+        xlab = VGroup(*[TX(s, size=30, color=C.MUTED).next_to(ax.c2p(k, 0), DOWN, buff=0.2)
                         for k, s in ((1, "T"), (2, "2T"), (3, "3T"))])
-        yname = X("θᵢ − θⱼ  (turns)", 30, C.WHITE).next_to(ax.c2p(0, 3.6), UP, buff=0.15).shift(RIGHT * 0.6)
-        xname = X("t", 30, C.WHITE).next_to(ax.c2p(3.6, 0), RIGHT, buff=0.15)
+        yname = TX(r"\theta_i - \theta_j\ \ (\text{turns})", size=32).next_to(ax.c2p(0, 3.6), UP, buff=0.15).shift(RIGHT * 0.6)
+        xname = TX("t", size=32).next_to(ax.c2p(3.6, 0), RIGHT, buff=0.15)
         graph = ax.plot(lambda x: x, x_range=[0, 3.5], color=MINUTE, stroke_width=5)
         dots = VGroup(*[Dot(ax.c2p(k, k), radius=0.12, color=MEET) for k in range(4)])
         drops = VGroup(*[DashedLine(ax.c2p(k, k), ax.c2p(k, 0), color=MEET, stroke_width=2) for k in (1, 2, 3)])
@@ -454,12 +480,15 @@ class ChapterB(S29):
                  Create(drops), FadeIn(xlab), run_time=1.4)
         self.fade_all()
 
-        s2 = lines(("T · (ωᵢ − ωⱼ) = 1", ()),
-                   ("Tᵢⱼ = tᵢ tⱼ / (tⱼ − tᵢ)", ("tᵢ tⱼ / (tⱼ − tᵢ)",)),
-                   ("Tₛₘ = 60 · 3,600 / 3,540 = 3,600/59 ≈ 61.02 s", ("61.02",)),
-                   ("Tₛₕ = 60 · 43,200 / 43,140 = 43,200/719 ≈ 60.08 s", ("60.08",)),
-                   ("Tₘₕ = 3,600 · 43,200 / 39,600 = 43,200/11 ≈ 3,927.27 s", ("3,927.27",)),
-                   size=38).move_to(CENTRE)
+        s2 = lines(([r"T \cdot (\omega_i - \omega_j)", "=", r"1"], ()),
+                   ([r"T_{ij}", "=", r"\frac{t_i\, t_j}{t_j - t_i}"], (2,)),
+                   ([r"T_{sm}", "=", r"\frac{60 \cdot 3{,}600}{3{,}540}", "=", r"\frac{3{,}600}{59}", r"\approx",
+                     r"61.02\,\text{s}"], (6,)),
+                   ([r"T_{sh}", "=", r"\frac{60 \cdot 43{,}200}{43{,}140}", "=", r"\frac{43{,}200}{719}", r"\approx",
+                     r"60.08\,\text{s}"], (6,)),
+                   ([r"T_{mh}", "=", r"\frac{3{,}600 \cdot 43{,}200}{39{,}600}", "=", r"\frac{43{,}200}{11}",
+                     r"\approx", r"3{,}927.27\,\text{s}"], (6,)),
+                   size=38, buff=0.28).move_to(CENTRE)
         self.reveal(s2, 0, "ב-T אחד הפער עולה בסיבוב אחד :\nהקצב כפול T שווה 1.")
         self.reveal(s2, 1, "ולכן T הוא מכפלת זמני הסיבוב\nחלקי ההפרש ביניהם.")
         self.reveal(s2, 2, "מציבים את השעון : לשניות והדקות\nיוצא 3,600 חלקי 59, כ-61.02 שניות.")
@@ -470,10 +499,11 @@ class ChapterB(S29):
         self.fade_all()
 
         # Step 3: the count on an interval, and the page's gapline box.
-        g3 = grid([["[0, L]", "closed", "⌊L/T⌋ + 1"], ["(0, L)", "open", "⌈L/T⌉ − 1"],
-                   ["[0, L)", "half-open", "⌈L/T⌉"]], size=40, head=False, hbuff=0.7, vbuff=0.4,
-                  align="lll", colors={(r, 2): C.AMBER for r in range(3)})
-        title = X("meetings at  0, T, 2T, 3T, …", 40, C.MUTED, disable_ligatures=True)
+        g3 = grid([["$[0, L]$", "closed", r"$\left\lfloor L/T \right\rfloor + 1$"],
+                   ["$(0, L)$", "open", r"$\left\lceil L/T \right\rceil - 1$"],
+                   ["$[0, L)$", "half-open", r"$\left\lceil L/T \right\rceil$"]], size=40, head=False, hbuff=0.7,
+                  vbuff=0.4, align="lll", colors={(r, 2): C.AMBER for r in range(3)})
+        title = TX(r"\text{meetings at}\quad 0,\ T,\ 2T,\ 3T,\ \dots", size=40, color=C.MUTED)
         title.next_to(g3, UP, buff=0.55).align_to(g3, LEFT)
         s3 = VGroup(title, *[row_of(g3, r, 3) for r in range(3)]).move_to(CENTRE)
         self.reveal(s3, 0, "שלב 3 : כמה פגישות יש בקטע באורך L\nשמתחיל בפגישה? תלוי בקצוות.")
@@ -497,11 +527,11 @@ class ChapterB(S29):
 
         heads = ["", "s & m", "s & h", "m & h"]
         rows = [heads,
-                ["L / T  (12 h)"] + [str(RATIO[p]) for p in PAIRS],
-                ["[0, L]"] + [str(CLOSED[p]) for p in PAIRS],
-                ["(0, L)"] + [str(OPEN[p]) for p in PAIRS],
-                ["[0, L)"] + [str(HALFOPEN[p]) for p in PAIRS],
-                ["day  [0, 2L)"] + [f"{COUNT[p]:,}" for p in PAIRS]]
+                [r"$L/T\ \ (12\,\text{h})$"] + [f"${RATIO[p]}$" for p in PAIRS],
+                ["$[0, L]$"] + [f"${CLOSED[p]}$" for p in PAIRS],
+                ["$(0, L)$"] + [f"${OPEN[p]}$" for p in PAIRS],
+                ["$[0, L)$"] + [f"${HALFOPEN[p]}$" for p in PAIRS],
+                [r"$\text{day}\ \ [0, 2L)$"] + ["$" + f"{COUNT[p]:,}".replace(",", "{,}") + "$" for p in PAIRS]]
         table = grid(rows, size=34, hbuff=0.9, vbuff=0.3).move_to(CENTRE)
         ratio = SurroundingRectangle(row_of(table, 1, 4), color=C.AMBER, buff=0.12, corner_radius=0.08)
         day = SurroundingRectangle(row_of(table, 5, 4), color=C.GREEN, buff=0.12, corner_radius=0.08)
@@ -511,12 +541,13 @@ class ChapterB(S29):
         self.fade_all()
 
         # Step 4: the triple meeting, as an equation in integers.
-        s4 = lines(("3,600 · a / 59 = 43,200 · b / 11", ()),
-                   ("a / 59 = 12 · b / 11", ()),
-                   ("11 · a = 708 · b", ("708",)),
-                   ("708 = 2² · 3 · 59,   gcd(11, 708) = 1", ("gcd(11, 708) = 1",)),
-                   ("b = 11c,   a = 708c", ("b = 11c",)),
-                   ("t = 43,200 · 11c / 11 = 43,200 · c", ("43,200 · c",)), size=38).move_to(CENTRE)
+        s4 = lines(([r"\frac{3{,}600\, a}{59}", "=", r"\frac{43{,}200\, b}{11}"], ()),
+                   ([r"\frac{a}{59}", "=", r"\frac{12\, b}{11}"], ()),
+                   ([r"11\, a", "=", r"708", r"\, b"], (2,)),
+                   ([r"708", "=", r"2^2 \cdot 3 \cdot 59,", r"\qquad \gcd(11, 708) = 1"], (3,)),
+                   ([r"b", "=", r"11c,", r"\qquad a = 708c"], (0, 1, 2)),
+                   ([r"t", "=", r"\frac{43{,}200 \cdot 11c}{11}", "=", r"43{,}200 \cdot c"], (4,)),
+                   size=38, buff=0.26).move_to(CENTRE)
         self.say("שלב 4 : פגישה של שלושה היא שתי\nפגישות של זוגות באותו רגע.")
         self.reveal(s4, 0, "השניות והדקות בפגישה a, והדקות\nוהשעות בפגישה b, באותו זמן.")
         self.reveal(s4, 1, "מחלקים את שני הצדדים ב-3,600.")
@@ -528,12 +559,13 @@ class ChapterB(S29):
         self.fade_all()
 
         # Steps 5-6: inclusion and exclusion, and 2,872 again.
-        s5 = lines(("N = Nₛₘ + Nₛₕ + Nₘₕ − 2 · Nₛₘₕ", ("− 2 · Nₛₘₕ",)),
-                   ("N = 1,416 + 1,438 + 22 − 2 · 2 = 2,872", ("2,872",)),
-                   ("12 h, open:  N = 707 + 718 + 10 = 1,435", ("1,435",)), size=42).move_to(CENTRE)
+        s5 = lines(([r"N", "=", r"N_{sm} + N_{sh} + N_{mh}", r"- 2 \cdot N_{smh}"], (3,)),
+                   ([r"N", "=", r"1{,}416 + 1{,}438 + 22 - 2 \cdot 2", "=", r"2{,}872"], (4,)),
+                   ([r"12\,\text{h, open:}\quad N", "=", r"707 + 718 + 10", "=", r"1{,}435"], (4,)),
+                   size=42).move_to(CENTRE)
         self.reveal(s5, 0, "שלב 5 : רגע של שני מחוגים שייך לזוג\nאחד, ורגע של שלושה לשלושת הזוגות.")
         self.say("ולכן מורידים פעמיים את מספר\nהפגישות של שלושה.",
-                 Circumscribe(s5[0][-7:], color=C.AMBER), run_time=1.2)
+                 Circumscribe(s5[0][3], color=C.AMBER), run_time=1.2)
         self.reveal(s5, 1, "ביממה : 1,416 ועוד 1,438 ועוד 22,\nפחות 2 כפול 2. שוב 2,872.")
         self.reveal(s5, 2, "ובקטע הפתוח של 12 שעות אין פגישה\nשל שלושה : 1,435, כמו בבדיקה של סעיף א.")
         self.fade_all()
@@ -541,8 +573,8 @@ class ChapterB(S29):
 
 class Closing(S29):
     def construct(self):
-        self.closing(QID, [("סעיף א", X("1,416 + 1,438 + 22 − 2 · 2 = 2,872", 36, disable_ligatures=True)),
-                           ("סעיף ב", X("Tᵢⱼ = tᵢ tⱼ / (tⱼ − tᵢ)", 36, disable_ligatures=True))],
+        self.closing(QID, [("סעיף א", TX(r"1{,}416 + 1{,}438 + 22 - 2 \cdot 2 = 2{,}872", size=42)),
+                           ("סעיף ב", TX(r"T_{ij} = \frac{t_i\, t_j}{t_j - t_i}", size=42))],
                      ["לסיכום : כל זוג לחוד, ואז מורידים את\nהרגעים של שלושה. 2,872 פגישות ביממה.",
                       "נסו את השעון ואת הגרף בתיבות\nשבעמוד של שאלה 0029 באתר."],
                      holds=(4.0, 4.0))
