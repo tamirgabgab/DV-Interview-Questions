@@ -1,0 +1,424 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0029: the three hands of a clock.
+A junior-level question.
+
+2
+00:00:04.600 --> 00:00:09.267
+Two parts: how many meetings a day,
+then the general formula and the proof.
+
+3
+00:00:10.067 --> 00:00:15.867
+The clock has three hands, and all of them move smoothly.
+Even the second hand glides, it does not jump.
+
+4
+00:00:15.867 --> 00:00:20.667
+The second hand makes a turn in a minute,
+the minute hand in an hour, the hour hand in 12 hours.
+
+5
+00:00:20.667 --> 00:00:25.400
+A meeting: a moment when two hands or more
+point in exactly the same direction.
+
+6
+00:00:25.400 --> 00:00:29.400
+Here the second and minute hands meet,
+at 0:01:01.02. We will see why exactly there.
+
+7
+00:00:30.200 --> 00:00:34.300
+Part A: how many times a day
+do at least two hands meet?
+
+8
+00:00:35.000 --> 00:00:40.500
+The day: from 00:00:00 to 23:59:59, inclusive.
+The midnight at its end belongs to the next day.
+
+9
+00:00:40.500 --> 00:00:44.033
+And a moment when all three meet
+is counted only once.
+
+10
+00:00:44.833 --> 00:00:50.433
+The idea: count each pair of hands on its own,
+then fix what was counted more than once.
+
+11
+00:00:51.233 --> 00:00:56.133
+Step 1: a day has 86,400 seconds.
+How many turns does each hand make in it?
+
+12
+00:00:56.133 --> 00:01:00.733
+The second hand: 86,400 divided by 60,
+that is 1,440 turns a day.
+
+13
+00:01:00.733 --> 00:01:04.633
+The minute hand makes 24 turns,
+and the hour hand only 2.
+
+14
+00:01:05.433 --> 00:01:10.533
+Step 2: in each pair, the fast hand laps the slow one,
+like a fast runner on a track.
+
+15
+00:01:10.533 --> 00:01:16.533
+Every time it gains a whole turn on it,
+they meet. Here, minutes and hours.
+
+16
+00:01:16.533 --> 00:01:22.533
+In 12 hours the minute hand makes 12 turns,
+the hour hand one. It gains 11.
+
+17
+00:01:22.533 --> 00:01:26.500
+The meeting at 12:00 is already the 12th,
+because 00:00 was counted too.
+
+18
+00:01:27.300 --> 00:01:32.300
+Over a day the gap between two hands grows
+at a constant rate, from 0 to the difference in turns.
+
+19
+00:01:32.300 --> 00:01:37.300
+They meet every time the gap is a whole number.
+The final gap comes only at the midnight that ends the day.
+
+20
+00:01:37.300 --> 00:01:42.300
+So for each pair, the number of meetings a day
+is the difference between their numbers of turns.
+
+21
+00:01:42.300 --> 00:01:46.467
+Seconds and minutes: 1,440 minus 24,
+that is 1,416 meetings.
+
+22
+00:01:46.467 --> 00:01:50.067
+Seconds and hours: 1,438.
+Minutes and hours: 22.
+
+23
+00:01:50.867 --> 00:01:55.900
+In the page's box: a clock that jumps
+from meeting to meeting. We start at 00:00.
+
+24
+00:01:55.900 --> 00:02:01.367
+Only the seconds and minutes pair stays checked,
+so the jumps are its own.
+
+25
+00:02:01.367 --> 00:02:06.500
+The first meeting: 0:01:01.02, a little after a minute,
+because the minute hand moved on meanwhile.
+
+26
+00:02:06.500 --> 00:02:09.967
+The next at 0:02:02.03,
+again 61.02 seconds later.
+
+27
+00:02:09.967 --> 00:02:14.633
+And 0:03:03.05. The gap is constant:
+3,600 over 59, about 61.02 seconds.
+
+28
+00:02:14.633 --> 00:02:19.300
+Now seconds and hours, from 00:00.
+The hour hand almost stands still.
+
+29
+00:02:19.300 --> 00:02:24.267
+A meeting at 0:01:00.08: a minute and a bit,
+because the hour hand moves a little.
+
+30
+00:02:24.267 --> 00:02:29.433
+Then 0:02:00.17 and 0:03:00.25:
+every 43,200 over 719, about 60.08 seconds.
+
+31
+00:02:29.433 --> 00:02:33.233
+And the slow pair, minutes and hours.
+Again from 00:00.
+
+32
+00:02:33.233 --> 00:02:38.367
+The first meeting: 1:05:27.27, not 1:05.
+The hour hand has already passed the 1.
+
+33
+00:02:38.367 --> 00:02:43.333
+The second at 2:10:54.55. The gap is constant:
+an hour, 5 minutes and 27.27 seconds.
+
+34
+00:02:43.333 --> 00:02:47.333
+The gap is constant because the angle gap grows steadily.
+So the meetings are equally spaced.
+
+35
+00:02:47.333 --> 00:02:52.800
+Now all the pairs together. Over a day the sum
+is 1,416 plus 1,438 plus 22: 2,876.
+
+36
+00:02:52.800 --> 00:02:56.700
+But that is the number of meetings of pairs,
+not the number of moments.
+
+37
+00:02:56.700 --> 00:03:01.500
+The "next triple" button jumps to 12:00:
+all three hands on the 12.
+
+38
+00:03:01.500 --> 00:03:05.500
+Such a moment is counted in all three pairs
+instead of once. Two too many.
+
+39
+00:03:05.500 --> 00:03:09.500
+A day has two such moments, 00:00 and 12:00.
+We subtract 2 for each.
+
+40
+00:03:10.300 --> 00:03:13.300
+The sum of the pairs: 2,876.
+
+41
+00:03:13.300 --> 00:03:17.833
+The answer: 2,876 minus 2 times 2,
+that is 2,872 meetings a day.
+
+42
+00:03:18.633 --> 00:03:22.633
+Why only two moments? Every meeting of all three
+is also a meeting of the minutes and hours.
+
+43
+00:03:22.633 --> 00:03:27.300
+In 12 hours there are only 11 of those.
+We check where the second hand is at each.
+
+44
+00:03:27.300 --> 00:03:32.700
+At meeting 1, minutes and hours are at tick 5.45,
+and the second hand at tick 27.27. Not together.
+
+45
+00:03:32.700 --> 00:03:38.200
+So in every row, except 0:00:00 and 12:00:00.
+Only there is the second hand on the same tick.
+
+46
+00:03:39.000 --> 00:03:44.000
+The trap: count 12 hours and double it.
+Without the ends, 12 hours have 1,435 meetings.
+
+47
+00:03:44.000 --> 00:03:48.033
+Twice that is 2,870, and the moments
+00:00 and 12:00 themselves are missing.
+
+48
+00:03:48.033 --> 00:03:51.033
+With both of them: 2,872.
+The same answer.
+
+49
+00:03:51.833 --> 00:03:56.933
+Part B, a bonus: a formula for any two hands,
+and a proof of when all three meet.
+
+50
+00:03:57.633 --> 00:04:02.367
+Two hands, with turn times t_i < t_j.
+How often do they meet?
+
+51
+00:04:02.367 --> 00:04:07.367
+Measure angles in turns. A hand with turn time t_i
+makes 1/t_i turns a second.
+
+52
+00:04:07.367 --> 00:04:11.600
+Step 1: the fast hand moves away from the slow one
+at the difference of their speeds.
+
+53
+00:04:12.400 --> 00:04:17.067
+On the graph: the gap in turns against time
+is a straight line rising at a constant rate.
+
+54
+00:04:17.067 --> 00:04:21.667
+The dashed lines are the whole numbers.
+Every crossing is a meeting.
+
+55
+00:04:21.667 --> 00:04:26.767
+Step 2: the crossings are equally spaced, T apart.
+The gap grows by a whole turn every T.
+
+56
+00:04:27.567 --> 00:04:31.733
+In one T the gap grows by one turn:
+the rate times T equals 1.
+
+57
+00:04:31.733 --> 00:04:35.700
+So T is the product of the turn times
+divided by their difference.
+
+58
+00:04:35.700 --> 00:04:40.700
+Put in the clock: for seconds and minutes
+it is 3,600 over 59, about 61.02 seconds.
+
+59
+00:04:40.700 --> 00:04:46.300
+For seconds and hours about 60.08 seconds, for minutes
+and hours about 3,927.27. As in part A's box.
+
+60
+00:04:47.100 --> 00:04:52.100
+Step 3: how many meetings in an interval of length L
+that starts at a meeting? It depends on the ends.
+
+61
+00:04:52.100 --> 00:04:57.067
+The meetings are at 0, T, 2T and so on.
+Count how many fall in the interval.
+
+62
+00:04:57.067 --> 00:05:01.800
+In a closed interval: every k from 0 to L/T,
+that is L/T rounded down, plus 1.
+
+63
+00:05:01.800 --> 00:05:06.200
+An open interval drops both 0 and L,
+a half-open one only L.
+
+64
+00:05:07.000 --> 00:05:12.400
+In the page's box: minutes and hours, with
+an interval of 3T. Closed: 4 meetings.
+
+65
+00:05:12.400 --> 00:05:17.533
+Open: a hollow dot is not counted.
+Both ends are out, and 2 meetings remain.
+
+66
+00:05:17.533 --> 00:05:21.200
+Half-open: 0 in and L out,
+so 3 meetings.
+
+67
+00:05:21.200 --> 00:05:26.000
+When L is 2.75T, the end L is not a meeting.
+Half-open: still 3.
+
+68
+00:05:26.000 --> 00:05:30.233
+Then only the end 0 matters: closed
+has 3, like half-open.
+
+69
+00:05:30.233 --> 00:05:33.367
+And open has 2,
+without the end 0.
+
+70
+00:05:34.167 --> 00:05:39.667
+Over 12 hours, L/T is 708, 719 and 11:
+exactly the differences in turns, as in part A.
+
+71
+00:05:39.667 --> 00:05:45.067
+And over a day, half-open: 1,416, 1,438
+and 22. The same numbers as in part A.
+
+72
+00:05:45.867 --> 00:05:49.867
+Step 4: a meeting of all three is two
+meetings of pairs at the same moment.
+
+73
+00:05:49.867 --> 00:05:54.600
+Seconds and minutes at meeting a, minutes
+and hours at meeting b, at the same time.
+
+74
+00:05:54.600 --> 00:05:57.600
+Divide both sides by 3,600.
+
+75
+00:05:57.600 --> 00:06:01.700
+Multiply by 59 and by 11, and we get
+an equation in whole numbers.
+
+76
+00:06:01.700 --> 00:06:06.233
+But 708 is 4 times 3 times 59,
+and it has no common divisor with 11.
+
+77
+00:06:06.233 --> 00:06:09.633
+So 11 divides b: b = 11c,
+and a = 708c.
+
+78
+00:06:09.633 --> 00:06:13.600
+And the time is 43,200 times c:
+only multiples of 12 hours.
+
+79
+00:06:13.600 --> 00:06:17.600
+In a day these are c = 0 and c = 1,
+that is 00:00 and 12:00 only.
+
+80
+00:06:18.400 --> 00:06:23.400
+Step 5: a moment of two hands belongs to one pair,
+a moment of three to all three pairs.
+
+81
+00:06:23.400 --> 00:06:27.200
+So we subtract twice the number
+of meetings of all three.
+
+82
+00:06:27.200 --> 00:06:32.000
+Over a day: 1,416 plus 1,438 plus 22,
+minus 2 times 2. Again 2,872.
+
+83
+00:06:32.000 --> 00:06:37.000
+And the open 12 hours have no meeting of three:
+1,435, as in the check of part A.
+
+84
+00:06:37.798 --> 00:06:43.398
+In short: each pair on its own, then subtract
+the moments of three. 2,872 meetings a day.
+
+85
+00:06:43.398 --> 00:06:48.798
+Try the clock and the graph in the boxes
+on the page of question 0029 on the site.

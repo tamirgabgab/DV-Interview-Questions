@@ -29,7 +29,8 @@ module literal `BOXES` of `videos/<id>/scene.py`:
 - **steps**: a list of actions, or {"do": [...], "repeat": n}. An action is
   ["click", sel] (a button, a cell of a figure; several clicks may make one step),
   ["fill", sel, value] (typed, then Enter, as a reader applies a field), ["check", sel,
-  true|false], or ["wait", ms]. A selector is a Playwright selector inside the box,
+  true|false], ["set", sel, value] (a <select> or a slider: the value, then its input and
+  change events), or ["wait", ms]. A selector is a Playwright selector inside the box,
   `button:has-text("דוגמת העמוד")` included.
 
 The page is the built site (`mkdocs build`, served locally) in Chromium at 1280 px, the
@@ -158,6 +159,12 @@ def _act(page, b: int, action: list) -> list[dict]:
         return [rect]
     if kind == "check":
         el.set_checked(bool(action[2]))
+        return [rect]
+    if kind == "set":
+        # a <select> or a slider: its value set, then the events a reader's change fires
+        page.evaluate("""([el, v]) => { el.value = v;
+          el.dispatchEvent(new Event("input", {bubbles: true}));
+          el.dispatchEvent(new Event("change", {bubbles: true})); }""", [handle, str(action[2])])
         return [rect]
     raise ValueError(f"unknown action {action!r}")
 
