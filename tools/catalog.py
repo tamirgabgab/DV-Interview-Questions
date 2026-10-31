@@ -2,8 +2,9 @@
 """Write CATALOG.md: every question's id, its Hebrew title as a link to its page on the
 live site, and its level, read from the pages' front matter. Also write the README's table
 of tutorial videos (between `<!-- videos -->` and `<!-- /videos -->`): one row per
-`videos/<id>/script.md`, with the page, the number of chapters and the YouTube link once
-the page has a `video:` id.
+`videos/<id>/script.md`, with the page, the number of chapters, the length and download
+links to the files of `videos/<id>/release/` (render.py --release writes them and their
+info.json), and the YouTube link once the page has a `video:` id.
 
     python tools/catalog.py           # rewrite CATALOG.md and the README's video table
     python tools/catalog.py --check   # exit 1 when either is out of date
@@ -20,6 +21,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://tamirgabgab.github.io/DV-Interview-Questions/"
+RAW = "https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/"
+RELEASE = [("{id}.mp4", "video"), ("{id}-music.mp4", "with music"), ("{id}-music.mp3", "music"),
+           ("{id}.he.vtt", "Hebrew captions"), ("{id}.en.vtt", "English captions"),
+           ("{id}-chapters.txt", "chapters")]
 LEVELS = {"student": "student (סטודנט)", "junior": "junior (ג'וניור)", "senior": "senior (סניור)"}
 FIELD = re.compile(r"^(id|title|level|video):\s*(.+?)\s*$", re.M)
 VIDEOS = re.compile(r"(<!-- videos -->\n).*?(<!-- /videos -->)", re.S)
@@ -50,19 +55,33 @@ def render(root: Path) -> str:
 
 
 def video_rows(root: Path) -> str:
-    """The README's video table: a row per question with a video script."""
+    """The README's video table: a row per question with a video script, its files to
+    download from videos/<id>/release/ (render.py --release) and its YouTube link."""
+    import json
+
     by_id = {int(f["id"]): (f, path) for f, path in fronts(root)}
     rows = []
     for script in sorted((root / "videos").glob("[0-9][0-9][0-9][0-9]/script.md")):
         qid = int(script.parent.name)
         front, path = by_id[qid]
         chapters = len(re.findall(r"^## Chapter", script.read_text(encoding="utf-8"), re.M))
+        info_path = script.parent / "release" / "info.json"
+        if info_path.exists():
+            info = json.loads(info_path.read_text(encoding="utf-8"))
+            length = f"{int(info['seconds'] // 60)}:{int(info['seconds'] % 60):02d}"
+            base = f"{RAW}videos/{qid:04d}/release/"
+            links = [f"[{label}]({base}{name.format(id=f'{qid:04d}')})" for name, label in RELEASE
+                     if name.format(id=f"{qid:04d}") in info["files"]]
+            files = " · ".join(links)
+        else:
+            length, files = "–", "not rendered yet"
         vid = front.get("video", "").strip("'\"")
-        watch = f"[YouTube](https://youtu.be/{vid})" if vid else "rendered, waiting for the upload"
-        rows.append(f"| {qid:04d} | [{front['title']}]({SITE}{path}) | {chapters} | {watch} |")
+        if vid:
+            files += f" · [YouTube](https://youtu.be/{vid})"
+        rows.append(f"| {qid:04d} | [{front['title']}]({SITE}{path}) | {chapters} | {length} | {files} |")
     if not rows:
         return "No videos yet.\n"
-    return ("| Id | Question | Chapters | Watch |\n|----|----------|----------|-------|\n"
+    return ("| Id | Question | Chapters | Length | Download |\n|----|----------|----------|--------|----------|\n"
             + "\n".join(rows) + "\n")
 
 

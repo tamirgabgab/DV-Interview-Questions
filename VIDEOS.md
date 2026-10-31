@@ -14,10 +14,12 @@ Once their structure is approved, the rest follow it question by question.
 | Narration | Captions only for now. The script is written so a voice can be added later |
 | Hebrew text | Kept out of the picture as far as possible. The Hebrew captions are a separate WebVTT file shown by the player |
 | Hosting | YouTube, on the owner's channel. The site embeds the video |
+| In the repository (2026-10-31) | The finished files of every video are kept in `videos/<id>/release/` and linked from the README's "Tutorial videos" table; the owner downloads them and uploads them to YouTube at their own time. Nothing is uploaded from here |
+| The page's box (2026-10-31) | Every chapter shows the page's own interactive box, captured from the built site (not redrawn): in the idea or steps beat, alone and large, played on the page's example with each click marked; and after the code is typed, beside it on a split screen, the box stepping with the traced lines. See "The page's box" |
 | Look | The site's navy (the hero's) with amber marks, one version for both schemes |
 | On the page | One video per question, a chapter per part: 1–3 minutes for a part without code; 2–4 minutes for a part with code, more when the code is long (2026-10-31, with the typed code beat) |
 | Pace | Calm, in the style of 3Blue1Brown: animations of 1–2 s, every picture held 2–4 s for its caption |
-| Code beat | Python only |
+| Code beat | Python, except a DV question whose answer is SystemVerilog constraints: there the SV class is typed (0011, the owner, 2026-10-31). Where a part has a naive and an efficient solution, only the efficient one is typed and the naive one is named in the idea (0006) |
 | Typed code (2026-10-31) | The code beat types the answer live: character by character, line by line, with a blinking amber cursor, and pauses after each line, or a small group of lines that make one operation, for a caption that says what it does and why. Only then the traced run on the page's example follows, in the same panel. A video gets 2–3 minutes longer, which the owner accepts |
 | Opening and closing | The drawn DV mark, the question's id and parts; the closing has the site's address and the question's id |
 | Captions (2026-10-31) | Two caption tracks go up with every video: Hebrew (`captions.vtt`) and English (`captions.en.vtt`, for viewers who are not Israeli). Neither is on by default, on YouTube or in the site's player: shown, they cover part of the picture, so the viewer turns them on |
@@ -65,11 +67,15 @@ in the same order.
       Chapter א (1–3 min; 2–4 with code, more when the code is long)
         1. The problem   — the part's setting drawn (the objects, the input, what is asked)
         2. The idea      — one picture of the key insight (the "aha"), held still for a moment
-        3. The steps     — the page's worked example, animated step by step
+        3. The steps     — the page's worked example, animated step by step; then the
+                           page's box, large, played on the same example (a click marked
+                           on each control it presses)
         4. The code      — typed, explained, traced: the Python answer typed live into an
                            empty panel, a caption after each line or group of lines (what
-                           it does and why); then run on the example, its lines lit in the
-                           order they run, the variables beside it
+                           it does and why); then the split screen: the code moves to the
+                           left, the box comes in on the right, and the run on the example
+                           lights the lines in the order they run while the box steps
+                           with them (the variables under the code, when there is room)
         5. Why it works  — the proof as a picture (an invariant, a table, a case split)
         6. The cost      — time and memory as two chips, and where they come from
         7. One trap      — the most common mistake, shown failing on a small input
@@ -89,10 +95,10 @@ Rules for every video:
 - **One idea per beat.** A beat ends on a still frame that holds for at least two
   seconds, so a pause lands on a readable picture.
 - **The code is the page's code.** The code beat loads the code from the page's Python
-  tab (`tools/extract_code.py`, without the annotation markers), so it never drifts from
-  the tested code. Python only: the SystemVerilog stays on the page. A long function may
-  leave its comment and blank lines out of the picture (0004's first solution), never its
-  code.
+  tab (`tools/extract_code.py`, without the annotation markers; `dvq.page_code()` for the
+  SystemVerilog tab), so it never drifts from the tested code. Python, unless the answer is
+  SystemVerilog constraints (0011). A long function may leave its comment and blank lines
+  out of the picture (0004's first solution), never its code.
 - **The code is typed, explained, then traced** (the owner, 2026-10-31). The code beat
   has two halves in one panel:
   1. **Typed.** `DVQScene.type_code(panel, groups)` types the function into an empty
@@ -140,6 +146,50 @@ Rules for every video:
   and `(k + 1) % 3` with its parenthesis moved. Both the browser and libass (the burned
   preview) honour the isolates.
 
+## The page's box
+
+The owner asked to see the box of the page in the video (2026-10-31), so the viewer sees
+the way to the answer, and the answer, the way the page shows it. The box is not redrawn:
+`videos/lib/box_shots.py` captures it from the built site, and the scene shows the
+pictures.
+
+- **The spec.** `scene.py` names its boxes in the module literal `BOXES`: per name, the
+  page's box (`"box": n`, the n-th `div.explorer`), the `region` (the selectors whose
+  union is cropped: the figure, the player and the line that explains the step; the
+  controls the box is driven by are best inside it), `hide` (a hint line inside the
+  region that the video does not need) and the `steps`: one picture after each list of
+  actions (`["click", sel]`, `["fill", sel, value]`, `["check", sel, bool]`, `["wait",
+  ms]`; `{"do": [...], "repeat": n}` for n pictures). The format is in box_shots.py's
+  docstring.
+- **The capture.** `render.py` builds the site into `videos/.cache/site` (again when
+  `docs/` or `hooks/` is newer), serves it, and runs box_shots.py with the Python that has
+  Playwright: Chromium at 1280 px, the dark scheme (the video is navy), twice the pixels,
+  the site's sticky bars hidden, the CDN scripts from `.cache/cdn`. The pictures and
+  `shots.json` (each picture's file and the rectangles of the controls its step clicked)
+  go to `out/boxes/<name>/`, cached by a hash of the spec, the page and the site's scripts
+  and styles.
+- **In the scene.** `dvq.BoxView(QID, name, height=...)` shows one picture in a thin frame.
+  `self.box_step(view, k)` goes to picture k: an amber ring closes on each control the step
+  clicked (a tap), then the picture changes. `self.box_beat(view, [(k, caption), ...])` plays
+  the box on the example, a caption per step (the idea or steps beat).
+- **The split screen.** After the code is typed, `self.split(panel, view, vp)` moves the
+  panel (and the variables, under it) into the left part of the frame and fades the box in
+  on the right, both as large as the room allows. `run_code(..., view=view)` takes groups
+  `(lines, caption, k)`: the box steps to picture k as the group's caption appears, and the
+  lines run under it. A SystemVerilog answer has no trace: `walk_code(panel, view, [(lines,
+  caption, k), ...])` lights the lines of each group (the window scrolls to them) while the
+  box steps. When the code's lines are too wide to share the frame (0011's constraints),
+  the code of one group stands above the box instead of beside it (a panel of those lines,
+  `CodePanel(code, only=...)`).
+- **Readable.** The box is shown at least at 80 % of its size on the page
+  (`MIN_BOX_SCALE`), and the code beside it at least 19 px (`MIN_SPLIT_EM`; typed alone it
+  stays at least 23). The record of each scene lists a breach as a problem, and the render
+  fails on it.
+- **Long code.** A panel may be a window of `rows` lines (`CodePanel(..., rows=14)`): the
+  typing scrolls it so that each group is whole in it, and the trace or `walk_code` scrolls
+  it to the lines it lights. A helper that only prints (0011's `show()`) may stay out of the
+  picture (`only=`), and a caption says so.
+
 ## The files
 
 Everything for one question lives in its own folder. Shared code sits in `videos/lib`.
@@ -151,14 +201,17 @@ videos/
 │   │                   # code beat (typed from the page, then traced), chips, caption recorder
 │   ├── captions.py     # writes captions.vtt and chapters.txt from the recorded captions
 │   ├── he_label.py     # renders a Hebrew label to a transparent PNG with Playwright
+│   ├── box_shots.py    # captures the page's box step by step from the built site
 │   └── music.py        # generates the video's background music from a seed (numpy + ffmpeg)
 ├── 0002/
 │   ├── script.md       # the storyboard: per chapter, per beat, the picture and the caption (Hebrew)
 │   ├── captions.en.md  # the English captions: each Hebrew caption of script.md with its translation
 │   ├── scene.py        # the Manim scenes, one class per chapter + Opening + Closing
-│   └── out/            # rendered, not committed: video.mp4 (with the music), music.wav,
-│                       # captions.vtt, captions.en.vtt, chapters.txt, parts/ (each scene's
-│                       # recorded captions), media/ (Manim's files)
+│   ├── out/            # rendered, not committed: video.mp4 (silent), music.wav, music.mp3,
+│   │                   # captions.vtt, captions.en.vtt, chapters.txt, parts/ (each scene's
+│   │                   # recorded captions), boxes/ (the box's pictures), media/ (Manim's files)
+│   └── release/        # committed (render.py --release): 0002.mp4 (silent), 0002-music.mp4,
+│                       # 0002-music.mp3, 0002.he.vtt, 0002.en.vtt, 0002-chapters.txt, info.json
 └── 0004/ …
 ```
 
@@ -384,15 +437,21 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
 
 ## Publishing and linking
 
-1. **Upload.** The owner uploads `video.mp4` to the YouTube channel. Unlisted or public
-   is the owner's call per video.
+0. **The release.** `render.py <id> --release` (720p, with no problem) copies the finished
+   files into `videos/<id>/release/`, and `python tools/catalog.py` puts their download
+   links into the README's "Tutorial videos" table (the length and the files, from
+   `release/info.json`). The folder is committed; that is where the owner takes the
+   videos from (2026-10-31).
+1. **Upload.** The owner uploads `<id>.mp4` (or `<id>-music.mp4`, or the video edited with
+   `<id>-music.mp3`) to the YouTube channel. Unlisted or public is the owner's call per
+   video.
 2. **Captions and chapters.** In YouTube Studio, under the video's Subtitles:
    - set the video's language to Hebrew;
-   - add a language, Hebrew, and upload `captions.vtt` as a file "with timing";
-   - add a language, English, and upload `captions.en.vtt` the same way;
+   - add a language, Hebrew, and upload `<id>.he.vtt` as a file "with timing";
+   - add a language, English, and upload `<id>.en.vtt` the same way;
    - leave both tracks off by default: do not set either one as the default track, and do
      not turn captions on for the video. The viewer picks a track in the player's settings;
-   - paste `chapters.txt` into the description (YouTube makes chapters from it).
+   - paste `<id>-chapters.txt` into the description (YouTube makes chapters from it).
 3. **The page.** The video id and the chapter times go into the page's front matter:
 
    ```yaml
@@ -473,7 +532,8 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
 | V3 | The site side: front matter fields, the hook's button, links and dialog, `check_videos.py`, CONTRIBUTING | 0002's page plays its video from YouTube at each part |
 | V4 | Pilot 0004: script → review → scenes (Hebrew box labels by `he_label.py`) → render | approved, and the Hebrew-label route is proven |
 | V5 | Freeze the structure: lessons from the pilots folded into this file | the owner approves |
-| V6… | The rest, a few questions per round, short questions first (student, then junior) | each video approved before upload |
+| V6 | The page's box in every chapter (idea beat and split screen), the release folder and the README's download links; 0002 and 0004 again with the box, and two more: 0006 (stock, long / short) and 0011 (random final tic-tac-toe board, the SV class) | the owner approves the four videos |
+| V7… | The rest, a few questions per round, short questions first (student, then junior) | each video approved before upload |
 
 ## The pilots' storyboards (outline; the full scripts are step V2 and V4)
 

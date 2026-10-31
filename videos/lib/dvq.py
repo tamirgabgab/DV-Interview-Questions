@@ -303,22 +303,28 @@ def dv_mark(height: float = 2.0) -> VGroup:
 # The code beat
 # --------------------------------------------------------------------------------------
 
-ANNOTATION = re.compile(r"[ \t]*#[ \t]*\(\d+\)!?[ \t]*$")
-ANNOTATION_IN_COMMENT = re.compile(r"(#[^\n]*?)[ \t]*\(\d+\)!?[ \t]*$")
+ANNOTATION = re.compile(r"[ \t]*(?:#|//)[ \t]*\(\d+\)!?[ \t]*$")
+ANNOTATION_IN_COMMENT = re.compile(r"((?:#|//)[^\n]*?)[ \t]*\(\d+\)!?[ \t]*$")
+COMMENT = {"python": "#", "systemverilog": "//"}
 
 
-def page_python(qid: int | str, marker: str) -> str:
-    """The Python block of the page that contains `marker`, without the annotation
-    markers (`# (1)!`, ` (1)` at the end of a comment), which only carry page notes."""
+def page_code(qid: int | str, lang: str, marker: str) -> str:
+    """The `lang` block of the page that contains `marker`, without the annotation markers
+    (`# (1)!`, `// (1)!`, ` (1)` at the end of a comment), which only carry page notes."""
     import extract_code  # tools/extract_code.py: the parser the tests use
 
-    code = extract_code.pick(qid, "python", marker)
+    code = extract_code.pick(qid, lang, marker)
     lines = []
     for line in code.rstrip("\n").split("\n"):
         line = ANNOTATION.sub("", line)
         line = ANNOTATION_IN_COMMENT.sub(r"\1", line)
         lines.append(line.rstrip())
     return "\n".join(lines) + "\n"
+
+
+def page_python(qid: int | str, marker: str) -> str:
+    """The page's Python block that contains `marker` (see page_code)."""
+    return page_code(qid, "python", marker)
 
 
 @dataclass
@@ -356,6 +362,16 @@ def trace(code: str, func: str, args: tuple, env: dict | None = None) -> tuple[l
     return steps, result
 
 
+class Bounded(VGroup):
+    """A group measured by its parts' own bounds, so a windowed CodePanel in it counts as
+    its window."""
+
+    def get_points_defining_boundary(self):
+        pts = [m.get_points_defining_boundary() for m in self.submobjects]
+        pts = [p for p in pts if len(p)]
+        return np.concatenate(pts) if pts else np.zeros((0, 3))
+
+
 class CodePanel(VGroup):
     """The page's code in the navy theme, with a cursor that lights one line.
 
@@ -364,18 +380,25 @@ class CodePanel(VGroup):
     moved and scaled: the cursor is placed from its background."""
 
     def __init__(self, code: str, font_size: float = 24, drop_comments: bool = False,
-                 drop_trailing_comments: bool = False, line_spacing: float = 0.7):
+                 drop_trailing_comments: bool = False, line_spacing: float = 0.7,
+                 language: str = "python", only=None, rows: int | None = None):
+        """`only`: the page lines kept in the picture (a helper that only prints, such as
+        0011's show(), may stay out; the caption says so). `rows`: the panel is a window of
+        that many lines, and it scrolls (`scroll_to`) when the code is longer."""
         super().__init__()
+        mark = COMMENT[language]
         shown, self.index = [], {}
         for n, line in enumerate(code.rstrip("\n").split("\n"), start=1):
-            if drop_comments and (not line.strip() or line.strip().startswith("#")):
+            if only is not None and n not in only:
                 continue
-            if drop_trailing_comments and "#" in line and not line.strip().startswith("#"):
-                line = line[:line.index("#")].rstrip()
+            if drop_comments and (not line.strip() or line.strip().startswith(mark)):
+                continue
+            if drop_trailing_comments and mark in line and not line.strip().startswith(mark):
+                line = line[:line.index(mark)].rstrip()
             self.index[n] = len(shown)
             shown.append(line)
         self.lines_text = shown
-        self.code = Code(code_string="\n".join(shown) + "\n", language="python",
+        self.code = Code(code_string="\n".join(shown) + "\n", language=language,
                          formatter_style=NavyCode, add_line_numbers=False,
                          background="rectangle",
                          background_config={"fill_color": C.NAVY_DARK, "stroke_color": C.FAINT,
@@ -393,18 +416,62 @@ class CodePanel(VGroup):
         top = self.code.background.get_top()[1]
         self._pitch = -slope
         self._rel0 = y0 - top            # line 0's centre, below the background's top
+        self.scroll = 0                  # lines scrolled out at the top
+        self.rows = rows if rows and rows < len(shown) else None
+        if self.rows:                    # the background shrinks to the window
+            old = self.code.background
+            h = self._rel0 * -2 + (self.rows - 1) * self._pitch
+            win = RoundedRectangle(width=old.width, height=h, corner_radius=0.18,
+                                   stroke_color=C.FAINT, stroke_width=2,
+                                   fill_color=C.NAVY_DARK, fill_opacity=1)
+            win.align_to(old, UP).align_to(old, LEFT)
+            self.code.submobjects[self.code.submobjects.index(old)] = win
+            self.code.background = win
+            for i, line in enumerate(self.code.code_lines):
+                if i >= self.rows:
+                    line.set_fill(opacity=0)
         self._h0 = self.code.background.height
 
     @property
     def background(self):
         return self.code.background
 
+    # A windowed panel is measured by its window: the lines scrolled out of it (hidden) do
+    # not count in its width, height or position. Groups that hold one are Bounded.
+    def get_points_defining_boundary(self):
+        if getattr(self, "rows", None):
+            return self.background.get_points_defining_boundary()
+        return super().get_points_defining_boundary()
+
+    def reduce_across_dimension(self, reduce_func, dim):
+        if getattr(self, "rows", None):
+            return self.background.reduce_across_dimension(reduce_func, dim)
+        return super().reduce_across_dimension(reduce_func, dim)
+
     @property
     def _s(self) -> float:
         return self.background.height / self._h0      # the scale since the panel was built
 
     def line_y(self, page_line: int) -> float:
-        return self.background.get_top()[1] + (self._rel0 - self.index[page_line] * self._pitch) * self._s
+        row = self.index[page_line] - self.scroll
+        return self.background.get_top()[1] + (self._rel0 - row * self._pitch) * self._s
+
+    def visible(self, page_line: int) -> bool:
+        return self.rows is None or 0 <= self.index[page_line] - self.scroll < self.rows
+
+    def scroll_to(self, first: int, typed: set | None = None) -> list:
+        """Animations that scroll the window so that its first row is the picture's line
+        `first` (0-based): the text moves up or down, the lines leaving the window fade out
+        and the ones entering it fade in (only the `typed` ones while the code is typed)."""
+        if self.rows is None or first == self.scroll:
+            return []
+        dy = (first - self.scroll) * self._pitch * self._s
+        self.scroll = first
+        anims = []
+        for i, line in enumerate(self.code.code_lines):
+            inside = first <= i < first + self.rows and (typed is None or i in typed)
+            anims.append(line.animate.shift(UP * dy).set_fill(opacity=1 if inside else 0))
+        return anims
 
     def bar(self, page_line: int) -> VGroup:
         """The cursor on `page_line` (1-based, in the page's code)."""
@@ -600,6 +667,82 @@ class VarPanel(VGroup):
 
 
 # --------------------------------------------------------------------------------------
+# The page's box, captured by box_shots.py
+# --------------------------------------------------------------------------------------
+
+MIN_BOX_SCALE = 0.8     # the box shown at least at 80 % of its size on the page (CSS px)
+MIN_SPLIT_EM = 19.0     # the code's em in px at 720p beside the box (typed, it is >= 23)
+
+
+class BoxView(Group):
+    """The page's interactive box as the reader sees it: the pictures that box_shots.py took
+    after each step of `BOXES[name]` in scene.py, one at a time in a thin frame. The scene
+    steps it with `DVQScene.box_step()`, which marks the controls the step clicked."""
+
+    def __init__(self, qid: int | str, name: str, height: float | None = None,
+                 width: float | None = None, start: int = 0):
+        super().__init__()
+        folder = VIDEOS / f"{int(qid):04d}" / "out" / "boxes" / name
+        record = folder / "shots.json"
+        if not record.exists():
+            if not COLLECT:
+                raise RuntimeError(f"{record} is missing: render.py captures the boxes first")
+            self.data = {"size": [1000, 800], "shots": [{"file": None, "clicks": []}]}
+        else:
+            self.data = json.loads(record.read_text(encoding="utf-8"))
+        self.folder = folder
+        self.px = self.data["size"]                  # the pictures' size in device pixels
+        self.scale_css = self.data.get("scale", 2)
+        w, h = self.px
+        if height is None and width is None:
+            height = 5.6
+        if width is not None and (height is None or width / height < w / h):
+            height = width * h / w
+        self.frame_w, self.frame_h = height * w / h, height
+        self.k = start
+        self.image = self._image(start)
+        self.border = RoundedRectangle(width=self.frame_w + 0.12, height=self.frame_h + 0.12,
+                                       corner_radius=0.12, stroke_color=C.FAINT, stroke_width=2,
+                                       fill_opacity=0)
+        self.add(self.image, self.border)
+
+    def __len__(self) -> int:
+        return len(self.data["shots"])
+
+    def _image(self, k: int) -> ImageMobject:
+        shot = self.data["shots"][min(k, len(self.data["shots"]) - 1)]
+        if shot["file"] is None:
+            img = ImageMobject(np.zeros((8, 10, 4), dtype=np.uint8))
+        else:
+            img = ImageMobject(str(self.folder / shot["file"]))
+        w, h = (self.image.width, self.image.height) if hasattr(self, "image") \
+            else (self.frame_w, self.frame_h)          # the view may have been scaled
+        img.stretch_to_fit_width(w)
+        img.stretch_to_fit_height(h)
+        if hasattr(self, "image"):
+            img.move_to(self.image)
+        return img
+
+    def css_scale(self) -> float:
+        """The box's size in the frame against its size on the page (1 = as large)."""
+        return self.image.width * PX / (self.px[0] / self.scale_css)
+
+    def point(self, px: float, py: float) -> np.ndarray:
+        """A point of the pictures (device pixels from the top left) in the frame."""
+        x0, y0 = self.image.get_left()[0], self.image.get_top()[1]
+        return np.array([x0 + px / self.px[0] * self.image.width,
+                         y0 - py / self.px[1] * self.image.height, 0.0])
+
+    def clicks(self, k: int) -> list[tuple[np.ndarray, float, float]]:
+        """The controls step k clicked: (centre, width, height) in the frame."""
+        out = []
+        for x0, y0, x1, y1 in self.data["shots"][k]["clicks"]:
+            a, b = self.point(x0, y0), self.point(x1, y1)
+            out.append(((a + b) / 2, abs(b[0] - a[0]), abs(a[1] - b[1])))
+        return out
+
+
+# --------------------------------------------------------------------------------------
 # The base scene: beats with recorded captions
 # --------------------------------------------------------------------------------------
 
@@ -687,19 +830,29 @@ class DVQScene(Scene):
 
     # -- the code beat -----------------------------------------------------------------------
 
-    def place_code(self, panel: "CodePanel", vp: "VarPanel", extra: Mobject | None = None,
+    def place_code(self, panel: "CodePanel", vp: "VarPanel" | None = None, extra: Mobject | None = None,
                    max_width: float = 13.2, max_height: float = 6.0, vp_width: float | None = None):
         """Side by side when it fits (`vp_width`: the variables' widest, if wider than now),
-        else the variables under the code; scaled down to fit the frame, centred."""
+        else the variables under the code; scaled down to fit the frame, centred. With no
+        variables (`vp` None) the panel alone."""
+        if vp is None:
+            group = Bounded(panel) if extra is None else Bounded(panel, extra)
+            if extra is not None:
+                extra.next_to(panel, DOWN, buff=0.6)
+            k = min(1.0, max_width / group.width, max_height / group.height)
+            if k < 1:
+                group.scale(k)
+            group.move_to(UP * (3.75 + SAFE_BOTTOM) / 2)
+            return group
         vw = max(vp.width, vp_width or 0)
         side = panel.width + 0.9 + vw <= max_width
         if side:
-            body = VGroup(panel, vp).arrange(RIGHT, buff=0.9, aligned_edge=UP)
+            body = Bounded(panel, vp).arrange(RIGHT, buff=0.9, aligned_edge=UP)
             vp.align_to(panel, UP).shift(DOWN * 0.3)
         else:
-            body = VGroup(panel, vp).arrange(DOWN, buff=0.6)
+            body = Bounded(panel, vp).arrange(DOWN, buff=0.6)
             vp.align_to(panel, LEFT).shift(RIGHT * 0.3)
-        group = VGroup(body) if extra is None else VGroup(body, extra)
+        group = Bounded(body) if extra is None else Bounded(body, extra)
         if extra is not None:
             extra.next_to(body, DOWN, buff=0.6)
         need = panel.width + 0.9 + vw if side else max(panel.width, vw)
@@ -758,8 +911,16 @@ class DVQScene(Scene):
             hold = self.reading_hold(intro, self.time - start)
             self.play(_Blink(caret, hold), run_time=hold)
             self._record(intro, start, self.time, hold)
+        typed: set[int] = set()
         for lines, captions in plan:
+            if panel.rows:      # the window scrolls so that the whole group is in it
+                last = panel.index[lines[-1]]
+                if last - panel.scroll >= panel.rows:
+                    if len(lines) > panel.rows:
+                        raise RuntimeError(f"a group of {len(lines)} lines in a window of {panel.rows}")
+                    self.play(*panel.scroll_to(last - panel.rows + 1, typed), run_time=0.7)
             for li, n in enumerate(lines):
+                typed.add(panel.index[n])
                 text, glyphs = panel.text_of(n), panel.glyphs(n)
                 t = 0.0
                 events = [(0.0, None, point(n, indent(n)))]
@@ -782,28 +943,129 @@ class DVQScene(Scene):
             panel.code.remove(band)
         self.play(FadeOut(caret), run_time=0.4)
 
-    def run_code(self, panel: "CodePanel", vp: "VarPanel", steps: list, groups: list,
-                 step_time: float = 2.4):
+    def run_code(self, panel: "CodePanel", vp: "VarPanel" | None, steps: list, groups: list,
+                 step_time: float = 2.4, view: "BoxView" | None = None):
         """Light the lines in the order they ran: `groups` is [(lines, caption), ...], the
-        lines of consecutive trace steps under one caption. The lines must be exactly the
-        trace's, in order, so the video follows the page's code as it really runs."""
-        planned = [n for lines, _ in groups for n in lines]
+        lines of consecutive trace steps under one caption, or [(lines, caption, k), ...]
+        beside the page's box (`view`, see split()), which steps to its picture k (None:
+        it stays) as the group's caption appears. The lines must be exactly the trace's,
+        in order, so the video follows the page's code as it really runs."""
+        planned = [n for g in groups for n in g[0]]
         ran = [s.line for s in steps]
         if planned != ran:
             raise RuntimeError(f"the code ran lines {ran}, the script lights {planned}")
         cursor = None
         k = 0
-        for lines, caption in groups:
+        for g in groups:
+            lines, caption = g[0], g[1]
+            frame = g[2] if len(g) > 2 else None
             with self.beat(caption):
+                if view is not None and frame is not None:
+                    self.box_step(view, frame)
                 per = min(1.0, step_time / len(lines))
                 for _ in lines:
                     step = steps[k]
                     k += 1
                     bar = panel.bar(step.line)
                     move = FadeIn(bar) if cursor is None else Transform(cursor, bar)
-                    self.play(move, *vp.show(step.state), run_time=per)
+                    self.play(move, *(vp.show(step.state) if vp is not None else []), run_time=per)
                     cursor = cursor or bar
         return cursor
+
+    # -- the page's box ----------------------------------------------------------------------
+
+    def box_step(self, view: "BoxView", k: int, run_time: float = 0.5):
+        """Step the box to its picture k: each control the step clicked is marked by an
+        amber ring that closes on it (a tap), then the picture changes."""
+        if k == view.k:
+            return
+        rings = []
+        for centre, w, h in view.clicks(k):
+            ring = RoundedRectangle(width=w + 0.16, height=h + 0.16,
+                                    corner_radius=min(0.2, (h + 0.16) / 2),
+                                    stroke_color=C.AMBER, stroke_width=5, fill_opacity=0)
+            ring.move_to(centre)
+            self.play(FadeIn(ring, scale=1.6), run_time=0.35)
+            rings.append(ring)
+        new = view._image(k)
+        self.play(FadeIn(new), run_time=run_time)
+        view.remove(view.image)
+        self.remove(view.image)
+        view.image = new
+        view.submobjects.insert(0, new)
+        view.k = k
+        if rings:
+            self.play(*[FadeOut(r) for r in rings], run_time=0.3)
+        self.remove(new)          # drawn as a part of the view from now on
+        self.add(view)
+
+    def box_beat(self, view: "BoxView", steps: list, step_hold: float | None = None):
+        """The box played on the example: `steps` is [(k, caption), ...], each picture k
+        reached with its click under its caption."""
+        for k, caption in steps:
+            with self.beat(caption, hold=step_hold):
+                self.box_step(view, k)
+
+    def split(self, panel: "CodePanel", view: "BoxView", vp: "VarPanel" | None = None,
+              run_time: float = 1.2, code_share: float | None = None):
+        """The code beside the box: the typed panel (with the variables under it, if any)
+        moves into the left part of the frame and the box fades in on the right, both as
+        large as the room allows. The box keeps at least MIN_BOX_SCALE of its page size
+        and the code MIN_SPLIT_EM px (or a problem is recorded)."""
+        margin, gap, top, bottom = 0.3, 0.45, 3.55, SAFE_BOTTOM + 0.12
+        room_w, room_h = config.frame_width - 2 * margin - gap, top - bottom
+        left = Bounded(panel) if vp is None else Bounded(panel, vp)
+        if vp is not None:
+            vp.next_to(panel, DOWN, buff=0.35).align_to(panel, LEFT).shift(RIGHT * 0.3)
+        aspect = view.width / view.height
+        if code_share is None:      # the box takes what it needs at its height, code the rest
+            bw = min(room_h * aspect, room_w * 0.55)
+        else:
+            bw = room_w * (1 - code_share)
+        cw = room_w - bw
+        k = min(cw / left.width, room_h / left.height, 1.6)
+        target_left = left.copy().scale(k)
+        target_left.move_to([-config.frame_width / 2 + margin + target_left.width / 2,
+                             (top + bottom) / 2, 0])
+        view.scale_to_fit_width(min(bw, room_h * aspect))
+        view.move_to([config.frame_width / 2 - margin - view.width / 2, (top + bottom) / 2, 0])
+        em = panel.em_px() * k
+        if em < MIN_SPLIT_EM:
+            self.problems.append(f"code beside the box {em:.1f} px high at 720p (at least {MIN_SPLIT_EM})")
+        if view.css_scale() < MIN_BOX_SCALE:
+            self.problems.append(f"box at {view.css_scale():.2f} of its page size (at least {MIN_BOX_SCALE})")
+        self.play(Transform(left, target_left), FadeIn(view), run_time=run_time)
+        return left
+
+    def walk_code(self, panel: "CodePanel", view: "BoxView" | None, groups: list):
+        """The code beside the box with no trace (SystemVerilog): `groups` is
+        [(lines, caption, k), ...]; the lines are lit together (the window scrolls to them)
+        while the box steps to its picture k (None: it stays)."""
+        cursor = None
+        for lines, caption, k in groups:
+            lines = _lines_of(lines)
+            with self.beat(caption):
+                if panel.rows:
+                    first, last = panel.index[lines[0]], panel.index[lines[-1]]
+                    if first < panel.scroll or last >= panel.scroll + panel.rows:
+                        anims = panel.scroll_to(max(0, min(first, len(panel.lines_text) - panel.rows)))
+                        if cursor is not None:
+                            anims.append(FadeOut(cursor))
+                            cursor = None
+                        self.play(*anims, run_time=0.7)
+                band = panel.band(lines)
+                panel.code.remove(band)          # drawn over the text, see-through
+                band.set_fill(opacity=0.2)
+                if cursor is None:
+                    self.play(FadeIn(band), run_time=0.4)
+                else:
+                    self.play(Transform(cursor, band), run_time=0.4)
+                    band = cursor
+                cursor = band
+                if view is not None and k is not None:
+                    self.box_step(view, k)
+        if cursor is not None:
+            self.play(FadeOut(cursor), run_time=0.3)
 
     # -- shared frames ---------------------------------------------------------------------
 

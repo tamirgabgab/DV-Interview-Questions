@@ -33,10 +33,10 @@ a link to its part's chapter in each solution. The plan and the tools: [`VIDEOS.
 This table is written by `python tools/catalog.py`.
 
 <!-- videos -->
-| Id | Question | Chapters | Watch |
-|----|----------|----------|-------|
-| 0002 | [החלפת ערכים בין שני משתנים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0002-swap-two-variables/) | 3 | rendered, waiting for the upload |
-| 0004 | [שלוש קופסאות עם תוויות שגויות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0004-three-mislabeled-boxes/) | 2 | rendered, waiting for the upload |
+| Id | Question | Chapters | Length | Download |
+|----|----------|----------|--------|----------|
+| 0002 | [החלפת ערכים בין שני משתנים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0002-swap-two-variables/) | 3 | – | not rendered yet |
+| 0004 | [שלוש קופסאות עם תוויות שגויות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0004-three-mislabeled-boxes/) | 2 | – | not rendered yet |
 <!-- /videos -->
 
 ## What is on the site

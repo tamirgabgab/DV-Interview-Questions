@@ -13,7 +13,9 @@ Steps:
 
 1. Read `videos/<id>/scene.py`'s `SCENES` (the scene classes in video order, each with its
    chapter title) and `script.md`'s captions, and check the scene's literal captions.
-2. List the Hebrew labels with a Manim dry run, and draw the ones not cached yet
+2. Capture the page's boxes that scene.py's `BOXES` names (lib/box_shots.py, on the site
+   built into videos/.cache/site, rebuilt when docs/ or hooks/ is newer), then list the
+   Hebrew labels with a Manim dry run, and draw the ones not cached yet
    (videos/.cache/labels) in one browser session.
 3. Render every scene with Manim (media under videos/<id>/out/media).
 4. Chain the scene files with ffmpeg's concat demuxer; streams with the same parameters are
@@ -24,13 +26,20 @@ Steps:
 6. Generate the music (lib/music.py, seeded by the question's id or scene.py's
    MUSIC_SEED) for the video's exact length and write it beside the video, as
    out/music.wav and out/music.mp3. The video stays silent: the owner edits the two
-   together himself (2026-10-31). `--mux-music` puts the music into video.mp4 instead
+   together in an editor (2026-10-31). `--mux-music` puts the music into video.mp4 instead
    (the video stream copied, the music as AAC at 160 kbps).
 7. Fail on a caption shorter than 1.5 s or longer than 7 s, a caption that breaks the RTL or
    colon rules, a beat with no still frame at its end, captions that differ from
    script.md, or a translation file that misses a caption or has an entry for one that no
    longer exists (checked in step 1 too, before the long render). A video with no
    captions.en.md yet gets a warning and no English track.
+
+`--release` also copies the finished files into `videos/<id>/release/`, the folder kept in
+the repository and linked from the README (the owner downloads them there and uploads them
+to YouTube; 2026-10-31): `<id>.mp4` (silent), `<id>-music.mp4` (with the music),
+`<id>-music.mp3`, `<id>.he.vtt`, `<id>.en.vtt`, `<id>-chapters.txt` and `info.json` (the
+length, the chapters and the `video_parts`, which tools/catalog.py reads for the README).
+Only a 720p render with no problem makes a release.
 
 Output: videos/<id>/out/video.mp4 (silent), music.wav, music.mp3, captions.vtt,
 captions.en.vtt, chapters.txt; with --preview also preview.mp4, the captions burned in and
@@ -195,7 +204,7 @@ def add_music(out: Path, seed: int, movies: list[Path], mux: bool = False) -> No
           f"{info['spikes']} click(s)")
     mp3 = out / "music.mp3"
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(wav), "-c:a", "libmp3lame",
-                    "-b:a", "320k", str(mp3)], check=True)
+                    "-b:a", "192k", str(mp3)], check=True)
     print(f"music: {wav.relative_to(VIDEOS.parent)} and {mp3.name}")
     for movie in movies:
         if mux:
@@ -247,6 +256,8 @@ def main() -> int:
     ap.add_argument("--no-music", action="store_true", help="make no music at all")
     ap.add_argument("--mux-music", action="store_true",
                     help="put the music into video.mp4 instead of a file beside it")
+    ap.add_argument("--release", action="store_true",
+                    help="copy the finished files into videos/<id>/release/ (720p, no problem)")
     args = ap.parse_args()
 
     qid = f"{int(args.qid):04d}"
@@ -283,7 +294,10 @@ def main() -> int:
              "--progress_bar", "none", "-v", "WARNING", str(scene_py), *names]
     env = dict(os.environ, DVQ_LABEL_PYTHON=args.label_python)
 
-    # 2. the Hebrew labels: a dry run lists them, he_label.py draws the missing ones
+    # 2. the page's boxes, then the Hebrew labels: a dry run lists them, he_label.py draws
+    #    the missing ones
+    if lits.get("BOXES"):
+        capture_boxes(qid, lits["BOXES"], args.label_python)
     with tempfile.TemporaryDirectory() as tmp:
         listed = Path(tmp) / "labels.jsonl"
         dry = subprocess.run([*manim, "--dry_run"], cwd=folder, capture_output=True, text=True,
@@ -372,8 +386,64 @@ def main() -> int:
     if problems:
         print(f"\n{len(problems)} problem(s):", file=sys.stderr)
         print("\n".join(f"  - {p}" for p in problems), file=sys.stderr)
+        if args.release:
+            print("no release: fix the problems first", file=sys.stderr)
         return 1
+    if args.release:
+        if args.draft or args.no_music:
+            print("no release from a draft or without music", file=sys.stderr)
+            return 1
+        release(folder, qid, total, chapters, starts)
     return 0
+
+
+def release(folder: Path, qid: str, seconds: float, chapters: str, parts: list[int]) -> None:
+    """videos/<id>/release/: the files the owner downloads from the README."""
+    out, rel = folder / "out", folder / "release"
+    rel.mkdir(exist_ok=True)
+    shutil.copyfile(out / "video.mp4", rel / f"{qid}.mp4")
+    shutil.copyfile(out / "video.mp4", rel / f"{qid}-music.mp4")
+    mux_music(rel / f"{qid}-music.mp4", out / "music.wav")
+    shutil.copyfile(out / "music.mp3", rel / f"{qid}-music.mp3")
+    shutil.copyfile(out / "captions.vtt", rel / f"{qid}.he.vtt")
+    if (out / "captions.en.vtt").exists():
+        shutil.copyfile(out / "captions.en.vtt", rel / f"{qid}.en.vtt")
+    (rel / f"{qid}-chapters.txt").write_text(chapters, encoding="utf-8")
+    info = {"id": qid, "seconds": round(seconds, 2), "video_parts": parts,
+            "chapters": [line.split(" ", 1) for line in chapters.strip().splitlines()],
+            "files": sorted(p.name for p in rel.iterdir() if p.name != "info.json")}
+    (rel / "info.json").write_text(json.dumps(info, ensure_ascii=False, indent=1) + "\n",
+                                   encoding="utf-8")
+    size = sum((rel / f).stat().st_size for f in info["files"]) / 1e6
+    print(f"release: {rel.relative_to(VIDEOS.parent)} ({len(info['files'])} files, {size:.1f} MB)")
+
+
+SITE = VIDEOS / ".cache" / "site"
+
+
+def newest(*folders: Path) -> float:
+    return max(p.stat().st_mtime for f in folders for p in f.rglob("*") if p.is_file())
+
+
+def capture_boxes(qid: str, boxes: dict, python: str) -> None:
+    """The pictures of the page's boxes (lib/box_shots.py) on the built site: built into
+    videos/.cache/site when it is missing or older than docs/ and hooks/."""
+    root = VIDEOS.parent
+    stamp = SITE / ".built"
+    if not stamp.exists() or stamp.stat().st_mtime < newest(root / "docs", root / "hooks"):
+        print("+ mkdocs build (for the boxes)")
+        subprocess.run([python, "-m", "mkdocs", "build", "-q", "-d", str(SITE)], check=True,
+                       cwd=root, env=dict(os.environ, DVQ_SOCIAL_CARDS="false"))
+        stamp.touch()
+    sys.path.insert(0, str(root / "tools"))
+    from check_phone import local_cdn_routes   # the CDN scripts from .cache/cdn
+
+    routes = [a for spec in local_cdn_routes() for a in ("--route", spec)]
+    with tempfile.TemporaryDirectory() as tmp:
+        spec = Path(tmp) / "boxes.json"
+        spec.write_text(json.dumps(boxes, ensure_ascii=False), encoding="utf-8")
+        subprocess.run([python, str(VIDEOS / "lib" / "box_shots.py"), qid, "--spec", str(spec),
+                        "--site", str(SITE), *routes], check=True)
 
 
 PREVIEW_STYLE = ("FontName=Rubik,FontSize=20,Encoding=-1,PrimaryColour=&H00FFFFFF,"
