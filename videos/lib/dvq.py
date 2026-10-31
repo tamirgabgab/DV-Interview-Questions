@@ -1038,7 +1038,7 @@ class DVQScene(Scene):
         if code_share is None and panel.em_px() * k < MIN_SPLIT_EM:
             # the code too small: give it the width it needs (for 21 px), as long as the box
             # keeps MIN_BOX_SCALE of its page size
-            box_min = MIN_BOX_SCALE * (view.px[0] / view.scale_css) / PX
+            box_min = (MIN_BOX_SCALE + 0.01) * (view.px[0] / view.scale_css) / PX
             need = left.width * 21.0 / panel.em_px()
             bw = max(box_min, min(bw, room_w - need))
             cw = room_w - bw
