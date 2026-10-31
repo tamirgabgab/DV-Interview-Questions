@@ -1601,6 +1601,19 @@ section below starts at session 22, whose numbered items run on through the late
     Released: 0002 8:29, 0004 7:30, 0006 7:40, 0011 7:01 (the chapters and `video_parts` in
     VIDEOS.md). Waiting on the owner: watch them, upload, send the YouTube ids.
 
+106. **Videos 0003 and 0010, the first V7 round (session 28, 2026-10-31).** The owner
+    picked the two simplest student questions without a video. 0003 (3:57, one part,
+    `video_parts` [0]): the question's code shown whole (it is the question, not the
+    answer), the trace box stepped through i = 0 and then to the end of each i, the split
+    screen stopping on every swap, the invariant step by step, the cost and the j = i + 1
+    trap. 0010 (7:19, [0, 182]): part א drawn in Manim (pairs deleted pass after pass, beside
+    the typed `isValid_brute`) with the box's pass table for (((()))); part ב the stack box
+    on {[()]}, ([)] and ((( (the code stops at the odd-length check; the box shows the
+    openers left), plus (([] for the final `return not stack`. `captions.py` now isolates a
+    left-to-right run that starts with `{`, `)`, `]` or `}`. Found on the way: the trace
+    box's loop counter read "3 = j ,0 = i" in RTL; fixed in trace.js (one `ltr()` run) and
+    published. Waiting on the owner: watch them, upload, send the YouTube ids.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),

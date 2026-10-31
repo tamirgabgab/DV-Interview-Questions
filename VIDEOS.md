@@ -19,7 +19,7 @@ Once their structure is approved, the rest follow it question by question.
 | Look | The site's navy (the hero's) with amber marks, one version for both schemes |
 | On the page | One video per question, a chapter per part: 1–3 minutes for a part without code; 2–4 minutes for a part with code, more when the code is long (2026-10-31, with the typed code beat) |
 | Pace | Calm, in the style of 3Blue1Brown: animations of 1–2 s, every picture held 2–4 s for its caption |
-| Code beat | Python only (the owner, 2026-10-31): the logic and the algorithm matter more than the syntax, and Python is the language a new engineer already writes. No SystemVerilog beat beside it. The exception is a question whose answer is SystemVerilog constraints (0011): it is meant for senior engineers who code, so the SV class is typed. A part with no code gets its mathematical proof step by step instead. Where a part has a naive and an efficient solution, only the efficient one is typed and the naive one is named in the idea (0006) |
+| Code beat | Python only (the owner, 2026-10-31): the logic and the algorithm matter more than the syntax, and Python is the language a new engineer already writes. No SystemVerilog beat beside it. The exception is a question whose answer is SystemVerilog constraints (0011): it is meant for senior engineers who code, so the SV class is typed. A part with no code gets its mathematical proof step by step instead. Where a part has a naive and an efficient solution, only the efficient one is typed and the naive one is named in the idea (0006). When the code is the question itself (0003, "what does this code do"), it is shown whole, not typed, and its lines are explained one by one before the traced run |
 | Typed code (2026-10-31) | The code beat types the answer live: character by character, line by line, with a blinking amber cursor, and pauses after each line, or a small group of lines that make one operation, for a caption that says what it does and why. Only then the traced run on the page's example follows, in the same panel. A video gets 2–3 minutes longer, which the owner accepts |
 | Opening and closing | The drawn DV mark, the question's id and parts; the closing has the site's address and the question's id |
 | Captions (2026-10-31) | Two caption tracks go up with every video: Hebrew (`captions.vtt`) and English (`captions.en.vtt`, for viewers who are not Israeli). Neither is on by default, on YouTube or in the site's player: shown, they cover part of the picture, so the viewer turns them on |
@@ -190,6 +190,13 @@ pictures.
   typing scrolls it so that each group is whole in it, and the trace or `walk_code` scrolls
   it to the lines it lights. A helper that only prints (0011's `show()`) may stay out of the
   picture (`only=`), and a caption says so.
+- **A part with no box.** When the page has no box for a part, the scene draws the idea in
+  Manim beside the code instead (0010 part א: the string as cells, the adjacent pairs
+  deleted pass after pass), and uses a table of the box that covers that part, if there is
+  one (0010's pass table).
+- **Bidi in the pictures.** A lone bracket inside the box's `ltr()` renders the right way
+  round; read a doubtful glyph by pixels against a left-to-right reference, not by eye, since
+  a right-to-left line is easy to misread.
 
 ## The files
 
@@ -535,7 +542,7 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
 | V4 | Pilot 0004: script → review → scenes (Hebrew box labels by `he_label.py`) → render | approved, and the Hebrew-label route is proven |
 | V5 | Freeze the structure: lessons from the pilots folded into this file | the owner approves |
 | V6 | The page's box in every chapter (idea beat and split screen), the release folder and the README's download links; 0002 and 0004 again with the box, and two more: 0006 (stock, long / short) and 0011 (random final tic-tac-toe board, the SV class) | the owner approves the four videos |
-| V7… | The rest, a few questions per round, short questions first (student, then junior) | each video approved before upload |
+| V7… | The rest, a few questions per round, short questions first (student, then junior). First round (2026-10-31): 0003 (the code shown whole, i = 0 stepped then a jump to the end of each i) and 0010 (part א drawn in Manim, part ב the stack box on {[()]}, ([)] and ((() | each video approved before upload |
 
 ## The pilots' storyboards (outline; the full scripts are step V2 and V4)
 
@@ -601,7 +608,7 @@ the typing adds about 1.5 minutes to 0002 (three 4-line functions) and 2 minutes
 
 ### With the page's box (2026-10-31)
 
-The box beats and the split screen added about a minute to each pilot. The four released
+The box beats and the split screen added about a minute to each pilot. The released
 videos (`videos/<id>/release/`):
 
 | Video | Chapters | `video_parts` |
@@ -610,6 +617,8 @@ videos (`videos/<id>/release/`):
 | 0004, 7:30 | 0:00 opening, 0:23 א, 2:18 ב, 7:18 closing | `[0, 138]` |
 | 0006, 7:40 | 0:00 opening, 0:14 א, 3:34 ב, 7:29 closing | `[0, 214]` |
 | 0011, 7:01 | 0:00 opening, 0:16 א, 4:59 ב, 6:49 closing | `[0, 299]` |
+| 0003, 3:57 | 0:00 opening, 0:16 the one part, 3:47 closing | `[0]` |
+| 0010, 7:19 | 0:00 opening, 0:22 א, 3:02 ב, 7:08 closing | `[0, 182]` |
 
 The `video_parts` go into the pages' front matter with the YouTube id, once the videos
 are uploaded (see "Publishing and linking").
