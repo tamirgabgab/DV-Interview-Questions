@@ -1023,7 +1023,7 @@ class DVQScene(Scene):
         moves into the left part of the frame and the box fades in on the right, both as
         large as the room allows. The box keeps at least MIN_BOX_SCALE of its page size
         and the code MIN_SPLIT_EM px (or a problem is recorded)."""
-        margin, gap, top, bottom = 0.3, 0.45, 3.55, SAFE_BOTTOM + 0.12
+        margin, gap, top, bottom = 0.25, 0.4, 3.55, SAFE_BOTTOM + 0.12
         room_w, room_h = config.frame_width - 2 * margin - gap, top - bottom
         left = Bounded(panel) if vp is None else Bounded(panel, vp)
         if vp is not None:
@@ -1038,7 +1038,8 @@ class DVQScene(Scene):
         if code_share is None and panel.em_px() * k < MIN_SPLIT_EM:
             # the code too small: give it the width it needs (for 21 px), as long as the box
             # keeps MIN_BOX_SCALE of its page size
-            box_min = (MIN_BOX_SCALE + 0.01) * (view.px[0] / view.scale_css) / PX
+            box_min = (MIN_BOX_SCALE + 0.005) * (view.px[0] / view.scale_css) / PX \
+                + (view.width - view.image.width)          # the frame around the picture
             need = left.width * 21.0 / panel.em_px()
             bw = max(box_min, min(bw, room_w - need))
             cw = room_w - bw
