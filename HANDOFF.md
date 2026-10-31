@@ -1614,6 +1614,17 @@ section below starts at session 22, whose numbered items run on through the late
     box's loop counter read "3 = j ,0 = i" in RTL; fixed in trace.js (one `ltr()` run) and
     published. Waiting on the owner: watch them, upload, send the YouTube ids.
 
+107. **Videos 0015 and 0029, proofs without code (session 28, 2026-10-31).** The owner
+    picked two questions with no code, the first videos built only on step-by-step proofs.
+    0015 (6:13, `video_parts` [0, 108, 240]): a Manim 2×2 grid of the families (1/3), a
+    14×14 grid of child kinds then the tuesday box (13/27), the general formula derived
+    through complements and checked at q = 1, 1/7 and q → 0, then the probability box
+    (square and curve, C = 3). 0029 (6:50, [0, 231]): the clock box pair after pair and to
+    the triple meeting at 12:00 (2,876 − 4 = 2,872), a Manim graph of the gap crossing whole
+    turns (T = tᵢtⱼ/(tⱼ − tᵢ)), the gapline box on closed, open and half-open intervals, and
+    the triple-meeting proof. `box_shots.py` gained a `set` action for a select or a slider.
+    Waiting on the owner: watch them, upload, send the YouTube ids.
+
 ## In progress
 
 - **Session 28 (2026-10-28):** the question map, `docs/graph.html` (work log item 80),

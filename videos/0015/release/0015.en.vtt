@@ -1,0 +1,364 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0015: two children, at least one a boy.
+A student-level question.
+
+2
+00:00:04.600 --> 00:00:09.700
+Three parts, each a proof step by step:
+no code here, only counting.
+
+3
+00:00:10.500 --> 00:00:15.900
+Yossi has two children. We asked him: is at least
+one of them a boy? He said yes.
+
+4
+00:00:15.900 --> 00:00:19.400
+What is the probability that both children are boys?
+
+5
+00:00:19.400 --> 00:00:24.867
+The assumptions: each child is a boy or a girl with 1/2,
+and every weekday is equally likely, all independent.
+
+6
+00:00:25.667 --> 00:00:30.867
+What is the probability that both are boys?
+The quick answer is a half. Is it right?
+
+7
+00:00:31.567 --> 00:00:36.233
+The guess: there is one boy, and the other child
+is a boy or a girl with 1/2. So a half?
+
+8
+00:00:36.833 --> 00:00:42.133
+Order the children by birth:
+four families, each with probability 1/4.
+
+9
+00:00:42.133 --> 00:00:46.433
+Boy-girl and girl-boy are two different families,
+not one outcome.
+
+10
+00:00:46.933 --> 00:00:50.433
+The answer yes rules out one family only:
+two girls.
+
+11
+00:00:50.433 --> 00:00:54.967
+Three equally likely families remain,
+with total probability 3/4.
+
+12
+00:00:54.967 --> 00:00:58.700
+Only one of them has two boys:
+boy-boy, with probability 1/4.
+
+13
+00:00:59.700 --> 00:01:03.933
+Let A be both children boys,
+and B at least one boy.
+
+14
+00:01:03.933 --> 00:01:08.833
+Every family with two boys also meets B,
+so the intersection is A itself.
+
+15
+00:01:08.833 --> 00:01:13.867
+The conditional probability: the probability
+of the intersection over that of the condition.
+
+16
+00:01:13.867 --> 00:01:18.833
+Substitute: 1/4 for two boys,
+and 3/4 for the three families left.
+
+17
+00:01:18.833 --> 00:01:22.333
+And we get a third, not a half.
+
+18
+00:01:23.133 --> 00:01:28.100
+Where did the guess go wrong? "At least one boy"
+does not say which of the two is the boy.
+
+19
+00:01:28.100 --> 00:01:33.600
+Had the information been "the elder is a boy",
+only the top row would remain: boy-boy and boy-girl.
+
+20
+00:01:33.600 --> 00:01:37.567
+Then the answer would be a half:
+the information points at a specific child.
+
+21
+00:01:38.367 --> 00:01:43.867
+With "at least one" the boy can be either child:
+two boy-girl families against one with two boys.
+
+22
+00:01:43.867 --> 00:01:47.867
+Trap: counting boy-and-girl as one outcome.
+It happens in two orders, so its probability is a half.
+
+23
+00:01:48.667 --> 00:01:53.867
+Now Yossi says yes to: do you have a boy
+born on a Tuesday? What is the probability now?
+
+24
+00:01:54.567 --> 00:01:58.533
+The birthday seems not to matter at all.
+Let's count.
+
+25
+00:01:59.033 --> 00:02:04.333
+Each child is one of 14 equally likely kinds:
+boy or girl, times seven days.
+
+26
+00:02:04.333 --> 00:02:08.567
+A boy born on a Tuesday is one of those kinds,
+with probability 1/14.
+
+27
+00:02:09.367 --> 00:02:14.600
+Two children have 14 × 14 = 196 ordered pairs,
+each with probability 1/196.
+
+28
+00:02:14.600 --> 00:02:19.400
+The rows are the first child, the columns the second.
+Tuesday is the third letter, gimel.
+
+29
+00:02:19.800 --> 00:02:25.300
+The first child a Tuesday boy: one row
+of 14 pairs, the second child of any kind.
+
+30
+00:02:25.300 --> 00:02:30.467
+The second child can be a Tuesday boy too:
+one column, another 14 pairs.
+
+31
+00:02:30.467 --> 00:02:35.967
+The cell where they cross, two Tuesday boys,
+was counted twice. Remove it once.
+
+32
+00:02:35.967 --> 00:02:39.467
+So the condition holds in 27 pairs,
+not 28.
+
+33
+00:02:39.467 --> 00:02:44.967
+Of these, two boys: the dashed square.
+Seven in the row, seven in the column, less the double.
+
+34
+00:02:44.967 --> 00:02:50.200
+All pairs are equally likely, so the probability
+is 13 over 27, about 0.481.
+
+35
+00:02:50.200 --> 00:02:54.200
+Almost a half, and far from part A's third.
+The specific information changed the answer.
+
+36
+00:02:54.200 --> 00:02:59.700
+Without removing the double cell we would get
+14 over 28, a half. That is a mistake.
+
+37
+00:02:59.700 --> 00:03:03.700
+Why? A Tuesday is information almost about one child,
+like "the elder is a boy", which gives a half.
+
+38
+00:03:04.400 --> 00:03:09.700
+The same answer through Bayes. The two-boys square:
+49 cells out of 196, a quarter.
+
+39
+00:03:09.700 --> 00:03:15.167
+Inside the square, no boy was born on a Tuesday
+with probability (6/7)². The complement is 13/49.
+
+40
+00:03:15.167 --> 00:03:20.567
+Each child is a Tuesday boy with 1/14,
+so the condition has 1 minus (13/14)².
+
+41
+00:03:20.567 --> 00:03:24.867
+Into Bayes' formula:
+13/196 over 27/196, again 13/27.
+
+42
+00:03:25.667 --> 00:03:31.167
+The page's box counts the same cross, step by step.
+Step 1: the row, 14 families.
+
+43
+00:03:31.167 --> 00:03:36.300
+Step 2: the second child's column, another 14.
+The cell where they cross was counted twice.
+
+44
+00:03:36.300 --> 00:03:40.967
+Step 3: each family counted once,
+14 + 14 − 1 = 27 families.
+
+45
+00:03:40.967 --> 00:03:45.567
+Step 4: of them two boys,
+7 + 7 − 1 = 13. The probability is 13/27.
+
+46
+00:03:46.167 --> 00:03:51.200
+The box's table compares three kinds of information,
+each on the same 196 families.
+
+47
+00:03:51.200 --> 00:03:55.200
+At least one boy gives a third, a Tuesday boy
+13/27, and the elder is a boy gives a half.
+
+48
+00:03:55.200 --> 00:03:59.200
+Tuesday sits between them: the more specific
+the information, the closer the answer to a half.
+
+49
+00:04:00.000 --> 00:04:05.200
+Now in general: C children, each a boy
+with probability p, with the trait with probability q.
+
+50
+00:04:05.900 --> 00:04:11.400
+Let A be all children boys, and T
+at least one child a boy with the trait.
+
+51
+00:04:11.400 --> 00:04:16.900
+Both are "at least one" events, and both are easiest
+through the complement: "none".
+
+52
+00:04:16.900 --> 00:04:22.133
+One child is a boy with the trait with probability pq,
+and is not with probability 1 − pq.
+
+53
+00:04:22.133 --> 00:04:27.633
+The children are independent, so none of them is
+with probability (1 − pq) to the power C.
+
+54
+00:04:27.633 --> 00:04:32.100
+The denominator is the complement: 1 minus
+that power. This is the probability of T.
+
+55
+00:04:33.000 --> 00:04:36.600
+The numerator: all children are boys
+with probability p to the power C.
+
+56
+00:04:36.600 --> 00:04:42.100
+If all are boys, T only says that at least one has
+the trait: one minus (1 − q) to the power C.
+
+57
+00:04:42.100 --> 00:04:47.200
+So the intersection is the product: the probability
+all are boys, times that of the trait.
+
+58
+00:04:48.000 --> 00:04:52.033
+Divide the numerator by the denominator,
+and we get the general formula.
+
+59
+00:04:52.933 --> 00:04:58.233
+Check: no trait, q = 1, the formula
+gives a quarter over three quarters, a third.
+
+60
+00:04:58.233 --> 00:05:03.133
+A weekday, q = 1/7: the numerator is 13/196,
+the denominator 27/196, again 13/27.
+
+61
+00:05:03.133 --> 00:05:08.033
+A very rare trait, q tends to 0:
+the answer tends to p to the power C − 1.
+
+62
+00:05:08.033 --> 00:05:12.033
+With two children that is a half: the information
+points almost surely at one specific boy.
+
+63
+00:05:12.833 --> 00:05:18.000
+The smaller q, the more specific the information,
+and the answer rises from a third towards a half.
+
+64
+00:05:18.000 --> 00:05:23.233
+With three children, from the same formula:
+from "at least one boy"'s seventh up to a quarter.
+
+65
+00:05:24.033 --> 00:05:29.533
+The page's box computes the formula. On the page's
+values, p = 1/2 and q = 1/7, the answer is 0.4815.
+
+66
+00:05:29.533 --> 00:05:33.533
+In the square, each cell's area is the probability
+of the pair. The coloured cross is the condition.
+
+67
+00:05:33.533 --> 00:05:37.533
+The green part, inside the dashed
+two-boys square, is the target.
+
+68
+00:05:38.133 --> 00:05:43.633
+The curve: the answer for every q. Right: q = 1
+and the third. Left: small q, and the half line.
+
+69
+00:05:43.633 --> 00:05:48.767
+With three children, C = 3: the answer is 0.2322,
+that is 127/547, and the limit is a quarter.
+
+70
+00:05:49.567 --> 00:05:55.067
+A last trap: the answer depends on how the information
+came. We asked a yes-or-no question.
+
+71
+00:05:55.067 --> 00:06:00.567
+Had Yossi picked a child at random and told us about it,
+the information would be about one child: a half.
+
+72
+00:06:01.366 --> 00:06:07.166
+To sum up: a third, 13/27, and one formula
+that gives back both.
+
+73
+00:06:07.166 --> 00:06:12.166
+Try your own values in the boxes
+on the page of question 0015 on the site.

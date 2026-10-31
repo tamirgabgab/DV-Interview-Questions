@@ -194,6 +194,12 @@ pictures.
   Manim beside the code instead (0010 part א: the string as cells, the adjacent pairs
   deleted pass after pass), and uses a table of the box that covers that part, if there is
   one (0010's pass table).
+- **A part with no code.** The proof beat takes the code beat's place: one equation line
+  at a time with its own caption, the earlier lines dimmed, the key numbers amber, and the
+  box (alone) where the page has one (0015, 0029). There is no LaTeX in the sandbox, so the
+  math is set in Inter text (fractions and powers built in the scene), never Hebrew.
+- **Selects and sliders.** `["set", sel, value]` sets a `<select>` or a slider and fires its
+  `input` and `change` events (0029's gapline box: the interval type and its length).
 - **Bidi in the pictures.** A lone bracket inside the box's `ltr()` renders the right way
   round; read a doubtful glyph by pixels against a left-to-right reference, not by eye, since
   a right-to-left line is easy to misread.
@@ -542,7 +548,7 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
 | V4 | Pilot 0004: script → review → scenes (Hebrew box labels by `he_label.py`) → render | approved, and the Hebrew-label route is proven |
 | V5 | Freeze the structure: lessons from the pilots folded into this file | the owner approves |
 | V6 | The page's box in every chapter (idea beat and split screen), the release folder and the README's download links; 0002 and 0004 again with the box, and two more: 0006 (stock, long / short) and 0011 (random final tic-tac-toe board, the SV class) | the owner approves the four videos |
-| V7… | The rest, a few questions per round, short questions first (student, then junior). First round (2026-10-31): 0003 (the code shown whole, i = 0 stepped then a jump to the end of each i) and 0010 (part א drawn in Manim, part ב the stack box on {[()]}, ([)] and ((() | each video approved before upload |
+| V7… | The rest, a few questions per round, short questions first (student, then junior). First round (2026-10-31): 0003 (the code shown whole, i = 0 stepped then a jump to the end of each i) and 0010 (part א drawn in Manim, part ב the stack box on {[()]}, ([)] and ((()). Second round (2026-10-31), the first two with no code: 0015 (three parts: a Manim 2×2 grid, a 14×14 grid then the tuesday box, the formula derived then the probability box) and 0029 (the clock box pair after pair, then a Manim gap graph, the gapline box and the triple-meeting proof) | each video approved before upload |
 
 ## The pilots' storyboards (outline; the full scripts are step V2 and V4)
 
@@ -619,6 +625,8 @@ videos (`videos/<id>/release/`):
 | 0011, 7:01 | 0:00 opening, 0:16 א, 4:59 ב, 6:49 closing | `[0, 299]` |
 | 0003, 3:57 | 0:00 opening, 0:16 the one part, 3:47 closing | `[0]` |
 | 0010, 7:19 | 0:00 opening, 0:22 א, 3:02 ב, 7:08 closing | `[0, 182]` |
+| 0015, 6:13 | 0:00 opening, 0:25 א, 1:48 ב, 4:00 ג, 6:01 closing | `[0, 108, 240]` |
+| 0029, 6:50 | 0:00 opening, 0:30 א, 3:51 ב, 6:37 closing | `[0, 231]` |
 
 The `video_parts` go into the pages' front matter with the YouTube id, once the videos
 are uploaded (see "Publishing and linking").
