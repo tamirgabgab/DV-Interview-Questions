@@ -1596,7 +1596,7 @@ section below starts at session 22, whose numbered items run on through the late
     built site (Playwright, dark scheme, a cropped region, an optional CSS width), and
     `dvq.BoxView`, `box_step`, `box_beat`, `split`, `run_code(view=)` and `walk_code` show it;
     a `CodePanel` can be a scrolling window (`rows`) and read SystemVerilog (`page_code`).
-    `render.py --release` writes `videos/<id>/release/` (silent mp4, mp4 with music, mp3,
+    `render.py --release` writes `videos/<id>/release/` (silent mp4, the music as mp3 (no muxed video, the owner asked),
     he/en VTT, chapters, info.json) and `tools/catalog.py` links the files from the README.
     Released: 0002 8:29, 0004 7:30, 0006 7:40, 0011 7:01 (the chapters and `video_parts` in
     VIDEOS.md). Waiting on the owner: watch them, upload, send the YouTube ids.

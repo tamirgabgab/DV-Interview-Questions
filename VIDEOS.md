@@ -211,8 +211,8 @@ videos/
 │   ├── out/            # rendered, not committed: video.mp4 (silent), music.wav, music.mp3,
 │   │                   # captions.vtt, captions.en.vtt, chapters.txt, parts/ (each scene's
 │   │                   # recorded captions), boxes/ (the box's pictures), media/ (Manim's files)
-│   └── release/        # committed (render.py --release): 0002.mp4 (silent), 0002-music.mp4,
-│                       # 0002-music.mp3, 0002.he.vtt, 0002.en.vtt, 0002-chapters.txt, info.json
+│   └── release/        # committed (render.py --release): 0002.mp4 (silent), 0002-music.mp3,
+│                       # 0002.he.vtt, 0002.en.vtt, 0002-chapters.txt, info.json
 └── 0004/ …
 ```
 
@@ -443,8 +443,9 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
    links into the README's "Tutorial videos" table (the length and the files, from
    `release/info.json`). The folder is committed; that is where the owner takes the
    videos from (2026-10-31).
-1. **Upload.** The owner uploads `<id>.mp4` (or `<id>-music.mp4`, or the video edited with
-   `<id>-music.mp3`) to the YouTube channel. Unlisted or public is the owner's call per
+1. **Upload.** The owner puts `<id>.mp4` and `<id>-music.mp3` together in an editor (the
+   release keeps no video with the music in it: the two files are enough, 2026-10-31) and
+   uploads the result to the YouTube channel. Unlisted or public is the owner's call per
    video.
 2. **Captions and chapters.** In YouTube Studio, under the video's Subtitles:
    - set the video's language to Hebrew;

@@ -36,8 +36,8 @@ Steps:
 
 `--release` also copies the finished files into `videos/<id>/release/`, the folder kept in
 the repository and linked from the README (the owner downloads them there and uploads them
-to YouTube; 2026-10-31): `<id>.mp4` (silent), `<id>-music.mp4` (with the music),
-`<id>-music.mp3`, `<id>.he.vtt`, `<id>.en.vtt`, `<id>-chapters.txt` and `info.json` (the
+to YouTube; 2026-10-31): `<id>.mp4` (silent), `<id>-music.mp3` (the music alone; no
+video with the music in it, the owner puts the two together in an editor), `<id>.he.vtt`, `<id>.en.vtt`, `<id>-chapters.txt` and `info.json` (the
 length, the chapters and the `video_parts`, which tools/catalog.py reads for the README).
 Only a 720p render with no problem makes a release.
 
@@ -405,8 +405,6 @@ def release(folder: Path, qid: str, seconds: float, chapters: str, parts: list[i
     out, rel = folder / "out", folder / "release"
     rel.mkdir(exist_ok=True)
     shutil.copyfile(out / "video.mp4", rel / f"{qid}.mp4")
-    shutil.copyfile(out / "video.mp4", rel / f"{qid}-music.mp4")
-    mux_music(rel / f"{qid}-music.mp4", out / "music.wav")
     shutil.copyfile(out / "music.mp3", rel / f"{qid}-music.mp3")
     shutil.copyfile(out / "captions.vtt", rel / f"{qid}.he.vtt")
     if (out / "captions.en.vtt").exists():

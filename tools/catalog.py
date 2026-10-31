@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://tamirgabgab.github.io/DV-Interview-Questions/"
 RAW = "https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/"
-RELEASE = [("{id}.mp4", "video"), ("{id}-music.mp4", "with music"), ("{id}-music.mp3", "music"),
+RELEASE = [("{id}.mp4", "video"), ("{id}-music.mp3", "music"),
            ("{id}.he.vtt", "Hebrew captions"), ("{id}.en.vtt", "English captions"),
            ("{id}-chapters.txt", "chapters")]
 LEVELS = {"student": "student (סטודנט)", "junior": "junior (ג'וניור)", "senior": "senior (סניור)"}
