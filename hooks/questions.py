@@ -88,6 +88,7 @@ TOPICS = {
     "dynamic-programming": "תכנות דינמי",
     "fifo": "FIFO",
     "fsm": "מכונת מצבים",
+    "game-theory": "תורת המשחקים",
     "geometry": "גאומטריה",
     "gray-code": "קוד Gray",
     "greedy": "אלגוריתם חמדן",
