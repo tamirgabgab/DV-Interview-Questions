@@ -28,9 +28,13 @@ with [graphify](https://pypi.org/project/graphifyy/)); click a question for a li
 ## Tutorial videos
 
 A video walks through a question's solution step by step, a chapter per part, with Hebrew
-captions. On the site, a question with a video has a "סרטון הסבר" button in its header and
-a link to its part's chapter in each solution. The plan and the tools: [`VIDEOS.md`](VIDEOS.md).
-This table is written by `python tools/catalog.py`.
+and English captions (off by default) and the page's own interactive box shown beside the
+code. The finished files of each video are kept in `videos/<id>/release/`: the silent video,
+the video with its background music, the music alone (for an editor), the two caption
+tracks and the chapter list for a YouTube description. Download them from the links below.
+Once a video is on YouTube, its page gets a "סרטון הסבר" button and a link to each part's
+chapter. The plan and the tools: [`VIDEOS.md`](VIDEOS.md). This table is written by
+`python tools/catalog.py`.
 
 <!-- videos -->
 | Id | Question | Chapters | Length | Download |

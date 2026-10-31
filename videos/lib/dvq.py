@@ -960,6 +960,17 @@ class DVQScene(Scene):
             lines, caption = g[0], g[1]
             frame = g[2] if len(g) > 2 else None
             with self.beat(caption):
+                if panel.rows and not all(panel.visible(n) for n in lines):
+                    # a windowed panel scrolls so that the group's lines are in it
+                    idx = [panel.index[n] for n in lines]
+                    if max(idx) - min(idx) >= panel.rows:
+                        raise RuntimeError(f"lines {lines} do not fit a window of {panel.rows}")
+                    first = min(idx) if min(idx) < panel.scroll else max(idx) - panel.rows + 1
+                    anims = panel.scroll_to(first)
+                    if cursor is not None:
+                        anims.append(FadeOut(cursor))
+                        cursor = None
+                    self.play(*anims, run_time=0.7)
                 if view is not None and frame is not None:
                     self.box_step(view, frame)
                 per = min(1.0, step_time / len(lines))

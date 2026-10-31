@@ -296,6 +296,9 @@ def main() -> int:
 
     # 2. the page's boxes, then the Hebrew labels: a dry run lists them, he_label.py draws
     #    the missing ones
+    if "\nBOXES" in scene_py.read_text(encoding="utf-8") and "BOXES" not in lits:
+        print("scene.py's BOXES must be a literal (no names in it)", file=sys.stderr)
+        return 1
     if lits.get("BOXES"):
         capture_boxes(qid, lits["BOXES"], args.label_python)
     with tempfile.TemporaryDirectory() as tmp:
