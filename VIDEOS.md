@@ -233,6 +233,9 @@ Beat 1, the problem: two boxes and a third one, t (English notes are plain lines
    part may leave `video_parts` out. The build, `lint_pages.py` and `check_videos.py`
    all reject a bad id, a missing time, a count that differs from the page's
    `### סעיף` headings, a first time other than 0, or times that do not rise.
+   Then `python tools/catalog.py` turns the README's "Tutorial videos" row of that
+   question into a YouTube link. The table has a row per `videos/<id>/script.md`, and a
+   test checks that it is up to date.
 4. **The hook** (`hooks/questions.py`) does the rest:
    - **The page tool.** A "סרטון הסבר" icon button (a screen with a play triangle) first
      among the page tools of the header card. Practice mode hides it with the solutions.

@@ -23,6 +23,21 @@ with [graphify](https://pypi.org/project/graphifyy/)); click a question for a li
 - [Topics](https://tamirgabgab.github.io/DV-Interview-Questions/tags/) and
   [what's new](https://tamirgabgab.github.io/DV-Interview-Questions/new/)
 - [`CATALOG.md`](CATALOG.md): every question with a direct link
+- [Tutorial videos](#tutorial-videos): a video per question, a chapter per part
+
+## Tutorial videos
+
+A video walks through a question's solution step by step, a chapter per part, with Hebrew
+captions. On the site, a question with a video has a "סרטון הסבר" button in its header and
+a link to its part's chapter in each solution. The plan and the tools: [`VIDEOS.md`](VIDEOS.md).
+This table is written by `python tools/catalog.py`.
+
+<!-- videos -->
+| Id | Question | Chapters | Watch |
+|----|----------|----------|-------|
+| 0002 | [החלפת ערכים בין שני משתנים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0002-swap-two-variables/) | 3 | rendered, waiting for the upload |
+| 0004 | [שלוש קופסאות עם תוויות שגויות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0004-three-mislabeled-boxes/) | 2 | rendered, waiting for the upload |
+<!-- /videos -->
 
 ## What is on the site
 
