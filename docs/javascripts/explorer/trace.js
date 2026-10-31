@@ -225,7 +225,7 @@
         $(".tr-right").innerHTML = `<div class="tr-arr" dir="ltr">` + arr.map((v, x) => {
           const cls = [x <= sortedTo ? "is-done" : "", fr && x === fr.i ? "is-i" : "", fr && x === fr.j ? "is-j" : "", fr && fr.swapped && (x === fr.i || x === fr.j) ? "is-swapped" : ""].join(" ").trim();
           return `<span class="${cls}"><span class="tr-idx">${x}</span>${v}</span>`;
-        }).join("") + `</div><p class="tr-counts">${fr ? `${ltr("i")} = ${ltr(fr.i)}, ${ltr("j")} = ${ltr(fr.j)}. ` : ""}השוואות : ${ltr(fr ? fr.comparisons : 0)} מתוך ${ltr(total)}, החלפות : ${ltr(fr ? fr.swaps : 0)}.</p>` +
+        }).join("") + `</div><p class="tr-counts">${fr ? `${ltr(`i = ${fr.i}, j = ${fr.j}`)}. ` : ""}השוואות : ${ltr(fr ? fr.comparisons : 0)} מתוך ${ltr(total)}, החלפות : ${ltr(fr ? fr.swaps : 0)}.</p>` +
           `<p class="tr-legend"><span class="tr-lg-i">מסגרת כחולה : ${code("i")}</span> <span class="tr-lg-j">מסגרת כתומה מקווקוות : ${code("j")}</span> <span class="tr-lg-done">ירוק : ${code("A[0..i]")} ממוין</span></p>`;
         $(".ex-pos").textContent = `השוואה ${st.k} מתוך ${total}`;
         let step;
