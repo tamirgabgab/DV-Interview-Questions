@@ -19,7 +19,7 @@ Once their structure is approved, the rest follow it question by question.
 | Look | The site's navy (the hero's) with amber marks, one version for both schemes |
 | On the page | One video per question, a chapter per part: 1–3 minutes for a part without code; 2–4 minutes for a part with code, more when the code is long (2026-10-31, with the typed code beat) |
 | Pace | Calm, in the style of 3Blue1Brown: animations of 1–2 s, every picture held 2–4 s for its caption |
-| Code beat | Python, except a DV question whose answer is SystemVerilog constraints: there the SV class is typed (0011, the owner, 2026-10-31). Where a part has a naive and an efficient solution, only the efficient one is typed and the naive one is named in the idea (0006) |
+| Code beat | Python only (the owner, 2026-10-31): the logic and the algorithm matter more than the syntax, and Python is the language a new engineer already writes. No SystemVerilog beat beside it. The exception is a question whose answer is SystemVerilog constraints (0011): it is meant for senior engineers who code, so the SV class is typed. A part with no code gets its mathematical proof step by step instead. Where a part has a naive and an efficient solution, only the efficient one is typed and the naive one is named in the idea (0006) |
 | Typed code (2026-10-31) | The code beat types the answer live: character by character, line by line, with a blinking amber cursor, and pauses after each line, or a small group of lines that make one operation, for a caption that says what it does and why. Only then the traced run on the page's example follows, in the same panel. A video gets 2–3 minutes longer, which the owner accepts |
 | Opening and closing | The drawn DV mark, the question's id and parts; the closing has the site's address and the question's id |
 | Captions (2026-10-31) | Two caption tracks go up with every video: Hebrew (`captions.vtt`) and English (`captions.en.vtt`, for viewers who are not Israeli). Neither is on by default, on YouTube or in the site's player: shown, they cover part of the picture, so the viewer turns them on |
@@ -96,8 +96,9 @@ Rules for every video:
   seconds, so a pause lands on a readable picture.
 - **The code is the page's code.** The code beat loads the code from the page's Python
   tab (`tools/extract_code.py`, without the annotation markers; `dvq.page_code()` for the
-  SystemVerilog tab), so it never drifts from the tested code. Python, unless the answer is
-  SystemVerilog constraints (0011). A long function may leave its comment and blank lines
+  SystemVerilog tab), so it never drifts from the tested code. Python only, unless the answer
+  is SystemVerilog constraints (0011, for senior engineers); a part without code shows its
+  mathematical proof step by step instead (the owner, 2026-10-31). A long function may leave its comment and blank lines
   out of the picture (0004's first solution), never its code.
 - **The code is typed, explained, then traced** (the owner, 2026-10-31). The code beat
   has two halves in one panel:
