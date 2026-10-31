@@ -1643,6 +1643,16 @@ section below starts at session 22, whose numbered items run on through the late
     the triple-meeting proof. `box_shots.py` gained a `set` action for a select or a slider.
     Waiting on the owner: watch them, upload, send the YouTube ids.
 
+109. **LaTeX math in the videos (session 28, 2026-10-31).** The owner wanted the equations
+    to look like LaTeX, as in 3Blue1Brown's videos, in every video, with code kept in the
+    code font. `dvq.TX()` sets math with `MathTex` in the palette, a cost chip's value in
+    `$...$` is math, and `render.py` stops with the apt line when `latex` or `dvisvgm` is
+    missing (the sandbox starts without them; the packages are in VIDEOS.md "Rendering"
+    and requirements-video.txt). Re-rendered with LaTeX: 0002, 0003, 0006, 0010, 0011,
+    0015, 0029 (0004 has no math, only code). Lengths and chapters are unchanged. Small
+    thing left: in `cost_chips` the word sits a little higher than a LaTeX value (centred,
+    not on one baseline).
+
 ## In progress
 
 - **Session 29 (2026-10-31):** question 0071, the three-wizard duel (work log item 107),
