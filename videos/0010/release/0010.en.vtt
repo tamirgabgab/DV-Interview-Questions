@@ -1,0 +1,415 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0010: valid parentheses,
+a student-level question.
+
+2
+00:00:04.600 --> 00:00:09.833
+Two parts: first a simple solution,
+then one that reads the string once.
+
+3
+00:00:10.633 --> 00:00:15.867
+A string holds brackets of three kinds:
+round, square and curly.
+
+4
+00:00:15.867 --> 00:00:21.333
+It is valid if every opener is closed by the same kind,
+and the last one opened is closed first.
+
+5
+00:00:22.133 --> 00:00:25.533
+Part A: a simple solution,
+even if it is not efficient.
+
+6
+00:00:26.233 --> 00:00:29.233
+The page's string: {[()]}.
+
+7
+00:00:29.233 --> 00:00:34.333
+The idea: a valid, non-empty string
+always has an adjacent pair, like () or [].
+
+8
+00:00:34.333 --> 00:00:39.133
+Delete it. What is left is valid
+if and only if the original string is valid.
+
+9
+00:00:39.133 --> 00:00:43.733
+Now [] is adjacent, and after it {}.
+Delete them too.
+
+10
+00:00:43.733 --> 00:00:47.233
+Nothing is left: the string is valid.
+
+11
+00:00:48.833 --> 00:00:53.867
+A deletion can create a new adjacent pair:
+in (()) we delete the inner pair,
+
+12
+00:00:53.867 --> 00:00:59.167
+and only then the outer pair becomes adjacent.
+So we repeat the deletion, pass after pass.
+
+13
+00:00:59.967 --> 00:01:04.767
+And the string ([)] has no adjacent pair:
+nothing to delete, and it is not empty.
+
+14
+00:01:04.767 --> 00:01:09.733
+So it is not valid: the round bracket closes
+before the square one, opened after it.
+
+15
+00:01:10.533 --> 00:01:13.533
+Now let's write it in Python.
+
+16
+00:01:15.833 --> 00:01:20.333
+isValid_brute takes the string s,
+and returns True if it is valid.
+
+17
+00:01:23.400 --> 00:01:27.900
+Line 2: the loop runs while the string has
+an adjacent pair, of any of the three kinds.
+
+18
+00:01:32.033 --> 00:01:36.533
+Line 3: one pass deletes every (),
+then every [], and then every {}.
+
+19
+00:01:37.867 --> 00:01:42.367
+Line 4: when no adjacent pair is left,
+the string is valid only if nothing is left.
+
+20
+00:01:43.067 --> 00:01:45.867
+Let's run the code on (()).
+
+21
+00:01:45.867 --> 00:01:48.967
+It has an adjacent pair, so we enter the loop.
+
+22
+00:01:48.967 --> 00:01:53.267
+Line 3: the first pass deletes
+the inner pair, and () is left.
+
+23
+00:01:53.267 --> 00:01:57.067
+The deletion created a new adjacent pair,
+so the loop goes on.
+
+24
+00:01:57.067 --> 00:02:01.367
+The second pass deletes it,
+and an empty string is left.
+
+25
+00:02:01.367 --> 00:02:04.367
+No adjacent pair is left,
+and the loop ends.
+
+26
+00:02:04.367 --> 00:02:08.367
+Line 4: the string is empty,
+so True is returned.
+
+27
+00:02:09.667 --> 00:02:13.967
+([)] has no adjacent pair,
+so the loop does not even start.
+
+28
+00:02:13.967 --> 00:02:17.967
+Line 4: four characters are left,
+so False is returned.
+
+29
+00:02:17.967 --> 00:02:23.467
+Note the loop's condition: there is an adjacent pair.
+With "the string is not empty" it would never end.
+
+30
+00:02:24.267 --> 00:02:28.567
+What does it cost? Take a nested string,
+(((()))), of length 8.
+
+31
+00:02:28.567 --> 00:02:34.467
+Each pass deletes only the inner pair:
+after two passes, (()) is left.
+
+32
+00:02:34.467 --> 00:02:39.867
+Two more passes, and only then is the string empty:
+four passes in all.
+
+33
+00:02:39.867 --> 00:02:45.367
+Each pass reads the string three times,
+once per replace: 44 characters, against 8.
+
+34
+00:02:46.167 --> 00:02:51.333
+The page's box shows the passes too,
+and the characters read in each one.
+
+35
+00:02:51.333 --> 00:02:55.333
+A nested string of length n takes n/2 passes,
+each costs O(n): O(n²) in all.
+
+36
+00:02:56.133 --> 00:03:01.633
+The cost: O(n²) time, and O(n) memory
+for the new strings. We can do better.
+
+37
+00:03:02.433 --> 00:03:06.233
+Part B: a solution that reads the string
+only once.
+
+38
+00:03:06.933 --> 00:03:10.533
+The idea: the bracket opened last
+is closed first.
+
+39
+00:03:10.533 --> 00:03:15.566
+When a closer comes, only the last opener
+not closed yet can match it.
+
+40
+00:03:15.566 --> 00:03:19.100
+That is exactly a stack:
+last in, first out.
+
+41
+00:03:19.900 --> 00:03:24.700
+This is the page's box. The stack is on the left,
+and the stack's depth in the chart.
+
+42
+00:03:24.700 --> 00:03:27.833
+{ is an opener, so it is pushed onto the stack.
+
+43
+00:03:27.833 --> 00:03:30.966
+[ is an opener too, pushed on top of it.
+
+44
+00:03:30.966 --> 00:03:34.100
+( is pushed as well, and it is now
+at the top of the stack.
+
+45
+00:03:34.100 --> 00:03:38.700
+) is a closer. The top is ( of the same kind,
+so we pop it.
+
+46
+00:03:38.700 --> 00:03:41.833
+] closes the [ at the top of the stack.
+
+47
+00:03:41.833 --> 00:03:45.866
+} closes the {. The stack is empty:
+the string is valid.
+
+48
+00:03:46.666 --> 00:03:49.566
+Now ([)], which has no adjacent pair.
+
+49
+00:03:49.566 --> 00:03:53.833
+( and then [ are pushed onto the stack.
+
+50
+00:03:53.833 --> 00:03:58.733
+) closes a round bracket, but the top is [:
+not valid, and we stop at once.
+
+51
+00:03:59.533 --> 00:04:04.933
+And in ((( every character is an opener,
+and all are pushed onto the stack.
+
+52
+00:04:04.933 --> 00:04:08.933
+The string has ended and the stack is not empty:
+three openers were never closed.
+
+53
+00:04:08.933 --> 00:04:12.933
+These are the three failures: a wrong kind,
+a closer with no opener, and openers left over.
+
+54
+00:04:13.733 --> 00:04:16.733
+Now let's write it in Python.
+
+55
+00:04:18.566 --> 00:04:22.666
+isValid takes a string,
+and returns True if it is valid.
+
+56
+00:04:25.200 --> 00:04:29.700
+Lines 2–3: an odd length is never valid,
+because brackets come in pairs.
+
+57
+00:04:32.433 --> 00:04:36.233
+Line 5: a dictionary from each closer
+to the opener of its kind.
+
+58
+00:04:37.233 --> 00:04:40.400
+Line 6: the stack, an empty list at first.
+
+59
+00:04:41.633 --> 00:04:45.166
+Line 8: we go over the characters,
+one after the other.
+
+60
+00:04:51.400 --> 00:04:55.900
+Lines 9–11: a closer needs its opener
+at the top of the stack. If not, return False.
+
+61
+00:04:55.900 --> 00:04:59.566
+Line 12: if it is there,
+we pop it off the stack.
+
+62
+00:05:01.666 --> 00:05:04.900
+Lines 13–14: an opener
+is pushed onto the stack.
+
+63
+00:05:06.300 --> 00:05:10.800
+Line 16: at the end, valid only if the stack is empty,
+that is, every opener was closed.
+
+64
+00:05:11.500 --> 00:05:14.700
+Let's run it on {[()]},
+beside the page's box.
+
+65
+00:05:14.700 --> 00:05:19.100
+The length is 6, even. The dictionary is ready,
+and the stack is empty.
+
+66
+00:05:19.100 --> 00:05:24.633
+{ is an opener: line 14 pushes it.
+
+67
+00:05:24.633 --> 00:05:30.166
+[ is pushed too.
+
+68
+00:05:30.166 --> 00:05:35.700
+( is pushed too. Now the stack
+holds three openers.
+
+69
+00:05:35.700 --> 00:05:41.233
+) is a closer, and the top is (:
+line 12 pops it.
+
+70
+00:05:41.233 --> 00:05:46.766
+] closes the [.
+
+71
+00:05:46.766 --> 00:05:52.300
+} closes the {.
+
+72
+00:05:52.300 --> 00:05:56.400
+The loop has ended and the stack is empty:
+line 16 returns True.
+
+73
+00:05:57.600 --> 00:06:02.000
+Now ([)]: the length is 4, even.
+
+74
+00:06:02.000 --> 00:06:07.533
+( is pushed.
+
+75
+00:06:07.533 --> 00:06:13.066
+[ is pushed on top of it.
+
+76
+00:06:13.066 --> 00:06:18.600
+) is a closer, and the top is [:
+line 11 returns False.
+
+77
+00:06:19.800 --> 00:06:25.100
+And on ((( the code stops at line 3 already:
+the length is 3, odd, before reading a character.
+
+78
+00:06:25.100 --> 00:06:29.100
+The box reads to the end and shows the openers
+left over. The code knows it earlier, from the length.
+
+79
+00:06:30.300 --> 00:06:35.466
+And openers left over at an even length? Say (([]:
+the length is 4, so the loop runs.
+
+80
+00:06:35.466 --> 00:06:41.000
+The three openers are pushed onto the stack.
+
+81
+00:06:41.000 --> 00:06:46.533
+] closes the [, and line 12 pops it.
+
+82
+00:06:46.533 --> 00:06:51.066
+The loop has ended, and (( is left on the stack:
+line 16 returns False.
+
+83
+00:06:51.866 --> 00:06:57.366
+The cost: each character is read once, O(n) time,
+and O(n) memory for the stack at worst.
+
+84
+00:06:58.166 --> 00:07:03.066
+A trap: counting openers and closers is not enough.
+)( has one of each.
+
+85
+00:07:03.066 --> 00:07:07.800
+But the closer comes while the stack is empty,
+and lines 10–11 return False.
+
+86
+00:07:08.593 --> 00:07:13.627
+In short: deleting adjacent pairs, O(n²),
+or a stack in one pass, O(n).
+
+87
+00:07:13.627 --> 00:07:17.727
+Try strings of your own in the box
+on the page of question 0010 on the site.

@@ -104,15 +104,15 @@ def check_caption(cap: dict) -> list[str]:
 
 
 LRI, PDI = "\u2066", "\u2069"
-LTR_RUN = re.compile(r"[A-Za-z0-9(\[−][A-Za-z0-9_()\[\]{}%^&|=+\-−*/<>≡'²³¹⁰₀ ,.]*")
+LTR_RUN = re.compile(r"[A-Za-z0-9(\[{)\]}−][A-Za-z0-9_()\[\]{}%^&|=+\-−*/<>≡'²³¹⁰₀ ,.]*")
 
 
 def _pieces(run: str):
     """Split a left-to-right run at ", " and ". " outside brackets (a list, a sentence)."""
     depth, start = 0, 0
     for i, ch in enumerate(run):
-        depth += ch in "([" and 1 or 0
-        depth -= ch in ")]" and 1 or 0
+        depth += ch in "([{" and 1 or 0
+        depth -= ch in ")]}" and 1 or 0
         if depth == 0 and ch in ",." and run[i + 1:i + 2] == " ":
             yield run[start:i]
             yield run[i:i + 2]
