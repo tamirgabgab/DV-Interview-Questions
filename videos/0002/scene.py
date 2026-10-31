@@ -4,13 +4,14 @@ Render with `python videos/render.py 0002` (see VIDEOS.md). The example is the p
 a = 5 and b = 3; the code beats run the page's Python on v = [5, 3], i = 0, j = 1.
 """
 
+import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
 from manim import *  # noqa: E402,F403
-from dvq import (BoxView, C, Cell, CodePanel, DVQScene, M, T, X, cost_chips,  # noqa: E402
+from dvq import (TX, BoxView, C, Cell, CodePanel, DVQScene, M, T, cost_chips,  # noqa: E402
                  page_python, trace)
 
 QID = 2
@@ -34,6 +35,22 @@ SCENES = [
 
 A0, B0 = 5, 3            # the page's example
 NUM = {"5": C.AMBER, "3": C.BLUE}
+
+
+XOR = r"\mathbin{\raisebox{-0.45ex}{\Large\texttt{\^{}}}}"   # the code's ^ inside LaTeX math, as the captions write it
+_SUP = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789")
+
+
+def mx(s: str) -> str:
+    """A formula as the captions write it (a₀, 2³¹, −, ^, mod) in LaTeX for `TX`."""
+    s = s.replace("^", f" {XOR} ").replace(" mod ", r" \bmod ").replace("·", r"\cdot")
+    s = s.replace("−", "-").replace("₀", "_0")
+    s = re.sub(r"([⁰¹²³⁴⁵⁶⁷⁸⁹]+)", lambda m: "^{" + m.group(1).translate(_SUP) + "}", s)
+    return s
+
+
+def tx(s: str, size: float = 32, color: str | None = None) -> Mobject:
+    return TX(mx(s), size=size, color=color)
 
 
 def bits(n: int, w: int = 4) -> str:
@@ -177,7 +194,7 @@ class ChapterA(SwapScene):
                  LaggedStart(*[Create(x) for x in rings], lag_ratio=0.15), run_time=2.0)
         self.fade_all()
 
-        chips = cost_chips(("time", "O(1)"), ("memory", "1 int"),
+        chips = cost_chips(("time", "$O(1)$"), ("memory", "1 int"),
                            notes=("three assignments", "temp"))
         self.say("הסיבוכיות : שלוש השמות, כלומר זמן O(1),\nוזיכרון נוסף של משתנה int אחד.",
                  FadeIn(chips, lag_ratio=0.3))
@@ -248,15 +265,21 @@ class ChapterB(SwapScene):
                       b.animate.move_to(RIGHT * 3.5 + DOWN * 0.1), run_time=0.9)
 
         tc = {"5": C.AMBER, "3": C.BLUE, "8": C.GREEN}
-        s = M("5 + 3 = 8", 56, t2c=tc).move_to(UP * 2.7)
+        s = TX("5", "+", "3", "=", "8", size=56).move_to(UP * 2.7)
+        for part in s:
+            part.set_color(tc.get(part.get_tex_string(), C.WHITE))
         self.say("הרעיון : הסכום 8 מחזיק את שני הערכים ביחד.", Write(s), run_time=1.2)
-        d = VGroup(M("8 − 3 = 5", 48, t2c=tc), M("8 − 5 = 3", 48, t2c=tc)).arrange(RIGHT, buff=1.6)
+        d = VGroup(TX("8", "-", "3", "=", "5", size=48), TX("8", "-", "5", "=", "3", size=48))
+        for eq in d:
+            for part in eq:
+                part.set_color(tc.get(part.get_tex_string(), C.WHITE))
+        d.arrange(RIGHT, buff=1.6)
         d.move_to(DOWN * 2.15)
         self.say("כשיודעים את הסכום ואחד הערכים,\nחיסור מחזיר את השני.", FadeIn(d, shift=0.2 * UP))
         self.play(FadeOut(s), FadeOut(d), run_time=0.6)
 
         def sym(cell, text, old=None):
-            new = X(text, 36, C.MUTED).next_to(cell.box, DOWN, buff=0.35)
+            new = tx(text, 36, C.MUTED).next_to(cell.box, DOWN, buff=0.35)
             return new if old is None else Transform(old, new)
 
         sa, sb = sym(a, "a₀"), sym(b, "b₀")
@@ -294,17 +317,18 @@ class ChapterB(SwapScene):
         # Why it works: the number line, then the symbolic table.
         nl = NumberLine(x_range=[0, 9, 1], length=12, color=C.MUTED, stroke_width=3,
                         include_tip=False).move_to(UP * 0.4)
-        nums = VGroup(*[M(str(k), 32, C.MUTED).next_to(nl.n2p(k), DOWN, buff=0.3) for k in range(10)])
+        nums = VGroup(*[TX(str(k), size=32, color=C.MUTED).next_to(nl.n2p(k), DOWN, buff=0.3)
+                        for k in range(10)])
         dots = VGroup(*[Dot(nl.n2p(k), radius=0.16, color=c) for k, c in ((3, C.BLUE), (5, C.AMBER),
                                                                        (8, C.GREEN))])
         back3 = CurvedArrow(nl.n2p(8) + UP * 0.25, nl.n2p(5) + UP * 0.25, angle=PI / 2.2,
                             color=C.AMBER, stroke_width=5)
-        l3 = M("− 3", 36, C.AMBER).next_to(back3, UP, buff=0.15)
+        l3 = TX("-3", size=36, color=C.AMBER).next_to(back3, UP, buff=0.15)
         self.say("למה זה נכון : על ציר המספרים,\nמ-8 חוזרים 3 צעדים ומגיעים ל-5.",
                  Create(nl), FadeIn(nums), FadeIn(dots), Create(back3), FadeIn(l3), run_time=1.8)
         back5 = CurvedArrow(nl.n2p(8) + DOWN * 0.9, nl.n2p(3) + DOWN * 0.9, angle=-PI / 2.4,
                             color=C.BLUE, stroke_width=5)
-        l5 = M("− 5", 36, C.BLUE).next_to(back5, DOWN, buff=0.15)
+        l5 = TX("-5", size=36, color=C.BLUE).next_to(back5, DOWN, buff=0.15)
         self.say("ומ-8 חוזרים 5 צעדים ומגיעים ל-3.\nשום מידע לא אבד.", Create(back5), FadeIn(l5))
         self.fade_all()
 
@@ -320,7 +344,7 @@ class ChapterB(SwapScene):
 
         self.overflow()
 
-        chips = cost_chips(("time", "O(1)"), ("memory", "0"), notes=("three operations", "no temp"))
+        chips = cost_chips(("time", "$O(1)$"), ("memory", "$0$"), notes=("three operations", "no temp"))
         self.say("הסיבוכיות : זמן O(1), וזיכרון נוסף אפס,\nוזה כל העניין של הסעיף.",
                  FadeIn(chips, lag_ratio=0.3))
         self.fade_all()
@@ -357,7 +381,7 @@ class ChapterB(SwapScene):
                 color = C.MUTED if r == 0 or c == 0 else C.WHITE
                 if r and c and val.endswith(("= a₀", "= b₀")):
                     color = C.GREEN
-                mob = (M if r == 0 or c == 0 else X)(val, size, color).move_to([x + w / 2, y, 0])
+                mob = (M if r == 0 or c == 0 else tx)(val, size, color).move_to([x + w / 2, y, 0])
                 grid.add(mob)
                 x += w
         grid.add(Line([x0, -h / 2, 0], [x0 + sum(widths), -h / 2, 0], stroke_color=C.MUTED,
@@ -376,12 +400,12 @@ class ChapterB(SwapScene):
         POS = {"0": 90, "1": 72, "max": -72, "min": -108}
         ticks = VGroup(*[Line(at(d, R - 0.14), at(d, R + 0.14), color=C.MUTED, stroke_width=3)
                          for d in POS.values()])
-        labels = VGroup(X("0", 32, C.MUTED).move_to(at(90, R + 0.45)),
-                        X("1", 32, C.MUTED).move_to(at(72, R + 0.45)),
-                        X("2³¹ − 1", 32, C.MUTED).move_to(at(-72, R + 0.45) + RIGHT * 0.75),
-                        X("−2³¹", 32, C.MUTED).move_to(at(-108, R + 0.45) + LEFT * 0.5))
-        plus = X("+", 44, C.MUTED).move_to(at(5, R - 0.6))
-        minus = X("−", 44, C.MUTED).move_to(at(175, R - 0.6))
+        labels = VGroup(tx("0", 32, C.MUTED).move_to(at(90, R + 0.45)),
+                        tx("1", 32, C.MUTED).move_to(at(72, R + 0.45)),
+                        tx("2³¹ − 1", 32, C.MUTED).move_to(at(-72, R + 0.45) + RIGHT * 0.75),
+                        tx("−2³¹", 32, C.MUTED).move_to(at(-108, R + 0.45) + LEFT * 0.5))
+        plus = tx("+", 44, C.MUTED).move_to(at(5, R - 0.6))
+        minus = tx("−", 44, C.MUTED).move_to(at(175, R - 0.6))
         seam = Line(at(-90, R - 0.4), at(-90, R + 0.4), color=C.AMBER, stroke_width=7)
         self.say("ומה עם גלישה? ב-SystemVerilog, int הוא 32 ביט,\nוהחשבון הוא מודולו 2³².",
                  Create(wheel), FadeIn(ticks), FadeIn(labels), FadeIn(plus), FadeIn(minus))
@@ -389,7 +413,7 @@ class ChapterB(SwapScene):
                  Flash(at(-90), color=C.AMBER, line_length=0.35))
 
         right = RIGHT * 3.6
-        rows = VGroup(X("a = 2³¹ − 1", 44, C.AMBER), X("b = 1", 44, C.BLUE))
+        rows = VGroup(tx("a = 2³¹ − 1", 44, C.AMBER), tx("b = 1", 44, C.BLUE))
         rows.arrange(DOWN, buff=0.45, aligned_edge=LEFT).move_to(right + UP * 0.6)
         da = Dot(at(POS["max"]), radius=0.16, color=C.AMBER)
         db = Dot(at(POS["1"]), radius=0.16, color=C.BLUE)
@@ -405,7 +429,7 @@ class ChapterB(SwapScene):
             return MoveAlongPath(dot, arc(R)), MoveAlongPath(label, arc(R * 0.8))
 
         def row(i, text, color):
-            return Transform(rows[i], X(text, 44, color).move_to(rows[i], aligned_edge=LEFT))
+            return Transform(rows[i], tx(text, 44, color).move_to(rows[i], aligned_edge=LEFT))
 
         stmt = M("a = a + b", 44, C.AMBER).move_to(right + UP * 2.8)
         with self.beat("נניח a = 2³¹ − 1 ו-b = 1.\nהסכום עובר את התפר ונעטף אל −2³¹."):
@@ -425,7 +449,8 @@ class ChapterB(SwapScene):
                       run_time=1.6)
             ok = M("✓", 56, C.GREEN).next_to(rows, RIGHT, buff=0.5)
             self.play(FadeIn(ok), run_time=0.4)
-        ident = VGroup(X("((a₀ + b₀) − b₀) mod 2³²", 34, C.GREEN), X("= a₀ mod 2³²", 34, C.GREEN))
+        ident = VGroup(TX(r"\big((a_0 + b_0) - b_0\big) \bmod 2^{32}", size=34, color=C.GREEN),
+                       TX(r"= a_0 \bmod 2^{32}", size=34, color=C.GREEN))
         ident.arrange(DOWN, buff=0.25, aligned_edge=LEFT).move_to(right + DOWN * 1.6)
         self.say("כל השוויונים נכונים גם מודולו 2³²,\nולכן הגלישה לא מזיקה.", Write(ident))
         self.fade_all()
@@ -548,7 +573,7 @@ class ChapterC(SwapScene):
         self.fade_all()
 
         # Why it works: one bit column, all four cases.
-        heads = ["a₀", "b₀", "1 · a", "2 · b", "3 · a"]
+        heads = ["a₀", "b₀", r"\text{1:}\ a", r"\text{2:}\ b", r"\text{3:}\ a"]
         subs = ["", "", "a₀ ^ b₀", "a ^ b₀", "a ^ b"]
         widths = [1.8, 1.8, 2.7, 2.7, 2.7]
         x0 = -sum(widths) / 2
@@ -559,8 +584,8 @@ class ChapterC(SwapScene):
         for w in widths:
             xs.append(x + w / 2)
             x += w
-        head = VGroup(*[X(t, 36, C.MUTED).move_to([xs[c], top, 0]) for c, t in enumerate(heads)])
-        sub = VGroup(*[X(t, 26, C.MUTED).move_to([xs[c], top - 0.48, 0]) for c, t in enumerate(subs) if t])
+        head = VGroup(*[tx(t, 36, C.MUTED).move_to([xs[c], top, 0]) for c, t in enumerate(heads)])
+        sub = VGroup(*[tx(t, 30, C.MUTED).move_to([xs[c], top - 0.5, 0]) for c, t in enumerate(subs) if t])
         rule = Line([x0, top - 0.8, 0], [x0 + sum(widths), top - 0.8, 0], stroke_color=C.MUTED,
                     stroke_width=2)
         self.say("למה זה נכון : XOR פועל על כל עמודה לבד,\nבלי נשא, אז מספיק לבדוק ביט אחד.",
@@ -582,11 +607,11 @@ class ChapterC(SwapScene):
         g2 = VGroup(SurroundingRectangle(cols[1], color=C.BLUE, buff=0.15),
                     SurroundingRectangle(cols[4], color=C.BLUE, buff=0.15))
         self.say("בכל הארבעה, שלב 2 מחזיר את a₀,\nושלב 3 מחזיר את b₀.", Create(g1), Create(g2))
-        alg = X("(a₀ ^ b₀) ^ b₀  =  a₀ ^ (b₀ ^ b₀)  =  a₀ ^ 0  =  a₀", 36, C.GREEN).move_to(DOWN * 2.25)
+        alg = tx("(a₀ ^ b₀) ^ b₀ = a₀ ^ (b₀ ^ b₀) = a₀ ^ 0 = a₀", 36, C.GREEN).move_to(DOWN * 2.25)
         self.say("ובאלגברה : b₀ ^ b₀ מתבטל ל-0, ונשאר a₀.", Write(alg))
         self.fade_all()
 
-        chips = cost_chips(("time", "O(1)"), ("memory", "0"), notes=("three XORs", "no temp"))
+        chips = cost_chips(("time", "$O(1)$"), ("memory", "$0$"), notes=("three XORs", "no temp"))
         self.say("הסיבוכיות : זמן O(1) וזיכרון אפס,\nבלי נשא ובלי גלישה.", FadeIn(chips, lag_ratio=0.3))
         chain = VGroup(M("a = a ^ b", 34), M("→", 34, C.MUTED), M("b = a ^ b", 34), M("→", 34, C.MUTED),
                        M("a = a ^ b", 34)).arrange(RIGHT, buff=0.3).move_to(DOWN * 2.2)

@@ -14,7 +14,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
 from manim import *  # noqa: E402,F403
-from dvq import C, BoxView, CodePanel, DVQScene, M, VarPanel, cost_chips, page_python, trace  # noqa: E402
+from dvq import (TX, C, BoxView, CodePanel, DVQScene, M, VarPanel, cost_chips,  # noqa: E402
+                 page_python, trace)
 
 QID = 3
 SCENES = [
@@ -185,7 +186,8 @@ class Chapter(DVQScene):
         self.say("למה זה עובד תמיד? נסתכל על המערך\nבסוף כל איטרציה של i.",
                  LaggedStart(*[FadeIn(r, shift=0.15 * DOWN) for r in rows], lag_ratio=0.25),
                  run_time=2.0)
-        claim = M("end of i:  A[0..i] sorted,  A[i] = max(A)", 30, C.AMBER).move_to(UP * 3.2)
+        claim = TX(r"\text{end of } i:\ \ A[0..i]\ \text{sorted},\ \ A[i] = \max(A)",
+                   size=32, color=C.AMBER).move_to(UP * 3.2)
         self.say("הטענה : בסוף איטרציה i, החלק A[0..i]\nממוין, ו-A[i] הוא המקסימום של כל המערך.",
                  FadeIn(claim))
         ring = rows[1][1].ring(0)
@@ -199,7 +201,8 @@ class Chapter(DVQScene):
         ring3 = rows[3][1].ring(2)
         self.say("הגדולים ממנו זזים מקום אחד ימינה,\nוהמקסימום מגיע בדיוק ל-A[i].",
                  Transform(ring, ring3))
-        never = M("j ≥ i:  A[i] < A[j]  never", 30, C.RED).next_to(rows, DOWN, buff=0.28)
+        never = TX(r"j \ge i:\ \ A[i] < A[j]\ \ \text{never}", size=32,
+                   color=C.RED).next_to(rows, DOWN, buff=0.28)
         self.say("שלב 3, j ≥ i : A[i] הוא כבר המקסימום,\nולכן התנאי לא מתקיים ואין החלפות.",
                  FadeIn(never))
         last = SurroundingRectangle(rows[4][1], color=C.GREEN, buff=0.08, corner_radius=0.1,
@@ -208,7 +211,7 @@ class Chapter(DVQScene):
                  FadeOut(arrow), FadeOut(never), Transform(ring, last))
         self.fade_all()
 
-        chips = cost_chips(("time", "Θ(n²)"), ("memory", "O(1)"),
+        chips = cost_chips(("time", r"$\Theta(n^2)$"), ("memory", "$O(1)$"),
                            notes=("n · n comparisons", "in place"))
         self.say("הסיבוכיות : תמיד n² השוואות, גם\nכשהמערך כבר ממוין. זמן Θ(n²).",
                  FadeIn(chips, lag_ratio=0.3))
@@ -235,7 +238,7 @@ class Chapter(DVQScene):
 
 class Closing(DVQScene):
     def construct(self):
-        self.closing(QID, [("התשובה", M("ascending sort,  n² comparisons", 34))],
+        self.closing(QID, [("התשובה", TX(r"\text{ascending sort},\ \ n^2\ \text{comparisons}", size=36))],
                      ["לסיכום : הקוד ממיין בסדר עולה,\nתמיד ב-n² השוואות.",
                       "נסו מערך משלכם בתיבה\nשבעמוד של שאלה 0003 באתר."],
                      holds=(3.2, 3.5))
