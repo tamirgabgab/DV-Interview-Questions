@@ -111,6 +111,21 @@ he: ודווקא מהקופסה "אדום ושחור".
 en: So the answer: one draw,
 en: and it must be from the "Red and Black" box.
 
+he: בתיבה שבעמוד אפשר לנסות :
+he: לוחצים על קופסה ודוגמים ממנה כדור.
+en: In the page's box you can try it:
+en: click a box to draw a ball from it.
+
+he: דוגמים מהקופסה "אדום ושחור",
+he: ויוצא כדור אדום.
+en: We draw from the box "Red and Black",
+en: and a red ball comes out.
+
+he: גילוי התוכן מראה בדיוק את מה שהסקנו :
+he: שלוש התוויות הנכונות, מדגימה אחת.
+en: Revealing the contents shows exactly what we deduced:
+en: all three labels, from one draw.
+
 he: המלכודת : לדגום מהקופסה "אדום".
 he: כדור שחור משם משאיר את שני הסידורים פתוחים.
 en: The trap: drawing from the "Red" box.
@@ -189,9 +204,9 @@ he: המערך labels עצמו לא השתנה.
 en: And return fixed.
 en: The array labels itself is unchanged.
 
-he: נריץ על הדוגמה מהעמוד,
+he: נריץ על הדוגמה מהעמוד, ליד התיבה,
 he: כש-draw מחזיר RED.
-en: Let's run it on the page's example,
+en: We run it on the page's example, beside the box,
 en: with draw returning RED.
 
 he: המעבר הראשון מחפש את MIXED.
@@ -257,6 +272,21 @@ he: הוא בדיוק שתי החלפות.
 en: And a rotation of three elements
 en: is exactly two swaps.
 
+he: בתיבה שבעמוד, fix_labels רץ שלב אחרי שלב
+he: על הדוגמה מהעמוד.
+en: In the page's box, fix_labels runs step by step
+en: on the page's example.
+
+he: החצים מעל הקופסאות הם הסיבוב
+he: של שלוש התוויות, ו-same ו-other מסומנים.
+en: The arrows over the boxes are the rotation
+en: of the three labels; same and other are marked.
+
+he: ובסוף התיבה מגלה את התוכן :
+he: שלוש התוויות נכונות, אחרי שתי החלפות.
+en: At the end the box reveals the contents:
+en: all three labels are right, after two swaps.
+
 he: הקוד : אחרי הדגימה לא מחפשים שוב,
 he: ולא בונים מערך חדש.
 en: The code: after the draw there is no second search,
@@ -295,8 +325,10 @@ en: Together the two swaps are the rotation.
 he: ומחזירים את labels, מתוקן במקום.
 en: And return labels, fixed in place.
 
-he: ועכשיו הריצה, שוב עם כדור אדום.
-en: Now the run, again with a red ball.
+he: ועכשיו הריצה ליד התיבה מהעמוד,
+he: שוב עם כדור אדום.
+en: And now the run beside the page's box,
+en: again with a red ball.
 
 he: שוב k = 2, והכדור שיוצא אדום.
 en: Again k = 2, and the ball that comes out is red.

@@ -52,6 +52,26 @@ he: ההחלפה הושלמה.
 en: Step 3: b = temp, and b gets 5.
 en: The swap is complete.
 
+he: אותה דוגמה בתיבה שבעמוד :
+he: הקוד, ומתחתיו הערך של כל משתנה.
+en: The same example in the page's box:
+en: the code, and under it the value of every variable.
+
+he: ‏temp שומר את a0, הערך 5,
+he: לפני שדורסים את v[i].
+en: temp keeps a0, the value 5,
+en: before v[i] is overwritten.
+
+he: ‏v[i] מקבל את b0, והעמודה הסימבולית
+he: מראה ש-a0 שמור רק ב-temp.
+en: v[i] gets b0, and the symbolic column
+en: shows a0 is kept only in temp.
+
+he: ‏v[j] מקבל את a0 מ-temp.
+he: בסוף a = b0 ו-b = a0.
+en: v[j] gets a0 from temp.
+en: At the end a = b0 and b = a0.
+
 he: עכשיו נכתוב את זה ב-Python, שורה אחרי שורה.
 en: Now let's write it in Python, line by line.
 
@@ -80,20 +100,20 @@ he: ששמור ב-temp.
 en: Line 4: v[j] gets the original value of a,
 en: which is saved in temp.
 
-he: נריץ על הדוגמה מהעמוד :
-he: הרשימה [5, 3], עם i = 0 ו-j = 1.
-en: Let's run it on the page's example:
-en: the list [5, 3], with i = 0 and j = 1.
+he: מימין, התיבה מהעמוד מריצה את אותו הקוד
+he: על [5, 3], עם i = 0 ו-j = 1.
+en: On the right, the page's box runs the same code
+en: on [5, 3], with i = 0 and j = 1.
 
-he: שורה 2 : temp מקבל את v[i], כלומר 5.
-en: Line 2: temp gets v[i], that is, 5.
+he: קודם temp מקבל את v[i], כלומר 5.
+en: First temp gets v[i], that is 5.
 
-he: שורה 3 : v[i] מקבל את v[j], כלומר 3.
-en: Line 3: v[i] gets v[j], that is, 3.
+he: אחר כך v[i] מקבל את v[j], כלומר 3.
+en: Then v[i] gets v[j], that is 3.
 
-he: שורה 4 : v[j] מקבל את temp,
+he: ובסוף v[j] מקבל את temp,
 he: והרשימה היא עכשיו [3, 5].
-en: Line 4: v[j] gets temp,
+en: Finally v[j] gets temp,
 en: and the list is now [3, 5].
 
 he: למה זה נכון : נעקוב אחרי 5 ו-3,
@@ -162,6 +182,26 @@ he: ו-a מקבל 3. הערכים הוחלפו.
 en: Step 3: a = a − b, that is, 8 minus 5,
 en: and a gets 3. The values are swapped.
 
+he: בתיבה שבעמוד, אותן שלוש שורות,
+he: ועמודה סימבולית שעוקבת אחרי a0 ו-b0.
+en: In the page's box, the same three lines,
+en: and a symbolic column that follows a0 and b0.
+
+he: ‏v[i] מקבל את הסכום, 8,
+he: ובסימבולית a0 + b0.
+en: v[i] gets the sum, 8,
+en: symbolically a0 + b0.
+
+he: ‏v[j] מקבל את הסכום פחות b0,
+he: כלומר 8 − 3 = 5, שהוא a0.
+en: v[j] gets the sum minus b0,
+en: that is 8 − 3 = 5, which is a0.
+
+he: ‏v[i] מקבל את הסכום פחות a0,
+he: כלומר 8 − 5 = 3, שהוא b0.
+en: v[i] gets the sum minus a0,
+en: that is 8 − 5 = 3, which is b0.
+
 he: בקוד מהעמוד אותן שלוש שורות, על v[i] ו-v[j].
 en: The page's code: the same three lines, on v[i] and v[j].
 
@@ -185,17 +225,19 @@ he: וזה הערך החדש של v[i].
 en: Line 4: the sum minus a0 leaves b0,
 en: and that is the new value of v[i].
 
-he: ונריץ על אותה דוגמה, v = [5, 3].
-en: And let's run it on the same example, v = [5, 3].
+he: ונריץ ליד התיבה מהעמוד,
+he: על אותה דוגמה, v = [5, 3].
+en: And we run it beside the page's box,
+en: on the same example, v = [5, 3].
 
-he: שורה 2 : v[i] מקבל את הסכום, 8.
-en: Line 2: v[i] gets the sum, 8.
+he: קודם v[i] מקבל את הסכום, 8.
+en: First v[i] gets the sum, 8.
 
-he: שורה 3 : v[j] מקבל 8 פחות 3, כלומר 5.
-en: Line 3: v[j] gets 8 minus 3, that is, 5.
+he: אחר כך v[j] מקבל 8 פחות 3, כלומר 5.
+en: Then v[j] gets 8 minus 3, that is 5.
 
-he: שורה 4 : v[i] מקבל 8 פחות 5, כלומר 3.
-en: Line 4: v[i] gets 8 minus 5, that is, 3.
+he: ובסוף v[i] מקבל 8 פחות 5, כלומר 3.
+en: Finally v[i] gets 8 minus 5, that is 3.
 
 he: ב-Python הסכום אף פעם לא גולש,
 he: כי מספרים שלמים הם בגודל לא מוגבל.
@@ -315,6 +357,26 @@ he: יוצא 0011, כלומר 3.
 en: Step 3: a = a ^ b, and a flips where b is 1.
 en: The result is 0011, that is, 3.
 
+he: והתיבה שבעמוד, הפעם עם XOR :
+he: אותן שלוש שורות, עם ^.
+en: And the page's box, this time with XOR:
+en: the same three lines, with ^.
+
+he: ‏v[i] מקבל 5 ^ 3, כלומר 6,
+he: ובסימבולית a0 ^ b0.
+en: v[i] gets 5 ^ 3, that is 6,
+en: symbolically a0 ^ b0.
+
+he: ‏v[j] מקבל 6 ^ 3, כלומר 5 :
+he: ה-b0 מתבטל ונשאר a0.
+en: v[j] gets 6 ^ 3, that is 5:
+en: b0 cancels out and a0 is left.
+
+he: ‏v[i] מקבל 6 ^ 5, כלומר 3 :
+he: ה-a0 מתבטל ונשאר b0.
+en: v[i] gets 6 ^ 5, that is 3:
+en: a0 cancels out and b0 is left.
+
 he: הקוד מהעמוד : אותן שלוש שורות,
 he: עם ^ במקום + ו-−.
 en: The code from the page: the same three lines,
@@ -338,17 +400,19 @@ he: ונשאר b0, הערך החדש של v[i].
 en: Line 4: an XOR with a0 cancels it,
 en: leaving b0, the new value of v[i].
 
-he: ועכשיו הריצה על 5 ו-3, גם בביטים.
-en: Now the run on 5 and 3, in bits as well.
+he: ועכשיו הריצה על 5 ו-3,
+he: לצד התיבה מהעמוד.
+en: And now the run on 5 and 3,
+en: beside the page's box.
 
-he: שורה 2 : v[i] מקבל 5 ^ 3, כלומר 6.
-en: Line 2: v[i] gets 5 ^ 3, that is, 6.
+he: קודם v[i] מקבל 5 ^ 3, כלומר 6.
+en: First v[i] gets 5 ^ 3, that is 6.
 
-he: שורה 3 : v[j] מקבל 6 ^ 3, כלומר 5.
-en: Line 3: v[j] gets 6 ^ 3, that is, 5.
+he: אחר כך v[j] מקבל 6 ^ 3, כלומר 5.
+en: Then v[j] gets 6 ^ 3, that is 5.
 
-he: שורה 4 : v[i] מקבל 6 ^ 5, כלומר 3.
-en: Line 4: v[i] gets 6 ^ 5, that is, 3.
+he: ובסוף v[i] מקבל 6 ^ 5, כלומר 3.
+en: Finally v[i] gets 6 ^ 5, that is 3.
 
 he: למה זה נכון : XOR פועל על כל עמודה לבד,
 he: בלי נשא, אז מספיק לבדוק ביט אחד.

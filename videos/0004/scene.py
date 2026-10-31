@@ -11,10 +11,24 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
 from manim import *  # noqa: E402,F403
-from dvq import (C, CodePanel, DVQScene, M, T, VarPanel, chip, cost_chips, he,  # noqa: E402
+from dvq import (BoxView, C, CodePanel, DVQScene, M, T, chip, cost_chips, he,  # noqa: E402
                  page_python, trace)
 
 QID = 4
+# The page's boxes (VIDEOS.md, "The page's box"): part א's game with seed 7 (the page's
+# example: a red ball from box 2) and seed 1 (a black ball), each a draw from crate 2 and
+# the contents revealed; part ב's fix_labels player, step by step (also narrower, "fixn").
+BOXES = {
+    "draw": {"box": 0, "region": [".b3-crates", ".b3-step", ".b3-lines"], "hide": [".b3-assign", ".b3-msg"],
+             "steps": [[["fill", ".ex-seed", "7"]], [["click", ".b3-crate[data-i='2']"]], [["click", ".ex-reveal"]]]},
+    "drawb": {"box": 0, "region": [".b3-crates", ".b3-step", ".b3-lines"], "hide": [".b3-assign", ".b3-msg"],
+              "steps": [[["fill", ".ex-seed", "1"]], [["click", ".b3-crate[data-i='2']"]], [["click", ".ex-reveal"]]]},
+    "fix": {"box": 1, "region": [".ex-play-row", ".lf-crates", ".lf-arr", ".lf-step", ".lf-vars"],
+            "hide": [".ex-scrubwrap"], "steps": [[], {"do": [["click", ".ex-next"]], "repeat": 5}]},
+    # the same player 440 px wide, beside the code of fix_labels (its lines are long)
+    "fixn": {"box": 1, "width": 440, "region": [".ex-play-row", ".lf-crates", ".lf-arr", ".lf-step", ".lf-vars"],
+             "hide": [".ex-scrubwrap"], "steps": [[], {"do": [["click", ".ex-next"]], "repeat": 5}]},
+}
 SCENES = [
     ("Opening", "פתיחה"),
     ("ChapterA", "סעיף א – מספר הדגימות המינימלי"),
@@ -234,6 +248,12 @@ class ChapterA(BoxScene):
                  FadeIn(answer, scale=1.2), FadeIn(under))
         self.fade_all()
 
+        # The page's box: the same draw, then the contents revealed.
+        view = BoxView(QID, "draw", height=5.0).move_to(UP * 0.6)
+        self.say('בתיבה שבעמוד אפשר לנסות\xa0:\nלוחצים על קופסה ודוגמים ממנה כדור.', FadeIn(view))
+        self.box_beat(view, [(1, 'דוגמים מהקופסה "אדום ושחור",\nויוצא כדור אדום.'), (2, 'גילוי התוכן מראה בדיוק את מה שהסקנו\xa0:\nשלוש התוויות הנכונות, מדגימה אחת.')])
+        self.fade_all()
+
         # The trap.
         row = crates(LABELS).move_to(UP * 0.4)
         self.play(FadeIn(row), run_time=0.8)
@@ -309,14 +329,7 @@ class ChapterB(BoxScene):
         code = page_python(QID, "def fix_labels_simple")
         panel = CodePanel(code, font_size=24, drop_comments=True, line_spacing=0.5)
 
-        def fmt(n, s):
-            if n.startswith("fixed"):
-                return repr(s["fixed"][int(n[6])]) if "fixed" in s else ""
-            return repr(s[n]) if n in s else ""
-
-        vp = VarPanel(["i", "k", "ball", "other", "fixed[0]", "fixed[1]", "fixed[2]"], fmt=fmt,
-                      size=32, buff=0.35).set_state({})
-        self.place_code(panel, vp, vp_width=vp.keys["fixed[0]"].width + 2.2)
+        self.place_code(panel)
         self.type_code(panel, [
             (1, "הפונקציה מקבלת את מערך התוויות,\nומחזירה את התוויות הנכונות."),
             (2, "המערך fixed יקבל את התוויות המתוקנות.\nבינתיים שלוש מחרוזות ריקות."),
@@ -328,27 +341,31 @@ class ChapterB(BoxScene):
             (range(23, 26), "לולאה שלישית : בקופסה שתוויתה other\nאין other ואין ball, ולכן היא MIXED."),
             (27, "ומחזירים את fixed.\nהמערך labels עצמו לא השתנה."),
         ], intro="הפתרון הראשון מתרגם את סעיף א כמעט מילה במילה,\nובונה מערך fixed חדש.")
-        self.say("נריץ על הדוגמה מהעמוד,\nכש-draw מחזיר RED.", FadeIn(vp))
+        view = BoxView(QID, "draw")
+        with self.beat('נריץ על הדוגמה מהעמוד, ליד התיבה,\nכש-draw מחזיר RED.'):
+            self.split(panel, view)
         steps, result = trace(code, "fix_labels_simple", ([EN[k] for k in LABELS],),
                               {"draw": lambda i: "RED"})
         assert result == [EN[k] for k in ARR1]
-        cursor = self.run_code(panel, vp, steps, [
+        cursor = self.run_code(panel, None, steps, [
             ([2, 5, 6, 5, 6, 5, 6, 7, 5], "המעבר הראשון מחפש את MIXED.\nהוא בקופסה 2, ולכן k = 2."),
-            ([8], "דגימה אחת מקופסה 2 : יוצא RED."),
+            ([8], "דגימה אחת מקופסה 2 : יוצא RED.", 1),
             ([11, 12, 15], "הצבע השני, other, הוא BLACK,\nוקופסה 2 מקבלת RED."),
             ([18, 19, 20, 18, 19, 18, 19, 18], "המעבר השני : הקופסה שתוויתה RED\nמקבלת את other, כלומר BLACK."),
             ([23, 24, 23, 24, 25, 23, 24, 23], "המעבר השלישי : הקופסה שתוויתה BLACK\nמקבלת MIXED."),
-            ([27], "התוצאה : BLACK, MIXED, RED.\nבדיוק סידור 1."),
-        ], step_time=3.0)
-        self.play(FadeOut(cursor), *vp.show({}, flash=False), run_time=0.6)
+            ([27], "התוצאה : BLACK, MIXED, RED.\nבדיוק סידור 1.", 2),
+        ], step_time=3.0, view=view)
+        black = BoxView(QID, "drawb")
+        black.scale_to_fit_width(view.width).move_to(view)
+        self.play(FadeOut(cursor), FadeOut(view), FadeIn(black), run_time=0.8)
         steps, result = trace(code, "fix_labels_simple", ([EN[k] for k in LABELS],),
                               {"draw": lambda i: "BLACK"})
         assert result == [EN[k] for k in ARR2]
-        cursor = self.run_code(panel, vp, steps, [
-            ([2, 5, 6, 5, 6, 5, 6, 7, 5, 8, 11, 14, 15], "ואם הכדור שחור? other הוא RED,\nוקופסה 2 מקבלת BLACK."),
+        cursor = self.run_code(panel, None, steps, [
+            ([2, 5, 6, 5, 6, 5, 6, 7, 5, 8, 11, 14, 15], "ואם הכדור שחור? other הוא RED,\nוקופסה 2 מקבלת BLACK.", 1),
             ([18, 19, 18, 19, 20, 18, 19, 18, 23, 24, 25, 23, 24, 23, 24, 23, 27],
-             "קופסה 1 מקבלת RED, וקופסה 0 מקבלת MIXED.\nזה סידור 2."),
-        ], step_time=3.4)
+             "קופסה 1 מקבלת RED, וקופסה 0 מקבלת MIXED.\nזה סידור 2.", 2),
+        ], step_time=3.4, view=black)
         self.fade_all()
         chips = cost_chips(("passes", "3"), ("memory", "new array"),
                            notes=("three loops over labels", "fixed"))
@@ -387,18 +404,18 @@ class ChapterB(BoxScene):
         self.say("וסיבוב של שלושה איברים\nהוא בדיוק שתי החלפות.", FadeIn(swaps, shift=0.2 * UP))
         self.fade_all()
 
+        # The page's box: fix_labels step by step on the page's example.
+        view = BoxView(QID, "fix", height=5.5).move_to(UP * 0.55)
+        self.say('בתיבה שבעמוד, fix_labels רץ שלב אחרי שלב\nעל הדוגמה מהעמוד.', FadeIn(view))
+        self.box_beat(view, [(2, 'החצים מעל הקופסאות הם הסיבוב\nשל שלוש התוויות, ו-same ו-other מסומנים.'), (5, 'ובסוף התיבה מגלה את התוכן\xa0:\nשלוש התוויות נכונות, אחרי שתי החלפות.')])
+        self.fade_all()
+
     def solution2(self):
         code = page_python(QID, "def fix_labels(")
         panel = CodePanel(code, font_size=26, drop_comments=True, drop_trailing_comments=True,
                           line_spacing=0.6)          # place_code scales it to the frame
 
-        def fmt(n, s):
-            return repr(s[n]) if n in s else ""
-
-        vp = VarPanel(["k", "ball", "n1", "n2", "same", "other", "labels"], fmt=fmt, size=30,
-                      cols=3, slot=3.7)
-        vp.set_state({"labels": [EN[k] for k in LABELS]})
-        self.place_code(panel, vp)
+        self.place_code(panel)
         self.type_code(panel, [
             (1, "הפעם הפונקציה מתקנת את labels במקום,\nומחזירה את אותו מערך."),
             ([2, 3], "המתודה index מוצאת את MIXED בשורה אחת,\nוהדגימה היחידה היא שוב מקופסה k."),
@@ -408,17 +425,20 @@ class ChapterB(BoxScene):
             (11, "החלפה שנייה, בין same ל-other.\nשתי ההחלפות יחד הן הסיבוב."),
             (12, "ומחזירים את labels, מתוקן במקום."),
         ], intro="הקוד : אחרי הדגימה לא מחפשים שוב,\nולא בונים מערך חדש.")
-        self.say("ועכשיו הריצה, שוב עם כדור אדום.", FadeIn(vp))
+        view = BoxView(QID, "fixn")
+        with self.beat('ועכשיו הריצה ליד התיבה מהעמוד,\nשוב עם כדור אדום.'):
+            self.split(panel, view)
         steps, result = trace(code, "fix_labels", ([EN[k] for k in LABELS],), {"draw": lambda i: "RED"})
         assert result == [EN[k] for k in ARR1]
-        self.run_code(panel, vp, steps, [
-            ([2, 3], "שוב k = 2, והכדור שיוצא אדום."),
-            ([5], "השכנים של k : ‏(k + 1) % 3, כלומר 0,\nו-(k + 2) % 3, כלומר 1."),
+        self.run_code(panel, None, steps, [
+            ([2, 3], "שוב k = 2, והכדור שיוצא אדום.", 1),
+            ([5], "השכנים של k : ‏(k + 1) % 3, כלומר 0,\nו-(k + 2) % 3, כלומר 1.", 2),
             ([6, 7], "בקופסה 0 כתוב RED, כמו הכדור,\nולכן same = 0 ו-other = 1."),
-            ([10], "החלפה ראשונה, בין k ל-same : קופסה 2 כבר נכונה,\nו-MIXED עובר זמנית ל-0."),
-            ([11, 12], "החלפה שנייה, בין same ל-other :\nמתקבל BLACK, MIXED, RED."),
-        ])
-        self.say("אותה תוצאה כמו בפתרון הראשון,\nבשתי החלפות במקום.")
+            ([10], "החלפה ראשונה, בין k ל-same : קופסה 2 כבר נכונה,\nו-MIXED עובר זמנית ל-0.", 3),
+            ([11, 12], "החלפה שנייה, בין same ל-other :\nמתקבל BLACK, MIXED, RED.", 4),
+        ], view=view)
+        with self.beat("אותה תוצאה כמו בפתרון הראשון,\nבשתי החלפות במקום."):
+            self.box_step(view, 5)
         self.fade_all()
 
     def modulo(self):

@@ -123,6 +123,18 @@ true content (a red ball) is pinned under it.
 > לכן התשובה : דגימה אחת,
 > ודווקא מהקופסה "אדום ושחור".
 
+**The page's box.** The box of part א, captured from the site (seed 7: the page's
+example, a red ball from box 2), large; a ring on the crate clicked, then on "reveal".
+
+> בתיבה שבעמוד אפשר לנסות :
+> לוחצים על קופסה ודוגמים ממנה כדור.
+
+> דוגמים מהקופסה "אדום ושחור",
+> ויוצא כדור אדום.
+
+> גילוי התוכן מראה בדיוק את מה שהסקנו :
+> שלוש התוויות הנכונות, מדגימה אחת.
+
 **The trap.** A black ball rises from the crate labelled "אדום"; both rows stay lit, each
 with a question mark.
 
@@ -156,7 +168,7 @@ with a question mark.
 
 **Solution 1, typed.** The empty panel of `fix_labels_simple`, laid out for the whole
 function (the comment lines and blank lines left out of the picture, the code at about
-25 px at 720p), the right side kept free for the variables. The amber caret types it.
+25 px at 720p), centred. The amber caret types it.
 
 > הפתרון הראשון מתרגם את סעיף א כמעט מילה במילה,
 > ובונה מערך fixed חדש.
@@ -206,10 +218,12 @@ function (the comment lines and blank lines left out of the picture, the code at
 > ומחזירים את fixed.
 > המערך labels עצמו לא השתנה.
 
-**Solution 1, run.** The variables `i`, `k`, `ball`, `other`, `fixed` appear beside the
-panel.
+**Solution 1, run, beside the box.** The split screen: the panel moves to the left and
+the box of part א comes in on the right (seed 7); it draws from crate 2 as line 8 runs,
+and reveals the contents at the return. For the black ball the box is swapped for the
+same box with seed 1 (a black ball).
 
-> נריץ על הדוגמה מהעמוד,
+> נריץ על הדוגמה מהעמוד, ליד התיבה,
 > כש-draw מחזיר RED.
 
 - Lines 2, 5–7 run (the first loop).
@@ -273,8 +287,20 @@ below; three curved arrows of the cycle above.
 > וסיבוב של שלושה איברים
 > הוא בדיוק שתי החלפות.
 
+**The page's box.** The fix box of part ב, large: step 2 (k, same, other and the arrows
+of the rotation), then step 5 (the labels after both swaps, the contents revealed).
+
+> בתיבה שבעמוד, fix_labels רץ שלב אחרי שלב
+> על הדוגמה מהעמוד.
+
+> החצים מעל הקופסאות הם הסיבוב
+> של שלוש התוויות, ו-same ו-other מסומנים.
+
+> ובסוף התיבה מגלה את התוכן :
+> שלוש התוויות נכונות, אחרי שתי החלפות.
+
 **Solution 2, typed.** The empty panel of `fix_labels` (comments left out of the picture),
-the room under it kept free for the variables.
+centred.
 
 > הקוד : אחרי הדגימה לא מחפשים שוב,
 > ולא בונים מערך חדש.
@@ -313,9 +339,13 @@ the room under it kept free for the variables.
 
 > ומחזירים את labels, מתוקן במקום.
 
-**Solution 2, run.** The variables appear under the panel.
+**Solution 2, run, beside the box.** The split screen with the fix box (captured 440 px
+wide, so the long lines of the code keep their size): it steps with
+the traced lines (k and the ball, same and other, swap 1, swap 2), and reveals the
+contents on the last caption.
 
-> ועכשיו הריצה, שוב עם כדור אדום.
+> ועכשיו הריצה ליד התיבה מהעמוד,
+> שוב עם כדור אדום.
 
 - Lines 2–3.
 

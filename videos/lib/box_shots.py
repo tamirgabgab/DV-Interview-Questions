@@ -23,6 +23,9 @@ module literal `BOXES` of `videos/<id>/scene.py`:
   explains the step); the controls it clicks are best inside it.
 - **hide** (optional): selectors inside the box hidden while it is captured (a hint line
   between the player and the figure), so the region is only what the video needs.
+- **width** (optional): the box's width in CSS px while it is captured (the page's is
+  about 600), for a box that shares the frame with wide code: its text wraps into more
+  lines, and the picture is narrower and taller.
 - **steps**: a list of actions, or {"do": [...], "repeat": n}. An action is
   ["click", sel] (a button, a cell of a figure; several clicks may make one step),
   ["fill", sel, value] (typed, then Enter, as a reader applies a field), ["check", sel,
@@ -196,6 +199,9 @@ def capture(qid: str, name: str, spec: dict, site: Path, routes: list[str]) -> P
                 page.evaluate("""([b, sels]) => { const box = document.querySelectorAll(".explorer")[b];
                   for (const sel of sels) box.querySelectorAll(sel).forEach((e) => (e.style.display = "none")); }""",
                               [b, spec["hide"]])
+            if spec.get("width"):     # a narrower box: its text wraps, the picture is taller
+                page.evaluate("""([b, w]) => { const box = document.querySelectorAll(".explorer")[b];
+                  box.style.width = w + "px"; box.style.maxWidth = w + "px"; }""", [b, int(spec["width"])])
             box = page.locator(".explorer").nth(b)
             box.scroll_into_view_if_needed()
             page.wait_for_timeout(600)

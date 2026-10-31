@@ -10,10 +10,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
 from manim import *  # noqa: E402,F403
-from dvq import (C, Cell, CodePanel, DVQScene, M, T, VarPanel, X, cost_chips,  # noqa: E402
+from dvq import (BoxView, C, Cell, CodePanel, DVQScene, M, T, X, cost_chips,  # noqa: E402
                  page_python, trace)
 
 QID = 2
+# The page's three trace boxes (VIDEOS.md, "The page's box"): picture k after k clicks on
+# "next", the box's line k run on a = 5, b = 3.
+BOXES = {
+    "temp": {"box": 0, "region": [".ex-play-row", ".tr-box", ".tr-step"], "hide": [".ex-scrubwrap"],
+             "steps": [[], {"do": [["click", ".ex-next"]], "repeat": 3}]},
+    "arith": {"box": 1, "region": [".ex-play-row", ".tr-box", ".tr-step"], "hide": [".ex-scrubwrap"],
+             "steps": [[], {"do": [["click", ".ex-next"]], "repeat": 3}]},
+    "xor": {"box": 2, "region": [".ex-play-row", ".tr-box", ".tr-step"], "hide": [".ex-scrubwrap"],
+             "steps": [[], {"do": [["click", ".ex-next"]], "repeat": 3}]},
+}
 SCENES = [
     ("Opening", "פתיחה"),
     ("ChapterA", "סעיף א – עם משתנה עזר"),
@@ -50,19 +60,29 @@ class SwapScene(DVQScene):
         dst.value = card
         dst.add(card)
 
-    def code(self, marker: str, func: str, names, fmt, typed, run, groups, intro=None, size=34,
-             extra=None, **vp):
+    def box_idea(self, name: str, intro: str, steps: list):
+        """The page's box, alone and large, played on the example: a caption per line."""
+        view = BoxView(QID, name, height=5.5).move_to(UP * 0.55)
+        self.say(intro, FadeIn(view))
+        self.box_beat(view, steps)
+        self.fade_all()
+
+    def code(self, marker: str, func: str, box: str, typed, run, groups, intro=None, size=34,
+             extra=None, share=None):
         """The code beat: the page's function typed line by line under its captions
-        (`typed`), then run on the example (`run`, the variables appear), its lines lit in
-        the order they ran (`groups`)."""
+        (`typed`), then beside the page's box (`run`, the split screen), its lines lit in
+        the order they ran while the box steps with them (`groups`: (lines, caption, k))."""
         code = page_python(QID, marker)
         steps, _ = trace(code, func, ([A0, B0], 0, 1))
         panel = CodePanel(code, font_size=size)
-        vars_ = VarPanel(names, fmt=fmt, size=34, **vp).set_state({"v": [A0, B0], "i": 0, "j": 1})
-        self.place_code(panel, vars_, extra)
+        self.place_code(panel, None, extra)
         self.type_code(panel, typed, intro=intro)
-        self.say(run, FadeIn(vars_))
-        self.run_code(panel, vars_, steps, groups)
+        view = BoxView(QID, box)
+        with self.beat(run):
+            if extra is not None:
+                self.play(FadeOut(extra), run_time=0.5)
+            self.split(panel, view, code_share=share)   # share: the code's part of the width
+        self.run_code(panel, None, steps, groups, view=view)
 
 
 class Opening(SwapScene):
@@ -123,21 +143,23 @@ class ChapterA(SwapScene):
             self.play(a.box.animate.set_stroke(C.GREEN, 5), b.box.animate.set_stroke(C.GREEN, 5),
                       run_time=0.6)
         self.fade_all()
-
-        def fmt(n, s):
-            return "" if n not in s else str(s[n])
+        self.box_idea('temp', 'אותה דוגמה בתיבה שבעמוד\xa0:\nהקוד, ומתחתיו הערך של כל משתנה.',
+                      [
+                       (1, '\u200ftemp שומר את a0, הערך 5,\nלפני שדורסים את v[i].'),
+                       (2, '\u200fv[i] מקבל את b0, והעמודה הסימבולית\nמראה ש-a0 שמור רק ב-temp.'),
+                       (3, '\u200fv[j] מקבל את a0 מ-temp.\nבסוף a = b0 ו-b = a0.')])
 
         extra = VGroup(M("a ≡ v[i]", 34, C.MUTED), M("b ≡ v[j]", 34, C.MUTED)).arrange(RIGHT, buff=1.4)
-        self.code("def swap_temp", "swap_temp", ["v", "i", "j", "temp"], fmt,
+        self.code("def swap_temp", "swap_temp", "temp",
                   [(1, ["ב-Python אין העברה של int by reference,\nולכן מעבירים רשימה v ושני אינדקסים, i ו-j.",
                         ("כאן v[i] משחק את התפקיד של a,\nו-v[j] את התפקיד של b.", [FadeIn(extra)])]),
                    (2, "שורה 2 : שומרים ב-temp את v[i],\nהערך של a, לפני שדורסים אותו."),
                    (3, "שורה 3 : עכשיו מותר לדרוס את v[i],\nוהוא מקבל את הערך של b."),
                    (4, "שורה 4 : v[j] מקבל את הערך המקורי של a,\nששמור ב-temp.")],
-                  "נריץ על הדוגמה מהעמוד :\nהרשימה [5, 3], עם i = 0 ו-j = 1.",
-                  [([2], "שורה 2 : temp מקבל את v[i], כלומר 5."),
-                   ([3], "שורה 3 : v[i] מקבל את v[j], כלומר 3."),
-                   ([4], "שורה 4 : v[j] מקבל את temp,\nוהרשימה היא עכשיו [3, 5].")],
+                  'מימין, התיבה מהעמוד מריצה את אותו הקוד\nעל [5, 3], עם i = 0 ו-j = 1.',
+                  [([2], 'קודם temp מקבל את v[i], כלומר 5.', 1),
+                   ([3], 'אחר כך v[i] מקבל את v[j], כלומר 3.', 2),
+                   ([4], 'ובסוף v[j] מקבל את temp,\nוהרשימה היא עכשיו [3, 5].', 3)],
                   intro="עכשיו נכתוב את זה ב-Python, שורה אחרי שורה.", extra=extra)
         self.fade_all()
 
@@ -250,20 +272,22 @@ class ChapterB(SwapScene):
             self.play(self.statement("a = a - b", stmt)[1], run_time=0.8)
             self.play(a.set_value(3, C.BLUE), sym(a, "(a₀ + b₀) − a₀ = b₀", sa), run_time=1.0)
         self.fade_all()
+        self.box_idea('arith', 'בתיבה שבעמוד, אותן שלוש שורות,\nועמודה סימבולית שעוקבת אחרי a0 ו-b0.',
+                      [
+                       (1, '\u200fv[i] מקבל את הסכום, 8,\nובסימבולית a0 + b0.'),
+                       (2, '\u200fv[j] מקבל את הסכום פחות b0,\nכלומר 8 − 3 = 5, שהוא a0.'),
+                       (3, '\u200fv[i] מקבל את הסכום פחות a0,\nכלומר 8 − 5 = 3, שהוא b0.')])
 
-        def fmt(n, s):
-            return "" if n not in s else str(s[n])
-
-        self.code("def swap_arith", "swap_arith", ["v", "i", "j"], fmt,
+        self.code("def swap_arith", "swap_arith", "arith",
                   [(1, "אותה חתימה כמו בסעיף א :\nרשימה v ושני אינדקסים, בלי temp."),
                    (2, "שורה 2 : v[i] נדרס בסכום של שניהם,\nוההערה רושמת a = a0 + b0."),
                    (3, "שורה 3 : הסכום פחות b0 משאיר את a0,\nוזה הערך החדש של v[j]."),
                    (4, "שורה 4 : הסכום פחות a0 משאיר את b0,\nוזה הערך החדש של v[i].")],
-                  "ונריץ על אותה דוגמה, v = [5, 3].",
-                  [([2], "שורה 2 : v[i] מקבל את הסכום, 8."),
-                   ([3], "שורה 3 : v[j] מקבל 8 פחות 3, כלומר 5."),
-                   ([4], "שורה 4 : v[i] מקבל 8 פחות 5, כלומר 3.")],
-                  intro="בקוד מהעמוד אותן שלוש שורות, על v[i] ו-v[j].", size=30, cols=3, slot=3.6)
+                  'ונריץ ליד התיבה מהעמוד,\nעל אותה דוגמה, v = [5, 3].',
+                  [([2], 'קודם v[i] מקבל את הסכום, 8.', 1),
+                   ([3], 'אחר כך v[j] מקבל 8 פחות 3, כלומר 5.', 2),
+                   ([4], 'ובסוף v[i] מקבל 8 פחות 5, כלומר 3.', 3)],
+                  intro="בקוד מהעמוד אותן שלוש שורות, על v[i] ו-v[j].", size=30, share=0.52)
         self.say("ב-Python הסכום אף פעם לא גולש,\nכי מספרים שלמים הם בגודל לא מוגבל.")
         self.fade_all()
 
@@ -505,21 +529,22 @@ class ChapterC(SwapScene):
         step("שלב 3 : a = a ^ b, ו-a מתהפך היכן ש-b הוא 1.\nיוצא 0011, כלומר 3.", "a = a ^ b", ra, rb,
              B0, C.AMBER, stmt)
         self.fade_all()
+        self.box_idea('xor', 'והתיבה שבעמוד, הפעם עם XOR\xa0:\nאותן שלוש שורות, עם ^.',
+                      [
+                       (1, '\u200fv[i] מקבל 5 ^ 3, כלומר 6,\nובסימבולית a0 ^ b0.'),
+                       (2, '\u200fv[j] מקבל 6 ^ 3, כלומר 5\xa0:\nה-b0 מתבטל ונשאר a0.'),
+                       (3, '\u200fv[i] מקבל 6 ^ 5, כלומר 3\xa0:\nה-a0 מתבטל ונשאר b0.')])
 
-        def fmt(n, s):
-            k = int(n[2])
-            return f"{s['v'][k]} ({bits(s['v'][k])})"
-
-        self.code("def swap_xor", "swap_xor", ["v[0]", "v[1]"], fmt,
+        self.code("def swap_xor", "swap_xor", "xor",
                   [(1, "שוב אותה חתימה : רשימה v ושני אינדקסים."),
                    (2, "שורה 2 : v[i] מקבל a0 ^ b0,\nהעמודות שבהן שני הערכים שונים."),
                    (3, "שורה 3 : XOR עם b0 מבטל אותו,\nונשאר a0, הערך החדש של v[j]."),
                    (4, "שורה 4 : XOR עם a0 מבטל אותו,\nונשאר b0, הערך החדש של v[i].")],
-                  "ועכשיו הריצה על 5 ו-3, גם בביטים.",
-                  [([2], "שורה 2 : v[i] מקבל 5 ^ 3, כלומר 6."),
-                   ([3], "שורה 3 : v[j] מקבל 6 ^ 3, כלומר 5."),
-                   ([4], "שורה 4 : v[i] מקבל 6 ^ 5, כלומר 3.")],
-                  intro="הקוד מהעמוד : אותן שלוש שורות,\nעם ^ במקום + ו-−.", size=30, cols=2, slot=5.0)
+                  'ועכשיו הריצה על 5 ו-3,\nלצד התיבה מהעמוד.',
+                  [([2], 'קודם v[i] מקבל 5 ^ 3, כלומר 6.', 1),
+                   ([3], 'אחר כך v[j] מקבל 6 ^ 3, כלומר 5.', 2),
+                   ([4], 'ובסוף v[i] מקבל 6 ^ 5, כלומר 3.', 3)],
+                  intro="הקוד מהעמוד : אותן שלוש שורות,\nעם ^ במקום + ו-−.", size=30, share=0.52)
         self.fade_all()
 
         # Why it works: one bit column, all four cases.
