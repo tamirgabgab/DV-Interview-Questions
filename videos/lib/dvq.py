@@ -1035,6 +1035,14 @@ class DVQScene(Scene):
             bw = room_w * (1 - code_share)
         cw = room_w - bw
         k = min(cw / left.width, room_h / left.height, 1.6)
+        if code_share is None and panel.em_px() * k < MIN_SPLIT_EM:
+            # the code too small: give it the width it needs (for 21 px), as long as the box
+            # keeps MIN_BOX_SCALE of its page size
+            box_min = MIN_BOX_SCALE * (view.px[0] / view.scale_css) / PX
+            need = left.width * 21.0 / panel.em_px()
+            bw = max(box_min, min(bw, room_w - need))
+            cw = room_w - bw
+            k = min(cw / left.width, room_h / left.height, 1.6)
         target_left = left.copy().scale(k)
         target_left.move_to([-config.frame_width / 2 + margin + target_left.width / 2,
                              (top + bottom) / 2, 0])
