@@ -1,0 +1,410 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0032: wolf, goat and cabbage,
+a student-level question.
+
+2
+00:00:04.600 --> 00:00:09.067
+Two parts: first the plan by hand,
+then code that finds it on its own.
+
+3
+00:00:09.867 --> 00:00:14.100
+A farmer must take a wolf, a goat and a cabbage
+to the far bank of the river.
+
+4
+00:00:14.100 --> 00:00:18.700
+The boat holds the farmer and one more,
+and only the farmer can row.
+
+5
+00:00:19.100 --> 00:00:23.200
+Without the farmer, the wolf eats the goat,
+and the goat eats the cabbage.
+
+6
+00:00:23.200 --> 00:00:27.500
+How many crossings, at the least,
+to take all three across safely?
+
+7
+00:00:28.300 --> 00:00:32.333
+Part A: find an order of crossings,
+and show none is shorter.
+
+8
+00:00:33.833 --> 00:00:38.233
+The idea: the only pair that is safe alone
+is the wolf and the cabbage.
+
+9
+00:00:38.633 --> 00:00:42.600
+If the farmer takes the wolf first,
+the goat is left with the cabbage.
+
+10
+00:00:42.600 --> 00:00:46.700
+And if he takes the cabbage,
+the goat is left with the wolf.
+
+11
+00:00:46.700 --> 00:00:50.600
+So on the first crossing
+the farmer must take the goat.
+
+12
+00:00:51.100 --> 00:00:56.133
+Crossing 1: the farmer takes the goat.
+The wolf and the cabbage stay together, which is safe.
+
+13
+00:00:56.133 --> 00:01:00.433
+Crossing 2: the farmer comes back alone.
+The goat is alone on the far side.
+
+14
+00:01:00.433 --> 00:01:05.033
+Crossing 3: the farmer takes the wolf.
+Now the wolf and the goat are on the far side.
+
+15
+00:01:05.033 --> 00:01:08.567
+If he goes back alone now,
+the wolf will eat the goat.
+
+16
+00:01:08.567 --> 00:01:13.167
+Crossing 4: the step people miss.
+The farmer brings the goat back to the near bank.
+
+17
+00:01:13.167 --> 00:01:17.700
+It looks like a wasted crossing,
+but without it there is no solution.
+
+18
+00:01:17.700 --> 00:01:22.800
+Crossing 5: the farmer takes the cabbage.
+On the far side, the wolf and the cabbage: safe.
+
+19
+00:01:22.800 --> 00:01:27.100
+Crossing 6: the farmer comes back alone.
+The goat is alone on the near bank.
+
+20
+00:01:27.100 --> 00:01:32.000
+Crossing 7: the farmer takes the goat.
+Everyone is across, after seven crossings.
+
+21
+00:01:32.000 --> 00:01:36.900
+The roles can also be swapped:
+the cabbage on crossing 3, the wolf on crossing 5.
+
+22
+00:01:37.700 --> 00:01:42.300
+This is the box on the page:
+you pick who boards the boat with the farmer.
+
+23
+00:01:42.300 --> 00:01:47.200
+A try with the wolf: the box cancels it,
+since the goat and the cabbage are left alone.
+
+24
+00:01:47.200 --> 00:01:52.600
+With the goat, back alone, and with the wolf:
+the first three crossings.
+
+25
+00:01:52.600 --> 00:01:57.067
+And now back alone? Cancelled too:
+the wolf and the goat stay together.
+
+26
+00:01:57.067 --> 00:02:03.600
+So the goat goes back, then the cabbage,
+back alone, and the goat: seven crossings.
+
+27
+00:02:04.400 --> 00:02:09.567
+Why not fewer than seven? Each forward crossing
+carries one item at most.
+
+28
+00:02:09.567 --> 00:02:14.733
+So at least three forward, and two returns
+between them: at least five crossings.
+
+29
+00:02:14.733 --> 00:02:20.233
+With exactly five, each forward carries an item
+and each return is alone. The first must be the goat.
+
+30
+00:02:20.233 --> 00:02:25.267
+But on the second return, the second item
+stays on the far side with the goat, unguarded.
+
+31
+00:02:25.267 --> 00:02:30.500
+So one return carries an item, which needs
+one more forward crossing: at least seven.
+
+32
+00:02:30.500 --> 00:02:35.167
+And the plan we saw does it
+in exactly seven: the least possible.
+
+33
+00:02:35.967 --> 00:02:41.433
+Four things, each on one of two banks:
+16 states, and only ten of them are safe.
+
+34
+00:02:42.233 --> 00:02:47.433
+Trap: after crossing 3 there seems to be no move.
+Going back alone leaves the wolf with the goat.
+
+35
+00:02:47.433 --> 00:02:52.533
+Going back with the wolf undoes crossing 3:
+we are back where we were after crossing 2.
+
+36
+00:02:52.533 --> 00:02:59.433
+Only the goat is left: bring something back
+to the near bank, and don't get stuck.
+
+37
+00:03:00.233 --> 00:03:04.833
+Part B: code that finds the plan
+by itself, without knowing it in advance.
+
+38
+00:03:05.533 --> 00:03:10.266
+The state: one bit for each of the four.
+0 on the near bank, 1 on the far bank.
+
+39
+00:03:10.266 --> 00:03:14.799
+For example, after the first crossing the farmer
+and the goat are far: 0101 = 5.
+
+40
+00:03:14.799 --> 00:03:19.033
+The start is 0000, everyone near,
+and the goal 1111, everyone far.
+
+41
+00:03:19.833 --> 00:03:24.566
+All 16 states: on top who is on the near bank,
+below who is on the far bank.
+
+42
+00:03:24.566 --> 00:03:29.366
+A state is safe if the goat is with the farmer,
+or away from both the wolf and the cabbage.
+
+43
+00:03:29.366 --> 00:03:34.399
+Six states are ruled out, and ten remain.
+In all six, the goat is without the farmer.
+
+44
+00:03:34.999 --> 00:03:40.399
+An edge: the farmer crosses, with at most
+one item from his side. Every crossing costs the same.
+
+45
+00:03:40.399 --> 00:03:45.133
+So we search breadth-first, BFS:
+layer after layer, by distance from the start.
+
+46
+00:03:45.133 --> 00:03:47.933
+Layer 0: the start, 0000.
+
+47
+00:03:47.933 --> 00:03:51.099
+Layer 1: only one crossing is safe,
+with the goat.
+
+48
+00:03:51.099 --> 00:03:55.899
+Layer 2: the farmer goes back alone. Back with the goat
+leads to 0000, already found.
+
+49
+00:03:55.899 --> 00:03:59.799
+Layer 3: two new states,
+with the wolf or with the cabbage.
+
+50
+00:03:59.799 --> 00:04:04.099
+Layers 4 and 5: the goat goes back,
+and the second item comes over.
+
+51
+00:04:04.099 --> 00:04:08.999
+Layer 6: back alone. Layer 7: the goal,
+1111, seven crossings from the start.
+
+52
+00:04:08.999 --> 00:04:13.899
+Two paths of length seven: the wolf before
+the cabbage, or the cabbage before the wolf.
+
+53
+00:04:14.699 --> 00:04:19.299
+Now let's write it in Python.
+First the constants and the safety check.
+
+54
+00:04:21.266 --> 00:04:24.666
+The BFS queue: deque
+from the standard library.
+
+55
+00:04:30.566 --> 00:04:34.366
+Each one's bit, and EVERYONE = 15,
+everyone far.
+
+56
+00:04:38.933 --> 00:04:43.433
+CARGO: what the farmer can take:
+nothing, the wolf, the goat or the cabbage.
+
+57
+00:04:52.299 --> 00:04:56.799
+river_safe: the four bits, and the rule we saw:
+the goat with the farmer, or away from both.
+
+58
+00:05:03.099 --> 00:05:07.399
+river_plan: the parent of 0 is None,
+and the queue starts with 0.
+
+59
+00:05:12.166 --> 00:05:15.699
+Take a state from the queue.
+If it is 15, we have reached the goal.
+
+60
+00:05:21.999 --> 00:05:26.499
+For each item: if it is on the other side
+from the farmer, it cannot board.
+
+61
+00:05:28.266 --> 00:05:32.766
+The crossing flips the farmer's bit
+and the bit of what he takes.
+
+62
+00:05:38.766 --> 00:05:43.266
+A safe state not seen yet: record where we came
+from and what was taken, and enqueue it.
+
+63
+00:05:52.066 --> 00:05:56.466
+The reconstruction: back from 15 by the parents,
+then reverse the list.
+
+64
+00:05:57.166 --> 00:06:01.566
+Let's run river_plan, beside the BFS layers
+in the box on the page.
+
+65
+00:06:01.566 --> 00:06:06.266
+At first the queue holds only 0,
+and its parent is None.
+
+66
+00:06:06.266 --> 00:06:11.599
+Take 0. Only the crossing with the goat
+is safe: 5 enters the queue.
+
+67
+00:06:11.599 --> 00:06:17.399
+Take 5. Back alone gives 4.
+Back with the goat is 0, already found.
+
+68
+00:06:17.399 --> 00:06:22.833
+Take 4: with the wolf 7,
+with the cabbage 13. Both enter the queue.
+
+69
+00:06:22.833 --> 00:06:28.766
+Take 7 and 13.
+From each, the goat comes back: 2 and 8.
+
+70
+00:06:28.766 --> 00:06:34.566
+From 2 and from 8 we reach 11. It enters once,
+from 2, which was taken first.
+
+71
+00:06:34.566 --> 00:06:39.799
+Take 11: the farmer goes back alone,
+and 10 enters the queue.
+
+72
+00:06:39.799 --> 00:06:45.599
+Take 10: with the goat we reach 15,
+the goal, and it enters the queue.
+
+73
+00:06:45.599 --> 00:06:49.999
+Take 15, and the break
+stops the loop.
+
+74
+00:06:49.999 --> 00:06:55.099
+The reconstruction walks back from 15 to 0,
+collecting what was taken on each crossing.
+
+75
+00:06:55.899 --> 00:07:00.933
+Reversed, it is the plan of part A:
+goat, alone, wolf, goat, cabbage, alone, goat.
+
+76
+00:07:00.933 --> 00:07:06.233
+Why is it right? BFS reaches the states by
+distance from the start, and 15 enters at layer 7.
+
+77
+00:07:06.233 --> 00:07:11.233
+So no path is shorter than seven, and the
+reconstruction returns one of the two shortest.
+
+78
+00:07:12.033 --> 00:07:17.533
+The cost: 16 states, at most four edges from each.
+Time and memory are constant in practice.
+
+79
+00:07:18.333 --> 00:07:23.366
+Trap: describing the state by the three
+items alone. That gives eight states.
+
+80
+00:07:23.366 --> 00:07:28.866
+But without the farmer's bit you don't know
+which side he can take from. He is part of the state.
+
+81
+00:07:29.658 --> 00:07:34.458
+To sum up: seven crossings, and the surprising
+step is bringing the goat back.
+
+82
+00:07:34.458 --> 00:07:39.358
+Try crossing yourself in the box
+on the page of question 0032.
