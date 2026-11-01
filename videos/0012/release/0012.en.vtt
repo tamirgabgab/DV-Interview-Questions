@@ -1,0 +1,386 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0012: sort the digits and subtract,
+a student-level question.
+
+2
+00:00:04.600 --> 00:00:09.633
+Three parts: check one number,
+check every number, and another base.
+
+3
+00:00:10.433 --> 00:00:15.333
+Take a number from 0 to 999, say 352,
+and write it with three digits.
+
+4
+00:00:15.333 --> 00:00:19.800
+Sort the digits from largest to smallest, 532,
+and from smallest to largest, 235.
+
+5
+00:00:19.800 --> 00:00:23.300
+Subtract the smaller from the larger,
+and get 297.
+
+6
+00:00:23.300 --> 00:00:26.967
+If the difference equals the number itself,
+the number is called special.
+
+7
+00:00:26.967 --> 00:00:30.467
+Here 297 differs from 352,
+so 352 is not special.
+
+8
+00:00:31.267 --> 00:00:36.467
+Part A: a function that takes a number x,
+and returns 1 if it is special, 0 otherwise.
+
+9
+00:00:37.167 --> 00:00:41.767
+First: a number below 100 gets
+leading zeros. 7 is written 007.
+
+10
+00:00:41.767 --> 00:00:45.867
+Largest to smallest is 700, smallest to largest 007:
+the difference is 693.
+
+11
+00:00:46.667 --> 00:00:50.667
+The idea: both numbers are built
+from the same three digits.
+
+12
+00:00:50.667 --> 00:00:54.633
+Sort once, in ascending order:
+that is the smaller number, 235.
+
+13
+00:00:54.633 --> 00:00:59.233
+The same digits reversed are the larger,
+532. No second sort is needed.
+
+14
+00:01:00.033 --> 00:01:04.767
+This is how the page's box shows it:
+the column subtraction, column by column.
+
+15
+00:01:04.767 --> 00:01:08.767
+532 minus 235, with two borrows:
+the difference is 297, so 352 is not special.
+
+16
+00:01:08.767 --> 00:01:11.900
+The example 7: 700 minus 007 is 693.
+
+17
+00:01:11.900 --> 00:01:17.033
+The example 45: 540 minus 045 is 495.
+That differs from 45, so 45 is not special.
+
+18
+00:01:17.033 --> 00:01:21.267
+And now 495: 954 minus 459
+is exactly 495. It is special.
+
+19
+00:01:22.067 --> 00:01:25.067
+Now let's write it in Python.
+
+20
+00:01:27.133 --> 00:01:31.100
+The function is_special takes x,
+and returns 1 or 0.
+
+21
+00:01:33.233 --> 00:01:37.733
+The format 03d writes x with three digits,
+leading zeros included: 7 becomes 007.
+
+22
+00:01:37.733 --> 00:01:41.733
+sorted sorts the three characters
+in ascending order, into a list.
+
+23
+00:01:44.100 --> 00:01:48.000
+Joining the characters in ascending order
+gives the smaller number.
+
+24
+00:01:50.800 --> 00:01:55.033
+The same characters reversed give
+the larger one, with no second sort.
+
+25
+00:01:57.700 --> 00:02:01.300
+Finally, compare the difference with x,
+and return 1 or 0.
+
+26
+00:02:02.000 --> 00:02:05.300
+Let's run the code on 352,
+beside the page's box.
+
+27
+00:02:05.300 --> 00:02:08.767
+x = 352: the digits in ascending order
+are 2, 3 and 5.
+
+28
+00:02:08.767 --> 00:02:11.767
+The smaller number is 235.
+
+29
+00:02:11.767 --> 00:02:14.767
+And the larger is 532.
+
+30
+00:02:14.767 --> 00:02:18.867
+532 minus 235 is 297, not 352:
+the function returns 0.
+
+31
+00:02:19.267 --> 00:02:23.400
+Now x = 495: the digits
+in ascending order are 4, 5 and 9.
+
+32
+00:02:23.400 --> 00:02:27.400
+The smaller is 459, the larger 954.
+
+33
+00:02:27.400 --> 00:02:30.800
+The difference is 495, exactly x:
+the function returns 1.
+
+34
+00:02:31.600 --> 00:02:36.200
+The cost: always three digits,
+so O(1) time and O(1) memory.
+
+35
+00:02:37.000 --> 00:02:42.300
+A trap: forgetting the zeros. Without padding,
+45 gives 54 minus 45, that is 9.
+
+36
+00:02:42.300 --> 00:02:47.800
+With padding it is 540 minus 045, that is 495.
+A small number is still a three-digit number.
+
+37
+00:02:48.598 --> 00:02:53.798
+Part B: run the function on 0 to 999.
+Which numbers are special, and why?
+
+38
+00:02:54.498 --> 00:02:59.098
+Name the sorted digits:
+the largest a, the middle b, the smallest c.
+
+39
+00:02:59.098 --> 00:03:04.498
+The larger minus the smaller: hundreds, tens, units,
+once in one order and once reversed.
+
+40
+00:03:04.498 --> 00:03:08.531
+The middle digit b appears twice, as 10b,
+and cancels in the subtraction.
+
+41
+00:03:08.531 --> 00:03:12.498
+What is left is 99 times a minus c:
+the difference is always a multiple of 99.
+
+42
+00:03:12.498 --> 00:03:17.531
+Let d = a − c. It is between 0 and 9,
+so only ten differences are possible.
+
+43
+00:03:18.331 --> 00:03:23.231
+A special number equals its difference,
+so it is one of these ten candidates.
+
+44
+00:03:24.031 --> 00:03:29.231
+Check the nine non-zero candidates:
+sort, subtract and compare.
+
+45
+00:03:29.231 --> 00:03:34.731
+Only 495 returns to itself: 954 minus 459.
+With 0, these are the two special numbers.
+
+46
+00:03:34.731 --> 00:03:39.765
+Note: d and 10 minus d are built
+from the same digits, and give the same difference.
+
+47
+00:03:40.565 --> 00:03:45.531
+The proof without the table: 99d always
+has the digits d − 1, 9 and 10 − d.
+
+48
+00:03:45.531 --> 00:03:51.031
+If x equals its difference, it has a 9, the largest
+digit: so a = 9, and c = 9 − d.
+
+49
+00:03:51.031 --> 00:03:56.331
+The other two digits equal the two on the right,
+and 9 − d cannot be 10 − d.
+
+50
+00:03:56.331 --> 00:04:01.231
+So 9 − d = d − 1, that is d = 5,
+and the number is 99 times 5: 495.
+
+51
+00:04:02.031 --> 00:04:05.265
+And in code: no proof, just check everything.
+
+52
+00:04:07.365 --> 00:04:11.031
+find_special takes nothing,
+and returns a list.
+
+53
+00:04:14.465 --> 00:04:18.965
+It goes over x from 0 to 999, and keeps
+every x for which is_special returns 1.
+
+54
+00:04:19.665 --> 00:04:24.265
+x = 0: all digits are 0, the difference is 0.
+It is special, and joins the list.
+
+55
+00:04:24.265 --> 00:04:28.298
+From 1 to 494 no number is special,
+so we jump ahead.
+
+56
+00:04:28.298 --> 00:04:32.698
+x = 495: 954 minus 459 is 495.
+Special, and it joins the list.
+
+57
+00:04:32.698 --> 00:04:36.865
+And from 496 to 999 there is none again:
+the result is 0 and 495.
+
+58
+00:04:37.665 --> 00:04:42.831
+The page's box applies the step again and again
+to the difference: 352 reaches 495.
+
+59
+00:04:42.831 --> 00:04:47.365
+100 is the longest: six steps
+to 495, where it stops.
+
+60
+00:04:47.965 --> 00:04:53.465
+Over all 1,000 numbers: 990 reach 495
+within six steps at most, and 10 reach 0.
+
+61
+00:04:54.065 --> 00:04:58.731
+And the map of d: 352 gives d = 3.
+Each step moves d to its next value.
+
+62
+00:04:58.731 --> 00:05:02.331
+Step 1: 352 becomes 297,
+and d jumps from 3 to 7.
+
+63
+00:05:02.331 --> 00:05:05.465
+Step 2: 297 becomes 693, and d = 6.
+
+64
+00:05:05.465 --> 00:05:08.598
+Step 3: 693 becomes 594, and d = 5.
+
+65
+00:05:08.598 --> 00:05:13.265
+Step 4: 594 becomes 495. Only 5
+points to itself: the fixed point.
+
+66
+00:05:14.065 --> 00:05:19.565
+The loop checks 1,000 numbers, each in O(1).
+By the proof, checking ten is enough.
+
+67
+00:05:20.364 --> 00:05:24.597
+Part C, briefly: the same process,
+but the number is written in base b.
+
+68
+00:05:25.297 --> 00:05:29.964
+The same computation: the middle digit cancels,
+and the difference is d times b² − 1.
+
+69
+00:05:29.964 --> 00:05:35.131
+Its digits are always d − 1, b − 1 and b − d,
+so the next d depends only on d.
+
+70
+00:05:35.131 --> 00:05:40.531
+The next d is the maximum of b − d and d − 1:
+the map pushes d to the middle, b/2.
+
+71
+00:05:40.531 --> 00:05:45.831
+Even base: d = b/2 stays put.
+A single fixed point; in base 10 it is 495.
+
+72
+00:05:45.831 --> 00:05:51.331
+Odd base: no whole middle, so d
+swings between two integers: a cycle of length 2.
+
+73
+00:05:52.131 --> 00:05:57.597
+In the page's box: base 7, starting from 610.
+Its d is 6 minus 0, that is 6.
+
+74
+00:05:57.597 --> 00:06:00.731
+Step 1: 610 becomes 561, and d = 5.
+
+75
+00:06:00.731 --> 00:06:03.864
+Step 2: 561 becomes 462, and d = 4.
+
+76
+00:06:03.864 --> 00:06:08.897
+Step 3: 462 becomes 363, and d = 3.
+From here 363 and 264 alternate forever.
+
+77
+00:06:08.897 --> 00:06:12.897
+The answer: an even base has one fixed point,
+an odd base a cycle of two numbers.
+
+78
+00:06:13.697 --> 00:06:19.597
+In short: sort once and subtract,
+and the difference is always a multiple of 99.
+
+79
+00:06:19.597 --> 00:06:24.497
+Try your own numbers and bases in the boxes
+on the page of question 0012 on the site.

@@ -1809,12 +1809,23 @@ section below starts at session 22, whose numbered items run on through the late
     right machine fires in cycle 6, the naive one never), and test_0040 checks both machines,
     tb.sv feeds 101011. Note: the system Playwright (1.56) wants headless_shell-1194, the
     sandbox has 1243; `check_phone.py --browser /opt/pw-browsers/chromium` works.
+121. **Videos 0026 and 0012 (session 32, 2026-11-01).** The two easy questions left were
+    0036 and 0026; the owner took 0026 and 0012. 0026 (4:04, `video_parts` [0]), no code: the
+    road with riders and walkers above a distance-time chart built in step, the plans where
+    the second friend waits (3 h) and walks (19/7 h), the best plan stage by stage (2.5 h,
+    all arrive together), the formula T = (3t0 + t1)/(t0 + 3t1)·t1 derived in LaTeX and its
+    limits, the motorcycle box on other values; every number recomputed with fractions in
+    scene.py. 0012 (6:26, [0, 168, 320]): part א `is_special` typed and traced on 352 and 495
+    beside the box's column subtraction, the no-padding trap; part ב the difference 99(a − c),
+    the ten candidates, d = 5, `find_special` typed (its run drawn as jumps of x, since the
+    trace is one line run 1,000 times), the chain, histogram and d-map boxes; part ג briefly,
+    the base-7 box (610 to 363, then 363 ↔ 264). No page bug found.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
-  37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120).
+  37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
