@@ -1841,13 +1841,25 @@ section below starts at session 22, whose numbered items run on through the late
      left out of the grid searches (there the tie rule decides; the point just under stands
      for it). The page has no code, as before. test_0071 takes about two minutes (the rule's
      grid).
+123. **Videos 0057 and 0043 (session 32, 2026-11-01).** The owner's picks after the easy
+    questions ran out (0036 is the last easy one left). 0057 (8:52, `video_parts` [0, 184,
+    340, 479]): parts א to ג in full (bouncing ants above ghosts that pass through, a
+    space-time chart, `last_fall`, `collisions` and `fall_times` typed and traced, the pole
+    and chart boxes), part ד in about 40 s (the labels turn by R − L a lap, 300 s); a
+    brute-force simulation in scene.py confirms the ghost model. 0043 (9:09, [0, 232]): part
+    א a Manim grid of 36 horses ruled out race by race to the nine races, the proof and the
+    information bound; part ב `horses_plan` typed in an 11-row window (three long lines
+    wrapped in the picture only, a caption says so) and traced race by race, the box after
+    the trace (too narrow beside 81-character lines). Seen in the horses box: the step line
+    puts "ועוד" inside an `ltr()` run ("F1, F2, F3, F4 ועוד 1"), so a wrapped line shows "(1"
+    at the start of the next line; not fixed yet.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
