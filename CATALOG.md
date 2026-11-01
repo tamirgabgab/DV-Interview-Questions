@@ -1,6 +1,6 @@
 # Catalog
 
-All 70 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 74 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -75,3 +75,7 @@ All 70 questions, with links to their pages on the [live site](https://tamirgabg
 | 0069 | [עקיפות בזרם תשובות – כמה עקפו כל בקשה, כמה היא עקפה, וסך העקיפות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0069-out-of-order-overtakes/) | senior (סניור) |
 | 0070 | [המסלול הקצר ביותר בלוח – BFS, שבירת עד k קירות, ועלות כניסה לכל תא](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0070-grid-shortest-path/) | junior (ג'וניור) |
 | 0071 | [דו-קרב שלושה קוסמים – איזה שרביט לבחור](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0071-three-wizards-duel/) | senior (סניור) |
+| 0072 | [סיבוב מערך ב-k מקומות – במקום, בשלושה היפוכים או במעגלים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0072-rotate-array-in-place/) | student (סטודנט) |
+| 0073 | [ערבוב מושלם של חפיסה – כמה ערבובים עד שהיא חוזרת, ושילוב במקום](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0073-perfect-shuffle/) | junior (ג'וניור) |
+| 0074 | [שחלוף מטריצה במקום – סיבוב ב-90°, מטריצה לא ריבועית ובלי סימון](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0074-transpose-matrix-in-place/) | junior (ג'וניור) |
+| 0075 | [שחלוף מטריצת ביטים 8×8 במילה של 64 ביט – שלוש החלפות, הכללה ו-RTL](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0075-bit-matrix-transpose/) | senior (סניור) |

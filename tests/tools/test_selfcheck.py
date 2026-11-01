@@ -497,6 +497,10 @@ EXPECTED = {
     "0069": [2, 3, 5],                                      # tests/0069 counts the pairs of 7 3 9 2 8
     "0070": [9, 3, 6],                                      # tests/0070 checks them against the brute-force searches
     "0071": wizard_answers(),
+    "0072": [3 // 2 + 4 // 2 + 7 // 2, 4, 2 * 8],             # tests/0072 rotates and counts the accesses
+    "0073": [8, 6],                                         # tests/0073 shuffles the decks until they are back
+    "0074": [5 * 4 // 2 + 5 * (5 // 2), 2],                 # tests/0074 follows the cycles of 3 x 5
+    "0075": [8, 5 * 16],                                    # tests/0075 transposes every single bit and 32 x 32
 }
 
 

@@ -499,6 +499,14 @@
   "quantile": {
    "label": "Quantile",
    "group": "probability"
+  },
+  "in_place_algorithm": {
+   "label": "In-place algorithm",
+   "group": "algorithms"
+  },
+  "multiplicative_order": {
+   "label": "Multiplicative order",
+   "group": "math"
   }
  },
  "questions": {
@@ -1888,6 +1896,110 @@
      "id": "0015",
      "explicit": false,
      "why": "probabilities built from conditional branches of a tree"
+    }
+   ]
+  },
+  "0072": {
+   "core": [
+    "permutation_cycles",
+    "in_place_algorithm",
+    "number_theory"
+   ],
+   "secondary": [
+    "two_pointers",
+    "modular_arithmetic",
+    "memory_model"
+   ],
+   "related": [
+    {
+     "id": "0073",
+     "explicit": false,
+     "why": "the interleave in place rotates segments with the three reversals"
+    },
+    {
+     "id": "0074",
+     "explicit": false,
+     "why": "another in-place permutation done cycle by cycle"
+    },
+    {
+     "id": "0009",
+     "explicit": false,
+     "why": "permutation cycles"
+    }
+   ]
+  },
+  "0073": {
+   "core": [
+    "permutation_cycles",
+    "multiplicative_order",
+    "modular_arithmetic"
+   ],
+   "secondary": [
+    "divide_and_conquer",
+    "in_place_algorithm",
+    "number_theory"
+   ],
+   "related": [
+    {
+     "id": "0072",
+     "explicit": false,
+     "why": "the rotation is the building block of the interleave"
+    },
+    {
+     "id": "0074",
+     "explicit": false,
+     "why": "a position map k -> k m mod M, like the shuffle's 2p mod M"
+    }
+   ]
+  },
+  "0074": {
+   "core": [
+    "permutation_cycles",
+    "in_place_algorithm",
+    "modular_arithmetic"
+   ],
+   "secondary": [
+    "number_theory",
+    "invariant"
+   ],
+   "related": [
+    {
+     "id": "0072",
+     "explicit": false,
+     "why": "cycles of an index map, moved with one value in hand"
+    },
+    {
+     "id": "0075",
+     "explicit": false,
+     "why": "the same transpose, on the bits of a word"
+    },
+    {
+     "id": "0073",
+     "explicit": false,
+     "why": "a multiplication modulo mn - 1 as the position map"
+    }
+   ]
+  },
+  "0075": {
+   "core": [
+    "bit_manipulation",
+    "divide_and_conquer",
+    "combinational_logic"
+   ],
+   "secondary": [
+    "xor_trick",
+    "in_place_algorithm"
+   ],
+   "related": [
+    {
+     "id": "0074",
+     "explicit": true,
+     "why": "the transpose of a matrix, here in the bits of one word"
+    },
+    {
+     "id": "0060",
+     "explicit": false,
+     "why": "word-wide bit tricks with masks and shifts"
     }
    ]
   }

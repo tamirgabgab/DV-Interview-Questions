@@ -1047,3 +1047,28 @@
 .md-typeset .viz-legend .mo-key-best { background: transparent; outline: 3px solid var(--viz-s2); outline-offset: -3px; }
 .md-typeset .viz-legend .mo-key-win { background: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
 .md-typeset .explorer.mo-is-rect .mo-key-nb-wrap, .md-typeset .explorer:not(.mo-is-rect) .mo-key-cand-wrap { display: none; }
+
+/* rotatek (0072): the array, tmp beside it and the target row under it */
+.md-typeset table.rk-cells td.is-in:not(.is-hl) { box-shadow: inset 0 -3px 0 var(--viz-ink); }
+.md-typeset table.rk-cells td.rk-tmp { margin-left: 0.6em; border-style: double; border-width: 3px; }
+.md-typeset table.rk-cells td.rk-tmplab { color: var(--viz-text); font-size: 0.65rem; }
+.md-typeset table.rk-cells tr.rk-want td.pm-c { color: var(--viz-text); border-style: dashed; }
+.md-typeset table.rk-cells tr.rk-want td.pm-c.is-done { color: var(--viz-ink); border-style: solid; border-color: var(--viz-s3); font-weight: 700; }
+.md-typeset .rk-note { min-height: 3em; }
+
+/* faro (0073), transpose (0074), bitmatrix (0075): the cell tables of 11-questions.css */
+.md-typeset .tp-hand { font-size: 0.75rem; color: var(--viz-text); text-align: center; margin: 0.2em 0 0.6em; }
+.md-typeset .tp-carry { display: inline-block; min-width: 1.8rem; padding: 0.1em 0.4em; border: 3px double var(--viz-ink); border-radius: 0.2rem; color: var(--viz-ink); font-family: var(--md-code-font-family); font-weight: 700; }
+.md-typeset table.tp-cells td.pm-c.is-done { box-shadow: inset 0 -3px 0 var(--viz-ink); font-weight: 700; }
+.md-typeset .viz-legend .tp-key-off { background: none; border: 1.5px dashed var(--viz-text); }
+.md-typeset .tp-note, .md-typeset .fa-note, .md-typeset .bm-note { min-height: 3em; }
+.md-typeset table.bm-cells td.bm-cell { cursor: pointer; color: var(--viz-text); }
+.md-typeset table.bm-cells td.bm-cell.bm-on { color: var(--viz-ink); font-weight: 700; }
+.md-typeset table.bm-cells td.bm-cell.bm-on:not(.c1):not(.c2) { background: color-mix(in srgb, var(--viz-ink) 14%, var(--md-default-bg-color)); }
+.md-typeset table.bm-cells td.bm-diag { outline: 1px dashed var(--viz-text); outline-offset: -5px; }
+.md-typeset .viz-legend .bm-key-on { background: color-mix(in srgb, var(--viz-ink) 14%, var(--md-default-bg-color)); border: 1.5px solid var(--viz-grid); }
+.md-typeset table.bm-vtab { direction: ltr; margin: 0.4em auto; font-size: 0.72rem; border-collapse: collapse; }
+.md-typeset table.bm-vtab th { font-weight: 400; color: var(--viz-text); text-align: right; padding: 0.1em 0.8em; border: 0; background: none; font-family: var(--md-text-font-family); }
+.md-typeset table.bm-vtab td { border: 0; padding: 0.1em 0.4em; }
+.md-typeset table.bm-vtab tr.is-now th, .md-typeset table.bm-vtab tr.is-now code { font-weight: 700; color: var(--viz-ink); }
+.md-typeset table.bm-vtab tr.is-later code { color: var(--viz-text); }

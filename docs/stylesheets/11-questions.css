@@ -785,3 +785,23 @@
 .md-typeset .explorer table.wz-table td, .md-typeset .explorer table.wz-table th { padding: 0.15em 0.5em; text-align: center; font-variant-numeric: tabular-nums; }
 .md-typeset .explorer table.wz-table tr.is-me td:first-child { font-weight: 700; }
 .md-typeset .explorer table.wz-table td.is-pick { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); font-weight: 700; }
+
+/* Rows of cells of the in-place questions (0072 to 0075, tools/figures/cells.py and their
+   boxes): an array, a deck, a matrix's memory or a word's bits; c1 .. c5 tint a cycle or
+   a group, is-hl frames the cells a step works on. */
+.md-typeset .pm-scroll { overflow-x: auto; margin: 0.6em 0; }
+.md-typeset table.pm-cells { border-collapse: separate; border-spacing: 3px; direction: ltr; font-family: var(--md-code-font-family); font-size: 0.75rem; margin: 0 auto; }
+.md-typeset table.pm-cells th { font-weight: 400; color: var(--viz-text); text-align: right; padding: 0 0.6em 0 0; white-space: nowrap; border: 0; background: none; font-family: var(--md-text-font-family); }
+.md-typeset table.pm-cells td { padding: 0 0.15em; border: 0; text-align: center; font-variant-numeric: tabular-nums; }
+.md-typeset table.pm-cells tr.pm-head td { color: var(--viz-text); font-size: 0.65rem; }
+.md-typeset table.pm-cells td.pm-c { min-width: 1.6rem; height: 1.6rem; border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; color: var(--viz-ink); background: var(--md-default-bg-color); }
+.md-typeset table.pm-cells td.pm-val { color: var(--viz-ink); padding-left: 0.7em; text-align: left; white-space: nowrap; }
+.md-typeset table.pm-cells td.c1, .md-typeset .viz-legend .pm-key-c1 { background: color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset table.pm-cells td.c2, .md-typeset .viz-legend .pm-key-c2 { background: color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset table.pm-cells td.c3, .md-typeset .viz-legend .pm-key-c3 { background: color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset table.pm-cells td.c4, .md-typeset .viz-legend .pm-key-c4 { background: color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color)); border-color: var(--viz-s4); }
+.md-typeset table.pm-cells td.c5, .md-typeset .viz-legend .pm-key-c5 { background: color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color)); border-color: var(--viz-s5); }
+.md-typeset table.pm-cells td.is-hl { border: 2.5px solid var(--site-mark-color); font-weight: 700; }
+.md-typeset .viz-legend .pm-key-hl { background: none; border: 2.5px solid var(--site-mark-color); }
+.md-typeset table.pm-cells td.is-off { border-style: dashed; color: var(--viz-text); background: none; }
+.md-typeset table.pm-cells td.is-gap { min-width: 0.6rem; }

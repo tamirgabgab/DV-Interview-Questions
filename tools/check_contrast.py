@@ -223,6 +223,15 @@ PAIRS = [
     ("video play disc", "var(--vd-accent)", ["var(--vd-glow)", "var(--vd-bg)"], UI),
     ("video play triangle", "var(--vd-on-accent)", ["var(--vd-accent)"], UI),
     ("video focus ring", "var(--vd-accent)", ["var(--vd-bg)"], UI),
+    ("in-place cells (0072 to 0075), tint c1", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))"], TEXT),
+    ("in-place cells (0072 to 0075), tint c2", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))"], TEXT),
+    ("in-place cells (0072 to 0075), tint c3", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))"], TEXT),
+    ("in-place cells (0072 to 0075), tint c4", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))"], TEXT),
+    ("in-place cells (0072 to 0075), tint c5", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color))"], TEXT),
+    ("in-place cells, a cell or an index", "var(--viz-text)", [PAGE], TEXT),
+    ("in-place cells, the mark of a step", "var(--site-mark-color)", [PAGE], UI),
+    ("bitmatrix box, a bit that is on", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 14%, var(--md-default-bg-color))"], TEXT),
+    ("bitmatrix box, a bit that is off", "var(--viz-text)", [CARD], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

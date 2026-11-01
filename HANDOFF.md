@@ -1754,11 +1754,35 @@ section below starts at session 22, whose numbered items run on through the late
     `check_table` and their part d forms; a wand "just under" is written \( 0.6^- \) (the
     plain "0.6⁻" showed reversed in RTL, also in the old positions table). The test now
     checks every step's formula and inequality against the generator, not page code.
+118. **Four new questions on in-place permutations, 0072 to 0075 (session 32, 2026-11-01).**
+    The owner asked for coding and logic questions on principles the bank lacks, liked an
+    in-place transpose, and picked three more of its kind. The owner's choices: four
+    separate questions, Python and SV everywhere plus an RTL module in 0075, a box of its
+    own for each, and all four published together.
+    - **0072, rotate an array by k (student):** three reversals (the swap count), the cycles
+      (gcd(n, k) of them, every entry moved once), and a full FIFO in a single-port RAM put
+      back to entry 0 (2n accesses for the cycles, 4 a swap for the reversals; `Ram` class).
+      Box `rotatek`: either method stepped, the cells tinted by part or cycle, tmp beside.
+    - **0073, perfect shuffles (junior):** 8 out-shuffles and 52 in-shuffles for 52 cards,
+      the order of 2 mod M for any n (M = n - 1, n + 1, or n when odd; the odd deck is the
+      even one without its fixed card), and the interleave in place by divide and conquer
+      with rotations (the O(n) cycle leader of Jain 2004 told, not coded). Box `faro`.
+    - **0074, transpose a matrix in place (junior, hard):** rotate an image by transpose and
+      row reversal; m x n by the cycles of k -> k m mod (mn - 1) with a bit per entry; and
+      without marks, each cycle from its leader (the walk steps tabled). Box `transpose`.
+    - **0075, the 8 x 8 bit transpose (senior):** the loop, three delta swaps (shifts 7, 14,
+      28; the masks are the bits with r_i = 0, c_i = 1), N x N in one word and 32 x 32 in 32
+      words (80 swaps), and `bit_transpose`, wires only, checked in Verilator at N = 8 and 4.
+      Box `bitmatrix`: draw bits or type the word, step the three stages.
+    Figures are HTML cell tables from `tools/figures/cells.py` (class `pm-cells`, tints c1 to
+    c5, a focusable scroll region), styled in 11-questions.css; new topics permutations,
+    number-theory, matrices; nine contrast pairs; the coding path and the question map have
+    the four.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
-  (work log item 117).
+  (work log item 117); questions 0072 to 0075 on in-place permutations (item 118).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
