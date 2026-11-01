@@ -1820,12 +1820,34 @@ section below starts at session 22, whose numbered items run on through the late
     the ten candidates, d = 5, `find_special` typed (its run drawn as jumps of x, since the
     trace is one line run 1,000 times), the chain, histogram and d-map boxes; part ג briefly,
     the base-7 box (610 to 363, then 363 ↔ 264). No page bug found.
+122. **0071 restructured: parts, a Markov chain, the box (session 32, 2026-11-01).** The owner
+     asked for new parts, after two rounds of questions. Part א (I am first against 0.6 and 0.8)
+     has numbers from the start, only p1 symbolic, and adds, at the best wand (0.6⁻), the
+     chances of wizard 2 (6/35), wizard 3 (64/575) and the cats (2/25) beside my 513/805. Part ב
+     lets me choose my turn and the rivals' order: a table of the six orders (the best wand is
+     0.6⁻ in all of them), the winner, third behind 0.6 then 0.8, developed stage by stage (my
+     13101/20125, 36/175, 64/575, cats 4/125), and why (both shoot before me; the weak one
+     first, so I am left facing it). Part ג is the general case in p1, p2, p3: the decisions
+     of every wizard as inequalities, and the rule, checked on every rival pair a < b in steps
+     of 0.025 against all six orders and every wand in steps of 0.005: the best is either
+     to hide third behind a then b with a wand just under a, or a sniper playing first
+     (1 − a); hide when a is above a threshold between 0.456 (b = 1) and 0.478 (b = a). The
+     old parts ב, ג and ד (me second, me third, rivals 0.8 and 0.4) are gone. New: the game
+     as a Markov chain, in the question (general, in p1, p2, p3) and in part א with the
+     numbers, drawn by `chain_svg` in tools/figures/q0071.py (styles `mk-*` in
+     11-questions.css, five contrast pairs). The `wizards` box now takes two rivals, my turn,
+     their order and my wand; shows the four chances, the six orders (a click picks a row),
+     "הבחירה הטובה ביותר", the chart and the live chain. A wand exactly equal to a rival is
+     left out of the grid searches (there the tie rule decides; the point just under stands
+     for it). The page has no code, as before. test_0071 takes about two minutes (the rule's
+     grid).
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
-  37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121).
+  37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
+  Markov chain and a new box (item 122).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

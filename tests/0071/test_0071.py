@@ -1,12 +1,13 @@
 """Question 0071: the exact backward induction of the generator (every option kept) against
-a Monte Carlo run of the same policies; the page's numbers (513/805 in parts a and b,
-13101/20125 in part c, part d's 91/220, 233/550, 1187/2750 and the snipers' 0.4, 0.08, 0.6,
-0.12), the closed forms and inequalities of every step, written with p1, p2, p3 and V; the
-general maxima of the three positions on a grid; the follow-ups; the explorer's JavaScript;
-and the page copies of the blocks. The page has no code: the reference is
-tools/figures/q0071.py."""
+a Monte Carlo run of the same policies; the page's numbers (part a: 513/805 and the others'
+6/35, 64/575, 2/25; part b: the six orders and 13101/20125 with 36/175, 64/575, 4/125;
+part c: the two plans, their closed forms and the threshold), the inequality of every step;
+the rule of part c against every place, order and wand on a grid of rival pairs; the
+follow-ups; the explorer's JavaScript; and the page copies of the blocks. The page has no
+code: the reference is tools/figures/q0071.py."""
 
 import json
+import math
 import random
 import sys
 from fractions import Fraction as Fr
@@ -16,11 +17,17 @@ from extract_code import ROOT
 sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0071  # noqa: E402
 
-V, E, H = q0071.F, q0071.EPS, Fr(1, 2)
+V, E = q0071.F, q0071.EPS
+R = q0071.RIVALS
 
 
 def near(x, y, tol=1e-9):
     return abs(float(x) - float(y)) < tol
+
+
+def one_minus_v(x, y):
+    """The second wizard of a duel wins: 1 - V(x, y) = (1 - x) y / (x + y - xy)."""
+    return 1 - V(x, y)
 
 
 def test_duel_formula():
@@ -34,10 +41,10 @@ def test_duel_formula():
 def test_monte_carlo():
     """The chances of the reference by playing the game itself with its round-1 choices."""
     rng = random.Random(61)
-    for p in ([0.6 - 1e-9, 0.6, 0.8], [0.6, 0.6 - 1e-9, 0.8], [0.6, 0.8, 0.6 - 1e-9], [1.0, 0.8, 0.4], [0.8, 0.4, 0.4 - 1e-9]):
+    for p in ([0.6 - 1e-9, 0.6, 0.8], [0.6, 0.8, 0.6 - 1e-9], [0.8, 0.6, 0.6 - 1e-9], [1.0, 0.8, 0.4], [0.47, 0.9, 0.47 - 1e-9]):
         want, trace = q0071.round_options([Fr(x) for x in p])
         choice = {w: best for w, _, best in trace}
-        wins, n = [0, 0, 0], 40000
+        wins, cats, n = [0, 0, 0], 0, 40000
         for _ in range(n):
             alive, winner = [0, 1, 2], None
             for w in (0, 1, 2):                                  # the first round
@@ -53,106 +60,187 @@ def test_monte_carlo():
                     break
             if winner is not None:
                 wins[winner] += 1
+            else:
+                cats += 1
         for k in range(3):
             assert abs(wins[k] / n - float(want[k])) < 0.012, (p, k, wins[k] / n, float(want[k]))
-
-
-def test_page_numbers():
-    rv, rd = q0071.RIVALS, q0071.RIVALS_D
-    w = lambda me, own, r: q0071.win(me, own, r)              # noqa: E731
-    assert near(w(1, Fr(6, 10) - E, rv), Fr(513, 805)) and near(w(2, Fr(6, 10) - E, rv), Fr(513, 805))
-    assert near(w(3, Fr(6, 10) - E, rv), Fr(13101, 20125))
-    assert w(1, Fr(1), rv) == Fr(2, 5) == w(2, Fr(1), rv) and w(3, Fr(1), rv) == Fr(2, 25)
-    assert near(w(1, Fr(4, 10) - E, rd), Fr(91, 220)) and w(1, Fr(1), rd) == Fr(3, 5)
-    assert near(w(2, Fr(4, 10) - E, rd), Fr(233, 550)) and w(2, Fr(1), rd) == Fr(3, 25)
-    assert near(w(3, Fr(4, 10) - E, rd), Fr(1187, 2750)) and w(3, Fr(1), rd) == Fr(3, 25)
-
-
-def one_minus_v(x, y):
-    """The second wizard of a duel wins: 1 - V(x, y) = (1 - x) y / (x + y - xy)."""
-    return 1 - V(x, y)
+        assert abs(cats / n - float(q0071.outcomes([Fr(x) for x in p])[1])) < 0.012
 
 
 def test_steps_of_part_a():
     p2, p3 = Fr(6, 10), Fr(8, 10)
-    # step 1: the four duels
+    # step 1: the duels, mine as functions of p1
     assert V(p2, p3) == Fr(15, 23) and V(p3, p2) == Fr(20, 23) and V(p2, p2) == Fr(5, 7)
-    # step 2: wizard 3 aims at me exactly when p1 > p2 (= 0.6)
+    for k in range(1, 100):
+        p1 = Fr(k, 100)
+        assert V(p1, p2) == p1 / (Fr(6, 10) + Fr(4, 10) * p1) and V(p1, p3) == p1 / (Fr(8, 10) + Fr(2, 10) * p1)
+        assert one_minus_v(p1, p2) == Fr(6, 10) * (1 - p1) / (Fr(6, 10) + Fr(4, 10) * p1)
+    # step 2: wizard 3 aims at me exactly when p1 > 0.6
     for k in range(1, 100):
         p1 = Fr(k, 100)
         at_me, at_2 = p3 * one_minus_v(p2, p3), p3 * one_minus_v(p1, p3)
-        assert (at_2 < at_me) == (p1 > p2) or p1 == p2
         assert at_me == p3 * Fr(8, 23)
-    # step 3: A = 12/23, D1 = 3/23, and D3 > A only below 11/31 (6.6 > 18.6 p1)
+        assert (at_2 < at_me) == (p1 > p2) or p1 == p2
+        assert (Fr(8, 10) * (1 - p1) / (Fr(8, 10) + Fr(2, 10) * p1) < Fr(8, 23)) == (Fr(184, 10) - Fr(184, 10) * p1 < Fr(64, 10) + Fr(16, 10) * p1) == (p1 > p2)
+    # step 3: A = 12/23, D1 = 3/23, and hitting 3 beats the air only below 11/31 (6.6 > 18.6 p1)
     A = p3 * V(p2, p3)
-    assert A == Fr(12, 23) and one_minus_v(p3, p2) == Fr(3, 23)
+    assert A == Fr(12, 23) and one_minus_v(p3, p2) == Fr(3, 23) and near(Fr(11, 31), 0.355, 1e-3)
     for k in range(1, 100):
         p1 = Fr(k, 100)
-        assert one_minus_v(p1, p2) == p2 * (1 - p1) / (p2 + (1 - p2) * p1)
         assert (one_minus_v(p1, p2) > A) == (p1 < Fr(11, 31))
-    # step 4: H3 > H2 for every wand; step 5: W > H3 (p2 >= 1/2), W rises, the limit 513/805
+    # steps 4-5: H3 > H2 always, W > H3, W rises; step 6: P(p1) <= 0.4
     W = lambda p1: p2 * V(p1, p2) + (1 - p2) * p3 * V(p1, p3)      # noqa: E731
     prev = 0
     for k in range(1, 60):
         p1 = Fr(k, 100)
         H3, H2 = one_minus_v(p2, p1), one_minus_v(p3, p1)
+        assert H3 == Fr(4, 10) * p1 / (Fr(6, 10) + Fr(4, 10) * p1) and H2 == Fr(2, 10) * p1 / (Fr(8, 10) + Fr(2, 10) * p1)
         assert H3 > H2 and W(p1) > H3 and W(p1) > prev
         assert W(p1) == Fr(6, 10) * p1 / (Fr(6, 10) + Fr(4, 10) * p1) + Fr(32, 100) * p1 / (Fr(8, 10) + Fr(2, 10) * p1)
+        assert near(q0071.win(1, p1, R), W(p1))
         prev = W(p1)
-    assert V(p2, p2) == 1 / (2 - p2)
-    weak = p2 / (2 - p2) + (1 - p2) * p3 * V(p2, p3)
-    assert weak == Fr(36, 84) + Fr(192, 920) == Fr(3, 7) + Fr(24, 115) == Fr(513, 805) == W(p2)
-    # step 6: p1 H3 = 0.4 p1^2 / (0.6 + 0.4 p1), rising to 1 - p2 at p1 = 1
     for k in range(61, 101):
         p1 = Fr(k, 100)
         assert p1 * one_minus_v(p2, p1) == Fr(4, 10) * p1 ** 2 / (Fr(6, 10) + Fr(4, 10) * p1) <= Fr(4, 10)
-        assert near(q0071.win(1, p1, q0071.RIVALS), p1 * one_minus_v(p2, p1))
-    assert 1 * one_minus_v(p2, 1) == 1 - p2
+        assert near(q0071.win(1, p1, R), p1 * one_minus_v(p2, p1))
+    # step 7: the limit
+    assert W(p2) == Fr(3, 7) + Fr(24, 115) == Fr(513, 805)
+    # step 8: the others and the cats at the best wand
+    ch = q0071.round_options(q0071.place(1, q0071.weak(R), R))[0]
+    cats = q0071.outcomes(q0071.place(1, q0071.weak(R), R))[1]
+    assert near(ch[0], Fr(513, 805)) and near(ch[1], Fr(6, 35)) and near(ch[2], Fr(64, 575)) and cats == Fr(2, 25)
+    assert Fr(6, 10) * Fr(2, 7) == Fr(6, 35) and Fr(32, 100) * Fr(8, 23) == Fr(64, 575)
+    assert [Fr(513, 805) * 4025, Fr(6, 35) * 4025, Fr(64, 575) * 4025, Fr(2, 25) * 4025] == [2565, 690, 448, 322]
+    assert 2565 + 690 + 448 + 322 == 4025
 
 
-def test_steps_of_parts_b_and_c():
-    p1, p3 = Fr(6, 10), Fr(8, 10)                                  # part b: I am wizard 2
-    for k in range(1, 60):
-        p2 = Fr(k, 100)
-        A, H3, H1 = p3 * V(p2, p3), one_minus_v(p1, p2), one_minus_v(p3, p2)
-        assert A > H3 > H1
-        assert one_minus_v(p2, p1) > one_minus_v(p3, p1)          # wizard 1 aims at 3
-    assert p1 / (2 - p1) + (1 - p1) * p3 * V(p1, p3) == Fr(513, 805)
-    assert p1 * (1 - p3) >= 1 - 2 * p3 and one_minus_v(p3, p1) == Fr(3, 23)   # the sniper: wizard 1 waits
-    p1, p2 = Fr(6, 10), Fr(8, 10)                                  # part c: I am wizard 3
+def test_the_choices_of_part_a():
+    _, trace = q0071.round_options(q0071.place(1, Fr(6, 10) - E, R))
+    assert [(w, best) for w, _, best in trace] == [(3, 2), (2, 3), (1, "air")]
+    _, trace = q0071.round_options(q0071.place(1, Fr(1), R))
+    assert [(w, best) for w, _, best in trace] == [(3, 1), (2, "air"), (1, 3)]
+    assert near(q0071.win(1, Fr(6, 10) + E, R), 0.1714, 1e-4)     # the trap: just above
+    assert q0071.win(1, Fr(1), R) == Fr(2, 5)
+
+
+def test_the_six_orders():
+    rows = q0071.orders(R)
+    got = {(me, tuple(float(x) for i, x in enumerate(p) if i != me - 1)): (q, ch, cats) for p, me, q, ch, cats in rows}
+    want = {(1, (0.6, 0.8)): (0.6373, 0.1714, 0.1113, 0.08), (1, (0.8, 0.6)): (0.6075, 0.2783, 0.0343, 0.08),
+            (2, (0.6, 0.8)): (0.6373, 0.1714, 0.1113, 0.08), (2, (0.8, 0.6)): (0.6075, 0.2783, 0.0343, 0.08),
+            (3, (0.6, 0.8)): (0.6510, 0.2057, 0.1113, 0.032), (3, (0.8, 0.6)): (0.5560, 0.2783, 0.0857, 0.08)}
+    for key, (m, r1, r2, c) in want.items():
+        q, ch, cats = got[key]
+        me = key[0]
+        others = [ch[i] for i in range(3) if i != me - 1]
+        assert near(q, 0.6, 1e-6)                                  # the best wand is 0.6- in every order
+        assert near(ch[me - 1], m, 1e-4) and near(others[0], r1, 1e-4) and near(others[1], r2, 1e-4) and near(cats, c, 1e-9)
+        assert near(sum(ch) + cats, 1)
+    best = max(rows, key=lambda r: r[3][r[1] - 1])
+    assert best[1] == 3 and [float(x) for x in best[0][:2]] == [0.6, 0.8]
+    assert near(best[3][2], Fr(13101, 20125))
+    # the orders where 0.8 shoots before 0.6, exactly
+    assert near(q0071.win(1, Fr(6, 10) - E, (Fr(8, 10), Fr(6, 10))), Fr(12, 23) + Fr(3, 35))
+    assert near(q0071.win(3, Fr(6, 10) - E, (Fr(8, 10), Fr(6, 10))), Fr(2238, 4025))
+
+
+def test_steps_of_part_b():
+    p1, p2 = Fr(6, 10), Fr(8, 10)                                  # I am wizard 3
     for k in range(1, 60):
         p3 = Fr(k, 100)
-        assert p3 * one_minus_v(p2, p3) < p3 * one_minus_v(p1, p3)  # I aim at 2
-        assert one_minus_v(p3, p2) > one_minus_v(p1, p2)            # 2 aims at 1
-        R1 = (1 - p2) * p3 * V(p1, p3)
-        assert one_minus_v(p3, p1) > R1                             # 1 aims at 2
-        W = p1 * V(p3, p1) + (1 - p1) * (p2 * V(p3, p2) + (1 - p2) * p3 * one_minus_v(p1, p3))
-        assert near(q0071.win(3, p3, q0071.RIVALS), W)
-    assert (1 - p2) * Fr(6, 10) * V(p1, p1) == Fr(3, 35) and one_minus_v(p1, p1) == Fr(2, 7)
-    R1 = p2 * V(p1, p2) + (1 - p2) * p1                             # the sniper
-    assert near(R1, 0.6417, 1e-4) and one_minus_v(p2, p1) == Fr(3, 23)
-    assert (1 - p2) * (1 - p1) == Fr(2, 25)
+        # step 3: I aim at 2
+        assert Fr(4, 10) / (Fr(6, 10) + Fr(4, 10) * p3) > Fr(2, 10) / (Fr(8, 10) + Fr(2, 10) * p3)
+        assert p3 * one_minus_v(p2, p3) < p3 * one_minus_v(p1, p3)
+        # step 4: 2 aims at 1
+        assert one_minus_v(p3, p2) > one_minus_v(p1, p2) == Fr(8, 23)
+        # step 5: 1 aims at 2
+        air = Fr(2, 10) * p3 * Fr(6, 10) / (Fr(6, 10) + Fr(4, 10) * p3)
+        hit = Fr(6, 10) * (1 - p3) / (Fr(6, 10) + Fr(4, 10) * p3)
+        assert air == (1 - p2) * p3 * V(p1, p3) and hit == one_minus_v(p3, p1)
+        assert (hit > air) == (p3 < Fr(5, 6)) and hit > one_minus_v(p2, p1)
+        # step 6: W
+        Wp = Fr(6, 10) * p3 / (Fr(6, 10) + Fr(4, 10) * p3) + Fr(32, 100) * p3 / (Fr(8, 10) + Fr(2, 10) * p3) \
+            + Fr(32, 1000) * p3 ** 2 / (Fr(6, 10) + Fr(4, 10) * p3)
+        assert near(q0071.win(3, p3, R), Wp)
+    assert one_minus_v(p1, p1) == Fr(2, 7) and (1 - p2) * Fr(6, 10) * V(p1, p1) == Fr(3, 35)
+    assert Fr(6, 10) * Fr(5, 7) + Fr(32, 100) * Fr(15, 23) + Fr(48, 1000) * Fr(2, 7) == Fr(13101, 20125)
+    # step 7: the sniper and the strong side
+    assert q0071.win(3, Fr(1), R) == Fr(2, 25)
+    _, trace = q0071.round_options(q0071.place(3, Fr(1), R))
+    assert [(w, best) for w, _, best in trace] == [(3, 2), (2, 3), (1, "air")]
+    for k in range(61, 101):
+        assert q0071.win(3, Fr(k, 100), R) <= Fr(2, 25)
+    # step 8: the others, the cats and the sum
+    p = q0071.place(3, q0071.weak(R), R)
+    ch, cats = q0071.round_options(p)[0], q0071.outcomes(p)[1]
+    assert near(ch[0], Fr(36, 175)) and near(ch[1], Fr(64, 575)) and near(cats, Fr(4, 125))
+    assert Fr(6, 10) * Fr(2, 7) + Fr(48, 1000) * Fr(5, 7) == Fr(36, 175)
+    assert [Fr(13101, 20125) * 20125, Fr(36, 175) * 20125, Fr(64, 575) * 20125, Fr(4, 125) * 20125] == [13101, 4140, 2240, 644]
+    assert 13101 + 4140 + 2240 + 644 == 20125
 
 
-def test_steps_of_part_d():
-    x, y = Fr(4, 10), Fr(8, 10)
-    assert V(x, y) == Fr(5, 11) and V(x, x) == Fr(5, 8) and one_minus_v(x, x) == Fr(3, 8)
-    for k in range(1, 100):                                       # the fact of step 1
+def test_part_c_closed_forms():
+    """The two plans: their chances against the induction, the decisions of plan b, and the
+    middle wizard's fact of step 3."""
+    N = 20
+    for i in range(1, N):
+        for j in range(i + 1, N + 1):
+            a, b = Fr(i, N), Fr(j, N)
+            hide = q0071.hide_third(a, b)
+            p = q0071.place(3, a - E, (a, b))
+            ch, cats = q0071.round_options(p)[0], q0071.outcomes(p)[1]
+            assert all(near(x, y) for x, y in zip(hide, (ch[2], ch[0], ch[1], cats))), (a, b)
+            assert near(sum(hide), 1)
+            _, trace = q0071.round_options(p)
+            assert [(w, best) for w, _, best in trace] == [(3, 2), (2, 1), (1, 2)], (a, b)
+            assert 1 - a > (1 - b) * a                                # a shoots rather than the air
+            snip = q0071.sniper_first(a, b)
+            assert q0071.win(1, Fr(1), (a, b)) == snip[0] == q0071.win(1, Fr(1), (b, a))
+            assert q0071.round_options(q0071.place(1, Fr(1), (a, b)))[0][1] == a
+    for k in range(1, 100):                                       # step 3's fact
         for j in range(1, 100):
             p2, p3 = Fr(k, 100), Fr(j, 100)
             assert p3 * V(p2, p3) - one_minus_v(p3, p2) == p2 * (2 * p3 - 1) / (p2 + p3 - p2 * p3)
-    assert y * V(x, y) + (1 - y) * x * V(x, x) == Fr(91, 220) and one_minus_v(x, x) < Fr(91, 220)
-    assert x * Fr(3, 8) + (1 - x) * x * V(x, x) == Fr(3, 10) and y * V(x, y) + (1 - y) * Fr(3, 10) == Fr(233, 550)
-    assert x * V(x, x) + (1 - x) * x * one_minus_v(x, x) == Fr(34, 100) and y * V(x, y) + (1 - y) * Fr(34, 100) == Fr(1187, 2750)
-    assert V(x, 1) == x and (1 - y) * (1 - x) == Fr(12, 100)
-    for k in range(1, 20):                                        # equal rivals (a follow-up): W = q
-        q = Fr(k, 20)
-        assert q * V(q, q) + (1 - q) * q * V(q, q) == q
+    # step 8: the first term alone passes 1 - a at 2 - sqrt 2, and the threshold table
+    for k in range(1, 100):
+        a = Fr(k, 100)
+        assert (a / (2 - a) >= 1 - a) == (a >= 2 - math.sqrt(2))
+        assert a * V(a, a) == a / (2 - a)
+    ts = [q0071.threshold(Fr(b, 10)) for b in (5, 6, 7, 8, 9, 10)]
+    assert all(x > y for x, y in zip(ts, ts[1:]))
+    assert near(ts[0], 0.4759, 1e-4) and near(ts[-1], 0.4563, 1e-4) and near(q0071.threshold(None), 0.4776, 1e-4)
+
+
+def test_part_c_rule_covers_everything():
+    """No place, order or wand beats max(hiding third, the sniper first): rival pairs in
+    steps of 0.025, wands in steps of 0.005 and the points just under the rivals and 0.5."""
+    N = 40
+    for i in range(1, N):
+        for j in range(i + 1, N):
+            a, b = Fr(i, N), Fr(j, N)
+            rule = max(q0071.hide_third(a, b)[0], 1 - a)
+            top = max(q0071.best_on_grid(me, rv, 200)[0] for rv in ((a, b), (b, a)) for me in (1, 2, 3))
+            assert top <= rule + Fr(1, 10**12), (a, b, float(top), float(rule))
+            for me in (1, 2, 3):                                  # a sniper never gets more than 1 - a
+                for rv in ((a, b), (b, a)):
+                    assert q0071.win(me, Fr(1), rv) <= 1 - a
+
+
+def test_examples_of_part_c():
+    want = {(0.6, 0.8): ("hide", 0.6510), (0.4, 0.8): ("sniper", 0.6), (0.47, 0.9): ("hide", 0.5526),
+            (0.47, 0.55): ("sniper", 0.53), (0.7, 0.9): ("hide", 0.7382)}
+    for a, b in q0071.EXAMPLES:
+        h, s = q0071.hide_third(a, b)[0], q0071.sniper_first(a, b)[0]
+        kind, val = want[(float(a), float(b))]
+        assert (kind == "hide") == (h > s) and near(max(h, s), val, 1e-4)
+        top = max(q0071.best_on_grid(me, rv, 200)[0] for rv in ((a, b), (b, a)) for me in (1, 2, 3))
+        assert near(top, max(h, s), 1e-9)
+    assert q0071.hide_third(Fr(6, 10), Fr(8, 10)) == (Fr(13101, 20125), Fr(36, 175), Fr(64, 575), Fr(4, 125))
 
 
 def test_who_wins_adds_up():
     for me in (1, 2, 3):
-        for rivals in (q0071.RIVALS, q0071.RIVALS_D):
+        for rivals in (R, (R[1], R[0]), (Fr(4, 10), Fr(8, 10))):
             for own in (q0071.weak(rivals), Fr(59, 100), Fr(1)):
                 p = q0071.place(me, own, rivals)
                 ways, cats = q0071.outcomes(p)
@@ -163,38 +251,6 @@ def test_who_wins_adds_up():
                     total[s] += pr * V(p[s], p[k])
                     total[k] += pr * one_minus_v(p[s], p[k])
                 assert total == chances and sum(chances) + cats == 1
-    p = q0071.place(1, q0071.weak(q0071.RIVALS), q0071.RIVALS)
-    ch, cats = q0071.round_options(p)[0], q0071.outcomes(p)[1]
-    assert near(ch[1], Fr(6, 35)) and near(ch[2], Fr(32, 100) * Fr(8, 23)) and near(cats, Fr(8, 100))
-
-
-def test_the_table_of_part_a():
-    _, trace = q0071.round_options(q0071.place(1, Fr(6, 10) - E, q0071.RIVALS))
-    assert [(w, best) for w, _, best in trace] == [(3, 2), (2, 3), (1, "air")]
-    _, trace = q0071.round_options(q0071.place(1, Fr(1), q0071.RIVALS))
-    assert [(w, best) for w, _, best in trace] == [(3, 1), (2, "air"), (1, 3)]
-    assert near(q0071.win(1, Fr(6, 10) + E, q0071.RIVALS), 0.1714, 1e-4)     # the trap: just above
-
-
-def test_general_maxima():
-    """P1 = max(W1(m-), 1 - m) on a grid; positions 2 and 3: the best is at m-, 0.5- or 1
-    except the narrow band of position 2 and one point of position 3."""
-    vals = [Fr(k, 10) for k in range(1, 10)]
-    for x in vals:
-        for y in vals:
-            if x == y:
-                continue
-            m = min(x, y)
-            best = q0071.best_on_grid(1, (x, y), 200)[0]
-            W1 = x * V(m, x) + (1 - x) * y * V(m, y)
-            assert near(best, max(W1, 1 - m), 1e-6), (x, y)
-            for me in (2, 3):
-                best = q0071.best_on_grid(me, (x, y), 200)[0]
-                cand = max(v for _, _, v in q0071.candidates(me, (x, y)))
-                if me == 2 and x < y < H:
-                    assert best >= cand - Fr(1, 10**9)
-                else:
-                    assert near(best, cand, 1e-6), (me, x, y)
 
 
 def test_follow_ups():
@@ -207,17 +263,10 @@ def test_follow_ups():
     assert near(p1 * one_minus_v(p2, p1) + (1 - p1) * W, 0.4263, 1e-4)
     # the cat rule in every round, position 1: max(m (1 - (1-b)(1-c)), 1 - m)
     assert near(Fr(6, 10) * (1 - Fr(4, 10) * Fr(2, 10)), 0.552) and near(Fr(6, 10) * (1 - Fr(3, 10) * Fr(1, 10)), 0.582)
-    # the narrow band of position 2: a = 0.3, c = 0.4
-    band = q0071.win(2, Fr(906, 1000), (Fr(3, 10), Fr(4, 10)))
-    assert near(band, 0.615, 1e-3) and q0071.win(2, Fr(1), (Fr(3, 10), Fr(4, 10))) == Fr(49, 100)
-
-
-def test_best_wand():
-    for me, rivals, chance, wand in [(1, (0.6, 0.8), Fr(513, 805), 0.6), (2, (0.6, 0.8), Fr(513, 805), 0.6),
-                                     (3, (0.6, 0.8), Fr(13101, 20125), 0.6), (1, (0.8, 0.4), Fr(3, 5), 1.0),
-                                     (2, (0.8, 0.4), Fr(233, 550), 0.4), (3, (0.8, 0.4), Fr(1187, 2750), 0.4)]:
-        got, q = q0071.best_on_grid(me, tuple(Fr(r).limit_denominator(10) for r in rivals), 1000)
-        assert near(got, chance) and near(q, wand, 1e-6), (me, rivals, float(got), float(q))
+    # equal rivals: W = q
+    for k in range(1, 20):
+        q = Fr(k, 20)
+        assert q * V(q, q) + (1 - q) * q * V(q, q) == q
 
 
 def test_explorer_matches_the_reference():
@@ -225,15 +274,24 @@ def test_explorer_matches_the_reference():
 
     rng = random.Random(62)
     cases = [[rng.randint(1, 100) / 100 for _ in range(3)] for _ in range(200)] + [[0.6 - 1e-9, 0.6, 0.8], [1, 0.8, 0.4]]
+    pairs = [(0.6, 0.8), (0.4, 0.8), (0.45, 0.9), (0.7, 0.75), (0.25, 0.3)]
     got = node_json(f"""
       const m = {explorer_require()};
-      console.log(JSON.stringify({json.dumps(cases)}.map((p) => m.wzRound(p))));""")
-    for p, g in zip(cases, got):
+      console.log(JSON.stringify({{ rounds: {json.dumps(cases)}.map((p) => m.wzRound(p)),
+        orders: {json.dumps(pairs)}.map(([a, b]) => m.wzOrders(a, b)) }}));""")
+    for p, g in zip(cases, got["rounds"]):
         if len(set(p)) < 3:
             continue
         want, trace = q0071.round_options([Fr(x) for x in p])
         assert all(near(a, b) for a, b in zip(g["win"], want)), p
         assert [t["choice"] for t in g["trace"]] == [str(best) for _, _, best in trace], p
+        assert near(g["cats"], q0071.outcomes([Fr(x) for x in p])[1]), p
+    for (a, b), rows in zip(pairs, got["orders"]):
+        ref = q0071.orders((Fr(a).limit_denominator(100), Fr(b).limit_denominator(100)))
+        assert len(rows) == 6
+        for row, (p, me, q, ch, cats) in zip(rows, ref):
+            assert row["me"] == me and near(row["wand"], q, 1e-6), (a, b, row, float(q))
+            assert all(near(x, y, 1e-6) for x, y in zip(row["win"], ch)) and near(row["cats"], cats, 1e-6), (a, b, me)
 
 
 def test_figures_up_to_date():

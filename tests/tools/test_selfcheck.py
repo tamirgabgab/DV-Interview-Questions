@@ -386,10 +386,11 @@ def kaprekar_keys() -> int:
 
 
 def wizard_answers() -> list:
-    """0071: the best chance of the three-wizard duel (cat rule after the first round) at
-    positions 1, 2, 3 against 0.6 then 0.8, and at position 1 against 0.8 then 0.4; the
-    first round solved backward with exact fractions (a target or the air at each turn), a
-    wand just under a rival standing for the limit."""
+    """0071: the best chance of the three-wizard duel (cat rule after the first round): at
+    place 1 against 0.6 then 0.8; with any place and order against 0.6 and 0.8; and with any
+    place and order against 0.4 and 0.8. The first round solved backward with exact
+    fractions (a target or the air at each turn), a wand just under a rival standing for the
+    limit."""
     def duel(x, y):                         # the opener wins
         return x / (x + y - x * y)
 
@@ -422,8 +423,11 @@ def wizard_answers() -> list:
             out = max(out, chances(p)[me])
         return out
 
+    def best_order(x, y):                   # any place, either order of the rivals
+        return max(best(me, rv) for me in range(3) for rv in ((x, y), (y, x)))
+
     a = (Fraction(3, 5), Fraction(4, 5))
-    return [best(0, a), best(1, a), best(2, a), best(0, (Fraction(4, 5), Fraction(2, 5)))]
+    return [best(0, a), best_order(*a), best_order(Fraction(2, 5), Fraction(4, 5))]
 
 
 def ones_answers() -> list:
