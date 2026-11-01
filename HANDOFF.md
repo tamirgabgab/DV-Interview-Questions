@@ -1736,9 +1736,29 @@ section below starts at session 22, whose numbered items run on through the late
     above the steps (24rem wide, on the surface) instead of beside them, and the reading
     line is lower there (the owner's choice). Keys in q0040, q0052 and q0032; a test per
     question; `page_tests.fig_steps` and `lit` for them.
+117. **0071 explained step by step, without code (session 32, 2026-11-01).** The owner found
+    the general formula of the wizards hard to follow and sent a step-by-step solution of
+    part a from a chat. The owner's choices: every part (a to d) as numbered stages solved
+    backward (the duel, the last wizard, the middle one, me, the weak option, the strong
+    option, the rule), each with the general formula in p1, p2, p3 (wizards 1, 2, 3 in turn
+    order) and then "with the numbers"; only V(x, y) = x / (x + y - xy) for the duel (no S, no
+    F/G, no a/b/c); the code removed (a math question: the Python and SystemVerilog tabs,
+    `tests/0071/demo.py` and `tb.sv` deleted), the charts, tables and the explorer kept; at
+    the end of each part three tables: my chance per wand with the calculation (a sum over
+    the ways the round ends), the rivals' strategies with a check at a wand of 0.59 (0.39 in
+    part d) and who wins in the end. The old decision tables are gone. The owner's chat
+    solution was checked first: every number in it holds (63.7%, 17.1%, 11.1%, 8%, the
+    thresholds 0.6 and 0.355). Part d puts the three positions in each table and adds the
+    "fact" (the middle wizard waits iff the last one hits with at least 1/2: both options
+    share the denominator). New in q0071: `outcomes`, `wand_table`, `who_wins`,
+    `check_table` and their part d forms; a wand "just under" is written \( 0.6^- \) (the
+    plain "0.6⁻" showed reversed in RTL, also in the old positions table). The test now
+    checks every step's formula and inequality against the generator, not page code.
 
 ## In progress
 
+- **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
+  (work log item 117).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
