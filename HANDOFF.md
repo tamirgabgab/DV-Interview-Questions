@@ -1778,11 +1778,28 @@ section below starts at session 22, whose numbered items run on through the late
     c5, a focusable scroll region), styled in 11-questions.css; new topics permutations,
     number-theory, matrices; nine contrast pairs; the coding path and the question map have
     the four.
+119. **Videos 0032 and 0031, the third V7 round (session 32, 2026-11-01).** The owner asked
+    for two fairly easy questions with no video and picked 0032 (wolf, goat and cabbage) and
+    0031 (the bridge and the torch). 0032 (7:40, `video_parts` [0, 180]): simple drawn icons
+    in Manim for the seven crossings, the river box's buttons (two refused tries, then the
+    plan), the proof that seven is the least; part ב the 4-bit state, a Manim graph of the
+    ten safe states filled layer by layer, `river_safe` and `river_plan` typed (a 15-line
+    window) and traced layer by layer beside the box's BFS panel. 0031 (8:23, [0, 213]): the
+    19-minute trap first, the 17 plan, the bridge box's plans, then the proof by cases (C
+    without D: 18 at least; C with D: 17 at least), a time bar per case; part ב the state
+    (mask, torch side), BFS against Dijkstra, `bridge()` typed in a 13-line window and traced
+    pop by pop with the variables and a log of pops beside the code (the box is too narrow
+    there at 80 % of its page size beside 74-character lines, so it follows for the walk
+    back). Environment notes: manimpango needs `libcairo2-dev libpango1.0-dev pkg-config`
+    from apt before `pip install -r requirements-video.txt`; the sandbox's proxy blocks
+    github.io, so the live site cannot be fetched from here. Waiting on the owner: watch them,
+    upload, send the YouTube ids.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
-  (work log item 117); questions 0072 to 0075 on in-place permutations (item 118).
+  (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
+  37984aa, deploy green); videos 0032 and 0031 (item 119).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

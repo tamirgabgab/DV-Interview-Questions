@@ -1,0 +1,460 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0031: the bridge and the torch,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:09.833
+Two parts: four people by hand,
+then code that finds the minimum for any number.
+
+3
+00:00:10.633 --> 00:00:15.100
+Part A: what is the shortest time
+for all four to cross the bridge?
+
+4
+00:00:15.800 --> 00:00:21.100
+Four people reach a narrow bridge at night.
+Their times: 1, 2, 5 and 10 minutes.
+
+5
+00:00:21.100 --> 00:00:24.633
+They have one torch, and without it
+nobody can cross.
+
+6
+00:00:24.633 --> 00:00:28.633
+At most two on the bridge at once,
+and a pair walks at the slower one's pace.
+
+7
+00:00:28.633 --> 00:00:32.633
+And someone has to bring the torch back
+so the others can cross.
+
+8
+00:00:32.633 --> 00:00:36.633
+The first plan that comes to mind: A, the fastest,
+escorts each one and brings the torch back.
+
+9
+00:00:36.633 --> 00:00:41.733
+A and D cross together: 10 minutes,
+D's pace.
+
+10
+00:00:41.733 --> 00:00:46.833
+A returns with the torch: one more minute.
+
+11
+00:00:46.833 --> 00:00:51.933
+A and C cross: 5 minutes.
+16 have passed.
+
+12
+00:00:51.933 --> 00:00:57.033
+A returns again: one minute.
+
+13
+00:00:57.033 --> 00:01:02.133
+A and B cross: 2 minutes.
+Everyone is across after 19 minutes.
+
+14
+00:01:02.133 --> 00:01:06.167
+19 looks reasonable: the fastest always returns.
+But we can do better.
+
+15
+00:01:06.967 --> 00:01:12.000
+The problem: this plan pays the 10
+and also the 5, in two different crossings.
+
+16
+00:01:12.000 --> 00:01:17.167
+The idea: if C and D cross as one pair,
+the 5 is swallowed by the 10, and we pay only 10.
+
+17
+00:01:17.167 --> 00:01:22.400
+The price: someone fast must already wait
+on the far bank to bring the torch back.
+
+18
+00:01:22.400 --> 00:01:26.400
+So the two fastest go first.
+Let's see it on the bridge.
+
+19
+00:01:28.000 --> 00:01:33.100
+Step 1: A and B cross, 2 minutes.
+B will wait on the far bank.
+
+20
+00:01:33.100 --> 00:01:38.200
+Step 2: A returns with the torch, 1 minute.
+3 minutes have passed.
+
+21
+00:01:38.200 --> 00:01:43.300
+Step 3: C and D cross together, 10 minutes.
+C's time is swallowed. 13 so far.
+
+22
+00:01:43.300 --> 00:01:48.400
+Step 4: B, who waited, brings the torch back.
+2 minutes, 15 so far.
+
+23
+00:01:48.400 --> 00:01:53.500
+Step 5: A and B cross, 2 minutes.
+Everyone is across after 17 minutes.
+
+24
+00:01:53.500 --> 00:01:58.667
+17, not 19: instead of the 5 we pay 2 twice
+and one more minute, only four minutes.
+
+25
+00:01:59.467 --> 00:02:04.967
+The page's box compares the plans:
+the search, the fastest escorts, and the two slow together.
+
+26
+00:02:04.967 --> 00:02:08.967
+The search finds 17, like the two slow ones together.
+The fastest escorting gives 19.
+
+27
+00:02:09.567 --> 00:02:13.733
+And it plays the search's plan,
+crossing by crossing.
+
+28
+00:02:13.733 --> 00:02:16.867
+A and B cross, and the torch goes with them.
+
+29
+00:02:16.867 --> 00:02:20.000
+A brings the torch back.
+
+30
+00:02:20.000 --> 00:02:23.133
+C and D cross together: t = 13.
+
+31
+00:02:23.133 --> 00:02:26.267
+B brings the torch back: t = 15.
+
+32
+00:02:26.267 --> 00:02:29.667
+A and B cross: t = 17,
+and everyone is across.
+
+33
+00:02:30.467 --> 00:02:35.000
+Why is less than 17 impossible? First:
+how many crossings are needed at least?
+
+34
+00:02:35.000 --> 00:02:39.000
+Each forward crossing moves at most two:
+three forward, and two back between them. Five.
+
+35
+00:02:39.000 --> 00:02:42.500
+D crosses forward at least once:
+10 minutes.
+
+36
+00:02:42.500 --> 00:02:47.400
+Each of the other four crossings takes
+at least the time of its fastest person.
+
+37
+00:02:48.000 --> 00:02:52.733
+Case 1: C does not cross with D.
+Then C crosses on its own once more, 5 at least.
+
+38
+00:02:52.733 --> 00:02:57.533
+And three more crossings of a minute at least:
+10 + 5 + 3 = 18. More than 17.
+
+39
+00:02:57.533 --> 00:03:02.533
+Case 2: C crosses with D, 10 minutes.
+Before that, someone crossed and waited on the far bank:
+
+40
+00:03:02.533 --> 00:03:07.633
+a forward crossing of 2 at least, since A alone
+cannot both wait there and come back.
+
+41
+00:03:07.633 --> 00:03:13.133
+The torch comes back twice: 1 and 2 at least,
+since one person cannot be on both banks.
+
+42
+00:03:13.133 --> 00:03:17.733
+And the last crossing, 2 at least:
+2 + 1 + 10 + 2 + 2 = 17.
+
+43
+00:03:17.733 --> 00:03:22.900
+In both cases at least 17, and our plan
+reaches exactly 17. That is the minimum.
+
+44
+00:03:23.700 --> 00:03:29.200
+The cost: every plan for four people is
+five crossings, and there are only a few dozen plans.
+
+45
+00:03:29.200 --> 00:03:33.000
+In part B code will go over all of them,
+for any number of people.
+
+46
+00:03:33.800 --> 00:03:39.000
+Part B: a function that takes the times and returns
+the shortest time and the crossings.
+
+47
+00:03:39.700 --> 00:03:44.300
+The state midway: who is already across,
+a bit per person, and where the torch is.
+
+48
+00:03:44.300 --> 00:03:49.333
+Here A and B are across, and the torch is there.
+What happened before does not change what follows.
+
+49
+00:03:49.333 --> 00:03:52.833
+With N people there are 2^N · 2 states.
+For four, 32.
+
+50
+00:03:52.833 --> 00:03:56.833
+The time spent is not part of the state:
+it is the cost of the path to it.
+
+51
+00:03:57.633 --> 00:04:02.367
+A crossing is an edge between two states,
+and its cost is the slower one's time.
+
+52
+00:04:02.367 --> 00:04:07.400
+BFS counts edges: both plans
+have five, and BFS cannot tell them apart.
+
+53
+00:04:07.400 --> 00:04:12.900
+With positive costs we need Dijkstra:
+always pop the state with the least time.
+
+54
+00:04:13.700 --> 00:04:16.700
+Now let's write it in Python.
+
+55
+00:04:20.067 --> 00:04:24.567
+heapq is a heap: the smallest comes out first.
+combinations gives all the pairs.
+
+56
+00:04:26.100 --> 00:04:28.833
+bridge takes the list of times.
+
+57
+00:04:31.867 --> 00:04:36.367
+n people, and everyone is the mask
+with all of them across: 1111.
+
+58
+00:04:37.667 --> 00:04:41.633
+The start state: nobody has crossed,
+and the torch is on the near bank.
+
+59
+00:04:46.300 --> 00:04:50.800
+best: the best time to each state.
+parent: where we came from. The heap holds the start.
+
+60
+00:04:54.300 --> 00:04:58.800
+While the heap is not empty, pop
+the state with the least time.
+
+61
+00:05:01.200 --> 00:05:05.100
+A stale entry, of a state already reached
+faster, is thrown away.
+
+62
+00:05:09.700 --> 00:05:14.200
+If everyone is across, we are done:
+the state came out with the least time.
+
+63
+00:05:19.067 --> 00:05:23.567
+bank: who is on the torch's bank.
+Their bit equals the torch's side.
+
+64
+00:05:28.833 --> 00:05:32.867
+Any group of one or two
+from that bank may cross.
+
+65
+00:05:39.867 --> 00:05:44.367
+The cost: t plus the slowest time in the group.
+Their bits flip, and the torch changes side.
+
+66
+00:05:53.733 --> 00:05:58.233
+If this is a cheaper way to the new state,
+update time and parent, and push it.
+
+67
+00:06:07.233 --> 00:06:11.733
+At the end, walk back from the final state
+by the parents, collecting the crossings.
+
+68
+00:06:15.300 --> 00:06:19.400
+And return the time, and the crossings
+in the right order, from the start.
+
+69
+00:06:20.100 --> 00:06:25.567
+Run it on 1, 2, 5, 10: the variables under the code,
+and on the right each state popped from the heap.
+
+70
+00:06:25.567 --> 00:06:30.733
+n = 4. The start: nobody across,
+torch near, time 0, and it is in the heap.
+
+71
+00:06:30.733 --> 00:06:36.333
+Pop the start, t = 0.
+All four are on the torch's bank.
+
+72
+00:06:36.333 --> 00:06:41.633
+The first group, A alone: cost 1.
+Less than infinity, so it is pushed.
+
+73
+00:06:41.633 --> 00:06:46.133
+So for all ten groups: ten states
+enter the heap, each with its own time.
+
+74
+00:06:46.133 --> 00:06:51.600
+(A, far) pops at time 1. Only A is by the torch,
+and going back does not improve the start.
+
+75
+00:06:51.600 --> 00:06:55.067
+(B, far) at time 2
+adds no new state either.
+
+76
+00:06:55.067 --> 00:07:00.067
+(AB, far) at 2: A goes back, a new state at 3.
+B goes back, a new state at 4.
+
+77
+00:07:00.067 --> 00:07:04.467
+The heap gives the states out by time:
+3, 4, 5, 5, 5, 6.
+
+78
+00:07:04.467 --> 00:07:09.467
+At 9 (BC, near) pops: A and D cross,
+and everyone is across for the first time, at 19.
+
+79
+00:07:09.467 --> 00:07:13.767
+The 19 waits in the heap. First come
+all the states from 10 to 15.
+
+80
+00:07:13.767 --> 00:07:18.767
+(CD, near) at time 15: A and B cross.
+15 + 2 = 17, less than 19: update.
+
+81
+00:07:18.767 --> 00:07:23.733
+The final state pops at 17, before the old 19.
+Everyone is across: break.
+
+82
+00:07:23.733 --> 00:07:28.333
+The walk back by the parents:
+five crossings, and 17 is returned.
+
+83
+00:07:29.133 --> 00:07:34.633
+The parents give the crossings from last to first.
+Reversed, they are the 17 plan of part A.
+
+84
+00:07:34.633 --> 00:07:37.767
+A and B forward: 2 minutes.
+
+85
+00:07:37.767 --> 00:07:40.900
+A returns with the torch: 3 minutes so far.
+
+86
+00:07:40.900 --> 00:07:44.033
+C and D forward: 13 minutes so far.
+
+87
+00:07:44.033 --> 00:07:47.500
+B returns, then A and B forward:
+17 minutes in all.
+
+88
+00:07:48.300 --> 00:07:53.467
+The cost: S = 2^N · 2 states, 512 for eight.
+O(N²) groups from each state.
+
+89
+00:07:53.467 --> 00:07:57.467
+With a heap, time O(S N² log S),
+and memory O(S) for the times and parents.
+
+90
+00:07:58.267 --> 00:08:01.867
+A trap: putting the elapsed time
+into the state as well.
+
+91
+00:08:01.867 --> 00:08:06.900
+Then every state is "new", the best check
+prunes nothing, and the search explodes.
+
+92
+00:08:06.900 --> 00:08:11.700
+The time is the cost of the path, not part
+of the state. Then there are only 32 states.
+
+93
+00:08:12.495 --> 00:08:18.095
+To sum up: the two slow ones cross together, 17 minutes,
+and Dijkstra over the states for any number.
+
+94
+00:08:18.095 --> 00:08:22.062
+Try your own times in the box
+on the page of question 0031 on the site.
