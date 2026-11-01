@@ -19,6 +19,7 @@ import q0071  # noqa: E402
 
 V, E = q0071.F, q0071.EPS
 R = q0071.RIVALS
+PAGE = ROOT / "docs" / "questions" / "senior" / "0071-three-wizards-duel.md"
 
 
 def near(x, y, tol=1e-9):
@@ -209,6 +210,30 @@ def test_part_c_closed_forms():
     ts = [q0071.threshold(Fr(b, 10)) for b in (5, 6, 7, 8, 9, 10)]
     assert all(x > y for x, y in zip(ts, ts[1:]))
     assert near(ts[0], 0.4759, 1e-4) and near(ts[-1], 0.4563, 1e-4) and near(q0071.threshold(None), 0.4776, 1e-4)
+
+
+def test_part_c_substituted_closed_form():
+    """Step 7 with V substituted: equal to the V form exactly, the limit of the induction as the
+    wand tends to a from below, and part b's numbers; the threshold inequality of step 8."""
+    N = 24
+    for i in range(1, N):
+        for j in range(i, N + 1):
+            a, b = Fr(i, N), Fr(j, N)
+            closed = q0071.hide_closed(a, b)
+            assert closed == q0071.hide_third(a, b), (a, b)
+            assert sum(closed) == 1
+            if a < b:
+                gaps = []
+                for e in (Fr(1, 10**3), Fr(1, 10**6)):
+                    ch = q0071.round_options(q0071.place(3, a - e, (a, b)))[0]
+                    gaps.append(abs(ch[2] - closed[0]))
+                assert gaps[1] < gaps[0] and gaps[1] < Fr(1, 10**5), (a, b)
+            assert (closed[0] > 1 - a) == (q0071.hide_third(a, b)[0] > 1 - a)
+    six, eight = Fr(6, 10), Fr(8, 10)
+    assert q0071.hide_closed(six, eight) == (Fr(13101, 20125), Fr(36, 175), Fr(64, 575), Fr(4, 125))
+    page = PAGE.read_text(encoding="utf-8")
+    assert page.count(r"\frac{a\,\bigl(1 + (1-a)^2(1-b)\bigr)}{2-a}") == 3
+    assert r"P_a = {}& \frac{a\,(1-a)(2-b)}{2-a}" in page and r"P_b = {}& \frac{(1-a)^2\,b^2}{a+b-ab}" in page
 
 
 def test_part_c_rule_covers_everything():

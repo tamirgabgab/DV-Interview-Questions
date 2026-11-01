@@ -1868,13 +1868,27 @@ section below starts at session 22, whose numbered items run on through the late
     q0071.chain_svg; wizards.js wires it). `q0071.chain_states` is the reference of the box's
     `wzStates`; a test checks both and the explanation's numbers. The labels of the two edges
     into a win sit at different heights so that "0.599" twice does not merge.
+125. **0071: side by side, a* transposed, part ג in a and b (session 32, 2026-11-01).** The
+    owner's screenshots of the live page: the table and the chart still stacked in their
+    window. The box is now a size container: the six orders (right) and the chart (left) are
+    a two-column grid, one column only when the box is under 26rem (520 px), the table's
+    smaller font under 47rem; no sideways scroll at box widths 332 to 635 px. Part ג's
+    threshold table is two rows (b, a*) with all six b and b = a; its row labels are plain
+    text (a MathJax label in the sticky first column of a scrolling grid table showed blank
+    at 390 px: a site-wide quirk of `table[data-grid][data-scrolls]`, not fixed), and it
+    fits 390 px (360 px in a 386 px column). The short answer and
+    steps 7 and 8 give the hide plan with V substituted: P_me = a(1 + (1 − a)²(1 − b))/(2 − a)
+    + ab(1 − a)/(a + b − ab), P_a = a(1 − a)(2 − b)/(2 − a), P_b = (1 − a)²b²/(a + b − ab),
+    cats (1 − a)²(1 − b), the limits as the wand tends to a from below
+    (`q0071.hide_closed`, tested equal to `hide_third`, against the induction at a − 10⁻³ and
+    a − 10⁻⁶, and 13101/20125 at 0.6 and 0.8), and the rule as that inequality against 1 − a.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

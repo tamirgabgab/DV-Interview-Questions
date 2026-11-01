@@ -137,6 +137,17 @@ def hide_third(a, b):
     return me, weak_w, strong, cats
 
 
+def hide_closed(a, b):
+    """hide_third with V substituted (V(a, a) = 1/(2 - a), V(a, b) = a/(a + b - ab)): the
+    chances as the wand tends to a from below (the supremum; a wand a - e gets within O(e))."""
+    d = a + b - a * b
+    me = a * (1 + (1 - a) ** 2 * (1 - b)) / (2 - a) + a * b * (1 - a) / d
+    weak_w = a * (1 - a) * (2 - b) / (2 - a)
+    strong = (1 - a) ** 2 * b ** 2 / d
+    cats = (1 - a) ** 2 * (1 - b)
+    return me, weak_w, strong, cats
+
+
 def sniper_first(a, b):
     """A sniper playing first kills the strong rival; the weak one opens against it."""
     return 1 - a, a, Fr(0), Fr(0)
@@ -302,13 +313,17 @@ def orders_table(rivals):
     return "\n".join(lines)
 
 
+THRESHOLD_BS = (Fr(1, 2), Fr(6, 10), Fr(7, 10), Fr(8, 10), Fr(9, 10), Fr(1))
+
+
 def threshold_table():
-    """Part c: the weak rival's threshold a* for several strong rivals b."""
-    lines = ["| היריב החזק \\( b \\) | הסף \\( a^* \\) |", "|:-:|:-:|"]
-    for b in (Fr(1, 2), Fr(6, 10), Fr(7, 10), Fr(8, 10), Fr(9, 10), Fr(1)):
-        lines.append(f"| {RLM}{float(b):g} | {RLM}{threshold(b):.3f} |")
-    lines.append(f"| ‏שווה ל-\\( a \\) | {RLM}{threshold(None):.3f} |")
-    return "\n".join(lines)
+    """Part c: the weak rival's threshold a* for several strong rivals b, two rows (b, a*)
+    and a column per b, the labels in the first (right) column."""
+    # plain-text labels: a MathJax label in the first column shows blank once a wide table scrolls
+    head = [f"{RLM}b"] + [f"{RLM}{float(b):g}" for b in THRESHOLD_BS] + [f"{RLM}b = a"]
+    row = [f"{RLM}a\\*"] + [f"{RLM}{threshold(b):.3f}" for b in THRESHOLD_BS] + [f"{RLM}{threshold(None):.3f}"]
+    return "\n".join(["| " + " | ".join(head) + " |", "|" + "|".join(["---"] + [":-:"] * (len(head) - 1)) + "|",
+                      "| " + " | ".join(row) + " |"])
 
 
 EXAMPLES = [(Fr(6, 10), Fr(8, 10)), (Fr(4, 10), Fr(8, 10)), (Fr(47, 100), Fr(9, 10)),
