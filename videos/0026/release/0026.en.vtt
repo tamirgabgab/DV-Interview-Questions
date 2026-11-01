@@ -1,0 +1,236 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0026: three friends and one motorcycle,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:08.767
+One part: the shortest time,
+the plan, and a general formula.
+
+3
+00:00:09.567 --> 00:00:14.767
+Three friends at A must get to B.
+They have one motorcycle: a driver and one passenger.
+
+4
+00:00:14.767 --> 00:00:19.867
+Walking the whole way: 13 hours.
+Riding the whole way: one hour.
+
+5
+00:00:19.867 --> 00:00:23.867
+What is the shortest time until all three are at B?
+The distance itself is unknown.
+
+6
+00:00:24.667 --> 00:00:29.867
+Let's start with the first plan that comes to mind.
+Above, the road; below, a chart of place against time.
+
+7
+00:00:29.867 --> 00:00:35.067
+The driver takes the passenger to B,
+in one hour. On the chart, a steep line.
+
+8
+00:00:35.067 --> 00:00:40.267
+He rides back empty to A, another hour,
+and the walker waits there all that time.
+
+9
+00:00:40.267 --> 00:00:45.467
+Then he takes the walker. 3 hours in all,
+and the walker wasted two hours waiting.
+
+10
+00:00:47.067 --> 00:00:52.267
+An improvement: the walker sets out at once.
+On the chart, a nearly flat line: slow walking.
+
+11
+00:00:52.267 --> 00:00:57.300
+The motorcycle rides back and meets him sooner,
+because they move toward each other.
+
+12
+00:00:57.300 --> 00:01:02.400
+So they arrive after 19/7 hours,
+about 2.71. But now the passenger waits at B.
+
+13
+00:01:02.400 --> 00:01:07.633
+The passenger's line is flat at B for almost two hours:
+time he could have spent walking.
+
+14
+00:01:08.433 --> 00:01:13.233
+The idea: nobody needs to wait.
+The passenger gets off before B and walks on.
+
+15
+00:01:13.233 --> 00:01:18.633
+Stage 1: the driver and the passenger ride to D,
+seven eighths of the way. The walker reaches Q.
+
+16
+00:01:18.633 --> 00:01:24.300
+Stage 2: the passenger walks from D; the motorcycle returns
+and meets the walker at C, one eighth of the way.
+
+17
+00:01:24.300 --> 00:01:29.533
+Stage 3: the driver takes the walker to B,
+and the passenger arrives on foot at the same moment.
+
+18
+00:01:29.533 --> 00:01:34.267
+All three are at B after two and a half hours,
+and nobody waited for a moment.
+
+19
+00:01:34.267 --> 00:01:39.767
+The two flat pieces are parallel and equal:
+each walks one eighth and rides seven eighths.
+
+20
+00:01:40.567 --> 00:01:45.967
+Now the formula. Call the ratio of the speeds
+α: how many times faster the motorcycle is.
+
+21
+00:01:46.467 --> 00:01:51.867
+The points cut the road into five pieces:
+y, x, z, x and r, in order from A.
+
+22
+00:01:51.867 --> 00:01:57.367
+Stage 1: in the same time the motorcycle covers y + x + z,
+the walker only y. α times faster: equation 1.
+
+23
+00:01:57.367 --> 00:02:02.333
+Stage 2: the motorcycle goes back z, the walker moves x,
+in the same time. So z = αx.
+
+24
+00:02:02.333 --> 00:02:06.333
+Note: the walker does not stand still.
+They close in at v₁ + v₀, not v₁.
+
+25
+00:02:06.333 --> 00:02:11.433
+Stage 3: the motorcycle covers z + x + r
+while the passenger walks r. That is equation 3.
+
+26
+00:02:11.433 --> 00:02:16.733
+Put z = αx into equations 1 and 3,
+and both give the same result: y = r.
+
+27
+00:02:16.733 --> 00:02:20.733
+The symmetry comes out by itself: the walker walks y + x
+at the start, the passenger x + r at the end.
+
+28
+00:02:21.333 --> 00:02:25.867
+Add up the five pieces, and write
+the length of the whole road in terms of x.
+
+29
+00:02:25.867 --> 00:02:30.167
+So the walker walks y + x, that is
+two over α + 3 of the road.
+
+30
+00:02:30.167 --> 00:02:35.067
+The rest he rides. His total time,
+which is everyone's time: T.
+
+31
+00:02:35.867 --> 00:02:40.900
+Put α = t₀ / t₁, and the distance drops out:
+the formula depends only on the two times.
+
+32
+00:02:40.900 --> 00:02:46.300
+A check with 13 and 1: forty over sixteen,
+two and a half hours, as on the chart.
+
+33
+00:02:47.100 --> 00:02:52.067
+A sanity check at the edges:
+a motorcycle as slow as walking does not help at all.
+
+34
+00:02:52.067 --> 00:02:57.233
+And a very fast motorcycle covers the road three times:
+forward, back and forward.
+
+35
+00:02:58.033 --> 00:03:02.567
+This is the box on the page:
+the road, and the same chart under it.
+
+36
+00:03:02.567 --> 00:03:07.233
+At the end of stage 1: the passenger gets off at D,
+the walker is at Q, after 0.875 hours.
+
+37
+00:03:07.233 --> 00:03:11.833
+At the end of stage 2: the motorcycle picks up
+the walker at C, after 1.625 hours.
+
+38
+00:03:11.833 --> 00:03:15.133
+And at the end of stage 3 all three are at B,
+after 2.5 hours.
+
+39
+00:03:15.733 --> 00:03:19.833
+In the box you can change the times.
+This is the plan with 13 and 1.
+
+40
+00:03:19.833 --> 00:03:25.300
+With 4 hours of walking the passenger gets off earlier,
+and the time is 13/7, about 1.86 hours.
+
+41
+00:03:25.300 --> 00:03:30.767
+And with three who need a ride, each rides
+the same distance: three hours and 40 minutes.
+
+42
+00:03:31.367 --> 00:03:36.867
+Why exactly D? In the proof step you move
+the drop point and see two arrival times.
+
+43
+00:03:36.867 --> 00:03:40.533
+An early drop: the passenger walks a lot
+and arrives last.
+
+44
+00:03:40.533 --> 00:03:44.933
+A late drop: the motorcycle rides back from far away,
+and the walker arrives last.
+
+45
+00:03:44.933 --> 00:03:50.067
+The later of the two is earliest when they are equal:
+at the point D, seven eighths of the way.
+
+46
+00:03:50.864 --> 00:03:56.464
+To sum up: the passenger gets off on the way,
+and all three arrive together after two and a half hours.
+
+47
+00:03:56.464 --> 00:04:02.364
+Try other times in the box
+on the page of question 0026 on the site.
