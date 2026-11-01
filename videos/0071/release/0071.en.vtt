@@ -1,0 +1,506 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0071: a duel of three wizards,
+a senior-level question.
+
+2
+00:00:04.600 --> 00:00:09.000
+Three parts: I go first, I choose my turn,
+and the general case.
+
+3
+00:00:09.800 --> 00:00:15.200
+Three wizards cast spells in turns:
+wizard 1, then 2, then 3, and around again.
+
+4
+00:00:15.200 --> 00:00:20.700
+On his turn each wizard targets one rival
+and hits with his chance. Casting into the air is allowed.
+
+5
+00:00:21.200 --> 00:00:26.700
+The cat rule: if all three are alive
+after the first round, all become cats and lose.
+
+6
+00:00:27.200 --> 00:00:32.700
+The wand: I choose my hit chance in advance,
+and everyone sees it. Everyone plays optimally.
+
+7
+00:00:33.500 --> 00:00:37.600
+Part A: I cast first,
+against wizards of 0.6 and 0.8.
+
+8
+00:00:38.300 --> 00:00:43.533
+Wizard 2 hits with 0.6 and wizard 3 with 0.8.
+The only variable is my wand, p₁.
+
+9
+00:00:43.533 --> 00:00:49.033
+The idea: solve from the end backward.
+First the duel, then wizard 3, wizard 2, and me.
+
+10
+00:00:49.833 --> 00:00:55.333
+Step 1: when two are left, they shoot in turn.
+The opener hits at once, or both miss,
+
+11
+00:00:55.333 --> 00:01:00.733
+and we are back in the same state. Solving gives
+the opener's chance to win, V(x,y).
+
+12
+00:01:00.733 --> 00:01:05.767
+Wizard 2 opening against wizard 3 wins 65%:
+the first shot is worth a lot.
+
+13
+00:01:05.767 --> 00:01:09.767
+And whoever hit in the first round is second in the duel,
+because the turn passes to the one left.
+
+14
+00:01:10.567 --> 00:01:14.733
+Step 2: wizard 3 must cast,
+or everyone becomes a cat. At whom?
+
+15
+00:01:14.733 --> 00:01:18.733
+If he hits me, he is second against wizard 2.
+If he hits wizard 2, he is second against me.
+
+16
+00:01:18.733 --> 00:01:23.967
+Compare the two chances and clear
+the denominators: a simple inequality in p₁.
+
+17
+00:01:23.967 --> 00:01:29.267
+He targets me exactly when p₁ > 0.6,
+that is, the stronger of me and wizard 2.
+
+18
+00:01:29.767 --> 00:01:35.267
+Step 3: wizard 2. When p₁ < 0.6, wizard 3
+targets him, so the air loses: he targets 3.
+
+19
+00:01:35.267 --> 00:01:40.767
+When p₁ > 0.6, in the air wizard 3 targets me,
+and wizard 2 then opens against him: 12/23.
+
+20
+00:01:40.767 --> 00:01:46.267
+For hitting wizard 3 to pay, he would need
+p₁ < 0.355. A contradiction, so he casts into the air.
+
+21
+00:01:46.767 --> 00:01:52.267
+Step 4: me. If I cast, I target wizard 3,
+the stronger. But should I cast at all?
+
+22
+00:01:52.767 --> 00:01:58.267
+If p₁ < 0.6, nobody targets me.
+I cast into the air and open against whoever is left.
+
+23
+00:01:58.267 --> 00:02:03.767
+Wizard 2 hits 3 with chance 0.6. Otherwise
+wizard 3 hits 2, with chance 0.4 times 0.8.
+
+24
+00:02:03.767 --> 00:02:09.267
+If p₁ > 0.6, wizard 3 targets me. I must
+hit at once, and get at most 0.4.
+
+25
+00:02:10.067 --> 00:02:15.867
+My chance by wand: it rises until just
+below 0.6, and drops once I pass wizard 2.
+
+26
+00:02:15.867 --> 00:02:20.767
+Just below 0.6: 513/805, almost 64%.
+A sniper, wand 1, gets only 40%.
+
+27
+00:02:20.767 --> 00:02:24.767
+Why not exactly 0.6? There wizard 3 is indifferent
+and might pick me. So slightly below, say 0.59.
+
+28
+00:02:25.567 --> 00:02:30.800
+The page's table: up to 0.6 I cast into the air,
+and above it I must target wizard 3.
+
+29
+00:02:30.800 --> 00:02:35.400
+Above 0.6 the chance drops to 0.223,
+and climbs only to 0.4 with a sniper.
+
+30
+00:02:36.200 --> 00:02:41.433
+The principle for both: kill the stronger,
+to face the weaker, me, at the end.
+
+31
+00:02:42.233 --> 00:02:47.333
+Now the whole game as a Markov chain:
+a state is who is alive and whose turn it is.
+
+32
+00:02:47.833 --> 00:02:53.533
+The top row is the first round: I cast into the air,
+wizard 2 at 3, and if he missed, wizard 3 at 2.
+
+33
+00:02:53.533 --> 00:02:58.200
+A hit leads to a duel, where they cast
+in turn until someone hits.
+
+34
+00:02:58.200 --> 00:03:03.500
+The bottom row is the wins. The chance of each end
+is a sum over the paths into it.
+
+35
+00:03:03.500 --> 00:03:09.000
+Duel 1 vs 2, my turn: I hit with 0.6,
+else wizard 2 casts, and if he missed, me again.
+
+36
+00:03:09.000 --> 00:03:12.600
+This is the loop of V: from this state
+I win with 5/7.
+
+37
+00:03:12.600 --> 00:03:17.833
+And duel 1 vs 3, my turn: we reach it
+with 0.32, and I win it with 15/23.
+
+38
+00:03:17.833 --> 00:03:21.567
+Each path is the product of the chances
+on its arrows.
+
+39
+00:03:21.567 --> 00:03:25.567
+Cats: both miss,
+0.4 times 0.2, that is 8%.
+
+40
+00:03:25.567 --> 00:03:30.300
+Me: 0.6 times 5/7, plus 0.32 times 15/23.
+In total 63.7%.
+
+41
+00:03:30.300 --> 00:03:35.033
+Wizard 2: hits 3 and wins as second against me,
+0.6 times 2/7, about 17.1%.
+
+42
+00:03:35.033 --> 00:03:39.833
+Wizard 3: 0.32 times 8/23, about 11.1%.
+The strongest of all gets the least.
+
+43
+00:03:39.833 --> 00:03:43.800
+The check: 63.7 plus 17.1, 11.1 and 8,
+exactly 100%.
+
+44
+00:03:44.600 --> 00:03:49.333
+In the page's box: me first with 0.599,
+and the Markov chain of the choice.
+
+45
+00:03:49.333 --> 00:03:53.500
+Wand 0.8: wizard 3 targets me,
+and wizard 2 casts into the air.
+
+46
+00:03:53.500 --> 00:03:57.967
+A sniper: I hit wizard 3 at once,
+and wizard 2 opens against me. Only 40%.
+
+47
+00:03:57.967 --> 00:04:01.000
+And back just below 0.6:
+63.7% again.
+
+48
+00:04:01.800 --> 00:04:07.300
+The trap: thinking the strongest wand is best.
+Here it gives 40%, against 63.7% for the weak one.
+
+49
+00:04:08.100 --> 00:04:13.000
+Part B: now I also choose my turn,
+and the order of the two rivals.
+
+50
+00:04:13.700 --> 00:04:19.200
+Three turns, two orders in each:
+six orders. Each is solved like part A.
+
+51
+00:04:19.200 --> 00:04:24.700
+In each, the best wand comes out just below
+0.6: be the weakest, so nobody targets me.
+
+52
+00:04:24.700 --> 00:04:29.433
+First or second: 63.7% or 60.7%,
+depending on which rival casts first.
+
+53
+00:04:29.433 --> 00:04:34.900
+Third after 0.6 then 0.8: 65.1%, the best.
+After 0.8 then 0.6, only 55.6%.
+
+54
+00:04:35.700 --> 00:04:41.200
+Let's work out the winning order. I am wizard 3, with p₃.
+Wizard 1 hits with 0.6, and wizard 2 with 0.8.
+
+55
+00:04:41.200 --> 00:04:46.600
+The duels of this order, with the same formula:
+I open, or the rival opens against me.
+
+56
+00:04:47.100 --> 00:04:52.400
+I am last in the round: I must cast, at the stronger,
+wizard 2, to stay against the weaker.
+
+57
+00:04:52.400 --> 00:04:57.900
+Wizard 2: in the air I kill him. So he casts,
+at the stronger of wizard 1 and me: at 1.
+
+58
+00:04:58.700 --> 00:05:04.500
+Wizard 1: hitting wizard 2 beats the air
+as long as p₃ < 5/6. So he also targets 2.
+
+59
+00:05:05.000 --> 00:05:10.400
+My chance: three ways into a duel.
+The last one, my own hit, is just a backup.
+
+60
+00:05:10.400 --> 00:05:13.933
+In the limit just below 0.6: 13101/20125,
+about 65.1%.
+
+61
+00:05:14.733 --> 00:05:20.333
+The chain of this order: wizard 1 at 2,
+if he missed wizard 2 at 1, and if he missed, me.
+
+62
+00:05:20.333 --> 00:05:24.033
+The duels: in all of them I play
+against whoever is left.
+
+63
+00:05:24.033 --> 00:05:28.000
+At the end: me 65.1%, wizard 1 20.6%,
+wizard 2 11.1%.
+
+64
+00:05:28.000 --> 00:05:33.300
+Cats only if all three of us miss:
+0.4 times 0.2 times 0.4, that is 3.2%.
+
+65
+00:05:33.300 --> 00:05:38.800
+And wizard 1: hits wizard 2 and wins as second against me,
+or opens against me after my hit.
+
+66
+00:05:38.800 --> 00:05:43.200
+And me: three ways into a duel,
+and in the first two I open.
+
+67
+00:05:43.200 --> 00:05:48.700
+Wizard 2: only if he hit wizard 1, and then he is
+second against me: 0.32 times 8/23, about 11.1%.
+
+68
+00:05:50.100 --> 00:05:55.600
+Why does this win? When I am last, both rivals
+cast before me, and the cats drop to 3.2%.
+
+69
+00:05:55.600 --> 00:06:00.900
+And the weaker casts first: he targets 0.8,
+and I stay against 0.6, not 0.8.
+
+70
+00:06:01.700 --> 00:06:06.000
+In the box, the "best choice" button
+goes through the six orders.
+
+71
+00:06:06.000 --> 00:06:10.733
+It picks third, after 0.6 then 0.8,
+just below 0.6: 65.1%.
+
+72
+00:06:11.333 --> 00:06:15.000
+And the Markov chain of this choice,
+with the same numbers.
+
+73
+00:06:15.800 --> 00:06:19.900
+Part C: any rivals, a < b.
+What is the best choice?
+
+74
+00:06:20.600 --> 00:06:26.100
+What we saw: each wizard targets the stronger
+of the other two. Nobody targets the weakest.
+
+75
+00:06:26.100 --> 00:06:31.567
+So there are two plans: hide as the weakest,
+or be a sniper and kill the strongest first.
+
+76
+00:06:31.567 --> 00:06:37.067
+Sniper first: wand 1, and I kill b at once.
+Rival a opens against me, and wins only if he hits.
+
+77
+00:06:37.067 --> 00:06:42.300
+Hide: third, after a then b,
+with a wand just below a, as in part B.
+
+78
+00:06:42.300 --> 00:06:46.300
+A sniper second or third gets no more:
+whoever casts before him sees him as the strongest.
+
+79
+00:06:47.100 --> 00:06:52.400
+In the hiding plan, as in part B: I am
+last and target b, and b targets a.
+
+80
+00:06:52.400 --> 00:06:56.200
+And a targets b, since 1 − a is always
+greater than (1 − b)a.
+
+81
+00:06:57.000 --> 00:07:01.800
+My chance: a sum over the three paths
+of the chain, as in part B.
+
+82
+00:07:01.800 --> 00:07:06.900
+Substitute V from step 1. Against an equal rival,
+the fraction reduces to 1/(2 − a).
+
+83
+00:07:06.900 --> 00:07:10.800
+And against b: a over a + b − ab.
+Nothing to reduce here.
+
+84
+00:07:10.800 --> 00:07:14.700
+And this is the general expression of my chance,
+in a and b only.
+
+85
+00:07:15.500 --> 00:07:19.533
+In the same way, the chances of the two rivals
+and of the cats.
+
+86
+00:07:19.533 --> 00:07:25.033
+The cats: all three miss, since my wand
+is close to a: (1 − a)² times (1 − b).
+
+87
+00:07:25.533 --> 00:07:31.033
+Check: a = 0.6 and b = 0.8 give
+13101/20125, exactly the answer of part B.
+
+88
+00:07:31.033 --> 00:07:35.033
+These are limits: a wand just below a
+gets as close to them as you like.
+
+89
+00:07:35.833 --> 00:07:40.000
+Hide when this expression is greater than 1 − a,
+the sniper's chance.
+
+90
+00:07:40.000 --> 00:07:44.533
+The first term alone beats 1 − a
+when a > 2 − √2, about 0.586.
+
+91
+00:07:45.033 --> 00:07:50.533
+With the other two terms the threshold a* is lower,
+and depends a little on b: between 0.456 and 0.478.
+
+92
+00:07:50.533 --> 00:07:55.933
+Below the threshold, sniper first. Above it, hide.
+In part B, a = 0.6, so we hide.
+
+93
+00:07:56.733 --> 00:08:01.833
+The rule on a few pairs of rivals: each row
+has the chance of each plan, and the choice.
+
+94
+00:08:01.833 --> 00:08:06.933
+0.4 and 0.8 are below the threshold: sniper, 60%.
+0.47 and 0.9 are already above it: hide.
+
+95
+00:08:06.933 --> 00:08:12.433
+0.47 and 0.55: the threshold rises as b shrinks,
+and the sniper barely wins. And 0.7 and 0.9: 73.8%.
+
+96
+00:08:13.233 --> 00:08:16.733
+In the box: rivals 0.4 and 0.8,
+below the threshold.
+
+97
+00:08:16.733 --> 00:08:21.033
+The best choice: sniper first, 60%,
+against 48.6% when hiding.
+
+98
+00:08:21.033 --> 00:08:24.500
+And now rivals 0.7 and 0.9,
+above the threshold.
+
+99
+00:08:24.500 --> 00:08:28.033
+The choice: third, just below 0.7,
+with 73.8%.
+
+100
+00:08:28.833 --> 00:08:35.233
+In short: be the weakest, cast last,
+and let the strong ones fight each other.
+
+101
+00:08:35.233 --> 00:08:41.133
+Try your own rivals in the box
+on the page of question 0071 on the site.

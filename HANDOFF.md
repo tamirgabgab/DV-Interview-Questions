@@ -1895,13 +1895,22 @@ section below starts at session 22, whose numbered items run on through the late
     D0 = Q̄1·Q̄0·b + Q1·b̄; part ב is part א with the two flip-flops swapped. q0055.py finds the
     equations by a small Quine-McCluskey (blocks 7 to 14); test_0055 runs the circuit
     against the page's functions on every bit string up to 8 bits.
+127. **Video 0071 (session 32, 2026-11-01).** The restructured question as on main
+    b9b8d61, no code (8:42, `video_parts` [0, 248, 375]): the duel formula, part א's stages
+    and the chart per wand (513/805), the Markov chain built row by row with one state
+    focused at a time, the box; part ב's six orders and the winning order stage by stage
+    (13101/20125); part ג's two plans, V substituted into the explicit P_me, P_a, P_b and
+    the cats, the a* table, the box on 0.4/0.8 and 0.7/0.9. scene.py asserts every number
+    against q0071. Shorter than the 10–12 minutes asked; the owner reviews it. To capture a
+    state's explanation from the box, box_shots.py would need a hover action (it fires
+    clicks; the box explains on pointer and focus).
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); video 0071 (item 127).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
