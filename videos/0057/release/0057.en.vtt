@@ -1,0 +1,501 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0057: ants on a rod,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:10.100
+Four parts: when it all ends, how many collisions,
+when a given ant falls, and a ring.
+
+3
+00:00:10.900 --> 00:00:15.367
+Ants stand on a rod 100 cm long,
+each at a different point.
+
+4
+00:00:15.367 --> 00:00:19.367
+Each ant faces left or right
+and walks one centimetre a second.
+
+5
+00:00:19.367 --> 00:00:24.467
+When two ants meet, both turn around
+at once. An ant that reaches an end falls.
+
+6
+00:00:24.467 --> 00:00:28.867
+The page's example: six ants,
+at 10, 25, 40, 60, 75 and 90.
+
+7
+00:00:29.667 --> 00:00:34.867
+Part A: 100 ants on the rod, in any order.
+What is the longest time until all have fallen?
+
+8
+00:00:35.567 --> 00:00:40.767
+Two ants, A and B, walk toward each other.
+On top they turn when they meet, as in the question.
+
+9
+00:00:40.767 --> 00:00:45.367
+Below, the same two, but here they pass
+through each other, like ghosts.
+
+10
+00:00:45.367 --> 00:00:49.367
+We run both together.
+They meet in the middle, at 50.
+
+11
+00:00:49.367 --> 00:00:53.833
+After the meeting: on top A goes back left,
+below A carries on to the right.
+
+12
+00:00:53.833 --> 00:00:57.833
+But the places are exactly the same: one point left
+and one point right. Only the colours swapped.
+
+13
+00:00:57.833 --> 00:01:01.833
+Without the names you cannot tell them apart.
+That is the whole trick: think of ghosts.
+
+14
+00:01:02.633 --> 00:01:08.033
+Now the page's six ants. Under the rod
+each ant draws a line: place against time.
+
+15
+00:01:08.033 --> 00:01:13.367
+Time runs downward. At every meeting
+the ants' lines break.
+
+16
+00:01:13.367 --> 00:01:18.933
+We go on until the rod is empty:
+the last ant falls after 90 seconds.
+
+17
+00:01:19.233 --> 00:01:23.533
+And now the same run with ghosts,
+which walk straight and never turn.
+
+18
+00:01:23.533 --> 00:01:29.267
+Each ghost is a straight line. These are exactly
+the same lines, only in other colours.
+
+19
+00:01:30.067 --> 00:01:35.567
+A ghost walking left from p leaves after p seconds,
+one walking right after 100 minus p.
+
+20
+00:01:35.567 --> 00:01:40.167
+In the example the six ghosts' times
+are 90, 25, 60, 60, 75 and 10.
+
+21
+00:01:40.167 --> 00:01:44.633
+The rod is empty when the last ghost leaves:
+the maximum, 90 seconds.
+
+22
+00:01:44.633 --> 00:01:50.100
+Every time is at most 100, and 100 happens
+when an ant stands at an end facing inward.
+
+23
+00:01:50.100 --> 00:01:54.100
+And it does not depend on how many ants:
+with one or with 100, the answer is 100 seconds.
+
+24
+00:01:54.900 --> 00:01:57.900
+Now let's write it in Python.
+
+25
+00:02:02.433 --> 00:02:06.933
+last_fall takes the places and the directions:
++1 right, -1 left.
+
+26
+00:02:11.500 --> 00:02:16.000
+For each ant, the time of its ghost:
+p if it walks left, else 100 minus p.
+
+27
+00:02:16.000 --> 00:02:20.000
+And we return the maximum. There is
+no simulation of collisions at all.
+
+28
+00:02:20.700 --> 00:02:24.200
+Let's run it on the page's six ants.
+
+29
+00:02:24.200 --> 00:02:28.000
+The times are 90, 25, 60, 60, 75 and 10,
+and the maximum is 90.
+
+30
+00:02:28.800 --> 00:02:33.767
+The page's box draws the lines too:
+place across, and time going down.
+
+31
+00:02:33.767 --> 00:02:38.267
+After 25 seconds four collisions
+have happened, and two ants have fallen.
+
+32
+00:02:38.267 --> 00:02:42.767
+Almost at the end, at 89.5 seconds,
+only ant 4 is left. The lines break at each meeting.
+
+33
+00:02:42.767 --> 00:02:47.267
+The "ghosts" switch turns them into straight lines:
+the very same lines, only the colours swap.
+
+34
+00:02:48.067 --> 00:02:52.533
+The cost: one pass over the ants,
+O(n) time and O(1) memory.
+
+35
+00:02:53.333 --> 00:02:58.800
+Trap: simulating collision after collision.
+With 100 ants there can be 2500 of them.
+
+36
+00:02:58.800 --> 00:03:04.200
+The ghosts spare all of that: the time depends
+only on each ant's own place and direction.
+
+37
+00:03:05.000 --> 00:03:10.200
+Part B: how many collisions in a given arrangement?
+And what is the most with 100 ants?
+
+38
+00:03:10.900 --> 00:03:16.300
+Every collision is a point where two lines
+cross. Let's look at the ghosts' straight lines.
+
+39
+00:03:16.300 --> 00:03:20.700
+The example has five crossings,
+so five collisions of ants.
+
+40
+00:03:20.700 --> 00:03:24.700
+Two straight lines cross only
+if they head toward each other.
+
+41
+00:03:25.500 --> 00:03:30.800
+A pair meets if the left one goes right
+and the right one goes left. Other pairs never meet.
+
+42
+00:03:30.800 --> 00:03:35.700
+And they always meet in time, halfway,
+before either of them leaves the rod.
+
+43
+00:03:36.500 --> 00:03:41.666
+We count: for each ant going left,
+how many going right are on its left.
+
+44
+00:03:41.666 --> 00:03:46.066
+25 meets 10. 60 and 75
+each meet 10 and 40.
+
+45
+00:03:46.066 --> 00:03:49.566
+In all 1 plus 2 plus 2:
+five collisions.
+
+46
+00:03:50.366 --> 00:03:55.333
+With k ants going right,
+there are at most k times n minus k pairs.
+
+47
+00:03:55.333 --> 00:03:59.733
+And the most is when all those going right
+are left of all those going left.
+
+48
+00:03:59.733 --> 00:04:04.833
+k(n − k) is largest at k = n/2:
+with 100 ants, 50 times 50, 2500.
+
+49
+00:04:05.633 --> 00:04:08.633
+Now let's write it in Python.
+
+50
+00:04:12.133 --> 00:04:16.633
+collisions takes the places and the directions
+and returns the number of collisions.
+
+51
+00:04:18.200 --> 00:04:22.700
+Two counters: count for the collisions,
+and right for the right-goers passed so far.
+
+52
+00:04:25.266 --> 00:04:29.433
+We go over the ants from left to right,
+after sorting them by place.
+
+53
+00:04:31.433 --> 00:04:35.933
+An ant going right: add one
+to right. It will meet those on its right.
+
+54
+00:04:37.900 --> 00:04:42.400
+An ant going left meets every right-goer
+on its left: add right.
+
+55
+00:04:43.566 --> 00:04:46.066
+At the end we return count.
+
+56
+00:04:47.366 --> 00:04:51.466
+Let's run it on the page's six ants.
+Both counters start at 0.
+
+57
+00:04:51.466 --> 00:04:55.866
+10 goes right: right = 1.
+
+58
+00:04:55.866 --> 00:05:00.266
+25 goes left and meets 10:
+count = 1.
+
+59
+00:05:00.266 --> 00:05:04.666
+40 goes right: right = 2.
+
+60
+00:05:04.666 --> 00:05:09.066
+60 goes left and meets 10 and 40:
+count = 3.
+
+61
+00:05:09.066 --> 00:05:13.466
+75 also goes left and meets both:
+count = 5.
+
+62
+00:05:13.466 --> 00:05:18.366
+90 goes right, and there is no one on its right
+to meet it: right = 3.
+
+63
+00:05:18.366 --> 00:05:21.966
+The loop is over: the function returns 5.
+
+64
+00:05:22.766 --> 00:05:28.266
+The cost: the sort is O(n log n),
+the pass itself O(n). O(n) memory for the list.
+
+65
+00:05:29.066 --> 00:05:34.066
+Trap: counting every pair with opposite
+directions. Here 25 goes left and 40 right.
+
+66
+00:05:34.066 --> 00:05:39.533
+They move apart and never meet.
+Count only pairs that face each other.
+
+67
+00:05:40.330 --> 00:05:45.530
+Part C: when, and from which side, does
+the k-th ant from the left fall? Which falls last?
+
+68
+00:05:46.230 --> 00:05:51.430
+The first idea: ants never pass each other.
+They only meet and turn.
+
+69
+00:05:51.430 --> 00:05:56.230
+So the order along the rod never changes:
+ant 1 is always the leftmost.
+
+70
+00:05:56.230 --> 00:06:00.230
+The ant that falls on the left is always
+the leftmost one still on the rod.
+
+71
+00:06:01.030 --> 00:06:06.530
+The second idea: every ghost leaving on the left
+drops an ant on the left. Three ghosts go left.
+
+72
+00:06:06.530 --> 00:06:10.530
+So ants 1, 2 and 3 fall on the left,
+after 25, 60 and 75 seconds, in order.
+
+73
+00:06:10.530 --> 00:06:14.763
+The ghosts going right leave
+after 90, 60 and 10 seconds.
+
+74
+00:06:14.763 --> 00:06:18.763
+On the right the rightmost ant falls first:
+ant 6 at 10, ant 5 at 60, ant 4 at 90.
+
+75
+00:06:19.563 --> 00:06:24.163
+The table: for each ant, which side
+it falls from, and when.
+
+76
+00:06:24.163 --> 00:06:29.463
+Ant 4 started at 60 walking left,
+yet it falls on the right, last, at 90.
+
+77
+00:06:30.263 --> 00:06:33.263
+Now let's write it in Python.
+
+78
+00:06:38.396 --> 00:06:42.896
+fall_times returns when each ant falls,
+in their order from the left.
+
+79
+00:06:46.530 --> 00:06:51.030
+The times of the ghosts leaving on the left:
+p of the left-goers, smallest first.
+
+80
+00:06:55.230 --> 00:06:59.730
+The times of the ghosts leaving on the right:
+100 minus p of the right-goers.
+
+81
+00:07:01.763 --> 00:07:06.263
+The left ones first, then the right ones
+reversed: the rightmost ant falls first.
+
+82
+00:07:07.363 --> 00:07:11.663
+On the example: on the left leave
+the ghosts of 25, 60 and 75.
+
+83
+00:07:11.663 --> 00:07:16.063
+On the right: 100 minus 10, 40 and 90,
+sorted: 10, 60 and 90.
+
+84
+00:07:16.063 --> 00:07:21.163
+The result: 25, 60, 75, then 90, 60 and 10.
+The maximum is ant 4's, 90.
+
+85
+00:07:21.963 --> 00:07:25.930
+In the page's box: the rod, and under it
+when each ant falls.
+
+86
+00:07:25.930 --> 00:07:29.530
+After 10 seconds ant 6 falls on the right,
+the first one.
+
+87
+00:07:29.530 --> 00:07:32.663
+After 25 seconds ant 1 falls on the left.
+
+88
+00:07:32.663 --> 00:07:37.630
+After 60 seconds two fall together:
+ant 2 on the left and ant 5 on the right.
+
+89
+00:07:37.630 --> 00:07:42.763
+At 75 ant 3 falls on the left. Only
+ant 4 is left; it will fall on the right at 90.
+
+90
+00:07:43.563 --> 00:07:48.663
+The cost: two sorts, O(n log n),
+and two lists of times, O(n).
+
+91
+00:07:49.463 --> 00:07:54.463
+Trap: "an ant falls on the side
+it faces". Ant 4 faces left.
+
+92
+00:07:54.463 --> 00:07:58.863
+But it falls on the right. What walks straight
+is the ghost, not the ant.
+
+93
+00:07:59.663 --> 00:08:04.763
+Part D, briefly: the rod bends into a ring,
+with no ends, and no ant falls.
+
+94
+00:08:05.463 --> 00:08:10.630
+The same six ants, but four walk
+clockwise, and only 60 and 75 against it.
+
+95
+00:08:10.630 --> 00:08:15.796
+Each ghost completes a lap in 100 seconds:
+the set of places and directions returns.
+
+96
+00:08:15.796 --> 00:08:20.763
+But the circular order turns: each ant
+moves s = R − L places, here 2.
+
+97
+00:08:20.763 --> 00:08:25.363
+After 100 seconds: ant 0 stands
+where ant 2 started, and so for all.
+
+98
+00:08:25.363 --> 00:08:28.563
+After 200 seconds: two more places.
+
+99
+00:08:28.563 --> 00:08:32.730
+After 300 seconds all are home,
+in the same place and the same direction.
+
+100
+00:08:32.730 --> 00:08:38.230
+In general: n over gcd(n, s) laps.
+Here 6 over 2, three laps: 300 seconds.
+
+101
+00:08:39.030 --> 00:08:45.730
+To sum up: ghosts that pass through each other
+solve all four parts.
+
+102
+00:08:45.730 --> 00:08:50.630
+Try your own arrangements in the box
+on the page of question 0057 on the site.
