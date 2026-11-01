@@ -1852,7 +1852,8 @@ section below starts at session 22, whose numbered items run on through the late
     wrapped in the picture only, a caption says so) and traced race by race, the box after
     the trace (too narrow beside 81-character lines). Seen in the horses box: the step line
     puts "ועוד" inside an `ltr()` run ("F1, F2, F3, F4 ועוד 1"), so a wrapped line shows "(1"
-    at the start of the next line; not fixed yet.
+    at the start of the next line. Fixed: each Latin run (the horse, the list of faster ones,
+    the count, the place) is isolated on its own, the Hebrew words between them.
 
 ## In progress
 

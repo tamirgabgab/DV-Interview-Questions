@@ -211,11 +211,12 @@
           const e = st.plan.log[st.step - 1];
           const reasons = e.gone.slice().sort((u, v) => (nm(u) < nm(v) ? -1 : 1)).map((x) => {
             const f = e.faster[x].slice().sort((u, v) => (nm(u) < nm(v) ? -1 : 1));
-            return `${nm(x)} (${f.slice(0, st.c).map(nm).join(", ")}${f.length > st.c ? ` ועוד ${f.length - st.c}` : ""})`;
+            // Latin runs isolated one by one: a Hebrew word inside an ltr() run wraps out of order
+            return `${ltr(nm(x))} (${ltr(f.slice(0, st.c).map(nm).join(", "))}${f.length > st.c ? ` ועוד ${ltr(f.length - st.c)}` : ""})`;
           });
           step = `תחרות ${ltr(st.step)}, ${whatText(e)} : ${ltr(e.order.map(nm).join(" > "))}. ` +
-            (e.gone.length ? `<span class="wv-bad">נפסלו ${ltr(e.gone.length)}</span>` + (e.what[0] === "final" || e.gone.length <= 6 ? ` : ${ltr(reasons.join("; "))}` : ` : ${ltr(e.gone.map(nm).sort().join(", "))}`) + ` (בסוגריים : מהירים ידועים). ` : "אף סוס לא נפסל. ") +
-            (e.placed.length ? `<span class="wv-ok">נקבעו</span> : ${ltr(e.placed.slice().sort((u, v) => rankOf(u) - rankOf(v)).map((x) => `${nm(x)} מקום ${rankOf(x)}`).join(", "))}. ` : "") +
+            (e.gone.length ? `<span class="wv-bad">נפסלו ${ltr(e.gone.length)}</span>` + (e.what[0] === "final" || e.gone.length <= 6 ? ` : ${reasons.join("; ")}` : ` : ${ltr(e.gone.map(nm).sort().join(", "))}`) + ` (בסוגריים : מהירים ידועים). ` : "אף סוס לא נפסל. ") +
+            (e.placed.length ? `<span class="wv-ok">נקבעו</span> : ${e.placed.slice().sort((u, v) => rankOf(u) - rankOf(v)).map((x) => `${ltr(nm(x))} מקום ${ltr(rankOf(x))}`).join(", ")}. ` : "") +
             (done ? `<b>סיימנו אחרי ${ltr(st.step)} תחרויות.</b>` : `נשארו ${ltr(e.open.length)} מועמדים פתוחים${st.step < R ? `; התחרות הבאה : ${ltr(st.plan.log[st.step].horses.map(nm).join(", "))}` : ""}.`);
         }
         $(".hr-step").innerHTML = step;
