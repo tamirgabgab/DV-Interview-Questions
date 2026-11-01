@@ -1904,13 +1904,19 @@ section below starts at session 22, whose numbered items run on through the late
     against q0071. Shorter than the 10–12 minutes asked; the owner reviews it. To capture a
     state's explanation from the box, box_shots.py would need a hover action (it fires
     clicks; the box explains on pointer and focus).
+128. **Video 0055 (session 32, 2026-11-01).** The owner asked for no code: parts א and ב
+    are built in D flip-flops in Manim (the three states, the binary code with 11 unused, the
+    encoded table, the Karnaugh maps, the equations, the circuit with an asynchronous reset),
+    a stream stepped through the circuit cycle by cycle, one beat on 11 staying 11 while
+    b = 0; part ג in about a minute with the box (343 in base 10, m = 7, from each end).
+    7:04, `video_parts` [0, 210, 355].
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); video 0071 (item 127).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

@@ -1,0 +1,447 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0055: a state machine for division by 3,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:09.567
+Three parts: bits from the MSB, bits from the LSB,
+then any m and any base.
+
+3
+00:00:10.367 --> 00:00:15.533
+Each clock cycle one bit comes in, din.
+The number can be as long as you like.
+
+4
+00:00:15.533 --> 00:00:20.133
+After each bit, div says whether the number
+read so far is divisible by 3.
+
+5
+00:00:20.933 --> 00:00:25.900
+Part A: the new bit is the number's lowest bit,
+as in normal reading.
+
+6
+00:00:26.600 --> 00:00:31.500
+A new bit doubles the number
+and adds the bit: v becomes 2v + b.
+
+7
+00:00:31.500 --> 00:00:36.533
+We cannot store v. But the remainder
+of 2v + b depends only on v's remainder.
+
+8
+00:00:36.533 --> 00:00:40.533
+So the state is the remainder r: 0, 1 or 2.
+Three states, and div is on when r = 0.
+
+9
+00:00:41.333 --> 00:00:46.300
+The three states. State 0 has a double ring:
+there the number is divisible, div = 1.
+
+10
+00:00:46.300 --> 00:00:50.467
+From state 0: bit 0 keeps it at 0,
+and bit 1 moves it to 1.
+
+11
+00:00:50.467 --> 00:00:55.633
+From state 1: 2·1 + 0 = 2, and 2·1 + 1 = 3,
+which is 0. So to 2 or to 0.
+
+12
+00:00:55.633 --> 00:00:59.933
+From state 2: 4, which is 1, and 5, which is 2.
+Six transitions in all.
+
+13
+00:00:59.933 --> 00:01:05.033
+The page's example: 13, that is 1101,
+arrives bit by bit. We start at 0.
+
+14
+00:01:05.033 --> 00:01:08.033
+Bit 1: the number 1, remainder 1.
+
+15
+00:01:08.033 --> 00:01:11.133
+Bit 1: the number 3, remainder 0. div = 1.
+
+16
+00:01:11.133 --> 00:01:14.233
+Bit 0: the number 6, remainder 0. div = 1.
+
+17
+00:01:14.233 --> 00:01:17.233
+Bit 1: the number 13, remainder 1.
+
+18
+00:01:17.733 --> 00:01:23.233
+Now to hardware. Three states take two bits,
+Q1 and Q0: 0 is 00, 1 is 01, 2 is 10.
+
+19
+00:01:23.233 --> 00:01:27.233
+Code 11 is unused. In the tables it is
+a don't care: we may choose what helps.
+
+20
+00:01:28.033 --> 00:01:33.333
+The encoded transition table: each state and bit,
+and the next state, which is the input D1D0.
+
+21
+00:01:33.333 --> 00:01:38.067
+And two rows of 11: we never reach them,
+so their next state is xx.
+
+22
+00:01:38.067 --> 00:01:43.267
+A Karnaugh map per flip-flop input:
+rows Q1Q0 in Gray order, columns b.
+
+23
+00:01:43.267 --> 00:01:47.167
+D1: two groups, with the help of the x.
+Q0·b' plus Q1·b.
+
+24
+00:01:47.167 --> 00:01:51.333
+D0: Q1·b' plus a single cell,
+Q1'·Q0'·b, which has no neighbour.
+
+25
+00:01:51.333 --> 00:01:56.133
+And the output depends only on the state:
+div is on at 00, so div = Q1'·Q0'.
+
+26
+00:01:56.933 --> 00:02:02.733
+The circuit. On the left the rails: b, its inverse
+through a NOT gate, and the four state outputs.
+
+27
+00:02:02.733 --> 00:02:07.400
+An AND gate for each product of the equations;
+a dot marks a connection to a rail.
+
+28
+00:02:07.400 --> 00:02:11.000
+OR gates join the products
+into the inputs D1 and D0.
+
+29
+00:02:11.000 --> 00:02:16.400
+Two D flip-flops with a clock and an asynchronous
+reset to 00. Q and Q' go back to the rails.
+
+30
+00:02:16.400 --> 00:02:21.600
+And a last AND gate: div = Q1'·Q0'.
+An amber wire carries 1, a grey wire 0.
+
+31
+00:02:21.600 --> 00:02:26.333
+After reset the state is 00 and div = 1:
+the number 0 is divisible. Now 1101.
+
+32
+00:02:26.333 --> 00:02:31.133
+Bit 1: Q1'·Q0'·b is on,
+so D0 = 1 and D1 = 0. The next state is 01.
+
+33
+00:02:31.133 --> 00:02:36.100
+Clock edge: state 01, that is remainder 1.
+div = 0, because 1 is not divisible.
+
+34
+00:02:36.400 --> 00:02:40.500
+Bit 1 again. Now no product is on:
+D1D0 = 00.
+
+35
+00:02:40.500 --> 00:02:43.700
+State 00 and div = 1: the number 3 is divisible.
+
+36
+00:02:44.000 --> 00:02:48.167
+Bit 0 in state 00: all products are off,
+and the state stays 00.
+
+37
+00:02:48.167 --> 00:02:51.367
+The number 6, and div stays 1.
+
+38
+00:02:51.667 --> 00:02:55.467
+Bit 1 in state 00: Q1'·Q0'·b again,
+and the next state is 01.
+
+39
+00:02:55.467 --> 00:02:59.633
+The number 13: remainder 1, and div = 0.
+Exactly as in the diagram.
+
+40
+00:02:59.933 --> 00:03:05.133
+What if the flip-flops start at 11?
+With b = 0: D1 = Q0·b' = 1, and D0 = 1 too.
+
+41
+00:03:05.133 --> 00:03:09.133
+State 11 stays 11 as long as b = 0, and div
+is stuck at 0. So the reset to 00 matters.
+
+42
+00:03:09.933 --> 00:03:13.433
+And this is how it looks in the page's box,
+on the same 1101.
+
+43
+00:03:13.433 --> 00:03:16.033
+Bit 1: from 0 to 1, on the orange arrow.
+
+44
+00:03:16.033 --> 00:03:18.567
+Bit 1: from 1 to 0. 3 is divisible.
+
+45
+00:03:18.567 --> 00:03:21.300
+Bit 0: we stay at 0. 6 is divisible.
+
+46
+00:03:21.300 --> 00:03:23.833
+Bit 1: to 1. 13 is not divisible.
+
+47
+00:03:24.633 --> 00:03:30.133
+The cost: two flip-flops, five AND gates, two ORs
+and one NOT, whatever the number's length.
+
+48
+00:03:30.933 --> 00:03:36.133
+Part B: the new bit is the number's highest bit.
+6 = 110 arrives as 0, 1, 1.
+
+49
+00:03:36.833 --> 00:03:42.000
+Now bit k adds b·2^k, and 2^k
+modulo 3 alternates: 1, 2, 1, 2.
+
+50
+00:03:42.000 --> 00:03:47.233
+The first attempt: keep the remainder
+and the parity of k. Six states.
+
+51
+00:03:47.233 --> 00:03:51.700
+But the future depends only on x = r·2^-k.
+Modulo 3 the inverse of 2 is 2.
+
+52
+00:03:51.700 --> 00:03:57.200
+Then x' = 2(x + b) mod 3: the position k is gone.
+Three states again, and div is on when x = 0.
+
+53
+00:03:58.000 --> 00:04:02.400
+Three states again, with other transitions.
+State 0 has a double ring.
+
+54
+00:04:02.400 --> 00:04:06.500
+From state 0: bit 0 stays at 0,
+and bit 1 gives 2·1 = 2.
+
+55
+00:04:06.500 --> 00:04:11.100
+From state 1: 2·1 = 2, and 2·2 = 4,
+which is 1. So to 2 or to 1.
+
+56
+00:04:11.100 --> 00:04:15.000
+From state 2: 2·2 = 4, which is 1,
+and 2·3 = 6, which is 0.
+
+57
+00:04:15.000 --> 00:04:20.500
+This is part A's machine with 1 and 2
+swapped. The same code: 00, 01, 10.
+
+58
+00:04:21.300 --> 00:04:26.533
+Part B's encoded table: x, the bit,
+and the next state x' = 2(x + b) mod 3.
+
+59
+00:04:26.533 --> 00:04:30.033
+And again 11 is a don't care.
+
+60
+00:04:30.033 --> 00:04:33.233
+Two Karnaugh maps, in the same Gray order.
+
+61
+00:04:33.233 --> 00:04:37.267
+D1: Q0·b' with the help of the x,
+plus the single cell Q1'·Q0'·b.
+
+62
+00:04:37.267 --> 00:04:41.667
+D0: Q0·b plus Q1·b'.
+The same products, just in other places.
+
+63
+00:04:41.667 --> 00:04:46.967
+The output is as in part A: div = Q1'·Q0',
+since x = 0 exactly when the number divides.
+
+64
+00:04:47.767 --> 00:04:52.867
+The same rails: b and b', and Q1, Q1', Q0, Q0'
+coming back from the flip-flops.
+
+65
+00:04:52.867 --> 00:04:56.667
+Four AND gates for part B's products.
+
+66
+00:04:56.667 --> 00:05:00.067
+Two ORs, for D1 and D0.
+
+67
+00:05:00.067 --> 00:05:05.167
+The same two flip-flops, reset to 00.
+Here too 11 stays 11 when b = 0.
+
+68
+00:05:05.167 --> 00:05:08.367
+div = Q1'·Q0', as before.
+
+69
+00:05:08.367 --> 00:05:12.600
+Now 6 = 110, from the LSB: 0, 1, 1.
+After reset x = 0.
+
+70
+00:05:12.600 --> 00:05:16.700
+Bit 0 in state 00: no product is on,
+and the next state is 00.
+
+71
+00:05:16.700 --> 00:05:19.900
+The number 0 is divisible: div = 1.
+
+72
+00:05:20.200 --> 00:05:24.367
+Bit 1: Q1'·Q0'·b is on,
+so D1 = 1. The next state is 10.
+
+73
+00:05:24.367 --> 00:05:27.567
+x = 2: the number 2 is not divisible, div = 0.
+
+74
+00:05:27.867 --> 00:05:32.333
+Bit 1 in state 10: Q1·b' is off, and Q0·b is off.
+The next state is 00.
+
+75
+00:05:32.333 --> 00:05:35.533
+x = 0: the number 6 is divisible, div = 1.
+
+76
+00:05:36.633 --> 00:05:41.533
+In the box choose concatenation at the MSB:
+the new digit enters on the left. Again 110.
+
+77
+00:05:41.533 --> 00:05:44.033
+Bit 0: we stay at 0.
+
+78
+00:05:44.033 --> 00:05:46.533
+Bit 1: to 2. The number 2.
+
+79
+00:05:46.533 --> 00:05:49.133
+Bit 1: back to 0. 6 is divisible.
+
+80
+00:05:49.933 --> 00:05:55.100
+Exactly the same cost: from the LSB too,
+three states and two flip-flops are enough.
+
+81
+00:05:55.900 --> 00:06:01.100
+Part C: division by m, a base-B digit
+entering each cycle, with B and m coprime.
+
+82
+00:06:01.800 --> 00:06:07.033
+From the MSB a new digit turns v into Bv + d,
+and the state is the remainder: m states.
+
+83
+00:06:07.033 --> 00:06:11.433
+From the LSB, part B's trick with B^-1:
+m states here too.
+
+84
+00:06:11.433 --> 00:06:16.933
+k bits a cycle are one digit in base 2^k:
+the same m states, only the multipliers change.
+
+85
+00:06:16.933 --> 00:06:22.433
+An example: division by 7, a decimal digit a cycle.
+The multiplier is 3, the inverse of 10 is 5.
+
+86
+00:06:23.233 --> 00:06:27.133
+In the box: 343 = 7³, from the MSB.
+Seven states on the ring.
+
+87
+00:06:27.133 --> 00:06:29.633
+Digit 3: remainder 3.
+
+88
+00:06:29.633 --> 00:06:32.667
+Digit 4: 3·3 + 4 = 13, remainder 6.
+
+89
+00:06:32.667 --> 00:06:36.833
+Digit 3: 3·6 + 3 = 21, remainder 0.
+343 is divisible by 7.
+
+90
+00:06:37.633 --> 00:06:42.133
+And now from the LSB, digit 3 first:
+(0 + 3)·5 = 15, that is 1.
+
+91
+00:06:42.133 --> 00:06:45.300
+Digit 4: (1 + 4)·5 = 25, that is 4.
+
+92
+00:06:45.300 --> 00:06:49.800
+Digit 3: (4 + 3)·5 = 35, that is 0.
+Divisible again, from the other end.
+
+93
+00:06:50.600 --> 00:06:57.000
+In short: three states in both directions,
+two flip-flops and a few gates.
+
+94
+00:06:57.000 --> 00:07:02.900
+Try your own numbers in the box
+on the page of question 0055 on the site.
