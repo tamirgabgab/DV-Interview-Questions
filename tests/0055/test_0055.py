@@ -130,3 +130,38 @@ def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(55)
+
+
+def test_flip_flop_equations():
+    """The D flip-flop implementation of parts a and b: the minimal equations the generator
+    finds from the K-maps (11 a don't care) give the page's machines on every state and
+    bit, they are the ones the page shows, 11 behaves as the page says, and part b is part
+    a with the two flip-flops swapped."""
+    page = next((ROOT / "docs" / "questions").rglob("0055-*.md")).read_text(encoding="utf-8")
+    want = {False: {"D1": ["Q₁·b", "Q₀·b̄"], "D0": ["Q̄₁·Q̄₀·b", "Q₁·b̄"]},
+            True: {"D1": ["Q̄₁·Q̄₀·b", "Q₀·b̄"], "D0": ["Q₁·b̄", "Q₀·b"]}}
+    for lsb in (False, True):
+        eqs = dict(q0055.equations(lsb))
+        assert {n: [q0055.term_uni(t) for t in ts] for n, ts in eqs.items()} == want[lsb]
+        step = ns["div3_lsb" if lsb else "div3_msb"]
+        for state in range(3):
+            q1, q0 = q0055.ENC[state]
+            for b in (0, 1):
+                nxt = (q0055.evaluate(eqs["D1"], q1, q0, b), q0055.evaluate(eqs["D0"], q1, q0, b))
+                assert nxt == q0055.ENC[q0055.table(3, 2, lsb)[state][b]]
+        # the circuit, run on bit strings, against the page's function
+        for n in range(1, 9):
+            for bits in itertools.product((0, 1), repeat=n):
+                q1 = q0 = 0
+                out = []
+                for b in bits:
+                    q1, q0 = q0055.evaluate(eqs["D1"], q1, q0, b), q0055.evaluate(eqs["D0"], q1, q0, b)
+                    out.append(not q1 and not q0)
+                assert out == step(list(bits)), (lsb, bits)
+        for n, ts in eqs.items():
+            assert q0055.equation_tex(n, ts).replace(" = ", " &= ", 1) in page
+    assert q0055.stuck(False) == [(1, 1), (1, 0)] and q0055.stuck(True) == [(1, 1), (0, 1)]
+    a, b = dict(q0055.equations(False)), dict(q0055.equations(True))
+    swap = lambda t: (t[1], t[0], t[2])
+    assert sorted(map(swap, a["D0"]), key=str) == sorted(b["D1"], key=str)
+    assert sorted(map(swap, a["D1"]), key=str) == sorted(b["D0"], key=str)

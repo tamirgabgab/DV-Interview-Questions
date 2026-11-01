@@ -1882,13 +1882,26 @@ section below starts at session 22, whose numbered items run on through the late
     cats (1 − a)²(1 − b), the limits as the wand tends to a from below
     (`q0071.hide_closed`, tested equal to `hide_third`, against the induction at a − 10⁻³ and
     a − 10⁻⁶, and 13101/20125 at 0.6 and 0.8), and the rule as that inequality against 1 − a.
+126. **0055: the machines in D flip-flops and gates (session 32, 2026-11-01).** The owner
+    wants parts א and ב implemented as digital logic, not only as code, on the page (and in
+    the coming video, which types no code). Their choices: D flip-flops, binary codes 00, 01,
+    10 with 11 a don't care, the minimal equations only, AND/OR/NOT gates, an asynchronous
+    active-low reset, no structural SV module. Each part's code block now ends with the
+    encoded transition table, the two Karnaugh maps (rows b, columns Q1Q0 in Gray order, a
+    tint per group, an unused don't care dashed), the equations in display math and the
+    schematic (rails b, b̄, Q1, Q̄1, Q0, Q̄0 joined by name, an AND per term, an OR per D, div
+    = Q̄1·Q̄0), and a line on 11: with the minimal equations it stays 11 while b = 0 (part א
+    11 → 10 on b = 1, part ב 11 → 01), so the reset to 00 matters. Part א: D1 = Q1·b + Q0·b̄,
+    D0 = Q̄1·Q̄0·b + Q1·b̄; part ב is part א with the two flip-flops swapped. q0055.py finds the
+    equations by a small Quine-McCluskey (blocks 7 to 14); test_0055 runs the circuit
+    against the page's functions on every bit string up to 8 bits.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

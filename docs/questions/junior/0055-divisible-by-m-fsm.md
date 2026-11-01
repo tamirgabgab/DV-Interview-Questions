@@ -136,6 +136,64 @@ added: 2026-10-27
 
         1. ‏\( 2r + b \) הוא לכל היותר 5, והסינתזה הופכת את הביטוי לטבלה של שש שורות.
 
+    **מימוש בשערים ובפליפ-פלופים.** בלי קוד : שני פליפ-פלופים מסוג D שומרים את המצב, בקידוד בינארי, ‏\( r = 0, 1, 2 \) כ-\( Q_1 Q_0 = 00, 01, 10 \). הקוד 11 לא בשימוש, ולכן בטבלה הוא × (Don't care). בפליפ-פלופ D הכניסה \( D \) היא בדיוק הביט של
+    המצב הבא, ולכן טבלת המעברים המקודדת היא גם הטבלה של \( D_1 \) ו-\( D_0 \) :
+
+    <!-- gen 7 -->
+
+    | המצב | ‏Q1 Q0 | ‏b | הבא ‏Q1 Q0, כלומר D1 D0 | ‏div |
+    |:-:|:-:|:-:|:-:|:-:|
+    | ‏r = 0 | ‏0 0 | ‏0 | ‏0 0 | ‏1 |
+    | ‏r = 0 | ‏0 0 | ‏1 | ‏0 1 | ‏1 |
+    | ‏r = 1 | ‏0 1 | ‏0 | ‏1 0 | ‏0 |
+    | ‏r = 1 | ‏0 1 | ‏1 | ‏0 0 | ‏0 |
+    | ‏r = 2 | ‏1 0 | ‏0 | ‏0 1 | ‏0 |
+    | ‏r = 2 | ‏1 0 | ‏1 | ‏1 0 | ‏0 |
+    | לא בשימוש | ‏1 1 | ‏0 | ‏× × | ‏× |
+    | לא בשימוש | ‏1 1 | ‏1 | ‏× × | ‏× |
+
+    <!-- /gen -->
+
+    **מפות קרנו.** מפה לכל כניסת D : השורות הן \( b \), והעמודות \( Q_1 Q_0 \) בסדר גריי
+    (00, 01, 11, 10), כך ששני תאים שכנים נבדלים בביט אחד. כל קבוצה צבועה היא מכפלה אחת. את
+    העמודה 11 (×) מותר לכלול בקבוצה, אם זה מגדיל אותה ומקצר את המכפלה :
+
+    <!-- gen 8 -->
+
+    <div class="ff-maps"><div class="ff-map"><p class="ff-map-title" dir="ltr">D₁</p><div class="pm-scroll" tabindex="0" role="region" aria-label="מפת קרנו של D1 : השורות b, העמודות Q1 Q0 בסדר גריי, והקבוצות צבועות"><table class="pm-cells ff-kmap" dir="ltr"><tbody><tr class="pm-head"><th dir="ltr">Q₁Q₀</th><td>00</td><td>01</td><td>11</td><td>10</td></tr><tr><th dir="ltr">b = 0</th><td class="pm-c">0</td><td class="pm-c c2">1</td><td class="pm-c c2">×</td><td class="pm-c">0</td></tr><tr><th dir="ltr">b = 1</th><td class="pm-c">0</td><td class="pm-c">0</td><td class="pm-c c1">×</td><td class="pm-c c1">1</td></tr></tbody></table></div><span class="viz-legend"><span><i class="pm-key-c1"></i>Q₁·b</span><span><i class="pm-key-c2"></i>Q₀·b̄</span></span></div><div class="ff-map"><p class="ff-map-title" dir="ltr">D₀</p><div class="pm-scroll" tabindex="0" role="region" aria-label="מפת קרנו של D0 : השורות b, העמודות Q1 Q0 בסדר גריי, והקבוצות צבועות"><table class="pm-cells ff-kmap" dir="ltr"><tbody><tr class="pm-head"><th dir="ltr">Q₁Q₀</th><td>00</td><td>01</td><td>11</td><td>10</td></tr><tr><th dir="ltr">b = 0</th><td class="pm-c">0</td><td class="pm-c">0</td><td class="pm-c c2">×</td><td class="pm-c c2">1</td></tr><tr><th dir="ltr">b = 1</th><td class="pm-c c1">1</td><td class="pm-c">0</td><td class="pm-c is-off">×</td><td class="pm-c">0</td></tr></tbody></table></div><span class="viz-legend"><span><i class="pm-key-c1"></i>Q̄₁·Q̄₀·b</span><span><i class="pm-key-c2"></i>Q₁·b̄</span></span></div></div>
+
+    <!-- /gen -->
+
+    המשוואות המינימליות, וגם היציאה, שדולקת רק במצב 00 :
+
+    <!-- gen 9 -->
+
+    \[
+    \begin{aligned}
+    D_1 &= Q_1\,b + Q_0\,\overline{b} \\
+    D_0 &= \overline{Q_1}\,\overline{Q_0}\,b + Q_1\,\overline{b} \\
+    \mathrm{div} &= \overline{Q_1}\,\overline{Q_0}
+    \end{aligned}
+    \]
+
+    <!-- /gen -->
+
+    המעגל : שני פליפ-פלופים עם שעון משותף ואיפוס אסינכרוני ‏`rst_n` (פעיל ב-0, מעמיד אותם
+    על 00), שער AND לכל מכפלה, שער OR לכל כניסת D, ומהפך אחד ל-\( \overline{b} \). את
+    \( \overline{Q_1} \) ו-\( \overline{Q_0} \) נותנת יציאת \( \overline{Q} \) של כל פליפ-פלופ :
+
+    <!-- gen 10 -->
+
+    <svg class="figure ff-fig" viewBox="0 0 640 420" style="max-width:40rem" role="img" aria-label="המעגל של סעיף א : שני פליפ-פלופים מסוג D עם איפוס אסינכרוני, שערי AND ו-OR לכל כניסת D, ו-div מ-AND של שני המשלימים"><line class="ff-wire" x1="34" y1="20" x2="34" y2="382"/><text class="ff-text" x="24" y="26" text-anchor="end">b</text><line class="ff-wire" x1="34" y1="36" x2="42" y2="36"/><path class="ff-gate" d="M42,28 L56,36 L42,44 Z"/><circle class="ff-gate" cx="59.5" cy="36" r="3.5"/><line class="ff-wire" x1="63" y1="36" x2="74" y2="36"/><line class="ff-wire" x1="74" y1="36" x2="74" y2="382"/><circle class="ink-dot" cx="34" cy="36" r="3.5"/><line class="ff-wire" x1="114" y1="58" x2="114" y2="382"/><text class="ff-text" x="114" y="50" text-anchor="middle">Q₁</text><line class="ff-wire" x1="154" y1="58" x2="154" y2="382"/><text class="ff-text" x="154" y="50" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₁</text><line class="ff-wire" x1="194" y1="58" x2="194" y2="382"/><text class="ff-text" x="194" y="50" text-anchor="middle">Q₀</text><line class="ff-wire" x1="234" y1="58" x2="234" y2="382"/><text class="ff-text" x="234" y="50" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₀</text><text class="ff-text" x="34" y="404" text-anchor="middle">b</text><text class="ff-text" x="74" y="404" text-anchor="middle"><tspan text-decoration="overline">b</tspan></text><text class="ff-text" x="114" y="404" text-anchor="middle">Q₁</text><text class="ff-text" x="154" y="404" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₁</text><text class="ff-text" x="194" y="404" text-anchor="middle">Q₀</text><text class="ff-text" x="234" y="404" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₀</text><line class="ff-wire" x1="114" y1="85" x2="300" y2="85"/><circle class="ink-dot" cx="114" cy="85" r="3.5"/><line class="ff-wire" x1="34" y1="99" x2="300" y2="99"/><circle class="ink-dot" cx="34" cy="99" r="3.5"/><path class="ff-gate" d="M300,77 H315 A15,15 0 0 1 315,107 H300 Z"/><line class="ff-wire" x1="194" y1="143" x2="300" y2="143"/><circle class="ink-dot" cx="194" cy="143" r="3.5"/><line class="ff-wire" x1="74" y1="157" x2="300" y2="157"/><circle class="ink-dot" cx="74" cy="157" r="3.5"/><path class="ff-gate" d="M300,135 H315 A15,15 0 0 1 315,165 H300 Z"/><polyline class="ff-wire" fill="none" points="330,92 378,92 378,114 398,114"/><polyline class="ff-wire" fill="none" points="330,150 378,150 378,128 398,128"/><path class="ff-gate" d="M392,104 Q415.5,104 431.1,121 Q415.5,138 392,138 Q402.9,121 392,104 Z"/><line class="ff-wire" x1="431.1" y1="121" x2="488" y2="121"/><rect class="ff-gate" x="488" y="99" width="64" height="74" rx="3"/><text class="ff-pin" x="496" y="126" text-anchor="start">D</text><path class="ff-wire" fill="none" d="M488,145 L497,151 L488,157"/><line class="ff-wire" x1="468" y1="151" x2="488" y2="151"/><text class="ff-small" x="465" y="156" text-anchor="end">clk</text><text class="ff-pin" x="546" y="126" text-anchor="end">Q</text><text class="ff-pin" x="546" y="156" text-anchor="end"><tspan text-decoration="overline">Q</tspan></text><line class="ff-wire" x1="552" y1="121" x2="574" y2="121"/><text class="ff-text" x="578" y="126" text-anchor="start">Q₁</text><line class="ff-wire" x1="552" y1="151" x2="574" y2="151"/><text class="ff-text" x="578" y="156" text-anchor="start"><tspan text-decoration="overline">Q</tspan>₁</text><circle class="ff-gate" cx="520.0" cy="177" r="4"/><line class="ff-wire" x1="520.0" y1="181" x2="520.0" y2="189"/><text class="ff-small" x="520" y="203" text-anchor="middle">rst_n</text><line class="ff-wire" x1="154" y1="216" x2="300" y2="216"/><circle class="ink-dot" cx="154" cy="216" r="3.5"/><line class="ff-wire" x1="234" y1="230" x2="300" y2="230"/><circle class="ink-dot" cx="234" cy="230" r="3.5"/><line class="ff-wire" x1="34" y1="244" x2="300" y2="244"/><circle class="ink-dot" cx="34" cy="244" r="3.5"/><path class="ff-gate" d="M300,208 H322 A22,22 0 0 1 322,252 H300 Z"/><line class="ff-wire" x1="114" y1="281" x2="300" y2="281"/><circle class="ink-dot" cx="114" cy="281" r="3.5"/><line class="ff-wire" x1="74" y1="295" x2="300" y2="295"/><circle class="ink-dot" cx="74" cy="295" r="3.5"/><path class="ff-gate" d="M300,273 H315 A15,15 0 0 1 315,303 H300 Z"/><polyline class="ff-wire" fill="none" points="344,230 378,230 378,252 398,252"/><polyline class="ff-wire" fill="none" points="330,288 378,288 378,266 398,266"/><path class="ff-gate" d="M392,242 Q415.5,242 431.1,259 Q415.5,276 392,276 Q402.9,259 392,242 Z"/><line class="ff-wire" x1="431.1" y1="259" x2="488" y2="259"/><rect class="ff-gate" x="488" y="237" width="64" height="74" rx="3"/><text class="ff-pin" x="496" y="264" text-anchor="start">D</text><path class="ff-wire" fill="none" d="M488,283 L497,289 L488,295"/><line class="ff-wire" x1="468" y1="289" x2="488" y2="289"/><text class="ff-small" x="465" y="294" text-anchor="end">clk</text><text class="ff-pin" x="546" y="264" text-anchor="end">Q</text><text class="ff-pin" x="546" y="294" text-anchor="end"><tspan text-decoration="overline">Q</tspan></text><line class="ff-wire" x1="552" y1="259" x2="574" y2="259"/><text class="ff-text" x="578" y="264" text-anchor="start">Q₀</text><line class="ff-wire" x1="552" y1="289" x2="574" y2="289"/><text class="ff-text" x="578" y="294" text-anchor="start"><tspan text-decoration="overline">Q</tspan>₀</text><circle class="ff-gate" cx="520.0" cy="315" r="4"/><line class="ff-wire" x1="520.0" y1="319" x2="520.0" y2="327"/><text class="ff-small" x="520" y="341" text-anchor="middle">rst_n</text><line class="ff-wire" x1="154" y1="361" x2="300" y2="361"/><circle class="ink-dot" cx="154" cy="361" r="3.5"/><line class="ff-wire" x1="234" y1="375" x2="300" y2="375"/><circle class="ink-dot" cx="234" cy="375" r="3.5"/><path class="ff-gate" d="M300,353 H315 A15,15 0 0 1 315,383 H300 Z"/><line class="ff-wire" x1="330" y1="368" x2="574" y2="368"/><text class="ff-text" x="578" y="373" text-anchor="start">div</text></svg>
+
+    <span class="viz-legend"><span><i class="ff-key-dot"></i>נקודה : חיבור לקו האנכי</span><span>קווים עם אותו שם מחוברים (‏Q₁ ו-Q̄₁ יוצאים מהפליפ-פלופ העליון)</span></span>
+
+    <!-- /gen -->
+
+    **המצב 11.** לפי המשוואות, מ-11 עם \( b = 0 \) חוזרים ל-11, ועם \( b = 1 \) עוברים ל-10. מכונה
+    שהגיעה ל-11 נתקעת שם כל עוד מגיעים אפסים. לכן האיפוס חשוב : הוא מעמיד את המכונה על 00
+    לפני הביט הראשון, ומשם המעברים לא מגיעים ל-11 אף פעם.
+
     #### למה זה נכון { .sol-proof }
 
     **המצב הוא השארית.** באינדוקציה : בהתחלה \( v = 0 \) ו-\( r = 0 \). אם \( r \equiv v \),
@@ -263,6 +321,67 @@ added: 2026-10-27
         ```
 
         1. ‏\( x' = (x + b) \cdot 2^{-1} \), ומודולו 3 ‏\( 2^{-1} = 2 \). המיקום \( k \) לא מופיע.
+
+    **מימוש בשערים ובפליפ-פלופים.** אותה דרך כמו בסעיף א, עם \( x = 0, 1, 2 \) כ-\( Q_1 Q_0 = 00, 01, 10 \) ו-11 לא בשימוש. בפליפ-פלופ D הכניסה \( D \) היא בדיוק הביט של
+    המצב הבא, ולכן טבלת המעברים המקודדת היא גם הטבלה של \( D_1 \) ו-\( D_0 \) :
+
+    <!-- gen 11 -->
+
+    | המצב | ‏Q1 Q0 | ‏b | הבא ‏Q1 Q0, כלומר D1 D0 | ‏div |
+    |:-:|:-:|:-:|:-:|:-:|
+    | ‏x = 0 | ‏0 0 | ‏0 | ‏0 0 | ‏1 |
+    | ‏x = 0 | ‏0 0 | ‏1 | ‏1 0 | ‏1 |
+    | ‏x = 1 | ‏0 1 | ‏0 | ‏1 0 | ‏0 |
+    | ‏x = 1 | ‏0 1 | ‏1 | ‏0 1 | ‏0 |
+    | ‏x = 2 | ‏1 0 | ‏0 | ‏0 1 | ‏0 |
+    | ‏x = 2 | ‏1 0 | ‏1 | ‏0 0 | ‏0 |
+    | לא בשימוש | ‏1 1 | ‏0 | ‏× × | ‏× |
+    | לא בשימוש | ‏1 1 | ‏1 | ‏× × | ‏× |
+
+    <!-- /gen -->
+
+    **מפות קרנו.** מפה לכל כניסת D : השורות הן \( b \), והעמודות \( Q_1 Q_0 \) בסדר גריי
+    (00, 01, 11, 10), כך ששני תאים שכנים נבדלים בביט אחד. כל קבוצה צבועה היא מכפלה אחת. את
+    העמודה 11 (×) מותר לכלול בקבוצה, אם זה מגדיל אותה ומקצר את המכפלה :
+
+    <!-- gen 12 -->
+
+    <div class="ff-maps"><div class="ff-map"><p class="ff-map-title" dir="ltr">D₁</p><div class="pm-scroll" tabindex="0" role="region" aria-label="מפת קרנו של D1 : השורות b, העמודות Q1 Q0 בסדר גריי, והקבוצות צבועות"><table class="pm-cells ff-kmap" dir="ltr"><tbody><tr class="pm-head"><th dir="ltr">Q₁Q₀</th><td>00</td><td>01</td><td>11</td><td>10</td></tr><tr><th dir="ltr">b = 0</th><td class="pm-c">0</td><td class="pm-c c2">1</td><td class="pm-c c2">×</td><td class="pm-c">0</td></tr><tr><th dir="ltr">b = 1</th><td class="pm-c c1">1</td><td class="pm-c">0</td><td class="pm-c is-off">×</td><td class="pm-c">0</td></tr></tbody></table></div><span class="viz-legend"><span><i class="pm-key-c1"></i>Q̄₁·Q̄₀·b</span><span><i class="pm-key-c2"></i>Q₀·b̄</span></span></div><div class="ff-map"><p class="ff-map-title" dir="ltr">D₀</p><div class="pm-scroll" tabindex="0" role="region" aria-label="מפת קרנו של D0 : השורות b, העמודות Q1 Q0 בסדר גריי, והקבוצות צבועות"><table class="pm-cells ff-kmap" dir="ltr"><tbody><tr class="pm-head"><th dir="ltr">Q₁Q₀</th><td>00</td><td>01</td><td>11</td><td>10</td></tr><tr><th dir="ltr">b = 0</th><td class="pm-c">0</td><td class="pm-c">0</td><td class="pm-c c1">×</td><td class="pm-c c1">1</td></tr><tr><th dir="ltr">b = 1</th><td class="pm-c">0</td><td class="pm-c c2">1</td><td class="pm-c c2">×</td><td class="pm-c">0</td></tr></tbody></table></div><span class="viz-legend"><span><i class="pm-key-c1"></i>Q₁·b̄</span><span><i class="pm-key-c2"></i>Q₀·b</span></span></div></div>
+
+    <!-- /gen -->
+
+    המשוואות המינימליות, וגם היציאה, שדולקת רק במצב 00 :
+
+    <!-- gen 13 -->
+
+    \[
+    \begin{aligned}
+    D_1 &= \overline{Q_1}\,\overline{Q_0}\,b + Q_0\,\overline{b} \\
+    D_0 &= Q_1\,\overline{b} + Q_0\,b \\
+    \mathrm{div} &= \overline{Q_1}\,\overline{Q_0}
+    \end{aligned}
+    \]
+
+    <!-- /gen -->
+
+    המעגל : שני פליפ-פלופים עם שעון משותף ואיפוס אסינכרוני ‏`rst_n` (פעיל ב-0, מעמיד אותם
+    על 00), שער AND לכל מכפלה, שער OR לכל כניסת D, ומהפך אחד ל-\( \overline{b} \). את
+    \( \overline{Q_1} \) ו-\( \overline{Q_0} \) נותנת יציאת \( \overline{Q} \) של כל פליפ-פלופ :
+
+    <!-- gen 14 -->
+
+    <svg class="figure ff-fig" viewBox="0 0 640 420" style="max-width:40rem" role="img" aria-label="המעגל של סעיף ב : שני פליפ-פלופים מסוג D עם איפוס אסינכרוני, שערי AND ו-OR לכל כניסת D, ו-div מ-AND של שני המשלימים"><line class="ff-wire" x1="34" y1="20" x2="34" y2="382"/><text class="ff-text" x="24" y="26" text-anchor="end">b</text><line class="ff-wire" x1="34" y1="36" x2="42" y2="36"/><path class="ff-gate" d="M42,28 L56,36 L42,44 Z"/><circle class="ff-gate" cx="59.5" cy="36" r="3.5"/><line class="ff-wire" x1="63" y1="36" x2="74" y2="36"/><line class="ff-wire" x1="74" y1="36" x2="74" y2="382"/><circle class="ink-dot" cx="34" cy="36" r="3.5"/><line class="ff-wire" x1="114" y1="58" x2="114" y2="382"/><text class="ff-text" x="114" y="50" text-anchor="middle">Q₁</text><line class="ff-wire" x1="154" y1="58" x2="154" y2="382"/><text class="ff-text" x="154" y="50" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₁</text><line class="ff-wire" x1="194" y1="58" x2="194" y2="382"/><text class="ff-text" x="194" y="50" text-anchor="middle">Q₀</text><line class="ff-wire" x1="234" y1="58" x2="234" y2="382"/><text class="ff-text" x="234" y="50" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₀</text><text class="ff-text" x="34" y="404" text-anchor="middle">b</text><text class="ff-text" x="74" y="404" text-anchor="middle"><tspan text-decoration="overline">b</tspan></text><text class="ff-text" x="114" y="404" text-anchor="middle">Q₁</text><text class="ff-text" x="154" y="404" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₁</text><text class="ff-text" x="194" y="404" text-anchor="middle">Q₀</text><text class="ff-text" x="234" y="404" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₀</text><line class="ff-wire" x1="154" y1="78" x2="300" y2="78"/><circle class="ink-dot" cx="154" cy="78" r="3.5"/><line class="ff-wire" x1="234" y1="92" x2="300" y2="92"/><circle class="ink-dot" cx="234" cy="92" r="3.5"/><line class="ff-wire" x1="34" y1="106" x2="300" y2="106"/><circle class="ink-dot" cx="34" cy="106" r="3.5"/><path class="ff-gate" d="M300,70 H322 A22,22 0 0 1 322,114 H300 Z"/><line class="ff-wire" x1="194" y1="143" x2="300" y2="143"/><circle class="ink-dot" cx="194" cy="143" r="3.5"/><line class="ff-wire" x1="74" y1="157" x2="300" y2="157"/><circle class="ink-dot" cx="74" cy="157" r="3.5"/><path class="ff-gate" d="M300,135 H315 A15,15 0 0 1 315,165 H300 Z"/><polyline class="ff-wire" fill="none" points="344,92 378,92 378,114 398,114"/><polyline class="ff-wire" fill="none" points="330,150 378,150 378,128 398,128"/><path class="ff-gate" d="M392,104 Q415.5,104 431.1,121 Q415.5,138 392,138 Q402.9,121 392,104 Z"/><line class="ff-wire" x1="431.1" y1="121" x2="488" y2="121"/><rect class="ff-gate" x="488" y="99" width="64" height="74" rx="3"/><text class="ff-pin" x="496" y="126" text-anchor="start">D</text><path class="ff-wire" fill="none" d="M488,145 L497,151 L488,157"/><line class="ff-wire" x1="468" y1="151" x2="488" y2="151"/><text class="ff-small" x="465" y="156" text-anchor="end">clk</text><text class="ff-pin" x="546" y="126" text-anchor="end">Q</text><text class="ff-pin" x="546" y="156" text-anchor="end"><tspan text-decoration="overline">Q</tspan></text><line class="ff-wire" x1="552" y1="121" x2="574" y2="121"/><text class="ff-text" x="578" y="126" text-anchor="start">Q₁</text><line class="ff-wire" x1="552" y1="151" x2="574" y2="151"/><text class="ff-text" x="578" y="156" text-anchor="start"><tspan text-decoration="overline">Q</tspan>₁</text><circle class="ff-gate" cx="520.0" cy="177" r="4"/><line class="ff-wire" x1="520.0" y1="181" x2="520.0" y2="189"/><text class="ff-small" x="520" y="203" text-anchor="middle">rst_n</text><line class="ff-wire" x1="114" y1="223" x2="300" y2="223"/><circle class="ink-dot" cx="114" cy="223" r="3.5"/><line class="ff-wire" x1="74" y1="237" x2="300" y2="237"/><circle class="ink-dot" cx="74" cy="237" r="3.5"/><path class="ff-gate" d="M300,215 H315 A15,15 0 0 1 315,245 H300 Z"/><line class="ff-wire" x1="194" y1="281" x2="300" y2="281"/><circle class="ink-dot" cx="194" cy="281" r="3.5"/><line class="ff-wire" x1="34" y1="295" x2="300" y2="295"/><circle class="ink-dot" cx="34" cy="295" r="3.5"/><path class="ff-gate" d="M300,273 H315 A15,15 0 0 1 315,303 H300 Z"/><polyline class="ff-wire" fill="none" points="330,230 378,230 378,252 398,252"/><polyline class="ff-wire" fill="none" points="330,288 378,288 378,266 398,266"/><path class="ff-gate" d="M392,242 Q415.5,242 431.1,259 Q415.5,276 392,276 Q402.9,259 392,242 Z"/><line class="ff-wire" x1="431.1" y1="259" x2="488" y2="259"/><rect class="ff-gate" x="488" y="237" width="64" height="74" rx="3"/><text class="ff-pin" x="496" y="264" text-anchor="start">D</text><path class="ff-wire" fill="none" d="M488,283 L497,289 L488,295"/><line class="ff-wire" x1="468" y1="289" x2="488" y2="289"/><text class="ff-small" x="465" y="294" text-anchor="end">clk</text><text class="ff-pin" x="546" y="264" text-anchor="end">Q</text><text class="ff-pin" x="546" y="294" text-anchor="end"><tspan text-decoration="overline">Q</tspan></text><line class="ff-wire" x1="552" y1="259" x2="574" y2="259"/><text class="ff-text" x="578" y="264" text-anchor="start">Q₀</text><line class="ff-wire" x1="552" y1="289" x2="574" y2="289"/><text class="ff-text" x="578" y="294" text-anchor="start"><tspan text-decoration="overline">Q</tspan>₀</text><circle class="ff-gate" cx="520.0" cy="315" r="4"/><line class="ff-wire" x1="520.0" y1="319" x2="520.0" y2="327"/><text class="ff-small" x="520" y="341" text-anchor="middle">rst_n</text><line class="ff-wire" x1="154" y1="361" x2="300" y2="361"/><circle class="ink-dot" cx="154" cy="361" r="3.5"/><line class="ff-wire" x1="234" y1="375" x2="300" y2="375"/><circle class="ink-dot" cx="234" cy="375" r="3.5"/><path class="ff-gate" d="M300,353 H315 A15,15 0 0 1 315,383 H300 Z"/><line class="ff-wire" x1="330" y1="368" x2="574" y2="368"/><text class="ff-text" x="578" y="373" text-anchor="start">div</text></svg>
+
+    <span class="viz-legend"><span><i class="ff-key-dot"></i>נקודה : חיבור לקו האנכי</span><span>קווים עם אותו שם מחוברים (‏Q₁ ו-Q̄₁ יוצאים מהפליפ-פלופ העליון)</span></span>
+
+    <!-- /gen -->
+
+    **המצב 11.** מ-11 עם \( b = 0 \) חוזרים ל-11, ועם \( b = 1 \) עוברים ל-01. גם כאן האיפוס מעמיד את
+    המכונה על 00, ומשם היא לא מגיעה ל-11.
+
+    **אותו מעגל.** אלה המשוואות של סעיף א, כשמחליפים בין שני הפליפ-פלופים : ‏\( D_1 \) כאן
+    היא \( D_0 \) של סעיף א עם \( Q_1 \) ו-\( Q_0 \) מוחלפים, וההפך. זו ההחלפה של 1 ו-2
+    במכונה, שמחליפה את הקודים 01 ו-10.
 
     #### למה זה נכון { .sol-proof }
 

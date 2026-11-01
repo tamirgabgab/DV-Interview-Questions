@@ -242,6 +242,20 @@
 .md-typeset svg .fs-node[role=button] { cursor: pointer; }
 .md-typeset svg .fs-node[role=button]:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
 .md-typeset .viz-legend .dv-key-peek { background: transparent; border-radius: 50%; outline: 2px dashed var(--viz-s3); outline-offset: -2px; }
+/* 0055: the D flip-flop implementation (q0055.kmaps, q0055.schematic): two Karnaugh maps
+   side by side (one under the other when narrow), the schematic in the page's ink. */
+.md-typeset .ff-maps { display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; justify-content: center; margin: 0.8rem 0; }
+.md-typeset .ff-map { display: flex; flex-direction: column; align-items: center; }
+.md-typeset .ff-map .viz-legend { justify-content: center; }
+.md-typeset .ff-map-title { margin: 0 0 0.2rem; font-family: var(--md-code-font-family); font-weight: 700; color: var(--viz-ink); }
+.md-typeset table.ff-kmap td.pm-c { min-width: 2rem; height: 1.8rem; font-size: 0.8rem; }
+.md-typeset table.ff-kmap th { padding-right: 0.5em; }
+.md-typeset svg.ff-fig .ff-wire { stroke: var(--viz-ink); stroke-width: 2; fill: none; }
+.md-typeset svg.ff-fig .ff-gate { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 2.2; }
+.md-typeset svg.ff-fig .ff-text { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 19px; font-weight: 700; }
+.md-typeset svg.ff-fig .ff-pin { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 18px; }
+.md-typeset svg.ff-fig .ff-small { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 18px; }
+.md-typeset .viz-legend .ff-key-dot { background: var(--viz-ink); border-radius: 50%; width: 0.5rem; height: 0.5rem; }
 .md-typeset .explorer input.wf-num { width: 11rem; letter-spacing: 0.08em; font-family: var(--md-code-font-family); }
 
 /* Ants on a pole (0057): the space-time figure and the ants explorer; one colour per ant (or ghost), six in turn */
