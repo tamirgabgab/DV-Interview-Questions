@@ -31,8 +31,14 @@ def test_page_numbers():
     assert q0040.run("1011", "1011011") == ([0, 1, 2, 3, 1, 2, 3], [0, 0, 0, 1, 0, 0, 1])
     assert q0040.table("1011") == [[0, 1], [2, 1], [0, 3], [2, 4], [2, 1]] and q0040.rest("1011") == 1
     assert NEXT_1011["S101"] == ("S10", "S1") and NEXT_1011["S10"] == ("S0", "S101")
-    # the traps: back to start misses the overlap in 10101011; Moore is one cycle later
-    assert q0040.run("1011", "10101011")[1][-1] == 1
+    # the traps: back to start misses the overlap in 101011; Moore is one cycle later
+    assert q0040.run("1011", "101011")[1] == [0, 0, 0, 0, 0, 1]
+    state, naive = 0, []
+    for b in "101011":                      # "on a mismatch, next = S0"
+        state = state + 1 if b == "1011"[state] else 0
+        naive.append(int(state == 4))
+        state = 0 if state == 4 else state
+    assert naive == [0] * 6
     assert q0040.run("1011", "1011011", moore=True)[1] == [0, 0, 0, 0, 1, 0, 0]
     assert len(set(NEXT_1011)) == 4 and len(q0040.table("1011")) == 5
 

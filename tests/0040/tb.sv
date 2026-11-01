@@ -56,9 +56,9 @@ module tb;
     // the question's stream: found at cycles 4 and 7
     feed(1); feed(0); feed(1); feed(1); feed(0); feed(1); feed(1);
     if (hits != 2) begin errors++; $display("1011011: %0d detections, expected 2", hits); end
-    // the overlap trap: 10101011 ends with a detection
-    feed(1); feed(0); feed(1); feed(0); feed(1); feed(0); feed(1); feed(1);
-    if (!f1011) begin errors++; $display("10101011: the overlapping detection is missing"); end
+    // the overlap trap: 101011 ends with a detection (going back to S0 after 1010 misses it)
+    feed(1); feed(0); feed(1); feed(0); feed(1); feed(1);
+    if (!f1011) begin errors++; $display("101011: the overlapping detection is missing"); end
     void'($urandom(40));
     for (int k = 0; k < 3000; k++) feed(1'($urandom_range(0, 1)));
     if (errors == 0) $display("PASS hits=%0d", hits);

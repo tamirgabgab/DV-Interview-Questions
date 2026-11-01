@@ -1794,12 +1794,27 @@ section below starts at session 22, whose numbered items run on through the late
     from apt before `pip install -r requirements-video.txt`; the sandbox's proxy blocks
     github.io, so the live site cannot be fetched from here. Waiting on the owner: watch them,
     upload, send the YouTube ids.
+120. **Videos 0001 and 0040, a fix on 0040 (session 32, 2026-11-01).** The owner picked two
+    more easy questions, both hardware, and chose: SystemVerilog typed in both (the 0011
+    exception) and walked beside the box, the timing built cycle by cycle in Manim, and in
+    0040's part ב the construction and Mealy against Moore. 0001 (4:55, `video_parts` [0]):
+    the circuit drawn, the timing under it, the page's WaveDrom diagram (taken from the built
+    site by `videos/0001/wave_shot.py`, since box_shots captures only `.explorer`), the edge
+    box, `rise_detect` typed, the two traps. 0040 (7:10, [0, 284]): the Mealy diagram edge by
+    edge, 1011011 stepped on it and on the box, `seq_detect_1011` typed in a 14-line window,
+    the timing built cycle by cycle; part ב 10101 by the longest suffix that is a prefix, the
+    box building it, the Moore diagram and the output table (Mealy in cycles 4 and 7, Moore 5
+    and 8). Found while scripting: 0040's trap "back to the start after a mismatch" used the
+    stream 10101011, where the naive detector also fires in cycle 8; it is now 101011 (the
+    right machine fires in cycle 6, the naive one never), and test_0040 checks both machines,
+    tb.sv feeds 101011. Note: the system Playwright (1.56) wants headless_shell-1194, the
+    sandbox has 1243; `check_phone.py --browser /opt/pw-browsers/chromium` works.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
-  37984aa, deploy green); videos 0032 and 0031 (item 119).
+  37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
