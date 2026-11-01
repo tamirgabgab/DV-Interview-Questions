@@ -337,17 +337,23 @@ CHECK = Fr(59, 100)          # a concrete wand just under 0.6 for the checks of 
 # --- the Markov chain ---------------------------------------------------------------------
 
 # The states: R1, R2, R3 (everyone alive, wizard k to shoot), the six duel states (i, j, k:
-# wizards i < j left, k to shoot), the four absorbing ones (W1, W2, W3, the cats).
-CW, CH = 480, 418
-POS = {"R1": (62, 46), "R2": (180, 46), "R3": (298, 46), "CATS": (420, 46),
-       (1, 2, 1): (44, 214), (1, 2, 2): (122, 214), (1, 3, 1): (200, 214), (1, 3, 3): (278, 214),
-       (2, 3, 2): (356, 214), (2, 3, 3): (434, 214),
-       "W1": (90, 372), "W2": (240, 372), "W3": (390, 372)}
+# wizards i < j left, k to shoot), the four absorbing ones (W1, W2, W3, the cats). The box
+# (docs/javascripts/explorer/wizards.js) draws the same chain from the same positions.
+CW, CH = 480, 340
+POS = {"R1": (70, 40), "R2": (180, 40), "R3": (290, 40), "CATS": (400, 40),
+       (1, 2, 1): (44, 176), (1, 2, 2): (122, 176), (1, 3, 1): (200, 176), (1, 3, 3): (278, 176),
+       (2, 3, 2): (356, 176), (2, 3, 3): (434, 176),
+       "W1": (100, 300), "W2": (240, 300), "W3": (380, 300)}
 SUB = {1: "₁", 2: "₂", 3: "₃"}
 # Where the label of each first-round hit sits on its edge (the share of the way, a shift
 # sideways), so that no two labels meet where the edges cross.
 LABEL_AT = {(1, 2): (0.55, 0), (1, 3): (0.45, -10), (2, 3): (0.25, 10), (2, 1): (0.35, 8),
             (3, 1): (0.6, 12), (3, 2): (0.42, -12)}
+
+
+def skey(key):
+    """A state's key as the drawings write it: "R1", "CATS", "W2" or "1,3,1"."""
+    return ",".join(map(str, key)) if isinstance(key, tuple) else key
 
 
 def duel_of(killer, victim):
@@ -356,20 +362,57 @@ def duel_of(killer, victim):
     return (i, j, 6 - killer - victim)
 
 
-def _box(key, lines, cls, w, h=40, me=False):
+def chain_states(p):
+    """How the numbers of the chain come about, with everyone's best choice (p in turn order):
+    the chance to ever reach each state; for a duel state, the chance that the wizard to
+    shoot wins the duel from there; for a win, its terms (the chance to enter a duel at a
+    state, times the winner's chance from there). The box's wzStates is checked against it."""
+    _, trace = round_options(p)
+    choice = {w: b for w, _, b in trace}
+    out = {"R1": {"reach": Fr(1)}}
+    direct = {}
+    r = Fr(1)
+    for w, nxt in ((1, "R2"), (2, "R3"), (3, "CATS")):
+        c = choice[w]
+        if c != "air":
+            d = duel_of(w, c)
+            direct[d] = direct.get(d, 0) + r * p[w - 1]
+        r = r * (1 if c == "air" else 1 - p[w - 1])
+        out[nxt] = {"reach": r}
+    for d in [d for d in POS if isinstance(d, tuple)]:
+        i, j, k = d
+        o = j if k == i else i
+        partner = (i, j, o)
+        out[skey(d)] = {"reach": direct.get(d, 0) + direct.get(partner, 0) * (1 - p[o - 1]),
+                        "duel": F(p[k - 1], p[o - 1])}
+    for k in (1, 2, 3):
+        terms = []
+        for d, r in direct.items():
+            i, j, s = d
+            if k not in (i, j) or not r:
+                continue
+            other = j if k == i else i                       # k's rival in this duel
+            terms.append((r, F(p[k - 1], p[other - 1]) if s == k else G(p[s - 1], p[k - 1])))
+        out[f"W{k}"] = {"reach": sum((a * b for a, b in terms), Fr(0)), "terms": terms}
+    return out
+
+
+def _state(key, lines, cls, w, h=40, me=False, faded=False):
+    """A state: its box and text in a focusable group (hover, focus or tap explains it)."""
     x, y = POS[key]
-    out = f'<rect class="{cls}{" mk-me" if me else ""}" x="{x - w / 2:.0f}" y="{y - h / 2:.0f}" width="{w}" height="{h}" rx="7"/>'
+    out = (f'<g class="mk-state{" st-faded" if faded else ""}" data-s="{skey(key)}" tabindex="0" role="button">'
+           f'<rect class="{cls}{" mk-me" if me else ""}" x="{x - w / 2:.0f}" y="{y - h / 2:.0f}" width="{w}" height="{h}" rx="7"/>')
     if len(lines) == 1:
         out += f'<text class="mk-text" x="{x}" y="{y + 5}" text-anchor="middle" direction="rtl">{lines[0]}</text>'
     else:
         out += (f'<text class="mk-text" x="{x}" y="{y - 3}" text-anchor="middle" direction="rtl">{lines[0]}</text>'
                 f'<text class="mk-text mk-sub" x="{x}" y="{y + 13}" text-anchor="middle" direction="rtl">{lines[1]}</text>')
-    return out
+    return out + "</g>"
 
 
 def _edge(a, b, cls, label=None, t=0.5, dx=0, dy=0, bend=0):
     (x1, y1), (x2, y2) = POS[a], POS[b]
-    hw = {True: 42, False: 32}
+    ends = f'data-a="{skey(a)}" data-b="{skey(b)}"'
     # leave and enter at the box edges (vertical edges between the rows, horizontal within one)
     if y1 == y2:
         s = 1 if x2 > x1 else -1
@@ -382,115 +425,111 @@ def _edge(a, b, cls, label=None, t=0.5, dx=0, dy=0, bend=0):
             cx, cy = (sx + ex) / 2, sy + bend * 14
             path = f"M{sx:.0f},{sy:.0f} Q{cx:.0f},{cy:.0f} {ex:.0f},{ey:.0f}"
             lx, ly = cx, sy + bend * 12 + (12 if bend > 0 else -4)
-            out = f'<path class="{cls}" d="{path}" fill="none" marker-end="url(#mk-arrow)"/>'
+            out = f'<path class="{cls}" {ends} d="{path}" fill="none" marker-end="url(#mk-arrow)"/>'
         else:
             sx, ex = x1 + s * w1, x2 - s * w2
             sy = ey = y1
-            out = f'<line class="{cls}" x1="{sx:.0f}" y1="{sy}" x2="{ex:.0f}" y2="{ey}" marker-end="url(#mk-arrow)"/>'
+            out = f'<line class="{cls}" {ends} x1="{sx:.0f}" y1="{sy}" x2="{ex:.0f}" y2="{ey}" marker-end="url(#mk-arrow)"/>'
             lx, ly = (sx + ex) / 2, sy - 7
     else:
         sy, ey = y1 + 20, y2 - 21
         sx, ex = x1 + (x2 - x1) * 0.12, x2 - (x2 - x1) * 0.04
-        out = f'<line class="{cls}" x1="{sx:.0f}" y1="{sy}" x2="{ex:.0f}" y2="{ey}" marker-end="url(#mk-arrow)"/>'
+        out = f'<line class="{cls}" {ends} x1="{sx:.0f}" y1="{sy}" x2="{ex:.0f}" y2="{ey}" marker-end="url(#mk-arrow)"/>'
         lx, ly = sx + (ex - sx) * t, sy + (ey - sy) * t + 4
     if label:
-        out_l = f'<text class="mk-lab" x="{lx + dx:.0f}" y="{ly + dy:.0f}" text-anchor="middle">{label}</text>'
+        out_l = f'<text class="mk-lab" {ends} x="{lx + dx:.0f}" y="{ly + dy:.0f}" text-anchor="middle">{label}</text>'
         return out, out_l
     return out, ""
 
 
-def chain_svg(p=None, me=None, aria=""):
-    """The game as a Markov chain. With p None, the general chain in p1, p2, p3 (every target
-    each wizard may choose, solid; the miss or the air, dashed). With p (in turn order), the
-    chain of everyone's best choice: the transition chances on the edges, the chances of the
-    absorbing states in them, the unused states faded; `me` (1..3) marks my states."""
-    general = p is None
-    if general:
-        lab = lambda w: f"p{SUB[w]}"                                  # noqa: E731
-        mis = lambda w: f"1−p{SUB[w]}"                                # noqa: E731
-        choice = None
-    else:
-        lab = lambda w: short(p[w - 1])                               # noqa: E731
-        mis = lambda w: short(1 - p[w - 1])                           # noqa: E731
-        _, trace = round_options(p)
-        choice = {w: b for w, _, b in trace}
-        chances, _ = round_options(p)
-        cats = outcomes(p)[1]
+def _data_num(x):
+    """A chance for the box's script: a wand just under a value (EPS away) is written 1e-9
+    under it, as the box itself does, so the script sees the same choices."""
+    d = Fr(str(round(float(x), 6)))
+    if x == d:
+        return str(d.numerator) if d.denominator == 1 else repr(float(d))
+    return repr(float(d) - 1e-9 if x < d else float(d) + 1e-9)
+
+
+def chain_svg(p, me, aria="", explain=""):
+    """The game as a Markov chain with everyone's best choice (p in turn order): the
+    transition chances on the edges, the chances of the absorbing states in them, the unused
+    states faded; `me` (1..3) marks my states. Every edge carries its two ends and every state
+    its key, so the box's script lights a state's edges and explains its number (data-p:
+    the chances in turn order, data-me, and data-explain: the id of the line under it)."""
+    lab = lambda w: short(p[w - 1])                                   # noqa: E731
+    mis = lambda w: short(1 - p[w - 1])                               # noqa: E731
+    chances, trace = round_options(p)
+    choice = {w: b for w, _, b in trace}
+    cats = outcomes(p)[1]
     edges, labels, used = [], [], {"R1"}
     # the first round
-    prev = "R1"
     for w, nxt in ((1, "R2"), (2, "R3"), (3, "CATS")):
         key = f"R{w}"
-        targets = [t for t in (1, 2, 3) if t != w] if general else ([] if choice[w] == "air" else [choice[w]])
-        if not general and key not in used:
+        if key not in used:
             break
-        for t in targets:
+        if choice[w] != "air":
+            t = choice[w]
             d = duel_of(w, t)
             at, dx = LABEL_AT[(w, t)]
             e, l = _edge(key, d, "mk-hit", lab(w), t=at, dx=dx)
             edges.append(e); labels.append(l); used.add(d)
-        air = not general and choice[w] == "air"
-        miss = mis(w) if (general or not air) else "1"
-        if general and w < 3:
-            miss = mis(w)
-        e, l = _edge(key, nxt, "mk-miss", miss)
+        air = choice[w] == "air"
+        e, l = _edge(key, nxt, "mk-miss", "1" if air else mis(w))
         edges.append(e); labels.append(l); used.add(nxt)
-        if not general and air:
-            labels.append(f'<text class="mk-lab" x="{(POS[key][0] + POS[nxt][0]) / 2:.0f}" y="{POS[key][1] + 34}" text-anchor="middle" direction="rtl">באוויר</text>')
+        if air:
+            labels.append(f'<text class="mk-lab" data-a="{key}" data-b="{nxt}" x="{(POS[key][0] + POS[nxt][0]) / 2:.0f}" '
+                          f'y="{POS[key][1] + 34}" text-anchor="middle" direction="rtl">באוויר</text>')
     # the duels
-    for (i, j, k), _ in [(d, 0) for d in POS if isinstance(d, tuple)]:
-        d = (i, j, k)
-        if not general and d not in used:
+    for d in [d for d in POS if isinstance(d, tuple)]:
+        if d not in used:
             continue
+        i, j, k = d
         other = (i, j, j if k == i else i)
         used.add(other)
-        e, l = _edge(d, f"W{k}", "mk-hit", lab(k), t=0.4, dx=14 if POS[f'W{k}'][0] > POS[d][0] else -14)
+        right = POS[f"W{k}"][0] > POS[d][0]       # the two edges into a win: labels at different heights
+        e, l = _edge(d, f"W{k}", "mk-hit", lab(k), t=0.62 if right else 0.45, dx=16 if right else -16)
         edges.append(e); labels.append(l); used.add(f"W{k}")
-        bend = -1 if k == i else 1
-        e, l = _edge(d, other, "mk-miss", mis(k), bend=bend)
+        e, l = _edge(d, other, "mk-miss", mis(k), bend=-1 if k == i else 1)
         edges.append(e); labels.append(l)
-    for k in (1, 2, 3):
-        if f"W{k}" in used:
-            pass
-    # the boxes
+    # the states
     boxes = []
-    mine = lambda w: me is not None and w == me                       # noqa: E731
+    mine = lambda w: w == me                                          # noqa: E731
     for w in (1, 2, 3):
         key = f"R{w}"
-        boxes.append((key, _box(key, ["כולם חיים", f"תור {w}"], "mk-node", 84, me=mine(w))))
-    boxes.append(("CATS", _box("CATS", ["חתולים"] + ([] if general else [pct(cats)]), "mk-cat", 84)))
+        boxes.append(_state(key, ["כולם חיים", f"תור {w}"], "mk-node", 84, me=mine(w), faded=key not in used))
+    boxes.append(_state("CATS", ["חתולים", pct(cats)], "mk-cat", 84, faded="CATS" not in used))
     for d in [d for d in POS if isinstance(d, tuple)]:
         i, j, k = d
-        boxes.append((d, _box(d, [f"{i} מול {j}", f"תור {k}"], "mk-node", 64, me=mine(k))))
+        boxes.append(_state(d, [f"{i} מול {j}", f"תור {k}"], "mk-node", 64, me=mine(k), faded=d not in used))
     for k in (1, 2, 3):
         key = f"W{k}"
-        txt = [f"{k} מנצח"] + ([] if general else [pct(chances[k - 1])])
-        boxes.append((key, _box(key, txt, "mk-win", 96, me=mine(k))))
-    parts = [f'<svg class="figure mk-chain" viewBox="0 0 {CW} {CH}" style="max-width:34rem" role="img" aria-label="{aria}">',
+        boxes.append(_state(key, [f"{k} מנצח", pct(chances[k - 1])], "mk-win", 96, me=mine(k), faded=key not in used))
+    data = ",".join(_data_num(x) for x in p)
+    parts = [f'<svg class="figure mk-chain" viewBox="0 0 {CW} {CH}" style="max-width:34rem" role="group" aria-label="{aria}" '
+             f'data-p="{data}" data-me="{me}" data-explain="{explain}">',
              '<defs><marker id="mk-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="mk-head"/></marker></defs>']
-    parts += edges
-    for key, b in boxes:
-        parts.append(b if general or key in used else f'<g class="st-faded">{b}</g>')
-    parts += labels
+    parts += edges + boxes + labels
     parts.append("</svg>")
     return "".join(parts)
 
 
-def chain_general():
-    return chain_svg(aria="שרשרת מרקוב של הדו-קרב : שלושת התורות של הסבב הראשון, ששת מצבי הדו-קרב, שלושת הניצחונות והחתולים, עם הסתברויות המעבר ב-p1, p2, p3")
+EXPLAIN_HINT = ("מעבירים את העכבר מעל מצב, או נוגעים בו, ורואים את החצים שנכנסים אליו ויוצאים ממנו, "
+                "ואיך התקבל המספר שלו.")
 
 
 def chain_a():
     p = place(1, weak(RIVALS), RIVALS)
-    return chain_svg(p, me=1, aria="שרשרת מרקוב של סעיף א עם השרביט הטוב ביותר : אני באוויר, קוסם 2 על 3, קוסם 3 על 2, והסיכויים הסופיים 63.7%, 17.1%, 11.1% ו-8%")
+    svg = chain_svg(p, me=1, explain="mk-explain-a",
+                    aria="שרשרת מרקוב של סעיף א עם השרביט הטוב ביותר : אני באוויר, קוסם 2 על 3, קוסם 3 על 2, והסיכויים הסופיים 63.7%, 17.1%, 11.1% ו-8%")
+    return svg + f'\n\n<p class="mk-explain" id="mk-explain-a" aria-live="polite">{EXPLAIN_HINT}</p>'
 
 
-def chain_legend(general):
-    me = "" if general else '<span><i class="mk-key-me"></i>המצבים שבהם אני יורה, ואני מנצח</span>'
-    tail = ("החץ המלא : פגיעה, עם ההסתברות שלה; המקווקו : החטאה או כישוף באוויר"
-            if general else "על החצים הסתברויות המעבר, ובמצבים הסופיים הסיכוי להגיע אליהם")
-    return (f'<span class="viz-legend"><span><i class="mk-key-hit"></i>פגיעה</span><span><i class="mk-key-miss"></i>החטאה או באוויר</span>'
-            f'<span><i class="mk-key-win"></i>ניצחון</span><span><i class="mk-key-cat"></i>חתולים</span>{me}<span>{tail}</span></span>').replace(" :", " :")
+def chain_legend():
+    return ('<span class="viz-legend"><span><i class="mk-key-hit"></i>פגיעה</span><span><i class="mk-key-miss"></i>החטאה או באוויר</span>'
+            '<span><i class="mk-key-win"></i>ניצחון</span><span><i class="mk-key-cat"></i>חתולים</span>'
+            '<span><i class="mk-key-me"></i>המצבים שבהם אני יורה, ואני מנצח</span>'
+            '<span>על החצים הסתברויות המעבר, ובמצבים הסופיים הסיכוי להגיע אליהם</span></span>')
 
 
 # --- charts -------------------------------------------------------------------------------
@@ -550,9 +589,8 @@ def blocks():
     """The generated blocks, in page order."""
     weak_a = weak(RIVALS)
     return [
-        chain_general(), chain_legend(True),
         wand_table(1, RIVALS, WANDS), chart_a(), legend([1]), check_table(1, CHECK, RIVALS),
-        chain_a(), chain_legend(False), who_wins(1, weak_a, RIVALS),
+        chain_a(), chain_legend(), who_wins(1, weak_a, RIVALS),
         orders_table(RIVALS), wand_table(3, RIVALS, WANDS), check_table(3, CHECK, RIVALS),
         who_wins(3, weak_a, RIVALS), chart_abc(), legend([1, 2, 3]),
         threshold_table(), examples_table(),

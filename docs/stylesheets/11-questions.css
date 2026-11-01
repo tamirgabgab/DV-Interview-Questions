@@ -799,7 +799,7 @@
 .md-typeset .viz-legend .mk-key-me { background: var(--md-default-bg-color); outline: 3px solid var(--viz-s1); }
 .md-typeset .explorer .wz-tablewrap { overflow-x: auto; }
 .md-typeset .explorer table.wz-table { font-size: 0.62rem; margin: 0.3rem 0; }
-.md-typeset .explorer table.wz-table td, .md-typeset .explorer table.wz-table th { padding: 0.15em 0.5em; text-align: center; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer table.wz-table td, .md-typeset .explorer table.wz-table th { padding: 0.15em 0.32em; text-align: center; font-variant-numeric: tabular-nums; }
 .md-typeset .explorer table.wz-table tbody tr { cursor: pointer; }
 .md-typeset .explorer table.wz-table tr.is-now td { outline: 2px solid var(--viz-s1); outline-offset: -2px; }
 .md-typeset .explorer table.wz-table tr.is-best td { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); font-weight: 700; }
@@ -808,6 +808,32 @@
 .md-typeset .explorer .wz-out span { padding: 0.15em 0.6em; border-radius: 0.3rem; border: 1px solid var(--viz-grid); font-size: 0.7rem; font-variant-numeric: tabular-nums; }
 .md-typeset .explorer .wz-out span.is-me { border-color: var(--viz-s1); border-width: 2px; font-weight: 700; }
 .md-typeset .explorer .wz-chain svg { max-width: 34rem; display: block; margin: 0 auto; }
+/* The table and the chart side by side when there is room, the chart smaller. */
+.md-typeset .explorer .wz-duo { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; align-items: flex-start; }
+.md-typeset .explorer .wz-col { flex: 1 1 17rem; min-width: 0; }
+.md-typeset .explorer .wz-chart svg { max-width: 22rem; display: block; margin: 0 auto; touch-action: pan-y; }
+.md-typeset .explorer table.wz-table tbody tr:focus-visible td { outline: 2px solid var(--md-accent-fg-color); outline-offset: -2px; }
+.md-typeset .explorer table.wz-table td.wz-seq { white-space: nowrap; }
+@media screen and (max-width: 30em) {
+  .md-typeset .explorer table.wz-table { font-size: 0.56rem; }
+  .md-typeset .explorer table.wz-table td, .md-typeset .explorer table.wz-table th { padding: 0.15em 0.18em; }
+}
+.md-typeset .explorer .wz-chart .wz-hit { cursor: crosshair; }
+.md-typeset svg .wz-hline { stroke: var(--viz-ink); stroke-width: 1; stroke-dasharray: 3 3; }
+.md-typeset svg .wz-hdot { fill: var(--viz-s1); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.md-typeset svg .wz-hbg { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .wz-htext { fill: var(--viz-ink); font-size: 13px; font-family: var(--md-code-font-family); }
+/* A state under the pointer or the focus: its edges and its neighbours lit, the rest dimmed,
+   and the line under the chain explains its number (fixed height: nothing below jumps). */
+.md-typeset svg.mk-chain .mk-state { cursor: pointer; outline: none; }
+.md-typeset svg.mk-chain .mk-state:focus-visible rect { stroke: var(--md-accent-fg-color); stroke-width: 3; }
+.md-typeset svg.mk-chain.mk-focus [data-a]:not(.is-on) { opacity: 0.12; }
+.md-typeset svg.mk-chain.mk-focus .mk-state:not(.is-on) { opacity: 0.4; }
+.md-typeset svg.mk-chain.mk-focus .mk-state.is-on rect { stroke-width: 2.5; }
+.md-typeset svg.mk-chain.mk-focus .mk-hit.is-on, .md-typeset svg.mk-chain.mk-focus .mk-miss.is-on { stroke-width: 2.6; }
+.md-typeset .mk-explain { min-height: 8.2em; margin: 0.3rem auto 0.4rem; max-width: 34rem; font-size: 0.72rem; line-height: 1.6; color: var(--md-default-fg-color); }
+.md-typeset .mk-explain .mk-math { display: block; text-align: right; font-variant-numeric: tabular-nums; }
+@media screen and (min-width: 45em) { .md-typeset .mk-explain { min-height: 6.6em; } }
 
 /* Rows of cells of the in-place questions (0072 to 0075, tools/figures/cells.py and their
    boxes): an array, a deck, a matrix's memory or a word's bits; c1 .. c5 tint a cycle or

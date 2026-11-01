@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { BASE, RIGHT, TOP, W, X0, f, ltr } = dvqExplorers.lib;
+  const { f, ltr } = dvqExplorers.lib;
   const NB = " ";
 
   // The model (0071): p in turn order. A duel to the end, the opener first; after a kill
@@ -65,67 +65,74 @@
   const short = (v) => { const s = Number(v).toFixed(3).replace(/0+$/, "").replace(/\.$/, ""); return s || "0"; };
   const wandText = (q) => { const r = Math.round(q * 1000) / 1000; return Math.abs(q - r) > 1e-12 && q < r ? `${r}⁻` : String(r); };
 
-  // The chart: my chance against my wand, broken where it jumps; the current wand and the best.
-  const H = 230;
+  // The chart: my chance against my wand, broken where it jumps; the current wand and the
+  // best. Its own small frame, so that it can sit beside the table; the hover group (a line,
+  // a dot and the values) is moved by the pointer, a click sets the wand.
+  const CWD = 360, CHT = 230, CX0 = 44, CRT = 12, CTP = 14, CBS = 196;
+  const cX = (x) => CX0 + x * (CWD - CX0 - CRT), cY = (v) => CBS - v * (CBS - CTP);
   const chart = (me, rivals, own, best) => {
-    const X = (x) => X0 + x * (W - X0 - RIGHT), Y = (v) => BASE - v * (BASE - TOP);
-    let s = `<svg class="perf-chart wz-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="הסיכוי שלי לנצח כפונקציה של השרביט">`;
+    let s = `<svg class="perf-chart wz-live" viewBox="0 0 ${CWD} ${CHT}" role="img" aria-label="הסיכוי שלי לנצח כפונקציה של השרביט">`;
     [0, 0.2, 0.4, 0.6, 0.8, 1].forEach((v) => {
-      s += `<line class="grid" x1="${X0}" x2="${W - RIGHT}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v * 100}%</text>`;
-      s += `<text class="tick" x="${f(X(v))}" y="${BASE + 18}" text-anchor="middle">${v}</text>`;
+      s += `<line class="grid" x1="${CX0}" x2="${CWD - CRT}" y1="${f(cY(v))}" y2="${f(cY(v))}"/><text class="tick" x="${CX0 - 6}" y="${f(cY(v) + 4)}" text-anchor="end">${v * 100}%</text>`;
+      s += `<text class="tick" x="${f(cX(v))}" y="${CBS + 18}" text-anchor="middle">${v}</text>`;
     });
-    rivals.forEach((r) => { s += `<line class="grid" x1="${f(X(r))}" x2="${f(X(r))}" y1="${TOP}" y2="${BASE}" stroke-dasharray="4 4"/>`; });
+    rivals.forEach((r) => { s += `<line class="grid" x1="${f(cX(r))}" x2="${f(cX(r))}" y1="${CTP}" y2="${CBS}" stroke-dasharray="4 4"/>`; });
     let pts = [], prev = null;
     const flush = () => { if (pts.length > 1) s += `<polyline class="s1-line" points="${pts.join(" ")}" fill="none" stroke-width="2.5"/>`; pts = []; };
     for (let k = 1; k <= 200; k++) {
       const x = k / 200 - 1e-7, v = wzChance(me, x, rivals);
       if (prev !== null && Math.abs(v - prev) > 0.04) flush();
-      pts.push(`${f(X(x))},${f(Y(v))}`);
+      pts.push(`${f(cX(x))},${f(cY(v))}`);
       prev = v;
     }
     flush();
     const now = wzChance(me, own, rivals);
-    s += `<circle class="s3-dot" cx="${f(X(best.wand))}" cy="${f(Y(best.chance))}" r="6"><title>${pct(best.chance)}</title></circle>`;
-    s += `<circle class="s2-dot" cx="${f(X(own))}" cy="${f(Y(now))}" r="6"><title>${pct(now)}</title></circle>`;
-    return s + `<line class="axis" x1="${X0}" x2="${W - RIGHT}" y1="${BASE}" y2="${BASE}"/></svg>`;
+    s += `<circle class="s3-dot" cx="${f(cX(best.wand))}" cy="${f(cY(best.chance))}" r="6"><title>${pct(best.chance)}</title></circle>`;
+    s += `<circle class="s2-dot" cx="${f(cX(own))}" cy="${f(cY(now))}" r="6"><title>${pct(now)}</title></circle>`;
+    s += `<line class="axis" x1="${CX0}" x2="${CWD - CRT}" y1="${CBS}" y2="${CBS}"/>`;
+    s += `<g class="wz-hover" visibility="hidden"><line class="wz-hline" y1="${CTP}" y2="${CBS}"/><circle class="wz-hdot" r="5"/><rect class="wz-hbg" rx="4" height="22"/><text class="wz-htext" dy="0.32em"></text></g>`;
+    return s + `<rect class="wz-hit" x="${CX0}" y="${CTP}" width="${CWD - CX0 - CRT}" height="${CBS - CTP}" fill="transparent"/></svg>`;
   };
 
   // The Markov chain of the current choice: the same drawing as tools/figures/q0071.py's
-  // chain_svg (the states, the chosen edges with their chances, the absorbing chances).
+  // chain_svg (the states, the chosen edges with their chances, the absorbing chances). Each
+  // edge carries its two ends (data-a, data-b) and each state its key (data-s).
   const CP = {
-    R1: [62, 46], R2: [180, 46], R3: [298, 46], CATS: [420, 46],
-    "1,2,1": [44, 214], "1,2,2": [122, 214], "1,3,1": [200, 214], "1,3,3": [278, 214], "2,3,2": [356, 214], "2,3,3": [434, 214],
-    W1: [90, 372], W2: [240, 372], W3: [390, 372],
+    R1: [70, 40], R2: [180, 40], R3: [290, 40], CATS: [400, 40],
+    "1,2,1": [44, 176], "1,2,2": [122, 176], "1,3,1": [200, 176], "1,3,3": [278, 176], "2,3,2": [356, 176], "2,3,3": [434, 176],
+    W1: [100, 300], W2: [240, 300], W3: [380, 300],
   };
   const LABEL_AT = { 12: [0.55, 0], 13: [0.45, -10], 23: [0.25, 10], 21: [0.35, 8], 31: [0.6, 12], 32: [0.42, -12] };
   const duelOf = (killer, victim) => { const [i, j] = [1, 2, 3].filter((k) => k !== victim); return `${i},${j},${6 - killer - victim}`; };
   const isDuel = (k) => k.includes(",");
-  const chainBox = (key, lines, cls, w, me) => {
+  const chainBox = (key, lines, cls, w, me, faded) => {
     const [x, y] = CP[key];
-    let s = `<rect class="${cls}${me ? " mk-me" : ""}" x="${x - w / 2}" y="${y - 20}" width="${w}" height="40" rx="7"/>`;
+    let s = `<g class="mk-state${faded ? " st-faded" : ""}" data-s="${key}" tabindex="0" role="button">` +
+      `<rect class="${cls}${me ? " mk-me" : ""}" x="${x - w / 2}" y="${y - 20}" width="${w}" height="40" rx="7"/>`;
     if (lines.length === 1) s += `<text class="mk-text" x="${x}" y="${y + 5}" text-anchor="middle" direction="rtl">${lines[0]}</text>`;
     else s += `<text class="mk-text" x="${x}" y="${y - 3}" text-anchor="middle" direction="rtl">${lines[0]}</text><text class="mk-text mk-sub" x="${x}" y="${y + 13}" text-anchor="middle" direction="rtl">${lines[1]}</text>`;
-    return s;
+    return s + "</g>";
   };
   const chainEdge = (a, b, cls, label, t = 0.5, dx = 0, bend = 0) => {
     let [x1, y1] = CP[a], [x2, y2] = CP[b], line, lx, ly;
+    const ends = `data-a="${a}" data-b="${b}"`;
     if (y1 === y2) {
       const s = x2 > x1 ? 1 : -1;
       if (bend) {
         const sx = x1 + s * 10, ex = x2 - s * 10, sy = y1 + bend * 20, cx = (sx + ex) / 2, cy = sy + bend * 14;
-        line = `<path class="${cls}" d="M${sx},${sy} Q${cx},${cy} ${ex},${sy}" fill="none" marker-end="url(#wz-arrow)"/>`;
+        line = `<path class="${cls}" ${ends} d="M${sx},${sy} Q${cx},${cy} ${ex},${sy}" fill="none" marker-end="url(#wz-arrow)"/>`;
         lx = cx; ly = sy + bend * 12 + (bend > 0 ? 12 : -4);
       } else {
         const sx = x1 + s * (isDuel(a) ? 32 : 42), ex = x2 - s * (isDuel(b) ? 32 : 42);
-        line = `<line class="${cls}" x1="${sx}" y1="${y1}" x2="${ex}" y2="${y2}" marker-end="url(#wz-arrow)"/>`;
+        line = `<line class="${cls}" ${ends} x1="${sx}" y1="${y1}" x2="${ex}" y2="${y2}" marker-end="url(#wz-arrow)"/>`;
         lx = (sx + ex) / 2; ly = y1 - 7;
       }
     } else {
       const sy = y1 + 20, ey = y2 - 21, sx = x1 + (x2 - x1) * 0.12, ex = x2 - (x2 - x1) * 0.04;
-      line = `<line class="${cls}" x1="${f(sx, 0)}" y1="${sy}" x2="${f(ex, 0)}" y2="${ey}" marker-end="url(#wz-arrow)"/>`;
+      line = `<line class="${cls}" ${ends} x1="${f(sx, 0)}" y1="${sy}" x2="${f(ex, 0)}" y2="${ey}" marker-end="url(#wz-arrow)"/>`;
       lx = sx + (ex - sx) * t; ly = sy + (ey - sy) * t + 4;
     }
-    return [line, label ? `<text class="mk-lab" x="${f(lx + dx, 0)}" y="${f(ly, 0)}" text-anchor="middle">${label}</text>` : ""];
+    return [line, label ? `<text class="mk-lab" ${ends} x="${f(lx + dx, 0)}" y="${f(ly, 0)}" text-anchor="middle">${label}</text>` : ""];
   };
   const chainSvg = (p, me) => {
     const res = wzRound(p), choice = Object.fromEntries(res.trace.map((t) => [t.w, t.choice]));
@@ -142,28 +149,130 @@
       const air = choice[w] === "air";
       const [e, l] = chainEdge(key, nxt, "mk-miss", air ? "1" : short(1 - p[w - 1]));
       edges.push(e); labels.push(l); used.add(nxt);
-      if (air) labels.push(`<text class="mk-lab" x="${(CP[key][0] + CP[nxt][0]) / 2}" y="${CP[key][1] + 34}" text-anchor="middle" direction="rtl">באוויר</text>`);
+      if (air) labels.push(`<text class="mk-lab" data-a="${key}" data-b="${nxt}" x="${(CP[key][0] + CP[nxt][0]) / 2}" y="${CP[key][1] + 34}" text-anchor="middle" direction="rtl">באוויר</text>`);
     }
     Object.keys(CP).filter(isDuel).forEach((d) => {
       if (!used.has(d)) return;
       const [i, j, k] = d.split(",").map(Number), other = `${i},${j},${k === i ? j : i}`;
       used.add(other);
-      let [e, l] = chainEdge(d, `W${k}`, "mk-hit", short(p[k - 1]), 0.4, CP[`W${k}`][0] > CP[d][0] ? 14 : -14);
+      let [e, l] = chainEdge(d, `W${k}`, "mk-hit", short(p[k - 1]), CP[`W${k}`][0] > CP[d][0] ? 0.62 : 0.45, CP[`W${k}`][0] > CP[d][0] ? 16 : -16);
       edges.push(e); labels.push(l); used.add(`W${k}`);
       [e, l] = chainEdge(d, other, "mk-miss", short(1 - p[k - 1]), 0.5, 0, k === i ? -1 : 1);
       edges.push(e); labels.push(l);
     });
     const boxes = [];
-    [1, 2, 3].forEach((w) => boxes.push([`R${w}`, chainBox(`R${w}`, ["כולם חיים", `תור ${w}`], "mk-node", 84, w === me)]));
-    boxes.push(["CATS", chainBox("CATS", ["חתולים", pct(res.cats)], "mk-cat", 84, false)]);
-    Object.keys(CP).filter(isDuel).forEach((d) => { const [i, j, k] = d.split(",").map(Number); boxes.push([d, chainBox(d, [`${i} מול ${j}`, `תור ${k}`], "mk-node", 64, k === me)]); });
-    [1, 2, 3].forEach((k) => boxes.push([`W${k}`, chainBox(`W${k}`, [`${k} מנצח`, pct(res.win[k - 1])], "mk-win", 96, k === me)]));
-    let s = `<svg class="figure mk-chain" viewBox="0 0 480 418" role="img" aria-label="שרשרת מרקוב של הבחירה הנוכחית : הסיכויים הסופיים ${res.win.map(pct).join(", ")}, חתולים ${pct(res.cats)}">` +
-      `<defs><marker id="wz-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="mk-head"/></marker></defs>`;
-    s += edges.join("");
-    boxes.forEach(([key, b]) => { s += used.has(key) ? b : `<g class="st-faded">${b}</g>`; });
-    return s + labels.join("") + "</svg>";
+    [1, 2, 3].forEach((w) => boxes.push(chainBox(`R${w}`, ["כולם חיים", `תור ${w}`], "mk-node", 84, w === me, !used.has(`R${w}`))));
+    boxes.push(chainBox("CATS", ["חתולים", pct(res.cats)], "mk-cat", 84, false, !used.has("CATS")));
+    Object.keys(CP).filter(isDuel).forEach((d) => { const [i, j, k] = d.split(",").map(Number); boxes.push(chainBox(d, [`${i} מול ${j}`, `תור ${k}`], "mk-node", 64, k === me, !used.has(d))); });
+    [1, 2, 3].forEach((k) => boxes.push(chainBox(`W${k}`, [`${k} מנצח`, pct(res.win[k - 1])], "mk-win", 96, k === me, !used.has(`W${k}`))));
+    return `<svg class="figure mk-chain" viewBox="0 0 480 340" role="group" data-p="${p.join(",")}" data-me="${me}" aria-label="שרשרת מרקוב של הבחירה הנוכחית : הסיכויים הסופיים ${res.win.map(pct).join(", ")}, חתולים ${pct(res.cats)}">` +
+      `<defs><marker id="wz-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="mk-head"/></marker></defs>` +
+      edges.join("") + boxes.join("") + labels.join("") + "</svg>";
   };
+
+  // How the number of each state comes about (q0071.chain_states): the chance to ever reach
+  // it; for a duel state, the chance that the wizard to shoot wins the duel from there; for
+  // a win, its terms: the chance to enter a duel at a state times the winner's chance there.
+  const wzStates = (p) => {
+    const res = wzRound(p), choice = Object.fromEntries(res.trace.map((t) => [t.w, t.choice]));
+    const out = { R1: { reach: 1 } }, direct = {};
+    let r = 1;
+    [[1, "R2"], [2, "R3"], [3, "CATS"]].forEach(([w, nxt]) => {
+      const c = choice[w], keep = c === "air" ? 1 : 1 - p[w - 1];
+      out[`R${w}`].choice = c;
+      if (c !== "air") { const d = duelOf(w, Number(c)); direct[d] = (direct[d] || 0) + r * p[w - 1]; out[`R${w}`].hit = { d, x: p[w - 1] }; }
+      out[nxt] = { reach: r * keep, prev: r, keep, w };
+      r *= keep;
+    });
+    Object.keys(CP).filter(isDuel).forEach((d) => {
+      const [i, j, k] = d.split(",").map(Number), o = k === i ? j : i, partner = `${i},${j},${o}`;
+      out[d] = { reach: (direct[d] || 0) + (direct[partner] || 0) * (1 - p[o - 1]), direct: direct[d] || 0, fromPartner: (direct[partner] || 0), k, o, duel: wzDuel(p[k - 1], p[o - 1]) };
+    });
+    [1, 2, 3].forEach((k) => {
+      const terms = [];
+      Object.entries(direct).forEach(([d, rr]) => {
+        const [i, j, s] = d.split(",").map(Number);
+        if ((k !== i && k !== j) || !rr) return;
+        const other = k === i ? j : i;
+        terms.push({ d, r: rr, v: s === k ? wzDuel(p[k - 1], p[other - 1]) : 1 - wzDuel(p[s - 1], p[k - 1]) });
+      });
+      out[`W${k}`] = { reach: terms.reduce((a, t) => a + t.r * t.v, 0), terms };
+    });
+    return out;
+  };
+
+  // The line under a chain: how the state's number came about, in one or two lines.
+  const n3 = (v) => { const s = Number(v).toFixed(3).replace(/0+$/, "").replace(/\.$/, ""); return s || "0"; };
+  // Each formula is a block of its own, left to right, so that a long one wraps in order.
+  const M = (x) => `<span class="mk-math" dir="ltr">${x}</span>`;
+  const explainState = (key, p, me) => {
+    const st = wzStates(p), e = st[key], P = (k) => (k === me ? wandText(p[k - 1]) : short(p[k - 1]));
+    const who = (c, w) => (c === "air" ? `קוסם ${w} מכשף באוויר.` : `קוסם ${w} מכשף על קוסם ${c}${c === String(me) ? " (עליי)" : ""}.`);
+    if (key === "R1") return `<b>כולם חיים, תור 1${NB}:</b> ההתחלה, מגיעים לכאן בהסתברות ${ltr(1)}. ${who(e.choice, 1)}`;
+    if (key === "R2" || key === "R3") {
+      const w = e.w, keepText = e.keep === 1 ? "1" : `(1 − ${P(w)})`, head = `<b>כולם חיים, תור ${w + 1}${NB}:</b> `;
+      if (!e.reach) return `${head}קוסם ${w} פוגע תמיד, ולכן אף מסלול לא מגיע לכאן.`;
+      return `${head}${e.keep === 1 ? `קוסם ${w} כישף באוויר` : `קוסם ${w} החטיא`}, ולכן מגיעים לכאן בהסתברות${NB}: ` +
+        M(`${n3(e.prev)} · ${keepText} = ${n3(e.reach)}`) + who(st[key].choice, w + 1);
+    }
+    if (key === "CATS") {
+      const f3 = [1, 2, 3].map((w) => (st[`R${w}`].choice === "air" ? "1" : `(1 − ${P(w)})`));
+      return `<b>חתולים${NB}:</b> אף אחד לא פגע בסבב הראשון${NB}: ` + M(`${f3.join(" · ")} = ${n3(e.reach)}`);
+    }
+    if (isDuel(key)) {
+      const [i, j] = key.split(",").map(Number), { k, o } = e, head = `<b>דו-קרב ${i} מול ${j}, תור ${k}${NB}:</b> `;
+      if (!e.reach) return `${head}בבחירות האלה אף מסלול לא מגיע לכאן.`;
+      const parts = [];
+      [1, 2, 3].forEach((w) => { const h = st[`R${w}`].hit; if (h && h.d === key) parts.push(`${n3(st[`R${w}`].reach)} · ${P(w)}`); });
+      if (e.fromPartner) parts.push(`${n3(e.fromPartner)} · (1 − ${P(o)})`);
+      return `${head}ההסתברות להגיע לכאן, ואז הסיכוי של קוסם ${k} לנצח את הדו-קרב${NB}: ` +
+        M(`${parts.join(" + ")} = ${n3(e.reach)}`) +
+        M(`V(${P(k)}, ${P(o)}) = ${P(k)} / (${P(k)} + ${P(o)} − ${P(k)}·${P(o)}) = ${n3(e.duel)}`);
+    }
+    const k = Number(key.slice(1)), head = `<b>קוסם ${k} מנצח${NB}:</b> `;
+    if (!e.terms.length) return `${head}אף מסלול לא מגיע לכאן.`;
+    return `${head}לכל חץ שנכנס, ההסתברות להגיע לדו-קרב כפול הסיכוי של קוסם ${k} לנצח בו, ומחברים${NB}: ` +
+      M(`${e.terms.map((t) => `${n3(t.r)} · ${n3(t.v)}`).join(" + ")} = ${n3(e.reach)}`);
+  };
+
+  // Light a state's edges and neighbours, dim the rest, and explain the state; `root` holds
+  // the chain (re-drawn by the box, or a page figure), `line` is the explanation's line.
+  const wireChain = (root, line) => {
+    const svgOf = () => root.matches("svg") ? root : root.querySelector("svg.mk-chain");
+    const clear = () => { const svg = svgOf(); if (!svg) return; svg.classList.remove("mk-focus"); svg.querySelectorAll(".is-on").forEach((x) => x.classList.remove("is-on")); };
+    const show = (g) => {
+      const svg = svgOf();
+      if (!svg || !g) return;
+      clear();
+      const key = g.dataset.s, p = svg.dataset.p.split(",").map(Number), me = Number(svg.dataset.me);
+      svg.classList.add("mk-focus");
+      g.classList.add("is-on");
+      svg.querySelectorAll("[data-a]").forEach((x) => {
+        if (x.dataset.a === key || x.dataset.b === key) {
+          x.classList.add("is-on");
+          const other = x.dataset.a === key ? x.dataset.b : x.dataset.a, n = svg.querySelector(`[data-s="${other}"]`);
+          if (n) n.classList.add("is-on");
+        }
+      });
+      if (line) line.innerHTML = explainState(key, p, me);
+    };
+    const at = (e) => e.target.closest && e.target.closest("[data-s]");
+    root.addEventListener("pointerover", (e) => { const g = at(e); if (g) show(g); });
+    root.addEventListener("pointerdown", (e) => { const g = at(e); if (g) show(g); });
+    root.addEventListener("focusin", (e) => { const g = at(e); if (g) show(g); });
+    root.addEventListener("pointerleave", clear);
+    root.addEventListener("focusout", (e) => { if (!root.contains(e.relatedTarget)) clear(); });
+  };
+  // The page's own chain (part a): the figure from q0071.py carries data-p, data-me and the
+  // id of its explanation line.
+  if (typeof document !== "undefined") {
+    const wireStatic = () => document.querySelectorAll("svg.mk-chain[data-p][data-explain]").forEach((svg) => {
+      if (svg.dataset.wired) return;
+      svg.dataset.wired = "1";
+      wireChain(svg, document.getElementById(svg.dataset.explain));
+    });
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wireStatic); else wireStatic();
+  }
 
   const wizardsView = () => ({
     mount(box) {
@@ -179,11 +288,12 @@
         `<button type="button" class="md-button wz-sniper">צלף (1)</button>` +
         `<button type="button" class="md-button md-button--primary wz-best">הבחירה הטובה ביותר</button></div>` +
         `<p class="ex-summary" aria-live="polite"></p><div class="wz-out"></div>` +
-        `<p class="ex-title">ששת הסדרים מול היריבים האלה, כל אחד עם השרביט הטוב ביותר שלו; לחיצה על שורה בוחרת אותה</p>` +
-        `<div class="wz-tablewrap" tabindex="0" role="region" aria-label="ששת הסדרים"></div>` +
-        `<p class="ex-title">הסיכוי שלי לנצח לכל שרביט, בתור ובסדר שבחרתי; הקווים המקווקווים הם היריבים</p><div class="wz-chart"></div>` +
-        `<span class="viz-legend"><span><i class="s1"></i>הסיכוי שלי</span><span><i class="s2"></i>השרביט שבחרתי</span><span><i class="s3"></i>השרביט הטוב ביותר בתור הזה</span></span>` +
+        `<div class="wz-duo"><div class="wz-col"><p class="ex-title">ששת הסדרים, כל אחד עם השרביט הטוב ביותר שלו; לחיצה על שורה בוחרת אותה</p>` +
+        `<div class="wz-tablewrap" role="region" aria-label="ששת הסדרים"></div></div>` +
+        `<div class="wz-col"><p class="ex-title">הסיכוי שלי לכל שרביט; לחיצה על הגרף קובעת שרביט</p><div class="wz-chart"></div>` +
+        `<span class="viz-legend"><span><i class="s1"></i>הסיכוי שלי</span><span><i class="s2"></i>השרביט שלי</span><span><i class="s3"></i>הטוב ביותר בתור הזה</span></span></div></div>` +
         `<p class="ex-title">שרשרת מרקוב של הבחירה${NB}: על החצים ההסתברויות, ובמצבים הסופיים הסיכוי להגיע אליהם</p><div class="wz-chain"></div>` +
+        `<p class="mk-explain wz-explain" aria-live="polite">מעבירים את העכבר מעל מצב, או נוגעים בו, ורואים את החצים שלו ואיך התקבל המספר שלו.</p>` +
         `<span class="viz-legend"><span><i class="mk-key-hit"></i>פגיעה</span><span><i class="mk-key-miss"></i>החטאה או באוויר</span><span><i class="mk-key-win"></i>ניצחון</span><span><i class="mk-key-cat"></i>חתולים</span><span><i class="mk-key-me"></i>המצבים שלי</span></span>`;
       const $ = (sel) => box.querySelector(sel);
       const rivals = () => (st.order === "ab" ? [st.a, st.b] : [st.b, st.a]);
@@ -204,15 +314,14 @@
         const outs = names.map((n, k) => `<span${k === st.me - 1 ? ' class="is-me"' : ""}>${n}${NB}: ${ltr(pct(res.win[k]))}</span>`);
         $(".wz-out").innerHTML = outs.join("") + `<span>חתולים${NB}: ${ltr(pct(res.cats))}</span>`;
         const rows = wzOrders(st.a, st.b), top = Math.max(...rows.map((o) => o.win[o.me - 1]));
-        let t = `<table class="wz-table"><thead><tr><th>ראשון</th><th>שני</th><th>שלישי</th><th>השרביט</th><th>אני</th><th>יריב א</th><th>יריב ב</th><th>חתולים</th><th></th></tr></thead><tbody>`;
+        let t = `<table class="wz-table"><thead><tr><th>הסדר</th><th>השרביט</th><th>אני</th><th>יריב א</th><th>יריב ב</th><th>חתולים</th></tr></thead><tbody>`;
         rows.forEach((o, i) => {
-          const pp = wzPlace(o.me, o.wand, o.rivals), seq = o.order === "ab" ? ["א", "ב"] : ["ב", "א"];
-          let q = 0;
-          const cells = [0, 1, 2].map((k) => (k === o.me - 1 ? `<td class="wz-me">אני</td>` : `<td>${seq[q++]} ${ltr(pp[k])}</td>`));
+          const pp = wzPlace(o.me, o.wand, o.rivals);
+          const seq = [0, 1, 2].map((k) => (k === o.me - 1 ? "אני" : ltr(short(pp[k])))).join(" ← ");
           const ia = [0, 1, 2].filter((k) => k !== o.me - 1)[o.order === "ab" ? 0 : 1], ib = [0, 1, 2].filter((k) => k !== o.me - 1)[o.order === "ab" ? 1 : 0];
           const now = o.me === st.me && o.order === st.order, isBest = Math.abs(o.win[o.me - 1] - top) < 1e-12;
-          t += `<tr data-i="${i}" class="${[now ? "is-now" : "", isBest ? "is-best" : ""].join(" ").trim()}">${cells.join("")}<td>${ltr(wandText(o.wand))}</td><td>${ltr(pct(o.win[o.me - 1]))}</td><td>${ltr(pct(o.win[ia]))}</td><td>${ltr(pct(o.win[ib]))}</td><td>${ltr(pct(o.cats))}</td>` +
-            `<td><button type="button" class="md-button wz-pick" data-i="${i}">לבחור</button></td></tr>`;
+          const name = `לבחור את הסדר ${[0, 1, 2].map((k) => (k === o.me - 1 ? "אני" : short(pp[k]))).join(", ")}, השרביט ${wandText(o.wand)}, הסיכוי שלי ${pct(o.win[o.me - 1])}`;
+          t += `<tr data-i="${i}" tabindex="0" aria-label="${name}" class="${[now ? "is-now" : "", isBest ? "is-best" : ""].join(" ").trim()}"><td class="wz-seq">${seq}</td><td>${ltr(wandText(o.wand))}</td><td>${ltr(pct(o.win[o.me - 1]))}</td><td>${ltr(pct(o.win[ia]))}</td><td>${ltr(pct(o.win[ib]))}</td><td>${ltr(pct(o.cats))}</td></tr>`;
         });
         $(".wz-tablewrap").innerHTML = t + "</tbody></table>";
         $(".wz-chart").innerHTML = chart(st.me, rv, st.wand, best);
@@ -229,10 +338,44 @@
         const rows = wzOrders(st.a, st.b);
         pick(rows.reduce((m, o) => (o.win[o.me - 1] > m.win[m.me - 1] + 1e-12 ? o : m)));
       });
-      $(".wz-tablewrap").addEventListener("click", (e) => {
+      const pickRow = (tr) => {
+        const i = tr.dataset.i, focused = document.activeElement === tr;
+        pick(wzOrders(st.a, st.b)[Number(i)]);
+        if (focused) { const again = $(`.wz-tablewrap tr[data-i="${i}"]`); if (again) again.focus(); }
+      };
+      $(".wz-tablewrap").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-i]"); if (tr) pickRow(tr); });
+      $(".wz-tablewrap").addEventListener("keydown", (e) => {
         const tr = e.target.closest("tr[data-i]");
-        if (tr) pick(wzOrders(st.a, st.b)[Number(tr.dataset.i)]);
+        if (tr && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pickRow(tr); }
       });
+      // the chart: a line and a dot follow the pointer with the wand and my chance; a click
+      // (or a tap) sets the wand there
+      const wandAt = (e) => {
+        const svg = $(".wz-chart svg");
+        if (!svg || !svg.getScreenCTM()) return null;
+        const pt = svg.createSVGPoint();
+        pt.x = e.clientX; pt.y = e.clientY;
+        const x = pt.matrixTransform(svg.getScreenCTM().inverse()).x;
+        return Math.min(1, Math.max(0.001, Math.round(((x - CX0) / (CWD - CX0 - CRT)) * 1000) / 1000));
+      };
+      const hover = (e) => {
+        const q = wandAt(e), g = $(".wz-chart .wz-hover");
+        if (q === null || !g) return;
+        const v = wzChance(st.me, q, rivals()), x = cX(q), y = cY(v), txt = `${q} → ${pct(v)}`;
+        g.setAttribute("visibility", "visible");
+        g.querySelector(".wz-hline").setAttribute("x1", f(x)); g.querySelector(".wz-hline").setAttribute("x2", f(x));
+        g.querySelector(".wz-hdot").setAttribute("cx", f(x)); g.querySelector(".wz-hdot").setAttribute("cy", f(y));
+        const t = g.querySelector(".wz-htext"), w = txt.length * 7.6 + 12, left = x + w + 10 > CWD - CRT;
+        const tx = left ? x - 8 - w : x + 8, ty = Math.min(Math.max(y - 18, CTP + 11), CBS - 11);
+        t.textContent = txt; t.setAttribute("x", f(tx + 6)); t.setAttribute("y", f(ty));
+        const bg = g.querySelector(".wz-hbg");
+        bg.setAttribute("x", f(tx)); bg.setAttribute("y", f(ty - 11)); bg.setAttribute("width", f(w));
+      };
+      $(".wz-chart").addEventListener("pointermove", hover);
+      $(".wz-chart").addEventListener("pointerdown", hover);
+      $(".wz-chart").addEventListener("pointerleave", () => { const g = $(".wz-chart .wz-hover"); if (g) g.setAttribute("visibility", "hidden"); });
+      $(".wz-chart").addEventListener("click", (e) => { const q = wandAt(e); if (q !== null) { setWand(q); hover(e); } });
+      wireChain($(".wz-chain"), $(".wz-explain"));
       sync();
       draw();
     },
@@ -243,6 +386,6 @@
     help: {
       wizards: "בוחרים את שני היריבים, את התור שלי, את הסדר שלהם ואת השרביט : מתחת לכפתורים הסיכויים של כולם ושל החתולים. ״הבחירה הטובה ביותר״ עוברת על ששת הסדרים ועל כל השרביטים. הטבלה מראה את ששת הסדרים, הגרף את הסיכוי שלי לכל שרביט, ושרשרת מרקוב את המשחק עם הבחירות של כולם.",
     },
-    models: { wzDuel, wzRound, wzChance, wzBest, wzOrders },
+    models: { wzDuel, wzRound, wzChance, wzBest, wzOrders, wzStates, explainState },
   });
 })();

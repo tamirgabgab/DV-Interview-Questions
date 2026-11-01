@@ -294,6 +294,44 @@ def test_explorer_matches_the_reference():
             assert all(near(x, y, 1e-6) for x, y in zip(row["win"], ch)) and near(row["cats"], cats, 1e-6), (a, b, me)
 
 
+def test_chain_states_and_their_explanations():
+    """The numbers behind each state of the chain (q0071.chain_states): the wins and the cats
+    add up to the reference; the box's wzStates gives the same numbers; the explanation of a
+    state quotes them; the page's chain carries the chances it is drawn from."""
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(63)
+    cases = [[0.6 - 1e-9, 0.6, 0.8], [0.6, 0.8, 0.6 - 1e-9], [1, 0.8, 0.4]] + \
+        [[rng.randint(1, 100) / 100 for _ in range(3)] for _ in range(80)]
+    cases = [p for p in cases if len(set(p)) == 3]
+    for p in cases:
+        st = q0071.chain_states([Fr(x) for x in p])
+        want, _ = q0071.round_options([Fr(x) for x in p])
+        assert [st[f"W{k}"]["reach"] for k in (1, 2, 3)] == want, p
+        assert st["CATS"]["reach"] == q0071.outcomes([Fr(x) for x in p])[1], p
+    keys = ["R1", "R2", "R3", "CATS", "1,2,1", "1,2,2", "1,3,1", "1,3,3", "2,3,2", "2,3,3", "W1", "W2", "W3"]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const cases = {json.dumps(cases)}, keys = {json.dumps(keys)};
+      console.log(JSON.stringify({{ states: cases.map((p) => m.wzStates(p)),
+        text: keys.map((k) => m.explainState(k, cases[0], 1).replace(/<[^>]+>/g, "")) }}));""")
+    for p, g in zip(cases, got["states"]):
+        st = q0071.chain_states([Fr(x) for x in p])
+        for k in keys:
+            assert near(g[k]["reach"], st[k]["reach"], 1e-7), (p, k)
+            if "duel" in st[k]:
+                assert near(g[k]["duel"], st[k]["duel"], 1e-7), (p, k)
+    text = dict(zip(keys, got["text"]))
+    assert "1 · (1 − 0.6) · (1 − 0.8) = 0.08" in text["CATS"]
+    assert "0.4 · 0.8 = 0.32" in text["1,3,1"] and "= 0.652" in text["1,3,1"]
+    assert "0.6 · 0.714 + 0.32 · 0.652 = 0.637" in text["W1"]
+    assert "0.6 · 0.286 = 0.171" in text["W2"] and "0.32 · 0.348 = 0.111" in text["W3"]
+    assert "אף מסלול לא מגיע לכאן" in text["2,3,2"]
+    page = (ROOT / "docs/questions/senior/0071-three-wizards-duel.md").read_text(encoding="utf-8")
+    assert page.count('class="figure mk-chain"') == 1 and 'data-p="0.599999999,0.6,0.8"' in page and 'data-me="1"' in page
+    assert 'id="mk-explain-a"' in page
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 

@@ -1854,13 +1854,27 @@ section below starts at session 22, whose numbered items run on through the late
     puts "ועוד" inside an `ltr()` run ("F1, F2, F3, F4 ועוד 1"), so a wrapped line shows "(1"
     at the start of the next line. Fixed: each Latin run (the horse, the list of faster ones,
     the count, the place) is isolated on its own, the Hebrew words between them.
+124. **0071: the chain explained, the box tighter (session 32, 2026-11-01).** The owner's
+    four touches and answers: the general chain in p1, p2, p3 left the question statement
+    (part א's chain with numbers stays, its intro paragraph now explains the chain); in the
+    box the six-orders table (one order column, "0.6 ← 0.8 ← אני"; a row is focusable and
+    a click, Enter or Space picks it) and a smaller chart (its own 360-wide frame) sit side by
+    side when there is room, the chain under them; the chart follows the pointer (a line, a
+    dot, the wand and my chance) and a click or tap sets the wand; the chain's rows are
+    closer (viewBox 480 × 340), and a state under the pointer, the focus or a tap lights its
+    edges and neighbours and explains its number in a fixed line under the chain (the reach
+    as a product or a sum, a duel's V(x, y) with the numbers, a win as the sum of its
+    arrows), in the box and on part א's figure (data-p, data-me and data-explain from
+    q0071.chain_svg; wizards.js wires it). `q0071.chain_states` is the reference of the box's
+    `wzStates`; a test checks both and the explanation's numbers. The labels of the two edges
+    into a win sit at different heights so that "0.599" twice does not merge.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
