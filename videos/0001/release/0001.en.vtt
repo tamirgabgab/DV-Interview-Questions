@@ -1,0 +1,284 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0001: a rising edge detector,
+a student-level question.
+
+2
+00:00:04.600 --> 00:00:10.100
+One part: draw the circuit, write it
+in SystemVerilog, and draw a timing diagram.
+
+3
+00:00:10.900 --> 00:00:15.300
+A signal sig is synchronous to a clock clk.
+What goes inside the box?
+
+4
+00:00:16.100 --> 00:00:21.067
+The goal: a pulse one clock cycle wide
+each time sig rises from 0 to 1.
+
+5
+00:00:21.767 --> 00:00:25.967
+Here is sig from the page's diagram,
+ten cycles of the clock.
+
+6
+00:00:25.967 --> 00:00:31.567
+sig rises twice, so we want two pulses,
+each exactly one cycle wide.
+
+7
+00:00:31.567 --> 00:00:35.733
+Even when sig stays high for four cycles,
+the pulse does not stretch.
+
+8
+00:00:36.133 --> 00:00:41.533
+A combinational circuit sees only sig of now.
+In cycle 2 and in cycle 4 it sees 1.
+
+9
+00:00:41.533 --> 00:00:47.033
+The difference is the cycle before: before cycle 2
+sig was 0, and before cycle 4 it was 1.
+
+10
+00:00:47.033 --> 00:00:51.033
+A change is a comparison of two cycles,
+so the circuit must remember the last sig.
+
+11
+00:00:51.833 --> 00:00:57.367
+A D flip-flop remembers the last value:
+at every rising clock edge it samples sig.
+
+12
+00:00:57.367 --> 00:01:01.333
+Its output, sig_q, is the value of sig
+in the previous cycle.
+
+13
+00:01:01.333 --> 00:01:06.300
+A rising edge: 1 now, and 0 before.
+That is sig, and the inverse of sig_q.
+
+14
+00:01:06.300 --> 00:01:11.600
+The output: pulse = sig & ~sig_q.
+That is the whole circuit: one memory, two gates.
+
+15
+00:01:12.600 --> 00:01:17.500
+Now let's build the timing diagram,
+cycle by cycle, with the same sig.
+
+16
+00:01:17.500 --> 00:01:22.967
+In cycles 0 and 1 sig is low. The reset
+starts sig_q at 0, and pulse is 0 too.
+
+17
+00:01:22.967 --> 00:01:28.267
+In cycle 2 sig rises. The flip-flop still
+remembers 0, so pulse = 1 & ~0 = 1.
+
+18
+00:01:28.267 --> 00:01:33.433
+At the next clock edge sig_q catches the 1,
+and ~sig_q = 0 clears pulse.
+
+19
+00:01:33.433 --> 00:01:38.400
+In cycles 4 and 5 sig is still high,
+but so is sig_q: the pulse does not stretch.
+
+20
+00:01:38.400 --> 00:01:43.200
+In cycle 6 sig falls, and the AND clears at once:
+a falling edge makes no pulse.
+
+21
+00:01:43.200 --> 00:01:47.167
+In cycle 7 sig_q falls to 0 as well,
+one cycle after sig.
+
+22
+00:01:47.167 --> 00:01:51.767
+In cycle 8 sig rises again. sig_q is 0,
+so a second pulse comes out.
+
+23
+00:01:51.767 --> 00:01:56.367
+And in cycle 9 sig_q catches the 1,
+and the pulse ends after one cycle.
+
+24
+00:01:56.767 --> 00:02:00.767
+sig_q is a copy of sig, one cycle late.
+The pulse: the cycles where sig = 1 and sig_q = 0.
+
+25
+00:02:01.567 --> 00:02:06.067
+And this is the page's diagram, in WaveDrom:
+the same four signals, the same cycles.
+
+26
+00:02:06.867 --> 00:02:12.367
+In the page's box you draw sig by clicking,
+and the circuit draws sig_q and pulse.
+
+27
+00:02:12.367 --> 00:02:17.033
+Click cycle 2: sig rises,
+and pulse is high in cycle 2 only.
+
+28
+00:02:17.033 --> 00:02:21.700
+Cycle 3: sig is still high, but sig_q is already 1,
+so there is no pulse.
+
+29
+00:02:21.700 --> 00:02:25.733
+With cycles 4 and 5 as well:
+one pulse, one cycle wide.
+
+30
+00:02:25.733 --> 00:02:29.700
+A second rise in cycle 8:
+another pulse, again one cycle.
+
+31
+00:02:29.700 --> 00:02:32.833
+And cycle 9 completes the page's diagram.
+
+32
+00:02:32.833 --> 00:02:37.333
+The reset trap: sig is already high
+when the reset is released, in cycle 0.
+
+33
+00:02:37.333 --> 00:02:41.333
+sig_q starts at 0, so a pulse comes out
+in cycle 0, with no rising edge.
+
+34
+00:02:41.333 --> 00:02:45.333
+If that is not wanted, reset sig_q to 1,
+or filter out the first cycle.
+
+35
+00:02:45.333 --> 00:02:49.833
+A follow-up: a falling edge is ~sig & sig_q,
+0 now and 1 before.
+
+36
+00:02:49.833 --> 00:02:53.500
+And any change, rising or falling,
+is sig ^ sig_q.
+
+37
+00:02:54.300 --> 00:02:57.333
+Now let's write it in SystemVerilog.
+
+38
+00:03:04.867 --> 00:03:09.367
+The module rise_detect: a clock, an active-low reset,
+the input sig and the output pulse.
+
+39
+00:03:10.567 --> 00:03:15.067
+sig_q: all the memory of the circuit,
+one bit, the sig of the previous cycle.
+
+40
+00:03:21.800 --> 00:03:26.300
+always_ff: registered logic, updated
+on a rising clk or a falling rst_n.
+
+41
+00:03:26.300 --> 00:03:30.300
+On reset sig_q is cleared to 0,
+and in every other cycle it samples sig.
+
+42
+00:03:32.533 --> 00:03:36.767
+assign: the output is combinational,
+exactly pulse = sig & ~sig_q.
+
+43
+00:03:37.733 --> 00:03:41.767
+And that is the whole module: one flip-flop,
+a NOT gate and an AND gate.
+
+44
+00:03:42.467 --> 00:03:46.000
+Let's walk through the code beside the box,
+from the empty diagram.
+
+45
+00:03:46.000 --> 00:03:50.900
+In cycle 2 sig = 1 and sig_q = 0,
+so the assign drives pulse = 1.
+
+46
+00:03:50.900 --> 00:03:55.067
+At the next clock edge: sig_q <= sig.
+Now sig_q = 1.
+
+47
+00:03:55.067 --> 00:03:59.467
+The assign computes again: ~sig_q = 0,
+and pulse falls after one cycle.
+
+48
+00:03:59.467 --> 00:04:03.333
+As long as sig stays high, sig_q stays 1
+and the pulse does not come back.
+
+49
+00:04:03.333 --> 00:04:08.233
+And on reset sig_q <= 0 even when sig is high:
+that is the trap's pulse.
+
+50
+00:04:09.333 --> 00:04:14.800
+The cost: one flip-flop and two gates.
+From the input sig to the output: one gate.
+
+51
+00:04:14.800 --> 00:04:18.800
+So the circuit does not limit the clock rate,
+and it has no counter or state machine.
+
+52
+00:04:19.600 --> 00:04:25.100
+A trap: detecting the edge with always @(posedge sig).
+That turns sig into another clock.
+
+53
+00:04:25.100 --> 00:04:30.600
+It gives no simple pulse one clk cycle wide.
+Instead, sample sig with clk.
+
+54
+00:04:31.400 --> 00:04:36.800
+A trap: sig coming from another clock domain.
+First synchronize it with two flip-flops,
+
+55
+00:04:36.800 --> 00:04:42.300
+and only then detect the edge. Otherwise metastability
+may make double or missing pulses.
+
+56
+00:04:43.099 --> 00:04:47.899
+In short: one flip-flop remembers sig,
+and pulse = sig & ~sig_q.
+
+57
+00:04:47.899 --> 00:04:53.799
+Try drawing sig yourself in the box
+on the page of question 0001 on the site.
