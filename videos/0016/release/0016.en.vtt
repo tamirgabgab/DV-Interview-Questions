@@ -1,0 +1,362 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0016: the Josephus problem,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:09.500
+Three parts: one leaves, two leave,
+and in the bonus L − 1 leave.
+
+3
+00:00:10.300 --> 00:00:15.100
+N people stand in a circle, numbered
+from 0 to N − 1 clockwise.
+
+4
+00:00:15.100 --> 00:00:20.400
+Person 0 stays, the next ones leave,
+the next stays, and so on around the circle.
+
+5
+00:00:20.400 --> 00:00:24.400
+Until one person is left: the survivor.
+Who is it, and what is the formula for any N?
+
+6
+00:00:25.200 --> 00:00:30.400
+Part A: person 0 stays and person 1 leaves,
+so every second one leaves. The survivor is F(N).
+
+7
+00:00:31.900 --> 00:00:35.667
+Start with 5 people. Person 0 stays,
+and person 1 leaves.
+
+8
+00:00:35.667 --> 00:00:39.433
+Person 2 stays, and person 3 leaves.
+
+9
+00:00:39.433 --> 00:00:43.667
+Person 4 stays, and the count goes on around
+the circle: person 0 leaves.
+
+10
+00:00:43.667 --> 00:00:47.967
+Person 2 stays, and person 4 leaves.
+The survivor is person 2: F(5) = 2.
+
+11
+00:00:48.767 --> 00:00:53.167
+Compute the survivor for every N up to 32,
+with a new row at each power of 2.
+
+12
+00:00:53.167 --> 00:00:58.067
+At each power of 2 the survivor is 0, and from
+there it climbs by 2 with each extra person.
+
+13
+00:00:58.067 --> 00:01:02.067
+For example 12 = 8 + 4 gives 8, and 31 = 16 + 15
+gives 30, the last cell of the row of 16.
+
+14
+00:01:02.067 --> 00:01:06.967
+The guess: if N = 2ᵐ + r with r < 2ᵐ,
+then F(N) = 2r. Now let's prove it.
+
+15
+00:01:07.767 --> 00:01:12.567
+First a power of 2: with 8 people,
+whoever starts the count is the survivor.
+
+16
+00:01:12.567 --> 00:01:18.033
+Round 1: all the odd ones leave, 4 are left,
+and the count comes back exactly to person 0.
+
+17
+00:01:18.033 --> 00:01:23.700
+Every round halves the circle and returns to the starter.
+After 3 rounds only person 0 is left.
+
+18
+00:01:23.700 --> 00:01:29.100
+With 2ᵐ people every round leaves half, again
+a power of 2, so whoever starts survives.
+
+19
+00:01:29.100 --> 00:01:34.600
+In general, for an even N a full round leaves
+the evens and starts from 0 again: F(2k) = 2F(k).
+
+20
+00:01:34.600 --> 00:01:39.200
+For example F(20) = 2F(10) = 4F(5) = 8,
+and we already saw F(5) = 2.
+
+21
+00:01:40.000 --> 00:01:45.533
+In the story, 41 people stood in a circle at Yodfat,
+but there every third one left, a different rule.
+
+22
+00:01:45.533 --> 00:01:50.333
+Run our rule on 41 = 32 + 9:
+a power of 2, plus 9 people.
+
+23
+00:01:50.333 --> 00:01:56.233
+Remove 9 people, 1, 3 up to 17,
+until exactly 32 are left: a power of 2.
+
+24
+00:01:56.233 --> 00:02:01.133
+Now the count starts from person 18.
+A circle of 32, so 18 is the survivor.
+
+25
+00:02:01.133 --> 00:02:05.133
+In general: after r eliminations all the odd ones
+up to 2r − 1 are gone, and person 2r starts.
+
+26
+00:02:05.133 --> 00:02:09.133
+Each extra person adds one elimination before
+the power of 2, so the survivor moves by 2.
+
+27
+00:02:09.133 --> 00:02:15.033
+Let's run to the end to check:
+everyone leaves, except person 18.
+
+28
+00:02:15.033 --> 00:02:20.333
+The survivor is 18: F(41) = 18. In the same
+way, 20 = 16 + 4 gives F(20) = 8.
+
+29
+00:02:21.133 --> 00:02:26.600
+In binary: 20 is 10100. The top bit
+is 16, and the bits after it are r = 4.
+
+30
+00:02:26.600 --> 00:02:32.067
+The top bit moves to the end and becomes 0:
+we get 01000, that is 2r = 8, the survivor.
+
+31
+00:02:32.067 --> 00:02:37.100
+And with 41, that is 101001: we get 010010,
+that is 18, as in the simulation.
+
+32
+00:02:37.100 --> 00:02:41.100
+Numbering from 0, the bit arrives at the end as 0.
+From 1, it stays 1, and the survivor is 2r + 1.
+
+33
+00:02:41.100 --> 00:02:46.400
+In hardware: a leading-one detector and a shift,
+the answer in one clock cycle, for any N.
+
+34
+00:02:47.200 --> 00:02:50.933
+In the page's box: 20 people in a circle,
+step by step.
+
+35
+00:02:50.933 --> 00:02:54.833
+After 10 steps, the end of round 1:
+only the even ones are left.
+
+36
+00:02:54.833 --> 00:02:59.133
+After 15 steps, the end of round 2:
+0, 4, 8, 12 and 16 are left.
+
+37
+00:02:59.133 --> 00:03:02.267
+And after 19 steps: the survivor is person 8.
+
+38
+00:03:03.062 --> 00:03:08.162
+Part B: person 0 stays, 1 and 2 leave,
+and so on. The survivor is F₃(N).
+
+39
+00:03:09.662 --> 00:03:14.496
+Seven people. Person 0 stays,
+and people 1 and 2 leave.
+
+40
+00:03:14.496 --> 00:03:19.329
+Person 3 stays, and 4 and 5 leave.
+
+41
+00:03:19.329 --> 00:03:24.662
+Person 6 stays, and 0 and 3 leave.
+The survivor is 6: F₃(7) = 6.
+
+42
+00:03:25.462 --> 00:03:31.262
+The survivor for every N up to 30. A step removes
+two, so we sort by parity: two chains.
+
+43
+00:03:31.262 --> 00:03:35.662
+The survivor drops to zero at 1, 3, 9 and 27,
+and among the evens at 2, 6 and 18.
+
+44
+00:03:35.662 --> 00:03:39.662
+Between two zero points of a chain, the survivor
+climbs by 3 with every step of 2.
+
+45
+00:03:39.662 --> 00:03:43.662
+What changed: two chains, zero points
+at 3ᵐ and 2 · 3ᵐ, and a climb of 3.
+
+46
+00:03:44.462 --> 00:03:49.929
+A full round on a multiple of 3 leaves the multiples
+of 3, and the count returns to person 0.
+
+47
+00:03:49.929 --> 00:03:54.829
+With 9 people: 0, 3 and 6 are left,
+again from person 0. Then only 0 is left.
+
+48
+00:03:54.829 --> 00:04:00.329
+Since F₃(1) = F₃(2) = 0, at every zero point,
+3ᵐ or 2 · 3ᵐ, whoever starts survives.
+
+49
+00:04:01.129 --> 00:04:06.029
+The same idea with 30 people. The even
+zero point below 30 is 18.
+
+50
+00:04:06.029 --> 00:04:11.229
+Each step removes two. After 6 steps
+exactly 18 are left: a zero point.
+
+51
+00:04:11.229 --> 00:04:16.262
+And the count starts from person 18, three
+per step: 3 · 6 = 18. That is the survivor.
+
+52
+00:04:16.262 --> 00:04:21.762
+Let's run to the end: everyone leaves,
+except person 18.
+
+53
+00:04:21.762 --> 00:04:27.262
+In general: from N go down j steps to the zero
+point M of the same parity; the survivor is 3j.
+
+54
+00:04:27.262 --> 00:04:32.296
+Mind the chain: 21 is odd, so M = 9
+and not 18, and the survivor is 18 again.
+
+55
+00:04:33.096 --> 00:04:37.096
+A digit rule here too, in base 3: write half of N,
+subtract 10…0 or 11…1, and append 0.
+
+56
+00:04:37.096 --> 00:04:42.596
+With 30: 15 is 120 in base 3, minus 100
+gives 20, and with 0 appended 200, that is 18.
+
+57
+00:04:42.596 --> 00:04:47.829
+With 21, odd: 10 is 101, minus 11
+gives 20, and again 200, that is 18.
+
+58
+00:04:48.629 --> 00:04:53.029
+In the page's box, with the rule of part B:
+thirty people in a circle.
+
+59
+00:04:53.029 --> 00:04:57.629
+After 10 steps only the multiples of 3
+are left, and the count is from person 0 again.
+
+60
+00:04:57.629 --> 00:05:00.762
+After 14 steps 18 and 27 are left.
+
+61
+00:05:00.762 --> 00:05:04.362
+And at step 15 person 27 leaves:
+the survivor is person 18.
+
+62
+00:05:05.161 --> 00:05:10.361
+Part C, bonus: one stays and L − 1 leave,
+for any L. One formula for every case.
+
+63
+00:05:11.061 --> 00:05:15.028
+One step removes L − 1 people, and shifts
+the numbering by L.
+
+64
+00:05:15.028 --> 00:05:19.428
+So there are L − 1 chains, by the remainder
+of N divided by L − 1.
+
+65
+00:05:19.428 --> 00:05:24.828
+The zero points are b · Lᵐ with 1 ≤ b < L,
+and between them the survivor climbs by L each step.
+
+66
+00:05:24.828 --> 00:05:28.828
+And the base: with fewer than L people, person 0
+stays and all the others leave at once.
+
+67
+00:05:28.828 --> 00:05:34.328
+The formula: M is the chain's zero point below N,
+and the survivor is L/(L − 1) · (N − M).
+
+68
+00:05:35.128 --> 00:05:39.794
+With L = 2: one chain, M = 2ᵐ,
+and F = 2(N − 2ᵐ). That is part A.
+
+69
+00:05:39.794 --> 00:05:45.194
+With L = 3: two chains by parity,
+and F = 3/2 · (N − M). That is part B.
+
+70
+00:05:45.194 --> 00:05:49.194
+With L = 4 there are three chains, by
+the remainder of N divided by 3.
+
+71
+00:05:49.194 --> 00:05:54.161
+And with L = 4 and N = 20: r = 2 and M = 8,
+and the survivor is 4/3 · 12 = 16.
+
+72
+00:05:54.961 --> 00:06:00.628
+To sum up: go down to a zero point, where whoever
+starts survives, and count the steps it took.
+
+73
+00:06:00.628 --> 00:06:04.528
+Try any N and any L in the box on the page
+of question 0016 on the site.
