@@ -23,8 +23,8 @@ from dvq import C, TX, BoxView, DVQScene, M, T, cost_chips  # noqa: E402
 QID = 55
 SCENES = [
     ("Opening", "פתיחה"),
-    ("ChapterA", "סעיף א – הביטים מגיעים מה-MSB"),
-    ("ChapterB", "סעיף ב – הביטים מגיעים מה-LSB"),
+    ("ChapterA", "סעיף א – כל ביט חדש נכנס כ-LSB"),
+    ("ChapterB", "סעיף ב – כל ביט חדש נכנס כ-MSB"),
     ("ChapterC", "סעיף ג – כל m, כל בסיס, ו-k ביטים במחזור"),
     ("Closing", "סיכום"),
 ]
@@ -503,9 +503,9 @@ class FsmScene(DVQScene):
 class Opening(FsmScene):
     def construct(self):
         self.opening(QID, "ג'וניור", "מכונת מצבים לחלוקה ב-3",
-                     ["א · מה-MSB", "ב · מה-LSB", "ג · כל m וכל בסיס"],
+                     ["א · ביט חדש כ-LSB", "ב · ביט חדש כ-MSB", "ג · כל m וכל בסיס"],
                      ["שאלה 0055 : מכונת מצבים לחלוקה ב-3,\nשאלה ברמת ג'וניור.",
-                      "שלושה סעיפים : ביטים מה-MSB, ביטים מה-LSB,\nואז כל m וכל בסיס."])
+                      "שלושה סעיפים : ביט חדש נכנס כ-LSB,\nביט חדש נכנס כ-MSB, ואז כל m וכל בסיס."])
         self.fade_all()
         panel = self.bits_panel([1, 1, 0], 0.6, 1.9, side=1.0)
         panel.arrange(RIGHT, buff=0.5).move_to([0.6, 1.9, 0])
@@ -527,7 +527,7 @@ class Opening(FsmScene):
 
 class ChapterA(FsmScene):
     def construct(self):
-        self.chapter_card("סעיף א", "הביטים מגיעים מה-MSB",
+        self.chapter_card("סעיף א", "כל ביט חדש נכנס כ-LSB",
                           "סעיף א : הביט החדש הוא הביט הנמוך\nשל המספר, כמו בקריאה רגילה.")
         self.idea()
         mc = self.states()
@@ -653,7 +653,7 @@ class ChapterA(FsmScene):
 
 class ChapterB(FsmScene):
     def construct(self):
-        self.chapter_card("סעיף ב", "הביטים מגיעים מה-LSB",
+        self.chapter_card("סעיף ב", "כל ביט חדש נכנס כ-MSB",
                           "סעיף ב : הביט החדש הוא הביט הגבוה\nשל המספר. 6 = 110 מגיע כ-0, 1, 1.")
         self.idea()
         self.states()

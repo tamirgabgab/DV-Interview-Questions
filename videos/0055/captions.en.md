@@ -10,10 +10,10 @@ he: שאלה ברמת ג'וניור.
 en: Question 0055: a state machine for division by 3,
 en: a junior-level question.
 
-he: שלושה סעיפים : ביטים מה-MSB, ביטים מה-LSB,
-he: ואז כל m וכל בסיס.
-en: Three parts: bits from the MSB, bits from the LSB,
-en: then any m and any base.
+he: שלושה סעיפים : ביט חדש נכנס כ-LSB,
+he: ביט חדש נכנס כ-MSB, ואז כל m וכל בסיס.
+en: Three parts: each new bit enters as the LSB,
+en: then as the MSB, then any m and any base.
 
 he: בכל מחזור שעון נכנס ביט אחד, din.
 he: המספר יכול להיות ארוך כרצוננו.
