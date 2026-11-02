@@ -1952,13 +1952,22 @@ section below starts at session 22, whose numbered items run on through the late
     "extra examples" of the code. Old `dvq-check:` keys stay unread in readers' browsers.
     The fast lane's classifier no longer names self-checks (any `data-` line is still
     guarded).
+133. **Videos 0030 and 0042 (session 32, 2026-11-02).** Chosen by the owner with guiding
+    questions. 0030 (5:02, `[0, 153]`): a translucent box, a colour per face kept through
+    the unfoldings, the trap of 42, the five-face route of 40 face by face, the page's 16
+    unfoldings in a table; part ב without code, the 16 as thumbnails, the strip of 48 lines
+    and the site's strip box. 0042 (7:07, `[0, 200]`): the trap of forgetting the way back,
+    the price list (60 + 100 + 300 − 60 = 400), the first segment trip by trip and the rest
+    fast, the camel box; part ב without code (the staircase, the area under 1/g, the closed
+    form and the bound's proof); the bonus as its own short YouTube chapter (the page has
+    two parts, so `video_parts` has two entries).
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

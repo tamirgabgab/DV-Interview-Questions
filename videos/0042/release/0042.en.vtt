@@ -1,0 +1,426 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0042: the camel and the water,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:10.067
+Two parts and a bonus: the question's numbers,
+the general formula, and special cases.
+
+3
+00:00:10.867 --> 00:00:15.100
+At the start there are 450 litres of water,
+three full loads of 150.
+
+4
+00:00:15.100 --> 00:00:20.133
+The camel carries up to 150 litres and drinks
+half a litre per km, loaded or not.
+
+5
+00:00:20.133 --> 00:00:24.133
+It may leave water in depots on the way
+and come back for more. How far can it get?
+
+6
+00:00:24.933 --> 00:00:29.833
+Part A: what is the farthest distance
+the camel can bring 30 litres to?
+
+7
+00:00:30.533 --> 00:00:36.033
+The first try: three loads, three walks,
+so every km costs 1.5 litres.
+
+8
+00:00:36.033 --> 00:00:41.333
+But between walks the camel goes back
+for the next load, and that burns water too.
+
+9
+00:00:41.333 --> 00:00:45.733
+Five crossings, not three:
+at the start every km costs 2.5 litres.
+
+10
+00:00:45.733 --> 00:00:51.233
+A calculation that counts only the walks forward:
+a first segment of 100 km, and an answer of 440 km.
+
+11
+00:00:51.233 --> 00:00:55.767
+But that cannot be reached: the camel
+cannot skip the way back.
+
+12
+00:00:55.767 --> 00:00:59.767
+This is the most common mistake in this puzzle:
+counting only the way forward.
+
+13
+00:01:00.567 --> 00:01:06.067
+The price list: with j loads, j walks forward
+and j − 1 back, so 2j − 1 crossings.
+
+14
+00:01:06.067 --> 00:01:10.800
+Three loads: 2.5 litres per km.
+Two: 1.5. One load: 0.5.
+
+15
+00:01:11.400 --> 00:01:16.900
+A litre at 2.5 per km moves the water
+only 1/2.5 km. So litres turn into km.
+
+16
+00:01:16.900 --> 00:01:21.633
+The top load is worth 60 km, the next 100,
+and the last 300: 460 in all.
+
+17
+00:01:21.633 --> 00:01:27.033
+But 30 litres must arrive. In the last load
+they are worth 60 km we may not burn.
+
+18
+00:01:27.033 --> 00:01:31.433
+That leaves 460 − 60 = 400 km.
+That is the answer; now the plan.
+
+19
+00:01:32.233 --> 00:01:37.733
+Where to stop? Say at 50 km, a round number.
+After 50 km at 2.5, 325 litres are left.
+
+20
+00:01:37.733 --> 00:01:43.233
+More than two loads: the next segment still
+pays 2.5 for 10 more km, or 25 are spilled.
+
+21
+00:01:43.233 --> 00:01:47.233
+So stop only when a whole load runs out exactly:
+there, and not before, the price drops.
+
+22
+00:01:48.033 --> 00:01:53.433
+Stop exactly when a whole load runs out:
+300 left at 60 km, 150 left at 160.
+
+23
+00:01:53.433 --> 00:01:59.033
+Segment 1, from 0 to 60: each walk burns 30.
+Take 150, arrive with 120, and leave 90.
+
+24
+00:01:59.033 --> 00:02:03.633
+Go back with 30, exactly what the way back burns,
+and reach the start empty.
+
+25
+00:02:03.633 --> 00:02:08.367
+Take another 150, again arrive with 120
+and leave 90. Depot 60 holds 180.
+
+26
+00:02:08.367 --> 00:02:12.767
+Back again with 30. At the start one last
+load is left, 150 litres.
+
+27
+00:02:12.767 --> 00:02:18.500
+The third time it does not go back and leaves everything:
+depot 60 holds 300 litres, two loads.
+
+28
+00:02:18.500 --> 00:02:22.500
+Five crossings of 60 km burned 150 litres,
+exactly one load. From here the price is 1.5.
+
+29
+00:02:22.500 --> 00:02:28.100
+Segment 2, from 60 to 160, the same way: each walk
+burns 50; out, back and out.
+
+30
+00:02:28.100 --> 00:02:32.100
+Three crossings of 100 km burned 150:
+depot 160 holds 150 litres, one load.
+
+31
+00:02:32.100 --> 00:02:37.133
+Segment 3: one load, no returns.
+Walk 240 km, burn 120, and arrive with 30.
+
+32
+00:02:37.133 --> 00:02:42.100
+400 km, with 30 litres at the target. Check:
+every litre was burned on the way or arrived.
+
+33
+00:02:42.600 --> 00:02:47.700
+The camel crossed the first segment 5 times,
+the second 3, and the last once.
+
+34
+00:02:47.700 --> 00:02:51.167
+840 km walked in all,
+to advance 400.
+
+35
+00:02:51.967 --> 00:02:57.133
+Why no further? The water still in motion
+drops from 450 to 30 along the road.
+
+36
+00:02:57.133 --> 00:03:01.800
+The slope in each segment is the price list:
+there is no cheaper way to move water.
+
+37
+00:03:01.800 --> 00:03:05.800
+Every km burns at least one km of the 460 range,
+so 400 is the maximum. The proof is in part B.
+
+38
+00:03:06.600 --> 00:03:10.633
+This is how the page's box shows it:
+the passes one after another.
+
+39
+00:03:10.633 --> 00:03:14.533
+After five passes all the water
+is at 60 km: 300 litres.
+
+40
+00:03:14.533 --> 00:03:19.667
+And the last pass: 30 litres reach
+400 km, with the price list under each segment.
+
+41
+00:03:20.466 --> 00:03:25.366
+Part B: the camel drinks a per km, carries c,
+there are w litres, and T must arrive.
+
+42
+00:03:26.066 --> 00:03:31.566
+The general price list: with N litres in motion
+you need ⌈N / c⌉ loads, and each km costs g(N).
+
+43
+00:03:31.566 --> 00:03:36.466
+The price is a staircase, dropping at every multiple of c.
+That is exactly where to stop.
+
+44
+00:03:37.066 --> 00:03:42.033
+A litre at price g buys 1/g km. The range
+of the water is the area under 1/g.
+
+45
+00:03:42.033 --> 00:03:46.766
+With part A's numbers: 300 + 100 + 60 = 460,
+the loads from the bottom up.
+
+46
+00:03:46.766 --> 00:03:50.766
+The top load is worth the least, 60 km,
+because it is carried the most times.
+
+47
+00:03:50.766 --> 00:03:55.299
+The 30 litres that must arrive are 60
+of the area: those are not burned.
+
+48
+00:03:55.299 --> 00:04:00.799
+The maximum distance is the area between T and w:
+the water's range minus what must arrive.
+
+49
+00:04:01.599 --> 00:04:06.999
+The levels: w, the multiples of c between T and w,
+and T. Each two adjacent levels are a segment.
+
+50
+00:04:06.999 --> 00:04:11.166
+A segment's length: the drop in water
+divided by the price of its loads.
+
+51
+00:04:11.166 --> 00:04:15.566
+In part A: 60, 100 and 240 km,
+the plan's three segments.
+
+52
+00:04:16.366 --> 00:04:21.666
+Each segment has j walks forward. On every walk
+but the last the camel takes a full load.
+
+53
+00:04:21.666 --> 00:04:25.666
+It burns aL on the way, keeps aL for the return,
+and leaves c − 2aL at the far depot.
+
+54
+00:04:25.666 --> 00:04:30.266
+On the last walk it takes what is left,
+the partial load, and leaves it all.
+
+55
+00:04:30.266 --> 00:04:34.266
+2j − 1 crossings of L burn exactly
+the drop: the far depot reaches the next level.
+
+56
+00:04:35.066 --> 00:04:40.533
+Let k be the loads, the top one partial,
+of size r: what is left above k − 1 full ones.
+
+57
+00:04:40.533 --> 00:04:46.033
+Each full load from the bottom is worth c / (2j − 1)a,
+the partial one on top r / (2k − 1)a.
+
+58
+00:04:46.033 --> 00:04:49.999
+And subtract T / a: the km
+the water that must arrive is worth.
+
+59
+00:04:49.999 --> 00:04:53.999
+With T = 0 this is exactly Φ(w): the camel reaches
+at most 460 km, empty.
+
+60
+00:04:53.999 --> 00:04:58.466
+Check against part A: k = 3 and r = 150,
+and the formula gives 400.
+
+61
+00:04:59.266 --> 00:05:04.766
+It remains to prove that no plan, even a clever
+one we did not think of, goes further.
+
+62
+00:05:04.766 --> 00:05:08.766
+The idea: count how much range each km
+of road burns, in any plan at all.
+
+63
+00:05:09.566 --> 00:05:15.066
+Each crossing forward carries at most c, so N litres
+need at least ⌈N / c⌉ crossings, with returns between.
+
+64
+00:05:15.066 --> 00:05:19.966
+So every km costs at least g(N):
+the price list is a lower bound on the price.
+
+65
+00:05:19.966 --> 00:05:24.566
+So in any plan the water in motion drops
+at least at rate g, every km.
+
+66
+00:05:24.566 --> 00:05:29.299
+And by the chain rule, every km of road
+burns at least one km of range.
+
+67
+00:05:29.299 --> 00:05:33.299
+Summed along the road: after d km
+at most Φ(w) − d of range is left.
+
+68
+00:05:33.299 --> 00:05:38.766
+For T litres to arrive, d cannot exceed
+Φ(w) − Φ(T). That is exactly the formula.
+
+69
+00:05:39.566 --> 00:05:45.066
+And the plan that stops at every multiple of c
+pays exactly the price list: it reaches the bound.
+
+70
+00:05:45.066 --> 00:05:49.066
+A stop anywhere else: the camel keeps paying
+for a load it no longer needs, or spills water.
+
+71
+00:05:49.866 --> 00:05:55.266
+The first stop is where the partial load runs out,
+and each stop after it where a whole load runs out.
+
+72
+00:05:55.266 --> 00:05:59.566
+In part A: stops at 60 and 160 km,
+exactly as in the plan.
+
+73
+00:05:59.566 --> 00:06:05.066
+At stop i, (k − i)c litres are left. The last
+segment, with one load, is (c − T) / a long.
+
+74
+00:06:05.866 --> 00:06:11.266
+In the general box you choose consumption, capacity,
+water and target. These are part A's numbers.
+
+75
+00:06:11.266 --> 00:06:16.399
+With 250 litres: a partial load of 100 on top,
+a stop at 66.7 km, and a distance of 306.7.
+
+76
+00:06:17.199 --> 00:06:21.499
+Bonus: three short questions
+that check the formula is really understood.
+
+77
+00:06:22.199 --> 00:06:27.699
+One load: no stops, the camel just walks
+until T litres are left. 150 litres: 240.
+
+78
+00:06:27.699 --> 00:06:32.999
+A target larger than a load: the same principle.
+200 litres to the target reach only 126.7 km.
+
+79
+00:06:32.999 --> 00:06:38.233
+And lots of water: the series 1 + 1/3 + 1/5 ...
+diverges, so any distance can be reached.
+
+80
+00:06:38.233 --> 00:06:42.233
+But slowly: each time the water is multiplied by e
+it adds only c / 2a, here 150 km.
+
+81
+00:06:43.033 --> 00:06:48.533
+In the box: the exact distance against the water,
+the approximation dashed. 450 litres: 400 km.
+
+82
+00:06:48.533 --> 00:06:52.133
+With 1,500 litres, more than three times as much,
+only 580 km.
+
+83
+00:06:52.133 --> 00:06:55.866
+And with 3,000 litres: 683.9 km.
+The growth is logarithmic.
+
+84
+00:06:56.666 --> 00:07:01.699
+To sum up: stop when a whole load runs out,
+and reach 400 km with 30 litres.
+
+85
+00:07:01.699 --> 00:07:06.099
+Try your own water and capacity in the box
+on question 0042's page on the site.
