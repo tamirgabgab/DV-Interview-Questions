@@ -1910,13 +1910,20 @@ section below starts at session 22, whose numbered items run on through the late
     a stream stepped through the circuit cycle by cycle, one beat on 11 staying 11 while
     b = 0; part ג in about a minute with the box (343 in base 10, m = 7, from each end).
     7:04, `video_parts` [0, 210, 355].
+129. **Video 0039 (session 32, 2026-11-02).** Eggs and floors (6:55, `video_parts` [0, 193]):
+    a 100-floor building in Manim, one egg, two eggs (14), three eggs; the question turned
+    around (floors coverable in t drops), the table (92 < 100 ≤ 129), the plan 37, 66, 88,
+    100 run against T = 36 (nine drops), the box, 93 < 101 for why 8 are not enough; part ב
+    the closed form, a decision tree, `egg_table`, `min_drops` and `egg_run` typed in an
+    11-row window and `egg_run(3, 100, 36)` traced drop by drop (the box after: beside the
+    code it would be at 0.52 of its page size), the box's chart of every threshold.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); video 0039 (item 129).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

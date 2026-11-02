@@ -1,0 +1,358 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0039: eggs and floors,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:09.900
+Two parts: three eggs and a hundred floors,
+then k eggs and n floors, with code.
+
+3
+00:00:10.700 --> 00:00:15.300
+A building of 100 floors, and three identical eggs.
+The building has a threshold floor.
+
+4
+00:00:15.300 --> 00:00:19.833
+An egg dropped above the threshold breaks,
+and from the threshold or below it does not.
+
+5
+00:00:19.833 --> 00:00:23.833
+The threshold can be any number from 0 to 100.
+We must find it in the worst case.
+
+6
+00:00:24.633 --> 00:00:29.300
+Part A: how many drops in the worst case,
+and from which floors do we drop?
+
+7
+00:00:30.800 --> 00:00:35.467
+With one egg there is no choice:
+drop from floor 1, 2, 3, and so on.
+
+8
+00:00:35.467 --> 00:00:40.700
+If it breaks midway, there is no other egg.
+So in the worst case: 100 drops.
+
+9
+00:00:41.200 --> 00:00:46.367
+With two eggs, the first one jumps,
+and the second goes floor by floor below it.
+
+10
+00:00:46.367 --> 00:00:51.900
+The jumps shrink by one: 14, 27, 39.
+Every jump costs the first egg a drop.
+
+11
+00:00:51.900 --> 00:00:57.400
+If the first breaks at 27, the second checks
+15 to 26: 2 + 12 = 14 drops.
+
+12
+00:00:57.400 --> 00:01:01.400
+Wherever the first one breaks, it comes to 14.
+That is the worst case with two eggs.
+
+13
+00:01:01.900 --> 00:01:07.200
+The idea: turn the question around. How many floors
+can k eggs and t drops settle?
+
+14
+00:01:07.200 --> 00:01:12.700
+Drop from one floor. If it broke, the threshold is below,
+with one egg fewer and one drop fewer.
+
+15
+00:01:12.700 --> 00:01:16.867
+If it did not break, the threshold is above:
+the same eggs, and one drop fewer.
+
+16
+00:01:16.867 --> 00:01:22.167
+Plus the floor itself. That is the recurrence,
+with zero when there are no eggs or no drops.
+
+17
+00:01:22.967 --> 00:01:27.567
+Fill a table: one egg settles t floors,
+and two settle t(t + 1)/2.
+
+18
+00:01:27.567 --> 00:01:33.300
+The three-egg column: every cell is
+the cell up-left, plus 1, plus the cell above.
+
+19
+00:01:33.300 --> 00:01:38.200
+For example 129 = 36 + 1 + 92.
+With 8 drops only 92 floors, fewer than 100.
+
+20
+00:01:38.200 --> 00:01:42.200
+And with 9 drops already 129 floors.
+So the answer is 9 drops.
+
+21
+00:01:43.600 --> 00:01:49.100
+The first drop: if it broke, two eggs
+and 8 drops are left for 36 floors. So from floor 37.
+
+22
+00:01:49.100 --> 00:01:54.067
+If it did not break, the next jump is smaller:
+to floor 66, then 88, then 100.
+
+23
+00:01:55.467 --> 00:01:59.767
+Let us run the plan on the page's example,
+with the threshold at floor 36.
+
+24
+00:01:59.767 --> 00:02:04.567
+37 is above the threshold: the egg breaks.
+Two eggs and eight drops are left for 1 to 36.
+
+25
+00:02:04.567 --> 00:02:10.467
+The second in shrinking jumps: 8, 15, 21, 26,
+30, 33, 35. None of them breaks.
+
+26
+00:02:10.467 --> 00:02:15.700
+The ninth drop, from floor 36, does not break.
+36 is safe and 37 breaks: the threshold is 36.
+
+27
+00:02:16.500 --> 00:02:20.600
+The page's box runs the same example,
+drop after drop.
+
+28
+00:02:20.600 --> 00:02:24.700
+Drop 1 from floor 37: broke.
+The part above 36 is known to break.
+
+29
+00:02:24.700 --> 00:02:29.167
+Drop 2 from floor 8: did not break.
+The unknown range is 9 to 36.
+
+30
+00:02:29.167 --> 00:02:34.967
+Then 15, 21 and 26: the unknown range
+shrinks with every drop, from below.
+
+31
+00:02:34.967 --> 00:02:40.767
+And after them 30, 33 and 35.
+None of them breaks.
+
+32
+00:02:40.767 --> 00:02:45.567
+And in the ninth drop, from floor 36: the threshold is 36.
+Nine drops, as computed.
+
+33
+00:02:46.367 --> 00:02:51.600
+And why not 8? Eight drops and three eggs
+tell apart at most 93 thresholds.
+
+34
+00:02:51.600 --> 00:02:56.133
+And there are 101 possible thresholds, from 0 to 100.
+The full proof is in part B.
+
+35
+00:02:56.933 --> 00:03:02.433
+The number of drops grows like the cube root of 6n:
+19 for 1,000 floors, and 40 for 10,000.
+
+36
+00:03:03.733 --> 00:03:07.633
+A trap: binary search. From floor 50,
+and the egg breaks.
+
+37
+00:03:07.633 --> 00:03:12.933
+Two eggs are left for 49 floors, which need
+10 drops. 11 in all, not 9.
+
+38
+00:03:13.728 --> 00:03:18.394
+Part B: any number of eggs and any number of floors.
+A formula, a proof and code.
+
+39
+00:03:19.094 --> 00:03:23.561
+The recurrence has a closed form:
+a sum of binomial coefficients.
+
+40
+00:03:23.561 --> 00:03:28.861
+The proof is by induction, with Pascal's rule.
+For three eggs and 9 drops: 129.
+
+41
+00:03:29.661 --> 00:03:35.194
+Every plan is a decision tree: at each node
+a drop, left if it broke and right if not.
+
+42
+00:03:35.194 --> 00:03:40.428
+Every path has at most k breaks.
+With two eggs and three drops, 000 is impossible.
+
+43
+00:03:40.428 --> 00:03:45.094
+So at most 7 leaves, and 7 thresholds:
+exactly 6 floors, f(2, 3).
+
+44
+00:03:45.894 --> 00:03:50.794
+In general: a leaf per threshold, so we need
+f(k, t) ≥ n. The condition the code looks for.
+
+45
+00:03:50.794 --> 00:03:56.194
+With three eggs and 8 drops: 93 leaves,
+and there are 101 thresholds. So 8 is not enough.
+
+46
+00:03:56.994 --> 00:03:59.994
+Now let us write it in Python.
+
+47
+00:04:03.228 --> 00:04:07.728
+egg_table builds the table F: how many floors
+e eggs settle in t drops.
+
+48
+00:04:10.661 --> 00:04:15.161
+At first everything is zero: with no eggs
+or no drops no floor is settled.
+
+49
+00:04:22.494 --> 00:04:26.994
+For every e and every t, the recurrence of part A,
+capped at n: above n the value changes nothing.
+
+50
+00:04:27.894 --> 00:04:30.394
+And returns the table.
+
+51
+00:04:38.194 --> 00:04:42.661
+min_drops: the first t
+at which the table covers all n floors.
+
+52
+00:04:47.428 --> 00:04:51.928
+egg_run runs the plan against a given threshold,
+and returns the drops.
+
+53
+00:04:58.228 --> 00:05:02.728
+low: the highest floor known to be safe. high:
+the lowest floor known to break. Plus eggs and t.
+
+54
+00:05:05.194 --> 00:05:09.161
+As long as some floor between low and high
+is unknown, we drop.
+
+55
+00:05:13.494 --> 00:05:17.994
+The next floor: above low by exactly what
+the eggs left can settle, plus one.
+
+56
+00:05:22.694 --> 00:05:26.728
+Above the threshold the egg breaks.
+We record the drop and its result.
+
+57
+00:05:28.294 --> 00:05:30.961
+Either way one drop fewer is left.
+
+58
+00:05:36.361 --> 00:05:40.861
+Broke: high comes down to the floor, and one egg fewer.
+Not broken: low goes up to the floor.
+
+59
+00:05:42.794 --> 00:05:47.294
+When high = low + 1 no floor is unknown,
+and we return the drops.
+
+60
+00:05:48.494 --> 00:05:53.094
+Let us run it on the page's example: three eggs,
+100 floors, and the threshold 36.
+
+61
+00:05:53.094 --> 00:05:58.694
+The first drop, from floor 37, is above the threshold:
+it broke. high = 37, and two eggs are left.
+
+62
+00:05:58.694 --> 00:06:03.261
+The second: 0 + F[1][7] + 1 = 8.
+It did not break, so low = 8.
+
+63
+00:06:03.261 --> 00:06:07.761
+Then six drops that do not break:
+15, 21, 26, 30, 33 and 35.
+
+64
+00:06:07.761 --> 00:06:12.328
+The ninth from floor 36: did not break.
+low = 36, and high = 37.
+
+65
+00:06:12.328 --> 00:06:17.294
+No floor is unknown any more: the threshold is 36,
+after nine drops, as in part A.
+
+66
+00:06:18.094 --> 00:06:23.194
+The box runs the plan against every threshold,
+from 0 to 100, and counts the drops.
+
+67
+00:06:23.194 --> 00:06:27.194
+No threshold goes past 9, and 46 thresholds
+reach exactly 9: that is the worst case.
+
+68
+00:06:27.994 --> 00:06:33.394
+The cost: the table O(kn), one run O(t),
+and the check against every threshold O(nt).
+
+69
+00:06:34.194 --> 00:06:39.694
+A trap: counting 100 thresholds. The threshold can
+also be 0 or 100: there are n + 1 thresholds.
+
+70
+00:06:39.694 --> 00:06:43.194
+Whoever counts n gets a lower bound
+that is off by one.
+
+71
+00:06:43.985 --> 00:06:48.218
+To sum up: instead of how many drops, how many floors
+t drops settle.
+
+72
+00:06:48.218 --> 00:06:53.618
+Try your own numbers in the box
+on the page of question 0039 on the site.
