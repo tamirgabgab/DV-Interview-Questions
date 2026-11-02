@@ -1,0 +1,387 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.667
+Question 0009: 16 people, 16 boxes
+and one helper. Junior level.
+
+2
+00:00:04.667 --> 00:00:08.400
+Two parts: the strategy,
+then the code that carries it out.
+
+3
+00:00:09.200 --> 00:00:14.433
+A room with 16 boxes, each holding a note
+with a number from 1 to 16, each number once.
+
+4
+00:00:14.433 --> 00:00:19.600
+The small number is the box, the big one
+is the note inside: box 1 holds note 6.
+
+5
+00:00:20.100 --> 00:00:25.133
+Person 0 goes in first: he looks into every box
+and may swap notes up to 4 times.
+
+6
+00:00:25.133 --> 00:00:30.533
+Then persons 1 to 16, one at a time:
+each opens up to 8 boxes, moving nothing.
+
+7
+00:00:30.533 --> 00:00:35.833
+The goal: everybody must find their own note.
+If one fails, everybody loses.
+
+8
+00:00:36.633 --> 00:00:41.733
+Part A: which strategy guarantees
+that everybody wins, for any arrangement?
+
+9
+00:00:43.233 --> 00:00:47.333
+The idea: every person first opens
+the box with his own number.
+
+10
+00:00:47.333 --> 00:00:51.733
+Then the box whose number is written
+on the note he found, and so on.
+
+11
+00:00:51.733 --> 00:00:57.000
+Let's follow person 1: box 1 holds note 6,
+then 11, 3, 14, 9, 16 and 4.
+
+12
+00:00:57.000 --> 00:01:02.167
+8 opens are used up and note 1 is still missing.
+It is in box 8, the 16th in the chain.
+
+13
+00:01:02.767 --> 00:01:07.967
+Following the notes from any box,
+the arrows always close into cycles.
+
+14
+00:01:07.967 --> 00:01:13.467
+Here all 16 boxes are on one cycle:
+box 1 points to 6, 6 to 11, and so on.
+
+15
+00:01:13.467 --> 00:01:18.967
+Why cycles? One arrow leaves each box
+and one enters it: every note appears once.
+
+16
+00:01:18.967 --> 00:01:23.067
+Person i starts at box i,
+so he walks along that box's cycle.
+
+17
+00:01:23.067 --> 00:01:27.733
+Note i is in the box that points back
+to box i: the last one on the cycle.
+
+18
+00:01:27.733 --> 00:01:32.467
+So whoever is on a cycle of length L finds
+his note at exactly the L-th open.
+
+19
+00:01:32.467 --> 00:01:37.500
+A cycle of up to 8: everybody on it succeeds.
+Here L = 16: all 16 people fail.
+
+20
+00:01:38.000 --> 00:01:43.033
+Without person 0 this happens a lot: the strategy
+succeeds in only about a third of arrangements.
+
+21
+00:01:43.033 --> 00:01:47.433
+And opening 8 random boxes is far worse:
+it almost never works.
+
+22
+00:01:47.933 --> 00:01:52.833
+Now person 0 comes in. He sees every box,
+so he sees the cycle.
+
+23
+00:01:52.833 --> 00:01:58.300
+He swaps the note of box 1, the start of the cycle,
+with the note of box 12, in the middle.
+
+24
+00:01:58.300 --> 00:02:01.967
+Note 6 moves to box 12,
+and note 7 moves to box 1.
+
+25
+00:02:01.967 --> 00:02:07.367
+Only two arrows change, and the cycle splits
+into two cycles, each of length 8.
+
+26
+00:02:07.367 --> 00:02:12.967
+Person 1 now: 1, 7, 2, 15, 5, 10, 13 and 8.
+His note is at the eighth open.
+
+27
+00:02:12.967 --> 00:02:17.700
+So everybody finds his note at exactly
+the 8th open: everybody wins.
+
+28
+00:02:18.500 --> 00:02:23.733
+Why does it work for any arrangement? First fact:
+there is at most one long cycle.
+
+29
+00:02:23.733 --> 00:02:29.133
+The cycle lengths add up to 16, and two cycles
+over 8 would already need 18 boxes.
+
+30
+00:02:29.133 --> 00:02:34.633
+Second fact: swapping the notes of c0
+and ch cuts the cycle into two cycles.
+
+31
+00:02:34.633 --> 00:02:38.133
+One of length L − h, the other of length h.
+
+32
+00:02:38.733 --> 00:02:44.200
+Choose the middle, h = ⌊L/2⌋. Since L ≤ 16,
+both pieces have length 8 at most.
+
+33
+00:02:44.200 --> 00:02:48.867
+So one swap is always enough,
+and the other three swaps are not needed.
+
+34
+00:02:49.667 --> 00:02:53.900
+A second arrangement, the page's example:
+the notes in boxes 1 to 16.
+
+35
+00:02:53.900 --> 00:02:59.100
+Following the arrows gives three cycles:
+of lengths 11, 3 and 2.
+
+36
+00:02:59.100 --> 00:03:04.700
+Person 13 is on the long cycle: 13, 1, 7, 12,
+3, 15, 9 and 4. 8 opens are used up.
+
+37
+00:03:04.700 --> 00:03:08.200
+Note 13 is in box 5,
+the 11th on the cycle: too far.
+
+38
+00:03:08.800 --> 00:03:13.767
+Person 0 swaps box 1 and box 9:
+they are c0 and c5, since ⌊11/2⌋ = 5.
+
+39
+00:03:13.767 --> 00:03:19.767
+Note 7 moves to box 9, and note 4 to box 1.
+The cycle of 11 splits into 6 and 5.
+
+40
+00:03:19.767 --> 00:03:25.500
+And now person 13: 13, 1, 4, 16, 10 and 5.
+Box 5 holds his note, at the sixth open.
+
+41
+00:03:25.500 --> 00:03:29.900
+And so for all 16 people: each of them
+needs 6 opens at most.
+
+42
+00:03:30.700 --> 00:03:35.667
+The page's box has the same arrangement. The dashed
+arrows are person 0's swap.
+
+43
+00:03:35.667 --> 00:03:40.267
+With each click person 13 opens a box:
+first box 13, which holds note 1.
+
+44
+00:03:40.267 --> 00:03:43.733
+He follows the notes:
+box 1, then box 4.
+
+45
+00:03:43.733 --> 00:03:47.700
+And at the sixth open, in box 5,
+he finds his note.
+
+46
+00:03:47.700 --> 00:03:52.667
+Without person 0 the cycle of 11 is red again,
+and person 13 fails after 8 opens.
+
+47
+00:03:53.466 --> 00:03:58.666
+Part B: implement the room with its limits,
+person 0, everybody else, and a whole game.
+
+48
+00:03:59.366 --> 00:04:04.266
+First the room, briefly and not typed:
+the class Room that enforces the rules.
+
+49
+00:04:04.266 --> 00:04:08.666
+The limits: 8 opens and 4 swaps.
+The room keeps a private copy of the notes.
+
+50
+00:04:08.666 --> 00:04:13.466
+look_all and swap only for person 0, before
+anybody else enters, and up to 4 swaps.
+
+51
+00:04:13.466 --> 00:04:18.566
+enter gives everyone who enters 8 opens, and open_box
+counts them: the room enforces the rules.
+
+52
+00:04:19.666 --> 00:04:24.566
+Now the strategy. First a helper function,
+shared by person 0 and everybody else.
+
+53
+00:04:26.533 --> 00:04:30.066
+cycle_from takes the notes
+and a starting box.
+
+54
+00:04:32.933 --> 00:04:37.433
+Start a list with the starting box,
+and move to the box its note names.
+
+55
+00:04:41.766 --> 00:04:46.266
+Until we are back at the start: add the box,
+and follow its note.
+
+56
+00:04:47.466 --> 00:04:49.966
+At the end, return the whole cycle.
+
+57
+00:04:49.966 --> 00:04:53.933
+In the page's example, from box 2:
+2, 11, 6, and back to 2.
+
+58
+00:04:57.599 --> 00:05:01.199
+Person 0 is the function helper,
+which takes the room.
+
+59
+00:05:04.133 --> 00:05:08.633
+He reads all the notes at once,
+and remembers which boxes he has visited.
+
+60
+00:05:16.633 --> 00:05:21.133
+He goes over the boxes, skips those already on a cycle,
+and finds the cycle of each new box.
+
+61
+00:05:26.866 --> 00:05:31.366
+A cycle longer than 8: swap the first and the middle,
+and leave. There is no second long cycle.
+
+62
+00:05:32.066 --> 00:05:34.866
+Let's run person 0 on the page's example.
+
+63
+00:05:34.866 --> 00:05:39.666
+The cycle of box 1 is the long cycle,
+with 11 boxes.
+
+64
+00:05:39.666 --> 00:05:45.333
+11 is longer than 8: he swaps cycle[0] = 1
+and cycle[5] = 9, and leaves. One swap.
+
+65
+00:05:49.066 --> 00:05:53.566
+Everybody else is find_my_note:
+it takes the room and his own number.
+
+66
+00:05:55.466 --> 00:05:59.966
+Enter, and start at your own box: that way
+you are on the cycle of your note.
+
+67
+00:06:05.833 --> 00:06:09.633
+Up to 8 times, open a box,
+and if the note is yours, you found it.
+
+68
+00:06:11.766 --> 00:06:16.266
+Otherwise move to the box on the note. After
+8 opens without the note: failed.
+
+69
+00:06:16.966 --> 00:06:19.633
+Person 13, after person 0's swap.
+
+70
+00:06:19.633 --> 00:06:24.599
+He starts at box 13, which holds note 1:
+not his, so he moves to box 1.
+
+71
+00:06:24.599 --> 00:06:29.266
+Then boxes 1, 4, 16 and 10,
+with notes 4, 16, 10 and 5.
+
+72
+00:06:29.266 --> 00:06:33.933
+Box 5 holds note 13: he found it,
+at the sixth open.
+
+73
+00:06:34.733 --> 00:06:39.766
+play builds a room, runs person 0, then
+everybody else, and checks that all 16 found theirs.
+
+74
+00:06:39.766 --> 00:06:44.433
+The code was tested on all 231 cycle structures
+and on 20,000 random arrangements.
+
+75
+00:06:44.433 --> 00:06:48.533
+In all of them all 16 people won,
+with at most one swap.
+
+76
+00:06:49.333 --> 00:06:54.733
+The cost: person 0 takes O(N) time and memory,
+and each of the others O(1) memory.
+
+77
+00:06:55.526 --> 00:07:00.626
+To sum up: the notes form cycles, and person 0
+cuts the long cycle with one swap.
+
+78
+00:07:00.626 --> 00:07:05.526
+Try your own arrangements in the box
+on the page of question 0009 on the site.
