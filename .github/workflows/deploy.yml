@@ -43,6 +43,9 @@ jobs:
     timeout-minutes: 5   # usually a few seconds
     outputs:
       verified: ${{ steps.check.outputs.verified }}
+      fast: ${{ steps.text.outputs.fast }}
+      ids: ${{ steps.text.outputs.ids }}
+      pages: ${{ steps.text.outputs.pages }}
     steps:
       - id: check
         env:
@@ -56,10 +59,27 @@ jobs:
           fi
           echo "verified=$verified" >> "$GITHUB_OUTPUT"
           echo "this commit already passed on a work branch: $verified"
+      # The fast lane: a push that changes only the prose of question pages (or only files
+      # outside the site, the videos and the notes) runs the lint, the build, the links, the
+      # touched questions' Python tests and the phone check of the touched pages, a few
+      # minutes, instead of every check (tools/text_only.py, CONTRIBUTING.md "The fast lane").
+      # The history is fetched without file contents; git reads the two versions it compares.
+      - uses: actions/checkout@v7
+        if: github.event_name == 'push'
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - id: text
+        run: |
+          if [ "${{ github.event_name }}" = push ]; then
+            python3 tools/text_only.py "${{ github.event.before }}" "${{ github.sha }}" --github
+          else
+            echo "fast=false" >> "$GITHUB_OUTPUT"
+          fi
 
   test:
     needs: gate
-    if: needs.gate.outputs.verified != 'true'
+    if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 45   # usually 8 min, about 25 more when the Verilator cache misses and it is built
     steps:
@@ -119,9 +139,35 @@ jobs:
       - name: Run question tests (Python + SystemVerilog)
         run: python tools/run_tests.py
 
+  # The fast lane's checks of prose: the lint, the video fields and captions, and the Python
+  # tests of the touched questions (a test may read the page's text). No Verilator: the
+  # code blocks are the same as before.
+  quick:
+    needs: gate
+    if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10   # usually 2 min
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Lint the question pages (structure and RTL rules)
+        run: python tools/lint_pages.py
+      - name: Check the video fields and the script captions
+        run: python tools/check_videos.py
+      - name: Run the touched questions' Python tests
+        if: needs.gate.outputs.ids != ''
+        run: python tools/run_tests.py --python-only ${{ needs.gate.outputs.ids }}
+
   build:
-    needs: [gate, test]
-    if: ${{ !cancelled() && needs.gate.result == 'success' && (needs.test.result == 'success' || needs.gate.outputs.verified == 'true') }}
+    needs: [gate, test, quick]
+    if: ${{ !cancelled() && needs.gate.result == 'success' && (needs.test.result == 'success' || needs.gate.outputs.verified == 'true' || (needs.gate.outputs.fast == 'true' && needs.quick.result == 'success')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25   # usually 5 min, about 9 with the dark phone check
     steps:
@@ -147,22 +193,26 @@ jobs:
       # axe-core runs on each page too: a serious or critical violation fails, and so does SVG
       # text under 9 px.
       - name: Install Playwright, Chromium and axe-core for the phone check
-        if: needs.gate.outputs.verified != 'true'
+        if: needs.gate.outputs.verified != 'true' && (needs.gate.outputs.fast != 'true' || needs.gate.outputs.pages != '')
         run: |
           pip install -r requirements-dev.txt
           python -m playwright install --with-deps chromium
           npm install --no-save --no-audit --no-fund axe-core@4.14.0
       - name: Check every page at phone width
-        if: needs.gate.outputs.verified != 'true'
+        if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
         run: python tools/check_phone.py site --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
+      # The fast lane: only the pages whose prose changed, with screenshots to look at.
+      - name: Check the touched pages at phone width
+        if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast == 'true' && needs.gate.outputs.pages != ''
+        run: python tools/check_phone.py site --only "${{ needs.gate.outputs.pages }}" --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
       # The 404 page as GitHub Pages serves it (under the site's path), at both widths, and a
       # keyboard pass over a few pages: the tab order, visible focus, names, and the keys of
       # the hints, folds, boxes, figures, self-checks, the run panel and the search.
       - name: Check the 404 page under the site's path
-        if: needs.gate.outputs.verified != 'true'
+        if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
         run: python tools/check_404.py site --axe node_modules/axe-core/axe.min.js
       - name: Check the keyboard paths
-        if: needs.gate.outputs.verified != 'true'
+        if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
         run: python tools/check_keyboard.py site
       - uses: actions/upload-artifact@v7
         if: always() && needs.gate.outputs.verified != 'true'
@@ -192,7 +242,7 @@ jobs:
   # remembered state reopen the same controls. Four runners, each a quarter of the boxes.
   explorers:
     needs: [gate, test]
-    if: needs.gate.outputs.verified != 'true'
+    if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20   # usually 6 min
     strategy:
@@ -223,7 +273,7 @@ jobs:
 
   deploy:
     needs: [gate, build, explorers]
-    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.explorers.result == 'success' || needs.gate.outputs.verified == 'true') }}
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.explorers.result == 'success' || needs.gate.outputs.verified == 'true' || needs.gate.outputs.fast == 'true') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10   # usually 1 min
     environment:

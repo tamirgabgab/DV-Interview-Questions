@@ -1924,13 +1924,28 @@ section below starts at session 22, whose numbered items run on through the late
     window and traced pop by pop with the popped states logged beside the code (the box
     after, too narrow beside 78-character lines), the box's search panel, the trap of a
     search without `seen` (244 pops against 5,403 at D = 60).
+131. **The fast lane for text-only changes (session 32, 2026-11-02).** The owner asked
+    whether small text changes need the twenty-minute CI. Both parts done: a local habit
+    (CLAUDE.md: lint, the question's Python tests, build, links, the phone check of the page
+    and a screenshot, then straight to `main`) and a CI fast lane: `tools/text_only.py`
+    compares the pushed range (`github.event.before`..sha, a blobless clone in the gate) and
+    calls a push text only when every touched file is a question page whose front matter,
+    code blocks, generated blocks and script-read HTML are unchanged, or a file outside the
+    site (videos, notes). Then `quick` (lint, check_videos, `run_tests.py --python-only` on
+    the touched ids) replaces `test`, the build runs the phone check on the touched pages
+    only, and the explorers, 404 and keyboard checks are skipped. Tested in
+    `tests/tools/test_text_only.py` and on the day's commits (0055's three prose commits are
+    text only, d8053ce with its figures is not). Also from the day: 0055's parts renamed by
+    where a new bit enters, both transitions derived step by step, part ב's display math
+    fixed (it was indented 7 spaces, out of its list item), and video 0055 re-rendered with
+    the new chapter names (7:04, [0, 211, 356]).
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

@@ -950,6 +950,23 @@ without it.
   formula): the tests then compute them independently and check the figures against the
   generator. The "tested automatically" badge needs both code and a tests folder.
 
+### The fast lane
+
+A push that changes only the prose of question pages takes a fast lane in CI, a few minutes
+instead of about twenty (the owner, 2026-11-02). `tools/text_only.py BASE HEAD` decides: every
+touched file must be a question page (or a file outside the site: README, the notes,
+`VIDEOS.md`, `videos/`), and in every page the front matter, the fenced code blocks, the
+generated blocks (`<!-- gen n -->` … `<!-- /gen -->`) and every line with HTML a script reads
+(a self-check, an explorer box, a figure, a stepper, any `data-` attribute) must be the same
+before and after. The gate job runs it on every push; on a fast push the workflow runs the
+lint, `check_videos.py`, the touched questions' Python tests, the build, the links and the
+phone check of the touched pages only, skips Verilator, the explorer checks, the 404 and the
+keyboard pass, and deploys `main`. A new or deleted page, or any change outside the prose,
+runs every check. `tests/tools/test_text_only.py` pins what counts as prose.
+
+Prose can still break the page's look (display math indented out of its list item showed
+raw on 0055): before pushing a text-only change, look at a screenshot of the changed part.
+
 ## Running the site locally
 
 ```bash
