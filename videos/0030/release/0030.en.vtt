@@ -1,0 +1,281 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0030: the spider and the fly,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:10.100
+Two parts: the shortest way over the box,
+then the idea of code that checks every net.
+
+3
+00:00:10.900 --> 00:00:14.800
+A room shaped like a box: 30 long,
+12 wide and 12 high.
+
+4
+00:00:14.800 --> 00:00:19.333
+The spider S is on an end wall, mid-width,
+one unit below the ceiling.
+
+5
+00:00:19.333 --> 00:00:23.933
+The fly F is on the opposite wall, mid-width,
+one unit above the floor.
+
+6
+00:00:23.933 --> 00:00:29.933
+The spider walks only on the surfaces, not through the air.
+What is the shortest way to the fly?
+
+7
+00:00:30.733 --> 00:00:35.467
+Part A: what is the shortest distance,
+and where does the spider pass from face to face?
+
+8
+00:00:36.967 --> 00:00:42.200
+The route that comes to mind first: up to the ceiling,
+along the whole ceiling, and down to the fly.
+
+9
+00:00:42.200 --> 00:00:47.433
+Its length: 1 + 30 + 11 = 42.
+The first answer that comes to mind, and it is wrong.
+
+10
+00:00:47.833 --> 00:00:53.433
+Unfold the three faces into a plane, like cardboard:
+the route becomes a straight line of length 42.
+
+11
+00:00:53.433 --> 00:00:57.433
+Exactly the same length over the floor: 11 + 30 + 1.
+But maybe other faces give a shorter line?
+
+12
+00:01:00.433 --> 00:01:06.833
+Over one of the long walls: unfold
+both end walls onto the far wall.
+
+13
+00:01:06.833 --> 00:01:11.633
+Both are 6 from the fold, at heights 11 and 1:
+the line is longer, 43.17.
+
+14
+00:01:14.633 --> 00:01:21.233
+Now five faces, as stairs: the spider's wall,
+the ceiling, the far wall, the floor and the fly's wall.
+
+15
+00:01:21.233 --> 00:01:25.333
+In this net the straight line from S to F
+crosses all five faces.
+
+16
+00:01:25.333 --> 00:01:30.567
+S and F are corners of a right triangle.
+Across: 1 + 30 + 1 = 32.
+
+17
+00:01:30.567 --> 00:01:35.300
+And up: half the ceiling, the far wall, half the floor,
+6 + 12 + 6 = 24.
+
+18
+00:01:35.300 --> 00:01:40.333
+Pythagoras: the root of 1,024 + 576,
+that is, the root of 1,600: exactly 40.
+
+19
+00:01:40.333 --> 00:01:45.833
+The line is valid: it crosses every fold inside the edge,
+at x = 7 and x = 23, through the edges.
+
+20
+00:01:46.433 --> 00:01:51.833
+Fold it back, and the straight line
+becomes a route over the box.
+
+21
+00:01:51.833 --> 00:01:55.833
+It climbs its wall to the ceiling, crosses it
+diagonally to the far wall, and goes down to the floor.
+
+22
+00:01:55.833 --> 00:02:01.233
+From there diagonally over the floor to the fly's wall,
+and up to the fly. Five faces, not three.
+
+23
+00:02:01.233 --> 00:02:06.133
+The lengths on the faces: 1.25, 8.75, 20,
+8.75 and 1.25. Together 40.
+
+24
+00:02:06.133 --> 00:02:12.133
+And a mirror image: the same route over the near wall,
+also exactly 40.
+
+25
+00:02:12.933 --> 00:02:18.467
+Every unfolding on the page: over three faces,
+four or five, each with its length.
+
+26
+00:02:18.467 --> 00:02:23.933
+The shortest is 40, twice: our route
+and its mirror image, over the near wall.
+
+27
+00:02:23.933 --> 00:02:27.533
+And 42, the route that comes first,
+is only in seventh place.
+
+28
+00:02:27.533 --> 00:02:32.567
+And a lower bound: through the air, 31.6.
+No route over the faces is shorter.
+
+29
+00:02:33.367 --> 00:02:38.567
+Part B: a function for any box and any two points,
+without handling each net on its own.
+
+30
+00:02:39.267 --> 00:02:44.667
+Every order of faces, from wall to wall, is one unfolding.
+Here are all 16 unfoldings on the page.
+
+31
+00:02:44.667 --> 00:02:49.867
+Each with its straight line and its length,
+from the shortest to the longest.
+
+32
+00:02:49.867 --> 00:02:54.467
+The shortest, 40, are marked: our route
+and its mirror image.
+
+33
+00:02:54.467 --> 00:02:58.933
+The longest, 57.27, goes over the floor,
+a side wall and the ceiling.
+
+34
+00:02:58.933 --> 00:03:04.433
+The idea in three steps. Step 1: go
+over every order of faces and unfold each into the plane.
+
+35
+00:03:04.433 --> 00:03:09.933
+Step 2: in each, draw a straight line from S to F,
+and check that it stays inside the faces.
+
+36
+00:03:09.933 --> 00:03:14.167
+Step 3: take the shortest
+of the valid lines. Here, 40.
+
+37
+00:03:14.167 --> 00:03:18.167
+But 16 different unfoldings are 16 cases in code.
+The trick: they are all lines in one strip.
+
+38
+00:03:19.767 --> 00:03:25.567
+The four side faces wrap the box
+like a hoop. Unroll them into one strip.
+
+39
+00:03:25.567 --> 00:03:31.067
+A coordinate p runs around the perimeter: floor,
+far wall, ceiling and near wall. The period is 48.
+
+40
+00:03:31.067 --> 00:03:36.867
+The spider's wall folds onto the strip around
+one of its four edges: four images of S.
+
+41
+00:03:36.867 --> 00:03:42.367
+Each image is S's distance from its edge, left of x = 0.
+Over the ceiling, for example: x = −1 and p = 30.
+
+42
+00:03:42.367 --> 00:03:46.167
+In the same way, four images of F,
+right of x = 30.
+
+43
+00:03:46.167 --> 00:03:51.367
+Each image of F also one period up or down:
+4 · 4 · 3 = 48 lines in all.
+
+44
+00:03:51.867 --> 00:03:57.333
+Each line has two checks: it crosses x = 0
+inside the edge the spider folded around,
+
+45
+00:03:57.333 --> 00:04:02.833
+and x = 30 inside the fly's edge.
+The red line leaves at p = 33.57, outside: rejected.
+
+46
+00:04:03.333 --> 00:04:08.067
+Of the 48 lines, 22 are valid.
+These are the ones inside the strip, with no shift.
+
+47
+00:04:08.067 --> 00:04:13.667
+The shortest: from S over the ceiling to F over the floor.
+Δx = 32, Δp = −24, length 40.
+
+48
+00:04:13.667 --> 00:04:19.167
+The exit point: p = 29.25, inside the ceiling's edge,
+that is, the point (0, 6.75, 12), as in part A.
+
+49
+00:04:19.167 --> 00:04:24.667
+Every net is a line in one strip: 48 lines,
+one root and two comparisons each, no special cases.
+
+50
+00:04:25.467 --> 00:04:30.633
+This is the box on the page: the strip,
+the eight images and the valid lines.
+
+51
+00:04:30.633 --> 00:04:35.100
+With "all 48" you also see the lines
+rejected by the two checks.
+
+52
+00:04:35.100 --> 00:04:39.600
+With "shortest only", the route of 40 remains.
+You can drag S and F and change the sizes.
+
+53
+00:04:39.600 --> 00:04:44.100
+When the spider moves half way down, z = 6,
+the straight route over the floor wins: 6 + 30 + 1 = 37.
+
+54
+00:04:44.100 --> 00:04:48.600
+And at the point (0, 2, 11), near the near wall,
+the shortest goes over four faces: 37.12.
+
+55
+00:04:49.400 --> 00:04:55.000
+To sum up: unfold the faces, and the shortest route
+is a straight line over five faces, of length 40.
+
+56
+00:04:55.000 --> 00:05:00.900
+Drag the spider and the fly in the box
+on the page of question 0030 on the site.
