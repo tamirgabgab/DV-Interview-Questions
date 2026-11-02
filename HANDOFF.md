@@ -1917,13 +1917,20 @@ section below starts at session 22, whose numbered items run on through the late
     the closed form, a decision tree, `egg_table`, `min_drops` and `egg_run` typed in an
     11-row window and `egg_run(3, 100, 36)` traced drop by drop (the box after: beside the
     code it would be at 0.52 of its page size), the box's chart of every threshold.
+130. **Video 0018 (session 32, 2026-11-02).** Two hourglasses (6:42, `video_parts` [0, 120]):
+    the glasses drawn in Manim with the sand flowing and each flip on a time line to 15
+    (A+B at 0, A at 7, A at 11), the box's four events, which D can be measured from 0; part
+    ב events, the state (t, a, b), the options and the pruning, `solve` typed in a 13-row
+    window and traced pop by pop with the popped states logged beside the code (the box
+    after, too narrow beside 78-character lines), the box's search panel, the trap of a
+    search without `seen` (244 pops against 5,403 at D = 60).
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); video 0039 (item 129).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

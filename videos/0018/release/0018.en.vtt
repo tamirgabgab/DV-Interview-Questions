@@ -1,0 +1,376 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0018: two hourglasses,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:09.067
+Two parts: an example by hand,
+then code that finds a plan for any goal.
+
+3
+00:00:09.867 --> 00:00:15.033
+Two hourglasses: A measures 7 minutes,
+and B measures 11. At time 0 all the sand is down.
+
+4
+00:00:15.033 --> 00:00:20.133
+You may turn a glass over at any moment, even midway:
+what was down goes up, and keeps falling.
+
+5
+00:00:20.133 --> 00:00:23.667
+At exactly time D
+some hourglass must run out.
+
+6
+00:00:24.467 --> 00:00:29.633
+Part A: glasses of 7 and 11 minutes.
+Measure exactly 15 minutes from time 0.
+
+7
+00:00:30.333 --> 00:00:34.567
+The two glasses, all the sand down,
+and a clock showing how much time has passed.
+
+8
+00:00:34.567 --> 00:00:39.533
+There is no other clock: only a glass running out
+tells us how much time has passed.
+
+9
+00:00:39.533 --> 00:00:43.633
+The idea: 15 = 11 + 4,
+and the 4 comes from the difference 11 − 7.
+
+10
+00:00:44.133 --> 00:00:48.367
+Time 0: turn both glasses over,
+and both start running.
+
+11
+00:00:48.367 --> 00:00:52.600
+After 7 minutes A runs out.
+B has 4 minutes left on top.
+
+12
+00:00:52.600 --> 00:00:56.567
+Time 7: turn A over at once,
+and it starts another 7 minutes.
+
+13
+00:00:56.567 --> 00:01:01.233
+At time 11 B runs out. Meanwhile A has dropped
+4 minutes, with 3 left on top.
+
+14
+00:01:01.233 --> 00:01:05.333
+The 4 minutes at the bottom of A are exactly
+the difference 11 − 7 we were looking for.
+
+15
+00:01:05.633 --> 00:01:10.300
+Time 11: turn A over midway,
+and the 4 at the bottom go up.
+
+16
+00:01:10.300 --> 00:01:14.267
+A runs out at 11 + 4 = 15:
+we measured exactly 15 minutes.
+
+17
+00:01:14.267 --> 00:01:18.267
+The plan: both at 0, A at 7,
+and A again at 11. Turning midway is the key.
+
+18
+00:01:19.067 --> 00:01:23.600
+This is the page's box:
+the time line, the clock and the two glasses.
+
+19
+00:01:23.600 --> 00:01:26.733
+Event 1, time 0: turn both over.
+
+20
+00:01:26.733 --> 00:01:30.033
+Event 2, time 7: A runs out,
+and we turn it over.
+
+21
+00:01:30.033 --> 00:01:34.700
+Event 3, time 11: B runs out. A has
+3 on top and 4 below, and we turn it over.
+
+22
+00:01:34.700 --> 00:01:38.167
+Event 4, time 15: A runs out.
+We measured 15 minutes.
+
+23
+00:01:38.967 --> 00:01:44.367
+Not every D can be measured from 0. With 7 and 11
+only 7, 11, 14, 15, and every number from 17.
+
+24
+00:01:44.367 --> 00:01:49.167
+Not 4 either: the difference 11 − 7 is a measure
+that starts at time 7, not at time 0.
+
+25
+00:01:49.967 --> 00:01:55.200
+A trap: turning over only a glass that ran out.
+Then you only measure sums of whole runs.
+
+26
+00:01:55.200 --> 00:02:00.167
+15 is not 7i + 11j for any i and j,
+so without turning midway there is no solution.
+
+27
+00:02:00.966 --> 00:02:06.066
+Part B: a function that takes A, B and D
+and returns a plan, or that there is none.
+
+28
+00:02:06.766 --> 00:02:12.166
+There is no other clock, so we decide only when
+a glass runs out. Such a moment is an event.
+
+29
+00:02:12.166 --> 00:02:16.399
+The state at an event: the time t,
+and the sand on top of each glass, a and b.
+
+30
+00:02:17.199 --> 00:02:22.366
+Four options from each state: turn nothing,
+turn A, turn B, or turn both.
+
+31
+00:02:22.366 --> 00:02:27.599
+Turning leaves A − a on top. We wait
+for the first glass to run out: the smallest of them.
+
+32
+00:02:27.599 --> 00:02:31.099
+And we reach the next state, at the next event.
+
+33
+00:02:31.099 --> 00:02:35.566
+We drop an option where no glass runs,
+and an option that goes past D.
+
+34
+00:02:36.366 --> 00:02:41.099
+For example, (7, 0, 4) leads to four states.
+Three of them were found before.
+
+35
+00:02:41.099 --> 00:02:44.633
+Only (11, 3, 0) is new, and it is the one
+that leads to the solution.
+
+36
+00:02:44.633 --> 00:02:48.633
+BFS goes through the states in order,
+and a state already seen does not enter the queue again.
+
+37
+00:02:49.433 --> 00:02:52.433
+Now let's write it in Python.
+
+38
+00:02:54.466 --> 00:02:58.433
+deque is a queue: we add at the end,
+and take from the front.
+
+39
+00:03:00.033 --> 00:03:03.499
+solve takes the two glasses
+and the goal D.
+
+40
+00:03:08.233 --> 00:03:12.733
+The start (0, 0, 0) is queued with an empty plan,
+and it is also in the set seen.
+
+41
+00:03:16.266 --> 00:03:20.766
+While the queue is not empty, take a state
+and the plan that led to it.
+
+42
+00:03:22.799 --> 00:03:26.533
+If its time is exactly D,
+its plan is the answer.
+
+43
+00:03:30.866 --> 00:03:34.966
+Two loops: turn A or not,
+and turn B or not.
+
+44
+00:03:38.999 --> 00:03:42.966
+Turning leaves A − a on top.
+Without turning the amount stays.
+
+45
+00:03:49.199 --> 00:03:53.699
+The glasses still running. If there are none,
+nothing will ever happen: continue.
+
+46
+00:03:56.099 --> 00:04:00.566
+Wait for the first glass to run out:
+the smallest of the positive amounts.
+
+47
+00:04:03.533 --> 00:04:06.033
+If that goes past D, drop it.
+
+48
+00:04:10.933 --> 00:04:15.233
+The next state: the time grows by wait,
+and the sand on top drops by wait.
+
+49
+00:04:19.499 --> 00:04:23.166
+A state already seen does not enter again.
+A new one goes into seen.
+
+50
+00:04:31.033 --> 00:04:35.533
+The action: what we turned at time t.
+The state enters the queue with the longer plan.
+
+51
+00:04:37.366 --> 00:04:40.899
+If the queue is empty, there is no solution:
+return None.
+
+52
+00:04:41.599 --> 00:04:46.766
+Let's run it on 7, 11, 15. The variables under the code,
+and on the right every state taken from the queue.
+
+53
+00:04:46.766 --> 00:04:50.966
+(0, 0, 0) is in the queue and in seen,
+with an empty plan.
+
+54
+00:04:50.966 --> 00:04:55.999
+Take (0, 0, 0). The time is 0, not 15,
+so go over the four options.
+
+55
+00:04:55.999 --> 00:05:01.033
+Turn nothing: no sand on top, no glass
+runs, so continue.
+
+56
+00:05:01.033 --> 00:05:05.633
+Turn B: wait 11 minutes.
+(11, 0, 0) is new and enters the queue.
+
+57
+00:05:05.633 --> 00:05:10.133
+A alone gives (7, 0, 0), and both give
+(7, 0, 4). Three states in the queue.
+
+58
+00:05:10.133 --> 00:05:14.933
+Take (11, 0, 0). Every option
+goes past 15, and nothing enters.
+
+59
+00:05:14.933 --> 00:05:18.833
+(7, 0, 0) adds (14, 0, 0)
+and (14, 0, 4).
+
+60
+00:05:18.833 --> 00:05:23.133
+(7, 0, 4): only turning A
+gives a new state, (11, 3, 0).
+
+61
+00:05:23.133 --> 00:05:27.033
+(14, 0, 0) and (14, 0, 4):
+every continuation goes past 15.
+
+62
+00:05:27.033 --> 00:05:31.766
+(11, 3, 0) adds (14, 0, 8),
+(15, 0, 0) and (15, 0, 7).
+
+63
+00:05:31.766 --> 00:05:34.766
+(14, 0, 8) adds nothing.
+
+64
+00:05:34.766 --> 00:05:39.966
+Take (15, 0, 0): t = D,
+and return its plan.
+
+65
+00:05:39.966 --> 00:05:43.966
+The plan returned: both at 0, A at 7,
+and A again at 11. Part A's plan.
+
+66
+00:05:44.766 --> 00:05:49.799
+In the page's box, the same search pop
+after pop: the children, the queue and the tree.
+
+67
+00:05:49.799 --> 00:05:54.533
+The first pop: three new states
+in the queue, and the tree starts to grow.
+
+68
+00:05:54.533 --> 00:05:59.433
+The fourth pop, (7, 0, 4):
+only (11, 3, 0) is new.
+
+69
+00:05:59.433 --> 00:06:04.333
+The seventh pop, (11, 3, 0),
+puts (15, 0, 0) into the queue.
+
+70
+00:06:04.333 --> 00:06:08.799
+At the ninth pop (15, 0, 0) comes out,
+and the path to it is marked in the tree.
+
+71
+00:06:09.599 --> 00:06:14.999
+At every event at least one glass is empty, so
+there are at most (D+1)(A+B+1) states.
+
+72
+00:06:14.999 --> 00:06:18.999
+Each state enters the queue once, with four
+checks. In the example only 9 states were taken.
+
+73
+00:06:19.799 --> 00:06:24.899
+A trap: dropping seen. The search
+still ends, since the time grows every step.
+
+74
+00:06:24.899 --> 00:06:29.133
+But at D = 60 it takes 5,403 states,
+instead of 244 with seen.
+
+75
+00:06:29.927 --> 00:06:35.527
+In short: turning midway gives 4 minutes,
+and BFS over (t, a, b) finds a plan for any D.
+
+76
+00:06:35.527 --> 00:06:40.927
+Try your own glasses and goals in the box
+on the page of question 0018 on the site.
