@@ -24,7 +24,7 @@ def plain(txns):
 def test_page_examples():
     assert tags_needed(q0062.TXNS) == 2 == q0062.brute_tags(q0062.TXNS)
     assert tags_needed([(0, 10), (10, 20)]) == 1                      # a response frees its tag for a send at the same time
-    assert tags_needed([(0, 10), (10, 20), (5, 15)]) == 2             # the self-check of part a
+    assert tags_needed([(0, 10), (10, 20), (5, 15)]) == 2             # the extra example of part a
     assert tags_needed([]) == 0 and tags_needed([(3, 4)]) == 1
     assert pools(q0062.TXNS_B) == (2, 2, 2) == q0062.pools(q0062.TXNS_B)
     assert pools(q0062.TXNS_C) == (2, 2, 4) == q0062.pools(q0062.TXNS_C)

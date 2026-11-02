@@ -1,6 +1,6 @@
 """Question 0070: the page's shortest_path, shortest_with_breaks and cheapest_path (as
 published) against independent brute-force searches on thousands of random grids, both
-neighbourhoods; the page's examples and self-checks, the claims of the proofs (the queue
+neighbourhoods; the page's examples and extra examples, the claims of the proofs (the queue
 holds two consecutive distances, a cell enters at most k + 1 times in part b, every cell
 enters the heap once with entry costs, part a is part c with unit costs, the shortcut by
 the Manhattan distance), the traps (one visit per cell, BFS with costs, paying the start,
@@ -84,7 +84,7 @@ def test_page_examples():
     assert cheapest_path(["19"], (0, 0), (0, 0)) == 0
 
 
-def test_self_checks():
+def test_extra_examples():
     assert shortest_path(*q0070.SC_A)[0] == 9 == q0070.length_ref(*q0070.SC_A)
     assert shortest_path(*q0070.SC_A)[1] == [(3, 0), (2, 0), (2, 1), (2, 2), (2, 3), (1, 3), (0, 3), (0, 2), (0, 1), (0, 0)]
     assert shortest_with_breaks(*q0070.SC_B) == 3 == q0070.breaks_ref(*q0070.SC_B)

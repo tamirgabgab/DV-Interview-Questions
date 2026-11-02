@@ -1,6 +1,6 @@
 /* The site's styles, part 21 of 21: interview mode (session 30), the quick jump, the
    home page's interview builder and my map. question-tools.js builds the bar, the
-   confidence question, the interviewer's follow-up and the summary; quick-jump.js the
+   confidence question and the summary; quick-jump.js the
    jump window; the hook the builder (home.js fills it) and my map (home-extras.js). */
 
 /* ---- interview mode: the bar at the foot of the screen ---- */
@@ -34,17 +34,6 @@ body.interview-mode .dvq-toast { bottom: 4rem; }
 .md-typeset .iv-conf .iv-conf-opts { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .md-typeset .iv-conf .md-button { margin: 0; padding: 0.35em 1em; border-color: var(--site-card-border); background: var(--site-surface); color: var(--md-default-fg-color); font-size: 0.7rem; }
 .md-typeset .iv-conf .md-button:is(:hover, :focus-visible) { border-color: var(--md-typeset-a-color); color: var(--md-typeset-a-color); }
-
-/* the interviewer's follow-up after a right self-check */
-.md-typeset .iv-follow { display: grid; grid-template-columns: 1.8rem minmax(0, 1fr); gap: var(--sp-2); align-items: start; margin: var(--sp-3) 0; }
-.md-typeset .iv-follow .iv-who { display: grid; place-items: center; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--md-primary-fg-color); color: #fff; font-size: 0.7rem; font-weight: 600; }
-.md-typeset .iv-follow .iv-bubble { min-width: 0; padding: var(--sp-2) var(--sp-3); border: 1px solid var(--site-card-border); border-radius: var(--radius-l); border-start-start-radius: var(--radius-s); background: var(--site-surface); }
-.md-typeset .iv-follow .iv-bubble > p { margin: 0 0 var(--sp-1); }
-.md-typeset .iv-follow .iv-who-name { color: var(--md-default-fg-color--light); font-size: 0.7rem; font-weight: 600; }
-@media (prefers-reduced-motion: no-preference) {
-  .md-typeset .iv-follow { animation: iv-in var(--dur-2) var(--ease) both; }
-  @keyframes iv-in { from { opacity: 0; transform: translateY(0.2rem); } }
-}
 
 /* the summary at the end */
 .md-typeset .iv-summary { margin: var(--sp-3) 0; padding: var(--sp-3) var(--sp-4); border: 1px solid var(--md-accent-fg-color); border-radius: var(--radius-l); background: var(--site-surface); box-shadow: var(--shadow-1); }

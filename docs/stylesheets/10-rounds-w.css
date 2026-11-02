@@ -1,4 +1,4 @@
-/* The site's styles, part 10 of 21: rounds W1 to W4: surfaces, traps, the home page, the run panel, motion, self-checks.
+/* The site's styles, part 10 of 21: rounds W1 to W4: surfaces, traps, the home page, the run panel, motion.
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
 /* Round W1 (session 27): white surfaces on the off-white page. Admonitions and tables take
@@ -182,18 +182,6 @@
   .md-typeset .w-reveal { opacity: 0; transform: translateY(12px); transition: opacity 400ms var(--ease), transform 400ms var(--ease); transition-delay: var(--w-delay, 0ms); }
   .md-typeset .w-reveal.is-in { opacity: 1; transform: none; }
 }
-/* Self-checks (selfcheck.js): a short question before the solution, a field and a check */
-.md-typeset .selfcheck { margin: 1em 0; padding: 0.55rem 0.8rem; border: 1px solid var(--viz-grid); border-inline-start: 0.2rem solid var(--md-accent-fg-color); border-radius: 0.3rem; background: var(--md-code-bg-color); }
-.md-typeset .selfcheck.is-done { border-inline-start-color: var(--diff-easy); }
-.md-typeset .selfcheck > p { margin: 0.3em 0; }
-.md-typeset .selfcheck .selfcheck__tag { margin: 0 0 0.2em; font-size: 0.7rem; font-weight: 700; color: var(--viz-text); }
-.md-typeset .selfcheck__row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; margin-top: 0.4rem; }
-.md-typeset .selfcheck__in { width: 8rem; max-width: 100%; box-sizing: border-box; padding: 0.25rem 0.45rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; font: inherit; font-family: var(--md-code-font-family); background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
-.md-typeset .selfcheck__row .md-button { margin: 0; padding: 0.2rem 0.75rem; font-size: 0.66rem; min-height: 1.8rem; }
-.md-typeset .selfcheck .selfcheck__msg:empty { display: none; }
-.md-typeset .selfcheck .selfcheck__msg.is-ok { color: var(--diff-easy); font-weight: 700; }
-.md-typeset .selfcheck .selfcheck__msg.is-bad { color: var(--diff-hard); }
-.md-typeset .selfcheck__row .md-button[hidden] { display: none; }
 .md-typeset .explorer .ld-msg:empty { display: none; }
 .md-typeset .explorer .ld-in { width: 5rem; font: inherit; font-family: var(--md-code-font-family); padding: 0.1rem 0.4rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
 .md-typeset .explorer .b3-msg:empty { display: none; }

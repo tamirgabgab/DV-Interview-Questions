@@ -1,6 +1,6 @@
 """Question 0069: the page's Fenwick, ranks, passed, passed_merge, overtook, inversions,
 disorder, arrival_order and live_overtakes (as published) against every pair on random
-arrays with and without ties; the page's examples and self-checks; the claims of the
+arrays with and without ties; the page's examples and extra examples; the claims of the
 proofs (the Fenwick invariant and the O(log n) walks, the sum identity, the reorder-buffer
 depth, the bounds 0 and n(n - 1) / 2 of the disorder, the stream equals passed); the traps
 (prefix(r) against prefix(r - 1), update before query, n instead of i, ranks with
@@ -50,7 +50,7 @@ def test_page_examples():
     assert 12 & -12 == 4 and 6 & -6 == 2 and 8 & -8 == 8
 
 
-def test_self_checks():
+def test_extra_examples():
     assert passed(SELF) == [2, 1, 2, 0, 0] and passed(SELF)[0] == 2
     assert overtook(SELF) == [0, 1, 0, 3, 1] and overtook(SELF)[3] == 3
     assert inversions(SELF) == 5 and abs(disorder(SELF) - 0.5) < 1e-12

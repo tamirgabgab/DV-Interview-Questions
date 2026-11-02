@@ -18,8 +18,8 @@ from collections import deque
 
 RLM = "‏"
 GRID = ["110000", "110011", "000010", "000100", "000100"]
-SC_GRID = ["101", "010", "101"]                  # the X of the self-checks of parts a and b
-SC_GRID_C = ["1101", "1001", "0111"]             # the self-check of part c
+SC_GRID = ["101", "010", "101"]                  # the X of the extra examples of parts a and b
+SC_GRID_C = ["1101", "1001", "0111"]             # the extra example of part c
 DIAG_GRID = ["0001", "0010", "0100", "1000"]     # the diagonal line of land of part b
 DIRS4 = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 DIRS8 = DIRS4 + [(-1, -1), (-1, 1), (1, -1), (1, 1)]

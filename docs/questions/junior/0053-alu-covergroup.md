@@ -45,10 +45,6 @@ added: 2026-10-27
     ‏bin יכול להיות ערך אחד (`{8'h80}`) או קבוצה של טווחים (`{[1:127], [129:254]}`). ול-`carry`
     יש `iff`.
 
-<div class="selfcheck" data-answer="15" data-show="15 = 5 + 4 + 4 + 2" data-hint="חמש פעולות, ארבע מחלקות לכל אופרנד, ושני ערכים ל-carry." markdown>
-כמה bins יש בארבעת ה-coverpoints יחד, בלי ה-cross?
-</div>
-
 ??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
         ‏`cp_op` עם bin לכל פעולה ו-`illegal_bins` לקודים 5 עד 7; ‏`cp_a` ו-`cp_b` עם ארבעה bins :
@@ -180,10 +176,6 @@ added: 2026-10-27
     ‏`SHL` ב-0x80 או ב-0xFF מוציא את כל הביטים. האם צריך לבדוק את זה פעם לכל מחלקה של `a`?
     ומה ההבדל בין להתעלם מתא לבין להגדיר אותו כאסור?
 
-<div class="selfcheck" data-answer="72" data-show="72 = 80 − 8" data-hint="5 כפול 4 כפול 4 צירופים, פחות התאים של SHL כש-b הוא 0x80 או 0xFF, לכל ערך של a." markdown>
-כמה תאים יש ב-cross אחרי ה-ignore?
-</div>
-
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"
         ‏`cross cp_op, cp_a, cp_b` נותן \( 5 \cdot 4 \cdot 4 = 80 \) תאים. ‏8 מהם (`SHL` עם `b`
@@ -250,10 +242,6 @@ added: 2026-10-27
 ??? tip "רמז 2"
     עם `randomize()` רגיל, \( P(a = 0) = 1/256 \). תא של `op` מסוים עם שני ערכי קצה : 
     \( \frac15 \cdot \frac{1}{256} \cdot \frac{1}{256} \).
-
-<div class="selfcheck" data-answer="327680" data-show="1/327,680" data-hint="פעולה אחת מתוך 5, וערך קצה מסוים מתוך 256 לכל אחד משני האופרנדים." markdown>
-אחד חלקי כמה היא ההסתברות של התא הנדיר ביותר, עם `randomize()` רגיל?
-</div>
 
 ??? success "פתרון סעיף ג"
     !!! answer "תשובה בקצרה"

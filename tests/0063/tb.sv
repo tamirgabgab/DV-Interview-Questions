@@ -1,6 +1,6 @@
 //@flags --timing
 // Question 0063: the page's window_max and longest_within against every window, on the
-// page's examples, the self-checks and random arrays; and the page's module win_max on
+// page's examples, the extra examples and random arrays; and the page's module win_max on
 // four lanes (K = 3 on the page's stream then random samples, K = 1, K = 5 with many equal
 // samples, K = 8) against the maximum of the last K samples kept in a queue.
 //@page module win_max
@@ -63,7 +63,7 @@ module tb;
     window_max(nums, 2, out);
     want = '{5, 5};
     if (out != want) begin errors++; $display("5 5 1"); end
-    // part b on the page's examples and the self-check
+    // part b on the page's examples and the extra example
     nums = '{10, 1, 2, 4, 7, 2};
     if (longest_within(nums, 5) != 4) begin errors++; $display("page example b: %0d", longest_within(nums, 5)); end
     nums = '{8, 2, 4, 7};
@@ -71,7 +71,7 @@ module tb;
     nums = '{4, 2, 2, 2, 4, 4, 2, 2};
     if (longest_within(nums, 0) != 3) begin errors++; $display("limit 0"); end
     nums = '{1, 5, 6, 7, 8, 10, 6, 5, 6};
-    if (longest_within(nums, 4) != 5) begin errors++; $display("self-check b"); end
+    if (longest_within(nums, 4) != 5) begin errors++; $display("extra example b"); end
     nums = new[0];
     if (longest_within(nums, 2) != 0) begin errors++; $display("empty"); end
     for (int r = 0; r < 2000; r++) begin

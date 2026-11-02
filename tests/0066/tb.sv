@@ -1,6 +1,6 @@
 // Question 0066: the page's merge, skyline, above and peak against references written
 // into the testbench (the overlap graph for the merge, the total height read at every
-// integer point for the pieces and the ranges), on the page's examples, the self-checks,
+// integer point for the pieces and the ranges), on the page's examples, the extra examples,
 // the edge cases and random inputs; and the corollary that part a is part b with height 1.
 module tb;
   //@page function automatic void merge
@@ -101,7 +101,7 @@ module tb;
     span_t a[], m[$], want[$], rs[$], wr[$], where[$], one[$];
     piece_t b[], sk[], pieces[$], wantp[$];
     int n, t, top, hmax;
-    // part a: the page's example, touching intervals, an unsorted list, a nested one, the self-check
+    // part a: the page's example, touching intervals, an unsorted list, a nested one, the extra example
     a = '{'{1, 3}, '{2, 6}, '{8, 10}, '{15, 18}};
     merge(a, m); want = '{'{1, 6}, '{8, 10}, '{15, 18}};
     if (!same_spans(m, want)) begin errors++; $display("page example a: %s", show_spans(m)); end
@@ -116,7 +116,7 @@ module tb;
     if (!same_spans(m, want)) begin errors++; $display("nested: %s", show_spans(m)); end
     a = '{'{2, 5}, '{1, 3}, '{6, 9}, '{9, 10}, '{12, 14}};
     merge(a, m);
-    if (m.size() != 3) begin errors++; $display("self-check a: %s", show_spans(m)); end
+    if (m.size() != 3) begin errors++; $display("extra example a: %s", show_spans(m)); end
     a = new[0];
     merge(a, m);
     if (m.size() != 0) begin errors++; $display("empty a"); end
@@ -138,11 +138,11 @@ module tb;
     if (!same_pieces(pieces, wantp)) begin errors++; $display("same start"); end
     b = '{'{0, 4, 2}, '{2, 6, 3}, '{4, 8, 2}};
     skyline(b, pieces);
-    if (pieces.size() != 3) begin errors++; $display("self-check b: %0d pieces", pieces.size()); end
+    if (pieces.size() != 3) begin errors++; $display("extra example b: %0d pieces", pieces.size()); end
     b = new[0];
     skyline(b, pieces);
     if (pieces.size() != 0) begin errors++; $display("empty b"); end
-    // part c: the page's example with T = 4, the peak, the self-check
+    // part c: the page's example with T = 4, the peak, the extra example
     b = '{'{0, 4, 2}, '{1, 3, 3}, '{2, 6, 1}, '{5, 8, 4}};
     skyline(b, pieces);
     above(pieces, 4, rs); want = '{'{1, 3}, '{5, 8}};

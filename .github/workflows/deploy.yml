@@ -207,7 +207,7 @@ jobs:
         run: python tools/check_phone.py site --only "${{ needs.gate.outputs.pages }}" --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
       # The 404 page as GitHub Pages serves it (under the site's path), at both widths, and a
       # keyboard pass over a few pages: the tab order, visible focus, names, and the keys of
-      # the hints, folds, boxes, figures, self-checks, the run panel and the search.
+      # the hints, folds, boxes, figures, the run panel and the search.
       - name: Check the 404 page under the site's path
         if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
         run: python tools/check_404.py site --axe node_modules/axe-core/axe.min.js

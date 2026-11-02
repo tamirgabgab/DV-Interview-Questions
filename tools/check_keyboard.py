@@ -4,7 +4,7 @@
     mkdocs build --strict && python tools/check_keyboard.py [site] [--only REGEX]
 
 Serves the site locally and, on a few pages (the home page, the all-questions table, the
-tags page, a study path and one question page with a box, a figure, a self-check and the
+tags page, a study path and one question page with a box, a figure and the
 run panel), walks the whole page with Tab at 1200 px. Every stop must be visible, every
 interactive stop must have a name (aria-label, a label, its text, a title) and must show a
 focus ring (an outline or a shadow while :focus-visible), the first stop must be the skip
@@ -12,7 +12,7 @@ link, and the walk must end (no trap); the theme's own header, drawer, search an
 walked but not judged (axe covers them in the phone check). On the question page it then presses the keys of the
 components: Enter opens a hint and toggles a fold of a box, the arrow keys step a focused
 box, Enter on the enlarge button opens the lightbox and Escape closes it and gives the
-focus back, a wrong self-check answer entered with Enter gets a message, Enter on "▶ להרצה"
+focus back, Enter on "▶ להרצה"
 opens the run panel, "/" opens the quick jump (session 30): typing finds a question, Tab
 stays in the window, Escape closes it and gives the focus back, and Ctrl+K opens it again,
 whose last row (the up arrow wraps to it) sends the words to the site search, which finds
@@ -156,16 +156,6 @@ def press_keys(page) -> list[str]:
                 out.append("Escape does not close the lightbox")
             elif not page.evaluate("() => document.activeElement && document.activeElement.classList.contains('fig-enlarge')"):
                 out.append("the focus does not come back to the enlarge button after the lightbox")
-    # a self-check answers Enter
-    field = page.locator(".selfcheck input").first
-    if field.count():
-        field.scroll_into_view_if_needed()
-        field.focus()
-        page.keyboard.type("987654")
-        page.keyboard.press("Enter")
-        page.wait_for_timeout(200)
-        if not (page.locator(".selfcheck__msg").first.text_content() or "").strip():
-            out.append("Enter in a self-check field gives no message")
     # the run panel opens from the code's button
     run = page.locator(".py-from-code").first
     if run.count():

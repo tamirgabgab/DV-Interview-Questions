@@ -56,7 +56,7 @@ def test_page_numbers():
     grants = wrr_run([0b1111] * 400, [1, 2, 3, 4])
     assert [sum(1 for g in grants if g >> i & 1) for i in range(4)] == [40, 80, 120, 160]
     assert [q0054.max_wait([0b1111] * 400, grants, i) for i in range(4)] == [9, 8, 7, 6]
-    # the self-checks: N - 1 = 3 and 7, 2 + 3 + 4 = 9
+    # the extra examples: N - 1 = 3 and 7, 2 + 3 + 4 = 9
     assert max(q0054.max_wait([255] * 64, rr_run([255] * 64, 8), i) for i in range(8)) == 7
 
 

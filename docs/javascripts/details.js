@@ -1,9 +1,7 @@
 // Details (19-details.css): the success pulse and the box loading wave.
 // V15: a calm green pulse where the reader marks a question solved (the "solved" button of
-// the page tools, question-tools.js, and its copy in the part bar, reading-tools.js) and where
-// a self-check answer is right (selfcheck.js). It only listens: a click that has turned the
-// button on (aria-pressed), or a check that has left the reply marked right (.is-ok), gets
-// an overlay fixed over the page, which removes itself. Nothing moves under reduced motion
+// the page tools, question-tools.js, and its copy in the part bar, reading-tools.js). It only
+// listens: a click that has turned the button on (aria-pressed) gets an overlay fixed over the page, which removes itself. Nothing moves under reduced motion
 // or in an automated browser (the page checks), where the state change is the whole answer.
 // V17: in an automated browser the root gets .dt-still, which stops the boxes' loading wave.
 (() => {
@@ -40,19 +38,6 @@
     if (btn) {
       // the part bar's copy follows the header's button through a MutationObserver
       setTimeout(() => { if (btn.getAttribute("aria-pressed") === "true") pulse(btn, btn.querySelector(".ui-ico")); }, 0);
-      return;
     }
-    const go = e.target.closest && e.target.closest(".selfcheck__go");
-    if (go) checked(go.closest(".selfcheck"));
   });
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" || !e.target.closest) return;
-    const input = e.target.closest(".selfcheck__in");
-    if (input) checked(input.closest(".selfcheck"));
-  });
-  const checked = (box) => {
-    const msg = box && box.querySelector(".selfcheck__msg");
-    // the ring around the field the answer was typed in, the mark from the reply's check mark
-    if (msg && msg.classList.contains("is-ok")) pulse(box.querySelector(".selfcheck__in") || msg, msg.querySelector(".selfcheck__tick"));
-  };
 })();

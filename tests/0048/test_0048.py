@@ -157,7 +157,7 @@ def test_part_c_example():
     # the food stop is left of A from tan 2 theta = L / (H + b): 27.2 degrees; at 30, x = -0.15
     assert f"{math.degrees(math.atan(7 / 5)) / 2:.1f}" == "27.2"
     assert f"{q0048.tilted(7, 3, 1, 2, 30)['P'][0]:.2f}" == "-0.15"
-    # the self-check: theta = 45, B2 = (-5, 10), z^2 = 106
+    # the extra example: theta = 45, B2 = (-5, 10), z^2 = 106
     r = q0048.tilted(7, 3, 1, 2, 45)
     assert math.isclose(r["B2"][0], -5) and math.isclose(r["B2"][1], 10) and math.isclose(r["z_sq"], 106)
     assert f"{r['z']:.2f}" == "10.30"

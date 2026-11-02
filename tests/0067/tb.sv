@@ -1,6 +1,6 @@
 // Question 0067: the page's delay_bfs, delay_dijkstra and delay_directed against the
 // least total weight of every simple path (a depth-first walk) on the page's examples,
-// the self-checks and random graphs, directed and not; part a against part b with unit
+// the extra examples and random graphs, directed and not; part a against part b with unit
 // weights; and the page's answers written in from the Python tests.
 module tb;
   //@page function automatic int delay_bfs
@@ -49,13 +49,13 @@ module tb;
     check("example c", delay_directed(6, e3, 1), -1);
     e3 = '{'{1, 2, 1}, '{1, 3, 5}, '{3, 2, 1}, '{3, 4, 2}, '{2, 5, 6}, '{4, 5, 1}};
     check("example c without 6", delay_directed(5, e3, 1), 7);
-    // the self-checks
+    // the extra examples
     e2 = '{'{1, 2}, '{2, 3}, '{3, 4}, '{4, 5}, '{5, 6}, '{6, 7}, '{1, 7}, '{2, 6}};
-    check("self-check a", delay_bfs(7, e2, 1), 3);
+    check("extra example a", delay_bfs(7, e2, 1), 3);
     e3 = '{'{1, 2, 4}, '{1, 3, 1}, '{3, 2, 1}, '{2, 4, 2}, '{3, 4, 5}};
-    check("self-check b", delay_dijkstra(4, e3, 1, 0), 4);
+    check("extra example b", delay_dijkstra(4, e3, 1, 0), 4);
     e3 = '{'{1, 2, 4}, '{1, 3, 1}, '{2, 3, 1}, '{2, 4, 2}, '{3, 4, 5}};
-    check("self-check c", delay_directed(4, e3, 1), 6);
+    check("extra example c", delay_directed(4, e3, 1), 6);
     // the edges of the cost block
     e2 = new[0]; e3 = new[0];
     check("one node a", delay_bfs(1, e2, 1), 0);

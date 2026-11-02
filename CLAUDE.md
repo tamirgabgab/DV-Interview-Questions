@@ -119,7 +119,7 @@ notes and simulator quirks are listed in `HANDOFF.md` under "Technical notes".
   every check and blocks a broken deploy: if it fails, fix it on `main` at once. Anything
   bigger keeps the full flow: branch CI green first, then fast-forward `main`.
 - Text-only changes to question pages (prose only: no code block, front matter, generated
-  block, self-check or box changes; the owner, 2026-11-02) go straight to `main` after the
+  block or box changes; the owner, 2026-11-02) go straight to `main` after the
   fast checks: `lint_pages.py`, `run_tests.py --python-only <id>`, `mkdocs build --strict`,
   `check_links.py`, `check_phone.py --only <id>`, and a screenshot of the changed part
   looked at (display math, indentation inside lists and admonitions, RTL), about three

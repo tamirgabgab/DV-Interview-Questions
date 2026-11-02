@@ -1,6 +1,6 @@
 /* The site's styles, part 13 of 21: round M (session 28), motion and finish: the drawn logo, the
    header and the table of contents, the home hero's live waves and example, the cards, the
-   question header card, self-check and hint feedback, the box skeleton, page transitions,
+   question header card, hint feedback, the box skeleton, page transitions,
    the footer and the 404 page. Every movement is defined only without reduced motion.
    The parts load in order (mkdocs.yml extra_css), and a later part may refine an earlier one. */
 
@@ -60,17 +60,6 @@
 }
 @media screen and (max-width: 29.9375em) {
   .md-typeset .question-header, .md-typeset .question-header:has(+ .part-nav, + .path-nav) { padding: var(--sp-3); }
-}
-
-/* M7: a self-check's reply: the check mark of a right answer is drawn, a wrong answer
-   shakes the field and gives it the trap colour. */
-.md-typeset .selfcheck__tick { width: 1.05em; height: 1.05em; margin-inline-end: 0.25em; vertical-align: -0.18em; }
-.md-typeset .selfcheck__tick path { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.md-typeset .selfcheck:has(.selfcheck__msg.is-bad) .selfcheck__in { border-color: var(--diff-hard); }
-@media (prefers-reduced-motion: no-preference) {
-  .md-typeset .selfcheck__tick path { stroke-dasharray: 1; animation: lg-draw 0.45s var(--ease) 0.05s both; }
-  .md-typeset .selfcheck__in.is-shake { animation: sc-shake 0.4s var(--ease); }
-  @keyframes sc-shake { 20% { transform: translateX(-5px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
 }
 
 /* M8: the dots above a run of hints (question-tools.js), one per hint, filled once opened. */

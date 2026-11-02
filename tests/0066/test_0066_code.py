@@ -1,6 +1,6 @@
 """Question 0066: the page's merge, skyline, above and peak (as published) against the
 references of the generator (the overlap graph, the total height read at every integer
-point) on random inputs; the page's examples and self-checks; the claims of the proofs
+point) on random inputs; the page's examples and extra examples; the claims of the proofs
 (after sorting only the last merged interval can overlap, the merged output is disjoint and
 sorted, the pieces are maximal and canonical, the order at equal positions does not matter);
 the corollary that part a is part b with height 1; the traps (no sort, the previous input
@@ -55,7 +55,7 @@ def test_page_examples():
     assert sum(h for s, e, h in q0066.TRIPLES_C if s <= 2 < e) == 6 == 2 + 3 + 1
 
 
-def test_self_checks():
+def test_extra_examples():
     assert len(merge([(2, 5), (1, 3), (6, 9), (9, 10), (12, 14)])) == 3
     assert merge([(2, 5), (1, 3), (6, 9), (9, 10), (12, 14)]) == [(1, 5), (6, 10), (12, 14)]
     assert skyline([(0, 4, 2), (2, 6, 3), (4, 8, 2)]) == [(0, 2, 2), (2, 6, 5), (6, 8, 2)]   # 3 pieces

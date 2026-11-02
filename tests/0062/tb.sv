@@ -35,7 +35,7 @@ module tb;
     s = '{0, 10}; e = '{10, 20};
     if (tags_needed(s, e) != 1) begin errors++; $display("a response and a send at 10: %0d", tags_needed(s, e)); end
     s = '{0, 10, 5}; e = '{10, 20, 15};
-    if (tags_needed(s, e) != 2) begin errors++; $display("self-check a: %0d", tags_needed(s, e)); end
+    if (tags_needed(s, e) != 2) begin errors++; $display("extra example a: %0d", tags_needed(s, e)); end
     s = new[0]; e = new[0];
     if (tags_needed(s, e) != 0) begin errors++; $display("empty"); end
     s = '{0, 2, 20, 22}; e = '{10, 12, 30, 32}; is_read = '{1, 1, 0, 0};

@@ -26,7 +26,7 @@ module tb;
 
   initial begin
     real L, H, a, b, theta, z, fx, fy, wx, t, s, legs, d;
-    // the page's example and the self-check
+    // the page's example and the extra example
     z = tilted_path(7, 3, 1, 2, 15, fx, fy, wx);
     if (!close(z * z, 92 + 10 * $sqrt(3.0), 1e-9) || !close(fx, 0.8026860219310012, 1e-9) || !close(wx, 4.6233096782319105, 1e-9)) begin
       errors++; $display("example: z = %f, food (%f, %f), water %f", z, fx, fy, wx);

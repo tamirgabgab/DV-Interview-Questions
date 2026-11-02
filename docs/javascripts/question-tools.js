@@ -237,9 +237,8 @@
 
   // Interview mode (session 30): a bar at the foot of the screen with a clock against the
   // question's target time (dvqInterview.targetMinutes: by difficulty, more for every part
-  // beyond the third), the hints opened and the self-checks answered right; a solution
-  // opens only after "how sure are you?"; a right self-check brings the next of the page's
-  // follow-up questions as the interviewer's question, its short answer folded; "end"
+  // beyond the third) and the hints opened; a solution opens only after "how sure are
+  // you?"; "end"
   // shows a summary beside the last interview of this question (kept in the browser), and
   // within a series from the home page's builder, a link to the series' next question.
   const CONF = ["מנחשים", "די בטוחים", "בטוחים"];
@@ -248,14 +247,9 @@
     const qid = bar.dataset.qid;
     const target = I ? I.targetMinutes(bar.dataset.difficulty, bar.dataset.parts) : 15;
     let on = false, running = false, startAt = 0, acc = 0, ticker = null;
-    let hints = new Set(), right = new Set(), conf = [], asked = new WeakSet(), fuNext = 0;
+    let hints = new Set(), conf = [], asked = new WeakSet();
     let ui = null;
     const secs = () => Math.floor((acc + (running ? Date.now() - startAt : 0)) / 1000);
-    const followups = () => {
-      const f = article.querySelector("details.followup");
-      return f ? Array.from(f.querySelectorAll(":scope > ul > li")) : [];
-    };
-    const checks = () => article.querySelectorAll(".selfcheck").length;
     const planNow = () => {
       const p = I && I.plan.get();
       if (!p || !Array.isArray(p.ids)) return null;
@@ -276,7 +270,6 @@
         '<span class="iv-gauge" aria-hidden="true"><i></i></span>' +
         `<span class="iv-stat">יעד <b>${target}</b> דקות</span>` +
         '<span class="iv-stat">רמזים <b class="iv-hints">0</b></span>' +
-        `<span class="iv-stat iv-stat-right">נכונות <b class="iv-right">0</b>${checks() ? ` מתוך ${checks()}` : ""}</span>` +
         '<button type="button" class="iv-btn iv-pause">השהיה</button>' +
         '<button type="button" class="iv-btn iv-end">סיום הראיון</button></div>';
       document.body.append(el);
@@ -292,7 +285,6 @@
     };
     const count = () => {
       ui.querySelector(".iv-hints").textContent = hints.size;
-      ui.querySelector(".iv-right").textContent = right.size;
     };
     const pause = () => {
       const b = ui.querySelector(".iv-pause");
@@ -304,15 +296,15 @@
       document.body.classList.toggle("interview-mode", on);
       btn.classList.toggle("is-active", on);
       btn.setAttribute("aria-pressed", String(on));
-      retip(btn, on ? "סיום הראיון : סיכום של הזמן, הרמזים והתשובות" : "מצב ראיון : שעון מול יעד, רמזים נספרים ושאלות המשך");
+      retip(btn, on ? "סיום הראיון : סיכום של הזמן, הרמזים והביטחון" : "מצב ראיון : שעון מול יעד ורמזים נספרים");
       repaint();
     };
     const start = (remember) => {
       if (on) return;
       if (!ui) ui = makeBar();
       on = true; running = true; startAt = Date.now(); acc = 0;
-      hints = new Set(); right = new Set(); conf = []; asked = new WeakSet(); fuNext = 0;
-      article.querySelectorAll(".iv-follow, .iv-conf").forEach((el) => el.remove());
+      hints = new Set(); conf = []; asked = new WeakSet();
+      article.querySelectorAll(".iv-conf").forEach((el) => el.remove());
       article.querySelectorAll(SOLUTION).forEach((d) => { d.open = false; });
       const p = planNow(), step = ui.querySelector(".iv-step");
       step.hidden = !p;
@@ -344,13 +336,11 @@
         '<dl class="iv-sum-grid">' +
         `<div><dt>זמן</dt><dd>${I.fmt(rec.secs)}<span class="iv-of"> מתוך ${rec.target} דקות</span></dd></div>` +
         `<div><dt>רמזים</dt><dd>${rec.hints}</dd></div>` +
-        `<div><dt>בדיקות נכונות</dt><dd>${rec.right}${rec.checks ? `<span class="iv-of"> מתוך ${rec.checks}</span>` : ""}</dd></div>` +
         `<div><dt>ביטחון לפני הפתרון</dt><dd class="iv-conf-list">${confText}</dd></div></dl>` +
         `<p class="iv-advice">${advice}</p>`;
       if (prev && Number.isFinite(prev.secs)) {
         const when = new Date(prev.at || Date.now()).toLocaleDateString("he-IL", { day: "numeric", month: "long" });
-        html += `<p class="iv-prev">בפעם הקודמת (${when}) : ${I.fmt(prev.secs)}, ${plural(prev.hints, "רמז אחד", "רמזים")}` +
-          `${prev.checks ? `, ${prev.right} מתוך ${prev.checks} נכונות` : ""}.</p>`;
+        html += `<p class="iv-prev">בפעם הקודמת (${when}) : ${I.fmt(prev.secs)}, ${plural(prev.hints, "רמז אחד", "רמזים")}.</p>`;
       }
       const p = planNow();
       html += '<p class="iv-sum-actions">';
@@ -373,7 +363,7 @@
     };
     const end = () => {
       if (!on) return;
-      const rec = { at: Date.now(), secs: secs(), target, hints: hints.size, right: right.size, checks: checks(), conf };
+      const rec = { at: Date.now(), secs: secs(), target, hints: hints.size, conf };
       clearInterval(ticker);
       on = false; running = false;
       ui.hidden = true;
@@ -425,29 +415,6 @@
       });
     }, true);
 
-    // a right self-check: the interviewer asks the next follow-up
-    document.addEventListener("dvq-selfcheck", (e) => {
-      const { box, ok } = e.detail || {};
-      if (!on || !ok || !box || !article.contains(box) || right.has(box)) return;
-      right.add(box);
-      count();
-      const items = followups();
-      if (fuNext >= items.length) return;
-      const li = items[fuNext++];
-      const say = document.createElement("div");
-      say.className = "iv-follow";
-      say.setAttribute("data-search-exclude", "");
-      const bubble = document.createElement("div");
-      bubble.className = "iv-bubble";
-      bubble.innerHTML = '<p class="iv-who-name">המראיין שואל</p>';
-      Array.from(li.children).forEach((c) => bubble.append(c.cloneNode(true)));
-      bubble.querySelectorAll("details").forEach((d) => { d.open = false; });
-      say.innerHTML = '<span class="iv-who" aria-hidden="true">מ</span>';
-      say.append(bubble);
-      box.after(say);
-      // math in a copy that MathJax had not reached yet (the copy of typeset math is left as it is)
-      if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise([bubble]).catch(() => {});
-    });
 
     return { on: () => on, start, end, inPlan: () => Boolean(planNow()) };
   };

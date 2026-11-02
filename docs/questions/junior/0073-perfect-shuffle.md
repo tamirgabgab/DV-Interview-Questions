@@ -45,10 +45,6 @@ added: 2026-11-01
     ‏\( p \to 2p \) בחצי העליון, ו-\( p \to 2p - 51 \) בתחתון : זה \( 2p \bmod 51 \). מתי \( 2^e \bmod 51 \)
     חוזר ל-1?
 
-<div class="selfcheck" data-answer="8" data-show="8 : ‏2⁸ = 256 = 5 · 51 + 1" data-hint="ב-out-shuffle הקלף במקום p עובר ל-2p mod 51. החפיסה חוזרת כש-2 בחזקת e שווה 1 מודולו 51." markdown>
-אחרי כמה out-shuffles חפיסה של 52 קלפים חוזרת לסדר המקורי?
-</div>
-
 ??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
         ‏**8 out-shuffles**, ו-**52 in-shuffles**. ב-out-shuffle הקלף במקום \( p \) עובר ל-\( 2p \bmod 51 \)
@@ -115,10 +111,6 @@ added: 2026-11-01
 ??? tip "רמז 2"
     למה תמיד קיימת חזקה \( e \) עם \( 2^e \equiv 1 \pmod M \)? חשבו על \( M \) אי-זוגי ועל עקרון שובך
     היונים בין החזקות של 2.
-
-<div class="selfcheck" data-answer="6" data-show="6 : ‏2⁶ = 64 ≡ 1 mod 63" data-hint="ב-out-shuffle של n זוגי המודולו הוא n − 1 = 63." markdown>
-אחרי כמה out-shuffles חפיסה של 64 קלפים חוזרת?
-</div>
 
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"

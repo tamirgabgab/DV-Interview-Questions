@@ -33,7 +33,7 @@ def test_page_examples():
     assert max(w) - min(w) == 5 and max([1, 2, 4, 7]) - min([1, 2, 4, 7]) == 6
 
 
-def test_self_checks():
+def test_extra_examples():
     # part a: [9 8 7 6 5 10], k = 4, the step of i = 5: one index from the front, three from the back
     ev = [e for e in q0063.trace_max([9, 8, 7, 6, 5, 10], 4) if e["i"] == 5 and e["kind"] != "push"]
     assert [e["kind"] for e in ev] == ["front", "pop", "pop", "pop"] and [e["idx"] for e in ev] == [1, 4, 3, 2]

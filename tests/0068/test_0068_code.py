@@ -1,6 +1,6 @@
 """Question 0068: the page's StreamMedian, StreamQuantile and WindowQuantile (as published)
 against sorting the prefix or the window on random streams with many duplicates and every p
-from 0 to 1; the page's examples and self-checks; the claims of the proofs (the order and
+from 0 to 1; the page's examples and extra examples; the claims of the proofs (the order and
 size invariants, the target moving by at most one, the live counts, the heap sizes bounded
 by 2 live + 1, the memory growth without the rebuild); the traps (the sign, floor and the
 float ceil) and the numbers of the follow-ups (the counting array, Welford)."""
@@ -41,7 +41,7 @@ def test_page_examples():
     assert all(q0068.rank_of(n, 99, 100) == n for n in range(1, 100)) and q0068.rank_of(100, 99, 100) == 99
 
 
-def test_self_checks():
+def test_extra_examples():
     assert stream_medians(S)[5] == 6 and sorted(S[:6]) == [1, 3, 5, 7, 8, 15]
     assert stream_quantiles(S, 9, 10)[-1] == 15 and sorted(S)[8] == 15 and q0068.rank_of(10, 9, 10) == 9
     assert window_quantiles(S, 4, 1, 2)[-1] == 9 and sorted(S[-4:]) == [2, 9, 10, 20]

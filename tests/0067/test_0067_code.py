@@ -1,5 +1,5 @@
 """Question 0067: the page's delay_bfs, delay_dijkstra and delay_directed (as published)
-against every simple path on random graphs; the page's examples and self-checks, the
+against every simple path on random graphs; the page's examples and extra examples, the
 claims of the proofs (the queue holds at most two consecutive times, every node settles
 once, part a is part b with unit weights), the traps (BFS with weights, a negative weight,
 the stale entries, the sum, the -1 case, both directions in part c) and the follow-ups
@@ -42,7 +42,7 @@ def test_page_examples():
     assert delay_dijkstra(2, [[1, 2, 0]], 1) == 0                                # a zero weight is allowed
 
 
-def test_self_checks():
+def test_extra_examples():
     ring = [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [1, 7], [2, 6]]
     assert delay_bfs(7, ring, 1) == 3
     assert q0067.brute_times(7, ring, 1, weighted=False) == [0, 1, 2, 3, 3, 2, 1]

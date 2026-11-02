@@ -1,5 +1,5 @@
 """Question 0065: the generator's references against the page code, the explorer's
-JavaScript (the frames of the islands flood) against the generator's trace, the self-check
+JavaScript (the frames of the islands flood) against the generator's trace, the extra example
 grids, and the page copies of the generated blocks."""
 
 import json
@@ -29,11 +29,11 @@ def test_generator_matches_the_page_code():
         assert len(q0065.components(grid, True)) == ns["count_islands8"](grid)
 
 
-def test_self_checks():
+def test_extra_examples():
     # part a: the X with four neighbours, five islands; part b: with eight, one
     assert ns["count_islands"](q0065.SC_GRID) == 5 and ns["count_islands8"](q0065.SC_GRID) == 1
     assert ns["island_sizes"](q0065.SC_GRID, True) == [5]
-    # part c: the largest island of the self-check grid, and the cells the answer names
+    # part c: the largest island of the extra example grid, and the cells the answer names
     assert ns["island_sizes"](q0065.SC_GRID_C) == [5, 3]
     big = max(q0065.components(q0065.SC_GRID_C), key=len)
     assert big == {(0, 3), (1, 3), (2, 3), (2, 2), (2, 1)}

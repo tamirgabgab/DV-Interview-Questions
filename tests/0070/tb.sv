@@ -1,7 +1,7 @@
 // Question 0070: the page's shortest_path, shortest_with_breaks and cheapest_path against
 // brute-force searches written here (a BFS over every state (cell, breaks left) with one
 // visit per state and no pruning, and costs relaxed over every move until nothing changes)
-// on the page's examples, the self-checks, the trap of part b and 2,000 random grids up to
+// on the page's examples, the extra examples, the trap of part b and 2,000 random grids up to
 // 6 x 6 with both neighbourhoods; the path of part a is checked step by step.
 module tb;
   //@page typedef struct { int r, c; } cell_t;
@@ -116,12 +116,12 @@ module tb;
     c3 = '{"1111111", "1559551", "1599951", "1599951", "1559551", "1115111"};
     check("example c", cheapest_path(c3, '{2, 0}, '{3, 6}, 0), 11);
     check("example c, diagonals", cheapest_path(c3, '{2, 0}, '{3, 6}, 1), 9);
-    // the self-checks
+    // the extra examples
     sc = '{"0000", "1110", "0000", "0111"};
-    check_path("self-check a", sc, '{3, 0}, '{0, 0}, 0, 9);
-    check("self-check b", shortest_with_breaks(sc, '{3, 0}, '{0, 0}, 1, 0), 3);
+    check_path("extra example a", sc, '{3, 0}, '{0, 0}, 0, 9);
+    check("extra example b", shortest_with_breaks(sc, '{3, 0}, '{0, 0}, 1, 0), 3);
     sc = '{"191", "151", "111"};
-    check("self-check c", cheapest_path(sc, '{0, 0}, '{0, 2}, 0), 6);
+    check("extra example c", cheapest_path(sc, '{0, 0}, '{0, 2}, 0), 6);
     // edge cases
     sc = '{"010", "111", "000"};
     check_path("walled in", sc, '{0, 0}, '{2, 2}, 0, -1);

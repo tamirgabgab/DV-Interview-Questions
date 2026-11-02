@@ -1,5 +1,5 @@
 // Question 0061: the page's longest_ones and longest_same against every window, on the
-// page's examples and the self-checks, and on random vectors and bus strings of up to 14
+// page's examples and the extra examples, and on random vectors and bus strings of up to 14
 // cells with k up to 4.
 module tb;
   //@page function automatic int longest_ones
@@ -43,10 +43,10 @@ module tb;
     if (longest_ones(bits, 2) != 6) begin errors++; $display("page example: %0d", longest_ones(bits, 2)); end
     if (longest_ones(bits, 0) != 4 || longest_ones(bits, 3) != 10 || longest_ones(bits, 11) != 11) begin errors++; $display("k = 0, 3, 11"); end
     bits = '{1, 0, 1, 1, 0, 1, 0, 1, 1, 1};
-    if (longest_ones(bits, 1) != 5) begin errors++; $display("self-check a: %0d", longest_ones(bits, 1)); end
+    if (longest_ones(bits, 1) != 5) begin errors++; $display("extra example a: %0d", longest_ones(bits, 1)); end
     if (longest_same("AAABBCBABA", 2) != 6) begin errors++; $display("bus example: %0d", longest_same("AAABBCBABA", 2)); end
     if (longest_same("AAABBCBABA", 0) != 3 || longest_same("AAABBCBABA", 1) != 4) begin errors++; $display("bus k = 0, 1"); end
-    if (longest_same("ABAACAAB", 2) != 7 || longest_same("ABAACAAB", 1) != 5) begin errors++; $display("self-check b"); end
+    if (longest_same("ABAACAAB", 2) != 7 || longest_same("ABAACAAB", 1) != 5) begin errors++; $display("extra example b"); end
     bits = new[0];
     if (longest_ones(bits, 1) != 0 || longest_same("", 1) != 0) begin errors++; $display("empty"); end
     for (int r = 0; r < 300; r++) begin

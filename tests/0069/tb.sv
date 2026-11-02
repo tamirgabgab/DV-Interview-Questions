@@ -1,5 +1,5 @@
 // Question 0069: the page's Fenwick tree, passed, passed_merge, overtook, inversions,
-// disorder, arrival_order and live_overtakes on the page's example, the self-checks,
+// disorder, arrival_order and live_overtakes on the page's example, the extra examples,
 // fixed arrays whose answers were computed by the page's Python (written here), and
 // random arrays with and without ties against an O(n^2) count of every pair.
 module tb;
@@ -65,13 +65,13 @@ module tb;
     ft.add(5); ft.add(7);
     if (ft.prefix(7) != 3 || ft.prefix(4) != 1 || ft.prefix(2) != 0 || ft.prefix(8) != 3 || ft.prefix(0) != 0) begin errors++; $display("prefix"); end
     if ((12 & -12) != 4 || (6 & -6) != 2 || (8 & -8) != 8 || (7 & -7) != 1) begin errors++; $display("lowest set bit"); end
-    // the page's example and the self-checks
+    // the page's example and the extra examples
     done = '{5, 2, 6, 1};
     check("example", done, '{2, 1, 1, 0}, '{0, 1, 0, 3});
     if (inversions(done) != 4) begin errors++; $display("example: inversions"); end
     done = '{7, 3, 9, 2, 8};
-    check("self-check", done, '{2, 1, 2, 0, 0}, '{0, 1, 0, 3, 1});
-    if (inversions(done) != 5) begin errors++; $display("self-check: inversions"); end
+    check("extra example", done, '{2, 1, 2, 0, 0}, '{0, 1, 0, 3, 1});
+    if (inversions(done) != 5) begin errors++; $display("extra example: inversions"); end
     // answers written by the page's Python (tests/0069/test_0069_code.py checks the same code)
     done = '{5, 5, 5};
     check("all equal", done, '{0, 0, 0}, '{0, 0, 0});

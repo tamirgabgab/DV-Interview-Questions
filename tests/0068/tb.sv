@@ -1,6 +1,6 @@
 // Question 0068: the page's heap_t, StreamMedian, StreamQuantile and WindowQuantile against
 // sorting the prefix or the window: the page's examples (the medians, p = 9/10, p = 1/4,
-// W = 4 with p = 1/2, as the Python tests print them), the self-checks, and random streams
+// W = 4 with p = 1/2, as the Python tests print them), the extra examples, and random streams
 // with many duplicates, every p from 0 to 1 and windows from 1 to 7.
 module tb;
   //@page class heap_t
@@ -71,10 +71,10 @@ module tb;
       if (q90.quantile() != q90_want[i]) begin errors++; $display("p = 0.9 after %0d: %0d", i + 1, q90.quantile()); end
       if (q25.quantile() != q25_want[i]) begin errors++; $display("p = 0.25 after %0d: %0d", i + 1, q25.quantile()); end
       if (wq.quantile() != win_want[i]) begin errors++; $display("W = 4 after %0d: %0d", i + 1, wq.quantile()); end
-      // the self-checks: the median after six values is 6, p = 0.9 after ten is 15, the window's last is 9
-      if (i == 5 && med != 6.0) begin errors++; $display("self-check a"); end
+      // the extra examples: the median after six values is 6, p = 0.9 after ten is 15, the window's last is 9
+      if (i == 5 && med != 6.0) begin errors++; $display("extra example a"); end
     end
-    if (q90.quantile() != 15 || wq.quantile() != 9) begin errors++; $display("self-checks b, c"); end
+    if (q90.quantile() != 15 || wq.quantile() != 9) begin errors++; $display("extra examples b, c"); end
     if (sm.low.size() != 5 || sm.high.size() != 5) begin errors++; $display("sizes at the end: %0d %0d", sm.low.size(), sm.high.size()); end
 
     // random streams against sorting

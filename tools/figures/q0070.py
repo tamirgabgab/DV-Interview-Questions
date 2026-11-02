@@ -38,7 +38,7 @@ CE_GRID, CE_S, CE_T, CE_K = ["001", "101", "010"], (0, 0), (2, 2), 1      # the 
 COST = ["1111111", "1559551", "1599951", "1599951", "1559551", "1115111"]
 CS, CT = (2, 0), (3, 6)
 KMAX = 4
-# the self-checks
+# the extra examples
 SC_GRID = ["0000", "1110", "0000", "0111"]
 SC_A = (SC_GRID, (3, 0), (0, 0))                                           # part a: 9
 SC_B = (SC_GRID, (3, 0), (0, 0), 1)                                        # part b: 3

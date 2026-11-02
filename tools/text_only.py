@@ -8,9 +8,9 @@ A change is text only when every file it touches is a question page
 (docs/questions/<level>/<id>-<slug>.md) or a file the workflow ignores anyway (README,
 HANDOFF and the like, or videos/), and in every page only prose changed: the front matter,
 the fenced code blocks, the generated blocks between `<!-- gen n -->` and `<!-- /gen -->`,
-and every line that carries HTML a script reads (a self-check, an explorer box, a figure, a
-stepper) are the same before and after. Such a change cannot touch the tested code, the
-figures, the answers or the boxes, so the fast lane checks only what prose can break: the
+and every line that carries HTML a script reads (an explorer box, a figure, a stepper) are
+the same before and after. Such a change cannot touch the tested code, the figures or the
+boxes, so the fast lane checks only what prose can break: the
 lint, the build, the links, the touched questions' Python tests and the phone check of the
 touched pages (CONTRIBUTING.md, "The fast lane").
 
@@ -34,7 +34,7 @@ GEN_OPEN = re.compile(r"<!--\s*gen\s+\d+\s*-->")
 GEN_CLOSE = re.compile(r"<!--\s*/gen\s*-->")
 # A line with HTML that a script or the hook reads: its attributes and data must not change.
 ACTIVE = re.compile(r"<(div|svg|section|figure|table|span|details)\b[^>]*"
-                    r"(class=\"[^\"]*(selfcheck|explorer|stepper|steps-fig|sf-fig|figure)|data-)")
+                    r"(class=\"[^\"]*(explorer|stepper|steps-fig|sf-fig|figure)|data-)")
 
 
 def protected(text: str) -> list[str]:

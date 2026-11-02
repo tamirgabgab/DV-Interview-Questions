@@ -302,20 +302,8 @@ under the item (8 spaces, the answer 12); `lint_pages.py` fails on a follow-up w
 and on a non-breaking space inside a fenced code block (the colon rule is for Hebrew text
 only).
 
-A part whose answer is a number can have a **self-check** just before its solution block:
-
-```markdown
-<div class="selfcheck" data-answer="13/27" data-show="13/27 ≈ 0.481" data-hint="..." markdown>
-מה ההסתברות ששני הילדים בנים?
-</div>
-```
-
-`docs/javascripts/selfcheck.js` adds a field and a check button: a whole answer must match
-exactly, a fraction or a decimal to three places; a wrong answer shows the hint (plain
-text, the colon rule applies) and then a button that shows `data-show`; a right one is
-remembered per page in the browser (it does not mark the question solved). `lint_pages.py`
-checks the attributes and that a solution block follows, and `tests/tools/test_selfcheck.py`
-recomputes every answer, so a new self-check comes with its computation there.
+There are no self-check fields on the pages (removed by the owner, 2026-11-02): a reader
+checks an answer by opening the part's solution.
 
 The build hook validates the front matter and **fails the build** on a missing field, an
 unknown level, difficulty or kind, a level that does not match the folder, a file name that does
@@ -341,11 +329,8 @@ not start with the id, or a duplicate id. It also generates, per question page:
   mode): a bar at the foot of the screen with a clock against the question's target
   (`dvqInterview.targetMinutes` in `docs/javascripts/interview.js`: 10, 15 or 25 minutes
   by difficulty, 3 more for every part beyond the third; the hook puts `data-difficulty`
-  and `data-parts`, the `### סעיף` headings, on the toolbar), the hints opened and the
-  self-checks answered right (`selfcheck.js` sends a `dvq-selfcheck` event); a solution
-  opens only after "how sure are you?"; after a right self-check the next item of the
-  page's follow-up list appears as the interviewer's question, its short answer folded;
-  "end" shows a summary beside the last interview of that question (`dvq-interview:<id>`
+  and `data-parts`, the `### סעיף` headings, on the toolbar) and the hints opened; a
+  solution opens only after "how sure are you?"; "end" shows a summary beside the last interview of that question (`dvq-interview:<id>`
   in localStorage), and within a series from the home page's builder (`dvq-plan`), a link
   to the series' next question, where the mode starts by itself. "Open all" leaves the
   solutions closed while it runs. The styles are in `21-interview.css`.
@@ -520,7 +505,7 @@ focus shows in the line under the fan (`.hb-peek`). A new series gathers the car
 pile and deals the new ones (still under reduced motion and in an automated browser). It
 stays hidden when `questions.json` does not load. Under the "continue" card, **my map**
 (`<!-- my-map -->`, `_my_map` in the hook, `home-extras.js`): a square per question, a
-row per level, painted solved, started (a self-check answered or an interview done) or
+row per level, painted solved, started (an interview done) or
 not yet, hidden until the reader has one of these; one square is in the tab order and the
 arrows move between them.
 Under it come **"how it works"** (`<!-- how-it-works -->`, three steps from `HOW_STEPS` in
@@ -569,8 +554,7 @@ slides along the table of contents to the section being read; a short cross-fade
 pages (`@view-transition`, where the browser has it) in which a question's title moves
 from the link that was followed into the page (`motion.js` names that one link
 `dvq-title`, the page's `h1` has the same name); cards whose top edge fills with amber
-under the pointer; a self-check whose right answer draws its check mark and whose wrong
-answer shakes the field; a row of dots above a run of hints, one per hint, filled once it
+under the pointer; a row of dots above a run of hints, one per hint, filled once it
 is opened (`question-tools.js`); a box not built yet shown as a skeleton (`.explorer:empty`);
 and buttons with a raised shadow and a focus ring that settles in (only its offset moves,
 so the ring is there from the first frame). The question header is a card: the title, one
@@ -618,7 +602,7 @@ The visual round V (parts 15 to 19, each with its own script):
   - The code tabs inside a solution (`details.success .tabbed-block > .highlight`, only
     those) are drawn as an editor window with the file name and the copy button in its bar.
 - **Details (`19-details.css`, `details.js`).**
-  - A short green pulse when a question is marked solved or a self-check answer is right.
+  - A short green pulse when a question is marked solved.
   - A clock-and-data wave in a box's reserved space while it loads.
   - The content icons, stroked like the logo: one per kind (`kind_icon`), per level
     (`level_icon`) and per study path (`path_icon`). A new path needs an entry in
@@ -870,7 +854,7 @@ interactive stop must have a name and a focus ring while `:focus-visible`, the f
 must be the skip link and the walk must end; the theme's header, drawer, search and footer
 are walked but not judged. On the question page it presses the keys of the components:
 Enter on a hint and on a fold, the arrows in a box, Enter and Escape on the enlarge button
-and the lightbox, Enter in a self-check field and on "▶ להרצה", and "/" for the search. A
+and the lightbox, Enter on "▶ להרצה", and "/" for the search. A
 new keyboard behaviour of a component belongs there. MathJax's contextual menu is off
 (`docs/javascripts/mathjax.js`): with it every formula was a tab stop. The first question
 page with a tutorial video is walked too, and its dialog checked by keyboard: Enter on the
@@ -957,7 +941,7 @@ instead of about twenty (the owner, 2026-11-02). `tools/text_only.py BASE HEAD` 
 touched file must be a question page (or a file outside the site: README, the notes,
 `VIDEOS.md`, `videos/`), and in every page the front matter, the fenced code blocks, the
 generated blocks (`<!-- gen n -->` … `<!-- /gen -->`) and every line with HTML a script reads
-(a self-check, an explorer box, a figure, a stepper, any `data-` attribute) must be the same
+(an explorer box, a figure, a stepper, any `data-` attribute) must be the same
 before and after. The gate job runs it on every push; on a fast push the workflow runs the
 lint, `check_videos.py`, the touched questions' Python tests, the build, the links and the
 phone check of the touched pages only, skips Verilator, the explorer checks, the 404 and the

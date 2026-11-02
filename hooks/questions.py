@@ -480,7 +480,7 @@ def _tool(cls: str, icon: str, tip: str, extra: str = "", name: str = "") -> str
 def _tools(q: dict, page_url: str) -> str:
     """The page tools as icon buttons (UI324): open or close every block (one toggle),
     interview mode (question-tools.js: a clock against the difficulty's target, hints and
-    answers counted, a follow-up after each right self-check), solved / favourite marks (kept in the browser) and a
+    the hints counted, the confidence before a solution), solved / favourite marks (kept in the browser) and a
     random question of the same level. They sit beside the header's chip row; the toolbar
     carries the level's ids and links for the message shown when a question is marked
     solved."""
@@ -655,7 +655,7 @@ def _path_cards(page_url: str, featured: bool = False) -> str:
 
 
 HOW_STEPS = [("search", "בוחרים שאלה", "לפי רמת משרה, נושא או מסלול לימוד, או שאלה אקראית."),
-             ("timer", "פותרים לבד", "עם רמזים שנפתחים בהדרגה, ובמצב ראיון עם שעון ושאלות המשך."),
+             ("timer", "פותרים לבד", "עם רמזים שנפתחים בהדרגה, ובמצב ראיון עם שעון מול יעד."),
              ("play", "בודקים ומריצים", "פתרון מלא עם הוכחה, קוד שנבדק אוטומטית והרצה בדפדפן.")]
 
 
@@ -1010,7 +1010,7 @@ def _continue_card() -> str:
 
 def _my_map(page_url: str) -> str:
     """My map (session 30): a square per question, a row per level, painted by home-extras.js
-    from this browser's marks (solved, started: a self-check answered or an interview done);
+    from this browser's marks (solved, started: an interview done);
     hidden until the reader has marked or started a question."""
     rows = []
     for lv, name in LEVELS.items():

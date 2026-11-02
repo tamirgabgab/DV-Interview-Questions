@@ -24,10 +24,6 @@ def f():
     return 1
 ```
 
-<div class="selfcheck" data-answer="3" markdown>
-שאלה?
-</div>
-
 <div class="explorer" data-kind="divfsm" data-m="3"></div>
 """
 
@@ -41,14 +37,9 @@ def test_prose_only_is_fast():
     assert fast and ids == ["0055"]
 
 
-def test_selfcheck_question_text_is_prose():
-    assert run(BASE.replace("שאלה?", "שאלה אחרת?"))[0]
-
-
 def test_code_figure_front_matter_and_boxes_are_not():
     for old, new in [("return 1", "return 2"), ("<svg class=\"figure\">a", "<svg class=\"figure\">b"),
-                     ("title: x", "title: y"), ('data-answer="3"', 'data-answer="4"'),
-                     ('data-m="3"', 'data-m="5"')]:
+                     ("title: x", "title: y"), ('data-m="3"', 'data-m="5"')]:
         assert not run(BASE.replace(old, new))[0], old
 
 

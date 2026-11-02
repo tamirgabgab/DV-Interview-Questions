@@ -1,6 +1,6 @@
 """Question 0061: the page's longest_ones and longest_same against every window on random
 vectors and bus strings; the page's numbers (6 on 11100011110 with k = 2, 4 with k = 0,
-6 on the bus with k = 2, the self-checks); the generator's traces; the explorer's
+6 on the bus with k = 2, the extra examples); the generator's traces; the explorer's
 JavaScript against the generator's traces; and the page copies of the blocks."""
 
 import json
@@ -14,8 +14,8 @@ import q0061  # noqa: E402
 
 ns = load_python(61)
 longest_ones, longest_same = ns["longest_ones"], ns["longest_same"]
-CHECK_A = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1]      # the self-check of part a, k = 1
-CHECK_B = "ABAACAAB"                           # the self-check of part b, k = 2
+CHECK_A = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1]      # the extra example of part a, k = 1
+CHECK_B = "ABAACAAB"                           # the extra example of part b, k = 2
 
 
 def test_page_examples():

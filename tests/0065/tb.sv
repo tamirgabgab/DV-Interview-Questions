@@ -1,6 +1,6 @@
 // Question 0065: the page's count_islands, count_islands8 and island_sizes against a
 // brute force (repeated label propagation: every land cell takes the smallest label among
-// itself and its neighbours until nothing changes) on the page's examples, the self-check
+// itself and its neighbours until nothing changes) on the page's examples, the extra example
 // grids, the edge cases and 2,000 random grids up to 8 x 8 with both neighbourhoods.
 module tb;
   //@page typedef struct { int r, c; } cell_t;
@@ -73,7 +73,7 @@ module tb;
     check("the X", g);
     g = '{"1101", "1001", "0111"};
     island_sizes(g, 0, s); want = '{5, 3};
-    if (s != want) begin errors++; $display("self-check c %p", s); end
+    if (s != want) begin errors++; $display("extra example c %p", s); end
     g = '{"0001", "0010", "0100", "1000"};
     if (count_islands(g) != 4 || count_islands8(g) != 1) begin errors++; $display("the diagonal line"); end
     g = new[0];

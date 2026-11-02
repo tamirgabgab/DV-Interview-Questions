@@ -1939,13 +1939,26 @@ section below starts at session 22, whose numbered items run on through the late
     where a new bit enters, both transitions derived step by step, part ב's display math
     fixed (it was indented 7 spaces, out of its list item), and video 0055 re-rendered with
     the new chapter names (7:04, [0, 211, 356]).
+132. **The self-checks removed (session 32, 2026-11-02).** The owner: the "בדקו את עצמכם"
+    fields add length and weight and nothing a reader does not get by opening the solution.
+    All 103 on 50 pages deleted with their question text (the answer is in the solution),
+    and the mechanism with them: `selfcheck.js`, its styles (10-rounds-w, 13-motion M7),
+    the lint rule, `tests/tools/test_selfcheck.py`, the keyboard check's step and three
+    contrast pairs. What leaned on them was dropped, not replaced (the owner's choice):
+    interview mode no longer counts right answers or asks a follow-up after one (the bar
+    keeps the clock, the target, the hints and the confidence question), "started" on my
+    map means an interview done, and a part's circle on the timeline gets its check only
+    when the whole question is marked solved. The per-question tests keep those values as
+    "extra examples" of the code. Old `dvq-check:` keys stay unread in readers' browsers.
+    The fast lane's classifier no longer names self-checks (any `data-` line is still
+    guarded).
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

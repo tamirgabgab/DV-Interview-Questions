@@ -16,10 +16,10 @@ refine one in an earlier part, and moving a rule between parts can change what w
 | `07-reading-aids.css` | reading aids (enlarge, lightbox, part bar), focus rings, code in dark mode, comments |
 | `08-explorers.css` | the explorer boxes of 0004 to 0047 |
 | `09-redesign.css` | the redesign: typography, icons, the header and toolbar, the hero, box cards, the 404 page, print, question tables |
-| `10-rounds-w.css` | rounds W1 to W4: surfaces, traps, the home page, the run panel, motion, self-checks |
+| `10-rounds-w.css` | rounds W1 to W4: surfaces, traps, the home page, the run panel, motion |
 | `11-questions.css` | the figures and boxes of 0036 and of 0049 to 0062 |
 | `12-rounds-y-s.css` | rounds Y and S: the tags page, box text size, touch tools, side navigation, button runs, S2 figures |
-| `13-motion.css` | round M: the drawn logo, the header and table of contents, the hero's live waves and example, cards, the question header card, self-check and hint feedback, the box skeleton, page transitions, the footer, the 404 page |
+| `13-motion.css` | round M: the drawn logo, the header and table of contents, the hero's live waves and example, cards, the question header card, hint feedback, the box skeleton, page transitions, the footer, the 404 page |
 | `14-layout.css` | the desktop layout: the wider grid, the folded level list in the side navigation, the grips that resize the three columns (`layout.js`) |
 | `15-home.css` | round V: the home page's navy band, the live level cards, the question of the day (`home-extras.js`) |
 | `16-maps.css` | round V: the study-path metro map and the tag graph (tokens `--mm-*`, `--tg-*`; `maps.js`) |

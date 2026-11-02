@@ -67,7 +67,7 @@
 
 // My map (session 30): a square per question, a row per level (the hook draws them as
 // links), painted from this browser: solved and favourite marks (marks.js), and started
-// (a self-check answered, or an interview done, interview mode). Hidden until there is
+// (an interview done, interview mode). Hidden until there is
 // something to show. One square is in the tab order; the arrows move between squares
 // (left is forward on this page), up and down between the levels, Home and End.
 (() => {
@@ -82,10 +82,10 @@
     return out;
   };
   const state = (cell, all) => {
-    const id = cell.dataset.id, path = new URL(cell.href).pathname;
+    const id = cell.dataset.id;
     const marks = window.dvqMarks;
     if (marks && marks.has(id, "solved")) return "solved";
-    if (all.some((k) => k === `dvq-interview:${id}` || k.startsWith(`dvq-check:${path}:`))) return "started";
+    if (all.includes(`dvq-interview:${id}`)) return "started";
     return "";
   };
   const say = { solved: "פתרתם", started: "התחלתם", "": "עוד לא" };
