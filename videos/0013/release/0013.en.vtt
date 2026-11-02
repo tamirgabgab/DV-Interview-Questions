@@ -1,0 +1,394 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.400
+Question 0013: sort the digits and subtract,
+this time with four digits. Junior level.
+
+2
+00:00:05.400 --> 00:00:10.300
+Three parts: check one number,
+check every number, and base B.
+
+3
+00:00:10.300 --> 00:00:14.300
+In the video of question 0012, with three digits,
+we got 495. Now four digits.
+
+4
+00:00:15.100 --> 00:00:20.133
+Take a number from 0 to 9999, say 3524,
+and write it with four digits.
+
+5
+00:00:20.133 --> 00:00:24.733
+Sort the digits from largest to smallest, 5432,
+and from smallest to largest, 2345.
+
+6
+00:00:24.733 --> 00:00:28.233
+Subtract the smaller from the larger,
+and get 3087.
+
+7
+00:00:28.233 --> 00:00:31.900
+If the difference equals the number itself,
+the number is called special.
+
+8
+00:00:31.900 --> 00:00:35.433
+Here 3087 differs from 3524,
+so 3524 is not special.
+
+9
+00:00:36.233 --> 00:00:41.433
+Part A: a function that takes a number x,
+and returns 1 if it is special, 0 otherwise.
+
+10
+00:00:42.133 --> 00:00:46.133
+The idea: both numbers are built
+from the same four digits.
+
+11
+00:00:46.133 --> 00:00:50.167
+Sort once in ascending order:
+that is the smaller number, 2345.
+
+12
+00:00:50.167 --> 00:00:54.833
+The same digits reversed are the larger,
+5432. No second sort is needed.
+
+13
+00:00:55.633 --> 00:01:00.433
+Now let's write it in Python: almost
+the same code as with three digits.
+
+14
+00:01:02.700 --> 00:01:06.800
+The function is_special_4 takes x,
+and returns 1 or 0.
+
+15
+00:01:09.033 --> 00:01:13.533
+The format 04d writes x with four digits,
+zeros on the left: 95 becomes 0095.
+
+16
+00:01:13.533 --> 00:01:17.533
+sorted sorts the four characters
+in ascending order, into a list.
+
+17
+00:01:19.967 --> 00:01:23.867
+Joining the characters in ascending order
+gives the smaller number.
+
+18
+00:01:26.800 --> 00:01:31.033
+The same characters reversed give
+the larger, with no second sort.
+
+19
+00:01:33.700 --> 00:01:37.300
+Finally compare the difference with x,
+and return 1 or 0.
+
+20
+00:01:38.000 --> 00:01:42.467
+Let's run the code on 3524,
+beside the page box's column subtraction.
+
+21
+00:01:42.467 --> 00:01:46.200
+x = 3524: the digits in ascending order
+are 2, 3, 4 and 5.
+
+22
+00:01:46.200 --> 00:01:49.200
+The smaller number is 2345.
+
+23
+00:01:49.200 --> 00:01:52.200
+And the larger is 5432.
+
+24
+00:01:52.200 --> 00:01:56.600
+5432 minus 2345 is 3087, not 3524:
+the function returns 0.
+
+25
+00:01:57.400 --> 00:02:01.800
+And what if we apply the same step again and again,
+each time to the difference?
+
+26
+00:02:01.800 --> 00:02:06.200
+3524 gives 3087, 3087 gives 8352,
+and 8352 gives 6174.
+
+27
+00:02:06.200 --> 00:02:11.700
+And there it stops: 7641 minus 1467 is
+exactly 6174. On 6174 the function returns 1.
+
+28
+00:02:12.500 --> 00:02:18.000
+First trap: all digits equal, like
+7777. The difference is 0, so 7777 is not special.
+
+29
+00:02:18.000 --> 00:02:23.500
+But 0 itself is special: 0000 minus 0000
+is 0, the number itself. So says the page's table too.
+
+30
+00:02:24.300 --> 00:02:29.800
+Second trap: a short number. Without zeros
+on the left, 95 gives 95 minus 59, that is 36.
+
+31
+00:02:29.800 --> 00:02:34.600
+Padded to four digits it is 0095:
+9500 minus 0059, that is 9441.
+
+32
+00:02:35.400 --> 00:02:40.000
+The cost: always four digits,
+so O(1) time and O(1) memory.
+
+33
+00:02:40.799 --> 00:02:45.999
+Part B: run the function on 0 to 9999.
+Which numbers are special, and why?
+
+34
+00:02:46.699 --> 00:02:50.599
+Call the sorted digits,
+from the largest a to the smallest d.
+
+35
+00:02:50.599 --> 00:02:55.399
+The larger minus the smaller: the same digits,
+once in one order and once reversed.
+
+36
+00:02:55.399 --> 00:02:59.999
+This time the middle digits do not cancel,
+but everything groups into two gaps.
+
+37
+00:02:59.999 --> 00:03:04.732
+p is the gap between the largest and the smallest,
+and q the gap between the two middle ones.
+
+38
+00:03:04.732 --> 00:03:08.766
+The difference is 999p plus 90q:
+it depends only on the pair p, q.
+
+39
+00:03:08.766 --> 00:03:14.266
+b, c lie between a and d, so q ≤ p ≤ 9:
+only 55 pairs, so only 55 differences.
+
+40
+00:03:15.066 --> 00:03:21.032
+Each cell is one pair, holding the difference
+it gives, 999p + 90q. p = 0 gives only 0.
+
+41
+00:03:21.032 --> 00:03:26.032
+Check every cell: do the digits
+of the difference give the same p and q again?
+
+42
+00:03:26.032 --> 00:03:30.632
+53 cells fail: the digits
+of their difference give another pair.
+
+43
+00:03:30.632 --> 00:03:34.666
+Only one cell passes:
+p = 6, q = 2, that is 6174.
+
+44
+00:03:34.666 --> 00:03:38.766
+Together with 0, there are exactly two
+special numbers: 0 and 6174.
+
+45
+00:03:39.566 --> 00:03:45.066
+Why? Column subtraction gives the digits of the difference
+straight from p and q, borrowing in the low columns.
+
+46
+00:03:45.066 --> 00:03:50.566
+A special number equals its difference, so the difference's
+digits have the same p and q: two conditions.
+
+47
+00:03:50.566 --> 00:03:56.066
+When q = 0 the difference has two 9s, and then
+it needs three. That fails: the column is out.
+
+48
+00:03:56.866 --> 00:04:01.832
+When q ≥ 1, check which digit is the largest
+and which the smallest: only seven cases.
+
+49
+00:04:01.832 --> 00:04:06.999
+Six cases are ruled out. In the only one
+left, the largest is 9 − q, the smallest q − 1.
+
+50
+00:04:06.999 --> 00:04:11.966
+The second condition gives q = 2, so p = 6:
+999 · 6 + 90 · 2 = 6174.
+
+51
+00:04:12.766 --> 00:04:15.999
+And in code: no proof, just check everything.
+
+52
+00:04:18.199 --> 00:04:21.999
+find_special_4 takes nothing,
+and returns a list.
+
+53
+00:04:25.666 --> 00:04:30.166
+It goes over x from 0 to 9999, and keeps
+every x for which is_special_4 returns 1.
+
+54
+00:04:30.866 --> 00:04:35.466
+x = 0: all digits are 0, and the difference is 0.
+It is special, and goes into the list.
+
+55
+00:04:35.466 --> 00:04:39.566
+From 1 to 6173 there is no special number,
+so we jump ahead.
+
+56
+00:04:39.566 --> 00:04:44.232
+x = 6174: 7641 minus 1467 is 6174.
+Special, and it goes into the list.
+
+57
+00:04:44.232 --> 00:04:48.632
+And from 6175 to 9999 again there is none:
+the result is 0 and 6174.
+
+58
+00:04:49.432 --> 00:04:54.932
+In the page's box you click a pair, and the arrow
+leads to the pair of the next difference. Start from 9441.
+
+59
+00:04:54.932 --> 00:04:58.732
+9441 gives the pair p = 8, q = 0,
+that is 7992.
+
+60
+00:04:58.732 --> 00:05:01.866
+7992 leads to 7173,
+
+61
+00:05:01.866 --> 00:05:04.999
+7173 to 6354,
+
+62
+00:05:04.999 --> 00:05:08.132
+6354 to 3087,
+
+63
+00:05:08.132 --> 00:05:11.266
+and 3087 to 8352.
+
+64
+00:05:11.266 --> 00:05:16.232
+8352 leads to 6174, and the pair (6, 2)
+points to itself: the path stops.
+
+65
+00:05:16.832 --> 00:05:22.332
+Over all 10,000 numbers: 9,990 reach
+6174 within seven steps at most.
+
+66
+00:05:22.332 --> 00:05:26.332
+And the ten numbers whose digits are all equal,
+like 7777, fall to 0.
+
+67
+00:05:27.132 --> 00:05:32.632
+The loop checks 10,000 numbers, each
+in O(1). By the proof, checking 55 is enough.
+
+68
+00:05:33.432 --> 00:05:37.666
+Part C, briefly: the same process,
+but the number is written in base B.
+
+69
+00:05:38.366 --> 00:05:42.899
+The same computation, with B instead of 10:
+the difference again depends only on p and q.
+
+70
+00:05:42.899 --> 00:05:47.499
+And its digits, when q ≥ 1, are p, q − 1,
+B − q − 1 and B − p.
+
+71
+00:05:47.499 --> 00:05:52.999
+The same two conditions. Only one split of
+the digits gives a family: p = 3q and B = 5q.
+
+72
+00:05:53.799 --> 00:05:59.299
+The answer: a fixed point exists when B is divisible
+by 5; its digits: 3k, k − 1, 4k − 1, 2k.
+
+73
+00:05:59.299 --> 00:06:04.599
+Base 5 gives 3032, base 15 gives 92B6,
+and in base 10, with k = 2, it is 6174.
+
+74
+00:06:04.599 --> 00:06:10.099
+And two exceptions: 0111 and 1001 in base 2,
+and 3021 in base 4. No other base has one.
+
+75
+00:06:10.899 --> 00:06:16.366
+But existence is not convergence. In the page's box:
+base 15, and its fixed point 92B6.
+
+76
+00:06:16.366 --> 00:06:20.866
+1234 in base 15 does not reach it: it enters
+a cycle of four, 30DC to 9676.
+
+77
+00:06:20.866 --> 00:06:24.766
+The same digits in base 10:
+1234, with p = 3 and q = 1.
+
+78
+00:06:24.766 --> 00:06:28.732
+Three steps, through 3087 and 8352,
+and it stops at 6174.
+
+79
+00:06:29.532 --> 00:06:35.432
+In short: the difference depends only on p and q,
+and only the pair (6, 2) returns to itself: 6174.
+
+80
+00:06:35.432 --> 00:06:40.332
+Try your own numbers and bases in the boxes
+on the page of question 0013 on the site.

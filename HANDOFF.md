@@ -1961,13 +1961,22 @@ section below starts at session 22, whose numbered items run on through the late
     fast, the camel box; part ב without code (the staircase, the area under 1/g, the closed
     form and the bound's proof); the bonus as its own short YouTube chapter (the page has
     two parts, so `video_parts` has two entries).
+134. **Videos 0016 and 0013 (session 32, 2026-11-02).** Two rounds of guiding questions each.
+    0016 (6:06, `[0, 183, 305]`), no code: a ring of people with a pointer, N = 5 step by
+    step, the table of F(N) to 32, the proof by the stop at a power of 2, the 41 of Yodfat
+    (told as a different rule, as the page's trap says), the moving top bit, the box; part ב
+    the same at a faster pace (zeros at 3^m and 2·3^m, as on the page); part ג short.
+    0013 (6:41, `[0, 160, 333]`): one line back to 0012, `is_special_4` typed in Python and
+    traced on 3524, the chain to 6174, the traps 7777 → 0 and 95 → 0095; part ב the grid
+    of the (p, q) pairs with a difference and ✓/✗ per cell, only (6, 2); the pairs and
+    histogram boxes; part ג short with the family B = 5k and the base box.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

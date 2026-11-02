@@ -646,6 +646,7 @@ videos (`videos/<id>/release/`):
 | 0030, 5:02 | 0:00 opening, 0:30 א, 2:33 ב, 4:49 closing | `[0, 153]` |
 | 0042, 7:07 | 0:00 opening, 0:24 א, 3:20 ב, 6:17 bonus, 6:56 closing | `[0, 200]` |
 | 0016, 6:06 | 0:00 opening, 0:25 א, 3:03 ב, 5:05 ג, 5:54 closing | `[0, 183, 305]` |
+| 0013, 6:41 | 0:00 opening, 0:36 א, 2:40 ב, 5:33 ג, 6:29 closing | `[0, 160, 333]` |
 
 The `video_parts` go into the pages' front matter with the YouTube id, once the videos
 are uploaded (see "Publishing and linking").
