@@ -1,0 +1,256 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0027: a cake shared by an arithmetic sequence,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:09.133
+Two parts: numbers first,
+then the general case, with a single peak.
+
+3
+00:00:09.933 --> 00:00:15.400
+A whole cake of size 1. People come in turn,
+and each cuts a slice of what is left.
+
+4
+00:00:15.400 --> 00:00:20.867
+Person k takes the fraction a + (k − 1)d
+of what is left: an arithmetic sequence.
+
+5
+00:00:21.667 --> 00:00:27.767
+For example a = d = 0.2: the fractions 0.2, 0.4, 0.6
+and 0.8, and the fifth, with 1, takes the rest.
+
+6
+00:00:27.767 --> 00:00:31.767
+The fraction grows, but what is left shrinks.
+Who gets the largest piece?
+
+7
+00:00:32.567 --> 00:00:37.767
+Part A: here a = 0.01 and d = 0.1, so
+the fractions are 0.01, 0.11, 0.21, 0.31 and so on.
+
+8
+00:00:40.867 --> 00:00:44.667
+The first person takes 0.01 of the whole cake,
+a very thin slice.
+
+9
+00:00:46.567 --> 00:00:51.533
+The second takes 0.11 of what is left, 0.99,
+and gets 0.1089: more than ten times as much.
+
+10
+00:00:53.433 --> 00:00:56.933
+The third takes 0.21 of 0.8811,
+and gets 0.1850.
+
+11
+00:00:58.833 --> 00:01:03.067
+The fourth takes 0.31 of 0.6961,
+and gets 0.2158. Up again.
+
+12
+00:01:04.967 --> 00:01:10.467
+The fifth takes 0.41, but only of 0.4803,
+and gets 0.1969: the first drop.
+
+13
+00:01:10.767 --> 00:01:15.733
+From here the shares only fall: the fraction grows,
+but there is almost nothing left to cut.
+
+14
+00:01:15.733 --> 00:01:20.833
+The eleventh would take 1.01, so
+he takes all the rest: only 0.0003.
+
+15
+00:01:20.833 --> 00:01:25.733
+The peak: the fourth person, with 0.2158 of the cake,
+about 21.6 percent.
+
+16
+00:01:26.533 --> 00:01:30.533
+Why the fourth? Two opposite forces:
+the fraction grows, and what is left shrinks.
+
+17
+00:01:30.533 --> 00:01:36.033
+Let Rₖ be what is left before person k.
+He takes pₖ of it, and the rest goes on.
+
+18
+00:01:36.033 --> 00:01:41.333
+Compare each person with the next: in the ratio
+what is left cancels, and only the fractions stay.
+
+19
+00:01:41.333 --> 00:01:46.800
+The next gets more when the ratio is above 1.
+Put pₖ₊₁ = pₖ + d and open the brackets.
+
+20
+00:01:46.800 --> 00:01:50.900
+A quadratic condition on pₖ alone,
+without what is left of the cake.
+
+21
+00:01:51.700 --> 00:01:56.233
+The positive root of p² + 0.1p − 0.1
+is the threshold T, about 0.2702.
+
+22
+00:01:56.233 --> 00:02:00.233
+Below the threshold the next one gets more,
+and above it he gets less.
+
+23
+00:02:01.033 --> 00:02:05.500
+Now the fractions themselves, a bar per person,
+and the dashed line is the threshold.
+
+24
+00:02:05.500 --> 00:02:10.233
+0.01, 0.11 and 0.21 are below the threshold:
+so the shares grow up to the fourth.
+
+25
+00:02:10.233 --> 00:02:15.733
+0.31 is the first to reach it, and all after are above:
+from the fourth on the shares only fall.
+
+26
+00:02:16.533 --> 00:02:21.633
+And his share: before the fourth there was left
+0.99 times 0.89 times 0.79 of the cake.
+
+27
+00:02:21.633 --> 00:02:26.233
+He takes 0.31 of that, and gets 0.2158:
+about 21.6 percent of the cake.
+
+28
+00:02:27.033 --> 00:02:31.933
+In the page's box you add one person at a time,
+and his slice is cut from the cake.
+
+29
+00:02:31.933 --> 00:02:36.833
+Three more people: the fourth,
+with the largest share so far.
+
+30
+00:02:36.833 --> 00:02:41.133
+The fifth already gets less: the ratio
+to the one before drops below 1.
+
+31
+00:02:41.133 --> 00:02:44.867
+And all eleven: the peak is at the fourth,
+as computed.
+
+32
+00:02:45.667 --> 00:02:49.700
+Part B: now a and d are general,
+with d at most one half.
+
+33
+00:02:50.400 --> 00:02:55.900
+The same steps as in part A, without numbers:
+the next gets more when d(1 − pₖ) > pₖ².
+
+34
+00:02:55.900 --> 00:03:01.300
+Divide by 1 − pₖ, positive for everyone
+but the last, and a function f appears.
+
+35
+00:03:01.300 --> 00:03:06.800
+f increases: the numerator p² grows, 1 − p shrinks,
+and both are positive. The derivative agrees.
+
+36
+00:03:07.600 --> 00:03:12.567
+Here is the curve f(p), and the dashed line
+is y = d, the 0.1 of part A.
+
+37
+00:03:12.567 --> 00:03:18.067
+Each person is a point on the curve, at his pₖ.
+The fractions grow, so the points climb.
+
+38
+00:03:18.067 --> 00:03:23.533
+The first three are below the line: the shares grow.
+The fourth is above it, and so is everyone after.
+
+39
+00:03:23.533 --> 00:03:29.000
+Once the condition fails, it fails for good:
+one peak, where the curve meets the line, at T.
+
+40
+00:03:29.800 --> 00:03:34.267
+The crossing is the positive root of
+p² + dp − d: the general threshold T.
+
+41
+00:03:34.267 --> 00:03:39.367
+The largest share is the first person whose fraction
+reaches the threshold, which gives a formula for k.
+
+42
+00:03:39.367 --> 00:03:43.900
+A check with part A: 2.60 rounds up to 3,
+plus 1: the fourth person.
+
+43
+00:03:43.900 --> 00:03:47.900
+The last person takes only what is left,
+but when d ≤ ½ it does not change the answer.
+
+44
+00:03:48.700 --> 00:03:52.500
+And when is there a tie? When someone's fraction
+equals the threshold exactly.
+
+45
+00:03:52.500 --> 00:03:57.533
+Example: a = d = 1/12. The threshold is
+exactly a quarter, which is exactly p₃ = 3/12.
+
+46
+00:03:57.533 --> 00:04:02.267
+So the third and the fourth get exactly
+the same share: 55/288 of the cake.
+
+47
+00:04:03.067 --> 00:04:07.067
+And if d is above one half? Capping the last fraction
+changes the picture: see the follow-up questions.
+
+48
+00:04:07.067 --> 00:04:12.567
+In the box's proof step each person is a point
+on the curve, and the peak is the first above the line.
+
+49
+00:04:12.567 --> 00:04:16.967
+With d = 0.25 the threshold rises to 0.390,
+and the peak moves to the third person.
+
+50
+00:04:17.767 --> 00:04:23.367
+To sum up: compare each person with the next,
+and the largest is the first to reach the threshold.
+
+51
+00:04:23.367 --> 00:04:29.267
+Try other a and d in the box
+on the page of question 0027 on the site.
