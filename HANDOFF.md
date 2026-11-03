@@ -1987,13 +1987,20 @@ section below starts at session 22, whose numbered items run on through the late
     typed in SystemVerilog and walked beside the page's draw, the i < j and < traps, the
     box with fixed seeds; part ב only what changes (`rect_set`, `constraint_mode`, the cross
     a corner test misses).
+137. **Videos 0027 and 0028 (session 32, 2026-11-03).** The cake pair, no code, the same
+    shape: a cake strip cut from what is left and the bars of the shares built person by
+    person, the peak through the ratio of neighbours, the tie, the exceptional case in one
+    sentence, the cake box. 0027 (4:30, `[0, 165]`): person 4 with 0.2158, T ≈ 0.270, the
+    increasing f, the tie at a = d = 1/12 (55/288 each). 0028 (4:35, `[0, 155]`): one line
+    back to 0027, person 10 with 0.1697, the traps of the last person (0.0155) and of the
+    threshold 1, T = 1 − 1/q, the tie at a = 0.25, q = 2 (0.375 each).
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

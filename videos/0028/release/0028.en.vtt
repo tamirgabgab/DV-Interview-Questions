@@ -1,0 +1,253 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.600
+Question 0028: a cake split in a geometric sequence,
+a junior-level question.
+
+2
+00:00:04.600 --> 00:00:08.833
+Two parts: plugging in numbers,
+then the general case with a proof.
+
+3
+00:00:09.633 --> 00:00:14.367
+As in question 0027, but now the fraction
+grows by a factor q, not by a fixed step.
+
+4
+00:00:14.367 --> 00:00:19.367
+A cake of size 1. Each person in turn cuts
+a fraction p_k of what is left, not of the whole cake.
+
+5
+00:00:19.367 --> 00:00:25.533
+An example with a = 0.1 and q = 2: the fractions
+0.1, 0.2, 0.4, 0.8, and the fifth takes the rest.
+
+6
+00:00:25.533 --> 00:00:29.533
+The fraction grows, but what is left
+to cut from shrinks. Who gets the largest piece?
+
+7
+00:00:30.333 --> 00:00:35.533
+Part A: a = 0.01 and q = 1.5. The fractions
+0.01, 0.015, 0.0225, each 1.5 times the last.
+
+8
+00:00:36.233 --> 00:00:40.967
+The cake on top, a chart below:
+the share each person gets, a bar per person.
+
+9
+00:00:40.967 --> 00:00:47.300
+The first five cut thin slices:
+the fraction is small and the cake is almost whole.
+
+10
+00:00:47.300 --> 00:00:53.100
+The fraction keeps growing by 1.5 and the bars
+rise. Up to the ninth, each one gets more.
+
+11
+00:00:53.100 --> 00:00:58.100
+The tenth takes 0.3844 of what is left
+and gets 0.1697: the tallest bar.
+
+12
+00:00:58.100 --> 00:01:03.900
+After him the fraction is large, but little is left.
+The bars fall, and the 13th takes the rest.
+
+13
+00:01:03.900 --> 00:01:07.900
+The first nine took less than 60% of the cake
+together, and from there the fraction jumps fast.
+
+14
+00:01:07.900 --> 00:01:12.900
+TODO
+
+15
+00:01:13.700 --> 00:01:19.100
+Notation: R_k is what is left before person k.
+He takes p_k of it, and the rest passes on.
+
+16
+00:01:19.100 --> 00:01:24.600
+Compare two neighbours: what is left cancels,
+and with p_{k+1} = q·p_k the fraction cancels too.
+
+17
+00:01:24.600 --> 00:01:29.767
+A very simple ratio is left: q times 1 − p_k.
+It does not depend on what is left at all.
+
+18
+00:01:29.767 --> 00:01:35.067
+The next person gets more exactly when the ratio
+is above 1, that is, when the fraction is below a third.
+
+19
+00:01:35.867 --> 00:01:40.467
+Here each bar is one person's fraction,
+and the dashed line is the threshold, one third.
+
+20
+00:01:40.467 --> 00:01:45.200
+Nine fractions are below the threshold: each of them
+is followed by someone who gets more.
+
+21
+00:01:45.200 --> 00:01:50.000
+The tenth fraction is the first above the threshold.
+All the fractions after it are above it.
+
+22
+00:01:50.800 --> 00:01:55.600
+Who passes the threshold? Multiply by q over a,
+since 0.5 over 0.01 is 50.
+
+23
+00:01:55.600 --> 00:02:00.000
+Take the logarithm in base 1.5 and round
+up: the tenth person.
+
+24
+00:02:00.000 --> 00:02:05.500
+TODO
+
+25
+00:02:06.100 --> 00:02:10.567
+A direct check: the ninth fraction is below
+the threshold, and the tenth is already above it.
+
+26
+00:02:10.567 --> 00:02:15.533
+And his share: 0.3844 of the 0.4415 left,
+that is, about 17% of the cake.
+
+27
+00:02:16.333 --> 00:02:21.133
+This is the page's box: the cake,
+and so far nine people in the table.
+
+28
+00:02:21.133 --> 00:02:25.600
+The next person: the tenth cuts 0.3844
+of what is left and gets 0.1697.
+
+29
+00:02:25.600 --> 00:02:29.833
+And the eleventh gets less, 0.1567.
+The peak is the tenth person.
+
+30
+00:02:29.833 --> 00:02:34.567
+TODO
+
+31
+00:02:35.367 --> 00:02:40.567
+Part B: any a and q, with 1 < q ≤ 2.
+Who gets the most, and why is there one peak?
+
+32
+00:02:41.267 --> 00:02:46.467
+The neighbours' ratio, q(1 − p_k), does not depend on
+Part A's numbers. Here it is as a dot per k.
+
+33
+00:02:46.467 --> 00:02:51.867
+The fractions grow, so the ratio only falls.
+Nine dots above the line: the shares grow.
+
+34
+00:02:51.867 --> 00:02:56.967
+The tenth person's dot is the first one
+below the line, and all after it stay below.
+
+35
+00:02:56.967 --> 00:03:00.967
+So there is one peak: the shares grow up to
+the first person who drops to the line, then only fall.
+
+36
+00:03:01.767 --> 00:03:07.167
+The threshold is where the ratio equals 1:
+T = 1 − 1/q. One third for q = 1.5.
+
+37
+00:03:07.167 --> 00:03:11.967
+Who passes the threshold: multiply by q over a
+and take the logarithm in base q.
+
+38
+00:03:11.967 --> 00:03:17.433
+And the formula: the first person whose fraction
+reaches the threshold. If a is above it, the first.
+
+39
+00:03:18.233 --> 00:03:23.733
+TODO
+
+40
+00:03:23.733 --> 00:03:29.233
+TODO
+
+41
+00:03:29.233 --> 00:03:33.233
+TODO
+
+42
+00:03:34.033 --> 00:03:39.433
+With a = 0.01 and other q: q = 2 gives
+the seventh person, with 0.313 of the cake.
+
+43
+00:03:39.433 --> 00:03:44.933
+The closer q is to 1, the later the peak,
+low and flat: with 1.1, the 25th person.
+
+44
+00:03:45.733 --> 00:03:51.133
+When is there a tie? When q^k equals
+(q − 1)/a exactly. For example a = 0.25 and q = 2.
+
+45
+00:03:51.933 --> 00:03:57.033
+The second fraction is exactly a half, the threshold.
+The second and third get 0.375 each.
+
+46
+00:03:57.633 --> 00:04:03.133
+TODO
+
+47
+00:04:03.133 --> 00:04:07.133
+TODO
+
+48
+00:04:07.933 --> 00:04:13.433
+In the page's box, at the proof step, each person
+is a dot on the line q(1 − p), against y = 1.
+
+49
+00:04:13.933 --> 00:04:19.433
+And with a = 0.25 and q = 2, the second dot
+touches the line exactly: a tie with the third.
+
+50
+00:04:19.433 --> 00:04:23.433
+When q is above 2 the last person can break
+the formula. The page's follow-ups show when.
+
+51
+00:04:24.233 --> 00:04:29.833
+To sum up: the neighbours' ratio is q(1 − p_k),
+and the peak is at the first to pass 1 − 1/q.
+
+52
+00:04:29.833 --> 00:04:33.800
+Try your own a and q in the box
+on the page of question 0028 on the site.
