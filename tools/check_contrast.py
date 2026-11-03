@@ -76,6 +76,8 @@ PAIRS = [
     ("base-3 leading digit (0076 box)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
     ("base-3 appended 0, its dashed border (0076 box)", "var(--viz-s3)", [CARD], UI),
     ("base-3 leading digit, its border (0076 box)", "var(--viz-s2)", [CARD], UI),
+    ("a moved 0, its border (0077 box)", "var(--viz-s2)", [CARD], UI),
+    ("a bit cell of 1 (0077 box)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("chain state text on the cats", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color))"], TEXT),
     ("chain state turn on the cats", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color))"], TEXT),
     ("chain frame of my states", "var(--viz-s1)", [PAGE], UI),

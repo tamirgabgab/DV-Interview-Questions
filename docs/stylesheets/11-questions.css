@@ -888,3 +888,17 @@
 .md-typeset .viz-legend .ff-key-lead { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
 .md-typeset .viz-legend .ff-key-zero { background: none; outline: 2px dashed var(--viz-s3); outline-offset: -2px; }
 .md-typeset .explorer .ff-why { margin: 0.35em 0; }
+
+/* 0077: the bitrev box (bitrev.js) reuses the bit rows of 0060 (gs-bits): a 0 that moved at
+   this step gets the mark's border, the row of n itself is bold in the table of the rules */
+.md-typeset table.gs-bits td.gs-b.br-mark { border: 2.5px solid var(--viz-s2); }
+.md-typeset .explorer .br-note { margin: 0.35em 0; }
+.md-typeset .explorer .br-rules tr.br-top td { font-weight: 700; }
+.md-typeset .explorer .br-rules > table { display: table; overflow: visible; margin: 0.3rem 0; }
+.md-typeset .explorer .br-rules td, .md-typeset .explorer .br-rules th { white-space: nowrap; }
+.md-typeset .explorer .br-rules td bdi.ex-nw { white-space: nowrap; }
+.md-typeset table.br-bits { font-size: 0.7rem; border-spacing: 1.5px; }
+.md-typeset table.br-bits td.gs-b { width: 1rem; min-width: 1rem; height: 1.3rem; }
+.md-typeset table.br-bits th { padding-right: 0.35em; }
+.md-typeset .explorer .br-bitswrap { direction: ltr; }
+.md-typeset .explorer .br-now { margin: 0.35em 0; }

@@ -2007,13 +2007,28 @@ section below starts at session 22, whose numbered items run on through the late
     follow-ups: f(n) = 2n only at 3^k, 100 is no value, no f for 2n, the version with 0).
     tests/0076 builds every strictly increasing f with f(f(n)) = 3n on 1..60 by search
     (exactly one) and checks the box under Node; four contrast pairs for the box's cells.
+139. **Question 0077, the function of five rules that reverses the bits (session 32,
+    2026-11-03).** The owner chose it from proposals (IMO 1988, the source not named on the
+    page), junior / medium, math, no code, in the digits path; the title and the path note
+    do not give the answer away. Part א f(2027) = 1727 by the rules alone: the 13 values
+    the rules need, a generated table from the bottom up. Part ב in the two ways the owner
+    asked for: guess and substitute (the table to 16 in binary, R(n) = Σ b_i 2^(L−1−i), the
+    lemma R(2m + c) = c·2^ℓ(m) + R(m), the five rules checked, uniqueness from part א), and
+    a derivation without guessing (d(m) = f(2m+1) − f(m), d(2m) = d(2m+1) = 2d(m),
+    d(m) = 2^ℓ(m), f(2m + c) = f(m) + c·2^ℓ(m), unrolled on 13 and in general); a figure of
+    the bits of 2027 crossing to 1727. Part ג 92 palindromes up to 1988 (62 up to 1023,
+    30 of the 32 of length 11; 2015 and 2047 out), P(k) in closed form. The new `bitrev`
+    box (n typed, ±1 or the next palindrome; the bits moving one by one to the top of f(n)
+    as in the derivation, and the table of the rules on the way) reuses the bit rows of
+    0060 (`gs-bits`); two contrast pairs. tests/0077 checks every number, f = R to 20,000,
+    d, the palindrome counts and the box's models under Node.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
