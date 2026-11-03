@@ -1970,13 +1970,21 @@ section below starts at session 22, whose numbered items run on through the late
     traced on 3524, the chain to 6174, the traps 7777 → 0 and 95 → 0095; part ב the grid
     of the (p, q) pairs with a difference and ✓/✗ per cell, only (6, 2); the pairs and
     histogram boxes; part ג short with the family B = 5k and the base box.
+135. **Videos 0009 and 0048 (session 32, 2026-11-02/03).** 0009 (7:07, `[0, 233]`): the
+    boxes as coloured cycles, one cycle of 16 cut by one swap into two of 8, the proof that
+    one swap is enough (as the page says), the page's example 11 + 3 + 2, the boxes box;
+    part ב types cycle_from, helper and find_my_note with traces, Room walked through.
+    0048 (6:15, `[0, 173, 238]`): three routes, the double reflection unfolding into one line
+    (√98), the stops 2 : 3 : 2; part ב the same reflection backwards (a = 0, b = H); part ג
+    without code, θ = 15° as a rotation about O, then θ swept 0 to 60 with z updating, and
+    the farm box in mode c. The page says the reflection holds up to 60°, so the video says so.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
