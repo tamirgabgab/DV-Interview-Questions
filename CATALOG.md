@@ -1,6 +1,6 @@
 # Catalog
 
-All 76 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 78 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -81,3 +81,5 @@ All 76 questions, with links to their pages on the [live site](https://tamirgabg
 | 0075 | [שחלוף מטריצת ביטים 8×8 במילה של 64 ביט – שלוש החלפות, הכללה ו-RTL](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0075-bit-matrix-transpose/) | senior (סניור) |
 | 0076 | [פונקציה עולה עם f(f(n)) = 3n](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0076-f-of-f-is-3n/) | junior (ג'וניור) |
 | 0077 | [פונקציה שמוגדרת בחמישה כללים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0077-f-of-2n-4n1-4n3/) | junior (ג'וניור) |
+| 0078 | [rand7 מתוך rand5 – ובאופן כללי randN מתוך randM](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0078-rand-n-from-rand-m/) | junior (ג'וניור) |
+| 0079 | [מטבע מוטה – מטבע הוגן ממנו, מטבע עם כל p, וקובייה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0079-biased-coin/) | junior (ג'וניור) |

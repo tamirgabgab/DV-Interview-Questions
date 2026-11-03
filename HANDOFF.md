@@ -2022,6 +2022,38 @@ section below starts at session 22, whose numbered items run on through the late
     as in the derivation, and the table of the rules on the way) reuses the bit rows of
     0060 (`gs-bits`); two contrast pairs. tests/0077 checks every number, f = R to 20,000,
     d, the palindrome counts and the box's models under Node.
+140. **Question 0078, rand7 from rand5 and randN from any randM (session 32, 2026-11-03).**
+    The owner chose the generalized rand7-from-rand5 direction from six proposals, split into
+    two questions (0078 and 0079), junior / medium, Python and SystemVerilog, in the
+    probability path. Part א: two calls as a base-5 number v = 5(a − 1) + b, reject 22..25,
+    (v − 1) mod 7 + 1, 50/21 ≈ 2.38 calls; part ב: k calls a round, L = ⌊M^k/N⌋·N,
+    k·M^k/L calls (under 2k), the fewest k not always the cheapest (rand5 from rand2: k = 4,
+    64/15, beats k = 3, 24/5); part ג (the owner's pick): an exact algorithm with a bounded
+    number of calls exists iff every prime of N divides M (rand8 from rand6 in 3 calls,
+    216 = 27·8; none for rand7 from rand5). Generator tools/figures/q0078.py (the coloured
+    5 × 5 table, the tables of parts ב and ג), the `randmn` box (M, N and k sliders, four
+    values of k against the expectation, the bounded test, the grid of the M^k outcomes up to
+    400 cells, ten seeded rounds stepped), tests/0078 (exact fractions, the theorem by brute
+    force, statistics of the page code, Verilator, the box under Node), CSS rn-* in
+    11-questions.css, 16 contrast pairs. tb.sv declares its loop variables at the top of the
+    initial block (an initialiser inside a loop there is static).
+141. **Question 0079, biased coins (session 32, 2026-11-03).** The second question of the
+    same direction, junior / medium, math, Python and SystemVerilog, in the probability path.
+    Part א von Neumann's pairs (HT gives 1, TH gives 0, HH and TT thrown away): fair for any
+    unknown p, 1/(p(1−p)) flips per bit, and no exact method with a bounded number of flips
+    (P(1) would be a polynomial in p). Part ב a coin of any p from a fair coin: the flips as
+    the digits of a uniform U, compared with the digits of p until the first difference,
+    P(1) = Σ p_i 2^-i = p, 2 flips on average (2 − 2^(1−k), and at most k, for a p of k
+    digits; 1/3 has no bound). Part ג (the owner's pick) a fair die: three fair bits, 6 and 7
+    thrown back, 4 fair bits = 4/(p(1−p)) flips. Traps: XOR, overlapping pairs, a fixed 10
+    flips (342/1024), v mod 6, flips that are not independent; follow-ups: Peres, 1/H(p), a
+    coin from a die (6/5), a die from 11/3 fair bits, 1/3 in hardware. Two new boxes in
+    explorer/vncoin.js: `vncoin` (pairs by seed, the last pairs and bits, the counts against
+    1/(p(1−p)) and 1/2) and `cmpcoin` (the digits of p against the fair flips, the deciding
+    cell marked, 1000 trials against p and 2); CSS bc-* in 08-explorers.css, three contrast
+    pairs. tests/0079 runs the page code exactly on every flip sequence up to a length
+    with fractions, statistically under seeds, the numbers of the page, and the boxes under
+    Node.
 
 ## In progress
 

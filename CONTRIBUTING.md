@@ -671,6 +671,8 @@ follow the light / dark switch automatically:
 | `gs-bits` (`gs-b` with `is-one`, `is-mark`, `is-lead`; `gs-val`; `is-off` rows in the explorer), `gs-scroll`, `gs-key-*` | The rows of bits of the next number with as many ones (0060): the figures and the `popnext` explorer |
 | `ff-table` (`ff-d` with `is-lead`, `is-zero`; `ff-pad`, `ff-val`), `ff-why`, `ff-key-*` | The chain n → f(n) → 3n in base 3 of the `ffn` explorer (0076): the leading digit tinted, the 0 that 3n adds dashed |
 | `br-bits` (over `gs-bits`; `br-mark` for a moved 0), `br-bitswrap`, `br-now`, `br-note`, `br-rules` (`br-top`) | The `bitrev` explorer (0077): the bits of n moving to the top of f(n), and the table of the rules |
+| `rn-grid` (`rn-fig` on the page, `rn-live` in the box; cells `rn-c` with `rn-t1`..`rn-t7`, `rn-rej`, `is-now`; `rn-v`), `rn-key-*`, `rn-tab`, `rn-ktab`, `rn-log`, `rn-gridwrap`, `rn-bound`, `rn-now`, `rn-lab` | The outcomes of a round in randN from randM (0078): the 5 × 5 table of part a (v above the output) and the `randmn` explorer's grid, tinted by the output in seven tints (the five series, the amber accent, a blue-green mix), the rejected outcomes dashed; the box's table of k and its log of rounds |
+| `bc-cell` (`is-one`, `is-zero`, `is-again`), `bc-prob`, `bc-out`, `bc-head`, `bc-bit` (`is-same`, `is-stop`, `is-later`), `bc-bitv`, `bc-key-*`; on `gs-bits` cells `bc-one`, `bc-zero`, `bc-same`, `bc-stop`, `vn-last` | Biased coins (0079): the grid of a pair of flips and the bits of p against the fair flips (figures), and the `vncoin` and `cmpcoin` explorers |
 
 Site-wide (HTML) classes in the same file: `chip`, `chip-level`, `chip-diff-*`, `chip-new`
 (level, difficulty and "new" chips), `question-header` (header card), `question-tools`

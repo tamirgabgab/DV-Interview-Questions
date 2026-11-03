@@ -902,3 +902,35 @@
 .md-typeset table.br-bits th { padding-right: 0.35em; }
 .md-typeset .explorer .br-bitswrap { direction: ltr; }
 .md-typeset .explorer .br-now { margin: 0.35em 0; }
+
+/* randN from randM (0078): the grid of a round's outcomes, tinted by the output (seven tints,
+   the five series, the amber accent and a blue-green mix; the output's number is in the cell
+   too), the rejected outcomes dashed; the page's 5 x 5 table shows v above the output; the
+   randmn box's grid, its table of k and its log of rounds */
+.md-typeset table.rn-grid { border-collapse: separate; border-spacing: 3px; direction: ltr; font-family: var(--md-code-font-family); margin: 0.8rem auto; }
+.md-typeset table.rn-grid th { font-weight: 400; color: var(--viz-text); border: 0; background: none; padding: 0 0.4em; font-size: 0.75rem; text-align: center; }
+.md-typeset table.rn-grid td.rn-c { border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; color: var(--viz-ink); text-align: center; padding: 0.1em 0.2em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.md-typeset table.rn-fig td.rn-c { min-width: 2.1rem; height: 2.3rem; font-size: 0.8rem; }
+.md-typeset table.rn-fig td.rn-c .rn-v { display: block; font-size: 0.62rem; color: var(--viz-text); }
+.md-typeset table.rn-fig td.rn-c b { font-weight: 700; }
+.md-typeset table.rn-live td.rn-c { min-width: 1.3rem; height: 1.3rem; font-size: 0.68rem; padding: 0 0.1em; }
+.md-typeset table.rn-grid td.rn-t1, .md-typeset .viz-legend .rn-key-t1 { background: color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset table.rn-grid td.rn-t2, .md-typeset .viz-legend .rn-key-t2 { background: color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset table.rn-grid td.rn-t3, .md-typeset .viz-legend .rn-key-t3 { background: color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset table.rn-grid td.rn-t4, .md-typeset .viz-legend .rn-key-t4 { background: color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color)); border-color: var(--viz-s4); }
+.md-typeset table.rn-grid td.rn-t5, .md-typeset .viz-legend .rn-key-t5 { background: color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color)); border-color: var(--viz-s5); }
+.md-typeset table.rn-grid td.rn-t6, .md-typeset .viz-legend .rn-key-t6 { background: color-mix(in srgb, var(--md-accent-fg-color) 24%, var(--md-default-bg-color)); border-color: var(--md-accent-fg-color); }
+.md-typeset table.rn-grid td.rn-t7, .md-typeset .viz-legend .rn-key-t7 { background: color-mix(in srgb, color-mix(in srgb, var(--viz-s1) 50%, var(--viz-s3)) 24%, var(--md-default-bg-color)); border-color: color-mix(in srgb, var(--viz-s1) 50%, var(--viz-s3)); }
+.md-typeset table.rn-grid td.rn-rej { border-style: dashed; border-color: var(--viz-text); color: var(--viz-text); background: none; }
+.md-typeset .viz-legend .rn-key-rej { background: none; outline: 1.5px dashed var(--viz-text); outline-offset: -1.5px; }
+.md-typeset table.rn-grid td.is-now { outline: 3px solid var(--viz-ink); outline-offset: 1px; font-weight: 700; }
+.md-typeset .viz-legend .rn-key-now { background: none; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .explorer .rn-lab output { min-width: 1.4rem; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer table.rn-tab { border-collapse: collapse; font-size: 0.7rem; margin: 0.2em auto 0.5em; }
+.md-typeset .explorer table.rn-tab td, .md-typeset .explorer table.rn-tab th { padding: 0.2em 0.6em; border-bottom: 1px solid var(--viz-grid); text-align: center; }
+.md-typeset .explorer table.rn-tab th { font-weight: 700; color: var(--viz-text); }
+.md-typeset .explorer table.rn-tab tr.is-later td { color: var(--viz-text); }
+.md-typeset .explorer .rn-ktab tr.is-now td, .md-typeset .explorer .rn-log tr.is-now td { background: var(--md-code-bg-color); }
+.md-typeset .explorer .rn-ktab tr.is-best td:last-child { font-weight: 700; color: var(--viz-s3-text); }
+.md-typeset .explorer .rn-now, .md-typeset .explorer .rn-bound { margin: 0.35em 0; }
+.md-typeset .explorer .rn-gridwrap { direction: ltr; }

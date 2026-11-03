@@ -30,6 +30,9 @@ TEXT, UI = 4.5, 3.0
 # explorer box's surface (white on the off-white page in the light scheme, W336).
 PAGE = "var(--md-default-bg-color)"
 TOAST = {"default": "var(--md-primary-fg-color)", "slate": "color-mix(in srgb, var(--md-primary-fg-color) 70%, #000)"}
+# the seven output tints of 0078 (the five series, the amber accent, a blue-green mix)
+RN_TINTS = ["var(--viz-s1)", "var(--viz-s2)", "var(--viz-s3)", "var(--viz-s4)", "var(--viz-s5)", "var(--md-accent-fg-color)",
+            "color-mix(in srgb, var(--viz-s1) 50%, var(--viz-s3))"]
 CARD = {"default": "var(--site-surface)",
         "slate": "color-mix(in srgb, var(--md-default-fg-color) 4%, var(--md-default-bg-color))"}
 PAIRS = [
@@ -72,12 +75,21 @@ PAIRS = [
     ("wizards box, the option taken", "var(--md-default-fg-color)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("chain state text on a win", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
     ("chain state turn on a win", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
+    ("a bit 0 or a matching flip (0079 figures and boxes)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
+    ("the deciding flip (0079 figure and cmpcoin box)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
+    ("a bit 0, its border (0079 boxes)", "var(--viz-s3)", [CARD], UI),
     ("base-3 digit (0076 box)", "var(--viz-ink)", [CARD], TEXT),
     ("base-3 leading digit (0076 box)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
     ("base-3 appended 0, its dashed border (0076 box)", "var(--viz-s3)", [CARD], UI),
     ("base-3 leading digit, its border (0076 box)", "var(--viz-s2)", [CARD], UI),
     ("a moved 0, its border (0077 box)", "var(--viz-s2)", [CARD], UI),
     ("a bit cell of 1 (0077 box)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    *[(f"output on tint {i} (0078)", "var(--viz-ink)", [f"color-mix(in srgb, {c} 24%, var(--md-default-bg-color))"], TEXT)
+      for i, c in enumerate(RN_TINTS, 1)],
+    *[(f"v above the output on tint {i} (0078)", "var(--viz-text)", [f"color-mix(in srgb, {c} 24%, var(--md-default-bg-color))"], TEXT)
+      for i, c in enumerate(RN_TINTS, 1)],
+    ("a rejected outcome, its text and dashed border (0078)", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("the cheapest k, on the current row (0078 box)", "var(--viz-s3-text)", ["var(--md-code-bg-color)"], TEXT),
     ("chain state text on the cats", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color))"], TEXT),
     ("chain state turn on the cats", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color))"], TEXT),
     ("chain frame of my states", "var(--viz-s1)", [PAGE], UI),

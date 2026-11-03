@@ -1072,3 +1072,26 @@
 .md-typeset table.bm-vtab td { border: 0; padding: 0.1em 0.4em; }
 .md-typeset table.bm-vtab tr.is-now th, .md-typeset table.bm-vtab tr.is-now code { font-weight: 700; color: var(--viz-ink); }
 .md-typeset table.bm-vtab tr.is-later code { color: var(--viz-text); }
+
+/* Biased coins (0079): the grid of a pair and the bits of p against the fair flips (figures),
+   the vncoin and cmpcoin boxes (the gs-bits cells of 11-questions.css) */
+.md-typeset svg .bc-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .bc-cell.is-one { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg .bc-cell.is-zero { fill: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg .bc-cell.is-again { stroke-dasharray: 6 4; }
+.md-typeset svg .bc-prob { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 17px; }
+.md-typeset svg .bc-out { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 22px; font-weight: 700; }
+.md-typeset svg .bc-head { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 19px; }
+.md-typeset svg .bc-bit { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .bc-bit.is-same { fill: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg .bc-bit.is-stop { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .bc-bit.is-later { fill: none; stroke-dasharray: 5 4; }
+.md-typeset svg .bc-bitv { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 20px; font-weight: 700; }
+.md-typeset .viz-legend .bc-key-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .bc-key-zero, .md-typeset .viz-legend .bc-key-same { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
+.md-typeset .viz-legend .bc-key-again, .md-typeset .viz-legend .bc-key-later { background: none; outline: 1.5px dashed var(--viz-grid); outline-offset: -1.5px; }
+.md-typeset .viz-legend .bc-key-stop { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s2); outline-offset: -2.5px; }
+.md-typeset table.gs-bits td.gs-b.bc-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border: 2px solid var(--viz-s1); color: var(--viz-ink); font-weight: 700; }
+.md-typeset table.gs-bits td.gs-b.bc-zero, .md-typeset table.gs-bits td.gs-b.bc-same { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border: 2px solid var(--viz-s3); color: var(--viz-ink); }
+.md-typeset table.gs-bits td.gs-b.bc-stop { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border: 2.5px solid var(--viz-s2); color: var(--viz-ink); font-weight: 700; }
+.md-typeset table.gs-bits td.gs-b.vn-last { box-shadow: inset 0 -3px 0 var(--viz-ink); }
