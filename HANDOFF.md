@@ -1978,13 +1978,22 @@ section below starts at session 22, whose numbered items run on through the late
     (√98), the stops 2 : 3 : 2; part ב the same reflection backwards (a = 0, b = H); part ג
     without code, θ = 15° as a rotation about O, then θ swept 0 to 60 with z updating, and
     the farm box in mode c. The page says the reflection holds up to 60°, so the video says so.
+136. **Videos 0008 and 0014 (session 32, 2026-11-03).** 0008 (6:02, `[0, 186]`): a live
+    scoreboard with each country's room under Israel's 343 against the public points left,
+    the announcements one by one until France (512 left, 495 room, 17 spill), the box; no
+    trap section (the owner); part ב types israel_cannot_win and earliest_certain_loss in
+    Python with traces (returns 4). 0014 (6:45, `[0, 292]`): squares drawn on the 10×8 grid,
+    overlaps flashed red and touching allowed, the four zones and the ≤ rule, `square_set`
+    typed in SystemVerilog and walked beside the page's draw, the i < j and < traps, the
+    box with fixed seeds; part ב only what changes (`rect_set`, `constraint_mode`, the cross
+    a corner test misses).
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
