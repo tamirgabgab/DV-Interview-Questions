@@ -874,3 +874,17 @@
 .md-typeset .viz-legend .pm-key-hl { background: none; border: 2.5px solid var(--site-mark-color); }
 .md-typeset table.pm-cells td.is-off { border-style: dashed; color: var(--viz-text); background: none; }
 .md-typeset table.pm-cells td.is-gap { min-width: 0.6rem; }
+
+/* 0076: the chain n -> f(n) -> 3n of the ffn box in base 3 (ffn.js): one row per number,
+   the digits right aligned in cells, the leading digit tinted and the 0 that 3n adds dashed */
+.md-typeset table.ff-table { border-collapse: separate; border-spacing: 3px; direction: ltr; font-family: var(--md-code-font-family); font-size: 0.8rem; margin: 0.3rem auto; }
+.md-typeset table.ff-table th { font-weight: 400; color: var(--viz-text); text-align: right; padding: 0 0.7em 0 0; white-space: nowrap; border: 0; background: none; }
+.md-typeset table.ff-table td { padding: 0; border: 0; text-align: center; }
+.md-typeset table.ff-table td.ff-d { width: 1.5rem; height: 1.6rem; border: 1.5px solid var(--viz-grid); border-radius: 0.2rem; color: var(--viz-ink); }
+.md-typeset table.ff-table td.ff-d.is-lead { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border: 2.5px solid var(--viz-s2); font-weight: 700; }
+.md-typeset table.ff-table td.ff-d.is-zero { border: 2px dashed var(--viz-s3); font-weight: 700; }
+.md-typeset table.ff-table td.ff-pad { width: 1.5rem; }
+.md-typeset table.ff-table td.ff-val { color: var(--viz-ink); padding-left: 0.7em; text-align: left; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.md-typeset .viz-legend .ff-key-lead { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .viz-legend .ff-key-zero { background: none; outline: 2px dashed var(--viz-s3); outline-offset: -2px; }
+.md-typeset .explorer .ff-why { margin: 0.35em 0; }

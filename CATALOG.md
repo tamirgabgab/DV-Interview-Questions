@@ -1,6 +1,6 @@
 # Catalog
 
-All 74 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 75 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -79,3 +79,4 @@ All 74 questions, with links to their pages on the [live site](https://tamirgabg
 | 0073 | [ערבוב מושלם של חפיסה – כמה ערבובים עד שהיא חוזרת, ושילוב במקום](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0073-perfect-shuffle/) | junior (ג'וניור) |
 | 0074 | [שחלוף מטריצה במקום – סיבוב ב-90°, מטריצה לא ריבועית ובלי סימון](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0074-transpose-matrix-in-place/) | junior (ג'וניור) |
 | 0075 | [שחלוף מטריצת ביטים 8×8 במילה של 64 ביט – שלוש החלפות, הכללה ו-RTL](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0075-bit-matrix-transpose/) | senior (סניור) |
+| 0076 | [פונקציה עולה עם f(f(n)) = 3n](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0076-f-of-f-is-3n/) | junior (ג'וניור) |

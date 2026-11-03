@@ -1994,13 +1994,26 @@ section below starts at session 22, whose numbered items run on through the late
     increasing f, the tie at a = d = 1/12 (55/288 each). 0028 (4:35, `[0, 155]`): one line
     back to 0027, person 10 with 0.1697, the traps of the last person (0.0155) and of the
     threshold 1, T = 1 − 1/q, the tie at a = 0.25, q = 2 (0.375 each).
+138. **Question 0076, a strictly increasing f with f(f(n)) = 3n (session 32, 2026-11-03).**
+    The owner's question, junior / medium, math, no code (the owner's choice), ℕ from 1, in
+    the digits path. Part א f(14) = 23 by the chain 1 → 2 → 3 → 6 → 9 → 18 → 27 and the
+    counting between f(9) = 18 and f(18) = 27 (a ladder figure), without the general
+    formula; part ב the formula (n + 3^k on [3^k, 2·3^k], 3n − 3^(k+1) on [2·3^k, 3^(k+1)])
+    with the anchors by induction, uniqueness and existence, the base-3 rule (leading 1 → 2,
+    leading 2 → 1 and a 0 appended) with a table, a graph against √3·n, and the new `ffn`
+    box (n typed or stepped along the chain, the three numbers in base 3, the interval and
+    the two lines that work out each value); part ג f(2027) = 3894, checked by
+    f(3894) = 6081 (the owner chose this over the other inverse questions, which became
+    follow-ups: f(n) = 2n only at 3^k, 100 is no value, no f for 2n, the version with 0).
+    tests/0076 builds every strictly increasing f with f(f(n)) = 3n on 1..60 by search
+    (exactly one) and checks the box under Node; four contrast pairs for the box's cells.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

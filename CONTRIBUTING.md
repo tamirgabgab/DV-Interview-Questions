@@ -669,6 +669,7 @@ follow the light / dark switch automatically:
 | `tc-tag` (`is-out`, `is-back`, `is-twice`, `is-last`), `tc-f`, `tc-table` (`is-hit`), `tc-key-*` | The tags and the accumulators of the `tagcheck` explorer (0058, HTML only) |
 | `cr-coin` (`cr-p0` / `cr-p1` by the parity of the place in the figure; `is-end`, `cr-p0` / `cr-p1` also in the explorer, over its older `cr-by0` / `cr-by1`), `cr-table` (`is-now`, `is-opt`), `cr-key-*` | Coins in a row (0059): the row of part a by colour, and the `coinrow` explorer's row and its table of d[i][j] |
 | `gs-bits` (`gs-b` with `is-one`, `is-mark`, `is-lead`; `gs-val`; `is-off` rows in the explorer), `gs-scroll`, `gs-key-*` | The rows of bits of the next number with as many ones (0060): the figures and the `popnext` explorer |
+| `ff-table` (`ff-d` with `is-lead`, `is-zero`; `ff-pad`, `ff-val`), `ff-why`, `ff-key-*` | The chain n → f(n) → 3n in base 3 of the `ffn` explorer (0076): the leading digit tinted, the 0 that 3n adds dashed |
 
 Site-wide (HTML) classes in the same file: `chip`, `chip-level`, `chip-diff-*`, `chip-new`
 (level, difficulty and "new" chips), `question-header` (header card), `question-tools`
