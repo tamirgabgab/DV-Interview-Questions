@@ -1,6 +1,6 @@
 # Catalog
 
-All 78 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 79 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -83,3 +83,4 @@ All 78 questions, with links to their pages on the [live site](https://tamirgabg
 | 0077 | [פונקציה שמוגדרת בחמישה כללים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0077-f-of-2n-4n1-4n3/) | junior (ג'וניור) |
 | 0078 | [rand7 מתוך rand5 – ובאופן כללי randN מתוך randM](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0078-rand-n-from-rand-m/) | junior (ג'וניור) |
 | 0079 | [מטבע מוטה – מטבע הוגן ממנו, מטבע עם כל p, וקובייה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0079-biased-coin/) | junior (ג'וניור) |
+| 0080 | [לאיזה כיס ייכנס הכדור – שולחן ביליארד, כיסים ברוחב w וכל נקודת התחלה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0080-billiard-pocket/) | senior (סניור) |

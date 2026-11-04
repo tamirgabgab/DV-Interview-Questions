@@ -934,3 +934,47 @@
 .md-typeset .explorer .rn-ktab tr.is-best td:last-child { font-weight: 700; color: var(--viz-s3-text); }
 .md-typeset .explorer .rn-now, .md-typeset .explorer .rn-bound { margin: 0.35em 0; }
 .md-typeset .explorer .rn-gridwrap { direction: ltr; }
+
+/* 0080, which pocket the ball enters: the table (felt and rail), the pockets (dots on the
+   page's point-pocket figures, discs of radius w/2 on the others and in the box, the one the
+   ball enters in orange with an ink ring), the path and its numbered cushion hits; in the
+   billiard box the ball, the dashed aim, the arrow with its draggable tip, the trail, the
+   unfolded table's gaps at every line of pockets (k, m) and the table of the calculation */
+:root { --bil-rail: #6b4a2b; }
+[data-md-color-scheme="slate"] { --bil-rail: #5a3d22; }
+.md-typeset svg .bil-felt { fill: color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color)); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .bil-rail { fill: var(--bil-rail); }
+.md-typeset svg .bil-pocket, .md-typeset svg .bil-hole { fill: var(--viz-ink); fill-opacity: 0.85; }
+.md-typeset svg .bil-pocket.is-in, .md-typeset svg .bil-hole.is-in { fill: var(--viz-s2-text); fill-opacity: 1; stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .bil-mid { stroke: var(--viz-text); stroke-width: 0.8; stroke-dasharray: 2 4; }
+.md-typeset svg .bil-ball { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .bil-ghost { fill: none; stroke: var(--viz-ink); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.md-typeset svg .bil-aim { stroke: var(--viz-s2-text); stroke-width: 2; stroke-dasharray: 7 6; }
+.md-typeset svg .bil-arrow { stroke: var(--viz-ink); stroke-width: 2.5; stroke-linecap: round; }
+.md-typeset svg .bil-tipdot { fill: var(--viz-s2-text); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .bil-path { stroke: var(--viz-s2-text); stroke-linecap: round; }
+.md-typeset svg .bil-trail { fill: none; stroke: var(--viz-s2-text); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.md-typeset svg .bil-ghost-line { stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 5 5; }
+.md-typeset svg .bil-gap { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .bil-gap.is-in { stroke: var(--viz-s3-text); stroke-width: 3; }
+.md-typeset svg .bil-hit { fill: transparent; }
+.md-typeset svg :is(.bil-arrow, .bil-aim, .bil-trail, .bil-ball, .bil-ghost, .bil-hole, .s1-dot) { pointer-events: none; }
+.md-typeset svg .bil-h { cursor: grab; }
+.md-typeset svg.is-dragging .bil-h { cursor: grabbing; }
+.md-typeset svg .bil-h:focus-visible { outline: none; }
+.md-typeset svg .bil-h:focus-visible .bil-hit { stroke: var(--site-focus-ring); stroke-width: 3; }
+.md-typeset svg.bil-live { touch-action: none; }
+.md-typeset .viz-legend .bil-key-felt { background: color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color)); outline: 1px solid var(--viz-ink); outline-offset: -1px; }
+.md-typeset .viz-legend .bil-key-pocket, .md-typeset .viz-legend .bil-key-hole { background: var(--viz-ink); border-radius: 50%; }
+.md-typeset .viz-legend .bil-key-in { background: var(--viz-s2-text); border-radius: 50%; outline: 2px solid var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .bil-key-path { background: var(--viz-s2-text); height: 0.2rem; border-radius: 0.1rem; }
+.md-typeset .viz-legend .bil-key-gap { background: var(--viz-s1); width: 0.25rem; }
+.md-typeset .viz-legend .bil-key-dash { height: 0; border-top: 2px dashed var(--viz-s2-text); border-radius: 0; }
+.md-typeset .explorer .bil-wm-row[hidden] { display: none !important; }
+.md-typeset .explorer .bil-f input { width: 5rem; }
+.md-typeset .explorer .bil-count { font-variant-numeric: tabular-nums; margin: 0.2em 0 0.4em; }
+.md-typeset .explorer .bil-unf-note:empty { display: none; }
+.md-typeset .explorer table.bil-checks { border-collapse: collapse; font-size: 0.7rem; margin: 0.3em auto 0.5em; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer table.bil-checks td, .md-typeset .explorer table.bil-checks th { padding: 0.2em 0.6em; border-bottom: 1px solid var(--viz-grid); text-align: center; }
+.md-typeset .explorer table.bil-checks th { font-weight: 700; color: var(--viz-text); }
+.md-typeset .explorer table.bil-checks tr.is-in td { background: var(--md-code-bg-color); font-weight: 700; }

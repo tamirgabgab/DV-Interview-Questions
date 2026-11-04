@@ -84,6 +84,11 @@ PAIRS = [
     ("base-3 leading digit, its border (0076 box)", "var(--viz-s2)", [CARD], UI),
     ("a moved 0, its border (0077 box)", "var(--viz-s2)", [CARD], UI),
     ("a bit cell of 1 (0077 box)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("figure text on the felt (0080)", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], TEXT),
+    ("a pocket and the ball's outline on the felt (0080)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
+    ("the path, the aim and the pocket entered on the felt (0080)", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
+    ("a cushion hit and a gap on the felt (0080)", "var(--viz-s1)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
+    ("the gap of the pocket entered (0080 box)", "var(--viz-s3-text)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
     *[(f"output on tint {i} (0078)", "var(--viz-ink)", [f"color-mix(in srgb, {c} 24%, var(--md-default-bg-color))"], TEXT)
       for i, c in enumerate(RN_TINTS, 1)],
     *[(f"v above the output on tint {i} (0078)", "var(--viz-text)", [f"color-mix(in srgb, {c} 24%, var(--md-default-bg-color))"], TEXT)

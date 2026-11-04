@@ -2054,6 +2054,34 @@ section below starts at session 22, whose numbered items run on through the late
     pairs. tests/0079 runs the page code exactly on every flip sequence up to a length
     with fractions, statistically under seeds, the numbers of the page, and the boxes under
     Node.
+142. **Question 0080, which pocket the ball enters (session 32, 2026-11-04).** The owner's
+    billiards question from a source write-up, senior / hard, math, Python only (the owner's
+    choice), in the geometry-and-motion path. The source was checked first: parts 1 to 3 hold
+    (tables, the six cases, the proof, Dirichlet, "K is a convergent denominator"), but its
+    part-4 example has m = 4, not 2, and four cushions (top, right, bottom, top), and its
+    part-4 method missed pockets near the start (21 of 3651 random starts): it began at
+    k = floor(2 x0 / a) + 1 and measured the distance to the whole line. The page uses the
+    fix (k from floor((2 x0 - w) / a), the ray only: the pocket must be ahead) and shows the
+    two failures as a trap. On the owner's rounded snooker table, 360 x 180 cm (s = tan
+    alpha): part a aims at (240, 180), three cushions into (0, 180), 900 cm, traced by hand;
+    part b unfolds the table, r = 2 tan alpha = q/p, the parity table, p + q - 2 cushions, 37
+    degrees never; part c pockets of w = 9 cm and the two middles, s, eps, K, m, the six
+    cases with examples, the impossible corners, Dirichlet (K <= 40 at w = 9), continued
+    fractions, 37 degrees into (0, 180) at K = 4; part d any start: from the centre at slope
+    7/6 into (0, 0) after four cushions, and a periodic shot that never enters ((180, 45) at
+    45 degrees, Kronecker for irrational s). Follow-ups: aiming at (241, 180) (599
+    cushions), 37 degrees with 1 cm pockets (K = 211, five convergents), mirroring for other
+    directions, a ball radius (the table shrunk), the cushion count, separate widths (the
+    proof needs w_c <= 2 w_m; 0.5 degrees with 9 and 1 cm enters (360, 0)). The new
+    `billiard` box (explorer/billiard.js): the ball dragged anywhere, the aim arrow's tip
+    dragged to any direction (and x0, y0, degrees fields, a slider), the pocket width, a
+    separate width for the middles, a real 2.625 cm ball; "מכה" runs the ball along its
+    real path into its pocket (the end at once under reduced motion), the unfolded table
+    under it with the gap at every line of pockets, the calculation (s, c, eps, K, m and the
+    row of the table) in a fold, six preset shots. tests/0080 compares the page code and the
+    box (Node) with a physical reflection simulation on thousands of random shots, exact
+    fractions for the rational slopes, and every number of the page; five contrast pairs on
+    the felt (the path and the entered pocket use the -text tones of orange and green).
 
 ## In progress
 
