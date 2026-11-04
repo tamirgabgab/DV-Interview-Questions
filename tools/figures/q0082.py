@@ -134,9 +134,9 @@ def table_examples() -> str:
         x = nim_xor(h)
         mv = nim_moves(h)
         verdict = "מפסיד" if not x else "מנצח"
-        moves = "אין" if not mv else "; ".join(f"{h[i]} → {new}" for i, new in mv)
-        lines.append(f'| {heaps_txt(h)} | <span dir="ltr">{x} = {bits(x, 4)}</span> | {verdict} | '
-                     f'{"אין" if not mv else f"<span dir=\"ltr\">{moves}</span>"} |')
+        moves = "; ".join(f"{h[i]} → {new}" for i, new in mv)
+        moves = f'<span dir="ltr">{moves}</span>' if mv else "אין"
+        lines.append(f'| {heaps_txt(h)} | <span dir="ltr">{x} = {bits(x, 4)}</span> | {verdict} | {moves} |')
     return "\n".join(lines)
 
 

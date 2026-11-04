@@ -23,7 +23,6 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from charts import Chart  # noqa: E402,F401
 
 # --- the reference -------------------------------------------------------------------------
 
@@ -131,12 +130,6 @@ def construct(n: int) -> list[int]:
     return evens + odds
 
 
-def is_solution(cols: list[int]) -> bool:
-    n = len(cols)
-    return sorted(cols) == sorted(set(cols)) and len(set(cols)) == n and all(
-        abs(cols[i] - cols[j]) != j - i for i in range(n) for j in range(i + 1, n))
-
-
 # --- drawing -------------------------------------------------------------------------------
 
 def queen(x: float, y: float, s: float, cls: str = "") -> str:
@@ -192,7 +185,7 @@ def search_board() -> str:
             return ""
         return "is-free" if free >> c & 1 else "is-hit"
     return board(n, dict(enumerate(qs)), label=(
-        "סעיף א : לוח של 8 על 8, העמודה 0 מימין. מלכות בשורה 0 בעמודה 0, בשורה 1 בעמודה 4 ובשורה 2 בעמודה 7. "
+        "סעיף א : לוח של 8 על 8, העמודה 0 מימין. מלכות בשורה 0 בעמודה 0, בשורה 1 בעמודה 4 ובשורה 2 בעמודה 7. "
         "בשורה 3 מאוימות העמודות 0, 2, 3, 4, 6 ו-7, ופנויות רק העמודות 1 ו-5"), cell_cls=cell, base="0")
 
 
@@ -213,7 +206,7 @@ def search_masks() -> str:
 
 def search_legend() -> str:
     return ('<span class="viz-legend"><span><i class="nq-key-hit"></i>מאוימת בשורה הבאה</span>'
-            '<span><i class="nq-key-free"></i>פנויה : ביט 1 ב-free</span>'
+            '<span><i class="nq-key-free"></i>פנויה : ביט 1 ב-free</span>'
             '<span><i class="gs-key-one"></i>ביט 1 במסכה</span></span>')
 
 
@@ -236,8 +229,8 @@ def class_boards() -> str:
     bh = bw + 22
     h = rows * bh + (rows - 1) * 12 + 4
     out = [f'<svg class="figure nq-classes" viewBox="0 0 {w} {h}" style="max-width:40rem" role="img" '
-           f'aria-label="סעיף ב : 12 הפתרונות השונים של 8 מלכות, כל אחד בתמונה הקטנה ביותר שלו. '
-           f'לאחד עשר מהם יש 8 תמונות שונות, ולאחד, המסומן, רק 4 : הוא לא משתנה בחצי סיבוב">']
+           f'aria-label="סעיף ב : 12 הפתרונות השונים של 8 מלכות, כל אחד בתמונה הקטנה ביותר שלו. '
+           f'לאחד עשר מהם יש 8 תמונות שונות, ולאחד, המסומן, רק 4 : הוא לא משתנה בחצי סיבוב">']
     for i, cls in enumerate(cl):
         p = cls[0]
         x0 = 2 + (i % cols) * (bw + gap)
@@ -257,7 +250,7 @@ def class_boards() -> str:
 def class_legend() -> str:
     return ('<span class="viz-legend"><span><i class="nq-key-dot"></i>מלכה</span>'
             '<span><i class="nq-key-sym"></i>הפתרון שחצי סיבוב לא משנה</span>'
-            '<span>‏×8 או ×4 : כמה פתרונות שונים יש במחלקה</span></span>')
+            '<span>‏×8 או ×4 : כמה פתרונות שונים יש במחלקה</span></span>')
 
 
 def burnside_table() -> str:
@@ -285,14 +278,14 @@ def construction_board() -> str:
             return ""
         return "is-even" if r < m else "is-odd"
     return board(n, qs, s=36, base="1", style="max-width:22rem", label=(
-        "סעיף ג : הבנייה ל-N = 10. בשורות 1 עד 5 המלכות בעמודות הזוגיות 2, 4, 6, 8, 10, "
+        "סעיף ג : הבנייה ל-N = 10. בשורות 1 עד 5 המלכות בעמודות הזוגיות 2, 4, 6, 8, 10, "
         "ובשורות 6 עד 10 בעמודות האי-זוגיות 1, 3, 5, 7, 9. בכל חצי המלכות על קו ששיפועו 2, "
         "ולכן אף שתיים לא באותו אלכסון"), cell_cls=cell)
 
 
 def construction_legend() -> str:
-    return ('<span class="viz-legend"><span><i class="nq-key-even"></i>שורות 1 עד 5 : העמודות הזוגיות</span>'
-            '<span><i class="nq-key-odd"></i>שורות 6 עד 10 : העמודות האי-זוגיות</span>'
+    return ('<span class="viz-legend"><span><i class="nq-key-even"></i>שורות 1 עד 5 : העמודות הזוגיות</span>'
+            '<span><i class="nq-key-odd"></i>שורות 6 עד 10 : העמודות האי-זוגיות</span>'
             '<span>העמודה 1 מימין</span></span>')
 
 

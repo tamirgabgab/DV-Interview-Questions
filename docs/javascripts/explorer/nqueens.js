@@ -6,7 +6,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const NMIN = 4, NMAX = 10;
 
   // --- the models ------------------------------------------------------------------------------
@@ -117,7 +117,9 @@
   const nqueensView = () => ({
     mount(box) {
       const N0 = clampN(box.dataset.n, 8);
+      const lastSol = (steps, n) => { for (let i = steps.length - 1; i >= 0; i--) if (steps[i].row === n - 1) return i; return -1; };
       const st = { n: N0, k: 0, steps: nqSteps(N0) };
+      st.last = lastSol(st.steps, N0);
       box.innerHTML =
         `<div class="ex-controls">` + nSelect(N0, "N, גודל הלוח ומספר המלכות") +
         `<button type="button" class="md-button nq-nextsol">לפתרון הבא</button>` +
@@ -147,8 +149,8 @@
         $(".ex-pos").textContent = `צעד ${k} מתוך ${T}`;
         $(".ex-prev").disabled = $(".ex-start").disabled = k === 0;
         $(".ex-next").disabled = $(".ex-end").disabled = k === T;
-        $(".nq-nextsol").disabled = !steps.some((s, i) => i >= k && s.row === n - 1);
-        const label = `לוח של ${n} על ${n} אחרי ${k} צעדים : ${row} מלכות, בשורות 0 עד ${row - 1}` + (sol ? ", פתרון" : row < n ? `. בשורה ${row} ${m.free ? "יש משבצות פנויות" : "אין משבצת פנויה"}` : "");
+        $(".nq-nextsol").disabled = st.last < k;
+        const label = `לוח של ${n} על ${n} אחרי ${k} צעדים${NB}: ${row} מלכות` + (row ? `, בשורות 0 עד ${row - 1}` : "") + (sol ? ", פתרון" : row < n ? `. בשורה ${row} ${m.free ? "יש משבצות פנויות" : "אין משבצת פנויה"}` : "");
         $(".nq-wrap").innerHTML = boardSvg(n, label, (r, c) => {
           let cls = "";
           if (r === row && row < n) cls = (m.free >> c) & 1 ? "is-free" : "is-hit";
@@ -178,7 +180,7 @@
         else answer(box, null);
       };
       const stop = autoplay(play, speed, { step: () => { st.k++; draw(); }, done: () => st.k >= st.steps.length, restart: () => { st.k = 0; draw(); } });
-      const setN = (n) => { stop(); st.n = n; st.steps = nqSteps(n); st.k = 0; draw(); };
+      const setN = (n) => { stop(); st.n = n; st.steps = nqSteps(n); st.last = lastSol(st.steps, n); st.k = 0; draw(); };
       $(".nq-n").addEventListener("change", () => setN(clampN($(".nq-n").value, N0)));
       $(".nq-nextsol").addEventListener("click", () => {
         stop();
@@ -228,8 +230,7 @@
       const has = (r, c) => st.qs.findIndex(([a, b]) => a === r && b === c);
       const state = () => {
         const n = st.n, conf = nqConflicts(st.qs), bad = new Set(conf.flat());
-        const rows = new Set(st.qs.map(([r]) => r)), oneRow = rows.size === st.qs.length;
-        const done = !conf.length && oneRow ? nqComplete(n, st.qs) : { count: 0, first: null };
+        const done = !conf.length ? nqComplete(n, st.qs) : { count: 0, first: null };
         return { n, conf, bad, done };
       };
       const draw = (focus = false) => {
@@ -239,17 +240,17 @@
         $(".nq-fill").disabled = !done.first || st.qs.length === n;
         $(".nq-clear").disabled = !st.qs.length;
         const ghost = done.first && st.qs.length < n ? done.first : null;
-        wrap.innerHTML = boardSvg(n, `לוח של ${n} על ${n}, העמודה 0 מימין : לוחצים על משבצת כדי לשים מלכה או להוריד אותה`, (r, c) => {
+        wrap.innerHTML = boardSvg(n, `לוח של ${n} על ${n}, העמודה 0 מימין${NB}: לוחצים על משבצת כדי לשים מלכה או להוריד אותה`, (r, c) => {
           const i = has(r, c), name = i >= 0 ? (bad.has(i) ? "מלכה מאוימת" : "מלכה") : hit.has(`${r},${c}`) ? "ריקה, מאוימת" : ghost && ghost[r] === c ? "ריקה, בהשלמה" : "ריקה";
           return {
             cls: i < 0 && hit.has(`${r},${c}`) ? "is-hit" : "",
             queen: i >= 0 ? (bad.has(i) ? "is-bad" : "is-new") : ghost && ghost[r] === c ? "is-ghost" : null,
-            attrs: `role="button" tabindex="${r === st.fr && c === st.fc ? 0 : -1}" data-r="${r}" data-c="${c}" aria-pressed="${i >= 0}" aria-label="שורה ${r}, עמודה ${c} : ${name}"`,
+            attrs: `role="button" tabindex="${r === st.fr && c === st.fc ? 0 : -1}" data-r="${r}" data-c="${c}" aria-pressed="${i >= 0}" aria-label="שורה ${r}, עמודה ${c}${NB}: ${name}"`,
           };
         }, "nq-live-place");
         if (focus) { const g = wrap.querySelector(`.nq-cell[data-r="${st.fr}"][data-c="${st.fc}"]`); if (g) g.focus(); }
         const k = st.qs.length;
-        let sum = `${ltr(k)} ${k === 1 ? "מלכה" : "מלכות"} על הלוח. `;
+        let sum = `‏${ltr(k)} ${k === 1 ? "מלכה" : "מלכות"} על הלוח. `;
         if (conf.length) {
           const [i, j] = conf[0], a = st.qs[i], b = st.qs[j];
           const why = a[0] === b[0] ? "באותה שורה" : a[1] === b[1] ? "באותה עמודה" : "באותו אלכסון";

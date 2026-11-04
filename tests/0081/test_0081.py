@@ -14,11 +14,9 @@ import itertools
 import json
 import math
 import sys
-from pathlib import Path
 
-from extract_code import load_python
+from extract_code import ROOT, load_python
 
-ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools" / "figures"))
 
 import q0081  # noqa: E402
@@ -210,7 +208,7 @@ def test_explorer_matches_the_reference():
              (8, [[3, 3], [4, 6]]), (4, [[0, 1], [1, 3], [2, 0], [3, 2]]), (10, [[9, 9]]), (5, [[2, 2]])]
     res = node_json(f"const m = {explorer_require()};"
                     f"console.log(JSON.stringify({json.dumps([list(c) for c in cases])}.map(([n, q]) => [m.nqConflicts(q), [...m.nqAttacked(n, q)].sort(),"
-                    " m.nqConflicts(q).length || new Set(q.map(([r]) => r)).size !== q.length ? null : m.nqComplete(n, q)])));")
+                    " m.nqConflicts(q).length ? null : m.nqComplete(n, q)])));")
     for (n, qs), (conf, attacked, done) in zip(cases, res):
         want_conf = [[i, j] for i in range(len(qs)) for j in range(i + 1, len(qs))
                      if qs[i][0] == qs[j][0] or qs[i][1] == qs[j][1] or abs(qs[i][0] - qs[j][0]) == abs(qs[i][1] - qs[j][1])]

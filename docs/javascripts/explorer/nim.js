@@ -111,7 +111,7 @@
       const game = () => nimPlay(st.rule, st.heaps, st.first, st.human);
       const draw = () => {
         const g = game(), h = g.heaps, rule = st.rule;
-        $(".nim-heaps").value = st.heaps.join(", "); $(".nim-rule").value = rule; $(".nim-first").value = st.first;
+        $(".nim-err").textContent = ""; $(".nim-heaps").value = st.heaps.join(", "); $(".nim-rule").value = rule; $(".nim-first").value = st.first;
         const myTurn = !g.over && g.who === 0;
         const best = g.over ? null : RULES[rule](h);
         const hint = $(".nim-hint").checked && myTurn && best;
