@@ -2082,6 +2082,47 @@ section below starts at session 22, whose numbered items run on through the late
     box (Node) with a physical reflection simulation on thousands of random shots, exact
     fractions for the rational slopes, and every number of the page; five contrast pairs on
     the felt (the path and the entered pocket use the -text tones of orange and green).
+143. **Question 0081, N queens (session 32, 2026-11-04).** The owner chose it from six
+    coding / logic / math proposals, junior / medium, code, Python and SystemVerilog, in the
+    advanced-algorithms path. Column c is bit c, drawn with column 0 on the right, so a
+    board row sits over its masks. Part א counts by backtracking row by row with the masks
+    cols, left (<< 1) and right (>> 1), free = full & ~(cols | left | right) and the lowest
+    bit free & -free: 92, 2,056 placements for 8 (a table of the counts and placements for N
+    = 4..12 against N! and N^N); the SystemVerilog is iterative with an explicit stack of
+    masks (bit is a keyword, so low). Part ב the 8 symmetries: 12 distinct solutions, 11
+    classes of 8 and one of 4 kept by a half turn, Burnside 96 / 8 = 12 with a proof that no
+    reflection keeps a solution, and count_half (row 0 in half the columns, doubled; the
+    middle column apart for odd N); SystemVerilog canonical packs 4 bits a row and distinct
+    counts an associative array. Part ג the explicit construction (evens then odds; the
+    fixes for N mod 6 = 2 and 3), the proof of the plain case (3(i − j) = m − 1 only when N
+    mod 6 is 2 or 3), why 2 and 3 have none. Traps: one diagonal only (2,113), free without
+    & full, rotations counted apart, the search space; follow-ups: the counts to 12, the
+    torus (gcd(N, 6) = 1), rooks and bishops, the first solution after 113 placements. Two
+    boxes in explorer/nqueens.js: `nqueens` (a step per placed queen, the next row's free
+    cells, the masks in binary, a jump to the next solution) and `nqplace` (queens clicked
+    or typed with the arrows and Enter, attacks and conflicts, the completions counted and
+    one shown faint, the queens in the link through dvqExtra); nine contrast pairs, CSS nq-*
+    in 11-questions.css. tests/0081 checks the page code against brute force, the classes,
+    Burnside, the construction for every N to 1000, every number of the page and the boxes'
+    models under Node.
+144. **Question 0082, Nim (session 32, 2026-11-04).** Chosen with 0081, senior / medium,
+    math, Python and SystemVerilog, in the advanced-algorithms path. Part א normal Nim on 3,
+    4, 5: 3 ⊕ 4 ⊕ 5 = 2, the only winning move 3 → 1 (5 ⊕ 2 = 7 and 4 ⊕ 2 = 6 are out of
+    reach), the theorem (lost iff XOR = 0), the move h → h ⊕ x on a heap with the top bit of
+    x, the number of winning moves, a table of six positions. Part ב misère: lost iff (a
+    heap > 1 and XOR = 0) or (all heaps ≤ 1 and an odd number of ones); the endgame (1, 1,
+    4): 4 → 0 loses, 4 → 1 wins. Part ג the subtraction game {1, 3, 4}: mex, Grundy numbers
+    0, 1, 0, 1, 2, 3, 2 with period 7, lost iff the XOR of the Grundy numbers is 0: 3, 4, 5
+    is now lost (1 ⊕ 2 ⊕ 3 = 0, while the sizes' XOR is 2); Sprague–Grundy stated. Traps:
+    sum or parity, the largest heap, normal play to the end in misère, XOR of sizes, max + 1
+    for mex; follow-ups: 3, 5, 6, 7 has three winning moves, take 1..k (n mod (k + 1)),
+    Staircase Nim, Lasker's Nim. The new `nim` box (explorer/nim.js), three times on the
+    page: a game against the computer (heaps, rule, who starts; a token click takes the rest
+    of its heap; the winning move on request; the heaps or Grundy numbers in binary with the
+    XOR row; undo, a log; my moves in the link); CSS nim-* in 08-explorers.css, three
+    contrast pairs. tests/0082 brute-forces every position of three heaps to 9 and four
+    heaps to 5 under the three rules against the page code and the theorems, checks every
+    number and the box under Node; tb.sv brute-forces all 512 positions of three heaps to 7.
 
 ## In progress
 

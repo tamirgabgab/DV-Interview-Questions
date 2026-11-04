@@ -978,3 +978,42 @@
 .md-typeset .explorer table.bil-checks td, .md-typeset .explorer table.bil-checks th { padding: 0.2em 0.6em; border-bottom: 1px solid var(--viz-grid); text-align: center; }
 .md-typeset .explorer table.bil-checks th { font-weight: 700; color: var(--viz-text); }
 .md-typeset .explorer table.bil-checks tr.is-in td { background: var(--md-code-bg-color); font-weight: 700; }
+
+/* N queens (0081): the boards of the figures and of the nqueens / nqplace explorers (column 0
+   on the right, as the low bit), the queens, the cells of the next row, the masks' free bits */
+.md-typeset svg.nq-board, .md-typeset svg.nq-classes { margin: 0.8rem auto; }
+.md-typeset .explorer svg.nq-board { max-width: 24rem; margin: 0.5rem auto; }
+.md-typeset svg .nq-sq { fill: var(--md-default-bg-color); }
+.md-typeset svg .nq-sq.is-dark { fill: color-mix(in srgb, var(--viz-grid) 75%, var(--md-default-bg-color)); }
+.md-typeset svg .nq-sq.is-hit { fill: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); }
+.md-typeset svg .nq-sq.is-free { fill: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); }
+.md-typeset svg .nq-sq.is-even { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); }
+.md-typeset svg .nq-sq.is-odd { fill: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); }
+.md-typeset svg .nq-frame { fill: none; stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .nq-frame.is-sym { stroke: var(--viz-s2); stroke-width: 3; }
+.md-typeset svg .nq-lab { fill: var(--viz-text); font-size: 13px; font-family: var(--md-text-font-family); }
+.md-typeset svg .nq-q { fill: var(--viz-ink); }
+.md-typeset svg .nq-q.is-new { fill: var(--viz-s1); }
+.md-typeset svg .nq-q.is-sol { fill: var(--viz-s3); stroke: var(--viz-ink); stroke-width: 1; }
+.md-typeset svg .nq-q.is-bad { fill: var(--viz-s2-text); }
+.md-typeset svg .nq-q.is-ghost { fill: none; stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: 3 2; }
+.md-typeset svg .nq-dot { fill: var(--viz-ink); }
+.md-typeset svg .nq-cell { cursor: pointer; }
+.md-typeset svg .nq-cell .nq-ring { fill: none; stroke: none; }
+.md-typeset svg .nq-cell:hover .nq-ring { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .nq-cell:focus { outline: none; }
+.md-typeset svg .nq-cell:focus-visible { outline: 3px solid var(--site-focus-ring); outline-offset: -3px; }
+.md-typeset svg .nq-cell:focus-visible .nq-ring { stroke: var(--site-focus-ring); stroke-width: 3; }
+.md-typeset table.gs-bits td.gs-b.is-one.is-free { background: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset table.gs-bits tr.nq-bitno th { font-size: 0.6rem; text-align: center; padding: 0; }
+.md-typeset table.nq-masks td.gs-val { white-space: nowrap; min-width: 0; padding-left: 0.4em; }
+.md-typeset table.gs-bits tr.nq-bitno th:first-child { text-align: right; padding-right: 0.6em; }
+.md-typeset .viz-legend .nq-key-new { background: var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .nq-key-bad { background: var(--viz-s2-text); border-radius: 50%; }
+.md-typeset .viz-legend .nq-key-sol { background: var(--viz-s3); border-radius: 50%; }
+.md-typeset .viz-legend .nq-key-dot { background: var(--viz-ink); border-radius: 50%; }
+.md-typeset .viz-legend .nq-key-ghost { background: none; outline: 2px dashed var(--viz-s1); outline-offset: -2px; border-radius: 50%; }
+.md-typeset .viz-legend .nq-key-hit { background: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .nq-key-free, .md-typeset .viz-legend .nq-key-odd { background: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .nq-key-even { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .nq-key-sym { background: none; outline: 3px solid var(--viz-s2); outline-offset: -3px; }

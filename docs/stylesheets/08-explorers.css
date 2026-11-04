@@ -1095,3 +1095,28 @@
 .md-typeset table.gs-bits td.gs-b.bc-zero, .md-typeset table.gs-bits td.gs-b.bc-same { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border: 2px solid var(--viz-s3); color: var(--viz-ink); }
 .md-typeset table.gs-bits td.gs-b.bc-stop { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border: 2.5px solid var(--viz-s2); color: var(--viz-ink); font-weight: 700; }
 .md-typeset table.gs-bits td.gs-b.vn-last { box-shadow: inset 0 -3px 0 var(--viz-ink); }
+
+/* Nim (0082): the nim box. A heap is a row of round tokens (buttons; a click takes the token
+   and every token after it), the taken ones hollow so the board keeps its size; the winning
+   move on request in the amber tint; the gs-bits table of 11-questions.css below it, the
+   column of the XOR's top bit framed and an XOR of 0 in green */
+.md-typeset .explorer .nim-board { display: flex; flex-direction: column; gap: 0.45rem; margin: 0.6rem 0; }
+.md-typeset .explorer .nim-heap { display: flex; align-items: center; gap: 0.6rem; }
+.md-typeset .explorer .nim-lab { flex: none; min-width: 5.6rem; color: var(--viz-text); font-size: 0.72rem; white-space: nowrap; }
+.md-typeset .explorer .nim-lab b { color: var(--viz-ink); font-variant-numeric: tabular-nums; }
+.md-typeset .explorer .nim-toks { display: flex; flex-wrap: wrap; gap: 0.25rem; flex: 1 1 auto; min-width: 0; }
+.md-typeset .explorer .nim-tok { width: 1.4rem; height: 1.4rem; padding: 0; border-radius: 50%; border: 2px solid var(--viz-grid);
+  background: var(--md-default-bg-color); box-sizing: border-box; }
+.md-typeset .explorer button.nim-tok:not([disabled]) { cursor: pointer; border-color: var(--viz-s1); background: color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color)); }
+.md-typeset .explorer button.nim-tok:not([disabled]):hover { background: color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color)); }
+.md-typeset .explorer button.nim-tok.is-hint { border: 3px solid var(--viz-s2); background: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); }
+.md-typeset .explorer button.nim-tok:focus-visible { outline: 2px solid var(--viz-ink); outline-offset: 2px; }
+.md-typeset .explorer .nim-tok.is-gone { border-style: dashed; background: none; }
+.md-typeset .explorer .nim-hintlab { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; }
+.md-typeset .explorer .nim-log { font-size: 0.7rem; color: var(--viz-text); margin: 0.3rem 1.2rem 0 0; }
+.md-typeset .explorer .nim-log li { margin: 0; }
+.md-typeset table.gs-bits.nim-bin td.gs-b.nim-top { border: 2.5px solid var(--viz-s2); }
+.md-typeset table.gs-bits.nim-bin td.gs-b.nim-zero { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border-color: var(--viz-s3); color: var(--viz-ink); }
+.md-typeset .viz-legend .nim-key-tok { border-radius: 50%; background: color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .nim-key-hint { border-radius: 50%; background: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); outline: 3px solid var(--viz-s2); outline-offset: -3px; }
+.md-typeset .viz-legend .nim-key-gone { border-radius: 50%; background: none; outline: 2px dashed var(--viz-grid); outline-offset: -2px; }
