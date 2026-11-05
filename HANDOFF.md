@@ -2123,6 +2123,43 @@ section below starts at session 22, whose numbered items run on through the late
     contrast pairs. tests/0082 brute-forces every position of three heaps to 9 and four
     heaps to 5 under the three rules against the page code and the theorems, checks every
     number and the box under Node; tb.sv brute-forces all 512 positions of three heaps to 7.
+145. **UX fixes from the audit (session 32, 2026-11-05).** The owner chose the "fix the
+    faults" package from a UX audit against the VectorLab skills. Search: search.suggest off
+    (its ghost overlapped the typed text in RTL, "fifif"); theme.language custom
+    (overrides/partials/languages/custom.html: Hebrew with "מסמך אחד תואם" / "# מסמכים
+    תואמים", the rest from he.html); a match is dark text on an amber tint (the amber text
+    was 2.2:1), tags at least 12 px; no result shows "קפיצה לשאלה" (closes the search, opens
+    the quick jump with the typed words) and "לכל השאלות" — a button, not a link, since
+    Material's Enter reads every [href] in the results (a link threw getAttribute of null).
+    Back to top: Material's inline top beat top: auto, so !important; it sits in the bottom
+    corner again (it covered the part bar on phones). Part bar: the solution map hangs under
+    the bar as an opaque second row (absolute, the page does not move), the part chips keep
+    their row, a row that scrolls fades at the edge with more chips (reading-tools.js
+    fades); one reading line (spyLine) for the part bar, the solution maps and the table of
+    contents (tocSpy sets .is-spy, the TOC marker follows it; before, the bar said ג while
+    the contents said ב: 6 positions of 0052 before, 0 after); h2/h3 stop under the bar when
+    reached by a link. Phones: the closed drawer is inert and the closed search's field and
+    buttons leave the Tab order (layout.js hiddenChrome; 0061 went from 163 to 57 tab
+    stops). The sidebar fold button says "כל המסלולים" in the paths section. Three contrast
+    pairs.
+146. **The circuit layer (session 32, 2026-11-05).** The owner chose a visual package (navy
+    and white kept, nothing drastic). 22-circuit.css and circuit.js: a static board-trace
+    mask at 5% (4.5% dark) in a top band (body::before, 8rem, 5.5rem on phones, fading
+    before the title) and in the margins outside the max(61rem, 80vw) grid at ≥76.25em
+    (body::after, fixed); a chip per question (question_chip in the hook: one pin a side per
+    part, 1 to 6, and a 4 × 4 die of the id's 16 bits, MSB top left, lit for a 1; colours
+    from qc-* only) in the tables' id cell, path cards, related / recent / new lists and the
+    header's corner emblem, with the label DVQ‑<id> (part_number) opening the header's meta
+    line; a compact phone header (h1 clamp(1.2rem, 5.4vw, 1.42rem), the label, topics, date
+    and source in one ellipsized line); the difficulty chip as three LEDs (CSS only, lit up
+    to the level with a glow, the word kept); path cards that rise and run one amber current
+    along the top edge on hover; <hr> as a data waveform with one amber packet when it first
+    comes into view (.is-on); the part bar's reading line as a clock, passed parts with an
+    amber ring; a slow wireframe icosahedron (canvas, 9%) under the home hero's chip and in
+    the level bands' corner, leaning to the pointer, on screen only, still under reduced
+    motion and webdriver, hidden on phones. Eight contrast pairs; tests: the chip is
+    deterministic, pins = parts, lit cells = the id's bits, every header has its chip. /all/
+    +41 KB HTML (+1.2 KB gzipped).
 
 ## In progress
 

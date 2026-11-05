@@ -1,0 +1,14 @@
+{#-
+  Hebrew (Material's partials/languages/he.html) with the search counts in grammatical
+  Hebrew: "מסמך אחד תואם", "3 מסמכים תואמים" (Material's own read "3 מסמך תואם").
+  mkdocs.yml sets theme.language to custom; every other string falls through to he.html.
+-#}
+{% import "partials/languages/he.html" as language %}
+{% macro override(key) %}{{ {
+  "search.result.none": "אין מסמכים תואמים",
+  "search.result.one": "מסמך אחד תואם",
+  "search.result.other": "# מסמכים תואמים",
+  "search.result.more.one": "עוד תוצאה אחת בדף הזה",
+  "search.result.more.other": "עוד # תוצאות בדף הזה"
+}[key] }}{% endmacro %}
+{% macro t(key) %}{{ override(key) or language.t(key) }}{% endmacro %}

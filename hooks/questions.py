@@ -372,6 +372,36 @@ def difficulty_chip(difficulty: str, quiet: bool = False) -> str:
     return f'<span class="chip chip-diff chip-diff-{difficulty}"{QUIET if quiet else ""}>{DIFFICULTIES[difficulty]}</span>'
 
 
+def _n(v: float) -> str:
+    """A coordinate for an SVG path, short (no trailing zeros)."""
+    return f"{v:.2f}".rstrip("0").rstrip(".")
+
+
+def question_chip(qid: str, parts: int, cls: str = "qchip") -> str:
+    """A question's own chip (session 32, 22-circuit.css): a package with one pin a side per
+    part (one at least, six at most) and a 4 x 4 die of the id's 16 bits, the most significant
+    bit at the top left, a lit cell for a 1 (the zeros are the die's own quiet square). The same id and parts always give the same chip,
+    so it works as the question's face in the lists and its header. Colours come from the
+    stylesheet (qc-*), the shape only from here; it is decoration (aria-hidden)."""
+    n = max(1, min(int(parts or 0), 6))
+    bits = int(qid) & 0xFFFF
+    top, height = 4, 32
+    pitch = height / (n + 1)
+    pins = "".join(f"M{x}{_n(top + pitch * (i + 1) - 1.2)}h5v2.4h-5z" for i in range(n) for x in ("3 ", "32 "))
+    on = [f"M{_n(11.6 + c * 4.4)} {_n(8 + r * 4.4)}h3v3h-3z"
+          for r in range(4) for c in range(4) if bits >> (15 - (r * 4 + c)) & 1]
+    on_path = f'<path class="qc-on" d="{"".join(on)}"/>' if on else ""
+    return (f'<svg class="{cls}" viewBox="0 0 40 40" aria-hidden="true" focusable="false">'
+            f'<path class="qc-pins" d="{pins}"/><rect class="qc-body" x="8" y="{top}" width="24" height="{height}" rx="2.5"/>'
+            f'<rect class="qc-die" x="11.1" y="7.5" width="17.7" height="17.7" rx="0.8"/>'
+            f'{on_path}<circle class="qc-dot" cx="12.6" cy="31.4" r="1.6"/></svg>')
+
+
+def part_number(qid: str) -> str:
+    """The chip's silkscreen label: DVQ, a non-breaking hyphen, the id."""
+    return f"DVQ‑{qid}"
+
+
 def kind_icon(kind: str) -> str:
     """The icon of a question kind (round V: thin strokes like the site mark, 19-details.css)."""
     return f'<i class="kind-ico kind-ico-{kind}" aria-hidden="true"></i>'
@@ -449,17 +479,20 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
     if _is_new(q):
         badges.append(_badge("new", "חדש", "מהשאלות החדשות ביותר באתר : נוספה בשבוע האחרון", " qh-badge-new"))
     topics = "".join(_tag_link(t, base, "qh-tag") for t in q["tags"])     # M5: the topics as chips
-    bottom = [f'<span class="qh-topics"><span class="qh-topics-name">נושאים :</span>{topics}</span>']
+    pn = (f'<span class="qh-pn">{question_chip(q["id"], q.get("parts", 0), "qchip qchip-s")}'
+          f'<bdi dir="ltr">{part_number(q["id"])}</bdi></span>')    # the chip's label opens the meta line
+    bottom = [pn, f'<span class="qh-topics"><span class="qh-topics-name">נושאים :</span>{topics}</span>']
     added = _added_date(q)
     if added:
         bottom.append(f'<span class="qh-sep"></span><span>נוספה ב-{_date_he(added)}</span>')
     if q.get("source"):
         bottom.append(f'<span class="qh-sep"></span><span>מקור : {html.escape(str(q["source"]))}</span>')
     # V11: the card carries its difficulty and kind (18-question.css tints a quiet trace
-    # pattern along its top edge by the difficulty) and a large kind icon at its corner
+    # pattern along its top edge by the difficulty); its corner shows the question's own
+    # chip (session 32, question_chip), and the meta line its label DVQ-<id>
     return (
         f'<div class="question-header qh-diff-{q["difficulty"]} qh-kind-{q["kind"]}">\n'
-        f'<span class="qh-emblem" aria-hidden="true">{kind_icon(q["kind"])}</span>\n'
+        f'<span class="qh-emblem qh-emblem-chip" aria-hidden="true">{question_chip(q["id"], q.get("parts", 0))}</span>\n'
         f'<h1>{html.escape(str(q["title"]))}</h1>\n'
         f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
         f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{"".join(badges)}</div>\n'
@@ -620,7 +653,7 @@ def _path_steps(page) -> str:
         q = s["q"]
         items.append(
             f'<li class="path-step" data-id="{q["id"]}"><span class="ps-num" data-search-exclude>{n}</span>'
-            f'<div class="ps-body"><div class="ps-head"><span class="ps-id">{q["id"]}</span> '
+            f'<div class="ps-body"><div class="ps-head">{question_chip(q["id"], q.get("parts", 0))}<span class="ps-id">{q["id"]}</span> '
             f'<a class="ps-title" href="{_href(q["src_uri"], page.url)}">{html.escape(str(q["title"]))}</a>'
             f'{level_chip(q["level"], True)}{difficulty_chip(q["difficulty"], True)}<span class="ps-mark"></span></div>'
             f'<p class="ps-note">{_inline_code(s["note"])}</p></div></li>')
@@ -998,7 +1031,7 @@ def _date_he(d: dt.date) -> str:
 
 
 def _question_item(q: dict, page_url: str) -> str:
-    return (f'<li><span class="rq-id">{q["id"]}</span> '
+    return (f'<li>{question_chip(q["id"], q.get("parts", 0))}<span class="rq-id">{q["id"]}</span> '
             f'<a class="rq-title" href="{_href(q["src_uri"], page_url)}">{html.escape(str(q["title"]))}</a>'
             f'{level_chip(q["level"], True)}{difficulty_chip(q["difficulty"], True)}{kind_chip(q["kind"], True)}</li>')
 
@@ -1155,7 +1188,7 @@ def _table(level: str | None, page_url: str) -> str:
             f'<tr data-id="{q["id"]}" data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" data-kind="{q["kind"]}" '
             f'data-level-rank="{LEVEL_RANK[q["level"]]}" data-diff-rank="{DIFF_RANK[q["difficulty"]]}" '
             f'data-tags="{html.escape(" ".join(q["tags"]))}" data-search="{html.escape(search.lower())}">'
-            f'<td class="q-id">{q["id"]}</td>'
+            f'<td class="q-id">{question_chip(q["id"], q.get("parts", 0))}<span class="q-idn">{q["id"]}</span></td>'
             f'<td class="q-title"><div class="q-line"><span class="q-kind q-kind-{q["kind"]}" title="{KINDS[q["kind"]]}">{kind_icon(q["kind"])}</span>'
             f'<a href="{href}" title="{title}">{title}</a>'
             f'{new_chip(q) if q["id"] in new else ""}<span class="q-marks"></span></div>'

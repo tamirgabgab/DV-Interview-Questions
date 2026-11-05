@@ -23,7 +23,7 @@
     logo.querySelector(".lg-v").addEventListener("animationend", () => logo.classList.remove("is-drawing"), { once: true });
   };
 
-  // M4: one bar beside the table of contents, moved to the link Material marks active.
+  // M4: one bar beside the table of contents, moved to the link being read.
   const tocMarker = () => {
     const nav = document.querySelector(".md-sidebar--secondary .md-nav--secondary");
     const list = nav && nav.querySelector(":scope > .md-nav__list");
@@ -35,8 +35,9 @@
     let frame = 0;
     const place = () => {
       frame = 0;
+      // the reading line's link (.is-spy, reading-tools.js tocSpy), else Material's
       const links = list.querySelectorAll(".md-nav__link--active");
-      const link = links[links.length - 1];
+      const link = list.querySelector(".md-nav__link.is-spy") || links[links.length - 1];
       const box = link && link.getBoundingClientRect();
       if (!box || !box.height) { bar.classList.remove("is-on"); return; }
       const top = box.top - nav.getBoundingClientRect().top;

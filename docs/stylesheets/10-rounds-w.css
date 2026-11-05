@@ -122,10 +122,17 @@
 .md-typeset .part-nav { gap: var(--sp-2); }
 .md-typeset .part-nav .pn-chips { flex: 0 1 auto; min-width: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }   /* a row too long for the screen scrolls, never widens the page */
 .md-typeset .part-nav .pn-chips::-webkit-scrollbar { display: none; }
-.md-typeset .part-nav .pn-sol { display: none; flex: 0 1 auto; min-width: 0; gap: 0.3rem; margin-inline-start: auto; overflow-x: auto; scrollbar-width: none; }
+/* The map of the solution being read hangs under the bar as a second row of its own
+   (position absolute and opaque: the page under it never moves when it comes and goes), so the part
+   chips keep their row and no chip is cut in half by a neighbour row ("סעי"). */
+.md-typeset .part-nav .pn-sol { display: none; position: absolute; top: 100%; inset-inline: 0; gap: 0.3rem; padding: 0.3rem 0 0.35rem; overflow-x: auto; scrollbar-width: none; background: var(--md-default-bg-color); border-bottom: 1px solid var(--site-card-border); pointer-events: auto; }
 .md-typeset .part-nav .pn-sol::-webkit-scrollbar { display: none; }
 .md-typeset .part-nav.has-sol .pn-sol { display: flex; }
-.md-typeset .part-nav.has-sol .pn-solved { margin-inline-start: 0; }
+.md-typeset .part-nav .pn-chips { flex: 1 1 auto; }
+/* a row that scrolls fades out at an edge with more chips beyond it (reading-tools.js fades) */
+.md-typeset .part-nav :is(.pn-chips, .pn-sol) { --fade-s: 0rem; --fade-e: 0rem; -webkit-mask-image: linear-gradient(to left, transparent 0, #000 var(--fade-s), #000 calc(100% - var(--fade-e)), transparent 100%); mask-image: linear-gradient(to left, transparent 0, #000 var(--fade-s), #000 calc(100% - var(--fade-e)), transparent 100%); }
+.md-typeset .part-nav :is(.pn-chips, .pn-sol).fade-s { --fade-s: 1.6rem; }
+.md-typeset .part-nav :is(.pn-chips, .pn-sol).fade-e { --fade-e: 1.6rem; }
 .md-typeset .part-nav .pn-sol .sol-map__chip { padding-block: 0.1rem; }
 .md-typeset .part-nav :is(.part-nav__chip, .sol-map__chip) { flex: none; white-space: nowrap; }   /* a chip keeps its one line; the row around it scrolls */
 .md-typeset .part-nav .qt-name { display: none; }   /* the solved button is a copy of the header's: its name stays there, the round button here */
@@ -143,8 +150,9 @@
 }
 .md-typeset .part-nav.pn-fixed.has-sol .pn-solved { box-shadow: none; background: transparent; }
 
-/* W347: "back to top" as a round button in the bottom corner, off the text column. */
-.md-top { top: auto; bottom: var(--sp-4); left: var(--sp-4); right: auto; margin: 0 !important; width: 2.6rem; height: 2.6rem; padding: 0; border-radius: 50%; font-size: 0; transform: none !important; box-shadow: var(--shadow-2); }
+/* W347: "back to top" as a round button in the bottom corner, off the text column
+   (Material writes an inline top under the header, so top: auto needs !important). */
+.md-top { top: auto !important; bottom: var(--sp-4); left: var(--sp-4); right: auto; margin: 0 !important; width: 2.6rem; height: 2.6rem; padding: 0; border-radius: 50%; font-size: 0; transform: none !important; box-shadow: var(--shadow-2); }
 .md-top svg { display: block; width: 1.2rem; height: 1.2rem; margin: auto; vertical-align: 0; }
 .md-top[hidden] { opacity: 0; transform: translateY(0.4rem) !important; }
 

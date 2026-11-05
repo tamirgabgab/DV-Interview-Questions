@@ -285,7 +285,7 @@
       if (site) nav.style.top = `${site.getBoundingClientRect().bottom}px`;
     };
     const mark = () => {
-      const y = 140;
+      const y = spyLine();                      // the one reading line (the TOC's too, tocSpy)
       let current = -1;
       parts.forEach((h, i) => { if (h.getBoundingClientRect().top <= y) current = i; });
       if (end && end.getBoundingClientRect().top <= y) current = -1;   // past the last part
@@ -300,9 +300,21 @@
       nav.style.setProperty("--pn-read", `${(read * 100).toFixed(1)}%`);
     };
     window.addEventListener("scroll", mark, { passive: true });
-    window.addEventListener("resize", () => { place(); mark(); }, { passive: true });
+    window.addEventListener("resize", () => { place(); mark(); fades(chips); }, { passive: true });
+    chips.addEventListener("scroll", () => fades(chips), { passive: true });
+    slot.addEventListener("scroll", () => fades(slot), { passive: true });
     place();
     mark();
+    fades(chips);
+  };
+
+  // A row of chips that scrolls sideways fades out at an edge with more chips beyond it,
+  // so a chip cut by the edge reads as "more this way" (the mask in 10-rounds-w.css).
+  const fades = (row) => {
+    if (!row) return;
+    const max = row.scrollWidth - row.clientWidth, pos = Math.abs(row.scrollLeft);
+    row.classList.toggle("fade-s", max > 1 && pos > 1);         // the start (right) edge
+    row.classList.toggle("fade-e", max > 1 && pos < max - 1);   // the end (left) edge
   };
 
   // --- figure text on narrow screens (D194) ---------------------------------------------------
@@ -513,6 +525,15 @@
     const site = document.querySelector(".md-header");
     return site ? site.getBoundingClientRect().bottom : 0;
   };
+  // The line a heading or a block has to pass to count as the one being read: under the
+  // part bar and the solution row hanging from it, the same for the part bar, the solution
+  // maps and the table of contents (one scroll-spy, so they never disagree).
+  const spyLine = () => {
+    const bar = document.querySelector(".part-nav");
+    const slot = bar && bar.classList.contains("has-sol") && bar.querySelector(".pn-sol");
+    const line = readingLine();
+    return (slot ? Math.max(line, slot.getBoundingClientRect().bottom) : line) + 24;
+  };
   let shown = null;
   const syncSlot = () => {
     const bar = document.querySelector(".part-nav");
@@ -525,6 +546,7 @@
       shown = active;
       slot.replaceChildren(...(active ? active.links.map((a) => a.cloneNode(true)) : []));
       bar.classList.toggle("has-sol", Boolean(active));
+      fades(slot);
     }
     if (!active) return;
     Array.from(slot.children).forEach((c, i) => {
@@ -558,7 +580,7 @@
     maps.push({ sol, nav, links });
     const mark = () => {
       if (!sol.open) return;
-      const y = readingLine() + 24;
+      const y = spyLine();
       let current = 0;
       blocks.forEach((b, i) => { if (b.getBoundingClientRect().top <= y) current = i; });
       if (links[current].classList.contains("is-current")) return;
@@ -626,6 +648,40 @@
     document.documentElement.style.setProperty("--part-nav-h", bar ? `${bar.offsetHeight}px` : "0px");
   };
 
+  // The table of contents follows the same reading line as the part bar (spyLine): its
+  // link of the heading being read gets .is-spy, which 13-motion.css colours and the TOC
+  // marker (motion.js) follows; Material's own --active class used a higher line, so the
+  // part bar said ג while the contents still said ב.
+  const tocSpy = () => {
+    const nav = document.querySelector(".md-sidebar--secondary .md-nav--secondary");
+    if (!nav) return;
+    const pairs = Array.from(nav.querySelectorAll("a.md-nav__link[href^='#']")).map((a) => {
+      let id = a.getAttribute("href").slice(1);
+      try { id = decodeURIComponent(id); } catch (e) { /* keep it */ }
+      return [a, document.getElementById(id)];
+    }).filter(([, h]) => h);
+    if (!pairs.length) return;
+    nav.classList.add("has-spy");
+    let on = null, frame = 0;
+    const mark = () => {
+      frame = 0;
+      const y = spyLine();
+      let cur = null;
+      pairs.forEach((p) => { if (p[1].getBoundingClientRect().top <= y) cur = p[0]; });
+      const doc = document.documentElement;
+      if (window.innerHeight + window.scrollY >= doc.scrollHeight - 2) cur = pairs[pairs.length - 1][0];   // the end of the page
+      if (cur === on) return;
+      if (on) { on.classList.remove("is-spy"); on.removeAttribute("aria-current"); }
+      on = cur;
+      if (on) { on.classList.add("is-spy"); on.setAttribute("aria-current", "location"); }
+    };
+    const later = () => { if (!frame) frame = requestAnimationFrame(mark); };
+    window.addEventListener("scroll", later, { passive: true });
+    window.addEventListener("resize", later, { passive: true });
+    document.addEventListener("toggle", later, true);
+    mark();
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
     decorate(document);
     document.querySelectorAll("article.md-content__inner").forEach(partBar);
@@ -633,8 +689,11 @@
       solutionMap(sol, solutionBlocks(sol));
     });
     partBarHeight();
+    const pbar = document.querySelector(".part-nav");
+    if (pbar && "ResizeObserver" in window) new ResizeObserver(partBarHeight).observe(pbar);
     window.addEventListener("scroll", syncSlot, { passive: true });
     syncSlot();
+    tocSpy();
     tables(document);
     watchFigures(document);
     document.querySelectorAll(".md-content .explorer").forEach((box) =>

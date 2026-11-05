@@ -367,6 +367,13 @@ not start with the id, or a duplicate id. It also generates, per question page:
   tags, `python` and `systemverilog` not counted), and the previous / next links come from
   Material's `navigation.footer`.
 
+One reading line (`spyLine()` in `reading-tools.js`) drives the part bar, the solution maps and
+the table of contents (the TOC link being read gets `.is-spy`, which the TOC marker in
+`motion.js` follows); rows of chips that scroll get `fade-s` / `fade-e`. On phones
+`layout.js` `hiddenChrome()` makes the closed drawer `inert` and takes the closed search's
+field and buttons out of the Tab order. The search's Hebrew strings live in
+`overrides/partials/languages/custom.html` (`theme.language: custom`).
+
 `docs/javascripts/reading-tools.js` adds the reading aids of every question page: an
 **enlarge button** on each inline SVG figure and chart (a full-screen view with pinch / wheel
 zoom, drag, double tap and Esc; the button is small and faint until the pointer is over the
@@ -675,6 +682,8 @@ follow the light / dark switch automatically:
 | `bc-cell` (`is-one`, `is-zero`, `is-again`), `bc-prob`, `bc-out`, `bc-head`, `bc-bit` (`is-same`, `is-stop`, `is-later`), `bc-bitv`, `bc-key-*`; on `gs-bits` cells `bc-one`, `bc-zero`, `bc-same`, `bc-stop`, `vn-last` | Biased coins (0079): the grid of a pair of flips and the bits of p against the fair flips (figures), and the `vncoin` and `cmpcoin` explorers |
 | `nq-board` (`nq-sq` with `is-dark`, `is-hit`, `is-free`, `is-even`, `is-odd`; `nq-frame` with `is-sym`; `nq-lab`; queens `nq-q` with `is-new`, `is-sol`, `is-bad`, `is-ghost`; `nq-cell` / `nq-ring` for a clickable cell), `nq-classes` (`nq-dot`), `nq-masks` (over `gs-bits`: `nq-bitno`, `is-free` bits), `nq-wrap`, `nq-key-*` | N queens (0081): the boards of the figures and of the `nqueens` / `nqplace` explorers (column 0 on the right, as the low bit), the queens, the next row's attacked and free cells, the masks with their free bits, the 12 distinct solutions, the two halves of the construction |
 | `nim-board`, `nim-heap`, `nim-lab`, `nim-toks`, `nim-tok` (`is-hint`, `is-gone`), `nim-hintlab`, `nim-log`, `nim-key-*`; on the `gs-bits` table `nim-bin` with cells `nim-top`, `nim-zero` | The `nim` explorer (0082): the heaps as rows of round tokens (a click takes the token and every token after it; the taken ones hollow, the winning move in the amber tint), and the heaps or their Grundy numbers in binary with the XOR row, its top bit framed and an XOR of 0 in green |
+| `qchip` (`qc-pins`, `qc-body`, `qc-die`, `qc-on`, `qc-dot`; `qchip-s` small), `qh-emblem-chip`, `qh-pn`, `q-idn` | A question's own chip (`question_chip` in the hook, 22-circuit.css): one pin a side per part and its id's bits on the die, in the lists and the question header, with its label DVQ‑&lt;id&gt; |
+| `cx-ico`, `hr.is-on`, `--cx-traces` / `--cx-wave` / `--cx-clock`, `--led-off` | The circuit layer (22-circuit.css, `circuit.js`): the slow icosahedron canvas of the home hero and the level bands, the divider's packet, the trace, waveform and clock masks, the unlit LED of the difficulty chips |
 | `bil-felt`, `bil-rail`, `bil-pocket` / `bil-hole` (`is-in`), `bil-path`, `bil-mid`, `bil-ball`, `bil-ghost`, `bil-aim`, `bil-arrow`, `bil-tipdot`, `bil-trail`, `bil-ghost-line`, `bil-gap` (`is-in`), `bil-h` / `bil-hit` (the draggable ball and arrow tip), `bil-checks`, `bil-count`, `bil-key-*` | Billiards (0080): the table and its pockets, the paths with their numbered cushion hits and the unfolded grid (figures), and the `billiard` explorer: the ball and the aim dragged, the trail of a shot, the unfolded table with the gap at every line of pockets, the table of the calculation |
 
 Site-wide (HTML) classes in the same file: `chip`, `chip-level`, `chip-diff-*`, `chip-new`

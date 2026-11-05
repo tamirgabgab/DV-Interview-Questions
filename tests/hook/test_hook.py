@@ -254,3 +254,32 @@ def test_no_real_page_has_a_fake_video():
 def html_unescape(s):
     import html
     return html.unescape(s)
+
+
+def test_question_chip():
+    """A question's chip (22-circuit.css): the same id and parts give the same chip; one pin a
+    side per part (1 to 6), and the die's lit cells read the id in binary, MSB first."""
+    pins = re.compile(r'class="qc-pins" d="([^"]*)"')
+    cells = lambda svg, cls: re.findall(r"M[\d.]+ [\d.]+h3v3h-3z", (re.search(rf'class="{cls}" d="([^"]*)"', svg) or ["", ""])[1])  # noqa: E731
+    assert hook.question_chip("0080", 4) == hook.question_chip("0080", 4)
+    assert hook.question_chip("0080", 4) != hook.question_chip("0081", 4)
+    for parts, n in ((0, 1), (1, 1), (3, 3), (4, 4), (9, 6)):
+        svg = hook.question_chip("0080", parts)
+        assert pins.search(svg).group(1).count("h5v2.4h-5z") == 2 * n
+    for qid in ("0001", "0080", "0255", "9999"):
+        svg = hook.question_chip(qid, 2)
+        assert len(cells(svg, "qc-on")) == bin(int(qid)).count("1") and 'class="qc-die"' in svg
+        assert 'aria-hidden="true"' in svg and "fill=" not in svg and "style=" not in svg   # colours from the stylesheet
+    # the bits read in order: 0080 = 0000 0000 0101 0000 lights the cells 9 and 11 of 16
+    order = [f"M{hook._n(11.6 + c * 4.4)} {hook._n(8 + r * 4.4)}h3v3h-3z" for r in range(4) for c in range(4)]
+    lit = cells(hook.question_chip("0080", 1), "qc-on")
+    assert [order.index(x) for x in lit] == [9, 11]
+    assert hook.part_number("0080") == "DVQ‑0080"
+
+
+def test_every_question_page_has_its_chip():
+    hook._questions = hook._load_questions(DOCS)
+    for q in hook._questions.values():
+        assert q["parts"] >= 0
+        header = hook._header(q, "", "questions/x/y/")
+        assert hook.question_chip(q["id"], q["parts"]) in header and hook.part_number(q["id"]) in header

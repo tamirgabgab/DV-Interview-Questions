@@ -72,6 +72,9 @@ PAIRS = [
     ("tag on a doubled response", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
     ("tag fault badge", "var(--md-default-bg-color)", ["var(--viz-ink)"], TEXT),
     ("coin of the first player", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("a search match, dark text on its amber tint (site search)", "var(--md-default-fg-color)", ["color-mix(in srgb, var(--md-accent-fg-color) 32%, var(--md-default-bg-color))"], TEXT),
+    ("the no-result button of the site search", "var(--md-primary-bg-color)", ["var(--md-primary-fg-color)"], TEXT),
+    ("the TOC link being read (one scroll-spy)", "var(--md-typeset-a-color)", [PAGE], TEXT),
     ("wizards box, the option taken", "var(--md-default-fg-color)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("chain state text on a win", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
     ("chain state turn on a win", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
@@ -269,6 +272,12 @@ PAIRS = [
     ("in-place cells, the mark of a step", "var(--site-mark-color)", [PAGE], UI),
     ("bitmatrix box, a bit that is on", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 14%, var(--md-default-bg-color))"], TEXT),
     ("bitmatrix box, a bit that is off", "var(--viz-text)", [CARD], TEXT),
+    # the circuit layer (22-circuit.css): the difficulty word beside its LEDs, with no pill now
+    *[(f"difficulty word beside its LEDs, {d}", f"var(--diff-{d})", [CARD, PAGE], TEXT) for d in ("easy", "medium", "hard")],
+    *[(f"level band difficulty word beside its LEDs, {d}", f"var(--lst-{d})", ["var(--lst-band-bg)"], TEXT) for d in ("easy", "medium", "hard")],
+    ("question chip, a lit bit on its body", "var(--md-accent-fg-color)",
+     [{"default": "var(--md-primary-fg-color)", "slate": "var(--md-primary-fg-color--light)"}], UI),
+    ("question chip label DVQ-<id> in the header", "var(--md-default-fg-color--light)", [CARD], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

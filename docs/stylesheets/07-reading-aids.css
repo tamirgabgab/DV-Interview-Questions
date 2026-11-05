@@ -92,6 +92,9 @@
   background: var(--md-default-bg-color);
   border-bottom: 1px solid var(--viz-grid);
 }
+/* a heading reached by a link (a part chip, the table of contents) stops under the site
+   header and the part bar, not behind them */
+.md-typeset :is(h2, h3)[id] { scroll-margin-top: calc(2.4rem + var(--part-nav-h, 0px) + 0.5rem); }
 .md-typeset .part-nav__chip {
   padding: 0.1rem 0.6rem;
   border: 1px solid var(--viz-grid);

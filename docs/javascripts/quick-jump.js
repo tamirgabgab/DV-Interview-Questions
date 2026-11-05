@@ -190,4 +190,37 @@
     btn.addEventListener("click", () => open());
     anchor.before(btn);
   });
+
+  // The site search with no result was a dead end ("אין מסמכים תואמים" and nothing else):
+  // under that line, the quick jump with the typed words, and the list of all questions.
+  document.addEventListener("DOMContentLoaded", () => {
+    const meta = document.querySelector(".md-search-result__meta");
+    const results = document.querySelector(".md-search-result__list");
+    const field = document.querySelector(".md-search__input");
+    if (!meta || !results || !field) return;
+    const empty = document.createElement("div");
+    empty.className = "sr-empty";
+    empty.hidden = true;
+    const all = I() && I().siteUrl ? I().siteUrl("all/") : "all/";
+    empty.innerHTML = "<p>אפשר לחפש שאלה לפי מספר, שם או נושא, או לעבור על כל השאלות.</p>" +
+      '<button type="button" class="sr-jump">קפיצה לשאלה</button>' +
+      '<button type="button" class="sr-all">לכל השאלות</button>';   // not a link: Material's Enter takes every [href] in the results for one
+    meta.after(empty);
+    empty.querySelector(".sr-all").addEventListener("click", () => { window.location.href = all; });
+    empty.querySelector(".sr-jump").addEventListener("click", () => {
+      const q = field.value.trim(), toggle = document.getElementById("__search");
+      if (toggle && toggle.checked) { toggle.checked = false; toggle.dispatchEvent(new Event("change")); }
+      open(q);
+    });
+    let frame = 0;
+    const sync = () => {
+      frame = 0;
+      // "אין מסמכים תואמים" (search.result.none, overrides/partials/languages/custom.html)
+      empty.hidden = !(field.value.trim() && !results.children.length && /^אין/.test(meta.textContent.trim()));
+    };
+    const later = () => { if (!frame) frame = requestAnimationFrame(sync); };
+    new MutationObserver(later).observe(results, { childList: true });
+    new MutationObserver(later).observe(meta, { childList: true, characterData: true, subtree: true });
+    field.addEventListener("input", later);
+  });
 })();

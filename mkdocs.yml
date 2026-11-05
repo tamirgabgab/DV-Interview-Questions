@@ -10,7 +10,7 @@ theme:
   # overrides/: main.html adds the web app manifest (home-screen icon), 404.html the
   # Hebrew "page not found" page, partials/content.html the edit link at the page end
   custom_dir: overrides
-  language: he
+  language: custom    # Hebrew with grammatical search counts (overrides/partials/languages/custom.html)
   logo: assets/logo.svg
   favicon: assets/favicon.svg
   font:
@@ -37,7 +37,6 @@ theme:
     - navigation.indexes
     - navigation.top
     - navigation.footer
-    - search.suggest
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
@@ -143,6 +142,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/19-details.css
   - stylesheets/20-video.css
   - stylesheets/21-interview.css
+  - stylesheets/22-circuit.css     # the circuit layer: traces, question chips, LEDs, signals (session 32)
 
 extra_javascript:
   - javascripts/mathjax.js
@@ -166,6 +166,7 @@ extra_javascript:
   - javascripts/question-page.js
   - javascripts/details.js
   - javascripts/video.js           # the tutorial video's dialog (pages with a video: field)
+  - javascripts/circuit.js         # the dividers' packet and the slow icosahedron (session 32)
   # The explorer boxes (docs/javascripts/explorer/) are added per page by hooks/questions.py.
 
 

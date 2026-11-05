@@ -23,6 +23,10 @@
 .md-sidebar--secondary .md-nav--secondary { position: relative; }
 .md-sidebar--secondary .toc-marker { position: absolute; top: 0; inset-inline-start: 0.1rem; width: 2px; height: 1rem; border-radius: 1px; background: var(--md-accent-fg-color); opacity: 0; pointer-events: none; }
 .md-sidebar--secondary .toc-marker.is-on { opacity: 1; }
+/* one scroll-spy for the part bar and the contents (reading-tools.js tocSpy): the link being
+   read is .is-spy; Material's own --active, on a higher line, only keeps the passed colour */
+.md-sidebar--secondary .md-nav--secondary.has-spy .md-nav__link--active { color: var(--md-default-fg-color--light); }
+.md-sidebar--secondary .md-nav--secondary.has-spy .md-nav__link.is-spy { color: var(--md-typeset-a-color); }
 @media (prefers-reduced-motion: no-preference) {
   .md-sidebar--secondary .toc-marker.is-moving { transition: transform var(--dur-2) var(--ease), height var(--dur-2) var(--ease), opacity var(--dur-1); }
 }

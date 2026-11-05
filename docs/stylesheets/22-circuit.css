@@ -1,0 +1,210 @@
+/* The site's styles, part 22 of 22: the circuit layer (session 32). A quiet board-trace
+   pattern at the top of every page and in the wide margins, each question's own chip
+   (hooks/questions.py question_chip), the difficulty as three LEDs, path cards that light
+   on hover, section dividers drawn as a digital waveform, the reading line as a clock, and
+   the slow wireframe icosahedron of the home hero and the level bands (circuit.js).
+   Everything here is decoration: nothing moves under reduced motion, nothing sits on
+   top of text, and the colours are the palette's (01-base.css). */
+
+:root {
+  /* one tile of board traces, vias and pads; used as a mask, so only its shape counts */
+  --cx-traces: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 160' fill='none' stroke='%23000' stroke-width='1.4'%3E%3Cpath d='M0 30h58l14 14h66l10-10h92M20 0v16l14 14M0 98h32l16-16h60l12 12h120M150 44v28l14 14h76M98 160v-26l-12-12H38l-14-14M240 130h-56l-14 14h-36M196 0v12l-10 10h-30M58 30v0M120 122v-28'/%3E%3Ccircle cx='138' cy='44' r='3.2'/%3E%3Ccircle cx='108' cy='82' r='3.2'/%3E%3Ccircle cx='24' cy='108' r='3.2'/%3E%3Ccircle cx='134' cy='144' r='3.2'/%3E%3Ccircle cx='156' cy='22' r='3.2'/%3E%3Ccircle cx='120' cy='94' r='2.4'/%3E%3Cpath fill='%23000' stroke='none' d='M68 40h8v8h-8zM160 82h8v8h-8zM178 126h8v8h-8z'/%3E%3C/svg%3E");
+  /* a stretch of a data line, irregular so the repeat is hard to see */
+  --cx-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 16' fill='none' stroke='%23000' stroke-width='1.6'%3E%3Cpath d='M0 12.5h10V3.5h20v9h8V3.5h12v9h22V3.5h10v9h14'/%3E%3C/svg%3E");
+  /* a clock, one period per tile */
+  --cx-clock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5' fill='none' stroke='%23000' stroke-width='1.3'%3E%3Cpath d='M0 4.3h2.5V.7h5v3.6h2.5'/%3E%3C/svg%3E");
+  --cx-ink: var(--md-primary-fg-color);
+  --cx-alpha: 0.05;
+  --led-off: color-mix(in srgb, var(--md-default-fg-color) 16%, transparent);
+}
+[data-md-color-scheme="slate"] { --cx-ink: var(--md-default-fg-color); --cx-alpha: 0.045; --led-off: color-mix(in srgb, var(--md-default-fg-color) 26%, transparent); }
+
+/* --- the board traces ---------------------------------------------------------------------
+   body::before: the top band, a strip under the header that fades out before the content
+   starts (the header and the cards are opaque over it). body::after: the margins outside
+   the grid (14-layout.css: max(61rem, 80vw)) on a wide screen, fixed while the page scrolls. */
+body::before,
+body::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--cx-ink);
+  opacity: var(--cx-alpha);
+}
+body::before {
+  top: 0;
+  height: 8rem;
+  -webkit-mask: var(--cx-traces) right top / 15rem auto repeat, linear-gradient(#000 50%, transparent);
+  -webkit-mask-composite: source-in;
+  mask: var(--cx-traces) right top / 15rem auto repeat, linear-gradient(#000 50%, transparent);
+  mask-composite: intersect;
+}
+body::after {
+  position: fixed;
+  inset-block: 0;
+  display: none;
+  -webkit-mask: var(--cx-traces) right top / 15rem auto repeat,
+    linear-gradient(to right, #000 calc(50% - max(30.5rem, 40vw) - 1.5rem), transparent calc(50% - max(30.5rem, 40vw)), transparent calc(50% + max(30.5rem, 40vw)), #000 calc(50% + max(30.5rem, 40vw) + 1.5rem));
+  -webkit-mask-composite: source-in;
+  mask: var(--cx-traces) right top / 15rem auto repeat,
+    linear-gradient(to right, #000 calc(50% - max(30.5rem, 40vw) - 1.5rem), transparent calc(50% - max(30.5rem, 40vw)), transparent calc(50% + max(30.5rem, 40vw)), #000 calc(50% + max(30.5rem, 40vw) + 1.5rem));
+  mask-composite: intersect;
+}
+@media screen and (min-width: 76.25em) { body::after { display: block; } }
+@media screen and (max-width: 44.9375em) { body::before { height: 5.5rem; } }   /* a phone's title starts right under the header */
+@media print { body::before, body::after { content: none; } }
+
+/* --- the question's chip ------------------------------------------------------------------ */
+.md-typeset .qchip { flex: none; width: 1.35rem; height: 1.35rem; vertical-align: middle; overflow: visible; }
+.md-typeset .qchip .qc-pins { fill: color-mix(in srgb, var(--md-default-fg-color) 42%, transparent); }
+.md-typeset .qchip .qc-body { fill: var(--md-primary-fg-color); }
+.md-typeset .qchip .qc-die { fill: var(--md-primary-bg-color); fill-opacity: 0.13; }
+.md-typeset .qchip .qc-on { fill: var(--md-accent-fg-color); }
+.md-typeset .qchip .qc-dot { fill: var(--md-primary-bg-color); fill-opacity: 0.45; }
+[data-md-color-scheme="slate"] .md-typeset .qchip .qc-body { fill: var(--md-primary-fg-color--light); stroke: color-mix(in srgb, var(--md-default-fg-color) 30%, transparent); stroke-width: 0.8; }
+
+/* in a list: before the id (tables, path cards, related and recent lists) */
+.md-typeset .questions-wrap td.q-id { white-space: nowrap; }
+.md-typeset .questions-wrap td.q-id .qchip { display: block; width: 1.5rem; height: 1.5rem; margin: 0 0 0.25rem; }
+.md-typeset .path-step .ps-head .qchip,
+.md-typeset .related-questions .qchip { width: 1.3rem; height: 1.3rem; margin-inline-end: -0.15rem; }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .questions-wrap td.q-id .qchip { display: inline-block; width: 1.2rem; height: 1.2rem; margin: 0 0 0 0.3rem; vertical-align: -0.3rem; }
+}
+
+/* in the question header: the corner emblem holds the chip (a wide screen with a pointer),
+   and the meta line opens with its label, DVQ-<id> (the small chip beside it on a phone) */
+.md-typeset .question-header .qh-emblem-chip .qchip { width: 2.1rem; height: 2.1rem; }
+.md-typeset .question-header .qh-pn { display: inline-flex; align-items: center; gap: 0.3em; font-family: var(--md-code-font-family); font-size: 0.64rem; letter-spacing: 0.04em; color: var(--md-default-fg-color--light); white-space: nowrap; }
+.md-typeset .question-header .qh-pn .qchip-s { width: 1.05rem; height: 1.05rem; }
+.md-typeset .question-header .qh-bottom > .qh-topics { order: -1; }   /* topics on their own line first, then the label, the date, the source */
+@media screen and (min-width: 45em) and (hover: hover) {
+  .md-typeset .question-header .qh-pn .qchip-s { display: none; }
+}
+
+/* --- a compact header on a phone ----------------------------------------------------------
+   The title a size smaller, and the topics, the label, the date and the source in one quiet
+   line (cut with an ellipsis; the full text stays for a screen reader). */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .question-header > h1 { font-size: clamp(1.2rem, 5.4vw, 1.42rem); line-height: 1.32; }
+  .md-typeset .question-header > .qh-bottom { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.64rem; }
+  .md-typeset .question-header > .qh-bottom > * { display: inline; }
+  .md-typeset .question-header .qh-bottom .qh-pn { display: inline-flex; vertical-align: middle; margin-inline-end: 0.35rem; }
+  .md-typeset .question-header .qh-topics-name { display: none; }
+  .md-typeset .question-header .qh-bottom a.qh-tag { padding: 0; border: 0; border-radius: 0; line-height: inherit; text-decoration: none; color: inherit; }
+  .md-typeset .question-header .qh-bottom a.qh-tag + a.qh-tag::before { content: "·"; margin-inline: 0.3em; color: var(--md-default-fg-color--lighter); }
+  .md-typeset .question-header .qh-topics + .qh-sep { display: inline-block; }
+  .md-typeset .question-header .qh-sep { margin-inline: 0.35rem; vertical-align: middle; }
+}
+
+/* --- the difficulty as three LEDs ---------------------------------------------------------
+   The chip keeps its word and colour; its dot becomes the first of three LEDs (the other
+   two are its box shadows, toward the word), lit up to the level with a soft glow. */
+.md-typeset .chip.chip-diff { gap: 0.45em; padding-inline: 0.1em; background: transparent; }
+.md-typeset .chip.chip-diff::before {
+  width: 0.46em;
+  height: 0.46em;
+  margin-inline-end: 1.2em;
+  --led-glow: color-mix(in srgb, currentColor 55%, transparent);
+}
+.md-typeset .chip-diff-easy::before {
+  box-shadow: 0 0 0.3em var(--led-glow), -0.62em 0 0 var(--led-off), -1.24em 0 0 var(--led-off);
+}
+.md-typeset .chip-diff-medium::before {
+  box-shadow: 0 0 0.3em var(--led-glow), -0.62em 0 0 currentColor, -0.62em 0 0.3em var(--led-glow), -1.24em 0 0 var(--led-off);
+}
+.md-typeset .chip-diff-hard::before {
+  box-shadow: 0 0 0.3em var(--led-glow), -0.62em 0 0 currentColor, -0.62em 0 0.3em var(--led-glow), -1.24em 0 0 currentColor, -1.24em 0 0.3em var(--led-glow);
+}
+.md-typeset .home-band .chip.chip-diff,
+.md-typeset .list-band .chip.chip-diff { --led-off: color-mix(in srgb, var(--md-primary-bg-color) 18%, transparent); }   /* on the navy bands */
+
+/* --- path cards light on hover: they rise 2px and a current runs once along the top edge,
+   from the start corner (transform and opacity only) */
+.md-typeset ol.path-steps > li.path-step { position: relative; }
+.md-typeset ol.path-steps > li.path-step::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  inset-inline-start: 0.6rem;
+  width: 34%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to left, transparent, var(--md-accent-fg-color) 55%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .md-typeset ol.path-steps > li.path-step { transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
+  .md-typeset ol.path-steps > li.path-step:hover { transform: translateY(-2px); box-shadow: var(--shadow-1); border-color: color-mix(in srgb, var(--md-accent-fg-color) 45%, var(--site-card-border)); }
+  .md-typeset ol.path-steps > li.path-step:hover::after { animation: cx-current 0.9s var(--ease) 1 both; }
+  .md-typeset .related-questions > li:hover .qc-on { filter: brightness(1.15); }
+}
+@keyframes cx-current {
+  0% { opacity: 0; transform: translateX(0); }
+  18% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-175%); }
+}
+
+/* --- section dividers as a data line ------------------------------------------------------
+   A quiet waveform, fading at both ends. circuit.js marks a divider .is-on the first time it
+   comes into view, and a short bright packet runs along it once. */
+.md-typeset hr { position: relative; display: block; height: 0.8rem; margin: 1.6em 0; overflow: hidden; border: 0; background: none; }
+.md-typeset hr::before,
+.md-typeset hr::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  -webkit-mask: var(--cx-wave) right center / 4.8rem 0.8rem repeat-x, linear-gradient(to left, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-composite: source-in;
+  mask: var(--cx-wave) right center / 4.8rem 0.8rem repeat-x, linear-gradient(to left, transparent, #000 12%, #000 88%, transparent);
+  mask-composite: intersect;
+}
+.md-typeset hr::before { background: color-mix(in srgb, var(--md-default-fg-color) 22%, transparent); }
+.md-typeset hr::after { inset-inline-end: auto; width: 4.8rem; background: var(--md-accent-fg-color); opacity: 0; -webkit-mask: var(--cx-wave) right center / 4.8rem 0.8rem repeat-x; mask: var(--cx-wave) right center / 4.8rem 0.8rem repeat-x; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset hr.is-on::after { animation: cx-packet 1.6s var(--ease) 1 both; }
+}
+@keyframes cx-packet {
+  0% { opacity: 0; transform: translateX(0); }
+  12% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(calc(-1 * var(--cx-run, 30rem))); }
+}
+
+/* --- the reading line of the part bar as a clock ------------------------------------------- */
+.md-typeset .part-nav .pn-progress { height: 4px; bottom: -2px; }
+.md-typeset .part-nav .pn-progress::before,
+.md-typeset .part-nav .pn-progress i {
+  -webkit-mask: var(--cx-clock) right center / 10px 4px repeat-x;
+  mask: var(--cx-clock) right center / 10px 4px repeat-x;
+}
+.md-typeset .part-nav .pn-progress::before { content: ""; position: absolute; inset: 0; background: color-mix(in srgb, var(--md-default-fg-color) 18%, transparent); }
+.md-typeset .part-nav .pn-progress i { position: relative; }
+.md-typeset .part-nav.pn-fixed .pn-progress { top: 0; bottom: auto; }
+
+/* the parts timeline: a part passed lights like a pad that took the signal */
+.md-typeset .qp-parts > .qp-part.is-passed::before { box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-accent-fg-color) 28%, transparent); }
+
+/* --- the slow icosahedron (circuit.js) ----------------------------------------------------- */
+.md-typeset .home-hero,
+.md-typeset .list-band.lb-level { isolation: isolate; }
+.md-typeset .cx-ico,
+.md-typeset :is(.home-hero, .list-band) > .cx-ico {   /* beats the bands' "> :not(bg) { position: relative }" */
+  position: absolute;
+  z-index: -1;
+  width: 17rem;
+  height: 17rem;
+  color: var(--md-primary-bg-color);
+  opacity: 0.09;
+  pointer-events: none;
+}
+.md-typeset .home-hero > .cx-ico { bottom: -5rem; left: 31%; width: 14rem; height: 14rem; }   /* under the chip, between the builder and the text */
+.md-typeset .list-band > .cx-ico { top: -4rem; left: -3rem; }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset :is(.home-hero, .list-band) > .cx-ico { display: none; }   /* a phone's band is text from edge to edge */
+}
+@media print { .md-typeset .cx-ico { display: none; } }

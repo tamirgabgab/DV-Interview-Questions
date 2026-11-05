@@ -2,8 +2,9 @@
 // folded to the current question behind a button with the count, and the three columns
 // (navigation, the page, the table of contents) resized by dragging the grip between them.
 // Both are remembered in localStorage; a double click on a grip (or Home on a focused grip)
-// gives the column back its default width. Nothing here runs on a phone or a tablet, where
-// the navigation is a drawer and the table of contents is hidden.
+// gives the column back its default width. Neither runs on a phone or a tablet, where
+// the navigation is a drawer and the table of contents is hidden; there the closed drawer
+// and the closed search are taken out of the Tab order instead (hiddenChrome).
 (() => {
   const FOLD_KEY = "dvq-nav-open";
   const WIDTH_KEY = { nav: "dvq-col-nav", toc: "dvq-col-toc" };
@@ -27,11 +28,16 @@
     btn.type = "button";
     btn.className = "nav-fold";
     btn.setAttribute("aria-controls", list.id);
-    btn.innerHTML = `<span class="nav-fold__text">כל השאלות במשרה</span> <span class="nav-fold__n">${items.length}</span><span class="nav-fold__arrow" aria-hidden="true"></span>`;
+    // the section of the study paths lists paths, not questions
+    const first = list.querySelector("a.md-nav__link[href]");
+    const paths = !!first && /(^|\/)paths\//.test(new URL(first.getAttribute("href"), location.href).pathname);
+    const all = paths ? "כל המסלולים" : "כל השאלות במשרה";
+    btn.innerHTML = `<span class="nav-fold__text">${all}</span> <span class="nav-fold__n">${items.length}</span><span class="nav-fold__arrow" aria-hidden="true"></span>`;
     const set = (open) => {
       nav.classList.toggle("is-folded", !open);
       btn.setAttribute("aria-expanded", String(open));
-      btn.title = open ? "לקפל את הרשימה לשאלה הנוכחית" : "לפרוס את כל השאלות של המשרה";
+      btn.title = open ? (paths ? "לקפל את הרשימה למסלול הנוכחי" : "לקפל את הרשימה לשאלה הנוכחית")
+        : (paths ? "לפרוס את כל המסלולים" : "לפרוס את כל השאלות של המשרה");
     };
     set(store.get(FOLD_KEY) === "1");
     btn.addEventListener("click", () => {
@@ -121,8 +127,40 @@
     }, { passive: true });
   };
 
+  // On a phone the closed drawer and the closed search are off the screen but were still in
+  // the Tab order, so Tab walked into links nobody could see. The drawer is inert while it
+  // is closed; the search's field and result list leave the Tab order (tabindex -1, so
+  // Material can still focus the field when the search opens).
+  const hiddenChrome = () => {
+    const drawer = document.getElementById("__drawer"), search = document.getElementById("__search");
+    const side = document.querySelector(".md-sidebar--primary");
+    const narrowNav = window.matchMedia("(max-width: 76.234375em)");      // Material's drawer
+    const narrowSearch = window.matchMedia("(max-width: 59.984375em)");   // the field folded into an icon
+    const sync = () => {
+      if (side && drawer) {
+        const hide = narrowNav.matches && !drawer.checked;
+        if (hide) side.setAttribute("inert", ""); else side.removeAttribute("inert");
+      }
+      if (search) {
+        const closed = !search.checked;
+        document.querySelectorAll(".md-search__scrollwrap").forEach((el) => el.setAttribute("tabindex", closed ? "-1" : "0"));
+        document.querySelectorAll(".md-search__input, .md-search__options :is(a, button)").forEach((el) => {
+          if (closed && narrowSearch.matches) el.setAttribute("tabindex", "-1"); else el.removeAttribute("tabindex");
+        });
+      }
+    };
+    const later = () => requestAnimationFrame(sync);
+    [drawer, search].forEach((t) => t && t.addEventListener("change", later));
+    document.addEventListener("click", later, true);    // Material also sets the toggles without a change event
+    document.addEventListener("keyup", later, true);
+    narrowNav.addEventListener("change", sync);
+    narrowSearch.addEventListener("change", sync);
+    sync();
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
     foldLevel();
     grips();
+    hiddenChrome();
   });
 })();
