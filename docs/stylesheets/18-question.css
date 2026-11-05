@@ -168,21 +168,17 @@
   overflow-wrap: anywhere;   /* a long list of names wraps in the bar on a phone */
 }
 .md-typeset details.success .tabbed-block > .highlight:not(:has(.filename))::before { content: ""; }
-/* the three dots and the file's name, before the title */
+/* the file's name, before the title (the three window dots were dropped in session 32: decoration
+   that read as another app's window) */
 .md-typeset details.success .tabbed-block > .highlight span.filename::before,
 .md-typeset details.success .tabbed-block > .highlight:not(:has(.filename))::after {
   content: var(--qw-ext);
   flex: none;
-  padding-left: 2.6rem;
-  background:
-    radial-gradient(circle, color-mix(in srgb, var(--diff-hard) 75%, transparent) 0.2rem, transparent 0.23rem) 0 50% / 0.62rem 0.62rem no-repeat,
-    radial-gradient(circle, color-mix(in srgb, var(--md-accent-fg-color) 85%, transparent) 0.2rem, transparent 0.23rem) 0.8rem 50% / 0.62rem 0.62rem no-repeat,
-    radial-gradient(circle, color-mix(in srgb, var(--diff-easy) 75%, transparent) 0.2rem, transparent 0.23rem) 1.6rem 50% / 0.62rem 0.62rem no-repeat;
   color: var(--md-default-fg-color);
-  font-weight: 700;
+  font-weight: 600;
 }
 .md-typeset details.success .tabbed-block > .highlight span.filename::before { margin-right: 0.15rem; }
-/* a block without a title: the dots and the name sit over the bar drawn by ::before */
+/* a block without a title: the name sits over the bar drawn by ::before */
 .md-typeset details.success .tabbed-block > .highlight:not(:has(.filename))::after {
   position: absolute;
   top: 0;

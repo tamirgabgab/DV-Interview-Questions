@@ -283,3 +283,12 @@ def test_every_question_page_has_its_chip():
         assert q["parts"] >= 0
         header = hook._header(q, "", "questions/x/y/")
         assert hook.question_chip(q["id"], q["parts"]) in header and hook.part_number(q["id"]) in header
+
+
+def test_revision_date(tmp_path):
+    """The footer's board line (24-living.css): the date of the last commit, the build day
+    outside a git checkout."""
+    import datetime as dt
+    rev = hook._revision_date(DOCS)
+    assert isinstance(rev, dt.date) and rev <= dt.date.today() + dt.timedelta(days=1)   # Israel is ahead of UTC
+    assert hook._revision_date(tmp_path) == dt.date.today()

@@ -21,7 +21,7 @@
   line-height: 1;
   cursor: zoom-in;
   opacity: 0.45;
-  transition: opacity 0.15s;
+  transition: opacity var(--dur-0);
 }
 .md-typeset .fig-wrap:hover .fig-enlarge, .md-typeset .fig-enlarge:focus-visible { opacity: 1; color: var(--md-accent-fg-color); }
 @media (hover: none) { .md-typeset .fig-enlarge { opacity: 0.6; } }

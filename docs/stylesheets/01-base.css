@@ -30,12 +30,13 @@
   --md-code-bg-color: #eef1f6;
   --md-admonition-bg-color: var(--site-surface);
   --site-surface: #ffffff;
-  --site-card-edge: transparent;
+  --site-card-edge: rgba(27, 42, 74, 0.08);   /* one thin edge under the soft shadow (session 32) */
   --md-footer-bg-color: var(--md-primary-fg-color);     /* the brand navy, not near-black */
   --md-footer-bg-color--dark: var(--md-primary-fg-color--dark);
-  --shadow-1: 0 1px 2px rgba(27, 42, 74, 0.06), 0 2px 8px rgba(27, 42, 74, 0.06);
-  --shadow-2: 0 2px 4px rgba(27, 42, 74, 0.08), 0 8px 20px rgba(27, 42, 74, 0.1);
-  --shadow-3: 0 4px 8px rgba(27, 42, 74, 0.1), 0 16px 36px rgba(27, 42, 74, 0.14);
+  /* soft shadows over the thin edge (session 32: lighter, the edge carries the outline) */
+  --shadow-1: 0 1px 2px rgba(27, 42, 74, 0.04), 0 2px 6px rgba(27, 42, 74, 0.04);
+  --shadow-2: 0 2px 4px rgba(27, 42, 74, 0.05), 0 6px 16px rgba(27, 42, 74, 0.07);
+  --shadow-3: 0 4px 8px rgba(27, 42, 74, 0.07), 0 12px 28px rgba(27, 42, 74, 0.1);
 }
 
 /* The dark scheme (UI331): a softer navy and a blue-grey page rather than near-black. */
@@ -75,7 +76,7 @@
 }
 
 /* W335: the design tokens. Spacing on a 4 px grid (the root font is 20 px), three radii,
-   three shadows (per scheme, above) and one motion speed and easing. New rules use these
+   three shadows (per scheme, above) and four motion durations (--dur-0 to --dur-3) with one easing. New rules use these
    rather than literal values. */
 :root {
   --sp-1: 0.2rem;   /* 4 px */
@@ -87,8 +88,10 @@
   --radius-s: 0.3rem;
   --radius-m: 0.5rem;
   --radius-l: 0.8rem;
-  --dur-1: 200ms;
-  --dur-2: 300ms;
+  --dur-0: 150ms;   /* a press, a hover colour, a focus ring */
+  --dur-1: 200ms;   /* a small move: a chip, a fade, a lift */
+  --dur-2: 300ms;   /* a panel or a block coming in */
+  --dur-3: 600ms;   /* a bar filling, a one-off flash */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 

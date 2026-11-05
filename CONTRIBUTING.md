@@ -532,10 +532,20 @@ from the footer of every page.
 `01-base.css` defines the tokens new rules use instead of literal values: spacing on a 4 px
 grid (`--sp-1` to `--sp-6`: 4, 8, 16, 24, 32, 48 px), three radii (`--radius-s/m/l`), three
 shadows (`--shadow-1` to `--shadow-3`, per scheme) and one motion speed and easing
-(`--dur-1`, `--dur-2`, `--ease`). In the light scheme the page is off-white
+(`--dur-0` 150 ms for a press or a hover colour, `--dur-1` 200 ms, `--dur-2` 300 ms for a
+panel coming in, `--dur-3` 600 ms for a bar filling or a one-off flash, and `--ease`). A
+progress bar scales (`transform: scaleX(var(--p))`, `transform-origin: right`) rather than
+changing its width. In the light scheme the page is off-white
 (`--md-default-bg-color: #f7f8fb`) and cards, boxes, admonitions and tables are white
-surfaces (`--site-surface`) lifted by a shadow, with no outline (`--site-card-edge` is
-transparent); the dark scheme keeps the page colour for surfaces and outlines its cards.
+surfaces (`--site-surface`) with one thin edge (`--site-card-edge`, navy at 8%) and a soft
+shadow; the dark scheme keeps the page colour for surfaces and outlines its cards.
+Buttons in a box and in the run panel use one action colour (23-polish.css): `--act` filled
+for the main action, `--act-line` outlined for the rest, never amber (amber is for
+highlights). An icon-only button carries `data-name` (set by `core.js`), a short word shown
+under it on a phone, where it is 44 px. Rubik and JetBrains Mono load as variable fonts
+(the `fonts` block of `overrides/main.html`), so 500 and 600 are real weights; inline code is
+at least 13 px. Page titles are semibold (600) and use tabular figures, like ids, counters
+and the boxes' readouts (24-living.css).
 Hints, solutions, traps and follow-ups set their text at the page size (0.8rem, not the
 theme's 0.64rem box size), their titles at 0.7rem, and an explorer box inside one keeps
 0.64rem, the size its figures were drawn for.
@@ -562,7 +572,7 @@ pages (`@view-transition`, where the browser has it) in which a question's title
 from the link that was followed into the page (`motion.js` names that one link
 `dvq-title`, the page's `h1` has the same name); cards whose top edge fills with amber
 under the pointer; a row of dots above a run of hints, one per hint, filled once it
-is opened (`question-tools.js`); a box not built yet shown as a skeleton (`.explorer:empty`);
+is opened (`question-tools.js`); a box not built yet shown as a skeleton (`.explorer:empty`, 30rem with bars for its title and controls, 24-living.css), and the run panel's output area as grey lines while Python downloads;
 and buttons with a raised shadow and a focus ring that settles in (only its offset moves,
 so the ring is there from the first frame). The question header is a card: the title, one
 row of chips, the topics as chips (`.qh-tag`) with the date and the source, and the page
@@ -684,6 +694,7 @@ follow the light / dark switch automatically:
 | `nim-board`, `nim-heap`, `nim-lab`, `nim-toks`, `nim-tok` (`is-hint`, `is-gone`), `nim-hintlab`, `nim-log`, `nim-key-*`; on the `gs-bits` table `nim-bin` with cells `nim-top`, `nim-zero` | The `nim` explorer (0082): the heaps as rows of round tokens (a click takes the token and every token after it; the taken ones hollow, the winning move in the amber tint), and the heaps or their Grundy numbers in binary with the XOR row, its top bit framed and an XOR of 0 in green |
 | `qchip` (`qc-pins`, `qc-body`, `qc-die`, `qc-on`, `qc-dot`; `qchip-s` small), `qh-emblem-chip`, `qh-pn`, `q-idn` | A question's own chip (`question_chip` in the hook, 22-circuit.css): one pin a side per part and its id's bits on the die, in the lists and the question header, with its label DVQ‑&lt;id&gt; |
 | `cx-ico`, `hr.is-on`, `--cx-traces` / `--cx-wave` / `--cx-clock`, `--led-off` | The circuit layer (22-circuit.css, `circuit.js`): the slow icosahedron canvas of the home hero and the level bands, the divider's packet, the trace, waveform and clock masks, the unlit LED of the difficulty chips |
+| `lv-dots` (`is-lit`, `--lv-x` / `--lv-y`), `df-board`, `df-reg` | The living layer (24-living.css, `dotgrid.js`): the pad field of the home hero and the level bands with its pointer light, and the footer's board line with its registration target (`dvq_cards.rev`, the date of the last commit in Israel time) |
 | `bil-felt`, `bil-rail`, `bil-pocket` / `bil-hole` (`is-in`), `bil-path`, `bil-mid`, `bil-ball`, `bil-ghost`, `bil-aim`, `bil-arrow`, `bil-tipdot`, `bil-trail`, `bil-ghost-line`, `bil-gap` (`is-in`), `bil-h` / `bil-hit` (the draggable ball and arrow tip), `bil-checks`, `bil-count`, `bil-key-*` | Billiards (0080): the table and its pockets, the paths with their numbered cushion hits and the unfolded grid (figures), and the `billiard` explorer: the ball and the aim dragged, the trail of a shot, the unfolded table with the gap at every line of pockets, the table of the calculation |
 
 Site-wide (HTML) classes in the same file: `chip`, `chip-level`, `chip-diff-*`, `chip-new`

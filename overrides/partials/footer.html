@@ -72,6 +72,9 @@
     </div>
     <div class="md-footer-meta__inner md-grid df-bottom">
       {% include "partials/copyright.html" %}
+      {#- the board line (24-living.css): the site's mark, the date of the last commit and
+          the number of questions, printed like the revision line on a circuit board -#}
+      <p class="df-board" dir="ltr"><span class="df-reg" aria-hidden="true"></span>DVQ · REV {{ cards.rev }} · {{ cards.total }} Q</p>
       {% if config.extra.social %}
         {% include "partials/social.html" %}
       {% endif %}

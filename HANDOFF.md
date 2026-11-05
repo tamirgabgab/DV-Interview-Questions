@@ -2169,13 +2169,62 @@ section below starts at session 22, whose numbered items run on through the late
     0082's (1, 1, 4) (q0082.py) are now isolated LTR. Lists read in order, years and
     thousands separators stay as they are; 0025's sequence numbers inside a generated
     stepper were left. CLAUDE.md gained the rule (Language and RTL).
+148. **The finishing round of the UX audit (session 32, 2026-11-05).** Items 1 to 6 of the
+    owner's UX list. Rubik loads as a variable font (overrides/main.html `fonts` block, css2
+    API, weights 300 to 800; JetBrains Mono 400 to 700): 500 and 600 were drawn as 400 and
+    700. Inline code is at least 13 px (`max(0.85em, 0.65rem)`, boxes excluded; it was
+    10.9 px in tables). Figure labels stay at the D194 fit (9 → 9.5 px): raising the fit to
+    11 px made tick and value labels overlap (32 → 116 pairs over 143 charts), so 11 px
+    needs work per generator (open item). Phones (hover: none or ≤ 30em): the box header's
+    icons and the playback bar are 44 px (play 48) with a short name under each
+    (`data-name` from core.js, drawn by ::after), the page tools 44 px, the part bar's
+    solved toggle 44 px without a name, the figure enlarge button unchanged. One action
+    colour in the boxes and the run panel (owner's choice; 23-polish.css `--act`,
+    `--act-line`, `--act-ink`): navy filled main action, navy outline for the rest, the play
+    button navy, no amber hover; in the dark scheme a light navy-blue `#a9c1f0` with dark
+    ink. Surfaces: lighter `--shadow-1/2/3` in light mode over a thin `--site-card-edge`;
+    seven literal shadows use the tokens; the window dots above solution code removed.
+    Motion: `--dur-0` (150 ms) and `--dur-3` (600 ms) join `--dur-1/2`; `.mp-bar` and
+    `.lb-pbar` scale (`--p`, scaleX) instead of resizing; the part bar's reading line is
+    clipped (clip-path); the home band's pulses run once when it first comes on screen and
+    the level-card pictures once per hover (home-extras.js; owner's choice). Eight
+    contrast pairs.
+149. **The living layer (session 32, 2026-11-05).** Items 7 to 12 of the owner's UX list, in
+    24-living.css and dotgrid.js. A pad field (solder pads as a repeating radial gradient
+    under two masks) in the home hero under the chip and in the end corner of the level
+    bands (owner's choice), at 12%; with a mouse the pads around the pointer light up
+    (dotgrid.js only moves --lv-x/--lv-y, once per frame, and sets .is-lit; still on touch,
+    under reduced motion and in an automated browser). The page cross-fade (round M's
+    @view-transition, the owner's choice over instant navigation) shortened to 180 ms. A box
+    not built yet keeps 30rem (built boxes are 24 to 118rem, median about 52) with grey bars
+    for its title and controls around the loading wave; the run panel shows its output area
+    as three grey lines while Python downloads. Tabular figures in the boxes, the run panel,
+    the question header, lists, the side navigation, search results, the quick jump, the
+    interview bar and the footer. Page titles a step larger and semibold (question h1
+    1.76rem, level band 1.92rem, hero 2.1rem; phones as before; "subtle", the owner's
+    choice). The footer gained crop marks and a board line "DVQ · REV <date of the last
+    commit in Israel> · <n> Q" (_revision_date and dvq_cards.rev in the hook). One contrast
+    pair; a hook test for the date.
+150. **Figures where a page had none (S415, session 32, 2026-11-05).** The owner chose four:
+    0001 a schematic of the module (D flip-flop with sig_q and the active-low rst_n bubble,
+    inverter, AND; it replaces the mermaid flowchart), 0002 part c's bits of a and b after
+    each XOR step (changed bits framed, MSB left), 0003 the array after each pass of i
+    (sorted part tinted, changed cells framed, an arc per swap, recorded from the page's own
+    mystery), 0038 the contract as a state machine over (req, ack) with the forbidden
+    samples marked by rule number. Generators q0001, q0002, q0003 and q0038;
+    25-figures-c.css; five contrast pairs. Tests: 0001's netlist simulated against the
+    page's assign and flip-flop; 0002's rows against swap_xor and the example table; 0003's
+    passes against a replay; 0038's moves against check_handshake. The brute force found
+    that the checker (and the SVA `$rose(req) |-> ##[1:3] ack`) misses an ack in the rise
+    cycle when a later ack lands in the window (rule 2 says one to three cycles): 9 traces;
+    reported to the owner, not changed (open item).
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139); questions 0078 to 0082 (items 140 to 144); the UX audit's fixes and the circuit layer (items 145, 146); numbers laid out from the right (item 147); the finishing round, the living layer and four figures (items 148 to 150).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
@@ -2247,6 +2296,8 @@ section below starts at session 22, whose numbered items run on through the late
   or mirror the state in a hidden input.
 - [x] ~~Re-run the 0007, 0011 and 0014 constraints in a simulator with full constraint support~~ — done in session 5 (Verilator snapshot + z3 in CI).
 - [x] ~~Wide data tables still scroll sideways on phones~~: tables of five or more columns that do not fit become cards on phones (C192, session 22).
+- [ ] 0038: `check_handshake` and the SVA miss an ack in the rise cycle when a later ack lands in the window (9 traces, work log item 150). The owner decides: fix the checker, or make it a trap of the question.
+- [ ] Figure labels under 11 px on phones (work log item 148): the D194 fit raises them to 9.5 px only; 11 px needs fewer value labels and more room in `charts.py`'s `tick` and `legend` and per generator (0028, 0044 first).
 - [ ] When a Verilator release newer than 5.052 is out, bump `VERILATOR_REF` to its tag and check that 0011 and the 0014 subclass still pass.
 
 ---
@@ -2462,7 +2513,7 @@ continue at 411.
 
 | # | Finding | Proposal | Size |
 |---|---|---|---|
-| S415 (done for 0045 to 0047, item 78) | 11 pages have no static figure (0001, 0002, 0003, 0034, 0036, 0038, 0045, 0046, 0047, 0057, 0059); their only picture is the box | one generated figure each where it explains the idea at a glance (0046 the DP grid, 0047 the water profile, 0045 the weighing tree, 0038 the handshake waveform...), via `tools/figures/` | L |
+| S415 (done for 0045 to 0047, item 78; 0001, 0002, 0003 and 0038, item 150) | 11 pages have no static figure (0001, 0002, 0003, 0034, 0036, 0038, 0045, 0046, 0047, 0057, 0059); their only picture is the box | one generated figure each where it explains the idea at a glance (0046 the DP grid, 0047 the water profile, 0045 the weighing tree, 0038 the handshake waveform...), via `tools/figures/` | L |
 
 **Round S3 — the boxes: bugs and consistency**
 

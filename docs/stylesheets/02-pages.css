@@ -176,7 +176,7 @@
   border: 1px solid var(--site-card-border);
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition: background var(--dur-0), border-color var(--dur-0), color var(--dur-0);
 }
 
 .md-typeset .filter-chip:hover {

@@ -1,6 +1,6 @@
 // The home page (15-home.css): the dark band, the live level cards and the question of the day.
-// The band's pulses run while it is on screen (.is-live) and the level cards' pictures move
-// on hover and focus (.is-motion), never under reduced motion or in an automated browser
+// The band's pulses run once, the first time it comes on screen (.is-live), and the level
+// cards' pictures play once on hover and focus (.is-motion), never under reduced motion or in an automated browser
 // (the page checks see a still page). The question of the day is the same for every reader:
 // day d since the epoch (the reader's local date) picks (d * stride) mod n in the list the
 // hook put in the page; the page already holds the pick of the build day, in the same place
@@ -13,8 +13,12 @@
   if (!quiet) {
     band.classList.add("is-motion");
     if ("IntersectionObserver" in window) {
-      new IntersectionObserver((entries) => entries.forEach((e) => band.classList.toggle("is-live", e.isIntersecting)))
-        .observe(band);
+      const seen = new IntersectionObserver((entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        band.classList.add("is-live");
+        seen.disconnect();
+      });
+      seen.observe(band);
     }
   }
 

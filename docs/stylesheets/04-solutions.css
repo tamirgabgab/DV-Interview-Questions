@@ -326,7 +326,7 @@
 .md-typeset .explorer tr.ex-answer-mark > td { background: color-mix(in srgb, var(--viz-s3) 16%, transparent); }
 .md-typeset .explorer :not(svg *).ex-answer-mark:not(tr) { outline: 2px solid var(--viz-s3); outline-offset: 1px; }
 @media (prefers-reduced-motion: no-preference) {
-  .md-typeset .explorer .ex-answer:not([hidden]):not(.ex-answer--off) { animation: ex-answer-in 0.35s ease-out; }
+  .md-typeset .explorer .ex-answer:not([hidden]):not(.ex-answer--off) { animation: ex-answer-in var(--dur-2) ease-out; }
   @keyframes ex-answer-in { from { opacity: 0; transform: translateY(-3px); } }
 }
 

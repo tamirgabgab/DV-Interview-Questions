@@ -432,9 +432,9 @@
     const resetTip = box.dvqSeed && box.dvqSeed.draw ? "איפוס הכול : הבקרות חוזרות לברירת המחדל, עם דוגמה אקראית חדשה מההתחלה"
       : "איפוס הכול : כל הבקרות חוזרות לברירת המחדל";
     bar.innerHTML = `<span class="ex-bar-title"><i class="ui-ico ui-ico-gesture" aria-hidden="true"></i>נסו בעצמכם</span>` +
-      `<button type="button" class="ex-help-btn ex-ibtn ui-ico-boxhelp" aria-expanded="false" aria-label="עזרה : מה התיבה מראה ומה הכפתורים עושים" data-tip="עזרה">עזרה</button>` +
-      `<button type="button" class="ex-reset-all ex-ibtn ui-ico-reset" data-tip="${resetTip}">איפוס הכול</button>` +
-      `<button type="button" class="ex-link ex-ibtn ui-ico-link" data-tip="העתקת קישור לתיבה עם אותן בחירות">העתקת קישור</button>` +
+      `<button type="button" class="ex-help-btn ex-ibtn ui-ico-boxhelp" aria-expanded="false" aria-label="עזרה : מה התיבה מראה ומה הכפתורים עושים" data-tip="עזרה" data-name="עזרה">עזרה</button>` +
+      `<button type="button" class="ex-reset-all ex-ibtn ui-ico-reset" data-tip="${resetTip}" data-name="איפוס">איפוס הכול</button>` +
+      `<button type="button" class="ex-link ex-ibtn ui-ico-link" data-tip="העתקת קישור לתיבה עם אותן בחירות" data-name="קישור">העתקת קישור</button>` +
       `<p class="ex-help" hidden>${HELP[box.dataset.kind] || ""}</p>`;
     box.prepend(bar);
     const btn = bar.querySelector(".ex-help-btn"), help = bar.querySelector(".ex-help");
@@ -457,8 +457,9 @@
       const url = `${location.origin}${location.pathname}${linkOf(box)}`;
       const done = () => {
         link.textContent = link.dataset.tip = "הועתק ✓";
+        link.dataset.name = "הועתק";
         link.classList.add("is-done");
-        setTimeout(() => { link.textContent = "העתקת קישור"; link.dataset.tip = "העתקת קישור לתיבה עם אותן בחירות"; link.classList.remove("is-done"); }, 1500);
+        setTimeout(() => { link.textContent = "העתקת קישור"; link.dataset.tip = "העתקת קישור לתיבה עם אותן בחירות"; link.dataset.name = "קישור"; link.classList.remove("is-done"); }, 1500);
       };
       const fallback = () => { window.prompt("הקישור :", url); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
@@ -750,6 +751,8 @@
   // The same seek keeps the place on the timeline through an edit (see edits below).
   const TRANSPORT = [["button.ex-start, button.ex-first", "first"], ["button.ex-prev", "prev"], ["button.ex-play", "play"],
     ["button.ex-next", "next"], ["button.ex-end, button.ex-last", "last"]];
+  // the short name under each icon on a phone (23-polish.css), whatever the box calls the step
+  const TRANSPORT_NAMES = { first: "התחלה", prev: "אחורה", play: "הפעלה", next: "קדימה", last: "סוף" };
   const SPEED_NAMES = ["×1", "×2", "×4"], SPEED_WORDS = "איטי,בינוני,מהיר";   // other speed lists stay a select
   const SCRUB_MAX = 5000;
   const POS = /(\d+)\s*מתוך\s*(\d+)/;
@@ -768,6 +771,8 @@
           const word = b.textContent.trim();
           b.dataset.tip = word;
           b.classList.toggle("is-playing", icon === "play" && word === "עצירה");
+          const name = icon === "play" && word === "עצירה" ? "עצירה" : TRANSPORT_NAMES[icon];
+          if (b.dataset.name !== name) b.dataset.name = name;   // an attribute: the observer above watches only the text
         };
         new MutationObserver(sync).observe(b, { childList: true, characterData: true, subtree: true });
         sync();

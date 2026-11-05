@@ -19,7 +19,7 @@
       const text = box.querySelector(".lb-ptext");
       box.classList.toggle("is-empty", done === 0);
       box.classList.toggle("is-done", done === ids.length);
-      box.querySelector(".lb-pbar i").style.width = `${(100 * done) / ids.length}%`;
+      box.querySelector(".lb-pbar i").style.setProperty("--p", done / ids.length);   // the bar scales to it (scaleX)
       let line = done === 0 ? "עוד לא סימנת שאלות כפתורות"
         : done === ids.length ? `פתרת את כל ${ids.length} השאלות` : `פתרת ${done} מתוך ${ids.length}`;
       if (stars) line += ` · ${stars}${NB}★ במועדפים`;

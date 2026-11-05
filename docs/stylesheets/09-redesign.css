@@ -101,9 +101,9 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 .md-typeset .part-nav .pn-progress i { display: block; height: 100%; width: var(--pn-read, 0%); margin-inline-start: 0; background: var(--md-accent-fg-color); }
 /* without parts the bar is only the progress line along the top and the solved toggle as a
    floating round button at its end; the script sets its left edge and width to the column */
-.md-typeset .part-nav.pn-fixed { position: fixed; top: 2.4rem; left: 0; right: auto; z-index: 3; margin: 0; padding: 0.35rem 0 0; background: transparent; border: 0; pointer-events: none; transform: translateY(-120%); visibility: hidden; transition: transform 0.2s, visibility 0.2s; }
+.md-typeset .part-nav.pn-fixed { position: fixed; top: 2.4rem; left: 0; right: auto; z-index: 3; margin: 0; padding: 0.35rem 0 0; background: transparent; border: 0; pointer-events: none; transform: translateY(-120%); visibility: hidden; transition: transform var(--dur-1), visibility var(--dur-1); }
 .md-typeset .part-nav.pn-fixed .pn-progress { top: 0; bottom: auto; }
-.md-typeset .part-nav.pn-fixed .pn-solved { pointer-events: auto; background: var(--md-default-bg-color); box-shadow: 0 0.1rem 0.45rem rgba(0, 0, 0, 0.18); }
+.md-typeset .part-nav.pn-fixed .pn-solved { pointer-events: auto; background: var(--md-default-bg-color); box-shadow: var(--shadow-2); }
 .md-typeset .part-nav.pn-fixed.is-stuck { transform: none; visibility: visible; }
 @media (prefers-reduced-motion: reduce) { .md-typeset .part-nav.pn-fixed { transition: none; } }
 
@@ -157,7 +157,7 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 .ui-ico-gesture { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 9a1 1 0 0 1 1-1 1 1 0 0 1 1 1v4.47l1.21.13 4.94 2.19c.53.24.85.77.85 1.35v4.36c-.03.82-.68 1.47-1.5 1.5H11c-.38 0-.74-.15-1-.43l-4.9-4.2.74-.77c.19-.21.46-.32.74-.32h.22L10 19zm1-4a4 4 0 0 1 4 4c0 1.5-.8 2.77-2 3.46v-1.22c.61-.55 1-1.35 1-2.24a3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .89.39 1.69 1 2.24v1.22C7.8 11.77 7 10.5 7 9a4 4 0 0 1 4-4'/%3E%3C/svg%3E"); }
 .ui-ico-play.is-playing { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 19h4V5h-4M6 19h4V5H6z'/%3E%3C/svg%3E"); }
 .ui-ico-link.is-done { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z'/%3E%3C/svg%3E"); }
-.md-typeset .explorer { margin: 1.2em 0; padding: 0 1rem 0.7rem; border: 1px solid var(--site-card-border); border-radius: var(--radius-l); background: color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color)); box-shadow: 0 0.1rem 0.6rem rgba(0, 0, 0, 0.05); }
+.md-typeset .explorer { margin: 1.2em 0; padding: 0 1rem 0.7rem; border: 1px solid var(--site-card-border); border-radius: var(--radius-l); background: color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color)); box-shadow: var(--shadow-1); }
 [data-md-color-scheme="default"] .md-typeset .explorer { border-color: var(--site-card-edge); background: var(--site-surface); box-shadow: var(--shadow-1); }
 .md-typeset .explorer .ex-bar { gap: 0.2rem 0.3rem; margin: 0 -1rem 0.6rem; padding: 0.35rem 0.8rem 0.35rem 0.6rem; border-bottom: 1px solid var(--site-card-border); border-radius: 0.8rem 0.8rem 0 0; background: color-mix(in srgb, var(--md-typeset-a-color) 7%, var(--md-default-bg-color)); }
 .md-typeset .explorer .ex-bar-title { display: inline-flex; align-items: center; gap: 0.35em; margin-inline-end: auto; color: var(--md-typeset-a-color); font-size: 0.72rem; font-weight: 700; }
@@ -196,7 +196,7 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 /* Marking a question solved (UI326): the message at the bottom of the screen (navy, like
    the home hero), the check mark's pop and the confetti of a finished level. The motion
    is defined only without prefers-reduced-motion (and the script skips it there). */
-.dvq-toast { position: fixed; z-index: 5; inset: auto 1rem 1rem; display: flex; align-items: flex-start; gap: 0.4rem; max-width: 24rem; margin-inline: auto; padding: 0.7rem 0.8rem 0.75rem 0.5rem; border-radius: 0.8rem; background: var(--md-primary-fg-color); color: #fff; box-shadow: 0 0.4rem 1.4rem rgba(0, 0, 0, 0.28); font-size: 0.74rem; line-height: 1.55; }
+.dvq-toast { position: fixed; z-index: 5; inset: auto 1rem 1rem; display: flex; align-items: flex-start; gap: 0.4rem; max-width: 24rem; margin-inline: auto; padding: 0.7rem 0.8rem 0.75rem 0.5rem; border-radius: 0.8rem; background: var(--md-primary-fg-color); color: #fff; box-shadow: var(--shadow-3); font-size: 0.74rem; line-height: 1.55; }
 [data-md-color-scheme="slate"] .dvq-toast { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
 .dvq-toast[hidden] { display: none; }
 .dvq-toast .dt-body { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 0.45rem; }
@@ -215,9 +215,9 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 .dvq-confetti .dc-2 { background: var(--diff-hard); }
 .dvq-confetti .dc-3 { background: var(--md-typeset-a-color); }
 @media (prefers-reduced-motion: no-preference) {
-  .dvq-toast.is-in { animation: dt-in 0.25s ease-out; }
+  .dvq-toast.is-in { animation: dt-in var(--dur-1) ease-out; }
   @keyframes dt-in { from { opacity: 0; transform: translateY(0.8rem); } }
-  .md-typeset .qt-btn.is-pop { animation: qt-pop 0.45s ease-out; }
+  .md-typeset .qt-btn.is-pop { animation: qt-pop var(--dur-2) ease-out; }
   @keyframes qt-pop { 40% { transform: scale(1.35); } }
   .dvq-confetti i { animation: dc-fall 2.1s cubic-bezier(0.3, 0.6, 0.5, 1) var(--d) forwards; }
   @keyframes dc-fall {
@@ -242,7 +242,7 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 /* The first-visit guide (E201, core.js `guide`): a navy bubble under its target (inside
    the figure for the figure's hint) with an arrow at --ax, and the target outlined. */
 .md-typeset .explorer.has-guide { position: relative; }
-.md-typeset .explorer .ex-guide { position: absolute; z-index: 4; width: min(17rem, calc(100% - 1rem)); padding: 0.55rem 0.7rem 0.5rem; border-radius: 0.6rem; background: var(--md-primary-fg-color); color: #fff; box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.25); font-size: 0.7rem; line-height: 1.55; }
+.md-typeset .explorer .ex-guide { position: absolute; z-index: 4; width: min(17rem, calc(100% - 1rem)); padding: 0.55rem 0.7rem 0.5rem; border-radius: 0.6rem; background: var(--md-primary-fg-color); color: #fff; box-shadow: var(--shadow-3); font-size: 0.7rem; line-height: 1.55; }
 [data-md-color-scheme="slate"] .md-typeset .explorer .ex-guide { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
 .md-typeset .explorer .ex-guide::before { content: ""; position: absolute; top: -0.35rem; left: calc(var(--ax, 50%) - 0.35rem); width: 0.7rem; height: 0.7rem; background: inherit; transform: rotate(45deg); }
 .md-typeset .explorer .ex-guide.is-inside::before { display: none; }
@@ -255,11 +255,11 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 .md-typeset .explorer .ex-guide button:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
 .md-typeset .explorer .ex-guide-target { outline: 2px dashed var(--md-accent-fg-color); outline-offset: 3px; border-radius: 0.3rem; }
 @media (prefers-reduced-motion: no-preference) {
-  .md-typeset .explorer .ex-guide { animation: dt-in 0.25s ease-out; }
+  .md-typeset .explorer .ex-guide { animation: dt-in var(--dur-1) ease-out; }
 }
 
 /* Dark scheme cards (UI331): a lighter surface and a shadow that shows on a dark page. */
-[data-md-color-scheme="slate"] .md-typeset .explorer { background: color-mix(in srgb, var(--md-default-fg-color) 4%, var(--md-default-bg-color)); box-shadow: 0 0.2rem 0.9rem rgba(0, 0, 0, 0.35); }
+[data-md-color-scheme="slate"] .md-typeset .explorer { background: color-mix(in srgb, var(--md-default-fg-color) 4%, var(--md-default-bg-color)); box-shadow: var(--shadow-1); }
 
 /* The 404 page (overrides/404.html): a navy card like the home hero. */
 .md-typeset .not-found { margin: 0.5rem 0 1.5rem; padding: 1.4rem 1.6rem 1.2rem; border-radius: 0.8rem; background: var(--md-primary-fg-color); color: #fff; }

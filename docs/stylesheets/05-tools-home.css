@@ -316,9 +316,10 @@ body.interview-mode .md-typeset .question-tools {
 .md-typeset .mark-progress .mp-bar i {
   display: block;
   height: 100%;
-  width: 0;
+  width: 100%;
+  transform: scaleX(var(--p, 0));   /* the share solved, set by marks.js: scaled, not resized */
+  transform-origin: right center;   /* the start of the right-to-left bar */
   background: var(--viz-s3);
-  transition: width 0.3s;
 }
 .md-typeset .mark-progress .mp-text { white-space: nowrap; }
 .md-typeset .path-card .pc-ids {

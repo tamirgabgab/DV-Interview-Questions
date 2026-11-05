@@ -69,7 +69,7 @@
 .md-typeset .list-band .lb-progress.is-empty .lb-ptext { color: var(--lst-fg-mute); }
 .md-typeset .list-band .lb-pbar { display: block; height: 0.3rem; overflow: hidden; border-radius: 1rem; background: var(--lst-track); }
 .md-typeset .list-band .lb-progress.is-empty .lb-pbar { visibility: hidden; }
-.md-typeset .list-band .lb-pbar i { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--md-accent-fg-color); }
+.md-typeset .list-band .lb-pbar i { display: block; width: 100%; height: 100%; transform: scaleX(var(--p, 0)); transform-origin: right center; background: var(--md-accent-fg-color); }   /* level-page.js sets --p; the track's rounded clip makes the ends */
 .md-typeset .list-band .lb-progress.is-done .lb-pbar i { background: var(--lst-easy); }
 .md-content:has(.list-band) .md-content__button { display: none; }
 /* The all-questions page: a lower band, the lead is the note on the difficulty chips. */
@@ -80,7 +80,7 @@
 @media (prefers-reduced-motion: no-preference) {
   .md-typeset .list-band.is-live .lb-roll { animation: lb-roll 120s linear infinite; }
   .md-typeset .list-band.is-paused .lb-roll { animation-play-state: paused; }
-  .md-typeset .list-band .lb-pbar i { transition: width 0.9s var(--ease) 0.15s; }
+  .md-typeset .list-band .lb-pbar i { transition: transform var(--dur-3) var(--ease) 0.15s; }
   @keyframes lb-roll { to { transform: translateX(-480px); } }
 }
 @media screen and (max-width: 44.9375em) {

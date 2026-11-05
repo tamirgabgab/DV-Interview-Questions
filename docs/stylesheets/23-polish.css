@@ -1,0 +1,96 @@
+/* The site's styles, part 23: the finishing round of the UX audit (session 32). One action
+   colour in the boxes and the run panel, icon buttons with their names on phones, inline
+   code at a readable size, the part bar's reading line drawn without layout. The surfaces
+   (shadows) and the motion durations are tokens in 01-base.css. */
+
+/* --- inline code: at least 13 px --------------------------------------------------------- */
+/* Material sets inline code at 0.85em: 13.6 px in the text, but 10.9 px in a table (0.64rem)
+   and 11.9 px in an example. Boxes keep their own sizes (their layout is measured). */
+.md-typeset :not(pre) > code:not(.explorer *, svg *) { font-size: max(0.85em, 0.65rem); }
+
+/* --- one action colour ----------------------------------------------------------------------
+   Every button that does something in a box or in the run panel is navy: the main action
+   filled, the others outlined in navy; hover darkens or tints, never amber (amber marks
+   what is highlighted). In the dark scheme the filled button is a light navy-blue with dark
+   ink, where the brand navy would sink into the page. */
+[data-md-color-scheme="default"] {
+  --act: #1b2a4a;            /* the filled button; white on it 14:1 */
+  --act-hover: #2d4370;      /* white on it 10:1 */
+  --act-ink: #ffffff;        /* the filled button's text and icon */
+  --act-line: #1b2a4a;       /* the outlined button's text and edge: 14:1 on white */
+  --act-tint: rgba(27, 42, 74, 0.08);
+}
+[data-md-color-scheme="slate"] {
+  --act: #a9c1f0;            /* a light navy-blue: the brand navy would sink into the page */
+  --act-hover: #c7d7f6;
+  --act-ink: #121d33;        /* the dark navy on it, 10:1 */
+  --act-line: #a9c1f0;       /* 9:1 on the page */
+  --act-tint: rgba(169, 193, 240, 0.12);
+}
+.md-typeset :is(.explorer, .py-runner) .md-button:not(.ex-tbtn, .ex-ibtn, #_) {
+  border: 1px solid var(--act-line);
+  background: transparent;
+  color: var(--act-line);
+}
+.md-typeset :is(.explorer, .py-runner) .md-button:not(.ex-tbtn, .ex-ibtn, #_):is(:hover, :focus-visible) {
+  border-color: var(--act-line);
+  background: var(--act-tint);
+  color: var(--act-line);
+}
+.md-typeset :is(.explorer, .py-runner) .md-button.md-button--primary:not(.ex-tbtn, .ex-ibtn, #_) {
+  border-color: var(--act);
+  background: var(--act);
+  color: var(--act-ink);
+}
+.md-typeset :is(.explorer, .py-runner) .md-button.md-button--primary:not(.ex-tbtn, .ex-ibtn, #_):is(:hover, :focus-visible) {
+  border-color: var(--act-hover);
+  background: var(--act-hover);
+  color: var(--act-ink);
+}
+.md-typeset :is(.explorer, .py-runner) .md-button:not(.ex-tbtn, .ex-ibtn, #_):disabled { border-color: var(--act-line); background: transparent; color: var(--act-line); }
+/* the play button of a box: the box's main action */
+.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_) { background: var(--act); color: var(--act-ink); }
+.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_):is(:hover, :focus-visible) { background: var(--act-hover); color: var(--act-ink); }
+/* pressed states: the help that is open, the chosen speed */
+.md-typeset .explorer .ex-help-btn[aria-expanded="true"]:not(#_) { border-color: var(--act); background: var(--act); color: var(--act-ink); }
+.md-typeset .explorer .ex-speedbtn[aria-pressed="true"] { background: var(--act-tint); color: var(--act-line); }
+/* the box's text buttons (start over, fold a proof) hover in the action colour, not amber */
+.md-typeset .explorer :is(.ex-restart, .ex-fold-btn):hover { color: var(--act-line); }
+
+/* --- the part bar's reading line: clipped, not resized --------------------------------------
+   The line is as wide as the bar and clipped to the share read (reading-tools.js sets
+   --pn-read on every scroll), so a scroll repaints it without a layout. Its clock pattern
+   (22-circuit.css) stays in place, which a scaleX would stretch. */
+.md-typeset .part-nav .pn-progress i:not(#_) { width: 100%; clip-path: inset(0 0 0 calc(100% - var(--pn-read, 0%))); }
+
+/* --- icon buttons on a phone: 44 px and a name under each ----------------------------------
+   On a touch screen or a narrow window there is no hover, so no tooltip: every icon-only
+   button gets a 44 px target and its short name under it (data-name, set by core.js and
+   reading-tools.js; the page tools have had theirs since S420). The name is drawn by
+   ::after, which on a desktop is the tooltip. */
+@media (hover: none), screen and (max-width: 30em) {
+  /* the page tools under the question's title (S420's names, now at 44 px on a narrow
+     desktop window too) */
+  .md-typeset .question-header .question-tools { flex-wrap: wrap; justify-content: center; gap: 0.3rem; }
+  .md-typeset .question-header .question-tools .qt-btn:not(#_) { flex-direction: column; gap: 0.1rem; width: auto; min-width: 2.7rem; height: auto; min-height: 2.2rem; padding: 0.2rem 0.3rem; border-radius: var(--radius-m); }
+  .md-typeset .question-header .question-tools .qt-name { display: block; font-size: 0.55rem; line-height: 1.2; white-space: nowrap; }
+  .md-typeset .question-header .question-tools .qt-btn[data-tip]:is(:hover, :focus-visible)::after { content: none; }
+
+  /* the box's header (help, reset, link) and its playback bar */
+  .md-typeset .explorer .ex-bar { padding-bottom: 1rem; }
+  .md-typeset .explorer .ex-transport { padding-bottom: 0.95rem; border-radius: 1.2rem; }
+  .md-typeset .explorer :is(.ex-ibtn, .ex-tbtn):not(#_):not(#_) { width: 2.2rem; height: 2.2rem; }
+  .md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_):not(#_) { width: 2.4rem; height: 2.4rem; }
+  .md-typeset .explorer :is(.ex-ibtn, .ex-tbtn)[data-name]::after,
+  .md-typeset .explorer :is(.ex-ibtn, .ex-tbtn)[data-name]:is(:hover, :focus-visible)::after {
+    content: attr(data-name);
+    position: absolute; top: 100%; left: 50%; right: auto; z-index: auto; transform: translateX(-50%);
+    padding: 0; border-radius: 0; background: none; color: var(--md-default-fg-color--light);
+    font-size: 0.5rem; font-weight: 400; line-height: 1.5; white-space: nowrap; pointer-events: none;
+  }
+  .md-typeset .explorer .ex-transport { flex-wrap: wrap; justify-content: center; gap: 0.5rem 0.3rem; }
+
+  /* the part bar's solved toggle */
+  .md-typeset .part-nav .qt-btn:not(#_) { width: 2.2rem; height: 2.2rem; }
+}
+

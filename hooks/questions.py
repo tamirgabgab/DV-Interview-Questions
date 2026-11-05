@@ -29,8 +29,10 @@ import html
 import json
 import posixpath
 import re
+import subprocess
 import sys
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from mkdocs.exceptions import PluginError
 from mkdocs.utils.meta import get_data
@@ -322,12 +324,24 @@ def on_config(config, **kwargs):
         "counts": {lv: sum(q["level"] == lv for q in _questions.values()) for lv in LEVELS},
         "total": len(_questions),
         "boxes": sum(q.get("boxes", 0) for q in _questions.values()),
+        "rev": _revision_date(Path(config["docs_dir"])).strftime("%Y.%m.%d"),
     }
     # the 404 page (overrides/404.html) offers the question whose id or slug is in the
     # missing address: [id, title, path from the site root]
     config["extra"]["dvq_404"] = [[q["id"], str(q["title"]), q["src_uri"][: -len(".md")] + "/"]
                                   for q in sorted(_questions.values(), key=lambda q: q["id"])]
     return config
+
+
+def _revision_date(docs_dir: Path) -> dt.date:
+    """The date of the site's last commit in Israel, for the footer's board line (REV): the
+    same for every build of one commit; the build day when git or the history is not there."""
+    try:
+        out = subprocess.run(["git", "log", "-1", "--format=%ct"], cwd=docs_dir, capture_output=True,
+                             text=True, timeout=10, check=True).stdout.strip()
+        return dt.datetime.fromtimestamp(int(out), ZoneInfo("Asia/Jerusalem")).date()
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return dt.date.today()
 
 
 def _added_date(q: dict) -> dt.date | None:

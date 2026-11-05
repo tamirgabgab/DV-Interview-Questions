@@ -278,6 +278,17 @@ PAIRS = [
     ("question chip, a lit bit on its body", "var(--md-accent-fg-color)",
      [{"default": "var(--md-primary-fg-color)", "slate": "var(--md-primary-fg-color--light)"}], UI),
     ("question chip label DVQ-<id> in the header", "var(--md-default-fg-color--light)", [CARD], TEXT),
+    # polish (fork A): one action colour in the boxes and the run panel (23-polish.css)
+    ("action button, filled", "var(--act-ink)", ["var(--act)"], TEXT),
+    ("action button, filled, hovered", "var(--act-ink)", ["var(--act-hover)"], TEXT),
+    ("action button, outlined, in a box", "var(--act-line)", [CARD, PAGE], TEXT),
+    ("action button, outlined, on the page (run panel)", "var(--act-line)", [PAGE], TEXT),
+    ("action button, outlined, hovered", "var(--act-line)", ["var(--act-tint)", CARD], TEXT),
+    ("action button, the filled one's edge on the box", "var(--act)", [CARD], UI),
+    ("speed button pressed", "var(--act-line)", ["var(--act-tint)", "var(--md-default-bg-color)"], TEXT),
+    ("an icon button's name under it on a phone", "var(--md-default-fg-color--light)", [CARD], TEXT),
+    # living (fork B, 24-living.css): the footer's board line (REV, the date and the count)
+    ("footer board line", "var(--md-footer-fg-color--light)", ["var(--md-footer-bg-color--dark)"], TEXT),
     # figures (fork C): the XOR bits of 0002, the passes of 0003, the handshake contract of 0038 (25-figures-c.css)
     ("figures C, a digit on a cell of 1 or of the sorted part", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("figures C, the rule number on its badge", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),

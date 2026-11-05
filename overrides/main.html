@@ -3,6 +3,19 @@
     tools/make_icons.py), and the service worker that keeps visited pages for offline
     reading (docs/sw.js). -#}
 {% extends "base.html" %}
+{#- Rubik as a variable font (weights 300 to 800) instead of the theme's 300 / 400 / 700:
+    with the static cuts every 500 and 600 in the stylesheets was drawn as 700. -#}
+{% block fonts %}
+  {% if config.theme.font != false %}
+    {% set text = config.theme.font.text | d("Roboto", true) %}
+    {% set code = config.theme.font.code | d("Roboto Mono", true) %}
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family={{
+        text | replace(' ', '+') }}:ital,wght@0,300..800;1,300..800&family={{
+        code | replace(' ', '+') }}:ital,wght@0,400..700;1,400..700&display=fallback">
+    <style>:root{--md-text-font:"{{ text }}";--md-code-font:"{{ code }}"}</style>
+  {% endif %}
+{% endblock %}
 {% block extrahead %}
   {{ super() }}
   <link rel="manifest" href="{{ 'manifest.webmanifest' | url }}">

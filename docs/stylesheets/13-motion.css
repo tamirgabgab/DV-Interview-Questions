@@ -19,7 +19,7 @@
 /* M4: the header lifts off the page once it scrolls (Material sets md-header--shadow), and
    a bar slides along the table of contents to the section being read (motion.js). */
 .md-header { transition: box-shadow var(--dur-2) var(--ease); }
-.md-header--shadow { box-shadow: 0 0.15rem 0.6rem rgba(0, 0, 0, 0.2); }
+.md-header--shadow { box-shadow: var(--shadow-2); }
 .md-sidebar--secondary .md-nav--secondary { position: relative; }
 .md-sidebar--secondary .toc-marker { position: absolute; top: 0; inset-inline-start: 0.1rem; width: 2px; height: 1rem; border-radius: 1px; background: var(--md-accent-fg-color); opacity: 0; pointer-events: none; }
 .md-sidebar--secondary .toc-marker.is-on { opacity: 1; }
@@ -40,10 +40,10 @@
 .md-typeset a.level-card:hover { border-top-color: var(--md-primary-fg-color); }
 .md-typeset a.level-card:is(:hover, :focus-visible)::before { transform: scaleX(1); }
 @media (prefers-reduced-motion: no-preference) {
-  .md-typeset .level-card::before { transition: transform 0.35s var(--ease); }
+  .md-typeset .level-card::before { transition: transform var(--dur-2) var(--ease); }
   .md-typeset .level-card .kind-ico { transition: transform var(--dur-2) var(--ease); }
   .md-typeset a.level-card:hover .kind-ico { transform: rotate(-10deg) scale(1.12); }
-  .md-typeset .mark-progress .mp-bar i { transition: width 0.9s var(--ease) 0.15s; }
+  .md-typeset .mark-progress .mp-bar i { transition: transform var(--dur-3) var(--ease) 0.15s; }
 }
 
 /* M5: the question header as a card: the title, one row of chips, the topics as chips with
@@ -73,7 +73,7 @@
 .md-typeset p.hint-dots i.is-on { background: var(--adm-followup); }
 @media (prefers-reduced-motion: no-preference) {
   .md-typeset p.hint-dots i { transition: background-color var(--dur-1); }
-  .md-typeset p.hint-dots i.is-on { animation: qt-pop 0.4s ease-out; }
+  .md-typeset p.hint-dots i.is-on { animation: qt-pop var(--dur-2) ease-out; }
 }
 
 /* M9: a box not built yet (core.js builds a box as it nears the screen) holds its place
@@ -99,10 +99,10 @@
 /* M13: buttons answer the pointer: a raised shadow under it, a press, and a focus ring that
    settles in (the ring is there from the first frame; only its offset moves). */
 @media (prefers-reduced-motion: no-preference) {
-  .md-typeset .md-button { transition: transform 120ms var(--ease), box-shadow var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
+  .md-typeset .md-button { transition: transform var(--dur-0) var(--ease), box-shadow var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
   .md-typeset .md-button:hover { box-shadow: var(--shadow-2); }
   :is(.md-top, .md-header__button, .md-footer__link):active { transform: scale(0.96) !important; }
-  :is(a, button, summary, input, select, [tabindex]):focus-visible { animation: focus-in 0.18s var(--ease); }
+  :is(a, button, summary, input, select, [tabindex]):focus-visible { animation: focus-in var(--dur-0) var(--ease); }
   @keyframes focus-in { from { outline-offset: 5px; } }
 }
 

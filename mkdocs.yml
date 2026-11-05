@@ -143,6 +143,8 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/20-video.css
   - stylesheets/21-interview.css
   - stylesheets/22-circuit.css     # the circuit layer: traces, question chips, LEDs, signals (session 32)
+  - stylesheets/23-polish.css      # one action colour, named icon buttons on phones, code size (session 32)
+  - stylesheets/24-living.css      # the pad field, skeletons, tabular figures, titles, the footer's board line (session 32)
   - stylesheets/25-figures-c.css   # S415 figures: 0002's XOR bits, 0003's passes, 0038's contract (session 32)
 
 extra_javascript:
@@ -168,6 +170,7 @@ extra_javascript:
   - javascripts/details.js
   - javascripts/video.js           # the tutorial video's dialog (pages with a video: field)
   - javascripts/circuit.js         # the dividers' packet and the slow icosahedron (session 32)
+  - javascripts/dotgrid.js         # the pad field of the home hero and the level bands (session 32)
   # The explorer boxes (docs/javascripts/explorer/) are added per page by hooks/questions.py.
 
 

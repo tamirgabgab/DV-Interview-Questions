@@ -62,7 +62,7 @@
       const done = ids.filter((id) => window.dvqMarks.has(id, "solved")).length;
       box.hidden = false;
       box.classList.toggle("is-empty", done === 0);
-      box.querySelector(".mp-bar i").style.width = `${(100 * done) / ids.length}%`;
+      box.querySelector(".mp-bar i").style.setProperty("--p", done / ids.length);   // the bar scales to it (scaleX)
       box.querySelector(".mp-text").textContent =
         done === ids.length ? `פתרת את כל ${ids.length} השאלות` : `פתרת ${done} מתוך ${ids.length}`;
     });
