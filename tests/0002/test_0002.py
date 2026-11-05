@@ -103,3 +103,35 @@ def test_explorer_rotation():
         for _line, va, vb, vc, a_sym, b_sym, c_sym in frames:
             assert (wrap(evaluate(a_sym, a, b, c)), wrap(evaluate(b_sym, a, b, c)), wrap(evaluate(c_sym, a, b, c))) == (va, vb, vc), (a, b, c, bits, a_sym, b_sym, c_sym)
         assert frames[3][4:] == ["b0", "a0", "c0"] and frames[-1][4:] == ["b0", "c0", "a0"]
+
+
+def test_xor_figure():
+    """The bit figure of part c (tools/figures/q0002.py): its rows against the page's
+    swap_xor and the page's numeric example table, and a frame exactly on the bits each
+    step changed."""
+    import re
+    import sys
+
+    from extract_code import ROOT, question_path
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0002
+
+    rows = q0002.rows()
+    v = [q0002.A0, q0002.B0]
+    load_python(2)["swap_xor"](v, 0, 1)
+    assert (rows[-1][2], rows[-1][3]) == tuple(v) == (q0002.B0, q0002.A0)
+    page = question_path(2).read_text(encoding="utf-8")
+    table = re.findall(r"\| ‏`([01]{4})` \((\d+)\) \| ‏`([01]{4})` \((\d+)\) \|", page)
+    assert [(int(a, 2), int(b, 2)) for a, _, b, _ in table] == [(a, b) for _, _, a, b in rows]
+    assert all(int(a, 2) == int(da) and int(b, 2) == int(db) for a, da, b, db in table)
+    svg = q0002.figure()
+    changed = sum(bin(p[2] ^ r[2]).count("1") + bin(p[3] ^ r[3]).count("1") for p, r in zip(rows, rows[1:]))
+    assert svg.count('class="fc-chg"') == changed == 6
+    assert q0002.bits(6) == [0, 1, 1, 0]                 # the most significant bit is drawn first (left)
+
+
+def test_figures_up_to_date():
+    from page_tests import assert_figures_match
+
+    assert_figures_match(2)

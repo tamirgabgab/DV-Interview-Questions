@@ -1,0 +1,29 @@
+/* Figures of S415 (session 32): the XOR steps of 0002, the passes of 0003 and the handshake
+   contract of 0038 (tools/figures/q0002.py, q0003.py, q0038.py; 0001's schematic uses the
+   ff-* classes of 11-questions.css). Colours from the palette only. */
+
+/* a bit or a cell that changed in this step: an orange frame over its fill */
+.md-typeset svg .fc-chg { fill: none; stroke: var(--viz-s2-text); stroke-width: 2.5; }
+/* a swap of the pass: an arc between the two cells */
+.md-typeset svg .fc-arc { fill: none; stroke: var(--viz-s2); stroke-width: 1.8; }
+.md-typeset svg .fc-t { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 14px; }
+.md-typeset svg .fc-t.fc-b { font-weight: 700; }
+.md-typeset svg .fc-sub { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 13px; }
+.md-typeset svg .fc-he { fill: var(--viz-ink); font-family: var(--md-text-font-family); font-size: 14px; }
+
+/* the handshake contract: states, allowed moves, forbidden ones with the rule they break */
+.md-typeset svg .fc-node { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.8; }
+.md-typeset svg .fc-node.fc-ack { fill: color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg .fc-move { fill: none; stroke: var(--viz-ink); stroke-width: 1.6; }
+.md-typeset svg .fc-bad { fill: none; stroke: var(--viz-s2); stroke-width: 1.8; stroke-dasharray: 5 4; }
+.md-typeset svg .fc-x { stroke: var(--viz-s2); stroke-width: 2.4; stroke-linecap: round; }
+.md-typeset svg .fc-badge { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 1.5; }
+.md-typeset svg .fc-head { fill: var(--viz-ink); }
+
+/* the keys of the legends */
+.md-typeset .viz-legend .fc-key-chg { background: var(--md-default-bg-color); outline: 2px solid var(--viz-s2-text); outline-offset: -2px; }
+.md-typeset .viz-legend .fc-key-sorted { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); }
+.md-typeset .viz-legend .fc-key-arc { background: none; height: 0.35rem; border: 2px solid var(--viz-s2); border-bottom: 0; border-radius: 0.4rem 0.4rem 0 0; }
+.md-typeset .viz-legend .fc-key-move { background: var(--viz-ink); height: 2px; width: 0.9rem; }
+.md-typeset .viz-legend .fc-key-bad { background: none; height: 0; width: 0.9rem; border-top: 2px dashed var(--viz-s2); }
+.md-typeset .viz-legend .fc-key-ack { background: color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }

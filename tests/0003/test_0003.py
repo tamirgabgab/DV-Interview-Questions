@@ -74,3 +74,39 @@ def test_explorer_trap_from_next():
         assert result == b == sorted(A, reverse=True)
         assert comparisons == len(A) * (len(A) - 1) // 2 and line.strip() == "for j in range(i + 1, n):"
         assert ends == after
+
+
+def test_passes_figure():
+    """The passes figure (tools/figures/q0003.py), recorded from the page's mystery: the
+    array after every i and the swaps of every pass against a plain replay of the loop,
+    one arc per swap and a frame on every cell a pass changed."""
+    import sys
+
+    from extract_code import ROOT
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0003
+
+    rng = random.Random(33)
+    for A in [q0003.EXAMPLE, [5, 4, 3, 2, 1], [2, 2, 1]] + [[rng.randint(0, 9) for _ in range(rng.randint(2, 7))] for _ in range(60)]:
+        b, want = list(A), []
+        for i in range(len(b)):
+            sw = []
+            for j in range(len(b)):
+                if b[i] < b[j]:
+                    b[i], b[j] = b[j], b[i]
+                    sw.append((i, j))
+            want.append((i, sw, list(b)))
+        assert q0003.passes(A) == want
+    p = q0003.passes()
+    assert [a for _, _, a in p] == [[4, 1, 3, 2], [1, 4, 3, 2], [1, 3, 4, 2], [1, 2, 3, 4]]   # the page's table
+    svg = q0003.figure()
+    assert svg.count('class="fc-arc"') == sum(len(s) for _, s, _ in p) == 5
+    rows = [q0003.EXAMPLE] + [a for _, _, a in p]
+    assert svg.count('class="fc-chg"') == sum(x != y for r, s in zip(rows, rows[1:]) for x, y in zip(r, s))
+
+
+def test_figures_up_to_date():
+    from page_tests import assert_figures_match
+
+    assert_figures_match(3)

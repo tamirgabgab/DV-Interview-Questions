@@ -143,6 +143,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/20-video.css
   - stylesheets/21-interview.css
   - stylesheets/22-circuit.css     # the circuit layer: traces, question chips, LEDs, signals (session 32)
+  - stylesheets/25-figures-c.css   # S415 figures: 0002's XOR bits, 0003's passes, 0038's contract (session 32)
 
 extra_javascript:
   - javascripts/mathjax.js

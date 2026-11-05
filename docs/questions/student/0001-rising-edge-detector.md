@@ -54,15 +54,13 @@ added: 2026-10-15
 
     **המעגל.** Flip-Flop אחד, שער NOT אחד ושער AND אחד :
 
-    ```mermaid
-    flowchart LR
-        sig([sig]) --> FF["D-FF"]
-        clk([clk]) --> FF
-        FF -- sig_q --> INV["NOT"]
-        sig --> AND["AND"]
-        INV --> AND
-        AND --> pulse([pulse])
-    ```
+    <!-- gen 0 -->
+
+    <svg class="figure ff-fig" viewBox="0 0 580 212" style="max-width:36rem" role="img" aria-label="המעגל : sig נכנס לפליפ-פלופ D שמוציא את sig_q, הערך של המחזור הקודם, עם איפוס rst_n פעיל בנמוך. sig_q עובר דרך מהפך, ושער AND מחבר אותו עם sig ומוציא את pulse"><text class="ff-text" x="62" y="50" text-anchor="end">sig</text><text class="ff-text" x="62" y="156" text-anchor="end">clk</text><text class="ff-text" x="62" y="202" text-anchor="end">rst_n</text><polyline class="ff-wire" points="68,44 408,44"/><polyline class="ff-wire" points="128,44 128,116 178,116"/><circle class="ink-dot" cx="128" cy="44" r="4"/><rect class="ff-gate" x="178" y="96" width="70" height="80" rx="3"/><text class="ff-pin" x="186" y="122" text-anchor="start">D</text><text class="ff-pin" x="240" y="122" text-anchor="end">Q</text><polyline class="ff-wire" points="68,150 178,150"/><path class="ff-wire" d="M178,143 L188,150 L178,157"/><circle class="ff-gate" cx="213" cy="180" r="4"/><polyline class="ff-wire" points="213,184 213,196 68,196"/><polyline class="ff-wire" points="248,116 318,116"/><text class="ff-small" x="283" y="106" text-anchor="middle">sig_q</text><path class="ff-gate" d="M318,104 L340,116 L318,128 Z"/><circle class="ff-gate" cx="344" cy="116" r="4"/><polyline class="ff-wire" points="348,116 382,116 382,72 408,72"/><path class="ff-gate" d="M408,36.0 H430.0 A22.0,22.0 0 0 1 430.0,80.0 H408 Z"/><polyline class="ff-wire" points="452,58 510,58"/><text class="ff-text" x="516" y="64" text-anchor="start">pulse</text></svg>
+
+    <span class="viz-legend"><span><i class="ff-key-dot"></i>נקודה : <code>sig</code> מתפצל לשער ולפליפ-פלופ</span><span>העיגול מתחת לפליפ-פלופ : איפוס אסינכרוני פעיל בנמוך</span></span>
+
+    <!-- /gen -->
 
     #### השלבים { .sol-steps }
 

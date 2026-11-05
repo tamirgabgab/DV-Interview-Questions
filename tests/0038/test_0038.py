@@ -135,3 +135,74 @@ def test_explorer_attempt_lanes():
                 if x["status"] == "open":
                     assert x["end"] == n - 1
     assert [x["status"] for x in got[1]["att"]["late"] if x["status"] != "vacuous"] == ["fail"]
+
+
+def _fig():
+    import sys
+
+    from extract_code import ROOT
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0038
+
+    return q0038
+
+
+def _walk(q, samples):
+    """The state after the samples (the first one is IDLE's), or None off the drawn moves."""
+    if not samples or samples[0] != (0, 0):
+        return None
+    state = "IDLE"
+    for s in samples[1:]:
+        nxt = [b for a, b in q.MOVES if a == state and q.STATES[b] == s]
+        if not nxt:
+            return None
+        assert len(nxt) == 1                                  # the drawing is deterministic
+        state = nxt[0]
+    return state
+
+
+def _run(samples):
+    return check_handshake([r for r, _ in samples], [a for _, a in samples])
+
+
+def test_contract_figure():
+    """The contract figure (tools/figures/q0038.py) against the page's check_handshake:
+    every walk on the solid arrows passes, every dashed sample fails exactly the rule it is
+    marked with, in that cycle; and, over every trace of 8 samples closed by idle cycles,
+    the drawing and the model disagree only where ack comes in the cycle req rises (the
+    contract's "one to three cycles" rules it out, the SVA window lets a later ack cover it)."""
+    import itertools
+
+    q = _fig()
+    samples = list(q.STATES.values()) + [(0, 1)]
+    paths = {"IDLE": [(0, 0)]}
+    frontier = [[(0, 0)]]
+    for _ in range(9):
+        nxt = []
+        for p in frontier:
+            for a, b in q.MOVES:
+                if a == _walk(q, p):
+                    w = p + [q.STATES[b]]
+                    assert not any(_run(w).values()), w
+                    paths.setdefault(b, w)
+                    nxt.append(w)
+        frontier = nxt
+    for state, sample, _rule, key in q.BAD:
+        w = paths[state] + [sample]
+        assert len(w) - 1 in _run(w)[key], (state, sample, key)
+    disagree = []
+    for tail in itertools.product(sorted(set(samples)), repeat=7):
+        seq = [(0, 0), *tail]
+        passes = not any(_run(seq + [(0, 0)] * 4).values())
+        if passes != (_walk(q, seq) in ("IDLE", "ACK")):
+            disagree.append(seq)
+    assert disagree and all(any(s == (1, 1) and p[0] == 0 for p, s in zip(seq, seq[1:])) for seq in disagree)
+    svg = q.figure()
+    assert svg.count('class="fc-move"') == len(q.MOVES) and svg.count('class="fc-badge"') == len(q.BAD)
+
+
+def test_figures_up_to_date():
+    from page_tests import assert_figures_match
+
+    assert_figures_match(38)

@@ -278,6 +278,12 @@ PAIRS = [
     ("question chip, a lit bit on its body", "var(--md-accent-fg-color)",
      [{"default": "var(--md-primary-fg-color)", "slate": "var(--md-primary-fg-color--light)"}], UI),
     ("question chip label DVQ-<id> in the header", "var(--md-default-fg-color--light)", [CARD], TEXT),
+    # figures (fork C): the XOR bits of 0002, the passes of 0003, the handshake contract of 0038 (25-figures-c.css)
+    ("figures C, a digit on a cell of 1 or of the sorted part", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("figures C, the rule number on its badge", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
+    ("figures C, the name of the ack state", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))"], TEXT),
+    ("figures C, req and ack values in the ack state", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))"], TEXT),
+    ("figures C, the frame of a changed cell", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

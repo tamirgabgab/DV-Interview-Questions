@@ -67,3 +67,52 @@ def test_explorer_matches_replay():
             assert sum(pulse) == edges + g["phantom"]
             if mode != "both":
                 assert all(w == 1 for w in pulse_widths(pulse))
+
+
+def _fig():
+    import sys
+
+    from extract_code import ROOT
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0001
+
+    return q0001
+
+
+def test_schematic_matches_module():
+    """The schematic's netlist (tools/figures/q0001.py) against the page's module: the
+    flip-flop samples sig, resets to the page's value, and pulse is the page's assign; both
+    simulated on random sig traces with the reset held in cycle 0."""
+    q = _fig()
+    page = question_path(1).read_text(encoding="utf-8")
+    assert re.search(r"if \(!rst_n\) sig_q <= 1'b0;", page) and re.search(r"else\s+sig_q <= sig;", page)
+    expr = re.search(r"assign pulse = (.+?);", page).group(1)
+    assert q.NETLIST["sig_q"] == ("dff", "sig", "clk", "rst_n", 0)
+
+    def page_pulse(sig, sig_q):                 # the assign, ~ on one bit
+        return int(eval(expr.replace("~sig_q", "(1 - sig_q)"), {}, {"sig": sig, "sig_q": sig_q}))
+
+    def net(sig, sig_q):
+        vals = {"sig": sig, "sig_q": sig_q}
+        for name, (kind, *ins) in q.NETLIST.items():
+            if kind == "not":
+                vals[name] = 1 - vals[ins[0]]
+            elif kind == "and":
+                vals[name] = vals[ins[0]] & vals[ins[1]]
+        return vals["pulse"]
+
+    rng = random.Random(11)
+    for _ in range(200):
+        sig = [rng.randrange(2) for _ in range(12)]
+        sig_q, pulse = replay(sig, "rise")
+        assert [net(s, p) for s, p in zip(sig, sig_q)] == [page_pulse(s, p) for s, p in zip(sig, sig_q)] == pulse
+    svg = q.figure()
+    for label in ("sig", "clk", "rst_n", "sig_q", "pulse", ">D<", ">Q<"):
+        assert label in svg
+
+
+def test_figures_up_to_date():
+    from page_tests import assert_figures_match
+
+    assert_figures_match(1)
