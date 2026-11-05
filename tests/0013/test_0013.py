@@ -145,7 +145,7 @@ def test_base_b_tables_and_figures():
     fam = q0013.family_table().splitlines()[2:]
     assert len(fam) == 10 and "**6174**" in fam[1] and "**92B6**" in fam[2] and fam[9].endswith("| ‏3,774,470 |")
     ex = q0013.example_table().splitlines()[2:]
-    assert len(ex) == 5 and "**30DC**" in ex[0] and "‏(3, 1)" in ex[4]
+    assert len(ex) == 5 and "**30DC**" in ex[0] and "‏<span dir='ltr'>(3, 1)</span>" in ex[4]
     att = q0013.attractor_table().splitlines()[2:]
     assert len(att) == 15 and "‏6174" in att[8] and att[8].endswith("| ‏9,990 מתוך 9,990 |") and "‏2,160 מתוך 50,610" in att[13]
     from page_tests import assert_figures_match

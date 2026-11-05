@@ -136,7 +136,7 @@ def family_table():
         x = fixed_b(B)[-1]
         assert digits_b(x, B) == [3 * k, k - 1, 4 * k - 1, 2 * k]
         shown = f"**{text_b(x, B)}**" if B <= 36 else "—"
-        lines.append(f"| {RLM}{B} | {RLM}{k} | {RLM}({3 * k}, {k - 1}, {4 * k - 1}, {2 * k}) | {RLM}{shown} | {RLM}{x:,} |")
+        lines.append(f"| {RLM}{B} | {RLM}{k} | {RLM}<span dir='ltr'>({3 * k}, {k - 1}, {4 * k - 1}, {2 * k})</span> | {RLM}{shown} | {RLM}{x:,} |")
     return "\n".join(lines)
 
 
@@ -149,7 +149,7 @@ def example_table(x0=EXAMPLE_X, B=EXAMPLE_B):
         small = sum(v * B ** j for j, v in enumerate(ds))
         y = step_b(x, B)
         p, q = pair_b(x, B)
-        lines.append(f"| {RLM}{i} | {RLM}{text_b(x, B)} | {RLM}{text_b(big, B)} | {RLM}{text_b(small, B)} | {RLM}({p}, {q}) | {RLM}**{text_b(y, B)}** |")
+        lines.append(f"| {RLM}{i} | {RLM}{text_b(x, B)} | {RLM}{text_b(big, B)} | {RLM}{text_b(small, B)} | {RLM}<span dir='ltr'>({p}, {q})</span> | {RLM}**{text_b(y, B)}** |")
     return "\n".join(lines)
 
 

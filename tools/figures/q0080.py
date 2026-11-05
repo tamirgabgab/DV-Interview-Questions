@@ -364,7 +364,7 @@ def grid_svg():
 def grid_legend():
     return ('<span class="viz-legend"><span><i class="bil-key-felt"></i>השולחן עצמו</span>'
             '<span><i class="box-copy"></i>העותקים</span><span><i class="bil-key-hole"></i>כיס, ברדיוס 4.5 ס״מ</span>'
-            '<span><i class="bil-path"></i>‏37° : נכנס ל-(0, 180)</span><span><i class="bil-key-dash"></i>‏tan α = 2/3 : נכנס לאמצעי התחתון</span></span>')
+            '<span><i class="bil-path"></i>‏37° : נכנס ל-<span dir="ltr">(0, 180)</span></span><span><i class="bil-key-dash"></i>‏tan α = 2/3 : נכנס לאמצעי התחתון</span></span>')
 
 
 D_START = (Fr(180), Fr(90))
