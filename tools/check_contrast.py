@@ -295,6 +295,28 @@ PAIRS = [
     ("figures C, the name of the ack state", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))"], TEXT),
     ("figures C, req and ack values in the ack state", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))"], TEXT),
     ("figures C, the frame of a changed cell", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], UI),
+    # 0083 jugs (26-jugs.css): the jugs, the grid of the states and the jugs / jugs3 boxes
+    ("0083 jugs, the amount on the water", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 32%, var(--md-default-bg-color))"], TEXT),
+    ("0083 jugs, the amount in an empty jug or a name", "var(--viz-ink)", [CARD, PAGE], TEXT),
+    ("0083 jugs, a capacity under a jug", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0083 jugs, the frame of the jug a step changed", "var(--viz-s2-text)", [CARD, PAGE], UI),
+    ("0083 jugs, the outline of a jug", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 32%, var(--md-default-bg-color))"], UI),
+    ("0083 jugs, a reachable state", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0083 jugs, a state with the target", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0083 jugs, a state never reached", "var(--viz-text)", [CARD, PAGE], UI),
+    ("0083 jugs, the longer plan on the grid", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0083 jugs, the shortest-plan tag", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))", CARD, PAGE], TEXT),
+    # 0084 LIS (27-lis.css): the figures and the box of the longest increasing subsequence
+    ("0084 LIS, a value on the LIS", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0084 LIS, a value compared or appended", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0084 LIS, a value not compared (a[j] >= a[i])", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color))"], TEXT),
+    ("0084 LIS, a value in the search range", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 16%, var(--md-default-bg-color))"], TEXT),
+    ("0084 LIS, an index, a row name or tail_at", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0084 LIS, lo, hi and k under tails", "var(--viz-s4-text)", [CARD, PAGE], TEXT),
+    ("0084 LIS, the frame of a[i] on a value on the LIS", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], UI),
+    ("0084 LIS, the frame of mid in the search range", "var(--viz-s4)", ["color-mix(in srgb, var(--viz-s4) 16%, var(--md-default-bg-color))"], UI),
+    ("0084 LIS, a prev or parent arc on the box", "var(--viz-text)", [CARD], UI),
+    ("0084 LIS, the LIS's arc on the box", "var(--viz-s1)", [CARD], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

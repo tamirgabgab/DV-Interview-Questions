@@ -146,6 +146,8 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/23-polish.css      # one action colour, named icon buttons on phones, code size (session 32)
   - stylesheets/24-living.css      # the pad field, skeletons, tabular figures, titles, the footer's board line (session 32)
   - stylesheets/25-figures-c.css   # S415 figures: 0002's XOR bits, 0003's passes, 0038's contract (session 32)
+  - stylesheets/26-jugs.css        # 0083: the water jugs, their figures and box (session 32)
+  - stylesheets/27-lis.css         # 0084: the longest increasing subsequence, its figures and box (session 32)
 
 extra_javascript:
   - javascripts/mathjax.js

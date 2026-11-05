@@ -1,0 +1,41 @@
+/* Question 0083, the water jugs (session 32): the jugs and their water, the grid of the
+   states, and the jugs / jugs3 boxes (tools/figures/q0083.py, docs/javascripts/explorer/jugs.js).
+   Colours from the palette only. */
+
+/* the jugs */
+.md-typeset svg .wj-jug { fill: none; stroke: var(--viz-ink); stroke-width: 2.5; stroke-linejoin: round; }
+.md-typeset svg .wj-jug.wj-chg { stroke: var(--viz-s2-text); stroke-width: 3.5; }
+.md-typeset svg .wj-water { fill: color-mix(in srgb, var(--viz-s1) 32%, var(--md-default-bg-color)); }
+.md-typeset svg .wj-lev { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg .wj-num { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 15px; font-weight: 700; }
+.md-typeset svg .wj-name { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 14px; font-weight: 700; }
+.md-typeset svg .wj-cap { fill: var(--viz-text); font-family: var(--md-text-font-family); font-size: 13px; }
+.md-typeset svg .wj-arrow { fill: none; stroke: var(--viz-s2-text); stroke-width: 2; }
+.md-typeset svg .wj-head { fill: var(--viz-s2-text); }
+
+/* the grid of the states */
+.md-typeset svg .wj-route { stroke: var(--viz-s2); stroke-linejoin: round; stroke-linecap: round; }
+.md-typeset svg .wj-route.is-alt { stroke: var(--viz-s4); }
+.md-typeset svg .wj-reach { fill: var(--viz-s1); stroke: var(--md-default-bg-color); stroke-width: 1.5; }
+.md-typeset svg .wj-goal { fill: var(--viz-s3); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .wj-never { fill: none; stroke: var(--viz-text); stroke-width: 1.2; }
+.md-typeset svg .wj-cur { fill: none; stroke: var(--viz-ink); stroke-width: 2.5; }
+
+/* the boxes: the jugs and the grid side by side when there is room */
+.md-typeset .wj-figs { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-end; justify-content: center; }
+.md-typeset .wj-figs > div { flex: 0 1 auto; min-width: 0; }
+.md-typeset .wj-figs svg.wj-live { width: 13rem; max-width: 100%; }
+.md-typeset .wj-figs svg.wj-grid { width: 15rem; max-width: 100%; }
+.md-typeset .wj-moves .md-button { font-variant-numeric: tabular-nums; }
+.md-typeset .wj-tag { display: inline-block; padding: 0 0.4em; border-radius: 0.3em; font-size: 0.85em;
+  background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); color: var(--viz-ink); }
+
+/* the keys of the legends */
+.md-typeset .viz-legend .wj-key-jug { background: none; border: 2px solid var(--viz-ink); border-top: 0; }
+.md-typeset .viz-legend .wj-key-water { background: color-mix(in srgb, var(--viz-s1) 32%, var(--md-default-bg-color)); outline: 1px solid var(--viz-ink); outline-offset: -1px; }
+.md-typeset .viz-legend .wj-key-chg { background: none; outline: 2px solid var(--viz-s2-text); outline-offset: -2px; }
+.md-typeset .viz-legend .wj-key-reach { background: var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .wj-key-goal { background: var(--viz-s3); border-radius: 50%; outline: 1.5px solid var(--viz-ink); outline-offset: -1.5px; }
+.md-typeset .viz-legend .wj-key-never { background: none; border-radius: 50%; border: 1.5px solid var(--viz-text); }
+.md-typeset .viz-legend .wj-key-best { background: var(--viz-s2); height: 0.2rem; border-radius: 0.1rem; }
+.md-typeset .viz-legend .wj-key-alt { background: none; height: 0; border-top: 2px dashed var(--viz-s4); border-radius: 0; }

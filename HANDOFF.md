@@ -2218,13 +2218,48 @@ section below starts at session 22, whose numbered items run on through the late
     that the checker (and the SVA `$rose(req) |-> ##[1:3] ack`) misses an ack in the rise
     cycle when a later ack lands in the window (rule 2 says one to three cycles): 9 traces;
     reported to the owner, not changed (open item).
+151. **0038's rule 2 closed (session 32, 2026-11-05).** The owner chose to fix the gap found by
+    item 150's brute force, without a new trap: rule 2 is `$rose(req) |-> !ack
+    ##[1:MAX_WAIT] ack` (an ack in the rise cycle fails at once, in that cycle; before, a
+    later quick transaction's ack inside the window satisfied it). The page's Python and SV,
+    the short answer, step 2, annotation (2), the follow-ups (`##[0:3]` without `!ack` for a
+    combinational ack, `start |-> !ack ##[1:3] ack` back to back), handshake.js (hsCheck,
+    hsAttempts, "ack מוקדם") and the contract figure (IDLE → req = ack = 1 marked ✗ 2).
+    Tests: a regression test on the covering traces, the figure's brute force agrees with
+    the model on every 8-sample trace, tb.sv injects an ack in the rise cycle. Published as a
+    small fix (`main` ec6957e).
+152. **Question 0083, the water jugs (session 32, 2026-11-05).** Chosen from eight logic and
+    coding proposals. Student / medium, Python and SV, logic-puzzles path after 0032. Part
+    a: 3 and 5 to 4 in six steps (fill B first; eight filling A first; the only shortest
+    plan), 16 of the 24 states reachable. Part b: T is measurable iff T ≤ max(a, b) and
+    gcd(a, b) divides T (an invariant one way, keep-pouring and k·a mod b the other); every
+    reachable state has a jug empty or full; BFS over (x, y) (`jugs_shortest`). Part c: 8,
+    5, 3 without a tap, split into 4 and 4 in seven pours (eight starting 8 into 3; unique),
+    `split_shortest`. q0083.py (an independent BFS, stepper, tables, the state grids),
+    jugs.js (kinds jugs and jugs3), 26-jugs.css, ten contrast pairs. Tests: the gcd rule and
+    the edge property for a ≤ 9 and b ≤ 12, the page code and the box against the reference,
+    the follow-ups (the total in both jugs, the shorter keep-pouring plan equals the BFS, the
+    DFS trap's eight steps), the SV replayed plans. `dist` is an SV keyword: the SV uses
+    `depth`.
+153. **Question 0084, the longest increasing subsequence (session 32, 2026-11-05).** Chosen
+    with 0083. Junior / medium, Python and SV, advanced-algorithms path after 0046. Part a:
+    dp and prev in O(n²) (`[10, 9, 2, 5, 3, 7, 101, 18]`: length 4, `[2, 5, 7, 101]`, 28
+    comparisons). Part b: tails with the binary search written out, tail_at and parent, the
+    invariant and its proof (`[2, 3, 7, 18]`, 10 comparisons). Part c: count_lis with
+    (length, count) pairs (`[1, 3, 5, 4, 7]` → 2, the example → 4). Traps: tails is not the
+    LIS (`[3, 4, 5, 1]`), bisect_right, dp[n−1], greedy. Follow-ups: non-decreasing,
+    patience piles and Dilworth, envelopes, Fenwick counting, Erdős–Szekeres. Five generated
+    blocks (q0084.py); the box `lis` (explorer/lis.js) in dp and tails modes with a text
+    field, presets and a random draw; 27-lis.css; ten contrast pairs; the tag binary-search
+    named in TOPICS. Tests: brute force over all subsequences in Python and SV, the box's
+    models under Node against the reference.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139); questions 0078 to 0082 (items 140 to 144); the UX audit's fixes and the circuit layer (items 145, 146); numbers laid out from the right (item 147); the finishing round, the living layer and four figures (items 148 to 150).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139); questions 0078 to 0082 (items 140 to 144); the UX audit's fixes and the circuit layer (items 145, 146); numbers laid out from the right (item 147); the finishing round, the living layer and four figures (items 148 to 150); 0038's rule 2 (item 151); questions 0083 and 0084 (items 152, 153).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
@@ -2296,7 +2331,7 @@ section below starts at session 22, whose numbered items run on through the late
   or mirror the state in a hidden input.
 - [x] ~~Re-run the 0007, 0011 and 0014 constraints in a simulator with full constraint support~~ — done in session 5 (Verilator snapshot + z3 in CI).
 - [x] ~~Wide data tables still scroll sideways on phones~~: tables of five or more columns that do not fit become cards on phones (C192, session 22).
-- [ ] 0038: `check_handshake` and the SVA miss an ack in the rise cycle when a later ack lands in the window (9 traces, work log item 150). The owner decides: fix the checker, or make it a trap of the question.
+- [x] ~~0038: the checker missed an ack in the rise cycle~~ (fixed, work log item 151).
 - [ ] Figure labels under 11 px on phones (work log item 148): the D194 fit raises them to 9.5 px only; 11 px needs fewer value labels and more room in `charts.py`'s `tick` and `legend` and per generator (0028, 0044 first).
 - [ ] When a Verilator release newer than 5.052 is out, bump `VERILATOR_REF` to its tag and check that 0011 and the 0014 subclass still pass.
 

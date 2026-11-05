@@ -80,6 +80,7 @@ TOPICS = {
     "algorithms": "אלגוריתמים",
     "assertions": "Assertions",
     "bfs": "BFS",
+    "binary-search": "חיפוש בינארי",
     "bitwise": "פעולות על ביטים",
     "cdc": "CDC",
     "clocks": "שעונים",
