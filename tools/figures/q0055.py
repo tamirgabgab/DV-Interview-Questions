@@ -285,6 +285,12 @@ def equations_block(lsb):
     return "\\[\n\\begin{aligned}\n" + " \\\\\n".join(lines) + "\n\\end{aligned}\n\\]"
 
 
+def ltr_bits(*bits):
+    """Bits written apart ("0 1"): in a right-to-left line the space splits the digits into
+    runs that the browser lays out from the right ("1 0"), so the pair is isolated LTR."""
+    return '<span dir="ltr">' + " ".join(str(b) for b in bits) + "</span>"
+
+
 def encoded_table(lsb):
     """Part a or b: the encoded transitions, a row per code and bit, the unused 11 too."""
     sym = "x" if lsb else "r"
@@ -294,10 +300,10 @@ def encoded_table(lsb):
         for b in (0, 1):
             nxt = next_code(lsb, q1, q0, b)
             if nxt is None:
-                rows.append(f"| לא בשימוש | {RLM}1 1 | {RLM}{b} | {RLM}× × | {RLM}× |")
+                rows.append(f"| לא בשימוש | {RLM}{ltr_bits(1, 1)} | {RLM}{b} | {RLM}× × | {RLM}× |")
             else:
                 div = int((q1, q0) == (0, 0))
-                rows.append(f"| {RLM}{sym} = {inv[(q1, q0)]} | {RLM}{q1} {q0} | {RLM}{b} | {RLM}{nxt[0]} {nxt[1]} | {RLM}{div} |")
+                rows.append(f"| {RLM}{sym} = {inv[(q1, q0)]} | {RLM}{ltr_bits(q1, q0)} | {RLM}{b} | {RLM}{ltr_bits(*nxt)} | {RLM}{div} |")
     return "\n".join(rows)
 
 
