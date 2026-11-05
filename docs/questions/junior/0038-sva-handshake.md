@@ -25,11 +25,11 @@ added: 2026-10-21
 
 <!-- gen 0 -->
 
-<svg class="figure" viewBox="0 0 494 272" style="max-width:30.9rem" role="img" aria-label="החוזה כמכונת מצבים של הדגימות. מעברים מותרים : IDLE ל-IDLE, IDLE ל-RISE, RISE ל-WAIT 1, WAIT 1 ל-WAIT 2, RISE ל-ACK, WAIT 1 ל-ACK, WAIT 2 ל-ACK, ACK ל-IDLE. מכל מצב המתנה, req שיורד מפר את חוק 1; WAIT 2 בלי ack מפר את חוק 2; ack בלי req מפר את חוק 3; req גבוה אחרי ACK מפר את חוק 4"><defs><marker id="fc38-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fc-head"/></marker></defs><rect class="fc-node" x="14" y="44" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="53" y="64" text-anchor="middle">IDLE</text><text class="fc-sub" x="53" y="82" text-anchor="middle">req 0</text><text class="fc-sub" x="53" y="98" text-anchor="middle">ack 0</text><rect class="fc-node" x="126" y="44" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="165" y="64" text-anchor="middle">RISE</text><text class="fc-sub" x="165" y="82" text-anchor="middle">req 1</text><text class="fc-sub" x="165" y="98" text-anchor="middle">ack 0</text><rect class="fc-node" x="238" y="44" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="277" y="64" text-anchor="middle">WAIT 1</text><text class="fc-sub" x="277" y="82" text-anchor="middle">req 1</text><text class="fc-sub" x="277" y="98" text-anchor="middle">ack 0</text><rect class="fc-node" x="350" y="44" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="389" y="64" text-anchor="middle">WAIT 2</text><text class="fc-sub" x="389" y="82" text-anchor="middle">req 1</text><text class="fc-sub" x="389" y="98" text-anchor="middle">ack 0</text><rect class="fc-node fc-ack" x="238" y="160" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="277" y="180" text-anchor="middle">ACK</text><text class="fc-sub" x="277" y="198" text-anchor="middle">req 1</text><text class="fc-sub" x="277" y="214" text-anchor="middle">ack 1</text><path class="fc-move" d="M36,44 C32,10 74,10 70,43" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M92,75 L125,75" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M204,75 L237,75" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M316,75 L349,75" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M165,106 L250,159" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M277,106 L277,159" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M389,106 L304,159" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M238,191 L53,191 L53,107" marker-end="url(#fc38-arrow)"/><line class="fc-bad" x1="165.0" y1="44" x2="165.0" y2="20"/><line class="fc-x" x1="160.0" y1="15" x2="170.0" y2="25"/><line class="fc-x" x1="160.0" y1="25" x2="170.0" y2="15"/><circle class="fc-badge" cx="185.0" cy="18" r="10"/><text class="fc-t fc-b" x="185.0" y="23" text-anchor="middle">1</text><line class="fc-bad" x1="277.0" y1="44" x2="277.0" y2="20"/><line class="fc-x" x1="272.0" y1="15" x2="282.0" y2="25"/><line class="fc-x" x1="272.0" y1="25" x2="282.0" y2="15"/><circle class="fc-badge" cx="297.0" cy="18" r="10"/><text class="fc-t fc-b" x="297.0" y="23" text-anchor="middle">1</text><line class="fc-bad" x1="389.0" y1="44" x2="389.0" y2="20"/><line class="fc-x" x1="384.0" y1="15" x2="394.0" y2="25"/><line class="fc-x" x1="384.0" y1="25" x2="394.0" y2="15"/><circle class="fc-badge" cx="409.0" cy="18" r="10"/><text class="fc-t fc-b" x="409.0" y="23" text-anchor="middle">1</text><line class="fc-bad" x1="428" y1="75.0" x2="454" y2="75.0"/><line class="fc-x" x1="449" y1="70.0" x2="459" y2="80.0"/><line class="fc-x" x1="449" y1="80.0" x2="459" y2="70.0"/><circle class="fc-badge" cx="474" cy="75.0" r="10"/><text class="fc-t fc-b" x="474" y="80.0" text-anchor="middle">2</text><line class="fc-bad" x1="28" y1="106" x2="28" y2="136"/><line class="fc-x" x1="23" y1="131" x2="33" y2="141"/><line class="fc-x" x1="23" y1="141" x2="33" y2="131"/><circle class="fc-badge" cx="28" cy="160" r="10"/><text class="fc-t fc-b" x="28" y="165" text-anchor="middle">3</text><line class="fc-bad" x1="316" y1="191.0" x2="342" y2="191.0"/><line class="fc-x" x1="337" y1="186.0" x2="347" y2="196.0"/><line class="fc-x" x1="337" y1="196.0" x2="347" y2="186.0"/><circle class="fc-badge" cx="362" cy="191.0" r="10"/><text class="fc-t fc-b" x="362" y="196.0" text-anchor="middle">4</text><line class="fc-bad" x1="277.0" y1="222" x2="277.0" y2="246"/><line class="fc-x" x1="272.0" y1="241" x2="282.0" y2="251"/><line class="fc-x" x1="272.0" y1="251" x2="282.0" y2="241"/><circle class="fc-badge" cx="299.0" cy="246" r="10"/><text class="fc-t fc-b" x="299.0" y="251" text-anchor="middle">3</text></svg>
+<svg class="figure" viewBox="0 0 494 272" style="max-width:30.9rem" role="img" aria-label="החוזה כמכונת מצבים של הדגימות. מעברים מותרים : IDLE ל-IDLE, IDLE ל-RISE, RISE ל-WAIT 1, WAIT 1 ל-WAIT 2, RISE ל-ACK, WAIT 1 ל-ACK, WAIT 2 ל-ACK, ACK ל-IDLE. מכל מצב המתנה, req שיורד מפר את חוק 1; WAIT 2 בלי ack, או req ו-ack שעולים יחד מ-IDLE, מפרים את חוק 2; ack בלי req מפר את חוק 3; req גבוה אחרי ACK מפר את חוק 4"><defs><marker id="fc38-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fc-head"/></marker></defs><rect class="fc-node" x="14" y="44" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="53" y="64" text-anchor="middle">IDLE</text><text class="fc-sub" x="53" y="82" text-anchor="middle">req 0</text><text class="fc-sub" x="53" y="98" text-anchor="middle">ack 0</text><rect class="fc-node" x="126" y="44" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="165" y="64" text-anchor="middle">RISE</text><text class="fc-sub" x="165" y="82" text-anchor="middle">req 1</text><text class="fc-sub" x="165" y="98" text-anchor="middle">ack 0</text><rect class="fc-node" x="238" y="44" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="277" y="64" text-anchor="middle">WAIT 1</text><text class="fc-sub" x="277" y="82" text-anchor="middle">req 1</text><text class="fc-sub" x="277" y="98" text-anchor="middle">ack 0</text><rect class="fc-node" x="350" y="44" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="389" y="64" text-anchor="middle">WAIT 2</text><text class="fc-sub" x="389" y="82" text-anchor="middle">req 1</text><text class="fc-sub" x="389" y="98" text-anchor="middle">ack 0</text><rect class="fc-node fc-ack" x="238" y="160" width="78" height="62" rx="8"/><text class="fc-t fc-b" x="277" y="180" text-anchor="middle">ACK</text><text class="fc-sub" x="277" y="198" text-anchor="middle">req 1</text><text class="fc-sub" x="277" y="214" text-anchor="middle">ack 1</text><path class="fc-move" d="M36,44 C32,10 74,10 70,43" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M92,75 L125,75" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M204,75 L237,75" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M316,75 L349,75" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M165,106 L250,159" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M277,106 L277,159" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M389,106 L304,159" marker-end="url(#fc38-arrow)"/><path class="fc-move" d="M238,191 L53,191 L53,107" marker-end="url(#fc38-arrow)"/><line class="fc-bad" x1="165.0" y1="44" x2="165.0" y2="20"/><line class="fc-x" x1="160.0" y1="15" x2="170.0" y2="25"/><line class="fc-x" x1="160.0" y1="25" x2="170.0" y2="15"/><circle class="fc-badge" cx="185.0" cy="18" r="10"/><text class="fc-t fc-b" x="185.0" y="23" text-anchor="middle">1</text><line class="fc-bad" x1="277.0" y1="44" x2="277.0" y2="20"/><line class="fc-x" x1="272.0" y1="15" x2="282.0" y2="25"/><line class="fc-x" x1="272.0" y1="25" x2="282.0" y2="15"/><circle class="fc-badge" cx="297.0" cy="18" r="10"/><text class="fc-t fc-b" x="297.0" y="23" text-anchor="middle">1</text><line class="fc-bad" x1="389.0" y1="44" x2="389.0" y2="20"/><line class="fc-x" x1="384.0" y1="15" x2="394.0" y2="25"/><line class="fc-x" x1="384.0" y1="25" x2="394.0" y2="15"/><circle class="fc-badge" cx="409.0" cy="18" r="10"/><text class="fc-t fc-b" x="409.0" y="23" text-anchor="middle">1</text><line class="fc-bad" x1="428" y1="75.0" x2="454" y2="75.0"/><line class="fc-x" x1="449" y1="70.0" x2="459" y2="80.0"/><line class="fc-x" x1="449" y1="80.0" x2="459" y2="70.0"/><circle class="fc-badge" cx="474" cy="75.0" r="10"/><text class="fc-t fc-b" x="474" y="80.0" text-anchor="middle">2</text><line class="fc-bad" x1="28" y1="106" x2="28" y2="136"/><line class="fc-x" x1="23" y1="131" x2="33" y2="141"/><line class="fc-x" x1="23" y1="141" x2="33" y2="131"/><circle class="fc-badge" cx="28" cy="160" r="10"/><text class="fc-t fc-b" x="28" y="165" text-anchor="middle">3</text><line class="fc-bad" x1="78" y1="106" x2="78" y2="136"/><line class="fc-x" x1="73" y1="131" x2="83" y2="141"/><line class="fc-x" x1="73" y1="141" x2="83" y2="131"/><circle class="fc-badge" cx="78" cy="160" r="10"/><text class="fc-t fc-b" x="78" y="165" text-anchor="middle">2</text><line class="fc-bad" x1="316" y1="191.0" x2="342" y2="191.0"/><line class="fc-x" x1="337" y1="186.0" x2="347" y2="196.0"/><line class="fc-x" x1="337" y1="196.0" x2="347" y2="186.0"/><circle class="fc-badge" cx="362" cy="191.0" r="10"/><text class="fc-t fc-b" x="362" y="196.0" text-anchor="middle">4</text><line class="fc-bad" x1="277.0" y1="222" x2="277.0" y2="246"/><line class="fc-x" x1="272.0" y1="241" x2="282.0" y2="251"/><line class="fc-x" x1="272.0" y1="251" x2="282.0" y2="241"/><circle class="fc-badge" cx="299.0" cy="246" r="10"/><text class="fc-t fc-b" x="299.0" y="251" text-anchor="middle">3</text></svg>
 
 <span class="viz-legend"><span><i class="fc-key-move"></i>הדגימה הבאה מותרת</span><span><i class="fc-key-bad"></i>דגימה אסורה, עם מספר החוק שהיא מפרה</span><span><i class="fc-key-ack"></i>מחזור של <code>ack</code></span></span>
 
-<span class="viz-legend"><span>חוק 1 : <code>req</code> יורד לפני <code>ack</code></span><span>חוק 2 : אין <code>ack</code> עד שלושה מחזורים אחרי העלייה</span><span>חוק 3 : <code>ack</code> כש-<code>req</code> נמוך</span><span>חוק 4 : <code>req</code> עדיין גבוה במחזור שאחרי <code>ack</code></span></span>
+<span class="viz-legend"><span>חוק 1 : <code>req</code> יורד לפני <code>ack</code></span><span>חוק 2 : <code>ack</code> כבר במחזור העלייה, או אין <code>ack</code> עד שלושה מחזורים אחריה</span><span>חוק 3 : <code>ack</code> כש-<code>req</code> נמוך</span><span>חוק 4 : <code>req</code> עדיין גבוה במחזור שאחרי <code>ack</code></span></span>
 
 <!-- /gen -->
 
@@ -64,7 +64,7 @@ added: 2026-10-21
 ??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
         ארבע properties בשעון `posedge clk`, כולן עם `disable iff (!rst_n)` :
-        ‏`(req && !ack) |=> req` (חוק 1), ‏`$rose(req) |-> ##[1:3] ack` (חוק 2),
+        ‏`(req && !ack) |=> req` (חוק 1), ‏`$rose(req) |-> !ack ##[1:3] ack` (חוק 2),
         ‏`ack |-> req` (חוק 3), ‏`ack |=> !req` (חוק 4). ‏`|->` כשהתוצאה נבדקת באותו
         מחזור של התנאי, ‏`|=>` כשהיא נבדקת מהמחזור הבא, ו-`##[1:3]` פותח חלון של שלושה
         מחזורים שבו מספיק שה-`ack` יופיע פעם אחת.
@@ -86,8 +86,9 @@ added: 2026-10-21
     1. **חוק 1 כצעד :** "מחזיק עד `ack`" שקול ל-"בכל מחזור שבו `req` גבוה בלי `ack`, במחזור
        הבא `req` עדיין גבוה" : `(req && !ack) |=> req`. הפרה נספרת במחזור שבו `req` נפל.
     2. **חוק 2 כחלון :** האירוע הוא העלייה, `$rose(req)` (נמוך בדגימה הקודמת, גבוה
-       בזו). מהעלייה, `##[1:3] ack` : ‏`ack` באחת משלוש השפות הבאות. ה-property נכשלת
-       רק אחרי השפה השלישית בלי `ack`, ולכן הכישלון מדווח שלושה מחזורים אחרי העלייה.
+       בזו). באותה דגימה `!ack`, כי "מחזור אחד עד שלושה" אוסר `ack` במחזור העלייה. אחר כך
+       `##[1:3] ack` : ‏`ack` באחת משלוש השפות הבאות. ‏`ack` מוקדם נכשל מיד, וחלון בלי
+       `ack` נכשל אחרי השפה השלישית, ולכן הכישלון מדווח שלושה מחזורים אחרי העלייה.
     3. **חוק 3 חופף :** ‏`ack |-> req` : באותה דגימה שבה `ack` גבוה, גם `req` גבוה. אין
        כאן זמן, ולכן `|->` ולא `|=>`.
     4. **חוק 4 לא חופף :** ‏`ack |=> !req` : בשפה שאחרי `ack` ה-`req` כבר נמוך. בחוק הזה
@@ -103,7 +104,7 @@ added: 2026-10-21
     מודל הייחוס ב-Python עובר על אותן דגימות ומחזיר את המחזורים של כל הפרה.
 
     === "Python"
-        ```python title="check_handshake" linenums="1" hl_lines="10 14 17 19"
+        ```python title="check_handshake" linenums="1" hl_lines="10 14 18 20"
         def check_handshake(req: list[int], ack: list[int], max_wait: int = 3) -> dict[str, list[int]]:
             """The four rules on sampled values (index = clock cycle). Returns the cycles at
             which each rule is violated, the cycle at which the SVA reports the failure."""
@@ -116,8 +117,10 @@ added: 2026-10-21
                     fails["hold"].append(t)                           # (1)!
                 if req[t] and not prev_req:                           # $rose(req)
                     window = ack[t + 1:t + 1 + max_wait]
-                    if len(window) == max_wait and not any(window):
-                        fails["late"].append(t + max_wait)            # (2)!
+                    if ack[t]:
+                        fails["late"].append(t)                       # (2)!
+                    elif len(window) == max_wait and not any(window):
+                        fails["late"].append(t + max_wait)
                 if ack[t] and not req[t]:
                     fails["orphan"].append(t)                         # (3)!
                 if t and prev_ack and req[t]:
@@ -126,7 +129,8 @@ added: 2026-10-21
         ```
 
         1. ‏`req` היה גבוה בלי `ack` ונפל : ההפרה נרשמת במחזור הנפילה, כמו `|=>`.
-        2. אין `ack` באף אחד משלושת המחזורים שאחרי העלייה : ההפרה נרשמת בסוף החלון. חלון
+        2. ‏`ack` כבר במחזור העלייה הוא מוקדם מדי, וההפרה נרשמת מיד, באותו מחזור. אחרת,
+           אין `ack` באף אחד משלושת המחזורים שאחרי העלייה : ההפרה נרשמת בסוף החלון. חלון
            שנחתך בסוף הרצף לא נספר, כמו property שעדיין פתוחה בסוף הסימולציה.
         3. ‏`ack` בלי `req` באותה דגימה.
         4. ‏`req` עדיין גבוה במחזור שאחרי `ack`.
@@ -150,8 +154,8 @@ added: 2026-10-21
 
           // 2. ack within 1..MAX_WAIT cycles after req rises
           a_ack_in_time: assert property (@(posedge clk) disable iff (!rst_n)
-            $rose(req) |-> ##[1:MAX_WAIT] ack)                        // (2)!
-            else begin fail_late++; $display("%0t ack too late", $time); end
+            $rose(req) |-> !ack ##[1:MAX_WAIT] ack)                   // (2)!
+            else begin fail_late++; $display("%0t ack not 1..MAX_WAIT cycles after req rose", $time); end
 
           // 3. no ack without a request
           a_no_orphan_ack: assert property (@(posedge clk) disable iff (!rst_n)
@@ -168,8 +172,9 @@ added: 2026-10-21
         1. ‏Implication לא חופפת : האנטצדנט בדגימה הזו, הקונסקוונט בדגימה הבאה. אם
            `req` ירד לפני `ack`, האנטצדנט התאים במחזור האחרון שבו הוא היה גבוה והקונסקוונט
            נכשל במחזור שאחריו.
-        2. ‏`$rose(req)` משווה לדגימה הקודמת. ‏`##[1:MAX_WAIT] ack` הוא חלון : מספיק
-           `ack` אחד בתוכו, והכישלון מדווח רק כשהחלון נסגר בלי `ack`.
+        2. ‏`$rose(req)` משווה לדגימה הקודמת. ‏`!ack` נבדק באותה דגימה, ולכן `ack` במחזור
+           העלייה נכשל מיד. ‏`##[1:MAX_WAIT] ack` הוא חלון : מספיק `ack` אחד בתוכו, והכישלון
+           מדווח רק כשהחלון נסגר בלי `ack`.
         3. ‏Implication חופפת : שני האותות באותה דגימה.
         4. במחזור שאחרי `ack` ה-`req` נמוך. עם `|->` זה היה סותר את חוק 3.
 
@@ -330,9 +335,10 @@ added: 2026-10-21
       משתנים חוקים 2 ו-4?
 
         ??? fu-answer "תשובה"
-            חוק 2 מתחיל את החלון באותו מחזור : ‏`$rose(req) |-> ##[0:3] ack`. חוק 4,
-            ‏`ack |=> !req`, נשאר כמו שהוא : גם `req` של מחזור אחד עם `ack` באותו מחזור חייב לרדת
-            מיד אחריו, וחוקים 1 ו-3 לא תלויים בזמן התגובה.
+            חוק 2 מתחיל את החלון באותו מחזור, בלי ה-`!ack` שבתחילתו :
+            ‏`$rose(req) |-> ##[0:3] ack`. חוק 4, ‏`ack |=> !req`, נשאר כמו שהוא : גם `req` של
+            מחזור אחד עם `ack` באותו מחזור חייב לרדת מיד אחריו, וחוקים 1 ו-3 לא תלויים בזמן
+            התגובה.
 
     - **עסקאות גב-אל-גב :** אם מותר ל-`req` להישאר גבוה אחרי `ack` ולהתחיל עסקה חדשה
       מיד, חוק 4 מתבטל ו-`$rose` כבר לא מזהה את העסקה השנייה. מה מחליף אותו?
@@ -340,7 +346,7 @@ added: 2026-10-21
         ??? fu-answer "תשובה"
             מגדירים התחלת עסקה : `req` גבוה, ובמחזור הקודם `req` היה נמוך או שהיה `ack`.
             כלומר `start = req && (!$past(req) || $past(ack))`, וחוק 2 הופך
-            ל-`start |-> ##[1:3] ack`.
+            ל-`start |-> !ack ##[1:3] ack`.
 
     - **‏valid / ready :** ב-AXI-stream `valid` חייב להחזיק עד `ready`, אבל `ready` רשאי
       להופיע לפני `valid` ואין חלון זמן. אילו מארבעת החוקים נשארים?

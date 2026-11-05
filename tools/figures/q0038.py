@@ -24,7 +24,7 @@ MOVES = [("IDLE", "IDLE"), ("IDLE", "RISE"), ("RISE", "WAIT 1"), ("WAIT 1", "WAI
          ("RISE", "ACK"), ("WAIT 1", "ACK"), ("WAIT 2", "ACK"), ("ACK", "IDLE")]
 # (from, the next sample (req, ack), the rule it breaks, the key in check_handshake)
 BAD = [("RISE", (0, 0), 1, "hold"), ("WAIT 1", (0, 0), 1, "hold"), ("WAIT 2", (0, 0), 1, "hold"),
-       ("WAIT 2", (1, 0), 2, "late"), ("IDLE", (0, 1), 3, "orphan"), ("ACK", (0, 1), 3, "orphan"),
+       ("WAIT 2", (1, 0), 2, "late"), ("IDLE", (1, 1), 2, "late"), ("IDLE", (0, 1), 3, "orphan"), ("ACK", (0, 1), 3, "orphan"),
        ("ACK", (1, 0), 4, "drop")]
 
 NW, NH, TOP = 78, 62, 44
@@ -78,6 +78,8 @@ def figure():
     s.append(_bad(X["WAIT 2"] + NW, cy, X["WAIT 2"] + NW + 26, cy, 2, X["WAIT 2"] + NW + 46, cy))
     ix = X["IDLE"] + 14
     s.append(_bad(ix, TOP + NH, ix, TOP + NH + 30, 3, ix, TOP + NH + 54))
+    jx = X["IDLE"] + NW - 14                 # req and ack together in the rise cycle: ack too early
+    s.append(_bad(jx, TOP + NH, jx, TOP + NH + 30, 2, jx, TOP + NH + 54))
     s.append(_bad(X["ACK"] + NW, mid, X["ACK"] + NW + 26, mid, 4, X["ACK"] + NW + 46, mid))
     s.append(_bad(cx["ACK"], ay + NH, cx["ACK"], ay + NH + 24, 3, cx["ACK"] + 22, ay + NH + 24))
     return "".join(s) + "</svg>"
@@ -86,7 +88,7 @@ def figure():
 def aria():
     moves = ", ".join(f"{a} ל-{b}" for a, b in MOVES)
     return ("החוזה כמכונת מצבים של הדגימות. מעברים מותרים : " + moves +
-            ". מכל מצב המתנה, req שיורד מפר את חוק 1; WAIT 2 בלי ack מפר את חוק 2; "
+            ". מכל מצב המתנה, req שיורד מפר את חוק 1; WAIT 2 בלי ack, או req ו-ack שעולים יחד מ-IDLE, מפרים את חוק 2; "
             "ack בלי req מפר את חוק 3; req גבוה אחרי ACK מפר את חוק 4")
 
 
@@ -96,7 +98,7 @@ def legend():
             '<span><i class="fc-key-ack"></i>מחזור של <code>ack</code></span></span>\n\n'
             '<span class="viz-legend">'
             '<span>חוק 1 : <code>req</code> יורד לפני <code>ack</code></span>'
-            '<span>חוק 2 : אין <code>ack</code> עד שלושה מחזורים אחרי העלייה</span>'
+            '<span>חוק 2 : <code>ack</code> כבר במחזור העלייה, או אין <code>ack</code> עד שלושה מחזורים אחריה</span>'
             '<span>חוק 3 : <code>ack</code> כש-<code>req</code> נמוך</span>'
             '<span>חוק 4 : <code>req</code> עדיין גבוה במחזור שאחרי <code>ack</code></span></span>')
 

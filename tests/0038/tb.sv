@@ -1,7 +1,8 @@
 //@flags --assert --timing
 //@page module handshake_checker
 // Question 0038: the page's checker on random traffic with injected violations, against a
-// procedural reference model of the four rules on the same samples: the four counters of
+// procedural reference model of the four rules on the same samples (an ack in the cycle req
+// rises included, with a later transaction's ack inside its window): the four counters of
 // the checker must equal the reference counts, and each rule must have failed at least
 // once (an assertion that never fails was not tested).
 module tb;
@@ -28,7 +29,8 @@ module tb;
       logic prev_req = t ? hist_req[t - 1] : 1'b0;
       logic prev_ack = t ? hist_ack[t - 1] : 1'b0;
       if (t && prev_req && !prev_ack && !hist_req[t]) ref_hold++;
-      if (hist_req[t] && !prev_req && t + 3 < n) begin
+      if (hist_req[t] && !prev_req && hist_ack[t]) ref_late++;          // ack in the rise cycle: too early
+      else if (hist_req[t] && !prev_req && t + 3 < n) begin
         if (!hist_ack[t + 1] && !hist_ack[t + 2] && !hist_ack[t + 3]) ref_late++;
       end
       if (hist_ack[t] && !hist_req[t]) ref_orphan++;
@@ -43,6 +45,11 @@ module tb;
 
   task automatic transaction(int wait_cycles, bit drop_early, bit hold_after);
     @(negedge clk) req = 1;
+    if (wait_cycles == 0) begin                 // ack in the rise cycle (rule 2: too early)
+      ack = 1;
+      @(negedge clk) begin ack = 0; req = 0; end
+      return;
+    end
     if (drop_early) begin
       repeat (wait_cycles) @(negedge clk);
       req = 0;                                  // gives up before the ack
@@ -61,12 +68,16 @@ module tb;
     @(negedge clk) rst_n = 1;
     idle(2);
     for (int k = 0; k < 400; k++) begin
-      kind = $urandom_range(0, 9);
+      kind = $urandom_range(0, 10);
       case (kind)
         0: transaction($urandom_range(4, 6), 0, 0);        // late ack (rule 2)
         1: transaction($urandom_range(1, 2), 1, 0);        // req dropped before ack (rules 1, 2)
         2: begin @(negedge clk) ack = 1; @(negedge clk) ack = 0; end   // orphan ack (rule 3)
         3: transaction($urandom_range(1, 3), 0, 1);        // req held after ack (rule 4)
+        4: begin                                            // ack in the rise cycle, then a quick
+          transaction(0, 0, 0);                             // transaction whose ack falls in the
+          transaction(1, 0, 0);                             // first one's window (rule 2)
+        end
         default: transaction($urandom_range(1, 3), 0, 0);  // a good one
       endcase
       idle($urandom_range(0, 2));

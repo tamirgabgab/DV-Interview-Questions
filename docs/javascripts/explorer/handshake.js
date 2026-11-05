@@ -17,7 +17,8 @@
       if (t && prevReq && !prevAck && !req[t]) fails.hold.push(t);
       if (req[t] && !prevReq) {
         const window = ack.slice(t + 1, t + 1 + maxWait);
-        if (window.length === maxWait && !window.some((v) => v)) fails.late.push(t + maxWait);
+        if (ack[t]) fails.late.push(t);                          // ack in the rise cycle: too early
+        else if (window.length === maxWait && !window.some((v) => v)) fails.late.push(t + maxWait);
       }
       if (ack[t] && !req[t]) fails.orphan.push(t);
       if (t && prevAck && req[t]) fails.drop.push(t);
@@ -73,12 +74,13 @@
         const prevReq = t ? req[t - 1] : 0, prevAck = t ? ack[t - 1] : 0;
         const lines = [];
         if (t && prevReq && !prevAck) lines.push(`חוק 1 : במחזור ${ltr(t - 1)} ‏${code("req")} היה גבוה בלי ${code("ack")}, ולכן ${code("req")} חייב להישאר גבוה עכשיו : ` + (req[t] ? `<span class="wv-ok">✓</span>` : `<span class="wv-bad">✗ ${code("req")} נפל לפני ${code("ack")}</span>`));
-        if (req[t] && !prevReq) {
+        if (req[t] && !prevReq && ack[t]) lines.push(`חוק 2 : ${code("req")} עלה עכשיו (‏${code("$rose(req)")}), ו-${code("ack")} כבר כאן, באותו מחזור : <span class="wv-bad">✗ ack מוקדם, החוזה דורש מחזור אחד עד ${ltr(MAX_WAIT)} אחרי העלייה</span>`);
+        else if (req[t] && !prevReq) {
           const win = ack.slice(t + 1, t + 1 + MAX_WAIT);
           lines.push(`חוק 2 : ${code("req")} עלה עכשיו (‏${code("$rose(req)")}), ולכן ${code("ack")} חייב להגיע במחזורים ${ltr(`${t + 1}..${t + MAX_WAIT}`)} : ` +
             (win.some((v) => v) ? `<span class="wv-ok">✓ מגיע במחזור ${ltr(t + 1 + win.findIndex((v) => v))}</span>` : win.length < MAX_WAIT ? `החלון עוד פתוח בסוף הרצף` : `<span class="wv-bad">✗ החלון נסגר בלי ack, הכישלון מדווח במחזור ${ltr(t + MAX_WAIT)}</span>`));
         }
-        if (fails.late.includes(t)) lines.push(`חוק 2 : כאן נסגר החלון של העלייה במחזור ${ltr(t - MAX_WAIT)} בלי ${code("ack")} : <span class="wv-bad">✗ ack מאוחר</span>`);
+        if (fails.late.includes(t) && !(req[t] && !prevReq && ack[t])) lines.push(`חוק 2 : כאן נסגר החלון של העלייה במחזור ${ltr(t - MAX_WAIT)} בלי ${code("ack")} : <span class="wv-bad">✗ ack מאוחר</span>`);
         if (ack[t]) lines.push(`חוק 3 : ${code("ack")} גבוה, ולכן ${code("req")} חייב להיות גבוה באותה דגימה : ` + (req[t] ? `<span class="wv-ok">✓</span>` : `<span class="wv-bad">✗ ack יתום</span>`));
         if (t && prevAck) lines.push(`חוק 4 : במחזור ${ltr(t - 1)} היה ${code("ack")}, ולכן ${code("req")} חייב להיות נמוך עכשיו : ` + (!req[t] ? `<span class="wv-ok">✓</span>` : `<span class="wv-bad">✗ req נשאר גבוה אחרי ack</span>`));
         $(".wv-step").innerHTML = `מחזור ${ltr(t)} : ${ltr(`req = ${req[t]}, ack = ${ack[t]}`)}. ` + (lines.length ? lines.join(" ") : `אף property לא נבדקת במחזור הזה (אין אנטצדנט).`);
@@ -112,7 +114,8 @@
   // at once, otherwise it runs over its window and ends in a pass, a fail, or is still
   // open when the trace ends (a window cut by the end, not reported, as on the page).
   //   hold   (req && !ack) |=> req        window t + 1
-  //   late   $rose(req) |-> ##[1:w] ack   window t + 1 .. t + w, passes at the first ack
+  //   late   $rose(req) |-> !ack ##[1:w] ack   fails at t on an ack in the rise cycle,
+  //          otherwise window t + 1 .. t + w, passes at the first ack
   //   orphan ack |-> req                  window t
   //   drop   ack |=> !req                 window t + 1
   // A fail ends at the cycle the SVA reports it, the cycle of hsCheck.
@@ -123,7 +126,8 @@
     for (let t = 0; t < n; t++) {
       const prevReq = t ? req[t - 1] : 0;
       if (req[t] && !ack[t]) next("hold", t, (u) => req[u]); else out.hold.push({ t, end: t, status: "vacuous" });
-      if (req[t] && !prevReq) {
+      if (req[t] && !prevReq && ack[t]) out.late.push({ t, end: t, status: "fail" });
+      else if (req[t] && !prevReq) {
         let u = t + 1;
         while (u <= t + maxWait && u < n && !ack[u]) u++;
         out.late.push(u <= t + maxWait && u < n ? { t, end: u, status: "pass" } : u > t + maxWait ? { t, end: t + maxWait, status: "fail" } : { t, end: n - 1, status: "open" });
@@ -144,7 +148,7 @@
       const N = 12, MAX_WAIT = 3, SW = 36, L = 130, RH = 34;
       const PROPS = [
         ["hold", "a_req_holds", "(req && !ack) |=> req", "חוק 1"],
-        ["late", "a_ack_in_time", "$rose(req) |-> ##[1:3] ack", "חוק 2"],
+        ["late", "a_ack_in_time", "$rose(req) |-> !ack ##[1:3] ack", "חוק 2"],
         ["orphan", "a_no_orphan_ack", "ack |-> req", "חוק 3"],
         ["drop", "a_req_drops", "ack |=> !req", "חוק 4"],
       ];

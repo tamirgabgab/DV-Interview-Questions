@@ -34,6 +34,20 @@ def test_window_and_edges():
     assert only(check_handshake(*wave("1110", "0010")))                         # req high at cycle 0 is a rise
     assert only(check_handshake(*wave("011", "001"), max_wait=1))               # a shorter window
     assert only(check_handshake(*wave("0110", "0000"), max_wait=1), hold=[3], late=[2])
+    assert only(check_handshake(*wave("0100", "0100")), late=[1])               # ack in the rise cycle: too early, at once
+    assert only(check_handshake(*wave("1000", "1000")), late=[0])               # the same at cycle 0
+
+
+def test_ack_in_the_rise_cycle_is_caught():
+    """Regression (the brute force of the contract figure found it): an ack in the cycle req
+    rises breaks rule 2 ("one to three cycles after"), but a window alone, ##[1:3] ack, was
+    satisfied by the ack of a later, quick transaction. The rule now checks !ack in the
+    rise cycle and fails there, whatever follows."""
+    # cycle:                     0 1 2 3 4 5
+    req, ack = wave("010110", "010010")      # rise at 1 with ack; rise at 3, ack at 4 (inside 1's window)
+    assert only(check_handshake(req, ack), late=[1])
+    req, ack = wave("0101100", "0100100")    # the same with the second ack at the window's last cycle
+    assert only(check_handshake(req, ack), late=[1])
 
 
 def independent(req, ack, max_wait=3):
@@ -47,7 +61,10 @@ def independent(req, ack, max_wait=3):
             fails["drop"].append(t)
         if t and req[t - 1] and not ack[t - 1] and not req[t]:
             fails["hold"].append(t)
-        if req[t] and (t == 0 or not req[t - 1]) and t + max_wait < n and not any(ack[t + 1:t + 1 + max_wait]):
+        rose = req[t] and (t == 0 or not req[t - 1])
+        if rose and ack[t]:
+            fails["late"].append(t)
+        elif rose and t + max_wait < n and not any(ack[t + 1:t + 1 + max_wait]):
             fails["late"].append(t + max_wait)
     return fails
 
@@ -170,8 +187,8 @@ def test_contract_figure():
     """The contract figure (tools/figures/q0038.py) against the page's check_handshake:
     every walk on the solid arrows passes, every dashed sample fails exactly the rule it is
     marked with, in that cycle; and, over every trace of 8 samples closed by idle cycles,
-    the drawing and the model disagree only where ack comes in the cycle req rises (the
-    contract's "one to three cycles" rules it out, the SVA window lets a later ack cover it)."""
+    the drawing and the model agree (an ack in the rise cycle included: the window alone
+    let a later transaction's ack cover it, the !ack of rule 2 catches it)."""
     import itertools
 
     q = _fig()
@@ -197,7 +214,7 @@ def test_contract_figure():
         passes = not any(_run(seq + [(0, 0)] * 4).values())
         if passes != (_walk(q, seq) in ("IDLE", "ACK")):
             disagree.append(seq)
-    assert disagree and all(any(s == (1, 1) and p[0] == 0 for p, s in zip(seq, seq[1:])) for seq in disagree)
+    assert disagree == []
     svg = q.figure()
     assert svg.count('class="fc-move"') == len(q.MOVES) and svg.count('class="fc-badge"') == len(q.BAD)
 
