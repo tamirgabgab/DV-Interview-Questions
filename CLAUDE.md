@@ -35,6 +35,16 @@ session.
   heading in words ("L − 1", "בזיכרון קבוע") and keep its old anchor with `{ #id }`.
 - Long display math or inline chains widen the page on phones: split equations with
   `aligned`, write number chains as text in `<span dir="ltr">`.
+- Numbers whose order is left to right must be isolated LTR in Hebrew text, table cells,
+  figure legends and the explorers' strings: in a right-to-left line a space or ", "
+  between numbers splits them into runs that the browser lays out from the right. Bits or
+  digits written apart ("0 1" showed as "1 0" in 0055's state codes), rows of a matrix or
+  an array ("1 1 1 1 0", 0046) and ordered tuples ("(3, 1)" read as (1, 3) in 0013) go in
+  `<span dir="ltr">…</span>` (in a generator, a helper like `ltr_bits` in q0055.py), or
+  are written without spaces ("01"), or in math or code. A cell that then starts with
+  the span gets the RLM first. Plain lists read in order ("1, 2, 4, 8"), years and
+  thousands separators ("1,000") need nothing. Before pushing a page with such
+  numbers, look at the rendered line, not only the source.
 
 ## Question pages
 

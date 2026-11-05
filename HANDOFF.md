@@ -2160,6 +2160,15 @@ section below starts at session 22, whose numbered items run on through the late
     motion and webdriver, hidden on phones. Eight contrast pairs; tests: the chip is
     deterministic, pins = parts, lit cells = the id's bits, every header has its chip. /all/
     +41 KB HTML (+1.2 KB gzipped).
+147. **Numbers laid out from the right (session 32, 2026-11-05).** The owner caught 0055's
+    state codes shown reversed: "0 1" in a right-to-left cell is two digit runs that the
+    browser lays out from the right, so r = 1 (01) read "1 0". Fixed with ltr_bits in
+    q0055.py; a scan of every built page and every box after a few steps found the same in
+    0046's heights rows (fixed) and in ordered tuples, "(3, 1)" read as (1, 3): 0013
+    (q0013.py), 0018, 0019, 0047, 0043, 0055's Gray order, 0080's legend (q0080.py) and
+    0082's (1, 1, 4) (q0082.py) are now isolated LTR. Lists read in order, years and
+    thousands separators stay as they are; 0025's sequence numbers inside a generated
+    stepper were left. CLAUDE.md gained the rule (Language and RTL).
 
 ## In progress
 
