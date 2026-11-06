@@ -428,6 +428,11 @@ PAIRS = [
     ("0095 soldiers, a distance on weight 6", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 4%, var(--md-default-bg-color))"], TEXT),
     ("0095 soldiers, the meter's bar", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0095 soldiers, the meter's mark of 1, above and below the bar", "var(--viz-ink)", [CARD, PAGE], UI),
+    # 0096 kelly (stylesheets/questions/0096-kelly.css): the curve g(f), the median, the line W0 e^(g t)
+    ("0096 kelly, the curve g(f) and the best fraction f*", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0096 kelly, the median of the paths and the current f", "var(--viz-ink)", [CARD, PAGE], UI),
+    ("0096 kelly, the line W0 e^(g t) and the zero of the growth", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0096 kelly, half Kelly", "var(--viz-s3)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

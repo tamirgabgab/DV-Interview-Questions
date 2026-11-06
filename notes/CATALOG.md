@@ -1,6 +1,6 @@
 # Catalog
 
-All 94 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 95 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/build/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -99,3 +99,4 @@ All 94 questions, with links to their pages on the [live site](https://tamirgabg
 | 0093 | [שידוך יציב – 6 מועמדים ו-6 משרות, האלגוריתם של Gale–Shapley, וכל השידוכים היציבים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0093-stable-matching/) | junior (ג'וניור) |
 | 0094 | [מונה credits בהליכה אקראית – יתמלא או יתרוקן?](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0094-credit-counter-random-walk/) | junior (ג'וניור) |
 | 0095 | [החיילים של Conway – כמה רחוק אפשר להגיע מעבר לקו](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0095-conways-soldiers/) | senior (סניור) |
+| 0096 | [כמה להמר בכל סיבוב – קריטריון Kelly](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0096-kelly-criterion/) | junior (ג'וניור) |

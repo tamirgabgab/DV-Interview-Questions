@@ -159,6 +159,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0093-match.css       # 0093: stable matching, the figure and the box (session 32)
   - stylesheets/questions/0094-creditwalk.css  # 0094: the credit counter as a random walk, its charts and box (session 33)
   - stylesheets/questions/0095-soldiers.css    # 0095: Conway's soldiers, the boards and the box (session 33)
+  - stylesheets/questions/0096-kelly.css       # 0096: the Kelly criterion, its charts and box (session 33)
 
 extra_javascript:
   - javascripts/mathjax.js

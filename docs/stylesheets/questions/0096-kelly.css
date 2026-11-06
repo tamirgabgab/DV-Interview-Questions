@@ -1,0 +1,22 @@
+/* Question 0096, the Kelly criterion: the figures of tools/figures/q0096.py and the box of
+   explorer/kelly.js (ky-*). The charts use the site's chart classes: s1 for the curve g(f)
+   and the best fraction f*, s2 for the line W0 e^(g t) and the fraction where the growth
+   falls back to 0, s3 for half Kelly, ink for the median and the current f. The single
+   paths of the wealth are thin and faded: they show the spread, not one value to read.
+   Colours from the palette only. */
+
+.md-typeset .ky-fig svg { display: block; width: 100%; height: auto; }
+
+/* a path of the wealth, in the figure and in the box */
+.md-typeset svg .ky-path { stroke: var(--viz-s1); stroke-opacity: 0.38; }
+
+/* the box: the paths and the curve side by side, one column on a phone */
+.md-typeset .explorer .ky-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin: 0.4rem 0; }
+.md-typeset .explorer .ky-grid svg { display: block; width: 100%; height: auto; }
+@media (max-width: 36em) {
+  .md-typeset .explorer .ky-grid { grid-template-columns: 1fr; }
+}
+.md-typeset svg .ky-now { stroke: var(--md-default-bg-color); stroke-width: 2; }
+
+/* the legend key of a single path: a thin faded line */
+.md-typeset .viz-legend .ky-key-path { height: 0; border-top: 2px solid var(--viz-s1); border-radius: 0; opacity: 0.45; }

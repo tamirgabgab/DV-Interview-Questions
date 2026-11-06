@@ -775,6 +775,16 @@ below start at item 112 (session 31).
     the known minimum without a proof. Box `soldiers` (prefix `cy-`: `cs-` belongs to 0020
     and 0023; `stylesheets/questions/0095-soldiers.css`): place and jump with undo, a
     potential meter against 1, and the stored plays of rows 1 to 4.
+167. **Question 0096, the Kelly criterion (session 33, 2026-11-06).** Chosen from eight
+    proposals with 0097, after guiding questions; junior / medium, kind math, Python only,
+    probability path. Part א: a coin of 0.6 at even odds, f = 0.2 maximizes the growth
+    g(f) = 0.6 ln(1+f) + 0.4 ln(1−f) ≈ 0.0201 (median ×7.5 after 100 rounds), all-in
+    survives with 0.6^100, zero growth at f ≈ 0.389. Part ב: f* = 2p − 1, g* = ln 2 − H(p).
+    Part ג: a win pays a times the stake, a loss costs b times: f* = p/b − q/a when pa > qb.
+    Part ד: a horse race, all-in gives b = p whatever the odds (Gibbs), with cash Kelly's
+    sorting algorithm with a KKT proof; a 4-horse example. Box `kelly` (prefix `ky-`,
+    `stylesheets/questions/0096-kelly.css`): sliders for p, a, b and f, 30 seeded paths on a
+    log scale with the median, beside g(f) with f* marked.
 
 
 ---
