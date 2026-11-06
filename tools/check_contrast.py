@@ -346,14 +346,6 @@ PAIRS = [
     ("0087 lights out, a light's number, a caption, the equals sign", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0087 lights out, a count under a cell", "var(--viz-ink)", [CARD, PAGE], TEXT),
     ("0087 lights out, a press of the solution in the system", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
-    # 0090 pancakes (33-pancake.css): the stacks of the figures and of the box
-    ("0090 pancakes, a size on a pancake", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], TEXT),
-    ("0090 pancakes, a size on a pancake in place", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color))"], TEXT),
-    ("0090 pancakes, the edge of a pancake", "var(--viz-s2-text)", [CARD, PAGE], UI),
-    ("0090 pancakes, the burnt side on a pancake", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], UI),
-    ("0090 pancakes, the frame of a flip", "var(--viz-s1)", [CARD, PAGE], UI),
-    ("0090 pancakes, the hint", "var(--viz-s4)", [CARD, PAGE], UI),
-    ("0090 pancakes, the plate", "var(--viz-text)", [CARD, PAGE], UI),
     # 0088 ducci (31-ducci.css): the circle of numbers, the parity rows, the box's chart
     ("0088 ducci, a number on the circle", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color))"], TEXT),
     ("0088 ducci, the rim of a number", "var(--viz-s1)", [CARD, PAGE], UI),
@@ -364,6 +356,23 @@ PAIRS = [
     ("0088 ducci, the frame of an all-even row", "var(--viz-s3-text)", [CARD, PAGE], UI),
     ("0088 ducci, a panel title, a round number, a chart label", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0088 ducci, a bar of the round where all turned even", "var(--viz-s3)", [CARD, PAGE], UI),
+    # 0089 frobenius (32-frobenius.css): the amount tables of the figures and of the box
+    ("0089 frobenius, a payable amount", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0089 frobenius, an amount that cannot be paid", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
+    ("0089 frobenius, the frame of the largest amount that cannot be paid", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], UI),
+    ("0089 frobenius, the frame of a payable amount of the run", "var(--viz-s3-text)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0089 frobenius, the head of a column", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0089 frobenius, the frame of a head and of the best so far", "var(--viz-s1)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0089 frobenius, the column settled now and the typed amount", "var(--viz-ink)", [CARD, PAGE], UI),
+    ("0089 frobenius, an amount not settled yet, the remainders", "var(--viz-text)", [CARD, PAGE], TEXT),
+    # 0090 pancakes (33-pancake.css): the stacks of the figures and of the box
+    ("0090 pancakes, a size on a pancake", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], TEXT),
+    ("0090 pancakes, a size on a pancake in place", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color))"], TEXT),
+    ("0090 pancakes, the edge of a pancake", "var(--viz-s2-text)", [CARD, PAGE], UI),
+    ("0090 pancakes, the burnt side on a pancake", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], UI),
+    ("0090 pancakes, the frame of a flip", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0090 pancakes, the hint", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0090 pancakes, the plate", "var(--viz-text)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
