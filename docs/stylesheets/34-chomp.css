@@ -1,0 +1,41 @@
+/* Question 0091, Chomp: the bars of tools/figures/q0091.py (cp-fig) and of the box of
+   explorer/chomp.js (cp-board). A square of chocolate is a warm tile, the poisoned a1 a
+   magenta tile with a cross, the squares the last move ate are dashed, the square chosen is
+   framed in blue; in the box a winning move is framed in green and a losing one dashed grey.
+   Colours from the palette only. */
+
+.md-typeset svg.cp-fig { display: block; margin: 0.8rem auto; }
+.md-typeset .explorer svg.cp-board { display: block; margin: 0.5rem auto; }
+
+/* the squares */
+.md-typeset svg .cp-sq { fill: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); stroke: var(--viz-s2-text); stroke-width: 1.2; }
+.md-typeset svg .cp-poison { fill: color-mix(in srgb, var(--viz-s5) 30%, var(--md-default-bg-color)); stroke: var(--viz-s5); stroke-width: 1.5; }
+.md-typeset svg .cp-cross { fill: none; stroke: var(--viz-ink); stroke-width: 2.2; stroke-linecap: round; }
+.md-typeset svg .cp-gone { fill: none; stroke: var(--viz-text); stroke-width: 1.3; stroke-dasharray: 4 3; }
+.md-typeset svg .cp-empty { fill: none; stroke: var(--viz-grid); stroke-width: 1; }
+
+/* the square chosen, and in the box the winning and the losing moves */
+.md-typeset svg .cp-pick { fill: none; stroke: var(--viz-s1); stroke-width: 3; }
+.md-typeset svg .cp-win { fill: none; stroke: var(--viz-s3-text); stroke-width: 3; }
+.md-typeset svg .cp-lose { fill: none; stroke: var(--viz-text); stroke-width: 1.5; stroke-dasharray: 3 3; }
+
+/* the column letters, the row numbers and the captions */
+.md-typeset svg .cp-lab { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 12px; }
+.md-typeset svg .cp-cap { fill: var(--viz-text); font-family: var(--md-text-font-family); font-size: 13px; }
+
+/* the box: a square is a button */
+.md-typeset svg .cp-btn { cursor: pointer; }
+.md-typeset svg .cp-btn .cp-ring { fill: none; stroke: none; }
+.md-typeset svg .cp-btn:hover .cp-ring { stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .cp-btn:focus { outline: none; }
+.md-typeset svg .cp-btn:focus-visible .cp-ring { stroke: var(--site-focus-ring); stroke-width: 3; }
+.md-typeset .explorer .cp-why { min-height: 3em; }
+.md-typeset .explorer .cp-log { font-size: 0.7rem; }
+
+/* the legend keys */
+.md-typeset .viz-legend .cp-key-sq { background: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); border-radius: 3px; outline: 1.2px solid var(--viz-s2-text); outline-offset: -1px; }
+.md-typeset .viz-legend .cp-key-poison { background: color-mix(in srgb, var(--viz-s5) 30%, var(--md-default-bg-color)); border-radius: 3px; outline: 1.5px solid var(--viz-s5); outline-offset: -1px; }
+.md-typeset .viz-legend .cp-key-pick { background: none; border-radius: 3px; outline: 3px solid var(--viz-s1); outline-offset: -3px; }
+.md-typeset .viz-legend .cp-key-gone { background: none; border-radius: 3px; outline: 1.3px dashed var(--viz-text); outline-offset: -1px; }
+.md-typeset .viz-legend .cp-key-win { background: none; border-radius: 3px; outline: 3px solid var(--viz-s3-text); outline-offset: -3px; }
+.md-typeset .viz-legend .cp-key-lose { background: none; border-radius: 3px; outline: 1.5px dashed var(--viz-text); outline-offset: -2px; }

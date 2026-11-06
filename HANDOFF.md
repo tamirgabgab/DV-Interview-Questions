@@ -2319,13 +2319,44 @@ section below starts at session 22, whose numbered items run on through the late
     down, at most 3n − 2; BFS gives 2n for n = 2..7 (15 at n = 8 cited). q0090.py,
     pancake.js (click to flip, flips against the BFS minimum, hint, plain or burnt),
     33-pancake.css, seven contrast pairs. Tests: every stack against the reference, Node, SV.
+160. **Question 0091, Chomp (session 32, 2026-11-06).** The owner chose three of eight
+    proposals (0091 to 0093) and set the order of each: a specific case first, then the
+    general one. Senior / medium, Python and SV, advanced-algorithms path after 0082. Squares
+    named like a chessboard, the poison a1. Part a: 4×4, b2 leaves an L of equal arms, then
+    the mirror (`mirror_move`). Part b: every n×n; positions are staircases; memoized search
+    (`eat`, `moves`, `wins`, `winning_moves`; the SV iterative in lexicographic order, 4 bits
+    a column, up to 8 columns); 8×8 has 12,869 positions with the poison and b2 is the only
+    winning first move. Part c: strategy stealing, the top-right corner loses on 3×3, two
+    rows by `two_rows_move`, a table of the winning first moves for 1–7 rows by 1–8 columns
+    (each unique). q0091.py, chomp.js (play against perfect play with winning and losing
+    squares marked; the mirror on n×n), 34-chomp.css, eight contrast pairs.
+161. **Question 0092, points on a circle (session 32, 2026-11-06).** Student / medium,
+    Python and SV, geometry-motion path after 0080. Part a: 5 points → 16; each chord adds 1
+    + the chords it crosses. Part b: 6 points → 31, not 32; C(n,4) + C(n,2) + 1 proved chord
+    by chord and by Euler (V = n + C(n,4), E = n + C(n,2) + 2C(n,4)); the pattern equals
+    2^(n−1) only while n ≤ 5. Part c: `count_regions(angles)` from coordinates; the regular
+    hexagon gives 30; a point of m chords loses C(m−1, 2); regular polygons 3–12 computed,
+    odd n on the formula (Poonen–Rubinstein, cited). q0092.py (faces traced by a half-edge
+    walk), circlecut.js (drag or keyboard points, regular mode, chords one at a time; the
+    SVG is kept and only its content redrawn so keyboard focus survives the figure
+    wrapper), 35-circle.css, seven contrast pairs.
+162. **Question 0093, stable matching (session 32, 2026-11-06).** Junior / medium, Python and
+    SV, coding path (last). Candidates A–F and jobs 1–6, chosen by search: 5 stable
+    matchings, every partner different between the extremes. Part a: a greedy matching with
+    3 blocking pairs; proposals take 11 in 5 rounds. Part b: `gale_shapley` with a rank
+    table, at most n² − n + 1 proposals (reached), stable, proposer-optimal,
+    receiver-pessimal. Part c: all 720 matchings give 5 stable ones; best for one side =
+    worst for the other; the lattice. Follow-ups: capacities, roommates with no stable split,
+    lying. q0093.py (`rtl_cells` puts an RLM before cells that start in Latin), matching.js
+    (two right-to-left tables, proposals step by step, who proposes, editing), 36-match.css,
+    nine contrast pairs.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139); questions 0078 to 0082 (items 140 to 144); the UX audit's fixes and the circuit layer (items 145, 146); numbers laid out from the right (item 147); the finishing round, the living layer and four figures (items 148 to 150); 0038's rule 2 (item 151); questions 0083 and 0084 (items 152, 153); questions 0085 to 0087 (items 154 to 156); questions 0088 to 0090 (items 157 to 159).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139); questions 0078 to 0082 (items 140 to 144); the UX audit's fixes and the circuit layer (items 145, 146); numbers laid out from the right (item 147); the finishing round, the living layer and four figures (items 148 to 150); 0038's rule 2 (item 151); questions 0083 and 0084 (items 152, 153); questions 0085 to 0087 (items 154 to 156); questions 0088 to 0090 (items 157 to 159); questions 0091 to 0093 (items 160 to 162).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
