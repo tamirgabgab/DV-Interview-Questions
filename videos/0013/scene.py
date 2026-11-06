@@ -1,6 +1,6 @@
 """The tutorial video of question 0013, sort four digits and subtract (script: script.md).
 
-Render with `python videos/render.py 0013` (see VIDEOS.md). The owner's choices
+Render with `python videos/render.py 0013` (see notes/VIDEOS.md). The owner's choices
 (2026-11-02): one sentence linking to video 0012 (three digits, 495), the video standing on
 its own; part א with the page's code typed and run with its trace on 6174 and on 3524 (not
 special), beside the page's column subtraction; part ב the proof through the grid of the

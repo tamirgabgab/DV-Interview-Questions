@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Click every button of every explorer box on the built site.
 
-    mkdocs build --strict && python tools/check_explorers.py [site]
+    mkdocs build --strict && python tools/checks/check_explorers.py [site]
 
 Serves the site locally and opens every page that has an explorer box (`div.explorer`) in
 Chromium at 390 x 844 px, with every collapsible block open. In each box it clicks every
@@ -22,7 +22,7 @@ different drawing (hidden elements aside) is a warning, since a box may draw fro
 history. "Reset everything" must then forget the state.
 --no-links skips this part.
 
-Needs Playwright, as tools/check_phone.py. In a sandbox without access to the CDNs,
+Needs Playwright, as tools/checks/check_phone.py. In a sandbox without access to the CDNs,
 --offline ignores errors of external scripts and --route REGEX=FILE serves a CDN script
 from a local copy; --local-cdn does both with the copies of .cache/cdn (tools/dev_setup.sh);
 --only REGEX checks only the matching pages. --shard K/N checks the K-th
@@ -38,7 +38,7 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1])]
 from check_phone import HEIGHT, OPEN_ALL, WIDTH, local_cdn_routes, serve  # noqa: E402
 
 BUTTONS = "button, [role=button]"

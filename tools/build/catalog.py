@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Write CATALOG.md: every question's id, its Hebrew title as a link to its page on the
+"""Write notes/CATALOG.md: every question's id, its Hebrew title as a link to its page on the
 live site, and its level, read from the pages' front matter. Also write the README's table
 of tutorial videos (between `<!-- videos -->` and `<!-- /videos -->`): one row per
 `videos/<id>/script.md`, with the page, the number of chapters, the length and download
 links to the files of `videos/<id>/release/` (render.py --release writes them and their
 info.json), and the YouTube link once the page has a `video:` id.
 
-    python tools/catalog.py           # rewrite CATALOG.md and the README's video table
-    python tools/catalog.py --check   # exit 1 when either is out of date
+    python tools/build/catalog.py           # rewrite notes/CATALOG.md and the README's video table
+    python tools/build/catalog.py --check   # exit 1 when either is out of date
 
-tools/new_question.py rewrites it when it adds a page; a test checks it is up to date.
+tools/authoring/new_question.py rewrites it when it adds a page; a test checks it is up to date.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 SITE = "https://tamirgabgab.github.io/DV-Interview-Questions/"
 RAW = "https://github.com/tamirgabgab/DV-Interview-Questions/raw/main/"
 RELEASE = [("{id}.mp4", "video"), ("{id}-music.mp3", "music"),
@@ -50,7 +50,7 @@ def render(root: Path) -> str:
             for qid, title, level, path in pages(root)]
     return ("# Catalog\n\n"
             f"All {len(rows)} questions, with links to their pages on the [live site]({SITE}). Written by\n"
-            "`python tools/catalog.py` from the pages' front matter; do not edit by hand.\n\n"
+            "`python tools/build/catalog.py` from the pages' front matter; do not edit by hand.\n\n"
             "| Id | Question | Level |\n|----|----------|-------|\n" + "\n".join(rows) + "\n")
 
 
@@ -91,7 +91,7 @@ def render_readme(root: Path) -> str:
 
 
 def write(root: Path = ROOT) -> Path:
-    path = root / "CATALOG.md"
+    path = root / "notes/CATALOG.md"
     path.write_text(render(root), encoding="utf-8")
     if (root / "README.md").exists():   # a scratch tree in the tests has none
         (root / "README.md").write_text(render_readme(root), encoding="utf-8")
@@ -100,16 +100,16 @@ def write(root: Path = ROOT) -> Path:
 
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--check", action="store_true", help="only check that CATALOG.md is up to date")
+    ap.add_argument("--check", action="store_true", help="only check that notes/CATALOG.md is up to date")
     if ap.parse_args(argv).check:
-        path = ROOT / "CATALOG.md"
+        path = ROOT / "notes/CATALOG.md"
         if not path.exists() or path.read_text(encoding="utf-8") != render(ROOT):
-            print("CATALOG.md is out of date: run python tools/catalog.py")
+            print("notes/CATALOG.md is out of date: run python tools/build/catalog.py")
             return 1
         if (ROOT / "README.md").read_text(encoding="utf-8") != render_readme(ROOT):
-            print("the README's video table is out of date: run python tools/catalog.py")
+            print("the README's video table is out of date: run python tools/build/catalog.py")
             return 1
-        print("CATALOG.md and the README's video table are up to date")
+        print("notes/CATALOG.md and the README's video table are up to date")
         return 0
     print(f"wrote {write().relative_to(ROOT)}")
     return 0

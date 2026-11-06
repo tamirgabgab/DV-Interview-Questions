@@ -4,7 +4,8 @@ Older parts of `HANDOFF.md`, moved here in session 26 (2026-10-25) to keep the l
 short: the work log of sessions 1 to 21, the "In progress" notes of sessions 20 to 26 as
 they were written, and the finished rounds U to X with the explorer survey. Nothing here
 is open; the current state, the open items and the proposals are in `HANDOFF.md`.
-Session 27 added the proposals that were never picked, at the end.
+Session 27 added the proposals that were never picked, at the end. Sessions 22 to 30 are in
+`HANDOFF-archive-2.md` (session 33).
 
 ---
 

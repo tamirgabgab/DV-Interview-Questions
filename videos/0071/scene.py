@@ -1,6 +1,6 @@
 """The tutorial video of question 0071, the three-wizard duel (script: script.md).
 
-Render with `python videos/render.py 0071` (see VIDEOS.md). The question has no code, so
+Render with `python videos/render.py 0071` (see notes/VIDEOS.md). The question has no code, so
 each part is a proof step by step, as in 0015, 0029 and 0026: one line of the argument at
 a time, in LaTeX, under its caption. Every number is recomputed here with exact fractions
 against the page's own reference, tools/figures/q0071.py (imported), and asserted.

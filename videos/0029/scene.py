@@ -1,7 +1,7 @@
 """The tutorial video of question 0029, three clock hands: how many meetings a day (script:
 script.md).
 
-Render with `python videos/render.py 0029` (see VIDEOS.md). The question has no code, so
+Render with `python videos/render.py 0029` (see notes/VIDEOS.md). The question has no code, so
 each part is a proof step by step (the owner, 2026-10-31): one line of the argument at a
 time under its caption, the earlier lines dimmed, the key numbers in amber. The math is set
 by LaTeX (`TX`, as in 3Blue1Brown's videos); words stay in Inter.

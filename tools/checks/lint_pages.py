@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 r"""Lint the question pages for the site's writing conventions.
 
-    python tools/lint_pages.py            # all pages
-    python tools/lint_pages.py 12 14      # some pages
+    python tools/checks/lint_pages.py            # all pages
+    python tools/checks/lint_pages.py 12 14      # some pages
 
 Checks, per page:
 - RTL safety: outside code blocks, HTML and math, no paragraph, list item, heading or
@@ -20,7 +20,7 @@ Checks, per page:
   the ``trap`` / ``followup`` types (a top-level ``note`` / ``warning`` titled like an
   interviewer / trap / follow-up block is reported; other notes may keep their type).
 - Video fields: ``video`` is a YouTube id and ``video_parts`` has one rising start time
-  per part from 0 (``video_problems`` of tools/check_videos.py, which the hook runs too).
+  per part from 0 (``video_problems`` of tools/checks/check_videos.py, which the hook runs too).
 - Code highlights: every line named in ``hl_lines=`` exists in the (dedented) block and is
   a code line, not a blank line, a comment alone or a bare ``end`` / ``endfunction``, so the
   highlights keep pointing at the code the explanation names after the block is edited.
@@ -37,7 +37,7 @@ import sys
 import textwrap
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1])]
 from check_videos import split_front_matter, video_problems  # noqa: E402
 from extract_code import FENCE, QUESTIONS, question_path  # noqa: E402
 
@@ -139,7 +139,7 @@ def topic_names() -> dict[str, str]:
     """The TOPICS table of hooks/questions.py (the Hebrew name of every topic), read
     without importing the hook."""
     import ast
-    src = (Path(__file__).resolve().parents[1] / "hooks" / "questions.py").read_text(encoding="utf-8")
+    src = (Path(__file__).resolve().parents[2] / "hooks" / "questions.py").read_text(encoding="utf-8")
     for node in ast.parse(src).body:
         if isinstance(node, ast.Assign) and any(getattr(t, "id", "") == "TOPICS" for t in node.targets):
             return ast.literal_eval(node.value)

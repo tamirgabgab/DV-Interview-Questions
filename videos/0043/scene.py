@@ -1,6 +1,6 @@
 """The tutorial video of question 0043, horse races without a stopwatch (script: script.md).
 
-Render with `python videos/render.py 0043` (see VIDEOS.md). Part א draws the 36 horses as a
+Render with `python videos/render.py 0043` (see notes/VIDEOS.md). Part א draws the 36 horses as a
 grid in Manim, a row per group and a column per place in the group, on the page's example
 (seed 3, the same hidden speeds as the page's first box): the group races put each row in
 order, the winners' race sorts the rows, every horse shows how many horses are known to be

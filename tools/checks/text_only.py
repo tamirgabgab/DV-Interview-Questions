@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Is a change text only? The CI's fast lane (.github/workflows/deploy.yml).
 
-    python tools/text_only.py BASE HEAD          # prints the verdict, exits 0 either way
-    python tools/text_only.py BASE HEAD --github # also writes fast= and ids= to $GITHUB_OUTPUT
+    python tools/checks/text_only.py BASE HEAD          # prints the verdict, exits 0 either way
+    python tools/checks/text_only.py BASE HEAD --github # also writes fast= and ids= to $GITHUB_OUTPUT
 
 A change is text only when every file it touches is a question page
 (docs/questions/<level>/<id>-<slug>.md) or a file the workflow ignores anyway (README,
@@ -27,8 +27,7 @@ import sys
 
 PAGE = re.compile(r"^docs/questions/[a-z]+/(\d{4})-[^/]+\.md$")
 # Files the workflow ignores (paths-ignore) or that are not part of the site.
-IGNORED = re.compile(r"^(README\.md|CONTRIBUTING\.md|CATALOG\.md|HANDOFF\.md|HANDOFF-archive\.md"
-                     r"|CLAUDE\.md|VIDEOS\.md|videos/.*)$")
+IGNORED = re.compile(r"^(README\.md|CONTRIBUTING\.md|CLAUDE\.md|notes/.*|videos/.*)$")
 FENCE = re.compile(r"^\s*(`{3,}|~{3,})")
 GEN_OPEN = re.compile(r"<!--\s*gen\s+\d+\s*-->")
 GEN_CLOSE = re.compile(r"<!--\s*/gen\s*-->")

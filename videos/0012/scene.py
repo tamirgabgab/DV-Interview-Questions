@@ -1,6 +1,6 @@
 """The tutorial video of question 0012, sort the digits and subtract (script: script.md).
 
-Render with `python videos/render.py 0012` (see VIDEOS.md). The owner's choice
+Render with `python videos/render.py 0012` (see notes/VIDEOS.md). The owner's choice
 (2026-11-01): parts א and ב in full, part ג briefly. Part א: the step on 352 drawn as digit
 cells (sort once: ascending is the smallest, reversed the largest), the box's column
 subtraction on the page's examples, `is_special` typed and traced on 352 and 495 beside

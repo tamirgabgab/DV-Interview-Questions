@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Start a new question: the page, its tests folder, a figure generator and the catalog row.
 
-    python tools/new_question.py --level junior --difficulty medium --kind math --slug cake-split \\
+    python tools/authoring/new_question.py --level junior --difficulty medium --kind math --slug cake-split \\
         --title "חלוקת עוגה" --tags math,sequences [--figures] [--code]
 
-Takes the next free id, copies templates/question.md to docs/questions/<level>/<id>-<slug>.md
+Takes the next free id, copies tools/authoring/question.md to docs/questions/<level>/<id>-<slug>.md
 with the front matter filled in, and creates:
 
 - tests/<id>/test_<id>.py: a stub test (with --figures, the "page blocks match the
@@ -13,7 +13,7 @@ with the front matter filled in, and creates:
   first gen markers on the page (see tools/figures/fill.py);
 - tests/<id>/tb.sv and tests/<id>/demo.py with --code: a testbench that pulls the page's
   SystemVerilog block and the starting code of the run panel;
-- CATALOG.md rewritten with the new page (tools/catalog.py).
+- notes/CATALOG.md rewritten with the new page (tools/build/catalog.py).
 
 Nothing is overwritten: the script stops if a file it would write already exists.
 """
@@ -26,7 +26,8 @@ import re
 import sys
 from pathlib import Path
 
-import catalog
+sys.path[:0] = [str(Path(__file__).resolve().parents[1]), str(Path(__file__).resolve().parents[1] / "build")]
+import catalog  # noqa: E402
 
 LEVELS = ("student", "junior", "senior")
 DIFFICULTIES = {"easy": "🟢 easy", "medium": "🟡 medium", "hard": "🔴 hard"}
@@ -131,7 +132,7 @@ def create(root: Path, level: str, difficulty: str, slug: str, title: str, tags:
     today = today or datetime.date.today().isoformat()
     tid = f"{qid:04d}"
     files = {root / "docs" / "questions" / level / f"{tid}-{slug}.md":
-             page_text((root / "templates" / "question.md").read_text(encoding="utf-8"),
+             page_text((root / "tools" / "authoring" / "question.md").read_text(encoding="utf-8"),
                        qid, title, level, difficulty, tags, today, figures, kind)}
     test = FIGURES_TEST if figures else CODE_TEST if code else NUMBERS_TEST
     files[root / "tests" / tid / f"test_{tid}.py"] = test.format(qid=qid)
@@ -163,13 +164,13 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--figures", action="store_true", help="add a figure generator and gen markers")
     ap.add_argument("--code", action="store_true", help="add tb.sv, demo.py and a code test")
     args = ap.parse_args(argv)
-    root = Path(__file__).resolve().parent.parent
+    root = Path(__file__).resolve().parents[2]
     tags = [t.strip() for t in args.tags.split(",") if t.strip()]
     written = create(root, args.level, args.difficulty, args.slug, args.title, tags, args.figures, args.code,
                      kind=args.kind)
     for p in written:
         print(f"wrote {p.relative_to(root)}")
-    print("next: write the page, then python tools/lint_pages.py and python tools/run_tests.py <id>")
+    print("next: write the page, then python tools/checks/lint_pages.py and python tools/checks/run_tests.py <id>")
     return 0
 
 

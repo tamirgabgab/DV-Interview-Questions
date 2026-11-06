@@ -1,6 +1,6 @@
 """The tutorial video of question 0002, swap two variables (script: script.md).
 
-Render with `python videos/render.py 0002` (see VIDEOS.md). The example is the page's,
+Render with `python videos/render.py 0002` (see notes/VIDEOS.md). The example is the page's,
 a = 5 and b = 3; the code beats run the page's Python on v = [5, 3], i = 0, j = 1.
 """
 
@@ -15,7 +15,7 @@ from dvq import (TX, BoxView, C, Cell, CodePanel, DVQScene, M, T, cost_chips,  #
                  page_python, trace)
 
 QID = 2
-# The page's three trace boxes (VIDEOS.md, "The page's box"): picture k after k clicks on
+# The page's three trace boxes (notes/VIDEOS.md, "The page's box"): picture k after k clicks on
 # "next", the box's line k run on a = 5, b = 3.
 BOXES = {
     "temp": {"box": 0, "region": [".ex-play-row", ".tr-box", ".tr-step"], "hide": [".ex-scrubwrap"],

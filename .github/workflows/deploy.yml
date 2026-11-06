@@ -5,9 +5,9 @@ name: Build and deploy site
 on:
   push:
     branches: ["**"]
-    paths-ignore: ["README.md", "CONTRIBUTING.md", "CATALOG.md", "HANDOFF.md", "HANDOFF-archive.md", "CLAUDE.md"]
+    paths-ignore: ["README.md", "CONTRIBUTING.md", "CLAUDE.md", "notes/**"]
   pull_request:
-    paths-ignore: ["README.md", "CONTRIBUTING.md", "CATALOG.md", "HANDOFF.md", "HANDOFF-archive.md", "CLAUDE.md"]
+    paths-ignore: ["README.md", "CONTRIBUTING.md", "CLAUDE.md", "notes/**"]
   workflow_dispatch:
     inputs:
       phone_dark:
@@ -62,7 +62,7 @@ jobs:
       # The fast lane: a push that changes only the prose of question pages (or only files
       # outside the site, the videos and the notes) runs the lint, the build, the links, the
       # touched questions' Python tests and the phone check of the touched pages, a few
-      # minutes, instead of every check (tools/text_only.py, CONTRIBUTING.md "The fast lane").
+      # minutes, instead of every check (tools/checks/text_only.py, CONTRIBUTING.md "The fast lane").
       # The history is fetched without file contents; git reads the two versions it compares.
       - uses: actions/checkout@v7
         if: github.event_name == 'push'
@@ -72,7 +72,7 @@ jobs:
       - id: text
         run: |
           if [ "${{ github.event_name }}" = push ]; then
-            python3 tools/text_only.py "${{ github.event.before }}" "${{ github.sha }}" --github
+            python3 tools/checks/text_only.py "${{ github.event.before }}" "${{ github.sha }}" --github
           else
             echo "fast=false" >> "$GITHUB_OUTPUT"
           fi
@@ -88,7 +88,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: pip install -r requirements/site.txt -r requirements/dev.txt
       # Node runs the math of the interactive explorers against the Python reference
       # (tests/0026 to tests/0028 and the Josephus tests); without it those tests skip.
       - uses: actions/setup-node@v7
@@ -129,15 +129,15 @@ jobs:
           key: sv-${{ runner.os }}-${{ hashFiles('tests/**', 'docs/questions/**') }}
           restore-keys: sv-${{ runner.os }}-
       - name: Lint the question pages (structure and RTL rules)
-        run: python tools/lint_pages.py
+        run: python tools/checks/lint_pages.py
       # The tutorial videos' fields on the pages and the captions of videos/*/script.md.
       - name: Check the video fields and the script captions
-        run: python tools/check_videos.py
+        run: python tools/checks/check_videos.py
       # Every text and mark colour pair of the site, light and dark, against WCAG 2.
       - name: Check the colour contrast of both schemes
-        run: python tools/check_contrast.py
+        run: python tools/checks/check_contrast.py
       - name: Run question tests (Python + SystemVerilog)
-        run: python tools/run_tests.py
+        run: python tools/checks/run_tests.py
 
   # The fast lane's checks of prose: the lint, the video fields and captions, and the Python
   # tests of the touched questions (a test may read the page's text). No Verilator: the
@@ -153,17 +153,17 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: pip install -r requirements/site.txt -r requirements/dev.txt
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
       - name: Lint the question pages (structure and RTL rules)
-        run: python tools/lint_pages.py
+        run: python tools/checks/lint_pages.py
       - name: Check the video fields and the script captions
-        run: python tools/check_videos.py
+        run: python tools/checks/check_videos.py
       - name: Run the touched questions' Python tests
         if: needs.gate.outputs.ids != ''
-        run: python tools/run_tests.py --python-only ${{ needs.gate.outputs.ids }}
+        run: python tools/checks/run_tests.py --python-only ${{ needs.gate.outputs.ids }}
 
   build:
     needs: [gate, test, quick]
@@ -176,44 +176,44 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt
+      - run: pip install -r requirements/site.txt
       # Social cards: libcairo for cairosvg (the logo on the card); the rendered cards and the
       # fonts downloaded from Google Fonts are cached, keyed on the pages and the layout.
       - run: sudo apt-get update -q && sudo apt-get install -y -q libcairo2
       - uses: actions/cache@v6
         with:
           path: .cache/plugin/social
-          key: social-${{ hashFiles('docs/**/*.md', 'layouts/**', 'mkdocs.yml') }}
+          key: social-${{ hashFiles('docs/**/*.md', 'tools/build/social/**', 'mkdocs.yml') }}
           restore-keys: social-
       # --strict also fails on invalid question front matter (see hooks/questions.py).
       - run: mkdocs build --strict
       - name: Check internal links and anchors
-        run: python tools/check_links.py site
+        run: python tools/checks/check_links.py site
       # Every page at 390 px with all blocks open: no sideways scroll, no script errors.
       # axe-core runs on each page too: a serious or critical violation fails, and so does SVG
       # text under 9 px.
       - name: Install Playwright, Chromium and axe-core for the phone check
         if: needs.gate.outputs.verified != 'true' && (needs.gate.outputs.fast != 'true' || needs.gate.outputs.pages != '')
         run: |
-          pip install -r requirements-dev.txt
+          pip install -r requirements/dev.txt
           python -m playwright install --with-deps chromium
           npm install --no-save --no-audit --no-fund axe-core@4.14.0
       - name: Check every page at phone width
         if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
-        run: python tools/check_phone.py site --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
+        run: python tools/checks/check_phone.py site --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
       # The fast lane: only the pages whose prose changed, with screenshots to look at.
       - name: Check the touched pages at phone width
         if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast == 'true' && needs.gate.outputs.pages != ''
-        run: python tools/check_phone.py site --only "${{ needs.gate.outputs.pages }}" --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
+        run: python tools/checks/check_phone.py site --only "${{ needs.gate.outputs.pages }}" --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
       # The 404 page as GitHub Pages serves it (under the site's path), at both widths, and a
       # keyboard pass over a few pages: the tab order, visible focus, names, and the keys of
       # the hints, folds, boxes, figures, the run panel and the search.
       - name: Check the 404 page under the site's path
         if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
-        run: python tools/check_404.py site --axe node_modules/axe-core/axe.min.js
+        run: python tools/checks/check_404.py site --axe node_modules/axe-core/axe.min.js
       - name: Check the keyboard paths
         if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
-        run: python tools/check_keyboard.py site
+        run: python tools/checks/check_keyboard.py site
       - uses: actions/upload-artifact@v7
         if: always() && needs.gate.outputs.verified != 'true'
         with:
@@ -224,7 +224,7 @@ jobs:
       # Dark mode on request only (Actions → Run workflow → phone_dark), it doubles the check time.
       - name: Check every page at phone width in dark mode
         if: github.event_name == 'workflow_dispatch' && inputs.phone_dark
-        run: python tools/check_phone.py site --scheme dark --shots phone-shots-dark --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
+        run: python tools/checks/check_phone.py site --scheme dark --shots phone-shots-dark --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
       - uses: actions/upload-artifact@v7
         if: always() && github.event_name == 'workflow_dispatch' && inputs.phone_dark
         with:
@@ -255,21 +255,21 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: pip install -r requirements/site.txt -r requirements/dev.txt
       - run: mkdocs build --strict
         env:
           DVQ_SOCIAL_CARDS: "false"
       - run: python -m playwright install --with-deps chromium
       - name: Click through the explorer boxes, part ${{ matrix.shard }} of 4
-        run: python tools/check_explorers.py site --shard ${{ matrix.shard }}/4
+        run: python tools/checks/check_explorers.py site --shard ${{ matrix.shard }}/4
       # Every box stepped from its first step to its last at 390 and 1200 px: a figure that
-      # moves while the box steps fails (tools/check_jumps.py).
+      # moves while the box steps fails (tools/checks/check_jumps.py).
       - name: Step the explorer boxes for jumping figures, part ${{ matrix.shard }} of 4
-        run: python tools/check_jumps.py site --shard ${{ matrix.shard }}/4
+        run: python tools/checks/check_jumps.py site --shard ${{ matrix.shard }}/4
       # Every number and text field of every box typed into: Enter, Tab and an input
-      # method's Enter must apply the value (tools/check_inputs.py).
+      # method's Enter must apply the value (tools/checks/check_inputs.py).
       - name: Type into the explorer boxes' fields, part ${{ matrix.shard }} of 4
-        run: python tools/check_inputs.py site --shard ${{ matrix.shard }}/4
+        run: python tools/checks/check_inputs.py site --shard ${{ matrix.shard }}/4
 
   deploy:
     needs: [gate, build, explorers]

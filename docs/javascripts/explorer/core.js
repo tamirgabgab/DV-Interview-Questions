@@ -1252,7 +1252,7 @@
   // block waits until the block opens), and then gets its remembered state back. The box a
   // link points at (`#seed-<kind>-…`, `#state-<kind>.…` or `#ctl-<kind>-<n>.…`) is built at
   // once, its closed blocks opened, and scrolled into view. ready() builds every box that
-  // is still waiting, for the page checks (tools/check_phone.py, tools/check_explorers.py)
+  // is still waiting, for the page checks (tools/checks/check_phone.py, tools/checks/check_explorers.py)
   // and for printing.
   const waiting = new Set();
   let observer = null;

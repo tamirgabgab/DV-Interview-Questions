@@ -1,6 +1,6 @@
 """The tutorial video of question 0030, the spider and the fly on a box (script: script.md).
 
-Render with `python videos/render.py 0030` (see VIDEOS.md). Part א has no code: the box is
+Render with `python videos/render.py 0030` (see notes/VIDEOS.md). Part א has no code: the box is
 drawn in 3D (an orthographic projection of the room, turned by a camera of its own), and
 its faces unfold into the plane around their shared edges, as cardboard opens, so that a
 path on the box becomes a straight line. First the obvious route over the ceiling (42),

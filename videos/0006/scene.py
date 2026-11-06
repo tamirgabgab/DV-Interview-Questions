@@ -1,6 +1,6 @@
 """The tutorial video of question 0006, the best single trade of a stock (script: script.md).
 
-Render with `python videos/render.py 0006` (see VIDEOS.md). The example is the page's,
+Render with `python videos/render.py 0006` (see notes/VIDEOS.md). The example is the page's,
 prices = [5, 8, 3, 9, 2, 6]: the best long earns 6 (days 2 and 3), the best short 7
 (days 3 and 4). Only the efficient O(n) code of each part is typed (the owner,
 2026-10-31); the O(n²) check of every pair is named in the idea. The page's box is shown

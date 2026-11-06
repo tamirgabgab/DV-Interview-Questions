@@ -5,7 +5,7 @@
     python videos/render.py 0002 --captions-only   # only out/captions.en.vtt, no render
     python videos/render.py 0002 --music-only      # only the music: out/music.wav and music.mp3
 
-Run it with the Python that has Manim (requirements-video.txt). The Hebrew labels are drawn
+Run it with the Python that has Manim (requirements/video.txt). The Hebrew labels are drawn
 first by videos/lib/he_label.py with a Python that has Playwright (`--label-python`, or
 DVQ_LABEL_PYTHON; default `python3`).
 
@@ -38,7 +38,7 @@ Steps:
 the repository and linked from the README (the owner downloads them there and uploads them
 to YouTube; 2026-10-31): `<id>.mp4` (silent), `<id>-music.mp3` (the music alone; no
 video with the music in it, the owner puts the two together in an editor), `<id>.he.vtt`, `<id>.en.vtt`, `<id>-chapters.txt` and `info.json` (the
-length, the chapters and the `video_parts`, which tools/catalog.py reads for the README).
+length, the chapters and the `video_parts`, which tools/build/catalog.py reads for the README).
 Only a 720p render with no problem makes a release.
 
 Output: videos/<id>/out/video.mp4 (silent), music.wav, music.mp3, captions.vtt,
@@ -129,7 +129,7 @@ def read_english(folder: Path, captions: list[str], required: bool) -> tuple[lis
     path = folder / caps.TRANSLATIONS
     rel = path.relative_to(VIDEOS.parent).as_posix()
     if not path.exists():
-        msg = f"{rel} does not exist, so there is no English track (see VIDEOS.md)"
+        msg = f"{rel} does not exist, so there is no English track (see notes/VIDEOS.md)"
         if required:
             return None, [msg]
         print(f"warn {msg}", file=sys.stderr)

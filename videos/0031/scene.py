@@ -1,6 +1,6 @@
 """The tutorial video of question 0031, the bridge and the torch (script: script.md).
 
-Render with `python videos/render.py 0031` (see VIDEOS.md). Part א draws the four people
+Render with `python videos/render.py 0031` (see notes/VIDEOS.md). Part א draws the four people
 (1, 2, 5 and 10 minutes), the bridge and the torch in Manim with a running clock: first the
 plan that comes to mind, the fastest escorts everyone (19 minutes), then the two slow ones
 together (17); the page's box plays the 17 plan and compares the plans; then the proof that

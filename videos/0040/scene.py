@@ -1,6 +1,6 @@
 """The tutorial video of question 0040, the 1011 sequence detector with overlap (script: script.md).
 
-Render with `python videos/render.py 0040` (see VIDEOS.md). The answer is hardware, so the
+Render with `python videos/render.py 0040` (see notes/VIDEOS.md). The answer is hardware, so the
 code beat types the page's SystemVerilog module (the owner, 2026-11-01: SV in both videos
 of the round, the 0011 exception) and walks it beside the page's box (`walk_code`, no line
 trace for SV). Part א: the state as "how much of the pattern was seen", the Mealy diagram

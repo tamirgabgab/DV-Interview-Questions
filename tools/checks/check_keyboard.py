@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """A keyboard pass over the built site (S425): the tab order and the keys of the components.
 
-    mkdocs build --strict && python tools/check_keyboard.py [site] [--only REGEX]
+    mkdocs build --strict && python tools/checks/check_keyboard.py [site] [--only REGEX]
 
 Serves the site locally and, on a few pages (the home page, the all-questions table, the
 tags page, a study path and one question page with a box, a figure and the
@@ -17,7 +17,7 @@ opens the run panel, "/" opens the quick jump (session 30): typing finds a quest
 stays in the window, Escape closes it and gives the focus back, and Ctrl+K opens it again,
 whose last row (the up arrow wraps to it) sends the words to the site search, which finds
 them; Enter on the interview tool starts interview mode (its bar shows) and Enter on the
-bar's "end" shows the summary with the focus on it. The first question page with a tutorial video (``video:``, VIDEOS.md) is walked too, and
+bar's "end" shows the summary with the focus on it. The first question page with a tutorial video (``video:``, notes/VIDEOS.md) is walked too, and
 its dialog is checked as a component: Enter on the "סרטון הסבר" tool opens it with the focus
 inside, Tab and Shift+Tab stay in it, every button in it has a name, Escape closes it and
 gives the focus back; play makes a titled player (the request to YouTube is cut off, so the
@@ -34,7 +34,7 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1])]
 from check_phone import local_cdn_routes, serve  # noqa: E402
 
 WIDTH, HEIGHT = 1200, 900

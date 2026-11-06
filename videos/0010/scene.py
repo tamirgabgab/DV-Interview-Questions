@@ -1,6 +1,6 @@
 """The tutorial video of question 0010, valid parentheses (script: script.md).
 
-Render with `python videos/render.py 0010` (see VIDEOS.md). Part א deletes adjacent
+Render with `python videos/render.py 0010` (see notes/VIDEOS.md). Part א deletes adjacent
 pairs, pass after pass: the page has no box for it, so the string is drawn here as a row
 of cells and its pairs are deleted as the page's code does (every "()", then every "[]",
 then every "{}" in one pass); the box's table of passes for (((()))) shows the O(n²).

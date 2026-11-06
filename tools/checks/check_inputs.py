@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Type into every number and text field of every explorer box and check that it applies.
 
-    mkdocs build --strict && python tools/check_inputs.py [site]
+    mkdocs build --strict && python tools/checks/check_inputs.py [site]
 
 A value typed into a box's field is applied on Enter and when the field is left (core.js,
 fields). This check opens every page with an explorer box at 1200 x 900 px, with every
@@ -24,8 +24,8 @@ none), or its min or max, kept within min and max and on the step; for a text fi
 current text with its last digit changed (0 and 1 swapped in a text of bits), or its parts
 (split by commas, spaces or new lines, or its characters) in reverse order.
 
-Needs Playwright, as tools/check_phone.py; --local-cdn, --offline, --route, --only and
---shard work as in tools/check_explorers.py.
+Needs Playwright, as tools/checks/check_phone.py; --local-cdn, --offline, --route, --only and
+--shard work as in tools/checks/check_explorers.py.
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1])]
 from check_explorers import BOXES, open_page, shard  # noqa: E402
 from check_phone import local_cdn_routes, serve  # noqa: E402
 

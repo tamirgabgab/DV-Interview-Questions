@@ -30,11 +30,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt
+      - run: pip install -r requirements/site.txt
       - run: sudo apt-get update -q && sudo apt-get install -y -q libcairo2
       - run: mkdocs build --strict
       - name: Fetch every external link of the site
-        run: python tools/check_links.py site --external
+        run: python tools/checks/check_links.py site --external
 
   verilator-release:
     runs-on: ubuntu-latest
@@ -61,6 +61,6 @@ jobs:
           gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$(cat <<EOF
           The weekly check found Verilator release **$LATEST**; the test workflow is pinned to a development commit after **$VERILATOR_RELEASE** (\`VERILATOR_REF\` in \`.github/workflows/deploy.yml\`).
 
-          To move to the release: set \`VERILATOR_REF\` to the release tag, push a branch, and check that the 0011 class and the 0014 subclass still pass in CI (the pinned commit fixed a crash and an unrandomized subclass; see \`HANDOFF.md\`, Technical notes). Then update \`VERILATOR_RELEASE\` in \`.github/workflows/weekly.yml\` so this check is quiet again.
+          To move to the release: set \`VERILATOR_REF\` to the release tag, push a branch, and check that the 0011 class and the 0014 subclass still pass in CI (the pinned commit fixed a crash and an unrandomized subclass; see \`notes/HANDOFF.md\`, Technical notes). Then update \`VERILATOR_RELEASE\` in \`.github/workflows/weekly.yml\` so this check is quiet again.
           EOF
           )"

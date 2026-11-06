@@ -1,5 +1,5 @@
 // The run panel's code editor (W349): CodeMirror 6 with Python, bundled by
-// tools/codemirror/build.sh into docs/javascripts/vendor/codemirror.min.js, which
+// tools/build/codemirror/build.sh into docs/javascripts/vendor/codemirror.min.js, which
 // run-python.js loads on the first open of a run panel. It exposes window.dvqEditor.
 import { EditorState, StateEffect, StateField, RangeSet } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter,

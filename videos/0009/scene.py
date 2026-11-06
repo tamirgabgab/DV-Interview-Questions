@@ -1,6 +1,6 @@
 """The tutorial video of question 0009, 16 people, 16 boxes and one helper (script: script.md).
 
-Render with `python videos/render.py 0009` (see VIDEOS.md). The owner's choices
+Render with `python videos/render.py 0009` (see notes/VIDEOS.md). The owner's choices
 (2026-11-02): part א drawn with the 16 boxes and their notes, a person's walk from his own
 box along the notes, the arrows that close into coloured cycles, a cycle longer than 8 that
 fails, and person 0 who cuts it with a swap; the main example one cycle of all 16 boxes,

@@ -981,7 +981,7 @@
 
 /* rainwater (0047): part a's columns, pointers and table; part b's height map and heap.
    The ground is shaded up to 29 % ink (height 20) and the water up to 45 % blue, so the
-   ink digits on them stay readable (tools/check_contrast.py has both ends). */
+   ink digits on them stay readable (tools/checks/check_contrast.py has both ends). */
 .md-typeset .explorer :is(.rw-bars, .rw-ptrs) { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1.6rem)); gap: 2px; width: max-content; max-width: 100%; margin: 0 auto; }
 .md-typeset .explorer .rw-bars { align-items: end; margin-top: 0.5rem; }
 .md-typeset .explorer .rw-col { display: flex; flex-direction: column; gap: 2px; min-width: 0; border-radius: 3px; cursor: pointer; touch-action: manipulation; }

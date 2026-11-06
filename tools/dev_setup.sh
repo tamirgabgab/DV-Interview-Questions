@@ -26,7 +26,7 @@ if python3 -c "import mkdocs, material, pytest, playwright, cairosvg" 2>/dev/nul
   step "python packages: present"
 else
   step "python packages: installing"
-  pip install -q --root-user-action=ignore -r "$ROOT/requirements.txt" -r "$ROOT/requirements-dev.txt" cairosvg \
+  pip install -q --root-user-action=ignore -r "$ROOT/requirements/site.txt" -r "$ROOT/requirements/dev.txt" cairosvg \
     || missing+=("python packages")
 fi
 

@@ -11,7 +11,7 @@ offset in the chained video and writes
 - `captions.en.vtt`: the English track, the same cues and times with the English text of
   `videos/<id>/captions.en.md` (`read_translations()`, `translate()`, `english_vtt()`).
 
-`check_caption()` holds the rules of CLAUDE.md and VIDEOS.md for a caption: every line
+`check_caption()` holds the rules of CLAUDE.md and notes/VIDEOS.md for a caption: every line
 starts with a Hebrew letter or an RLM, a colon has a no-break space before it, at most 12
 words a line and 2 lines, and 1.5–7 s on screen.
 """
@@ -38,7 +38,7 @@ def words(line: str) -> list[str]:
 
 
 def count_words(line: str) -> int:
-    """Words as tools/check_videos.py counts them: tokens with a letter or a digit."""
+    """Words as tools/checks/check_videos.py counts them: tokens with a letter or a digit."""
     return sum(1 for w in line.replace(NBSP, " ").split() if re.search(r"\w", w))
 
 

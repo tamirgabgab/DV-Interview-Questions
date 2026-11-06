@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Step every explorer box through its steps and report figures that jump.
 
-    mkdocs build --strict && python tools/check_jumps.py [site]
+    mkdocs build --strict && python tools/checks/check_jumps.py [site]
 
 The text under the controls of a box changes at every step, and core.js (steady) keeps
 each paragraph at the tallest height it has shown, so the figures under it stay put while
@@ -13,8 +13,8 @@ end (at most --max-steps steps), measuring after each step the top of every figu
 relative to the box. A figure that moves by more than --tol px fails the check, with the
 step and the paragraphs that grew at that step.
 
-Needs Playwright, as tools/check_phone.py; --local-cdn, --offline, --route, --only and
---shard work as in tools/check_explorers.py.
+Needs Playwright, as tools/checks/check_phone.py; --local-cdn, --offline, --route, --only and
+--shard work as in tools/checks/check_explorers.py.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1])]
 from check_explorers import BOXES, open_page, shard  # noqa: E402
 from check_phone import HEIGHT, local_cdn_routes, serve  # noqa: E402
 

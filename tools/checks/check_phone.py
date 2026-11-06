@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Check every page of the built site at phone width.
 
-    mkdocs build --strict && python tools/check_phone.py [site] [--shots DIR]
+    mkdocs build --strict && python tools/checks/check_phone.py [site] [--shots DIR]
 
 Serves the site locally, opens each page in Chromium at 390 x 844 px with every collapsible
 block open (hints and solutions included), and fails when the page scrolls sideways or a
 script throws. A full-page screenshot of each page goes to --shots (CI uploads them as an
-artifact). Needs Playwright: pip install -r requirements-dev.txt and
+artifact). Needs Playwright: pip install -r requirements/dev.txt and
 python -m playwright install chromium (or --browser PATH to an installed Chromium).
 
 It also warns (without failing) about display math wider than its column: such an
@@ -185,7 +185,7 @@ OPEN_ALL = """async () => {
 
 # The CDN scripts the pages load and their copies in .cache/cdn (tools/dev_setup.sh), as
 # --route specs for --local-cdn.
-CDN_DIR = Path(__file__).resolve().parent.parent / ".cache" / "cdn"
+CDN_DIR = Path(__file__).resolve().parents[2] / ".cache" / "cdn"
 LOCAL_CDN = [
     (r"mathjax@3\.2\.2/es5/tex-mml-chtml\.js", "mathjax/es5/tex-mml-chtml.js"),
     (r"unpkg\.com/mermaid@11/dist/mermaid\.min\.js", "mermaid/dist/mermaid.min.js"),

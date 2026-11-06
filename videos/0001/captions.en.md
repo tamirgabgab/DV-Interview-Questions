@@ -3,7 +3,7 @@
 # One entry per caption of script.md, in the same order: the Hebrew caption's lines
 # (he:), exactly as in the script, then the English cue's lines (en:), at most two
 # lines of 12 words. A blank line ends an entry. render.py writes out/captions.en.vtt
-# from it with the times of captions.vtt (--captions-only: no render); VIDEOS.md.
+# from it with the times of captions.vtt (--captions-only: no render); notes/VIDEOS.md.
 
 he: שאלה 0001 : גלאי עליית שפה,
 he: שאלה ברמת סטודנט.

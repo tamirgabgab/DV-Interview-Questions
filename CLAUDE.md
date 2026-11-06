@@ -1,13 +1,16 @@
 # CLAUDE.md — working rules for this repository
 
 This is a Hebrew, right-to-left MkDocs Material site of Design Verification interview
-questions, published to GitHub Pages from `main`. `README.md` has the links to the site;
-`CONTRIBUTING.md` documents the content format and the tooling; `CATALOG.md` lists the
-questions (written by `tools/catalog.py`); `HANDOFF.md` is the living task list and work
-log (the older log is in `HANDOFF-archive.md`). `VIDEOS.md` is the plan of the tutorial videos
-(Manim, one per question, a chapter per part). Read `CONTRIBUTING.md` and `HANDOFF.md`
-before a work session, and update `HANDOFF.md` (work log, open items) at the end of every
-session.
+questions, published to GitHub Pages from `main`. `README.md` has the links to the site and a
+map of the repository; `CONTRIBUTING.md` documents the content format and the tooling. The
+working notes are in `notes/`: `notes/CATALOG.md` lists the questions (written by
+`tools/build/catalog.py`); `notes/HANDOFF.md` is the living task list and the recent work log
+(older logs in `notes/HANDOFF-archive.md` and `notes/HANDOFF-archive-2.md`);
+`notes/VIDEOS.md` is the plan of the tutorial videos (Manim, one per question, a chapter per
+part). The tools are in `tools/checks/` (what CI runs), `tools/build/` (what the site is built
+from), `tools/authoring/` (the new-question scaffold and its template) and `tools/figures/`.
+Read `CONTRIBUTING.md` and `notes/HANDOFF.md` before a work session, and update
+`notes/HANDOFF.md` (work log, open items) at the end of every session.
 
 ## Language and RTL
 
@@ -15,7 +18,7 @@ session.
   question and end-of-round summary, also after a model switch or a context summary.
   English appears only as relevant technical terms, identifiers and file names inside a
   Hebrew sentence. Question content is Hebrew. Code, comments, identifiers,
-  commit messages, `README.md`, `CONTRIBUTING.md`, `HANDOFF.md` and this file are English.
+  commit messages, `README.md`, `CONTRIBUTING.md`, `notes/HANDOFF.md` and this file are English.
 - Times shown to the owner are Israel time (Asia/Jerusalem: UTC+2 in winter time, which
   runs from 25 October 2026 to 26 March 2027, and UTC+3 in summer time), never UTC. Tools report UTC: convert
   before writing, e.g. "23:31 (שעון ישראל)".
@@ -50,10 +53,10 @@ session.
 
 - One Markdown file per question: `docs/questions/<level>/<id>-<slug>.md`, zero-padded id
   unique across the repository, `level` equal to the folder. Start from
-  `templates/question.md`; the skeleton (interviewer block, hint ladder, short answer,
+  `tools/authoring/question.md`; the skeleton (interviewer block, hint ladder, short answer,
   solution blocks idea → steps → code → proof → cost, traps, follow-ups with a short
   collapsed answer each) is described in
-  `CONTRIBUTING.md` and enforced by `python tools/lint_pages.py`.
+  `CONTRIBUTING.md` and enforced by `python tools/checks/lint_pages.py`.
 - Code answers in Python and SystemVerilog as linked tabs, Python first (the owner's choice,
   2026-10-29). The pages
   are the single source of truth: tests and the run panel execute the page code as is, so
@@ -65,7 +68,7 @@ session.
   `tools/figures/charts.py`, and their blocks sit between `<!-- gen n -->` markers that
   `python tools/figures/fill.py <id>` rewrites. Colours come from CSS variables in
   the stylesheets in `docs/stylesheets/` (the palette in `01-base.css`), never hard-coded.
-- Start a question with `python tools/new_question.py` (see `CONTRIBUTING.md`). Interactive
+- Start a question with `python tools/authoring/new_question.py` (see `CONTRIBUTING.md`). Interactive
   sliders are a `data-kind` with its own file in `docs/javascripts/explorer/` (the shared
   code is `core.js`), tested under Node. A box keeps its figures still while it steps
   (`check_jumps.py`): a block that grows with the steps goes under the figures, or is
@@ -80,18 +83,18 @@ session.
 ## Tests and checks
 
 ```bash
-python tools/lint_pages.py            # page skeleton and RTL rules
-python tools/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
-python tools/run_tests.py             # pytest + Verilator (needs Verilator 5.052+ with z3)
+python tools/checks/lint_pages.py            # page skeleton and RTL rules
+python tools/checks/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
+python tools/checks/run_tests.py             # pytest + Verilator (needs Verilator 5.052+ with z3)
 mkdocs build --strict                 # the build CI runs
-python tools/check_links.py           # internal links and anchors of the built site
-python tools/check_phone.py           # every page at 390 px (add --local-cdn in a sandbox)
-python tools/check_explorers.py       # every explorer box: buttons clicked, link and saved state
-python tools/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
-python tools/check_inputs.py          # every box field typed into: Enter, Tab and an input method apply it
-python tools/check_contrast.py        # the site's colour pairs, light and dark (WCAG 2)
-python tools/check_404.py             # the 404 page under the site's path, both widths
-python tools/check_keyboard.py        # a keyboard pass: tab order, focus rings, names, the components' keys
+python tools/checks/check_links.py           # internal links and anchors of the built site
+python tools/checks/check_phone.py           # every page at 390 px (add --local-cdn in a sandbox)
+python tools/checks/check_explorers.py       # every explorer box: buttons clicked, link and saved state
+python tools/checks/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
+python tools/checks/check_inputs.py          # every box field typed into: Enter, Tab and an input method apply it
+python tools/checks/check_contrast.py        # the site's colour pairs, light and dark (WCAG 2)
+python tools/checks/check_404.py             # the 404 page under the site's path, both widths
+python tools/checks/check_keyboard.py        # a keyboard pass: tab order, focus rings, names, the components' keys
 ```
 
 The linter checks RTL at every paragraph start (indented blocks and the steps timeline
@@ -107,10 +110,10 @@ sit on one row. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
 All twelve run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
-CATALOG, HANDOFF, its archive or this file runs nothing, and `main` skips the checks for a commit that
+this file or files under `notes/` runs nothing, and `main` skips the checks for a commit that
 already passed on its branch); a failure blocks the deploy. A new colour pair (a text
-or a mark on a fill) goes into the `PAIRS` list of `tools/check_contrast.py`. Verilator
-notes and simulator quirks are listed in `HANDOFF.md` under "Technical notes".
+or a mark on a fill) goes into the `PAIRS` list of `tools/checks/check_contrast.py`. Verilator
+notes and simulator quirks are listed in `notes/HANDOFF.md` under "Technical notes".
 
 ## Workflow
 
@@ -133,10 +136,10 @@ notes and simulator quirks are listed in `HANDOFF.md` under "Technical notes".
   fast checks: `lint_pages.py`, `run_tests.py --python-only <id>`, `mkdocs build --strict`,
   `check_links.py`, `check_phone.py --only <id>`, and a screenshot of the changed part
   looked at (display math, indentation inside lists and admonitions, RTL), about three
-  minutes. The CI's fast lane (`tools/text_only.py`) recognizes such a push and runs only
+  minutes. The CI's fast lane (`tools/checks/text_only.py`) recognizes such a push and runs only
   those checks, then deploys, in a few minutes; any other change runs every check.
 - Commit messages: English, imperative, with a short body for anything non-obvious. No
   model identifiers in commits, code or docs.
 - Check the live result after a deploy: desktop and phone width (390 px), light and dark
   mode. Local screenshot checks need the CDN scripts routed to local copies (see
-  `HANDOFF.md`).
+  `notes/HANDOFF.md`).

@@ -1,6 +1,6 @@
 """The tutorial video of question 0055, the divide-by-3 state machine (script: script.md).
 
-Render with `python videos/render.py 0055` (see VIDEOS.md). No code is typed (the owner,
+Render with `python videos/render.py 0055` (see notes/VIDEOS.md). No code is typed (the owner,
 2026-11-01): in parts א and ב the machine is built from D flip-flops instead. Each part
 draws the three states and their six edges, encodes them in two bits (00, 01, 10; 11 is a
 don't care), fills the encoded transition table, reads the minimal equations off two

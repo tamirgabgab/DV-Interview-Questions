@@ -264,7 +264,7 @@ def main() -> int:
     ap.add_argument("--spec", type=Path, required=True, help="a JSON file: scene.py's BOXES")
     ap.add_argument("--site", type=Path, required=True, help="the built site")
     ap.add_argument("--route", action="append", default=[], metavar="REGEX=FILE",
-                    help="serve a CDN script from a local copy (as tools/check_phone.py)")
+                    help="serve a CDN script from a local copy (as tools/checks/check_phone.py)")
     args = ap.parse_args()
     qid = f"{int(args.qid):04d}"
     boxes = json.loads(args.spec.read_text(encoding="utf-8"))

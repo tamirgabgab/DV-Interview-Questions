@@ -232,7 +232,7 @@ videos/
 - **The script** (`script.md`, Hebrew captions and English notes) is written first and
   reviewed by the owner before any animation is built. A video is cheap to rework at
   the script stage and expensive after the render. Its format is fixed, because
-  `tools/check_videos.py` reads it (see "The script's format" below).
+  `tools/checks/check_videos.py` reads it (see "The script's format" below).
 - **The captions are recorded while the scene plays.** Each beat calls
   `self.say("…", hold=…)`. The library writes the caption with its exact start and end
   times, as the animation really ran. Captions are therefore in sync by construction,
@@ -319,7 +319,7 @@ en: and the original 5 is still saved in temp.
 ## Rendering
 
 - **Tools.**
-  - `manim` (Community Edition, pinned in `requirements-video.txt`, apart from the site's
+  - `manim` (Community Edition, pinned in `requirements/video.txt`, apart from the site's
     requirements so CI does not install it).
   - `ffmpeg`.
   - The Code mobject (Pygments) for the code beats.
@@ -332,7 +332,7 @@ en: and the original 5 is still saved in temp.
     (about two minutes; `render.py` stops with this line when a scene uses `TX` and
     `latex` or `dvisvgm` is missing).
 - **The command.** `~/.venvs/manim/bin/python videos/render.py 0002` (any Python with
-  `requirements-video.txt`) renders the chapters at 720p30, chains them, and writes
+  `requirements/video.txt`) renders the chapters at 720p30, chains them, and writes
   `video.mp4`, `captions.vtt`, `captions.en.vtt` and `chapters.txt` to `videos/0002/out/`. The flag
   `--draft` renders at 480p15 for a quick look, and `--preview` also writes
   `preview.mp4` with the captions burned in (libass, Rubik, `Encoding=-1` so the base
@@ -456,7 +456,7 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
 ## Publishing and linking
 
 0. **The release.** `render.py <id> --release` (720p, with no problem) copies the finished
-   files into `videos/<id>/release/`, and `python tools/catalog.py` puts their download
+   files into `videos/<id>/release/`, and `python tools/build/catalog.py` puts their download
    links into the README's "Tutorial videos" table (the length and the files, from
    `release/info.json`). The folder is committed; that is where the owner takes the
    videos from (2026-10-31).
@@ -482,7 +482,7 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
    part may leave `video_parts` out. The build, `lint_pages.py` and `check_videos.py`
    all reject a bad id, a missing time, a count that differs from the page's
    `### סעיף` headings, a first time other than 0, or times that do not rise.
-   Then `python tools/catalog.py` turns the README's "Tutorial videos" row of that
+   Then `python tools/build/catalog.py` turns the README's "Tutorial videos" row of that
    question into a YouTube link. The table has a row per `videos/<id>/script.md`, and a
    test checks that it is up to date.
 4. **The hook** (`hooks/questions.py`) does the rest:
@@ -517,7 +517,7 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
 
 ## Checks
 
-- **`tools/check_videos.py`** runs in CI's test job, after the lint, and needs no video.
+- **`tools/checks/check_videos.py`** runs in CI's test job, after the lint, and needs no video.
   For every question with a `video:` field:
   - the id has the YouTube form;
   - `video_parts` has one time per part, rising from 0;
@@ -546,7 +546,7 @@ ffmpeg -i out/video.mp4 -i voice.wav -filter_complex "
 | Step | What | Done when |
 |---|---|---|
 | V0 | This plan | the owner approves it |
-| V1 | `videos/lib` (palette, opening/closing, chapter card, code beat, caption recorder, VTT and chapters), `render.py`, `requirements-video.txt` | a 20 s test scene renders with captions in sync |
+| V1 | `videos/lib` (palette, opening/closing, chapter card, code beat, caption recorder, VTT and chapters), `render.py`, `requirements/video.txt` | a 20 s test scene renders with captions in sync |
 | V2 | Pilot 0002: script → owner review → scenes → render | the owner approves the video and its captions |
 | V3 | The site side: front matter fields, the hook's button, links and dialog, `check_videos.py`, CONTRIBUTING | 0002's page plays its video from YouTube at each part |
 | V4 | Pilot 0004: script → review → scenes (Hebrew box labels by `he_label.py`) → render | approved, and the Hebrew-label route is proven |

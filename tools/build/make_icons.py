@@ -3,7 +3,7 @@
 header. The plain icons fill a navy square with the logo at 70 %; the maskable one keeps
 the logo inside the central 60 % that every launcher mask leaves visible.
 
-    python tools/make_icons.py      # rewrites docs/assets/icons/*.png
+    python tools/build/make_icons.py      # rewrites docs/assets/icons/*.png
 """
 
 import re
@@ -11,7 +11,7 @@ from pathlib import Path
 
 import cairosvg
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 LOGO = ROOT / "docs" / "assets" / "logo.svg"
 OUT = ROOT / "docs" / "assets" / "icons"
 NAVY = "#1b2a4a"

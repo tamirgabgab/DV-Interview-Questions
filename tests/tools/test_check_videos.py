@@ -1,5 +1,5 @@
-"""Tests of tools/check_videos.py: the video fields of a page, the chapters of a script and
-the RTL rules of its captions (VIDEOS.md)."""
+"""Tests of tools/checks/check_videos.py: the video fields of a page, the chapters of a script and
+the RTL rules of its captions (notes/VIDEOS.md)."""
 
 import sys
 

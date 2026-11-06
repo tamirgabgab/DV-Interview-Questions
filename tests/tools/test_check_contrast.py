@@ -1,4 +1,4 @@
-"""tools/check_contrast.py: the colour parser against known values (hex, rgba, hsla with
+"""tools/checks/check_contrast.py: the colour parser against known values (hex, rgba, hsla with
 Material's hue, color-mix with transparent), the WCAG ratio at its two ends, and the site's
 pairs passing in both schemes."""
 

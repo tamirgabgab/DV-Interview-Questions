@@ -1,4 +1,4 @@
-"""Generated background music for the tutorial videos (VIDEOS.md, "The music").
+"""Generated background music for the tutorial videos (notes/VIDEOS.md, "The music").
 
 Every video gets its own calm piece, rendered here from a seed (the question's id), so the
 music is ours: no download, no licence, no Content ID claim. Pure numpy for the synthesis,
@@ -27,7 +27,7 @@ The piece:
 - a 3 s fade-in and a 4 s fade-out that end exactly at the video's length;
 - loudness: ffmpeg's loudnorm in two passes (measure, then a linear gain) to -28 LUFS
   integrated, true peak under -2 dBTP. The narration will sit near -16 LUFS, about 12 dB
-  above, and duck the music a few dB more (VIDEOS.md has the filter graph).
+  above, and duck the music a few dB more (notes/VIDEOS.md has the filter graph).
 
 The seed picks the progression (and with it the mode), the key, the arpeggio pattern by
 fixed rotations (so neighbouring ids never share them), and through a random generator

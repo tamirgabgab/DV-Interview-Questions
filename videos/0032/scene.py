@@ -1,6 +1,6 @@
 """The tutorial video of question 0032, wolf, goat and cabbage (script: script.md).
 
-Render with `python videos/render.py 0032` (see VIDEOS.md). The river is drawn in Manim
+Render with `python videos/render.py 0032` (see notes/VIDEOS.md). The river is drawn in Manim
 with simple icons (the owner, 2026-11-01: a farmer with a hat, a wolf, a goat and a
 cabbage, no Hebrew in the picture), the near bank on the left as in the page's box. Part א
 plays the seven crossings, then the page's box crossing by crossing (two forbidden tries

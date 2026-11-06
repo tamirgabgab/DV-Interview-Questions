@@ -1,7 +1,7 @@
 """The tutorial video of question 0027, a cake split by fractions that grow as an arithmetic
 sequence (script: script.md).
 
-Render with `python videos/render.py 0027` (see VIDEOS.md). No code (the page has none).
+Render with `python videos/render.py 0027` (see notes/VIDEOS.md). No code (the page has none).
 The division (the owner, 2026-11-03): a cake strip, as in the page's figure, from which each
 person cuts a slice of what is left (the slices taken before stay faint in place, the
 peak's slice orange), and under it a bar chart of each person's share, built bar by bar.

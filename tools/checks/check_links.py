@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the internal links of the built site.
 
-    mkdocs build --strict && python tools/check_links.py [site]
+    mkdocs build --strict && python tools/checks/check_links.py [site]
 
 Walks every HTML file under the site directory and checks that each internal link (href,
 src, srcset, poster), including a #fragment, points at an existing file and, for a

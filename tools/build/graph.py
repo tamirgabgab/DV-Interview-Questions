@@ -3,9 +3,9 @@
 techniques their solutions use, drawn with graphify (https://pypi.org/project/graphifyy/).
 
     pip install graphifyy          # not a site dependency; only this script needs it
-    python tools/graph.py          # rewrite docs/graph.html from tools/graph_concepts.json
+    python tools/build/graph.py          # rewrite docs/graph.html from tools/build/graph_concepts.json
 
-tools/graph_concepts.json is the data: for every question its core concepts (the idea the
+tools/build/graph_concepts.json is the data: for every question its core concepts (the idea the
 solution is built on), its secondary concepts, and the questions it is related to (explicit:
 the page links to it). It was written by reading every page (graphify's semantic pass);
 update it by hand when a question is added. Question titles and levels come from the pages'
@@ -19,10 +19,10 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1])]
 from catalog import ROOT, pages  # noqa: E402
 
-DATA = ROOT / "tools" / "graph_concepts.json"
+DATA = ROOT / "tools" / "build" / "graph_concepts.json"
 OUT = ROOT / "docs" / "graph.html"
 GROUP_HE = {"algorithms": "אלגוריתמים", "math": "מתמטיקה", "probability": "הסתברות",
             "puzzles": "חידות", "digital design": "תכנון לוגי", "verification": "אימות",
@@ -45,7 +45,7 @@ def extraction(data: dict) -> dict:
     def edge(a, b, relation, weight, confidence):
         edges.append({"source": a, "target": b, "relation": relation, "weight": weight,
                       "confidence": "EXTRACTED" if confidence == 1.0 else "INFERRED",
-                      "confidence_score": confidence, "source_file": "tools/graph_concepts.json"})
+                      "confidence_score": confidence, "source_file": "tools/build/graph_concepts.json"})
 
     for key, q in data["questions"].items():
         for cid in q["core"]:

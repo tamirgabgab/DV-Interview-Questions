@@ -1,6 +1,6 @@
 """The tutorial video of question 0004, three mislabeled boxes (script: script.md).
 
-Render with `python videos/render.py 0004` (see VIDEOS.md). The example is the page's: the
+Render with `python videos/render.py 0004` (see notes/VIDEOS.md). The example is the page's: the
 labels RED, BLACK, MIXED on boxes 0, 1, 2 and the contents of arrangement 1, so the ball
 drawn from box 2 is red. The Hebrew in the frame comes from he() (browser-drawn PNGs).
 """
@@ -15,7 +15,7 @@ from dvq import (BoxView, C, CodePanel, DVQScene, M, T, chip, cost_chips, he,  #
                  page_python, trace)
 
 QID = 4
-# The page's boxes (VIDEOS.md, "The page's box"): part א's game with seed 7 (the page's
+# The page's boxes (notes/VIDEOS.md, "The page's box"): part א's game with seed 7 (the page's
 # example: a red ball from box 2) and seed 1 (a black ball), each a draw from crate 2 and
 # the contents revealed; part ב's fix_labels player, step by step (also narrower, "fixn").
 BOXES = {

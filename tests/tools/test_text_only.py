@@ -1,4 +1,4 @@
-"""tools/text_only.py: which changes take the CI's fast lane."""
+"""tools/checks/text_only.py: which changes take the CI's fast lane."""
 
 import sys
 from pathlib import Path
@@ -50,5 +50,5 @@ def test_other_files_and_new_pages_are_not():
 
 
 def test_ignored_files_alone_are_fast_with_no_pages():
-    fast, ids, _ = text_only.verdict({"videos/0055/release/0055.mp4": (None, None), "HANDOFF.md": (None, None)})
+    fast, ids, _ = text_only.verdict({"videos/0055/release/0055.mp4": (None, None), "notes/HANDOFF.md": (None, None)})
     assert fast and ids == []

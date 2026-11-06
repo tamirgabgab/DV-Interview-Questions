@@ -1,7 +1,7 @@
 """The tutorial video of question 0008, Eurovision 2026: when was Israel's loss certain
 (script: script.md).
 
-Render with `python videos/render.py 0008` (see VIDEOS.md). The owner's choices
+Render with `python videos/render.py 0008` (see notes/VIDEOS.md). The owner's choices
 (2026-11-03): part א as a live scoreboard, the eight countries at the top after the jury as
 bars, the public announcements one after another (from last after the jury to first), the
 countries still to come as cups up to Israel's 343, and two counters, the points left

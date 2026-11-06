@@ -1,6 +1,6 @@
 """The tutorial video of question 0016, the Josephus problem (script: script.md).
 
-Render with `python videos/render.py 0016` (see VIDEOS.md). No code in this question's
+Render with `python videos/render.py 0016` (see notes/VIDEOS.md). No code in this question's
 video (the owner, 2026-11-02): parts א and ב get their formula and its proof, part ג is a
 short chapter with the general formula and its check against parts א and ב.
 

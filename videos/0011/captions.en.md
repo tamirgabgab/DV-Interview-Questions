@@ -1,7 +1,7 @@
 # 0011 — a random final tic-tac-toe board: the English captions
 #
 # One entry per caption of script.md, in the same order: the Hebrew caption's lines
-# (he:), exactly as in the script, then the English cue's lines (en:). VIDEOS.md.
+# (he:), exactly as in the script, then the English cue's lines (en:). notes/VIDEOS.md.
 
 he: שאלה 0011 : לוח סיום אקראי של איקס-עיגול,
 he: שאלה ברמת סניור.

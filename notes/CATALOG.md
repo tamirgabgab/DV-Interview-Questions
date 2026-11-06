@@ -1,7 +1,7 @@
 # Catalog
 
 All 92 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
-`python tools/catalog.py` from the pages' front matter; do not edit by hand.
+`python tools/build/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
 |----|----------|-------|

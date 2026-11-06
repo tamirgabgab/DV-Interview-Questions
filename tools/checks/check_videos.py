@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Check the tutorial videos' fields on the pages and the captions of their scripts (VIDEOS.md).
+"""Check the tutorial videos' fields on the pages and the captions of their scripts (notes/VIDEOS.md).
 
-    python tools/check_videos.py          # every page and every videos/*/script.md
+    python tools/checks/check_videos.py          # every page and every videos/*/script.md
 
 Needs no video and no network. For every question page with a ``video:`` field:
 
@@ -13,7 +13,7 @@ Needs no video and no network. For every question page with a ``video:`` field:
   heading per part (``## Opening`` and ``## Closing`` are not chapters).
 
 For every ``videos/*/script.md``, every caption line (a line that starts with ``> ``, see
-VIDEOS.md) follows the RTL rules of CLAUDE.md: it starts with a Hebrew letter or the RLM
+notes/VIDEOS.md) follows the RTL rules of CLAUDE.md: it starts with a Hebrew letter or the RLM
 mark (U+200F), every colon has a non-breaking space (U+00A0) before it and an ordinary
 space or the end of the line after it (times such as 1:35, URLs and `code` are exempt),
 and it has at most 12 words. When ``videos/<id>/captions.en.md`` (the English track) exists,
@@ -22,7 +22,7 @@ script has them, no entry is left for a caption that no longer exists, and the E
 has one or two lines of at most 12 words (the parser and the rules are
 ``videos/lib/captions.py``'s, the ones render.py uses).
 
-The same field checks run in tools/lint_pages.py and in the build hook, which import
+The same field checks run in tools/checks/lint_pages.py and in the build hook, which import
 ``video_problems`` from here. Exit status 1 on a problem; a missing script is a warning.
 """
 
@@ -35,7 +35,7 @@ from pathlib import Path
 
 import yaml
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 QUESTIONS = ROOT / "docs" / "questions"
 VIDEOS = ROOT / "videos"
 

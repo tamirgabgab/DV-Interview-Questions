@@ -1,6 +1,6 @@
 """The tutorial video of question 0011, a random final tic-tac-toe board (script: script.md).
 
-Render with `python videos/render.py 0011` (see VIDEOS.md). The answer is the page's
+Render with `python videos/render.py 0011` (see notes/VIDEOS.md). The answer is the page's
 SystemVerilog class `ttt_end` (the owner, 2026-10-31: a DV question whose answer is SV
 constraints types the SV class); it is typed into a scrolling window, then each constraint
 stands above the page's box, which shows a board that the constraint keeps or rejects. The

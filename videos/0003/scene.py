@@ -1,6 +1,6 @@
 """The tutorial video of question 0003, what does this code do (script: script.md).
 
-Render with `python videos/render.py 0003` (see VIDEOS.md). The code is the question
+Render with `python videos/render.py 0003` (see notes/VIDEOS.md). The code is the question
 itself (the page's `mystery`), so it is shown whole, not typed (the owner, 2026-10-31);
 its lines are explained one by one, then it runs on the page's example A = [3, 1, 4, 2]
 beside the page's box. The box is shown twice: alone, i = 0 comparison by comparison and

@@ -1,4 +1,4 @@
-// The tutorial video of a question page (V3, VIDEOS.md). The hook writes a "סרטון הסבר"
+// The tutorial video of a question page (V3, notes/VIDEOS.md). The hook writes a "סרטון הסבר"
 // page tool and a "לפרק בסרטון" link at the top of each part's solution, both with
 // data-video (the YouTube id) and data-video-chapters ([letter, start] pairs); a link also
 // has data-video-start and data-video-part. A click opens a modal <dialog> above the page:

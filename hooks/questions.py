@@ -13,11 +13,11 @@ Responsibilities:
   file of each kind on the page (on_post_page).
 - The home page's "continue" card and "recently added" strip, and the "what's new" page
   (``<!-- home-continue -->``, ``<!-- recent -->``, ``<!-- whats-new -->``).
-- The tutorial video of a question (front matter ``video`` and ``video_parts``, VIDEOS.md):
+- The tutorial video of a question (front matter ``video`` and ``video_parts``, notes/VIDEOS.md):
   a "סרטון הסבר" page tool and a "לפרק בסרטון" link at the top of each part's solution;
   docs/javascripts/video.js opens the video in a dialog.
 - Keep only the questions in the search index, each with its statement and its parts'
-  statements (math in plain symbols, tools/search_text.py), and add the prefix-stripped
+  statements (math in plain symbols, tools/build/search_text.py), and add the prefix-stripped
   Hebrew words, and the id, level, difficulty and kind to the result of a question page
   (on_post_build).
 """
@@ -37,7 +37,7 @@ from zoneinfo import ZoneInfo
 from mkdocs.exceptions import PluginError
 from mkdocs.utils.meta import get_data
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+sys.path[:0] = [str(Path(__file__).resolve().parent.parent / "tools" / d) for d in ("", "checks", "build")]
 import extract_code  # noqa: E402
 from check_videos import part_letters, video_problems  # noqa: E402
 from search_text import STATEMENT, statement_sections  # noqa: E402
@@ -75,7 +75,7 @@ NEW_MAX = 5     # and at most this many (the newest), so the chip stays rare (UI
 
 # The topics (front matter `tags:`) as the site shows them (UI322): Hebrew, or the term as
 # DV engineers say it. The tag itself stays in the files, the URLs and the anchors; a tag
-# without a name here shows as written, and `tools/lint_pages.py` warns about it.
+# without a name here shows as written, and `tools/checks/lint_pages.py` warns about it.
 TOPICS = {
     "algorithms": "אלגוריתמים",
     "assertions": "Assertions",
@@ -185,7 +185,7 @@ WAVEDROM_INIT = "javascripts/wavedrom-init.js"
 WAVE_VIEWER = "javascripts/wave-viewer.js"     # measure and play under each diagram (session 31)
 WAVEDROM_BLOCK = '<pre class="wavedrom">'
 JOINED_CSS = "stylesheets/site.css"
-CSS_LINK = re.compile(r'<link rel="stylesheet" href="([^"]*?)stylesheets/\d\d-[\w-]+\.css">\n?')
+CSS_LINK = re.compile(r'<link rel="stylesheet" href="([^"]*?)stylesheets/(?:\d\d|questions/\d{4})-[\w-]+\.css">\n?')
 _css_parts: list[str] = []      # the parts of extra_css, in order; filled in on_config
 # The cost chips of a solution (A183): one comment line under its answer block,
 # "<!-- cost: זמן \( O(n) \) | זיכרון \( O(1) \) -->", each chip a label word and a value.
@@ -297,7 +297,7 @@ def on_config(config, **kwargs):
     _questions = _load_questions(Path(config["docs_dir"]))
     _css_parts = [str(c) for c in (config.get("extra_css") or [])]
     if any(not CSS_LINK.match(f'<link rel="stylesheet" href="{c}">') for c in _css_parts):
-        raise PluginError(f"extra_css must be the parts stylesheets/NN-name.css, got {_css_parts}")
+        raise PluginError(f"extra_css must be the parts stylesheets/NN-name.css or stylesheets/questions/<id>-name.css, got {_css_parts}")
     _paths = _load_paths(Path(config["docs_dir"]))
     _comments = dict(config["extra"].get("comments") or {})
     _kind_files = _load_kind_files(Path(config["docs_dir"]))
@@ -318,7 +318,7 @@ def on_config(config, **kwargs):
     nav.append({"תגיות": "tags.md"})
     nav.append({"מה חדש": "new.md"})
     config["nav"] = nav
-    # the social cards (layouts/dvq.yml) read the kind names and the counts from here
+    # the social cards (tools/build/social/dvq.yml) read the kind names and the counts from here
     config["extra"]["dvq_cards"] = {
         "kinds": KINDS,
         "levels": LEVELS,

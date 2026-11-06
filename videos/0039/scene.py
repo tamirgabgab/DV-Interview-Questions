@@ -1,6 +1,6 @@
 """The tutorial video of question 0039, eggs and floors (script: script.md).
 
-Render with `python videos/render.py 0039` (see VIDEOS.md). Part א draws the 100-floor
+Render with `python videos/render.py 0039` (see notes/VIDEOS.md). Part א draws the 100-floor
 building in Manim: one egg goes floor by floor, two eggs jump in decreasing steps (14, 27,
 39, ...), then the question turned around (how many floors t drops settle), the recurrence
 as two bands around a drop, the table f(k, t) to 129, the three-egg plan (37, 66, 88, 100),

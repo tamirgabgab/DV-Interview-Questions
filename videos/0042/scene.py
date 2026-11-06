@@ -1,6 +1,6 @@
 """The tutorial video of question 0042, the camel and the water depots (script: script.md).
 
-Render with `python videos/render.py 0042` (see VIDEOS.md). No code in this question's
+Render with `python videos/render.py 0042` (see notes/VIDEOS.md). No code in this question's
 video (the owner, 2026-11-02): part ב gets its formula and the reasoning behind it.
 
 Part א draws the road from 0 to 400 km with the depots as water bars (a thin line at

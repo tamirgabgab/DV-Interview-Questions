@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Builds docs/javascripts/vendor/codemirror.min.js from tools/codemirror/entry.js with the
+# Builds docs/javascripts/vendor/codemirror.min.js from tools/build/codemirror/entry.js with the
 # pinned CodeMirror packages below (MIT licence). Run it after a version bump or an edit of
 # entry.js, and commit the bundle; the site never loads CodeMirror from a CDN.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
-root="$(cd "$here/../.." && pwd)"
+root="$(cd "$here/../../.." && pwd)"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 cp "$here/entry.js" "$work/"
@@ -16,6 +16,6 @@ npm install --no-audit --no-fund --silent \
 mkdir -p "$root/docs/javascripts/vendor"
 npx esbuild entry.js --bundle --minify --format=iife --target=es2020 \
   --legal-comments=none \
-  --banner:js="/* CodeMirror 6 (MIT, https://codemirror.net), bundled by tools/codemirror/build.sh */" \
+  --banner:js="/* CodeMirror 6 (MIT, https://codemirror.net), bundled by tools/build/codemirror/build.sh */" \
   --outfile="$root/docs/javascripts/vendor/codemirror.min.js"
 ls -l "$root/docs/javascripts/vendor/codemirror.min.js"

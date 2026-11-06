@@ -1,6 +1,6 @@
 """The tutorial video of question 0026, three friends and one motorcycle (script: script.md).
 
-Render with `python videos/render.py 0026` (see VIDEOS.md). One part and no code: the
+Render with `python videos/render.py 0026` (see notes/VIDEOS.md). One part and no code: the
 proof step by step instead (as in 0015 and 0029). The road from A to B is drawn as a line,
 the motorcycle with its driver and the two others move on it, and a distance-time chart
 under it is drawn in step (a line per traveller and one for the motorcycle): first the two

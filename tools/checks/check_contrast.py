@@ -7,8 +7,8 @@ a text or a mark on a background as the site draws it; a translucent colour is c
 over what lies under it. Text needs 4.5:1, marks and controls (icons, bars, focus rings)
 3:1. A pair under its minimum fails, so a new colour that reads badly stops the deploy.
 
-    python tools/check_contrast.py          # every pair, both schemes
-    python tools/check_contrast.py --all    # also print the pairs that pass
+    python tools/checks/check_contrast.py          # every pair, both schemes
+    python tools/checks/check_contrast.py --all    # also print the pairs that pass
 """
 
 from __future__ import annotations
@@ -19,9 +19,10 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 # the site's stylesheets in their load order (mkdocs.yml lists the same parts)
-STYLES = sorted((ROOT / "docs" / "stylesheets").glob("[0-9][0-9]-*.css"))
+STYLES = (sorted((ROOT / "docs" / "stylesheets").glob("[0-9][0-9]-*.css"))
+          + sorted((ROOT / "docs" / "stylesheets" / "questions").glob("[0-9][0-9][0-9][0-9]-*.css")))
 
 TEXT, UI = 4.5, 3.0
 
@@ -295,7 +296,7 @@ PAIRS = [
     ("figures C, the name of the ack state", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))"], TEXT),
     ("figures C, req and ack values in the ack state", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))"], TEXT),
     ("figures C, the frame of a changed cell", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], UI),
-    # 0083 jugs (26-jugs.css): the jugs, the grid of the states and the jugs / jugs3 boxes
+    # 0083 jugs (stylesheets/questions/0083-jugs.css): the jugs, the grid of the states and the jugs / jugs3 boxes
     ("0083 jugs, the amount on the water", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 32%, var(--md-default-bg-color))"], TEXT),
     ("0083 jugs, the amount in an empty jug or a name", "var(--viz-ink)", [CARD, PAGE], TEXT),
     ("0083 jugs, a capacity under a jug", "var(--viz-text)", [CARD, PAGE], TEXT),
@@ -306,7 +307,7 @@ PAIRS = [
     ("0083 jugs, a state never reached", "var(--viz-text)", [CARD, PAGE], UI),
     ("0083 jugs, the longer plan on the grid", "var(--viz-s4)", [CARD, PAGE], UI),
     ("0083 jugs, the shortest-plan tag", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))", CARD, PAGE], TEXT),
-    # 0084 LIS (27-lis.css): the figures and the box of the longest increasing subsequence
+    # 0084 LIS (stylesheets/questions/0084-lis.css): the figures and the box of the longest increasing subsequence
     ("0084 LIS, a value on the LIS", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("0084 LIS, a value compared or appended", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
     ("0084 LIS, a value not compared (a[j] >= a[i])", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color))"], TEXT),
@@ -317,7 +318,7 @@ PAIRS = [
     ("0084 LIS, the frame of mid in the search range", "var(--viz-s4)", ["color-mix(in srgb, var(--viz-s4) 16%, var(--md-default-bg-color))"], UI),
     ("0084 LIS, a prev or parent arc on the box", "var(--viz-text)", [CARD], UI),
     ("0084 LIS, the LIS's arc on the box", "var(--viz-s1)", [CARD], UI),
-    # 0085 self-describing (28-selfdesc.css): the digit tables of the figures and the box
+    # 0085 self-describing (stylesheets/questions/0085-selfdesc.css): the digit tables of the figures and the box
     ("0085 self-describing, a digit d[i]", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("0085 self-describing, a count that matches", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
     ("0085 self-describing, a count that does not match", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
@@ -326,7 +327,7 @@ PAIRS = [
     ("0085 self-describing, the positions and row names", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0085 self-describing, the base shown in the strip", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 18%, var(--md-default-bg-color))"], TEXT),
     ("0085 self-describing, the frame of the base shown", "var(--viz-s4)", ["color-mix(in srgb, var(--viz-s4) 18%, var(--md-default-bg-color))"], UI),
-    # 0086 chameleons (29-chameleons.css): red is --viz-s5, green --viz-s3, blue --viz-s1
+    # 0086 chameleons (stylesheets/questions/0086-chameleons.css): red is --viz-s5, green --viz-s3, blue --viz-s1
     ("0086 chameleons, a count on its disc", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s5) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
     ("0086 chameleons, a count and its residue in the box", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s5) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color))"], TEXT),
     ("0086 chameleons, a chameleon's colour as a mark", "var(--viz-s5)", [CARD, PAGE], UI),
@@ -337,7 +338,7 @@ PAIRS = [
     ("0086 chameleons, the start ring", "var(--viz-s2-text)", [CARD, PAGE], UI),
     ("0086 chameleons, the path so far", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0086 chameleons, the shortest-plan tag", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
-    # 0087 lights out (30-lights.css): the boards of the figures and of the box
+    # 0087 lights out (stylesheets/questions/0087-lights.css): the boards of the figures and of the box
     ("0087 lights out, the rim of a light that is on", "var(--viz-ink)", [CARD, PAGE, "var(--md-accent-fg-color)"], UI),
     ("0087 lights out, the ring of a light that is off", "var(--viz-text)", [CARD, PAGE], UI),
     ("0087 lights out, a press", "var(--viz-s1)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], UI),
@@ -346,7 +347,7 @@ PAIRS = [
     ("0087 lights out, a light's number, a caption, the equals sign", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0087 lights out, a count under a cell", "var(--viz-ink)", [CARD, PAGE], TEXT),
     ("0087 lights out, a press of the solution in the system", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
-    # 0088 ducci (31-ducci.css): the circle of numbers, the parity rows, the box's chart
+    # 0088 ducci (stylesheets/questions/0088-ducci.css): the circle of numbers, the parity rows, the box's chart
     ("0088 ducci, a number on the circle", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color))"], TEXT),
     ("0088 ducci, the rim of a number", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0088 ducci, the rim of a number in the cycle", "var(--viz-s4)", [CARD, PAGE], UI),
@@ -356,7 +357,7 @@ PAIRS = [
     ("0088 ducci, the frame of an all-even row", "var(--viz-s3-text)", [CARD, PAGE], UI),
     ("0088 ducci, a panel title, a round number, a chart label", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0088 ducci, a bar of the round where all turned even", "var(--viz-s3)", [CARD, PAGE], UI),
-    # 0089 frobenius (32-frobenius.css): the amount tables of the figures and of the box
+    # 0089 frobenius (stylesheets/questions/0089-frobenius.css): the amount tables of the figures and of the box
     ("0089 frobenius, a payable amount", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
     ("0089 frobenius, an amount that cannot be paid", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
     ("0089 frobenius, the frame of the largest amount that cannot be paid", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], UI),
@@ -365,7 +366,7 @@ PAIRS = [
     ("0089 frobenius, the frame of a head and of the best so far", "var(--viz-s1)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))", CARD, PAGE], UI),
     ("0089 frobenius, the column settled now and the typed amount", "var(--viz-ink)", [CARD, PAGE], UI),
     ("0089 frobenius, an amount not settled yet, the remainders", "var(--viz-text)", [CARD, PAGE], TEXT),
-    # 0090 pancakes (33-pancake.css): the stacks of the figures and of the box
+    # 0090 pancakes (stylesheets/questions/0090-pancake.css): the stacks of the figures and of the box
     ("0090 pancakes, a size on a pancake", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], TEXT),
     ("0090 pancakes, a size on a pancake in place", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color))"], TEXT),
     ("0090 pancakes, the edge of a pancake", "var(--viz-s2-text)", [CARD, PAGE], UI),
@@ -373,7 +374,7 @@ PAIRS = [
     ("0090 pancakes, the frame of a flip", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0090 pancakes, the hint", "var(--viz-s4)", [CARD, PAGE], UI),
     ("0090 pancakes, the plate", "var(--viz-text)", [CARD, PAGE], UI),
-    # 0091 chomp (34-chomp.css): the chocolate bars of the figures and of the box
+    # 0091 chomp (stylesheets/questions/0091-chomp.css): the chocolate bars of the figures and of the box
     ("0091 chomp, the edge of a square of chocolate", "var(--viz-s2-text)", [CARD, PAGE], UI),
     ("0091 chomp, the edge of the poisoned square", "var(--viz-s5)", [CARD, PAGE], UI),
     ("0091 chomp, the cross on the poisoned square", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s5) 30%, var(--md-default-bg-color))"], UI),
@@ -382,7 +383,7 @@ PAIRS = [
     ("0091 chomp, a losing move on chocolate", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], UI),
     ("0091 chomp, the squares a move ate", "var(--viz-text)", [CARD, PAGE], UI),
     ("0091 chomp, a column letter or a row number", "var(--viz-text)", [CARD, PAGE], TEXT),
-    # 0092 circle (35-circle.css): the disc cut into regions, in the figures and the box
+    # 0092 circle (stylesheets/questions/0092-circle.css): the disc cut into regions, in the figures and the box
     ("0092 circle, a region number on any of the six tints", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], TEXT),
     ("0092 circle, a chord over any region", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
     ("0092 circle, the new chord over any region", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
@@ -390,7 +391,7 @@ PAIRS = [
     ("0092 circle, a point on the circle", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0092 circle, the number of a point", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0092 circle, the dashed bar of the powers of 2", "var(--viz-s2-text)", [CARD, PAGE], UI),
-    # 0093 matching (36-match.css): the figure and the box's preference tables
+    # 0093 matching (stylesheets/questions/0093-match.css): the figure and the box's preference tables
     ("0093 matching, an entry that holds or a pair now", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
     ("0093 matching, a refused entry", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
     ("0093 matching, an entry, a name, a label in the figure", "var(--viz-ink)", [CARD, PAGE], TEXT),

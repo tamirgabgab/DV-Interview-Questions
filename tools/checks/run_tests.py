@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Run the question tests: Python with pytest, SystemVerilog with Verilator.
 
-    python tools/run_tests.py                 # everything
-    python tools/run_tests.py 6 7             # only questions 0006 and 0007
-    python tools/run_tests.py --python-only   # skip SystemVerilog
-    python tools/run_tests.py --sv-only
+    python tools/checks/run_tests.py                 # everything
+    python tools/checks/run_tests.py 6 7             # only questions 0006 and 0007
+    python tools/checks/run_tests.py --python-only   # skip SystemVerilog
+    python tools/checks/run_tests.py --sv-only
 
 SystemVerilog needs Verilator 5.053 or newer (today: a development snapshot built from a
 pinned commit, see CONTRIBUTING.md "Tests" and the CI workflow) with the z3 solver on the PATH,
@@ -34,7 +34,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1])]
 import extract_code  # noqa: E402
 
 ROOT = extract_code.ROOT

@@ -1,7 +1,7 @@
 """The tutorial video of question 0018, two hourglasses measuring D minutes from time 0
 (script: script.md).
 
-Render with `python videos/render.py 0018` (see VIDEOS.md). Part א draws the two hourglasses
+Render with `python videos/render.py 0018` (see notes/VIDEOS.md). Part א draws the two hourglasses
 (7 and 11 minutes) in Manim with a clock and a time line: the sand flows, each flip turns the
 glass over, and the page's plan (both at 0, A at 7, A again at 11) ends at 15; then the page's
 box plays the plan event by event, the values of D that can be measured from 0, and the trap

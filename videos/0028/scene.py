@@ -1,7 +1,7 @@
 """The tutorial video of question 0028, a cake shared by fractions that grow as a geometric
 sequence (script: script.md).
 
-Render with `python videos/render.py 0028` (see VIDEOS.md). No code (the page has none):
+Render with `python videos/render.py 0028` (see notes/VIDEOS.md). No code (the page has none):
 the proof step by step instead, as in 0026. The cake is a strip, as in the page's figure:
 each person cuts a slice of what is left, from the left, and under the strip a bar chart of
 each person's share is built bar by bar up to the peak and past it. Part א on the page's

@@ -1,6 +1,6 @@
 /* The site's styles, part 20 of 21: the tutorial video: the page tool, the chapter links in the solutions, the dialog with its poster (V3, video.js). */
 
-/* The dialog's own colours, one version for both schemes (VIDEOS.md: the hero's navy with
+/* The dialog's own colours, one version for both schemes (notes/VIDEOS.md: the hero's navy with
    amber marks): white ink and bright amber on navy. */
 :root {
   --vd-bg: #1b2a4a;

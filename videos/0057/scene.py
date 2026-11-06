@@ -1,6 +1,6 @@
 """The tutorial video of question 0057, ants on a rod (script: script.md).
 
-Render with `python videos/render.py 0057` (see VIDEOS.md). The owner's choice
+Render with `python videos/render.py 0057` (see notes/VIDEOS.md). The owner's choice
 (2026-11-01): parts א, ב and ג in full, part ד briefly. The ants are drawn in Manim on a
 rod of 100 cm, with the space-time chart under it (place across, time down): two ants that
 meet and turn look exactly like two ghosts that walk through each other, only the colours

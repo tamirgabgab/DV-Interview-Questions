@@ -71,12 +71,12 @@ plugins:
       lang: en          # Hebrew prefix letters: see on_post_build in hooks/questions.py
   - tags
   # Social preview cards (one PNG per page, linked from og:image); the layout is RTL and
-  # lives in layouts/dvq.yml. Needs pillow + cairosvg (requirements.txt); fonts are
+  # lives in tools/build/social/dvq.yml. Needs pillow + cairosvg (requirements/site.txt); fonts are
   # downloaded from Google Fonts into .cache/plugin/social on the first build.
   # DVQ_SOCIAL_CARDS=false builds without them (the CI's explorer check does not need them).
   - social:
       enabled: !ENV [DVQ_SOCIAL_CARDS, true]
-      cards_layout_dir: layouts
+      cards_layout_dir: tools/build/social
       cards_layout: dvq
 
 hooks:
@@ -146,17 +146,17 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/23-polish.css      # one action colour, named icon buttons on phones, code size (session 32)
   - stylesheets/24-living.css      # the pad field, skeletons, tabular figures, titles, the footer's board line (session 32)
   - stylesheets/25-figures-c.css   # S415 figures: 0002's XOR bits, 0003's passes, 0038's contract (session 32)
-  - stylesheets/26-jugs.css        # 0083: the water jugs, their figures and box (session 32)
-  - stylesheets/27-lis.css         # 0084: the longest increasing subsequence, its figures and box (session 32)
-  - stylesheets/28-selfdesc.css    # 0085: the self-describing number, its tables and box (session 32)
-  - stylesheets/29-chameleons.css  # 0086: the chameleons, their figures and box (session 32)
-  - stylesheets/30-lights.css      # 0087: Lights Out, its boards and box (session 32)
-  - stylesheets/31-ducci.css       # 0088: differences in a circle, its figures and box (session 32)
-  - stylesheets/32-frobenius.css   # 0089: coins you cannot make up, the amount tables and box (session 32)
-  - stylesheets/33-pancake.css     # 0090: pancake sorting, the stacks and the box (session 32)
-  - stylesheets/34-chomp.css       # 0091: Chomp, the chocolate bars and the box (session 32)
-  - stylesheets/35-circle.css      # 0092: points on a circle, the regions and the box (session 32)
-  - stylesheets/36-match.css       # 0093: stable matching, the figure and the box (session 32)
+  - stylesheets/questions/0083-jugs.css        # 0083: the water jugs, their figures and box (session 32)
+  - stylesheets/questions/0084-lis.css         # 0084: the longest increasing subsequence, its figures and box (session 32)
+  - stylesheets/questions/0085-selfdesc.css    # 0085: the self-describing number, its tables and box (session 32)
+  - stylesheets/questions/0086-chameleons.css  # 0086: the chameleons, their figures and box (session 32)
+  - stylesheets/questions/0087-lights.css      # 0087: Lights Out, its boards and box (session 32)
+  - stylesheets/questions/0088-ducci.css       # 0088: differences in a circle, its figures and box (session 32)
+  - stylesheets/questions/0089-frobenius.css   # 0089: coins you cannot make up, the amount tables and box (session 32)
+  - stylesheets/questions/0090-pancake.css     # 0090: pancake sorting, the stacks and the box (session 32)
+  - stylesheets/questions/0091-chomp.css       # 0091: Chomp, the chocolate bars and the box (session 32)
+  - stylesheets/questions/0092-circle.css      # 0092: points on a circle, the regions and the box (session 32)
+  - stylesheets/questions/0093-match.css       # 0093: stable matching, the figure and the box (session 32)
 
 extra_javascript:
   - javascripts/mathjax.js

@@ -2,7 +2,7 @@
 
 How the questions are organized and written, the tools that scaffold and check them, the
 tests, the interactive boxes and the publishing. The [README](README.md) has the links to
-the site; [`CATALOG.md`](CATALOG.md) lists every question; [`HANDOFF.md`](HANDOFF.md) is
+the site; [`notes/CATALOG.md`](notes/CATALOG.md) lists every question; [`notes/HANDOFF.md`](notes/HANDOFF.md) is
 the work log and the open tasks.
 
 ## How questions are organized
@@ -62,7 +62,7 @@ Each question carries one or more tags. Use the existing ones where possible:
 The owner sends questions and solutions during the week. Gaps in the coverage, new
 question formats, and a list of external sources for inspiration (HDLBits, Verification
 Academy, ChipVerify, Sunburst Design papers, puzzle sites and more) are kept in
-[`HANDOFF.md` → Question variety](HANDOFF.md#question-variety). Take ideas from them, but
+[`notes/HANDOFF.md` → Question variety](notes/HANDOFF.md#question-variety). Take ideas from them, but
 write our own statement and solution.
 
 ---
@@ -71,51 +71,63 @@ write our own statement and solution.
 
 ```text
 DV-Interview-Questions/
-├── README.md                 # The links to the site, running it locally
-├── CONTRIBUTING.md           # This file
-├── CATALOG.md                # Every question with its link (written by tools/catalog.py)
+├── README.md                   # The links to the site, the videos, the repository's layout, running it locally
+├── CONTRIBUTING.md             # This file
 ├── CLAUDE.md                   # Working rules for AI sessions (language, skeleton, tests, workflow)
-├── HANDOFF.md                  # Task list: done / in progress / future work
-├── HANDOFF-archive.md          # The older work log (sessions 1 to 21) and finished rounds
-├── mkdocs.yml                  # Site configuration
-├── requirements.txt            # Pinned Python dependencies for building the site
-├── requirements-dev.txt        # Test dependencies (pytest)
+├── mkdocs.yml                  # Site configuration (nav, extra_css, extra_javascript, the hook)
+├── notes/                      # Working notes, not part of the site (a push of only these runs no CI)
+│   ├── CATALOG.md              # Every question with its link (written by tools/build/catalog.py)
+│   ├── HANDOFF.md              # Task list: in progress, open items, the recent work log, technical notes
+│   ├── HANDOFF-archive.md      # The work log of sessions 1 to 21 and the finished rounds U to X
+│   ├── HANDOFF-archive-2.md    # The work log of sessions 22 to 30, the redesign plan, proposal series 6 to 8
+│   └── VIDEOS.md               # The plan and the format of the tutorial videos
+├── requirements/
+│   ├── site.txt                # Pinned Python dependencies for building the site
+│   ├── dev.txt                 # Test and check dependencies (pytest, Playwright)
+│   └── video.txt               # The tutorial videos (Manim), rendered locally, never in CI
 ├── hooks/
-│   └── questions.py            # Validation, navigation, tags, tables, run panels
+│   └── questions.py            # Validation, navigation, tags, tables, run panels, the joined stylesheet
 ├── tools/
-│   ├── extract_code.py         # Pulls the code blocks out of a question page
-│   ├── search_text.py          # A question's statement for the search, math in plain symbols
-│   ├── lint_pages.py           # Checks the page skeleton and the RTL rules
-│   ├── check_links.py          # Internal link / anchor check of the built site (--external fetches the rest)
-│   ├── check_phone.py          # Every built page at 390 px (sideways scroll, JS errors, axe-core)
-│   ├── check_404.py            # The 404 page under the site's path, at both widths
-│   ├── check_keyboard.py       # A keyboard pass: tab order, focus rings, names, the components' keys
-│   ├── check_explorers.py      # Every explorer box: each button clicked, its link and remembered state
-│   ├── check_jumps.py          # Every explorer box stepped: no figure moves while it steps
-│   ├── check_inputs.py         # Every number and text field of every box: typed, Enter / Tab, the box changes
-│   ├── check_contrast.py       # The site's colour pairs in both schemes against WCAG 2
-│   ├── check_videos.py         # The video fields of the pages and the captions of videos/*/script.md
-│   ├── run_tests.py            # Runs all question tests (Python + SystemVerilog)
-│   ├── new_question.py         # Scaffold: page, tests folder, generator stub, catalog row
-│   ├── catalog.py              # Writes CATALOG.md from the pages' front matter
-│   ├── graph.py                # Writes docs/graph.html (the question map) from graph_concepts.json
+│   ├── extract_code.py         # Pulls the code blocks out of a question page (shared by the tests and the checks)
 │   ├── page_tests.py           # Test helpers: Node runner, "page blocks match the generator"
-│   ├── codemirror/             # entry.js + build.sh: the run panel's editor bundle
+│   ├── explorer_node.js        # Runs an explorer's model under Node for the tests
+│   ├── dev_setup.sh            # Prepares a sandbox: packages, the CDN copies in .cache/cdn, --verilator
+│   ├── checks/                 # Everything CI runs on a push
+│   │   ├── lint_pages.py       # Checks the page skeleton and the RTL rules
+│   │   ├── run_tests.py        # Runs all question tests (Python + SystemVerilog)
+│   │   ├── check_links.py      # Internal link / anchor check of the built site (--external fetches the rest)
+│   │   ├── check_phone.py      # Every built page at 390 px (sideways scroll, JS errors, axe-core)
+│   │   ├── check_404.py        # The 404 page under the site's path, at both widths
+│   │   ├── check_keyboard.py   # A keyboard pass: tab order, focus rings, names, the components' keys
+│   │   ├── check_explorers.py  # Every explorer box: each button clicked, its link and remembered state
+│   │   ├── check_jumps.py      # Every explorer box stepped: no figure moves while it steps
+│   │   ├── check_inputs.py     # Every number and text field of every box: typed, Enter / Tab, the box changes
+│   │   ├── check_contrast.py   # The site's colour pairs in both schemes against WCAG 2
+│   │   ├── check_videos.py     # The video fields of the pages and the captions of videos/*/script.md
+│   │   └── text_only.py        # The CI's fast lane: is a push only prose on question pages?
+│   ├── build/                  # Files the site is built from
+│   │   ├── catalog.py          # Writes notes/CATALOG.md and the README's video table from the front matter
+│   │   ├── graph.py            # Writes docs/graph.html (the question map) from graph_concepts.json
+│   │   ├── search_text.py      # A question's statement for the search, math in plain symbols (the hook imports it)
+│   │   ├── make_icons.py       # The home-screen icons in docs/assets/icons/
+│   │   ├── social/dvq.yml      # Social preview card layout (RTL) for Material's social plugin
+│   │   └── codemirror/         # entry.js + build.sh: the run panel's editor bundle
+│   ├── authoring/
+│   │   ├── new_question.py     # Scaffold: page, tests folder, generator stub, catalog row
+│   │   └── question.md         # The page template new_question.py copies
 │   └── figures/                # Generators of the inline SVG figures (q<id>.py with blocks()),
 │                               # charts.py (shared chart helpers), fill.py (puts blocks on pages),
 │                               # stepper.py, cake.py
 ├── tests/
-│   ├── conftest.py
+│   ├── conftest.py             # Puts tools/ and its three folders on the import path
 │   ├── hook/                   # Tests of the site hook (search variants and documents, study paths)
 │   ├── tools/                  # Tests of new_question.py, fill.py, charts.py, check_videos.py ...
 │   └── <id>/                   # One folder per question with code, e.g. tests/0006/
 │       ├── test_<id>.py        # pytest tests of the page's Python code
 │       ├── tb.sv               # SystemVerilog testbench of the page's SV code
 │       └── demo.py             # Starting code of the in-browser "run" panel
-├── templates/
-│   └── question.md             # Copy this to start a new question
-├── layouts/
-│   └── dvq.yml                 # Social preview card layout (RTL) for Material's social plugin
+├── videos/                     # The tutorial videos: render.py, lib/, and per question <id>/ with
+│                               # script.md, scene.py, captions.en.md and release/ (the finished files)
 ├── overrides/                  # Theme overrides (custom_dir)
 │   ├── main.html               # Adds the web app manifest (home-screen icon) and the offline worker
 │   ├── 404.html                # Hebrew "page not found" with the question the address names
@@ -124,16 +136,16 @@ DV-Interview-Questions/
 ├── docs/                       # Site content
 │   ├── index.md                # Home page: hero, how it works, levels, featured paths, FAQ
 │   ├── all.md                  # "כל השאלות": the table of all questions with its filters
-│   ├── tags.md                 # Tag index
+│   ├── new.md, tags.md         # What's new, the tag index
+│   ├── graph.html              # The question map (tools/build/graph.py)
 │   ├── paths/                  # Study paths: index.md + one page per path
 │   ├── questions/
-│   │   ├── student/
-│   │   │   ├── index.md        # Level page (generated question table)
-│   │   │   └── 0001-rising-edge-detector.md, 0002-…, 0003-…, 0010-…, 0012-…, 0015-…, 0032-…, 0036-…, 0040-…, 0048-…
-│   │   ├── junior/            # 0004-… to 0006-…, 0008-…, 0009-…, 0013-…, 0014-…, 0016-…, 0017-…, 0018-…, 0026-… to 0031-…, 0033-… to 0035-…, 0038-…, 0049-…, 0051-…, 0053-…, 0055-… to 0057-…, 0059-… to 0062-…
-│   │   └── senior/            # 0007-…, 0011-…, 0019-…, 0020-…, 0021-…, 0023-…, 0024-…, 0025-…, 0037-…, 0050-…, 0052-…, 0054-…, 0058-…
+│   │   ├── student/            # index.md (the level page) + <id>-<slug>.md per question
+│   │   ├── junior/
+│   │   └── senior/
 │   ├── assets/
 │   │   ├── logo.svg, favicon.svg  # Site mark: DV, the V an amber check
+│   │   ├── icons/              # Home-screen icons (tools/build/make_icons.py)
 │   │   ├── images/             # Figures and screenshots referenced by questions
 │   │   └── spider-fly.html     # The owner's standalone spider-and-fly tool, embedded by 0030 (kept as sent)
 │   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner
@@ -146,7 +158,8 @@ DV-Interview-Questions/
 │   │                           # (the success pulse, the box loading wave), video.js (the tutorial
 │   │                           # video's dialog), and explorer/:
 │   │                           # core.js (shared code of the boxes) + one file per explorer kind
-│   └── stylesheets/            # The styles in 21 parts loaded in order (README.md lists them)
+│   └── stylesheets/            # The shared styles in 25 numbered parts, then questions/<id>-<name>.css,
+│                               # one per question that needs its own (README.md lists them)
 └── .github/workflows/
     ├── deploy.yml              # Test + build on every push (explorers on 4 runners), deploy main; every job has a timeout
     └── weekly.yml              # Mondays: external links of the site, newer Verilator release
@@ -161,14 +174,14 @@ is unique across the whole repository (e.g. `0042-async-fifo-depth.md`).
 
 Each question is a single Markdown file: a front-matter header followed by the question,
 optional collapsible hints, the solution and the key takeaways. The headings and text are
-in Hebrew. See [`templates/question.md`](templates/question.md).
+in Hebrew. See [`tools/authoring/question.md`](tools/authoring/question.md).
 
 Conventions:
 
 - **Solutions are collapsed** (`??? success "פתרון"`) so the page can be used for practice.
 - **Multi-part questions** stay in one file, with `### סעיף א`, `### סעיף ב`, ... and a
   separate collapsed solution right after each part.
-- **Fixed page skeleton** (checked by `tools/lint_pages.py`, which runs in CI):
+- **Fixed page skeleton** (checked by `tools/checks/lint_pages.py`, which runs in CI):
   - one `??? interviewer "מה המראיין בודק"` block right after the question text, written
     so that it does not reveal the answer;
   - hints as a ladder: `??? tip "רמז 1"`, `??? tip "רמז 2"` (hint 2 is shown only after
@@ -226,7 +239,7 @@ Conventions:
   `tests/tools/test_run_panel.py`, which runs every demo against its page and fails on an
   error or a comment that does not match. Opening a panel by hand starts downloading
   Python and swaps the textarea for a CodeMirror editor (`docs/javascripts/vendor/
-  codemirror.min.js`, built by `tools/codemirror/build.sh` from `tools/codemirror/entry.js`
+  codemirror.min.js`, built by `tools/build/codemirror/build.sh` from `tools/build/codemirror/entry.js`
   with pinned versions; never loaded from a CDN). Every Python and SystemVerilog tab of a
   solution's code gets a "▶ להרצה" button that opens the panel.
 - **Math stays symbolic**: no Hebrew inside MathJax (`\text{...}` renders Hebrew reversed);
@@ -234,7 +247,7 @@ Conventions:
 - **RTL-safe text:** every line, list item and table cell starts with a Hebrew word, or
   with the RLM mark (U+200F) when it has to start with Latin text, code or math.
 
-The full skeleton with comments is in [`templates/question.md`](templates/question.md):
+The full skeleton with comments is in [`tools/authoring/question.md`](tools/authoring/question.md):
 
 ```markdown
 ---
@@ -246,7 +259,7 @@ kind: design             # puzzle | code | design | math | dv
 tags: [fifo, clock-domain-crossing]
 source: ""               # optional: company / interview round
 added: 2026-10-15
-# video: dQw4w9WgXcQ     # optional, once the video is on YouTube: its id (VIDEOS.md)
+# video: dQw4w9WgXcQ     # optional, once the video is on YouTube: its id (notes/VIDEOS.md)
 # video_parts: [0, 95]   # optional: each part's chapter start in seconds, one per part
 ---
 
@@ -346,7 +359,7 @@ not start with the id, or a duplicate id. It also generates, per question page:
   and a link to the level's next question not solved yet; the check mark pops and the
   level's last question drops a short confetti (both off under reduced motion). Taking the
   mark off says so, with an undo;
-- the **tutorial video** of a question whose front matter has `video:` (VIDEOS.md): a
+- the **tutorial video** of a question whose front matter has `video:` (notes/VIDEOS.md): a
   "סרטון הסבר" tool first among the page tools (hidden in interview mode), and a "לפרק בסרטון 1:35" pill at the top of the first solution block of
   every part ("לסרטון ההסבר" on a page without parts), its `href` the video on YouTube at
   that time. `docs/javascripts/video.js` opens the video in a modal `<dialog>`: a title,
@@ -437,7 +450,7 @@ filters, the header card, the tags page (its headings and contents list, rewritt
 the build, with a grid of every tag and its count above the lists; each list is folded
 under its tag's name, a link to `tags/#tag:...` opens it, and an open list runs in two
 columns on a wide screen) and the search results; the tag as written stays in the files, the addresses
-and the anchors. `tools/lint_pages.py` warns about a topic without a name.
+and the anchors. `tools/checks/lint_pages.py` warns about a topic without a name.
 
 ### Study paths
 
@@ -459,7 +472,7 @@ The search finds the questions themselves (Y396): after the build the hook keeps
 document per question page, its text the statement (the "השאלה" section), and one per part
 ("סעיף א ...") with that part's statement. Hints, solutions, code, figures, boxes, traps and
 follow-ups, and every page that is not a question (home, paths, catalog, tags, what's new),
-are left out. `tools/search_text.py` reads the statement out of the built page and writes
+are left out. `tools/build/search_text.py` reads the statement out of the built page and writes
 its math in plain symbols ("O(n log n)", "2ⁿ − 1", "⌊log₂ n⌋"), each formula in a
 left-to-right isolate (U+2066 ... U+2069, as the results drop markup); a TeX command it
 does not know comes out as its name, never with a backslash
@@ -692,17 +705,17 @@ follow the light / dark switch automatically:
 | `bc-cell` (`is-one`, `is-zero`, `is-again`), `bc-prob`, `bc-out`, `bc-head`, `bc-bit` (`is-same`, `is-stop`, `is-later`), `bc-bitv`, `bc-key-*`; on `gs-bits` cells `bc-one`, `bc-zero`, `bc-same`, `bc-stop`, `vn-last` | Biased coins (0079): the grid of a pair of flips and the bits of p against the fair flips (figures), and the `vncoin` and `cmpcoin` explorers |
 | `nq-board` (`nq-sq` with `is-dark`, `is-hit`, `is-free`, `is-even`, `is-odd`; `nq-frame` with `is-sym`; `nq-lab`; queens `nq-q` with `is-new`, `is-sol`, `is-bad`, `is-ghost`; `nq-cell` / `nq-ring` for a clickable cell), `nq-classes` (`nq-dot`), `nq-masks` (over `gs-bits`: `nq-bitno`, `is-free` bits), `nq-wrap`, `nq-key-*` | N queens (0081): the boards of the figures and of the `nqueens` / `nqplace` explorers (column 0 on the right, as the low bit), the queens, the next row's attacked and free cells, the masks with their free bits, the 12 distinct solutions, the two halves of the construction |
 | `nim-board`, `nim-heap`, `nim-lab`, `nim-toks`, `nim-tok` (`is-hint`, `is-gone`), `nim-hintlab`, `nim-log`, `nim-key-*`; on the `gs-bits` table `nim-bin` with cells `nim-top`, `nim-zero` | The `nim` explorer (0082): the heaps as rows of round tokens (a click takes the token and every token after it; the taken ones hollow, the winning move in the amber tint), and the heaps or their Grundy numbers in binary with the XOR row, its top bit framed and an XOR of 0 in green |
-| `wj-*` (26-jugs.css) | The water jugs (0083): the jugs with their water (the changed jug framed, an arrow over a pour) and the grid of states (reachable, never reached, the goal, the path so far) in the figures and in the `jugs` / `jugs3` explorers (`data-a`, `data-b`, `data-t`; `data-caps`, `data-goal`): moves by hand with undo, or the BFS shortest plan played step by step, why T is impossible, the moves in the link |
-| `lis-*` (`lis-fig`, `lis-live`, `lis-link` `is-chain` / `is-now`, `lis-val` `is-range` / `is-mid` / `is-new` / `is-rep`; 27-lis.css) | The longest increasing subsequence (0084): the figures and the `lis` explorer in two modes, dp (a step per comparison, len and cnt rows, prev arcs) and tails (a step per probe or insertion, [lo, hi) and mid, parent arcs), with a text field, presets and a random draw |
-| `sd-*` (`sd-tab`, `sd-ix`, `sd-ok` / `sd-bad`, `sd-cut`, `sd-empty`, `sd-count` with `sd-cur`, `sd-key-*`; 28-selfdesc.css) | The self-describing number (0085): gs-bits digit tables (positions, digits, the real count of each position, matched or not; `is-mark` on the four places of the pattern) in the figures and in the `selfdesc` explorer (`data-mode` edit / search / bases, `data-base`, `data-digits`) |
-| `ch-*` (`ch-c0` / `ch-c1` / `ch-c2` for red, green, blue on `ch-dot`, `ch-disc`, `ch-key`, `ch-mono`, `ch-count`; `ch-reach`, `ch-never`, `ch-route`, `ch-start`, `ch-cur`, `ch-goal`, `ch-edge`; 29-chameleons.css) | The chameleons (0086): the three colours, the meetings, the triangle of the states with one sum, and the `chameleons` explorer (`data-r`, `data-g`, `data-b`): meetings by hand with undo or the construction played, the counts with their residues mod 3, the meetings in the link |
-| `lo-*` (`lo-fig`, `lo-board`, `lo-cell` `is-band` / `is-rest`, `lo-on` / `lo-off`, `lo-press`, `lo-now`, `lo-quiet`, `lo-btn`, `lo-sys`, `lo-x`; 30-lights.css) | Lights Out (0087): the boards of the figures and of the `lightsout` explorer (`data-mode` play or chase, `data-n`, `data-diag`, `data-lit` as hex with cell k as bit k); a lit light is an amber bulb, a press a blue frame, the chase step's press orange, a quiet pattern a dashed purple frame; also the 9×9 system table of part a |
-| `du-*` (`du-fig` / `du-live`, `du-ring`, `du-chord`, `du-node` `is-cyc`, `du-val`, `du-diff-bg`, `du-diff`; `du-bits` with `du-one`, `du-zero`, `du-dead`, `du-panel`, `du-tick`; `du-chart` with `du-bar` `is-half` / `is-cyc` / `is-now`, `du-cycline`, `du-lab`; `du-key-*`; 31-ducci.css) | Differences in a circle (0088): the circle with the differences on its edges, the parity rows of a single 1, and the `ducci` explorer (`data-v`): the circle round by round, presets and a random draw, the chart of the maximum with the halvings and the cycle marked |
-| `fb-*` (`fb-tab` with `fb-line` / `fb-res` / `fb-sym` / `fb-col`; cells `fb-ok`, `fb-no`, `fb-g`, `fb-run`, `fb-first`, `fb-now`, `fb-unk`, `fb-tent`, `fb-pick`, `fb-pad`; `fb-ix`, `fb-key-*`; 32-frobenius.css) | Coins you cannot make up (0089): gs-bits tables of amounts (rows of ten, columns by remainder mod the smallest coin, the n / g − n pairs) in the figures and the `frobenius` explorer (`data-mode` line / residues / pay, `data-coins`, `data-n`): payable green, not orange, the largest unpayable framed, a column's head blue, Dijkstra's best so far dashed |
-| `pk-*` (`pk-fig`, `pk-cake` with `pk-done`, `pk-burnt`, `pk-num`, `pk-plate`, `pk-flipbox`, `pk-arrow` / `pk-head`; in the box `pk-stack`, `pk-row` with `is-flip` / `is-hint`, `pk-cakeb` with `pk-down` / `pk-up`, `pk-platebar`, `pk-key-*`; 33-pancake.css) | Pancake sorting (0090): stacks top first, pancakes as wide as their size, the last flip framed, pancakes in place in green, the burnt side as a thick edge; the `pancake` explorer (`data-n`, `data-burnt`, `data-stack`): click a pancake to flip, flips against the BFS minimum, a hint, start and flips in the link |
-| `cp-*` (`cp-fig` / `cp-board`, `cp-sq`, `cp-poison` with `cp-cross`, `cp-gone`, `cp-empty`, `cp-pick`, `cp-win`, `cp-lose`, `cp-lab`, `cp-cap`, `cp-btn` / `cp-ring`, `cp-key-*`; 34-chomp.css) | Chomp (0091): chocolate bars with a1 at the bottom left, the squares a move ate dashed, the square chosen framed in blue; the `chomp` explorer (`data-mode` play with `data-m` / `data-n`, or mirror with `data-n`): play against perfect play with the winning (green) and losing (grey dashed) squares marked, or the mirror on a square board with a random opponent move; the moves in the link |
-| `mc-*` (`mc-reg` with `mc-c0`…`mc-c5`, `mc-ring`, `mc-chord` `is-new` / `is-later`, `mc-pt`, `mc-hit`, `mc-triple`, `mc-num`, `mc-plab`, `mc-count`; `mc-h` / `mc-hring` handles; `mc-bar-reg`, `mc-bar-pow`; `mc-key-*`; 35-circle.css) | Points on a circle (0092): the disc cut by every chord, each region in one of six tints so that neighbours differ, in the figures and the `circlecut` explorer (`data-n`, `data-angles`, `data-where` free / regular, `data-show` all / steps): points dragged or moved with arrows, chords added one at a time with their meeting points, three-chord points ringed; the angles and the step in the link via `dvqExtra` |
-| `sm-*` (`sm-fig` with `sm-pair` / `sm-no` / `sm-cnode` / `sm-jnode` / `sm-lab`; in the box `sm-tables`, `sm-tab`, `sm-cap`, `sm-role`, `sm-prefs`, `sm-chip` with `sm-hold` / `sm-out` / `sm-now` / `sm-sel` / `sm-todo`, `sm-pairs` / `sm-pair`, `sm-key-*`; 36-match.css) | Stable matching (0093): the figure of the final pairs and the refused proposals, and the `matching` explorer (`data-side` cand or job): the two preference tables (right to left) as entry buttons, the proposals step by step, who proposes, size 3–6, random lists, swaps by two clicks; the lists and the step in the link |
+| `wj-*` (stylesheets/questions/0083-jugs.css) | The water jugs (0083): the jugs with their water (the changed jug framed, an arrow over a pour) and the grid of states (reachable, never reached, the goal, the path so far) in the figures and in the `jugs` / `jugs3` explorers (`data-a`, `data-b`, `data-t`; `data-caps`, `data-goal`): moves by hand with undo, or the BFS shortest plan played step by step, why T is impossible, the moves in the link |
+| `lis-*` (`lis-fig`, `lis-live`, `lis-link` `is-chain` / `is-now`, `lis-val` `is-range` / `is-mid` / `is-new` / `is-rep`; stylesheets/questions/0084-lis.css) | The longest increasing subsequence (0084): the figures and the `lis` explorer in two modes, dp (a step per comparison, len and cnt rows, prev arcs) and tails (a step per probe or insertion, [lo, hi) and mid, parent arcs), with a text field, presets and a random draw |
+| `sd-*` (`sd-tab`, `sd-ix`, `sd-ok` / `sd-bad`, `sd-cut`, `sd-empty`, `sd-count` with `sd-cur`, `sd-key-*`; stylesheets/questions/0085-selfdesc.css) | The self-describing number (0085): gs-bits digit tables (positions, digits, the real count of each position, matched or not; `is-mark` on the four places of the pattern) in the figures and in the `selfdesc` explorer (`data-mode` edit / search / bases, `data-base`, `data-digits`) |
+| `ch-*` (`ch-c0` / `ch-c1` / `ch-c2` for red, green, blue on `ch-dot`, `ch-disc`, `ch-key`, `ch-mono`, `ch-count`; `ch-reach`, `ch-never`, `ch-route`, `ch-start`, `ch-cur`, `ch-goal`, `ch-edge`; stylesheets/questions/0086-chameleons.css) | The chameleons (0086): the three colours, the meetings, the triangle of the states with one sum, and the `chameleons` explorer (`data-r`, `data-g`, `data-b`): meetings by hand with undo or the construction played, the counts with their residues mod 3, the meetings in the link |
+| `lo-*` (`lo-fig`, `lo-board`, `lo-cell` `is-band` / `is-rest`, `lo-on` / `lo-off`, `lo-press`, `lo-now`, `lo-quiet`, `lo-btn`, `lo-sys`, `lo-x`; stylesheets/questions/0087-lights.css) | Lights Out (0087): the boards of the figures and of the `lightsout` explorer (`data-mode` play or chase, `data-n`, `data-diag`, `data-lit` as hex with cell k as bit k); a lit light is an amber bulb, a press a blue frame, the chase step's press orange, a quiet pattern a dashed purple frame; also the 9×9 system table of part a |
+| `du-*` (`du-fig` / `du-live`, `du-ring`, `du-chord`, `du-node` `is-cyc`, `du-val`, `du-diff-bg`, `du-diff`; `du-bits` with `du-one`, `du-zero`, `du-dead`, `du-panel`, `du-tick`; `du-chart` with `du-bar` `is-half` / `is-cyc` / `is-now`, `du-cycline`, `du-lab`; `du-key-*`; stylesheets/questions/0088-ducci.css) | Differences in a circle (0088): the circle with the differences on its edges, the parity rows of a single 1, and the `ducci` explorer (`data-v`): the circle round by round, presets and a random draw, the chart of the maximum with the halvings and the cycle marked |
+| `fb-*` (`fb-tab` with `fb-line` / `fb-res` / `fb-sym` / `fb-col`; cells `fb-ok`, `fb-no`, `fb-g`, `fb-run`, `fb-first`, `fb-now`, `fb-unk`, `fb-tent`, `fb-pick`, `fb-pad`; `fb-ix`, `fb-key-*`; stylesheets/questions/0089-frobenius.css) | Coins you cannot make up (0089): gs-bits tables of amounts (rows of ten, columns by remainder mod the smallest coin, the n / g − n pairs) in the figures and the `frobenius` explorer (`data-mode` line / residues / pay, `data-coins`, `data-n`): payable green, not orange, the largest unpayable framed, a column's head blue, Dijkstra's best so far dashed |
+| `pk-*` (`pk-fig`, `pk-cake` with `pk-done`, `pk-burnt`, `pk-num`, `pk-plate`, `pk-flipbox`, `pk-arrow` / `pk-head`; in the box `pk-stack`, `pk-row` with `is-flip` / `is-hint`, `pk-cakeb` with `pk-down` / `pk-up`, `pk-platebar`, `pk-key-*`; stylesheets/questions/0090-pancake.css) | Pancake sorting (0090): stacks top first, pancakes as wide as their size, the last flip framed, pancakes in place in green, the burnt side as a thick edge; the `pancake` explorer (`data-n`, `data-burnt`, `data-stack`): click a pancake to flip, flips against the BFS minimum, a hint, start and flips in the link |
+| `cp-*` (`cp-fig` / `cp-board`, `cp-sq`, `cp-poison` with `cp-cross`, `cp-gone`, `cp-empty`, `cp-pick`, `cp-win`, `cp-lose`, `cp-lab`, `cp-cap`, `cp-btn` / `cp-ring`, `cp-key-*`; stylesheets/questions/0091-chomp.css) | Chomp (0091): chocolate bars with a1 at the bottom left, the squares a move ate dashed, the square chosen framed in blue; the `chomp` explorer (`data-mode` play with `data-m` / `data-n`, or mirror with `data-n`): play against perfect play with the winning (green) and losing (grey dashed) squares marked, or the mirror on a square board with a random opponent move; the moves in the link |
+| `mc-*` (`mc-reg` with `mc-c0`…`mc-c5`, `mc-ring`, `mc-chord` `is-new` / `is-later`, `mc-pt`, `mc-hit`, `mc-triple`, `mc-num`, `mc-plab`, `mc-count`; `mc-h` / `mc-hring` handles; `mc-bar-reg`, `mc-bar-pow`; `mc-key-*`; stylesheets/questions/0092-circle.css) | Points on a circle (0092): the disc cut by every chord, each region in one of six tints so that neighbours differ, in the figures and the `circlecut` explorer (`data-n`, `data-angles`, `data-where` free / regular, `data-show` all / steps): points dragged or moved with arrows, chords added one at a time with their meeting points, three-chord points ringed; the angles and the step in the link via `dvqExtra` |
+| `sm-*` (`sm-fig` with `sm-pair` / `sm-no` / `sm-cnode` / `sm-jnode` / `sm-lab`; in the box `sm-tables`, `sm-tab`, `sm-cap`, `sm-role`, `sm-prefs`, `sm-chip` with `sm-hold` / `sm-out` / `sm-now` / `sm-sel` / `sm-todo`, `sm-pairs` / `sm-pair`, `sm-key-*`; stylesheets/questions/0093-match.css) | Stable matching (0093): the figure of the final pairs and the refused proposals, and the `matching` explorer (`data-side` cand or job): the two preference tables (right to left) as entry buttons, the proposals step by step, who proposes, size 3–6, random lists, swaps by two clicks; the lists and the step in the link |
 | `qchip` (`qc-pins`, `qc-body`, `qc-die`, `qc-on`, `qc-dot`; `qchip-s` small), `qh-emblem-chip`, `qh-pn`, `q-idn` | A question's own chip (`question_chip` in the hook, 22-circuit.css): one pin a side per part and its id's bits on the die, in the lists and the question header, with its label DVQ‑&lt;id&gt; |
 | `cx-ico`, `hr.is-on`, `--cx-traces` / `--cx-wave` / `--cx-clock`, `--led-off` | The circuit layer (22-circuit.css, `circuit.js`): the slow icosahedron canvas of the home hero and the level bands, the divider's packet, the trace, waveform and clock masks, the unlit LED of the difficulty chips |
 | `lv-dots` (`is-lit`, `--lv-x` / `--lv-y`), `df-board`, `df-reg` | The living layer (24-living.css, `dotgrid.js`): the pad field of the home hero and the level bands with its pointer light, and the footer's board line with its registration target (`dvq_cards.rev`, the date of the last commit in Israel time) |
@@ -739,14 +752,14 @@ holds the same numbers.
 
 1. Pick the position level and difficulty. When the owner sends a source file with tables
    and formulas, recompute them first in the question's test and report what does not hold.
-2. Run `python tools/new_question.py --level <level> --difficulty <d> --kind <kind> --slug <slug> --title
+2. Run `python tools/authoring/new_question.py --level <level> --difficulty <d> --kind <kind> --slug <slug> --title
    "<Hebrew title>" --tags a,b [--figures] [--code]`. It takes the next free id, writes
    `docs/questions/<level>/<id>-<slug>.md` from the template, `tests/<id>/`, a generator stub
-   with `--figures` and `tb.sv` / `demo.py` with `--code`, and rewrites `CATALOG.md`
-   (`python tools/catalog.py` does that after a title or a level changes; a test checks it).
+   with `--figures` and `tb.sv` / `demo.py` with `--code`, and rewrites `notes/CATALOG.md`
+   (`python tools/build/catalog.py` does that after a title or a level changes; a test checks it).
 3. Write the page. Put any images in `docs/assets/images/` named `<id>-<description>.<ext>`;
    put generated figures in `blocks()` and run `python tools/figures/fill.py <id>`.
-4. Run `python tools/run_tests.py <id>` and `python tools/lint_pages.py <id>`, build locally
+4. Run `python tools/checks/run_tests.py <id>` and `python tools/checks/lint_pages.py <id>`, build locally
    (below) and check the page at desktop and phone width, light and dark.
 5. Commit with a message like `Add question 0042: async FIFO depth`.
 
@@ -758,23 +771,23 @@ of `all.md` and in the tag index — no other file needs to change.
 ## Tests
 
 ```bash
-pip install -r requirements.txt -r requirements-dev.txt   # or tools/dev_setup.sh (below)
-python tools/lint_pages.py            # page structure and RTL rules (also in CI)
-python tools/run_tests.py             # everything (under a minute once compiled)
-python tools/run_tests.py 6 7         # only questions 0006 and 0007
-python tools/run_tests.py --python-only
-python tools/check_links.py           # internal links and anchors of the built site
-python tools/check_links.py site --external   # also fetch every external link (the weekly workflow)
-python tools/check_phone.py           # every built page at 390 px: no sideways scroll, no JS errors
-python tools/check_phone.py --scheme dark   # the same in dark mode (CI: manual run with phone_dark)
-python tools/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-core (npm install axe-core)
-python tools/check_explorers.py       # every explorer box clicked through, its link and remembered state
-python tools/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
-python tools/check_inputs.py          # every box field typed into: Enter, Tab and an input method apply it
-python tools/check_contrast.py        # every colour pair, light and dark (--all prints the passes)
-python tools/check_404.py             # the 404 page as GitHub Pages serves it, at 390 and 1200 px
-python tools/check_keyboard.py        # a keyboard pass over a few pages: tab order, focus, names, the components' keys
-python tools/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
+pip install -r requirements/site.txt -r requirements/dev.txt   # or tools/dev_setup.sh (below)
+python tools/checks/lint_pages.py            # page structure and RTL rules (also in CI)
+python tools/checks/run_tests.py             # everything (under a minute once compiled)
+python tools/checks/run_tests.py 6 7         # only questions 0006 and 0007
+python tools/checks/run_tests.py --python-only
+python tools/checks/check_links.py           # internal links and anchors of the built site
+python tools/checks/check_links.py site --external   # also fetch every external link (the weekly workflow)
+python tools/checks/check_phone.py           # every built page at 390 px: no sideways scroll, no JS errors
+python tools/checks/check_phone.py --scheme dark   # the same in dark mode (CI: manual run with phone_dark)
+python tools/checks/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-core (npm install axe-core)
+python tools/checks/check_explorers.py       # every explorer box clicked through, its link and remembered state
+python tools/checks/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
+python tools/checks/check_inputs.py          # every box field typed into: Enter, Tab and an input method apply it
+python tools/checks/check_contrast.py        # every colour pair, light and dark (--all prints the passes)
+python tools/checks/check_404.py             # the 404 page as GitHub Pages serves it, at 390 and 1200 px
+python tools/checks/check_keyboard.py        # a keyboard pass over a few pages: tab order, focus, names, the components' keys
+python tools/checks/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```
 
@@ -906,10 +919,10 @@ from 0, and `videos/<id>/script.md` with one `## Chapter` heading per part (a wa
 while the script does not exist yet). In every `videos/*/script.md` each caption line,
 a line that starts with `> `, must start with a Hebrew letter or the RLM mark, have a
 U+00A0 before every colon (times, URLs and `code` exempt) and at most 12 words. The format
-of a script is in VIDEOS.md ("The script's format"); the lint and the build hook run the
+of a script is in notes/VIDEOS.md ("The script's format"); the lint and the build hook run the
 same field checks (`video_problems`).
 
-`check_phone.py` needs Playwright (`requirements-dev.txt`) and its Chromium
+`check_phone.py` needs Playwright (`requirements/dev.txt`) and its Chromium
 (`python -m playwright install chromium`). It writes a screenshot of each page to
 `.cache/phone/` (CI uploads them as the `phone-screenshots` artifact). Without access to the
 CDNs, add `--local-cdn`: it implies `--offline` and serves MathJax, Mermaid and WaveDrom
@@ -975,9 +988,9 @@ without it.
 ### The fast lane
 
 A push that changes only the prose of question pages takes a fast lane in CI, a few minutes
-instead of about twenty (the owner, 2026-11-02). `tools/text_only.py BASE HEAD` decides: every
+instead of about twenty (the owner, 2026-11-02). `tools/checks/text_only.py BASE HEAD` decides: every
 touched file must be a question page (or a file outside the site: README, the notes,
-`VIDEOS.md`, `videos/`), and in every page the front matter, the fenced code blocks, the
+`notes/VIDEOS.md`, `videos/`), and in every page the front matter, the fenced code blocks, the
 generated blocks (`<!-- gen n -->` … `<!-- /gen -->`) and every line with HTML a script reads
 (an explorer box, a figure, a stepper, any `data-` attribute) must be the same
 before and after. The gate job runs it on every push; on a fast push the workflow runs the
@@ -992,7 +1005,7 @@ raw on 0055): before pushing a text-only change, look at a screenshot of the cha
 ## Running the site locally
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements/site.txt
 mkdocs serve          # live preview at http://127.0.0.1:8000
 mkdocs build --strict # the same check that CI runs
 ```
@@ -1009,8 +1022,8 @@ links and the phone check) beside `explorers` (the explorer check on four runner
 quarter of the boxes each, `--shard K/4`), then `deploy` on `main`. Two shortcuts keep it
 short, about 13 minutes on a work branch:
 
-- A push that changes only `README.md`, `CONTRIBUTING.md`, `CATALOG.md`, `HANDOFF.md`,
-  `HANDOFF-archive.md` or `CLAUDE.md` runs nothing (`paths-ignore`): none of them is part of the site.
+- A push that changes only `README.md`, `CONTRIBUTING.md`, `CLAUDE.md` or files under `notes/`
+  runs nothing (`paths-ignore`): none of them is part of the site.
 - The `gate` job looks up the commit's runs: when `main` is fast-forwarded to a commit that
   already passed on a work branch, `main` only builds and deploys, in about 3 minutes.
 
@@ -1021,12 +1034,12 @@ the Actions tab (the workflow also has a manual `workflow_dispatch` trigger).
 ### Social preview cards
 
 Material's `social` plugin renders a 1200 × 630 card per page (`og:image`, shown when a
-link is shared in WhatsApp, LinkedIn, Slack...) from the RTL layout in `layouts/dvq.yml`:
+link is shared in WhatsApp, LinkedIn, Slack...) from the RTL layout in `tools/build/social/dvq.yml`:
 navy background, the logo, the title aligned to the right, a line above it (level ·
 difficulty · id · kind on question pages, "n שאלות ברמת …" on a level page, the totals of
 questions and boxes on the home page; the hook passes the kind names and the counts in
 `config.extra.dvq_cards`), the description and an amber bar. It needs `pillow` and `cairosvg`
-(`requirements.txt`; `libcairo2` on the machine) and downloads the Rubik font from Google
+(`requirements/site.txt`; `libcairo2` on the machine) and downloads the Rubik font from Google
 Fonts into `.cache/plugin/social/` on the first build (CI caches that directory). Without
 network access, put any Hebrew-capable TTF there as `fonts/Rubik/Regular.ttf` and
 `Bold.ttf`. The cards are written to `site/assets/images/social/`.
@@ -1040,7 +1053,7 @@ state X at the cursor (drawn once, the X pulses); when
 the address holds a question's id (`/0046-old-name/`) or its slug, it offers that question
 (the list comes from the hook, `config.extra.dvq_404`). `docs/manifest.webmanifest`, linked
 from `overrides/main.html`, lets a phone add the site to its home screen (Hebrew name, RTL,
-navy theme); its icons are drawn from the logo by `python tools/make_icons.py` into
+navy theme); its icons are drawn from the logo by `python tools/build/make_icons.py` into
 `docs/assets/icons/`. `docs/sw.js`, registered from `overrides/main.html`, keeps the pages a
 reader opened for offline reading: network first (a reader online always gets the current
 site), the last copy without a network, a short "no connection" page for a page never
@@ -1056,10 +1069,10 @@ the run panel and the comments; each box prints its figures and summary as they 
 `docs/graph.html` is a standalone page (not in the navigation, linked from `README.md`): an
 interactive knowledge graph of every question and the techniques its solution uses, drawn
 by [graphify](https://pypi.org/project/graphifyy/) with vis-network from unpkg. The data is
-`tools/graph_concepts.json`: per question its core concepts (2 to 5), its secondary ones,
+`tools/build/graph_concepts.json`: per question its core concepts (2 to 5), its secondary ones,
 and its related questions (`explicit` when the page links to it). It was written by reading
 every page; when a question is added, add its entry (and any new concept with a label and a
-group), then run `pip install graphifyy` and `python tools/graph.py`, which takes titles and
+group), then run `pip install graphifyy` and `python tools/build/graph.py`, which takes titles and
 levels from the front matter, colours the groups graphify finds, makes the canvas and the
 side panel right to left, stacks the panel under the graph below 700 px, and turns a
 question's source into a link to its page. graphify is not a site dependency.

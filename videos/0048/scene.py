@@ -1,6 +1,6 @@
 """The tutorial video of question 0048, the farmer, the food and the water (script: script.md).
 
-Render with `python videos/render.py 0048` (see VIDEOS.md). No code in this question's video
+Render with `python videos/render.py 0048` (see notes/VIDEOS.md). No code in this question's video
 (the owner, 2026-11-02): every part is the reflection, drawn.
 
 Part א works with the page's numbers L = 7, H = 3, a = 1, b = 2. First three routes that are

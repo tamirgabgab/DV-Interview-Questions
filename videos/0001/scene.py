@@ -1,6 +1,6 @@
 """The tutorial video of question 0001, the rising edge detector (script: script.md).
 
-Render with `python videos/render.py 0001` (see VIDEOS.md). One part: the problem on the
+Render with `python videos/render.py 0001` (see notes/VIDEOS.md). One part: the problem on the
 page's sig (0 0 1 1 1 1 0 0 1 1), why a combinational circuit cannot tell "rose now" from
 "high for long", the circuit drawn in Manim (a D flip-flop, NOT and AND), then the timing
 diagram built cycle by cycle under the circuit, the flip-flop showing the sig it remembers

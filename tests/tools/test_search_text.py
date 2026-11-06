@@ -1,4 +1,4 @@
-"""The search text of a question (tools/search_text.py): TeX in plain symbols, and only the
+"""The search text of a question (tools/build/search_text.py): TeX in plain symbols, and only the
 statement and the parts' statements of a page."""
 
 import re

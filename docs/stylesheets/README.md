@@ -31,6 +31,26 @@ refine one in an earlier part, and moving a rule between parts can change what w
 | `22-circuit.css` | the circuit layer (session 32): the quiet board-trace pattern at the top of every page and in the wide margins (`body::before`, `body::after`), each question's chip (`qchip`, `question_chip` in the hook) in the lists and the question header, the compact phone header, the difficulty as three LEDs (`.chip-diff`), path cards that light on hover, section dividers as a data line and the part bar's reading line as a clock, and the slow icosahedron of the home hero and the level bands (`circuit.js`) |
 | `23-polish.css` | the finishing round of the UX audit (session 32): one action colour in the boxes and the run panel (`--act`, `--act-line`: navy filled, navy outline, never amber), icon buttons at 44 px with their short name under them on a phone (`data-name`, set by `core.js`), inline code at least 13 px, the part bar's reading line clipped rather than resized |
 | `24-living.css` | the living layer (session 32): the pad field of the home hero and the level bands (`.lv-dots`, `dotgrid.js`), the page transition's timing, the skeletons of a box not built yet and of the run panel's output while Python downloads, tabular figures, the page titles a step larger, and the footer's crop marks and board line (`.df-board`, the date of the last commit from the hook) |
+| `25-figures-c.css` | the figures of S415 (session 32): the XOR steps of 0002, the passes of 0003, the handshake contract of 0038 |
+
+After the numbered parts come the stylesheets of single questions, in `questions/`, named
+`<id>-<name>.css` after the question (`questions/0083-jugs.css` for 0083's water jugs). A new
+question whose figures or box need rules of their own gets such a file, with its own class
+prefix (the class table of `CONTRIBUTING.md` lists them), and a line at the end of `extra_css`.
+
+| File | Prefix | Holds |
+|---|---|---|
+| `questions/0083-jugs.css` | `wj-` | the water jugs: the jugs, the grid of the states, the `jugs` / `jugs3` boxes |
+| `questions/0084-lis.css` | `lis-` | the longest increasing subsequence: its figures and box |
+| `questions/0085-selfdesc.css` | `sd-` | the self-describing number: the digit tables and the box |
+| `questions/0086-chameleons.css` | `ch-` | the chameleons: their figures and box |
+| `questions/0087-lights.css` | `lo-` | Lights Out: the boards of the figures and the box |
+| `questions/0088-ducci.css` | `du-` | differences in a circle: the circle, the parity rows, the box's chart |
+| `questions/0089-frobenius.css` | `fb-` | coins you cannot make up: the amount tables and the box |
+| `questions/0090-pancake.css` | `pk-` | pancake sorting: the stacks and the box |
+| `questions/0091-chomp.css` | `cp-` | Chomp: the chocolate bars and the box |
+| `questions/0092-circle.css` | `mc-` | points on a circle: the regions and the box |
+| `questions/0093-match.css` | `sm-` | stable matching: the figure and the preference tables of the box |
 
 The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
 `stylesheets/site.css` at the end of the build and links that file from every page and from
@@ -39,4 +59,4 @@ the 404 page (S423). The parts are the source; the joined file is never edited.
 Colours are CSS variables, defined for both schemes in `01-base.css` (the palette) and used
 everywhere else; figures and boxes never hard-code a colour. A new rule goes into the part
 of its component, at its end, or into the last part when it overrides rules of several
-parts. `tools/check_contrast.py` reads every part in this order.
+parts. `tools/checks/check_contrast.py` reads every part in this order, the numbered parts first.

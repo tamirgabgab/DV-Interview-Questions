@@ -1,7 +1,7 @@
 """The tutorial video of question 0014, random squares and rectangles without overlap
 (script: script.md).
 
-Render with `python videos/render.py 0014` (see VIDEOS.md). The owner's choices
+Render with `python videos/render.py 0014` (see notes/VIDEOS.md). The owner's choices
 (2026-11-03): part א with squares drawn on the 10 x 8 grid one after another, an overlap
 rejected in red and touching (a whole edge, part of an edge, only a corner) allowed in
 green, then the condition (the four zones with <=, and its "and" form), then the page's

@@ -1,4 +1,4 @@
-"""The shared Manim library of the tutorial videos (VIDEOS.md).
+"""The shared Manim library of the tutorial videos (notes/VIDEOS.md).
 
 A question's `videos/<id>/scene.py` builds its chapters from these parts:
 

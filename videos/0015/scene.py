@@ -1,6 +1,6 @@
 """The tutorial video of question 0015, two children, at least one a boy (script: script.md).
 
-Render with `python videos/render.py 0015` (see VIDEOS.md). The question has no code, so
+Render with `python videos/render.py 0015` (see notes/VIDEOS.md). The question has no code, so
 every part is a proof step by step (the owner, 2026-10-31): one equation line at a time,
 its caption saying why it holds, the earlier lines dimmed and the key numbers in amber.
 Part א draws the four ordered families (the page has no box for it) and crosses out two

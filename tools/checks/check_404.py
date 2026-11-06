@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the 404 page of the built site as GitHub Pages serves it (S424).
 
-    mkdocs build --strict && python tools/check_404.py [site]
+    mkdocs build --strict && python tools/checks/check_404.py [site]
 
 The page (overrides/404.html) links its styles and scripts by the site's absolute path
 (/DV-Interview-Questions/...), so it cannot be opened from a plain local server. This check
@@ -27,10 +27,10 @@ import sys
 import threading
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1])]
 from check_phone import AXE, CDN_DIR, INSPECT, local_cdn_routes  # noqa: E402
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 WIDTHS = (390, 1200)
 HEIGHT = 844
 GUESS_ID = "0046"
