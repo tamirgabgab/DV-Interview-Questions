@@ -88,6 +88,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: requirements/*.txt
       - run: pip install -r requirements/site.txt -r requirements/dev.txt
       # Node runs the math of the interactive explorers against the Python reference
       # (tests/0026 to tests/0028 and the Josephus tests); without it those tests skip.
@@ -153,6 +154,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: requirements/*.txt
       - run: pip install -r requirements/site.txt -r requirements/dev.txt
       - uses: actions/setup-node@v7
         with:
@@ -176,6 +178,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: requirements/*.txt
       - run: pip install -r requirements/site.txt
       # Social cards: libcairo for cairosvg (the logo on the card); the rendered cards and the
       # fonts downloaded from Google Fonts are cached, keyed on the pages and the layout.
@@ -255,6 +258,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: requirements/*.txt
       - run: pip install -r requirements/site.txt -r requirements/dev.txt
       - run: mkdocs build --strict
         env:
