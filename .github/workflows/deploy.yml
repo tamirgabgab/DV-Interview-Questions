@@ -244,7 +244,7 @@ jobs:
     needs: [gate, test]
     if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20   # usually 6 min
+    timeout-minutes: 30   # usually 15 to 18 min with 92 questions; a slow Chromium install adds up to 10
     strategy:
       fail-fast: false
       matrix:
