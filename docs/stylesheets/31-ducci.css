@@ -1,0 +1,52 @@
+/* Question 0088, differences in a circle (the Ducci sequence): the circle of numbers with the
+   differences on its edges, the parity rows of a single odd number, and the ducci box
+   (tools/figures/q0088.py, docs/javascripts/explorer/ducci.js). Colours from the palette only. */
+
+.md-typeset svg.du-fig, .md-typeset svg.du-bits { display: block; margin: 0.8rem auto; }
+
+/* the circle: the numbers on it, the chords between neighbours, the difference on each chord */
+.md-typeset svg .du-ring { fill: none; stroke: var(--viz-grid); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.md-typeset svg .du-chord { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .du-node { fill: color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg .du-node.is-cyc { stroke: var(--viz-s4); stroke-width: 3; }
+.md-typeset svg .du-val { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 16px; font-weight: 700; }
+.md-typeset svg .du-diff-bg { fill: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); stroke: var(--viz-s2-text); stroke-width: 1.5; }
+.md-typeset svg .du-diff { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 13px; font-weight: 700; }
+
+/* the parity rows: an odd number is a dark cell, an all-even row is framed */
+.md-typeset svg .du-one { fill: var(--viz-s1); }
+.md-typeset svg .du-zero { fill: none; stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .du-dead { fill: none; stroke: var(--viz-s3-text); stroke-width: 2.5; }
+.md-typeset svg .du-panel { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 14px; font-weight: 700; }
+.md-typeset svg .du-tick { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 12px; }
+
+/* the box: the circle, the chart of the maximum, the run as a strip */
+.md-typeset .du-stage { display: flex; justify-content: center; }
+.md-typeset .du-stage svg { width: 19rem; max-width: 100%; }
+.md-typeset .du-chartbox { display: flex; justify-content: center; }
+.md-typeset .du-chartbox svg { width: 34rem; max-width: 100%; }
+.md-typeset svg .du-bar { fill: color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color)); }
+.md-typeset svg .du-bar.is-half { fill: var(--viz-s3); }
+.md-typeset svg .du-bar.is-cyc { fill: color-mix(in srgb, var(--viz-s4) 55%, var(--md-default-bg-color)); }
+.md-typeset svg .du-bar.is-now { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .du-axis { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg .du-cycline { stroke: var(--viz-s4); stroke-width: 2; stroke-dasharray: 4 3; }
+.md-typeset svg .du-lab { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 12px; }
+.md-typeset .du-field { font-family: var(--md-code-font-family); min-width: 12rem; }
+.md-typeset .du-presets { overflow-x: auto; flex-wrap: nowrap; }
+.md-typeset .du-presets .md-button { white-space: nowrap; }
+.md-typeset .du-tag { display: inline-block; padding: 0 0.4em; border-radius: 0.3em; font-size: 0.85em;
+  background: color-mix(in srgb, var(--viz-s4) 16%, var(--md-default-bg-color)); color: var(--viz-ink); }
+.md-typeset .du-nums { font-family: var(--md-code-font-family); font-variant-numeric: tabular-nums; }
+
+/* the keys of the legends */
+.md-typeset .viz-legend .du-key-node { background: color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color));
+  border: 2px solid var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .du-key-diff { background: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color));
+  border: 1.5px solid var(--viz-s2-text); border-radius: 0.15rem; }
+.md-typeset .viz-legend .du-key-one { background: var(--viz-s1); border-radius: 0.1rem; }
+.md-typeset .viz-legend .du-key-zero { background: none; border: 1px solid var(--viz-grid); border-radius: 0.1rem; }
+.md-typeset .viz-legend .du-key-dead { background: none; border: 2px solid var(--viz-s3-text); border-radius: 0.1rem; }
+.md-typeset .viz-legend .du-key-bar { background: color-mix(in srgb, var(--viz-s1) 45%, var(--md-default-bg-color)); border-radius: 0.1rem; }
+.md-typeset .viz-legend .du-key-half { background: var(--viz-s3); border-radius: 0.1rem; }
+.md-typeset .viz-legend .du-key-cyc { background: color-mix(in srgb, var(--viz-s4) 55%, var(--md-default-bg-color)); border-radius: 0.1rem; }

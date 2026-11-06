@@ -354,6 +354,16 @@ PAIRS = [
     ("0090 pancakes, the frame of a flip", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0090 pancakes, the hint", "var(--viz-s4)", [CARD, PAGE], UI),
     ("0090 pancakes, the plate", "var(--viz-text)", [CARD, PAGE], UI),
+    # 0088 ducci (31-ducci.css): the circle of numbers, the parity rows, the box's chart
+    ("0088 ducci, a number on the circle", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color))"], TEXT),
+    ("0088 ducci, the rim of a number", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0088 ducci, the rim of a number in the cycle", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0088 ducci, a difference on an edge", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color))"], TEXT),
+    ("0088 ducci, the frame of a difference", "var(--viz-s2-text)", [CARD, PAGE], UI),
+    ("0088 ducci, an odd cell of the parity rows", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0088 ducci, the frame of an all-even row", "var(--viz-s3-text)", [CARD, PAGE], UI),
+    ("0088 ducci, a panel title, a round number, a chart label", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0088 ducci, a bar of the round where all turned even", "var(--viz-s3)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
