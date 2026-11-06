@@ -373,6 +373,16 @@ PAIRS = [
     ("0090 pancakes, the frame of a flip", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0090 pancakes, the hint", "var(--viz-s4)", [CARD, PAGE], UI),
     ("0090 pancakes, the plate", "var(--viz-text)", [CARD, PAGE], UI),
+    # 0093 matching (36-match.css): the figure and the box's preference tables
+    ("0093 matching, an entry that holds or a pair now", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0093 matching, a refused entry", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
+    ("0093 matching, an entry, a name, a label in the figure", "var(--viz-ink)", [CARD, PAGE], TEXT),
+    ("0093 matching, a candidate's label in the figure", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0093 matching, the role and the ranks over the tables", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0093 matching, the frame of the proposal of the step", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0093 matching, a final pair and a held frame", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0093 matching, a refused proposal in the figure", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0093 matching, the dashed frame of an entry picked for a swap", "var(--viz-ink)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

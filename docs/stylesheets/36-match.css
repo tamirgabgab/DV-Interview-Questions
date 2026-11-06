@@ -1,0 +1,52 @@
+/* Question 0093, stable matching: the figure of tools/figures/q0093.py (candidates and jobs
+   with the final pairs and the refused proposals) and the box of explorer/matching.js (sm-*):
+   the two preference tables, one button per entry, marked by what the proposals did to it.
+   A pair that holds each other is green, a refused proposal is orange and struck through, the
+   proposal of the step is framed blue, an entry picked for a swap is framed dashed. Colours
+   from the palette only. */
+
+/* the figure */
+.md-typeset svg.sm-fig line.sm-pair { stroke: var(--viz-s3); stroke-width: 3; stroke-linecap: round; }
+.md-typeset svg.sm-fig line.sm-no { stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.md-typeset svg.sm-fig .sm-cnode { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.sm-fig .sm-jnode { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg.sm-fig .sm-lab { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .sm-key-c { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; border-radius: 50%; }
+.md-typeset .viz-legend .sm-key-j { background: none; outline: 1.5px solid var(--viz-ink); outline-offset: -1.5px; }
+.md-typeset .viz-legend .sm-key-pair { background: var(--viz-s3); height: 0.2rem; }
+.md-typeset .viz-legend .sm-key-no { background: none; border-top: 2px dashed var(--viz-s2); height: 0; }
+
+/* the box: the two tables side by side, one under the other on a phone */
+.md-typeset .explorer .sm-tables { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; justify-content: center; }
+.md-typeset .explorer .sm-tab { min-width: 0; }
+.md-typeset .explorer .sm-cap { margin: 0 0 0.25rem; font-size: 0.72rem; text-align: center; }
+.md-typeset .explorer .sm-role { display: inline-block; margin-inline-start: 0.3rem; padding: 0 0.4rem; border-radius: 0.6rem; font-size: 0.62rem; border: 1px solid var(--viz-grid); color: var(--viz-text); }
+.md-typeset .explorer table.sm-prefs { border-collapse: separate; border-spacing: 3px; margin: 0 auto; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer table.sm-prefs th, .md-typeset .explorer table.sm-prefs td { padding: 0; border: 0; background: none; text-align: center; font-size: 0.68rem; }
+.md-typeset .explorer table.sm-prefs thead th { color: var(--viz-text); font-weight: 400; font-size: 0.6rem; }
+.md-typeset .explorer table.sm-prefs tbody th { padding-inline: 0.25rem; font-family: var(--md-code-font-family); font-weight: 700; color: var(--viz-ink); }
+.md-typeset .explorer button.sm-chip {
+  width: 1.75rem; height: 1.75rem; padding: 0; cursor: pointer;
+  font: inherit; font-family: var(--md-code-font-family); font-weight: 700; color: var(--viz-ink);
+  background: var(--md-default-bg-color); border: 1.5px solid var(--viz-grid); border-radius: 0.3rem;
+}
+.md-typeset .explorer button.sm-chip:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer button.sm-chip.sm-hold { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset .explorer button.sm-chip.sm-out { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); border-color: color-mix(in srgb, var(--viz-s2) 55%, var(--md-default-bg-color)); text-decoration: line-through; }
+.md-typeset .explorer button.sm-chip.sm-now { box-shadow: 0 0 0 2.5px var(--viz-s1); }
+.md-typeset .explorer button.sm-chip.sm-sel { outline: 2px dashed var(--viz-ink); outline-offset: 2px; }
+
+/* the pairs held now */
+.md-typeset .explorer .sm-pairs { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.3rem; min-height: 1.9rem; margin-top: 0.5rem; font-size: 0.7rem; }
+.md-typeset .explorer .sm-pair { padding: 0.05rem 0.4rem; border: 1.5px solid var(--viz-s3); border-radius: 0.3rem; background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); font-family: var(--md-code-font-family); font-weight: 700; color: var(--viz-ink); }
+.md-typeset .explorer .sm-none { color: var(--viz-text); }
+
+/* the legend keys of the box */
+.md-typeset .viz-legend .sm-key-now { background: none; outline: 2.5px solid var(--viz-s1); outline-offset: -2.5px; }
+.md-typeset .viz-legend .sm-key-hold { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s3); outline-offset: -1.5px; }
+.md-typeset .viz-legend .sm-key-out { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); outline: 1.5px solid color-mix(in srgb, var(--viz-s2) 55%, var(--md-default-bg-color)); outline-offset: -1.5px; }
+.md-typeset .viz-legend .sm-key-sel { background: none; outline: 2px dashed var(--viz-ink); outline-offset: -2px; }
+
+@media screen and (max-width: 30em) {
+  .md-typeset .explorer button.sm-chip { width: 1.6rem; height: 1.6rem; }
+}
