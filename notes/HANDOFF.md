@@ -764,6 +764,17 @@ below start at item 112 (session 31).
     count against the formula, and the curves of P_full and E over every start. tests/0094
     checks every number against a Gaussian solve of the chain, Monte Carlo, the box under
     Node, and tb.sv runs a Monte Carlo of an SV credit counter.
+166. **Question 0095, Conway's soldiers (session 33, 2026-11-06).** Chosen with 0094; senior /
+    hard, kind math, Python only, logic-puzzles path. Part א: rows 1 to 3 with 2, 4 and 8
+    soldiers, frame by frame. Part ב: a backward search (each soldier on row h costs at
+    least 2, 4 or 8; the potential cannot pass the 20 heaviest cells) finds the 20-soldier
+    start for row 4 in about 11 s; its 19 moves are 12 that build the row-3 army one row up,
+    then the 7 of row 3, and the potential stays exactly 1. Part ג: row 5 is impossible,
+    with σ = (√5 − 1)/2 and exact arithmetic in a + b√5: the half plane weighs exactly 1. The
+    potential proves 2, 4, 8 minimal; for row 4 it gives only 19, and the page states 20 as
+    the known minimum without a proof. Box `soldiers` (prefix `cy-`: `cs-` belongs to 0020
+    and 0023; `stylesheets/questions/0095-soldiers.css`): place and jump with undo, a
+    potential meter against 1, and the stored plays of rows 1 to 4.
 
 
 ---

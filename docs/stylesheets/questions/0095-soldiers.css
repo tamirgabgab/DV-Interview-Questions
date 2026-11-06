@@ -1,0 +1,61 @@
+/* Question 0095, Conway's soldiers: the boards of tools/figures/q0095.py (cy-fig) and of the
+   box of explorer/soldiers.js (cy-board). The cells below the line are a warm ground, the
+   cells above it plain; a soldier is a blue dot, the soldier that just landed an orange
+   dot, the cells a jump emptied dashed circles, the target a magenta frame. In part c's
+   figure the cells below the line darken with their weight. Colours from the palette only. */
+
+.md-typeset svg.cy-fig { display: block; margin: 0.8rem auto; }
+.md-typeset .explorer svg.cy-board { display: block; margin: 0.5rem auto; touch-action: manipulation; }
+
+/* the cells and the line */
+.md-typeset svg .cy-ground { fill: color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color)); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .cy-sky { fill: none; stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg .cy-line { stroke: var(--viz-ink); stroke-width: 2.5; stroke-linecap: round; }
+.md-typeset svg .cy-target { fill: none; stroke: var(--viz-s5); stroke-width: 2.5; }
+
+/* the soldiers and the last jump */
+.md-typeset svg .cy-man { fill: var(--viz-s1); }
+.md-typeset svg .cy-new { fill: var(--viz-s2-text); }
+.md-typeset svg .cy-gone { fill: none; stroke: var(--viz-text); stroke-width: 1.3; stroke-dasharray: 3 2.5; }
+.md-typeset svg .cy-arrow { fill: none; stroke: var(--viz-s2-text); stroke-width: 1.6; stroke-dasharray: 2 2; }
+.md-typeset svg .cy-sel { fill: none; stroke: var(--viz-s5); stroke-width: 2.5; }
+.md-typeset svg .cy-hint { fill: none; stroke: var(--viz-s3-text); stroke-width: 2; stroke-dasharray: 3 2; }
+
+/* part c: the weights below the line, darker when heavier */
+.md-typeset svg .cy-w0 { fill: color-mix(in srgb, var(--viz-s1) 48%, var(--md-default-bg-color)); stroke: var(--viz-grid); }
+.md-typeset svg .cy-w1 { fill: color-mix(in srgb, var(--viz-s1) 36%, var(--md-default-bg-color)); stroke: var(--viz-grid); }
+.md-typeset svg .cy-w2 { fill: color-mix(in srgb, var(--viz-s1) 26%, var(--md-default-bg-color)); stroke: var(--viz-grid); }
+.md-typeset svg .cy-w3 { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-grid); }
+.md-typeset svg .cy-w4 { fill: color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color)); stroke: var(--viz-grid); }
+.md-typeset svg .cy-w5 { fill: color-mix(in srgb, var(--viz-s1) 7%, var(--md-default-bg-color)); stroke: var(--viz-grid); }
+.md-typeset svg .cy-w6 { fill: color-mix(in srgb, var(--viz-s1) 4%, var(--md-default-bg-color)); stroke: var(--viz-grid); }
+.md-typeset svg .cy-wnum { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 11px; }
+.md-typeset svg .cy-wsky { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 11px; }
+
+/* the row numbers and the captions */
+.md-typeset svg .cy-lab { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 11px; }
+.md-typeset svg .cy-cap { fill: var(--viz-text); font-family: var(--md-text-font-family); font-size: 12px; }
+
+/* the box: a cell is a button; the meter of the potential */
+.md-typeset svg .cy-btn { cursor: pointer; }
+.md-typeset svg .cy-btn .cy-ring { fill: transparent; stroke: none; }
+.md-typeset svg .cy-btn:hover .cy-ring { stroke: var(--viz-ink); stroke-width: 1.3; }
+.md-typeset svg .cy-btn:focus { outline: none; }
+.md-typeset svg .cy-btn:focus-visible .cy-ring { stroke: var(--site-focus-ring); stroke-width: 2.5; }
+.md-typeset .explorer .cy-meter { display: flex; align-items: center; gap: 0.5rem; min-width: 0; margin: 0.4rem auto; max-width: 26rem; font-size: 0.75rem; }
+.md-typeset .explorer .cy-bar { position: relative; flex: 1; height: 0.75rem; direction: ltr; border: 1px solid var(--viz-text); border-radius: 0.2rem; }
+.md-typeset .explorer .cy-fill { position: absolute; inset: 0; border-radius: 0.15rem; background: var(--viz-s1); transform-origin: left center; transition: transform var(--dur-1, 120ms) ease-out; }
+.md-typeset .explorer .cy-one { position: absolute; top: -0.3rem; bottom: -0.3rem; width: 3px; background: var(--viz-ink); border-radius: 1px; }
+.md-typeset .explorer .cy-val { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer .cy-why { min-height: 3em; }
+@media (prefers-reduced-motion: reduce) { .md-typeset .explorer .cy-fill { transition: none; } }
+
+/* the legend keys */
+.md-typeset .viz-legend .cy-key-man { background: var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .cy-key-new { background: var(--viz-s2-text); border-radius: 50%; }
+.md-typeset .viz-legend .cy-key-gone { background: none; border-radius: 50%; outline: 1.3px dashed var(--viz-text); outline-offset: -2px; }
+.md-typeset .viz-legend .cy-key-target { background: none; border-radius: 2px; outline: 2.5px solid var(--viz-s5); outline-offset: -3px; }
+.md-typeset .viz-legend .cy-key-line { background: var(--viz-ink); height: 3px; align-self: center; }
+.md-typeset .viz-legend .cy-key-w { background: color-mix(in srgb, var(--viz-s1) 36%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .cy-key-sel { background: none; border-radius: 50%; outline: 2.5px solid var(--viz-s5); outline-offset: -3px; }
+.md-typeset .viz-legend .cy-key-hint { background: none; outline: 2px dashed var(--viz-s3-text); outline-offset: -2px; }

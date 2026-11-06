@@ -408,6 +408,26 @@ PAIRS = [
     ("0094 credit walk, the ring of what the runs measured", "var(--viz-s3)", [CARD, PAGE], UI),
     ("0094 credit walk, the tag \"filled\"", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("0094 credit walk, the tag \"emptied\"", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
+    # 0095 soldiers (stylesheets/questions/0095-soldiers.css): the boards of the figures and of the box
+    ("0095 soldiers, a soldier on the ground", "var(--viz-s1)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))"], UI),
+    ("0095 soldiers, a soldier above the line", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0095 soldiers, the soldier that just jumped", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0095 soldiers, a cell a jump emptied", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0095 soldiers, the target", "var(--viz-s5)", [CARD, PAGE], UI),
+    ("0095 soldiers, the soldier chosen", "var(--viz-s5)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0095 soldiers, where it can jump", "var(--viz-s3-text)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0095 soldiers, the line", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0095 soldiers, a row number or a caption", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0095 soldiers, a distance above the line", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0095 soldiers, a distance on weight 0", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 48%, var(--md-default-bg-color))"], TEXT),
+    ("0095 soldiers, a distance on weight 1", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 36%, var(--md-default-bg-color))"], TEXT),
+    ("0095 soldiers, a distance on weight 2", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 26%, var(--md-default-bg-color))"], TEXT),
+    ("0095 soldiers, a distance on weight 3", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
+    ("0095 soldiers, a distance on weight 4", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color))"], TEXT),
+    ("0095 soldiers, a distance on weight 5", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 7%, var(--md-default-bg-color))"], TEXT),
+    ("0095 soldiers, a distance on weight 6", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 4%, var(--md-default-bg-color))"], TEXT),
+    ("0095 soldiers, the meter's bar", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0095 soldiers, the meter's mark of 1, above and below the bar", "var(--viz-ink)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
