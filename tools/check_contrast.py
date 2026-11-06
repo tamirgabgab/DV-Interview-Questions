@@ -326,6 +326,17 @@ PAIRS = [
     ("0085 self-describing, the positions and row names", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0085 self-describing, the base shown in the strip", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 18%, var(--md-default-bg-color))"], TEXT),
     ("0085 self-describing, the frame of the base shown", "var(--viz-s4)", ["color-mix(in srgb, var(--viz-s4) 18%, var(--md-default-bg-color))"], UI),
+    # 0086 chameleons (29-chameleons.css): red is --viz-s5, green --viz-s3, blue --viz-s1
+    ("0086 chameleons, a count on its disc", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s5) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
+    ("0086 chameleons, a count and its residue in the box", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s5) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color))"], TEXT),
+    ("0086 chameleons, a chameleon's colour as a mark", "var(--viz-s5)", [CARD, PAGE], UI),
+    ("0086 chameleons, green as a mark", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0086 chameleons, blue as a mark", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0086 chameleons, a reachable state", "var(--viz-ink)", [CARD, PAGE], UI),
+    ("0086 chameleons, a state never reached", "var(--viz-text)", [CARD, PAGE], UI),
+    ("0086 chameleons, the start ring", "var(--viz-s2-text)", [CARD, PAGE], UI),
+    ("0086 chameleons, the path so far", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0086 chameleons, the shortest-plan tag", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
