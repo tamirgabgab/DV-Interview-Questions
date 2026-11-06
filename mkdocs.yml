@@ -150,6 +150,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/27-lis.css         # 0084: the longest increasing subsequence, its figures and box (session 32)
   - stylesheets/28-selfdesc.css    # 0085: the self-describing number, its tables and box (session 32)
   - stylesheets/29-chameleons.css  # 0086: the chameleons, their figures and box (session 32)
+  - stylesheets/30-lights.css      # 0087: Lights Out, its boards and box (session 32)
 
 extra_javascript:
   - javascripts/mathjax.js

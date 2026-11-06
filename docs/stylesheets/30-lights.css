@@ -1,0 +1,55 @@
+/* Question 0087, Lights Out: the boards of tools/figures/q0087.py (lo-fig) and of the box of
+   explorer/lightsout.js (lo-live). A light is a bulb in its cell: filled amber with a dark
+   rim when it is on, a hollow ring when it is off; a press is a blue frame inside the cell.
+   Colours from the palette only. */
+
+.md-typeset svg.lo-fig { display: block; margin: 0.8rem auto; }
+.md-typeset .explorer svg.lo-board { display: block; max-width: 22rem; margin: 0.5rem auto; }
+
+/* the cells and the frame of the board */
+.md-typeset svg .lo-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset svg .lo-frame { fill: none; stroke: var(--viz-text); stroke-width: 1.5; }
+/* the row light chasing is clearing, and the bottom row it leaves */
+.md-typeset svg .lo-cell.is-band { fill: color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color)); }
+.md-typeset svg .lo-cell.is-rest { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); }
+
+/* the bulbs: on (amber, a dark rim) and off (a ring) */
+.md-typeset svg .lo-on { fill: var(--md-accent-fg-color); stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg .lo-off { fill: none; stroke: var(--viz-text); stroke-width: 1.5; }
+
+/* a press (blue), the press of the step (orange), a quiet pattern that sees the state (purple) */
+.md-typeset svg .lo-press { fill: none; stroke: var(--viz-s1); stroke-width: 3; }
+.md-typeset svg .lo-now { fill: none; stroke: var(--viz-s2-text); stroke-width: 3; }
+.md-typeset svg .lo-quiet { fill: none; stroke: var(--viz-s4); stroke-width: 3; stroke-dasharray: 5 3; }
+
+/* labels: the number of a light, a caption under a board, a count under a cell */
+.md-typeset svg .lo-ix { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 12px; }
+.md-typeset svg .lo-cap { fill: var(--viz-text); font-family: var(--md-text-font-family); font-size: 14px; }
+.md-typeset svg .lo-num { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 15px; font-weight: 700; }
+
+/* the 9 x 9 system of part a: the equals sign, the solution row */
+.md-typeset table.lo-sys td.lo-eq { color: var(--viz-text); padding: 0 0.3em; }
+.md-typeset table.lo-sys tr.lo-head th { font-size: 0.6rem; text-align: center; padding: 0 0.15em; }
+.md-typeset table.lo-sys tr.lo-sol th,
+.md-typeset table.lo-sys tr.lo-sol td { border-top: 2px solid var(--viz-text); }
+.md-typeset table.gs-bits td.lo-x { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); font-weight: 700; }
+
+/* the box: a cell is a button */
+.md-typeset svg .lo-btn { cursor: pointer; }
+.md-typeset svg .lo-btn .lo-ring { fill: none; stroke: none; }
+.md-typeset svg .lo-btn:hover .lo-ring { stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg .lo-btn:focus { outline: none; }
+.md-typeset svg .lo-btn:focus-visible .lo-ring { stroke: var(--site-focus-ring); stroke-width: 3; }
+.md-typeset .lo-live .lo-note { min-height: 3em; }
+
+/* the legend keys */
+.md-typeset .viz-legend .lo-key-on { background: var(--md-accent-fg-color); border-radius: 50%; outline: 2px solid var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .lo-key-off { background: none; border-radius: 50%; outline: 1.5px solid var(--viz-text); outline-offset: -2px; }
+.md-typeset .viz-legend .lo-key-press { background: none; border-radius: 3px; outline: 3px solid var(--viz-s1); outline-offset: -3px; }
+.md-typeset .viz-legend .lo-key-now { background: none; border-radius: 3px; outline: 3px solid var(--viz-s2-text); outline-offset: -3px; }
+.md-typeset .viz-legend .lo-key-quiet { background: none; border-radius: 3px; outline: 3px dashed var(--viz-s4); outline-offset: -3px; }
+.md-typeset .viz-legend .lo-key-band { background: color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .lo-key-rest { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .lo-key-x { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .lo-key-ix { background: none; outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .lo-key-ix::before { content: "0"; display: block; font: 700 0.55rem/1 var(--md-code-font-family); color: var(--viz-text); padding: 1px 0 0 2px; }

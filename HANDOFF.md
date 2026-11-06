@@ -2253,13 +2253,50 @@ section below starts at session 22, whose numbered items run on through the late
     field, presets and a random draw; 27-lis.css; ten contrast pairs; the tag binary-search
     named in TOPICS. Tests: brute force over all subsequences in Python and SV, the box's
     models under Node against the reference.
+154. **Question 0085, the self-describing number (session 32, 2026-11-06).** The owner chose
+    three of eight logic-and-maths proposals (0085 to 0087), asking for the generalizations
+    and a proof that no other numbers exist. Junior / medium, Python and SV, digits path.
+    Part a: 6210001000; the two sums Σd_i = b and Σi·d_i = b; a search that fills digit by
+    digit and cuts when either sum passes b (980 full candidates and 4,845 cuts in base 10,
+    out of 10^10; 184,746 with the first sum alone). Part b: uniqueness in base 10 from
+    Σ_{i≥2}(i−1)d_i = d_0 (z ≥ 3 gives z = 6; z = 1, 2 force d_1 = 8, 6). Part c: every
+    base: (b−4) 2 1 0…0 1 000 for b ≥ 7, 1210 and 2020 in base 4, 21200 in base 5, none in
+    bases 2, 3, 6; `predicted` and `differ()` against the search to base 16. q0085.py,
+    selfdesc.js (edit, search, bases), 28-selfdesc.css, eight contrast pairs. Tests: brute
+    force for b ≤ 6, the classification to 16, the box under Node, the SV against
+    `predicted`.
+155. **Question 0086, the chameleons (session 32, 2026-11-06).** Junior / medium, Python and
+    SV, logic-puzzles path after 0083. Part a: 13, 15, 17 never share a colour (a meeting
+    adds 2 to every count mod 3; residues 1, 0, 2). Part b: all can turn to c iff the other
+    two counts agree mod 3 (unless everyone already has another single colour);
+    `meeting_plan`. Part c: the minimum is max(x, y), by counting meetings by kind (r = p +
+    q − 2s ≤ p + q); the cheapest colour, the middle count when all three agree;
+    `meetings_to` / `min_meetings`; 13, 16, 17 to blue in 16. Follow-ups: 14, 15, 17 to
+    green in 17; the reachable states are those with the same residues of the differences
+    (360 of 1,081). q0086.py, chameleons.js (sliders, meetings with undo, the plan, the
+    triangle of states), 29-chameleons.css, ten contrast pairs. Tests: formula and
+    construction against BFS for counts ≤ 12, the box under Node, the SV against its own
+    BFS for counts ≤ 9.
+156. **Question 0087, Lights Out (session 32, 2026-11-06).** Senior / hard, Python and SV,
+    advanced-algorithms path before 0081. Neighbours up, down, left, right (5, 4 or 3 lights
+    flip). Part a: 3×3, rank 9 (the top row lit: presses 3, 4, 5, 7), GF(2) elimination on
+    bit vectors (`press_masks`, `gauss`, `solve_lights`; `solve` is an SV keyword). Part b:
+    6×6 rank 36; 5×5 rank 23 (a quarter solvable, 4 solutions each, three quiet patterns,
+    the parity test); light chasing with n equations for the first row. Part c: with
+    diagonals the effect is P·X·P, P singular iff n ≡ 2 mod 3, 2n − 1 free variables, full
+    proof. Part d: free variables = deg gcd(p_n(x), p_n(x+1)) (Sutner), checked against the
+    rank to n = 40; coprime ⇒ solvable proved, the converse cited; bad sizes to 20: 4, 5, 9,
+    11, 14, 16, 17, 19; "all lit" always solvable on any graph. q0087.py (11 blocks),
+    lightsout.js (play with the solution or a quiet witness; chase step by step),
+    30-lights.css, eight contrast pairs. Tests: brute force to 3×3, random boards to 8×8,
+    the follow-ups (torus, rectangles, m+1 | n+1, 15 presses for 5×5 all lit), Node, SV.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139); questions 0078 to 0082 (items 140 to 144); the UX audit's fixes and the circuit layer (items 145, 146); numbers laid out from the right (item 147); the finishing round, the living layer and four figures (items 148 to 150); 0038's rule 2 (item 151); questions 0083 and 0084 (items 152, 153).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139); questions 0078 to 0082 (items 140 to 144); the UX audit's fixes and the circuit layer (items 145, 146); numbers laid out from the right (item 147); the finishing round, the living layer and four figures (items 148 to 150); 0038's rule 2 (item 151); questions 0083 and 0084 (items 152, 153); questions 0085 to 0087 (items 154 to 156).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).

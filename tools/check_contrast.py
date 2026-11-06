@@ -337,6 +337,15 @@ PAIRS = [
     ("0086 chameleons, the start ring", "var(--viz-s2-text)", [CARD, PAGE], UI),
     ("0086 chameleons, the path so far", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0086 chameleons, the shortest-plan tag", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
+    # 0087 lights out (30-lights.css): the boards of the figures and of the box
+    ("0087 lights out, the rim of a light that is on", "var(--viz-ink)", [CARD, PAGE, "var(--md-accent-fg-color)"], UI),
+    ("0087 lights out, the ring of a light that is off", "var(--viz-text)", [CARD, PAGE], UI),
+    ("0087 lights out, a press", "var(--viz-s1)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], UI),
+    ("0087 lights out, the press of the step", "var(--viz-s2-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], UI),
+    ("0087 lights out, a quiet pattern", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0087 lights out, a light's number, a caption, the equals sign", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0087 lights out, a count under a cell", "var(--viz-ink)", [CARD, PAGE], TEXT),
+    ("0087 lights out, a press of the solution in the system", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
