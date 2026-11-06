@@ -401,6 +401,13 @@ PAIRS = [
     ("0093 matching, a final pair and a held frame", "var(--viz-s3)", [CARD, PAGE], UI),
     ("0093 matching, a refused proposal in the figure", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0093 matching, the dashed frame of an entry picked for a swap", "var(--viz-ink)", [CARD, PAGE], UI),
+    # 0094 credit walk (stylesheets/questions/0094-creditwalk.css): the walk, the two curves and the tags
+    ("0094 credit walk, the wall N and the curve of the chance to fill", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0094 credit walk, the wall 0 and the curve of the expected cycles", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0094 credit walk, the walk and the fair curve", "var(--viz-ink)", [CARD, PAGE], UI),
+    ("0094 credit walk, the ring of what the runs measured", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0094 credit walk, the tag \"filled\"", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0094 credit walk, the tag \"emptied\"", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))"], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

@@ -51,6 +51,7 @@ prefix (the class table of `CONTRIBUTING.md` lists them), and a line at the end 
 | `questions/0091-chomp.css` | `cp-` | Chomp: the chocolate bars and the box |
 | `questions/0092-circle.css` | `mc-` | points on a circle: the regions and the box |
 | `questions/0093-match.css` | `sm-` | stable matching: the figure and the preference tables of the box |
+| `questions/0094-creditwalk.css` | `cw-` | the credit counter as a random walk: the charts of the figures, the walk and the two curves of the box |
 
 The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
 `stylesheets/site.css` at the end of the build and links that file from every page and from

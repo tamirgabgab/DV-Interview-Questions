@@ -1,0 +1,31 @@
+/* Question 0094, the credit counter as a random walk: the figures of tools/figures/q0094.py
+   and the box of explorer/creditwalk.js (cw-*). The charts use the site's chart classes:
+   s1 for the wall N and "full", s2 for the wall 0 and "empty", ink for the walk and the
+   fair curve. The box shows the walk over the last 40 cycles beside the two curves of the
+   formula (the chance to fill, the expected cycles) for every start k, with a hollow ring
+   for what the runs measured. Colours from the palette only. */
+
+.md-typeset .cw-fig svg { display: block; width: 100%; height: auto; }
+
+/* the box: the walk on top, the two curves side by side under it (one column on a phone) */
+.md-typeset .explorer .cw-grid { display: grid; gap: 0.6rem; margin: 0.4rem 0; }
+.md-typeset .explorer .cw-walkwrap svg,
+.md-typeset .explorer .cw-curves svg { display: block; width: 100%; height: auto; }
+.md-typeset .explorer .cw-curves { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+@media (max-width: 30em) {
+  .md-typeset .explorer .cw-curves { grid-template-columns: 1fr; }
+}
+
+/* the measured value of the runs, a ring around the formula's dot */
+.md-typeset svg .cw-meas { fill: none; stroke: var(--viz-s3); stroke-width: 2.5; }
+.md-typeset svg .cw-now-dot { stroke: var(--md-default-bg-color); stroke-width: 2; }
+
+/* "filled" and "emptied" in the line under the walk */
+.md-typeset .explorer .cw-tag { padding: 0 0.3em; border-radius: 0.2em; color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .cw-tag-full { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cw-tag-empty { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+
+/* the legend keys: the two walls as dashed lines, the measured ring */
+.md-typeset .viz-legend .cw-key-full { height: 0; border-top: 2.5px dashed var(--viz-s1); border-radius: 0; }
+.md-typeset .viz-legend .cw-key-empty { height: 0; border-top: 2.5px dashed var(--viz-s2); border-radius: 0; }
+.md-typeset .viz-legend .cw-key-meas { background: none; border: 2.5px solid var(--viz-s3); border-radius: 50%; }

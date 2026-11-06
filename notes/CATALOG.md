@@ -1,6 +1,6 @@
 # Catalog
 
-All 92 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 93 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/build/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -97,3 +97,4 @@ All 92 questions, with links to their pages on the [live site](https://tamirgabg
 | 0091 | [Chomp – טבלת השוקולד המורעלת, גניבת אסטרטגיה וחיפוש עם זיכרון](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0091-chomp/) | senior (סניור) |
 | 0092 | [נקודות על מעגל – לכמה חלקים מתחלק העיגול](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0092-circle-regions/) | student (סטודנט) |
 | 0093 | [שידוך יציב – 6 מועמדים ו-6 משרות, האלגוריתם של Gale–Shapley, וכל השידוכים היציבים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0093-stable-matching/) | junior (ג'וניור) |
+| 0094 | [מונה credits בהליכה אקראית – יתמלא או יתרוקן?](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0094-credit-counter-random-walk/) | junior (ג'וניור) |

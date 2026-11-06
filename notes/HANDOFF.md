@@ -752,6 +752,18 @@ below start at item 112 (session 31).
     with the Python tests of every question, the tools and hook tests, the lint, the
     contrast check, the strict build, the link check, the phone check on 0083 to 0093 and the
     home page, and the explorer check on 0083 and 0093.
+165. **Question 0094, the credit counter as a random walk (session 33, 2026-11-06).** Chosen
+    from eight proposals, after guiding questions; junior / medium, kind math, Python and SV,
+    probability path. A counter between 0 (empty) and N (full): part א the fair walk from 3
+    to 10 (3/10, 7/10, 21 cycles); part ב +1 with p and -1 with q, P_full and the expected
+    cycles from the recurrence (p = 0.6); part ג a stay with r, the chances depend only on
+    p/(p+q) and the time divides by p + q; part ד geometric (discrete exponential) times
+    with λ1 for a returned credit and λ2 for a used one, memorylessness turns them into
+    p = λ1(1 - λ2), q = λ2(1 - λ1). Box `creditwalk` (the kind `credits` belongs to 0024;
+    prefix `cw-`, `stylesheets/questions/0094-creditwalk.css`): the walk drawn live, a run
+    count against the formula, and the curves of P_full and E over every start. tests/0094
+    checks every number against a Gaussian solve of the chain, Monte Carlo, the box under
+    Node, and tb.sv runs a Monte Carlo of an SV credit counter.
 
 
 ---

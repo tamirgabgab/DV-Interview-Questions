@@ -157,6 +157,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0091-chomp.css       # 0091: Chomp, the chocolate bars and the box (session 32)
   - stylesheets/questions/0092-circle.css      # 0092: points on a circle, the regions and the box (session 32)
   - stylesheets/questions/0093-match.css       # 0093: stable matching, the figure and the box (session 32)
+  - stylesheets/questions/0094-creditwalk.css  # 0094: the credit counter as a random walk, its charts and box (session 33)
 
 extra_javascript:
   - javascripts/mathjax.js
