@@ -2350,13 +2350,18 @@ section below starts at session 22, whose numbered items run on through the late
     lying. q0093.py (`rtl_cells` puts an RLM before cells that start in Latin), matching.js
     (two right-to-left tables, proposals step by step, who proposes, editing), 36-match.css,
     nine contrast pairs.
+163. **The explorer jobs' time limit (session 32, 2026-11-06).** With 92 questions each of
+    the four explorer shards takes 15 to 18 minutes; twice a slow Chromium install (9 to 10
+    minutes) on one shard pushed it past the 20-minute limit and the run was cancelled. The
+    limit is now 30 minutes (deploy.yml). If it keeps growing, add a fifth shard rather than
+    raising the limit again.
 
 ## In progress
 
 - **Session 32 (2026-11-01):** 0071 rewritten step by step with p1, p2, p3 and no code
   (work log item 117); questions 0072 to 0075 on in-place permutations (item 118), published (`main`
   37984aa, deploy green); videos 0032 and 0031 (item 119), 0001 and 0040 (item 120), 0026 and 0012 (item 121); 0071 restructured with a
-  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139); questions 0078 to 0082 (items 140 to 144); the UX audit's fixes and the circuit layer (items 145, 146); numbers laid out from the right (item 147); the finishing round, the living layer and four figures (items 148 to 150); 0038's rule 2 (item 151); questions 0083 and 0084 (items 152, 153); questions 0085 to 0087 (items 154 to 156); questions 0088 to 0090 (items 157 to 159); questions 0091 to 0093 (items 160 to 162).
+  Markov chain and a new box (item 122); videos 0057 and 0043 (item 123); 0071's chain explained on hover and the box tighter (item 124); the box side by side, a* transposed, part ג in a and b (item 125); 0055 in D flip-flops and gates (item 126); videos 0071 (item 127) and 0055 (item 128); videos 0039 (item 129) and 0018 (item 130); the CI's fast lane and 0055's wording (item 131); the self-checks removed (item 132); videos 0030 and 0042 (item 133); videos 0016 and 0013 (item 134); videos 0009 and 0048 (item 135); videos 0008 and 0014 (item 136); videos 0027 and 0028 (item 137); question 0076 (item 138); question 0077 (item 139); questions 0078 to 0082 (items 140 to 144); the UX audit's fixes and the circuit layer (items 145, 146); numbers laid out from the right (item 147); the finishing round, the living layer and four figures (items 148 to 150); 0038's rule 2 (item 151); questions 0083 and 0084 (items 152, 153); questions 0085 to 0087 (items 154 to 156); questions 0088 to 0090 (items 157 to 159); questions 0091 to 0093 (items 160 to 162); the explorer jobs' time limit (item 163).
 - **Session 31 (2026-10-31):** the home page touches (work log item 112) and the waveform
   viewer (item 113), shipped one after the other; three accessibility fixes (item 114);
   the figure beside the steps on 0055 (item 115), then on 0040, 0032 and 0052 (item 116).
