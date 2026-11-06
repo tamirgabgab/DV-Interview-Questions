@@ -383,6 +383,14 @@ PAIRS = [
     ("0093 matching, a final pair and a held frame", "var(--viz-s3)", [CARD, PAGE], UI),
     ("0093 matching, a refused proposal in the figure", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0093 matching, the dashed frame of an entry picked for a swap", "var(--viz-ink)", [CARD, PAGE], UI),
+    # 0092 circle (35-circle.css): the disc cut into regions, in the figures and the box
+    ("0092 circle, a region number on any of the six tints", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], TEXT),
+    ("0092 circle, a chord over any region", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
+    ("0092 circle, the new chord over any region", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
+    ("0092 circle, a ring where three chords meet", "var(--viz-s5)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
+    ("0092 circle, a point on the circle", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0092 circle, the number of a point", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0092 circle, the dashed bar of the powers of 2", "var(--viz-s2-text)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

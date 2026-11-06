@@ -1,6 +1,6 @@
 # Catalog
 
-All 90 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 91 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -94,4 +94,5 @@ All 90 questions, with links to their pages on the [live site](https://tamirgabg
 | 0088 | [הפרשים במעגל – מתי הכל מתאפס ומתי יש מחזור](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0088-ducci-differences/) | junior (ג'וניור) |
 | 0089 | [מטבעות שאי אפשר להרכיב – 3 ו-5, כל זוג מטבעות, ו-6, 9 ו-20](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0089-frobenius-coins/) | junior (ג'וניור) |
 | 0090 | [מיון פנקייקים – הפיכות מלמעלה, המקרה הגרוע ופנקייקים שרופים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0090-pancake-sorting/) | senior (סניור) |
+| 0092 | [נקודות על מעגל – לכמה חלקים מתחלק העיגול](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0092-circle-regions/) | student (סטודנט) |
 | 0093 | [שידוך יציב – 6 מועמדים ו-6 משרות, האלגוריתם של Gale–Shapley, וכל השידוכים היציבים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0093-stable-matching/) | junior (ג'וניור) |

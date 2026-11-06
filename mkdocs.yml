@@ -154,6 +154,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/31-ducci.css       # 0088: differences in a circle, its figures and box (session 32)
   - stylesheets/32-frobenius.css   # 0089: coins you cannot make up, the amount tables and box (session 32)
   - stylesheets/33-pancake.css     # 0090: pancake sorting, the stacks and the box (session 32)
+  - stylesheets/35-circle.css      # 0092: points on a circle, the regions and the box (session 32)
   - stylesheets/36-match.css       # 0093: stable matching, the figure and the box (session 32)
 
 extra_javascript:
