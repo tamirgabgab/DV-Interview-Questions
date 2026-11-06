@@ -1,0 +1,54 @@
+/* Question 0097, the integer square root in hardware, bit by bit: the figures of
+   tools/figures/q0097.py and the box of explorer/isqrt.js (isq-*). The step as areas: the
+   square r² that is already in (blue), the two r × b rectangles and the b × b square of the
+   trial (green when it fits, orange when it does not), inside the dashed square of side √n.
+   The bit rows are gs-bits tables (11-questions.css), left to right: the root's bits in
+   blue, the bit of b² in green, the trial framed in ink. Colours from the palette only. */
+
+/* --- the step as areas ------------------------------------------------------------------- */
+.md-typeset .isq-figwrap { display: flex; justify-content: center; }
+.md-typeset svg.isq-fig { width: 100%; height: auto; }
+.md-typeset svg.isq-fig .isq-sq-old { fill: color-mix(in srgb, var(--viz-s1) 26%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.isq-fig .isq-sq-add { fill: color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 1.5; }
+.md-typeset svg.isq-fig .isq-sq-small,
+.md-typeset svg.isq-fig .isq-sq-add.isq-small { fill: color-mix(in srgb, var(--viz-s3) 46%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 1.5; }
+.md-typeset svg.isq-fig .isq-sq-miss { fill: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 5 3; }
+.md-typeset svg.isq-fig .isq-sq-miss.isq-small { fill: color-mix(in srgb, var(--viz-s2) 32%, var(--md-default-bg-color)); }
+.md-typeset svg.isq-fig .isq-sq-bound { fill: none; stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 7 5; }
+.md-typeset svg.isq-fig .isq-lab { fill: var(--viz-ink); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* --- the bit rows ------------------------------------------------------------------------ */
+.md-typeset table.gs-bits.isq-bits td.isq-ix,
+.md-typeset table.gs-bits.isq-rbits td.isq-ix { height: 1.1rem; font-size: 0.6rem; color: var(--viz-text); text-align: center; }
+.md-typeset table.gs-bits.isq-bits th { font-size: 0.65rem; padding-right: 0.5em; white-space: nowrap; }
+.md-typeset table.gs-bits td.isq-val { color: var(--viz-ink); padding-left: 0.6em; text-align: left; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.md-typeset table.gs-bits td.gs-b.isq-one.isq-r { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); color: var(--viz-ink); font-weight: 700; }
+.md-typeset table.gs-bits td.gs-b.isq-one.isq-b { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border-color: var(--viz-s3); color: var(--viz-ink); font-weight: 700; }
+.md-typeset table.gs-bits td.gs-b.isq-one.isq-t { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border: 2.5px solid var(--viz-ink); color: var(--viz-ink); font-weight: 700; }
+
+/* --- the box ----------------------------------------------------------------------------- */
+.md-typeset .explorer .isq-grid > * { min-width: 0; }
+.md-typeset .explorer .isq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.4rem 1.2rem; align-items: start; }
+.md-typeset .explorer .isq-pic svg.isq-live { max-width: 20rem; display: block; margin-inline: auto; }
+.md-typeset table.gs-bits.isq-rbits td.gs-b.isq-on { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); color: var(--viz-ink); font-weight: 700; }
+.md-typeset table.gs-bits.isq-rbits td.gs-b.isq-off { color: var(--viz-text); }
+.md-typeset table.gs-bits.isq-rbits td.gs-b.isq-undec { border-style: dashed; color: var(--viz-text); }
+.md-typeset table.gs-bits.isq-rbits td.gs-b.is-now { box-shadow: 0 0 0 2px var(--viz-ink); }
+
+.md-typeset .explorer table.isq-steps { margin: 0.5rem 0 0; font-size: 0.7rem; font-variant-numeric: tabular-nums; border-collapse: collapse; }
+.md-typeset .explorer table.isq-steps th,
+.md-typeset .explorer table.isq-steps td { padding: 0.15rem 0.6rem; text-align: center; border-bottom: 1px solid var(--viz-grid); }
+.md-typeset .explorer table.isq-steps tr.is-todo td { color: var(--viz-text); }
+.md-typeset .explorer table.isq-steps tr.is-now td { background: color-mix(in srgb, var(--viz-ink) 8%, var(--md-default-bg-color)); font-weight: 700; }
+.md-typeset .explorer table.isq-steps td.isq-yes { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer table.isq-steps td.isq-no { color: var(--viz-s2-text); font-weight: 700; }
+
+/* --- the legend keys --------------------------------------------------------------------- */
+.md-typeset .viz-legend .isq-key-old { background: color-mix(in srgb, var(--viz-s1) 26%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
+.md-typeset .viz-legend .isq-key-add { background: color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s3); outline-offset: -1.5px; }
+.md-typeset .viz-legend .isq-key-small { background: color-mix(in srgb, var(--viz-s3) 46%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s3); outline-offset: -1.5px; }
+.md-typeset .viz-legend .isq-key-miss { background: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); outline: 1.5px dashed var(--viz-s2); outline-offset: -1.5px; }
+.md-typeset .viz-legend .isq-key-bound { background: none; outline: 2px dashed var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .isq-key-r { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
+.md-typeset .viz-legend .isq-key-b { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s3); outline-offset: -1.5px; }
+.md-typeset .viz-legend .isq-key-t { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; }

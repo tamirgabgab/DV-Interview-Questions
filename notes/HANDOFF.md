@@ -785,6 +785,16 @@ below start at item 112 (session 31).
     sorting algorithm with a KKT proof; a 4-horse example. Box `kelly` (prefix `ky-`,
     `stylesheets/questions/0096-kelly.css`): sliders for p, a, b and f, 30 seeded paths on a
     log scale with the median, beside g(f) with f* marked.
+168. **Question 0097, the integer square root in hardware (session 33, 2026-11-06).** Chosen
+    with 0096; senior / hard, kind design, Python and SV, logic-design path (its intro now
+    counts eight questions). Part א: 1000 → 31 bit by bit, remainder 39, and the base-10
+    pencil method. Part ב: the trial (r << (k+1)) | (1 << 2k), why OR suffices, the invariant
+    r ≤ s < r + 2^k. Part ג: `isqrt_seq` with start / busy / done in 8 clocks, a checker
+    r² ≤ n < (r+1)², all 65,536 inputs in tb.sv, corner inputs for 32 bits, a WaveDrom
+    diagram. Part ד (the owner's choice): restoring division (1000 / 7 = 142 r 6) and the
+    cube root with r² kept in a register (no multiplier). Box `isqrt` (prefix `isq-`,
+    `stylesheets/questions/0097-isqrt.css`): n, presets, the bits stepped and the step drawn
+    as areas inside the √n square.
 
 
 ---

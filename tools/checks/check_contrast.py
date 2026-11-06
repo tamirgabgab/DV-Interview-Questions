@@ -433,6 +433,21 @@ PAIRS = [
     ("0096 kelly, the median of the paths and the current f", "var(--viz-ink)", [CARD, PAGE], UI),
     ("0096 kelly, the line W0 e^(g t) and the zero of the growth", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0096 kelly, half Kelly", "var(--viz-s3)", [CARD, PAGE], UI),
+    # 0097 isqrt (stylesheets/questions/0097-isqrt.css): the step as areas, the bit rows, the box's table
+    ("0097 isqrt, a number on r² (the old square)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 26%, var(--md-default-bg-color))"], TEXT),
+    ("0097 isqrt, a number on a trial rectangle", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color))"], TEXT),
+    ("0097 isqrt, a number on the trial's small square", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 46%, var(--md-default-bg-color))"], TEXT),
+    ("0097 isqrt, a number on a trial that does not fit", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 32%, var(--md-default-bg-color))"], TEXT),
+    ("0097 isqrt, the edge of r²", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0097 isqrt, the edge of the trial", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0097 isqrt, the edge of a trial that does not fit", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0097 isqrt, the dashed square of side root n", "var(--viz-ink)", [CARD, PAGE], UI),
+    ("0097 isqrt, a bit of the root", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0097 isqrt, the bit of b²", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0097 isqrt, a bit not decided yet", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0097 isqrt, the row of the step just decided", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 8%, var(--md-default-bg-color))", CARD, PAGE], TEXT),
+    ("0097 isqrt, the step's yes", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
+    ("0097 isqrt, the step's no", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
