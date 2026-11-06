@@ -1,6 +1,6 @@
 # Catalog
 
-All 86 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 87 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -91,3 +91,4 @@ All 86 questions, with links to their pages on the [live site](https://tamirgabg
 | 0085 | [מספר שמתאר את עצמו – כל ספרה סופרת את המופעים של המקום שלה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0085-self-describing-number/) | junior (ג'וניור) |
 | 0086 | [הזיקיות – שלושה צבעים, שארית מודולו 3 ומספר הפגישות המינימלי](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0086-chameleons/) | junior (ג'וניור) |
 | 0087 | [כיבוי הנורות – Lights Out, XOR ואלגברה לינארית מעל GF(2)](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0087-lights-out/) | senior (סניור) |
+| 0090 | [מיון פנקייקים – הפיכות מלמעלה, המקרה הגרוע ופנקייקים שרופים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0090-pancake-sorting/) | senior (סניור) |

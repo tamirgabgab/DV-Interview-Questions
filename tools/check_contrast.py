@@ -346,6 +346,14 @@ PAIRS = [
     ("0087 lights out, a light's number, a caption, the equals sign", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0087 lights out, a count under a cell", "var(--viz-ink)", [CARD, PAGE], TEXT),
     ("0087 lights out, a press of the solution in the system", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    # 0090 pancakes (33-pancake.css): the stacks of the figures and of the box
+    ("0090 pancakes, a size on a pancake", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], TEXT),
+    ("0090 pancakes, a size on a pancake in place", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color))"], TEXT),
+    ("0090 pancakes, the edge of a pancake", "var(--viz-s2-text)", [CARD, PAGE], UI),
+    ("0090 pancakes, the burnt side on a pancake", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], UI),
+    ("0090 pancakes, the frame of a flip", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0090 pancakes, the hint", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0090 pancakes, the plate", "var(--viz-text)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
