@@ -317,6 +317,15 @@ PAIRS = [
     ("0084 LIS, the frame of mid in the search range", "var(--viz-s4)", ["color-mix(in srgb, var(--viz-s4) 16%, var(--md-default-bg-color))"], UI),
     ("0084 LIS, a prev or parent arc on the box", "var(--viz-text)", [CARD], UI),
     ("0084 LIS, the LIS's arc on the box", "var(--viz-s1)", [CARD], UI),
+    # 0085 self-describing (28-selfdesc.css): the digit tables of the figures and the box
+    ("0085 self-describing, a digit d[i]", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0085 self-describing, a count that matches", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0085 self-describing, a count that does not match", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
+    ("0085 self-describing, the frame of a count that does not match", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], UI),
+    ("0085 self-describing, a value cut by the search", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
+    ("0085 self-describing, the positions and row names", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0085 self-describing, the base shown in the strip", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 18%, var(--md-default-bg-color))"], TEXT),
+    ("0085 self-describing, the frame of the base shown", "var(--viz-s4)", ["color-mix(in srgb, var(--viz-s4) 18%, var(--md-default-bg-color))"], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

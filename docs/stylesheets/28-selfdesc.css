@@ -1,0 +1,27 @@
+/* Question 0085, the self-describing number: the tables of tools/figures/q0085.py and the
+   box of explorer/selfdesc.js (sd-*). Both draw a number as a gs-bits table, left to right:
+   the positions i, the digits d[i] (the gs-bits "is-one" cells; "is-mark" frames the four
+   places of the pattern of b >= 7), and the real count of each position, green when it
+   matches the digit and orange when it does not. Colours from the palette only. */
+
+/* the row of positions: plain small numbers, no cell */
+.md-typeset table.gs-bits.sd-tab td.gs-b.sd-ix { border: 0; height: 1.1rem; font-size: 0.65rem; color: var(--viz-text); }
+
+/* the count row: matches the digit above it, or not */
+.md-typeset table.gs-bits td.gs-b.sd-ok { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border-color: var(--viz-s3); color: var(--viz-ink); }
+.md-typeset table.gs-bits td.gs-b.sd-bad { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); border: 2.5px solid var(--viz-s2-text); color: var(--viz-ink); font-weight: 700; }
+
+/* the search: a value cut (with every larger one), a place not written yet */
+.md-typeset table.gs-bits td.gs-b.sd-cut { border: 2.5px dashed var(--viz-s2-text); color: var(--viz-s2-text); font-weight: 700; }
+.md-typeset table.gs-bits td.gs-b.sd-empty { border-style: dashed; }
+
+/* the strip of the bases box: the base shown */
+.md-typeset table.gs-bits.sd-count td.gs-b { width: 1.6rem; }
+.md-typeset table.gs-bits td.gs-b.sd-cur { background: color-mix(in srgb, var(--viz-s4) 18%, var(--md-default-bg-color)); border: 2px solid var(--viz-s4); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .sd-wrap .gs-scroll + .gs-scroll { margin-top: 0.4rem; }
+
+/* the legend keys */
+.md-typeset .viz-legend .sd-key-ok { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s3); outline-offset: -1.5px; }
+.md-typeset .viz-legend .sd-key-bad { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2-text); outline-offset: -2px; }
+.md-typeset .viz-legend .sd-key-cut { background: none; outline: 2px dashed var(--viz-s2-text); outline-offset: -2px; }
+.md-typeset .viz-legend .sd-key-mark { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s2); outline-offset: -2.5px; }

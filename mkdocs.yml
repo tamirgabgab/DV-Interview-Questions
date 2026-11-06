@@ -148,6 +148,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/25-figures-c.css   # S415 figures: 0002's XOR bits, 0003's passes, 0038's contract (session 32)
   - stylesheets/26-jugs.css        # 0083: the water jugs, their figures and box (session 32)
   - stylesheets/27-lis.css         # 0084: the longest increasing subsequence, its figures and box (session 32)
+  - stylesheets/28-selfdesc.css    # 0085: the self-describing number, its tables and box (session 32)
 
 extra_javascript:
   - javascripts/mathjax.js

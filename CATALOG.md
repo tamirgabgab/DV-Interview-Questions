@@ -1,6 +1,6 @@
 # Catalog
 
-All 83 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 84 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -88,3 +88,4 @@ All 83 questions, with links to their pages on the [live site](https://tamirgabg
 | 0082 | [משחק Nim – ה-XOR של הערימות, המשחק ההפוך ומספרי גרנדי](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0082-nim-xor-grundy/) | senior (סניור) |
 | 0083 | [כדי המים – למדוד 4 ליטר עם כד של 3 וכד של 5](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0083-water-jugs/) | student (סטודנט) |
 | 0084 | [תת-הסדרה העולה הארוכה ביותר – DP, מערך tails וספירת כל ה-LIS](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0084-longest-increasing-subsequence/) | junior (ג'וניור) |
+| 0085 | [מספר שמתאר את עצמו – כל ספרה סופרת את המופעים של המקום שלה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0085-self-describing-number/) | junior (ג'וניור) |
