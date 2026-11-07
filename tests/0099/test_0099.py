@@ -70,6 +70,8 @@ def test_part_b_hardware():
     # after the rest, 5 after the tail, and 5 + 93 = 98
     tr = q0099.trace_rows()
     assert tr[5][5] == 93 == 182162 % 97 and tr[24][6] == 90 and tr[-1][6] == 5 and 5 + 93 == 98
+    # the counter: last loads 1, the tail counts to 6, and the clock with n = 6 brings it back to 0
+    assert [row[7] for row in tr[24:]] == [1, 2, 3, 4, 5, 6, 0]
     assert (90 * 10**6) % 97 == 5 and len(tr) == 31
     # the follow-ups: two digits a clock (3r + 10a + b <= 387) and a letter (3r + v), 13 clocks
     assert all(q0099.step2_hw(r, a, b) == (100 * r + 10 * a + b) % 97 for r in range(97) for a in range(10) for b in range(10))
@@ -207,18 +209,19 @@ def test_hardware_box_matches_the_reference():
     strings = [q0099.norm(x) for x in q0099.EXAMPLES] + [q0099.norm(q0099.SLIP)]
     strings += ["".join(rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(2)) + f"{rng.randrange(100):02d}"
                 + "".join(rng.choice(alnum) for _ in range(rng.randrange(1, 30))) for _ in range(120)]
-    versions = [k for k, _ in q0099.VERSIONS]
     got = node_json(f"const m = {explorer_require()};"
-                    f"console.log(JSON.stringify({json.dumps(strings)}.map((s) => [m.ihStream(s), {json.dumps(versions)}.map((v) => {{"
-                    "const t = m.ihTrace(m.ihStream(s), v); return [t.length, t[t.length - 1].ok]; })])));")
-    for s, (ds, res) in zip(strings, got):
+                    f"console.log(JSON.stringify({json.dumps(strings)}.map((s) => {{ const t = m.ihTrace(m.ihStream(s)); "
+                    "return [m.ihStream(s), t.length, t.filter((c) => c.done).length, t.some((c) => c.ok)]; })));")
+    for s, (ds, clocks, dones, ok) in zip(strings, got):
         assert ds == q0099.stream(s), s
-        for (name, run), (clocks, ok) in zip(q0099.VERSIONS, res):
-            want_ok, want_clocks, _ = run(q0099.stream(s))
-            assert (clocks, ok) == (want_clocks, want_ok), (s, name)
-    # the trace of the page's IBAN, clock by clock, as the table of the page
-    tr = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.ihTrace(m.ihStream('{IL}'), 'final').map((e) => [e.regs.h, e.regs.r, e.regs.n])));")
-    assert tr == [[row[5], row[6], row[7]] for row in q0099.trace_rows()]
+        want_ok, want_clocks, _ = q0099.run_final(q0099.stream(s))
+        assert (clocks, ok, dones) == (want_clocks, want_ok, 1), s
+    # the trace of the page's IBAN, clock by clock, as the table of the page and the SV
+    tr = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.ihTrace(m.ihStream('{IL}')).map((e) => [e.s, e.y, e.h, e.r, e.n, e.head, e.tail, e.done])));")
+    rows = q0099.trace_rows()
+    assert [t[:5] for t in tr] == [[row[3], row[4], row[5], row[6], row[7]] for row in rows]
+    assert [t[5] for t in tr] == [True] * 6 + [False] * 25 and [t[6] for t in tr] == [False] * 25 + [True] * 6
+    assert [t[7] for t in tr] == [False] * 30 + [True]
     cases = ["IL62 0108", "il620108", "IL6", "1L620", "IL62" + "0" * 30, "IL62" + "0" * 31]
     parsed = node_json(f"const m = {explorer_require()};console.log(JSON.stringify({json.dumps(cases)}.map(m.ihParse)));")
     assert parsed == ["IL620108", "IL620108", None, None, "IL62" + "0" * 30, None]

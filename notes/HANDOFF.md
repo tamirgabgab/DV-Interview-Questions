@@ -928,7 +928,14 @@ below start at item 112 (session 31).
     parts, a clock-by-clock table of the page's IBAN (h = 93, r = 90, after the tail 5, 5 + 93
     = 98), SV `iban_checker` with `done` six clocks after `last`, and the box with the two
     versions. The owner then had the two state diagrams (the mod 3 machine and the fans of
-    states 1 and 96) taken out as too much for the page.
+    states 1 and 96) taken out as too much for the page, and the box redone: the block
+    diagram with this clock's values and path, a table of every signal per clock (the SV's
+    counter: last loads 1, back to 0 after 6), the answer shown from the first clock, and
+    wider IBAN fields in both boxes (an `input.ex-num` rule had kept them 5.2rem).
+    Both figures carry `direction="ltr"`: in the RTL page "= 1 or 98 ?" and "r ≥ 97 ?" were
+    reordered as "? or 98 1 =". The answer mark goes on the result block's frame only (on
+    the group it stroked the text); the dead fan rules (`ih-state`, `ih-edge`, `ih-lab`)
+    are gone.
 
 
 ---

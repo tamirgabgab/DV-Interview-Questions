@@ -343,7 +343,7 @@ def datapath_svg() -> str:
         return f'<path class="{cls}" d="{d}"' + (' marker-end="url(#ih-hb)"' if arrow else "") + "/>"
     def lab(x, y, t, anchor="middle"):
         return f'<text class="ih-wlab" x="{x}" y="{y}" text-anchor="{anchor}">{t}</text>'
-    o = [f'<svg class="figure ih-fig ih-dp" viewBox="0 0 {W} {H}" style="max-width:{W / 16:g}rem" role="img" '
+    o = [f'<svg class="figure ih-fig ih-dp" viewBox="0 0 {W} {H}" direction="ltr" style="max-width:{W / 16:g}rem" role="img" '
          'aria-label="תרשים המלבנים של הבודק : שלושה רגיסטרים, h ו-r של 7 ביטים ומונה n של 3 ביטים. הבקרה מחשבת head כש-r לפחות 97 '
          'ו-tail כש-n גדול מ-0. מרבב בוחר את h בזמן הראש ואת r אחריו, מרבב שני מכניס 0 במקום הספרה בזמן הזנב, '
          'בלוק אחד מחשב 10x ועוד הספרה ובלוק אחד mod 97. התוצאה נכתבת ל-h בזמן הראש ול-r אחריו. בסוף בודקים אם y ועוד h '
@@ -389,21 +389,24 @@ def datapath_svg() -> str:
 
 
 def trace_rows(iban: str = IL):
-    """The checker clock by clock: (clock, digit or 0, the register that goes in, 10x + e,
-    mod 97, h, r, n)."""
+    """The checker clock by clock, as the SystemVerilog of the page: (clock, digit or 0, the
+    register that goes in, 10x + e, mod 97, h, r, n after the clock). last loads n = 1, the
+    tail counts 1..6, and the clock with n = 6 is the answer's, after which n is 0 again."""
     h, r, n, out = 0, 97, 0, []
-    for k, d in enumerate(stream(iban), 1):
+    ds = stream(iban)
+    for k, d in enumerate(ds, 1):
         if r >= 97:
             s = 10 * h + d
             h, r, reg = s % 97, (0 if r == 97 + HEAD - 1 else r + 1), "h"
         else:
             s = 10 * r + d
             r, reg = s % 97, "r"
+            n = 1 if k == len(ds) else 0
         out.append((k, d, reg, s, s % 97, h, r, n))
-    for _ in range(6):
-        n += 1
+    while n:
         s = 10 * r
         r = s % 97
+        n = 0 if n == 6 else n + 1
         out.append((out[-1][0] + 1, 0, "r", s, r, h, r, n))
     return out
 
@@ -417,9 +420,10 @@ def trace_table() -> str:
             rows.append("| … | | | | | |")
             continue
         k, d, reg, s, y, h, r, n = tr[i]
+        tail = i >= len(stream(IL))
         what = (f"ספרת ראש, ‏{L(f'x = h = {tr[i - 1][5] if i else 0}')}" if i < HEAD else
-                f"ספרה, ‏{L(f'x = r = {tr[i - 1][6]}')}" if n == 0 else f"‏0 של הזנב, ‏{L(f'x = r = {tr[i - 1][6]}')}")
-        after = L(f"h = {h}, r = {r}" + (f", n = {n}" if n else ""))
+                f"‏0 של הזנב, ‏{L(f'n = {tr[i - 1][7]}, x = r = {tr[i - 1][6]}')}" if tail else f"ספרה, ‏{L(f'x = r = {tr[i - 1][6]}')}")
+        after = L(f"h = {h}, r = {r}" + (f", n = {n}" if n or tail else ""))
         rows.append(f"| {k} | {d} | {what} | {s} | {y} | {RLM}{after} |")
     k, d, reg, s, y, h, r, n = tr[-1]
     assert r + h == 98

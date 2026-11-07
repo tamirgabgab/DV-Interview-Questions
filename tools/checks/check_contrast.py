@@ -468,6 +468,8 @@ PAIRS = [
     ("0099 iban, the edges of the letter and check-digit cells", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0099 ibanhw, a state, a label, a block's text, a bit", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
     ("0099 ibanhw, an edge, a wire, a block's second line, a register's name", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0099 ibanhw, a value in the table of signals", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
+    ("0099 ibanhw, a clock's number in the table", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0099 ibanhw, the frame of a register and the edge a digit took", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0099 ibanhw, the frame of a stage and of the head's digits", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0099 ibanhw, the frame of the start and of the output", "var(--viz-s3)", [CARD, PAGE], UI),

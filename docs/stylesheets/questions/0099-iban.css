@@ -26,7 +26,7 @@
 
 
 /* the box: the IBAN as written and moved, one character a cell */
-.md-typeset .explorer .ib-in { width: 17rem; max-width: 100%; }
+
 .md-typeset .explorer .ib-lines { margin: 0.3rem 0; }
 .md-typeset .explorer .ib-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.6rem; margin: 0.15rem 0; }
 .md-typeset .explorer .ib-lab { min-width: 6.5rem; font-size: 0.75rem; color: var(--viz-ink); }
@@ -48,20 +48,10 @@
 .md-typeset .viz-legend .ib-key-pos { background: none; outline: 2px dashed var(--viz-ink); outline-offset: -2px; }
 
 /* Part b, the hardware checker (session 33): the block diagram of tools/figures/q0099.py and the box of
-   explorer/ibanhw.js (ih-*). A state is a circle, an edge a thin line with its digits; the
-   edge a digit took is blue (s1), the head's digits orange (s2), a flip-flop that changed
-   this clock outlined in ink. */
-.md-typeset svg.ih-fig .ih-state circle { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
-.md-typeset svg.ih-fig .ih-state text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
-.md-typeset svg.ih-fig .ih-state.ih-small text { font-size: 12px; }
-.md-typeset svg.ih-fig .ih-state.ih-src circle { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
-.md-typeset svg.ih-fig .ih-edge { fill: none; stroke: var(--viz-text); stroke-width: 1.3; }
-.md-typeset svg.ih-fig .ih-edge.is-took { stroke: var(--viz-s1); stroke-width: 3; }
-.md-typeset svg.ih-fig .ih-edge.is-off { stroke-dasharray: 3 3; opacity: 0.5; }
-.md-typeset svg.ih-fig .ih-state.is-took circle { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2.5; }
+   explorer/ibanhw.js (ih-*). A register is blue (s1), the path of this clock blue, the head's
+   digits orange (s2), a flip-flop that changed this clock outlined in ink. The figures are
+   drawn left to right (direction="ltr"), so "= 1 or 98 ?" is not reordered. */
 .md-typeset svg.ih-fig .ih-headp { fill: var(--viz-text); }
-.md-typeset svg.ih-fig .ih-lab { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
-.md-typeset svg.ih-fig .ih-lab.is-took { font-weight: 700; }
 .md-typeset svg.ih-fig .ih-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
 .md-typeset svg.ih-fig .ih-blk.ih-reg rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
 .md-typeset svg.ih-fig .ih-blk.ih-stage rect { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
@@ -71,11 +61,10 @@
 .md-typeset svg.ih-fig .ih-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
 
 /* the box */
-.md-typeset .explorer .ih-in { width: 15em; font-family: var(--md-code-font-family); }
+
 .md-typeset .explorer .ih-strip { display: flex; flex-wrap: wrap; gap: 2px; margin: 0.5rem 0; font-family: var(--md-code-font-family); font-size: 0.72rem; }
 .md-typeset .explorer .ih-c { display: inline-grid; place-items: center; width: 1.25rem; height: 1.5rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; color: var(--viz-ink); background: var(--md-default-bg-color); }
 .md-typeset .explorer .ih-c.ih-head { background: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
-.md-typeset .explorer .ih-c.ih-replay { border-style: dashed; }
 .md-typeset .explorer .ih-c.is-past { color: var(--viz-text); }
 .md-typeset .explorer .ih-c.is-now { box-shadow: inset 0 0 0 2px var(--viz-ink); font-weight: 700; color: var(--viz-ink); }
 .md-typeset .explorer .ih-regs { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; margin: 0.4rem 0; font-family: var(--md-code-font-family); font-size: 0.7rem; }
@@ -85,7 +74,6 @@
 .md-typeset .explorer .ih-b { display: inline-grid; place-items: center; width: 1.05rem; height: 1.35rem; border: 1px solid var(--viz-grid); background: color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color)); color: var(--viz-ink); font-style: normal; }
 .md-typeset .explorer .ih-b.is-flip { box-shadow: inset 0 0 0 2px var(--viz-ink); font-weight: 700; }
 .md-typeset .explorer .ih-rval { color: var(--viz-text); min-width: 2ch; font-variant-numeric: tabular-nums; }
-.md-typeset .explorer .ih-fan svg { display: block; width: 100%; max-width: 16.25rem; margin: 0.3rem auto; }
 .md-typeset .explorer .ih-note { font-size: 0.72rem; margin: 0.3em 0; min-height: 2.6em; }
 .md-typeset .viz-legend .ih-key-head { background: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s2); outline-offset: -1px; }
 .md-typeset .viz-legend .ih-key-now { background: var(--md-default-bg-color); outline: 2px solid var(--viz-ink); outline-offset: -2px; }
@@ -95,3 +83,27 @@
 .md-typeset svg.ih-fig .ih-wlab { fill: var(--viz-s3-text); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset .explorer .ih-c.ih-tail { border-style: dashed; color: var(--viz-text); }
 .md-typeset .viz-legend .ih-key-tail { background: var(--md-default-bg-color); outline: 1px dashed var(--viz-text); outline-offset: -1px; }
+
+/* the IBAN fields of both boxes: wide enough for a whole IBAN in groups of four */
+.md-typeset .explorer .ex-controls > label:has(input.ex-num:is(.ib-in, .ih-in)) { flex: 1 1 100%; max-width: 100%; min-width: 0; }
+.md-typeset .explorer input.ex-num:is(.ib-in, .ih-in) { flex: 1 1 auto; width: 36ch; max-width: 100%; min-width: 0; box-sizing: border-box; padding: 0.15rem 0.4rem; }
+
+/* the live block diagram of the box: the blocks and wires of this clock lit (s1), the values
+   in the code face under each block's name */
+.md-typeset .explorer .ih-dpwrap svg { display: block; width: 100%; max-width: 25rem; margin: 0.4rem auto; }
+.md-typeset svg.ih-fig .ih-val { fill: var(--viz-ink); font-size: 12px; font-weight: 400; font-family: var(--md-code-font-family); }
+.md-typeset svg.ih-live-dp .ih-blk rect { stroke: var(--viz-grid); }
+.md-typeset svg.ih-live-dp .ih-blk.is-on rect { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg.ih-live-dp .ih-wire { stroke: var(--viz-grid); }
+.md-typeset svg.ih-live-dp .ih-wire.is-on { stroke: var(--viz-s1); stroke-width: 2.4; }
+
+/* the table of every signal, a column per clock */
+.md-typeset .explorer .ih-wavewrap { overflow-x: auto; margin: 0.4rem 0; }
+.md-typeset .explorer table.ih-wave { display: table; width: auto; margin: 0; border-collapse: collapse; font-family: var(--md-code-font-family); font-size: 0.62rem; }
+.md-typeset .explorer table.ih-wave :is(th, td) { min-width: 1.7rem; padding: 0.1rem 0.2rem; border: 1px solid var(--viz-grid); text-align: center; color: var(--viz-ink); background: var(--md-default-bg-color); font-variant-numeric: tabular-nums; }
+.md-typeset .explorer table.ih-wave th[scope="row"] { position: sticky; left: 0; z-index: 1; text-align: left; font-weight: 700; background: color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.ih-wave thead th { color: var(--viz-text); font-weight: 400; }
+.md-typeset .explorer table.ih-wave .is-now { box-shadow: inset 0 0 0 2px var(--viz-s1); font-weight: 700; }
+.md-typeset .explorer table.ih-wave td.is-hi { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.ih-wave td.is-fut { background: color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .ih-key-on { background: none; height: 0; border-top: 3px solid var(--viz-s1); align-self: center; }
