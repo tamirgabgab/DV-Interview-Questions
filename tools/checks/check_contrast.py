@@ -456,6 +456,20 @@ PAIRS = [
     ("0098 luhn, the frame of the chosen place and of the last error's cell", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))"], UI),
     ("0098 luhn, the × of an error that slips by", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 40%, var(--md-default-bg-color))"], TEXT),
     ("0098 luhn, the digits around a map", "var(--viz-ink)", [CARD, PAGE], TEXT),
+    # 0099 iban (stylesheets/questions/0099-iban.css): the digit tables, the Israeli structure and the box
+    ("0099 iban, a digit or a remainder", "var(--viz-ink)", [CARD, PAGE], TEXT),
+    ("0099 iban, a digit of a letter", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0099 iban, a check digit, the check digits' part", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0099 iban, the first four characters in the box, the bank's part", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0099 iban, the branch's part", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s5) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0099 iban, the account's part", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 14%, var(--md-default-bg-color))"], TEXT),
+    ("0099 iban, a remainder not read yet", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0099 iban, the frame of the last remainder", "var(--viz-s3-text)", [CARD, PAGE], UI),
+    ("0099 iban, the frame of a last remainder that is not 1", "var(--viz-s2-text)", [CARD, PAGE], UI),
+    ("0099 iban, the frame of the step and of the chosen place", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], UI),
+    ("0099 iban, the edges of the letter and check-digit cells", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0099 iban, an error caught", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
+    ("0099 iban, an error that slips", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

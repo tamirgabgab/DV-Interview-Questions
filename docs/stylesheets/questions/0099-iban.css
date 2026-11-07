@@ -1,0 +1,63 @@
+/* Question 0099, the check digits of an IBAN: the tables of tools/figures/q0099.py and the box
+   of explorer/iban.js (ib-*). The digits of the moved IBAN sit in gs-bits tables, left to
+   right, in rows of ten, each with the remainder mod 97 under it (ib-rrow): the digits of a
+   letter are blue (s1), the check digits green (s3), the last remainder framed. The Israeli
+   structure (ib-struct) gives each part its own tint, with a swatch (ib-sw) in the table
+   under it. In the box the first four characters are amber (s4) on the lines as written and
+   moved, and the chosen place has a dashed frame.
+   Colours from the palette only. */
+
+.md-typeset table.gs-bits.ib-tab td.gs-b { width: 1.9rem; font-variant-numeric: tabular-nums; }
+.md-typeset table.gs-bits.ib-tab th { font-size: 0.65rem; }
+.md-typeset table.gs-bits.ib-tab td.gs-b.ib-pad { visibility: hidden; }
+
+/* a digit, and where it came from */
+.md-typeset table.gs-bits td.gs-b.ib-d { color: var(--viz-ink); }
+.md-typeset table.gs-bits td.gs-b.ib-d.ib-let { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset table.gs-bits td.gs-b.ib-d.ib-chk { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+
+/* the remainder under each digit; the last one framed; one not read yet */
+.md-typeset table.gs-bits.ib-tab tr.ib-rrow td.gs-b { font-size: 0.7rem; color: var(--viz-ink); border-style: dotted; }
+.md-typeset table.gs-bits.ib-tab tr.ib-rrow td.gs-b.ib-last { border: 2.5px solid var(--viz-s3-text); font-weight: 700; }
+.md-typeset table.gs-bits.ib-tab tr.ib-rrow td.gs-b.ib-last.ib-lastbad { border-color: var(--viz-s2-text); }
+.md-typeset table.gs-bits.ib-tab tr.ib-rrow td.gs-b.ib-fut { color: var(--viz-text); }
+.md-typeset table.gs-bits.ib-tab tr.ib-rrow + tr th { padding-top: 0.5rem; }
+
+/* the step of the box: the digit read and the remainder after it */
+.md-typeset table.gs-bits td.gs-b.ib-now { box-shadow: 0 0 0 2px var(--viz-ink); font-weight: 700; }
+
+/* the Israeli structure: one tint per part, its name under it */
+.md-typeset table.gs-bits.ib-struct td.gs-b.ib-seg { width: auto; padding: 0.2rem 0.45rem; color: var(--viz-ink); font-weight: 700; letter-spacing: 0.04em; }
+.md-typeset table.gs-bits td.gs-b.ib-cc { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset table.gs-bits td.gs-b.ib-ck { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset table.gs-bits td.gs-b.ib-bk { background: color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color)); border-color: var(--viz-s4); }
+.md-typeset table.gs-bits td.gs-b.ib-br { background: color-mix(in srgb, var(--viz-s5) 22%, var(--md-default-bg-color)); border-color: var(--viz-s5); }
+.md-typeset table.gs-bits td.gs-b.ib-ac { background: color-mix(in srgb, var(--viz-s2) 14%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset .ib-sw { display: inline-block; width: 0.8em; height: 0.8em; margin-inline-end: 0.35em; vertical-align: -0.05em; border: 1.5px solid; border-radius: 0.15em; }
+.md-typeset .ib-sw.ib-cc { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset .ib-sw.ib-ck { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); border-color: var(--viz-s3); }
+.md-typeset .ib-sw.ib-bk { background: color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color)); border-color: var(--viz-s4); }
+.md-typeset .ib-sw.ib-br { background: color-mix(in srgb, var(--viz-s5) 22%, var(--md-default-bg-color)); border-color: var(--viz-s5); }
+.md-typeset .ib-sw.ib-ac { background: color-mix(in srgb, var(--viz-s2) 14%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+
+/* the box: the IBAN as written and moved, one character a cell */
+.md-typeset .explorer .ib-in { width: 17rem; max-width: 100%; }
+.md-typeset .explorer .ib-lines { margin: 0.3rem 0; }
+.md-typeset .explorer .ib-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.6rem; margin: 0.15rem 0; }
+.md-typeset .explorer .ib-lab { min-width: 6.5rem; font-size: 0.75rem; color: var(--viz-ink); }
+.md-typeset .explorer .ib-str { display: inline-flex; flex-wrap: wrap; gap: 1px; font-family: var(--md-code-font-family); font-size: 0.8rem; }
+.md-typeset .explorer .ib-c { min-width: 0.95rem; padding: 0 0.1rem; text-align: center; color: var(--viz-ink); border-radius: 0.15rem; }
+.md-typeset .explorer .ib-c.ib-head { background: color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color)); }
+.md-typeset .explorer .ib-c.ib-at { outline: 2px dashed var(--viz-ink); outline-offset: -1px; font-weight: 700; }
+
+/* the verdict after a change: caught (green) or slipped (orange) */
+.md-typeset .explorer .ib-caught { color: var(--viz-s3-text); }
+.md-typeset .explorer .ib-slip { color: var(--viz-s2-text); }
+
+/* the legend keys */
+.md-typeset .viz-legend .ib-key-let { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
+.md-typeset .viz-legend .ib-key-chk { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s3); outline-offset: -1.5px; }
+.md-typeset .viz-legend .ib-key-last { background: none; outline: 2.5px solid var(--viz-s3-text); outline-offset: -2.5px; }
+.md-typeset .viz-legend .ib-key-head { background: color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .ib-key-now { background: none; outline: 2px solid var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .ib-key-pos { background: none; outline: 2px dashed var(--viz-ink); outline-offset: -2px; }

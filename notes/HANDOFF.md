@@ -806,6 +806,17 @@ below start at item 112 (session 31).
     case. Part ד: SV stimulus with `randomize() with { valid == want; }` and a checker
     taking a digit per clock. Box `luhn` (prefix `lu-`): the check digit by digit, error
     buttons, and 10 × 10 maps of swaps or single changes against a chosen scheme.
+170. **Question 0099, the IBAN's check digits mod 97 (session 33, 2026-11-07).** Chosen with
+    0098; junior / medium, kind code, Python and SV, digits path. Part א: the registry
+    example IL62 0108 0000 0009 9999 999, moved and turned to digits, the remainder digit by
+    digit ends at 1; the SV `iban_check` takes a character a clock and needs no buffer (the
+    first four characters are always 6 digits: (27·rest + head) mod 97, as 10⁶ ≡ 27).
+    Part ב: the check digits are 98 − m, and why 98 (they stay in 02 to 98). Part ג: every
+    single error and every swap of two digits is caught (10 has order 96 mod 97); the
+    double error 99 → 02 slips; letters as two digits (B1 = 1B = 111); moduli 97 to 100
+    compared on made-up IBANs. Part ד: the Israeli structure (bank 3, branch 3, account
+    13), a made-up IL14 0123 4500 0000 6789 012. Box `iban` (prefix `ib-`): the steps, the
+    running remainder stepped, and error buttons.
 
 
 ---
