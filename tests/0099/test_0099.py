@@ -45,7 +45,54 @@ def test_part_a_numbers():
     assert 10**19 < 2**64 < 10**20 and int(d) > 2**64 and 10**9 - 1 < 2**31
 
 
-def test_part_b_check_digits():
+def test_part_b_hardware():
+    # the datapath: 8r + 2r + d and four stages give (10r + d) mod 97 for every state and digit
+    assert all(q0099.step_hw(r, d) == (10 * r + d) % 97 for r in range(97) for d in range(10))
+    assert max((r << 3) + (r << 1) + d for r in range(97) for d in range(10)) == 969 < 1024 and 969 < 2 * 776
+    assert all(q0099.final_hw(r, h) == (27 * r + h) % 97 for r in range(97) for h in range(97))
+    assert 27 * 96 + 96 == 2688 < 2 * 1552 and 10**6 == 97 * 10309 + 27 and pow(10, 6, 97) == 27
+    # faster: two digits (3r + 10a + b <= 387, two stages) and a letter (3r + v <= 323)
+    assert all(q0099.step2_hw(r, a, b) == (100 * r + 10 * a + b) % 97 for r in range(97) for a in range(10) for b in range(10))
+    assert all(q0099.step_letter(r, v) == (100 * r + v) % 97 for r in range(97) for v in range(10, 36))
+    assert 3 * 96 + 99 == 387 < 388 and 3 * 96 + 35 == 323
+    # the figures: state 1 goes to 10..19, state 96 to 87..96; mod 3 adds d mod 3
+    assert [q0099.step_hw(1, d) for d in range(10)] == list(range(10, 20))
+    assert [q0099.step_hw(96, d) for d in range(10)] == list(range(87, 97)) and 960 % 97 == 87
+    assert all((10 * r + d) % 3 == (r + d) % 3 for r in range(3) for d in range(10))
+    # the four versions agree with the reference on every string, and their costs
+    rng = random.Random(9)
+    alnum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    strings = [q0099.norm(x) for x in q0099.EXAMPLES] + [q0099.norm(q0099.SLIP)] + q0099.random_ibans(100, seed=12)
+    strings += ["".join(rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(2)) + f"{rng.randrange(100):02d}"
+                + "".join(rng.choice(alnum) for _ in range(rng.randrange(1, 30))) for _ in range(800)]
+    for s in strings:
+        ds = q0099.stream(s)
+        for _, run in q0099.VERSIONS:
+            assert run(ds)[0] == (q0099.mod97(s) == 1), s
+    il = q0099.stream(IL)
+    assert len(il) == 25 and len(IL) == 23
+    assert [run(il)[1:] for _, run in q0099.VERSIONS] == [(31, 34), (25, 17), (25, 15), (25, 14)]
+    # two digits a clock: 3 clocks of head, the 19 digits of the rest padded to 20, 10 clocks
+    assert 6 // 2 + (19 + 1) // 2 == 13
+    # the lower bound: 97 * 97 pairs (h, r) all told apart, more than 2^13
+    assert 97 * 97 == 9409 > 2**13 and q0099.states_needed() == 9895
+    for (h, r), (h2, r2) in [((5, 7), (5, 8)), ((5, 7), (6, 7)), ((0, 0), (96, 96))]:
+        told = False
+        for k in (2, 3):
+            for S in range(10**k):
+                a = (27 * ((10**k * r + S) % 97) + h) % 97 == 1
+                b = (27 * ((10**k * r2 + S) % 97) + h2) % 97 == 1
+                if a != b:
+                    told = True
+                    break
+            if told:
+                break
+        assert told
+    # and 27 * 900 is not a multiple of 97, the step of the proof
+    assert 27 * 900 % 97 != 0
+
+
+def test_part_c_check_digits():
     for s in q0099.random_ibans(300, seed=7) + [IL]:
         m = q0099.mod97(s[:2] + "00" + s[4:])
         c = 98 - m
@@ -57,7 +104,7 @@ def test_part_b_check_digits():
     assert {c for c in range(100) if (0 + c) % 97 == 1} == {1, 98}
 
 
-def test_part_c_claims():
+def test_part_d_claims():
     s = IL
     n0 = int(q0099.to_digits(s))
     # every single digit error and every swap of two different digits, at any distance
@@ -104,14 +151,6 @@ def test_moduli_table():
     assert res[100]["double"][0] == 0
     # the cost line: 19 digits in the account part of each IBAN, 30 IBANs
     assert len(q0099.random_ibans()) == 30 and all(len(x) == 23 for x in q0099.random_ibans())
-
-
-def test_part_d_israeli():
-    ib = q0099.israeli(12, 345, 6789012)
-    assert ib == "IL140123450000006789012" and q0099.grouped(ib) == "IL14 0123 4500 0000 6789 012"
-    assert q0099.mod97("IL00" + ib[4:]) == 84 and q0099.valid(ib) and len(ib) == 23 == 2 + 2 + 3 + 3 + 13
-    assert q0099.israeli(10, 800, 99999999) == IL
-    assert (IL[4:7], IL[7:10], IL[10:]) == ("010", "800", "0000099999999")
 
 
 def test_follow_ups():
@@ -167,3 +206,27 @@ def test_explorer_matches_the_reference():
              "IL6A000", "IL62", "IL62" + "0" * 30, "IL62" + "0" * 31, "IL62-0108", ""]
     parsed = node_json(f"const m = {explorer_require()};console.log(JSON.stringify({json.dumps(cases)}.map((t) => m.ibParse(t))));")
     assert parsed == [IL, IL, "GB82WEST12345698765432", None, None, None, None, "IL62" + "0" * 30, None, None, None]
+
+
+def test_hardware_box_matches_the_reference():
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(21)
+    alnum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    strings = [q0099.norm(x) for x in q0099.EXAMPLES] + [q0099.norm(q0099.SLIP)]
+    strings += ["".join(rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(2)) + f"{rng.randrange(100):02d}"
+                + "".join(rng.choice(alnum) for _ in range(rng.randrange(1, 30))) for _ in range(120)]
+    versions = [k for k, _ in q0099.VERSIONS]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({json.dumps(strings)}.map((s) => [m.ihStream(s), {json.dumps(versions)}.map((v) => {{"
+                    "const t = m.ihTrace(m.ihStream(s), v); return [t.length, t[t.length - 1].ok, t[t.length - 1].regs]; })])));")
+    for s, (ds, res) in zip(strings, got):
+        assert ds == q0099.stream(s), s
+        for (name, run), (clocks, ok, regs) in zip(q0099.VERSIONS, res):
+            want_ok, want_clocks, _ = run(q0099.stream(s))
+            assert (clocks, ok) == (want_clocks, want_ok), (s, name)
+    steps = node_json(f"const m = {explorer_require()};console.log(JSON.stringify([...Array(97).keys()].map((r) => [...Array(10).keys()].map((d) => m.ihStep(r, d)))));")
+    assert steps == [[(10 * r + d) % 97 for d in range(10)] for r in range(97)]
+    cases = ["IL62 0108", "il620108", "IL6", "1L620", "IL62" + "0" * 30, "IL62" + "0" * 31]
+    parsed = node_json(f"const m = {explorer_require()};console.log(JSON.stringify({json.dumps(cases)}.map(m.ihParse)));")
+    assert parsed == ["IL620108", "IL620108", None, None, "IL62" + "0" * 30, None]

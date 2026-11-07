@@ -1,6 +1,6 @@
 """Question 0099: the page's Python code (it runs as published) against the generator's
 reference: to_digits, mod97 and is_valid on the registry examples, made-up IBANs and random
-strings; check_digits; israeli_iban and grouped."""
+strings; check_digits; the hardware checker of part b (step, finish, stream, check_stream)."""
 
 import random
 import sys
@@ -37,13 +37,17 @@ def test_random_strings():
         assert not ns["is_valid"](bad), bad
 
 
-def test_israeli():
-    assert ns["israeli_iban"](12, 345, 6789012) == "IL140123450000006789012"
-    assert ns["grouped"](ns["israeli_iban"](12, 345, 6789012)) == "IL14 0123 4500 0000 6789 012"
-    assert ns["israeli_iban"](10, 800, 99999999) == q0099.IL.replace(" ", "")
-    rng = random.Random(8)
-    for _ in range(500):
-        b, br, a = rng.randrange(1000), rng.randrange(1000), rng.randrange(10**13)
-        ib = ns["israeli_iban"](b, br, a)
-        assert ib == q0099.israeli(b, br, a) and len(ib) == 23 and ns["is_valid"](ib)
-        assert (int(ib[4:7]), int(ib[7:10]), int(ib[10:])) == (b, br, a)
+def test_hardware_part_b():
+    assert all(ns["step"](r, d) == (10 * r + d) % 97 for r in range(97) for d in range(10))
+    assert all(ns["finish"](r, h) == (27 * r + h) % 97 for r in range(97) for h in range(97))
+    assert ns["stream"]("IL62 0108") == [1, 8, 2, 1, 6, 2, 0, 1, 0, 8]
+    for ib in q0099.EXAMPLES + (q0099.SLIP,):
+        assert ns["stream"](ib) == q0099.stream(ib) and ns["check_stream"](ns["stream"](ib))
+    rng = random.Random(6)
+    alnum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    for _ in range(1500):
+        s = "".join(rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(2)) + f"{rng.randrange(100):02d}" \
+            + "".join(rng.choice(alnum) for _ in range(rng.randrange(1, 30)))
+        assert ns["check_stream"](ns["stream"](s)) == (q0099.mod97(s) == 1) == q0099.run_codes(q0099.stream(s))[0]
+    # a stream shorter than the head is never valid
+    assert not ns["check_stream"]([1, 8, 2, 1, 6])

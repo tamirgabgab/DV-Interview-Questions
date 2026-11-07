@@ -103,5 +103,5 @@ All 100 questions, with links to their pages on the [live site](https://tamirgab
 | 0096 | [כמה להמר בכל סיבוב – קריטריון Kelly](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0096-kelly-criterion/) | junior (ג'וניור) |
 | 0097 | [שורש ריבועי בחומרה, ביט אחרי ביט](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0097-integer-square-root-in-hardware/) | senior (סניור) |
 | 0098 | [ספרת ביקורת בכרטיס אשראי – מה Luhn תופס ומה חומק](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0098-luhn-check-digit/) | junior (ג'וניור) |
-| 0099 | [ספרות הביקורת של IBAN – למה דווקא 97](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0099-iban-check-digits/) | junior (ג'וניור) |
+| 0099 | [ספרות הביקורת של IBAN – בודק בחומרה, ולמה דווקא 97](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0099-iban-check-digits/) | senior (סניור) |
 | 0100 | [כמה דרכים לעלות במדרגות – קפיצות מקבוצה, מדרגות שבורות, בלי סדר ובדיוק t קפיצות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0100-climbing-stairs-count/) | junior (ג'וניור) |

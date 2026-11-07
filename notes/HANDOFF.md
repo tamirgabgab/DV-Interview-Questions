@@ -899,6 +899,22 @@ below start at item 112 (session 31).
     wave `<hr>` dividers (22-circuit.css) are plain hairlines now (`WAVE_DIVIDERS` off in
     `circuit.js`), and the part bar's reading line (the clock) is larger (8 px, 16 px period)
     and fills from left to right like a trace in a waveform viewer.
+177. **0099 reworked: a hardware checker as part b, part d dropped, senior (session 33,
+    2026-11-07).** The owner asked to drop part d (the Israeli IBAN's structure) and to make
+    part b a hardware design with adders and flip-flops; MCQ answers: both ways of the head
+    (kept in registers, then without), a digit a clock and then faster inputs, a block
+    diagram (no per-gate equations), the SV module of part a moved to part b, a small full
+    diagram and a fragment of mod 97, the fewest flip-flops as the last step, senior and
+    kind design, a stepping box. The page moved to `docs/questions/senior/` (the old URL
+    404s). Part b: a 97-state machine on the remainder (7 flip-flops), `8r + 2r + d` and four
+    compare-and-subtract stages (776, 388, 194, 97); the head kept (34 flip-flops, 31 clocks
+    for the Israeli IBAN), two remainders with `(27r + h) mod 97` (17, 25 clocks), the count
+    in r (15), then the unused codes 97..102 of r as the head's count (14), with a proof that
+    14 is the least (97 * 97 pairs told apart, more than 2^13); faster: a letter in a clock
+    (`3r + v`) and two digits a clock (`3r + 10a + b`, two stages, 13 clocks). Figures: the
+    mod 3 machine, two fans of mod 97, the block diagram, two tables; SV `iban_checker` (14
+    flip-flops, a Mealy `ok` at the last digit); box `ibanhw` (prefix `ih-`). Part a keeps the
+    hand check, Python and SV functions; the old b and c are now c and d.
 
 
 ---

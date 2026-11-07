@@ -57,7 +57,7 @@ prefix (the class table of `CONTRIBUTING.md` lists them), and a line at the end 
 | `questions/0096-kelly.css` | `ky-` | the Kelly criterion: the curve g(f), the wealth paths on a log scale, the box with its paths and curve |
 | `questions/0097-isqrt.css` | `isq-` | the integer square root in hardware: the step as areas, the bit rows, the box's table of the eight steps |
 | `questions/0098-luhn.css` | `lu-` | check digits: the digit strips of the figures, the box's strip and its two maps of the errors |
-| `questions/0099-iban.css` | `ib-` | the IBAN's check digits: the digits of the moved IBAN with the remainder mod 97 under each, the Israeli structure, the box's lines and its error at a chosen place |
+| `questions/0099-iban.css` | `ib-` | the IBAN's check digits: the digits of the moved IBAN with the remainder mod 97 under each, the box's lines and its error at a chosen place; part b's state diagrams, block diagram and the hardware box (`ih-`) |
 | `questions/0022-latpaths.css` | `lp-` | the paths in a grid: the tints of the counts on the boards (the shared `gx-` figures and the `gp-` grid of the box), the small boards with one path each |
 | `questions/0100-stairs.css` | `sw-` | the ways to climb the stairs: the staircases of the figures with the arrows into a stair, the box's flights of stair buttons |
 | `questions/0037-editdist.css` | `ed-` | the edit distance between two streams: the tables of the prefixes with the path shaded by step, the band, the box's table filled a cell at a time and its report |
