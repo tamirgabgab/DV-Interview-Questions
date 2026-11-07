@@ -836,14 +836,26 @@ below start at item 112 (session 31).
     force. Box `latpaths` (prefix `lp-`, `stylesheets/questions/0022-latpaths.css`, the
     shared `gp-` grid of 0070): a uniform random path drawn backwards through the counts
     (tested for uniformity under Node). Coding path.
+172. **Question 0100, the ways to climb the stairs (session 33, 2026-11-07).** The owner chose
+    Climbing Stairs from a new list and asked for code that counts and a generalization;
+    MCQ answers: broken stairs, the order not mattering, exactly t jumps; a plain DP (no
+    matrix power); the box with S, n, broken stairs and the count on every stair; junior.
+    Part א: S = {1, 2}, n = 10 gives 89 (w(n) = F(n+1)); any S by the last jump;
+    `count_ways` and `list_ways`, SV `count_ways`. Part ב: stair 5 broken gives 25 = 5 · 5,
+    two adjacent broken stairs give 0; SV `stairs_ways`, a stair a clock with a shift
+    register of K values. Part ג: the order does not matter, the loops swapped (6 and 14
+    against 89 and 274), proof by the one non-decreasing order of every multiset. Part ד:
+    exactly t jumps, a row per t, C(t, n − t) for {1, 2} (35 for t = 7), the rows summing to
+    part א. Box `stairs` (prefix `sw-`, `stylesheets/questions/0100-stairs.css`): the stairs
+    as buttons in flights of ten, a picked stair's sum, breaking and mending. Coding path.
 
 
 ---
 
 ## In progress
 
-- **Session 33 (2026-11-07):** questions 0094 to 0099 and 0022 (work log items 165 to
-  171); the site has 99 questions, ids 0001 to 0099 with no gap.
+- **Session 33 (2026-11-07):** questions 0094 to 0099, 0022 and 0100 (work log items 165 to
+  172); the site has 100 questions, ids 0001 to 0100 with no gap.
 - **Session 33 (2026-11-06):** the repository's files reorganized (work log item 164):
   the notes in `notes/`, the requirements in `requirements/`, `tools/` split into
   `checks/`, `build/` and `authoring/`, the questions' own stylesheets in

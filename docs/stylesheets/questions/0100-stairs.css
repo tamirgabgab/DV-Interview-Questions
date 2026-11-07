@@ -1,0 +1,44 @@
+/* Question 0100, the ways to climb the stairs: the staircases of tools/figures/q0100.py and
+   the box of explorer/stairs.js (sw-*). A stair is a block that rises to the right with its
+   number of ways on it; the stair being made is blue (s1), the stairs that jump to it green
+   (s3), a broken stair hatched grey with a cross. In the box the stairs are buttons in
+   flights of ten.
+   Colours from the palette only. */
+
+/* the figures */
+.md-typeset svg.sw-fig .sw-stair rect { fill: color-mix(in srgb, var(--viz-ink) 7%, var(--md-default-bg-color)); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg.sw-fig .sw-stair.sw-focus rect { fill: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.sw-fig .sw-stair.sw-from rect { fill: color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 1.5; }
+.md-typeset svg.sw-fig .sw-stair.sw-broken rect { fill: color-mix(in srgb, var(--viz-ink) 22%, var(--md-default-bg-color)); stroke: var(--viz-ink); stroke-dasharray: 3 2; }
+.md-typeset svg.sw-fig .sw-x { stroke: var(--viz-ink); stroke-width: 2; stroke-linecap: round; fill: none; }
+.md-typeset svg.sw-fig .sw-val { fill: var(--viz-ink); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.sw-fig .sw-arc { fill: none; stroke: var(--viz-s3-text); stroke-width: 1.6; }
+.md-typeset svg.sw-fig .sw-headp { fill: var(--viz-s3-text); }
+
+/* the legend keys */
+.md-typeset .viz-legend .sw-key { background: color-mix(in srgb, var(--viz-ink) 7%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .sw-key-focus { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
+.md-typeset .viz-legend .sw-key-from { background: color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s3); outline-offset: -1.5px; }
+.md-typeset .viz-legend .sw-key-broken { background: color-mix(in srgb, var(--viz-ink) 22%, var(--md-default-bg-color)); outline: 1.5px dashed var(--viz-ink); outline-offset: -1.5px; }
+
+/* the box: the jump toggles, the flights of stairs */
+.md-typeset .explorer .sw-lab { font-size: 0.75rem; }
+.md-typeset .explorer .sw-jumps { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+/* a jump size: off is a dashed outline, on is filled (the #_ matches the shared button rule's weight) */
+.md-typeset .explorer .md-button.sw-tog:not(#_) { min-width: 2.4rem; min-height: 2.4rem; padding: 0 0.4rem; border-style: dashed; color: var(--act-line); background: transparent; }
+.md-typeset .explorer .md-button.sw-tog[aria-pressed="true"]:not(#_) { border: 1px solid var(--act); background: var(--act); color: var(--act-ink); font-weight: 700; }
+.md-typeset .explorer .sw-sum bdi { white-space: nowrap; }
+.md-typeset .explorer .sw-eq { display: block; margin-top: 0.2rem; font-family: var(--md-code-font-family); text-align: left; }
+.md-typeset .explorer .sw-flights { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0; }
+.md-typeset .explorer .sw-flight { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); align-items: end; gap: 2px; min-height: 4.9rem; }
+.md-typeset .explorer .sw-cell { display: flex; flex-direction: column; align-items: stretch; gap: 0.1rem; min-width: 0; }
+.md-typeset .explorer .sw-st { display: flex; justify-content: center; align-items: flex-start; height: calc(1.6rem + var(--j) * 0.29rem); min-width: 0; padding: 0.3rem 0 0; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: color-mix(in srgb, var(--viz-ink) 7%, var(--md-default-bg-color)); color: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 0.72rem; font-weight: 700; line-height: 1; cursor: pointer; }
+.md-typeset .explorer .sw-st.sw-long { font-size: 0.56rem; }
+.md-typeset .explorer .sw-st.sw-broken::before { content: "✕"; }
+.md-typeset .explorer .sw-i { font-size: 0.6rem; color: var(--viz-text); line-height: 1; text-align: center; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .sw-st.sw-focus { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); border: 2px solid var(--viz-s1); }
+.md-typeset .explorer .sw-st.sw-from { background: color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color)); border: 2px solid var(--viz-s3); }
+.md-typeset .explorer .sw-st.sw-broken { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--viz-ink) 22%, var(--md-default-bg-color)) 0 4px, color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color)) 4px 8px); border-style: dashed; border-color: var(--viz-ink); }
+.md-typeset .explorer .sw-st.sw-broken.sw-focus { border: 2px dashed var(--viz-s1); }
+.md-typeset .explorer .sw-st:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 1px; z-index: 1; }
+.md-typeset .explorer .sw-note { font-size: 0.72rem; margin: 0.3em 0; }

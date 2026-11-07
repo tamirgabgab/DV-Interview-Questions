@@ -1,6 +1,6 @@
 # Catalog
 
-All 99 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 100 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/build/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -104,3 +104,4 @@ All 99 questions, with links to their pages on the [live site](https://tamirgabg
 | 0097 | [שורש ריבועי בחומרה, ביט אחרי ביט](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0097-integer-square-root-in-hardware/) | senior (סניור) |
 | 0098 | [ספרת ביקורת בכרטיס אשראי – מה Luhn תופס ומה חומק](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0098-luhn-check-digit/) | junior (ג'וניור) |
 | 0099 | [ספרות הביקורת של IBAN – למה דווקא 97](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0099-iban-check-digits/) | junior (ג'וניור) |
+| 0100 | [כמה דרכים לעלות במדרגות – קפיצות מקבוצה, מדרגות שבורות, בלי סדר ובדיוק t קפיצות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0100-climbing-stairs-count/) | junior (ג'וניור) |

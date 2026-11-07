@@ -476,6 +476,13 @@ PAIRS = [
     ("0022 latpaths, S and T on their tint", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 8%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color))"], TEXT),
     ("0022 latpaths, the path on a small board", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))"], UI),
     ("0022 latpaths, the path line over the tints", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color))"], UI),
+    # 0100 stairs (stylesheets/questions/0100-stairs.css): the staircases and the box
+    ("0100 stairs, a count on a stair", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 7%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color))"], TEXT),
+    ("0100 stairs, a stair's number in the box", "var(--viz-text)", ["color-mix(in srgb, var(--viz-ink) 7%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color))"], TEXT),
+    ("0100 stairs, the cross of a broken stair", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color))"], TEXT),
+    ("0100 stairs, the edges of the picked stair and of the stairs below it", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0100 stairs, the arrows into the last stair", "var(--viz-s3-text)", [CARD, PAGE], UI),
+    ("0100 stairs, a jump size that is on", "var(--act-ink)", ["var(--act)"], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
