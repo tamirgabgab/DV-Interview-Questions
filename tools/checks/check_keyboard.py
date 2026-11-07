@@ -46,7 +46,10 @@ QUESTION = r"0061-longest-ones"
 DESCRIBE = """() => {
   const el = document.activeElement;
   if (!el || el === document.body || el === document.documentElement) return null;
-  const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+  // a content tab's radio input is hidden by design: its label is what the reader sees,
+  // and the label carries the focus ring (26-ui-round.css)
+  const shown = el.matches(".tabbed-set > input") && document.querySelector(`label[for="${CSS.escape(el.id)}"]`) || el;
+  const r = shown.getBoundingClientRect(), cs = getComputedStyle(shown);
   const clean = (s) => (s || "").replace(/\\s+/g, " ").trim();
   const visible = r.width > 0 && r.height > 0 && cs.visibility !== "hidden" && cs.display !== "none";
   let name = clean(el.getAttribute("aria-label"));
@@ -56,7 +59,16 @@ DESCRIBE = """() => {
   if (!name && el.closest("label")) name = clean(el.closest("label").textContent);
   if (!name) name = clean(el.textContent) || clean(el.getAttribute("title")) || clean(el.getAttribute("placeholder")) || clean(el.getAttribute("alt"));
   if (!name) { const t = el.querySelector("img[alt], svg title"); if (t) name = clean(t.alt || t.textContent); }
-  const ring = (cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) > 0) || cs.boxShadow !== "none";
+  let ring = (cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) > 0) || cs.boxShadow !== "none";
+  // an SVG control draws its ring as a stroke in the focus colour on a shape inside it
+  if (!ring && el instanceof SVGElement) {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--site-focus-ring)";
+    document.body.append(probe);
+    const focusColour = getComputedStyle(probe).color;
+    probe.remove();
+    ring = [el, ...el.querySelectorAll("*")].some((n) => { const c = getComputedStyle(n); return c.stroke === focusColour && parseFloat(c.strokeWidth) > 0; });
+  }
   const cls = typeof el.className === "string" ? el.className.trim().split(/\\s+/).slice(0, 2).join(".") : "";
   window.__kbStops = window.__kbStops || new Map();
   if (!window.__kbStops.has(el)) window.__kbStops.set(el, window.__kbStops.size + 1);

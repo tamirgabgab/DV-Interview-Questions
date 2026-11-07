@@ -116,3 +116,16 @@
 .md-typeset .daily-card,
 .md-typeset .level-card :is(.lc-diff, .lc-count),
 .md-typeset .path-nav { font-variant-numeric: tabular-nums; }
+
+/* --- the keyboard: a content tab's radio input is hidden (Material), so the ring of the
+   focused one is drawn on its label (the label of the n-th input is the n-th label) ------- */
+.md-typeset .tabbed-set > input:nth-child(1):focus-visible ~ .tabbed-labels > :nth-child(1),
+.md-typeset .tabbed-set > input:nth-child(2):focus-visible ~ .tabbed-labels > :nth-child(2),
+.md-typeset .tabbed-set > input:nth-child(3):focus-visible ~ .tabbed-labels > :nth-child(3),
+.md-typeset .tabbed-set > input:nth-child(4):focus-visible ~ .tabbed-labels > :nth-child(4),
+.md-typeset .tabbed-set > input:nth-child(5):focus-visible ~ .tabbed-labels > :nth-child(5),
+.md-typeset .tabbed-set > input:nth-child(6):focus-visible ~ .tabbed-labels > :nth-child(6),
+.md-typeset .tabbed-set > input:nth-child(7):focus-visible ~ .tabbed-labels > :nth-child(7),
+.md-typeset .tabbed-set > input:nth-child(8):focus-visible ~ .tabbed-labels > :nth-child(8) {
+  outline: 2px solid var(--site-focus-ring); outline-offset: 2px; border-radius: var(--radius-s);
+}
