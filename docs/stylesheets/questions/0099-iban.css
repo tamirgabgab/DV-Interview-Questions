@@ -47,27 +47,21 @@
 .md-typeset .viz-legend .ib-key-now { background: none; outline: 2px solid var(--viz-ink); outline-offset: -2px; }
 .md-typeset .viz-legend .ib-key-pos { background: none; outline: 2px dashed var(--viz-ink); outline-offset: -2px; }
 
-/* Part b, the hardware checker (session 33): the state diagrams of tools/figures/q0099.py
-   (mod 3, two fans of the mod 97 machine, the block diagram) and the box of
+/* Part b, the hardware checker (session 33): the block diagram of tools/figures/q0099.py and the box of
    explorer/ibanhw.js (ih-*). A state is a circle, an edge a thin line with its digits; the
    edge a digit took is blue (s1), the head's digits orange (s2), a flip-flop that changed
    this clock outlined in ink. */
 .md-typeset svg.ih-fig .ih-state circle { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
 .md-typeset svg.ih-fig .ih-state text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset svg.ih-fig .ih-state.ih-small text { font-size: 12px; }
-.md-typeset svg.ih-fig .ih-state.ih-start circle { fill: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2.5; }
 .md-typeset svg.ih-fig .ih-state.ih-src circle { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
 .md-typeset svg.ih-fig .ih-edge { fill: none; stroke: var(--viz-text); stroke-width: 1.3; }
-.md-typeset svg.ih-fig .ih-edge.ih-e1 { stroke: var(--viz-s1); }
-.md-typeset svg.ih-fig .ih-edge.ih-e2 { stroke: var(--viz-s2); }
 .md-typeset svg.ih-fig .ih-edge.is-took { stroke: var(--viz-s1); stroke-width: 3; }
 .md-typeset svg.ih-fig .ih-edge.is-off { stroke-dasharray: 3 3; opacity: 0.5; }
 .md-typeset svg.ih-fig .ih-state.is-took circle { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2.5; }
 .md-typeset svg.ih-fig .ih-headp { fill: var(--viz-text); }
 .md-typeset svg.ih-fig .ih-lab { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
 .md-typeset svg.ih-fig .ih-lab.is-took { font-weight: 700; }
-.md-typeset svg.ih-fig .ih-lab.ih-e1 { fill: var(--viz-s1-text); }
-.md-typeset svg.ih-fig .ih-lab.ih-e2 { fill: var(--viz-s2-text); }
 .md-typeset svg.ih-fig .ih-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
 .md-typeset svg.ih-fig .ih-blk.ih-reg rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
 .md-typeset svg.ih-fig .ih-blk.ih-stage rect { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
@@ -75,10 +69,6 @@
 .md-typeset svg.ih-fig .ih-blk text { fill: var(--viz-ink); font-size: 13px; font-weight: 600; font-family: var(--md-code-font-family); }
 .md-typeset svg.ih-fig .ih-sub { fill: var(--viz-text); font-size: 11px; font-weight: 400; font-family: var(--md-code-font-family); }
 .md-typeset svg.ih-fig .ih-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
-.md-typeset .viz-legend .ih-key-start { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; border-radius: 50%; }
-.md-typeset .viz-legend .ih-key-e0 { background: none; height: 0; border-top: 2px solid var(--viz-text); align-self: center; }
-.md-typeset .viz-legend .ih-key-e1 { background: none; height: 0; border-top: 2px solid var(--viz-s1); align-self: center; }
-.md-typeset .viz-legend .ih-key-e2 { background: none; height: 0; border-top: 2px solid var(--viz-s2); align-self: center; }
 
 /* the box */
 .md-typeset .explorer .ih-in { width: 15em; font-family: var(--md-code-font-family); }

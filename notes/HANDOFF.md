@@ -927,7 +927,8 @@ below start at item 112 (session 31).
     multiplexers, 10x + e, mod 97, the write back, y + h against 1 and 98) with a list of its
     parts, a clock-by-clock table of the page's IBAN (h = 93, r = 90, after the tail 5, 5 + 93
     = 98), SV `iban_checker` with `done` six clocks after `last`, and the box with the two
-    versions.
+    versions. The owner then had the two state diagrams (the mod 3 machine and the fans of
+    states 1 and 96) taken out as too much for the page.
 
 
 ---

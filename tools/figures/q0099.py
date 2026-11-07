@@ -16,7 +16,6 @@ Only published registry examples are used (the ISO 13616 registry's IL62 0108 00
 from __future__ import annotations
 
 import itertools
-import math as _m
 import random
 import re
 import sys
@@ -327,63 +326,6 @@ def _arrow_defs(idn: str) -> str:
             '<path class="ih-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs>')
 
 
-def mod3_svg() -> str:
-    """The whole machine for a small modulus: 3 states, (10 r + d) mod 3 = (r + d) mod 3, so
-    the digits fall into three groups by d mod 3; state 0 is the start and the accepting one.
-    Between two states the two edges bend to opposite sides; a state's own group is a loop."""
-    W, H, R = 380, 350, 26
-    pos = {0: (190, 104), 1: (310, 262), 2: (70, 262)}
-    groups = {0: "0,3,6,9", 1: "1,4,7", 2: "2,5,8"}
-    out = [f'<svg class="figure ih-fig" viewBox="0 0 {W} {H}" style="max-width:{W / 16:g}rem" role="img" '
-           'aria-label="מכונת המצבים של השארית בחלוקה ל-3 : שלושה מצבים, 0, 1 ו-2. מכל מצב ספרה מקבוצה 0, 3, 6, 9 '
-           'משאירה במקום, ספרה מקבוצה 1, 4, 7 מוסיפה 1, וספרה מקבוצה 2, 5, 8 מוסיפה 2, מודולו 3. ההתחלה ב-0, '
-           'ו-0 הוא גם המצב שבו המספר מתחלק ב-3">', _arrow_defs("ih-h3")]
-    for r in range(3):
-        for step, cls in ((1, "ih-e1"), (2, "ih-e2")):
-            t = (r + step) % 3
-            a, b = min(r, t), max(r, t)
-            (ax, ay), (bx, by) = pos[a], pos[b]
-            ln = _m.hypot(bx - ax, by - ay)
-            nx, ny = -(by - ay) / ln, (bx - ax) / ln         # one normal for the pair
-            side = 1 if r < t else -1
-            (x1, y1), (x2, y2) = pos[r], pos[t]
-            ux, uy = (x2 - x1) / ln, (y2 - y1) / ln
-            off = 9 * side
-            sx, sy = x1 + ux * R + nx * off, y1 + uy * R + ny * off
-            ex, ey = x2 - ux * (R + 3) + nx * off, y2 - uy * (R + 3) + ny * off
-            mx, my = (x1 + x2) / 2 + nx * 34 * side, (y1 + y2) / 2 + ny * 34 * side
-            out.append(f'<path class="ih-edge {cls}" d="M{sx:.1f},{sy:.1f} Q{mx:.1f},{my:.1f} {ex:.1f},{ey:.1f}" marker-end="url(#ih-h3)"/>')
-            lx, ly = (x1 + x2) / 2 + nx * 34 * side, (y1 + y2) / 2 + ny * 34 * side
-            out.append(f'<text class="ih-lab {cls}" x="{lx:.1f}" y="{ly + 4:.1f}" text-anchor="middle">{groups[step]}</text>')
-    for r, (x, y) in pos.items():
-        up = -1 if r == 0 else 1
-        out.append(f'<path class="ih-edge ih-e0" d="M{x - 12},{y + up * (R - 4)} C{x - 30},{y + up * (R + 36)} {x + 30},{y + up * (R + 36)} {x + 12},{y + up * (R - 2)}" marker-end="url(#ih-h3)"/>')
-        out.append(f'<text class="ih-lab" x="{x}" y="{y + up * (R + 40) + (0 if up < 0 else 10)}" text-anchor="middle">{groups[0]}</text>')
-        cls = "ih-state ih-start" if r == 0 else "ih-state"
-        out.append(f'<g class="{cls}"><circle cx="{x}" cy="{y}" r="{R}"/><text x="{x}" y="{y + 6}" text-anchor="middle">{r}</text></g>')
-    return "".join(out) + "</svg>"
-
-
-def fan_svg() -> str:
-    """Two states of the mod 97 machine and their 10 edges: 1 goes to 10..19, and 96 to
-    (960 + d) mod 97 = 87..96, which wraps around."""
-    W, H = 420, 330
-    out = [f'<svg class="figure ih-fig" viewBox="0 0 {W} {H}" style="max-width:{W / 16:g}rem" role="img" '
-           'aria-label="שני מצבים של מכונת השארית מודולו 97 : ממצב 1 עשר קשתות, לספרות 0 עד 9, אל המצבים 10 עד 19. '
-           'ממצב 96 עשר קשתות אל המצבים 87 עד 96, כי 960 מודולו 97 הוא 87">', _arrow_defs("ih-hf")]
-    for col, (src, x0) in enumerate(((1, 40), (96, 236))):
-        sy = 160
-        out.append(f'<g class="ih-state ih-src"><circle cx="{x0}" cy="{sy}" r="22"/><text x="{x0}" y="{sy + 6}" text-anchor="middle">{src}</text></g>')
-        for d in range(10):
-            ty = 18 + d * 32
-            tx = x0 + 132
-            t = step_hw(src, d)
-            out.append(f'<path class="ih-edge" d="M{x0 + 22},{sy} C{x0 + 70},{sy} {x0 + 70},{ty} {tx - 20},{ty}" marker-end="url(#ih-hf)"/>')
-            out.append(f'<text class="ih-lab" x="{x0 + 92}" y="{ty - 4}" text-anchor="middle">{d}</text>')
-            out.append(f'<g class="ih-state ih-small"><circle cx="{tx}" cy="{ty}" r="15"/><text x="{tx}" y="{ty + 5}" text-anchor="middle">{t}</text></g>')
-    return "".join(out) + "</svg>"
-
-
 def datapath_svg() -> str:
     """The block diagram of the checker (blocks of at most 10 bits and a mod 97 block): the
     registers h and r, the counter n of the tail; the control (head = r >= 97, tail = n > 0)
@@ -446,12 +388,6 @@ def datapath_svg() -> str:
     return "".join(o) + "</svg>"
 
 
-def legend_mod3() -> str:
-    return ('<span class="viz-legend"><span><i class="ih-key-start"></i>ההתחלה, ומתחלק ב-3</span>'
-            '<span><i class="ih-key-e0"></i>ספרות שלא משנות את השארית</span><span><i class="ih-key-e1"></i>מוסיפות 1</span>'
-            '<span><i class="ih-key-e2"></i>מוסיפות 2</span></span>')
-
-
 def trace_rows(iban: str = IL):
     """The checker clock by clock: (clock, digit or 0, the register that goes in, 10x + e,
     mod 97, h, r, n)."""
@@ -510,9 +446,6 @@ def blocks():
     return [
         moved_table(),
         running_grid(),
-        mod3_svg(),
-        legend_mod3(),
-        fan_svg(),
         datapath_svg(),
         trace_table(),
         versions_table(),

@@ -48,10 +48,8 @@ def test_part_a_numbers():
 def test_part_b_hardware():
     # one step: 10x + d at most 969, 10 bits; the mod block gives (10x + d) mod 97
     assert 10 * 96 + 9 == 969 < 1024
-    # the figures: state 1 goes to 10..19, state 96 to 87..96; mod 3 adds d mod 3
-    assert [q0099.step_hw(1, d) for d in range(10)] == list(range(10, 20))
-    assert [q0099.step_hw(96, d) for d in range(10)] == list(range(87, 97)) and 960 % 97 == 87
-    assert all((10 * r + d) % 3 == (r + d) % 3 for r in range(3) for d in range(10))
+    # the datapath step against the modulo, every state and digit
+    assert all(q0099.step_hw(r, d) == (10 * r + d) % 97 for r in range(97) for d in range(10))
     # six zeros multiply by 10^6; r + h <= 192, and mod 97 it is 1 only for 1 and 98
     assert all((r * 10**6) % 97 == (r * pow(10, 6, 97)) % 97 for r in range(97))
     assert [v for v in range(193) if v % 97 == 1] == [1, 98]
