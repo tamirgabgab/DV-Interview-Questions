@@ -1,5 +1,11 @@
-"""Question 0037: the generator's numbers (the page example) and the generated blocks."""
+"""Question 0037, the edit distance between two streams: the numbers the page states,
+recomputed from the reference in tools/figures/q0037.py (the table, and a search over the
+strings one edit apart that does not use it); every report rebuilds the actual stream and has
+as many lines as the distance; the band of part c against the full table; the generated
+blocks; the box's models under Node against the same reference."""
 
+import json
+import random
 import sys
 
 from extract_code import ROOT
@@ -8,39 +14,117 @@ sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0037  # noqa: E402
 
 
-def test_example():
-    args = (q0037.F_DATA, q0037.TAU, q0037.T0, q0037.OVERHEAD)
-    assert abs(q0037.mtbf(500e6, *args, 1) - 19.3) < 0.1
-    assert abs(q0037.mtbf(500e6, *args, 2) / q0037.YEAR - 297) < 1
-    assert abs(q0037.mtbf(500e6, *args, 3) / q0037.YEAR / 1.44e11 - 1) < 0.01
-    assert abs(q0037.mtbf(1e9, *args, 1) / 0.439e-3 - 1) < 0.01
-    assert abs(q0037.mtbf(1e9, *args, 2) - 9.66) < 0.05
-    assert abs(q0037.mtbf(1e9, *args, 3) / 86400 - 2.46) < 0.01
-    assert q0037.human(19.3) == "19.3 שניות" and q0037.human(297 * q0037.YEAR).startswith("297")
+def streams(rng, n=400, letters="ABCD", top=6):
+    for _ in range(n):
+        yield ("".join(rng.choice(letters) for _ in range(rng.randint(0, top))),
+               "".join(rng.choice(letters) for _ in range(rng.randint(0, top))))
 
 
-def test_traps_and_follow_ups():
-    """The conservative per-stage model N (T - t_su - t_cq): 3.4 ns, about 4.7e8 s (15
-    years) for two flops and 3.6e8 years for three, e^3 less per stage after the first; a
-    clock-like 50 MHz data signal makes 100 million transitions, half the MTBF (149 years);
-    the log-scale gap per flop at 500 MHz, 20 / ln 10 = 8.7 decades."""
-    import math
+def test_table_against_the_search():
+    rng = random.Random(37)
+    for a, b in streams(rng, 600, "ABC", 5):
+        assert q0037.distance(a, b) == q0037.bfs(a, b), (a, b)
+        # the swaps of part d: never above the plain distance, never below unrestricted Damerau
+        assert q0037.bfs(a, b, True) <= q0037.distance(a, b, True) <= q0037.distance(a, b)
 
-    den = q0037.T0 * q0037.F_CLK * q0037.F_DATA
-    assert math.isclose(den, 1.25e6)
-    per_stage = lambda n: math.exp(n * (1 / q0037.F_CLK - q0037.OVERHEAD) / q0037.TAU) / den
-    assert abs(2 * (1 / q0037.F_CLK - q0037.OVERHEAD) - 3.4e-9) < 1e-15
-    assert abs(per_stage(2) / 4.7e8 - 1) < 0.01 and round(per_stage(2) / q0037.YEAR) == 15
-    assert abs(per_stage(3) / q0037.YEAR / 3.6e8 - 1) < 0.01
-    for n in (2, 3):
-        model = q0037.mtbf(q0037.F_CLK, q0037.F_DATA, q0037.TAU, q0037.T0, q0037.OVERHEAD, n)
-        assert math.isclose(model / per_stage(n), math.exp(3 * (n - 1)), rel_tol=1e-9)
-    clocklike = q0037.mtbf(q0037.F_CLK, 2 * q0037.F_DATA, q0037.TAU, q0037.T0, q0037.OVERHEAD, 2)
-    assert round(clocklike / q0037.YEAR) == 149
-    assert round(20 / math.log(10), 1) == 8.7
+
+def test_reports_rebuild_the_stream():
+    rng = random.Random(1)
+    for a, b in streams(rng, 800):
+        for swap in (False, True):
+            dist = q0037.distance(a, b, swap)
+            for prefer in ("gaps", "changed"):
+                path = q0037.walk(a, b, prefer, swap)
+                assert q0037.apply(a, b, path) == b
+                assert sum(k != "same" for k, _, _ in path) == dist == len(q0037.report(a, b, prefer, swap))
+
+
+def test_part_a_numbers():
+    assert q0037.distance("ABCDEFGH", "ABDEYGHH") == 3
+    assert sum(x != y for x, y in zip("ABCDEFGH", "ABDEYGHH")) == 5
+    # two changes in place of C and F give neither stream
+    assert {"ABCDEFGH".replace("C", x).replace("F", y) for x, y in ("YH", "HY")} == {"ABYDEHGH", "ABHDEYGH"}
+    # neighbouring cells differ by at most 1, and d[i][j] >= |i - j|
+    rng = random.Random(5)
+    for a, b in streams(rng, 200):
+        d = q0037.table(a, b)
+        for i in range(len(a) + 1):
+            for j in range(len(b) + 1):
+                assert d[i][j] >= abs(i - j)
+                if i:
+                    assert abs(d[i][j] - d[i - 1][j]) <= 1
+                if j:
+                    assert abs(d[i][j] - d[i][j - 1]) <= 1
+                if i and j and a[i - 1] == b[j - 1]:
+                    assert d[i][j] == d[i - 1][j - 1]
+
+
+def test_part_b_numbers():
+    assert q0037.report("ABCDEFGH", "ABDEYGHH") == [("missing", "C", None), ("changed", "F", "Y"), ("extra", None, "H")]
+    assert q0037.report("ABCDEF", "ABDXEF", "gaps") == [("missing", "C", None), ("extra", None, "X")]
+    assert q0037.report("ABCDEF", "ABDXEF", "changed") == [("changed", "C", "D"), ("changed", "D", "X")]
+    # the tie at cell (4, 4), D against X: the left and the diagonal neighbours give 1, up gives 2
+    d = q0037.table("ABCDEF", "ABDXEF")
+    assert d[4][4] == 2 and d[4][3] == 1 and d[3][3] == 1 and d[3][4] == 2
+
+
+def test_part_c_numbers():
+    a, b = q0037.BAND_A, q0037.BAND_B
+    assert q0037.within(a, b, 2) == 2 and q0037.within(a, b, 1) is None and q0037.distance(a, b) == 2
+    assert q0037.band_cells(12, 2) == 54 and q0037.band_cells(1000, 3) == 6988 and q0037.band_cells(10**6, 10) == 20999890
+    rng = random.Random(3)
+    for x, y in streams(rng, 1500, "ABC", 8):
+        for dd in range(0, 9):
+            dist = q0037.distance(x, y)
+            assert q0037.within(x, y, dd) == (dist if dist <= dd else None), (x, y, dd)
+
+
+def test_part_d_numbers():
+    assert q0037.distance("ABCDEFGH", "ABDCEFHG") == 4 and q0037.distance("ABCDEFGH", "ABDCEFHG", True) == 2
+    assert q0037.report("ABCDEFGH", "ABDCEFHG", swap=True) == [("swapped", "CD", "DC"), ("swapped", "GH", "HG")]
+    assert q0037.distance("ABCDEF", "ABDCEF", True) == 1 and q0037.distance("ABCD", "BCDA", True) == 2
+    d = q0037.table("ABCDEFGH", "ABDCEFHG", True)
+    assert d[4][4] == 1 and d[6][6] == 1 and d[8][8] == 2
+    # the trap: CA and ABC, 3 with each packet edited once, 2 by unrestricted Damerau
+    assert q0037.distance("CA", "ABC", True) == 3 and q0037.bfs("CA", "ABC", True) == 2
+
+
+def test_follow_ups():
+    # only missing and extra: m + n - 2 LCS
+    def lcs(a, b):
+        t = [[0] * (len(b) + 1) for _ in range(len(a) + 1)]
+        for i in range(len(a)):
+            for j in range(len(b)):
+                t[i + 1][j + 1] = t[i][j] + 1 if a[i] == b[j] else max(t[i][j + 1], t[i + 1][j])
+        return t[-1][-1]
+    assert lcs("ABCDEFGH", "ABDEYGHH") == 6 == len("ABDEGH") and 8 + 8 - 2 * 6 == 4
+    rng = random.Random(9)
+    for a, b in streams(rng, 300, "ABC", 5):
+        # with a change costing 2 the table gives m + n - 2 LCS
+        d = [[i + j if i == 0 or j == 0 else 0 for j in range(len(b) + 1)] for i in range(len(a) + 1)]
+        for i in range(1, len(a) + 1):
+            for j in range(1, len(b) + 1):
+                d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + 2 * (a[i - 1] != b[j - 1]))
+        assert d[-1][-1] == len(a) + len(b) - 2 * lcs(a, b)
 
 
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
     assert_figures_match(37)
+
+
+def test_explorer_matches_the_reference():
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(11)
+    cases = [[a, b, p, s] for a, b in streams(rng, 150, "ABCD", 9) for p, s in (("gaps", False), ("changed", True)) if a and b]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({json.dumps(cases)}.map(([a, b, p, s]) => [m.edTable(a, b, s), m.edWalk(a, b, p, s), m.edReport(a, b, p, s)])));")
+    for (a, b, p, s), (tab, path, rep) in zip(cases, got):
+        assert tab == q0037.table(a, b, s)
+        assert [tuple(x) for x in path] == q0037.walk(a, b, p, s)
+        assert [tuple(x) for x in rep] == q0037.report(a, b, p, s)
+    parsed = node_json(f"const m = {explorer_require()};"
+                       "console.log(JSON.stringify(['abc', 'A B C', 'ABCDEFGHIJKL', 'ABCDEFGHIJKLM', '', 'AB1', 'אב'].map(m.edParse)));")
+    assert parsed == ["ABC", "ABC", "ABCDEFGHIJKL", None, None, None, None]

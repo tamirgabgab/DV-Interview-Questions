@@ -1,9 +1,9 @@
-# MTBF of one, two and three flops at 500 MHz and 1 GHz (the page example)
+# The page's functions: the edit distance between an expected stream and an actual one
 from solution import *  # noqa: F401,F403
 
-YEAR = 365.25 * 86400
-for f_clk in (500e6, 1e9):
-    for flops in (1, 2, 3):
-        m = sync_mtbf(f_clk, 50e6, 100e-12, 50e-12, 0.3e-9, flops)
-        unit = f"{m:.3g} s" if m < 86400 else f"{m / 86400:.3g} days" if m < YEAR else f"{m / YEAR:.3g} years"
-        print(f"{f_clk / 1e6:.0f} MHz, {flops} flop(s): {unit}")
+print(edit_distance("ABCDEFGH", "ABDEYGHH"))           # 3
+print(diff("ABCDEFGH", "ABDEYGHH"))                    # [('missing', 'C', None), ('changed', 'F', 'Y'), ('extra', None, 'H')]
+print(diff("ABCDEF", "ABDXEF", "changed"))             # [('changed', 'C', 'D'), ('changed', 'D', 'X')]
+print(edit_distance_within("ABCDEFGHIJKL", "ABCEFGHIXJKL", 2))   # 2
+print(edit_distance_within("ABCDEFGHIJKL", "ABCEFGHIXJKL", 1))   # None
+print(edit_distance_swaps("ABCDEFGH", "ABDCEFHG"))     # 2

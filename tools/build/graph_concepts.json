@@ -1126,11 +1126,6 @@
      "id": "0033",
      "explicit": true,
      "why": "FIFO depth sizing, the latency of the synchronized pointers matters"
-    },
-    {
-     "id": "0037",
-     "explicit": true,
-     "why": "why two synchronizer flops, MTBF"
     }
    ]
   },
@@ -1172,21 +1167,22 @@
   },
   "0037": {
    "core": [
-    "metastability_mtbf",
-    "two_flop_synchronizer",
-    "cdc"
+    "dynamic_programming",
+    "scoreboard",
+    "recurrence_relation",
+    "induction_proof"
    ],
    "secondary": [
-    "gray_code",
-    "handshake",
-    "closed_form",
-    "fifo"
+    "reference_model",
+    "transaction_ordering",
+    "sliding_window",
+    "systemverilog"
    ],
    "related": [
     {
-     "id": "0034",
+     "id": "0050",
      "explicit": true,
-     "why": "multi-bit values cross domains with Gray code instead of per-bit synchronizers"
+     "why": "a stream out of order is matched by ID, not by an alignment"
     }
    ]
   },

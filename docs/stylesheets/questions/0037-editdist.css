@@ -1,0 +1,54 @@
+/* Question 0037, the edit distance between two streams: the tables of tools/figures/q0037.py and
+   the box of explorer/editdist.js (ed-*). The expected stream runs down the rows, the actual
+   one along the columns; the path back from the corner is shaded by what every step means:
+   the same packet grey, a missing packet orange (s2), an extra one green (s3), a changed one
+   purple (s4), two that swapped blue (s1). In the figures a second rule for ties is a dashed
+   line, and the cells outside a band are left empty. In the box the cell of the moment is
+   outlined in ink, the neighbours that give its minimum in blue.
+   Colours from the palette only. */
+
+/* the figures */
+.md-typeset svg.ed-fig .ed-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg.ed-fig .ed-cell.ed-out { fill: none; stroke: none; }
+.md-typeset svg.ed-fig .ed-cell.ed-same { fill: color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color)); }
+.md-typeset svg.ed-fig .ed-cell.ed-miss { fill: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.ed-fig .ed-cell.ed-extra { fill: color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg.ed-fig .ed-cell.ed-chg { fill: color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color)); stroke: var(--viz-s4); stroke-width: 2; }
+.md-typeset svg.ed-fig .ed-cell.ed-swap { fill: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.ed-fig .ed-v { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.ed-fig .ed-pk { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.ed-fig .ed-idx { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
+.md-typeset svg.ed-fig .ed-other { fill: none; stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 5 3; stroke-linejoin: round; }
+
+/* the legend keys, in the figures and in the box */
+.md-typeset .viz-legend .ed-key-same { background: color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .ed-key-miss { background: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .viz-legend .ed-key-extra { background: color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
+.md-typeset .viz-legend .ed-key-chg { background: color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s4); outline-offset: -2px; }
+.md-typeset .viz-legend .ed-key-swap { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .ed-key-other { background: none; height: 0; border-top: 2px dashed var(--viz-ink); align-self: center; }
+.md-typeset .viz-legend .ed-key-now { background: var(--md-default-bg-color); outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; }
+.md-typeset .viz-legend .ed-key-from { background: color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color)); outline: 2px dashed var(--viz-s1); outline-offset: -2px; }
+
+/* the box: the table of the prefixes */
+.md-typeset .explorer .ed-in { width: 9.5em; font-family: var(--md-code-font-family); text-transform: uppercase; }
+.md-typeset .explorer .ed-wrap { position: relative; overflow-x: auto; margin: 0.5rem 0; }   /* relative: the hidden caption of the corner stays inside the scroller */
+.md-typeset .explorer table.ed-table { display: table; width: auto; margin: 0; border-collapse: collapse; font-family: var(--md-code-font-family); font-size: 0.7rem; table-layout: fixed; }
+.md-typeset .explorer table.ed-table th, .md-typeset .explorer table.ed-table td { width: 1.35rem; min-width: 1.35rem; height: 1.5rem; padding: 0; text-align: center; vertical-align: middle; line-height: 1; }
+.md-typeset .explorer table.ed-table td { border: 1px solid var(--viz-grid); background: var(--md-default-bg-color); color: var(--viz-ink); }
+.md-typeset .explorer table.ed-table th { border: none; background: none; color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer table.ed-table th small { display: block; font-size: 0.75em; font-weight: 400; color: var(--viz-text); margin-top: 0.1em; }
+.md-typeset .explorer table.ed-table .ed-h0 { color: var(--viz-text); font-weight: 400; }
+.md-typeset .explorer table.ed-table td.ed-same { background: color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.ed-table td.ed-miss { background: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); box-shadow: inset 0 0 0 2px var(--viz-s2); }
+.md-typeset .explorer table.ed-table td.ed-extra { background: color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color)); box-shadow: inset 0 0 0 2px var(--viz-s3); }
+.md-typeset .explorer table.ed-table td.ed-chg { background: color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color)); box-shadow: inset 0 0 0 2px var(--viz-s4); }
+.md-typeset .explorer table.ed-table td.ed-swap { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); box-shadow: inset 0 0 0 2px var(--viz-s1); }
+.md-typeset .explorer table.ed-table td.is-nb { background: color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.ed-table td.is-from { background: color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color)); box-shadow: inset 0 0 0 2px var(--viz-s1); }
+.md-typeset .explorer table.ed-table td.is-now { box-shadow: inset 0 0 0 2.5px var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .ed-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.md-typeset .explorer .ed-note { font-size: 0.72rem; margin: 0.3em 0; }
+.md-typeset .explorer .ed-report { font-size: 0.72rem; margin: 0.2em 1.4em 0.4em 0; }
+.md-typeset .explorer .ed-report li { margin: 0.1em 0; }
+.md-typeset .explorer .ed-report .ed-wait { list-style: none; color: var(--viz-text); }

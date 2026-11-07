@@ -483,6 +483,13 @@ PAIRS = [
     ("0100 stairs, the edges of the picked stair and of the stairs below it", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0100 stairs, the arrows into the last stair", "var(--viz-s3-text)", [CARD, PAGE], UI),
     ("0100 stairs, a jump size that is on", "var(--act-ink)", ["var(--act)"], TEXT),
+    # 0037 editdist (stylesheets/questions/0037-editdist.css): the tables of the prefixes and the box
+    ("0037 editdist, a value on the tint of its step", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color))"], TEXT),
+    ("0037 editdist, the indices of the prefixes", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0037 editdist, the edges of the steps of the path", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0037 editdist, the edges of an extra packet", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0037 editdist, the edges of a changed packet", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0037 editdist, the edges of a swap and of the neighbours that give the minimum", "var(--viz-s1)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

@@ -97,4 +97,4 @@
 .md-typeset .explorer label:has(> input[type="range"] + output:last-child) > span { flex-shrink: 0; max-width: 40%; }
 .md-typeset .explorer label > input[type="range"] + output { flex: none; }
 @media (max-width: 600px) { .md-typeset .explorer label > input[type="range"] + output { min-width: 3ch; } }
-.md-typeset .explorer :is(.bridge-greedy, .mtbf-table) { overflow-x: auto; }
+.md-typeset .explorer .bridge-greedy { overflow-x: auto; }

@@ -41,7 +41,7 @@ All 100 questions, with links to their pages on the [live site](https://tamirgab
 | 0034 | [קוד Gray למצביעי FIFO אסינכרוני](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0034-gray-code-fifo-pointers/) | junior (ג'וניור) |
 | 0035 | [חלוקת שעון ב-3 עם duty cycle של 50%](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0035-divide-by-three-fifty-duty/) | junior (ג'וניור) |
 | 0036 | [LFSR מקסימלי – למה סט אחד של taps נותן 15 ואחר פחות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0036-maximal-lfsr/) | student (סטודנט) |
-| 0037 | [MTBF של סנכרן – שני פלופים, ומה נותן השלישי](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0037-synchronizer-mtbf/) | senior (סניור) |
+| 0037 | [מרחק עריכה בין שני זרמים – מה חסר, מה מיותר ומה שובש, עד d הבדלים, וחבילות שהתחלפו](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0037-edit-distance-scoreboard/) | senior (סניור) |
 | 0038 | [SVA ללחיצת ידיים – req, ack ומה אסור ביניהם](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0038-sva-handshake/) | junior (ג'וניור) |
 | 0039 | [ביצים וקומות – כמה הטלות במקרה הגרוע](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0039-egg-drop-floors/) | junior (ג'וניור) |
 | 0040 | [גלאי רצף 1011 עם חפיפה – מכונת מצבים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/0040-sequence-detector-1011/) | student (סטודנט) |

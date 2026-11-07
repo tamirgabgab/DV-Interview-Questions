@@ -848,14 +848,34 @@ below start at item 112 (session 31).
     exactly t jumps, a row per t, C(t, n − t) for {1, 2} (35 for t = 7), the rows summing to
     part א. Box `stairs` (prefix `sw-`, `stylesheets/questions/0100-stairs.css`): the stairs
     as buttons in flights of ten, a picked stair's sum, breaking and mending. Coding path.
+173. **Question 0037 replaced: the MTBF question out, the edit distance in (session 33,
+    2026-11-07).** The owner found the synchronizer MTBF question less relevant and asked
+    to delete it completely and put a new question at the same level in its place; from
+    two lists of eight the owner chose the edit distance as a scoreboard diff. MCQ answers:
+    keep id 0037 with a new slug (the old URL now 404s); parts: the report, the band of d
+    differences, the swap of two neighbours; the box with the coloured table and path, a
+    cell-by-cell fill and the rule at a tie; packets as letters. Deleted: the page, `mtbf.js`
+    (kinds `mtbf`, `metamc`), the old generator and tests, the `mc-*` rules of
+    `08-explorers.css` and `.mtbf-table`, the topic `metastability`, the step in the CDC
+    path (now four questions), 0034's follow-up link (the follow-up kept, without the
+    numbers of the old page), its graph links. New 0037 (senior, medium, code): part א
+    `ABCDEFGH` against `ABDEYGHH` is 3 (C missing, F changed to Y, H extra; five places
+    differ position by position); part ב the walk back with a rule at ties (`ABCDEF` against
+    `ABDXEF`: "C missing, X extra" or "C changed to D, D changed to X"), SV `diff` returns
+    a queue of lines; part ג the band |i − j| ≤ d, O(m·d), early stop, SV with the cell at
+    k = j − i + d; part ד the optimal string alignment (`ABDCEFHG` 2 instead of 4), the trap
+    `CA`/`ABC` (3 against 2 for unrestricted Damerau). The reference `bfs()` searches the
+    strings themselves; tb.sv checks diff's lines as an edit script. Box `editdist` (prefix
+    `ed-`, `stylesheets/questions/0037-editdist.css`); topic `scoreboard`; coding path.
 
 
 ---
 
 ## In progress
 
-- **Session 33 (2026-11-07):** questions 0094 to 0099, 0022 and 0100 (work log items 165 to
-  172); the site has 100 questions, ids 0001 to 0100 with no gap.
+- **Session 33 (2026-11-07):** questions 0094 to 0099, 0022 and 0100, and 0037 replaced
+  by the edit distance (work log items 165 to 173); the site has 100 questions, ids 0001 to
+  0100 with no gap. 0022, 0100 and the new 0037 are on the branch, not yet on `main`.
 - **Session 33 (2026-11-06):** the repository's files reorganized (work log item 164):
   the notes in `notes/`, the requirements in `requirements/`, `tools/` split into
   `checks/`, `build/` and `authoring/`, the questions' own stylesheets in
@@ -913,11 +933,11 @@ below start at item 112 (session 31).
 |-------|-----------|---------------------|
 | Student | 0001, 0002, 0003, 0010, 0012, 0015, 0032, 0036, 0040, 0048, 0064 | digital logic, bitwise, sorting, stack, digit puzzles (with number bases in 0012 part c), conditional probability, BFS over a tiny state space (wolf, goat and cabbage), LFSR periods and primitive polynomials, the shortest path by two reflections (the farmer, the food and the water), weights for every load in base 2, balanced base 3 and balanced base 2c + 1 (0064) |
 | Junior | 0004, 0005, 0006, 0008, 0009, 0013, 0014, 0016, 0017, 0018, 0026, 0027, 0028, 0029, 0030, 0031, 0033, 0034, 0035, 0038, 0039, 0041, 0042, 0043, 0044, 0045, 0046, 0047, 0049, 0051, 0053, 0055, 0056, 0058, 0059, 0060, 0061, 0062, 0063, 0065, 0066, 0067, 0068 | FIFO depth from rates, Gray pointers and CDC, a divide-by-3 clock, SVA for a handshake, logic puzzles, BFS (remainders, hourglass states), O(n) scans, permutations, SV constraints, Josephus (proof), cycle detection, motion and speed ratios, sequences and a single-peak proof (cake split), relative speed and counting with inclusion-exclusion (clock hands), geodesics on a box by unfolding (spider and fly), Dijkstra over a bitmask state with the greedy rule (bridge and torch), a price list per load and a range function (the camel and the water), selection from partial orders (horse races without a stopwatch), the Kaprekar step as code with a hash and a closed form for the digits (0044), the odd ball in fewest weighings (0045), the largest square, rectangle and right triangle of ones by dynamic programming and a stack (0046), trapping rain water by two pointers and a heap (0047), the UVM testbench architecture (0049), poisoned bottles as digits in base b + 1 (0051), an ALU covergroup and its closure time (0053), a divisible-by-m state machine from the MSB and the LSB (0055), ants on a pole by ghosts (0056), coins in a row by a parity trick and an interval DP (0058), the next number with as many ones by Gosper's hack, the previous by the complement, and the same for zeros across lengths (0059), the longest run of ones with k flips by a sliding window, and of one value on a bus (0060), the tags a list of transactions needs by an event sweep, one pool and two (0061), the sliding-window maximum by a monotonic deque, the window with max − min <= limit, and the same in hardware (0063), islands in four and eight directions (0065), merged intervals and the total height per piece (0066), BFS and Dijkstra for a broadcast time (0067), the median and the p-quantile of a stream by two heaps (0068) |
-| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057, 0069, 0071 | a three-wizard duel solved backward (0071), synchronizer MTBF, SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057), overtakes in a stream of responses by a Fenwick tree (0069) |
+| Senior | 0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037, 0050, 0052, 0054, 0057, 0069, 0071 | a three-wizard duel solved backward (0071), the edit distance of a scoreboard (0037), SV constraints, randomization, probability, combinatorics, Dijkstra on a state graph, PCIe completion rules, recursive enumeration, counting formula with proof, generalized Josephus (recurrences, induction), a PCIe endpoint reference model (classes, block memory, scheduling), a USB4 credit flow-control reference model (modulo counters, loss and resynchronization), a PCIe Ack/Nak reference model (Retry Buffer, Replay, error handling), an out-of-order scoreboard (0050), waiting times of coin patterns and Penney's game (0052), round-robin and weighted arbiters with SVA (0054), a constant-memory checker for missing tags (0057), overtakes in a stream of responses by a Fenwick tree (0069) |
 
 Algorithms and puzzles are well covered; 0020 / 0021 / 0023 / 0024 / 0025 are the protocol questions (PCIe, USB4), with 0023, 0024 and 0025 reference models.
 Round R (session 18) opened the DV-core shelf: FIFO depth, Gray pointers / CDC, a clock
-divider, an LFSR, synchronizer MTBF and SVA; 0040 (a sequence detector FSM) and 0041
+divider, an LFSR, synchronizer MTBF (replaced by the edit distance in session 33) and SVA; 0040 (a sequence detector FSM) and 0041
 (coverage closure of random tests) followed, then 0049 (the UVM testbench) and 0050 (an
 out-of-order scoreboard). **Still missing:** UVM in depth (factory, RAL, virtual
 sequences as questions of their own), debug ("find the bug") and verification

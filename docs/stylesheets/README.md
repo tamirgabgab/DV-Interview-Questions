@@ -59,6 +59,7 @@ prefix (the class table of `CONTRIBUTING.md` lists them), and a line at the end 
 | `questions/0099-iban.css` | `ib-` | the IBAN's check digits: the digits of the moved IBAN with the remainder mod 97 under each, the Israeli structure, the box's lines and its error at a chosen place |
 | `questions/0022-latpaths.css` | `lp-` | the paths in a grid: the tints of the counts on the boards (the shared `gx-` figures and the `gp-` grid of the box), the small boards with one path each |
 | `questions/0100-stairs.css` | `sw-` | the ways to climb the stairs: the staircases of the figures with the arrows into a stair, the box's flights of stair buttons |
+| `questions/0037-editdist.css` | `ed-` | the edit distance between two streams: the tables of the prefixes with the path shaded by step, the band, the box's table filled a cell at a time and its report |
 
 The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
 `stylesheets/site.css` at the end of the build and links that file from every page and from
