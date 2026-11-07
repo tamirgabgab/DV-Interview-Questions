@@ -795,6 +795,17 @@ below start at item 112 (session 31).
     cube root with r² kept in a register (no multiplier). Box `isqrt` (prefix `isq-`,
     `stylesheets/questions/0097-isqrt.css`): n, presets, the bits stepped and the step drawn
     as areas inside the √n square.
+169. **Question 0098, check digits of credit cards (session 33, 2026-11-07).** The owner chose
+    the check-digit family (item recorded under Open items) and asked for Luhn and IBAN;
+    junior / medium, Python and SV, digits path. Part א: Luhn on the test card
+    4111 1111 1111 1111 (sum 30), every single error caught, the only adjacent swap missed
+    is 09 ↔ 90. Part ב: the Israeli ID (the synthetic 000000018) and ISBN-10 mod 11, which
+    catches every swap of any two digits. Part ג: no per-place permutation summed mod 10
+    catches every adjacent swap (the residues sum to 45 ≡ 5, a difference of permutations
+    to 0), so Luhn's single miss is optimal; the weighted-sum parity argument as the special
+    case. Part ד: SV stimulus with `randomize() with { valid == want; }` and a checker
+    taking a digit per clock. Box `luhn` (prefix `lu-`): the check digit by digit, error
+    buttons, and 10 × 10 maps of swaps or single changes against a chosen scheme.
 
 
 ---

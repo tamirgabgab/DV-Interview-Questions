@@ -161,6 +161,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0095-soldiers.css    # 0095: Conway's soldiers, the boards and the box (session 33)
   - stylesheets/questions/0096-kelly.css       # 0096: the Kelly criterion, its charts and box (session 33)
   - stylesheets/questions/0097-isqrt.css       # 0097: the integer square root in hardware, the steps, the areas and the box (session 33)
+  - stylesheets/questions/0098-luhn.css        # 0098: check digits (Luhn, the ID, ISBN), the digit strips and the box's maps (session 33)
 
 extra_javascript:
   - javascripts/mathjax.js

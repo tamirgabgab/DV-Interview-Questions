@@ -55,6 +55,7 @@ prefix (the class table of `CONTRIBUTING.md` lists them), and a line at the end 
 | `questions/0095-soldiers.css` | `cy-` | Conway's soldiers: the boards of the figures and the box, the weights of part c, the potential meter |
 | `questions/0096-kelly.css` | `ky-` | the Kelly criterion: the curve g(f), the wealth paths on a log scale, the box with its paths and curve |
 | `questions/0097-isqrt.css` | `isq-` | the integer square root in hardware: the step as areas, the bit rows, the box's table of the eight steps |
+| `questions/0098-luhn.css` | `lu-` | check digits: the digit strips of the figures, the box's strip and its two maps of the errors |
 
 The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
 `stylesheets/site.css` at the end of the build and links that file from every page and from

@@ -448,6 +448,14 @@ PAIRS = [
     ("0097 isqrt, the row of the step just decided", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 8%, var(--md-default-bg-color))", CARD, PAGE], TEXT),
     ("0097 isqrt, the step's yes", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
     ("0097 isqrt, the step's no", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
+    # 0098 luhn (stylesheets/questions/0098-luhn.css): the digit strips and the box's maps
+    ("0098 luhn, a digit in a doubled place", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0098 luhn, a digit in a plain place", "var(--viz-ink)", [CARD, PAGE], TEXT),
+    ("0098 luhn, a digit in the colliding columns 0 and 9", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], TEXT),
+    ("0098 luhn, the edge of a doubled place", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0098 luhn, the frame of the chosen place and of the last error's cell", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))"], UI),
+    ("0098 luhn, the × of an error that slips by", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 40%, var(--md-default-bg-color))"], TEXT),
+    ("0098 luhn, the digits around a map", "var(--viz-ink)", [CARD, PAGE], TEXT),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

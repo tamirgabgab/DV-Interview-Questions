@@ -1,0 +1,41 @@
+/* Question 0098, check digits of credit cards (Luhn): the digit strips of tools/figures/q0098.py
+   and the box of explorer/luhn.js (lu-*). A strip is one column per digit, read left to
+   right: a doubled place is filled with s1, the columns that collide (0 and 9) with s2. On
+   the box's maps a pair whose error is caught is a light s3 cell, a pair that slips by is
+   an s2 cell with a ×, and the diagonal (the same digit) is a faint grey. Colours from the
+   palette only. */
+
+.md-typeset .lu-fig { margin: 0.6rem 0; }
+.md-typeset .lu-fig svg, .md-typeset .explorer .lu-stripwrap svg { display: block; width: 100%; max-width: 32rem; height: auto; }
+
+/* the cells of a strip: a plain place, a doubled place, a colliding column */
+.md-typeset svg .lu-cell { fill: none; stroke: color-mix(in srgb, var(--viz-ink) 30%, transparent); stroke-width: 1; }
+.md-typeset svg .lu-cell.lu-dbl { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .lu-cell.lu-hit { fill: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg .lu-pos { fill: none; stroke: var(--viz-ink); stroke-width: 2.5; }
+.md-typeset svg .lu-t { font: 600 15px var(--md-code-font-family); fill: var(--viz-ink); }
+.md-typeset svg .lu-lab { font: 500 13px var(--md-text-font-family); fill: var(--viz-ink); }
+.md-typeset svg .lu-rule { stroke: color-mix(in srgb, var(--viz-ink) 30%, transparent); stroke-width: 1; }
+
+/* the legend keys */
+.md-typeset .viz-legend .lu-key-dbl { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border: 1px solid var(--viz-s1); }
+.md-typeset .viz-legend .lu-key-cell { background: transparent; border: 1px solid color-mix(in srgb, var(--viz-ink) 40%, transparent); }
+.md-typeset .viz-legend .lu-key-hit { background: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); border: 1px solid var(--viz-s2); }
+.md-typeset .viz-legend .lu-key-ok { background: color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color)); border: 1px solid var(--viz-s3); }
+.md-typeset .viz-legend .lu-key-miss { background: color-mix(in srgb, var(--viz-s2) 40%, var(--md-default-bg-color)); border: 1px solid var(--viz-s2); }
+
+/* the box: the strip on top, then the two maps side by side, one under the other on a phone */
+.md-typeset .explorer .lu-maps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin: 0.4rem 0; }
+.md-typeset .explorer .lu-maps svg { display: block; width: 100%; max-width: 16rem; height: auto; }
+@media (max-width: 36em) {
+  .md-typeset .explorer .lu-maps { grid-template-columns: 1fr; }
+}
+.md-typeset .explorer .lu-maps .ex-title { margin: 0 0 0.2rem; }
+.md-typeset svg .lu-m { stroke: var(--md-default-bg-color); stroke-width: 1; }
+.md-typeset svg .lu-m-ok { fill: color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color)); }
+.md-typeset svg .lu-m-miss { fill: color-mix(in srgb, var(--viz-s2) 40%, var(--md-default-bg-color)); }
+.md-typeset svg .lu-m-same { fill: color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color)); }
+.md-typeset svg .lu-m-now { fill: none; stroke: var(--viz-ink); stroke-width: 2.5; }
+.md-typeset svg .lu-mx { font: 700 12px var(--md-text-font-family); fill: var(--viz-ink); }
+.md-typeset svg .lu-mh { font: 600 12px var(--md-code-font-family); fill: var(--viz-ink); }
+.md-typeset .explorer input.lu-num { width: min(100%, 15em); }
