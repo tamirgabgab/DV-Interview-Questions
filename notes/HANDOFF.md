@@ -936,6 +936,11 @@ below start at item 112 (session 31).
     reordered as "? or 98 1 =". The answer mark goes on the result block's frame only (on
     the group it stroked the text); the dead fan rules (`ih-state`, `ih-edge`, `ih-lab`)
     are gone.
+    At the owner's request the page now explains the question marks of the diagram (a
+    comparison asks yes or no, a selection is the ternary operator, a multiplexer) and why
+    r runs 97..102 in the head: a remainder is 0..96, so those 7-bit values are free and r
+    counts the head digits in them (17 flip-flops, not 20 with a separate head counter);
+    the tail is n's, loaded by `last`. A small table gives the three phases.
 
 
 ---
