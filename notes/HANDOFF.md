@@ -941,6 +941,12 @@ below start at item 112 (session 31).
     r runs 97..102 in the head: a remainder is 0..96, so those 7-bit values are free and r
     counts the head digits in them (17 flip-flops, not 20 with a separate head counter);
     the tail is n's, loaded by `last`. A small table gives the three phases.
+    The box then fits one computer screen (the owner): `.ih-grid` with a container query
+    (600 px and wider) puts the diagram in a column (clamp(16rem, 45%, 22rem)) beside the
+    digits, the flip-flops and the table of signals, the field and its button on one row, a
+    one-line summary. At 1920 by 1080 the whole box is about 970 px tall; a narrower box
+    (a 1366 laptop, 597 px) keeps the one-column order. Steady while stepping (measured at
+    1600, 1920 and 2560; check_jumps runs at 1200 px, where the box is one column).
 
 
 ---

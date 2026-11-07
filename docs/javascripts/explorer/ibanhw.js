@@ -114,10 +114,11 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1100, 600, 200) +
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary ih-sum" aria-live="polite"></p>` +
+        `<div class="ih-grid">` +
         `<div class="ih-strip" dir="ltr" tabindex="0" role="region" aria-label="הספרות כפי שהן מגיעות, ספרה בכל שעון, ואחריהן הזנב"></div>` +
         `<div class="ih-dpwrap"></div>` +
         `<div class="ih-regs" dir="ltr" role="group" aria-label="הפליפ-פלופים אחרי השעון, ביט אחרי ביט"></div>` +
-        `<div class="ih-wavewrap" dir="ltr" tabindex="0" role="region" aria-label="כל האותות, עמודה לכל שעון"></div>` +
+        `<div class="ih-wavewrap" dir="ltr" tabindex="0" role="region" aria-label="כל האותות, עמודה לכל שעון"></div></div>` +
         `<span class="viz-legend"><span><i class="ih-key-head"></i>ספרות הראש</span><span><i class="ih-key-tail"></i>ספרות 0 של הזנב</span>` +
         `<span><i class="ih-key-now"></i>השעון של הרגע</span><span><i class="ih-key-on"></i>הנתיב של השעון הזה</span><span><i class="ih-key-flip"></i>פליפ-פלופ שהשתנה</span></span>` +
         `<p class="ih-note" aria-live="polite"></p>`;
@@ -147,7 +148,7 @@
         wv.innerHTML = wave(tr, st.k);
         const cur = wv.querySelector("th.is-now");
         if (cur) wv.scrollLeft = Math.max(0, cur.offsetLeft - wv.clientWidth / 2);
-        $(".ih-sum").innerHTML = `ה-IBAN הוא ${ltr(digits.length)} ספרות, ${ltr(HEAD)} מהן בראש, ואחריהן ${ltr(T - digits.length)} שעונים של זנב${NB}: ${ltr(T)} שעונים, ${ltr(17)} פליפ-פלופים.`;
+        $(".ih-sum").innerHTML = `בסך הכול ${ltr(T)} שעונים${NB}: ${ltr(digits.length)} ספרות, ${ltr(HEAD)} מהן בראש, ו-${ltr(T - digits.length)} אפסים של זנב. ‏${ltr(17)} פליפ-פלופים.`;
         let note;
         if (!c) note = `לפני השעון הראשון${NB}: ${ltr("h = 0")}, ${ltr("r = 97")} (ספרה 0 של הראש) ו-${ltr("n = 0")}. ‏"השעון הבא" מכניס ספרה.`;
         else if (c.head) note = `שעון ${ltr(st.k)}, הראש${NB}: ${ltr("r ≥ 97")}, ולכן ${ltr(`x = h = ${c.x}`)}. ‏${ltr(`(10·${c.x} + ${c.e}) mod 97 = ${c.y}`)} נכתב ל-${ltr("h")}, ו-${ltr("r")} סופר${NB}: ${ltr(`r = ${c.r}`)}${c.r === 0 ? ", הראש נגמר" : ""}.`;

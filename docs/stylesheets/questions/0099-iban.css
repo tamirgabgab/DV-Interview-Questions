@@ -107,3 +107,27 @@
 .md-typeset .explorer table.ih-wave td.is-hi { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
 .md-typeset .explorer table.ih-wave td.is-fut { background: color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color)); }
 .md-typeset .viz-legend .ih-key-on { background: none; height: 0; border-top: 3px solid var(--viz-s1); align-self: center; }
+
+/* a wide box (a computer) fits on one screen (the owner, session 33): the block diagram in a
+   column of its own beside the digits, the flip-flops and the table of signals; a narrow box
+   keeps them one under the other */
+.md-typeset .explorer[data-kind="ibanhw"] { container-type: inline-size; }
+@container (min-width: 600px) {
+  .md-typeset .explorer .ih-grid {
+    display: grid; column-gap: 1.2rem; align-items: start;
+    grid-template-columns: minmax(0, 1fr) clamp(16rem, 45%, 22rem);
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas: "strip dp" "regs dp" "wave dp" ". dp";
+  }
+  .md-typeset .explorer .ex-controls > label.ih-lab-in:not(#_) { flex: 0 1 auto; }   /* the field and its button on one row */
+  .md-typeset .explorer .ih-grid > .ih-strip { grid-area: strip; margin-top: 0.2rem; }
+  .md-typeset .explorer .ih-grid > .ih-regs { grid-area: regs; }
+  .md-typeset .explorer .ih-grid > .ih-wavewrap { grid-area: wave; }
+  .md-typeset .explorer .ih-grid > .ih-dpwrap { grid-area: dp; }
+  .md-typeset .explorer .ih-grid > .ih-dpwrap svg { max-width: none; margin: 0; }
+  .md-typeset .explorer table.ih-wave :is(th, td) { min-width: 1.4rem; padding: 0.05rem 0.1rem; line-height: 1.35; }
+  .md-typeset .explorer .ih-sum { margin: 0.3em 0; }
+  .md-typeset .explorer table.ih-wave th[scope="row"] { min-width: 2.6rem; }
+  .md-typeset .explorer .ih-grid > .ih-dpwrap svg .ih-blk text { font-size: 14px; }
+  .md-typeset .explorer .ih-grid > .ih-dpwrap svg .ih-val { font-size: 13px; }
+}
