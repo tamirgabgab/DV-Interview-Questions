@@ -163,6 +163,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0097-isqrt.css       # 0097: the integer square root in hardware, the steps, the areas and the box (session 33)
   - stylesheets/questions/0098-luhn.css        # 0098: check digits (Luhn, the ID, ISBN), the digit strips and the box's maps (session 33)
   - stylesheets/questions/0099-iban.css        # 0099: the IBAN's check digits mod 97, the digit tables and the box (session 33)
+  - stylesheets/questions/0022-latpaths.css    # 0022: the paths in a grid, the boards of counts and the box (session 33)
 
 extra_javascript:
   - javascripts/mathjax.js

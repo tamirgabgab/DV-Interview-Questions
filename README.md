@@ -17,8 +17,8 @@ with [graphify](https://pypi.org/project/graphifyy/)); click a question for a li
 - [All questions](https://tamirgabgab.github.io/DV-Interview-Questions/all/): a table you
   can filter by level, difficulty, kind and topic, and a random question
 - By level: [student](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/) (14),
-  [junior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/) (57),
-  [senior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/) (21)
+  [junior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/) (62),
+  [senior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/) (23)
 - [Study paths](https://tamirgabgab.github.io/DV-Interview-Questions/paths/): 13 paths of a
   few questions on one topic, in the order to solve them
 - [Topics](https://tamirgabgab.github.io/DV-Interview-Questions/tags/) and

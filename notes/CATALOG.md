@@ -1,6 +1,6 @@
 # Catalog
 
-All 98 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 99 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/build/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -26,6 +26,7 @@ All 98 questions, with links to their pages on the [live site](https://tamirgabg
 | 0019 | [שני שעוני חול – מדידת D דקות בין שני רגעים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0019-hourglass-measure-interval/) | senior (סניור) |
 | 0020 | [פיצול Completions ב-PCIe – כל הדרכים להחזיר קריאה אחת](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0020-pcie-completion-splits/) | senior (סניור) |
 | 0021 | [כמה פיצולי Completions יש לקריאה ב-PCIe – ספירה, ונוסחה כללית עם הוכחה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0021-pcie-completion-count/) | senior (סניור) |
+| 0022 | [מסלולים בלוח – ימינה ולמטה, מכשולים, וגם למעלה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0022-grid-paths-count/) | junior (ג'וניור) |
 | 0023 | [מודל ייחוס ל-PCIe Endpoint – כתיבה, קריאה ושידור Completions](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0023-pcie-endpoint-reference-model/) | senior (סניור) |
 | 0024 | [מודל ייחוס לקרדיטים של נתיב USB4 – Credit Grant, שידור ו-Path Credit Sync](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0024-usb4-path-credits-reference-model/) | senior (סניור) |
 | 0025 | [מודל ייחוס ל-Ack/Nak של PCIe – Sequence Number, ‏Retry Buffer ו-Replay](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0025-pcie-ack-nak-reference-model/) | senior (סניור) |

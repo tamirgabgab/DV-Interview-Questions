@@ -817,12 +817,33 @@ below start at item 112 (session 31).
     compared on made-up IBANs. Part ד: the Israeli structure (bank 3, branch 3, account
     13), a made-up IL14 0123 4500 0000 6789 012. Box `iban` (prefix `ib-`): the steps, the
     running remainder stepped, and error buttons.
+171. **Question 0022, the paths in a grid (session 33, 2026-11-07).** The free id 0022
+    (merged into 0016 long ago) filled at the owner's request. After rounds of proposals the
+    owner chose a LeetCode-style question (Unique Paths) and asked for a third direction and
+    obstacles; MCQ answers: parts a to d below, start top-left and target bottom-right
+    always, exact and mod 10^9 + 7, junior; the box with a count and a tint in every cell,
+    the size and the directions, obstacles by a tap, a random path; obstacles in both kinds.
+    Part א: 3 x 7 gives C(8, 2) = 28, the row DP, mod p by Fermat; SV `paths_rd` in 64 bits
+    (only additions, exact up to 34 x 34). Part ב: the obstacle board (0,5), (1,1), (2,3)
+    gives 9 (19 of the 28 orders hit an obstacle); SV `paths_rows`, a row a clock, P = 0
+    exact or mod P with one compare-and-subtract. Part ג: right, up and down, never a cell
+    twice: every column is one vertical run, so a path is its exit rows, m^(n-1) (729);
+    four directions by search (1, 2, 12, 184, 8512; 1369 on 3 x 7); SV `pow_mod`. Part ד:
+    a DP over the columns, a cell's count is the sum of what entered its run of open cells
+    (32 on part b's board; the zigzag gives 0 right/down and 9 with up); SV `paths_cols`
+    with two chains (down, then the run's total upwards). Traps: the formula with
+    obstacles, multiply-then-divide overflowing at 33 x 33, memo by cell with up, brute
+    force. Box `latpaths` (prefix `lp-`, `stylesheets/questions/0022-latpaths.css`, the
+    shared `gp-` grid of 0070): a uniform random path drawn backwards through the counts
+    (tested for uniformity under Node). Coding path.
 
 
 ---
 
 ## In progress
 
+- **Session 33 (2026-11-07):** questions 0094 to 0099 and 0022 (work log items 165 to
+  171); the site has 99 questions, ids 0001 to 0099 with no gap.
 - **Session 33 (2026-11-06):** the repository's files reorganized (work log item 164):
   the notes in `notes/`, the requirements in `requirements/`, `tools/` split into
   `checks/`, `build/` and `authoring/`, the questions' own stylesheets in

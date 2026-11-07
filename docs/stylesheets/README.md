@@ -57,6 +57,7 @@ prefix (the class table of `CONTRIBUTING.md` lists them), and a line at the end 
 | `questions/0097-isqrt.css` | `isq-` | the integer square root in hardware: the step as areas, the bit rows, the box's table of the eight steps |
 | `questions/0098-luhn.css` | `lu-` | check digits: the digit strips of the figures, the box's strip and its two maps of the errors |
 | `questions/0099-iban.css` | `ib-` | the IBAN's check digits: the digits of the moved IBAN with the remainder mod 97 under each, the Israeli structure, the box's lines and its error at a chosen place |
+| `questions/0022-latpaths.css` | `lp-` | the paths in a grid: the tints of the counts on the boards (the shared `gx-` figures and the `gp-` grid of the box), the small boards with one path each |
 
 The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
 `stylesheets/site.css` at the end of the build and links that file from every page and from

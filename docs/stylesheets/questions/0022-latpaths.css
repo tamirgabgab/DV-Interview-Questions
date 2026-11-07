@@ -1,0 +1,32 @@
+/* Question 0022, counting the paths in a grid: the boards of tools/figures/q0022.py and the box
+   of explorer/latpaths.js (lp-*). The boards are the shared grid figures (gx-*, 0070) with a
+   count in every open cell on a blue tint (s1) that grows with the count, on a log scale,
+   in four steps (lp-h1 .. lp-h4). The small boards (lp-small) show one path each, the start
+   and the target cells tinted. The box reuses the grid of the gridpath box (gp-*) with the
+   same four tints.
+   Colours from the palette only. */
+
+/* the tints of the counts, in the figures and in the box */
+.md-typeset svg.gx-fig .gx-cell.lp-h1 rect { fill: color-mix(in srgb, var(--viz-s1) 8%, var(--md-default-bg-color)); }
+.md-typeset svg.gx-fig .gx-cell.lp-h2 rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset svg.gx-fig .gx-cell.lp-h3 rect { fill: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); }
+.md-typeset svg.gx-fig .gx-cell.lp-h4 rect { fill: color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color)); }
+.md-typeset .explorer .gp-cell.is-open.lp-h1 { background: color-mix(in srgb, var(--viz-s1) 8%, var(--md-default-bg-color)); }
+.md-typeset .explorer .gp-cell.is-open.lp-h2 { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer .gp-cell.is-open.lp-h3 { background: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); }
+.md-typeset .explorer .gp-cell.is-open.lp-h4 { background: color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color)); }
+
+/* the small boards: one path on each */
+.md-typeset svg.lp-small .lp-sq { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg.lp-small .lp-sq.lp-end { fill: color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color)); }
+.md-typeset svg.lp-small .lp-line { fill: none; stroke: var(--viz-ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* the box: a long count in a smaller font, a cell that no path reaches, the summary's numbers */
+.md-typeset .explorer .gp-cell .gp-v.lp-long { font-size: 0.7em; }
+.md-typeset .explorer .gp-cell .gp-v.lp-long2 { font-size: 0.55em; }
+.md-typeset .explorer .gp-cell.is-open.lp-h0 .gp-v { color: var(--viz-text); font-weight: 400; }
+.md-typeset .explorer .lp-big { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+/* the legend keys */
+.md-typeset .viz-legend .lp-key-lo { background: color-mix(in srgb, var(--viz-s1) 8%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .lp-key-hi { background: color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color)); }

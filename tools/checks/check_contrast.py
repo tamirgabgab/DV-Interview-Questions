@@ -470,6 +470,12 @@ PAIRS = [
     ("0099 iban, the edges of the letter and check-digit cells", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0099 iban, an error caught", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
     ("0099 iban, an error that slips", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
+    # 0022 latpaths (stylesheets/questions/0022-latpaths.css): the counts on their tints, the small boards and the box
+    ("0022 latpaths, a count on its tint", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-s1) {p}%, var(--md-default-bg-color))" for p in (8, 18, 30, 44)], TEXT),
+    ("0022 latpaths, a cell no path reaches", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0022 latpaths, S and T on their tint", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 8%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color))"], TEXT),
+    ("0022 latpaths, the path on a small board", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))"], UI),
+    ("0022 latpaths, the path line over the tints", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color))"], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")
