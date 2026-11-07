@@ -828,6 +828,15 @@ below start at item 112 (session 31).
 ### Content
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
+- [ ] Candidate the owner liked (2026-11-07), not yet chosen to implement: check digits, ISBN-10
+  against Luhn. ISBN-10 (weights 10..1, mod 11) catches every single-digit error and every
+  swap of two digits, since (i − j)(b − a) is never 0 mod the prime 11; Luhn (mod 10, the
+  Israeli ID number uses it) catches every single error and every adjacent swap except
+  09 ↔ 90. Generalization: no weighted sum mod 10 catches both kinds (the weights must be
+  units, 1 3 7 9, and the difference of two of them is even, so not a unit); Verhoeff /
+  Damm do. The same-style list offered with it: EAN-13 (weights 1, 3, misses adjacent swaps
+  of digits 5 apart), IBAN mod 97, Damm / Verhoeff, the Internet checksum against Fletcher,
+  RAID 5 / RAID 6 recovery, Hamming (7,4) and SECDED, CRC as polynomial division.
 - [x] ~~Explorer state outside the controls is not in the box link or the remembered state~~ (done in session 22 with `box.dvqExtra`, work log item 33)
   (code review, session 22): the hand-made cuts in 0020 and the dragged sandbox shapes in
   0014 come back as the greedy split and the start positions after a reload or from a
