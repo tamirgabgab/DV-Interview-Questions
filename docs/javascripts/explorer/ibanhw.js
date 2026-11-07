@@ -1,5 +1,5 @@
 // kinds: ibanhw
-//   ibanhw                 0099        the hardware checker of part b (data-iban): the IBAN as it arrives, a digit a clock (every letter as two digits, the first 6 the head), then the tail of six zeros, stepped clock by clock (step / play); the answer of the whole IBAN shown from the first clock; the block diagram of the page with the values on its wires and blocks this clock (head and tail, the two multiplexers, 10x + e, mod 97, what is written where, y + h at the end), the path the clock takes lit; the flip-flops h, r and n bit by bit; a table of every signal, a column per clock, the clock of the moment marked
+//   ibanhw                 0099        the hardware checker of part b (data-iban): the IBAN as it arrives, a digit a clock (every letter as two digits, the first 6 the head), then the tail of six zeros, stepped clock by clock (step / play); the answer of the whole IBAN shown from the first clock; the block diagram of the page with the values on its wires and blocks this clock (head and tail, the two multiplexers, 10x + e, mod 97, last from the input, what is written where, y + h at the end), the path the clock takes lit; the flip-flops h, r and n bit by bit; a table of every signal, a column per clock, the clock of the moment marked
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -29,7 +29,7 @@
     const clock = (d, last) => {
       const head = r >= 97, tail = n > 0;
       const x = head ? h : r, e = tail ? 0 : d, s = 10 * x + e, y = s % 97;
-      const rec = { d: tail ? null : d, hb: h, rb: r, nb: n, head, tail, x, e, s, y, done: false, ok: false };
+      const rec = { d: tail ? null : d, last: !tail && last, hb: h, rb: r, nb: n, head, tail, x, e, s, y, done: false, ok: false };
       if (tail) { r = y; rec.done = n === TAIL; rec.ok = rec.done && (y + h === 1 || y + h === 98); n = n === TAIL ? 0 : n + 1; }
       else if (head) { h = y; r = r === 97 + HEAD - 1 ? 0 : r + 1; }
       else { r = y; n = last ? 1 : 0; }
@@ -74,6 +74,8 @@
     g += wire([[200, 266], [200, 290]], any);
     g += blk(40, 358, 320, 44, "write back", wrote, "ih-mux", any);
     g += wire([[200, 334], [200, 358]], any);
+    // last, from the input with the last digit: it loads n = 1, the start of the tail
+    g += `<text class="ih-wlab" x="50" y="347" text-anchor="start">last = ${any && c.last ? 1 : 0}</text>` + wire([[46, 340], [46, 358]], any && c.last);
     g += wire([[40, 380], [8, 380], [8, 38], [20, 38]], head);
     g += wire([[360, 380], [392, 380], [392, 6], [200, 6], [200, 14]], any && !head ? true : head) + wire([[328, 6], [328, 14]], any && c.n !== c.nb);
     const done = any && c.done;
@@ -83,9 +85,9 @@
     return g + "</svg>";
   };
   // every signal, a row each, a column per clock; the clock of the moment marked
-  const ROWS = [["d", (c) => (c.d == null ? "" : c.d)], ["head", (c) => +c.head], ["tail", (c) => +c.tail], ["x", (c) => c.x], ["e", (c) => c.e],
+  const ROWS = [["d", (c) => (c.d == null ? "" : c.d)], ["last", (c) => +c.last], ["head", (c) => +c.head], ["tail", (c) => +c.tail], ["x", (c) => c.x], ["e", (c) => c.e],
     ["s", (c) => c.s], ["y", (c) => c.y], ["h", (c) => c.h], ["r", (c) => c.r], ["n", (c) => c.n], ["done", (c) => +c.done], ["ok", (c) => +c.ok]];
-  const FLAGS = new Set(["head", "tail", "done", "ok"]);
+  const FLAGS = new Set(["last", "head", "tail", "done", "ok"]);
   const wave = (tr, k) => {
     let t = `<table class="ih-wave"><thead><tr><th scope="col">שעון</th>${tr.map((_, i) => `<th scope="col"${i === k - 1 ? ' class="is-now"' : ""}>${i + 1}</th>`).join("")}</tr></thead><tbody>`;
     ROWS.forEach(([name, f]) => {

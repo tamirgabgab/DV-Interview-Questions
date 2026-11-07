@@ -346,7 +346,7 @@ def datapath_svg() -> str:
     o = [f'<svg class="figure ih-fig ih-dp" viewBox="0 0 {W} {H}" direction="ltr" style="max-width:{W / 16:g}rem" role="img" '
          'aria-label="תרשים המלבנים של הבודק : שלושה רגיסטרים, h ו-r של 7 ביטים ומונה n של 3 ביטים. הבקרה מחשבת head כש-r לפחות 97 '
          'ו-tail כש-n גדול מ-0. מרבב בוחר את h בזמן הראש ואת r אחריו, מרבב שני מכניס 0 במקום הספרה בזמן הזנב, '
-         'בלוק אחד מחשב 10x ועוד הספרה ובלוק אחד mod 97. התוצאה נכתבת ל-h בזמן הראש ול-r אחריו. בסוף בודקים אם y ועוד h '
+         'בלוק אחד מחשב 10x ועוד הספרה ובלוק אחד mod 97. התוצאה נכתבת ל-h בזמן הראש ול-r אחריו, והאות last של הספרה האחרונה טוען n = 1 ומתחיל את הזנב. בסוף בודקים אם y ועוד h '
          'שווה 1 או 98">', _arrow_defs("ih-hb")]
     # the registers and the control
     o.append(box(20, 14, 104, 44, "h", "ih-blk ih-reg", "7 flip-flops"))
@@ -374,8 +374,10 @@ def datapath_svg() -> str:
     o.append(box(90, 284, 220, 44, "y = s mod 97", "ih-blk ih-stage", "0 .. 96"))
     o.append(line([(200, 258), (200, 284)]))
     # the write back
-    o.append(box(40, 356, 320, 44, "head: h ← y, r ← r + 1 (0 after 102)", "ih-blk ih-mux", "rest and tail: r ← y; tail: n ← n + 1"))
+    o.append(box(40, 356, 320, 44, "head: h ← y, r ← r + 1 (0 after 102)", "ih-blk ih-mux", "after: r ← y, last: n ← 1, tail: n + 1"))
     o.append(line([(200, 328), (200, 356)]))
+    o.append(lab(50, 345, "last", "start"))       # from the input, with the last digit
+    o.append(line([(46, 338), (46, 356)]))
     o.append(line([(40, 378), (8, 378), (8, 36), (20, 36)]))
     o.append(line([(360, 378), (392, 378), (392, 6), (200, 6), (200, 14)]))
     o.append(line([(328, 6), (328, 14)]))

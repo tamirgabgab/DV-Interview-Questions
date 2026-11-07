@@ -217,11 +217,13 @@ def test_hardware_box_matches_the_reference():
         want_ok, want_clocks, _ = q0099.run_final(q0099.stream(s))
         assert (clocks, ok, dones) == (want_clocks, want_ok, 1), s
     # the trace of the page's IBAN, clock by clock, as the table of the page and the SV
-    tr = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.ihTrace(m.ihStream('{IL}')).map((e) => [e.s, e.y, e.h, e.r, e.n, e.head, e.tail, e.done])));")
+    tr = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.ihTrace(m.ihStream('{IL}')).map((e) => [e.s, e.y, e.h, e.r, e.n, e.head, e.tail, e.done, e.last])));")
     rows = q0099.trace_rows()
     assert [t[:5] for t in tr] == [[row[3], row[4], row[5], row[6], row[7]] for row in rows]
     assert [t[5] for t in tr] == [True] * 6 + [False] * 25 and [t[6] for t in tr] == [False] * 25 + [True] * 6
     assert [t[7] for t in tr] == [False] * 30 + [True]
+    # last comes with the last digit (clock 25) and loads n = 1 in that clock
+    assert [t[8] for t in tr] == [False] * 24 + [True] + [False] * 6 and tr[24][4] == 1
     cases = ["IL62 0108", "il620108", "IL6", "1L620", "IL62" + "0" * 30, "IL62" + "0" * 31]
     parsed = node_json(f"const m = {explorer_require()};console.log(JSON.stringify({json.dumps(cases)}.map(m.ihParse)));")
     assert parsed == ["IL620108", "IL620108", None, None, "IL62" + "0" * 30, None]

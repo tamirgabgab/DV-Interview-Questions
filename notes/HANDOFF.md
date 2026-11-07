@@ -947,6 +947,10 @@ below start at item 112 (session 31).
     one-line summary. At 1920 by 1080 the whole box is about 970 px tall; a narrower box
     (a 1366 laptop, 597 px) keeps the one-column order. Steady while stepping (measured at
     1600, 1920 and 2560; check_jumps runs at 1200 px, where the box is one column).
+    Then `last` shown (the owner asked why n rose at clock 25): a row of the table of
+    signals, a label into the write back of the box's diagram (lit with the last digit), and
+    an input `last` in the page's figure, whose write back now reads "after: r ← y, last:
+    n ← 1, tail: n + 1". The test checks last only at clock 25, with n = 1 after it.
 
 
 ---
