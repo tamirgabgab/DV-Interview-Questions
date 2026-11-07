@@ -867,6 +867,14 @@ below start at item 112 (session 31).
     `CA`/`ABC` (3 against 2 for unrestricted Damerau). The reference `bfs()` searches the
     strings themselves; tb.sv checks diff's lines as an edit script. Box `editdist` (prefix
     `ed-`, `stylesheets/questions/0037-editdist.css`); topic `scoreboard`; coding path.
+174. **Design skills in the repository (session 33, 2026-11-07).** The owner asked for the
+    popular Claude design skills, mainly UI UX Pro Max, to collect proposals for the site's
+    visuals, effects and animations. Copied into `.claude/skills/`: `ui-ux-pro-max` (MIT),
+    `impeccable` (Apache 2.0; its launcher downloads a binary on first use, which needs the
+    owner's permission in a session, `scripts/bin/` git-ignored) and `web-design-guidelines`
+    (MIT). Not installed: Taste Skill (40 MB of assets and a Stop hook) and
+    elite-frontend-design (no source repository). Sources, commits and how to run them:
+    `.claude/skills/README.md`; CLAUDE.md says their advice never overrides the site's rules.
 
 
 ---

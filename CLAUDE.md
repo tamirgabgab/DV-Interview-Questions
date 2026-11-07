@@ -115,6 +115,13 @@ already passed on its branch); a failure blocks the deploy. A new colour pair (a
 or a mark on a fill) goes into the `PAIRS` list of `tools/checks/check_contrast.py`. Verilator
 notes and simulator quirks are listed in `notes/HANDOFF.md` under "Technical notes".
 
+## Design skills
+
+- `.claude/skills/` holds third-party design skills (ui-ux-pro-max, impeccable,
+  web-design-guidelines); `.claude/skills/README.md` lists their sources, licenses and how to
+  run them here. Their advice never overrides the rules of this file (RTL, the palette
+  variables, contrast, reduced motion, the checks); a conflict goes to the owner.
+
 ## Workflow
 
 - Ask the owner guiding questions before a big change, then implement; end a work round
