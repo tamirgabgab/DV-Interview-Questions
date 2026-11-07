@@ -32,6 +32,7 @@ refine one in an earlier part, and moving a rule between parts can change what w
 | `23-polish.css` | the finishing round of the UX audit (session 32): one action colour in the boxes and the run panel (`--act`, `--act-line`: navy filled, navy outline, never amber), icon buttons at 44 px with their short name under them on a phone (`data-name`, set by `core.js`), inline code at least 13 px, the part bar's reading line clipped rather than resized |
 | `24-living.css` | the living layer (session 32): the pad field of the home hero and the level bands (`.lv-dots`, `dotgrid.js`), the page transition's timing, the skeletons of a box not built yet and of the run panel's output while Python downloads, tabular figures, the page titles a step larger, and the footer's crop marks and board line (`.df-board`, the date of the last commit from the hook) |
 | `25-figures-c.css` | the figures of S415 (session 32): the XOR steps of 0002, the passes of 0003, the handshake contract of 0038 |
+| `26-ui-round.css` | the UI round of session 33: one yellow button on the home hero and the board's stop button, a question's title over its subtitle and the source at the page's end, the header's chips in three tiers, exit tokens (`--ease-exit`, `--dur-exit-0..2`) for what closes, a content-only fade between pages, tabular figures |
 
 After the numbered parts come the stylesheets of single questions, in `questions/`, named
 `<id>-<name>.css` after the question (`questions/0083-jugs.css` for 0083's water jugs). A new

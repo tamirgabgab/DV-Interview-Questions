@@ -26,10 +26,14 @@
     requestAnimationFrame(frame);
   };
 
-  const STAGGER_MS = 40;
-  const reveal = (content) => {
+  const STAGGER_MS = 60;
+  // the sections and the cards rise into view once a visit (session 33), not on every load
+  const firstVisit = (key) => {
+    try { if (sessionStorage.getItem(key)) return false; sessionStorage.setItem(key, "1"); return true; } catch (e) { return false; }
+  };
+  const reveal = (content, cardsOnly = false) => {
     const items = [];
-    content.querySelectorAll(":scope > :is(h2, p, .related-questions, .catalog-link, details)").forEach((el) => items.push([el, 0]));
+    if (!cardsOnly) content.querySelectorAll(":scope > :is(h2, p, .related-questions, .catalog-link, details)").forEach((el) => items.push([el, 0]));
     content.querySelectorAll(":scope > :is(.level-cards, .how-it-works)").forEach((row) =>
       Array.from(row.children).forEach((el, i) => items.push([el, i % 3])));     // a row has three
     const seen = new IntersectionObserver((entries) => {
@@ -66,7 +70,7 @@
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(PICK) || "null"); } catch (e) { /* none */ }
     const st = { level: "junior", minutes: 40, kinds: [...panel.querySelectorAll(".hb-topic")].map((b) => b.dataset.kind), seed: 1, ...(saved || {}) };
-    let data = null, current = [], turn = 0;
+    let data = null, current = [], turn = 0, dealt = false;
     const peek = panel.querySelector(".hb-peek");
     const cards = () => [...plan.querySelectorAll(".hb-card")];
     // each card's place along a shallow arc, the first on the right
@@ -93,8 +97,10 @@
     // gather the old cards into the pile, put the new ones in and deal them
     const deal = (html) => {
       const mine = ++turn;
+      const calm = still || !dealt;                      // the first series is laid down, not dealt
+      if (html.includes("hb-card")) dealt = true;
       const lis = [...plan.querySelectorAll("li")].filter((li) => li.querySelector(".hb-card"));
-      const gather = still || !lis.length ? Promise.resolve() : Promise.all(lis.map((li, k) =>
+      const gather = calm || !lis.length ? Promise.resolve() : Promise.all(lis.map((li, k) =>
         li.animate([{ transform: li.style.transform, opacity: 1 }, { transform: pile(), opacity: 0 }],
           { duration: 200, delay: (lis.length - 1 - k) * 35, easing: "cubic-bezier(.4, 0, 1, 1)", fill: "forwards" }).finished)).catch(() => {});
       gather.then(() => {
@@ -102,7 +108,7 @@
         plan.innerHTML = html;
         place();
         show(null);
-        if (still) return;
+        if (calm) return;
         const from = pile();
         plan.querySelectorAll("li").forEach((li, k) => {
           if (!li.querySelector(".hb-card")) return;
@@ -200,6 +206,14 @@
     Promise.all(run.map((an) => an.finished)).then(() => { fix.classList.remove("is-live"); fix.textContent = word; }).catch(() => {});
   };
 
+  // the path cards of the paths page come in the same way, once a visit
+  document.addEventListener("DOMContentLoaded", () => {
+    const content = document.querySelector(".md-content__inner");
+    if (!content || reduce || navigator.webdriver || !("IntersectionObserver" in window)) return;
+    if (content.querySelector(".home-hero") || !content.querySelector(":scope > .level-cards")) return;
+    if (firstVisit("dvq-revealed:" + location.pathname)) reveal(content, true);
+  });
+
   document.addEventListener("DOMContentLoaded", () => {
     const fix = document.querySelector(".home-hero .hh-fix");
     if (fix) motto(fix);                       // the old word at once; the edit starts a moment later
@@ -209,7 +223,7 @@
     const stats = document.querySelector(".home-hero .hh-stats");
     if (!stats || reduce || navigator.webdriver || !("IntersectionObserver" in window)) return;
     const content = stats.closest(".md-content__inner");
-    if (content) reveal(content);
+    if (content && firstVisit("dvq-revealed:" + location.pathname)) reveal(content);
     const seen = new IntersectionObserver((entries) => {
       if (!entries.some((e) => e.isIntersecting)) return;
       seen.disconnect();

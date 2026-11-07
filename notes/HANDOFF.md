@@ -875,6 +875,21 @@ below start at item 112 (session 31).
     (MIT). Not installed: Taste Skill (40 MB of assets and a Stop hook) and
     elite-frontend-design (no source repository). Sources, commits and how to run them:
     `.claude/skills/README.md`; CLAUDE.md says their advice never overrides the site's rules.
+175. **The UI round from the design review (session 33, 2026-11-07).** The owner picked
+    proposals 1, 2, 3, 5, 6, 7, 8, 9 and 11 of the review made with ui-ux-pro-max and
+    web-design-guidelines, with MCQ answers (all the recommended options). New part
+    `26-ui-round.css`. (1) One yellow button on the home hero: the builder's "start the
+    interview" is outlined, the search and its ready queries a row of their own (`.hh-find`).
+    (2) A title with " – " is a title over a subtitle (`_title_html`), the source closes the
+    page (`_source_line`). (3) The header chips in three tiers (level and difficulty; the
+    kind as a plain outline; the badges as icon and word). (5) The hero board's stop button
+    (`.hh-pause`, remembered) and a stop by itself after a minute (WCAG 2.2.2). (6) Only the
+    board moves by itself: the icosahedron is still, the builder's first series is not dealt.
+    (7) Between pages only `.md-content` fades (the header and menus stay; the title morph of
+    M6 kept). (8) `--ease-exit` and `--dur-exit-0..2`, with closing runs (`.is-closing`) on
+    the quick jump, the figure lightbox and the toast. (9) The home sections and the path
+    cards rise in once a browser session, a 60 ms stagger. (11) Tabular figures in the
+    boxes' summaries, the builder, my map, the daily card and the level cards.
 
 
 ---

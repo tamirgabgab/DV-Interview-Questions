@@ -1,0 +1,118 @@
+/* The site's styles, part 26: the UI round of session 33 (the owner's choices from the
+   design review with the ui-ux-pro-max and web-design-guidelines skills): one yellow button
+   on the home hero, the hero board's stop button, a question's title over a subtitle and its
+   source at the end of the page, the header's chips in three tiers, exit easing for what
+   closes, a content-only fade between pages, and tabular figures where numbers change.
+   It loads after parts 01-25 and refines them. */
+
+/* --- motion tokens for what closes or hides (01-base.css has the entering ones): a closing
+   panel accelerates away and takes about 70% of its opening time ---------------------------- */
+:root {
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --dur-exit-0: 100ms;   /* after --dur-0 */
+  --dur-exit-1: 140ms;   /* after --dur-1 */
+  --dur-exit-2: 210ms;   /* after --dur-2 */
+}
+
+/* --- 1. the home hero: one yellow button ------------------------------------------------------
+   "start practising" is the only filled button; the builder's "start the interview" is an
+   outlined one, as "a random question" is; the search and its ready queries are a row of
+   their own under the buttons. */
+.md-typeset .home-hero .hb-actions .md-button.hb-start { border: 1px solid rgba(255, 255, 255, 0.7); background: transparent; color: #fff; font-weight: 600; }
+.md-typeset .home-hero .hb-actions .md-button.hb-start:is(:hover, :focus-visible) { border-color: var(--md-accent-fg-color); background: rgba(255, 255, 255, 0.08); color: #fff; }
+.md-typeset .home-hero .hh-find { margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px solid rgba(255, 255, 255, 0.14); }
+.md-typeset .home-hero .hh-find .hh-suggest { margin-bottom: var(--sp-3); }
+
+/* --- 5. the hero board's stop button (hero-board.js adds it unless motion is reduced) ------- */
+.md-typeset .home-hero .hh-pause {
+  position: absolute; z-index: 2; bottom: var(--sp-3); inset-inline-start: var(--sp-3);
+  display: inline-grid; place-items: center; width: 2rem; height: 2rem; padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 50%; background: rgba(13, 22, 44, 0.55);
+  color: #fff; cursor: pointer; transition: border-color var(--dur-0) var(--ease), background-color var(--dur-0) var(--ease);
+}
+.md-typeset .home-hero .hh-pause::before {            /* two bars: running, a press stops it */
+  content: ""; width: 0.6rem; height: 0.7rem;
+  background: linear-gradient(to right, currentColor 0 35%, transparent 35% 65%, currentColor 65%);
+}
+.md-typeset .home-hero .hh-pause.is-paused::before {  /* a play triangle (media icons are not mirrored in RTL): start it */
+  width: 0.6rem; height: 0.7rem; background: currentColor; clip-path: polygon(0 0, 100% 50%, 0 100%); margin-inline-start: 0.12rem;
+}
+.md-typeset .home-hero .hh-pause:hover { border-color: var(--md-accent-fg-color); background: rgba(13, 22, 44, 0.8); }
+.md-typeset .home-hero .hh-pause:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+@media screen and (max-width: 59.9375em) {              /* the builder runs to the bottom: room under it */
+  .md-typeset .home-hero:has(.hh-pause) { padding-bottom: 3rem; }
+  .md-typeset .home-hero .hh-pause { bottom: var(--sp-2); }
+}
+
+/* --- 2. a question's title: the words before " – " as the title, the rest a subtitle --------- */
+.md-typeset .question-header h1 .qh-main { display: block; }
+.md-typeset .question-header h1 .qh-dash {             /* read, not seen: the heading's text stays whole */
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.md-typeset .question-header h1 .qh-subtitle {
+  display: block; margin-top: 0.35rem; color: var(--md-default-fg-color--light);
+  font-size: 0.56em; font-weight: 500; line-height: 1.4; letter-spacing: 0; text-wrap: balance;
+}
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .question-header h1 .qh-subtitle { font-size: 0.66em; }
+}
+/* the source, out of the header, closes the page above the related questions */
+.md-typeset .q-source {
+  margin: var(--sp-5) 0 var(--sp-3); padding-top: var(--sp-3); border-top: 1px solid var(--site-card-border);
+  color: var(--md-default-fg-color--light); font-size: 0.68rem;
+}
+
+/* --- 3. the header's chips in three tiers ----------------------------------------------------
+   tier 1, what the question is for: the level (filled) and the difficulty (its LEDs);
+   tier 2, what it is about: the kind, a plain outline like the topics;
+   tier 3, what the page has: interactive, tested code, new, as an icon and a word, no box. */
+.md-typeset .question-header .qh-top .chip-kind { border: 1px solid var(--site-card-border); border-style: solid; color: var(--md-default-fg-color--light); }
+.md-typeset .question-header .qh-top .qh-badge,
+.md-typeset .question-header .qh-top .qh-badge-ok,
+.md-typeset .question-header .qh-top .qh-badge-new {
+  padding: 0 0.15em; border: 0; border-radius: 0; background: transparent;
+  color: var(--md-default-fg-color--light); font-weight: 500;
+}
+.md-typeset .question-header .qh-top .qh-badge-play .ui-ico { color: var(--md-typeset-a-color); }
+.md-typeset .question-header .qh-top .qh-badge-ok .ui-ico { color: var(--diff-easy); }
+.md-typeset .question-header .qh-top .qh-badge-new .ui-ico { color: var(--viz-s2-text); }
+
+/* --- 7. between pages only the content fades (the header, the tabs and the side menus stay);
+   a question's title still moves from the link into its place (13-motion.css) ------------- */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(root) { animation-duration: 0s; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  .md-content { view-transition-name: dvq-content; }
+  ::view-transition-group(dvq-content) { animation-duration: 0s; }
+  ::view-transition-old(dvq-content) { animation: vt-out var(--dur-exit-1) var(--ease-exit) both; }
+  ::view-transition-new(dvq-content) { animation: vt-in var(--dur-1) var(--ease) both; }
+  ::view-transition-old(dvq-content), ::view-transition-new(dvq-content) { height: 100%; object-fit: none; object-position: right top; }
+  @keyframes vt-out { to { opacity: 0; } }
+  @keyframes vt-in { from { opacity: 0; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+}
+
+/* --- 8. panels and pop-ups open with --ease and close with --ease-exit ----------------------
+   (quick-jump.js, reading-tools.js and question-tools.js add .is-closing for the closing run,
+   and hide the element when it ends) */
+@media (prefers-reduced-motion: no-preference) {
+  .fig-lightbox.is-open { animation: lb-in var(--dur-2) var(--ease) both; }
+  .fig-lightbox.is-closing { animation: lb-out var(--dur-exit-2) var(--ease-exit) both; }
+  @keyframes lb-in { from { opacity: 0; } }
+  @keyframes lb-out { to { opacity: 0; } }
+  .qj.is-closing .qj-panel { animation: qj-out var(--dur-exit-0) var(--ease-exit) both; }
+  .qj.is-closing { animation: lb-out var(--dur-exit-0) var(--ease-exit) both; }
+  @keyframes qj-out { to { opacity: 0; transform: scale(0.98); } }
+  .dvq-toast.is-closing { animation: dt-out var(--dur-exit-1) var(--ease-exit) both; }
+  @keyframes dt-out { to { opacity: 0; transform: translateY(0.5rem); } }
+}
+
+/* --- 11. tabular figures where numbers change in place --------------------------------------- */
+.md-typeset .explorer :is(.ex-summary, .ex-answer, .ex-pos, output),
+.md-typeset .home-hero :is(.hb-sum, .hb-plan),
+.md-typeset .my-map .mm-stats,
+.md-typeset .daily-card,
+.md-typeset .level-card :is(.lc-diff, .lc-count),
+.md-typeset .path-nav { font-variant-numeric: tabular-nums; }

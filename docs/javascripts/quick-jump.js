@@ -138,6 +138,8 @@
   const open = (text = "") => {
     if (!box) build();
     if (box.hidden) back = document.activeElement;
+    turn++;
+    box.classList.remove("is-closing");
     box.hidden = false;
     document.documentElement.classList.add("qj-open");
     input.value = text;
@@ -148,11 +150,24 @@
         .catch(() => { failed = true; if (!box.hidden) render(); });
     }
   };
+  // A closing run (session 33, 26-ui-round.css): .is-closing plays the exit animation, and
+  // done() hides the element when it ends; at once under reduced motion, in an automated
+  // browser (the page checks) or without the Web Animations API.
+  const exitRun = (el, done) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.webdriver || !el.getAnimations) { done(); return; }
+    el.classList.add("is-closing");
+    const runs = el.getAnimations({ subtree: true }).filter((a) => a.playState !== "finished");
+    const end = () => { el.classList.remove("is-closing"); done(); };
+    if (!runs.length) { end(); return; }
+    Promise.all(runs.map((a) => a.finished)).then(end, end);
+  };
+  let turn = 0;                                        // an open during a closing run wins
   const close = (restore = true) => {
-    if (!box || box.hidden) return;
-    box.hidden = true;
+    if (!box || box.hidden || box.classList.contains("is-closing")) return;
+    const mine = ++turn;
     document.documentElement.classList.remove("qj-open");
     if (restore && back && back.focus) back.focus();
+    exitRun(box, () => { if (mine === turn) box.hidden = true; });
   };
   window.dvqQuickJump = { open, close };
 

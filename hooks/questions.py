@@ -474,10 +474,28 @@ def _badge(icon: str, text: str, title: str, cls: str = "") -> str:
     return f'<span class="qh-badge{cls}" title="{html.escape(title)}">{ui_icon(icon)}{text}</span>'
 
 
+def _title_html(title: str) -> str:
+    """The title as the header shows it (session 33): the words before the first " – " as the
+    title, the rest as a smaller subtitle line under it. A hidden " – " keeps the heading's
+    text whole for screen readers and for the scripts that read it (marks.js, video.js)."""
+    main, sep, rest = title.partition(" – ")
+    if not sep:
+        return html.escape(title)
+    return (f'<span class="qh-main">{html.escape(main)}</span><span class="qh-dash"> – </span>'
+            f'<span class="qh-subtitle">{html.escape(rest)}</span>')
+
+
+def _source_line(q: dict) -> str:
+    """The source of the question at the end of the page (session 33: out of the header)."""
+    if not q.get("source"):
+        return ""
+    return f'\n\n<p class="q-source" data-search-exclude>מקור\u00a0: {html.escape(str(q["source"]))}</p>\n\n'
+
+
 def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
     """Header card (UI324): the title first with the page tools beside it, then one row of
     chips (id, level, difficulty, kind) and small badges (interactive, tested code, new),
-    and one quiet line of topics, date and source. On a phone the tools go under the
+    and one quiet line of topics and date (the source closes the page). On a phone the tools go under the
     chips, so the title opens the page."""
     base = _base(page_url)
     langs = [name for name, fence in (("SV", "systemverilog"), ("Python", "python"))
@@ -500,15 +518,13 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
     added = _added_date(q)
     if added:
         bottom.append(f'<span class="qh-sep"></span><span>נוספה ב-{_date_he(added)}</span>')
-    if q.get("source"):
-        bottom.append(f'<span class="qh-sep"></span><span>מקור : {html.escape(str(q["source"]))}</span>')
     # V11: the card carries its difficulty and kind (18-question.css tints a quiet trace
     # pattern along its top edge by the difficulty); its corner shows the question's own
     # chip (session 32, question_chip), and the meta line its label DVQ-<id>
     return (
         f'<div class="question-header qh-diff-{q["difficulty"]} qh-kind-{q["kind"]}">\n'
         f'<span class="qh-emblem qh-emblem-chip" aria-hidden="true">{question_chip(q["id"], q.get("parts", 0))}</span>\n'
-        f'<h1>{html.escape(str(q["title"]))}</h1>\n'
+        f'<h1>{_title_html(str(q["title"]))}</h1>\n'
         f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
         f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{"".join(badges)}</div>\n'
         f'{tools}\n'
@@ -974,7 +990,7 @@ def _hero_builder() -> str:
             '<ol class="hb-plan" aria-live="polite"></ol>'
             '<p class="hb-peek" aria-hidden="true"></p>'
             '<p class="hb-sum"></p>'
-            '<div class="hb-actions"><a class="md-button md-button--primary hb-start" href="#">להתחיל את הראיון</a>'
+            '<div class="hb-actions"><a class="md-button hb-start" href="#">להתחיל את הראיון</a>'
             '<button type="button" class="hb-shuffle">סדרה אחרת</button></div>'
             '</div>')
 
@@ -1001,8 +1017,9 @@ def _hero(inner: str, page_url: str) -> str:
         '<div class="hh-actions">'
         f'<a class="md-button md-button--primary hh-start" href="{hrefs[0]}" data-hrefs="{html.escape(json.dumps(hrefs))}" data-ids="{" ".join(ids)}">להתחיל לתרגל</a>'
         f'<a class="md-button hh-random" href="{hrefs[0]}" data-hrefs="{html.escape(json.dumps(hrefs))}">{ui_icon("random")}שאלה אקראית</a></div>'
+        '<div class="hh-find">'      # the search and its ready queries, a row of their own under the one yellow button
         f'<button type="button" class="hh-search">{ui_icon("search")}<span>חיפוש לפי מספר שאלה, שם או נושא</span><kbd>/</kbd></button>'
-        f'<div class="hh-suggest"><span>למשל\u00a0:</span>{searches}</div>'
+        f'<div class="hh-suggest"><span>למשל\u00a0:</span>{searches}</div></div>'
         '<div class="hh-stats">' + "".join(f'<span>{ui_icon(i)}<b>{n}</b> {label}</span>' for i, n, label in stats) + '</div>'
         '</div>\n'
         '<div class="hh-chip-slot" aria-hidden="true"></div>\n'
@@ -1345,7 +1362,7 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
         page.meta["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], *q["tags"]]
         page.meta.setdefault("hide", []).append("tags")   # the header card shows them
         markdown = (_header(q, markdown, page.url, _tools(q, page.url)) + _path_nav(q, page.url) + markdown
-                    + _run_panel(q, markdown) + _related(q, page.url) + _comments_block())
+                    + _run_panel(q, markdown) + _source_line(q) + _related(q, page.url) + _comments_block())
 
     markdown = COST_LINE.sub(_cost_chips, markdown)
     markdown = CARDS.sub(lambda m: _level_cards(page.url), markdown)

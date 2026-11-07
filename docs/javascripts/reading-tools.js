@@ -103,6 +103,7 @@
     const copy = svg.cloneNode(true);
     copy.removeAttribute("style");          // the page copy may carry a max-width
     unfit(copy);                             // the phone text sizes (D194) are not needed here
+    box.classList.remove("is-closing");
     stage.replaceChildren(copy);
     view.scale = 1; view.x = 0; view.y = 0;
     apply();
@@ -110,11 +111,22 @@
     document.documentElement.classList.add("fig-lightbox-open");
     box.querySelector(".fig-lb-close").focus();
   };
+  // A closing run (session 33, 26-ui-round.css): .is-closing plays the exit animation, and
+  // done() hides the element when it ends; at once under reduced motion, in an automated
+  // browser (the page checks) or without the Web Animations API.
+  const exitRun = (el, done) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.webdriver || !el.getAnimations) { done(); return; }
+    el.classList.add("is-closing");
+    const runs = el.getAnimations({ subtree: true }).filter((a) => a.playState !== "finished");
+    const end = () => { el.classList.remove("is-closing"); done(); };
+    if (!runs.length) { end(); return; }
+    Promise.all(runs.map((a) => a.finished)).then(end, end);
+  };
   function close() {
-    box.classList.remove("is-open");
+    if (!box.classList.contains("is-open") || box.classList.contains("is-closing")) return;
     document.documentElement.classList.remove("fig-lightbox-open");
-    stage.replaceChildren();
     if (lastFocus) lastFocus.focus();
+    exitRun(box, () => { box.classList.remove("is-open"); stage.replaceChildren(); });
   }
 
   // The button covers the top inline-start corner of the drawing. When SVG text is drawn

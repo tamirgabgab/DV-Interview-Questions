@@ -323,12 +323,16 @@ unknown level, difficulty or kind, a level that does not match the folder, a fil
 not start with the id, or a duplicate id. It also generates, per question page:
 
 - the **header card**: the title first with the page tools beside it (under the chips on
-  a phone), one row of chips (id label, level, difficulty, kind with its icon)
-  and small badges with an icon and a word ("interactive", "tested code" when the page has
+  a phone); a title with " – " shows the words before it as the title and the rest as a
+  smaller subtitle under it (`_title_html`; a hidden " – " keeps the heading's text whole),
+  one row of chips in three tiers (session 33: the level filled and the difficulty's LEDs;
+  the kind with its icon as a plain outline; the badges as an icon and a word without a
+  box: "interactive", "tested code" when the page has
   a `tests/<id>/` folder or else the code languages, "new" for the newest five questions
   added in the last 7 days (`NEW_DAYS`, `NEW_MAX`); the full text
-  is a tooltip), and one quiet line of topic links,
-  the `added` date in Hebrew and `source` when filled; the page's own title comes from
+  is a tooltip), and one quiet line of topic links and
+  the `added` date in Hebrew; `source`, when filled, closes the page above the related
+  questions (`_source_line`, `.q-source`); the page's own title comes from
   `title`, so the Markdown must not start with a `#` heading;
 - the Material tags (level, difficulty, topics) for the tag index, with the tag chips above
   the title hidden because the header card shows them;
@@ -512,7 +516,13 @@ between the text and the builder from 76.25em up and a strip under the numbers o
 (`21-interview.css`); the wires are not drawn in the builder's box, run on to the edge on
 the text's side, and pass under a soft calm patch of the hero's colour under every line of
 text and every control (measured once per layout, again when the web font arrives). It runs only while the hero is on screen, and is one still frame under reduced
-motion and in an automated browser. Beside the text (under it on a narrow screen) sits the
+motion and in an automated browser. A round button in the hero's corner (`.hh-pause`,
+session 33, WCAG 2.2.2) stops and starts it; a stop chosen by the reader is kept in
+`localStorage` (`dvq-hero-still`), and the board also stops by itself after a minute of
+running (`BUDGET`). It is the one thing on the home page that moves by itself: the
+icosahedron of `circuit.js` is a still drawing (`ICO_STILL`), the builder's first series is
+laid down without dealing, and the sections and cards rise into view once a browser
+session (`home.js`, `firstVisit`). Beside the text (under it on a narrow screen) sits the
 **interview builder** (session 30, `_hero_builder` in the hook, `home.js`; it replaced the
 live example of 0055): a level, a length (20, 40 or 60 minutes) and kinds give a series
 that fits the time (`dvqInterview.buildPlan`: a seeded shuffle of the level's questions
@@ -726,7 +736,7 @@ follow the light / dark switch automatically:
 | `sw-*` (`sw-fig` a staircase, `sw-stair` + `sw-focus` (the stair being made) / `sw-from` (the stairs that jump to it) / `sw-broken` with the cross `sw-x`, `sw-val`, the arrows `sw-arc` / `sw-headp`; in the box `sw-tog` (a jump size), `sw-n`, `sw-break`, `sw-mend`, `sw-flights` / `sw-flight` (ten stairs a row) of `sw-cell` (a `sw-st` button with the count, the stair number `sw-i` under it), `sw-long`, `sw-top`, `sw-note`; `sw-key-*`; stylesheets/questions/0100-stairs.css) | The ways to climb the stairs (0100): the count on every stair and the stairs that make it, a broken stair, and the box `stairs` (`data-n`, `data-steps`, `data-broken`, `data-pick`): the jump sizes 1 to 6, n up to 30, a picked stair's sum, breaking and mending |
 | `ed-*` (`ed-fig` a table of the prefixes, `ed-cell` + `ed-same` / `ed-miss` / `ed-extra` / `ed-chg` / `ed-swap` the steps of the path, `ed-out` a cell outside the band, `ed-v`, `ed-pk` a packet, `ed-idx`, `ed-other` the path of the other rule for ties (dashed); in the box `ed-in`, `ed-wrap` / `ed-table` with `is-now` (the cell just filled), `is-from` (the neighbours that give its minimum), `is-nb`, `ed-h0`, `ed-sr`, `ed-note`, `ed-report` / `ed-wait`; `ed-key-*`; stylesheets/questions/0037-editdist.css) | The edit distance between two streams (0037): the table with its path, the tie with both paths, the band of d differences, and the box `editdist` |
 | `qchip` (`qc-pins`, `qc-body`, `qc-die`, `qc-on`, `qc-dot`; `qchip-s` small), `qh-emblem-chip`, `qh-pn`, `q-idn` | A question's own chip (`question_chip` in the hook, 22-circuit.css): one pin a side per part and its id's bits on the die, in the lists and the question header, with its label DVQ‑&lt;id&gt; |
-| `cx-ico`, `hr.is-on`, `--cx-traces` / `--cx-wave` / `--cx-clock`, `--led-off` | The circuit layer (22-circuit.css, `circuit.js`): the slow icosahedron canvas of the home hero and the level bands, the divider's packet, the trace, waveform and clock masks, the unlit LED of the difficulty chips |
+| `cx-ico`, `hr.is-on`, `--cx-traces` / `--cx-wave` / `--cx-clock`, `--led-off` | The circuit layer (22-circuit.css, `circuit.js`): the icosahedron canvas of the home hero and the level bands (a still drawing since session 33), the divider's packet, the trace, waveform and clock masks, the unlit LED of the difficulty chips |
 | `lv-dots` (`is-lit`, `--lv-x` / `--lv-y`), `df-board`, `df-reg` | The living layer (24-living.css, `dotgrid.js`): the pad field of the home hero and the level bands with its pointer light, and the footer's board line with its registration target (`dvq_cards.rev`, the date of the last commit in Israel time) |
 | `bil-felt`, `bil-rail`, `bil-pocket` / `bil-hole` (`is-in`), `bil-path`, `bil-mid`, `bil-ball`, `bil-ghost`, `bil-aim`, `bil-arrow`, `bil-tipdot`, `bil-trail`, `bil-ghost-line`, `bil-gap` (`is-in`), `bil-h` / `bil-hit` (the draggable ball and arrow tip), `bil-checks`, `bil-count`, `bil-key-*` | Billiards (0080): the table and its pockets, the paths with their numbered cushion hits and the unfolded grid (figures), and the `billiard` explorer: the ball and the aim dragged, the trail of a shot, the unfolded table with the gap at every line of pockets, the table of the calculation |
 

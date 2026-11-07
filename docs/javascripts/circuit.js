@@ -3,8 +3,8 @@
 // - Section dividers (<hr>) are drawn as a data line; the first time one comes into view it
 //   gets .is-on, and the stylesheet runs a short bright packet along it once (its length,
 //   --cx-run, is the divider's width).
-// - A wireframe icosahedron turns very slowly in a corner of the home hero and of a level
-//   page's header band: twelve vertices (0, ±1, ±φ) and their cyclic shifts, the thirty edges
+// - A wireframe icosahedron sits in a corner of the home hero and of a level page's header
+//   band (still since session 33; ICO_STILL turns it on again): twelve vertices (0, ±1, ±φ) and their cyclic shifts, the thirty edges
 //   of length 2, drawn on a canvas in the canvas's CSS colour (22-circuit.css; nothing is
 //   hard-coded here). It leans a little toward the pointer, runs only while on screen, and
 //   is one still frame under reduced motion and in an automated browser.
@@ -41,6 +41,7 @@
     }
   }
   const R = Math.hypot(1, PHI);              // the circumradius, to fit the canvas
+  const ICO_STILL = true;                    // drawn once, not turning (session 33)
 
   const rotate = ([x, y, z], ax, ay) => {    // about y, then about x
     const cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
@@ -113,8 +114,11 @@
 
     size();
     draw();
-    if (still || !canvas.clientWidth) return;        // a still frame, or hidden (a phone)
+    // session 33 (the motion budget of the home page): the board of the hero is the one
+    // thing that moves by itself, so the icosahedron is a still drawing everywhere; it keeps
+    // its size with the canvas. The turning and the lean toward the pointer stay below.
     if ("ResizeObserver" in window) new ResizeObserver(() => { size(); draw(); }).observe(canvas);
+    if (ICO_STILL || still || !canvas.clientWidth) return;        // a still frame, or hidden (a phone)
     host.addEventListener("pointermove", (e) => {
       const r = host.getBoundingClientRect();
       tx = ((e.clientX - r.left) / Math.max(1, r.width) - 0.5) * 0.5;

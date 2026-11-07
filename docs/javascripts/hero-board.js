@@ -17,6 +17,8 @@
   const EVERY = 0.16;           // a new electron every so many seconds
   const BURST = [2.6, 4.2];     // a white burst every so many seconds (a random time between)
   const FAST = 1.7;             // a burst runs this many times faster
+  const BUDGET = 60;            // seconds of running before the board stops by itself
+  const STOP_KEY = "dvq-hero-still";   // the reader stopped the board: it stays still
   const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.webdriver;
 
   // a polyline of horizontal and vertical steps, with its length
@@ -207,6 +209,7 @@
       const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
       t += dt;
+      if (t - budgetFrom > BUDGET) { stop(false); return; }     // a minute, then a still frame
       if (t - spawned > EVERY) {
         spawned = t;
         flows.push({ i: Math.floor(Math.random() * geo.wires.length), t0: t, dir: Math.random() < 0.5 ? 1 : -1 });
@@ -219,6 +222,7 @@
       frame = requestAnimationFrame(tick);
     };
     const play = (on) => {
+      on = on && seen && !paused;
       if (still || on === running) return;
       running = on;
       last = 0;
@@ -226,13 +230,43 @@
       else cancelAnimationFrame(frame);
     };
 
+    // WCAG 2.2.2: the moving board can be stopped. A button in the hero's corner stops and
+    // starts it (a stop chosen by the reader is remembered in this browser), and the board
+    // also stops by itself after BUDGET seconds of running; starting it again gives it
+    // another BUDGET. Under reduced motion there is no motion and no button.
+    let seen = false, paused = false, budgetFrom = 0;
+    const pauseBtn = document.createElement("button");
+    pauseBtn.type = "button";
+    pauseBtn.className = "hh-pause";
+    const label = () => {
+      pauseBtn.setAttribute("aria-label", paused ? "הפעלת האנימציה של הלוח" : "עצירת האנימציה של הלוח");
+      pauseBtn.dataset.tip = pauseBtn.getAttribute("aria-label");
+      pauseBtn.classList.toggle("is-paused", paused);
+    };
+    const stop = (chosen) => {
+      paused = true;
+      if (chosen) { try { localStorage.setItem(STOP_KEY, "1"); } catch (e) { /* storage off */ } }
+      label();
+      play(false);
+    };
+    pauseBtn.addEventListener("click", () => {
+      if (!paused) { stop(true); return; }
+      paused = false;
+      budgetFrom = t;
+      try { localStorage.removeItem(STOP_KEY); } catch (e) { /* storage off */ }
+      label();
+      play(true);
+    });
+    try { paused = localStorage.getItem(STOP_KEY) === "1"; } catch (e) { /* storage off */ }
+    if (!still) { label(); hero.append(pauseBtn); }
+
     new ResizeObserver(measure).observe(hero);
     // the builder appears once the question list has loaded, which moves the slot
     const builder = hero.querySelector(".hh-builder");
     if (builder) new MutationObserver(measure).observe(builder, { attributes: true, attributeFilter: ["hidden"] });
     // the hero's colour follows the light / dark switch
     new MutationObserver(measure).observe(document.body, { attributes: true, attributeFilter: ["data-md-color-scheme"] });
-    new IntersectionObserver((entries) => play(entries.some((e) => e.isIntersecting))).observe(hero);
+    new IntersectionObserver((entries) => { seen = entries.some((e) => e.isIntersecting); play(seen); }).observe(hero);
     // the calm patches follow the text, whose lines move once the web font is in
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
     measure();

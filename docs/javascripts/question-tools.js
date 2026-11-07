@@ -53,15 +53,26 @@
     close.className = "dt-close";
     close.setAttribute("aria-label", "סגירת ההודעה");
     close.textContent = "×";
-    close.addEventListener("click", () => { t.hidden = true; });
+    close.addEventListener("click", () => { clearTimeout(toastTimer); exitRun(t, () => { t.hidden = true; }); });
     t.append(body, close);
     t.hidden = false;
-    t.classList.remove("is-in");
+    t.classList.remove("is-in", "is-closing");
     void t.offsetWidth;                                  // restart the entrance
     t.classList.add("is-in");
     later(t);
   };
-  const later = (t) => { clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, TOAST_MS); };
+  // A closing run (session 33, 26-ui-round.css): .is-closing plays the exit animation, and
+  // done() hides the element when it ends; at once under reduced motion, in an automated
+  // browser (the page checks) or without the Web Animations API.
+  const exitRun = (el, done) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.webdriver || !el.getAnimations) { done(); return; }
+    el.classList.add("is-closing");
+    const runs = el.getAnimations({ subtree: true }).filter((a) => a.playState !== "finished");
+    const end = () => { el.classList.remove("is-closing"); done(); };
+    if (!runs.length) { end(); return; }
+    Promise.all(runs.map((a) => a.finished)).then(end, end);
+  };
+  const later = (t) => { clearTimeout(toastTimer); toastTimer = setTimeout(() => { exitRun(t, () => { t.hidden = true; }); }, TOAST_MS); };
 
   const pop = () => {
     if (still()) return;
