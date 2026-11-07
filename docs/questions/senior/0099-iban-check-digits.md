@@ -298,12 +298,12 @@ added: 2026-11-07
     | 10 | 8 | ספרה, ‏<span dir="ltr">x = r = 10</span> | 108 | 11 | ‏<span dir="ltr">h = 93, r = 11</span> |
     | … | | | | | |
     | 25 | 9 | ספרה, ‏<span dir="ltr">x = r = 76</span> | 769 | 90 | ‏<span dir="ltr">h = 93, r = 90</span> |
-    | 26 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 90</span> | 900 | 27 | ‏<span dir="ltr">h = 93, r = 27</span>, ‏<span dir="ltr">n = 1</span> |
-    | 27 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 27</span> | 270 | 76 | ‏<span dir="ltr">h = 93, r = 76</span>, ‏<span dir="ltr">n = 2</span> |
-    | 28 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 76</span> | 760 | 81 | ‏<span dir="ltr">h = 93, r = 81</span>, ‏<span dir="ltr">n = 3</span> |
-    | 29 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 81</span> | 810 | 34 | ‏<span dir="ltr">h = 93, r = 34</span>, ‏<span dir="ltr">n = 4</span> |
-    | 30 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 34</span> | 340 | 49 | ‏<span dir="ltr">h = 93, r = 49</span>, ‏<span dir="ltr">n = 5</span> |
-    | 31 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 49</span> | 490 | 5 | ‏<span dir="ltr">h = 93, r = 5</span>, ‏<span dir="ltr">n = 6</span> |
+    | 26 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 90</span> | 900 | 27 | ‏<span dir="ltr">h = 93, r = 27, n = 1</span> |
+    | 27 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 27</span> | 270 | 76 | ‏<span dir="ltr">h = 93, r = 76, n = 2</span> |
+    | 28 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 76</span> | 760 | 81 | ‏<span dir="ltr">h = 93, r = 81, n = 3</span> |
+    | 29 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 81</span> | 810 | 34 | ‏<span dir="ltr">h = 93, r = 34, n = 4</span> |
+    | 30 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 34</span> | 340 | 49 | ‏<span dir="ltr">h = 93, r = 49, n = 5</span> |
+    | 31 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 49</span> | 490 | 5 | ‏<span dir="ltr">h = 93, r = 5, n = 6</span> |
     | סוף | | ‏<span dir="ltr">y + h</span> | | | ‏<span dir="ltr">5 + 93 = 98</span>, תקין |
 
     <!-- /gen -->

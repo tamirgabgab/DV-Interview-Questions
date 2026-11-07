@@ -483,7 +483,7 @@ def trace_table() -> str:
         k, d, reg, s, y, h, r, n = tr[i]
         what = (f"ספרת ראש, ‏{L(f'x = h = {tr[i - 1][5] if i else 0}')}" if i < HEAD else
                 f"ספרה, ‏{L(f'x = r = {tr[i - 1][6]}')}" if n == 0 else f"‏0 של הזנב, ‏{L(f'x = r = {tr[i - 1][6]}')}")
-        after = L(f"h = {h}, r = {r}") + (f", ‏{L(f'n = {n}')}" if n else "")
+        after = L(f"h = {h}, r = {r}" + (f", n = {n}" if n else ""))
         rows.append(f"| {k} | {d} | {what} | {s} | {y} | {RLM}{after} |")
     k, d, reg, s, y, h, r, n = tr[-1]
     assert r + h == 98
