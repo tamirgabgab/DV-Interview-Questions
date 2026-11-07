@@ -46,20 +46,16 @@ def test_part_a_numbers():
 
 
 def test_part_b_hardware():
-    # the datapath: 8r + 2r + d and four stages give (10r + d) mod 97 for every state and digit
-    assert all(q0099.step_hw(r, d) == (10 * r + d) % 97 for r in range(97) for d in range(10))
-    assert max((r << 3) + (r << 1) + d for r in range(97) for d in range(10)) == 969 < 1024 and 969 < 2 * 776
-    assert all(q0099.final_hw(r, h) == (27 * r + h) % 97 for r in range(97) for h in range(97))
-    assert 27 * 96 + 96 == 2688 < 2 * 1552 and 10**6 == 97 * 10309 + 27 and pow(10, 6, 97) == 27
-    # faster: two digits (3r + 10a + b <= 387, two stages) and a letter (3r + v <= 323)
-    assert all(q0099.step2_hw(r, a, b) == (100 * r + 10 * a + b) % 97 for r in range(97) for a in range(10) for b in range(10))
-    assert all(q0099.step_letter(r, v) == (100 * r + v) % 97 for r in range(97) for v in range(10, 36))
-    assert 3 * 96 + 99 == 387 < 388 and 3 * 96 + 35 == 323
+    # one step: 10x + d at most 969, 10 bits; the mod block gives (10x + d) mod 97
+    assert 10 * 96 + 9 == 969 < 1024
     # the figures: state 1 goes to 10..19, state 96 to 87..96; mod 3 adds d mod 3
     assert [q0099.step_hw(1, d) for d in range(10)] == list(range(10, 20))
     assert [q0099.step_hw(96, d) for d in range(10)] == list(range(87, 97)) and 960 % 97 == 87
     assert all((10 * r + d) % 3 == (r + d) % 3 for r in range(3) for d in range(10))
-    # the four versions agree with the reference on every string, and their costs
+    # six zeros multiply by 10^6; r + h <= 192, and mod 97 it is 1 only for 1 and 98
+    assert all((r * 10**6) % 97 == (r * pow(10, 6, 97)) % 97 for r in range(97))
+    assert [v for v in range(193) if v % 97 == 1] == [1, 98]
+    # the versions agree with the reference on every string, and their costs
     rng = random.Random(9)
     alnum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     strings = [q0099.norm(x) for x in q0099.EXAMPLES] + [q0099.norm(q0099.SLIP)] + q0099.random_ibans(100, seed=12)
@@ -67,30 +63,27 @@ def test_part_b_hardware():
                 + "".join(rng.choice(alnum) for _ in range(rng.randrange(1, 30))) for _ in range(800)]
     for s in strings:
         ds = q0099.stream(s)
-        for _, run in q0099.VERSIONS:
+        for run in (q0099.run_buffer, q0099.run_final, q0099.run_codes):
             assert run(ds)[0] == (q0099.mod97(s) == 1), s
     il = q0099.stream(IL)
     assert len(il) == 25 and len(IL) == 23
-    assert [run(il)[1:] for _, run in q0099.VERSIONS] == [(31, 34), (25, 17), (25, 15), (25, 14)]
-    # two digits a clock: 3 clocks of head, the 19 digits of the rest padded to 20, 10 clocks
-    assert 6 // 2 + (19 + 1) // 2 == 13
-    # the lower bound: 97 * 97 pairs (h, r) all told apart, more than 2^13
-    assert 97 * 97 == 9409 > 2**13 and q0099.states_needed() == 9895
+    assert [run(il)[1:] for run in (q0099.run_buffer, q0099.run_final, q0099.run_codes)] == [(31, 34), (31, 17), (25, 14)]
+    # the clock-by-clock table of the page: h = 93 after the head (182162 mod 97), r = 90
+    # after the rest, 5 after the tail, and 5 + 93 = 98
+    tr = q0099.trace_rows()
+    assert tr[5][5] == 93 == 182162 % 97 and tr[24][6] == 90 and tr[-1][6] == 5 and 5 + 93 == 98
+    assert (90 * 10**6) % 97 == 5 and len(tr) == 31
+    # the follow-ups: two digits a clock (3r + 10a + b <= 387) and a letter (3r + v), 13 clocks
+    assert all(q0099.step2_hw(r, a, b) == (100 * r + 10 * a + b) % 97 for r in range(97) for a in range(10) for b in range(10))
+    assert all(q0099.step_letter(r, v) == (100 * r + v) % 97 for r in range(97) for v in range(10, 36))
+    assert 3 * 96 + 99 == 387 and 6 // 2 + (19 + 1) // 2 == 13
+    # 14 with a 12-bit multiplier: 27r + h <= 2688; the lower bound 97 * 97 > 2^13
+    assert 27 * 96 + 96 == 2688 < 4096 and pow(10, 6, 97) == 27 and 97 * 97 == 9409 > 2**13
     for (h, r), (h2, r2) in [((5, 7), (5, 8)), ((5, 7), (6, 7)), ((0, 0), (96, 96))]:
-        told = False
-        for k in (2, 3):
-            for S in range(10**k):
-                a = (27 * ((10**k * r + S) % 97) + h) % 97 == 1
-                b = (27 * ((10**k * r2 + S) % 97) + h2) % 97 == 1
-                if a != b:
-                    told = True
-                    break
-            if told:
-                break
+        told = any(((27 * ((10**k * r + S) % 97) + h) % 97 == 1) != ((27 * ((10**k * r2 + S) % 97) + h2) % 97 == 1)
+                   for k in (2, 3) for S in range(10**k))
         assert told
-    # and 27 * 900 is not a multiple of 97, the step of the proof
     assert 27 * 900 % 97 != 0
-
 
 def test_part_c_check_digits():
     for s in q0099.random_ibans(300, seed=7) + [IL]:
@@ -219,14 +212,15 @@ def test_hardware_box_matches_the_reference():
     versions = [k for k, _ in q0099.VERSIONS]
     got = node_json(f"const m = {explorer_require()};"
                     f"console.log(JSON.stringify({json.dumps(strings)}.map((s) => [m.ihStream(s), {json.dumps(versions)}.map((v) => {{"
-                    "const t = m.ihTrace(m.ihStream(s), v); return [t.length, t[t.length - 1].ok, t[t.length - 1].regs]; })])));")
+                    "const t = m.ihTrace(m.ihStream(s), v); return [t.length, t[t.length - 1].ok]; })])));")
     for s, (ds, res) in zip(strings, got):
         assert ds == q0099.stream(s), s
-        for (name, run), (clocks, ok, regs) in zip(q0099.VERSIONS, res):
+        for (name, run), (clocks, ok) in zip(q0099.VERSIONS, res):
             want_ok, want_clocks, _ = run(q0099.stream(s))
             assert (clocks, ok) == (want_clocks, want_ok), (s, name)
-    steps = node_json(f"const m = {explorer_require()};console.log(JSON.stringify([...Array(97).keys()].map((r) => [...Array(10).keys()].map((d) => m.ihStep(r, d)))));")
-    assert steps == [[(10 * r + d) % 97 for d in range(10)] for r in range(97)]
+    # the trace of the page's IBAN, clock by clock, as the table of the page
+    tr = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.ihTrace(m.ihStream('{IL}'), 'final').map((e) => [e.regs.h, e.regs.r, e.regs.n])));")
+    assert tr == [[row[5], row[6], row[7]] for row in q0099.trace_rows()]
     cases = ["IL62 0108", "il620108", "IL6", "1L620", "IL62" + "0" * 30, "IL62" + "0" * 31]
     parsed = node_json(f"const m = {explorer_require()};console.log(JSON.stringify({json.dumps(cases)}.map(m.ihParse)));")
     assert parsed == ["IL620108", "IL620108", None, None, "IL62" + "0" * 30, None]

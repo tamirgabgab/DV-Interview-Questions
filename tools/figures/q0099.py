@@ -148,29 +148,6 @@ def run_buffer(digits) -> tuple[bool, int, int]:
     return r == 1, clocks, 6 * 4 + 3 + 7
 
 
-def run_two(digits) -> tuple[bool, int, int]:
-    """17 flip-flops: h and r (7 each) and a counter of the head (3)."""
-    h = r = n = 0
-    for d in digits:
-        if n < HEAD:
-            h, n = step_hw(h, d), n + 1
-        else:
-            r = step_hw(r, d)
-    return final_hw(r, h) == 1, len(digits), 7 + 7 + 3
-
-
-def run_shared(digits) -> tuple[bool, int, int]:
-    """15 flip-flops: during the head r counts its digits, a phase bit tells the two apart."""
-    h, r, head = 0, 0, 1
-    for d in digits:
-        if head:
-            h = step_hw(h, d)
-            r, head = (0, 0) if r == HEAD - 1 else (r + 1, 1)
-        else:
-            r = step_hw(r, d)
-    return final_hw(r, h) == 1, len(digits), 7 + 7 + 1
-
-
 def run_codes(digits) -> tuple[bool, int, int]:
     """14 flip-flops: r never holds 97..127 as a remainder, so 97 + k means "head digit k";
     after the sixth head digit r becomes 0. No other state."""
@@ -184,7 +161,26 @@ def run_codes(digits) -> tuple[bool, int, int]:
     return r < 97 and final_hw(r, h) == 1, len(digits), 7 + 7
 
 
-VERSIONS = (("buffer", run_buffer), ("two", run_two), ("shared", run_shared), ("codes", run_codes))
+def run_final(digits) -> tuple[bool, int, int]:
+    """The page's checker with blocks of at most 10 bits: 17 flip-flops (h, r, and n, a counter
+    of the tail). The head goes to h while r counts it in 97..102; the rest goes to r; after
+    the last digit six clocks feed the digit 0, which multiplies r by 10^6; then
+    r + h is 1 or 98 exactly when (R 10^6 + H) mod 97 = 1."""
+    h, r = 0, 97
+    for d in digits:
+        if r >= 97:
+            h = (10 * h + d) % 97
+            r = 0 if r == 97 + HEAD - 1 else r + 1
+        else:
+            r = (10 * r + d) % 97
+    if r >= 97:
+        return False, len(digits), 17
+    for _ in range(6):                          # the tail: n = 1..6
+        r = (10 * r) % 97
+    return r + h in (1, 98), len(digits) + 6, 7 + 7 + 3
+
+
+VERSIONS = (("buffer", run_buffer), ("final", run_final))     # the two of the page and its box
 
 
 def states_needed() -> int:
@@ -389,48 +385,64 @@ def fan_svg() -> str:
 
 
 def datapath_svg() -> str:
-    """The block diagram of the 14 flip-flop checker: the two registers, the multiplexer that
-    picks h in the head and r after it, 8x + 2x + d, the four compare-and-subtract stages,
-    the head's count kept in r (97 + k), and at the last digit (27 r + h) mod 97 = 1."""
-    W, H = 400, 470
+    """The block diagram of the checker (blocks of at most 10 bits and a mod 97 block): the
+    registers h and r, the counter n of the tail; the control (head = r >= 97, tail = n > 0)
+    drives the two multiplexers; one multiply-add and one mod 97; at the end y + h against 1
+    and 98."""
+    W, H = 400, 520
     def box(x, y, w, h, text, cls="ih-blk", sub=""):
         t = f'<g class="{cls}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="5"/>'
-        t += f'<text x="{x + w / 2:g}" y="{y + h / 2 + (0 if sub else 5):g}" text-anchor="middle">{text}</text>'
+        t += f'<text x="{x + w / 2:g}" y="{y + h / 2 + (-2 if sub else 5):g}" text-anchor="middle">{text}</text>'
         if sub:
-            t += f'<text class="ih-sub" x="{x + w / 2:g}" y="{y + h / 2 + 15:g}" text-anchor="middle">{sub}</text>'
+            t += f'<text class="ih-sub" x="{x + w / 2:g}" y="{y + h / 2 + 13:g}" text-anchor="middle">{sub}</text>'
         return t + "</g>"
     def line(pts, arrow=True, cls="ih-wire"):
         d = "M" + " L".join(f"{x:g},{y:g}" for x, y in pts)
         return f'<path class="{cls}" d="{d}"' + (' marker-end="url(#ih-hb)"' if arrow else "") + "/>"
+    def lab(x, y, t, anchor="middle"):
+        return f'<text class="ih-wlab" x="{x}" y="{y}" text-anchor="{anchor}">{t}</text>'
     o = [f'<svg class="figure ih-fig ih-dp" viewBox="0 0 {W} {H}" style="max-width:{W / 16:g}rem" role="img" '
-         'aria-label="תרשים המלבנים של הבודק עם 14 פליפ-פלופים : שני רגיסטרים של 7 ביטים, h ו-r. מרבב בוחר את h בזמן הראש '
-         'ואת r אחריו, מחשבים 8x ועוד 2x ועוד d, ואז ארבעה שלבים של השוואה וחיסור של 776, 388, 194 ו-97. בזמן הראש r סופר '
-         '97 ועוד k. בספרה האחרונה מחשבים 27r ועוד h מודולו 97 ובודקים שזה 1">', _arrow_defs("ih-hb")]
-    o.append(box(150, 10, 100, 30, "d[3:0]", "ih-blk ih-in"))
-    o.append(box(30, 60, 110, 40, "h", "ih-blk ih-reg", "7 D flip-flops"))
-    o.append(box(260, 60, 110, 40, "r", "ih-blk ih-reg", "7 D flip-flops"))
-    o.append(box(150, 128, 100, 34, "mux: r ≥ 97 ?", "ih-blk ih-mux"))
-    o.append(line([(85, 100), (85, 145), (150, 145)]))
-    o.append(line([(315, 100), (315, 145), (250, 145)]))
-    o.append(box(110, 186, 180, 40, "8x + 2x + d", "ih-blk ih-add", "two adders, ≤ 969"))
-    o.append(line([(200, 162), (200, 186)]))
-    o.append(line([(200, 40), (200, 52), (380, 52), (380, 206), (290, 206)]))
-    for k, m in enumerate((776, 388, 194, 97)):
-        x = 16 + k * 94
-        o.append(box(x, 250, 86, 40, f"≥ {m} ?", "ih-blk ih-stage", f"− {m}"))
-        if k:
-            o.append(line([(x - 8, 270), (x, 270)]))
-    o.append(line([(200, 226), (200, 238), (59, 238), (59, 250)]))
-    o.append(box(110, 314, 180, 40, "write h or r", "ih-blk ih-mux", "head: r ← r + 1"))
-    o.append(line([(345, 290), (345, 304), (290, 324)]))
-    o.append(line([(110, 334), (14, 334), (14, 80), (30, 80)]))
-    o.append(line([(290, 334), (392, 334), (392, 80), (370, 80)]))
-    o.append(box(30, 380, 150, 40, "27r + h", "ih-blk ih-add", "at the last digit"))
-    o.append(box(200, 380, 90, 40, "5 stages", "ih-blk ih-stage", "mod 97"))
-    o.append(box(310, 380, 70, 40, "= 1 ?", "ih-blk ih-out", "ok"))
-    o.append(line([(180, 400), (200, 400)]))
-    o.append(line([(290, 400), (310, 400)]))
-    o.append(f'<text class="ih-sub" x="200" y="452" text-anchor="middle">critical path: mux, two adders, four stages</text>')
+         'aria-label="תרשים המלבנים של הבודק : שלושה רגיסטרים, h ו-r של 7 ביטים ומונה n של 3 ביטים. הבקרה מחשבת head כש-r לפחות 97 '
+         'ו-tail כש-n גדול מ-0. מרבב בוחר את h בזמן הראש ואת r אחריו, מרבב שני מכניס 0 במקום הספרה בזמן הזנב, '
+         'בלוק אחד מחשב 10x ועוד הספרה ובלוק אחד mod 97. התוצאה נכתבת ל-h בזמן הראש ול-r אחריו. בסוף בודקים אם y ועוד h '
+         'שווה 1 או 98">', _arrow_defs("ih-hb")]
+    # the registers and the control
+    o.append(box(20, 14, 104, 44, "h", "ih-blk ih-reg", "7 flip-flops"))
+    o.append(box(148, 14, 104, 44, "r", "ih-blk ih-reg", "7 flip-flops"))
+    o.append(box(276, 14, 104, 44, "n", "ih-blk ih-reg", "3 flip-flops"))
+    o.append(box(148, 84, 104, 30, "r ≥ 97 ?", "ih-blk ih-ctl"))
+    o.append(box(276, 84, 104, 30, "n > 0 ?", "ih-blk ih-ctl"))
+    o.append(line([(200, 58), (200, 84)]))
+    o.append(line([(328, 58), (328, 84)]))
+    o.append(lab(144, 128, "head", "end"))
+    o.append(lab(326, 128, "tail", "end"))
+    # the two multiplexers
+    o.append(box(40, 150, 150, 36, "x = head ? h : r", "ih-blk ih-mux"))
+    o.append(box(220, 150, 150, 36, "e = tail ? 0 : d", "ih-blk ih-mux"))
+    o.append(line([(72, 58), (72, 150)]))
+    o.append(line([(170, 58), (170, 70), (134, 70), (134, 150)]))
+    o.append(line([(148, 114), (148, 132), (115, 132), (115, 150)]))
+    o.append(line([(330, 114), (330, 132), (295, 132), (295, 150)]))
+    o.append(lab(352, 134, "d[3:0]", "start"))
+    o.append(line([(350, 138), (350, 150)]))
+    # the arithmetic: one multiply-add, one mod 97
+    o.append(box(90, 214, 220, 44, "s = 10x + e", "ih-blk ih-add", "≤ 969, 10 bits"))
+    o.append(line([(115, 186), (115, 214)]))
+    o.append(line([(295, 186), (295, 214)]))
+    o.append(box(90, 284, 220, 44, "y = s mod 97", "ih-blk ih-stage", "0 .. 96"))
+    o.append(line([(200, 258), (200, 284)]))
+    # the write back
+    o.append(box(40, 356, 320, 44, "head: h ← y, r ← r + 1 (0 after 102)", "ih-blk ih-mux", "rest and tail: r ← y; tail: n ← n + 1"))
+    o.append(line([(200, 328), (200, 356)]))
+    o.append(line([(40, 378), (8, 378), (8, 36), (20, 36)]))
+    o.append(line([(360, 378), (392, 378), (392, 6), (200, 6), (200, 14)]))
+    o.append(line([(328, 6), (328, 14)]))
+    # the end: y + h against 1 and 98
+    o.append(box(40, 432, 140, 44, "y + h", "ih-blk ih-add", "≤ 192"))
+    o.append(box(220, 432, 140, 44, "= 1 or 98 ?", "ih-blk ih-out", "ok, n = 6"))
+    o.append(line([(110, 400), (110, 432)]))
+    o.append(line([(180, 454), (220, 454)]))
+    o.append(f'<text class="ih-sub" x="200" y="506" text-anchor="middle">one clock: a mux, 10x + e, mod 97</text>')
     return "".join(o) + "</svg>"
 
 
@@ -440,33 +452,56 @@ def legend_mod3() -> str:
             '<span><i class="ih-key-e2"></i>מוסיפות 2</span></span>')
 
 
-VERSION_ROWS = (
-    ("buffer", "שומרים את 6 ספרות הראש ומכניסים אותן שוב בסוף", "24 + 3 + 7"),
-    ("two", "שתי שאריות, h לראש ו-r לשאר, ומונה לראש", "7 + 7 + 3"),
-    ("shared", "המונה בתוך r, שלא בשימוש בזמן הראש, ועוד ביט של שלב", "7 + 7 + 1"),
-    ("codes", "הערכים 97 עד 102 של r הם שלבי הראש", "7 + 7"),
-)
+def trace_rows(iban: str = IL):
+    """The checker clock by clock: (clock, digit or 0, the register that goes in, 10x + e,
+    mod 97, h, r, n)."""
+    h, r, n, out = 0, 97, 0, []
+    for k, d in enumerate(stream(iban), 1):
+        if r >= 97:
+            s = 10 * h + d
+            h, r, reg = s % 97, (0 if r == 97 + HEAD - 1 else r + 1), "h"
+        else:
+            s = 10 * r + d
+            r, reg = s % 97, "r"
+        out.append((k, d, reg, s, s % 97, h, r, n))
+    for _ in range(6):
+        n += 1
+        s = 10 * r
+        r = s % 97
+        out.append((out[-1][0] + 1, 0, "r", s, r, h, r, n))
+    return out
 
 
-def versions_table() -> str:
-    il = stream(IL)
-    rows = ["| הגרסה | פליפ-פלופים | שעונים ל-IBAN הישראלי |", "|---|:-:|:-:|"]
-    for (key, text, parts), (_, run) in zip(VERSION_ROWS, VERSIONS):
-        ok, clocks, ff = run(il)
-        assert ok and ff == sum(int(x) for x in parts.split(" + "))
-        rows.append(f"| {text} | {RLM}{L(f'{parts} = {ff}')} | {clocks} |")
+def trace_table() -> str:
+    rows = ["| שעון | נכנס | מה נכנס לבלוקים | ‏10x + e | ‏mod 97 | אחרי השעון |", "|:-:|:-:|---|:-:|:-:|---|"]
+    tr = trace_rows()
+    show = list(range(0, 10)) + [None] + [24] + list(range(25, 31))
+    for i in show:
+        if i is None:
+            rows.append("| … | | | | | |")
+            continue
+        k, d, reg, s, y, h, r, n = tr[i]
+        what = (f"ספרת ראש, ‏{L(f'x = h = {tr[i - 1][5] if i else 0}')}" if i < HEAD else
+                f"ספרה, ‏{L(f'x = r = {tr[i - 1][6]}')}" if n == 0 else f"‏0 של הזנב, ‏{L(f'x = r = {tr[i - 1][6]}')}")
+        after = L(f"h = {h}, r = {r}") + (f", ‏{L(f'n = {n}')}" if n else "")
+        rows.append(f"| {k} | {d} | {what} | {s} | {y} | {RLM}{after} |")
+    k, d, reg, s, y, h, r, n = tr[-1]
+    assert r + h == 98
+    rows.append(f"| סוף | | ‏{L('y + h')} | | | {RLM}{L(f'{r} + {h} = {r + h}')}, תקין |")
     return "\n".join(rows)
 
 
-def faster_table() -> str:
-    il = norm(IL)
-    digits = len(stream(IL))
-    rest = digits - HEAD
-    pairs = HEAD // 2 + (rest + 1) // 2
-    rows = ["| בכל שעון | הצעד | השלבים | שעונים ל-IBAN הישראלי |", "|---|---|:-:|:-:|",
-            f"| ספרה, 4 ביטים | {RLM}{L('(10r + d) mod 97')} | 4 | {digits} |",
-            f"| תו, 6 ביטים, אות כערך אחד | {RLM}{L('(3r + v) mod 97')} לאות | 4 | {len(il)} |",
-            f"| שתי ספרות, 8 ביטים | {RLM}{L('(3r + 10a + b) mod 97')} | 2 | {pairs} |"]
+def versions_table() -> str:
+    """The way in and the way out, and the least with a wider multiplier."""
+    il = stream(IL)
+    ok1, c1, f1 = run_buffer(il)
+    ok2, c2, f2 = run_final(il)
+    ok3, c3, f3 = run_codes(il)
+    assert ok1 and ok2 and ok3 and (f1, c1, f2, c2, f3, c3) == (34, 31, 17, 31, 14, 25)
+    rows = ["| הבודק | פליפ-פלופים | שעונים ל-IBAN הישראלי |", "|---|:-:|:-:|",
+            f"| שומרים את 6 ספרות הראש ומכניסים אותן שוב בסוף | {RLM}{L('24 + 7 + 3 = 34')} | {c1} |",
+            f"| שארית לראש, שש ספרות 0 בסוף (הפתרון) | {RLM}{L('7 + 7 + 3 = 17')} | {c2} |",
+            f"| עם מכפל של 12 ביטים, ‏{L('(27r + h) mod 97')} | {RLM}{L('7 + 7 = 14')} | {c3} |"]
     return "\n".join(rows)
 
 
@@ -479,8 +514,8 @@ def blocks():
         legend_mod3(),
         fan_svg(),
         datapath_svg(),
+        trace_table(),
         versions_table(),
-        faster_table(),
         check_table(),
         moduli_table(),
     ]

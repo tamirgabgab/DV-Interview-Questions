@@ -186,37 +186,38 @@ added: 2026-11-07
 
 ### סעיף ב – בודק בחומרה, ספרה בכל שעון
 
-תכננו בודק IBAN בחומרה : רגיסטרים של פליפ-פלופים מסוג D, ולוגיקה צירופית של מחברים
-והשוואות, בלי חילוק. ה-IBAN מגיע כפי שהוא כתוב, ספרה אחת בכל שעון ב-4 ביטים. כל אות כבר
-פוצלה לשתי הספרות שלה, ולכן 6 הספרות הראשונות הן הראש : שתי האותיות ושתי ספרות הביקורת,
-שאחרי ההעברה שייכות לסוף. עם הספרה האחרונה מגיע האות `last`, ובאותו שעון הבודק אומר אם
-ה-IBAN תקין. כמה פליפ-פלופים צריך, וכמה שעונים? ואיך מקטינים את שניהם?
+תכננו בודק IBAN בחומרה : רגיסטרים של פליפ-פלופים מסוג D, ולוגיקה צירופית. מותר להניח
+בלוקים של כפל, חיבור וחיסור על מספרים של עד 10 ביטים, כלומר עד 1023, ובלוק שמחשב את השארית
+בחלוקה ל-97 של מספר כזה. ה-IBAN מגיע כפי שהוא כתוב, ספרה אחת בכל שעון ב-4 ביטים. כל אות כבר
+פוצלה לשתי הספרות שלה, ולכן 6 הספרות הראשונות הן הראש : שתי האותיות ושתי ספרות הביקורת. עם
+הספרה האחרונה מגיע האות `last`. תארו את כל הארכיטקטורה : אילו רגיסטרים, אילו בלוקים, מה
+בוחר ביניהם בכל שעון, ומתי יוצאת התשובה.
 
 ??? tip "רמז 1"
-    כמה ערכים שונים יכולה לקבל השארית? כמה פליפ-פלופים צריך כדי לזכור אחד מהם?
+    מספר בן 25 ספרות לא נכנס לשום רגיסטר. מה מספיק לזכור ממנו אחרי כל ספרה?
 
 ??? tip "רמז 2"
-    הראש מגיע ראשון אבל שייך לסוף. אם \( R \) הוא המספר של השאר ו-\( H \) המספר של 6
-    ספרות הראש, המספר כולו הוא \( R \cdot 10^6 + H \). מה זה \( 10^6 \bmod 97 \)?
+    הראש מגיע ראשון אבל בבדיקה הוא בסוף המספר. מה קורה למספר כשכותבים אחריו עוד 6 ספרות?
 
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"
-        **‏14 פליפ-פלופים ו-25 שעונים.** הבודק הוא מכונת מצבים של השארית : 97 מצבים, 7
-        פליפ-פלופים, ובכל שעון \( r \to (10r + d) \bmod 97 \), שהלוגיקה מחשבת כ-\( 8r + 2r + d \)
-        ועוד ארבעה שלבים של השוואה וחיסור. את הראש לא שומרים : שארית נפרדת \( h \) לשש
-        הספרות הראשונות, ובסוף בודקים \( (27r + h) \bmod 97 = 1 \), כי \( 10^6 \equiv 27 \).
-        את ספרות הראש סופרים בערכים 97 עד 102 של \( r \), שאף שארית לא משתמשת בהם. ‏14 הוא
-        גם המינימום : יש 9,409 זוגות \( (h, r) \) שהבודק חייב להבדיל ביניהם, יותר
-        מ-\( 2^{13} \).
+        **שלושה רגיסטרים, 17 פליפ-פלופים, ושני בלוקים של חשבון.** בכל שעון בלוק אחד מחשב
+        \( 10x + d \) ובלוק אחד את השארית בחלוקה ל-97, כש-\( x \) הוא אחד משני רגיסטרים של 7
+        ביטים : \( h \), השארית של 6 ספרות הראש, ו-\( r \), השארית של כל השאר. אחרי הספרה
+        האחרונה הבודק מכניס עוד 6 פעמים את הספרה 0, וכך \( r \) הופך לשארית של
+        \( R \cdot 10^6 \) : השאר, מוזז 6 ספרות שמאלה, בדיוק כמו אחרי ההעברה. מונה של 3 ביטים
+        סופר את 6 השעונים האלה. בסוף ה-IBAN תקין אם ורק אם \( r + h \) הוא 1 או 98.
 
-    <!-- cost: פליפ-פלופים 14 | שעונים 25 | שלבים 4 בשעון -->
+    <!-- cost: פליפ-פלופים 17 | שעונים 31 | בלוקים בשעון 2 -->
 
     #### הרעיון { .sol-idea }
 
-    בסעיף א ראינו שאחרי כל ספרה מספיק לזכור את השארית של מה שנקרא עד עכשיו. לכן הבודק הוא
-    **מכונת מצבים** : מצב לכל שארית, 0 עד 96, ובכל שעון מעבר לפי הספרה,
-    \( r \to (10r + d) \bmod 97 \). כך נראית אותה מכונה כשמחלקים ב-3 במקום ב-97 : שלושה
-    מצבים, ו-\( 10 \equiv 1 \pmod 3 \), כך שכל ספרה מוסיפה לשארית את השארית שלה עצמה :
+    **רעיון 1 : לזכור רק את השארית.** כשמגיעה ספרה \( d \), המספר שנקרא עד עכשיו, \( a \),
+    הופך ל-\( 10a + d \), והשארית החדשה תלויה רק בשארית הקודמת :
+    \( r \to (10r + d) \bmod 97 \). השארית היא בין 0 ל-96, ולכן מספיקים 7 ביטים. זו **מכונת
+    מצבים** : מצב לכל שארית, ובכל שעון מעבר לפי הספרה. כך נראית אותה מכונה כשמחלקים ב-3
+    במקום ב-97 : שלושה מצבים, ו-\( 10 \equiv 1 \pmod 3 \), כך שכל ספרה מוסיפה לשארית את השארית
+    שלה עצמה :
 
     <!-- gen 2 -->
 
@@ -239,45 +240,83 @@ added: 2026-11-07
 
     <!-- /gen -->
 
-    **מהמצבים לפליפ-פלופים.** ‏97 מצבים צריכים \( \lceil \log_2 97 \rceil = 7 \) ביטים. הקידוד
-    הטבעי הוא השארית עצמה בבינארי, וכך הלוגיקה של המעבר היא חשבון : ‏\( 10r = 8r + 2r \) הוא
-    שתי הזזות ומחבר, ‏\( 10r + d \) לכל היותר 969, עשרה ביטים, ואת המודולו מקבלים בארבעה
-    שלבים, שכל אחד מהם משווה ומחסר כפולה של 97, מהגדולה לקטנה :
+    **רעיון 2 : החשבון נכנס ב-10 ביטים.** ‏\( 10r + d \le 10 \cdot 96 + 9 = 969 \), ולכן בלוק
+    אחד של כפל וחיבור ובלוק אחד של mod 97 מחשבים את המעבר בשעון אחד.
+
+    **רעיון 3 : הראש בלי לשמור אותו.** אחרי ההעברה המספר הוא השאר ואחריו 6 ספרות הראש :
+    \( N = R \cdot 10^6 + H \). כתיבה של 6 ספרות אחרי \( R \) מזיזה אותו 6 מקומות שמאלה,
+    כלומר מכפילה ב-\( 10^6 \), ו-\( H \) נוסף. לכן :
+
+    - את 6 ספרות הראש מחשבים לרגיסטר משלהן, \( h = H \bmod 97 \), באותם בלוקים.
+    - את השאר מחשבים ל-\( r = R \bmod 97 \).
+    - את ההזזה ב-\( 10^6 \) עושים כמו שהיא נשמעת : עוד 6 שעונים שבהם נכנסת הספרה 0. כל אחד
+      מהם מכפיל את \( r \) ב-10, ובסוף \( r = R \cdot 10^6 \bmod 97 \).
+    - ‏\( N \bmod 97 = (r + h) \bmod 97 \). ‏\( r + h \le 192 \), ולכן השארית היא 1 אם ורק אם
+      \( r + h \) הוא 1 או 98. מספיקים מחבר והשוואה.
+
+    **הארכיטקטורה.** כל זה יחד, בתרשים אחד :
 
     <!-- gen 5 -->
 
-    <svg class="figure ih-fig ih-dp" viewBox="0 0 400 470" style="max-width:25rem" role="img" aria-label="תרשים המלבנים של הבודק עם 14 פליפ-פלופים : שני רגיסטרים של 7 ביטים, h ו-r. מרבב בוחר את h בזמן הראש ואת r אחריו, מחשבים 8x ועוד 2x ועוד d, ואז ארבעה שלבים של השוואה וחיסור של 776, 388, 194 ו-97. בזמן הראש r סופר 97 ועוד k. בספרה האחרונה מחשבים 27r ועוד h מודולו 97 ובודקים שזה 1"><defs><marker id="ih-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path class="ih-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs><g class="ih-blk ih-in"><rect x="150" y="10" width="100" height="30" rx="5"/><text x="200" y="30" text-anchor="middle">d[3:0]</text></g><g class="ih-blk ih-reg"><rect x="30" y="60" width="110" height="40" rx="5"/><text x="85" y="80" text-anchor="middle">h</text><text class="ih-sub" x="85" y="95" text-anchor="middle">7 D flip-flops</text></g><g class="ih-blk ih-reg"><rect x="260" y="60" width="110" height="40" rx="5"/><text x="315" y="80" text-anchor="middle">r</text><text class="ih-sub" x="315" y="95" text-anchor="middle">7 D flip-flops</text></g><g class="ih-blk ih-mux"><rect x="150" y="128" width="100" height="34" rx="5"/><text x="200" y="150" text-anchor="middle">mux: r ≥ 97 ?</text></g><path class="ih-wire" d="M85,100 L85,145 L150,145" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M315,100 L315,145 L250,145" marker-end="url(#ih-hb)"/><g class="ih-blk ih-add"><rect x="110" y="186" width="180" height="40" rx="5"/><text x="200" y="206" text-anchor="middle">8x + 2x + d</text><text class="ih-sub" x="200" y="221" text-anchor="middle">two adders, ≤ 969</text></g><path class="ih-wire" d="M200,162 L200,186" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M200,40 L200,52 L380,52 L380,206 L290,206" marker-end="url(#ih-hb)"/><g class="ih-blk ih-stage"><rect x="16" y="250" width="86" height="40" rx="5"/><text x="59" y="270" text-anchor="middle">≥ 776 ?</text><text class="ih-sub" x="59" y="285" text-anchor="middle">− 776</text></g><g class="ih-blk ih-stage"><rect x="110" y="250" width="86" height="40" rx="5"/><text x="153" y="270" text-anchor="middle">≥ 388 ?</text><text class="ih-sub" x="153" y="285" text-anchor="middle">− 388</text></g><path class="ih-wire" d="M102,270 L110,270" marker-end="url(#ih-hb)"/><g class="ih-blk ih-stage"><rect x="204" y="250" width="86" height="40" rx="5"/><text x="247" y="270" text-anchor="middle">≥ 194 ?</text><text class="ih-sub" x="247" y="285" text-anchor="middle">− 194</text></g><path class="ih-wire" d="M196,270 L204,270" marker-end="url(#ih-hb)"/><g class="ih-blk ih-stage"><rect x="298" y="250" width="86" height="40" rx="5"/><text x="341" y="270" text-anchor="middle">≥ 97 ?</text><text class="ih-sub" x="341" y="285" text-anchor="middle">− 97</text></g><path class="ih-wire" d="M290,270 L298,270" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M200,226 L200,238 L59,238 L59,250" marker-end="url(#ih-hb)"/><g class="ih-blk ih-mux"><rect x="110" y="314" width="180" height="40" rx="5"/><text x="200" y="334" text-anchor="middle">write h or r</text><text class="ih-sub" x="200" y="349" text-anchor="middle">head: r ← r + 1</text></g><path class="ih-wire" d="M345,290 L345,304 L290,324" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M110,334 L14,334 L14,80 L30,80" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M290,334 L392,334 L392,80 L370,80" marker-end="url(#ih-hb)"/><g class="ih-blk ih-add"><rect x="30" y="380" width="150" height="40" rx="5"/><text x="105" y="400" text-anchor="middle">27r + h</text><text class="ih-sub" x="105" y="415" text-anchor="middle">at the last digit</text></g><g class="ih-blk ih-stage"><rect x="200" y="380" width="90" height="40" rx="5"/><text x="245" y="400" text-anchor="middle">5 stages</text><text class="ih-sub" x="245" y="415" text-anchor="middle">mod 97</text></g><g class="ih-blk ih-out"><rect x="310" y="380" width="70" height="40" rx="5"/><text x="345" y="400" text-anchor="middle">= 1 ?</text><text class="ih-sub" x="345" y="415" text-anchor="middle">ok</text></g><path class="ih-wire" d="M180,400 L200,400" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M290,400 L310,400" marker-end="url(#ih-hb)"/><text class="ih-sub" x="200" y="452" text-anchor="middle">critical path: mux, two adders, four stages</text></svg>
+    <svg class="figure ih-fig ih-dp" viewBox="0 0 400 520" style="max-width:25rem" role="img" aria-label="תרשים המלבנים של הבודק : שלושה רגיסטרים, h ו-r של 7 ביטים ומונה n של 3 ביטים. הבקרה מחשבת head כש-r לפחות 97 ו-tail כש-n גדול מ-0. מרבב בוחר את h בזמן הראש ואת r אחריו, מרבב שני מכניס 0 במקום הספרה בזמן הזנב, בלוק אחד מחשב 10x ועוד הספרה ובלוק אחד mod 97. התוצאה נכתבת ל-h בזמן הראש ול-r אחריו. בסוף בודקים אם y ועוד h שווה 1 או 98"><defs><marker id="ih-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path class="ih-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs><g class="ih-blk ih-reg"><rect x="20" y="14" width="104" height="44" rx="5"/><text x="72" y="34" text-anchor="middle">h</text><text class="ih-sub" x="72" y="49" text-anchor="middle">7 flip-flops</text></g><g class="ih-blk ih-reg"><rect x="148" y="14" width="104" height="44" rx="5"/><text x="200" y="34" text-anchor="middle">r</text><text class="ih-sub" x="200" y="49" text-anchor="middle">7 flip-flops</text></g><g class="ih-blk ih-reg"><rect x="276" y="14" width="104" height="44" rx="5"/><text x="328" y="34" text-anchor="middle">n</text><text class="ih-sub" x="328" y="49" text-anchor="middle">3 flip-flops</text></g><g class="ih-blk ih-ctl"><rect x="148" y="84" width="104" height="30" rx="5"/><text x="200" y="104" text-anchor="middle">r ≥ 97 ?</text></g><g class="ih-blk ih-ctl"><rect x="276" y="84" width="104" height="30" rx="5"/><text x="328" y="104" text-anchor="middle">n > 0 ?</text></g><path class="ih-wire" d="M200,58 L200,84" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M328,58 L328,84" marker-end="url(#ih-hb)"/><text class="ih-wlab" x="144" y="128" text-anchor="end">head</text><text class="ih-wlab" x="326" y="128" text-anchor="end">tail</text><g class="ih-blk ih-mux"><rect x="40" y="150" width="150" height="36" rx="5"/><text x="115" y="173" text-anchor="middle">x = head ? h : r</text></g><g class="ih-blk ih-mux"><rect x="220" y="150" width="150" height="36" rx="5"/><text x="295" y="173" text-anchor="middle">e = tail ? 0 : d</text></g><path class="ih-wire" d="M72,58 L72,150" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M170,58 L170,70 L134,70 L134,150" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M148,114 L148,132 L115,132 L115,150" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M330,114 L330,132 L295,132 L295,150" marker-end="url(#ih-hb)"/><text class="ih-wlab" x="352" y="134" text-anchor="start">d[3:0]</text><path class="ih-wire" d="M350,138 L350,150" marker-end="url(#ih-hb)"/><g class="ih-blk ih-add"><rect x="90" y="214" width="220" height="44" rx="5"/><text x="200" y="234" text-anchor="middle">s = 10x + e</text><text class="ih-sub" x="200" y="249" text-anchor="middle">≤ 969, 10 bits</text></g><path class="ih-wire" d="M115,186 L115,214" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M295,186 L295,214" marker-end="url(#ih-hb)"/><g class="ih-blk ih-stage"><rect x="90" y="284" width="220" height="44" rx="5"/><text x="200" y="304" text-anchor="middle">y = s mod 97</text><text class="ih-sub" x="200" y="319" text-anchor="middle">0 .. 96</text></g><path class="ih-wire" d="M200,258 L200,284" marker-end="url(#ih-hb)"/><g class="ih-blk ih-mux"><rect x="40" y="356" width="320" height="44" rx="5"/><text x="200" y="376" text-anchor="middle">head: h ← y, r ← r + 1 (0 after 102)</text><text class="ih-sub" x="200" y="391" text-anchor="middle">rest and tail: r ← y; tail: n ← n + 1</text></g><path class="ih-wire" d="M200,328 L200,356" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M40,378 L8,378 L8,36 L20,36" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M360,378 L392,378 L392,6 L200,6 L200,14" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M328,6 L328,14" marker-end="url(#ih-hb)"/><g class="ih-blk ih-add"><rect x="40" y="432" width="140" height="44" rx="5"/><text x="110" y="452" text-anchor="middle">y + h</text><text class="ih-sub" x="110" y="467" text-anchor="middle">≤ 192</text></g><g class="ih-blk ih-out"><rect x="220" y="432" width="140" height="44" rx="5"/><text x="290" y="452" text-anchor="middle">= 1 or 98 ?</text><text class="ih-sub" x="290" y="467" text-anchor="middle">ok, n = 6</text></g><path class="ih-wire" d="M110,400 L110,432" marker-end="url(#ih-hb)"/><path class="ih-wire" d="M180,454 L220,454" marker-end="url(#ih-hb)"/><text class="ih-sub" x="200" y="506" text-anchor="middle">one clock: a mux, 10x + e, mod 97</text></svg>
 
     <!-- /gen -->
 
-    **הראש.** הדרך הישירה שומרת את 6 ספרות הראש, 24 פליפ-פלופים, ומכניסה אותן שוב אחרי
-    השאר, בשישה שעונים נוספים. אבל \( 10^6 \equiv 27 \pmod{97} \), ולכן מספיק לשמור את
-    השארית של הראש, \( h \) : בסוף \( N \bmod 97 = (27r + h) \bmod 97 \). את מספר ספרות הראש
-    צריך לספור, וכאן נחסכים עוד פליפ-פלופים : בזמן הראש \( r \) לא בשימוש, ושארית אף פעם לא
-    מגיעה ל-97. לכן \( r = 97 + k \) אומר "ספרה \( k \) של הראש", ואין צורך במונה :
+    - **הרגיסטרים :** ‏\( h \) ו-\( r \), 7 פליפ-פלופים כל אחד, ומונה \( n \) של 3 פליפ-פלופים.
+      אחרי איפוס \( h = 0 \), ‏\( r = 97 \) ו-\( n = 0 \).
+    - **הבקרה :** שני אותות שמחושבים מהרגיסטרים עצמם. ‏`head` הוא \( r \ge 97 \) : שארית אף פעם
+      לא מגיעה ל-97, ולכן בזמן הראש \( r \) שומר בערכים 97 עד 102 את מספר ספרות הראש שעברו,
+      בלי מונה נוסף. ‏`tail` הוא \( n > 0 \), השעונים של ה-0 בסוף.
+    - **המרבב הראשון :** \( x = \) `head` ? \( h \) : \( r \). רק נתיב חשבון אחד, ושתי השאריות
+      משתמשות בו לפי התור.
+    - **המרבב השני :** \( e = \) `tail` ? 0 : \( d \). בזנב נכנסת הספרה 0 במקום הקלט.
+    - **החשבון :** \( s = 10x + e \), לכל היותר 969, ואחריו \( y = s \bmod 97 \).
+    - **הכתיבה :** בראש \( h \leftarrow y \) ו-\( r \leftarrow r + 1 \), ואחרי 102,
+      \( r \leftarrow 0 \). אחר כך \( r \leftarrow y \). בזנב גם \( n \leftarrow n + 1 \), ו-`last`
+      מתחיל אותו, \( n \leftarrow 1 \).
+    - **המונה :** \( n \) לא סופר כל הזמן. כש-\( n = 0 \) הוא כבוי ולא זז, וזה המצב שלו
+      בכל הראש והשאר. ‏`last` טוען לתוכו 1. כל עוד \( n \ne 0 \) הוא עולה ב-1 בכל שעון, וכש-\( n = 6 \)
+      השעון הבא טוען 0 ולא 7 : \( n \leftarrow (n = 6)\ ?\ 0 : n + 1 \). לכן הוא לא מסתובב, אלא
+      עובר פעם אחת 1, 2, ... 6, חוזר ל-0 ונשאר שם עד ה-`last` הבא.
+    - **התשובה :** בשעון שבו \( n = 6 \), ‏`done` עולה, ו-`ok` אומר אם \( y + h \) הוא 1 או 98.
+
+    כך עובר דרכו ה-IBAN של העמוד, שעון אחרי שעון :
 
     <!-- gen 6 -->
 
-    | הגרסה | פליפ-פלופים | שעונים ל-IBAN הישראלי |
-    |---|:-:|:-:|
-    | שומרים את 6 ספרות הראש ומכניסים אותן שוב בסוף | ‏<span dir="ltr">24 + 3 + 7 = 34</span> | 31 |
-    | שתי שאריות, h לראש ו-r לשאר, ומונה לראש | ‏<span dir="ltr">7 + 7 + 3 = 17</span> | 25 |
-    | המונה בתוך r, שלא בשימוש בזמן הראש, ועוד ביט של שלב | ‏<span dir="ltr">7 + 7 + 1 = 15</span> | 25 |
-    | הערכים 97 עד 102 של r הם שלבי הראש | ‏<span dir="ltr">7 + 7 = 14</span> | 25 |
+    | שעון | נכנס | מה נכנס לבלוקים | ‏10x + e | ‏mod 97 | אחרי השעון |
+    |:-:|:-:|---|:-:|:-:|---|
+    | 1 | 1 | ספרת ראש, ‏<span dir="ltr">x = h = 0</span> | 1 | 1 | ‏<span dir="ltr">h = 1, r = 98</span> |
+    | 2 | 8 | ספרת ראש, ‏<span dir="ltr">x = h = 1</span> | 18 | 18 | ‏<span dir="ltr">h = 18, r = 99</span> |
+    | 3 | 2 | ספרת ראש, ‏<span dir="ltr">x = h = 18</span> | 182 | 85 | ‏<span dir="ltr">h = 85, r = 100</span> |
+    | 4 | 1 | ספרת ראש, ‏<span dir="ltr">x = h = 85</span> | 851 | 75 | ‏<span dir="ltr">h = 75, r = 101</span> |
+    | 5 | 6 | ספרת ראש, ‏<span dir="ltr">x = h = 75</span> | 756 | 77 | ‏<span dir="ltr">h = 77, r = 102</span> |
+    | 6 | 2 | ספרת ראש, ‏<span dir="ltr">x = h = 77</span> | 772 | 93 | ‏<span dir="ltr">h = 93, r = 0</span> |
+    | 7 | 0 | ספרה, ‏<span dir="ltr">x = r = 0</span> | 0 | 0 | ‏<span dir="ltr">h = 93, r = 0</span> |
+    | 8 | 1 | ספרה, ‏<span dir="ltr">x = r = 0</span> | 1 | 1 | ‏<span dir="ltr">h = 93, r = 1</span> |
+    | 9 | 0 | ספרה, ‏<span dir="ltr">x = r = 1</span> | 10 | 10 | ‏<span dir="ltr">h = 93, r = 10</span> |
+    | 10 | 8 | ספרה, ‏<span dir="ltr">x = r = 10</span> | 108 | 11 | ‏<span dir="ltr">h = 93, r = 11</span> |
+    | … | | | | | |
+    | 25 | 9 | ספרה, ‏<span dir="ltr">x = r = 76</span> | 769 | 90 | ‏<span dir="ltr">h = 93, r = 90</span> |
+    | 26 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 90</span> | 900 | 27 | ‏<span dir="ltr">h = 93, r = 27</span>, ‏<span dir="ltr">n = 1</span> |
+    | 27 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 27</span> | 270 | 76 | ‏<span dir="ltr">h = 93, r = 76</span>, ‏<span dir="ltr">n = 2</span> |
+    | 28 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 76</span> | 760 | 81 | ‏<span dir="ltr">h = 93, r = 81</span>, ‏<span dir="ltr">n = 3</span> |
+    | 29 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 81</span> | 810 | 34 | ‏<span dir="ltr">h = 93, r = 34</span>, ‏<span dir="ltr">n = 4</span> |
+    | 30 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 34</span> | 340 | 49 | ‏<span dir="ltr">h = 93, r = 49</span>, ‏<span dir="ltr">n = 5</span> |
+    | 31 | 0 | ‏0 של הזנב, ‏<span dir="ltr">x = r = 49</span> | 490 | 5 | ‏<span dir="ltr">h = 93, r = 5</span>, ‏<span dir="ltr">n = 6</span> |
+    | סוף | | ‏<span dir="ltr">y + h</span> | | | ‏<span dir="ltr">5 + 93 = 98</span>, תקין |
 
     <!-- /gen -->
 
-    **מהר יותר.** ‏\( 100 = 97 + 3 \), ולכן שתי ספרות בבת אחת הן \( (3r + 10a + b) \bmod 97 \).
-    הסכום לכל היותר 387, ומספיקים שני שלבים, 194 ו-97 : חצי מהשעונים, ונתיב קצר יותר. אות
-    שלמה בשעון אחד היא אותו רעיון, \( (3r + v) \bmod 97 \) :
+    ובהשוואה לדרך הישירה, ששומרת את 6 ספרות הראש ומכניסה אותן שוב בסוף :
 
     <!-- gen 7 -->
 
-    | בכל שעון | הצעד | השלבים | שעונים ל-IBAN הישראלי |
-    |---|---|:-:|:-:|
-    | ספרה, 4 ביטים | ‏<span dir="ltr">(10r + d) mod 97</span> | 4 | 25 |
-    | תו, 6 ביטים, אות כערך אחד | ‏<span dir="ltr">(3r + v) mod 97</span> לאות | 4 | 23 |
-    | שתי ספרות, 8 ביטים | ‏<span dir="ltr">(3r + 10a + b) mod 97</span> | 2 | 13 |
+    | הבודק | פליפ-פלופים | שעונים ל-IBAN הישראלי |
+    |---|:-:|:-:|
+    | שומרים את 6 ספרות הראש ומכניסים אותן שוב בסוף | ‏<span dir="ltr">24 + 7 + 3 = 34</span> | 31 |
+    | שארית לראש, שש ספרות 0 בסוף (הפתרון) | ‏<span dir="ltr">7 + 7 + 3 = 17</span> | 31 |
+    | עם מכפל של 12 ביטים, ‏<span dir="ltr">(27r + h) mod 97</span> | ‏<span dir="ltr">7 + 7 = 14</span> | 25 |
 
     <!-- /gen -->
 
@@ -285,40 +324,19 @@ added: 2026-11-07
 
     <div class="steps" markdown>
 
-    1. **השארית :** רגיסטר \( r \) של 7 פליפ-פלופים. בכל שעון \( s = 8r + 2r + d \), ואחריו
-       ארבעה שלבים : אם \( s \ge 776 \) מחסרים 776, וכך גם 388, ‏194 ו-97.
-    2. **הראש :** רגיסטר \( h \) של 7 פליפ-פלופים מקבל את שש הספרות הראשונות באותו צעד, דרך
-       מרבב שבוחר בין \( h \) ל-\( r \).
-    3. **הספירה :** אחרי איפוס \( r = 97 \). כל ספרת ראש מעלה את \( r \) ב-1, ואחרי
-       השישית, ב-\( r = 102 \), ‏\( r \leftarrow 0 \).
-    4. **התשובה :** בשעון של הספרה האחרונה, \( (27r + h) \bmod 97 = 1 \), עם
-       \( 27r = 16r + 8r + 2r + r \) וחמישה שלבים, 1552 עד 97.
+    1. **הראש, 6 שעונים :** ‏`head` דולק, \( h \leftarrow (10h + d) \bmod 97 \), ו-\( r \) סופר
+       97, 98, ... 102, ואז 0.
+    2. **השאר, שעון לכל ספרה :** \( r \leftarrow (10r + d) \bmod 97 \). ‏\( h \) לא משתנה.
+    3. **הזנב, 6 שעונים :** `last` מדליק את המונה. \( r \leftarrow 10r \bmod 97 \), והמונה עולה
+       עד 6.
+    4. **התשובה :** בשעון השישי של הזנב, תקין אם ורק אם \( y + h \in \{1, 98\} \).
 
     </div>
 
     #### הקוד { .sol-code }
 
     === "Python"
-        ```python title="check_stream" linenums="1" hl_lines="4 5 6 7 31 32 33"
-        def step(r, d):
-            """(10r + d) mod 97 the way the hardware does it: shifts and adders, then four
-            compare-and-subtract stages. No division."""
-            s = (r << 3) + (r << 1) + d                          # (1)!
-            for m in (776, 388, 194, 97):                        # (2)!
-                if s >= m:
-                    s -= m
-            return s
-
-
-        def finish(r, h):
-            """(27r + h) mod 97: the head's 6 digits come after the rest, and 10^6 = 27 mod 97."""
-            s = (r << 4) + (r << 3) + (r << 1) + r + h           # 27r + h, at most 2688
-            for m in (1552, 776, 388, 194, 97):
-                if s >= m:
-                    s -= m
-            return s
-
-
+        ```python title="check_stream" linenums="1" hl_lines="12 13 15 18 19 20"
         def stream(iban):
             """The digits as they arrive: the IBAN as written, every letter as two digits."""
             s = iban.replace(" ", "").upper()
@@ -326,105 +344,88 @@ added: 2026-11-07
 
 
         def check_stream(digits):
-            """The checker, a digit a clock, with two 7-bit registers and nothing else:
-            r = 97 + k means "digit k of the head", which no remainder can be."""
-            h, r = 0, 97                                         # (3)!
+            """The checker, a clock a line: h and r (7 bits), and 6 clocks of the digit 0 at the
+            end. r = 97 + k means "digit k of the head", which no remainder can be."""
+            h, r = 0, 97                                         # (1)!
             for d in digits:
-                if r >= 97:
-                    h = step(h, d)
-                    r = 0 if r == 102 else r + 1
+                if r >= 97:                                      # head
+                    h, r = (10 * h + d) % 97, (0 if r == 102 else r + 1)
                 else:
-                    r = step(r, d)
-            return r < 97 and finish(r, h) == 1
+                    r = (10 * r + d) % 97                        # (2)!
+            if r >= 97:
+                return False                                     # shorter than the head
+            for n in range(1, 7):                                # (3)!
+                r = (10 * r + 0) % 97
+            return r + h in (1, 98)                              # (4)!
         ```
 
-        1. ‏`r << 3` הוא \( 8r \) ו-`r << 1` הוא \( 2r \) : בחומרה אלה רק חוטים, והסכום הוא
-           שני מחברים. ‏\( 10 \cdot 96 + 9 = 969 \), עשרה ביטים.
-        2. ארבעה שלבים, כפולות של 97 מהגדולה לקטנה : 8, 4, 2 ו-1 כפול 97. כל שלב הוא מחסר
-           שהלווה שלו אומר אם \( s \ge m \), ומרבב שבוחר את \( s \) או את \( s - m \).
-        3. המצב אחרי איפוס : \( r = 97 \), ספרה 0 של הראש. ‏14 הפליפ-פלופים הם \( h \) ו-\( r \).
+        1. המצב אחרי איפוס : ‏\( h = 0 \), ו-\( r = 97 \), ספרה 0 של הראש.
+        2. אותם שני בלוקים, \( 10x + e \) ו-mod 97, רק עם \( x = r \).
+        3. הזנב : 6 פעמים הספרה 0, כלומר \( r \) כפול \( 10^6 \). בחומרה המונה \( n \) סופר אותם.
+        4. ‏\( r + h \le 192 \), ולכן \( (r + h) \bmod 97 = 1 \) רק כשהסכום 1 או 98.
 
     === "SystemVerilog"
-        ```systemverilog title="module iban_checker" linenums="1" hl_lines="11 15 16 17 18 19 35 37 38"
+        ```systemverilog title="module iban_checker" linenums="1" hl_lines="15 16 17 18 19 20 21 23 24 28 30 31"
         // One digit a clock: the IBAN as written, every letter already split into its two
-        // digits, so the first 6 digits are the head. 14 flip-flops: h and r.
+        // digits, so the first 6 digits are the head. 17 flip-flops: h, r and the counter n.
         module iban_checker (
           input  logic       clk, rst_n,
           input  logic       start,          // a new IBAN: this clock's digit is its first
           input  logic       valid,          // d holds a digit this clock
           input  logic       last,           // d is the IBAN's last digit
           input  logic [3:0] d,
-          output logic       ok);            // with last: the IBAN is valid
+          output logic       done,           // one clock, at the end of the tail
+          output logic       ok);            // with done: the IBAN is valid
 
           logic [6:0] h, r;                  // r = 97 + k: digit k of the head
-
-          function automatic logic [6:0] step(logic [6:0] x, logic [3:0] v);
-            logic [9:0] s;
-            s = {x, 3'b000} + {x, 1'b0} + 10'(v);       // 8x + 2x + v, at most 969
-            if (s >= 776) s -= 776;
-            if (s >= 388) s -= 388;
-            if (s >= 194) s -= 194;
-            if (s >= 97)  s -= 97;
-            return s[6:0];
-          endfunction
-
-          function automatic logic [6:0] finish(logic [6:0] x, logic [6:0] y);
-            logic [11:0] s;
-            s = {x, 4'b0} + {x, 3'b0} + {x, 1'b0} + 12'(x) + 12'(y);   // 27x + y
-            if (s >= 1552) s -= 1552;
-            if (s >= 776)  s -= 776;
-            if (s >= 388)  s -= 388;
-            if (s >= 194)  s -= 194;
-            if (s >= 97)   s -= 97;
-            return s[6:0];
-          endfunction
+          logic [2:0] n;                     // the tail: 1 .. 6
 
           wire [6:0] rr = start ? 7'd97 : r, hh = start ? 7'd0 : h;
           wire       head = rr >= 7'd97;
-          wire [6:0] h_next = head ? step(hh, d) : hh;
-          wire [6:0] r_next = head ? (rr == 7'd102 ? 7'd0 : rr + 7'd1) : step(rr, d);
-          assign ok = valid && last && !head && finish(r_next, h_next) == 7'd1;
+          wire       tail = n != 0;
+          wire [6:0] x = head ? hh : rr;                     // the first multiplexer
+          wire [3:0] e = tail ? 4'd0 : d;                    // the second
+          wire [9:0] s = 10'd10 * x + e;                     // at most 969
+          wire [6:0] y = 7'(s % 10'd97);                     // the mod 97 block
+          wire [7:0] sum = y + hh;                           // at most 192
+          assign done = tail && n == 3'd6;
+          assign ok = done && (sum == 8'd1 || sum == 8'd98);
 
           always_ff @(posedge clk or negedge rst_n)
-            if (!rst_n) begin h <= '0; r <= 7'd97; end
-            else if (valid) begin h <= h_next; r <= r_next; end
+            if (!rst_n) begin h <= '0; r <= 7'd97; n <= '0; end
+            else if (tail) begin r <= y; n <= n == 3'd6 ? '0 : n + 3'd1; end
+            else if (valid) begin
+              if (head) begin h <= y; r <= rr == 7'd102 ? 7'd0 : rr + 7'd1; end
+              else begin h <= hh; r <= y; n <= last ? 3'd1 : '0; end
+            end
         endmodule
         ```
 
     #### למה זה נכון { .sol-proof }
 
-    **השלבים.** לפני השלב של \( m \) מתקיים \( s < 2m \) : בהתחלה \( s \le 969 < 1552 \).
-    אם \( s \ge m \) מחסרים \( m \), ובכל מקרה אחרי השלב \( s < m \), שזה בדיוק התנאי לשלב
-    הבא, \( m/2 \). אחרי השלב של 97 ‏\( s < 97 \), ורק כפולות של 97 הוחסרו, ולכן
-    \( s = (10r + d) \bmod 97 \). אותו טיעון ל-\( 27r + h \le 2688 < 3104 \) עם חמישה שלבים.
+    **השארית ספרה אחרי ספרה.** זה סעיף א : \( (10a + d) \bmod 97 \) תלוי רק ב-\( a \bmod 97 \).
+    באינדוקציה, אחרי הראש \( h = H \bmod 97 \), ואחרי השאר \( r = R \bmod 97 \).
 
-    **הראש בסוף.** אחרי ההעברה המספר הוא \( N = R \cdot 10^6 + H \), כש-\( H \) הוא המספר של
-    6 ספרות הראש. ‏\( 10^6 = 97 \cdot 10309 + 27 \), ולכן
-    \( N \equiv 27 \cdot (R \bmod 97) + (H \bmod 97) \pmod{97} \) : שתי השאריות מחושבות
-    כשהספרות מגיעות, כל אחת באותה מכונה, ונפגשות רק בסוף.
+    **הזנב.** כל שעון של הזנב מחשב \( (10r + 0) \bmod 97 \), השארית של המספר עם 0 נוסף בסופו.
+    אחרי 6 שעונים \( r = R \cdot 10^6 \bmod 97 \).
 
-    **הקודים 97 עד 102.** שארית תמיד קטנה מ-97, ולכן ערך של \( r \) מ-97 ומעלה לא יכול להיות
-    שארית, והבודק יודע בכל שעון אם הוא בראש או בשאר בלי פליפ-פלופ נוסף.
+    **הסכום.** ‏\( N = R \cdot 10^6 + H \), ולכן \( N \equiv r + h \pmod{97} \). ‏\( r \) ו-\( h \)
+    בין 0 ל-96, ולכן \( r + h \) בין 0 ל-192. בטווח הזה רק 1 ו-98 נותנים שארית 1.
 
-    **למה 14 הוא המינימום.** בזמן השאר הבודק חייב להבדיל בין כל שני זוגות שונים
-    \( (h, r) \) ו-\( (h', r') \) : יש המשך שעבורו האחד תקין והשני לא. אם \( r = r' \), המשך
-    שמשלים את הראשון ל-1 משאיר את השני ב-\( 1 + h' - h \ne 1 \). אם \( r \ne r' \), המשך של
-    \( k \) ספרות שמשלים את הראשון משאיר את השני ב-\( 1 + 27 \cdot 10^k (r' - r) + (h' - h) \).
-    כדי ששני ההמשכים, באורך 2 ובאורך 3, יתנו 1 בשניהם, היה צריך
-    \( 27 \cdot 900 \cdot (r' - r) \equiv 0 \), ו-97 ראשוני שלא מחלק אף גורם. לכן יש
-    \( 97 \cdot 97 = 9409 \) מצבים שונים, יותר מ-\( 2^{13} = 8192 \), ו-13 פליפ-פלופים לא
-    מספיקים.
+    **הקודים 97 עד 102.** שארית תמיד קטנה מ-97, ולכן \( r \ge 97 \) לא יכול להיות שארית, והבודק
+    יודע בכל שעון אם הוא בראש בלי פליפ-פלופ נוסף. בזנב \( r \) כבר שארית, ולכן שם צריך את
+    המונה.
 
-    **נסו בעצמכם.** התקדמו ספרה אחרי ספרה ובחרו גרסה. התיבה מראה בכל שעון את הפליפ-פלופים,
-    ביט אחרי ביט, ואת המצב של המכונה עם עשר הקשתות שלו :
+    **נסו בעצמכם.** התקדמו שעון אחרי שעון. התיבה מראה את הפליפ-פלופים ביט אחרי ביט, ואת המצב
+    שזז עם עשר הקשתות שלו. "הגרסה" מחליפה לדרך הישירה, ששומרת את הראש :
 
     <div class="explorer" data-kind="ibanhw"></div>
 
     #### סיבוכיות { .sol-cost }
 
-    שעון לכל ספרה, 25 שעונים ל-IBAN ישראלי, והתשובה באותו שעון של הספרה האחרונה. בכל שעון
-    הנתיב הארוך הוא מרבב, שני מחברים וארבעה שלבים של השוואה וחיסור. בסוף עוד מחבר של
-    \( 27r + h \) וחמישה שלבים, פעם אחת. ‏14 פליפ-פלופים, המינימום.
+    שעון לכל ספרה ועוד 6 שעונים של הזנב : 31 שעונים ל-IBAN ישראלי. בכל שעון מרבב, בלוק
+    \( 10x + e \) ובלוק mod 97, כולם על מספרים של עד 10 ביטים. ‏17 פליפ-פלופים, לעומת 34 בדרך
+    הישירה.
 
 ---
 
@@ -639,6 +640,23 @@ added: 2026-11-07
     בישראל 23 תווים, וכולם ספרות אחרי IL.
 
 ??? followup "שאלות המשך"
+    - **מהר יותר :** איך בודקים את אותו IBAN בפחות שעונים?
+
+        ??? fu-answer "תשובה"
+            ‏\( 100 = 97 + 3 \), ולכן שתי ספרות בשעון הן \( r \to (3r + 10a + b) \bmod 97 \), לכל
+            היותר 387 : חצי מהשעונים, 13 במקום 25 לחלק של הספרות, ושוב בלוקים של 10 ביטים. אות
+            שלמה בשעון אחד היא אותו רעיון, \( (3r + v) \bmod 97 \), והזנב מתקצר ל-3 שעונים של
+            "00".
+
+    - **כמה פליפ-פלופים לכל הפחות :** אפשר בפחות מ-17?
+
+        ??? fu-answer "תשובה"
+            עם מכפל של 12 ביטים אין צורך בזנב : \( 10^6 \equiv 27 \pmod97 \), ובספרה האחרונה
+            בודקים \( (27r + h) \bmod 97 = 1 \). אז אין מונה, ו-14 פליפ-פלופים מספיקים. זה גם
+            המינימום : בזמן השאר הבודק חייב להבדיל בין כל \( 97 \cdot 97 = 9409 \) הזוגות
+            \( (h, r) \), כי לכל שני זוגות יש המשך שאחד מהם תקין בו והשני לא, ו-9409 יותר
+            מ-\( 2^{13} = 8192 \).
+
     - **‏9 ספרות בכל פעם :** התקן מציע לחשב את השארית מ-9 ספרות בכל פעם. למה דווקא 9?
 
         ??? fu-answer "תשובה"

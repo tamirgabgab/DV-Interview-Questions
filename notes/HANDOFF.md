@@ -915,6 +915,19 @@ below start at item 112 (session 31).
     mod 3 machine, two fans of mod 97, the block diagram, two tables; SV `iban_checker` (14
     flip-flops, a Mealy `ok` at the last digit); box `ibanhw` (prefix `ih-`). Part a keeps the
     hand check, Python and SV functions; the old b and c are now c and d.
+178. **0099 part b redone for clarity (session 33, 2026-11-07).** The owner found the block
+    diagram hard to follow and asked to assume blocks of multiply, add and subtract on numbers
+    of up to 10 bits and a mod 97 block, with fewer blocks and the whole architecture
+    explained. MCQ answers: the head moved to the end by a tail of six 0 digits after the
+    last one (r becomes R 10^6 mod 97, then r + h is 1 or 98: no x27, which needs 12 bits),
+    a 3-bit counter for the tail (17 flip-flops: the head is still counted in r's codes
+    97..102), only the buffer (34) and the final design in the section (the 14 of a 12-bit
+    multiplier and the lower bound in a follow-up), the faster inputs as a follow-up. The
+    part is now three ideas, the block diagram (control head = r >= 97 and tail = n > 0, two
+    multiplexers, 10x + e, mod 97, the write back, y + h against 1 and 98) with a list of its
+    parts, a clock-by-clock table of the page's IBAN (h = 93, r = 90, after the tail 5, 5 + 93
+    = 98), SV `iban_checker` with `done` six clocks after `last`, and the box with the two
+    versions.
 
 
 ---

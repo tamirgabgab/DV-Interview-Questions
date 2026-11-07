@@ -4,18 +4,18 @@
 //@page function automatic int iban_check_digits
 // Question 0099: the page's SystemVerilog against an independent reference (the moved IBAN
 // written out as digits, then long division by 97). iban_checker is fed the IBAN a digit a
-// clock (every letter as its two digits, now and then an idle clock) and its ok at the last
-// digit is checked: the registry examples and the double error of part d pass; made-up IBANs
+// clock (every letter as its two digits, now and then an idle clock), and its ok when done
+// rises, six clocks after the last digit, is checked: the registry examples and the double error of part d pass; made-up IBANs
 // built with iban_check_digits pass, and each with one character changed or two neighbours
 // swapped fails; random strings with letters agree with the reference. iban_mod97 and
 // iban_valid of part a, and iban_check_digits of part c, on the same strings.
 module tb;
   logic clk = 0, rst_n = 0, start = 0, valid = 0, last = 0;
   logic [3:0] d = 0;
-  logic ok;
+  logic done, ok;
   int errors = 0;
 
-  iban_checker dut (.clk, .rst_n, .start, .valid, .last, .d, .ok);
+  iban_checker dut (.clk, .rst_n, .start, .valid, .last, .d, .done, .ok);
   always #5 clk = ~clk;
 
   task automatic fail(string what);
@@ -45,19 +45,25 @@ module tb;
     return out;
   endfunction
 
-  // feed the checker one digit a clock (an idle clock now and then) and read ok at the last
+  // feed the checker one digit a clock (an idle clock now and then), then wait for done:
+  // six clocks of the tail after the last digit, done for one clock
   task automatic feed(string s, int gap, output bit good);
     string ds = as_digits(s);
+    int waited = 0;
     good = 0;
     for (int i = 0; i < ds.len(); i++) begin
       @(negedge clk);
       if (gap > 0 && i % gap == 1) begin valid = 0; start = 0; last = 0; @(negedge clk); end
       valid = 1; start = i == 0; last = i == ds.len() - 1; d = 4'(ds[i] - "0");
       #1;
-      if (last) good = ok;
-      else if (ok) fail($sformatf("%s: ok before the last digit", s));
+      if (done) fail($sformatf("%s: done before the tail", s));
     end
     @(negedge clk); valid = 0; start = 0; last = 0;
+    while (!done && waited < 10) begin #1; if (!done) begin @(negedge clk); waited++; end end
+    if (ds.len() >= 7 && waited != 5) fail($sformatf("%s: done after %0d more clocks, not 6", s, waited + 1));
+    good = done && ok;
+    @(negedge clk);
+    if (done) fail($sformatf("%s: done for two clocks", s));
   endtask
 
   function automatic string digits_of(int len);
