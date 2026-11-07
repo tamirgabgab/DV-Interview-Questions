@@ -1,8 +1,7 @@
 // The circuit layer (session 32, 22-circuit.css).
 //
-// - Section dividers (<hr>) are drawn as a data line; the first time one comes into view it
-//   gets .is-on, and the stylesheet runs a short bright packet along it once (its length,
-//   --cx-run, is the divider's width).
+// - Section dividers (<hr>) were drawn as a data line with a packet run once along it; since
+//   session 33 they are plain hairlines (26-ui-round.css) and WAVE_DIVIDERS is off.
 // - A wireframe icosahedron sits in a corner of the home hero and of a level page's header
 //   band (still since session 33; ICO_STILL turns it on again): twelve vertices (0, ±1, ±φ) and their cyclic shifts, the thirty edges
 //   of length 2, drawn on a canvas in the canvas's CSS colour (22-circuit.css; nothing is
@@ -42,6 +41,7 @@
   }
   const R = Math.hypot(1, PHI);              // the circumradius, to fit the canvas
   const ICO_STILL = true;                    // drawn once, not turning (session 33)
+  const WAVE_DIVIDERS = false;               // the dividers are plain lines now (session 33, 26-ui-round.css)
 
   const rotate = ([x, y, z], ax, ay) => {    // about y, then about x
     const cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
@@ -130,7 +130,7 @@
   };
 
   document.addEventListener("DOMContentLoaded", () => {
-    dividers();
+    if (WAVE_DIVIDERS) dividers();
     document.querySelectorAll(".md-typeset .home-hero, .md-typeset .list-band.lb-level").forEach(icosahedron);
   });
 })();

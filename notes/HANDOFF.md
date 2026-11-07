@@ -890,6 +890,15 @@ below start at item 112 (session 31).
     the quick jump, the figure lightbox and the toast. (9) The home sections and the path
     cards rise in once a browser session, a 60 ms stagger. (11) Tabular figures in the
     boxes' summaries, the builder, my map, the daily card and the level cards.
+176. **Keyboard fixes and the dividers (session 33, 2026-11-07).** A keyboard walk of 121
+    pages found 9 old problems (CI walks only 5 pages): a content tab's hidden radio input
+    had no visible ring on its label (8 pages whose code tabs are outside a collapsed block)
+    and 0044's last step card lost its focus stroke under the answer's mark. Fixed in
+    `26-ui-round.css`; `check_keyboard.py` now measures a tab's label and counts an SVG
+    control's ring drawn as a stroke in the focus colour. The owner then asked: the square-
+    wave `<hr>` dividers (22-circuit.css) are plain hairlines now (`WAVE_DIVIDERS` off in
+    `circuit.js`), and the part bar's reading line (the clock) is larger (8 px, 16 px period)
+    and fills from left to right like a trace in a waveform viewer.
 
 
 ---

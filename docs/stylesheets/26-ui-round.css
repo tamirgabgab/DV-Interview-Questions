@@ -129,3 +129,24 @@
 .md-typeset .tabbed-set > input:nth-child(8):focus-visible ~ .tabbed-labels > :nth-child(8) {
   outline: 2px solid var(--site-focus-ring); outline-offset: 2px; border-radius: var(--radius-s);
 }
+/* an SVG control that holds the answer's mark (04-solutions.css) shows the focus ring over the
+   mark while it has the focus (0044's last step card) */
+.md-typeset .explorer svg :focus-visible .ex-answer-mark:not(#_),
+.md-typeset .explorer svg .ex-answer-mark:focus-visible:not(#_) { stroke: var(--site-focus-ring); }
+
+/* --- the section dividers: a plain hairline (the owner, session 33: the square wave of
+   22-circuit.css under every block and part was too busy); circuit.js no longer runs the
+   packet along them ------------------------------------------------------------------------ */
+.md-typeset hr { height: 1px; margin: 1.6em 0; overflow: visible; background: color-mix(in srgb, var(--md-default-fg-color) 14%, transparent); }
+.md-typeset hr::before, .md-typeset hr::after { content: none; display: none; animation: none; }
+
+/* --- the reading line of the part bar (22-circuit.css's clock): larger, and filling from
+   left to right like a trace in a waveform viewer (the owner, session 33) ------------------- */
+.md-typeset .part-nav .pn-progress { height: 8px; bottom: -4px; }
+.md-typeset .part-nav .pn-progress::before,
+.md-typeset .part-nav .pn-progress i {
+  -webkit-mask: var(--cx-clock) left center / 16px 8px repeat-x;
+  mask: var(--cx-clock) left center / 16px 8px repeat-x;
+}
+.md-typeset .part-nav .pn-progress i:not(#_) { width: 100%; clip-path: inset(0 calc(100% - var(--pn-read, 0%)) 0 0); }
+.md-typeset .part-nav.pn-fixed .pn-progress { top: 0; bottom: auto; }
