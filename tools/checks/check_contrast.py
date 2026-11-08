@@ -474,6 +474,15 @@ PAIRS = [
     ("0099 ibanhw, the frame of a register and the edge a digit took", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0099 ibanhw, the frame of a stage and of the head's digits", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0099 ibanhw, the frame of the start and of the output", "var(--viz-s3)", [CARD, PAGE], UI),
+    # 0055 divhw (stylesheets/questions/0055-divfsm.css): the block diagram of parts a and b and the box
+    ("0055 divhw, a block's text, a bit, a wire's value", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color))"], TEXT),
+    ("0055 divhw, a block's second line, a flip-flop's name", "var(--viz-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color))"], TEXT),
+    ("0055 divhw, a wire's name", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
+    ("0055 divhw, a value in the table of signals", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color))"], TEXT),
+    ("0055 divhw, the register, a wire at 1, the clock of the moment", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0055 divhw, the frame of the next-state logic", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0055 divhw, the frame of the output logic", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0055 divhw, a flip-flop and the frame of one that flips", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], UI),
     ("0099 iban, an error caught", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
     ("0099 iban, an error that slips", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
     # 0022 latpaths (stylesheets/questions/0022-latpaths.css): the counts on their tints, the small boards and the box

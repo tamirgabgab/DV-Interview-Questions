@@ -102,8 +102,8 @@ added: 2026-10-22
 
     === "Python"
         ```python title="detect_1011" hl_lines="2 11 12"
-        # the next state per state and bit: (on 0, on 1); the names are what was seen so far
-        NEXT_1011 = {"S0": ("S0", "S1"), "S1": ("S10", "S1"), "S10": ("S0", "S101"), "S101": ("S10", "S1")}   # (1)!
+        # the next state per state and bit: (on 0, on 1); in Sk the last k bits are the first k of 1011
+        NEXT_1011 = {"S0": ("S0", "S1"), "S1": ("S2", "S1"), "S2": ("S0", "S3"), "S3": ("S2", "S1")}   # (1)!
 
 
         def detect_1011(bits: list[int]) -> tuple[list[str], list[int]]:
@@ -111,13 +111,13 @@ added: 2026-10-22
             state, states, out = "S0", [], []
             for b in bits:
                 states.append(state)
-                out.append(int(state == "S101" and b == 1))   # (2)!
+                out.append(int(state == "S3" and b == 1))   # (2)!
                 state = NEXT_1011[state][b]
             return states, out
         ```
 
         1. אותה טבלת מעברים כמו ב-`case` של המודול.
-        2. הפלט של Mealy : המצב `101` והביט `1` ביחד.
+        2. הפלט של Mealy : המצב `S3` (ראינו `101`) והביט `1` ביחד.
 
     === "SystemVerilog"
         ```systemverilog title="module seq_detect_1011" linenums="1" hl_lines="8 16 17"
@@ -127,17 +127,17 @@ added: 2026-10-22
           input  logic din,
           output logic found
         );
-          typedef enum logic [1:0] {S0, S1, S10, S101} state_t;   // (1)!
+          typedef enum logic [1:0] {S0, S1, S2, S3} state_t;   // (1)!
           state_t state, next;
 
           always_comb begin
             next  = state;
             found = 1'b0;
             case (state)
-              S0:   next = din ? S1 : S0;
-              S1:   next = din ? S1 : S10;
-              S10:  next = din ? S101 : S0;
-              S101: begin found = din; next = din ? S1 : S10; end   // (2)!
+              S0: next = din ? S1 : S0;
+              S1: next = din ? S1 : S2;
+              S2: next = din ? S3 : S0;
+              S3: begin found = din; next = din ? S1 : S2; end   // (2)!
             endcase
           end
 
@@ -147,9 +147,10 @@ added: 2026-10-22
         endmodule
         ```
 
-        1. שמות המצבים הם מה שנראה עד כה. שני ביטים מספיקים לארבעה מצבים.
+        1. אותם שמות כמו בגרף ובטבלאות : במצב `Sk` ‏k הביטים האחרונים הם k הראשונים של
+           `1011` (‏`S2` ראה `10`, ‏`S3` ראה `101`). שני ביטים מספיקים לארבעה מצבים.
         2. הזיהוי : הפלט תלוי במצב ובביט (Mealy). עם `1` עוברים ל-`S1`, כי ה-`1` האחרון
-           הוא גם ה-`1` הראשון של התאמה חופפת; עם `0` ל-`S10`, כי `1010` מסתיים ב-`10`.
+           הוא גם ה-`1` הראשון של התאמה חופפת; עם `0` ל-`S2`, כי `1010` מסתיים ב-`10`.
 
     #### למה זה נכון { .sol-proof }
 
@@ -183,17 +184,47 @@ added: 2026-10-22
 
     <!-- /gen -->
 
+    **המעגל.** המודול הוא שלושה בלוקים. לוגיקת המצב הבא (ה-`case` שב-`always_comb`)
+    מחשבת את `next` מ-`state` ומ-`din`; רגיסטר המצב, שני פליפ-פלופים (ה-`always_ff`),
+    שומר את `next` בכל עליית שעון; ולוגיקת המוצא מחשבת את `found`. ב-Mealy גם `din`
+    נכנס ללוגיקת המוצא, ולכן יש מסלול צירופי מ-`din` ל-`found` בלי פליפ-פלופ באמצע :
+
+    <!-- gen 6 -->
+
+    <svg class="figure shw-fig shw-dp" viewBox="0 0 440 356" direction="ltr" style="max-width:27.5rem" role="img" aria-label="תרשים המלבנים של הגלאי : din נכנס ללוגיקת המצב הבא, שמחשבת את next משני ביטים. רגיסטר המצב, שני פליפ-פלופים על clk עם איפוס rst_n, שומר את next בעליית השעון, ו-state חוזר ללוגיקת המצב הבא ונכנס ללוגיקת המוצא. ב-Mealy גם din נכנס ישר ללוגיקת המוצא : found = (state == S3) & din, מסלול צירופי מ-din ל-found בלי פליפ-פלופ באמצע"><defs><marker id="shw-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path class="shw-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs><text class="shw-wlab" x="200" y="14" text-anchor="middle">din</text><path class="shw-wire" d="M200,20 L200,58" marker-end="url(#shw-hb)"/><path class="shw-wire shw-mealy" d="M200,38 L410,38 L410,285 L322,285" marker-end="url(#shw-hb)"/><circle class="shw-dot" cx="200" cy="38" r="3"/><text class="shw-wlab shw-mlab" x="404" y="160" text-anchor="end">Mealy</text><g class="shw-blk shw-logic"><rect x="80" y="60" width="240" height="50" rx="5"/><text x="200" y="82" text-anchor="middle">next-state logic</text><text class="shw-sub" x="200" y="99" text-anchor="middle">next = f(state, din)</text></g><path class="shw-wire" d="M200,110 L200,158" marker-end="url(#shw-hb)"/><text class="shw-wlab" x="208" y="140" text-anchor="start">next[1:0]</text><g class="shw-blk shw-reg"><rect x="110" y="160" width="180" height="50" rx="5"/><text x="200" y="182" text-anchor="middle">state register</text><text class="shw-sub" x="200" y="199" text-anchor="middle">2 D flip-flops</text></g><path class="shw-wire" d="M370,185 L292,185" marker-end="url(#shw-hb)"/><text class="shw-wlab" x="298" y="178" text-anchor="start">clk, rst_n</text><path class="shw-wire" d="M200,210 L200,258" marker-end="url(#shw-hb)"/><circle class="shw-dot" cx="200" cy="235" r="3"/><path class="shw-wire" d="M200,235 L40,235 L40,85 L78,85" marker-end="url(#shw-hb)"/><text class="shw-wlab" x="208" y="250" text-anchor="start">state[1:0]</text><g class="shw-blk shw-out"><rect x="80" y="260" width="240" height="50" rx="5"/><text x="200" y="282" text-anchor="middle">output logic</text><text class="shw-sub" x="200" y="299" text-anchor="middle">found = (state == S3) &amp; din</text></g><path class="shw-wire" d="M200,310 L200,343" marker-end="url(#shw-hb)"/><text class="shw-wlab" x="208" y="338" text-anchor="start">found</text></svg>
+
+    <!-- /gen -->
+
+    <!-- gen 7 -->
+
+    <span class="viz-legend"><span><i class="shw-key-reg"></i>רגיסטר המצב : פליפ-פלופים</span><span><i class="shw-key-logic"></i>לוגיקה צירופית</span><span><i class="shw-key-mealy"></i>‏din → found : מסלול צירופי, רק ב-Mealy</span></span>
+
+    <!-- /gen -->
+
     **דיאגרמת התזמון.** ‏`din` נדגם בעליית השעון, המצב מתעדכן אחריה, ו-`found` הוא
-    צירופי : הוא עולה באותו מחזור שבו הביט הרביעי נמצא על הקו :
+    צירופי : הוא עולה באותו מחזור שבו הביט הרביעי נמצא על הקו. השורה `found_moore` היא
+    אותו גלאי ב-Moore, עם המצב החמישי `S4` של סעיף ב : הפלט שלו יוצא מהמצב בלבד, ולכן
+    הוא עולה מחזור אחד אחרי `found`, במחזורים 5 ו-8. במחזור 8 לא מגיע ביט חדש (x),
+    ו-`found_moore` עולה בו בכל זאת :
 
     ```wavedrom
     { signal: [
-      { name: "clk",   wave: "p......." },
-      { name: "din",   wave: "x101.01." },
-      { name: "state", wave: "========", data: ["S0", "S0", "S1", "S10", "S101", "S1", "S10", "S101"] },
-      { name: "found", wave: "0...10.1" }
+      { name: "clk",   wave: "p........" },
+      { name: "din",   wave: "x101.01.x" },
+      { name: "state", wave: "=========", data: ["S0", "S0", "S1", "S2", "S3", "S1", "S2", "S3", "S1"] },
+      { name: "found", wave: "0...10.10" },
+      { name: "found_moore", wave: "0....10.1" }
     ]}
     ```
+
+    **נסו בעצמכם.** התיבה מריצה את המעגל שבתרשים שעון אחרי שעון. הקלידו `101011` : ב-`S3`
+    מגיע `0`, המכונה עוברת ל-`S2` ולא ל-`S0`, ו-`found` עולה בשעון 6. עברו ל-Moore :
+    ‏`found` עולה שעון אחד מאוחר יותר, ורגיסטר המצב צריך שלושה פליפ-פלופים. ב-`1011011`
+    שימו לב לשעונים 4 ו-7 : ‏`din` הוא שמחליט על `found` באותו שעון. מעבר לתרשים ולדיאגרמת
+    התזמון, התיבה מראה את הערך בכל חוט ובכל בלוק בשעון הנבחר, את הביטים של המצב שמתהפכים,
+    וטבלה של כל האותות, עמודה לכל שעון :
+
+    <div class="explorer" data-kind="seqhw" data-bits="1011011"></div>
 
     **למה החפיפה נכונה.** ב-`1011011` הזיהוי השני משתמש ב-`1` האחרון של הראשון. מי שחוזר
     ל-`S0` אחרי זיהוי יראה אחריו `011`, שאינם `1011`, ויפספס. המעבר ל-`S1` אומר בדיוק
@@ -248,6 +279,23 @@ added: 2026-10-22
     מחשבים מ-\( fail(s) \) באותה טבלה : \( fail(s + 1) = next[fail(s)][P[s]] \). כך
     הטבלה נבנית בשורה אחת של לולאה, בלי לחשוב על אף מקרה ביד : זה האוטומט של
     Knuth–Morris–Pratt.
+
+    **הכישלון על 1011, שורה אחרי שורה.** כל שורה מחשבת את \( fail \) מהשורה הקודמת,
+    והביט שלא מתאים הולך לאן שהולך מצב הכישלון עם אותו ביט. יוצא \( fail = 0, 0, 1, 1 \) :
+
+    <!-- gen 8 -->
+
+    | המצב | התאים | בלי הביט הראשון | ‏fail | איך מקבלים את fail | הביט שלא מתאים |
+    |:-:|:-:|:-:|:-:|---|---|
+    | ‏S1 | ‏`1` | ריק | ‏0 | התחלה : שום ביט | ‏`1 → next[0][1] = 1` |
+    | ‏S2 | ‏`10` | ‏`0` | ‏0 | ‏`next[0][P[1]] = next[0][0]` | ‏`0 → next[0][0] = 0` |
+    | ‏S3 | ‏`101` | ‏`01` | ‏1 | ‏`next[0][P[2]] = next[0][1]` | ‏`0 → next[1][0] = 2` |
+    | ‏S4 | ‏`1011` | ‏`011` | ‏1 | ‏`next[1][P[3]] = next[1][1]` | שניהם, כמו ב-‏`S1` : `next[4] = next[1]` |
+
+    <!-- /gen -->
+
+    השורה של `S3` היא החפיפה של סעיף א : בלי הביט הראשון, `101` הופך ל-`01`, שמביא
+    ל-`S1`, ו-`S1` עם `0` הולך ל-`S2`. לכן אחרי `1010` המכונה ב-`S2` ולא ב-`S0`.
 
     **‏Mealy מול Moore.** ב-Moore הפלט שייך למצב, ולכן צריך מצב \( L \) ("התבנית הסתיימה")
     שמוציא 1, והמוצא עולה **מחזור אחד אחרי** הביט האחרון. ב-Mealy הפלט שייך למעבר
@@ -404,11 +452,12 @@ added: 2026-10-22
 
     <!-- /gen -->
 
-    **נסו בעצמכם.** מקלידים תבנית (עד 8 ביטים), בוחרים Mealy או Moore, ומזינים ביטים :
-    בלחיצה על `0` או `1`, בביט אקראי לפי ההסתברות שבסליידר, או בהפעלה רציפה. הגרף
-    מראה את המצב הנוכחי ואת המעבר שנלקח, הרצועה מראה את הביטים, המצבים והפלט, ושורת
-    הסיכום אומרת לאן יובילו `0` ו-`1`. המתג "איך נבנה המעבר" מראה את שני המעברים מהמצב
-    הנוכחי : התבנית מוזזת מתחת לקלט עד ההתאמה הארוכה ביותר, ואורך ההתאמה הוא המצב הבא :
+    **נסו בעצמכם.** הזינו `1011011` (הכפתור בדוגמאות) וספרו את הזיהויים : שניים, במחזורים
+    4 ו-7. עברו ל-Moore : ‏`found` זז מחזור אחד, ל-5, והמכונה עוצרת ב-`S4`, שיוציא את
+    הזיהוי השני במחזור 8. אחר כך הקלידו את התבנית `1111`, לחצו על "ניקוי" והזינו `11111` : שני זיהויים,
+    במחזורים 4 ו-5, כי אחרי זיהוי המכונה נשארת ב-`S3`. מעבר לטבלאות, התיבה בונה את המכונה
+    לכל תבנית שתקלידו, ומראה בכל מצב למה כל מעבר הולך לאן שהוא הולך : התבנית מוזזת מתחת
+    לקלט עד ההתאמה הארוכה ביותר :
 
     <div class="explorer" data-kind="seqdet" data-pattern="1011"></div>
 
@@ -452,8 +501,11 @@ added: 2026-10-22
       מצבים צריך למכונה אחת שעושה את שניהם?
 
         ??? fu-answer "תשובה"
-            מכפלת המכונות : המצב הוא זוג של מצבים, לכל היותר \( 5 \cdot 5 \) זוגות, ובפועל רק 9
-            מהם ישיגים מ-\( (0, 0) \). זה בדיוק מספר המצבים של אוטומט אהו–קורסיק על שתי התבניות.
+            מכפלת המכונות : המצב הוא זוג של מצבים, אחד לכל תבנית. ב-Moore יש לכל היותר
+            \( 5 \cdot 5 \) זוגות, ובפועל רק 9 מהם ישיגים מ-\( (0, 0) \) : זה בדיוק מספר
+            הצמתים של אוטומט אהו–קורסיק על שתי התבניות (כל ההתחלות של `1011` ושל `0110`,
+            כולל הריקה). ב-Mealy כל מצב מלא מתמזג במצב השקול לו, ולכן מספיקים 7 מתוך
+            \( 4 \cdot 4 \) : שני הזוגות עם מצב מלא, \( (4, 3) \) ו-\( (2, 4) \), נעלמים.
 
     - **אות תקפות :** ‏`din` תקף רק כש-`valid = 1`. איפה נכנס `valid` בקוד?
 

@@ -7,10 +7,13 @@ any pattern through the KMP automaton).
 The reference here is independent of the page code: table(pattern) builds the automaton
 by brute force (the next state is the longest suffix of "what was seen so far plus the
 bit" that is a prefix of the pattern), and the page's KMP construction must agree.
-blocks() returns, in page order: the Mealy state diagram of 1011, its transition table,
-the bit-by-bit table of the stream 1011011, the Moore transition table, and the tables
-of the automata of several patterns for part b. tests/0040 checks the numbers against the
-page code and against brute force.
+blocks() returns: the Mealy state diagram of 1011 and its legend, its transition table,
+the bit-by-bit table of the stream 1011011, the Moore transition table, the tables of the
+automata of several patterns for part b, the block diagram of part a's circuit (state
+register, next-state logic, output logic; din -> found combinational in Mealy) and its
+legend, and the trace of the fail recurrence for 1011. The page's markers carry these
+indices (not in page order). tests/0040 checks the numbers against the page code and
+against brute force.
 """
 
 PATTERN = "1011"
@@ -161,9 +164,120 @@ def legend():
             '<span><i class="fs-key-found"></i>המעבר שמזהה : הביט / הפלט 1</span></span>')
 
 
+# --- the circuit of part a: the block diagram --------------------------------------------------
+
+def _arrow_defs(idn):
+    return (f'<defs><marker id="{idn}" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto">'
+            '<path class="shw-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs>')
+
+
+def circuit_svg():
+    """The module of part a as blocks: din into the next-state logic (the always_comb case),
+    next[1:0] into the state register (two D flip-flops on clk, reset by rst_n), state[1:0]
+    back into the next-state logic and into the output logic. In Mealy din also goes straight
+    into the output logic (found = (state == S3) & din): a combinational path from din to
+    found, drawn in its own colour. explorer/seqhw.js draws the same blocks with the values of
+    one clock."""
+    W, H = 440, 356
+
+    def box(x, y, w, h, text, cls, sub):
+        return (f'<g class="shw-blk {cls}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="5"/>'
+                f'<text x="{x + w / 2:g}" y="{y + h / 2 - 3:g}" text-anchor="middle">{text}</text>'
+                f'<text class="shw-sub" x="{x + w / 2:g}" y="{y + h / 2 + 14:g}" text-anchor="middle">{sub}</text></g>')
+
+    def line(pts, cls="shw-wire", arrow=True):
+        d = "M" + " L".join(f"{x:g},{y:g}" for x, y in pts)
+        return f'<path class="{cls}" d="{d}"' + (' marker-end="url(#shw-hb)"' if arrow else "") + "/>"
+
+    def lab(x, y, t, anchor="start", cls="shw-wlab"):
+        return f'<text class="{cls}" x="{x}" y="{y}" text-anchor="{anchor}">{t}</text>'
+
+    o = [f'<svg class="figure shw-fig shw-dp" viewBox="0 0 {W} {H}" direction="ltr" style="max-width:{W / 16:g}rem" role="img" '
+         'aria-label="תרשים המלבנים של הגלאי : din נכנס ללוגיקת המצב הבא, שמחשבת את next משני ביטים. '
+         'רגיסטר המצב, שני פליפ-פלופים על clk עם איפוס rst_n, שומר את next בעליית השעון, ו-state חוזר ללוגיקת המצב הבא '
+         'ונכנס ללוגיקת המוצא. ב-Mealy גם din נכנס ישר ללוגיקת המוצא : found = (state == S3) & din, '
+         'מסלול צירופי מ-din ל-found בלי פליפ-פלופ באמצע">', _arrow_defs("shw-hb")]
+    o.append(lab(200, 14, "din", "middle"))
+    o.append(line([(200, 20), (200, 58)]))
+    o.append(line([(200, 38), (410, 38), (410, 285), (322, 285)], "shw-wire shw-mealy"))
+    o.append('<circle class="shw-dot" cx="200" cy="38" r="3"/>')
+    o.append(lab(404, 160, "Mealy", "end", "shw-wlab shw-mlab"))
+    o.append(box(80, 60, 240, 50, "next-state logic", "shw-logic", "next = f(state, din)"))
+    o.append(line([(200, 110), (200, 158)]))
+    o.append(lab(208, 140, "next[1:0]"))
+    o.append(box(110, 160, 180, 50, "state register", "shw-reg", "2 D flip-flops"))
+    o.append(line([(370, 185), (292, 185)]))
+    o.append(lab(298, 178, "clk, rst_n"))
+    o.append(line([(200, 210), (200, 258)]))
+    o.append('<circle class="shw-dot" cx="200" cy="235" r="3"/>')
+    o.append(line([(200, 235), (40, 235), (40, 85), (78, 85)]))
+    o.append(lab(208, 250, "state[1:0]"))
+    o.append(box(80, 260, 240, 50, "output logic", "shw-out", "found = (state == S3) &amp; din"))
+    o.append(line([(200, 310), (200, 343)]))
+    o.append(lab(208, 338, "found"))
+    return "".join(o) + "</svg>"
+
+
+def circuit_legend():
+    return ('<span class="viz-legend"><span><i class="shw-key-reg"></i>רגיסטר המצב : פליפ-פלופים</span>'
+            '<span><i class="shw-key-logic"></i>לוגיקה צירופית</span>'
+            '<span><i class="shw-key-mealy"></i>‏din → found : מסלול צירופי, רק ב-Mealy</span></span>')
+
+
+# --- part b: the fail recurrence, row by row -----------------------------------------------------
+
+def fails(pattern=PATTERN):
+    """fail(s) for s = 1..L by the recurrence of the page: fail(1) = 0 and
+    fail(s + 1) = next[fail(s)][P[s]], on the brute-force table."""
+    nxt, out = table(pattern), [0]
+    for s in range(1, len(pattern)):
+        out.append(nxt[out[-1]][int(pattern[s])])
+    return out
+
+
+def fail_table(pattern=PATTERN):
+    """The four rows of 1011: what matched, without its first bit, fail(s), how the
+    recurrence gives it, and the edge on the bit that does not match."""
+    L, nxt, fl = len(pattern), table(pattern), fails(pattern)
+    for s in range(1, L + 1):                        # fail(s) is the state of P[1..s-1]
+        assert fl[s - 1] == longest_prefix_suffix(pattern[1:s], pattern)
+    lines = ["| המצב | התאים | בלי הביט הראשון | ‏fail | איך מקבלים את fail | הביט שלא מתאים |", "|:-:|:-:|:-:|:-:|---|---|"]
+    for s in range(1, L + 1):
+        f = fl[s - 1]
+        how = "התחלה : שום ביט" if s == 1 else f"{RLM}`next[{fl[s - 2]}][P[{s - 1}]] = next[{fl[s - 2]}][{pattern[s - 1]}]`"
+        if s < L:
+            b = 1 - int(pattern[s])
+            miss = f"{RLM}`{b} → next[{f}][{b}] = {nxt[f][b]}`"
+        else:
+            miss = f"שניהם, כמו ב-{RLM}`S{f}` : `next[{L}] = next[{f}]`"
+        rest_cell = f"{RLM}`{pattern[1:s]}`" if s > 1 else "ריק"
+        lines.append(f"| {RLM}S{s} | {RLM}`{pattern[:s]}` | {rest_cell} | {RLM}{f} | {how} | {miss} |")
+    return "\n".join(lines)
+
+
+# --- the follow-up: two patterns at once ----------------------------------------------------------
+
+def product_states(pa, pb, moore):
+    """The states of the product machine reachable from (0, 0): Moore keeps the full-match
+    states (5 x 5 pairs for two patterns of 4), Mealy merges each into its rest (4 x 4)."""
+    def step(p, s, b):
+        n = table(p)[s][b]
+        return n if moore or n < len(p) else rest(p)
+    seen, todo = {(0, 0)}, [(0, 0)]
+    while todo:
+        a, c = todo.pop()
+        for b in (0, 1):
+            t = (step(pa, a, b), step(pb, c, b))
+            if t not in seen:
+                seen.add(t)
+                todo.append(t)
+    return seen
+
+
 def blocks():
-    """The generated blocks, in page order."""
-    return [diagram(), legend(), mealy_table(), stream_table(), moore_table(), patterns_table()]
+    """The generated blocks; the page's markers carry these indices."""
+    return [diagram(), legend(), mealy_table(), stream_table(), moore_table(), patterns_table(),
+            circuit_svg(), circuit_legend(), fail_table()]
 
 
 if __name__ == "__main__":

@@ -1,0 +1,91 @@
+/* Question 0040, the sequence detector 1011 (session 34): the block diagram of part a's circuit
+   (tools/figures/q0040.py circuit_svg) and its box explorer/seqhw.js (shw-*), and the
+   one-screen layout of the part b box explorer/seqdet.js. The state register is blue (s1),
+   the output logic green (s3), the wire din -> found of Mealy orange (s2); in the box the path
+   of this clock is blue and a flip-flop that flips at the edge is outlined in ink. The
+   diagrams are drawn left to right (direction="ltr"). Colours from the palette only, in the
+   mixes of 0099's hardware box. */
+
+.md-typeset svg.shw-fig .shw-headp { fill: var(--viz-text); }
+.md-typeset svg.shw-fig .shw-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
+.md-typeset svg.shw-fig .shw-blk.shw-reg rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.shw-fig .shw-blk.shw-out rect { fill: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg.shw-fig .shw-blk text { fill: var(--viz-ink); font-size: 13px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.shw-fig .shw-blk text.shw-sub,
+.md-typeset svg.shw-fig .shw-blk text.shw-val { fill: var(--viz-ink); font-size: 11.5px; font-weight: 400; }
+.md-typeset svg.shw-fig .shw-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.shw-fig .shw-wire.shw-mealy { stroke: var(--viz-s2); stroke-width: 2.2; }
+.md-typeset svg.shw-fig .shw-dot { fill: var(--viz-text); }
+.md-typeset svg.shw-fig .shw-wlab { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.shw-fig .shw-wlab.shw-mlab { fill: var(--viz-s2-text); }
+.md-typeset .viz-legend .shw-key-reg { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .shw-key-logic { background: var(--md-default-bg-color); outline: 1.4px solid var(--viz-ink); outline-offset: -1.4px; }
+.md-typeset .viz-legend .shw-key-mealy { background: none; height: 0; border-top: 3px solid var(--viz-s2); align-self: center; }
+
+/* the box: the live diagram (the wires and blocks of this clock lit), the bits of din, the
+   flip-flops, the table of every signal */
+.md-typeset .explorer .shw-dpwrap svg { display: block; width: 100%; max-width: 25rem; margin: 0.4rem auto; }
+.md-typeset svg.shw-live-dp .shw-blk rect { stroke: var(--viz-grid); }
+.md-typeset svg.shw-live-dp .shw-blk.is-on rect { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg.shw-live-dp .shw-wire { stroke: var(--viz-grid); }
+.md-typeset svg.shw-live-dp .shw-wire.is-on { stroke: var(--viz-s1); stroke-width: 2.4; }
+.md-typeset svg.shw-live-dp .shw-wire.shw-mealy { stroke: var(--viz-grid); stroke-width: 1.4; stroke-dasharray: 5 3; }
+.md-typeset svg.shw-live-dp .shw-wire.shw-mealy.is-on { stroke: var(--viz-s2); stroke-width: 2.6; stroke-dasharray: none; }
+
+.md-typeset .explorer input.ex-num.shw-in { width: 16rem; max-width: 100%; letter-spacing: 0.12em; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .shw-strip { display: flex; flex-wrap: wrap; gap: 2px; margin: 0.5rem 0; font-family: var(--md-code-font-family); font-size: 0.72rem; }
+.md-typeset .explorer .shw-c { display: inline-grid; place-items: center; width: 1.25rem; height: 1.5rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; color: var(--viz-ink); background: var(--md-default-bg-color); }
+.md-typeset .explorer .shw-c.shw-none { border-style: dashed; color: var(--viz-text); }
+.md-typeset .explorer .shw-c.is-past { color: var(--viz-text); }
+.md-typeset .explorer .shw-c.is-now { box-shadow: inset 0 0 0 2px var(--viz-ink); font-weight: 700; color: var(--viz-ink); }
+.md-typeset .explorer .shw-regs { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin: 0.4rem 0; font-family: var(--md-code-font-family); font-size: 0.7rem; }
+.md-typeset .explorer .shw-reg { display: inline-flex; align-items: center; gap: 0.3rem; }
+.md-typeset .explorer .shw-rname { color: var(--viz-text); font-weight: 700; min-width: 6.5ch; }
+.md-typeset .explorer .shw-bits { display: inline-flex; gap: 1px; }
+.md-typeset .explorer .shw-b { display: inline-grid; place-items: center; width: 1.05rem; height: 1.35rem; border: 1px solid var(--viz-grid); background: color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color)); color: var(--viz-ink); font-style: normal; }
+.md-typeset .explorer .shw-b.shw-none { background: var(--md-default-bg-color); border-style: dashed; color: var(--viz-text); }
+.md-typeset .explorer .shw-b.is-flip { box-shadow: inset 0 0 0 2px var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .shw-rval { color: var(--viz-text); min-width: 2ch; }
+.md-typeset .explorer .shw-note { font-size: 0.72rem; margin: 0.3em 0; min-height: 2.6em; }
+.md-typeset .explorer .shw-wavewrap { overflow-x: auto; margin: 0.4rem 0; }
+.md-typeset .explorer table.shw-wave { display: table; width: auto; margin: 0; border-collapse: collapse; font-family: var(--md-code-font-family); font-size: 0.62rem; }
+.md-typeset .explorer table.shw-wave :is(th, td) { min-width: 1.7rem; padding: 0.1rem 0.2rem; border: 1px solid var(--viz-grid); text-align: center; color: var(--viz-ink); background: var(--md-default-bg-color); font-variant-numeric: tabular-nums; }
+.md-typeset .explorer table.shw-wave th[scope="row"] { position: sticky; left: 0; z-index: 1; text-align: left; font-weight: 700; background: color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.shw-wave thead th { color: var(--viz-text); font-weight: 400; }
+.md-typeset .explorer table.shw-wave .is-now { box-shadow: inset 0 0 0 2px var(--viz-s1); font-weight: 700; }
+.md-typeset .explorer table.shw-wave td.is-hi { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.shw-wave td.is-fut { background: color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .shw-key-now { background: var(--md-default-bg-color); outline: 2px solid var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .shw-key-on { background: none; height: 0; border-top: 3px solid var(--viz-s1); align-self: center; }
+.md-typeset .viz-legend .shw-key-flip { background: color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color)); outline: 2px solid var(--viz-ink); outline-offset: -2px; }
+
+/* one screen on a computer: the diagram in a column of its own beside the bits, the
+   flip-flops and the table; a narrow box keeps them one under the other */
+.md-typeset .explorer[data-kind="seqhw"] { container-type: inline-size; }
+@container (min-width: 600px) {
+  .md-typeset .explorer .shw-grid {
+    display: grid; column-gap: 1.2rem; align-items: start;
+    grid-template-columns: minmax(0, 1fr) clamp(16rem, 45%, 22rem);
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas: "strip dp" "regs dp" "wave dp" ". dp";
+  }
+  .md-typeset .explorer .shw-grid > .shw-strip { grid-area: strip; margin-top: 0.2rem; }
+  .md-typeset .explorer .shw-grid > .shw-regs { grid-area: regs; }
+  .md-typeset .explorer .shw-grid > .shw-wavewrap { grid-area: wave; }
+  .md-typeset .explorer .shw-grid > .shw-dpwrap { grid-area: dp; }
+  .md-typeset .explorer .shw-grid > .shw-dpwrap svg { max-width: none; margin: 0; }
+  .md-typeset .explorer .shw-sum { margin: 0.3em 0; }
+  .md-typeset .explorer .shw-grid > .shw-dpwrap svg .shw-blk text { font-size: 15px; }
+  .md-typeset .explorer .shw-grid > .shw-dpwrap svg .shw-blk text.shw-val { font-size: 14px; }
+  .md-typeset .explorer .shw-grid > .shw-dpwrap svg .shw-wlab { font-size: 14px; }
+}
+
+/* Part b's box (explorer/seqdet.js) on one screen: with a wide enough main column, the build
+   of the two edges out of the current state sits side by side under its title */
+.md-typeset .explorer[data-kind="seqdet"] .ex-main { container-type: inline-size; }
+@container (min-width: 440px) {
+  .md-typeset .explorer[data-kind="seqdet"] .sq-slide { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1rem; align-items: start; }
+  .md-typeset .explorer[data-kind="seqdet"] .sq-slide > .ex-title { grid-column: 1 / -1; margin-bottom: 0; }
+  .md-typeset .explorer[data-kind="seqdet"] .sq-lab { width: 3.4rem; }
+  .md-typeset .explorer[data-kind="seqdet"] .sq-c { width: 1.15rem; }
+}

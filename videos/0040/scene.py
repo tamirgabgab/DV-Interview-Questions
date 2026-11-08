@@ -29,13 +29,13 @@ SCENES = [
     ("Closing", "סיכום"),
 ]
 
-# The page's box (data-kind="seqdet"). "stream": the pattern 1011 (Mealy) fed 1011011 by
+# The page's part b box (data-kind="seqdet", the second on the page after part a's seqhw). "stream": the pattern 1011 (Mealy) fed 1011011 by
 # the bit buttons, picture k after k bits; the graph and the strip of din / state / found.
 # "build": the pattern 10101 typed, then 1, 0, 1 (state S3, the build of both edges
 # shown), 0 (S4) and 1 (a match: found, back to S3). "mm": 1011011 by the example
 # button, Mealy, then the machine switched to Moore.
 BOXES = {
-    "stream": {"box": 0, "width": 520,
+    "stream": {"box": 1, "width": 520,
                "region": [".sq-bits", ".sq-sum", ".sq-graph", ".sq-strip"],
                "hide": [".ex-play-row > :not(.sq-bits)", ".sq-next", ".sq-slide",
                         ".sq-build-toggle", ".viz-legend", ".ex-reset", ".ex-keys", ".wv-export"],
@@ -43,7 +43,7 @@ BOXES = {
                          [["click", ".sq-bit[data-b='1']"]], [["click", ".sq-bit[data-b='1']"]],
                          [["click", ".sq-bit[data-b='0']"]], [["click", ".sq-bit[data-b='1']"]],
                          [["click", ".sq-bit[data-b='1']"]]]},
-    "build": {"box": 0,
+    "build": {"box": 1,
               "region": [".sq-pat", ".sq-bits", ".sq-sum", ".sq-graph", ".sq-slide"],
               "hide": [".ex-controls:not(.ex-play-row) > :not(label:has(.sq-pat))",
                        ".ex-play-row > :not(.sq-bits)", ".sq-next", ".sq-build-toggle", ".viz-legend",
@@ -53,7 +53,7 @@ BOXES = {
                          ["click", ".sq-bit[data-b='1']"]],
                         [["click", ".sq-bit[data-b='0']"]],
                         [["click", ".sq-bit[data-b='1']"]]]},
-    "mm": {"box": 0,
+    "mm": {"box": 1,
            "region": [".sq-kind", ".sq-sum", ".sq-graph", ".sq-strip"],
            "hide": [".ex-controls:not(.ex-play-row) > :not(label:has(.sq-kind))",
                     ".ex-play-row", ".sq-next", ".sq-slide", ".sq-build-toggle", ".viz-legend",

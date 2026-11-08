@@ -1,9 +1,10 @@
 """Question 0040: the page's detect_1011 and run_fsm against the generator's brute-force
 automaton (the longest suffix that is a prefix) and against a plain "last L bits equal
 the pattern" check, Mealy and Moore, on random patterns up to 8 bits; the page's numbers
-(two detections in 1011011, four states, the fall-back of S3 on 0 to S2); the WaveDrom
-block of the page; the explorer's JavaScript; and the page copies of the generated
-blocks."""
+(two detections in 1011011, four states, the fall-back of S3 on 0 to S2, the fail
+recurrence 0, 0, 1, 1, the 9 and 7 states of the two-pattern product); the WaveDrom
+block of the page (found and found_moore); the explorers' JavaScript (seqdet and the
+hardware box seqhw); and the page copies of the generated blocks."""
 
 import json
 import random
@@ -17,7 +18,7 @@ import q0040  # noqa: E402
 
 ns = load_python(40)
 NEXT_1011, detect_1011, fsm_table, run_fsm = ns["NEXT_1011"], ns["detect_1011"], ns["fsm_table"], ns["run_fsm"]
-NAMES = {"S0": 0, "S1": 1, "S10": 2, "S101": 3}
+NAMES = {"S0": 0, "S1": 1, "S2": 2, "S3": 3}
 
 
 def bits_of(text):
@@ -30,7 +31,12 @@ def test_page_numbers():
     assert [NAMES[s] for s in states] == [0, 1, 2, 3, 1, 2, 3]
     assert q0040.run("1011", "1011011") == ([0, 1, 2, 3, 1, 2, 3], [0, 0, 0, 1, 0, 0, 1])
     assert q0040.table("1011") == [[0, 1], [2, 1], [0, 3], [2, 4], [2, 1]] and q0040.rest("1011") == 1
-    assert NEXT_1011["S101"] == ("S10", "S1") and NEXT_1011["S10"] == ("S0", "S101")
+    assert NEXT_1011["S3"] == ("S2", "S1") and NEXT_1011["S2"] == ("S0", "S3")
+    # one naming: the code's states are the tables' and the diagram's S0..S3
+    nxt, rest = q0040.table("1011"), q0040.rest("1011")
+    assert all(NAMES[s] == (rest if nxt[NAMES[k]][b] == 4 else nxt[NAMES[k]][b]) for k, v in NEXT_1011.items() for b, s in enumerate(v))
+    # the fail recurrence of part b on 1011, as its table
+    assert q0040.fails("1011") == [0, 0, 1, 1]
     # the traps: back to start misses the overlap in 101011; Moore is one cycle later
     assert q0040.run("1011", "101011")[1] == [0, 0, 0, 0, 0, 1]
     state, naive = 0, []
@@ -88,12 +94,19 @@ def test_wavedrom_block():
             out.append(out[-1] if c == "." else c)
         return out
 
-    assert rows["state"] == "=" * len(names)                 # one data entry per cycle
-    bits = [int(c) for c in decode(rows["din"])[1:]]         # cycle 0 is the reset cycle
+    assert rows["state"] == "=" * len(names) == "=" * 9      # one data entry per cycle
+    din = decode(rows["din"])
+    assert din[0] == din[8] == "x"                            # cycle 0 resets, cycle 8 has no bit
+    bits = [int(c) for c in din[1:8]]
     assert bits == bits_of("1011011")
     states, out = detect_1011(bits)
-    assert names[1:] == states and names[0] == "S0"
-    assert [int(c) for c in decode(rows["found"])[1:]] == out
+    assert names[1:8] == states and names[0] == "S0"
+    assert names[8] == detect_1011(bits + [0])[0][-1] == "S1"
+    assert [int(c) for c in decode(rows["found"])] == [0] + out + [0]
+    # found_moore: the same detector in Moore, a cycle later (cycles 5 and 8)
+    moore = run_fsm([1, 0, 1, 1], bits + [0], moore=True)[1]
+    assert [int(c) for c in decode(rows["found_moore"])] == [0] + moore
+    assert [k for k, v in enumerate(decode(rows["found_moore"])) if v == "1"] == [5, 8]
 
 
 def test_explorer_matches_the_page_code():
@@ -167,3 +180,48 @@ def test_steps_light_the_right_parts():
         got = {k for k in plan[i].split() if k.startswith("e")}
         assert got == {f"e{s}-{b}-{edges[s, b]}" for (s, b) in edges if kind(s, b) == want}
     assert {k for k in plan[3].split() if k.startswith("e")} == {f"e{s}-{b}-{edges[s, b]}" for (s, b) in edges if kind(s, b) == "found"}
+
+
+def test_two_patterns_product():
+    """The follow-up: one machine for 1011 and 0110. Moore's product has 9 reachable pairs
+    (the nodes of the Aho-Corasick trie: every prefix of the two, the empty one included),
+    Mealy's 7 (the two pairs with a full-match state merge into their rests)."""
+    moore, mealy = q0040.product_states("1011", "0110", True), q0040.product_states("1011", "0110", False)
+    assert len(moore) == 9 == len({p[:k] for p in ("1011", "0110") for k in range(5)})
+    assert len(mealy) == 7 and moore - mealy == {(4, 3), (2, 4)}
+    page = question_path(40).read_text(encoding="utf-8")
+    assert "רק 9 מהם ישיגים" in page and "מספיקים 7 מתוך" in page
+
+
+def test_hardware_box_matches_the_page_code():
+    """The box seqhw (part a's circuit clock by clock): Mealy as the page's detect_1011, a
+    clock per bit; Moore as run_fsm(moore=True) plus one clock without a bit, whose found
+    comes from the state alone; next is the state of the following clock, and the state
+    register's bits are the state's number (2 flip-flops in Mealy, 3 in Moore)."""
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(43)
+    streams = ["1011011", "101011", "11111", "1"] + ["".join(rng.choice("01") for _ in range(rng.randint(1, 24))) for _ in range(120)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(streams)}.map((s) => [false, true].map((moore) => {{
+        const t = m.shTrace([...s].map(Number), moore);
+        return [t.width, t.clocks.map((c) => [c.din, c.state, c.next, c.found, c.q, c.d])];
+      }}))));""")
+    for s, ((w_mealy, mealy), (w_moore, moore)) in zip(streams, got):
+        bits = bits_of(s)
+        states, out = detect_1011(bits)
+        assert w_mealy == 2 and w_moore == 3
+        assert [c[0] for c in mealy] == bits and [c[3] for c in mealy] == out, s
+        assert [c[1] for c in mealy] == [NAMES[x] for x in states], s
+        after = [NAMES[x] for x in detect_1011(bits + [0])[0][1:]]
+        assert [c[2] for c in mealy] == after, s
+        assert all(c[4] == [(c[1] >> 1) & 1, c[1] & 1] and c[5] == [(c[2] >> 1) & 1, c[2] & 1] for c in mealy)
+        m_states, m_out = run_fsm([1, 0, 1, 1], bits + [0], moore=True)
+        assert [c[0] for c in moore] == bits + [None] and [c[1] for c in moore] == m_states, s
+        assert [c[3] for c in moore] == m_out, s
+        assert [c[2] for c in moore] == m_states[1:] + [None], s
+        assert all(c[4] == [(c[1] >> 2) & 1, (c[1] >> 1) & 1, c[1] & 1] for c in moore)
+    cases = ["1011011", " 1011 011 ", "", "10a1", "1" * 24, "1" * 25]
+    parsed = node_json(f"const m = {explorer_require()};console.log(JSON.stringify({json.dumps(cases)}.map(m.shParse)));")
+    assert parsed == ["1011011", "1011011", None, None, "1" * 24, None]

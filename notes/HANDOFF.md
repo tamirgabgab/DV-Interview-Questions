@@ -1032,6 +1032,35 @@ below start at item 112 (session 31).
     0041, 0042, 0052, 0055, 0061, 0080. Two read-only review passes (each correctness claim
     checked with a script) and every box measured at 1920 by 1080. Findings under "Open
     items", "Review round 3 (session 34)". Nothing was changed yet.
+185. **The third ten questions fixed (session 34, 2026-11-08).** Six agents; every R1 claim
+    re-verified by a script first (all held). 0001: the `edge` box in two columns with the
+    live circuit of the chosen edge and a table of signals per cycle, a transport for the
+    cursor, a truth table before the formula, a generated synchronizer chain (gen 2) for the
+    asynchronous trap, the registered-output idiom. 0030: 28 face orders (16 legal; 22 of the
+    strip's 48 lines), Δx and Δp in letters, part b's example in the idea. 0032: the trap
+    about the bank left removed, the plan table merged into the stepper, the six forbidden
+    states, the parity argument for 7, the mirror path lit; the river box with its graph
+    beside the banks (1455 -> 905 px; stylesheets/questions/0032-river.css). 0040: one state
+    naming (S0..S3 in Python, SV, tables and boxes), a generated block diagram, `found_moore`
+    in the waveform, a fail-recurrence table, the product follow-up (Moore 9, Mealy 7), a new
+    hardware box `seqhw` (class prefix `shw-`), the seqdet box 1036 -> 920 px. 0041: the last
+    bin as ten (not twelve) earlier bins, 44% for the last two, inclusion-exclusion in floats
+    fails only for small t, the percentile ratios. 0042: the N(x) chart in the idea, hint 2
+    without the prices, two camels restated, evaporation dropped. 0052: the gap argument, a
+    casino example, part d checked on HH, the SD claim limited, part d's equation split (it
+    was 16 px too wide on a phone). 0055: `div_fsm` (Python and SV) computes the base's
+    inverse only from the LSB (MSB-first base 10, m = 5 raised), one wording ("נכנס כ-LSB /
+    כ-MSB") with a mapping table, a generated block diagram and clock table for 13, a new box
+    `divhw` (prefix `dh-`), part b shortened, the divfsm box moved to part c's idea (1092 ->
+    953 px). 0061: the trace in the steps, part b's steps and trace, hints, both sides of the
+    monotonicity, windows in LTR spans. 0080: p·a and q·b, why K mod 4, part d's start
+    motivated, the billiard box 1087 -> 966 px. Box paragraphs give "נסו" tasks. The lead:
+    lint_pages.py's markdown-div test now skips quoted attribute values (a `>` in 0040's
+    data-fig-steps had left most of 0040 unlinted), eight contrast pairs for divhw,
+    CONTRIBUTING rows. Videos: 0040's scene now captures box 1 (seqhw is box 0), and its
+    code-walk captions still say S10 / S101: a caption pass before any re-render; 0001's
+    `.wv-step` text moved to the side column (the "draw" capture region would look
+    different); 0055's video shows part b's Karnaugh maps, no longer on the page.
 
 ---
 
@@ -1262,26 +1291,28 @@ diff, memory for 10^6 packets) and positions in the report ("H extra" which one)
 
 ### Review round 3 (session 34): ten more questions
 
-Correctness first; every claim below was checked by a reviewer's script (CONFIRMED); verify
+All done (work log item 185), with the owner's choices: the 0032 trap removed, hardware boxes
+for 0001, 0040 and 0055, 0032's graph in a side column, box tasks in the text only (no trap
+buttons). Correctness first; every claim below was checked by a reviewer's script (CONFIRMED); verify
 again before changing a page. 0001, 0040, 0042, 0052, 0055, 0061 and 0080: no wrong claim
 found (all tables recomputed exactly).
 
 **R1. Correctness:**
-- [ ] 0030: proof "מספיק לבדוק סדרים בלי חזרה": "נשארים 16 סדרים : (4), (8), (8), (8)"
+- [x] 0030: proof "מספיק לבדוק סדרים בלי חזרה": "נשארים 16 סדרים : (4), (8), (8), (8)"
   sums to 28, not 16 (step 5 says the same): 28 face orders without a repeat, 16 of them
   give a legal straight line (the table); in the strip 22 of 48 lines are legal (the 16
   and 6 that wrap and repeat a face). Also step 3 explains Δp = 24 by "the far wall's
   width, 12", but that 12 is the height h (b = h = 12 hides it): write Δx and Δp in letters.
-- [ ] 0032: the trap "לבדוק רק את הצד שעוזבים" is not a bug: after a crossing the bank
+- [x] 0032: the trap "לבדוק רק את הצד שעוזבים" is not a bug: after a crossing the bank
   with the farmer is always safe, so the left bank is the full check (the box's captions
   check only that bank). Drop it, or replace it by "checking before the crossing instead of
   after".
-- [ ] 0041: "התא האחרון ... כמו 12 התאים הראשונים ביחד" (the first 12 cost 20.8 tests;
+- [x] 0041: "התא האחרון ... כמו 12 התאים הראשונים ביחד" (the first 12 cost 20.8 tests;
   about 10, 14.9); the trap "הכלה-הדחה ב-n גדול ... זבל" is overstated (at n = 100 floats
   match the exact value to 1e-13 at t = 497, 754, 916; it fails only for t below about 80,
   where P(T > t) = 1 anyway); "חצי מהזמן ... שני התאים האחרונים" is 44%; "כמעט פי שניים"
   is 1.66 at n = 16 and 1.45 at n = 100.
-- [ ] Small: 0052 "סטיית התקן קרובה לתוחלת" fails for HT (2 vs 4): say for longer or
+- [x] Small: 0052 "סטיית התקן קרובה לתוחלת" fails for HT (2 vs 4): say for longer or
   self-overlapping patterns. 0055's Python `div_fsm` calls `pow(base, -1, m)` also when
   `lsb=False`, so MSB-first base 10, m = 5 raises (the docstring asks gcd = 1, but the
   base-10 trap says that case works with 2 states). 0040's "two patterns" follow-up counts
@@ -1313,27 +1344,27 @@ D1D0, div), the register and its signals in the box (it shows only the state rin
 vocabulary ("נכנס כ-LSB" vs "מה-MSB").
 
 **R4. Explanations (most valuable first):**
-- [ ] 0001: a 4-row (sig, sig_q) table before the formula; the registered-output idiom
+- [x] 0001: a 4-row (sig, sig_q) table before the formula; the registered-output idiom
   `pulse_q = sig_q & ~sig_qq` in the follow-up.
-- [ ] 0030: move part b's step-6 example (end0 folded on top) into the idea; the 4-face
+- [x] 0030: move part b's step-6 example (end0 folded on top) into the idea; the 4-face
   routes (40.72) also beat the ceiling (z0 = 9, z1 ≤ 3.3) in the follow-up.
-- [ ] 0032: the 7 crossings shown 4 times (merge the table into the stepper); the 16-row
+- [x] 0032: the 7 crossings shown 4 times (merge the table into the stepper); the 16-row
   safety table (show the 6 forbidden states); the parity argument for 7 (odd, 5
   impossible); step 5 claims a mirror path but does not light it.
-- [ ] 0040: part b's fail recurrence with a 4-row trace for 1011 (fail = 0, 0, 1, 1).
-- [ ] 0041: part a's steps repeat the idea; a two-bin anchor for inclusion-exclusion
+- [x] 0040: part b's fail recurrence with a 4-row trace for 1011 (fail = 0, 0, 1, 1).
+- [x] 0041: part a's steps repeat the idea; a two-bin anchor for inclusion-exclusion
   (p = 0.01 gives about 100); 54.1 / 90 repeated six times.
-- [ ] 0042: 60 + 100 + 300 = 460 repeated five times; the N(x) chart from the proof into
+- [x] 0042: 60 + 100 + 300 = 460 repeated five times; the N(x) chart from the proof into
   the idea; hint 2 gives the prices; the two-camels follow-up compares 900 L and 450 L
   unclearly; "מים שמתאדים" has no payoff.
-- [ ] 0052: a three-toss casino example for HH (4 + 2 = 6); the gap argument for "same
+- [x] 0052: a three-toss casino example for HH (4 + 2 = 6); the gap argument for "same
   probability, different time" (½·1 + ½·7 = 4); check part d's equation once on HH, n = 1.
-- [ ] 0055: part b repeats the x derivation three times and part a's whole gate pipeline
+- [x] 0055: part b repeats the x derivation three times and part a's whole gate pipeline
   (keep the table and the flip-flop swap).
-- [ ] 0061: the trace sits under the proof (move it to the steps); part b has no steps or
+- [x] 0061: the trace sits under the proof (move it to the steps); part b has no steps or
   trace (AAABBCBABA, a step where the window's most common value changes); hint 2 gives
   the whole algorithm; part b's proof only one side of monotonicity.
-- [ ] 0080: K mod 4 needs its why (reflections repeat every 2a); part d step 3's start
+- [x] 0080: K mod 4 needs its why (reflections repeat every 2a); part d step 3's start
   ⌊(2x₀ − w)/a⌋ before its motivation (bring in the (2, 170) at 80° example); "בגלל
   הסימטריה" -> point to the midpoint argument.
 

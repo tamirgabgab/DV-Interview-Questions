@@ -217,7 +217,8 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
             para_start = True
             continue
         # Markdown inside an HTML block (the steps timeline) is linted like the rest
-        if re.match(r"<div\b[^>]*\bmarkdown\b[^>]*>$", stripped) or stripped == "</div>":
+        # (an attribute value may hold a ">", as 0040's data-fig-steps does)
+        if re.match(r"""<div\b(?:[^>"']|"[^"]*"|'[^']*')*\bmarkdown\b(?:[^>"']|"[^"]*"|'[^']*')*>$""", stripped) or stripped == "</div>":
             para_start = True
             continue
         # html blocks (svg etc.)

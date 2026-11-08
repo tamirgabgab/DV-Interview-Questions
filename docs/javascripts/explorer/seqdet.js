@@ -81,7 +81,12 @@
       let stop = () => {};
       const graph = (t, run) => {
         const L = t.L, N = st.moore ? L + 1 : L;
-        const W = 640, Y = 90, R = N > 6 ? 18 : 24, H = 200;
+        // the height follows the deepest edge below the row (one screen at 1920 x 1080): the
+        // loops' labels just under the top, what each state has seen in a row under the arcs
+        const R = N > 6 ? 18 : 24, Y = R + 46, W = 640;
+        let deep = 0;
+        for (let s = 0; s < N; s++) for (let b = 0; b < 2; b++) { const tg = st.moore || t.nxt[s][b] < L ? t.nxt[s][b] : t.rest; if (tg !== s && tg !== s + 1) deep = Math.max(deep, Math.abs(s - tg)); }
+        const H = Math.min(200, Math.round(Y + R + (26 + 14 * deep) / 2 + 14 + 26));
         const xs = Array.from({ length: N }, (_, k) => (N === 1 ? W / 2 : 50 + (k * (W - 100)) / (N - 1)));
         const cur = run.next, last = st.bits.length ? st.bits[st.bits.length - 1] : null, before = st.bits.length ? run.states[run.states.length - 1] : null;
         const target = (s, b) => { const n = t.nxt[s][b]; return st.moore || n < L ? n : t.rest; };
