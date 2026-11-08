@@ -952,6 +952,13 @@ below start at item 112 (session 31).
     an input `last` in the page's figure, whose write back now reads "after: r ← y, last:
     n ← 1, tail: n + 1". The test checks last only at clock 25, with n = 1 after it.
 
+179. **Review of ten random questions and of every box's height (session 34, 2026-11-08).**
+    The owner asked for ten random questions (seed 20261108, 0099 left out: 0005, 0025,
+    0047, 0062, 0064, 0066, 0078, 0086, 0093, 0097) to be reviewed for their explanations,
+    boxes and figures, with the wish that a whole box fit one computer screen as 0099's does.
+    Every box of the site was measured at 1920 by 1080 (stepped to its end): 183 boxes of
+    117 kinds; 102 boxes are over 970 px, 30 over 1500 px. The findings and the proposed
+    work are under "Open items", "Review round (session 34)". Nothing was changed yet.
 
 ---
 
@@ -1006,6 +1013,108 @@ below start at item 112 (session 31).
 - [x] ~~0038: the checker missed an ack in the rise cycle~~ (fixed, work log item 151).
 - [ ] Figure labels under 11 px on phones (work log item 148): the D194 fit raises them to 9.5 px only; 11 px needs fewer value labels and more room in `charts.py`'s `tick` and `legend` and per generator (0028, 0044 first).
 - [ ] When a Verilator release newer than 5.052 is out, bump `VERILATOR_REF` to its tag and check that 0011 and the 0014 subclass still pass.
+
+### Review round (session 34): ten questions and one screen per box
+
+Found by reading the ten pages (two review passes) and by measuring every box at 1920 by
+1080 with all its blocks open and the box stepped to its end. The screen budget: about
+970 px of box under the sticky header and the part bar (0099's box is about 980 px).
+Waiting for the owner to choose; the two correctness items (R1) go first.
+
+**R1. Correctness (verify, then fix the text and the test):**
+- [ ] 0062: "בלי ההסכמה התשובה יכולה להיות גדולה באחד" (statement) and "נספר tag אחד
+  יותר מדי" (proof, equal times) are wrong in general: 0-10, 0-10, 10-20, 10-20 counts 4
+  instead of 2; the excess is the number of sends at that instant (min of ends and starts).
+- [ ] 0066: "ניקח כל קטע סגור [s, e] ... כחצי קטע [s, e)" loses a point interval [5, 5];
+  say "with s < e" (the testbench already filters s < e).
+- [ ] 0086: part b's short answer ("אפשר אם ורק אם שתיים מהספירות שוות מודולו 3, ואז
+  כולן מגיעות לצבע השלישי") misses the exception (3, 0, 0), where no meeting can happen;
+  it is only in the proof and in part c.
+- [ ] 0025: part b's step 11 sends three Ack 1 and the short answer counts three, but steps
+  12 and 13 deliver two; show the third or say it is the same.
+- [ ] 0078: the follow-up "בחומרה" (LFSR) treats LFSR outputs as independent rand7 calls;
+  rejecting 7 from a deterministic cycle gives a fixed sequence. Say it is pseudo-random.
+
+**R2. One screen per box (shared work, then per kind).** What makes boxes tall, from the
+ten: control rows (three or four rows of sliders, a select, reset and random buttons, up
+to 200 px); the steps-and-code panel inside a box ("הסבר : השלבים של הפתרון והקוד",
+300 to 500 px in 0062, 0064, 0066); and figures, tables and notes stacked one under the
+other (0078: a summary table, the 5 by 5 grid and the table of ten rounds). Proposal:
+- [ ] A shared wide layout in `core.js` and a shared stylesheet, like `.ih-grid`: a
+  container query on the box (600 px and wider) that puts the controls in fewer rows
+  (labels beside their fields, the play row and the scrub on one row) and lays out a
+  main column (the figure) beside a side column (tables, the steps-and-code panel, the
+  note). A kind opts in by wrapping its blocks in `ex-main` / `ex-side`; a narrow box
+  keeps today's one-column order. check_jumps should then also step boxes at 1920 px.
+- [ ] The steps-and-code panel in the side column, or closed by default in a box.
+- [ ] A check (in check_explorers or a new one) that reports each box's height at
+  1920 by 1080 against the budget, so new boxes stay on one screen.
+- [ ] Then the kinds, tallest first. Over 1500 px: twoheaps 2375 (0068), billiard 2204
+  (0080), lfsr 2196 (0036), netdelay 1979 (0067), cake-geo / cake-arith 1974 (0027,
+  0028), eggs 1939 (0039), strip 1926 (0030), gridpath 1882 (0070), overtakes 1864
+  (0069), oddball 1849 (0045), boxes 1791 (0009), winfsm 1738 (0056), islands 1707
+  (0065), weights 1704 (0064), motorcycle 1671 (0026), kap4base 1667 (0013), slidemax
+  1635 (0063), arbiter 1587 (0054), horses 1566 (0043), intervals 1541 (0066), kapbase
+  1509 (0012), hourglass 1505 (0018, 0019). 1200 to 1500 px: divfsm, credits, randmn,
+  river, josephus, ants, bitrev, camel, acknak, shapes, wizards, endpoint, eurovision,
+  tagpool, ducci, nqueens, covergroup, creditwalk. 970 to 1200 px: probability, maxones,
+  rainwater, kaprekar, uvmarch, kapn, tuesday, onesk, floyd, kapgraph, seqdet, bitmatrix,
+  tagcheck, bridge, farm, pcie, luhn, jugs, soldiers, editdist, chameleons, dupbin,
+  attempts, fifo, clock. The other 50 kinds fit (among them abmap, bfs01, isqrt,
+  matching, repunit and iban).
+
+**R3. Boxes and figures, patterns across the ten:**
+- [ ] A box that replays the static figure above it with the same input (0062 part a,
+  0066 mode a, 0086's triangle, 0025's scripts): load a trap case instead (the tie
+  0-10 / 10-20 in 0062; unsorted, nested and touching intervals in 0066), and say in one
+  line what the box adds.
+- [ ] Box paragraphs describe the layout ("למעלה ... מתחת") instead of giving a task
+  (0005, 0047, 0078, 0025): one or two "try this" lines each (0078: M = 2, N = 5, k from 3
+  to 4 and the rejected share falls; 0025: corrupt the head TLP and deliver the rest, one
+  Nak and not three; 0047: watch which side moves).
+- [ ] The same worked numbers three times (steps, table, box) in 0064, 0025, 0097 and
+  0086: keep the table, shorten the steps to the rule.
+- [ ] 0093: the second box only flips the default of the "מי מציע" switch of the first;
+  drop it and point back. Table gen 5 mixes job numbers with places (both 1 to 6): label
+  the cells.
+- [ ] 0097 part c has no datapath figure: registers k (3 bits), root (8), rem (16), the
+  trial shifter, the comparator (the subtractor's borrow), the mux back into rem, the
+  decoder of root[k], busy and done; and one clock-by-clock table tied to the wavedrom
+  (clock, k, trial, fits, root, rem, busy, done), the way 0099 part b was redone.
+
+**R4. Explanations, per question (most valuable first):**
+- [ ] 0005: move the pruning argument and "BFS = fewest digits first" from the proof
+  into the idea; split hint 2 (remainder, then the order of visiting); the x = 7 tree
+  and the queue table say the same thing: one right after the steps; the follow-up "ספרות
+  אחרות" repeats a section: replace it (at most k ones) or drop it.
+- [ ] 0047: the trace on [3, 0, 2, 0, 4] never moves r, so it never shows the decision:
+  use an array where both pointers move (the box's default); one sentence in the idea on
+  why the smaller side is decided; define the escape height at the start of part b.
+- [ ] 0062: part b never answers "מה היחס ביניהם": S ≥ max(R, W) ≥ (R + W) / 2, so two
+  pools cost at most twice one; why AXI keeps them apart (no starving); the events table
+  belongs under the steps.
+- [ ] 0066: part c never writes its four intervals; the verification paragraph of the
+  statement is nine lines (two are enough); six traps overlap the steps and the proof;
+  note that part c's peak is tracked in the sweep in O(1) memory.
+- [ ] 0078: part b's 7-row table comes before L is defined; the `$urandom % N` bias at
+  the end of part b (k = 1, no rejection); the follow-up "לחסוך בקריאות" needs its first
+  step (4 leftovers times one call give 20, accept 14).
+- [ ] 0086: a and b are both colours and counts (use x / y for colours); part a says the
+  residue argument three times; one sentence of geometry for the triangle (a meeting is
+  a step of 3 in two coordinates).
+- [ ] 0093: a middle hint ("what if a job could change its mind?"); show the greedy
+  matching (A-6, B-1, C-2, D-3, E-4, F-5) before the blocking pairs; one sentence that the
+  order of proposals does not change the result; the tightness construction as the n = 3
+  instance before the general rule.
+- [ ] 0025: a column naming the method called at each step (send_tlp, receive_tlp,
+  receive_dllp, on_replay_timeout); the 2048 window motivated where it is first used;
+  the receiver rules as a small table (crc by expected / old / future).
+- [ ] 0097: hint 1 gives the procedure (make it "how many bits, decide from the top");
+  part a's steps repeat its table.
+- [ ] 0064: CSD / Booth is base 2 with a redundant digit set, not base 3: say the shared
+  step ("a remainder too big becomes a negative digit and a carry"); a number-line figure
+  for uniqueness step 3; say why the all-on-the-other-pan placement weighs 40; split
+  "ארבע מספיקות" into its two proofs.
 
 ---
 
