@@ -999,6 +999,11 @@ below start at item 112 (session 31).
     a bullet per block (the comparator is the subtractor's borrow), a cycle table and a
     generated waveform with k, trial and fits, and a new box `isqrthw` (two columns, trap
     cases 65535, 4096, 4095, 0) beside the areas box `isqrt`.
+182. **Second review round: ten more random questions (session 34, 2026-11-08).** Seed
+    20261109, the first round's ten and 0099 left out: 0006, 0010, 0016, 0021, 0034, 0037,
+    0043, 0065, 0084, 0100. Two read-only review passes (each correctness claim checked
+    with a script) and a look at every box at 1920 by 1080. Findings under "Open items",
+    "Review round 2 (session 34)". Nothing was changed yet.
 
 ---
 
@@ -1157,6 +1162,75 @@ other (0078: a summary table, the 5 by 5 grid and the table of ten rounds). Prop
   step ("a remainder too big becomes a negative digit and a carry"); a number-line figure
   for uniqueness step 3; say why the all-on-the-other-pan placement weighs 40; split
   "ארבע מספיקות" into its two proofs.
+
+### Review round 2 (session 34): ten more questions
+
+Waiting for the owner. Correctness first; every claim below was checked by a reviewer's
+script (CONFIRMED) unless marked SUSPECTED; verify again before changing a page.
+
+**R1. Correctness:**
+- [ ] 0006: "הסדר בתוך הלולאה חשוב ... כך אף פעם לא 'קונים ומוכרים' באותו יום" (and the box
+  text, annotation (1)) is overstated: with the strict `>` the order never changes the result
+  (200,000 random arrays); it matters only with `>=` or a must-trade variant. The fee
+  follow-up's "הרווח הוא 7" is the multi-trade answer; one trade gives 7 − 2 = 5.
+- [ ] 0016: the base-4 follow-up "מחסרים את הגדול ביותר שאינו עולה עליו מבין `11…1`,
+  `22…2` או `10…0`" read literally gives wrong survivors (N = 20 gives 4, not 16): subtract
+  the one of N's own chain r.
+- [ ] 0034: "16 צירופים ... 14 מהם הם ערכים שהמצביע לא עבר בהם" (and the box paragraph):
+  7 of the 14 (0..6) are values the pointer already passed (behind it, conservative), 7
+  (9..15) are ahead (the harmful ones). SUSPECTED: the waveform's `rclk` (period 1.5) has
+  no edge where the sync rows change, and no skew between bits.
+- [ ] 0043: the examples table gives 10 as the worst case for 64 / 8 / 4, but the page's
+  `horses_plan` needs 11 on 49 of 4000 random orders (the generator samples 60). "לכל היותר
+  שלושה שורדים" among A4, B3, C2 and "לכל היותר ארבעה סוסים" in race 9: at most one survives,
+  so race 9 has at most 2 horses, and is skipped about 25% of the time; D1's place in race 8
+  comes from a tie-break, not from "most missing comparisons".
+- [ ] 0065: "והסריקה ממשיכה מ-(1, 2) : היא עוברת 9 תאים" — the scan resumes at (0, 1);
+  "הגודל של כל גוש אומר אם שורת חילוף אחת או עמודת חילוף אחת מספיקות" is wrong (the 3-cell
+  L at (1,4), (1,5), (2,4) needs two spares): the island's row and column span decides.
+- [ ] Small: 0037 part c says O(n·d) in the question and O(m·d) in its cost; 0100's
+  follow-up says "three variables" and uses two; 0010's timing "~7 s" at 100,000 measured
+  about 16 s (machine-dependent: say "several seconds"), and part a's converse misses
+  strings with no closer (`(((`); 0016's cost "סימולציה O(N)" holds for the recurrence,
+  not a list simulation (O(N²)). SUSPECTED: 0021's "Root Complex טיפוסי מחזיר Completions
+  גדולים ככל האפשר" (many return RCB-sized ones; the point stands as "one fixed policy").
+
+**R2. Boxes (every one of the ten opens on the page's own example):** start them on a trap
+case or add trap buttons, and give each box paragraph a task instead of a layout
+description: 0006 (`3 9 1 2`, the tie `1 5 1`), 0010 (`())`, "one string per failure
+reason"), 0016 (N = 21, N = 2·3^m − 1, "every N ≤ 64 where seat 0 survives"), 0021
+(0x1020 / 128 / MPS 128, L = 320, RCB = 128), 0034 ("at b = 11 predict the flipped Gray
+bit"), 0037 (AB / XAB, CA / ABC, ABCD / BCDA), 0043 (a seed where race 9 is skipped),
+0065 (a U-shaped island, a diagonal line, a small island before a large one), 0084
+(3 4 5 1), 0100 (S = {2, 3}, broken 5 and 6, S = {1, 3}). Heights: 0043 (1226) and 0065
+(1186) are still over the screen. In a side column the code view cuts long lines (0065):
+a smaller code font there, or wrapping, would show whole lines.
+
+**R3. Hardware and DV:** 0034 has no block diagram and its waveform does not show the
+2-3 cycle latency: draw `wbin`, `wgray`, `rq1_wgray`, `rq2_wgray`, `rempty` (and the
+mirror for full), a clock-by-clock waveform with skewed bits, and a glitch sketch for the
+combinational-Gray trap. 0100's `stairs_ways` module: a cycle table for the broken-5 run.
+0037: the scoreboard flow (monitor → actual queue, model → expected queue, an end-of-test
+diff, memory for 10^6 packets) and positions in the report ("H extra" which one).
+
+**R4. Explanations (most valuable first):**
+- [ ] 0006: a worked trace in part a; reword the loop-order argument; a must-trade follow-up.
+- [ ] 0010: drop part b's tables (the steppers show them); the invariant first in the
+  proof; the odd-length precheck as an optional shortcut; "כמה זה משנה" keeps two of three.
+- [ ] 0016: the same run three times (keep the stepper and the table); hints that give the
+  answer (part a hint 2; part b hint 3); merge the three 20-row tables.
+- [ ] 0021: T(N, k) used in part b before part c defines it; the δ case worked four times;
+  part c's idea as the one-sentence insight; split part b's hint 2.
+- [ ] 0034: part a's 4-bit pointer vs part c's 5 bits (say the extra bit is left out).
+- [ ] 0037: the "coincidence" reason first in part b; why the band's values do not fall.
+- [ ] 0043: "ולמה 8 לא מספיקות" is a compressed sketch; race 8 as it really works; a
+  letter mapping for the random example.
+- [ ] 0065: the paragraph under the step table retells it; an MBIST follow-up (each
+  island's span, one spare row or column); the corner paradox into a collapsed note.
+- [ ] 0084: the step proof with one index; part b's answer differs from part a's (say both
+  are valid); part c's numbers repeated; a third hint in part c.
+- [ ] 0100: part d's table stops at stair 6 (the question asks 10); w′(4) used before it
+  is defined; "two adjacent broken stairs block everything" only for S = {1, 2}.
 
 ---
 
