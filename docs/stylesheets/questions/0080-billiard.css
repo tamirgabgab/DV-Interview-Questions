@@ -1,0 +1,12 @@
+/* Question 0080, the billiard pocket: the box (explorer/billiard.js, bil-*) on one 1920 x 1080
+   screen. Its colours and figures stay in 11-questions.css; here only its controls in the
+   two-column layout (27-box-columns.css): narrower number fields and sliders, so the
+   position, the direction and the degrees share one row and the widths and the ball's
+   radius another, and the six shots of the page on one row of smaller buttons. */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="billiard"] .ex-controls { gap: 0.45rem 1rem; }
+  .md-typeset .explorer[data-kind="billiard"] .bil-f input { width: 4rem; }
+  .md-typeset .explorer[data-kind="billiard"] .ex-controls input[type="range"] { max-width: 8rem; }
+  .md-typeset .explorer[data-kind="billiard"] .ex-controls:has(.bil-pre) { gap: 0.4rem 0.5rem; }
+  .md-typeset .explorer[data-kind="billiard"] .ex-controls button.md-button.bil-pre { padding: 0.2rem 0.5rem; }
+}

@@ -8,7 +8,7 @@ The reference here is independent of the page code: brute_ones() and brute_same(
 window, trace_ones() and trace_same() replay the sliding window step by step (the rows of
 the table and what the onesk explorer draws). blocks() returns, in page order: the strip of
 part a with its best window, its legend, the table of the window's steps on the page's
-example, the strip of part b and its legend.
+example, the strip of part b, its legend and the table of its window's steps.
 """
 
 RLM = "‏"
@@ -125,6 +125,8 @@ def strip_b():
 
 
 def steps_table(bits, k):
+    # a window "4..9" is isolated left to right: in a right-to-left cell the two dots
+    # between the numbers would lay it out as "9..4"
     rows = trace_ones(bits, k)
     out = ["| הצעד | הביט שנכנס | אפסים בחלון | הקצה השמאלי | החלון | הטוב עד עכשיו |", "|:-:|:-:|:-:|:-:|:-:|:-:|"]
     for r in rows:
@@ -132,13 +134,36 @@ def steps_table(bits, k):
         # a step that shrank the window shows the count that set it off, then the count after
         peak = r["zeros"] + bits[r["left"] - r["moved"]:r["left"]].count(0)
         zeros = f'<span dir="ltr">{peak} → {r["zeros"]}</span>' if r["moved"] else str(r["zeros"])
-        out.append(f"| {RLM}{r['right']} | {RLM}{r['bit']} | {RLM}{zeros} | {RLM}{r['left']}{moved} | {RLM}{r['left']}..{r['right']} | **{RLM}{r['best']}** |")
+        out.append(f"| {RLM}{r['right']} | {RLM}{r['bit']} | {RLM}{zeros} | {RLM}{r['left']}{moved} | {RLM}<span dir=\"ltr\">{r['left']}..{r['right']}</span> | **{RLM}{r['best']}** |")
+    return "\n".join(out)
+
+
+def steps_table_same(values, k):
+    """Part b's window step by step: the value that came in, the counters of the window, its
+    most frequent value, the cells to replace, the window and the best so far."""
+    rows = trace_same(values, k)
+    out = ["| הצעד | הערך שנכנס | המונים בחלון | הנפוץ | להחלפה | החלון | הטוב עד עכשיו |", "|:-:|:-:|:-:|:-:|:-:|:-:|:-:|"]
+    for r in rows:
+        left, right = r["left"], r["right"]
+        counts = ", ".join(f"{c}: {n}" for c, n in sorted(r["count"].items()) if n)
+        bad = right - left + 1 - r["count"][r["top"]]
+        # a step that shrank the window shows the cells to replace that set it off, then after
+        if r["moved"]:
+            w0 = values[left - r["moved"]:right + 1]
+            peak = len(w0) - max(w0.count(c) for c in set(w0))
+            bad_s = f'<span dir="ltr">{peak} → {bad}</span>'
+        else:
+            bad_s = str(bad)
+        moved = f" (זז {RLM}{r['moved']})" if r["moved"] else ""
+        out.append(f"| {RLM}{right} | {RLM}{r['value']} | {RLM}<span dir=\"ltr\">{counts}</span> | {RLM}{r['top']} | {RLM}{bad_s} | "
+                   f"{RLM}<span dir=\"ltr\">{left}..{right}</span>{moved} | **{RLM}{r['best']}** |")
     return "\n".join(out)
 
 
 def blocks():
     """The generated blocks, in page order."""
-    return [strip_a(), legend("אפס שהופך לאחד"), steps_table(BITS, K), strip_b(), legend("ערך שמוחלף")]
+    return [strip_a(), legend("אפס שהופך לאחד"), steps_table(BITS, K), strip_b(), legend("ערך שמוחלף"),
+            steps_table_same(BUS, K_BUS)]
 
 
 if __name__ == "__main__":
