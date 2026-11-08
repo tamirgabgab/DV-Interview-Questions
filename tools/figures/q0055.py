@@ -10,11 +10,13 @@ minimized by partition refinement, so the state counts are found, not assumed. b
 returns, in page order: the MSB machine of 3 as a state diagram, its legend, its
 transition table, the six naive LSB states and the three classes they merge into, the
 LSB machine of 3, the table of the fewest states for m = 2 to 16, and the multipliers of
-k bits a cycle; then, for parts a and b, the implementation with two D flip-flops (the
-encoded transition table, the Karnaugh maps of D1 and D0 with their groups, and the
-schematic of the circuit). The flip-flop equations are found here by a small Quine-McCluskey
-over the three inputs Q1, Q0, b with the unused code 11 as a don't care, not written by
-hand. tests/0055 checks the page code against these.
+k bits a cycle; then, for part a, the implementation with two D flip-flops (the encoded
+transition table, the Karnaugh maps of D1 and D0 with their groups, the equations and the
+schematic of the circuit); for part b its encoded table and equations (the same circuit with
+the flip-flops swapped); last the block diagram of the machine and part a's table of clocks
+for 13 = 1101 (hw_clocks, the model of the divhw box). The flip-flop equations are found here
+by a small Quine-McCluskey over the three inputs Q1, Q0, b with the unused code 11 as a don't
+care, not written by hand. tests/0055 checks the page code and the box against these.
 """
 
 import itertools
@@ -157,7 +159,7 @@ def merge_table():
 
 
 def states_table():
-    rows = ["| ‏m | מה-MSB | מה-LSB | המכונה הנאיבית מה-LSB |", "|:-:|:-:|:-:|:-:|"]
+    rows = ["| ‏m | ביט נכנס כ-LSB | ביט נכנס כ-MSB | הנאיבית, ביט נכנס כ-MSB |", "|:-:|:-:|:-:|:-:|"]
     for m in range(2, 17):
         a, b, c = naive_msb(m)[0], naive_lsb(m)[0], naive_lsb(m)[1]
         rows.append(f"| {RLM}{m} | {RLM}{a} | {RLM}{b} | {RLM}{c} |")
@@ -463,14 +465,107 @@ def schematic_legend():
             '<span>קווים עם אותו שם מחוברים (‏Q₁ ו-Q̄₁ יוצאים מהפליפ-פלופ העליון)</span></span>')
 
 
+# --- the machine clock by clock (part a's table, the divhw box) ----------------------------
+
+NB = " "
+
+
+def hw_clocks(bits, lsb=False, start=(0, 0)):
+    """The circuit of part a (lsb False) or part b clock by clock, the way the table and the
+    box read it: one record per clock, clock 0 the one after reset (or after power-up in
+    `start`, the unused 11 for the trap). q1, q0 are the flip-flops through the clock; din
+    the bit presented in it and d1, d0 the next-state logic (None after the last bit); div =
+    Q̄1·Q̄0, the output through the clock; v the number the bits of the clocks before spell.
+    The logic is the minimal equations, so the code 11 behaves as the page says."""
+    eqs = dict(equations(lsb))
+    q1, q0 = start
+    out = []
+    for t in range(len(bits) + 1):
+        din = bits[t] if t < len(bits) else None
+        d1 = d0 = None
+        if din is not None:
+            d1, d0 = evaluate(eqs["D1"], q1, q0, din), evaluate(eqs["D0"], q1, q0, din)
+        out.append({"clock": t, "din": din, "q1": q1, "q0": q0, "d1": d1, "d0": d0,
+                    "div": int(not q1 and not q0), "v": value(bits[:t], 2, lsb)})
+        if din is not None:
+            q1, q0 = d1, d0
+    return out
+
+
+def clocks_table(bits=(1, 1, 0, 1)):
+    """Part a: 13 = 1101 through the circuit, a row per clock. div comes from the flip-flops
+    only (Moore), so the answer for the bits up to clock t shows in clock t + 1."""
+    rows = [f"| השעון | ‏din | ‏Q1 Q0 | ‏D1 D0 | ‏div | הביטים לפני השעון |", "|:-:|:-:|:-:|:-:|:-:|:-:|"]
+    for c in hw_clocks(list(bits)):
+        t = c["clock"]
+        when = f"{RLM}0, אחרי reset" if t == 0 else f"{RLM}{t}"
+        din = "–" if c["din"] is None else f"{RLM}{c['din']}"
+        nxt = "–" if c["d1"] is None else f"{RLM}{ltr_bits(c['d1'], c['d0'])}"
+        read = "אין עדיין, ‏0" if t == 0 else f'{RLM}<span dir="ltr">{"".join(map(str, bits[:t]))} = {c["v"]}</span>'
+        div = f"**{c['div']}**" if c["div"] else str(c["div"])
+        rows.append(f"| {when} | {din} | {RLM}{ltr_bits(c['q1'], c['q0'])} | {nxt} | {RLM}{div} | {read} |")
+    return "\n".join(rows)
+
+
+# The block diagram of parts a and b (the page's figure and the divhw box): the next-state
+# logic, the state register of two D flip-flops, the output logic and the loop back.
+HW_W, HW_H = 500, 224
+# (id, x, y, w, h, class, title, second line)
+HW_BLOCKS = (
+    ("ns", 40, 50, 130, 110, "stage", "next state", "D = f(Q, din)"),
+    ("reg", 220, 50, 110, 110, "reg", "register", ""),
+    ("out", 380, 75, 90, 60, "out", "output", "!Q1 & !Q0"),
+)
+# the two flip-flops inside the register: (id, x, y, w, h, name)
+HW_FFS = (("ff1", 236, 82, 36, 36, "Q1"), ("ff0", 278, 82, 36, 36, "Q0"))
+# (id, points, label, label x, label y, anchor)
+HW_WIRES = (
+    ("din", ((6, 105), (40, 105)), "din", 8, 97, "start"),
+    ("d", ((170, 105), (220, 105)), "D1 D0", 195, 97, "middle"),
+    ("clk", ((252, 14), (252, 50)), "clk", 246, 26, "end"),
+    ("rst", ((298, 14), (298, 50)), "rst_n", 304, 26, "start"),
+    ("q", ((330, 105), (380, 105)), "Q1 Q0", 360, 97, "middle"),
+    ("fb", ((346, 105), (346, 196), (105, 196), (105, 160)), "Q1 Q0", 225, 214, "middle"),
+    ("div", ((470, 105), (496, 105)), "div", 483, 97, "middle"),
+)
+
+
+def hw_diagram():
+    """Parts a and b: the block diagram of the machine, the same for both directions (only
+    the next-state logic differs)."""
+    label = ("תרשים המלבנים של המכונה" + NB + ": הלוגיקה של המצב הבא מקבלת את din ואת Q1 Q0 ומחשבת את D1 D0. "
+             "רגיסטר המצב, שני פליפ-פלופים מסוג D עם clk ו-rst_n, כותב את D1 D0 ל-Q1 Q0 בקצה השעון. "
+             "לוגיקת היציאה מחשבת div מ-Q1 Q0 בלבד, ו-Q1 Q0 חוזרים גם ללוגיקה של המצב הבא")
+    o = [f'<svg class="figure dh-fig dh-dp" viewBox="0 0 {HW_W} {HW_H}" direction="ltr" style="max-width:{HW_W / 16:g}rem" '
+         f'role="img" aria-label="{escape(label)}">',
+         '<defs><marker id="dh-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" '
+         'markerHeight="9" orient="auto"><path class="dh-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs>']
+    for _id, x, y, w, h, cls, title, sub in HW_BLOCKS:
+        ty = y + 18 if _id == "reg" else y + h / 2 - 3
+        o.append(f'<g class="dh-blk dh-{cls}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="5"/>'
+                 f'<text x="{x + w / 2:g}" y="{ty:g}" text-anchor="middle">{escape(title)}</text>'
+                 + (f'<text class="dh-sub" x="{x + w / 2:g}" y="{y + h / 2 + 13:g}" text-anchor="middle">{escape(sub)}</text>' if sub else "")
+                 + "</g>")
+    for _id, x, y, w, h, name in HW_FFS:
+        o.append(f'<g class="dh-ff"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="3"/>'
+                 f'<text x="{x + w / 2:g}" y="{y + h / 2 + 5:g}" text-anchor="middle">{name}</text></g>')
+    for _id, pts, lab, lx, ly, anchor in HW_WIRES:
+        d = "M" + " L".join(f"{x:g},{y:g}" for x, y in pts)
+        o.append(f'<path class="dh-wire" d="{d}" marker-end="url(#dh-hb)"/>')
+        o.append(f'<text class="dh-wlab" x="{lx}" y="{ly}" text-anchor="{anchor}">{escape(lab)}</text>')
+    o.append('<circle class="dh-dot" cx="346" cy="105" r="3.5"/>')
+    return "".join(o) + "</svg>"
+
+
 def blocks():
-    """The generated blocks, in page order."""
-    return [diagram(3, False, "מכונת המצבים של 3 מה-MSB : שלושה מצבים, השארית של המספר עד עכשיו"),
+    """The generated blocks, in page order (12 to 14 sit earlier on the page: part b's
+    equations, then part a's block diagram and table of clocks)."""
+    return [diagram(3, False, "מכונת המצבים של 3 כשביט חדש נכנס כ-LSB : שלושה מצבים, השארית של המספר עד עכשיו"),
             legend(), msb_table(), merge_table(),
-            diagram(3, True, "מכונת המצבים של 3 מה-LSB : שלושה מצבים, x הוא השארית כפול 2 בחזקת מינוס k"),
+            diagram(3, True, "מכונת המצבים של 3 כשביט חדש נכנס כ-MSB : שלושה מצבים, x הוא השארית כפול 2 בחזקת מינוס k"),
             states_table(), kbits_table(),
             encoded_table(False), kmaps(False), equations_block(False), schematic(False) + "\n\n" + schematic_legend(),
-            encoded_table(True), kmaps(True), equations_block(True), schematic(True) + "\n\n" + schematic_legend()]
+            encoded_table(True), equations_block(True), hw_diagram(), clocks_table()]
 
 
 if __name__ == "__main__":

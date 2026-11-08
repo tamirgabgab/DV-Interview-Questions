@@ -1,0 +1,64 @@
+/* Question 0055, the divisible-by-3 machine in hardware: the block diagram of parts a and b
+   (tools/figures/q0055.py hw_diagram, dh-dp) and the box of explorer/divhw.js (dh-*), in the
+   colours of 0099's hardware box: the register blue (s1), the next-state logic orange (s2),
+   the output logic green (s3), the wires grey; in the box the wires at 1 blue and a flip-flop
+   that flips at the coming edge framed in ink. Drawn left to right (direction="ltr").
+   Also the divfsm box of part c: its legend beside the ring. Colours from the palette only. */
+
+/* --- the block diagram ------------------------------------------------------------------- */
+.md-typeset svg.dh-dp { display: block; width: 100%; height: auto; margin-inline: auto; }
+.md-typeset svg.dh-dp .dh-headp { fill: var(--viz-text); }
+.md-typeset svg.dh-dp .dh-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
+.md-typeset svg.dh-dp .dh-blk.dh-reg rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.dh-dp .dh-blk.dh-stage rect { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg.dh-dp .dh-blk.dh-out rect { fill: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg.dh-dp .dh-blk text { fill: var(--viz-ink); font-size: 13px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.dh-dp .dh-sub { fill: var(--viz-text); font-size: 11px; font-weight: 400; font-family: var(--md-code-font-family); }
+.md-typeset svg.dh-dp .dh-ff rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
+.md-typeset svg.dh-dp .dh-ff text { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.dh-dp .dh-ff text.dh-sub { fill: var(--viz-text); font-size: 11px; font-weight: 400; }
+.md-typeset svg.dh-dp .dh-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.dh-dp .dh-dot { fill: var(--viz-text); }
+.md-typeset svg.dh-dp .dh-wlab { fill: var(--viz-s3-text); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+
+/* --- the live diagram: the wires at 1 lit, a flip-flop that flips framed ------------------ */
+.md-typeset .explorer .dh-dpwrap svg { max-width: 31.25rem; margin: 0.4rem auto; }
+.md-typeset svg.dh-live-dp .dh-wire { stroke: var(--viz-grid); }
+.md-typeset svg.dh-live-dp .dh-wire.is-on { stroke: var(--viz-s1); stroke-width: 2.6; }
+.md-typeset svg.dh-live-dp .dh-dot { fill: var(--viz-grid); }
+.md-typeset svg.dh-live-dp .dh-val { fill: var(--viz-ink); font-size: 12px; font-weight: 400; font-family: var(--md-code-font-family); }
+.md-typeset svg.dh-live-dp .dh-wval { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.dh-live-dp .dh-ff.is-one rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset svg.dh-live-dp .dh-ff.is-flip rect { stroke-width: 3; }
+
+/* --- the table of every signal, a column per clock --------------------------------------- */
+.md-typeset .explorer .dh-wavewrap { overflow-x: auto; margin: 0.4rem 0; }
+.md-typeset .explorer table.dh-wave { display: table; width: auto; margin: 0; border-collapse: collapse; font-family: var(--md-code-font-family); font-size: 0.62rem; }
+.md-typeset .explorer table.dh-wave :is(th, td) { min-width: 1.6rem; padding: 0.1rem 0.2rem; border: 1px solid var(--viz-grid); text-align: center; color: var(--viz-ink); background: var(--md-default-bg-color); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.md-typeset .explorer table.dh-wave th[scope="row"] { position: sticky; left: 0; z-index: 1; min-width: 2.8rem; text-align: left; font-weight: 700; background: color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.dh-wave thead th { color: var(--viz-text); font-weight: 400; }
+.md-typeset .explorer table.dh-wave .is-now { box-shadow: inset 0 0 0 2px var(--viz-s1); font-weight: 700; }
+.md-typeset .explorer table.dh-wave td.is-hi { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.dh-wave td.is-bad { background: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.dh-wave td.is-fut { background: color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color)); }
+.md-typeset .explorer .dh-note { font-size: 0.72rem; margin: 0.3em 0; min-height: 2.6em; }
+
+/* --- the legend keys --------------------------------------------------------------------- */
+.md-typeset .viz-legend .dh-key-on { background: none; height: 0; border-top: 3px solid var(--viz-s1); align-self: center; }
+.md-typeset .viz-legend .dh-key-flip { background: var(--md-default-bg-color); outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .viz-legend .dh-key-now { background: var(--md-default-bg-color); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .dh-key-bad { background: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+
+/* a wide box (core.js cols): the diagram on the left, the table and the note on the right */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="divhw"] .ex-main .dh-dpwrap svg { max-width: none; margin: 0; }
+  .md-typeset .explorer[data-kind="divhw"] table.dh-wave :is(th, td) { min-width: 1.4rem; padding: 0.05rem 0.15rem; line-height: 1.4; }
+}
+
+/* --- part c, the divfsm box: the ring a little smaller beside the steps ------------------ */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="divfsm"] .ex-main svg.dv-live { max-width: 14.5rem; margin-inline: auto; }
+}
+/* the empty anchor of the seed field and an empty error line take no place in the row, so the
+   reset button stays on the second row of controls */
+.md-typeset .explorer[data-kind="divfsm"] .ex-controls > :is(.dv-anchor, .dv-err:empty) { display: none; }

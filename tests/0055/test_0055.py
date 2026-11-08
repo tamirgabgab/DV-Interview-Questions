@@ -2,7 +2,8 @@
 bit string up to 12 bits and on random digit strings in several bases; the generator's
 minimized machines (the state counts on the page, the LSB machine of 3 being the MSB one
 with 1 and 2 swapped); the page's numbers; the explorer's JavaScript; the page copies
-of the generated blocks; and the keys the steps light in the figure beside them."""
+of the generated blocks; the keys the steps light in the figure beside them; and the circuit
+clock by clock (part a's table and the divhw box)."""
 
 import itertools
 import json
@@ -50,6 +51,17 @@ def test_general_machine():
             assert div_fsm(digits, m, base, lsb) == truth(digits, m, base, lsb), (digits, m, base, lsb)
     assert div_fsm([1, 1, 0], 3) == div3_msb([1, 1, 0])
     assert div_fsm([0, 1, 1], 3, lsb=True) == div3_lsb([0, 1, 1])
+    # base and m not coprime (the trap): from the MSB the remainder works, from the LSB pow raises
+    rng = random.Random(10)
+    for _ in range(200):
+        digits = [rng.randrange(10) for _ in range(rng.randint(1, 15))]
+        assert div_fsm(digits, 5, 10) == truth(digits, 5, 10, False), digits
+        assert div_fsm(digits, 4, 10) == truth(digits, 4, 10, False), digits
+    try:
+        div_fsm([1, 0], 5, 10, lsb=True)
+        raise AssertionError("pow(10, -1, 5) should raise")
+    except ValueError:
+        pass
 
 
 def test_state_counts():
@@ -165,3 +177,50 @@ def test_flip_flop_equations():
     swap = lambda t: (t[1], t[0], t[2])
     assert sorted(map(swap, a["D0"]), key=str) == sorted(b["D1"], key=str)
     assert sorted(map(swap, a["D1"]), key=str) == sorted(b["D0"], key=str)
+
+
+def test_clocks_and_block_diagram():
+    """Part a's table of clocks (13 = 1101) and the divhw box's model: the circuit of the
+    minimal equations, clock by clock, gives the page's functions one clock late (Moore), the
+    unused 11 stays while zeros come, and the box draws the page's block diagram."""
+    import re
+
+    from page_tests import explorer_require, node_json
+
+    for lsb, step in ((False, div3_msb), (True, div3_lsb)):
+        for n in range(1, 10):
+            for bits in itertools.product((0, 1), repeat=n):
+                tr = q0055.hw_clocks(list(bits), lsb)
+                assert [c["div"] == 1 for c in tr[1:]] == step(list(bits)), (lsb, bits)
+                assert tr[0]["div"] == 1 and all(c["v"] == q0055.value(list(bits[:c["clock"]]), 2, lsb) for c in tr)
+    # 13 = 1101: div is 1, 0, 1, 1, 0 in clocks 0 to 4, the page's 0, 1, 1, 0 one clock late
+    tr = q0055.hw_clocks([1, 1, 0, 1])
+    assert [c["div"] for c in tr] == [1, 0, 1, 1, 0] and [(c["q1"], c["q0"]) for c in tr] == [(0, 0), (0, 1), (0, 0), (0, 0), (0, 1)]
+    assert [c["v"] for c in tr] == [0, 1, 3, 6, 13]
+    # without reset, from 11: zeros keep it there (div = 0 on the number 0), a 1 leaves it
+    for lsb, out in ((False, (1, 0)), (True, (0, 1))):
+        tr = q0055.hw_clocks([0, 0, 0, 1], lsb, start=(1, 1))
+        assert all((c["q1"], c["q0"]) == (1, 1) and c["div"] == 0 for c in tr[:4]) and (tr[4]["q1"], tr[4]["q0"]) == out
+    # the box's model against the generator, every bit string up to 8, both directions, both starts
+    cases = [[list(bits), d, s] for n in range(1, 9) for bits in itertools.product((0, 1), repeat=n)
+             for d in ("lsb", "msb") for s in ([0, 0], [1, 1])]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({json.dumps(cases)}.map(([b, d, s]) => m.dhTrace(b, d, s))));")
+    for (bits, d, start), tr in zip(cases, got):
+        assert tr == q0055.hw_clocks(bits, d == "msb", tuple(start)), (bits, d, start)
+    # the box draws the page's diagram: the same rectangles and wires
+    svg = node_json(f"const m = {explorer_require()};const t = m.dhTrace([1, 1, 0, 1]);"
+                    "console.log(JSON.stringify([null, ...t].map((c) => m.dhDiagram(c))));")
+    rect = re.compile(r'<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"')
+    path = re.compile(r'<path class="dh-wire[^"]*" d="([^"]+)"')
+    page = q0055.hw_diagram()
+    for live in svg:
+        assert rect.findall(live) == rect.findall(page) and path.findall(live) == path.findall(page)
+    for _id, x, y, w, h, *_ in q0055.HW_BLOCKS + q0055.HW_FFS:
+        assert 0 <= x and x + w <= q0055.HW_W and 0 <= y and y + h <= q0055.HW_H
+    # the lit wires: a wire is lit exactly when its value is 1 (a pair: not 00)
+    lit = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.dhTrace([1, 1, 0, 1, 0, 1]).map((c) => [...m.dhLit(c)].sort())));")
+    for c, on in zip(q0055.hw_clocks([1, 1, 0, 1, 0, 1]), lit):
+        want = {w for w, on in (("din", c["din"] == 1), ("d", bool(c["d1"] or c["d0"])), ("q", bool(c["q1"] or c["q0"])),
+                                ("fb", bool(c["q1"] or c["q0"])), ("div", c["div"] == 1)) if on}
+        assert set(on) == want, c

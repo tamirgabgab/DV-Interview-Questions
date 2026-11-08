@@ -22,6 +22,14 @@ added: 2026-10-27
   \( B \), למשל \( k \) ביטים יחד (בסיס \( 2^k \)) או ספרה עשרונית. כתבו מודול אחד עם
   פרמטרים לשני הכיוונים.
 
+לכל כיוון שני שמות : איפה הביט החדש נכנס, ומאיזה קצה המספר נקרא. הם אומרים אותו דבר, והקוד
+משתמש בשני :
+
+| הסעיף | ביט חדש נכנס | המספר נקרא | בקוד |
+|:-:|:-:|:-:|:-:|
+| סעיף א | כ-LSB, מימין | מה-MSB : ה-MSB מגיע ראשון | ‏`div3_msb`, ‏`lsb=False`, ‏`LSB = 0` |
+| סעיף ב | כ-MSB, משמאל | מה-LSB : ה-LSB מגיע ראשון | ‏`div3_lsb`, ‏`lsb=True`, ‏`LSB = 1` |
+
 ??? interviewer "מה המראיין בודק"
     - **מה זוכרים :** האם המועמד מבין שאת המספר אי אפשר לשמור, ומחפש את המידע הקטן ביותר
       שמספיק כדי לענות גם בעתיד.
@@ -75,7 +83,7 @@ added: 2026-10-27
 
     <!-- gen 0 -->
 
-    <svg class="figure dv-fig" viewBox="0 0 360 272" style="max-width:24rem" role="img" aria-label="מכונת המצבים של 3 מה-MSB : שלושה מצבים, השארית של המספר עד עכשיו"><defs><marker id="dv-arrow-m3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" data-fig="e0-0-0" d="M165.6,54.8 C158,14 202,14 194.4,54.8" marker-end="url(#dv-arrow-m3)"><title>0 --0--> 0</title></path><text class="fs-label halo" data-fig="e0-0-0" x="180" y="18" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e0-1-1" d="M199.4,88.2 Q250.2,125.5 256.8,186.2" marker-end="url(#dv-arrow-m3)"><title>0 --1--> 1</title></path><text class="fs-label halo is-found" data-fig="e0-1-1" x="248.7" y="129.8" text-anchor="middle">1</text><path class="fs-edge" data-fig="e1-0-2" d="M237.7,221.7 Q180,247.1 124.1,222.5" marker-end="url(#dv-arrow-m3)"><title>1 --0--> 2</title></path><text class="fs-label halo" data-fig="e1-0-2" x="180.5" y="249.6" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e1-1-0" d="M240.3,197.8 Q189.5,160.5 182.8,99.8" marker-end="url(#dv-arrow-m3)"><title>1 --1--> 0</title></path><text class="fs-label halo is-found" data-fig="e1-1-0" x="191" y="164.2" text-anchor="middle">1</text><path class="fs-edge" data-fig="e2-0-1" d="M122.3,202.3 Q180,176.9 235.9,201.5" marker-end="url(#dv-arrow-m3)"><title>2 --0--> 1</title></path><text class="fs-label halo" data-fig="e2-0-1" x="179.5" y="182.4" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e2-1-2" d="M90.9,234.1 C59.4,261.1 37.4,222.9 76.5,209.1" marker-end="url(#dv-arrow-m3)"><title>2 --1--> 2</title></path><text class="fs-label halo is-found" data-fig="e2-1-2" x="48.4" y="246" text-anchor="middle">1</text><g class="fs-node is-start" data-fig="n0"><circle cx="180" cy="74" r="24"/><circle cx="180" cy="74" r="19"/><text x="180" y="79" text-anchor="middle">r=0</text></g><g class="fs-node" data-fig="n1"><circle cx="259.7" cy="212" r="24"/><text x="259.7" y="217" text-anchor="middle">r=1</text></g><g class="fs-node" data-fig="n2"><circle cx="100.3" cy="212" r="24"/><text x="100.3" y="217" text-anchor="middle">r=2</text></g></svg>
+    <svg class="figure dv-fig" viewBox="0 0 360 272" style="max-width:24rem" role="img" aria-label="מכונת המצבים של 3 כשביט חדש נכנס כ-LSB : שלושה מצבים, השארית של המספר עד עכשיו"><defs><marker id="dv-arrow-m3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" data-fig="e0-0-0" d="M165.6,54.8 C158,14 202,14 194.4,54.8" marker-end="url(#dv-arrow-m3)"><title>0 --0--> 0</title></path><text class="fs-label halo" data-fig="e0-0-0" x="180" y="18" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e0-1-1" d="M199.4,88.2 Q250.2,125.5 256.8,186.2" marker-end="url(#dv-arrow-m3)"><title>0 --1--> 1</title></path><text class="fs-label halo is-found" data-fig="e0-1-1" x="248.7" y="129.8" text-anchor="middle">1</text><path class="fs-edge" data-fig="e1-0-2" d="M237.7,221.7 Q180,247.1 124.1,222.5" marker-end="url(#dv-arrow-m3)"><title>1 --0--> 2</title></path><text class="fs-label halo" data-fig="e1-0-2" x="180.5" y="249.6" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e1-1-0" d="M240.3,197.8 Q189.5,160.5 182.8,99.8" marker-end="url(#dv-arrow-m3)"><title>1 --1--> 0</title></path><text class="fs-label halo is-found" data-fig="e1-1-0" x="191" y="164.2" text-anchor="middle">1</text><path class="fs-edge" data-fig="e2-0-1" d="M122.3,202.3 Q180,176.9 235.9,201.5" marker-end="url(#dv-arrow-m3)"><title>2 --0--> 1</title></path><text class="fs-label halo" data-fig="e2-0-1" x="179.5" y="182.4" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e2-1-2" d="M90.9,234.1 C59.4,261.1 37.4,222.9 76.5,209.1" marker-end="url(#dv-arrow-m3)"><title>2 --1--> 2</title></path><text class="fs-label halo is-found" data-fig="e2-1-2" x="48.4" y="246" text-anchor="middle">1</text><g class="fs-node is-start" data-fig="n0"><circle cx="180" cy="74" r="24"/><circle cx="180" cy="74" r="19"/><text x="180" y="79" text-anchor="middle">r=0</text></g><g class="fs-node" data-fig="n1"><circle cx="259.7" cy="212" r="24"/><text x="259.7" y="217" text-anchor="middle">r=1</text></g><g class="fs-node" data-fig="n2"><circle cx="100.3" cy="212" r="24"/><text x="100.3" y="217" text-anchor="middle">r=2</text></g></svg>
 
     <!-- /gen -->
 
@@ -146,6 +154,38 @@ added: 2026-10-27
 
         1. ‏\( 2r + b \) הוא לכל היותר 5, והסינתזה הופכת את הביטוי לטבלה של שש שורות.
 
+    **המבנה בחומרה.** כל מכונת מצבים היא שלושה חלקים : רגיסטר המצב, כאן שני פליפ-פלופים
+    ‏\( Q_1 Q_0 \); לוגיקה צירופית שמחשבת ממנו ומ-`din` את המצב הבא \( D_1 D_0 \); ולוגיקת יציאה
+    שמחשבת את `div` מהמצב בלבד. בכל קצה עולה של `clk` הרגיסטר מעתיק את \( D_1 D_0 \)
+    ל-\( Q_1 Q_0 \), ו-`rst_n` מעמיד אותו על 00 :
+
+    <!-- gen 13 -->
+
+    <svg class="figure dh-fig dh-dp" viewBox="0 0 500 224" direction="ltr" style="max-width:31.25rem" role="img" aria-label="תרשים המלבנים של המכונה : הלוגיקה של המצב הבא מקבלת את din ואת Q1 Q0 ומחשבת את D1 D0. רגיסטר המצב, שני פליפ-פלופים מסוג D עם clk ו-rst_n, כותב את D1 D0 ל-Q1 Q0 בקצה השעון. לוגיקת היציאה מחשבת div מ-Q1 Q0 בלבד, ו-Q1 Q0 חוזרים גם ללוגיקה של המצב הבא"><defs><marker id="dh-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path class="dh-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs><g class="dh-blk dh-stage"><rect x="40" y="50" width="130" height="110" rx="5"/><text x="105" y="102" text-anchor="middle">next state</text><text class="dh-sub" x="105" y="118" text-anchor="middle">D = f(Q, din)</text></g><g class="dh-blk dh-reg"><rect x="220" y="50" width="110" height="110" rx="5"/><text x="275" y="68" text-anchor="middle">register</text></g><g class="dh-blk dh-out"><rect x="380" y="75" width="90" height="60" rx="5"/><text x="425" y="102" text-anchor="middle">output</text><text class="dh-sub" x="425" y="118" text-anchor="middle">!Q1 &amp; !Q0</text></g><g class="dh-ff"><rect x="236" y="82" width="36" height="36" rx="3"/><text x="254" y="105" text-anchor="middle">Q1</text></g><g class="dh-ff"><rect x="278" y="82" width="36" height="36" rx="3"/><text x="296" y="105" text-anchor="middle">Q0</text></g><path class="dh-wire" d="M6,105 L40,105" marker-end="url(#dh-hb)"/><text class="dh-wlab" x="8" y="97" text-anchor="start">din</text><path class="dh-wire" d="M170,105 L220,105" marker-end="url(#dh-hb)"/><text class="dh-wlab" x="195" y="97" text-anchor="middle">D1 D0</text><path class="dh-wire" d="M252,14 L252,50" marker-end="url(#dh-hb)"/><text class="dh-wlab" x="246" y="26" text-anchor="end">clk</text><path class="dh-wire" d="M298,14 L298,50" marker-end="url(#dh-hb)"/><text class="dh-wlab" x="304" y="26" text-anchor="start">rst_n</text><path class="dh-wire" d="M330,105 L380,105" marker-end="url(#dh-hb)"/><text class="dh-wlab" x="360" y="97" text-anchor="middle">Q1 Q0</text><path class="dh-wire" d="M346,105 L346,196 L105,196 L105,160" marker-end="url(#dh-hb)"/><text class="dh-wlab" x="225" y="214" text-anchor="middle">Q1 Q0</text><path class="dh-wire" d="M470,105 L496,105" marker-end="url(#dh-hb)"/><text class="dh-wlab" x="483" y="97" text-anchor="middle">div</text><circle class="dh-dot" cx="346" cy="105" r="3.5"/></svg>
+
+    <!-- /gen -->
+
+    **שעון אחרי שעון.** המספר 13, כלומר `1101`, נכנס ביט בכל שעון. בכל שורה המצב \( Q_1 Q_0 \) לאורך השעון,
+    הביט `din` שמגיע בו, המצב הבא \( D_1 D_0 \) שנכתב בקצה שבסופו, ו-`div` :
+
+    <!-- gen 14 -->
+
+    | השעון | ‏din | ‏Q1 Q0 | ‏D1 D0 | ‏div | הביטים לפני השעון |
+    |:-:|:-:|:-:|:-:|:-:|:-:|
+    | ‏0, אחרי reset | ‏1 | ‏<span dir="ltr">0 0</span> | ‏<span dir="ltr">0 1</span> | ‏**1** | אין עדיין, ‏0 |
+    | ‏1 | ‏1 | ‏<span dir="ltr">0 1</span> | ‏<span dir="ltr">0 0</span> | ‏0 | ‏<span dir="ltr">1 = 1</span> |
+    | ‏2 | ‏0 | ‏<span dir="ltr">0 0</span> | ‏<span dir="ltr">0 0</span> | ‏**1** | ‏<span dir="ltr">11 = 3</span> |
+    | ‏3 | ‏1 | ‏<span dir="ltr">0 0</span> | ‏<span dir="ltr">0 1</span> | ‏**1** | ‏<span dir="ltr">110 = 6</span> |
+    | ‏4 | – | ‏<span dir="ltr">0 1</span> | – | ‏0 | ‏<span dir="ltr">1101 = 13</span> |
+
+    <!-- /gen -->
+
+    **‏`div` מאחר שעון אחד.** ‏`div` תלוי רק ב-\( Q_1 Q_0 \) (מכונת Moore), ו-\( Q_1 Q_0 \) משתנים
+    רק בקצה השעון. לכן התשובה על הביטים שנכנסו עד שעון \( t \) מופיעה בשעון \( t + 1 \) : ה-1
+    של 3 (`11`) בשעון 2, וה-0 של 13 בשעון 4. בשעון 0 ‏`div = 1`, כי עוד לא נכנס ביט והמספר 0.
+    מכונת Mealy, עם `div` מ-\( D_1 D_0 = 00 \), הייתה עונה כבר באותו שעון, אבל אז היציאה תלויה
+    ב-`din` דרך שערים בלבד, בלי רגיסטר ביניהם.
+
     **מימוש בשערים ובפליפ-פלופים.** בלי קוד : שני פליפ-פלופים מסוג D שומרים את המצב, בקידוד בינארי, ‏\( r = 0, 1, 2 \) כ-\( Q_1 Q_0 = 00, 01, 10 \). הקוד 11 לא בשימוש, ולכן בטבלה הוא × (Don't care). בפליפ-פלופ D הכניסה \( D \) היא בדיוק הביט של
     המצב הבא, ולכן טבלת המעברים המקודדת היא גם הטבלה של \( D_1 \) ו-\( D_0 \) :
 
@@ -204,6 +244,14 @@ added: 2026-10-27
     שהגיעה ל-11 נתקעת שם כל עוד מגיעים אפסים. לכן האיפוס חשוב : הוא מעמיד את המכונה על 00
     לפני הביט הראשון, ומשם המעברים לא מגיעים ל-11 אף פעם.
 
+    **נסו בעצמכם.** התיבה מריצה את המעגל שעון אחרי שעון. הריצו את 13, כלומר `1101`, ועקבו אחרי
+    `div`, שמאחר שעון אחד אחרי `din`. הקלידו `0000` ובחרו להתחיל מ-11 בלי reset : המספר הוא 0,
+    ו-`div` נשאר 0 בכל שעון. בחרו "ביט חדש נכנס כ-MSB" והריצו `011`, כלומר 6 של סעיף ב : אותו
+    תרשים, ורק המשוואות של המצב הבא מתחלפות. מעבר לטבלה שלמעלה, התיבה מראה את הערך של כל חוט
+    בכל שעון, על כל קלט, את הביטים שיתהפכו בקצה הבא, ואת ההתחלה מ-11 :
+
+    <div class="explorer" data-kind="divhw" data-bits="1101" data-dir="lsb" data-start="00"></div>
+
     #### למה זה נכון { .sol-proof }
 
     **המצב הוא השארית.** באינדוקציה : בהתחלה \( v = 0 \) ו-\( r = 0 \). אם \( r \equiv v \),
@@ -237,14 +285,16 @@ added: 2026-10-27
 
     #### הרעיון { .sol-idea }
 
-    **הניסיון הראשון.** ביט חדש מוסיף \( b \cdot 2^k \), ו-\( 2^k \bmod 3 \) מתחלף בין 1
-    ל-2. לכן שומרים את השארית ואת זוגיות \( k \) : שישה מצבים. זה עובד, אבל לא צריך את
-    כולם.
+    **הניסיון הראשון.** אחרי \( k \) ביטים המספר הוא \( v \). הביט הבא נכנס כ-MSB, במשקל
+    \( 2^k \), ולכן המספר החדש הוא \( v + b \cdot 2^k \), ושום ביט קודם לא זז. השארית החדשה
+    תלויה ב-\( k \), כי \( 2^k \bmod 3 \) מתחלף בין 1 ל-2. לכן שומרים את השארית ואת זוגיות
+    \( k \) : שישה מצבים. זה עובד, אבל לא צריך את כולם.
 
     **מה באמת קובע את העתיד.** אחרי \( k \) ביטים, כל ביט שיבוא מוסיף כפולה של \( 2^k \).
     לכן המספר כולו יהיה \( v + 2^k w \), כאשר \( w \) הוא המספר שהביטים הבאים יבנו. הוא
     מתחלק ב-3 אם ורק אם \( v \cdot 2^{-k} + w \equiv 0 \) : כפל ב-\( 2^{-k} \) לא משנה
-    חלוקה ב-3, כי 2 הפיך מודולו 3. לכן העתיד תלוי רק ב-\( x = v \cdot 2^{-k} \bmod 3 \),
+    חלוקה ב-3, כי 2 הפיך מודולו 3 (‏\( 2^{-1} \equiv 2 \), כי \( 2 \cdot 2 = 4 \equiv 1 \)). לכן
+    העתיד תלוי רק ב-\( x = v \cdot 2^{-k} \bmod 3 \), השארית "מנורמלת" למשקל של הביט הבא,
     ושני מצבים נאיביים עם אותו \( x \) הם אותו מצב :
 
     <!-- gen 3 -->
@@ -260,35 +310,19 @@ added: 2026-10-27
 
     <!-- /gen -->
 
-    **המעבר.** ‏\( x' = (v + b \cdot 2^k) \cdot 2^{-(k+1)} = (x + b) \cdot 2^{-1} \), כלומר
-    ‏\( x' = 2(x + b) \bmod 3 \). המיקום \( k \) נעלם מהנוסחה, ולכן אין צורך לזכור אותו. המכונה
+    **המעבר.** אחרי הביט המספר הוא \( v + b \cdot 2^k \), והביט הבא יהיה במשקל \( 2^{k+1} \), ולכן
+
+    \[
+    \begin{aligned}
+    x' &= (v + b \cdot 2^k) \cdot 2^{-(k+1)} \\
+       &= (v \cdot 2^{-k} + b) \cdot 2^{-1} \\
+       &= (x + b) \cdot 2 \bmod 3.
+    \end{aligned}
+    \]
+
+    ‏\( 2^k \) נעלם : המשקל של הביט החדש בוטל בדיוק בנרמול של \( x \), ולכן אין צורך לזכור את
+    המיקום. ‏`div` דולק כש-\( x = 0 \), כי \( v \equiv 0 \) אם ורק אם \( x \equiv 0 \). המכונה
     בשלבים, ליד הצעדים.
-
-    **איך מגיעים ל-\( 2(x + b) \bmod 3 \), צעד אחרי צעד.**
-
-    1. **מה ביט חדש עושה :** אחרי \( k \) ביטים המספר הוא \( v \). הביט הבא נכנס כ-MSB, במשקל
-       \( 2^k \), ולכן המספר החדש הוא \( v + b \cdot 2^k \). שום ביט קודם לא זז.
-    2. **למה השארית לבד לא מספיקה :** השארית החדשה היא \( (r + b \cdot 2^k) \bmod 3 \), והיא
-       תלויה ב-\( k \) : ‏\( 2^k \bmod 3 \) הוא 1, 2, 1, 2, … לכן מי ששומר רק את \( r \) צריך לזכור
-       גם אם \( k \) זוגי, ושישה מצבים.
-    3. **להפוך את 2 :** מודולו 3 ‏\( 2 \cdot 2 = 4 \equiv 1 \), כלומר \( 2^{-1} \equiv 2 \). נגדיר
-       \( x = v \cdot 2^{-k} \bmod 3 \) : השארית, "מנורמלת" למשקל של הביט הבא.
-    4. **להציב :** אחרי הביט המספר הוא \( v + b \cdot 2^k \), והביט הבא יהיה במשקל \( 2^{k+1} \), ולכן
-
-        \[
-        \begin{aligned}
-        x' &= (v + b \cdot 2^k) \cdot 2^{-(k+1)} \\
-           &= (v \cdot 2^{-k} + b) \cdot 2^{-1} \\
-           &= (x + b) \cdot 2 \bmod 3.
-        \end{aligned}
-        \]
-
-        ‏\( 2^k \) נעלם : המשקל של הביט החדש בוטל בדיוק בנרמול של \( x \).
-    5. **מתי המספר מתחלק :** ‏2 הפיך מודולו 3, ולכן \( v \equiv 0 \) אם ורק אם
-       \( x = v \cdot 2^{-k} \equiv 0 \). היציאה היא עדיין `div = (x == 0)`.
-    6. **בדיקה על מספר :** ‏6 = 110 מגיע כ-0, 1, 1. אחרי 0 ‏\( v = 0 \) ו-\( x = 0 \). אחרי 1
-       ‏\( v = 2 \) (‏10), ו-\( x = 2(0 + 1) = 2 \). אחרי 1 נוסף ‏\( v = 6 \) (‏110), ו-\( x = 2(2 + 1) = 6 \equiv 0 \) :
-       מתחלק, כמו ש-6 מתחלק ב-3.
 
     **הפתעה.** זו בדיוק המכונה של סעיף א, עם 1 ו-2 בתפקידים הפוכים. הסיבה : ‏\( 2 \equiv -1
     \pmod 3 \), ולכן היפוך סדר הביטים רק מחליף את סימן השארית, ו-0 נשאר 0. ב-5 זה כבר לא
@@ -302,7 +336,7 @@ added: 2026-10-27
 
     <!-- gen 4 -->
 
-    <svg class="figure dv-fig" viewBox="0 0 360 272" style="max-width:24rem" role="img" aria-label="מכונת המצבים של 3 מה-LSB : שלושה מצבים, x הוא השארית כפול 2 בחזקת מינוס k"><defs><marker id="dv-arrow-l3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" data-fig="e0-0-0" d="M165.6,54.8 C158,14 202,14 194.4,54.8" marker-end="url(#dv-arrow-l3)"><title>0 --0--> 0</title></path><text class="fs-label halo" data-fig="e0-0-0" x="180" y="18" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e0-1-2" d="M177.4,97.9 Q170.5,160.5 121.3,196.6" marker-end="url(#dv-arrow-l3)"><title>0 --1--> 2</title></path><text class="fs-label halo is-found" data-fig="e0-1-2" x="169.5" y="163.4" text-anchor="middle">1</text><path class="fs-edge" data-fig="e1-0-2" d="M237.7,221.7 Q180,247.1 124.1,222.5" marker-end="url(#dv-arrow-l3)"><title>1 --0--> 2</title></path><text class="fs-label halo" data-fig="e1-0-2" x="180.5" y="249.6" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e1-1-1" d="M283.5,209.1 C322.6,222.9 300.6,261.1 269.1,234.1" marker-end="url(#dv-arrow-l3)"><title>1 --1--> 1</title></path><text class="fs-label halo is-found" data-fig="e1-1-1" x="311.6" y="246" text-anchor="middle">1</text><path class="fs-edge" data-fig="e2-0-1" d="M122.3,202.3 Q180,176.9 235.9,201.5" marker-end="url(#dv-arrow-l3)"><title>2 --0--> 1</title></path><text class="fs-label halo" data-fig="e2-0-1" x="179.5" y="182.4" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e2-1-0" d="M102.9,188.1 Q109.8,125.5 159,89.4" marker-end="url(#dv-arrow-l3)"><title>2 --1--> 0</title></path><text class="fs-label halo is-found" data-fig="e2-1-0" x="110.9" y="130.6" text-anchor="middle">1</text><g class="fs-node is-start" data-fig="n0"><circle cx="180" cy="74" r="24"/><circle cx="180" cy="74" r="19"/><text x="180" y="79" text-anchor="middle">x=0</text></g><g class="fs-node" data-fig="n1"><circle cx="259.7" cy="212" r="24"/><text x="259.7" y="217" text-anchor="middle">x=1</text></g><g class="fs-node" data-fig="n2"><circle cx="100.3" cy="212" r="24"/><text x="100.3" y="217" text-anchor="middle">x=2</text></g></svg>
+    <svg class="figure dv-fig" viewBox="0 0 360 272" style="max-width:24rem" role="img" aria-label="מכונת המצבים של 3 כשביט חדש נכנס כ-MSB : שלושה מצבים, x הוא השארית כפול 2 בחזקת מינוס k"><defs><marker id="dv-arrow-l3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><path class="fs-edge" data-fig="e0-0-0" d="M165.6,54.8 C158,14 202,14 194.4,54.8" marker-end="url(#dv-arrow-l3)"><title>0 --0--> 0</title></path><text class="fs-label halo" data-fig="e0-0-0" x="180" y="18" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e0-1-2" d="M177.4,97.9 Q170.5,160.5 121.3,196.6" marker-end="url(#dv-arrow-l3)"><title>0 --1--> 2</title></path><text class="fs-label halo is-found" data-fig="e0-1-2" x="169.5" y="163.4" text-anchor="middle">1</text><path class="fs-edge" data-fig="e1-0-2" d="M237.7,221.7 Q180,247.1 124.1,222.5" marker-end="url(#dv-arrow-l3)"><title>1 --0--> 2</title></path><text class="fs-label halo" data-fig="e1-0-2" x="180.5" y="249.6" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e1-1-1" d="M283.5,209.1 C322.6,222.9 300.6,261.1 269.1,234.1" marker-end="url(#dv-arrow-l3)"><title>1 --1--> 1</title></path><text class="fs-label halo is-found" data-fig="e1-1-1" x="311.6" y="246" text-anchor="middle">1</text><path class="fs-edge" data-fig="e2-0-1" d="M122.3,202.3 Q180,176.9 235.9,201.5" marker-end="url(#dv-arrow-l3)"><title>2 --0--> 1</title></path><text class="fs-label halo" data-fig="e2-0-1" x="179.5" y="182.4" text-anchor="middle">0</text><path class="fs-edge is-found" data-fig="e2-1-0" d="M102.9,188.1 Q109.8,125.5 159,89.4" marker-end="url(#dv-arrow-l3)"><title>2 --1--> 0</title></path><text class="fs-label halo is-found" data-fig="e2-1-0" x="110.9" y="130.6" text-anchor="middle">1</text><g class="fs-node is-start" data-fig="n0"><circle cx="180" cy="74" r="24"/><circle cx="180" cy="74" r="19"/><text x="180" y="79" text-anchor="middle">x=0</text></g><g class="fs-node" data-fig="n1"><circle cx="259.7" cy="212" r="24"/><text x="259.7" y="217" text-anchor="middle">x=1</text></g><g class="fs-node" data-fig="n2"><circle cx="100.3" cy="212" r="24"/><text x="100.3" y="217" text-anchor="middle">x=2</text></g></svg>
 
     <!-- /gen -->
 
@@ -313,7 +347,7 @@ added: 2026-10-27
     1. **המצב :** ‏\( x = v \cdot 2^{-k} \bmod 3 \), שני ביטים. השארית עצמה היא
        \( x \cdot 2^k \bmod 3 \), אבל לא צריך אותה.
     2. **המעבר :** ‏\( x' = 2(x + b) \bmod 3 \).
-    3. **היציאה :** ‏`div = (x == 0)`, כי \( v \equiv 0 \) אם ורק אם \( x \equiv 0 \).
+    3. **היציאה :** ‏`div = (x == 0)`.
     4. **דוגמה :** ‏6 מגיע כ-0, 1, 1. ‏\( x \) עובר 0, 2, 0 (‏\( 2 \cdot 0 = 0 \), ‏\( 2 \cdot 1 = 2 \),
        ‏\( 2 \cdot 3 = 6 \equiv 0 \)), ולכן `div` הוא 1, 0, 1 : המספרים 0, 2 ו-6.
 
@@ -354,8 +388,8 @@ added: 2026-10-27
 
         1. ‏\( x' = (x + b) \cdot 2^{-1} \), ומודולו 3 ‏\( 2^{-1} = 2 \). המיקום \( k \) לא מופיע.
 
-    **מימוש בשערים ובפליפ-פלופים.** אותה דרך כמו בסעיף א, עם \( x = 0, 1, 2 \) כ-\( Q_1 Q_0 = 00, 01, 10 \) ו-11 לא בשימוש. בפליפ-פלופ D הכניסה \( D \) היא בדיוק הביט של
-    המצב הבא, ולכן טבלת המעברים המקודדת היא גם הטבלה של \( D_1 \) ו-\( D_0 \) :
+    **מימוש בשערים ובפליפ-פלופים.** כמו בסעיף א, עם \( x = 0, 1, 2 \) כ-\( Q_1 Q_0 = 00, 01, 10 \)
+    ו-11 לא בשימוש. הטבלה המקודדת היא גם הטבלה של \( D_1 \) ו-\( D_0 \) :
 
     <!-- gen 11 -->
 
@@ -372,19 +406,9 @@ added: 2026-10-27
 
     <!-- /gen -->
 
-    **מפות קרנו.** מפה לכל כניסת D : השורות הן \( b \), והעמודות \( Q_1 Q_0 \) בסדר גריי
-    ‏<span dir="ltr">(00, 01, 11, 10)</span>, כך ששני תאים שכנים נבדלים בביט אחד. כל קבוצה צבועה היא מכפלה אחת. את
-    העמודה 11 (×) מותר לכלול בקבוצה, אם זה מגדיל אותה ומקצר את המכפלה :
+    מפות קרנו כמו בסעיף א נותנות את המשוואות המינימליות :
 
     <!-- gen 12 -->
-
-    <div class="ff-maps"><div class="ff-map"><p class="ff-map-title" dir="ltr">D₁</p><div class="pm-scroll" tabindex="0" role="region" aria-label="מפת קרנו של D1 : השורות b, העמודות Q1 Q0 בסדר גריי, והקבוצות צבועות"><table class="pm-cells ff-kmap" dir="ltr"><tbody><tr class="pm-head"><th dir="ltr">Q₁Q₀</th><td>00</td><td>01</td><td>11</td><td>10</td></tr><tr><th dir="ltr">b = 0</th><td class="pm-c">0</td><td class="pm-c c2">1</td><td class="pm-c c2">×</td><td class="pm-c">0</td></tr><tr><th dir="ltr">b = 1</th><td class="pm-c c1">1</td><td class="pm-c">0</td><td class="pm-c is-off">×</td><td class="pm-c">0</td></tr></tbody></table></div><span class="viz-legend"><span><i class="pm-key-c1"></i>Q̄₁·Q̄₀·b</span><span><i class="pm-key-c2"></i>Q₀·b̄</span></span></div><div class="ff-map"><p class="ff-map-title" dir="ltr">D₀</p><div class="pm-scroll" tabindex="0" role="region" aria-label="מפת קרנו של D0 : השורות b, העמודות Q1 Q0 בסדר גריי, והקבוצות צבועות"><table class="pm-cells ff-kmap" dir="ltr"><tbody><tr class="pm-head"><th dir="ltr">Q₁Q₀</th><td>00</td><td>01</td><td>11</td><td>10</td></tr><tr><th dir="ltr">b = 0</th><td class="pm-c">0</td><td class="pm-c">0</td><td class="pm-c c1">×</td><td class="pm-c c1">1</td></tr><tr><th dir="ltr">b = 1</th><td class="pm-c">0</td><td class="pm-c c2">1</td><td class="pm-c c2">×</td><td class="pm-c">0</td></tr></tbody></table></div><span class="viz-legend"><span><i class="pm-key-c1"></i>Q₁·b̄</span><span><i class="pm-key-c2"></i>Q₀·b</span></span></div></div>
-
-    <!-- /gen -->
-
-    המשוואות המינימליות, וגם היציאה, שדולקת רק במצב 00 :
-
-    <!-- gen 13 -->
 
     \[
     \begin{aligned}
@@ -396,30 +420,17 @@ added: 2026-10-27
 
     <!-- /gen -->
 
-    המעגל : שני פליפ-פלופים עם שעון משותף ואיפוס אסינכרוני ‏`rst_n` (פעיל ב-0, מעמיד אותם
-    על 00), שער AND לכל מכפלה, שער OR לכל כניסת D, ומהפך אחד ל-\( \overline{b} \). את
-    \( \overline{Q_1} \) ו-\( \overline{Q_0} \) נותנת יציאת \( \overline{Q} \) של כל פליפ-פלופ :
-
-    <!-- gen 14 -->
-
-    <svg class="figure ff-fig" viewBox="0 0 640 420" style="max-width:40rem" role="img" aria-label="המעגל של סעיף ב : שני פליפ-פלופים מסוג D עם איפוס אסינכרוני, שערי AND ו-OR לכל כניסת D, ו-div מ-AND של שני המשלימים"><line class="ff-wire" x1="34" y1="20" x2="34" y2="382"/><text class="ff-text" x="24" y="26" text-anchor="end">b</text><line class="ff-wire" x1="34" y1="36" x2="42" y2="36"/><path class="ff-gate" d="M42,28 L56,36 L42,44 Z"/><circle class="ff-gate" cx="59.5" cy="36" r="3.5"/><line class="ff-wire" x1="63" y1="36" x2="74" y2="36"/><line class="ff-wire" x1="74" y1="36" x2="74" y2="382"/><circle class="ink-dot" cx="34" cy="36" r="3.5"/><line class="ff-wire" x1="114" y1="58" x2="114" y2="382"/><text class="ff-text" x="114" y="50" text-anchor="middle">Q₁</text><line class="ff-wire" x1="154" y1="58" x2="154" y2="382"/><text class="ff-text" x="154" y="50" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₁</text><line class="ff-wire" x1="194" y1="58" x2="194" y2="382"/><text class="ff-text" x="194" y="50" text-anchor="middle">Q₀</text><line class="ff-wire" x1="234" y1="58" x2="234" y2="382"/><text class="ff-text" x="234" y="50" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₀</text><text class="ff-text" x="34" y="404" text-anchor="middle">b</text><text class="ff-text" x="74" y="404" text-anchor="middle"><tspan text-decoration="overline">b</tspan></text><text class="ff-text" x="114" y="404" text-anchor="middle">Q₁</text><text class="ff-text" x="154" y="404" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₁</text><text class="ff-text" x="194" y="404" text-anchor="middle">Q₀</text><text class="ff-text" x="234" y="404" text-anchor="middle"><tspan text-decoration="overline">Q</tspan>₀</text><line class="ff-wire" x1="154" y1="78" x2="300" y2="78"/><circle class="ink-dot" cx="154" cy="78" r="3.5"/><line class="ff-wire" x1="234" y1="92" x2="300" y2="92"/><circle class="ink-dot" cx="234" cy="92" r="3.5"/><line class="ff-wire" x1="34" y1="106" x2="300" y2="106"/><circle class="ink-dot" cx="34" cy="106" r="3.5"/><path class="ff-gate" d="M300,70 H322 A22,22 0 0 1 322,114 H300 Z"/><line class="ff-wire" x1="194" y1="143" x2="300" y2="143"/><circle class="ink-dot" cx="194" cy="143" r="3.5"/><line class="ff-wire" x1="74" y1="157" x2="300" y2="157"/><circle class="ink-dot" cx="74" cy="157" r="3.5"/><path class="ff-gate" d="M300,135 H315 A15,15 0 0 1 315,165 H300 Z"/><polyline class="ff-wire" fill="none" points="344,92 378,92 378,114 398,114"/><polyline class="ff-wire" fill="none" points="330,150 378,150 378,128 398,128"/><path class="ff-gate" d="M392,104 Q415.5,104 431.1,121 Q415.5,138 392,138 Q402.9,121 392,104 Z"/><line class="ff-wire" x1="431.1" y1="121" x2="488" y2="121"/><rect class="ff-gate" x="488" y="99" width="64" height="74" rx="3"/><text class="ff-pin" x="496" y="126" text-anchor="start">D</text><path class="ff-wire" fill="none" d="M488,145 L497,151 L488,157"/><line class="ff-wire" x1="468" y1="151" x2="488" y2="151"/><text class="ff-small" x="465" y="156" text-anchor="end">clk</text><text class="ff-pin" x="546" y="126" text-anchor="end">Q</text><text class="ff-pin" x="546" y="156" text-anchor="end"><tspan text-decoration="overline">Q</tspan></text><line class="ff-wire" x1="552" y1="121" x2="574" y2="121"/><text class="ff-text" x="578" y="126" text-anchor="start">Q₁</text><line class="ff-wire" x1="552" y1="151" x2="574" y2="151"/><text class="ff-text" x="578" y="156" text-anchor="start"><tspan text-decoration="overline">Q</tspan>₁</text><circle class="ff-gate" cx="520.0" cy="177" r="4"/><line class="ff-wire" x1="520.0" y1="181" x2="520.0" y2="189"/><text class="ff-small" x="520" y="203" text-anchor="middle">rst_n</text><line class="ff-wire" x1="114" y1="223" x2="300" y2="223"/><circle class="ink-dot" cx="114" cy="223" r="3.5"/><line class="ff-wire" x1="74" y1="237" x2="300" y2="237"/><circle class="ink-dot" cx="74" cy="237" r="3.5"/><path class="ff-gate" d="M300,215 H315 A15,15 0 0 1 315,245 H300 Z"/><line class="ff-wire" x1="194" y1="281" x2="300" y2="281"/><circle class="ink-dot" cx="194" cy="281" r="3.5"/><line class="ff-wire" x1="34" y1="295" x2="300" y2="295"/><circle class="ink-dot" cx="34" cy="295" r="3.5"/><path class="ff-gate" d="M300,273 H315 A15,15 0 0 1 315,303 H300 Z"/><polyline class="ff-wire" fill="none" points="330,230 378,230 378,252 398,252"/><polyline class="ff-wire" fill="none" points="330,288 378,288 378,266 398,266"/><path class="ff-gate" d="M392,242 Q415.5,242 431.1,259 Q415.5,276 392,276 Q402.9,259 392,242 Z"/><line class="ff-wire" x1="431.1" y1="259" x2="488" y2="259"/><rect class="ff-gate" x="488" y="237" width="64" height="74" rx="3"/><text class="ff-pin" x="496" y="264" text-anchor="start">D</text><path class="ff-wire" fill="none" d="M488,283 L497,289 L488,295"/><line class="ff-wire" x1="468" y1="289" x2="488" y2="289"/><text class="ff-small" x="465" y="294" text-anchor="end">clk</text><text class="ff-pin" x="546" y="264" text-anchor="end">Q</text><text class="ff-pin" x="546" y="294" text-anchor="end"><tspan text-decoration="overline">Q</tspan></text><line class="ff-wire" x1="552" y1="259" x2="574" y2="259"/><text class="ff-text" x="578" y="264" text-anchor="start">Q₀</text><line class="ff-wire" x1="552" y1="289" x2="574" y2="289"/><text class="ff-text" x="578" y="294" text-anchor="start"><tspan text-decoration="overline">Q</tspan>₀</text><circle class="ff-gate" cx="520.0" cy="315" r="4"/><line class="ff-wire" x1="520.0" y1="319" x2="520.0" y2="327"/><text class="ff-small" x="520" y="341" text-anchor="middle">rst_n</text><line class="ff-wire" x1="154" y1="361" x2="300" y2="361"/><circle class="ink-dot" cx="154" cy="361" r="3.5"/><line class="ff-wire" x1="234" y1="375" x2="300" y2="375"/><circle class="ink-dot" cx="234" cy="375" r="3.5"/><path class="ff-gate" d="M300,353 H315 A15,15 0 0 1 315,383 H300 Z"/><line class="ff-wire" x1="330" y1="368" x2="574" y2="368"/><text class="ff-text" x="578" y="373" text-anchor="start">div</text></svg>
-
-    <span class="viz-legend"><span><i class="ff-key-dot"></i>נקודה : חיבור לקו האנכי</span><span>קווים עם אותו שם מחוברים (‏Q₁ ו-Q̄₁ יוצאים מהפליפ-פלופ העליון)</span></span>
-
-    <!-- /gen -->
-
-    **המצב 11.** מ-11 עם \( b = 0 \) חוזרים ל-11, ועם \( b = 1 \) עוברים ל-01. גם כאן האיפוס מעמיד את
-    המכונה על 00, ומשם היא לא מגיעה ל-11.
-
     **אותו מעגל.** אלה המשוואות של סעיף א, כשמחליפים בין שני הפליפ-פלופים : ‏\( D_1 \) כאן
     היא \( D_0 \) של סעיף א עם \( Q_1 \) ו-\( Q_0 \) מוחלפים, וההפך. זו ההחלפה של 1 ו-2
-    במכונה, שמחליפה את הקודים 01 ו-10.
+    במכונה, שמחליפה את הקודים 01 ו-10. גם כאן המצב 11 נשאר 11 עם \( b = 0 \), ועם
+    \( b = 1 \) הוא עובר ל-01 (בסעיף א ל-10), ולכן האיפוס ל-00 חשוב גם כאן. בתיבה של סעיף א בוחרים "ביט
+    חדש נכנס כ-MSB" ורואים את המעגל הזה שעון אחרי שעון.
 
     #### למה זה נכון { .sol-proof }
 
-    **המצב נכון.** באינדוקציה : בהתחלה \( v = 0 \), ‏\( k = 0 \) ו-\( x = 0 \). אם
-    \( x \equiv v \cdot 2^{-k} \), אחרי הביט \( b \) המספר הוא \( v + b \cdot 2^k \), ו-
-    ‏\( (v + b \cdot 2^k) \cdot 2^{-(k+1)} \equiv (x + b) \cdot 2^{-1} = x' \).
+    **המצב נכון.** באינדוקציה : בהתחלה \( v = 0 \), ‏\( k = 0 \) ו-\( x = 0 \), והחישוב של המעבר
+    ברעיון מראה שאם \( x \equiv v \cdot 2^{-k} \) לפני הביט, אז \( x' \equiv (v + b \cdot 2^k) \cdot 2^{-(k+1)} \)
+    אחריו.
 
     **היציאה נכונה.** ‏\( 2^k \) הפיך מודולו 3, ולכן \( v \equiv 0 \) אם ורק אם
     \( x = v \cdot 2^{-k} \equiv 0 \).
@@ -433,18 +444,18 @@ added: 2026-10-27
 
 עכשיו בכל מחזור נכנסת ספרה \( d \) בבסיס \( B \), והשאלה היא חלוקה ב-\( m \), כאשר
 \( m \) ו-\( B \) זרים (למשל \( m \) אי-זוגי ו-\( B = 2^k \)). כמה מצבים צריך בכל כיוון,
-ומה המעברים?
+ומה המעברים? כמו בטבלה שבשאלה, "כ-LSB" ו-"כ-MSB" אומרים איפה הספרה החדשה נכנסת.
 
 ??? tip "רמז 1"
-    מה-MSB ספרה חדשה הופכת את המספר ל-\( Bv + d \). מה-LSB היא מוסיפה \( d \cdot B^k \).
+    ספרה חדשה שנכנסת כ-LSB הופכת את המספר ל-\( Bv + d \). ספרה שנכנסת כ-MSB מוסיפה \( d \cdot B^k \).
 
 ??? tip "רמז 2"
     ‏\( B \) הפיך מודולו \( m \) כשהם זרים. העתיקו את הטריק של סעיף ב עם \( B^{-1} \).
 
 ??? success "פתרון סעיף ג"
     !!! answer "תשובה בקצרה"
-        ‏\( m \) מצבים בשני הכיוונים. מה-MSB : ‏\( r' = (Br + d) \bmod m \). מה-LSB :
-        ‏\( x' = (x + d) \cdot B^{-1} \bmod m \). ‏\( k \) ביטים במחזור הם ספרה בבסיס \( 2^k \) :
+        ‏\( m \) מצבים בשני הכיוונים. ספרה שנכנסת כ-LSB : ‏\( r' = (Br + d) \bmod m \). ספרה
+        שנכנסת כ-MSB : ‏\( x' = (x + d) \cdot B^{-1} \bmod m \). ‏\( k \) ביטים במחזור הם ספרה בבסיס \( 2^k \) :
         אותם \( m \) מצבים, רק המכפילים משתנים.
 
     <!-- cost: מצבים \( m \) | רגיסטר \( \lceil \log_2 m \rceil \) ביטים | לוגיקה טבלה של \( m \times B \) -->
@@ -452,12 +463,12 @@ added: 2026-10-27
     #### הרעיון { .sol-idea }
 
     **שני הכיוונים.** סעיפים א ו-ב לא השתמשו בשום דבר מיוחד ל-3 או ל-2, חוץ מכך ש-2
-    הפיך מודולו 3. לכן אותו דבר עובד לכל \( m \) ו-\( B \) זרים : מה-MSB המצב הוא
-    השארית, ומה-LSB המצב הוא \( x = v \cdot B^{-k} \bmod m \).
+    הפיך מודולו 3. לכן אותו דבר עובד לכל \( m \) ו-\( B \) זרים : כשהספרה נכנסת כ-LSB
+    המצב הוא השארית, וכשהיא נכנסת כ-MSB המצב הוא \( x = v \cdot B^{-k} \bmod m \).
 
     **‏k ביטים במחזור.** ‏\( k \) ביטים שנכנסים יחד הם ספרה אחת בבסיס \( 2^k \), ולכן זה אותו
-    מקרה עם \( B = 2^k \). מספר המצבים לא משתנה, רק המכפילים : ‏\( B \bmod m \) מה-MSB
-    ו-\( B^{-1} \bmod m \) מה-LSB. בטבלה, בכל תא המכפיל מה-MSB ואחריו המכפיל מה-LSB :
+    מקרה עם \( B = 2^k \). מספר המצבים לא משתנה, רק המכפילים : ‏\( B \bmod m \) כשהספרה
+    נכנסת כ-LSB, ו-\( B^{-1} \bmod m \) כשהיא נכנסת כ-MSB. בטבלה, בכל תא הראשון ואחריו השני :
 
     <!-- gen 6 -->
 
@@ -477,12 +488,12 @@ added: 2026-10-27
 
     **כמה מצבים בכל כיוון.** הטבלה סופרת, לכל \( m \) עד 16 וביט במחזור, את המצבים של
     המכונה הקטנה ביותר : המכונות הנאיביות נבנו מההגדרה ומוזערו. ב-\( m \) אי-זוגי שני
-    הכיוונים צריכים \( m \) בדיוק, והמכונה הנאיבית מה-LSB גדולה פי אורך המחזור של
+    הכיוונים צריכים \( m \) בדיוק, והמכונה הנאיבית של ספרה שנכנסת כ-MSB גדולה פי אורך המחזור של
     \( 2^k \bmod m \). ב-\( m \) זוגי מספיק פחות, וזו שאלת המשך :
 
     <!-- gen 5 -->
 
-    | ‏m | מה-MSB | מה-LSB | המכונה הנאיבית מה-LSB |
+    | ‏m | ביט נכנס כ-LSB | ביט נכנס כ-MSB | הנאיבית, ביט נכנס כ-MSB |
     |:-:|:-:|:-:|:-:|
     | ‏2 | ‏2 | ‏3 | ‏3 |
     | ‏3 | ‏3 | ‏3 | ‏6 |
@@ -502,14 +513,23 @@ added: 2026-10-27
 
     <!-- /gen -->
 
+    **נסו בעצמכם.** הקלידו `1011`, כלומר 11, ועברו ביט אחרי ביט בשני הכיוונים : כשכל ביט חדש
+    נכנס כ-LSB המכונה עוברת בשאריות 1, 2, 2, 2, וכשהוא נכנס כ-MSB היא קוראת את אותו מספר מהצד
+    השני, ב-\( x \) ‏2, 0, 0, 2. בשני המקרים היא נעצרת מחוץ ל-0, כי 11 לא מתחלק ב-3. אחר כך
+    בחרו \( m = 5 \) : שתי המכונות כבר שונות, ובכיוון הראשון המכונה עוברת ב-0 אחרי `101`, שהוא 5.
+    ולבסוף \( m = 7 \) בבסיס 8, שלושה ביטים במחזור : ‏\( 8 \equiv 1 \pmod 7 \), והמכונה רק מחברת
+    ספרות. ‏`1011` בבסיס 8 הוא 521, והמכונה נעצרת ב-3 בשני הכיוונים, סכום הספרות. מעבר לטבלאות, התיבה מראה בכל צעד את הנוסחה עם המספרים, ולחיצה על מצב מראה את המעברים שלו :
+
+    <div class="explorer" data-kind="divfsm" data-m="3" data-base="2" data-num="1011"></div>
+
     #### הקוד { .sol-code }
 
     === "Python"
         ```python title="div_fsm" linenums="1" hl_lines="4 7"
         def div_fsm(digits: list[int], m: int, base: int = 2, lsb: bool = False) -> list[bool]:
-            """After each digit: is the number read so far divisible by m? (gcd(base, m) = 1)
-            From the MSB the state is the remainder; from the LSB it is remainder * base^-k."""
-            inv = pow(base, -1, m)                     # (1)!
+            """After each digit: is the number read so far divisible by m? From the MSB the state
+            is the remainder (any base); from the LSB it is remainder * base^-k (gcd(base, m) = 1)."""
+            inv = pow(base, -1, m) if lsb else 0       # (1)!
             s, out = 0, []
             for d in digits:
                 s = (s + d) * inv % m if lsb else (s * base + d) % m
@@ -517,11 +537,11 @@ added: 2026-10-27
             return out
         ```
 
-        1. ‏\( B^{-1} \bmod m \). ‏`pow` מעלה שגיאה כש-\( B \) ו-\( m \) לא זרים.
+        1. ‏\( B^{-1} \bmod m \), רק כשהספרה נכנסת כ-MSB. ‏`pow` מעלה שגיאה כש-\( B \) ו-\( m \) לא זרים, וכשהספרה נכנסת כ-LSB אין בו צורך.
 
     === "SystemVerilog"
         ```systemverilog title="module div_fsm" linenums="1" hl_lines="16 20 21"
-        // divisible by M, one base-B digit a cycle, from the MSB or from the LSB (gcd(B, M) = 1)
+        // divisible by M, one base-B digit a cycle, from the MSB or from the LSB (gcd(B, M) = 1 for LSB)
         module div_fsm #(
           parameter int M   = 7,
           parameter int B   = 8,          // 2**k for k bits a cycle
@@ -536,7 +556,7 @@ added: 2026-10-27
             for (int y = 0; y < m; y++) if (b * y % m == 1 % m) return y;
             return 0;                                     // (1)!
           endfunction
-          localparam int BINV = inverse(B % M, M);
+          localparam int BINV = LSB ? inverse(B % M, M) : 0;
           logic [W-1:0] s;                // MSB: the remainder; LSB: x = remainder * B^-k
           always_ff @(posedge clk or negedge rst_n)
             if (!rst_n)   s <= '0;
@@ -546,27 +566,20 @@ added: 2026-10-27
         endmodule
         ```
 
-        1. לא קורה כש-\( B \) ו-\( M \) זרים. ‏`inverse` רץ בזמן ה-elaboration, ו-`BINV` הוא קבוע.
+        1. לא קורה כש-\( B \) ו-\( M \) זרים. ‏`inverse` רץ בזמן ה-elaboration, ו-`BINV` הוא קבוע, שנחוץ רק כש-`LSB = 1`.
         2. אותו כלל של סעיף ב : ‏\( x' = (x + d) \cdot B^{-1} \).
 
     #### למה זה נכון { .sol-proof }
 
-    **המעברים.** מה-MSB : ‏\( r \equiv v \) גורר \( Br + d \equiv Bv + d \). מה-LSB :
+    **המעברים.** כ-LSB : ‏\( r \equiv v \) גורר \( Br + d \equiv Bv + d \). כ-MSB :
     ‏\( (v + d B^k) B^{-(k+1)} \equiv (x + d) B^{-1} \). בשני המקרים היציאה דולקת כשהמצב 0,
     כי \( B^k \) הפיך מודולו \( m \).
 
-    **פחות מ-\( m \) אי אפשר.** קחו שני מצבים שונים \( s \ne s' \). מה-LSB, הספרות הבאות
+    **פחות מ-\( m \) אי אפשר.** קחו שני מצבים שונים \( s \ne s' \). כ-MSB, הספרות הבאות
     יכולות לבנות כל \( w \), ויש \( w \) שבו \( s + w \equiv 0 \) אבל \( s' + w \not\equiv 0 \).
-    מה-MSB, ‏\( \ell \) ספרות נוספות נותנות \( B^\ell s + w \). בוחרים \( \ell \) עם
+    כ-LSB, ‏\( \ell \) ספרות נוספות נותנות \( B^\ell s + w \). בוחרים \( \ell \) עם
     \( B^\ell \ge m \), כך ש-\( w \) יכול להיות כל שארית, ו-\( B^\ell (s - s') \not\equiv 0 \) כי
     \( B \) הפיך. כל שני מצבים נבדלים, ולכן צריך את כל \( m \).
-
-    **נסו בעצמכם.** בוחרים ברשימה איפה הספרה החדשה נכנסת. בשרשור ל-LSB כל ספרה חדשה היא
-    הספרה הנמוכה של המספר, והמכונה קוראת אותו מה-MSB (סעיף א). בשרשור ל-MSB כל ספרה חדשה
-    היא הגבוהה, והמכונה קוראת מה-LSB (סעיף ב). בשני הכיוונים המכונה מגיעה למצב 0 בדיוק כשהמספר
-    מתחלק. בוחרים \( m \), בסיס ומספר, או משרשרים ספרות בכפתורים :
-
-    <div class="explorer" data-kind="divfsm" data-m="3" data-base="2" data-num="1011"></div>
 
     #### סיבוכיות { .sol-cost }
 
@@ -580,26 +593,27 @@ added: 2026-10-27
     רגיסטר שמחזיק את המספר כולו ובודק `% 3` עובד רק עד שהוא מתמלא. השאלה היא בדיוק מה
     **מספיק** לזכור, והתשובה היא שני ביטים, לכל אורך.
 
-??? trap "מלכודת : 'מה-LSB צריך גם את המיקום'"
+??? trap "מלכודת : 'כשביט נכנס כ-MSB צריך גם את המיקום'"
     שישה מצבים (שארית וזוגיות) הם מכונה נכונה, אבל לא הקטנה ביותר. המיקום נחוץ רק כדי
     לדעת את השארית עצמה, וכדי לענות "מתחלק או לא" מספיק \( x = r \cdot 2^{-k} \).
 
 ??? trap "מלכודת : בסיס ו-m לא זרים"
-    בבסיס 10 ‏\( 10^{-1} \bmod 5 \) לא קיים, והנוסחה מה-LSB לא עובדת. אבל חלוקה ב-5 בבסיס
-    10 תלויה רק בספרה האחרונה, ולכן מה-MSB מספיקים שני מצבים ומה-LSB שלושה (הספרה
+    בבסיס 10 ‏\( 10^{-1} \bmod 5 \) לא קיים, והנוסחה של ספרה שנכנסת כ-MSB לא עובדת : ‏`pow`
+    ב-`div_fsm` מעלה שגיאה כש-`lsb=True`. כשהספרה נכנסת כ-LSB השארית עובדת בכל בסיס. וחלוקה
+    ב-5 בבסיס 10 תלויה רק בספרה האחרונה, ולכן כ-LSB מספיקים שני מצבים, וכ-MSB שלושה (הספרה
     הראשונה שנקראה, ואז הכרעה קבועה).
 
 ??? followup "שאלות המשך"
     - **‏m זוגי :** כמה מצבים צריך לחלוקה ב-6 או ב-12, ביט במחזור?
 
         ??? fu-answer "תשובה"
-            כש-\( m = 2^a m' \) עם \( m' \) אי-זוגי : מה-MSB ‏\( m' + a \) מצבים, ומה-LSB ‏\( m' + a + 1 \)
+            כש-\( m = 2^a m' \) עם \( m' \) אי-זוגי : כשהביט נכנס כ-LSB ‏\( m' + a \) מצבים, וכשהוא נכנס כ-MSB ‏\( m' + a + 1 \)
             (‏\( a \) הביטים הראשונים חייבים להיות 0, ומצב "נכשל" אחד). ל-6 : ‏4 ו-5, ל-12 : ‏5 ו-6, כמו בטבלה.
 
     - **לא רק כן או לא :** רוצים את השארית עצמה ביציאה. מה משתנה?
 
         ??? fu-answer "תשובה"
-            מה-MSB כלום : המצב הוא השארית. מה-LSB השארית היא \( x \cdot 2^k \), ולכן צריך גם את
+            כשהביט נכנס כ-LSB כלום : המצב הוא השארית. כשהוא נכנס כ-MSB השארית היא \( x \cdot 2^k \), ולכן צריך גם את
             \( k \) מודולו אורך המחזור, והמכונה הנאיבית (6 מצבים ל-3) היא כבר הקטנה ביותר.
 
     - **חלון של L ביטים :** המספר הוא רק \( L \) הביטים האחרונים, והביט הוותיק יוצא. מה משתנה?

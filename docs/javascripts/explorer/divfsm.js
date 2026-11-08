@@ -1,5 +1,5 @@
 // kinds: divfsm winfsm
-//   divfsm                 0055        divisible by m: one number fed digit by digit to one machine, chosen in a list: concatenated at the LSB (read from the MSB, the state is the remainder) or at the MSB (read from the LSB, x = remainder * B^-k); m, the base (k bits a cycle or decimal), digits typed, added or drawn; the ring shows the current state, the edges out of it and the edge just taken
+//   divfsm                 0055        divisible by m: one number fed digit by digit to one machine, chosen in a list: entering as the LSB (read from the MSB, the state is the remainder) or as the MSB (read from the LSB, x = remainder * B^-k); m, the base (k bits a cycle or decimal), digits typed, added or drawn; the ring shows the current state, the edges out of it and the edge just taken
 //   winfsm                 0056        divisible by m over a window of the last L digits: a digit enters at the LSB (the highest leaves) or at the MSB (the lowest leaves), chosen in a list; m, the base, L, the window after reset and the digits that enter; the data path (the window, the digit in, the digit out, the remainder updated) and, up to 16 windows, the machine with a state per window
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
@@ -167,7 +167,8 @@
         `<label>מחלקים ב-m <select class="dv-m" aria-label="המחלק m">${MS.map((v) => `<option value="${v}">${v}</option>`).join("")}</select></label>` +
         `<label>בכל מחזור <select class="dv-b" aria-label="הבסיס : כמה ביטים נכנסים בכל מחזור">${BASES.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select></label>` +
         `<label><span>המספר</span><input type="text" class="ex-num dv-num" dir="ltr" maxlength="${MAXD}" spellcheck="false" aria-label="המספר בבסיס שנבחר, הספרה הגבוהה משמאל, עד ${MAXD} ספרות"></label>` +
-        DIR_LIST("dv-dir") +
+        `<label>נכנסת <select class="dv-dir" aria-label="איפה הספרה החדשה נכנסת">` +
+        `<option value="lsb">כ-LSB (מה-MSB)</option><option value="msb">כ-MSB (מה-LSB)</option></select></label>` +
         `<button type="button" class="md-button dv-rand">מספר אקראי</button><span class="dv-anchor"></span>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err dv-err"></span></div>` +
         `<div class="ex-controls dv-add"></div>` +
@@ -217,12 +218,12 @@
         $(".dv-digits").innerHTML = `<span class="dv-tag">MSB →</span><span class="dv-cells">` +
           st.ds.map((d, i) => `<span class="dv-cell${!lsb && i < k ? " is-msb" : ""}${lsb && i >= N - k ? " is-lsb" : ""}">${DIG[d]}</span>`).join("") +
           `</span><span class="dv-tag">← LSB</span>`;
-        $(".dv-head").textContent = lsb ? "שרשור ל-MSB : המצב הוא ‎x = r · B⁻ᵏ‎" : "שרשור ל-LSB : המצב הוא השארית";
+        $(".dv-head").textContent = lsb ? "נכנסת כ-MSB : המצב הוא ‎x = r · B⁻ᵏ‎" : "נכנסת כ-LSB : המצב הוא השארית";
         const seq = lsb ? [...st.ds].reverse() : st.ds;
         $(".dv-ring").innerHTML = ring({
           n: m, b, t: divTable(m, b, lsb), cur: states[k], prev: k ? states[k - 1] : null, last: k ? seq[k - 1] : null, peek: st.peek,
           mk: `dv-arrow-${box.dataset.dvqIndex || 0}`, label: (i) => i, title: (i) => `${lsb ? "x" : "r"} = ${i}`, accept: (i) => i === 0,
-          aria: `${lsb ? "המכונה של שרשור ל-MSB" : "המכונה של שרשור ל-LSB"} : ${m} מצבים, המצב הנוכחי ${states[k]}`,
+          aria: `${lsb ? "המכונה של ספרה שנכנסת כ-MSB" : "המכונה של ספרה שנכנסת כ-LSB"} : ${m} מצבים, המצב הנוכחי ${states[k]}`,
         });
         const d = k ? seq[k - 1] : null;
         $(".dv-read").innerHTML = k === 0 ? `עוד לא נקראה ספרה : ${ltr(lsb ? "x = 0" : "r = 0")}.`
@@ -242,7 +243,7 @@
             ltr(`${name} = ${raw % m}`) + (raw % m === 0 ? " ✓" : "")];
         }), next);
         $(".dv-add").innerHTML = b <= 4
-          ? `<span class="ex-title">${lsb ? "שרשור ספרה משמאל (MSB) :" : "שרשור ספרה מימין (LSB) :"}</span> ` + Array.from({ length: b }, (_, dd) => `<button type="button" class="md-button md-button--primary dv-push" data-d="${dd}">${dd}</button>`).join(" ") +
+          ? `<span class="ex-title">${lsb ? "ספרה חדשה כ-MSB, משמאל :" : "ספרה חדשה כ-LSB, מימין :"}</span> ` + Array.from({ length: b }, (_, dd) => `<button type="button" class="md-button md-button--primary dv-push" data-d="${dd}">${dd}</button>`).join(" ") +
             ` <button type="button" class="md-button dv-pop">מחיקת הספרה האחרונה</button>`
           : `<span class="ex-note">בבסיס ${ltr(b)} מקלידים את המספר בשדה (${ltr(b === 16 ? "0-9, a-f" : "0-9")}).</span>`;
         if (k === N) {
@@ -461,12 +462,12 @@
   dvqExplorers.register({
     views: { divfsm: divfsmView, winfsm: winfsmView },
     help: {
-      divfsm: "בוחרים ברשימה איפה הספרה החדשה נכנסת : שרשור ל-LSB (המכונה קוראת את המספר מה-MSB, והמצב הוא השארית) או שרשור ל-MSB (המכונה קוראת מה-LSB). בכל צעד המכונה קוראת עוד ספרה, והגרף מראה את המצב הנוכחי, את המעבר האחרון ואת המעברים שיוצאים ממנו. בוחרים m ובסיס (כמה ביטים במחזור), מקלידים מספר, משרשרים ספרות בכפתורים או מגרילים. בסוף המכונה במצב 0 בדיוק כשהמספר מתחלק.",
+      divfsm: "בוחרים ברשימה איפה הספרה החדשה נכנסת : כ-LSB (המכונה קוראת את המספר מה-MSB, והמצב הוא השארית) או כ-MSB (המכונה קוראת מה-LSB). בכל צעד המכונה קוראת עוד ספרה, והגרף מראה את המצב הנוכחי, את המעבר האחרון ואת המעברים שיוצאים ממנו. בוחרים m ובסיס (כמה ביטים במחזור), מקלידים מספר, משרשרים ספרות בכפתורים או מגרילים. בסוף המכונה במצב 0 בדיוק כשהמספר מתחלק.",
       winfsm: "החלון שומר רק את L הספרות האחרונות. בוחרים ברשימה איפה ספרה חדשה נכנסת : מימין (שרשור ל-LSB, הספרה השמאלית יוצאת) או משמאל (שרשור ל-MSB, הימנית יוצאת). נתיב הנתונים מראה את החלון, את הספרה שנכנסת ואת זו שיוצאת, ואת עדכון השארית בלי לחשב את החלון מחדש. כשיש עד 16 חלונות מופיעה גם המכונה עם מצב לכל חלון. בוחרים m, בסיס, L, החלון אחרי reset והספרות שנכנסות.",
     },
     models: { divInv, divTable, divRun, winRun, winStep },
     cols: {                                               // the machine beside the derivation, the digits and the moves
-      divfsm: { side: ".dv-derive, .dv-digits, .dv-moves", w: "minmax(0, 0.75fr)" },
+      divfsm: { side: ".dv-derive, .dv-digits, .dv-moves, .dv-legend", w: "minmax(0, 0.75fr)" },   // the legend under the moves
       winfsm: { main: ".dv-pair, .wf-read, .dv-legend", side: ".dv-derive, .wf-path, .wf-rem", w: "minmax(0, 0.75fr)" },   // the moves full width under them
     },
   });
