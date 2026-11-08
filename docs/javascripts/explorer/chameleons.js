@@ -1,5 +1,5 @@
 // kinds: chameleons
-//   chameleons             0086        red, green and blue chameleons (sliders for the three counts): meetings by hand (red and green, red and blue, green and blue, undo), or the shortest plan to the cheapest colour loaded and played meeting by meeting; the counts with their residues mod 3, why no single colour is possible when the residues differ, and the triangle of every state with the same sum: the reachable ones, the corners where all share a colour, the path so far
+//   chameleons             0086        red, green and blue chameleons (sliders for the three counts): meetings by hand (red and green, red and blue, green and blue, undo), or the shortest plan to the cheapest colour loaded and played meeting by meeting; the counts with their residues mod 3, why no single colour is possible when the residues differ, and the triangle of every state with the same sum: the reachable ones, the corners where all share a colour, the path so far; a button loads the trap (3, 0, 0)
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the script
 // tag); under Node tools/explorer_node.js loads every kind file and merges the models for the
 // question tests.
@@ -31,10 +31,10 @@
   const mod3 = (v) => ((v % 3) + 3) % 3;
   // the closed form of the page: the fewest meetings until all are of colour c, or null
   const chTo = (s, c) => {
-    const [x, y] = [0, 1, 2].filter((k) => k !== c).map((k) => s[k]);
-    if (mod3(x - y)) return null;
-    if (s[c] === 0 && Math.min(x, y) === 0 && Math.max(x, y) > 0) return null;
-    return Math.max(x, y);
+    const [sx, sy] = [0, 1, 2].filter((k) => k !== c).map((k) => s[k]);
+    if (mod3(sx - sy)) return null;
+    if (s[c] === 0 && Math.min(sx, sy) === 0 && Math.max(sx, sy) > 0) return null;
+    return Math.max(sx, sy);
   };
   // [meetings, colour] for the cheapest colour (the first on a tie), or null
   const chMin = (s) => {
@@ -42,14 +42,15 @@
     for (let c = 0; c < 3; c++) { const m = chTo(s, c); if (m !== null && (best === null || m < best[0])) best = [m, c]; }
     return best;
   };
-  // the construction of part b: [[i, j], ...] with i < j
+  // the construction of part b: [[i, j], ...] with i < j; x and y are the other two colours,
+  // x the one with more chameleons
   const chPlan = (counts, c) => {
     const s = counts.slice(), plan = [];
-    let [a, b] = [0, 1, 2].filter((k) => k !== c);
-    if (s[a] < s[b]) [a, b] = [b, a];
+    let [x, y] = [0, 1, 2].filter((k) => k !== c);
+    if (s[x] < s[y]) [x, y] = [y, x];
     const go = (i, j) => { s[i]--; s[j]--; s[3 - i - j] += 2; plan.push([Math.min(i, j), Math.max(i, j)]); };
-    while (s[b] > 0) go(a, b);
-    while (s[a] > 0) { go(a, c); go(a, b); go(a, b); }
+    while (s[y] > 0) go(x, y);
+    while (s[x] > 0) { go(x, c); go(x, y); go(x, y); }
     return plan;
   };
 
@@ -103,9 +104,10 @@
       box.innerHTML =
         `<div class="ex-controls">` + slider("ch-r", 0) + slider("ch-g", 1) + slider("ch-b", 2) +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button></div>` +
-        `<div class="ex-controls ch-moves" role="group" aria-label="הפגישות">` +
+        `<div class="ex-controls ch-moves" role="group" aria-label="הפגישות, ומקרה המלכודת">` +
         PAIRS.map((p) => `<button type="button" class="md-button ch-mv" data-m="${encode(p)}">${ONE[p[0]]} ו${ONE[p[1]]}</button>`).join("") +
-        `<button type="button" class="md-button ch-undo">ביטול</button></div>` +
+        `<button type="button" class="md-button ch-undo">ביטול</button>` +
+        `<button type="button" class="md-button ex-preset ch-trap">מקרה מלכודת${NB}: <span dir="ltr">3, 0, 0</span></button></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ch-best">הדרך הקצרה</button>` +
         `<button type="button" class="md-button ex-start">התחלה</button>` +
@@ -143,7 +145,11 @@
         const r0 = st.s0.map(mod3), same = PAIRS.filter(([i, j]) => r0[i] === r0[j]);
         let note;
         if (!n) note = "אין זיקיות. הזיזו אחד המחוונים.";
-        else if (best && best[0] === 0) note = `כולן כבר ${NAMES[best[1]]}, בלי אף פגישה.`;
+        else if (best && best[0] === 0) {
+          const [i, j] = [0, 1, 2].filter((c) => c !== best[1]);
+          note = `כולן כבר ${NAMES[best[1]]}, בלי אף פגישה.` + (n % 3 ? "" : ` <strong>המלכודת${NB}:</strong> כל שלוש הספירות שוות מודולו 3, ובכל זאת אין אף זוג בצבעים שונים ` +
+            `ואין שום פגישה, ול${NAMES[i]} או ל${NAMES[j]} לא מגיעים לעולם.`);
+        }
         else if (best) {
           const [i, j] = same.find(([a, b]) => 3 - a - b === best[1]) || same[0];
           note = `${RLM}${NAMES[i]} ו${NAMES[j]} שוות מודולו 3 (שארית ${r0[i]}), ולכן כולן יכולות להיות ${NAMES[best[1]]}, אחרי ${ltr(best[0])} פגישות לכל הפחות.` +
@@ -179,6 +185,8 @@
       };
       ["ch-r", "ch-g", "ch-b"].forEach((c) => $(`.${c}`).addEventListener("input", onSlide));
       $(".ex-reset").addEventListener("click", () => { stop(); st.s0 = [D.r, D.g, D.b]; resetPlan(); compute(); draw(); });
+      // the trap of part b: two counts agree mod 3 (0 and 0, and 3 too), but no meeting at all
+      $(".ch-trap").addEventListener("click", () => { stop(); st.s0 = [3, 0, 0]; resetPlan(); compute(); draw(); });
       // the meetings ride in the link: "m" (by hand) or "b" (the shortest), the meeting shown, the meetings
       box.dvqExtra = {
         get: () => (st.track === "best" ? `b.${st.k}` : st.mine.length ? `m.${st.k}.${st.mine.map(encode).join("-")}` : ""),
@@ -204,7 +212,7 @@
   dvqExplorers.register({
     views: { chameleons: view },
     help: {
-      chameleons: "בוחרים כמה זיקיות מכל צבע, ומפגישים זוגות בכפתורים : שתי הזיקיות שנפגשו עוברות לצבע השלישי. מתחת לכל ספירה מוצגת השארית שלה מודולו 3, וכל פגישה מוסיפה 2 לכל השאריות. \"הדרך הקצרה\" טוענת את הבנייה לצבע הזול ביותר, והחיצים עוברים עליה פגישה אחרי פגישה. במשולש כל נקודה היא מצב : נקודה מלאה אם מגיעים אליו, עיגול ריק אם לא, והקו הוא הדרך עד עכשיו.",
+      chameleons: "בוחרים כמה זיקיות מכל צבע, ומפגישים זוגות בכפתורים : שתי הזיקיות שנפגשו עוברות לצבע השלישי. מתחת לכל ספירה מוצגת השארית שלה מודולו 3, וכל פגישה מוסיפה 2 לכל השאריות. \"הדרך הקצרה\" טוענת את הבנייה לצבע הזול ביותר, והחיצים עוברים עליה פגישה אחרי פגישה. \"מקרה מלכודת\" טוען 3 אדומות בלבד : כל השאריות שוות, ובכל זאת אין אף פגישה. במשולש כל נקודה היא מצב : נקודה מלאה אם מגיעים אליו, עיגול ריק אם לא, והקו הוא הדרך עד עכשיו.",
     },
     models: { chMeet, chDist, chTo, chMin, chPlan },
   });

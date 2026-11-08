@@ -311,6 +311,31 @@ def match_svg():
     return "".join(parts) + "\n\n" + legend
 
 
+TIGHT_N = 3
+
+
+def tight_example():
+    """The instance of worst_case(3) with the page's names (proposers A, B, C, receivers 1, 2,
+    3): the lists of both sides, then its seven proposals one by one."""
+    n = TIGHT_N
+    P, Q = worst_case(n)
+    head = "| מי מדרג | " + " | ".join(f"מקום {k}" for k in range(1, n + 1)) + " |"
+    sep = "|:-:|" + ":-:|" * n
+    rows = [head, sep]
+    for i in range(n):
+        rows.append(f"| **{cname(i)}** | " + " | ".join(jname(j) for j in P[i]) + " |")
+    for j in range(n):
+        rows.append(f"| **{jname(j)}** | " + " | ".join(cname(i) for i in Q[j]) + " |")
+    _, steps = gs_steps(P, Q)
+    trace = ["| הצעה | מי מציע למי | מה קורה |", "|:-:|:-:|---|"]
+    for k, (i, j, kind, freed) in enumerate(steps, 1):
+        what = {"take": f"מקבל {jname(j)} פנוי ומחזיק את {cname(i)}",
+                "swap": f"מקבל {jname(j)} מעדיף את {cname(i)} ומשחרר את {cname(freed)}" if freed is not None else "",
+                "no": f"מקבל {jname(j)} מעדיף את מי שהוא מחזיק, ו-{cname(i)} נדחה"}[kind]
+        trace.append(f"| {k} | {RLM}{ltr(f'{cname(i)}→{jname(j)}')} | {what} |")
+    return rtl_cells(rows) + "\n\n" + rtl_cells(trace)
+
+
 BOUND_NS = range(2, 8)
 
 
@@ -332,7 +357,7 @@ def stable_sorted():
 def stable_table():
     cm = gs(CAND, JOBS)[0]
     jm = flip(gs(JOBS, CAND)[0])
-    rows = ["| | " + " | ".join(cname(i) for i in range(N)) + " | Σ מועמדים | Σ משרות |",
+    rows = ["| השידוך | " + " | ".join(f"המשרה של {cname(i)}" for i in range(N)) + " | Σ מועמדים | Σ משרות |",
             "|:-:|" + ":-:|" * (N + 2)]
     for k, m in enumerate(stable_sorted(), 1):
         sc, sj = rank_sums(CAND, JOBS, m)
@@ -367,6 +392,7 @@ def blocks():
         greedy_table(),
         rounds_table(),
         match_svg(),
+        tight_example(),
         bound_table(),
         stable_table(),
         extremes_table(),

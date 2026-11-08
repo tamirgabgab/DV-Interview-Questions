@@ -115,6 +115,45 @@ def test_page_numbers():
             assert rp[i][q0093.gs(C2, J)[0][i]] >= rp[i][match[i]]
 
 
+def test_page_text():
+    page = (ROOT / "docs" / "questions" / "junior" / "0093-stable-matching.md").read_text(encoding="utf-8")
+    # part a: the greedy matching is written before its blocking pairs
+    greedy = q0093.pairs_text(q0093.greedy_by_order(q0093.CAND))
+    assert greedy == '<span dir="ltr">A–6, B–1, C–2, D–3, E–4, F–5</span>'
+    assert greedy in page and page.index(greedy) < page.index("<!-- gen 1 -->")
+    # part b: the instance of 3 needs 3 · 2 + 1 = 7 proposals, every proposer tries both first receivers
+    P, Q = q0093.worst_case(3)
+    _, steps = q0093.gs_steps(P, Q)
+    assert len(steps) == 7 == 3 * 2 + 1 and [j for _, j, _, _ in steps].count(2) == 1
+    assert all({j for i, j, _, _ in steps if i == p} >= {0, 1} for p in range(3))
+    assert "\\( 3 \\cdot 2 + 1 = 7 \\)" in page
+    # one matching box: part c points back to it
+    assert page.count('data-kind="matching"') == 1
+
+
+def test_order_of_proposals_does_not_matter():
+    """Any order of taking the free proposers ends in the same matching (the proposer-optimal one)."""
+    rnd = random.Random(31)
+    for P, Q in instances():
+        n = len(P)
+        want = q0093.gs(P, Q)[0]
+        rq = q0093.ranks(Q)
+        for _ in range(5):
+            nxt, held, free = [0] * n, [None] * n, list(range(n))
+            while free:
+                i = free.pop(rnd.randrange(len(free)))
+                j = P[i][nxt[i]]
+                nxt[i] += 1
+                if held[j] is None:
+                    held[j] = i
+                elif rq[j][i] < rq[j][held[j]]:
+                    free.append(held[j])
+                    held[j] = i
+                else:
+                    free.append(i)
+            assert q0093.flip(held) == want
+
+
 def test_roommates_example():
     """A: B > C > D, B: C > A > D, C: A > B > D, D last for all: no split into pairs is stable."""
     pref = {"A": "BCD", "B": "CAD", "C": "ABD", "D": "ABC"}

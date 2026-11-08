@@ -38,10 +38,23 @@ def test_part_b_condition_both_ways():
         some = any(q0086.mono(sum(s), c) in dist for c in range(3))
         assert some == any((s[i] - s[j]) % 3 == 0 for i, j in q0086.PAIRS), s
         for c in range(3):
-            x, y = (s[k] for k in range(3) if k != c)
-            if (x - y) % 3 == 0 and not (s[c] == 0 and min(x, y) == 0 and max(x, y) > 0):
+            sx, sy = (s[k] for k in range(3) if k != c)
+            if (sx - sy) % 3 == 0 and not (s[c] == 0 and min(sx, sy) == 0 and max(sx, sy) > 0):
                 plan = q0086.construct(s, c)
-                assert len(plan) == max(x, y) and (not plan or plan[-1][1] == q0086.mono(sum(s), c)), (s, c)
+                assert len(plan) == max(sx, sy) and (not plan or plan[-1][1] == q0086.mono(sum(s), c)), (s, c)
+
+
+def test_part_b_exception():
+    """Two counts agree mod 3 but the third colour is out of reach only when every chameleon
+    already shares one colour (and the count is a multiple of 3): (3, 0, 0) in the short answer."""
+    for s in every_state():
+        dist = q0086.distances(s)
+        for c in range(3):
+            sx, sy = (s[k] for k in range(3) if k != c)
+            if (sx - sy) % 3 == 0 and q0086.mono(sum(s), c) not in dist:
+                assert s[c] == 0 and sum(1 for v in s if v) == 1 and sum(s) % 3 == 0, (s, c)
+    assert q0086.distances((3, 0, 0)) == {(3, 0, 0): 0} and (3 - 0) % 3 == 0
+    assert "\\( (3, 0, 0) \\)" in PAGE
 
 
 def test_part_b_example():
@@ -92,7 +105,7 @@ def test_follow_ups():
 
 
 def test_page_text():
-    for words in ["\\( \\max(x, y) \\)", "16 פגישות", "360 מתוך 1,081", "\\( r - p - q + 2s = 0 \\)",
+    for words in ["\\( \\max(s_x, s_y) \\)", "16 פגישות", "360 מתוך 1,081", "\\( r - p - q + 2t = 0 \\)",
                   "\\( \\max(14, 17) = 17 \\)", "13, 15 ו-17", "סכום עד 15", "\\( r, g, b \\le 12 \\)"]:
         assert words in PAGE, words
 

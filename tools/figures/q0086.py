@@ -69,14 +69,14 @@ def bfs_to(start, c):
 
 
 def formula_to(s, c):
-    """The closed form: the other two counts x, y must agree mod 3, and the answer is the
-    larger of them; a state of one other colour has no meeting at all."""
-    x, y = (s[k] for k in range(3) if k != c)
-    if (x - y) % 3:
+    """The closed form: the counts sx, sy of the other two colours x, y must agree mod 3, and
+    the answer is the larger of them; a state of one other colour has no meeting at all."""
+    sx, sy = (s[k] for k in range(3) if k != c)
+    if (sx - sy) % 3:
         return None
-    if s[c] == 0 and min(x, y) == 0 and max(x, y) > 0:
+    if s[c] == 0 and min(sx, sy) == 0 and max(sx, sy) > 0:
         return None
-    return max(x, y)
+    return max(sx, sy)
 
 
 def formula_min(s):
@@ -90,12 +90,12 @@ def formula_min(s):
 
 
 def construct(s, c):
-    """The construction of part b: the larger of the other two meets the smaller until the
-    smaller is gone, then three meetings at a time (with c, then twice with the other)."""
+    """The construction of part b: of the other two colours, x (the larger count) meets y
+    until y is gone, then three meetings at a time (x with c, then twice x with y)."""
     s = list(s)
-    a, b = [k for k in range(3) if k != c]
-    if s[a] < s[b]:
-        a, b = b, a
+    x, y = [k for k in range(3) if k != c]
+    if s[x] < s[y]:
+        x, y = y, x
     plan = []
 
     def go(i, j):
@@ -103,12 +103,12 @@ def construct(s, c):
         s = list(meet(s, i, j))
         plan.append(((min(i, j), max(i, j)), tuple(s)))
 
-    while s[b] > 0:
-        go(a, b)
-    while s[a] > 0:
-        go(a, c)
-        go(a, b)
-        go(a, b)
+    while s[y] > 0:
+        go(x, y)
+    while s[x] > 0:
+        go(x, c)
+        go(x, y)
+        go(x, y)
     return plan
 
 
