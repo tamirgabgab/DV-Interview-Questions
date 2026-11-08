@@ -35,10 +35,11 @@ added: 2026-11-06
 שלב החליטו אם להדליק את הביט, וכתבו כמה נשאר מ-1000.
 
 ??? tip "רמז 1"
-    השורש של מספר בן 16 ביטים קטן מ-\( 2^8 = 256 \), ולכן יש לו 8 ביטים, 7 עד 0. מתחילים
-    מ-\( r = 0 \). ביט \( k \) נשאר דלוק אם \( (r + 2^k)^2 \le 1000 \).
+    כמה ביטים יש לשורש של מספר בן 16 ביטים? החליטו עליהם מהעליון למטה : ביט עליון שווה יותר
+    מכל הביטים שמתחתיו יחד.
 
 ??? tip "רמז 2"
+    ביט \( b = 2^k \) נשאר דלוק אם \( (r + b)^2 \le 1000 \), כש-\( r \) הוא מה שהוחלט עד עכשיו.
     במקום לחשב את \( (r + b)^2 \) מחדש, שמרו את מה שנשאר, \( n - r^2 \). כשמדליקים ביט
     \( b \), הריבוע גדל ב-\( (r + b)^2 - r^2 = 2rb + b^2 \).
 
@@ -80,12 +81,10 @@ added: 2026-11-06
 
     <div class="steps" markdown>
 
-    1. **ביטים 7, 6 ו-5 :** ‏\( r = 0 \), והניסיון הוא רק \( b^2 \) : ‏16384, 4096 ו-1024, כולם מעל 1000. הביטים נשארים כבויים.
-    2. **ביט 4 :** הניסיון \( 16^2 = 256 \) נכנס. \( r = 16 \), ונשארים \( 1000 - 256 = 744 \).
-    3. **ביט 3 :** הניסיון \( 2 \cdot 16 \cdot 8 + 64 = 320 \) נכנס. \( r = 24 \), ונשארים 424.
-    4. **ביט 2 :** הניסיון \( 2 \cdot 24 \cdot 4 + 16 = 208 \) נכנס. \( r = 28 \), ונשארים 216.
-    5. **ביט 1 :** הניסיון \( 2 \cdot 28 \cdot 2 + 4 = 116 \) נכנס. \( r = 30 \), ונשארים 100.
-    6. **ביט 0 :** הניסיון \( 2 \cdot 30 + 1 = 61 \) נכנס. \( r = 31 \), ונשארים 39. בדיקה : \( 31^2 + 39 = 961 + 39 = 1000 \).
+    1. **התחלה :** ‏\( r = 0 \), והשארית היא כל ה-1000.
+    2. **ביט אחרי ביט, מ-7 עד 0 :** הניסיון הוא \( 2rb + b^2 \), עם \( b = 2^k \) ועם ה-\( r \) של עד עכשיו. כל עוד \( r = 0 \) הוא רק \( b^2 \).
+    3. **ההחלטה :** ניסיון שלא גדול מהשארית נכנס : מדליקים את הביט ומחסירים אותו מהשארית. אחרת הביט נשאר כבוי והשארית לא משתנה.
+    4. **בדיקה :** ‏\( 31^2 + 39 = 961 + 39 = 1000 \), ו-\( 32^2 = 1024 \) כבר גדול מ-1000.
 
     </div>
 
@@ -228,9 +227,9 @@ added: 2026-11-06
     **כמה שלבים.** קלט של \( 2m \) ביטים קטן מ-\( 2^{2m} \), ולכן השורש קטן מ-\( 2^m \) : יש
     לו \( m \) ביטים, וכל שלב קובע אחד. לקלט באורך אי-זוגי מוסיפים ביט 0 מלמעלה.
 
-    **נסו בעצמכם.** הקלידו \( n \) והתקדמו ביט אחד בכל פעם. בטבלה רואים את הניסיון, את
-    השארית ואת ההחלטה, ובציור את הריבוע \( r^2 \) גדל : שני המלבנים והריבוע הקטן הם
-    הניסיון, והריבוע המקווקו הוא \( \sqrt{n} \). ניסיון שלא נכנס יוצא מהריבוע המקווקו :
+    **נסו בעצמכם.** הקלידו 4095, לחצו "עד הסוף", ואחר כך הקלידו 4096. הפרש של 1 ב-\( n \) הופך
+    את כל שמונת הביטים של השורש, מ-00111111 ל-01000000. ב-4096 התקדמו ביט אחרי ביט : בביט 6
+    הניסיון ממלא בדיוק את הריבוע המקווקו של \( \sqrt{n} \), וכל ניסיון אחריו יוצא ממנו :
 
     <div class="explorer" data-kind="isqrt" data-n="1000"></div>
 
@@ -269,42 +268,85 @@ added: 2026-11-06
     #### הרעיון { .sol-idea }
 
     המודול הוא הלולאה של סעיף ב, פרוסה על פני שעונים : כל איטרציה היא מחזור. מונה \( k \)
-    יורד מ-7 ל-0, והניסיון מחושב בצירופי מ-`root` ומ-\( k \). כך נראים הרגיסטרים על 1000 :
+    יורד מ-7 ל-0, והניסיון מחושב בצירופי מ-`root` ומ-\( k \). כך זה נראה בחומרה :
 
     <!-- gen 3 -->
 
-    | אחרי השעון | ‏k | ‏root | ‏rem |
-    |:-:|:-:|:-:|:-:|
-    | 0, ‏`start` | 7 | 0 | 1000 |
-    | 1 | 6 | 0 | 1000 |
-    | 2 | 5 | 0 | 1000 |
-    | 3 | 4 | 0 | 1000 |
-    | 4 | 3 | 16 | 744 |
-    | 5 | 2 | 24 | 424 |
-    | 6 | 1 | 28 | 216 |
-    | 7 | 0 | 30 | 100 |
-    | **8, ‏`done`** | 0 | **31** | **39** |
+    <svg class="figure isq-fig isq-dp" viewBox="0 0 410 346" direction="ltr" style="max-width:25.625rem" role="img" aria-label="תרשים המלבנים של isqrt_seq : שלושה רגיסטרים, k של 3 ביטים, root של 8 ו-rem של 16. המזיז בוחר לפי k את הניסיון מתוך root. מחסר אחד מחשב rem פחות trial, וה-borrow שלו הוא ההשוואה : fits הוא ההפך של borrow. המפענח מדליק את root[k] כש-fits, והמרבב כותב ל-rem את n ב-load, את diff כש-fits, ואחרת את rem עצמו. הבקרה מחשבת load מ-start, מורידה את k ב-1 בכל מחזור של busy, ומעלה את done כש-k הוא 0"><defs><marker id="isq-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path class="isq-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs><g class="isq-blk isq-reg"><rect x="10" y="14" width="70" height="44" rx="5"/><text x="45" y="33" text-anchor="middle">k</text><text class="isq-sub" x="45" y="49" text-anchor="middle">3 bits</text></g><g class="isq-blk isq-reg"><rect x="118" y="14" width="130" height="44" rx="5"/><text x="183" y="33" text-anchor="middle">root</text><text class="isq-sub" x="183" y="49" text-anchor="middle">8 bits</text></g><g class="isq-blk isq-reg"><rect x="284" y="14" width="108" height="44" rx="5"/><text x="338" y="33" text-anchor="middle">rem</text><text class="isq-sub" x="338" y="49" text-anchor="middle">16 bits</text></g><g class="isq-blk isq-mux"><rect x="118" y="92" width="126" height="44" rx="5"/><text x="181" y="111" text-anchor="middle">trial</text><text class="isq-sub" x="181" y="127" text-anchor="middle">a mux on k</text></g><g class="isq-blk isq-stage"><rect x="284" y="92" width="108" height="44" rx="5"/><text x="338" y="111" text-anchor="middle">rem − trial</text><text class="isq-sub" x="338" y="127" text-anchor="middle">diff and borrow</text></g><g class="isq-blk isq-mux"><rect x="118" y="166" width="124" height="44" rx="5"/><text x="180" y="185" text-anchor="middle">decoder</text><text class="isq-sub" x="180" y="201" text-anchor="middle">root[k] ← 1</text></g><g class="isq-blk isq-ctl"><rect x="278" y="166" width="92" height="40" rx="5"/><text x="324" y="183" text-anchor="middle">fits</text><text class="isq-sub" x="324" y="199" text-anchor="middle">= !borrow</text></g><g class="isq-blk isq-ctl"><rect x="10" y="246" width="238" height="44" rx="5"/><text x="129" y="265" text-anchor="middle">control</text><text class="isq-sub" x="129" y="281" text-anchor="middle">load, busy, done, k ← k − 1</text></g><g class="isq-blk isq-mux"><rect x="284" y="246" width="108" height="44" rx="5"/><text x="338" y="265" text-anchor="middle">rem mux</text><text class="isq-sub" x="338" y="281" text-anchor="middle">n, diff or rem</text></g><path class="isq-wire" d="M28,58 L28,246" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="32" y="232" text-anchor="start">k</text><path class="isq-wire" d="M62,246 L62,58" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="66" y="232" text-anchor="start">k − 1</text><path class="isq-wire" d="M80,36 L92,36 L92,180 L118,180" marker-end="url(#isq-hb)"/><path class="isq-wire" d="M146,74 L146,92" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="152" y="84" text-anchor="start">k</text><path class="isq-wire" d="M183,58 L183,92" marker-end="url(#isq-hb)"/><path class="isq-wire" d="M244,114 L284,114" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="264" y="105" text-anchor="middle">trial</text><path class="isq-wire" d="M338,58 L338,92" marker-end="url(#isq-hb)"/><path class="isq-wire" d="M304,136 L304,166" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="299" y="155" text-anchor="end">borrow</text><path class="isq-wire" d="M278,194 L242,194" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="260" y="188" text-anchor="middle">fits</text><path class="isq-wire" d="M316,206 L316,246" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="312" y="232" text-anchor="end">fits</text><path class="isq-wire" d="M382,136 L382,246" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="378" y="232" text-anchor="end">diff</text><path class="isq-wire" d="M392,268 L401,268 L401,36 L392,36" marker-end="url(#isq-hb)"/><path class="isq-wire" d="M146,166 L146,150 L104,150 L104,66 L128,66 L128,58" marker-end="url(#isq-hb)"/><path class="isq-wire" d="M183,246 L183,210" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="187" y="232" text-anchor="start">load, busy</text><path class="isq-wire" d="M248,268 L284,268" marker-end="url(#isq-hb)"/><path class="isq-wire" d="M56,318 L56,290" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="56" y="332" text-anchor="middle">start</text><path class="isq-wire" d="M170,290 L170,318" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="170" y="332" text-anchor="middle">busy, done</text><path class="isq-wire" d="M338,318 L338,290" marker-end="url(#isq-hb)"/><text class="isq-wlab" x="338" y="332" text-anchor="middle">n</text></svg>
 
     <!-- /gen -->
+
+    - **הרגיסטרים :** \( k \) של 3 ביטים, הביט שמחליטים עליו במחזור הזה. ‏`root` של 8 ביטים,
+      השורש עד עכשיו. ‏`rem` של 16 ביטים, השארית \( n - \mathit{root}^2 \), שבהתחלה היא כל
+      \( n \).
+    - **המזיז :** מחשב את הניסיון \( (\mathit{root} \ll (k + 1)) \mathbin{|} (1 \ll 2k) \). אין
+      בו חשבון : לכל ערך של \( k \) הניסיון הוא אותם ביטים של `root` במקום אחר, ועוד ביט אחד.
+      לכן זה מרבב של 8 כניסות, שכל אחת מהן היא חיווט, והבורר שלו הוא \( k \).
+    - **המחסר :** מחשב \( \mathit{diff} = \mathit{rem} - \mathit{trial} \) ב-17 ביטים. הביט
+      העליון הוא ה-`borrow` : הוא 1 בדיוק כשהניסיון גדול מהשארית, והחיסור "לווה".
+    - **המשווה הוא ה-borrow :** אין משווה נפרד. ‏\( \mathit{trial} \le \mathit{rem} \) אם ורק
+      אם החיסור לא לווה, ולכן `fits = !borrow`. מחסר אחד נותן גם את ההחלטה וגם את השארית
+      החדשה. בקוד כתובים `trial <= rem` ו-`rem - trial` בנפרד, וכדי לא לסמוך על הסינתזה שתאחד
+      אותם אפשר לכתוב את המחסר במפורש, `{borrow, diff} = {1'b0, rem} - {1'b0, trial}`.
+    - **המפענח :** הופך את \( k \) לאחד משמונה קווים, ובמחזור שבו `fits` דולק הוא מדליק את
+      `root[k]`. ביט של `root` שנדלק לא נכבה עד החישוב הבא, ולכן לכל פליפ-פלופ של `root` יש
+      אפשור משלו, ואין צורך בחיבור. ב-`load` הוא מאפס את כל `root`.
+    - **המרבב של rem :** בוחר מה ייכתב ל-`rem` בסוף המחזור : \( n \) ב-`load`, ‏`diff`
+      כש-`fits` דולק, ואחרת את `rem` עצמו.
+    - **הבקרה :** ‏`load = start && !busy` טוען את \( n \), מאפס את `root`, כותב \( k = 7 \)
+      ומדליק את `busy`. בכל מחזור של `busy` ‏\( k \) יורד ב-1, וב-\( k = 0 \) ‏`busy` יורד ו-`done`
+      עולה למחזור אחד. ‏`busy` גם מאפשר את הכתיבה ל-`rem` ול-`root`, כך שהם לא זזים בין
+      חישובים.
+
+    כך עובר דרכו \( n = 1000 \). שורה בטבלה היא מחזור אחד בגל שמתחתיה, מעליית שעון אחת עד
+    הבאה, והמספור שלהן אחד : במחזור 0 ‏`start` דולק, ו-`done` עולה במחזור 9. ‏`trial` ו-`fits`
+    מחושבים בתוך המחזור, והעלייה שבסופו כותבת אותם, ולכן `root` ו-`rem` החדשים מופיעים רק בשורה
+    הבאה :
+
+    <!-- gen 4 -->
+
+    | מחזור | ‏k | הניסיון ‏trial | נכנס? ‏fits | ‏root | ‏rem | ‏busy | ‏done |
+    |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+    | 0 | – | – | – | – | – | 0 | 0 |
+    | 1 | 7 | 16384 | ✗ | 0 | 1000 | 1 | 0 |
+    | 2 | 6 | 4096 | ✗ | 0 | 1000 | 1 | 0 |
+    | 3 | 5 | 1024 | ✗ | 0 | 1000 | 1 | 0 |
+    | 4 | 4 | **256** | ✓ | 0 | 1000 | 1 | 0 |
+    | 5 | 3 | **320** | ✓ | 16 | 744 | 1 | 0 |
+    | 6 | 2 | **208** | ✓ | 24 | 424 | 1 | 0 |
+    | 7 | 1 | **116** | ✓ | 28 | 216 | 1 | 0 |
+    | 8 | 0 | **61** | ✓ | 30 | 100 | 1 | 0 |
+    | **9** | 0 | – | – | **31** | **39** | 0 | **1** |
+    | 10 | 0 | – | – | 31 | 39 | 0 | 0 |
+
+    <!-- /gen -->
+
+    <!-- gen 5 -->
 
     ```wavedrom
     { signal: [
       { name: "clk",   wave: "p.........." },
+      { name: "cycle", wave: "===========", data: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] },
       { name: "start", wave: "10........." },
       { name: "busy",  wave: "01.......0." },
+      { name: "k",     wave: "x========..", data: ["7", "6", "5", "4", "3", "2", "1", "0"] },
+      { name: "trial", wave: "x========x.", data: ["16384", "4096", "1024", "256", "320", "208", "116", "61"] },
+      { name: "fits",  wave: "x0..1....x." },
       { name: "root",  wave: "x=...=====.", data: ["0", "16", "24", "28", "30", "31"] },
       { name: "rem",   wave: "x=...=====.", data: ["1000", "744", "424", "216", "100", "39"] },
       { name: "done",  wave: "0........10" }
     ]}
     ```
 
+    <!-- /gen -->
+
     #### השלבים { .sol-steps }
 
     <div class="steps" markdown>
 
-    1. **הפעלה ב-`start` :** טוענים `rem = n`, ‏`root = 0`, ‏`k = 7`, ומרימים את `busy`.
-    2. **כל שעון כש-`busy` :** אם הניסיון נכנס, מחסירים אותו ומדליקים את `root[k]`. אחר כך \( k \) יורד ב-1.
-    3. **אחרי ביט 0 :** ‏`busy` יורד ו-`done` עולה למחזור אחד.
+    1. **מחזור 0, ‏`start` :** ‏`load` טוען `rem = n`, ‏`root = 0` ו-`k = 7`, ומדליק את `busy`.
+    2. **מחזורים 1 עד 8, ‏`busy` :** אם הניסיון נכנס, מחסירים אותו ומדליקים את `root[k]`. בכל מקרה \( k \) יורד ב-1.
+    3. **מחזור 9 :** אחרי ביט 0 ‏`busy` יורד, ו-`done` עולה למחזור אחד.
     4. **האימות :** כל הקלטים מול המודל, ו-assertion על התוצאה בכל `done`.
 
     </div>
@@ -425,10 +467,18 @@ added: 2026-11-06
     - **חזקות של 2 ו-\( 2^i - 1 \) :** ביט אחד דלוק, וכל הביטים דלוקים, לבדיקת הנשאים במחסר.
     - **קלטים אקראיים :** לבאגים שתלויים בביטים באמצע, כמו רוחב שגוי של `rem`.
 
+    **נסו בעצמכם.** התקדמו מחזור אחרי מחזור ועקבו אחרי `borrow` בטבלת האותות : כשהוא 1,
+    ‏`fits` כבוי, ו-`root` ו-`rem` לא זזים. אחר כך לחצו על מקרה המלכודת 4096 : במחזור 2 הניסיון
+    שווה בדיוק לשארית, והמחסר לא לווה, כי \( 4096 - 4096 = 0 \). משווה שבודק "קטן מ-" במקום
+    "קטן או שווה" היה מחזיר 63 :
+
+    <div class="explorer" data-kind="isqrthw" data-n="1000"></div>
+
     #### סיבוכיות { .sol-cost }
 
     ‏8 מחזורים לתוצאה, ואי אפשר להתחיל חדשה לפני שהקודמת נגמרה. בחומרה : שלושה רגיסטרים
-    (8, 16 ו-3 ביטים), מחסר והשוואה של 16 ביטים, ובורר שמזיז את `root` לפי \( k \).
+    (3, 8 ו-16 ביטים), מחסר אחד של 17 ביטים שה-borrow שלו הוא גם ההשוואה, מרבב שמזיז את
+    `root` לפי \( k \), מפענח של 3 ל-8 ומרבב לפני `rem`.
 
 ---
 
@@ -471,7 +521,7 @@ added: 2026-11-06
     **החילוק של 1000 ב-7.** המנה של 16 ביטים, מביט 15 למטה. ביטים 15 עד 8 גדולים מדי :
     ‏\( 7 \cdot 256 = 1792 > 1000 \).
 
-    <!-- gen 4 -->
+    <!-- gen 6 -->
 
     | ביט ‏k | הניסיון ‏d · 2ᵏ | השארית לפני | ‏q אחרי |
     |:-:|:-:|:-:|:-:|
@@ -490,7 +540,7 @@ added: 2026-11-06
     **השורש השלישי של 1000.** ‏\( 1000 < 2^{12} \), ולשורש השלישי של מספר בן 12 ביטים יש
     4 ביטים, 3 עד 0. ‏\( r^2 \) נשמר ברגיסטר ומתעדכן רק כשביט נדלק :
 
-    <!-- gen 5 -->
+    <!-- gen 7 -->
 
     | ביט ‏k | הניסיון ‏3r²b + 3rb² + b³ | השארית לפני | ‏r, r² אחרי |
     |:-:|:-:|:-:|:-:|

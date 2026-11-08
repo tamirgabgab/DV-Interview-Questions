@@ -5,7 +5,7 @@
 // Question 0097: the page's SystemVerilog. isqrt16 on every 16-bit input against a reference
 // that counts up the squares; isqrt_seq on every 16-bit input through start / busy / done,
 // with the page's checker (isqrt_check) bound to it, 8 busy clocks each and rem = n - root²,
-// and the trace of n = 1000 clock by clock; divide16 against / and % on every dividend with
+// and the trace of n = 1000 clock by clock (root, rem, k and the trial, as the page's table); divide16 against / and % on every dividend with
 // many divisors (and d = 0); icbrt24 on every n below 2^20 and around every cube up to 255³.
 module tb;
   logic clk = 0, rst_n = 0, start = 0;
@@ -40,7 +40,7 @@ module tb;
   initial begin
     int s, r, rr, cyc, want_q, want_r;
     logic [15:0] q16, r16;
-    int trace_root[$], trace_rem[$];
+    int trace_root[$], trace_rem[$], trace_k[$], trace_trial[$];
     int ds[10] = '{1, 2, 3, 7, 10, 255, 256, 1000, 40000, 65535};
 
     // isqrt16 on every input; s steps up through the squares
@@ -57,6 +57,7 @@ module tb;
     @(negedge clk) start = 0;
     while (!done) begin
       trace_root.push_back(root); trace_rem.push_back(rem);
+      trace_k.push_back(dut.k); trace_trial.push_back(dut.trial);
       @(negedge clk);
     end
     trace_root.push_back(root); trace_rem.push_back(rem);
@@ -66,6 +67,13 @@ module tb;
       int wm[9] = '{1000, 1000, 1000, 1000, 744, 424, 216, 100, 39};
       foreach (wr[i]) if (i < trace_root.size() && (trace_root[i] != wr[i] || trace_rem[i] != wm[i]))
         fail($sformatf("1000 clock %0d: root %0d rem %0d, want %0d %0d", i, trace_root[i], trace_rem[i], wr[i], wm[i]));
+    end
+    // the page's table: k and the trial in the busy cycles 1 to 8
+    begin
+      int wk[8] = '{7, 6, 5, 4, 3, 2, 1, 0};
+      int wt[8] = '{16384, 4096, 1024, 256, 320, 208, 116, 61};
+      foreach (wk[i]) if (i < trace_k.size() && (trace_k[i] != wk[i] || trace_trial[i] != wt[i]))
+        fail($sformatf("1000 cycle %0d: k %0d trial %0d, want %0d %0d", i + 1, trace_k[i], trace_trial[i], wk[i], wt[i]));
     end
     @(negedge clk);
     if (done) fail("done stays high for more than one clock");

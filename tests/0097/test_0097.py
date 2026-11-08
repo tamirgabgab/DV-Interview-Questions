@@ -91,21 +91,69 @@ def test_module_trace_and_wavedrom():
     cyc = q0097.seq_cycles(1000)
     assert [(r, rem) for _, _, r, rem, _, _ in cyc] == [(0, 1000)] * 4 + [(16, 744), (24, 424), (28, 216), (30, 100), (31, 39)]
     assert [busy for *_, busy, _ in cyc] == [1] * 8 + [0] and [done for *_, done in cyc] == [0] * 8 + [1]
+    hw = q0097.hw_cycles(1000)
+    assert len(hw) == 11 and [c["cycle"] for c in hw] == list(range(11))
+    assert [c["k"] for c in hw] == [None, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0]
+    assert [c["trial"] for c in hw] == [None, 16384, 4096, 1024, 256, 320, 208, 116, 61, None, None]
+    assert [c["fits"] for c in hw] == [None, 0, 0, 0, 1, 1, 1, 1, 1, None, None]
+    assert [c["busy"] for c in hw] == [0] + [1] * 8 + [0, 0] and [c["done"] for c in hw] == [0] * 9 + [1, 0]
+    # the waveform of the page, lane by lane, slot c = cycle c of the table
     wave = re.search(r"```wavedrom\n(.*?)```", PAGE, re.S).group(1)
-    root = re.search(r'name: "root",\s*wave: "([^"]+)", data: (\[[^\]]*\])', wave)
-    rem = re.search(r'name: "rem",\s*wave: "([^"]+)", data: (\[[^\]]*\])', wave)
-    # slot c + 1 shows the registers after clock c; '=' marks a new value
-    want_root = [str(r) for i, (_, _, r, _, _, _) in enumerate(cyc) if i == 0 or r != cyc[i - 1][2]]
-    want_rem = [str(m) for i, (_, _, _, m, _, _) in enumerate(cyc) if i == 0 or m != cyc[i - 1][3]]
-    assert json.loads(root.group(2)) == want_root and json.loads(rem.group(2)) == want_rem
-    for wv, idx in ((root.group(1), 2), (rem.group(1), 3)):
-        assert len(wv) == 11
-        for c, regs in enumerate(cyc):
-            changed = c == 0 or regs[idx] != cyc[c - 1][idx]
-            assert (wv[c + 1] == "=") == changed, (wv, c)
-    busy = re.search(r'name: "busy",\s*wave: "([^"]+)"', wave).group(1)
-    done = re.search(r'name: "done",\s*wave: "([^"]+)"', wave).group(1)
-    assert busy == "01.......0." and done == "0........10"
+
+    def lane(name):
+        m = re.search(r'name: "' + name + r'",\s*wave: "([^"]+)"(?:, data: (\[[^\]]*\]))?', wave)
+        w, data = m.group(1), json.loads(m.group(2)) if m.group(2) else []
+        out, it, cur = [], iter(data), None
+        for ch in w:
+            cur = None if ch == "x" else next(it) if ch == "=" else cur if ch == "." else int(ch)
+            out.append(cur)
+        assert len(out) == len(hw), name
+        return out
+
+    assert lane("cycle") == [str(c) for c in range(11)]
+    for name in ("start", "busy", "fits", "done"):
+        assert lane(name) == [c[name] for c in hw], name
+    for name in ("k", "trial", "root", "rem"):
+        assert lane(name) == [None if c[name] is None else str(c[name]) for c in hw], name
+    # the table of the page has one row a cycle, as the waveform
+    rows = [ln for ln in q0097.cycles_table().splitlines()[2:]]
+    assert len(rows) == 11 and rows[0].startswith("| 0 |") and rows[9].startswith("| **9** |")
+
+
+def test_hardware_cycles():
+    """isqrt_seq cycle by cycle: the registers through cycle c + 1 are the model's after clock c;
+    the comparison is the subtractor's borrow; the trap of the box (a strict comparison)."""
+    for n in list(range(0, 1 << 16, 7)) + [65535, 4095, 4096]:
+        hw, seq = q0097.hw_cycles(n), q0097.seq_cycles(n)
+        assert [(c["k"], c["root"], c["rem"], c["busy"], c["done"]) for c in hw[1:10]] == [t[1:] for t in seq], n
+        for c in hw:
+            if c["busy"]:
+                d17 = (c["rem"] - c["trial"]) % (1 << 17)
+                assert c["borrow"] == d17 >> 16 == int(c["trial"] > c["rem"]) and c["fits"] == 1 - c["borrow"]
+                assert c["trial"] < 1 << 16 and (c["fits"] == 0 or c["diff"] == d17)
+                assert c["set"] == (c["k"] if c["fits"] else None) and c["nroot"] == c["root"] | (c["fits"] << c["k"])
+            nxt = hw[c["cycle"] + 1] if c["cycle"] + 1 < len(hw) else None
+            if nxt:
+                assert (nxt["k"], nxt["root"], nxt["rem"], nxt["busy"], nxt["done"]) == (c["nk"], c["nroot"], c["nrem"], c["nbusy"], c["ndone"])
+        assert hw[9]["done"] == 1 and (hw[9]["root"], hw[9]["rem"]) == q0097.isqrt_ref(n)
+
+    def strict(n):                               # trial < rem instead of trial <= rem
+        r, rem = 0, n
+        for k in range(7, -1, -1):
+            t = (r << (k + 1)) | (1 << (2 * k))
+            if t < rem:
+                rem, r = rem - t, r | 1 << k
+        return r
+    assert strict(4096) == 63 and q0097.isqrt_ref(4096) == (64, 0)
+    hw = q0097.hw_cycles(4096)
+    assert hw[2]["k"] == 6 and hw[2]["trial"] == hw[2]["rem"] == 4096 and hw[2]["borrow"] == 0 and hw[2]["diff"] == 0
+    # the traps of the box
+    assert q0097.isqrt_ref(4095) == (63, 126) and format(63, "08b") == "00111111" and format(64, "08b") == "01000000"
+    assert max(s["trial"] for s in q0097.isqrt_steps(65535)) == 20480 and q0097.isqrt_ref(65535) == (255, 510)
+    assert all(not s["ok"] for s in q0097.isqrt_steps(0))
+    # the block diagram: every block inside the picture, the wires end on a block or the edge
+    for _id, x, y, w, h, *_ in q0097.DP_BLOCKS:
+        assert 0 <= x and x + w <= q0097.DP_W and 0 <= y and y + h <= q0097.DP_H
 
 
 def test_figures_up_to_date():
@@ -124,3 +172,32 @@ def test_explorer_matches_the_reference():
         want = q0097.isqrt_steps(n)
         assert steps == want, n
         assert tuple(root) == q0097.isqrt_ref(n), n
+
+
+def test_hardware_box_matches_the_reference():
+    from page_tests import explorer_require, node_json
+
+    ns = list(range(0, 1 << 16, 251)) + [0, 1, 2, 3, 1000, 4095, 4096, 65024, 65025, 65535]
+    got = node_json(f"const m = {explorer_require()};console.log(JSON.stringify({json.dumps(ns)}.map((n) => m.isqhwTrace(n))));")
+    for n, tr in zip(ns, got):
+        assert tr == q0097.hw_cycles(n), n
+    # the box draws the page's diagram: the same rectangles and wires, block by block
+    svg = node_json(f"const m = {explorer_require()};const t = m.isqhwTrace(1000);"
+                    "console.log(JSON.stringify([null, ...t].map((c) => m.isqhwDiagram(c, 1000))));")
+    rect = re.compile(r'<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"')
+    path = re.compile(r'<path class="isq-wire[^"]*" d="([^"]+)"')
+    page = q0097.datapath_svg()
+    for live in svg:
+        assert rect.findall(live) == rect.findall(page) and path.findall(live) == path.findall(page)
+    # the lit path: a cycle with a fit lights the decoder and the way back into rem, one without does not
+    lit = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.isqhwTrace(1000).map((c) => {{ const l = m.isqhwLit(c); return [[...l.blocks].sort(), [...l.wires].sort()]; }})));")
+    for c, (blocks, wires) in zip(q0097.hw_cycles(1000), lit):
+        if c["load"]:
+            assert {"start", "n", "mux_rem"} <= set(wires)
+        elif c["busy"]:
+            assert ("dec_root" in wires) == ("mux_rem" in wires) == ("dec" in blocks) == bool(c["fits"]), c["cycle"]
+            assert {"sh_sub", "borrow", "rem_sub"} <= set(wires)
+        elif c["done"]:
+            assert wires == ["out"]
+        else:
+            assert blocks == [] and wires == []

@@ -979,6 +979,26 @@ below start at item 112 (session 31).
     requests scrolls its figures sideways in the column; 0019 stepped through its proof
     is taller than before; eurovision's labels are 9.8 px in a column; floyd's labels on a
     very long tail are about 8 px.
+181. **The ten reviewed questions fixed (session 34, 2026-11-08).** The owner's choices: 0097
+    "like 0099", trap-case buttons in the boxes that replayed their figure, the duplicates
+    removed and replaced, x / y for 0086's colours. Six agents, one or two questions each,
+    every R1 claim verified by brute force before the text changed (all five held). 0005:
+    the follow-up "at most k ones" replaces "other digits", the why of BFS in the idea,
+    hint 2 split, the mermaid tree dropped (the box draws it). 0025: the third Ack 1 is the
+    one changed to 9; one generated table per part with the method called (the steppers
+    gone); the 2048 window and the receiver's rules as a table; a trap case. 0047: why the
+    lower side is decided, the trace on the box's array, the escape height first. 0062:
+    the excess at equal times is the number of response/send pairs (not one), the ratio
+    S >= (R + W) / 2, AXI's reason, three trap cases. 0064: the CSD link stated right, a
+    tiling figure (gen 7, 8; part c's markers 9 to 12), the steps as rules. 0066: s < e,
+    part c's intervals and pieces, four traps, five trap cases, NBSP everywhere. 0078: L
+    first, the LFSR is a deterministic cycle, the $urandom bias. 0086: the exception (all
+    one colour, a count divisible by 3), x / y / c and s_x / s_y (part c's meetings t),
+    a trap case. 0093: the second box removed, a middle hint, the greedy matching, the
+    n = 3 tight instance (gen 4; later gens 5 to 7). 0097: a datapath figure (gen 3) with
+    a bullet per block (the comparator is the subtractor's borrow), a cycle table and a
+    generated waveform with k, trial and fits, and a new box `isqrthw` (two columns, trap
+    cases 65535, 4096, 4095, 0) beside the areas box `isqrt`.
 
 ---
 
@@ -1039,20 +1059,20 @@ below start at item 112 (session 31).
 Found by reading the ten pages (two review passes) and by measuring every box at 1920 by
 1080 with all its blocks open and the box stepped to its end. The screen budget: about
 970 px of box under the sticky header and the part bar (0099's box is about 980 px).
-Waiting for the owner to choose; the two correctness items (R1) go first.
+All done in session 34 (work log items 180 and 181).
 
 **R1. Correctness (verify, then fix the text and the test):**
-- [ ] 0062: "בלי ההסכמה התשובה יכולה להיות גדולה באחד" (statement) and "נספר tag אחד
+- [x] 0062: "בלי ההסכמה התשובה יכולה להיות גדולה באחד" (statement) and "נספר tag אחד
   יותר מדי" (proof, equal times) are wrong in general: 0-10, 0-10, 10-20, 10-20 counts 4
   instead of 2; the excess is the number of sends at that instant (min of ends and starts).
-- [ ] 0066: "ניקח כל קטע סגור [s, e] ... כחצי קטע [s, e)" loses a point interval [5, 5];
+- [x] 0066: "ניקח כל קטע סגור [s, e] ... כחצי קטע [s, e)" loses a point interval [5, 5];
   say "with s < e" (the testbench already filters s < e).
-- [ ] 0086: part b's short answer ("אפשר אם ורק אם שתיים מהספירות שוות מודולו 3, ואז
+- [x] 0086: part b's short answer ("אפשר אם ורק אם שתיים מהספירות שוות מודולו 3, ואז
   כולן מגיעות לצבע השלישי") misses the exception (3, 0, 0), where no meeting can happen;
   it is only in the proof and in part c.
-- [ ] 0025: part b's step 11 sends three Ack 1 and the short answer counts three, but steps
+- [x] 0025: part b's step 11 sends three Ack 1 and the short answer counts three, but steps
   12 and 13 deliver two; show the third or say it is the same.
-- [ ] 0078: the follow-up "בחומרה" (LFSR) treats LFSR outputs as independent rand7 calls;
+- [x] 0078: the follow-up "בחומרה" (LFSR) treats LFSR outputs as independent rand7 calls;
   rejecting 7 from a deterministic cycle gives a fixed sequence. Say it is pseudo-random.
 
 **R2. One screen per box (shared work, then per kind).** What makes boxes tall, from the
@@ -1086,54 +1106,54 @@ other (0078: a summary table, the 5 by 5 grid and the table of ten rounds). Prop
   matching, repunit and iban).
 
 **R3. Boxes and figures, patterns across the ten:**
-- [ ] A box that replays the static figure above it with the same input (0062 part a,
+- [x] A box that replays the static figure above it with the same input (0062 part a,
   0066 mode a, 0086's triangle, 0025's scripts): load a trap case instead (the tie
   0-10 / 10-20 in 0062; unsorted, nested and touching intervals in 0066), and say in one
   line what the box adds.
-- [ ] Box paragraphs describe the layout ("למעלה ... מתחת") instead of giving a task
+- [x] Box paragraphs describe the layout ("למעלה ... מתחת") instead of giving a task
   (0005, 0047, 0078, 0025): one or two "try this" lines each (0078: M = 2, N = 5, k from 3
   to 4 and the rejected share falls; 0025: corrupt the head TLP and deliver the rest, one
   Nak and not three; 0047: watch which side moves).
-- [ ] The same worked numbers three times (steps, table, box) in 0064, 0025, 0097 and
+- [x] The same worked numbers three times (steps, table, box) in 0064, 0025, 0097 and
   0086: keep the table, shorten the steps to the rule.
-- [ ] 0093: the second box only flips the default of the "מי מציע" switch of the first;
+- [x] 0093: the second box only flips the default of the "מי מציע" switch of the first;
   drop it and point back. Table gen 5 mixes job numbers with places (both 1 to 6): label
   the cells.
-- [ ] 0097 part c has no datapath figure: registers k (3 bits), root (8), rem (16), the
+- [x] 0097 part c has no datapath figure: registers k (3 bits), root (8), rem (16), the
   trial shifter, the comparator (the subtractor's borrow), the mux back into rem, the
   decoder of root[k], busy and done; and one clock-by-clock table tied to the wavedrom
   (clock, k, trial, fits, root, rem, busy, done), the way 0099 part b was redone.
 
 **R4. Explanations, per question (most valuable first):**
-- [ ] 0005: move the pruning argument and "BFS = fewest digits first" from the proof
+- [x] 0005: move the pruning argument and "BFS = fewest digits first" from the proof
   into the idea; split hint 2 (remainder, then the order of visiting); the x = 7 tree
   and the queue table say the same thing: one right after the steps; the follow-up "ספרות
   אחרות" repeats a section: replace it (at most k ones) or drop it.
-- [ ] 0047: the trace on [3, 0, 2, 0, 4] never moves r, so it never shows the decision:
+- [x] 0047: the trace on [3, 0, 2, 0, 4] never moves r, so it never shows the decision:
   use an array where both pointers move (the box's default); one sentence in the idea on
   why the smaller side is decided; define the escape height at the start of part b.
-- [ ] 0062: part b never answers "מה היחס ביניהם": S ≥ max(R, W) ≥ (R + W) / 2, so two
+- [x] 0062: part b never answers "מה היחס ביניהם": S ≥ max(R, W) ≥ (R + W) / 2, so two
   pools cost at most twice one; why AXI keeps them apart (no starving); the events table
   belongs under the steps.
-- [ ] 0066: part c never writes its four intervals; the verification paragraph of the
+- [x] 0066: part c never writes its four intervals; the verification paragraph of the
   statement is nine lines (two are enough); six traps overlap the steps and the proof;
   note that part c's peak is tracked in the sweep in O(1) memory.
-- [ ] 0078: part b's 7-row table comes before L is defined; the `$urandom % N` bias at
+- [x] 0078: part b's 7-row table comes before L is defined; the `$urandom % N` bias at
   the end of part b (k = 1, no rejection); the follow-up "לחסוך בקריאות" needs its first
   step (4 leftovers times one call give 20, accept 14).
-- [ ] 0086: a and b are both colours and counts (use x / y for colours); part a says the
+- [x] 0086: a and b are both colours and counts (use x / y for colours); part a says the
   residue argument three times; one sentence of geometry for the triangle (a meeting is
   a step of 3 in two coordinates).
-- [ ] 0093: a middle hint ("what if a job could change its mind?"); show the greedy
+- [x] 0093: a middle hint ("what if a job could change its mind?"); show the greedy
   matching (A-6, B-1, C-2, D-3, E-4, F-5) before the blocking pairs; one sentence that the
   order of proposals does not change the result; the tightness construction as the n = 3
   instance before the general rule.
-- [ ] 0025: a column naming the method called at each step (send_tlp, receive_tlp,
+- [x] 0025: a column naming the method called at each step (send_tlp, receive_tlp,
   receive_dllp, on_replay_timeout); the 2048 window motivated where it is first used;
   the receiver rules as a small table (crc by expected / old / future).
-- [ ] 0097: hint 1 gives the procedure (make it "how many bits, decide from the top");
+- [x] 0097: hint 1 gives the procedure (make it "how many bits, decide from the top");
   part a's steps repeat its table.
-- [ ] 0064: CSD / Booth is base 2 with a redundant digit set, not base 3: say the shared
+- [x] 0064: CSD / Booth is base 2 with a redundant digit set, not base 3: say the shared
   step ("a remainder too big becomes a negative digit and a carry"); a number-line figure
   for uniqueness step 3; say why the all-on-the-other-pan placement weighs 40; split
   "ארבע מספיקות" into its two proofs.

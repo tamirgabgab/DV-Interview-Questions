@@ -52,3 +52,48 @@
 .md-typeset .viz-legend .isq-key-r { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
 .md-typeset .viz-legend .isq-key-b { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s3); outline-offset: -1.5px; }
 .md-typeset .viz-legend .isq-key-t { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; }
+
+/* --- part c: the block diagram of isqrt_seq (tools/figures/q0097.py datapath_svg) and the box
+   of explorer/isqrthw.js (isqh-*), the colours of 0099's hardware box: a register blue (s1),
+   the subtractor orange (s2), fits and the control green (s3), the wires grey; in the box the
+   blocks and wires of this cycle lit blue. Drawn left to right (direction="ltr"). ---------- */
+.md-typeset svg.isq-dp { display: block; margin-inline: auto; }
+.md-typeset svg.isq-dp .isq-headp { fill: var(--viz-text); }
+.md-typeset svg.isq-dp .isq-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
+.md-typeset svg.isq-dp .isq-blk.isq-reg rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.isq-dp .isq-blk.isq-stage rect { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg.isq-dp .isq-blk.isq-ctl rect { fill: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg.isq-dp .isq-blk text { fill: var(--viz-ink); font-size: 13px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.isq-dp .isq-blk text.isq-sub { fill: var(--viz-text); font-size: 11px; font-weight: 400; }
+.md-typeset svg.isq-dp .isq-blk text.isq-val { fill: var(--viz-ink); font-size: 12px; font-weight: 400; }
+.md-typeset svg.isq-dp .isq-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.isq-dp .isq-wlab { fill: var(--viz-s3-text); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+
+/* the live diagram: what this cycle does not use in the grid colour, what it uses lit */
+.md-typeset .explorer .isqh-dpwrap svg { display: block; width: 100%; max-width: 26rem; height: auto; margin: 0.4rem auto; }
+.md-typeset svg.isq-live-dp .isq-blk rect { stroke: var(--viz-grid); }
+.md-typeset svg.isq-live-dp .isq-blk.is-on rect { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg.isq-live-dp .isq-wire { stroke: var(--viz-grid); }
+.md-typeset svg.isq-live-dp .isq-wire.is-on { stroke: var(--viz-s1); stroke-width: 2.4; }
+
+/* the table of every signal, a column per cycle */
+.md-typeset .explorer .isqh-wavewrap { overflow-x: auto; margin: 0.4rem 0; }
+.md-typeset .explorer table.isq-wave { display: table; width: auto; margin: 0; border-collapse: collapse; font-family: var(--md-code-font-family); font-size: 0.62rem; }
+.md-typeset .explorer table.isq-wave :is(th, td) { min-width: 2.3rem; padding: 0.1rem 0.2rem; border: 1px solid var(--viz-grid); text-align: center; color: var(--viz-ink); background: var(--md-default-bg-color); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.md-typeset .explorer table.isq-wave th[scope="row"] { position: sticky; left: 0; z-index: 1; min-width: 3rem; text-align: left; font-weight: 700; background: color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.isq-wave thead th { color: var(--viz-text); font-weight: 400; }
+.md-typeset .explorer table.isq-wave .is-now { box-shadow: inset 0 0 0 2px var(--viz-s1); font-weight: 700; }
+.md-typeset .explorer table.isq-wave td.is-hi { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.isq-wave td.is-fut { background: color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color)); }
+.md-typeset .explorer .isqh-note { font-size: 0.72rem; margin: 0.3em 0; min-height: 2.6em; }
+.md-typeset .viz-legend .isq-key-on { background: none; height: 0; border-top: 3px solid var(--viz-s1); align-self: center; }
+.md-typeset .viz-legend .isq-key-now { background: var(--md-default-bg-color); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .isq-key-hi { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+
+/* a wide box: the diagram on the left, the table and the note on the right (core.js cols) */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="isqrthw"] .ex-main .isqh-dpwrap svg { max-width: none; margin: 0; }
+  .md-typeset .explorer[data-kind="isqrthw"] table.isq-wave { font-size: 0.58rem; }
+  .md-typeset .explorer[data-kind="isqrthw"] table.isq-wave :is(th, td) { min-width: 1.5rem; padding: 0.05rem 0.15rem; line-height: 1.4; }
+  .md-typeset .explorer[data-kind="isqrthw"] table.isq-wave th[scope="row"] { min-width: 0; }
+}
