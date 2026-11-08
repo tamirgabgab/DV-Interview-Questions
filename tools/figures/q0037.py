@@ -95,6 +95,13 @@ def report(a: str, b: str, prefer: str = "gaps", swap: bool = False) -> list[tup
     return out
 
 
+def report_at(a: str, b: str, prefer: str = "gaps", swap: bool = False) -> list[tuple]:
+    """The report with positions, as the page's diff returns it: (kind, expected, actual, i, j),
+    (i, j) the cell where the step ends, i the packets of a and j the packets of b read so far
+    (a missing packet is a[i - 1], an extra one b[j - 1])."""
+    return [r + (i, j) for r, (_, i, j) in zip(report(a, b, prefer, swap), [s for s in walk(a, b, prefer, swap) if s[0] != "same"])]
+
+
 def apply(a: str, b: str, path) -> str:
     """b rebuilt from a along the path (the check that a report says what happened)."""
     out = []
@@ -259,6 +266,47 @@ def table_swaps() -> str:
     return "\n".join(rows)
 
 
+def flow_svg() -> str:
+    """The scoreboard around the question: the monitor puts what the DUT sent in the queue of
+    the actual packets, the reference model what it expected in the queue of the expected
+    ones, and at the end of the test the diff compares the two queues and writes the report.
+    It stands in the statement, so nothing in it tells part a's answer. The labels are
+    English, the flow left to right."""
+    W, H, CQ = 372, 148, 14
+    qx = 150                                           # the queues start here, 8 cells of CQ
+    s = (f'<svg class="figure ed-fig ed-flow" viewBox="0 0 {W} {H}" style="max-width:{W / 16:g}rem" role="img" '
+         f'aria-label="הזרימה ב-scoreboard : ה-monitor שם את מה שה-DUT שלח, {B}, בתור actual, ה-reference model שם את '
+         f'מה שציפה, {A}, בתור expected, ובסוף הבדיקה diff משווה את שני התורים וכותב דוח">'
+         '<defs><marker id="ed-flow-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
+         '<path class="ed-head" d="M0,0 L10,5 L0,10 Z"/></marker></defs>')
+
+    def box(x, y, w, h, *lines):
+        out = f'<rect class="ed-blk" x="{x}" y="{y}" width="{w}" height="{h}" rx="5"/>'
+        y0 = y + h / 2 - 7 * (len(lines) - 1) + 4
+        for k, t in enumerate(lines):
+            out += f'<text class="ed-blk-t" x="{x + w / 2:g}" y="{y0 + 14 * k:g}" text-anchor="middle">{t}</text>'
+        return out
+
+    def arrow(x1, y1, x2, y2):
+        return f'<path class="ed-arr" d="M{x1},{y1} L{x2},{y2}" marker-end="url(#ed-flow-head)"/>'
+
+    def queue(y, name, packets):
+        out = f'<text class="ed-lab" x="{qx + 4 * CQ}" y="{y - 6}" text-anchor="middle">{name}</text>'
+        for k, p in enumerate(packets):
+            out += (f'<rect class="ed-cell" x="{qx + k * CQ}" y="{y}" width="{CQ}" height="20"/>'
+                    f'<text class="ed-pk" x="{qx + k * CQ + CQ / 2:g}" y="{y + 15}" text-anchor="middle">{p}</text>')
+        return out
+
+    s += box(4, 14, 52, 32, "DUT") + arrow(56, 30, 69, 30) + box(70, 14, 66, 32, "monitor") + arrow(136, 30, 149, 30)
+    s += queue(20, "actual", B)
+    s += box(4, 74, 132, 32, "reference model") + arrow(136, 90, 149, 90)
+    s += queue(80, "expected", A)
+    s += arrow(qx + 8 * CQ, 30, 273, 30) + arrow(qx + 8 * CQ, 90, 273, 90)
+    s += box(274, 14, 72, 92, "diff at", "the end", "of the test")
+    s += arrow(310, 106, 310, 125) + f'<text class="ed-blk-t" x="310" y="141" text-anchor="middle">report</text>'
+    return s + "</svg>"
+
+
 def blocks():
     """The generated blocks, in page order."""
     out = [
@@ -273,6 +321,7 @@ def blocks():
                   "שסביב האלכסון הראשי מחושבים, ובפינה 2", band=BAND_D),
         table_costs(),
         table_swaps(),
+        flow_svg(),
     ]
     return [re.sub(r"(?<=\S) :(?=[\s*]|$)", NB + ":", blk) for blk in out]
 

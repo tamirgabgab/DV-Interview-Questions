@@ -1,5 +1,5 @@
 // kinds: editdist
-//   editdist               0037        the edit distance between an expected stream and an actual one, a packet a letter (data-a, data-b, A to Z, 1 to 12; data-prefer "gaps" or "changed", the rule at a tie; data-swap "1": two neighbouring packets that swapped count as one edit): the table of the prefixes, filled a cell at a time by the stepping buttons (the cell of the moment and its neighbours, the minimum they give and who gave it), and once full the path back from the corner shaded by what each step means, with the scoreboard's report under the table; the examples of the page, the rule at a tie and the swap as selects
+//   editdist               0037        the edit distance between an expected stream and an actual one, a packet a letter (data-a, data-b, A to Z, 1 to 12; data-prefer "gaps" or "changed", the rule at a tie; data-swap "1": two neighbouring packets that swapped count as one edit): the table of the prefixes, filled a cell at a time by the stepping buttons (the cell of the moment and its neighbours, the minimum they give and who gave it), and once full the path back from the corner shaded by what each step means, with the scoreboard's report under the table; the examples of the page, the rule at a tie and the swap as selects, and a button for each trap of the page (an empty table to guess the corner; once full the note says what the trap is)
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -9,10 +9,16 @@
   const MAXLEN = 12;
   const EXAMPLES = [
     ["ABCDEFGH", "ABDEYGHH", "סעיף א"],
-    ["ABCDEF", "ABDXEF", "השוויון של סעיף ב"],
-    ["ABCDEFGHIJKL", "ABCEFGHIXJKL", "הרצועה של סעיף ג"],
-    ["ABCDEFGH", "ABDCEFHG", "ההחלפות של סעיף ד"],
-    ["ABCD", "BCDA", "חבילה שזזה רחוק"],
+    ["ABCDEF", "ABDXEF", "סעיף ב"],
+    ["ABCDEFGHIJKL", "ABCEFGHIXJKL", "סעיף ג"],
+    ["ABCDEFGH", "ABDCEFHG", "סעיף ד"],
+  ];
+  // the traps of the page, a button each: the streams, the swap, the name, and the line the
+  // note adds once the table is full (for CA / ABC and ABCD / BCDA only with the swap on)
+  const TRAPS = [
+    ["AB", "XAB", false, "השורה של 0", `מלכודת השורה של 0${NB}: אילו השורה של 0 הייתה אפסים, X בתחילת הזרם לא הייתה עולה כלום, והפינה הייתה 0 במקום 1.`],
+    ["CA", "ABC", true, "CA מול ABC", `מלכודת${NB}: כאן כל חבילה נערכת לכל היותר פעם אחת, ולכן 3. בשתי פעולות אפשר, החלפה ל-AC ואז B באמצע, אבל ההכנסה עורכת שוב את הזוג שהתחלף.`],
+    ["ABCD", "BCDA", true, "חבילה שזזה רחוק", `מלכודת${NB}: A זזה שלושה מקומות ולא מקום אחד. זו לא החלפה של שכנות, והדוח נשאר חסרה ומיותרת, 2.`],
   ];
 
   // --- the models, as tools/figures/q0037.py table(), walk() and report() -----------------------
@@ -76,13 +82,14 @@
         `<div class="ex-controls">` +
         field("ed-a", "הצפוי", `הזרם הצפוי, אותיות A עד Z, עד ${MAXLEN}`) +
         field("ed-b", "בפועל", `הזרם בפועל, אותיות A עד Z, עד ${MAXLEN}`) +
-        `<label>דוגמה <select class="ed-ex" data-nolink aria-label="דוגמה מהעמוד"><option value="">לבחירה</option>` +
+        `<label>דוגמה <select class="ed-ex" data-nolink aria-label="הדוגמה של סעיף בעמוד"><option value="">לבחירה</option>` +
         EXAMPLES.map(([x, y, t], n) => `<option value="${n}">${t}</option>`).join("") + `</select></label>` +
-        `<span class="fl-err ed-err" aria-live="polite"></span></div>` +
-        `<div class="ex-controls">` +
         `<label>בשוויון <select class="ed-prefer" data-nolink aria-label="הכלל כששני שכנים נותנים את המינימום"><option value="gaps">קודם חסרה ומיותרת</option><option value="changed">קודם שיבוש</option></select></label>` +
+        `<span class="fl-err ed-err" aria-live="polite"></span></div>` +
+        `<div class="ex-controls ed-traps">` +
         `<label>הפעולות <select class="ed-ops" data-nolink aria-label="הפעולות המותרות"><option value="3">חסרה, מיותרת, שובשה</option><option value="4">גם החלפה של שכנות</option></select></label>` +
-        `<button type="button" class="md-button ex-reset">חזרה לזרמים של העמוד</button></div>` +
+        `<span class="ed-trap-run"><span>מלכודות${NB}:</span>` +
+        TRAPS.map(([x, y, w, t], n) => `<button type="button" class="md-button ed-trap" data-trap="${n}">${t}</button>`).join("") + `</span></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-start">ההתחלה</button>` +
         `<button type="button" class="md-button ex-prev">התא הקודם</button>` +
@@ -92,7 +99,7 @@
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary ed-sum" aria-live="polite"></p>` +
         `<div class="ed-wrap" dir="ltr" tabindex="0" role="region" aria-label="טבלת המרחקים בין הקידומות"><table class="ed-table"></table></div>` +
-        `<span class="viz-legend"><span><i class="ed-key-now"></i>התא שמולא עכשיו</span><span><i class="ed-key-from"></i>השכן שנותן את המינימום</span>` +
+        `<span class="viz-legend"><span><i class="ed-key-now"></i>התא של הצעד</span><span><i class="ed-key-from"></i>השכן של המינימום</span>` +
         `<span><i class="ed-key-same"></i>אותה חבילה</span><span><i class="ed-key-miss"></i>חסרה</span><span><i class="ed-key-extra"></i>מיותרת</span>` +
         `<span><i class="ed-key-chg"></i>שובשה</span><span><i class="ed-key-swap"></i>התחלפו</span></span>` +
         `<p class="ed-note" aria-live="polite"></p><ol class="ed-report"></ol>`;
@@ -156,6 +163,8 @@
             `המינימום <b>${ltr(best)}</b>, ${wins.length > 1 ? `שוויון${NB}: ${wins.join(" וגם ")}` : `מגיע ${wins[0]}`}.`;
           if (full) note += ` הטבלה מלאה${NB}: המסלול הצבוע חוזר מהפינה, ובכל תא לשכן שנתן את המינימום לפי הכלל לשוויון.`;
         }
+        const trap = TRAPS.find(([x, y, w]) => x === a && y === b && (!w || swap));
+        if (full && trap) note += ` ${trap[4]}`;
         $(".ed-note").innerHTML = note;
         const diffs = path.filter(([k]) => k !== "same");
         $(".ed-report").innerHTML = full
@@ -180,6 +189,14 @@
         });
         el.addEventListener("keydown", (e) => { if (e.key === "Enter") el.blur(); });
       });
+      box.querySelectorAll(".ed-trap").forEach((btn) => btn.addEventListener("click", () => {
+        const [x, y, w] = TRAPS[Number(btn.dataset.trap)];
+        $(".ed-ex").value = "";
+        st.swap = w;
+        set(x, y);
+        st.k = 0;                                         // an empty table: guess the corner first
+        draw();
+      }));
       $(".ed-ex").addEventListener("change", () => {
         const e = EXAMPLES[Number($(".ed-ex").value)];
         if (!$(".ed-ex").value || !e) return;
@@ -192,11 +209,6 @@
       $(".ex-prev").addEventListener("click", () => { stop(); st.k--; draw(); });
       $(".ex-next").addEventListener("click", () => { st.k++; draw(); });
       $(".ex-end").addEventListener("click", () => { stop(); st.k = total(); draw(); });
-      $(".ex-reset").addEventListener("click", () => {
-        stop(); $(".ed-ex").value = "";
-        Object.assign(st, { a: a0, b: b0, prefer: prefer0, swap: swap0, k: a0.length * b0.length });
-        $(".ed-err").textContent = ""; draw();
-      });
       // the link and the remembered state: "ABCDEF_ABDXEF_gaps_0_36" (streams, rule, swap, cells)
       box.dvqExtra = {
         get: () => `${st.a}_${st.b}_${st.prefer}_${st.swap ? 1 : 0}_${st.k}`,
@@ -216,7 +228,7 @@
   dvqExplorers.register({
     views: { editdist: editdistView },
     help: {
-      editdist: "כותבים שני זרמים של חבילות, אות לכל חבילה : הצפוי והזרם בפועל. בטבלה, הצפוי בשורות ובפועל בעמודות, ובכל תא המרחק בין שתי הקידומות. \"התא הבא\" ממלא תא אחרי תא ומראה מאילו שכנים הוא בא, ו\"ההתחלה\" מרוקן את הטבלה. כשהטבלה מלאה, המסלול מהפינה צבוע לפי מה שכל צעד אומר, ומתחת לה הדוח. \"בשוויון\" בוחר את הכלל כששני שכנים נותנים את המינימום, ו\"הפעולות\" מוסיף החלפה של שתי חבילות צמודות.".replace(/ :/g, " :"),
+      editdist: "כותבים שני זרמים של חבילות, אות לכל חבילה : הצפוי והזרם בפועל. בטבלה, הצפוי בשורות ובפועל בעמודות, ובכל תא המרחק בין שתי הקידומות. \"התא הבא\" ממלא תא אחרי תא ומראה מאילו שכנים הוא בא, ו\"ההתחלה\" מרוקן את הטבלה. כשהטבלה מלאה, המסלול מהפינה צבוע לפי מה שכל צעד אומר, ומתחת לה הדוח. \"בשוויון\" בוחר את הכלל כששני שכנים נותנים את המינימום, ו\"הפעולות\" מוסיף החלפה של שתי חבילות צמודות. כפתורי המלכודות טוענים את המקרים שבסוף העמוד עם טבלה ריקה : נחשו את הפינה, ואז \"כל הטבלה\".".replace(/ :/g, " :"),
     },
     models: { edParse, edTable, edWalk, edReport },
   });

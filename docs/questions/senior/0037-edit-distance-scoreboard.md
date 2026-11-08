@@ -20,6 +20,17 @@ added: 2026-11-07
 - **חבילה מיותרת :** חבילה שהגיעה ולא הייתה בזרם הצפוי.
 - **חבילה ששובשה :** במקום חבילה אחת הגיעה חבילה אחרת.
 
+ב-scoreboard שני הזרמים נאספים לשני תורים : ה-monitor שם בתור `actual` כל חבילה שה-DUT שלח,
+וה-reference model שם בתור `expected` כל חבילה שציפה לה. השוואה בכל הגעה, ראש התור מול
+החבילה שהגיעה, נתקעת בהבדל הראשון : מ-C והלאה כל חבילה נראית שגויה. לכן ההשוואה כאן רצה
+בסוף הבדיקה, על שני התורים המלאים, וכותבת דוח :
+
+<!-- gen 8 -->
+
+<svg class="figure ed-fig ed-flow" viewBox="0 0 372 148" style="max-width:23.25rem" role="img" aria-label="הזרימה ב-scoreboard : ה-monitor שם את מה שה-DUT שלח, ABDEYGHH, בתור actual, ה-reference model שם את מה שציפה, ABCDEFGH, בתור expected, ובסוף הבדיקה diff משווה את שני התורים וכותב דוח"><defs><marker id="ed-flow-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ed-head" d="M0,0 L10,5 L0,10 Z"/></marker></defs><rect class="ed-blk" x="4" y="14" width="52" height="32" rx="5"/><text class="ed-blk-t" x="30" y="34" text-anchor="middle">DUT</text><path class="ed-arr" d="M56,30 L69,30" marker-end="url(#ed-flow-head)"/><rect class="ed-blk" x="70" y="14" width="66" height="32" rx="5"/><text class="ed-blk-t" x="103" y="34" text-anchor="middle">monitor</text><path class="ed-arr" d="M136,30 L149,30" marker-end="url(#ed-flow-head)"/><text class="ed-lab" x="206" y="14" text-anchor="middle">actual</text><rect class="ed-cell" x="150" y="20" width="14" height="20"/><text class="ed-pk" x="157" y="35" text-anchor="middle">A</text><rect class="ed-cell" x="164" y="20" width="14" height="20"/><text class="ed-pk" x="171" y="35" text-anchor="middle">B</text><rect class="ed-cell" x="178" y="20" width="14" height="20"/><text class="ed-pk" x="185" y="35" text-anchor="middle">D</text><rect class="ed-cell" x="192" y="20" width="14" height="20"/><text class="ed-pk" x="199" y="35" text-anchor="middle">E</text><rect class="ed-cell" x="206" y="20" width="14" height="20"/><text class="ed-pk" x="213" y="35" text-anchor="middle">Y</text><rect class="ed-cell" x="220" y="20" width="14" height="20"/><text class="ed-pk" x="227" y="35" text-anchor="middle">G</text><rect class="ed-cell" x="234" y="20" width="14" height="20"/><text class="ed-pk" x="241" y="35" text-anchor="middle">H</text><rect class="ed-cell" x="248" y="20" width="14" height="20"/><text class="ed-pk" x="255" y="35" text-anchor="middle">H</text><rect class="ed-blk" x="4" y="74" width="132" height="32" rx="5"/><text class="ed-blk-t" x="70" y="94" text-anchor="middle">reference model</text><path class="ed-arr" d="M136,90 L149,90" marker-end="url(#ed-flow-head)"/><text class="ed-lab" x="206" y="74" text-anchor="middle">expected</text><rect class="ed-cell" x="150" y="80" width="14" height="20"/><text class="ed-pk" x="157" y="95" text-anchor="middle">A</text><rect class="ed-cell" x="164" y="80" width="14" height="20"/><text class="ed-pk" x="171" y="95" text-anchor="middle">B</text><rect class="ed-cell" x="178" y="80" width="14" height="20"/><text class="ed-pk" x="185" y="95" text-anchor="middle">C</text><rect class="ed-cell" x="192" y="80" width="14" height="20"/><text class="ed-pk" x="199" y="95" text-anchor="middle">D</text><rect class="ed-cell" x="206" y="80" width="14" height="20"/><text class="ed-pk" x="213" y="95" text-anchor="middle">E</text><rect class="ed-cell" x="220" y="80" width="14" height="20"/><text class="ed-pk" x="227" y="95" text-anchor="middle">F</text><rect class="ed-cell" x="234" y="80" width="14" height="20"/><text class="ed-pk" x="241" y="95" text-anchor="middle">G</text><rect class="ed-cell" x="248" y="80" width="14" height="20"/><text class="ed-pk" x="255" y="95" text-anchor="middle">H</text><path class="ed-arr" d="M262,30 L273,30" marker-end="url(#ed-flow-head)"/><path class="ed-arr" d="M262,90 L273,90" marker-end="url(#ed-flow-head)"/><rect class="ed-blk" x="274" y="14" width="72" height="92" rx="5"/><text class="ed-blk-t" x="310" y="50" text-anchor="middle">diff at</text><text class="ed-blk-t" x="310" y="64" text-anchor="middle">the end</text><text class="ed-blk-t" x="310" y="78" text-anchor="middle">of the test</text><path class="ed-arr" d="M310,106 L310,125" marker-end="url(#ed-flow-head)"/><text class="ed-blk-t" x="310" y="141" text-anchor="middle">report</text></svg>
+
+<!-- /gen -->
+
 השאלה בארבעה סעיפים :
 
 1. **המרחק :** פונקציה שמחשבת אותו, והמרחק בדוגמה.
@@ -42,7 +53,8 @@ added: 2026-11-07
 
 ### סעיף א – המרחק
 
-כתבו פונקציה שמחזירה את המרחק בין הזרם הצפוי `a` לזרם בפועל `b`, וחשבו אותו לדוגמה.
+כתבו פונקציה שמחזירה את המרחק בין הזרם הצפוי `a`, באורך \( m \), לזרם בפועל `b`, באורך
+\( n \), וחשבו אותו לדוגמה.
 
 ??? tip "רמז 1"
     מה יכול היה לקרות לחבילה האחרונה של הזרם הצפוי?
@@ -154,8 +166,9 @@ added: 2026-11-07
     ולכן צריך לפחות שתי פעולות. שתיים מספיקות רק אם שתיהן שיבושים במקום, של C ושל F, אבל
     שתי האפשרויות נותנות `ABYDEHGH` ו-`ABHDEYGH`, ולא `ABDEYGHH`.
 
-    **נסו בעצמכם.** שנו את שני הזרמים. "התא הבא" ממלא את הטבלה תא אחרי תא, ומראה מאיזה שכן
-    הגיע המינימום. בסוף מופיעים המסלול והדוח :
+    **נסו בעצמכם.** לפני כל "התא הבא" נחשו מאיזה שכן יגיע המינימום, והתיבה תראה. הכפתורים
+    של המלכודות טוענים את המקרים שבסוף העמוד : לחצו על "השורה של 0" ‏(`AB` מול `XAB`), ונחשו
+    מה היה בפינה אילו השורה של 0 הייתה אפסים :
 
     <div class="explorer" data-kind="editdist" data-a="ABCDEFGH" data-b="ABDEYGHH"></div>
 
@@ -180,18 +193,27 @@ added: 2026-11-07
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"
         **הולכים אחורה מהפינה.** בכל תא עוברים לשכן שממנו הגיע המינימום : למעלה היא חבילה
-        חסרה, שמאלה מיותרת, ובאלכסון אותה חבילה או חבילה ששובשה. בדוגמה של סעיף א הדוח הוא
-        C חסרה, F שובשה ל-Y ו-H מיותרת. כשיש שוויון, הכלל קובע את הסיפור : ב-`ABCDEF` מול
-        `ABDXEF` המרחק 2 הוא גם "C חסרה ו-X מיותרת" וגם "C שובשה ל-D ו-D שובשה ל-X". הכלל
-        הטוב ל-scoreboard הוא להעדיף חבילה חסרה ומיותרת.
+        חסרה, שמאלה מיותרת, ובאלכסון אותה חבילה או חבילה ששובשה. כל שורה בדוח נושאת גם את
+        המקום שלה. בדוגמה של סעיף א הדוח הוא C חסרה (מקום 3 בצפוי), F שובשה ל-Y (מקום 6 בצפוי
+        ו-5 בפועל) ו-H מיותרת, זו שבמקום 7 בפועל. כשיש שוויון, הכלל קובע את הסיפור : ב-`ABCDEF`
+        מול `ABDXEF` המרחק 2 הוא גם "C חסרה ו-X מיותרת" וגם "C שובשה ל-D ו-D שובשה ל-X". שני
+        שיבושים שנותנים בדיוק את החבילות הבאות בזרם הם צירוף מקרים, ולכן ה-scoreboard מעדיף
+        חבילה חסרה ומיותרת.
 
     <!-- cost: זמן \( O(m \cdot n) \) | זיכרון \( O(m \cdot n) \) -->
 
     #### הרעיון { .sol-idea }
 
     הערך של כל תא הגיע מאחד משלושת השכנים שלו. אם זוכרים את כל הטבלה, אפשר ללכת אחורה
-    מהפינה ולקרוא את המסלול. כל צעד במסלול שאינו אותה חבילה הוא שורה בדוח. בתא שבו שני
-    שכנים נותנים את המינימום, שני המסלולים זולים באותה מידה, וצריך כלל :
+    מהפינה ולקרוא את המסלול. כל צעד במסלול שאינו אותה חבילה הוא שורה בדוח, והתא \( (i, j) \)
+    שבו הצעד נגמר הוא המקום שלה : ‏\( i \) חבילות של הזרם הצפוי ו-\( j \) של הזרם בפועל. ב-`ABDEYGHH`
+    יש שתי H, והמקום אומר איזו מהן מיותרת : זו שבמקום 7. ב-scoreboard המקום הוא המספר של
+    הטרנזקציה, ואיתו מוצאים אותה בלוג וב-waveform.
+
+    בתא שבו שני שכנים נותנים את המינימום, שני המסלולים זולים באותה מידה, וצריך כלל. שני
+    שיבושים שכל אחד מהם נותן בדיוק את החבילה הבאה בזרם הם צירוף מקרים. חבילה אחת שחסרה,
+    ואחריה חבילה אחת מיותרת, מסבירות אותו דבר בלי צירוף מקרים. לכן כשיש שוויון,
+    ה-scoreboard מעדיף חסרה ומיותרת על פני שיבוש :
 
     <!-- gen 2 -->
 
@@ -216,10 +238,6 @@ added: 2026-11-07
 
     <!-- /gen -->
 
-    שני שיבושים שכל אחד מהם נותן בדיוק את החבילה הבאה בזרם הם צירוף מקרים. חבילה אחת
-    שחסרה, ואחריה חבילה אחת מיותרת, מסבירות אותו דבר בלי צירוף מקרים. לכן כשיש שוויון,
-    ה-scoreboard מעדיף חסרה ומיותרת על פני שיבוש.
-
     #### השלבים { .sol-steps }
 
     <div class="steps" markdown>
@@ -228,7 +246,7 @@ added: 2026-11-07
     2. **מהפינה :** מתחילים ב-\( (m, n) \).
     3. **אותה חבילה :** אם \( a_i = b_j \), עוברים באלכסון, בלי שורה בדוח.
     4. **אחרת :** עוברים לשכן הראשון, לפי סדר הכלל, שהערך שלו קטן ב-1, וכותבים בדוח מה
-       הצעד אומר.
+       הצעד אומר, ואת התא \( (i, j) \) שבו הוא נגמר.
     5. **הסוף :** ב-\( (0, 0) \). הופכים את הסדר של הדוח, כי הלכנו מהסוף להתחלה.
 
     </div>
@@ -236,10 +254,11 @@ added: 2026-11-07
     #### הקוד { .sol-code }
 
     === "Python"
-        ```python title="diff" linenums="1" hl_lines="16 17 18 19"
+        ```python title="diff" linenums="1" hl_lines="17 18 19 20"
         def diff(a, b, prefer="gaps"):
-            """The report: every difference in stream order as (kind, expected, actual). At a
-            tie "gaps" says missing or extra before changed, "changed" the other way."""
+            """The report: every difference in stream order as (kind, expected, actual, i, j),
+            i and j the packets of a and of b read up to the line. At a tie "gaps" says missing
+            or extra before changed, "changed" the other way."""
             d = [[i + j if i == 0 or j == 0 else 0 for j in range(len(b) + 1)] for i in range(len(a) + 1)]
             for i in range(1, len(a) + 1):
                 for j in range(1, len(b) + 1):
@@ -255,7 +274,7 @@ added: 2026-11-07
                 for kind, di, dj in moves:
                     if i >= di and j >= dj and d[i][j] == d[i - di][j - dj] + 1:
                         break                                    # (2)!
-                out.append((kind, a[i - 1] if di else None, b[j - 1] if dj else None))
+                out.append((kind, a[i - 1] if di else None, b[j - 1] if dj else None, i, j))  # (3)!
                 i, j = i - di, j - dj
             return out[::-1]
         ```
@@ -263,13 +282,15 @@ added: 2026-11-07
         1. כשהחבילות שוות, האלכסון תמיד נותן את המינימום (ההוכחה למטה), ולכן אין צורך לבדוק.
         2. הערך של התא הוא המינימום של שלוש האפשרויות, ולכן לפחות אחת מהן מתאימה. הסדר של
            `moves` הוא הכלל לשוויון.
+        3. המקום של השורה : חבילה חסרה היא `a[i - 1]`, אחרי \( j \) חבילות בפועל, וחבילה מיותרת
+           היא `b[j - 1]`, אחרי \( i \) חבילות צפויות.
 
     === "SystemVerilog"
-        ```systemverilog title="function automatic lines_t diff" linenums="1" hl_lines="27 28 29 30 31 32"
+        ```systemverilog title="function automatic lines_t diff" linenums="1" hl_lines="27 28 29 30 31 32 33"
         typedef string lines_t[$];
 
-        // The report: every difference in stream order. prefer_changed: at a tie a changed
-        // packet before a missing or an extra one.
+        // The report: every difference in stream order, at its cell (i, j). prefer_changed: at
+        // a tie a changed packet before a missing or an extra one.
         function automatic lines_t diff(string a, string b, bit prefer_changed);
           int d[][];
           int i = a.len(), j = b.len();
@@ -293,11 +314,12 @@ added: 2026-11-07
             if (i > 0 && j > 0 && a[i - 1] == b[j - 1]) begin
               i--; j--;
             end else if (chg && (prefer_changed || !(miss || ext))) begin
-              out.push_front($sformatf("%c changed to %c", a[i - 1], b[j - 1])); i--; j--;
+              out.push_front($sformatf("%c changed to %c at (%0d, %0d)", a[i - 1], b[j - 1], i, j));
+              i--; j--;
             end else if (miss) begin
-              out.push_front($sformatf("%c missing", a[i - 1])); i--;
+              out.push_front($sformatf("%c missing at (%0d, %0d)", a[i - 1], i, j)); i--;
             end else begin
-              out.push_front($sformatf("%c extra", b[j - 1])); j--;
+              out.push_front($sformatf("%c extra at (%0d, %0d)", b[j - 1], i, j)); j--;
             end
           end
           return out;
@@ -323,7 +345,8 @@ added: 2026-11-07
     השכן באלכסון שווים 1. משמאל ממשיכים ל-"X מיותרת" ול-"C חסרה", ובאלכסון ל-"D שובשה ל-X"
     ול-"C שובשה ל-D".
 
-    **נסו בעצמכם.** החליפו את הכלל לשוויון ותראו איך אותו מרחק מקבל דוח אחר :
+    **נסו בעצמכם.** החליפו את הכלל לשוויון, ומצאו בטבלה את התא שבו שני המסלולים נפרדים. מה
+    המקום של כל שורה בדוח, בכל אחד מהכללים?
 
     <div class="explorer" data-kind="editdist" data-a="ABCDEF" data-b="ABDXEF"></div>
 
@@ -338,7 +361,7 @@ added: 2026-11-07
 
 זרם של מיליון חבילות לא נכנס לטבלה של \( 10^{12} \) תאים. אבל ב-scoreboard ההבדלים מעטים.
 כתבו פונקציה שמחזירה את המרחק אם הוא לכל היותר \( d \), ואחרת אומרת שהוא גדול מ-\( d \),
-בזמן \( O(n \cdot d) \).
+בזמן \( O(m \cdot d) \).
 
 ??? tip "רמז 1"
     מה הערך הקטן ביותר שיכול להיות בתא \( (i, j) \)?
@@ -358,9 +381,9 @@ added: 2026-11-07
     #### הרעיון { .sol-idea }
 
     ההפרש בין האורכים של שתי קידומות הוא מספר חבילות שחייבות להיות חסרות או מיותרות, ולכן
-    \( d[i][j] \ge |i - j| \). המסלול הזול ביותר עובר בתאים שהערכים שלהם לא יורדים, ולכן אם
-    בפינה יש לכל היותר \( d \), כל התאים במסלול רחוקים מהאלכסון לכל היותר \( d \). עם \( d = 2 \)
-    מחשבים רק חמישה אלכסונים :
+    \( d[i][j] \ge |i - j| \). לאורך המסלול הזול ביותר הערכים לא יורדים, כי כל צעד בו מוסיף 0
+    (אותה חבילה) או 1 (פעולה). לכן אם בפינה יש לכל היותר \( d \), כל תא במסלול שווה לכל היותר
+    \( d \), ורחוק מהאלכסון לכל היותר \( d \). עם \( d = 2 \) מחשבים רק חמישה אלכסונים :
 
     <!-- gen 5 -->
 
@@ -420,7 +443,7 @@ added: 2026-11-07
         ```
 
         1. הנוסחה של סעיף א. ‏`get(..., big)` הוא שכן מחוץ לרצועה.
-        2. המסלול הזול ביותר עובר בשורה הזו, והערכים לאורכו לא יורדים.
+        2. המסלול הזול ביותר עובר בשורה הזו, והערכים לאורכו לא יורדים : כל צעד מוסיף 0 או 1.
 
     === "SystemVerilog"
         ```systemverilog title="function automatic int edit_distance_within" linenums="1" hl_lines="18 19 20 26"
@@ -462,7 +485,8 @@ added: 2026-11-07
     חבילות לוקחת אחת מכל צד. אם \( i > j \), לפחות \( i - j \) חבילות של `a` נשארות מול חור.
     לכן \( d[i][j] \ge |i - j| \).
 
-    **המסלול נשאר ברצועה.** לאורך המסלול הזול ביותר הערכים לא יורדים, ובפינה יש \( d[m][n] \).
+    **המסלול נשאר ברצועה.** כל צעד במסלול הזול ביותר מוסיף לערך 0 או 1, ולכן הערכים לאורכו
+    לא יורדים, ובפינה יש \( d[m][n] \).
     אם \( d[m][n] \le d \), כל תא במסלול מקיים \( |i - j| \le d[i][j] \le d \).
 
     **מה הקוד מחשב.** תא ברצועה מחושב מהשכנים שלו ברצועה בלבד, ולכן הערך שלו הוא המחיר של
@@ -479,6 +503,12 @@ added: 2026-11-07
     ‏\( 2d + 1 \) תאים בכל אחת מ-\( m \) השורות : זמן \( O(m \cdot d) \), וזיכרון של שתי שורות
     של הרצועה, \( O(d) \). כשלא יודעים את \( d \) מראש מתחילים ב-\( d = 1 \) ומכפילים פי 2
     עד שיש תשובה : הזמן הכולל הוא \( O(m \cdot D) \), כש-\( D \) המרחק האמיתי.
+
+    ב-scoreboard של מיליון חבילות, עד סוף הבדיקה הזיכרון מחזיק את שני התורים : מיליון חבילות
+    בכל אחד, או מזהה של 8 בתים לכל חבילה, ‏8 MB לתור. המרחק לבדו צריך עוד שתי שורות של
+    הרצועה. לדוח שומרים את הרצועה כולה, כי ההליכה אחורה של סעיף ב לא יוצאת ממנה : עם
+    \( d = 10 \) זה כ-21 מיליון תאים, בית לכל תא (הערכים עד \( d + 1 \)), כ-21 MB במקום
+    \( 10^{12} \).
 
 ---
 
@@ -580,7 +610,9 @@ added: 2026-11-07
     **הדוגמה.** ‏`ABCDEFGH` מול `ABDCEFHG` : בלי החלפה כל זוג עולה 2, למשל C חסרה ו-C
     מיותרת, ובסך הכול 4. עם החלפה, ‏\( d[4][4] = d[2][2] + 1 = 1 \) ו-\( d[8][8] = d[6][6] + 1 = 2 \).
 
-    **נסו בעצמכם.** הדליקו את "גם החלפה של שכנות" ותראו את הצעד הכפול באלכסון :
+    **נסו בעצמכם.** כבו את "גם החלפה של שכנות" ובדקו איך כל החלפה נהיית חסרה ומיותרת. אחר כך
+    לחצו על המלכודת "CA מול ABC" : הטבלה נותנת 3, אבל יש דרך בשתי פעולות. מצאו אותה. ומה
+    קורה ב"חבילה שזזה רחוק"?
 
     <div class="explorer" data-kind="editdist" data-a="ABCDEFGH" data-b="ABDCEFHG" data-swap="1"></div>
 

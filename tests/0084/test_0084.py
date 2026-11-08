@@ -98,6 +98,14 @@ def test_traps():
         tails[k:k + 1] = [x]
     assert len(tails) == 3 and lis_dp([2, 2, 2])[0] == 1
     assert lis_dp([3, 4, 1])[1][-1] == 1 and lis_dp([3, 4, 1])[0] == 2
+    # the tasks of the boxes: "יורד" and "ערכים שווים" have five LIS of length 1, tails stays at
+    # one value on equal values, and in part c's array cnt[4] = 2 after the tie of a[3] = 4
+    assert lis_dp([5, 4, 3, 2, 1])[0] == 1 and count_lis([5, 4, 3, 2, 1]) == 5
+    assert count_lis([2] * 5) == 5 and q0084.tails_trace([2] * 5)[-1][5] == [2]
+    assert q0084.pairs([1, 3, 5, 4, 7])[1][4] == 2
+    # part c's steps: a[5] = 7 of part a reaches length 3 after 5 and after 3, count[5] = 2
+    A = [10, 9, 2, 5, 3, 7, 101, 18]
+    assert [j for j in range(5) if A[j] < A[5] and q0084.pairs(A)[0][j] == 2] == [3, 4] and q0084.pairs(A)[1][5] == 2
 
     def greedy(a):
         out = []

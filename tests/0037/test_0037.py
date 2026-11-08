@@ -63,6 +63,8 @@ def test_part_b_numbers():
     assert q0037.report("ABCDEFGH", "ABDEYGHH") == [("missing", "C", None), ("changed", "F", "Y"), ("extra", None, "H")]
     assert q0037.report("ABCDEF", "ABDXEF", "gaps") == [("missing", "C", None), ("extra", None, "X")]
     assert q0037.report("ABCDEF", "ABDXEF", "changed") == [("changed", "C", "D"), ("changed", "D", "X")]
+    # the positions of the lines: the extra H is the one at actual position 7, not 8
+    assert q0037.report_at("ABCDEFGH", "ABDEYGHH") == [("missing", "C", None, 3, 2), ("changed", "F", "Y", 6, 5), ("extra", None, "H", 7, 7)]
     # the tie at cell (4, 4), D against X: the left and the diagonal neighbours give 1, up gives 2
     d = q0037.table("ABCDEF", "ABDXEF")
     assert d[4][4] == 2 and d[4][3] == 1 and d[3][3] == 1 and d[3][4] == 2
@@ -70,6 +72,9 @@ def test_part_b_numbers():
 
 def test_part_c_numbers():
     a, b = q0037.BAND_A, q0037.BAND_B
+    # the memory of the cost: the band of two streams of a million packets with d = 10, about
+    # 21 million cells of a byte (values up to d + 1)
+    assert round(q0037.band_cells(10**6, 10) / 1e6) == 21 and 10 + 1 < 256
     assert q0037.within(a, b, 2) == 2 and q0037.within(a, b, 1) is None and q0037.distance(a, b) == 2
     assert q0037.band_cells(12, 2) == 54 and q0037.band_cells(1000, 3) == 6988 and q0037.band_cells(10**6, 10) == 20999890
     rng = random.Random(3)
@@ -77,6 +82,40 @@ def test_part_c_numbers():
         for dd in range(0, 9):
             dist = q0037.distance(x, y)
             assert q0037.within(x, y, dd) == (dist if dist <= dd else None), (x, y, dd)
+
+
+def test_part_c_report_inside_the_band():
+    # the cost of part c: a report needs only the band, since walking back from the corner
+    # with the band's values (a cell outside it counted as d + 1) gives part b's report
+    def band_walk(a, b, d, prefer):
+        big, t = d + 1, {}
+        for i in range(len(a) + 1):
+            for j in range(max(0, i - d), min(len(b), i + d) + 1):
+                if i == 0 or j == 0:
+                    t[i, j] = i + j
+                else:
+                    t[i, j] = min(t.get((i - 1, j), big) + 1, t.get((i, j - 1), big) + 1,
+                                  t.get((i - 1, j - 1), big) + (a[i - 1] != b[j - 1]))
+        g = lambda i, j: t.get((i, j), big)  # noqa: E731
+        moves = [("missing", 1, 0), ("extra", 0, 1), ("changed", 1, 1)]
+        if prefer == "changed":
+            moves = moves[2:] + moves[:2]
+        i, j, out = len(a), len(b), []
+        while i or j:
+            if i and j and a[i - 1] == b[j - 1] and g(i, j) == g(i - 1, j - 1):
+                i, j = i - 1, j - 1
+                continue
+            kind, di, dj = next(mv for mv in moves if i >= mv[1] and j >= mv[2] and g(i, j) == g(i - mv[1], j - mv[2]) + 1)
+            out.append((kind, i, j))
+            i, j = i - di, j - dj
+        return out[::-1]
+
+    rng = random.Random(4)
+    for a, b in streams(rng, 1500, "ABC", 8):
+        dist = q0037.distance(a, b)
+        for d in range(dist, 9):
+            for prefer in ("gaps", "changed"):
+                assert band_walk(a, b, d, prefer) == [s for s in q0037.walk(a, b, prefer) if s[0] != "same"], (a, b, d)
 
 
 def test_part_d_numbers():

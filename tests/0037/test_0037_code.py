@@ -1,5 +1,5 @@
 """Question 0037: the page's Python code (it runs as published) against the generator's
-reference: edit_distance, diff with both rules for ties, edit_distance_within for every d,
+reference: edit_distance, diff with both rules for ties and the cell of every line, edit_distance_within for every d,
 and edit_distance_swaps, on the page's examples and random streams."""
 
 import random
@@ -15,9 +15,10 @@ ns = load_python(37)
 
 def test_examples():
     assert ns["edit_distance"]("ABCDEFGH", "ABDEYGHH") == 3
-    assert ns["diff"]("ABCDEFGH", "ABDEYGHH") == [("missing", "C", None), ("changed", "F", "Y"), ("extra", None, "H")]
-    assert ns["diff"]("ABCDEF", "ABDXEF") == [("missing", "C", None), ("extra", None, "X")]
-    assert ns["diff"]("ABCDEF", "ABDXEF", "changed") == [("changed", "C", "D"), ("changed", "D", "X")]
+    # every line with its cell: the H that is extra is the one at actual position 7
+    assert ns["diff"]("ABCDEFGH", "ABDEYGHH") == [("missing", "C", None, 3, 2), ("changed", "F", "Y", 6, 5), ("extra", None, "H", 7, 7)]
+    assert ns["diff"]("ABCDEF", "ABDXEF") == [("missing", "C", None, 3, 2), ("extra", None, "X", 4, 4)]
+    assert ns["diff"]("ABCDEF", "ABDXEF", "changed") == [("changed", "C", "D", 3, 3), ("changed", "D", "X", 4, 4)]
     assert ns["edit_distance_within"]("ABCDEFGHIJKL", "ABCEFGHIXJKL", 2) == 2
     assert ns["edit_distance_within"]("ABCDEFGHIJKL", "ABCEFGHIXJKL", 1) is None
     assert ns["edit_distance_within"]("ABC", "ABCDEF", 2) is None
@@ -35,7 +36,7 @@ def test_random():
         dist = q0037.distance(a, b)
         assert ns["edit_distance"](a, b) == dist
         for prefer in ("gaps", "changed"):
-            assert ns["diff"](a, b, prefer) == q0037.report(a, b, prefer)
+            assert ns["diff"](a, b, prefer) == q0037.report_at(a, b, prefer)
         for d in range(0, 10):
             assert ns["edit_distance_within"](a, b, d) == (dist if dist <= d else None)
         assert ns["edit_distance_swaps"](a, b) == q0037.distance(a, b, swap=True)
