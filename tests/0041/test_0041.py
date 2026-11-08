@@ -34,6 +34,27 @@ def test_page_numbers():
     assert abs(expected_uniform(256) - 1568) < 0.5 and quantile(256, 0.95) == 2176   # the cross follow-up
     assert abs(16 * math.log(16 * 20) - 92.3) < 0.1                           # the approximation n ln(20 n)
     assert abs(sum(16 / (16 - i) for i in range(14)) - 30.09) < 0.01          # 90 % of 16 bins
+    waits = [Fraction(16, 16 - i) for i in range(16)]
+    assert abs(float(sum(waits[:10])) - 14.9) < 0.01 and waits[-1] == 16 > sum(waits[:10])   # the last bin > the first 10
+    assert waits[-1] + waits[-2] == 24 and abs(float(24 / sum(waits)) - 0.44) < 0.005         # the last two: 44 %
+    assert abs(90 / expected_uniform(16) - 1.66) < 0.005 and abs(754 / expected_uniform(100) - 1.45) < 0.005
+    # the two-bin anchor of part b: 1/p + 1/(1 - p) - 1, about 100 for p = 0.01
+    assert abs(expected_k1([0.01, 0.99]) - (100 + 1 / 0.99 - 1)) < 1e-9
+    # the coverage box's tasks: ten bins with one rare (weights 1, 10, ..., 10), ten equal, four equal with k = 2
+    assert abs(expected_k1([1 / 91] + [10 / 91] * 9) - 94.8) < 0.05 and abs(expected_uniform(10) - 29.3) < 0.05
+    assert abs(expected_tests([0.25] * 4, 2) - 14.19) < 0.005 and abs(expected_tests([0.25] * 4, 2) - 2 * expected_uniform(4)) > 2
+
+
+def test_inclusion_exclusion_in_floating_point():
+    """The trap: the alternating sum in floats is right where the terms are small (the
+    median, 95 % and 99 % of 100 bins) and garbage for small t (P(T > 60) about 43)."""
+    def ie(n, t, one=1.0):
+        return sum((-1) ** (j + 1) * math.comb(n, j) * (one - Fraction(j, n) if one != 1.0 else 1 - j / n) ** t for j in range(1, n + 1))
+
+    for t in (497, 754, 916):
+        assert abs(ie(100, t) - float(ie(100, t, Fraction(1)))) < 1e-14
+    assert abs(ie(100, 60) - 43.3) < 0.1 and max(math.comb(100, j) * (1 - j / 100) ** 60 for j in range(1, 101)) > 1e16
+    assert abs(ie(100, 80) - 1) < 0.01 and ie(100, 75) > 1.05
 
 
 def test_chain_matches_exact_inclusion_exclusion():

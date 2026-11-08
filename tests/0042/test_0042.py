@@ -48,6 +48,12 @@ def test_page_numbers():
     assert near(q0042.approx(A, C, 1500, T), 580, 0.1) and near(q0042.distance(F(1, 2), C, 1500, T), 580, 0.05)
     # the traps: 1.5 instead of 2.5 would give 440; a stop at 50 km leaves 325 litres (more than two loads)
     assert near(150 / 1.5 + 150 / 1.5 + (150 - 30) / 0.5, 440) and W - 5 * 50 * A == 325
+    # the general box's tasks: w = 250 stops once at 66.7; w = 120 walks 180 with no stop; T = c ends at the stop 160
+    assert [round(x1, 1) for _, x1, _ in camel_segments(A, C, 250, T)] == [66.7, 306.7]
+    assert [(x0, x1) for x0, x1, _ in camel_segments(A, C, 120, T)] == [(0, 180)] and near(camel_distance(A, C, 120, T), 180)
+    assert [round(x1, 6) for _, x1, _ in camel_segments(A, C, W, 150)] == [60, 160] and near(camel_distance(A, C, W, 150), 160)
+    # the two-camels follow-up: j - 1 litres a km with j >= 2 loads gives 465; one camel with 900 litres gives 503.5
+    assert 150 / 2 + 150 / 1 + 150 / 0.5 - 30 / 0.5 == 465 and near(camel_distance(A, C, 900, T), 503.46, 0.005)
 
 
 def test_segments_match_the_closed_form():

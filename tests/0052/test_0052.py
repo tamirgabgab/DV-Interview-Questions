@@ -61,6 +61,23 @@ def test_page_numbers():
     for L in range(1, 9):
         es = [expected_tosses(w) for w in words(L)]
         assert max(es) == 2 ** (L + 1) - 2 and min(es) == 2 ** L
+    # the gap between occurrences of HH: H at once (1), or T and a fresh wait (1 + 6); 1/2 + 7/2 = 4
+    assert Fr(1, 2) * 1 + Fr(1, 2) * (1 + expected_tosses("HH")) == 4 == 1 / Fr(1, 4)
+    # the casino after THH: a gambler a toss, each bets all on the next letter of HH; they hold 0, 4 and 2
+    def holding(start, tosses="THH", pat="HH"):
+        money = Fr(1)
+        for i, c in enumerate(tosses[start:]):
+            money = money * 2 if i < len(pat) and c == pat[i] else 0
+        return money
+    assert [holding(s) for s in range(3)] == [0, 4, 2]
+    # part d's equation on HH, n = 1: P(T > 1) P(A) = P(T = 2) P(H) + P(T = 3) * 1
+    g = wait_dist("HH", n=4)
+    assert (1 - sum(g[:2])) * Fr(1, 4) == g[2] * Fr(1, 2) + g[3] == Fr(1, 4)
+    # the standard deviation: close to the mean for long patterns (HHHH 27.1 of 30), half of it for HT
+    sd = lambda w: float(wait_moments(w)[1]) ** 0.5   # noqa: E731
+    assert sd("HT") == 2 and abs(sd("HHHH") - 27.09) < 0.005 and sd("HHHH") / 30 > 0.9
+    # the box's task: q = 0.9 flips the order of HH and HT
+    assert abs(float(expected_tosses("HH", coin(Fr(9, 10)))) - 2.35) < 0.005 and abs(float(expected_tosses("HT", coin(Fr(9, 10)))) - 11.1) < 0.02
 
 
 def test_expected_matches_the_chain():
