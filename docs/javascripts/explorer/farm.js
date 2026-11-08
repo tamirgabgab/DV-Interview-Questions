@@ -515,6 +515,7 @@
 
   dvqExplorers.register({
     views: { farm: farmView },
+    cols: { farm: { main: ".farm-drag, svg.farm-live", side: ".viz-legend", w: "minmax(0, 2.2fr)" } },   // the picture beside its legend; the lengths table stays wide under them
     help: {
       farm: "בסעיף א גוררים את החוואי ואת הפרה לאורך הדפנות, ובסעיף ב את נקודות העצירה לאורך הקווים; הפינות משנות את L ואת H, והשיקוף מראה את הקו הישר שמוצאים בו את המסלול. בסעיף ג המחוון משנה את הזווית θ של קו האוכל, והשיקוף מראה את הסיבוב של הפרה סביב O.",
     },

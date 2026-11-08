@@ -143,7 +143,7 @@
         return s + `<text class="legend" x="${W - 8}" y="${H - 4}" text-anchor="end">rows: a, columns: b</text></svg>`;
       };
       const curve = (exp) => {
-        const W = 640, H = 230, X0 = 46, R = 12, T = 14, B = 196, lmax = 7;
+        const W = 360, H = 200, X0 = 46, R = 18, T = 14, B = 166, lmax = 7;   // narrow: it fits a column at a readable size
         const X = (n) => X0 + (Math.log10(Math.max(1, n)) / lmax) * (W - X0 - R), Y = (v) => B - (v / 100) * (B - T);
         let s = `<svg class="perf-chart cv-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="הכיסוי כפונקציה של מספר הטרנזקציות, ציר לוגריתמי">`;
         [0, 25, 50, 75, 100].forEach((v) => { s += `<line class="grid" x1="${X0}" x2="${W - R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v}%</text>`; });
@@ -192,6 +192,7 @@
 
   dvqExplorers.register({
     views: { covergroup: covergroupView },
+    cols: { covergroup: { main: ".cv-points", side: ".cv-curve" } },   // the coverpoints beside the curve; the cross map stays wide under them
     help: {
       covergroup: "בוחרים גירוי (אחיד או dist) ושולחים טרנזקציות : ‏+100, ‏+1,000, ‏+10,000 או עד שה-cross נסגר. העמודות הן ה-bins של כל coverpoint עם מספר הפגיעות, המפות הן ה-cross (שורות : a, עמודות : b), והגרף מראה את הכיסוי לפי מספר הטרנזקציות מול התוחלת. ״טרנזקציה ביד״ דוגמת ערכים שבוחרים, והמתג סופר גם את התאים המושמטים.",
     },

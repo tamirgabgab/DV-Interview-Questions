@@ -113,6 +113,7 @@
 
   dvqExplorers.register({
     views: { tuesday: tuesdayView },
+    cols: { tuesday: { side: ".tu-step, .tu-cell, .viz-legend, .tu-table", w: "minmax(0, 1.5fr)" } },   // the grid beside the step, the legend and the table
     help: {
       tuesday: "״הצעד הבא״ סופר את המשפחות שמקיימות את המידע : השורה של הילד הראשון, העמודה של הילד השני, המשבצת שנספרה פעמיים, ובסוף המשפחות עם שני בנים. לחיצה על משבצת מראה את המשפחה. בוחרים מידע אחר או יום אחר, והטבלה משווה את שלושת סוגי המידע.",
     },

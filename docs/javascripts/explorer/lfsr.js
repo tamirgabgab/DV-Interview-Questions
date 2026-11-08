@@ -96,7 +96,7 @@
         `<p class="lf-poly"></p><p class="lf-state"></p><p class="lf-fb"></p>` +
         `<p class="ex-summary lf-sum" aria-live="polite"></p></div></div>` +
         `<p class="ex-title">הרגיסטר עצמו : הביטים זזים ימינה, ${code("s[0]")} יוצא, וה-XOR של ה-taps נכנס משמאל</p><div class="lf-reg"></div>` +
-        `<p class="ex-title">רצועת התזמון : המצב, הביט שיוצא (${code("s[0]")}) וביט ההיזון החוזר שנכנס, צעד אחרי צעד</p>` +
+        `<p class="ex-title lf-strip-title">רצועת התזמון : המצב, הביט שיוצא (${code("s[0]")}) וביט ההיזון החוזר שנכנס, צעד אחרי צעד</p>` +
         `<div class="wv-wrap lf-strip" tabindex="0" role="group" aria-label="רצועת התזמון של ה-LFSR, גלילה אופקית"></div>` +
         `<p class="ex-title lf-table-title"></p><div class="lf-table" tabindex="0"></div>` +
         `<section class="ex-proof lf-proof"><p class="ex-proof-title">שלב ההוכחה : כל המחזורים של הפולינום</p>` +
@@ -298,6 +298,7 @@
 
   dvqExplorers.register({
     views: { lfsr: lfsrView },
+    cols: { lfsr: { side: ".lf-table-title, .lf-table, .lf-proof" } },   // the ring, the step, the register and the strip beside the table and the cycles
     help: {
       lfsr: "מסמנים taps ובוחרים רוחב : ״צעד״ ו״הפעלה״ מריצים את המצב מ-0…01 על טבעת המצבים (עד 6 ביטים), רצועת התזמון מראה את המצב, הביט שיוצא וביט ההיזון בכל צעד, והטבלה נותנת את אורך המחזור של כל פולינום. שלב ההוכחה מצייר את כל המחזורים של הפולינום, טבעת קטנה לכל מחזור. הרגיסטר עצמו מצויר מתחת לטבעת : הביטים, ה-taps וה-XOR שמחזיר את fb.",
     },

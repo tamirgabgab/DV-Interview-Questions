@@ -143,9 +143,9 @@
         `<button type="button" class="md-button ex-run">הרץ עד שכל ה-Completions יצאו</button><span class="ex-pos"></span></div>` +
         `<p class="ex-title">הזיכרון, בלוק אחרי בלוק (128 בתים) : הכתיבות צבועות, הקריאות הפתוחות מסומנות בקו</p><div class="ep-mem"></div>` +
         `<p class="ex-title">קריאות פתוחות</p><div class="ep-pending"></div><div class="ep-gantt"></div>` +
-        `<p class="ex-title">ציר המחזורים : ה-Completion שיצא בכל מחזור, ומתי כל קריאה מוכנה</p><div class="wv-wrap ep-strip" tabindex="0" role="group" aria-label="ציר המחזורים, גלילה אופקית"></div>` +
+        `<p class="ex-title ep-strip-title">ציר המחזורים : ה-Completion שיצא בכל מחזור, ומתי כל קריאה מוכנה</p><div class="wv-wrap ep-strip" tabindex="0" role="group" aria-label="ציר המחזורים, גלילה אופקית"></div>` +
         `<p class="wv-step an-log" aria-live="polite"></p>` +
-        `<p class="ex-title">ה-Completions שיצאו</p><div class="ep-table" tabindex="0"></div><p class="ex-summary an-sum"></p>`;
+        `<p class="ex-title ep-table-title">ה-Completions שיצאו</p><div class="ep-table" tabindex="0"></div><p class="ex-summary an-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const colour = (id) => `ep-c${id % 4}`;
       const render = () => {
@@ -317,6 +317,7 @@
 
   dvqExplorers.register({
     views: { endpoint: endpointView },
+    cols: { endpoint: { side: ".ep-strip-title, .ep-strip, .wv-export, .an-log, .ep-table-title, .ep-table", w: "minmax(0, 1.8fr)" } },   // the block map and the pending reads beside the cycle strip and the table
     help: {
       endpoint: "בונים בקשות כתיבה וקריאה : ״מחזור״ ו״הרץ״ מוציאים Completions לפי המודל, ומפת הבלוקים, ציר ההמתנות, ציר המחזורים וטבלת ה-Completions מתעדכנים. ה-presets טוענים את דוגמאות העמוד.",
     },

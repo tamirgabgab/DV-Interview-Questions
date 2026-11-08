@@ -505,9 +505,10 @@
       const treeSvg = (tr, upTo, path) => {
         const known = tr.nodes.filter((_, i) => i <= upTo.maxId), popped = new Set(tr.pops.slice(0, st.q).map((p) => p.id));
         const rows = []; known.forEach((n, i) => { (rows[n.depth] = rows[n.depth] || []).push(i); });
-        const w = 640, dy = 46, h = rows.length * dy + 14, pos = {};
+        // as wide as its widest row needs (34 a node), so a small tree stays readable in a column
+        const w = Math.max(300, Math.min(640, 34 * (Math.max(...rows.map((r) => r.length)) + 1))), dy = 46, h = rows.length * dy + 14, pos = {};
         rows.forEach((ids, d) => ids.forEach((id, k) => { pos[id] = [((k + 1) * w) / (ids.length + 1), 22 + d * dy]; }));
-        let s = `<svg class="figure hg-tree" viewBox="0 0 ${w} ${h}" role="img" aria-label="עץ החיפוש עם ${known.length === 1 ? "מצב אחד" : `${known.length} מצבים`}">`;
+        let s = `<svg class="figure hg-tree" viewBox="0 0 ${w} ${h}" style="max-width:${Math.round(w * 1.1)}px" role="img" aria-label="עץ החיפוש עם ${known.length === 1 ? "מצב אחד" : `${known.length} מצבים`}">`;
         known.forEach((n, i) => {
           if (n.parent < 0) return;
           const [x1, y1] = pos[n.parent], [x2, y2] = pos[i], on = path.has(i);
@@ -659,6 +660,7 @@
 
   dvqExplorers.register({
     views: { hourglass: hourglassView },
+    cols: { hourglass: { main: ".hg-frame, .hg-caption, .hg-compare", side: ".hg-proof" } },   // the time axis stays wide; under the play row the glasses beside the search
     help: {
       hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן. ״האירוע הבא״ הופך את השעונים של האירוע ומריץ את החול עד האירוע הבא, ״הפעלה״ מריצה את כל התכנית ברצף (ועוצרת באמצע), והקצב קובע כמה זמן נמשכת דקה של שעון. השעון שבצד מראה את הזמן t, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר. בתיבה של 0019 המתג ״ההסתעפות״ מראה את שתי הריצות שמתפצלות ברגע שהשעון הגדול נגמר. בשלב ההוכחה ״השליפה הבאה״ מריץ את החיפוש של העמוד מצב אחרי מצב, עם התור ועץ החיפוש.",
     },

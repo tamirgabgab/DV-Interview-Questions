@@ -261,6 +261,7 @@
 
   dvqExplorers.register({
     views: { bridge: bridgeView },
+    cols: { bridge: { main: ".bridge-frame", side: ".bridge-caption", w: "minmax(0, 2.2fr)" } },   // the tables and the legend stay wide; the bridge beside its caption
     help: {
       bridge: "זמני החצייה בשדה, קיבולת הגשר ובורר התכנית : ״הבא״ ו״הפעלה״ מעבירים חצייה אחרי חצייה, והטבלה משווה את שלוש התכניות. המתג ״הכלל החמדני״ מראה בכל סיבוב את שתי הדרכים להעביר את שני האיטיים ואת הזולה מביניהן. ״התוכנית שלי״ בבורר התוכנית : בוחרים מי חוצה בכל פעם, והזמן נבדק מול הקצר ביותר בסוף.",
     },
