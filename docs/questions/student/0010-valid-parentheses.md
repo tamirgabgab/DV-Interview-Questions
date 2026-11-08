@@ -141,8 +141,9 @@ added: 2026-10-16
     במחרוזת תקינה ולא ריקה, הסוגר הפותח **האחרון** לפני הסוגר הסוגר הראשון חייב להיות
     צמוד אליו ומאותו סוג : בין שניהם אין סוגר פותח (הוא האחרון) ואין סוגר סוגר (ההוא
     הראשון), ולפי כלל LIFO הסוגר הסוגר הראשון סוגר את הפותח האחרון. לכן תמיד יש זוג
-    צמוד, ומחיקה שלו משאירה מחרוזת שתקינה אם ורק אם המקורית תקינה. ולהפך : במחרוזת
-    שאין בה אף זוג צמוד, הסוגר הסוגר הראשון לא צמוד לפותח מאותו סוג, ולכן היא לא תקינה.
+    צמוד, ומחיקה שלו משאירה מחרוזת שתקינה אם ורק אם המקורית תקינה. ומכאן גם הכיוון ההפוך,
+    בניסוח השקול : מחרוזת לא ריקה **בלי** אף זוג צמוד אינה תקינה, כי לכל מחרוזת תקינה ולא
+    ריקה יש זוג כזה. זה מכסה גם מחרוזות בלי אף סוגר סוגר, כמו `(((`.
 
     **דוגמה.** עבור `(((())))` כל מעבר מוחק רק את הזוג הפנימי, ולכן צריך 4 מעברים :
 
@@ -194,13 +195,16 @@ added: 2026-10-16
 
     <div class="steps" markdown>
 
-    1. **בדיקה מקדימה :** מחרוזת באורך אי-זוגי אף פעם לא תקינה, כי סוגריים באים בזוגות.
-    2. **סוגר פותח :** דוחפים אותו למחסנית.
-    3. **סוגר סוגר :** בראש המחסנית חייב להיות הפותח מאותו סוג. אם המחסנית ריקה, או
+    1. **סוגר פותח :** דוחפים אותו למחסנית.
+    2. **סוגר סוגר :** בראש המחסנית חייב להיות הפותח מאותו סוג. אם המחסנית ריקה, או
        שבראשה סוג אחר, המחרוזת לא תקינה. אחרת מוציאים את הפותח מהמחסנית.
-    4. **בסוף :** המחרוזת תקינה רק אם המחסנית ריקה, כלומר כל הפותחים נסגרו.
+    3. **בסוף :** המחרוזת תקינה רק אם המחסנית ריקה, כלומר כל הפותחים נסגרו.
 
     </div>
+
+    **קיצור דרך, לא חובה.** מחרוזת באורך אי-זוגי אף פעם לא תקינה, כי סוגריים באים בזוגות.
+    הקוד בודק את זה לפני הלולאה וחוסך אותה, אבל הבדיקה לא מחליפה את שלושת הצעדים :
+    `)(` באורך זוגי ולא תקינה.
 
     #### הקוד { .sol-code }
 
@@ -270,6 +274,11 @@ added: 2026-10-16
 
     #### למה זה נכון { .sol-proof }
 
+    **האינווריאנט של הלולאה.** אחרי כל תו, המחסנית מכילה בדיוק את הפותחים שעוד לא נסגרו, מהישן
+    לחדש. סוגר סוגר יכול לסגור רק את החדש שבהם (כלל LIFO), ולכן השוואה לראש המחסנית
+    בודקת את כל שלושת התנאים : סוג תואם (ראש המחסנית מאותו סוג), סדר נכון (סוגרים רק את
+    האחרון שנפתח) ואין עודפים (מחסנית ריקה כשמגיע סוגר, או מחסנית לא ריקה בסוף).
+
     **המחסנית צעד אחרי צעד.** לחצו "הבא" כדי לעקוב אחרי המחסנית תו אחרי תו, קודם על
     מחרוזת תקינה ואז על מחרוזת שנכשלת בגלל סדר הסגירה :
 
@@ -277,35 +286,12 @@ added: 2026-10-16
 
     <div class="stepper" role="group" aria-label="המחסנית תו אחרי תו על ([)]" tabindex="0"><figure class="stepper-frame is-active"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-cell" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><text class="st-small" x="312" y="162" text-anchor="middle">empty</text></svg><figcaption>לפני הקריאה : המחרוזת שבאיור, והמחסנית ריקה.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-cur" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><path class="s2-fill" d="M29.0,92 L43.0,92 L36.0,82 z"/><rect class="st-cell" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><rect class="st-top" x="290" y="138" width="44" height="34" rx="5"/><text class="st-text" x="312" y="162" text-anchor="middle">(</text></svg><figcaption>תו 1 הוא פותח עגול, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><rect class="st-cur" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><path class="s2-fill" d="M75.0,92 L89.0,92 L82.0,82 z"/><rect class="st-cell" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="290" y="138" width="44" height="34" rx="5"/><text class="st-text" x="312" y="162" text-anchor="middle">(</text><rect class="st-top" x="290" y="100" width="44" height="34" rx="5"/><text class="st-text" x="312" y="124" text-anchor="middle">[</text></svg><figcaption>תו 2 הוא פותח מרובע, ולכן נדחף למחסנית.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 360 190" style="max-width:22rem" role="img" aria-label="מצב המחסנית"><rect class="st-done" x="16" y="36" width="40" height="40" rx="5"/><text class="st-text" x="36.0" y="63" text-anchor="middle">(</text><rect class="st-done" x="62" y="36" width="40" height="40" rx="5"/><text class="st-text" x="82.0" y="63" text-anchor="middle">[</text><rect class="st-bad" x="108" y="36" width="40" height="40" rx="5"/><text class="st-text" x="128.0" y="63" text-anchor="middle">)</text><path class="s2-fill" d="M121.0,92 L135.0,92 L128.0,82 z"/><rect class="st-cell" x="154" y="36" width="40" height="40" rx="5"/><text class="st-text" x="174.0" y="63" text-anchor="middle">]</text><text class="st-small" x="16" y="24">input</text><text class="st-small" x="312" y="24" text-anchor="middle">stack</text><line class="ink-line" x1="284" x2="340" y1="176" y2="176" stroke-width="2"/><rect class="st-stack" x="290" y="138" width="44" height="34" rx="5"/><text class="st-text" x="312" y="162" text-anchor="middle">(</text><rect class="st-bad" x="290" y="100" width="44" height="34" rx="5"/><text class="st-text" x="312" y="124" text-anchor="middle">[</text></svg><figcaption>תו 3 הוא סוגר עגול, אבל בראש המחסנית פותח מרובע ולא פותח עגול. סדר הסגירה שגוי : המחרוזת לא תקינה ✗</figcaption></figure><div class="stepper-nav"><button type="button" class="stepper-btn stepper-prev">הקודם</button><span class="stepper-pos" data-total="4"></span><button type="button" class="stepper-btn stepper-next">הבא</button></div></div>
 
-    **אותן דוגמאות בטבלה.** עבור `{[()]}` :
-
-    | תו | פעולה | המחסנית |
-    |---|---|---|
-    | ‏`{` | דחיפה | <span class="arr"><span>{</span></span> |
-    | ‏`[` | דחיפה | <span class="arr"><span>{</span><span>[</span></span> |
-    | ‏`(` | דחיפה | <span class="arr"><span>{</span><span>[</span><span class="hl">(</span></span> |
-    | ‏`)` | בראש `(`, מתאים, הוצאה | <span class="arr"><span>{</span><span>[</span></span> |
-    | ‏`]` | בראש `[`, מתאים, הוצאה | <span class="arr"><span>{</span></span> |
-    | ‏`}` | בראש `{`, מתאים, הוצאה | (ריקה) ✓ |
-
-    עבור `([)]` :
-
-    | תו | פעולה | המחסנית |
-    |---|---|---|
-    | ‏`(` | דחיפה | <span class="arr"><span>(</span></span> |
-    | ‏`[` | דחיפה | <span class="arr"><span>(</span><span class="hl">[</span></span> |
-    | ‏`)` | בראש `[`, לא מתאים ל-`(` | לא תקינה ✗ |
-
-    **נסו בעצמכם.** הקלידו מחרוזת מששת הסוגריים (תווים אחרים נמחקים), או בחרו דוגמה
-    מהטבלה : התיבה קוראת תו אחרי תו, המחסנית גדלה ומתכווצת, גרף העומק מצטייר, והכישלון
-    הראשון מוקף באדום עם הסיבה שלו : סוג לא מתאים, סוגר בלי פותח, או פותחים שנשארו בסוף.
+    **נסו בעצמכם.** התיבה מוסיפה על האיורים מחרוזות משלכם ומקרי מלכודת, עם גרף העומק
+    והמעברים של סעיף א על אותה מחרוזת. הקלידו מחרוזת אחת לכל סיבת כישלון : סוג לא מתאים,
+    סוגר בלי פותח, ופותחים שנשארו בסוף, ונחשו באיזה תו כל אחת תיכשל לפני שאתם מריצים.
+    ואחת רביעית : מחרוזת באורך זוגי שבכל זאת נכשלת.
 
     <div class="explorer" data-kind="brackets" data-s="{[()]}"></div>
-
-    **למה המחסנית מספיקה.** בכל רגע המחסנית מכילה בדיוק את הפותחים שעוד לא נסגרו, מהישן
-    לחדש. סוגר סוגר יכול לסגור רק את החדש שבהם (כלל LIFO), ולכן השוואה לראש המחסנית
-    בודקת את כל שלושת התנאים : סוג תואם (ראש המחסנית מאותו סוג), סדר נכון (סוגרים רק את
-    האחרון שנפתח) ואין עודפים (מחסנית ריקה כשמגיע סוגר, או מחסנית לא ריקה בסוף).
 
     #### סיבוכיות { .sol-cost }
 
@@ -324,12 +310,9 @@ added: 2026-10-16
     | 10,000 | 5,000 | 25,005,000 | 10,000 | 2,500 |
     | 100,000 | 50,000 | 2,500,050,000 | 100,000 | 25,000 |
 
-    <span class="viz-legend"><span><i class="by-enum"></i>פתרון פשוט : מחיקת זוגות</span><span><i class="by-multiples"></i>פתרון יעיל : מחסנית</span></span>
-
-    <svg class="perf-chart" viewBox="0 0 640 280" role="img" aria-label="מספר התווים שכל פתרון קורא, בסקאלה לוגריתמית"><line class="grid" x1="64" x2="630" y1="240.0" y2="240.0"/><text class="tick" x="56" y="244.0" text-anchor="end">10<tspan dy="-5" font-size="9">0</tspan></text><line class="grid" x1="64" x2="630" y1="217.6" y2="217.6"/><text class="tick" x="56" y="221.6" text-anchor="end">10<tspan dy="-5" font-size="9">1</tspan></text><line class="grid" x1="64" x2="630" y1="195.2" y2="195.2"/><text class="tick" x="56" y="199.2" text-anchor="end">10<tspan dy="-5" font-size="9">2</tspan></text><line class="grid" x1="64" x2="630" y1="172.8" y2="172.8"/><text class="tick" x="56" y="176.8" text-anchor="end">10<tspan dy="-5" font-size="9">3</tspan></text><line class="grid" x1="64" x2="630" y1="150.4" y2="150.4"/><text class="tick" x="56" y="154.4" text-anchor="end">10<tspan dy="-5" font-size="9">4</tspan></text><line class="grid" x1="64" x2="630" y1="128.0" y2="128.0"/><text class="tick" x="56" y="132.0" text-anchor="end">10<tspan dy="-5" font-size="9">5</tspan></text><line class="grid" x1="64" x2="630" y1="105.6" y2="105.6"/><text class="tick" x="56" y="109.6" text-anchor="end">10<tspan dy="-5" font-size="9">6</tspan></text><line class="grid" x1="64" x2="630" y1="83.2" y2="83.2"/><text class="tick" x="56" y="87.2" text-anchor="end">10<tspan dy="-5" font-size="9">7</tspan></text><line class="grid" x1="64" x2="630" y1="60.8" y2="60.8"/><text class="tick" x="56" y="64.8" text-anchor="end">10<tspan dy="-5" font-size="9">8</tspan></text><line class="grid" x1="64" x2="630" y1="38.4" y2="38.4"/><text class="tick" x="56" y="42.4" text-anchor="end">10<tspan dy="-5" font-size="9">9</tspan></text><line class="grid" x1="64" x2="630" y1="16.0" y2="16.0"/><text class="tick" x="56" y="20.0" text-anchor="end">10<tspan dy="-5" font-size="9">10</tspan></text><rect class="bar by-enum" x="86.6" y="206.9" width="34.0" height="33.1"><title>n = 10: pair removal reads 30</title></rect><rect class="bar by-multiples" x="120.6" y="217.6" width="34.0" height="22.4"><title>n = 10: stack reads 10</title></rect><text class="tick" x="120.6" y="258" text-anchor="middle">n = 10</text><rect class="bar by-enum" x="199.8" y="163.7" width="34.0" height="76.3"><title>n = 100: pair removal reads 2,550</title></rect><rect class="bar by-multiples" x="233.8" y="195.2" width="34.0" height="44.8"><title>n = 100: stack reads 100</title></rect><text class="tick" x="233.8" y="258" text-anchor="middle">n = 100</text><rect class="bar by-enum" x="313.0" y="119.1" width="34.0" height="120.9"><title>n = 1,000: pair removal reads 250,500</title></rect><rect class="bar by-multiples" x="347.0" y="172.8" width="34.0" height="67.2"><title>n = 1,000: stack reads 1,000</title></rect><text class="tick" x="347.0" y="258" text-anchor="middle">n = 1,000</text><rect class="bar by-enum" x="426.2" y="74.3" width="34.0" height="165.7"><title>n = 10,000: pair removal reads 25,005,000</title></rect><rect class="bar by-multiples" x="460.2" y="150.4" width="34.0" height="89.6"><title>n = 10,000: stack reads 10,000</title></rect><text class="tick" x="460.2" y="258" text-anchor="middle">n = 10,000</text><rect class="bar by-enum" x="539.4" y="29.5" width="34.0" height="210.5"><title>n = 100,000: pair removal reads 2,500,050,000</title></rect><rect class="bar by-multiples" x="573.4" y="128.0" width="34.0" height="112.0"><title>n = 100,000: stack reads 100,000</title></rect><text class="tick" x="573.4" y="258" text-anchor="middle">n = 100,000</text><line class="axis" x1="64" x2="630" y1="240" y2="240"/></svg>
-
-    במדידה ב-Python, על מחרוזת של 100,000 תווים, הפתרון הפשוט לקח כ-7 שניות, והמחסנית
-    פחות מ-10 מילישניות.
+    במדידה ב-Python, על מחרוזת של 100,000 תווים, הפתרון הפשוט לוקח כמה שניות והמחסנית כמה
+    אלפיות שנייה, כלומר היא מהירה פי כמה אלפים (המספרים המדויקים תלויים במחשב). הפער קטן
+    מפי 25,000 של הטבלה, כי `replace` רץ בקוד מהודר וקורא כל תו מהר יותר מהלולאה של המחסנית ב-Python.
 
 ## נקודות חשובות ושאלות המשך
 

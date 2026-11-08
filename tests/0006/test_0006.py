@@ -120,3 +120,98 @@ def test_explorer_typed_prices():
       console.log(JSON.stringify({json.dumps(list(ok) + bad)}.map((t) => m.stockParse(t))));""")
     assert got[:len(ok)] == list(ok.values())
     assert all(isinstance(r, str) and r for r in got[len(ok):]), got[len(ok):]
+
+
+def _long_update_first(prices):
+    """Part a's loop with the two lines swapped: the minimum updated before the check."""
+    best, buy, sell = 0, None, None
+    if not prices:
+        return best, buy, sell
+    min_p, min_i = prices[0], 0
+    for i, p in enumerate(prices):
+        if p < min_p:
+            min_p, min_i = p, i
+        if p - min_p > best:
+            best, buy, sell = p - min_p, min_i, i
+    return best, buy, sell
+
+
+def _must_trade(prices, update_first=False):
+    """The follow-up "a trade is a must": the best starts at day 1 minus day 0."""
+    min_p, min_i = prices[0], 0
+    best, buy, sell = prices[1] - prices[0], 0, 1
+    for i in range(1, len(prices)):
+        p = prices[i]
+        if update_first and p < min_p:
+            min_p, min_i = p, i
+        if p - min_p > best:
+            best, buy, sell = p - min_p, min_i, i
+        if not update_first and p < min_p:
+            min_p, min_i = p, i
+    return best, buy, sell
+
+
+def test_loop_order_claims():
+    """Part a's proof: with the strict > and a best that starts at 0 the order of the check
+    and the update changes neither the profit nor the days. The must-trade follow-up: there
+    the order decides ({9, 7, 4, 1} gives -2 on days 0 and 1, the swapped order 0 on day 1)."""
+    rng = random.Random(61)
+    for _ in range(5000):
+        prices = [rng.randint(1, 20) for _ in range(rng.randint(0, 10))]
+        assert _long_update_first(prices) == ns["max_long_fast"](prices), prices
+        if len(prices) >= 2:
+            best = max(prices[j] - prices[i] for i in range(len(prices)) for j in range(i + 1, len(prices)))
+            got = _must_trade(prices)
+            assert got[0] == best and got[1] < got[2] and prices[got[2]] - prices[got[1]] == best, prices
+    assert _must_trade([9, 7, 4, 1]) == (-2, 0, 1)
+    assert _must_trade([9, 7, 4, 1], update_first=True) == (0, 1, 1)
+
+
+def test_part_a_trace_and_traps():
+    """Part a's trace on {3, 9, 1, 2}: the long is 6 (days 0 and 1), while max - min = 8 is
+    the short of part b; the tie {1, 5, 1} answers the long. The box's trap buttons load the
+    same prices."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    assert ns["max_long_fast"]([3, 9, 1, 2]) == (6, 0, 1)
+    assert ns["max_profit_fast"]([3, 9, 1, 2]) == (8, "short", 1, 2)
+    assert ns["max_profit_fast"]([1, 5, 1]) == (4, "long", 0, 1)
+    assert ns["max_profit_brute"]([1, 5, 1]) == (4, "long", 0, 1)
+    assert ns["max_profit_fast"]([2, 5, 1]) == (4, "short", 1, 2)   # the box task: day 0 -> 2
+    assert ns["max_long_fast"]([3, 9, 1, 12]) == (11, 2, 3)          # the box task: day 3 -> 12
+    # the trace table: the minimum of the previous days and the profit of each day
+    prices, mins = [3, 9, 1, 2], [3, 3, 3, 1]
+    assert [min(prices[:max(i, 1)]) for i in range(4)] == mins
+    assert [p - m for p, m in zip(prices, mins)] == [0, 6, -2, 1]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify(m.stockTraps));""")
+    assert got["peak"]["prices"] == [3, 9, 1, 2] and got["tie"]["prices"] == [1, 5, 1]
+
+
+def test_followup_numbers():
+    """The follow-ups on the page example: many trades 13; k = 1, 2, 3 trades 6, 10, 13;
+    a fee of 2: one trade 7 - 2 = 5 (the short), many long trades 7 = 1 + 4 + 2."""
+    ex = [5, 8, 3, 9, 2, 6]
+    assert sum(max(0, b - a) for a, b in zip(ex, ex[1:])) == 13
+
+    def k_trades(prices, k):
+        hold, free = [float("-inf")] * (k + 1), [0] * (k + 1)
+        for p in prices:
+            for t in range(1, k + 1):
+                hold[t] = max(hold[t], free[t - 1] - p)
+                free[t] = max(free[t], hold[t] + p)
+        return free[k]
+
+    assert [k_trades(ex, k) for k in (1, 2, 3)] == [6, 10, 13]
+
+    def many_with_fee(prices, fee):
+        cash, hold = 0, float("-inf")
+        for p in prices:
+            cash, hold = max(cash, hold + p - fee), max(hold, cash - p)
+        return cash
+
+    assert ns["max_profit_fast"](ex)[0] - 2 == 5
+    assert many_with_fee(ex, 2) == 7 == (8 - 5 - 2) + (9 - 3 - 2) + (6 - 2 - 2)

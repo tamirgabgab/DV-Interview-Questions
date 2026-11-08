@@ -125,3 +125,20 @@ def test_explorer_pair_passes():
                 s = s.replace(pair, "")
             want.append(s)
         assert afters == want and reads == total and valid == (s == "")
+
+
+def test_explorer_trap_buttons():
+    """The box's trap buttons: one string per failure reason of the question's table, each
+    failing for the reason its title gives (and ")(" passing the odd-length shortcut)."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify(m.bracketsTraps.map(([s, why, kind]) => [s, kind, m.bracketsTrace(s)])));""")
+    assert {k for _, k, _ in got} == {"mismatch", "unopened", "unclosed"}
+    for s, kind, tr in got:
+        assert not ns["isValid"](s) and not ns["isValid_brute"](s) and EXAMPLES[s] is False, s
+        assert tr["fail"]["kind"] == kind, s
+    assert len(")(") % 2 == 0 and ")(" in [s for s, _, _ in got]

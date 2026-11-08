@@ -31,6 +31,13 @@
   // The box's bounds: 2 to 30 days, each price a whole number from 1 to 20 (the chart's
   // y scale is fixed at 0..20, so a dragged point and a typed price share one scale).
   const NMIN = 2, NMAX = 30, PMAX = 20;
+  // The trap cases the box loads (the page's example stays its default): the cheapest day
+  // after the dearest (max − min of the array is a short, not a long) and a long and a
+  // short of the same profit (the page answers the long; part b's box only).
+  const TRAPS = {
+    peak: { name: "שפל מאוחר", prices: [3, 9, 1, 2], title: "המחיר הנמוך בא אחרי הגבוה" },
+    tie: { name: "תיקו", prices: [1, 5, 1], title: "לונג ושורט באותו רווח", both: true },
+  };
   const stockRandom = (n, rnd = Math.random) => Array.from({ length: n }, () => 1 + Math.floor(rnd() * PMAX));
   // The typed prices: whole numbers separated by spaces or commas. Returns the array, or
   // the Hebrew reason it is refused.
@@ -57,9 +64,10 @@
         `<label class="st-plab">המחירים <input type="text" class="ex-num st-prices" value="${PAGE.join(" ")}" dir="ltr" spellcheck="false" autocomplete="off" aria-label="המחירים לפי יום, מספרים מ-1 עד ${PMAX} מופרדים ברווחים או בפסיקים"></label></div>` +
         `<div class="ex-controls">` +
         `<span class="wv-presets">דוגמאות : <button type="button" class="md-button ex-preset" data-p="page">דוגמת העמוד</button> ` +
-        `<button type="button" class="md-button ex-preset" data-p="up">עולה</button> ` +
         `<button type="button" class="md-button ex-preset" data-p="down">יורד</button> ` +
-        `<button type="button" class="md-button ex-preset" data-p="random">אקראי</button></span></div>` +
+        `<button type="button" class="md-button ex-preset" data-p="random">אקראי</button></span>` +
+        `<span class="wv-presets st-traps">מלכודות : ` + Object.entries(TRAPS).filter(([, t]) => !(t.both && longOnly)).map(([k, t]) =>
+          `<button type="button" class="md-button ex-preset" data-p="${k}" title="${t.title}">${t.name}</button>`).join(" ") + `</span></div>` +
         `<p class="fl-err st-err" aria-live="polite"></p>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button md-button--primary ex-next">היום הבא</button>` +
@@ -169,7 +177,7 @@
       });
       if (longOnly) { $(".ex-mode").value = "long"; $(".ex-mode").closest("label").hidden = true; }
       $(".ex-mode").addEventListener("change", () => { st.both = $(".ex-mode").value === "both"; draw(); });
-      const seed = seedControls(box, $(".wv-presets"), (rng) => setPrices(stockRandom(st.n, rng), 0), { state: {
+      const seed = seedControls(box, $(".st-traps"), (rng) => setPrices(stockRandom(st.n, rng), 0), { state: {
         get: () => STATE_CODECS.stock.enc({ prices: st.prices, k: st.k, both: st.both }),
         set: (p) => { const d = STATE_CODECS.stock.dec(p); if (!d) return false; st.both = d.both && !longOnly; $(".ex-mode").value = st.both ? "both" : "long"; setPrices(d.prices, d.k); return true; },
       } });
@@ -192,8 +200,8 @@
       box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => {
         const p = b.dataset.p;
         if (p === "page") setPrices(PAGE.slice(), 0);
-        else if (p === "up") setPrices([3, 4, 6, 7, 9, 11, 12, 14, 16, 18], 0);
         else if (p === "down") setPrices([18, 16, 15, 13, 12, 10, 8, 7, 5, 3], 0);
+        else if (TRAPS[p]) setPrices(TRAPS[p].prices.slice(), 0);
         else seed.draw();
       }));
       $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, st.prices.length); draw(); });
@@ -214,8 +222,8 @@
   dvqExplorers.register({
     views: { stock: stockView },
     help: {
-      stock: "גוררים מחירים, מקלידים אותם או מגרילים כמה ימים שרוצים : ״היום הבא״ ו״הפעלה״ מריצים את הסריקה יום אחרי יום עם המינימום והמקסימום עד כה והעסקה הטובה ביותר. הבורר עובר ללונג בלבד.",
+      stock: "גוררים מחירים, מקלידים אותם או מגרילים כמה ימים שרוצים : ״היום הבא״ ו״הפעלה״ מריצים את הסריקה יום אחרי יום עם המינימום והמקסימום עד כה והעסקה הטובה ביותר. הבורר עובר ללונג בלבד. ״מלכודות״ טוענים מחיר נמוך שבא אחרי הגבוה, ותיקו בין לונג לשורט (הלונג מנצח).",
     },
-    models: { stockScan, stockRandom, stockParse },
+    models: { stockScan, stockRandom, stockParse, stockTraps: TRAPS },
   });
 })();

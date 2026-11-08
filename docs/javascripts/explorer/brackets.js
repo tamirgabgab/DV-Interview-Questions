@@ -48,15 +48,22 @@
     return { passes, reads, valid: s === "", left: s };
   };
 
+  // The box's buttons: the valid examples of the question's table, and its failures as trap
+  // cases, one per reason (the title names it; the box's verdict line explains it), with the
+  // failure kind of bracketsTrace that each one meets first.
+  const TRAPS = [["(]", "סוג לא מתאים", "mismatch"], ["([)]", "סדר סגירה הפוך", "mismatch"], ["())", "סוגר בלי פותח", "unopened"],
+    ["(((", "פותחים שנשארו בסוף", "unclosed"], [")(", "אורך זוגי, וסוגר בלי פותח", "unopened"]];
+
   const bracketsView = () => ({
     mount(box) {
-      const PRESETS = ["()", "()[]{}", "{[()]}", "([]{})", "(((())))", "(]", "([)]", "(((", "())", ")("];
+      const PRESETS = ["()", "()[]{}", "{[()]}", "([]{})", "(((())))"];
       const st = { s: box.dataset.s || "{[()]}", k: 0 };
       const NAMES = { "(": "עגול", "[": "מרובע", "{": "מסולסל" };
       const esc = (c) => c.replace(/</g, "&lt;");
       box.innerHTML =
         `<div class="ex-controls"><label><span>המחרוזת</span><input type="text" class="ex-s" dir="ltr" spellcheck="false" maxlength="40" aria-label="מחרוזת של סוגריים"></label>` +
-        `<span class="br-presets">דוגמאות : ` + PRESETS.map((p) => `<button type="button" class="md-button ex-preset" dir="ltr" data-s="${esc(p)}">${esc(p)}</button>`).join(" ") + `</span>` +
+        `<span class="br-presets">תקינות : ` + PRESETS.map((p) => `<button type="button" class="md-button ex-preset" dir="ltr" data-s="${esc(p)}">${esc(p)}</button>`).join(" ") + `</span>` +
+        `<span class="br-presets br-traps">מקרי מלכודת : ` + TRAPS.map(([p, why]) => `<button type="button" class="md-button ex-preset" dir="ltr" data-s="${esc(p)}" title="${why}">${esc(p)}</button>`).join(" ") + `</span>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-prev">התו הקודם</button>` +
@@ -145,8 +152,8 @@
   dvqExplorers.register({
     views: { brackets: bracketsView },
     help: {
-      brackets: "מקלידים מחרוזת סוגריים : ״הצעד הבא״ ו״הפעלה״ קוראים תו אחרי תו, המחסנית וגרף העומק מתעדכנים, והכישלון הראשון מסומן עם הסיבה. מתחת, סעיף א : המחרוזת אחרי כל מעבר של מחיקת זוגות, ומספר התווים שנקראו מול המחסנית.",
+      brackets: "מקלידים מחרוזת סוגריים : ״הצעד הבא״ ו״הפעלה״ קוראים תו אחרי תו, המחסנית וגרף העומק מתעדכנים, והכישלון הראשון מסומן עם הסיבה. ״מקרי מלכודת״ טוענים מחרוזת אחת לכל סיבת כישלון. מתחת, סעיף א : המחרוזת אחרי כל מעבר של מחיקת זוגות, ומספר התווים שנקראו מול המחסנית.",
     },
-    models: { bracketsClean, bracketsTrace, bracketsPasses },
+    models: { bracketsClean, bracketsTrace, bracketsPasses, bracketsTraps: TRAPS },
   });
 })();
