@@ -493,5 +493,6 @@
       maxones: "עורכים את המערך : לחיצה על תא הופכת אותו, גרירה מסמנת מלבן שאפשר להפוך כולו ל-1 או ל-0, ו\"מערך אקראי\" ממלא לפי הסיכוי ל-1. בוחרים ריבוע, מלבן או משולש ומריצים צעד אחרי צעד, שורה אחרי שורה, כיוון אחרי כיוון (במשולש) או עד הסוף : לצד המערך מתמלא dp (בריבוע ובמשולש, בכל כיוון בנפרד) או heights (במלבן, עם המחסנית), הטוב עד עכשיו מוקף בכתום, ובסוף התשובה נצבעת בירוק.",
     },
     models: { moSquare, moRect, moTri, moCount, moParse, moText },
+    cols: { maxones: { main: ".mo-code", side: ".mo-step" } },   // the step (right) beside its code line (left); the editing group lays its rows out in two columns (27-box-columns.css)
   });
 })();

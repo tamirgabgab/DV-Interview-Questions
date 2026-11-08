@@ -301,5 +301,6 @@
       "cake-geo": "העוגה מחולקת לפי החוק ההנדסי : a הוא החלק הראשון ו-q היחס בין אדם לאדם. הסליידרים ושדות המספר קובעים אותם, ״הבא״ ו״הפעלה״ עוברים אדם אחרי אדם, והטבלה והגרפים מראים מי מקבל הכי הרבה. שלב ההוכחה מראה כל אדם כנקודה על עקומת התנאי, והפסגה היא הנקודה הראשונה שעוברת את הקו.",
     },
     models: { cakeSplit, cakeThreshold, cakeFormula, cakeCondition, cakeBest, cakeTrend, CAKE_MAX, cakeDone },
+    cols: { "cake-arith": { main: ".cake-charts", side: ".cake-proof" }, "cake-geo": { main: ".cake-charts", side: ".cake-proof" } },   // the cake and its table stay wide; under them the two charts beside the proof
   });
 })();

@@ -382,5 +382,6 @@
       motorcycle: "הציור מראה את הנוסעים על הדרך והגרף את מיקומם בזמן. הסליידרים קובעים את מהירויות ההליכה והרכיבה, בורר האסטרטגיה ומספר הרוכבים את התכנית, ״הפעלה״ מריץ אותה, ו״להשוואה עם״ מצייר תכנית שנייה מקווקוות. בשלב ההוכחה מזיזים את נקודת הירידה D ורואים את זמני ההגעה של הנוסע ושל ההולך : המאוחר מהשניים הכי קטן כשהם שווים.",
     },
     models: { motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, motorcycleRiders, motorcycleAt, motorcycleTimeK, motorcycleWaits, motorcycleExact, motorcycleDrop, josephusRun },
+    cols: { motorcycle: { main: ".road-title, .road-chart, .road-legend", side: ".road-proof" } },   // the road stays wide; under it the position chart beside the proof
   });
 })();

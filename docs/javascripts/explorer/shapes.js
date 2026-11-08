@@ -93,8 +93,10 @@
         `<button type="button" class="md-button ex-clear">ניקוי</button>` +
         `<button type="button" class="md-button ex-heat">500 הגרלות למפת חום</button><span class="sh-note" aria-live="polite"></span></div>` +
         `<label><input type="checkbox" class="ex-proj" checked> ההטלות על הצירים</label>` +
+        // the summary over the two columns (core.js columns()): the board beside the sandbox
+        `<p class="ex-summary sh-sum"></p>` +
         `<div class="sh-box"><div class="sh-grid"></div><div class="sh-heat"></div></div>` +
-        `<p class="sh-step" aria-live="polite"></p><p class="ex-summary sh-sum"></p>` +
+        `<p class="sh-step" aria-live="polite"></p>` +
         `<div class="sh-sand"><p class="ex-title">שתי צורות להזזה : גוררים את A או את B (או מקש Tab וחצים), וההטלות והתנאים מתעדכנים</p><div class="sh-sand-svg"></div><ul class="sh-conds"></ul></div>`;
       const $ = (sel) => box.querySelector(sel);
       let timer = null;
@@ -275,5 +277,6 @@
       shapes: "״עוד צורה״ מגריל מועמד ומראה את הנדחים בגלל חפיפה, ״הגרלה שלמה״ מציירת את כולן, ו״500 הגרלות״ בונה מפת חום. N, M ומספר הצורות בסליידרים. המתג ״ההטלות״ מצייר את ההטלות של מועמד שנדחה ושל הצורה שהוא חופף, ומתחת שתי צורות להזזה עם ארבעת התנאים של הדף.",
     },
     models: { shapesOverlap, shapesWhy, shapesCandidates, shapesOk, shapesTry, shapesRandom, shapesHeat },
+    cols: { shapes: { main: ".sh-box, .sh-step", side: ".sh-sand" } },   // the board beside the two-shape sandbox
   });
 })();

@@ -287,5 +287,6 @@
       eggs: "k ביצים ו-n קומות בבקרות, והסף נבחר בלחיצה על הבניין, על קומה בתקריב או בשדה. ״ההטלה הבאה״ ו״הפעלה״ מריצים את התוכנית : הבניין צובע את הקומות הידועות, התקריב מראה את הקומות הלא ידועות אחת-אחת, והגרף סופר את ההטלות לכל סף מתחת לקו של המקרה הגרוע. המתג ״הנוסחה על הבניין״ מסמן ליד הבניין את שני החלקים של ההטלה הבאה, f(k − 1, t − 1) מתחתיה ו-f(k, t − 1) מעליה. ״משחק : הסף נסתר״ : מטילים מקומות לבחירתכם מול סף אקראי או יריב, ומשווים למקרה הגרוע.",
     },
     models: { eggsTable, eggsSplitAt, eggsDrops, eggsRun, eggsFirst, eggsPerThreshold, eggsNeed, eggsAdversary },
+    cols: { eggs: { main: ".viz-legend, .eg-box", side: ".eg-step, .eg-rec-text, .ex-title, .eg-chart, .eg-game", w: "minmax(0, 1fr)" } },   // the building and its zoom beside the step text, the chart and the game
   });
 })();

@@ -268,5 +268,6 @@
       horses: "המהירויות מוגרלות מערך אתחול ונסתרות, כמו בחידה. ״התחרות הבאה״ ו״הפעלה״ מריצים את התוכנית תחרות אחרי תחרות : הרשת צובעת כל סוס (נפסל, מועמד, נקבע) עם מספר המהירים הידועים ממנו, הטבלה גדלה, והשורה מתחת מסבירה מי נפסל ולמה. בתיבה הכללית קובעים a, b ו-c, ומתג החשיפה מראה את הדירוג האמיתי. לחיצה על סוס ברשת מראה בשלב ההוכחה את שרשרת התוצאות שמוכיחה מי מהיר ממנו.",
     },
     models: { horsesSpeeds, horsesPlan, horsesChain },
+    cols: { horses: { main: ".viz-legend, .hr-gridbox", side: ".hr-step, .hr-proof" } },   // the grid of horses beside its step and its proof; the races table stays wide under them
   });
 })();

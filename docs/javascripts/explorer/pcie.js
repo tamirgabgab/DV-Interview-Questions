@@ -247,7 +247,7 @@
         else {
           const rows = pcieSplits(addr, len, mps, rcb, MAX_ROWS);
           const note = BigInt(rows.length) < total ? `רק ${rows.length} הראשונים מתוך ${big(total)} מצוירים, בסדר של הפונקציה (החיתוך הרחוק קודם)` : `כל ${rows.length === 1 ? "הפיצול היחיד" : `${rows.length} הפיצולים`}, מקובצים לפי מספר ה-Completions`;
-          $(".pcie-map").innerHTML = `<p class="ex-title">${note}</p>${mapSvg(addr, len, mps, rcb, rows, Number(total))}` +
+          $(".pcie-map").innerHTML = `<p class="ex-title">${note}</p><div class="pcie-mapscroll" tabindex="0" role="region" aria-label="מפת הפיצולים, שורה לכל פיצול">${mapSvg(addr, len, mps, rcb, rows, Number(total))}</div>` +
             `<span class="viz-legend"><span><i class="cs-first"></i>ה-Completion הראשון (או היחיד)</span><span><i class="cs-mid"></i>אמצעי</span><span><i class="cs-last"></i>אחרון</span><span><i class="cs-rcb"></i>גבול RCB</span><span><i class="cs-req"></i>קצות הבקשה</span></span>`;
         }
 
@@ -381,5 +381,6 @@
       ladder: "לחיצה על C(n) בשורה, או ״n הבא״, מדליקה את האיברים שהוא סוכם : לכל i, ה-Completion הראשון מכסה i בלוקים, ומה שנשאר הוא C(n − i). N ו-m משנים את השורה. ״לנחש את C(n)״ מסתיר את הערך עד שמקלידים אותו ובודקים.",
     },
     models: { pcieBoundaries, pcieBlocks, pcieSplitOf, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula, ladderC, ladderTerms },
+    cols: { pcie: { main: ".pcie-blocks, .ex-fold", side: ".pcie-choose, .pcie-counts", w: "minmax(0, 2.6fr)" } },   // the blocks and the map of splits (scrolling, 27-box-columns.css) beside the chosen cuts and the counts table
   });
 })();

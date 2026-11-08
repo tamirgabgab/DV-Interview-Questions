@@ -95,8 +95,10 @@
         `<label>הקצב <select class="ex-speed"><option value="1200">איטי</option><option value="500" selected>בינוני</option><option value="150">מהיר</option></select></label>` +
         `<button type="button" class="md-button ex-start">להתחלה</button>` +
         `<span class="ex-pos"></span></div>` +
+        // the summary over the two columns (core.js columns()): the circle beside the chart and the proof
+        `<p class="ex-summary" aria-live="polite"></p>` +
         `<div class="jos-box"><div class="jos-circle" data-steady></div><div class="jos-panel"><p class="jos-now"></p><p class="jos-order"></p></div></div>` +
-        `<p class="ex-summary" aria-live="polite"></p><p class="ex-note jos-seat"></p><p class="ex-title">השורד לכל N, עם N הנבחר מודגש; נקודות שחורות הן נקודות אפס</p><div class="jos-chart"></div>` +
+        `<p class="ex-note jos-seat"></p><p class="ex-title">השורד לכל N, עם N הנבחר מודגש; נקודות שחורות הן נקודות אפס</p><div class="jos-chart"></div>` +
         `<section class="ex-proof jos-proof"><p class="ex-proof-title">שלב ההוכחה : מספור מחדש</p>` +
         `<div class="ex-controls"><label><input type="checkbox" class="ex-renum" checked> המספר החדש ליד כל מי שנשאר</label>` +
         `<button type="button" class="md-button ex-round">עד סוף הסיבוב</button></div><p class="jos-renum"></p></section>`;
@@ -268,5 +270,6 @@
       josephus: "המעגל מראה את המשחק : N ו-L (אחד נשאר, L − 1 יוצאים) בסליידרים, ״הצעד הבא״ או ״הפעלה״ מוציאים אדם אחרי אדם, השורד מודגש מהתחלה, והגרף מראה את השורד לכל N עם נקודות האפס. שדה המושב מחפש באילו מעגלים מושב שורד. בשלב ההוכחה כל מי שנשאר מקבל מספר חדש, מ-0 אצל הבא שנשאר, ו״עד סוף הסיבוב״ מראה איך סיבוב שלם מקטין את המעגל.",
     },
     models: { josephusSteps, josephusZero, josephusFormula, josephusSurvivor, josephusSeats, josephusRenumber },
+    cols: { josephus: { side: ".ex-title, .jos-chart, .jos-proof" } },   // the circle beside the survivor chart and the proof
   });
 })();
