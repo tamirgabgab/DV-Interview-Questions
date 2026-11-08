@@ -173,5 +173,6 @@
       bitrev: "מקלידים n, מזיזים אותו ב-1 או קופצים לפלינדרום הבא. הצעדים מעבירים את הביטים של n, מהנמוך, לראש של f(n), כמו בפיתוח של סעיף ב, והטבלה מתחת מראה את כל הערכים שהכללים צריכים בדרך ל-f(n), כמו בסעיף א.",
     },
     models: { brValue, brReverse, brIsPal, brNextPal, brRules, brSteps },
+    cols: { bitrev: { side: ".br-rules-title, .br-rules", w: "minmax(0, 0.65fr)" } },   // the bits beside the table of the rules
   });
 })();

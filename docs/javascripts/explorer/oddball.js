@@ -123,16 +123,21 @@
 
       // one balance: the beam tilted by the outcome, the balls in rows on each pan, and the
       // balls off the scale in rows under it; a narrow box (a phone) gets a narrower drawing
-      // with fewer balls per row, so the balls keep their size
-      const R = 15, STEP = 33, BEAM = 104, TILT = 0.12;
-      const geom = () => (box.clientWidth && box.clientWidth < 520
-        ? { W: 400, per: 4, offPer: 10, left: 100, right: 300 }
-        : { W: 640, per: 7, offPer: 13, left: 170, right: 470 });
+      // with fewer balls per row, so the balls keep their size; a column of a computer's box
+      // (core.js columns(): the balances beside the table) gets a tighter one, so its numbers
+      // stay readable at the column's width
+      const R = 15, STEP = 33, TILT = 0.12;
+      const geom = () => {
+        if (box.clientWidth && box.clientWidth < 520) return { W: 400, per: 4, offPer: 10, left: 100, right: 300, beam: 104 };
+        const sc = box.querySelector(".ob-scales");
+        if (sc && sc.clientWidth && sc.clientWidth < 600) return { W: 460, per: 6, offPer: 13, left: 115, right: 345, beam: 76 };   // less room over the beam
+        return { W: 640, per: 7, offPer: 13, left: 170, right: 470, beam: 104 };
+      };
       const ballSvg = (b, x, y, cls, title) =>
         `<g class="ob-ball ${cls}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${R}"><title>${title}</title></circle>` +
         `<text class="ob-num" x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle">${b}</text></g>`;
       const balance = (j, p, out, scen) => {
-        const g = geom(), PIVOT = g.W / 2, tilt = out * TILT;    // left heavier: the left end goes down
+        const g = geom(), PIVOT = g.W / 2, BEAM = g.beam, tilt = out * TILT;    // left heavier: the left end goes down
         const beamY = (x) => BEAM + (PIVOT - x) * tilt;
         const cls = (b) => (scen && b === scen.ball ? (scen.heavy ? "is-heavy" : "is-light") : "");
         const helper = new Set(p.moved.filter((m) => m.to !== "off").map((m) => m.ball));
@@ -224,8 +229,8 @@
       });
       draw();
       if ("ResizeObserver" in window) {
-        let wasNarrow = geom().W < 640;
-        new ResizeObserver(() => { const now = geom().W < 640; if (now !== wasNarrow) { wasNarrow = now; draw(); } }).observe(box);
+        let was = geom().W;
+        new ResizeObserver(() => { const now = geom().W; if (now !== was) { was = now; draw(); } }).observe($(".ob-scales"));
       }
     },
   });
@@ -236,5 +241,6 @@
       oddball: "בוחרים מספר כדורים : התיבה מחשבת את מספר השקילות המינימלי ומציירת את השקילות הקבועות, שורה של מאזניים לכל שקילה. בוחרים כדור חריג וקל או כבד, או לוחצים על שורה בטבלה (או חיצים למעלה ולמטה כשהטבלה ממוקדת) : הכדור נצבע במאזניים, הכפות נוטות לפי התוצאה, והשורה המתאימה בטבלה מודגשת.",
     },
     models: { obMinK, obDyson, obCodes, obPans, obWeigh, obDecode, obRows, OB_CODES12 },
+    cols: { oddball: { side: ".viz-legend, .ob-table-title, .ob-table", w: "minmax(0, 1.6fr)" } },   // the balances beside their legend and the decision table
   });
 })();

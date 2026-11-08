@@ -186,5 +186,8 @@
       tagpool: "מקלידים טרנזקציות כזוגות שליחה-תשובה (למשל 0-30 5-10), ובשני מאגרים עם R או W לפני כל אחת, או מגרילים. כל צעד הוא אירוע אחד לפי הזמן, תשובה לפני שליחה באותו רגע : הקו שמתחת לטרנזקציות הוא כמה פתוחות, הקו המקווקו השיא עד עכשיו, והטרנזקציות הפתוחות מודגשות. בסוף התשובה היא השיא, ובשני מאגרים גם השיא של כל סוג לבד והחיסכון של מאגר משותף.",
     },
     models: { tpSweep, tpPools },
+    // the timeline, narrower but its text still at its size, beside its legend and the line
+    // of the event; the steps-and-code panel under the timeline
+    cols: { tagpool: { main: ".tp-wrap, .ex-explain", side: ".viz-legend, .tp-note", w: "minmax(0, 3.2fr)" } },
   });
 })();

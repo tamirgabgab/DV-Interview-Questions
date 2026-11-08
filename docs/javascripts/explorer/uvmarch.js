@@ -166,5 +166,6 @@
       uvmarch: "לחיצה על רכיב בסכימה מראה מה הוא עושה, מה הוא לא עושה ואת הקריאות החשובות שלו. ״השלב הבא״ מעביר טרנזקציה אחת מה-sequence עד ה-scoreboard, עם החץ והרכיב של כל שלב. במצב ״חידון״ התיבה שואלת ״מי עושה את זה?״, ולוחצים על הרכיב.",
     },
     models: { UV_LAYOUT, UV_ARROWS, UV_PATH, UV_INFO, UV_QUIZ, UV_STAGES },
+    cols: { uvmarch: { main: ".uv-draw", side: ".uv-card", w: "minmax(0, 3fr)" } },   // the diagram, its text still 11 px and more, beside the card of the component
   });
 })();

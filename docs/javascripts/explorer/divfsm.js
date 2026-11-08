@@ -465,5 +465,9 @@
       winfsm: "החלון שומר רק את L הספרות האחרונות. בוחרים ברשימה איפה ספרה חדשה נכנסת : מימין (שרשור ל-LSB, הספרה השמאלית יוצאת) או משמאל (שרשור ל-MSB, הימנית יוצאת). נתיב הנתונים מראה את החלון, את הספרה שנכנסת ואת זו שיוצאת, ואת עדכון השארית בלי לחשב את החלון מחדש. כשיש עד 16 חלונות מופיעה גם המכונה עם מצב לכל חלון. בוחרים m, בסיס, L, החלון אחרי reset והספרות שנכנסות.",
     },
     models: { divInv, divTable, divRun, winRun, winStep },
+    cols: {                                               // the machine beside the derivation, the digits and the moves
+      divfsm: { side: ".dv-derive, .dv-digits, .dv-moves", w: "minmax(0, 0.75fr)" },
+      winfsm: { main: ".dv-pair, .wf-read, .dv-legend", side: ".dv-derive, .wf-path, .wf-rem", w: "minmax(0, 0.75fr)" },   // the moves full width under them
+    },
   });
 })();

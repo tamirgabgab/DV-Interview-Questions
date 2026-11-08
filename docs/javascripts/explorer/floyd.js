@@ -168,5 +168,6 @@
       floyd: "המערך כגרף של זנב ומעגל : ״הגרלה״ או הקלדה קובעים אותו, ו״הצעד הבא״ ו״הפעלה״ מזיזים את הצב ואת הארנב דרך שני השלבים עד הערך הכפול.",
     },
     models: { floydRho, floydRandom },
+    cols: { floyd: { main: ".fl-graph", side: ".fl-step", w: "minmax(0, 2.6fr)" } },   // the graph beside the line of the step
   });
 })();

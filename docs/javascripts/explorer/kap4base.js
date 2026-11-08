@@ -170,5 +170,6 @@
       kap4base: "בוחרים בסיס ומקלידים ארבע ספרות בו : ״הצעד הבא״ ו״הפעלה״ ממיינים ומחסרים צעד אחרי צעד עד שערך חוזר, השורה מתחת מסבירה את p, q ואת הספרות של F ומודיעה על נקודת שבת או מחזור, המפה מראה את המסלול על הזוגות (p, q), והטבלה האחרונה אומרת לאן מגיעים כל מספרי הבסיס.",
     },
     models: { k4Digits, k4Text, k4Parse, k4Pair, k4Value, k4FormulaDigits, k4Step, k4Fixed, k4Orbit, k4Attractors },
+    cols: { kap4base: { side: ".kb-step, .ex-fold", w: "minmax(0, 1.15fr)" } },   // the map and the steps under it beside the line of the step and the table of the base
   });
 })();
