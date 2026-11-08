@@ -3,11 +3,15 @@
 
     python tools/figures/q0025.py > /tmp/q0025.html
 
-Prints, in page order: the stepper of the error-free run (part a), its legend and its
-table; the stepper of the run with a corrupt TLP, a corrupt Ack, a replay timeout and an
-illegal Ack (part b), its legend and its table. Both runs drive the page's own Python
-classes through a scripted "random" source, so the Ack thresholds are the ones the page
-names; tests/0025 checks that the page copies match.
+blocks(), in page order: the table of the error-free run (part a) and the table of the
+run with a corrupt TLP, a corrupt Ack, a replay timeout and an Ack whose number the link
+changed (part b), a row per step with the model's method the environment called and, under
+it, what went out on the link. NEXT_TRANSMIT_SEQ is left out (the transmitter's invariant gives it:
+one past the last entry of the Retry Buffer, or ACKD_SEQ + 1 when it is empty), the other
+state columns are named short (NRS, NAK, as on the box's event axis) and the step's number
+opens its event cell, so the seven columns fit the page's column. Both runs drive the page's own Python classes through a scripted
+"random" source, so the Ack thresholds are the ones the page names; tests/0025 checks
+that the page copies match (python tools/figures/fill.py 25 rewrites them).
 """
 
 import sys
@@ -16,7 +20,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from extract_code import load_python  # noqa: E402
-from stepper import stepper  # noqa: E402
 
 ns = load_python(25)
 Tlp, Dllp, DllpKind = ns["Tlp"], ns["Dllp"], ns["DllpKind"]
@@ -39,11 +42,6 @@ class Script:
 
     def done(self):
         assert not self.values, self.values
-
-
-def legend(items):
-    return ('<span class="viz-legend">' + "".join(f'<span><i class="{c}"></i>{t}</span>' for c, t in items)
-            + "</span>")
 
 
 # ------------------------------------------------------------------ the runs
@@ -71,14 +69,15 @@ class Run:
                 "tx_dllps": [(d.kind.name, d.seq) for d in self.ep.tx_dllps],
                 "tx_tlps": [(t.seq, t.is_replay) for t in self.rc.tx_tlps]}
 
-    def step(self, kind, label, event, action, **extra):
+    def step(self, kind, label, event, action, call, **extra):
         before = self.state()
         action()
         after = self.state()
-        self.frames.append({"kind": kind, "label": label, "event": event, "before": before, "after": after, **extra})
+        self.frames.append({"kind": kind, "label": label, "event": event, "call": call,
+                            "before": before, "after": after, **extra})
 
     def start(self):
-        self.step("start", "initial state", "מצב התחלתי", lambda: None)
+        self.step("start", "initial state", "מצב התחלתי", lambda: None, "הבנאים")
 
     def send(self, n):
         seqs = [(self.rc.next_transmit_seq + i) % 4096 for i in range(n)]
@@ -88,7 +87,7 @@ class Run:
                 self.rc.send_tlp(Tlp(self.payload))
                 self.payload += 1
         self.step("send", f"send TLP {seqs[0]}" if n == 1 else f"send TLPs · {', '.join(map(str, seqs))}",
-                  f"ה-RC שולח {'TLP' if n == 1 else 'TLPs'} {', '.join(map(str, seqs))}", act)
+                  f"ה-RC שולח {'TLP' if n == 1 else 'TLPs'} {', '.join(map(str, seqs))}", act, times("send_tlp", n))
 
     def deliver_tlp(self, corrupt=False, kind=None, count=1):
         """The next `count` TLPs on the link reach the EP; `kind` names the frame for the page."""
@@ -99,27 +98,38 @@ class Run:
         replay = tlps[0].is_replay
         label = ("TLP %s · bad LCRC" % seqs if corrupt else
                  ("replayed " if replay else "") + ("TLPs · " if count > 1 else "TLP ") + seqs)
-        events = {"bad": f"{RLM}TLP {seqs} מגיע עם LCRC שגוי", "future": f"{RLM}TLP {seqs} מגיע לפני זמנו",
-                  "dup": f"{RLM}TLP {seqs} מגיע שוב (כפול)", None: f"{RLM}TLP {seqs} מגיע"}
+        tlp, arrive = ("TLPs", "מגיעים") if count > 1 else ("TLP", "מגיע")
+        events = {"bad": f"{RLM}{tlp} {seqs} {arrive} עם LCRC שגוי", "future": f"{RLM}{tlp} {seqs} {arrive} לפני זמנו",
+                  "dup": f"{RLM}{tlp} {seqs} {arrive} שוב (כפולים)" if count > 1 else f"{RLM}TLP {seqs} מגיע שוב (כפול)",
+                  None: f"{RLM}{tlp} {seqs} {arrive}"}
         self.step(kind or ("replay" if replay else "tlp"), label,
                   events[kind] + (" (Replay)" if replay and kind != "dup" else ""),
-                  lambda: [self.ep.receive_tlp(t) for t in tlps], replay=replay)
+                  lambda: [self.ep.receive_tlp(t) for t in tlps], times("receive_tlp", count), replay=replay)
 
-    def deliver_dllp(self, corrupt=False, tamper=None, count=1):
+    def deliver_dllp(self, corrupt=False, tamper=None, count=1, which=""):
+        """The next `count` DLLPs reach the RC; `which` ("הראשון", ...) tells apart equal ones."""
         dllps = [self.ep.tx_dllps.pop(0) for _ in range(count)]
+        names = ", ".join(f"{d.kind.name.title()} {d.seq}" for d in dllps)
         if corrupt:
             dllps[0].crc_ok = False
         if tamper is not None:
             dllps[0].seq = tamper
-        names = ", ".join(f"{d.kind.name.title()} {d.seq}" for d in dllps)
         kind = "bad_dllp" if corrupt else "illegal" if tamper is not None else dllps[0].kind.name.lower()
-        label = names + (" · bad CRC" if corrupt else " · unknown seq" if tamper is not None else "")
+        label = names + (" · bad CRC" if corrupt else f" · seq changed to {tamper}" if tamper is not None else "")
+        names += f" {which}" if which else ""
         event = (f"{RLM}{names} מגיע עם CRC שגוי" if corrupt else
-                 f"{RLM}{names} מגיע עם מספר לא מוכר" if tamper is not None else f"{RLM}{names} מגיע")
-        self.step(kind, label, event, lambda: [self.rc.receive_dllp(d) for d in dllps])
+                 f"{RLM}{names} מגיע, המספר שונה ל-{tamper}" if tamper is not None else f"{RLM}{names} מגיע")
+        self.step(kind, label, event, lambda: [self.rc.receive_dllp(d) for d in dllps], times("receive_dllp", count))
 
     def timeout(self):
-        self.step("timeout", "replay timer expired", "ה-REPLAY_TIMER פג", self.rc.on_replay_timeout)
+        self.step("timeout", "replay timer expired", "ה-REPLAY_TIMER פג", self.rc.on_replay_timeout,
+                  times("on_replay_timeout", 1))
+
+
+def times(method, n):
+    """The table's call cell: the method the environment called (once a packet; the event
+    cell says how many packets)."""
+    return f"{RLM}`{method}`"
 
 
 def run_a():
@@ -153,200 +163,63 @@ def run_b():
     r.deliver_dllp(corrupt=True)                     # Ack 1 corrupt: ignored
     r.timeout()                                      # replay 4095 0 1 again
     r.deliver_tlp(kind="dup", count=3)               # three duplicates: three Ack 1
-    r.deliver_dllp()                                 # Ack 1: purge everything
-    r.deliver_dllp()                                 # Ack 1 again: no progress, no effect
-    r.deliver_dllp(tamper=9)                         # Ack 9 (the link damaged the number): protocol error
+    r.deliver_dllp(which="הראשון")                   # the first Ack 1: purge everything
+    r.deliver_dllp(which="השני")                     # the second: no progress, no effect
+    r.deliver_dllp(tamper=9, which="השלישי")         # the third, its number changed to 9: protocol error
     r.script.done()
     assert not r.rc.tx_tlps and not r.ep.tx_dllps and not r.rc.retry_buffer
     return r.frames
 
 
-# ------------------------------------------------------------------ stepper frames
-
-def defs(uid):
-    m = []
-    for c in ("s1", "s2", "s3"):
-        m.append(f'<marker id="{uid}-{c}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" '
-                 f'orient="auto"><path class="{c}-fill" d="M0,0 L10,5 L0,10 z"/></marker>')
-    return "<defs>" + "".join(m) + "</defs>"
-
-
-def row(p, x, y, name, before, after, text=None):
-    if before != after:
-        p.append(f'<rect class="st-cur" x="{x + 150}" y="{y - 17}" width="70" height="24" rx="4"/>')
-    p.append(f'<text class="tick" x="{x + 14}" y="{y}">{name}</text>')
-    p.append(f'<text class="st-text" x="{x + 214}" y="{y}" text-anchor="end">{text if text is not None else after}</text>')
-
-
-def seq_boxes(p, x, y, seqs, cls):
-    for i, s in enumerate(seqs[-5:]):
-        bx = x + 30 + i * 42
-        p.append(f'<rect class="{cls}" x="{bx}" y="{y}" width="38" height="24" rx="3"/>')
-        p.append(f'<text class="st-text st-sm" x="{bx + 19}" y="{y + 16.5}" text-anchor="middle">{s}</text>')
-    if not seqs:
-        p.append(f'<text class="tick" x="{x + 30}" y="{y + 16}">empty</text>')
-
-
-def rc_box(p, a, b):
-    x = 16
-    p.append(f'<rect class="cs-blk" x="{x}" y="36" width="230" height="204" rx="6"/>')
-    p.append(f'<text class="coord" x="{x + 115}" y="58" text-anchor="middle" font-weight="700">RC · dll_transmitter</text>')
-    row(p, x, 86, "NEXT_TRANSMIT_SEQ", a["nts"], b["nts"])
-    row(p, x, 110, "ACKD_SEQ", a["ackd"], b["ackd"])
-    p.append(f'<text class="tick" x="{x + 14}" y="136">retry buffer</text>')
-    seq_boxes(p, x, 144, b["retry"], "fc-full")
-    purged = [s for s in a["retry"] if s not in b["retry"]]
-    replayed = [s for s, is_replay in b["tx_tlps"][len(a["tx_tlps"]):] if is_replay]
-    note = (f"purged {', '.join(map(str, purged))}" if purged else "") + \
-           (("; " if purged else "") + f"replay {', '.join(map(str, replayed))}" if replayed else "")
-    if note:
-        p.append(f'<text class="tick" x="{x + 14}" y="190">{note}</text>')
-    counters = f"bad DLLP {b['bad_dllp']} · protocol err {b['proto']} · replays {b['replays']}"
-    cls = "cs-no" if (a["bad_dllp"], a["proto"]) != (b["bad_dllp"], b["proto"]) else "tick"
-    p.append(f'<text class="{cls}" x="{x + 14}" y="226" font-size="11">{counters}</text>')
-
-
-def ep_box(p, a, b):
-    x = 394
-    p.append(f'<rect class="cs-blk" x="{x}" y="36" width="230" height="204" rx="6"/>')
-    p.append(f'<text class="coord" x="{x + 115}" y="58" text-anchor="middle" font-weight="700">EP · dll_receiver</text>')
-    row(p, x, 86, "NEXT_RCV_SEQ", a["nrs"], b["nrs"])
-    row(p, x, 110, "pending / threshold", (a["pending"], a["threshold"]), (b["pending"], b["threshold"]),
-        f"{b['pending']} / {b['threshold']}")
-    row(p, x, 134, "NAK_SCHEDULED", a["nak"], b["nak"], int(b["nak"]))
-    p.append(f'<text class="tick" x="{x + 14}" y="160">delivered to TL</text>')
-    seq_boxes(p, x, 168, b["delivered"], "fc-slot")
-    sent = [f"{k.title()} {s}" for k, s in b["tx_dllps"][len(a["tx_dllps"]):]]
-    if sent:
-        p.append(f'<text class="tick" x="{x + 14}" y="212">sent {", ".join(sent)}</text>')
-    counters = f"bad TLP {b['bad_tlp']} · duplicates {b['dups']}"
-    cls = "cs-no" if (a["bad_tlp"], a["dups"]) != (b["bad_tlp"], b["dups"]) else "tick"
-    p.append(f'<text class="{cls}" x="{x + 14}" y="232" font-size="11">{counters}</text>')
-
-
-def middle(p, f, uid):
-    """The event between the two boxes: at most 20 characters per line."""
-    kind, label = f["kind"], f["label"]
-    right = {"tlp": ("fc-pkt", "s1"), "replay": ("fc-replay", "s1"), "future": ("fc-pkt", "s1"), "dup": ("fc-pkt", "s1")}
-    left = {"ack": ("fc-grant", "s3"), "nak": ("fc-nak", "s2"), "illegal": ("fc-grant", "s3")}
-    notes = {"tlp": ("accepted",), "replay": ("accepted",), "future": ("future:", "discarded, no Nak"),
-             "dup": ("old: discarded,", "Ack again"), "ack": ("purge through it",), "nak": ("purge, then", "replay the rest"),
-             "bad": ("discarded;", "Nak once"), "bad_dllp": ("discarded,", "nothing changes"),
-             "illegal": ("protocol error,", "nothing changes"), "send": ("copies kept in the", "retry buffer"),
-             "timeout": ("replay everything", "unacknowledged")}
-    if kind in right:
-        cls, m = right[kind]
-        if f.get("replay"):
-            cls = "fc-replay"
-        p.append(f'<line class="{cls}" x1="252" y1="118" x2="384" y2="118" marker-end="url(#{uid}-{m})"/>')
-    elif kind in left:
-        cls, m = left[kind]
-        p.append(f'<line class="{cls}" x1="388" y1="118" x2="256" y2="118" marker-end="url(#{uid}-{m})"/>')
-    elif kind == "bad":
-        p.append('<line class="fc-drop" x1="252" y1="118" x2="308" y2="118"/>')
-        p.append('<text class="cs-no" x="320" y="123" text-anchor="middle">✕</text>')
-    elif kind == "bad_dllp":
-        p.append('<line class="fc-drop" x1="388" y1="118" x2="332" y2="118"/>')
-        p.append('<text class="cs-no" x="320" y="123" text-anchor="middle">✕</text>')
-    if kind == "illegal":
-        p.append('<text class="cs-no" x="320" y="123" text-anchor="middle">?</text>')
-    words = label.split(" · ")
-    for i, w in enumerate(words):
-        p.append(f'<text class="tick" x="320" y="{88 + i * 16}" text-anchor="middle">{w}</text>')
-    for i, line in enumerate(notes.get(kind, ())):
-        p.append(f'<text class="tick" x="320" y="{140 + i * 16}" text-anchor="middle">{line}</text>')
-
-
-def frame_svg(k, f, uid):
-    p = [f'<svg class="figure" viewBox="0 0 640 250" style="max-width:40rem" role="img" '
-         f'aria-label="צעד {k} : {f["event"]}; מצב המשדר והמקבל">', defs(uid)]
-    p.append(f'<text class="coord" x="8" y="20" font-weight="700">step {k} · {f["label"].replace(" · ", " ")}</text>')
-    rc_box(p, f["before"], f["after"])
-    ep_box(p, f["before"], f["after"])
-    middle(p, f, uid)
-    p.append("</svg>")
-    return "".join(p)
-
+# ------------------------------------------------------------------ the tables
 
 def fmt(seqs):
     return ", ".join(map(str, seqs)) if seqs else "ריק"
 
 
-def caption(k, f):
-    a, b, kind = f["before"], f["after"], f["kind"]
-    sent = [f"{kd.title()} {s}" for kd, s in b["tx_dllps"][len(a["tx_dllps"]):]]
-    purged = [s for s in a["retry"] if s not in b["retry"]]
-    replayed = [s for s, r in b["tx_tlps"][len(a["tx_tlps"]):] if r]
-    if kind == "start":
-        return (f"צעד {k} : הקישור פעיל כבר זמן מה. ה-RC עומד על NEXT_TRANSMIT_SEQ = {b['nts']} ו-ACKD_SEQ = "
-                f"{b['ackd']}, ה-Retry Buffer ריק; ה-EP מצפה ל-{b['nrs']} והסף הראשון שהגריל הוא {b['threshold']}.")
-    if kind == "send":
-        return (f"צעד {k} : {f['event']}. כל אחד מקבל את NEXT_TRANSMIT_SEQ ומקדם אותו; ה-Retry Buffer מחזיק "
-                f"{fmt(b['retry'])}, ועותקים נפרדים יצאו לקישור. ‏NEXT_TRANSMIT_SEQ = {b['nts']}.")
-    if kind in ("tlp", "replay"):
-        n = len(b["delivered"]) - len(a["delivered"])
-        head = f"צעד {k} : {f['event']} : {'המספר הצפוי' if n == 1 else 'המספרים הצפויים'}, {'נמסר' if n == 1 else 'נמסרים'} ל-TL"
-        nak = " ו-NAK_SCHEDULED כבה" if a["nak"] and not b["nak"] else ""
-        if sent:
-            return (f"{head}{nak}. ‏NEXT_RCV_SEQ = {b['nrs']}; הספירה הגיעה לסף {a['threshold']}, ולכן יוצא "
-                    f"{sent[0]} והסף הבא הוא {b['threshold']}.")
-        return f"{head}{nak}. ‏NEXT_RCV_SEQ = {b['nrs']}, {b['pending']} ממתינים ל-Ack מול סף {b['threshold']}."
-    if kind == "ack":
-        if purged:
-            return (f"צעד {k} : {f['event']}. ה-RC מוצא את {purged[-1]} "
-                    f"ב-Retry Buffer ומוחק מהראש עד אליו : {fmt(purged)}. נשאר {fmt(b['retry'])}, ‏ACKD_SEQ = {b['ackd']}.")
-        return (f"צעד {k} : {f['event']}. המספר הוא ACKD_SEQ עצמו : Ack חוזר בלי התקדמות, שום דבר לא משתנה.")
-    if kind == "bad":
-        return (f"צעד {k} : {f['event']}. ה-EP זורק אותו ושולח {sent[0]} (האחרון שנמסר); NAK_SCHEDULED נדלק "
-                f"והספירה ל-Ack מתאפסת. ‏NEXT_RCV_SEQ נשאר {b['nrs']}.")
-    if kind == "future":
-        return (f"צעד {k} : {f['event']} : ה-EP עדיין מצפה ל-{b['nrs']}, ולכן זה TLP \"מהעתיד\". נזרק, ובלי Nak נוסף "
-                f"כי NAK_SCHEDULED דולק.")
-    if kind == "nak":
-        return (f"צעד {k} : {f['event']}. קודם כמו Ack : {fmt(purged)} נמחק ו-ACKD_SEQ = {b['ackd']}; ואז Replay של כל "
-                f"מה שנשאר, בסדר ועם המספרים המקוריים : {fmt(replayed)}.")
-    if kind == "bad_dllp":
-        return (f"צעד {k} : {f['event']}. אי אפשר לסמוך על הסוג ולא על המספר : ה-RC סופר DLLP פגום ולא נוגע "
-                f"ב-Retry Buffer ({fmt(b['retry'])}) ולא ב-ACKD_SEQ.")
-    if kind == "timeout":
-        return (f"צעד {k} : {f['event']} וב-Retry Buffer עוד {fmt(b['retry'])}. ה-RC משדר מחדש את כולם מהעותקים "
-                f"השמורים : {fmt(replayed)}.")
-    if kind == "dup":
-        return (f"צעד {k} : {f['event']}. ה-EP כבר מסר אותם (NEXT_RCV_SEQ = {b['nrs']}), ולכן כל אחד נזרק ועונה "
-                f"ב-Ack חוזר : {', '.join(sent)}. ‏Nak אין, כי שום דבר לא חסר.")
-    return (f"צעד {k} : {f['event']}. המספר אינו ב-Retry Buffer ואינו ACKD_SEQ ({b['ackd']}) : Data Link Protocol "
-            f"Error, נספר ונזרק בלי שינוי.")
+def went_out(f):
+    """What the step put on the link, as a second line under the call: the TLPs the RC sent
+    or replayed, the DLLPs the EP sent."""
+    a, b = f["before"], f["after"]
+    tlps = b["tx_tlps"][len(a["tx_tlps"]):]
+    dllps = b["tx_dllps"][len(a["tx_dllps"]):]
+    if tlps:
+        seqs = ", ".join(str(q) for q, _ in tlps)
+        many = len(tlps) > 1
+        if tlps[0][1]:
+            return f"<br>{RLM}Replay של {seqs}"
+        return f"<br>{'יוצאים' if many else 'יוצא'} TLP {seqs}"
+    names = [f"{k.title()} {q}" for k, q in dllps]
+    if len(names) > 1 and len(set(names)) == 1:                  # three equal Acks: say "three"
+        return f"<br>יוצאים {COUNT[len(names)]} {names[0]}"
+    if names:
+        return f"<br>{'יוצאים' if len(names) > 1 else 'יוצא'} " + ", ".join(names)
+    return ""
 
 
-def run_stepper(frames, part, aria):
-    return stepper([(frame_svg(k, f, f"an{part}{k}"), caption(k, f)) for k, f in enumerate(frames)], aria)
+COUNT = {2: "שני", 3: "שלושה", 4: "ארבעה"}
 
 
-def stepper_legend():
-    return legend([("fc-full", "רשומה ב-Retry Buffer"), ("fc-slot", "‏TLP שנמסר ל-Transaction Layer"),
-                   ("st-cur", "ערך שהשתנה בצעד הזה"), ("fc-pkt", "‏TLP מה-RC ל-EP"), ("fc-replay", "‏TLP משודר מחדש"),
-                   ("fc-grant", "‏Ack מה-EP ל-RC"), ("fc-nak", "‏Nak"), ("fc-drop", "פקט שנפגע על הקו")])
+def ltr(text):
+    """Numbers read left to right in a right-to-left cell (the RLM keeps the cell RTL)."""
+    return RLM + '<span dir="ltr">' + text + "</span>"
 
 
 def run_table(frames):
-    rows = [f"| צעד | אירוע | {RLM}NEXT_TRANSMIT_SEQ | {RLM}ACKD_SEQ | {RLM}Retry Buffer | {RLM}NEXT_RCV_SEQ | ממתינים / סף | {RLM}NAK_SCHEDULED |",
-            "|---|---|---|---|---|---|---|---|"]
+    rows = [f"| צעד | קריאה ומה שיצא לקישור | {RLM}ACKD_SEQ | {RLM}Retry Buffer "
+            f"| {RLM}NRS | ממתינים / סף | {RLM}NAK |",
+            "|---|---|---|---|---|---|---|"]
     for k, f in enumerate(frames):
         b = f["after"]
-        rows.append(f"| {k} | {f['event']} | {b['nts']} | {b['ackd']} | {fmt(b['retry'])} | {b['nrs']} | "
-                    f"{b['pending']} / {b['threshold']} | {int(b['nak'])} |")
+        counts = ltr(f"{b['pending']} / {b['threshold']}")
+        rows.append(f"| **{k}** · {f['event']} | {f['call']}{went_out(f)} | {b['ackd']} | {fmt(b['retry'])} "
+                    f"| {b['nrs']} | {counts} | {int(b['nak'])} |")
     return "\n".join(rows)
 
 
-def figures():
-    a, b = run_a(), run_b()
-    return {
-        "FIG:stepper_a": run_stepper(a, "a", "הזרימה התקינה, צעד אחרי צעד : חמישה TLPs דרך הגלישה ושני Ack-ים מצטברים"),
-        "LEG:stepper_a": stepper_legend(), "TAB:stepper_a": run_table(a),
-        "FIG:stepper_b": run_stepper(b, "b", "שגיאות, צעד אחרי צעד : TLP פגום, Nak ו-Replay, Ack פגום, טיימר, כפילויות ו-Ack לא חוקי"),
-        "LEG:stepper_b": stepper_legend(), "TAB:stepper_b": run_table(b),
-    }
+def blocks():
+    return [run_table(run_a()), run_table(run_b())]
 
 
 if __name__ == "__main__":
-    print("\n\n".join(figures().values()))
+    print("\n\n".join(blocks()))

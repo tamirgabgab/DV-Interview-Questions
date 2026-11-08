@@ -1,5 +1,5 @@
 // kinds: acknak
-//   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts; random traffic at a fault rate with the invariants checked; an event axis of the counters
+//   acknak                 0025        the RC and the EP with the two link queues: send, deliver / corrupt / lose, the timers; the page's examples as scripts and a trap case (the head TLP corrupt: one Nak, not three); random traffic at a fault rate with the invariants checked; an event axis of the counters
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -50,7 +50,7 @@
       else if (ev.how === "lose") log.items.push({ out: "lost", kind: d.kind, seq: d.seq });
       else {
         if (ev.how === "bad") d.crcOk = false;
-        if (ev.tamper !== undefined) d.seq = ev.tamper;
+        if (ev.tamper !== undefined) { log.items.push({ out: "tampered", kind: d.kind, from: d.seq, seq: ev.tamper }); d.seq = ev.tamper; }
         log.kind = d.kind; log.seq = d.seq;
         if (!d.crcOk) { s.badDllp += 1; log.items.push({ out: "badDllp", kind: d.kind, seq: d.seq }); }
         else {
@@ -76,6 +76,13 @@
       { type: "send", n: 4 }, { type: "tlp", how: "ok" }, { type: "tlp", how: "bad" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" },
       { type: "dllp", how: "ok" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok", count: 2 }, { type: "dllp", how: "bad" },
       { type: "timeout" }, { type: "tlp", how: "ok", count: 3 }, { type: "dllp", how: "ok" }, { type: "dllp", how: "ok" }, { type: "dllp", how: "ok", tamper: 9 }] },
+    // the trap case, not on the page: the head TLP is corrupt and the three after it arrive
+    // whole; they are "future" ones, held without a second Nak, and the one Nak carries
+    // ACKD_SEQ itself, so it purges nothing and replays all four
+    trap: { start: 4094, thresholds: [4, 1], steps: [
+      { type: "send", n: 4 }, { type: "tlp", how: "bad" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" },
+      { type: "dllp", how: "ok" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" }, { type: "tlp", how: "ok" },
+      { type: "dllp", how: "ok" }] },
   };
   const anRun = (script, rnd) => {
     const th = [...script.thresholds];
@@ -166,6 +173,7 @@
         `<div class="ex-controls"><span class="wv-presets">הדוגמאות שבעמוד : ` +
         `<button type="button" class="md-button ex-preset" data-p="a">סעיף א</button> ` +
         `<button type="button" class="md-button ex-preset" data-p="b">סעיף ב</button></span>` +
+        `<button type="button" class="md-button ex-preset" data-p="trap">מקרה מלכודת : הראשון פגום</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא בתסריט</button>` +
         `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1800, 1000, 400) +
@@ -241,7 +249,9 @@
             case "lost": return `${it.kind ? (it.kind === "ACK" ? "Ack" : "Nak") + " " + ltr(it.seq) : "‏TLP " + ltr(it.seq)} אבד על הקו : אף צד לא יודע על זה עדיין.`;
             case "badDllp": return `<span class="wv-bad">${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} הגיע עם CRC שגוי : לא סומכים לא על הסוג ולא על המספר, נזרק.</span>`;
             case "purged": return `<span class="wv-ok">${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} מצטבר : ${seqs(it.seqs)} נמחקים מה-Retry Buffer ו-ACKD_SEQ הופך ל-${ltr(it.seq)}.</span>`;
-            case "noProgress": return `${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} שווה ל-ACKD_SEQ : אין התקדמות, המצב לא משתנה.`;
+            case "noProgress": return it.kind === "ACK" ? `‏Ack ${ltr(it.seq)} שווה ל-ACKD_SEQ : אין התקדמות, המצב לא משתנה.`
+              : `‏Nak ${ltr(it.seq)} שווה ל-ACKD_SEQ : אין מה למחוק, אבל Nak מבקש Replay.`;
+            case "tampered": return `<span class="wv-bad">הקו שינה את המספר של ${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.from)} ל-${ltr(it.seq)}.</span>`;
             case "protoErr": return `<span class="wv-bad">${it.kind === "ACK" ? "Ack" : "Nak"} ${ltr(it.seq)} לא ב-Retry Buffer ולא ACKD_SEQ : שגיאת פרוטוקול, נזרק ונספר.</span>`;
             case "replay": return `<span class="wv-ok">‏Replay : ${seqs(it.seqs)} יוצאים שוב לקישור מהעותקים השמורים, עם המספרים המקוריים.</span>`;
             case "nothingToReplay": return `אין מה לשדר מחדש : ה-Retry Buffer ריק.`;
@@ -294,7 +304,7 @@
   dvqExplorers.register({
     views: { acknak: acknakView },
     help: {
-      acknak: "ה-RC וה-EP עם שני תורי הקישור : ״הצעד הבא״ ו״הפעלה״ מריצים את תסריטי העמוד, האירועים החופשיים שולחים, מוסרים (גם עם CRC שגוי או אובדן) ומפעילים טיימרים, ו״הרצה אקראית״ מגרילה תנועה עם תקלות ובודקת את האינווריאנטים. ציר האירועים מוסיף עמודה לכל אירוע.",
+      acknak: "ה-RC וה-EP עם שני תורי הקישור : ״הצעד הבא״ ו״הפעלה״ מריצים את תסריטי העמוד ואת מקרה המלכודת, האירועים החופשיים שולחים, מוסרים (גם עם CRC שגוי או אובדן) ומפעילים טיימרים, ו״הרצה אקראית״ מגרילה תנועה עם תקלות ובודקת את האינווריאנטים. ציר האירועים מוסיף עמודה לכל אירוע.",
     },
     models: { AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, anInvariants, anRandomScript, anEventLabel },
   });

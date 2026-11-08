@@ -276,15 +276,59 @@ def test_random_lossy_traffic_delivers_everything_once_in_order():
 
 
 def test_figures_up_to_date():
-    out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0025.py")],
-                         capture_output=True, text=True, check=True).stdout
-    text = question_path(25).read_text(encoding="utf-8")
-    for pattern in (r'<div class="stepper".*?</div></div>', r'<span class="viz-legend">.*?</span></span>'):
-        generated = re.findall(pattern, out)
-        assert generated and re.findall(pattern, text) == generated, pattern
-    page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
-    for row in (l for l in out.splitlines() if l.startswith("|")):
-        assert row.strip() in page_rows, row
+    """The two step tables are tools/figures/q0025.py's blocks; part b's step 11 sends three
+    Ack 1 and steps 12 to 14 are those three (the last one with its number changed to 9)."""
+    from page_tests import assert_figures_match
+
+    assert_figures_match(25)
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0025
+
+    b = q0025.run_b()
+    sent = [b[11]["after"]["tx_dllps"][len(b[11]["before"]["tx_dllps"]):]]
+    assert sent == [[("ACK", 1)] * 3]
+    assert [f["kind"] for f in b[12:]] == ["ack", "ack", "illegal"] and not b[-1]["after"]["tx_dllps"]
+    calls = [f["call"].replace("\u200f", "").replace("`", "") for f in q0025.run_a()[1:5]]
+    assert calls == ["send_tlp", "receive_tlp", "receive_tlp", "receive_dllp"]
+    assert "יוצאים שלושה Ack 1" in q0025.run_table(b)
+
+
+def test_explorer_trap_case():
+    """The box's trap case: the head TLP corrupt and the three after it whole. One Nak and
+    not three (the three are future ones, held), and it carries ACKD_SEQ, so it purges
+    nothing and replays all four; the page's classes on the same events agree."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const sc = m.AN_SCRIPTS.trap, th = [...sc.thresholds], draw = () => (th.length ? th.shift() : 1);
+      let s = m.anInit(sc.start, draw);
+      const outs = [];
+      for (const ev of sc.steps) {{ const r = m.anApply(s, ev, draw); s = r.state; outs.push(...r.log.items.map((x) => x.out)); }}
+      console.log(JSON.stringify({{ outs, retry: s.retry.length, received: s.received, ackd: s.ackd, left: th.length }}));""")
+    assert got["outs"].count("nak") == 1 and got["outs"].count("nakHeld") == 3 and got["outs"].count("future") == 3
+    assert "noProgress" in got["outs"] and got["outs"].count("replay") == 1
+    assert got["retry"] == 0 and got["received"] == [4094, 4095, 0, 1] and got["ackd"] == 1 and got["left"] == 0
+
+    class Script:
+        def __init__(self, values):
+            self.values = list(values)
+
+        def randint(self, a, b):
+            return self.values.pop(0)
+
+    rc, ep = Tx(4094), Rx(4094, Script([4, 1]))
+    send(rc, 4)
+    first = rc.tx_tlps.pop(0)
+    first.crc_ok = False
+    ep.receive_tlp(first)
+    pass_tlps(rc, ep)
+    assert dllps(ep) == [(DllpKind.NAK, 4093)] and rc.ackd_seq == 4093
+    pass_dllps(rc, ep)
+    assert seqs(rc.retry_buffer) == [4094, 4095, 0, 1] and rc.replay_count == 1
+    pass_tlps(rc, ep)
+    pass_dllps(rc, ep)
+    assert not rc.retry_buffer and seqs(ep.received_tlps) == [4094, 4095, 0, 1]
 
 
 def test_explorer_matches_page_classes():

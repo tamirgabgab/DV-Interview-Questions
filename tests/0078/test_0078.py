@@ -196,11 +196,26 @@ def test_follow_ups():
     assert round(math.log(7, 5), 2) == 1.21
     assert q0078.expected(7, 5) == Fraction(7, 5)
     assert Counter(r % 5 for r in range(1, 8)) == {1: 2, 2: 2, 3: 1, 4: 1, 0: 1}
-    # $urandom % N: 2^32 mod N small outputs get one value more
+    # $urandom % N (end of part b): 2^32 mod N small outputs get one value more
     for n in (3, 6, 7, 10, 1000):
         counts = (2 ** 32 // n, 2 ** 32 // n + 1)
         assert 2 ** 32 % n > 0 and counts[1] - counts[0] == 1
-    # a 3-bit LFSR gives 7 values: rand6 by rejecting 7, 7/6 cycles; no bounded way
+    # how big: one value in 429 million for N = 10; 3 against 2 (1.5 times) for N = 3 * 2^29
+    assert 2 ** 32 // 10 // 10 ** 6 == 429
+    n = 3 * 2 ** 29                                       # fits a signed int
+    values = lambda r: 2 ** 32 // n + (r < 2 ** 32 % n)  # how many v in 0 .. 2^32 - 1 give v % n == r
+    assert n < 2 ** 31 and 2 ** 32 % n == 2 ** 30 and values(0) == values(2 ** 30 - 1) == 3 and values(2 ** 30) == 2
+    # recycling the rejected rounds of rand7: 4 leftovers times one call give 20, accept 14, keep 6
+    assert (25 - 21) * 5 == 20 and 20 - 20 % 7 == 14 and 20 % 7 == 6
+    # a 3-bit LFSR is not rand7: its 7 non-zero states come in one fixed cycle; skipping 7
+    # gives 1..6 once every 7 clocks, always in the same order, and wastes at most one clock
+    state, seen = 1, []
+    for _ in range(14):
+        seen.append(state)
+        state = ((state << 1) | (((state >> 2) ^ (state >> 1)) & 1)) & 7   # x^3 + x^2 + 1
+    assert sorted(seen[:7]) == list(range(1, 8)) and seen[7:] == seen[:7]
+    outs = [v for v in seen if v != 7]
+    assert sorted(outs[:6]) == list(range(1, 7)) and outs[6:] == outs[:6]
     assert q0078.expected(7, 6) == Fraction(7, 6) and exact_calls(7, 6) == 0
 
 
@@ -226,7 +241,7 @@ def test_page_code_statistically():
 def test_page_numbers():
     for s in ["50/21 \\approx 2.38", "2 \\cdot 25/21", "v = 5(a - 1) + b", "(v - 1) \\bmod 7 + 1", "64/15 \\approx 4.27",
               "6^3 = 216 = 27 \\cdot 8", "2 \\cdot 36/32 = 9/4 = 2.25", "1115/504 \\approx 2.21", "\\log_5 7 \\approx 1.21",
-              "7/5 = 1.4", "441 עד 451", "3125", "P_3 = 5/8", "P_4 = 15/16", 'data-kind="randmn" data-m="5" data-n="7"']:
+              "7/5 = 1.4", "441 עד 451", "3125", "4 \\cdot 5 = 20", "N = 3 \\cdot 2^{29}", "429", "P_3 = 5/8", "P_4 = 15/16", 'data-kind="randmn" data-m="5" data-n="7"']:
         assert s in PAGE, s
     assert re.search(r"הפלט 7 מקבל 5, ‏?1 ו-6 מקבלים 4", PAGE)
 
