@@ -135,5 +135,8 @@
       bitmatrix: "בוחרים דוגמה, מקלידים מילה בהקסדצימלי או לוחצים על תאים כדי להדליק ולכבות ביטים. ״השלב הבא״ מבצע delta swap אחד : הביטים של המסכה צבועים, בני הזוג שלהם בצבע אחר, והביטים שהשתנו ממוסגרים. מתחת לטבלה המילה אחרי כל שלב, המסכה, ההזזה ו-t.",
     },
     models: { bmStages },
+    // on a computer: the matrix and its legend on the left, the words after each stage and
+    // the stage's note on the right
+    cols: { bitmatrix: { side: ".bm-vals, .bm-note" } },
   });
 })();

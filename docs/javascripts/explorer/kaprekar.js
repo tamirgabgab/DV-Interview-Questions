@@ -66,7 +66,7 @@
         `<button type="button" class="md-button md-button--primary ex-random">הגרלה</button>` +
         `<span class="kp-presets">דוגמאות : ` + presets.map((p) => `<button type="button" class="md-button ex-preset" data-x="${p}">${p}</button>`).join(" ") + `</span></div>` +
         `<div class="kp-table"></div><p class="kp-chain" aria-live="polite"></p>` +
-        `<label><input type="checkbox" class="ex-cols" checked> החיסור במאונך של הצעד הראשון</label><div class="kp-cols"></div>` +
+        `<label><input type="checkbox" class="kp-show-cols" checked> החיסור במאונך של הצעד הראשון</label><div class="kp-cols"></div>` +
         `<p class="ex-title">מספר הצעדים עד שהערך מפסיק להשתנות, על כל ${ltr(num(MAX + 1))} המספרים; המספר שלכם מסומן</p><div class="kp-chart"></div><p class="ex-summary kp-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const input = $(".ex-x");
@@ -87,7 +87,7 @@
         $(".kp-chain").innerHTML = text;
         // the first step as a column subtraction, units first, with the borrows; the digits
         // the page's p and q predict beside it
-        if ($(".ex-cols").checked) {
+        if ($(".kp-show-cols").checked) {
           const s0 = c.steps[0], cols = kapColumns(s0.largest, s0.smallest, d), ds = s0.digits.split("").map(Number);
           const p = ds[0] - ds[d - 1], q = d === 4 ? ds[1] - ds[2] : null;
           const NAMES = ["אחדות", "עשרות", "מאות", "אלפים"];
@@ -126,7 +126,7 @@
       };
       const set = (x) => { if (Number.isInteger(x) && x >= 0 && x <= MAX) st.x = x; draw(); };
       input.addEventListener("change", () => set(Math.round(Number(input.value))));
-      $(".ex-cols").addEventListener("change", draw);
+      $(".kp-show-cols").addEventListener("change", draw);
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
       const seed = seedControls(box, $(".kp-presets"), (rng) => set(Math.floor(rng() * (MAX + 1))));
       $(".ex-random").addEventListener("click", seed.draw);
@@ -141,5 +141,8 @@
       kaprekar: "מקלידים או מגרילים מספר : ״הצעד הבא״ ממיין ומחסר עד 495 או 6174, וההיסטוגרמה סופרת את אורכי השרשראות של כל המספרים. המתג ״החיסור במאונך״ מראה את הצעד הראשון עמודה אחרי עמודה, עם הלווים.",
     },
     models: { kapStep, kapColumns, kapChain, kapHistogram },
+    // on a computer: the table of the steps on the left, the chain and the column
+    // subtraction on the right; the wide histogram stays under both
+    cols: { kaprekar: { main: ".kp-table", side: ".kp-chain, label:has(> .kp-show-cols), .kp-cols" } },
   });
 })();

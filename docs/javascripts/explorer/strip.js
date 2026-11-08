@@ -266,5 +266,9 @@
       strip: "גוררים את העכביש ואת הזבוב על הקירות : הרצועה המחזורית מראה את התמונות, את 48 הקווים ואת הקצר שבהם, והמסלול נפרש פנים אחרי פנים.",
     },
     models: { stripImages, stripEdgePoint, stripPoint3, stripFacesBetween, stripLines, stripBest },
+    // on a computer: the two walls and the path table on the left, the strip with its title
+    // and legend on the right; the summary under both (a phone keeps the walls first)
+    cols: { strip: { main: ".strip-walls, .strip-segments, .ex-title:has(+ .strip-segments)",
+                     side: ".strip-chart, .ex-title:has(+ .strip-chart), .viz-legend", w: "minmax(0, 0.9fr)" } },
   });
 })();

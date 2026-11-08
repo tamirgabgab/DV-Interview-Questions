@@ -174,5 +174,8 @@
       randmn: "בוחרים את המקור M, את היעד N ואת מספר הקריאות בסבב k. למעלה החשבון של סבב (כמה תוצאות, כמה מתקבלות, התוחלת), טבלה של ארבעה ערכים של k עם הזול מסומן, והאם יש אלגוריתם מדויק עם מספר קריאות חסום. הטבלה הצבועה היא כל התוצאות של סבב, כל תא עם הפלט שלו, והנדחים מקווקווים. הצעדים מריצים עשרה סבבים אקראיים, סבב בכל צעד, והגרלה חדשה מחליפה אותם.",
     },
     models: { rnCalls, rnLimit, rnExpected, rnFactors, rnExact, rnRound, rnRun, rnShape },
+    // on a computer: the table of k and the grid of one round on the left, the ten rounds
+    // (a row a step) and the current round's line on the right; the bound stays above both
+    cols: { randmn: { main: ".rn-ktab, .rn-gridwrap, .viz-legend, .ex-title:not(:has(+ .rn-log))", side: ".rn-log, .ex-title:has(+ .rn-log), .rn-now" } },
   });
 })();
