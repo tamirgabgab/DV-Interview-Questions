@@ -244,3 +244,10 @@
 @container (min-width: 600px) {
   .md-typeset .explorer .ex-side .ex-explain .ex-codewrap { max-height: 22rem; overflow-y: auto; }
 }
+
+/* the code of a side column in a smaller face (11 px at 1920), so most lines fit whole; a
+   longer one still scrolls sideways (the owner, session 34) */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-side pre.ex-codeview { font-size: 0.5rem; }
+  .md-typeset .explorer .ex-side pre.ex-codeview .ex-line { padding-inline-end: 0.3rem; padding-left: 2.5em; }
+}
