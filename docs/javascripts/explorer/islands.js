@@ -1,5 +1,5 @@
 // kinds: islands
-//   islands                0065        a grid of land and water (data-grid, rows of 0 and 1 joined by dots) edited by a tap on a cell or drawn from a seed; the flood fill of the page's code stepped one cell at a time: a new island when the scan meets land not marked yet, a cell leaving the queue with its neighbours checked and the land ones pushed; four or eight neighbours by a select; every island in its own colour with its number (modes a and b) or its running size (mode c, with the sorted list under the grid); the queue drawn beside the grid, a caption per step and the explain panel with the code lines of the step
+//   islands                0065        a grid of land and water (data-grid, rows of 0 and 1 joined by dots) edited by a tap on a cell, drawn from a seed or loaded as the mode's trap case (a U, a diagonal line, a small island before a large one); the flood fill of the page's code stepped one cell at a time: a new island when the scan meets land not marked yet, a cell leaving the queue with its neighbours checked and the land ones pushed; four or eight neighbours by a select; every island in its own colour with its number (modes a and b) or its running size (mode c, with the sorted list under the grid); the queue drawn beside the grid, a caption per step and the explain panel with the code lines of the step
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -66,6 +66,14 @@
     b: { label: "כמה איים, שמונה כיוונים (סעיף ב)", code: "count_islands8", diag: true },
     c: { label: "הגודל של כל אי (סעיף ג)", code: "island_sizes", diag: false },
   };
+  // the trap case of each mode, a button in its box (tools/figures/q0065.py TRAP_GRIDS): a U
+  // whose two arms the scan meets in row 0, a diagonal line (four islands or one), and a
+  // small island the scan finds before a large one
+  const TRAPS = {
+    a: { label: "אי בצורת U", grid: "10001.10001.11111" },
+    b: { label: "קו אלכסוני", grid: "0001.0010.0100.1000" },
+    c: { label: "אי קטן לפני גדול", grid: "1101.1001.0111" },
+  };
   const STEPS = {
     a: ["הסריקה : תא אחרי תא", "אי חדש : המונה גדל, התא לתור", "ההצפה : תא יוצא, שכנים נכנסים", "האי נגמר : התור ריק", "הסוף : count"],
     c: ["הסריקה : תא אחרי תא", "אי חדש : הצפה", "ההצפה סופרת : size גדל", "הגודל לרשימה", "המיון בסוף"],
@@ -97,7 +105,8 @@
         `<label>עמודות <input type="number" class="ex-num il-n" min="1" max="${MAXC}" step="1" dir="ltr" aria-label="מספר העמודות, עד ${MAXC}"></label>` +
         `<label>הסיכוי ליבשה <input type="range" class="il-p" min="10" max="90" step="10" value="50" dir="ltr" aria-label="הסיכוי של תא להיות יבשה בלוח אקראי, באחוזים"><output class="il-po">50%</output></label>` +
         `<button type="button" class="md-button il-rand">לוח אקראי</button><span class="il-anchor"></span>` +
-        `<button type="button" class="md-button ex-reset">חזרה ללוח של העמוד</button></div>` +
+        `<button type="button" class="md-button ex-reset">חזרה ללוח של העמוד</button>` +
+        `<button type="button" class="md-button ex-preset il-trap">מקרה מלכודת${NB}: ${TRAPS[mode0].label}</button></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-start">ההתחלה</button>` +
         `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
@@ -232,6 +241,7 @@
       $(".ex-next").addEventListener("click", () => { st.s++; draw(); });
       $(".ex-end").addEventListener("click", () => { stop(); st.s = total(); draw(); });
       $(".ex-reset").addEventListener("click", () => { st.grid = grid0.map((r) => r.slice()); st.mode = mode0; st.diag = MODES[mode0].diag; st.p = 50; $(".il-p").value = "50"; st.focus = [0, 0]; edited(); });
+      $(".il-trap").addEventListener("click", () => { st.grid = ilParse(TRAPS[mode0].grid); st.focus = [0, 0]; edited(); });
       // the grid: a tap toggles a cell; the arrow keys move between the cells, space or
       // Enter toggles (the box's own arrows step the run, so the keys stop here)
       gin.addEventListener("click", (ev) => {
@@ -283,7 +293,7 @@
   dvqExplorers.register({
     views: { islands: islandsView },
     help: {
-      islands: "לחיצה על תא הופכת אותו ממים ליבשה ובחזרה, \"לוח אקראי\" מגריל לוח לפי הסיכוי ליבשה, ובוחרים ארבעה או שמונה כיוונים. כל צעד הוא תא אחד של מילוי בהצפה : הסריקה פוגשת יבשה שלא סומנה ומתחילה אי חדש, או תא יוצא מהתור ושכניו נבדקים. התור מצויר ליד הלוח, התא שיצא מוקף, התאים שנכנסו מסומנים בכתום, וכל אי מקבל צבע עם המספר שלו (בסעיף ג : הגודל שלו, והרשימה הממוינת מתחת). השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
+      islands: "לחיצה על תא הופכת אותו ממים ליבשה ובחזרה, \"לוח אקראי\" מגריל לוח לפי הסיכוי ליבשה, \"מקרה מלכודת\" טוען לוח שמכשיל פתרון נאיבי, ובוחרים ארבעה או שמונה כיוונים. כל צעד הוא תא אחד של מילוי בהצפה : הסריקה פוגשת יבשה שלא סומנה ומתחילה אי חדש, או תא יוצא מהתור ושכניו נבדקים. התור מצויר ליד הלוח, התא שיצא מוקף, התאים שנכנסו מסומנים בכתום, וכל אי מקבל צבע עם המספר שלו (בסעיף ג : הגודל שלו, והרשימה הממוינת מתחת). השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
     },
     models: { ilTrace, ilSizes, ilParse, ilText },
     // on a computer: the board, the queue and the notes on the left, the steps-and-code

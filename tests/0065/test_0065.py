@@ -39,6 +39,24 @@ def test_extra_examples():
     assert big == {(0, 3), (1, 3), (2, 3), (2, 2), (2, 1)}
 
 
+def test_trap_cases():
+    """The boxes' trap buttons: a U-shaped island (part a) is one island although the scan
+    meets two land cells in row 0; the diagonal line (part b) is four islands with four
+    neighbours and one with eight; a small island before a large one (part c) is found
+    first, and only the final sort puts the large one first."""
+    u, diag, small = q0065.TRAP_GRIDS["a"], q0065.TRAP_GRIDS["b"], q0065.TRAP_GRIDS["c"]
+    assert ns["count_islands"](u) == 1 and u[0].count("1") == 2 and u[0][1:-1].count("1") == 0
+    starts = [f for f in q0065.trace(u) if f["kind"] == "start"]
+    reach = next(k for k, f in enumerate(q0065.trace(u)) if f["kind"] == "pop" and f["cell"] == [0, 4])
+    assert len(starts) == 1 and reach == 9                   # the flood takes (0, 4) in step 10, last
+    assert ns["count_islands"](diag) == 4 and ns["count_islands8"](diag) == 1
+    assert sum(1 for f in q0065.trace(diag, True) if f["kind"] == "start") == 1
+    assert q0065.flood_sizes(small) == [3, 5] and ns["island_sizes"](small) == [5, 3]
+    box = (ROOT / "docs" / "javascripts" / "explorer" / "islands.js").read_text(encoding="utf-8")
+    for mode, grid in q0065.TRAP_GRIDS.items():
+        assert f'{mode}: {{ label: ' in box and ".".join(grid) in box
+
+
 def test_explorer_matches_the_reference():
     from page_tests import explorer_require, node_json
 

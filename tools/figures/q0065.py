@@ -238,6 +238,20 @@ def count_online(m, n, adds, diag=False):
     return out
 
 
+def spare_lines(grid, diag=False):
+    """The MBIST follow-up: for every island, in the order of its first cell, its size, how
+    many rows and how many columns it spans, and whether one spare row or one spare column
+    replaces all of its cells (it lies in one row, or in one column)."""
+    out = []
+    for comp in components(grid, diag):
+        rows, cols = {r for r, _ in comp}, {c for _, c in comp}
+        out.append({"size": len(comp), "rows": len(rows), "cols": len(cols), "row": len(rows) == 1, "col": len(cols) == 1})
+    return out
+
+
+TRAP_GRIDS = {"a": ["10001", "10001", "11111"], "b": DIAG_GRID, "c": SC_GRID_C}   # the boxes' trap cases
+
+
 # --- blocks ---------------------------------------------------------------------------------
 
 def cell_name(r, c):

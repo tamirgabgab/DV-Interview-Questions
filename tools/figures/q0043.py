@@ -12,11 +12,12 @@ the b most promising unsettled candidates with the most comparisons still missin
 them (the same rule as the page code, so the race logs are comparable). blocks() returns,
 in page order: the staircase table of part a, the grid figure after the winners' race
 with its legend, the race log of the page's example of part a, the grid and the log of
-part b, and the examples table of the general plan. tests/0043 checks every number against
-the page code, brute force over every ordering of the staircase, and the explorer.
+part b, and the examples table of the general plan, whose race counts are the exact worst
+case of the plan (worst_case(): an adversary search over every result of every race).
+tests/0043 checks every number against the page code, brute force over every ordering of
+the staircase, the same adversary search run on the page code, and the explorer.
 """
 
-import random
 import sys
 from math import ceil
 from pathlib import Path
@@ -29,11 +30,13 @@ LETTERS = "ABCDEFGHIJ"
 
 # --- the model --------------------------------------------------------------------------
 
-def plan(a, b, c, speed):
+def plan(a, b, c, speed, race=None):
     """The plan against hidden speeds (lower is faster): the ranking of the c fastest and a
     log with, per race, the horses, the result, the horses newly known to be out of the
-    top c (with c horses known faster), the horses newly settled at an exact rank, and
-    how many candidates are still open."""
+    top c (with c horses known faster), the horses newly settled at an exact rank, how
+    many candidates are still open, and `ties`: how many picks of the race the horses'
+    numbers decided (the greedy's other keys tied). With `race`, a function from the
+    horses to their finishing order, the results come from it instead of `speed`."""
     assert a <= b * b, "more groups than a race holds: the winners would need a tournament"
     faster = [set() for _ in range(a)]
     slower = [set() for _ in range(a)]
@@ -49,8 +52,8 @@ def plan(a, b, c, speed):
                 slower[u].add(v)
                 faster[v].add(u)
 
-    def run(group, what):
-        order = sorted(group, key=lambda x: speed[x])
+    def run(group, what, ties=0):
+        order = list(race(group)) if race else sorted(group, key=lambda x: speed[x])
         for i, x in enumerate(order):
             for y in order[i + 1:]:
                 add(x, y)
@@ -64,23 +67,25 @@ def plan(a, b, c, speed):
                 placed.append(x)
         open_ = [x for x in range(a) if x not in out and x not in settled]
         log.append(dict(what=what, horses=list(group), order=order, gone=gone, placed=placed, open=open_,
-                        faster={x: sorted(faster[x]) for x in gone}))
+                        faster={x: sorted(faster[x]) for x in gone}, ties=ties))
 
     groups = [list(range(k, min(k + b, a))) for k in range(0, a, b)]
     for k, g in enumerate(groups):
         run(g, ("group", k))
     if len(groups) > 1:
-        run([min(g, key=lambda x: speed[x]) for g in groups], ("winners", None))
+        run([log[k]["order"][0] for k in range(len(groups))], ("winners", None))
     while any(r not in settled.values() for r in range(1, c + 1)):
         pool = [x for x in range(a) if x not in out and x not in settled]
         pool.sort(key=lambda x: (len(faster[x]), -len(slower[x]), x))
-        chosen = []
+        chosen, ties = [], 0
         while len(chosen) < b and pool:
-            best = max(pool, key=lambda x: (sum(1 for y in chosen if y not in faster[x] and y not in slower[x]),
-                                            -len(faster[x]), len(slower[x]), -x))
+            key = lambda x: (sum(1 for y in chosen if y not in faster[x] and y not in slower[x]),   # noqa: E731
+                             -len(faster[x]), len(slower[x]))
+            best = max(pool, key=lambda x: (*key(x), -x))
+            ties += sum(1 for x in pool if key(x) == key(best)) > 1
             pool.remove(best)
             chosen.append(best)
-        run(chosen, ("final", None))
+        run(chosen, ("final", None), ties)
     ranking = [x for r in range(1, c + 1) for x in range(a) if settled.get(x) == r]
     return ranking, log
 
@@ -120,15 +125,75 @@ def speeds(a, seed):
     return p
 
 
-def race_count(a, b, c, trials=60, seed=43):
-    """The most races the plan needed over seeded random speeds."""
-    rng = random.Random(seed)
-    worst = 0
-    for _ in range(trials):
-        sp = list(range(a))
-        rng.shuffle(sp)
-        worst = max(worst, len(plan(a, b, c, sp)[1]))
-    return worst
+def worst_case(a, b, c):
+    """The exact worst case of the plan, by an adversary search. After the groups and the
+    winners every input looks the same up to the names: a chain per group and the chain
+    of the winners. So the search names horse j * b + i the i-th of the group whose winner
+    came j-th, and from there tries every finishing order of every race the plan asks
+    for that agrees with what is already known (the linear extensions of the known
+    order on the race's horses), depth first, until the first c ranks are settled. Each
+    branch is a real input (any order that agrees with what is known is the order of
+    some hidden speeds), and every input follows one branch, so the deepest branch is
+    the worst case. The names only matter where they break a tie of the greedy pick;
+    `ties` counts such picks over the whole search, and when it is 0 the worst case holds
+    for every naming, not just this one. Returns the races, the number of branches, the
+    ties, and the races after the winners on the deepest branch."""
+    assert a % b == 0, "the search assumes full groups"
+    g = a // b
+    fixed = [list(range(j * b, j * b + b)) for j in range(g)] + ([[j * b for j in range(g)]] if g > 1 else [])
+
+    class Ask(Exception):
+        pass
+
+    def known_faster(orders):
+        faster = [set() for _ in range(a)]
+        for order in orders:
+            for i, x in enumerate(order):
+                for y in order[i + 1:]:
+                    up = faster[x] | {x}
+                    for v in range(a):
+                        if v == y or y in faster[v]:
+                            faster[v] |= up
+        return faster
+
+    stats = {"branches": 0, "ties": 0}
+
+    def search(prefix):
+        answers = iter(prefix)
+
+        def race(group):
+            k = len(asked)
+            asked.append(group)
+            if k < len(fixed):
+                assert sorted(group) == fixed[k]
+                return fixed[k]
+            nxt = next(answers, None)
+            if nxt is None:
+                raise Ask
+            return nxt
+
+        asked = []
+        try:
+            log = plan(a, b, c, None, race)[1]
+        except Ask:
+            group, faster = asked[-1], known_faster(fixed + prefix)
+            best = (0, None)
+            stack = [([], list(group))]
+            while stack:                           # every order of the group that agrees with what is known
+                done, rest = stack.pop()
+                if not rest:
+                    best = max(best, search(prefix + [done]), key=lambda t: t[0])
+                    continue
+                for x in rest:
+                    if not any(y in faster[x] for y in rest if y != x):
+                        stack.append((done + [x], [y for y in rest if y != x]))
+            return best
+        stats["branches"] += 1
+        stats["ties"] += sum(e["ties"] for e in log)
+        return len(log), prefix
+
+    races, deepest = search([])
+    return races, stats["branches"], stats["ties"], deepest
 
 
 SEED_A, SEED_B = 3, 11
@@ -183,10 +248,11 @@ EXAMPLES = [(25, 5, 3), (25, 5, 1), (36, 6, 4), (30, 6, 3), (16, 4, 3), (49, 7, 
 
 
 def examples_table():
-    lines = ["| ‏a | ‏b | ‏c | קבוצות | מועמדי המדרגות | תחרויות |", "|:-:|:-:|:-:|:-:|:-:|:-:|"]
+    lines = ["| ‏a | ‏b | ‏c | קבוצות | מועמדי המדרגות | בתחרות אחת? | תחרויות במקרה הגרוע |", "|:-:|:-:|:-:|:-:|:-:|:-:|:-:|"]
     for a, b, c in EXAMPLES:
         n = c * (c + 1) // 2 - 1
-        lines.append(f"| {RLM}{a} | {RLM}{b} | {RLM}{c} | {RLM}{ceil(a / b)} | {RLM}{n} | {RLM}**{race_count(a, b, c)}** |")
+        fits = "כן" if n <= b else "לא"
+        lines.append(f"| {RLM}{a} | {RLM}{b} | {RLM}{c} | {RLM}{ceil(a / b)} | {RLM}{n} | {fits} | {RLM}**{worst_case(a, b, c)[0]}** |")
     return "\n".join(lines)
 
 

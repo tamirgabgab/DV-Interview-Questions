@@ -86,10 +86,17 @@ def test_every_land_cell_once():
             assert sorted(groups.values(), key=min) == q0065.components(grid, diag)
             # the neighbours are checked in the order of the directions, 4 or 8 of them
             assert all(len(f["nb"]) == (8 if diag else 4) for f in frames if f["kind"] == "pop")
-    # the page's walk: 9 pops, and 9 cells skipped between the first and the second island
+    # the page's walk: 9 pops, and 9 cells skipped between the first and the second island:
+    # the scan resumes at (0, 1), the cell after (0, 0), and passes 6 water cells and 3 cells
+    # of the first island up to (1, 4)
     frames = q0065.trace(GRID)
     assert sum(1 for f in frames if f["kind"] == "pop") == 9
     assert [f["skipped"] for f in frames if f["kind"] == "start"] == [0, 9, 10] and frames[-1]["skipped"] == 8
+    passed = [(r, c) for r in range(5) for c in range(6) if (0, 0) < (r, c) < (1, 4)]
+    assert passed[0] == (0, 1) and len(passed) == 9
+    assert sum(GRID[r][c] == "0" for r, c in passed) == 6 and sum((r, c) in q0065.components(GRID)[0] for r, c in passed) == 3
+    # step 4 pushes nothing: (1, 1), the only land neighbour of (0, 1), was marked when pushed in step 3
+    assert frames[2]["pushed"] == [[1, 1]] and frames[3]["cell"] == [0, 1] and frames[3]["pushed"] == []
     assert frames[1]["pushed"] == [[1, 0], [0, 1]] and frames[3]["pushed"] == []
     assert len(frames) == 13
 
@@ -245,6 +252,21 @@ def test_follow_ups():
     # LC 694: the example has three shapes (a square, an L and a stick); copies count once
     assert q0065.distinct_shapes(GRID) == 3
     assert q0065.distinct_shapes(["1010", "1010", "0000", "1010"]) == 2 and count_islands(["1010", "1010", "0000", "1010"]) == 4
+    # MBIST: the span decides one spare row or column, not the size; in the example only the
+    # bottom island (rows 3 and 4, column 3) takes one spare column, the square and the L of
+    # three cells span two rows and two columns (the L: row 1 and column 4), and a stick of
+    # three cells in one row, as large as the L, takes one spare row
+    spans = q0065.spare_lines(GRID)
+    assert [(s["size"], s["rows"], s["cols"], s["row"], s["col"]) for s in spans] == [(4, 2, 2, False, False), (3, 2, 2, False, False), (2, 2, 1, False, True)]
+    ell = q0065.components(GRID)[1]
+    assert all(r == 1 or c == 4 for r, c in ell)
+    assert q0065.spare_lines(["111"]) == [{"size": 3, "rows": 1, "cols": 3, "row": True, "col": False}]
+    for _ in range(200):
+        grid = random_grid(rng, rng.randint(1, 6), rng.randint(1, 6), 0.5)
+        for comp, s in zip(q0065.components(grid), q0065.spare_lines(grid)):
+            # one spare row r replaces every failing cell of the island exactly when they all lie in row r
+            assert s["row"] == any(all(r == rr for r, _ in comp) for rr in range(len(grid)))
+            assert s["col"] == any(all(c == cc for _, c in comp) for cc in range(len(grid[0])))
     # a 3D grid: the same flood with a table of six directions, against union-find in 3D
     rng3 = random.Random(654)
     for _ in range(100):

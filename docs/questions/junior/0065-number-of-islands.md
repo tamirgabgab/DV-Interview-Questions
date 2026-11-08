@@ -30,8 +30,9 @@ added: 2026-10-29
 
 **ההקשר באימות :** בדיקת זיכרון (MBIST) מחזירה **מפת כשלים** : לוח של תאי הזיכרון, שורה
 לכל כתובת ועמודה לכל ביט, ובו 1 בכל תא שנכשל. פגם פיזי אחד (קצר בין שתי ליניות, חלקיק
-על הסיליקון) מופיע במפה כגוש של תאים צמודים, ולכן ספירת הגושים היא ספירת הפגמים, והגודל
-של כל גוש אומר אם שורת חילוף אחת או עמודת חילוף אחת מספיקות לתקן אותו. מי שמנתח מפות כאלה,
+על הסיליקון) מופיע במפה כגוש של תאים צמודים, ולכן ספירת הגושים היא ספירת הפגמים, והשורות
+והעמודות שכל גוש נפרש עליהן אומרות אם שורת חילוף אחת או עמודת חילוף אחת מספיקה לתקן אותו
+(שאלת ההמשך האחרונה). מי שמנתח מפות כאלה,
 ומי שכותב מודל ייחוס ל-DUT שמנתח אותן, כותב בדיוק את הפונקציה של השאלה הזו : סעיף א סופר
 את הגושים, סעיף ב מתייחס גם לתאים שנוגעים בפינה (פגם לא מכבד את רשת הקואורדינטות), וסעיף ג
 מחזיר את הגודל של כל גוש.
@@ -149,11 +150,12 @@ added: 2026-10-29
 
     <!-- /gen -->
 
-    בצעד 2 התא <span dir="ltr">(0, 0)</span> יוצא, ושני שכניו ביבשה נכנסים. בצעד 4 כל ארבעת
-    השכנים של <span dir="ltr">(0, 1)</span> כבר מסומנים, מים, או מחוץ ללוח, ולכן שום תא לא
-    נכנס. אחרי צעד 5 התור ריק, האי הראשון שלם עם 4 תאים, והסריקה ממשיכה מ-<span dir="ltr">(1, 2)</span> :
-    היא עוברת 9 תאים (מים, ותאי האי שכבר סומנו) עד <span dir="ltr">(1, 4)</span>, האי השני. בסך
-    הכול 9 הוצאות מהתור, אחת לכל תא יבשה.
+    שני דברים שהטבלה לא אומרת במפורש. בצעד 4 אף תא לא נכנס לתור, כי השכן היחיד של
+    <span dir="ltr">(0, 1)</span> ביבשה, <span dir="ltr">(1, 1)</span>, סומן כבר כשנכנס בצעד 3 :
+    זה הסימון ברגע הכניסה, שמונע כניסה כפולה. ובצעד 6 הסריקה ממשיכה מ-<span dir="ltr">(0, 1)</span>,
+    התא שאחרי <span dir="ltr">(0, 0)</span> בסדר הסריקה, ולא מהמקום שבו ההצפה נגמרה : 9 התאים
+    שהיא עוברת עד <span dir="ltr">(1, 4)</span> הם 6 תאי מים ו-3 תאים של האי הראשון, שהסימון
+    מדלג עליהם.
 
     #### הקוד { .sol-code }
 
@@ -286,9 +288,10 @@ added: 2026-10-29
       בלוח 20 × 20 שכולו יבשה הוא מגיע ל-20 תאים לכל היותר, ואילו מחסנית של DFS מגיעה
       ל-191 ורקורסיה לעומק 400 (כל הלוח). במקרה הגרוע גם התור הוא \( O(mn) \).
 
-    **נסו בעצמכם.** לחיצה על תא הופכת אותו ממים ליבשה ובחזרה, ו"לוח אקראי" מגריל לוח חדש. כל
-    צעד הוא תא אחד : אי חדש שנכנס לתור, או תא שיוצא ממנו ושכניו נבדקים. התור מצויר ליד הלוח,
-    התא הנוכחי מוקף, וכל אי מקבל צבע ומספר :
+    **נסו בעצמכם.** התיבה מוסיפה על הטבלה לוחות משלכם : לחיצה על תא הופכת אותו ממים ליבשה
+    ובחזרה, ו"לוח אקראי" מגריל לוח חדש. נסו את "מקרה מלכודת : אי בצורת U" : בשורה הראשונה
+    שני תאי יבשה רחוקים זה מזה. נחשו לפני ההרצה כמה איים תספור הסריקה, ובאיזה צעד ההצפה
+    מגיעה לזרוע הימנית :
 
     <div class="explorer" data-kind="islands" data-mode="a" data-grid="110000.110011.000010.000100.000100"></div>
 
@@ -340,31 +343,32 @@ added: 2026-10-29
 
     <!-- /gen -->
 
-    **הפרדוקס של הפינות.** על נייר, קו סגור של יבשה מפריד בין המים שבתוכו למים שבחוץ. על לוח
-    של תאים זה כבר לא בטוח. קו אלכסוני של יבשה הוא אי אחד בשמונה כיוונים, אבל שני תאי מים
-    משני צדדיו נוגעים זה בזה בפינה **באותה** פינה שדרכה היבשה מחוברת. אם גם המים "מחוברים
-    בשמונה כיוונים", הקו לא מפריד כלום; ואם המים מחוברים בארבעה כיוונים בלבד, הקו מפריד, אבל
-    אז בארבעה כיוונים הוא עצמו ארבעה איים נפרדים :
+    ??? note "הפרדוקס של הפינות (הרחבה)"
+        על נייר, קו סגור של יבשה מפריד בין המים שבתוכו למים שבחוץ. על לוח
+        של תאים זה כבר לא בטוח. קו אלכסוני של יבשה הוא אי אחד בשמונה כיוונים, אבל שני תאי מים
+        משני צדדיו נוגעים זה בזה בפינה **באותה** פינה שדרכה היבשה מחוברת. אם גם המים "מחוברים
+        בשמונה כיוונים", הקו לא מפריד כלום; ואם המים מחוברים בארבעה כיוונים בלבד, הקו מפריד, אבל
+        אז בארבעה כיוונים הוא עצמו ארבעה איים נפרדים :
 
-    <!-- gen 5 -->
+        <!-- gen 5 -->
 
-    <svg class="figure il-fig" viewBox="0 0 176 172" style="max-width:11rem" role="img" aria-label="קו אלכסוני של יבשה על לוח 4 על 4 : עם שמונה כיוונים הוא אי אחד, והמים משני הצדדים גם הם מחוברים דרך אותן פינות"><text class="tick" x="44" y="14" text-anchor="middle">0</text><text class="tick" x="80" y="14" text-anchor="middle">1</text><text class="tick" x="116" y="14" text-anchor="middle">2</text><text class="tick" x="152" y="14" text-anchor="middle">3</text><text class="tick" x="18" y="44" text-anchor="end">0</text><text class="tick" x="18" y="80" text-anchor="end">1</text><text class="tick" x="18" y="116" text-anchor="end">2</text><text class="tick" x="18" y="152" text-anchor="end">3</text><g class="il-cell is-water"><title>cell (0, 0): water</title><rect x="28" y="24" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (0, 1): water</title><rect x="64" y="24" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (0, 2): water</title><rect x="100" y="24" width="32" height="32" rx="4"/></g><g class="il-cell is-land il-i1"><title>cell (0, 3): land, island 1 of 4 cells</title><rect x="136" y="24" width="32" height="32" rx="4"/><text x="152" y="45" text-anchor="middle">1</text></g><g class="il-cell is-water"><title>cell (1, 0): water</title><rect x="28" y="60" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (1, 1): water</title><rect x="64" y="60" width="32" height="32" rx="4"/></g><g class="il-cell is-land il-i1"><title>cell (1, 2): land, island 1 of 4 cells</title><rect x="100" y="60" width="32" height="32" rx="4"/><text x="116" y="81" text-anchor="middle">1</text></g><g class="il-cell is-water"><title>cell (1, 3): water</title><rect x="136" y="60" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (2, 0): water</title><rect x="28" y="96" width="32" height="32" rx="4"/></g><g class="il-cell is-land il-i1"><title>cell (2, 1): land, island 1 of 4 cells</title><rect x="64" y="96" width="32" height="32" rx="4"/><text x="80" y="117" text-anchor="middle">1</text></g><g class="il-cell is-water"><title>cell (2, 2): water</title><rect x="100" y="96" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (2, 3): water</title><rect x="136" y="96" width="32" height="32" rx="4"/></g><g class="il-cell is-land il-i1"><title>cell (3, 0): land, island 1 of 4 cells</title><rect x="28" y="132" width="32" height="32" rx="4"/><text x="44" y="153" text-anchor="middle">1</text></g><g class="il-cell is-water"><title>cell (3, 1): water</title><rect x="64" y="132" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (3, 2): water</title><rect x="100" y="132" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (3, 3): water</title><rect x="136" y="132" width="32" height="32" rx="4"/></g><line class="il-link" x1="152" y1="40" x2="116" y2="76"><title>a corner link: (0, 3) and (1, 2)</title></line><line class="il-link" x1="116" y1="76" x2="80" y2="112"><title>a corner link: (1, 2) and (2, 1)</title></line><line class="il-link" x1="80" y1="112" x2="44" y2="148"><title>a corner link: (2, 1) and (3, 0)</title></line></svg>
+        <svg class="figure il-fig" viewBox="0 0 176 172" style="max-width:11rem" role="img" aria-label="קו אלכסוני של יבשה על לוח 4 על 4 : עם שמונה כיוונים הוא אי אחד, והמים משני הצדדים גם הם מחוברים דרך אותן פינות"><text class="tick" x="44" y="14" text-anchor="middle">0</text><text class="tick" x="80" y="14" text-anchor="middle">1</text><text class="tick" x="116" y="14" text-anchor="middle">2</text><text class="tick" x="152" y="14" text-anchor="middle">3</text><text class="tick" x="18" y="44" text-anchor="end">0</text><text class="tick" x="18" y="80" text-anchor="end">1</text><text class="tick" x="18" y="116" text-anchor="end">2</text><text class="tick" x="18" y="152" text-anchor="end">3</text><g class="il-cell is-water"><title>cell (0, 0): water</title><rect x="28" y="24" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (0, 1): water</title><rect x="64" y="24" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (0, 2): water</title><rect x="100" y="24" width="32" height="32" rx="4"/></g><g class="il-cell is-land il-i1"><title>cell (0, 3): land, island 1 of 4 cells</title><rect x="136" y="24" width="32" height="32" rx="4"/><text x="152" y="45" text-anchor="middle">1</text></g><g class="il-cell is-water"><title>cell (1, 0): water</title><rect x="28" y="60" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (1, 1): water</title><rect x="64" y="60" width="32" height="32" rx="4"/></g><g class="il-cell is-land il-i1"><title>cell (1, 2): land, island 1 of 4 cells</title><rect x="100" y="60" width="32" height="32" rx="4"/><text x="116" y="81" text-anchor="middle">1</text></g><g class="il-cell is-water"><title>cell (1, 3): water</title><rect x="136" y="60" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (2, 0): water</title><rect x="28" y="96" width="32" height="32" rx="4"/></g><g class="il-cell is-land il-i1"><title>cell (2, 1): land, island 1 of 4 cells</title><rect x="64" y="96" width="32" height="32" rx="4"/><text x="80" y="117" text-anchor="middle">1</text></g><g class="il-cell is-water"><title>cell (2, 2): water</title><rect x="100" y="96" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (2, 3): water</title><rect x="136" y="96" width="32" height="32" rx="4"/></g><g class="il-cell is-land il-i1"><title>cell (3, 0): land, island 1 of 4 cells</title><rect x="28" y="132" width="32" height="32" rx="4"/><text x="44" y="153" text-anchor="middle">1</text></g><g class="il-cell is-water"><title>cell (3, 1): water</title><rect x="64" y="132" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (3, 2): water</title><rect x="100" y="132" width="32" height="32" rx="4"/></g><g class="il-cell is-water"><title>cell (3, 3): water</title><rect x="136" y="132" width="32" height="32" rx="4"/></g><line class="il-link" x1="152" y1="40" x2="116" y2="76"><title>a corner link: (0, 3) and (1, 2)</title></line><line class="il-link" x1="116" y1="76" x2="80" y2="112"><title>a corner link: (1, 2) and (2, 1)</title></line><line class="il-link" x1="80" y1="112" x2="44" y2="148"><title>a corner link: (2, 1) and (3, 0)</title></line></svg>
 
-    <!-- /gen -->
+        <!-- /gen -->
 
-    <!-- gen 6 -->
+        <!-- gen 6 -->
 
-    | השכנות | איים של יבשה | חלקים של מים | מה זה אומר |
-    |:--|:-:|:-:|:--|
-    | ארבעה כיוונים | ‏4 | ‏2 | ארבעה תאים בודדים, והמים משני צידי האלכסון מופרדים |
-    | שמונה כיוונים | ‏1 | ‏1 | אי אחד, אבל גם המים חוצים את האלכסון דרך אותן פינות : הקו לא מפריד |
+        | השכנות | איים של יבשה | חלקים של מים | מה זה אומר |
+        |:--|:-:|:-:|:--|
+        | ארבעה כיוונים | ‏4 | ‏2 | ארבעה תאים בודדים, והמים משני צידי האלכסון מופרדים |
+        | שמונה כיוונים | ‏1 | ‏1 | אי אחד, אבל גם המים חוצים את האלכסון דרך אותן פינות : הקו לא מפריד |
 
-    <!-- /gen -->
+        <!-- /gen -->
 
-    לכן בעיבוד תמונה בוחרים שכנות **שונה** ליבשה ולמים : שמונה כיוונים לרקע הקדמי וארבעה לרקע
-    האחורי (או להפך). ככה קו סגור תמיד מפריד, וקו שאינו סגור אף פעם לא. השאלה הזו שואלת רק
-    על היבשה, ולכן לא נתקלים בפרדוקס; אבל מי שסופר גם "אגמים" (חורים של מים בתוך אי) חייב
-    להחליט.
+        לכן בעיבוד תמונה בוחרים שכנות **שונה** ליבשה ולמים : שמונה כיוונים לרקע הקדמי וארבעה לרקע
+        האחורי (או להפך). ככה קו סגור תמיד מפריד, וקו שאינו סגור אף פעם לא. השאלה הזו שואלת רק
+        על היבשה, ולכן לא נתקלים בפרדוקס; אבל מי שסופר גם "אגמים" (חורים של מים בתוך אי) חייב
+        להחליט.
 
     #### השלבים { .sol-steps }
 
@@ -445,9 +449,10 @@ added: 2026-10-29
     - **זמן :** ‏\( O(mn) \), עם לכל היותר \( 8mn \) בדיקות של שכנים במקום \( 4mn \).
     - **זיכרון :** ‏\( O(mn) \), כמו בסעיף א.
 
-    **נסו בעצמכם.** אותה תיבה, עם מתג בין ארבעה לשמונה כיוונים. התיבה מתחילה בשמונה : הפינה
-    בין <span dir="ltr">(2, 4)</span> ל-<span dir="ltr">(3, 3)</span> מחברת את שני האיים. עברו
-    לארבעה וחזרה, או ציירו קו אלכסוני :
+    **נסו בעצמכם.** אותה תיבה, עם מתג בין ארבעה לשמונה כיוונים, והיא מתחילה בשמונה : הפינה
+    בין <span dir="ltr">(2, 4)</span> ל-<span dir="ltr">(3, 3)</span> מחברת את שני האיים. נסו
+    את "מקרה מלכודת : קו אלכסוני" : כמה איים בשמונה כיוונים, וכמה בארבעה? ובשמונה, כמה פעמים
+    הסריקה פוגשת בקו יבשה שלא סומנה :
 
     <div class="explorer" data-kind="islands" data-mode="b" data-grid="110000.110011.000010.000100.000100"></div>
 
@@ -589,8 +594,9 @@ added: 2026-10-29
       ליניארי ממש ממיין בספירה : הגדלים הם מספרים שלמים בין 1 ל-\( mn \).
     - **זיכרון :** ‏\( O(mn) \) ל-`seen`, ועוד \( O(k) \) לרשימה.
 
-    **נסו בעצמכם.** אותה תיבה : הגודל של כל אי כתוב בתאים שלו וגדל עם ההצפה, ומתחת ללוח
-    הרשימה הממוינת, שמתעדכנת כשאי נגמר :
+    **נסו בעצמכם.** אותה תיבה, והגודל של כל אי כתוב בתאים שלו וגדל עם ההצפה. נסו את "מקרה
+    מלכודת : אי קטן לפני גדול" : הסריקה מוצאת קודם אי של 3 תאים, ורק המיון בסוף מעביר את
+    האי של 5 לראש הרשימה. מה היה מחזיר קוד שמניח שהאי הראשון שנמצא הוא הגדול :
 
     <div class="explorer" data-kind="islands" data-mode="c" data-grid="110000.110011.000010.000100.000100"></div>
 
@@ -661,3 +667,12 @@ added: 2026-10-29
             רק טבלת הכיוונים ומספר הקואורדינטות : שישה שכנים בצלעות (\( \pm 1 \) בכל ציר), או 26
             עם הפינות והמקצועות. ההצפה, הסימון והסריקה זהים, והזמן \( O(mnp) \). זה בדיוק היתרון
             של לכתוב את השכנים כטבלה.
+
+    - **שורת חילוף או עמודת חילוף (MBIST) :** הלוח הוא מפת כשלים, וכל אי הוא פגם. לכל אי,
+      האם שורת חילוף אחת או עמודת חילוף אחת מספיקה כדי לתקן אותו?
+
+        ??? fu-answer "תשובה"
+            לא הגודל מכריע אלא **הטווח** : ההצפה שומרת לכל אי את השורה והעמודה הקטנות והגדולות
+            ביותר, ושורה אחת מספיקה כשכל התאים באותה שורה (עמודה אחת : כשכולם באותה עמודה). בדוגמה
+            האי התחתון מתוקן בעמודה 3, אבל ה-L של שלושה תאים נפרש על שתי שורות ושתי עמודות וצריך
+            שני קווים (שורה 1 ועמודה 4), בעוד שמקל של שלושה תאים בשורה אחת מתוקן בשורה אחת.
