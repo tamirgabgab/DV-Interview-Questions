@@ -14,6 +14,10 @@ with the count on every stair and the two stairs that make the last one, the tab
 several sets S, the staircase with stair 5 broken, the table of the climbs of n = 10 by the
 number of 2's (orders and multisets), the table of the swapped loops for S = {1, 2, 3}, and
 the table of the ways in exactly t jumps.
+
+The cycle table of the module stairs_ways (part b) comes from module_trace(), a clock-by-clock
+model of the page's RTL: the combinational sum of the window, then the edge that shifts it.
+tests/0100/tb.sv checks the same numbers on the module itself.
 """
 
 from __future__ import annotations
@@ -96,6 +100,27 @@ def exact_table(n: int, steps, tmax: int) -> list[list[int]]:
     for _ in range(tmax):
         row = [sum(row[i - s] for s in steps if s <= i) for i in range(n + 1)]
         rows.append(row)
+    return rows
+
+
+def module_trace(n: int, steps, broken=(), k: int = 6) -> list[dict]:
+    """stairs_ways clock by clock: cycle 0 start, cycles 1..n the stairs (valid, no idle clock),
+    cycle n + 1 idle. Each row is the inputs of its cycle, the combinational sum and the
+    registers inside the cycle; the edge at its end writes the next row's registers."""
+    below, ways_reg, rows = [0] * (k + 1), 0, []                # after reset
+    bad = set(broken)
+    for c in range(n + 2):
+        start, valid = c == 0, 1 <= c <= n
+        brk = valid and c in bad
+        total = sum(below[s] for s in steps)
+        rows.append({"cycle": c, "start": int(start), "valid": int(valid), "stair": c if valid else None,
+                     "broken": int(brk), "b1": below[1], "b2": below[2], "sum": total, "ways": ways_reg})
+        if start:
+            below = [0] * (k + 1)
+            below[1] = ways_reg = 1
+        elif valid:
+            below = [0, 0 if brk else total] + below[1:k]
+            ways_reg = 0 if brk else total
     return rows
 
 
@@ -189,11 +214,36 @@ def table_loops() -> str:
     return "\n".join(rows)
 
 
+def table_cycles() -> str:
+    """The module stairs_ways on the broken-5 run: a row a clock."""
+    rows = ["| מחזור | ‏start | ‏valid | המדרגה | ‏broken | ‏below[1] | ‏below[2] | ‏sum | ‏ways |",
+            "|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|"]
+    w = table(N, S, BROKEN)
+    for r in module_trace(N, S, BROKEN):
+        c = r["cycle"]
+        if 1 <= c <= N + 1:                                     # the window and ways lag by a clock
+            assert r["b1"] == w[c - 1] == r["ways"] and r["b2"] == (w[c - 2] if c >= 2 else 0)
+        bold = lambda v, on: f"**{v}**" if on else str(v)       # noqa: E731
+        cells = [bold(c, c in BROKEN or c == N + 1), str(r["start"]), str(r["valid"]),
+                 "–" if r["stair"] is None else str(r["stair"]), bold(r["broken"], r["broken"]),
+                 bold(r["b1"], c - 1 in BROKEN), str(r["b2"]), str(r["sum"]),
+                 bold(r["ways"], c - 1 in BROKEN or c == N + 1)]
+        rows.append("| " + " | ".join(cells) + " |")
+    return "\n".join(rows)
+
+
 def table_exact() -> str:
-    n, tmax = 6, 6
+    """The ways in exactly t jumps, a row per t and a column per stair, n = 10; the last row
+    sums every column, which is part a's table."""
+    n, t_ask = N, 7
     rows = ["| הקפיצות t | " + " | ".join(str(i) for i in range(n + 1)) + " |", "|:-:|" + ":-:|" * (n + 1)]
-    for t, row in enumerate(exact_table(n, S, tmax)):
-        rows.append(f"| {t} | " + " | ".join(str(v) if v else "·" for v in row) + " |")
+    table_ = exact_table(n, S, n)
+    for t, row in enumerate(table_):
+        cells = [("**%d**" % v if (t, i) == (t_ask, n) else str(v)) if v else "·" for i, v in enumerate(row)]
+        rows.append(f"| {t} | " + " | ".join(cells) + " |")
+    sums = [sum(r[i] for r in table_) for i in range(n + 1)]
+    assert sums == table(n, S)
+    rows.append("| **סך הכול** | " + " | ".join(f"**{v}**" if i == n else str(v) for i, v in enumerate(sums)) + " |")
     return "\n".join(rows)
 
 
@@ -205,6 +255,7 @@ def blocks():
         table_sets(),
         staircase_svg(N, S, BROKEN, "אותו גרם מדרגות כשמדרגה 5 שבורה : עליה 0, מדרגה 6 מקבלת רק ממדרגה 4, ובמדרגה 10 יש 25 דרכים", focus=6),
         legend(focus=True, broken=True),
+        table_cycles(),
         table_by_twos(),
         table_loops(),
         table_exact(),
@@ -214,6 +265,6 @@ def blocks():
 
 if __name__ == "__main__":
     print("a", table(N, S), ways(10, (1, 3, 5)), ways(10, (1, 2, 3)))
-    print("b", table(N, S, BROKEN), ways(N, S, (5, 6)))
+    print("b", table(N, S, BROKEN), ways(N, S, (5, 6)), ways(N, (1, 3), (5, 6)))
     print("c", len(multisets(N, S)), len(multisets(10, (1, 2, 3))), unordered_rows(6, (1, 2, 3)))
     print("d", [exact(N, S, t) for t in range(5, 11)], exact_table(6, S, 6))

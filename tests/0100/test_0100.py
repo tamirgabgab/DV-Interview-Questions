@@ -49,6 +49,33 @@ def test_part_b_numbers():
         for b in range(1, n):
             assert q0100.ways(n, (1, 2), (b,)) == q0100.ways(b - 1, (1, 2)) * q0100.ways(n - b - 1, (1, 2))
     assert q0100.ways(10, (1, 2), (10,)) == 0
+    # two adjacent broken stairs block only {1, 2}: {1, 3} jumps from 4 to 7; a run of max S blocks
+    assert q0100.table(10, (1, 3), (5, 6)) == [1, 1, 1, 2, 3, 0, 0, 3, 3, 3, 6]
+    assert q0100.ways(10, (1, 3), (5, 6, 7)) == 0
+    for steps in SETS:
+        for b in range(1, 8):
+            assert q0100.ways(14, steps, tuple(range(b, b + max(steps)))) == 0, (steps, b)
+    # the box's first trap: S = {2, 3}, stair 1 has no way, 7 ways to stair 10 from 8 and 7
+    assert q0100.table(10, (2, 3)) == [1, 0, 1, 1, 1, 2, 2, 3, 4, 5, 7]
+
+
+# the page's cycle table of stairs_ways (stair 5 broken); tests/0100/tb.sv has the same rows
+CYCLES = {"b1": [0, 1, 1, 2, 3, 5, 0, 5, 5, 10, 15, 25], "b2": [0, 0, 1, 1, 2, 3, 5, 0, 5, 5, 10, 15],
+          "sum": [0, 1, 2, 3, 5, 8, 5, 5, 10, 15, 25, 40], "ways": [0, 1, 1, 2, 3, 5, 0, 5, 5, 10, 15, 25]}
+
+
+def test_module_trace():
+    rows = q0100.module_trace(10, (1, 2), (5,))
+    for key, want in CYCLES.items():
+        assert [r[key] for r in rows] == want, key
+    # ways is a register: in the cycle of stair i it still holds stair i - 1, then w(i)
+    rng = random.Random(3)
+    for _ in range(100):
+        steps = tuple(sorted(rng.sample(range(1, 7), rng.randint(1, 4))))
+        n = rng.randint(1, 14)
+        broken = tuple(b for b in range(1, n + 1) if rng.random() < 0.2)
+        w, rows = q0100.table(n, steps, broken), q0100.module_trace(n, steps, broken)
+        assert [r["ways"] for r in rows[1:]] == w and rows[-1]["ways"] == q0100.ways(n, steps, broken)
 
 
 def test_part_c_numbers():
@@ -79,9 +106,11 @@ def test_part_d_numbers():
             rows = q0100.exact_table(n, steps, n)
             assert all(rows[t][n] == q0100.exact(n, steps, t) for t in range(n + 1))
             assert sum(rows[t][n] for t in range(n + 1)) == q0100.ways(n, steps)
-    # the table of the page: row t, column i is C(t, i - t)
-    rows = q0100.exact_table(6, (1, 2), 6)
-    assert all(rows[t][i] == (comb(t, i - t) if 0 <= i - t <= t else 0) for t in range(7) for i in range(7))
+    # the table of the page: row t, column i is C(t, i - t); the columns sum to part a's table
+    rows = q0100.exact_table(10, (1, 2), 10)
+    assert all(rows[t][i] == (comb(t, i - t) if 0 <= i - t <= t else 0) for t in range(11) for i in range(11))
+    assert [sum(r[i] for r in rows) for i in range(11)] == q0100.table(10, (1, 2))
+    assert [rows[t][6] for t in range(3, 7)] == [1, 6, 5, 1] and rows[7][10] == 35
 
 
 def test_figures_up_to_date():
@@ -108,5 +137,11 @@ def test_explorer_matches_the_reference():
     parsed = node_json(f"const m = {explorer_require()};"
                        "console.log(JSON.stringify(['1.2', '2.1', '1.2.3.4.5.6', '7', '1.1', '', '0.2', '3'].map(m.swSteps)));")
     assert parsed == [[1, 2], [1, 2], [1, 2, 3, 4, 5, 6], None, None, None, None, [3]]
+    traps = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.swTraps));")
+    assert set(traps) == {"s23", "b56", "s13"}
+    got = {k: q0100.table(t["n"], tuple(t["steps"]), tuple(t["broken"])) for k, t in traps.items()}
+    assert got["s23"][1] == 0 and got["s23"][10] == 7 and traps["s23"]["pick"] == 1
+    assert got["b56"][7:] == [0, 0, 0, 0] and traps["b56"]["pick"] == 7
+    assert got["s13"][7] == 3 and got["s13"][10] == 6 and traps["s13"]["pick"] == 7
     short = node_json(f"const m = {explorer_require()};console.log(JSON.stringify([1n, 89n, 99999n, 832040n, 1346269n].map(m.swShort)));")
     assert short == ["1", "89", "99999", "8.3e5", "1.3e6"]

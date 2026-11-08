@@ -7,7 +7,8 @@
 // every climb as the set of stairs it lands on (a bit mask over the stairs 1 .. n-1, the gaps
 // checked against S and the broken stairs), its number of jumps for count_ways_exact, and the
 // counts of each jump size for count_multisets. stairs_ways is fed a stair a clock (now and
-// then with an idle clock), on the page's examples (89, 25, 0) and random sets.
+// then with an idle clock), on the page's examples (89, 25, 0) and random sets, and its
+// registers are checked clock by clock against the page's cycle table (stair 5 broken).
 module tb;
   logic clk = 0, rst_n = 0, start = 0, valid = 0, broken = 0;
   logic [6:1] steps = 0;
@@ -80,6 +81,7 @@ module tb;
     for (int i = 1; i <= n; i++) begin
       if ($urandom_range(3) == 0) begin valid = 0; @(negedge clk); end
       valid = 1; broken = bad[i];
+      #1 if (ways != w[i - 1]) fail($sformatf("stairs_ways stair %0d: ways moved before the edge", i));
       @(negedge clk);
       valid = 0; broken = 0;
       if (ways != w[i]) fail($sformatf("stairs_ways stair %0d: %0d, want %0d", i, ways, w[i]));
@@ -99,6 +101,23 @@ module tb;
       fail("count_multisets on the page's examples");
     if (count_ways_exact(10, '{1, 2}, 7) != 35) fail("count_ways_exact(10, {1, 2}, 7)");
     if (count_ways(92, '{1, 2}) != 64'd12200160415121876738) fail("count_ways(92, {1, 2}) = F(93)");
+    // the page's cycle table: S = {1, 2}, stair 5 broken, a stair a clock with no idle clock;
+    // a row is read in the middle of its cycle, the inputs set and the edge that ends it not
+    // yet come: cycle 0 start, cycles 1 to 10 the stairs, cycle 11 idle
+    begin
+      longint unsigned t_b1[12] = '{0, 1, 1, 2, 3, 5, 0, 5, 5, 10, 15, 25};
+      longint unsigned t_b2[12] = '{0, 0, 1, 1, 2, 3, 5, 0, 5, 5, 10, 15};
+      longint unsigned t_sum[12] = '{0, 1, 2, 3, 5, 8, 5, 5, 10, 15, 25, 40};
+      longint unsigned t_ways[12] = '{0, 1, 1, 2, 3, 5, 0, 5, 5, 10, 15, 25};
+      steps = 6'b000011;
+      for (int c = 0; c < 12; c++) begin
+        @(negedge clk);
+        start = (c == 0); valid = (c >= 1 && c <= 10); broken = (c == 5);
+        #1;
+        if (dut.below[1] != t_b1[c] || dut.below[2] != t_b2[c] || dut.sum != t_sum[c] || ways != t_ways[c])
+          fail($sformatf("cycle table, cycle %0d: below %0d %0d, sum %0d, ways %0d", c, dut.below[1], dut.below[2], dut.sum, ways));
+      end
+    end
     bad = new[11];
     foreach (bad[i]) bad[i] = 0;
     bad[5] = 1;

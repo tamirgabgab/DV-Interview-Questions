@@ -1,5 +1,5 @@
 // kinds: stairs
-//   stairs                 0100        the ways to climb from stair 0 to stair n with jumps from a set S (data-n, data-steps "1.2", data-broken "5.7", data-pick): the stairs in flights of ten rising to the right, every stair with its number of ways (the order matters), a broken stair crossed and 0; the jump sizes 1 to 6 toggled, n from 1 to 30, a stair picked by a tap shows the stairs that jump to it and the sum that makes it, and the button under the stairs breaks or mends the picked stair; the summary gives w(n), and without broken stairs also the count when the order does not matter
+//   stairs                 0100        the ways to climb from stair 0 to stair n with jumps from a set S (data-n, data-steps "1.2", data-broken "5.7", data-pick, data-traps "b56.s13": buttons that load the trap cases of swTraps): the stairs in flights of ten rising to the right, every stair with its number of ways (the order matters), a broken stair crossed and 0; the jump sizes 1 to 6 toggled, n from 1 to 30, a stair picked by a tap shows the stairs that jump to it and the sum that makes it, and the button under the stairs breaks or mends the picked stair; the summary gives w(n), and without broken stairs also the count when the order does not matter
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -34,6 +34,13 @@
     return s.length <= 5 ? s : `${s[0]}.${s[1]}e${s.length - 1}`;
   };
   const group = (v) => v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  // the trap cases a box may offer (data-traps): S = {2, 3}, where stair 1 has no way; the
+  // two adjacent broken stairs that block {1, 2}; the same two that {1, 3} jumps over
+  const swTraps = {
+    s23: { label: `<span dir="ltr">S = {2, 3}</span>`, steps: [2, 3], n: 10, broken: [], pick: 1 },
+    b56: { label: "שבורות 5 ו-6", steps: [1, 2], n: 10, broken: [5, 6], pick: 7 },
+    s13: { label: `<span dir="ltr">{1, 3}</span>, שבורות 5 ו-6`, steps: [1, 3], n: 10, broken: [5, 6], pick: 7 },
+  };
 
   // --- the box ---------------------------------------------------------------------------------
 
@@ -44,6 +51,7 @@
       const broken0 = (box.dataset.broken || "").split(".").map(Number).filter((b) => Number.isInteger(b) && b >= 1 && b <= n0);
       const pick0 = Math.min(n0, Math.max(0, Math.floor(Number(box.dataset.pick)) || n0));
       const st = { n: n0, steps: steps0.slice(), broken: new Set(broken0), pick: pick0 };
+      const traps = (box.dataset.traps || "").split(".").filter((k) => swTraps[k]);
       box.innerHTML =
         `<div class="ex-controls"><div class="sw-jumps" role="group" aria-label="גדלי הקפיצה"><span class="sw-lab">קפיצות</span>` +
         Array.from({ length: KMAX }, (_, k) => `<button type="button" class="md-button sw-tog" data-s="${k + 1}" aria-label="קפיצה של ${k + 1}">${k + 1}</button>`).join("") +
@@ -51,7 +59,9 @@
         `<div class="ex-controls">` +
         `<button type="button" class="md-button sw-break"></button>` +
         `<button type="button" class="md-button sw-mend">תיקון כל המדרגות</button>` +
-        `<button type="button" class="md-button ex-reset">חזרה לערך של העמוד</button></div>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערך של העמוד</button>` +
+        traps.map((k) => `<button type="button" class="md-button ex-preset sw-trap" data-trap="${k}">מקרה מלכודת${NB}: ${swTraps[k].label}</button>`).join("") +
+        `</div>` +
         `<p class="ex-summary sw-sum" aria-live="polite"></p>` +
         `<div class="sw-flights" dir="ltr" role="group" aria-label="המדרגות${NB}: לחיצה על מדרגה בוחרת אותה"></div>` +
         `<span class="viz-legend"><span><i class="sw-key"></i>מדרגה ומספר הדרכים אליה</span><span><i class="sw-key-focus"></i>המדרגה שנבחרה</span>` +
@@ -130,6 +140,11 @@
         draw();
       });
       $(".sw-mend").addEventListener("click", () => { st.broken.clear(); draw(); });
+      box.querySelectorAll(".sw-trap").forEach((b) => b.addEventListener("click", () => {
+        const t = swTraps[b.dataset.trap];
+        Object.assign(st, { n: t.n, steps: t.steps.slice(), broken: new Set(t.broken), pick: t.pick });
+        draw();
+      }));
       $(".ex-reset").addEventListener("click", () => { st.n = n0; st.steps = steps0.slice(); st.broken = new Set(broken0); st.pick = pick0; draw(); });
       fl.addEventListener("click", (ev) => {
         const b = ev.target.closest(".sw-st");
@@ -158,8 +173,8 @@
   dvqExplorers.register({
     views: { stairs: stairsView },
     help: {
-      stairs: "בוחרים גדלי קפיצה, 1 עד 6, ומספר מדרגות. על כל מדרגה מופיע מספר הדרכים להגיע אליה מהקרקע, כשהסדר של הקפיצות חשוב. לחיצה על מדרגה בוחרת אותה : המדרגות שקופצים מהן אליה צבועות, והשורה שמתחת נותנת את הסכום. הכפתור \"שבירת מדרגה\" שובר את המדרגה שנבחרה או מתקן אותה, ומדרגה שבורה מקבלת 0.".replace(/ :/g, " :"),
+      stairs: "בוחרים גדלי קפיצה, 1 עד 6, ומספר מדרגות. על כל מדרגה מופיע מספר הדרכים להגיע אליה מהקרקע, כשהסדר של הקפיצות חשוב. לחיצה על מדרגה בוחרת אותה : המדרגות שקופצים מהן אליה צבועות, והשורה שמתחת נותנת את הסכום. הכפתור \"שבירת מדרגה\" שובר את המדרגה שנבחרה או מתקן אותה, ומדרגה שבורה מקבלת 0. הכפתורים \"מקרה מלכודת\" טוענים מקרה שבו קל לטעות : קבוצה בלי קפיצה של 1, או מדרגות שבורות צמודות.".replace(/ :/g, " :"),
     },
-    models: { swTable, swMultisets, swSteps, swShort },
+    models: { swTable, swMultisets, swSteps, swShort, swTraps },
   });
 })();
