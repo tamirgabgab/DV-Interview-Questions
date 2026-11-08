@@ -99,6 +99,7 @@ DV-Interview-Questions/
 │   │   ├── check_phone.py      # Every built page at 390 px (sideways scroll, JS errors, axe-core)
 │   │   ├── check_404.py        # The 404 page under the site's path, at both widths
 │   │   ├── check_keyboard.py   # A keyboard pass: tab order, focus rings, names, the components' keys
+│   │   ├── check_heights.py    # Every box at 1920 x 1080: the boxes taller than one screen (a warning)
 │   │   ├── check_explorers.py  # Every explorer box: each button clicked, its link and remembered state
 │   │   ├── check_jumps.py      # Every explorer box stepped: no figure moves while it steps
 │   │   ├── check_inputs.py     # Every number and text field of every box: typed, Enter / Tab, the box changes
@@ -802,11 +803,12 @@ python tools/checks/check_phone.py           # every built page at 390 px: no si
 python tools/checks/check_phone.py --scheme dark   # the same in dark mode (CI: manual run with phone_dark)
 python tools/checks/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-core (npm install axe-core)
 python tools/checks/check_explorers.py       # every explorer box clicked through, its link and remembered state
-python tools/checks/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
+python tools/checks/check_jumps.py           # every box stepped at 390, 1200 and 1920 px: no figure moves
 python tools/checks/check_inputs.py          # every box field typed into: Enter, Tab and an input method apply it
 python tools/checks/check_contrast.py        # every colour pair, light and dark (--all prints the passes)
 python tools/checks/check_404.py             # the 404 page as GitHub Pages serves it, at 390 and 1200 px
 python tools/checks/check_keyboard.py        # a keyboard pass over a few pages: tab order, focus, names, the components' keys
+python tools/checks/check_heights.py         # every box at 1920 x 1080, stepped to its end: those over 1000 px (a warning)
 python tools/checks/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```
@@ -852,7 +854,8 @@ needs no Enter handler of its own. A textarea is tried with Tab only; a `data-no
 (a guess, the operands or the brush of a button) with Enter only, and nothing changing is
 then a warning.
 
-`check_jumps.py` opens the same pages at 390 and at 1200 px and steps every box that has a
+`check_jumps.py` opens the same pages at 390, 1200 and 1920 px (where a wide box has two
+columns) and steps every box that has a
 step counter (`.ex-pos`, "k מתוך T" or a bare count) and a next button, from its first step
 to its last, measuring the top of every figure in the box; a figure that moves by more than
 2 px fails, with the step and the element that grew. What keeps the figures still:
@@ -863,6 +866,22 @@ place when it is cleared; a block that grows with the steps (a table of the step
 under the figures; and a live figure whose labels reach the enlarge button only at some
 steps sits in a container marked `data-fig-strip`, whose figures always have the button's
 strip above them. CI runs it in the four explorer shards.
+
+One screen on a computer (session 34, the owner): a whole box should fit a 1920 x 1080
+screen, about 1000 px under the sticky header, measured with the box stepped to its end.
+`check_heights.py` lists the boxes over that (a warning only; CI runs it in the build job).
+A kind lays its blocks out in two columns with `cols` in its register call
+(`dvqExplorers.register({ views, help, cols: { kind: { main, side, w } } })`; `columns()` in
+`core.js`): the box's body blocks (its children under the controls, the summary and the
+answer) that match `side`, and the steps-and-code panel always, go to `.ex-side`; those
+that match `main`, or every other one when `main` is left out, go to `.ex-main`; a block
+that matches neither stays full width where it is (a wide, short figure, whose labels a
+half column would shrink too far). From a 600 px box (a container query,
+`stylesheets/27-box-columns.css`) the columns sit side by side, the main one on the left
+and the side one on the right, and sliders take less room; a narrower box (a phone, a
+1366 px laptop) reads main, then side. `w` sets the main column's track (default
+`minmax(0, 1.15fr)`); a kind's own two-column tweaks go into 27-box-columns.css under
+the kind's name. 0099's `ibanhw` lays itself out the same way by hand (`.ih-grid`).
 
 Folds keep a tall box short on a phone: a proof panel (`<section class="ex-proof">` with
 its `.ex-proof-title`) or a group of controls (`<div class="ex-fold">` whose first child is

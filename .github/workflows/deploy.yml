@@ -217,6 +217,11 @@ jobs:
       - name: Check the keyboard paths
         if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
         run: python tools/checks/check_keyboard.py site
+      # Every box measured at 1920 x 1080: the boxes taller than one screen are listed (a
+      # warning only, the owner's choice; tools/checks/check_heights.py).
+      - name: Measure the explorer boxes on a computer screen
+        if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
+        run: python tools/checks/check_heights.py site
       - uses: actions/upload-artifact@v7
         if: always() && needs.gate.outputs.verified != 'true'
         with:

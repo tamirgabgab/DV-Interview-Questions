@@ -90,11 +90,12 @@ mkdocs build --strict                 # the build CI runs
 python tools/checks/check_links.py           # internal links and anchors of the built site
 python tools/checks/check_phone.py           # every page at 390 px (add --local-cdn in a sandbox)
 python tools/checks/check_explorers.py       # every explorer box: buttons clicked, link and saved state
-python tools/checks/check_jumps.py           # every box stepped at 390 and 1200 px: no figure moves
+python tools/checks/check_jumps.py           # every box stepped at 390, 1200 and 1920 px: no figure moves
 python tools/checks/check_inputs.py          # every box field typed into: Enter, Tab and an input method apply it
 python tools/checks/check_contrast.py        # the site's colour pairs, light and dark (WCAG 2)
 python tools/checks/check_404.py             # the 404 page under the site's path, both widths
 python tools/checks/check_keyboard.py        # a keyboard pass: tab order, focus rings, names, the components' keys
+python tools/checks/check_heights.py         # every box at 1920 x 1080: those taller than one screen (a warning)
 ```
 
 The linter checks RTL at every paragraph start (indented blocks and the steps timeline
@@ -109,7 +110,7 @@ fails if it is then wider than the screen; at both sizes a box's slider and its 
 sit on one row. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
-All twelve run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
+All thirteen run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
 this file or files under `notes/` runs nothing, and `main` skips the checks for a commit that
 already passed on its branch); a failure blocks the deploy. A new colour pair (a text
 or a mark on a fill) goes into the `PAIRS` list of `tools/checks/check_contrast.py`. Verilator
