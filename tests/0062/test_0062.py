@@ -66,6 +66,30 @@ def test_explorer_matches_the_reference():
         assert tuple(pool) == q0062.pools([tuple(t) for t in txns]) == pools([tuple(t) for t in txns])
 
 
+def test_explorer_traps():
+    """The box's trap lines: a send counted before a response at the same time gives the
+    count of closed intervals (4 instead of 2 on the tie of the page, and never more than the
+    pairs of a response and a send at one time above the right answer), and "the most
+    overlaps of one transaction, plus 1" (3 on the page's example, 5 on the long one)."""
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(63)
+    cases = [[[0, 10], [0, 10], [10, 20], [10, 20]], [list(t) for t in q0062.TXNS], [[0, 40], [2, 8], [10, 16], [18, 24], [26, 32]]]
+    cases += [[[s, s + rng.randint(1, 6)] for s in (rng.randint(0, 10) for _ in range(rng.randint(1, 8)))] for _ in range(60)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map((c) => [m.tpSendFirst(c), m.tpPairsBound(c)])));""")
+    assert got[:3] == [[4, 2], [2, 3], [2, 5]]
+    for txns, (wrong, pairs) in zip(cases, got):
+        right = tags_needed([tuple(t) for t in txns])
+        times = {p for t in txns for p in t}
+        closed = max(sum(1 for s, e in txns if s <= p <= e) for p in times)
+        excess = max(min(sum(s == p for s, _ in txns), sum(e == p for _, e in txns)) for p in times)
+        assert wrong == closed and right <= wrong <= right + excess, txns
+        assert pairs == 1 + max(sum(1 for j, (s2, e2) in enumerate(txns) if j != i and s < e2 and s2 < e) for i, (s, e) in enumerate(txns))
+        assert pairs >= right
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 

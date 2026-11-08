@@ -30,6 +30,21 @@
       return { ...x, open: { ...open }, total: open.R + open.W, best: { ...best } };
     });
   };
+  // the traps of the page: the peak when a send is counted before a response at the same
+  // time (the count of closed intervals), and "the most overlaps of one transaction, plus 1"
+  const tpSendFirst = (txns) => {
+    const ev = txns.flatMap(([s, e]) => [[s, 1], [e, -1]]).sort((a, b) => a[0] - b[0] || b[1] - a[1]);
+    let open = 0, best = 0;
+    ev.forEach(([, d]) => { open += d; best = Math.max(best, open); });
+    return best;
+  };
+  const tpPairsBound = (txns) => txns.length ? 1 + Math.max(...txns.map(([s, e], i) => txns.filter(([s2, e2], j) => j !== i && s < e2 && s2 < e).length)) : 0;
+  // the trap cases the box loads (the page's example is its default)
+  const PRESETS = [
+    { name: "תיקו ב-10", two: false, txns: "0-10 0-10 10-20 10-20", title: "שתי תשובות ושתי שליחות באותו רגע" },
+    { name: "חפיפות של זוגות", two: false, txns: "0-40 2-8 10-16 18-24 26-32", title: "טרנזקציה ארוכה שחופפת לארבע קצרות" },
+    { name: "שיאים בו-זמנית", two: true, txns: "R0-10 R2-12 W3-13 W5-15", title: "הקריאות והכתיבות בשיא באותו רגע" },
+  ];
   const tpPools = (txns) => { const r = tpSweep(txns); const b = r.length ? r[r.length - 1].best : { R: 0, W: 0, all: 0 }; return [b.R, b.W, b.all]; };
 
   const parse = (text) => {
@@ -103,6 +118,7 @@
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary tp-sum" aria-live="polite"></p>` +
         `<div class="tp-wrap" data-fig-strip></div>` +
+        `<p class="wv-presets tp-presets">מקרי מלכודת${NB}: ${PRESETS.map((p, k) => `<button type="button" class="md-button ex-preset" data-k="${k}" title="${p.title}">${p.name}</button>`).join(" ")}</p>` +
         `<span class="viz-legend"><span class="tp-one"><i class="tp-key-bar"></i>טרנזקציה</span><span class="tp-two"><i class="tp-key-r"></i>קריאה</span><span class="tp-two"><i class="tp-key-w"></i>כתיבה</span>` +
         `<span><i class="tp-key-open"></i>פתוחה עכשיו</span><span><i class="tp-key-count"></i>כמה פתוחות</span><span><i class="tp-key-max"></i>המקסימום עד עכשיו</span><span><i class="tp-key-cursor"></i>האירוע הנוכחי</span></span>` +
         `<p class="tp-note"></p>`;
@@ -133,7 +149,13 @@
             : `לוחצים על "האירוע הבא"${NB}: האירועים עוברים לפי הזמן, תשובה לפני שליחה באותו רגע.`);
         $(".tp-note").innerHTML = !cur ? "" :
           `${ltr(`t = ${cur.t}`)}${NB}: ${cur.d > 0 ? "שליחה" : "תשובה"} של ${ltr(`${two ? cur.kind : "T"}${cur.i + 1}`)} (${ltr(`${st.txns[cur.i][0]}–${st.txns[cur.i][1]}`)}), המונה ${cur.d > 0 ? "עולה" : "יורד"} ל-${ltr(cur.total)}.` +
+          (cur.d < 0 && R.some((r) => r.t === cur.t && r.d > 0) ? ` באותו רגע יש גם שליחה${NB}: התשובה קודמת, וה-tag שלה כבר פנוי.` : "") +
           (cur.total === cur.best.all && cur.d > 0 && (st.s === 1 || R[st.s - 2].best.all < cur.best.all) ? ` <b>שיא חדש${NB}: ${ltr(cur.total)} ✓</b>` : "");
+        if (done && !two) {
+          const wrong = tpSendFirst(st.txns), pairs = tpPairsBound(st.txns);
+          if (wrong > last.best.all) $(".tp-note").innerHTML += ` שליחה לפני תשובה באותו רגע הייתה נותנת ${ltr(wrong)}, יותר מדי.`;
+          if (pairs > last.best.all) $(".tp-note").innerHTML += ` "הכי הרבה חפיפות ועוד 1" היה נותן ${ltr(pairs)}.`;
+        }
         // the explanation panel: the steps of the moment, the lines they ran, the variables
         const prev = st.s > 1 ? R[st.s - 2] : null;
         let lit, lines, vars;
@@ -171,6 +193,10 @@
         restart();
       }, { fresh: false });
       $(".tp-rand").addEventListener("click", () => seed.draw());
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => {
+        const p = PRESETS[Number(b.dataset.k)];
+        st.two = p.two; st.txns = parse(p.txns); restart();
+      }));
       $(".ex-start").addEventListener("click", () => { stop(); st.s = 0; draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.s--; draw(); });
       $(".ex-next").addEventListener("click", () => { st.s++; draw(); });
@@ -183,11 +209,11 @@
   dvqExplorers.register({
     views: { tagpool: tagpoolView },
     help: {
-      tagpool: "מקלידים טרנזקציות כזוגות שליחה-תשובה (למשל 0-30 5-10), ובשני מאגרים עם R או W לפני כל אחת, או מגרילים. כל צעד הוא אירוע אחד לפי הזמן, תשובה לפני שליחה באותו רגע : הקו שמתחת לטרנזקציות הוא כמה פתוחות, הקו המקווקו השיא עד עכשיו, והטרנזקציות הפתוחות מודגשות. בסוף התשובה היא השיא, ובשני מאגרים גם השיא של כל סוג לבד והחיסכון של מאגר משותף.",
+      tagpool: "מקלידים טרנזקציות כזוגות שליחה-תשובה (למשל 0-30 5-10), ובשני מאגרים עם R או W לפני כל אחת, או מגרילים. כל צעד הוא אירוע אחד לפי הזמן, תשובה לפני שליחה באותו רגע : הקו שמתחת לטרנזקציות הוא כמה פתוחות, הקו המקווקו השיא עד עכשיו, והטרנזקציות הפתוחות מודגשות. כפתורי מקרי המלכודת טוענים תיקו בזמן, טרנזקציה שחופפת להרבה אחרות, ושני שיאים באותו רגע. בסוף התשובה היא השיא, ובשני מאגרים גם השיא של כל סוג לבד והחיסכון של מאגר משותף.",
     },
-    models: { tpSweep, tpPools },
+    models: { tpSweep, tpPools, tpSendFirst, tpPairsBound },
     // the timeline, narrower but its text still at its size, beside its legend and the line
     // of the event; the steps-and-code panel under the timeline
-    cols: { tagpool: { main: ".tp-wrap, .ex-explain", side: ".viz-legend, .tp-note", w: "minmax(0, 3.2fr)" } },
+    cols: { tagpool: { main: ".tp-wrap, .ex-explain", side: ".tp-presets, .viz-legend, .tp-note", w: "minmax(0, 3.2fr)" } },
   });
 })();

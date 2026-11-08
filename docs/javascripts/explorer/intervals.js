@@ -24,6 +24,15 @@
     });
     return ev;
   };
+  // The trap of the page: the same loop on the input as typed, without the sort.
+  const ivMergeUnsorted = (intervals) => {
+    const out = [];
+    intervals.forEach(([s, e]) => {
+      if (out.length && s <= out[out.length - 1][1]) out[out.length - 1][1] = Math.max(out[out.length - 1][1], e);
+      else out.push([s, e]);
+    });
+    return out;
+  };
   // Part b position by position, as trace_skyline(): the events at the position (−h before
   // +h, then by the interval's index), the total before and after them, the piece emitted
   // for the gap since the previous position and whether it joined the previous piece.
@@ -91,11 +100,19 @@
   // a list in Hebrew text: every interval its own short LTR run, so a long list wraps between them
   const spansH = (list, closed) => list.map(([a, b]) => ltr(span(a, b, closed))).join(" ");
 
+  // the trap cases the box loads (the page's examples are its defaults)
+  const PRESETS = [
+    { name: "לא ממוין", mode: "a", ivs: "8-10 1-3 2-6", title: "קלט שלא ממוין לפי ההתחלה" },
+    { name: "מקונן", mode: "a", ivs: "1-10 2-3 4-5", title: "שני קטעים בתוך קטע ארוך" },
+    { name: "נוגעים", mode: "a", ivs: "1-4 4-5", title: "שני קטעים סגורים שנוגעים בנקודה אחת" },
+    { name: "נוגעים באותו גובה", mode: "b", ivs: "0-2-3 2-4-3", title: "קטע נגמר ואחר באותו גובה מתחיל באותו מיקום" },
+    { name: "מתחילים יחד", mode: "b", ivs: "0-4-1 0-4-2", title: "שני קטעים עם אותה התחלה ואותו סוף" },
+  ];
   const MODES = { a: "מיזוג קטעים (סעיף א)", b: "הגובה הכולל (סעיף ב)", c: "השיא והסף (סעיף ג)" };
   const STEPS = {
-    a: ["מיון לפי ההתחלה", "מתחיל עד הסוף : מאריכים", "מתחיל אחרי הסוף : קטע חדש", "התשובה : הרשימה הממוזגת"],
-    b: ["שני אירועים לקטע, +h ו-−h", "מיון לפי מיקום", "לפני האירועים : פולטים חתיכה", "מעדכנים את הסכום"],
-    c: ["החתיכות של סעיף ב", "הסף : מצטרפת לטווח או פותחת חדש", "השיא : הגובה הגדול ביותר"],
+    a: ["מיון לפי ההתחלה", "מתחיל עד הסוף : מאריכים", "מתחיל אחרי הסוף : קטע חדש", "התשובה : הרשימה הממוזגת"],
+    b: ["שני אירועים לקטע, +h ו-−h", "מיון לפי מיקום", "לפני האירועים : פולטים חתיכה", "מעדכנים את הסכום"],
+    c: ["החתיכות של סעיף ב", "הסף : מצטרפת לטווח או פותחת חדש", "השיא : הגובה הגדול ביותר"],
   };
   const CODE = { a: "merge", b: "skyline", c: "above" };
   const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
@@ -230,7 +247,7 @@
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>המצב <select class="iv-mode" aria-label="איזה סעיף">${Object.entries(MODES).map(([v, w]) => `<option value="${v}">${w}</option>`).join("")}</select></label>` +
-        `<label><span>הקטעים</span><input type="text" class="ex-num iv-ivs" dir="ltr" spellcheck="false" aria-label="הקטעים : התחלה-סוף, או התחלה-סוף-גובה, מופרדים ברווח"></label>` +
+        `<label><span>הקטעים</span><input type="text" class="ex-num iv-ivs" dir="ltr" spellcheck="false" aria-label="הקטעים : התחלה-סוף, או התחלה-סוף-גובה, מופרדים ברווח"></label>` +
         `<label class="iv-tlab"><span>T</span> <input type="range" class="iv-t" min="1" max="9" step="1" dir="ltr" aria-label="הסף T"><output class="iv-tout"></output></label>` +
         `<label>בהגרלה <select class="iv-n" aria-label="כמה קטעים להגריל">${[4, 6, 8, 10].map((v) => `<option value="${v}"${v === 6 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button iv-rand">הגרלה</button><span class="iv-anchor"></span>` +
@@ -244,12 +261,13 @@
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary iv-sum" aria-live="polite"></p>` +
         `<div class="iv-wrap" data-fig-strip></div>` +
+        `<p class="wv-presets iv-presets">מקרי מלכודת${NB}: ${PRESETS.map((p, k) => `<button type="button" class="md-button ex-preset" data-k="${k}" title="${p.title}">${p.name}</button>`).join(" ")}</p>` +
         `<span class="viz-legend"><span class="iv-only-a"><i class="iv-key-bar"></i>קטע מהקלט</span><span class="iv-only-a"><i class="iv-key-merged"></i>קטע ממוזג</span>` +
         `<span class="iv-not-a"><i class="iv-key-blk"></i>הגובה של קטע אחד</span><span class="iv-not-a"><i class="iv-key-line"></i>הגובה הכולל</span><span class="iv-only-b"><i class="iv-key-piece"></i>חתיכה שנפלטה</span>` +
         `<span class="iv-only-c"><i class="iv-key-thr"></i>הסף T</span><span class="iv-only-c"><i class="iv-key-peak"></i>השיא עד עכשיו</span><span class="iv-only-c"><i class="iv-key-range"></i>טווח בגובה לפחות T</span>` +
         `<span><i class="iv-key-cur"></i>הקטע או החתיכה של הצעד</span></span>` +
         `<p class="iv-note"></p>`;
-      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
+      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       answer(box, NB); answer(box, null);           // the answer line keeps its place from the first step
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
@@ -275,7 +293,7 @@
           if (e) {
             if (e.prev_end === null) note = `הפלט ריק, ולכן ${ltr(span(e.s, e.e, true))} נפתח כקטע הראשון.`;
             else if (e.kind === "new") note = `${ltr(`${e.s} > ${e.prev_end}`)}${NB}: הקטע מתחיל אחרי הסוף של הקטע הממוזג האחרון, ולכן אינו חופף לו, וגם לא לקטעים שלפניו, שנגמרים עוד קודם. הוא נוסף לפלט כקטע חדש, והקודם לא ישתנה יותר.`;
-            else if (e.kind === "extend") note = `${ltr(`${e.s} ≤ ${e.prev_end}`)}${NB}: הקטע חופף לקטע הממוזג האחרון, והסוף של האחרון גדל מ-${ltr(e.prev_end)} ל-${ltr(e.e)}.`;
+            else if (e.kind === "extend") note = `${ltr(`${e.s} ≤ ${e.prev_end}`)}${NB}: הקטע חופף לקטע הממוזג האחרון${e.s === e.prev_end ? " (הם נוגעים בנקודה אחת, ובקטעים סגורים זו חפיפה)" : ""}, והסוף של האחרון גדל מ-${ltr(e.prev_end)} ל-${ltr(e.e)}.`;
             else note = `${ltr(`${e.s} ≤ ${e.prev_end}`)} וגם ${ltr(`${e.e} ≤ ${e.prev_end}`)}${NB}: הקטע כולו בתוך הקטע הממוזג האחרון, ודבר לא משתנה.`;
           }
           if (!e) { lines = { py: [4, 5], sv: [6, 7, 8, 9] }; vars = ltr("out = []"); }
@@ -286,7 +304,11 @@
             const endAfter = e.after[e.after.length - 1][1];
             vars = [ltr(`i = ${e.i}`), ltr(`s = ${e.s}`), ltr(`e = ${e.e}`), V("end", e.prev_end === null ? "—" : e.prev_end, endAfter), ltr(`out = ${spans(e.after, true)}`)].join(" · ");
           }
-          if (done && e) { ans = `הקטעים הממוזגים${NB}: ${spansH(e.after, true)}.`; marks = ".iv-wrap .iv-merged"; }
+          if (done && e) {
+            ans = `הקטעים הממוזגים${NB}: ${spansH(e.after, true)}.`; marks = ".iv-wrap .iv-merged";
+            const raw = ivMergeUnsorted(st.ivs);
+            if (JSON.stringify(raw) !== JSON.stringify(e.after)) note += ` בלי המיון, על הקלט כפי שהוקלד, אותה לולאה הייתה מחזירה ${spansH(raw, true)}${NB}: שגוי.`;
+          }
         } else if (m === "b") {
           $(".iv-wrap").innerHTML = svgB(st.ivs, e);
           const evs = (x) => x.events.map((q) => ltr(`${q.d > 0 ? "+" : "−"}${Math.abs(q.d)}`) + ` (קטע ${ltr(q.i + 1)})`).join(", ");
@@ -350,6 +372,10 @@
         restart();
       }, { fresh: false });
       $(".iv-rand").addEventListener("click", () => seed.draw());
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => {
+        const p = PRESETS[Number(b.dataset.k)];
+        st.mode = p.mode; st.ivs = parse(p.ivs); restart();
+      }));
       $(".ex-start").addEventListener("click", () => { stop(); st.s = 0; draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.s--; draw(); });
       $(".ex-next").addEventListener("click", () => { st.s++; draw(); });
@@ -362,9 +388,9 @@
   dvqExplorers.register({
     views: { intervals: intervalsView },
     help: {
-      intervals: "מקלידים קטעים כזוגות התחלה-סוף (למשל 1-3 2-6), ובסעיפים ב ו-ג עם גובה, התחלה-סוף-גובה (למשל 1-7-7), או מגרילים. בסעיף א כל צעד הוא קטע אחד בסדר הממוין : מאריך את הקטע הממוזג האחרון או פותח חדש, והפלט על השורה שמתחת לציר. בסעיף ב כל צעד הוא מיקום אחד של אירועים : החתיכה עד אליו נפלטת בגובה הסכום הרץ, הבלוקים הם הגובה של כל קטע והקו הוא הסכום. בסעיף ג כל צעד הוא חתיכה אחת מול הסף T שבסליידר : מצטרפת לטווח או פותחת חדש, והשיא מקווקו. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
+      intervals: "מקלידים קטעים כזוגות התחלה-סוף (למשל 1-3 2-6), ובסעיפים ב ו-ג עם גובה, התחלה-סוף-גובה (למשל 1-7-7), או מגרילים. בסעיף א כל צעד הוא קטע אחד בסדר הממוין : מאריך את הקטע הממוזג האחרון או פותח חדש, והפלט על השורה שמתחת לציר. בסעיף ב כל צעד הוא מיקום אחד של אירועים : החתיכה עד אליו נפלטת בגובה הסכום הרץ, הבלוקים הם הגובה של כל קטע והקו הוא הסכום. בסעיף ג כל צעד הוא חתיכה אחת מול הסף T שבסליידר : מצטרפת לטווח או פותחת חדש, והשיא מקווקו. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד. כפתורי מקרי המלכודת טוענים קלט לא ממוין, קטעים מקוננים ונוגעים, ובסעיף ב קטעים שנוגעים באותו גובה או מתחילים יחד.",
     },
-    cols: { intervals: { main: ".viz-legend, .iv-note" } },   // the wide timeline stays full width; under it its legend and the step's note beside the code
-    models: { ivMerge, ivSkyline, ivPieces, ivAbove },
+    cols: { intervals: { main: ".iv-presets, .viz-legend, .iv-note" } },   // the wide timeline stays full width; under it its legend and the step's note beside the code
+    models: { ivMerge, ivMergeUnsorted, ivSkyline, ivPieces, ivAbove },
   });
 })();

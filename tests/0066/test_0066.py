@@ -65,6 +65,28 @@ def test_explorer_matches_the_reference():
         assert [tuple(json.dumps(e[k]) for k in keys) for e in ev] == [tuple(json.dumps(e[k]) for k in keys) for e in ref], (tr, t)
 
 
+def test_explorer_unsorted_trap():
+    """The box's "without the sort" line: the page's loop on the input as typed. On the trap
+    of the page it swallows [1, 3] and [2, 6] into [8, 10]; on sorted input it is merge()."""
+    from page_tests import explorer_require, node_json
+
+    raw = [[[8, 10], [1, 3], [2, 6]], [[1, 10], [2, 3], [4, 5]], [[1, 4], [4, 5]]] + [[list(x) for x in c] for c in cases(6605, 20, False)]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(raw)}.map((a) => m.ivMergeUnsorted(a))));""")
+    assert got[0] == [[8, 10]]
+    for ivs, out in zip(raw, got):
+        ref = []
+        for s, e in ivs:                                   # merge() without its sorted()
+            if ref and s <= ref[-1][1]:
+                ref[-1][1] = max(ref[-1][1], e)
+            else:
+                ref.append([s, e])
+        assert out == ref, ivs
+        if ivs == sorted(ivs):
+            assert [tuple(x) for x in out] == q0066.brute_merge(ivs)
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 

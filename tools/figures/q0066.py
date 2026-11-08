@@ -334,9 +334,9 @@ def table_above(triples, t):
 
 def blocks():
     """The generated blocks, in page order."""
-    return [merge_svg(IVS, "ארבעה קטעים סגורים : [1, 3], [2, 6], [8, 10] ו-[15, 18], ומתחתם התוצאה הממוזגת [1, 6], [8, 10], [15, 18]"),
+    return [merge_svg(IVS, "ארבעה קטעים סגורים : [1, 3], [2, 6], [8, 10] ו-[15, 18], ומתחתם התוצאה הממוזגת [1, 6], [8, 10], [15, 18]"),
             legend_a(), table_merge(IVS),
-            skyline_svg(TRIPLES, "שני קטעים, [1, 7) בגובה 7 ו-[2, 6) בגובה 4, ומתחתם הגובה הכולל : 7 ב-[1, 2), 11 ב-[2, 6) ו-7 ב-[6, 7)"),
+            skyline_svg(TRIPLES, "שני קטעים, [1, 7) בגובה 7 ו-[2, 6) בגובה 4, ומתחתם הגובה הכולל : 7 ב-[1, 2), 11 ב-[2, 6) ו-7 ב-[6, 7)"),
             legend_b(), table_skyline(TRIPLES),
             skyline_svg(TRIPLES_C, "ארבעה קטעים עם גבהים, הגובה הכולל שלהם, הסף T = 4 והשיא 6 ב-[2, 3)", threshold=T_C, peak_mark=True),
             legend_c(), table_above(TRIPLES_C, T_C)]
