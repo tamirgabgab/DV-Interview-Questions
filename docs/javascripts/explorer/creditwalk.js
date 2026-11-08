@@ -229,6 +229,7 @@
     help: {
       creditwalk: "בוחרים מודל : p ו-q, או p, q ו-r, או λ1 ו-λ2 של הזמנים הגאומטריים. N הוא הקיר העליון ו-k נקודת ההתחלה. \"מחזור אחד\" מזיז את המונה פעם אחת, \"עד הקיר\" מסיים את הריצה, ו-\"100 ריצות\" מוסיף מאה ריצות לספירה. הספירה מושווית לנוסחה, ובשני הגרפים העקומות של הסיכוי להתמלא ושל מספר המחזורים הממוצע לכל k, עם העיגול הריק של מה שנמדד.",
     },
+    cols: { creditwalk: { main: ".cw-grid", side: ".viz-legend, .cw-now, .cw-count", w: "minmax(0, 2.2fr)" } },   // the walk and the curves beside their key and the run text
     models: { cwSteps, cwOdds, cwCurves, cwStep, cwRun },
   });
 })();

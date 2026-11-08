@@ -87,6 +87,11 @@
         `<p class="eu-pour-text"></p></section>`;
       const $ = (sel) => box.querySelector(sel);
       const slider = $(".ex-k");
+      // in two columns (a box of 600 px and more, stylesheets/27-box-columns.css) each chart has
+      // half the width: a narrower drawing keeps its labels readable
+      const two = () => { const cs = getComputedStyle(box); return box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) >= 600; };
+      // a country's label under its bar: shorter in the narrower drawing
+      const short = (name, W) => { const max = W < 640 ? 7 : 9; return name.length > max ? name.slice(0, max - 1) + "…" : name; };
       const draw = () => {
         const sc = euroScan(euroWithIsrael(st.jury, st.pub));
         const n = sc.rows.length - 1;
@@ -95,7 +100,7 @@
         $(".ex-jury").value = st.jury; $(".ex-pub").value = st.pub;
         const row = sc.rows[st.k];
         // the cups: every country above Israel by the jury, announced or not
-        const W = 640, H = 300, X0 = 48, BASE = 240, TOP = 20;
+        const W = two() ? 476 : 640, H = 300, X0 = 48, BASE = 240, TOP = 20;
         const ymax = Math.max(sc.total, ...sc.above.map((r) => r[1] + r[2]), 1) * 1.08;
         const Y = (v) => BASE - (v / ymax) * (BASE - TOP);
         const slot = (W - X0 - 12) / Math.max(sc.above.length, 1), bw = slot * 0.6;
@@ -113,7 +118,7 @@
           } else if (jury < sc.total) {
             s += `<rect class="cup-room" x="${f(x)}" y="${f(Y(sc.total))}" width="${f(bw)}" height="${f(Y(jury) - Y(sc.total))}"><title>${country} : מקום פנוי ${sc.total - jury}</title></rect>`;
           }
-          s += `<text class="tick" x="${f(cx)}" y="${BASE + 16}" text-anchor="middle" font-size="10">${country.length > 9 ? country.slice(0, 8) + "…" : country}</text>` +
+          s += `<text class="tick" x="${f(cx)}" y="${BASE + 16}" text-anchor="middle" font-size="10">${short(country, W)}</text>` +
                `<text class="tick" x="${f(cx)}" y="${BASE + 30}" text-anchor="middle" font-size="10">${announced ? jury + pub : jury}</text>`;
         });
         s += `<line class="axis" x1="${X0}" x2="${W - 12}" y1="${BASE}" y2="${BASE}"/></svg>`;
@@ -143,7 +148,7 @@
       let pourAnim = null;
       const drawPour = (share = 1) => {
         const res = euroWithIsrael(st.jury, st.pub), pr = euroPour(res, Math.min(st.k, euroScan(res).rows.length - 1), share), full = euroPour(res, Math.min(st.k, euroScan(res).rows.length - 1));
-        const W = 640, H = 270, X0 = 48, BASE = 220, TOP = 16, n = pr.cups.length + 1;
+        const W = two() ? 476 : 640, H = 270, X0 = W < 640 ? 36 : 48, BASE = 220, TOP = 16, n = pr.cups.length + 1;   // narrower: the cups get the room
         const ymax = Math.max(pr.total, full.spill, ...pr.cups.map((c) => c.jury), 1) * 1.1, Y = (v) => BASE - (v / ymax) * (BASE - TOP);
         const slot = (W - X0 - 12) / Math.max(n, 2), bw = slot * 0.6;
         let s = `<svg class="perf-chart eu-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="${pr.left} נקודות הקהל שנותרו נמזגות לכוסות של ${pr.cups.length} המדינות שעוד לא הכריזו, כל כוס עד ${pr.total}, ומה שלא נכנס נשפך">`;
@@ -155,8 +160,8 @@
           s += `<rect class="bar by-multiples" x="${f(x)}" y="${f(Y(c.jury))}" width="${f(bw)}" height="${f(BASE - Y(c.jury))}"><title>${c.country} : שופטים ${c.jury}</title></rect>`;
           if (c.room > 0) s += `<rect class="cup-room" x="${f(x)}" y="${f(Y(pr.total))}" width="${f(bw)}" height="${f(Y(c.jury) - Y(pr.total))}"><title>${c.country} : מקום פנוי ${c.room}</title></rect>`;
           if (c.fill > 0) s += `<rect class="pour-water" x="${f(x)}" y="${f(Y(c.jury + c.fill))}" width="${f(bw)}" height="${f(Y(c.jury) - Y(c.jury + c.fill))}"><title>${c.country} : נמזגו ${c.fill}</title></rect>`;
-          s += `<text class="tick" x="${f(cx)}" y="${BASE + 16}" text-anchor="middle" font-size="10">${c.country.length > 9 ? c.country.slice(0, 8) + "…" : c.country}</text>` +
-               `<text class="tick" x="${f(cx)}" y="${BASE + 30}" text-anchor="middle" font-size="10">${c.fill} / ${c.room}</text>`;
+          s += `<text class="tick" x="${f(cx)}" y="${BASE + 16}" text-anchor="middle" font-size="10">${short(c.country, W)}</text>` +
+               `<text class="tick" x="${f(cx)}" y="${BASE + 30}" text-anchor="middle" font-size="10">${W < 640 ? `${c.fill}/${c.room}` : `${c.fill} / ${c.room}`}</text>`;
         });
         const xs = X0 + pr.cups.length * slot + (slot - bw) / 2;
         if (pr.spill > 0) s += `<rect class="overflow" x="${f(xs)}" y="${f(Y(pr.spill))}" width="${f(bw)}" height="${f(BASE - Y(pr.spill))}"><title>נשפך : ${pr.spill}</title></rect>`;
@@ -201,6 +206,7 @@
     help: {
       eurovision: "״ההכרזה הבאה״ מוסיפה מדינה : הכוסות מתחת לסכום של ישראל כנגד הנקודות שנותרו. תיבת ה״מה אם״ משנה את הניקוד של ישראל. בשלב ההוכחה ״מזיגה״ ממלאת את הכוסות שנותרו עד הסף, ומה שלא נכנס נשפך.",
     },
+    cols: { eurovision: { main: ".eu-chart, .eu-step", side: ".eu-proof", w: "minmax(0, 1fr)" } },   // the cups beside the pouring proof
     models: { EURO_RESULTS, EURO_PUBLIC_TOTAL, euroOrder, euroWithIsrael, euroCannotWin, euroScan, euroPour },
   });
 })();

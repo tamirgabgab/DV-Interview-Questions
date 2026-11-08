@@ -221,6 +221,7 @@
     help: {
       camel: "״המעבר הבא״ ו״הפעלה״ מזיזים את הגמל מעבר אחרי מעבר על ציר הדרך : הליטרים שעליו מסומנים לידו, כל מחסן מראה כמה ליטר יש בו, והשורה מתחת מסבירה מה הוא עשה. בתיבה הכללית הסליידרים והשדות קובעים את הצריכה, הקיבולת, המים והיעד, והגרף מראה את המרחק המקסימלי לכל כמות מים עם הקירוב הלוגריתמי. המתג ״המחירון על הדרך״ מראה מתחת לכל קטע כמה פעמים הגמל עבר בו ומה עולה בו ק״מ.",
     },
+    cols: { camel: { main: ".viz-legend, .cm-road, .ex-title, .cm-chart", side: ".cm-step, .cm-price-text", w: "minmax(0, 1.6fr)" } },   // the road and the chart beside the step and the price list
     models: { camelLevels, camelSegments, camelDistance, camelApprox, camelPasses, camelCrossings },
   });
 })();

@@ -146,8 +146,11 @@
         row.innerHTML = long.map((b, i) => i === 0
           ? `<span class="bx-cut-cell is-first">${b}</span>`
           : `<button type="button" class="bx-cut-cell${i === h ? " is-cut" : ""}${i <= h ? " is-a" : " is-b"}${i >= lo && i <= hi ? "" : " is-bad"}" data-h="${i}" aria-pressed="${i === h}" aria-label="${b}, חיתוך אחרי ${i} קופסאות">${b}</button>`).join("");
-        // the chart: one column per h, the larger piece's length
-        const w = 640, ht = 200, x0 = 46, right = 12, top = 14, base = 166, slot = (w - x0 - right) / (L - 1);
+        // the chart: one column per h, the larger piece's length; in two columns (a box of
+        // 600 px and more, stylesheets/27-box-columns.css) the proof has half the width, and a
+        // narrower drawing keeps its numbers readable
+        const cs = getComputedStyle(box), two = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) >= 600;
+        const w = two ? 360 : 640, ht = 200, x0 = 46, right = 12, top = 14, base = 166, slot = (w - x0 - right) / (L - 1);
         const Y = (v) => base - (v / L) * (base - top);
         let svg = `<svg class="perf-chart" viewBox="0 0 ${w} ${ht}" role="img" aria-label="החתיכה הגדולה לכל נקודת חיתוך, מול הקו N / 2 = ${m}">`;
         [0, m, L].forEach((v) => { svg += `<line class="grid" x1="${x0}" x2="${w - right}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${x0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`; });
@@ -309,6 +312,7 @@
     help: {
       boxes: "N קופסאות במעגל עם המעגלים שלהן בצבעים : ״ערבוב״ מגריל סידור, בוחרים אדם ועוקבים אחרי הפתיחות שלו, ו״1,000 סיבובים״ משווה את האסטרטגיה עם אדם 0 ובלעדיו לבחירה אקראית, וסופר כמה החלפות אדם 0 עשה. ״העתקת קישור״ שומר את המצב. בשלב ההוכחה בוחרים בעצמכם איפה אדם 0 חותך את המעגל הארוך, ורואים מתי שתי החתיכות קצרות מספיק.",
     },
+    cols: { boxes: { main: ".bx-box", side: ".bx-proof" } },   // the ring and the walk beside the proof; the 1,000 rounds stay wide under them
     models: { permCycles, permHelper, permCutAt, permSwap, permWalk, permAllWin, permHelped, permShuffle, permRandomPicks, permStrategyProb, permRandomProb },
   });
 })();

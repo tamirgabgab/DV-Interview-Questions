@@ -100,7 +100,7 @@
       const $ = (sel) => box.querySelector(sel);
       const bits = (v, w) => (v >>> 0).toString(2).padStart(w, "0").slice(-w);
       const grid = (rr, fx, wr, fails) => {
-        const S = 30, L = 118, top = 26, gap = 22, W = L + T * S + 64;
+        const S = 30, L = 118, top = 26, gap = 22, W = L + T * S + 92;   // 92: room for the wait/bound column and its title
         const blocks = [["req", null], ["fixed", fx], [`RR${st.bug !== "none" ? " ✗" : ""}`, rr], ["WRR", wr]];
         const H = top + blocks.length * (N * S + gap);
         const bad = new Set([...fails.onehot, ...fails.spurious]);
@@ -186,6 +186,7 @@
     help: {
       arbiter: "הרשת העליונה היא הבקשות : לחיצה על משבצת מדליקה או מכבה בקשה, או שבוחרים דוגמה. מתחת, המענקים של עדיפות קבועה, ‏round robin ו-WRR, ובסוף כל שורה ההמתנה הארוכה ביותר מול החסם. ״המחזור הבא״ בוחר מחזור, והטבלה מראה את הטריק של round robin בו. ״באג״ מכניס באג ל-round robin, והרשימה מראה איזו assertion נכשלת ומתי.",
     },
+    cols: { arbiter: { side: ".arb-trick, .arb-rules", w: "minmax(0, 1.4fr)" } },   // the grid beside the trick table and the assertions
     models: { arbFixed, arbTrick, arbRR, arbWRR, arbCheck, arbMaxWait },
   });
 })();

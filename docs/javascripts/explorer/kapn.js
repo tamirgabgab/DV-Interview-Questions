@@ -331,6 +331,10 @@
       kapn: "מקלידים שלוש ספרות או מגרילים, ובוחרים n עד 1000 (ובסעיף הבונוס גם בסיס) : הגרף מראה את הפער D_k אחרי כל פעולה, והטבלה משווה בכל צעד את הספרות מהנוסחה של העמוד לספרות מהחישוב הישיר, עם השורה בנוסחה שנתנה אותן.",
       kapgraph: "בוחרים בסיס מ-2 עד 20 ומקלידים שלוש ספרות : הדיאגרמה מראה את המספרים שהפעולה עוברת בהם, כל כרטיס בצבע לפי הפער d ועם השלב בהוכחה, עד הלולאה של נקודת השבת או החץ החוזר של המחזור. הטבלה מפרטת את a_n, b_n, c_n ו-d_n, ולחיצה על כרטיס או על שורה מסבירה את הצעד.",
     },
+    cols: {
+      kapn: { main: ".ex-title, .kn-chart", side: ".viz-legend", w: "minmax(0, 2fr)" },   // the chart beside its key; the table stays wide
+      kapgraph: { main: ".kg-graph, .viz-legend", side: ".kg-step, .kg-table" },   // the diagram beside the table of the steps
+    },
     models: { kapnDigits, kapnStep, kapnRun, kapnGap, kapnFormula, kapgChain, kapgStage },
   });
 })();
