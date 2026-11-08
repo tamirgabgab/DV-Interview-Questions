@@ -8,8 +8,9 @@ The reference here is independent of the page code: coefficients() finds the pla
 a load by searching every coefficient vector, and convert() replays the digit-by-digit
 conversion for the tables (the rows the weights explorer steps through). blocks() returns,
 in page order: part a's balance for 40 on one pan, the legend of the balances, the halving
-table of 40; part b's balance for 25, the conversion tables of 25 and of 40; part c's
-the table of the reach by the number of states per weight, the conversion of 40 in
+table of 40; part b's balance for 25, the conversion tables of 25 and of 40, the number line
+of the uniqueness proof (the triples t - 1, t, t + 1 tiling -40..40) and its legend; part
+c's table of the reach by the number of states per weight, the conversion of 40 in
 balanced base 5, and its balance with two copies of each weight.
 """
 
@@ -121,6 +122,63 @@ def legend(two: bool) -> str:
     return f'<span class="viz-legend">{"".join(keys)}</span>'
 
 
+# --- the number line of the uniqueness proof ----------------------------------------------
+
+def tiling_svg() -> str:
+    """Step 3 of part b's uniqueness proof: with the weight 1 fixed, every value -40..40 is
+    t - 1, t or t + 1 for a value t of the other three weights, each exactly once. Above, the
+    27 triples around t = -39, -36, ..., 39 tile the line with no overlap and no gap; under it,
+    two neighbours t and t' of T: 2 apart they share a value, 3 apart they tile, 4 apart they
+    leave a value no placement reaches."""
+    W, X0, U, TOP, TH = 640, 20, 600 / 81, 8, 26
+    T = range(-39, 40, 3)
+    assert sorted(v for t in T for v in (t - 1, t, t + 1)) == list(range(-40, 41))
+
+    def vx(v):                                          # the left edge of the cell of v
+        return X0 + (v + 40) * U
+
+    s = (f'<svg class="figure wt-fig" viewBox="0 0 {W} 176" direction="ltr" role="img" aria-label="השלשות '
+         f'של t פחות 1, t ו-t ועוד 1, סביב t = {MINUS}39, {MINUS}36 עד 39, מכסות כל מספר מ-{MINUS}40 עד 40 '
+         f'פעם אחת. מתחת : שני איברים סמוכים של T ברווח 2 חולקים ערך, ברווח 3 מרצפים, ברווח 4 משאירים ערך בלי הצבה">')
+    for t in T:
+        s += (f'<rect class="tri-ok" x="{vx(t - 1):.1f}" y="{TOP}" width="{3 * U:.1f}" height="{TH}">'
+              f'<title>t = {num(t)}: {num(t - 1)}, {num(t)}, {num(t + 1)}</title></rect>'
+              f'<circle class="center-dot" cx="{vx(t) + U / 2:.1f}" cy="{TOP + TH / 2}" r="2.5"/>')
+    for v in range(-40, 41, 10):
+        x = vx(v) + U / 2
+        s += (f'<line class="axis" x1="{x:.1f}" y1="{TOP + TH}" x2="{x:.1f}" y2="{TOP + TH + 6}"/>'
+              f'<text class="tick" x="{x:.1f}" y="{TOP + TH + 22}" text-anchor="middle">{num(v)}</text>')
+    # the three neighbours of t = 0: t' = 2 (on the right, read first), 3 and 4
+    C, Y, gap = 28, 104, 48
+    widths = {g: (g + 3) * C for g in (2, 3, 4)}
+    x = W - 20
+    for g in (2, 3, 4):
+        x -= widths[g]
+        left = x
+        for v in range(-1, g + 2):
+            cnt = (abs(v) <= 1) + (abs(v - g) <= 1)
+            cx = left + (v + 1) * C
+            if cnt:
+                s += f'<rect class="{"tri-bad" if cnt == 2 else "tri-ok"}" x="{cx:g}" y="{Y}" width="{C}" height="{TH}"/>'
+                s += f'<text class="wt-num" x="{cx + C / 2:g}" y="{Y + 19}" text-anchor="middle">{num(v)}</text>'
+            else:
+                s += (f'<g class="wt-w is-wait"><title>{v}: no placement</title><rect x="{cx + 1:g}" y="{Y + 1}" width="{C - 2}" height="{TH - 2}"/>'
+                      f'<text class="wt-num" x="{cx + C / 2:g}" y="{Y + 19}" text-anchor="middle">{num(v)}</text></g>')
+        for c0, y0, y1, lab, ly in ((0, Y - 4, Y - 10, "t = 0", Y - 16), (g, Y + TH + 4, Y + TH + 10, f"t′ = {g}", Y + TH + 28)):
+            a, b = left + c0 * C + 3, left + (c0 + 3) * C - 3
+            s += (f'<path class="ink-line" d="M{a:g},{y0} V{y1} H{b:g} V{y0}" fill="none" stroke-width="1.5"/>'
+                  f'<text class="legend" x="{(a + b) / 2:g}" y="{ly}" text-anchor="middle">{lab}</text>')
+        x -= gap
+    return s + "</svg>"
+
+
+def tiling_legend() -> str:
+    return ('<span class="viz-legend"><span><i class="by-bfs"></i>שלשה של ערכים, פעם אחת</span>'
+            '<span><i class="ink"></i>‏t, ערך של שלוש המשקולות האחרות</span>'
+            '<span><i class="s2"></i>ערך ששתי הצבות נותנות</span>'
+            '<span><i class="wt-key-wait"></i>ערך ששום הצבה לא נותנת</span></span>')
+
+
 # --- the tables ---------------------------------------------------------------------------
 
 def halving_table(n: int, k: int) -> str:
@@ -165,6 +223,8 @@ def blocks():
         legend(True),
         ternary_table(25, 4),
         ternary_table(40, 4),
+        tiling_svg(),
+        tiling_legend(),
         reach_table(),
         ternary_table(40, 3, 2),
         balance_svg(40, 3, 2, True, "שני עותקים מכל משקולת : המשא 40 ושתי משקולות של 5 בכף אחת, מול שתי משקולות של 25 בכף השנייה"),

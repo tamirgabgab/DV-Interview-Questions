@@ -337,6 +337,7 @@ PAIRS = [
     ("0086 chameleons, a state never reached", "var(--viz-text)", [CARD, PAGE], UI),
     ("0086 chameleons, the start ring", "var(--viz-s2-text)", [CARD, PAGE], UI),
     ("0086 chameleons, the path so far", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0064 weights, a value two triples share (the tiling figure)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 15%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 15%, var(--md-default-bg-color))"], TEXT),
     ("0086 chameleons, the shortest-plan tag", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
     # 0087 lights out (stylesheets/questions/0087-lights.css): the boards of the figures and of the box
     ("0087 lights out, the rim of a light that is on", "var(--viz-ink)", [CARD, PAGE, "var(--md-accent-fg-color)"], UI),
