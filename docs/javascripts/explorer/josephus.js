@@ -1,10 +1,11 @@
 // kinds: josephus
-//   josephus               0016        sliders N and L (2 to 6), and the circle played step by step; the survivor chart with the zero points; a seat lookup, N up to a million; the proof panel: the new labels after every step and a full round
+//   josephus               0016        sliders N and L (2 to 6), and the circle played step by step; the survivor chart with the zero points; a seat lookup, N up to a million; the proof panel: the new labels after every step and a full round; trap buttons (data-traps: circle sizes at the box's L)
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
   const { answer, f, frame, ltr } = dvqExplorers.lib;
+  const NB = "\u00a0";
 
   const josephusZero = (n, L) => {
     let m = 1 + ((n - 1) % (L - 1));
@@ -78,6 +79,8 @@
     mount(box2) {
       const nmax = Number(box.dataset.nmax || 64), lmax = Number(box.dataset.lmax || 6), NBIG = 1000000, NCIRCLE = 128;
       const defaults = { n: Number(box.dataset.n || 20), l: Number(box.dataset.l || 2) };
+      // the page's trap cases (data-traps="21,53"): circle sizes loaded at the box's own L
+      const traps = (box.dataset.traps || "").split(",").map(Number).filter((v) => v >= 1 && v <= nmax);
       const st = { ...defaults, s: 0, seat: null };
       const runFast = (n) => josephusSurvivor(n, st.l);
       box.innerHTML =
@@ -87,7 +90,9 @@
         `<label><span>הכלל ${ltr("L")} : אחד נשאר, ${ltr("L − 1")} יוצאים</span><input type="range" class="ex-l" min="2" max="${lmax}" step="1" value="${st.l}" dir="ltr"><output class="out-l"></output></label>` +
         `<label><input type="checkbox" class="ex-mark" checked> להדגיש את השורד מההתחלה</label>` +
         `<label>המושב <input type="number" class="ex-num ex-seat" min="0" step="1" dir="ltr" placeholder="s" aria-label="מושב לחיפוש הפוך : לאילו N הוא שורד"></label>` +
-        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button>` +
+        (traps.length ? `<span class="wv-presets">${traps.map((v) => `<button type="button" class="md-button jos-trap" data-n="${v}">מקרה מלכודת${NB}: ${ltr(`N = ${v}`)}</button>`).join(" ")}</span>` : "") +
+        `</div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא</button>` +
@@ -259,6 +264,9 @@
       $(".ex-seat").addEventListener("change", () => { const v = Math.round(Number($(".ex-seat").value)); stop(); st.seat = $(".ex-seat").value === "" || !Number.isFinite(v) || v < 0 ? null : v; draw(); });
       [$(".ex-nbig"), $(".ex-seat")].forEach((el) => el.addEventListener("keydown", (e) => { if (e.key === "Enter") el.blur(); }));
       $(".ex-l").addEventListener("input", () => { stop(); st.l = Number($(".ex-l").value); st.s = 0; draw(); });
+      box.querySelectorAll(".jos-trap").forEach((b) => b.addEventListener("click", () => {
+        stop(); Object.assign(st, { n: Number(b.dataset.n), l: defaults.l, s: 0 }); $(".ex-l").value = st.l; draw();
+      }));
       $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, defaults, { s: 0, seat: null }); $(".ex-n").value = st.n; $(".ex-seat").value = ""; $(".ex-l").value = st.l; draw(); });
       draw();
     },
@@ -267,7 +275,7 @@
   dvqExplorers.register({
     views: { josephus: josephusView },
     help: {
-      josephus: "המעגל מראה את המשחק : N ו-L (אחד נשאר, L − 1 יוצאים) בסליידרים, ״הצעד הבא״ או ״הפעלה״ מוציאים אדם אחרי אדם, השורד מודגש מהתחלה, והגרף מראה את השורד לכל N עם נקודות האפס. שדה המושב מחפש באילו מעגלים מושב שורד. בשלב ההוכחה כל מי שנשאר מקבל מספר חדש, מ-0 אצל הבא שנשאר, ו״עד סוף הסיבוב״ מראה איך סיבוב שלם מקטין את המעגל.",
+      josephus: "המעגל מראה את המשחק : N ו-L (אחד נשאר, L − 1 יוצאים) בסליידרים, ״הצעד הבא״ או ״הפעלה״ מוציאים אדם אחרי אדם, השורד מודגש מהתחלה, והגרף מראה את השורד לכל N עם נקודות האפס. שדה המושב מחפש באילו מעגלים מושב שורד. בשלב ההוכחה כל מי שנשאר מקבל מספר חדש, מ-0 אצל הבא שנשאר, ו״עד סוף הסיבוב״ מראה איך סיבוב שלם מקטין את המעגל. כפתורי מקרה המלכודת טוענים גדלי מעגל שבהם קל לטעות.",
     },
     models: { josephusSteps, josephusZero, josephusFormula, josephusSurvivor, josephusSeats, josephusRenumber },
     cols: { josephus: { side: ".ex-title, .jos-chart, .jos-proof" } },   // the circle beside the survivor chart and the proof

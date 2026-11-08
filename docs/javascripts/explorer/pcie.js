@@ -1,6 +1,6 @@
 // kinds: pcie ladder
-//   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits; a toggle to cut the boundaries by hand
-//   ladder                 0021        part b's recurrence: C(0..N) as a row, a click on C(n) lights the m terms it sums, and a block strip per term with the first completion taking i blocks
+//   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits; a toggle to cut the boundaries by hand; trap buttons on 0021 (data-traps)
+//   ladder                 0021        part b's recurrence: C(0..N) as a row, a click on C(n) lights the m terms it sums, and a block strip per term with the first completion taking i blocks; a trap button for n = m + 1
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -84,6 +84,9 @@
       const PRESETS = [["0x1010", 256, 256, 64, "0020: ‏0x1010, ‏256 B, ‏MPS 256"], ["0x1010", 256, 128, 64, "0020 : אותה בקשה עם MPS 128"],
                        ["0x1000", 256, 256, 64, "0021 א : ‏0x1000, ‏256 B"], ["0x1000", 512, 256, 64, "0021 ב : ‏0x1000, ‏512 B"],
                        ["0x1010", 512, 256, 64, "0021 ב : ‏0x1010, ‏512 B"], ["0x1020", 128, 128, 64, "0021 ג : ‏0x1020, ‏128 B, ‏MPS 128 (δ = 1)"]];
+      // the trap cases of 0021 (data-traps): the smallest delta, an aligned 320 where 2^(N - 1)
+      // fails by one, and the unaligned 512 on an RCB of 128
+      const TRAPS = box.dataset.traps ? [["0x1020", 128, 128, 64, "החריג δ"], ["0x1000", 320, 256, 64, ltr("L = 320")], ["0x1010", 512, 256, 128, ltr("RCB = 128")]] : [];
       const defaults = { addr: box.dataset.addr || "0x1010", len: Number(box.dataset.len || 256), mps: Number(box.dataset.mps || 256), rcb: Number(box.dataset.rcb || 64) };
       const st = { ...defaults, cuts: null, shown: null };   // cuts: the boundaries chosen by hand, null = the greedy split's; shown: the cuts drawn
       // data-notation="c" (0020): that page's own symbol, c inner boundaries and 2^c subsets;
@@ -98,7 +101,9 @@
         `<label>MPS <select class="ex-mps">${[128, 256, 512, 1024, 2048, 4096].map((v) => `<option value="${v}"${v === st.mps ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<label>RCB <select class="ex-rcb">${[64, 128].map((v) => `<option value="${v}"${v === st.rcb ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button>` +
-        `<label><input type="checkbox" class="ex-choose" checked> לבחור חיתוכים בעצמי</label></div>` +
+        `<label><input type="checkbox" class="ex-choose" checked> לבחור חיתוכים בעצמי</label>` +
+        (TRAPS.length ? `<span class="wv-presets">מקרי מלכודת${NB}: ${TRAPS.map((p, i) => `<button type="button" class="md-button pcie-trap" data-i="${i}">${p[4]}</button>`).join(" ")}</span>` : "") +
+        `</div>` +
         `<p class="ex-summary" aria-live="polite"></p><div class="pcie-blocks"></div><p class="pcie-choose"></p><div class="pcie-counts"></div>` +
         `<div class="ex-fold" data-fold="closed"><p class="ex-fold-title">מפת הפיצולים</p><div class="pcie-map"></div></div>`;
       const $ = (sel) => box.querySelector(sel);
@@ -266,13 +271,13 @@
       $(".ex-len").addEventListener("input", () => { st.len = Number($(".ex-len").value); draw(); });
       $(".ex-mps").addEventListener("change", () => { st.mps = Number($(".ex-mps").value); draw(); });
       $(".ex-rcb").addEventListener("change", () => { st.rcb = Number($(".ex-rcb").value); draw(); });
-      $(".ex-preset").addEventListener("change", () => {
-        const p = PRESETS[Number($(".ex-preset").value)];
-        if (!p) return;
+      const load = (p) => {
         [$(".ex-addr").value, st.len, st.mps, st.rcb] = p;
         $(".ex-len").value = st.len; $(".ex-mps").value = st.mps; $(".ex-rcb").value = st.rcb;
         draw();
-      });
+      };
+      $(".ex-preset").addEventListener("change", () => { const p = PRESETS[Number($(".ex-preset").value)]; if (p) load(p); });
+      box.querySelectorAll(".pcie-trap").forEach((b) => b.addEventListener("click", () => { st.cuts = null; $(".ex-preset").value = ""; load(TRAPS[Number(b.dataset.i)]); }));
       // the clicked cuts ride in the copy link and the remembered state: hex addresses, "-"
       // for no cut at all, nothing while the greedy split is shown
       box.dvqExtra = {
@@ -322,7 +327,8 @@
         `<label><input type="checkbox" class="ld-guess"> לנחש את C(n) לפני החשיפה</label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">‏n הקודם</button>` +
-        `<button type="button" class="md-button md-button--primary ex-next">‏n הבא</button><span class="ex-pos"></span></div>` +
+        `<button type="button" class="md-button md-button--primary ex-next">‏n הבא</button>` +
+        `<span class="wv-presets"><button type="button" class="md-button ld-trap">מקרה מלכודת${NB}: ${ltr("n = m + 1")}</button></span><span class="ex-pos"></span></div>` +
         `<div class="ld-row" dir="ltr" role="group" aria-label="הערכים C(0) עד C(N), לחיצה בוחרת ערך"></div>` +
         // the guess (V4): C(n) and the values after it are hidden until the reader types C(n)
         `<div class="ex-controls ld-guessrow" hidden><label><span class="ld-ask"></span> <input type="text" class="ld-in" inputmode="numeric" dir="ltr" size="6" data-nolink aria-label="הניחוש שלכם ל-C(n)"></label>` +
@@ -349,12 +355,16 @@
           `</span><span class="ld-txt">${t.rest ? `ועוד ${ltr(`C(${t.rest}) = ${t.value}`)} ${t.value === 1 ? "דרך" : "דרכים"} לחלק את ${t.rest === 1 ? "הבלוק שנשאר" : `${ltr(t.rest)} הבלוקים שנשארו`}` : `Completion אחד לכל הבלוקים, ${ltr("C(0) = 1")}`}</span></div>`).join("");
         const tag = !known(st.n) ? "" : st.m === 4 && st.n === 8 ? ` זו הבקשה המיושרת של העמוד, 108 פיצולים.` : st.m === 4 && st.n === 9 ? ` זו הבקשה הלא מיושרת של העמוד, 208 פיצולים.` : "";
         $(".ld-sum").innerHTML = `בלי MPS כל אחד מ-${ltr(st.n - 1)} הגבולות הפנימיים חותך או לא, ${ltr(`2^${st.n - 1} = ${2 ** (st.n - 1)}`)} פיצולים. ` +
-          (c[st.n] < 2 ** (st.n - 1) ? `עם Completion של עד ${ltr(st.m)} בלוקים נשארים ${ltr(cn)}${NB}: הפיצולים שבהם Completion מכסה יותר מ-${ltr(st.m)} בלוקים נפסלים.` : `כאן ${ltr(`n ≤ ${st.m}`)}, ולכן אף פיצול לא נפסל.`) + tag;
+          (c[st.n] >= 2 ** (st.n - 1) ? `כאן ${ltr(`n ≤ ${st.m}`)}, ולכן אף פיצול לא נפסל.`
+            : `עם Completion של עד ${ltr(st.m)} בלוקים נשארים ${ltr(cn)}${NB}: ` + (st.n === st.m + 1 && known(st.n)
+              ? `נפסל רק ה-Completion היחיד על כל ${ltr(st.n)} הבלוקים, שעם קצוות חלקיים נכנס ב-MPS (ה-${ltr("δ")} של סעיף ג).`
+              : `הפיצולים שבהם Completion מכסה יותר מ-${ltr(st.m)} בלוקים נפסלים.`)) + tag;
       };
       $(".ld-row").addEventListener("click", (e) => { const b = e.target.closest(".ld-cell"); if (b && !b.disabled) { st.n = Number(b.dataset.n); draw(); const again = box.querySelector(`.ld-cell[data-n="${st.n}"]`); if (again) again.focus(); } });
       $(".ld-N").addEventListener("input", () => { st.N = Number($(".ld-N").value); draw(); });
       $(".ld-m").addEventListener("change", () => { st.m = Number($(".ld-m").value); draw(); });
       $(".ex-next").addEventListener("click", () => { st.n++; draw(); });
+      $(".ld-trap").addEventListener("click", () => { if (st.N < st.m + 1) st.N = st.m + 1; st.n = st.m + 1; draw(); });
       $(".ex-prev").addEventListener("click", () => { st.n--; draw(); });
       $(".ex-reset").addEventListener("click", () => { Object.assign(st, D); st.shown.clear(); draw(); });
       const say = (cls, html) => { const m = $(".ld-msg"); m.className = `ld-msg ${cls}`; m.innerHTML = html; };
@@ -377,8 +387,8 @@
   dvqExplorers.register({
     views: { pcie: pcieView, ladder: ladderView },
     help: {
-      pcie: "כתובת, אורך, MPS ו-RCB : התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד. עם ״לבחור חיתוכים בעצמי״ לוחצים על הגבולות כדי לחתוך או לא, ורואים את ה-Completions שנוצרים.",
-      ladder: "לחיצה על C(n) בשורה, או ״n הבא״, מדליקה את האיברים שהוא סוכם : לכל i, ה-Completion הראשון מכסה i בלוקים, ומה שנשאר הוא C(n − i). N ו-m משנים את השורה. ״לנחש את C(n)״ מסתיר את הערך עד שמקלידים אותו ובודקים.",
+      pcie: "כתובת, אורך, MPS ו-RCB : התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד, וכפתורי מקרי המלכודת טוענים בקשות שבהן קל לטעות. עם ״לבחור חיתוכים בעצמי״ לוחצים על הגבולות כדי לחתוך או לא, ורואים את ה-Completions שנוצרים.",
+      ladder: "לחיצה על C(n) בשורה, או ״n הבא״, מדליקה את האיברים שהוא סוכם : לכל i, ה-Completion הראשון מכסה i בלוקים, ומה שנשאר הוא C(n − i). N ו-m משנים את השורה. ״לנחש את C(n)״ מסתיר את הערך עד שמקלידים אותו ובודקים. מקרה המלכודת בוחר את n = m + 1, הראשון שבו 2^(n − 1) נכשל.",
     },
     models: { pcieBoundaries, pcieBlocks, pcieSplitOf, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula, ladderC, ladderTerms },
     cols: { pcie: { main: ".pcie-blocks, .ex-fold", side: ".pcie-choose, .pcie-counts", w: "minmax(0, 2.6fr)" } },   // the blocks and the map of splits (scrolling, 27-box-columns.css) beside the chosen cuts and the counts table

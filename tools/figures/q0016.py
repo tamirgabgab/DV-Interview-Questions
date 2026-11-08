@@ -9,10 +9,11 @@ Prints, in page order: part a (L = 2): the step-through circle for N = 20, the
 round-by-round table for N = 20, the table of survivors for N = 1..16, the survivor chart
 for N = 1..40, the relabelling figure after one elimination, the one-round figure for
 N = 8, and the binary figure; part b (L = 3): the step-through circle for N = 30, the
-round-by-round table for N = 30, the values table for N = 1..20, the base-3 table, the
-survivor chart for N = 1..60, the relabelling figure, the one-round figure for N = 9, and
-the base-3 digits figure; the bonus part: the zero-point table for L = 2..5, the values
-table for L = 4 and the chart for L = 4. tests/0016 checks that the page copies match.
+round-by-round table for N = 30, the values table for N = 1..20 with the base-3 digit rule
+in its last columns, the survivor chart for N = 1..60, the relabelling figure, the
+one-round figure for N = 9, and the base-3 digits figure; the bonus part: the zero-point
+table for L = 2..5, the values table for L = 4 (the rows around its zero points) and the
+chart for L = 4. tests/0016 checks that the page copies match.
 """
 
 import math
@@ -80,8 +81,15 @@ def rounds(n, L=2):
 
 # --- the circle ----------------------------------------------------------------------
 
+def _c(v):
+    """A coordinate with one decimal, without a trailing ".0" (the steppers' weight)."""
+    s = f"{v:.1f}"
+    return s[:-2] if s.endswith(".0") else s
+
+
 def circle_frame(n, out, stays=None, leave=(), winner=None):
-    """n people on a circle, person 0 at the top, numbered clockwise."""
+    """n people on a circle, person 0 at the top, numbered clockwise. The labels take their
+    text-anchor from one group, and only a faded person gets a group of its own."""
     if n <= 12:
         w, R, r, small = 300, 105, 17, ""
     elif n <= 20:
@@ -93,7 +101,7 @@ def circle_frame(n, out, stays=None, leave=(), winner=None):
     p = [f'<svg class="figure" viewBox="0 0 {w} {h}" style="max-width:{w / 16:.0f}rem" role="img" '
          f'aria-label="{n} אנשים במעגל">']
     p.append(f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="none" class="ink-line" stroke-width="1" '
-             'stroke-dasharray="3 5" opacity="0.5"/>')
+             'stroke-dasharray="3 5" opacity="0.5"/><g text-anchor="middle">')
     for i in range(n):
         a = -math.pi / 2 + 2 * math.pi * i / n
         x, y = cx + R * math.cos(a), cy + R * math.sin(a)
@@ -107,14 +115,17 @@ def circle_frame(n, out, stays=None, leave=(), winner=None):
             cls = "st-done"
         else:
             cls = "st-cell"
-        faded = ' class="st-faded"' if i in out and i not in leave else ""
-        p.append(f'<g{faded}><circle class="{cls}" cx="{x:.1f}" cy="{y:.1f}" r="{r}"/>'
-                 f'<text class="st-text{small}" x="{x:.1f}" y="{y + (4 if small else 5):.1f}" text-anchor="middle">{i}</text>')
+        faded = i in out and i not in leave
+        if faded:
+            p.append('<g class="st-faded">')
+        p.append(f'<circle class="{cls}" cx="{_c(x)}" cy="{_c(y)}" r="{r}"/>'
+                 f'<text class="st-text{small}" x="{_c(x)}" y="{_c(y + (4 if small else 5))}">{i}</text>')
         if i in out:
             d = r - 3
-            p.append(f'<line class="pg-strike" x1="{x - d:.1f}" y1="{y + d:.1f}" x2="{x + d:.1f}" y2="{y - d:.1f}"/>')
-        p.append("</g>")
-    p.append(f'<text class="st-text" x="{cx}" y="{cy + 6}" text-anchor="middle">{n - len(out)}</text>')
+            p.append(f'<line class="pg-strike" x1="{_c(x - d)}" y1="{_c(y + d)}" x2="{_c(x + d)}" y2="{_c(y - d)}"/>')
+        if faded:
+            p.append("</g>")
+    p.append(f'<text class="st-text" x="{cx}" y="{cy + 6}">{n - len(out)}</text></g>')
     p.append("</svg>")
     return "".join(p)
 
@@ -164,17 +175,23 @@ def survivors_table(N=16):
     return "\n".join(lines)
 
 
-def values_table(L, N, with_residue=False):
-    """L >= 3: N, (its residue,) the zero point M below it, the formula and the simulation."""
+def values_table(L, ns, with_residue=False):
+    """L >= 3: N, (its residue,) the zero point M below it, the formula and the simulation,
+    for every N in ns (an int: 1 .. ns)."""
+    ns = range(1, ns + 1) if isinstance(ns, int) else ns
     frac = f"\\tfrac{{{L}}}{{{L - 1}}}"
     head = ["‏\\( N \\)"] + (["‏\\( r \\)"] if with_residue else []) + ["‏\\( M \\)", f"‏\\( {frac}(N - M) \\)", "השורד"]
     lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
-    for n in range(1, N + 1):
+    for n in ns:
         M = zero_below(n, L)
         cells = [str(n)] + ([str(residue(n, L))] if with_residue else []) + \
                 [str(M), f"‏\\( {frac} \\cdot {n - M} = {formula(n, L)} \\)", f"**{survivor(n, L)}**"]
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines)
+
+
+# the rows of the L = 4 table: around the zero points 8, 12 and 16, and the example N = 20
+L4_ROWS = (7, 8, 9, 11, 12, 13, 15, 16, 17, 20)
 
 
 def zeros_table(Ls=(2, 3, 4, 5), limit=100):
@@ -206,15 +223,20 @@ def half_rule(n):
     return half, c, half - c
 
 
-def base3_table(N=20):
-    """L = 3: N and floor(N/2) in base 3, the digits to subtract, and the survivor in base 3."""
-    head = ["‏\\( N \\)", "בבסיס 3", "השרשרת", "‏\\( \\lfloor N/2 \\rfloor \\)", "מחסרים", "ההפרש", "‏\\( F_3(N) \\) בבסיס 3", "‏\\( F_3(N) \\)"]
+def values3_table(N=20):
+    """L = 3, the table of part b: N, the zero point M below it on N's chain, the formula
+    and the simulation, then the digit rule: floor(N/2) in base 3, the digits subtracted
+    (floor(M/2): 10..0 or 11..1) and the survivor in base 3 (the difference and a 0)."""
+    head = ["‏\\( N \\)", "‏\\( M \\)", "‏\\( \\tfrac{3}{2}(N - M) \\)", "השורד",
+            "‏\\( \\lfloor N/2 \\rfloor \\) בבסיס 3", "מחסרים", "השורד בבסיס 3"]
     lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
     for n in range(1, N + 1):
+        M = zero_below(n, 3)
         half, c, diff = half_rule(n)
-        chain = "אי-זוגית" if n % 2 else "זוגית"
         F = formula(n, 3)
-        lines.append(f"| {n} | ‏`{base3(n)}` | {chain} | ‏`{base3(half)}` | ‏`{base3(c)}` | ‏`{base3(diff)}` | ‏`{base3(F)}` | **{F}** |")
+        assert F == survivor(n, 3)
+        lines.append(f"| {n} | {M} | ‏\\( \\tfrac{{3}}{{2}} \\cdot {n - M} = {F} \\) | **{F}** | "
+                     f"‏`{base3(half)}` | ‏`{base3(c)}` | ‏`{base3(F)}` |")
     return "\n".join(lines)
 
 
@@ -424,8 +446,7 @@ if __name__ == "__main__":
     # part b: L = 3
     print(circle_stepper(30, 3), "\n")
     print(rounds_table(30, 3), "\n")
-    print(values_table(3, 20), "\n")
-    print(base3_table(), "\n")
+    print(values3_table(), "\n")
     print(chart_legend(3), "\n")
     print(chart(3, 60, 6), "\n")
     print(relabel_svg(8, 3), "\n")
@@ -433,6 +454,6 @@ if __name__ == "__main__":
     print(digits3_svg(), "\n")
     # the bonus part: any L
     print(zeros_table(), "\n")
-    print(values_table(4, 20, with_residue=True), "\n")
+    print(values_table(4, L4_ROWS, with_residue=True), "\n")
     print(chart_legend(4), "\n")
     print(chart(4, 64, 8))
