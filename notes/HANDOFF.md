@@ -959,6 +959,26 @@ below start at item 112 (session 31).
     Every box of the site was measured at 1920 by 1080 (stepped to its end): 183 boxes of
     117 kinds; 102 boxes are over 970 px, 30 over 1500 px. The findings and the proposed
     work are under "Open items", "Review round (session 34)". Nothing was changed yet.
+180. **One screen per box: two columns (session 34, 2026-11-08).** The owner's choices: all
+    the kinds over the screen, the steps-and-code panel in the side column, a 1920 by 1080
+    screen, the check a warning only. `core.js` `columns()`: a kind's `cols` in its
+    register call (`main`, `side`, `w`) splits the box's body blocks into `.ex-cols >
+    .ex-main + .ex-side`; the steps-and-code panel always goes to the side, where its code
+    view is at most 22rem tall and scrolls itself (never the page) to the step's first lit
+    line. `stylesheets/27-box-columns.css`: from a 600 px box (a container query) the
+    columns sit side by side, main on the left; a narrower box (a phone, a 1366 laptop,
+    597 px) keeps one column. A wide, short figure stays full width (a half column would
+    shrink its labels under 11 px). `tools/checks/check_heights.py` (CI, warning only)
+    lists the boxes over 1000 px at 1920 by 1080, stepped to their end; `check_jumps`
+    also steps at 1920. 56 kinds got `cols` (six agents in parallel, each kind's checks
+    green); some kinds' drawings got a narrower variant in a column (boxes, eurovision,
+    oddball, hourglass's tree, covergroup's curve), kaprekar's checkbox class `ex-cols`
+    became `kp-show-cols` (it clashed), credits lost its `.cr-box` wrapper, acknak and
+    probability got CSS only. Result: 102 boxes over the screen before (the tallest 2375
+    px), 48 boxes of 28 kinds after (the tallest 1530). Known costs: 0069 with 12 or 16
+    requests scrolls its figures sideways in the column; 0019 stepped through its proof
+    is taller than before; eurovision's labels are 9.8 px in a column; floyd's labels on a
+    very long tail are about 8 px.
 
 ---
 
@@ -1040,16 +1060,18 @@ ten: control rows (three or four rows of sliders, a select, reset and random but
 to 200 px); the steps-and-code panel inside a box ("הסבר : השלבים של הפתרון והקוד",
 300 to 500 px in 0062, 0064, 0066); and figures, tables and notes stacked one under the
 other (0078: a summary table, the 5 by 5 grid and the table of ten rounds). Proposal:
-- [ ] A shared wide layout in `core.js` and a shared stylesheet, like `.ih-grid`: a
+- [x] (done, work log item 180) A shared wide layout in `core.js` and a shared stylesheet, like `.ih-grid`: a
   container query on the box (600 px and wider) that puts the controls in fewer rows
   (labels beside their fields, the play row and the scrub on one row) and lays out a
   main column (the figure) beside a side column (tables, the steps-and-code panel, the
   note). A kind opts in by wrapping its blocks in `ex-main` / `ex-side`; a narrow box
   keeps today's one-column order. check_jumps should then also step boxes at 1920 px.
-- [ ] The steps-and-code panel in the side column, or closed by default in a box.
-- [ ] A check (in check_explorers or a new one) that reports each box's height at
+- [x] The steps-and-code panel in the side column (item 180).
+- [x] A check (`check_heights.py`, item 180) that reports each box's height at
   1920 by 1080 against the budget, so new boxes stay on one screen.
-- [ ] Then the kinds, tallest first. Over 1500 px: twoheaps 2375 (0068), billiard 2204
+- [x] Then the kinds, tallest first (item 180; 48 boxes of 28 kinds still over: the list is
+  `python tools/checks/check_heights.py`; the rest needs fewer control rows or a redesign:
+  river 0032, credits 0024, horses 0043, cake 0027/0028, islands 0065, twoheaps 0068). Over 1500 px before: twoheaps 2375 (0068), billiard 2204
   (0080), lfsr 2196 (0036), netdelay 1979 (0067), cake-geo / cake-arith 1974 (0027,
   0028), eggs 1939 (0039), strip 1926 (0030), gridpath 1882 (0070), overtakes 1864
   (0069), oddball 1849 (0045), boxes 1791 (0009), winfsm 1738 (0056), islands 1707
