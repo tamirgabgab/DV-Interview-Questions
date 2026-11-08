@@ -7,7 +7,8 @@ The text under the controls of a box changes at every step, and core.js (steady)
 each paragraph at the tallest height it has shown, so the figures under it stay put while
 the box plays. That reservation only knows the steps already shown: a step whose text is
 taller than every earlier one still moves the figures once. This check opens every page
-with an explorer box at 390 px and at 1200 px, and in every box with a step counter
+with an explorer box at 390, 1200 and 1920 px (where a wide box has two columns), and in
+every box with a step counter
 ("k מתוך T") and a next button it goes back to the first step and presses next until the
 end (at most --max-steps steps), measuring after each step the top of every figure
 relative to the box. A figure that moves by more than --tol px fails the check, with the
@@ -29,7 +30,7 @@ sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve
 from check_explorers import BOXES, open_page, shard  # noqa: E402
 from check_phone import HEIGHT, local_cdn_routes, serve  # noqa: E402
 
-WIDTHS = (390, 1200)
+WIDTHS = (390, 1200, 1920)   # 1920: the two columns of a wide box (session 34)
 
 # Step box b through every transport row (a row of .ex-controls with its own .ex-pos counter
 # and next button): first step, then next until the counter stops or maxSteps. After each

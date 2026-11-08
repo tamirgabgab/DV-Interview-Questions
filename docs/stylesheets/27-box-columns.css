@@ -1,0 +1,24 @@
+/* The site's styles, part 27: a box on one computer screen (session 34, the owner: as
+   0099's hardware box). core.js's columns() wraps a kind's blocks in .ex-cols > .ex-main
+   (the figure) + .ex-side (tables, notes, the steps-and-code panel); from a 600 px box the
+   two sit side by side, the main column on the left, and the controls take fewer rows.
+   A narrower box (a phone, a small laptop) keeps one column: the main blocks, then the
+   side ones. It loads after parts 01-26. */
+.md-typeset .explorer:has(> .ex-cols) { container-type: inline-size; }
+.md-typeset .explorer .ex-cols > :is(.ex-main, .ex-side) { min-width: 0; }
+
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols {
+    display: grid; align-items: start; column-gap: 1.2rem;
+    grid-template-columns: minmax(0, 1fr) var(--ex-main-w, minmax(0, 1.15fr));
+    grid-template-areas: "side main";              /* the first track is the right one (RTL) */
+  }
+  .md-typeset .explorer .ex-cols > .ex-main { grid-area: main; }
+  .md-typeset .explorer .ex-cols > .ex-side { grid-area: side; }
+  /* the first block of each column starts at the same height */
+  .md-typeset .explorer .ex-cols > * > :first-child { margin-top: 0; }
+  /* the steps-and-code panel in a column: its code scrolls sideways instead of widening it */
+  .md-typeset .explorer .ex-side .ex-explain .ex-codewrap { max-width: 100%; overflow-x: auto; }
+  /* the controls in fewer rows: a slider takes less room, so a row holds more of them */
+  .md-typeset .explorer .ex-controls input[type="range"] { max-width: 10rem; }
+}

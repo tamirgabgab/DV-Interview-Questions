@@ -1223,6 +1223,36 @@
     });
   };
 
+  // Two columns on a computer (session 34, the owner: a whole box on one screen, as 0099's
+  // hardware box). A kind that registers cols gets its blocks under the controls (the
+  // children of the box but the header, the controls, the scrubber, the summary, the
+  // answer and the key hints) split in two: side, the blocks its selector names, and the
+  // steps-and-code panel of explain() always; main, the blocks main names, or by default
+  // every other one. They are wrapped in place in .ex-cols > .ex-main + .ex-side, each in
+  // its order; from a 600 px box (stylesheets/27-box-columns.css) the two sit side by side,
+  // the main one on the left, and a narrower box reads as before. w sets the main column's
+  // width (a grid track; the default is minmax(0, 1.15fr)). cols: { kind: {} } puts the
+  // steps-and-code panel beside everything else.
+  const TOP_PARTS = ".ex-bar, .ex-controls, .ex-scrubwrap, .ex-summary, .ex-answer, .ex-keys, .ex-restored, .ex-guide, .ex-help";
+  const columns = (box) => {
+    const spec = COLS[box.dataset.kind];
+    if (!spec) return;
+    const body = [...box.children].filter((el) => !el.matches(TOP_PARTS));
+    const sideSel = [spec.side, ".ex-explain"].filter(Boolean).join(", ");
+    const side = body.filter((el) => el.matches(sideSel) && !(spec.main && el.matches(spec.main)));
+    const main = body.filter((el) => !side.includes(el) && (!spec.main || el.matches(spec.main)));
+    if (!main.length || !side.length) return;
+    const wrap = document.createElement("div"), m = document.createElement("div"), s = document.createElement("div");
+    wrap.className = "ex-cols";
+    m.className = "ex-main";
+    s.className = "ex-side";
+    body.find((el) => main.includes(el) || side.includes(el)).before(wrap);
+    wrap.append(m, s);
+    m.append(...main);
+    s.append(...side);
+    if (spec.w) wrap.style.setProperty("--ex-main-w", spec.w);
+  };
+
   const setup = (box, helpOpen = false) => {
     const make = VIEWS[box.dataset.kind];
     if (!make) return;
@@ -1231,6 +1261,7 @@
     box.dvqSeed = null;
     make(box).mount(box);
     folds(box);
+    columns(box);
     layout(box);
     transport(box);
     edits(box);
@@ -1276,13 +1307,14 @@
 
   // --- the registry ----------------------------------------------------------------------------
 
-  // Every kind file (explorer/<kind>.js) registers its views, its help line and the pure
+  // Every kind file (explorer/<kind>.js) registers its views, its help line, its columns (cols, see columns()) and the pure
   // functions the question tests compare with the Python reference. Under Node the
   // models of every file are merged (tools/explorer_node.js) and nothing is built.
-  const VIEWS = {}, HELP = {};
+  const VIEWS = {}, HELP = {}, COLS = {};
   const models = { mulberry32, waveDromOf, waveDromText, floydTrace, floydParse, STATE_CODECS, bitsOf };
-  const register = ({ views = {}, help = {}, models: own = {} }) => {
+  const register = ({ views = {}, help = {}, models: own = {}, cols = {} }) => {
     Object.assign(VIEWS, views);
+    Object.assign(COLS, cols);
     Object.assign(HELP, help);
     Object.assign(models, own);
   };

@@ -251,6 +251,7 @@
 
   dvqExplorers.register({
     views: { weights: weightsView },
+    cols: { weights: { main: ".wt-digits, .wt-sums, .wt-note, .ex-title, .wt-conv" } },   // the scale stays wide; under it its tables beside the code
     help: {
       weights: "בוחרים סעיף (כף אחת, שתי כפות, או c עותקים מכל משקולת), מספר משקלים k ומשא n. כל צעד הוא ספרה אחת של n, מהנמוכה : השארית, הספרה (בשתי כפות שארית גדולה מ-c הופכת לספרה שלילית עם העברה), והמשקולת עוברת מהשורה שמתחת למאזניים לכף שלה. הטבלה מתחת למאזניים היא הספרות, הספרה השלילית מסומנת, ולמעלה החסם של k משקלים מול מה שהמשקולות שוקלות בפועל.",
     },
