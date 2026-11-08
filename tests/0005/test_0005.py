@@ -273,3 +273,57 @@ def test_explorer_pigeonhole_box():
         assert d["exact"] and int(d["quotient"]) * x == diff
     r, d = got[xs.index(7)]
     assert (r["i"], r["j"], d["digits"], d["quotient"]) == (7, 1, "1111110", "158730")
+
+
+def test_followup_at_most_k_ones():
+    """The follow-up "at most k ones": a BFS over (remainder, ones so far) against an
+    enumeration of the 0/1 numbers in increasing order, and the numbers its answer states
+    (x = 17, the remainder-only pruning that fails, k = 1, and multiples of 3 and 9)."""
+    from collections import deque
+
+    def by_pairs(x, k, prune=lambda r, c: (r, c)):
+        start = (1 % x, 1)
+        number, queue = {prune(*start): "1"}, deque([start])
+        if start[0] == 0:
+            return "1"
+        while queue:
+            r, c = queue.popleft()
+            y = number[prune(r, c)]
+            for d in (0, 1):
+                if c + d > k:
+                    continue
+                nxt = ((10 * r + d) % x, c + d)
+                if prune(*nxt) not in number:
+                    number[prune(*nxt)] = y + str(d)
+                    if nxt[0] == 0:
+                        return y + str(d)
+                    queue.append(nxt)
+        return None
+
+    def enumerate_01(x, k, max_len):
+        for i in range(1, 2 ** max_len):
+            if bin(i).count("1") <= k and int(format(i, "b")) % x == 0:
+                return format(i, "b")
+        return None
+
+    for x in range(1, 120):
+        for k in range(1, 8):
+            y = by_pairs(x, k)
+            if y is None:
+                assert enumerate_01(x, k, 18) is None, (x, k)
+            elif len(y) <= 18:
+                assert y == enumerate_01(x, k, len(y)), (x, k, y)
+                assert y.count("1") <= k and int(y) % x == 0
+        assert by_pairs(x, x + 1) == bfs(x)          # no limit in effect: the page's answer
+    assert bfs(17) == "11101" and by_pairs(17, 3) == "100011" and by_pairs(17, 2) == "100000001"
+    assert by_pairs(17, 3, prune=lambda r, c: r) is None             # pruning by remainder only
+    def only_2_and_5(x):
+        for p in (2, 5):
+            while x % p == 0:
+                x //= p
+        return x == 1
+
+    assert all((by_pairs(x, 1) is not None) == only_2_and_5(x) for x in range(1, 3000))
+    assert all(by_pairs(x, k) is None for x in range(3, 1500, 3) for k in (1, 2))
+    assert all(by_pairs(x, k) is None for x in range(9, 1500, 9) for k in range(1, 9))
+    assert by_pairs(9, 9) == "111111111"

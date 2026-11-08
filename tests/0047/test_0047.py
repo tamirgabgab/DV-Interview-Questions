@@ -83,20 +83,33 @@ def test_page_numbers():
     assert trap(LEET) == 6
     assert trap_2d(MAP) == 8 and water_map(MAP) == [[0] * 5, [0, 1, 1, 1, 0], [0, 1, 0, 1, 0], [0, 1, 1, 1, 0], [0] * 5]
     assert trap_2d([[1, 4, 3, 1, 3, 2], [3, 2, 1, 3, 2, 4], [2, 3, 3, 2, 3, 1]]) == 4     # LeetCode 407
+    # the task of the map box: the leak (3, 4) raised to 3 closes it, lowered to 1 drains all
+    assert [trap_2d([row[:4] + [v] if i == 3 else row for i, row in enumerate(MAP)]) for v in (1, 2, 3)] == [0, 8, 16]
     # the edge cases
     assert trap([]) == trap([5]) == trap([1, 2]) == trap([2, 2, 2]) == 0
     assert trap_2d([]) == trap_2d([[]]) == trap_2d([[1, 0, 1]]) == trap_2d([[2, 0], [0, 2]]) == 0
 
 
 def test_two_pointer_trace():
-    """The table of part a: the left pointer moves four times, adding 0, 3, 1, 3."""
-    h, l, r, lm, rm, total, rows = ROW, 0, 4, 0, 0, 0, []
-    while l < r:
-        if h[l] < h[r]:
-            lm = max(lm, h[l]); total += lm - h[l]; rows.append((l, r, lm, lm - h[l], total)); l += 1
-        else:
-            rm = max(rm, h[r]); total += rm - h[r]; rows.append((l, r, rm, rm - h[r], total)); r -= 1
-    assert rows == [(0, 4, 3, 0, 0), (1, 4, 3, 3, 3), (2, 4, 3, 1, 4), (3, 4, 3, 3, 7)]
+    """The trace of part a: on the statement's row only the left pointer moves (adding 0, 3,
+    1, 3); the table runs on the box's default array, where both move and a tie moves r."""
+    def trace(h):
+        l, r, lm, rm, total, rows = 0, len(h) - 1, 0, 0, 0, []
+        while l < r:
+            if h[l] < h[r]:
+                lm = max(lm, h[l]); total += lm - h[l]; rows.append((l, r, "L", lm, lm - h[l], total)); l += 1
+            else:
+                rm = max(rm, h[r]); total += rm - h[r]; rows.append((l, r, "R", rm, rm - h[r], total)); r -= 1
+        return rows, l
+
+    rows, meet = trace(ROW)
+    assert [x for *_, x in rows] == [0, 3, 4, 7] and {s for _, _, s, *_ in rows} == {"L"} and meet == 4
+    rows, meet = trace(LEET)
+    assert rows == [(0, 11, "L", 0, 0, 0), (1, 11, "R", 1, 0, 0), (1, 10, "L", 1, 0, 0), (2, 10, "L", 1, 1, 1),
+                    (3, 10, "R", 2, 0, 1), (3, 9, "R", 2, 1, 2), (3, 8, "R", 2, 0, 2), (3, 7, "L", 2, 0, 2),
+                    (4, 7, "L", 2, 1, 3), (5, 7, "L", 2, 2, 5), (6, 7, "L", 2, 1, 6)]
+    assert meet == 7 and LEET[7] == max(LEET) and trace(LEET)[0][-1][-1] == trap(LEET) == 6
+    assert [i + 1 for i, (l, r, *_) in enumerate(rows) if LEET[l] == LEET[r]] == [2, 5, 7]   # the ties 1 = 1, 2 = 2
 
 
 def flood(h, wall=lambda level, x: max(level, x)):
