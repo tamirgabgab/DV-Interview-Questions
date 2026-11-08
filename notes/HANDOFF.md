@@ -1027,6 +1027,11 @@ below start at item 112 (session 31).
     for S = {1, 2} only, trap buttons. A reported issue (a hardware box's reset returning
     to the old step) did not reproduce: reset all and the box's reset both go to step 0 in
     0034, 0064, 0097 and 0099.
+184. **Third review round: ten more random questions (session 34, 2026-11-08).** Seed
+    20261108, the twenty reviewed questions and 0099 left out: 0001, 0030, 0032, 0040,
+    0041, 0042, 0052, 0055, 0061, 0080. Two read-only review passes (each correctness claim
+    checked with a script) and every box measured at 1920 by 1080. Findings under "Open
+    items", "Review round 3 (session 34)". Nothing was changed yet.
 
 ---
 
@@ -1254,6 +1259,83 @@ diff, memory for 10^6 packets) and positions in the report ("H extra" which one)
   are valid); part c's numbers repeated; a third hint in part c.
 - [x] 0100: part d's table stops at stair 6 (the question asks 10); w′(4) used before it
   is defined; "two adjacent broken stairs block everything" only for S = {1, 2}.
+
+### Review round 3 (session 34): ten more questions
+
+Correctness first; every claim below was checked by a reviewer's script (CONFIRMED); verify
+again before changing a page. 0001, 0040, 0042, 0052, 0055, 0061 and 0080: no wrong claim
+found (all tables recomputed exactly).
+
+**R1. Correctness:**
+- [ ] 0030: proof "מספיק לבדוק סדרים בלי חזרה": "נשארים 16 סדרים : (4), (8), (8), (8)"
+  sums to 28, not 16 (step 5 says the same): 28 face orders without a repeat, 16 of them
+  give a legal straight line (the table); in the strip 22 of 48 lines are legal (the 16
+  and 6 that wrap and repeat a face). Also step 3 explains Δp = 24 by "the far wall's
+  width, 12", but that 12 is the height h (b = h = 12 hides it): write Δx and Δp in letters.
+- [ ] 0032: the trap "לבדוק רק את הצד שעוזבים" is not a bug: after a crossing the bank
+  with the farmer is always safe, so the left bank is the full check (the box's captions
+  check only that bank). Drop it, or replace it by "checking before the crossing instead of
+  after".
+- [ ] 0041: "התא האחרון ... כמו 12 התאים הראשונים ביחד" (the first 12 cost 20.8 tests;
+  about 10, 14.9); the trap "הכלה-הדחה ב-n גדול ... זבל" is overstated (at n = 100 floats
+  match the exact value to 1e-13 at t = 497, 754, 916; it fails only for t below about 80,
+  where P(T > t) = 1 anyway); "חצי מהזמן ... שני התאים האחרונים" is 44%; "כמעט פי שניים"
+  is 1.66 at n = 16 and 1.45 at n = 100.
+- [ ] Small: 0052 "סטיית התקן קרובה לתוחלת" fails for HT (2 vs 4): say for longer or
+  self-overlapping patterns. 0055's Python `div_fsm` calls `pow(base, -1, m)` also when
+  `lsb=False`, so MSB-first base 10, m = 5 raises (the docstring asks gcd = 1, but the
+  base-10 trap says that case works with 2 states). 0040's "two patterns" follow-up counts
+  9 product states for Moore; the Mealy product needs 7 (say which). 0080: "אותם המספרים, 2
+  ו-3, מופיעים בכל מכה" reads as false: every entering shot ends at (p·a, q·b).
+
+**R2. Boxes and one screen.** Heights at 1920 x 1080 (stepped to the end): 0032 river
+1455 (one column: the state graph under the banks; put the graph beside them), 0055
+divfsm 1092, 0080 billiard 1087, 0040 seqdet 1036 (two columns, still over); the other
+nine boxes fit (590 to 965). Every box paragraph of the ten describes the layout: give a
+task and trap buttons instead: 0001 (a one-cycle blip, sig toggling every cycle, sig high
+at reset: predict pulse), 0030 (the fly at (30, 6, 6) gives 37, a case where k = ±1 wins,
+a point on an edge), 0032 (the wolf first; from FWG|C find the only safe move), 0040
+(1011011, switch to Moore and watch found move, 1111 on 11111), 0041 (the stages box: how
+many tests the last two bins take), 0042 (part a's box replays the step tables; w = 250,
+T = 200 > c, w ≤ c), 0052 (HH vs HT over 1000 games, HHH vs THH for 7/8, q = 0.9 flips the
+order; the box sits at the end of part c), 0055 (1011 both ways, m = 5, m = 7 base 8; the
+only box sits after part c's proof), 0061 (both boxes replay the figures: k = 0, all
+zeros, k ≥ the zeros, `10` with k = 0), 0080 (the two trap shots, 45° from (180, 45), 37°
+with 1 cm pockets).
+
+**R3. Hardware and DV (like 0099):** 0001: the waveform box uses half the width at 1920;
+add the circuit (one flip-flop, NOT, AND) beside it with live values per clock, and the
+synchronizer chain for the asynchronous-signal trap. 0040: no block diagram (state
+register, next-state logic, output logic, `din` -> `found` combinational for Mealy); one
+naming of states (S2/S3 in the tables, S10/S101 in code and waveform); a `found_moore` row
+in the waveform for the off-by-one trap. 0055: a per-clock table for 13 (clock, din, Q1Q0,
+D1D0, div), the register and its signals in the box (it shows only the state ring); one
+vocabulary ("נכנס כ-LSB" vs "מה-MSB").
+
+**R4. Explanations (most valuable first):**
+- [ ] 0001: a 4-row (sig, sig_q) table before the formula; the registered-output idiom
+  `pulse_q = sig_q & ~sig_qq` in the follow-up.
+- [ ] 0030: move part b's step-6 example (end0 folded on top) into the idea; the 4-face
+  routes (40.72) also beat the ceiling (z0 = 9, z1 ≤ 3.3) in the follow-up.
+- [ ] 0032: the 7 crossings shown 4 times (merge the table into the stepper); the 16-row
+  safety table (show the 6 forbidden states); the parity argument for 7 (odd, 5
+  impossible); step 5 claims a mirror path but does not light it.
+- [ ] 0040: part b's fail recurrence with a 4-row trace for 1011 (fail = 0, 0, 1, 1).
+- [ ] 0041: part a's steps repeat the idea; a two-bin anchor for inclusion-exclusion
+  (p = 0.01 gives about 100); 54.1 / 90 repeated six times.
+- [ ] 0042: 60 + 100 + 300 = 460 repeated five times; the N(x) chart from the proof into
+  the idea; hint 2 gives the prices; the two-camels follow-up compares 900 L and 450 L
+  unclearly; "מים שמתאדים" has no payoff.
+- [ ] 0052: a three-toss casino example for HH (4 + 2 = 6); the gap argument for "same
+  probability, different time" (½·1 + ½·7 = 4); check part d's equation once on HH, n = 1.
+- [ ] 0055: part b repeats the x derivation three times and part a's whole gate pipeline
+  (keep the table and the flip-flop swap).
+- [ ] 0061: the trace sits under the proof (move it to the steps); part b has no steps or
+  trace (AAABBCBABA, a step where the window's most common value changes); hint 2 gives
+  the whole algorithm; part b's proof only one side of monotonicity.
+- [ ] 0080: K mod 4 needs its why (reflections repeat every 2a); part d step 3's start
+  ⌊(2x₀ − w)/a⌋ before its motivation (bring in the (2, 170) at 80° example); "בגלל
+  הסימטריה" -> point to the midpoint argument.
 
 ---
 
