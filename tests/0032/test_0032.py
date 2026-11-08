@@ -1,5 +1,6 @@
-"""Question 0032: the plan and its two mirror solutions, the ten safe states, the tables,
-the explorer's JavaScript against the generator, and the page copies of the blocks."""
+"""Question 0032: the plan and its two mirror solutions, the ten safe states and the table
+of the six forbidden ones, the stepper's captions, the explorer's JavaScript against the
+generator, and the page copies of the blocks."""
 
 import sys
 from itertools import product
@@ -21,8 +22,13 @@ def test_safe_states():
         s = f * 1 + w * 2 + g * 4 + c * 8
         assert q0032.safe(s) == safe_by_words(f, w, g, c), (f, w, g, c)
     assert sum(q0032.safe(s) for s in range(16)) == 10
-    rows = q0032.states_table().splitlines()[2:]
-    assert len(rows) == 16 and sum("| כן |" in r for r in rows) == 10
+    rows = q0032.forbidden_table().splitlines()[2:]
+    unsafe = [s for s in range(16) if not q0032.safe(s)]
+    assert len(rows) == 6 == len(unsafe)
+    for row, s in zip(rows, unsafe):
+        assert row.startswith(f"| \u200f{q0032.bank_text(s, 0)} | \u200f{q0032.bank_text(s, 1)} |"), row
+        f, w, g, c = (s >> k & 1 for k in range(4))
+        assert ("הזאב אוכל את העז" in row) == (w == g != f) and ("את הכרוב" in row) == (g == c != f), row
 
 
 def test_plan_and_solutions():
@@ -33,8 +39,14 @@ def test_plan_and_solutions():
     assert sorted(map(str, sols)) == sorted(map(str, [plan, ["goat", None, "cabbage", "goat", "wolf", None, "goat"]]))
     assert q0032.all_solutions(6) == []                      # nothing shorter
     assert q0032.replay(["wolf"]) is None and q0032.replay(["goat", "goat"]) is None
-    rows = q0032.plan_table().splitlines()[2:]
-    assert len(rows) == 7 and rows[-1].endswith("| ‏– | ‏FWGC |")
+    # the stepper's captions name both banks after every crossing (the plan table merged in)
+    import re
+    caps = re.findall(r"<figcaption>(.*?)</figcaption>", q0032.crossing_stepper())
+    states = q0032.replay(plan)
+    assert len(caps) == 9
+    for cap, s in zip(caps[1:8], states[1:]):
+        near, far = q0032.bank_text(s, 0), q0032.bank_text(s, 1)
+        assert (f"על הגדה הקרובה {near}," if near != "–" else "הגדה הקרובה ריקה,") in cap and cap.endswith(f"על הרחוקה {far}."), cap
 
 
 def test_explorer_matches_generator():
@@ -104,3 +116,21 @@ def test_steps_light_the_right_parts():
     assert plan[4].split(">") == fwd
     back = states[::-1]
     assert plan[3].split(">") == ["n15"] + [f"e{min(a, b)}-{max(a, b)} n{b}" for a, b in zip(back, back[1:])]
+    mirror = q0032.replay(["goat", None, "cabbage", "goat", "wolf", None, "goat"])
+    assert len(plan) == 6 and plan[5].split(">") == ["n0"] + [f"e{min(a, b)}-{max(a, b)} n{b}" for a, b in zip(mirror, mirror[1:])]
+    # step 6's text: the mirror leaves the plan after crossing 2 and meets it again after crossing 5
+    assert states[:3] == mirror[:3] and states[5:] == mirror[5:] and states[3:5] != mirror[3:5]
+    assert [q0032.bank_text(s, 0) + " | " + q0032.bank_text(s, 1) for s in mirror[3:5]] == ["W | FGC", "FWG | C"]
+    assert [q0032.bank_text(s, 0) + " | " + q0032.bank_text(s, 1) for s in states[3:5]] == ["C | FWG", "FGC | W"]
+
+
+def test_box_task():
+    """The box paragraph: the wolf first is refused; at C | FWG (after G, alone, W) going
+    alone is unsafe, the wolf back undoes crossing 3, and the goat back is the only safe
+    move forward."""
+    assert not q0032.safe(dict(q0032.moves(0))["wolf"])
+    s = q0032.replay(["goat", None, "wolf", "goat", "cabbage", None, "goat"])[3]
+    assert (q0032.bank_text(s, 0), q0032.bank_text(s, 1)) == ("C", "FWG")
+    moves = dict(q0032.moves(s))
+    assert set(moves) == {None, "wolf", "goat"} and not q0032.safe(moves[None])
+    assert moves["wolf"] == 4 and q0032.safe(moves["wolf"]) and q0032.safe(moves["goat"]) and moves["goat"] == 2

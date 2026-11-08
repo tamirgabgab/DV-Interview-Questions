@@ -1,0 +1,22 @@
+/* Question 0032, wolf, goat and cabbage: the river box (explorer/river.js) on one 1920 x 1080
+   screen. core.js's columns() puts the controls and the banks beside the state graph
+   (27-box-columns.css); here the proof panel's graph beside its legend and text, and the
+   state labels of both graphs larger, so that a graph in a column keeps them at about
+   11 px. Its colours and figures stay in 06-figures.css. A phone keeps one column. */
+
+/* "the farmer crosses:" leads its row of buttons (core.js's layout() orders a row's parts by
+   kind, which put this label last) */
+.md-typeset .explorer[data-kind="river"] .ex-controls > .river-lead { order: 0; }
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="river"] .river-proof-grid {
+    display: grid; align-items: start; column-gap: 1.2rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    grid-template-areas: "side graph";             /* the first track is the right one (RTL) */
+  }
+  .md-typeset .explorer[data-kind="river"] .river-bfs { grid-area: graph; }
+  .md-typeset .explorer[data-kind="river"] .river-proof-side { grid-area: side; }
+  .md-typeset .explorer[data-kind="river"] .river-proof-side > .viz-legend { margin-top: 0.4rem; }
+  .md-typeset .explorer[data-kind="river"] .river-graph svg .st-text.st-sm { font-size: 20px; }
+  .md-typeset .explorer[data-kind="river"] .river-bfs svg .st-text.st-sm:not([style]) { font-size: 17px; }
+  .md-typeset .explorer[data-kind="river"] :is(.river-graph, .river-bfs) svg .legend { font-size: 18px; }
+}

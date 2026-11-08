@@ -5,6 +5,7 @@ on random boxes, and the page copies of the generated blocks."""
 
 import math
 import random
+from itertools import permutations
 import sys
 from fractions import Fraction as Fr
 from pathlib import Path
@@ -86,11 +87,61 @@ def test_generator_matches_reference():
         assert sorted((round(c["length"], 7), tuple(c["faces"])) for c in valid) == sorted((round(r[0], 7), tuple(r[1])) for r in ref)
 
 
+def test_counts():
+    """Part a: 28 face orders without a repeat (one lateral face 4, two 8, three 8, four 8),
+    16 of them with a legal straight line; part b: 22 of the strip's 48 lines are legal, the
+    16 and 6 that wrap around the box and repeat a face, all longer."""
+    lat = ["bottom", "sideB", "top", "side0"]                    # around the box: neighbours differ by 1 mod 4
+    orders = [o for n in (1, 2, 3, 4) for o in permutations(lat, n)
+              if all((lat.index(q) - lat.index(p)) % 4 in (1, 3) for p, q in zip(o, o[1:]))]
+    by_len = [sum(len(o) == n for o in orders) for n in (1, 2, 3, 4)]
+    assert by_len == [4, 8, 8, 8] and sum(by_len) == 28
+    assert len(reference.routes(30, 12, 12, (0, 6, 11), (30, 6, 1))) == 16
+    valid = [c for c in q0030.candidates() if c["valid"]]
+    wrap = [c for c in valid if len(set(c["faces"])) < len(c["faces"])]
+    assert len(valid) == 22 and len(wrap) == 6 and round(min(c["length"] for c in wrap), 2) == 71.61
+    # part a's step 3 in letters: dx = (h - z0) + a + z1, dp = (b - y0) + h + (b - y1)
+    c = q0030.best()
+    assert (c["dx"], -c["dp"]) == ((12 - 11) + 30 + 1, (12 - 6) + 12 + (12 - 6))
+    other = next(c for c in q0030.candidates(30, 10, 12, (0, 5, 11), (30, 5, 1))
+                 if (c["s_edge"], c["f_edge"], c["k"]) == ("top", "bottom", 0))
+    assert (other["dx"], other["dp"]) == (32, -22) and other["faces"] == ["end0", "top", "sideB", "bottom", "enda"]
+
+
+def test_box_task():
+    """The cases of the box paragraph: the fly mid-wall (37), a line through the seam with
+    k = 1 (36.72, 40.79 without the shift), the spider on the ceiling's edge (39.2, it leaves
+    where it is)."""
+    assert q0030.best(30, 12, 12, (0, 6, 11), (30, 6, 6))["length"] == 37
+    c = q0030.best(30, 12, 12, (0, 1, 9), (30, 9, 1))
+    assert c["k"] == 1 and c["faces"] == ["end0", "side0", "bottom", "enda"] and round(c["length"], 2) == 36.72
+    no_shift = min(x["length"] for x in q0030.candidates(30, 12, 12, (0, 1, 9), (30, 9, 1)) if x["valid"] and x["k"] == 0)
+    assert round(no_shift, 2) == 40.79
+    assert math.isclose(reference.shortest(30, 12, 12, 1, 9, 9, 1)[0], c["length"])
+    c = q0030.best(30, 12, 12, (0, 6, 12), (30, 6, 1))
+    assert round(c["length"], 1) == 39.2 and c["s_edge"] == "top" and q0030.edge_point("top", c["p_exit"]) == (6, 12)
+
+
 def test_follow_ups():
     assert reference.shortest(30, 12, 12, 6, 11, 6, 6)[0] == 37 == 1 + 30 + 6
     assert reference.shortest(1, 1, 1, 0.5, 0.5, 0.5, 0.5)[0] == 2
     assert reference.shortest(30, 12, 12, 6, 11, 6, 1)[1] == [["end0", "top", "side0", "bottom", "enda"],
                                                             ["end0", "top", "sideB", "bottom", "enda"]]
+    # when five faces win, and the four-face routes over a wider range: at z0 = 9 five faces
+    # never beat the ceiling and the floor, four do for z1 up to about 3.3
+
+    def by_faces(z0, z1):
+        out = {}
+        for c in q0030.candidates(30, 12, 12, (0, 6, Fr(z0)), (30, 6, Fr(z1))):
+            if c["valid"] and len(set(c["faces"])) == len(c["faces"]):
+                out[len(c["faces"]) - 2] = min(out.get(len(c["faces"]) - 2, math.inf), c["length"])
+        return out
+
+    assert by_faces(11, 1) == {1: 42, 2: by_faces(11, 1)[2], 3: 40} and round(by_faces(11, 1)[2], 2) == 40.72
+    grid = [Fr(k, 10) for k in range(61)]
+    assert all(by_faces(9, z1)[3] >= by_faces(9, z1)[1] for z1 in grid)
+    assert all(by_faces(9, z1)[2] < by_faces(9, z1)[1] for z1 in grid[1:34])      # 0.1 .. 3.3
+    assert all(by_faces(9, z1)[2] > by_faces(9, z1)[1] for z1 in grid[34:])
 
 
 def test_explorer_matches_python():

@@ -6,10 +6,11 @@
 A farmer must ferry a wolf, a goat and a cabbage across a river in a boat that holds the
 farmer and one more; left alone, the wolf eats the goat and the goat eats the cabbage. A
 state is four bits (farmer, wolf, goat, cabbage: 0 near, 1 far). blocks() returns, in page
-order: the statement figure, its legend, the step-through figure of the seven crossings,
-the plan as a table, the state graph (sixteen states, the six forbidden ones struck out,
-the two shortest paths), its legend, and the table of the ten legal states. tests/0032
-checks the plan against brute force and the page code.
+order: the statement figure, its legend, the step-through figure of the seven crossings
+(its captions name both banks after every crossing), the table of the six forbidden
+states, the state graph (sixteen states, the six forbidden ones struck out, the two
+shortest paths) and its legend. tests/0032 checks the plan against brute force and the
+page code.
 """
 
 import sys
@@ -152,11 +153,16 @@ def crossing_stepper():
     frames = [(frame(0, label="התחלה : כולם על הגדה הקרובה"), "רגע 0 : כולם על הגדה הקרובה. הסירה מכילה את האיכר ועוד אחד.")]
     for k, (item, s_from, s_to) in enumerate(zip(plan, states, states[1:]), 1):
         forward = not s_from & FARMER
-        what = f"האיכר לוקח את {HEB[item]}" if item else "האיכר חוזר לבד"
-        left = ", ".join(HEB[n] for n in ITEMS if bool(s_from & BITS[n]) == bool(s_from & FARMER) and n != item)
+        way = "קדימה" if forward else "חזרה"
+        what = f"האיכר לוקח את {HEB[item]} {way}" if item else ("האיכר חוזר לבד" if not forward else "האיכר חוצה לבד")
+        left = [HEB[n] for n in ITEMS if bool(s_from & BITS[n]) == bool(s_from & FARMER) and n != item]
+        left = " ו".join(left)
+        after = "".join(f", על {name} {bank_text(s_to, side)}" if bank_text(s_to, side) != "–" else f", {name} ריקה"
+                        for side, name in ((0, "הגדה הקרובה"), (1, "הרחוקה")))[2:]
         frames.append((frame(s_from, item, forward, moving=True, label=f"חצייה {k}"),
-                       f"חצייה {k} : {what} {'קדימה' if forward else 'חזרה'}. "
-                       + (f"על הגדה שעזב נשארים {left}, וזה בטוח." if left else "הגדה שעזב ריקה.")))
+                       f"חצייה {k} : {what}. "
+                       + (f"על הגדה שעזב : {left}, וזה בטוח. " if left else "הגדה שעזב ריקה. ")
+                       + f"אחרי החצייה : {after}."))
     frames.append((frame(15, label="סיום"), f"כולם על הגדה הרחוקה אחרי {len(plan)} חציות."))
     return stepper(frames, "שבע החציות של האיכר, חצייה אחרי חצייה")
 
@@ -164,17 +170,6 @@ def crossing_stepper():
 def bank_text(state, side):
     names = [LETTER[n] for n in ["farmer"] + ITEMS if bool(state & BITS[n]) == bool(side)]
     return "".join(names) or "–"
-
-
-def plan_table():
-    plan = solve()
-    states = replay(plan)
-    lines = ["| חצייה | מי בסירה | לאן | הגדה הקרובה אחרי | הגדה הרחוקה אחרי |", "|:-:|---|---|:-:|:-:|"]
-    for k, (item, s_from, s_to) in enumerate(zip(plan, states, states[1:]), 1):
-        forward = not s_from & FARMER
-        lines.append(f"| {k} | האיכר{' ו' + HEB[item] if item else ' לבד'} | {'קדימה' if forward else 'חזרה'} | "
-                     f"‏{bank_text(s_to, 0)} | ‏{bank_text(s_to, 1)} |")
-    return "\n".join(lines)
 
 
 # --- the state graph ------------------------------------------------------------------
@@ -223,21 +218,21 @@ def graph_legend():
             '<span><i class="ink"></i>חצייה בטוחה אחרת</span></span>')
 
 
-def states_table():
-    lines = ["| הגדה הקרובה | הגדה הרחוקה | בטוח? | למה |", "|---|---|:-:|---|"]
+def forbidden_table():
+    """The six forbidden states: the goat away from the farmer, with the wolf or the cabbage."""
+    lines = ["| הגדה הקרובה | הגדה הרחוקה | מי נאכל |", "|---|---|---|"]
     for s in range(16):
-        f, w, g, c = (bool(s & b) for b in (FARMER, WOLF, GOAT, CABBAGE))
         if safe(s):
-            why = "העז עם האיכר" if g == f else "העז לבד, הזאב והכרוב עם האיכר"
-        else:
-            why = "הזאב אוכל את העז" if g == w else "העז אוכלת את הכרוב"
-        lines.append(f"| ‏{bank_text(s, 0)} | ‏{bank_text(s, 1)} | {'כן' if safe(s) else 'לא'} | {why} |")
+            continue
+        w, g, c = bool(s & WOLF), bool(s & GOAT), bool(s & CABBAGE)
+        why = ("הזאב אוכל את העז, והעז את הכרוב" if g == c else "הזאב אוכל את העז") if g == w else "העז אוכלת את הכרוב"
+        lines.append(f"| ‏{bank_text(s, 0)} | ‏{bank_text(s, 1)} | {why} |")
     return "\n".join(lines)
 
 
 def blocks():
     """The generated blocks, in page order."""
-    return [statement_figure(), legend(), crossing_stepper(), plan_table(), graph_svg(), graph_legend(), states_table()]
+    return [statement_figure(), legend(), crossing_stepper(), forbidden_table(), graph_svg(), graph_legend()]
 
 
 if __name__ == "__main__":

@@ -61,21 +61,24 @@
       const LETTER = { farmer: "F", wolf: "W", goat: "G", cabbage: "C" };
       const HEB = { wolf: "הזאב", goat: "העז", cabbage: "הכרוב" };
       const st = { s: 0, history: [], unsafe: null, plan: null, k: 0, layer: 0 };   // layer: the BFS layers shown
+      // the controls and the banks in one block (the main column on a computer), the state
+      // graph beside them, the step text under both, the proof panel full width under it
+      // with its graph beside its legend and text (stylesheets/questions/0032-river.css)
       box.innerHTML =
-        `<div class="ex-controls"><span>האיכר חוצה :</span>` +
+        `<div class="river-play"><div class="ex-controls"><span class="river-lead">האיכר חוצה :</span>` +
         `<button type="button" class="md-button ex-go" data-item="">לבד</button>` +
         ["wolf", "goat", "cabbage"].map((i) => `<button type="button" class="md-button ex-go" data-item="${i}">עם ${HEB[i]}</button>`).join("") +
         `<button type="button" class="md-button ex-undo">צעד אחורה</button>` +
         `<button type="button" class="md-button ex-reset">מההתחלה</button>` +
         `<button type="button" class="md-button md-button--primary ex-solve">פתרון</button>` + speedSel(1800, 1100, 500) + `</div>` +
-        `<div class="river-frame"></div><p class="ex-summary" aria-live="polite"></p>` +
+        `<div class="river-frame"></div></div><p class="ex-summary" aria-live="polite"></p>` +
         `<p class="ex-title">גרף המצבים : המצב הנוכחי מודגש, והמסלול שעברתם בכתום</p><div class="river-graph"></div>` +
         `<section class="ex-proof river-proof"><p class="ex-proof-title">שלב ההוכחה : החיפוש לרוחב, שכבה אחרי שכבה</p>` +
         `<div class="ex-controls"><button type="button" class="md-button md-button--primary ex-bfs-next">השכבה הבאה</button>` +
         `<button type="button" class="md-button ex-bfs-all">כל השכבות</button><button type="button" class="md-button ex-bfs-start">שכבה 0</button><span class="river-bfs-pos"></span></div>` +
-        `<div class="river-bfs"></div>` +
+        `<div class="river-proof-grid"><div class="river-bfs"></div><div class="river-proof-side">` +
         `<span class="viz-legend"><span><i class="st-cur"></i>השכבה החדשה</span><span><i class="st-ok"></i>כבר בתור</span><span><i class="st-cell"></i>עוד לא הגענו</span><span><i class="s1"></i>מאיפה הגענו</span><span><i class="box-path"></i>שתי התוכניות הקצרות</span></span>` +
-        `<p class="river-bfs-text"></p></section>`;
+        `<p class="river-bfs-text"></p></div></div></section>`;
       const $ = (sel) => box.querySelector(sel);
       let timer = null;
       const bankText = (s, side) => ["farmer", "wolf", "goat", "cabbage"].filter((n) => !!(s & RIVER[n]) === !!side).map((n) => LETTER[n]).join("") || "–";
@@ -249,5 +252,9 @@
       river: "מעבירים את הזאב, העז והכרוב בלחיצה, או נותנים לתכנית ה-BFS לרוץ; גרף המצבים מתעדכן עם כל מעבר. בשלב ההוכחה ״השכבה הבאה״ ממלא את הגרף שכבה אחרי שכבה, עם המרחק של כל מצב והחץ מהמצב שממנו הגענו.",
     },
     models: { riverSafe, riverMoves, riverPlan, riverLayers },
+    // on a computer: the controls and the banks on the left, the state graph with its title
+    // beside them; the step text under both and the proof panel full width under it (a phone
+    // keeps the banks first)
+    cols: { river: { main: ".river-play", side: ".ex-title, .river-graph" } },
   });
 })();
