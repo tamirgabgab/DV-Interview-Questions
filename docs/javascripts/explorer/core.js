@@ -411,6 +411,12 @@
         if (/^<span class="hll">/.test(t)) t = t.replace(/^<span class="hll">/, "").replace(/\n?<\/span>$/, "");   // the page's own key lines
         return `<span class="ex-line${lit.has(n + 1) ? " hll" : ""}" data-n="${n + 1}">${t}\n</span>`;
       }).join("");
+      // in a box's side column the code view has a height of its own (27-box-columns.css):
+      // it scrolls itself, never the page, to keep the step's first lit line in sight
+      const view = panel.querySelector(".ex-codewrap"), hit = code.querySelector(".ex-line.hll");
+      if (view && hit && view.scrollHeight > view.clientHeight + 1) {
+        view.scrollTop += hit.getBoundingClientRect().top - view.getBoundingClientRect().top - view.clientHeight / 3;
+      }
     };
     PANELS.add(render);
     if (PANELS.size === 1) {                 // the language of every panel follows the tabs

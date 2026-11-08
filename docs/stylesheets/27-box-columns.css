@@ -22,3 +22,236 @@
   /* the controls in fewer rows: a slider takes less room, so a row holds more of them */
   .md-typeset .explorer .ex-controls input[type="range"] { max-width: 10rem; }
 }
+
+/* strip (0030): the two walls side by side in the right column */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-side > .strip-walls { gap: 0.4rem 1rem; }
+  .md-typeset .explorer .ex-side > .strip-walls > .strip-wall { flex: 1 1 7.5rem; }
+}
+
+/* kap4base (0013): the steps under the map and the table of the base beside it, in a
+   smaller type so their columns fit a column without scrolling */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols :is(.k4-table, .k4-att) table { font-size: 0.62rem; }
+  .md-typeset .explorer .ex-cols :is(.k4-table, .k4-att) :is(td, th) { padding: 0.2em 0.4em; }
+  .md-typeset .explorer .ex-cols .k4-table td { white-space: nowrap; }
+  .md-typeset .explorer .ex-cols .k4-att td:not(:first-child) { white-space: nowrap; }
+}
+
+/* wizards (0071): the six orders and the chart stacked in their column, beside the chain */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols .wz-duo { grid-template-columns: minmax(0, 1fr); }
+}
+/* kap4base (0013): the header cells drop Material's 5rem minimum */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols :is(.k4-table, .k4-att) th { min-width: 0; }
+}
+/* kap4base (0013): a step's pair and difference each on one line */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols .k4-table td bdi.ex-nw { white-space: nowrap; }
+}
+
+/* kapbase (0012): the table of the steps beside the map, smaller and without Material's
+   minimum column width, so its seven columns fit the right column */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-side .kb-table table { font-size: 0.62rem; }
+  .md-typeset .explorer .ex-side .kb-table :is(td, th) { padding: 0.2em 0.35em; min-width: 0; }
+  .md-typeset .explorer .ex-side .kb-table td.kb-diff { white-space: nowrap; }
+}
+
+/* boxes (0009): the ring a little smaller in its column, so the walk beside the proof is shorter */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="boxes"] .ex-main svg.bx-live { width: 16rem; }
+}
+/* arbiter (0054): the grid in its column keeps its labels at about 11 px */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="arbiter"] .ex-main svg.arb-live :is(.tick, .arb-mark, .arb-name, .arb-wait) { font-size: 17px; }
+  .md-typeset .explorer[data-kind="arbiter"] .ex-main svg.arb-live .legend { font-size: 16px; }
+}
+/* camel (0042): the chart under the road, its labels at about 11 px; its last tick may pass the edge */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="camel"] .ex-main .cm-chart svg.perf-chart { overflow: visible; }
+  .md-typeset .explorer[data-kind="camel"] .ex-main .cm-chart svg.perf-chart .tick { font-size: 15px; }
+  .md-typeset .explorer[data-kind="camel"] .ex-main :is(svg.cm-live, .cm-chart svg.perf-chart) { margin: 0.4rem auto; }
+}
+/* creditwalk (0094): the walk and the curves in the wide column, their numbers at about 11 px */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="creditwalk"] .ex-main svg.perf-chart :is(.tick, .legend) { font-size: 14px; }
+}
+/* kapn (0044): the chart beside its key, its numbers at about 11 px */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="kapn"] .ex-main svg.kn-svg :is(.tick, .legend) { font-size: 14px; }
+}
+
+/* randmn (0078): the tables and the grid a little tighter in the two columns */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols table.rn-tab :is(td, th) { padding: 0.1em 0.5em; line-height: 1.4; }
+  .md-typeset .explorer .ex-cols table.rn-grid { margin: 0.3rem auto; }
+  .md-typeset .explorer .ex-cols > * > .gs-scroll:is(.rn-ktab, .rn-gridwrap, .rn-log) { margin: 0.3rem 0; }
+}
+/* lfsr (0036): the polynomial table beside the ring, a row a line */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="lfsr"] .ex-side .lf-table :is(td, th) { padding: 0.2em 0.45em; }
+  .md-typeset .explorer[data-kind="lfsr"] .ex-side .lf-table td:first-child { white-space: nowrap; }
+}
+/* covergroup (0053): each coverpoint's bins on one row beside the curve */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="covergroup"] .ex-main .cv-name { min-width: 4.2rem; }
+  .md-typeset .explorer[data-kind="covergroup"] .ex-main .cv-bin { min-width: 2.5rem; }
+}
+/* bridge (0031): the bridge beside its caption, the names and the bank labels at about 10-12 px */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="bridge"] .ex-main svg.bridge-fig .st-small { font-size: 12px; }
+  .md-typeset .explorer[data-kind="bridge"] .ex-main svg.bridge-fig .legend { font-size: 15px; }
+}
+
+/* bitrev (0077): the table of the rules in a column, in compact rows */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols .br-rules table { font-size: 0.64rem; }
+  .md-typeset .explorer .ex-cols .br-rules :is(td, th) { padding: 0.25em 0.5em; min-width: 0; white-space: nowrap; }
+}
+
+/* acknak (0025): no columns (the event strip is wide and the controls are rows), but from a
+   600 px box the RC, the two link queues and the EP sit in one row, as the link runs */
+.md-typeset .explorer[data-kind="acknak"] { container-type: inline-size; }
+@container (min-width: 600px) {
+  .md-typeset .explorer .an-box { flex-wrap: nowrap; gap: 0.6rem 0.8rem; }
+  .md-typeset .explorer .an-box > :is(.an-side, .an-link) { flex: 1 1 0; }
+}
+/* bitrev (0077): narrower still, so 12 bits and four-digit sums fit without scrolling */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols .br-rules table { font-size: 0.6rem; }
+  .md-typeset .explorer .ex-cols .br-rules :is(td, th) { padding: 0.25em 0.35em; }
+}
+/* lfsr (0036): the polynomial itself stays on one line too */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="lfsr"] .ex-side .lf-table td:first-child bdi { white-space: nowrap; }
+}
+
+/* probability (0015): the curve against q under the square at a readable size, not the
+   whole box wide */
+@container (min-width: 600px) {
+  .md-typeset .explorer .prob-chart svg { max-width: 30rem; }
+}
+
+/* tagpool (0062): the timeline in its wide column drops its 30rem minimum (the column keeps
+   its text at 11 px and more) */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols .tp-wrap svg { min-width: 0; }
+}
+
+/* probability (0015): no columns of cols (the box is one block), but from a 600 px box the
+   square and its legend stand side by side, the title above them, and the curve under them */
+.md-typeset .explorer[data-kind="probability"] { container-type: inline-size; }
+@container (min-width: 600px) {
+  .md-typeset .explorer .prob-box { display: block; }
+  .md-typeset .explorer .prob-grid:has(> .viz-legend) { display: grid; grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); column-gap: 1.2rem; align-items: center; max-width: none; }
+  .md-typeset .explorer .prob-grid > .ex-title { grid-column: 1 / -1; }
+  .md-typeset .explorer .prob-grid > .viz-legend { flex-direction: column; align-items: flex-start; }
+}
+
+/* ducci (0088): the chart of the maxima in a column: its axis numbers drawn larger, so they
+   stay at 11 px and more on screen */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols svg.du-chart .du-lab { font-size: 17px; }
+}
+
+/* kapbase (0012): each cell of the step table on one line, a little less padding */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-side .kb-table td bdi { white-space: nowrap; }
+  .md-typeset .explorer .ex-side .kb-table :is(td, th) { padding-inline: 0.25em; }
+}
+
+/* kaprekar (0012, 0013): the step table in the left column without Material's minimum
+   column width, so its six columns fit */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-main > .kp-table:not(.kb-table, .k4-table) th { min-width: 0; }
+  .md-typeset .explorer .ex-main > .kp-table:not(.kb-table, .k4-table) :is(td, th) { padding-inline: 0.5em; }
+}
+
+/* cake-arith, cake-geo, motorcycle, josephus (0027, 0028, 0026, 0016): a 640-wide chart in one
+   column keeps its text readable (12-13 px in its viewBox would be 8 px on a 400 px column) */
+@container (min-width: 600px) {
+  .md-typeset .explorer:is([data-kind="cake-arith"], [data-kind="cake-geo"], [data-kind="motorcycle"], [data-kind="josephus"]) .ex-cols svg.perf-chart .tick { font-size: 18px; }
+  .md-typeset .explorer:is([data-kind="cake-arith"], [data-kind="cake-geo"], [data-kind="motorcycle"], [data-kind="josephus"]) .ex-cols svg.perf-chart .legend { font-size: 18px; }
+  .md-typeset .explorer .ex-side :is(.cake-proof, .jos-chart) svg.perf-chart :is(.tick, .legend) { font-size: 20px; }
+  .md-typeset .explorer:is([data-kind="cake-arith"], [data-kind="cake-geo"], [data-kind="motorcycle"], [data-kind="josephus"], [data-kind="eggs"]) .ex-cols svg.perf-chart { overflow: visible; }   /* an end label a few px wider than the chart */
+}
+
+/* cake-arith, cake-geo (0027, 0028): a smaller cake and a shorter table over the two columns */
+@container (min-width: 600px) {
+  .md-typeset .explorer .cake-pie { flex-basis: 11rem; }
+  .md-typeset .explorer .cake-scroll { max-height: 10.5rem; }
+}
+
+/* eggs (0039): the building and its zoom side by side in the left column, both a little
+   narrower, their numbers a little larger; the chart's text readable in the right column */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-main > .eg-box { flex-wrap: nowrap; gap: 0.6rem 1rem; }
+  .md-typeset .explorer .ex-main .eg-building { flex-basis: 8.5rem; }
+  .md-typeset .explorer .ex-main svg.eg-live { width: 8.5rem; }
+  .md-typeset .explorer .ex-main .eg-zoomwrap { flex: 1 1 0; max-width: none; }
+  .md-typeset .explorer .ex-main svg.eg-zoomsvg { max-width: 9.5rem; }
+  .md-typeset .explorer .ex-main svg .eg-tick { font-size: 10px; }
+  .md-typeset .explorer .ex-main svg .eg-drop text { font-size: 10px; }
+  .md-typeset .explorer .ex-main svg .eg-rownum { font-size: 13px; }
+  .md-typeset .explorer .ex-main svg .eg-rowtxt { font-size: 12px; }
+  .md-typeset .explorer .ex-side .eg-chart svg.perf-chart :is(.tick, .legend) { font-size: 20px; }
+}
+
+/* josephus (0016): the circle over its text in the left column */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-main .jos-circle { flex-basis: 100%; max-width: 15.5rem; margin-inline: auto; }
+}
+
+/* horses (0043): the grid in the left column, its corner counts a little larger */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols svg .hr-count { font-size: 12px; }
+}
+
+/* pcie (0020, 0021): the map of splits scrolls inside its column */
+@container (min-width: 600px) {
+  .md-typeset .explorer .pcie-mapscroll { max-height: 11rem; overflow-y: auto; }
+}
+
+/* maxones, rainwater (0046, 0047): the editing group open, its value rows on the right and
+   the text field on the left */
+@container (min-width: 600px) {
+  .md-typeset .explorer:is([data-kind="maxones"], [data-kind="rainwater"]) > .ex-fold:not(.is-folded) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 1.2rem; align-items: start; }
+  .md-typeset .explorer:is([data-kind="maxones"], [data-kind="rainwater"]) > .ex-fold > .ex-fold-title { grid-column: 1 / -1; }
+  .md-typeset .explorer:is([data-kind="maxones"], [data-kind="rainwater"]) > .ex-fold > .ex-controls { grid-column: 1; }
+  .md-typeset .explorer:is([data-kind="maxones"], [data-kind="rainwater"]) > .ex-fold > :is(.mo-textrow, .rw-textrow) { grid-column: 2; grid-row: 2 / span 3; flex-direction: column; align-items: flex-start; }
+}
+
+/* acknak (0025): the RC, the queues and the EP in one row only from an 800 px box; in a
+   narrower one (a 1200 px window) the RC's chips would wrap and move the strip below */
+@container (min-width: 600px) and (max-width: 799.98px) {
+  .md-typeset .explorer .an-box { flex-wrap: wrap; }
+  .md-typeset .explorer .an-box > .an-side { flex: 1 1 15rem; }
+  .md-typeset .explorer .an-box > .an-link { flex: 1 1 14rem; }
+}
+
+/* josephus, shapes (0016, 0014): one column when the other one is hidden (a circle too big to
+   draw; the sandbox switched off) */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols:has(> .ex-main > .jos-box[hidden]) { grid-template-columns: minmax(0, 1fr); grid-template-areas: "side"; }
+  .md-typeset .explorer .ex-cols:has(> .ex-side > .sh-sand[hidden]) { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main"; }
+}
+
+/* strip (0030): the two walls side by side in the left column (supersedes the .ex-side
+   rule of the strip block above, which no longer matches) */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-main > .strip-walls { gap: 0.4rem 1rem; }
+  .md-typeset .explorer .ex-main > .strip-walls > .strip-wall { flex: 1 1 7.5rem; }
+}
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-main > .strip-walls { gap: 0.4rem 0.6rem; }
+  .md-typeset .explorer .ex-main > .strip-walls > .strip-wall { flex: 1 1 6.5rem; min-width: 0; }
+}
+
+/* the steps-and-code panel in the side column (core.js explain()): its code view is at most
+   22rem tall and scrolls itself to the step's lit lines, so a long function does not make
+   the box taller than the screen */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-side .ex-explain .ex-codewrap { max-height: 22rem; overflow-y: auto; }
+}
