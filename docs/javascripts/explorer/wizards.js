@@ -386,6 +386,7 @@
     help: {
       wizards: "בוחרים את שני היריבים, את התור שלי, את הסדר שלהם ואת השרביט : מתחת לכפתורים הסיכויים של כולם ושל החתולים. ״הבחירה הטובה ביותר״ עוברת על ששת הסדרים ועל כל השרביטים. הטבלה מראה את ששת הסדרים, הגרף את הסיכוי שלי לכל שרביט, ושרשרת מרקוב את המשחק עם הבחירות של כולם.",
     },
+    cols: { wizards: { main: ".wz-duo", side: ".ex-title, .wz-chain, .wz-explain, .viz-legend", w: "minmax(0, 0.75fr)" } },   // the six orders and the chart (stacked) beside the chain; the outcome chips stay full width
     models: { wzDuel, wzRound, wzChance, wzBest, wzOrders, wzStates, explainState },
   });
 })();

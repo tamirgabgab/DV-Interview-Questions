@@ -205,6 +205,7 @@
     help: {
       tagcheck: "כל ה-tags נשלחים, והתשובות חוזרות אחת אחת בסדר אקראי. לחיצה על tag מסמנת שהוא לא יחזור (✗) או שיחזור פעמיים (×2), או שבוחרים תרחיש מוכן. המצברים מתעדכנים בכל תשובה, ובסוף רואים מה כל שיטה מוצאת ואם היא צודקת. במצב חידה התקלה מוסתרת : מריצים את כל התשובות וכותבים מה חסר ומה כפול.",
     },
+    cols: { tagcheck: { main: ".tc-acc", side: ".tc-decode", w: "minmax(0, 0.75fr)" } },   // the accumulators beside what each method finds; the tags and the guess row stay full width
     models: { tcAcc, tcK, tcDecode },
   });
 })();

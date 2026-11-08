@@ -73,8 +73,8 @@
         `<span class="wv-presets">דוגמאות : <button type="button" class="md-button ex-preset" data-s="1011011">1011011</button> <button type="button" class="md-button ex-preset" data-s="10101011">10101011</button></span></div>` +
         `<p class="ex-summary sq-sum" aria-live="polite"></p><p class="sq-next"></p>` +
         `<div class="sq-graph"></div>` +
-        `<label class="sq-build-toggle"><input type="checkbox" class="sq-build" checked> איך נבנה המעבר מהמצב הנוכחי</label><div class="sq-slide"></div>` +
         `<span class="viz-legend"><span><i class="fs-key"></i>מעבר</span><span><i class="fs-key-found"></i>המעבר שמזהה (Mealy) או המצב שמוציא 1 (Moore)</span><span><i class="sq-key-cur"></i>המצב הנוכחי</span></span>` +
+        `<label class="sq-build-toggle"><input type="checkbox" class="sq-build" checked> איך נבנה המעבר מהמצב הנוכחי</label><div class="sq-slide"></div>` +
         `<div class="wv-wrap sq-strip" tabindex="0" role="group" aria-label="רצועת התזמון של הגלאי, גלילה אופקית"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
@@ -173,6 +173,7 @@
     help: {
       seqdet: "מקלידים תבנית ובוחרים Mealy או Moore : הכפתורים 0 ו-1 מזינים ביט, ״ביט אקראי״ ו״הפעלה״ מגרילים לפי ההסתברות שבסליידר. הגרף מדגיש את המצב ואת המעבר שנלקח, הרצועה מראה din, state ו-found, והשורה מתחת אומרת לאן 0 ו-1 יובילו. המתג ״איך נבנה המעבר״ מראה את התבנית מוזזת מתחת לקלט עד ההתאמה הארוכה ביותר, וזה המצב הבא.",
     },
+    cols: { seqdet: { main: ".sq-build-toggle, .sq-slide", side: ".sq-strip, .wv-export", w: "minmax(0, 1.6fr)" } },   // the wide graph and its legend stay full width; under them the building of the step beside the timing strip
     models: { seqTable, seqFallback, seqRun },
   });
 })();
