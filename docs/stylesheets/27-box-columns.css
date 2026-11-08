@@ -23,12 +23,6 @@
   .md-typeset .explorer .ex-controls input[type="range"] { max-width: 10rem; }
 }
 
-/* strip (0030): the two walls side by side in the right column */
-@container (min-width: 600px) {
-  .md-typeset .explorer .ex-side > .strip-walls { gap: 0.4rem 1rem; }
-  .md-typeset .explorer .ex-side > .strip-walls > .strip-wall { flex: 1 1 7.5rem; }
-}
-
 /* kap4base (0013): the steps under the map and the table of the base beside it, in a
    smaller type so their columns fit a column without scrolling */
 @container (min-width: 600px) {
@@ -238,12 +232,7 @@
   .md-typeset .explorer .ex-cols:has(> .ex-side > .sh-sand[hidden]) { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main"; }
 }
 
-/* strip (0030): the two walls side by side in the left column (supersedes the .ex-side
-   rule of the strip block above, which no longer matches) */
-@container (min-width: 600px) {
-  .md-typeset .explorer .ex-main > .strip-walls { gap: 0.4rem 1rem; }
-  .md-typeset .explorer .ex-main > .strip-walls > .strip-wall { flex: 1 1 7.5rem; }
-}
+/* strip (0030): the two walls side by side in the left column */
 @container (min-width: 600px) {
   .md-typeset .explorer .ex-main > .strip-walls { gap: 0.4rem 0.6rem; }
   .md-typeset .explorer .ex-main > .strip-walls > .strip-wall { flex: 1 1 6.5rem; min-width: 0; }

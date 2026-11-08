@@ -418,7 +418,6 @@
 .md-typeset .explorer .an-head-btns { display: flex; flex-wrap: wrap; gap: 0.2rem; margin-top: 0.3rem; }
 .md-typeset .explorer .an-head-btns .md-button { padding: 0.1rem 0.45rem; font-size: 0.6rem; margin: 0; }
 .md-typeset .explorer .an-counts { margin: 0.3em 0 0; font-size: 0.68rem; color: var(--viz-text); }
-.md-typeset .explorer .cr-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
 .md-typeset .explorer .cr-circle { flex: 0 1 19rem; }
 .md-typeset .explorer svg.cr-live { width: 19rem; max-width: 100%; display: block; }
 .md-typeset .explorer .cr-panel { flex: 1 1 16rem; min-width: 0; }
