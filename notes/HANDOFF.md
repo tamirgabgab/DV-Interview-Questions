@@ -1004,6 +1004,29 @@ below start at item 112 (session 31).
     0043, 0065, 0084, 0100. Two read-only review passes (each correctness claim checked
     with a script) and a look at every box at 1920 by 1080. Findings under "Open items",
     "Review round 2 (session 34)". Nothing was changed yet.
+183. **The second ten questions fixed (session 34, 2026-11-08).** The owner's choices: 0034
+    "like 0099", the exact worst case for 0043, a smaller code face in a side column
+    (0.5rem, stylesheets/27-box-columns.css), 0065's corner paradox in a closed note. Six
+    agents; every R1 claim was verified by a script before the text changed (all held, some
+    with corrections). 0006: the loop order does not matter with the strict > (a new
+    must-trade follow-up where it does), the fee follow-up gives 5 for one trade. 0010: the
+    timing machine-independent, the converse as a contrapositive, part b's repeated tables
+    and the log chart removed, trap presets. 0016: the base-4 rule subtracts N's own chain
+    (N = 20 gave 4 instead of 16), costs named, tables merged, a lighter stepper (419 ->
+    393 KB). 0021: one fixed RC policy, T(N, k) defined where used, trap presets (0020's box
+    unchanged). 0034: a generated block diagram, an edge-by-edge model (`q0034.py`, new)
+    with a skewed waveform (the old rclk had no edge where the sync rows changed), a glitch
+    sketch, the "14 of 16" claim corrected (7 behind, 7 ahead; behind is harmful below the
+    read pointer), trap buttons in the three boxes, and a new hardware box `grayhw` with its
+    stylesheet questions/0034-gray.css. 0037: the scoreboard flow figure, positions in the
+    report (Python and SV), O(m·d), trap buttons. 0043: an adversary search gives the exact
+    worst cases (64 / 8 / 4 needs 11), race 9 has exactly two horses and is skipped in
+    30/119. 0065: the scan resumes at (0, 1), the span (not the size) decides spares, an
+    MBIST follow-up, trap buttons. 0084: one-index proof, a third hint. 0100: the
+    stairs_ways cycle table checked by the testbench, part d to stair 10, the blocking rule
+    for S = {1, 2} only, trap buttons. A reported issue (a hardware box's reset returning
+    to the old step) did not reproduce: reset all and the box's reset both go to step 0 in
+    0034, 0064, 0097 and 0099.
 
 ---
 
@@ -1165,30 +1188,30 @@ other (0078: a summary table, the 5 by 5 grid and the table of ten rounds). Prop
 
 ### Review round 2 (session 34): ten more questions
 
-Waiting for the owner. Correctness first; every claim below was checked by a reviewer's
+All done (work log item 183). Correctness first; every claim below was checked by a reviewer's
 script (CONFIRMED) unless marked SUSPECTED; verify again before changing a page.
 
 **R1. Correctness:**
-- [ ] 0006: "הסדר בתוך הלולאה חשוב ... כך אף פעם לא 'קונים ומוכרים' באותו יום" (and the box
+- [x] 0006: "הסדר בתוך הלולאה חשוב ... כך אף פעם לא 'קונים ומוכרים' באותו יום" (and the box
   text, annotation (1)) is overstated: with the strict `>` the order never changes the result
   (200,000 random arrays); it matters only with `>=` or a must-trade variant. The fee
   follow-up's "הרווח הוא 7" is the multi-trade answer; one trade gives 7 − 2 = 5.
-- [ ] 0016: the base-4 follow-up "מחסרים את הגדול ביותר שאינו עולה עליו מבין `11…1`,
+- [x] 0016: the base-4 follow-up "מחסרים את הגדול ביותר שאינו עולה עליו מבין `11…1`,
   `22…2` או `10…0`" read literally gives wrong survivors (N = 20 gives 4, not 16): subtract
   the one of N's own chain r.
-- [ ] 0034: "16 צירופים ... 14 מהם הם ערכים שהמצביע לא עבר בהם" (and the box paragraph):
+- [x] 0034: "16 צירופים ... 14 מהם הם ערכים שהמצביע לא עבר בהם" (and the box paragraph):
   7 of the 14 (0..6) are values the pointer already passed (behind it, conservative), 7
   (9..15) are ahead (the harmful ones). SUSPECTED: the waveform's `rclk` (period 1.5) has
   no edge where the sync rows change, and no skew between bits.
-- [ ] 0043: the examples table gives 10 as the worst case for 64 / 8 / 4, but the page's
+- [x] 0043: the examples table gives 10 as the worst case for 64 / 8 / 4, but the page's
   `horses_plan` needs 11 on 49 of 4000 random orders (the generator samples 60). "לכל היותר
   שלושה שורדים" among A4, B3, C2 and "לכל היותר ארבעה סוסים" in race 9: at most one survives,
   so race 9 has at most 2 horses, and is skipped about 25% of the time; D1's place in race 8
   comes from a tie-break, not from "most missing comparisons".
-- [ ] 0065: "והסריקה ממשיכה מ-(1, 2) : היא עוברת 9 תאים" — the scan resumes at (0, 1);
+- [x] 0065: "והסריקה ממשיכה מ-(1, 2) : היא עוברת 9 תאים" — the scan resumes at (0, 1);
   "הגודל של כל גוש אומר אם שורת חילוף אחת או עמודת חילוף אחת מספיקות" is wrong (the 3-cell
   L at (1,4), (1,5), (2,4) needs two spares): the island's row and column span decides.
-- [ ] Small: 0037 part c says O(n·d) in the question and O(m·d) in its cost; 0100's
+- [x] Small: 0037 part c says O(n·d) in the question and O(m·d) in its cost; 0100's
   follow-up says "three variables" and uses two; 0010's timing "~7 s" at 100,000 measured
   about 16 s (machine-dependent: say "several seconds"), and part a's converse misses
   strings with no closer (`(((`); 0016's cost "סימולציה O(N)" holds for the recurrence,
@@ -1214,22 +1237,22 @@ combinational-Gray trap. 0100's `stairs_ways` module: a cycle table for the brok
 diff, memory for 10^6 packets) and positions in the report ("H extra" which one).
 
 **R4. Explanations (most valuable first):**
-- [ ] 0006: a worked trace in part a; reword the loop-order argument; a must-trade follow-up.
-- [ ] 0010: drop part b's tables (the steppers show them); the invariant first in the
+- [x] 0006: a worked trace in part a; reword the loop-order argument; a must-trade follow-up.
+- [x] 0010: drop part b's tables (the steppers show them); the invariant first in the
   proof; the odd-length precheck as an optional shortcut; "כמה זה משנה" keeps two of three.
-- [ ] 0016: the same run three times (keep the stepper and the table); hints that give the
+- [x] 0016: the same run three times (keep the stepper and the table); hints that give the
   answer (part a hint 2; part b hint 3); merge the three 20-row tables.
-- [ ] 0021: T(N, k) used in part b before part c defines it; the δ case worked four times;
+- [x] 0021: T(N, k) used in part b before part c defines it; the δ case worked four times;
   part c's idea as the one-sentence insight; split part b's hint 2.
-- [ ] 0034: part a's 4-bit pointer vs part c's 5 bits (say the extra bit is left out).
-- [ ] 0037: the "coincidence" reason first in part b; why the band's values do not fall.
-- [ ] 0043: "ולמה 8 לא מספיקות" is a compressed sketch; race 8 as it really works; a
+- [x] 0034: part a's 4-bit pointer vs part c's 5 bits (say the extra bit is left out).
+- [x] 0037: the "coincidence" reason first in part b; why the band's values do not fall.
+- [x] 0043: "ולמה 8 לא מספיקות" is a compressed sketch; race 8 as it really works; a
   letter mapping for the random example.
-- [ ] 0065: the paragraph under the step table retells it; an MBIST follow-up (each
+- [x] 0065: the paragraph under the step table retells it; an MBIST follow-up (each
   island's span, one spare row or column); the corner paradox into a collapsed note.
-- [ ] 0084: the step proof with one index; part b's answer differs from part a's (say both
+- [x] 0084: the step proof with one index; part b's answer differs from part a's (say both
   are valid); part c's numbers repeated; a third hint in part c.
-- [ ] 0100: part d's table stops at stair 6 (the question asks 10); w′(4) used before it
+- [x] 0100: part d's table stops at stair 6 (the question asks 10); w′(4) used before it
   is defined; "two adjacent broken stairs block everything" only for S = {1, 2}.
 
 ---

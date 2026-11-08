@@ -1,0 +1,76 @@
+/* Question 0034, Gray pointers of an asynchronous FIFO: the figures of tools/figures/q0034.py
+   (the block diagram of the two pointer paths, the glitch sketch) and the hardware box of
+   explorer/grayhw.js (gh-*), in the colours of 0099's and 0097's hardware boxes: a register
+   blue (s1), a comparison orange (s2), a flag green (s3), a synchronizer flop framed blue and
+   dashed, the wires grey; in the box the domain of this edge lit blue, a register that changed
+   framed in ink, a bit caught metastable orange. Drawn left to right (direction="ltr").
+   Colours from the palette only. */
+
+/* --- the block diagram -------------------------------------------------------------------- */
+.md-typeset svg.gh-fig { display: block; margin-inline: auto; width: 100%; height: auto; }
+.md-typeset svg.gh-fig .gh-headp { fill: var(--viz-text); }
+.md-typeset svg.gh-fig .gh-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
+.md-typeset svg.gh-fig .gh-blk.gh-reg rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.gh-fig .gh-blk.gh-sync rect { stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: 5 3; }
+.md-typeset svg.gh-fig .gh-blk.gh-stage rect { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg.gh-fig .gh-blk.gh-out rect { fill: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg.gh-fig .gh-blk text { fill: var(--viz-ink); font-size: 13px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.gh-fig .gh-blk text.gh-sub { fill: var(--viz-text); font-size: 11px; font-weight: 400; }
+.md-typeset svg.gh-fig .gh-blk text.gh-val { fill: var(--viz-ink); font-size: 12px; font-weight: 400; }
+.md-typeset svg.gh-fig .gh-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.gh-fig .gh-wlab { fill: var(--viz-s3-text); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.gh-fig .gh-cdc { fill: none; stroke: var(--viz-text); stroke-width: 1.4; stroke-dasharray: 7 5; }
+.md-typeset svg.gh-fig .gh-dom { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+
+/* --- the glitch sketch -------------------------------------------------------------------- */
+.md-typeset svg.gh-glitch .gh-lane { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.gh-glitch .gh-lane.gh-lane2 { fill: var(--viz-text); font-size: 11px; }
+.md-typeset svg.gh-glitch .gh-bitline { fill: none; stroke: var(--viz-ink); stroke-width: 1.6; }
+.md-typeset svg.gh-glitch .gh-seg { fill: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 1.2; }
+.md-typeset svg.gh-glitch .gh-seg.gh-bad { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg.gh-glitch .gh-segv { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.gh-glitch .gh-segn { fill: var(--viz-ink); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg.gh-glitch .gh-edge { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.md-typeset svg.gh-glitch .gh-edge.gh-redge { stroke: var(--viz-s2-text); stroke-width: 2; }
+.md-typeset svg.gh-glitch .gh-elab { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg.gh-glitch .gh-elab.gh-relab { fill: var(--viz-s2-text); font-weight: 700; }
+.md-typeset .viz-legend .gh-key-bad { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s2); outline-offset: -1px; }
+.md-typeset .viz-legend .gh-key-ok { background: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s3); outline-offset: -1px; }
+.md-typeset .viz-legend .gh-key-edge { background: none; height: 0; border-top: 2px dashed var(--viz-s2-text); align-self: center; }
+
+/* --- the box ------------------------------------------------------------------------------ */
+.md-typeset .explorer .gh-dpwrap svg { max-width: 27rem; margin: 0.4rem auto; }
+.md-typeset svg.gh-live-dp .gh-blk rect { stroke: var(--viz-grid); }
+.md-typeset svg.gh-live-dp .gh-blk.is-on rect { stroke: var(--viz-s1); stroke-width: 2.5; }
+.md-typeset svg.gh-live-dp .gh-blk.is-chg rect { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg.gh-live-dp .gh-blk.is-meta rect { stroke: var(--viz-s2); stroke-width: 3; stroke-dasharray: 5 3; }
+.md-typeset svg.gh-live-dp .gh-xbit { fill: var(--viz-s2-text); font-weight: 700; text-decoration: underline; }
+.md-typeset svg.gh-live-dp .gh-wire { stroke: var(--viz-grid); }
+.md-typeset svg.gh-live-dp .gh-wire.is-on { stroke: var(--viz-s1); stroke-width: 2.4; }
+.md-typeset svg.gh-live-dp .gh-dom.is-on { fill: var(--viz-ink); font-weight: 700; }
+
+/* the table of every signal, a column per edge */
+.md-typeset .explorer .gh-wavewrap { overflow-x: auto; margin: 0.4rem 0; }
+.md-typeset .explorer table.gh-wave { display: table; width: auto; margin: 0; border-collapse: collapse; font-family: var(--md-code-font-family); font-size: 0.6rem; }
+.md-typeset .explorer table.gh-wave :is(th, td) { min-width: 2.4rem; padding: 0.05rem 0.15rem; border: 1px solid var(--viz-grid); text-align: center; color: var(--viz-ink); background: var(--md-default-bg-color); font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.35; }
+.md-typeset .explorer table.gh-wave th[scope="row"] { position: sticky; left: 0; z-index: 1; min-width: 3.4rem; text-align: left; font-weight: 700; background: color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.gh-wave thead th { color: var(--viz-text); font-weight: 400; }
+.md-typeset .explorer table.gh-wave .is-now { box-shadow: inset 0 0 0 2px var(--viz-s1); font-weight: 700; }
+.md-typeset .explorer table.gh-wave td.is-hi { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.gh-wave td.is-fut { background: color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.gh-wave td.is-bad { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); font-weight: 700; }
+.md-typeset .explorer table.gh-wave td.is-meta { outline: 2px dashed var(--viz-s2); outline-offset: -3px; }
+.md-typeset .explorer table.gh-wave td.gh-w { color: var(--viz-ink); }
+.md-typeset .explorer table.gh-wave td.gh-r { color: var(--viz-ink); font-style: italic; }
+.md-typeset .explorer .gh-note { font-size: 0.72rem; margin: 0.3em 0; min-height: 3.9em; }
+.md-typeset .viz-legend .gh-key-on { background: none; height: 0; border-top: 3px solid var(--viz-s1); align-self: center; }
+.md-typeset .viz-legend .gh-key-chg { background: var(--md-default-bg-color); outline: 3px solid var(--viz-ink); outline-offset: -3px; }
+.md-typeset .viz-legend .gh-key-meta { background: var(--md-default-bg-color); outline: 2px dashed var(--viz-s2); outline-offset: -2px; }
+
+/* a wide box: the diagram on the left, the table and the note on the right (core.js cols) */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="grayhw"] .ex-main .gh-dpwrap svg { max-width: none; margin: 0; }
+  .md-typeset .explorer[data-kind="grayhw"] table.gh-wave { font-size: 0.56rem; }
+  .md-typeset .explorer[data-kind="grayhw"] table.gh-wave :is(th, td) { min-width: 2.1rem; padding: 0.03rem 0.12rem; line-height: 1.3; }
+  .md-typeset .explorer[data-kind="grayhw"] table.gh-wave th[scope="row"] { min-width: 0; }
+}

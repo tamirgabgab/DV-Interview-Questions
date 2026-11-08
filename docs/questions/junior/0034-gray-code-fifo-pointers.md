@@ -31,8 +31,10 @@ added: 2026-10-21
 
 ### סעיף א – למה לא בינארי
 
-מצביע בינארי של 4 ביטים עובר מ-`0111` ל-`1000`. הסבירו מה יכול לקרות כשהערך הזה נדגם
-בדומיין השני דרך סנכרן, ולמה קוד Gray, שבו כל צעד משנה **ביט אחד בלבד**, פותר את הבעיה.
+מצביע בינארי עובר מ-`0111` ל-`1000`. הסבירו מה יכול לקרות כשהערך הזה נדגם בדומיין השני
+דרך סנכרן, ולמה קוד Gray, שבו כל צעד משנה **ביט אחד בלבד**, פותר את הבעיה. מסתכלים כאן רק
+על ארבעת הביטים הנמוכים של המצביע : בסעיף ג יתברר שהוא צריך ביט אחד נוסף, וזה לא משתנה בצעד
+הזה.
 
 ??? tip "רמז 1"
     שני פלופים של סנכרן לא מבטיחים שכל ארבעת הביטים של המצביע ייתפסו באותו מחזור. אם
@@ -55,8 +57,8 @@ added: 2026-10-21
 
     סנכרן שומר על כל ביט בנפרד : כל ביט מגיע לצד השני "ישן" או "חדש", ללא קשר לשכניו.
     כשרק ביט אחד משתנה בין שני צעדים, יש בדיוק שתי תוצאות אפשריות, ושתיהן ערכים חוקיים
-    של המצביע. כששניים או יותר משתנים, מספר הצירופים גדל, וחלקם ערכים שהמצביע מעולם לא
-    החזיק.
+    של המצביע. כששניים או יותר משתנים, מספר הצירופים גדל, וכל צירוף מלבד שניים הוא ערך שאינו
+    הישן ואינו החדש.
 
     #### השלבים { .sol-steps }
 
@@ -64,9 +66,12 @@ added: 2026-10-21
 
     1. **מה הסנכרן מבטיח :** אחרי שני פלופים הערך יציב, אבל ביט שהשתנה סמוך לשפת
        השעון יכול להיתפס רק במחזור הבא. ההחלטה "ישן או חדש" נופלת **לכל ביט בנפרד**.
-    2. **בינארי :** במעבר `0111` → `1000` יש \( 2^4 = 16 \) צירופים אפשריים של ישן/חדש,
-       ו-14 מהם הם ערכים שהמצביע לא עבר בהם. `1111` למשל יגרום לקורא לחשוב שיש 8 מילים
-       יותר מהאמת, ואז הוא יקרא זבל.
+    2. **בינארי :** במעבר `0111` → `1000` יש \( 2^4 = 16 \) צירופים של ישן/חדש, כלומר כל
+       16 הערכים. מלבד הישן (7) והחדש (8) נשארים 14 : שבעה, 0 עד 6, הם ערכים שהמצביע כבר
+       עבר, ושבעה, 9 עד 15, הם ערכים שהוא עוד לא הגיע אליהם. `1111` (15) יגרום לקורא לחשוב
+       שנכתבו 7 מילים יותר מהאמת, וקורא שסומך על הספירה הזאת, למשל כדי לקרוא פרץ של מילים,
+       יקרא מילים שלא נכתבו. גם ערך מאחור לא תמיד בטוח : אם הוא קטן ממצביע הקריאה, ההפרש
+       גולש, והקורא רואה יותר מילים ממה שה-FIFO בכלל מחזיק.
     3. **‏Gray :** `0111` הוא `0100` ב-Gray ו-`1000` הוא `1100`. משתנה רק הביט העליון, ולכן
        הערך הנדגם הוא `0100` או `1100`. במקרה הגרוע הקורא רואה את המצביע הישן, כלומר
        חושב שיש פחות מילים מהאמת : הוא יחכה מחזור נוסף, וזה בטוח.
@@ -75,21 +80,26 @@ added: 2026-10-21
 
     #### למה זה נכון { .sol-proof }
 
-    **דיאגרמת תזמון.** הכותב מקדם את המצביע מ-7 ל-8 בזמן שהשפה של `rclk` נופלת באמצע
-    המעבר. בבינארי ביטים 3 ו-0 נתפסים חדשים וביטים 2 ו-1 ישנים, והקורא רואה `1110` (14).
-    ב-Gray רק ביט 3 משתנה, ולקורא יש שתי אפשרויות בלבד :
+    **דיאגרמת תזמון.** הכותב מקדם את המצביע מ-7 ל-8, ושפה עולה של `rclk` נופלת בדיוק על
+    המעבר : בה דוגם `rq1`, הפלופ הראשון של הסנכרן. בבינארי ביטים 3 ו-0 נתפסים חדשים וביטים
+    2 ו-1 ישנים, והקורא רואה `1110` (14). ב-Gray רק ביט 3 משתנה, ולקורא יש שתי אפשרויות
+    בלבד. בשפה הבאה של `rclk` הביטים כבר יציבים, ושני הקווים מקבלים את הערך החדש :
+
+    <!-- gen 0 -->
 
     ```wavedrom
     { signal: [
-      { name: "wclk",          wave: "p......" },
-      { name: "wptr (binary)", wave: "=.=....", data: ["0111", "1000"] },
-      { name: "wptr (Gray)",   wave: "=.=....", data: ["0100", "1100"] },
+      { name: "wclk",          wave: "p......." },
+      { name: "wptr (binary)", wave: "=.=.....", data: ["0111", "1000"] },
+      { name: "wptr (Gray)",   wave: "=.=.....", data: ["0100", "1100"] },
       {},
-      { name: "rclk",          wave: "0.1.0.1", period: 1.5 },
-      { name: "sync binary",   wave: "=....=.", data: ["0111", "1110 ?"] },
-      { name: "sync Gray",     wave: "=....=.", data: ["0100", "0100 / 1100"] }
+      { name: "rclk",          wave: "p..", period: 3, phase: 1 },
+      { name: "rq1 (binary)",  wave: "===", period: 3, phase: 1, data: ["0111", "1110 ?", "1000"] },
+      { name: "rq1 (Gray)",    wave: "===", period: 3, phase: 1, data: ["0100", "0100 / 1100", "1100"] }
     ]}
     ```
+
+    <!-- /gen -->
 
     **מה הערך הישן עושה.** מצביע קריאה ישן אצל הכותב גורם ל-`full` להידלק מוקדם (הכותב
     חושב שנשאר פחות מקום), ומצביע כתיבה ישן אצל הקורא גורם ל-`empty` להידלק מוקדם. בשני
@@ -97,10 +107,11 @@ added: 2026-10-21
     נקראה ולא נקראת לפני שנכתבה. זו השמרנות הנכונה, והיא נשמרת רק כשהערך הנדגם הוא
     באמת ערך שהמצביע עבר בו.
 
-    **לנסות בעצמכם.** בתיבה הבאה בוחרים את המצביע לפני הצעד, וכל ביט שמשתנה נדגם ישן
-    או חדש, בלחיצה או בהגרלה. בבינארי מתקבלים ערכים שהמצביע מעולם לא עבר בהם; ב-Gray
-    תמיד הישן או החדש. בורר הרוחב עובר ל-3 עד 6 ביטים, ומתחיל מהצעד שלפני הגלישה, שבו
-    כל הביטים משתנים.
+    **נסו בעצמכם.** בתיבה הבאה כל ביט שמשתנה בצעד נדגם ישן או חדש, ולחיצה על ביט הופכת
+    אותו. היא מוסיפה על הדיאגרמה את כל הצירופים, ומצביעים ורוחבים אחרים. מצאו בבינארי צירוף
+    שבו הקורא רואה ערך גדול מהחדש, ואחד שבו הוא רואה ערך קטן מהישן, והשוו עם מקרי המלכודת
+    15 ו-0. אחר כך נסו את הגלישה, `1111` → `0000` : כל הביטים הבינאריים משתנים, וב-Gray
+    רק העליון.
 
     <div class="explorer" data-kind="gray" data-mode="sync"></div>
 
@@ -231,10 +242,11 @@ added: 2026-10-21
     הביט שמשתנה בצעד \( b \to b + 1 \) הוא מספר האפסים בסוף של \( b + 1 \), כלומר הביט
     הנמוך ביותר שהופך ל-1, וזה בדיוק גבול הבלוק מהשלב הרביעי.
 
-    **לנסות בעצמכם.** בתיבה הבאה בוחרים ערך ורוחב. בצד אחד ההמרה קדימה : הבינארי, השורה
-    המוזזת שמעליה נכנס 0, וה-XOR שלהן. בצד השני ״הביט הבא״ מוצא את הבינארי מה-Gray ביט
-    אחרי ביט מלמעלה, כל ביט מהביט שנמצא לפניו. ״b + 1״ ו״הפעלה״ מקדמים את המונה, והרצועה
-    מסמנת את הביט היחיד של Gray שמשתנה בכל צעד, גם בגלישה ל-0.
+    **נסו בעצמכם.** בתיבה הבאה שתי ההמרות לכל ערך ולכל רוחב, ההמרה חזרה ביט אחרי ביט, והמונה
+    בתנועה : זה מה שהיא מוסיפה על הטבלה. היא נפתחת ב-\( b = 11 \), והרצועה מסמנת את הביט של
+    ה-Gray שהשתנה בצעד שהביא אליו, 10 → 11. לפני שלוחצים ״b + 1״, נחשו איזה ביט יתהפך בצעד
+    ל-12 (רמז : כמה אפסים יש בסוף של `1100`?), ולחצו לבדוק. אחר כך לחצו על מקרה המלכודת של
+    הגלישה, 15 → 0 : בבינארי כל ארבעת הביטים מתהפכים, וב-Gray רק העליון.
 
     <div class="explorer" data-kind="gray" data-mode="convert" data-b="11"></div>
 
@@ -353,14 +365,82 @@ added: 2026-10-21
     **הכתובת לזיכרון.** ה-\( N \) הביטים הנמוכים של המצביע **הבינארי** המקומי הם הכתובת.
     הביט הנוסף משמש רק להשוואה, ולכן הזיכרון נשאר בגודל \( 2^N \).
 
-    **לנסות בעצמכם.** כותבים וקוראים ב-FIFO של 16 כניסות ורואים את שני המצביעים בני
-    5 הביטים בבינארי וב-Gray, את התפוסה, ואת `empty` ו-`full` לפי הכללים שלמעלה. אחרי
-    16 כתיבות בלי קריאה ארבעת הביטים הנמוכים שווים, ורק הביט החמישי מפריד בין מלא לריק.
-    בורר העומק עובר ל-8, 32 או 64 כניסות, והמצביעים מתרחבים לביט אחד מעל הכתובת. רצועת
-    התזמון מוסיפה עמודה לכל כתיבה או קריאה, עם המצביעים בבינארי וב-Gray והדגלים; כתיבה
-    ל-FIFO מלא או קריאה מ-FIFO ריק לא נכנסות אליה, כי ה-FIFO מסרב להן.
+    **נסו בעצמכם.** בתיבה הבאה כותבים וקוראים ב-FIFO של 16 כניסות, ו-`empty` ו-`full`
+    מחושבים לפי הכללים שלמעלה. היא מוסיפה על הבדיקה הממצה את הדרך למצב : כל כתיבה וקריאה
+    בדרך, ברצועת התזמון. כתבו 16 מילים בלי לקרוא, והשוו את ארבעת הביטים הנמוכים של שני
+    המצביעים : רק הביט החמישי מפריד בין מלא לריק. אחר כך לחצו על מקרה המלכודת של התנאי
+    הבינארי : 15 מילים בפנים, וב-Gray רק הביט העליון שונה, ולכן מי שמעתיק את התנאי של
+    בינארי מקבל ״מלא״.
 
     <div class="explorer" data-kind="gray" data-mode="flags"></div>
+
+    **החומרה כולה.** כך נראים שני המצביעים בחומרה, כל אחד בדומיין שלו, ושני הסנכרנים שמעבירים
+    אותם לצד השני. הקו המקווקו הוא הגבול בין הדומיינים, ורק שני חוטים חוצים אותו, `wgray`
+    ו-`rgray`, ושניהם יוצאים מרגיסטר :
+
+    <!-- gen 1 -->
+
+    <svg class="figure gh-fig gh-dp" viewBox="0 0 420 352" direction="ltr" style="max-width:26.25rem" role="img" aria-label="תרשים המלבנים של מצביעי ה-FIFO : למעלה הדומיין של wclk, למטה של rclk, וקו מקווקו ביניהם. בצד הכותב wbin של 5 ביטים עולה ב-1 על winc, bin2gray מחשב ממנו את wgray_next, והרגיסטר wgray שומר אותו. החוט wgray חוצה את הקו לשני פלופים בדומיין של הקורא, rq1_wgray ו-rq2_wgray. המשווה empty משווה את rq2_wgray עם rgray_next, והתוצאה נרשמת ב-rempty. בכיוון ההפוך rbin, bin2gray ו-rgray, החוט rgray חוצה לשני פלופים wq1_rgray ו-wq2_rgray, והמשווה full בודק ששני הביטים העליונים הפוכים והשאר שווים, ונרשם ב-wfull"><defs><marker id="gh-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path class="gh-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs><path class="gh-cdc" d="M0,180 L420,180"/><text class="gh-dom" x="210" y="173" text-anchor="middle">wclk domain</text><text class="gh-dom" x="210" y="196" text-anchor="middle">rclk domain</text><g class="gh-blk gh-reg"><rect x="20" y="30" width="76" height="44" rx="5"/><text x="58" y="49" text-anchor="middle">wbin</text><text class="gh-sub" x="58" y="65" text-anchor="middle">+1 on winc</text></g><g class="gh-blk gh-mux"><rect x="122" y="30" width="76" height="44" rx="5"/><text x="160" y="49" text-anchor="middle">bin2gray</text><text class="gh-sub" x="160" y="65" text-anchor="middle">b^(b&gt;&gt;1)</text></g><g class="gh-blk gh-reg"><rect x="224" y="30" width="76" height="44" rx="5"/><text x="262" y="49" text-anchor="middle">wgray</text><text class="gh-sub" x="262" y="65" text-anchor="middle">5 flops</text></g><g class="gh-blk gh-sync"><rect x="20" y="110" width="76" height="44" rx="5"/><text x="58" y="129" text-anchor="middle">wq1_rgray</text><text class="gh-sub" x="58" y="145" text-anchor="middle">flop 1</text></g><g class="gh-blk gh-sync"><rect x="122" y="110" width="76" height="44" rx="5"/><text x="160" y="129" text-anchor="middle">wq2_rgray</text><text class="gh-sub" x="160" y="145" text-anchor="middle">flop 2</text></g><g class="gh-blk gh-stage"><rect x="224" y="110" width="76" height="44" rx="5"/><text x="262" y="129" text-anchor="middle">full ?</text><text class="gh-sub" x="262" y="145" text-anchor="middle">top 2 inv.</text></g><g class="gh-blk gh-out"><rect x="326" y="110" width="76" height="44" rx="5"/><text x="364" y="129" text-anchor="middle">wfull</text><text class="gh-sub" x="364" y="145" text-anchor="middle">1 flop</text></g><g class="gh-blk gh-out"><rect x="20" y="206" width="76" height="44" rx="5"/><text x="58" y="225" text-anchor="middle">rempty</text><text class="gh-sub" x="58" y="241" text-anchor="middle">1 flop</text></g><g class="gh-blk gh-stage"><rect x="122" y="206" width="76" height="44" rx="5"/><text x="160" y="225" text-anchor="middle">empty ?</text><text class="gh-sub" x="160" y="241" text-anchor="middle">all equal</text></g><g class="gh-blk gh-sync"><rect x="224" y="206" width="76" height="44" rx="5"/><text x="262" y="225" text-anchor="middle">rq2_wgray</text><text class="gh-sub" x="262" y="241" text-anchor="middle">flop 2</text></g><g class="gh-blk gh-sync"><rect x="326" y="206" width="76" height="44" rx="5"/><text x="364" y="225" text-anchor="middle">rq1_wgray</text><text class="gh-sub" x="364" y="241" text-anchor="middle">flop 1</text></g><g class="gh-blk gh-reg"><rect x="20" y="286" width="76" height="44" rx="5"/><text x="58" y="305" text-anchor="middle">rgray</text><text class="gh-sub" x="58" y="321" text-anchor="middle">5 flops</text></g><g class="gh-blk gh-mux"><rect x="122" y="286" width="76" height="44" rx="5"/><text x="160" y="305" text-anchor="middle">bin2gray</text><text class="gh-sub" x="160" y="321" text-anchor="middle">b^(b&gt;&gt;1)</text></g><g class="gh-blk gh-reg"><rect x="224" y="286" width="76" height="44" rx="5"/><text x="262" y="305" text-anchor="middle">rbin</text><text class="gh-sub" x="262" y="321" text-anchor="middle">+1 on rinc</text></g><path class="gh-wire" d="M58,8 L58,30" marker-end="url(#gh-hb)"/><text class="gh-wlab" x="64" y="18" text-anchor="start">winc</text><path class="gh-wire" d="M96,52 L122,52" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M198,52 L224,52" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M160,74 L160,92 L262,92 L262,110" marker-end="url(#gh-hb)"/><text class="gh-wlab" x="211" y="88" text-anchor="middle">wgray_next</text><path class="gh-wire" d="M300,52 L412,52 L412,228 L402,228" marker-end="url(#gh-hb)"/><text class="gh-wlab" x="406" y="96" text-anchor="end">wgray</text><path class="gh-wire" d="M96,132 L122,132" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M198,132 L224,132" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M300,132 L326,132" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M326,228 L300,228" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M224,228 L198,228" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M122,228 L96,228" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M20,308 L8,308 L8,132 L20,132" marker-end="url(#gh-hb)"/><text class="gh-wlab" x="14" y="270" text-anchor="start">rgray</text><path class="gh-wire" d="M224,308 L198,308" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M122,308 L96,308" marker-end="url(#gh-hb)"/><path class="gh-wire" d="M160,286 L160,250" marker-end="url(#gh-hb)"/><text class="gh-wlab" x="166" y="272" text-anchor="start">rgray_next</text><path class="gh-wire" d="M262,348 L262,330" marker-end="url(#gh-hb)"/><text class="gh-wlab" x="268" y="344" text-anchor="start">rinc</text></svg>
+
+    <!-- /gen -->
+
+    - **המונה `wbin` :** חמישה פלופים בשעון `wclk`. בכל שפה הוא עולה ב-1 כש-`winc` דולק
+      ו-`wfull` כבוי, וארבעת הביטים הנמוכים שלו הם כתובת הכתיבה בזיכרון.
+    - **ההמרה bin2gray :** ארבעה שערי XOR, ‏\( g = b \oplus (b \gg 1) \), על הערך הבא של
+      המונה. התוצאה, `wgray_next`, נכנסת לרגיסטר `wgray` ולמשווה של full.
+    - **הרגיסטר `wgray` :** חמישה פלופים שמתעדכנים באותה שפה כמו `wbin`. הוא היחיד שחוצה
+      לצד של הקורא : ערך רשום משתנה פעם אחת בשפה, ובכל צעד ביט אחד בלבד.
+    - **הסנכרן `rq1_wgray`, ‏`rq2_wgray` :** שני פלופים לכל ביט, בשעון `rclk`. הראשון נתפס
+      מטא-יציב כשביט משתנה בדיוק בשפה, ועד השפה הבאה הוא נרגע לישן או לחדש; השני מעביר
+      ערך יציב.
+    - **המשווה empty :** משווה את `rgray_next`, המצביע של הקורא אחרי הקריאה של השפה הזאת,
+      עם `rq2_wgray`, בכל חמשת הביטים. התוצאה נרשמת ב-`rempty`, והקורא קורא רק כשהוא כבוי.
+    - **הכיוון ההפוך :** ‏`rbin`, ‏bin2gray ו-`rgray` בצד הקורא, באותו מבנה, והחוט `rgray`
+      חוצה לשני פלופים בשעון `wclk`, ‏`wq1_rgray` ו-`wq2_rgray`.
+    - **המשווה full :** משווה את `wgray_next` עם `wq2_rgray` כששני הביטים העליונים הפוכים,
+      התנאי מלמעלה. התוצאה נרשמת ב-`wfull`, והכותב כותב רק כשהוא כבוי.
+
+    **שפה אחרי שפה.** כך עוברות שלוש כתיבות ל-FIFO ריק, מהכתיבה הראשונה; בגל `rq1` ו-`rq2`
+    הם `rq1_wgray` ו-`rq2_wgray`. כל ביט של `wgray` מגיע לצד השני בהשהיה משלו (ה-clock-to-q
+    והחוט), ולכן הביטים זזים בזמנים שונים אחרי השפה של `wclk`; זה לא משנה, כי בכל צעד משתנה
+    ביט אחד. ביט 0 של המילה הראשונה מגיע בדיוק בשפה של `rclk`, ו-`rq1[0]` מטא-יציב (x) עד
+    שהוא נרגע, כאן לערך החדש. בשפה הבאה `rq2` מקבל אותו, ובזו שאחריה `rempty` יורד : שני
+    מחזורי `rclk` מהרגע שהביט הגיע. אילו הביט היה נרגע לערך הישן, הוא היה נתפס רק בשפה הבאה,
+    ו-`rempty` היה יורד אחרי שלושה מחזורים, וכך גם כשהביט מגיע רגע אחרי שפה. מכאן "2 עד 3
+    מחזורים". ‏`rq2` עובר רק דרך ערכים שהמצביע באמת החזיק. הביט החמישי, הנוסף, נשאר 0 ולא
+    מופיע :
+
+    <!-- gen 2 -->
+
+    ```wavedrom
+    { signal: [
+      { name: "wclk", wave: "p....", period: 2 },
+      { name: "wbin", wave: "===..", period: 2, data: ["1", "2", "3"] },
+      { name: "wgray[3]", wave: "0.........", phase: 0.7 },
+      { name: "wgray[2]", wave: "0.........", phase: 0.5 },
+      { name: "wgray[1]", wave: "0..1......", phase: 0.3 },
+      { name: "wgray[0]", wave: "01...0....", phase: 0.1 },
+      {},
+      { name: "rclk", wave: "0p..", period: 3, phase: 2.1 },
+      { name: "rq1[3]", wave: "0.......", period: 1.5, phase: 2.1 },
+      { name: "rq1[2]", wave: "0.......", period: 1.5, phase: 2.1 },
+      { name: "rq1[1]", wave: "0...1...", period: 1.5, phase: 2.1 },
+      { name: "rq1[0]", wave: "0.x1..0.", period: 1.5, phase: 2.1 },
+      { name: "rq2", wave: "=.==", period: 3, phase: 2.1, data: ["0000", "0001", "0011"] },
+      { name: "rempty", wave: "1..0", period: 3, phase: 2.1 }
+    ]}
+    ```
+
+    <!-- /gen -->
+
+    **נסו בעצמכם.** בתיבה הבאה ה-FIFO מתקדם שפה אחרי שפה, של `wclk` או של `rclk` לפי הזמן.
+    התרשים מראה את הערך של כל רגיסטר אחרי השפה, ולידו טבלה של כל האותות, עמודה לכל שפה. היא
+    מוסיפה על הגל את הכיוון ההפוך, את `full`, ומקרי מלכודת. התקדמו עד ש-`rempty` יורד,
+    וספרו את השפות של `rclk` מאז שהביט של `wgray` הגיע. אחר כך לחצו על מקרה המלכודת של
+    המצביע הבינארי : שפה של `rclk` נופלת באמצע המעבר 7 → 8, ‏`rq2_wbin` מקבל 15, והקורא
+    חושב שיש 8 מילים כשנכתבה אחת :
+
+    <div class="explorer" data-kind="grayhw"></div>
 
     #### סיבוכיות { .sol-cost }
 
@@ -371,9 +451,22 @@ added: 2026-10-21
 
 ??? trap "מלכודת : לסנכרן ערך Gray שחושב בלוגיקה צירופית"
     אם ה-Gray מחושב מהמצביע הבינארי ב-XOR ונשלח ישר לסנכרן, גליצ'ים בלוגיקה הצירופית
-    יכולים להפוך כמה ביטים לרגע. את ה-Gray **רושמים** בפלופ בדומיין המקור, ורק הפלופ
-    הזה עובר לסנכרן. הדרך המקובלת : המונה עצמו שומר בינארי ו-Gray בשני רגיסטרים, ושניהם
-    מתעדכנים באותה שפה.
+    יכולים להפוך כמה ביטים לרגע. ב-`0111` → `1000` כל ארבעת הביטים של `wbin` משתנים, וכל
+    אחד מגיע ל-XOR בזמן אחר. אם העליון מגיע ראשון, הפלט עובר בדרך מ-`0100` ל-`1100` דרך
+    `1000`, ‏`1110` ו-`1101`, ושפה של `rclk` באמצע תופסת `1000`, שהוא 15 בבינארי, בדיוק
+    הבעיה של סעיף א :
+
+    <!-- gen 3 -->
+
+    <svg class="figure gh-fig gh-glitch" viewBox="0 0 420 222" direction="ltr" style="max-width:26.25rem" role="img" aria-label="שרטוט הגליץ&#x27; : ארבעת הביטים של wbin עוברים מ-0111 ל-1000, כל אחד בזמן אחר. ה-Gray שמחושב מהם ב-XOR עובר בדרך דרך 1000, 1110 ו-1101 לפני 1100, ושפה של rclk באמצע תופסת 1000, שהוא 15 בבינארי. ה-wgray הרשום משנה רק ביט אחד, מ-0100 ל-1100"><text class="gh-lane" x="96" y="42" text-anchor="end">wbin[3]</text><path class="gh-bitline" d="M104,44 L170,44 L170,30 L412,30"/><text class="gh-lane" x="96" y="68" text-anchor="end">wbin[2]</text><path class="gh-bitline" d="M104,56 L214,56 L214,70 L412,70"/><text class="gh-lane" x="96" y="94" text-anchor="end">wbin[1]</text><path class="gh-bitline" d="M104,82 L258,82 L258,96 L412,96"/><text class="gh-lane" x="96" y="120" text-anchor="end">wbin[0]</text><path class="gh-bitline" d="M104,108 L302,108 L302,122 L412,122"/><text class="gh-lane" x="96" y="150" text-anchor="end">bin2gray</text><text class="gh-lane gh-lane2" x="96" y="164" text-anchor="end">(wbin)</text><rect class="gh-seg" x="105" y="134" width="64" height="36" rx="3"/><text class="gh-segv" x="137" y="149" text-anchor="middle">0100</text><text class="gh-segn" x="137" y="164" text-anchor="middle">= 7</text><rect class="gh-seg gh-bad" x="171" y="134" width="42" height="36" rx="3"/><text class="gh-segv" x="192" y="149" text-anchor="middle">1000</text><text class="gh-segn" x="192" y="164" text-anchor="middle">= 15</text><rect class="gh-seg gh-bad" x="215" y="134" width="42" height="36" rx="3"/><text class="gh-segv" x="236" y="149" text-anchor="middle">1110</text><text class="gh-segn" x="236" y="164" text-anchor="middle">= 11</text><rect class="gh-seg gh-bad" x="259" y="134" width="42" height="36" rx="3"/><text class="gh-segv" x="280" y="149" text-anchor="middle">1101</text><text class="gh-segn" x="280" y="164" text-anchor="middle">= 9</text><rect class="gh-seg" x="303" y="134" width="108" height="36" rx="3"/><text class="gh-segv" x="357" y="149" text-anchor="middle">1100</text><text class="gh-segn" x="357" y="164" text-anchor="middle">= 8</text><text class="gh-lane" x="96" y="196" text-anchor="end">wgray</text><text class="gh-lane gh-lane2" x="96" y="210" text-anchor="end">(register)</text><rect class="gh-seg" x="105" y="180" width="64" height="36" rx="3"/><text class="gh-segv" x="137" y="195" text-anchor="middle">0100</text><text class="gh-segn" x="137" y="210" text-anchor="middle">= 7</text><rect class="gh-seg" x="171" y="180" width="240" height="36" rx="3"/><text class="gh-segv" x="291" y="195" text-anchor="middle">1100</text><text class="gh-segn" x="291" y="210" text-anchor="middle">= 8</text><path class="gh-edge" d="M104,16 L104,220"/><text class="gh-elab" x="104" y="11" text-anchor="middle">wclk ↑</text><path class="gh-edge gh-redge" d="M192,16 L192,132 M192,172 L192,220"/><text class="gh-elab gh-relab" x="192" y="11" text-anchor="middle">rclk ↑</text></svg>
+
+    <span class="viz-legend"><span><i class="gh-key-bad"></i><span>ערך ביניים, לא הישן ולא החדש</span></span><span><i class="gh-key-ok"></i><span>ערך שהמצביע באמת מחזיק</span></span><span><i class="gh-key-edge"></i><span>השפה של rclk</span></span></span>
+
+    <!-- /gen -->
+
+    את ה-Gray **רושמים** בפלופ בדומיין המקור, ורק הפלופ הזה עובר לסנכרן : הפלט שלו משתנה
+    פעם אחת בשפה, בביט אחד. הדרך המקובלת : המונה עצמו שומר בינארי ו-Gray בשני רגיסטרים,
+    ושניהם מתעדכנים באותה שפה.
 
 ??? trap "מלכודת : מצביע שקופץ ביותר מאחד"
     התכונה "ביט אחד בצעד" נכונה רק לצעדים של \( \pm 1 \). FIFO שכותב שתי מילים במחזור

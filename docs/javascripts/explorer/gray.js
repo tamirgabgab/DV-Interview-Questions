@@ -39,6 +39,18 @@
       wrongCount: changedBin.length >= 1 ? (1 << changedBin.length) - 2 : 0,
     };
   };
+  // Where a value seen in place of the step old -> old + 1 lies (tools/figures/q0034.py place):
+  // "old", "new", "behind" (d steps before old, a value the pointer held) or "ahead" (d steps
+  // after new, one it has not reached). The k changing bits make a window of 2^k values
+  // around the step, half on each side, the wrap to 0 included.
+  const grayPlace = (old, bits, seen) => {
+    const size = 1 << bits, k = ((old ^ ((old + 1) % size)).toString(2).match(/1/g) || []).length;
+    let d = (((seen - old) % size) + size) % size;
+    if (d > 1 << (k - 1)) d -= size;
+    if (d === 0) return ["old", 0];
+    if (d === 1) return ["new", 0];
+    return d > 1 ? ["ahead", d - 1] : ["behind", -d];
+  };
   // The page's two conversions bit by bit (part b), from the top bit down: forward,
   // g_i = b_(i+1) xor b_i with 0 above the top; back, b_i = b_(i+1) xor g_i, where
   // b_(i+1) is the bit found one step before (0 above the top again).
@@ -84,7 +96,9 @@
     const empty = wg === rg;
     const full = (wg & top) === (~rg & top) && (wg & rest) === (rg & rest);
     const occupancy = (w - r) & ((1 << bits) - 1);
-    return { wg, rg, empty, full, occupancy };
+    // the binary rule copied onto Gray (the trap): only the top bit differs
+    const naiveFull = (wg ^ rg) === 1 << (bits - 1);
+    return { wg, rg, empty, full, naiveFull, occupancy };
   };
 
   // The Gray pointer box (0034). data-mode="sync": a step b -> b + 1 of a 4-bit pointer
@@ -93,6 +107,12 @@
   // data-mode="flags": a FIFO of 8 to 64 entries with pointers one bit wider than the
   // address, write and read, the pointers in binary and Gray, empty and full by the
   // page's rules.
+  // the sync box's trap cases: [label, bits, b, binary bits arrived, Gray bits arrived]
+  const SYNC_TRAPS = [
+    [`${ltr("15")} במקום ${ltr("8")}`, 4, 7, { 3: 1, 2: 0, 1: 0, 0: 0 }, { 3: 1 }],
+    [`${ltr("0")} במקום ${ltr("8")}`, 4, 7, { 3: 0, 2: 1, 1: 1, 0: 1 }, { 3: 0 }],
+    [`הגלישה ${ltr("1111 → 0000")}`, 4, 15, { 3: 1, 2: 0, 1: 0, 0: 0 }, { 3: 0 }],
+  ];
   const grayView = (box) => ({
     mount() {
       if (box.dataset.mode === "flags") { grayFlagsMount(box); return; }
@@ -105,7 +125,8 @@
         `<button type="button" class="md-button ex-random">הגרלה : אילו ביטים הגיעו</button>` +
         `<button type="button" class="md-button ex-all">הכול הגיע</button>` +
         `<button type="button" class="md-button ex-none">כלום עוד לא הגיע</button>` +
-        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button>` +
+        SYNC_TRAPS.map(([label], i) => `<button type="button" class="md-button ex-preset gr-trap" data-i="${i}">מקרה מלכודת${NB}: ${label}</button>`).join("") + `</div>` +
         `<p class="wv-hint">כל ביט שמשתנה בצעד עובר סנכרן משלו, ויכול להידגם ישן או חדש. לחיצה על ביט כזה בשורה "נדגם" הופכת אותו.</p>` +
         `<div class="gr-box"><div class="gr-side gr-bin"></div><div class="gr-side gr-gray"></div></div>` +
         `<p class="ex-summary gr-sum" aria-live="polite"></p>`;
@@ -125,14 +146,21 @@
         $(".ex-b").max = String((1 << BITS) - 1); $(".ex-b").value = st.b; $(".ex-bout").textContent = String(st.b);
         const bin = side(`בינארי : ${ltr(`${bitsOf(r.oldB, BITS)} → ${bitsOf(r.newB, BITS)}`)}, ${ltr(r.changedBin.length)} ביטים משתנים`, r.oldB, r.newB, r.changedBin, st.arrBin, r.seenBin, "bin");
         const gray = side(`‏Gray : ${ltr(`${bitsOf(r.oldG, BITS)} → ${bitsOf(r.newG, BITS)}`)}, ביט אחד משתנה`, r.oldG, r.newG, r.changedGray, st.arrGray, r.seenGray, "gray");
+        const [where, d] = grayPlace(r.oldB, BITS, r.seenBin);
         const binV = r.binValid
-          ? `<p class="gr-ok">הקורא רואה ${ltr(r.seenBin)} : ${r.seenBin === r.oldB ? "הערך הישן" : "הערך החדש"}, ערך שהמצביע באמת עבר בו ✓</p>`
-          : `<p class="gr-bad">הקורא רואה ${ltr(r.seenBin)} : לא הישן ולא החדש. המצביע מעולם לא היה שם, והתפוסה שהקורא יחשב שגויה ב-${ltr(Math.abs(r.seenBin - r.oldB))} מילים ✗</p>`;
+          ? `<p class="gr-ok">הקורא רואה ${ltr(r.seenBin)}${NB}: ${r.seenBin === r.oldB ? "הערך הישן" : "הערך החדש"}, ערך שהמצביע באמת עבר בו ✓</p>`
+          : where === "ahead"
+            ? `<p class="gr-bad">הקורא רואה ${ltr(r.seenBin)}${NB}: לא הישן ולא החדש, אלא ערך שהמצביע עוד לא הגיע אליו, ${ltr(d)} צעדים אחרי החדש. הקורא חושב שנכתבו ${ltr(d)} מילים שלא נכתבו ✗</p>`
+            : `<p class="gr-bad">הקורא רואה ${ltr(r.seenBin)}${NB}: לא הישן ולא החדש, אלא ערך שהמצביע עבר ${ltr(d)} צעדים לפני הישן. הקורא חושב שיש פחות מילים, וזה בטוח רק כל עוד הערך לא קטן ממצביע הקריאה שלו; אחרת ההפרש גולש ✗</p>`;
         const grayV = `<p class="gr-ok">הקורא רואה ${ltr(bitsOf(r.seenGray, BITS))}, כלומר ${ltr(r.seenGrayAsBin)} : ${r.seenGray === r.oldG ? "הערך הישן (במקרה הגרוע הוא מחכה מחזור נוסף)" : "הערך החדש"} ✓</p>`;
         $(".gr-bin").innerHTML = bin + binV;
         $(".gr-gray").innerHTML = gray + grayV;
         const k = r.changedBin.length;
-        $(".gr-sum").innerHTML = `בצעד ${ltr(`${r.oldB} → ${r.newB}`)} משתנים ${ltr(k)} ביטים בבינארי : ${ltr(`2<sup>${k}</sup> = ${1 << k}`)} צירופים של ישן/חדש, ${ltr(r.wrongCount)} מהם ערכים שגויים. ב-Gray משתנה ביט אחד : שני צירופים, שניהם ערכים שהמצביע עבר בהם.`;
+        const half = k > 1 ? (1 << (k - 1)) - 1 : 0;
+        $(".gr-sum").innerHTML = (k === 1
+          ? `בצעד ${ltr(`${r.oldB} → ${r.newB}`)} משתנה ביט אחד גם בבינארי${NB}: שני צירופים, הישן והחדש.`
+          : `בצעד ${ltr(`${r.oldB} → ${r.newB}`)} משתנים ${ltr(k)} ביטים בבינארי${NB}: ${ltr(`2<sup>${k}</sup> = ${1 << k}`)} צירופים של ישן/חדש, ו-${ltr(r.wrongCount)} מהם לא הישן ולא החדש${NB}: ${ltr(half)} ערכים שהמצביע כבר עבר, ו-${ltr(half)} שהוא עוד לא הגיע אליהם.`) +
+          ` ב-Gray משתנה ביט אחד${NB}: שני צירופים, שניהם ערכים שהמצביע עבר בהם.`;
       };
       const randomize = (rng) => {
         const r = graySample(st.b, BITS, {}, {});
@@ -155,6 +183,11 @@
       // the page's example: 4 bits, bits 3 and 0 arrived, 2 and 1 did not (1110); in Gray the old value
       const page = () => { st.bits = 4; $(".ex-bits").value = "4"; st.b = 7; st.arrBin = { 3: 1, 0: 1, 2: 0, 1: 0 }; st.arrGray = { 3: 0 }; draw(); };
       $(".ex-reset").addEventListener("click", page);
+      // the trap cases: a value ahead (15 for 8), one behind (0 for 8), the wrap 1111 -> 0000
+      box.querySelectorAll(".gr-trap").forEach((btn) => btn.addEventListener("click", () => {
+        const [, bits, b, arrBin, arrGray] = SYNC_TRAPS[Number(btn.dataset.i)];
+        st.bits = bits; $(".ex-bits").value = String(bits); st.b = b; st.arrBin = { ...arrBin }; st.arrGray = { ...arrGray }; draw();
+      }));
       // a new width: the step before the wrap (all bits change), nothing arrived yet
       $(".ex-bits").addEventListener("change", () => { st.bits = Number($(".ex-bits").value); st.b = (1 << (st.bits - 1)) - 1; st.arrBin = {}; st.arrGray = {}; draw(); });
       page();
@@ -174,7 +207,9 @@
       `<label><span>הערך b</span><input type="range" class="ex-b" min="0" max="15" step="1" value="${B0}" dir="ltr" aria-label="הערך הבינארי b"><output class="ex-bout"></output></label>` +
       `<button type="button" class="md-button md-button--primary ex-inc">‏b + 1</button>` +
       `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 300) +
-      `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
+      `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button>` +
+      `<button type="button" class="md-button ex-preset gr-trap" data-b="0">מקרה מלכודת${NB}: הגלישה ${ltr("15 → 0")}</button>` +
+      `<button type="button" class="md-button ex-preset gr-trap" data-b="8">מקרה מלכודת${NB}: ${ltr("7 → 8")}, ארבעה ביטים בבינארי</button></div>` +
       `<div class="gr-box"><div class="gr-side gr-fwd"></div><div class="gr-side gr-back"></div></div>` +
       `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">הביט הקודם</button>` +
       `<button type="button" class="md-button md-button--primary ex-next">הביט הבא</button>` +
@@ -187,7 +222,9 @@
     const cell = (v, cls = "") => `<span class="gr-bit${cls ? ` ${cls}` : ""}">${v}</span>`;
     const row = (label, cells, dec) => `<div class="gr-row"><span class="gr-label">${label}</span><span class="gr-bits" dir="ltr">${cells}</span><span class="gr-dec">${dec}</span></div>`;
     const draw = () => {
-      const BITS = st.bits, size = 1 << BITS, r = grayConvertSteps(st.b, BITS), walk = grayWalk(BITS), w = walk[st.b];
+      // the step that led to b (b - 1 -> b, the wrap when b is 0): its one Gray bit is marked, so at
+      // b the reader can predict the bit of the next step before pressing b + 1
+      const BITS = st.bits, size = 1 << BITS, r = grayConvertSteps(st.b, BITS), walk = grayWalk(BITS), pb = (st.b - 1 + size) % size, w = walk[pb];
       st.k = Math.min(st.k, BITS);
       $(".ex-b").max = String(size - 1); $(".ex-b").value = st.b; $(".ex-bout").textContent = String(st.b);
       const ch = (i) => (i === w.bit ? " is-changed" : "");
@@ -217,10 +254,9 @@
         [...Array(BITS)].map((_, j) => { const i = BITS - 1 - j; return { name: `g${i}`, kind: "bit", values: cols.map((g) => (g >> i) & 1), cls: i === w.bit ? "wv-s2" : "wv-s3" }; }),
         cols.length, { slotW: SW, labelW: 40, cursor: st.b, ticks: (k) => (k === size ? 0 : k), label: `ביטי ה-Gray של ${size} ערכי המונה, הערך ${st.b} מסומן` });
       wrapEl.scrollLeft = Math.max(0, 40 + st.b * SW - wrapEl.clientWidth / 2);
-      const nb = (st.b + 1) % size;
-      $(".gr-sum").innerHTML = `הצעד ${ltr(`${st.b} → ${nb}`)}${NB}: בבינארי ${w.binChanges === 1 ? "משתנה ביט אחד" : `משתנים ${ltr(w.binChanges)} ביטים`} ` +
-        `(${ltr(`${bitsOf(st.b, BITS)} → ${bitsOf(nb, BITS)}`)}), וב-Gray רק ביט ${ltr(w.bit)} (${ltr(`${bitsOf(w.g, BITS)} → ${bitsOf(grayOf(nb), BITS)}`)}), המודגש ברצועה. ` +
-        (nb === 0 ? `זו הגלישה : כל הביטים הבינאריים מתהפכים, וב-Gray משתנה רק הביט העליון.` : `זה מספר האפסים בסוף של ${ltr(nb)}.`);
+      $(".gr-sum").innerHTML = `הצעד שהביא ל-${ltr(st.b)}, ${ltr(`${pb} → ${st.b}`)}${NB}: בבינארי ${w.binChanges === 1 ? "השתנה ביט אחד" : `השתנו ${ltr(w.binChanges)} ביטים`} ` +
+        `(${ltr(`${bitsOf(pb, BITS)} → ${bitsOf(st.b, BITS)}`)}), וב-Gray רק ביט ${ltr(w.bit)} (${ltr(`${bitsOf(w.g, BITS)} → ${bitsOf(grayOf(st.b), BITS)}`)}), המודגש ברצועה. ` +
+        (st.b === 0 ? `זו הגלישה${NB}: כל הביטים הבינאריים מתהפכים, וב-Gray משתנה רק הביט העליון.` : `זה מספר האפסים בסוף של ${ltr(st.b)}.`);
     };
     const inc = () => { st.b = (st.b + 1) % (1 << st.bits); st.walked++; draw(); };
     $(".ex-b").addEventListener("input", () => { stop(); st.b = Number($(".ex-b").value); draw(); });
@@ -230,9 +266,15 @@
     $(".ex-prev").addEventListener("click", () => { if (st.k > 0) st.k--; draw(); });
     $(".ex-end").addEventListener("click", () => { st.k = st.bits; draw(); });
     $(".ex-reset").addEventListener("click", () => { stop(); st.bits = 4; $(".ex-bits").value = "4"; st.b = B0; st.k = 4; draw(); });
+    box.querySelectorAll(".gr-trap").forEach((btn) => btn.addEventListener("click", () => { stop(); st.bits = 4; $(".ex-bits").value = "4"; st.b = Number(btn.dataset.b); st.k = 4; draw(); }));
     const stop = autoplay($(".ex-play"), $(".ex-speed"), { step: inc, done: () => st.walked >= 1 << st.bits, restart: () => { st.walked = 0; } });
     draw();
   };
+  // the flags box's trap cases: [label, [writes, reads]...] from the reset, 16 entries
+  const FLAG_TRAPS = [
+    ["מלא אחרי גלגול", [[16, 0], [0, 16], [16, 0]]],
+    ["התנאי הבינארי על Gray", [[15, 0], [0, 8], [8, 0]]],
+  ];
   const grayFlagsMount = (box) => {
     const st = { size: 16, w: 0, r: 0, hist: [], ops: [] };
     const KEEP = 64;                                       // columns kept on the strip
@@ -245,6 +287,7 @@
       `<button type="button" class="md-button ex-read8"></button>` +
       `<button type="button" class="md-button ex-prev">צעד אחורה</button>` +
       `<button type="button" class="md-button ex-start">איפוס</button></div>` +
+      `<div class="ex-controls">` + FLAG_TRAPS.map(([label], i) => `<button type="button" class="md-button ex-preset gr-trap" data-i="${i}">מקרה מלכודת${NB}: ${label}</button>`).join("") + `</div>` +
       `<div class="gr-slots" dir="ltr" role="img"></div>` +
       `<div class="gr-ptrs"></div><p class="ex-summary gr-sum" aria-live="polite"></p>` +
       `<p class="ex-title">רצועת התזמון : עמודה לכל כתיבה או קריאה, המצביעים אחריה והדגלים</p>` +
@@ -279,7 +322,8 @@
       sum += fl.full ? `<span class="gr-ok">מלא ✓</span> : שני הביטים העליונים הפוכים (${ltr(wg.slice(0, 2))} מול ${ltr(rg.slice(0, 2))}) ו-${ltr(BITS - 2)} הנמוכים שווים (${ltr(wg.slice(2))}).`
         : `מלא? לא : ` + (topFlip ? `העליונים הפוכים, אבל הנמוכים ${ltr(wg.slice(2))} מול ${ltr(rg.slice(2))}.` : `העליונים ${ltr(wg.slice(0, 2))} מול ${ltr(rg.slice(0, 2))} אינם הפוכים.`);
       if (fl.occupancy === 0 && st.w !== 0) sum += ` בלי הביט הנוסף המצביעים היו ${ltr(lowBits)} ו-${ltr(bitsOf(ra, low))} : שווים, בדיוק כמו במצב מלא.`;
-      if (fl.full) sum += ` ${ltr(low)} הביטים הנמוכים של שני המצביעים שווים (${ltr(lowBits)})  : בלי הביט הנוסף זה היה נראה ריק.`;
+      if (fl.full) sum += ` ${ltr(low)} הביטים הנמוכים של שני המצביעים שווים (${ltr(lowBits)})${NB}: בלי הביט הנוסף זה היה נראה ריק.`;
+      if (fl.naiveFull && !fl.full) sum += ` <span class="gr-bad">התנאי של בינארי, רק העליון הפוך, היה אומר כאן ״מלא״ (${ltr(wg)} מול ${ltr(rg)}), אבל בפנים ${ltr(fl.occupancy)} מילים ✗</span>`;
       $(".gr-sum").innerHTML = sum;
       // the strip: the last KEEP columns of the operations so far
       const all = grayFlagsOps(st.ops, SIZE), first = Math.max(0, all.length - KEEP), cols = all.slice(first);
@@ -310,6 +354,11 @@
     $(".ex-read8").addEventListener("click", () => step(0, st.size / 2));
     $(".ex-prev").addEventListener("click", () => { const h = st.hist.pop(); if (h) { [st.w, st.r] = h; st.ops.length = h[2]; } draw(); });
     $(".ex-start").addEventListener("click", () => { st.w = 0; st.r = 0; st.hist = []; st.ops = []; draw(); });
+    // a trap case: from the reset of a FIFO of 16 entries, the writes and reads of its recipe
+    box.querySelectorAll(".gr-trap").forEach((btn) => btn.addEventListener("click", () => {
+      st.size = 16; $(".ex-size").value = "16"; st.w = 0; st.r = 0; st.hist = []; st.ops = [];
+      FLAG_TRAPS[Number(btn.dataset.i)][1].forEach(([dw, dr]) => step(dw, dr));
+    }));
     $(".ex-size").addEventListener("change", () => { st.size = Number($(".ex-size").value); st.w = 0; st.r = 0; st.hist = []; st.ops = []; draw(); });
     draw();
   };
@@ -317,8 +366,8 @@
   dvqExplorers.register({
     views: { gray: grayView },
     help: {
-      gray: "בסנכרן בוחרים מצביע ורוחב, וכל ביט שמשתנה נדגם ישן או חדש (בלחיצה או ב״הגרלה״). ב-FIFO ״כתיבה״ ו״קריאה״ מזיזים את המצביעים, empty ו-full מחושבים לפי הכללים, ורצועת התזמון מוסיפה עמודה לכל פעולה. בהמרות בוחרים ערך ורוחב : ״הביט הבא״ מוצא את הבינארי מה-Gray ביט אחרי ביט, ו-״b + 1״ ו״הפעלה״ מקדמים את המונה, והביט היחיד שמשתנה ב-Gray מודגש.",
+      gray: "בסנכרן בוחרים מצביע ורוחב, וכל ביט שמשתנה נדגם ישן או חדש (בלחיצה או ב״הגרלה״). ב-FIFO ״כתיבה״ ו״קריאה״ מזיזים את המצביעים, empty ו-full מחושבים לפי הכללים, ורצועת התזמון מוסיפה עמודה לכל פעולה. בהמרות בוחרים ערך ורוחב : ״הביט הבא״ מוצא את הבינארי מה-Gray ביט אחרי ביט, ו-״b + 1״ ו״הפעלה״ מקדמים את המונה, והביט היחיד שמשתנה ב-Gray מודגש. כפתורי ״מקרה מלכודת״ טוענים מצבים שבהם קל לטעות.",
     },
-    models: { grayOf, grayToBin, graySample, grayFlags, grayFlagsOps, grayConvertSteps, grayWalk },
+    models: { grayOf, grayToBin, graySample, grayPlace, grayFlags, grayFlagsOps, grayConvertSteps, grayWalk },
   });
 })();
