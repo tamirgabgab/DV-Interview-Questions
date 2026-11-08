@@ -46,7 +46,21 @@ added: 2026-10-15
     #### הרעיון { .sol-idea }
 
     שומרים את הערך של `sig` מהמחזור הקודם ב-Flip-Flop אחד, ונקרא לו `sig_q`.
-    עליית שפה מתרחשת בדיוק כאשר הערך הנוכחי הוא `1` והערך הקודם היה `0` :
+    בכל מחזור יש רק ארבעה צירופים של `sig` ו-`sig_q`, ורק אחד מהם הוא עליית שפה :
+
+    <!-- gen 0 -->
+
+    | עכשיו, `sig` | במחזור הקודם, `sig_q` | מה קרה | המוצא, `pulse` |
+    |:-:|:-:|:-:|:-:|
+    | ‏0 | ‏0 | נמוך, וגם קודם היה נמוך | ‏0 |
+    | ‏0 | ‏1 | ירידת שפה | ‏0 |
+    | ‏1 | ‏0 | **עליית שפה** | **‏1** |
+    | ‏1 | ‏1 | גבוה כבר מהמחזור הקודם | ‏0 |
+
+    <!-- /gen -->
+
+    עליית שפה מתרחשת בדיוק כאשר הערך הנוכחי הוא `1` והערך הקודם היה `0`, כלומר `sig` עם
+    ההיפוך של `sig_q` :
 
     \[
     pulse = sig \land \lnot sig\_q
@@ -54,9 +68,9 @@ added: 2026-10-15
 
     **המעגל.** Flip-Flop אחד, שער NOT אחד ושער AND אחד :
 
-    <!-- gen 0 -->
+    <!-- gen 1 -->
 
-    <svg class="figure ff-fig" viewBox="0 0 580 212" style="max-width:36rem" role="img" aria-label="המעגל : sig נכנס לפליפ-פלופ D שמוציא את sig_q, הערך של המחזור הקודם, עם איפוס rst_n פעיל בנמוך. sig_q עובר דרך מהפך, ושער AND מחבר אותו עם sig ומוציא את pulse"><text class="ff-text" x="62" y="50" text-anchor="end">sig</text><text class="ff-text" x="62" y="156" text-anchor="end">clk</text><text class="ff-text" x="62" y="202" text-anchor="end">rst_n</text><polyline class="ff-wire" points="68,44 408,44"/><polyline class="ff-wire" points="128,44 128,116 178,116"/><circle class="ink-dot" cx="128" cy="44" r="4"/><rect class="ff-gate" x="178" y="96" width="70" height="80" rx="3"/><text class="ff-pin" x="186" y="122" text-anchor="start">D</text><text class="ff-pin" x="240" y="122" text-anchor="end">Q</text><polyline class="ff-wire" points="68,150 178,150"/><path class="ff-wire" d="M178,143 L188,150 L178,157"/><circle class="ff-gate" cx="213" cy="180" r="4"/><polyline class="ff-wire" points="213,184 213,196 68,196"/><polyline class="ff-wire" points="248,116 318,116"/><text class="ff-small" x="283" y="106" text-anchor="middle">sig_q</text><path class="ff-gate" d="M318,104 L340,116 L318,128 Z"/><circle class="ff-gate" cx="344" cy="116" r="4"/><polyline class="ff-wire" points="348,116 382,116 382,72 408,72"/><path class="ff-gate" d="M408,36.0 H430.0 A22.0,22.0 0 0 1 430.0,80.0 H408 Z"/><polyline class="ff-wire" points="452,58 510,58"/><text class="ff-text" x="516" y="64" text-anchor="start">pulse</text></svg>
+    <svg class="figure ff-fig" viewBox="0 0 580 212" style="max-width:36rem" role="img" aria-label="המעגל : sig נכנס לפליפ-פלופ D שמוציא את sig_q, הערך של המחזור הקודם, עם איפוס rst_n פעיל בנמוך. sig_q עובר דרך מהפך, ושער AND מחבר אותו עם sig ומוציא את pulse"><text class="ff-text" x="62" y="50" text-anchor="end">sig</text><text class="ff-text" x="62" y="156" text-anchor="end">clk</text><text class="ff-text" x="62" y="202" text-anchor="end">rst_n</text><polyline class="ff-wire" points="68,44 408,44"/><polyline class="ff-wire" points="128,44 128,116 178,116"/><circle class="ink-dot" cx="128" cy="44" r="4"/><rect class="ff-gate" x="178" y="96" width="70" height="80" rx="3"/><text class="ff-pin" x="186" y="122" text-anchor="start">D</text><text class="ff-pin" x="240" y="122" text-anchor="end">Q</text><polyline class="ff-wire" points="68,150 178,150"/><path class="ff-wire" d="M178,143 L188,150 L178,157"/><circle class="ff-gate" cx="213" cy="180" r="4"/><polyline class="ff-wire" points="213,184 213,196 68,196"/><text class="ff-small" x="283" y="106" text-anchor="middle">sig_q</text><polyline class="ff-wire" points="248,116 318,116"/><path class="ff-gate" d="M318,104 L340,116 L318,128 Z"/><circle class="ff-gate" cx="344" cy="116" r="4"/><polyline class="ff-wire" points="348,116 382,116 382,72 408,72"/><path class="ff-gate" d="M408,36.0 H430.0 A22.0,22.0 0 0 1 430.0,80.0 H408 Z"/><polyline class="ff-wire" points="452,58 510,58"/><text class="ff-text" x="516" y="64" text-anchor="start">pulse</text></svg>
 
     <span class="viz-legend"><span><i class="ff-key-dot"></i>נקודה : <code>sig</code> מתפצל לשער ולפליפ-פלופ</span><span>העיגול מתחת לפליפ-פלופ : איפוס אסינכרוני פעיל בנמוך</span></span>
 
@@ -121,11 +135,18 @@ added: 2026-10-15
     מאפס את `pulse`, גם אם `sig` נשאר גבוה. כש-`sig` יורד, `sig = 0` מאפס את ה-AND מיד,
     ולכן ירידת שפה לא מייצרת פולס.
 
-    **לנסות בעצמכם.** בתיבה הבאה מציירים את `sig` מחזור אחרי מחזור, והמעגל מצייר מתחתיו
-    את `sig_q` ואת `pulse`. אפשר לבחור איזו שפה מזהים (עלייה, ירידה או שתיהן, כמו בשאלות
-    ההמשך), ולהדליק את המלכודת של האיפוס : `sig` שכבר גבוה כשהאיפוס משתחרר. "העתקת
-    WaveDrom" מתחת לרצועה מעתיקה אותה כ-JSON כמו הדיאגרמה שלמעלה, ו"פתיחה בעורך" פותחת
-    אותה באתר של WaveDrom.
+    **לנסות בעצמכם.** בתיבה הבאה מציירים את `sig` בלחיצה על המשבצות שלו. נחשו את `pulse`
+    לפני שאתם מסתכלים :
+
+    - **בליפ של מחזור אחד :** "ניקוי", ואז רק מחזור 4 גבוה. האם יוצא פולס, באיזה מחזור,
+      ומה רואים במחזור 5?
+    - **אות שמתחלף בכל מחזור :** מחזורים 1, 3, 5, 7, 9 ו-11 גבוהים. כמה פולסים יוצאים?
+      ומה קורה ל-`pulse` כשבוחרים "שתיהן"?
+    - **אות שגבוה כבר באיפוס :** מסמנים "`sig` כבר גבוה בזמן האיפוס" (מחזור 0 גבוה). מאיפה
+      בא הפולס של מחזור 0, אם אין שם שפה?
+
+    מעבר לדיאגרמה שלמעלה, התיבה מראה את המעגל עצמו בכל מחזור : הערך על כל חוט, החוטים
+    שב-`1` מודגשים, וטבלה של כל האותות, עמודה לכל מחזור. החצים מעבירים את המחזור.
 
     <div class="explorer" data-kind="edge"></div>
 
@@ -145,7 +166,22 @@ added: 2026-10-15
 ??? trap "מלכודת : אות אסינכרוני"
     אם `sig` מגיע מדומיין שעון אחר, קודם מעבירים אותו דרך סנכרון של שני Flip-Flops
     (2-FF synchronizer), ורק אחר כך מבצעים את זיהוי השפה על האות המסונכרן. זיהוי שפה ישירות
-    על אות אסינכרוני עלול לייצר פולסים כפולים או חסרים בגלל metastability.
+    על אות אסינכרוני עלול לייצר פולסים כפולים או חסרים בגלל metastability : אם `sig` משתנה
+    ממש ליד עליית השעון, ה-Flip-Flop שדוגם אותו יכול להישאר לזמן מה בערך שאינו `0` ואינו `1`.
+    וגם בלי זה, `sig` נכנס ישר ל-AND, ולכן הפולס מתחיל באמצע מחזור וקצר ממחזור שלם.
+
+    <!-- gen 2 -->
+
+    <svg class="figure ff-fig" viewBox="0 0 680 236" style="max-width:40rem" role="img" aria-label="שרשרת הסנכרון : sig מדומיין שעון אחר עובר שני פליפ-פלופים של clk, meta ו-sig_s, ורק sig_s נכנס לגלאי השפה : פליפ-פלופ שלישי sig_q, מהפך ושער AND שמוציא את pulse"><rect class="ed-group" x="50" y="72" width="204" height="138" rx="6"/><text class="ff-small" x="152" y="64" text-anchor="middle">synchronizer</text><rect class="ed-group" x="272" y="22" width="402" height="188" rx="6"/><text class="ff-small" x="493" y="204" text-anchor="middle">edge detector</text><text class="ff-text" x="44" y="134" text-anchor="end">sig</text><polyline class="ff-wire" points="50,128 80,128"/><rect class="ff-gate" x="80" y="98" width="56" height="80" rx="3"/><text class="ff-pin" x="87" y="134" text-anchor="start">D</text><text class="ff-pin" x="129" y="134" text-anchor="end">Q</text><path class="ff-wire" d="M80,153 L90,160 L80,167"/><polyline class="ff-wire" points="66,222 66,160 80,160"/><rect class="ff-gate" x="184" y="98" width="56" height="80" rx="3"/><text class="ff-pin" x="191" y="134" text-anchor="start">D</text><text class="ff-pin" x="233" y="134" text-anchor="end">Q</text><path class="ff-wire" d="M184,153 L194,160 L184,167"/><polyline class="ff-wire" points="170,222 170,160 184,160"/><rect class="ff-gate" x="366" y="98" width="56" height="80" rx="3"/><text class="ff-pin" x="373" y="134" text-anchor="start">D</text><text class="ff-pin" x="415" y="134" text-anchor="end">Q</text><path class="ff-wire" d="M366,153 L376,160 L366,167"/><polyline class="ff-wire" points="352,222 352,160 366,160"/><text class="ff-text" x="44" y="228" text-anchor="end">clk</text><polyline class="ff-wire" points="50,222 352,222"/><polyline class="ff-wire" points="136,128 184,128"/><text class="ff-small" x="160" y="118" text-anchor="middle">meta</text><polyline class="ff-wire" points="240,128 366,128"/><text class="ff-small" x="294" y="96" text-anchor="start">sig_s</text><polyline class="ff-wire" points="286,128 286,52 566,52"/><circle class="ink-dot" cx="286" cy="128" r="4"/><polyline class="ff-wire" points="422,128 486,128"/><text class="ff-small" x="454" y="118" text-anchor="middle">sig_q</text><path class="ff-gate" d="M486,116 L508,128 L486,140 Z"/><circle class="ff-gate" cx="512" cy="128" r="4"/><polyline class="ff-wire" points="516,128 546,128 546,80 566,80"/><path class="ff-gate" d="M566,44.0 H588.0 A22.0,22.0 0 0 1 588.0,88.0 H566 Z"/><polyline class="ff-wire" points="610,66 640,66"/><text class="ff-text" x="616" y="94" text-anchor="start">pulse</text></svg>
+
+    <span class="viz-legend"><span><code>meta</code> : עלול להיות במטא-יציבות</span><span><code>sig_s</code> : יציב, וממנו מזהים את השפה</span><span>האיפוס לא מצויר</span></span>
+
+    <!-- /gen -->
+
+    כל שלושת ה-Flip-Flops רצים על `clk`. הראשון (`meta`) הוא היחיד שעלול להיתקע, ויש לו מחזור
+    שלם להתייצב לפני שהשני דוגם אותו. גלאי השפה קורא רק את `sig_s`, ולכן הוא אותו מעגל כמו
+    בפתרון, עם `sig_s` במקום `sig`. המחיר : הפולס יוצא שני מחזורים אחרי שהיה יוצא בלי הסנכרון,
+    ו-`sig` צריך להישאר יציב לפחות מחזור וחצי של `clk`, אחרת השינוי עלול לא להיקלט בכלל.
 
 ??? followup "שאלות המשך"
     - **ירידת שפה :** איך מזהים ירידת שפה במקום עליית שפה?
@@ -162,8 +198,13 @@ added: 2026-10-15
     - **מוצא רשום :** המוצא כאן קומבינטורי. איך מקבלים מוצא נקי ישירות מ-Flip-Flop?
 
         ??? fu-answer "תשובה"
-            רושמים גם את `pulse` ב-Flip-Flop נוסף. המוצא נקי מ-glitches, במחיר השהיה של מחזור
-            אחד.
+            רושמים גם את `pulse` ב-Flip-Flop נוסף, בתוך אותו `always_ff` :
+            `pulse_q <= sig & ~sig_q;`. במחזור \( n \) הוא שווה ל-`pulse` של מחזור \( n - 1 \), כלומר
+            `pulse_q = sig_q & ~sig_qq`, כש-`sig_qq` הוא `sig_q` מאוחר במחזור. זה גם הניסוח
+            המקובל של הגלאי הרשום : שני Flip-Flops בשרשרת, `sig_q` ואחריו `sig_qq`,
+            וה-AND על המוצאים שלהם. בשתי הצורות אין נתיב צירופי מהכניסה `sig` למוצא, ובצורה הראשונה המוצא
+            יוצא ישר מ-Flip-Flop ונקי מ-glitches. המחיר : Flip-Flop נוסף, והפולס מגיע מחזור אחד
+            מאוחר יותר.
 
     - **פולס ארוך יותר :** איך מרחיבים את הפולס ל-N מחזורים?
 

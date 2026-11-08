@@ -1,0 +1,35 @@
+/* Question 0001, the rising edge detector: the synchronizer chain of the asynchronous-signal
+   trap (tools/figures/q0001.py sync_figure, its groups dashed) and the circuit and table of
+   the edge box (explorer/edge.js, ed-*). In the box a wire at 1 is blue (s1), as is the gate
+   whose output is 1 and the flip-flop that took a new value this cycle; each wire's value in
+   the code face beside it. The circuit is drawn left to right (direction="ltr").
+   Colours from the palette only. */
+
+.md-typeset svg.ff-fig .ed-group { fill: none; stroke: var(--viz-text); stroke-width: 1.5; stroke-dasharray: 6 4; }
+
+/* the live circuit */
+.md-typeset .explorer .ed-dpwrap svg { display: block; width: 100%; max-width: 30rem; height: auto; margin: 0.4rem auto; }
+.md-typeset svg.ed-live .ff-wire.is-hi { stroke: var(--viz-s1); stroke-width: 3.5; }
+.md-typeset svg.ed-live .ff-gate.is-on { stroke: var(--viz-s1); stroke-width: 3.5; }
+.md-typeset svg.ed-live .ed-val { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 19px; }
+.md-typeset svg.ed-live .ed-val.is-one { font-weight: 700; }
+
+/* the table of every signal, a column per cycle */
+.md-typeset .explorer .ed-tabwrap { overflow-x: auto; margin: 0.3rem 0; }
+.md-typeset .explorer .ed-tabwrap:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer table.ed-tab { display: table; width: auto; margin: 0 auto; border-collapse: collapse; font-family: var(--md-code-font-family); font-size: 0.62rem; }
+.md-typeset .explorer table.ed-tab :is(th, td) { min-width: 1.1rem; padding: 0.05rem 0.1rem; border: 1px solid var(--viz-grid); text-align: center; color: var(--viz-ink); background: var(--md-default-bg-color); font-variant-numeric: tabular-nums; line-height: 1.3; }
+.md-typeset .explorer table.ed-tab th[scope="row"] { position: sticky; left: 0; z-index: 1; min-width: 6ch; white-space: nowrap; text-align: left; font-weight: 700; background: color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.ed-tab thead th { color: var(--viz-text); font-weight: 400; }
+.md-typeset .explorer table.ed-tab thead th[scope="col"]:first-child { font-family: var(--md-text-font-family); }
+.md-typeset .explorer table.ed-tab td.is-hi { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.ed-tab .is-now { box-shadow: inset 0 0 0 2px var(--viz-s1); font-weight: 700; }
+
+/* the key */
+.md-typeset .explorer .ed-legend { margin: 0; }
+.md-typeset .viz-legend .ed-key-hi { background: none; height: 0; border-top: 3px solid var(--viz-s1); align-self: center; }
+.md-typeset .viz-legend .ed-key-cap { background: var(--md-default-bg-color); outline: 2.5px solid var(--viz-s1); outline-offset: -2.5px; }
+.md-typeset .viz-legend .ed-key-now { background: var(--md-default-bg-color); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+
+/* the summary of the whole strip sits under it, in the main column (not a top part) */
+.md-typeset .explorer .ed-sum { font-weight: 600; min-height: 2lh; margin: 0.3em 0 0.2em; }

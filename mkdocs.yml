@@ -169,6 +169,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0100-stairs.css      # 0100: the ways to climb the stairs, the staircases and the box (session 33)
   - stylesheets/questions/0037-editdist.css    # 0037: the edit distance between two streams, the tables and the box (session 33)
   - stylesheets/questions/0034-gray.css        # 0034: Gray pointers, the block diagram, the glitch sketch and the hardware box (session 34)
+  - stylesheets/questions/0001-edge.css        # 0001: the edge detector, the synchronizer chain and the box's live circuit (session 34)
 
 extra_javascript:
   - javascripts/mathjax.js
