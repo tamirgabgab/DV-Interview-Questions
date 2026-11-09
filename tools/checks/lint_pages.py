@@ -24,6 +24,8 @@ Checks, per page:
 - Code highlights: every line named in ``hl_lines=`` exists in the (dedented) block and is
   a code line, not a blank line, a comment alone or a bare ``end`` / ``endfunction``, so the
   highlights keep pointing at the code the explanation names after the block is edited.
+- Colons: a colon in Hebrew text has U+00A0 before it (CLAUDE.md), outside code, inline
+  code, math, comments and the generated blocks (``<!-- gen n -->``, the generator's job).
 Once per run (when no page is named): every question is in a study path, and the explorer
 strings (``docs/javascripts/explorer/*.js``) keep the colon rule: ``const NB`` is U+00A0, and
 no Hebrew text has a plain space before a colon (a Hebrew letter, or a closing ``)`` / ``}``
@@ -323,8 +325,40 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     problems.extend(lint_followups(path.read_text(encoding="utf-8")))
     problems.extend(lint_code_spaces(path.read_text(encoding="utf-8")))
     problems.extend(lint_tab_order(path.read_text(encoding="utf-8")))
+    problems.extend(lint_colons(path.read_text(encoding="utf-8")))
     problems.extend(f"front matter: {p}" for p in video_problems(*split_front_matter(text)))
     return problems
+
+
+PAGE_COLON = re.compile(r"(?<=\S) :(?=[\s*<\"']|$)")
+PAGE_SKIP = re.compile(r"`[^`\n]*`|\\\(.*?\\\)|\\\[.*?\\\]|\$\$.*?\$\$|<!--.*?-->")
+
+
+def lint_colons(text: str) -> list[str]:
+    """A colon in Hebrew text has U+00A0 before it, so it never wraps to the start of a line
+    (CLAUDE.md). Code blocks, inline code, math, comments and the generated blocks (their
+    generator's job) are skipped; a line without a Hebrew letter is not Hebrew text."""
+    out, fence, gen = [], None, False
+    for n, line in enumerate(text.split("\n"), 1):
+        st = line.lstrip()
+        if st.startswith("<!-- gen "):
+            gen = True
+        elif st.startswith("<!-- /gen"):
+            gen = False
+        if fence:
+            fence = None if st.startswith(fence) else fence
+            continue
+        if st.startswith(("```", "~~~")):
+            fence = st[:3]
+            continue
+        if gen or not re.search(r"[\u05d0-\u05ea]", line):
+            continue
+        skip = [m.span() for m in PAGE_SKIP.finditer(line)]
+        for m in PAGE_COLON.finditer(line):
+            if not any(a <= m.start() < b for a, b in skip):
+                out.append(f"line {n}: a plain space before a colon in Hebrew text (use U+00A0)")
+                break
+    return out
 
 
 def lint_paths() -> list[str]:
@@ -355,6 +389,7 @@ HEB = "\u05d0-\u05ea"
 PLAIN_COLON = (
     re.compile(rf"(?<=[{HEB}]) :(?=[ <`\"\n])"),
     re.compile(rf"(?<=[^\s\"'`{HEB}]) :(?= [{HEB}<\u200f]| \$\{{)"),
+    re.compile(r"(?<=\)\}) :(?= [A-Za-z])"),  # ${code("x")} : XOR
 )
 
 

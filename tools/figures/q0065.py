@@ -319,7 +319,7 @@ def table_flood(grid, diag=False):
     for t, f in enumerate(trace(grid, diag)):
         if f["kind"] == "start":
             what = (f"הסריקה עברה {f['skipped']} תאים של מים או תאים שכבר סומנו, ופגשה" if f["skipped"] else "הסריקה פגשה") + \
-                f" יבשה שלא סומנה : **אי חדש {f['isle']}**, התא מסומן ונכנס לתור"
+                f" יבשה שלא סומנה : **אי חדש {f['isle']}**, התא מסומן ונכנס לתור"
             nb = "—"
         elif f["kind"] == "pop":
             what = "התא יוצא מהתור, הגודל גדל ב-1"
@@ -343,7 +343,7 @@ def table_paradox(grid):
     eight neighbours."""
     rows = ["| השכנות | איים של יבשה | חלקים של מים | מה זה אומר |", "|:--|:-:|:-:|:--|"]
     for diag, name, meaning in ((False, "ארבעה כיוונים", "ארבעה תאים בודדים, והמים משני צידי האלכסון מופרדים"),
-                                (True, "שמונה כיוונים", "אי אחד, אבל גם המים חוצים את האלכסון דרך אותן פינות : הקו לא מפריד")):
+                                (True, "שמונה כיוונים", "אי אחד, אבל גם המים חוצים את האלכסון דרך אותן פינות : הקו לא מפריד")):
         rows.append(f"| {name} | {RLM}{len(components(grid, diag))} | {RLM}{water_pieces(grid, diag)} | {meaning} |")
     return "\n".join(rows)
 
@@ -366,12 +366,12 @@ def table_sizes(grid):
 def blocks():
     """The generated blocks, in page order."""
     return [
-        grid_svg(GRID, False, "הלוח 5 על 6 של הדוגמה : שלושה איים עם ארבעה כיוונים, כל אי בצבע שלו והמספר שלו בתא"),
+        grid_svg(GRID, False, "הלוח 5 על 6 של הדוגמה : שלושה איים עם ארבעה כיוונים, כל אי בצבע שלו והמספר שלו בתא"),
         legend(),
         table_flood(GRID, False),
-        grid_svg(GRID, True, "אותו לוח עם שמונה כיוונים : שני איים, הפינה בין (2, 4) ל-(3, 3) מחברת"),
+        grid_svg(GRID, True, "אותו לוח עם שמונה כיוונים : שני איים, הפינה בין (2, 4) ל-(3, 3) מחברת"),
         legend(diag=True),
-        grid_svg(DIAG_GRID, True, "קו אלכסוני של יבשה על לוח 4 על 4 : עם שמונה כיוונים הוא אי אחד, והמים משני הצדדים גם הם מחוברים דרך אותן פינות"),
+        grid_svg(DIAG_GRID, True, "קו אלכסוני של יבשה על לוח 4 על 4 : עם שמונה כיוונים הוא אי אחד, והמים משני הצדדים גם הם מחוברים דרך אותן פינות"),
         table_paradox(DIAG_GRID),
         grid_svg(GRID, False, "הלוח של הדוגמה, הגודל של האי כתוב בכל תא שלו", show="size"),
         legend(show="size"),

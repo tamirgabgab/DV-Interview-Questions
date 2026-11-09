@@ -429,7 +429,7 @@ def legend(mode="a", ghost=False, squeeze=False, broken=False):
     if ghost:
         keys += '<span><i class="gx-key-ghost"></i>המסלול עם הכי מעט צעדים (BFS)</span>'
     if squeeze:
-        keys += '<span><i class="gx-key-squeeze"></i>אלכסון בין שני קירות : אסור</span>'
+        keys += '<span><i class="gx-key-squeeze"></i>אלכסון בין שני קירות : אסור</span>'
     return f'<span class="viz-legend">{keys}</span>'
 
 
@@ -496,7 +496,7 @@ def table_run_b(grid, s, t, k, naive):
         u, left, d = q.popleft()
         step += 1
         if u == t:
-            rows.append(f"| {RLM}{step} | {RLM}{state(u, left, d)} | **היעד** : התשובה {d} | {RLM}{queue()} |")
+            rows.append(f"| {RLM}{step} | {RLM}{state(u, left, d)} | **היעד** : התשובה {d} | {RLM}{queue()} |")
             return "\n".join(rows)
         parts = []
         for a, b, kk, sq in moves(grid, *u, False):
@@ -505,20 +505,20 @@ def table_run_b(grid, s, t, k, naive):
             rest = left - wallc
             name = f"{DIR_HEB[kk]} {ltr(cell_name(a, b))}{' קיר' if wallc else ''}"
             if rest < 0:
-                parts.append(f"{name} : אין שבירות")
+                parts.append(f"{name} : אין שבירות")
             elif naive and v in seen:
-                parts.append(f"{name} : כבר סומן")
+                parts.append(f"{name} : כבר סומן")
             elif not naive and rest <= best.get(v, -1):
-                parts.append(f"{name} : {rest} לא יותר מ-{best[v]}")
+                parts.append(f"{name} : {rest} לא יותר מ-{best[v]}")
             else:
                 if naive:
                     seen.add(v)
                 else:
                     best[v] = rest
                 q.append((v, rest, d + 1))
-                parts.append(f"{name} : **נכנס עם {rest}**")
+                parts.append(f"{name} : **נכנס עם {rest}**")
         rows.append(f"| {RLM}{step} | {RLM}{state(u, left, d)} | {'; '.join(parts)} | {RLM}{queue()} |")
-    rows.append(f"| {RLM}{step + 1} | — | התור ריק : התשובה <span dir=\"ltr\">−1</span> | ריק |")
+    rows.append(f"| {RLM}{step + 1} | — | התור ריק : התשובה <span dir=\"ltr\">−1</span> | ריק |")
     return "\n".join(rows)
 
 
@@ -542,8 +542,8 @@ def table_paths(grid, s, t):
     cp = trace("c", grid, s, t)[-1]["path"]
     steps, best_short = fewest_steps_costs(grid, s, t)
     rows = ["| המסלול | צעדים | העלויות של התאים שנכנסים אליהם | העלות |", "|:--|:-:|:--|:-:|"]
-    rows.append(f"| ‏BFS : הכי מעט צעדים | {RLM}{len(bp) - 1} | {RLM}{ltr(' + '.join(grid[r][c] for r, c in bp[1:]))} | {RLM}{path_cost(grid, bp)} |")
-    rows.append(f"| ‏Dijkstra : הכי זול | {RLM}{len(cp) - 1} | {RLM}{ltr(' + '.join(grid[r][c] for r, c in cp[1:]))} | {RLM}{path_cost(grid, cp)} |")
+    rows.append(f"| ‏BFS : הכי מעט צעדים | {RLM}{len(bp) - 1} | {RLM}{ltr(' + '.join(grid[r][c] for r, c in bp[1:]))} | {RLM}{path_cost(grid, bp)} |")
+    rows.append(f"| ‏Dijkstra : הכי זול | {RLM}{len(cp) - 1} | {RLM}{ltr(' + '.join(grid[r][c] for r, c in cp[1:]))} | {RLM}{path_cost(grid, cp)} |")
     rows.append(f"| הזול ביותר מבין המסלולים של {steps} צעדים | {RLM}{steps} | — | {RLM}{best_short} |")
     return "\n".join(rows)
 
@@ -555,10 +555,10 @@ def table_pops(grid, s, t):
         r, c = f["cell"]
         out = ltr(f"({r},{c})={f['d']}")
         if f["kind"] == "goal":
-            pushed = "**היעד** : העלות הסופית"
+            pushed = "**היעד** : העלות הסופית"
         else:
             p = [f"({a},{b})={v}" for a, b, why, v in f["nb"] if why == "push"]
-            pushed = RLM + ltr("&nbsp; ".join(p)) if p else "אף תא : לכל השכנים כבר יש עלות קטנה או שווה"
+            pushed = RLM + ltr("&nbsp; ".join(p)) if p else "אף תא : לכל השכנים כבר יש עלות קטנה או שווה"
         rows.append(f"| {RLM}{i + 1} | {RLM}{out} | {pushed} | {RLM}{len(f['front'])} |")
     return "\n".join(rows)
 
@@ -575,21 +575,21 @@ def blocks():
     dc = {(r, c): v for r, row in enumerate(fc[-1]["val"]) for c, v in enumerate(row) if v >= 0}
     ghost = trace("a", ["0" * len(COST[0])] * len(COST), CS, CT)[-1]["path"]
     out = [
-        grid_svg(GRID, S, T, "הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל והיעד T מימין ; בכל תא המרחק שלו מ-S ב-BFS של ארבעה כיוונים, והמסלול הקצר מסומן",
+        grid_svg(GRID, S, T, "הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל והיעד T מימין ; בכל תא המרחק שלו מ-S ב-BFS של ארבעה כיוונים, והמסלול הקצר מסומן",
                  values=da, path=fa[-1]["path"]),
         legend(),
         table_layers(GRID, S, T),
-        grid_svg(GRID, S, T, "אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, והאלכסונים בין שני קירות מסומנים באיקס",
+        grid_svg(GRID, S, T, "אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, והאלכסונים בין שני קירות מסומנים באיקס",
                  values=d8, path=f8[-1]["path"], squeeze=squeezes(GRID)),
         legend(squeeze=True),
         table_rules(GRID, S, T),
-        grid_svg(CE_GRID, CE_S, CE_T, "הלוח הקטן של המלכודת : 3 על 3, ההתחלה בפינה השמאלית העליונה והיעד בפינה הימנית התחתונה"),
+        grid_svg(CE_GRID, CE_S, CE_T, "הלוח הקטן של המלכודת : 3 על 3, ההתחלה בפינה השמאלית העליונה והיעד בפינה הימנית התחתונה"),
         table_run_b(CE_GRID, CE_S, CE_T, CE_K, naive=True),
         table_run_b(CE_GRID, CE_S, CE_T, CE_K, naive=False),
-        grid_svg(GRID, S, T, "הדוגמה עם k = 1 : המסלול של 14 צעדים שובר את הקיר של עמודה 7", values=None, path=fb[-1]["path"], broken=broken),
+        grid_svg(GRID, S, T, "הדוגמה עם k = 1 : המסלול של 14 צעדים שובר את הקיר של עמודה 7", values=None, path=fb[-1]["path"], broken=broken),
         legend(broken=True),
         table_k(GRID, S, T),
-        grid_svg(COST, CS, CT, "השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל תא העלות הקטנה ביותר להגיע אליו (בפינה עלות הכניסה), המסלול הזול רציף ומסלול ה-BFS מקווקו",
+        grid_svg(COST, CS, CT, "השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל תא העלות הקטנה ביותר להגיע אליו (בפינה עלות הכניסה), המסלול הזול רציף ומסלול ה-BFS מקווקו",
                  values=dc, path=fc[-1]["path"], ghost=ghost, mode="c"),
         legend("c", ghost=True),
         table_paths(COST, CS, CT),

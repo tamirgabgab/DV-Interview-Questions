@@ -288,13 +288,13 @@ def statement_figure():
     cell = 2 * (R + pad)
     W, H = 4 * cell + 3 * gap, cell + 30
     out = [f'<svg class="figure mc-fig mc-row" viewBox="0 0 {W} {H}" style="max-width:{W / 16:.1f}rem" role="img" '
-           f'aria-label="עיגולים עם נקודה אחת, שתיים, שלוש וארבע, וכל זוג נקודות מחובר בקו. מספר החלקים : 1, 2, 4 ו-8">']
+           f'aria-label="עיגולים עם נקודה אחת, שתיים, שלוש וארבע, וכל זוג נקודות מחובר בקו. מספר החלקים : 1, 2, 4 ו-8">']
     for i, n in enumerate((1, 2, 3, 4)):
         ox = W - (i + 1) * cell - i * gap                 # right to left: the page reads from the right
         inner = disc_svg(SMALL[n], R=R, pad=pad, label_points=False, aria="")
         body = inner[inner.index(">") + 1:-len("</svg>")]
         out.append(f'<g transform="translate({ox},0)">{body}</g>')
-        out.append(f'<text class="mc-count" x="{ox + cell / 2:.1f}" y="{H - 6}" text-anchor="middle">n = {n} : {regions(SMALL[n])}</text>')
+        out.append(f'<text class="mc-count" x="{ox + cell / 2:.1f}" y="{H - 6}" text-anchor="middle">n = {n} : {regions(SMALL[n])}</text>')
     out.append("</svg>")
     return "".join(out)
 
@@ -307,7 +307,7 @@ def statement_legend():
 # --- part a: five points --------------------------------------------------------------------------
 
 def five_figure():
-    return disc_svg(N5, labels=True, aria="חמש נקודות על מעגל וכל עשרת הקווים ביניהן. העיגול מתחלק ל-16 חלקים, ממוספרים 1 עד 16 : מחומש באמצע, חמישה משולשים סביבו, עוד חמישה ליד הצלעות, וחמש קשתות")
+    return disc_svg(N5, labels=True, aria="חמש נקודות על מעגל וכל עשרת הקווים ביניהן. העיגול מתחלק ל-16 חלקים, ממוספרים 1 עד 16 : מחומש באמצע, חמישה משולשים סביבו, עוד חמישה ליד הצלעות, וחמש קשתות")
 
 
 def five_table():
@@ -336,7 +336,7 @@ def euler_table():
 
 
 def pattern_chart():
-    c = Chart("מספר החלקים לפי n, מול 2 בחזקת n פחות 1 : עד n = 5 הם שווים, ומ-6 החלקים מפגרים : 31 מול 32, 57 מול 64, 256 מול 512",
+    c = Chart("מספר החלקים לפי n, מול 2 בחזקת n פחות 1 : עד n = 5 הם שווים, ומ-6 החלקים מפגרים : 31 מול 32, 57 מול 64, 256 מול 512",
               slots=10, y_max=520, h=250, base=210)
     c.grid_y([0, 128, 256, 384, 512])
     for n in range(1, 11):

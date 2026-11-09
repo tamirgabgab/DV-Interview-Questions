@@ -80,8 +80,8 @@ def sums_table():
     ret = [t for t in sent if t != C_MISS] + [C_DUP]
     _, _, s, q, out = accumulators(sent, ret, 4)
     rows = ["| המצבר | נשלחו | חזרו | ההפרש | מה זה |", "|:-:|:-:|:-:|:-:|---|"]
-    rows.append(f"| ‏`s` : סכום | {RLM}{sum(sent)} | {RLM}{sum(ret)} | {RLM}{s} | ‏\\( a - d \\) |")
-    rows.append(f"| ‏`q` : סכום ריבועים | {RLM}{sum(t * t for t in sent)} | {RLM}{sum(t * t for t in ret)} | {RLM}{q} | ‏\\( a^2 - d^2 \\) |")
+    rows.append(f"| ‏`s` : סכום | {RLM}{sum(sent)} | {RLM}{sum(ret)} | {RLM}{s} | ‏\\( a - d \\) |")
+    rows.append(f"| ‏`q` : סכום ריבועים | {RLM}{sum(t * t for t in sent)} | {RLM}{sum(t * t for t in ret)} | {RLM}{q} | ‏\\( a^2 - d^2 \\) |")
     rows.append(f"| ‏XOR | | | {RLM}{C_MISS ^ C_DUP} | ‏\\( a \\oplus d \\), כמו שני חסרים |")
     rows.append(f"| מונה | {RLM}{len(sent)} | {RLM}{len(ret)} | {RLM}{out} | אף אחד לא \"בחוץ\" |")
     return "\n".join(rows)

@@ -87,7 +87,7 @@ def reversal_table():
     for (cur, rng), name in zip(reversal_rows(a, EX_K), NAMES):
         cells = [(v, "is-hl" if rng and rng[0] <= i < rng[1] else ("c1" if v <= EX_K else "c2")) for i, v in enumerate(cur)]
         rows.append((name, cells, None))
-    return table(rows, "שלושת ההיפוכים על 1 עד 7 עם k = 3 : בכל שורה המערך אחרי ההיפוך, והקטע שהתהפך ממוסגר",
+    return table(rows, "שלושת ההיפוכים על 1 עד 7 עם k = 3 : בכל שורה המערך אחרי ההיפוך, והקטע שהתהפך ממוסגר",
                  head=list(range(EX_N)))
 
 
@@ -95,7 +95,7 @@ def cycle_table():
     cs = cycles(CY_N, CY_K)
     which = {i: c for c, cyc in enumerate(cs) for i in cyc}
     rows = [("המעגל", [(which[i] + 1, f"c{which[i] + 1}") for i in range(CY_N)], None)]
-    return table(rows, f"המעגלים של n = {CY_N} ו-k = {CY_K} : לכל אינדקס, מספר המעגל שלו", head=list(range(CY_N)))
+    return table(rows, f"המעגלים של n = {CY_N} ו-k = {CY_K} : לכל אינדקס, מספר המעגל שלו", head=list(range(CY_N)))
 
 
 def cycle_legend():

@@ -13,26 +13,26 @@ added: 2026-10-27
 
 מטילים מטבע הוגן שוב ושוב, ועוצרים ברגע שמופיעות שתי הטלות רצופות מסוימות.
 
-- **סעיף א – ‏HH מול HT :** מה מספר ההטלות הממוצע עד שמופיע `HH` (שני "עץ" ברצף)? ומה
+- **סעיף א – ‏HH מול HT :** מה מספר ההטלות הממוצע עד שמופיע `HH` (שני "עץ" ברצף)? ומה
   הממוצע עד שמופיע `HT`? למה התשובות שונות, אם לשני הרצפים אותה הסתברות בכל מקום?
-- **סעיף ב – כל רצף, ומטבע לא הוגן :** כתבו קוד שמחשב את מספר ההטלות הממוצע לכל רצף,
+- **סעיף ב – כל רצף, ומטבע לא הוגן :** כתבו קוד שמחשב את מספר ההטלות הממוצע לכל רצף,
   והסבירו את הנוסחה. כמה זה ל-`HHH`? ומה משתנה כש-H יוצא בהסתברות \( q \)?
-- **סעיף ג – מירוץ :** שני שחקנים מטילים אותו מטבע; אחד בוחר `HH` והשני `HT`, ומנצח
+- **סעיף ג – מירוץ :** שני שחקנים מטילים אותו מטבע; אחד בוחר `HH` והשני `HT`, ומנצח
   מי שהרצף שלו מופיע קודם. מה הסיכוי של כל אחד? ומה קורה עם רצפים באורך 3, ועם שלושה
   שחקנים או יותר?
-- **סעיף ד – ההתפלגות :** מצאו את הפונקציה היוצרת של מספר ההטלות, ומתוכה את השונות
+- **סעיף ד – ההתפלגות :** מצאו את הפונקציה היוצרת של מספר ההטלות, ומתוכה את השונות
   ואת ההסתברות לכל מספר הטלות.
 
 ??? interviewer "מה המראיין בודק"
-    - **מצבים במקום מקרים :** האם המועמד מגדיר מצב לפי "כמה מהרצף כבר נבנה", כמו בגלאי
+    - **מצבים במקום מקרים :** האם המועמד מגדיר מצב לפי "כמה מהרצף כבר נבנה", כמו בגלאי
       רצף בחומרה, וכותב משוואה לכל מצב.
-    - **הבחנה בין "באותה הסתברות" ל"באותו זמן" :** ‏`HH` ו-`HT` מופיעים בכל מקום
+    - **הבחנה בין "באותה הסתברות" ל"באותו זמן" :** ‏`HH` ו-`HT` מופיעים בכל מקום
       בהסתברות 1/4, ובכל זאת זמני ההמתנה שונים. האם הוא מסביר למה.
-    - **הכללה :** האם הוא מגיע לנוסחה שתלויה רק בחפיפות של הרצף עם עצמו, ושעובדת גם
+    - **הכללה :** האם הוא מגיע לנוסחה שתלויה רק בחפיפות של הרצף עם עצמו, ושעובדת גם
       במטבע לא הוגן ובכל אלפבית.
-    - **אינטואיציה מטעה :** במירוץ, האם הוא נופל ל"הרצף עם התוחלת הקטנה מנצח".
-    - **מעבר לתוחלת :** האם הוא יודע להגיע להתפלגות כולה, ולמה השונות גדולה כל כך.
-    - **הקשר ל-DV :** כמה זמן טסט אקראי צריך לרוץ עד שרצף מסוים מופיע ב-stimulus.
+    - **אינטואיציה מטעה :** במירוץ, האם הוא נופל ל"הרצף עם התוחלת הקטנה מנצח".
+    - **מעבר לתוחלת :** האם הוא יודע להגיע להתפלגות כולה, ולמה השונות גדולה כל כך.
+    - **הקשר ל-DV :** כמה זמן טסט אקראי צריך לרוץ עד שרצף מסוים מופיע ב-stimulus.
 
 ---
 
@@ -72,13 +72,13 @@ added: 2026-10-27
 
     <!-- gen 0 -->
 
-    <svg class="figure cp-fig" viewBox="0 0 660 300" style="max-width:41rem" role="img" aria-label="שרשראות המצבים של HH ושל HT : שלושה מצבים כל אחת, החצים מסומנים בהטלה"><defs><marker id="cp-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><line class="fs-edge" data-fig="HT-e0-H-1" x1="106" y1="92" x2="242" y2="92" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HT-e0-H-1" x="175.0" y="84" text-anchor="middle">H</text><line class="fs-edge is-found" data-fig="HT-e1-T-2" x1="296" y1="92" x2="432" y2="92" marker-end="url(#cp-arrow)"/><text class="fs-label is-found halo" data-fig="HT-e1-T-2" x="365.0" y="84" text-anchor="middle">T</text><path class="fs-edge" data-fig="HT-e0-T-0" d="M71,69 C50,28 110,28 89,68" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HT-e0-T-0" x="80" y="38" text-anchor="middle">T</text><path class="fs-edge" data-fig="HT-e1-H-1" d="M261,69 C240,28 300,28 279,68" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HT-e1-H-1" x="270" y="38" text-anchor="middle">H</text><g class="fs-node is-start" data-fig="HT-n0"><circle cx="80" cy="92" r="26"/><text x="80" y="96" text-anchor="middle" style="font-size:11px">start</text></g><g class="fs-node" data-fig="HT-n1"><circle cx="270" cy="92" r="26"/><text x="270" y="96" text-anchor="middle">H</text></g><g class="fs-node is-out" data-fig="HT-n2"><circle cx="460" cy="92" r="26"/><text x="460" y="96" text-anchor="middle">HT</text></g><text class="cp-exp" x="600" y="98" text-anchor="middle">E = 4</text><line class="fs-edge" data-fig="HH-e0-H-1" x1="106" y1="222" x2="242" y2="222" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HH-e0-H-1" x="175.0" y="214" text-anchor="middle">H</text><line class="fs-edge is-found" data-fig="HH-e1-H-2" x1="296" y1="222" x2="432" y2="222" marker-end="url(#cp-arrow)"/><text class="fs-label is-found halo" data-fig="HH-e1-H-2" x="365.0" y="214" text-anchor="middle">H</text><path class="fs-edge" data-fig="HH-e0-T-0" d="M71,199 C50,158 110,158 89,198" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HH-e0-T-0" x="80" y="168" text-anchor="middle">T</text><path class="fs-edge is-back" data-fig="HH-e1-T-0" d="M270,248 Q175.0,292 80,250" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HH-e1-T-0" x="175.0" y="284" text-anchor="middle">T</text><g class="fs-node is-start" data-fig="HH-n0"><circle cx="80" cy="222" r="26"/><text x="80" y="226" text-anchor="middle" style="font-size:11px">start</text></g><g class="fs-node" data-fig="HH-n1"><circle cx="270" cy="222" r="26"/><text x="270" y="226" text-anchor="middle">H</text></g><g class="fs-node is-out" data-fig="HH-n2"><circle cx="460" cy="222" r="26"/><text x="460" y="226" text-anchor="middle">HH</text></g><text class="cp-exp" x="600" y="228" text-anchor="middle">E = 6</text></svg>
+    <svg class="figure cp-fig" viewBox="0 0 660 300" style="max-width:41rem" role="img" aria-label="שרשראות המצבים של HH ושל HT : שלושה מצבים כל אחת, החצים מסומנים בהטלה"><defs><marker id="cp-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><line class="fs-edge" data-fig="HT-e0-H-1" x1="106" y1="92" x2="242" y2="92" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HT-e0-H-1" x="175.0" y="84" text-anchor="middle">H</text><line class="fs-edge is-found" data-fig="HT-e1-T-2" x1="296" y1="92" x2="432" y2="92" marker-end="url(#cp-arrow)"/><text class="fs-label is-found halo" data-fig="HT-e1-T-2" x="365.0" y="84" text-anchor="middle">T</text><path class="fs-edge" data-fig="HT-e0-T-0" d="M71,69 C50,28 110,28 89,68" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HT-e0-T-0" x="80" y="38" text-anchor="middle">T</text><path class="fs-edge" data-fig="HT-e1-H-1" d="M261,69 C240,28 300,28 279,68" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HT-e1-H-1" x="270" y="38" text-anchor="middle">H</text><g class="fs-node is-start" data-fig="HT-n0"><circle cx="80" cy="92" r="26"/><text x="80" y="96" text-anchor="middle" style="font-size:11px">start</text></g><g class="fs-node" data-fig="HT-n1"><circle cx="270" cy="92" r="26"/><text x="270" y="96" text-anchor="middle">H</text></g><g class="fs-node is-out" data-fig="HT-n2"><circle cx="460" cy="92" r="26"/><text x="460" y="96" text-anchor="middle">HT</text></g><text class="cp-exp" x="600" y="98" text-anchor="middle">E = 4</text><line class="fs-edge" data-fig="HH-e0-H-1" x1="106" y1="222" x2="242" y2="222" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HH-e0-H-1" x="175.0" y="214" text-anchor="middle">H</text><line class="fs-edge is-found" data-fig="HH-e1-H-2" x1="296" y1="222" x2="432" y2="222" marker-end="url(#cp-arrow)"/><text class="fs-label is-found halo" data-fig="HH-e1-H-2" x="365.0" y="214" text-anchor="middle">H</text><path class="fs-edge" data-fig="HH-e0-T-0" d="M71,199 C50,158 110,158 89,198" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HH-e0-T-0" x="80" y="168" text-anchor="middle">T</text><path class="fs-edge is-back" data-fig="HH-e1-T-0" d="M270,248 Q175.0,292 80,250" marker-end="url(#cp-arrow)"/><text class="fs-label halo" data-fig="HH-e1-T-0" x="175.0" y="284" text-anchor="middle">T</text><g class="fs-node is-start" data-fig="HH-n0"><circle cx="80" cy="222" r="26"/><text x="80" y="226" text-anchor="middle" style="font-size:11px">start</text></g><g class="fs-node" data-fig="HH-n1"><circle cx="270" cy="222" r="26"/><text x="270" y="226" text-anchor="middle">H</text></g><g class="fs-node is-out" data-fig="HH-n2"><circle cx="460" cy="222" r="26"/><text x="460" y="226" text-anchor="middle">HH</text></g><text class="cp-exp" x="600" y="228" text-anchor="middle">E = 6</text></svg>
 
     <!-- /gen -->
 
     <!-- gen 1 -->
 
-    <span class="viz-legend"><span><i class="fs-key"></i>מעבר : ההטלה</span><span><i class="fs-key-found"></i>ההטלה שמשלימה את הרצף</span><span><i class="cp-key-back"></i>HH : זנב אחרי H מחזיר להתחלה</span></span>
+    <span class="viz-legend"><span><i class="fs-key"></i>מעבר : ההטלה</span><span><i class="fs-key-found"></i>ההטלה שמשלימה את הרצף</span><span><i class="cp-key-back"></i>HH : זנב אחרי H מחזיר להתחלה</span></span>
 
     <!-- /gen -->
 
@@ -86,11 +86,11 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **‏HT, ממצב `H` :** ‏\( E_1 = 1 + \tfrac12 \cdot 0 + \tfrac12 E_1 \), ולכן \( E_1 = 2 \).
-    2. **‏HT, מההתחלה :** ‏\( E_0 = 1 + \tfrac12 E_1 + \tfrac12 E_0 \), ולכן
+    1. **‏HT, ממצב `H` :** ‏\( E_1 = 1 + \tfrac12 \cdot 0 + \tfrac12 E_1 \), ולכן \( E_1 = 2 \).
+    2. **‏HT, מההתחלה :** ‏\( E_0 = 1 + \tfrac12 E_1 + \tfrac12 E_0 \), ולכן
        \( E_0 = 2 + E_1 = 4 \).
-    3. **‏HH, ממצב `H` :** ‏\( E_1 = 1 + \tfrac12 \cdot 0 + \tfrac12 E_0 \).
-    4. **‏HH, מההתחלה :** ‏\( E_0 = 1 + \tfrac12 E_1 + \tfrac12 E_0 \), כלומר
+    3. **‏HH, ממצב `H` :** ‏\( E_1 = 1 + \tfrac12 \cdot 0 + \tfrac12 E_0 \).
+    4. **‏HH, מההתחלה :** ‏\( E_0 = 1 + \tfrac12 E_1 + \tfrac12 E_0 \), כלומר
        \( E_0 = 2 + E_1 = 3 + \tfrac12 E_0 \), ולכן \( E_0 = 6 \).
 
     </div>
@@ -110,13 +110,13 @@ added: 2026-10-27
 
     <!-- gen 2 -->
 
-    <svg class="perf-chart" viewBox="0 0 640 250" role="img" aria-label="ההסתברות שהרצף מופיע לראשונה בהטלה t, ל-HT ול-HH : ל-HT שיא גבוה ב-2 ו-3 וזנב קצר, ל-HH זנב ארוך"><line class="grid" x1="46" x2="628" y1="216.0" y2="216.0"/><text class="tick" x="38" y="220.0" text-anchor="end">0</text><line class="grid" x1="46" x2="628" y1="149.3" y2="149.3"/><text class="tick" x="38" y="153.3" text-anchor="end">0.1</text><line class="grid" x1="46" x2="628" y1="82.7" y2="82.7"/><text class="tick" x="38" y="86.7" text-anchor="end">0.2</text><line class="grid" x1="46" x2="628" y1="16.0" y2="16.0"/><text class="tick" x="38" y="20.0" text-anchor="end">0.3</text><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="58.4" y="49.3" width="14.0" height="166.7" rx="2"><title>HT: P(T = 2) = 1/4</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="58.4" y="49.3" width="14.0" height="166.7" rx="2"><title>HH: P(T = 2) = 1/4</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="97.2" y="49.3" width="14.0" height="166.7" rx="2"><title>HT: P(T = 3) = 1/4</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="97.2" y="132.7" width="14.0" height="83.3" rx="2"><title>HH: P(T = 3) = 1/8</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="136.0" y="91.0" width="14.0" height="125.0" rx="2"><title>HT: P(T = 4) = 3/16</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="136.0" y="132.7" width="14.0" height="83.3" rx="2"><title>HH: P(T = 4) = 1/8</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="174.8" y="132.7" width="14.0" height="83.3" rx="2"><title>HT: P(T = 5) = 1/8</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="174.8" y="153.5" width="14.0" height="62.5" rx="2"><title>HH: P(T = 5) = 3/32</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="213.6" y="163.9" width="14.0" height="52.1" rx="2"><title>HT: P(T = 6) = 5/64</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="213.6" y="163.9" width="14.0" height="52.1" rx="2"><title>HH: P(T = 6) = 5/64</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="252.4" y="184.8" width="14.0" height="31.2" rx="2"><title>HT: P(T = 7) = 3/64</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="252.4" y="174.3" width="14.0" height="41.7" rx="2"><title>HH: P(T = 7) = 1/16</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="291.2" y="197.8" width="14.0" height="18.2" rx="2"><title>HT: P(T = 8) = 7/256</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="291.2" y="182.1" width="14.0" height="33.9" rx="2"><title>HH: P(T = 8) = 13/256</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="330.0" y="205.6" width="14.0" height="10.4" rx="2"><title>HT: P(T = 9) = 1/64</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="330.0" y="188.7" width="14.0" height="27.3" rx="2"><title>HH: P(T = 9) = 21/512</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="368.8" y="210.1" width="14.0" height="5.9" rx="2"><title>HT: P(T = 10) = 9/1024</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="368.8" y="193.9" width="14.0" height="22.1" rx="2"><title>HH: P(T = 10) = 17/512</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="407.6" y="212.7" width="14.0" height="3.3" rx="2"><title>HT: P(T = 11) = 5/1024</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="407.6" y="198.1" width="14.0" height="17.9" rx="2"><title>HH: P(T = 11) = 55/2048</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="446.4" y="214.2" width="14.0" height="1.8" rx="2"><title>HT: P(T = 12) = 11/4096</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="446.4" y="201.5" width="14.0" height="14.5" rx="2"><title>HH: P(T = 12) = 89/4096</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="485.2" y="215.0" width="14.0" height="1.0" rx="2"><title>HT: P(T = 13) = 3/2048</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="485.2" y="204.3" width="14.0" height="11.7" rx="2"><title>HH: P(T = 13) = 9/512</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="524.0" y="215.5" width="14.0" height="0.5" rx="2"><title>HT: P(T = 14) = 13/16384</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="524.0" y="206.5" width="14.0" height="9.5" rx="2"><title>HH: P(T = 14) = 233/16384</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="562.8" y="215.7" width="14.0" height="0.3" rx="2"><title>HT: P(T = 15) = 7/16384</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="562.8" y="208.3" width="14.0" height="7.7" rx="2"><title>HH: P(T = 15) = 377/32768</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="601.6" y="215.8" width="14.0" height="0.2" rx="2"><title>HT: P(T = 16) = 15/65536</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="601.6" y="209.8" width="14.0" height="6.2" rx="2"><title>HH: P(T = 16) = 305/32768</title></rect></g><text class="tick" x="65.4" y="234" text-anchor="middle">2</text><text class="tick" x="104.2" y="234" text-anchor="middle">3</text><text class="tick" x="143.0" y="234" text-anchor="middle">4</text><text class="tick" x="181.8" y="234" text-anchor="middle">5</text><text class="tick" x="220.6" y="234" text-anchor="middle">6</text><text class="tick" x="259.4" y="234" text-anchor="middle">7</text><text class="tick" x="298.2" y="234" text-anchor="middle">8</text><text class="tick" x="337.0" y="234" text-anchor="middle">9</text><text class="tick" x="375.8" y="234" text-anchor="middle">10</text><text class="tick" x="414.6" y="234" text-anchor="middle">11</text><text class="tick" x="453.4" y="234" text-anchor="middle">12</text><text class="tick" x="492.2" y="234" text-anchor="middle">13</text><text class="tick" x="531.0" y="234" text-anchor="middle">14</text><text class="tick" x="569.8" y="234" text-anchor="middle">15</text><text class="tick" x="608.6" y="234" text-anchor="middle">16</text><line class="axis" x1="46" x2="628" y1="216" y2="216"/><text class="tick" x="38" y="234" text-anchor="end">t</text></svg>
+    <svg class="perf-chart" viewBox="0 0 640 250" role="img" aria-label="ההסתברות שהרצף מופיע לראשונה בהטלה t, ל-HT ול-HH : ל-HT שיא גבוה ב-2 ו-3 וזנב קצר, ל-HH זנב ארוך"><line class="grid" x1="46" x2="628" y1="216.0" y2="216.0"/><text class="tick" x="38" y="220.0" text-anchor="end">0</text><line class="grid" x1="46" x2="628" y1="149.3" y2="149.3"/><text class="tick" x="38" y="153.3" text-anchor="end">0.1</text><line class="grid" x1="46" x2="628" y1="82.7" y2="82.7"/><text class="tick" x="38" y="86.7" text-anchor="end">0.2</text><line class="grid" x1="46" x2="628" y1="16.0" y2="16.0"/><text class="tick" x="38" y="20.0" text-anchor="end">0.3</text><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="58.4" y="49.3" width="14.0" height="166.7" rx="2"><title>HT: P(T = 2) = 1/4</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="58.4" y="49.3" width="14.0" height="166.7" rx="2"><title>HH: P(T = 2) = 1/4</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="97.2" y="49.3" width="14.0" height="166.7" rx="2"><title>HT: P(T = 3) = 1/4</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="97.2" y="132.7" width="14.0" height="83.3" rx="2"><title>HH: P(T = 3) = 1/8</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="136.0" y="91.0" width="14.0" height="125.0" rx="2"><title>HT: P(T = 4) = 3/16</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="136.0" y="132.7" width="14.0" height="83.3" rx="2"><title>HH: P(T = 4) = 1/8</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="174.8" y="132.7" width="14.0" height="83.3" rx="2"><title>HT: P(T = 5) = 1/8</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="174.8" y="153.5" width="14.0" height="62.5" rx="2"><title>HH: P(T = 5) = 3/32</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="213.6" y="163.9" width="14.0" height="52.1" rx="2"><title>HT: P(T = 6) = 5/64</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="213.6" y="163.9" width="14.0" height="52.1" rx="2"><title>HH: P(T = 6) = 5/64</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="252.4" y="184.8" width="14.0" height="31.2" rx="2"><title>HT: P(T = 7) = 3/64</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="252.4" y="174.3" width="14.0" height="41.7" rx="2"><title>HH: P(T = 7) = 1/16</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="291.2" y="197.8" width="14.0" height="18.2" rx="2"><title>HT: P(T = 8) = 7/256</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="291.2" y="182.1" width="14.0" height="33.9" rx="2"><title>HH: P(T = 8) = 13/256</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="330.0" y="205.6" width="14.0" height="10.4" rx="2"><title>HT: P(T = 9) = 1/64</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="330.0" y="188.7" width="14.0" height="27.3" rx="2"><title>HH: P(T = 9) = 21/512</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="368.8" y="210.1" width="14.0" height="5.9" rx="2"><title>HT: P(T = 10) = 9/1024</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="368.8" y="193.9" width="14.0" height="22.1" rx="2"><title>HH: P(T = 10) = 17/512</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="407.6" y="212.7" width="14.0" height="3.3" rx="2"><title>HT: P(T = 11) = 5/1024</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="407.6" y="198.1" width="14.0" height="17.9" rx="2"><title>HH: P(T = 11) = 55/2048</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="446.4" y="214.2" width="14.0" height="1.8" rx="2"><title>HT: P(T = 12) = 11/4096</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="446.4" y="201.5" width="14.0" height="14.5" rx="2"><title>HH: P(T = 12) = 89/4096</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="485.2" y="215.0" width="14.0" height="1.0" rx="2"><title>HT: P(T = 13) = 3/2048</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="485.2" y="204.3" width="14.0" height="11.7" rx="2"><title>HH: P(T = 13) = 9/512</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="524.0" y="215.5" width="14.0" height="0.5" rx="2"><title>HT: P(T = 14) = 13/16384</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="524.0" y="206.5" width="14.0" height="9.5" rx="2"><title>HH: P(T = 14) = 233/16384</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="562.8" y="215.7" width="14.0" height="0.3" rx="2"><title>HT: P(T = 15) = 7/16384</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="562.8" y="208.3" width="14.0" height="7.7" rx="2"><title>HH: P(T = 15) = 377/32768</title></rect></g><g transform="translate(-7.4,0)"><rect class="bar by-multiples" x="601.6" y="215.8" width="14.0" height="0.2" rx="2"><title>HT: P(T = 16) = 15/65536</title></rect></g><g transform="translate(7.4,0)"><rect class="bar by-enum" x="601.6" y="209.8" width="14.0" height="6.2" rx="2"><title>HH: P(T = 16) = 305/32768</title></rect></g><text class="tick" x="65.4" y="234" text-anchor="middle">2</text><text class="tick" x="104.2" y="234" text-anchor="middle">3</text><text class="tick" x="143.0" y="234" text-anchor="middle">4</text><text class="tick" x="181.8" y="234" text-anchor="middle">5</text><text class="tick" x="220.6" y="234" text-anchor="middle">6</text><text class="tick" x="259.4" y="234" text-anchor="middle">7</text><text class="tick" x="298.2" y="234" text-anchor="middle">8</text><text class="tick" x="337.0" y="234" text-anchor="middle">9</text><text class="tick" x="375.8" y="234" text-anchor="middle">10</text><text class="tick" x="414.6" y="234" text-anchor="middle">11</text><text class="tick" x="453.4" y="234" text-anchor="middle">12</text><text class="tick" x="492.2" y="234" text-anchor="middle">13</text><text class="tick" x="531.0" y="234" text-anchor="middle">14</text><text class="tick" x="569.8" y="234" text-anchor="middle">15</text><text class="tick" x="608.6" y="234" text-anchor="middle">16</text><line class="axis" x1="46" x2="628" y1="216" y2="216"/><text class="tick" x="38" y="234" text-anchor="end">t</text></svg>
 
     <!-- /gen -->
 
     <!-- gen 3 -->
 
-    <span class="viz-legend"><span><i class="by-multiples"></i>HT : ‏(t − 1) / 2^t</span><span><i class="by-enum"></i>HH : ‏F(t − 1) / 2^t (פיבונאצ׳י)</span></span>
+    <span class="viz-legend"><span><i class="by-multiples"></i>HT : ‏(t − 1) / 2^t</span><span><i class="by-enum"></i>HH : ‏F(t − 1) / 2^t (פיבונאצ׳י)</span></span>
 
     <!-- /gen -->
 
@@ -234,11 +234,11 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **חפיפות :** לכל \( k = 1, \dots, L \) בודקים אם \( k \) האותיות האחרונות שוות
+    1. **חפיפות :** לכל \( k = 1, \dots, L \) בודקים אם \( k \) האותיות האחרונות שוות
        ל-\( k \) הראשונות.
-    2. **משקל :** כל חפיפה באורך \( k \) מוסיפה \( 1 / P(A_{1..k}) \), ההסתברות ההפוכה של
+    2. **משקל :** כל חפיפה באורך \( k \) מוסיפה \( 1 / P(A_{1..k}) \), ההסתברות ההפוכה של
        התחילית באורך \( k \). החפיפה \( k = L \) תמיד קיימת ותורמת \( 1 / P(A) \).
-    3. **אלפבית כלשהו :** הנוסחה לא תלויה בכך שיש שתי אותיות. בקובייה כל אות היא 1/6,
+    3. **אלפבית כלשהו :** הנוסחה לא תלויה בכך שיש שתי אותיות. בקובייה כל אות היא 1/6,
        וחפיפה באורך \( k \) תורמת \( 6^k \).
 
     </div>
@@ -372,11 +372,11 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **מטריצה :** ‏\( m \times m \) של `corr(A_i, A_j)`.
-    2. **משוואות :** לכל \( j \), \( \sum_i p_i \, \mathrm{corr}(A_i, A_j) - E = 0 \); ועוד
+    1. **מטריצה :** ‏\( m \times m \) של `corr(A_i, A_j)`.
+    2. **משוואות :** לכל \( j \), \( \sum_i p_i \, \mathrm{corr}(A_i, A_j) - E = 0 \); ועוד
        \( \sum_i p_i = 1 \).
-    3. **פתרון :** אלימינציה של גאוס על \( m + 1 \) משוואות.
-    4. **תנאי :** אף רצף לא מופיע בתוך אחר, אחרת הרצף הפנימי תמיד מנצח (או משתתף בתיקו).
+    3. **פתרון :** אלימינציה של גאוס על \( m + 1 \) משוואות.
+    4. **תנאי :** אף רצף לא מופיע בתוך אחר, אחרת הרצף הפנימי תמיד מנצח (או משתתף בתיקו).
 
     </div>
 
@@ -548,13 +548,13 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **‏C(z) :** לכל חפיפה באורך \( k \) מוסיפים \( P(A_{k+1..L}) z^{L-k} \). החפיפה
+    1. **‏C(z) :** לכל חפיפה באורך \( k \) מוסיפים \( P(A_{k+1..L}) z^{L-k} \). החפיפה
        \( k = L \) נותנת את האיבר הקבוע 1.
-    2. **המכנה :** ‏\( D(z) = P(A) z^L + (1 - z) C(z) \), פולינום ממעלה \( L + 1 \) לכל
+    2. **המכנה :** ‏\( D(z) = P(A) z^L + (1 - z) C(z) \), פולינום ממעלה \( L + 1 \) לכל
        היותר, עם \( D(0) = 1 \).
-    3. **ההתפלגות :** מ-\( D(z) G(z) = P(A) z^L \) :
+    3. **ההתפלגות :** מ-\( D(z) G(z) = P(A) z^L \) :
        \( g_t = P(A)[t = L] - \sum_{j \ge 1} d_j \, g_{t-j} \), כאשר \( g_t = P(T = t) \).
-    4. **מומנטים :** ‏\( G'(1) \) ו-\( G''(1) \) מהנגזרות של המונה והמכנה ב-\( z = 1 \).
+    4. **מומנטים :** ‏\( G'(1) \) ו-\( G''(1) \) מהנגזרות של המונה והמכנה ב-\( z = 1 \).
 
     </div>
 
@@ -692,20 +692,20 @@ added: 2026-10-27
     לנצח, והמשוואות של סעיף ג מתנוונות. בודקים את התנאי לפני שפותרים.
 
 ??? followup "שאלות המשך"
-    - **קובייה :** כמה הטלות בממוצע עד `66`? ועד `12`?
+    - **קובייה :** כמה הטלות בממוצע עד `66`? ועד `12`?
 
         ??? fu-answer "תשובה"
             ל-`66` יש חפיפות באורכים 1 ו-2, ולכן \( 6 + 36 = 42 \). ל-`12` יש רק את הרצף כולו, ולכן
             36. אותה סיבה כמו `HH` מול `HT`.
 
-    - **כיסוי בטסט אקראי :** ‏stimulus אקראי של ביטים הוגנים, ורוצים לראות `1011` לפחות
+    - **כיסוי בטסט אקראי :** ‏stimulus אקראי של ביטים הוגנים, ורוצים לראות `1011` לפחות
       פעם אחת. כמה מחזורים בממוצע?
 
         ??? fu-answer "תשובה"
             החפיפות של `1011` עם עצמו הן באורכים 1 ו-4, ולכן \( 2 + 16 = 18 \) מחזורים. ל-`1111`
             צריך \( 2 + 4 + 8 + 16 = 30 \).
 
-    - **כמה רצפים ב-stimulus :** רוצים לראות גם `1011` וגם `0110`. כמה מחזורים עד שמופיע
+    - **כמה רצפים ב-stimulus :** רוצים לראות גם `1011` וגם `0110`. כמה מחזורים עד שמופיע
       **אחד** מהם, ואיזה מופיע קודם?
 
         ??? fu-answer "תשובה"
@@ -713,7 +713,7 @@ added: 2026-10-27
             בממוצע, ו-`1011` קודם בסיכוי 7/12. עד ששניהם מופיעים : \( \max + \min = T_A + T_B \), ולכן
             \( E[\max] = 18 + 18 - 73/6 = 143/6 \approx 23.8 \), גם כשהזמנים תלויים.
 
-    - **הכי הרבה זמן :** איזה רצף באורך \( L \) מחכה הכי הרבה, ואיזה הכי מעט?
+    - **הכי הרבה זמן :** איזה רצף באורך \( L \) מחכה הכי הרבה, ואיזה הכי מעט?
 
         ??? fu-answer "תשובה"
             הכי הרבה : רצף של אות אחת (`HHH...`), עם \( 2^{L+1} - 2 \). הכי מעט : רצף בלי חפיפות

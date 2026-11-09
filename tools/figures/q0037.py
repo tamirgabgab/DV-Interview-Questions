@@ -275,7 +275,7 @@ def flow_svg() -> str:
     W, H, CQ = 372, 148, 14
     qx = 150                                           # the queues start here, 8 cells of CQ
     s = (f'<svg class="figure ed-fig ed-flow" viewBox="0 0 {W} {H}" style="max-width:{W / 16:g}rem" role="img" '
-         f'aria-label="הזרימה ב-scoreboard : ה-monitor שם את מה שה-DUT שלח, {B}, בתור actual, ה-reference model שם את '
+         f'aria-label="הזרימה ב-scoreboard : ה-monitor שם את מה שה-DUT שלח, {B}, בתור actual, ה-reference model שם את '
          f'מה שציפה, {A}, בתור expected, ובסוף הבדיקה diff משווה את שני התורים וכותב דוח">'
          '<defs><marker id="ed-flow-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
          '<path class="ed-head" d="M0,0 L10,5 L0,10 Z"/></marker></defs>')
@@ -310,14 +310,14 @@ def flow_svg() -> str:
 def blocks():
     """The generated blocks, in page order."""
     out = [
-        table_svg(A, B, f"טבלת המרחקים של {A} מול {B} : הזרם הצפוי בשורות, הזרם בפועל בעמודות, ובפינה 3. "
-                  "המסלול מהפינה : C חסרה, F שובשה ל-Y, ו-H מיותרת"),
+        table_svg(A, B, f"טבלת המרחקים של {A} מול {B} : הזרם הצפוי בשורות, הזרם בפועל בעמודות, ובפינה 3. "
+                  "המסלול מהפינה : C חסרה, F שובשה ל-Y, ו-H מיותרת"),
         legend(),
         table_ties(),
-        table_svg(TIE_A, TIE_B, f"טבלת המרחקים של {TIE_A} מול {TIE_B}, ובפינה 2. שני מסלולים באותו אורך : "
+        table_svg(TIE_A, TIE_B, f"טבלת המרחקים של {TIE_A} מול {TIE_B}, ובפינה 2. שני מסלולים באותו אורך : "
                   "C חסרה ו-X מיותרת, או C שובשה ל-D ו-D שובשה ל-X", other="changed"),
         legend(other=True),
-        table_svg(BAND_A, BAND_B, f"טבלת המרחקים של {BAND_A} מול {BAND_B} עם d = 2 : רק חמשת האלכסונים "
+        table_svg(BAND_A, BAND_B, f"טבלת המרחקים של {BAND_A} מול {BAND_B} עם d = 2 : רק חמשת האלכסונים "
                   "שסביב האלכסון הראשי מחושבים, ובפינה 2", band=BAND_D),
         table_costs(),
         table_swaps(),

@@ -101,8 +101,8 @@ def mirror() -> str:
     w = 2 * x0 + L * (cw + gap) - gap
     h = y2 + ch + 36
     s = [f'<svg class="figure" viewBox="0 0 {w} {h}" style="max-width:32rem" role="img" '
-         f'aria-label="סעיף ב : הביטים של {PICK} למעלה והביטים של {rev(PICK)} למטה. קו יוצא מכל ביט '
-         f'של {PICK} אל המקום המשתקף שלו : הביט הנמוך הופך לעליון, והעליון לנמוך">']
+         f'aria-label="סעיף ב : הביטים של {PICK} למעלה והביטים של {rev(PICK)} למטה. קו יוצא מכל ביט '
+         f'של {PICK} אל המקום המשתקף שלו : הביט הנמוך הופך לעליון, והעליון לנמוך">']
     cx = lambda c: x0 + c * (cw + gap) + cw / 2  # noqa: E731
     for c in range(L):
         bit = top[c]

@@ -26,7 +26,7 @@ def columns_svg(heights=HEIGHTS):
     height = base + 26
     total = sum(w_of)
     p = [f'<svg class="figure" viewBox="0 0 {width} {height}" style="max-width:{width / 16:.1f}rem" role="img" '
-         f'aria-label="העמודים {", ".join(map(str, heights))} : נשארות {total} יחידות מים">']
+         f'aria-label="העמודים {", ".join(map(str, heights))} : נשארות {total} יחידות מים">']
     for i, (h, wv) in enumerate(zip(heights, w_of)):
         x = PAD + i * (CELL + GAP)
         for lv in range(levels):

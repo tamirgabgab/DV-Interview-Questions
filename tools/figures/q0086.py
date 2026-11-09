@@ -18,7 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from charts import Chart  # noqa: E402,F401
 
-NB = " "
+NB = " "
 RLM = "‏"
 NAMES = ("אדומות", "ירוקות", "כחולות")       # plural, the colour of a group
 ONE = ("אדומה", "ירוקה", "כחולה")            # singular, one chameleon

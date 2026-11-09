@@ -91,7 +91,7 @@ def row_svg(coins):
     W, R, gap = 400, 26, 70
     x0 = W / 2 - gap * (len(coins) - 1) / 2
     s = (f'<svg class="figure cr-fig" viewBox="0 0 {W} 110" style="max-width:26rem" role="img" '
-         f'aria-label="השורה {", ".join(map(str, coins))} : המקומות הזוגיים בצבע אחד והאי-זוגיים בצבע אחר">')
+         f'aria-label="השורה {", ".join(map(str, coins))} : המקומות הזוגיים בצבע אחד והאי-זוגיים בצבע אחר">')
     for k, v in enumerate(coins):
         x = x0 + k * gap
         s += (f'<g class="cr-coin cr-p{k % 2}"><title>place {k + 1}, value {v}</title><circle cx="{x:g}" cy="50" r="{R}"/>'
@@ -116,7 +116,7 @@ def moves_table(coins, pairs):
         cells = []
         for moves, _ in games:
             who, sd, coin = moves[k]
-            cells.append(f"{'הראשון' if who == 0 else 'השני'} : {side[sd]}, {RLM}{coin}")
+            cells.append(f"{'הראשון' if who == 0 else 'השני'} : {side[sd]}, {RLM}{coin}")
         rows.append(f"| {RLM}{k + 1} | " + " | ".join(cells) + " |")
     rows.append("| **סך הכול** | " + " | ".join(f"**{RLM}{t[0]} מול {t[1]}**" for _, t in games) + " |")
     return "\n".join(rows)

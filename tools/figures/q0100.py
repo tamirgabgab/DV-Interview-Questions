@@ -31,7 +31,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 RLM = "‏"
-NB = " "
+NB = " "
 N, S = 10, (1, 2)                                     # the example of part a
 BROKEN = (5,)                                         # the broken stair of part b
 
@@ -206,7 +206,7 @@ def table_by_twos() -> str:
 def table_loops() -> str:
     steps, n = (1, 2, 3), 6
     rows = ["| אחרי הלולאה של | הטבלה, מדרגות 0 עד 6 | מה נספר |", "|---|---|---|"]
-    says = {1: "רק קפיצות של 1 : דרך אחת לכל מדרגה", 2: "קפיצות של 1 ושל 2, כל ה-2 אחרי כל ה-1",
+    says = {1: "רק קפיצות של 1 : דרך אחת לכל מדרגה", 2: "קפיצות של 1 ושל 2, כל ה-2 אחרי כל ה-1",
             3: "גם קפיצות של 3, אחרי כל השאר"}
     for s, w in zip(steps, unordered_rows(n, steps)):
         rows.append(f"| {s} | {RLM}{ltr(', '.join(map(str, w)))} | {says[s]} |")
@@ -250,10 +250,10 @@ def table_exact() -> str:
 def blocks():
     """The generated blocks, in page order."""
     out = [
-        staircase_svg(N, S, (), "גרם מדרגות 0 עד 10 עם קפיצות של 1 ושל 2 : על כל מדרגה מספר הדרכים להגיע אליה, 1, 1, 2, 3, 5 ועד 89 במדרגה 10. חיצים מהמדרגות 9 ו-8 אל מדרגה 10", focus=N),
+        staircase_svg(N, S, (), "גרם מדרגות 0 עד 10 עם קפיצות של 1 ושל 2 : על כל מדרגה מספר הדרכים להגיע אליה, 1, 1, 2, 3, 5 ועד 89 במדרגה 10. חיצים מהמדרגות 9 ו-8 אל מדרגה 10", focus=N),
         legend(focus=True),
         table_sets(),
-        staircase_svg(N, S, BROKEN, "אותו גרם מדרגות כשמדרגה 5 שבורה : עליה 0, מדרגה 6 מקבלת רק ממדרגה 4, ובמדרגה 10 יש 25 דרכים", focus=6),
+        staircase_svg(N, S, BROKEN, "אותו גרם מדרגות כשמדרגה 5 שבורה : עליה 0, מדרגה 6 מקבלת רק ממדרגה 4, ובמדרגה 10 יש 25 דרכים", focus=6),
         legend(focus=True, broken=True),
         table_cycles(),
         table_by_twos(),

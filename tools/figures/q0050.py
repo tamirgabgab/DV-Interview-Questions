@@ -98,7 +98,7 @@ def queues_figure():
     reqs = [(0, "A"), (1, "B"), (0, "C"), (2, "D"), (1, "E")]
     W, H = 640, 250
     s = (f'<svg class="figure sb-fig" viewBox="0 0 {W} {H}" style="max-width:40rem" role="img" '
-         'aria-label="תור לכל ID : הבקשות נכנסות לסוף התור של ה-ID שלהן, ותשובה נבדקת מול ראש התור של אותו ID">')
+         'aria-label="תור לכל ID : הבקשות נכנסות לסוף התור של ה-ID שלהן, ותשובה נבדקת מול ראש התור של אותו ID">')
     # the stream of requests on top, oldest on the right
     s += f'<text class="legend" x="{W - 10}" y="22" text-anchor="end" direction="rtl">בקשות, לפי סדר ההגעה</text>'
     for k, (i, name) in enumerate(reqs):
@@ -129,7 +129,7 @@ def queues_figure():
 
 
 def legend():
-    return ('<span class="viz-legend"><span><i class="sb-key-head"></i>ראש התור : התשובה הבאה של ה-ID הזה</span>'
+    return ('<span class="viz-legend"><span><i class="sb-key-head"></i>ראש התור : התשובה הבאה של ה-ID הזה</span>'
             '<span><i class="sb-key-done"></i>בקשה שכבר נענתה</span></span>')
 
 

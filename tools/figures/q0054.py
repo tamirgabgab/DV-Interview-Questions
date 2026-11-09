@@ -103,7 +103,7 @@ def grids():
     W, S, x0, top, gap = 660, 34, 150, 30, 26
     H = top + len(rows) * (N * S + gap) + 10
     s = (f'<svg class="figure arb-fig" viewBox="0 0 {W} {H}" style="max-width:41rem" role="img" '
-         'aria-label="ארבעה מבקשים שמבקשים כל הזמן : ב-fixed priority רק מבקש 0 מקבל, ב-round robin כל אחד מקבל פעם בארבעה מחזורים">')
+         'aria-label="ארבעה מבקשים שמבקשים כל הזמן : ב-fixed priority רק מבקש 0 מקבל, ב-round robin כל אחד מקבל פעם בארבעה מחזורים">')
     for c in range(len(FULL)):
         s += f'<text class="tick" x="{x0 + c * S + S / 2}" y="{top - 10}" text-anchor="middle">{c}</text>'
     for k, (name, grants) in enumerate(rows):

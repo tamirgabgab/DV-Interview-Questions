@@ -79,7 +79,7 @@ def rotate_table():
             + [("", "is-gap")] + [(v, "c1") for v in r[i]]
         rows.append((f"שורה {i}", cells, None))
     head = list(range(n)) + [""] + list(range(n)) + [""] + list(range(n))
-    return table(rows, "תמונה 3 על 3 : המקורית, אחרי שחלוף (האלכסון לא זז), ואחרי היפוך של כל שורה, סיבוב של רבע סיבוב בכיוון השעון",
+    return table(rows, "תמונה 3 על 3 : המקורית, אחרי שחלוף (האלכסון לא זז), ואחרי היפוך של כל שורה, סיבוב של רבע סיבוב בכיוון השעון",
                  head=head)
 
 

@@ -237,7 +237,7 @@ def log_table(a, b, c, seed):
             gone = "; ".join(f"{nm[x]} ({', '.join(nm[y] for y in sorted(e['faster'][x][:c], key=lambda y: nm[y]))}"
                              f"{' ועוד ' + str(len(e['faster'][x]) - c) if len(e['faster'][x]) > c else ''})" for x in gone_sorted)
         else:
-            gone = f"{len(gone_sorted)} : " + ", ".join(nm[x] for x in gone_sorted) if gone_sorted else "—"
+            gone = f"{len(gone_sorted)} : " + ", ".join(nm[x] for x in gone_sorted) if gone_sorted else "—"
         rank_of = {x: r + 1 for r, x in enumerate(sorted(range(a), key=lambda z: sp[z]))}
         placed = ", ".join(f"{nm[x]} מקום {rank_of[x]}" for x in sorted(e["placed"], key=lambda x: rank_of[x])) or "—"
         lines.append(f"| {RLM}{r} | {RLM}{horses} | {RLM}{result} | {RLM}{gone or '—'} | {RLM}{placed} | {RLM}{len(e['open'])} |")

@@ -195,7 +195,7 @@ def pair_map_svg(B=EXAMPLE_B, x0=EXAMPLE_X):
             v = value_b(p, q, B)
             cls = "is-fixed" if v in fixed and pair_b(v, B) == (p, q) else "is-cycle" if (p, q) in on_cycle else "to-fixed" if (p, q) in to_fixed else "to-cycle"
             out.append(f'<rect class="kq-cell {cls}" x="{X0 + q * CW + 1}" y="{Y0 + (p - 1) * CH + 1}" width="{CW - 2}" height="{CH - 2}" rx="3">'
-                       f'<title>(p, q) = ({p}, {q}) : {text_b(v, B)}</title></rect>')
+                       f'<title>(p, q) = ({p}, {q}) : {text_b(v, B)}</title></rect>')
     vals, start = orbit_b(x0, B)
     pairs = [pair_b(x, B) for x in vals] + [pair_b(step_b(vals[-1], B), B)]
     for (p1, q1), (p2, q2) in zip(pairs, pairs[1:]):
@@ -211,7 +211,7 @@ def pair_map_legend():
             '<span><i class="kq-key-cycle"></i>זוגות שעל מחזור</span>'
             '<span><i class="kq-key-tofixed"></i>מגיעים לנקודת השבת</span>'
             '<span><i class="kq-key-tocycle"></i>נכנסים למחזור</span>'
-            '<span><i class="kq-key-path"></i>המסלול של 1234 (העיגול : ההתחלה)</span></span>')
+            '<span><i class="kq-key-path"></i>המסלול של 1234 (העיגול : ההתחלה)</span></span>')
 
 
 def blocks():

@@ -11,7 +11,7 @@ Colours come from the site's palette through the lu-* classes of
 docs/stylesheets/questions/0098-luhn.css.
 """
 
-NB = " "
+NB = " "
 RLM = "‏"
 
 CARD = "4111111111111111"          # the standard Visa test number, valid
@@ -75,10 +75,10 @@ def swap_misses(name):
 
 
 SCHEMES = [
-    ("luhn", RLM + "Luhn : כפל ב-2 וסכום ספרות".replace(" :", NB + ":")),
+    ("luhn", RLM + "Luhn : כפל ב-2 וסכום ספרות".replace(" :", NB + ":")),
     ("w12", "משקלים 1 ו-2, בלי סכום ספרות"),
     ("ean", "ברקוד EAN-13, משקלים 1 ו-3"),
-    ("isbn", RLM + "ISBN-10 : משקלים 10 עד 1, מודולו 11".replace(" :", NB + ":")),
+    ("isbn", RLM + "ISBN-10 : משקלים 10 עד 1, מודולו 11".replace(" :", NB + ":")),
 ]
 
 

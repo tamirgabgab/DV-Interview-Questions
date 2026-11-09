@@ -326,7 +326,7 @@ def kmap(lsb, k, name, terms):
             body += f'<td class="pm-c{(" " + " ".join(cls[:1])) if cls else ""}">{text}</td>'
         body += "</tr>"
     head = '<tr class="pm-head"><th dir="ltr">Q₁Q₀</th>' + "".join(f"<td>{a}{c}</td>" for a, c in GRAY) + "</tr>"
-    aria = f"מפת קרנו של {name} : השורות b, העמודות Q1 Q0 בסדר גריי, והקבוצות צבועות"
+    aria = f"מפת קרנו של {name} : השורות b, העמודות Q1 Q0 בסדר גריי, והקבוצות צבועות"
     title = f'<p class="ff-map-title" dir="ltr">{name[0]}{"₁" if name[1] == "1" else "₀"}</p>'
     tab = (f'<div class="pm-scroll" tabindex="0" role="region" aria-label="{escape(aria)}">'
            f'<table class="pm-cells ff-kmap" dir="ltr"><tbody>{head}{body}</tbody></table></div>')
@@ -455,13 +455,13 @@ def schematic(lsb):
     s.append(f'<line class="ff-wire" x1="{_f(out)}" y1="{_f(dy)}" x2="{fx + fw + 22}" y2="{_f(dy)}"/>'
              + _text(fx + fw + 26, dy + 5, "div", "start"))
     label = ("המעגל של סעיף ב" if lsb else "המעגל של סעיף א") + (
-        " : שני פליפ-פלופים מסוג D עם איפוס אסינכרוני, שערי AND ו-OR לכל כניסת D, ו-div מ-AND של שני המשלימים")
+        " : שני פליפ-פלופים מסוג D עם איפוס אסינכרוני, שערי AND ו-OR לכל כניסת D, ו-div מ-AND של שני המשלימים")
     return (f'<svg class="figure ff-fig" viewBox="0 0 {W} {H}" style="max-width:40rem" role="img" '
             f'aria-label="{escape(label)}">' + "".join(s) + "</svg>")
 
 
 def schematic_legend():
-    return ('<span class="viz-legend"><span><i class="ff-key-dot"></i>נקודה : חיבור לקו האנכי</span>'
+    return ('<span class="viz-legend"><span><i class="ff-key-dot"></i>נקודה : חיבור לקו האנכי</span>'
             '<span>קווים עם אותו שם מחוברים (‏Q₁ ו-Q̄₁ יוצאים מהפליפ-פלופ העליון)</span></span>')
 
 
@@ -560,9 +560,9 @@ def hw_diagram():
 def blocks():
     """The generated blocks, in page order (12 to 14 sit earlier on the page: part b's
     equations, then part a's block diagram and table of clocks)."""
-    return [diagram(3, False, "מכונת המצבים של 3 כשביט חדש נכנס כ-LSB : שלושה מצבים, השארית של המספר עד עכשיו"),
+    return [diagram(3, False, "מכונת המצבים של 3 כשביט חדש נכנס כ-LSB : שלושה מצבים, השארית של המספר עד עכשיו"),
             legend(), msb_table(), merge_table(),
-            diagram(3, True, "מכונת המצבים של 3 כשביט חדש נכנס כ-MSB : שלושה מצבים, x הוא השארית כפול 2 בחזקת מינוס k"),
+            diagram(3, True, "מכונת המצבים של 3 כשביט חדש נכנס כ-MSB : שלושה מצבים, x הוא השארית כפול 2 בחזקת מינוס k"),
             states_table(), kbits_table(),
             encoded_table(False), kmaps(False), equations_block(False), schematic(False) + "\n\n" + schematic_legend(),
             encoded_table(True), equations_block(True), hw_diagram(), clocks_table()]

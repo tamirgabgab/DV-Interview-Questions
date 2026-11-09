@@ -144,7 +144,7 @@ def part_a(a=EXAMPLE):
     body += array_row(a, idx)
     body += value_row("dp", dp, 100, idx)
     W = LW + n * (C + G) - G + PAD
-    label = (f"סעיף א : המערך {' '.join(map(str, a))}. מתחת לכל איבר dp, האורך של תת-הסדרה העולה הארוכה ביותר שנגמרת בו : "
+    label = (f"סעיף א : המערך {' '.join(map(str, a))}. מתחת לכל איבר dp, האורך של תת-הסדרה העולה הארוכה ביותר שנגמרת בו : "
              f"{' '.join(map(str, dp))}. קשת מכל איבר לאיבר prev שלפניו. האורך {best}, והסדרה {' '.join(map(str, seq))} מודגשת")
     return svg(W, 136, label, body)
 
@@ -176,9 +176,9 @@ def part_b(a=EXAMPLE):
         note = f"k = {k}, append" if app else f"k = {k}, {old} → {x}"
         body.append(f'<text class="lis-side" x="{xs(L) + 4}" y="{y + 21}">{escape(note)}</text>')
     H = 24 + len(trace) * RH - 4
-    rows = "; ".join(f"x = {x} : {'מאריך' if app else f'מחליף את {old}'} במקום {k}, tails = {' '.join(map(str, t))}"
+    rows = "; ".join(f"x = {x} : {'מאריך' if app else f'מחליף את {old}'} במקום {k}, tails = {' '.join(map(str, t))}"
                      for i, x, k, app, old, t in trace)
-    label = f"סעיף ב : מערך tails אחרי כל איבר של {' '.join(map(str, a))}. {rows}"
+    label = f"סעיף ב : מערך tails אחרי כל איבר של {' '.join(map(str, a))}. {rows}"
     return svg(W, H, label, body)
 
 
@@ -203,8 +203,8 @@ def part_b_chain(a=EXAMPLE):
     body += value_row("parent", parent, 100, idx)
     W = LW + 18 + n * (C + G) - G + PAD
     body = [f'<g transform="translate(18 0)">'] + body + ["</g>"]
-    label = (f"סעיף ב, השחזור : parent של כל איבר, {' '.join('–' if p < 0 else str(p) for p in parent)}. "
-             f"מהאיבר האחרון שנכנס לסוף tails, האינדקס {end}, אחורה לפי parent : {' '.join(map(str, seq))}")
+    label = (f"סעיף ב, השחזור : parent של כל איבר, {' '.join('–' if p < 0 else str(p) for p in parent)}. "
+             f"מהאיבר האחרון שנכנס לסוף tails, האינדקס {end}, אחורה לפי parent : {' '.join(map(str, seq))}")
     return svg(W, 136, label, body)
 
 
@@ -239,7 +239,7 @@ def count_table(a, what):
         cells = "".join(f'<td class="gs-b{" is-one" if i in lit else ""}">{v}</td>' for i, v in enumerate(vals))
         return f'<tr{f" class={chr(34)}{cls}{chr(34)}" if cls else ""}><th>{name}</th>{cells}</tr>'
 
-    label = (f"{what} : לכל אינדקס האורך length ומספר הסדרות count. האורך המקסימלי {best}, "
+    label = (f"{what} : לכל אינדקס האורך length ומספר הסדרות count. האורך המקסימלי {best}, "
              f"והסכום של count בעמודות שלו הוא {total}")
     return (f'<div class="gs-scroll" tabindex="0" role="region" aria-label="{escape(label)}">'
             f'<table class="gs-bits lis-tab" dir="ltr" aria-label="{escape(label)}"><tbody>'
@@ -251,7 +251,7 @@ def legend_c(a):
     length, count = pairs(a)
     best = max(length)
     total = sum(c for n, c in zip(length, count) if n == best)
-    return (f'<span class="viz-legend"><span><i class="gs-key-one"></i>אורך מקסימלי, {best} : הסכום של <code>count</code> בעמודות '
+    return (f'<span class="viz-legend"><span><i class="gs-key-one"></i>אורך מקסימלי, {best} : הסכום של <code>count</code> בעמודות '
             f'האלה הוא {total}</span></span>')
 
 

@@ -15,22 +15,22 @@ added: 2026-10-27
 **בדיוק 24 שעות אחר כך**, ולא לפני. יש לנו עכברי מעבדה, וכל עכבר יכול לשתות מכמה
 בקבוקים שנרצה באותו רגע. רוצים לדעת בוודאות איזה בקבוק מורעל, עם כמה שפחות עכברים.
 
-- **סעיף א – סבב אחד :** יש בדיוק 24 שעות. כל העכברים שותים יחד, ולמחרת בודקים מי
+- **סעיף א – סבב אחד :** יש בדיוק 24 שעות. כל העכברים שותים יחד, ולמחרת בודקים מי
   מת. כמה עכברים צריך?
-- **סעיף ב – שני סבבים :** יש 48 שעות. משקים, רואים מי מת אחרי 24 שעות, ומשקים את מי
+- **סעיף ב – שני סבבים :** יש 48 שעות. משקים, רואים מי מת אחרי 24 שעות, ומשקים את מי
   שנשאר בסבב שני. כמה עכברים צריך עכשיו?
-- **סעיף ג – המקרה הכללי :** ‏\( n \) בקבוקים ו-\( b \) סבבים. כמה עכברים צריך, ולמה
+- **סעיף ג – המקרה הכללי :** ‏\( n \) בקבוקים ו-\( b \) סבבים. כמה עכברים צריך, ולמה
   אי אפשר פחות? כתבו קוד שמחשב את המספר, אומר לכל עכבר מאילו בקבוקים לשתות ובאיזה
   סבב, ומוצא את הבקבוק מתוך מה שקרה לעכברים.
 
 ??? interviewer "מה המראיין בודק"
-    - **מעבר מחיפוש לקידוד :** האם המועמד מפסיק לחשוב על "חצי מהבקבוקים לעכבר הראשון"
+    - **מעבר מחיפוש לקידוד :** האם המועמד מפסיק לחשוב על "חצי מהבקבוקים לעכבר הראשון"
       ומתחיל לחשוב על מה כל עכבר **מספר** לנו.
-    - **ספירת תוצאות :** האם הוא מנמק את החסם התחתון במספר התוצאות האפשריות, ולא רק מציג
+    - **ספירת תוצאות :** האם הוא מנמק את החסם התחתון במספר התוצאות האפשריות, ולא רק מציג
       שיטה שעובדת.
-    - **מה סבב נוסף נותן :** האם הוא רואה שעכבר שמת בסבב הראשון ועכבר שמת בשני הם שתי
+    - **מה סבב נוסף נותן :** האם הוא רואה שעכבר שמת בסבב הראשון ועכבר שמת בשני הם שתי
       תוצאות שונות, כלומר יותר מידע לכל עכבר.
-    - **הכללה נקייה :** נוסחה אחת ל-\( n \) ו-\( b \), עם מקרי קצה (בקבוק אחד, \( n \)
+    - **הכללה נקייה :** נוסחה אחת ל-\( n \) ו-\( b \), עם מקרי קצה (בקבוק אחד, \( n \)
       שהוא חזקה בדיוק).
 
 ---
@@ -66,13 +66,13 @@ added: 2026-10-27
 
     <!-- gen 0 -->
 
-    <svg class="figure mc-fig" viewBox="0 0 640 150" style="max-width:40rem" role="img" aria-label="עשרה עכברים, ביט לכל אחד : בבקבוק 613 מתים העכברים של הביטים שהם 1"><g class="mc-mouse is-dead"><title>mouse 0: bit 1, dies</title><circle cx="600" cy="62" r="22"/><text x="600" y="68" text-anchor="middle">1</text></g><text class="tick" x="600" y="24" text-anchor="middle">2^0</text><text class="tick" x="600" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>mouse 1: bit 0, lives</title><circle cx="540" cy="62" r="22"/><text x="540" y="68" text-anchor="middle">0</text></g><text class="tick" x="540" y="24" text-anchor="middle">2^1</text><text class="tick" x="540" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>mouse 2: bit 1, dies</title><circle cx="480" cy="62" r="22"/><text x="480" y="68" text-anchor="middle">1</text></g><text class="tick" x="480" y="24" text-anchor="middle">2^2</text><text class="tick" x="480" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>mouse 3: bit 0, lives</title><circle cx="420" cy="62" r="22"/><text x="420" y="68" text-anchor="middle">0</text></g><text class="tick" x="420" y="24" text-anchor="middle">2^3</text><text class="tick" x="420" y="112" text-anchor="middle">✓</text><g class="mc-mouse"><title>mouse 4: bit 0, lives</title><circle cx="360" cy="62" r="22"/><text x="360" y="68" text-anchor="middle">0</text></g><text class="tick" x="360" y="24" text-anchor="middle">2^4</text><text class="tick" x="360" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>mouse 5: bit 1, dies</title><circle cx="300" cy="62" r="22"/><text x="300" y="68" text-anchor="middle">1</text></g><text class="tick" x="300" y="24" text-anchor="middle">2^5</text><text class="tick" x="300" y="112" text-anchor="middle">✗</text><g class="mc-mouse is-dead"><title>mouse 6: bit 1, dies</title><circle cx="240" cy="62" r="22"/><text x="240" y="68" text-anchor="middle">1</text></g><text class="tick" x="240" y="24" text-anchor="middle">2^6</text><text class="tick" x="240" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>mouse 7: bit 0, lives</title><circle cx="180" cy="62" r="22"/><text x="180" y="68" text-anchor="middle">0</text></g><text class="tick" x="180" y="24" text-anchor="middle">2^7</text><text class="tick" x="180" y="112" text-anchor="middle">✓</text><g class="mc-mouse"><title>mouse 8: bit 0, lives</title><circle cx="120" cy="62" r="22"/><text x="120" y="68" text-anchor="middle">0</text></g><text class="tick" x="120" y="24" text-anchor="middle">2^8</text><text class="tick" x="120" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>mouse 9: bit 1, dies</title><circle cx="60" cy="62" r="22"/><text x="60" y="68" text-anchor="middle">1</text></g><text class="tick" x="60" y="24" text-anchor="middle">2^9</text><text class="tick" x="60" y="112" text-anchor="middle">✗</text><text class="legend" x="632" y="142" text-anchor="end">613 = 1001100101 (binary)</text></svg>
+    <svg class="figure mc-fig" viewBox="0 0 640 150" style="max-width:40rem" role="img" aria-label="עשרה עכברים, ביט לכל אחד : בבקבוק 613 מתים העכברים של הביטים שהם 1"><g class="mc-mouse is-dead"><title>mouse 0: bit 1, dies</title><circle cx="600" cy="62" r="22"/><text x="600" y="68" text-anchor="middle">1</text></g><text class="tick" x="600" y="24" text-anchor="middle">2^0</text><text class="tick" x="600" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>mouse 1: bit 0, lives</title><circle cx="540" cy="62" r="22"/><text x="540" y="68" text-anchor="middle">0</text></g><text class="tick" x="540" y="24" text-anchor="middle">2^1</text><text class="tick" x="540" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>mouse 2: bit 1, dies</title><circle cx="480" cy="62" r="22"/><text x="480" y="68" text-anchor="middle">1</text></g><text class="tick" x="480" y="24" text-anchor="middle">2^2</text><text class="tick" x="480" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>mouse 3: bit 0, lives</title><circle cx="420" cy="62" r="22"/><text x="420" y="68" text-anchor="middle">0</text></g><text class="tick" x="420" y="24" text-anchor="middle">2^3</text><text class="tick" x="420" y="112" text-anchor="middle">✓</text><g class="mc-mouse"><title>mouse 4: bit 0, lives</title><circle cx="360" cy="62" r="22"/><text x="360" y="68" text-anchor="middle">0</text></g><text class="tick" x="360" y="24" text-anchor="middle">2^4</text><text class="tick" x="360" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>mouse 5: bit 1, dies</title><circle cx="300" cy="62" r="22"/><text x="300" y="68" text-anchor="middle">1</text></g><text class="tick" x="300" y="24" text-anchor="middle">2^5</text><text class="tick" x="300" y="112" text-anchor="middle">✗</text><g class="mc-mouse is-dead"><title>mouse 6: bit 1, dies</title><circle cx="240" cy="62" r="22"/><text x="240" y="68" text-anchor="middle">1</text></g><text class="tick" x="240" y="24" text-anchor="middle">2^6</text><text class="tick" x="240" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>mouse 7: bit 0, lives</title><circle cx="180" cy="62" r="22"/><text x="180" y="68" text-anchor="middle">0</text></g><text class="tick" x="180" y="24" text-anchor="middle">2^7</text><text class="tick" x="180" y="112" text-anchor="middle">✓</text><g class="mc-mouse"><title>mouse 8: bit 0, lives</title><circle cx="120" cy="62" r="22"/><text x="120" y="68" text-anchor="middle">0</text></g><text class="tick" x="120" y="24" text-anchor="middle">2^8</text><text class="tick" x="120" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>mouse 9: bit 1, dies</title><circle cx="60" cy="62" r="22"/><text x="60" y="68" text-anchor="middle">1</text></g><text class="tick" x="60" y="24" text-anchor="middle">2^9</text><text class="tick" x="60" y="112" text-anchor="middle">✗</text><text class="legend" x="632" y="142" text-anchor="end">613 = 1001100101 (binary)</text></svg>
 
     <!-- /gen -->
 
     <!-- gen 1 -->
 
-    <span class="viz-legend"><span><i class="mc-key-dead"></i>עכבר שמת : הביט שלו 1</span><span><i class="mc-key-live"></i>עכבר ששרד : הביט שלו 0</span></span>
+    <span class="viz-legend"><span><i class="mc-key-dead"></i>עכבר שמת : הביט שלו 1</span><span><i class="mc-key-live"></i>עכבר ששרד : הביט שלו 0</span></span>
 
     <!-- /gen -->
 
@@ -80,11 +80,11 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **מספור :** הבקבוקים מקבלים את המספרים 0 עד 999, עשרה ביטים לכל אחד.
-    2. **השקיה :** עכבר \( i \) שותה טיפה מכל בקבוק שהביט ה-\( i \) שלו הוא 1 (כ-500
+    1. **מספור :** הבקבוקים מקבלים את המספרים 0 עד 999, עשרה ביטים לכל אחד.
+    2. **השקיה :** עכבר \( i \) שותה טיפה מכל בקבוק שהביט ה-\( i \) שלו הוא 1 (כ-500
        בקבוקים לעכבר).
-    3. **המתנה :** אחרי 24 שעות בודקים מי מת.
-    4. **קריאה :** ‏\( x = \sum_{i\ \text{dead}} 2^i \). בדוגמה ‏\( 1 + 4 + 32 + 64 + 512 = 613 \).
+    3. **המתנה :** אחרי 24 שעות בודקים מי מת.
+    4. **קריאה :** ‏\( x = \sum_{i\ \text{dead}} 2^i \). בדוגמה ‏\( 1 + 4 + 32 + 64 + 512 = 613 \).
 
     </div>
 
@@ -165,10 +165,10 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **מספור :** הבקבוקים 0 עד 999, כל אחד בשבע ספרות בבסיס 3.
-    2. **סבב 1 :** עכבר \( i \) שותה מכל בקבוק שהספרה ה-\( i \) שלו היא 1.
-    3. **סבב 2 :** אחרי 24 שעות, כל עכבר שנשאר שותה מכל בקבוק שהספרה ה-\( i \) שלו היא 2.
-    4. **קריאה :** אחרי עוד 24 שעות, הספרה \( i \) היא הסבב שבו עכבר \( i \) מת, או 0
+    1. **מספור :** הבקבוקים 0 עד 999, כל אחד בשבע ספרות בבסיס 3.
+    2. **סבב 1 :** עכבר \( i \) שותה מכל בקבוק שהספרה ה-\( i \) שלו היא 1.
+    3. **סבב 2 :** אחרי 24 שעות, כל עכבר שנשאר שותה מכל בקבוק שהספרה ה-\( i \) שלו היא 2.
+    4. **קריאה :** אחרי עוד 24 שעות, הספרה \( i \) היא הסבב שבו עכבר \( i \) מת, או 0
        אם שרד. בדוגמה ‏\( 1 + 2 \cdot 9 + 27 + 81 + 2 \cdot 243 = 613 \).
 
     </div>
@@ -235,12 +235,12 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **מספר העכברים :** מכפילים ב-\( b + 1 \) עד שעוברים את \( n \); מספר ההכפלות הוא \( m \).
-    2. **התכנית :** לכל בקבוק \( x \) ולכל עכבר \( i \), הספרה ה-\( i \) של \( x \) בבסיס
+    1. **מספר העכברים :** מכפילים ב-\( b + 1 \) עד שעוברים את \( n \); מספר ההכפלות הוא \( m \).
+    2. **התכנית :** לכל בקבוק \( x \) ולכל עכבר \( i \), הספרה ה-\( i \) של \( x \) בבסיס
        \( b + 1 \) היא הסבב שבו \( i \) שותה מ-\( x \) (0 : אף פעם).
-    3. **הניסוי :** בכל סבב, כל עכבר שעוד חי שותה מהבקבוקים של הסבב, ואחרי 24 שעות רושמים
+    3. **הניסוי :** בכל סבב, כל עכבר שעוד חי שותה מהבקבוקים של הסבב, ואחרי 24 שעות רושמים
        מי מת.
-    4. **הפענוח :** ‏\( x = \sum_i d_i (b + 1)^i \), כאשר \( d_i \) הוא הסבב שבו עכבר \( i \)
+    4. **הפענוח :** ‏\( x = \sum_i d_i (b + 1)^i \), כאשר \( d_i \) הוא הסבב שבו עכבר \( i \)
        מת, ו-0 אם שרד.
 
     </div>
@@ -337,9 +337,9 @@ added: 2026-10-27
 
     #### סיבוכיות { .sol-cost }
 
-    - **עכברים :** ‏\( \lceil \log_{b+1} n \rceil \), וזה גם החסם התחתון.
-    - **בניית התכנית :** לכל בקבוק \( m \) ספרות, כלומר \( O(n \log n) \) בסך הכול.
-    - **הפענוח :** ‏\( O(m) \) פעולות.
+    - **עכברים :** ‏\( \lceil \log_{b+1} n \rceil \), וזה גם החסם התחתון.
+    - **בניית התכנית :** לכל בקבוק \( m \) ספרות, כלומר \( O(n \log n) \) בסך הכול.
+    - **הפענוח :** ‏\( O(m) \) פעולות.
 
 ## נקודות חשובות ושאלות המשך
 
@@ -358,27 +358,27 @@ added: 2026-10-27
     \( m \) ביטים. לחלופין, בקבוק שאף עכבר לא שותה ממנו הוא הקוד "כולם חיים".
 
 ??? followup "שאלות המשך"
-    - **הפוך :** יש \( m \) עכברים ו-\( n \) בקבוקים. כמה סבבים צריך?
+    - **הפוך :** יש \( m \) עכברים ו-\( n \) בקבוקים. כמה סבבים צריך?
 
         ??? fu-answer "תשובה"
             הקטן ביותר שבו \( (b + 1)^m \ge n \), כלומר \( b = \lceil n^{1/m} \rceil - 1 \). ל-1000
             בקבוקים ו-5 עכברים : \( 4^5 = 1024 \), ולכן 3 סבבים.
 
-    - **שני בקבוקים מורעלים בסבב אחד :** מה החסם התחתון?
+    - **שני בקבוקים מורעלים בסבב אחד :** מה החסם התחתון?
 
         ??? fu-answer "תשובה"
             יש \( \binom{1000}{2} = 499{,}500 \) זוגות אפשריים, ולכן צריך \( 2^m \ge 499{,}500 \), כלומר
             19 עכברים לפחות. הקוד הבינארי כבר לא מספיק : שני בקבוקים נותנים את ה-OR של הביטים,
             ואותו OR יכול לבוא מכמה זוגות. צריך קוד שבו כל OR של שתי מילים שונה (disjunct code).
 
-    - **‏git bisect עם כמה מכונות :** יש 1000 קומיטים ואחד מהם שבר טסט. כל ריצה לוקחת
+    - **‏git bisect עם כמה מכונות :** יש 1000 קומיטים ואחד מהם שבר טסט. כל ריצה לוקחת
       שעה, ויש 4 מכונות שרצות במקביל. כמה שעות?
 
         ??? fu-answer "תשובה"
             ‏4 מכונות מחלקות את הטווח ל-5 חלקים בכל סבב, ולכן צריך \( \lceil \log_5 1000 \rceil = 5 \)
             שעות. זו אותה ספירה, רק שכאן הסבבים הם המשאב והמכונות קבועות.
 
-    - **בקבוק שמזיק רק לפעמים :** הרעל הורג עכבר בהסתברות 90%. מה משתנה?
+    - **בקבוק שמזיק רק לפעמים :** הרעל הורג עכבר בהסתברות 90%. מה משתנה?
 
         ??? fu-answer "תשובה"
             הקוד צריך יתירות : עכבר ששרד כבר לא מוכיח שהספרה 0. מוסיפים עכברים כקוד לתיקון

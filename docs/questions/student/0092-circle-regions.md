@@ -19,7 +19,7 @@ added: 2026-11-06
 
 <!-- gen 0 -->
 
-<svg class="figure mc-fig mc-row" viewBox="0 0 518 146" style="max-width:32.4rem" role="img" aria-label="עיגולים עם נקודה אחת, שתיים, שלוש וארבע, וכל זוג נקודות מחובר בקו. מספר החלקים : 1, 2, 4 ו-8"><g transform="translate(402,0)"><path class="mc-reg mc-c0" d="M58.0,12.0A46,46 0 0 0 58.0,104.0A46,46 0 0 0 58.0,12.0Z"/><circle class="mc-ring" cx="58" cy="58" r="46"/><circle class="mc-pt" cx="58.0" cy="12.0" r="5.5"/></g><text class="mc-count" x="460.0" y="140" text-anchor="middle">n = 1 : 1</text><g transform="translate(268,0)"><path class="mc-reg mc-c0" d="M58.0,104.0A46,46 0 0 0 58.0,12.0L58.0,104.0Z"/><path class="mc-reg mc-c1" d="M58.0,12.0A46,46 0 0 0 58.0,104.0L58.0,12.0Z"/><circle class="mc-ring" cx="58" cy="58" r="46"/><line class="mc-chord" x1="58.0" y1="12.0" x2="58.0" y2="104.0"/><circle class="mc-pt" cx="58.0" cy="12.0" r="5.5"/><circle class="mc-pt" cx="58.0" cy="104.0" r="5.5"/></g><text class="mc-count" x="326.0" y="140" text-anchor="middle">n = 2 : 2</text><g transform="translate(134,0)"><path class="mc-reg mc-c0" d="M58.0,12.0L18.2,81.0L97.8,81.0L58.0,12.0Z"/><path class="mc-reg mc-c1" d="M97.8,81.0A46,46 0 0 0 58.0,12.0L97.8,81.0Z"/><path class="mc-reg mc-c2" d="M18.2,81.0A46,46 0 0 0 97.8,81.0L18.2,81.0Z"/><path class="mc-reg mc-c3" d="M58.0,12.0A46,46 0 0 0 18.2,81.0L58.0,12.0Z"/><circle class="mc-ring" cx="58" cy="58" r="46"/><line class="mc-chord" x1="58.0" y1="12.0" x2="18.2" y2="81.0"/><line class="mc-chord" x1="58.0" y1="12.0" x2="97.8" y2="81.0"/><line class="mc-chord" x1="18.2" y1="81.0" x2="97.8" y2="81.0"/><circle class="mc-pt" cx="58.0" cy="12.0" r="5.5"/><circle class="mc-pt" cx="18.2" cy="81.0" r="5.5"/><circle class="mc-pt" cx="97.8" cy="81.0" r="5.5"/></g><text class="mc-count" x="192.0" y="140" text-anchor="middle">n = 3 : 4</text><g transform="translate(0,0)"><path class="mc-reg mc-c0" d="M81.0,18.2L58.0,58.0L97.8,81.0L81.0,18.2Z"/><path class="mc-reg mc-c1" d="M58.0,58.0L35.0,97.8L97.8,81.0L58.0,58.0Z"/><path class="mc-reg mc-c2" d="M35.0,97.8L58.0,58.0L18.2,35.0L35.0,97.8Z"/><path class="mc-reg mc-c3" d="M81.0,18.2L18.2,35.0L58.0,58.0L81.0,18.2Z"/><path class="mc-reg mc-c4" d="M97.8,81.0A46,46 0 0 0 81.0,18.2L97.8,81.0Z"/><path class="mc-reg mc-c5" d="M35.0,97.8A46,46 0 0 0 97.8,81.0L35.0,97.8Z"/><path class="mc-reg mc-c0" d="M18.2,35.0A46,46 0 0 0 35.0,97.8L18.2,35.0Z"/><path class="mc-reg mc-c1" d="M81.0,18.2A46,46 0 0 0 18.2,35.0L81.0,18.2Z"/><circle class="mc-ring" cx="58" cy="58" r="46"/><line class="mc-chord" x1="81.0" y1="18.2" x2="18.2" y2="35.0"/><line class="mc-chord" x1="81.0" y1="18.2" x2="35.0" y2="97.8"/><line class="mc-chord" x1="81.0" y1="18.2" x2="97.8" y2="81.0"/><line class="mc-chord" x1="18.2" y1="35.0" x2="35.0" y2="97.8"/><line class="mc-chord" x1="18.2" y1="35.0" x2="97.8" y2="81.0"/><line class="mc-chord" x1="35.0" y1="97.8" x2="97.8" y2="81.0"/><circle class="mc-pt" cx="81.0" cy="18.2" r="5.5"/><circle class="mc-pt" cx="18.2" cy="35.0" r="5.5"/><circle class="mc-pt" cx="35.0" cy="97.8" r="5.5"/><circle class="mc-pt" cx="97.8" cy="81.0" r="5.5"/></g><text class="mc-count" x="58.0" y="140" text-anchor="middle">n = 4 : 8</text></svg>
+<svg class="figure mc-fig mc-row" viewBox="0 0 518 146" style="max-width:32.4rem" role="img" aria-label="עיגולים עם נקודה אחת, שתיים, שלוש וארבע, וכל זוג נקודות מחובר בקו. מספר החלקים : 1, 2, 4 ו-8"><g transform="translate(402,0)"><path class="mc-reg mc-c0" d="M58.0,12.0A46,46 0 0 0 58.0,104.0A46,46 0 0 0 58.0,12.0Z"/><circle class="mc-ring" cx="58" cy="58" r="46"/><circle class="mc-pt" cx="58.0" cy="12.0" r="5.5"/></g><text class="mc-count" x="460.0" y="140" text-anchor="middle">n = 1 : 1</text><g transform="translate(268,0)"><path class="mc-reg mc-c0" d="M58.0,104.0A46,46 0 0 0 58.0,12.0L58.0,104.0Z"/><path class="mc-reg mc-c1" d="M58.0,12.0A46,46 0 0 0 58.0,104.0L58.0,12.0Z"/><circle class="mc-ring" cx="58" cy="58" r="46"/><line class="mc-chord" x1="58.0" y1="12.0" x2="58.0" y2="104.0"/><circle class="mc-pt" cx="58.0" cy="12.0" r="5.5"/><circle class="mc-pt" cx="58.0" cy="104.0" r="5.5"/></g><text class="mc-count" x="326.0" y="140" text-anchor="middle">n = 2 : 2</text><g transform="translate(134,0)"><path class="mc-reg mc-c0" d="M58.0,12.0L18.2,81.0L97.8,81.0L58.0,12.0Z"/><path class="mc-reg mc-c1" d="M97.8,81.0A46,46 0 0 0 58.0,12.0L97.8,81.0Z"/><path class="mc-reg mc-c2" d="M18.2,81.0A46,46 0 0 0 97.8,81.0L18.2,81.0Z"/><path class="mc-reg mc-c3" d="M58.0,12.0A46,46 0 0 0 18.2,81.0L58.0,12.0Z"/><circle class="mc-ring" cx="58" cy="58" r="46"/><line class="mc-chord" x1="58.0" y1="12.0" x2="18.2" y2="81.0"/><line class="mc-chord" x1="58.0" y1="12.0" x2="97.8" y2="81.0"/><line class="mc-chord" x1="18.2" y1="81.0" x2="97.8" y2="81.0"/><circle class="mc-pt" cx="58.0" cy="12.0" r="5.5"/><circle class="mc-pt" cx="18.2" cy="81.0" r="5.5"/><circle class="mc-pt" cx="97.8" cy="81.0" r="5.5"/></g><text class="mc-count" x="192.0" y="140" text-anchor="middle">n = 3 : 4</text><g transform="translate(0,0)"><path class="mc-reg mc-c0" d="M81.0,18.2L58.0,58.0L97.8,81.0L81.0,18.2Z"/><path class="mc-reg mc-c1" d="M58.0,58.0L35.0,97.8L97.8,81.0L58.0,58.0Z"/><path class="mc-reg mc-c2" d="M35.0,97.8L58.0,58.0L18.2,35.0L35.0,97.8Z"/><path class="mc-reg mc-c3" d="M81.0,18.2L18.2,35.0L58.0,58.0L81.0,18.2Z"/><path class="mc-reg mc-c4" d="M97.8,81.0A46,46 0 0 0 81.0,18.2L97.8,81.0Z"/><path class="mc-reg mc-c5" d="M35.0,97.8A46,46 0 0 0 97.8,81.0L35.0,97.8Z"/><path class="mc-reg mc-c0" d="M18.2,35.0A46,46 0 0 0 35.0,97.8L18.2,35.0Z"/><path class="mc-reg mc-c1" d="M81.0,18.2A46,46 0 0 0 18.2,35.0L81.0,18.2Z"/><circle class="mc-ring" cx="58" cy="58" r="46"/><line class="mc-chord" x1="81.0" y1="18.2" x2="18.2" y2="35.0"/><line class="mc-chord" x1="81.0" y1="18.2" x2="35.0" y2="97.8"/><line class="mc-chord" x1="81.0" y1="18.2" x2="97.8" y2="81.0"/><line class="mc-chord" x1="18.2" y1="35.0" x2="35.0" y2="97.8"/><line class="mc-chord" x1="18.2" y1="35.0" x2="97.8" y2="81.0"/><line class="mc-chord" x1="35.0" y1="97.8" x2="97.8" y2="81.0"/><circle class="mc-pt" cx="81.0" cy="18.2" r="5.5"/><circle class="mc-pt" cx="18.2" cy="35.0" r="5.5"/><circle class="mc-pt" cx="35.0" cy="97.8" r="5.5"/><circle class="mc-pt" cx="97.8" cy="81.0" r="5.5"/></g><text class="mc-count" x="58.0" y="140" text-anchor="middle">n = 4 : 8</text></svg>
 
 <!-- /gen -->
 
@@ -30,14 +30,14 @@ added: 2026-11-06
 <!-- /gen -->
 
 ??? interviewer "מה המראיין בודק"
-    - **לא לסמוך על דפוס :** 1, 2, 4, 8 ו-16 מזמינים את הניחוש "חזקות של 2". האם המועמד
+    - **לא לסמוך על דפוס :** 1, 2, 4, 8 ו-16 מזמינים את הניחוש "חזקות של 2". האם המועמד
       בודק עוד מקרה לפני שהוא מכריז על נוסחה.
-    - **ספירה בשני שלבים :** האם הוא מוצא מה כל קו **מוסיף**, במקום לספור חלקים בציור.
-    - **מה קובע חיתוך :** שני קווים נחתכים בדיוק כשארבעת הקצוות שלהם מתחלפים לאורך המעגל.
+    - **ספירה בשני שלבים :** האם הוא מוצא מה כל קו **מוסיף**, במקום לספור חלקים בציור.
+    - **מה קובע חיתוך :** שני קווים נחתכים בדיוק כשארבעת הקצוות שלהם מתחלפים לאורך המעגל.
       האם הוא רואה שכל ארבע נקודות נותנות נקודת חיתוך אחת בדיוק.
-    - **נוסחת אוילר :** האם הוא יודע לספור קודקודים, צלעות ופאות בגרף מישורי, ולא שוכח
+    - **נוסחת אוילר :** האם הוא יודע לספור קודקודים, צלעות ופאות בגרף מישורי, ולא שוכח
       את הקשתות ואת הפאה החיצונית.
-    - **מה ההנחה נותנת :** מה קורה כששלושה קווים כן נפגשים, למשל במשושה משוכלל.
+    - **מה ההנחה נותנת :** מה קורה כששלושה קווים כן נפגשים, למשל במשושה משוכלל.
 
 ---
 
@@ -79,10 +79,10 @@ added: 2026-11-06
 
     <div class="steps" markdown>
 
-    1. **מספור :** הנקודות 1 עד \( n \) לפי הסדר על המעגל.
-    2. **קו אחר קו :** לכל קו, סופרים כמה מהקווים שכבר צוירו הוא חוצה, בבדיקת ההתחלפות.
-    3. **חיבור :** מתחילים מ-1, ומוסיפים \( k + 1 \) לכל קו.
-    4. **חמש נקודות :** הקווים מוסיפים 15, ויוצא 16.
+    1. **מספור :** הנקודות 1 עד \( n \) לפי הסדר על המעגל.
+    2. **קו אחר קו :** לכל קו, סופרים כמה מהקווים שכבר צוירו הוא חוצה, בבדיקת ההתחלפות.
+    3. **חיבור :** מתחילים מ-1, ומוסיפים \( k + 1 \) לכל קו.
+    4. **חמש נקודות :** הקווים מוסיפים 15, ויוצא 16.
 
     </div>
 
@@ -137,7 +137,7 @@ added: 2026-11-06
         endfunction
         ```
 
-        1. אותו תנאי כמו ב-Python : ארבעה קצוות שונים, ובדיוק אחד מקצות הקו השני בין
+        1. אותו תנאי כמו ב-Python : ארבעה קצוות שונים, ובדיוק אחד מקצות הקו השני בין
            \( a \) ל-\( b \).
         2. ‏\( k \) חיתוכים, \( k + 1 \) קטעים, \( k + 1 \) חלקים חדשים.
 
@@ -153,7 +153,7 @@ added: 2026-11-06
 
     <!-- gen 2 -->
 
-    <svg class="figure mc-fig" viewBox="0 0 272 272" style="max-width:17.0rem" role="img" aria-label="חמש נקודות על מעגל וכל עשרת הקווים ביניהן. העיגול מתחלק ל-16 חלקים, ממוספרים 1 עד 16 : מחומש באמצע, חמישה משולשים סביבו, עוד חמישה ליד הצלעות, וחמש קשתות"><path class="mc-reg mc-c0" d="M111.3,102.0L96.0,149.0L136.0,178.0L176.0,149.0L160.7,102.0L111.3,102.0Z"/><path class="mc-reg mc-c1" d="M136.0,26.0L111.3,102.0L160.7,102.0L136.0,26.0Z"/><path class="mc-reg mc-c2" d="M160.7,102.0L176.0,149.0L240.6,102.0L160.7,102.0Z"/><path class="mc-reg mc-c3" d="M200.7,225.0L176.0,149.0L136.0,178.0L200.7,225.0Z"/><path class="mc-reg mc-c4" d="M96.0,149.0L71.3,225.0L136.0,178.0L96.0,149.0Z"/><path class="mc-reg mc-c5" d="M96.0,149.0L111.3,102.0L31.4,102.0L96.0,149.0Z"/><path class="mc-reg mc-c0" d="M136.0,26.0L160.7,102.0L240.6,102.0L136.0,26.0Z"/><path class="mc-reg mc-c1" d="M176.0,149.0L200.7,225.0L240.6,102.0L176.0,149.0Z"/><path class="mc-reg mc-c2" d="M200.7,225.0L136.0,178.0L71.3,225.0L200.7,225.0Z"/><path class="mc-reg mc-c3" d="M71.3,225.0L96.0,149.0L31.4,102.0L71.3,225.0Z"/><path class="mc-reg mc-c4" d="M136.0,26.0L31.4,102.0L111.3,102.0L136.0,26.0Z"/><path class="mc-reg mc-c5" d="M240.6,102.0A110,110 0 0 0 136.0,26.0L240.6,102.0Z"/><path class="mc-reg mc-c0" d="M200.7,225.0A110,110 0 0 0 240.6,102.0L200.7,225.0Z"/><path class="mc-reg mc-c1" d="M71.3,225.0A110,110 0 0 0 200.7,225.0L71.3,225.0Z"/><path class="mc-reg mc-c2" d="M31.4,102.0A110,110 0 0 0 71.3,225.0L31.4,102.0Z"/><path class="mc-reg mc-c3" d="M136.0,26.0A110,110 0 0 0 31.4,102.0L136.0,26.0Z"/><circle class="mc-ring" cx="136" cy="136" r="110"/><line class="mc-chord" x1="136.0" y1="26.0" x2="31.4" y2="102.0"/><line class="mc-chord" x1="136.0" y1="26.0" x2="71.3" y2="225.0"/><line class="mc-chord" x1="136.0" y1="26.0" x2="200.7" y2="225.0"/><line class="mc-chord" x1="136.0" y1="26.0" x2="240.6" y2="102.0"/><line class="mc-chord" x1="31.4" y1="102.0" x2="71.3" y2="225.0"/><line class="mc-chord" x1="31.4" y1="102.0" x2="200.7" y2="225.0"/><line class="mc-chord" x1="31.4" y1="102.0" x2="240.6" y2="102.0"/><line class="mc-chord" x1="71.3" y1="225.0" x2="200.7" y2="225.0"/><line class="mc-chord" x1="71.3" y1="225.0" x2="240.6" y2="102.0"/><line class="mc-chord" x1="200.7" y1="225.0" x2="240.6" y2="102.0"/><text class="mc-num" x="136.0" y="140.0" text-anchor="middle">1</text><text class="mc-num" x="136.0" y="80.7" text-anchor="middle">2</text><text class="mc-num" x="192.4" y="121.7" text-anchor="middle">3</text><text class="mc-num" x="170.9" y="188.0" text-anchor="middle">4</text><text class="mc-num" x="101.1" y="188.0" text-anchor="middle">5</text><text class="mc-num" x="79.6" y="121.7" text-anchor="middle">6</text><text class="mc-num" x="179.1" y="80.7" text-anchor="middle">7</text><text class="mc-num" x="205.7" y="162.7" text-anchor="middle">8</text><text class="mc-num" x="136.0" y="213.3" text-anchor="middle">9</text><text class="mc-num" x="66.3" y="162.7" text-anchor="middle">10</text><text class="mc-num" x="92.9" y="80.7" text-anchor="middle">11</text><text class="mc-num" x="195.9" y="57.5" text-anchor="middle">12</text><text class="mc-num" x="233.0" y="171.5" text-anchor="middle">13</text><text class="mc-num" x="136.0" y="242.0" text-anchor="middle">14</text><text class="mc-num" x="39.0" y="171.5" text-anchor="middle">15</text><text class="mc-num" x="76.1" y="57.5" text-anchor="middle">16</text><circle class="mc-pt" cx="136.0" cy="26.0" r="5.5"/><text class="mc-plab" x="136.0" y="15.0" text-anchor="middle">1</text><circle class="mc-pt" cx="31.4" cy="102.0" r="5.5"/><text class="mc-plab" x="17.1" y="101.4" text-anchor="middle">2</text><circle class="mc-pt" cx="71.3" cy="225.0" r="5.5"/><text class="mc-plab" x="62.5" y="241.1" text-anchor="middle">3</text><circle class="mc-pt" cx="200.7" cy="225.0" r="5.5"/><text class="mc-plab" x="209.5" y="241.1" text-anchor="middle">4</text><circle class="mc-pt" cx="240.6" cy="102.0" r="5.5"/><text class="mc-plab" x="254.9" y="101.4" text-anchor="middle">5</text></svg>
+    <svg class="figure mc-fig" viewBox="0 0 272 272" style="max-width:17.0rem" role="img" aria-label="חמש נקודות על מעגל וכל עשרת הקווים ביניהן. העיגול מתחלק ל-16 חלקים, ממוספרים 1 עד 16 : מחומש באמצע, חמישה משולשים סביבו, עוד חמישה ליד הצלעות, וחמש קשתות"><path class="mc-reg mc-c0" d="M111.3,102.0L96.0,149.0L136.0,178.0L176.0,149.0L160.7,102.0L111.3,102.0Z"/><path class="mc-reg mc-c1" d="M136.0,26.0L111.3,102.0L160.7,102.0L136.0,26.0Z"/><path class="mc-reg mc-c2" d="M160.7,102.0L176.0,149.0L240.6,102.0L160.7,102.0Z"/><path class="mc-reg mc-c3" d="M200.7,225.0L176.0,149.0L136.0,178.0L200.7,225.0Z"/><path class="mc-reg mc-c4" d="M96.0,149.0L71.3,225.0L136.0,178.0L96.0,149.0Z"/><path class="mc-reg mc-c5" d="M96.0,149.0L111.3,102.0L31.4,102.0L96.0,149.0Z"/><path class="mc-reg mc-c0" d="M136.0,26.0L160.7,102.0L240.6,102.0L136.0,26.0Z"/><path class="mc-reg mc-c1" d="M176.0,149.0L200.7,225.0L240.6,102.0L176.0,149.0Z"/><path class="mc-reg mc-c2" d="M200.7,225.0L136.0,178.0L71.3,225.0L200.7,225.0Z"/><path class="mc-reg mc-c3" d="M71.3,225.0L96.0,149.0L31.4,102.0L71.3,225.0Z"/><path class="mc-reg mc-c4" d="M136.0,26.0L31.4,102.0L111.3,102.0L136.0,26.0Z"/><path class="mc-reg mc-c5" d="M240.6,102.0A110,110 0 0 0 136.0,26.0L240.6,102.0Z"/><path class="mc-reg mc-c0" d="M200.7,225.0A110,110 0 0 0 240.6,102.0L200.7,225.0Z"/><path class="mc-reg mc-c1" d="M71.3,225.0A110,110 0 0 0 200.7,225.0L71.3,225.0Z"/><path class="mc-reg mc-c2" d="M31.4,102.0A110,110 0 0 0 71.3,225.0L31.4,102.0Z"/><path class="mc-reg mc-c3" d="M136.0,26.0A110,110 0 0 0 31.4,102.0L136.0,26.0Z"/><circle class="mc-ring" cx="136" cy="136" r="110"/><line class="mc-chord" x1="136.0" y1="26.0" x2="31.4" y2="102.0"/><line class="mc-chord" x1="136.0" y1="26.0" x2="71.3" y2="225.0"/><line class="mc-chord" x1="136.0" y1="26.0" x2="200.7" y2="225.0"/><line class="mc-chord" x1="136.0" y1="26.0" x2="240.6" y2="102.0"/><line class="mc-chord" x1="31.4" y1="102.0" x2="71.3" y2="225.0"/><line class="mc-chord" x1="31.4" y1="102.0" x2="200.7" y2="225.0"/><line class="mc-chord" x1="31.4" y1="102.0" x2="240.6" y2="102.0"/><line class="mc-chord" x1="71.3" y1="225.0" x2="200.7" y2="225.0"/><line class="mc-chord" x1="71.3" y1="225.0" x2="240.6" y2="102.0"/><line class="mc-chord" x1="200.7" y1="225.0" x2="240.6" y2="102.0"/><text class="mc-num" x="136.0" y="140.0" text-anchor="middle">1</text><text class="mc-num" x="136.0" y="80.7" text-anchor="middle">2</text><text class="mc-num" x="192.4" y="121.7" text-anchor="middle">3</text><text class="mc-num" x="170.9" y="188.0" text-anchor="middle">4</text><text class="mc-num" x="101.1" y="188.0" text-anchor="middle">5</text><text class="mc-num" x="79.6" y="121.7" text-anchor="middle">6</text><text class="mc-num" x="179.1" y="80.7" text-anchor="middle">7</text><text class="mc-num" x="205.7" y="162.7" text-anchor="middle">8</text><text class="mc-num" x="136.0" y="213.3" text-anchor="middle">9</text><text class="mc-num" x="66.3" y="162.7" text-anchor="middle">10</text><text class="mc-num" x="92.9" y="80.7" text-anchor="middle">11</text><text class="mc-num" x="195.9" y="57.5" text-anchor="middle">12</text><text class="mc-num" x="233.0" y="171.5" text-anchor="middle">13</text><text class="mc-num" x="136.0" y="242.0" text-anchor="middle">14</text><text class="mc-num" x="39.0" y="171.5" text-anchor="middle">15</text><text class="mc-num" x="76.1" y="57.5" text-anchor="middle">16</text><circle class="mc-pt" cx="136.0" cy="26.0" r="5.5"/><text class="mc-plab" x="136.0" y="15.0" text-anchor="middle">1</text><circle class="mc-pt" cx="31.4" cy="102.0" r="5.5"/><text class="mc-plab" x="17.1" y="101.4" text-anchor="middle">2</text><circle class="mc-pt" cx="71.3" cy="225.0" r="5.5"/><text class="mc-plab" x="62.5" y="241.1" text-anchor="middle">3</text><circle class="mc-pt" cx="200.7" cy="225.0" r="5.5"/><text class="mc-plab" x="209.5" y="241.1" text-anchor="middle">4</text><circle class="mc-pt" cx="240.6" cy="102.0" r="5.5"/><text class="mc-plab" x="254.9" y="101.4" text-anchor="middle">5</text></svg>
 
     <!-- /gen -->
 
@@ -230,10 +230,10 @@ added: 2026-11-06
 
     <div class="steps" markdown>
 
-    1. **שש נקודות :** \( \binom{6}{4} + \binom{6}{2} + 1 = 15 + 15 + 1 = 31 \).
-    2. **הוכחה ראשונה :** 1 ועוד \( k + 1 \) לכל קו, וכל ארבע נקודות נותנות חיתוך אחד.
-    3. **הוכחה שנייה :** אוילר על הגרף של הנקודות, החיתוכים, הקשתות והקטעים.
-    4. **הקוד :** נוסחה בשורה אחת, ובדיקה שהספירה של אוילר נותנת אותו מספר.
+    1. **שש נקודות :** \( \binom{6}{4} + \binom{6}{2} + 1 = 15 + 15 + 1 = 31 \).
+    2. **הוכחה ראשונה :** 1 ועוד \( k + 1 \) לכל קו, וכל ארבע נקודות נותנות חיתוך אחד.
+    3. **הוכחה שנייה :** אוילר על הגרף של הנקודות, החיתוכים, הקשתות והקטעים.
+    4. **הקוד :** נוסחה בשורה אחת, ובדיקה שהספירה של אוילר נותנת אותו מספר.
 
     </div>
 
@@ -288,7 +288,7 @@ added: 2026-11-06
 
         1. המכפלה \( r \cdot (n - i) \) מתחלקת תמיד ב-\( i + 1 \), כי אחרי \( i + 1 \) צעדים
            \( r \) הוא \( \binom{n}{i+1} \). לכן החילוק השלם מדויק.
-        2. אותו חשבון כמו ב-Python : הפאות של אוילר בלי הפאה החיצונית.
+        2. אותו חשבון כמו ב-Python : הפאות של אוילר בלי הפאה החיצונית.
 
     #### למה זה נכון { .sol-proof }
 
@@ -321,11 +321,11 @@ added: 2026-11-06
     קשיר, כי המעגל מחבר את כל הנקודות. ב-\( n = 1 \) הקשת היחידה היא לולאה, וב-\( n = 2 \)
     יש שתי צלעות בין אותן שתי נקודות, ונוסחת אוילר נכונה גם לגרף כזה.
 
-    - **קודקודים :** \( V = n + \binom{n}{4} \), הנקודות ונקודות החיתוך.
-    - **צלעות :** \( n \) קשתות. קו שחוצה \( k \) קווים הוא \( k + 1 \) קטעים, והסכום על
+    - **קודקודים :** \( V = n + \binom{n}{4} \), הנקודות ונקודות החיתוך.
+    - **צלעות :** \( n \) קשתות. קו שחוצה \( k \) קווים הוא \( k + 1 \) קטעים, והסכום על
       כל הקווים הוא \( \binom{n}{2} + 2\binom{n}{4} \), כי כל נקודת חיתוך נמצאת על שני
       קווים. לכן \( E = n + \binom{n}{2} + 2\binom{n}{4} \).
-    - **פאות :** \( F = E - V + 2 \), ואחת מהן היא כל מה שמחוץ לעיגול. לכן
+    - **פאות :** \( F = E - V + 2 \), ואחת מהן היא כל מה שמחוץ לעיגול. לכן
 
     \[
     \begin{aligned}
@@ -356,7 +356,7 @@ added: 2026-11-06
 
     <!-- gen 6 -->
 
-    <svg class="perf-chart mc-chart" viewBox="0 0 640 250" role="img" aria-label="מספר החלקים לפי n, מול 2 בחזקת n פחות 1 : עד n = 5 הם שווים, ומ-6 החלקים מפגרים : 31 מול 32, 57 מול 64, 256 מול 512"><line class="grid" x1="46" x2="628" y1="210.0" y2="210.0"/><text class="tick" x="38" y="214.0" text-anchor="end">0</text><line class="grid" x1="46" x2="628" y1="162.2" y2="162.2"/><text class="tick" x="38" y="166.2" text-anchor="end">128</text><line class="grid" x1="46" x2="628" y1="114.5" y2="114.5"/><text class="tick" x="38" y="118.5" text-anchor="end">256</text><line class="grid" x1="46" x2="628" y1="66.7" y2="66.7"/><text class="tick" x="38" y="70.7" text-anchor="end">384</text><line class="grid" x1="46" x2="628" y1="19.0" y2="19.0"/><text class="tick" x="38" y="23.0" text-anchor="end">512</text><rect class="mc-bar-pow" x="54.1" y="209.6" width="19.8" height="0.4" rx="2"/><rect class="mc-bar-reg" x="76.3" y="209.6" width="19.8" height="0.4" rx="2"/><rect class="mc-bar-pow" x="112.3" y="209.3" width="19.8" height="0.7" rx="2"/><rect class="mc-bar-reg" x="134.5" y="209.3" width="19.8" height="0.7" rx="2"/><rect class="mc-bar-pow" x="170.5" y="208.5" width="19.8" height="1.5" rx="2"/><rect class="mc-bar-reg" x="192.7" y="208.5" width="19.8" height="1.5" rx="2"/><rect class="mc-bar-pow" x="228.7" y="207.0" width="19.8" height="3.0" rx="2"/><rect class="mc-bar-reg" x="250.9" y="207.0" width="19.8" height="3.0" rx="2"/><rect class="mc-bar-pow" x="286.9" y="204.0" width="19.8" height="6.0" rx="2"/><rect class="mc-bar-reg" x="309.1" y="204.0" width="19.8" height="6.0" rx="2"/><rect class="mc-bar-pow" x="345.1" y="198.1" width="19.8" height="11.9" rx="2"/><rect class="mc-bar-reg" x="367.3" y="198.4" width="19.8" height="11.6" rx="2"/><text class="tick" x="377.2" y="193.4" text-anchor="middle">31</text><rect class="mc-bar-pow" x="403.3" y="186.1" width="19.8" height="23.9" rx="2"/><rect class="mc-bar-reg" x="425.5" y="188.7" width="19.8" height="21.3" rx="2"/><text class="tick" x="435.4" y="183.7" text-anchor="middle">57</text><rect class="mc-bar-pow" x="461.5" y="162.2" width="19.8" height="47.8" rx="2"/><rect class="mc-bar-reg" x="483.7" y="173.1" width="19.8" height="36.9" rx="2"/><text class="tick" x="493.6" y="168.1" text-anchor="middle">99</text><rect class="mc-bar-pow" x="519.7" y="114.5" width="19.8" height="95.5" rx="2"/><rect class="mc-bar-reg" x="541.9" y="149.2" width="19.8" height="60.8" rx="2"/><text class="tick" x="551.8" y="144.2" text-anchor="middle">163</text><rect class="mc-bar-pow" x="577.9" y="19.0" width="19.8" height="191.0" rx="2"/><rect class="mc-bar-reg" x="600.1" y="114.5" width="19.8" height="95.5" rx="2"/><text class="tick" x="610.0" y="109.5" text-anchor="middle">256</text><text class="tick" x="75.1" y="228" text-anchor="middle">1</text><text class="tick" x="133.3" y="228" text-anchor="middle">2</text><text class="tick" x="191.5" y="228" text-anchor="middle">3</text><text class="tick" x="249.7" y="228" text-anchor="middle">4</text><text class="tick" x="307.9" y="228" text-anchor="middle">5</text><text class="tick" x="366.1" y="228" text-anchor="middle">6</text><text class="tick" x="424.3" y="228" text-anchor="middle">7</text><text class="tick" x="482.5" y="228" text-anchor="middle">8</text><text class="tick" x="540.7" y="228" text-anchor="middle">9</text><text class="tick" x="598.9" y="228" text-anchor="middle">10</text><line class="axis" x1="46" x2="628" y1="210" y2="210"/><text class="tick" x="38" y="228" text-anchor="end">n</text></svg>
+    <svg class="perf-chart mc-chart" viewBox="0 0 640 250" role="img" aria-label="מספר החלקים לפי n, מול 2 בחזקת n פחות 1 : עד n = 5 הם שווים, ומ-6 החלקים מפגרים : 31 מול 32, 57 מול 64, 256 מול 512"><line class="grid" x1="46" x2="628" y1="210.0" y2="210.0"/><text class="tick" x="38" y="214.0" text-anchor="end">0</text><line class="grid" x1="46" x2="628" y1="162.2" y2="162.2"/><text class="tick" x="38" y="166.2" text-anchor="end">128</text><line class="grid" x1="46" x2="628" y1="114.5" y2="114.5"/><text class="tick" x="38" y="118.5" text-anchor="end">256</text><line class="grid" x1="46" x2="628" y1="66.7" y2="66.7"/><text class="tick" x="38" y="70.7" text-anchor="end">384</text><line class="grid" x1="46" x2="628" y1="19.0" y2="19.0"/><text class="tick" x="38" y="23.0" text-anchor="end">512</text><rect class="mc-bar-pow" x="54.1" y="209.6" width="19.8" height="0.4" rx="2"/><rect class="mc-bar-reg" x="76.3" y="209.6" width="19.8" height="0.4" rx="2"/><rect class="mc-bar-pow" x="112.3" y="209.3" width="19.8" height="0.7" rx="2"/><rect class="mc-bar-reg" x="134.5" y="209.3" width="19.8" height="0.7" rx="2"/><rect class="mc-bar-pow" x="170.5" y="208.5" width="19.8" height="1.5" rx="2"/><rect class="mc-bar-reg" x="192.7" y="208.5" width="19.8" height="1.5" rx="2"/><rect class="mc-bar-pow" x="228.7" y="207.0" width="19.8" height="3.0" rx="2"/><rect class="mc-bar-reg" x="250.9" y="207.0" width="19.8" height="3.0" rx="2"/><rect class="mc-bar-pow" x="286.9" y="204.0" width="19.8" height="6.0" rx="2"/><rect class="mc-bar-reg" x="309.1" y="204.0" width="19.8" height="6.0" rx="2"/><rect class="mc-bar-pow" x="345.1" y="198.1" width="19.8" height="11.9" rx="2"/><rect class="mc-bar-reg" x="367.3" y="198.4" width="19.8" height="11.6" rx="2"/><text class="tick" x="377.2" y="193.4" text-anchor="middle">31</text><rect class="mc-bar-pow" x="403.3" y="186.1" width="19.8" height="23.9" rx="2"/><rect class="mc-bar-reg" x="425.5" y="188.7" width="19.8" height="21.3" rx="2"/><text class="tick" x="435.4" y="183.7" text-anchor="middle">57</text><rect class="mc-bar-pow" x="461.5" y="162.2" width="19.8" height="47.8" rx="2"/><rect class="mc-bar-reg" x="483.7" y="173.1" width="19.8" height="36.9" rx="2"/><text class="tick" x="493.6" y="168.1" text-anchor="middle">99</text><rect class="mc-bar-pow" x="519.7" y="114.5" width="19.8" height="95.5" rx="2"/><rect class="mc-bar-reg" x="541.9" y="149.2" width="19.8" height="60.8" rx="2"/><text class="tick" x="551.8" y="144.2" text-anchor="middle">163</text><rect class="mc-bar-pow" x="577.9" y="19.0" width="19.8" height="191.0" rx="2"/><rect class="mc-bar-reg" x="600.1" y="114.5" width="19.8" height="95.5" rx="2"/><text class="tick" x="610.0" y="109.5" text-anchor="middle">256</text><text class="tick" x="75.1" y="228" text-anchor="middle">1</text><text class="tick" x="133.3" y="228" text-anchor="middle">2</text><text class="tick" x="191.5" y="228" text-anchor="middle">3</text><text class="tick" x="249.7" y="228" text-anchor="middle">4</text><text class="tick" x="307.9" y="228" text-anchor="middle">5</text><text class="tick" x="366.1" y="228" text-anchor="middle">6</text><text class="tick" x="424.3" y="228" text-anchor="middle">7</text><text class="tick" x="482.5" y="228" text-anchor="middle">8</text><text class="tick" x="540.7" y="228" text-anchor="middle">9</text><text class="tick" x="598.9" y="228" text-anchor="middle">10</text><line class="axis" x1="46" x2="628" y1="210" y2="210"/><text class="tick" x="38" y="228" text-anchor="end">n</text></svg>
 
     <!-- /gen -->
 
@@ -434,13 +434,13 @@ added: 2026-11-06
 
     <div class="steps" markdown>
 
-    1. **נקודות :** \( (\cos\theta, \sin\theta) \) לכל זווית.
-    2. **חיתוכים :** לכל זוג קווים עם ארבעה קצוות שונים, נקודת החיתוך אם היא בתוך שני
+    1. **נקודות :** \( (\cos\theta, \sin\theta) \) לכל זווית.
+    2. **חיתוכים :** לכל זוג קווים עם ארבעה קצוות שונים, נקודת החיתוך אם היא בתוך שני
        הקטעים.
     3. **איחוד :** מעגלים את הקואורדינטות של כל נקודת חיתוך ל-7 ספרות אחרי הנקודה, ונקודות
        שיוצאות זהות הן נקודה אחת. ב-SystemVerilog בודקים במקום זה מרחק קטן
        מ-\( 10^{-7} \).
-    4. **אוילר :** \( V \) ו-\( E \) כמו בסעיף ב, והחלקים \( E - V + 1 \).
+    4. **אוילר :** \( V \) ו-\( E \) כמו בסעיף ב, והחלקים \( E - V + 1 \).
 
     </div>
 
@@ -529,7 +529,7 @@ added: 2026-11-06
         endfunction
         ```
 
-        1. האיחוד : נקודה במרחק קטן מ-\( 10^{-7} \) מנקודה שכבר נמצאה על אותו קו היא אותה
+        1. האיחוד : נקודה במרחק קטן מ-\( 10^{-7} \) מנקודה שכבר נמצאה על אותו קו היא אותה
            נקודה.
         2. ‏\( E - V + 1 \), עם \( E = n + \) הקטעים ו-\( V = n + \) נקודות החיתוך השונות.
 
@@ -590,38 +590,38 @@ added: 2026-11-06
 
 ## נקודות חשובות ושאלות המשך
 
-??? trap "מלכודת : 1, 2, 4, 8, 16, אז 32"
+??? trap "מלכודת : 1, 2, 4, 8, 16, אז 32"
     חמשת המקרים הראשונים מתאימים ל-\( 2^{n-1} \), ומשם זה נשבר : 31, 57, 99. דפוס הוא
     השערה, לא הוכחה. הספירה של מה שכל קו מוסיף נותנת את התשובה הנכונה מההתחלה.
 
-??? trap "מלכודת : לספור כל זוג קווים כחיתוך"
+??? trap "מלכודת : לספור כל זוג קווים כחיתוך"
     יש \( \binom{\binom{n}{2}}{2} \) זוגות של קווים, אבל רובם לא נחתכים בתוך העיגול : קווים
     עם קצה משותף נפגשים רק על המעגל, וקווים שהקצוות שלהם לא מתחלפים לא נפגשים בכלל. רק
     זיווג אחד מכל ארבע נקודות נחתך, ולכן החיתוכים הם \( \binom{n}{4} \).
 
-??? trap "מלכודת : אוילר בלי הקשתות או עם הפאה החיצונית"
+??? trap "מלכודת : אוילר בלי הקשתות או עם הפאה החיצונית"
     בלי הקשתות של המעגל, החלקים שליד המעגל לא סגורים והגרף לא נותן אותם. ונוסחת אוילר
     סופרת גם את הפאה שמחוץ לעיגול. החלקים הם \( E - V + 1 \), לא \( E - V + 2 \).
 
-??? trap "מלכודת : להשוות נקודות חיתוך בשוויון מדויק"
+??? trap "מלכודת : להשוות נקודות חיתוך בשוויון מדויק"
     במשושה משוכלל שלושת החיתוכים במרכז יוצאים במחשב כנקודות שנבדלות ב-\( 10^{-16} \).
     בשוויון מדויק הן שלוש נקודות, והתוצאה היא 31 במקום 30. צריך לאחד נקודות קרובות.
 
 ??? followup "שאלות המשך"
-    - **ישרים במישור :** לכמה חלקים מחלקים \( n \) ישרים את המישור, כששום שניים לא מקבילים
+    - **ישרים במישור :** לכמה חלקים מחלקים \( n \) ישרים את המישור, כששום שניים לא מקבילים
       ושום שלושה לא נפגשים?
 
         ??? fu-answer "תשובה"
-            ‏\( \binom{n}{2} + n + 1 \). אותו טיעון : כל ישר חדש נחתך ב-\( k \) נקודות
+            ‏\( \binom{n}{2} + n + 1 \). אותו טיעון : כל ישר חדש נחתך ב-\( k \) נקודות
             ל-\( k + 1 \) חלקים, וכאן כל זוג ישרים נחתך.
 
-    - **קצב הגדילה :** מי גדל מהר יותר, מספר החלקים או \( 2^{n-1} \)?
+    - **קצב הגדילה :** מי גדל מהר יותר, מספר החלקים או \( 2^{n-1} \)?
 
         ??? fu-answer "תשובה"
             ‏\( 2^{n-1} \). מספר החלקים הוא בערך \( n^4/24 \), פולינום, וב-\( n = 10 \) הוא כבר
             256 מול 512. היחס ביניהם שואף ל-0.
 
-    - **מצולע משוכלל :** האם יש נוסחה למספר החלקים במצולע משוכלל?
+    - **מצולע משוכלל :** האם יש נוסחה למספר החלקים במצולע משוכלל?
 
         ??? fu-answer "תשובה"
             יש, אבל מסובכת. Poonen ו-Rubinstein (1998) נתנו נוסחה שיש בה איברים שתלויים

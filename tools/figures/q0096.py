@@ -19,7 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from charts import Chart  # noqa: E402
 
-NB = " "
+NB = " "
 RLM = "‏"
 P0, W0, ROUNDS = 0.6, 100, 100
 

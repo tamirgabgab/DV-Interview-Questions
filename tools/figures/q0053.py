@@ -116,7 +116,7 @@ def cross_figure():
     under uniform stimulus; the ignored cells hatched."""
     W, H, S, G = 660, 196, 26, 14
     s = (f'<svg class="figure cg-fig" viewBox="0 0 {W} {H}" style="max-width:41rem" role="img" '
-         'aria-label="ה-cross של op, a ו-b : חמש מפות של 4 על 4, תאים נדירים כהים, ושמונה תאים של SHL מסומנים כמושמטים">'
+         'aria-label="ה-cross של op, a ו-b : חמש מפות של 4 על 4, תאים נדירים כהים, ושמונה תאים של SHL מסומנים כמושמטים">'
          '<defs><pattern id="cg-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          '<line x1="0" y1="0" x2="0" y2="6" class="cg-hatch-line"/></pattern></defs>')
     pa = DISTS["uniform"]
@@ -144,14 +144,14 @@ def cross_figure():
 
 
 def cross_legend():
-    return ('<span class="viz-legend"><span><i class="cg-key-r2"></i>שני ערכי קצה : ‏1 ל-327,680</span>'
-            '<span><i class="cg-key-r1"></i>ערך קצה אחד : ‏1 ל-1,295 בערך</span>'
-            '<span><i class="cg-key-r0"></i>בלי ערכי קצה : ‏1 ל-5.1 בערך</span>'
+    return ('<span class="viz-legend"><span><i class="cg-key-r2"></i>שני ערכי קצה : ‏1 ל-327,680</span>'
+            '<span><i class="cg-key-r1"></i>ערך קצה אחד : ‏1 ל-1,295 בערך</span>'
+            '<span><i class="cg-key-r0"></i>בלי ערכי קצה : ‏1 ל-5.1 בערך</span>'
             '<span><i class="cg-key-ign"></i>‏ignore_bins</span></span>')
 
 
 def closure_table():
-    names = {"uniform": "אחיד (‏`randomize` רגיל)", "dist": "‏`dist` : כל ערך קצה 1/5, השאר 2/5", "equal": "‏`dist` : כל מחלקה 1/4"}
+    names = {"uniform": "אחיד (‏`randomize` רגיל)", "dist": "‏`dist` : כל ערך קצה 1/5, השאר 2/5", "equal": "‏`dist` : כל מחלקה 1/4"}
     rows = ["| הגירוי | התא הנדיר ביותר | תוחלת הטרנזקציות עד שכל ה-cross מכוסה |", "|---|:-:|:-:|"]
     for d in ("uniform", "dist", "equal"):
         ps = cell_probs(d)

@@ -107,7 +107,7 @@ def deck_table():
     for t in range(order_by_shuffling(n) + 1):
         rows.append(("לפני" if t == 0 else f"אחרי {t}", [(card, f"c{cyc[card] + 1}") for card in deck], None))
         deck = shuffle(deck)
-    return table(rows, "שמונה קלפים בשלושה out-shuffles : בכל שורה הסדר מלמעלה, ואחרי שלושה ערבובים הסדר חוזר",
+    return table(rows, "שמונה קלפים בשלושה out-shuffles : בכל שורה הסדר מלמעלה, ואחרי שלושה ערבובים הסדר חוזר",
                  head=list(range(n)))
 
 
@@ -142,7 +142,7 @@ def interleave_table():
                 cls += " is-hl"
             cells.append((v, cls))
         rows.append((name, cells, None))
-    return table(rows, "השילוב במקום של a0 עד a3 ו-b0 עד b3 : בכל רמה מסובבים את הקטעים הממוסגרים", head=list(range(2 * m)))
+    return table(rows, "השילוב במקום של a0 עד a3 ו-b0 עד b3 : בכל רמה מסובבים את הקטעים הממוסגרים", head=list(range(2 * m)))
 
 
 def blocks():

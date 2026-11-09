@@ -17,21 +17,21 @@ added: 2026-11-01
 
 לדוגמה, ‏\( [1, 2, 3, 4, 5, 6, 7] \) עם \( k = 3 \) הופך ל-\( [4, 5, 6, 7, 1, 2, 3] \).
 
-**התנאי :** במקום, כלומר עם זיכרון נוסף \( O(1) \) בלבד, בלי מערך עזר, ובזמן \( O(n) \).
+**התנאי :** במקום, כלומר עם זיכרון נוסף \( O(1) \) בלבד, בלי מערך עזר, ובזמן \( O(n) \).
 
-- **סעיף א – שלושה היפוכים :** סובבו בעזרת היפוכים של קטעים בלבד, והוכיחו שזה נכון.
-- **סעיף ב – מעגלים :** סובבו כך שכל איבר זז **פעם אחת** בלבד. כמה "מעגלים" יש, ולמה?
-- **סעיף ג – buffer מעגלי :** ‏FIFO שמור בזיכרון של \( n \) כניסות, מלא, והאיבר הוותיק נמצא
+- **סעיף א – שלושה היפוכים :** סובבו בעזרת היפוכים של קטעים בלבד, והוכיחו שזה נכון.
+- **סעיף ב – מעגלים :** סובבו כך שכל איבר זז **פעם אחת** בלבד. כמה "מעגלים" יש, ולמה?
+- **סעיף ג – buffer מעגלי :** ‏FIFO שמור בזיכרון של \( n \) כניסות, מלא, והאיבר הוותיק נמצא
   בכניסה ‏`head`. צריך לסדר אותו מחדש כך שהוותיק יהיה בכניסה 0. הזיכרון הוא single-port : קריאה
   אחת או כתיבה אחת בכל מחזור. כמה מחזורים לוקחת כל שיטה?
 
 ??? interviewer "מה המראיין בודק"
-    - **במקום :** האם המועמד יודע לעבוד בלי מערך עזר, ומבין למה העתקה פשוטה דורסת ערכים.
-    - **הוכחה קצרה :** האם הוא מסביר למה שלושת ההיפוכים נותנים סיבוב, ולא רק זוכר את הטריק.
-    - **תורת המספרים :** האם הוא מוצא שמספר המעגלים הוא \( \gcd(n, k) \), ולא מניח שיש מעגל
+    - **במקום :** האם המועמד יודע לעבוד בלי מערך עזר, ומבין למה העתקה פשוטה דורסת ערכים.
+    - **הוכחה קצרה :** האם הוא מסביר למה שלושת ההיפוכים נותנים סיבוב, ולא רק זוכר את הטריק.
+    - **תורת המספרים :** האם הוא מוצא שמספר המעגלים הוא \( \gcd(n, k) \), ולא מניח שיש מעגל
       אחד.
-    - **מקרי קצה :** ‏\( k = 0 \), ‏\( k \ge n \), ‏\( n = 0 \), וכיוון הסיבוב.
-    - **חומרה :** האם הוא סופר גישות לזיכרון, ולא רק פעולות, כשהמחיר הוא מחזורים של SRAM.
+    - **מקרי קצה :** ‏\( k = 0 \), ‏\( k \ge n \), ‏\( n = 0 \), וכיוון הסיבוב.
+    - **חומרה :** האם הוא סופר גישות לזיכרון, ולא רק פעולות, כשהמחיר הוא מחזורים של SRAM.
 
 ---
 
@@ -63,7 +63,7 @@ added: 2026-11-01
 
     <!-- gen 0 -->
 
-    <div class="pm-scroll" tabindex="0" role="region" aria-label="שלושת ההיפוכים על 1 עד 7 עם k = 3 : בכל שורה המערך אחרי ההיפוך, והקטע שהתהפך ממוסגר"><table class="pm-cells" dir="ltr"><tbody><tr class="pm-head"><th></th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr><tr><th dir="rtl">לפני</th><td class="pm-c c1">1</td><td class="pm-c c1">2</td><td class="pm-c c1">3</td><td class="pm-c c2">4</td><td class="pm-c c2">5</td><td class="pm-c c2">6</td><td class="pm-c c2">7</td></tr><tr><th dir="rtl">היפוך של A</th><td class="pm-c is-hl">3</td><td class="pm-c is-hl">2</td><td class="pm-c is-hl">1</td><td class="pm-c c2">4</td><td class="pm-c c2">5</td><td class="pm-c c2">6</td><td class="pm-c c2">7</td></tr><tr><th dir="rtl">היפוך של B</th><td class="pm-c c1">3</td><td class="pm-c c1">2</td><td class="pm-c c1">1</td><td class="pm-c is-hl">7</td><td class="pm-c is-hl">6</td><td class="pm-c is-hl">5</td><td class="pm-c is-hl">4</td></tr><tr><th dir="rtl">היפוך של הכול</th><td class="pm-c is-hl">4</td><td class="pm-c is-hl">5</td><td class="pm-c is-hl">6</td><td class="pm-c is-hl">7</td><td class="pm-c is-hl">1</td><td class="pm-c is-hl">2</td><td class="pm-c is-hl">3</td></tr></tbody></table></div>
+    <div class="pm-scroll" tabindex="0" role="region" aria-label="שלושת ההיפוכים על 1 עד 7 עם k = 3 : בכל שורה המערך אחרי ההיפוך, והקטע שהתהפך ממוסגר"><table class="pm-cells" dir="ltr"><tbody><tr class="pm-head"><th></th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr><tr><th dir="rtl">לפני</th><td class="pm-c c1">1</td><td class="pm-c c1">2</td><td class="pm-c c1">3</td><td class="pm-c c2">4</td><td class="pm-c c2">5</td><td class="pm-c c2">6</td><td class="pm-c c2">7</td></tr><tr><th dir="rtl">היפוך של A</th><td class="pm-c is-hl">3</td><td class="pm-c is-hl">2</td><td class="pm-c is-hl">1</td><td class="pm-c c2">4</td><td class="pm-c c2">5</td><td class="pm-c c2">6</td><td class="pm-c c2">7</td></tr><tr><th dir="rtl">היפוך של B</th><td class="pm-c c1">3</td><td class="pm-c c1">2</td><td class="pm-c c1">1</td><td class="pm-c is-hl">7</td><td class="pm-c is-hl">6</td><td class="pm-c is-hl">5</td><td class="pm-c is-hl">4</td></tr><tr><th dir="rtl">היפוך של הכול</th><td class="pm-c is-hl">4</td><td class="pm-c is-hl">5</td><td class="pm-c is-hl">6</td><td class="pm-c is-hl">7</td><td class="pm-c is-hl">1</td><td class="pm-c is-hl">2</td><td class="pm-c is-hl">3</td></tr></tbody></table></div>
 
     <!-- /gen -->
 
@@ -71,11 +71,11 @@ added: 2026-11-01
 
     <div class="steps" markdown>
 
-    1. **מנרמלים :** ‏\( k \leftarrow k \bmod n \). סיבוב ב-\( n \) מחזיר את המערך למקומו. אם יצא 0,
+    1. **מנרמלים :** ‏\( k \leftarrow k \bmod n \). סיבוב ב-\( n \) מחזיר את המערך למקומו. אם יצא 0,
        אין מה לעשות.
-    2. **היפוך של \( A \) :** האיברים \( 0 \) עד \( k - 1 \).
-    3. **היפוך של \( B \) :** האיברים \( k \) עד \( n - 1 \).
-    4. **היפוך של הכול :** ‏\( (A^R B^R)^R = (B^R)^R (A^R)^R = B A \).
+    2. **היפוך של \( A \) :** האיברים \( 0 \) עד \( k - 1 \).
+    3. **היפוך של \( B \) :** האיברים \( k \) עד \( n - 1 \).
+    4. **היפוך של הכול :** ‏\( (A^R B^R)^R = (B^R)^R (A^R)^R = B A \).
 
     </div>
 
@@ -133,12 +133,12 @@ added: 2026-11-01
     היפוך של קטע באורך \( L \) שולח את המקום \( j \) בקטע למקום \( L - 1 - j \). נעקוב אחרי איבר
     אחד :
 
-    - **איבר מ-\( A \), במקום \( i < k \) :** אחרי ההיפוך הראשון הוא במקום \( k - 1 - i \), ואחרי
+    - **איבר מ-\( A \), במקום \( i < k \) :** אחרי ההיפוך הראשון הוא במקום \( k - 1 - i \), ואחרי
       ההיפוך של הכול במקום \( n - 1 - (k - 1 - i) = n - k + i \). זה בדיוק \( i - k \bmod n \).
-    - **איבר מ-\( B \), במקום \( i \ge k \) :** אחרי ההיפוך השני הוא במקום \( k + (n - 1 - i) \), ואחרי
+    - **איבר מ-\( B \), במקום \( i \ge k \) :** אחרי ההיפוך השני הוא במקום \( k + (n - 1 - i) \), ואחרי
       ההיפוך של הכול במקום \( n - 1 - k - (n - 1 - i) = i - k \).
 
-    כלומר כל איבר זז \( k \) מקומות שמאלה, מעגלית. **המחיר :** ‏\( \lfloor k/2 \rfloor + \lfloor (n-k)/2 \rfloor + \lfloor n/2 \rfloor \)
+    כלומר כל איבר זז \( k \) מקומות שמאלה, מעגלית. **המחיר :** ‏\( \lfloor k/2 \rfloor + \lfloor (n-k)/2 \rfloor + \lfloor n/2 \rfloor \)
     החלפות, בערך \( n \). כל איבר זז פעמיים.
 
 ---
@@ -171,7 +171,7 @@ added: 2026-11-01
 
     <!-- gen 1 -->
 
-    <div class="pm-scroll" tabindex="0" role="region" aria-label="המעגלים של n = 12 ו-k = 8 : לכל אינדקס, מספר המעגל שלו"><table class="pm-cells" dir="ltr"><tbody><tr class="pm-head"><th></th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td></tr><tr><th dir="rtl">המעגל</th><td class="pm-c c1">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c4">4</td><td class="pm-c c1">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c4">4</td><td class="pm-c c1">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c4">4</td></tr></tbody></table></div>
+    <div class="pm-scroll" tabindex="0" role="region" aria-label="המעגלים של n = 12 ו-k = 8 : לכל אינדקס, מספר המעגל שלו"><table class="pm-cells" dir="ltr"><tbody><tr class="pm-head"><th></th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td></tr><tr><th dir="rtl">המעגל</th><td class="pm-c c1">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c4">4</td><td class="pm-c c1">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c4">4</td><td class="pm-c c1">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c4">4</td></tr></tbody></table></div>
 
     <!-- /gen -->
 
@@ -196,11 +196,11 @@ added: 2026-11-01
 
     <div class="steps" markdown>
 
-    1. **מנרמלים :** ‏\( k \leftarrow k \bmod n \). אם יצא 0, אין מה לעשות.
-    2. **מספר המעגלים :** ‏\( g = \gcd(n, k) \), באלגוריתם של אוקלידס.
-    3. **לכל מעגל, \( s = 0 \) עד \( g - 1 \) :** שומרים \( \mathit{tmp} = a[s] \), ומ-\( i = s \) מושכים
+    1. **מנרמלים :** ‏\( k \leftarrow k \bmod n \). אם יצא 0, אין מה לעשות.
+    2. **מספר המעגלים :** ‏\( g = \gcd(n, k) \), באלגוריתם של אוקלידס.
+    3. **לכל מעגל, \( s = 0 \) עד \( g - 1 \) :** שומרים \( \mathit{tmp} = a[s] \), ומ-\( i = s \) מושכים
        \( a[i] \leftarrow a[i + k] \) (מודולו \( n \)) ומתקדמים, עד שהמקום הבא הוא שוב \( s \).
-    4. **סוגרים את המעגל :** במקום האחרון כותבים את \( \mathit{tmp} \).
+    4. **סוגרים את המעגל :** במקום האחרון כותבים את \( \mathit{tmp} \).
 
     </div>
 
@@ -416,24 +416,24 @@ added: 2026-11-01
     הקטעים, מסובבים ימינה. כדאי לבדוק על דוגמה קטנה לפני שכותבים.
 
 ??? followup "שאלות המשך"
-    - **סיבוב ימינה :** איך מסובבים ימינה ב-\( k \) עם אותן פונקציות?
+    - **סיבוב ימינה :** איך מסובבים ימינה ב-\( k \) עם אותן פונקציות?
 
         ??? fu-answer "תשובה"
             סיבוב שמאלה ב-\( n - k \). או בהיפוכים : קודם את הכול, ואז את \( k \) הראשונים ואת השאר.
 
-    - **רשימה מקושרת :** איך מסובבים רשימה מקושרת ב-\( k \)?
+    - **רשימה מקושרת :** איך מסובבים רשימה מקושרת ב-\( k \)?
 
         ??? fu-answer "תשובה"
             לא מזיזים ערכים : מוצאים את הצומת ה-\( k \), מחברים את הזנב לראש וחותכים אחרי הצומת
             ה-\( k - 1 \). זמן \( O(n) \), בלי שום העתקה.
 
-    - **בחומרה, וקטור ביטים :** איך מסובבים וקטור של \( n \) ביטים ב-\( k \) במחזור אחד?
+    - **בחומרה, וקטור ביטים :** איך מסובבים וקטור של \( n \) ביטים ב-\( k \) במחזור אחד?
 
         ??? fu-answer "תשובה"
             ‏barrel shifter : ‏\( \log_2 n \) שלבים של mux, שלב \( j \) מסובב ב-\( 2^j \) לפי ביט \( j \) של
             \( k \). ל-\( k \) קבוע זה רק חיווט, בלי שערים.
 
-    - **בלי gcd :** איך מוצאים את המעגלים בלי לחשב \( \gcd \)?
+    - **בלי gcd :** איך מוצאים את המעגלים בלי לחשב \( \gcd \)?
 
         ??? fu-answer "תשובה"
             סופרים כמה השמות עשינו, ומתחילים מעגל חדש ב-\( s + 1 \) עד שהגענו ל-\( n \). זה עובד

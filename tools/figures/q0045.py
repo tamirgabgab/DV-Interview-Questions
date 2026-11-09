@@ -37,7 +37,7 @@ def rows_svg():
     width = 2 * PAD + 12 * STEP
     height = len(RESULTS) * ROW + PAD
     p = [f'<svg class="figure" viewBox="0 0 {width} {height}" style="max-width:{width / 16:.1f}rem" role="img" '
-         'aria-label="מה נשאר אחרי השקילה הראשונה, 1 עד 4 מול 5 עד 8 : שמונה אפשרויות בכל תוצאה">']
+         'aria-label="מה נשאר אחרי השקילה הראשונה, 1 עד 4 מול 5 עד 8 : שמונה אפשרויות בכל תוצאה">']
     for r, (res, title) in enumerate(RESULTS):
         y0 = r * ROW + TITLE
         cases = sum((v == "both") + (v is not None) for v in candidates(res).values())

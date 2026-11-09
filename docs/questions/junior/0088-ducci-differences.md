@@ -13,17 +13,17 @@ added: 2026-11-06
 
 ארבעה מספרים שלמים אי-שליליים יושבים על מעגל. בכל סיבוב מחליפים **כל** מספר בהפרש
 המוחלט בינו לבין השכן שלו בכיוון השעון, כולם בבת אחת. למשל, מ-2, 6, 11 ו-4 (בכיוון
-השעון) מקבלים 4, 5, 7 ו-2 : ההפרש של 2 ו-6, של 6 ו-11, של 11 ו-4, ושל 4 ו-2.
+השעון) מקבלים 4, 5, 7 ו-2 : ההפרש של 2 ו-6, של 6 ו-11, של 11 ו-4, ושל 4 ו-2.
 
 <!-- gen 0 -->
 
-<svg class="figure du-fig" viewBox="0 0 300 236" style="max-width:18.8rem" role="img" aria-label="ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : 2, 6, 11, 4. על כל צלע ההפרש בין שני המספרים שבקצותיה : 4, 5, 7, 2. אלה המספרים של הסיבוב הבא"><circle class="du-ring" cx="150" cy="116" r="84"/><line class="du-chord" x1="150" y1="32" x2="234" y2="116"/><rect class="du-diff-bg" x="177.0" y="62.0" width="30" height="24" rx="6"/><text class="du-diff" x="192.0" y="79.0" text-anchor="middle">4</text><line class="du-chord" x1="234" y1="116" x2="150" y2="200"/><rect class="du-diff-bg" x="177.0" y="146.0" width="30" height="24" rx="6"/><text class="du-diff" x="192.0" y="163.0" text-anchor="middle">5</text><line class="du-chord" x1="150" y1="200" x2="66" y2="116"/><rect class="du-diff-bg" x="93.0" y="146.0" width="30" height="24" rx="6"/><text class="du-diff" x="108.0" y="163.0" text-anchor="middle">7</text><line class="du-chord" x1="66" y1="116" x2="150" y2="32"/><rect class="du-diff-bg" x="93.0" y="62.0" width="30" height="24" rx="6"/><text class="du-diff" x="108.0" y="79.0" text-anchor="middle">2</text><circle class="du-node" cx="150" cy="32" r="20"/><text class="du-val" x="150" y="38" text-anchor="middle">2</text><circle class="du-node" cx="234" cy="116" r="20"/><text class="du-val" x="234" y="122" text-anchor="middle">6</text><circle class="du-node" cx="150" cy="200" r="20"/><text class="du-val" x="150" y="206" text-anchor="middle">11</text><circle class="du-node" cx="66" cy="116" r="20"/><text class="du-val" x="66" y="122" text-anchor="middle">4</text></svg>
+<svg class="figure du-fig" viewBox="0 0 300 236" style="max-width:18.8rem" role="img" aria-label="ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : 2, 6, 11, 4. על כל צלע ההפרש בין שני המספרים שבקצותיה : 4, 5, 7, 2. אלה המספרים של הסיבוב הבא"><circle class="du-ring" cx="150" cy="116" r="84"/><line class="du-chord" x1="150" y1="32" x2="234" y2="116"/><rect class="du-diff-bg" x="177.0" y="62.0" width="30" height="24" rx="6"/><text class="du-diff" x="192.0" y="79.0" text-anchor="middle">4</text><line class="du-chord" x1="234" y1="116" x2="150" y2="200"/><rect class="du-diff-bg" x="177.0" y="146.0" width="30" height="24" rx="6"/><text class="du-diff" x="192.0" y="163.0" text-anchor="middle">5</text><line class="du-chord" x1="150" y1="200" x2="66" y2="116"/><rect class="du-diff-bg" x="93.0" y="146.0" width="30" height="24" rx="6"/><text class="du-diff" x="108.0" y="163.0" text-anchor="middle">7</text><line class="du-chord" x1="66" y1="116" x2="150" y2="32"/><rect class="du-diff-bg" x="93.0" y="62.0" width="30" height="24" rx="6"/><text class="du-diff" x="108.0" y="79.0" text-anchor="middle">2</text><circle class="du-node" cx="150" cy="32" r="20"/><text class="du-val" x="150" y="38" text-anchor="middle">2</text><circle class="du-node" cx="234" cy="116" r="20"/><text class="du-val" x="234" y="122" text-anchor="middle">6</text><circle class="du-node" cx="150" cy="200" r="20"/><text class="du-val" x="150" y="206" text-anchor="middle">11</text><circle class="du-node" cx="66" cy="116" r="20"/><text class="du-val" x="66" y="122" text-anchor="middle">4</text></svg>
 
 <!-- /gen -->
 
 <!-- gen 1 -->
 
-<span class="viz-legend"><span><i class="du-key-node"></i>מספר על המעגל</span><span><i class="du-key-diff"></i>ההפרש בין שני שכנים : המספר שיחליף אותם בסיבוב הבא</span></span>
+<span class="viz-legend"><span><i class="du-key-node"></i>מספר על המעגל</span><span><i class="du-key-diff"></i>ההפרש בין שני שכנים : המספר שיחליף אותם בסיבוב הבא</span></span>
 
 <!-- /gen -->
 
@@ -32,15 +32,15 @@ added: 2026-11-06
 מספרים?
 
 ??? interviewer "מה המראיין בודק"
-    - **מה לא משתנה ומה לא עולה :** האם המועמד מחפש כמות שלא גדלה (המקסימום), ומבין
+    - **מה לא משתנה ומה לא עולה :** האם המועמד מחפש כמות שלא גדלה (המקסימום), ומבין
       שהיא לבדה לא מספיקה, כי היא יכולה לעמוד במקום.
-    - **מודולו 2 :** ההפרש המוחלט מודולו 2 הוא XOR. האם הוא רואה שזוגיות היא מערכת
+    - **מודולו 2 :** ההפרש המוחלט מודולו 2 הוא XOR. האם הוא רואה שזוגיות היא מערכת
       לינארית, והופך את החידה לחשבון על ביטים.
-    - **אינדוקציה עם חלוקה :** כשהכל זוגי, אפשר לחלק ב-2 ולהמשיך באותו משחק. האם הוא
+    - **אינדוקציה עם חלוקה :** כשהכל זוגי, אפשר לחלק ב-2 ולהמשיך באותו משחק. האם הוא
       יודע לסגור את ההוכחה באינדוקציה על המקסימום.
-    - **כש-n משתנה :** האם הוא בודק את המקרה של שלושה מספרים, ומוצא דוגמה נגדית במקום
+    - **כש-n משתנה :** האם הוא בודק את המקרה של שלושה מספרים, ומוצא דוגמה נגדית במקום
       להכליל מ-4.
-    - **קוד :** סיבוב בלולאה אחת, וזיהוי מחזור עם מילון של המצבים שכבר נראו.
+    - **קוד :** סיבוב בלולאה אחת, וזיהוי מחזור עם מילון של המצבים שכבר נראו.
 
 ---
 
@@ -59,7 +59,7 @@ added: 2026-11-06
 
 ??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
-        מ-2, 6, 11 ו-4 מגיעים לאפסים אחרי **6 סיבובים**. מכל התחלה : המקסימום אף פעם לא
+        מ-2, 6, 11 ו-4 מגיעים לאפסים אחרי **6 סיבובים**. מכל התחלה : המקסימום אף פעם לא
         עולה, ואחרי **4 סיבובים כל המספרים זוגיים** (מודולו 2 סיבוב הוא XOR, ואחרי ארבעה
         סיבובים \( x_i \oplus x_{i+4} = 0 \)). ממספרים זוגיים המשחק הוא אותו משחק על
         החצאים, ולכן באינדוקציה על המקסימום מגיעים לאפסים.
@@ -69,27 +69,27 @@ added: 2026-11-06
     #### הרעיון { .sol-idea }
 
     **המקסימום לא עולה.** אם \( 0 \le a, b \le M \) אז \( |a - b| \le M \). אבל הוא יכול
-    לעמוד במקום : מ-2, 0, 2 ו-0 מקבלים 2, 2, 2 ו-2. לכן "יורד" לבד לא מוכיח שהמשחק נגמר.
+    לעמוד במקום : מ-2, 0, 2 ו-0 מקבלים 2, 2, 2 ו-2. לכן "יורד" לבד לא מוכיח שהמשחק נגמר.
 
     **זוגיות.** \( |a - b| \) זוגי בדיוק כש-\( a \) ו-\( b \) באותה זוגיות, כלומר מודולו 2
     ההפרש הוא \( a \oplus b \). סיבוב אחד נותן מודולו 2 את \( x_i \oplus x_{i+1} \). סיבוב
     שני נותן \( (x_i \oplus x_{i+1}) \oplus (x_{i+1} \oplus x_{i+2}) = x_i \oplus x_{i+2} \),
-    כי \( x_{i+1} \) מופיע פעמיים ומתבטל. אותו חשבון שוב, על הצעדים של 2 : אחרי ארבעה
+    כי \( x_{i+1} \) מופיע פעמיים ומתבטל. אותו חשבון שוב, על הצעדים של 2 : אחרי ארבעה
     סיבובים \( x_i \oplus x_{i+4} \). עם ארבעה מספרים על מעגל \( x_{i+4} = x_i \), ולכן
     הכל זוגי.
 
-    **חלוקה ב-2.** אם כל המספרים זוגיים, \( |2a - 2b| = 2|a - b| \) : המשחק ממשיך בדיוק כמו
+    **חלוקה ב-2.** אם כל המספרים זוגיים, \( |2a - 2b| = 2|a - b| \) : המשחק ממשיך בדיוק כמו
     המשחק על החצאים, כפול 2.
 
     #### השלבים { .sol-steps }
 
     <div class="steps" markdown>
 
-    1. **לא עולה :** בכל סיבוב המקסימום \( M \) נשאר או יורד.
-    2. **ארבעה סיבובים :** אחריהם כל המספרים זוגיים, והמקסימום עדיין לכל היותר \( M \).
-    3. **חלוקה :** מכאן המשחק הוא פעמיים המשחק על החצאים, שהמקסימום שלו לכל היותר
+    1. **לא עולה :** בכל סיבוב המקסימום \( M \) נשאר או יורד.
+    2. **ארבעה סיבובים :** אחריהם כל המספרים זוגיים, והמקסימום עדיין לכל היותר \( M \).
+    3. **חלוקה :** מכאן המשחק הוא פעמיים המשחק על החצאים, שהמקסימום שלו לכל היותר
        \( M/2 \).
-    4. **אינדוקציה :** מקסימום 0 הוא ארבעה אפסים. כל ארבעה סיבובים חוצים את המקסימום,
+    4. **אינדוקציה :** מקסימום 0 הוא ארבעה אפסים. כל ארבעה סיבובים חוצים את המקסימום,
        ולכן אחרי \( 4(\lfloor \log_2 M \rfloor + 1) \) סיבובים לכל היותר הכל 0.
 
     </div>
@@ -115,7 +115,7 @@ added: 2026-11-06
             return steps
         ```
 
-        1. כל המספרים מתעדכנים בבת אחת : הרשימה החדשה נבנית מהישנה, ולכן אין בעיה של
+        1. כל המספרים מתעדכנים בבת אחת : הרשימה החדשה נבנית מהישנה, ולכן אין בעיה של
            סדר עדכון.
         2. אחרי ארבעה סיבובים הכל זוגי, ואחרי \( 4(\lfloor \log_2 M \rfloor + 1) \) הכל 0,
            ולכן הלולאה נגמרת.
@@ -148,13 +148,13 @@ added: 2026-11-06
         endfunction
         ```
 
-        1. העדכון במקום : כש-\( i \) עולה, \( v[i+1] \) עוד לא עודכן. רק \( v[0] \)
+        1. העדכון במקום : כש-\( i \) עולה, \( v[i+1] \) עוד לא עודכן. רק \( v[0] \)
            כבר עודכן כשמגיעים לאחרון, ולכן הערך הישן שלו נשמר ב-`first`.
 
     #### למה זה נכון { .sol-proof }
 
     **הריצה של 2, 6, 11 ו-4.** העמודה האחרונה היא כמה מארבעת המספרים אי-זוגיים. אחרי
-    ארבעה סיבובים היא 0, כמו שההוכחה אומרת, ומשם המשחק הוא פעמיים המשחק של 1, 0, 1 ו-0 :
+    ארבעה סיבובים היא 0, כמו שההוכחה אומרת, ומשם המשחק הוא פעמיים המשחק של 1, 0, 1 ו-0 :
 
     <!-- gen 2 -->
 
@@ -180,7 +180,7 @@ added: 2026-11-06
 
     **נסו בעצמכם.** המעגל מראה את המספרים, ועל כל צלע את ההפרש שיחליף אותם בסיבוב הבא.
     אפשר לבחור כמה מספרים, להקליד או להגריל, ולנסות את ההתחלות המוכנות. הגרף מתחת מראה את
-    המקסימום בכל סיבוב : הוא אף פעם לא עולה.
+    המקסימום בכל סיבוב : הוא אף פעם לא עולה.
 
     <div class="explorer" data-kind="ducci" data-v="2,6,11,4"></div>
 
@@ -198,7 +198,7 @@ added: 2026-11-06
 
 1. הוכיחו שכש-\( n \) הוא חזקה של 2 (1, 2, 4, 8, 16, ...) מגיעים תמיד לאפסים.
 2. כתבו פונקציה שבודקת, בלי לנסות התחלות, אם כל התחלה של \( n \) מספרים מגיעה לאפסים.
-   השתמשו בזוגיות : שמרו את הזוגיות של \( n \) המספרים כביטים של מספר שלם.
+   השתמשו בזוגיות : שמרו את הזוגיות של \( n \) המספרים כביטים של מספר שלם.
 
 ??? tip "רמז 1"
     בסעיף א, אחרי סיבוב אחד הזוגיות של \( x_i \) היא \( x_i \oplus x_{i+1} \), ואחרי שניים
@@ -212,8 +212,8 @@ added: 2026-11-06
     !!! answer "תשובה בקצרה"
         אחרי \( t \) סיבובים הזוגיות של \( x_i \) היא ה-XOR של \( x_{i+j} \) על כל \( j \)
         שבו \( \binom{t}{j} \) אי-זוגי. כש-\( t = n = 2^k \), המקדמים \( \binom{n}{j} \) זוגיים
-        לכל \( 0 < j < n \), ונשאר \( x_i \oplus x_{i+n} = 0 \) : אחרי \( n \) סיבובים הכל
-        זוגי. משם, כמו בסעיף א, חלוקה ב-2 ואינדוקציה על המקסימום : לכל היותר
+        לכל \( 0 < j < n \), ונשאר \( x_i \oplus x_{i+n} = 0 \) : אחרי \( n \) סיבובים הכל
+        זוגי. משם, כמו בסעיף א, חלוקה ב-2 ואינדוקציה על המקסימום : לכל היותר
         \( n(\lfloor \log_2 M \rfloor + 1) \) סיבובים. בקוד, מספיק לבדוק ש-1 אחד בין
         אפסים נעלם מודולו 2 אחרי \( n \) סיבובים.
 
@@ -222,10 +222,10 @@ added: 2026-11-06
     #### הרעיון { .sol-idea }
 
     **זוגיות היא XOR, ו-XOR הוא חיבור.** מודולו 2, סיבוב מחליף את \( x_i \) ב-\( x_i \oplus x_{i+1} \).
-    זו פעולה **לינארית** : הזוגיות אחרי סיבוב של סכום (ב-XOR) של שתי התחלות היא הסכום של
+    זו פעולה **לינארית** : הזוגיות אחרי סיבוב של סכום (ב-XOR) של שתי התחלות היא הסכום של
     הזוגיות שלהן. לכן מספיק להבין מה קורה ל-1 אחד בין אפסים, וכל התחלה היא XOR של כאלה.
 
-    **משולש פסקל מודולו 2.** כמו בסעיף א, באינדוקציה על \( t \) : אחרי \( t \) סיבובים
+    **משולש פסקל מודולו 2.** כמו בסעיף א, באינדוקציה על \( t \) : אחרי \( t \) סיבובים
     הזוגיות של \( x_i \) היא \( \bigoplus_j \binom{t}{j} x_{i+j} \), כי הצעד מחבר כל מקדם עם
     השכן שלו, בדיוק כמו הכלל של פסקל \( \binom{t+1}{j} = \binom{t}{j} + \binom{t}{j-1} \).
     בשורה \( t = 2^k \) כל המקדמים חוץ מהקצוות זוגיים, ולכן אחרי \( n = 2^k \) סיבובים
@@ -235,11 +235,11 @@ added: 2026-11-06
 
     <div class="steps" markdown>
 
-    1. **מודולו 2 :** אחרי \( t \) סיבובים, \( x_i \mapsto \bigoplus_j \binom{t}{j} x_{i+j} \).
-    2. **חזקה של 2 :** \( \binom{2^k}{j} \) זוגי לכל \( 0 < j < 2^k \), ולכן אחרי \( n \)
+    1. **מודולו 2 :** אחרי \( t \) סיבובים, \( x_i \mapsto \bigoplus_j \binom{t}{j} x_{i+j} \).
+    2. **חזקה של 2 :** \( \binom{2^k}{j} \) זוגי לכל \( 0 < j < 2^k \), ולכן אחרי \( n \)
        סיבובים הכל זוגי.
-    3. **חלוקה :** כמו בסעיף א, המשחק ממשיך כפעמיים המשחק על החצאים, והמקסימום נחצה.
-    4. **הקוד :** הזוגיות כביטים של מספר שלם. סיבוב הוא XOR עם הסיבוב (rotate) של המילה
+    3. **חלוקה :** כמו בסעיף א, המשחק ממשיך כפעמיים המשחק על החצאים, והמקסימום נחצה.
+    4. **הקוד :** הזוגיות כביטים של מספר שלם. סיבוב הוא XOR עם הסיבוב (rotate) של המילה
        בביט אחד. 1 אחד שנעלם אחרי \( n \) סיבובים מוכיח את זה לכל ההתחלות, בגלל
        הלינאריות.
 
@@ -266,7 +266,7 @@ added: 2026-11-06
         ```
 
         1. הביט \( i \) של `rotated` הוא הביט \( i + 1 \) של `b`, והביט האחרון מקבל את הביט
-           0 : השכן של \( x_n \) הוא \( x_1 \).
+           0 : השכן של \( x_n \) הוא \( x_1 \).
         2. אחרי \( n \) סיבובים הזוגיות של 1 אחד היא שורה \( n \) של משולש פסקל מודולו 2,
            מגולגלת על המעגל. היא 0 בדיוק כש-\( n \) חזקה של 2.
 
@@ -289,18 +289,18 @@ added: 2026-11-06
         endfunction
         ```
 
-        1. אותו סיבוב (rotate) של \( n \) ביטים כמו ב-Python : הביט 0 עובר למקום
+        1. אותו סיבוב (rotate) של \( n \) ביטים כמו ב-Python : הביט 0 עובר למקום
            \( n - 1 \). בחומרה זה רק חיווט ושער XOR לכל ביט.
 
     #### למה זה נכון { .sol-proof }
 
     **1 אחד בין אפסים.** כל שורה היא הזוגיות אחרי עוד סיבוב, ובמשבצת כהה מספר אי-זוגי.
     מימין, על 8 מספרים, השורות הן משולש פסקל מודולו 2, ובשורה 8 הכל זוגי. משמאל, על 6
-    מספרים, המשולש מתגלגל סביב המעגל ואף שורה לא מתרוקנת :
+    מספרים, המשולש מתגלגל סביב המעגל ואף שורה לא מתרוקנת :
 
     <!-- gen 3 -->
 
-    <svg class="figure du-bits" viewBox="0 0 400 222" style="max-width:25.0rem" role="img" aria-label="הזוגיות של 1 בודד בין אפסים, סיבוב אחרי סיבוב. מימין 8 מספרים : אחרי 8 סיבובים הכל זוגי. משמאל 6 מספרים : אף פעם לא הכל זוגי"><text class="du-panel" x="302.0" y="30" text-anchor="middle">n = 8</text><text class="du-tick" x="222" y="52.2" text-anchor="end">0</text><rect class="du-zero" x="231" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="41" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="41" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="70.2" text-anchor="end">1</text><rect class="du-zero" x="231" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="59" width="16" height="16" rx="2"/><rect class="du-one" x="339" y="59" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="59" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="88.2" text-anchor="end">2</text><rect class="du-zero" x="231" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="77" width="16" height="16" rx="2"/><rect class="du-one" x="321" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="77" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="77" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="106.2" text-anchor="end">3</text><rect class="du-zero" x="231" y="95" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="95" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="95" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="303" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="321" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="339" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="95" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="124.2" text-anchor="end">4</text><rect class="du-zero" x="231" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="113" width="16" height="16" rx="2"/><rect class="du-one" x="285" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="113" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="113" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="142.2" text-anchor="end">5</text><rect class="du-zero" x="231" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="267" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="285" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="339" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="131" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="160.2" text-anchor="end">6</text><rect class="du-zero" x="231" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="249" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="285" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="321" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="149" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="178.2" text-anchor="end">7</text><rect class="du-one" x="231" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="249" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="267" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="285" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="303" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="321" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="339" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="167" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="196.2" text-anchor="end">8</text><rect class="du-zero" x="231" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="357" y="185" width="16" height="16" rx="2"/><rect class="du-dead" x="229" y="184" width="146" height="18" rx="3"/><text class="du-panel" x="104.0" y="30" text-anchor="middle">n = 6</text><text class="du-tick" x="42" y="52.2" text-anchor="end">0</text><rect class="du-zero" x="51" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="105" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="41" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="41" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="70.2" text-anchor="end">1</text><rect class="du-zero" x="51" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="105" y="59" width="16" height="16" rx="2"/><rect class="du-one" x="123" y="59" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="59" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="88.2" text-anchor="end">2</text><rect class="du-zero" x="51" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="77" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="77" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="77" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="106.2" text-anchor="end">3</text><rect class="du-zero" x="51" y="95" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="87" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="123" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="95" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="124.2" text-anchor="end">4</text><rect class="du-zero" x="51" y="113" width="16" height="16" rx="2"/><rect class="du-one" x="69" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="105" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="113" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="113" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="142.2" text-anchor="end">5</text><rect class="du-one" x="51" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="69" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="105" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="123" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="131" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="160.2" text-anchor="end">6</text><rect class="du-zero" x="51" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="69" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="141" y="149" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="178.2" text-anchor="end">7</text><rect class="du-one" x="51" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="69" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="87" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="167" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="167" width="16" height="16" rx="2"/><rect class="du-zero" x="141" y="167" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="196.2" text-anchor="end">8</text><rect class="du-zero" x="51" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="185" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="185" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="185" width="16" height="16" rx="2"/></svg>
+    <svg class="figure du-bits" viewBox="0 0 400 222" style="max-width:25.0rem" role="img" aria-label="הזוגיות של 1 בודד בין אפסים, סיבוב אחרי סיבוב. מימין 8 מספרים : אחרי 8 סיבובים הכל זוגי. משמאל 6 מספרים : אף פעם לא הכל זוגי"><text class="du-panel" x="302.0" y="30" text-anchor="middle">n = 8</text><text class="du-tick" x="222" y="52.2" text-anchor="end">0</text><rect class="du-zero" x="231" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="41" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="41" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="70.2" text-anchor="end">1</text><rect class="du-zero" x="231" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="59" width="16" height="16" rx="2"/><rect class="du-one" x="339" y="59" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="59" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="88.2" text-anchor="end">2</text><rect class="du-zero" x="231" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="77" width="16" height="16" rx="2"/><rect class="du-one" x="321" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="77" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="77" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="106.2" text-anchor="end">3</text><rect class="du-zero" x="231" y="95" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="95" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="95" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="303" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="321" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="339" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="95" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="124.2" text-anchor="end">4</text><rect class="du-zero" x="231" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="113" width="16" height="16" rx="2"/><rect class="du-one" x="285" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="113" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="113" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="142.2" text-anchor="end">5</text><rect class="du-zero" x="231" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="267" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="285" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="339" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="131" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="160.2" text-anchor="end">6</text><rect class="du-zero" x="231" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="249" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="285" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="321" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="149" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="178.2" text-anchor="end">7</text><rect class="du-one" x="231" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="249" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="267" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="285" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="303" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="321" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="339" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="357" y="167" width="16" height="16" rx="2"/><text class="du-tick" x="222" y="196.2" text-anchor="end">8</text><rect class="du-zero" x="231" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="249" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="267" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="285" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="303" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="321" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="339" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="357" y="185" width="16" height="16" rx="2"/><rect class="du-dead" x="229" y="184" width="146" height="18" rx="3"/><text class="du-panel" x="104.0" y="30" text-anchor="middle">n = 6</text><text class="du-tick" x="42" y="52.2" text-anchor="end">0</text><rect class="du-zero" x="51" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="105" y="41" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="41" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="41" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="70.2" text-anchor="end">1</text><rect class="du-zero" x="51" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="59" width="16" height="16" rx="2"/><rect class="du-zero" x="105" y="59" width="16" height="16" rx="2"/><rect class="du-one" x="123" y="59" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="59" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="88.2" text-anchor="end">2</text><rect class="du-zero" x="51" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="77" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="77" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="77" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="77" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="106.2" text-anchor="end">3</text><rect class="du-zero" x="51" y="95" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="87" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="123" y="95" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="95" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="124.2" text-anchor="end">4</text><rect class="du-zero" x="51" y="113" width="16" height="16" rx="2"/><rect class="du-one" x="69" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="105" y="113" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="113" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="113" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="142.2" text-anchor="end">5</text><rect class="du-one" x="51" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="69" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="131" width="16" height="16" rx="2"/><rect class="du-zero" x="105" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="123" y="131" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="131" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="160.2" text-anchor="end">6</text><rect class="du-zero" x="51" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="69" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="149" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="149" width="16" height="16" rx="2"/><rect class="du-zero" x="141" y="149" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="178.2" text-anchor="end">7</text><rect class="du-one" x="51" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="69" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="87" y="167" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="167" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="167" width="16" height="16" rx="2"/><rect class="du-zero" x="141" y="167" width="16" height="16" rx="2"/><text class="du-tick" x="42" y="196.2" text-anchor="end">8</text><rect class="du-zero" x="51" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="69" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="87" y="185" width="16" height="16" rx="2"/><rect class="du-one" x="105" y="185" width="16" height="16" rx="2"/><rect class="du-zero" x="123" y="185" width="16" height="16" rx="2"/><rect class="du-one" x="141" y="185" width="16" height="16" rx="2"/></svg>
 
     <!-- /gen -->
 
@@ -312,20 +312,20 @@ added: 2026-11-06
 
     **למה \( \binom{2^k}{j} \) זוגי.** \( \binom{n}{j} = \frac{n}{j} \binom{n-1}{j-1} \). עם
     \( n = 2^k \) ו-\( 0 < j < n \), החזקה של 2 ב-\( j \) קטנה מ-\( 2^k \), ולכן
-    \( \frac{2^k}{j} \binom{n-1}{j-1} \), שהוא מספר שלם, עדיין מתחלק ב-2. דרך אחרת :
+    \( \frac{2^k}{j} \binom{n-1}{j-1} \), שהוא מספר שלם, עדיין מתחלק ב-2. דרך אחרת :
     \( (1 + x)^2 = 1 + x^2 \) מודולו 2, ולכן \( (1 + x)^{2^k} = 1 + x^{2^k} \).
 
     **מספיק 1 אחד.** הזוגיות אחרי \( t \) סיבובים של XOR של התחלות היא ה-XOR של הזוגיות
     שלהן, ו-1 במקום אחר הוא אותו ציור מסובב. לכן אם 1 אחד נעלם אחרי \( n \) סיבובים, כל
     התחלה הופכת לזוגית אחרי \( n \) סיבובים.
 
-    **הספירה.** כמו בסעיף א, כל \( n \) סיבובים חוצים את המקסימום : לכל היותר
+    **הספירה.** כמו בסעיף א, כל \( n \) סיבובים חוצים את המקסימום : לכל היותר
     \( n(\lfloor \log_2 M \rfloor + 1) \) סיבובים. הטסט של השאלה בודק את החסם לכל התחלה
     עם ערכים קטנים, ל-\( n = 4 \) ול-\( n = 8 \).
 
     #### סיבוכיות { .sol-cost }
 
-    הפונקציה `always_zero` עושה \( n \) סיבובים, כל אחד כמה פעולות על מילה : \( O(n) \) זמן ו-\( O(1) \)
+    הפונקציה `always_zero` עושה \( n \) סיבובים, כל אחד כמה פעולות על מילה : \( O(n) \) זמן ו-\( O(1) \)
     זיכרון, עד 64 מספרים במילה אחת. בדיקה של כל ההתחלות הייתה אינסופית.
 
 ---
@@ -349,9 +349,9 @@ added: 2026-11-06
 
 ??? success "פתרון סעיף ג"
     !!! answer "תשובה בקצרה"
-        מ-0, 0 ו-1 מקבלים 0, 1 ו-1, ואז 1, 0 ו-1, ואז 1, 1 ו-0, ושוב 0, 1 ו-1 : מחזור באורך 3. באופן
+        מ-0, 0 ו-1 מקבלים 0, 1 ו-1, ואז 1, 0 ו-1, ואז 1, 1 ו-0, ושוב 0, 1 ו-1 : מחזור באורך 3. באופן
         כללי, עם \( n = 2^k m \) ו-\( m \) אי-זוגי, \( m \ge 3 \), ההתחלה עם 1 בכל מקום
-        \( m \)-י ואפסים בשאר לא מגיעה לאפסים לעולם. וכל התחלה נכנסת למחזור : המקסימום לא
+        \( m \)-י ואפסים בשאר לא מגיעה לאפסים לעולם. וכל התחלה נכנסת למחזור : המקסימום לא
         עולה, ולכן יש מספר סופי של מצבים. בקוד, מילון של המצבים שכבר נראו נותן את הצעד שבו
         המחזור מתחיל ואת האורך שלו.
 
@@ -370,18 +370,18 @@ added: 2026-11-06
     המשחק על \( m \) מספרים, \( 2^k \) פעמים. ההתחלה עם 1 בכל מקום \( m \)-י היא 1 אחד בין
     אפסים במשחק של \( m \), ולכן גם היא לא מגיעה לאפסים.
 
-    **מחזור.** המקסימום לא עולה, ולכן כל המצבים הם \( n \) מספרים בין 0 ל-\( M \) : לכל
+    **מחזור.** המקסימום לא עולה, ולכן כל המצבים הם \( n \) מספרים בין 0 ל-\( M \) : לכל
     היותר \( (M + 1)^n \) מצבים. אחרי מספיק סיבובים מצב חוזר, ומשם הכל חוזר.
 
     #### השלבים { .sol-steps }
 
     <div class="steps" markdown>
 
-    1. **דוגמה :** 0, 0 ו-1 נכנסים למחזור של שלושה מצבים : 0, 1 ו-1, ואז 1, 0 ו-1, ואז 1, 1 ו-0.
-    2. **מעגל אי-זוגי :** לאפסים מגיעים רק דרך "כולו 1", ול"כולו 1" רק ממצב לסירוגין, שאין
+    1. **דוגמה :** 0, 0 ו-1 נכנסים למחזור של שלושה מצבים : 0, 1 ו-1, ואז 1, 0 ו-1, ואז 1, 1 ו-0.
+    2. **מעגל אי-זוגי :** לאפסים מגיעים רק דרך "כולו 1", ול"כולו 1" רק ממצב לסירוגין, שאין
        על מעגל אי-זוגי.
-    3. **כל n :** \( n = 2^k m \), והתחלה עם מחזוריות \( m \) משחקת כמו המשחק על \( m \).
-    4. **מחזור :** מספר סופי של מצבים. הקוד שומר מילון ממצב לצעד שבו נראה לראשונה.
+    3. **כל n :** \( n = 2^k m \), והתחלה עם מחזוריות \( m \) משחקת כמו המשחק על \( m \).
+    4. **מחזור :** מספר סופי של מצבים. הקוד שומר מילון ממצב לצעד שבו נראה לראשונה.
 
     </div>
 
@@ -435,7 +435,7 @@ added: 2026-11-06
 
     #### למה זה נכון { .sol-proof }
 
-    **1, 2 ו-3.** שני סיבובים עד שנכנסים למחזור, ושלושה במחזור :
+    **1, 2 ו-3.** שני סיבובים עד שנכנסים למחזור, ושלושה במחזור :
 
     <!-- gen 5 -->
 
@@ -471,57 +471,57 @@ added: 2026-11-06
 
     <!-- /gen -->
 
-    **נסו בעצמכם.** אותה תיבה, עם 1, 2, 3, 4 ו-5 : המשחק נכנס למחזור באורך 15, והתיבה
-    מסמנת את הסיבוב שבו המחזור מתחיל :
+    **נסו בעצמכם.** אותה תיבה, עם 1, 2, 3, 4 ו-5 : המשחק נכנס למחזור באורך 15, והתיבה
+    מסמנת את הסיבוב שבו המחזור מתחיל :
 
     <div class="explorer" data-kind="ducci" data-v="1,2,3,4,5"></div>
 
     #### סיבוכיות { .sol-cost }
 
     יש \( T \) סיבובים עד המחזור ו-\( L \) במחזור, כל אחד \( O(n) \), ועוד \( O(n) \) למפתח
-    של המילון : \( O(n(T + L)) \) זמן וזיכרון. \( T + L \) לכל היותר \( (M + 1)^n \), אבל
-    בפועל קטן בהרבה : ל-1 עד 5 זה 17.
+    של המילון : \( O(n(T + L)) \) זמן וזיכרון. \( T + L \) לכל היותר \( (M + 1)^n \), אבל
+    בפועל קטן בהרבה : ל-1 עד 5 זה 17.
 
 ## נקודות חשובות ושאלות המשך
 
-??? trap "מלכודת : המקסימום יורד, אז זה נגמר"
-    המקסימום לא עולה, אבל הוא לא חייב לרדת : 2, 0, 2 ו-0 הופכים ל-2, 2, 2 ו-2. ועם שלושה
+??? trap "מלכודת : המקסימום יורד, אז זה נגמר"
+    המקסימום לא עולה, אבל הוא לא חייב לרדת : 2, 0, 2 ו-0 הופכים ל-2, 2, 2 ו-2. ועם שלושה
     מספרים, 1, 2 ו-3 נכנסים למחזור שהמקסימום שלו נשאר 1 לנצח. צריך את הזוגיות כדי להוכיח
     ירידה של ממש, וכש-\( n \) אינו חזקה של 2 אין ירידה כזו.
 
-??? trap "מלכודת : להכליל מארבעה"
+??? trap "מלכודת : להכליל מארבעה"
     ארבעה מספרים תמיד מתאפסים, ולכן קל להניח ש"זה עובד לכל \( n \)". הניסיון הראשון עם
-    שלושה מספרים, 1, 2 ו-3, כבר מראה שלא. המבנה הוא החזקה של 2, לא הזוגיות של \( n \) :
+    שלושה מספרים, 1, 2 ו-3, כבר מראה שלא. המבנה הוא החזקה של 2, לא הזוגיות של \( n \) :
     גם 6 ו-10 מגיעים למחזורים.
 
-??? trap "מלכודת : עדכון במקום בלי עותק"
+??? trap "מלכודת : עדכון במקום בלי עותק"
     אם מעדכנים את \( v[i] \) במקום ואז משתמשים בו לחישוב של \( v[i-1] \), או מעדכנים את
     האחרון לפי \( v[0] \) החדש, מקבלים משחק אחר. ב-Python בונים רשימה חדשה, וב-SV שומרים
     את \( v[0] \) הישן לפני הלולאה.
 
 ??? followup "שאלות המשך"
-    - **כמה סיבובים :** האם יש חסם על מספר הסיבובים לארבעה מספרים, בלי תלות במקסימום?
+    - **כמה סיבובים :** האם יש חסם על מספר הסיבובים לארבעה מספרים, בלי תלות במקסימום?
 
         ??? fu-answer "תשובה"
-            לא. התחלות שנבנות ממספרי טריבונאצ'י לוקחות כל פעם יותר : 0, 7, 20 ו-44 לוקחים
+            לא. התחלות שנבנות ממספרי טריבונאצ'י לוקחות כל פעם יותר : 0, 7, 20 ו-44 לוקחים
             13 סיבובים, ו-0, 1705, 4841 ו-10609 לוקחים 25. החסם של סעיף א,
             \( 4(\lfloor \log_2 M \rfloor + 1) \), גדל עם \( M \).
 
-    - **מספרים ממשיים :** האם ארבעה מספרים **ממשיים** תמיד מגיעים לאפסים?
+    - **מספרים ממשיים :** האם ארבעה מספרים **ממשיים** תמיד מגיעים לאפסים?
 
         ??? fu-answer "תשובה"
             לא. עם \( q \approx 1.839 \), השורש של \( q^3 = q^2 + q + 1 \), ההתחלה
             \( 1, q, q^2, q^3 \) שומרת על הצורה שלה אחרי כל סיבוב, רק מוקטנת, ולכן לא מגיעה
             לאפס לעולם. ההוכחה של סעיף א השתמשה בזוגיות, שקיימת רק בשלמים.
 
-    - **זיכרון קבוע :** איך מזהים את המחזור בלי מילון?
+    - **זיכרון קבוע :** איך מזהים את המחזור בלי מילון?
 
         ??? fu-answer "תשובה"
-            השפן והצב של Floyd : שני מצבים, אחד מתקדם סיבוב אחד והשני שניים, עד שהם
+            השפן והצב של Floyd : שני מצבים, אחד מתקדם סיבוב אחד והשני שניים, עד שהם
             נפגשים. אחר כך מוצאים את תחילת המחזור ואת האורך שלו, ב-\( O(n) \) זיכרון במקום
             \( O(n(T + L)) \).
 
-    - **החשבון של המחזורים :** למה ל-5 מספרים המחזור באורך 15?
+    - **החשבון של המחזורים :** למה ל-5 מספרים המחזור באורך 15?
 
         ??? fu-answer "תשובה"
             על 0 ו-1 הסיבוב הוא כפל ב-\( (1 + x) \) בפולינומים מודולו \( x^n - 1 \) מעל

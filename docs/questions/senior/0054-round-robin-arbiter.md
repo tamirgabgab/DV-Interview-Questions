@@ -15,23 +15,23 @@ added: 2026-10-27
 `req[i]` אם הוא רוצה את המשאב, וה-arbiter נותן מענק `gnt` לאחד לכל היותר, באותו מחזור.
 מבקש שלא קיבל משאיר את `req[i]` למעלה עד שהוא מקבל.
 
-- **סעיף א – עדיפות קבועה :** כתבו arbiter שבו המבקש עם המספר הנמוך תמיד מנצח. מה הבעיה
+- **סעיף א – עדיפות קבועה :** כתבו arbiter שבו המבקש עם המספר הנמוך תמיד מנצח. מה הבעיה
   שלו?
-- **סעיף ב – ‏round robin :** כתבו arbiter סבבי : אחרי שמבקש קיבל, הוא הופך לאחרון בתור.
+- **סעיף ב – ‏round robin :** כתבו arbiter סבבי : אחרי שמבקש קיבל, הוא הופך לאחרון בתור.
   איך עושים את זה בלי לולאה על כל המבקשים בכל מחזור?
-- **סעיף ג – ‏SVA והוגנות :** כתבו assertions לחוקים של ה-arbiter, כולל "מבקש מחכה לכל
+- **סעיף ג – ‏SVA והוגנות :** כתבו assertions לחוקים של ה-arbiter, כולל "מבקש מחכה לכל
   היותר \( K \) מחזורים". מה \( K \) הקטן ביותר, ולמה?
-- **סעיף ד – משקלים :** למבקש \( i \) יש משקל \( w_i \), והוא אמור לקבל חלק \( w_i / \sum w \)
+- **סעיף ד – משקלים :** למבקש \( i \) יש משקל \( w_i \), והוא אמור לקבל חלק \( w_i / \sum w \)
   מהמשאב בעומס מלא. איך משנים את ה-arbiter, ומה ההמתנה הארוכה ביותר עכשיו?
 
 ??? interviewer "מה המראיין בודק"
-    - **הרעבה :** האם המועמד רואה מיד שעדיפות קבועה יכולה להשאיר מבקש בלי מענק לעולם.
-    - **‏RTL יעיל :** האם הוא מכיר את הטריק של \( x \mathbin{\&} \lnot(x - p) \) לבחירת הבקשה
+    - **הרעבה :** האם המועמד רואה מיד שעדיפות קבועה יכולה להשאיר מבקש בלי מענק לעולם.
+    - **‏RTL יעיל :** האם הוא מכיר את הטריק של \( x \mathbin{\&} \lnot(x - p) \) לבחירת הבקשה
       הראשונה מעמדה מסוימת, ואת הכפלת הבקשות למעבר מעגלי.
-    - **עדכון המצביע :** אחרי מי הוא זז, ומה קורה כשאין אף בקשה.
-    - **אימות :** האם ה-assertions מנוסחות כך שהן גם נכשלות על באגים אמיתיים, והאם ההוגנות
+    - **עדכון המצביע :** אחרי מי הוא זז, ומה קורה כשאין אף בקשה.
+    - **אימות :** האם ה-assertions מנוסחות כך שהן גם נכשלות על באגים אמיתיים, והאם ההוגנות
       מותנית בהנחה על הסביבה (בקשה נשארת עד שמקבלים).
-    - **משקלים :** האם הוא מבין שמשקל משנה את החלוקה, אבל גם מאריך את ההמתנה של האחרים.
+    - **משקלים :** האם הוא מבין שמשקל משנה את החלוקה, אבל גם מאריך את ההמתנה של האחרים.
 
 ---
 
@@ -62,7 +62,7 @@ added: 2026-10-27
 
     <!-- gen 0 -->
 
-    <svg class="figure arb-fig" viewBox="0 0 660 364" style="max-width:41rem" role="img" aria-label="ארבעה מבקשים שמבקשים כל הזמן : ב-fixed priority רק מבקש 0 מקבל, ב-round robin כל אחד מקבל פעם בארבעה מחזורים"><text class="tick" x="167.0" y="20" text-anchor="middle">0</text><text class="tick" x="201.0" y="20" text-anchor="middle">1</text><text class="tick" x="235.0" y="20" text-anchor="middle">2</text><text class="tick" x="269.0" y="20" text-anchor="middle">3</text><text class="tick" x="303.0" y="20" text-anchor="middle">4</text><text class="tick" x="337.0" y="20" text-anchor="middle">5</text><text class="tick" x="371.0" y="20" text-anchor="middle">6</text><text class="tick" x="405.0" y="20" text-anchor="middle">7</text><text class="arb-name" x="80" y="103.0" text-anchor="middle">fixed</text><text class="tick" x="142" y="51.0" text-anchor="end">req 0</text><rect class="arb-cell is-gnt" x="150" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="166.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="184" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="200.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="218" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="234.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="252" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="268.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="286" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="302.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="320" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="336.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="354" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="370.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="388" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="404.0" y="51.0" text-anchor="middle">G</text><text class="tick" x="142" y="85.0" text-anchor="end">req 1</text><rect class="arb-cell is-wait" x="150" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="64" width="31" height="31" rx="3"/><text class="tick" x="142" y="119.0" text-anchor="end">req 2</text><rect class="arb-cell is-wait" x="150" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="98" width="31" height="31" rx="3"/><text class="tick" x="142" y="153.0" text-anchor="end">req 3</text><rect class="arb-cell is-wait" x="150" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="132" width="31" height="31" rx="3"/><text class="arb-name" x="80" y="265.0" text-anchor="middle">round robin</text><text class="tick" x="142" y="213.0" text-anchor="end">req 0</text><rect class="arb-cell is-gnt" x="150" y="192" width="31" height="31" rx="3"/><text class="arb-mark" x="166.0" y="213.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="184" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="286" y="192" width="31" height="31" rx="3"/><text class="arb-mark" x="302.0" y="213.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="320" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="192" width="31" height="31" rx="3"/><text class="tick" x="142" y="247.0" text-anchor="end">req 1</text><rect class="arb-cell is-wait" x="150" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="184" y="226" width="31" height="31" rx="3"/><text class="arb-mark" x="200.0" y="247.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="218" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="320" y="226" width="31" height="31" rx="3"/><text class="arb-mark" x="336.0" y="247.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="354" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="226" width="31" height="31" rx="3"/><text class="tick" x="142" y="281.0" text-anchor="end">req 2</text><rect class="arb-cell is-wait" x="150" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="218" y="260" width="31" height="31" rx="3"/><text class="arb-mark" x="234.0" y="281.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="252" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="354" y="260" width="31" height="31" rx="3"/><text class="arb-mark" x="370.0" y="281.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="388" y="260" width="31" height="31" rx="3"/><text class="tick" x="142" y="315.0" text-anchor="end">req 3</text><rect class="arb-cell is-wait" x="150" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="252" y="294" width="31" height="31" rx="3"/><text class="arb-mark" x="268.0" y="315.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="286" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="388" y="294" width="31" height="31" rx="3"/><text class="arb-mark" x="404.0" y="315.0" text-anchor="middle">G</text><text class="legend" x="652" y="360" text-anchor="end">cycle →</text></svg>
+    <svg class="figure arb-fig" viewBox="0 0 660 364" style="max-width:41rem" role="img" aria-label="ארבעה מבקשים שמבקשים כל הזמן : ב-fixed priority רק מבקש 0 מקבל, ב-round robin כל אחד מקבל פעם בארבעה מחזורים"><text class="tick" x="167.0" y="20" text-anchor="middle">0</text><text class="tick" x="201.0" y="20" text-anchor="middle">1</text><text class="tick" x="235.0" y="20" text-anchor="middle">2</text><text class="tick" x="269.0" y="20" text-anchor="middle">3</text><text class="tick" x="303.0" y="20" text-anchor="middle">4</text><text class="tick" x="337.0" y="20" text-anchor="middle">5</text><text class="tick" x="371.0" y="20" text-anchor="middle">6</text><text class="tick" x="405.0" y="20" text-anchor="middle">7</text><text class="arb-name" x="80" y="103.0" text-anchor="middle">fixed</text><text class="tick" x="142" y="51.0" text-anchor="end">req 0</text><rect class="arb-cell is-gnt" x="150" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="166.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="184" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="200.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="218" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="234.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="252" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="268.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="286" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="302.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="320" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="336.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="354" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="370.0" y="51.0" text-anchor="middle">G</text><rect class="arb-cell is-gnt" x="388" y="30" width="31" height="31" rx="3"/><text class="arb-mark" x="404.0" y="51.0" text-anchor="middle">G</text><text class="tick" x="142" y="85.0" text-anchor="end">req 1</text><rect class="arb-cell is-wait" x="150" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="64" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="64" width="31" height="31" rx="3"/><text class="tick" x="142" y="119.0" text-anchor="end">req 2</text><rect class="arb-cell is-wait" x="150" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="98" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="98" width="31" height="31" rx="3"/><text class="tick" x="142" y="153.0" text-anchor="end">req 3</text><rect class="arb-cell is-wait" x="150" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="132" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="132" width="31" height="31" rx="3"/><text class="arb-name" x="80" y="265.0" text-anchor="middle">round robin</text><text class="tick" x="142" y="213.0" text-anchor="end">req 0</text><rect class="arb-cell is-gnt" x="150" y="192" width="31" height="31" rx="3"/><text class="arb-mark" x="166.0" y="213.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="184" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="286" y="192" width="31" height="31" rx="3"/><text class="arb-mark" x="302.0" y="213.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="320" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="192" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="192" width="31" height="31" rx="3"/><text class="tick" x="142" y="247.0" text-anchor="end">req 1</text><rect class="arb-cell is-wait" x="150" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="184" y="226" width="31" height="31" rx="3"/><text class="arb-mark" x="200.0" y="247.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="218" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="252" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="320" y="226" width="31" height="31" rx="3"/><text class="arb-mark" x="336.0" y="247.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="354" y="226" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="388" y="226" width="31" height="31" rx="3"/><text class="tick" x="142" y="281.0" text-anchor="end">req 2</text><rect class="arb-cell is-wait" x="150" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="218" y="260" width="31" height="31" rx="3"/><text class="arb-mark" x="234.0" y="281.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="252" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="286" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="260" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="354" y="260" width="31" height="31" rx="3"/><text class="arb-mark" x="370.0" y="281.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="388" y="260" width="31" height="31" rx="3"/><text class="tick" x="142" y="315.0" text-anchor="end">req 3</text><rect class="arb-cell is-wait" x="150" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="184" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="218" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="252" y="294" width="31" height="31" rx="3"/><text class="arb-mark" x="268.0" y="315.0" text-anchor="middle">G</text><rect class="arb-cell is-wait" x="286" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="320" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-wait" x="354" y="294" width="31" height="31" rx="3"/><rect class="arb-cell is-gnt" x="388" y="294" width="31" height="31" rx="3"/><text class="arb-mark" x="404.0" y="315.0" text-anchor="middle">G</text><text class="legend" x="652" y="360" text-anchor="end">cycle →</text></svg>
 
     <!-- /gen -->
 
@@ -76,9 +76,9 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **‏-req :** ‏`~req + 1` מהפך הכול ומוסיף 1, שרץ עד הבקשה הנמוכה ביותר.
-    2. **‏AND :** ‏`req & -req` משאיר רק אותה.
-    3. **אין בקשה :** ‏`req = 0` נותן `gnt = 0`, בלי מקרה מיוחד.
+    1. **‏-req :** ‏`~req + 1` מהפך הכול ומוסיף 1, שרץ עד הבקשה הנמוכה ביותר.
+    2. **‏AND :** ‏`req & -req` משאיר רק אותה.
+    3. **אין בקשה :** ‏`req = 0` נותן `gnt = 0`, בלי מקרה מיוחד.
 
     </div>
 
@@ -160,10 +160,10 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **הכפלה :** ‏`dbl = {req, req}`, ‏\( 2N \) ביטים.
-    2. **בחירה :** ‏`sel = dbl & ~(dbl - pri)`, כש-`pri` מורחב ל-\( 2N \) ביטים.
-    3. **קיפול :** ‏`gnt = sel[N-1:0] | sel[2N-1:N]`.
-    4. **מצביע :** אם יש מענק, `pri <= {gnt[N-2:0], gnt[N-1]}` (המבקש שאחרי המנצח); אחרת `pri`
+    1. **הכפלה :** ‏`dbl = {req, req}`, ‏\( 2N \) ביטים.
+    2. **בחירה :** ‏`sel = dbl & ~(dbl - pri)`, כש-`pri` מורחב ל-\( 2N \) ביטים.
+    3. **קיפול :** ‏`gnt = sel[N-1:0] | sel[2N-1:N]`.
+    4. **מצביע :** אם יש מענק, `pri <= {gnt[N-2:0], gnt[N-1]}` (המבקש שאחרי המנצח); אחרת `pri`
        נשאר.
 
     </div>
@@ -273,11 +273,11 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **‏one-hot :** ‏`$onehot0(gnt)`, בכל מחזור.
-    2. **אין מענק בלי בקשה :** ‏`(gnt & ~req) == '0`.
-    3. **הסביבה :** ‏`req[i] && !gnt[i] |=> req[i]`, לכל \( i \).
-    4. **הוגנות :** ‏`req[i] |-> ##[0:MAX_WAIT] gnt[i]`, עם `MAX_WAIT = N - 1`.
-    5. **‏disable iff :** כל החוקים מושבתים באיפוס.
+    1. **‏one-hot :** ‏`$onehot0(gnt)`, בכל מחזור.
+    2. **אין מענק בלי בקשה :** ‏`(gnt & ~req) == '0`.
+    3. **הסביבה :** ‏`req[i] && !gnt[i] |=> req[i]`, לכל \( i \).
+    4. **הוגנות :** ‏`req[i] |-> ##[0:MAX_WAIT] gnt[i]`, עם `MAX_WAIT = N - 1`.
+    5. **‏disable iff :** כל החוקים מושבתים באיפוס.
 
     </div>
 
@@ -478,25 +478,25 @@ added: 2026-10-27
     באותו מחזור), נוצרת לולאה צירופית. בממשקים כאלה `gnt` רשום, ואז ההמתנה גדלה במחזור.
 
 ??? followup "שאלות המשך"
-    - **‏N שאינו חזקה של 2 ו-N גדול :** מה משתנה ב-RTL כש-\( N = 64 \)?
+    - **‏N שאינו חזקה של 2 ו-N גדול :** מה משתנה ב-RTL כש-\( N = 64 \)?
 
         ??? fu-answer "תשובה"
             כלום בנכונות; ההשהיה של מחסר של 128 ביטים היא הבעיה. מחלקים לקבוצות (arbiter של
             קבוצות מעל arbiters בתוך כל קבוצה), או משתמשים ב-parallel prefix ל-"הביט הראשון".
 
-    - **‏arbiter עם תור מצביעים (matrix arbiter) :** מה היתרון?
+    - **‏arbiter עם תור מצביעים (matrix arbiter) :** מה היתרון?
 
         ??? fu-answer "תשובה"
             מטריצה \( N \times N \) של "i עדיף על j" : אחרי מענק ל-\( i \), כל השורה שלו מתאפסת. זה LRU
             מדויק (מי שקיבל הכי מזמן עדיף), במחיר \( N^2 / 2 \) פלופים.
 
-    - **‏grant רשום :** מה משתנה ב-assertions אם `gnt` יוצא מרגיסטר?
+    - **‏grant רשום :** מה משתנה ב-assertions אם `gnt` יוצא מרגיסטר?
 
         ??? fu-answer "תשובה"
             המענק מגיע מחזור אחרי הבקשה : ‏`req[i] |-> ##[1:N] gnt[i]`, ו-"אין מענק בלי בקשה" נבדק
             מול `$past(req)`.
 
-    - **כיסוי :** איך יודעים שה-testbench בכלל בדק את החסם?
+    - **כיסוי :** איך יודעים שה-testbench בכלל בדק את החסם?
 
         ??? fu-answer "תשובה"
             ‏`cover property (req[i] && !gnt[i] [*N-1] ##1 gnt[i])` : הגענו להמתנה של \( N - 1 \) מחזורים. בלי

@@ -13,25 +13,25 @@ added: 2026-11-01
 
 **ערבוב מושלם** (faro shuffle) : חוצים חפיסה בדיוק לשני חצאים, ומשלבים אותם קלף אחרי קלף.
 
-- **‏out-shuffle :** הקלף העליון של החפיסה נשאר למעלה. מהחצי העליון \( t_0, t_1, \dots \) ומהתחתון
+- **‏out-shuffle :** הקלף העליון של החפיסה נשאר למעלה. מהחצי העליון \( t_0, t_1, \dots \) ומהתחתון
   \( b_0, b_1, \dots \) יוצא \( t_0, b_0, t_1, b_1, \dots \).
-- **‏in-shuffle :** הקלף העליון יורד למקום השני : ‏\( b_0, t_0, b_1, t_1, \dots \).
+- **‏in-shuffle :** הקלף העליון יורד למקום השני : ‏\( b_0, t_0, b_1, t_1, \dots \).
 
 שאלות :
 
-- **סעיף א – 52 קלפים :** אחרי כמה out-shuffles חפיסה של 52 קלפים חוזרת לסדר המקורי? ואחרי כמה
+- **סעיף א – 52 קלפים :** אחרי כמה out-shuffles חפיסה של 52 קלפים חוזרת לסדר המקורי? ואחרי כמה
   in-shuffles?
-- **סעיף ב – כל גודל :** אותה שאלה לחפיסה של \( n \) קלפים, זוגי או אי-זוגי. כתבו נוסחה, והוכיחו
+- **סעיף ב – כל גודל :** אותה שאלה לחפיסה של \( n \) קלפים, זוגי או אי-זוגי. כתבו נוסחה, והוכיחו
   שהחפיסה תמיד חוזרת.
-- **סעיף ג – שילוב במקום :** כתבו קוד שהופך מערך \( [a_0, \dots, a_{m-1}, b_0, \dots, b_{m-1}] \)
+- **סעיף ג – שילוב במקום :** כתבו קוד שהופך מערך \( [a_0, \dots, a_{m-1}, b_0, \dots, b_{m-1}] \)
   ל-\( [a_0, b_0, a_1, b_1, \dots] \), כלומר out-shuffle, בלי מערך עזר.
 
 ??? interviewer "מה המראיין בודק"
-    - **נוסחה למקום :** האם המועמד כותב לאן הולך הקלף במקום \( p \), במקום לסמלץ.
-    - **תורת המספרים :** האם הוא מזהה שזו הכפלה ב-2 מודולו מספר, ומבין למה היא תמיד חוזרת
+    - **נוסחה למקום :** האם המועמד כותב לאן הולך הקלף במקום \( p \), במקום לסמלץ.
+    - **תורת המספרים :** האם הוא מזהה שזו הכפלה ב-2 מודולו מספר, ומבין למה היא תמיד חוזרת
       ל-1.
-    - **מקרי קצה :** הקלף העליון והתחתון שלא זזים, ו-\( n \) אי-זוגי.
-    - **במקום :** האם הוא משתמש בסיבוב של מערך (שאלה 0072) כאבן בניין, ויודע להעריך את המחיר.
+    - **מקרי קצה :** הקלף העליון והתחתון שלא זזים, ו-\( n \) אי-זוגי.
+    - **במקום :** האם הוא משתמש בסיבוב של מערך (שאלה 0072) כאבן בניין, ויודע להעריך את המחיר.
 
 ---
 
@@ -66,7 +66,7 @@ added: 2026-11-01
 
     <!-- gen 0 -->
 
-    <div class="pm-scroll" tabindex="0" role="region" aria-label="שמונה קלפים בשלושה out-shuffles : בכל שורה הסדר מלמעלה, ואחרי שלושה ערבובים הסדר חוזר"><table class="pm-cells" dir="ltr"><tbody><tr class="pm-head"><th></th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr><tr><th dir="rtl">לפני</th><td class="pm-c c1">0</td><td class="pm-c c2">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c2">4</td><td class="pm-c c3">5</td><td class="pm-c c3">6</td><td class="pm-c c4">7</td></tr><tr><th dir="rtl">אחרי 1</th><td class="pm-c c1">0</td><td class="pm-c c2">4</td><td class="pm-c c2">1</td><td class="pm-c c3">5</td><td class="pm-c c2">2</td><td class="pm-c c3">6</td><td class="pm-c c3">3</td><td class="pm-c c4">7</td></tr><tr><th dir="rtl">אחרי 2</th><td class="pm-c c1">0</td><td class="pm-c c2">2</td><td class="pm-c c2">4</td><td class="pm-c c3">6</td><td class="pm-c c2">1</td><td class="pm-c c3">3</td><td class="pm-c c3">5</td><td class="pm-c c4">7</td></tr><tr><th dir="rtl">אחרי 3</th><td class="pm-c c1">0</td><td class="pm-c c2">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c2">4</td><td class="pm-c c3">5</td><td class="pm-c c3">6</td><td class="pm-c c4">7</td></tr></tbody></table></div>
+    <div class="pm-scroll" tabindex="0" role="region" aria-label="שמונה קלפים בשלושה out-shuffles : בכל שורה הסדר מלמעלה, ואחרי שלושה ערבובים הסדר חוזר"><table class="pm-cells" dir="ltr"><tbody><tr class="pm-head"><th></th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr><tr><th dir="rtl">לפני</th><td class="pm-c c1">0</td><td class="pm-c c2">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c2">4</td><td class="pm-c c3">5</td><td class="pm-c c3">6</td><td class="pm-c c4">7</td></tr><tr><th dir="rtl">אחרי 1</th><td class="pm-c c1">0</td><td class="pm-c c2">4</td><td class="pm-c c2">1</td><td class="pm-c c3">5</td><td class="pm-c c2">2</td><td class="pm-c c3">6</td><td class="pm-c c3">3</td><td class="pm-c c4">7</td></tr><tr><th dir="rtl">אחרי 2</th><td class="pm-c c1">0</td><td class="pm-c c2">2</td><td class="pm-c c2">4</td><td class="pm-c c3">6</td><td class="pm-c c2">1</td><td class="pm-c c3">3</td><td class="pm-c c3">5</td><td class="pm-c c4">7</td></tr><tr><th dir="rtl">אחרי 3</th><td class="pm-c c1">0</td><td class="pm-c c2">1</td><td class="pm-c c2">2</td><td class="pm-c c3">3</td><td class="pm-c c2">4</td><td class="pm-c c3">5</td><td class="pm-c c3">6</td><td class="pm-c c4">7</td></tr></tbody></table></div>
 
     <!-- /gen -->
 
@@ -80,10 +80,10 @@ added: 2026-11-01
 
     <div class="steps" markdown>
 
-    1. **‏out-shuffle :** ‏\( p \to 2p \bmod 51 \). אחרי \( e \) ערבובים, \( p \to 2^e p \bmod 51 \).
-    2. **מתי כולם חוזרים :** כש-\( 2^e p \equiv p \) לכל \( p \), ובפרט ל-\( p = 1 \) : ‏\( 2^e \equiv 1 \pmod{51} \).
-    3. **החזקות של 2 מודולו 51 :** ‏2, 4, 8, 16, 32, 13, 26, 1. **‏\( e = 8 \).**
-    4. **‏in-shuffle :** במספור מ-1, הקלף \( q \) עובר ל-\( 2q \bmod 53 \). ‏53 ראשוני, וההחזקות של 2
+    1. **‏out-shuffle :** ‏\( p \to 2p \bmod 51 \). אחרי \( e \) ערבובים, \( p \to 2^e p \bmod 51 \).
+    2. **מתי כולם חוזרים :** כש-\( 2^e p \equiv p \) לכל \( p \), ובפרט ל-\( p = 1 \) : ‏\( 2^e \equiv 1 \pmod{51} \).
+    3. **החזקות של 2 מודולו 51 :** ‏2, 4, 8, 16, 32, 13, 26, 1. **‏\( e = 8 \).**
+    4. **‏in-shuffle :** במספור מ-1, הקלף \( q \) עובר ל-\( 2q \bmod 53 \). ‏53 ראשוני, וההחזקות של 2
        עוברות על כל 52 השאריות לפני שחוזרות ל-1 : **‏\( e = 52 \)**.
 
     </div>
@@ -148,9 +148,9 @@ added: 2026-11-01
 
     <div class="steps" markdown>
 
-    1. **המודולו :** ‏\( M = n - 1 \) (out, ‏\( n \) זוגי), ‏\( M = n + 1 \) (in, ‏\( n \) זוגי), ‏\( M = n \) (‏\( n \) אי-זוגי).
-    2. **מקרה קצה :** ‏\( M = 1 \) (שני קלפים, out) : הערבוב לא משנה כלום, ‏\( e = 1 \).
-    3. **הסדר של 2 :** מכפילים ב-2 מודולו \( M \) עד שמגיעים ל-1, וסופרים.
+    1. **המודולו :** ‏\( M = n - 1 \) (out, ‏\( n \) זוגי), ‏\( M = n + 1 \) (in, ‏\( n \) זוגי), ‏\( M = n \) (‏\( n \) אי-זוגי).
+    2. **מקרה קצה :** ‏\( M = 1 \) (שני קלפים, out) : הערבוב לא משנה כלום, ‏\( e = 1 \).
+    3. **הסדר של 2 :** מכפילים ב-2 מודולו \( M \) עד שמגיעים ל-1, וסופרים.
 
     </div>
 
@@ -231,7 +231,7 @@ added: 2026-11-01
 
     <!-- gen 3 -->
 
-    <div class="pm-scroll" tabindex="0" role="region" aria-label="השילוב במקום של a0 עד a3 ו-b0 עד b3 : בכל רמה מסובבים את הקטעים הממוסגרים"><table class="pm-cells" dir="ltr"><tbody><tr class="pm-head"><th></th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr><tr><th dir="rtl">לפני</th><td class="pm-c c1">a0</td><td class="pm-c c1">a1</td><td class="pm-c c1">a2</td><td class="pm-c c1">a3</td><td class="pm-c c2">b0</td><td class="pm-c c2">b1</td><td class="pm-c c2">b2</td><td class="pm-c c2">b3</td></tr><tr><th dir="rtl">רמה 1</th><td class="pm-c c1">a0</td><td class="pm-c c1">a1</td><td class="pm-c c2 is-hl">b0</td><td class="pm-c c2 is-hl">b1</td><td class="pm-c c1 is-hl">a2</td><td class="pm-c c1 is-hl">a3</td><td class="pm-c c2">b2</td><td class="pm-c c2">b3</td></tr><tr><th dir="rtl">רמה 2</th><td class="pm-c c1">a0</td><td class="pm-c c2 is-hl">b0</td><td class="pm-c c1 is-hl">a1</td><td class="pm-c c2">b1</td><td class="pm-c c1">a2</td><td class="pm-c c2 is-hl">b2</td><td class="pm-c c1 is-hl">a3</td><td class="pm-c c2">b3</td></tr></tbody></table></div>
+    <div class="pm-scroll" tabindex="0" role="region" aria-label="השילוב במקום של a0 עד a3 ו-b0 עד b3 : בכל רמה מסובבים את הקטעים הממוסגרים"><table class="pm-cells" dir="ltr"><tbody><tr class="pm-head"><th></th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr><tr><th dir="rtl">לפני</th><td class="pm-c c1">a0</td><td class="pm-c c1">a1</td><td class="pm-c c1">a2</td><td class="pm-c c1">a3</td><td class="pm-c c2">b0</td><td class="pm-c c2">b1</td><td class="pm-c c2">b2</td><td class="pm-c c2">b3</td></tr><tr><th dir="rtl">רמה 1</th><td class="pm-c c1">a0</td><td class="pm-c c1">a1</td><td class="pm-c c2 is-hl">b0</td><td class="pm-c c2 is-hl">b1</td><td class="pm-c c1 is-hl">a2</td><td class="pm-c c1 is-hl">a3</td><td class="pm-c c2">b2</td><td class="pm-c c2">b3</td></tr><tr><th dir="rtl">רמה 2</th><td class="pm-c c1">a0</td><td class="pm-c c2 is-hl">b0</td><td class="pm-c c1 is-hl">a1</td><td class="pm-c c2">b1</td><td class="pm-c c1">a2</td><td class="pm-c c2 is-hl">b2</td><td class="pm-c c1 is-hl">a3</td><td class="pm-c c2">b3</td></tr></tbody></table></div>
 
     <!-- /gen -->
 
@@ -239,10 +239,10 @@ added: 2026-11-01
 
     <div class="steps" markdown>
 
-    1. **קטע ראשון :** כל המערך, \( 2m \) איברים, \( m \) מכל צד.
-    2. **החלוקה :** ‏\( h = \lfloor m/2 \rfloor \), ‏\( A_1 \) ו-\( B_1 \) באורך \( h \), ‏\( A_2 \) ו-\( B_2 \) באורך \( m - h \).
-    3. **הסיבוב :** הקטע \( A_2 B_1 \) (מ-\( h \) עד \( m + h \)) מסתובב שמאלה ב-\( m - h \), ונהיה \( B_1 A_2 \).
-    4. **שני תת-קטעים :** ‏\( A_1 B_1 \) עם \( h \) מכל צד, ו-\( A_2 B_2 \) עם \( m - h \) מכל צד. קטע עם
+    1. **קטע ראשון :** כל המערך, \( 2m \) איברים, \( m \) מכל צד.
+    2. **החלוקה :** ‏\( h = \lfloor m/2 \rfloor \), ‏\( A_1 \) ו-\( B_1 \) באורך \( h \), ‏\( A_2 \) ו-\( B_2 \) באורך \( m - h \).
+    3. **הסיבוב :** הקטע \( A_2 B_1 \) (מ-\( h \) עד \( m + h \)) מסתובב שמאלה ב-\( m - h \), ונהיה \( B_1 A_2 \).
+    4. **שני תת-קטעים :** ‏\( A_1 B_1 \) עם \( h \) מכל צד, ו-\( A_2 B_2 \) עם \( m - h \) מכל צד. קטע עם
        \( m \le 1 \) כבר משולב.
 
     </div>
@@ -350,23 +350,23 @@ added: 2026-11-01
     \( O(M) \) הכפלות של מספרים קטנים, ולא דורשת חפיסה בכלל.
 
 ??? followup "שאלות המשך"
-    - **הקלף העליון למקום \( p \) :** איך מעבירים את הקלף העליון למקום \( p \) (מ-0) בערבובים מושלמים בלבד?
+    - **הקלף העליון למקום \( p \) :** איך מעבירים את הקלף העליון למקום \( p \) (מ-0) בערבובים מושלמים בלבד?
 
         ??? fu-answer "תשובה"
             כותבים את \( p \) בבינארית ועוברים מהביט העליון : 1 הוא in-shuffle (‏\( x \to 2x + 1 \)), ו-0 הוא
             out-shuffle (‏\( x \to 2x \)). זה הטריק של Alex Elmsley.
 
-    - **שילוב של \( k \) ערימות :** מחלקים ל-\( k \) ערימות שוות ומשלבים. כמה ערבובים?
+    - **שילוב של \( k \) ערימות :** מחלקים ל-\( k \) ערימות שוות ומשלבים. כמה ערבובים?
 
         ??? fu-answer "תשובה"
             אותו רעיון : ‏\( p \to kp \bmod (n - 1) \), ולכן הסדר של \( k \) מודולו \( n - 1 \), כש-\( k \) זר ל-\( n - 1 \).
 
-    - **המקום של קלף אחרי \( e \) ערבובים :** בלי לסמלץ?
+    - **המקום של קלף אחרי \( e \) ערבובים :** בלי לסמלץ?
 
         ??? fu-answer "תשובה"
             ‏\( 2^e p \bmod M \), עם חזקה מהירה (ריבוע וכפל) : ‏\( O(\log e) \) הכפלות.
 
-    - **‏\( n = 2^j \) בחומרה :** מה זה out-shuffle על הכתובות?
+    - **‏\( n = 2^j \) בחומרה :** מה זה out-shuffle על הכתובות?
 
         ??? fu-answer "תשובה"
             סיבוב של ביטי הכתובת שמאלה (perfect shuffle network). ‏\( j \) סיבובים מחזירים כל כתובת למקומה.

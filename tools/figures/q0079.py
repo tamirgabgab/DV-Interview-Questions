@@ -88,7 +88,7 @@ def pair_grid() -> str:
             x = x0 + c * (cw + gap)
             prob, out, cls = cells[(first, second)]
             s.append(f'<rect class="bc-cell {cls}" x="{x}" y="{y}" width="{cw}" height="{ch}" rx="6"/>')
-            s.append(f'<text class="bc-prob" x="{x + cw / 2:.1f}" y="{y + 34}" text-anchor="middle">{first}{second} : {prob}</text>')
+            s.append(f'<text class="bc-prob" x="{x + cw / 2:.1f}" y="{y + 34}" text-anchor="middle">{first}{second} : {prob}</text>')
             s.append(f'<text class="bc-out" x="{x + cw / 2:.1f}" y="{y + 66}" text-anchor="middle">→ {out}</text>')
     return "".join(s) + "</svg>"
 

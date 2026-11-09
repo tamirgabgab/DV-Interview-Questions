@@ -170,7 +170,7 @@ def step_words(m, s, caps, names=None):
 
 def contents(s, caps, names=None):
     """The contents after a step: "A = 3, B = 4" isolated left to right, or by capacity
-    in Hebrew order ("בכדים של 8, 5 ו-3 : 4, 4 ו-0")."""
+    in Hebrew order ("בכדים של 8, 5 ו-3 : 4, 4 ו-0")."""
     if names:
         return f"ב-{names[0]} יש {s[0]}, וב-{names[1]} יש {s[1]}"
     return (f"בכדים של {', '.join(map(str, caps[:-1]))} ו-{caps[-1]}{NB}: "
@@ -221,7 +221,7 @@ def jugs_svg(caps, amounts, aria, names=None, labels=None, changed=(), pour=None
 
 
 def statement_figure():
-    return jugs_svg((A, B), (0, 0), "שני כדים ריקים בלי סימונים : A מחזיק 3 ליטר ו-B מחזיק 5 ליטר", names=NAMES)
+    return jugs_svg((A, B), (0, 0), "שני כדים ריקים בלי סימונים : A מחזיק 3 ליטר ו-B מחזיק 5 ליטר", names=NAMES)
 
 
 def statement_legend():
@@ -282,7 +282,7 @@ def grid_figure(caps, dist, paths, goal, aria, names=("A", "B"), dims=(0, 1), fi
                 cls = "wj-goal" if goal(x, y) else "wj-reach"
                 c.add(f'<circle class="{cls}" cx="{c.X(x):.1f}" cy="{c.Y(y):.1f}" r="6.5"><title>{names[0]} = {x}, {names[1]} = {y}</title></circle>')
             else:
-                c.add(f'<circle class="wj-never" cx="{c.X(x):.1f}" cy="{c.Y(y):.1f}" r="4.5"><title>{names[0]} = {x}, {names[1]} = {y} : לא מגיעים</title></circle>')
+                c.add(f'<circle class="wj-never" cx="{c.X(x):.1f}" cy="{c.Y(y):.1f}" r="4.5"><title>{names[0]} = {x}, {names[1]} = {y} : לא מגיעים</title></circle>')
     return c.svg()
 
 
@@ -290,7 +290,7 @@ def grid2():
     d = distances((A, B))
     paths = [("alt", [(0, 0)] + [s for _, s in OTHER]), ("best", [(0, 0)] + [s for _, s in PLAN])]
     return grid_figure((A, B), d, paths, lambda x, y: T in (x, y),
-                       "מרחב המצבים של שני הכדים : A לרוחב מ-0 עד 3, B לגובה מ-0 עד 5. 16 מצבים נגישים, כולם על השפה, "
+                       "מרחב המצבים של שני הכדים : A לרוחב מ-0 עד 3, B לגובה מ-0 עד 5. 16 מצבים נגישים, כולם על השפה, "
                        "ו-8 המצבים שבפנים לא נגישים. המסלול של 6 צעדים והמסלול של 8 צעדים מסומנים")
 
 
@@ -346,7 +346,7 @@ def grid3():
 
 def grid3_legend():
     return ('<span class="viz-legend"><span><i class="wj-key-reach"></i>מצב שמגיעים אליו</span>'
-            '<span><i class="wj-key-goal"></i>החלוקה : 4 ו-4</span><span><i class="wj-key-never"></i>מצב שלא מגיעים אליו</span>'
+            '<span><i class="wj-key-goal"></i>החלוקה : 4 ו-4</span><span><i class="wj-key-never"></i>מצב שלא מגיעים אליו</span>'
             '<span><i class="wj-key-best"></i>7 המזיגות, מתחילים מ-8 ל-5</span><span><i class="wj-key-alt"></i>8 המזיגות, מתחילים מ-8 ל-3</span></span>')
 
 

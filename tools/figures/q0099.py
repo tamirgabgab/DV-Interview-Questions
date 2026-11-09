@@ -25,7 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 RLM = "‏"
-NB = " "
+NB = " "
 
 IL = "IL62 0108 0000 0009 9999 999"
 EXAMPLES = (IL, "GB82 WEST 1234 5698 7654 32", "DE89 3704 0044 0532 0130 00")
@@ -344,7 +344,7 @@ def datapath_svg() -> str:
     def lab(x, y, t, anchor="middle"):
         return f'<text class="ih-wlab" x="{x}" y="{y}" text-anchor="{anchor}">{t}</text>'
     o = [f'<svg class="figure ih-fig ih-dp" viewBox="0 0 {W} {H}" direction="ltr" style="max-width:{W / 16:g}rem" role="img" '
-         'aria-label="תרשים המלבנים של הבודק : שלושה רגיסטרים, h ו-r של 7 ביטים ומונה n של 3 ביטים. הבקרה מחשבת head כש-r לפחות 97 '
+         'aria-label="תרשים המלבנים של הבודק : שלושה רגיסטרים, h ו-r של 7 ביטים ומונה n של 3 ביטים. הבקרה מחשבת head כש-r לפחות 97 '
          'ו-tail כש-n גדול מ-0. מרבב בוחר את h בזמן הראש ואת r אחריו, מרבב שני מכניס 0 במקום הספרה בזמן הזנב, '
          'בלוק אחד מחשב 10x ועוד הספרה ובלוק אחד mod 97. התוצאה נכתבת ל-h בזמן הראש ול-r אחריו, והאות last של הספרה האחרונה טוען n = 1 ומתחיל את הזנב. בסוף בודקים אם y ועוד h '
          'שווה 1 או 98">', _arrow_defs("ih-hb")]

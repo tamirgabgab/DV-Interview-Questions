@@ -207,7 +207,7 @@ def legend(directed=False, weighted=True):
     if weighted:
         items.append(('nd-key-w', 'המשקל של הקשת, הזמן שהיא לוקחת'))
     if directed:
-        items.append(('nd-key-far', 'צומת שאף מסלול לא מגיע אליו : −1'))
+        items.append(('nd-key-far', 'צומת שאף מסלול לא מגיע אליו : −1'))
     return '<span class="viz-legend">' + "".join(f'<span><i class="{c}"></i>{t}</span>' for c, t in items) + '</span>'
 
 
@@ -235,7 +235,7 @@ def table_bfs(n, edges, k):
         j = i + 1
         while j < len(ev) and ev[j]["kind"] == "relax":
             r = ev[j]
-            rel.append(f"{RLM}{r['v']} : " + (f"מקבל את הזמן {r['nd']}, נכנס לתור" if r["improved"] else "כבר יש לו זמן"))
+            rel.append(f"{RLM}{r['v']} : " + (f"מקבל את הזמן {r['nd']}, נכנס לתור" if r["improved"] else "כבר יש לו זמן"))
             j += 1
         last = ev[j - 1]
         q = tl([str(x) for x in last["q"]]) if last["q"] else "ריק"
@@ -260,7 +260,7 @@ def table_dijkstra(n, edges, k, directed=False):
             continue
         step += 1
         if e["kind"] == "skip":
-            out.append(f"| {RLM}{step} | {tl([f'({e['d']},{e['u']})'])} ישנה : {e['u']} כבר הסתיים בזמן {e['t'][e['u'] - 1]}, מדלגים | אין | "
+            out.append(f"| {RLM}{step} | {tl([f'({e['d']},{e['u']})'])} ישנה : {e['u']} כבר הסתיים בזמן {e['t'][e['u'] - 1]}, מדלגים | אין | "
                        f"{heap_cell(e['heap'])} | {tl([str(x) for x in e['settled']])} | {times_cell(e['t'])} |")
             continue
         rel = []
@@ -268,7 +268,7 @@ def table_dijkstra(n, edges, k, directed=False):
         while j < len(ev) and ev[j]["kind"] == "relax":
             r = ev[j]
             old = "∞" if r["old"] is None else str(r["old"])
-            rel.append(f"{RLM}{r['v']} : {RLM}<span dir=\"ltr\">{e['d']} + {r['w']} = {r['nd']}</span> " +
+            rel.append(f"{RLM}{r['v']} : {RLM}<span dir=\"ltr\">{e['d']} + {r['w']} = {r['nd']}</span> " +
                        (f"מול {old}, משתפר ונכנס" if r["improved"] else f"מול {old}, לא משתפר"))
             j += 1
         last = ev[j - 1]
@@ -299,12 +299,12 @@ def blocks():
     ev_b = dijkstra_trace(N, EDGES, K)
     ev_c = dijkstra_trace(N, EDGES, K, directed=True)
     fig_a = graph_svg(N, EDGES_A, K, ev_a[-1]["t"], parents(ev_a),
-                      "הדוגמה : שישה צמתים על מעגל, שבע קשתות ללא משקל, המקור 1 ; ליד כל צומת הזמן שבו האות מגיע אליו, וקשתות עץ ה-BFS מודגשות",
+                      "הדוגמה : שישה צמתים על מעגל, שבע קשתות ללא משקל, המקור 1 ; ליד כל צומת הזמן שבו האות מגיע אליו, וקשתות עץ ה-BFS מודגשות",
                       weighted=False, cls="nd-a")
     fig_b = graph_svg(N, EDGES, K, ev_b[-1]["t"], parents(ev_b),
-                      "הדוגמה עם משקלים : ליד כל צומת הזמן הקצר ביותר מהמקור 1, וקשתות עץ המסלולים הקצרים מודגשות", cls="nd-b")
+                      "הדוגמה עם משקלים : ליד כל צומת הזמן הקצר ביותר מהמקור 1, וקשתות עץ המסלולים הקצרים מודגשות", cls="nd-b")
     fig_c = graph_svg(N, EDGES, K, ev_c[-1]["t"], parents(ev_c),
-                      "הדוגמה עם קשתות חד-כיווניות : הצומת 6 לא מושג, והצומת 3 מקבל את האות רק בזמן 5 דרך הקשת הישירה", directed=True, cls="nd-c")
+                      "הדוגמה עם קשתות חד-כיווניות : הצומת 6 לא מושג, והצומת 3 מקבל את האות רק בזמן 5 דרך הקשת הישירה", directed=True, cls="nd-c")
     return [fig_a, legend(weighted=False), table_bfs(N, EDGES_A, K),
             fig_b, legend(), table_dijkstra(N, EDGES, K), table_bfs_vs_dijkstra(N, EDGES, K),
             fig_c, legend(directed=True), table_dijkstra(N, EDGES, K, directed=True)]

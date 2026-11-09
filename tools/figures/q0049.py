@@ -82,7 +82,7 @@ def arrow_line(a, b):
 
 def figure():
     s = (f'<svg class="figure uv-fig" viewBox="0 0 {W} {H}" style="max-width:42rem" role="img" '
-         'aria-label="סביבת UVM : test, env, שני agents, scoreboard ו-coverage מעל ה-DUT, עם ה-interfaces ביניהם">'
+         'aria-label="סביבת UVM : test, env, שני agents, scoreboard ו-coverage מעל ה-DUT, עם ה-interfaces ביניהם">'
          '<defs><marker id="uv-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
          '<path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs>')
     for c, (label, x, y, w, h, cont) in LAYOUT.items():
@@ -101,7 +101,7 @@ def figure():
 
 
 def legend():
-    return ('<span class="viz-legend"><span><i class="uv-key-tlm"></i>חיבור TLM : טרנזקציות</span>'
+    return ('<span class="viz-legend"><span><i class="uv-key-tlm"></i>חיבור TLM : טרנזקציות</span>'
             '<span><i class="uv-key-pin"></i>אותות דרך ה-interface</span></span>')
 
 
@@ -123,10 +123,10 @@ def connections_table():
 
 PHASES = [
     ("‏`build_phase`", "מלמעלה למטה", "יצירת הרכיבים (`type_id::create`) ולקיחת הגדרות מ-`config_db`"),
-    ("‏`connect_phase`", "מלמטה למעלה", "חיבור ה-ports : ‏driver ל-sequencer, מוניטורים ל-scoreboard"),
+    ("‏`connect_phase`", "מלמטה למעלה", "חיבור ה-ports : ‏driver ל-sequencer, מוניטורים ל-scoreboard"),
     ("‏`end_of_elaboration_phase`", "מלמטה למעלה", "הדפסת הטופולוגיה, בדיקות שהכול מחובר"),
     ("‏`run_phase`", "במקביל, זמן סימולציה", "ה-test מרים objection, מריץ sequences ומוריד objection"),
-    ("‏`extract` / `check` / `report`", "מלמטה למעלה", "בדיקות סוף : תורים ריקים ב-scoreboard, סיכום שגיאות"),
+    ("‏`extract` / `check` / `report`", "מלמטה למעלה", "בדיקות סוף : תורים ריקים ב-scoreboard, סיכום שגיאות"),
 ]
 
 

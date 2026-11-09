@@ -11,19 +11,19 @@ added: 2026-11-05
 
 ## השאלה
 
-יש שני כדים בלי שום סימון : כד **A** מחזיק בדיוק 3 ליטר, וכד **B** מחזיק בדיוק 5 ליטר. יש
-ברז עם מים בלי הגבלה, וכיור. כל **צעד** הוא אחד משלושה :
+יש שני כדים בלי שום סימון : כד **A** מחזיק בדיוק 3 ליטר, וכד **B** מחזיק בדיוק 5 ליטר. יש
+ברז עם מים בלי הגבלה, וכיור. כל **צעד** הוא אחד משלושה :
 
-- **מילוי :** ממלאים כד מהברז עד שהוא מלא.
-- **ריקון :** שופכים את כל מה שבכד לכיור.
-- **מזיגה :** מוזגים מכד אחד לשני, עד שהראשון ריק או שהשני מלא, מה שקורה קודם.
+- **מילוי :** ממלאים כד מהברז עד שהוא מלא.
+- **ריקון :** שופכים את כל מה שבכד לכיור.
+- **מזיגה :** מוזגים מכד אחד לשני, עד שהראשון ריק או שהשני מלא, מה שקורה קודם.
 
-אין אפשרות לעצור באמצע מזיגה, כי אין על הכדים סימונים. המטרה : שבאחד הכדים יהיו
+אין אפשרות לעצור באמצע מזיגה, כי אין על הכדים סימונים. המטרה : שבאחד הכדים יהיו
 **בדיוק 4 ליטר**.
 
 <!-- gen 0 -->
 
-<svg class="figure wj-fig" viewBox="0 0 198 190" style="max-width:12.4rem" role="img" aria-label="שני כדים ריקים בלי סימונים : A מחזיק 3 ליטר ו-B מחזיק 5 ליטר"><line class="wj-lev" x1="12" x2="20" y1="122" y2="122"/><line class="wj-lev" x1="12" x2="20" y1="100" y2="100"/><path class="wj-jug" d="M12,78 L12,144 L76,144 L76,78"/><text class="wj-num" x="44.0" y="134" text-anchor="middle">0</text><text class="wj-name" x="44.0" y="164" text-anchor="middle">A</text><text class="wj-cap" x="44.0" y="182" text-anchor="middle" direction="rtl">3 ליטר</text><line class="wj-lev" x1="122" x2="130" y1="122" y2="122"/><line class="wj-lev" x1="122" x2="130" y1="100" y2="100"/><line class="wj-lev" x1="122" x2="130" y1="78" y2="78"/><line class="wj-lev" x1="122" x2="130" y1="56" y2="56"/><path class="wj-jug" d="M122,34 L122,144 L186,144 L186,34"/><text class="wj-num" x="154.0" y="134" text-anchor="middle">0</text><text class="wj-name" x="154.0" y="164" text-anchor="middle">B</text><text class="wj-cap" x="154.0" y="182" text-anchor="middle" direction="rtl">5 ליטר</text></svg>
+<svg class="figure wj-fig" viewBox="0 0 198 190" style="max-width:12.4rem" role="img" aria-label="שני כדים ריקים בלי סימונים : A מחזיק 3 ליטר ו-B מחזיק 5 ליטר"><line class="wj-lev" x1="12" x2="20" y1="122" y2="122"/><line class="wj-lev" x1="12" x2="20" y1="100" y2="100"/><path class="wj-jug" d="M12,78 L12,144 L76,144 L76,78"/><text class="wj-num" x="44.0" y="134" text-anchor="middle">0</text><text class="wj-name" x="44.0" y="164" text-anchor="middle">A</text><text class="wj-cap" x="44.0" y="182" text-anchor="middle" direction="rtl">3 ליטר</text><line class="wj-lev" x1="122" x2="130" y1="122" y2="122"/><line class="wj-lev" x1="122" x2="130" y1="100" y2="100"/><line class="wj-lev" x1="122" x2="130" y1="78" y2="78"/><line class="wj-lev" x1="122" x2="130" y1="56" y2="56"/><path class="wj-jug" d="M122,34 L122,144 L186,144 L186,34"/><text class="wj-num" x="154.0" y="134" text-anchor="middle">0</text><text class="wj-name" x="154.0" y="164" text-anchor="middle">B</text><text class="wj-cap" x="154.0" y="182" text-anchor="middle" direction="rtl">5 ליטר</text></svg>
 
 <!-- /gen -->
 
@@ -34,12 +34,12 @@ added: 2026-11-05
 <!-- /gen -->
 
 ??? interviewer "מה המראיין בודק"
-    - **ניסוי מסודר :** האם המועמד רואה שמזיגה היא כלי מדידה ("מה שנשאר ב-B אחרי שמילאנו
+    - **ניסוי מסודר :** האם המועמד רואה שמזיגה היא כלי מדידה ("מה שנשאר ב-B אחרי שמילאנו
       את A"), במקום לנחש צעדים.
-    - **מינימליות :** האם הוא יודע להסביר למה אין דרך קצרה יותר, ולא רק להראות דרך אחת.
-    - **הכללה :** מתי אפשר בכלל. האם הוא מגיע ל-gcd, ומוכיח את שני הכיוונים, גם "רק
+    - **מינימליות :** האם הוא יודע להסביר למה אין דרך קצרה יותר, ולא רק להראות דרך אחת.
+    - **הכללה :** מתי אפשר בכלל. האם הוא מגיע ל-gcd, ומוכיח את שני הכיוונים, גם "רק
       כפולות" וגם "כל הכפולות".
-    - **מרחב מצבים :** האם הוא מתאר מצב כזוג כמויות, רואה גרף, ובוחר BFS למסלול הקצר.
+    - **מרחב מצבים :** האם הוא מתאר מצב כזוג כמויות, רואה גרף, ובוחר BFS למסלול הקצר.
 
 ---
 
@@ -55,7 +55,7 @@ added: 2026-11-05
 
 ??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
-        שישה צעדים : ממלאים את B, מוזגים ממנו ל-A (ב-B נשארים 2), מרוקנים את A, מוזגים את
+        שישה צעדים : ממלאים את B, מוזגים ממנו ל-A (ב-B נשארים 2), מרוקנים את A, מוזגים את
         ה-2 ל-A, ממלאים שוב את B, ומשלימים ממנו את A, שחסר בו ליטר אחד. ב-B נשארים 4.
         מי שמתחיל במילוי A מגיע ל-4 רק אחרי שמונה צעדים, ופחות משישה אי אפשר.
 
@@ -65,25 +65,25 @@ added: 2026-11-05
 
     המזיגה היא כלי המדידה היחיד. מזיגה של B מלא לתוך A ריק משאירה ב-B בדיוק
     ‏\( 5 - 3 = 2 \) ליטר. כשה-2 האלה עוברים ל-A, נשאר ב-A מקום לליטר אחד בדיוק, ולכן
-    מזיגה של B מלא לתוך A מוציאה מ-B ליטר אחד, ונשארים בו \( 5 - 1 = 4 \). בחשבון : מילאנו
+    מזיגה של B מלא לתוך A מוציאה מ-B ליטר אחד, ונשארים בו \( 5 - 1 = 4 \). בחשבון : מילאנו
     את B פעמיים ושפכנו את A פעמיים, \( 2 \cdot 5 - 2 \cdot 3 = 4 \).
 
     #### השלבים { .sol-steps }
 
     <div class="steps" markdown>
 
-    1. **מילוי B :** ב-B יש 5.
-    2. **מזיגה מ-B ל-A :** ‏A מתמלא ב-3, וב-B נשארים 2.
-    3. **ריקון A :** ‏A ריק, וב-B עדיין 2.
-    4. **מזיגה מ-B ל-A :** ה-2 עוברים ל-A, ו-B ריק.
-    5. **מילוי B :** ב-B יש 5, וב-A יש 2.
-    6. **מזיגה מ-B ל-A :** ב-A יש מקום לליטר אחד בלבד. הוא מתמלא, וב-B נשארים 4.
+    1. **מילוי B :** ב-B יש 5.
+    2. **מזיגה מ-B ל-A :** ‏A מתמלא ב-3, וב-B נשארים 2.
+    3. **ריקון A :** ‏A ריק, וב-B עדיין 2.
+    4. **מזיגה מ-B ל-A :** ה-2 עוברים ל-A, ו-B ריק.
+    5. **מילוי B :** ב-B יש 5, וב-A יש 2.
+    6. **מזיגה מ-B ל-A :** ב-A יש מקום לליטר אחד בלבד. הוא מתמלא, וב-B נשארים 4.
 
     </div>
 
     #### למה זה נכון { .sol-proof }
 
-    **צעד אחרי צעד.** לחצו "הבא" כדי לעקוב אחרי הכמות בכל כד :
+    **צעד אחרי צעד.** לחצו "הבא" כדי לעקוב אחרי הכמות בכל כד :
 
     <!-- gen 2 -->
 
@@ -106,7 +106,7 @@ added: 2026-11-05
 
     **הדרך השנייה.** מי שמתחיל במילוי A וממשיך לשפוך את A לתוך B, כל פעם ש-B מתמלא
     מרוקנים אותו, מגיע ל-4 בתוך B, אבל רק אחרי שמונה צעדים. כאן מילאנו את A שלוש פעמים
-    ושפכנו את B פעם אחת : \( 3 \cdot 3 - 5 = 4 \).
+    ושפכנו את B פעם אחת : \( 3 \cdot 3 - 5 = 4 \).
 
     <!-- gen 4 -->
 
@@ -125,7 +125,7 @@ added: 2026-11-05
 
     **למה לא פחות משישה.** בשני הכדים יש רק 24 מצבים אפשריים, ומהם מגיעים רק ל-16 (סעיף ב
     מראה את כולם). חיפוש לרוחב, צעד אחרי צעד, עובר על כל המצבים שמגיעים אליהם בצעד אחד,
-    אחר כך בשניים, וכן הלאה. מצב עם 4 ליטר מופיע לראשונה בצעד השישי, ויש רק מסלול אחד כזה :
+    אחר כך בשניים, וכן הלאה. מצב עם 4 ליטר מופיע לראשונה בצעד השישי, ויש רק מסלול אחד כזה :
     זה שלמעלה.
 
     #### סיבוכיות { .sol-cost }
@@ -151,7 +151,7 @@ added: 2026-11-05
     צעד עולה אחד. איזה חיפוש מוצא את המסלול הקצר?
 
 ??? tip "רמז 3"
-    לכיוון השני של ההוכחה : ממלאים רק את A, שופכים אותו לתוך B, ומרוקנים את B כשהוא מלא.
+    לכיוון השני של ההוכחה : ממלאים רק את A, שופכים אותו לתוך B, ומרוקנים את B כשהוא מלא.
     מה יש ב-B אחרי שמזגנו בסך הכול \( k \) כדים של A?
 
 ??? success "פתרון סעיף ב"
@@ -165,17 +165,17 @@ added: 2026-11-05
 
     #### הרעיון { .sol-idea }
 
-    **המצב.** הזוג \( (x, y) \) : כמה יש ב-A וכמה ב-B. ההתחלה \( (0, 0) \), ויש לכל
+    **המצב.** הזוג \( (x, y) \) : כמה יש ב-A וכמה ב-B. ההתחלה \( (0, 0) \), ויש לכל
     היותר \( (a + 1)(b + 1) \) זוגות. כל צעד מעביר מזוג לזוג, ולכן התוכנית היא מסלול
     בגרף, והתוכנית הקצרה היא המסלול הקצר. כל הקשתות שוות, ולכן BFS.
 
-    **מה מגיעים אליו.** אחרי כל צעד אחד הכדים ריק או מלא : מילוי וריקון קובעים כד אחד,
+    **מה מגיעים אליו.** אחרי כל צעד אחד הכדים ריק או מלא : מילוי וריקון קובעים כד אחד,
     ומזיגה נגמרת כשהראשון ריק או שהשני מלא. לכן כל המצבים הנגישים יושבים על שפת הרשת. ב-3
-    ו-5 אלה 16 מתוך 24, ו-8 המצבים שבפנים לא נגישים לעולם :
+    ו-5 אלה 16 מתוך 24, ו-8 המצבים שבפנים לא נגישים לעולם :
 
     <!-- gen 5 -->
 
-    <svg class="perf-chart" viewBox="0 0 244 244" style="max-width:15.2rem" role="img" aria-label="מרחב המצבים של שני הכדים : A לרוחב מ-0 עד 3, B לגובה מ-0 עד 5. 16 מצבים נגישים, כולם על השפה, ו-8 המצבים שבפנים לא נגישים. המסלול של 6 צעדים והמסלול של 8 צעדים מסומנים"><line class="grid" x1="67.5" x2="67.5" y1="6" y2="212"/><text class="tick" x="67.5" y="230" text-anchor="middle">0</text><line class="grid" x1="114.5" x2="114.5" y1="6" y2="212"/><text class="tick" x="114.5" y="230" text-anchor="middle">1</text><line class="grid" x1="161.5" x2="161.5" y1="6" y2="212"/><text class="tick" x="161.5" y="230" text-anchor="middle">2</text><line class="grid" x1="208.5" x2="208.5" y1="6" y2="212"/><text class="tick" x="208.5" y="230" text-anchor="middle">3</text><line class="grid" x1="44" x2="232" y1="195.3" y2="195.3"/><text class="tick" x="36" y="199.3" text-anchor="end">0</text><line class="grid" x1="44" x2="232" y1="162.0" y2="162.0"/><text class="tick" x="36" y="166.0" text-anchor="end">1</text><line class="grid" x1="44" x2="232" y1="128.7" y2="128.7"/><text class="tick" x="36" y="132.7" text-anchor="end">2</text><line class="grid" x1="44" x2="232" y1="95.3" y2="95.3"/><text class="tick" x="36" y="99.3" text-anchor="end">3</text><line class="grid" x1="44" x2="232" y1="62.0" y2="62.0"/><text class="tick" x="36" y="66.0" text-anchor="end">4</text><line class="grid" x1="44" x2="232" y1="28.7" y2="28.7"/><text class="tick" x="36" y="32.7" text-anchor="end">5</text><line class="axis" x1="44" x2="232" y1="212" y2="212"/><text class="tick" x="232.0" y="242.0" text-anchor="end">A</text><text class="tick" x="34.0" y="22.0" text-anchor="end">B</text><polyline class="wj-route is-alt" points="67.5,195.3 208.5,195.3 67.5,95.3 208.5,95.3 114.5,28.7 114.5,195.3 67.5,162.0 208.5,162.0 67.5,62.0" fill="none" stroke-width="2.5" stroke-dasharray="6 5"/><polyline class="wj-route" points="67.5,195.3 67.5,28.7 208.5,128.7 67.5,128.7 161.5,195.3 161.5,28.7 208.5,62.0" fill="none" stroke-width="3"/><circle class="wj-reach" cx="67.5" cy="195.3" r="6.5"><title>A = 0, B = 0</title></circle><circle class="wj-reach" cx="67.5" cy="162.0" r="6.5"><title>A = 0, B = 1</title></circle><circle class="wj-reach" cx="67.5" cy="128.7" r="6.5"><title>A = 0, B = 2</title></circle><circle class="wj-reach" cx="67.5" cy="95.3" r="6.5"><title>A = 0, B = 3</title></circle><circle class="wj-goal" cx="67.5" cy="62.0" r="6.5"><title>A = 0, B = 4</title></circle><circle class="wj-reach" cx="67.5" cy="28.7" r="6.5"><title>A = 0, B = 5</title></circle><circle class="wj-reach" cx="114.5" cy="195.3" r="6.5"><title>A = 1, B = 0</title></circle><circle class="wj-never" cx="114.5" cy="162.0" r="4.5"><title>A = 1, B = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="114.5" cy="128.7" r="4.5"><title>A = 1, B = 2 : לא מגיעים</title></circle><circle class="wj-never" cx="114.5" cy="95.3" r="4.5"><title>A = 1, B = 3 : לא מגיעים</title></circle><circle class="wj-never" cx="114.5" cy="62.0" r="4.5"><title>A = 1, B = 4 : לא מגיעים</title></circle><circle class="wj-reach" cx="114.5" cy="28.7" r="6.5"><title>A = 1, B = 5</title></circle><circle class="wj-reach" cx="161.5" cy="195.3" r="6.5"><title>A = 2, B = 0</title></circle><circle class="wj-never" cx="161.5" cy="162.0" r="4.5"><title>A = 2, B = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="161.5" cy="128.7" r="4.5"><title>A = 2, B = 2 : לא מגיעים</title></circle><circle class="wj-never" cx="161.5" cy="95.3" r="4.5"><title>A = 2, B = 3 : לא מגיעים</title></circle><circle class="wj-never" cx="161.5" cy="62.0" r="4.5"><title>A = 2, B = 4 : לא מגיעים</title></circle><circle class="wj-reach" cx="161.5" cy="28.7" r="6.5"><title>A = 2, B = 5</title></circle><circle class="wj-reach" cx="208.5" cy="195.3" r="6.5"><title>A = 3, B = 0</title></circle><circle class="wj-reach" cx="208.5" cy="162.0" r="6.5"><title>A = 3, B = 1</title></circle><circle class="wj-reach" cx="208.5" cy="128.7" r="6.5"><title>A = 3, B = 2</title></circle><circle class="wj-reach" cx="208.5" cy="95.3" r="6.5"><title>A = 3, B = 3</title></circle><circle class="wj-goal" cx="208.5" cy="62.0" r="6.5"><title>A = 3, B = 4</title></circle><circle class="wj-reach" cx="208.5" cy="28.7" r="6.5"><title>A = 3, B = 5</title></circle></svg>
+    <svg class="perf-chart" viewBox="0 0 244 244" style="max-width:15.2rem" role="img" aria-label="מרחב המצבים של שני הכדים : A לרוחב מ-0 עד 3, B לגובה מ-0 עד 5. 16 מצבים נגישים, כולם על השפה, ו-8 המצבים שבפנים לא נגישים. המסלול של 6 צעדים והמסלול של 8 צעדים מסומנים"><line class="grid" x1="67.5" x2="67.5" y1="6" y2="212"/><text class="tick" x="67.5" y="230" text-anchor="middle">0</text><line class="grid" x1="114.5" x2="114.5" y1="6" y2="212"/><text class="tick" x="114.5" y="230" text-anchor="middle">1</text><line class="grid" x1="161.5" x2="161.5" y1="6" y2="212"/><text class="tick" x="161.5" y="230" text-anchor="middle">2</text><line class="grid" x1="208.5" x2="208.5" y1="6" y2="212"/><text class="tick" x="208.5" y="230" text-anchor="middle">3</text><line class="grid" x1="44" x2="232" y1="195.3" y2="195.3"/><text class="tick" x="36" y="199.3" text-anchor="end">0</text><line class="grid" x1="44" x2="232" y1="162.0" y2="162.0"/><text class="tick" x="36" y="166.0" text-anchor="end">1</text><line class="grid" x1="44" x2="232" y1="128.7" y2="128.7"/><text class="tick" x="36" y="132.7" text-anchor="end">2</text><line class="grid" x1="44" x2="232" y1="95.3" y2="95.3"/><text class="tick" x="36" y="99.3" text-anchor="end">3</text><line class="grid" x1="44" x2="232" y1="62.0" y2="62.0"/><text class="tick" x="36" y="66.0" text-anchor="end">4</text><line class="grid" x1="44" x2="232" y1="28.7" y2="28.7"/><text class="tick" x="36" y="32.7" text-anchor="end">5</text><line class="axis" x1="44" x2="232" y1="212" y2="212"/><text class="tick" x="232.0" y="242.0" text-anchor="end">A</text><text class="tick" x="34.0" y="22.0" text-anchor="end">B</text><polyline class="wj-route is-alt" points="67.5,195.3 208.5,195.3 67.5,95.3 208.5,95.3 114.5,28.7 114.5,195.3 67.5,162.0 208.5,162.0 67.5,62.0" fill="none" stroke-width="2.5" stroke-dasharray="6 5"/><polyline class="wj-route" points="67.5,195.3 67.5,28.7 208.5,128.7 67.5,128.7 161.5,195.3 161.5,28.7 208.5,62.0" fill="none" stroke-width="3"/><circle class="wj-reach" cx="67.5" cy="195.3" r="6.5"><title>A = 0, B = 0</title></circle><circle class="wj-reach" cx="67.5" cy="162.0" r="6.5"><title>A = 0, B = 1</title></circle><circle class="wj-reach" cx="67.5" cy="128.7" r="6.5"><title>A = 0, B = 2</title></circle><circle class="wj-reach" cx="67.5" cy="95.3" r="6.5"><title>A = 0, B = 3</title></circle><circle class="wj-goal" cx="67.5" cy="62.0" r="6.5"><title>A = 0, B = 4</title></circle><circle class="wj-reach" cx="67.5" cy="28.7" r="6.5"><title>A = 0, B = 5</title></circle><circle class="wj-reach" cx="114.5" cy="195.3" r="6.5"><title>A = 1, B = 0</title></circle><circle class="wj-never" cx="114.5" cy="162.0" r="4.5"><title>A = 1, B = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="114.5" cy="128.7" r="4.5"><title>A = 1, B = 2 : לא מגיעים</title></circle><circle class="wj-never" cx="114.5" cy="95.3" r="4.5"><title>A = 1, B = 3 : לא מגיעים</title></circle><circle class="wj-never" cx="114.5" cy="62.0" r="4.5"><title>A = 1, B = 4 : לא מגיעים</title></circle><circle class="wj-reach" cx="114.5" cy="28.7" r="6.5"><title>A = 1, B = 5</title></circle><circle class="wj-reach" cx="161.5" cy="195.3" r="6.5"><title>A = 2, B = 0</title></circle><circle class="wj-never" cx="161.5" cy="162.0" r="4.5"><title>A = 2, B = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="161.5" cy="128.7" r="4.5"><title>A = 2, B = 2 : לא מגיעים</title></circle><circle class="wj-never" cx="161.5" cy="95.3" r="4.5"><title>A = 2, B = 3 : לא מגיעים</title></circle><circle class="wj-never" cx="161.5" cy="62.0" r="4.5"><title>A = 2, B = 4 : לא מגיעים</title></circle><circle class="wj-reach" cx="161.5" cy="28.7" r="6.5"><title>A = 2, B = 5</title></circle><circle class="wj-reach" cx="208.5" cy="195.3" r="6.5"><title>A = 3, B = 0</title></circle><circle class="wj-reach" cx="208.5" cy="162.0" r="6.5"><title>A = 3, B = 1</title></circle><circle class="wj-reach" cx="208.5" cy="128.7" r="6.5"><title>A = 3, B = 2</title></circle><circle class="wj-reach" cx="208.5" cy="95.3" r="6.5"><title>A = 3, B = 3</title></circle><circle class="wj-goal" cx="208.5" cy="62.0" r="6.5"><title>A = 3, B = 4</title></circle><circle class="wj-reach" cx="208.5" cy="28.7" r="6.5"><title>A = 3, B = 5</title></circle></svg>
 
     <!-- /gen -->
 
@@ -189,13 +189,13 @@ added: 2026-11-05
 
     <div class="steps" markdown>
 
-    1. **בדיקה מראש :** אם \( T > \max(a, b) \) או ש-\( T \) לא מתחלק ב-\( \gcd(a, b) \),
+    1. **בדיקה מראש :** אם \( T > \max(a, b) \) או ש-\( T \) לא מתחלק ב-\( \gcd(a, b) \),
        אין דרך, ואין טעם לחפש.
-    2. **תור והורים :** מכניסים את \( (0, 0) \) לתור, ורושמים שאין לו הורה.
-    3. **הוצאה :** מוציאים זוג. אם באחד הכדים יש \( T \), סיימנו.
-    4. **הרחבה :** מחשבים את ששת הצעדים : מילוי A או B, ריקון A או B, ומזיגה לכל כיוון.
+    2. **תור והורים :** מכניסים את \( (0, 0) \) לתור, ורושמים שאין לו הורה.
+    3. **הוצאה :** מוציאים זוג. אם באחד הכדים יש \( T \), סיימנו.
+    4. **הרחבה :** מחשבים את ששת הצעדים : מילוי A או B, ריקון A או B, ומזיגה לכל כיוון.
        כל זוג חדש מקבל הורה ואת שם הצעד, ונכנס לתור.
-    5. **שחזור :** מהזוג שנמצא הולכים אחורה לפי ההורים, ואז הופכים את הסדר.
+    5. **שחזור :** מהזוג שנמצא הולכים אחורה לפי ההורים, ואז הופכים את הסדר.
 
     </div>
 
@@ -246,7 +246,7 @@ added: 2026-11-05
             return None
         ```
 
-        1. כמה עובר במזיגה : כל מה שיש ב-A, או המקום שנשאר ב-B, הקטן מביניהם.
+        1. כמה עובר במזיגה : כל מה שיש ב-A, או המקום שנשאר ב-B, הקטן מביניהם.
         2. ‏BFS מוציא את הזוגות לפי מרחק עולה מההתחלה, ולכן הזוג הראשון עם \( T \) הוא הקרוב
            ביותר.
         3. זוג שכבר נראה, נראה במרחק קטן או שווה. אין טעם להכניס אותו שוב.
@@ -291,7 +291,7 @@ added: 2026-11-05
         endfunction
         ```
 
-        1. התור מחזיק מפתחות : זוג \( (x, y) \) נשמר כמספר אחד, \( x \cdot (b + 1) + y \).
+        1. התור מחזיק מפתחות : זוג \( (x, y) \) נשמר כמספר אחד, \( x \cdot (b + 1) + y \).
         2. אותם ששה צעדים ובאותו סדר כמו ב-Python, ולכן גם אותה תוכנית.
 
     #### למה זה נכון { .sol-proof }
@@ -306,13 +306,13 @@ added: 2026-11-05
     **כל הכפולות.** נניח \( a \le b \). ממלאים רק את A, שופכים אותו לתוך B, ומרוקנים את B
     בכל פעם שהוא מתמלא. אחרי שמזגנו בסך הכול \( k \) כדים של A, ב-B יש \( k \cdot a \bmod b \)
     (מה שלא נשפך לכיור). כש-\( k \) עובר על \( 0, 1, \dots, b/g - 1 \), השארית
-    \( k \cdot a \bmod b \) עוברת על **כל** הכפולות של \( g \) שקטנות מ-\( b \) : אם שתיים היו
+    \( k \cdot a \bmod b \) עוברת על **כל** הכפולות של \( g \) שקטנות מ-\( b \) : אם שתיים היו
     שוות, \( b \) היה מחלק את \( (k_1 - k_2) \cdot a \), כלומר \( b/g \) מחלק את \( k_1 - k_2 \),
     וזה בלתי אפשרי כש-\( |k_1 - k_2| < b/g \). את \( T = b \) מקבלים במילוי אחד. זה הכיוון
-    השני של הזהות של Bézout : כל כפולה של \( g \) היא \( u \cdot a - v \cdot b \).
+    השני של הזהות של Bézout : כל כפולה של \( g \) היא \( u \cdot a - v \cdot b \).
 
     **הקצר ביותר.** ‏BFS מבקר בזוגות לפי מרחק עולה מ-\( (0, 0) \), ולכן הזוג הראשון שבו יש
-    \( T \) נמצא דרך מסלול באורך מינימלי. הטבלה בודקת את כל זה על כמה דוגמאות :
+    \( T \) נמצא דרך מסלול באורך מינימלי. הטבלה בודקת את כל זה על כמה דוגמאות :
 
     <!-- gen 7 -->
 
@@ -329,10 +329,10 @@ added: 2026-11-05
 
     <!-- /gen -->
 
-    **נסו בעצמכם.** בוחרים \( a \), \( b \) ו-\( T \), ומשחקים בכפתורים : מילוי, ריקון
+    **נסו בעצמכם.** בוחרים \( a \), \( b \) ו-\( T \), ומשחקים בכפתורים : מילוי, ריקון
     ומזיגה. הדף סופר צעדים ומשווה למינימום. "הדרך הקצרה" טוענת את הפתרון של BFS, ואפשר
     לעבור עליו צעד אחרי צעד. ברשת מתחת לכדים כל עיגול הוא זוג \( (x, y) \), והקו הוא הדרך
-    שעברתם :
+    שעברתם :
 
     <div class="explorer" data-kind="jugs" data-a="3" data-b="5" data-t="4"></div>
 
@@ -357,7 +357,7 @@ added: 2026-11-05
 
 ??? success "פתרון סעיף ג"
     !!! answer "תשובה בקצרה"
-        שבע מזיגות : מ-8 ל-5, מ-5 ל-3, מ-3 ל-8, מ-5 ל-3, מ-8 ל-5, מ-5 ל-3 ומ-3 ל-8. בסוף
+        שבע מזיגות : מ-8 ל-5, מ-5 ל-3, מ-3 ל-8, מ-5 ל-3, מ-8 ל-5, מ-5 ל-3 ומ-3 ל-8. בסוף
         יש 4 בכד של 8 ו-4 בכד של 5. מי שמתחיל במזיגה מ-8 ל-3 צריך שמונה, ופחות משבע אי
         אפשר.
 
@@ -376,13 +376,13 @@ added: 2026-11-05
 
     <div class="steps" markdown>
 
-    1. **מ-8 ל-5 :** ‏3, 5 ו-0 (בכדים של 8, 5 ו-3).
-    2. **מ-5 ל-3 :** ‏3, 2 ו-3.
-    3. **מ-3 ל-8 :** ‏6, 2 ו-0.
-    4. **מ-5 ל-3 :** ‏6, 0 ו-2.
-    5. **מ-8 ל-5 :** ‏1, 5 ו-2.
-    6. **מ-5 ל-3 :** הכד של 3 צריך רק ליטר אחד : ‏1, 4 ו-3.
-    7. **מ-3 ל-8 :** ‏4, 4 ו-0.
+    1. **מ-8 ל-5 :** ‏3, 5 ו-0 (בכדים של 8, 5 ו-3).
+    2. **מ-5 ל-3 :** ‏3, 2 ו-3.
+    3. **מ-3 ל-8 :** ‏6, 2 ו-0.
+    4. **מ-5 ל-3 :** ‏6, 0 ו-2.
+    5. **מ-8 ל-5 :** ‏1, 5 ו-2.
+    6. **מ-5 ל-3 :** הכד של 3 צריך רק ליטר אחד : ‏1, 4 ו-3.
+    7. **מ-3 ל-8 :** ‏4, 4 ו-0.
 
     </div>
 
@@ -439,7 +439,7 @@ added: 2026-11-05
             return None
         ```
 
-        1. כמו בסעיף ב : כל מה שיש בכד i, או המקום שנשאר בכד j. מזיגה שלא מעבירה כלום לא
+        1. כמו בסעיף ב : כל מה שיש בכד i, או המקום שנשאר בכד j. מזיגה שלא מעבירה כלום לא
            נחשבת.
 
     === "SystemVerilog"
@@ -481,29 +481,29 @@ added: 2026-11-05
         endfunction
         ```
 
-        1. מצב של שלושה כדים נשמר כמספר אחד, כמו מספר בבסיס מעורב : ספרה לכל כד.
+        1. מצב של שלושה כדים נשמר כמספר אחד, כמו מספר בבסיס מעורב : ספרה לכל כד.
 
     #### למה זה נכון { .sol-proof }
 
     **אותו גרף, אותו BFS.** כל מזיגה היא קשת בין שני מצבים, וכל הקשתות שוות, ולכן BFS מוצא
     מסלול באורך מינימלי. הוא מגיע לחלוקה רק במזיגה השביעית, ויש בדיוק מסלול אחד באורך
     שבע. הרשת מראה את 16 המצבים הנגישים, לפי הכד של 5 לרוחב והכד של 3 לגובה, ואת שתי
-    הדרכים :
+    הדרכים :
 
     <!-- gen 10 -->
 
-    <svg class="perf-chart" viewBox="0 0 336 176" style="max-width:21.0rem" role="img" aria-label="מרחב המצבים של שלושת הכדים לפי הכד של 5 לרוחב והכד של 3 לגובה, והכד של 8 מחזיק את השאר. 16 מצבים נגישים, כולם על השפה. המסלול של 7 מזיגות והמסלול של 8 מזיגות מסומנים"><line class="grid" x1="67.3" x2="67.3" y1="6" y2="144"/><text class="tick" x="67.3" y="162" text-anchor="middle">0</text><line class="grid" x1="114.0" x2="114.0" y1="6" y2="144"/><text class="tick" x="114.0" y="162" text-anchor="middle">1</text><line class="grid" x1="160.7" x2="160.7" y1="6" y2="144"/><text class="tick" x="160.7" y="162" text-anchor="middle">2</text><line class="grid" x1="207.3" x2="207.3" y1="6" y2="144"/><text class="tick" x="207.3" y="162" text-anchor="middle">3</text><line class="grid" x1="254.0" x2="254.0" y1="6" y2="144"/><text class="tick" x="254.0" y="162" text-anchor="middle">4</text><line class="grid" x1="300.7" x2="300.7" y1="6" y2="144"/><text class="tick" x="300.7" y="162" text-anchor="middle">5</text><line class="grid" x1="44" x2="324" y1="127.5" y2="127.5"/><text class="tick" x="36" y="131.5" text-anchor="end">0</text><line class="grid" x1="44" x2="324" y1="94.5" y2="94.5"/><text class="tick" x="36" y="98.5" text-anchor="end">1</text><line class="grid" x1="44" x2="324" y1="61.5" y2="61.5"/><text class="tick" x="36" y="65.5" text-anchor="end">2</text><line class="grid" x1="44" x2="324" y1="28.5" y2="28.5"/><text class="tick" x="36" y="32.5" text-anchor="end">3</text><line class="axis" x1="44" x2="324" y1="144" y2="144"/><text class="tick" x="324.0" y="174.0" text-anchor="end">5</text><text class="tick" x="34.0" y="22.0" text-anchor="end">3</text><polyline class="wj-route is-alt" points="67.3,127.5 67.3,28.5 207.3,127.5 207.3,28.5 300.7,94.5 67.3,94.5 114.0,127.5 114.0,28.5 254.0,127.5" fill="none" stroke-width="2.5" stroke-dasharray="6 5"/><polyline class="wj-route" points="67.3,127.5 300.7,127.5 160.7,28.5 160.7,127.5 67.3,61.5 300.7,61.5 254.0,28.5 254.0,127.5" fill="none" stroke-width="3"/><circle class="wj-reach" cx="67.3" cy="127.5" r="6.5"><title>5 = 0, 3 = 0</title></circle><circle class="wj-reach" cx="67.3" cy="94.5" r="6.5"><title>5 = 0, 3 = 1</title></circle><circle class="wj-reach" cx="67.3" cy="61.5" r="6.5"><title>5 = 0, 3 = 2</title></circle><circle class="wj-reach" cx="67.3" cy="28.5" r="6.5"><title>5 = 0, 3 = 3</title></circle><circle class="wj-reach" cx="114.0" cy="127.5" r="6.5"><title>5 = 1, 3 = 0</title></circle><circle class="wj-never" cx="114.0" cy="94.5" r="4.5"><title>5 = 1, 3 = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="114.0" cy="61.5" r="4.5"><title>5 = 1, 3 = 2 : לא מגיעים</title></circle><circle class="wj-reach" cx="114.0" cy="28.5" r="6.5"><title>5 = 1, 3 = 3</title></circle><circle class="wj-reach" cx="160.7" cy="127.5" r="6.5"><title>5 = 2, 3 = 0</title></circle><circle class="wj-never" cx="160.7" cy="94.5" r="4.5"><title>5 = 2, 3 = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="160.7" cy="61.5" r="4.5"><title>5 = 2, 3 = 2 : לא מגיעים</title></circle><circle class="wj-reach" cx="160.7" cy="28.5" r="6.5"><title>5 = 2, 3 = 3</title></circle><circle class="wj-reach" cx="207.3" cy="127.5" r="6.5"><title>5 = 3, 3 = 0</title></circle><circle class="wj-never" cx="207.3" cy="94.5" r="4.5"><title>5 = 3, 3 = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="207.3" cy="61.5" r="4.5"><title>5 = 3, 3 = 2 : לא מגיעים</title></circle><circle class="wj-reach" cx="207.3" cy="28.5" r="6.5"><title>5 = 3, 3 = 3</title></circle><circle class="wj-goal" cx="254.0" cy="127.5" r="6.5"><title>5 = 4, 3 = 0</title></circle><circle class="wj-never" cx="254.0" cy="94.5" r="4.5"><title>5 = 4, 3 = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="254.0" cy="61.5" r="4.5"><title>5 = 4, 3 = 2 : לא מגיעים</title></circle><circle class="wj-reach" cx="254.0" cy="28.5" r="6.5"><title>5 = 4, 3 = 3</title></circle><circle class="wj-reach" cx="300.7" cy="127.5" r="6.5"><title>5 = 5, 3 = 0</title></circle><circle class="wj-reach" cx="300.7" cy="94.5" r="6.5"><title>5 = 5, 3 = 1</title></circle><circle class="wj-reach" cx="300.7" cy="61.5" r="6.5"><title>5 = 5, 3 = 2</title></circle><circle class="wj-reach" cx="300.7" cy="28.5" r="6.5"><title>5 = 5, 3 = 3</title></circle></svg>
+    <svg class="perf-chart" viewBox="0 0 336 176" style="max-width:21.0rem" role="img" aria-label="מרחב המצבים של שלושת הכדים לפי הכד של 5 לרוחב והכד של 3 לגובה, והכד של 8 מחזיק את השאר. 16 מצבים נגישים, כולם על השפה. המסלול של 7 מזיגות והמסלול של 8 מזיגות מסומנים"><line class="grid" x1="67.3" x2="67.3" y1="6" y2="144"/><text class="tick" x="67.3" y="162" text-anchor="middle">0</text><line class="grid" x1="114.0" x2="114.0" y1="6" y2="144"/><text class="tick" x="114.0" y="162" text-anchor="middle">1</text><line class="grid" x1="160.7" x2="160.7" y1="6" y2="144"/><text class="tick" x="160.7" y="162" text-anchor="middle">2</text><line class="grid" x1="207.3" x2="207.3" y1="6" y2="144"/><text class="tick" x="207.3" y="162" text-anchor="middle">3</text><line class="grid" x1="254.0" x2="254.0" y1="6" y2="144"/><text class="tick" x="254.0" y="162" text-anchor="middle">4</text><line class="grid" x1="300.7" x2="300.7" y1="6" y2="144"/><text class="tick" x="300.7" y="162" text-anchor="middle">5</text><line class="grid" x1="44" x2="324" y1="127.5" y2="127.5"/><text class="tick" x="36" y="131.5" text-anchor="end">0</text><line class="grid" x1="44" x2="324" y1="94.5" y2="94.5"/><text class="tick" x="36" y="98.5" text-anchor="end">1</text><line class="grid" x1="44" x2="324" y1="61.5" y2="61.5"/><text class="tick" x="36" y="65.5" text-anchor="end">2</text><line class="grid" x1="44" x2="324" y1="28.5" y2="28.5"/><text class="tick" x="36" y="32.5" text-anchor="end">3</text><line class="axis" x1="44" x2="324" y1="144" y2="144"/><text class="tick" x="324.0" y="174.0" text-anchor="end">5</text><text class="tick" x="34.0" y="22.0" text-anchor="end">3</text><polyline class="wj-route is-alt" points="67.3,127.5 67.3,28.5 207.3,127.5 207.3,28.5 300.7,94.5 67.3,94.5 114.0,127.5 114.0,28.5 254.0,127.5" fill="none" stroke-width="2.5" stroke-dasharray="6 5"/><polyline class="wj-route" points="67.3,127.5 300.7,127.5 160.7,28.5 160.7,127.5 67.3,61.5 300.7,61.5 254.0,28.5 254.0,127.5" fill="none" stroke-width="3"/><circle class="wj-reach" cx="67.3" cy="127.5" r="6.5"><title>5 = 0, 3 = 0</title></circle><circle class="wj-reach" cx="67.3" cy="94.5" r="6.5"><title>5 = 0, 3 = 1</title></circle><circle class="wj-reach" cx="67.3" cy="61.5" r="6.5"><title>5 = 0, 3 = 2</title></circle><circle class="wj-reach" cx="67.3" cy="28.5" r="6.5"><title>5 = 0, 3 = 3</title></circle><circle class="wj-reach" cx="114.0" cy="127.5" r="6.5"><title>5 = 1, 3 = 0</title></circle><circle class="wj-never" cx="114.0" cy="94.5" r="4.5"><title>5 = 1, 3 = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="114.0" cy="61.5" r="4.5"><title>5 = 1, 3 = 2 : לא מגיעים</title></circle><circle class="wj-reach" cx="114.0" cy="28.5" r="6.5"><title>5 = 1, 3 = 3</title></circle><circle class="wj-reach" cx="160.7" cy="127.5" r="6.5"><title>5 = 2, 3 = 0</title></circle><circle class="wj-never" cx="160.7" cy="94.5" r="4.5"><title>5 = 2, 3 = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="160.7" cy="61.5" r="4.5"><title>5 = 2, 3 = 2 : לא מגיעים</title></circle><circle class="wj-reach" cx="160.7" cy="28.5" r="6.5"><title>5 = 2, 3 = 3</title></circle><circle class="wj-reach" cx="207.3" cy="127.5" r="6.5"><title>5 = 3, 3 = 0</title></circle><circle class="wj-never" cx="207.3" cy="94.5" r="4.5"><title>5 = 3, 3 = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="207.3" cy="61.5" r="4.5"><title>5 = 3, 3 = 2 : לא מגיעים</title></circle><circle class="wj-reach" cx="207.3" cy="28.5" r="6.5"><title>5 = 3, 3 = 3</title></circle><circle class="wj-goal" cx="254.0" cy="127.5" r="6.5"><title>5 = 4, 3 = 0</title></circle><circle class="wj-never" cx="254.0" cy="94.5" r="4.5"><title>5 = 4, 3 = 1 : לא מגיעים</title></circle><circle class="wj-never" cx="254.0" cy="61.5" r="4.5"><title>5 = 4, 3 = 2 : לא מגיעים</title></circle><circle class="wj-reach" cx="254.0" cy="28.5" r="6.5"><title>5 = 4, 3 = 3</title></circle><circle class="wj-reach" cx="300.7" cy="127.5" r="6.5"><title>5 = 5, 3 = 0</title></circle><circle class="wj-reach" cx="300.7" cy="94.5" r="6.5"><title>5 = 5, 3 = 1</title></circle><circle class="wj-reach" cx="300.7" cy="61.5" r="6.5"><title>5 = 5, 3 = 2</title></circle><circle class="wj-reach" cx="300.7" cy="28.5" r="6.5"><title>5 = 5, 3 = 3</title></circle></svg>
 
     <!-- /gen -->
 
     <!-- gen 11 -->
 
-    <span class="viz-legend"><span><i class="wj-key-reach"></i>מצב שמגיעים אליו</span><span><i class="wj-key-goal"></i>החלוקה : 4 ו-4</span><span><i class="wj-key-never"></i>מצב שלא מגיעים אליו</span><span><i class="wj-key-best"></i>7 המזיגות, מתחילים מ-8 ל-5</span><span><i class="wj-key-alt"></i>8 המזיגות, מתחילים מ-8 ל-3</span></span>
+    <span class="viz-legend"><span><i class="wj-key-reach"></i>מצב שמגיעים אליו</span><span><i class="wj-key-goal"></i>החלוקה : 4 ו-4</span><span><i class="wj-key-never"></i>מצב שלא מגיעים אליו</span><span><i class="wj-key-best"></i>7 המזיגות, מתחילים מ-8 ל-5</span><span><i class="wj-key-alt"></i>8 המזיגות, מתחילים מ-8 ל-3</span></span>
 
     <!-- /gen -->
 
-    **נסו בעצמכם.** אותה תיבה עם שלושה כדים : מוזגים בכפתורים, או טוענים את הדרך הקצרה
-    ועוברים עליה מזיגה אחרי מזיגה :
+    **נסו בעצמכם.** אותה תיבה עם שלושה כדים : מוזגים בכפתורים, או טוענים את הדרך הקצרה
+    ועוברים עליה מזיגה אחרי מזיגה :
 
     <div class="explorer" data-kind="jugs3" data-caps="8,5,3" data-goal="4,4,0"></div>
 
@@ -515,34 +515,34 @@ added: 2026-11-05
 
 ## נקודות חשובות ושאלות המשך
 
-??? trap "מלכודת : gcd בלבד"
-    ‏\( \gcd(3, 5) = 1 \) מחלק כל מספר, אבל 7 ליטר אי אפשר למדוד בכד אחד : אף כד לא מחזיק
+??? trap "מלכודת : gcd בלבד"
+    ‏\( \gcd(3, 5) = 1 \) מחלק כל מספר, אבל 7 ליטר אי אפשר למדוד בכד אחד : אף כד לא מחזיק
     יותר מ-5. התנאי המלא הוא גם כפולה של \( \gcd \) וגם לא יותר מהכד הגדול.
 
-??? trap "מלכודת : DFS במקום BFS"
+??? trap "מלכודת : DFS במקום BFS"
     חיפוש לעומק מוצא דרך, אבל לא בהכרח את הקצרה. ב-3 ו-5, חיפוש לעומק שמנסה קודם את מילוי
     A מגיע ל-4 אחרי שמונה צעדים, ועוצר שם. רק BFS, שעובר על המצבים לפי מרחק, מבטיח את
     המינימום.
 
-??? trap "מלכודת : לעצור באמצע מזיגה"
-    "מוזגים 4 ליטר מ-B" הוא לא צעד : אין על הכדים סימונים. כל מזיגה נגמרת רק כשאחד הכדים
+??? trap "מלכודת : לעצור באמצע מזיגה"
+    "מוזגים 4 ליטר מ-B" הוא לא צעד : אין על הכדים סימונים. כל מזיגה נגמרת רק כשאחד הכדים
     ריק או מלא, ולכן אחרי כל צעד אחד הכדים ריק או מלא.
 
 ??? followup "שאלות המשך"
-    - **4 ליטר בשני הכדים יחד :** מה משתנה אם המטרה היא \( T \) ליטר בסך הכול, A ו-B ביחד?
+    - **4 ליטר בשני הכדים יחד :** מה משתנה אם המטרה היא \( T \) ליטר בסך הכול, A ו-B ביחד?
 
         ??? fu-answer "תשובה"
-            עכשיו אפשר כל כפולה של \( \gcd(a, b) \) עד \( a + b \). למשל 7 ליטר ב-3 ו-5 :
+            עכשיו אפשר כל כפולה של \( \gcd(a, b) \) עד \( a + b \). למשל 7 ליטר ב-3 ו-5 :
             חמשת הצעדים הראשונים של סעיף א משאירים 2 ב-A ו-5 ב-B, ופחות מחמישה אי אפשר.
 
-    - **בלי BFS :** האם אפשר לחשב את מספר הצעדים המינימלי בנוסחה?
+    - **בלי BFS :** האם אפשר לחשב את מספר הצעדים המינימלי בנוסחה?
 
         ??? fu-answer "תשובה"
-            כן. הדרך הקצרה היא תמיד אחת משתי שיטות "המזיגה החוזרת" : ממלאים רק את A ושופכים
+            כן. הדרך הקצרה היא תמיד אחת משתי שיטות "המזיגה החוזרת" : ממלאים רק את A ושופכים
             ל-B, או ממלאים רק את B ושופכים ל-A. מריצים את שתיהן ולוקחים את הקצרה, ב-\( O(a + b) \).
             ב-3 ו-5 אלה 8 ו-6 צעדים. הטסט של השאלה משווה את זה ל-BFS לכל \( a \le 9 \) ו-\( b \le 12 \).
 
-    - **ארבעה כדים, או שלושה עם ברז :** מה משתנה בקוד?
+    - **ארבעה כדים, או שלושה עם ברז :** מה משתנה בקוד?
 
         ??? fu-answer "תשובה"
             רק רשימת הצעדים. המצב הוא וקטור של כמויות, ומכל מצב יש מילוי וריקון לכל כד

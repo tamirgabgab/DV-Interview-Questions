@@ -85,8 +85,8 @@ def statement_figure():
     pts = [(cx, cy - R), (cx + R, cy), (cx, cy + R), (cx - R, cy)]   # clockwise from the top
     nxt = step(START)
     out = [f'<svg class="figure du-fig" viewBox="0 0 {W} {H}" style="max-width:{W / 16:.1f}rem" role="img" '
-           f'aria-label="ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : {", ".join(map(str, START))}. '
-           f'על כל צלע ההפרש בין שני המספרים שבקצותיה : {", ".join(map(str, nxt))}. אלה המספרים של הסיבוב הבא">']
+           f'aria-label="ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : {", ".join(map(str, START))}. '
+           f'על כל צלע ההפרש בין שני המספרים שבקצותיה : {", ".join(map(str, nxt))}. אלה המספרים של הסיבוב הבא">']
     out.append(f'<circle class="du-ring" cx="{cx}" cy="{cy}" r="{R}"/>')
     for i in range(4):
         (x1, y1), (x2, y2) = pts[i], pts[(i + 1) % 4]
@@ -103,7 +103,7 @@ def statement_figure():
 
 def statement_legend():
     return ('<span class="viz-legend"><span><i class="du-key-node"></i>מספר על המעגל</span>'
-            '<span><i class="du-key-diff"></i>ההפרש בין שני שכנים : המספר שיחליף אותם בסיבוב הבא</span></span>')
+            '<span><i class="du-key-diff"></i>ההפרש בין שני שכנים : המספר שיחליף אותם בסיבוב הבא</span></span>')
 
 
 # --- part a: the run of 2, 6, 11, 4 ----------------------------------------------------------------
@@ -136,8 +136,8 @@ def bits_figure():
     t, cell = 8, 18
     W, H = 400, 50 + (t + 1) * cell + 10
     out = [f'<svg class="figure du-bits" viewBox="0 0 {W} {H}" style="max-width:{W / 16:.1f}rem" role="img" '
-           f'aria-label="הזוגיות של 1 בודד בין אפסים, סיבוב אחרי סיבוב. מימין 8 מספרים : אחרי 8 סיבובים הכל זוגי. '
-           f'משמאל 6 מספרים : אף פעם לא הכל זוגי">']
+           f'aria-label="הזוגיות של 1 בודד בין אפסים, סיבוב אחרי סיבוב. מימין 8 מספרים : אחרי 8 סיבובים הכל זוגי. '
+           f'משמאל 6 מספרים : אף פעם לא הכל זוגי">']
     out += bits_panel(8, t, 230, 40, cell, "n = 8")
     out += bits_panel(6, t, 50, 40, cell, "n = 6")
     out.append("</svg>")

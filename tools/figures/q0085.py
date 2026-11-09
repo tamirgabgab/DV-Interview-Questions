@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-NB = " "
+NB = " "
 RLM = "‏"
 DIGITS = "0123456789ABCDEFG"
 BASES = range(2, 17)
@@ -108,13 +108,13 @@ def legend(extra=""):
 
 
 def statement_table():
-    return digit_table([1, 2, 1, 0], "המספר 1210 בבסיס 4 : במקום 0 הספרה 1 ובאמת יש אפס אחד, במקום 1 הספרה 2 "
+    return digit_table([1, 2, 1, 0], "המספר 1210 בבסיס 4 : במקום 0 הספרה 1 ובאמת יש אפס אחד, במקום 1 הספרה 2 "
                        "ויש שני אחדים, במקום 2 הספרה 1 ויש שתיים אחת, במקום 3 הספרה 0 ואין אף שלוש")
 
 
 def answer_table():
     d = family(10)[0]
-    return digit_table(d, f"המספר {text(d)} : שישה אפסים, שני אחדים, שתיים אחת, אפס שלשות, חמישיות ושביעיות, ושש אחת")
+    return digit_table(d, f"המספר {text(d)} : שישה אפסים, שני אחדים, שתיים אחת, אפס שלשות, חמישיות ושביעיות, ושש אחת")
 
 
 def cases_table():
@@ -128,7 +128,7 @@ def cases_table():
             need = f"{RLM}\\( d_1 = 2 \\), ואז \\( z = {b} - 4 = {b - 4} \\)"
         else:
             zz = f"{RLM}\\( z = {z} \\)"
-            need = f"{RLM}\\( d_1 = {ones} \\) : ספרה גדולה מ-2, שאסור שתופיע"
+            need = f"{RLM}\\( d_1 = {ones} \\) : ספרה גדולה מ-2, שאסור שתופיע"
         rows.append(f"| {zz} | {forced[z]} | {need} | {'כן' if ok else 'לא'} |")
     return "\n".join(rows)
 
@@ -150,13 +150,13 @@ def bases_table():
 def pattern_table():
     b = 12
     d = family(b)[0]
-    return digit_table(d, f"המספר בבסיס {b} : במקום 0 הספרה {b - 4}, במקום 1 הספרה 2, במקום 2 הספרה 1, "
+    return digit_table(d, f"המספר בבסיס {b} : במקום 0 הספרה {b - 4}, במקום 1 הספרה 2, במקום 2 הספרה 1, "
                        f"ובמקום {b - 4} הספרה 1. כל השאר אפסים",
                        marks=(0, 1, 2, b - 4))
 
 
 def pattern_legend():
-    return legend('<span><i class="sd-key-mark"></i><span>ארבעת המקומות שאינם אפס : '
+    return legend('<span><i class="sd-key-mark"></i><span>ארבעת המקומות שאינם אפס : '
                   '<code>b − 4</code>, <code>2</code>, <code>1</code> ו-<code>1</code></span></span>')
 
 

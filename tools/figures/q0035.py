@@ -35,10 +35,10 @@ def flop(x, y, name, falling=False, title=""):
 def schematic_svg():
     W, H = 640, 210
     parts = [f'<svg class="figure" viewBox="0 0 {W} {H}" style="max-width:40rem" role="img" '
-             f'aria-label="המעגל של סעיף א : מונה מודולו 3 בעליית השעון, השוואה cnt == 2 שנרשמת בפלופ a בעליית '
+             f'aria-label="המעגל של סעיף א : מונה מודולו 3 בעליית השעון, השוואה cnt == 2 שנרשמת בפלופ a בעליית '
              f'השעון, פלופ b שדוגם את a בירידת השעון, ושער OR של a ו-b שמוציא את clk_out">']
     # the counter
-    parts.append('<rect class="box-face" x="30" y="30" width="110" height="80" rx="4"><title>מונה מודולו 3 : 0, 1, 2, 0, ...</title></rect>')
+    parts.append('<rect class="box-face" x="30" y="30" width="110" height="80" rx="4"><title>מונה מודולו 3 : 0, 1, 2, 0, ...</title></rect>')
     parts.append(text(85, 64, "cnt", size=15) + text(85, 86, "mod 3", size=13))
     # the compare
     parts.append('<rect class="box-face" x="175" y="45" width="80" height="34" rx="17"><title>השוואה צירופית</title></rect>')
@@ -71,7 +71,7 @@ def schematic_svg():
 
 def schematic_legend():
     return ('<span class="viz-legend"><span><i class="s1"></i>השעון clk</span><span><i class="box-face"></i>פלופים ולוגיקה</span>'
-            '<span><i class="ink"></i>עיגול בכניסת השעון : הפלופ מתעדכן בירידה</span><span><i class="box-path"></i>המוצא clk_out</span></span>')
+            '<span><i class="ink"></i>עיגול בכניסת השעון : הפלופ מתעדכן בירידה</span><span><i class="box-path"></i>המוצא clk_out</span></span>')
 
 
 def blocks():

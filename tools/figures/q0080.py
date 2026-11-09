@@ -222,8 +222,8 @@ def part_a_svg():
     segs = trace(Fr(3, 4))
     pts = [segs[0][0]] + [s[1] for s in segs]
     return path_svg(pts, pts[1:-1], (0, B),
-                    "סעיף א : הכדור יוצא מ-(0, 0) לכיוון (240, 180). הוא פוגע בדופן העליונה ב-(240, 180), בימנית "
-                    "ב-(360, 90) ובתחתונה ב-(240, 0), ונכנס לכיס השמאלי העליון (0, 180) : שלוש פגיעות")
+                    "סעיף א : הכדור יוצא מ-(0, 0) לכיוון (240, 180). הוא פוגע בדופן העליונה ב-(240, 180), בימנית "
+                    "ב-(360, 90) ובתחתונה ב-(240, 0), ונכנס לכיס השמאלי העליון (0, 180) : שלוש פגיעות")
 
 
 def part_a_table():
@@ -239,7 +239,7 @@ def unfold_svg():
     the crossings of the grid lines (the cushion hits) and every grid point named by its real
     corner."""
     n = Net(-40, 2 * A + 30, -30, 3 * B + 22, Fr(3, 4), pad=(8, 8, 8, 8), max_rem=30,
-            label="סעיף א אחרי פתיחת השולחן : שישה עותקים של השולחן, שתי עמודות ושלוש שורות. הקו הישר מ-(0, 0) "
+            label="סעיף א אחרי פתיחת השולחן : שישה עותקים של השולחן, שתי עמודות ושלוש שורות. הקו הישר מ-(0, 0) "
                   "ל-(720, 540) חוצה קו אנכי אחד ושני קווים אופקיים, שלוש הפגיעות, ומגיע לנקודת הרשת (720, 540), "
                   "שהיא הפינה (0, 180) של השולחן האמיתי")
     for i in range(2):
@@ -251,14 +251,14 @@ def unfold_svg():
             real = (fold(x, A), fold(y, B))
             hl = (x, y) == (2 * A, 3 * B)
             n.add(f'<circle class="bil-pocket{" is-in" if hl else ""}" cx="{n.X(x):.1f}" cy="{n.Y(y):.1f}" r="4">'
-                  f'<title>{pt((x, y))} : הפינה {pt(real)}</title></circle>')
+                  f'<title>{pt((x, y))} : הפינה {pt(real)}</title></circle>')
             n.label(x, y, pt(real), dx=-5 if i == 2 else 5, dy=14 if j == 0 else -6, size=12,
                     anchor="end" if i == 2 else "start")
     n.line(0, 0, 2 * A, 3 * B, "bil-path", 3)
     xs, ys = unfolded_cushions(Fr(0), Fr(0), Fr(3, 4), Fr(2 * A))
     hits = sorted([(x, x * Fr(3, 4)) for x in xs] + [(y / Fr(3, 4), y) for y in ys])
     for i, (x, y) in enumerate(hits, 1):
-        n.point(x, y, "s1", r=5, title=f"חצייה {i} : פגיעה בדופן")
+        n.point(x, y, "s1", r=5, title=f"חצייה {i} : פגיעה בדופן")
         n.label(x, y, str(i), dx=12, dy=4, size=14)
     n.point(0, 0, "ink", r=5, title="הכדור יוצא מ-(0, 0)")
     return n.svg()
@@ -267,7 +267,7 @@ def unfold_svg():
 def unfold_legend():
     return ('<span class="viz-legend"><span><i class="bil-key-felt"></i>השולחן עצמו</span>'
             '<span><i class="box-copy"></i>העותקים המשוקפים</span><span><i class="bil-path"></i>המסלול, קו ישר</span>'
-            '<span><i class="s1"></i>חצייה של קו ברשת : פגיעה בדופן</span><span><i class="bil-key-pocket"></i>נקודת רשת : פינה</span></span>')
+            '<span><i class="s1"></i>חצייה של קו ברשת : פגיעה בדופן</span><span><i class="bil-key-pocket"></i>נקודת רשת : פינה</span></span>')
 
 
 B_ROWS = [((360, 180), Fr(1, 2)), ((180, 180), Fr(1)), ((240, 180), Fr(3, 4)), ((270, 180), Fr(2, 3)),
@@ -293,7 +293,7 @@ C_ROWS = [((A // 2, 0), "\\( K \\) אי־זוגי, \\( m \\) זוגי", "\\( p \
 
 
 def part_c_table():
-    rows = ["| הכיס | נכנס כאשר | כיסים נקודתיים, \\( s = q/p \\) מצומצם | דוגמה : מכוונים ל- | ‏\\( K, m \\) ב-\\( w = 9 \\) |",
+    rows = ["| הכיס | נכנס כאשר | כיסים נקודתיים, \\( s = q/p \\) מצומצם | דוגמה : מכוונים ל- | ‏\\( K, m \\) ב-\\( w = 9 \\) |",
             "|:-:|:-:|:-:|:-:|:-:|"]
     for pocket, when, exact, tan in C_ROWS:
         if tan is None:
@@ -324,7 +324,7 @@ def steps37_table():
     while True:
         v = k * t
         d = norm(v)
-        rows.append(f"| {k} | {ltr(f'{v:.4f}')} | {ltr(f'{d:.4f}')} | {'**כן** : ' + ltr(f'K = {k}, m = {round(v)}') if d < e else 'לא'} |")
+        rows.append(f"| {k} | {ltr(f'{v:.4f}')} | {ltr(f'{d:.4f}')} | {'**כן** : ' + ltr(f'K = {k}, m = {round(v)}') if d < e else 'לא'} |")
         if d < e:
             break
         k += 1
@@ -337,7 +337,7 @@ def grid_svg():
     into the middle pocket at (540, 360)."""
     sc = Fr(3, 4)
     n = Net(-20, 2 * A + 30, -20, 3 * B + 20, sc, pad=(8, 8, 8, 8), max_rem=30,
-            label="סעיף ג אחרי פתיחת השולחן : שישה עותקים, ונקודות הרשת כל 180 ס״מ לרוחב : פינות וכיסים אמצעיים "
+            label="סעיף ג אחרי פתיחת השולחן : שישה עותקים, ונקודות הרשת כל 180 ס״מ לרוחב : פינות וכיסים אמצעיים "
                   "לסירוגין, כל כיס עיגול ברדיוס 4.5 ס״מ. הקו של 37° עובר ליד שלוש נקודות רשת ונכנס לעיגול של "
                   "(720, 540), הפינה (0, 180). הקו המקווקו, tan α = 2/3, נכנס כבר ב-(540, 360), הכיס האמצעי התחתון")
     for i in range(2):
@@ -351,7 +351,7 @@ def grid_svg():
             real = pocket_of(i, j)
             hl = (x, y) in ((2 * A, 3 * B), (3 * A // 2, 2 * B))
             n.add(f'<circle class="bil-hole{" is-in" if hl else ""}" cx="{n.X(x):.1f}" cy="{n.Y(y):.1f}" '
-                  f'r="{W / 2 * float(sc):.2f}"><title>{pt((x, y))} : {NAMES[real]} {pt(real)}</title></circle>')
+                  f'r="{W / 2 * float(sc):.2f}"><title>{pt((x, y))} : {NAMES[real]} {pt(real)}</title></circle>')
     t = tan37()
     n.line(0, 0, 2 * A, 2 * A * t, "bil-path", 2.5)
     n.line(0, 0, 3 * A / 2, B * 2, "s2-line", 2, "7 5")
@@ -364,7 +364,7 @@ def grid_svg():
 def grid_legend():
     return ('<span class="viz-legend"><span><i class="bil-key-felt"></i>השולחן עצמו</span>'
             '<span><i class="box-copy"></i>העותקים</span><span><i class="bil-key-hole"></i>כיס, ברדיוס 4.5 ס״מ</span>'
-            '<span><i class="bil-path"></i>‏37° : נכנס ל-<span dir="ltr">(0, 180)</span></span><span><i class="bil-key-dash"></i>‏tan α = 2/3 : נכנס לאמצעי התחתון</span></span>')
+            '<span><i class="bil-path"></i>‏37° : נכנס ל-<span dir="ltr">(0, 180)</span></span><span><i class="bil-key-dash"></i>‏tan α = 2/3 : נכנס לאמצעי התחתון</span></span>')
 
 
 D_START = (Fr(180), Fr(90))
@@ -385,8 +385,8 @@ def part_d_svg():
     hits, pocket = part_d_path()
     pts = [D_START] + hits + [pocket]
     return path_svg(pts, hits, pocket,
-                    "סעיף ד : הכדור יוצא ממרכז השולחן (180, 90) בשיפוע tan α = 7/6. הוא פוגע בדופן העליונה, בימנית, "
-                    "בתחתונה ושוב בעליונה, ונכנס לכיס (0, 0) : ארבע פגיעות", start=D_START, r=Fr(W, 2))
+                    "סעיף ד : הכדור יוצא ממרכז השולחן (180, 90) בשיפוע tan α = 7/6. הוא פוגע בדופן העליונה, בימנית, "
+                    "בתחתונה ושוב בעליונה, ונכנס לכיס (0, 0) : ארבע פגיעות", start=D_START, r=Fr(W, 2))
 
 
 def part_d_table():
@@ -396,11 +396,11 @@ def part_d_table():
     for k, yk, m, d in steps:
         if k * A // 2 <= x0 and k != k_end:
             note = "מאחורי הכדור" if k * A // 2 < x0 else "נקודת היציאה"
-            rows.append(f"| {k} | {k * A // 2} | {ltr(num(yk))} | – | – | לא : {note} |")
+            rows.append(f"| {k} | {k * A // 2} | {ltr(num(yk))} | – | – | לא : {note} |")
             continue
         yes = k == k_end
         rows.append(f"| {k} | {k * A // 2} | {ltr(num(yk))} | {m} | {ltr(num(d))} | "
-                    f"{'**כן** : ' + ltr(pt(pocket)) if yes else 'לא'} |")
+                    f"{'**כן** : ' + ltr(pt(pocket)) if yes else 'לא'} |")
     return "\n".join(rows)
 
 

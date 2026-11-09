@@ -121,7 +121,7 @@
         const a = tcAcc(sent(), back, w);
         const hl = (j) => last !== null && ((last >> j) & 1);
         $(".tc-acc").innerHTML = `<table class="tc-table"><thead><tr><th>המצבר</th><th>בבינארי</th><th>ערך</th></tr></thead><tbody>` +
-          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("x")} : XOR של הכול</td><td dir="ltr"><code>${bin(a.x)}</code></td><td>${ltr(a.x)}</td></tr>` +
+          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("x")}${NB}: XOR של הכול</td><td dir="ltr"><code>${bin(a.x)}</code></td><td>${ltr(a.x)}</td></tr>` +
           a.part.map((v, j) => `<tr${hl(j) ? ' class="is-hit"' : ""}><td>${code(`part[${j}]`)} : ביט ${ltr(j)} דולק</td><td dir="ltr"><code>${bin(v)}</code></td><td>${ltr(v)}</td></tr>`).join("") +
           `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("s")} : סכום, נשלח פחות חזר</td><td></td><td>${ltr(a.s)}</td></tr>` +
           `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("q")} : סכום ריבועים</td><td></td><td>${ltr(a.q)}</td></tr>` +

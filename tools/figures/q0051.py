@@ -63,7 +63,7 @@ def mice_figure():
     W, gap = 640, 60
     x0 = W - 40                                   # mouse 0 (the lowest bit) on the right
     s = (f'<svg class="figure mc-fig" viewBox="0 0 {W} 150" style="max-width:40rem" role="img" '
-         f'aria-label="עשרה עכברים, ביט לכל אחד : בבקבוק {BOTTLE} מתים העכברים של הביטים שהם 1">')
+         f'aria-label="עשרה עכברים, ביט לכל אחד : בבקבוק {BOTTLE} מתים העכברים של הביטים שהם 1">')
     for i in range(m):
         x = x0 - i * gap
         dead = death[i] == 1
@@ -76,8 +76,8 @@ def mice_figure():
 
 
 def legend():
-    return ('<span class="viz-legend"><span><i class="mc-key-dead"></i>עכבר שמת : הביט שלו 1</span>'
-            '<span><i class="mc-key-live"></i>עכבר ששרד : הביט שלו 0</span></span>')
+    return ('<span class="viz-legend"><span><i class="mc-key-dead"></i>עכבר שמת : הביט שלו 1</span>'
+            '<span><i class="mc-key-live"></i>עכבר ששרד : הביט שלו 0</span></span>')
 
 
 def one_round_table():

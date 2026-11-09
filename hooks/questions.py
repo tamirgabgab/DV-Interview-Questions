@@ -1768,7 +1768,18 @@ def _trap_group(m: re.Match) -> str:
             f'{run.replace(TRAP_PREFIX, "<summary>").rstrip()}</div>\n')
 
 
+TOC_COLON = re.compile(r'(<span class="md-ellipsis">[^<]*?[\u05d0-\u05ea\)]) :')
+
+
+def toc_colons(output: str) -> str:
+    """The table of contents writes a heading's text with its whitespace collapsed, so the
+    U+00A0 before a colon ("סעיף ד – ההתפלגות כולה : ...") becomes a plain space there and the
+    colon can wrap to the start of a line in the sidebar; put it back."""
+    return TOC_COLON.sub(lambda m: m.group(1) + "\u00a0:", output)
+
+
 def on_post_page(output, page, config, **kwargs):
+    output = toc_colons(output)
     if page.file.src_uri == "tags.md":
         output = _tag_names(output)
     if "home-band" in output:

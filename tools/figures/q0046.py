@@ -47,7 +47,7 @@ def grids_svg(rows=GRID):
     width = 2 * PAD + 2 * one + SPACE
     height = HEAD + m * CELL + (m - 1) * GAP + PAD
     p = [f'<svg class="figure" viewBox="0 0 {width} {height}" style="max-width:{width / 16:.1f}rem" role="img" '
-         f'aria-label="המערך וטבלת dp : הריבוע הגדול ביותר בצלע {k}, מ-({r1}, {c1}) עד ({r2}, {c2})">']
+         f'aria-label="המערך וטבלת dp : הריבוע הגדול ביותר בצלע {k}, מ-({r1}, {c1}) עד ({r2}, {c2})">']
     for t, (title, values) in enumerate((("grid", g), ("dp", d))):
         x0 = PAD + t * (one + SPACE)
         p.append(f'<text class="st-text st-sm" x="{x0 + one / 2:g}" y="{HEAD - 8}" text-anchor="middle">{title}</text>')

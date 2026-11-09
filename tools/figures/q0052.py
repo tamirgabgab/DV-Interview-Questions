@@ -176,7 +176,7 @@ def chain_svg(pattern, y, mid):
 
 def diagram():
     s = ('<svg class="figure cp-fig" viewBox="0 0 660 300" style="max-width:41rem" role="img" '
-         'aria-label="שרשראות המצבים של HH ושל HT : שלושה מצבים כל אחת, החצים מסומנים בהטלה">'
+         'aria-label="שרשראות המצבים של HH ושל HT : שלושה מצבים כל אחת, החצים מסומנים בהטלה">'
          '<defs><marker id="cp-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" '
          'orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs>')
     s += chain_svg("HT", 92, expected("HT"))
@@ -185,9 +185,9 @@ def diagram():
 
 
 def legend():
-    return ('<span class="viz-legend"><span><i class="fs-key"></i>מעבר : ההטלה</span>'
+    return ('<span class="viz-legend"><span><i class="fs-key"></i>מעבר : ההטלה</span>'
             '<span><i class="fs-key-found"></i>ההטלה שמשלימה את הרצף</span>'
-            '<span><i class="cp-key-back"></i>HH : זנב אחרי H מחזיר להתחלה</span></span>')
+            '<span><i class="cp-key-back"></i>HH : זנב אחרי H מחזיר להתחלה</span></span>')
 
 
 TMAX = 16
@@ -195,7 +195,7 @@ TMAX = 16
 
 def dist_chart():
     hh, ht = dist("HH", TMAX), dist("HT", TMAX)
-    c = Chart("ההסתברות שהרצף מופיע לראשונה בהטלה t, ל-HT ול-HH : ל-HT שיא גבוה ב-2 ו-3 וזנב קצר, ל-HH זנב ארוך",
+    c = Chart("ההסתברות שהרצף מופיע לראשונה בהטלה t, ל-HT ול-HH : ל-HT שיא גבוה ב-2 ו-3 וזנב קצר, ל-HH זנב ארוך",
               slots=TMAX - 1, y_max=0.3, h=250, base=216)
     c.grid_y([0, 0.1, 0.2, 0.3])
     for t in range(2, TMAX + 1):
@@ -211,8 +211,8 @@ def dist_chart():
 
 
 def dist_legend():
-    return ('<span class="viz-legend"><span><i class="by-multiples"></i>HT : ‏(t − 1) / 2^t</span>'
-            '<span><i class="by-enum"></i>HH : ‏F(t − 1) / 2^t (פיבונאצ׳י)</span></span>')
+    return ('<span class="viz-legend"><span><i class="by-multiples"></i>HT : ‏(t − 1) / 2^t</span>'
+            '<span><i class="by-enum"></i>HH : ‏F(t − 1) / 2^t (פיבונאצ׳י)</span></span>')
 
 
 def dist_table():

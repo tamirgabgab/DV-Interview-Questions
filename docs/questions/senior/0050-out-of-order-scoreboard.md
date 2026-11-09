@@ -16,23 +16,23 @@ added: 2026-10-27
 ל-`id` שונים יכולות להגיע בכל סדר. מודל ייחוס נותן לכל בקשה, ברגע שהיא נשלחת, את
 הנתון שהתשובה שלה צריכה להחזיר.
 
-- **סעיף א – התכנון :** תכננו את ה-scoreboard : באיזה מבנה נתונים שומרים את מה שמחכה
+- **סעיף א – התכנון :** תכננו את ה-scoreboard : באיזה מבנה נתונים שומרים את מה שמחכה
   לתשובה, מה בודקים בכל תשובה, ומה בודקים בסוף הטסט. כתבו אותו.
-- **סעיף ב – למה לא פשוט יותר :** שני מהנדסים מציעים חלופות : "תור אחד לכל הבקשות",
+- **סעיף ב – למה לא פשוט יותר :** שני מהנדסים מציעים חלופות : "תור אחד לכל הבקשות",
   ו"לכל תשובה, לחפש בתור של ה-`id` שלה בקשה עם אותו נתון". מה כל אחת תפספס, ומה כל אחת
   תדווח בטעות?
-- **סעיף ג – איפוס, זמן וכיסוי :** מה קורה ל-scoreboard כשה-DUT מתאפס באמצע תעבורה?
+- **סעיף ג – איפוס, זמן וכיסוי :** מה קורה ל-scoreboard כשה-DUT מתאפס באמצע תעבורה?
   איך תופסים תשובה שלא מגיעה אף פעם? ואיך יודעים שהטסט בכלל בדק ערבוב בין `id`-ים?
 
 ??? interviewer "מה המראיין בודק"
-    - **הכלל של הממשק כמבנה נתונים :** האם המועמד מתרגם "בסדר בתוך `id`, חופשי בין
+    - **הכלל של הממשק כמבנה נתונים :** האם המועמד מתרגם "בסדר בתוך `id`, חופשי בין
       `id`-ים" ישירות למבנה, ולא כותב חיפוש כללי שמקבל יותר ממה שמותר.
-    - **שני סוגי טעויות :** אזעקת שווא על התנהגות חוקית, ופספוס של באג. האם הוא בודק את
+    - **שני סוגי טעויות :** אזעקת שווא על התנהגות חוקית, ופספוס של באג. האם הוא בודק את
       התכנון מול שניהם.
-    - **מה שלא קורה :** תשובה חסרה ותשובה שלא מגיעה בזמן לא מופיעות באף השוואה; צריך
+    - **מה שלא קורה :** תשובה חסרה ותשובה שלא מגיעה בזמן לא מופיעות באף השוואה; צריך
       בדיקה בסוף ובדיקת זמן.
-    - **מחזור החיים :** איפוס באמצע, תשובות "ישנות" אחריו, וניקוי בסוף הטסט.
-    - **כיסוי :** סביבה שעוברת בלי לבדוק את המקרה הקשה לא הוכיחה כלום.
+    - **מחזור החיים :** איפוס באמצע, תשובות "ישנות" אחריו, וניקוי בסוף הטסט.
+    - **כיסוי :** סביבה שעוברת בלי לבדוק את המקרה הקשה לא הוכיחה כלום.
 
 ---
 
@@ -62,13 +62,13 @@ added: 2026-10-27
 
     <!-- gen 0 -->
 
-    <svg class="figure sb-fig" viewBox="0 0 640 250" style="max-width:40rem" role="img" aria-label="תור לכל ID : הבקשות נכנסות לסוף התור של ה-ID שלהן, ותשובה נבדקת מול ראש התור של אותו ID"><text class="legend" x="630" y="22" text-anchor="end" direction="rtl">בקשות, לפי סדר ההגעה</text><g class="sb-item sb-id0"><rect x="544" y="34" width="52" height="30" rx="5"/><text x="570" y="54" text-anchor="middle">0:A</text></g><g class="sb-item sb-id1 is-done"><rect x="474" y="34" width="52" height="30" rx="5"/><text x="500" y="54" text-anchor="middle">1:B</text></g><g class="sb-item sb-id0"><rect x="404" y="34" width="52" height="30" rx="5"/><text x="430" y="54" text-anchor="middle">0:C</text></g><g class="sb-item sb-id2"><rect x="334" y="34" width="52" height="30" rx="5"/><text x="360" y="54" text-anchor="middle">2:D</text></g><g class="sb-item sb-id1"><rect x="264" y="34" width="52" height="30" rx="5"/><text x="290" y="54" text-anchor="middle">1:E</text></g><text class="sb-qname" x="620" y="128" text-anchor="end">ID 0</text><line class="sb-rail" x1="550" y1="123" x2="240" y2="123"/><g class="sb-item sb-id0 is-head"><rect x="494" y="108" width="52" height="30" rx="5"/><text x="520" y="128" text-anchor="middle">A</text></g><g class="sb-item sb-id0"><rect x="430" y="108" width="52" height="30" rx="5"/><text x="456" y="128" text-anchor="middle">C</text></g><text class="sb-qname" x="620" y="174" text-anchor="end">ID 1</text><line class="sb-rail" x1="550" y1="169" x2="240" y2="169"/><g class="sb-item sb-id1 is-head"><rect x="494" y="154" width="52" height="30" rx="5"/><text x="520" y="174" text-anchor="middle">E</text></g><text class="sb-qname" x="620" y="220" text-anchor="end">ID 2</text><line class="sb-rail" x1="550" y1="215" x2="240" y2="215"/><g class="sb-item sb-id2 is-head"><rect x="494" y="200" width="52" height="30" rx="5"/><text x="520" y="220" text-anchor="middle">D</text></g><g class="sb-item sb-id1 is-rsp"><rect x="40" y="154" width="120" height="30" rx="5"/><text x="100" y="174" text-anchor="middle">rsp 1:B ✓</text></g><path class="sb-arrow" d="M160,169 L220,169" marker-end="url(#sb-arrow)"/><defs><marker id="sb-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><text class="legend" x="100" y="206" text-anchor="middle">popped from the head of queue 1</text></svg>
+    <svg class="figure sb-fig" viewBox="0 0 640 250" style="max-width:40rem" role="img" aria-label="תור לכל ID : הבקשות נכנסות לסוף התור של ה-ID שלהן, ותשובה נבדקת מול ראש התור של אותו ID"><text class="legend" x="630" y="22" text-anchor="end" direction="rtl">בקשות, לפי סדר ההגעה</text><g class="sb-item sb-id0"><rect x="544" y="34" width="52" height="30" rx="5"/><text x="570" y="54" text-anchor="middle">0:A</text></g><g class="sb-item sb-id1 is-done"><rect x="474" y="34" width="52" height="30" rx="5"/><text x="500" y="54" text-anchor="middle">1:B</text></g><g class="sb-item sb-id0"><rect x="404" y="34" width="52" height="30" rx="5"/><text x="430" y="54" text-anchor="middle">0:C</text></g><g class="sb-item sb-id2"><rect x="334" y="34" width="52" height="30" rx="5"/><text x="360" y="54" text-anchor="middle">2:D</text></g><g class="sb-item sb-id1"><rect x="264" y="34" width="52" height="30" rx="5"/><text x="290" y="54" text-anchor="middle">1:E</text></g><text class="sb-qname" x="620" y="128" text-anchor="end">ID 0</text><line class="sb-rail" x1="550" y1="123" x2="240" y2="123"/><g class="sb-item sb-id0 is-head"><rect x="494" y="108" width="52" height="30" rx="5"/><text x="520" y="128" text-anchor="middle">A</text></g><g class="sb-item sb-id0"><rect x="430" y="108" width="52" height="30" rx="5"/><text x="456" y="128" text-anchor="middle">C</text></g><text class="sb-qname" x="620" y="174" text-anchor="end">ID 1</text><line class="sb-rail" x1="550" y1="169" x2="240" y2="169"/><g class="sb-item sb-id1 is-head"><rect x="494" y="154" width="52" height="30" rx="5"/><text x="520" y="174" text-anchor="middle">E</text></g><text class="sb-qname" x="620" y="220" text-anchor="end">ID 2</text><line class="sb-rail" x1="550" y1="215" x2="240" y2="215"/><g class="sb-item sb-id2 is-head"><rect x="494" y="200" width="52" height="30" rx="5"/><text x="520" y="220" text-anchor="middle">D</text></g><g class="sb-item sb-id1 is-rsp"><rect x="40" y="154" width="120" height="30" rx="5"/><text x="100" y="174" text-anchor="middle">rsp 1:B ✓</text></g><path class="sb-arrow" d="M160,169 L220,169" marker-end="url(#sb-arrow)"/><defs><marker id="sb-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs><text class="legend" x="100" y="206" text-anchor="middle">popped from the head of queue 1</text></svg>
 
     <!-- /gen -->
 
     <!-- gen 1 -->
 
-    <span class="viz-legend"><span><i class="sb-key-head"></i>ראש התור : התשובה הבאה של ה-ID הזה</span><span><i class="sb-key-done"></i>בקשה שכבר נענתה</span></span>
+    <span class="viz-legend"><span><i class="sb-key-head"></i>ראש התור : התשובה הבאה של ה-ID הזה</span><span><i class="sb-key-done"></i>בקשה שכבר נענתה</span></span>
 
     <!-- /gen -->
 
@@ -80,13 +80,13 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **בקשה (מהמוניטור של הכניסה) :** מכניסים לסוף `pending[id]` את הנתון שהמודל צופה
+    1. **בקשה (מהמוניטור של הכניסה) :** מכניסים לסוף `pending[id]` את הנתון שהמודל צופה
        ואת הזמן.
-    2. **תשובה (מהמוניטור של היציאה) :** אם `pending[id]` ריק, זו תשובה לא צפויה. אחרת
+    2. **תשובה (מהמוניטור של היציאה) :** אם `pending[id]` ריק, זו תשובה לא צפויה. אחרת
        מוציאים את הראש ומשווים.
-    3. **זמן :** בכל מחזור, כל בקשה שמחכה יותר מ-timeout מדווחת פעם אחת.
-    4. **סוף הטסט (`check_phase`) :** כל מה שנשאר בתורים הוא תשובה חסרה.
-    5. **איפוס :** מרוקנים את כל התורים (סעיף ג).
+    3. **זמן :** בכל מחזור, כל בקשה שמחכה יותר מ-timeout מדווחת פעם אחת.
+    4. **סוף הטסט (`check_phase`) :** כל מה שנשאר בתורים הוא תשובה חסרה.
+    5. **איפוס :** מרוקנים את כל התורים (סעיף ג).
 
     </div>
 
@@ -240,10 +240,10 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **מה מותר :** לכתוב את הכלל של הממשק כטבלה : מה חוקי, מה לא.
-    2. **מה הבודק מקבל :** לכל תכנון, לשאול על כל שורה בטבלה אם הוא מקבל אותה.
-    3. **תרחישים קטנים :** תרחיש של 3 עד 5 אירועים לכל שורה, ולהריץ עליו את הבודק.
-    4. **זרם אקראי :** להשוות את הבודק לזרמים חוקיים ולזרמים עם באג מוזרק אחד.
+    1. **מה מותר :** לכתוב את הכלל של הממשק כטבלה : מה חוקי, מה לא.
+    2. **מה הבודק מקבל :** לכל תכנון, לשאול על כל שורה בטבלה אם הוא מקבל אותה.
+    3. **תרחישים קטנים :** תרחיש של 3 עד 5 אירועים לכל שורה, ולהריץ עליו את הבודק.
+    4. **זרם אקראי :** להשוות את הבודק לזרמים חוקיים ולזרמים עם באג מוזרק אחד.
 
     </div>
 
@@ -314,12 +314,12 @@ added: 2026-10-27
 
     <div class="steps" markdown>
 
-    1. **איפוס :** ‏`on_reset` מרוקן את כל התורים, מקריאה של המוניטור באותו מחזור שבו
+    1. **איפוס :** ‏`on_reset` מרוקן את כל התורים, מקריאה של המוניטור באותו מחזור שבו
        האיפוס נדגם.
-    2. **אחרי איפוס :** תשובה לבקשה מלפני האיפוס נתפסת כ"לא צפויה", ובקשות חדשות נבדקות
+    2. **אחרי איפוס :** תשובה לבקשה מלפני האיפוס נתפסת כ"לא צפויה", ובקשות חדשות נבדקות
        כרגיל.
-    3. **זמן :** ‏`check_timeouts` בכל מחזור, עם timeout שנגזר מהמפרט ולא מניחוש.
-    4. **כיסוי :** בכל תשובה בודקים אם יש בקשה ממתינה של `id` אחר שנשלחה קודם, וסופרים
+    3. **זמן :** ‏`check_timeouts` בכל מחזור, עם timeout שנגזר מהמפרט ולא מניחוש.
+    4. **כיסוי :** בכל תשובה בודקים אם יש בקשה ממתינה של `id` אחר שנשלחה קודם, וסופרים
        עקיפה; דוגמים את מספר ה-`id`-ים הפעילים ואת עומק התורים.
 
     </div>
@@ -351,28 +351,28 @@ added: 2026-10-27
     `id` ומאיזה זמן. בדיקת זמן לכל בקשה נותנת את זה מיד.
 
 ??? followup "שאלות המשך"
-    - **סדר חופשי גם בתוך `id` :** מה משתנה כשהממשק מתיר כל סדר, אבל התשובה מחזירה tag
+    - **סדר חופשי גם בתוך `id` :** מה משתנה כשהממשק מתיר כל סדר, אבל התשובה מחזירה tag
       ייחודי?
 
         ??? fu-answer "תשובה"
             המפתח הוא ה-tag ולא ה-`id` : מערך אסוציאטיבי tag → פריט צפוי, ובדיקה ש-tag לא
             נמצא בשימוש פעמיים. ה-tag הוא שמזהה את הבקשה, ולכן אין צורך בסדר.
 
-    - **תשובה בכמה חלקים :** כל קריאה חוזרת ב-4 beats (burst), ו-beats של `id`-ים שונים יכולים
+    - **תשובה בכמה חלקים :** כל קריאה חוזרת ב-4 beats (burst), ו-beats של `id`-ים שונים יכולים
       להשתלב. איך?
 
         ??? fu-answer "תשובה"
             בתור של כל `id` הפריט שבראש מחזיק מונה של ה-beats שהגיעו; מוציאים אותו רק ב-beat
             האחרון (`last`), ובודקים ש-`last` מגיע בדיוק אחרי 4.
 
-    - **מודל שלא יודע את הנתון מראש :** הנתון תלוי בכתיבות שעוד לא הסתיימו. איפה מחשבים
+    - **מודל שלא יודע את הנתון מראש :** הנתון תלוי בכתיבות שעוד לא הסתיימו. איפה מחשבים
       את הצפוי?
 
         ??? fu-answer "תשובה"
             ברגע התשובה, לא ברגע הבקשה : התור שומר את הכתובת, והמודל מחשב את הנתון לפי סדר
             הסיום של הכתיבות, או מחזיר קבוצה של ערכים חוקיים כשהסדר לא מוגדר.
 
-    - **ביצועים :** ‏100,000 בקשות ממתינות. מה עולה הכי הרבה בקוד?
+    - **ביצועים :** ‏100,000 בקשות ממתינות. מה עולה הכי הרבה בקוד?
 
         ??? fu-answer "תשובה"
             ‏`check_timeouts` שעובר על כל הממתינים בכל מחזור. מספיק לבדוק את ראש כל תור (הוא
