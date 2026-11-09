@@ -46,7 +46,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          latest=$(gh api repos/verilator/verilator/releases/latest --jq .tag_name)
+          # Verilator publishes release tags (v5.052), not GitHub releases: releases/latest is 404
+          latest=$(gh api 'repos/verilator/verilator/tags?per_page=100' --jq '[.[].name | select(test("^v[0-9]+\\.[0-9]+$"))] | sort_by(ltrimstr("v") | split(".") | map(tonumber)) | last')
+          test -n "$latest"
           echo "latest=$latest" >> "$GITHUB_OUTPUT"
           echo "Latest Verilator release: $latest (pinned after: $VERILATOR_RELEASE)"
       - name: Open an issue once when a newer release is out

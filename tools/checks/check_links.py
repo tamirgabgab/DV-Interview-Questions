@@ -40,6 +40,8 @@ class Collector(HTMLParser):
         self.ids: set[str] = set()
 
     def handle_starttag(self, tag, attrs):
+        if tag == "link" and {"preconnect", "dns-prefetch"} & set((dict(attrs).get("rel") or "").split()):
+            return  # a connection hint names a host, not a page (fonts.gstatic.com answers 404 at /)
         for name, value in attrs:
             if value is None:
                 continue
