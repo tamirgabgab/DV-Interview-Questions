@@ -1067,6 +1067,29 @@ below start at item 112 (session 31).
     script; the reports and scripts are in the session scratchpad, review5/) and every box
     measured at 1920 by 1080. Findings under "Open items", "Review round 4 (session 34)".
     Nothing was changed yet.
+187. **The fourth ten questions fixed (session 34, 2026-11-09).** Seven agents; every R1 claim
+    re-verified by a script first (all held; one reviewer side claim did not: in 0004's
+    four-boxes follow-up only the box labelled with the drawn colour separates the three
+    arrangements left). R0: every explorer's NB is U+00A0 and about 150 Hebrew strings in 40
+    boxes got U+00A0 before their colon; lint_pages.py now checks the explorer strings
+    (`lint_explorers`, once per run). 0004: the box and page deduce the mix from the box
+    labelled with the other colour first; the box counts lucky first draws and keeps the
+    label order in its link. 0018: the hourglass box 1091 -> 961 px (0019's 1331 -> 1201),
+    the summary "7, 11, 14, 15, and from 17 every value" (`hourglassTail`), the mermaid tree
+    dropped for the box's. 0026: the box 1157 -> 920 px; the chain's bound for n riders;
+    the fixed-driver bound covers every ratio (checked). 0029: gapline's "L = 12 hours";
+    clock explains two meetings in one second; the two-clocks follow-up. 0045: an exact search
+    over adaptive strategies in the tests; the syndrome-decoding follow-up. 0048: the farm
+    box's free-stops mode (`farmFree`). 0056: winfsm 1222 -> 978 px (every base under 1000),
+    any m at the LSB, the minimal machine's size (`winFewest`), an elaboration check in the
+    SV module. 0063: all three boxes under 1000; `<` / `<=` and a deque of values in mode a.
+    0089: the pay box gives the fewest-coins payment (`fbFewest`). 0092: box 3 keeps the
+    polygon's points when switched to free. Left open (see "Open items"): 0019's box at
+    1201 px; 0048's box with the reflection shown 1120 (1221 in free mode), a state
+    check_heights does not open; the videos of 0004, 0018, 0026, 0029 and 0048 differ from
+    the pages (captions listed there); 0004's mermaid lays out some RTL labels badly; the
+    shared `max-width: 10rem` on range inputs in 27-box-columns.css looks overridden in the
+    motorcycle box.
 
 ---
 
@@ -1376,7 +1399,11 @@ vocabulary ("נכנס כ-LSB" vs "מה-MSB").
 
 ### Review round 4 (session 34): ten more questions
 
-Open: nothing changed yet (work log item 186). Every claim below was checked by a reviewer's
+All done (work log item 187), with the owner's choices: 0026's optimality restricted to
+t0 >= 3 t1 with a pointer to the fixed-driver proof; DV follow-ups only for 0029 (two clocks)
+and 0045 (syndrome decoding), none for 0004, 0063, 0089; new box controls for 0029 (L = 12 h),
+0048 (free stops), 0056 (any m at the LSB) and 0063 (< or <=, a deque of values); box
+paragraphs as text tasks; the NB fix with a lint rule. Findings were (work log item 186): Every claim below was checked by a reviewer's
 script (CONFIRMED) unless marked SUSPECTED; verify again before changing a page. All the
 tables and worked numbers of the ten pages recompute exactly; the findings are wrong
 sentences, proof gaps and boxes.
@@ -1391,24 +1418,24 @@ explorer string). Also hourglass.js lines 577, 619, 620 and boxes3.js line 112 (
 NBSP).
 
 **R1. Correctness:**
-- [ ] 0004: the `boxes3` box says the colour-labelled box holds "לא את התערובת (היא בקופסה k)"
+- [x] 0004: the `boxes3` box says the colour-labelled box holds "לא את התערובת (היא בקופסה k)"
   but box k holds the drawn colour; the page's rule (part a, SV note 3) is circular in the
   same way (resolve the box labelled with the other colour first: it must be the mix).
   Line 325 "12 המקרים של סעיף א" (part a has 2; the 12 are part b's). The Python block's
   `hl_lines="8 13"` lights `else:` (should be 8 15). The four-boxes follow-up never defines
   "ארבעה סוגי תוכן" and proves only "at least 2" (four single colours: exactly 2).
-- [ ] 0018: the stepper caption "11 + 4 = 15" (q0018.py line 29) renders "15 = 4 + 11":
+- [x] 0018: the stepper caption "11 + 4 = 15" (q0018.py line 29) renders "15 = 4 + 11":
   an LTR span.
-- [ ] 0026: the lower bound covers only alpha >= 3 but the page claims the formula is
+- [x] 0026: the lower bound covers only alpha >= 3 but the page claims the formula is
   optimal for all speeds (alpha = 2: the page's own inequalities admit T = 4/3 < 7/5; say so
   or point to the fixed-driver follow-up, whose proof holds for all alpha). The "four
   people" and "general" follow-ups say "show it is the shortest" but only compute the
   symmetric plan: the same chain gives (alpha + 2k - 1) T >= (2k - 1) alpha + 1 for alpha >= 3.
-- [ ] 0029: "וב-12 שעות יש רק 11 כאלה" next to a table of 12 rows (k = 0..11); step 6 of
+- [x] 0029: "וב-12 שעות יש רק 11 כאלה" next to a table of 12 rows (k = 0..11); step 6 of
   part b asserts without a reason that no moment belongs to exactly two pairs; the clock box
   paints all three hands orange at 3:16:16 (two separate meetings 0.085 s apart, the
   closest pair of the day: say so, or make it a task).
-- [ ] 0045: trap 1's reason is wrong: the "all balanced shows no kind" count allows 13 balls
+- [x] 0045: trap 1's reason is wrong: the "all balanced shows no kind" count allows 13 balls
   (2N = 26 <= 26); what rules 13 out is the first weighing without a helper ball (the search:
   13 solvable with one helper, not without). Follow-up 1 proves only fixed codes (lead with:
   at most 4 per pan by parity, the balanced branch leaves >= 5, two weighings with a helper
@@ -1417,10 +1444,10 @@ NBSP).
   N >= 3; the interviewer block's "החסם הוא ספירה פשוטה" contradicts trap 1. Follow-up 2
   overstated: no odd ball gives only (=,=,=); with two odd balls 252 of 264 cases decode
   silently to a wrong ball.
-- [ ] 0048: part c's "s < 0 בדיוק כש..." fails at a = H (s = 0 at 30 degrees); the short
+- [x] 0048: part c's "s < 0 בדיוק כש..." fails at a = H (s = 0 at 30 degrees); the short
   answer's "בלי מקרי קצה" against the proof's 60-degree case through O; the water-first
   follow-up says the line rises (it falls; the size is right).
-- [ ] 0056: the "חלון שמתמלא" follow-up ("from then on the update is normal") is wrong: with
+- [x] 0056: the "חלון שמתמלא" follow-up ("from then on the update is normal") is wrong: with
   no reset r stays wrong (642 of 1000 runs at L = 4); treat the leaving digit as 0 until the
   counter reaches L (0 of 1000). "The same number of states both ways" holds only for m = 3
   (bit reversal keeps divisibility by 3; m = 7, L = 7: 61 vs 63); "at least L bits" rests on
@@ -1428,15 +1455,15 @@ NBSP).
   ceil(5 * 2^L / 6), checked to L = 14). Trace headers say 2^L, the cells use C = 2. The
   follow-up mixes the alternating bit sum (2 = -1 mod 3) with the sum of bit pairs (4 = 1).
   SV `win_div` is silently wrong when MSB = 1 and B has no inverse mod M (an elaboration check).
-- [ ] 0063: part c's cost "needs the same storage" (the deque needs more: 33 vs 24 bits at
+- [x] 0063: part c's cost "needs the same storage" (the deque needs more: 33 vs 24 bits at
   K = 3, W = 8); the `if` trap says the recorded length is right "במקרה" (it always is). SUSPECTED:
   "a for loop with break unrolls into K comparisons in series" (K parallel comparators and an
   AND chain). Typo "זוזות" -> "זזות".
-- [ ] 0089: part c's cost "g גדל בערך כמו המכפלה של שני מטבעות" (101, 103, 107: g = 3533,
+- [x] 0089: part c's cost "g גדל בערך כמו המכפלה של שני מטבעות" (101, 103, 107: g = 3533,
   not ~10403; the product is only a bound); the short answer "אין נוסחה" -> no simple closed
   formula (fast exact methods exist for three coins). Proof gaps: part b's "payable iff
   y >= 0" unproven; part c's proof never writes "n >= dist implies payable".
-- [ ] 0092: box 3's switch from the regular polygon to "חופשי, גוררים" loads the nudged
+- [x] 0092: box 3's switch from the regular polygon to "חופשי, גוררים" loads the nudged
   default (31 regions), not the hexagon, so the page's "move to free and drag" cannot break
   the centre point (keep the current angles). "ההתאמה עד 5 היא מקרה" then proves an
   identity; "במחשב P <= C(n,4)" is always true; hint 2 of part c "בחלק המיליארד האחרון"
@@ -1476,31 +1503,46 @@ coverage of every insert position, the spare slot included. 0089: the constraint
 unaligned edges are at least 2 ns apart, the gcd). None needed: 0018, 0026, 0048, 0092.
 
 **R4. Explanations:**
-- [ ] 0004: the 12 cases; the four-boxes answer.
-- [ ] 0018: the cost needs a case for "BFS is not fewest flips" (A = 3, B = 5, D = 12); the
+- [x] 0004: the 12 cases; the four-boxes answer.
+- [x] 0018: the cost needs a case for "BFS is not fewest flips" (A = 3, B = 5, D = 12); the
   "from 17 every D" follow-up needs its reason (A alone to t = 7 shifts the start state:
   closed under +7 and +11, and 17-23 are seven in a row); the proof never says why the
   t + w > D prune (w >= 1) and `seen` are safe; hints 1 and 2 together give the whole plan;
   the wait trap is weaker than it reads (from 0 dropping the wait changed nothing for
   A, B <= 15, D < 80); the box's "not measurable" list of 48 numbers -> "7, 11, 14, 15, and
   from 17 every value".
-- [ ] 0026: the "the other walks meanwhile" row (3 alpha - 1)/(alpha + 1) has no
+- [x] 0026: the "the other walks meanwhile" row (3 alpha - 1)/(alpha + 1) has no
   derivation; the "where does the rider get off" follow-up is solved twice in the body and
   "why nothing faster" repeats the proof; "מקווקות" -> "בקו מקווקו"; "תכנית" / "תוכנית" mixed.
-- [ ] 0029: the three hands meet only at 00:00 and 12:00, proved three times; part b's
+- [x] 0029: the three hands meet only at 00:00 and 12:00, proved three times; part b's
   "אותה הוכחה, בדרך של סעיף א" paragraph can shrink; line 290 a colon after math with no NBSP.
-- [ ] 0045: part b's 12-ball table differs from what part c builds for N = 12 (one line);
+- [x] 0045: part b's 12-ball table differs from what part c builds for N = 12 (one line);
   part a step 3 has no numbers; part c needs a small orbit example (k = 3, four orbits).
-- [ ] 0048: part c step 5 jumps to the closed form of s (the distance of B1 from the food
+- [x] 0048: part c step 5 jumps to the closed form of s (the distance of B1 from the food
   line comes only in a trap; the report has the line in coordinates); part b step 4 lists
   four range conditions and checks two; numbers repeated; part a's idea vague.
-- [ ] 0056: the trap's difference starts "when a 1 leaves", not when the window fills; part
+- [x] 0056: the trap's difference starts "when a 1 leaves", not when the window fills; part
   b's short answer renders "ו- r'".
-- [ ] 0089: the box paragraph "הקלידו מטבעות, ושני עד ארבעה ערכים" is garbled (the field takes
+- [x] 0089: the box paragraph "הקלידו מטבעות, ושני עד ארבעה ערכים" is garbled (the field takes
   one to four coins); the last step of "everything above g is payable" is compressed; part
   c's proof starts both directions with the same premise.
-- [ ] 0092: hint 1 of part b gives "1 + lines + crossings"; part b's idea repeats proof 1
+- [x] 0092: hint 1 of part b gives "1 + lines + crossings"; part b's idea repeats proof 1
   line by line.
+
+**Left after round 4 (open):**
+- [ ] 0019's hourglass box is 1201 px at 1920 x 1080 (it shares 0018's stylesheet now).
+- [ ] 0048's farm box with "הצגת השיקוף" on is 1120 px (1221 in free-stops mode); check_heights
+  measures the default state only.
+- [ ] Videos to re-caption before any re-render: 0004 (the rule in the old order: the box
+  labelled c first; the box beat and the trap repeat text the page shortened), 0018
+  ("מ-(7, 0, 4) יוצאים ארבעה מצבים. שלושה כבר נמצאו", the old slider labels and long list),
+  0026 (the box captures show the one-column layout and the old help wording), 0029 (script
+  line 138 "ב-12 שעות יש רק 11 כאלה"; captures at 3:16:16 lack the new summary), 0048 (script
+  line 210 "בלי מקרי קצה").
+- [ ] 0004's mermaid flowchart: "איזה צבע יצא?" renders with "?" first, and "צבע הכדור עובר
+  ל-k" breaks around "-k" (Mermaid's RTL layout).
+- [ ] stylesheets/27-box-columns.css sets `max-width: 10rem` on `.ex-controls input[type=range]`,
+  but the motorcycle box's sliders measure 220 px: check which rule wins.
 
 ---
 
