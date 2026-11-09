@@ -1,5 +1,5 @@
 // kinds: circlecut
-//   circlecut              0092        points on a circle, every pair joined by a chord (n from 1 to 10, the points dragged on the circle or a regular polygon): every region of the disc in its own colour, the counts live (points, chords, crossing points, regions, against C(n, 4) + C(n, 2) + 1), and the chords added one at a time, each adding 1 + the number of points where it meets the earlier chords; points where three chords meet are ringed
+//   circlecut              0092        points on a circle, every pair joined by a chord (n from 1 to 10, the points dragged on the circle or a regular polygon; from the polygon to dragging the points stay put): every region of the disc in its own colour, the counts live (points, chords, crossing points, regions, against C(n, 4) + C(n, 2) + 1), and the chords added one at a time, each adding 1 + the number of points where it meets the earlier chords; points where three chords meet are ringed
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the script
 // tag); under Node tools/explorer_node.js loads every kind file and merges the models for the
 // question tests.
@@ -271,7 +271,17 @@
         draw();
       };
       $(".mc-n").addEventListener("change", setN);
-      $(".mc-where").addEventListener("change", setN);
+      // from the regular polygon to free dragging the points stay where they are, so one
+      // vertex moved a little breaks the polygon's special points (on the half-degree grid
+      // of the dragged points and the link: only 7 points move, by at most a quarter degree,
+      // and an odd polygon has no point of three chords to lose)
+      $(".mc-where").addEventListener("change", () => {
+        if ($(".mc-where").value === "regular" || st.angles.length !== Number($(".mc-n").value)) { setN(); return; }
+        stop();
+        st.angles = st.angles.map((t) => (Math.round(t * 2) / 2) % 360);
+        st.k = 0;
+        draw();
+      });
       $(".mc-show").addEventListener("change", () => { stop(); st.k = 0; draw(); });
       $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
       $(".ex-prev").addEventListener("click", () => { stop(); st.k--; draw(); });

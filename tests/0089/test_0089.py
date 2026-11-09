@@ -121,6 +121,18 @@ def test_explorer_matches_the_reference():
                 assert sum(c * k for c, k in p["counts"]) == n, (coins, n)
             elif reduce(gcd, coins) == 1:
                 assert p["why"] == "below", (coins, n)
+    # the fewest coins (the pay box's extra line), against a brute force over every count
+    for coins in ([6, 9, 20], [3, 5], [4, 6, 9, 20]):
+        few = node_json(f"const m = {explorer_require()};"
+                        f"console.log(JSON.stringify(Array.from({{length: 121}}, (_, n) => m.fbFewest({json.dumps(coins)}, n))));")
+        for n, f in enumerate(few):
+            counts = [sum(ks) for ks in itertools.product(*[range(n // c + 1) for c in coins])
+                      if sum(k * c for k, c in zip(ks, coins)) == n]
+            if not counts:
+                assert f is None, (coins, n)
+                continue
+            assert sum(c * k for c, k in f) == n and sum(k for _, k in f) == min(counts), (coins, n)
+    assert node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.fbFewest([6, 9, 20], 60)));") == [[20, 3]]
     greedy = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.fbGreedy([6, 9, 20], 24)));")
     assert greedy == {"counts": [[20, 1]], "left": 4}
     cases = ["6, 9, 20", "20 9 6", "3,5", "7", "4, 6, 9, 20", "1, 2, 3, 4, 5", "0, 5", "21, 4", "a, 3", "", "6,6,9"]

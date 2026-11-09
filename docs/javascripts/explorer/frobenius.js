@@ -1,5 +1,5 @@
 // kinds: frobenius
-//   frobenius              0089        coins you cannot make up (data-coins, one to four coins of 1 to 20) in three modes: line (data-mode="line"), the amounts in rows of ten, payable or not, the largest one that is not framed and the run of min(coins) payable amounts after it; residues (data-mode="residues"), the amounts in columns by their remainder mod the smallest coin, Dijkstra settling one column a step, the first payable amount of each column and everything under it; pay (data-mode="pay", data-n), a typed amount paid with the coins (the first payable amount of its column and coins of the smallest one), or why it cannot be
+//   frobenius              0089        coins you cannot make up (data-coins, one to four coins of 1 to 20) in three modes: line (data-mode="line"), the amounts in rows of ten, payable or not, the largest one that is not framed and the run of min(coins) payable amounts after it; residues (data-mode="residues"), the amounts in columns by their remainder mod the smallest coin, Dijkstra settling one column a step, the first payable amount of each column and everything under it; pay (data-mode="pay", data-n), a typed amount paid with the coins (the first payable amount of its column and coins of the smallest one, and the fewest coins when that is fewer), or why it cannot be
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -66,6 +66,22 @@
     for (let s = r; dist[s] > 0; s = (s - last[s] % a + a) % a) cnt.set(last[s], cnt.get(last[s]) + 1);
     cnt.set(a, cnt.get(a) + (n - dist[r]) / a);
     return { ok: true, r, first: dist[r], counts: [...cnt].filter(([, k]) => k > 0).sort((x, y) => y[0] - x[0]) };
+  };
+  // the payment with the fewest coins: [[coin, count], ...] largest coin first (ties to the
+  // larger coins), or null when n cannot be paid
+  const fbFewest = (coins, n) => {
+    const best = new Int32Array(n + 1).fill(-1), last = new Int32Array(n + 1);
+    best[0] = 0;
+    const desc = [...coins].reverse();
+    for (let v = 1; v <= n; v++) {
+      for (const c of desc) {
+        if (c <= v && best[v - c] >= 0 && (best[v] < 0 || best[v - c] + 1 < best[v])) { best[v] = best[v - c] + 1; last[v] = c; }
+      }
+    }
+    if (best[n] < 0) return null;
+    const cnt = new Map();
+    for (let v = n; v > 0; v -= last[v]) cnt.set(last[v], (cnt.get(last[v]) || 0) + 1);
+    return [...cnt].sort((x, y) => y[0] - x[0]);
   };
   // the greedy payment, largest coin first: the coins and what is left (0 when it pays)
   const fbGreedy = (coins, n) => {
@@ -155,7 +171,7 @@
       $(".fb-sum").innerHTML = `הגדול שאי אפשר${NB}: ${ltr(g)}. אחריו ${ltr(a)} סכומים ברצף שאפשר (${ltr(`${g + 1}–${g + a}`)}), ומכאן כל סכום אפשרי. בסך הכול ${ltr(bad)} סכומים אי אפשר לשלם.`;
       $(".fb-note").innerHTML = coins.length === 2
         ? `שני מטבעות זרים${NB}: ${ltr(`ab − a − b = ${coins[0] * coins[1]} − ${coins[0]} − ${coins[1]} = ${coins[0] * coins[1] - coins[0] - coins[1]}`)}, ו-${ltr(`(a − 1)(b − 1)/2 = ${((coins[0] - 1) * (coins[1] - 1)) / 2}`)}.`
-        : coins.length > 2 ? `לשלושה מטבעות ויותר אין נוסחה. התשובה באה מהעמודות של סעיף ג.` : "";
+        : coins.length > 2 ? `לשלושה מטבעות ויותר אין נוסחה סגורה פשוטה. התשובה באה מהעמודות של סעיף ג.` : "";
       answer(box, `הסכום הגדול ביותר שאי אפשר לשלם במטבעות ${ltr(coinsText(coins))} הוא ${ltr(g)}.`, ".fb-wrap td.fb-g");
     };
     setupCoins(box, c0, (v) => { st.coins = v; draw(); });
@@ -281,6 +297,8 @@
       if (p.ok) {
         sum = `${RLM}${ltr(`${n} = ${n ? sumText(p.counts) : "0"}`)}.`;
         note = n ? `הסכום בעמודה של שארית ${ltr(r)}, שהראש שלה ${ltr(p.first)}${how2(coins, p.first)}. ${adds((n - p.first) / a, a)}` : "סכום 0, בלי מטבעות.";
+        const few = n ? fbFewest(coins, n) : null, many = (cs) => cs.reduce((s, [, k]) => s + k, 0);
+        if (few && many(few) < many(p.counts)) note += ` זו דרך אחת. הכי מעט מטבעות${NB}: ${ltr(sumText(few))}, ${ltr(many(few))} מטבעות.`;
         const gr = fbGreedy(coins, n);
         if (gr.left) note += ` החמדן, שמתחיל במטבע הגדול, היה נתקע${NB}: ${ltr(gr.counts.length ? `${sumText(gr.counts)}` : "0")} ונשארים ${ltr(gr.left)}.`;
         answer(box, `את ${ltr(n)} אפשר לשלם${NB}: ${ltr(n ? sumText(p.counts) : "0")}.`, ".fb-wrap td.fb-pick");
@@ -322,6 +340,6 @@
     help: {
       frobenius: "שלושה מצבים. בכולם מקלידים את המטבעות, אחד עד ארבעה ערכים מ-1 עד 20, ומאשרים ב-Enter. בציר הסכומים כל סכום צבוע לפי אם אפשר לשלם אותו, והגדול שאי אפשר ממוסגר. בעמודות כל צעד הוא צעד של Dijkstra : עמודה אחת נסגרת, הראש שלה מתגלה, וכל מה שמתחתיו נצבע. בתשלום מקלידים סכום, ורואים איך לשלם אותו, או למה אי אפשר.",
     },
-    models: { fbParse, fbGcd, fbPayable, fbApery, fbFrob, fbPay, fbGreedy },
+    models: { fbParse, fbGcd, fbPayable, fbApery, fbFrob, fbPay, fbFewest, fbGreedy },
   });
 })();
