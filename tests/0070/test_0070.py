@@ -53,23 +53,29 @@ def test_explorer_matches_the_reference():
     cases += [["b", q0070.CE_GRID, [0, 0], [2, 2], False, 1], ["c", q0070.COST, list(q0070.CS), list(q0070.CT), False, 0],
               ["c", q0070.COST, list(q0070.CS), list(q0070.CT), True, 0], ["a", ["010", "111", "000"], [0, 0], [2, 2], False, 0]]
     cases += [c for c in (random_case(rng, mode) for mode in "abc" for _ in range(40)) if c]
+    cases = [c + [False] for c in cases]
+    # the trap's search (one visit per cell) of box b: its 3 x 3 board and random grids
+    cases += [["b", q0070.CE_GRID, [0, 0], [2, 2], False, 1, True], ["b", q0070.GRID, list(q0070.S), list(q0070.T), False, 1, True]]
+    cases += [c + [True] for c in (random_case(rng, "b") for _ in range(40)) if c]
     got = node_json(f"""
       const m = {explorer_require()};
       const C = {json.dumps(cases)};
-      console.log(JSON.stringify([C.map(([mode, g, s, t, d, k]) => m.gpTrace(mode, g, s, t, d, k)),
+      console.log(JSON.stringify([C.map(([mode, g, s, t, d, k, naive]) => m.gpTrace(mode, g, s, t, d, k, naive)),
         [1, 2, 3, 77, 1234].map((seed) => ["a", "c"].map((mode) => m.gpRandom(m.mulberry32(seed), mode, 9, 11, [3, 0], [3, 8]))),
         [m.gpParse("0000.0101.0000.0010", "a"), m.gpParse("0000.010", "a"), m.gpParse("19#1.1111.1111.1111", "c"), m.gpParse("0102.0000.0000.0000", "a"),
-         m.gpParse("000.000.000", "a")]]));""")
+         m.gpParse("000.000.000", "a"), m.gpParse("00.00", "a")]]));""")
     for case, frames in zip(cases, got[0]):
-        mode, g, s, t, diag, k = case
-        ref = json.loads(json.dumps(q0070.trace(mode, g, tuple(s), tuple(t), diag, k)))
+        mode, g, s, t, diag, k, naive = case
+        ref = json.loads(json.dumps(q0070.trace(mode, g, tuple(s), tuple(t), diag, k, naive)))
+        if naive:                                   # the trap's search is the generator's naive_breaks
+            assert q0070.answer_of(ref) == q0070.naive_breaks(g, tuple(s), tuple(t), k, diag), case
         assert frames == ref, case
     for per_seed in got[1]:
         a, c = per_seed
         assert len(a) == 9 and all(len(r) == 11 and set(r) <= {"0", "1"} for r in a)
         assert a[3][0] == "0" and a[3][8] == "0"
         assert len(c) == 9 and all(set(r) <= set("123456789#") for r in c) and c[3][0] != "#" and c[3][8] != "#"
-    assert got[2] == [["0000", "0101", "0000", "0010"], None, ["19#1", "1111", "1111", "1111"], None, None]
+    assert got[2] == [["0000", "0101", "0000", "0010"], None, ["19#1", "1111", "1111", "1111"], None, ["000", "000", "000"], None]
 
 
 def test_figures_up_to_date():

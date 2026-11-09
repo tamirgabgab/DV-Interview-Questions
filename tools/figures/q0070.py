@@ -165,7 +165,7 @@ def fewest_steps_costs(grid, s, t, diag=False):
 
 # --- the page's three searches, pop by pop --------------------------------------------------------
 
-def trace(mode, grid, s, t, diag=False, k=0):
+def trace(mode, grid, s, t, diag=False, k=0, naive=False):
     """The search of the mode ("a" BFS, "b" BFS over (cell, breaks left), "c" Dijkstra) pop
     by pop, as the page's code runs it. A frame per pop: kind "pop", "goal" (t popped: the
     end, with the path) or "skip" (a stale heap entry), and a last "none" frame when the
@@ -174,7 +174,9 @@ def trace(mode, grid, s, t, diag=False, k=0):
     mode a; squeeze, nobreak, worse, push in b; squeeze, wall, noimp, push in c), the
     frontier after it (cells in a, [r, c, left, d] in b, [d, r, c] sorted in c) and the
     values of every cell (a: the distance, b: the most breaks left and the distance of that
-    state, c: the cost; -1 for none)."""
+    state, c: the cost; -1 for none). naive (mode b only) runs the trap's search instead: a
+    cell enters the queue once, with the breaks left of its first entry, and a later state
+    of a marked cell is dropped (why "seen")."""
     m, n = len(grid), len(grid[0])
     wall = wall_of(mode)
     frames = []
@@ -234,6 +236,8 @@ def trace(mode, grid, s, t, diag=False, k=0):
                     nb.append([a, b, "squeeze", None])
                 elif rest < 0:
                     nb.append([a, b, "nobreak", rest])
+                elif naive and val[a][b] >= 0:
+                    nb.append([a, b, "seen", rest])
                 elif rest <= val[a][b]:
                     nb.append([a, b, "worse", rest])
                 else:
@@ -281,10 +285,12 @@ def answer_of(frames):
 
 # --- follow-ups -------------------------------------------------------------------------------------
 
-def astar(grid, s, t, diag=False):
+def astar(grid, s, t, diag=False, tie="g"):
     """A* with the entry costs: h is the number of steps left (Manhattan, or Chebyshev with
-    diagonals) times the least cost of a cell, which never overestimates. Returns the cost
-    and the number of pops (stale entries skipped)."""
+    diagonals) times the least cost of a cell, which never overestimates. Equal f values
+    leave by the cost paid so far g, then the cell (tie "g"), or by the row and the column
+    as cheapest_path's heap does (tie "cell"). Returns the cost and the number of pops
+    (stale entries skipped)."""
     m, n = len(grid), len(grid[0])
     cmin = min(int(ch) for row in grid for ch in row if ch != "#")
 
@@ -292,10 +298,14 @@ def astar(grid, s, t, diag=False):
         dr, dc = abs(r - t[0]), abs(c - t[1])
         return cmin * (max(dr, dc) if diag else dr + dc)
 
+    def entry(d, u):
+        return (d + h(*u), d, u) if tie == "g" else (d + h(*u), u, d)
+
     g = {s: 0}
-    heap, pops = [(h(*s), 0, s)], 0
+    heap, pops = [entry(0, s)], 0
     while heap:
-        f, d, u = heapq.heappop(heap)
+        e = heapq.heappop(heap)
+        d, u = (e[1], e[2]) if tie == "g" else (e[2], e[1])
         if d > g[u]:
             continue
         pops += 1
@@ -306,7 +316,7 @@ def astar(grid, s, t, diag=False):
                 nd = d + int(grid[a][b])
                 if nd < g.get((a, b), float("inf")):
                     g[(a, b)] = nd
-                    heapq.heappush(heap, (nd + h(a, b), nd, (a, b)))
+                    heapq.heappush(heap, entry(nd, (a, b)))
     return -1, pops
 
 
@@ -544,7 +554,12 @@ def table_paths(grid, s, t):
     rows = ["| המסלול | צעדים | העלויות של התאים שנכנסים אליהם | העלות |", "|:--|:-:|:--|:-:|"]
     rows.append(f"| ‏BFS : הכי מעט צעדים | {RLM}{len(bp) - 1} | {RLM}{ltr(' + '.join(grid[r][c] for r, c in bp[1:]))} | {RLM}{path_cost(grid, bp)} |")
     rows.append(f"| ‏Dijkstra : הכי זול | {RLM}{len(cp) - 1} | {RLM}{ltr(' + '.join(grid[r][c] for r, c in cp[1:]))} | {RLM}{path_cost(grid, cp)} |")
-    rows.append(f"| הזול ביותר מבין המסלולים של {steps} צעדים | {RLM}{steps} | — | {RLM}{best_short} |")
+    # a path of the fewest steps goes right 6 times and down once, in rows 2 and 3 only (the
+    # same costs): one cell in each of columns 1 to 5, then two more cells of at least 1
+    assert grid[2] == grid[3] and steps == 7
+    mid = ltr(" + ".join(grid[2][1:6]))
+    rows.append(f"| הזול ביותר מבין המסלולים של {steps} צעדים | {RLM}{steps} | {RLM}{mid} בעמודות 1 עד 5, בשורה 2 או 3, "
+                f"ועוד שני תאים של 1 לפחות | {RLM}{best_short} |")
     return "\n".join(rows)
 
 
@@ -595,7 +610,7 @@ def blocks():
         table_paths(COST, CS, CT),
         table_pops(COST, CS, CT),
     ]
-    return [re.sub(r"(?<=\S) :(?=[\s*]|$)", NB + ":", b) for b in out]   # the colon rule of the Hebrew text
+    return [re.sub(r"(?<=\S) ([:;])(?=[\s*]|$)", NB + r"\1", b) for b in out]   # the colon rule of the Hebrew text, also for ";"
 
 
 if __name__ == "__main__":

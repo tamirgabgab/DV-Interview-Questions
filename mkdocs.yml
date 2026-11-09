@@ -178,6 +178,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0026-motorcycle.css   # 0026: the motorcycle box on one screen, its figures' labels in the columns (session 34)
   - stylesheets/questions/0018-hourglass.css   # 0018, 0019: the hourglass box on one screen (session 34)
   - stylesheets/questions/0063-slidemax.css    # 0063: the sliding window maximum, its box on one screen (session 34)
+  - stylesheets/questions/0070-gridpath.css    # 0070: the grid shortest path, its three boxes on one screen, box b's walls and box c's terrain (session 34)
 
 extra_javascript:
   - javascripts/mathjax.js

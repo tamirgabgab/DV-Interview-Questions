@@ -1,0 +1,35 @@
+/* Question 0070, the shortest path in a grid: the three gridpath boxes of
+   explorer/gridpath.js (gp-*, on the shared grid rules of 11-questions.css) on one screen,
+   box b's walls (entered by a state, or broken by the path) and box c's popped cells, which
+   keep their terrain. Every rule is scoped to data-kind="gridpath", so the latpaths box of
+   0022, which reuses the gp-* grid, is not touched. Colours from the palette only. */
+
+/* box b: a wall some state entered stays grey, lighter than a wall so that its numbers read
+   (the mountain's fill of box c, whose text pairs are checked); at the end only the walls
+   of the path are broken (the shared is-broken fill) */
+.md-typeset .explorer[data-kind="gridpath"].gp-is-b .gp-cell.is-entered { background: color-mix(in srgb, var(--viz-ink) 29%, var(--md-default-bg-color)); }
+.md-typeset .explorer[data-kind="gridpath"] .viz-legend .gp-key-entered { background: color-mix(in srgb, var(--viz-ink) 29%, var(--md-default-bg-color)); }
+
+/* box c: every open cell keeps its terrain (road, mud, mountain) through the run; the
+   frontier is the shared tint over it, and a popped cell gets a frame instead of a fill, in
+   the link blue, which keeps 3:1 on all three terrains in both schemes (s1 does not on the
+   mountain) */
+.md-typeset .explorer[data-kind="gridpath"].gp-is-c .gp-cell.is-open.gx-t1 { background-color: var(--md-default-bg-color); }
+.md-typeset .explorer[data-kind="gridpath"].gp-is-c .gp-cell.is-open.gx-t2 { background-color: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer[data-kind="gridpath"].gp-is-c .gp-cell.is-open.gx-t3 { background-color: color-mix(in srgb, var(--viz-ink) 29%, var(--md-default-bg-color)); }
+.md-typeset .explorer[data-kind="gridpath"].gp-is-c .gp-cell.is-open.is-front { background-image: linear-gradient(color-mix(in srgb, var(--viz-s3) 30%, transparent), color-mix(in srgb, var(--viz-s3) 30%, transparent)); }
+.md-typeset .explorer[data-kind="gridpath"].gp-is-c .gp-cell.is-open.is-done { background-image: none; box-shadow: inset 0 0 0 2px var(--md-typeset-a-color); }
+.md-typeset .explorer[data-kind="gridpath"].gp-is-c .viz-legend .gp-key-done { background: none; outline: 2px solid var(--md-typeset-a-color); outline-offset: -2px; }
+
+/* the number fields no wider than their two digits */
+.md-typeset .explorer[data-kind="gridpath"] input.ex-num { width: 3.2rem; }
+
+/* one screen at 1920 x 1080 (the box in two columns): the key beside the grid (core.js cols), a
+   shorter code view, which scrolls itself to the step's lines, and slightly smaller cells */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="gridpath"] .ex-side .ex-explain .ex-codewrap { max-height: 14rem; }
+  .md-typeset .explorer[data-kind="gridpath"] .ex-side .viz-legend { gap: 0.2rem 0.6rem; font-size: 0.6rem; margin: 0 0 0.4rem; }
+  .md-typeset .explorer[data-kind="gridpath"] .ex-main .gp-wrap { width: min(100%, calc(var(--n) * 2rem)); }
+  .md-typeset .explorer[data-kind="gridpath"] .ex-main .gp-edit-hint { margin: 0 0 0.2rem; }
+  .md-typeset .explorer[data-kind="gridpath"] .ex-main .gp-panel { margin: 0.3rem 0; }
+}

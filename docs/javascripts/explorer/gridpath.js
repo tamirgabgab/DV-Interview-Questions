@@ -1,12 +1,12 @@
 // kinds: gridpath
-//   gridpath               0070        a grid of open cells and walls (data-grid, rows joined by dots; in mode c every cell a cost 1..9 or # for a wall) with a start and a target (data-s, data-t "r,c") and three modes: a, the BFS of shortest_path; b, the BFS over (cell, breaks left) of shortest_with_breaks with k from 0 to 5 (data-k); c, the Dijkstra of cheapest_path. Four or eight directions (data-diag), the rows and the columns from 4 to 14, a tap or a drag paints walls (a, b) or the brush's cost (c), S and T dragged, a random grid from a seed and a clear one; every step one pop: the cell out of the queue framed, its neighbours marked, the frontier tinted, every visited cell with its distance (b: and the most breaks left, c: its cost), the path drawn at the end; a caption per step, the queue or the heap under the grid and the explain panel with the code lines of the step
+//   gridpath               0070        a grid of open cells and walls (data-grid, rows joined by dots; in mode c every cell a cost 1..9 or # for a wall) with a start and a target (data-s, data-t "r,c") and three modes: a, the BFS of shortest_path; b, the BFS over (cell, breaks left) of shortest_with_breaks with k from 0 to 5 (data-k), or the trap's search that marks every cell once (a select); c, the Dijkstra of cheapest_path. Four or eight directions (data-diag), the rows and the columns from 3 to 14, a tap or a drag paints walls (a, b) or the brush's cost (c), S and T dragged, a random grid from a seed and a clear one; every step one pop: the cell out of the queue framed, its neighbours marked, the frontier tinted, every visited cell with its distance (b: and the most breaks left, c: its cost), the path drawn at the end; a caption per step, the queue or the heap under the grid and the explain panel with the code lines of the step
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
   const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
   const NB = "\u00a0";
-  const MINS = 4, MAXS = 14, KMAX = 5, LIST_MAX = 14;
+  const MINS = 3, MAXS = 14, KMAX = 5, LIST_MAX = 14;
   const DIRS = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
   const DIR_HEB = ["למעלה", "למטה", "שמאלה", "ימינה", "למעלה-שמאלה", "למעלה-ימינה", "למטה-שמאלה", "למטה-ימינה"];
 
@@ -27,8 +27,9 @@
   // the popped cell and its value (d; left in mode b), the moves checked as [a, b, why,
   // value], the frontier after it (cells in a, [r, c, left, d] in b, [d, r, c] sorted in c)
   // and the values of every cell (a: the distance, b: the most breaks left and in dst the
-  // steps of that state, c: the cost; -1 for none).
-  const gpTrace = (mode, grid, s, t, diag, k) => {
+  // steps of that state, c: the cost; -1 for none). naive (mode b) is the trap's search: a
+  // cell enters the queue once, and a later state of a marked cell is "seen".
+  const gpTrace = (mode, grid, s, t, diag, k, naive = false) => {
     const m = grid.length, n = grid[0].length, wall = mode === "c" ? "#" : "1";
     const val = grid.map((row) => [...row].map(() => -1)), dst = grid.map((row) => [...row].map(() => -1));
     const par = new Map(), frames = [];
@@ -71,6 +72,7 @@
           const rest = left - (grid[a][b] === "1" ? 1 : 0);
           if (sq) nb.push([a, b, "squeeze", null]);
           else if (rest < 0) nb.push([a, b, "nobreak", rest]);
+          else if (naive && val[a][b] >= 0) nb.push([a, b, "seen", rest]);
           else if (rest <= val[a][b]) nb.push([a, b, "worse", rest]);
           else {
             val[a][b] = rest;
@@ -134,9 +136,9 @@
     c: { code: "cheapest_path", wall: "#", open: "1", queue: "הערימה" },
   };
   const STEPS = {
-    a: ["מתחילים מ-S", "מוציאים מראש התור", `השכנים${NB}: מרחק + 1, הורה, לתור`, `תור ריק${NB}: −1`, "המסלול מההורים"],
-    b: [`מתחילים${NB}: (S, k, 0)`, "מוציאים מראש התור", `השכנים${NB}: ℓ′`, "רק מצב טוב יותר נכנס", `תור ריק${NB}: −1`],
-    c: [`מתחילים${NB}: cost[S] = 0`, "מוציאים את הקטן", "היעד", "משחררים", `ערימה ריקה${NB}: −1`],
+    a: ["מתחילים מ-S", "מוציאים מראש התור", `השכנים${NB}: מרחק + 1, הורה, לתור`, `תור ריק${NB}: ${ltr("−1")}`, "המסלול מההורים"],
+    b: [`מתחילים${NB}: (S, k, 0)`, "מוציאים מראש התור", `השכנים${NB}: ℓ′`, "רק מצב טוב יותר נכנס", `תור ריק${NB}: ${ltr("−1")}`],
+    c: [`מתחילים${NB}: cost[S] = 0`, "מוציאים את הקטן", "היעד", "משחררים", `ערימה ריקה${NB}: ${ltr("−1")}`],
   };
   const R = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
   // the lines of the page's code for every kind of frame, per mode
@@ -170,14 +172,15 @@
       const s0 = fit(cellOf(box.dataset.s), grid0, [0, 0]);
       const t0 = fit(cellOf(box.dataset.t), grid0, [grid0.length - 1, grid0[0].length - 1]);
       const k0 = Math.min(KMAX, Math.max(0, Number(box.dataset.k) || 0)), diag0 = box.dataset.diag === "1";
-      const st = { grid: grid0.slice(), s: s0.slice(), t: t0.slice(), k: k0, diag: diag0, brush: "#", s_: 0, focus: [0, 0] };
+      const st = { grid: grid0.slice(), s: s0.slice(), t: t0.slice(), k: k0, diag: diag0, naive: false, brush: "#", s_: 0, focus: [0, 0] };
       const still = typeof navigator !== "undefined" && navigator.webdriver === true;
       box.classList.add(`gp-is-${mode}`);
       if (still) box.classList.add("gp-still");
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>כיוונים <select class="gp-dirs" aria-label="ארבעה או שמונה כיוונים"><option value="4">ארבעה</option><option value="8">שמונה</option></select></label>` +
-        (mode === "b" ? `<label><span>k</span> <input type="number" class="ex-num gp-k" min="0" max="${KMAX}" step="1" dir="ltr" aria-label="מספר הקירות שמותר לשבור, 0 עד ${KMAX}"></label>` : "") +
+        (mode === "b" ? `<label><span>k</span> <input type="number" class="ex-num gp-k" min="0" max="${KMAX}" step="1" dir="ltr" aria-label="מספר הקירות שמותר לשבור, 0 עד ${KMAX}"></label>` +
+          `<label>סימון <select class="gp-mark" aria-label="מה החיפוש מסמן כמי שכבר נראה, מצב כמו בקוד או תא כמו במלכודת"><option value="state">לפי מצב (הקוד)</option><option value="cell">לפי תא (המלכודת)</option></select></label>` : "") +
         `<label>שורות <input type="number" class="ex-num gp-rows" min="${MINS}" max="${MAXS}" step="1" dir="ltr" aria-label="מספר השורות, ${MINS} עד ${MAXS}"></label>` +
         `<label>עמודות <input type="number" class="ex-num gp-cols" min="${MINS}" max="${MAXS}" step="1" dir="ltr" aria-label="מספר העמודות, ${MINS} עד ${MAXS}"></label>` +
         (mode === "c" ? `<label>מברשת <select class="gp-brush" data-nolink aria-label="מה לחיצה על תא צובעת">` +
@@ -192,23 +195,28 @@
         `<button type="button" class="md-button ex-end">עד הסוף</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(600, 250, 80) +
         `<span class="ex-pos"></span></div>` +
-        `<p class="ex-summary gp-sum" aria-live="polite"></p>` +
-        `<p class="gp-edit-hint">${mode === "c" ? "לחיצה או גרירה על תאים צובעת אותם במברשת" : "לחיצה או גרירה על תאים מציירת קירות או מוחקת אותם"}, ו-S ו-T נגררים למקום אחר. במקלדת${NB}: חיצים בין התאים, רווח צובע, S או T מעבירים לשם את ההתחלה או את היעד.</p>` +
-        `<figure class="gp-panel"><div class="gp-wrap"><div class="gp-grid" role="grid" dir="ltr" data-edits aria-label="הלוח${NB}: לחיצה או גרירה צובעת תאים"></div>` +
+        `<p class="gp-edit-hint">${mode === "c" ? "לחיצה או גרירה צובעת תאים במברשת" : "לחיצה או גרירה מציירת קירות או מוחקת אותם"}, ו-S ו-T נגררים.</p>` +
+        `<figure class="gp-panel"><div class="gp-wrap"><div class="gp-grid" role="grid" dir="ltr" data-edits aria-label="הלוח${NB}: לחיצה או גרירה צובעת תאים. במקלדת חיצים בין התאים, רווח צובע, ו-S או T מעבירים לשם את ההתחלה או את היעד"></div>` +
         `<svg class="gp-over" aria-hidden="true" preserveAspectRatio="none"><polyline class="gp-line" points=""/></svg></div></figure>` +
         `<span class="viz-legend"><span><i class="gx-key-s"></i>S ההתחלה, T היעד</span>` +
         (mode === "c" ? `<span><i class="gx-key gx-t1"></i>כביש</span><span><i class="gx-key gx-t2"></i>בוץ</span><span><i class="gx-key gx-t3"></i>הר</span>` : "") +
-        `<span><i class="gx-key is-wall"></i>קיר</span>${mode === "b" ? `<span><i class="gx-key is-broken"></i>קיר שנכנסו אליו (נשבר)</span>` : ""}` +
+        `<span><i class="gx-key is-wall"></i>קיר</span>${mode === "b" ? `<span><i class="gx-key gp-key-entered"></i>קיר שנכנסו אליו</span><span><i class="gx-key is-broken"></i>קיר שהמסלול שובר</span>` : ""}` +
         `<span><i class="gp-key-front"></i>ב${M.queue}</span><span><i class="gp-key-done"></i>יצא מ${M.queue}</span>` +
         `<span><i class="gp-key-cur"></i>יוצא עכשיו</span><span><i class="gp-key-new"></i>נכנס בצעד הזה</span><span><i class="gx-key-path"></i>המסלול</span></span>` +
-        `<p class="gp-note"></p><p class="gp-front"></p>`;
+        `<p class="gp-note" aria-live="polite"></p><p class="gp-front"></p>`;
       const show = explain(box, "הסבר : השלבים של הפתרון והקוד".replace(" :", `${NB}:`));
       answer(box, NB); answer(box, null);                 // the answer line keeps its place from the first step
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), gin = $(".gp-grid"), line = $(".gp-line"), over = $(".gp-over");
-      let F = [];
-      const retrace = () => { F = gpTrace(mode, st.grid, st.s, st.t, st.diag, st.k); };
+      let F = [], right = -1;                            // right: the answer of the code, beside the trap's
+      const retrace = () => {
+        F = gpTrace(mode, st.grid, st.s, st.t, st.diag, st.k, mode === "b" && st.naive);
+        right = mode === "b" && st.naive ? gpAnswer(gpTrace(mode, st.grid, st.s, st.t, st.diag, st.k)) : gpAnswer(F);
+      };
       const isS = (r, c) => st.s[0] === r && st.s[1] === c, isT = (r, c) => st.t[0] === r && st.t[1] === c;
+      // the trap's answer line also gives the code's answer when the two differ
+      const trapTail = (got) => (mode === "b" && st.naive && got !== right
+        ? ` בסימון לפי מצב, כמו בקוד${NB}: ${right < 0 ? ltr("−1") : `${ltr(right)} צעדים`}.` : "");
       const tag = (r, c) => (isS(r, c) ? "S" : isT(r, c) ? "T" : "");
 
       const draw = () => {
@@ -217,6 +225,7 @@
         const e = st.s_ ? F[st.s_ - 1] : null, done = st.s_ === N;
         $(".gp-dirs").value = st.diag ? "8" : "4";
         if ($(".gp-k")) $(".gp-k").value = String(st.k);
+        if ($(".gp-mark")) $(".gp-mark").value = st.naive ? "cell" : "state";
         $(".gp-rows").value = String(m); $(".gp-cols").value = String(n);
         if ($(".gp-brush")) $(".gp-brush").value = st.brush;
         $(".ex-pos").textContent = `צעד ${st.s_} מתוך ${N}`;
@@ -226,7 +235,8 @@
         const val = e ? e.val : st.grid.map((row, r) => [...row].map((_, c) => (isS(r, c) ? (mode === "b" ? st.k : 0) : -1)));
         const dstM = e ? e.dst : null;
         const popped = new Set();
-        for (let i = 0; i < st.s_; i++) if (F[i].cell && F[i].kind !== "skip") popped.add(F[i].cell.join(","));
+        let pops = 0;
+        for (let i = 0; i < st.s_; i++) if (F[i].cell && F[i].kind !== "skip") { popped.add(F[i].cell.join(",")); pops++; }
         const front = new Set((e ? e.front : [mode === "c" ? [0, ...st.s] : st.s.slice()]).map((x) => (mode === "c" ? `${x[1]},${x[2]}` : `${x[0]},${x[1]}`)));
         const moved = new Map((e ? e.nb : []).map(([a, b, why]) => [`${a},${b}`, why]));
         const cur = e && e.cell ? e.cell.join(",") : "";
@@ -237,7 +247,9 @@
           g += `<div role="row" class="gp-r">`;
           for (let c = 0; c < n; c++) {
             const ch = st.grid[r][c], key = `${r},${c}`, isWall = ch === M.wall, v = val[r][c], tg = tag(r, c);
-            let cls = isWall ? (mode === "b" && v >= 0 ? " is-broken" : " is-wall") : " is-open";
+            // a wall some state entered (b): broken only on the path at the end, else entered
+            const entered = mode === "b" && isWall && v >= 0, broken = entered && onPath.has(key);
+            let cls = isWall ? (broken ? " is-broken" : entered ? " is-entered" : " is-wall") : " is-open";
             if (mode === "c" && !isWall) cls += ` gx-t${Math.floor((Number(ch) - 1) / 3) + 1}`;
             if (popped.has(key)) cls += " is-done";
             else if (front.has(key)) cls += " is-front";
@@ -248,7 +260,7 @@
             if (onPath.has(key)) cls += " is-path";
             const shown = v < 0 ? "" : mode === "b" ? dstM ? dstM[r][c] : 0 : v;
             const corner = mode === "c" && !isWall ? ch : mode === "b" && v >= 0 ? v : "";
-            const what = (isWall ? (mode === "b" && v >= 0 ? "קיר שנשבר" : "קיר") : mode === "c" ? `עלות כניסה ${ch}` : "פתוח") +
+            const what = (isWall ? (broken ? "קיר שהמסלול שובר" : entered ? "קיר שנכנסו אליו" : "קיר") : mode === "c" ? `עלות כניסה ${ch}` : "פתוח") +
               (tg === "S" ? ", ההתחלה" : tg === "T" ? ", היעד" : "") +
               (v >= 0 ? (mode === "c" ? `, העלות עד כאן ${v}` : mode === "b" ? `, ${shown} צעדים, נשארו ${v} שבירות` : `, מרחק ${v}`) : "");
             const f = st.focus[0] === r && st.focus[1] === c;
@@ -273,26 +285,27 @@
         if (!e) {
           sum = `לוח ${ltr(`${m} × ${n}`)}, ${dirs}${mode === "b" ? `, ${ltr(`k = ${st.k}`)}` : ""}. כל צעד מוציא ${mode === "c" ? "רשומה אחת מהערימה" : "מצב אחד מהתור"}.`;
           note = `${Q} מחזיק${mode === "c" ? "ה" : ""} את ההתחלה ${P(...st.s)}${mode === "b" ? ` עם ${ltr(st.k)} שבירות` : ""}, ${mode === "c" ? "בעלות 0 : העלות של S לא משולמת" : "במרחק 0"}. "הצעד הבא" מוציא אותה ובודק את השכנים.`.replace(" :", `${NB}:`);
-          vars = mode === "a" ? [ltr(`dist[S] = 0`), ltr(`q = [(${st.s})]`)] : mode === "b" ? [ltr(`best[S] = ${st.k}`), ltr(`q = [(${st.s},${st.k},0)]`)] : [ltr("cost[S] = 0"), ltr(`heap = [(0,${st.s})]`)];
+          if (mode === "b" && st.naive) note += ` המלכודת${NB}: כל תא נכנס לתור פעם אחת, עם השבירות של הכניסה הראשונה.`;
+          vars = mode === "a" ? [ltr(`dist[S] = 0`), ltr(`q = [(${st.s})]`)] : mode === "b" ? [ltr(st.naive ? "seen = {S}" : `best[S] = ${st.k}`), ltr(`q = [(${st.s},${st.k},0)]`)] : [ltr("cost[S] = 0"), ltr(`heap = [(0,${st.s})]`)];
         } else if (kind === "none") {
           sum = `${Q} התרוקן${mode === "c" ? "ה" : ""} לפני ש-T יצא${NB}: אין מסלול.`;
           note = `אף תא שעוד לא יצא אינו מגיע ל-T${mode === "b" ? ` גם עם ${ltr(st.k)} שבירות` : ""}${mode === "c" ? " בלי לעבור בקיר" : ""}. התשובה ${ltr("−1")}.`;
           vars = [ltr(mode === "c" ? "heap = []" : "q = []")];
-          ans = `אין מסלול${NB}: ${ltr("−1")}.`;
+          ans = `אין מסלול${NB}: ${ltr("−1")}.` + trapTail(-1);
         } else {
           const [r, c] = e.cell, word = mode === "c" ? "בעלות" : "במרחק";
           const stateTxt = mode === "b" ? ltr(`(${r},${c},${e.left},${e.d})`) : mode === "c" ? ltr(`(${e.d}, ${r}, ${c})`) : P(r, c);
           if (kind === "goal") {
             const steps = e.path.length - 1, broken = mode === "b" ? e.path.filter(([a, b]) => st.grid[a][b] === "1").length : 0;
             sum = `T יצא מ${Q} ${word} ${ltr(e.d)}${NB}: ${mode === "c" ? `העלות הקטנה ביותר, במסלול של ${ltr(steps)} צעדים` : `המסלול הקצר הוא ${ltr(e.d)} צעדים`}.`;
-            note = `${stateTxt} יוצא מ${Q} והוא היעד, ולכן ${mode === "c" ? "העלות" : "המרחק"} שלו סופי${mode === "c" ? "ת" : ""}. המסלול נבנה מההורים${NB}: מ-T אחורה עד S, ${ltr(e.path.length)} תאים.` +
+            note = `${stateTxt} הוא היעד, ולכן ${mode === "c" ? "העלות" : "המרחק"} שלו סופי${mode === "c" ? "ת" : ""}. המסלול נבנה מההורים${NB}: מ-T אחורה עד S, ${ltr(e.path.length)} תאים.` +
               (mode === "b" ? ` ${broken ? `הוא שובר ${walls(broken)}${NB}: ${e.path.filter(([a, b]) => st.grid[a][b] === "1").map(([a, b]) => P(a, b)).join(", ")}` : "הוא לא שובר אף קיר"}, ונשארו ${ltr(e.left)} שבירות.` : "");
             ans = mode === "c" ? `עלות ${ltr(e.d)}, במסלול של ${ltr(steps)} צעדים.` :
-              mode === "b" ? `${ltr(e.d)} צעדים, ${broken ? `שוברים ${walls(broken)}` : "בלי לשבור קיר"}.` : `${ltr(e.d)} צעדים מ-S ל-T.`;
+              mode === "b" ? `${ltr(e.d)} צעדים, ${broken ? `שוברים ${walls(broken)}` : "בלי לשבור קיר"}.` + trapTail(e.d) : `${ltr(e.d)} צעדים מ-S ל-T.`;
             vars = [stateTxt, ltr(`${mode === "c" ? "cost" : mode === "b" ? "d" : "dist"}[T] = ${e.d}`), ltr(`path: ${e.path.length} cells`)];
           } else if (kind === "skip") {
             sum = `צעד ${ltr(st.s_)}${NB}: רשומה ישנה של ${P(r, c)}, מדלגים.`;
-            note = `${stateTxt} יוצאת מהערימה, אבל ${P(r, c)} כבר יצא בעלות ${ltr(e.val[r][c])}, קטנה יותר. מדלגים.`;
+            note = `${stateTxt} יוצאת מהערימה, אבל ${P(r, c)} כבר יצא בעלות ${ltr(e.val[r][c])}, קטנה יותר.`;
             vars = [stateTxt, ltr(`cost = ${e.val[r][c]}`)];
           } else {
             const pushed = e.nb.filter((x) => x[2] === "push");
@@ -303,28 +316,28 @@
               const what = {
                 squeeze: "אלכסון בין שני קירות, אסור",
                 wall: "קיר",
-                seen: `כבר יש לו מרחק ${ltr(v)}`,
-                push: mode === "a" ? `<b>מרחק ${ltr(v)}, נכנס לתור</b>` : mode === "b" ? `<b>נכנס עם ${ltr(v)} שבירות</b>` : `<b>עלות ${ltr(v)}, נכנס לערימה</b>`,
-                nobreak: "קיר, ואין שבירות",
-                worse: `${ltr(v)} שבירות, לא יותר מ-${ltr(e.val[a][b])} שכבר נראו`,
+                seen: mode === "b" ? "כבר סומן" : `כבר יש לו מרחק ${ltr(v)}`,
+                push: mode === "a" ? `<b>מרחק ${ltr(v)}, נכנס לתור</b>` : mode === "b" ? `<b>נכנס עם ${ltr(v)}</b>` : `<b>עלות ${ltr(v)}, נכנס לערימה</b>`,
+                nobreak: "קיר, אין שבירות",
+                worse: `${ltr(v)} לא יותר מ-${ltr(e.val[a][b])}`,
                 noimp: `${ltr(`${e.d} + ${st.grid[a][b]} = ${v}`)}, לא פחות מ-${ltr(e.val[a][b])}`,
               }[why];
               return `${DIR_HEB[k]} ${P(a, b)}${NB}: ${what}`;
             };
-            note = `${stateTxt} יוצא מראש ${Q}. ${e.nb.length ? e.nb.map(say).join("; ") : "אין לו שכנים בתוך הלוח"}.` +
+            note = `${mode === "a" ? "" : `${mode === "b" ? "המצב" : "הרשומה"} ${stateTxt}. `}${e.nb.length ? e.nb.map(say).join("; ") : "אין לו שכנים בתוך הלוח"}.` +
               (e.front.length ? "" : ` ${Q} ריק${mode === "c" ? "ה" : ""} עכשיו.`);
             vars = mode === "a" ? [ltr(`(r, c) = (${r}, ${c})`), ltr(`dist = ${e.d}`), ltr(`len(q) = ${e.front.length}`)]
               : mode === "b" ? [ltr(`(r, c, left, d) = (${r}, ${c}, ${e.left}, ${e.d})`), ltr(`len(q) = ${e.front.length}`)]
                 : [ltr(`(d, r, c) = (${e.d}, ${r}, ${c})`), ltr(`len(heap) = ${e.front.length}`)];
           }
         }
-        $(".gp-sum").innerHTML = sum;
-        $(".gp-note").innerHTML = note;
+        $(".gp-note").innerHTML = `<b>${sum}</b> ${note}`;             // the step's summary, then its detail
         const items = e ? e.front : [mode === "c" ? [0, ...st.s] : mode === "b" ? [...st.s, st.k, 0] : st.s.slice()];
+        const cap = mode === "b" ? LIST_MAX - 6 : LIST_MAX;          // b's states are longer: fewer of them on the line
         const fmt = (x) => (mode === "c" ? `(${x[1]},${x[2]})=${x[0]}` : mode === "b" ? `(${x.join(",")})` : `(${x.join(",")})`);
         $(".gp-front").innerHTML = `${Q}${mode === "c" ? ", הקטן משמאל" : ", הראש משמאל"}${NB}: ` + (items.length
-          ? ltr(items.slice(0, LIST_MAX).map(fmt).join(" ")) + (items.length > LIST_MAX ? ` ועוד ${ltr(items.length - LIST_MAX)}` : "")
-          : "ריק") + ` · יצאו עד עכשיו${NB}: ${ltr(popped.size)} תאים.`;
+          ? ltr(items.slice(0, cap).map(fmt).join(" ")) + (items.length > cap ? ` ועוד ${ltr(items.length - cap)}` : "")
+          : "ריק") + ` · יצאו עד עכשיו${NB}: ` + (mode === "b" ? `${ltr(pops)} מצבים, ${ltr(popped.size)} תאים שונים.` : `${ltr(popped.size)} תאים.`);
         show({ code: M.code, steps: STEPS[mode], lit: LIT[mode][kind], lines, vars: vars.join(" · ") });
         answer(box, ans, '.gp-grid .gp-cell[data-tag="T"].is-path');
       };
@@ -338,6 +351,7 @@
         st.k = Number.isFinite(v) ? Math.min(KMAX, Math.max(0, v)) : st.k;
         edited();
       });
+      if ($(".gp-mark")) $(".gp-mark").addEventListener("change", () => { st.naive = $(".gp-mark").value === "cell"; edited(); });
       if ($(".gp-brush")) $(".gp-brush").addEventListener("change", () => { st.brush = $(".gp-brush").value; });
       // the size: cells kept where they were, new ones open; S and T kept inside, apart
       const place = (x, other) => {
@@ -370,7 +384,7 @@
       $(".ex-next").addEventListener("click", () => { st.s_++; draw(); });
       $(".ex-end").addEventListener("click", () => { stop(); st.s_ = total(); draw(); });
       $(".ex-reset").addEventListener("click", () => {
-        st.grid = grid0.slice(); st.s = s0.slice(); st.t = t0.slice(); st.k = k0; st.diag = diag0; st.focus = [0, 0];
+        st.grid = grid0.slice(); st.s = s0.slice(); st.t = t0.slice(); st.k = k0; st.diag = diag0; st.naive = false; st.focus = [0, 0];
         edited();
       });
       // editing the grid: a press on S or T drags it, a press elsewhere paints (a, b: the
@@ -461,9 +475,9 @@
   dvqExplorers.register({
     views: { gridpath: gridpathView },
     help: {
-      gridpath: "לחיצה או גרירה על תאים מציירת קירות (בסעיף ג : צובעת בעלות של המברשת), ואת S ו-T גוררים למקום אחר; \"אקראי\" מגריל לוח, \"ניקוי\" מנקה אותו, ובוחרים ארבעה או שמונה כיוונים (ובסעיף ב את k). כל צעד מוציא תא אחד מהתור (בסעיף ג מהערימה) : הוא מוקף, השכנים שנבדקו מסומנים, מה שבתור צבוע, ובכל תא שכבר הגיעו אליו כתוב המרחק שלו (בסעיף ב גם השבירות שנשארו, בפינה; בסעיף ג העלות). בסוף המסלול מצויר כקו. השורה שמתחת ללוח מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.".replace(/ :/g, "\u00a0:"),
+      gridpath: "לחיצה או גרירה על תאים מציירת קירות (בסעיף ג : צובעת בעלות של המברשת), ואת S ו-T גוררים למקום אחר. במקלדת : חיצים בין התאים, רווח צובע, ו-S או T מעבירים לשם את ההתחלה או את היעד. \"אקראי\" מגריל לוח, \"ניקוי\" מנקה אותו, ובוחרים ארבעה או שמונה כיוונים (ובסעיף ב את k). כל צעד מוציא תא אחד מהתור (בסעיף ג מהערימה) : הוא מוקף, השכנים שנבדקו מסומנים, מה שבתור צבוע, ובכל תא שכבר הגיעו אליו כתוב המרחק שלו (בסעיף ב גם השבירות שנשארו, בפינה; בסעיף ג העלות, ותא שיצא מהערימה ממוסגר בלי לאבד את הצבע של השטח). בסוף המסלול מצויר כקו. בסעיף ב קיר שמצב כלשהו נכנס אליו מסומן, ובסוף רק הקירות שהמסלול שובר נצבעים כשבורים; \"סימון לפי תא\" מריץ את החיפוש השגוי של המלכודת, ושורת התשובה מוסיפה את התשובה של הקוד. השורה שמתחת ללוח מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.".replace(/ :/g, "\u00a0:"),
     },
-    cols: { gridpath: {} },
+    cols: { gridpath: { side: ".viz-legend" } },        // the key beside the grid, above the steps and the code
     models: { gpMoves, gpTrace, gpAnswer, gpRandom, gpParse },
   });
 })();

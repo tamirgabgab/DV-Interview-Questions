@@ -44,6 +44,26 @@ def valid_path(grid, path, s, t, diag, wall="1", breaks=None):
     return walls == 0 if breaks is None else walls <= breaks
 
 
+def strict_length(grid, s, t):
+    """Eight directions under the strict rule of the follow-up: no diagonal past any wall."""
+    d, q = {s: 0}, [s]
+    for u in q:
+        for a, b in q0070.nbrs(grid, *u, True):
+            if (a - u[0]) and (b - u[1]) and "1" in (grid[u[0]][b], grid[a][u[1]]):
+                continue
+            if grid[a][b] == "0" and (a, b) not in d:
+                d[(a, b)] = d[u] + 1
+                q.append((a, b))
+    return d.get(t, -1)
+
+
+def with_cells(grid, cells, ch):
+    rows = [list(r) for r in grid]
+    for r, c in cells:
+        rows[r][c] = ch
+    return ["".join(r) for r in rows]
+
+
 def test_page_examples():
     G, S, T = q0070.GRID, q0070.S, q0070.T
     d, path = shortest_path(G, S, T)
@@ -276,9 +296,11 @@ def test_follow_ups():
     # the other rules of a diagonal: cutting between two walls gives 12; the strict rule
     # (no diagonal past any wall) is never shorter than ours
     assert q0070.length_ref(G, S, T, True, cut=True) == 12
+    assert strict_length(G, S, T) == 19 and strict_length(G, S, T) >= shortest_path(G, S, T, True)[0]
     # A*: the same answer as Dijkstra, never more pops; 19 against 25 on the terrain
     C, CS, CT = q0070.COST, q0070.CS, q0070.CT
     assert q0070.astar(C, CS, CT) == (11, 19) and q0070.dijkstra_pops(C, CS, CT) == 25
+    assert q0070.astar(C, CS, CT, tie="cell") == (11, 16)                    # ties by row and column, as the heap of cheapest_path
     rng = random.Random(708)
     for _ in range(500):
         c = random_cost(rng, rng.randint(1, 7), rng.randint(1, 7))
@@ -309,3 +331,63 @@ def test_follow_ups():
         want = [q0070.length_ref(g, s, x) for x in targets]
         want = [x for x in want if x >= 0]
         assert d == (min(want) if want else -1)
+
+
+def test_part_b_explanations():
+    """The text of part b: with k = 2 an unbroken wall sends the path to row 0 or row 6 (each
+    wall's only opening), 6 steps more than the 8 of the straight row; with eight directions
+    and k = 2 the path breaks (3, 2) and (4, 7) and dips to row 6 for free."""
+    G, S, T = q0070.GRID, q0070.S, q0070.T
+    assert [r for r in range(7) if G[r][2] == "0"] == [6] and [r for r in range(7) if G[r][7] == "0"] == [0]
+    assert [r for r in range(7) if G[r][4] == "0" and G[r][5] == "0"] == [6]
+    assert all((G[r][4] + G[r][5]).count("1") == 1 for r in range(6))     # one wall per row of the zigzag
+    path = [(3, 0), (3, 1), (3, 2), (4, 3), (5, 4), (6, 5), (5, 6), (4, 7), (3, 8)]
+    assert all(v in q0070.nbrs(G, *u, True) for u, v in zip(path, path[1:]))
+    assert [x for x in path if G[x[0]][x[1]] == "1"] == [(3, 2), (4, 7)]
+    assert shortest_with_breaks(G, S, T, 2, True) == len(path) - 1 == 8
+    # steps against cells: the path of 20 steps has 21 cells, the one of 15 steps 16
+    assert len(shortest_path(G, S, T)[1]) == 21 and len(shortest_path(G, S, T, True)[1]) == 16
+
+
+def test_stop_at_the_first_push_with_entry_costs():
+    """Annotation 4 of cheapest_path: with a cost per cell the first push of t is already its
+    final cost, so stopping there would be right here (not with a cost per move)."""
+    rng = random.Random(709)
+    for _ in range(1500):
+        c = random_cost(rng, rng.randint(1, 6), rng.randint(1, 6))
+        s, t = open_cell(rng, c, "#"), open_cell(rng, c, "#")
+        if s is None or s == t:
+            continue
+        for diag in (False, True):
+            first = next((v for f in q0070.trace("c", c, s, t, diag) for a, b, why, v in f["nb"] if why == "push" and (a, b) == t), -1)
+            assert first == cheapest_path(c, s, t, diag)
+    # several targets backwards: with entry costs the cost from t to s differs by w(s) - w(t)
+    for _ in range(300):
+        c = random_cost(rng, rng.randint(2, 6), rng.randint(2, 6), 0)
+        s, t = open_cell(rng, c, "#"), open_cell(rng, c, "#")
+        assert cheapest_path(c, t, s) - cheapest_path(c, s, t) == int(c[s[0]][s[1]]) - int(c[t[0]][t[1]])
+
+
+def test_box_tasks():
+    """The tasks of the page's "נסו" paragraphs, on the boxes' boards."""
+    G, S, T = q0070.GRID, q0070.S, q0070.T
+    closed = with_cells(G, [(6, 2)], "1")
+    fa = q0070.trace("a", closed, S, T)
+    assert q0070.answer_of(fa) == -1 and sum(1 for f in fa if f["kind"] == "pop") == 14
+    opened = with_cells(closed, [(3, 2)], "0")                              # the tasks one after the other
+    assert shortest_path(opened, S, T)[0] == 20 and shortest_path(opened, S, T, True)[0] == 14
+    assert shortest_path(with_cells(opened, [(6, 7)], "0"), S, T)[0] == 14
+    assert [shortest_with_breaks(G, S, T, k) for k in range(4)] == [20, 14, 14, 8] and shortest_with_breaks(G, S, T, 1, True) == 9
+    # the trap's board in box b, marked per cell and per state
+    g, s, t = q0070.CE_GRID, q0070.CE_S, q0070.CE_T
+    assert q0070.answer_of(q0070.trace("b", g, s, t, False, 1, naive=True)) == -1
+    assert q0070.answer_of(q0070.trace("b", g, s, t, False, 1)) == 4
+    # box b at the end: 73 states out of the queue, 57 cells
+    fb = q0070.trace("b", G, S, T, False, 1)
+    assert len(fb) == 73 and len({tuple(f["cell"]) for f in fb}) == 57
+    # part c's terrain: a wall at (0, 3) sends the path to the bottom road through the mud (5, 3)
+    C, CS, CT = q0070.COST, q0070.CS, q0070.CT
+    c1 = with_cells(C, [(0, 3)], "#")
+    assert cheapest_path(c1, CS, CT) == 15 and [5, 3] in q0070.trace("c", c1, CS, CT)[-1]["path"]
+    assert cheapest_path(with_cells(c1, [(5, 3)], "1"), CS, CT) == 11
+    assert cheapest_path(with_cells(C, [(2, c) for c in range(1, 6)], "1"), CS, CT) == 7
