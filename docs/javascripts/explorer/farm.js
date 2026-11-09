@@ -1,6 +1,7 @@
 // kinds: farm
 //   farm                   0048        the farmer, the food line and the water line: the shortest path by reflection
-//                                      (modes a and b: parallel lines; mode c: the food line tilted by theta)
+//                                      (modes a and b: parallel lines; mode f: part a with free stops against
+//                                      the shortest path; mode c: the food line tilted by theta)
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every file and merges the models.
 (() => {
@@ -14,6 +15,15 @@
   const farmShortest = (L, H, a, b) => {
     const D = 2 * H + b - a, x = (L * (H - a)) / D, y = (L * H) / D, w = (L * b) / D;
     return { D, x, y, w, z1: Math.hypot(x, H - a), z2: Math.hypot(y, H), z3: Math.hypot(w, b), z: Math.hypot(L, D) };
+  };
+  // Mode f: any path, with the food stop at p1 and the water stop at p2 (horizontal places, in
+  // [0, L]). Unfolded by the same two reflections it is the broken line A -> (p1, H) ->
+  // (p2, 2H) -> (L, 2H + b), as long as the path, with the same rise D as the straight line:
+  // so z >= sqrt(L^2 + D^2), equal only when the stops are farmShortest's. As length() in
+  // tools/figures/q0048.py.
+  const farmFree = (L, H, a, b, p1, p2) => {
+    const z1 = Math.hypot(p1, H - a), z2 = Math.hypot(p2 - p1, H), z3 = Math.hypot(L - p2, b);
+    return { x: p1, y: p2 - p1, w: L - p2, z1, z2, z3, z: z1 + z2 + z3 };
   };
   // Part b: the heights whose shortest path stops after x and x + y, or null (valid when
   // 0 <= x <= y and 0 <= w <= y).
@@ -58,11 +68,15 @@
   const LIM = { L: [0.5, 20], H: [0.5, 10] };
   const num = (v) => { const s = Number(v).toFixed(2); return s.replace(/\.?0+$/, "").replace(/^-0$/, "0"); };
   const snap = (v, q) => Math.round(v / q) * q;
+  const iso = (x) => `\u2066${x}\u2069`;          // an LTR island in a plain-text note
 
   const farmView = () => ({
     mount(box) {
       const d = box.dataset;
-      const st = { mode: ["b", "c"].includes(d.mode) ? d.mode : "a", L: Number(d.l || 7), H: Number(d.h || 3), a: Number(d.a || 1), b: Number(d.b || 2), t: Number(d.t || 15), refl: false };
+      const st = { mode: ["b", "c", "f"].includes(d.mode) ? d.mode : "a", L: Number(d.l || 7), H: Number(d.h || 3), a: Number(d.a || 1), b: Number(d.b || 2), t: Number(d.t || 15), refl: false };
+      // mode f's free stops start where the page's first figure has them, at 3/7 and 5/7 of L
+      st.p1 = (3 * st.L) / 7; st.p2 = (5 * st.L) / 7;
+      const isFree = () => st.mode === "f";
       // in part c st.b is the height asked for; the cow stays under the food line, at bEff()
       const bEff = () => (st.mode === "c" ? Math.min(st.b, bMax(st.L, st.H, st.t)) : st.b);
       const field = (k, label, title) =>
@@ -71,6 +85,7 @@
         `<div class="ex-controls">` +
         `<label>סעיף <select class="ex-mode" aria-label="מה בוחרים">` +
         `<option value="a"${st.mode === "a" ? " selected" : ""}>א : בוחרים את a ואת b</option>` +
+        `<option value="f"${st.mode === "f" ? " selected" : ""}>א : עצירות חופשיות</option>` +
         `<option value="b"${st.mode === "b" ? " selected" : ""}>ב : בוחרים את נקודות העצירה</option>` +
         `<option value="c"${st.mode === "c" ? " selected" : ""}>ג : קו האוכל נוטה בזווית θ</option></select></label>` +
         `<label><input type="checkbox" class="ex-refl"> הצגת השיקוף</label>` +
@@ -88,7 +103,8 @@
         `<svg class="figure farm-live" role="img" aria-label="השטח בין קו האוכל לקו המים, החוואי, הפרה והמסלול הקצר ביותר"></svg>` +
         `<span class="viz-legend"><span><i class="s3"></i>קו האוכל</span><span><i class="s1"></i>קו המים</span>` +
         `<span><i class="ink"></i>החוואי A</span><span><i class="s2"></i>הפרה B</span>` +
-        `<span><i class="box-path"></i>המסלול הקצר ביותר</span><span class="farm-lg-copy"><i class="box-copy"></i>השיקופים</span><span class="farm-lg-arc"><i class="farm-arc"></i>הסיבוב של B סביב O</span></span>` +
+        `<span><i class="box-path"></i><span class="farm-lg-path">המסלול הקצר ביותר</span></span><span class="farm-lg-opt"><i class="farm-arc"></i>הקצר ביותר</span>` +
+        `<span class="farm-lg-copy"><i class="box-copy"></i>השיקופים</span><span class="farm-lg-arc"><i class="farm-arc"></i>הסיבוב של B סביב O</span></span>` +
         `<div class="farm-table"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const svg = $(".farm-live"), summary = $(".ex-summary"), note = $(".farm-note"), table = $(".farm-table");
@@ -153,8 +169,11 @@
         (drag ? `<circle class="farm-hit" data-drag="${drag}" cx="${f(X(u))}" cy="${f(Y(v))}" r="16"/>` : "") +
         `<circle class="${cls}-dot${drag ? " farm-handle-pt" : ""}"${drag ? ` data-drag="${drag}"` : ""} cx="${f(X(u))}" cy="${f(Y(v))}" r="${r}"><title>${title}</title></circle>`;
 
-      const picture = (s) => {
-        const { L, H, a, b } = st, p1 = s.x, p2 = s.x + s.y;
+      // s is the shortest path; fr, in mode f, the path through the reader's stops, drawn
+      // solid, with the shortest one thin and dashed beside it
+      const picture = (s, fr) => {
+        const { L, H, a, b } = st, o1 = s.x, o2 = s.x + s.y;
+        const p1 = fr ? st.p1 : o1, p2 = fr ? st.p2 : o2;
         const fs = layout.narrow ? 16 : 15;
         let out = "";
         const strip = (lo, hi, cls) => `<rect class="${cls}" x="${f(X(0))}" y="${f(Y(hi))}" width="${f(L * layout.S)}" height="${f((hi - lo) * layout.S)}"/>`;
@@ -166,12 +185,17 @@
         }
         out += strip(0, H, "box-face");
         out += line(-ext, 0, L + ext, 0, "s1-line", 3, "9 6") + line(-ext, H, L + ext, H, "s3-line", 3, "9 6");
-        // the path, dashed
-        out += line(0, a, p1, H, "box-path", 3.5, "10 6") + line(p1, H, p2, 0, "box-path", 3.5, "10 6") + line(p2, 0, L, b, "box-path", 3.5, "10 6");
+        // the path: dashed when it is the shortest one, solid when the reader put its stops
+        const pd = fr ? null : "10 6";
+        if (fr) out += line(0, a, o1, H, "ink-line", 1.5, "6 4") + line(o1, H, o2, 0, "ink-line", 1.5, "6 4") + line(o2, 0, L, b, "ink-line", 1.5, "6 4");
+        out += line(0, a, p1, H, "box-path", 3.5, pd) + line(p1, H, p2, 0, "box-path", 3.5, pd) + line(p2, 0, L, b, "box-path", 3.5, pd);
         if (st.refl) {
           const top = 2 * H + b;
           out += line(p2, 0, L, -b, "ink-line", 1.5, "4 3") + line(L, b, L, -b, "ink-line", 1, "2 3") +
-                 line(0, a, L, top, "box-path", 2.5, "10 6") +
+                 // unfolded, the path is the broken line A -> P -> Q'' -> B'' (in mode f) and
+                 // the shortest one the straight line A -> B''
+                 (fr ? line(0, a, L, top, "ink-line", 1.5, "6 4") + line(p1, H, p2, 2 * H, "box-path", 2.5, "10 6") + line(p2, 2 * H, L, top, "box-path", 2.5, "10 6")
+                     : line(0, a, L, top, "box-path", 2.5, "10 6")) +
                  line(0, a, L, a, "ink-line", 1.2) + line(L, a, L, top, "ink-line", 1.2);
           [[0, a, p1, H], [p1, H, p2, 2 * H], [p2, 2 * H, L, top]].forEach(([x0, y0, x1, y1], i) => {
             out += line(x0, y0, x1, y0, "ink-line", 1, "3 3") + line(x1, y0, x1, y1, "ink-line", 1, "3 3");
@@ -181,7 +205,8 @@
           const tk = 6 / layout.S;
           out += line(dd, a, dd, top, "ink-line", 1.2) + line(dd - tk, a, dd + tk, a, "ink-line", 1.2) + line(dd - tk, top, dd + tk, top, "ink-line", 1.2) + text(dd, (a + top) / 2, `D = ${num(s.D)}`, 6, 5, "start", fs) +
                  text(L / 2, a, `L = ${num(L)}`, 0, 18, "middle", fs) +
-                 dot(p2, 2 * H, "s1", 4, "נקודת המים אחרי השיקוף") +
+                 dot(p2, 2 * H, "s1", 4, fr ? `Q″ = (${num(p2)}, ${num(2 * H)}) : נקודת המים אחרי השיקוף` : "נקודת המים אחרי השיקוף") +
+                 (fr ? text(p2, 2 * H, "Q″", 10, -8, "start", fs) : "") +
                  dot(L, -b, "ink", 4, `B′ = (${num(L)}, −${num(b)}) : השיקוף של B דרך קו המים`) + text(L, -b, "B′", 14, 16, "start", fs) +
                  dot(L, top, "s2", 6, `B″ = (${num(L)}, ${num(top)}) : השיקוף של B′ דרך קו האוכל`) + text(L, top, "B″", 0, -12, "middle", fs + 1);
         } else {
@@ -189,7 +214,7 @@
           const yb = -22 / layout.S, yl = -48 / layout.S, tk = 6 / layout.S;
           [[0, p1, "x"], [p1, p2, "y"], [p2, L, "w"]].forEach(([lo, hi, t]) => {
             out += line(lo, yb, hi, yb, "ink-line", 1.2) + line(lo, yb + tk, lo, yb - tk, "ink-line", 1.2) + line(hi, yb + tk, hi, yb - tk, "ink-line", 1.2);
-            if ((hi - lo) * layout.S > 22) out += text((lo + hi) / 2, yb, t, 0, -5, "middle", fs);
+            if (Math.abs(hi - lo) * layout.S > 22) out += text((lo + hi) / 2, yb, t, 0, -5, "middle", fs);
           });
           out += line(0, yl, L, yl, "ink-line", 1.2) + line(0, yl + tk, 0, yl - tk, "ink-line", 1.2) + line(L, yl + tk, L, yl - tk, "ink-line", 1.2) +
                  text(L / 2, yl, `L = ${num(L)}`, 0, -5, "middle", fs);
@@ -204,11 +229,12 @@
           });
         }
         // the stops, the farmer and the cow, and the corners
-        const dragStops = st.mode === "b";
-        out += dot(p1, H, "s3", 6, `נקודת האוכל, x = ${num(p1)}`, dragStops ? "food" : null) +
-               dot(p2, 0, "s1", 6, `נקודת המים, x + y = ${num(p2)}`, dragStops ? "water" : null) +
-               dot(0, a, "ink", 7, `החוואי A, a = ${num(a)}`, dragStops ? null : "A") + text(0, a, "A", 14, -8, "start", fs + 2) +
-               dot(L, b, "s2", 7, `הפרה B, b = ${num(b)}`, dragStops ? null : "B") + text(L, b, "B", -14, -8, "end", fs + 2);
+        const dragStops = st.mode === "b" || Boolean(fr), dragAB = st.mode !== "b";
+        if (fr) out += text(p1, H, "P", 10, -8, "start", fs) + text(p2, 0, "Q", 10, -8, "start", fs);
+        out += dot(p1, H, "s3", 6, `נקודת האוכל${fr ? " P" : ""}, x = ${num(p1)}`, dragStops ? "food" : null) +
+               dot(p2, 0, "s1", 6, `נקודת המים${fr ? " Q" : ""}, x + y = ${num(p2)}`, dragStops ? "water" : null) +
+               dot(0, a, "ink", 7, `החוואי A, a = ${num(a)}`, dragAB ? "A" : null) + text(0, a, "A", 14, -8, "start", fs + 2) +
+               dot(L, b, "s2", 7, `הפרה B, b = ${num(b)}`, dragAB ? "B" : null) + text(L, b, "B", -14, -8, "end", fs + 2);
         [[0, 0], [L, 0], [0, H], [L, H]].forEach(([u, v]) => {
           out += `<rect class="farm-corner" data-drag="corner" x="${f(X(u) - 7)}" y="${f(Y(v) - 7)}" width="14" height="14" rx="3"><title>גוררים את הפינה כדי לשנות את L ואת H</title></rect>`;
         });
@@ -300,6 +326,8 @@
         svg.innerHTML = pictureC(r);
         $(".farm-lg-copy").style.display = st.refl ? "" : "none";
         $(".farm-lg-arc").style.display = st.refl ? "" : "none";
+        $(".farm-lg-opt").style.display = "none";
+        $(".farm-lg-path").textContent = "המסלול הקצר ביותר";
         $(".farm-drag").textContent = "שנו את הזווית θ במחוון, וגררו את החוואי A ואת הפרה B לאורך הדפנות.";
         sync({ x: 0, y: 0 });
         const pt = (p) => `(${num(p[0])}, ${num(p[1])})`, b = bEff();
@@ -308,7 +336,6 @@
           : `${ltr(`B2 = ${pt(r.B2)}`)}, כי כש-θ = 0 שני השיקופים הם הזזה ב-2H כלפי מעלה. `) +
           `המסלול הקצר ביותר : ${ltr(`z = |AB2| ≈ ${num(r.z)}`)}, עם עצירה באוכל ב-${ltr(pt(r.P))} ובמים ב-${ltr(pt(r.Q))}. ` +
           (r.O ? `הקו הישר מסתובב סביב O ב-${ltr(`2θ + β − α ≈ ${num(r.turn)}° ≤ 180°`)}, ולכן השיקוף תקף.` : "בקווים מקבילים השיקוף תקף תמיד.");
-        const iso = (x) => `\u2066${x}\u2069`;          // an LTR island in the plain-text note
         let auto = "";
         if (st.b > b + 1e-9) auto = `הפרה ירדה ל-${iso(`b = ${num(b)}`)} כדי להישאר מתחת לקו האוכל, ${iso("b ≤ H + L·tanθ")}. כשהזווית תגדל היא תחזור ל-${num(st.b)}.`;
         else if (r.O && Math.abs(r.turn - 180) < 1e-6) auto = `כאן ${iso("2θ + β − α = 180°")} בדיוק : המסלול עובר דרך O ונוגע בה בשני הקווים.`;
@@ -329,47 +356,67 @@
       const sync = (s) => {
         const vals = { L: st.L, H: st.H, t: st.t, a: st.a, b: bEff(), x: s.x, y: s.y };
         Object.entries(inputs).forEach(([k, el]) => { if (document.activeElement !== el) el.value = num(vals[k]); });
-        const editAB = st.mode !== "b", isC = st.mode === "c";
-        ["a", "b"].forEach((k) => { inputs[k].disabled = !editAB; inputs[k].closest("label").hidden = !editAB; });
-        ["x", "y"].forEach((k) => { inputs[k].disabled = editAB; inputs[k].closest("label").hidden = editAB; });
+        // mode f hides a and b (A and B are dragged), so its fields fit one row: L, H, x, y; the
+        // fields stay enabled, so a link still sets them
+        const editAB = st.mode !== "b", editXY = st.mode === "b" || isFree(), isC = st.mode === "c";
+        ["a", "b"].forEach((k) => { inputs[k].disabled = !editAB; inputs[k].closest("label").hidden = !editAB || isFree(); });
+        ["x", "y"].forEach((k) => { inputs[k].disabled = !editXY; inputs[k].closest("label").hidden = !editXY; });
         inputs.t.disabled = trange.disabled = !isC; inputs.t.closest("label").hidden = !isC;
         if (document.activeElement !== trange) trange.value = String(st.t);
         inputs.L.min = LIM.L[0]; inputs.L.max = LIM.L[1]; inputs.H.min = LIM.H[0]; inputs.H.max = LIM.H[1];
         inputs.t.min = 0; inputs.t.max = TMAX;
         inputs.a.min = inputs.b.min = 0; inputs.a.max = num(st.H); inputs.b.max = num(isC ? bMax(st.L, st.H, st.t) : st.H);
+        // mode f: the stops on the lines between the farmer and the cow, 0 <= x <= L and 0 <= x + y <= L
+        const lim = isFree() ? { x: [0, st.L], y: [-st.p1, st.L - st.p1] } : {};
+        ["x", "y"].forEach((k) => ["min", "max"].forEach((m, i) => {
+          if (lim[k]) inputs[k][m] = num(lim[k][i]); else inputs[k].removeAttribute(m);
+        }));
       };
       const draw = () => {
         if (st.mode === "c") { drawC(); return; }
-        const s = farmShortest(st.L, st.H, st.a, st.b);
+        const s = farmShortest(st.L, st.H, st.a, st.b), fr = isFree() ? farmFree(st.L, st.H, st.a, st.b, st.p1, st.p2) : null;
         if (!frozen) layout = fit();
         svg.setAttribute("viewBox", `0 0 ${layout.W} ${f(layout.Hh)}`);
-        svg.innerHTML = picture(s);
+        svg.innerHTML = picture(s, fr);
         $(".farm-lg-copy").style.display = st.refl ? "" : "none";
         $(".farm-lg-arc").style.display = "none";
+        $(".farm-lg-opt").style.display = fr ? "" : "none";
+        $(".farm-lg-path").textContent = fr ? "המסלול שלכם" : "המסלול הקצר ביותר";
         $(".farm-drag").textContent = st.mode === "a"
           ? "גררו את החוואי A ואת הפרה B לאורך הדפנות, ואת הפינות כדי לשנות את L ואת H."
-          : "גררו את נקודת האוכל ואת נקודת המים לאורך הקווים, ואת הפינות כדי לשנות את L ואת H.";
-        sync(s);
-        const sq = (v) => `${num(v)}²`;
-        summary.innerHTML = (st.mode === "b"
-          ? `העצירות ${ltr(`x = ${num(s.x)}, y = ${num(s.y)}, w = ${num(s.w)}`)} הן הקצרות ביותר כש-${ltr(`a = ${num(st.a)}, b = ${num(st.b)}`)}. `
-          : `העצירות הטובות ביותר : ${ltr(`x = ${num(s.x)}, y = ${num(s.y)}, w = ${num(s.w)}`)}. `) +
-          `המסלול הקצר ביותר : ${ltr(`z = √(L² + (2H + b − a)²) = √(${sq(st.L)} + ${sq(s.D)}) ≈ ${num(s.z)}`)}.`;
+          : fr ? "גררו את נקודת האוכל P ואת נקודת המים Q לכל מקום על הקווים, ואת A ואת B לאורך הדפנות."
+            : "גררו את נקודת האוכל ואת נקודת המים לאורך הקווים, ואת הפינות כדי לשנות את L ואת H.";
+        const c = fr || s;
+        sync(c);
+        const sq = (v) => `${num(v)}²`, stops = (p) => ltr(`x = ${num(p.x)}, y = ${num(p.y)}, w = ${num(p.w)}`);
+        const best = ltr(`z = √(L² + (2H + b − a)²) = √(${sq(st.L)} + ${sq(s.D)}) ≈ ${num(s.z)}`);
+        if (fr) {
+          const extra = fr.z - s.z;
+          summary.innerHTML = `המסלול שלכם : ${stops(fr)}, ${ltr(`z = z1 + z2 + z3 ≈ ${num(fr.z)}`)}. הקצר ביותר : ${best}, ` +
+            (extra < 1e-9 * (1 + s.z) ? "ואלה העצירות שלו : המסלול שלכם הוא הקצר ביותר." : `עם ${stops(s)} : המסלול שלכם ארוך ממנו ${extra < 0.005 ? "בפחות מ-0.01" : `ב-${ltr(num(extra))}`}.`) +
+            (st.refl ? " בפרישה הוא הקו השבור מ-A דרך P ו-Q″ אל B″." : "");
+        } else {
+          summary.innerHTML = (st.mode === "b"
+            ? `העצירות ${stops(s)} הן הקצרות ביותר כש-${ltr(`a = ${num(st.a)}, b = ${num(st.b)}`)}. `
+            : `העצירות הטובות ביותר : ${stops(s)}. `) + `המסלול הקצר ביותר : ${best}.`;
+        }
         note.textContent = message;
         const row = (name, h, v, z, cls = "") => `<tr${cls}><td>${name}</td><td>${ltr(h)}</td><td>${ltr(v)}</td><td>${ltr(z)}</td></tr>`;
         table.innerHTML = `<table><thead><tr><th>הקטע</th><th>אופקי</th><th>אנכי</th><th>האורך, לפי פיתגורס</th></tr></thead><tbody>` +
-          row("מהחוואי לאוכל", `x = ${num(s.x)}`, `H − a = ${num(st.H - st.a)}`, `z1 = ${num(s.z1)}`) +
-          row("מהאוכל למים", `y = ${num(s.y)}`, `H = ${num(st.H)}`, `z2 = ${num(s.z2)}`) +
-          row("מהמים לפרה", `w = ${num(s.w)}`, `b = ${num(st.b)}`, `z3 = ${num(s.z3)}`) +
-          row("כל המסלול", `L = ${num(st.L)}`, `2H + b − a = ${num(s.D)}`, `z = ${num(s.z)}`, ` class="farm-total"`) +
+          row("מהחוואי לאוכל", `x = ${num(c.x)}`, `H − a = ${num(st.H - st.a)}`, `z1 = ${num(c.z1)}`) +
+          row("מהאוכל למים", `y = ${num(c.y)}`, `H = ${num(st.H)}`, `z2 = ${num(c.z2)}`) +
+          row("מהמים לפרה", `w = ${num(c.w)}`, `b = ${num(st.b)}`, `z3 = ${num(c.z3)}`) +
+          (fr ? row("המסלול שלכם", `L = ${num(st.L)}`, `2H + b − a = ${num(s.D)}`, `z = z1 + z2 + z3 = ${num(fr.z)}`, ` class="farm-total"`) +
+                row("הקו הישר, הקצר ביותר", `L = ${num(st.L)}`, `2H + b − a = ${num(s.D)}`, `z = ${num(s.z)}`)
+              : row("כל המסלול", `L = ${num(st.L)}`, `2H + b − a = ${num(s.D)}`, `z = ${num(s.z)}`, ` class="farm-total"`)) +
           `</tbody></table>`;
       };
       const say = (m) => { message = m; };
 
       // the heights follow H in proportion, so the picture keeps its shape
       const setSize = (L, H) => {
-        const ra = st.a / st.H, rb = st.b / st.H;
-        st.L = L; st.H = H; st.a = ra * H; st.b = rb * H;
+        const ra = st.a / st.H, rb = st.b / st.H, rl = L / st.L;
+        st.L = L; st.H = H; st.a = ra * H; st.b = rb * H; st.p1 *= rl; st.p2 *= rl;
       };
       const setStops = (p1, p2) => {
         const hb = farmHeights(st.L, st.H, p1, p2 - p1);
@@ -402,6 +449,10 @@
         } else if (k === "a" || k === "b") {
           if (v < 0 || v > st.H) { say(`הערך של ${k} צריך להיות בין 0 ל-H = ${num(st.H)} : הנקודה בין הקווים או עליהם.`); draw(); return; }
           st[k] = v;
+        } else if (isFree()) {
+          const x = k === "x" ? v : st.p1, y = k === "y" ? v : st.p2 - st.p1;
+          if (x < 0 || x > st.L + 1e-9 || x + y < -1e-9 || x + y > st.L + 1e-9) { say(`העצירות על הקווים בין החוואי לפרה : צריך ${iso("0 ≤ x ≤ L")} ו-${iso("0 ≤ x + y ≤ L")}, כאן ${iso(`L = ${num(st.L)}`)}.`); draw(); return; }
+          st.p1 = Math.min(st.L, x); st.p2 = Math.min(st.L, Math.max(0, x + y));
         } else {
           const s = farmShortest(st.L, st.H, st.a, st.b);
           const x = k === "x" ? v : s.x, y = k === "y" ? v : s.y, w = st.L - x - y;
@@ -426,8 +477,10 @@
       // a random example: L and H in halves, then the heights (part a) or two valid stops (part b)
       const random = (rng) => {
         st.L = 2 + snap(rng() * 18, 0.5); st.H = 1 + snap(rng() * 9, 0.5);
-        if (st.mode === "a") {
+        if (st.mode === "a" || isFree()) {
           st.a = Math.min(st.H, snap(rng() * st.H, 0.1)); st.b = Math.min(st.H, snap(rng() * st.H, 0.1));
+          const u = Math.min(st.L, snap(rng() * st.L, 0.1)), v = Math.min(st.L, snap(rng() * st.L, 0.1));
+          st.p1 = Math.min(u, v); st.p2 = Math.max(u, v);
         } else if (st.mode === "c") {
           st.t = Math.round(rng() * TMAX);
           st.a = Math.min(st.H, snap(rng() * st.H, 0.1));
@@ -473,6 +526,9 @@
         } else if (drag === "A" || drag === "B") {
           st[drag === "A" ? "a" : "b"] = Math.min(st.H, Math.max(0, snap(vUp, 0.05)));
           say("");
+        } else if (isFree()) {
+          st[drag === "food" ? "p1" : "p2"] = Math.min(st.L, Math.max(0, snap(u, 0.05)));
+          say("");
         } else {
           const s = farmShortest(st.L, st.H, st.a, st.b);
           let p1 = s.x, p2 = s.x + s.y;
@@ -517,8 +573,8 @@
     views: { farm: farmView },
     cols: { farm: { main: ".farm-drag, svg.farm-live", side: ".viz-legend", w: "minmax(0, 2.2fr)" } },   // the picture beside its legend; the lengths table stays wide under them
     help: {
-      farm: "בסעיף א גוררים את החוואי ואת הפרה לאורך הדפנות, ובסעיף ב את נקודות העצירה לאורך הקווים; הפינות משנות את L ואת H, והשיקוף מראה את הקו הישר שמוצאים בו את המסלול. בסעיף ג המחוון משנה את הזווית θ של קו האוכל, והשיקוף מראה את הסיבוב של הפרה סביב O.",
+      farm: "בסעיף א גוררים את החוואי ואת הפרה לאורך הדפנות, ובסעיף ב את נקודות העצירה לאורך הקווים; הפינות משנות את L ואת H, והשיקוף מראה את הקו הישר שמוצאים בו את המסלול. ב\"עצירות חופשיות\" גוררים את נקודות העצירה לכל מקום ומשווים את האורך לקצר ביותר. בסעיף ג המחוון משנה את הזווית θ של קו האוכל, והשיקוף מראה את הסיבוב של הפרה סביב O.",
     },
-    models: { farmShortest, farmHeights, farmStopRange, farmTilt },
+    models: { farmShortest, farmFree, farmHeights, farmStopRange, farmTilt },
   });
 })();

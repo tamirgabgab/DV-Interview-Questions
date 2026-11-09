@@ -157,6 +157,17 @@ def test_part_c_example():
     # the food stop is left of A from tan 2 theta = L / (H + b): 27.2 degrees; at 30, x = -0.15
     assert f"{math.degrees(math.atan(7 / 5)) / 2:.1f}" == "27.2"
     assert f"{q0048.tilted(7, 3, 1, 2, 30)['P'][0]:.2f}" == "-0.15"
+    # "s < 0 exactly when L cos 2 theta < (H + b) sin 2 theta" needs a < H: with the farmer on
+    # the food line (a = H) the food stop is (0, H) at every angle, although 7 cos 60 < 5 sin 60
+    assert 7 * math.cos(math.radians(60)) < 5 * math.sin(math.radians(60))
+    assert q0048.tilted(7, 3, 3, 2, 30)["sf"] == 0 and tilted_path(7, 3, 3, 2, 30)[1] == (0.0, 3.0)
+    rng = random.Random(4800)
+    for _ in range(2000):
+        L, H, a, b, th = random_tilted(rng)
+        r, t = q0048.tilted(L, H, a, b, th), math.radians(2 * th)
+        side = L * math.cos(t) - (H + b) * math.sin(t)
+        if a < H and abs(side) > 1e-9:
+            assert (r["sf"] < 0) == (side < 0), (L, H, a, b, th)
     # the extra example: theta = 45, B2 = (-5, 10), z^2 = 106
     r = q0048.tilted(7, 3, 1, 2, 45)
     assert math.isclose(r["B2"][0], -5) and math.isclose(r["B2"][1], 10) and math.isclose(r["z_sq"], 106)
@@ -301,6 +312,27 @@ def test_explorer_matches_python():
         assert edge(p1, wlo - p1), (L, H, a, b)                    # and so does the water stop
     out = node_json(f"const m = {explorer_require()}; console.log(JSON.stringify([m.farmHeights(7, 3, 3, 2), m.farmHeights(7, 3, 1, 2)]));")
     assert out == [None, None]
+
+
+def test_explorer_free_stops():
+    """Mode f of the box: the length of a path through any two stops is length() of the
+    generator, never below the shortest one, and equal to it at the shortest path's stops;
+    the page's task: stops at 3 and 5 give 10.04 against 9.9, and the food stop moved to 2
+    gives the shortest path."""
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(23)
+    cases = [(7, 3, 1, 2, 3, 5), (7, 3, 1, 2, 2, 5), (7, 3, 0, 3, 7 / 3, 14 / 3), (7, 3, 1, 2, 5, 1)]
+    cases += [(L, H, rng.uniform(0, H), rng.uniform(0, H), rng.uniform(0, L), rng.uniform(0, L))
+              for L, H in ((rng.uniform(0.5, 20), rng.uniform(0.5, 10)) for _ in range(60))]
+    got = node_json(f"const m = {explorer_require()}; const cases = {[list(c) for c in cases]};"
+                    "console.log(JSON.stringify(cases.map(([L, H, a, b, p, q]) => [m.farmFree(L, H, a, b, p, q), m.farmShortest(L, H, a, b)])));")
+    for (L, H, a, b, p1, p2), (fr, s) in zip(cases, got):
+        assert math.isclose(fr["z"], q0048.length(L, H, a, b, p1, p2), rel_tol=1e-12)
+        assert math.isclose(fr["z1"] + fr["z2"] + fr["z3"], fr["z"]) and math.isclose(fr["x"] + fr["y"] + fr["w"], L)
+        assert fr["z"] >= s["z"] - 1e-9
+    assert (f"{got[0][0]['z']:.2f}", f"{got[0][1]['z']:.1f}", f"{got[0][0]['z'] - got[0][1]['z']:.2f}") == ("10.04", "9.9", "0.14")
+    assert math.isclose(got[1][0]["z"], got[1][1]["z"]) and math.isclose(got[2][0]["z"], got[2][1]["z"])
 
 
 def test_explorer_tilted_matches_python():
