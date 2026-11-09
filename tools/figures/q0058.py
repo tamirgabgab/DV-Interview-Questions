@@ -87,19 +87,32 @@ def sums_table():
     return "\n".join(rows)
 
 
+def final_bits(width=8):
+    """The width each register needs for its final value, for tags of `width` bits (n =
+    2^width of them). A running sum may wrap: adding and subtracting modulo 2^b is exact
+    modulo 2^b, so only the value at the end must fit. s = a - d and q = a^2 - d^2 of part c
+    can be negative (a sign bit); the power sums p_i of at most k missing tags are at most
+    k (n - 1)^i."""
+    top = (1 << width) - 1
+    signed = lambda m: m.bit_length() + 1                 # -m .. m in two's complement
+    return {
+        "sums": [signed(top), signed(top * top)],
+        **{k: [(k * top ** i).bit_length() for i in range(1, k + 1)] for k in (2, 3, 4)},
+    }
+
+
 def memory_table(width=8):
-    """Bits of each method for tags of `width` bits, all 2^width of them sent once: the
-    largest value each register holds, plus a sign bit for the differences of part c."""
+    """Bits of each method for tags of `width` bits, the counter not counted: the final
+    value of each register (final_bits), the parts in an LTR span that does not wrap."""
     n = 1 << width
-    top = lambda i: sum(t ** i for t in range(n))
+    fb = final_bits(width)
+    total = lambda ws: f'{RLM}{sum(ws)} (<span dir="ltr">{"\u00a0+\u00a0".join(map(str, ws))}</span>)'
     rows = ["| השיטה | מה היא מוצאת | הרגיסטרים | ביטים ל-tags של 8 ביטים |", "|---|---|---|:-:|"]
     rows.append(f"| ‏XOR | חסר אחד | ‏`x` | {RLM}{width} |")
     rows.append(f"| ‏XOR לפי ביט | שני חסרים | ‏`x` ו-`part[0..W-1]` | {RLM}{width + width * width} |")
-    c = 1 + top(1).bit_length() + 1 + top(2).bit_length()
-    rows.append(f"| סכום וסכום ריבועים | חסר אחד וכפול אחד | ‏`s` ו-`q`, עם סימן | {RLM}{c} |")
+    rows.append(f"| סכום וסכום ריבועים | חסר אחד וכפול אחד | ‏`s` ו-`q`, עם סימן | {total(fb['sums'])} |")
     for k in (2, 3, 4):
-        pk = sum(top(i).bit_length() for i in range(1, k + 1))
-        rows.append(f"| סכומי חזקות עד {k} | עד {k} חסרים | ‏\\( p_1, \\dots, p_{{{k}}} \\) | {RLM}{pk} |")
+        rows.append(f"| סכומי חזקות עד {k} | עד {k} חסרים | ‏\\( p_1, \\dots, p_{{{k}}} \\) | {total(fb[k])} |")
     rows.append(f"| טבלה של ביט לכל tag | הכול | ‏{n} ביטים | {RLM}{n} |")
     return "\n".join(rows)
 

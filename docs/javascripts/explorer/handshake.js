@@ -1,5 +1,5 @@
 // kinds: handshake attempts
-//   handshake              0038        req and ack drawn cell by cell; the four rules checked every cycle, a failure marked on its assertion's row
+//   handshake              0038        part b, the mutation box: rst_n, req and ack drawn cell by cell; the four rules and one trap's variant of a property (MAX_WAIT 1 to 4) checked side by side, a failure marked on its assertion's row, and whether the trace tells the variant from the rule
 //   attempts               0038        part a: an attempt lane per property, where the antecedent matched, the window as a bracket, and pass, fail, still open or vacuous
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
@@ -38,60 +38,142 @@
     return out;
   };
 
-  // The handshake box (0038): draw req and ack cell by cell on a timing strip; the four
-  // rules of the page's reference model are evaluated every cycle, a failure marked on
-  // the row of its assertion at the cycle the SVA reports it; the page's traces as presets.
+  // The mutation box (0038 part b): one property swapped for a trap's variant, checked
+  // side by side with the page's four on the same trace. Every property, the page's and
+  // the variants, as attempts with reset: an attempt that matched at t and ends at `end`
+  // is disabled when rst_n is low at any cycle t..end (disable iff (!rst_n)), unless the
+  // variant drops disable iff. With rst_n high throughout, the page's four give hsCheck.
+  //   r4      ack |-> !req                    (trap 1: |-> where |=> was meant)
+  //   r2req   req |-> ##[1:w] ack             (req instead of $rose(req))
+  //   r2noack $rose(req) |-> ##[1:w] ack      (no !ack: an ack in the rise cycle passes)
+  //   nodis   the page's four without disable iff (trap 2)
+  const HS_MUTANTS = { r4: "drop", r2req: "late", r2noack: "late", nodis: null };
+  const hsProp = (key, req, ack, rst, maxWait = 3, dis = true) => {
+    const n = req.length, out = [];
+    const win = (t, early) => {                     // ##[1:w] ack after t; early: !ack at t first
+      if (early && ack[t]) return { t, end: t, status: "fail" };
+      let u = t + 1;
+      while (u <= t + maxWait && u < n && !ack[u]) u++;
+      return u <= t + maxWait && u < n ? { t, end: u, status: "pass" } : u > t + maxWait ? { t, end: t + maxWait, status: "fail" } : { t, end: n - 1, status: "open" };
+    };
+    const next = (t, ok) => (t + 1 < n ? { t, end: t + 1, status: ok(t + 1) ? "pass" : "fail" } : { t, end: n - 1, status: "open" });
+    for (let t = 0; t < n; t++) {
+      const prevReq = t ? req[t - 1] : 0, rose = req[t] && !prevReq;
+      let a = null;
+      if (key === "hold" && req[t] && !ack[t]) a = next(t, (u) => req[u]);
+      else if (key === "late" && rose) a = win(t, true);
+      else if (key === "r2noack" && rose) a = win(t, false);
+      else if (key === "r2req" && req[t]) a = win(t, false);
+      else if (key === "orphan" && ack[t]) a = { t, end: t, status: req[t] ? "pass" : "fail" };
+      else if (key === "r4" && ack[t]) a = { t, end: t, status: req[t] ? "fail" : "pass" };
+      else if (key === "drop" && ack[t]) a = next(t, (u) => !req[u]);
+      if (!a) { out.push({ t, end: t, status: "vacuous" }); continue; }
+      if (dis && rst.slice(t, a.end + 1).some((v) => !v)) a = { t, end: a.end, status: "disabled" };
+      out.push(a);
+    }
+    return out;
+  };
+  const hsFails = (att) => att.filter((a) => a.status === "fail").map((a) => a.end).sort((a, b) => a - b);
+  // The page's four with reset (dis: disable iff), and the variant's failures.
+  const hsCheckRst = (req, ack, rst, maxWait = 3, dis = true) =>
+    Object.fromEntries(HS_PROPS.map((key) => [key, hsFails(hsProp(key, req, ack, rst, maxWait, dis))]));
+  const hsMutant = (variant, req, ack, rst, maxWait = 3) => {
+    if (variant === "nodis") return [...new Set(Object.values(hsCheckRst(req, ack, rst, maxWait, false)).flat())].sort((a, b) => a - b);
+    return hsFails(hsProp(variant, req, ack, rst, maxWait, true));
+  };
+  // The trap of trap 2 as a preset: req rises at 1, reset at cycles 3 and 4 (req and ack
+  // low under reset), so rule 1's attempt at 2 and rule 2's window 1..4 meet the reset.
+  const HS_RESET = ["01.0....", "0.......", "111001.."];
+
   const handshakeView = () => ({
     mount(box) {
-      const N = 12, MAX_WAIT = 3;
+      const N = 12;
       const RULES = [
-        ["hold", "a_req_holds", "חוק 1, req מחזיק"],
-        ["late", "a_ack_in_time", "חוק 2, ack בזמן"],
-        ["orphan", "a_no_orphan_ack", "חוק 3, אין ack יתום"],
-        ["drop", "a_req_drops", "חוק 4, req יורד אחרי ack"],
+        ["hold", "a_req_holds", "חוק 1", "(req && !ack) |=> req"],
+        ["late", "a_ack_in_time", "חוק 2", "$rose(req) |-> !ack ##[1:W] ack"],
+        ["orphan", "a_no_orphan_ack", "חוק 3", "ack |-> req"],
+        ["drop", "a_req_drops", "חוק 4", "ack |=> !req"],
       ];
-      const st = { req: hsWave(HS_PRESETS.ok[0], N), ack: hsWave(HS_PRESETS.ok[1], N), cur: 3 };
+      // variant: [the row's name, its expression, the select's text (code isolated LTR)]
+      const iso = (t) => `\u2066${t}\u2069`;
+      const MUT = {
+        r4: [`מוטציה${NB}: חוק 4`, "ack |-> !req", `חוק 4 עם ${iso("|->")} במקום ${iso("|=>")}`],
+        r2req: [`מוטציה${NB}: חוק 2`, "req |-> ##[1:W] ack", `חוק 2 עם ${iso("req")} במקום ${iso("$rose(req)")}`],
+        r2noack: [`מוטציה${NB}: חוק 2`, "$rose(req) |-> ##[1:W] ack", `חוק 2 בלי ${iso("!ack")} במחזור העלייה`],
+        nodis: ["בלי disable iff", "disable iff הוסר", `ארבעת החוקים בלי ${iso("disable iff")}`],
+      };
+      const d0 = { mut: MUT[box.dataset.mut] ? box.dataset.mut : "r4" };
+      const st = { req: hsWave(HS_PRESETS.ok[0], N), ack: hsWave(HS_PRESETS.ok[1], N), rst: new Array(N).fill(1), cur: 3 };
       box.innerHTML =
-        `<div class="ex-controls"><span class="wv-presets">הדיאגרמות שבעמוד : ` +
+        `<div class="ex-controls"><span class="wv-presets">הרצף${NB}: ` +
         `<button type="button" class="md-button ex-preset" data-p="ok">עסקה תקינה</button> ` +
         `<button type="button" class="md-button ex-preset" data-p="late">ack מאוחר</button> ` +
         `<button type="button" class="md-button ex-preset" data-p="drop">req נופל</button> ` +
         `<button type="button" class="md-button ex-preset" data-p="orphan">ack יתום</button> ` +
+        `<button type="button" class="md-button ex-preset" data-p="reset">reset באמצע</button> ` +
         `<button type="button" class="md-button ex-preset" data-p="clear">ניקוי</button></span></div>` +
-        `<p class="wv-hint">לחיצה על משבצת של ${code("req")} או ${code("ack")} הופכת את הערך שלה באותו מחזור. ✗ בשורה של assertion הוא המחזור שבו היא מדווחת על כישלון.</p>` +
-        `<div class="wv-wrap" tabindex="0" role="group" aria-label="דיאגרמת תזמון של לחיצת הידיים וארבע שורות ה-assertions, גלילה אופקית"></div>` +
+        `<div class="ex-controls"><label>המוטציה <select class="hs-mut" aria-label="ה-property שמוחלפת בגרסה של מלכודת">` +
+        Object.entries(MUT).map(([v, m]) => `<option value="${v}">${m[2]}</option>`).join("") + `</select></label>` +
+        `<label>MAX_WAIT <select class="hs-wait" aria-label="MAX_WAIT, סוף החלון של חוק 2">${[1, 2, 3, 4].map((v) => `<option value="${v}">${v}</option>`).join("")}</select></label></div>` +
+        `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">המחזור הקודם</button>` +
+        `<button type="button" class="md-button md-button--primary ex-next">המחזור הבא</button><span class="ex-pos"></span></div>` +
+        `<p class="wv-hint">לחיצה על משבצת של ${code("rst_n")}, ${code("req")} או ${code("ack")} הופכת אותה. ✗ בשורה הוא המחזור שבו ה-assertion מדווחת על כישלון; השורה האחרונה היא המוטציה.</p>` +
+        `<div class="wv-wrap" tabindex="0" role="group" aria-label="דיאגרמת תזמון של לחיצת הידיים, ארבע שורות ה-assertions ושורת המוטציה, גלילה אופקית"></div>` +
         `<p class="wv-step" aria-live="polite"></p><p class="ex-summary wv-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
+      $(".hs-mut").value = d0.mut; $(".hs-wait").value = "3";
+      const mut = () => $(".hs-mut").value, W = () => Number($(".hs-wait").value);
+      const exprOf = (e) => e.replace("W]", `${W()}]`);
+      const word = (a) => (a.status === "pass" ? `<span class="wv-ok">✓ במחזור ${ltr(a.end)}</span>` : a.status === "fail" ? `<span class="wv-bad">✗ במחזור ${ltr(a.end)}</span>`
+        : a.status === "open" ? "עוד פתוח בסוף הרצף" : `מבוטל${NB}: ${code("rst_n")} נמוך בחלון`);
       const draw = () => {
-        const fails = hsCheck(st.req, st.ack, MAX_WAIT);
+        const w = W(), v = mut(), dis = v !== "nodis";
+        const fails = hsCheckRst(st.req, st.ack, st.rst, w);
+        const mf = hsMutant(v, st.req, st.ack, st.rst, w);
+        const flag = (list) => st.req.map((_, k) => (list.includes(k) ? 1 : 0));
         const rows = [
           { name: "clk", kind: "clock" },
-          { name: "req", kind: "bit", values: st.req, cls: "wv-s1", cells: (k) => `מחזור ${k} : req = ${st.req[k]}, לחיצה הופכת` },
-          { name: "ack", kind: "bit", values: st.ack, cls: "wv-s3", cells: (k) => `מחזור ${k} : ack = ${st.ack[k]}, לחיצה הופכת` },
-        ].concat(RULES.map(([key, name]) => ({ name, kind: "flag", values: st.req.map((_, k) => (fails[key].includes(k) ? 1 : 0)) })));
-        $(".wv-wrap").innerHTML = waveStrip(rows, N, { role: "group", label: "דיאגרמת תזמון", labelW: 130, cursor: st.cur, ticks: (k) => k });
-        const t = st.cur, req = st.req, ack = st.ack;
-        const prevReq = t ? req[t - 1] : 0, prevAck = t ? ack[t - 1] : 0;
-        const lines = [];
-        if (t && prevReq && !prevAck) lines.push(`חוק 1 : במחזור ${ltr(t - 1)} ‏${code("req")} היה גבוה בלי ${code("ack")}, ולכן ${code("req")} חייב להישאר גבוה עכשיו : ` + (req[t] ? `<span class="wv-ok">✓</span>` : `<span class="wv-bad">✗ ${code("req")} נפל לפני ${code("ack")}</span>`));
-        if (req[t] && !prevReq && ack[t]) lines.push(`חוק 2 : ${code("req")} עלה עכשיו (‏${code("$rose(req)")}), ו-${code("ack")} כבר כאן, באותו מחזור : <span class="wv-bad">✗ ack מוקדם, החוזה דורש מחזור אחד עד ${ltr(MAX_WAIT)} אחרי העלייה</span>`);
-        else if (req[t] && !prevReq) {
-          const win = ack.slice(t + 1, t + 1 + MAX_WAIT);
-          lines.push(`חוק 2 : ${code("req")} עלה עכשיו (‏${code("$rose(req)")}), ולכן ${code("ack")} חייב להגיע במחזורים ${ltr(`${t + 1}..${t + MAX_WAIT}`)} : ` +
-            (win.some((v) => v) ? `<span class="wv-ok">✓ מגיע במחזור ${ltr(t + 1 + win.findIndex((v) => v))}</span>` : win.length < MAX_WAIT ? `החלון עוד פתוח בסוף הרצף` : `<span class="wv-bad">✗ החלון נסגר בלי ack, הכישלון מדווח במחזור ${ltr(t + MAX_WAIT)}</span>`));
-        }
-        if (fails.late.includes(t) && !(req[t] && !prevReq && ack[t])) lines.push(`חוק 2 : כאן נסגר החלון של העלייה במחזור ${ltr(t - MAX_WAIT)} בלי ${code("ack")} : <span class="wv-bad">✗ ack מאוחר</span>`);
-        if (ack[t]) lines.push(`חוק 3 : ${code("ack")} גבוה, ולכן ${code("req")} חייב להיות גבוה באותה דגימה : ` + (req[t] ? `<span class="wv-ok">✓</span>` : `<span class="wv-bad">✗ ack יתום</span>`));
-        if (t && prevAck) lines.push(`חוק 4 : במחזור ${ltr(t - 1)} היה ${code("ack")}, ולכן ${code("req")} חייב להיות נמוך עכשיו : ` + (!req[t] ? `<span class="wv-ok">✓</span>` : `<span class="wv-bad">✗ req נשאר גבוה אחרי ack</span>`));
-        $(".wv-step").innerHTML = `מחזור ${ltr(t)} : ${ltr(`req = ${req[t]}, ack = ${ack[t]}`)}. ` + (lines.length ? lines.join(" ") : `אף property לא נבדקת במחזור הזה (אין אנטצדנט).`);
+          { name: "rst_n", kind: "bit", values: st.rst, cells: (k) => `מחזור ${k} : rst_n = ${st.rst[k]}, לחיצה הופכת` },
+          { name: "req", kind: "bit", values: st.req, cls: "wv-s1", cells: (k) => `מחזור ${k} : req = ${st.req[k]}, לחיצה הופכת` },
+          { name: "ack", kind: "bit", values: st.ack, cls: "wv-s3", cells: (k) => `מחזור ${k} : ack = ${st.ack[k]}, לחיצה הופכת` },
+        ].concat(RULES.map(([key, name]) => ({ name, kind: "flag", values: flag(fails[key]) })), [{ name: MUT[v][0], kind: "flag", values: flag(mf) }]);
+        const wrap = $(".wv-wrap"), left = wrap.scrollLeft;
+        wrap.innerHTML = waveStrip(rows, N, { role: "group", label: "דיאגרמת תזמון", labelW: 130, cursor: st.cur, ticks: (k) => k });
+        wrap.scrollLeft = left;
+        $(".ex-pos").textContent = `מחזור ${st.cur}`;
+        $(".ex-prev").disabled = st.cur === 0; $(".ex-next").disabled = st.cur >= N - 1;
+        // the cursor cycle: every attempt that starts here, or fails here after starting earlier
+        const t = st.cur, said = [];
+        const tell = (label, expr, att) => {
+          const a = att[t];
+          if (a.status !== "vacuous") said.push(`${label} (${code(expr.replace(/ /g, NB))})${NB}: ` + (a.end === t && (a.status === "pass" || a.status === "fail") ? `${a.status === "pass" ? `<span class="wv-ok">✓</span>` : `<span class="wv-bad">✗</span>`} באותו מחזור` : word(a)) + ".");
+          att.filter((b) => b.t < t && b.end === t && b.status === "fail").forEach((b) => said.push(`${label}${NB}: הניסיון של מחזור ${ltr(b.t)} נכשל כאן <span class="wv-bad">✗</span>.`));
+        };
+        RULES.forEach(([key, , rule, expr]) => tell(rule, exprOf(expr), hsProp(key, st.req, st.ack, st.rst, w)));
+        if (v !== "nodis") tell("המוטציה", exprOf(MUT[v][1]), hsProp(v, st.req, st.ack, st.rst, w));
+        else RULES.forEach(([key, , rule]) => hsProp(key, st.req, st.ack, st.rst, w, false).filter((b) => b.end === t && b.status === "fail" && !fails[key].includes(t))
+          .forEach((b) => said.push(`בלי ${code("disable iff")}, ${rule} נכשל כאן <span class="wv-bad">✗</span> (הניסיון של מחזור ${ltr(b.t)}).`)));
+        $(".wv-step").innerHTML = `מחזור ${ltr(t)}${NB}: ${ltr(`rst_n = ${st.rst[t]}, req = ${st.req[t]}, ack = ${st.ack[t]}`)}. ` +
+          (!st.rst[t] && dis ? `${code("rst_n")} נמוך${NB}: ‏${code("disable iff")} מבטל כל ניסיון שפתוח עכשיו. ` : "") +
+          (said.length ? said.join(" ") : `אף אנטצדנט לא התאים כאן${NB}: כל הניסיונות שהתחילו במחזור הזה עברו באופן ריק.`);
+        // the verdict: does this trace tell the variant from the rule it replaces?
+        const orig = HS_MUTANTS[v] ? fails[HS_MUTANTS[v]] : [...new Set(Object.values(fails).flat())].sort((a, b) => a - b);
         const total = RULES.reduce((a, [key]) => a + fails[key].length, 0);
-        $(".wv-sum").innerHTML = total === 0
-          ? `<span class="wv-ok">כל ארבע ה-properties מרוצות ✓</span>` + (req.some((v) => v) ? "" : ` (ובלי אף ${code("req")} הן מרוצות באופן ריק : vacuous pass)`)
-          : `<span class="wv-bad">${ltr(total)} ${total === 1 ? "הפרה" : "הפרות"} :</span> ` + RULES.filter(([key]) => fails[key].length).map(([key, name, heb]) => `${heb} (${code(name)}) במחזור${fails[key].length > 1 ? "ים" : ""} ${ltr(fails[key].join(", "))}`).join("; ") + `.`;
+        const page = total === 0 ? `<span class="wv-ok">ארבעת החוקים עוברים ✓</span>`
+          : `<span class="wv-bad">ארבעת החוקים${NB}: ${ltr(total)} ${total === 1 ? "הפרה" : "הפרות"}</span> (` + RULES.filter(([key]) => fails[key].length).map(([key, , rule]) => `${rule} במחזור${fails[key].length > 1 ? "ים" : ""} ${ltr(fails[key].join(", "))}`).join("; ") + `).`;
+        const m = mf.length ? `המוטציה נכשלת במחזור${mf.length > 1 ? "ים" : ""} ${ltr(mf.join(", "))}` : "המוטציה עוברת";
+        const same = JSON.stringify(orig) === JSON.stringify(mf);
+        const extra = mf.some((k) => !orig.includes(k)), missed = orig.some((k) => !mf.includes(k));
+        const kill = same ? `על הרצף הזה המוטציה והחוק המקורי מסכימים${NB}: הרצף לא מבדיל ביניהם.`
+          : extra && missed ? `<span class="wv-bad">המוטציה והחוק נכשלים במחזורים שונים${NB}: הרצף מבדיל ביניהם.</span>`
+          : extra ? `<span class="wv-bad">המוטציה מתריעה איפה שהחוק עבר${NB}: התרעת שווא.</span>`
+          : `<span class="wv-bad">המוטציה שותקת איפה שהחוק נכשל${NB}: באג שהיה עובר.</span>`;
+        $(".wv-sum").innerHTML = `${page} ${m}. ${kill}`;
       };
       const wrap = $(".wv-wrap");
       const tap = (c) => {
-        const k = Number(c.dataset.k), row = c.getAttribute("aria-label").includes("req") ? st.req : st.ack;
+        const k = Number(c.dataset.k), label = c.getAttribute("aria-label");
+        const row = label.includes("rst_n") ? st.rst : label.includes("req") ? st.req : st.ack;
         row[k] = row[k] ? 0 : 1; st.cur = k; draw();
       };
       wrap.addEventListener("click", (e) => { const c = e.target.closest(".wv-cell"); if (c) tap(c); });
@@ -99,12 +181,29 @@
         const c = e.target.closest(".wv-cell");
         if (c && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); tap(c); }
       });
-      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => {
-        const p = b.dataset.p;
-        if (p === "clear") { st.req = new Array(N).fill(0); st.ack = new Array(N).fill(0); st.cur = 0; }
-        else { st.req = hsWave(HS_PRESETS[p][0], N); st.ack = hsWave(HS_PRESETS[p][1], N); const fl = hsCheck(st.req, st.ack, MAX_WAIT); const first = Object.values(fl).flat().sort((a, b) => a - b)[0]; st.cur = first === undefined ? 3 : first; }
-        draw();
-      }));
+      const load = (p) => {
+        st.rst = new Array(N).fill(1);
+        if (p === "clear") { st.req = new Array(N).fill(0); st.ack = new Array(N).fill(0); st.cur = 0; return; }
+        const [r, a, n] = p === "reset" ? HS_RESET : HS_PRESETS[p];
+        st.req = hsWave(r, N); st.ack = hsWave(a, N); if (n) st.rst = hsWave(n, N);
+        const first = Object.values(hsCheckRst(st.req, st.ack, st.rst, W())).flat().concat(hsMutant(mut(), st.req, st.ack, st.rst, W())).sort((x, y) => x - y)[0];
+        st.cur = first === undefined ? 3 : first;
+      };
+      box.querySelectorAll(".ex-preset").forEach((b) => b.addEventListener("click", () => { load(b.dataset.p); draw(); }));
+      $(".hs-mut").addEventListener("change", draw);
+      $(".hs-wait").addEventListener("change", draw);
+      $(".ex-next").addEventListener("click", () => { if (st.cur < N - 1) st.cur++; draw(); });
+      $(".ex-prev").addEventListener("click", () => { if (st.cur > 0) st.cur--; draw(); });
+      // the drawn rows ride in the link: "<rst_n>-<req>-<ack>", a bit per cycle
+      box.dvqExtra = {
+        get: () => [st.rst, st.req, st.ack].map((r) => r.join("")).join("-"),
+        set: (text) => {
+          const m = /^([01]{12})-([01]{12})-([01]{12})$/.exec(text);
+          if (!m) return false;
+          [st.rst, st.req, st.ack] = m.slice(1).map((s) => [...s].map(Number));
+          draw(); return true;
+        },
+      };
       draw();
     },
   });
@@ -243,9 +342,9 @@
   dvqExplorers.register({
     views: { handshake: handshakeView, attempts: attemptsView },
     help: {
-      handshake: "לוחצים על משבצות של req ו-ack ברצועה : ארבעת הכללים נבדקים בכל מחזור, וכישלון מסומן בשורת ה-assertion שלו. ה-presets טוענים את ארבע הדוגמאות של העמוד. ״העתקת WaveDrom״ מעתיקה את הרצועה כ-JSON.",
+      handshake: "בוחרים מוטציה, גרסה של אחת ה-properties מהמלכודות, והיא נבדקת לצד ארבעת החוקים של הדף על אותו רצף. לחיצה על משבצת של rst_n, req או ack הופכת אותה; הכפתורים טוענים את הדיאגרמות של הדף ורצף עם reset באמצע. בשורה האחרונה ה-✗ של המוטציה, ובסיכום אם הרצף מבדיל בינה לבין החוק המקורי : התרעת שווא, או באג שהיה עובר.",
       attempts: "מתחת לרצועה יש מסלול לכל property : בכל מחזור מתחיל ניסיון, נקודה מסמנת שהאנטצדנט התאים, הסוגר הוא החלון, ובסופו ✓ או ✗. נקודה אפורה היא ניסיון vacuous. ה-presets טוענים את הדיאגרמות של העמוד, לחיצה על משבצת הופכת אותה, ו״המחזור הבא״ מסביר מה קורה בכל מחזור.",
     },
-    models: { hsCheck, HS_PRESETS, hsWave, hsAttempts, HS_PROPS },
+    models: { hsCheck, HS_PRESETS, hsWave, hsAttempts, HS_PROPS, hsProp, hsCheckRst, hsMutant, HS_MUTANTS, HS_RESET },
   });
 })();

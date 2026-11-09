@@ -1,16 +1,23 @@
 // kinds: tagcheck
-//   tagcheck               0058        n tags sent, the responses back in a seeded order with tags dropped or doubled (a click on a tag, or a preset); the accumulators (XOR, XOR per bit, sum, sum of squares, the count out) updated response by response; at the end what each method finds and where it is wrong; a quiz that hides the fault
+//   tagcheck               0058        n tags sent, the responses back in a seeded order with tags dropped or doubled (a click on a tag, or a preset); the accumulators (XOR, XOR per bit, sum, sum of squares, the count out) updated response by response; s and q at a chosen width (full, W + 1 / 2W + 1 or W / 2W bits, signed, wrapping); at the end what each method finds and where it is wrong; a quiz that hides the fault
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
   const { answer, autoplay, code, ltr, seedControls, speedSel } = dvqExplorers.lib;
+  const NB = "\u00a0";
 
   // Missing tags (0058): the accumulators of every tag sent and returned, and what each
   // method of the page reads from them: XOR (one missing), the split on the lowest bit of
   // x (two missing), the sums (one missing, one twice), the power sums with k = the count
   // still out (Newton's identities, the roots among 0..n-1).
-  const tcAcc = (sent, ret, w) => {
+  // wrap: 0 the full sums; 1 s and q in W + 1 and 2W + 1 bits, signed (the final
+  // differences fit, the running sums wrap on the way); 2 in W and 2W bits (no sign bit).
+  // Adding and subtracting modulo 2^b is exact modulo 2^b, so the register holds the
+  // true sum wrapped to b bits, read as a signed number.
+  const tcBits = (w, wrap) => (wrap === 1 ? [w + 1, 2 * w + 1] : wrap === 2 ? [w, 2 * w] : [0, 0]);
+  const tcWrap = (v, b) => { if (!b) return v; const m = 2 ** b, u = ((v % m) + m) % m; return u >= m / 2 ? u - m : u; };
+  const tcAcc = (sent, ret, w, wrap = 0) => {
     let x = 0, s = 0, q = 0;
     const part = Array(w).fill(0);
     for (const t of [...sent, ...ret]) {
@@ -19,7 +26,8 @@
     }
     sent.forEach((t) => { s += t; q += t * t; });
     ret.forEach((t) => { s -= t; q -= t * t; });
-    return { x, part, s, q, out: sent.length - ret.length };
+    const [sb, qb] = tcBits(w, wrap);
+    return { x, part, s: tcWrap(s, sb), q: tcWrap(q, qb), out: sent.length - ret.length };
   };
   const tcK = (sent, ret, k, n) => {
     const p = [0];
@@ -34,8 +42,8 @@
     for (let z = 0; z < n; z++) { let v = 0; for (let i = 0; i <= k; i++) v = v * z + (i % 2 ? -e[i] : e[i]); if (v === 0) out.push(z); }
     return out;
   };
-  const tcDecode = (sent, ret, w, n) => {
-    const a = tcAcc(sent, ret, w), r = { ...a, one: a.x, two: null, sums: null, k: null, bit: null };
+  const tcDecode = (sent, ret, w, n, wrap = 0) => {
+    const a = tcAcc(sent, ret, w, wrap), r = { ...a, one: a.x, two: null, sums: null, k: null, bit: null };
     if (a.x) {
       const j = Math.log2(a.x & -a.x), m = a.part[j];
       r.bit = j; r.two = [m, a.x ^ m].sort((u, v) => u - v);
@@ -71,6 +79,8 @@
         `<label>tags <select class="tc-n" aria-label="כמה tags">${[8, 16, 32].map((v) => `<option value="${v}">${v}</option>`).join("")}</select></label>` +
         `<label>התקלה <select class="tc-case" aria-label="התרחיש">${Object.entries(CASES).map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}<option value="custom">בחירה בלחיצה</option></select></label>` +
         `<button type="button" class="md-button tc-shuffle">סדר חדש</button><span class="tc-anchor"></span>` +
+        `<label>רוחב ${code("s")} ו-${code("q")} <select class="tc-wrap" aria-label="הרוחב של המצברים s ו-q">` +
+        `<option value="0">בלי גלישה</option><option value="1">W + 1, 2W + 1 ביטים</option><option value="2">W, 2W ביטים</option></select></label>` +
         `<label><input type="checkbox" class="tc-quiz"> חידה : התקלה מוסתרת</label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button></div>` +
         `<div class="ex-controls ex-play-row">` +
@@ -118,18 +128,20 @@
           const mark = hidden() ? "" : st.f[t] === 1 ? `<span class="tc-f">✗</span>` : st.f[t] === 2 ? `<span class="tc-f">×2</span>` : "";
           return `<button type="button" class="tc-tag ${cls}${t === last ? " is-last" : ""}" data-t="${t}" title="tag ${t}"${hidden() ? " disabled" : ""}><b>${t}</b><small>${bin(t)}</small>${mark}</button>`;
         }).join("");
-        const a = tcAcc(sent(), back, w);
+        const wrap = Number($(".tc-wrap").value), [sb, qb] = tcBits(w, wrap);
+        const bitsOfReg = (b) => (b ? ` (${ltr(b)} ביטים)` : "");
+        const a = tcAcc(sent(), back, w, wrap);
         const hl = (j) => last !== null && ((last >> j) & 1);
         $(".tc-acc").innerHTML = `<table class="tc-table"><thead><tr><th>המצבר</th><th>בבינארי</th><th>ערך</th></tr></thead><tbody>` +
           `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("x")}${NB}: XOR של הכול</td><td dir="ltr"><code>${bin(a.x)}</code></td><td>${ltr(a.x)}</td></tr>` +
           a.part.map((v, j) => `<tr${hl(j) ? ' class="is-hit"' : ""}><td>${code(`part[${j}]`)} : ביט ${ltr(j)} דולק</td><td dir="ltr"><code>${bin(v)}</code></td><td>${ltr(v)}</td></tr>`).join("") +
-          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("s")} : סכום, נשלח פחות חזר</td><td></td><td>${ltr(a.s)}</td></tr>` +
-          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("q")} : סכום ריבועים</td><td></td><td>${ltr(a.q)}</td></tr>` +
+          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("s")}${NB}: סכום, נשלח פחות חזר${bitsOfReg(sb)}</td><td></td><td>${ltr(a.s)}</td></tr>` +
+          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("q")}${NB}: סכום ריבועים${bitsOfReg(qb)}</td><td></td><td>${ltr(a.q)}</td></tr>` +
           `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("out")} : מונה</td><td></td><td>${ltr(a.out)}</td></tr></tbody></table>` +
           `<p class="ex-note">${last === null ? "לפני התשובה הראשונה : המצברים מכילים את כל מה שנשלח." : `התשובה האחרונה ${code(String(last))} = ${code(bin(last))} : היא נכנסה ל-x, ל-s, ל-q, ולכל ${code("part[j]")} שהביט שלו דולק בה.`}</p>`;
         // the end: what each method reads, and whether it is right
         if (st.k < R) { $(".tc-decode").innerHTML = `<p class="ex-note">בסוף כל התשובות יופיע כאן מה כל שיטה מוצאת.</p>`; answer(box, null); return; }
-        const d = tcDecode(sent(), st.order, w, n);
+        const d = tcDecode(sent(), st.order, w, n, wrap);
         const same = (u, v) => JSON.stringify([...u].sort((x, y) => x - y)) === JSON.stringify([...v].sort((x, y) => x - y));
         const verdict = (ok) => (hidden() ? "" : ok ? ` <span class="wv-ok">✓ נכון</span>` : ` <span class="wv-bad">✗ טועה</span>`);
         const lines = [];
@@ -169,6 +181,7 @@
         st.c = "custom"; stop(); shuffle(st.rng || dvqExplorers.lib.mulberry32(57)); st.k = 0; draw();
       });
       $(".tc-shuffle").addEventListener("click", fresh);
+      $(".tc-wrap").addEventListener("change", draw);
       $(".tc-quiz").addEventListener("change", () => { st.quiz = $(".tc-quiz").checked; st.solved = false; if (st.quiz) fresh(); else { st.c = d0.c; setCase(); } });
       const say = (cls, html) => { const p = document.createElement("p"); p.className = cls; p.innerHTML = html; $(".tc-decode").prepend(p); };
       $(".tc-check").addEventListener("click", () => {
@@ -185,7 +198,7 @@
       $(".ex-prev").addEventListener("click", () => { stop(); st.k = Math.max(0, st.k - 1); draw(); });
       $(".ex-next").addEventListener("click", () => { st.k = Math.min(st.order.length, st.k + 1); draw(); });
       $(".ex-end").addEventListener("click", () => { stop(); st.k = st.order.length; draw(); });
-      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, { n: d0.n, c: d0.c, quiz: false, solved: false, rng: null }); setCase(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); Object.assign(st, { n: d0.n, c: d0.c, quiz: false, solved: false, rng: null }); $(".tc-wrap").value = "0"; setCase(); });
       // the faults ride in the link when chosen by click: "m5.12-d3"
       box.dvqExtra = {
         get: () => (st.c !== "custom" ? "" : st.f.map((v, t) => (v === 1 ? `m${t}` : v === 2 ? `d${t}` : "")).filter(Boolean).join(".")),
@@ -203,9 +216,9 @@
   dvqExplorers.register({
     views: { tagcheck: tagcheckView },
     help: {
-      tagcheck: "כל ה-tags נשלחים, והתשובות חוזרות אחת אחת בסדר אקראי. לחיצה על tag מסמנת שהוא לא יחזור (✗) או שיחזור פעמיים (×2), או שבוחרים תרחיש מוכן. המצברים מתעדכנים בכל תשובה, ובסוף רואים מה כל שיטה מוצאת ואם היא צודקת. במצב חידה התקלה מוסתרת : מריצים את כל התשובות וכותבים מה חסר ומה כפול.",
+      tagcheck: "כל ה-tags נשלחים, והתשובות חוזרות אחת אחת בסדר אקראי. לחיצה על tag מסמנת שהוא לא יחזור (✗) או שיחזור פעמיים (×2), או שבוחרים תרחיש מוכן. המצברים מתעדכנים בכל תשובה, ובסוף רואים מה כל שיטה מוצאת ואם היא צודקת. ‏״רוחב s, q״ שומר את הסכומים ברוחב קבוע, כמו רגיסטר : הם גולשים בדרך, ובסוף צריך שרק ההפרש ייכנס, עם הסימן שלו. במצב חידה התקלה מוסתרת : מריצים את כל התשובות וכותבים מה חסר ומה כפול.",
     },
     cols: { tagcheck: { main: ".tc-acc", side: ".tc-decode", w: "minmax(0, 0.75fr)" } },   // the accumulators beside what each method finds; the tags and the guess row stay full width
-    models: { tcAcc, tcK, tcDecode },
+    models: { tcAcc, tcK, tcDecode, tcWrap, tcBits },
   });
 })();

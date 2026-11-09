@@ -154,6 +154,91 @@ def test_explorer_attempt_lanes():
     assert [x["status"] for x in got[1]["att"]["late"] if x["status"] != "vacuous"] == ["fail"]
 
 
+
+def _with_reset(req, ack, rst, max_wait=3, dis=True, variant=None):
+    """The rules (or one trap's variant) with reset, written from the failures: each fail
+    of check_handshake's rules (and of the variants) has the cycle its attempt started; with
+    disable iff the fail is dropped when rst_n is low anywhere from that start to the fail."""
+    n = len(req)
+    rose = lambda t: req[t] and not (req[t - 1] if t else 0)
+    window = lambda t: t + max_wait < n and not any(ack[t + 1:t + 1 + max_wait])
+    if variant is None:
+        f = check_handshake(req, ack, max_wait)
+        starts = {"hold": lambda t: t - 1, "orphan": lambda t: t, "drop": lambda t: t - 1,
+                  "late": lambda t: t if rose(t) and ack[t] else t - max_wait}
+        fails = {k: [(starts[k](t), t) for t in v] for k, v in f.items()}
+    else:
+        fails = {variant: {
+            "r4": [(t, t) for t in range(n) if ack[t] and req[t]],
+            "r2req": [(t, t + max_wait) for t in range(n) if req[t] and window(t)],
+            "r2noack": [(t, t + max_wait) for t in range(n) if rose(t) and window(t)],
+        }[variant]}
+    keep = lambda s, e: not dis or all(rst[s:e + 1])
+    return {k: sorted(e for s, e in v if keep(s, e)) for k, v in fails.items()}
+
+
+def test_mutation_box():
+    """The mutation box of part b: the page's four rules with reset (disable iff), and the
+    traps' variants, against the formulation above on random traces with reset (MAX_WAIT 1
+    to 4); with rst_n high the rules are check_handshake; the cases the page's text names."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(380)
+    cases = []
+    for _ in range(400):
+        req = [int(rng.random() < 0.6) for _ in range(12)]
+        ack = [int(rng.random() < 0.3) for _ in range(12)]
+        rst = [int(rng.random() < 0.85) for _ in range(12)]
+        cases.append([req, ack, rst, rng.randint(1, 4)])
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const cs = {json.dumps(cases)};
+      console.log(JSON.stringify(cs.map(([r, a, n, w]) => ({{ on: m.hsCheckRst(r, a, n, w), off: m.hsCheckRst(r, a, n, w, false),
+        mut: Object.fromEntries(Object.keys(m.HS_MUTANTS).map((v) => [v, m.hsMutant(v, r, a, n, w)])) }}))));""")
+    for (req, ack, rst, w), res in zip(cases, got):
+        assert res["on"] == _with_reset(req, ack, rst, w)
+        assert res["off"] == check_handshake(req, ack, w) == _with_reset(req, ack, rst, w, dis=False)
+        assert res["mut"]["nodis"] == sorted(set(sum(res["off"].values(), [])))
+        for v in ("r4", "r2req", "r2noack"):
+            assert res["mut"][v] == _with_reset(req, ack, rst, w, variant=v)[v], v
+    one = [1] * 12
+    req, ack = wave("011100000000", "000100000000")                  # the good transaction
+    assert _with_reset(req, ack, one, variant="r4") == {"r4": [3]}     # trap 1: fails at the ack
+    assert _with_reset(req, ack, one, variant="r2req") == {"r2req": [6]}   # trap 4: the attempt at the ack waits for another
+    assert only(check_handshake(req, ack, 1), late=[2])                # MAX_WAIT 1: the ack after 2 cycles is late
+    req, ack = wave("010110000000", "010010000000")                  # ack in the rise cycle, then a quick one
+    assert only(check_handshake(req, ack), late=[1]) and _with_reset(req, ack, one, variant="r2noack") == {"r2noack": []}
+    req, ack = wave("011000000000", "000000000000")                  # the reset preset: rst_n low at 3 and 4
+    rst = [1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1]
+    assert only(_with_reset(req, ack, rst)) and only(check_handshake(req, ack), hold=[3], late=[4])   # trap 2
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify(m.HS_RESET.map((s) => m.hsWave(s, 12))));""")
+    assert got == [req, ack, rst]
+
+
+def test_page_text_cases():
+    """Numbers the page's text gives: one fault firing two assertions (req held one cycle
+    too long), rule 1 needed (only it fails), a two-cycle ack, and at most two attempts
+    of rule 2 open at once for MAX_WAIT 3 (ceil((MAX_WAIT + 1) / 2) in general)."""
+    assert only(check_handshake(*wave("011110000000", "000100000000")), drop=[4], hold=[5])
+    assert only(check_handshake(*wave("01011000", "00001000")), hold=[2])
+    assert only(check_handshake(*wave("01110000", "00011000")), orphan=[4])
+    assert only(check_handshake(*wave("011111000000", "000101000000")), drop=[4])   # late, with an ack at 3 too
+    assert only(check_handshake(*wave("011100000000", "010100000000")), late=[1], drop=[2])
+    assert only(check_handshake(*wave("011000000000", "000010000000")), hold=[3], orphan=[4])
+    import itertools
+
+    for w in (1, 2, 3, 4, 5):
+        most = 0
+        for req in itertools.product((0, 1), repeat=12):
+            opens = [t for t in range(12) if req[t] and not (req[t - 1] if t else 0)]
+            most = max(most, max((sum(s <= c <= s + w for s in opens) for c in range(12)), default=0))
+        assert most == (w + 2) // 2, w
+
+
 def _fig():
     import sys
 
