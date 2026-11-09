@@ -39,14 +39,17 @@ def brute_limit(nums, limit):
     return best
 
 
-def trace_max(nums, k, strict=False):
+def trace_max(nums, k, strict=False, by_value=False):
     """Part a event by event: the front index that left the window, every index popped from
     the back (a value <= the new one; with strict only a smaller one), and the push of the
     new index with the output of the window it closes. Every event keeps the deque after it
-    (indices, front first) and the outputs so far."""
+    (indices, front first) and the outputs so far. by_value is the first trap, a deque of
+    values: the front leaves when its value equals the value leaving the window,
+    nums[i - k] (the events still name the index the value came from)."""
     ev, q, out = [], [], []
     for i, x in enumerate(nums):
-        if q and q[0] == i - k:
+        leaves = (i >= k and q and nums[q[0]] == nums[i - k]) if by_value else (q and q[0] == i - k)
+        if leaves:
             ev.append({"kind": "front", "i": i, "idx": q[0], "q": q[1:], "out": list(out)})
             q = q[1:]
         while q and (nums[q[-1]] < x if strict else nums[q[-1]] <= x):

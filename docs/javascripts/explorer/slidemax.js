@@ -1,5 +1,5 @@
 // kinds: slidemax
-//   slidemax               0063        an array of numbers (data-nums) and three modes: a, the monotonic deque of window_max with every pop its own step (the window, the deque under its indices, the outputs filling in); b, longest_within with the two deques hi and lo, the left and right ends and the best window; c, the module win_max cycle by cycle (the stream, the K entries with their ages, the comparisons with x, the keep mask, the slot of x, the entry that ages out, max_out), two steps a cycle
+//   slidemax               0063        an array of numbers (data-nums) and three modes: a, the monotonic deque of window_max with every pop its own step (the window, the deque under its indices, the outputs filling in; a choice of <= or < at the back, and a deque of values, the trap, whose wrong outputs are struck out); b, longest_within with the two deques hi and lo, the left and right ends and the best window; c, the module win_max cycle by cycle (the stream, the K entries with their ages, the comparisons with x, the keep mask, the slot of x, the entry that ages out, max_out), two steps a cycle
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -10,13 +10,17 @@
   const num = (v) => String(v).replace("-", "−");
 
   // Part a event by event, as tools/figures/q0063.py trace_max(): the front index that left
-  // the window, every index popped from the back, and the push with the output.
-  const smTraceMax = (nums, k) => {
+  // the window, every index popped from the back, and the push with the output. strict pops
+  // only a smaller value (<), byValue is the trap of a deque of values: its front leaves
+  // when it equals the value leaving the window, nums[i - k] (q still keeps the indices,
+  // so the figure can show which place really left).
+  const smTraceMax = (nums, k, strict = false, byValue = false) => {
     const ev = [], out = [];
     let q = [];
     nums.forEach((x, i) => {
-      if (q.length && q[0] === i - k) { ev.push({ kind: "front", i, idx: q[0], q: q.slice(1), out: out.slice() }); q = q.slice(1); }
-      while (q.length && nums[q[q.length - 1]] <= x) { ev.push({ kind: "pop", i, idx: q[q.length - 1], q: q.slice(0, -1), out: out.slice() }); q = q.slice(0, -1); }
+      const leaves = byValue ? i >= k && q.length > 0 && nums[q[0]] === nums[i - k] : q.length > 0 && q[0] === i - k;
+      if (leaves) { ev.push({ kind: "front", i, idx: q[0], q: q.slice(1), out: out.slice() }); q = q.slice(1); }
+      while (q.length && (strict ? nums[q[q.length - 1]] < x : nums[q[q.length - 1]] <= x)) { ev.push({ kind: "pop", i, idx: q[q.length - 1], q: q.slice(0, -1), out: out.slice() }); q = q.slice(0, -1); }
       q = [...q, i];
       if (i >= k - 1) out.push(nums[q[0]]);
       ev.push({ kind: "push", i, idx: i, q: q.slice(), out: out.slice() });
@@ -101,7 +105,7 @@
 
   // mode a: the array with the window, the deque under its indices, the outputs under the
   // index that closes each window
-  const svgA = (nums, k, e) => {
+  const svgA = (nums, k, e, byValue) => {
     const n = nums.length, W = LW + n * CELL + 8, H = 166;
     let s = open(W, H, `המערך, החלון של ${k} הערכים האחרונים, ה-deque מתחת למקומות שלו והמקסימום של כל חלון`);
     s += ticks(n, 14) + label(42, "nums") + label(92, "deque") + label(146, "max");
@@ -109,13 +113,14 @@
     if (e) s += frame(Math.max(0, i - k + 1), i, 21, 34, "sm-win");
     nums.forEach((v, p) => { s += cell(p, 24, 28, v, p === i ? "is-cur" : p > i ? "is-wait" : "is-off", `place ${p}, value ${v}`); });
     if (e) {
-      e.q.forEach((p, m) => { s += cell(p, 74, 28, nums[p], m === 0 ? "is-front" : "is-in", `in the deque: place ${p}, value ${nums[p]}`); });
+      e.q.forEach((p, m) => { s += cell(p, 74, 28, nums[p], m === 0 ? "is-front" : "is-in", byValue ? `in the deque: value ${nums[p]} (it came from place ${p})` : `in the deque: place ${p}, value ${nums[p]}`); });
       if (e.kind !== "push") s += cell(e.idx, 74, 28, nums[e.idx], "is-pop", `left the deque: place ${e.idx}`) + strike(e.idx, 74, 28);
       if (e.q.length) s += `<text class="tick" x="${cx(e.q[0])}" y="116" text-anchor="middle">front</text>`;
       if (e.q.length > 1) s += `<text class="tick" x="${cx(e.q[e.q.length - 1])}" y="116" text-anchor="middle">back</text>`;
       e.out.forEach((v, j) => {
         const p = j + k - 1, now = e.kind === "push" && p === i;
         s += `<text class="sm-out is-val${now ? " is-now" : ""}" x="${cx(p)}" y="146" text-anchor="middle">${num(v)}</text>`;
+        if (v !== Math.max(...nums.slice(j, j + k))) s += strike(p, 130, 22);      // a wrong output (the trap)
       });
     }
     return s + "</svg>";
@@ -183,12 +188,16 @@
     mount(box) {
       const mode0 = MODES[box.dataset.mode] ? box.dataset.mode : "a";
       const d0 = { mode: mode0, nums: parse(box.dataset.nums || "1 3 -1 -3 5 3 6 7") || [1, 3, -1, -3, 5, 3, 6, 7], k: Number(box.dataset.k) || 3, limit: Number(box.dataset.limit) || 0 };
-      const st = { mode: d0.mode, nums: d0.nums.slice(), k: d0.k, limit: d0.limit, s: 0, n: 8 };
+      const st = { mode: d0.mode, nums: d0.nums.slice(), k: d0.k, limit: d0.limit, strict: false, byValue: false, s: 0, n: 8 };
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>המצב <select class="sm-mode" aria-label="איזה סעיף">${Object.entries(MODES).map(([v, w]) => `<option value="${v}">${w}</option>`).join("")}</select></label>` +
         `<label><span>המערך</span><input type="text" class="ex-num sm-nums" dir="ltr" spellcheck="false" aria-label="המערך : עד ${NMAX} מספרים שלמים, מופרדים ברווח"></label>` +
         `<label class="sm-klab"><span class="sm-kname">k</span> <input type="number" class="ex-num sm-k" min="1" max="${NMAX}" step="1" dir="ltr" aria-label="גודל החלון"></label>` +
+        `<label class="sm-alab"><span>מהזנב יוצא ערך</span> <select class="sm-pop" aria-label="איזה ערך יוצא מהזנב">` +
+        `<option value="le">קטן או שווה ל-x (הקוד)</option><option value="lt">קטן מ-x</option></select></label>` +
+        `<label class="sm-alab"><span>ב-deque</span> <select class="sm-store" aria-label="מה ה-deque שומר">` +
+        `<option value="idx">מקומות (הקוד)</option><option value="val">ערכים (המלכודת)</option></select></label>` +
         `<label class="sm-llab"><span>limit</span> <input type="number" class="ex-num sm-limit" min="0" max="${2 * VMAX}" step="1" dir="ltr" aria-label="ההפרש המותר בין המקסימום למינימום"></label>` +
         `<label>בהגרלה <select class="sm-n" aria-label="כמה מספרים להגריל">${[8, 12, 16, 24].map((v) => `<option value="${v}"${v === 8 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button sm-rand">הגרלה</button><span class="sm-anchor"></span>` +
@@ -200,19 +209,18 @@
         `<button type="button" class="md-button ex-end">עד הסוף</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 350) +
         `<span class="ex-pos"></span></div>` +
-        `<p class="ex-summary sm-sum" aria-live="polite"></p>` +
         `<div class="sm-wrap" data-fig-strip></div>` +
-        `<span class="viz-legend"><span><i class="sm-key-win"></i>החלון</span><span class="sm-only-b"><i class="sm-key-best"></i>החלון הטוב ביותר עד עכשיו</span>` +
-        `<span class="sm-not-c"><i class="sm-key-in"></i>ב-deque</span><span class="sm-only-c"><i class="sm-key-in"></i>כניסה בשימוש</span><span><i class="sm-key-front"></i>הראש, המקסימום</span>` +
-        `<span><i class="sm-key-pop"></i>יוצא בצעד הזה</span><span><i class="sm-key-cur"></i>הערך החדש</span></span>` +
-        `<p class="sm-note"></p><p class="sm-tally"></p>`;
+        `<span class="viz-legend"><span><i class="sm-key-win"></i>החלון</span><span class="sm-only-b"><i class="sm-key-best"></i>הטוב ביותר</span>` +
+        `<span class="sm-not-c"><i class="sm-key-in"></i>ב-deque</span><span class="sm-only-c"><i class="sm-key-in"></i>בשימוש</span><span><i class="sm-key-front"></i>הראש (max)</span>` +
+        `<span><i class="sm-key-pop"></i>יוצא</span><span><i class="sm-key-cur"></i>חדש</span></span>` +
+        `<p class="sm-note" aria-live="polite"></p><p class="sm-tally"></p>`;
       const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       answer(box, NB); answer(box, null);           // the answer line keeps its place from the first step
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       // the frames of the mode: the events of a and b, two frames per cycle in c
       const frames = () => {
-        if (st.mode === "a") return smTraceMax(st.nums, st.k);
+        if (st.mode === "a") return smTraceMax(st.nums, st.k, st.strict, st.byValue);
         if (st.mode === "b") return smTraceLimit(st.nums, st.limit);
         const F = [];
         smTraceHw(st.nums, st.k).forEach((r) => { F.push({ row: r, phase: "cmp" }); F.push({ row: r, phase: "clk" }); });
@@ -224,43 +232,58 @@
         const e = st.s ? F[st.s - 1] : null, done = st.s === N, prev = st.s > 1 ? F[st.s - 2] : null;
         $(".sm-mode").value = m; $(".sm-nums").value = nums.join(" "); $(".sm-k").value = String(st.k); $(".sm-limit").value = String(st.limit);
         $(".sm-kname").textContent = m === "c" ? "K" : "k";
+        $(".sm-pop").value = st.strict ? "lt" : "le"; $(".sm-store").value = st.byValue ? "val" : "idx";
         $(".sm-klab").hidden = m === "b"; $(".sm-llab").hidden = m !== "b";
+        box.querySelectorAll(".sm-alab").forEach((el) => { el.hidden = m !== "a"; });
         box.classList.toggle("sm-is-b", m === "b"); box.classList.toggle("sm-is-c", m === "c");
         $(".ex-pos").textContent = `צעד ${st.s} מתוך ${N}`;
         $(".ex-prev").disabled = $(".ex-start").disabled = st.s === 0;
         $(".ex-next").disabled = $(".ex-end").disabled = done;
-        let note = "", tally = "", sum = "", lit = [], lines = { py: [], sv: [] }, vars = "", ans = null, marks = [];
+        let note = "", tally = "", lit = [], lines = { py: [], sv: [] }, vars = "", ans = null, marks = [];
         if (m === "a") {
-          $(".sm-wrap").innerHTML = svgA(nums, st.k, e);
+          const k = st.k, le = !st.strict, byV = st.byValue;
+          $(".sm-wrap").innerHTML = svgA(nums, k, e, byV);
           const pops = F.slice(0, st.s).filter((x) => x.kind !== "push").length, pushes = st.s - pops;
-          sum = e ? `הצעד של ${ltr(`i = ${e.i}`)} (הערך ${ltr(num(nums[e.i]))}). ה-deque${NB}: ${ltr(list(nums, e.q))}.`
-            : `${ltr(n)} ערכים, ${ltr(`k = ${st.k}`)}, ${ltr(n - st.k + 1)} חלונות. כל צעד הוא פעולה אחת על ה-deque.`;
-          if (e) {
+          const right = (j) => Math.max(...nums.slice(j, j + k));            // the true maximum of the window from j
+          if (!e) note = `${ltr(n)} ערכים, ${ltr(`k = ${k}`)}, ${ltr(n - k + 1)} חלונות. כל צעד הוא פעולה אחת על ה-deque` +
+            (byV ? `, וה-deque שומר ערכים${NB}: הראש יוצא כשהוא שווה לערך שיוצא מהחלון.` : ".");
+          else {
             const x = nums[e.i], v = nums[e.idx];
-            if (e.kind === "front") note = `המקום ${ltr(e.idx)} בראש, וזה ${ltr(`${e.i} − ${st.k}`)}${NB}: החלון שנגמר ב-${ltr(e.i)} מתחיל ב-${ltr(e.i - st.k + 1)}, ולכן המקום ${ltr(e.idx)} (הערך ${ltr(num(v))}) כבר בחוץ ויוצא מהראש.`;
-            else if (e.kind === "pop") note = `נכנס ${ltr(num(x))} במקום ${ltr(e.i)}. בזנב המקום ${ltr(e.idx)} עם ${ltr(`${num(v)} ≤ ${num(x)}`)}${NB}: מעכשיו כל חלון שמכיל אותו מכיל גם את ${ltr(num(x))}, ולכן הוא לא יהיה מקסימום יותר. יוצא מהזנב.`;
+            if (e.kind === "front" && !byV) note = `המקום ${ltr(e.idx)} בראש, וזה ${ltr(`${e.i} − ${k}`)}${NB}: החלון שנגמר ב-${ltr(e.i)} מתחיל ב-${ltr(e.i - k + 1)}, ולכן המקום ${ltr(e.idx)} (הערך ${ltr(num(v))}) כבר בחוץ ויוצא מהראש.`;
+            else if (e.kind === "front") note = `מהחלון יוצא ${ltr(`nums[${e.i - k}] = ${num(nums[e.i - k])}`)}, והערך בראש שווה לו, ולכן הוא יוצא מהראש. ` +
+              (e.idx === e.i - k ? `הפעם הוא אכן בא מהמקום ${ltr(e.idx)}.`
+                : `<b>אבל הוא בא מהמקום ${ltr(e.idx)}, שעדיין בחלון ${ltr(`${e.i - k + 1}..${e.i}`)}</b>${NB}: ה-deque של ערכים לא יודע איזה מהערכים השווים יצא. זו המלכודת.`);
+            else if (e.kind === "pop") note = `נכנס ${ltr(num(x))} במקום ${ltr(e.i)}. בזנב ${byV ? "הערך" : `המקום ${ltr(e.idx)} עם`} ${ltr(`${num(v)} ${le ? "≤" : "<"} ${num(x)}`)}${NB}: מעכשיו כל חלון שמכיל אותו מכיל גם את ${ltr(num(x))}, ולכן הוא לא יהיה מקסימום יותר. יוצא מהזנב.`;
             else {
-              const tail = e.q.length > 1 ? e.q[e.q.length - 2] : null;
-              note = `${tail === null ? "ה-deque ריק" : `בזנב ${ltr(`${num(nums[tail])} > ${num(x)}`)}`}, ולכן הניקוי נעצר, ו-${ltr(e.i)} נכנס לזנב. ` +
-                (e.i >= st.k - 1 ? `החלון ${ltr(`${e.i - st.k + 1}..${e.i}`)} מלא, והראש, הערך <b>${ltr(num(nums[e.q[0]]))}</b>, הוא המקסימום שלו.` : `החלון עוד לא מלא (צריך ${ltr(st.k)} ערכים), ואין פלט.`);
+              const tail = e.q.length > 1 ? e.q[e.q.length - 2] : null, w0 = e.i - k + 1;
+              const got = nums[e.q[0]], want = e.i >= k - 1 ? right(w0) : null;
+              note = `${tail === null ? "ה-deque ריק" : `בזנב ${ltr(`${num(nums[tail])} ${le ? ">" : "≥"} ${num(x)}`)}`}, ולכן הניקוי נעצר, ו-${byV ? ltr(num(x)) : ltr(e.i)} נכנס לזנב. ` +
+                (e.i < k - 1 ? `החלון עוד לא מלא (צריך ${ltr(k)} ערכים), ואין פלט.`
+                  : got === want ? `החלון ${ltr(`${w0}..${e.i}`)} מלא, והראש, הערך <b>${ltr(num(got))}</b>, הוא המקסימום שלו.`
+                    : `החלון ${ltr(`${w0}..${e.i}`)} מלא, והראש הוא ${ltr(num(got))}, <b>אבל המקסימום שלו ${ltr(num(want))}</b>${NB}: הפלט שגוי (מחוק באיור).`);
             }
           }
           tally = `פעולות על ה-deque עד עכשיו${NB}: ${ltr(pushes)} הכנסות ו-${ltr(pops)} הוצאות. בכל הריצה לכל היותר ${ltr(`2n = ${2 * n}`)}, כי כל מקום נכנס פעם אחת ויוצא לכל היותר פעם אחת.`;
+          const show_q = (q) => `[${q.map((p) => (byV ? num(nums[p]) : p)).join(", ")}]`;
           if (!e) { lines = { py: [7, 8], sv: [4, 5] }; vars = ltr("q = [], out = []"); }
           else {
-            lit = e.kind === "front" ? [1] : e.kind === "pop" ? [2] : [3, ...(e.i >= st.k - 1 ? [4] : [])];
+            lit = e.kind === "front" ? [1] : e.kind === "pop" ? [2] : [3, ...(e.i >= k - 1 ? [4] : [])];
             lines = e.kind === "front" ? { py: [10, 11], sv: [7] } : e.kind === "pop" ? { py: [12, 13], sv: [8] }
-              : { py: [14, 15, ...(e.i >= st.k - 1 ? [16] : []), ...(done ? [17] : [])], sv: [9, 10] };
+              : { py: [14, 15, ...(e.i >= k - 1 ? [16] : []), ...(done ? [17] : [])], sv: [9, 10] };
             const qb = prev ? prev.q : [];                                   // the deque before this event
-            vars = [ltr(`i = ${e.i}`), ltr(`x = ${num(nums[e.i])}`), V("q", `[${qb.join(", ")}]`, `[${e.q.join(", ")}]`), ltr(`out = [${e.out.map(num).join(", ")}]`)].join(" · ");
+            vars = [ltr(`i = ${e.i}`), ltr(`x = ${num(nums[e.i])}`), V("q", show_q(qb), show_q(e.q)), ltr(`out = [${e.out.map(num).join(", ")}]`)].join(" · ");
           }
-          if (done && e) { ans = `המקסימום של כל חלון${NB}: ${ltr(e.out.map(num).join(" "))}.`; marks = ".sm-wrap .sm-out"; }
+          if (done && e) {
+            const truth = nums.slice(0, n - k + 1).map((_, j) => right(j));
+            ans = truth.every((t, j) => t === e.out[j]) ? `המקסימום של כל חלון${NB}: ${ltr(e.out.map(num).join(" "))}.`
+              : `הפלט של הגרסה הזו${NB}: ${ltr(e.out.map(num).join(" "))}, אבל המקסימום של כל חלון הוא ${ltr(truth.map(num).join(" "))}.`;
+            marks = ".sm-wrap .sm-out";
+          }
         } else if (m === "b") {
           $(".sm-wrap").innerHTML = svgB(nums, e);
           const lim = st.limit;
-          sum = e ? `החלון ${ltr(`${e.left}..${e.right}`)}, המקסימום ${ltr(num(nums[e.hi[0]]))} והמינימום ${ltr(num(nums[e.lo[0]]))}. הטוב עד עכשיו${NB}: <b>${ltr(e.best)}</b>.`
-            : `${ltr(n)} ערכים, ${ltr(`limit = ${lim}`)}. כל צעד הוא פעולה אחת על deque או על הקצה השמאלי.`;
-          if (e) {
+          if (!e) note = `${ltr(n)} ערכים, ${ltr(`limit = ${lim}`)}. כל צעד הוא פעולה אחת על deque או על הקצה השמאלי.`;
+          else {
             const x = nums[e.right], v = e.idx === null ? 0 : nums[e.idx], mx = nums[e.hi[0]], mn = nums[e.lo[0]], d = mx - mn, len = e.right - e.left + 1;
             const fresh = e.measured && e.best === len && (!prev || prev.best < e.best) ? ` <b>אורך חדש${NB}: ${ltr(len)} ✓</b>` : "";
             if (e.kind === "hipop") note = `נכנס ${ltr(num(x))} במקום ${ltr(e.right)}. ב-${ltr("hi")} הזנב הוא המקום ${ltr(e.idx)} עם ${ltr(`${num(v)} ≤ ${num(x)}`)}${NB}: הוא לא יהיה מקסימום יותר, ויוצא.`;
@@ -284,17 +307,16 @@
         } else {
           const K = st.k, row = e ? e.row : null, ph = e ? e.phase : null;
           $(".sm-wrap").innerHTML = svgC(nums, K, row, ph);
-          sum = row ? `מחזור ${ltr(row.t)}, ${ltr(`x = ${num(row.x)}`)}${NB}: ${ph === "clk" ? `עליית השעון, ${ltr(`max_out = ${num(row.out)}`)}` : "ההשוואות"}.`
-            : `${ltr(n)} דגימות, ${ltr(`K = ${K}`)}. בכל מחזור שני צעדים${NB}: ההשוואות, ואז עליית השעון.`;
-          if (row) {
+          if (!row) note = `${ltr(n)} דגימות, ${ltr(`K = ${K}`)}. בכל מחזור שני צעדים${NB}: ההשוואות, ואז עליית השעון.`;
+          else {
             const cut = row.before.slice(row.p).map((x) => num(x[0]));
             if (ph === "cmp") {
               const bits = row.keep.map((b) => (b ? 1 : 0)).join("");
-              note = `מחזור ${ltr(row.t)}, הדגימה ${ltr(num(row.x))} נכנסת. ${ltr(K)} המשווים בבת אחת נותנים ${ltr(`keep = ${bits}`)}${NB}: ` +
-                (row.p === 0 ? "אף כניסה לא גדולה מ-x" : `${row.p === 1 ? "הכניסה 0 גדולה" : `הכניסות ${ltr(`0..${row.p - 1}`)} גדולות`} מ-x`) +
-                (row.p < K ? `, והאפס הראשון במקום ${ltr(row.p)}. לשם נכתבת x` : `, כולן. x נכתבת למקום הנוסף ${ltr(K)}`) +
-                (cut.length ? `, והכניסות שאחריה מתבטלות (${ltr(cut.join(", "))}), כמו ההוצאות מהזנב בסעיף א.` : ".") +
-                (row.drop ? ` הראש, ${ltr(num(row.dropped[0]))}, מגיע לגיל ${ltr(K)}${NB}: הוא כבר מחוץ לחלון, ויוצא, וכל הכניסות זזות מקום אחד לראש.` : "");
+              note = `הדגימה ${ltr(num(row.x))} נכנסת, ${ltr(`keep = ${bits}`)}${NB}: ` +
+                (row.p === 0 ? "אף כניסה לא גדולה מ-x" : `${row.p === 1 ? "כניסה 0 גדולה" : `הכניסות ${ltr(`0..${row.p - 1}`)} גדולות`} מ-x`) +
+                (row.p < K ? `, ו-x נכתבת לכניסה ${ltr(row.p)}, האפס הראשון.` : `, כולן, ו-x נכתבת למקום הנוסף ${ltr(K)}.`) +
+                (cut.length > 1 ? ` הערכים ${ltr(cut.join(", "))} שאחריה מתבטלים, כמו ההוצאות מהזנב בסעיף א.` : cut.length ? ` הערך ${ltr(cut[0])} שאחריה מתבטל, כמו הוצאה מהזנב בסעיף א.` : "") +
+                (row.drop ? ` הראש ${ltr(num(row.dropped[0]))} מגיע לגיל ${ltr(K)} ויוצא מהחלון, והכניסות זזות מקום לכיוון הראש.` : "");
             } else {
               note = `עליית השעון${NB}: הכניסות עכשיו ${ltr(row.after.map(([v, a]) => `${num(v)}(${a})`).join(" "))}, ערך עם הגיל שלו. ` +
                 `${ltr(`max_out = val[0] = ${num(row.out)}`)}, המקסימום של ${ltr(nums.slice(Math.max(0, row.t - K + 1), row.t + 1).map(num).join(" "))}.`;
@@ -314,7 +336,6 @@
           }
           if (done && row) { ans = `${ltr("max_out")} בכל מחזור${NB}: ${ltr(smTraceHw(nums, K).map((r) => num(r.out)).join(" "))}.`; marks = ".sm-wrap .sm-out"; }
         }
-        $(".sm-sum").innerHTML = sum;
         $(".sm-note").innerHTML = note;
         $(".sm-tally").innerHTML = tally;
         show({ code: CODE[m], steps: STEPS[m], lit, lines, vars });
@@ -341,6 +362,8 @@
         if (!(v >= 0 && v <= 2 * VMAX)) { $(".sm-limit").value = String(st.limit); return; }
         st.limit = v; restart();
       });
+      $(".sm-pop").addEventListener("change", () => { st.strict = $(".sm-pop").value === "lt"; restart(); });
+      $(".sm-store").addEventListener("change", () => { st.byValue = $(".sm-store").value === "val"; restart(); });
       $(".sm-n").addEventListener("change", () => { st.n = Number($(".sm-n").value); });
       const seed = seedControls(box, $(".sm-anchor"), (rng) => {
         st.nums = Array.from({ length: st.n }, () => (st.mode === "c" ? Math.floor(rng() * 16) : Math.floor(rng() * 19) - 9));
@@ -351,7 +374,7 @@
       $(".ex-prev").addEventListener("click", () => { stop(); st.s--; draw(); });
       $(".ex-next").addEventListener("click", () => { st.s++; draw(); });
       $(".ex-end").addEventListener("click", () => { stop(); st.s = total(); draw(); });
-      $(".ex-reset").addEventListener("click", () => { Object.assign(st, { mode: d0.mode, nums: d0.nums.slice(), k: d0.k, limit: d0.limit, n: 8 }); $(".sm-n").value = "8"; restart(); });
+      $(".ex-reset").addEventListener("click", () => { Object.assign(st, { mode: d0.mode, nums: d0.nums.slice(), k: d0.k, limit: d0.limit, strict: false, byValue: false, n: 8 }); $(".sm-n").value = "8"; restart(); });
       draw();
     },
   });
@@ -360,7 +383,7 @@
     views: { slidemax: slideView },
     cols: { slidemax: {} },   // the figure, the legend and the notes beside the steps and the code
     help: {
-      slidemax: "מקלידים מערך של מספרים שלמים (או מגרילים) ובוחרים מצב. בסעיף א כל צעד הוא פעולה אחת על ה-deque : הוצאה מהראש כשהמקום יצא מהחלון, הוצאה מהזנב של ערך שאינו גדול מהחדש, או הכנסה עם הפלט. ה-deque מצויר מתחת למקומות שלו, הראש מודגש והיוצא מחוק. בסעיף ב שני deques, hi למקסימום ו-lo למינימום, והקצוות L ו-R : השמאלי מתקדם כל עוד ההפרש גדול מ-limit. בסעיף ג המודול, שני צעדים בכל מחזור : ההשוואות של הכניסות עם x, המסכה keep והמקום של x, ואז עליית השעון עם הכניסות החדשות ו-max_out. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
+      slidemax: "מקלידים מערך של מספרים שלמים (או מגרילים) ובוחרים מצב. בסעיף א כל צעד הוא פעולה אחת על ה-deque : הוצאה מהראש כשהמקום יצא מהחלון, הוצאה מהזנב של ערך שאינו גדול מהחדש, או הכנסה עם הפלט. ה-deque מצויר מתחת למקומות שלו, הראש מודגש והיוצא מחוק. שתי בחירות בסעיף א : איזה ערך יוצא מהזנב (קטן או שווה ל-x, כמו בקוד, או רק קטן ממנו), והאם ה-deque שומר מקומות או ערכים (המלכודת הראשונה בעמוד : פלט שגוי מחוק). בסעיף ב שני deques, hi למקסימום ו-lo למינימום, והקצוות L ו-R : השמאלי מתקדם כל עוד ההפרש גדול מ-limit. בסעיף ג המודול, שני צעדים בכל מחזור : ההשוואות של הכניסות עם x, המסכה keep והמקום של x, ואז עליית השעון עם הכניסות החדשות ו-max_out. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
     },
     models: { smTraceMax, smTraceLimit, smTraceHw },
   });

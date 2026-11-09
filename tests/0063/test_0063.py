@@ -30,20 +30,22 @@ def test_explorer_matches_the_reference():
     from page_tests import explorer_require, node_json
 
     rng = random.Random(6301)
-    acases = [(q0063.NUMS, 3), ([9, 8, 7, 6, 5, 10], 4), ([2, 2, 2, 2], 2)]
-    acases += [([rng.randint(-5, 5) for _ in range(n)], rng.randint(1, n)) for n in (rng.randint(1, 16) for _ in range(25))]
+    acases = [(q0063.NUMS, 3, False, False), ([9, 8, 7, 6, 5, 10], 4, False, False), ([2, 2, 2, 2], 2, False, False),
+              ([2, 2, 2, 2, 2], 3, True, False), ([5, 5, 1], 2, False, True), ([5, 5, 1], 2, True, True)]
+    acases += [([rng.randint(-5, 5) for _ in range(n)], rng.randint(1, n), rng.random() < 0.5, rng.random() < 0.5)
+               for n in (rng.randint(1, 16) for _ in range(40))]
     bcases = [(q0063.NUMS_B, 5), ([4, 2, 2, 2, 4, 4, 2, 2], 0), ([1, 2, 3, 10], 2)]
     bcases += [([rng.randint(-5, 5) for _ in range(rng.randint(1, 16))], rng.randint(0, 6)) for _ in range(25)]
     ccases = [(q0063.STREAM, 3), ([5, 5, 5, 5], 2)]
     ccases += [([rng.randint(0, 9) for _ in range(rng.randint(1, 16))], rng.randint(1, 6)) for _ in range(25)]
     got = node_json(f"""
       const m = {explorer_require()};
-      console.log(JSON.stringify([{json.dumps(acases)}.map(([a, k]) => m.smTraceMax(a, k)),
+      console.log(JSON.stringify([{json.dumps(acases)}.map(([a, k, lt, val]) => m.smTraceMax(a, k, lt, val)),
         {json.dumps(bcases)}.map(([a, l]) => m.smTraceLimit(a, l)),
         {json.dumps(ccases)}.map(([a, k]) => m.smTraceHw(a, k))]));""")
-    for (nums, k), ev in zip(acases, got[0]):
-        ref = q0063.trace_max(nums, k)
-        assert [(e["kind"], e["i"], e["idx"], e["q"], e["out"]) for e in ev] == [(e["kind"], e["i"], e["idx"], e["q"], e["out"]) for e in ref], (nums, k)
+    for (nums, k, lt, val), ev in zip(acases, got[0]):
+        ref = q0063.trace_max(nums, k, strict=lt, by_value=val)
+        assert [(e["kind"], e["i"], e["idx"], e["q"], e["out"]) for e in ev] == [(e["kind"], e["i"], e["idx"], e["q"], e["out"]) for e in ref], (nums, k, lt, val)
     for (nums, limit), ev in zip(bcases, got[1]):
         ref = q0063.trace_limit(nums, limit)
         keys = ("kind", "right", "idx", "hi", "lo", "left", "best", "win", "measured", "gone")

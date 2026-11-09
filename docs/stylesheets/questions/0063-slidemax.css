@@ -1,0 +1,14 @@
+/* Question 0063, sliding window maximum: the slidemax box of explorer/slidemax.js on one
+   screen. From a 600 px box (core.js cols) the figure, its legend and the notes sit in the
+   main column, the steps and the code beside them; the code view is shorter than the
+   default and scrolls itself to the step's lines. Colours from the palette only. */
+
+/* the empty anchor of the seed field and an empty error line take no place in the row */
+.md-typeset .explorer[data-kind="slidemax"] .ex-controls > :is(.sm-anchor, .sm-err:empty) { display: none; }
+
+@container (min-width: 600px) {
+  /* the legend on one row */
+  .md-typeset .explorer[data-kind="slidemax"] .ex-main .viz-legend { gap: 0.3rem 0.7rem; font-size: 0.65rem; }
+  /* the code view no taller than the figure and its notes */
+  .md-typeset .explorer[data-kind="slidemax"] .ex-side .ex-explain .ex-codewrap { max-height: 15rem; }
+}
