@@ -1,5 +1,5 @@
 // kinds: lightsout
-//   lightsout              0087        Lights Out on an n x n board (3 to 7), a press flips the light and its neighbours up, down, left and right (or the eight around it with the diagonals). Mode play: a click presses (or, in drawing, flips one light), a random start that can be solved, the presses against the fewest from the start, the solution shown as frames (the fewest presses), or why there is none (a quiet pattern that touches an odd number of lit lights). Mode chase: light chasing step by step, a press under every light still on, row by row, then the first row from the lights left on the bottom row, and chasing again
+//   lightsout              0087        Lights Out on an n x n board (3 to 7), a press flips the light and its neighbours up, down, left and right (or the eight around it with the diagonals). Mode play: a click presses (or, in drawing, flips one light), the cells pressed so far marked (a corner triangle), a random start that can be solved (also on a size change, except the page's size, which brings back the page's start), the presses against the fewest from the start, the solution shown as frames (the fewest presses), or why there is none (a quiet pattern that touches an odd number of lit lights). Mode chase: light chasing step by step, a press under every light still on, row by row, then the first row from the lights left on the bottom row, and chasing again
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tag); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests. Cell (r, c) is index r*n + c, row 0 on top and column 0
@@ -176,17 +176,21 @@
   // --- the board -------------------------------------------------------------------------------
 
   const S = 40;
-  // marks: k → classes of overlays (lo-press, lo-now, lo-quiet); band(r) → a row class
-  const boardSvg = (n, lit, aria, { marks = () => [], band = () => "", buttons = false, focus = -1 } = {}) => {
+  // marks: k → classes of overlays (lo-press, lo-now, lo-quiet: a frame; lo-did: a triangle in
+  // the top left corner); band(r) → a row class; said(k) → words added to a cell's name
+  const boardSvg = (n, lit, aria, { marks = () => [], band = () => "", buttons = false, focus = -1, said = () => "" } = {}) => {
     const w = n * S + 4;
     let s = `<svg class="figure lo-board" viewBox="0 0 ${w} ${w}" style="max-width:${Math.min(22, (w * 1.3) / 16).toFixed(1)}rem" role="${buttons ? "group" : "img"}" aria-label="${aria}">`;
     for (let k = 0; k < n * n; k++) {
       const r = Math.floor(k / n), c = k % n, x = 2 + c * S, y = 2 + r * S, b = band(r);
       let cell = `<rect class="lo-cell${b ? ` ${b}` : ""}" x="${x}" y="${y}" width="${S}" height="${S}"/>`;
-      marks(k).forEach((m) => { cell += `<rect class="${m}" x="${x + 3}" y="${y + 3}" width="${S - 6}" height="${S - 6}" rx="4"/>`; });
+      marks(k).forEach((m) => {
+        cell += m === "lo-did" ? `<path class="lo-did" d="M${x + 6} ${y + 6}h10l-10 10z"/>`
+          : `<rect class="${m}" x="${x + 3}" y="${y + 3}" width="${S - 6}" height="${S - 6}" rx="4"/>`;
+      });
       cell += `<circle class="${lit[k] ? "lo-on" : "lo-off"}" cx="${x + S / 2}" cy="${y + S / 2}" r="${(S * 0.27).toFixed(1)}"/>`;
       if (buttons) {
-        const name = `שורה ${r}, עמודה ${c}${NB}: ${lit[k] ? "דולקת" : "כבויה"}`;
+        const name = `שורה ${r}, עמודה ${c}${NB}: ${lit[k] ? "דולקת" : "כבויה"}${said(k)}`;
         cell = `<g class="lo-btn" role="button" tabindex="${k === focus ? 0 : -1}" data-k="${k}" aria-label="${name}">${cell}` +
           `<rect class="lo-ring" x="${x + 1}" y="${y + 1}" width="${S - 2}" height="${S - 2}"/></g>`;
       }
@@ -248,7 +252,7 @@
       `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button></div>` +
       `<div class="lo-wrap"></div>` +
       `<span class="viz-legend"><span><i class="lo-key-on"></i>דולקת</span><span><i class="lo-key-off"></i>כבויה</span>` +
-      `<span><i class="lo-key-press"></i>לחיצה בפתרון</span><span><i class="lo-key-quiet"></i>דפוס שקט</span></span>` +
+      `<span><i class="lo-key-did"></i>נלחצה עד עכשיו</span><span><i class="lo-key-press"></i>לחיצה בפתרון</span><span><i class="lo-key-quiet"></i>דפוס שקט</span></span>` +
       `<p class="ex-summary lo-sum" aria-live="polite"></p>` +
       `<p class="lo-note"></p>`;
     const $ = (s) => box.querySelector(s);
@@ -263,7 +267,8 @@
       const on = weight(st.lit);
       wrap.innerHTML = boardSvg(n, st.lit, `לוח של ${n} על ${n}${NB}: ${on} נורות דולקות. לוחצים על נורה, או עוברים בחיצים ולוחצים Enter`, {
         buttons: true, focus: st.focus,
-        marks: (k) => (st.show && on ? (sol.press ? (sol.press[k] ? ["lo-press"] : []) : sol.quiet && sol.quiet[k] ? ["lo-quiet"] : []) : []),
+        marks: (k) => (st.press[k] ? ["lo-did"] : []).concat(st.show && on ? (sol.press ? (sol.press[k] ? ["lo-press"] : []) : sol.quiet && sol.quiet[k] ? ["lo-quiet"] : []) : []),
+        said: (k) => (st.press[k] ? ", נלחצה" : ""),
       });
       if (focus) { const g = wrap.querySelector(`.lo-btn[data-k="${st.focus}"]`); if (g) g.focus(); }
       let sum = `‏${ltr(on)} ${on === 1 ? "נורה דולקת" : "נורות דולקות"}, ${ltr(st.count)} ${st.count === 1 ? "לחיצה" : "לחיצות"} עד עכשיו. `;
@@ -298,7 +303,8 @@
     };
     wrap.addEventListener("click", (e) => { const g = e.target.closest(".lo-btn"); if (g) act(Number(g.dataset.k)); });
     arrows(wrap, () => st.n, (k) => { st.focus = k; }, act);
-    $(".lo-n").addEventListener("change", () => { st.n = clampN($(".lo-n").value, N0); restart(new Array(st.n * st.n).fill(0)); draw(); });
+    // a new size: the page's start on the page's size, else a random board that can be solved
+    $(".lo-n").addEventListener("change", () => { st.n = clampN($(".lo-n").value, N0); restart(st.n === N0 ? L0 : randomSolvable(st.n, st.diag)); draw(); });
     $(".lo-diag").addEventListener("change", () => { st.diag = $(".lo-diag").value === "1"; restart(st.lit); draw(); });
     $(".lo-show").addEventListener("click", () => { st.show = !st.show; draw(); });
     $(".lo-rand").addEventListener("click", () => { restart(randomSolvable(st.n, st.diag)); draw(); });
@@ -389,7 +395,8 @@
         } else if (s.phase === "fix") {
           note = `מתקנים את השורה העליונה${NB}: לוחצים על ${cellName(n, s.k)}.`;
         } else {
-          note = `כל הנורות כבויות. הלחיצות המסומנות הן הפתרון${NB}: ${listCells(n, s.press) || "אף אחת"}.`;
+          const free = loMatrix(n, false).kernel.length;
+          note = `כל הנורות כבויות. הלחיצות המסומנות הן ${free ? `פתרון אחד מתוך ${ltr(2 ** free)}` : "הפתרון היחיד"}${NB}: ${listCells(n, s.press) || "אף אחת"}.`;
           ans = `כל הנורות כבויות${NB}: ${ltr(weight(s.press))} לחיצות בפתרון, ${ltr(s.presses)} לחיצות בדרך (לחיצה כפולה מבטלת את עצמה).`;
         }
       }
@@ -402,7 +409,7 @@
     const act = (k) => { st.focus = k; const lit = st.start.slice(); lit[k] ^= 1; stop(); st.start = lit; st.steps = loChaseSteps(st.n, lit); st.k = 0; draw(true); };
     wrap.addEventListener("click", (e) => { const g = e.target.closest(".lo-btn"); if (g) act(Number(g.dataset.k)); });
     arrows(wrap, () => st.n, (k) => { st.focus = k; }, act);
-    $(".lo-n").addEventListener("change", () => { st.n = clampN($(".lo-n").value, N0); st.focus = 0; setStart(randomSolvable(st.n, false)); });
+    $(".lo-n").addEventListener("change", () => { st.n = clampN($(".lo-n").value, N0); st.focus = 0; setStart(st.n === N0 ? L0 : randomSolvable(st.n, false)); });
     $(".lo-rand").addEventListener("click", () => setStart(randomSolvable(st.n, false)));
     $(".lo-clear").addEventListener("click", () => setStart(new Array(st.n * st.n).fill(0)));
     $(".ex-start").addEventListener("click", () => { stop(); st.k = 0; draw(); });
@@ -425,7 +432,7 @@
   dvqExplorers.register({
     views: { lightsout: lightsoutView },
     help: {
-      lightsout: "במצב משחק לוחצים על נורות (או עוברים בחיצים ולוחצים Enter) : כל לחיצה הופכת את הנורה ואת השכנות שלה. אפשר לבחור גודל לוח ושכנות, להגריל מצב שאפשר לכבות, או לבחור \"מדליקה או מכבה רק אותה\" ולצייר מצב. \"הצגת פתרון\" מסמנת את הלחיצות המעטות ביותר מהמצב הנוכחי, או דפוס שקט שמראה למה אין פתרון. בתיבה של רדיפת האורות כל צעד הוא לחיצה אחת : מתחת לכל נורה דולקת, שורה אחרי שורה, ואז התיקון של השורה העליונה לפי מה שנשאר בתחתונה, ורדיפה שנייה.",
+      lightsout: "במצב משחק לוחצים על נורות (או עוברים בחיצים ולוחצים Enter) : כל לחיצה הופכת את הנורה ואת השכנות שלה, ומשולש כחול בפינה מסמן משבצת שלחצתם עליה עד עכשיו. אפשר לבחור גודל לוח ושכנות, להגריל מצב שאפשר לכבות, או לבחור \"מדליקה או מכבה רק אותה\" ולצייר מצב. \"הצגת פתרון\" מסמנת את הלחיצות המעטות ביותר מהמצב הנוכחי, או דפוס שקט שמראה למה אין פתרון. בתיבה של רדיפת האורות כל צעד הוא לחיצה אחת : מתחת לכל נורה דולקת, שורה אחרי שורה, ואז התיקון של השורה העליונה לפי מה שנשאר בתחתונה, ורדיפה שנייה.",
     },
     models: { loFlips, loApply, loMatrix, loSolve, loFirstRow, loChaseSteps, loHex, loUnhex },
   });

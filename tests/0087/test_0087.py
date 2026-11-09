@@ -146,7 +146,10 @@ def test_part_d():
     for n in range(1, 21):
         for diag in (False, True):
             assert solve_lights(n, (1 << n * n) - 1, diag)[0] is not None
-    assert weight(q.solve(5, (1 << 25) - 1)) == 15 and "ב-15 לחיצות לפחות" in PAGE
+    # 5 x 5 all lit: four solutions, every one of 15 presses
+    x = q.solve(5, (1 << 25) - 1)
+    assert sorted(weight(x ^ k) for k in [0] + q.kernel(5)) == [15] * 4
+    assert "ובכל אחד מ-4 הפתרונות שלו 15 לחיצות" in PAGE
 
 
 def rank_q(rows_bits, N):
@@ -165,12 +168,51 @@ def rank_q(rows_bits, N):
     return r
 
 
+def q_kernel(rows_bits, N):
+    """A basis of the kernel over the rationals of the symmetric 0/1 matrix rows_bits."""
+    M = [[Fraction(r >> i & 1) for i in range(N)] for r in rows_bits]
+    piv, r = [], 0
+    for c in range(N):
+        p = next((i for i in range(r, len(M)) if M[i][c] != 0), None)
+        if p is None:
+            continue
+        M[r], M[p] = M[p], M[r]
+        M[r] = [a / M[r][c] for a in M[r]]
+        for i in range(len(M)):
+            if i != r and M[i][c] != 0:
+                f = M[i][c]
+                M[i] = [a - f * b for a, b in zip(M[i], M[r])]
+        piv.append(c)
+        r += 1
+    out = []
+    for f in (c for c in range(N) if c not in piv):
+        v = [Fraction(0)] * N
+        v[f] = Fraction(1)
+        for i, c in enumerate(piv):
+            v[c] = -M[i][f]
+        out.append(v)
+    return out
+
+
 def test_traps():
     lit = 0b111
     for k in (0, 1, 2):
         lit ^= press_masks(3)[k]
     assert weight(lit) == 5
     assert rank_q(q.masks(4), 16) == 14 and q.rank(4) == 12
+    # elimination over the rationals is wrong both ways on 4 x 4: a board b has a rational
+    # solution iff y . b = 0 for the two vectors y of the rational kernel (A is symmetric)
+    ker = q_kernel(q.masks(4), 16)
+    assert len(ker) == 2
+    over_q = lambda b: all(sum(y[j] for j in range(16) if b >> j & 1) == 0 for y in ker)
+    over_2 = {q.apply(4, 0, x) for x in range(1 << 16)}
+    both = sum(1 for b in over_2 if over_q(b))
+    only_q = sum(1 for b in range(1 << 16) if b not in over_2 and over_q(b))
+    assert (len(over_2), len(over_2) - both, only_q) == (4096, 3008, 3280)
+    assert 0b110100 in over_2 and not over_q(0b110100)            # lights 2, 4 and 5
+    assert 0b110 not in over_2 and over_q(0b110)                  # lights 1 and 2
+    for words in ["4,096 הלוחות", "ש-3,008", "ועל 3,280 לוחות", "רק הנורות 2, 4 ו-5", "רק הנורות 1 ו-2"]:
+        assert words in PAGE, words
 
 
 def torus_free(n):
@@ -212,6 +254,10 @@ def test_follow_ups():
                     assert q.gcd_degree(n) > 0
     assert all(q.free(n) for n in (9, 14, 19, 24, 11, 17, 23))
     assert len([x for x in q.kernel(5)]) + 1 == 4
+    # the fewest presses: 4 x 4 all lit has 16 solutions of 4 to 12 presses
+    x = q.solve(4, (1 << 16) - 1)
+    assert sorted(weight(x ^ k) for k in [0] + q.kernel(4)) == [4, 4, 6, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 10, 12, 12]
+    assert "יש 16 פתרונות, מ-4 לחיצות עד 12, והקצר ביותר 4" in PAGE
 
 
 def test_page_boxes():

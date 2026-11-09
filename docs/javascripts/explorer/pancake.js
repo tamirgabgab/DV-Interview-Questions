@@ -1,5 +1,5 @@
 // kinds: pancake
-//   pancake                0090        a stack of pancakes to sort by flips (n from 3 to 8, or burnt pancakes up to 6): a click on a pancake turns it and every one above it over; the flips counted against the fewest (a BFS from the sorted stack over every stack of n), a hint that marks a flip one closer, undo, start over, a random stack; burnt pancakes show their burnt side as a thick edge
+//   pancake                0090        a stack of pancakes to sort by flips (n from 3 to 8, or burnt pancakes up to 6): a click on a pancake turns it and every one above it over; the flips counted against the fewest (a BFS from the sorted stack over every stack of n), a hint that marks a flip one closer, the broken adjacencies counted (a lower bound), undo, start over, a random stack; burnt pancakes show their burnt side as a thick edge
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests (tests/0090 compares them with tools/figures/q0090.py).
@@ -38,6 +38,15 @@
   const pkBest = (s, dist, burnt) => {
     const out = [];
     for (let k = pkNext(s, dist, burnt); k; k = pkNext(s, dist, burnt)) { s = pkFlip(s, k, burnt); out.push(k); }
+    return out;
+  };
+  // the broken adjacencies of the first follow-up: neighbours that are not consecutive sizes,
+  // the plate counted as n + 1 under the stack (burnt: b - a !== 1, so the signs count too). A
+  // flip changes only the pair at its cut, so it is a lower bound on the flips left
+  const pkBreaks = (s, burnt) => {
+    const t = s.concat([s.length + 1]);
+    let out = 0;
+    for (let i = 0; i + 1 < t.length; i++) if (burnt ? t[i + 1] - t[i] !== 1 : Math.abs(t[i + 1] - t[i]) !== 1) out++;
     return out;
   };
   // "3,1,5,4,2" -> the stack, or null unless it is 1..n once each (signed only when burnt)
@@ -120,7 +129,7 @@
           if (again && !again.disabled) again.focus();
         }));
         const left = dist[s.join(",")], from = dist[st.start.join(",")], used = st.flips.length;
-        $(".pk-sum").innerHTML = `הפיכות${NB}: ${ltr(used)}. מכאן צריך לפחות ${ltr(left)}, ומההתחלה המינימום הוא ${ltr(from)}.`;
+        $(".pk-sum").innerHTML = `הפיכות${NB}: ${ltr(used)}. מכאן צריך לפחות ${ltr(left)}, ומההתחלה המינימום הוא ${ltr(from)}. שכנויות שבורות${NB}: ${ltr(pkBreaks(s, st.burnt))}.`;
         $(".pk-undo").disabled = !used;
         $(".pk-again").disabled = !used;
         $(".pk-hintb").disabled = !left;
@@ -179,8 +188,8 @@
   dvqExplorers.register({
     views: { pancake: pancakeView },
     help: {
-      pancake: "לוחצים על פנקייק כדי להפוך אותו ואת כל מה שמעליו. הדף סופר הפיכות ומשווה למינימום, שחושב ב-BFS על כל הערימות. \"רמז\" מסמן פנקייק שההפיכה שלו מקרבת למיון, \"ביטול\" מחזיר הפיכה אחת, \"מההתחלה\" חוזר לערימה שהתחלתם בה, ו\"הגרלה\" נותנת ערימה חדשה. בפנקייקים שרופים, הפס העבה הוא הצד השרוף, וצריך שכולם יהיו למטה.",
+      pancake: "לוחצים על פנקייק כדי להפוך אותו ואת כל מה שמעליו. התיבה סופרת הפיכות ומשווה למינימום, שחושב ב-BFS על כל הערימות, וסופרת שכנויות שבורות, זוגות סמוכים שאינם גדלים עוקבים (הצלחת היא n + 1). הפיכה משנה את המספר הזה לכל היותר ב-1, ולכן הוא חסם תחתון. \"רמז\" מסמן פנקייק שההפיכה שלו מקרבת למיון, \"ביטול\" מחזיר הפיכה אחת, \"מההתחלה\" חוזר לערימה שהתחלתם בה, ו\"הגרלה\" נותנת ערימה חדשה. בפנקייקים שרופים, הפס העבה הוא הצד השרוף, וצריך שכולם יהיו למטה.",
     },
-    models: { pkFlip, pkDist, pkNext, pkBest, pkParse, pkHardest },
+    models: { pkFlip, pkDist, pkNext, pkBest, pkBreaks, pkParse, pkHardest },
   });
 })();

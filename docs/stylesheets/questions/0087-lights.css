@@ -21,6 +21,8 @@
 .md-typeset svg .lo-press { fill: none; stroke: var(--viz-s1); stroke-width: 3; }
 .md-typeset svg .lo-now { fill: none; stroke: var(--viz-s2-text); stroke-width: 3; }
 .md-typeset svg .lo-quiet { fill: none; stroke: var(--viz-s4); stroke-width: 3; stroke-dasharray: 5 3; }
+/* a cell pressed so far in the play box (an odd number of times): a blue triangle in its corner */
+.md-typeset svg .lo-did { fill: var(--viz-s1); stroke: none; }
 
 /* labels: the number of a light, a caption under a board, a count under a cell */
 .md-typeset svg .lo-ix { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 12px; }
@@ -47,6 +49,7 @@
 .md-typeset .viz-legend .lo-key-off { background: none; border-radius: 50%; outline: 1.5px solid var(--viz-text); outline-offset: -2px; }
 .md-typeset .viz-legend .lo-key-press { background: none; border-radius: 3px; outline: 3px solid var(--viz-s1); outline-offset: -3px; }
 .md-typeset .viz-legend .lo-key-now { background: none; border-radius: 3px; outline: 3px solid var(--viz-s2-text); outline-offset: -3px; }
+.md-typeset .viz-legend .lo-key-did { background: var(--viz-s1); clip-path: polygon(0 0, 70% 0, 0 70%); }
 .md-typeset .viz-legend .lo-key-quiet { background: none; border-radius: 3px; outline: 3px dashed var(--viz-s4); outline-offset: -3px; }
 .md-typeset .viz-legend .lo-key-band { background: color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
 .md-typeset .viz-legend .lo-key-rest { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
