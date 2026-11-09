@@ -483,6 +483,10 @@ PAIRS = [
     ("0055 divhw, the frame of the next-state logic", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0055 divhw, the frame of the output logic", "var(--viz-s3)", [CARD, PAGE], UI),
     ("0055 divhw, a flip-flop and the frame of one that flips", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], UI),
+    # 0070 gridpath (stylesheets/questions/0070-gridpath.css): box b's walls, box c's popped cells
+    ("0070 gridpath, a number on a wall a state entered (box b)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 29%, var(--md-default-bg-color))"], TEXT),
+    ("0070 gridpath, a number on a wall the path breaks (box b)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 40%, var(--md-default-bg-color))"], TEXT),
+    ("0070 gridpath, the frame of a popped cell on road, mud and mountain (box c)", "var(--md-typeset-a-color)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 29%, var(--md-default-bg-color))"], UI),
     ("0099 iban, an error caught", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
     ("0099 iban, an error that slips", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
     # 0022 latpaths (stylesheets/questions/0022-latpaths.css): the counts on their tints, the small boards and the box

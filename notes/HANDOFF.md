@@ -1096,6 +1096,28 @@ below start at item 112 (session 31).
     session scratchpad, review6/) and every box measured at 1920 by 1080. Findings under
     "Open items", "Review round 5 (session 34)". Nothing was changed yet. Also found: the
     weekly workflow has failed three Mondays running (see R0).
+189. **The fifth ten questions fixed (session 34, 2026-11-09).** R0 by the lead: weekly.yml
+    reads Verilator's highest vX.Y tag (releases/latest is 404) and check_links skips
+    preconnect / dns-prefetch hints (fonts.gstatic.com answered 404); about 1,600 Hebrew
+    colons on the pages and in the generators got U+00A0 (seven generators had a plain-space
+    NB), lint_pages.py checks the pages' colons (`lint_colons`, outside code, math, comments and
+    generated blocks) and a colon after an inline value before Latin text in the explorers;
+    the hook (`toc_colons`) restores the NBSP the sidebar's table of contents collapses (50
+    entries). The colon commit used `${NB}` in tagcheck.js, which had no NB: the 0058 box
+    failed to mount on the branch until the 0058 agent defined it (never on main). Six agents
+    then; every R1 claim re-verified (all held; one reviewer count was off: the chase on 5x5
+    all-lit presses 5 cells twice, not 10). Highlights: 0003 exact swap bounds and 6
+    comparators; 0011 the 4x4 fifth condition (9 boards), a tested covergroup, 1,000 draws
+    with and without solve-before, q0011.py with gen markers; 0038 the handshake box as a
+    mutation box; 0058 final widths 26 / 26 / 54 / 88, a sum of cubes for two-and-two faults,
+    the box at part c with a width select; 0059 an example menu, ordered rows in LTR spans;
+    0070 boxes 1118 -> under 1000, per-cell marking in box b; 0071 five reasons corrected,
+    0.01 sliders; 0085 the copy-the-counts button, a tested SV solver, the 1-bit sum trap;
+    0087 the rank trap, the pressed cells; 0090 tight bounds proved, broken adjacencies.
+    Three contrast pairs for 0070. Verilator 5.053 notes: `sort()` on an int queue orders
+    negatives as unsigned ('{-3,0,-3,2,-8} gives '{0,2,-8,-3,-3}); a tb comment starting with
+    "Verilator" is read as a pragma (BADVLTPRAGMA); `bit[]` `.sum()` gives 2 where the LRM
+    gives 1 bit; `sum() with (item == i)` inside a constraint crashes it.
 
 ---
 
@@ -1552,30 +1574,33 @@ unaligned edges are at least 2 ns apart, the gcd). None needed: 0018, 0026, 0048
 
 ### Review round 5 (session 34): ten more questions
 
-Open: nothing changed yet (work log item 188). Every claim below was checked by a reviewer's
+All done (work log item 189), with the owner's choices: hardware / DV only for 0011
+(coverage) and 0085 (the constraint solver, the 1-bit sum); every proposed box control; the
+page colons fixed and linted; the weekly workflow fixed (no post-deploy crawl). Findings were
+(work log item 188): Every claim below was checked by a reviewer's
 script (CONFIRMED) unless marked SUSPECTED; verify again before changing a page.
 
 **R0. Site-wide:**
-- [ ] The weekly workflow (`weekly.yml`) has failed on 2026-10-26, 11-02 and 11-09: the
+- [x] The weekly workflow (`weekly.yml`) has failed on 2026-10-26, 11-02 and 11-09: the
   Verilator job asks `repos/verilator/verilator/releases/latest`, which is 404 (Verilator
   publishes tags, not GitHub releases: read the tags instead); the external-links job
   counts 404.html's preconnect `https://fonts.gstatic.com` as broken (skip preconnect /
   dns-prefetch hrefs). The site is not affected.
-- [ ] Page colons: 1352 plain spaces before a Hebrew colon on 37 pages (0013 120, 0067 123,
+- [x] Page colons: 1352 plain spaces before a Hebrew colon on 37 pages (0013 120, 0067 123,
   0065 102, 0022 90, 0100 74, 0037 72, 0071 67, 0085 60, 0084 59, ...), not linted (the
   owner deferred it on 2026-10-30; the explorers were fixed in round 4). Also " ;" with a
   plain space (0070, 17 times), and the sidebar's table of contents drops the NBSP before a
   heading's colon (about 50 entries).
-- [ ] The explorer lint misses a colon followed by Latin text (tagcheck.js line 124,
+- [x] The explorer lint misses a colon followed by Latin text (tagcheck.js line 124,
   `${code("x")} : XOR`).
 
 **R1. Correctness:**
-- [ ] 0003: the hardware follow-up says 9 comparators; the first follow-up's own answer shows
+- [x] 0003: the hardware follow-up says 9 comparators; the first follow-up's own answer shows
   6 suffice (an insertion network of depth 5). "Swaps at most O(n^2)" can be exact: at most
   n(n-1)/2 + 1, at least n - 1; sorted [1, 2, 3, 4] makes 6 swaps (more than the example's
   5). Box: the "j < i" note shows when no swap happened; in trap mode the last cell is never
   marked sorted.
-- [ ] 0011: the 4x4 follow-up's answer (only the lines and the draw rule change) is wrong:
+- [x] 0011: the 4x4 follow-up's answer (only the lines and the draw rule change) is wrong:
   on 4x4 the diagonals share no cell and X can have 8 marks; X.OXOXXOOXXOXOOX passes all four
   conditions as "X won" though no single move completes both lines (8 such boards): add
   "every winning line passes through one cell". The bit-sum trap understates: all 22
@@ -1584,44 +1609,44 @@ script (CONFIRMED) unless marked SUSPECTED; verify again before changing a page.
   breaks). Verilator returns 2 for a `bit[]` `.sum()` (the LRM gives 1 bit), so the page's
   tests cannot show this trap: say so. Part b's proof: "parallel lines need 6 X" does not
   cover three crossing lines (any three lines cover at least 6 cells).
-- [ ] 0038: part b's short answer "בשלוש ההפרות נכשלת בדיוק property אחת" (the "req
+- [x] 0038: part b's short answer "בשלוש ההפרות נכשלת בדיוק property אחת" (the "req
   dropped" trace fails two: hold [3] and late [4]; the parenthesis leaves out rule 2); the
   cost "עד שלושה" open attempts of rule 2 (at most 2 over every 12-cycle trace); trap 3's
   title "assertion שתמיד עוברת" against its body (it fails on every good transaction).
-- [ ] 0058: trap 3 and the memory table: wrap-around of the accumulators is harmless (modular
+- [x] 0058: trap 3 and the memory table: wrap-around of the accumulators is harmless (modular
   add and subtract are exact), only the final value must fit, with a sign bit: minimal widths
   26 / 26 / 54 / 88, not 40 / 38 / 68 / 106 (`memory_table()` in q0058.py, part b's "38
   ביטים במקום 72", the cost lines). Part c gives a confident wrong answer for two missing and
   two duplicated tags (missing {0, 6}, duplicates {1, 4} decode as "missing 10, duplicate 9"
   and a xor d == x holds; 252 such cases on 16 tags). Part d: k must come from the counter (a
   larger k adds a spurious root 0: k = 3 with 5 and 12 missing gives [0, 5, 12]).
-- [ ] 0059: "זו הדוגמה הקטנה ביותר" only with distinct values (1, 1, 3, 2 also defeats the
+- [x] 0059: "זו הדוגמה הקטנה ביותר" only with distinct values (1, 1, 3, 2 also defeats the
   greedy player); the three-player follow-up needs a tie rule (1, 1, 1, 2, 1 gives (3, 2, 1)
   or (2, 3, 1)); the O(n)-memory follow-up works only with i ascending (descending: 127 of 300
   random rows wrong); `best_total([])` raises IndexError though its docstring says any n.
-- [ ] 0070: "19 הוצאות במקום 25" for A* holds only with (f, g) ties (row and column ties, as
+- [x] 0070: "19 הוצאות במקום 25" for A* holds only with (f, g) ties (row and column ties, as
   the page's Dijkstra uses, give 16): state the rule. Box b cannot draw the trap board (3x3
   is under its 4x4 minimum, and it runs only the corrected search): a toggle for the wrong
   per-cell marking, or drop "ציירו את הלוח של המלכודת". Box b's end shows about 15 walls as
   broken though the path breaks only (3, 7); box c's popped cells lose their terrain colour.
-- [ ] 0071: part b step 8 "כשאני ראשון או שני, רק אחד מהם מכשף על השני לפני שאני פותח" (both
+- [x] 0071: part b step 8 "כשאני ראשון או שני, רק אחד מהם מכשף על השני לפני שאני פותח" (both
   rivals shoot at each other in both orders; the difference is the round's last shot, 0.048 *
   2/7, and the cats from 8% to 3.2%); step 6 and the proof intro "שני האחרים מכשפים עליי"
   (for every wand in (0.6, 1] wizard 1 misses on purpose); part c step 5 "my chance rises
   with the wand while it is under both" (order 0.8, 0.6, me: 0.529 just under 0.5, 0.469 at
   0.5); the "חוק החתולים בכל סבב" follow-up's formula with m = 0.7 gives 67.9%, the page says
   58.2% (from the menu's 0.6); step 4's "p3 < 5/6" holds only when p3 < 0.6.
-- [ ] 0085: the first box (in the question, before the hints) always prints "במספר שמתאר את
+- [x] 0085: the first box (in the question, before the hints) always prints "במספר שמתאר את
   עצמו שניהם b" (hints 1-2): hide it there. Part c step 3 (z = 2): "d1 הוא 0 או 1" never says
   why d1 <= 2 (d1 = 2 is base 6, 222000).
-- [ ] 0087: the trap "דירוג מעל המספרים הממשיים ... מבטיח פתרון עם שברים" (over Q the 4x4 rank
+- [x] 0087: the trap "דירוג מעל המספרים הממשיים ... מבטיח פתרון עם שברים" (over Q the 4x4 rank
   is 14: 3008 of the 4096 clearable boards get no Q solution and 3280 unclearable ones get
   one); the "fewest presses" follow-up uses 5x5 all-lit, whose 4 solutions all have 15 presses
   (4x4 all-lit: 16 solutions of 4 to 12; also part d's "ב-15 לחיצות לפחות"); part b "לכל
   שורה תחתונה שהרדיפה יכולה להשאיר" next to "רק 8 מתוך 32" (the chase can leave any of 32:
   "שאפשר לנקות"). SUSPECTED: part b's O(n^3) for the code as written (`chase` XORs an n^2-bit
   mask per press: about O(n^5 / w)).
-- [ ] 0090: part c "-I_n תמיד בין הקשות" verified to n = 7 only (SUSPECTED: the Cohen-Blum
+- [x] 0090: part c "-I_n תמיד בין הקשות" verified to n = 7 only (SUSPECTED: the Cohen-Blum
   conjecture is refuted for larger n): add "עד n = 7". 3n - 2 cites only the test to n = 6
   (a one-line induction on -I_n proves it for every n); "לכל n יש ערימה" for 2n - 3 has no
   construction (start from [2, 1, 3..n], then for k = 3..n flip k, then 2; checked n = 2..9).
@@ -1657,27 +1682,39 @@ line). 0090: one sentence (P(n) is the pancake network's diameter). None: 0003 (
 follow-up), 0038 (already SVA), 0071.
 
 **R4. Explanations:**
-- [ ] 0003: the per-pass table repeats the figure; the steps duplicate the proof.
-- [ ] 0011: 958 / 626 / 316 / 16 four times; part b step 2 repeated word for word in the
+- [x] 0003: the per-pass table repeats the figure; the steps duplicate the proof.
+- [x] 0011: 958 / 626 / 316 / 16 four times; part b step 2 repeated word for word in the
   proof; q0011.py is old-style (no gen markers), so the figures are not checked by tests.
-- [ ] 0038: traps 3 and 4 repeat the same `req` vs `$rose(req)` example; the page never
+- [x] 0038: traps 3 and 4 repeat the same `req` vs `$rose(req)` example; the page never
   says that one fault can fire two assertions.
-- [ ] 0058: part d needs a worked example ({1, 8, 14} in the report).
-- [ ] 0059: 0-based and 1-based indexes of d mixed; "1, 2, 5, 3" in Hebrew text shows
+- [x] 0058: part d needs a worked example ({1, 8, 14} in the report).
+- [x] 0059: 0-based and 1-based indexes of d mixed; "1, 2, 5, 3" in Hebrew text shows
   mirrored (an ordered row: an LTR span, the owner's call).
-- [ ] 0070: part c's proof uses |P| undefined and its "no stale entries" step relies on pops
+- [x] 0070: part c's proof uses |P| undefined and its "no stale entries" step relies on pops
   in cost order, unproved; part b hint 2 gives the solution; the cost 39 six times; no trap
   on steps vs cells (LeetCode 1091 counts cells: 21, not 20); the 8-direction k = 2 result
   (8) unexplained (the path breaks (3, 2) and (4, 7)).
-- [ ] 0071: the same numbers in five to eight places; hint 2 of parts a and c give the
+- [x] 0071: the same numbers in five to eight places; hint 2 of parts a and c give the
   answer; part c step 4 uses j undefined.
-- [ ] 0085: "ניחוש ותיקון לא מתכנס" asserted (the cycle above shows it).
-- [ ] 0087: hint 3 of part d reuses A for the n^2 x n^2 matrix; the proof "אין פתרון שהרדיפה
+- [x] 0085: "ניחוש ותיקון לא מתכנס" asserted (the cycle above shows it).
+- [x] 0087: hint 3 of part d reuses A for the n^2 x n^2 matrix; the proof "אין פתרון שהרדיפה
   מפספסת" worded backwards; lines 612 and 667 end with "כש-" / "ו-" (a gap "כש- w·u"); "order
   does not matter" six times.
-- [ ] 0090: "one BFS, a flip is its own inverse" six times.
+- [x] 0090: "one BFS, a flip is its own inverse" six times.
 
 ---
+
+**Left after round 5 (open):**
+- [ ] Videos to re-caption before any re-render: 0003 ("אז זה selection sort" for the trap,
+  the page now says exchange sort; the box's old "j < i" note), 0011 ("ואף בדיקה לא תתריע
+  עליו", the page now says only coverage finds it; the ttt box lacks the draws button), 0071
+  (script lines 186-187 "כל עוד p3 < 5/6"; 216-217 imply only one rival shoots in the other
+  orders).
+- [ ] Not done by the owner's choice (R3): 0038 bind / cover / req at reset release, 0058's
+  per-clock table and end-of-test check, 0059's parity assertion, 0070's Lee router, 0087's
+  per-clock table and SVA, 0090's network-diameter sentence.
+- [ ] 0038's violations WaveDrom was checked only as source (the CDN script is blocked
+  locally): look at it on the live site.
 
 ## Question variety
 
