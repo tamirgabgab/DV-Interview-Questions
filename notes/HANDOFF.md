@@ -1061,6 +1061,12 @@ below start at item 112 (session 31).
     code-walk captions still say S10 / S101: a caption pass before any re-render; 0001's
     `.wv-step` text moved to the side column (the "draw" capture region would look
     different); 0055's video shows part b's Karnaugh maps, no longer on the page.
+186. **Fourth review round: ten more random questions (session 34, 2026-11-09).** Seed
+    20261109, the thirty reviewed questions and 0099 left out: 0004, 0018, 0026, 0029, 0045,
+    0048, 0056, 0063, 0089, 0092. Five read-only review agents (every claim recomputed by a
+    script; the reports and scripts are in the session scratchpad, review5/) and every box
+    measured at 1920 by 1080. Findings under "Open items", "Review round 4 (session 34)".
+    Nothing was changed yet.
 
 ---
 
@@ -1367,6 +1373,134 @@ vocabulary ("נכנס כ-LSB" vs "מה-MSB").
 - [x] 0080: K mod 4 needs its why (reflections repeat every 2a); part d step 3's start
   ⌊(2x₀ − w)/a⌋ before its motivation (bring in the (2, 170) at 80° example); "בגלל
   הסימטריה" -> point to the midpoint argument.
+
+### Review round 4 (session 34): ten more questions
+
+Open: nothing changed yet (work log item 186). Every claim below was checked by a reviewer's
+script (CONFIRMED) unless marked SUSPECTED; verify again before changing a page. All the
+tables and worked numbers of the ten pages recompute exactly; the findings are wrong
+sentences, proof gaps and boxes.
+
+**R0. Site-wide:** 29 of the 51 explorer files define `const NB = " "` with a plain space
+(the 22 newer ones have U+00A0), so their colons can wrap to a line start: billiard,
+bitmatrix, bitrev, chameleons, circlecut, creditwalk, ducci, faro, frobenius, iban,
+intervals, islands, isqrt, jugs, kelly, maxones, netdelay, oddball, onesk, rainwater, randmn,
+rotatek, slidemax, soldiers, tagpool, transpose, twoheaps, vncoin, weights. Fix them and add
+a lint rule (an explorer's NB must be U+00A0; a Hebrew word, a space and a colon in an
+explorer string). Also hourglass.js lines 577, 619, 620 and boxes3.js line 112 (a double
+NBSP).
+
+**R1. Correctness:**
+- [ ] 0004: the `boxes3` box says the colour-labelled box holds "לא את התערובת (היא בקופסה k)"
+  but box k holds the drawn colour; the page's rule (part a, SV note 3) is circular in the
+  same way (resolve the box labelled with the other colour first: it must be the mix).
+  Line 325 "12 המקרים של סעיף א" (part a has 2; the 12 are part b's). The Python block's
+  `hl_lines="8 13"` lights `else:` (should be 8 15). The four-boxes follow-up never defines
+  "ארבעה סוגי תוכן" and proves only "at least 2" (four single colours: exactly 2).
+- [ ] 0018: the stepper caption "11 + 4 = 15" (q0018.py line 29) renders "15 = 4 + 11":
+  an LTR span.
+- [ ] 0026: the lower bound covers only alpha >= 3 but the page claims the formula is
+  optimal for all speeds (alpha = 2: the page's own inequalities admit T = 4/3 < 7/5; say so
+  or point to the fixed-driver follow-up, whose proof holds for all alpha). The "four
+  people" and "general" follow-ups say "show it is the shortest" but only compute the
+  symmetric plan: the same chain gives (alpha + 2k - 1) T >= (2k - 1) alpha + 1 for alpha >= 3.
+- [ ] 0029: "וב-12 שעות יש רק 11 כאלה" next to a table of 12 rows (k = 0..11); step 6 of
+  part b asserts without a reason that no moment belongs to exactly two pairs; the clock box
+  paints all three hands orange at 3:16:16 (two separate meetings 0.085 s apart, the
+  closest pair of the day: say so, or make it a task).
+- [ ] 0045: trap 1's reason is wrong: the "all balanced shows no kind" count allows 13 balls
+  (2N = 26 <= 26); what rules 13 out is the first weighing without a helper ball (the search:
+  13 solvable with one helper, not without). Follow-up 1 proves only fixed codes (lead with:
+  at most 4 per pan by parity, the balanced branch leaves >= 5, two weighings with a helper
+  handle 4). Part c is adaptive (the helpers of weighing 2 depend on weighing 1) but says
+  "אותה שיטה כמו בסעיף ב", and the box says "השקילות הקבועות". Part c's short answer lacks
+  N >= 3; the interviewer block's "החסם הוא ספירה פשוטה" contradicts trap 1. Follow-up 2
+  overstated: no odd ball gives only (=,=,=); with two odd balls 252 of 264 cases decode
+  silently to a wrong ball.
+- [ ] 0048: part c's "s < 0 בדיוק כש..." fails at a = H (s = 0 at 30 degrees); the short
+  answer's "בלי מקרי קצה" against the proof's 60-degree case through O; the water-first
+  follow-up says the line rises (it falls; the size is right).
+- [ ] 0056: the "חלון שמתמלא" follow-up ("from then on the update is normal") is wrong: with
+  no reset r stays wrong (642 of 1000 runs at L = 4); treat the leaving digit as 0 until the
+  counter reaches L (0 of 1000). "The same number of states both ways" holds only for m = 3
+  (bit reversal keeps divisibility by 3; m = 7, L = 7: 61 vs 63); "at least L bits" rests on
+  the table only (the argument with one extra bit gives 2^(L-1) + 1 states; exact count
+  ceil(5 * 2^L / 6), checked to L = 14). Trace headers say 2^L, the cells use C = 2. The
+  follow-up mixes the alternating bit sum (2 = -1 mod 3) with the sum of bit pairs (4 = 1).
+  SV `win_div` is silently wrong when MSB = 1 and B has no inverse mod M (an elaboration check).
+- [ ] 0063: part c's cost "needs the same storage" (the deque needs more: 33 vs 24 bits at
+  K = 3, W = 8); the `if` trap says the recorded length is right "במקרה" (it always is). SUSPECTED:
+  "a for loop with break unrolls into K comparisons in series" (K parallel comparators and an
+  AND chain). Typo "זוזות" -> "זזות".
+- [ ] 0089: part c's cost "g גדל בערך כמו המכפלה של שני מטבעות" (101, 103, 107: g = 3533,
+  not ~10403; the product is only a bound); the short answer "אין נוסחה" -> no simple closed
+  formula (fast exact methods exist for three coins). Proof gaps: part b's "payable iff
+  y >= 0" unproven; part c's proof never writes "n >= dist implies payable".
+- [ ] 0092: box 3's switch from the regular polygon to "חופשי, גוררים" loads the nudged
+  default (31 regions), not the hexagon, so the page's "move to free and drag" cannot break
+  the centre point (keep the current angles). "ההתאמה עד 5 היא מקרה" then proves an
+  identity; "במחשב P <= C(n,4)" is always true; hint 2 of part c "בחלק המיליארד האחרון"
+  (about 1e-16). SUSPECTED: the Python merge rounds to 7 digits while step 3 says "closer
+  than 1e-7" (a point on a rounding boundary can split; no failure found up to n = 40).
+  `count_regions([0, 360, 90])` gives 4 (the same point twice; 2).
+
+**R2. Boxes and one screen.** Heights at 1920 x 1080 (stepped to the end): 0056 winfsm 1222
+(1380 in base 10, 1560 in base 16: the moves table has a row per digit; keep the ring and
+legend in the main column, the data path, the lines, the moves table (only the next digit's
+row above base 4) and the derivation folded in the side column, about 900), 0026 motorcycle
+1157, 0018 hourglass 1091, 0063 slidemax boxes 3 and 2 1072 and 1026; 0045 oddball 986 and
+0029 clock 977 at the limit; the other thirteen fit (329 to 945). None of the twenty box
+paragraphs is a "נסו" task; the reports give checked tasks, e.g. 0018 D = 16 then 17, and
+A = 3, B = 5, D = 12 with "fewest flips" (4 events and 5 flips against 4 flips); 0026
+D = 0.75 (all arrive at 4 h) and D = 0.95 (2.629), alpha = 2 (drop at 3/5, time 1.4);
+0029 3:16:16, and 0:59:00 to 1:00:00; 0045 ball 11 light then heavy (mirror rows); 0048
+a = 0.5, b = 2.5 (x = w = 2.1875); 0089 44 = 20 + 4*6 where greedy is stuck; 0092 points 4,
+5, 6 to 265, 332, 23 (three diameters, 30 regions), and chord 3-6 of the hexagon adds 4.
+Missing controls: 0029 gapline caps L at 6T (the page's own L = 12 h table cannot be
+replayed: add an "L = 12 h" button); 0048 draws only the optimal path (add free stops with
+the current length against the minimum); 0056 disables even m in LSB mode (the page's trap
+says LSB works for any m); 0063 mode a has no `<` / `<=` choice and no deque of values;
+0004's stats count only draws from the mixed-label box, and the paragraph never mentions
+the self-assign step (on by default); 0089's pay box pays 60 as 10 * 6 next to the
+fewest-coins follow-up.
+
+**R3. Hardware and DV:** 0004: "how would you verify `fix_labels`" (constrained-random
+contents, a `draw()` counter checked to be 1, a 24-bin covergroup). 0045: part b's decoder is
+syndrome decoding (a 27-entry ROM that corrects one fault and cannot detect two), coverage
+bins for the 27 outcome vectors, an assertion that the pans are equal. 0063: part c's
+invariants as assertions (valid entries a prefix, values and ages strictly decreasing) and
+coverage of every insert position, the spare slot included. 0089: the constraint
+`n == 6x + 9y + 20z` as an oracle (randomize() fails exactly on the 22 unpayable amounts);
+`frobenius_dp` as a shift register with a per-clock table. 0029 (optional): two clocks of
+10 and 12 ns (edges align every 60 ns; [0, 600 ns] has 11 aligned edges, [0, 600 ns) 10; two
+unaligned edges are at least 2 ns apart, the gcd). None needed: 0018, 0026, 0048, 0092.
+
+**R4. Explanations:**
+- [ ] 0004: the 12 cases; the four-boxes answer.
+- [ ] 0018: the cost needs a case for "BFS is not fewest flips" (A = 3, B = 5, D = 12); the
+  "from 17 every D" follow-up needs its reason (A alone to t = 7 shifts the start state:
+  closed under +7 and +11, and 17-23 are seven in a row); the proof never says why the
+  t + w > D prune (w >= 1) and `seen` are safe; hints 1 and 2 together give the whole plan;
+  the wait trap is weaker than it reads (from 0 dropping the wait changed nothing for
+  A, B <= 15, D < 80); the box's "not measurable" list of 48 numbers -> "7, 11, 14, 15, and
+  from 17 every value".
+- [ ] 0026: the "the other walks meanwhile" row (3 alpha - 1)/(alpha + 1) has no
+  derivation; the "where does the rider get off" follow-up is solved twice in the body and
+  "why nothing faster" repeats the proof; "מקווקות" -> "בקו מקווקו"; "תכנית" / "תוכנית" mixed.
+- [ ] 0029: the three hands meet only at 00:00 and 12:00, proved three times; part b's
+  "אותה הוכחה, בדרך של סעיף א" paragraph can shrink; line 290 a colon after math with no NBSP.
+- [ ] 0045: part b's 12-ball table differs from what part c builds for N = 12 (one line);
+  part a step 3 has no numbers; part c needs a small orbit example (k = 3, four orbits).
+- [ ] 0048: part c step 5 jumps to the closed form of s (the distance of B1 from the food
+  line comes only in a trap; the report has the line in coordinates); part b step 4 lists
+  four range conditions and checks two; numbers repeated; part a's idea vague.
+- [ ] 0056: the trap's difference starts "when a 1 leaves", not when the window fills; part
+  b's short answer renders "ו- r'".
+- [ ] 0089: the box paragraph "הקלידו מטבעות, ושני עד ארבעה ערכים" is garbled (the field takes
+  one to four coins); the last step of "everything above g is payable" is compressed; part
+  c's proof starts both directions with the same premise.
+- [ ] 0092: hint 1 of part b gives "1 + lines + crossings"; part b's idea repeats proof 1
+  line by line.
 
 ---
 
