@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Inline SVG figures of question 0011 (random final board of tic-tac-toe).
 
-    python tools/figures/q0011.py > /tmp/q0011.html
+    python tools/figures/fill.py 11       # put the blocks on the page
 
-Prints five figures separated by blank lines: numbering, examples, wrap-around examples,
-the four directions of the 12 lines, and "every fifth cell completes a line".
+Five blocks, in page order: the numbering of the cells, examples of legal and illegal
+final boards, the wrap-around diagonals, the four directions of the 12 lines (with their
+legend), and "every fifth cell completes a line". tests/0011 checks the page copies.
 """
 
 LINES = [(0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6)]
@@ -120,6 +121,15 @@ def fifth():
     return svg(x - 16, 3 * C + 34, "ריבוע של 4 משבצות בלי קו, וכל משבצת חמישית משלימה קו", "".join(body))
 
 
+def directions_legend():
+    return ('<span class="viz-legend"><span><i class="s1"></i>קו ראשון</span><span><i class="s2"></i>קו שני</span>'
+            '<span><i class="s3"></i>קו שלישי</span></span>')
+
+
+def blocks():
+    """The generated blocks, in page order."""
+    return [numbering(), examples(), wrap_examples(), directions_legend() + "\n\n" + directions(), fifth()]
+
+
 if __name__ == "__main__":
-    for fig in (numbering, examples, wrap_examples, directions, fifth):
-        print(fig(), "\n")
+    print("\n\n".join(blocks()))

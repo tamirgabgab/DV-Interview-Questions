@@ -10,6 +10,16 @@ module tb;
     expected = '{1, 2, 3, 4};
     mystery(a);
     if (a != expected) errors++;
+    // the corner cases of the verification follow-up, with their sorted results written out
+    begin
+      int corner[$][$] = '{'{}, '{7}, '{5, 5, 5, 5}, '{1, 2, 3, 4, 5}, '{5, 4, 3, 2, 1}, '{-3, 0, -3, 2, -8}};
+      int sorted[$][$] = '{'{}, '{7}, '{5, 5, 5, 5}, '{1, 2, 3, 4, 5}, '{1, 2, 3, 4, 5}, '{-8, -3, -3, 0, 2}};
+      foreach (corner[c]) begin
+        a = corner[c];
+        mystery(a);
+        if (a != sorted[c]) begin errors++; $display("corner %0d: %p -> %p", c, corner[c], a); end
+      end
+    end
     repeat (500) begin
       a.delete();
       repeat ($urandom_range(0, 12)) a.push_back(int'($urandom_range(0, 40)) - 20);

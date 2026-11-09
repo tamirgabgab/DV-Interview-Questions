@@ -5,6 +5,7 @@
 // models for the question tests.
 (() => {
   const { code, ltr, seedControls } = dvqExplorers.lib;
+  const NB = "\u00a0";
 
   // Code tracer (0002, 0003): the page's swap functions and the double loop replayed one
   // line (or one comparison) at a time, with the values and, for the swaps, the symbolic
@@ -76,23 +77,25 @@
     return { code: ROT_CODE, frames, ok: v.a === wrap(b) && v.b === wrap(c) && v.c === wrap(a) };
   };
   // loopTrace: the page's mystery(A), one comparison per frame; `endOfI` marks the last
-  // comparison of an outer iteration, with the sorted prefix and the maximum noted.
+  // comparison of an outer iteration, with the sorted prefix and the maximum noted; `tags`
+  // is where every cell's value started (its index in A0), moved with every swap, so equal
+  // values can be told apart (the stability follow-up).
   // `fromNext` runs the trap of the page instead (V4): the inner loop from j = i + 1, which
   // sorts the array in descending order.
   const LOOP_CODE = ["n = len(A)", "for i in range(n):", "    for j in range(n):", "        if A[i] < A[j]:", "            A[i], A[j] = A[j], A[i]"];
   const LOOP_CODE_NEXT = LOOP_CODE.map((l, k) => (k === 2 ? "    for j in range(i + 1, n):" : l));
   const loopTrace = (A0, fromNext = false) => {
-    const A = [...A0], n = A.length, frames = [];
+    const A = [...A0], T = A0.map((_, k) => k), n = A.length, frames = [];
     let comparisons = 0, swaps = 0;
     for (let i = 0; i < n; i++) {
       for (let j = fromNext ? i + 1 : 0; j < n; j++) {
         const before = [...A], swapped = A[i] < A[j];
         comparisons += 1;
-        if (swapped) { const t = A[i]; A[i] = A[j]; A[j] = t; swaps += 1; }
-        frames.push({ i, j, before, after: [...A], swapped, comparisons, swaps, endOfI: j === n - 1 });
+        if (swapped) { [A[i], A[j]] = [A[j], A[i]]; [T[i], T[j]] = [T[j], T[i]]; swaps += 1; }
+        frames.push({ i, j, before, after: [...A], tags: [...T], swapped, comparisons, swaps, endOfI: j === n - 1 });
       }
     }
-    return { code: fromNext ? LOOP_CODE_NEXT : LOOP_CODE, frames, result: A, comparisons, swaps };
+    return { code: fromNext ? LOOP_CODE_NEXT : LOOP_CODE, frames, result: A, tags: T, comparisons, swaps };
   };
 
   // The tracer box (0002, 0003): the Python code of the page on the left with the current
@@ -100,7 +103,8 @@
   // same-variable and 8-bit toggles, the symbolic expressions in a0 and b0; data-version
   // locks it on one version, data-start only opens it there.
   // data-mode="loop": a typed or random array, one comparison per step, a jump to the end
-  // of the outer iteration with the invariant, the counters.
+  // of the outer iteration with the invariant, the counters; a value typed more than once
+  // carries a letter by its first place (a, b, ...), so a change in their order shows.
   const traceView = (box) => ({
     mount() {
       const mode = box.dataset.mode === "loop" ? "loop" : "swap";
@@ -208,6 +212,8 @@
       }
       const PAGE = [3, 1, 4, 2];
       const st = { A: PAGE.slice(), k: 0, next: false };
+      // a value that appears more than once gets a letter per copy, by its place in the input
+      const tagLetters = (A) => A.map((v, k) => (A.filter((u) => u === v).length > 1 ? "abcdefgh"[A.slice(0, k).filter((u) => u === v).length] : ""));
       const trace = () => loopTrace(st.A, st.next);
       box.innerHTML =
         `<div class="ex-controls"><label><span>המערך</span><input type="text" class="ex-nums" dir="ltr" value="3, 1, 4, 2" spellcheck="false" aria-label="המערך, מספרים מופרדים בפסיקים"></label>` +
@@ -221,10 +227,12 @@
         st.k = Math.min(st.k, total);
         const fr = st.k ? tr.frames[st.k - 1] : null, n = st.A.length;
         $(".tr-left").innerHTML = codeHtml(tr.code, fr ? 3 : 0, fr && fr.swapped ? 4 : -1);
-        const arr = fr ? fr.after : st.A, sortedTo = fr ? (fr.endOfI ? fr.i : fr.i - 1) : -1;
+        // the whole array is sorted at the end, also in the trap, whose last i is n - 2
+        const arr = fr ? fr.after : st.A, sortedTo = !fr ? -1 : st.k === total ? n - 1 : fr.endOfI ? fr.i : fr.i - 1;
+        const tags = fr ? fr.tags : st.A.map((_, k) => k), letter = tagLetters(st.A);
         $(".tr-right").innerHTML = `<div class="tr-arr" dir="ltr">` + arr.map((v, x) => {
           const cls = [x <= sortedTo ? "is-done" : "", fr && x === fr.i ? "is-i" : "", fr && x === fr.j ? "is-j" : "", fr && fr.swapped && (x === fr.i || x === fr.j) ? "is-swapped" : ""].join(" ").trim();
-          return `<span class="${cls}"><span class="tr-idx">${x}</span>${v}</span>`;
+          return `<span class="${cls}"><span class="tr-idx">${x}</span>${v}${letter[tags[x]] ? `<sub>${letter[tags[x]]}</sub>` : ""}</span>`;
         }).join("") + `</div><p class="tr-counts">${fr ? `${ltr(`i = ${fr.i}, j = ${fr.j}`)}. ` : ""}השוואות : ${ltr(fr ? fr.comparisons : 0)} מתוך ${ltr(total)}, החלפות : ${ltr(fr ? fr.swaps : 0)}.</p>` +
           `<p class="tr-legend"><span class="tr-lg-i">מסגרת כחולה : ${code("i")}</span> <span class="tr-lg-j">מסגרת כתומה מקווקוות : ${code("j")}</span> <span class="tr-lg-done">ירוק : ${code("A[0..i]")} ממוין</span></p>`;
         $(".ex-pos").textContent = `השוואה ${st.k} מתוך ${total}`;
@@ -235,13 +243,14 @@
           step = `${ltr(`i = ${fr.i}, j = ${fr.j}`)} : ${ltr(`A[i] < A[j]`)} הוא ${ltr(`${ai} < ${aj}`)}, ` + (fr.swapped ? `<span class="wv-ok">כן ⇒ החלפה</span> : ${ltr(`A = [${fr.after.join(", ")}]`)}.` : `לא ⇒ בלי שינוי.`);
           if (fr.endOfI && st.next) step += ` <span class="wv-ok">סוף האיטרציה ${ltr(`i = ${fr.i}`)} : ${ltr(`A[${fr.i}]`)} הוא המקסימום של ${ltr(`A[${fr.i}..${n - 1}]`)}, ולכן ${ltr(`A[0..${fr.i}]`)} ממוין בסדר יורד.</span>`;
           else if (fr.endOfI) step += ` <span class="wv-ok">סוף האיטרציה ${ltr(`i = ${fr.i}`)} : ${ltr(`A[0..${fr.i}]`)} ממוין בסדר עולה, והמקסימום של כל המערך (${ltr(Math.max(...fr.after))}) יושב במקום ${ltr(fr.i)}.</span>`;
-          else if (fr.j < fr.i) step += ` ‏${ltr("j < i")} : החלפה כאן מזיזה את ${ltr("A[i]")} אחורה לתוך החלק הממוין.`;
+          else if (fr.j < fr.i && fr.swapped) step += ` החלפה ב-${ltr("j < i")} מכניסה את ${ltr("A[i]")} לחלק הממוין, או מגלגלת איבר גדול מקום אחד ימינה.`;
         }
         $(".tr-step").innerHTML = step;
         // at the end, both inner loops side by side: the page's sorts up, the trap sorts down
         const other = loopTrace(st.A, !st.next).result, up = st.next ? other : tr.result, down = st.next ? tr.result : other;
         $(".tr-sum").innerHTML = st.k >= total && n ? `<span class="wv-ok">✓ ${ltr(st.next ? `n(n − 1)/2 = ${total}` : `n² = ${n * n}`)} השוואות, ${ltr(tr.swaps)} החלפות. המערך ממוין בסדר ${st.next ? "יורד" : "עולה"}.</span> ` +
-          `מ-${ltr("j = 0")} יוצא ${ltr(`[${up.join(", ")}]`)}, ומ-${ltr("j = i + 1")} יוצא ${ltr(`[${down.join(", ")}]`)} : אותו תנאי, כיוון הפוך.` : "";
+          `מ-${ltr("j = 0")} יוצא ${ltr(`[${up.join(", ")}]`)}, ומ-${ltr("j = i + 1")} יוצא ${ltr(`[${down.join(", ")}]`)} : אותו תנאי, כיוון הפוך.` +
+          (tagLetters(st.A).some(Boolean) && !st.next ? ` האותיות מבדילות בין ערכים שווים${tr.tags.some((t, x) => x && st.A[t] === st.A[tr.tags[x - 1]] && t < tr.tags[x - 1]) ? `${NB}: הסדר שלהם התהפך, ולכן המיון לא יציב.` : `, והפעם הסדר שלהם נשמר.`}` : "") : "";
       };
       const total = () => trace().frames.length;
       $(".tr-from").addEventListener("change", () => { stop(); st.next = $(".tr-from").value === "1"; st.k = 0; draw(); });
@@ -282,7 +291,7 @@
   dvqExplorers.register({
     views: { trace: traceView },
     help: {
-      trace: "הקוד של העמוד שורה אחרי שורה : ״הבא״ ו״הפעלה״ מריצים אותו עם הערכים והביטויים, הבורר מחליף בין הגרסאות, והשדות קובעים את הקלט. בלולאה הכפולה, ״הלולאה הפנימית״ מריצה גם את המלכודת j = i + 1.",
+      trace: "הקוד של העמוד שורה אחרי שורה : ״הבא״ ו״הפעלה״ מריצים אותו עם הערכים והביטויים, הבורר מחליף בין הגרסאות, והשדות קובעים את הקלט. בלולאה הכפולה, ״הלולאה הפנימית״ מריצה גם את המלכודת j = i + 1, וערך שמופיע יותר מפעם אחת מקבל אות לכל עותק (a, b ...), כדי לראות אם הסדר ביניהם נשמר.",
     },
     models: { SWAP_CODE, swapTrace, ROT_CODE, rotTrace, LOOP_CODE, LOOP_CODE_NEXT, loopTrace },
   });

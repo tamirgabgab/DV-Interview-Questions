@@ -23,7 +23,11 @@ added: 2026-10-16
 
 המשבצות ממוספרות מ-0 עד 8, שורה אחרי שורה :
 
+<!-- gen 0 -->
+
 <svg class="figure" viewBox="0 0 110 110" style="max-width:8rem" role="img" aria-label="מספור המשבצות 0 עד 8, שורה אחרי שורה"><g><text class="box-num" x="21.0" y="26.0" text-anchor="middle">0</text><text class="box-num" x="55.0" y="26.0" text-anchor="middle">1</text><text class="box-num" x="89.0" y="26.0" text-anchor="middle">2</text><text class="box-num" x="21.0" y="60.0" text-anchor="middle">3</text><text class="box-num" x="55.0" y="60.0" text-anchor="middle">4</text><text class="box-num" x="89.0" y="60.0" text-anchor="middle">5</text><text class="box-num" x="21.0" y="94.0" text-anchor="middle">6</text><text class="box-num" x="55.0" y="94.0" text-anchor="middle">7</text><text class="box-num" x="89.0" y="94.0" text-anchor="middle">8</text><line class="ttt-grid" x1="38" x2="38" y1="4" y2="106"/><line class="ttt-grid" x1="4" x2="106" y1="38" y2="38"/><line class="ttt-grid" x1="72" x2="72" y1="4" y2="106"/><line class="ttt-grid" x1="4" x2="106" y1="72" y2="72"/></g></svg>
+
+<!-- /gen -->
 
 ??? interviewer "מה המראיין בודק"
     - **רשימת תנאים מלאה :** האם מגיעים לכל התנאים שלוח סיום אמיתי מקיים, או עוצרים אחרי
@@ -223,21 +227,21 @@ added: 2026-10-16
         3. ‏`l < n_lines` מכבה את ארבעת הקווים האחרונים בלוח הרגיל. `n_lines` אינו `rand`, ולכן
            מבחינת ה-solver הוא קבוע, ואפשר לשנות אותו בין קריאות (סעיף ב) בלי לגעת
            ב-constraints.
-        4. ‏`with (int'(item))` הוא לא קישוט : `sum()` על מערך של `bit` מחזיר תוצאה ברוחב של
-           איבר אחד, כלומר ביט אחד, ושתי שלישיות היו נספרות כ-0. ההמרה ל-`int` נותנת ספירה
-           אמיתית.
+        4. ‏`with (int'(item))` הוא לא קישוט : לפי התקן, `sum()` על מערך של `bit` מחזיר תוצאה
+           ברוחב של איבר אחד, כלומר ביט אחד, ושתי שלישיות היו נספרות כ-0 (המלכודת השלישית).
+           ההמרה ל-`int` נותנת ספירה אמיתית בכל סימולטור.
         5. אימפליקציה ולא שוויון : `->` אומר "אם התוצאה היא X_WINS אז התנאים מתקיימים". שלושת
            התנאים זרים זה לזה, ולכן ביחד הם קובעים את התוצאה באופן חד-משמעי לכל לוח חוקי.
         6. תיקו דורש לוח **מלא** : `n_x + n_o == 9`. בלי התנאי הזה לוח ריק או לוח באמצע המשחק
            היה "תיקו" חוקי.
 
         **מה `solve result before board` משנה.** בלי השורה הזו, ה-solver בוחר **לוח** אחיד
-        מבין כל 958 הפתרונות. אז X מנצח בכ-65% מהמקרים (626 מתוך 958), ותיקו יוצא רק ב-1.7%
-        (16 מתוך 958). בבדיקות אימות זה אומר שהמקרה הנדיר כמעט לא נבדק. עם
+        מבין כל לוחות הסיום, ולכן כל תוצאה יוצאת לפי מספר הלוחות שלה : X מנצח בכ-65% מהמקרים,
+        ותיקו יוצא רק ב-1.7%. בבדיקות אימות זה אומר שהמקרה הנדיר כמעט לא נבדק. עם
         `solve result before board` ה-solver בוחר קודם תוצאה אפשרית, בהסתברות שווה, ורק אחר
         כך לוח אחיד מבין הלוחות עם התוצאה הזו, וכל תוצאה מקבלת שליש. חשוב להבין
         ש-`solve ... before` **לא משנה את מרחב הפתרונות**, רק את ההסתברות של כל פתרון : אותם
-        958 לוחות חוקיים, בהתפלגות אחרת.
+        לוחות חוקיים, בהתפלגות אחרת.
 
         שימוש :
 
@@ -294,22 +298,29 @@ added: 2026-10-16
 
     !!! note "איך נבדק הקוד"
         ‏`final_result` נבדקה מול סריקה מלאה של עץ המשחק, גם ב-Python וגם ב-SystemVerilog
-        ב-Verilator : היא מקבלת בדיוק את 958 לוחות הסיום (ו-1,314 בסעיף ב), ופוסלת את כל
-        השאר. המחלקה רצה **כמו שהיא כתובה כאן** ב-Verilator עם ה-solver ‏z3, בכל עדכון של
-        האתר : 150 הגרלות על הלוח הקלאסי ו-150 עם האלכסונים המעגליים, כל לוח עבר את
-        `final_result` עם התוצאה שהמחלקה בחרה, שלוש התוצאות הופיעו בלוח הקלאסי, ואף תיקו
-        לא הופיע בסעיף ב. בנוסף, `randomize() with { result == DRAW; }` נכשל עם 12 הקווים
-        ומצליח עם 8. (גרסת השחרור 5.052 של Verilator קורסת על המחלקה הזו; ב-CI רצה גרסת
-        פיתוח מאוחרת יותר, ובסימולטור מסחרי הקוד רץ כמו שהוא.)
+        ב-Verilator : היא מקבלת בדיוק את לוחות הסיום, בשתי קבוצות הקווים, ופוסלת את כל השאר.
+        המחלקה רצה **כמו שהיא כתובה כאן** ב-Verilator עם ה-solver ‏z3, בכל עדכון של האתר : 150
+        הגרלות על הלוח הקלאסי ו-150 עם האלכסונים המעגליים, כל לוח עבר את `final_result` עם
+        התוצאה שהמחלקה בחרה, שלוש התוצאות הופיעו בלוח הקלאסי, ואף תיקו לא הופיע בסעיף ב.
+        בנוסף, `randomize() with { result == DRAW; }` נכשל עם 12 הקווים ומצליח עם 8, וה-covergroup
+        משאלת ההמשך על כיסוי מגיע ל-100% על כל לוחות הסיום.
 
     #### למה זה נכון { .sol-proof }
 
+    <!-- gen 1 -->
+
     <svg class="figure" viewBox="0 0 696 136" role="img" aria-label="דוגמאות ללוחות סיום חוקיים ולא חוקיים"><g><rect class="cell-s2" x="6" y="6" width="34" height="34"/><path class="mark" d="M15,15 L31,31 M31,15 L15,31"/><rect class="cell-s2" x="40" y="6" width="34" height="34"/><path class="mark" d="M49,15 L65,31 M65,15 L49,31"/><rect class="cell-s2" x="74" y="6" width="34" height="34"/><path class="mark" d="M83,15 L99,31 M99,15 L83,31"/><circle class="mark" cx="23.0" cy="57.0" r="9.0"/><rect class="cell-s2" x="40" y="40" width="34" height="34"/><path class="mark" d="M49,49 L65,65 M65,49 L49,65"/><circle class="mark" cx="91.0" cy="57.0" r="9.0"/><circle class="mark" cx="23.0" cy="91.0" r="9.0"/><circle class="mark" cx="57.0" cy="91.0" r="9.0"/><rect class="cell-s2" x="74" y="74" width="34" height="34"/><path class="mark" d="M83,83 L99,99 M99,83 L83,99"/><line class="ttt-grid" x1="40" x2="40" y1="6" y2="108"/><line class="ttt-grid" x1="6" x2="108" y1="40" y2="40"/><line class="ttt-grid" x1="74" x2="74" y1="6" y2="108"/><line class="ttt-grid" x1="6" x2="108" y1="74" y2="74"/><text class="legend" x="57.0" y="128" text-anchor="middle" direction="rtl">X ניצח : 2 שלישיות</text></g><g><path class="mark" d="M157,15 L173,31 M173,15 L157,31"/><path class="mark" d="M191,15 L207,31 M207,15 L191,31"/><rect class="cell-s1" x="216" y="6" width="34" height="34"/><circle class="mark" cx="233.0" cy="23.0" r="9.0"/><path class="mark" d="M157,49 L173,65 M173,49 L157,65"/><rect class="cell-s1" x="182" y="40" width="34" height="34"/><circle class="mark" cx="199.0" cy="57.0" r="9.0"/><rect class="cell-s1" x="148" y="74" width="34" height="34"/><circle class="mark" cx="165.0" cy="91.0" r="9.0"/><line class="ttt-grid" x1="182" x2="182" y1="6" y2="108"/><line class="ttt-grid" x1="148" x2="250" y1="40" y2="40"/><line class="ttt-grid" x1="216" x2="216" y1="6" y2="108"/><line class="ttt-grid" x1="148" x2="250" y1="74" y2="74"/><text class="legend" x="199.0" y="128" text-anchor="middle" direction="rtl">O ניצח</text></g><g><path class="mark" d="M299,15 L315,31 M315,15 L299,31"/><circle class="mark" cx="341.0" cy="23.0" r="9.0"/><path class="mark" d="M367,15 L383,31 M383,15 L367,31"/><path class="mark" d="M299,49 L315,65 M315,49 L299,65"/><circle class="mark" cx="341.0" cy="57.0" r="9.0"/><circle class="mark" cx="375.0" cy="57.0" r="9.0"/><circle class="mark" cx="307.0" cy="91.0" r="9.0"/><path class="mark" d="M333,83 L349,99 M349,83 L333,99"/><path class="mark" d="M367,83 L383,99 M383,83 L367,99"/><line class="ttt-grid" x1="324" x2="324" y1="6" y2="108"/><line class="ttt-grid" x1="290" x2="392" y1="40" y2="40"/><line class="ttt-grid" x1="358" x2="358" y1="6" y2="108"/><line class="ttt-grid" x1="290" x2="392" y1="74" y2="74"/><text class="legend" x="341.0" y="128" text-anchor="middle" direction="rtl">תיקו</text></g><g><rect class="cell-s2" x="432" y="6" width="34" height="34"/><path class="mark" d="M441,15 L457,31 M457,15 L441,31"/><rect class="cell-s2" x="466" y="6" width="34" height="34"/><path class="mark" d="M475,15 L491,31 M491,15 L475,31"/><rect class="cell-s2" x="500" y="6" width="34" height="34"/><path class="mark" d="M509,15 L525,31 M525,15 L509,31"/><rect class="cell-s1" x="432" y="40" width="34" height="34"/><circle class="mark" cx="449.0" cy="57.0" r="9.0"/><rect class="cell-s1" x="466" y="40" width="34" height="34"/><circle class="mark" cx="483.0" cy="57.0" r="9.0"/><rect class="cell-s1" x="500" y="40" width="34" height="34"/><circle class="mark" cx="517.0" cy="57.0" r="9.0"/><line class="ttt-grid" x1="466" x2="466" y1="6" y2="108"/><line class="ttt-grid" x1="432" x2="534" y1="40" y2="40"/><line class="ttt-grid" x1="500" x2="500" y1="6" y2="108"/><line class="ttt-grid" x1="432" x2="534" y1="74" y2="74"/><text class="legend" x="483.0" y="128" text-anchor="middle" direction="rtl">✗ שניהם ניצחו</text></g><g><rect class="cell-s2" x="574" y="6" width="34" height="34"/><path class="mark" d="M583,15 L599,31 M599,15 L583,31"/><rect class="cell-s2" x="608" y="6" width="34" height="34"/><path class="mark" d="M617,15 L633,31 M633,15 L617,31"/><rect class="cell-s2" x="642" y="6" width="34" height="34"/><path class="mark" d="M651,15 L667,31 M667,15 L651,31"/><circle class="mark" cx="591.0" cy="57.0" r="9.0"/><circle class="mark" cx="625.0" cy="57.0" r="9.0"/><circle class="mark" cx="591.0" cy="91.0" r="9.0"/><line class="ttt-grid" x1="608" x2="608" y1="6" y2="108"/><line class="ttt-grid" x1="574" x2="676" y1="40" y2="40"/><line class="ttt-grid" x1="642" x2="642" y1="6" y2="108"/><line class="ttt-grid" x1="574" x2="676" y1="74" y2="74"/><text class="legend" x="625.0" y="128" text-anchor="middle" direction="rtl">✗ O שיחק אחרי הניצחון</text></g></svg>
 
-    **נסו בעצמכם.** לחצו על משבצות כדי לבנות לוח (ריק, X, O), והתנאים של הדף מכריעים חי
-    אם זה לוח סיום חוקי ולמה לא : ספירה שגויה, שני מנצחים, מהלך אחרי הניצחון או משחק שלא
-    נגמר. "לוח חוקי אקראי" מגריל כמו `randomize()` של הדף, והמתג מוסיף את האלכסונים
-    המעגליים של סעיף ב, שאיתם התיקו נעלם.
+    <!-- /gen -->
+
+    **נסו בעצמכם.** בלוח של התיבה X ניצח עם שתי שלישיות דרך משבצת 0. לחצו פעמיים על משבצת 8
+    (מ-X ל-O ואז לריק) : עכשיו \( n_X = n_O = 4 \), ול-X עדיין יש את השורה העליונה, כלומר O
+    שיחק אחרי שהמשחק נגמר. אחר כך בנו את לוח התיקו מהציור (השורות `XOX`, `XOO`, `OXX`)
+    והדליקו את "אלכסונים מסביב" : ל-X נוצר הקו \( \{2, 3, 7\} \) ול-O הקו \( \{1, 5, 6\} \), והתיקו הופך
+    ללוח עם שני מנצחים. לבסוף לחצו "אלף הגרלות" פעם עם `solve result before board` ופעם
+    בלעדיו : עם המתג כל תוצאה יוצאת בערך שליש, ובלעדיו X מנצח ב-65.3%, O ב-33.0% והתיקו
+    ב-1.7% בלבד. עם האלכסונים מסביב התיקו לא יוצא אף פעם. מעבר לציור, התיבה מראה איזה
+    תנאי נשבר בכל לוח שתבנו, ואת ההתפלגות של ההגרלה בפועל.
 
     <div class="explorer" data-kind="ttt" data-board="XXXOXOOOX"></div>
 
@@ -353,7 +364,11 @@ added: 2026-10-16
 מודבק לעצמו מימין לשמאל ומלמעלה למטה. למשל, המשבצות 0, 5, 7 הן שלישייה : מתחילים ב-0,
 יורדים שמאלה, יוצאים מהלוח וחוזרים מימין.
 
+<!-- gen 2 -->
+
 <svg class="figure" viewBox="0 0 476 136" role="img" aria-label="אלכסונים שממשיכים מהצד השני של הלוח"><g class="ttt-ghost"><rect class="cell-s2" x="6" y="6" width="34" height="34"/><path class="mark" d="M15,15 L31,31 M31,15 L15,31"/><rect class="cell-s2" x="74" y="40" width="34" height="34"/><path class="mark" d="M83,49 L99,65 M99,49 L83,65"/><rect class="cell-s2" x="40" y="74" width="34" height="34"/><path class="mark" d="M49,83 L65,99 M65,83 L49,99"/><line class="ttt-grid" x1="40" x2="40" y1="6" y2="108"/><line class="ttt-grid" x1="6" x2="108" y1="40" y2="40"/><line class="ttt-grid" x1="74" x2="74" y1="6" y2="108"/><line class="ttt-grid" x1="6" x2="108" y1="74" y2="74"/></g><g><rect class="cell-s2" x="112" y="6" width="34" height="34"/><path class="mark" d="M121,15 L137,31 M137,15 L121,31"/><rect class="cell-s2" x="180" y="40" width="34" height="34"/><path class="mark" d="M189,49 L205,65 M205,49 L189,65"/><rect class="cell-s2" x="146" y="74" width="34" height="34"/><path class="mark" d="M155,83 L171,99 M171,83 L155,99"/><line class="ttt-grid" x1="146" x2="146" y1="6" y2="108"/><line class="ttt-grid" x1="112" x2="214" y1="40" y2="40"/><line class="ttt-grid" x1="180" x2="180" y1="6" y2="108"/><line class="ttt-grid" x1="112" x2="214" y1="74" y2="74"/><text class="legend" x="163.0" y="128" text-anchor="middle" direction="rtl">המשבצות 0, 5, 7</text></g><polyline class="s2-line" points="129.0,23.0 91.0,57.0 57.0,91.0" fill="none" stroke-width="3"/><g class="ttt-ghost"><rect class="cell-s2" x="432" y="6" width="34" height="34"/><path class="mark" d="M441,15 L457,31 M457,15 L441,31"/><rect class="cell-s2" x="364" y="40" width="34" height="34"/><path class="mark" d="M373,49 L389,65 M389,49 L373,65"/><rect class="cell-s2" x="398" y="74" width="34" height="34"/><path class="mark" d="M407,83 L423,99 M423,83 L407,99"/><line class="ttt-grid" x1="398" x2="398" y1="6" y2="108"/><line class="ttt-grid" x1="364" x2="466" y1="40" y2="40"/><line class="ttt-grid" x1="432" x2="432" y1="6" y2="108"/><line class="ttt-grid" x1="364" x2="466" y1="74" y2="74"/></g><g><rect class="cell-s2" x="326" y="6" width="34" height="34"/><path class="mark" d="M335,15 L351,31 M351,15 L335,31"/><rect class="cell-s2" x="258" y="40" width="34" height="34"/><path class="mark" d="M267,49 L283,65 M283,49 L267,65"/><rect class="cell-s2" x="292" y="74" width="34" height="34"/><path class="mark" d="M301,83 L317,99 M317,83 L301,99"/><line class="ttt-grid" x1="292" x2="292" y1="6" y2="108"/><line class="ttt-grid" x1="258" x2="360" y1="40" y2="40"/><line class="ttt-grid" x1="326" x2="326" y1="6" y2="108"/><line class="ttt-grid" x1="258" x2="360" y1="74" y2="74"/><text class="legend" x="309.0" y="128" text-anchor="middle" direction="rtl">המשבצות 2, 3, 7</text></g><polyline class="s2-line" points="343.0,23.0 381.0,57.0 415.0,91.0" fill="none" stroke-width="3"/></svg>
+
+<!-- /gen -->
 
 עדכנו את התנאים ואת הקוד. מה מיוחד בלוח הזה?
 
@@ -373,9 +388,8 @@ added: 2026-10-16
 
     #### הרעיון { .sol-idea }
 
-    ארבעת האלכסונים החדשים משלימים 12 קווים בארבעה כיוונים, וכל כיוון מחלק את הלוח לשלושה
-    קווים מקבילים. כל זוג משבצות נמצא על קו אחד בדיוק (מערכת שטיינר \( S(2,3,9) \)), וספירת זוגות מראה שאי אפשר
-    לשים 5 סימנים בלי להשלים קו. לכן ל-X תמיד יש שלישייה בלוח מלא, ותיקו בלתי אפשרי.
+    עם 12 הקווים כל זוג משבצות נמצא על קו אחד בדיוק, וספירה של הזוגות מראה שכל 5 משבצות
+    מכילות קו שלם, ולכן בלוח מלא ל-X תמיד יש שלישייה.
 
     #### השלבים { .sol-steps }
 
@@ -383,9 +397,11 @@ added: 2026-10-16
 
     1. **מוסיפים את 4 הקווים :** \( \{1,5,6\}, \{2,3,7\}, \{0,5,7\}, \{1,3,8\} \). יחד עם השורות,
        הטורים ושני האלכסונים יש 12 קווים.
-    2. **בודקים שהטיעונים נשארים :** שני קווים באותו כיוון זרים, ולכן שתי שלישיות מקבילות של
-       X דורשות 6 X. לכן ל-X יש עד 2 שלישיות שנחתכות, ול-O יש עד אחת. התנאים מסעיף א
-       נשארים כמו שהם.
+    2. **בודקים שהטיעונים נשארים :** גם כאן שני קווים נפגשים לכל היותר במשבצת אחת. שתי
+       שלישיות מקבילות של X דורשות 6 X, ושלוש שלישיות מכסות לפחות 6 משבצות, גם כשכל שתיים
+       מהן נחתכות. ל-X יש לכל היותר 5, ולכן לכל היותר 2 שלישיות, והן נחתכות.
+       ל-O יש לכל היותר 4 סימנים, ושתי שלישיות מכסות לפחות 5 משבצות, ולכן יש לו לכל היותר
+       אחת. התנאים מסעיף א נשארים כמו שהם.
     3. **משנים רק את קבוצת הקווים בקוד :** ב-SystemVerilog `n_lines = 12`, וב-Python
        `WRAP_LINES`.
     4. **שמים לב שהתיקו נעלם :** ה-solver לא מוצא אף פתרון עם `result == DRAW`, וההוכחה
@@ -426,17 +442,17 @@ added: 2026-10-16
     **שנים-עשר הקווים.** לשורות ולטורים מצטרפים 4 אלכסונים חדשים, ובסך הכול יש **12 קווים** בארבעה
     **כיוונים**. כל כיוון מחלק את 9 המשבצות ל-3 קווים מקבילים :
 
+    <!-- gen 3 -->
+
     <span class="viz-legend"><span><i class="s1"></i>קו ראשון</span><span><i class="s2"></i>קו שני</span><span><i class="s3"></i>קו שלישי</span></span>
 
     <svg class="figure" viewBox="0 0 528 136" role="img" aria-label="ארבעת הכיוונים : כל כיוון מחלק את הלוח לשלושה קווים מקבילים"><g><rect class="cell-s1" x="6" y="6" width="34" height="34"/><text class="box-num" x="23.0" y="28.0" text-anchor="middle">0</text><rect class="cell-s1" x="40" y="6" width="34" height="34"/><text class="box-num" x="57.0" y="28.0" text-anchor="middle">1</text><rect class="cell-s1" x="74" y="6" width="34" height="34"/><text class="box-num" x="91.0" y="28.0" text-anchor="middle">2</text><rect class="cell-s2" x="6" y="40" width="34" height="34"/><text class="box-num" x="23.0" y="62.0" text-anchor="middle">3</text><rect class="cell-s2" x="40" y="40" width="34" height="34"/><text class="box-num" x="57.0" y="62.0" text-anchor="middle">4</text><rect class="cell-s2" x="74" y="40" width="34" height="34"/><text class="box-num" x="91.0" y="62.0" text-anchor="middle">5</text><rect class="cell-s3" x="6" y="74" width="34" height="34"/><text class="box-num" x="23.0" y="96.0" text-anchor="middle">6</text><rect class="cell-s3" x="40" y="74" width="34" height="34"/><text class="box-num" x="57.0" y="96.0" text-anchor="middle">7</text><rect class="cell-s3" x="74" y="74" width="34" height="34"/><text class="box-num" x="91.0" y="96.0" text-anchor="middle">8</text><line class="ttt-grid" x1="40" x2="40" y1="6" y2="108"/><line class="ttt-grid" x1="6" x2="108" y1="40" y2="40"/><line class="ttt-grid" x1="74" x2="74" y1="6" y2="108"/><line class="ttt-grid" x1="6" x2="108" y1="74" y2="74"/><text class="legend" x="57.0" y="128" text-anchor="middle" direction="rtl">שורות</text></g><g><rect class="cell-s1" x="144" y="6" width="34" height="34"/><text class="box-num" x="161.0" y="28.0" text-anchor="middle">0</text><rect class="cell-s2" x="178" y="6" width="34" height="34"/><text class="box-num" x="195.0" y="28.0" text-anchor="middle">1</text><rect class="cell-s3" x="212" y="6" width="34" height="34"/><text class="box-num" x="229.0" y="28.0" text-anchor="middle">2</text><rect class="cell-s1" x="144" y="40" width="34" height="34"/><text class="box-num" x="161.0" y="62.0" text-anchor="middle">3</text><rect class="cell-s2" x="178" y="40" width="34" height="34"/><text class="box-num" x="195.0" y="62.0" text-anchor="middle">4</text><rect class="cell-s3" x="212" y="40" width="34" height="34"/><text class="box-num" x="229.0" y="62.0" text-anchor="middle">5</text><rect class="cell-s1" x="144" y="74" width="34" height="34"/><text class="box-num" x="161.0" y="96.0" text-anchor="middle">6</text><rect class="cell-s2" x="178" y="74" width="34" height="34"/><text class="box-num" x="195.0" y="96.0" text-anchor="middle">7</text><rect class="cell-s3" x="212" y="74" width="34" height="34"/><text class="box-num" x="229.0" y="96.0" text-anchor="middle">8</text><line class="ttt-grid" x1="178" x2="178" y1="6" y2="108"/><line class="ttt-grid" x1="144" x2="246" y1="40" y2="40"/><line class="ttt-grid" x1="212" x2="212" y1="6" y2="108"/><line class="ttt-grid" x1="144" x2="246" y1="74" y2="74"/><text class="legend" x="195.0" y="128" text-anchor="middle" direction="rtl">טורים</text></g><g><rect class="cell-s1" x="282" y="6" width="34" height="34"/><text class="box-num" x="299.0" y="28.0" text-anchor="middle">0</text><rect class="cell-s2" x="316" y="6" width="34" height="34"/><text class="box-num" x="333.0" y="28.0" text-anchor="middle">1</text><rect class="cell-s3" x="350" y="6" width="34" height="34"/><text class="box-num" x="367.0" y="28.0" text-anchor="middle">2</text><rect class="cell-s3" x="282" y="40" width="34" height="34"/><text class="box-num" x="299.0" y="62.0" text-anchor="middle">3</text><rect class="cell-s1" x="316" y="40" width="34" height="34"/><text class="box-num" x="333.0" y="62.0" text-anchor="middle">4</text><rect class="cell-s2" x="350" y="40" width="34" height="34"/><text class="box-num" x="367.0" y="62.0" text-anchor="middle">5</text><rect class="cell-s2" x="282" y="74" width="34" height="34"/><text class="box-num" x="299.0" y="96.0" text-anchor="middle">6</text><rect class="cell-s3" x="316" y="74" width="34" height="34"/><text class="box-num" x="333.0" y="96.0" text-anchor="middle">7</text><rect class="cell-s1" x="350" y="74" width="34" height="34"/><text class="box-num" x="367.0" y="96.0" text-anchor="middle">8</text><line class="ttt-grid" x1="316" x2="316" y1="6" y2="108"/><line class="ttt-grid" x1="282" x2="384" y1="40" y2="40"/><line class="ttt-grid" x1="350" x2="350" y1="6" y2="108"/><line class="ttt-grid" x1="282" x2="384" y1="74" y2="74"/><text class="legend" x="333.0" y="128" text-anchor="middle" direction="rtl">אלכסונים ↘</text></g><g><rect class="cell-s1" x="420" y="6" width="34" height="34"/><text class="box-num" x="437.0" y="28.0" text-anchor="middle">0</text><rect class="cell-s2" x="454" y="6" width="34" height="34"/><text class="box-num" x="471.0" y="28.0" text-anchor="middle">1</text><rect class="cell-s3" x="488" y="6" width="34" height="34"/><text class="box-num" x="505.0" y="28.0" text-anchor="middle">2</text><rect class="cell-s2" x="420" y="40" width="34" height="34"/><text class="box-num" x="437.0" y="62.0" text-anchor="middle">3</text><rect class="cell-s3" x="454" y="40" width="34" height="34"/><text class="box-num" x="471.0" y="62.0" text-anchor="middle">4</text><rect class="cell-s1" x="488" y="40" width="34" height="34"/><text class="box-num" x="505.0" y="62.0" text-anchor="middle">5</text><rect class="cell-s3" x="420" y="74" width="34" height="34"/><text class="box-num" x="437.0" y="96.0" text-anchor="middle">6</text><rect class="cell-s1" x="454" y="74" width="34" height="34"/><text class="box-num" x="471.0" y="96.0" text-anchor="middle">7</text><rect class="cell-s2" x="488" y="74" width="34" height="34"/><text class="box-num" x="505.0" y="96.0" text-anchor="middle">8</text><line class="ttt-grid" x1="454" x2="454" y1="6" y2="108"/><line class="ttt-grid" x1="420" x2="522" y1="40" y2="40"/><line class="ttt-grid" x1="488" x2="488" y1="6" y2="108"/><line class="ttt-grid" x1="420" x2="522" y1="74" y2="74"/><text class="legend" x="471.0" y="128" text-anchor="middle" direction="rtl">אלכסונים ↙</text></g></svg>
 
+    <!-- /gen -->
+
     בדקו שני זוגות משבצות שרירותיים : תמיד יש **בדיוק קו אחד** שעובר דרך שתיהן. מבנה כזה
     נקרא **מערכת שטיינר** \( S(2, 3, 9) \) : 9 נקודות, קווים של 3, וכל זוג נקודות נמצא על קו
     אחד בדיוק. זה גם המישור האפיני \( AG(2, 3) \).
-
-    **התנאים לא משתנים**, רק קבוצת הקווים גדלה מ-8 ל-12. גם הטיעונים נשארים : שני קווים
-    באותו כיוון זרים, ולכן שתי שלישיות מקבילות של X דורשות 6 X. לכן ל-X יש עד 2 שלישיות
-    שנחתכות, ול-O יש עד אחת.
 
     **הטריק : אין תיקו.** עם 12 הקווים **אף משחק לא נגמר בתיקו**. תיקו דורש לוח מלא, כלומר
     5 X בלי אף שלישייה. נראה שזה בלתי אפשרי : **כל 5 משבצות מכילות קו שלם**.
@@ -459,19 +475,20 @@ added: 2026-10-16
 
     </div>
 
-    **הערה על הוכחה דרך זוגיות.** טיעון כמו "כל קו נוגע ב-\( S \) ב-0 או ב-2 משבצות, ולכן
-    הסכום על 3 שורות זוגי" לא עובד : קו יכול לגעת ב-\( S \) גם במשבצת **אחת**, והחלוקה 2, 2, 1
-    בדיוק מראה את זה. ההוכחה הנכונה סופרת **זוגות** ולא משבצות.
-
     **אפשר לראות את זה גם בציור.** ל-4 משבצות כבר אפשר להגיע בלי קו, למשל ריבוע 2 על 2 בפינה.
     כל משבצת חמישית שמוסיפים משלימה קו :
 
+    <!-- gen 4 -->
+
     <svg class="figure" viewBox="0 0 610 136" role="img" aria-label="ריבוע של 4 משבצות בלי קו, וכל משבצת חמישית משלימה קו"><g><rect class="cell-s2" x="6" y="6" width="34" height="34"/><path class="mark" d="M15,15 L31,31 M31,15 L15,31"/><rect class="cell-s2" x="40" y="6" width="34" height="34"/><path class="mark" d="M49,15 L65,31 M65,15 L49,31"/><rect class="cell-s2" x="74" y="6" width="34" height="34"/><path class="mark mark-new" d="M83,15 L99,31 M99,15 L83,31"/><path class="mark" d="M15,49 L31,65 M31,49 L15,65"/><path class="mark" d="M49,49 L65,65 M65,49 L49,65"/><line class="ttt-grid" x1="40" x2="40" y1="6" y2="108"/><line class="ttt-grid" x1="6" x2="108" y1="40" y2="40"/><line class="ttt-grid" x1="74" x2="74" y1="6" y2="108"/><line class="ttt-grid" x1="6" x2="108" y1="74" y2="74"/><text class="legend" x="57.0" y="128" text-anchor="middle" direction="rtl">משבצת 2</text></g><g><path class="mark" d="M139,15 L155,31 M155,15 L139,31"/><path class="mark" d="M173,15 L189,31 M189,15 L173,31"/><rect class="cell-s2" x="130" y="40" width="34" height="34"/><path class="mark" d="M139,49 L155,65 M155,49 L139,65"/><rect class="cell-s2" x="164" y="40" width="34" height="34"/><path class="mark" d="M173,49 L189,65 M189,49 L173,65"/><rect class="cell-s2" x="198" y="40" width="34" height="34"/><path class="mark mark-new" d="M207,49 L223,65 M223,49 L207,65"/><line class="ttt-grid" x1="164" x2="164" y1="6" y2="108"/><line class="ttt-grid" x1="130" x2="232" y1="40" y2="40"/><line class="ttt-grid" x1="198" x2="198" y1="6" y2="108"/><line class="ttt-grid" x1="130" x2="232" y1="74" y2="74"/><text class="legend" x="181.0" y="128" text-anchor="middle" direction="rtl">משבצת 5</text></g><g><rect class="cell-s2" x="254" y="6" width="34" height="34"/><path class="mark" d="M263,15 L279,31 M279,15 L263,31"/><path class="mark" d="M297,15 L313,31 M313,15 L297,31"/><rect class="cell-s2" x="254" y="40" width="34" height="34"/><path class="mark" d="M263,49 L279,65 M279,49 L263,65"/><path class="mark" d="M297,49 L313,65 M313,49 L297,65"/><rect class="cell-s2" x="254" y="74" width="34" height="34"/><path class="mark mark-new" d="M263,83 L279,99 M279,83 L263,99"/><line class="ttt-grid" x1="288" x2="288" y1="6" y2="108"/><line class="ttt-grid" x1="254" x2="356" y1="40" y2="40"/><line class="ttt-grid" x1="322" x2="322" y1="6" y2="108"/><line class="ttt-grid" x1="254" x2="356" y1="74" y2="74"/><text class="legend" x="305.0" y="128" text-anchor="middle" direction="rtl">משבצת 6</text></g><g><path class="mark" d="M387,15 L403,31 M403,15 L387,31"/><rect class="cell-s2" x="412" y="6" width="34" height="34"/><path class="mark" d="M421,15 L437,31 M437,15 L421,31"/><path class="mark" d="M387,49 L403,65 M403,49 L387,65"/><rect class="cell-s2" x="412" y="40" width="34" height="34"/><path class="mark" d="M421,49 L437,65 M437,49 L421,65"/><rect class="cell-s2" x="412" y="74" width="34" height="34"/><path class="mark mark-new" d="M421,83 L437,99 M437,83 L421,99"/><line class="ttt-grid" x1="412" x2="412" y1="6" y2="108"/><line class="ttt-grid" x1="378" x2="480" y1="40" y2="40"/><line class="ttt-grid" x1="446" x2="446" y1="6" y2="108"/><line class="ttt-grid" x1="378" x2="480" y1="74" y2="74"/><text class="legend" x="429.0" y="128" text-anchor="middle" direction="rtl">משבצת 7</text></g><g><rect class="cell-s2" x="502" y="6" width="34" height="34"/><path class="mark" d="M511,15 L527,31 M527,15 L511,31"/><rect class="cell-s2" x="536" y="6" width="34" height="34"/><path class="mark" d="M545,15 L561,31 M561,15 L545,31"/><rect class="cell-s2" x="502" y="40" width="34" height="34"/><path class="mark" d="M511,49 L527,65 M527,49 L511,65"/><rect class="cell-s2" x="536" y="40" width="34" height="34"/><path class="mark" d="M545,49 L561,65 M561,49 L545,65"/><rect class="cell-s2" x="570" y="74" width="34" height="34"/><path class="mark mark-new" d="M579,83 L595,99 M595,83 L579,99"/><line class="ttt-grid" x1="536" x2="536" y1="6" y2="108"/><line class="ttt-grid" x1="502" x2="604" y1="40" y2="40"/><line class="ttt-grid" x1="570" x2="570" y1="6" y2="108"/><line class="ttt-grid" x1="502" x2="604" y1="74" y2="74"/><text class="legend" x="553.0" y="128" text-anchor="middle" direction="rtl">משבצת 8</text></g></svg>
 
-    **נסו בעצמכם.** בתיבה הבאה בוחרים עד חמש משבצות, והטבלה סופרת לכל כיוון כמה מהן על כל
-    אחד משלושת הקווים, וכמה זוגות נמצאים על קו. סכום הזוגות תמיד \( \binom{m}{2} \), כמו
-    בשלב 3. הדוגמה היא הריבוע מהציור : ארבע משבצות בלי קו, והכוכבים מראים שכל משבצת ריקה
-    משלימה קו. נסו לבחור חמש בלי קו, ותראו שזה לא מצליח.
+    <!-- /gen -->
+
+    **נסו בעצמכם.** הקלידו `0,2,3,7,8`, ה-X של לוח התיקו מסעיף א : בשורות ובטורים החלוקה
+    2-1-2 בלי קו, אבל בכיוון ↘ החלוקה 2-0-3, והקו \( \{2, 3, 7\} \) שלם. סכום הזוגות
+    \( 2 + 2 + 4 + 2 = 10 \), כמו בשלב 3. אחר כך בחרו `0,1,3,5`, ארבע
+    משבצות שאינן ריבוע : גם בהן אין קו, וגם כאן כוכב מסמן כל אחת מחמש המשבצות הריקות, כי כל
+    אחת מהן משלימה קו. מעבר לציור, התיבה סופרת את הזוגות לכל בחירה, לא רק לריבוע.
 
     <div class="explorer" data-kind="tttfive" data-cells="0 1 3 4"></div>
 
@@ -486,18 +503,25 @@ added: 2026-10-16
 
 ??? trap "מלכודת : O המשיך לשחק אחרי הניצחון"
     הרבה מועמדים כותבים "X ניצח" כ-"ל-X יש שלישייה ול-O אין", ושוכחים את \( n_X = n_O + 1 \).
-    אז ה-solver מייצר לוחות שבהם X השלים שלישייה ו-O "המשיך לשחק" אחרי שהפסיד. הכלל : מי
-    שניצח הוא זה ששיחק אחרון, וזה מתבטא בספירה.
+    אז ה-solver מייצר לוחות שבהם X השלים שלישייה ו-O "המשיך לשחק" אחרי שהפסיד : 942 לוחות
+    "X ניצח" במקום 626, ו-316 מהם, שליש, לא יכולים לקרות במשחק. הכלל : מי שניצח הוא זה
+    ששיחק אחרון, וזה מתבטא בספירה.
 
 ??? trap "מלכודת : לדרוש שלישייה אחת בלבד"
     הדרישה "למנצח בדיוק שלישייה אחת" פוסלת לוחות חוקיים שבהם X סוגר שתי שלישיות במהלך
     אחד (משבצת משותפת לשורה ולאלכסון). constraint חזק מדי הוא באג באימות : הוא מסתיר מצבים
-    אמיתיים מהבדיקות, ואף בדיקה לא תתריע עליו כי כל לוח שכן מתקבל הוא חוקי.
+    אמיתיים מהבדיקות, ואף בדיקה של תקינות לא תתריע עליו, כי כל לוח שכן מתקבל הוא חוקי. רק
+    כיסוי מגלה אותו : bin של שתי שלישיות שנשאר ריק (שאלת ההמשך על כיסוי).
 
 ??? trap "מלכודת : sum על מערך של ביטים"
-    ‏`x_line.sum()` בלי `with (int'(item))` מחזיר תוצאה ברוחב של איבר אחד, כלומר ביט אחד.
-    שתי שלישיות נספרות כ-0, ולוח שבו X סגר שתי שלישיות במהלך אחד לא יכול להתקבל כניצחון
-    של X, בדיוק הלוחות המעניינים. כשסוכמים ביטים ב-SystemVerilog תמיד מרחיבים במפורש.
+    לפי התקן, `x_line.sum()` בלי `with (int'(item))` מחזיר תוצאה ברוחב של איבר אחד, כלומר ביט
+    אחד, ושתי שלישיות נספרות כ-0. ויותר גרוע : כל 22 הלוחות שבהם X סגר שתי שלישיות מלאים (חמישה X
+    וארבעה O), ועם ספירה של 0 הם עונים על תנאי התיקו. בלוח הרגיל יוצאים 38 "תיקו" במקום 16,
+    ועם 12 הקווים של סעיף ב יש 54 תיקו מזויפים : `randomize() with { result == DRAW; }` מצליח,
+    והמשפט "אין תיקו" נראה מופרך. ב-Verilator הבאג לא נראה : הוא מחזיר 2 על `sum()` של שני
+    ביטים דולקים (בדקנו בגרסה 5.053), כלומר מרחיב לרוחב ההקשר, ולכן הבדיקות של הדף, שרצות
+    בו, לא יכולות להראות את המלכודת הזו. בסימולטור שעוקב אחרי התקן היא מופיעה, ולכן כשסוכמים
+    ביטים כותבים את ה-`with` במפורש.
 
 ??? followup "שאלות המשך"
     - **כל לוח באמצע משחק :** איך משנים את ה-constraints כדי לקבל גם לוחות שבהם המשחק עוד
@@ -521,6 +545,35 @@ added: 2026-10-16
       להיות למנצח?
 
         ??? fu-answer "תשובה"
-            משתנים רק הקווים (10 קווים של 4) ותנאי התיקו (\( n_X + n_O = 16 \)); הספירה נשארת.
-            למנצח יש לכל היותר **2** רביעיות : כולן עוברות במשבצת של המהלך האחרון, דרך משבצת עוברים
-            לכל היותר 3 קווים, ושלושה כאלה דורשים 10 סימנים, יותר מ-8 שיש לשחקן.
+            משתנים הקווים (10 רביעיות) ותנאי התיקו (\( n_X + n_O = 16 \)), וצריך **תנאי חדש** : כל
+            הרביעיות של המנצח עוברות במשבצת אחת, זו של המהלך האחרון. ב-3 על 3 זה נבע מהספירה, ב-4
+            על 4 לא : שני האלכסונים זרים, ולוח עם X על שניהם, שמונה X ושבעה O, עובר את ארבעת התנאים אף
+            שאף מהלך לא משלים את שניהם. ב-constraint : `!(x_line[D1] && x_line[D2])`, וכך גם ל-O.
+            עם התנאי למנצח יש לכל היותר **2** רביעיות : דרך משבצת עוברים לכל היותר 3 קווים, ושלושה
+            כאלה דורשים 10 סימנים, יותר מ-8 שיש לשחקן.
+
+    - **כיסוי :** המלכודת "שלישייה אחת בלבד" לא מפילה אף בדיקה של תקינות. איך מגלים
+      constraints חזקים מדי, או חלשים מדי?
+
+        ??? fu-answer "תשובה"
+            ב-covergroup שנדגם אחרי כל `randomize()` : bin נפרד לשתי שלישיות של X, ו-cross של
+            התוצאה עם מספר המהלכים, שבו הצירופים שלא קורים במשחק הם `illegal_bins`. constraint
+            חזק מדי משאיר את ה-bin ‏`two` ריק, ו-constraint חלש מדי (המלכודת הראשונה) פוגע ב-bin
+            לא חוקי, והסימולטור מדווח על שגיאה. 22 הלוחות עם שתי שלישיות הם 3.5% מניצחונות X,
+            ולכן עם `solve result before board` ה-bin מתמלא בערך פעם ב-85 הגרלות.
+
+            ```systemverilog title="covergroup ttt_cov"
+            covergroup ttt_cov with function sample(result_e result, int x_lines, int n_moves);
+              cp_result: coverpoint result;
+              cp_x_lines: coverpoint x_lines iff (result == X_WINS) {
+                bins one = {1};
+                bins two = {2};                  // empty when the constraints are too strong
+              }
+              cp_moves: coverpoint n_moves { bins m[] = {[5:9]}; }
+              x_result_moves: cross cp_result, cp_moves {
+                illegal_bins x_even = binsof(cp_result) intersect {X_WINS} && binsof(cp_moves) intersect {6, 8};
+                illegal_bins o_odd  = binsof(cp_result) intersect {O_WINS} && binsof(cp_moves) intersect {5, 7, 9};
+                illegal_bins draw   = binsof(cp_result) intersect {DRAW}   && binsof(cp_moves) intersect {[5:8]};
+              }
+            endgroup
+            ```

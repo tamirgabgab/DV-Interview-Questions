@@ -4,7 +4,11 @@
 // release crashes on this class (segmentation fault in its randomization runtime on the
 // rand enum array). The published final_result is checked against a full game tree, and
 // every randomized board must be a legal end position with the result the class says.
+// The coverage follow-up's covergroup: every legal final board sampled reaches 100 %, the
+// boards with at most one line of X leave the "two" bin empty (87.5 %), and the class's
+// draws never hit an illegal cross bin (Verilator stops the run on one).
 //@page class ttt_end;
+//@page covergroup ttt_cov
 
 module tb;
   //@page function automatic bit final_result
@@ -16,6 +20,14 @@ module tb;
       board[i] = cell_e'(code % 3);
       code /= 3;
     end
+  endfunction
+
+  function automatic int count_lines(board_t board, cell_e p, int n_lines);
+    int k = 0;
+    for (int l = 0; l < n_lines; l++)
+      k += (board[ttt_end::LINES[l][0]] == p && board[ttt_end::LINES[l][1]] == p &&
+            board[ttt_end::LINES[l][2]] == p);
+    return k;
   endfunction
 
   function automatic bit has_line(board_t board, cell_e p, int n_lines);
@@ -58,7 +70,8 @@ module tb;
     int      seen[3];
     int      expect_total[2] = '{958, 1314};
     int      expect_draw[2]  = '{16, 0};
-    int      n, legal_count;
+    int      n, legal_count, xl, moves;
+    ttt_cov  cov_all = new(), cov_one = new(), cov_draws = new();
 
     // 1. The page's final_result against the game tree, classic board and part b
     for (int k = 0; k < 2; k++) begin
@@ -72,10 +85,21 @@ module tb;
         if (final_result(board, n, r)) begin
           legal_count++;
           seen[r]++;
+          if (k == 0) begin                              // the covergroup on the classic board
+            xl = count_lines(board, X, 8);
+            moves = 0;
+            foreach (board[i]) moves += (board[i] != EMPTY);
+            cov_all.sample(r, xl, moves);
+            if (xl <= 1) cov_one.sample(r, xl, moves);   // as if "exactly one line" were required
+          end
           if (!ends.exists(code) || ends[code] != r) errors++;
         end else if (ends.exists(code)) errors++;
       end
       if (legal_count != expect_total[k] || seen[DRAW] != expect_draw[k]) errors++;
+    end
+    if (cov_all.get_inst_coverage() < 99.999) begin errors++; $display("coverage %f", cov_all.get_inst_coverage()); end
+    if (cov_one.get_inst_coverage() > 87.501 || cov_one.get_inst_coverage() < 87.499) begin
+      errors++; $display("coverage without two lines %f", cov_one.get_inst_coverage());
     end
 
     // 2. The class as published: every board legal for its result, every feasible result seen
@@ -85,6 +109,7 @@ module tb;
       repeat (150) begin
         if (!t.randomize()) errors++;
         seen[t.result]++;
+        if (k == 0) cov_draws.sample(t.result, t.x_lines, t.n_x + t.n_o);
         if (!final_result(t.board, t.n_lines, r) || r != t.result) errors++;
       end
       if (seen[X_WINS] == 0 || seen[O_WINS] == 0) errors++;
