@@ -110,6 +110,7 @@
       const timeIn = $(".ex-time"), day = $(".ex-day"), summary = $(".ex-summary");
       ["h", "m", "s"].forEach((k) => { hands[k] = $(`.hand-${k}`); });
       let t = Number(box.dataset.t || 0), shown = -1, running = false, last = 0;
+      let wrapped = false;                             // the triple jump went from after 12:00 back to 00:00
       const mask = () => {
         const on = [...box.querySelectorAll(".ex-pair")].filter((c) => c.checked).map((c) => Number(c.value));
         return on.length ? on : [0, 1, 2];
@@ -204,9 +205,16 @@
         let text;
         const triple = sec % CLOCK_HALF === 0;               // all three meet only at 00:00 and 12:00
         if (triple) {
-          text = `בשנייה הזו שלושת המחוגים נפגשים, ב-${ltr(clockLabel(meets[0][1]))}.`;
+          text = `בשנייה הזו שלושת המחוגים נפגשים, ב-${ltr(clockLabel(meets[0][1]))}.` +
+            (wrapped && sec === 0 ? " אחרי 12:00 אין עוד פגישה של שלושה ביממה, ולכן הקפיצה חזרה ל-00:00." : "");
         } else if (meets.length) {
           text = "בשנייה הזו : " + meets.map(([n, v]) => `${PAIR_NAME[n]} נפגשים ב-${ltr(clockLabel(v))}`).join(", ") + ".";
+          // two pairs in one second (3:16:16): all three hands turn orange, but these are two
+          // separate moments, never a meeting of three (only 00:00 and 12:00 are)
+          if (meets.length > 1) {
+            const gap = Math.abs(meets[1][1] - meets[0][1]);
+            text += ` אלה שתי פגישות נפרדות, ${ltr(String(Number(gap.toFixed(3))))} שניות זו מזו, ולא פגישה של שלושה.`;
+          }
         } else {
           const nx = clockNext(sec + 1 - 1e-9, mask());
           text = "בשנייה הזו אין פגישה." + (nx === null ? " אין עוד פגישות עד סוף היממה."
@@ -214,7 +222,7 @@
         }
         summary.innerHTML = text;                    // built from numbers and fixed names only
       };
-      const setTime = (v) => { t = Math.min(Math.max(v, 0), LAST); render(); };
+      const setTime = (v, wrap = false) => { const was = wrapped; wrapped = wrap; t = Math.min(Math.max(v, 0), LAST); render(wrap !== was); };
       const stop = () => {
         running = false;
         play.textContent = "הפעלה";
@@ -224,6 +232,7 @@
         if (!running) return;
         t = Math.min(t + ((now - last) / 1000) * Number(speed.value), LAST);
         last = now;
+        wrapped = false;
         render();
         if (t >= LAST) stop(); else requestAnimationFrame(tick);
       };
@@ -238,7 +247,7 @@
       });
       $(".ex-next").addEventListener("click", () => { stop(); const v = clockNext(t, mask()); if (v !== null) setTime(v); });
       $(".ex-prev").addEventListener("click", () => { stop(); const v = clockPrev(t, mask()); if (v !== null) setTime(v); });
-      $(".ex-triple").addEventListener("click", () => { stop(); setTime(t < CLOCK_HALF - 1e-9 ? CLOCK_HALF : 0); });
+      $(".ex-triple").addEventListener("click", () => { stop(); const wrap = t >= CLOCK_HALF - 1e-9; setTime(wrap ? 0 : CLOCK_HALF, wrap); });
       box.querySelectorAll(".ex-pair").forEach((c) => c.addEventListener("change", () => render(true)));
       $(".ex-reset").addEventListener("click", () => { stop(); setTime(0); });
       day.addEventListener("input", () => { stop(); setTime(Number(day.value)); });

@@ -216,3 +216,42 @@ def test_explorer_gap_line():
     table = [(r["closed"], r["open"], r["half"]) for r in got[:3]]
     assert table == [(709, 707, 708), (720, 718, 719), (12, 10, 11)]
     assert [r["half"] for r in got[3:6]] == [1416, 1438, 22]
+
+
+def test_two_clocks_follow_up():
+    """The hardware follow-up: clocks of 10 ns and 12 ns, rising edges at 10a and 12b. They
+    align every lcm = 60 ns: 11 aligned edges in [0, 600], 10 in [0, 600); two edges that are
+    not aligned are at least gcd = 2 ns apart (and 2 ns is reached). The hands' meeting gap
+    t_i t_j / (t_j - t_i) is another quantity: 61.02 s for seconds and minutes, lcm 3,600 s."""
+    e10, e12 = {10 * a for a in range(61)}, {12 * b for b in range(51)}
+    aligned = sorted(e10 & e12)
+    assert aligned == list(range(0, 601, 60)) and math.lcm(10, 12) == 60
+    assert len([t for t in aligned if t <= 600]) == 11 and len([t for t in aligned if t < 600]) == 10
+    gaps = {abs(a - b) for a in e10 for b in e12 if a != b}
+    assert min(gaps) == 2 == math.gcd(10, 12) and all(g % 2 == 0 for g in gaps)
+    assert q0029.dec(q0029.gap("s", "m")) == "61.02" and math.lcm(60, 3600) == 3600
+
+
+def test_box_tasks():
+    """The tasks of the boxes' paragraphs: 0:59:00 to 1:00:00 with the second-minute pair only,
+    3:16:16 (two meetings 3600 / 42421 s apart, the counters 194 + 197 + 3 - 2 = 392),
+    12:00:00 (709, 720, 12, 1,437) and 23:59:59 (2,872); the gap line at 3T, 2.75T and 12 h."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"const m = {explorer_require()};"
+                    "const b = m.gapLine(3600, 43200, 1), q = (n) => m.gapLine(3600, 43200, n * b.Tn, 4 * b.Td);"
+                    "console.log(JSON.stringify({ next: m.clockNext(3540, [0]), c59: m.clockCounts(3540), in: m.clockMeetsIn(11776),"
+                    " c316: m.clockCounts(11776), c12: m.clockCounts(43200), cEnd: m.clockCounts(86399), after: m.clockNext(86399),"
+                    " g3: q(12), g275: q(11), g23: m.gapLine(2, 3, 1), h12: [[60, 3600], [60, 43200], [3600, 43200]].map(([i, j]) => m.gapLine(i, j, 43200)) }));")
+    assert got["next"] == 3600 and got["c59"]["pairs"][0] == 59
+    (n0, t0), (n1, t1) = got["in"]
+    assert (n0, n1) == (0, 1) and abs((t1 - t0) - 3600 / 42421) < 1e-9
+    assert Fr(193 * 3600, 59) == min(q0029.meetings("s", "m"), key=lambda t: abs(t - 11776.27))
+    assert Fr(196 * 43200, 719) - Fr(193 * 3600, 59) == Fr(3600, 42421)
+    assert got["c316"] == {"pairs": [194, 197, 3], "triple": 1, "total": 392}
+    assert got["c12"] == {"pairs": [709, 720, 12], "triple": 2, "total": 1437}
+    assert got["cEnd"]["total"] == 2872 and got["after"] is None
+    assert [got["g3"][k] for k in ("closed", "open", "half")] == [4, 2, 3]
+    assert [got["g275"][k] for k in ("closed", "open", "half")] == [3, 2, 3]
+    assert (got["g23"]["Tn"], got["g23"]["Td"]) == (6, 1)
+    assert [(r["closed"], r["open"], r["half"]) for r in got["h12"]] == [(709, 707, 708), (720, 718, 719), (12, 10, 11)]

@@ -1,0 +1,26 @@
+/* Question 0026, three people and one motorcycle: the motorcycle box (explorer/motorcycle.js)
+   on one 1920 x 1080 screen. core.js's columns() puts the road, the summary and the position
+   chart in the main column beside the proof panel (27-box-columns.css, which also enlarges
+   the charts' labels); here the road's labels are larger too, so that it keeps them at
+   about 11 px in its column. Its colours stay in 02-pages.css and 06-figures.css. A phone
+   keeps one column. */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-main svg.road-live { margin-top: 0; }
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-main svg.road-live :is(.tick, .legend) { font-size: 17px; }
+}
+/* With 1, 3, 4 or 5 riders the proof panel is hidden: the summary takes the side column
+   then, beside the road and the chart, instead of growing the main column alone. */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-cols:has(.road-proof[hidden]) {
+    grid-template-areas: "sum road" "sum title" "sum chart" "sum legend";
+    grid-template-rows: auto auto auto 1fr;
+  }
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-cols:has(.road-proof[hidden]) > .ex-main { display: contents; }
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-cols:has(.road-proof[hidden]) > .ex-side { display: none; }
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-cols:has(.road-proof[hidden]) .road-box { grid-area: road; }
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-cols:has(.road-proof[hidden]) .road-sum { grid-area: sum; }
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-cols:has(.road-proof[hidden]) .road-title { grid-area: title; }
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-cols:has(.road-proof[hidden]) .road-chart { grid-area: chart; }
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-cols:has(.road-proof[hidden]) .road-legend { grid-area: legend; }
+  .md-typeset .explorer[data-kind="motorcycle"] .ex-cols:has(.road-proof[hidden]) .road-sum > .ex-summary { margin-top: 0; }
+}

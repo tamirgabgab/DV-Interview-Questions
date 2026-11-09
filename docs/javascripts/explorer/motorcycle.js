@@ -162,7 +162,7 @@
         `<label>הקצב <select class="ex-speed"><option value="0.25">רבע שעה בשנייה</option><option value="0.5" selected>חצי שעה בשנייה</option><option value="1">שעה בשנייה</option><option value="2">שעתיים בשנייה</option></select></label>` +
         `<label class="ex-scrub"><span>הזמן</span><input type="range" class="ex-t" min="0" max="1" step="0.001" value="0" dir="ltr"><output class="out-t" dir="ltr"></output></label></div>` +
         `<div class="road-box"></div>` +
-        `<p class="ex-summary" aria-live="polite"></p>` +
+        `<div class="road-sum"><p class="ex-summary" aria-live="polite"></p></div>` +
         `<p class="ex-title road-title"></p><div class="road-chart"></div>` +
         `<span class="viz-legend road-legend"></span>` +
         `<section class="ex-proof road-proof"><p class="ex-proof-title">שלב ההוכחה : למה הנוסע יורד דווקא ב-D</p>` +
@@ -214,7 +214,7 @@
         const Tmax = Math.max(pl.T, other ? other.T : 0);
         const X = (t) => x0 + (t / Tmax) * (w - x0 - right);
         const Y = (v) => base - v * (base - top);
-        let s = `<svg class="perf-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="המקום של האופנוע ושל הנוסעים לאורך הזמן, עד הזמן הנוכחי${other ? ", והתוכנית להשוואה מקווקות" : ""}">`;
+        let s = `<svg class="perf-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="המקום של האופנוע ושל הנוסעים לאורך הזמן, עד הזמן הנוכחי${other ? ", והתוכנית להשוואה בקו מקווקו" : ""}">`;
         const yt = [[0, "0"], [1, st.km === null ? "1" : `${st.km}`]];
         if (st.strategy === "optimal" && st.k === 2) { const p2 = motorcyclePlan(alpha()); yt.push([p2.C, exact(p2.C)], [p2.D, exact(p2.D)]); }
         if (st.strategy === "meanwhile" && st.k === 2) yt.push([2 / (alpha() + 1), exact(2 / (alpha() + 1))]);
@@ -379,9 +379,9 @@
   dvqExplorers.register({
     views: { motorcycle: motorcycleView },
     help: {
-      motorcycle: "הציור מראה את הנוסעים על הדרך והגרף את מיקומם בזמן. הסליידרים קובעים את מהירויות ההליכה והרכיבה, בורר האסטרטגיה ומספר הרוכבים את התכנית, ״הפעלה״ מריץ אותה, ו״להשוואה עם״ מצייר תכנית שנייה מקווקוות. בשלב ההוכחה מזיזים את נקודת הירידה D ורואים את זמני ההגעה של הנוסע ושל ההולך : המאוחר מהשניים הכי קטן כשהם שווים.",
+      motorcycle: "הציור מראה את הנוסעים על הדרך והגרף את מיקומם בזמן. הסליידרים קובעים את מהירויות ההליכה והרכיבה, בורר האסטרטגיה ומספר הרוכבים את התוכנית, ״הפעלה״ מריץ אותה, ו״להשוואה עם״ מצייר תוכנית שנייה בקו מקווקו. בשלב ההוכחה מזיזים את נקודת הירידה D ורואים את זמני ההגעה של הנוסע ושל ההולך : המאוחר מהשניים הכי קטן כשהם שווים.",
     },
     models: { motorcyclePlan, motorcycleTime, motorcyclePhases, motorcyclePositions, motorcycleRiders, motorcycleAt, motorcycleTimeK, motorcycleWaits, motorcycleExact, motorcycleDrop, josephusRun },
-    cols: { motorcycle: { main: ".road-title, .road-chart, .road-legend", side: ".road-proof" } },   // the road stays wide; under it the position chart beside the proof
+    cols: { motorcycle: { main: ".road-box, .road-sum, .road-title, .road-chart, .road-legend", side: ".road-proof" } },   // the road, the summary (in a wrapper, so it can leave the top) and the position chart beside the proof
   });
 })();

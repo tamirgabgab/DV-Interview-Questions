@@ -335,3 +335,49 @@ def test_explorer_waits_and_numbers():
     nums = node_json(f"const m = {explorer_require()};"
                      "console.log(JSON.stringify([7 / 8, 1 / 8, 2 / 14, 31 / 41, 2.5, 1, 0, 19 / 7, 0.9876].map((v) => m.motorcycleExact(v))));")
     assert nums == ["7/8", "1/8", "1/7", "0.756", "5/2", "1", "0", "19/7", "0.988"]
+
+
+def test_lower_bound_limits():
+    """Where the proof's chain stops: for 1 < alpha < 3 its inequalities admit a shorter time
+    than the formula (alpha = 2: T = 4/3 with f = 2/3, b = 0, Mf = 1, Mb = 0, against 7/5); the
+    fixed-driver bound min over r of max(2k r - 1, r + alpha (1 - r)) is the formula for every
+    alpha > 1; and with k + 1 people the chain ends in (alpha + 2k - 1) T >= (2k - 1) alpha + 1
+    for alpha >= 3, met with equality by the symmetric shuttle."""
+    a = Fr(2)
+    T, f, b, Mf, Mb = Fr(4, 3), Fr(2, 3), Fr(0), Fr(1), Fr(0)
+    assert T >= f + b + a * (1 - f + b) and 3 * f <= 2 * Mf and 3 * b >= Mb >= Mf - 1 and Mf + Mb <= T
+    assert T < formula(a) == Fr(7, 5)
+    for k in range(1, 7):
+        for alpha in (Fr(11, 10), Fr(3, 2), 2, Fr(5, 2), 3, 13, 50):
+            a = Fr(alpha)
+            r = (a + 1) / (a + 2 * k - 1)
+            assert 2 * k * r - 1 == r + a * (1 - r) == formula(a, k)
+            grid = [Fr(i, 200) for i in range(201)]
+            assert min(max(2 * k * u - 1, u + a * (1 - u)) for u in grid) >= formula(a, k)
+        for alpha in (3, Fr(7, 2), 4, 13, 50):
+            a = Fr(alpha)
+            T = formula(a, k)
+            # (k + 1) T >= k alpha - 1 + (3 - alpha) Mf with Mf <= (T + 1) / 2, rearranged
+            assert (k + 1) * T == k * a - 1 + (3 - a) * (T + 1) / 2
+            assert (a + 2 * k - 1) * T == (2 * k - 1) * a + 1
+    assert (Fr(13) + 5) * formula(13, 3) == 5 * 13 + 1
+
+
+def test_new_numbers_on_the_page():
+    """The derivation of the middle row, the alpha = 2 follow-up and the box tasks."""
+    for alpha in (Fr(3, 2), Fr(2), Fr(4), Fr(13)):
+        a = alpha
+        back = (1 - 1 / a) / (1 + 1 / a)          # the motorcycle at B, the walker at 1 / alpha
+        assert back == (a - 1) / (a + 1) and 1 + 2 * back == q0026.t_walk_meanwhile(a)
+    assert 2 * (Fr(12, 14)) == Fr(12, 7) and q0026.t_walk_meanwhile(13) == Fr(19, 7)
+    assert q0026.plan(Fr(2))["D"] == Fr(3, 5) and formula(2) == Fr(7, 5)
+    assert best_ride(13, 3) == Fr(7, 9) and formula(13, 3) == Fr(11, 3)
+
+    def arrivals(d, a=13):
+        d = Fr(d)
+        dt = meet(d, d / a, a)
+        return d + (1 - d) * a, d + dt + (1 - (d - dt))
+    assert arrivals(Fr(3, 4)) == (4, 1 + Fr(24, 14) * Fr(3, 4))
+    assert round(float(arrivals(Fr(3, 4))[1]), 3) == 2.286
+    p, w = arrivals(Fr(95, 100))
+    assert w > p and round(float(w), 3) == 2.629
