@@ -27,6 +27,54 @@ def test_page_examples():
     assert first == (1, 2, 5, 3)
     assert all(2 * q0059.play(list(c), "greedy", "optimal")[1][0] >= sum(c) for c in itertools.product(range(1, 6), repeat=2))
     assert best_total([5]) == 5
+    # part b's proof: with distinct values the smallest losing sum is 11, by six rows (1, 2, 5, 3
+    # first); with repeated values 1, 1, 3, 2 (sum 7) already loses, 3 against 4
+    losing = [c for c in itertools.permutations(range(1, 9), 4) if 2 * q0059.play(list(c), "greedy", "optimal")[1][0] < sum(c)]
+    low = min(map(sum, losing))
+    assert low == 11 and sorted(c for c in losing if sum(c) == low) == [
+        (1, 2, 5, 3), (1, 3, 5, 2), (2, 1, 5, 3), (2, 5, 3, 1), (3, 5, 1, 2), (3, 5, 2, 1)]
+    assert q0059.play([1, 1, 3, 2], "greedy", "optimal")[1] == [3, 4]
+    # part e: one more coin is sometimes enough
+    assert best_total([5, 1, 1]) == 6
+
+
+def test_follow_ups():
+    """The O(n) memory follow-up needs i ascending; the three-player game needs a tie rule."""
+    from functools import lru_cache
+
+    def one_array(coins, ascending):
+        n, d = len(coins), list(coins)
+        for length in range(2, n + 1):
+            order = range(n - length + 1)
+            for i in (order if ascending else reversed(order)):
+                j = i + length - 1
+                d[i] = max(coins[i] - d[i + 1], coins[j] - d[i])
+        return d[0]
+
+    rng, wrong = random.Random(61), 0
+    for _ in range(300):
+        coins = [rng.randint(1, 30) for _ in range(rng.randint(2, 10))]
+        lead = 2 * best_total(coins) - sum(coins)
+        assert one_array(coins, True) == lead
+        wrong += one_array(coins, False) != lead
+    assert wrong > 0
+
+    def three(coins, tie):
+        @lru_cache(None)
+        def f(i, j, w):                     # the three totals from coins[i..j], player w to move
+            if i > j:
+                return (0, 0, 0)
+            opts = []
+            for k, rest in ((i, (i + 1, j)), (j, (i, j - 1)))[: 1 if i == j else 2]:
+                r = list(f(*rest, (w + 1) % 3))
+                r[w] += coins[k]
+                opts.append(tuple(r))
+            if len(opts) == 1 or opts[0][w] != opts[1][w]:
+                return max(opts, key=lambda r: r[w])
+            return opts[0] if tie == "L" else opts[1]
+        return f(0, len(coins) - 1, 0)
+
+    assert three((1, 1, 1, 2, 1), "L") == (3, 2, 1) and three((1, 1, 1, 2, 1), "R") == (2, 3, 1)
 
 
 def test_against_minimax():

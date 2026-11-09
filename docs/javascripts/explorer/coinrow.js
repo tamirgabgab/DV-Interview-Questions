@@ -1,5 +1,5 @@
 // kinds: coinrow
-//   coinrow                0059        coins in a row, each player takes an end: a player per side (me by a click on an end, greedy, the parity trick, optimal), played move by move with the totals; the coins coloured by the parity of the place with the two colour sums, the colour the trick committed to, and the lead turned into what the mover collects; the table of d[i][j] with the interval of the moment and the move it recommends
+//   coinrow                0059        coins in a row, each player takes an end: a menu of the page's rows (parts b, d and e) with their players; a player per side (me by a click on an end, greedy, the parity trick, optimal), played move by move with the totals; the coins coloured by the parity of the place with the two colour sums, the colour the trick committed to, and the lead turned into what the mover collects; the table of d[i][j] with the interval of the moment and the move it recommends
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -55,6 +55,14 @@
 
   const NAMES = { me: "אני (בלחיצה)", greedy: "חמדן", parity: "הטריק של הזוגיות", optimal: "אופטימלי" };
   const NMAX = 12;
+  // the rows of parts b, d and e with the players their tasks on the page use (the selects
+  // show them); the rows are written without spaces, so they read left to right in a
+  // right-to-left menu
+  const EXAMPLES = [
+    { name: "סעיף ב : 1,2,5,3", coins: [1, 2, 5, 3], players: ["me", "optimal"] },
+    { name: "סעיף ד : 1,1,9,1,1,9", coins: [1, 1, 9, 1, 1, 9], players: ["parity", "optimal"] },
+    { name: "סעיף ה : 1,5,1", coins: [1, 5, 1], players: ["optimal", "parity"] },
+  ];
   const parse = (text) => {
     const v = String(text).split(/[\s,]+/).filter(Boolean).map(Number);
     return v.length >= 1 && v.length <= NMAX && v.every((x) => Number.isInteger(x) && x >= 1 && x <= 99) ? v : null;
@@ -68,6 +76,7 @@
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label><span>המטבעות</span><input type="text" class="ex-num cr-coins" dir="ltr" aria-label="ערכי המטבעות, מופרדים בפסיקים, עד ${NMAX}"></label>` +
+        `<label>דוגמה <select class="cr-ex" aria-label="דוגמה מהעמוד"><option value="">משלכם</option>${EXAMPLES.map((e, k) => `<option value="${k}">${e.name}</option>`).join("")}</select></label>` +
         `<label>בהגרלה <select class="cr-n" aria-label="כמה מטבעות להגריל">${[4, 5, 6, 7, 8, 10, 12].map((v) => `<option value="${v}"${v === 6 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button cr-rand">הגרלה</button><span class="cr-anchor"></span>` +
         sel("cr-a", d0.a, "הראשון") + sel("cr-b", d0.b, "השני") +
@@ -94,6 +103,9 @@
         const cur = crRun(c, st.players, st.human, st.k), done = cur.i > cur.j;
         const waiting = !done && st.k === T && st.players[cur.who] === "me";
         $(".cr-coins").value = c.join(", "); $(".cr-a").value = st.players[0]; $(".cr-b").value = st.players[1];
+        // the menu names the example on the board, if any
+        const ex = EXAMPLES.findIndex((e) => e.coins.join() === c.join() && e.players.join() === st.players.join());
+        $(".cr-ex").value = ex < 0 ? "" : String(ex);
         $(".ex-pos").textContent = `מהלך ${st.k} מתוך ${T}`;
         $(".ex-prev").disabled = $(".ex-start").disabled = st.k === 0;
         $(".ex-next").disabled = $(".ex-end").disabled = st.k === T;
@@ -172,6 +184,11 @@
         if (v) { st.coins = v; newGame(); }
       });
       $(".cr-coins").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".cr-coins").blur(); });
+      $(".cr-ex").addEventListener("change", () => {
+        const e = EXAMPLES[Number($(".cr-ex").value)];
+        if (!$(".cr-ex").value || !e) { draw(); return; }
+        st.coins = [...e.coins]; st.players = [...e.players]; $(".cr-err").textContent = ""; newGame();
+      });
       $(".cr-a").addEventListener("change", () => { st.players[0] = $(".cr-a").value; newGame(); });
       $(".cr-b").addEventListener("change", () => { st.players[1] = $(".cr-b").value; newGame(); });
       $(".cr-n").addEventListener("change", () => { st.n = Number($(".cr-n").value); });
@@ -198,7 +215,7 @@
   dvqExplorers.register({
     views: { coinrow: coinrowView },
     help: {
-      coinrow: "בוחרים מי משחק בכל צד : אתם (לוחצים על אחד הקצוות כשמגיע תורכם), חמדן, הטריק של הזוגיות או משחק אופטימלי, ומריצים מהלך אחרי מהלך. מתחת לשורה הטבלה d[i][j] : היתרון של מי שתורו בכל קטע, הקטע של הרגע מסומן, ולצידה המהלך שהיא ממליצה עליו.",
+      coinrow: "בתפריט ״דוגמה״ השורות של סעיפים ב, ד ו-ה. בוחרים מי משחק בכל צד : אתם (לוחצים על אחד הקצוות כשמגיע תורכם), חמדן, הטריק של הזוגיות או משחק אופטימלי, ומריצים מהלך אחרי מהלך. מתחת לשורה הטבלה d[i][j] : היתרון של מי שתורו בכל קטע, הקטע של הרגע מסומן, ולצידה המהלך שהיא ממליצה עליו.",
     },
     models: { crDiff, crPlay },
   });

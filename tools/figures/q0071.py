@@ -581,7 +581,8 @@ def chart(positions, rivals, label, y_max=0.8):
         cand = max(candidates(me, rivals), key=lambda t: t[2])
         cls = {1: "s1", 2: "s2", 3: "ink"}[me]
         x = float(cand[1])
-        c.dot(x, cand[2], cls, title=f"{NAME[me]}: {pct(cand[2])} at {x:.3g}")
+        where = "שרביט 1" if cand[0] == "sniper" else f"שרביט ממש מתחת ל-{x:.3g}"
+        c.dot(x, cand[2], cls, title=f"אני {NAME[me]}\u00a0: {pct(cand[2])}, {where}")
     c.axis()
     return c.svg()
 

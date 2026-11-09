@@ -279,8 +279,8 @@
       const num = (v, d) => (Number.isFinite(Number(v)) && v !== undefined ? Number(v) : d);
       const st = { a: num(box.dataset.r1, 0.6), b: num(box.dataset.r2, 0.8), me: num(box.dataset.me, 1), order: box.dataset.order === "ba" ? "ba" : "ab", wand: num(box.dataset.wand, 0.599) };
       box.innerHTML =
-        `<div class="ex-controls"><label><span>יריב א</span><input type="range" class="wz-r1" min="0.05" max="1" step="0.05" dir="ltr" aria-label="ההסתברות של יריב א לפגוע"><output class="wz-o1"></output></label>` +
-        `<label><span>יריב ב</span><input type="range" class="wz-r2" min="0.05" max="1" step="0.05" dir="ltr" aria-label="ההסתברות של יריב ב לפגוע"><output class="wz-o2"></output></label></div>` +
+        `<div class="ex-controls"><label><span>יריב א</span><input type="range" class="wz-r1" min="0.01" max="1" step="0.01" dir="ltr" aria-label="ההסתברות של יריב א לפגוע"><output class="wz-o1"></output></label>` +
+        `<label><span>יריב ב</span><input type="range" class="wz-r2" min="0.01" max="1" step="0.01" dir="ltr" aria-label="ההסתברות של יריב ב לפגוע"><output class="wz-o2"></output></label></div>` +
         `<div class="ex-controls"><label>אני <select class="wz-me" aria-label="התור שלי">${POS.map((n, i) => `<option value="${i + 1}">${n}</option>`).join("")}</select></label>` +
         `<label>הסדר <select class="wz-order" aria-label="הסדר של היריבים"><option value="ab">א לפני ב</option><option value="ba">ב לפני א</option></select></label>` +
         `<label><span>השרביט שלי</span><input type="range" class="wz-wand" min="0.001" max="1" step="0.001" dir="ltr" aria-label="ההסתברות שלי לפגוע"><output class="wz-ow"></output></label></div>` +

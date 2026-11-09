@@ -169,8 +169,30 @@ def test_steps_of_part_b():
     assert q0071.win(3, Fr(1), R) == Fr(2, 25)
     _, trace = q0071.round_options(q0071.place(3, Fr(1), R))
     assert [(w, best) for w, _, best in trace] == [(3, 2), (2, 3), (1, "air")]
-    for k in range(61, 101):
-        assert q0071.win(3, Fr(k, 100), R) <= Fr(2, 25)
+    for k in range(601, 1001):
+        assert q0071.win(3, Fr(k, 1000), R) <= Fr(2, 25)
+        # step 6: above 0.6 only wizard 2 shoots at me, wizard 1 misses on purpose
+        _, trace = q0071.round_options(q0071.place(3, Fr(k, 1000), R))
+        assert [(w, best) for w, _, best in trace][1:] == [(2, 3), (1, "air")]
+    # step 8: first or second, both rivals shoot at each other before I shoot; third, I get
+    # the round's last shot (0.048 * 2/7) and the cats fall from 8% to 3.2%
+    for me, plan in ((1, [(3, 2), (2, 3), (1, "air")]), (2, [(3, 1), (2, "air"), (1, 3)])):
+        p = q0071.place(me, q0071.weak(R), R)
+        assert [(w, best) for w, _, best in q0071.round_options(p)[1]] == plan
+        assert near(q0071.outcomes(p)[1], Fr(2, 25))
+    assert near(q0071.win(3, q0071.weak(R), R) - q0071.win(1, q0071.weak(R), R), Fr(48, 1000) * Fr(2, 7))
+    # part c, step 5: below both rivals my chance rises with the wand, except one drop at 0.5
+    # when I am third (0.8, 0.6, me: 0.529 just under 0.5, 0.469 at 0.5)
+    rv = (Fr(8, 10), Fr(6, 10))
+    assert near(q0071.win(3, Fr(1, 2) - E, rv), 0.5294, 1e-4) and near(q0071.win(3, Fr(1, 2), rv), 0.4694, 1e-4)
+    for i in range(1, 20):
+        for j in range(i, 20):
+            for rv in ((Fr(i, 20), Fr(j, 20)), (Fr(j, 20), Fr(i, 20))):
+                for me in (1, 2, 3):
+                    ws = [Fr(k, 100) for k in range(1, 100) if Fr(k, 100) < Fr(i, 20)]
+                    vs = [q0071.win(me, w, rv) for w in ws]
+                    drops = [w for w, u, v in zip(ws[1:], vs, vs[1:]) if v < u]
+                    assert drops in ([], [q0071.HALF]) and (not drops or me == 3), (rv, me, drops)
     # step 8: the others, the cats and the sum
     p = q0071.place(3, q0071.weak(R), R)
     ch, cats = q0071.round_options(p)[0], q0071.outcomes(p)[1]
@@ -286,8 +308,28 @@ def test_follow_ups():
     p1, p2, p3 = Fr(6, 10), Fr(6, 10), Fr(8, 10)
     W = p2 * V(p1, p2) + (1 - p2) * p3 * V(p1, p3)
     assert near(p1 * one_minus_v(p2, p1) + (1 - p1) * W, 0.4263, 1e-4)
-    # the cat rule in every round, position 1: max(m (1 - (1-b)(1-c)), 1 - m)
-    assert near(Fr(6, 10) * (1 - Fr(4, 10) * Fr(2, 10)), 0.552) and near(Fr(6, 10) * (1 - Fr(3, 10) * Fr(1, 10)), 0.582)
+    # the cat rule in every round, position 1: max(m (1 - (1-b)(1-c)), 1 - m) with a free wand
+    # (0.552 in part a, 0.679 in the original), and 0.582 with the original's menu wand 0.6;
+    # checked against the backward induction with the duel opener winning only on the first shot
+    def every_round(p):
+        after = [Fr(0)] * 3
+        for w in (2, 1, 0):
+            opts = [after]
+            for t in range(3):
+                if t != w:
+                    o, hit = 3 - w - t, [Fr(0)] * 3
+                    hit[o], hit[w] = p[o], (1 - p[o]) * p[w]
+                    opts.append([p[w] * h + (1 - p[w]) * a for h, a in zip(hit, after)])
+            after = max(opts, key=lambda v: v[w])
+        return after[0]
+
+    for rv, free, menu in (((Fr(6, 10), Fr(8, 10)), 0.552, None), (orig, 0.679, 0.582)):
+        wands = [Fr(k, 1000) for k in range(1, 1001) if Fr(k, 1000) not in rv] + [min(rv) - E]
+        m = min(rv)
+        assert near(max(every_round([q, *rv]) for q in wands), free) and near(max(m * (1 - (1 - rv[0]) * (1 - rv[1])), 1 - m), free)
+        if menu:
+            assert max(every_round([q, *rv]) for q in (Fr(6, 10), Fr(8, 10), Fr(1))) == every_round([Fr(6, 10), *rv])
+            assert near(every_round([Fr(6, 10), *rv]), menu)
     # equal rivals: W = q
     for k in range(1, 20):
         q = Fr(k, 20)
