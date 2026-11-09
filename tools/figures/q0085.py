@@ -140,10 +140,10 @@ def bases_table():
         nums = ", ".join(text(d) for d in sols) or "אין"
         if len(sols) > 1:
             nums = f'{RLM}<span dir="ltr">{nums}</span>'      # two numbers, in reading order
-        elif nums[0].isascii() and nums[0].isalpha():
-            nums = RLM + nums          # a cell that starts with a Latin letter (base 11 and up)
+        elif sols:
+            nums = RLM + nums          # a cell that starts with a digit or a Latin letter
         pattern = "כן" if b >= 7 else "‏–"
-        rows.append(f"| {b} | {nums} | {pattern} | {checked:,} |")
+        rows.append(f"| {RLM}{b} | {nums} | {pattern} | {RLM}{checked:,} |")
     return "\n".join(rows)
 
 
@@ -164,7 +164,7 @@ def search_table():
     rows = ["| בסיס b | מחרוזות של b ספרות | מועמדים מלאים שנבדקו | חיתוכים | פתרונות |", "|:-:|:-:|:-:|:-:|:-:|"]
     for b in (4, 5, 6, 7, 8, 9, 10):
         sols, checked, cuts = search(b)
-        rows.append(f"| {b} | {b ** b:,} | {checked:,} | {cuts:,} | {len(sols)} |")
+        rows.append(f"| {RLM}{b} | {RLM}{b ** b:,} | {RLM}{checked:,} | {RLM}{cuts:,} | {RLM}{len(sols)} |")
     return "\n".join(rows)
 
 

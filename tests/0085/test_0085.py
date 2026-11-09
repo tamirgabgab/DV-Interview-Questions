@@ -3,11 +3,14 @@
 The generator's search against a brute force over every string of b digits (b <= 6) and
 against the list of part c (b <= 16), the two sums, part b's case analysis, the numbers of
 the page (980 candidates and 4,845 cuts in base 10, 184,746 with the first sum only, 32,523
-up to base 16, base 16's number), the follow-up on n digits in base 10, the generated
-blocks, and the box's models under Node against the reference."""
+up to base 16, base 16's number), guess and fix (the counts copied as the new number: the
+cycle from 9000000000, base 4 from 3000), the follow-ups on n digits in base 10 and on
+starting d[0] from 1, the one-bit sum of the SV trap, the generated blocks, and the box's
+models under Node against the reference."""
 
 import itertools
 import json
+import random
 import sys
 
 from extract_code import ROOT
@@ -84,6 +87,75 @@ def test_page_numbers():
     assert q0085.search(16)[1] == 10459 and "10,459" in PAGE
     assert q0085.text(q0085.family(16)[0]) == "C210000000001000" and "C210000000001000" in PAGE
     assert q0085.family(16)[0][12] == 1
+
+
+def copies(d):
+    """Guess and fix: d replaced by its counts until a number comes back (or a count is
+    not a digit); the numbers in order, the repeated one last."""
+    out = [list(d)]
+    while True:
+        c = q0085.counts(out[-1])
+        if max(c) >= len(d):
+            return out
+        seen = c in out
+        out.append(c)
+        if seen:
+            return out
+
+
+def test_guess_and_fix():
+    walk = [q0085.text(d) for d in copies([9] + [0] * 9)]
+    assert walk == ["9000000000", "9000000001", "8100000001", "7200000010", "7110000100",
+                    "6300000100", "7101001000", "6300000100"]
+    assert "אחרי חמש\n    העתקות ל-6300000100, משם ל-7101001000, ומשם שוב ל-6300000100" in PAGE
+    assert "אחרי שבע העתקות" in PAGE
+    assert [q0085.text(d) for d in copies([3, 0, 0, 0])] == ["3000", "3001", "2101", "1210", "1210"]
+    assert "מ-3000, והעתיקו שלוש פעמים" in PAGE
+    # "fewer than a third" of 20,000 random starts reach 6210001000
+    rng = random.Random(1)
+    hits = sum(copies([rng.randrange(10) for _ in range(10)])[-1] == q0085.family(10)[0] for _ in range(20000))
+    assert 0.25 < hits / 20000 < 1 / 3 and "פחות משליש" in PAGE
+
+
+def test_start_from_one_zero():
+    """The follow-up: d[0] >= 1 in every solution (part b), so the search may start d[0] at 1."""
+    def checked(b, low):
+        n = 0
+
+        def rec(i, total, weight):
+            nonlocal n
+            if i == b:
+                n += 1
+                return
+            for v in range(low if i == 0 else 0, b):
+                if total + v > b or weight + i * v > b:
+                    break
+                rec(i + 1, total + v, weight + i * v)
+
+        rec(0, 0, 0)
+        return n
+
+    assert (checked(10, 1), checked(10, 0)) == (843, 980) and "843 מועמדים" in PAGE
+    first = next(k for k, e in enumerate(q0085.events(4)) if e[1] and e[1][0] >= 1)
+    assert first == 22 and "כל 22 הצעדים הראשונים" in PAGE
+
+
+def test_one_bit_sum():
+    """The SV trap: with the counts taken modulo 2 every digit is 0 or 1, and the only string
+    of 10 such digits whose digit i is its count of i modulo 2 is 0000000000."""
+    mod2 = [d for d in itertools.product(range(2), repeat=10) if all(d[i] == d.count(i) % 2 for i in range(10))]
+    assert mod2 == [(0,) * 10] and "0000000000" in PAGE
+
+
+def test_search_box_task():
+    """The numbers of the search box's task: the first cut at step 3, 1210 at step 39, 2020
+    at step 50, base 6 in 425 steps."""
+    ev = q0085.events(4)
+    assert ev[2] == ("cut", (0, 0, 0), 2)
+    assert [k + 1 for k, e in enumerate(ev) if e[0] == "check" and e[2]] == [39, 50]
+    assert len(q0085.events(6)) == 425
+    for t in ("בצעד 3", "בצעד 39", "בצעד 50", "425 צעדים"):
+        assert t in PAGE, t
 
 
 def test_n_digits_in_base_10():

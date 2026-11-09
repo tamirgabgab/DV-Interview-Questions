@@ -1,5 +1,5 @@
 // kinds: selfdesc
-//   selfdesc               0085        self-describing numbers in base b (data-base) in three modes: edit (data-mode="edit", data-digits), a typed number with the real count of every digit under its position, the mismatches marked, and the two sums; search (data-mode="search", bases 2 to 8), the search of the page step by step, every cut and every full candidate its own step, with the counters and the numbers found so far; bases (data-mode="bases", bases 2 to 16), the numbers of a base found by the same search, the four places of the pattern of b >= 7 marked, and how many each base has
+//   selfdesc               0085        self-describing numbers in base b (data-base) in three modes: edit (data-mode="edit", data-digits), a typed number with the real count of every digit under its position and the mismatches marked, and a button that copies the counts as the new number (guess and fix) with the trail of numbers and the cycle it enters; search (data-mode="search", bases 2 to 8), the search of the page step by step, every cut and every full candidate its own step, with the counters and the numbers found so far; bases (data-mode="bases", bases 2 to 16), the numbers of a base found by the same search, the four places of the pattern of b >= 7 marked, and how many each base has
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -105,43 +105,65 @@
   const editMount = (box) => {
     const b0 = clampBase(box.dataset.base, BMIN, BMAX, 10);
     const d0 = sdParse(box.dataset.digits || "", b0) || firstGuess(b0);
-    const st = { b: b0, d: d0.slice() };
+    // trail: the numbers before d, one per copy of the counts (guess and fix)
+    const st = { b: b0, d: d0.slice(), trail: [] };
     box.innerHTML =
       `<div class="ex-controls">${baseSel(BMIN, BMAX, b0)}` +
       `<label><span>המספר</span><input type="text" class="ex-num sd-digits" dir="ltr" spellcheck="false" autocomplete="off" aria-label="המספר${NB}: b ספרות, 0 עד 9 ו-A עד F"></label>` +
+      `<button type="button" class="md-button md-button--primary sd-copy">העתיקו את הספירה</button>` +
       `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err sd-err" role="status"></span></div>` +
       `<div class="sd-wrap"></div>` +
       `<span class="viz-legend">${key("gs-key-one", `הספרה ${ltr("d[i]")}`)}${key("sd-key-ok", "הספירה מתאימה")}${key("sd-key-bad", "הספירה לא מתאימה")}</span>` +
       `<p class="ex-summary sd-sum" aria-live="polite"></p><p class="sd-note"></p>`;
     const $ = (sel) => box.querySelector(sel);
     const draw = () => {
-      const { b, d } = st, c = sdCounts(d);
+      const { b, d, trail } = st, c = sdCounts(d);
       const bad = d.map((x, i) => i).filter((i) => c[i] !== d[i]);
+      const digit = c.every((v) => v < b);
       $(".sd-base").value = String(b);
       if (document.activeElement !== $(".sd-digits")) $(".sd-digits").value = sdText(d);
+      $(".sd-copy").disabled = !bad.length || !digit;
       $(".sd-wrap").innerHTML = table(b, d, c, { label: `המספר ${sdText(d)} בבסיס ${b}, ומתחת לכל מקום כמה פעמים הספרה שלו מופיעה` });
-      const [s1, s2] = sums(d);
       $(".sd-sum").innerHTML = bad.length
         ? `${ltr(b - bad.length)} מתוך ${ltr(b)} המקומות מתאימים. הראשון שלא${NB}: במקום ${ltr(bad[0])} כתוב ${ltr(DIG[d[bad[0]]])}, אבל ${times(bad[0], c[bad[0]])}.`
         : `כל ${ltr(b)} המקומות מתאימים.`;
-      $(".sd-note").innerHTML = `הסכומים${NB}: ${ltr(`Σ d[i] = ${s1}`)} ו-${ltr(`Σ i·d[i] = ${s2}`)}. במספר שמתאר את עצמו שניהם ${ltr(b)}.`;
+      let note;
+      if (!trail.length) {
+        note = digit
+          ? `הכפתור ״העתיקו את הספירה״ כותב את שורת ${ltr("count(i)")} כמספר החדש, כמו מי שמנחש ומתקן את כל המקומות בבת אחת.`
+          : `בשורת הספירה יש ${ltr(b)}, ערך שאינו ספרה בבסיס ${ltr(b)}${NB}: אין מה להעתיק.`;
+      } else {
+        const all = trail.concat([d]).map(sdText), now = sdText(d);
+        // in reading order, right to left: each number isolated, the arrows pointing left
+        const shown = all.length > 8 ? ["…"].concat(all.slice(-7)) : all;
+        const last = all.slice(0, -1).lastIndexOf(now);
+        note = `הדרך${NB}: ${shown.map((x) => (x === "…" ? x : ltr(x))).join(" ← ")}` + (last >= 0
+          ? `. המספר ${ltr(now)} כבר היה לפני ${ltr(trail.length - last)} העתקות${NB}: מחזור, וההעתקה לבדה לא תצא ממנו.`
+          : bad.length ? "." : `. הספירה כבר לא משתנה.`);
+      }
+      $(".sd-note").innerHTML = note;
       answer(box, bad.length ? null : `${ltr(sdText(d))} מתאר את עצמו בבסיס ${ltr(b)}.`, ".sd-wrap td.is-one");
     };
+    const restart = (b, d) => { st.b = b; st.d = d; st.trail = []; $(".sd-err").textContent = ""; $(".sd-digits").value = sdText(st.d); draw(); };
     $(".sd-base").addEventListener("change", () => {
-      st.b = clampBase($(".sd-base").value, BMIN, BMAX, st.b);
-      st.d = firstGuess(st.b);
-      $(".sd-err").textContent = "";
-      $(".sd-digits").value = sdText(st.d);
-      draw();
+      const b = clampBase($(".sd-base").value, BMIN, BMAX, st.b);
+      restart(b, firstGuess(b));
     });
     $(".sd-digits").addEventListener("change", () => {
       const v = sdParse($(".sd-digits").value, st.b);
       if (!v) { $(".sd-err").textContent = `המספר${NB}: בדיוק ${st.b} ספרות, כל אחת קטנה מ-${st.b}`; return; }
+      restart(st.b, v);
+    });
+    $(".sd-copy").addEventListener("click", () => {
+      const c = sdCounts(st.d);
+      if (c.some((v) => v >= st.b)) return;
+      st.trail.push(st.d);
+      st.d = c;
       $(".sd-err").textContent = "";
-      st.d = v;
+      $(".sd-digits").value = sdText(st.d);
       draw();
     });
-    $(".ex-reset").addEventListener("click", () => { st.b = b0; st.d = d0.slice(); $(".sd-err").textContent = ""; $(".sd-digits").value = sdText(st.d); draw(); });
+    $(".ex-reset").addEventListener("click", () => restart(b0, d0.slice()));
     draw();
   };
 
@@ -265,7 +287,7 @@
   dvqExplorers.register({
     views: { selfdesc: selfdescView },
     help: {
-      selfdesc: "שלושה מצבים. בעורך מקלידים מספר בבסיס שנבחר (ספרות 0 עד 9 ו-A עד F), ומתחת לכל מקום מופיע כמה פעמים הספרה שלו באמת מופיעה, ירוק כשזה מתאים וכתום כשלא. בחיפוש כל צעד הוא חיתוך (ערך שהסכומים שלו עוברים את הבסיס) או מועמד מלא שנבדק, ו״הפתרון הבא״ קופץ למספר הבא שמתאר את עצמו. בטבלת הבסיסים בוחרים בסיס ורואים את המספרים שלו ואת ארבעת המקומות של התבנית.",
+      selfdesc: "שלושה מצבים. בעורך מקלידים מספר בבסיס שנבחר (ספרות 0 עד 9 ו-A עד F), ומתחת לכל מקום מופיע כמה פעמים הספרה שלו באמת מופיעה, ירוק כשזה מתאים וכתום כשלא; ״העתיקו את הספירה״ כותב את שורת הספירה כמספר החדש, ומתחת מופיעה הדרך עד שמספר חוזר. בחיפוש כל צעד הוא חיתוך (ערך שהסכומים שלו עוברים את הבסיס) או מועמד מלא שנבדק, ו״הפתרון הבא״ קופץ למספר הבא שמתאר את עצמו. בטבלת הבסיסים בוחרים בסיס ורואים את המספרים שלו ואת ארבעת המקומות של התבנית.",
     },
     models: { sdParse, sdCounts, sdEvents, sdSearch, sdFamily },
   });
