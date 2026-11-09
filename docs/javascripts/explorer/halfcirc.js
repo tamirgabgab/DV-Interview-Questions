@@ -77,7 +77,7 @@
         angles.forEach((d, i) => {
           const [x, y] = at(d, R), [lx, ly] = at(d, R_LBL);
           pts[i].setAttribute("cx", f(x)); pts[i].setAttribute("cy", f(y)); pts[i].setAttribute("aria-valuenow", d);
-          pts[i].setAttribute("aria-valuetext", `${NAMES[i]} : ${d}°`);
+          pts[i].setAttribute("aria-valuetext", `${NAMES[i]} : ${d}°`);
           names[i].setAttribute("x", f(lx)); names[i].setAttribute("y", f(ly + 5));
           if (document.activeElement !== inputs[i]) inputs[i].value = d;
         });
@@ -155,7 +155,7 @@
   dvqExplorers.register({
     views: { halfcirc: halfcircView },
     help: {
-      halfcirc: "גוררים את P1, P2, P3 (או מקלידים זוויות) : כל חצי מעגל צבוע מתחיל בנקודה שלו נגד כיוון השעון, והרשימה אומרת אם הוא מכיל את שתי הנקודות האחרות. לכל היותר אחד מתקיים. ״100 הגרלות״ ו״1,000 הגרלות״ מוסיפים משולשים אקראיים לספירה.",
+      halfcirc: "גוררים את P1, P2, P3 (או מקלידים זוויות) : כל חצי מעגל צבוע מתחיל בנקודה שלו נגד כיוון השעון, והרשימה אומרת אם הוא מכיל את שתי הנקודות האחרות. לכל היותר אחד מתקיים. ״100 הגרלות״ ו״1,000 הגרלות״ מוסיפים משולשים אקראיים לספירה.",
     },
     models: { halfEvents, halfCount },
   });

@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const MAX = 4095;                   // 12 bits: at most 21 rows in the table of the rules
 
   const bin = (n) => n.toString(2);

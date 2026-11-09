@@ -24,6 +24,10 @@ Checks, per page:
 - Code highlights: every line named in ``hl_lines=`` exists in the (dedented) block and is
   a code line, not a blank line, a comment alone or a bare ``end`` / ``endfunction``, so the
   highlights keep pointing at the code the explanation names after the block is edited.
+Once per run (when no page is named): every question is in a study path, and the explorer
+strings (``docs/javascripts/explorer/*.js``) keep the colon rule: ``const NB`` is U+00A0, and
+no Hebrew text has a plain space before a colon (a Hebrew letter, or a closing ``)`` / ``}``
+/ tag of a text, then " : "), so a colon never wraps to the start of a line in a box.
 Warnings (printed, exit status unchanged): an inline SVG colour written as a literal
 (``fill="#..."``, ``stroke:#...``, ``fill="white"``) instead of a class whose colour is a CSS
 variable, since such a figure does not follow the light / dark switch.
@@ -343,6 +347,33 @@ def lint_paths() -> list[str]:
     return out
 
 
+EXPLORERS = QUESTIONS.parent / "javascripts" / "explorer"
+HEB = "\u05d0-\u05ea"
+# a plain space before a colon in a box's Hebrew text: after a Hebrew letter, or after the
+# end of an inline value (")", "}", a tag) when Hebrew, a tag, an RLM or "${" follows; a
+# JavaScript ternary " : " follows a space, a quote or a backtick, or is followed by code
+PLAIN_COLON = (
+    re.compile(rf"(?<=[{HEB}]) :(?=[ <`\"\n])"),
+    re.compile(rf"(?<=[^\s\"'`{HEB}]) :(?= [{HEB}<\u200f]| \$\{{)"),
+)
+
+
+def lint_explorers() -> list[str]:
+    """The colon rule in the explorer boxes' strings (29 boxes had a plain-space NB, and
+    many strings a plain space before the colon, until session 34)."""
+    out = []
+    for f in sorted(EXPLORERS.glob("*.js")):
+        lines = f.read_text(encoding="utf-8").split("\n")
+        for n, line in enumerate(lines, 1):
+            if re.search(r'const NB = "(?!\u00a0"|\\u00a0")', line):
+                out.append(f"{f.name}:{n}: NB must be U+00A0 (a non-breaking space)")
+            if line.lstrip().startswith("//"):
+                continue
+            if any(r.search(line) for r in PLAIN_COLON):
+                out.append(f"{f.name}:{n}: a plain space before a colon in Hebrew text (use U+00A0 or ${{NB}})")
+    return out
+
+
 def main(argv: list[str]) -> int:
     paths = [question_path(a) for a in argv] if argv else sorted(QUESTIONS.glob("*/0*.md"))
     bad = warned = 0
@@ -358,7 +389,7 @@ def main(argv: list[str]) -> int:
         bad += bool(problems)
         warned += bool(warnings)
     print(f"{len(paths) - bad}/{len(paths)} pages clean" + (f", {warned} with warnings" if warned else ""))
-    orphans = [] if argv else lint_paths()
+    orphans = [] if argv else lint_paths() + lint_explorers()
     for o in orphans:
         print(f"  {o}")
     return 1 if bad or orphans else 0

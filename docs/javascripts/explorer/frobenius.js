@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const RLM = "‏";
   const CMAX = 20, KMAX = 4, NMAX = 100000;
 

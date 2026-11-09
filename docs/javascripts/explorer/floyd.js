@@ -128,7 +128,7 @@
         $(".fl-sum").innerHTML = `הזנב : ${rho.mu === 0 ? "ריק" : ltr(rho.tail.join(" → "))} (${ltr(`μ = ${rho.mu}`)}), המעגל : ${ltr(rho.cycle.join(" → "))} (${ltr(`λ = ${rho.lambda}`)}). ` +
           `המפגש אחרי ${ltr(tr.frames.findIndex((g) => g.phase === 2) - 1)} איטרציות, ושלב 2 לוקח ${ltr(rho.mu)}. התשובה : ${ltr(tr.answer)}.` +
           (rho.others.length ? ` האינדקסים ${ltr(rho.others.join(", "))} לא נגישים מ-0 ולא משנים כלום.` : "");
-        answer(box, last ? `הערך הכפול הוא ${ltr(tr.answer)} : הכניסה למעגל, שהצב והארנב נפגשים בה בשלב 2.` : null, ".fl-cells .hl");
+        answer(box, last ? `הערך הכפול הוא ${ltr(tr.answer)} : הכניסה למעגל, שהצב והארנב נפגשים בה בשלב 2.` : null, ".fl-cells .hl");
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
       const setNums = (nums) => { stop(); st.nums = nums; st.k = 0; $(".ex-n").value = nums.length - 1; $(".fl-err").textContent = ""; draw(); };

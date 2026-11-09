@@ -118,7 +118,7 @@
   const svgTree = (m, tree, qpath, upath, under) => {
     const levels = m.toString(2).length, BAR = 14, LVL = 16, top = 8 + levels * LVL, H = top + 30 + 54, W = LW + m * CELL + 8;
     const tx = (i) => LW + (i - 1) * CELL + CELL / 2;
-    let s = open(W, H, "ov-fw", "מערך Fenwick : מעל כל תא הטווח שהוא מכסה, בתא הערך, ומתחתיו האינדקס, הבינארי שלו ומה הוא מייצג");
+    let s = open(W, H, "ov-fw", "מערך Fenwick : מעל כל תא הטווח שהוא מכסה, בתא הערך, ומתחתיו האינדקס, הבינארי שלו ומה הוא מייצג");
     s += `<text class="ov-lab" x="${LW - 8}" y="${top + 19}" text-anchor="end">tree[i]</text><text class="tick" x="${LW - 8}" y="${top + 44}" text-anchor="end">i</text>` +
       `<text class="tick" x="${LW - 8}" y="${top + 57}" text-anchor="end">binary</text><text class="tick" x="${LW - 8}" y="${top + 71}" text-anchor="end">${under[0]}</text>`;
     for (let i = 1; i <= m; i++) {
@@ -141,7 +141,7 @@
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>המצב <select class="ov-mode" aria-label="איזה סעיף">${Object.entries(MODES).map(([v, w]) => `<option value="${v}">${w}</option>`).join("")}</select></label>` +
-        `<label><span>זמני התשובה</span><input type="text" class="ex-num ov-done" dir="ltr" spellcheck="false" aria-label="זמני התשובה : עד ${NMAX} מספרים שלמים בין 0 ל-${VMAX}, מופרדים ברווח"></label>` +
+        `<label><span>זמני התשובה</span><input type="text" class="ex-num ov-done" dir="ltr" spellcheck="false" aria-label="זמני התשובה : עד ${NMAX} מספרים שלמים בין 0 ל-${VMAX}, מופרדים ברווח"></label>` +
         `<label>בהגרלה <select class="ov-n" aria-label="כמה בקשות להגריל">${[6, 8, 12, 16].map((v) => `<option value="${v}"${v === 8 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button ov-rand">הגרלה</button><span class="ov-anchor"></span>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err ov-err" role="status"></span></div>` +

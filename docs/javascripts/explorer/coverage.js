@@ -84,7 +84,7 @@
         `<p class="ex-title sg-chart-title"></p><div class="sg-chart"></div>` +
         `<span class="viz-legend"><span><i class="by-multiples"></i>ההמתנה שנמדדה</span><span><i class="sg-key-now"></i>השלב הנוכחי, עד עכשיו</span><span><i class="ink"></i>‏n/(n − i), התוחלת</span></span>` +
         // under the chart: the ribbon grows a row every few tests
-        `<p class="ex-title">הסרט : כל טסט משבצת, מחולק לשלבים, והטסט שמצא תא חדש מודגש</p><div class="sg-ribbon" dir="ltr"></div>` +
+        `<p class="ex-title">הסרט : כל טסט משבצת, מחולק לשלבים, והטסט שמצא תא חדש מודגש</p><div class="sg-ribbon" dir="ltr"></div>` +
         `<p class="ex-summary sg-sum" aria-live="polite"></p>`;
       const $ = (sel) => box.querySelector(sel);
       // the stage of every test and whether it found a new bin
@@ -100,7 +100,7 @@
           const x = X0 + (i + 0.5) * slot, v = vals[i];
           if (v !== undefined) {
             const now = !st.avg && i === cur && partial;
-            s += `<rect class="bar ${now ? "sg-now" : "by-multiples"}" x="${f(x - bw / 2)}" y="${f(Y(v))}" width="${f(bw)}" height="${f(BASE - Y(v))}" rx="2"><title>שלב ${i} → ${i + 1} : ${st.avg ? `ממוצע ${v.toFixed(2)}` : `${v} טסטים`}, התוחלת ${exp[i].toFixed(2)}</title></rect>`;
+            s += `<rect class="bar ${now ? "sg-now" : "by-multiples"}" x="${f(x - bw / 2)}" y="${f(Y(v))}" width="${f(bw)}" height="${f(BASE - Y(v))}" rx="2"><title>שלב ${i} → ${i + 1} : ${st.avg ? `ממוצע ${v.toFixed(2)}` : `${v} טסטים`}, התוחלת ${exp[i].toFixed(2)}</title></rect>`;
             if (!st.avg && n <= 12) s += `<text class="tick" x="${f(x)}" y="${f(Y(v) - 4)}" text-anchor="middle">${v}</text>`;
           }
           s += `<line class="ink-line" x1="${f(x - slot * 0.42)}" x2="${f(x + slot * 0.42)}" y1="${f(Y(exp[i]))}" y2="${f(Y(exp[i]))}" stroke-width="2" stroke-dasharray="4 3"/>`;
@@ -216,7 +216,7 @@
         let h = `<svg class="perf-chart cv-histsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="היסטוגרמה של מספר הטסטים ב-${m} ריצות">`;
         counts.forEach((c, b) => { h += `<rect class="bar by-multiples" x="${f(X0 + b * slot + 1)}" y="${f(Y(c))}" width="${f(Math.max(1, slot - 2))}" height="${f(BASE - Y(c))}"><title>${lo + b * width}${width > 1 ? `–${lo + b * width + width - 1}` : ""} טסטים : ${c} ריצות</title></rect>`; });
         const mark = (v, cls, lab, dy) => `<line class="${cls}" x1="${f(X(v) + slot / 2)}" x2="${f(X(v) + slot / 2)}" y1="${TOP}" y2="${BASE}" stroke-width="2"/><text class="legend halo" x="${f(X(v) + slot / 2 + 4)}" y="${TOP + dy}">${lab}</text>`;
-        h += mark(mean, "s2-line", `ממוצע ${mean.toFixed(1)}`, 12) + mark(exact, "ink-line", `תוחלת ${exact.toFixed(1)}`, 28) + mark(q95, "s3-line", `95% : ${q95}`, 44);
+        h += mark(mean, "s2-line", `ממוצע ${mean.toFixed(1)}`, 12) + mark(exact, "ink-line", `תוחלת ${exact.toFixed(1)}`, 28) + mark(q95, "s3-line", `95% : ${q95}`, 44);
         const every = Math.max(1, Math.ceil(nb / 8));
         for (let b = 0; b < nb; b += every) h += `<text class="tick" x="${f(X0 + b * slot + slot / 2)}" y="${BASE + 16}" text-anchor="middle">${lo + b * width}</text>`;
         return h + `<line class="axis" x1="${X0}" x2="${W - 12}" y1="${BASE}" y2="${BASE}"/></svg>`;

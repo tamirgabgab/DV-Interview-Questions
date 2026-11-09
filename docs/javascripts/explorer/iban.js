@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const MAXLEN = 34;
   // the published registry examples (ISO 13616) and the double error of 0099 part c
   const PRESETS = [["IL620108000000099999999", "ישראל, הדוגמה של העמוד"], ["GB82WEST12345698765432", "בריטניה, עם אותיות"],
@@ -208,7 +208,7 @@
   dvqExplorers.register({
     views: { iban: ibanView },
     help: {
-      iban: "מקלידים IBAN, או בוחרים דוגמה, ומתקדמים ספרה אחרי ספרה. ארבעת התווים הראשונים עוברים לסוף, כל אות נכתבת כשתי ספרות, ומתחת לכל ספרה מופיעה השארית בחלוקה ל-97 עד אליה. בסוף, שארית 1 היא IBAN תקין. בשורה השנייה בוחרים מקום, ומשנים את התו שם או מחליפים אותו עם השכן : התיבה אומרת אם הטעות נתפסה או עברה.",
+      iban: "מקלידים IBAN, או בוחרים דוגמה, ומתקדמים ספרה אחרי ספרה. ארבעת התווים הראשונים עוברים לסוף, כל אות נכתבת כשתי ספרות, ומתחת לכל ספרה מופיעה השארית בחלוקה ל-97 עד אליה. בסוף, שארית 1 היא IBAN תקין. בשורה השנייה בוחרים מקום, ומשנים את התו שם או מחליפים אותו עם השכן : התיבה אומרת אם הטעות נתפסה או עברה.",
     },
     models: { ibNorm, ibParse, ibGroup, ibDigits, ibRunning, ibMod, ibValid, ibCheck, ibChange, ibSwap },
   });

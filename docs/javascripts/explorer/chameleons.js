@@ -5,7 +5,7 @@
 // question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const RLM = "‏";
   const NAMES = ["אדומות", "ירוקות", "כחולות"];
   const ONE = ["אדומה", "ירוקה", "כחולה"];

@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, mulberry32, seedControls, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const NMIN = 2, NMAX = 40, WIN = 40, CAP = 1000000;
 
   // --- the models ------------------------------------------------------------------------------

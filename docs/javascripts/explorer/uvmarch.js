@@ -122,7 +122,7 @@
       };
       const card = (c) => {
         const [what, not, calls] = UV_INFO[c];
-        return `<p class="uv-ctitle">${code(UV_LAYOUT[c][0])}</p><p><b>תפקיד :</b> ${what}</p><p><b>לא עושה :</b> ${not}</p><p><b>קריאות חשובות :</b> <span dir="ltr">${calls}</span></p>`;
+        return `<p class="uv-ctitle">${code(UV_LAYOUT[c][0])}</p><p><b>תפקיד :</b> ${what}</p><p><b>לא עושה :</b> ${not}</p><p><b>קריאות חשובות :</b> <span dir="ltr">${calls}</span></p>`;
       };
       const draw = () => {
         const N = UV_STAGES.length;

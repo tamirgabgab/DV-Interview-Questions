@@ -115,7 +115,7 @@
         const w = 640, h = 270, X0 = 46, X1 = 624, Y0 = 14, Y1 = 230, end = Math.max(r.end, 1);
         const X = (u) => X0 + (u / end) * (X1 - X0), Y = (v) => Y1 - (v / st.burst) * (Y1 - Y0);
         const stair = (times) => { let d = `M${f(X(0))},${f(Y(0))}`; times.forEach((u, k) => { d += ` H${f(X(u))} V${f(Y(k + 1))}`; }); return d + ` H${f(X(end))}`; };
-        let s = `<svg class="perf-chart fs-live" viewBox="0 0 ${w} ${h}" role="img" aria-label="שתי מדרגות : המילים שנכתבו והמילים שנקראו לאורך הזמן, והפער ביניהן">`;
+        let s = `<svg class="perf-chart fs-live" viewBox="0 0 ${w} ${h}" role="img" aria-label="שתי מדרגות : המילים שנכתבו והמילים שנקראו לאורך הזמן, והפער ביניהן">`;
         const step = st.burst > 128 ? 50 : st.burst > 48 ? 20 : st.burst > 16 ? 5 : 2;
         for (let v = 0; v <= st.burst; v += step) s += `<line class="grid" x1="${X0}" x2="${X1}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 6}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`;
         const tick = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000].find((v) => (end * 0.05) / v <= 6) || 20000;

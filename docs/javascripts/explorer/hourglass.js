@@ -574,7 +574,7 @@
         }
         events = replay(res);
         st.s = Math.min(Math.max(st.s, 0), events.length - 1);
-        const flips = res.plan.map(([t, act]) => `${ltr(t)}: ${HEB(act)}`).join("; ");
+        const flips = res.plan.map(([t, act]) => `${ltr(t)} : ${HEB(act)}`).join("; ");
         summary.innerHTML = (interval ? `${st.objective === "page" ? "המדידה שמסתיימת הכי מוקדם" : "המדידה עם הכי מעט היפוכים"} : מרגע ${ltr(res.start)} עד רגע ${ltr(res.end)}, ‏${ltr(`${res.end} − ${res.start} = ${st.D}`)}. ` : `מודדים ${ltr(st.D)} דקות מרגע 0 ב-${ltr(events.length - 1)} אירועים${st.objective === "page" ? "" : ` ו-${ltr(res.flips)} היפוכים`}. `) +
           `התוכנית : ${flips}.` + (interval ? "" : ` מרגע 0 אפשר למדוד גם : ${ltr(reach().filter((v) => v !== st.D).slice(0, 12).join(", "))}, ...`);
         // the other objective, for comparison
@@ -616,8 +616,8 @@
         caption = (k) => {
           const [t, act, before, after] = events[k], out = outOf(k), done = k === events.length - 1;
           const ran = k === 0 ? "התחלה" : out.length > 1 ? `שעונים ${out.join(" ו-")} נגמרים` : `שעון ${out[0]} נגמר`;
-          $(".hg-caption").innerHTML = `רגע ${ltr(t)} : ${ran}. חול למעלה : ${tops(before)}. ` +
-            (done ? (interval ? `מסיימים : נמדדו ${ltr(st.D)} דקות מרגע ${ltr(res.start)}.` : `עברו בדיוק ${ltr(st.D)} דקות מרגע 0.`)
+          $(".hg-caption").innerHTML = `רגע ${ltr(t)} : ${ran}. חול למעלה : ${tops(before)}. ` +
+            (done ? (interval ? `מסיימים : נמדדו ${ltr(st.D)} דקות מרגע ${ltr(res.start)}.` : `עברו בדיוק ${ltr(st.D)} דקות מרגע 0.`)
               : `${interval && t === res.start ? "מתחילים למדוד, ו" : ""}${HEB(act)}${act ? `; אחרי ההיפוך למעלה ${tops(after)}` : ""}.`);
         };
         // the live scene shows the moment of the step being animated, or the event itself;

@@ -151,7 +151,7 @@
             setTime(Math.min(Math.max((Math.round((at * q) / P) * P) / q, 0), LAST));
           });
         });
-        $(".clock-hour-title").textContent = `השעה ${hh(H)}:00 עד ${hh(H + 1)}:00 מקרוב : כל פגישה היא קו`;
+        $(".clock-hour-title").textContent = `השעה ${hh(H)}:00 עד ${hh(H + 1)}:00 מקרוב : כל פגישה היא קו`;
         hourShown = H;
       };
       timeline.querySelectorAll(".tl-row").forEach((row) => {

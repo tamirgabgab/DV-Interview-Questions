@@ -141,7 +141,7 @@
     const shown = (k) => step && k <= i;
     s += valRow(n, 100, "len", (k) => (shown(k) ? step.len[k] : null), (k) => (shown(k) ? "" : " is-off") + (live && k === i ? " is-cur" : "") + (lit.has(k) ? " is-lis" : ""));
     s += valRow(n, 136, "cnt", (k) => (shown(k) ? step.cnt[k] : null), (k) => (shown(k) ? "" : " is-off") + (live && k === i ? " is-cur" : ""));
-    const aria = step ? `המערך ${a.join(" ")}. i = ${i}${j >= 0 ? `, j = ${j}` : ""}. len עד i : ${step.len.slice(0, i + 1).join(" ")}; cnt : ${step.cnt.slice(0, i + 1).join(" ")}` : `המערך ${a.join(" ")}, לפני הצעד הראשון`;
+    const aria = step ? `המערך ${a.join(" ")}. i = ${i}${j >= 0 ? `, j = ${j}` : ""}. len עד i : ${step.len.slice(0, i + 1).join(" ")}; cnt : ${step.cnt.slice(0, i + 1).join(" ")}` : `המערך ${a.join(" ")}, לפני הצעד הראשון`;
     return svgOf(width(n), 172, aria, s);
   };
   // the tails mode: the parent arcs over the array, tails under it with tail_at, and the
@@ -178,7 +178,7 @@
     } else if (live) {
       s += `<text class="lis-mark" x="${cx(step.k)}" y="${T + 68}" text-anchor="middle">k</text>`;
     }
-    const aria = step ? `המערך ${a.join(" ")}. x = ${step.x} (i = ${i}). tails : ${tails.join(" ") || "ריק"}` : `המערך ${a.join(" ")}, tails ריק`;
+    const aria = step ? `המערך ${a.join(" ")}. x = ${step.x} (i = ${i}). tails : ${tails.join(" ") || "ריק"}` : `המערך ${a.join(" ")}, tails ריק`;
     return svgOf(width(n), T + 94, aria, s);
   };
 

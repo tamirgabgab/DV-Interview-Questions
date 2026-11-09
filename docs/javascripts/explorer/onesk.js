@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const NMAX = 40;
 
   // Part a as the page's longest_ones plays it: a frame per right end, with the zeros in
@@ -53,7 +53,7 @@
     bits: ["הקצה הימני מתקדם", "יותר מ-k אפסים : השמאלי מתקדם", "הטוב עד עכשיו", "הסוף : הטוב הוא התשובה"],
     values: ["הקצה הימני מתקדם, והמונה שלו גדל", "יותר מ-k להחלפה : השמאלי מתקדם", "הטוב עד עכשיו", "הסוף : הטוב הוא התשובה"],
   };
-  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
+  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
   const onesView = () => ({
     mount(box) {
       const d0 = { mode: box.dataset.mode === "values" ? "values" : "bits", bits: box.dataset.bits || "11100011110", values: box.dataset.values || "AAABBCBABA", k: Number(box.dataset.k) || 2 };

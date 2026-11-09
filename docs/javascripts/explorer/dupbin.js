@@ -73,7 +73,7 @@
         g += `<rect class="db-range" x="${f(X(s.lo) - bw / 2)}" y="${Y0}" width="${f(bw * (s.hi - s.lo + 1))}" height="${Y1 - Y0}"/>`;
         for (let v = 1; v <= n; v++) {
           const mid = s.fr && v === s.fr.mid, out = v < s.lo || v > s.hi, over = c[v] > v;
-          g += `<rect class="db-bar${mid ? " is-mid" : ""}${out ? " is-out" : ""}" x="${f(X(v) - bw * 0.32)}" y="${f(Y(c[v]))}" width="${f(bw * 0.64)}" height="${f(Y1 - Y(c[v]))}"><title>${v} : ${c[v]} מספרים לכל היותר ${v}${over ? `, יותר מ-${v}` : ""}</title></rect>` +
+          g += `<rect class="db-bar${mid ? " is-mid" : ""}${out ? " is-out" : ""}" x="${f(X(v) - bw * 0.32)}" y="${f(Y(c[v]))}" width="${f(bw * 0.64)}" height="${f(Y1 - Y(c[v]))}"><title>${v} : ${c[v]} מספרים לכל היותר ${v}${over ? `, יותר מ-${v}` : ""}</title></rect>` +
                `<text class="tick" x="${f(X(v))}" y="${f(Y(c[v]) - 4)}" text-anchor="middle">${c[v]}</text>` +
                `<text class="tick" x="${f(X(v))}" y="${Y1 + 16}" text-anchor="middle">${v}</text>`;
         }
@@ -127,7 +127,7 @@
   dvqExplorers.register({
     views: { dupbin: dupbinView },
     help: {
-      dupbin: "״הצעד הבא״ ו״הפעלה״ מריצים את החיפוש הבינארי של פתרון 3 : בכל צעד מודגשים במערך המספרים שלכל היותר mid, העמודה של mid בתרשים מראה את הספירה מול הקו y = v, והטווח lo עד hi מצטמצם. ״הגרלה״, ‏n והשדה קובעים את המערך.",
+      dupbin: "״הצעד הבא״ ו״הפעלה״ מריצים את החיפוש הבינארי של פתרון 3 : בכל צעד מודגשים במערך המספרים שלכל היותר mid, העמודה של mid בתרשים מראה את הספירה מול הקו y = v, והטווח lo עד hi מצטמצם. ״הגרלה״, ‏n והשדה קובעים את המערך.",
     },
     models: { dupBinarySearch, dupCounts },
   });

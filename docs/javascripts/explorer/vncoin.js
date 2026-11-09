@@ -6,7 +6,7 @@
 // models for the question tests.
 (() => {
   const { ltr, mulberry32, autoplay, speedSel, seedControls } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
 
   // --- part a: von Neumann's pairs -----------------------------------------------------------
   // the bit of a pair: 1 for HT (a = 1, b = 0), 0 for TH, null for HH and TT

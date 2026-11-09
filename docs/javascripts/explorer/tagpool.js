@@ -5,14 +5,14 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const NMAX = 12, TMAX = 99;
   // the solution's steps, as chips of the explanation panel, and a variable's change
   const STEPS = {
     one: ["שני אירועים לטרנזקציה", "מיון לפי זמן, תשובה לפני שליחה", "סריקה : המונה והשיא", "התשובה : השיא"],
     two: ["שני אירועים לטרנזקציה, עם הסוג", "מיון לפי זמן, תשובה לפני שליחה", "סריקה : מונה לכל סוג, והסכום", "התשובה : שלושת השיאים"],
   };
-  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
+  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
 
   // The sorted events of the transactions (a response before a send at one time, then the
   // reads before the writes, then the list order) with the counters after each, as
@@ -209,7 +209,7 @@
   dvqExplorers.register({
     views: { tagpool: tagpoolView },
     help: {
-      tagpool: "מקלידים טרנזקציות כזוגות שליחה-תשובה (למשל 0-30 5-10), ובשני מאגרים עם R או W לפני כל אחת, או מגרילים. כל צעד הוא אירוע אחד לפי הזמן, תשובה לפני שליחה באותו רגע : הקו שמתחת לטרנזקציות הוא כמה פתוחות, הקו המקווקו השיא עד עכשיו, והטרנזקציות הפתוחות מודגשות. כפתורי מקרי המלכודת טוענים תיקו בזמן, טרנזקציה שחופפת להרבה אחרות, ושני שיאים באותו רגע. בסוף התשובה היא השיא, ובשני מאגרים גם השיא של כל סוג לבד והחיסכון של מאגר משותף.",
+      tagpool: "מקלידים טרנזקציות כזוגות שליחה-תשובה (למשל 0-30 5-10), ובשני מאגרים עם R או W לפני כל אחת, או מגרילים. כל צעד הוא אירוע אחד לפי הזמן, תשובה לפני שליחה באותו רגע : הקו שמתחת לטרנזקציות הוא כמה פתוחות, הקו המקווקו השיא עד עכשיו, והטרנזקציות הפתוחות מודגשות. כפתורי מקרי המלכודת טוענים תיקו בזמן, טרנזקציה שחופפת להרבה אחרות, ושני שיאים באותו רגע. בסוף התשובה היא השיא, ובשני מאגרים גם השיא של כל סוג לבד והחיסכון של מאגר משותף.",
     },
     models: { tpSweep, tpPools, tpSendFirst, tpPairsBound },
     // the timeline, narrower but its text still at its size, beside its legend and the line

@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const STAGES = [
     { s: 7n, mask: 0x00AA00AA00AA00AAn, what: "בתוך כל בלוק 2×2" },
     { s: 14n, mask: 0x0000CCCC0000CCCCn, what: "בלוקים 2×2 בתוך כל 4×4" },
@@ -73,7 +73,7 @@
             else if (g && p >= Number(g.s) && bit(g.mask, p - Number(g.s))) cls += " c2";
             if (prev !== null && bit(prev, p) !== on) cls += " is-hl";
             if (r === c) cls += " bm-diag";
-            rows += `<td class="pm-c bm-cell ${cls}" data-p="${p}" title="(${r}, ${c}) : ביט ${p}">${on}</td>`;
+            rows += `<td class="pm-c bm-cell ${cls}" data-p="${p}" title="(${r}, ${c}) : ביט ${p}">${on}</td>`;
           }
           rows += "</tr>";
         }
@@ -132,7 +132,7 @@
   dvqExplorers.register({
     views: { bitmatrix: bitmatrixView },
     help: {
-      bitmatrix: "בוחרים דוגמה, מקלידים מילה בהקסדצימלי או לוחצים על תאים כדי להדליק ולכבות ביטים. ״השלב הבא״ מבצע delta swap אחד : הביטים של המסכה צבועים, בני הזוג שלהם בצבע אחר, והביטים שהשתנו ממוסגרים. מתחת לטבלה המילה אחרי כל שלב, המסכה, ההזזה ו-t.",
+      bitmatrix: "בוחרים דוגמה, מקלידים מילה בהקסדצימלי או לוחצים על תאים כדי להדליק ולכבות ביטים. ״השלב הבא״ מבצע delta swap אחד : הביטים של המסכה צבועים, בני הזוג שלהם בצבע אחר, והביטים שהשתנו ממוסגרים. מתחת לטבלה המילה אחרי כל שלב, המסכה, ההזזה ו-t.",
     },
     models: { bmStages },
     // on a computer: the matrix and its legend on the left, the words after each stage and

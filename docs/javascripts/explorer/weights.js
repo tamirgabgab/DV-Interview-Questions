@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, explain, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const MINUS = "−";
   const num = (v) => (v < 0 ? `${MINUS}${-v}` : String(v));
 

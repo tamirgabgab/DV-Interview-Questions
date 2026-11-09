@@ -56,7 +56,7 @@
         `<button type="button" class="md-button md-button--primary ex-next">לזוג הבא</button>` +
         `<button type="button" class="md-button ex-prev">חזרה</button>` +
         `<button type="button" class="md-button ex-reset">חזרה לדוגמה של העמוד</button></div>` +
-        `<p class="ex-title">הזוגות (p, q) : לחיצה על משבצת בוחרת אותה, והחץ מוביל לזוג של ההפרש הבא</p><div class="kpp-grid"></div>` +
+        `<p class="ex-title">הזוגות (p, q) : לחיצה על משבצת בוחרת אותה, והחץ מוביל לזוג של ההפרש הבא</p><div class="kpp-grid"></div>` +
         `<span class="viz-legend"><span><i class="kpp-key-q0"></i>העמודה q = 0 (שלב 5)</span><span><i class="kpp-key-fixed"></i>‏6174, חוזר לעצמו</span><span><i class="kq-key-path"></i>המסלול מהזוג שנבחר</span></span>` +
         `<div class="kpp-text" aria-live="polite"></div>`;
       const $ = (sel) => box.querySelector(sel);
@@ -143,7 +143,7 @@
   dvqExplorers.register({
     views: { kappairs: kappairsView },
     help: {
-      kappairs: "לוחצים על משבצת (או בוחרים זוג ברשימה) : השורות מתחת מראות את ההפרש, את הספרות לפי שלב 3, את המקרה של שלב 6 ואת שני התנאים, והחץ מוביל לזוג הבא. ״לזוג הבא״ הולך בעקבות החץ, ו״חזרה״ חוזר לזוג הקודם.",
+      kappairs: "לוחצים על משבצת (או בוחרים זוג ברשימה) : השורות מתחת מראות את ההפרש, את הספרות לפי שלב 3, את המקרה של שלב 6 ואת שני התנאים, והחץ מוביל לזוג הבא. ״לזוג הבא״ הולך בעקבות החץ, ו״חזרה״ חוזר לזוג הקודם.",
     },
     models: { kapPair, kapPairPath },
   });

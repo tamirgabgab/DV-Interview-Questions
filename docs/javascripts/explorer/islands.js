@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const MAXR = 8, MAXC = 10;
   const DIRS4 = [[-1, 0], [1, 0], [0, -1], [0, 1]];
   const DIRS8 = [...DIRS4, [-1, -1], [-1, 1], [1, -1], [1, 1]];
@@ -75,8 +75,8 @@
     c: { label: "אי קטן לפני גדול", grid: "1101.1001.0111" },
   };
   const STEPS = {
-    a: ["הסריקה : תא אחרי תא", "אי חדש : המונה גדל, התא לתור", "ההצפה : תא יוצא, שכנים נכנסים", "האי נגמר : התור ריק", "הסוף : count"],
-    c: ["הסריקה : תא אחרי תא", "אי חדש : הצפה", "ההצפה סופרת : size גדל", "הגודל לרשימה", "המיון בסוף"],
+    a: ["הסריקה : תא אחרי תא", "אי חדש : המונה גדל, התא לתור", "ההצפה : תא יוצא, שכנים נכנסים", "האי נגמר : התור ריק", "הסוף : count"],
+    c: ["הסריקה : תא אחרי תא", "אי חדש : הצפה", "ההצפה סופרת : size גדל", "הגודל לרשימה", "המיון בסוף"],
   };
   STEPS.b = STEPS.a;
   // the lines of the page's code: the scan of each mode's function, and the flood of part a
@@ -116,12 +116,12 @@
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary il-sum" aria-live="polite"></p>` +
         `<p class="il-edit-hint">לחיצה על תא הופכת אותו ממים ליבשה ובחזרה, ומתחילה את ההצפה מחדש. במקלדת${NB}: חיצים בין התאים, רווח או Enter הופכים תא.</p>` +
-        `<div class="il-panels"><figure class="il-panel"><figcaption class="il-cap"></figcaption><div class="il-grid" role="grid" dir="ltr" data-edits aria-label="הלוח : לחיצה על תא הופכת אותו"></div></figure>` +
+        `<div class="il-panels"><figure class="il-panel"><figcaption class="il-cap"></figcaption><div class="il-grid" role="grid" dir="ltr" data-edits aria-label="הלוח : לחיצה על תא הופכת אותו"></div></figure>` +
         `<figure class="il-panel il-qpanel" data-steady><figcaption>התור, הראש משמאל</figcaption><div class="il-queue"></div></figure></div>` +
         `<span class="viz-legend"><span><i class="il-key is-water"></i>מים</span><span><i class="il-key is-land"></i>יבשה שעוד לא הוצפה</span><span><i class="il-key il-i1"></i>אי (צבע ומספר לכל אי)</span>` +
         `<span><i class="il-key-q"></i>בתור</span><span><i class="il-key-cur"></i>התא שיצא מהתור</span><span><i class="il-key-new"></i>נכנס לתור בצעד הזה</span></span>` +
         `<p class="il-note"></p><p class="il-sizes"></p>`;
-      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
+      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       answer(box, NB); answer(box, null);           // the answer line keeps its place from the first step
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), gin = $(".il-grid");
@@ -184,7 +184,7 @@
         } else if (e.kind === "pop") {
           const [i, j] = e.cell, size = e.sizes[e.sizes.length - 1], empty = e.q.length === 0;
           sum = `צעד ${ltr(st.s)}${NB}: ${P(i, j)} יוצא מהתור, אי ${ltr(e.isle)}, הגודל עד עכשיו ${ltr(size)}. איים עד עכשיו${NB}: <b>${ltr(e.count)}</b>.`;
-          const parts = e.nb.map(([a, b, why, k]) => `${DIR_HEB[k]}${why === "out" ? " מחוץ ללוח" : ` ${P(a, b)} ${{ water: "מים", seen: "כבר סומן", push: "<b>יבשה שלא סומנה : מסומן ונכנס לתור</b>" }[why]}`}`);
+          const parts = e.nb.map(([a, b, why, k]) => `${DIR_HEB[k]}${why === "out" ? " מחוץ ללוח" : ` ${P(a, b)} ${{ water: "מים", seen: "כבר סומן", push: "<b>יבשה שלא סומנה : מסומן ונכנס לתור</b>" }[why]}`}`);
           note = `${P(i, j)} יוצא מראש התור, ${ltr(`size ← ${size}`)}. ${e.nb.length} השכנים${NB}: ${parts.join("; ")}.` +
             (empty ? ` התור ריק${NB}: האי ${ltr(e.isle)} שלם, ${ltr(size)} תאים${sizesMode ? `, והגודל נכנס לרשימה` : ""}. הסריקה ממשיכה מהמקום שבו עצרה.` : "");
           lit = [3, ...(empty ? [4] : [])]; lines = FLOOD(e.pushed.length > 0, empty); code = "count_islands";
@@ -293,7 +293,7 @@
   dvqExplorers.register({
     views: { islands: islandsView },
     help: {
-      islands: "לחיצה על תא הופכת אותו ממים ליבשה ובחזרה, \"לוח אקראי\" מגריל לוח לפי הסיכוי ליבשה, \"מקרה מלכודת\" טוען לוח שמכשיל פתרון נאיבי, ובוחרים ארבעה או שמונה כיוונים. כל צעד הוא תא אחד של מילוי בהצפה : הסריקה פוגשת יבשה שלא סומנה ומתחילה אי חדש, או תא יוצא מהתור ושכניו נבדקים. התור מצויר ליד הלוח, התא שיצא מוקף, התאים שנכנסו מסומנים בכתום, וכל אי מקבל צבע עם המספר שלו (בסעיף ג : הגודל שלו, והרשימה הממוינת מתחת). השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
+      islands: "לחיצה על תא הופכת אותו ממים ליבשה ובחזרה, \"לוח אקראי\" מגריל לוח לפי הסיכוי ליבשה, \"מקרה מלכודת\" טוען לוח שמכשיל פתרון נאיבי, ובוחרים ארבעה או שמונה כיוונים. כל צעד הוא תא אחד של מילוי בהצפה : הסריקה פוגשת יבשה שלא סומנה ומתחילה אי חדש, או תא יוצא מהתור ושכניו נבדקים. התור מצויר ליד הלוח, התא שיצא מוקף, התאים שנכנסו מסומנים בכתום, וכל אי מקבל צבע עם המספר שלו (בסעיף ג : הגודל שלו, והרשימה הממוינת מתחת). השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
     },
     models: { ilTrace, ilSizes, ilParse, ilText },
     // on a computer: the board, the queue and the notes on the left, the steps-and-code

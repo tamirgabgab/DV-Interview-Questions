@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
 
   // The cycles of the places: the value at k goes to k m mod (mn - 1); 0 and mn - 1 stay.
   const tpNext = (k, m, size) => (k === size - 1 ? k : (k * m) % (size - 1));
@@ -77,7 +77,7 @@
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary tp-sum" aria-live="polite"></p>` +
         `<div class="tp-fig" data-steady></div>` +
-        `<span class="viz-legend"><span><i class="pm-key-c1"></i>הצבע : המעגל</span><span><i class="pm-key-hl"></i>ההנחה של הצעד</span><span><i class="tp-key-off"></i>לא זז</span></span>` +
+        `<span class="viz-legend"><span><i class="pm-key-c1"></i>הצבע : המעגל</span><span><i class="pm-key-hl"></i>ההנחה של הצעד</span><span><i class="tp-key-off"></i>לא זז</span></span>` +
         `<p class="tp-note"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const frames = () => tpSteps(st.m, st.n, st.method === "leader");
@@ -119,7 +119,7 @@
           `${ltr(long)} מעגלים שזזים, ${ltr(T)} הנחות. ` +
           (st.method === "leader" ? `בלי סימון, ההליכות לחיפוש המנהיגים${NB}: ${ltr(f.checks)} צעדים עד עכשיו, ${ltr(tpChecks(m, n))} בסך הכול.` : `עם סימון${NB}: ${ltr(size)} ביטים של "בוצע".`);
         $(".tp-note").innerHTML = st.s === 0
-          ? (size <= 2 ? "מטריצה של איבר אחד או שניים, או שורה ועמודה אחת : השחלוף לא מזיז כלום." : `מתחילים מ-${ltr("s = 1")}. כל ערך מונח במקום שלו, ומה שהיה שם עולה ליד.`)
+          ? (size <= 2 ? "מטריצה של איבר אחד או שניים, או שורה ועמודה אחת : השחלוף לא מזיז כלום." : `מתחילים מ-${ltr("s = 1")}. כל ערך מונח במקום שלו, ומה שהיה שם עולה ליד.`)
           : `מניחים את ${ltr(f.put)} באינדקס ${ltr(f.at)} (${ltr(`${f.put}·${m} mod ${size - 1} = ${f.at}`)})` +
             (f.carry === null ? `, והמעגל של ${ltr(f.s)} נסגר.` : `, ומרימים את ${ltr(f.carry)}.`) +
             (st.method === "leader" ? ` ‏${ltr(f.s)} הוא המנהיג${NB}: אין במעגל שלו אינדקס קטן ממנו.` : "");

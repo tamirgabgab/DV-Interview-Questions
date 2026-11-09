@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const NMIN = 3, NMAX = 8, WMAX = 99;
 
   // --- the two searches, event by event, as tools/figures/q0067.py -------------------------
@@ -120,7 +120,7 @@
     F.forEach((x) => { if (x.kind === "relax" && x.improved) tree[x.v] = x.i; });
     const mx = e && e.kind === "done" && e.ans >= 0 ? e.ans : null;
     let s = `<svg class="figure nd-fig nd-live" viewBox="0 0 ${W} ${H}" style="max-width:${Math.round(W * 1.15)}px" role="img" ` +
-      `aria-label="הרשת על מעגל עם ${st.mode === "a" ? "התור" : "הערימה"} לידה : המקור ${k}, הזמנים בתוויות, הצומת של הצעד מוקף והקשת שנבדקת מודגשת">`;
+      `aria-label="הרשת על מעגל עם ${st.mode === "a" ? "התור" : "הערימה"} לידה : המקור ${k}, הזמנים בתוויות, הצומת של הצעד מוקף והקשת שנבדקת מודגשת">`;
     const P = {};
     for (let i = 1; i <= n; i++) P[i] = pos(i, n);
     edges.forEach(([u, v, w], i) => {
@@ -206,7 +206,7 @@
         `<span class="nd-not-a"><i class="nd-key-old"></i>רשומה ישנה</span><span><i class="nd-key-far"></i>לא מושג</span></span>` +
         `<p class="nd-note"></p><p class="nd-tally"></p>` +
         `<div class="ex-fold"><p class="ex-fold-title">הקשתות והמשקלים</p><div class="nd-etab-wrap"></div></div>`;
-      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
+      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       answer(box, NB); answer(box, null);           // the answer line keeps its place from the first step
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
@@ -344,7 +344,7 @@
   dvqExplorers.register({
     views: { netdelay: netView },
     help: {
-      netdelay: "בוחרים סעיף וגרף (הדוגמה של העמוד, קו, טבעת, עץ, צפוף, או הגרלה מערך אתחול), את מספר הצמתים ואת המקור k, ובטבלה שמתחת לאיור את המשקל של כל קשת. הגרף מצויר על מעגל והתור (סעיף א) או הערימה (סעיפים ב ו-ג, ממוינת) לידו. כל צעד הוא הוצאה אחת מהתור או מהערימה, או בדיקה של קשת אחת : הצומת של הצעד מוקף, הקשת שנבדקת מודגשת, צומת שנסגר נצבע והזמן שלו נכתב בתווית שלידו, ורשומה ישנה בערימה נמחקת כשהיא יוצאת. בסוף התשובה : הזמן הגדול ביותר, או −1 עם הצמתים שלא מושגים. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
+      netdelay: "בוחרים סעיף וגרף (הדוגמה של העמוד, קו, טבעת, עץ, צפוף, או הגרלה מערך אתחול), את מספר הצמתים ואת המקור k, ובטבלה שמתחת לאיור את המשקל של כל קשת. הגרף מצויר על מעגל והתור (סעיף א) או הערימה (סעיפים ב ו-ג, ממוינת) לידו. כל צעד הוא הוצאה אחת מהתור או מהערימה, או בדיקה של קשת אחת : הצומת של הצעד מוקף, הקשת שנבדקת מודגשת, צומת שנסגר נצבע והזמן שלו נכתב בתווית שלידו, ורשומה ישנה בערימה נמחקת כשהיא יוצאת. בסוף התשובה : הזמן הגדול ביותר, או −1 עם הצמתים שלא מושגים. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
     },
     cols: { netdelay: { side: ".nd-note" } },   // the graph, its legend, the tally and the links table beside the step's note and the code
     models: { ndBfs, ndDijkstra, ndRandomGraph, ndReady: (g, n) => (g === "example" ? EXAMPLE.edges : READY[g](n)) },

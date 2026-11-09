@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, mulberry32, seedControls, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const MMIN = 2, MMAX = 10, NMIN = 2, NMAX = 40, KMORE = 3, ROUNDS = 10, DRAW_MAX = 400;
 
   const gcd = (a, b) => (b ? gcd(b, a % b) : a);

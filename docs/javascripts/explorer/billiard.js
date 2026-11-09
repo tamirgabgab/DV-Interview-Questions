@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { arrowStep, ltr } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
 
   // --- the model -------------------------------------------------------------------------------
   // The table is a x b with its corner (0, 0) at the origin; a ball of radius rho moves its
@@ -150,8 +150,8 @@
         `<svg class="figure bil-live" viewBox="0 0 ${W} ${HT}" role="group" aria-label="שולחן הביליארד, ששת הכיסים, הכדור, חץ הכיוון והמסלול"></svg>` +
         `<p class="bil-count" data-steady></p>` +
         `<p class="ex-summary bil-sum" aria-live="polite"></p>` +
-        `<p class="ex-title">אותה מכה על השולחן הפתוח : קו ישר, וליד כל קו של כיסים הפער מנקודת הרשת הקרובה</p>` +
-        `<svg class="figure bil-unf" role="img" aria-label="השולחן הפתוח : עותקי השולחן, נקודות הרשת של הכיסים והמסלול כקו ישר"></svg>` +
+        `<p class="ex-title">אותה מכה על השולחן הפתוח : קו ישר, וליד כל קו של כיסים הפער מנקודת הרשת הקרובה</p>` +
+        `<svg class="figure bil-unf" role="img" aria-label="השולחן הפתוח : עותקי השולחן, נקודות הרשת של הכיסים והמסלול כקו ישר"></svg>` +
         `<span class="viz-legend"><span><i class="bil-key-felt"></i>השולחן עצמו</span><span><i class="box-copy"></i>העותקים</span>` +
         `<span><i class="bil-key-hole"></i>כיס</span><span><i class="bil-key-path"></i>המסלול</span><span><i class="s1"></i>פגיעה בדופן</span>` +
         `<span><i class="bil-key-gap"></i>הפער בקו של כיסים</span><span><i class="bil-key-in"></i>הכיס שהכדור נכנס אליו</span></span>` +
@@ -211,11 +211,11 @@
         // the handles: the ball at its start, and the tip of the aim arrow
         const th = (st.deg * Math.PI) / 180, L = 48;
         const tx = st.x + L * Math.cos(th), ty = st.y + L * Math.sin(th);
-        s += `<g class="bil-h bil-start" data-drag="ball" tabindex="0" role="button" aria-label="הכדור ב-(${nf(st.x, 1)}, ${nf(st.y, 1)}) : גוררים, או מזיזים בחיצים (עם Shift בקפיצות)">` +
+        s += `<g class="bil-h bil-start" data-drag="ball" tabindex="0" role="button" aria-label="הכדור ב-(${nf(st.x, 1)}, ${nf(st.y, 1)}) : גוררים, או מזיזים בחיצים (עם Shift בקפיצות)">` +
           `<circle class="bil-hit" cx="${PX(st.x).toFixed(1)}" cy="${PY(st.y).toFixed(1)}" r="18"/>` +
           (st.phase === "idle" ? "" : `<circle class="bil-ghost" cx="${PX(st.x).toFixed(1)}" cy="${PY(st.y).toFixed(1)}" r="${ballR.toFixed(1)}"/>`) + `</g>`;
         s += `<line class="bil-arrow" x1="${PX(st.x).toFixed(1)}" y1="${PY(st.y).toFixed(1)}" x2="${PX(tx).toFixed(1)}" y2="${PY(ty).toFixed(1)}"/>` +
-          `<g class="bil-h bil-tip" data-drag="aim" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="360" aria-valuenow="${nf(st.deg, 1)}" aria-label="כיוון המכה : ${nf(st.deg, 1)} מעלות. גוררים, או מסובבים בחיצים">` +
+          `<g class="bil-h bil-tip" data-drag="aim" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="360" aria-valuenow="${nf(st.deg, 1)}" aria-label="כיוון המכה : ${nf(st.deg, 1)} מעלות. גוררים, או מסובבים בחיצים">` +
           `<circle class="bil-hit" cx="${PX(tx).toFixed(1)}" cy="${PY(ty).toFixed(1)}" r="18"/><circle class="bil-tipdot" cx="${PX(tx).toFixed(1)}" cy="${PY(ty).toFixed(1)}" r="7"/></g>`;
         live.innerHTML = s;
       };
@@ -240,7 +240,7 @@
           if (px < 0 || px > xb + 1e-9 || c.back) return;
           if (st.phase === "idle" || (st.phase === "run" && passed < px)) return;
           if (c.yk > yb + B || c.yk < -B) return;
-          s += `<line class="bil-gap${c.ok ? " is-in" : ""}" x1="${ux(px).toFixed(1)}" y1="${uy(c.yk).toFixed(1)}" x2="${ux(px).toFixed(1)}" y2="${uy(c.m * B).toFixed(1)}"><title>k = ${c.k} : פער של ${nf(c.gap, 1)} ס״מ</title></line>`;
+          s += `<line class="bil-gap${c.ok ? " is-in" : ""}" x1="${ux(px).toFixed(1)}" y1="${uy(c.yk).toFixed(1)}" x2="${ux(px).toFixed(1)}" y2="${uy(c.m * B).toFixed(1)}"><title>k = ${c.k} : פער של ${nf(c.gap, 1)} ס״מ</title></line>`;
         });
         for (let k = 0; k * (A / 2) <= xb + 1e-9; k++) for (let m = 0; m * B <= yb + 1e-9; m++) {
           const isIn = st.phase === "done" && sh.hit && sh.hit.k === k && sh.hit.m === m;

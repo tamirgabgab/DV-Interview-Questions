@@ -165,7 +165,7 @@
     boxes.push(chainBox("CATS", ["חתולים", pct(res.cats)], "mk-cat", 84, false, !used.has("CATS")));
     Object.keys(CP).filter(isDuel).forEach((d) => { const [i, j, k] = d.split(",").map(Number); boxes.push(chainBox(d, [`${i} מול ${j}`, `תור ${k}`], "mk-node", 64, k === me, !used.has(d))); });
     [1, 2, 3].forEach((k) => boxes.push(chainBox(`W${k}`, [`${k} מנצח`, pct(res.win[k - 1])], "mk-win", 96, k === me, !used.has(`W${k}`))));
-    return `<svg class="figure mk-chain" viewBox="0 0 480 340" role="group" data-p="${p.join(",")}" data-me="${me}" aria-label="שרשרת מרקוב של הבחירה הנוכחית : הסיכויים הסופיים ${res.win.map(pct).join(", ")}, חתולים ${pct(res.cats)}">` +
+    return `<svg class="figure mk-chain" viewBox="0 0 480 340" role="group" data-p="${p.join(",")}" data-me="${me}" aria-label="שרשרת מרקוב של הבחירה הנוכחית : הסיכויים הסופיים ${res.win.map(pct).join(", ")}, חתולים ${pct(res.cats)}">` +
       `<defs><marker id="wz-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="mk-head"/></marker></defs>` +
       edges.join("") + boxes.join("") + labels.join("") + "</svg>";
   };
@@ -384,7 +384,7 @@
   dvqExplorers.register({
     views: { wizards: wizardsView },
     help: {
-      wizards: "בוחרים את שני היריבים, את התור שלי, את הסדר שלהם ואת השרביט : מתחת לכפתורים הסיכויים של כולם ושל החתולים. ״הבחירה הטובה ביותר״ עוברת על ששת הסדרים ועל כל השרביטים. הטבלה מראה את ששת הסדרים, הגרף את הסיכוי שלי לכל שרביט, ושרשרת מרקוב את המשחק עם הבחירות של כולם.",
+      wizards: "בוחרים את שני היריבים, את התור שלי, את הסדר שלהם ואת השרביט : מתחת לכפתורים הסיכויים של כולם ושל החתולים. ״הבחירה הטובה ביותר״ עוברת על ששת הסדרים ועל כל השרביטים. הטבלה מראה את ששת הסדרים, הגרף את הסיכוי שלי לכל שרביט, ושרשרת מרקוב את המשחק עם הבחירות של כולם.",
     },
     cols: { wizards: { main: ".wz-duo", side: ".ex-title, .wz-chain, .wz-explain, .viz-legend", w: "minmax(0, 0.75fr)" } },   // the six orders and the chart (stacked) beside the chain; the outcome chips stay full width
     models: { wzDuel, wzRound, wzChance, wzBest, wzOrders, wzStates, explainState },

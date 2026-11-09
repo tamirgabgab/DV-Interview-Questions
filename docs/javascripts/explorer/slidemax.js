@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const NMAX = 24, VMAX = 99, KMAX_HW = 8;
   const num = (v) => String(v).replace("-", "−");
 
@@ -81,11 +81,11 @@
   const MODES = { a: "המקסימום של כל חלון (סעיף א)", b: "max − min ≤ limit (סעיף ב)", c: "המודול, מחזור אחרי מחזור (סעיף ג)" };
   const STEPS = {
     a: ["הראש יצא מהחלון", "מנקים את הזנב", "מכניסים", "הפלט"],
-    b: ["הקצה הימני מתקדם", "החלון לא חוקי : השמאלי מתקדם", "הטוב עד עכשיו", "הסוף : הטוב הוא התשובה"],
+    b: ["הקצה הימני מתקדם", "החלון לא חוקי : השמאלי מתקדם", "הטוב עד עכשיו", "הסוף : הטוב הוא התשובה"],
     c: ["השוואה", "המקום של x", "המצב הבא", "יציאה לפי גיל", "המוצא"],
   };
   const CODE = { a: "window_max", b: "longest_within", c: "win_max" };
-  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
+  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
   const list = (nums, idx) => `[${idx.map((j) => num(nums[j])).join(", ")}]`;
 
   // --- drawing ------------------------------------------------------------------------
@@ -187,7 +187,7 @@
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>המצב <select class="sm-mode" aria-label="איזה סעיף">${Object.entries(MODES).map(([v, w]) => `<option value="${v}">${w}</option>`).join("")}</select></label>` +
-        `<label><span>המערך</span><input type="text" class="ex-num sm-nums" dir="ltr" spellcheck="false" aria-label="המערך : עד ${NMAX} מספרים שלמים, מופרדים ברווח"></label>` +
+        `<label><span>המערך</span><input type="text" class="ex-num sm-nums" dir="ltr" spellcheck="false" aria-label="המערך : עד ${NMAX} מספרים שלמים, מופרדים ברווח"></label>` +
         `<label class="sm-klab"><span class="sm-kname">k</span> <input type="number" class="ex-num sm-k" min="1" max="${NMAX}" step="1" dir="ltr" aria-label="גודל החלון"></label>` +
         `<label class="sm-llab"><span>limit</span> <input type="number" class="ex-num sm-limit" min="0" max="${2 * VMAX}" step="1" dir="ltr" aria-label="ההפרש המותר בין המקסימום למינימום"></label>` +
         `<label>בהגרלה <select class="sm-n" aria-label="כמה מספרים להגריל">${[8, 12, 16, 24].map((v) => `<option value="${v}"${v === 8 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
@@ -206,7 +206,7 @@
         `<span class="sm-not-c"><i class="sm-key-in"></i>ב-deque</span><span class="sm-only-c"><i class="sm-key-in"></i>כניסה בשימוש</span><span><i class="sm-key-front"></i>הראש, המקסימום</span>` +
         `<span><i class="sm-key-pop"></i>יוצא בצעד הזה</span><span><i class="sm-key-cur"></i>הערך החדש</span></span>` +
         `<p class="sm-note"></p><p class="sm-tally"></p>`;
-      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
+      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       answer(box, NB); answer(box, null);           // the answer line keeps its place from the first step
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
@@ -360,7 +360,7 @@
     views: { slidemax: slideView },
     cols: { slidemax: {} },   // the figure, the legend and the notes beside the steps and the code
     help: {
-      slidemax: "מקלידים מערך של מספרים שלמים (או מגרילים) ובוחרים מצב. בסעיף א כל צעד הוא פעולה אחת על ה-deque : הוצאה מהראש כשהמקום יצא מהחלון, הוצאה מהזנב של ערך שאינו גדול מהחדש, או הכנסה עם הפלט. ה-deque מצויר מתחת למקומות שלו, הראש מודגש והיוצא מחוק. בסעיף ב שני deques, hi למקסימום ו-lo למינימום, והקצוות L ו-R : השמאלי מתקדם כל עוד ההפרש גדול מ-limit. בסעיף ג המודול, שני צעדים בכל מחזור : ההשוואות של הכניסות עם x, המסכה keep והמקום של x, ואז עליית השעון עם הכניסות החדשות ו-max_out. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
+      slidemax: "מקלידים מערך של מספרים שלמים (או מגרילים) ובוחרים מצב. בסעיף א כל צעד הוא פעולה אחת על ה-deque : הוצאה מהראש כשהמקום יצא מהחלון, הוצאה מהזנב של ערך שאינו גדול מהחדש, או הכנסה עם הפלט. ה-deque מצויר מתחת למקומות שלו, הראש מודגש והיוצא מחוק. בסעיף ב שני deques, hi למקסימום ו-lo למינימום, והקצוות L ו-R : השמאלי מתקדם כל עוד ההפרש גדול מ-limit. בסעיף ג המודול, שני צעדים בכל מחזור : ההשוואות של הכניסות עם x, המסכה keep והמקום של x, ואז עליית השעון עם הכניסות החדשות ו-max_out. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
     },
     models: { smTraceMax, smTraceLimit, smTraceHw },
   });

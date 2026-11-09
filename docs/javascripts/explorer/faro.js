@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const PER = 13;
 
   // One perfect shuffle, top card first: out keeps the top card on top (an odd deck's top
@@ -59,7 +59,7 @@
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary fa-sum" aria-live="polite"></p>` +
         `<div class="fa-fig" data-steady></div>` +
-        `<span class="viz-legend"><span><i class="pm-key-c1"></i>הצבע : המעגל של המקום המקורי</span><span><i class="pm-key-hl"></i>קלף שחזר למקומו</span></span>` +
+        `<span class="viz-legend"><span><i class="pm-key-c1"></i>הצבע : המעגל של המקום המקורי</span><span><i class="pm-key-hl"></i>קלף שחזר למקומו</span></span>` +
         `<p class="fa-note"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const order = () => faroOrder(st.n, st.kind);

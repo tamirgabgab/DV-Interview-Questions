@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const gcd = (x, y) => (y ? gcd(y, x % y) : x);
 
   // The cycles of the rotation: from every start s, s <- s + k <- s + 2k ... (mod n).
@@ -154,7 +154,7 @@
   dvqExplorers.register({
     views: { rotatek: rotatekView },
     help: {
-      rotatek: "בוחרים שיטה, אורך n ו-k. בשלושה היפוכים כל צעד הוא החלפה אחת, והקטע שמתהפך מסומן. במעגלים כל צעד הוא השמה אחת : שומרים ב-tmp, מושכים לאורך המעגל וסוגרים. השורה התחתונה היא המערך שצריך להגיע אליו, והתאים שכבר במקומם מסומנים.",
+      rotatek: "בוחרים שיטה, אורך n ו-k. בשלושה היפוכים כל צעד הוא החלפה אחת, והקטע שמתהפך מסומן. במעגלים כל צעד הוא השמה אחת : שומרים ב-tmp, מושכים לאורך המעגל וסוגרים. השורה התחתונה היא המערך שצריך להגיע אליו, והתאים שכבר במקומם מסומנים.",
     },
     models: { rkCycles, rkReversalSteps, rkCycleSteps },
   });

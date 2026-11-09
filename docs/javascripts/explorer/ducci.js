@@ -5,7 +5,7 @@
 // question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const NMIN = 3, NMAX = 12, VMAX = 99999, CAP = 600;
   const PRESETS = [
     ["2, 6, 11, 4", "2 6 11 4"],
@@ -51,7 +51,7 @@
       return [CX + CR * Math.cos(a), CY + CR * Math.sin(a)];
     });
     const rNode = n > 8 ? 17 : 21, fs = big ? (n > 6 ? 10 : 12) : n > 8 ? 13 : 15, dfs = big ? 10 : 12;
-    let s = `<svg class="figure du-fig du-live" viewBox="0 0 ${CW} ${CH}" role="img" aria-label="${n} מספרים על מעגל, בכיוון השעון מלמעלה : ${v.join(", ")}. על כל צלע ההפרש של שני השכנים, המספרים של הסיבוב הבא : ${nxt.join(", ")}">`;
+    let s = `<svg class="figure du-fig du-live" viewBox="0 0 ${CW} ${CH}" role="img" aria-label="${n} מספרים על מעגל, בכיוון השעון מלמעלה : ${v.join(", ")}. על כל צלע ההפרש של שני השכנים, המספרים של הסיבוב הבא : ${nxt.join(", ")}">`;
     s += `<circle class="du-ring" cx="${CX}" cy="${CY}" r="${CR}"/>`;
     pts.forEach(([x1, y1], i) => {
       const [x2, y2] = pts[(i + 1) % n], mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
@@ -114,9 +114,9 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1000, 500, 180) +
         `<span class="ex-pos"></span></div>` +
         `<div class="du-stage"></div>` +
-        `<span class="viz-legend"><span><i class="du-key-node"></i>מספר על המעגל</span><span><i class="du-key-diff"></i>ההפרש של שני שכנים : המספר של הסיבוב הבא</span></span>` +
+        `<span class="viz-legend"><span><i class="du-key-node"></i>מספר על המעגל</span><span><i class="du-key-diff"></i>ההפרש של שני שכנים : המספר של הסיבוב הבא</span></span>` +
         `<div class="du-chartbox"></div>` +
-        `<span class="viz-legend"><span><i class="du-key-bar"></i>המקסימום בכל סיבוב</span><span><i class="du-key-half"></i>סיבוב שבו כל המספרים מתחלקים בעוד 2 : המשחק נחצה</span><span><i class="du-key-cyc"></i>בתוך המחזור</span></span>` +
+        `<span class="viz-legend"><span><i class="du-key-bar"></i>המקסימום בכל סיבוב</span><span><i class="du-key-half"></i>סיבוב שבו כל המספרים מתחלקים בעוד 2 : המשחק נחצה</span><span><i class="du-key-cyc"></i>בתוך המחזור</span></span>` +
         `<p class="ex-summary du-sum" aria-live="polite"></p>` +
         `<p class="du-note"></p>`;
       const $ = (q) => box.querySelector(q);
@@ -173,7 +173,7 @@
   dvqExplorers.register({
     views: { ducci: view },
     help: {
-      ducci: "מקלידים מספרים מופרדים ברווח, בוחרים התחלה מוכנה, או בוחרים כמה מספרים ומגרילים. על המעגל המספרים של הסיבוב הנוכחי, ועל כל צלע ההפרש של שני השכנים שבקצותיה : אלה המספרים של הסיבוב הבא. החיצים עוברים סיבוב אחרי סיבוב. בגרף, עמודה לכל סיבוב בגובה המקסימום שלו : הוא אף פעם לא עולה. עמודה ירוקה היא סיבוב שבו כל המספרים מתחלקים בעוד 2 (בפעם הראשונה הם כולם זוגיים, אחר כך כולם מתחלקים ב-4, וכן הלאה), ועמודות סגולות הן המחזור.",
+      ducci: "מקלידים מספרים מופרדים ברווח, בוחרים התחלה מוכנה, או בוחרים כמה מספרים ומגרילים. על המעגל המספרים של הסיבוב הנוכחי, ועל כל צלע ההפרש של שני השכנים שבקצותיה : אלה המספרים של הסיבוב הבא. החיצים עוברים סיבוב אחרי סיבוב. בגרף, עמודה לכל סיבוב בגובה המקסימום שלו : הוא אף פעם לא עולה. עמודה ירוקה היא סיבוב שבו כל המספרים מתחלקים בעוד 2 (בפעם הראשונה הם כולם זוגיים, אחר כך כולם מתחלקים ב-4, וכן הלאה), ועמודות סגולות הן המחזור.",
     },
     models: { duStep, duOrbit, duParityStep, duAlwaysZero, duParse },
     cols: { ducci: { main: ".du-stage, .du-stage + .viz-legend", side: ".du-chartbox, .du-chartbox + .viz-legend", w: "minmax(0, 1fr)" } },   // the circle beside the chart of the maxima

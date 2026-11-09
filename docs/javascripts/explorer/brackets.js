@@ -75,7 +75,7 @@
         `<div class="br-box"><div class="br-main"><div class="br-chars" dir="ltr"></div><div class="br-chart"></div></div>` +
         `<div class="br-stackwrap"><p class="ex-title">המחסנית</p><div class="br-stack" dir="ltr"></div></div></div>` +
         `<p class="br-step" aria-live="polite"></p><p class="ex-summary br-sum"></p>` +
-        `<div class="ex-fold br-passes"><p class="ex-fold-title">סעיף א : מחיקת זוגות, מעבר אחרי מעבר</p><div class="br-passtable"></div><p class="br-passsum"></p></div>`;
+        `<div class="ex-fold br-passes"><p class="ex-fold-title">סעיף א : מחיקת זוגות, מעבר אחרי מעבר</p><div class="br-passtable"></div><p class="br-passsum"></p></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), input = $(".ex-s");
       let timer = null;
@@ -120,7 +120,7 @@
         $(".br-passtable").innerHTML = !s.length ? "" : !ps.passes.length ? `<p class="ex-note">אין במחרוזת אף זוג צמוד, ולכן הלולאה לא מתחילה.</p>` :
           `<div class="at-scroll" tabindex="0" role="region" aria-label="המעברים של מחיקת הזוגות"><table class="bridge-table"><thead><tr><th>מעבר</th><th>לפני</th><th>אחרי</th><th>תווים שנקראו</th></tr></thead><tbody>` +
           ps.passes.map((p, i) => `<tr><td>${i + 1}</td><td>${cell(p.before)}</td><td>${cell(p.after)}</td><td>${ltr(p.reads)}</td></tr>`).join("") + `</tbody></table></div>`;
-        $(".br-passsum").innerHTML = !s.length ? "" : `${ps.valid ? "המחרוזת נמחקה כולה : תקינה ✓" : `נשאר ${cell(ps.left)} : לא תקינה ✗`}. ` +
+        $(".br-passsum").innerHTML = !s.length ? "" : `${ps.valid ? "המחרוזת נמחקה כולה : תקינה ✓" : `נשאר ${cell(ps.left)} : לא תקינה ✗`}. ` +
           `${ltr(ps.passes.length)} ${ps.passes.length === 1 ? "מעבר" : "מעברים"}, ${ltr(ps.reads)} תווים נקראו (שלוש קריאות של ${ltr("replace")} בכל מעבר), לעומת ${ltr(s.length)} במחסנית.` +
           (ps.passes.length > 1 ? ` כל מעבר מוחק לפחות זוג אחד, ולכן במחרוזת מקוננת כמו ${ltr("(((())))")} המעברים מצטברים ל-${ltr("O(n²)")}.` : "");
         $(".br-sum").innerHTML = (tr.valid ? `<span class="br-ok">תקינה ✓</span>` : `<span class="br-bad">לא תקינה ✗</span>`) +

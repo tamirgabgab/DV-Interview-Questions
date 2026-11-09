@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, gridText, ltr, parseGrid, seedControls, speedSel, viewSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const MAX = 16;
 
   // Part a, the page's largest_square one cell at a time: dp[i][j] is the side of the

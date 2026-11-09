@@ -74,7 +74,7 @@
         const prevReq = t ? req[t - 1] : 0, prevAck = t ? ack[t - 1] : 0;
         const lines = [];
         if (t && prevReq && !prevAck) lines.push(`חוק 1 : במחזור ${ltr(t - 1)} ‏${code("req")} היה גבוה בלי ${code("ack")}, ולכן ${code("req")} חייב להישאר גבוה עכשיו : ` + (req[t] ? `<span class="wv-ok">✓</span>` : `<span class="wv-bad">✗ ${code("req")} נפל לפני ${code("ack")}</span>`));
-        if (req[t] && !prevReq && ack[t]) lines.push(`חוק 2 : ${code("req")} עלה עכשיו (‏${code("$rose(req)")}), ו-${code("ack")} כבר כאן, באותו מחזור : <span class="wv-bad">✗ ack מוקדם, החוזה דורש מחזור אחד עד ${ltr(MAX_WAIT)} אחרי העלייה</span>`);
+        if (req[t] && !prevReq && ack[t]) lines.push(`חוק 2 : ${code("req")} עלה עכשיו (‏${code("$rose(req)")}), ו-${code("ack")} כבר כאן, באותו מחזור : <span class="wv-bad">✗ ack מוקדם, החוזה דורש מחזור אחד עד ${ltr(MAX_WAIT)} אחרי העלייה</span>`);
         else if (req[t] && !prevReq) {
           const win = ack.slice(t + 1, t + 1 + MAX_WAIT);
           lines.push(`חוק 2 : ${code("req")} עלה עכשיו (‏${code("$rose(req)")}), ולכן ${code("ack")} חייב להגיע במחזורים ${ltr(`${t + 1}..${t + MAX_WAIT}`)} : ` +

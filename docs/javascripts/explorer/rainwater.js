@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, gridText, ltr, parseGrid, seedControls, speedSel, viewSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const ROW_MAX = 24, MAP_MAX = 10, H_MAX = 20, TYPE_MS = 900;
 
   // Part a, the page's trap one move at a time: the lower side moves, its maximum is

@@ -77,7 +77,7 @@
         `<label class="eg-winlab"><span>חלון התקריב</span><input type="range" class="eg-win" min="1" max="1" step="1" value="1" dir="ltr" aria-label="הקומה הראשונה בחלון התקריב"></label></div></div>` +
         `<p class="ex-title">מספר ההטלות של התוכנית לכל סף אפשרי</p><div class="eg-chart"></div>` +
         // the game (V4): the threshold hidden, the reader drops, against the worst case
-        `<div class="ex-fold eg-game"><p class="ex-fold-title">משחק : הסף נסתר</p>` +
+        `<div class="ex-fold eg-game"><p class="ex-fold-title">משחק : הסף נסתר</p>` +
         `<div class="ex-controls"><label>הסף <select class="eg-mode" data-nolink aria-label="איך נקבע הסף הנסתר"><option value="rand">אקראי</option><option value="adv">יריב, המקרה הגרוע</option></select></label>` +
         `<label>קומה <input type="number" class="ex-num eg-gfloor" min="1" step="1" dir="ltr" inputmode="numeric" data-nolink aria-label="הקומה שממנה מטילים"></label>` +
         `<button type="button" class="md-button md-button--primary eg-gdrop">הטלה</button><button type="button" class="md-button eg-new">משחק חדש</button>` +
@@ -185,7 +185,7 @@
               (s.eggs === 1 ? ` (ביצה אחרונה : קומה אחר קומה).` : `.`));
         }
         $(".eg-step").innerHTML = step;
-        answer(box, done && st.step ? `הסף הוא קומה ${ltr(s.low)} : קומה ${ltr(s.low)} בטוחה ו-${ltr(s.high)} שוברת, אחרי ${ltr(st.step)} הטלות (לכל היותר ${ltr(st.worst)}).` : null,
+        answer(box, done && st.step ? `הסף הוא קומה ${ltr(s.low)} : קומה ${ltr(s.low)} בטוחה ו-${ltr(s.high)} שוברת, אחרי ${ltr(st.step)} הטלות (לכל היותר ${ltr(st.worst)}).` : null,
           ".eg-building .eg-thr");
         // the recurrence for the next drop, in words, next to the bands on the building
         if ($(".eg-rec").checked && !done) {
@@ -248,18 +248,18 @@
         const broke = g.T === null ? eggsAdversary(g.F, g.low, g.high, g.eggs, fl) : fl > g.T;
         g.drops++;
         if (broke) { g.high = fl; g.eggs--; } else g.low = fl;
-        $(".eg-log").insertAdjacentHTML("beforeend", `<li>מקומה ${ltr(fl)} : ${broke ? "נשברה" : "לא נשברה"}${broke ? `, נשארו ${ltr(g.eggs)}` : ""}</li>`);
+        $(".eg-log").insertAdjacentHTML("beforeend", `<li>מקומה ${ltr(fl)} : ${broke ? "נשברה" : "לא נשברה"}${broke ? `, נשארו ${ltr(g.eggs)}` : ""}</li>`);
         if (g.high - g.low === 1) {
           g.over = true;
           const ok = g.drops <= g.worst;
-          gsay(ok ? "wv-ok" : "wv-bad", `${ok ? "✓ " : ""}הסף ידוע : הביצה ${g.low ? `שורדת בקומה ${ltr(g.low)}` : "נשברת כבר מהקומה הראשונה"}${g.high <= g.n ? ` ונשברת מקומה ${ltr(g.high)}` : " ושורדת בכל הקומות"}, אחרי ${ltr(g.drops)} הטלות. ` +
-            `התוכנית האופטימלית מבטיחה ${ltr(g.worst)} במקרה הגרוע${ok ? "." : `. רמז : בחרו את ההטלה הראשונה כך שאם הביצה נשברת, הביצים שנשארו יספיקו לקומות שמתחתיה.`}`);
+          gsay(ok ? "wv-ok" : "wv-bad", `${ok ? "✓ " : ""}הסף ידוע : הביצה ${g.low ? `שורדת בקומה ${ltr(g.low)}` : "נשברת כבר מהקומה הראשונה"}${g.high <= g.n ? ` ונשברת מקומה ${ltr(g.high)}` : " ושורדת בכל הקומות"}, אחרי ${ltr(g.drops)} הטלות. ` +
+            `התוכנית האופטימלית מבטיחה ${ltr(g.worst)} במקרה הגרוע${ok ? "." : `. רמז : בחרו את ההטלה הראשונה כך שאם הביצה נשברת, הביצים שנשארו יספיקו לקומות שמתחתיה.`}`);
           if (!ok) $(".eg-plan").hidden = false;
         } else if (!g.eggs) {
           g.over = true;
-          gsay("wv-bad", `נגמרו הביצים, והסף עוד בין ${ltr(g.low)} ל-${ltr(g.high - 1)}. רמז : כשנשארת ביצה אחת אפשר רק לעלות קומה אחרי קומה מהקומה הנמוכה שעוד לא ידועה.`);
+          gsay("wv-bad", `נגמרו הביצים, והסף עוד בין ${ltr(g.low)} ל-${ltr(g.high - 1)}. רמז : כשנשארת ביצה אחת אפשר רק לעלות קומה אחרי קומה מהקומה הנמוכה שעוד לא ידועה.`);
           $(".eg-plan").hidden = false;
-        } else gsay("", `נשארו ${ltr(g.eggs)} ${g.eggs === 1 ? "ביצה" : "ביצים"}, ${ltr(g.drops)} הטלות עד עכשיו. הקומות שעוד לא ידועות : ${ltr(`${g.low + 1} עד ${g.high - 1}`)}.`);
+        } else gsay("", `נשארו ${ltr(g.eggs)} ${g.eggs === 1 ? "ביצה" : "ביצים"}, ${ltr(g.drops)} הטלות עד עכשיו. הקומות שעוד לא ידועות : ${ltr(`${g.low + 1} עד ${g.high - 1}`)}.`);
         $(".eg-gfloor").value = "";
       };
       $(".eg-gdrop").addEventListener("click", dropAt);

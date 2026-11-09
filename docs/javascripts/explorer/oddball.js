@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, ltr } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
 
   // The fewest weighings for n balls: the smallest k with (3^k − 3) / 2 >= n.
   const obMinK = (n) => { let k = 2; while ((3 ** k - 3) / 2 < n) k++; return k; };

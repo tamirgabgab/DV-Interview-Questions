@@ -148,7 +148,7 @@
             const X = X0 + i * CW, Y = Y0 + j * CH;
             const label = s.raced.has(row.k) ? nm(x) : `${L[row.k]}?`;        // a name only once the group raced
             const name = `${label} ${nf}${st.reveal ? ` #${rankOf(x)}` : ""}`;   // the visible texts, in order
-            h += `<g class="hr-cell ${cls}${now.has(x) ? " is-now" : ""}${lit.has(x) ? " is-chain" : ""}${x === st.pick ? " is-pick" : ""}" data-x="${x}" tabindex="0" role="button" aria-pressed="${x === st.pick}" aria-label="${name}, השרשרת של הסוס"><rect x="${X + 2}" y="${Y + 2}" width="${CW - 4}" height="${CH - 4}" rx="4"><title>${label} : ${nf} מהירים ידועים, ${s.slower[x].size} איטיים ידועים${st.reveal ? `, מקום אמיתי ${rankOf(x)}` : ""}</title></rect>` +
+            h += `<g class="hr-cell ${cls}${now.has(x) ? " is-now" : ""}${lit.has(x) ? " is-chain" : ""}${x === st.pick ? " is-pick" : ""}" data-x="${x}" tabindex="0" role="button" aria-pressed="${x === st.pick}" aria-label="${name}, השרשרת של הסוס"><rect x="${X + 2}" y="${Y + 2}" width="${CW - 4}" height="${CH - 4}" rx="4"><title>${label} : ${nf} מהירים ידועים, ${s.slower[x].size} איטיים ידועים${st.reveal ? `, מקום אמיתי ${rankOf(x)}` : ""}</title></rect>` +
               `<text class="hr-name" x="${X + CW / 2}" y="${Y + CH / 2 + 5}" text-anchor="middle">${label}</text><text class="hr-count" x="${X + CW - 6}" y="${Y + 13}" text-anchor="end">${nf}</text>` +
               (st.reveal ? `<text class="hr-rank" x="${X + 6}" y="${Y + CH - 6}">#${rankOf(x)}</text>` : "") + `</g>`;
           });
@@ -214,13 +214,13 @@
             // Latin runs isolated one by one: a Hebrew word inside an ltr() run wraps out of order
             return `${ltr(nm(x))} (${ltr(f.slice(0, st.c).map(nm).join(", "))}${f.length > st.c ? ` ועוד ${ltr(f.length - st.c)}` : ""})`;
           });
-          step = `תחרות ${ltr(st.step)}, ${whatText(e)} : ${ltr(e.order.map(nm).join(" > "))}. ` +
+          step = `תחרות ${ltr(st.step)}, ${whatText(e)} : ${ltr(e.order.map(nm).join(" > "))}. ` +
             (e.gone.length ? `<span class="wv-bad">נפסלו ${ltr(e.gone.length)}</span>` + (e.what[0] === "final" || e.gone.length <= 6 ? ` : ${reasons.join("; ")}` : ` : ${ltr(e.gone.map(nm).sort().join(", "))}`) + ` (בסוגריים : מהירים ידועים). ` : "אף סוס לא נפסל. ") +
             (e.placed.length ? `<span class="wv-ok">נקבעו</span> : ${e.placed.slice().sort((u, v) => rankOf(u) - rankOf(v)).map((x) => `${ltr(nm(x))} מקום ${ltr(rankOf(x))}`).join(", ")}. ` : "") +
             (done ? `<b>סיימנו אחרי ${ltr(st.step)} תחרויות.</b>` : `נשארו ${ltr(e.open.length)} מועמדים פתוחים${st.step < R ? `; התחרות הבאה : ${ltr(st.plan.log[st.step].horses.map(nm).join(", "))}` : ""}.`);
         }
         $(".hr-step").innerHTML = step;
-        answer(box, done ? `${ltr(st.c)} הראשונים, לפי הסדר : ${ltr(st.plan.ranking.map(nm).join(", "))}, אחרי ${ltr(R)} תחרויות.` : null,
+        answer(box, done ? `${ltr(st.c)} הראשונים, לפי הסדר : ${ltr(st.plan.ranking.map(nm).join(", "))}, אחרי ${ltr(R)} תחרויות.` : null,
           st.plan.ranking.map((x) => box.querySelector(`.hr-gridbox .hr-cell[data-x="${x}"] rect`)));
       };
       let stop = () => {};

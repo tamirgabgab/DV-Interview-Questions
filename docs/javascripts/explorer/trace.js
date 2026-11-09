@@ -233,7 +233,7 @@
         else {
           const ai = fr.before[fr.i], aj = fr.before[fr.j];
           step = `${ltr(`i = ${fr.i}, j = ${fr.j}`)} : ${ltr(`A[i] < A[j]`)} הוא ${ltr(`${ai} < ${aj}`)}, ` + (fr.swapped ? `<span class="wv-ok">כן ⇒ החלפה</span> : ${ltr(`A = [${fr.after.join(", ")}]`)}.` : `לא ⇒ בלי שינוי.`);
-          if (fr.endOfI && st.next) step += ` <span class="wv-ok">סוף האיטרציה ${ltr(`i = ${fr.i}`)} : ${ltr(`A[${fr.i}]`)} הוא המקסימום של ${ltr(`A[${fr.i}..${n - 1}]`)}, ולכן ${ltr(`A[0..${fr.i}]`)} ממוין בסדר יורד.</span>`;
+          if (fr.endOfI && st.next) step += ` <span class="wv-ok">סוף האיטרציה ${ltr(`i = ${fr.i}`)} : ${ltr(`A[${fr.i}]`)} הוא המקסימום של ${ltr(`A[${fr.i}..${n - 1}]`)}, ולכן ${ltr(`A[0..${fr.i}]`)} ממוין בסדר יורד.</span>`;
           else if (fr.endOfI) step += ` <span class="wv-ok">סוף האיטרציה ${ltr(`i = ${fr.i}`)} : ${ltr(`A[0..${fr.i}]`)} ממוין בסדר עולה, והמקסימום של כל המערך (${ltr(Math.max(...fr.after))}) יושב במקום ${ltr(fr.i)}.</span>`;
           else if (fr.j < fr.i) step += ` ‏${ltr("j < i")} : החלפה כאן מזיזה את ${ltr("A[i]")} אחורה לתוך החלק הממוין.`;
         }

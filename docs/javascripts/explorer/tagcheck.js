@@ -122,10 +122,10 @@
         const hl = (j) => last !== null && ((last >> j) & 1);
         $(".tc-acc").innerHTML = `<table class="tc-table"><thead><tr><th>המצבר</th><th>בבינארי</th><th>ערך</th></tr></thead><tbody>` +
           `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("x")} : XOR של הכול</td><td dir="ltr"><code>${bin(a.x)}</code></td><td>${ltr(a.x)}</td></tr>` +
-          a.part.map((v, j) => `<tr${hl(j) ? ' class="is-hit"' : ""}><td>${code(`part[${j}]`)} : ביט ${ltr(j)} דולק</td><td dir="ltr"><code>${bin(v)}</code></td><td>${ltr(v)}</td></tr>`).join("") +
-          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("s")} : סכום, נשלח פחות חזר</td><td></td><td>${ltr(a.s)}</td></tr>` +
-          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("q")} : סכום ריבועים</td><td></td><td>${ltr(a.q)}</td></tr>` +
-          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("out")} : מונה</td><td></td><td>${ltr(a.out)}</td></tr></tbody></table>` +
+          a.part.map((v, j) => `<tr${hl(j) ? ' class="is-hit"' : ""}><td>${code(`part[${j}]`)} : ביט ${ltr(j)} דולק</td><td dir="ltr"><code>${bin(v)}</code></td><td>${ltr(v)}</td></tr>`).join("") +
+          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("s")} : סכום, נשלח פחות חזר</td><td></td><td>${ltr(a.s)}</td></tr>` +
+          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("q")} : סכום ריבועים</td><td></td><td>${ltr(a.q)}</td></tr>` +
+          `<tr${last !== null ? ' class="is-hit"' : ""}><td>${code("out")} : מונה</td><td></td><td>${ltr(a.out)}</td></tr></tbody></table>` +
           `<p class="ex-note">${last === null ? "לפני התשובה הראשונה : המצברים מכילים את כל מה שנשלח." : `התשובה האחרונה ${code(String(last))} = ${code(bin(last))} : היא נכנסה ל-x, ל-s, ל-q, ולכל ${code("part[j]")} שהביט שלו דולק בה.`}</p>`;
         // the end: what each method reads, and whether it is right
         if (st.k < R) { $(".tc-decode").innerHTML = `<p class="ex-note">בסוף כל התשובות יופיע כאן מה כל שיטה מוצאת.</p>`; answer(box, null); return; }
@@ -141,7 +141,7 @@
             verdict(same(d.two, miss) && !dups.length) + `</p>` +
             `<p class="tc-groups">הקבוצה שהביט ${ltr(d.bit)} שלה 1 : <span dir="ltr">${g1.join(" ")}</span><br>הקבוצה שהביט ${ltr(d.bit)} שלה 0 : <span dir="ltr">${sent().filter((t) => !((t >> d.bit) & 1)).join(" ")}</span></p>`);
         } else lines.push(`<p><b>חלוקה לפי ביט :</b> ‏${code("x")} = 0, אין ביט להתחלק לפיו.${verdict(miss.length === 0 && !dups.length)}</p>`);
-        lines.push(`<p><b>סכומים :</b> ${d.sums ? `‏${code("s")} = ${ltr(d.s)}, ‏${code("q")} = ${ltr(d.q)} : החסר ${ltr(d.sums[0])}, הכפול ${ltr(d.sums[1])}` : `‏${code("s")} = 0 : אין חסר וכפול`}` +
+        lines.push(`<p><b>סכומים :</b> ${d.sums ? `‏${code("s")} = ${ltr(d.s)}, ‏${code("q")} = ${ltr(d.q)} : החסר ${ltr(d.sums[0])}, הכפול ${ltr(d.sums[1])}` : `‏${code("s")} = 0 : אין חסר וכפול`}` +
           verdict(d.sums ? same([d.sums[0]], miss) && same([d.sums[1]], dups) : !miss.length && !dups.length) + `</p>`);
         lines.push(`<p><b>סכומי חזקות, ‏k = המונה :</b> ${d.k ? `‏k = ${ltr(d.out)}, השורשים ${ltr(d.k.join(", ") || "—")}` : `המונה ${ltr(d.out)} : אין מה לחפש`}` +
           verdict(d.k ? same(d.k, miss) && !dups.length : !miss.length && !dups.length) + `</p>`);

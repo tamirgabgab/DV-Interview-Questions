@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, ltr, mulberry32, seedControls } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const W0 = 100, ROUNDS = 100, PATHS = 30;
 
   // --- the models ------------------------------------------------------------------------------

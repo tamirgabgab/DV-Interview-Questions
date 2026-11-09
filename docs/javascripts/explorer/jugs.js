@@ -6,7 +6,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, ltr, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const RLM = "‏";
 
   // --- the model (tests/0083 compares it with the page's code and the generator) ------------
@@ -103,7 +103,7 @@
     const X = (x) => L + cell * (x + 0.5), Y = (y) => T + cell * (cb - y + 0.5);
     const at = (s) => [s[i0], s[i1]];
     const seen = new Set(Object.keys(dist).map((k) => at(k.split(",").map(Number)).join(",")));
-    let out = `<svg class="figure wj-grid" viewBox="0 0 ${W} ${H}" role="img" aria-label="מרחב המצבים : ${names[0]} לרוחב, ${names[1]} לגובה. ${seen.size} מצבים נגישים, והמסלול עד עכשיו">`;
+    let out = `<svg class="figure wj-grid" viewBox="0 0 ${W} ${H}" role="img" aria-label="מרחב המצבים : ${names[0]} לרוחב, ${names[1]} לגובה. ${seen.size} מצבים נגישים, והמסלול עד עכשיו">`;
     for (let x = 0; x <= ca; x++) out += `<line class="grid" x1="${X(x)}" x2="${X(x)}" y1="${T}" y2="${T + cell * (cb + 1)}"/><text class="tick" x="${X(x)}" y="${H - 16}" text-anchor="middle">${x}</text>`;
     for (let y = 0; y <= cb; y++) out += `<line class="grid" x1="${L}" x2="${W - 12}" y1="${Y(y)}" y2="${Y(y)}"/><text class="tick" x="${L - 8}" y="${Y(y) + 4}" text-anchor="end">${y}</text>`;
     out += `<text class="tick" x="${W - 12}" y="${H - 2}" text-anchor="end">${names[0]}</text><text class="tick" x="${L - 26}" y="${T + 10}" text-anchor="end">${names[1]}</text>`;
@@ -189,7 +189,7 @@
           $(".wj-a-o").textContent = st.a; $(".wj-b-o").textContent = st.b; $(".wj-t-o").textContent = st.t;
         }
         const nm = three ? D.caps.map(String) : names;
-        const aria = (three ? `שלושת הכדים : ` : `שני הכדים : `) + s.map((v, i) => (three ? `בכד של ${D.caps[i]} ${v}` : `ב-${names[i]} ${v}`)).join(", ");
+        const aria = (three ? `שלושת הכדים : ` : `שני הכדים : `) + s.map((v, i) => (three ? `בכד של ${D.caps[i]} ${v}` : `ב-${names[i]} ${v}`)).join(", ");
         $(".wj-jugs").innerHTML = jugsSvg(caps(), s, three ? nm.map((c) => "") : names, m, aria);
         const goal = three ? (y, z) => same([D.caps[0] - y - z, y, z], D.goal) : (x, y) => x === st.t || y === st.t;
         $(".wj-gridwrap").innerHTML = gridSvg(caps(), dist, three ? 1 : 0, three ? 2 : 1, three ? D.caps[0] : null, states, s,
@@ -270,7 +270,7 @@
   dvqExplorers.register({
     views: { jugs: jugsView(false), jugs3: jugsView(true) },
     help: {
-      jugs: "בוחרים את הקיבולות a ו-b ואת הכמות T. הכפתורים ממלאים, מרוקנים ומוזגים, והדף סופר צעדים ומשווה למינימום. \"הדרך הקצרה\" טוענת את התוכנית של BFS, והחיצים עוברים עליה צעד אחרי צעד. ברשת, כל עיגול הוא זוג (x, y) : מלא אם מגיעים אליו, טבעת אם לא, והקו הוא המסלול עד עכשיו.",
+      jugs: "בוחרים את הקיבולות a ו-b ואת הכמות T. הכפתורים ממלאים, מרוקנים ומוזגים, והדף סופר צעדים ומשווה למינימום. \"הדרך הקצרה\" טוענת את התוכנית של BFS, והחיצים עוברים עליה צעד אחרי צעד. ברשת, כל עיגול הוא זוג (x, y) : מלא אם מגיעים אליו, טבעת אם לא, והקו הוא המסלול עד עכשיו.",
       jugs3: "מוזגים בין שלושת הכדים בכפתורים, או טוענים את \"הדרך הקצרה\" ועוברים עליה מזיגה אחרי מזיגה. הרשת מראה את הכד של 5 לרוחב ואת הכד של 3 לגובה, והכד של 8 מחזיק את השאר.",
     },
     models: { jugApply, jugMoves, jugBfs, jugDist, jugCan },

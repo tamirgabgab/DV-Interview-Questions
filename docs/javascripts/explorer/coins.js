@@ -94,7 +94,7 @@
       const fmt = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? String(Math.round(v)) : v.toFixed(2));
       let toss = () => {};
       const hand = () => {
-        $(".cn-hand").innerHTML = `<span class="ex-title">ההטלה הבאה :</span> ` + letters().map((c) => `<button type="button" class="md-button md-button--primary cn-toss" data-c="${c}">${c}</button>`).join(" ");
+        $(".cn-hand").innerHTML = `<span class="ex-title">ההטלה הבאה :</span> ` + letters().map((c) => `<button type="button" class="md-button md-button--primary cn-toss" data-c="${c}">${c}</button>`).join(" ");
         box.querySelectorAll(".cn-toss").forEach((b) => b.addEventListener("click", () => { stop(); toss(b.dataset.c); }));
       };
       // the state graph of A: states 0..L in a row, the arrow forward with its letter, and
@@ -104,7 +104,7 @@
         const prev = st.tosses.length ? st.tosses.slice(0, -1).reduce((s, c) => coinStep(p, s, c), 0) : null;
         const lastC = st.tosses.length ? st.tosses[st.tosses.length - 1] : null;
         const W = 640, Y = 70, R = 22, H = 150, xs = Array.from({ length: L + 1 }, (_, k) => 46 + (k * (W - 92)) / L);
-        let s = `<svg class="figure cn-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="גרף המצבים של ${p} : ${L + 1} מצבים, המצב הנוכחי מודגש">` +
+        let s = `<svg class="figure cn-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="גרף המצבים של ${p} : ${L + 1} מצבים, המצב הנוכחי מודגש">` +
           `<defs><marker id="cn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs>`;
         const labs = [];
         for (let k = 0; k < L; k++) {
@@ -141,7 +141,7 @@
         [1, 5, 10, 15, 20, 25, 30].forEach((i) => { s += fr.xtick(i, String(i)); });
         const mean = waits.reduce((x, y) => x + y, 0) / waits.length;
         const [wins, len] = race() ? coinRace([st.a, st.b], P()) : [null, null];
-        return `<p class="ex-title">${race() ? `ההמתנה בכל משחק עד שאחד הרצפים הופיע` : `מספר ההטלות עד ${code(st.a)} בכל משחק`} : עמודות מהסימולציה, נקודות מהחישוב המדויק${race() ? ` (של ${code(st.a)} לבד)` : ""}</p>` + s + fr.close() +
+        return `<p class="ex-title">${race() ? `ההמתנה בכל משחק עד שאחד הרצפים הופיע` : `מספר ההטלות עד ${code(st.a)} בכל משחק`} : עמודות מהסימולציה, נקודות מהחישוב המדויק${race() ? ` (של ${code(st.a)} לבד)` : ""}</p>` + s + fr.close() +
           `<span class="viz-legend"><span><i class="by-multiples"></i>שכיחות בסימולציה</span><span><i class="cn-key-exact"></i>ההסתברות המדויקת ל-${code(st.a)}</span></span>` +
           `<p class="cn-simsum">${ltr(SIMS)} משחקים : ממוצע ${ltr(mean.toFixed(2))} הטלות` + (race()
             ? ` (המירוץ המדויק : ${ltr(len.toFixed(2))}); ${code(st.a)} ניצח ב-${ltr(winsA)} (${ltr(`${(100 * winsA / SIMS).toFixed(1)}%`)}), והחישוב המדויק ${ltr(`${(100 * wins[0]).toFixed(1)}%`)}.`

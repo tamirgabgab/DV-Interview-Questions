@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const NMAX = 10, TMAX = 60, HMAX = 9;
 
   // Part a interval by interval, as tools/figures/q0066.py trace_merge(): the merged list
@@ -115,7 +115,7 @@
     c: ["החתיכות של סעיף ב", "הסף : מצטרפת לטווח או פותחת חדש", "השיא : הגובה הגדול ביותר"],
   };
   const CODE = { a: "merge", b: "skyline", c: "above" };
-  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
+  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
 
   // --- drawing ------------------------------------------------------------------------
   const L = 64, R = 44, W = 640, BAR = 16, GAP = 8, TOP = 14;

@@ -164,7 +164,7 @@
         // the reader's own plan hides the best one (the summary, the tables) until everyone is across
         const mineAcross = st.mine.reduce((m, g) => m ^ g.reduce((u, i) => u | (1 << i), 0), 0), hide = st.plan === "mine" && mineAcross !== (1 << times.length) - 1;
         $(".bridge-tables").hidden = hide;
-        if (hide) $(".ex-summary").innerHTML = `${times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`} על גשר של ${st.cap === 2 ? "שניים" : "שלושה"} : בנו תוכנית משלכם. הזמן הקצר ביותר יופיע כשכולם יעברו.`;
+        if (hide) $(".ex-summary").innerHTML = `${times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`} על גשר של ${st.cap === 2 ? "שניים" : "שלושה"} : בנו תוכנית משלכם. הזמן הקצר ביותר יופיע כשכולם יעברו.`;
         else $(".ex-summary").innerHTML = `${times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`} על גשר של ${st.cap === 2 ? "שניים" : "שלושה"} : הזמן הקצר ביותר הוא ${ltr(best.time)} דקות ב-${ltr(best.moves.length)} חציות, ${ltr(planText(best.moves))}.` +
           (st.plan === "best" || st.plan === "mine" ? "" : ` מוצגת התוכנית "${PLANS[st.plan]}" : ${ltr(r.time)} דקות${r.time > best.time ? `, ${ltr(r.time - best.time)} יותר מהקצרה ביותר` : ", בדיוק כמו הקצרה ביותר"}.`);
         $(".bridge-plans").innerHTML = st.cap === 2 && times.length >= 2
@@ -216,9 +216,9 @@
         const say = (cls, html) => { const m = $(".br-msg"); m.className = `br-msg ${cls}`; m.innerHTML = html; };
         if (!done) say("", st.mine.length ? `עד עכשיו ${ltr(t)} דקות ב-${ltr(st.mine.length)} חציות. ${side === 0 ? `בחרו עד ${st.cap === 2 ? "שניים" : "שלושה"} שחוצים קדימה.` : "בחרו מי מחזיר את הלפיד."}`
           : `בחרו עד ${st.cap === 2 ? "שניים" : "שלושה"} מהגדה הקרובה ולחצו "חצייה קדימה". הזמן של חצייה הוא הזמן של האיטי שבה.`);
-        else if (t === best) say("wv-ok", `✓ כולם בצד השני אחרי ${ltr(t)} דקות : הזמן הקצר ביותר.`);
+        else if (t === best) say("wv-ok", `✓ כולם בצד השני אחרי ${ltr(t)} דקות : הזמן הקצר ביותר.`);
         else {
-          say("wv-bad", `כולם בצד השני אחרי ${ltr(t)} דקות, ${ltr(t - best)} יותר מהקצר ביותר. רמז : נסו לשלוח את שני האיטיים יחד, כך שמשלמים על האיטי מביניהם פעם אחת.`);
+          say("wv-bad", `כולם בצד השני אחרי ${ltr(t)} דקות, ${ltr(t - best)} יותר מהקצר ביותר. רמז : נסו לשלוח את שני האיטיים יחד, כך שמשלמים על האיטי מביניהם פעם אחת.`);
           $(".br-show").hidden = false;
         }
       };

@@ -5,7 +5,7 @@
 // models for the question tests.
 (() => {
   const { answer, autoplay, explain, ltr, seedControls, speedSel } = dvqExplorers.lib;
-  const NB = " ";
+  const NB = " ";
   const NMAX = 15, VMAX = 99, WMAX = 7;
   const num = (v) => String(v).replace("-", "−");
 
@@ -139,12 +139,12 @@
 
   const MODES = { a: "החציון (סעיף א)", b: "אחוזון p (סעיף ב)", c: "חלון של W הערכים האחרונים (סעיף ג)" };
   const STEPS = {
-    a: ["דוחפים ל-low", "הראש של low עובר ל-high", "איזון : high גדולה יותר?", "החציון"],
-    b: ["דוחפים דרך low", "היעד ⌈p · n⌉", "השלמה : חסר ל-low?", "האחוזון"],
+    a: ["דוחפים ל-low", "הראש של low עובר ל-high", "איזון : high גדולה יותר?", "החציון"],
+    b: ["דוחפים דרך low", "היעד ⌈p · n⌉", "השלמה : חסר ל-low?", "האחוזון"],
     c: ["הערך הישן יוצא", "דוחפים דרך low", "היעד על החיים", "בנייה מחדש", "האחוזון"],
   };
   const CODE = { a: "StreamMedian", b: "StreamQuantile", c: "WindowQuantile" };
-  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
+  const V = (name, before, after) => ltr(before === after ? `${name} = ${after}` : `${name} : ${before} → ${after}`);
   const vals = (a, isMax) => `[${a.slice().sort((p, q) => (isMax ? q[0] - p[0] : p[0] - q[0]) || p[1] - q[1]).map((x) => num(x[0])).join(", ")}]`;
 
   // --- drawing ------------------------------------------------------------------------
@@ -152,7 +152,7 @@
   // mode c the window outlined and the values that left it dimmed
   const svgStream = (nums, i, left, w) => {
     const n = nums.length, C = 30, W = n * C + 8, H = 50;
-    let s = `<svg class="figure th-fig th-stream th-live" viewBox="0 0 ${W} ${H}" style="max-width:${Math.round(W * 1.25)}px" role="img" aria-label="הזרם : ${n} ערכים, הערך הנוכחי מסומן">`;
+    let s = `<svg class="figure th-fig th-stream th-live" viewBox="0 0 ${W} ${H}" style="max-width:${Math.round(W * 1.25)}px" role="img" aria-label="הזרם : ${n} ערכים, הערך הנוכחי מסומן">`;
     nums.forEach((_, p) => { s += `<text class="tick" x="${4 + p * C + C / 2}" y="12" text-anchor="middle">${p}</text>`; });
     if (i >= 0 && w) s += `<rect class="th-win" x="${4 + left * C + 1}" y="17" width="${(i - left + 1) * C - 2}" height="30" rx="5"/>`;
     nums.forEach((v, p) => {
@@ -201,7 +201,7 @@
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>המצב <select class="th-mode" aria-label="איזה סעיף">${Object.entries(MODES).map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select></label>` +
-        `<label><span>הזרם</span><input type="text" class="ex-num th-nums" dir="ltr" spellcheck="false" aria-label="הזרם : עד ${NMAX} מספרים שלמים, מופרדים ברווח"></label>` +
+        `<label><span>הזרם</span><input type="text" class="ex-num th-nums" dir="ltr" spellcheck="false" aria-label="הזרם : עד ${NMAX} מספרים שלמים, מופרדים ברווח"></label>` +
         `<label class="th-plab"><span>p</span><input type="range" class="th-p" min="0" max="100" step="1" dir="ltr" aria-label="האחוזון p באחוזים"><output class="th-po"></output></label>` +
         `<label class="th-wlab"><span>W</span> <input type="number" class="ex-num th-w" min="1" max="${WMAX}" step="1" dir="ltr" aria-label="גודל החלון"></label>` +
         `<label>בהגרלה <select class="th-n" aria-label="כמה מספרים להגריל">${[8, 10, 12, 15].map((v) => `<option value="${v}"${v === 10 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
@@ -219,7 +219,7 @@
         `<span class="viz-legend"><span><i class="th-key-in"></i>בערימה</span><span><i class="th-key-top"></i>הראש</span><span><i class="th-key-new"></i>הערך החדש</span>` +
         `<span><i class="th-key-moved"></i>עבר בצעד הזה</span><span class="th-only-c"><i class="th-key-dead"></i>יצא מהחלון, עוד בערימה</span><span class="th-only-c"><i class="th-key-win"></i>החלון</span></span>` +
         `<p class="th-note"></p><p class="th-tally"></p>`;
-      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
+      const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       answer(box, NB); answer(box, null);           // the answer line keeps its place from the first step
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
@@ -242,7 +242,7 @@
         const ansOf = (f) => (m === "a" ? fmt(f.ans) : num(f.ans));
         const last = F.slice(0, st.s).reverse().find((f) => f.ans !== undefined);   // the answer of the moment, or the last one
         const lineTxt = last ? `${name} = ${ansOf(last)}` : "";
-        const o = { label: `שתי הערימות : high למעלה עם הראש למטה, low למטה עם הראש למעלה, ו${m === "a" ? "החציון" : "האחוזון"} על הקו ביניהן`,
+        const o = { label: `שתי הערימות : high למעלה עם הראש למטה, low למטה עם הראש למעלה, ו${m === "a" ? "החציון" : "האחוזון"} על הקו ביניהן`,
           now: e && e.kind !== "leave" ? e.i : undefined, moved: e && e.moved ? e.moved[1] : undefined, dead: e ? e.dead : [],
           nh: e ? (m === "c" ? e.live.high : e.high.length) : 0, nl: e ? (m === "c" ? e.live.low : e.low.length) : 0,
           target: m !== "a" && e ? e.t : undefined, line: lineTxt, hot: e && e.ans !== undefined };
@@ -337,7 +337,7 @@
   dvqExplorers.register({
     views: { twoheaps: twoView },
     help: {
-      twoheaps: "מקלידים זרם של מספרים שלמים (או מגרילים) ובוחרים מצב. שתי הערימות מצוירות זו מול זו : high למעלה עם הראש שלה למטה, low למטה עם הראש שלה למעלה, והקו ביניהן הוא התשובה. בסעיף א כל ערך הוא שלושה צעדים : הדחיפה ל-low, המעבר של הראש ל-high, והאיזון עם החציון. בסעיף ב מחוון ל-p, והצעד השלישי משלים את low ליעד ⌈p · n⌉. בסעיף ג חלון של W הערכים האחרונים : ערך שיצא מהחלון נשאר בערימה מחוק ואפור עד שהוא נזרק מהראש, והגדלים שמוצגים הם החיים. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
+      twoheaps: "מקלידים זרם של מספרים שלמים (או מגרילים) ובוחרים מצב. שתי הערימות מצוירות זו מול זו : high למעלה עם הראש שלה למטה, low למטה עם הראש שלה למעלה, והקו ביניהן הוא התשובה. בסעיף א כל ערך הוא שלושה צעדים : הדחיפה ל-low, המעבר של הראש ל-high, והאיזון עם החציון. בסעיף ב מחוון ל-p, והצעד השלישי משלים את low ליעד ⌈p · n⌉. בסעיף ג חלון של W הערכים האחרונים : ערך שיצא מהחלון נשאר בערימה מחוק ואפור עד שהוא נזרק מהראש, והגדלים שמוצגים הם החיים. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
     },
     cols: { twoheaps: {} },   // the stream and the two heaps beside the steps and the code
     models: { thTraceMedian, thTraceQuantile, thTraceWindow, thRank, thLevels },

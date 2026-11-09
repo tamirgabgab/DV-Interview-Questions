@@ -234,7 +234,7 @@
         row("‏Gray", r.fwd.map((s) => cell(s.g, `gr-res${ch(s.i)}`)).join(""), ltr(r.g)) +
         `<p>כל ביט של Gray הוא XOR של הביט שמעליו ושל עצמו. מעל הביט העליון נכנס 0, ולכן הוא מועתק כמו שהוא.</p>`;
       const shown = r.back.slice(0, st.k);
-      $(".gr-back").innerHTML = `<p class="ex-title">חזרה : XOR מצטבר מהביט העליון</p>` +
+      $(".gr-back").innerHTML = `<p class="ex-title">חזרה : XOR מצטבר מהביט העליון</p>` +
         row("‏Gray", r.back.map((s, j) => cell(s.g, j === st.k - 1 ? "gr-cur" : "")).join(""), ltr(r.g)) +
         row("בינארי", r.back.map((s, j) => (j < st.k ? cell(s.b, `gr-res${j === st.k - 1 ? " gr-cur" : ""}`) : cell("?", "gr-unk"))).join(""),
           st.k === BITS ? ltr(r.b) : "") +
