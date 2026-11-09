@@ -1090,6 +1090,12 @@ below start at item 112 (session 31).
     the pages (captions listed there); 0004's mermaid lays out some RTL labels badly; the
     shared `max-width: 10rem` on range inputs in 27-box-columns.css looks overridden in the
     motorcycle box.
+188. **Fifth review round: ten more random questions (session 34, 2026-11-09).** Seed
+    20261110, the forty reviewed questions and 0099 left out: 0003, 0011, 0038, 0058, 0059,
+    0070, 0071, 0085, 0087, 0090. Five read-only review agents (reports and scripts in the
+    session scratchpad, review6/) and every box measured at 1920 by 1080. Findings under
+    "Open items", "Review round 5 (session 34)". Nothing was changed yet. Also found: the
+    weekly workflow has failed three Mondays running (see R0).
 
 ---
 
@@ -1119,7 +1125,7 @@ below start at item 112 (session 31).
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
 - [ ] Fifth series: W1 to W4 done on the branch (W348's drawn check mark not picked); W5 not picked; `main` when the owner asks.
 - [ ] Pick rounds from the proposals (now in `HANDOFF-archive-2.md`): the owner's current direction is the eighth series, S1 to S6 (improve what exists, no new questions); the question proposals X360 to X410 wait; the older proposals are in the archive.
-- [ ] Colons: many pages and explorer strings put a plain space before a colon in Hebrew text (0065 to 0067 and their boxes have no NBSP at all), and the linter does not check it. The owner chose not to fix it for now (2026-10-30).
+- [ ] Colons: many pages and explorer strings put a plain space before a colon in Hebrew text (0065 to 0067 and their boxes have no NBSP at all), and the linter does not check it. The owner chose not to fix it for now (2026-10-30). The explorers were fixed and linted in round 4 (session 34); the pages remain (round 5, R0).
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Content
@@ -1543,6 +1549,133 @@ unaligned edges are at least 2 ns apart, the gcd). None needed: 0018, 0026, 0048
   ל-k" breaks around "-k" (Mermaid's RTL layout).
 - [ ] stylesheets/27-box-columns.css sets `max-width: 10rem` on `.ex-controls input[type=range]`,
   but the motorcycle box's sliders measure 220 px: check which rule wins.
+
+### Review round 5 (session 34): ten more questions
+
+Open: nothing changed yet (work log item 188). Every claim below was checked by a reviewer's
+script (CONFIRMED) unless marked SUSPECTED; verify again before changing a page.
+
+**R0. Site-wide:**
+- [ ] The weekly workflow (`weekly.yml`) has failed on 2026-10-26, 11-02 and 11-09: the
+  Verilator job asks `repos/verilator/verilator/releases/latest`, which is 404 (Verilator
+  publishes tags, not GitHub releases: read the tags instead); the external-links job
+  counts 404.html's preconnect `https://fonts.gstatic.com` as broken (skip preconnect /
+  dns-prefetch hrefs). The site is not affected.
+- [ ] Page colons: 1352 plain spaces before a Hebrew colon on 37 pages (0013 120, 0067 123,
+  0065 102, 0022 90, 0100 74, 0037 72, 0071 67, 0085 60, 0084 59, ...), not linted (the
+  owner deferred it on 2026-10-30; the explorers were fixed in round 4). Also " ;" with a
+  plain space (0070, 17 times), and the sidebar's table of contents drops the NBSP before a
+  heading's colon (about 50 entries).
+- [ ] The explorer lint misses a colon followed by Latin text (tagcheck.js line 124,
+  `${code("x")} : XOR`).
+
+**R1. Correctness:**
+- [ ] 0003: the hardware follow-up says 9 comparators; the first follow-up's own answer shows
+  6 suffice (an insertion network of depth 5). "Swaps at most O(n^2)" can be exact: at most
+  n(n-1)/2 + 1, at least n - 1; sorted [1, 2, 3, 4] makes 6 swaps (more than the example's
+  5). Box: the "j < i" note shows when no swap happened; in trap mode the last cell is never
+  marked sorted.
+- [ ] 0011: the 4x4 follow-up's answer (only the lines and the draw rule change) is wrong:
+  on 4x4 the diagonals share no cell and X can have 8 marks; X.OXOXXOOXXOXOOX passes all four
+  conditions as "X won" though no single move completes both lines (8 such boards): add
+  "every winning line passes through one cell". The bit-sum trap understates: all 22
+  double-line boards are full, so they come out as draws (16 -> 38; with part b's 12 lines
+  54 fake draws, so `randomize() with {result == DRAW}` succeeds and part b's "no draw"
+  breaks). Verilator returns 2 for a `bit[]` `.sum()` (the LRM gives 1 bit), so the page's
+  tests cannot show this trap: say so. Part b's proof: "parallel lines need 6 X" does not
+  cover three crossing lines (any three lines cover at least 6 cells).
+- [ ] 0038: part b's short answer "בשלוש ההפרות נכשלת בדיוק property אחת" (the "req
+  dropped" trace fails two: hold [3] and late [4]; the parenthesis leaves out rule 2); the
+  cost "עד שלושה" open attempts of rule 2 (at most 2 over every 12-cycle trace); trap 3's
+  title "assertion שתמיד עוברת" against its body (it fails on every good transaction).
+- [ ] 0058: trap 3 and the memory table: wrap-around of the accumulators is harmless (modular
+  add and subtract are exact), only the final value must fit, with a sign bit: minimal widths
+  26 / 26 / 54 / 88, not 40 / 38 / 68 / 106 (`memory_table()` in q0058.py, part b's "38
+  ביטים במקום 72", the cost lines). Part c gives a confident wrong answer for two missing and
+  two duplicated tags (missing {0, 6}, duplicates {1, 4} decode as "missing 10, duplicate 9"
+  and a xor d == x holds; 252 such cases on 16 tags). Part d: k must come from the counter (a
+  larger k adds a spurious root 0: k = 3 with 5 and 12 missing gives [0, 5, 12]).
+- [ ] 0059: "זו הדוגמה הקטנה ביותר" only with distinct values (1, 1, 3, 2 also defeats the
+  greedy player); the three-player follow-up needs a tie rule (1, 1, 1, 2, 1 gives (3, 2, 1)
+  or (2, 3, 1)); the O(n)-memory follow-up works only with i ascending (descending: 127 of 300
+  random rows wrong); `best_total([])` raises IndexError though its docstring says any n.
+- [ ] 0070: "19 הוצאות במקום 25" for A* holds only with (f, g) ties (row and column ties, as
+  the page's Dijkstra uses, give 16): state the rule. Box b cannot draw the trap board (3x3
+  is under its 4x4 minimum, and it runs only the corrected search): a toggle for the wrong
+  per-cell marking, or drop "ציירו את הלוח של המלכודת". Box b's end shows about 15 walls as
+  broken though the path breaks only (3, 7); box c's popped cells lose their terrain colour.
+- [ ] 0071: part b step 8 "כשאני ראשון או שני, רק אחד מהם מכשף על השני לפני שאני פותח" (both
+  rivals shoot at each other in both orders; the difference is the round's last shot, 0.048 *
+  2/7, and the cats from 8% to 3.2%); step 6 and the proof intro "שני האחרים מכשפים עליי"
+  (for every wand in (0.6, 1] wizard 1 misses on purpose); part c step 5 "my chance rises
+  with the wand while it is under both" (order 0.8, 0.6, me: 0.529 just under 0.5, 0.469 at
+  0.5); the "חוק החתולים בכל סבב" follow-up's formula with m = 0.7 gives 67.9%, the page says
+  58.2% (from the menu's 0.6); step 4's "p3 < 5/6" holds only when p3 < 0.6.
+- [ ] 0085: the first box (in the question, before the hints) always prints "במספר שמתאר את
+  עצמו שניהם b" (hints 1-2): hide it there. Part c step 3 (z = 2): "d1 הוא 0 או 1" never says
+  why d1 <= 2 (d1 = 2 is base 6, 222000).
+- [ ] 0087: the trap "דירוג מעל המספרים הממשיים ... מבטיח פתרון עם שברים" (over Q the 4x4 rank
+  is 14: 3008 of the 4096 clearable boards get no Q solution and 3280 unclearable ones get
+  one); the "fewest presses" follow-up uses 5x5 all-lit, whose 4 solutions all have 15 presses
+  (4x4 all-lit: 16 solutions of 4 to 12; also part d's "ב-15 לחיצות לפחות"); part b "לכל
+  שורה תחתונה שהרדיפה יכולה להשאיר" next to "רק 8 מתוך 32" (the chase can leave any of 32:
+  "שאפשר לנקות"). SUSPECTED: part b's O(n^3) for the code as written (`chase` XORs an n^2-bit
+  mask per press: about O(n^5 / w)).
+- [ ] 0090: part c "-I_n תמיד בין הקשות" verified to n = 7 only (SUSPECTED: the Cohen-Blum
+  conjecture is refuted for larger n): add "עד n = 7". 3n - 2 cites only the test to n = 6
+  (a one-line induction on -I_n proves it for every n); "לכל n יש ערימה" for 2n - 3 has no
+  construction (start from [2, 1, 3..n], then for k = 3..n flip k, then 2; checked n = 2..9).
+
+**R2. Boxes and one screen.** Heights at 1920 x 1080: 0070 gridpath boxes 1, 2, 3 at 1118,
+1118, 1110 (two columns already); 0038 attempts 980 at the limit; the others fit (421 to
+900). None of the box paragraphs is a "נסו" task; the reports give checked tasks, e.g. 0003
+sorted [1, 2, 3, 4] (6 swaps); 0011 the wrap toggle on the figure's draw board (both get a
+line, {2, 3, 7} and {1, 5, 6}); 0038 one fault firing two assertions (req held one cycle too
+long: drop [4] and hold [5]); 0058 the bit split calling the duplicate 3 missing, tag 0
+missing gives x = 0; 0059 3 or 1 first on 1, 2, 5, 3 (5 or 6), 1, 1, 9, 1, 1, 9 (the trick
+ties 11-11, best play 19-3); 0070 closing (6, 2) gives -1 after 14 pops, opening (3, 2):
+4 directions 20, 8 directions 14; 0071 the drop at 0.601 to 17.2%, 65.1% against 55.6% by
+the rivals' order; 0085 guess and fix from 9000000000 cycles (6300000100 <-> 7101001000,
+29% of random starts reach the answer); 0087 the chase on all-lit leaves 10001, 25 presses
+for a 15-cell solution; 0090 n = 6 loads [4, 6, 2, 5, 1, 3], one of the 2 hardest.
+Missing controls proposed: 0011 "1,000 draws" with solve-before on / off (about 1/3 each
+against 65.3 / 33.0 / 1.7%); 0038 the handshake box is nearly a subset of attempts (make it
+a mutation box: trap variants, an rst_n row, MAX_WAIT); 0071 rival sliders in 0.01 steps
+(0.05 cannot find a* = 0.456-0.478); 0085 a "copy the counts" button for guess and fix;
+0087 the play box never draws the cells pressed, and a size change clears the play box but
+randomizes the chase box; 0090 a breakpoint count (ties the box to the first follow-up);
+0058 the box sits at the end of part d though it serves a to c.
+
+**R3. Hardware and DV:** 0011: coverage (coverpoints on x_lines with bin 2, result x n_moves
+with illegal crosses), against trap 2's "no test will alert". 0058: a per-clock signal table
+and an end-of-test check. 0059 (optional): an assertion of the parity invariant. 0070: Lee's
+maze router (the layer table as a per-clock table) and a NoC scoreboard check of hops against
+the BFS distance. 0085: the SV constraint solver finds the number (explicit sums work under
+Verilator 5.053 with z3; the short `d.sum() with (item == i)` adds in 1 bit and wraps, and
+crashes Verilator 5.053). 0087: one row per clock (a 4-clock table for 5x5 all-lit and an SVA
+line). 0090: one sentence (P(n) is the pancake network's diameter). None: 0003 (beyond its
+follow-up), 0038 (already SVA), 0071.
+
+**R4. Explanations:**
+- [ ] 0003: the per-pass table repeats the figure; the steps duplicate the proof.
+- [ ] 0011: 958 / 626 / 316 / 16 four times; part b step 2 repeated word for word in the
+  proof; q0011.py is old-style (no gen markers), so the figures are not checked by tests.
+- [ ] 0038: traps 3 and 4 repeat the same `req` vs `$rose(req)` example; the page never
+  says that one fault can fire two assertions.
+- [ ] 0058: part d needs a worked example ({1, 8, 14} in the report).
+- [ ] 0059: 0-based and 1-based indexes of d mixed; "1, 2, 5, 3" in Hebrew text shows
+  mirrored (an ordered row: an LTR span, the owner's call).
+- [ ] 0070: part c's proof uses |P| undefined and its "no stale entries" step relies on pops
+  in cost order, unproved; part b hint 2 gives the solution; the cost 39 six times; no trap
+  on steps vs cells (LeetCode 1091 counts cells: 21, not 20); the 8-direction k = 2 result
+  (8) unexplained (the path breaks (3, 2) and (4, 7)).
+- [ ] 0071: the same numbers in five to eight places; hint 2 of parts a and c give the
+  answer; part c step 4 uses j undefined.
+- [ ] 0085: "ניחוש ותיקון לא מתכנס" asserted (the cycle above shows it).
+- [ ] 0087: hint 3 of part d reuses A for the n^2 x n^2 matrix; the proof "אין פתרון שהרדיפה
+  מפספסת" worded backwards; lines 612 and 667 end with "כש-" / "ו-" (a gap "כש- w·u"); "order
+  does not matter" six times.
+- [ ] 0090: "one BFS, a flip is its own inverse" six times.
 
 ---
 
