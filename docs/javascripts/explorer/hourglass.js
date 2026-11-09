@@ -162,6 +162,23 @@
     return [...times].sort((u, v) => u - v).filter((v) => v > 0);
   };
 
+  // The measurable D from time 0, said short: running one hourglass alone from rest brings
+  // the glasses back to rest, so the measurable set is closed under adding any glass's size;
+  // once m / g values in a row of the step g are measurable (m the smallest glass, g the gcd
+  // of the sizes), every larger multiple of g is (0018's follow-up "which D"). Returns the
+  // values before that run and its start, or null when the bound shows no such run.
+  const hourglassTail = (sizes, bound) => {
+    const gcd = (u, v) => (v ? gcd(v, u % v) : u), g = sizes.reduce(gcd), m = Math.min(...sizes);
+    const times = hourglassReachableN(sizes, bound), have = new Set(times);
+    for (const x of times) {
+      if (x + m - g > bound) break;
+      let run = true;
+      for (let y = x; y <= x + m - g; y += g) if (!have.has(y)) { run = false; break; }
+      if (run) return { before: times.filter((v) => v < x), from: x, step: g };
+    }
+    return null;
+  };
+
   // The follow-ups of 0018 and 0019 in one search: `sizes` is [A, B] or [A, B, C] (letters
   // A, B, C in the actions), `interval` measures between two events as 0019 does, and
   // `objective` is "events" (every event costs 1: the BFS of 0018), "time" (the earliest
@@ -259,9 +276,9 @@
       const LET = "ABC";
       box.innerHTML =
         `<div class="ex-controls">` +
-        [["A", "שעון A (דקות)", 1, 30], ["B", "שעון B (דקות)", 1, 30], ["D", "המטרה D (דקות)", 1, 60]].map(([k, label, min, max]) =>
+        [["A", "שעון A", 1, 30], ["B", "שעון B", 1, 30], ["D", "המטרה D", 1, 60]].map(([k, label, min, max]) =>
           `<label><span>${label}</span><input type="range" class="ex-${k}" min="${min}" max="${max}" step="1" value="${st[k]}" dir="ltr"><output class="out-${k}"></output></label>`).join("") +
-        `<label>שעון C (דקות, ריק = בלי) <input type="number" class="ex-num ex-C" min="1" max="30" step="1" dir="ltr" placeholder="–" aria-label="שעון חול שלישי בדקות, ריק בלי שעון שלישי"></label>` +
+        `<label>שעון C (ריק = בלי) <input type="number" class="ex-num ex-C" min="1" max="30" step="1" dir="ltr" placeholder="–" aria-label="שעון חול שלישי בדקות, ריק בלי שעון שלישי"></label>` +
         `<label>המטרה <select class="ex-obj" aria-label="מטרת החיפוש"><option value="page">${interval ? "הסיום המוקדם ביותר (השאלה)" : "הכי מעט אירועים (השאלה)"}</option><option value="flips">הכי מעט היפוכים</option></select></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<p class="ex-summary" aria-live="polite"></p>` +
@@ -496,6 +513,13 @@
       const solve = () => solveFor(st.objective);
       const replay = (res) => hourglassReplayN(sizes(), res.plan, res.end);
       const reach = () => hourglassReachableN(sizes(), 60);
+      // "7, 11, 14, 15, ומ-17 כל ערך": the values up to the run after which every one is measurable
+      const reachText = () => {
+        const tail = hourglassTail(sizes(), 60);
+        if (!tail) return `${ltr(reach().join(", "))} (עד 60)`;
+        return (tail.before.length ? `${ltr(tail.before.join(", "))}, ` : "") +
+          (tail.step === 1 ? `ומ-${ltr(tail.from)} כל ערך` : `ומ-${ltr(tail.from)} כל כפולה של ${ltr(tail.step)}`);
+      };
       // the proof panel: the page's own search, pop by pop, for two hourglasses and the
       // page's objective: the popped state, its four children, the queue, and the tree
       const STATUS = { new: "חדש, נכנס לתור", better: "מוקדם יותר, נכנס לתור", seen: "כבר נמצא", past: "אחרי D, נזרק", stuck: "שום שעון לא רץ" };
@@ -566,7 +590,7 @@
           st.s = 0;
           summary.innerHTML = `עם שעונים של ${sizesText} דקות אי אפשר למדוד ${ltr(st.D)} דקות${interval ? "" : " מרגע 0"}` +
             (st.D % gAll ? ` : ‏${ltr(st.D)} איננו כפולה של ${ltr(`gcd(${sz.join(", ")}) = ${gAll}`)}.` : ".") +
-            (interval ? "" : ` מרגע 0 אפשר למדוד : ${ltr(reach().join(", "))} (עד 60).`);
+            (interval ? "" : ` מרגע 0 אפשר למדוד : ${reachText()}.`);
           halt(); events = []; scene = null; axisX = null; axisHead = []; shownAxis = null;
           $(".hg-axis").innerHTML = ""; $(".hg-fork").innerHTML = ""; $(".hg-frame").innerHTML = ""; $(".hg-caption").textContent = ""; $(".ex-pos").textContent = ""; $(".hg-compare").textContent = "";
           $(".ex-prev").disabled = $(".ex-next").disabled = true;
@@ -576,13 +600,13 @@
         st.s = Math.min(Math.max(st.s, 0), events.length - 1);
         const flips = res.plan.map(([t, act]) => `${ltr(t)} : ${HEB(act)}`).join("; ");
         summary.innerHTML = (interval ? `${st.objective === "page" ? "המדידה שמסתיימת הכי מוקדם" : "המדידה עם הכי מעט היפוכים"} : מרגע ${ltr(res.start)} עד רגע ${ltr(res.end)}, ‏${ltr(`${res.end} − ${res.start} = ${st.D}`)}. ` : `מודדים ${ltr(st.D)} דקות מרגע 0 ב-${ltr(events.length - 1)} אירועים${st.objective === "page" ? "" : ` ו-${ltr(res.flips)} היפוכים`}. `) +
-          `התוכנית : ${flips}.` + (interval ? "" : ` מרגע 0 אפשר למדוד גם : ${ltr(reach().filter((v) => v !== st.D).slice(0, 12).join(", "))}, ...`);
+          `התוכנית : ${flips}.` + (interval ? "" : ` מרגע 0 אפשר למדוד : ${reachText()}.`);
         // the other objective, for comparison
         const other = solveFor(st.objective === "page" ? "flips" : "page");
         const describe = (r) => (interval ? `מסתיימת ברגע ${ltr(r.end)}, ${ltr(r.events)} אירועים ו-${ltr(r.flips)} היפוכים` : `${ltr(r.events)} אירועים ו-${ltr(r.flips)} היפוכים`);
         $(".hg-compare").innerHTML = `התוכנית הזו : ${describe(res)}. ` +
           (other ? `במטרה האחרת (${st.objective === "page" ? "הכי מעט היפוכים" : interval ? "הסיום המוקדם ביותר" : "הכי מעט אירועים"}) : ${describe(other)}${other.flips === res.flips && other.events === res.events && other.end === res.end ? ", אותו דבר" : ""}.` : "") +
-          (res.explored !== null ? ` החיפוש בדק ${ltr(res.explored)} מצבים${sz.length === 3 ? " (עם שעון שלישי: 8 אפשרויות בכל אירוע)" : ""}.` : "");
+          (res.explored !== null ? ` החיפוש בדק ${ltr(res.explored)} מצבים${sz.length === 3 ? " (עם שעון שלישי\u00a0: 8 אפשרויות בכל אירוע)" : ""}.` : "");
         if (interval) $(".ex-fork").disabled = st.C !== null;
         const fork = interval && st.C === null && $(".ex-fork").checked ? hourglassFork(st.A, st.B) : null;
         // the axis and the scene are drawn again only when they change (a new plan, a new
@@ -664,6 +688,6 @@
     help: {
       hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן. ״האירוע הבא״ הופך את השעונים של האירוע ומריץ את החול עד האירוע הבא, ״הפעלה״ מריצה את כל התכנית ברצף (ועוצרת באמצע), והקצב קובע כמה זמן נמשכת דקה של שעון. השעון שבצד מראה את הזמן t, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר. בתיבה של 0019 המתג ״ההסתעפות״ מראה את שתי הריצות שמתפצלות ברגע שהשעון הגדול נגמר. בשלב ההוכחה ״השליפה הבאה״ מריץ את החיפוש של העמוד מצב אחרי מצב, עם התור ועץ החיפוש.",
     },
-    models: { hourglassSolve, hourglassInterval, hourglassSolveTrace, hourglassIntervalTrace, hourglassFork, hourglassReplay, hourglassReachable, hourglassStepN, hourglassSearch, hourglassReplayN, hourglassReachableN },
+    models: { hourglassTail, hourglassSolve, hourglassInterval, hourglassSolveTrace, hourglassIntervalTrace, hourglassFork, hourglassReplay, hourglassReachable, hourglassStepN, hourglassSearch, hourglassReplayN, hourglassReachableN },
   });
 })();

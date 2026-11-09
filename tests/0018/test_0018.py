@@ -196,3 +196,46 @@ def test_explorer_search_trace():
             plan[nodes[nodes[i]["parent"]]["t"]] = nodes[i]["act"]
             i = nodes[i]["parent"]
         assert nodes[tr["goal"]]["t"] == D and plan == ref, (A, B, D)
+
+
+def test_explorer_measurable_tail():
+    """The box's summary says the measurable D short ("7, 11, 14, 15, and from 17 every
+    value"): the values before the run are exactly the measurable ones, every multiple of
+    the step from the run on is measurable (checked to 150 by an independent search), and
+    the value one step before the run is not (so the run starts as early as it can)."""
+    import itertools
+    from math import gcd
+
+    from page_tests import explorer_require, node_json
+
+    def reachable(sizes, bound):
+        start = (0,) + tuple(0 for _ in sizes)
+        seen, todo, times = {start}, [start], set()
+        while todo:
+            t, *tops = todo.pop()
+            for mask in range(1, 1 << len(sizes)) if not any(tops) else range(1 << len(sizes)):
+                nxt = [s - v if (mask >> i) & 1 else v for i, (s, v) in enumerate(zip(sizes, tops))]
+                running = [v for v in nxt if v > 0]
+                if not running or t + min(running) > bound:
+                    continue
+                w = min(running)
+                state = (t + w,) + tuple(max(v - w, 0) for v in nxt)
+                if state not in seen:
+                    seen.add(state)
+                    todo.append(state)
+                    times.add(t + w)
+        return times
+
+    cases = [list(c) for c in itertools.combinations_with_replacement(range(1, 13), 2)] + [[3, 5, 7], [4, 6, 9], [6, 10, 15], [4, 8, 12]]
+    got = node_json(f"const m = {explorer_require()}; console.log(JSON.stringify({cases}.map((s) => m.hourglassTail(s, 60))));")
+    assert got[cases.index([7, 11])] == {"before": [7, 11, 14, 15], "from": 17, "step": 1}
+    assert got[cases.index([4, 6])] == {"before": [], "from": 4, "step": 2}
+    for sizes, tail in zip(cases, got):
+        times = reachable(sizes, 150)
+        g = 0
+        for s in sizes:
+            g = gcd(g, s)
+        assert tail is not None, sizes
+        assert tail["step"] == g and tail["before"] == sorted(v for v in times if v < tail["from"]), sizes
+        assert all(v in times for v in range(tail["from"], 151, g)), sizes
+        assert tail["from"] - g not in times, sizes

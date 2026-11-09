@@ -41,17 +41,25 @@
       const HE = { RED: "אדום", BLACK: "שחור", MIXED: "אדום ושחור" };
       // assign (V4): after a draw the reader names the three contents and checks them before
       // the deduction is shown; answered once they are right, shown or revealed
-      const st = { labels: ["RED", "BLACK", "MIXED"], content: null, draws: [], games: 0, solvedFirst: 0, answered: false, revealed: false };
-      const newGame = (keepStats = true, rnd = Math.random) => {
+      // games: the games played; decided: those whose first draw left one arrangement; lucky:
+      // those of them whose first draw was from a box labelled with a colour (a red ball from
+      // the box labelled red, say), which a draw of the other colour would not have decided
+      const st = { labels: ["RED", "BLACK", "MIXED"], content: null, u: 0, draws: [], games: 0, decided: 0, lucky: 0, answered: false, revealed: false };
+      // u picks one of the two contents the labels allow; kept, so the labels of a link pick the same one
+      const pickContent = () => {
         const cases = boxesCases().filter((c) => c.labels.join() === st.labels.join());
-        st.content = cases[Math.floor(rnd() * cases.length)].content;
+        st.content = cases[Math.floor(st.u * cases.length)].content;
+      };
+      const newGame = (keepStats = true, rnd = Math.random) => {
+        st.u = rnd();
+        pickContent();
         st.draws = [];
         st.answered = st.revealed = false;
         box.querySelectorAll(".b3-pick").forEach((sel) => { sel.value = ""; });
         const why = box.querySelector(".b3-why"), msg = box.querySelector(".b3-msg");
         if (why) why.hidden = true;
         if (msg) msg.textContent = "";
-        if (!keepStats) { st.games = 0; st.solvedFirst = 0; }
+        if (!keepStats) { st.games = 0; st.decided = 0; st.lucky = 0; }
       };
       newGame(false);
       box.innerHTML =
@@ -91,7 +99,7 @@
         st.draws.forEach((d) => balls[d.i].push(d.ball));
         $(".b3-crates").innerHTML = `<svg class="figure b3-live" viewBox="0 0 620 200">` +
           st.labels.map((l, i) => crate(i, l, balls[i], reveal)).join("") + `</svg>`;
-        $(".b3-stats").textContent = st.games ? `${st.games} משחקים, ${st.solvedFirst} נפתרו בדגימה הראשונה` : "";
+        $(".b3-stats").textContent = st.games ? `${st.games} משחקים, ${st.decided} הוכרעו בדגימה הראשונה${st.lucky ? ` (${st.lucky} מהם במזל)` : ""}` : "";
         const lines = [];
         let sum = "";
         const self = $(".b3-self").checked, waiting = self && st.draws.length > 0 && !st.answered && !reveal;
@@ -109,8 +117,8 @@
             const fixed = boxesFix(st.labels, first.ball);
             const other = first.ball === "RED" ? "BLACK" : "RED";
             lines.push(`הקופסה "אדום ושחור" לא מעורבת (התווית שגויה), ויצא ממנה ${HE[first.ball]} : יש בה רק ${HE[first.ball]}.`);
-            lines.push(`הקופסה שתוויתה "${HE[first.ball]}" לא מכילה ${HE[first.ball]} (תווית שגויה) ולא את התערובת (היא בקופסה ${ltr(k)})  : נשאר ${HE[other]}.`);
-            lines.push(`הקופסה שתוויתה "${HE[other]}" מקבלת את מה שנשאר : אדום ושחור.`);
+            lines.push(`הקופסה שתוויתה "${HE[other]}" לא מכילה ${HE[other]} (תווית שגויה), וגם לא ${HE[first.ball]} (הצבע הזה בקופסה ${ltr(k)})${NB}: היא המעורבת.`);
+            lines.push(`לקופסה שתוויתה "${HE[first.ball]}" נשאר ${HE[other]}.`);
             $(".b3-step").innerHTML = `<span class="b3-ok">✓ דגימה אחת הספיקה.</span> התוויות הנכונות : ${fixed.map((c, i) => `קופסה ${ltr(i)} = ${HE[c]}`).join(", ")}.`;
             sum = `הדגימה מהקופסה "אדום ושחור" מכריעה תמיד, כי שני הסידורים האפשריים נבדלים בה בצבע אחד וברור.`;
           } else {
@@ -136,7 +144,10 @@
       };
       const drawFrom = (i) => {
         const ball = boxesDraw(st.content, i);
-        if (!st.draws.length) { st.games++; if (i === st.labels.indexOf("MIXED")) st.solvedFirst++; }
+        if (!st.draws.length) {
+          st.games++;
+          if (boxesDeduce(st.labels, i, ball).length === 1) { st.decided++; if (i !== st.labels.indexOf("MIXED")) st.lucky++; }
+        }
         st.draws.push({ i, ball });
         draw();
       };
@@ -144,7 +155,22 @@
       $(".b3-crates").addEventListener("keydown", (e) => { const g = e.target.closest(".b3-crate"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); drawFrom(Number(g.dataset.i)); } });
       const seed = seedControls(box, $(".ex-reveal"), (rng) => { newGame(true, rng); draw(); });
       $(".ex-new").addEventListener("click", seed.draw);
-      $(".ex-shuffle").addEventListener("click", () => { st.labels = st.labels.slice().sort(() => Math.random() - 0.5); newGame(); draw(); });
+      $(".ex-shuffle").addEventListener("click", () => {
+        const l = st.labels.slice();
+        for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; }
+        st.labels = l;
+        seed.draw();
+      });
+      // the label order rides in the copy link and the remembered state ("MRB": mixed, red, black)
+      const CODE = { R: "RED", B: "BLACK", M: "MIXED" };
+      box.dvqExtra = {
+        get: () => (st.labels.join() === BOX_LABELS.join() ? "" : st.labels.map((l) => l[0]).join("")),
+        set: (text) => {
+          const l = [...text].map((c) => CODE[c]);
+          if (l.length !== 3 || new Set(l).size !== 3 || l.includes(undefined)) return false;
+          st.labels = l; pickContent(); st.draws = []; st.answered = st.revealed = false; draw(); return true;
+        },
+      };
       $(".ex-reveal").addEventListener("click", () => { st.revealed = true; draw(true); });
       $(".b3-self").addEventListener("change", () => draw(st.revealed));
       const say = (cls, html) => { const m = $(".b3-msg"); m.className = `b3-msg ${cls}`; m.innerHTML = html; };

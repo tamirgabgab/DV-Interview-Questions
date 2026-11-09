@@ -16,6 +16,8 @@ from hourglass import branches, event_frame  # noqa: E402
 from stepper import stepper  # noqa: E402
 
 A, B = 7, 11
+# the frames' accessible names in Hebrew (the drawing's own labels stay as hourglass.py writes them)
+EVENT_HE = {"start": "התחלה", "A runs out": "שעון A נגמר", "B runs out": "שעון B נגמר"}
 
 # (t, what happened, (a, b) on arrival, action, (a, b) after, caption)
 PLAN = [
@@ -26,12 +28,12 @@ PLAN = [
     (11, "B runs out", (3, 0), "flip A", (4, 0),
      "רגע 11 : שעון B נגמר. בשעון A נשארו 3 דקות למעלה ו-4 למטה; ההיפוך מעלה את 4 הדקות."),
     (15, "A runs out", (0, 0), "✓ D = 15", None,
-     "רגע 15 : שעון A נגמר. עברו בדיוק 11 + 4 = 15 דקות מרגע 0."),
+     "רגע 15 : שעון A נגמר. עברו בדיוק <span dir=\"ltr\">11 + 4 = 15</span> דקות מרגע 0."),
 ]
 
 
 def main() -> None:
-    frames = [(event_frame(A, B, t, event, before, action, after, f"רגע {t} : {event}"), caption)
+    frames = [(event_frame(A, B, t, event, before, action, after, f"רגע {t} : {EVENT_HE[event]}"), caption)
               for t, event, before, action, after, caption in PLAN]
     print(stepper(frames, "התוכנית למדידת 15 דקות עם שעוני חול של 7 ו-11 דקות, אירוע אחרי אירוע"))
     print()

@@ -174,6 +174,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0055-divfsm.css      # 0055: the divisible-by-3 machine in hardware, its block diagram and box (session 34)
   - stylesheets/questions/0032-river.css       # 0032: the river box on one screen, the proof panel's graph beside its text (session 34)
   - stylesheets/questions/0040-seqdet.css      # 0040: the sequence detector, its block diagram and hardware box, the seqdet box on one screen (session 34)
+  - stylesheets/questions/0018-hourglass.css   # 0018, 0019: the hourglass box on one screen (session 34)
   - stylesheets/questions/0063-slidemax.css    # 0063: the sliding window maximum, its box on one screen (session 34)
 
 extra_javascript:
