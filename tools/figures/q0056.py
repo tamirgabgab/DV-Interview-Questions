@@ -120,19 +120,21 @@ def diagram(L, m, msb, label):
 def legend():
     return ('<span class="viz-legend"><span><i class="fs-key"></i>הביט 0</span>'
             '<span><i class="fs-key-found"></i>הביט 1</span>'
-            '<span><i class="dv-key-acc"></i>עיגול כפול : החלון מתחלק ב-3</span></span>')
+            '<span><i class="dv-key-acc"></i>עיגול כפול : החלון מתחלק ב-3</span></span>')
 
 
 def trace(bits, L, msb):
-    """The steps of part a (msb False) or b (msb True) for m = 3, from the window 0."""
+    """The steps of part a (msb False) or b (msb True) for m = 3, from the window 0. The
+    column's title names the constant its cells use: C = 2^L mod 3 for the bit that leaves
+    (part a), T = 2^(L-1) mod 3 for the bit that enters (part b)."""
+    c = pow(2, L - 1 if msb else L, 3)
     if msb:
-        rule = "‏\\( r' = (2(r - out) + 2^{L-1} b) \\bmod 3 \\)"
+        rule = f"‏\\( r' = (2(r - out) + T \\cdot b) \\bmod 3 \\), ‏\\( T = {c} \\)"
     else:
-        rule = "‏\\( r' = (2r + b - 2^L out) \\bmod 3 \\)"
+        rule = f"‏\\( r' = (2r + b - C \\cdot out) \\bmod 3 \\), ‏\\( C = {c} \\)"
     rows = [f"| הביט שנכנס | הביט שיוצא | החלון | {rule} | מתחלק |", "|:-:|:-:|:-:|:-:|:-:|",
             f"| אחרי reset | אין | {RLM}`{text(0, 2, L)}` | {RLM}0 | ✓ |"]
     w, r = 0, 0
-    c = pow(2, L - 1 if msb else L, 3)
     for b in bits:
         out = leaving(w, 2, L, msb)
         r2 = (2 * (r - out) + c * b) % 3 if msb else (2 * r + b - c * out) % 3
@@ -145,10 +147,11 @@ def trace(bits, L, msb):
 
 
 def states_table():
-    rows = ["| ‏L | החלונות ‏\\( 2^L \\) | שרשור ל-LSB | שרשור ל-MSB | חסם תחתון ‏\\( 2^{L-2} \\) |", "|:-:|:-:|:-:|:-:|:-:|"]
+    """The fewest states for L = 1 to 8 both ways, beside the proof's lower bound 2^(L-1) + 1."""
+    rows = ["| ‏L | החלונות ‏\\( 2^L \\) | שרשור ל-LSB | שרשור ל-MSB | חסם תחתון ‏\\( 2^{L-1} + 1 \\) |", "|:-:|:-:|:-:|:-:|:-:|"]
     for L in range(1, 9):
         a, b = fewest_states(3, 2, L, False), fewest_states(3, 2, L, True)
-        low = 2 ** (L - 2) if L >= 2 else 1
+        low = 2 ** (L - 1) + 1
         rows.append(f"| {RLM}{L} | {RLM}{2 ** L} | {RLM}{a} | {RLM}{b} | {RLM}{low} |")
     return "\n".join(rows)
 
@@ -165,7 +168,7 @@ def constants_table():
 
 def blocks():
     """The generated blocks, in page order."""
-    return [diagram(2, 3, False, "המכונה הישירה של חלון של 2 ביטים, ביט חדש נכנס כ-LSB : מצב לכל חלון, 00 ו-11 מתחלקים ב-3"),
+    return [diagram(2, 3, False, "המכונה הישירה של חלון של 2 ביטים, ביט חדש נכנס כ-LSB : מצב לכל חלון, 00 ו-11 מתחלקים ב-3"),
             legend(), trace([1, 1, 0, 1], 3, False), states_table(), trace([1, 0, 1, 1], 3, True), constants_table()]
 
 

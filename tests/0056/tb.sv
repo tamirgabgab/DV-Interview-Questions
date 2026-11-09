@@ -1,6 +1,6 @@
 //@flags --timing
 // Question 0056: the page's win3_lsb, win3_msb and win_div (several parameter sets, start
-// windows and both directions) clocked on random bits and digits; every cycle each div is
+// windows and both directions; at the LSB also an m that shares a factor with the base) clocked on random bits and digits; every cycle each div is
 // compared with the window kept here as a value, stepped by the definition (at the LSB:
 // w = (B*w + d) mod B^L; at the MSB: w = d*B^(L-1) + w / B) and divided by m afresh.
 //@page module win3_lsb
@@ -12,8 +12,8 @@ module tb;
   always #5 clk = ~clk;
 
   logic b1, b2, b3, b4;
-  logic [3:0] d1, d2, d3, d4, d5;
-  logic o1, o2, o3, o4, g1, g2, g3, g4, g5;
+  logic [3:0] d1, d2, d3, d4, d5, d6;
+  logic o1, o2, o3, o4, g1, g2, g3, g4, g5, g6;
   int errors = 0;
 
   win3_lsb #(.L(1))                     u1 (.clk, .rst_n, .din(b1), .div(o1));
@@ -25,9 +25,10 @@ module tb;
   win_div #(.M(9), .B(2),  .L(6), .MSB(1), .INIT(37))   v3 (.clk, .rst_n, .d(d3[0]), .div(g3));
   win_div #(.M(5), .B(16), .L(2), .MSB(0), .INIT(200))  v4 (.clk, .rst_n, .d(d4), .div(g4));
   win_div #(.M(3), .B(10), .L(1), .MSB(1), .INIT(7))    v5 (.clk, .rst_n, .d(d5), .div(g5));
+  win_div #(.M(6), .B(10), .L(3), .MSB(0), .INIT(123))  v6 (.clk, .rst_n, .d(d6), .div(g6));   // no 10^-1 mod 6: fine at the LSB
 
   // the reference windows, as values
-  longint w1, w2, w3, w4, x1, x2, x3, x4, x5;
+  longint w1, w2, w3, w4, x1, x2, x3, x4, x5, x6;
 
   function automatic longint lsb_in(longint w, longint d, longint b, int L);
     return (w * b + d) % (b ** L);
@@ -40,12 +41,12 @@ module tb;
   endtask
   task automatic start();
     w1 = 0; w2 = 5'b10110; w3 = 0; w4 = 6'b100101;
-    x1 = 0; x2 = 1234; x3 = 37; x4 = 200; x5 = 7;
+    x1 = 0; x2 = 1234; x3 = 37; x4 = 200; x5 = 7; x6 = 123;
   endtask
 
   initial begin
     start();
-    {b1, b2, b3, b4, d1, d2, d3, d4, d5} = '0;
+    {b1, b2, b3, b4, d1, d2, d3, d4, d5, d6} = '0;
     repeat (2) @(posedge clk);
     for (int t = 0; t < 6000; t++) begin
       @(negedge clk);
@@ -59,15 +60,16 @@ module tb;
         check("reset M=9 B=2 MSB", g3, x3, 9);
         check("reset M=5 B=16 LSB", g4, x4, 5);
         check("reset M=3 B=10 L=1", g5, x5, 3);
+        check("reset M=6 B=10 LSB", g6, x6, 6);
       end
       b1 = 1'($urandom); b2 = 1'($urandom); b3 = 1'($urandom); b4 = 1'($urandom);
       d1 = 4'($urandom_range(0, 7)); d2 = 4'($urandom_range(0, 9)); d3 = 4'($urandom_range(0, 1));
-      d4 = 4'($urandom_range(0, 15)); d5 = 4'($urandom_range(0, 9));
+      d4 = 4'($urandom_range(0, 15)); d5 = 4'($urandom_range(0, 9)); d6 = 4'($urandom_range(0, 9));
       @(posedge clk);
       w1 = lsb_in(w1, b1, 2, 1); w2 = lsb_in(w2, b2, 2, 5);
       w3 = msb_in(w3, b3, 2, 1); w4 = msb_in(w4, b4, 2, 6);
       x1 = lsb_in(x1, d1, 8, 3); x2 = msb_in(x2, d2, 10, 4); x3 = msb_in(x3, d3, 2, 6);
-      x4 = lsb_in(x4, d4, 16, 2); x5 = msb_in(x5, d5, 10, 1);
+      x4 = lsb_in(x4, d4, 16, 2); x5 = msb_in(x5, d5, 10, 1); x6 = lsb_in(x6, d6, 10, 3);
       #1;
       check("win3_lsb L=1", o1, w1, 3);
       check("win3_lsb L=5", o2, w2, 3);
@@ -78,6 +80,7 @@ module tb;
       check("M=9 B=2 L=6 MSB", g3, x3, 9);
       check("M=5 B=16 L=2 LSB", g4, x4, 5);
       check("M=3 B=10 L=1 MSB", g5, x5, 3);
+      check("M=6 B=10 L=3 LSB", g6, x6, 6);
     end
     if (errors == 0) $display("PASS"); else $display("FAIL: %0d errors", errors);
     $finish;

@@ -1,0 +1,33 @@
+/* Question 0056, the divisible window: the winfsm box of explorer/divfsm.js on one screen.
+   From a 600 px box (core.js cols) the ring and its legend sit in the main column, the data
+   path, the rule and the step and the folded derivation beside them, and the moves of the
+   window full width under both; the digit buttons sit in the play row. Colours from the
+   palette only. */
+
+/* the rule with this run's constants and the step with its numbers, two short lines */
+.md-typeset .explorer[data-kind="winfsm"] .wf-rule { font-size: 0.7rem; margin: 0.2rem 0 0; text-align: center; }
+.md-typeset .explorer[data-kind="winfsm"] .wf-rule + .wf-rem { margin-top: 0.1rem; }
+/* the empty anchor of the seed field and an empty error line take no place in the row */
+.md-typeset .explorer[data-kind="winfsm"] .ex-controls > :is(.wf-anchor, .wf-err:empty) { display: none; }
+.md-typeset .explorer[data-kind="winfsm"] input.wf-init { width: 4.5rem; }
+.md-typeset .explorer[data-kind="winfsm"] input.wf-num { width: 8rem; }
+/* the digit buttons beside the playback bar */
+.md-typeset .explorer[data-kind="winfsm"] .ex-play-row .wf-add { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; }
+.md-typeset .explorer[data-kind="winfsm"] .wf-add .md-button { padding: 0.35em 0.7em; }
+.md-typeset .explorer[data-kind="winfsm"] .wf-add .wf-push { min-width: 1.6rem; font-family: var(--md-code-font-family); font-weight: 700; }
+/* the moves: the title and the toggle of every digit's row on one line */
+.md-typeset .explorer[data-kind="winfsm"] .wf-moves-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.8rem; margin-bottom: 0.2rem; }
+.md-typeset .explorer[data-kind="winfsm"] .wf-moves-head .dv-moves-title { flex: 1 1 20rem; margin: 0; }
+.md-typeset .explorer[data-kind="winfsm"] .wf-all { font-size: 0.65rem; }
+.md-typeset .explorer[data-kind="winfsm"] .wf-fold { margin-top: 0.4rem; }
+.md-typeset .explorer[data-kind="winfsm"] table.dv-moves-table th { white-space: nowrap; }
+
+@container (min-width: 600px) {
+  /* the ring no taller than about a third of the screen */
+  .md-typeset .explorer[data-kind="winfsm"] .ex-main svg.dv-live { max-height: 13.5rem; }
+  .md-typeset .explorer[data-kind="winfsm"] .ex-controls input[type="range"] { max-width: 6rem; }
+  .md-typeset .explorer[data-kind="winfsm"] .ex-main .dv-side { max-width: none; }
+  .md-typeset .explorer[data-kind="winfsm"] .ex-side :is(.wf-rule, .wf-rem) { text-align: start; }
+  /* no ring (more than 16 windows): the main column holds only a note, the side one more room */
+  .md-typeset .explorer[data-kind="winfsm"]:has(.wf-ring > .ex-note) .ex-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 0.45fr); }
+}

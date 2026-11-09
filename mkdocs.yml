@@ -172,6 +172,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0001-edge.css        # 0001: the edge detector, the synchronizer chain and the box's live circuit (session 34)
   - stylesheets/questions/0080-billiard.css    # 0080: the billiard pocket, its box on one screen (session 34)
   - stylesheets/questions/0055-divfsm.css      # 0055: the divisible-by-3 machine in hardware, its block diagram and box (session 34)
+  - stylesheets/questions/0056-winfsm.css      # 0056: the divisible window, its box on one screen (session 34)
   - stylesheets/questions/0032-river.css       # 0032: the river box on one screen, the proof panel's graph beside its text (session 34)
   - stylesheets/questions/0040-seqdet.css      # 0040: the sequence detector, its block diagram and hardware box, the seqdet box on one screen (session 34)
   - stylesheets/questions/0026-motorcycle.css   # 0026: the motorcycle box on one screen, its figures' labels in the columns (session 34)

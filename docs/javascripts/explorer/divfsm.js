@@ -1,6 +1,6 @@
 // kinds: divfsm winfsm
 //   divfsm                 0055        divisible by m: one number fed digit by digit to one machine, chosen in a list: entering as the LSB (read from the MSB, the state is the remainder) or as the MSB (read from the LSB, x = remainder * B^-k); m, the base (k bits a cycle or decimal), digits typed, added or drawn; the ring shows the current state, the edges out of it and the edge just taken
-//   winfsm                 0056        divisible by m over a window of the last L digits: a digit enters at the LSB (the highest leaves) or at the MSB (the lowest leaves), chosen in a list; m, the base, L, the window after reset and the digits that enter; the data path (the window, the digit in, the digit out, the remainder updated) and, up to 16 windows, the machine with a state per window
+//   winfsm                 0056        divisible by m over a window of the last L digits: a digit enters at the LSB (the highest leaves, any m) or at the MSB (the lowest leaves, m coprime to the base), chosen in a list; m, the base, L, the window after reset and the digits that enter; the data path (the window, the digit in, the digit out, the remainder updated), the moves of a window and, up to 16 windows, the machine with a state per window and the size of the smallest one
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -298,42 +298,71 @@
   // The box (0056): the digits that enter a window of L digits, one machine chosen in a
   // list (a digit at the LSB or at the MSB). The data path: the window's cells, the digit
   // that enters, the digit that leaves and the remainder's update; up to 16 windows also
-  // the machine with a state per window (a double circle: the window divides by m).
-  const WMAX = 16, LMAX = 8;
+  // the machine with a state per window (a double circle: the window divides by m), and the
+  // number of states of the smallest machine. At the LSB any m works; at the MSB the update
+  // divides by B, so m must be coprime to B (the others are disabled in the list).
+  const WMAX = 16, LMAX = 8, FEWMAX = 4096;
+  const WMS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15];
+  // The states of the smallest machine that says whether the window divides by m: the
+  // direct machine (a state per window) minimized by partition refinement, as
+  // tools/figures/q0056.py's fewest_states; null above FEWMAX windows.
+  const winFewest = (m, b, L, msb) => {
+    const n = b ** L;
+    if (n > FEWMAX) return null;
+    let cls = Array.from({ length: n }, (_, w) => (w % m === 0 ? 1 : 0)), count = new Set(cls).size;
+    for (;;) {
+      const ids = new Map();
+      const next = cls.map((c, w) => {
+        const key = [c, ...Array.from({ length: b }, (_, d) => cls[winStep(w, d, b, L, msb)])].join(",");
+        if (!ids.has(key)) ids.set(key, ids.size);
+        return ids.get(key);
+      });
+      if (ids.size === count) return count;
+      cls = next; count = ids.size;
+    }
+  };
+  const fewMemo = new Map();
+  const fewest = (m, b, L, msb) => {
+    const key = `${m},${b},${L},${msb}`;
+    if (!fewMemo.has(key)) fewMemo.set(key, winFewest(m, b, L, msb));
+    return fewMemo.get(key);
+  };
   const winfsmView = () => ({
     mount(box) {
       const d0 = { m: Number(box.dataset.m || 3), b: Number(box.dataset.base || 2), L: Number(box.dataset.len || 3), init: box.dataset.init || "000",
         bits: box.dataset.num || "1101", dir: box.dataset.dir === "msb" ? "msb" : "lsb" };
-      const st = { m: d0.m, b: d0.b, L: d0.L, init: [], ds: [], k: 0, dir: d0.dir, peek: null };
+      const st = { m: d0.m, b: d0.b, L: d0.L, init: [], ds: [], k: 0, dir: d0.dir, peek: null, all: false };
       box.innerHTML =
         `<div class="ex-controls">` +
-        `<label>מחלקים ב-m <select class="wf-m" aria-label="המחלק m">${MS.map((v) => `<option value="${v}">${v}</option>`).join("")}</select></label>` +
+        `<label>מחלקים ב-m <select class="wf-m" aria-label="המחלק m">${WMS.map((v) => `<option value="${v}">${v}</option>`).join("")}</select></label>` +
         `<label>בכל מחזור <select class="wf-b" aria-label="הבסיס : כמה ביטים נכנסים בכל מחזור">${BASES.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select></label>` +
-        `<label><span>אורך החלון L</span><input type="range" class="wf-L" min="1" max="${LMAX}" step="1" value="${st.L}" dir="ltr" aria-label="אורך החלון, מ-1 עד ${LMAX} ספרות"><output class="wf-out-L">${st.L}</output></label>` +
         DIR_LIST("wf-dir") +
+        `<label><span>אורך L</span><input type="range" class="wf-L" min="1" max="${LMAX}" step="1" value="${st.L}" dir="ltr" aria-label="אורך החלון, מ-1 עד ${LMAX} ספרות"><output class="wf-out-L">${st.L}</output></label>` +
         `<label><span>החלון בהתחלה</span><input type="text" class="ex-num wf-init" dir="ltr" maxlength="${LMAX}" spellcheck="false" aria-label="החלון אחרי reset, L ספרות, הגבוהה משמאל"></label>` +
-        `<label><span>הספרות שנכנסות</span><input type="text" class="ex-num wf-num" dir="ltr" maxlength="${MAXD}" spellcheck="false" aria-label="הספרות שנכנסות לחלון, לפי סדר ההגעה, עד ${MAXD}"></label>` +
+        `<label><span>הספרות</span><input type="text" class="ex-num wf-num" dir="ltr" maxlength="${MAXD}" spellcheck="false" aria-label="הספרות שנכנסות לחלון, לפי סדר ההגעה, עד ${MAXD}"></label>` +
         `<button type="button" class="md-button wf-rand">ספרות אקראיות</button><span class="wf-anchor"></span>` +
-        `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err wf-err"></span></div>` +
-        `<div class="ex-controls wf-add"></div>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err wf-err" aria-live="polite"></span></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-start">לפני הספרה הראשונה</button>` +
         `<button type="button" class="md-button ex-prev">הספרה הקודמת</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">הספרה הבאה</button>` +
         `<button type="button" class="md-button ex-end">כל הספרות</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 350) +
-        `<span class="ex-pos"></span></div>` +
-        `<p class="ex-summary wf-sum" aria-live="polite"></p>` +
-        `<ol class="dv-derive" data-steady></ol>` +
-        `<div class="wf-path" data-steady></div><p class="wf-rem"></p>` +
+        `<span class="ex-pos"></span><span class="wf-add" role="group"></span></div>` +
+        `<div class="wf-path" data-steady></div><p class="wf-rule"></p><p class="wf-rem"></p>` +
         `<div class="dv-pair"><div class="dv-side"><p class="ex-title wf-head"></p><div class="dv-ring wf-ring"></div></div></div>` +
-        `<p class="dv-read wf-read"></p>` +
         `<span class="viz-legend dv-legend wf-legend"></span>` +
-        `<div class="dv-moves"><p class="dv-moves-title"></p><div class="dv-moves-body"></div></div>`;
+        `<div class="ex-fold wf-fold" data-fold="closed"><p class="ex-fold-title">הדרך לנוסחאות של החצים ושל השארית</p><ol class="dv-derive"></ol></div>` +
+        `<div class="dv-moves"><div class="wf-moves-head"><p class="dv-moves-title"></p>` +
+        `<button type="button" class="md-button wf-all" aria-pressed="false" hidden></button></div><div class="dv-moves-body"></div></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
       const n = () => st.ds.length;
       const fit = (ds) => { const pad = Array(Math.max(0, st.L - ds.length)).fill(0); return [...pad, ...ds].slice(-st.L); };
+      const ok = (m, b, msb) => !msb || gcd(m, b) === 1;     // at the MSB the update needs B^-1 mod m
+      // a change that leaves the MSB machine without B^-1 mod m: m goes back to 3 (coprime to
+      // every base here); the list then shows the other m disabled, each with its reason
+      const keepValid = () => { if (!ok(st.m, st.b, st.dir === "msb")) st.m = 3; };
 
       const draw = (keep = false) => {
         const { m, b, L } = st, N = n(), msb = st.dir === "msb", inv = divInv(b % m, m), size = b ** L;
@@ -341,26 +370,25 @@
         if (!keep || size > WMAX) st.peek = null;
         $(".wf-m").value = String(m); $(".wf-b").value = String(b); $(".wf-dir").value = st.dir;
         $(".wf-L").value = String(L); $(".wf-out-L").textContent = String(L);
-        [...$(".wf-m").options].forEach((o) => { o.disabled = gcd(Number(o.value), b) !== 1; });
+        [...$(".wf-m").options].forEach((o) => {
+          o.disabled = !ok(Number(o.value), b, msb);
+          o.title = o.disabled ? `בשרשור ל-MSB צריך ${b}⁻¹ mod ${o.value}, והוא לא קיים` : "";
+        });
         const init = Number(big(st.init, b)), run = winRun(st.ds, m, b, L, init, msb), k = st.k, now = run[k];
         const cl = b ** L % m, ch = b ** (L - 1) % m;
         $(".ex-pos").textContent = `ספרה ${k} מתוך ${N}`;
         $(".ex-prev").disabled = $(".ex-start").disabled = k === 0;
         $(".ex-next").disabled = $(".ex-end").disabled = k === N;
         const wText = (w) => digitText(fit(toDigits(BigInt(w), b, L)));
-        $(".wf-sum").innerHTML = msb
-          ? "ספרה נכנסת כ-MSB, והספרה הנמוכה יוצאת. הדרך לנוסחאות של החצים ושל השארית :"
-          : "ספרה נכנסת כ-LSB, והספרה הגבוהה יוצאת. הדרך לנוסחאות של החצים ושל השארית :";
+        // the way to the formulas, folded: the general steps; this run's constants are in the rule line
         $(".dv-derive").innerHTML = stepsList(msb ? [
-          `החלון ${ltr("w")} הוא ${ltr(L)} ספרות. ספרה ${ltr("d")} נכנסת כ-MSB, הכול זז ימינה, והספרה הנמוכה ${ltr("out = w mod B")} יוצאת : ${ltr("w' = d·B^(L−1) + ⌊w / B⌋")}.`,
-          `המצב הוא החלון כולו, ${ltr(`${b}^${L} = ${size.toLocaleString("en-US")}`)} מצבים. כאן כל חץ הוא ${ltr(`w' = d·${b ** (L - 1)} + ⌊w / ${b}⌋`)}.`,
-          `השארית בלי לחשב את החלון מחדש : ${ltr("⌊w / B⌋ = (w − out) / B ≡ (r − out)·B⁻¹")}, והספרה החדשה שווה ${ltr("B^(L−1)")}. לכן ${ltr("r' = ((r − out)·B⁻¹ + d·C) mod m")}, ${ltr("C = B^(L−1) mod m")}.`,
-          `כאן ${ltr(`${b}⁻¹ mod ${m} = ${inv}`)} ו-${ltr(`C = ${b}^${L - 1} mod ${m} = ${ch}`)} : ${ltr(`r' = ((r − out)·${inv} + d·${ch}) mod ${m}`)}. עיגול כפול : חלון ש-${ltr(`w mod ${m} = 0`)}.`,
+          `ספרה ${ltr("d")} נכנסת משמאל והנמוכה ${ltr("out = w mod B")} יוצאת : ${ltr("w' = d·B^(L−1) + ⌊w / B⌋")}.`,
+          `מצב לכל חלון, ${ltr(`${b}^${L} = ${size.toLocaleString("en-US")}`)} מצבים, וכל חץ הוא ${ltr(`w' = d·${b ** (L - 1)} + ⌊w / ${b}⌋`)}.`,
+          `מודולו ${ltr("m")} : ${ltr("⌊w / B⌋ = (w − out)·B⁻¹ ≡ (r − out)·B⁻¹")}, ולכן ${ltr("r' = ((r − out)·B⁻¹ + d·C) mod m")}, ${ltr("C = B^(L−1) mod m")}.`,
         ] : [
-          `החלון ${ltr("w")} הוא ${ltr(L)} ספרות. ספרה ${ltr("d")} נכנסת כ-LSB, הכול זז שמאלה, והספרה הגבוהה ${ltr("out")} יוצאת : ${ltr("w' = (B·w + d) mod B^L = B·w + d − out·B^L")}.`,
-          `המצב הוא החלון כולו, ${ltr(`${b}^${L} = ${size.toLocaleString("en-US")}`)} מצבים. כאן כל חץ הוא ${ltr(`w' = (${b}·w + d) mod ${size}`)}.`,
-          `השארית בלי לחשב את החלון מחדש : מודולו ${ltr("m")}, ${ltr("r' = (B·r + d − out·C) mod m")}, כאשר ${ltr("C = B^L mod m")} הוא מה ששווה הספרה שיוצאת.`,
-          `כאן ${ltr(`C = ${b}^${L} mod ${m} = ${cl}`)} : ${ltr(`r' = (${b}·r + d − out·${cl}) mod ${m}`)}. עיגול כפול : חלון ש-${ltr(`w mod ${m} = 0`)}.`,
+          `ספרה ${ltr("d")} נכנסת מימין והגבוהה ${ltr("out")} יוצאת : ${ltr("w' = B·w + d − out·B^L")}.`,
+          `מצב לכל חלון, ${ltr(`${b}^${L} = ${size.toLocaleString("en-US")}`)} מצבים, וכל חץ הוא ${ltr(`w' = (${b}·w + d) mod ${size}`)}.`,
+          `מודולו ${ltr("m")} לא צריך את החלון : ${ltr("r' = (B·r + d − out·C) mod m")}, כאשר ${ltr("C = B^L mod m")} הוא מה ששווה הספרה שיוצאת.`,
         ]);
         // the data path: the window's cells (the highest on the left), the digit in at one end, the digit out at the other
         const cells = toDigits(BigInt(now.w), b, L), pad = Array(L - cells.length).fill(0), win = [...pad, ...cells];
@@ -374,36 +402,48 @@
           `<div class="wf-reg" dir="ltr">${msb ? inn : out}<span class="dv-tag">MSB</span><span class="dv-cells wf-win">` +
           win.map((d, i) => `<span class="dv-cell${i === inCell ? " is-in" : ""}">${DIG[d]}</span>`).join("") +
           `</span><span class="dv-tag">LSB</span>${msb ? out : inn}</div>`;
+        // the rule with this run's constants, then this step with its numbers
+        $(".wf-rule").innerHTML = msb
+          ? `העדכון : ${ltr(`r' = ((r − out)·${inv} + d·${ch}) mod ${m}`)}, כי ${ltr(`${b}⁻¹ mod ${m} = ${inv}`)} ו-${ltr(`C = ${b}^${L - 1} mod ${m} = ${ch}`)}.`
+          : `העדכון : ${ltr(`r' = (${b}·r + d − out·${cl}) mod ${m}`)}, כי ${ltr(`C = ${b}^${L} mod ${m} = ${cl}`)}.`;
         $(".wf-rem").innerHTML = (k === 0
-            ? `אחרי reset : החלון ${code(digitText(win))} = ${ltr(init)}, ${ltr(`r = ${init} mod ${m} = ${now.r}`)}.`
-            : msb ? `${ltr(`r' = ((${run[k - 1].r} − ${gone})·${inv} + ${din}·${ch}) mod ${m} = ${now.r}`)}; החלון ${code(digitText(win))} = ${ltr(now.w)}, ${ltr(`${now.w} mod ${m} = ${now.w % m}`)}.`
-              : `${ltr(`r' = (${b}·${run[k - 1].r} + ${din} − ${gone}·${cl}) mod ${m} = ${now.r}`)}; החלון ${code(digitText(win))} = ${ltr(now.w)}, ${ltr(`${now.w} mod ${m} = ${now.w % m}`)}.`);
-        $(".wf-head").textContent = size <= WMAX ? `המכונה : מצב לכל חלון, ${size} מצבים` : `המכונה : ${size} חלונות, יותר מדי לציור`;
+            ? `אחרי reset : החלון ${code(digitText(win))} = ${ltr(init)}, ${ltr(`r = ${init} mod ${m} = ${now.r}`)}`
+            : msb ? `${ltr(`r' = ((${run[k - 1].r} − ${gone})·${inv} + ${din}·${ch}) mod ${m} = ${now.r}`)}; החלון ${code(digitText(win))} = ${ltr(now.w)}, ${ltr(`${now.w} mod ${m} = ${now.w % m}`)}`
+              : `${ltr(`r' = (${b}·${run[k - 1].r} + ${din} − ${gone}·${cl}) mod ${m} = ${now.r}`)}; החלון ${code(digitText(win))} = ${ltr(now.w)}, ${ltr(`${now.w} mod ${m} = ${now.w % m}`)}`) +
+          (now.r === 0 ? `, <span class="wv-ok">מתחלק ב-${ltr(m)} ✓</span>` : `, לא מתחלק ב-${ltr(m)}`) + ".";
+        const few = fewest(m, b, L, msb), fewText = few === null ? "" : `; המינימלית : ${few.toLocaleString("en-US")}`;
+        $(".wf-head").textContent = `המכונה הישירה : ${size.toLocaleString("en-US")} מצבים${size <= WMAX ? "" : ", יותר מדי לציור"}${fewText}`;
         $(".wf-ring").innerHTML = size <= WMAX ? ring({
           n: size, b, t: Array.from({ length: size }, (_, w) => Array.from({ length: b }, (_, d) => winStep(w, d, b, L, msb))),
           cur: now.w, prev: k ? run[k - 1].w : null, last: din, mk: `wf-arrow-${box.dataset.dvqIndex || 0}`, peek: st.peek,
           label: wText, title: (w) => `${wText(w)} = ${w}`, accept: (w) => w % m === 0,
           aria: `המכונה של החלון : ${size} מצבים, החלון הנוכחי ${digitText(win)}`,
-        }) : `<p class="ex-note">‏${ltr(`${b}^${L} = ${size.toLocaleString("en-US")}`)} חלונות. נתיב הנתונים למעלה הוא אותה מכונה : רגיסטר הזזה של ${ltr(L)} ספרות ורגיסטר שארית.</p>`;
-        $(".wf-read").innerHTML = `החלון ${code(digitText(win))} ` + (now.r === 0 ? `<span class="wv-ok">מתחלק ב-${ltr(m)} ✓</span>` : `לא מתחלק ב-${ltr(m)} (שארית ${ltr(now.r)})`) +
-          (k ? `. ${msb ? "הספרה נכנסה משמאל, והימנית יצאה" : "הספרה נכנסה מימין, והשמאלית יצאה"}.` : ".");
+        }) : `<p class="ex-note">‏${ltr(`${b}^${L} = ${size.toLocaleString("en-US")}`)} חלונות. נתיב הנתונים הוא אותה מכונה : רגיסטר הזזה של ${ltr(L)} ספרות ורגיסטר שארית.</p>`;
         $(".wf-legend").innerHTML = size <= WMAX ? legendOf(b, "עיגול כפול : החלון מתחלק") + (st.peek !== null ? `<span><i class="dv-key-peek"></i>המעברים של החלון שנבחר</span>` : "") : "";
         // the moves out of the current window, or of a window clicked on the ring: the next
-        // window and the remainder, each with the numbers put in
+        // window and the remainder, each with the numbers put in; from base 4 only the row of
+        // the next digit (of 0 when none is next), unless all are asked for
         const from = st.peek ?? now.w, fr = from % m, fo = msb ? from % b : Math.floor(from / b ** (L - 1)), next = st.peek === null && k < N ? st.ds[k] : null;
-        $(".dv-moves-title").innerHTML = `המעברים מהחלון ${code(wText(from))} = ${ltr(from)} (שארית ${ltr(fr)}, הספרה שתצא ${ltr(DIG[fo])})` + (st.peek === null
-          ? `, החלון הנוכחי.${size <= WMAX ? " לחיצה על חלון בגרף מראה את המעברים שלו." : ""}`
-          : `, נבחר בלחיצה. לחיצה נוספת עליו חוזרת לחלון הנוכחי.`);
-        $(".dv-moves-body").innerHTML = movesTable(["הספרה d", "החלון הבא", "השארית הבאה"], Array.from({ length: b }, (_, dd) => {
+        const few1 = b > 2 && !st.all, shown = few1 ? [next ?? 0] : Array.from({ length: b }, (_, dd) => dd);
+        $(".dv-moves-title").innerHTML = `המעברים מ${st.peek === null ? "החלון הנוכחי" : "החלון שנבחר"} ${code(wText(from))} = ${ltr(from)} (שארית ${ltr(fr)}, תצא ${ltr(DIG[fo])}).` + (size > WMAX ? ""
+          : st.peek === null ? " לחיצה על חלון בגרף מראה את שלו." : " לחיצה נוספת חוזרת לנוכחי.");
+        $(".dv-moves-body").innerHTML = movesTable(["הספרה d", "החלון הבא", "השארית הבאה"], shown.map((dd) => {
           const w2 = winStep(from, dd, b, L, msb), raw = msb ? (fr - fo) * inv + dd * ch : b * fr + dd - fo * cl, r2 = ((raw % m) + m) % m;
           return [nextMark(dd, next),
             ltr(msb ? `${dd}·${b ** (L - 1)} + ⌊${from} / ${b}⌋ = ${w2}` : `(${b}·${from} + ${dd}) mod ${size} = ${w2}`) + ` → ${code(wText(w2))}`,
             ltr(msb ? `((${fr} − ${fo})·${inv} + ${dd}·${ch}) mod ${m} ${modTail(raw, m)}` : `(${b}·${fr} + ${dd} − ${fo}·${cl}) mod ${m} ${modTail(raw, m)}`) + (r2 === 0 ? " ✓" : "")];
-        }), next);
+        }), few1 ? 0 : next);
+        const all = $(".wf-all");
+        all.hidden = b <= 2;
+        all.textContent = st.all ? "רק הספרה הבאה" : `כל ${b} הספרות`;
+        all.setAttribute("aria-pressed", String(st.all));
+        // the digit buttons beside the playback bar: a digit enters at once, as the machine's last step
+        const side = msb ? "משמאל" : "מימין";
+        $(".wf-add").setAttribute("aria-label", `ספרה חדשה נכנסת ${side}`);
         $(".wf-add").innerHTML = b <= 4
-          ? `<span class="ex-title">${msb ? "ספרה נכנסת משמאל (MSB) :" : "ספרה נכנסת מימין (LSB) :"}</span> ` + Array.from({ length: b }, (_, dd) => `<button type="button" class="md-button md-button--primary wf-push" data-d="${dd}">${dd}</button>`).join(" ") +
-            ` <button type="button" class="md-button wf-pop">מחיקת הספרה האחרונה</button>`
-          : `<span class="ex-note">בבסיס ${ltr(b)} מקלידים את הספרות בשדה (${ltr(b === 16 ? "0-9, a-f" : "0-9")}).</span>`;
+          ? Array.from({ length: b }, (_, dd) => `<button type="button" class="md-button md-button--primary wf-push" data-d="${dd}" title="הספרה ${dd} נכנסת ${side}" aria-label="הספרה ${dd} נכנסת ${side}">${dd}</button>`).join(" ") +
+            ` <button type="button" class="md-button wf-pop" title="מחיקה של הספרה האחרונה" aria-label="מחיקה של הספרה האחרונה">מחיקה</button>`
+          : `<span class="ex-note">בבסיס ${ltr(b)} מקלידים בשדה (${ltr(b === 16 ? "0-9, a-f" : "0-9")}).</span>`;
         if (k === N && N) answer(box, `אחרי ${ltr(N)} ספרות החלון הוא ${code(digitText(win))} = ${ltr(now.w)}, ${now.r === 0 ? "ומתחלק" : "ולא מתחלק"} ב-${ltr(m)} (שארית ${ltr(now.r)}).`, box.querySelectorAll(".wf-win, .fs-node.is-cur"));
         else answer(box, null);
       };
@@ -421,8 +461,8 @@
         stop(); setInit(ds); $(".wf-err").textContent = ""; st.k = 0; draw();
       });
       [$(".wf-num"), $(".wf-init")].forEach((el) => el.addEventListener("keydown", (e) => { if (e.key === "Enter") el.blur(); }));
-      $(".wf-m").addEventListener("change", () => { stop(); st.m = Number($(".wf-m").value); st.k = 0; draw(); });
-      $(".wf-dir").addEventListener("change", () => { stop(); st.dir = $(".wf-dir").value === "msb" ? "msb" : "lsb"; st.k = 0; draw(); });
+      $(".wf-m").addEventListener("change", () => { stop(); st.m = Number($(".wf-m").value); $(".wf-err").textContent = ""; st.k = 0; draw(); });
+      $(".wf-dir").addEventListener("change", () => { stop(); st.dir = $(".wf-dir").value === "msb" ? "msb" : "lsb"; $(".wf-err").textContent = ""; keepValid(); st.k = 0; draw(); });
       $(".wf-L").addEventListener("input", () => { stop(); st.L = Number($(".wf-L").value); setInit(st.init); st.k = 0; draw(); });
       $(".wf-b").addEventListener("change", () => {
         stop();
@@ -430,7 +470,7 @@
         st.b = nb;
         setInit(toDigits(v % BigInt(nb) ** BigInt(st.L), nb));   // the window's value, as far as it fits
         setNum(st.ds.map((d) => d % nb));
-        if (gcd(st.m, nb) !== 1) st.m = 3;
+        keepValid();
         st.k = 0; draw();
       });
       $(".wf-add").addEventListener("click", (e) => {
@@ -438,6 +478,7 @@
         if (push && n() < MAXD) { stop(); setNum([...st.ds, Number(push.dataset.d)]); st.k = n(); draw(); }
         if (pop && n() > 1) { stop(); setNum(st.ds.slice(0, -1)); st.k = Math.min(st.k, n()); draw(); }
       });
+      $(".wf-all").addEventListener("click", () => { st.all = !st.all; draw(true); });
       const seed = seedControls(box, $(".wf-anchor"), (rng) => {
         stop();
         setNum(Array.from({ length: 6 + Math.floor(rng() * 5) }, () => Math.floor(rng() * st.b)));
@@ -449,7 +490,7 @@
       $(".ex-next").addEventListener("click", () => { st.k = Math.min(n(), st.k + 1); draw(); });
       $(".ex-end").addEventListener("click", () => { stop(); st.k = n(); draw(); });
       const reset = () => {
-        Object.assign(st, { m: d0.m, b: d0.b, L: d0.L, k: 0, dir: d0.dir });
+        Object.assign(st, { m: d0.m, b: d0.b, L: d0.L, k: 0, dir: d0.dir, all: false });
         setInit(parse(d0.init, d0.b, LMAX) || []); setNum(parse(d0.bits, d0.b) || [1, 1, 0, 1]);
       };
       $(".ex-reset").addEventListener("click", () => { stop(); reset(); draw(); });
@@ -463,12 +504,12 @@
     views: { divfsm: divfsmView, winfsm: winfsmView },
     help: {
       divfsm: "בוחרים ברשימה איפה הספרה החדשה נכנסת : כ-LSB (המכונה קוראת את המספר מה-MSB, והמצב הוא השארית) או כ-MSB (המכונה קוראת מה-LSB). בכל צעד המכונה קוראת עוד ספרה, והגרף מראה את המצב הנוכחי, את המעבר האחרון ואת המעברים שיוצאים ממנו. בוחרים m ובסיס (כמה ביטים במחזור), מקלידים מספר, משרשרים ספרות בכפתורים או מגרילים. בסוף המכונה במצב 0 בדיוק כשהמספר מתחלק.",
-      winfsm: "החלון שומר רק את L הספרות האחרונות. בוחרים ברשימה איפה ספרה חדשה נכנסת : מימין (שרשור ל-LSB, הספרה השמאלית יוצאת) או משמאל (שרשור ל-MSB, הימנית יוצאת). נתיב הנתונים מראה את החלון, את הספרה שנכנסת ואת זו שיוצאת, ואת עדכון השארית בלי לחשב את החלון מחדש. כשיש עד 16 חלונות מופיעה גם המכונה עם מצב לכל חלון. בוחרים m, בסיס, L, החלון אחרי reset והספרות שנכנסות.",
+      winfsm: "החלון שומר רק את L הספרות האחרונות. בוחרים ברשימה איפה ספרה חדשה נכנסת : מימין (שרשור ל-LSB, הספרה השמאלית יוצאת) או משמאל (שרשור ל-MSB, הימנית יוצאת). נתיב הנתונים מראה את החלון, את הספרה שנכנסת ואת זו שיוצאת, ואת עדכון השארית בלי לחשב את החלון מחדש. כשיש עד 16 חלונות מופיעה גם המכונה עם מצב לכל חלון, ובראשה מספר המצבים של המכונה הקטנה ביותר. בשרשור ל-LSB כל m עובד; בשרשור ל-MSB רק m זר לבסיס, כי העדכון מחלק בבסיס. הדרך לנוסחאות מקופלת ליד הגרף, וטבלת המעברים שמתחתיו מראה לאן מוביל כל ספרה מהחלון הנוכחי, או מחלון שלוחצים עליו.",
     },
-    models: { divInv, divTable, divRun, winRun, winStep },
+    models: { divInv, divTable, divRun, winRun, winStep, winFewest },
     cols: {                                               // the machine beside the derivation, the digits and the moves
       divfsm: { side: ".dv-derive, .dv-digits, .dv-moves, .dv-legend", w: "minmax(0, 0.75fr)" },   // the legend under the moves
-      winfsm: { main: ".dv-pair, .wf-read, .dv-legend", side: ".dv-derive, .wf-path, .wf-rem", w: "minmax(0, 0.75fr)" },   // the moves full width under them
+      winfsm: { main: ".dv-pair, .dv-legend", side: ".wf-path, .wf-rule, .wf-rem, .wf-fold", w: "minmax(0, 0.7fr)" },   // the ring and its legend beside the data path, the two lines and the folded derivation; the moves full width under them
     },
   });
 })();
