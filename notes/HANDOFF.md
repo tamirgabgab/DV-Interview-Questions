@@ -1117,7 +1117,9 @@ below start at item 112 (session 31).
     Three contrast pairs for 0070. Verilator 5.053 notes: `sort()` on an int queue orders
     negatives as unsigned ('{-3,0,-3,2,-8} gives '{0,2,-8,-3,-3}); a tb comment starting with
     "Verilator" is read as a pragma (BADVLTPRAGMA); `bit[]` `.sum()` gives 2 where the LRM
-    gives 1 bit; `sum() with (item == i)` inside a constraint crashes it.
+    gives 1 bit; `sum() with (item == i)` inside a constraint crashes it. On main as 6ed193f
+    (deployed 2026-11-09 20:59 UTC); a crawl of the live site (121 pages, 262 links and files)
+    found no 404, and the ten pages' 22 boxes built with no script error.
 
 ---
 
