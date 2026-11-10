@@ -1177,7 +1177,9 @@ below start at item 112 (session 31).
     dropped 0039's eggs rule; caught before commit. Page code changed (tell the owner): 0098
     `luhn_sum` keeps only ASCII digits, `luhn_valid` needs a digit, SV `luhn_ok` needs n > 0;
     0031 `bridge([])` still raises KeyError (the owner's code; the statement says one to
-    eight people).
+    eight people). On main as 4a0b42f (deployed 2026-11-10 22:36 UTC); a crawl of the live site
+    (121 pages, 262 links and files) found no 404, and the twelve pages' 23 boxes (0012,
+    0028 and 0036 included) built with no script error.
 
 ---
 
