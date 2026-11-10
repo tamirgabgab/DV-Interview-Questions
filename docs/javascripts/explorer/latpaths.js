@@ -1,5 +1,5 @@
 // kinds: latpaths
-//   latpaths               0022        the paths from the top-left cell to the bottom-right one (data-grid, rows of 0 and 1 joined by dots, 1 an obstacle; data-dirs "rd" right and down, "rud" right, up and down without a cell twice): every open cell shows the number of paths that end at it, on a tint that grows with it (log scale); a tap or a drag puts or removes obstacles (not on S and T), the rows and the columns from 2 to 10, the directions, a clear board; "a random path" draws one path with every path equally likely (backwards through the counts), and the summary gives the count, the closed form when the board is empty, and the count of the other directions
+//   latpaths               0022        the paths from the top-left cell to the bottom-right one (data-grid, rows of 0 and 1 joined by dots, 1 an obstacle; data-dirs "rd" right and down, "rud" right, up and down without a cell twice): every open cell shows the number of paths that end at it, on a tint that grows with it (log scale); a tap or a drag puts or removes obstacles (not on S and T), the rows and the columns from 2 to 10, the directions, a clear board; "a random path" draws one path with every path equally likely (backwards through the counts); "one clock" fills the board as the page's hardware does, a row a clock (paths_rows) or with up a column a clock (paths_cols), the cells not yet reached blank, the register after the clock (row or out) marked, and the note giving block and count; and the summary gives the count, the closed form when the board is empty, and the count of the other directions
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -93,6 +93,15 @@
     }
     return back.reverse();
   };
+  // the page's hardware after clock k (1-based): paths_rows takes row k - 1 of the board,
+  // paths_cols column k - 1; block as a SystemVerilog literal (bit i is cell i, so the
+  // literal is the cells reversed), the register (row or out, 0 at an obstacle) and count
+  const lpClock = (grid, up, k) => {
+    const f = lpCounts(grid, up);
+    const cells = up ? grid.map((row) => row[k - 1]) : grid[k - 1].split("");
+    const reg = up ? f.map((row) => row[k - 1]) : f[k - 1].slice();
+    return { block: `${cells.length}'b${cells.slice().reverse().join("")}`, reg, count: reg[reg.length - 1] };
+  };
   const lpArrows = (path) => path.slice(1).map(([r, c], i) => ARROW[`${r - path[i][0]},${c - path[i][1]}`]).join("");
   // a count in a cell: up to 4 digits as they are, else two digits and the power of ten
   const lpShort = (v) => {
@@ -112,7 +121,7 @@
     mount(box) {
       const grid0 = lpParse(box.dataset.grid || "") || ["000", "000", "000"];
       const up0 = box.dataset.dirs === "rud";
-      const st = { grid: grid0.slice(), up: up0, path: null, focus: [0, 0] };
+      const st = { grid: grid0.slice(), up: up0, path: null, focus: [0, 0], clk: null };
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>כיוונים <select class="lp-dirs" data-nolink aria-label="הצעדים המותרים"><option value="rd">ימינה ולמטה</option><option value="rud">ימינה, למעלה ולמטה</option></select></label>` +
@@ -122,7 +131,8 @@
         `<button type="button" class="md-button ex-reset">חזרה ללוח של העמוד</button></div>` +
         `<div class="ex-controls">` +
         `<button type="button" class="md-button md-button--primary lp-rand">מסלול אקראי</button>` +
-        `<button type="button" class="md-button lp-unpath">בלי מסלול</button></div>` +
+        `<button type="button" class="md-button lp-unpath">בלי מסלול</button>` +
+        `<button type="button" class="md-button lp-step">שעון אחד</button></div>` +
         `<p class="ex-summary lp-sum" aria-live="polite"></p>` +
         `<p class="gp-edit-hint">לחיצה או גרירה על תאים שמה מכשולים או מורידה אותם, חוץ מ-S ו-T. במקלדת${NB}: חיצים בין התאים, ורווח או Enter.</p>` +
         `<figure class="gp-panel"><div class="gp-wrap"><div class="gp-grid" role="grid" dir="ltr" data-edits aria-label="הלוח${NB}: לחיצה על תא שמה בו מכשול או מורידה אותו"></div>` +
@@ -148,18 +158,25 @@
         $(".lp-unpath").disabled = !st.path;
         const had = box.contains(document.activeElement) && document.activeElement.classList.contains("gp-cell");
         const onPath = new Set((st.path || []).map((x) => x.join(",")));
+        // one clock of the hardware: the rows (or the columns) before the clock are filled,
+        // the one of this clock is marked, the rest blank
+        const k = st.clk, len = st.up ? n : m;
+        const later = (r, c) => k !== null && (st.up ? c : r) >= k;
+        const now = (r, c) => k !== null && (st.up ? c : r) === k - 1;
         let g = "";
         for (let r = 0; r < m; r++) {
           g += `<div role="row" class="gp-r">`;
           for (let c = 0; c < n; c++) {
             const wall = blocked(st.grid, r, c), v = f[r][c], tg = isS(r, c) ? "S" : isT(r, c) ? "T" : "";
-            const shown = wall ? "" : lpShort(v);
-            let cls = wall ? " is-wall" : ` is-open lp-h${heat(v, top)}`;
+            const wait = !wall && later(r, c);
+            const shown = wall || wait ? "" : lpShort(v);
+            let cls = wall ? " is-wall" : wait ? " is-open lp-h0" : ` is-open lp-h${heat(v, top)}`;
             if (onPath.has(`${r},${c}`)) cls += " is-path";
-            const what = (wall ? "מכשול" : `${group(v)} מסלולים נגמרים בתא`) + (tg === "S" ? ", ההתחלה" : tg === "T" ? ", היעד" : "");
+            if (!wall && now(r, c)) cls += " is-new";
+            const what = (wall ? "מכשול" : wait ? "עוד לא חושב" : `${group(v)} מסלולים נגמרים בתא`) + (tg === "S" ? ", ההתחלה" : tg === "T" ? ", היעד" : "");
             const fo = st.focus[0] === r && st.focus[1] === c;
             const long = shown.length >= 6 ? " lp-long2" : shown.length >= 4 ? " lp-long" : "";
-            g += `<div role="gridcell" class="gp-cell${cls}" data-r="${r}" data-c="${c}"${tg ? ` data-tag="${tg}"` : ""} tabindex="${fo ? 0 : -1}"${wall ? "" : ` title="${group(v)}"`}>` +
+            g += `<div role="gridcell" class="gp-cell${cls}" data-r="${r}" data-c="${c}"${tg ? ` data-tag="${tg}"` : ""} tabindex="${fo ? 0 : -1}"${wall || wait ? "" : ` title="${group(v)}"`}>` +
               `<span class="gp-sr">שורה ${r}, עמודה ${c}${NB}: ${what}</span>` +
               (tg ? `<span class="gp-tag" aria-hidden="true">${tg}</span>` : "") +
               `<span class="gp-v${long}" aria-hidden="true">${shown}</span></div>`;
@@ -181,13 +198,17 @@
         else if (total === 0n) sum += ` המכשולים חוסמים כל מסלול${st.up ? "" : other > 0n ? ", אבל עם צעד למעלה יש" : ""}.`;
         sum += ` ${otherDirs}${NB}: ${ltr(group(other))}.`;
         $(".lp-sum").innerHTML = sum;
-        $(".lp-note").innerHTML = st.path
+        const hw = k !== null ? lpClock(st.grid, st.up, k) : null;
+        $(".lp-note").innerHTML = hw
+          ? `שעון ${ltr(k)} מתוך ${ltr(len)}, ${st.up ? "עמודה" : "שורה"} ${ltr(k - 1)} ב-${ltr(st.up ? "paths_cols" : "paths_rows")}${NB}: ` +
+            `${ltr(`block = ${hw.block}`)}, ${ltr(`count = ${group(hw.count)}`)}. האוגר ${ltr(st.up ? "out" : "row")} אחרי השעון הוא ה${st.up ? "עמודה" : "שורה"} המסומנת.`
+          : st.path
           ? `המסלול האקראי, ${ltr(st.path.length - 1)} צעדים${NB}: ${ltr(lpArrows(st.path))}. לכל אחד מ-${ltr(group(total))} המסלולים יש אותו סיכוי.`
           : st.up ? "בכל עמודה, כל תא של קטע פנוי מקבל את סכום הכניסות לקטע." : "כל תא פנוי הוא סכום של התא משמאלו והתא מעליו.";
         answer(box, total > 0n ? `${ltr(group(total))} מסלולים מ-S ל-T.` : `אין מסלול מ-S ל-T${NB}: ${ltr(0)}.`, '.gp-grid .gp-cell[data-tag="T"]');
       };
 
-      const edited = () => { st.path = null; draw(); };
+      const edited = () => { st.path = null; st.clk = null; draw(); };
       $(".lp-dirs").addEventListener("change", () => { st.up = $(".lp-dirs").value === "rud"; edited(); });
       // the size: cells kept where they were, new ones open, S and T open
       const resize = () => {
@@ -202,7 +223,14 @@
       $(".lp-cols").addEventListener("change", resize);
       $(".lp-clear").addEventListener("click", () => { st.grid = st.grid.map((row) => "0".repeat(row.length)); edited(); });
       $(".ex-reset").addEventListener("click", () => { st.grid = grid0.slice(); st.up = up0; st.focus = [0, 0]; edited(); });
-      $(".lp-rand").addEventListener("click", () => { st.path = lpSample(st.grid, st.up, Math.random); draw(); });
+      $(".lp-rand").addEventListener("click", () => { st.path = lpSample(st.grid, st.up, Math.random); st.clk = null; draw(); });
+      // one clock: the next row (or column); after the last one the next press starts again
+      $(".lp-step").addEventListener("click", () => {
+        const len = st.up ? st.grid[0].length : st.grid.length;
+        st.clk = st.clk === null || st.clk >= len ? 1 : st.clk + 1;
+        st.path = null;
+        draw();
+      });
       $(".lp-unpath").addEventListener("click", () => { st.path = null; draw(); });
       // editing: a press paints the pressed cell's opposite, a drag goes on painting
       const setCell = (r, c, ch) => {
@@ -271,8 +299,8 @@
   dvqExplorers.register({
     views: { latpaths: latpathsView },
     help: {
-      latpaths: "בכל תא פנוי מופיע מספר המסלולים מ-S שנגמרים בו, והצבע מתחזק כשהמספר גדל. לחיצה או גרירה על תאים שמה מכשולים או מורידה אותם, ובוחרים את גודל הלוח ואת הכיוונים : ימינה ולמטה, או ימינה, למעלה ולמטה בלי לעבור באותו תא פעמיים. \"מסלול אקראי\" מצייר מסלול אחד מ-S ל-T, כשלכל המסלולים יש אותו סיכוי. השורה שמעל הלוח נותנת את המספר, את הנוסחה כשהלוח ריק, ואת המספר של הכיוונים האחרים.".replace(/ :/g, " :"),
+      latpaths: "בכל תא פנוי מופיע מספר המסלולים מ-S שנגמרים בו, והצבע מתחזק כשהמספר גדל. לחיצה או גרירה על תאים שמה מכשולים או מורידה אותם, ובוחרים את גודל הלוח ואת הכיוונים : ימינה ולמטה, או ימינה, למעלה ולמטה בלי לעבור באותו תא פעמיים. \"מסלול אקראי\" מצייר מסלול אחד מ-S ל-T, כשלכל המסלולים יש אותו סיכוי. \"שעון אחד\" ממלא את הלוח כמו החומרה של העמוד : שורה בכל שעון, או עם צעד למעלה עמודה בכל שעון, האוגר אחרי השעון מסומן, והשורה שמתחת ללוח נותנת את block ואת count. השורה שמעל הלוח נותנת את המספר, את הנוסחה כשהלוח ריק, ואת המספר של הכיוונים האחרים.".replace(/ :/g, " :"),
     },
-    models: { lpParse, lpCounts, lpCount, lpFormula, lpSample, lpArrows, lpShort },
+    models: { lpParse, lpCounts, lpCount, lpFormula, lpSample, lpArrows, lpShort, lpClock },
   });
 })();

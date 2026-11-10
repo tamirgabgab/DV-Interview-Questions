@@ -13,7 +13,10 @@ the closed forms come from math.comb and powers. blocks() returns, in page order
 paths of a 3 x 3 board, the counts of the 3 x 7 board with their legend, the obstacles board
 of part b with its counts, the nine paths of a 3 x 3 board with up allowed, the table of
 the two counts (and of four directions) for a few sizes, the obstacles board of part d with
-the counts of both kinds, and the zigzag board where only the paths with up arrive.
+the counts of both kinds, and the zigzag board where only the paths with up arrive. Two of
+the tables are per-clock tables of the page's hardware: paths_rows fed board B a row a clock,
+and paths_cols fed the zigzag a column a clock (rows_clocks() and cols_clocks() model the
+two modules register by register, independently of counts()).
 """
 
 from __future__ import annotations
@@ -225,23 +228,77 @@ def table_sizes() -> str:
     return "\n".join(rows)
 
 
+def block_literal(cells) -> str:
+    """The block input of a row or a column as a SystemVerilog literal: bit i is cell i, so
+    the literal is the cells reversed (the row "0000010" is 7'b0100000)."""
+    return f"{len(cells)}'b" + "".join(str(x) for x in reversed(cells))
+
+
+def rows_clocks(grid):
+    """paths_rows fed one row a clock (first on the first): the block input and the row
+    register after every clock, as the module's always_comb computes them."""
+    n, row, out = len(grid[0]), [0] * len(grid[0]), []
+    for i, cells in enumerate(grid):
+        first, nxt = i == 0, [0] * n
+        nxt[0] = 0 if cells[0] else 1 if first else row[0]
+        for c in range(1, n):
+            nxt[c] = 0 if cells[c] else (0 if first else row[c]) + nxt[c - 1]
+        row = nxt
+        out.append((block_literal(cells), row[:]))
+    return out
+
+
+def cols_clocks(grid):
+    """paths_cols fed one column a clock: the block input and the out register after every
+    clock (down from the top of each run, then the bottom of the run copied up)."""
+    m, out, res = len(grid), [0] * len(grid), []
+    for c in range(len(grid[0])):
+        cells, first = [grid[r][c] for r in range(m)], c == 0
+        down = [0] * m
+        down[0] = 0 if cells[0] else 1 if first else out[0]
+        for r in range(1, m):
+            down[r] = 0 if cells[r] else down[r - 1] + (0 if first else out[r])
+        run = [0] * m
+        run[m - 1] = down[m - 1]
+        for r in range(m - 2, -1, -1):
+            run[r] = 0 if cells[r] else down[r] if cells[r + 1] else run[r + 1]
+        out = run
+        res.append((block_literal(cells), out[:]))
+    return res
+
+
+def vec(vals) -> str:
+    """A vector of a table cell, from row (or column) 0, left to right."""
+    return RLM + ltr("[" + ", ".join(map(str, vals)) + "]")
+
+
+def table_rows_clocks() -> str:
+    """paths_rows on board B, a row a clock: the row, its block literal, the row register
+    and count after the clock."""
+    g = parse(BOARD_B)
+    rows = ["| שורה | בלוח | ‏`block` | ‏`row` אחרי השעון | ‏`count` |", "|:-:|:-:|:-:|:-:|:-:|"]
+    for r, (blk, reg) in enumerate(rows_clocks(g)):
+        rows.append(f"| {r} | {RLM}{ltr(BOARD_B[r])} | {RLM}`{blk}` | {vec(reg)} | {reg[-1]} |")
+    return "\n".join(rows)
+
+
 def table_zigzag() -> str:
-    """Column by column: what enters each row and the count of every cell, as vectors from
-    row 0 down (# an obstacle)."""
+    """Column by column, which is also paths_cols fed a column a clock: the block literal,
+    what enters each row and the count of every cell, as vectors from row 0 down (# an
+    obstacle), and count, the bottom cell of the out register."""
     g = parse(ZIGZAG)
     up = counts(g, True)
     m = len(g)
-
-    def vec(vals):
-        return RLM + ltr("[" + ", ".join(vals) + "]")
-
-    rows = ["| עמודה | נכנסים בכל שורה | המסלולים שנגמרים בכל תא | למה |", "|:-:|:-:|:-:|---|"]
+    hw = cols_clocks(g)
+    rows = ["| עמודה | ‏`block` | נכנסים בכל שורה | המסלולים שנגמרים בכל תא | ‏`count` | למה |", "|:-:|:-:|:-:|:-:|:-:|---|"]
     why = {0: "ההתחלה בשורה 0, וכל העמודה קטע אחד", 1: "רק שורה 2 פנויה", 2: "קטע אחד : כל תא מקבל 1, גם שורה 0",
            3: "רק שורה 0 פנויה", 4: "קטע אחד : " + ltr("1 + 0 + 0"), 5: "קטע אחד : " + ltr("1 + 1 + 1"), 6: "קטע אחד : " + ltr("3 + 3 + 3")}
     for c in range(len(g[0])):
         enter = ["#" if g[r][c] else str(1 if c == 0 and r == 0 else 0 if c == 0 else up[r][c - 1]) for r in range(m)]
         out = ["#" if g[r][c] else str(up[r][c]) for r in range(m)]
-        rows.append(f"| {c} | {vec(enter)} | {vec(out)} | {why[c]} |")
+        blk, reg = hw[c]
+        assert reg == [0 if g[r][c] else up[r][c] for r in range(m)]
+        rows.append(f"| {c} | {RLM}`{blk}` | {vec(enter)} | {vec(out)} | {reg[-1]} | {why[c]} |")
     return "\n".join(rows)
 
 
@@ -260,6 +317,7 @@ def blocks():
         legend(),
         board_svg(b, "הלוח של סעיף ב : 3 על 7 עם שלושה מכשולים. בכל תא פנוי מספר המסלולים מ-S שנגמרים בו, ימינה ולמטה, ובתא T יש 9",
                   values=counts(b)),
+        table_rows_clocks(),
         multiples_svg(rud3, 3, 3, "תשעת המסלולים של לוח 3 על 3 כשמותר גם למעלה, בלי לחזור לתא : בכל עמודה המסלול הוא קטע אנכי אחד, ובשתי העמודות הראשונות בוחרים את שורת היציאה", 5),
         table_sizes(),
         board_svg(b, "אותו לוח של סעיף ב כשמותר גם למעלה : בכל תא פנוי מספר המסלולים מ-S שנגמרים בו, ובתא T יש 32",

@@ -1,15 +1,19 @@
-//@flags --timing
+//@flags --assert --timing
 //@page function automatic longint unsigned paths_rd
-//@page module paths_rows
+//@page module paths_rows #(
 //@page function automatic longint unsigned pow_mod
 //@page module paths_cols
+//@page module paths_rows_check
 // Question 0022: the page's SystemVerilog against references written here independently: a
 // full table over the cells for right and down, and for right, up and down a sum over every
 // pair of rows of a column whose cells between them are all open. paths_rows is fed a row a
 // clock and paths_cols a column a clock, exact (64 bits) and mod 10^9 + 7 (32 bits), on the
 // page's boards (9 and 32, the zigzag 0 and 9), empty boards (28, 729, C(18, 9), 10^9) and
 // random boards; paths_rd on every board up to 34 x 34 against the table; pow_mod against
-// repeated multiplication.
+// repeated multiplication. The per-clock tables of the page (paths_rows on the board of part
+// b, paths_cols on the zigzag) against the registers after every clock, and the follow-up's
+// paths_rows_check bound to both paths_rows instances (its assertions stop the run when they
+// fail; the corners it covers are counted here and must all be reached).
 module tb;
   localparam longint unsigned P = 64'd1000000007;
   logic clk = 0, rst_n = 0, valid = 0, first = 0;
@@ -25,6 +29,16 @@ module tb;
   paths_cols #(.M(3),  .W(32), .P(P))    u_c3m (.clk, .rst_n, .valid, .first, .block(blk[2:0]), .count(c3m));
   paths_cols #(.M(10), .W(64))           u_c10 (.clk, .rst_n, .valid, .first, .block(blk),      .count(c10));
   always #5 clk = ~clk;
+
+  paths_rows_check #(.N(7))  u_k7  (.clk, .rst_n, .valid, .first, .block(blk[6:0]), .count(r7));
+  paths_rows_check #(.N(10)) u_k10 (.clk, .rst_n, .valid, .first, .block(blk),      .count(r10));
+  // the corners of the checker's cover properties on the 7-column instance, counted here
+  int hit_s = 0, hit_t = 0, hit_wall = 0;
+  always @(posedge clk) if (rst_n && valid) begin
+    if (first && blk[0]) hit_s++;
+    if (blk[6]) hit_t++;
+    if (&blk[6:0]) hit_wall++;
+  end
 
   // the board: g[r][c] = 1 is an obstacle; m rows, n columns
   bit g[12][12];
@@ -108,6 +122,36 @@ module tb;
     z = '{"0100000", "0101000", "0001000"};
     #12 rst_n = 1;
 
+    // the per-clock tables of the page: the registers after every clock
+    begin
+      longint unsigned want_r[3][7] = '{'{1, 1, 1, 1, 1, 0, 0}, '{1, 0, 1, 2, 3, 3, 3}, '{1, 1, 2, 0, 3, 6, 9}};
+      longint unsigned want_c[7][3] = '{'{1, 1, 1}, '{0, 0, 1}, '{1, 1, 1}, '{1, 0, 0}, '{1, 1, 1}, '{3, 3, 3}, '{9, 9, 9}};
+      logic [6:0] rows_b[3] = '{7'b0100000, 7'b0000010, 7'b0001000};
+      logic [2:0] cols_z[7] = '{3'b000, 3'b011, 3'b000, 3'b110, 3'b000, 3'b000, 3'b000};
+      for (int i = 0; i < 3; i++) begin
+        @(negedge clk); valid = 1; first = i == 0; blk = '0; blk[6:0] = rows_b[i];
+        @(negedge clk); valid = 0; first = 0;
+        for (int c = 0; c < 7; c++)
+          if (u_r7.row[c] != want_r[i][c]) fail($sformatf("paths_rows clock %0d: row[%0d] = %0d, want %0d", i + 1, c, u_r7.row[c], want_r[i][c]));
+        if (r7 != want_r[i][6]) fail($sformatf("paths_rows clock %0d: count %0d", i + 1, r7));
+      end
+      for (int i = 0; i < 7; i++) begin
+        @(negedge clk); valid = 1; first = i == 0; blk = '0; blk[2:0] = cols_z[i];
+        @(negedge clk); valid = 0; first = 0;
+        for (int r = 0; r < 3; r++)
+          if (u_c3.out[r] != want_c[i][r]) fail($sformatf("paths_cols clock %0d: out[%0d] = %0d, want %0d", i + 1, r, u_c3.out[r], want_c[i][r]));
+        if (c3 != want_c[i][2]) fail($sformatf("paths_cols clock %0d: count %0d", i + 1, c3));
+      end
+    end
+
+    // the corners of the checker: S blocked, a fully blocked row, T blocked
+    board_of('{"1000000", "0000000", "0000000"});
+    check_rows(0);
+    board_of('{"0000000", "1111111", "0000000"});
+    check_rows(0);
+    board_of('{"0000000", "0000000", "0000001"});
+    check_rows(0);
+
     // the page's boards and the empty ones
     board_of(b);
     if (ref_rd() != 9 || ref_rud() != 32) fail("the references on the board of part b");
@@ -165,6 +209,7 @@ module tb;
     if (paths_rud_mod(3, 7) != 729 || paths_rud_mod(10, 10) != 1000000000 || paths_rud_mod(10, 11) != 64'd999999937)
       fail("paths_rud_mod");
 
+    if (hit_s == 0 || hit_t == 0 || hit_wall == 0) fail($sformatf("corners not reached: %0d %0d %0d", hit_s, hit_t, hit_wall));
     if (errors == 0) $display("PASS");
     else $display("FAIL errors=%0d", errors);
     $finish;

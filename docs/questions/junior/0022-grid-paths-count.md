@@ -18,7 +18,7 @@ added: 2026-11-07
 1. **ימינה ולמטה :** לוח ריק של 3 שורות ו-7 עמודות, ואחר כך כל לוח.
 2. **מכשולים :** חלק מהתאים חסומים, ואסור לעבור בהם.
 3. **גם למעלה :** מותר ימינה, למעלה ולמטה, אבל אסור לעבור באותו תא פעמיים. בלי הכלל הזה
-   יש אינסוף מסלולים.
+   יש אינסוף מסלולים בכל לוח עם שתי שורות לפחות.
 4. **גם למעלה, עם מכשולים :** שני הכללים יחד.
 
 המספרים גדלים מהר, ולכן בכל סעיף מחזירים את המספר המדויק, וגם את השארית שלו בחלוקה
@@ -45,7 +45,7 @@ added: 2026-11-07
     כמה צעדים ימינה וכמה צעדים למטה יש בכל מסלול? האם המספרים האלה תלויים במסלול?
 
 ??? tip "רמז 2"
-    לתא \( (r, c) \) מגיעים רק מהתא שמשמאלו או מהתא שמעליו.
+    מאילו תאים אפשר להגיע לתא \( (r, c) \) בצעד אחד? מה זה אומר על מספר המסלולים שנגמרים בו?
 
 ??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
@@ -199,7 +199,7 @@ added: 2026-11-07
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"
         **‏9.** אותה טבלה של סעיף א, רק שבתא חסום כותבים 0 : אף מסלול לא נגמר בו, ולכן הוא
-        לא מוסיף כלום לתאים שאחריו. הנוסחה כבר לא עובדת, כי היא סופרת גם 19 מסלולים שעוברים
+        לא מוסיף כלום לתאים שאחריו. הנוסחה כבר לא עובדת, כי היא סופרת גם מסלולים שעוברים
         במכשול. החומרה מחזיקה שורה אחת של מונים, ומעדכנת את כולה בשעון אחד לכל שורה של
         הלוח.
 
@@ -290,7 +290,10 @@ added: 2026-11-07
         1. שתי שאריות קטנות מ-\( P \), והסכום שלהן קטן מ-\( 2P \) : השוואה אחת וחיסור אחד
            מחזירים אותו לשארית, בלי פעולת חילוק.
         2. ‏`row[c]` הוא התא שמעל, ו-`nxt[c - 1]` התא משמאל באותה שורה, שחושב באותו שעון.
-           כל השורה היא שרשרת של \( N - 1 \) מחברים, כמו ב-ripple carry.
+           כל השורה היא שרשרת של \( N - 1 \) מחברים, כמו ב-ripple carry, וזה הנתיב הקריטי :
+           ב-\( N = 7 \) ו-\( W = 64 \) שישה מחברים של 64 ביטים בשעון אחד. בלוח רחב שמים
+           רגיסטר באמצע השורה : החצי הימני של שורה מחושב בשעון שאחרי החצי השמאלי שלה, ביחד עם
+           החצי השמאלי של השורה הבאה. עדיין נכנסת שורה בכל שעון, והתשובה מגיעה שעון אחד אחר כך.
 
     #### למה זה נכון { .sol-proof }
 
@@ -307,9 +310,29 @@ added: 2026-11-07
     משמאל לימין באותו סדר של הקוד ב-Python. ‏`first` מחליף את השורה שמעל בשורה של ההתחלה :
     1 בעמודה 0 ו-0 בכל השאר. אחרי השורה האחרונה `count` הוא \( f(m-1, n-1) \).
 
-    **נסו בעצמכם.** לחצו על תא כדי לשים בו מכשול או להוריד אותו, ושנו את גודל הלוח ואת
-    הכיוונים. בכל תא מופיע מספר המסלולים שנגמרים בו, והצבע מתחזק כשהמספר גדל. "מסלול
-    אקראי" מצייר מסלול אחד, כשלכל המסלולים יש אותו סיכוי :
+    בלוח של סעיף ב נכנסת שורה בכל שעון, ו-`first` הוא 1 בשורה 0. אחרי כל שעון `row` הוא
+    השורה של הטבלה, עם 0 במכשול :
+
+    <!-- gen 4 -->
+
+    | שורה | בלוח | ‏`block` | ‏`row` אחרי השעון | ‏`count` |
+    |:-:|:-:|:-:|:-:|:-:|
+    | 0 | ‏<span dir="ltr">0000010</span> | ‏`7'b0100000` | ‏<span dir="ltr">[1, 1, 1, 1, 1, 0, 0]</span> | 0 |
+    | 1 | ‏<span dir="ltr">0100000</span> | ‏`7'b0000010` | ‏<span dir="ltr">[1, 0, 1, 2, 3, 3, 3]</span> | 3 |
+    | 2 | ‏<span dir="ltr">0001000</span> | ‏`7'b0001000` | ‏<span dir="ltr">[1, 1, 2, 0, 3, 6, 9]</span> | 9 |
+
+    <!-- /gen -->
+
+    **סדר הביטים.** ב-`block` הביט \( c \) הוא עמודה \( c \), וליטרל של SystemVerilog נכתב
+    מהביט הגבוה. לכן השורה <span dir="ltr">0000010</span> של הלוח, עם מכשול בעמודה 5, נכנסת
+    כ-`7'b0100000`, הפוכה. בבדיקה שבונה את `block` ממחרוזת של הלוח זו טעות נפוצה.
+
+    **נסו בעצמכם.** הורידו את המכשול מ-\( (1, 1) \) : ‏T עולה מ-9 ל-15. בלי \( (0, 5) \)
+    יש 12, ובלי \( (2, 3) \) יש 13. שימו מכשול ב-\( (0, 2) \) : ימינה ולמטה אין אף מסלול,
+    ועם "ימינה, למעלה ולמטה" יש 8, כי המסלול עולה בחזרה בעמודה 2. ‏"ניקוי" ולוח של 10 על 10
+    נותנים \( \binom{18}{9} = 48{,}620 \), ועם צעד למעלה \( 10^9 \). "שעון אחד" ממלא את
+    הלוח שורה אחרי שורה, כמו `paths_rows` בטבלה למעלה. מעבר לאיורים, בקופסה יש כל לוח עד 10
+    על 10, שני סוגי הצעדים על אותו לוח, ומסלול אקראי שלכל המסלולים יש בו אותו סיכוי :
 
     <div class="explorer" data-kind="latpaths" data-grid="0000010.0100000.0001000"></div>
 
@@ -347,16 +370,16 @@ added: 2026-11-07
     במקום לשאול איך המסלול זז, שואלים איפה הוא **עוזב** כל עמודה. בלוח של 3 על 3 יש שלוש
     שורות יציאה לעמודה 0 ושלוש לעמודה 1, ובעמודה האחרונה יורדים ל-T. אלה תשעת המסלולים :
 
-    <!-- gen 4 -->
+    <!-- gen 5 -->
 
     <svg class="figure gx-fig lp-fig lp-small" viewBox="0 0 277 94" style="max-width:17.3125rem" role="img" aria-label="תשעת המסלולים של לוח 3 על 3 כשמותר גם למעלה, בלי לחזור לתא : בכל עמודה המסלול הוא קטע אנכי אחד, ובשתי העמודות הראשונות בוחרים את שורת היציאה"><g class="lp-one"><title>path 1: →→↓↓</title><rect class="lp-sq lp-end" x="2.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="15.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="28.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="2.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="15.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="28.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="2.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="15.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq lp-end" x="28.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><polyline class="lp-line" points="8.5,8.5 21.5,8.5 34.5,8.5 34.5,21.5 34.5,34.5"/></g><g class="lp-one"><title>path 2: →↓→↓</title><rect class="lp-sq lp-end" x="53.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="66.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="79.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="53.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="66.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="79.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="53.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="66.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq lp-end" x="79.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><polyline class="lp-line" points="59.5,8.5 72.5,8.5 72.5,21.5 85.5,21.5 85.5,34.5"/></g><g class="lp-one"><title>path 3: →↓↓→</title><rect class="lp-sq lp-end" x="104.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="117.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="130.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="104.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="117.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="130.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="104.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="117.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq lp-end" x="130.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><polyline class="lp-line" points="110.5,8.5 123.5,8.5 123.5,21.5 123.5,34.5 136.5,34.5"/></g><g class="lp-one"><title>path 4: ↓→→↓</title><rect class="lp-sq lp-end" x="155.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="168.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="181.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="155.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="168.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="181.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="155.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="168.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq lp-end" x="181.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><polyline class="lp-line" points="161.5,8.5 161.5,21.5 174.5,21.5 187.5,21.5 187.5,34.5"/></g><g class="lp-one"><title>path 5: ↓→↓→</title><rect class="lp-sq lp-end" x="206.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="219.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="232.75" y="2.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="206.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="219.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="232.75" y="15.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="206.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="219.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq lp-end" x="232.75" y="28.75" width="11.5" height="11.5" rx="1.5"/><polyline class="lp-line" points="212.5,8.5 212.5,21.5 225.5,21.5 225.5,34.5 238.5,34.5"/></g><g class="lp-one"><title>path 6: ↓→↑→↓↓</title><rect class="lp-sq lp-end" x="2.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="15.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="28.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="2.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="15.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="28.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="2.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="15.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq lp-end" x="28.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><polyline class="lp-line" points="8.5,59.5 8.5,72.5 21.5,72.5 21.5,59.5 34.5,59.5 34.5,72.5 34.5,85.5"/></g><g class="lp-one"><title>path 7: ↓↓→→</title><rect class="lp-sq lp-end" x="53.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="66.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="79.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="53.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="66.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="79.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="53.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="66.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq lp-end" x="79.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><polyline class="lp-line" points="59.5,59.5 59.5,72.5 59.5,85.5 72.5,85.5 85.5,85.5"/></g><g class="lp-one"><title>path 8: ↓↓→↑→↓</title><rect class="lp-sq lp-end" x="104.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="117.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="130.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="104.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="117.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="130.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="104.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="117.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq lp-end" x="130.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><polyline class="lp-line" points="110.5,59.5 110.5,72.5 110.5,85.5 123.5,85.5 123.5,72.5 136.5,72.5 136.5,85.5"/></g><g class="lp-one"><title>path 9: ↓↓→↑↑→↓↓</title><rect class="lp-sq lp-end" x="155.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="168.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="181.75" y="53.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="155.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="168.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="181.75" y="66.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="155.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq" x="168.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><rect class="lp-sq lp-end" x="181.75" y="79.75" width="11.5" height="11.5" rx="1.5"/><polyline class="lp-line" points="161.5,59.5 161.5,72.5 161.5,85.5 174.5,85.5 174.5,72.5 174.5,59.5 187.5,59.5 187.5,72.5 187.5,85.5"/></g></svg>
 
     <!-- /gen -->
 
-    כך גדלים שני המספרים. בעמודה האחרונה המסלולים שמותר בהם גם שמאלה, בלי לחזור לתא, שנספרו
-    בחיפוש מלא :
+    כך גדלים שני המספרים. העמודה האחרונה של הטבלה, "גם שמאלה", סופרת את המסלולים שמותר בהם
+    גם צעד שמאלה, בלי לחזור לתא. אותם ספרנו בחיפוש מלא :
 
-    <!-- gen 5 -->
+    <!-- gen 6 -->
 
     | הלוח | ימינה ולמטה | ימינה, למעלה ולמטה | גם שמאלה |
     |---|:-:|:-:|:-:|
@@ -455,7 +478,8 @@ added: 2026-11-07
     ועל, ויש \( m^{n-1} \) רשימות.
 
     **בלי "לא פעמיים".** אם מותר לחזור לתא, מסלול יכול לעלות ולרדת באותה עמודה כמה פעמים
-    שירצה, ויש אינסוף מסלולים.
+    שירצה, ויש אינסוף מסלולים. זה דורש שתי שורות לפחות : בלוח של שורה אחת אין צעד למעלה או
+    למטה, ויש בו מסלול אחד.
 
     **ושמאלה?** עם ארבעה כיוונים, בלי לחזור לתא, יש מספר סופי של מסלולים, אבל מסלול יכול לחזור
     לעמודה שכבר עזב, וההתאמה לשורות יציאה נשברת. לספירה הזו אין נוסחה ידועה. בטבלה היא נספרה
@@ -495,7 +519,7 @@ added: 2026-11-07
     עכשיו סופרים לפי עמודות ולא לפי תאים. בכל עמודה, מכל שורה שנכנסים בה אפשר להגיע בדרך
     אחת לכל תא של אותו קטע פנוי, ולשום תא אחר. בלוח של סעיף ב :
 
-    <!-- gen 6 -->
+    <!-- gen 7 -->
 
     <svg class="figure gx-fig lp-fig" viewBox="0 0 268 130" style="max-width:16.75rem" role="img" aria-label="אותו לוח של סעיף ב כשמותר גם למעלה : בכל תא פנוי מספר המסלולים מ-S שנגמרים בו, ובתא T יש 32"><text class="tick" x="41" y="14" text-anchor="middle">0</text><text class="tick" x="75" y="14" text-anchor="middle">1</text><text class="tick" x="109" y="14" text-anchor="middle">2</text><text class="tick" x="143" y="14" text-anchor="middle">3</text><text class="tick" x="177" y="14" text-anchor="middle">4</text><text class="tick" x="211" y="14" text-anchor="middle">5</text><text class="tick" x="245" y="14" text-anchor="middle">6</text><text class="tick" x="17" y="43" text-anchor="end">0</text><text class="tick" x="17" y="77" text-anchor="end">1</text><text class="tick" x="17" y="111" text-anchor="end">2</text><g class="gx-cell is-open lp-h1"><title>cell (0, 0): 1 path ends here</title><rect x="25.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (0, 1): 1 path ends here</title><rect x="59.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (0, 2): 2 paths end here</title><rect x="93.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h2"><title>cell (0, 3): 4 paths end here</title><rect x="127.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h3"><title>cell (0, 4): 8 paths end here</title><rect x="161.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-wall"><title>cell (0, 5): an obstacle</title><rect x="195.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h4"><title>cell (0, 6): 32 paths end here</title><rect x="229.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (1, 0): 1 path ends here</title><rect x="25.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-wall"><title>cell (1, 1): an obstacle</title><rect x="59.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (1, 2): 2 paths end here</title><rect x="93.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h2"><title>cell (1, 3): 4 paths end here</title><rect x="127.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h3"><title>cell (1, 4): 8 paths end here</title><rect x="161.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h4"><title>cell (1, 5): 16 paths end here</title><rect x="195.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h4"><title>cell (1, 6): 32 paths end here</title><rect x="229.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (2, 0): 1 path ends here</title><rect x="25.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (2, 1): 1 path ends here</title><rect x="59.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (2, 2): 2 paths end here</title><rect x="93.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-wall"><title>cell (2, 3): an obstacle</title><rect x="127.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h3"><title>cell (2, 4): 8 paths end here</title><rect x="161.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h4"><title>cell (2, 5): 16 paths end here</title><rect x="195.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h4"><title>cell (2, 6): 32 paths end here</title><rect x="229.5" y="91.5" width="31" height="31" rx="3"/></g><text class="gx-val" x="41" y="47" text-anchor="middle">1</text><text class="gx-tag" x="28" y="34">S</text><text class="gx-val" x="75" y="44" text-anchor="middle">1</text><text class="gx-val" x="109" y="44" text-anchor="middle">2</text><text class="gx-val" x="143" y="44" text-anchor="middle">4</text><text class="gx-val" x="177" y="44" text-anchor="middle">8</text><text class="gx-val" x="245" y="44" text-anchor="middle">32</text><text class="gx-val" x="41" y="78" text-anchor="middle">1</text><text class="gx-val" x="109" y="78" text-anchor="middle">2</text><text class="gx-val" x="143" y="78" text-anchor="middle">4</text><text class="gx-val" x="177" y="78" text-anchor="middle">8</text><text class="gx-val" x="211" y="78" text-anchor="middle">16</text><text class="gx-val" x="245" y="78" text-anchor="middle">32</text><text class="gx-val" x="41" y="112" text-anchor="middle">1</text><text class="gx-val" x="75" y="112" text-anchor="middle">1</text><text class="gx-val" x="109" y="112" text-anchor="middle">2</text><text class="gx-val" x="177" y="112" text-anchor="middle">8</text><text class="gx-val" x="211" y="112" text-anchor="middle">16</text><text class="gx-val" x="245" y="115" text-anchor="middle">32</text><text class="gx-tag" x="232" y="102">T</text></svg>
 
@@ -505,31 +529,33 @@ added: 2026-11-07
     בעמודה 1, לעלות בעמודה 2 ולעבור למעלה בעמודה 3. בעמודות 4 ו-5 הוא בוחר שוב שורת
     יציאה :
 
-    <!-- gen 7 -->
+    <!-- gen 8 -->
 
     <svg class="figure gx-fig lp-fig" viewBox="0 0 268 130" style="max-width:16.75rem" role="img" aria-label="לוח הזיגזג : עמודה 1 פתוחה רק למטה ועמודה 3 רק למעלה. בצעדים ימינה ולמטה אין אף מסלול, וכשמותר גם למעלה יש 9. בכל תא מספר המסלולים שנגמרים בו, ומסלול אחד מסומן"><text class="tick" x="41" y="14" text-anchor="middle">0</text><text class="tick" x="75" y="14" text-anchor="middle">1</text><text class="tick" x="109" y="14" text-anchor="middle">2</text><text class="tick" x="143" y="14" text-anchor="middle">3</text><text class="tick" x="177" y="14" text-anchor="middle">4</text><text class="tick" x="211" y="14" text-anchor="middle">5</text><text class="tick" x="245" y="14" text-anchor="middle">6</text><text class="tick" x="17" y="43" text-anchor="end">0</text><text class="tick" x="17" y="77" text-anchor="end">1</text><text class="tick" x="17" y="111" text-anchor="end">2</text><g class="gx-cell is-open lp-h1"><title>cell (0, 0): 1 path ends here</title><rect x="25.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-wall"><title>cell (0, 1): an obstacle</title><rect x="59.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (0, 2): 1 path ends here</title><rect x="93.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (0, 3): 1 path ends here</title><rect x="127.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (0, 4): 1 path ends here</title><rect x="161.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h2"><title>cell (0, 5): 3 paths end here</title><rect x="195.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h4"><title>cell (0, 6): 9 paths end here</title><rect x="229.5" y="23.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (1, 0): 1 path ends here</title><rect x="25.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-wall"><title>cell (1, 1): an obstacle</title><rect x="59.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (1, 2): 1 path ends here</title><rect x="93.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-wall"><title>cell (1, 3): an obstacle</title><rect x="127.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (1, 4): 1 path ends here</title><rect x="161.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h2"><title>cell (1, 5): 3 paths end here</title><rect x="195.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h4"><title>cell (1, 6): 9 paths end here</title><rect x="229.5" y="57.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (2, 0): 1 path ends here</title><rect x="25.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (2, 1): 1 path ends here</title><rect x="59.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (2, 2): 1 path ends here</title><rect x="93.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-wall"><title>cell (2, 3): an obstacle</title><rect x="127.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h1"><title>cell (2, 4): 1 path ends here</title><rect x="161.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h2"><title>cell (2, 5): 3 paths end here</title><rect x="195.5" y="91.5" width="31" height="31" rx="3"/></g><g class="gx-cell is-open lp-h4"><title>cell (2, 6): 9 paths end here</title><rect x="229.5" y="91.5" width="31" height="31" rx="3"/></g><polyline class="gx-path" points="41,39 41,73 41,107 75,107 109,107 109,73 109,39 143,39 177,39 211,39 245,39 245,73 245,107"><title>a path: ↓↓→→↑↑→→→→↓↓</title></polyline><text class="gx-val" x="41" y="47" text-anchor="middle">1</text><text class="gx-tag" x="28" y="34">S</text><text class="gx-val" x="109" y="44" text-anchor="middle">1</text><text class="gx-val" x="143" y="44" text-anchor="middle">1</text><text class="gx-val" x="177" y="44" text-anchor="middle">1</text><text class="gx-val" x="211" y="44" text-anchor="middle">3</text><text class="gx-val" x="245" y="44" text-anchor="middle">9</text><text class="gx-val" x="41" y="78" text-anchor="middle">1</text><text class="gx-val" x="109" y="78" text-anchor="middle">1</text><text class="gx-val" x="177" y="78" text-anchor="middle">1</text><text class="gx-val" x="211" y="78" text-anchor="middle">3</text><text class="gx-val" x="245" y="78" text-anchor="middle">9</text><text class="gx-val" x="41" y="112" text-anchor="middle">1</text><text class="gx-val" x="75" y="112" text-anchor="middle">1</text><text class="gx-val" x="109" y="112" text-anchor="middle">1</text><text class="gx-val" x="177" y="112" text-anchor="middle">1</text><text class="gx-val" x="211" y="112" text-anchor="middle">3</text><text class="gx-val" x="245" y="115" text-anchor="middle">9</text><text class="gx-tag" x="232" y="102">T</text></svg>
 
     <!-- /gen -->
 
-    <!-- gen 8 -->
+    <!-- gen 9 -->
 
     <span class="viz-legend"><span><i class="gx-key-s"></i>S ההתחלה, T היעד</span><span><i class="lp-key-lo"></i>מעט מסלולים</span><span><i class="lp-key-hi"></i>הרבה מסלולים</span><span><i class="gx-key is-wall"></i>מכשול</span><span><i class="gx-key-path"></i>מסלול אחד</span></span>
 
     <!-- /gen -->
 
-    עמודה אחרי עמודה, בווקטורים לפי השורות 0, 1 ו-2 מלמעלה למטה, ו-# הוא מכשול :
+    עמודה אחרי עמודה, בווקטורים לפי השורות 0, 1 ו-2 מלמעלה למטה, ו-# הוא מכשול. זו גם
+    הטבלה של `paths_cols`, עמודה בכל שעון : ב-`block` הביט \( r \) הוא שורה \( r \), האוגר
+    `out` מקבל את המסלולים שנגמרים בכל תא של העמודה (0 במכשול), ו-`count` הוא התא התחתון :
 
-    <!-- gen 9 -->
+    <!-- gen 10 -->
 
-    | עמודה | נכנסים בכל שורה | המסלולים שנגמרים בכל תא | למה |
-    |:-:|:-:|:-:|---|
-    | 0 | ‏<span dir="ltr">[1, 0, 0]</span> | ‏<span dir="ltr">[1, 1, 1]</span> | ההתחלה בשורה 0, וכל העמודה קטע אחד |
-    | 1 | ‏<span dir="ltr">[#, #, 1]</span> | ‏<span dir="ltr">[#, #, 1]</span> | רק שורה 2 פנויה |
-    | 2 | ‏<span dir="ltr">[0, 0, 1]</span> | ‏<span dir="ltr">[1, 1, 1]</span> | קטע אחד : כל תא מקבל 1, גם שורה 0 |
-    | 3 | ‏<span dir="ltr">[1, #, #]</span> | ‏<span dir="ltr">[1, #, #]</span> | רק שורה 0 פנויה |
-    | 4 | ‏<span dir="ltr">[1, 0, 0]</span> | ‏<span dir="ltr">[1, 1, 1]</span> | קטע אחד : <span dir="ltr">1 + 0 + 0</span> |
-    | 5 | ‏<span dir="ltr">[1, 1, 1]</span> | ‏<span dir="ltr">[3, 3, 3]</span> | קטע אחד : <span dir="ltr">1 + 1 + 1</span> |
-    | 6 | ‏<span dir="ltr">[3, 3, 3]</span> | ‏<span dir="ltr">[9, 9, 9]</span> | קטע אחד : <span dir="ltr">3 + 3 + 3</span> |
+    | עמודה | ‏`block` | נכנסים בכל שורה | המסלולים שנגמרים בכל תא | ‏`count` | למה |
+    |:-:|:-:|:-:|:-:|:-:|---|
+    | 0 | ‏`3'b000` | ‏<span dir="ltr">[1, 0, 0]</span> | ‏<span dir="ltr">[1, 1, 1]</span> | 1 | ההתחלה בשורה 0, וכל העמודה קטע אחד |
+    | 1 | ‏`3'b011` | ‏<span dir="ltr">[#, #, 1]</span> | ‏<span dir="ltr">[#, #, 1]</span> | 1 | רק שורה 2 פנויה |
+    | 2 | ‏`3'b000` | ‏<span dir="ltr">[0, 0, 1]</span> | ‏<span dir="ltr">[1, 1, 1]</span> | 1 | קטע אחד : כל תא מקבל 1, גם שורה 0 |
+    | 3 | ‏`3'b110` | ‏<span dir="ltr">[1, #, #]</span> | ‏<span dir="ltr">[1, #, #]</span> | 0 | רק שורה 0 פנויה |
+    | 4 | ‏`3'b000` | ‏<span dir="ltr">[1, 0, 0]</span> | ‏<span dir="ltr">[1, 1, 1]</span> | 1 | קטע אחד : <span dir="ltr">1 + 0 + 0</span> |
+    | 5 | ‏`3'b000` | ‏<span dir="ltr">[1, 1, 1]</span> | ‏<span dir="ltr">[3, 3, 3]</span> | 3 | קטע אחד : <span dir="ltr">1 + 1 + 1</span> |
+    | 6 | ‏`3'b000` | ‏<span dir="ltr">[3, 3, 3]</span> | ‏<span dir="ltr">[9, 9, 9]</span> | 9 | קטע אחד : <span dir="ltr">3 + 3 + 3</span> |
 
     <!-- /gen -->
 
@@ -638,8 +664,11 @@ added: 2026-11-07
     `down` של התא התחתון בקטע, כלומר הסכום של כל הקטע. אלה בדיוק \( f \) של העמודה, והם
     נכנסים ל-`out` לעמודה הבאה.
 
-    **נסו בעצמכם.** הקופסה פותחת את לוח הזיגזג, עם צעד למעלה. החליפו ל"ימינה ולמטה" וראו שאין
-    מסלול, או הזיזו מכשולים וראו איך הסכומים של כל קטע משתנים :
+    **נסו בעצמכם.** הקופסה פותחת את לוח הזיגזג, עם צעד למעלה. פתחו את \( (1, 3) \) : עמודה 3
+    הופכת לקטע אחד של שני תאים, ו-T עולה מ-9 ל-36. בלוח של העמוד, חסמו את \( (1, 5) \) :
+    עמודה 5 מתפצלת לשני קטעים של תא אחד, כל קטע מעביר רק את מה שנכנס אליו, ו-T יורד מ-9
+    ל-2. החליפו ל"ימינה ולמטה" : אין אף מסלול. "שעון אחד" ממלא את הלוח עמודה אחרי עמודה,
+    כמו `paths_cols` בטבלה למעלה :
 
     <div class="explorer" data-kind="latpaths" data-dirs="rud" data-grid="0100000.0101000.0001000"></div>
 
@@ -651,9 +680,9 @@ added: 2026-11-07
 ## נקודות חשובות ושאלות המשך
 
 ??? trap "מלכודת : הנוסחה כשיש מכשולים"
-    ‏\( \binom{m+n-2}{m-1} \) סופרת את כל הסדרים של הצעדים, גם את אלה שעוברים במכשול. בלוח
-    של סעיף ב היא נותנת 28, והתשובה היא 9. עם מכשולים צריך את הטבלה, או לחסר את המסלולים
-    שעוברים במכשולים, כמו בשאלת ההמשך הראשונה.
+    ‏\( \binom{m+n-2}{m-1} \) סופרת את כל הסדרים של הצעדים, גם את אלה שעוברים במכשול, ולכן עם
+    מכשולים היא רק חסם עליון. צריך את הטבלה, או לחסר את המסלולים שעוברים במכשולים בהכלה
+    והדחה, כמו בשאלת ההמשך הראשונה.
 
 ??? trap "מלכודת : כפל לפני חילוק ב-64 ביטים"
     הנוסחה בלולאה, \( r \leftarrow r \cdot (\text{top} - k + i) / i \), נותנת בכל צעד מספר
@@ -695,7 +724,35 @@ added: 2026-11-07
         ??? fu-answer "תשובה"
             מהסוף להתחלה, עם הטבלה : מהתא \( (r, c) \) חוזרים לתא משמאל בהסתברות
             \( f(r, c-1) / f(r, c) \), ולמעלה בשאר. ההסתברות של מסלול היא מכפלה שמצטמצמת
-            ל-\( 1 / f(m-1, n-1) \). כך עושה הכפתור "מסלול אקראי" בקופסה.
+            ל-\( 1 / f(m-1, n-1) \). עם צעד למעלה הולכים מהסוף עמודה אחרי עמודה : בעמודה
+            שבה המסלול נגמר בשורה \( r \) בוחרים את שורת הכניסה \( a \) מהקטע של \( r \),
+            בהסתברות של הכניסה בשורה \( a \) מתוך סכום הכניסות של הקטע, ועוברים בעמודה מ-\( a \)
+            ל-\( r \). כך עושה הכפתור "מסלול אקראי" בקופסה, בשני סוגי הצעדים.
+
+    - **אימות של `paths_rows` :** מה בודקים במודול, ואילו מקרי קצה הבדיקה האקראית חייבת לפגוש?
+
+        ??? fu-answer "תשובה"
+            מודל ייחוס, הטבלה של Python, ב-scoreboard שמשווה את `count` אחרי כל שורה, על
+            לוחות אקראיים ועל הלוחות של העמוד. ליד המודול, טענות שתמיד נכונות ונקודות כיסוי
+            למקרי הקצה :
+
+            ```systemverilog title="module paths_rows_check" linenums="1"
+            // Bound next to paths_rows: what always holds, and the corners a random test must reach.
+            module paths_rows_check #(parameter int N = 7, W = 64) (
+              input logic         clk, rst_n, valid, first,
+              input logic [N-1:0] block,
+              input logic [W-1:0] count);
+              // no row this clock: the count holds
+              a_hold: assert property (@(posedge clk) disable iff (!rst_n) !valid |=> $stable(count));
+              // a fully blocked row ends every path
+              a_wall: assert property (@(posedge clk) disable iff (!rst_n) valid && &block |=> count == '0);
+              c_s_blocked: cover property (@(posedge clk) valid && first && block[0]);
+              c_t_blocked: cover property (@(posedge clk) valid && block[N-1]);
+              c_wall:      cover property (@(posedge clk) valid && &block);
+            endmodule
+            ```
+
+            ועם \( P > 0 \) גם נקודת כיסוי בתוך `add`, לסכום שעובר את \( P \) ומחסרים ממנו.
 
     - **גם שמאלה :** כמה מסלולים יש עם ארבעה כיוונים, בלי לחזור לתא?
 

@@ -212,3 +212,57 @@ def test_explorer_random_path_is_uniform():
         assert all(abs(v - expect) < 5 * expect ** 0.5 + 3 for v in hist.values()), (g, up, hist)
     none = node_json(f"const m = {explorer_require()};console.log(JSON.stringify(m.lpSample({json.dumps(q0022.ZIGZAG)}, false, Math.random)));")
     assert none is None
+
+
+def test_per_clock_tables():
+    """The per-clock tables of paths_rows (board B) and paths_cols (the zigzag): the register
+    models of the generator against the DP over the cells on random boards, the numbers of
+    the page's tables, and the bit order of block (bit i is cell i)."""
+    rng = random.Random(23)
+    for _ in range(400):
+        m, n = rng.randint(1, 7), rng.randint(1, 7)
+        g = rand_grid(rng, m, n, rng.choice((0.1, 0.3, 0.5)))
+        g[0][0] = rng.random() < 0.1               # now and then S blocked too
+        rd, rud = q0022.counts(g), q0022.counts(g, True)
+        assert [reg for _, reg in q0022.rows_clocks(g)] == rd
+        assert [reg for _, reg in q0022.cols_clocks(g)] == [[rud[r][c] for r in range(m)] for c in range(n)]
+    assert q0022.rows_clocks(B) == [("7'b0100000", [1, 1, 1, 1, 1, 0, 0]), ("7'b0000010", [1, 0, 1, 2, 3, 3, 3]),
+                                    ("7'b0001000", [1, 1, 2, 0, 3, 6, 9])]
+    assert [blk for blk, _ in q0022.cols_clocks(Z)] == ["3'b000", "3'b011", "3'b000", "3'b110", "3'b000", "3'b000", "3'b000"]
+    assert [reg[-1] for _, reg in q0022.cols_clocks(Z)] == [1, 1, 1, 0, 1, 3, 9]
+
+
+def test_explorer_one_clock():
+    """The box's "one clock": block, the register and count after every clock, both kinds,
+    against the generator's register models."""
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(24)
+    grids = [q0022.BOARD_B, q0022.ZIGZAG]
+    for _ in range(40):
+        m, n = rng.randint(2, 10), rng.randint(2, 10)
+        grids.append(["".join(map(str, row)) for row in rand_grid(rng, m, n, 0.3)])
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({json.dumps(grids)}.map((g) => [false, true].map((up) =>"
+                    " Array.from({ length: up ? g[0].length : g.length }, (_, i) => { const h = m.lpClock(g, up, i + 1);"
+                    " return [h.block, h.reg.map(String), String(h.count)]; })))));")
+    for g, (rd, rud) in zip(grids, got):
+        p = q0022.parse(g)
+        for mine, ref in ((rd, q0022.rows_clocks(p)), (rud, q0022.cols_clocks(p))):
+            assert [(b, [int(x) for x in reg], int(cnt)) for b, reg, cnt in mine] == [(b, reg, reg[-1]) for b, reg in ref]
+
+
+def test_box_tasks():
+    """The numbers of the "try it" paragraphs next to the two boxes."""
+    def flip(rows, r, c):
+        out = [list(x) for x in rows]
+        out[r][c] = "1" if out[r][c] == "0" else "0"
+        return q0022.parse(["".join(x) for x in out])
+    assert [q0022.count(flip(q0022.BOARD_B, r, c)) for r, c in ((1, 1), (0, 5), (2, 3))] == [15, 12, 13]
+    b2 = flip(q0022.BOARD_B, 0, 2)
+    assert q0022.count(b2) == 0 and q0022.count(b2, True) == 8 == q0022.count_walks(b2, q0022.RUD)
+    assert q0022.count(E(10, 10)) == comb(18, 9) == 48620 and q0022.count(E(10, 10), True) == 10**9
+    z1, z2 = flip(q0022.ZIGZAG, 1, 3), flip(q0022.ZIGZAG, 1, 5)
+    assert q0022.count(z1, True) == 36 and q0022.count(z2, True) == 2 and q0022.count(Z) == 0
+    # one row: no up or down move, one path even without the never-twice rule
+    assert q0022.count(E(1, 6), True) == 1
