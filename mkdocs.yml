@@ -189,7 +189,6 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0069-overtakes.css   # 0069: the block diagram of the RTL monitor, the three overtakes boxes on one screen (session 34)
   - stylesheets/questions/0017-duplicate.css   # 0017: the dupbin and floyd boxes on one screen, the figure beside the step's text (session 34)
   - stylesheets/questions/0031-bridge.css      # 0031: the bridge box on one screen, the two tables side by side and the plan line (session 34)
-  - stylesheets/questions/0036-lfsr.css        # 0036: the lfsr box on one screen (the cycles as rings, the table scrolling), the static register (session 34)
 
 extra_javascript:
   - javascripts/mathjax.js
