@@ -1128,6 +1128,27 @@ below start at item 112 (session 31).
     0046's third box, 1118 px, and 0039's box, 1086 px, are over 1000). Findings under "Open
     items", "Review round 6 (session 34)". Nothing was changed yet.
 
+191. **The sixth ten questions fixed (session 34, 2026-11-10).** The owner's choices: hardware
+    and DV for all six proposals (0020, 0022, 0033, 0039, 0060, 0082), every proposed box
+    control, no ring mode for 0057, the closed form of 0020's minimum. The lead: lint_pages.py
+    also fails on a colon glued to math or inline code in a Hebrew paragraph and on Hebrew
+    inside math (0021, 0027, 0028 fixed; 0015 and 0033 by their agents); contrast pairs for
+    0060's and 0082's block diagrams and for latpaths' step ring (the shared orange is-new
+    ring was under 3:1 on the blue tints, now ink in 0022-latpaths.css). Six agents; every R1
+    claim re-verified (two reviewer numbers were off: 0033's skip example is 36 = 36, the
+    real one is 64 @ 100/70 skip 1 in 3, 35 against 34; any FIFO depth works with a Gray
+    range from the middle, not only even). Highlights: 0033 exact arithmetic (Fraction /
+    integers; the box also simulated on 0.05 ns steps, off by up to 9 words on 31% of its
+    grid, now exact periods), the +-1 bound proved, a phase slider, fifo_depth_check; 0082
+    every winning move, nim_move_hw with a block diagram and a checker over 512 positions;
+    0060 a block diagram, a 3-of-5 enumerator table, next_same_1c and next_same_sva; 0020
+    the closed form tested against both DPs, a header table in the box, cpl_checker with
+    injected bugs; 0022 per-clock tables, a one-clock step button, paths_rows_check; 0039
+    f(5, 7) = 119, a per-clock table and egg_checker, the box 1086 -> 996 px; 0046 the trap's
+    2, the boxes 1118 -> 903 px; 0057 ghost times, ties, continuous positions; 0076 the
+    1.5-2 ratio, labels to 999999999, a strip that scrolls on a phone (it widened the page
+    from about 99999); 0015 p = 1/2, a log q axis.
+
 ---
 
 ## In progress
@@ -1727,94 +1748,108 @@ follow-up), 0038 (already SVA), 0071.
 
 ### Review round 6 (session 34): ten more questions
 
-Findings of work log item 190. Every claim below was checked by a reviewer's script
+All done (work log item 191), with the owner's choices: hardware / DV for all six proposals,
+every box control, no ring mode for 0057 (open below), 0020's closed form. Findings were
+those of work log item 190. Every claim below was checked by a reviewer's script
 (CONFIRMED) unless marked SUSPECTED; verify again before changing a page. Common to all ten:
 the paragraph next to the box describes the layout instead of giving "נסו" tasks (the
 reports have tasks with checked inputs and results).
 
 **R1. Correctness:**
-- [ ] 0033: `fifo_depth` (page Python and SV, q0033.py) takes `ceil` of a float:
+- [x] 0033: `fifo_depth` (page Python and SV, q0033.py) takes `ceil` of a float:
   `fifo_depth(40, 100, 70)` is 13, exact 12 (14,895 slider combinations off by one; fifo.js
   has an epsilon and disagrees). The table row 100 / 100 / 99 MHz shows formula 2, exact 1.
   Use integers or Fraction and test against Fraction.
-- [ ] 0033: "up to 2 either way" for the skipping reader (step 4, proof) is at most 1
+- [x] 0033: "up to 2 either way" for the skipping reader (step 4, proof) is at most 1
   (proved; 20,000 cases); the simulation can be below the formula (B=120, 100/80, skip 1 in
   8: 37 vs 36). Tighten the test's +-2.
-- [ ] 0033: "fr >= fw needs depth 1": equal clocks give 2 in the page's simulation.
-- [ ] 0033: trap "the depth must be a power of 2" contradicts 0034's 12-entry Gray FIFO.
-- [ ] 0033: the two-burst follow-up says peaks 24, 32, 40; the simulation gives 25, 33, 41
+- [x] 0033: "fr >= fw needs depth 1": equal clocks give 2 in the page's simulation.
+- [x] 0033: trap "the depth must be a power of 2" contradicts 0034's 12-entry Gray FIFO.
+- [x] 0033: the two-burst follow-up says peaks 24, 32, 40; the simulation gives 25, 33, 41
   (the second burst overflows the recommended 32), and "how many bursts" has no number.
-- [ ] 0033: Hebrew inside MathJax in part b's cost (`\text{הריקון}`), missed by the linter.
-- [ ] 0039: part a's cost block says f(5, 7) = 120; it is 119 (f(4, 7) = 98 holds).
-- [ ] 0039: "binary search needs ceil(log2(n+1)) = 7 eggs" (trap, cost): rounding the middle
+- [x] 0033: Hebrew inside MathJax in part b's cost (`\text{הריקון}`), missed by the linter.
+- [x] 0039: part a's cost block says f(5, 7) = 120; it is 119 (f(4, 7) = 98 holds).
+- [x] 0039: "binary search needs ceil(log2(n+1)) = 7 eggs" (trap, cost): rounding the middle
   up breaks at most 6. `egg_run` rebuilds the table per call: O(k n^2), not "O(n t), instant".
-- [ ] 0046: trap "the imaginary column": `1 1 1` returns 2 without it (the `>=`), not 0; a
+- [x] 0046: trap "the imaginary column": `1 1 1` returns 2 without it (the `>=`), not 0; a
   single `1` or `01.11` gives 0. Steps and proof say "lower" where the code pops "not
   higher"; the proof lacks why the found bounds are the maximal rectangle's.
-- [ ] 0057: part a step 2 prints max(25, 60, 75, 90, 60, 10) (the fall times of part c), not
+- [x] 0057: part a step 2 prints max(25, 60, 75, 90, 60, 10) (the fall times of part c), not
   the ghost times (90, 25, 60, 60, 75, 10). Follow-up 2's 100n/(n+1) needs continuous
   positions (whole cm gives 99.66 at n = 100). The box names one ant on a tie
   (10R.20R.30R.70L.80L.90L: ants 3 and 4 at 90 s).
-- [ ] 0060: the box's "previous" note "shorter, with more zeros" is backwards (9 -> 6 = 110);
+- [x] 0060: the box's "previous" note "shorter, with more zeros" is backwards (9 -> 6 = 110);
   the "(x ^ r) >> 2" note says m-1 ones but 92 shows 1111 (they drop after / c); "in four
   steps" where there are five; follow-up 1's stop rule never ends for n = w or k = 0.
-- [ ] 0076: part b hint 3 says "the previous interval"; it is the first half of the same one
+- [x] 0076: part b hint 3 says "the previous interval"; it is the first half of the same one
   (21 = f(12), both in [9, 27]). "The graph hugs sqrt(3) n" (idea, trap 1): f(n)/n swings
   between 1.5 and 2. Trap 1 should say "with c^2 = 3".
-- [ ] 0082: part c idea "moving to a larger g does not help" is wrong: in (5, 6, 7) under
+- [x] 0082: part c idea "moving to a larger g does not help" is wrong: in (5, 6, 7) under
   {1, 3, 4} the moves 6 -> 5 (g 2 -> 3) and 7 -> 3 win too. The gen-7 table lists one
   winning move of three. Follow-up 1's "5 → 2, 6 → 1 ו-7 → 0" renders reversed (no LTR
   span). The SV `subtraction_move` rebuilds the table inside its loops (not O(n |S|)).
-- [ ] 0015: the follow-up's (2-q)/(4-q) needs p = 1/2 (p = 1/3, q = 1/7 gives 13/41). Part b
+- [x] 0015: the follow-up's (2-q)/(4-q) needs p = 1/2 (p = 1/3, q = 1/7 gives 13/41). Part b
   hint 2 gives away the double count; "14+14" explained twice; colons glued to math on
   lines 69 and 135 ("\( 1/4 \):"), missed by the linter.
-- [ ] 0020: trap "the minimum at an unaligned address is three" (0x1010 with 128 B needs 1,
+- [x] 0020: trap "the minimum at an unaligned address is three" (0x1010 with 128 B needs 1,
   with 512 B 5 at MPS 128); the random-split follow-up's "favours few completions" holds
   only on aggregate ([176,64,16] 1/10 vs [48,208] 1/20); "how MPS prunes" lists 176/240
   where MPS = 128 allows only 48 or 112. A closed form for the minimum (0 mismatches in
   20,000): 1 + ceil((end - g) / MPS), g = floor((addr + MPS) / RCB) * RCB.
-- [ ] 0022: "infinitely many paths without the rule" needs at least 2 rows. All numbers
+- [x] 0022: "infinitely many paths without the rule" needs at least 2 rows. All numbers
   hold (also the per-cell counts with up moves, against brute force).
 
 **R2. Boxes:**
-- [ ] Every box: a "נסו" paragraph (all ten pages).
-- [ ] 0039 box 1086 px and 0046 triangle box 1118 px: under 1000.
-- [ ] 0015 `probability`: the q axis is linear (1/7, 1/12, 1/365 in the left 15%; 1/365 left of
+- [x] Every box: a "נסו" paragraph (all ten pages).
+- [x] 0039 box 1086 px and 0046 triangle box 1118 px: under 1000.
+- [x] 0015 `probability`: the q axis is linear (1/7, 1/12, 1/365 in the left 15%; 1/365 left of
   the curve's start); the cross is invisible at 1/365; tooltip colon at probability.js:42.
   `tuesday` step 4 duplicates the static figure above it.
-- [ ] 0020: length slider stops at 2048 (the 4 KB follow-up needs 4096).
-- [ ] 0033: no read-clock phase control (the page says the phase adds a word: 24 for
+- [x] 0020: length slider stops at 2048 (the 4 KB follow-up needs 4096).
+- [x] 0033: no read-clock phase control (the page says the phase adds a word: 24 for
   phi < 2.5 ns, else 25); the summary blames the phase also when the difference is rounding.
-- [ ] 0057: a click on the pole at time > 0 rewinds and drops the edit; 6 colours for up to 12
+- [x] 0057: a click on the pole at time > 0 rewinds and drops the edit; 6 colours for up to 12
   ants; part d (the ring) has no box.
-- [ ] 0076 `ffn`: tick labels clipped from n >= 3^13 (999999999 shows "87420489").
-- [ ] 0022: optional step button (one clock of `paths_rows` / `paths_cols`); the random-path
+- [x] 0076 `ffn`: tick labels clipped from n >= 3^13 (999999999 shows "87420489").
+- [x] 0022: optional step button (one clock of `paths_rows` / `paths_cols`); the random-path
   follow-up describes only the right/down rule.
 
 **R3. Hardware / DV (proposals):**
-- [ ] 0020: a per-completion header table (Length, Byte Count, Lower Address), an SVA /
+- [x] 0020: a per-completion header table (Length, Byte Count, Lower Address), an SVA /
   covergroup in the scoreboard follow-up.
-- [ ] 0022: per-clock tables for `paths_rows` (board B) and `paths_cols`; the `block` bit
+- [x] 0022: per-clock tables for `paths_rows` (board B) and `paths_cols`; the `block` bit
   order (row "0000010" is 7'b0100000).
-- [ ] 0033: overflow SVA, a high-water cover point, a tb that randomizes the phase.
-- [ ] 0039: a per-cycle table and an SVA for the proof's invariant in the follow-up.
-- [ ] 0060: a block diagram of the one-cycle datapath, a k-of-n enumerator per-clock table,
+- [x] 0033: overflow SVA, a high-water cover point, a tb that randomizes the phase.
+- [x] 0039: a per-cycle table and an SVA for the proof's invariant in the follow-up.
+- [x] 0060: a block diagram of the one-cycle datapath, a k-of-n enumerator per-clock table,
   assertions and coverage.
-- [ ] 0082: a `nim_move` block diagram (XOR tree, leading one, candidate AND, priority
+- [x] 0082: a `nim_move` block diagram (XOR tree, leading one, candidate AND, priority
   encoder, mux) with an SVA and coverage.
 - 0015, 0046 (optional line buffer), 0057, 0076: none needed.
 
 **R4. Explanations:**
-- [ ] Hints that give the answer: 0015 b2, 0033 a2, 0039 a3 (floor 37) and b2, 0057 b2 and c2,
+- [x] Hints that give the answer: 0015 b2, 0033 a2, 0039 a3 (floor 37) and b2, 0057 b2 and c2,
   0060 a2 and a3, 0082 c2 (mex). 0033 part a's chart legend gives part b's answer.
-- [ ] Repetition: 0022 "28 against 9" three times, 0076 "9 steps, a rise of 9" six times,
+- [x] Repetition: 0022 "28 against 9" three times, 0076 "9 steps, a rise of 9" six times,
   0015 "14+14" twice, 0033 the synchronizer latency twice.
-- [ ] Asserted steps: 0057 part b's inequalities (a + b < 200), 0060 the minimal q, 0020 the
+- [x] Asserted steps: 0057 part b's inequalities (a + b < 200), 0060 the minimal q, 0020 the
   "rules => every cut on a boundary" direction and the MPS >= RCB assumption in the cost,
   0033 the proof's other direction (and the rule: an integer B(1 - fr/fw) gives +1).
-- [ ] Small: 0046 7x7 vs 8x8 test sizes, singular vs plural address; 0057 ants numbered from
+- [x] Small: 0046 7x7 vs 8x8 test sizes, singular vs plural address; 0057 ants numbered from
   1 then from 0 in part d; 0076 aria-label "nine numbers" of ten; 0082 two properties vs
   three; 0022 "בעמודה האחרונה" before the table reads as the board's column.
+
+**Left after round 6 (open):**
+- [ ] Videos to re-caption before any re-render: 0015 (its part b segment steps the tuesday
+  box in day mode; the box now opens on "at least one boy"; the probability square's labels,
+  the widened thin band and the log q axis are new), 0039 (the narration's "O(nt)" for the
+  check, now O(k n^2) for the page code; the building and chart are shorter), 0057 (script
+  line 160 "k = n/2", the page now says floor(n/2); the box's hint text is longer).
+- [ ] 0057 part d (the ring) has no box (the owner: not now).
+- [ ] 0020: a 4 KB request at MPS 128 with the splits map opened measures 1012 px (a state,
+  not the default); 0046's box with a 16 x 16 grid is 1234 px, as large grids always were.
+- [ ] Not done: 0046's histogram bars in rectangle mode (optional, would add height); 0076's
+  marker for where f(n) lands (optional); 0020's "draw" button.
 
 ## Question variety
 
@@ -1928,6 +1963,13 @@ solution; do not copy text). Quality varies, so check the answers.
     master after 5.052 (the pinned commit in CI). z3 prints `%Warning-UNSATCONSTR` for an
     unsatisfiable `randomize() with`, which the 0007 and 0011 testbenches trigger on purpose.
   - Icarus does not support `ref` ports or `break`.
+  - Verilator 5.053 and assertions (round 6, 0020, 0022, 0033, 0039, 0060, 0082): the
+    action block of `cover property` never runs unless the bench is built with
+    `--coverage-user` (0082 does; the others count with a covergroup and
+    `get_inst_coverage()` instead). Two instances of one parameterization of a module that
+    holds a covergroup fail at C++ compile (`no member named '__PVT____Vint'`); give them
+    different parameters (0060 uses widths 12, 10 and 32). A `break` in an inner `for`
+    inside an `initial` block left the outer loop too (0060).
   - In a module `initial` block, `string y = f(x);` inside a loop is a **static**
     initialiser that runs once — declare first, assign inside the loop. Verilator 5.020
     re-ran such initialisers on every iteration (not LRM-correct), which hid two testbench

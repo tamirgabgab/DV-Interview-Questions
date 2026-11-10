@@ -483,6 +483,18 @@ PAIRS = [
     ("0055 divhw, the frame of the next-state logic", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0055 divhw, the frame of the output logic", "var(--viz-s3)", [CARD, PAGE], UI),
     ("0055 divhw, a flip-flop and the frame of one that flips", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], UI),
+    # 0060 popnext (stylesheets/questions/0060-popnext.css): the block diagram of the one-cycle next_same
+    ("0060 popnext, a block's text", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color))"], TEXT),
+    ("0060 popnext, a block's second line", "var(--viz-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color))"], TEXT),
+    ("0060 popnext, a wire's name", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
+    *[(f"0060 popnext, the frame of stage {s}", f"var(--viz-{s})", [CARD, PAGE], UI) for s in ("s1", "s2", "s3")],
+    # 0082 nim (stylesheets/questions/0082-nim.css): the block diagram of nim_move_hw, the box's disallowed token (drawn as
+    # a disabled button's border, like its token: an inactive control, not checked)
+    ("0082 nim, a block's text", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color))"], TEXT),
+    ("0082 nim, a block's second line", "var(--viz-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color))"], TEXT),
+    ("0082 nim, a wire's name", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
+    # 0022 latpaths: the register of this clock (the shared gp-cell is-new ring) on the count tints
+    *[(f"0022 latpaths, the ring of this clock's register on tint lp-h{i}", "var(--viz-ink)", [f"color-mix(in srgb, var(--viz-s1) {p}%, var(--md-default-bg-color))"], UI) for i, p in ((1, 8), (2, 18), (3, 30), (4, 44))],
     # 0070 gridpath (stylesheets/questions/0070-gridpath.css): box b's walls, box c's popped cells
     ("0070 gridpath, a number on a wall a state entered (box b)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 29%, var(--md-default-bg-color))"], TEXT),
     ("0070 gridpath, a number on a wall the path breaks (box b)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 40%, var(--md-default-bg-color))"], TEXT),
