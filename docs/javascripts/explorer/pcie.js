@@ -1,5 +1,5 @@
 // kinds: pcie ladder
-//   pcie                   0020, 0021  address, length, MPS and RCB: the blocks, the count and the map of splits; a toggle to cut the boundaries by hand; trap buttons on 0021 (data-traps)
+//   pcie                   0020, 0021  address, length (up to 4 KB), MPS and RCB: the blocks, the count and the map of splits; a toggle to cut the boundaries by hand, with the header fields of each completion; trap buttons on 0021 (data-traps)
 //   ladder                 0021        part b's recurrence: C(0..N) as a row, a click on C(n) lights the m terms it sums, and a block strip per term with the first completion taking i blocks; a trap button for n = m + 1
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
@@ -32,6 +32,17 @@
     const pts = [addr, ...pcieBoundaries(addr, len, rcb).filter((b) => cuts.includes(b)), addr + len];
     const sizes = pts.slice(1).map((b, i) => b - pts[i]);
     return { sizes, ok: sizes.every((v) => v <= mps) };
+  };
+  // The header fields of each completion of a split (0020's follow-up): its address, Length
+  // in DW, Byte Count (the bytes still to come, its own included) and Lower Address (the
+  // low 7 bits of its address).
+  const pcieHeaders = (addr, len, sizes) => {
+    let at = addr, left = len;
+    return sizes.map((size) => {
+      const h = { addr: at, size, dw: size / 4, bc: left, la: at % 128 };
+      at += size; left -= size;
+      return h;
+    });
   };
   const pcieSplits = (addr, len, mps, rcb, limit = Infinity) => {
     const end = addr + len, out = [];
@@ -97,18 +108,26 @@
         `<div class="ex-controls">` +
         `<label>דוגמאות מהדפים <select class="ex-preset"><option value="">בחרו...</option>${PRESETS.map((p, i) => `<option value="${i}">${p[4]}</option>`).join("")}</select></label>` +
         `<label>הכתובת ${ltr("A")} <input type="text" class="ex-addr" value="${st.addr}" size="8" dir="ltr" inputmode="text" aria-label="כתובת הבקשה, בהקסדצימלי" spellcheck="false"></label>` +
-        `<label><span>האורך ${ltr("L")} (בתים)</span><input type="range" class="ex-len" min="4" max="2048" step="4" value="${st.len}" dir="ltr"><output class="out-len" dir="ltr"></output></label>` +
+        `<label><span>האורך ${ltr("L")} (בתים)</span><input type="range" class="ex-len" min="4" max="4096" step="4" value="${st.len}" dir="ltr"><output class="out-len" dir="ltr"></output></label>` +
         `<label>MPS <select class="ex-mps">${[128, 256, 512, 1024, 2048, 4096].map((v) => `<option value="${v}"${v === st.mps ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<label>RCB <select class="ex-rcb">${[64, 128].map((v) => `<option value="${v}"${v === st.rcb ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button>` +
         `<label><input type="checkbox" class="ex-choose" checked> לבחור חיתוכים בעצמי</label>` +
         (TRAPS.length ? `<span class="wv-presets">מקרי מלכודת${NB}: ${TRAPS.map((p, i) => `<button type="button" class="md-button pcie-trap" data-i="${i}">${p[4]}</button>`).join(" ")}</span>` : "") +
         `</div>` +
-        `<p class="ex-summary" aria-live="polite"></p><div class="pcie-blocks"></div><p class="pcie-choose"></p><div class="pcie-counts"></div>` +
+        `<p class="ex-summary" aria-live="polite"></p><div class="pcie-blocks"></div><p class="pcie-choose"></p><div class="pcie-hdr"></div><div class="pcie-counts"></div>` +
         `<div class="ex-fold" data-fold="closed"><p class="ex-fold-title">מפת הפיצולים</p><div class="pcie-map"></div></div>`;
       const $ = (sel) => box.querySelector(sel);
       const hex = (v) => "0x" + v.toString(16).toUpperCase();
       const big = (v) => v.toLocaleString("en-US");
+      // a long split written with its runs: 112+128+128+128+16 stays, a 4 KB one becomes
+      // "64 + 62 × 64 + 64" (up to 8 sizes are written out)
+      const sizesText = (sz) => {
+        if (sz.length <= 8) return sz.join("+");
+        const runs = [];
+        sz.forEach((v) => { const r = runs[runs.length - 1]; if (r && r[0] === v) r[1]++; else runs.push([v, 1]); });
+        return runs.map(([v, n]) => (n >= 3 ? `${n} × ${v}` : Array(n).fill(v).join(" + "))).join(" + ");
+      };
       const parseAddr = () => {
         const t = $(".ex-addr").value.trim().toLowerCase().replace(/^0x/, "");
         const v = /^[0-9a-f]{1,8}$/.test(t) ? parseInt(t, 16) : NaN;
@@ -214,6 +233,7 @@
         const addr = parseAddr();
         $(".out-len").textContent = String(st.len);
         if (addr === null) { $(".ex-summary").innerHTML = "הכתובת צריכה להיות מספר הקסדצימלי, למשל ‏<bdi dir=\"ltr\">0x1010</bdi>."; return; }
+        if (addr % 4) { $(".ex-summary").innerHTML = `הכתובת של בקשת קריאה ב-PCIe מיושרת ל-DW, כלומר כפולה של 4 (למשל ${ltr("0x1010")}).`; return; }
         const { len, mps, rcb } = st;
         if (mps < rcb) { $(".ex-summary").textContent = "בשאלה MPS ≥ RCB."; return; }
         const sizes = pcieBlocks(addr, len, rcb), N = sizes.length, m = mps / rcb;
@@ -230,7 +250,7 @@
           `בקשה של ${ltr(`${len} B`)} מכתובת ${ltr(hex(addr))} על רשת ${ltr(`RCB = ${rcb}`)} : ${grid}. ` +
           `מספר הפיצולים החוקיים עם ${ltr(`MPS = ${mps}`)} : <b>${ltr(big(total))}</b>` +
           (total === formula ? ` (הנוסחה הסגורה נותנת אותו מספר).` : ` (הנוסחה הסגורה נותנת ${ltr(big(formula))}!).`) +
-          (first ? ` הפיצול החמדני, עם הכי פחות Completions : ${ltr(first.join("+"))}.` : " אין פיצול חוקי.") +
+          (first ? ` הפיצול החמדני, עם הכי פחות Completions : ${ltr(sizesText(first))}.` : " אין פיצול חוקי.") +
           (crosses ? ` <b>הבקשה חוצה גבול 4 KB</b>, וזה אסור ב-PCIe; המספר מחושב כאילו מותר.` : "");
         // the hand-made split: the greedy split's cuts until a boundary is clicked, then the
         // clicked cuts for as long as they are all boundaries of the request
@@ -242,12 +262,16 @@
         $(".pcie-blocks").innerHTML = `<p class="ex-title">הבלוקים : הבקשה על רשת ה-RCB, הגבולות הפנימיים בירוק${choose ? "; לחיצה על גבול חותכת שם, והשורה שמתחת היא ה-Completions" : ""}</p>${blocksSvg(addr, len, mps, rcb, choose ? cuts : null)}`;
         if (choose) {
           const sp = pcieSplitOf(addr, len, mps, rcb, cuts), all = 1n << BigInt(B.length), over = sp.sizes.filter((v) => v > mps);
-          $(".pcie-choose").innerHTML = `החיתוכים שבחרתם : ${ltr(sp.sizes.join("+"))}, ${ltr(sp.sizes.length)} Completions. ` +
+          $(".pcie-choose").innerHTML = `החיתוכים שבחרתם : ${ltr(sizesText(sp.sizes))}, ${ltr(sp.sizes.length)} Completions. ` +
             (sp.ok ? `<span class="eu-ok">✓ כולם עד ${ltr(`MPS = ${mps}`)}.</span> ` : `<span class="eu-bad">✗ ${ltr(over.join(", "))} גדול מ-${ltr(`MPS = ${mps}`)}.</span> `) +
             `פיצול הוא בדיוק בחירה של תת-קבוצה של ${ltr(`${own ? "c" : "|B|"} = ${B.length}`)} הגבולות : יש ${ltr(`2^${B.length} = ${big(all)}`)} תת-קבוצות, ומהן ${ltr(big(total))} לא משאירות קטע ארוך מ-MPS. זה מספר הפיצולים.`;
-        } else $(".pcie-choose").innerHTML = "";
+          // the header of each completion of the hand-made split, as the Completer sends it
+          const rows = pcieHeaders(addr, len, sp.sizes).map((h) => `<tr${h.size > mps ? ' class="is-bad"' : ""}><td>${hex(h.addr)}</td><td>${h.dw}</td><td>${h.bc}</td><td>${hex(h.la)}</td></tr>`).join("");
+          $(".pcie-hdr").innerHTML = `<p class="ex-title">ה-header של כל Completion</p>` +
+            `<div class="pcie-hdrscroll" tabindex="0" role="region" aria-label="שדות ה-header של ה-Completions"><table class="pcie-table pcie-hdrtable" dir="ltr"><thead><tr><th>Address</th><th>Length (DW)</th><th>Byte Count</th><th>Lower Address</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        } else { $(".pcie-choose").innerHTML = ""; $(".pcie-hdr").innerHTML = ""; }
         const counts = byK.map((w, k) => (k && w ? `<tr><td>${k}</td><td>${big(w)}</td></tr>` : "")).join("");
-        $(".pcie-counts").innerHTML = total > 1n ? `<p class="ex-title">כמה פיצולים יש לכל מספר Completions</p><table class="pcie-table" dir="ltr"><thead><tr><th>Completions</th><th>פיצולים</th></tr></thead><tbody>${counts}</tbody></table>` : "";
+        $(".pcie-counts").innerHTML = total > 1n ? `<p class="ex-title">כמה פיצולים יש לכל מספר Completions</p><div class="pcie-countscroll" tabindex="0" role="region" aria-label="כמה פיצולים יש לכל מספר Completions"><table class="pcie-table" dir="ltr"><thead><tr><th>Completions</th><th>פיצולים</th></tr></thead><tbody>${counts}</tbody></table></div>` : "";
         if (total === 0n) { $(".pcie-map").innerHTML = ""; }
         else {
           const rows = pcieSplits(addr, len, mps, rcb, MAX_ROWS);
@@ -387,10 +411,10 @@
   dvqExplorers.register({
     views: { pcie: pcieView, ladder: ladderView },
     help: {
-      pcie: "כתובת, אורך, MPS ו-RCB : התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד, וכפתורי מקרי המלכודת טוענים בקשות שבהן קל לטעות. עם ״לבחור חיתוכים בעצמי״ לוחצים על הגבולות כדי לחתוך או לא, ורואים את ה-Completions שנוצרים.",
+      pcie: "כתובת, אורך, MPS ו-RCB : התיבה חותכת את הבקשה לבלוקים, סופרת את הפיצולים בתכנות דינמי ובנוסחה סגורה, ומציירת את מפת הפיצולים כשהם מעטים. ה-presets טוענים את דוגמאות העמוד, וכפתורי מקרי המלכודת טוענים בקשות שבהן קל לטעות. עם ״לבחור חיתוכים בעצמי״ לוחצים על הגבולות כדי לחתוך או לא, ורואים את ה-Completions שנוצרים ואת שדות ה-header שלהם.",
       ladder: "לחיצה על C(n) בשורה, או ״n הבא״, מדליקה את האיברים שהוא סוכם : לכל i, ה-Completion הראשון מכסה i בלוקים, ומה שנשאר הוא C(n − i). N ו-m משנים את השורה. ״לנחש את C(n)״ מסתיר את הערך עד שמקלידים אותו ובודקים. מקרה המלכודת בוחר את n = m + 1, הראשון שבו 2^(n − 1) נכשל.",
     },
-    models: { pcieBoundaries, pcieBlocks, pcieSplitOf, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula, ladderC, ladderTerms },
-    cols: { pcie: { main: ".pcie-blocks, .ex-fold", side: ".pcie-choose, .pcie-counts", w: "minmax(0, 2.6fr)" } },   // the blocks and the map of splits (scrolling, 27-box-columns.css) beside the chosen cuts and the counts table
+    models: { pcieBoundaries, pcieBlocks, pcieSplitOf, pcieHeaders, pcieSplits, pcieByCompletions, pcieCount, pcieS, pcieFormula, ladderC, ladderTerms },
+    cols: { pcie: { main: ".pcie-blocks, .ex-fold", side: ".pcie-choose, .pcie-hdr, .pcie-counts", w: "minmax(0, 2.6fr)" } },   // the blocks and the map of splits (scrolling, 27-box-columns.css) beside the chosen cuts, their headers (scrolling, 0020-pcie.css) and the counts table
   });
 })();

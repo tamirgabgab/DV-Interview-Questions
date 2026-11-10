@@ -1,0 +1,16 @@
+/* Questions 0020 and 0021, PCIe completion splits: the header fields of the hand-made split
+   in the pcie box of explorer/pcie.js. The table scrolls inside its own region, so a long
+   split (a 4 KB request cut at every boundary) does not make the box taller than a screen;
+   its cells are narrow enough for the box's side column. A completion above MPS is marked
+   as the box's other "bad" marks are. Palette colours only. */
+
+.md-typeset .explorer .pcie-hdrscroll { max-height: 7.2rem; overflow: auto; margin-bottom: 0.4rem; }
+.md-typeset .explorer .pcie-hdrscroll .pcie-table { margin: 0; }
+.md-typeset .explorer .pcie-hdrtable td, .md-typeset .explorer .pcie-hdrtable th { padding: 0.1em 0.25em; }
+.md-typeset .explorer .pcie-hdrtable th { line-height: 1.25; }
+.md-typeset .explorer .pcie-hdrtable tr.is-bad td { color: var(--diff-hard); font-weight: 700; }
+
+/* the counts per number of completions: 33 rows for a 4 KB request at MPS 128, so they scroll */
+.md-typeset .explorer .pcie-countscroll { max-height: 8.5rem; overflow: auto; }
+.md-typeset .explorer .pcie-countscroll .pcie-table { margin: 0 0 0.4rem; }
+.md-typeset .explorer .pcie-countscroll .pcie-table :is(td, th) { padding: 0.1em 0.4em; }

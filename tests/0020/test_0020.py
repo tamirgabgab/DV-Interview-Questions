@@ -223,3 +223,75 @@ def test_explorer_notation():
     assert 'data-kind="pcie" data-notation' not in page21
     js = (ROOT / "docs" / "javascripts" / "explorer" / "pcie.js").read_text(encoding="utf-8")
     assert 'box.dataset.notation === "c"' in js and "2^c = " in js
+
+
+def min_completions(addr, length, mps, rcb):
+    """The min/max follow-up's closed form: one completion when the end is within MPS,
+    else the greedy first cut g, then full MPS steps from one boundary to the next."""
+    end = addr + length                                           # the first byte after the request
+    if addr + mps >= end:
+        return 1
+    g = (addr + mps) // rcb * rcb
+    return 1 + -(-(end - g) // mps)
+
+
+def test_min_completions_closed_form():
+    """The closed form against the page's enumeration (the fewest completions of all its
+    splits, which is splits[0]) on small requests, and against the box's dynamic program
+    (pcieByCompletions: its first non-zero count) on requests up to 4 KB; the page's
+    example and the counterexamples of the trap and of the case split."""
+    from page_tests import explorer_require, node_json
+
+    assert min_completions(ADDR, LEN, 128, RCB) == 3                 # g = 0x1080, 1 + ceil(144 / 128)
+    assert (ADDR + 128) // RCB * RCB == 0x1080
+    assert min_completions(0x1010, 128, 128, 64) == 1                # the formula alone would say 2
+    assert 1 + -(-(0x1090 - 0x1080) // 128) == 2
+    assert min_completions(0x1010, 512, 128, 64) == 5                # an unaligned request needing five
+    rng = random.Random(2020)
+    for _ in range(1500):
+        rcb = rng.choice([64, 128])
+        mps = rng.choice([m for m in (128, 256, 512) if m >= rcb])
+        length = 4 * rng.randint(1, 160)
+        addr = 4 * rng.randrange(0, 1 << 12)
+        splits = completion_splits(addr, length, mps, rcb)
+        assert min(map(len, splits)) == len(splits[0]) == min_completions(addr, length, mps, rcb), (addr, length, mps, rcb)
+    cases = []
+    for _ in range(3000):
+        rcb = rng.choice([64, 128])
+        mps = rng.choice([m for m in (128, 256, 512, 1024, 2048, 4096) if m >= rcb])
+        length = 4 * rng.randint(1, 1024)
+        cases.append((4 * rng.randrange(0, 1 << 20), length, mps, rcb))
+    got = node_json(f"const m = {explorer_require()}; const cases = {[list(c) for c in cases]};"
+                    "console.log(JSON.stringify(cases.map(([a, l, p, r]) => m.pcieByCompletions(a, l, p, r).findIndex((w) => w > 0n))));")
+    for case, k in zip(cases, got):
+        assert k == min_completions(*case), case
+
+
+def test_explorer_headers():
+    """The box's header table (pcieHeaders) against the header follow-up: Length in DW,
+    Byte Count (the bytes left, the completion's own included) and Lower Address for
+    [48, 64, 64, 64, 16] from 0x1010, and on random splits of the page against the rules
+    (the last completion is the one whose Byte Count equals its own size)."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(21)
+    jobs = [[ADDR, LEN, [48, 64, 64, 64, 16]]]
+    for _ in range(200):
+        length = 4 * rng.randint(1, 128)
+        addr = 4 * rng.randrange(0, 1 << 12)
+        splits = completion_splits(addr, length, 256, 64)
+        jobs.append([addr, length, splits[rng.randrange(len(splits))]])
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({json.dumps(jobs)}.map(([a, l, s]) => m.pcieHeaders(a, l, s))));")
+    first = got[0]
+    assert [h["dw"] for h in first] == [12, 16, 16, 16, 4]
+    assert [h["la"] for h in first] == [0x10, 0x40, 0x00, 0x40, 0x00]
+    assert [h["bc"] for h in first] == [256, 208, 144, 80, 16]
+    for (addr, length, sizes), hs in zip(jobs, got):
+        pos, left = addr, length
+        for size, h in zip(sizes, hs):
+            assert (h["addr"], h["size"], h["dw"], h["bc"], h["la"]) == (pos, size, size // 4, left, pos & 0x7F)
+            pos, left = pos + size, left - size
+        assert [h["bc"] == h["size"] for h in hs] == [False] * (len(hs) - 1) + [True]

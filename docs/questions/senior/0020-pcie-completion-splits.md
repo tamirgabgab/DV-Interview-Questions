@@ -78,8 +78,11 @@ added: 2026-10-18
     **למה "כל חיתוך על גבול RCB" מספיק.** אם כל נקודת חיתוך היא כפולה של RCB, אז
     ה-Completion הראשון מסתיים על גבול (חוק 1), כל אמצעי מתחיל ומסתיים על גבולות ולכן
     אורכו כפולה של RCB (חוק 2), והאחרון מסתיים בסוף הבקשה כי שם הרקורסיה נעצרת (חוק 3).
-    ולהפך : מהחוקים נובע שכל חיתוך הוא על גבול. אז במקום לבדוק שלושה חוקים בודקים
-    תנאי אחד על כתובות החיתוך, ו-MPS הוא סינון נוסף על המרחק בין חיתוכים עוקבים.
+    ולהפך : מהחוקים נובע שכל חיתוך הוא על גבול. החיתוך הראשון הוא סוף ה-Completion הראשון,
+    ולכן גבול (חוק 1). וכל Completion אמצעי מתחיל בחיתוך שהוא גבול ואורכו כפולה של RCB
+    (חוק 2), ולכן גם מסתיים על גבול; באינדוקציה, כל החיתוכים הם גבולות. אז במקום לבדוק
+    שלושה חוקים בודקים תנאי אחד על כתובות החיתוך, ו-MPS הוא סינון נוסף על המרחק בין חיתוכים
+    עוקבים.
 
     **הרקורסיה.** המצב הוא `pos`, הבית הראשון שעוד לא כוסה, והרשימה `sizes` של הגדלים
     עד כה. מ-`pos` יש קבוצה קטנה של סיומים אפשריים ל-Completion הבא : סוף הבקשה אם
@@ -160,7 +163,7 @@ added: 2026-10-18
         2. סוף הבקשה הוא סיום אפשרי רק אם הוא במרחק של עד MPS מ-`pos`. בלי התנאי הזה
            הפונקציה הייתה מחזירה גם `[256]` כש-MPS הוא 128.
         3. הגבול הראשון אחרי `pos` : חילוק שלם, ועוד אחד, כפול RCB. אם `pos` עצמו על גבול
-           (כמו באמצע הבקשה) מקבלים את הגבול הבא, לא את `pos`. הלולאה עוצרת בסוף הבקשה או
+           (כמו אחרי החיתוך הראשון) מקבלים את הגבול הבא, לא את `pos`. הלולאה עוצרת בסוף הבקשה או
            כשהגבול רחוק מ-MPS.
         4. מיון יורד : הסיום הרחוק קודם. כך `splits[0]` הוא הפיצול החמדני (הכי פחות
            Completions) ו-`splits[-1]` הוא זה שחותך בכל גבול.
@@ -208,7 +211,7 @@ added: 2026-10-18
         2. סוף הבקשה הוא סיום אפשרי רק אם הוא במרחק של עד MPS מ-`pos`. בלי התנאי הזה
            הפונקציה הייתה מחזירה גם `[256]` כש-MPS הוא 128.
         3. הגבול הראשון אחרי `pos` : חילוק שלם, ועוד אחד, כפול RCB. אם `pos` עצמו על גבול
-           (כמו באמצע הבקשה) מקבלים את הגבול הבא, לא את `pos`. הלולאה עוצרת בסוף הבקשה או
+           (כמו אחרי החיתוך הראשון) מקבלים את הגבול הבא, לא את `pos`. הלולאה עוצרת בסוף הבקשה או
            כשהגבול רחוק מ-MPS.
         4. מיון יורד : הסיום הרחוק קודם. כך `splits[0]` הוא הפיצול החמדני (הכי פחות
            Completions) ו-`splits[$]` הוא זה שחותך בכל גבול.
@@ -250,7 +253,8 @@ added: 2026-10-18
 
     **איך MPS גוזם.** אותה בקשה עם `MPS = 128` : כל פיצול שיש בו Completion גדול מ-128 נפסל,
     ונשארים 8. שימו לב שפיצול כמו `[128, 128]` לא קיים בכלל : מכתובת לא מיושרת
-    ה-Completion הראשון חייב להסתיים על גבול, ולכן הוא 48, 112, 176 או 240, אף פעם לא 128 :
+    ה-Completion הראשון חייב להסתיים על גבול, ולכן הוא 48, 112, 176 או 240 (ועם `MPS = 128`
+    רק 48 או 112), אף פעם לא 128 :
 
     <svg class="figure cs-fig" viewBox="0 0 640 602" style="max-width:40rem" role="img" aria-label="אותם פיצולים כש-MPS = 128 : הפיצולים שיש בהם Completion גדול מ-128 מסומנים ודהויים"><line class="cs-rcb" x1="128.0" y1="24" x2="128.0" y2="598"/><text class="coord halo" x="128.0" y="16" text-anchor="middle">0x1000</text><line class="cs-rcb" x1="224.8" y1="24" x2="224.8" y2="598"/><text class="coord halo" x="224.8" y="16" text-anchor="middle">0x1040</text><line class="cs-rcb" x1="321.6" y1="24" x2="321.6" y2="598"/><text class="coord halo" x="321.6" y="16" text-anchor="middle">0x1080</text><line class="cs-rcb" x1="418.4" y1="24" x2="418.4" y2="598"/><text class="coord halo" x="418.4" y="16" text-anchor="middle">0x10C0</text><line class="cs-rcb" x1="515.2" y1="24" x2="515.2" y2="598"/><text class="coord halo" x="515.2" y="16" text-anchor="middle">0x1100</text><line class="cs-rcb" x1="612.0" y1="24" x2="612.0" y2="598"/><text class="coord halo" x="612.0" y="16" text-anchor="middle">0x1140</text><line class="cs-req" x1="152.2" y1="24" x2="152.2" y2="598"/><line class="cs-req" x1="539.4" y1="24" x2="539.4" y2="598"/><text class="legend halo" x="136" y="45" font-weight="700">1 completion: 1 split</text><g class="st-faded"><text class="coord halo" x="118" y="69" text-anchor="end">256</text><rect class="cs-bad" x="152.2" y="54" width="387.2" height="22" rx="3"><title>0x1010–0x110F: 256 bytes (one)</title></rect><text class="cs-size" x="345.8" y="69" text-anchor="middle">256</text></g><text class="legend halo" x="136" y="97" font-weight="700">2 completions: 4 splits</text><g class="st-faded"><text class="coord halo" x="118" y="121" text-anchor="end">240+16</text><rect class="cs-bad" x="152.2" y="106" width="363.0" height="22" rx="3"><title>0x1010–0x10FF: 240 bytes (first)</title></rect><text class="cs-size" x="333.7" y="121" text-anchor="middle">240</text><rect class="cs-last" x="515.2" y="106" width="24.2" height="22" rx="3"><title>0x1100–0x110F: 16 bytes (last)</title></rect><text class="cs-size" x="527.3" y="121" text-anchor="middle">16</text></g><g class="st-faded"><text class="coord halo" x="118" y="149" text-anchor="end">176+80</text><rect class="cs-bad" x="152.2" y="134" width="266.2" height="22" rx="3"><title>0x1010–0x10BF: 176 bytes (first)</title></rect><text class="cs-size" x="285.3" y="149" text-anchor="middle">176</text><rect class="cs-last" x="418.4" y="134" width="121.0" height="22" rx="3"><title>0x10C0–0x110F: 80 bytes (last)</title></rect><text class="cs-size" x="478.9" y="149" text-anchor="middle">80</text></g><g class="st-faded"><text class="coord halo" x="118" y="177" text-anchor="end">112+144</text><rect class="cs-first" x="152.2" y="162" width="169.4" height="22" rx="3"><title>0x1010–0x107F: 112 bytes (first)</title></rect><text class="cs-size" x="236.9" y="177" text-anchor="middle">112</text><rect class="cs-bad" x="321.6" y="162" width="217.8" height="22" rx="3"><title>0x1080–0x110F: 144 bytes (last)</title></rect><text class="cs-size" x="430.5" y="177" text-anchor="middle">144</text></g><g class="st-faded"><text class="coord halo" x="118" y="205" text-anchor="end">48+208</text><rect class="cs-first" x="152.2" y="190" width="72.6" height="22" rx="3"><title>0x1010–0x103F: 48 bytes (first)</title></rect><text class="cs-size" x="188.5" y="205" text-anchor="middle">48</text><rect class="cs-bad" x="224.8" y="190" width="314.6" height="22" rx="3"><title>0x1040–0x110F: 208 bytes (last)</title></rect><text class="cs-size" x="382.1" y="205" text-anchor="middle">208</text></g><text class="legend halo" x="136" y="233" font-weight="700">3 completions: 6 splits</text><g class="st-faded"><text class="coord halo" x="118" y="257" text-anchor="end">176+64+16</text><rect class="cs-bad" x="152.2" y="242" width="266.2" height="22" rx="3"><title>0x1010–0x10BF: 176 bytes (first)</title></rect><text class="cs-size" x="285.3" y="257" text-anchor="middle">176</text><rect class="cs-mid" x="418.4" y="242" width="96.8" height="22" rx="3"><title>0x10C0–0x10FF: 64 bytes (mid)</title></rect><text class="cs-size" x="466.8" y="257" text-anchor="middle">64</text><rect class="cs-last" x="515.2" y="242" width="24.2" height="22" rx="3"><title>0x1100–0x110F: 16 bytes (last)</title></rect><text class="cs-size" x="527.3" y="257" text-anchor="middle">16</text></g><g><text class="coord halo" x="118" y="285" text-anchor="end">112+128+16</text><rect class="cs-first" x="152.2" y="270" width="169.4" height="22" rx="3"><title>0x1010–0x107F: 112 bytes (first)</title></rect><text class="cs-size" x="236.9" y="285" text-anchor="middle">112</text><rect class="cs-mid" x="321.6" y="270" width="193.6" height="22" rx="3"><title>0x1080–0x10FF: 128 bytes (mid)</title></rect><text class="cs-size" x="418.4" y="285" text-anchor="middle">128</text><rect class="cs-last" x="515.2" y="270" width="24.2" height="22" rx="3"><title>0x1100–0x110F: 16 bytes (last)</title></rect><text class="cs-size" x="527.3" y="285" text-anchor="middle">16</text></g><g><text class="coord halo" x="118" y="313" text-anchor="end">112+64+80</text><rect class="cs-first" x="152.2" y="298" width="169.4" height="22" rx="3"><title>0x1010–0x107F: 112 bytes (first)</title></rect><text class="cs-size" x="236.9" y="313" text-anchor="middle">112</text><rect class="cs-mid" x="321.6" y="298" width="96.8" height="22" rx="3"><title>0x1080–0x10BF: 64 bytes (mid)</title></rect><text class="cs-size" x="370.0" y="313" text-anchor="middle">64</text><rect class="cs-last" x="418.4" y="298" width="121.0" height="22" rx="3"><title>0x10C0–0x110F: 80 bytes (last)</title></rect><text class="cs-size" x="478.9" y="313" text-anchor="middle">80</text></g><g class="st-faded"><text class="coord halo" x="118" y="341" text-anchor="end">48+192+16</text><rect class="cs-first" x="152.2" y="326" width="72.6" height="22" rx="3"><title>0x1010–0x103F: 48 bytes (first)</title></rect><text class="cs-size" x="188.5" y="341" text-anchor="middle">48</text><rect class="cs-bad" x="224.8" y="326" width="290.4" height="22" rx="3"><title>0x1040–0x10FF: 192 bytes (mid)</title></rect><text class="cs-size" x="370.0" y="341" text-anchor="middle">192</text><rect class="cs-last" x="515.2" y="326" width="24.2" height="22" rx="3"><title>0x1100–0x110F: 16 bytes (last)</title></rect><text class="cs-size" x="527.3" y="341" text-anchor="middle">16</text></g><g><text class="coord halo" x="118" y="369" text-anchor="end">48+128+80</text><rect class="cs-first" x="152.2" y="354" width="72.6" height="22" rx="3"><title>0x1010–0x103F: 48 bytes (first)</title></rect><text class="cs-size" x="188.5" y="369" text-anchor="middle">48</text><rect class="cs-mid" x="224.8" y="354" width="193.6" height="22" rx="3"><title>0x1040–0x10BF: 128 bytes (mid)</title></rect><text class="cs-size" x="321.6" y="369" text-anchor="middle">128</text><rect class="cs-last" x="418.4" y="354" width="121.0" height="22" rx="3"><title>0x10C0–0x110F: 80 bytes (last)</title></rect><text class="cs-size" x="478.9" y="369" text-anchor="middle">80</text></g><g class="st-faded"><text class="coord halo" x="118" y="397" text-anchor="end">48+64+144</text><rect class="cs-first" x="152.2" y="382" width="72.6" height="22" rx="3"><title>0x1010–0x103F: 48 bytes (first)</title></rect><text class="cs-size" x="188.5" y="397" text-anchor="middle">48</text><rect class="cs-mid" x="224.8" y="382" width="96.8" height="22" rx="3"><title>0x1040–0x107F: 64 bytes (mid)</title></rect><text class="cs-size" x="273.2" y="397" text-anchor="middle">64</text><rect class="cs-bad" x="321.6" y="382" width="217.8" height="22" rx="3"><title>0x1080–0x110F: 144 bytes (last)</title></rect><text class="cs-size" x="430.5" y="397" text-anchor="middle">144</text></g><text class="legend halo" x="136" y="425" font-weight="700">4 completions: 4 splits</text><g><text class="coord halo" x="118" y="449" text-anchor="end">112+64+64+16</text><rect class="cs-first" x="152.2" y="434" width="169.4" height="22" rx="3"><title>0x1010–0x107F: 112 bytes (first)</title></rect><text class="cs-size" x="236.9" y="449" text-anchor="middle">112</text><rect class="cs-mid" x="321.6" y="434" width="96.8" height="22" rx="3"><title>0x1080–0x10BF: 64 bytes (mid)</title></rect><text class="cs-size" x="370.0" y="449" text-anchor="middle">64</text><rect class="cs-mid" x="418.4" y="434" width="96.8" height="22" rx="3"><title>0x10C0–0x10FF: 64 bytes (mid)</title></rect><text class="cs-size" x="466.8" y="449" text-anchor="middle">64</text><rect class="cs-last" x="515.2" y="434" width="24.2" height="22" rx="3"><title>0x1100–0x110F: 16 bytes (last)</title></rect><text class="cs-size" x="527.3" y="449" text-anchor="middle">16</text></g><g><text class="coord halo" x="118" y="477" text-anchor="end">48+128+64+16</text><rect class="cs-first" x="152.2" y="462" width="72.6" height="22" rx="3"><title>0x1010–0x103F: 48 bytes (first)</title></rect><text class="cs-size" x="188.5" y="477" text-anchor="middle">48</text><rect class="cs-mid" x="224.8" y="462" width="193.6" height="22" rx="3"><title>0x1040–0x10BF: 128 bytes (mid)</title></rect><text class="cs-size" x="321.6" y="477" text-anchor="middle">128</text><rect class="cs-mid" x="418.4" y="462" width="96.8" height="22" rx="3"><title>0x10C0–0x10FF: 64 bytes (mid)</title></rect><text class="cs-size" x="466.8" y="477" text-anchor="middle">64</text><rect class="cs-last" x="515.2" y="462" width="24.2" height="22" rx="3"><title>0x1100–0x110F: 16 bytes (last)</title></rect><text class="cs-size" x="527.3" y="477" text-anchor="middle">16</text></g><g><text class="coord halo" x="118" y="505" text-anchor="end">48+64+128+16</text><rect class="cs-first" x="152.2" y="490" width="72.6" height="22" rx="3"><title>0x1010–0x103F: 48 bytes (first)</title></rect><text class="cs-size" x="188.5" y="505" text-anchor="middle">48</text><rect class="cs-mid" x="224.8" y="490" width="96.8" height="22" rx="3"><title>0x1040–0x107F: 64 bytes (mid)</title></rect><text class="cs-size" x="273.2" y="505" text-anchor="middle">64</text><rect class="cs-mid" x="321.6" y="490" width="193.6" height="22" rx="3"><title>0x1080–0x10FF: 128 bytes (mid)</title></rect><text class="cs-size" x="418.4" y="505" text-anchor="middle">128</text><rect class="cs-last" x="515.2" y="490" width="24.2" height="22" rx="3"><title>0x1100–0x110F: 16 bytes (last)</title></rect><text class="cs-size" x="527.3" y="505" text-anchor="middle">16</text></g><g><text class="coord halo" x="118" y="533" text-anchor="end">48+64+64+80</text><rect class="cs-first" x="152.2" y="518" width="72.6" height="22" rx="3"><title>0x1010–0x103F: 48 bytes (first)</title></rect><text class="cs-size" x="188.5" y="533" text-anchor="middle">48</text><rect class="cs-mid" x="224.8" y="518" width="96.8" height="22" rx="3"><title>0x1040–0x107F: 64 bytes (mid)</title></rect><text class="cs-size" x="273.2" y="533" text-anchor="middle">64</text><rect class="cs-mid" x="321.6" y="518" width="96.8" height="22" rx="3"><title>0x1080–0x10BF: 64 bytes (mid)</title></rect><text class="cs-size" x="370.0" y="533" text-anchor="middle">64</text><rect class="cs-last" x="418.4" y="518" width="121.0" height="22" rx="3"><title>0x10C0–0x110F: 80 bytes (last)</title></rect><text class="cs-size" x="478.9" y="533" text-anchor="middle">80</text></g><text class="legend halo" x="136" y="561" font-weight="700">5 completions: 1 split</text><g><text class="coord halo" x="118" y="585" text-anchor="end">48+64+64+64+16</text><rect class="cs-first" x="152.2" y="570" width="72.6" height="22" rx="3"><title>0x1010–0x103F: 48 bytes (first)</title></rect><text class="cs-size" x="188.5" y="585" text-anchor="middle">48</text><rect class="cs-mid" x="224.8" y="570" width="96.8" height="22" rx="3"><title>0x1040–0x107F: 64 bytes (mid)</title></rect><text class="cs-size" x="273.2" y="585" text-anchor="middle">64</text><rect class="cs-mid" x="321.6" y="570" width="96.8" height="22" rx="3"><title>0x1080–0x10BF: 64 bytes (mid)</title></rect><text class="cs-size" x="370.0" y="585" text-anchor="middle">64</text><rect class="cs-mid" x="418.4" y="570" width="96.8" height="22" rx="3"><title>0x10C0–0x10FF: 64 bytes (mid)</title></rect><text class="cs-size" x="466.8" y="585" text-anchor="middle">64</text><rect class="cs-last" x="515.2" y="570" width="24.2" height="22" rx="3"><title>0x1100–0x110F: 16 bytes (last)</title></rect><text class="cs-size" x="527.3" y="585" text-anchor="middle">16</text></g></svg>
 
@@ -304,18 +308,28 @@ added: 2026-10-18
 
     - **זמן :** תלוי בגודל הפלט. יש לכל היותר \( 2^c \) פיצולים, וכל אחד מועתק (עד \( c + 1 \)
       גדלים) כשהוא נשמר, כלומר \( O(c \cdot 2^c) \) במקרה הגרוע, כש-MPS לא גוזם כלום. בכל
-      צומת של הרקורסיה נבדקים לכל היותר \( MPS / RCB + 1 \) סיומים.
+      צומת של הרקורסיה נבדקים לכל היותר \( MPS / RCB + 1 \) סיומים. הזמן תלוי בפלט כי אין
+      ענפים מתים : \( MPS \ge RCB \), ולכן מכל `pos` הגבול הבא (במרחק של עד RCB) או סוף הבקשה
+      תמיד בהישג יד, וכל ענף מסתיים בפיצול. מאותה סיבה `splits[0]`, שבו כל צעד לקח את הסיום
+      הרחוק ביותר, הוא תמיד החמדני.
     - **בפועל :** לבקשות של ראיון (עד 512 בתים) מדובר בעשרות עד מאות פיצולים. לבקשה של
       4 KB עם `RCB = 64` יש \( c = 63 \) גבולות, ומנייה מלאה לא אפשרית; אז סופרים בלי למנות
       (ראו שאלות ההמשך) או מגרילים פיצול אחד.
     - **זיכרון :** התוצאה עצמה, ועומק רקורסיה של עד \( c + 1 \).
 
-    **נסו בעצמכם.** שנו את הכתובת, את האורך, את MPS ואת RCB : התיבה מציירת את הבלוקים
-    של הבקשה על רשת ה-RCB, סופרת את הפיצולים (ומשווה לנוסחה הסגורה של
-    [שאלה 0021](0021-pcie-completion-count.md)), ומציירת את מפת הפיצולים כמו למעלה, עד
-    ארבעים שורות. הדוגמאות מהדף נמצאות ברשימה. עם "לבחור חיתוכים בעצמי" לוחצים על הגבולות
-    הירוקים : כל לחיצה חותכת שם או מבטלת, השורה שמתחת מראה את ה-Completions שנוצרים, וחתיכה
-    גדולה מ-MPS מסומנת. כל פיצול הוא תת-קבוצה של הגבולות, והמספר הוא כמה מהן מותרות.
+    **נסו בעצמכם.** התיבה מוסיפה על האיורים כל כתובת, אורך (עד 4 KB), MPS ו-RCB, ספירה
+    שמושווית לנוסחה הסגורה של [שאלה 0021](0021-pcie-completion-count.md), וחיתוך ביד : לחיצה
+    על גבול ירוק חותכת שם או מבטלת, וטבלה מראה את שדות ה-header של כל Completion.
+
+    - **‏MPS 128 :** בחרו ברשימה "אותה בקשה עם MPS 128". יש 8 פיצולים, והחמדני הוא
+      ‏112+128+16. לחצו על הגבול `0x1080` כדי לבטל אותו : נשאר `[240, 16]`, וה-240 מסומן כגדול
+      מ-MPS.
+    - **כתובת מיושרת :** השאירו `MPS = 128` והקלידו את הכתובת `0x1000`. יש 5 פיצולים, וה-`[128, 128]`
+      של המלכודת חוקי עכשיו : מה שפסל אותו הוא היישור, לא MPS.
+    - **‏RCB 128 :** חזרו ל-`0x1010` ובחרו `RCB = 128`. עכשיו \( c = 2 \) ויש 4 פיצולים, ועם
+      `MPS = 128` פיצול אחד, בדיוק כמו בעץ הרקורסיה.
+    - **‏4 KB :** בחרו כתובת `0x1000`, אורך 4096 ו-`MPS = 256` : 63 גבולות, וכ-\( 9.85 \cdot 10^{17} \)
+      פיצולים, כמו בשאלת ההמשך הראשונה.
 
     <div class="explorer" data-kind="pcie" data-notation="c" data-addr="0x1010" data-len="256" data-mps="256" data-rcb="64"></div>
 
@@ -330,7 +344,7 @@ added: 2026-10-18
 
 ??? trap "מלכודת : לפצל לפי MPS במקום לפי RCB"
     עם `MPS = 128` מפתה לענות `[128, 128]` : שני Completions "מלאים". מ-`0x1010` זה חותך
-    ב-`0x1090`, שאינו גבול RCB, ולכן פסול. המינימום בכתובת לא מיושרת הוא **שלושה**
+    ב-`0x1090`, שאינו גבול RCB, ולכן פסול. בבקשה הזו המינימום הוא **שלושה**
     Completions, למשל `[112, 128, 16]`. ה-MPS קובע את המינימום רק דרך הגבולות שבהישג יד;
     הוא לא נקודת חיתוך בעצמו.
 
@@ -354,9 +368,18 @@ added: 2026-10-18
       אופטימלי כאן?
 
         ??? fu-answer "תשובה"
-            המקסימום הוא \( c + 1 \). המינימום הוא החמדני, בכל צעד הסיום הרחוק ביותר שבהישג יד :
-            הסיום הרחוק ביותר שבהישג יד, הגבול האחרון עד \( pos + MPS \), רק מתקדם כש-`pos` מתקדם,
-            ולכן באינדוקציה אחרי \( k \) צעדים החמדני רחוק לפחות כמו כל פיצול אחר.
+            המקסימום הוא \( c + 1 \), חיתוך בכל גבול. המינימום הוא החמדני : בכל צעד הוא לוקח את
+            הסיום הרחוק ביותר שבהישג יד. הסיום הזה, הגבול האחרון עד \( pos + MPS \), רק מתקדם
+            כש-`pos` מתקדם, ולכן באינדוקציה אחרי \( k \) צעדים החמדני רחוק לפחות כמו כל פיצול אחר.
+
+            ולחמדני יש נוסחה. נסמן \( end = addr + len \), הבית הראשון שאחרי הבקשה. אם
+            \( addr + MPS \ge end \), מספיק Completion אחד. אחרת הראשון מסתיים בגבול האחרון שבהישג
+            יד, \( g = \lfloor (addr + MPS) / RCB \rfloor \cdot RCB \). מ-\( g \) כל צעד מתחיל על
+            גבול, ו-MPS הוא כפולה של RCB, ולכן גם \( pos + MPS \) הוא גבול : כל צעד מתקדם בדיוק
+            MPS, עד שסוף הבקשה בהישג יד. לכן המינימום הוא
+            \( 1 + \lceil (end - g) / MPS \rceil \). בדוגמה עם `MPS = 128`, ‏\( g \) הוא `0x1080`,
+            ו-\( 1 + \lceil 144 / 128 \rceil = 3 \), הפיצול `[112, 128, 16]`. בלי המקרה הראשון
+            הנוסחה טועה : מ-`0x1010` עם 128 בתים היא נותנת 2, ומספיק אחד.
 
     - **שדות ה-header :** לכל Completion יש `Length` ב-DW, `Byte Count` (כמה בתים נשארו כולל
       הנוכחי) ו-`Lower Address` (7 הביטים התחתונים של הבית הראשון). כתבו את שלושתם עבור
@@ -371,9 +394,63 @@ added: 2026-10-18
       כל הרשימה? ואילו bins כדאי להגדיר?
 
         ??? fu-answer "תשובה"
-            בודקים תכונות : כתובות החיתוך כפולות של RCB, כל Completion עד MPS, ‏`Byte Count`
-            יורד בעקביות, והסכום שווה ל-`len`. ה-bins : מספר ה-Completions, גודל הראשון, האם
-            היה Completion בגודל MPS מלא, ו-Completion אחרון קצר (16 בתים בדוגמה).
+            בודקים תכונות של כל Completion כשהוא מגיע : כתובת החיתוך שאחריו כפולה של RCB (חוץ
+            מהאחרון), הוא לא גדול מ-MPS, ‏`Byte Count` של הראשון הוא `len` וכל הבא קטן ממנו בדיוק
+            במספר הבתים של הקודם, ו-`Lower Address` הוא 7 הביטים התחתונים של הכתובת שבה הוא
+            מתחיל. ובקשה חדשה מגיעה רק אחרי שכל הבתים של הקודמת חזרו. ה-bins : מספר
+            ה-Completions, גודל הראשון, האם היה Completion בגודל MPS מלא, ו-Completion אחרון קצר
+            מ-RCB (16 בתים בדוגמה). ב-SystemVerilog, checker שזוכר רק את הכתובת הבאה ואת הבתים
+            שנשארו (הטסט של השאלה מריץ אותו ב-Verilator על פיצולים חוקיים ועל חמישה באגים) :
+
+            ```systemverilog title="module cpl_checker" linenums="1" hl_lines="33 34 35 36 37"
+            // Checks the completions of one read at a time: `start` loads the request, then every
+            // cycle with `cpl` carries the header fields of its next completion.
+            module cpl_checker #(parameter int MPS = 256, parameter int RCB = 64) (
+              input logic        clk, rst_n,
+              input logic        start,              // a new request
+              input logic [63:0] addr,
+              input logic [12:0] len,                // bytes, 4 to 4096
+              input logic        cpl,                // a completion of that request
+              input logic [9:0]  length_dw,          // Length, in DW (0 means 1024)
+              input logic [11:0] byte_count,         // Byte Count (0 means 4096)
+              input logic [6:0]  lower_addr          // Lower Address
+            );
+              logic [63:0] cur;                      // the first byte of the next completion
+              logic [12:0] left, first;              // the bytes still to come; the first one's size
+              int n;                                 // the completions of this request so far
+              bit full;                              // one of them carried MPS bytes
+              int f_size = 0, f_bc = 0, f_la = 0, f_cut = 0, f_done = 0;
+              wire [12:0] bytes = (length_dw == 0 ? 13'd1024 : 13'(length_dw)) << 2;
+              wire [12:0] bc = byte_count == 0 ? 13'd4096 : 13'(byte_count);
+              wire last = cpl && bytes == left;
+
+              always @(posedge clk or negedge rst_n)
+                if (!rst_n) left <= '0;
+                else if (start) begin cur <= addr; left <= len; n <= 0; full <= 0; end
+                else if (cpl) begin
+                  cur <= cur + bytes; left <= left - bytes; n <= n + 1;
+                  if (n == 0) first <= bytes;
+                  full <= full || bytes == MPS;
+                end
+
+              default clocking @(posedge clk); endclocking
+              default disable iff (!rst_n);
+              a_size: assert property (cpl |-> bytes <= MPS && bytes <= left) else f_size++;
+              a_bc:   assert property (cpl |-> bc == left) else f_bc++;
+              a_la:   assert property (cpl |-> lower_addr == cur[6:0]) else f_la++;
+              a_cut:  assert property (cpl && !last |-> (cur + bytes) % RCB == 0) else f_cut++;
+              a_done: assert property (start |-> left == 0) else f_done++;
+
+              covergroup cpl_cg with function sample(int n_cpl, int first_b, bit full_mps, int last_b);
+                cp_n:     coverpoint n_cpl { bins one = {1}; bins two = {2}; bins more = {[3:1024]}; }
+                cp_first: coverpoint first_b iff (n_cpl > 1) { bins below_rcb = {[1:RCB - 1]}; bins rcb_up = {[RCB:MPS]}; }
+                cp_full:  coverpoint full_mps;
+                cp_last:  coverpoint last_b iff (n_cpl > 1) { bins below_rcb = {[1:RCB - 1]}; bins rcb_up = {[RCB:MPS]}; }
+              endgroup
+              cpl_cg cov = new();
+              always @(posedge clk) if (rst_n && last) cov.sample(n + 1, n == 0 ? bytes : first, full || bytes == MPS, bytes);
+            endmodule
+            ```
 
     - **מי קובע את ה-RCB :** ב-Root Port הביט ב-Link Control הוא לקריאה בלבד (64 או 128);
       ב-Endpoint התוכנה מגדירה אותו כדי לשקף את ה-Root Port שמעליו. למה ל-Requester חשוב
@@ -391,8 +468,10 @@ added: 2026-10-18
       עושים את זה נכון?
 
         ??? fu-answer "תשובה"
-            בחירה אחידה בכל צעד מעדיפה פיצולים עם מעט Completions : בדוגמה יש מ-`0x1010` חמישה
-            סיומים מותרים, ולכן `[256]` יוצא בהסתברות \( 1/5 \) במקום \( 1/16 \). הדרך הנכונה :
+            בחירה אחידה בכל צעד מעדיפה Completion ראשון ארוך, ובסך הכול פיצולים עם מעט
+            Completions : בדוגמה יש מ-`0x1010` חמישה סיומים מותרים, ולכן `[256]` יוצא בהסתברות
+            \( 1/5 \) במקום \( 1/16 \), ופיצול לשני Completions יוצא ב-0.42 במקום 0.25. אבל לא כל
+            פיצול קצר מועדף : `[176, 64, 16]` יוצא ב-\( 1/10 \) ו-`[48, 208]` רק ב-\( 1/20 \). הדרך הנכונה :
             מחשבים את \( ways \) של התכנון הדינמי (משאלת ההמשך הראשונה), ומכל `pos` בוחרים את
             הסיום `cut` בהסתברות \( ways(cut) / ways(pos) \). המכפלה לאורך מסלול מצטמצמת
             ל-\( 1 / ways(addr) \), אותה הסתברות לכל פיצול. ב-SystemVerilog אפשר גם מערך
