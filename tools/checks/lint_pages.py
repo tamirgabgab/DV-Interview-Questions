@@ -334,12 +334,21 @@ PAGE_COLON = re.compile(r"(?<=\S) :(?=[\s*<\"']|$)")
 PAGE_SKIP = re.compile(r"`[^`\n]*`|\\\(.*?\\\)|\\\[.*?\\\]|\$\$.*?\$\$|<!--.*?-->")
 
 
+GLUED_COLON = re.compile(r"(\\\)|\\\]|`):(?=\s|$)")
+HEBREW = re.compile(r"[\u05d0-\u05ea]")
+MATH = re.compile(r"\\\((.*?)\\\)|\\\[(.*?)\\\]|\$\$(.*?)\$\$", re.S)
+
+
 def lint_colons(text: str) -> list[str]:
     """A colon in Hebrew text has U+00A0 before it, so it never wraps to the start of a line
     (CLAUDE.md). Code blocks, inline code, math, comments and the generated blocks (their
-    generator's job) are skipped; a line without a Hebrew letter is not Hebrew text."""
+    generator's job) are skipped; a line without a Hebrew letter is not Hebrew text. A colon
+    glued to math or inline code ("\\( 1/4 \\):") counts when its paragraph is Hebrew, and
+    math may not hold Hebrew (MathJax lays it out reversed)."""
     out, fence, gen = [], None, False
-    for n, line in enumerate(text.split("\n"), 1):
+    lines = text.split("\n")
+    prose = []  # the lines outside code fences and generated blocks, others blanked
+    for n, line in enumerate(lines, 1):
         st = line.lstrip()
         if st.startswith("<!-- gen "):
             gen = True
@@ -347,17 +356,37 @@ def lint_colons(text: str) -> list[str]:
             gen = False
         if fence:
             fence = None if st.startswith(fence) else fence
+            prose.append("")
             continue
         if st.startswith(("```", "~~~")):
             fence = st[:3]
+            prose.append("")
             continue
-        if gen or not re.search(r"[\u05d0-\u05ea]", line):
+        prose.append("" if gen else line)
+        if gen:
+            continue
+        if GLUED_COLON.search(line):
+            a = n - 1
+            while a > 0 and lines[a - 1].strip():
+                a -= 1
+            b = n - 1
+            while b < len(lines) - 1 and lines[b + 1].strip():
+                b += 1
+            if HEBREW.search("\n".join(lines[a:b + 1])):
+                out.append(f"line {n}: a colon glued to math or code in Hebrew text (use U+00A0 and a space)")
+        if not HEBREW.search(line):
             continue
         skip = [m.span() for m in PAGE_SKIP.finditer(line)]
         for m in PAGE_COLON.finditer(line):
             if not any(a <= m.start() < b for a, b in skip):
                 out.append(f"line {n}: a plain space before a colon in Hebrew text (use U+00A0)")
                 break
+    body = "\n".join(prose)
+    for m in MATH.finditer(body):
+        inner = next(g for g in m.groups() if g is not None)
+        if HEBREW.search(inner):
+            n = body.count("\n", 0, m.start()) + 1
+            out.append(f"line {n}: Hebrew inside math (MathJax shows it reversed): {m.group(0)[:40]}")
     return out
 
 

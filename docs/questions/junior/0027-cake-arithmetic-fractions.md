@@ -283,7 +283,7 @@ added: 2026-10-19
        בדיוק 1, בלי חיתוך.
 
     6. **הנוסחה :** מחפשים את ה-\( k \) הקטן ביותר שבו \( a + (k - 1)d \ge T \), כלומר
-       \( k - 1 \ge \frac{T - a}{d} \):
+       \( k - 1 \ge \frac{T - a}{d} \) :
 
         \[
         k = \max\left(1,\ \left\lceil \frac{T - a}{d} \right\rceil + 1\right)
