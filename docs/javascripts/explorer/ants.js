@@ -36,6 +36,11 @@
   };
 
   const LEN = 100, NMAX = 12, X0 = 22, SX = 3.56, COLORS = 6;
+  // ants 7 to 12 repeat the six colours, so their lines and rings are dashed
+  const dash = (i) => (i >= COLORS ? ` stroke-dasharray="6 3.5"` : "");
+  const ringDash = (i) => (i >= COLORS ? ` stroke-dasharray="4 2.6"` : "");
+  // the ants that fall last (two at most: the last one on the left and the first on the right)
+  const antsLast = (fall) => { const top = Math.max(...fall.map(([t]) => t)); return fall.map((_, k) => k).filter((k) => fall[k][0] === top); };
   const parseCfg = (text) => {
     const m = String(text).split(".").map((s) => /^(\d{1,3})([RL])$/.exec(s));
     if (!m.length || m.some((x) => !x) || m.length > NMAX) return null;
@@ -67,7 +72,7 @@
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary an-sum" aria-live="polite"></p>` +
         `<div class="an-pole-wrap" data-fig-strip></div>` +
-        `<p class="ex-note an-hint">לחיצה על המוט מוסיפה נמלה (פונה ימינה), לחיצה על נמלה הופכת אותה, ולחיצה שנייה מוחקת אותה. העריכה היא של מצב ההתחלה.</p>` +
+        `<p class="ex-note an-hint">לחיצה על המוט מוסיפה נמלה (פונה ימינה), לחיצה על נמלה הופכת אותה, ולחיצה שנייה מוחקת אותה. העריכה היא של מצב ההתחלה : לחיצה בזמן מאוחר חוזרת לזמן 0.</p>` +
         `<div class="an-st-wrap"></div>` +
         `<span class="viz-legend"><span><i class="an-key-path"></i>הקו של כל נמלה עד עכשיו : מקום מול זמן</span><span><i class="an-key-now"></i>הרגע הנוכחי</span></span>` +
         `<div class="an-falls" data-steady></div>`;
@@ -86,10 +91,10 @@
         frame.forEach((a, k) => {
           if (a.gone) return;
           const id = st.ghosts ? a.ghost : k, x = X(a.x), dx = a.dir * 16;
-          s += `<g class="an-ant an-c${id % COLORS}" data-k="${k}" tabindex="0" role="button" aria-label="נמלה ${k + 1} במקום ${a.x}, ${a.dir > 0 ? "ימינה" : "שמאלה"}">` +
+          s += `<g class="an-ant an-c${id % COLORS}" data-k="${id}" tabindex="0" role="button" aria-label="${st.ghosts ? "רוח" : "נמלה"} ${id + 1} במקום ${a.x}, ${a.dir > 0 ? "ימינה" : "שמאלה"}">` +
             `<title>${st.ghosts ? `ghost ${id + 1}` : `ant ${k + 1}`} at ${a.x} cm, going ${a.dir > 0 ? "right" : "left"}</title>` +
             `<path class="an-dir" d="M${f(x + dx)},${Y - 16} L${f(x + dx * 0.4)},${Y - 22} L${f(x + dx * 0.4)},${Y - 10} Z"/>` +
-            `<circle cx="${f(x)}" cy="${Y - 16}" r="10"/><text x="${f(x)}" y="${Y - 11.5}" text-anchor="middle">${id + 1}</text></g>`;
+            `<circle cx="${f(x)}" cy="${Y - 16}" r="10"${ringDash(id)}/><text x="${f(x)}" y="${Y - 11.5}" text-anchor="middle">${id + 1}</text></g>`;
         });
         return s + "</svg>";
       };
@@ -101,7 +106,7 @@
         if (st.ghosts) {
           st.ants.forEach(([p, d], i) => {
             const g = antsGhost(p, d, LEN, t), stop = Math.min(t, d < 0 ? p : LEN - p), x1 = p + d * stop;
-            if (stop > 0) s += `<line class="an-path an-c${i % COLORS}" x1="${f(X(p))}" y1="${top}" x2="${f(X(x1))}" y2="${f(top + stop * SY)}"/>`;
+            if (stop > 0) s += `<line class="an-path an-c${i % COLORS}"${dash(i)} x1="${f(X(p))}" y1="${top}" x2="${f(X(x1))}" y2="${f(top + stop * SY)}"/>`;
             if (!g.gone) s += `<circle class="an-start an-c${i % COLORS}" cx="${f(X(x1))}" cy="${f(top + stop * SY)}" r="3.5"/>`;
           });
         } else {
@@ -112,7 +117,7 @@
               if (a.gone) { pts.push([a.gone === "L" ? 0 : LEN, u / 2]); break; }
               pts.push([a.x, u / 2]);
             }
-            if (pts.length > 1) s += `<polyline class="an-path an-c${k % COLORS}" points="${pts.map(([x, u]) => `${f(X(x))},${f(top + u * SY)}`).join(" ")}"/>`;
+            if (pts.length > 1) s += `<polyline class="an-path an-c${k % COLORS}"${dash(k)} points="${pts.map(([x, u]) => `${f(X(x))},${f(top + u * SY)}`).join(" ")}"/>`;
             const a = frames[Math.min(st.t2, frames.length - 1)][k];
             if (!a.gone) s += `<circle class="an-start an-c${k % COLORS}" cx="${f(X(a.x))}" cy="${f(top + t * SY)}" r="3.5"/>`;
           });
@@ -138,18 +143,22 @@
         const fl = frame.filter((a) => a.gone === "L").length, fr = frame.filter((a) => a.gone === "R").length;
         $(".an-sum").innerHTML = !n ? "אין נמלים על המוט : לחצו על המוט כדי להוסיף." :
           `${ltr(n)} ${n === 1 ? "נמלה" : "נמלים"}, אחרי ${ltr(st.t2 / 2)} שניות : ${ltr(hits)} מתוך ${ltr(all)} התנגשויות, ` +
-          `${ltr(fl)} נפלו משמאל ו-${ltr(fr)} מימין. ${st.ghosts ? "הרוחות עוברות זו דרך זו, וכל רוח בצבע שלה." : "כל נמלה בצבע שלה, והיא מסתובבת בכל מפגש."}`;
+          `${ltr(fl)} נפלו משמאל ו-${ltr(fr)} מימין. ${st.ghosts ? "הרוחות עוברות זו דרך זו, וכל רוח בצבע שלה" : "כל נמלה בצבע שלה, והיא מסתובבת בכל מפגש"}${n > COLORS ? " (מ-7 והלאה בקו מקווקו)." : "."}`;
         const fall = antsFall(P, D, LEN);
         $(".an-falls").innerHTML = !n ? "" : `<p class="ex-title">מתי נופלת כל נמלה (משמאל לימין) :</p><div class="an-chips">` +
           fall.map(([tt, side], k) => `<span class="an-chip an-c${k % COLORS}${tt <= st.t2 / 2 ? " is-gone" : ""}"><b>${k + 1}</b> : ${side === "L" ? "משמאל" : "מימין"} ב-${ltr(tt)}</span>`).join("") + `</div>`;
         if (n && st.t2 === end) {
-          const k = fall.reduce((b, [tt], i) => (tt >= fall[b][0] ? i : b), 0);
-          answer(box, `המוט ריק אחרי ${ltr(end / 2)} שניות. האחרונה היא נמלה ${ltr(k + 1)} (התחילה ב-${ltr(P[k])}), והיא נופלת ${fall[k][1] === "L" ? "משמאל" : "מימין"}. היו ${ltr(all)} התנגשויות.`,
-            box.querySelectorAll(`.an-chip:nth-child(${k + 1})`));
+          const last = antsLast(fall), side = (k) => (fall[k][1] === "L" ? "משמאל" : "מימין");
+          const who = last.length === 1
+            ? `האחרונה היא נמלה ${ltr(last[0] + 1)} (התחילה ב-${ltr(P[last[0]])}), והיא נופלת ${side(last[0])}.`
+            : `האחרונות הן נמלים ${ltr(last[0] + 1)} ו-${ltr(last[1] + 1)} (התחילו ב-${ltr(P[last[0]])} וב-${ltr(P[last[1]])}), והן נופלות יחד, ${ltr(last[0] + 1)} ${side(last[0])} ו-${ltr(last[1] + 1)} ${side(last[1])}.`;
+          answer(box, `המוט ריק אחרי ${ltr(end / 2)} שניות. ${who} היו ${ltr(all)} התנגשויות.`,
+            box.querySelectorAll(last.map((k) => `.an-chip:nth-child(${k + 1})`).join(", ")));
         } else answer(box, null);
       };
       const stop = autoplay(play, speed, { step: () => { st.t2 = Math.min(T2(), st.t2 + 1); draw(); }, done: () => st.t2 >= T2(), restart: () => { st.t2 = 0; draw(); } });
-      const edit = (fn) => { stop(); if (st.t2 > 0) { st.t2 = 0; draw(); return; } $(".an-err").textContent = ""; fn(); st.ants.sort((a, b) => a[0] - b[0]); draw(); };
+      // an edit is of the start: a click at a later time goes back to 0 and applies it there
+      const edit = (fn) => { stop(); st.t2 = 0; $(".an-err").textContent = ""; fn(); st.ants.sort((a, b) => a[0] - b[0]); draw(); };
       const turn = (k) => edit(() => { const a = st.ants[k]; if (!a) return; if (a[1] > 0) a[1] = -1; else st.ants.splice(k, 1); });
       $(".an-pole-wrap").addEventListener("click", (e) => {
         const ant = e.target.closest(".an-ant");
@@ -203,8 +212,8 @@
     views: { ants: antsView },
     cols: { ants: { side: ".an-st-wrap, .viz-legend" } },   // the pole, the hint and the falls beside the space-time chart
     help: {
-      ants: "נמלים על מוט של 100 ס״מ, במהירות 1 ס״מ לשנייה. לוחצים על המוט כדי להוסיף נמלה, על נמלה כדי להפוך אותה, ושוב כדי למחוק; או מגרילים. ההפעלה מזיזה את הנמלים בחצאי שניות, ומתחת מצטייר הקו של כל נמלה, מקום מול זמן. המתג ״רוחות״ מראה את אותם מקומות כרוחות שעוברות זו דרך זו : הקווים זהים, רק הצבעים מתחלפים.",
+      ants: "נמלים על מוט של 100 ס״מ, במהירות 1 ס״מ לשנייה. לוחצים על המוט כדי להוסיף נמלה, על נמלה כדי להפוך אותה, ושוב כדי למחוק; או מגרילים. ההפעלה מזיזה את הנמלים בחצאי שניות, ובתרשים מצטייר הקו של כל נמלה, מקום מול זמן (נמלים 7 עד 12 בקו מקווקו). עריכה בזמן מאוחר חוזרת להתחלה ומוחלת שם. המתג ״רוחות״ מראה את אותם מקומות כרוחות שעוברות זו דרך זו : הקווים זהים, רק הצבעים מתחלפים.",
     },
-    models: { antsGhost, antsAt, antsFall, antsEnd, antsHits },
+    models: { antsGhost, antsAt, antsFall, antsEnd, antsHits, antsLast },
   });
 })();

@@ -82,16 +82,20 @@ def test_explorer_matches_the_simulation():
     from page_tests import explorer_require, node_json
 
     rng = random.Random(58)
-    cases = [(q0057.POS, q0057.DIRS)] + [random_pole(rng, 12) for _ in range(40)]
+    # the box's ties (ants 3 and 4 at 90 s; 1 and 2 at 10 s) name every ant that falls last
+    ties = [([10, 20, 30, 70, 80, 90], [1, 1, 1, -1, -1, -1]), ([10, 90], [-1, 1])]
+    cases = [(q0057.POS, q0057.DIRS)] + ties + [random_pole(rng, 12) for _ in range(40)]
     got = node_json(f"""
       const m = {explorer_require()};
       console.log(JSON.stringify({json.dumps(cases)}.map(([p, d]) => {{
         const T = 2 * m.antsEnd(p, d, 100);
-        return {{ fall: m.antsFall(p, d, 100), hits: m.antsHits(p, d, T), frames: [...Array(T + 1).keys()].map((t) => m.antsAt(p, d, 100, t)) }};
+        return {{ fall: m.antsFall(p, d, 100), last: m.antsLast(m.antsFall(p, d, 100)), hits: m.antsHits(p, d, T), frames: [...Array(T + 1).keys()].map((t) => m.antsAt(p, d, 100, t)) }};
       }})));""")
     for (pos, dirs), res in zip(cases, got):
         fall, hits, paths = q0057.simulate(pos, dirs)
         assert res["fall"] == [[t, s] for t, s in fall] and res["hits"] == hits
+        top = max(t for t, _ in fall)
+        assert res["last"] == [k for k, (t, _) in enumerate(fall) if t == top], (pos, dirs)
         # every ant at every half second: on the turning path of the simulation
         for t2, frame in enumerate(res["frames"]):
             for k, ant in enumerate(frame):
