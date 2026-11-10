@@ -102,32 +102,47 @@ def count_shortest(caps, target, start=None, tap=True):
     return sum(ways[s] for s in dist if hit(s) and dist[s] == best)
 
 
-def keep_pouring(a, b, t, from_a):
-    """The "keep pouring" plan: always fill the same jug (A when from_a), pour it into the other,
-    and empty the other when it is full; stops when one jug holds t (None after 200 steps)."""
-    x = y = 0
+def pour_step(a, b, x, y, from_a):
+    """One step of a "keep pouring" plan from (x, y): always fill the same jug (A when from_a),
+    pour it into the other, and empty the other when it is full. Returns (step, (x, y))."""
+    if from_a:
+        if x == 0:
+            return ("fill", 0), (a, y)
+        if y == b:
+            return ("empty", 1), (x, 0)
+        d = min(x, b - y)
+        return ("pour", 0, 1), (x - d, y + d)
+    if y == 0:
+        return ("fill", 1), (x, b)
+    if x == a:
+        return ("empty", 0), (0, y)
+    d = min(y, a - x)
+    return ("pour", 1, 0), (x + d, y - d)
+
+
+def keep_pouring(a, b, t, from_a, limit=200):
+    """The "keep pouring" plan (pour_step again and again) until one jug holds t; None when
+    it takes more than `limit` steps."""
+    s = (0, 0)
     plan = []
-    for _ in range(200):
-        if t in (x, y):
+    for _ in range(limit):
+        if t in s:
             return plan
-        if from_a:
-            if x == 0:
-                x, m = a, ("fill", 0)
-            elif y == b:
-                y, m = 0, ("empty", 1)
-            else:
-                d = min(x, b - y)
-                x, y, m = x - d, y + d, ("pour", 0, 1)
-        else:
-            if y == 0:
-                y, m = b, ("fill", 1)
-            elif x == a:
-                x, m = 0, ("empty", 0)
-            else:
-                d = min(y, a - x)
-                x, y, m = x + d, y - d, ("pour", 1, 0)
-        plan.append((m, (x, y)))
+        m, s = pour_step(a, b, *s, from_a)
+        plan.append((m, s))
     return None
+
+
+def pour_cycle(a, b, from_a):
+    """The states a "keep pouring" plan goes through, from its first step until it is back
+    at the state of its first step (the cycle it then repeats)."""
+    _, first = pour_step(a, b, 0, 0, from_a)
+    out, s = [first], first
+    while True:
+        _, s = pour_step(a, b, *s, from_a)
+        if s == first:
+            return out
+        out.append(s)
 
 
 def measurable(a, b, t):
@@ -247,10 +262,24 @@ def plan_stepper(caps, plan, start, names, aria, labels=None, unit=22):
 
 
 def plan_table(plan, names=NAMES, caps=(A, B)):
-    head = "| צעד | הפעולה | " + " | ".join(RLM + n for n in names) + " |"
+    """The steps as a table. The jugs' columns are in the order of the drawing: the page reads
+    right to left, so B is written first and A lands on the left, as it is drawn."""
+    head = "| צעד | הפעולה | " + " | ".join(RLM + n for n in reversed(names)) + " |"
     rows = [head, "|:-:|---|" + ":-:|" * len(names)]
     for k, (m, s) in enumerate(plan, 1):
-        rows.append(f"| {k} | {step_name(m, names)} | " + " | ".join(str(v) for v in s) + " |")
+        rows.append(f"| {k} | {step_name(m, names)} | " + " | ".join(str(v) for v in reversed(s)) + " |")
+    return "\n".join(rows)
+
+
+def layers_table():
+    """The breadth-first search of part a, layer by layer: the new states at every distance,
+    as (A, B) pairs written left to right; a state with the target in bold."""
+    dist = distances((A, B))
+    rows = ["| צעדים | מצבים חדשים, כזוגות " + ltr("(A, B)") + " | כמה |", "|:-:|---|:-:|"]
+    for d in range(max(dist.values()) + 1):
+        new = [s for s in dist if dist[s] == d]              # in the order the search met them
+        cells = ", ".join(f"<strong>({x}, {y})</strong>" if T in (x, y) else f"({x}, {y})" for x, y in new)
+        rows.append(f"| {d} | {RLM}{ltr(cells)} | {len(new)} |")
     return "\n".join(rows)
 
 
@@ -329,9 +358,10 @@ def plan3_stepper():
 
 
 def plan3_table():
-    rows = ["| מזיגה | מ- | ל- | הכד של 8 | הכד של 5 | הכד של 3 |", "|:-:|:-:|:-:|:-:|:-:|:-:|"]
+    # the jugs' columns in the order of the drawing (the 8 on the left of a right-to-left table)
+    rows = ["| מזיגה | מ- | ל- | הכד של 3 | הכד של 5 | הכד של 8 |", "|:-:|:-:|:-:|:-:|:-:|:-:|"]
     for k, (m, s) in enumerate(PLAN3, 1):
-        rows.append(f"| {k} | {CAPS3[m[1]]} | {CAPS3[m[2]]} | {s[0]} | {s[1]} | {s[2]} |")
+        rows.append(f"| {k} | {CAPS3[m[1]]} | {CAPS3[m[2]]} | {s[2]} | {s[1]} | {s[0]} |")
     return "\n".join(rows)
 
 
@@ -358,6 +388,7 @@ def blocks():
         plan_stepper((A, B), PLAN, (0, 0), NAMES, "ששת הצעדים שמביאים 4 ליטר לכד B, צעד אחרי צעד"),
         plan_table(PLAN),
         other_table(),
+        layers_table(),
         grid2(),
         grid2_legend(),
         examples_table(),

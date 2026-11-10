@@ -21,11 +21,29 @@
 .md-typeset svg .wj-never { fill: none; stroke: var(--viz-text); stroke-width: 1.2; }
 .md-typeset svg .wj-cur { fill: none; stroke: var(--viz-ink); stroke-width: 2.5; }
 
-/* the boxes: the jugs and the grid side by side when there is room */
-.md-typeset .wj-figs { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-end; justify-content: center; }
-.md-typeset .wj-figs > div { flex: 0 1 auto; min-width: 0; }
-.md-typeset .wj-figs svg.wj-live { width: 13rem; max-width: 100%; }
-.md-typeset .wj-figs svg.wj-grid { width: 15rem; max-width: 100%; }
+/* the boxes: the jugs (with their key and the note) beside the grid of the states (core.js's
+   cols; one column on a phone). Each drawing sets its own width (jugs.js), which caps its
+   height whatever the capacities are, so the whole box fits one screen */
+.md-typeset .explorer :is(.wj-jugs, .wj-gridwrap) { display: flex; justify-content: center; }
+.md-typeset .explorer svg:is(.wj-live, .wj-grid) { max-width: 100%; margin: 0.3rem 0; }
+.md-typeset .explorer :is(.wj-leg-j, .wj-leg-g) { justify-content: center; }
+.md-typeset .explorer .wj-note { margin: 0.5em 0 0; }
+/* the row's name stays in front of its buttons (core.js orders a plain span after them) */
+.md-typeset .explorer .ex-controls > .wj-movesname.ex-c-other { order: 0; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .wj-distlab { display: inline-flex; align-items: center; gap: 0.35em; font-size: 0.7rem; white-space: nowrap; }
+.md-typeset .explorer svg .wj-axis { font-family: var(--md-text-font-family); }
+/* the fewest steps to every state, written in it ("מרחק BFS") */
+.md-typeset svg .wj-dring { fill: var(--md-default-bg-color); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg .wj-dring.wj-dgoal { stroke: var(--viz-s3); stroke-width: 3.5; }
+.md-typeset svg .wj-dnum { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-weight: 700; }
+/* on a computer the three sliders and the reset button share one row, and so do the steps */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="jugs"] .ex-controls input[type="range"] { max-width: 4.8rem; }
+  .md-typeset .explorer[data-kind="jugs"] .ex-controls output { min-width: 1.2rem; }
+  .md-typeset .explorer[data-kind="jugs"] .wj-moves { column-gap: 0.8rem; }
+  .md-typeset .explorer[data-kind="jugs3"] .wj-moves { column-gap: 0.4rem; }
+  .md-typeset .explorer[data-kind="jugs3"] .wj-moves .md-button { padding-inline: 0.9em; }
+}
 .md-typeset .wj-moves .md-button { font-variant-numeric: tabular-nums; }
 .md-typeset .wj-tag { display: inline-block; padding: 0 0.4em; border-radius: 0.3em; font-size: 0.85em;
   background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); color: var(--viz-ink); }
@@ -39,3 +57,5 @@
 .md-typeset .viz-legend .wj-key-never { background: none; border-radius: 50%; border: 1.5px solid var(--viz-text); }
 .md-typeset .viz-legend .wj-key-best { background: var(--viz-s2); height: 0.2rem; border-radius: 0.1rem; }
 .md-typeset .viz-legend .wj-key-alt { background: none; height: 0; border-top: 2px dashed var(--viz-s4); border-radius: 0; }
+.md-typeset .viz-legend .wj-key-dist { background: var(--md-default-bg-color); border-radius: 50%; border: 2px solid var(--viz-s1); }
+.md-typeset .viz-legend .wj-key-dist.wj-key-dgoal { border-color: var(--viz-s3); border-width: 3px; }

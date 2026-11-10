@@ -49,6 +49,45 @@ def test_the_page_plan():
     assert jugs_shortest(3, 5, 0) == []
 
 
+def test_replay_checker():
+    """The follow-up's checker, independent of the search: a plan exists exactly when the gcd
+    rule says so, every step of it is legal and changes something, the reported contents are
+    the replayed ones, and the last state holds t. Covers gcd > 1, t over both jugs, t = 0, a = b."""
+    def apply(a, b, x, y, step):
+        if step == ("fill", "A"):
+            return a, y
+        if step == ("fill", "B"):
+            return x, b
+        if step == ("empty", "A"):
+            return 0, y
+        if step == ("empty", "B"):
+            return x, 0
+        if step == ("pour", "A", "B"):
+            d = min(x, b - y)
+            return x - d, y + d
+        assert step == ("pour", "B", "A"), step
+        d = min(y, a - x)
+        return x + d, y - d
+
+    seen = set()
+    for a in range(1, 10):
+        for b in range(1, 13):
+            for t in range(0, 14):
+                plan = jugs_shortest(a, b, t)
+                assert (plan is not None) == can_measure(a, b, t), (a, b, t)
+                if plan is None:
+                    seen.add("over" if t > max(a, b) else "gcd")
+                    continue
+                x = y = 0
+                for step, px, py in plan:
+                    nx, ny = apply(a, b, x, y, step)
+                    assert (nx, ny) != (x, y) and (nx, ny) == (px, py), (a, b, t, step)
+                    x, y = nx, ny
+                assert t in (x, y), (a, b, t)
+                seen.add("zero" if t == 0 else "equal" if a == b else "gcd>1" if gcd(a, b) > 1 else "plain")
+    assert seen == {"over", "gcd", "zero", "equal", "gcd>1", "plain"}
+
+
 def test_split_shortest():
     got = split_shortest((8, 5, 3), (8, 0, 0), (4, 4, 0))
     assert [(i, j, s) for i, j, s in got] == [(m[1], m[2], s) for m, s in q0083.PLAN3]
