@@ -10,7 +10,8 @@ plays it against a threshold. blocks() returns, in page order: the table of floo
 covered by 1, 2 and 3 eggs per number of drops, the building figure of the plan for
 three eggs and 100 floors, the plan table (the first egg's floors with what each
 outcome leaves), the chart of drops used against every threshold, the table of the
-answer for k eggs on 100 and 1,000 floors, and the examples table of part b.
+answer for k eggs on 100 and 1,000 floors, the examples table of part b, and the per-clock
+table of the hardware follow-up (three eggs, 100 floors, threshold 36).
 tests/0039 checks every number against the page code and against brute force.
 """
 
@@ -91,6 +92,28 @@ def answers_table(ks=range(1, 11), ns=(100, 1000)):
     lines = ["| ביצים k | " + " | ".join(f"הטלות ל-{n} קומות" for n in ns) + " |", "|:-:|" + ":-:|" * len(ns)]
     for k in ks:
         lines.append(f"| {RLM}{k} | " + " | ".join(f"{RLM}{min_drops(k, n)}" for n in ns) + " |")
+    return "\n".join(lines)
+
+
+def cycle_table(k=K, n=N, threshold=36):
+    """The hardware follow-up: the plan one drop per clock against a threshold, the state
+    before each drop (the known floors, the eggs and drops left), the unknown floors
+    against what the eggs and drops left settle (the proof's invariant), and the drop."""
+    lines = ["| מחזור | רצפה low | תקרה high | ביצים | הטלות t | לא ידועות | מכסות f | קומה | נשברה |",
+             "|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|"]
+    t, low, high, eggs = min_drops(k, n), 0, n + 1, k
+    drops = run(k, n, threshold)
+    for c, (fl, broke) in enumerate(drops + [(None, None)]):
+        unknown, fit = high - low - 1, covered(eggs, t)
+        assert unknown <= fit
+        tail = f"{RLM}{fl} | {'כן' if broke else 'לא'}" if fl else "אין | הסף הוא " + str(low)
+        lines.append(f"| {RLM}{c} | {RLM}{low} | {RLM}{high} | {RLM}{eggs} | {RLM}{t} | {RLM}{unknown} | {RLM}{fit} | {tail} |")
+        if fl:
+            t -= 1
+            if broke:
+                high, eggs = fl, eggs - 1
+            else:
+                low = fl
     return "\n".join(lines)
 
 
@@ -190,7 +213,7 @@ def chart_legend(k=K, n=N):
 def blocks():
     """The generated blocks, in page order."""
     return [covered_table(), building_svg(), legend(), plan_table(), threshold_chart(), chart_legend(),
-            answers_table(), examples_table()]
+            answers_table(), examples_table(), cycle_table()]
 
 
 if __name__ == "__main__":

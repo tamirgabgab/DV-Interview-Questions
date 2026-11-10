@@ -1,6 +1,8 @@
 """Question 0039: every number the page states (9 drops, the floors 37, 66, 88, 100, the
 table of covered floors, 46 thresholds at the worst case, the answers table), the
-generator's binomial reference against the page's capped table, the page plan against
+generator's binomial reference against the page's capped table, the traps and the
+follow-ups (binary search's broken eggs, the best average, the cost per broken egg, the
+per-clock table of the hardware follow-up), the page plan against
 every threshold (never more than the worst case, always ends on the threshold), the
 optimum by exhaustive search on small cases, the explorer's JavaScript, and the page
 copies of the generated blocks."""
@@ -37,7 +39,7 @@ def test_page_numbers():
     assert q0039.run(3, 100, 36) == [(37, True)] + [(fl, False) for fl in (8, 15, 21, 26, 30, 33, 35, 36)]
     used = q0039.drops_per_threshold(3, 100)
     assert max(used) == 9 and sum(1 for d in used if d == 9) == 46
-    assert abs(sum(used) / len(used) - 7.72) < 0.005                  # the follow-up's expectation
+    assert abs(sum(used) / len(used) - 7.72) < 0.005 and sum(used) == 780   # the follow-up's expectation
     assert q0039.min_drops(2, 100) == 14 and q0039.first_egg_floors(2, 100) == [14, 27, 39, 50, 60, 69, 77, 84, 90, 95, 99, 100]
     assert [q0039.min_drops(k, 100) for k in range(1, 11)] == [100, 14, 9, 8, 7, 7, 7, 7, 7, 7]
     assert [q0039.min_drops(k, 1000) for k in range(1, 11)] == [1000, 45, 19, 13, 11, 11, 11, 10, 10, 10]
@@ -45,6 +47,86 @@ def test_page_numbers():
     # the traps: binary search and equal jumps with three eggs
     assert 1 + q0039.min_drops(2, 49) == 11
     assert 4 + q0039.min_drops(2, 24) == 11
+    # the cost of part a: five eggs reach 7 drops on 100 floors, four do not
+    assert q0039.covered(5, 7) == 119 and q0039.covered(4, 7) == 98
+
+
+def test_binary_search_eggs():
+    """The trap and the cost of part a: a plain binary search on 100 floors takes 7 drops
+    and breaks up to 6 or 7 eggs, by how it rounds the middle of the unknown floors."""
+    def search(T, up):
+        low, high, drops, broken = 0, 101, 0, 0
+        while high - low > 1:
+            mid = (low + high + up) // 2
+            drops += 1
+            if mid > T:
+                high, broken = mid, broken + 1
+            else:
+                low = mid
+        return drops, broken
+    for up, eggs in ((0, 6), (1, 7)):
+        runs = [search(T, up) for T in range(101)]
+        assert max(d for d, _ in runs) == 7 and max(b for _, b in runs) == eggs
+
+
+def test_average_follow_up():
+    """The best plan on average for three eggs: 754 drops over the 101 thresholds (7.47),
+    and every plan with that sum still has the worst case 9."""
+    @lru_cache(None)
+    def best(e, m):            # (the least total drops over the m + 1 thresholds, the least and most worst case among those plans)
+        if m == 0:
+            return 0, 0, 0
+        if e == 1:
+            return m * (m + 1) // 2 + m, m, m
+        out = None
+        for x in range(1, m + 1):
+            a, b = best(e - 1, x - 1), best(e, m - x)
+            cand = (m + 1 + a[0] + b[0], 1 + max(a[1], b[1]), 1 + max(a[2], b[2]))
+            if out is None or cand[0] < out[0]:
+                out = cand
+            elif cand[0] == out[0]:
+                out = (out[0], min(out[1], cand[1]), max(out[2], cand[2]))
+        return out
+    assert best(3, 100) == (754, 9, 9) and round(754 / 101, 2) == 7.47
+    assert best(2, 1) == (sum(len(egg_run(2, 1, T)) for T in range(2)), 1, 1)
+
+
+def test_cost_follow_up():
+    """A drop costs 1 and a broken egg c: the budget recurrence F(k, C) = F(k - 1, C - 1 - c)
+    + 1 + F(k, C - 1), with F = 0 when C < 1 + c, against the fewest worst-case cost by
+    trying every floor; and the allowed first floors of three eggs and 100 floors."""
+    for c in (0, 1, 3, 10, 30, 100):
+        @lru_cache(None)
+        def worst(e, m):
+            if m == 0:
+                return 0
+            if e == 0:
+                return float("inf")
+            return min(max(1 + c + worst(e - 1, x - 1), 1 + worst(e, m - x)) for x in range(1, m + 1))
+
+        @lru_cache(None)
+        def F(k, C):
+            return 0 if k == 0 or C < 1 + c else F(k - 1, C - 1 - c) + 1 + F(k, C - 1)
+
+        for k in range(1, 4):
+            for m in range(0, 40):
+                assert next(C for C in range(10 ** 4) if F(k, C) >= m) == worst(k, m), (c, k, m)
+        w = worst(3, 100)
+        first = [x for x in range(1, 101) if max(1 + c + worst(2, x - 1), 1 + worst(3, 100 - x)) == w]
+        assert first == list(range(first[0], first[-1] + 1))
+        assert (first[0], first[-1]) == {0: (8, 37), 1: (28, 30), 3: (7, 32), 10: (12, 14), 30: (4, 12), 100: (1, 1)}[c]
+
+
+def test_cycle_table():
+    """The hardware follow-up's table: a row per clock of the run against threshold 36, the
+    unknown floors never above f(eggs, t), and the threshold found."""
+    rows = [r.split("|")[1:-1] for r in q0039.cycle_table().splitlines()[2:]]
+    cells = [[c.strip().lstrip("‏") for c in r] for r in rows]
+    assert len(cells) == 10 and cells[-1][-1] == "הסף הוא 36"
+    assert [int(r[7]) for r in cells[:-1]] == [fl for fl, _ in egg_run(3, 100, 36)]
+    for r in cells:
+        low, high, eggs, t, unknown, fit = map(int, r[1:7])
+        assert unknown == high - low - 1 <= fit == q0039.covered(eggs, t)
 
 
 def test_capped_table_matches_the_binomial_sum():

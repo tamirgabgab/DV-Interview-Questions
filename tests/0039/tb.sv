@@ -3,9 +3,15 @@
 // the floors 37, 66, 88, 100, the run against threshold 36), and the plan replayed against
 // every threshold of several (k, n): never more drops than the worst case, every floor
 // inside the unknown range, the outcome as the threshold dictates, and the run ends with
-// the threshold settled. The worst case must also be reached by some threshold.
+// the threshold settled. The worst case must also be reached by some threshold. Then the
+// hardware follow-up's egg_checker, clock by clock: the page's plan against every threshold
+// of (3, 100) fails no assertion and its covergroup reaches 100 % (every threshold, and a
+// search that uses every drop); a plan that drops one floor too high fails a_fits.
+//@flags --assert --timing
+//@page function automatic void egg_table
+//@page module egg_checker
+
 module tb;
-  //@page function automatic void egg_table
 
   int errors = 0;
 
@@ -47,10 +53,36 @@ module tb;
     if (worst != t) begin errors++; $display("k=%0d n=%0d: worst case %0d reached, expected %0d", k, n, worst, t); end
   endtask
 
+  // the checker's ports, driven between the clock edges as the follow-up's module would
+  logic clk = 0, rst_n = 0, busy = 0;
+  int low_q = 0, high_q = 101, eggs_q = 3, t_q = 9;
+  int Fc[MAXK + 1][MAXN + 1];
+  always #5 clk = ~clk;
+  egg_checker #(.K(3), .N(100)) chk (.clk, .rst_n, .busy, .low(low_q), .high(high_q), .eggs(eggs_q), .t(t_q));
+
+  // one search, a drop per clock; bug = 1 drops one floor above the page's rule
+  task automatic search(int T, int bug);
+    int fl;
+    low_q = 0; high_q = 101; eggs_q = 3; t_q = min_drops(3, 100); busy = 1;
+    while (busy) begin
+      @(negedge clk);
+      if (eggs_q == 0 || t_q == 0) busy = 0;            // out of eggs or drops: a failed search
+      else begin
+        fl = low_q + Fc[eggs_q - 1][t_q - 1] + 1 + bug;
+        if (fl > high_q - 1) fl = high_q - 1;
+        if (fl > T) begin high_q = fl; eggs_q--; end
+        else low_q = fl;
+        t_q--;
+        busy = high_q - low_q > 1;
+      end
+    end
+    @(negedge clk);
+  endtask
+
   initial begin
     int floors[MAXN];
     bit broke[MAXN];
-    int d;
+    int d, fails0, worst0;
     int F[MAXK + 1][MAXN + 1];
 
     if (min_drops(3, 100) != 9) begin errors++; $display("min_drops(3, 100) = %0d", min_drops(3, 100)); end
@@ -77,6 +109,21 @@ module tb;
     check_pair(5, 1);
     for (int k = 1; k <= 6; k++)
       for (int n = 1; n <= 40; n++) check_pair(k, n);
+
+    // the follow-up's checker
+    egg_table(3, 100, Fc);
+    repeat (2) @(negedge clk);
+    rst_n = 1;
+    search(0, 0);                                    // one threshold, 3 drops: far from covered
+    if (chk.cov.get_inst_coverage() > 50) begin errors++; $display("coverage %f after one search", chk.cov.get_inst_coverage()); end
+    for (int T = 1; T <= 100; T++) search(T, 0);
+    if (chk.fails != 0 || chk.cov.get_inst_coverage() < 99.999) begin
+      errors++; $display("egg_checker on the plan: %0d fails, coverage %f", chk.fails, chk.cov.get_inst_coverage());
+    end
+    fails0 = chk.fails;
+    for (int T = 0; T <= 100; T++) search(T, 1);
+    if (chk.fails == fails0) begin errors++; $display("egg_checker missed the plan one floor too high"); end
+    else $display("one floor too high: a_fits failed %0d times", chk.fails - fails0);
 
     if (errors == 0) $display("PASS");
     else $display("FAIL errors=%0d", errors);

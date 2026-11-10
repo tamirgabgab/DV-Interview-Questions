@@ -54,7 +54,7 @@
   const eggsView = () => ({
     mount(box) {
       const d = box.dataset;
-      const KMAX = Number(d.kmax || 10), NMAX = Number(d.nmax || 1000), ZW = 30;
+      const KMAX = Number(d.kmax || 10), NMAX = Number(d.nmax || 1000), ZW = 24;   // the zoom shows up to ZW floors
       const K0 = Math.min(KMAX, Number(d.k || 3)), N0 = Math.min(NMAX, Number(d.n || 100)), T0 = Math.min(N0, Number(d.t || 36));
       const st = { k: K0, n: N0, T: T0, step: 0, win: null, F: null, drops: [], worst: 0, used: [] };
       box.innerHTML =
@@ -71,13 +71,14 @@
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span>` +
         `<label><input type="checkbox" class="eg-rec" checked> הנוסחה על הבניין</label></div>` +
-        `<p class="ex-summary eg-sum" aria-live="polite"></p><p class="eg-step"></p><p class="eg-rec-text"></p>` +
+        `<p class="ex-summary eg-sum" aria-live="polite"></p>` +
         `<span class="viz-legend"><span><i class="eg-key-safe"></i>ידוע שלא נשברת</span><span><i class="eg-key-broke"></i>ידוע שנשברת</span><span><i class="eg-key-unknown"></i>עוד לא ידוע</span><span><i class="eg-key-thr"></i>הסף שבחרתם</span><span><i class="eg-key-next"></i>ההטלה הבאה</span></span>` +
+        `<p class="eg-step"></p><p class="eg-rec-text"></p>` +
         `<div class="eg-box"><div class="eg-building"></div><div class="eg-zoomwrap" data-steady><p class="ex-title eg-zoomtitle"></p><div class="eg-zoom" data-steady data-fig-strip></div>` +
-        `<label class="eg-winlab"><span>חלון התקריב</span><input type="range" class="eg-win" min="1" max="1" step="1" value="1" dir="ltr" aria-label="הקומה הראשונה בחלון התקריב"></label></div></div>` +
+        `<label class="eg-winlab"><span>חלון</span><input type="range" class="eg-win" min="1" max="1" step="1" value="1" dir="ltr" aria-label="הקומה הראשונה בחלון התקריב"></label></div></div>` +
         `<p class="ex-title">מספר ההטלות של התוכנית לכל סף אפשרי</p><div class="eg-chart"></div>` +
         // the game (V4): the threshold hidden, the reader drops, against the worst case
-        `<div class="ex-fold eg-game"><p class="ex-fold-title">משחק : הסף נסתר</p>` +
+        `<div class="ex-fold eg-game" data-fold="closed"><p class="ex-fold-title">משחק : הסף נסתר</p>` +
         `<div class="ex-controls"><label>הסף <select class="eg-mode" data-nolink aria-label="איך נקבע הסף הנסתר"><option value="rand">אקראי</option><option value="adv">יריב, המקרה הגרוע</option></select></label>` +
         `<label>קומה <input type="number" class="ex-num eg-gfloor" min="1" step="1" dir="ltr" inputmode="numeric" data-nolink aria-label="הקומה שממנה מטילים"></label>` +
         `<button type="button" class="md-button md-button--primary eg-gdrop">הטלה</button><button type="button" class="md-button eg-new">משחק חדש</button>` +
@@ -99,8 +100,9 @@
         return { low, high, eggs, left: st.worst - step };
       };
       const clampWin = (s) => { const { low, high } = after(st.step); const len = Math.min(ZW, high - low - 1); return Math.max(low + 1, Math.min(s, high - len)); };
+      const BH = 330, BTOP = 18, BBOT = 312;                     // the building's height and its floors' span
       const building = (s) => {
-        const W = 160, H = 380, X0 = 44, X1 = 112, TOP = 18, BOT = 362, n = st.n;
+        const W = 160, H = BH, X0 = 44, X1 = 112, TOP = BTOP, BOT = BBOT, n = st.n;
         const pitch = (BOT - TOP) / n, y = (fl) => BOT - fl * pitch;
         const next = st.step < st.drops.length ? st.drops[st.step][0] : null;
         const len = Math.min(ZW, s.high - s.low - 1), w0 = st.win, w1 = st.win + len - 1;
@@ -144,14 +146,14 @@
         return h + "</svg>";
       };
       const chart = () => {
-        const n = st.n, t = st.worst, W = 640, H = 200, X0 = 40, R = 12, TOP = 14, BASE = 170;
+        const n = st.n, t = st.worst, W = 640, H = 178, X0 = 40, R = 12, TOP = 14, BASE = 148;
         const X = (v) => X0 + (v / (n + 1)) * (W - X0 - R), Y = (v) => BASE - (v / (t + 1)) * (BASE - TOP);
         let h = `<svg class="perf-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="מספר ההטלות לכל סף, מתחת לקו של ${t}">`;
         const ystep = t > 20 ? 10 : t > 8 ? 4 : t > 3 ? 2 : 1;
         for (let v = 0; v <= t + 1; v += ystep) h += `<line class="grid" x1="${X0}" x2="${W - R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${X0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`;
         const xs = n <= 10 ? Array.from({ length: n + 1 }, (_, i) => i) : [0, Math.round(n / 4), Math.round(n / 2), Math.round(3 * n / 4), n];
         xs.forEach((v) => { h += `<text class="tick" x="${f(X(v + 0.5))}" y="${BASE + 16}" text-anchor="middle">${v}</text>`; });
-        h += `<line class="ink-line" x1="${X0}" x2="${W - R}" y1="${f(Y(t))}" y2="${f(Y(t))}" stroke-width="1.5" stroke-dasharray="6 4"/><text class="legend" x="${W - R - 4}" y="${f(Y(t) - 6)}" text-anchor="end">המקרה הגרוע : ${t}</text>`;
+        h += `<line class="ink-line" x1="${X0}" x2="${W - R}" y1="${f(Y(t))}" y2="${f(Y(t))}" stroke-width="1.5" stroke-dasharray="6 4"/><text class="legend" x="${X0 + 6}" y="${f(Y(t) - 6)}" direction="rtl" text-anchor="end">המקרה הגרוע : ${t}</text>`;   // on the left: the enlarge button's corner stays free
         let path = "";
         st.used.forEach((v, T) => { path += `${f(X(T))},${f(Y(v))} ${f(X(T + 1))},${f(Y(v))} `; });
         h += `<polyline class="s1-line" points="${path.trim()}" fill="none" stroke-width="2"/>`;
@@ -167,7 +169,7 @@
         win.min = s.low + 1; win.max = Math.max(s.low + 1, s.high - len); win.value = st.win; win.disabled = s.high - s.low - 1 <= ZW;
         $(".eg-building").innerHTML = building(s);
         $(".eg-zoom").innerHTML = zoom(s);
-        $(".eg-zoomtitle").textContent = s.high - s.low > 1 ? `תקריב : קומות ${st.win} עד ${st.win + len - 1} מתוך ${s.high - s.low - 1} הלא ידועות (${s.low + 1} עד ${s.high - 1})` : "תקריב";
+        $(".eg-zoomtitle").textContent = s.high - s.low > 1 ? `תקריב : קומות ${st.win} עד ${st.win + len - 1}` + (len < s.high - s.low - 1 ? ` מתוך ${s.low + 1} עד ${s.high - 1}` : ", כל הלא ידועות") : "תקריב";
         $(".eg-chart").innerHTML = chart();
         $(".ex-pos").textContent = `הטלה ${st.step} מתוך ${st.drops.length}`;
         $(".ex-prev").disabled = st.step === 0; $(".ex-next").disabled = done; $(".ex-end").disabled = done;
@@ -175,13 +177,15 @@
         $(".eg-sum").innerHTML = `${ltr(st.k)} ${st.k === 1 ? "ביצה" : "ביצים"} ו-${ltr(st.n)} קומות : המקרה הגרוע הוא ${ltr(st.worst)} הטלות, ` +
           `והסף ${ltr(st.T)} דורש ${ltr(st.drops.length)}. ${worstCount === st.n + 1 ? "כל" : ltr(worstCount)} ${worstCount === 1 ? "סף אחד מגיע" : "ספים מגיעים"} למקרה הגרוע, ואף סף לא עובר אותו ✓`;
         let step;
-        if (st.step === 0) step = `לפני ההטלה הראשונה : ${ltr(st.n)} קומות לא ידועות, ${ltr(st.k)} ביצים ו-${ltr(st.worst)} הטלות. ` +
-          (st.drops.length ? `ההטלה הראשונה מקומה ${ltr(st.drops[0][0])} : מתחתיה ${ltr(st.drops[0][0] - 1)} קומות, בדיוק מה ש-${ltr(st.k - 1)} ${st.k - 1 === 1 ? "ביצה מספיקה לה" : "ביצים מספיקות להן"} ב-${ltr(st.worst - 1)} הטלות.` : "אין מה להטיל.");
+        const rec = $(".eg-rec").checked;                  // the formula's paragraph explains the next drop
+        if (st.step === 0) step = `לפני ההטלה הראשונה : ${ltr(st.n)} קומות לא ידועות, ${ltr(st.k)} ${st.k === 1 ? "ביצה" : "ביצים"} ו-${ltr(st.worst)} הטלות. ` +
+          (!st.drops.length ? "אין מה להטיל." : rec ? `הראשונה מקומה ${ltr(st.drops[0][0])}.` :
+            `הראשונה מקומה ${ltr(st.drops[0][0])} : מתחתיה ${ltr(st.drops[0][0] - 1)} קומות, מה ש-${ltr(st.k - 1)} ${st.k - 1 === 1 ? "ביצה מספיקה לה" : "ביצים מספיקות להן"} ב-${ltr(st.worst - 1)} הטלות.`);
         else {
           const [fl, broke] = st.drops[st.step - 1];
-          step = `הטלה ${ltr(st.step)} מקומה ${ltr(fl)} : ` + (broke ? `<span class="wv-bad">נשברה</span>, הסף מתחת ל-${ltr(fl)}, נשארו ${ltr(s.eggs)} ${s.eggs === 1 ? "ביצה" : "ביצים"}.` : `<span class="wv-ok">לא נשברה</span>, הסף הוא ${ltr(fl)} או מעליו.`) +
-            (done ? ` <b>הסתיים אחרי ${ltr(st.step)} הטלות</b> : קומה ${ltr(s.low)} בטוחה ו-${ltr(s.high)} שוברת, ולכן הסף הוא ${ltr(s.low)} ✓` :
-              ` נשארו ${ltr(s.high - s.low - 1)} קומות לא ידועות (${ltr(s.low + 1)} עד ${ltr(s.high - 1)}), ${ltr(s.eggs)} ${s.eggs === 1 ? "ביצה" : "ביצים"} ו-${ltr(s.left)} הטלות; הבאה מקומה ${ltr(st.drops[st.step][0])}` +
+          step = `הטלה ${ltr(st.step)} מקומה ${ltr(fl)} : ` + (broke ? `<span class="wv-bad">נשברה</span>, נשארו ${ltr(s.eggs)} ${s.eggs === 1 ? "ביצה" : "ביצים"}.` : `<span class="wv-ok">לא נשברה</span>.`) +
+            (done ? ` <b>הסתיים</b> : הסף הוא ${ltr(s.low)} ✓` :
+              ` לא ידועות : ${ltr(`${s.low + 1}–${s.high - 1}`)}, עם ${ltr(s.left)} הטלות; הבאה מקומה ${ltr(st.drops[st.step][0])}` +
               (s.eggs === 1 ? ` (ביצה אחרונה : קומה אחר קומה).` : `.`));
         }
         $(".eg-step").innerHTML = step;
@@ -190,13 +194,13 @@
         // the recurrence for the next drop, in words, next to the bands on the building
         if ($(".eg-rec").checked && !done) {
           const sp = eggsSplitAt(st.F, s.low, s.high, s.eggs, s.left), e = s.eggs, t = s.left;
-          $(".eg-rec-text").innerHTML = `הנוסחה על הבניין : ההטלה הבאה מקומה ${ltr(sp.floor)}. מתחתיה <span class="eg-below-txt">${ltr(sp.below)} קומות</span>, ` +
-            (e === 1 ? `ואין עוד ביצה אחרי שבירה, ולכן עולים קומה אחר קומה. ` :
+          $(".eg-rec-text").innerHTML = `הנוסחה : מתחת ל-${ltr(sp.floor)} <span class="eg-below-txt">${ltr(sp.below)} קומות</span>` +
+            (e === 1 ? `, כי אחרי שבירה אין עוד ביצה. ` :
               sp.below === sp.fBelow
-                ? `בדיוק ${ltr(`f(${e - 1}, ${t - 1}) = ${sp.fBelow}`)} : מה ש-${ltr(e - 1)} ${e - 1 === 1 ? "ביצה שנשארת" : "ביצים שנשארות"} אחרי שבירה מכריעות ב-${ltr(t - 1)} ההטלות שנשארו. `
-                : `פחות מ-${ltr(`f(${e - 1}, ${t - 1}) = ${sp.fBelow}`)}, כי ההטלה לא עולה מעל הקומה האחרונה שעוד לא ידועה. ${ltr(e - 1)} ${e - 1 === 1 ? "ביצה שנשארת" : "ביצים שנשארות"} אחרי שבירה מכריעות ב-${ltr(t - 1)} ההטלות שנשארו עד ${ltr(sp.fBelow)} קומות, ולכן גם ${ltr(sp.below)} האלה. `) +
-            `מעליה <span class="eg-above-txt">${ltr(sp.above)} קומות</span>, ו-${ltr(`f(${e}, ${t - 1}) = ${sp.fAbove}`)} ${sp.above === sp.fAbove ? "מכריעות בדיוק אותן" : "מכריעות עד כמה שצריך"} אם היא לא נשברת. ` +
-            `ביחד ${ltr(`f(${e}, ${t}) = f(${e - 1}, ${t - 1}) + 1 + f(${e}, ${t - 1}) = ${sp.fBelow} + 1 + ${sp.fAbove}`)}${sp.fBelow + 1 + sp.fAbove > st.n ? `, יותר מ-${ltr(st.n)} הקומות` : ""}, והטווח הלא ידוע הוא ${ltr(s.high - s.low - 1)} קומות.`;
+                ? ` ${ltr(`= f(${e - 1}, ${t - 1})`)}, מה ש-${ltr(e - 1)} ${e - 1 === 1 ? "ביצה מכריעה" : "ביצים מכריעות"} ב-${ltr(t - 1)} הטלות אחרי שבירה. `
+                : `, פחות מ-${ltr(`f(${e - 1}, ${t - 1}) = ${sp.fBelow}`)}, כי ההטלה לא עולה מעל הקומה הלא ידועה האחרונה. `) +
+            `מעליה <span class="eg-above-txt">${ltr(sp.above)} קומות</span> ${ltr(`${sp.above === sp.fAbove ? "=" : "≤"} f(${e}, ${t - 1})${sp.above === sp.fAbove ? "" : ` = ${sp.fAbove}`}`)}, לכל הביצים אם היא שורדת. ` +
+            `ביחד ${ltr(`f(${e}, ${t}) = ${sp.fBelow} + 1 + ${sp.fAbove}`)}, לא פחות מ-${ltr(s.high - s.low - 1)} הקומות הלא ידועות.`;
         } else $(".eg-rec-text").innerHTML = "";
         // the clickable floors
         box.querySelectorAll(".eg-row").forEach((r) => {
@@ -207,8 +211,8 @@
         const hit = $(".eg-hit");
         if (hit) hit.addEventListener("click", (e) => {
           const svg = hit.ownerSVGElement, r = svg.getBoundingClientRect();
-          const yv = 18 + ((e.clientY - r.top) / r.height) * 380;
-          const fl = Math.round(st.n - ((yv - 18) / (362 - 18)) * st.n);
+          const yv = ((e.clientY - r.top) / r.height) * BH;
+          const fl = Math.round(st.n - ((yv - BTOP) / (BBOT - BTOP)) * st.n);
           setT(Math.max(0, Math.min(st.n, fl)), true);
         });
       };
@@ -287,6 +291,6 @@
       eggs: "k ביצים ו-n קומות בבקרות, והסף נבחר בלחיצה על הבניין, על קומה בתקריב או בשדה. ״ההטלה הבאה״ ו״הפעלה״ מריצים את התוכנית : הבניין צובע את הקומות הידועות, התקריב מראה את הקומות הלא ידועות אחת-אחת, והגרף סופר את ההטלות לכל סף מתחת לקו של המקרה הגרוע. המתג ״הנוסחה על הבניין״ מסמן ליד הבניין את שני החלקים של ההטלה הבאה, f(k − 1, t − 1) מתחתיה ו-f(k, t − 1) מעליה. ״משחק : הסף נסתר״ : מטילים מקומות לבחירתכם מול סף אקראי או יריב, ומשווים למקרה הגרוע.",
     },
     models: { eggsTable, eggsSplitAt, eggsDrops, eggsRun, eggsFirst, eggsPerThreshold, eggsNeed, eggsAdversary },
-    cols: { eggs: { main: ".viz-legend, .eg-box", side: ".eg-step, .eg-rec-text, .ex-title, .eg-chart, .eg-game", w: "minmax(0, 1fr)" } },   // the building and its zoom beside the step text, the chart and the game
+    cols: { eggs: { main: ".eg-box", side: ".eg-step, .eg-rec-text, .ex-title, .eg-chart, .eg-game", w: "minmax(0, 1fr)" } },   // the legend over both; the building and its zoom beside the step text, the chart and the game
   });
 })();
