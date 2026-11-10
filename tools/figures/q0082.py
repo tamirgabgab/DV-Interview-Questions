@@ -6,10 +6,11 @@
 
 blocks() returns them in page order: for part a the heaps 3, 4, 5 in binary with their XOR
 row (the column of the XOR's highest bit marked, and the one heap that has it), the same
-table after the winning move, their legend, and a table of positions with every winning
-move; for part b the endgame (1, 1, 4) under the two rules; for part c the Grundy numbers of
+table after the winning move, their legend, the block diagram of the combinational
+nim_move_hw, and a table of positions with every winning move; for part b the endgame (1, 1, 4) under the two rules; for part c the Grundy numbers of
 {1, 3, 4} from 0 to 13 with the period of 7 tinted, its legend, and a table of positions in
-the subtraction game (the XOR of the Grundy numbers against the XOR of the sizes).
+the subtraction game with every winning move (the XOR of the Grundy numbers against the
+XOR of the sizes).
 tests/0082 checks that the page copies match and solves every position by brute force.
 """
 
@@ -17,6 +18,7 @@ from __future__ import annotations
 
 import sys
 from functools import reduce
+from html import escape
 from operator import xor
 from pathlib import Path
 
@@ -74,6 +76,11 @@ def bits(v: int, n: int = BITS) -> str:
 
 def heaps_txt(h) -> str:
     return f'<span dir="ltr">({", ".join(map(str, h))})</span>'
+
+
+def arrow(a, b) -> str:
+    """One move "a → b", never split at the end of a line (non-breaking spaces)."""
+    return f"{a}\u00a0→\u00a0{b}"
 
 
 def move_txt(heaps, mv) -> str:
@@ -134,10 +141,67 @@ def table_examples() -> str:
         x = nim_xor(h)
         mv = nim_moves(h)
         verdict = "מפסיד" if not x else "מנצח"
-        moves = "; ".join(f"{h[i]} → {new}" for i, new in mv)
+        moves = "; ".join(arrow(h[i], new) for i, new in mv)
         moves = f'<span dir="ltr">{moves}</span>' if mv else "אין"
         lines.append(f'| {heaps_txt(h)} | <span dir="ltr">{x} = {bits(x, 4)}</span> | {verdict} | {moves} |')
     return "\n".join(lines)
+
+
+# --- part a in hardware: the block diagram of nim_move_hw ----------------------------------
+
+NB = "\u00a0"
+DP_W, DP_H = 400, 440
+# (x, y, w, h, kind, title, sub): one column of blocks, the data flowing down
+DP_BLOCKS = (
+    (50, 40, 270, 46, "tree", "XOR tree", "x = heap[0] ^ ... ^ heap[n-1]"),
+    (50, 116, 270, 46, "logic", "leading one", "top = the highest 1 of x"),
+    (50, 192, 270, 46, "logic", "candidates", "cand[i] = |(heap[i] & top)"),
+    (50, 268, 270, 46, "logic", "priority encoder", "idx = the first 1 of cand"),
+    (50, 344, 270, 46, "out", "mux + XOR", "new_size = heap[idx] ^ x"),
+)
+# (points, arrow head, label, label x, label y, anchor)
+DP_WIRES = (
+    (((185, 4), (185, 40)), True, "heap[0..n-1]", 179, 16, "end"),
+    (((185, 22), (350, 22), (350, 215), (320, 215)), True, "", 0, 0, ""),
+    (((350, 215), (350, 367), (320, 367)), True, "heap", 355, 335, "start"),
+    (((185, 86), (185, 116)), True, "x", 191, 106, "start"),
+    (((185, 100), (22, 100), (22, 367), (50, 367)), True, "x", 28, 300, "start"),
+    (((185, 162), (185, 192)), True, "top", 191, 182, "start"),
+    (((185, 238), (185, 268)), True, "cand", 191, 258, "start"),
+    (((185, 314), (185, 344)), True, "idx", 191, 334, "start"),
+    (((320, 291), (396, 291)), True, "valid", 394, 284, "end"),
+    (((185, 390), (185, 420)), True, "new_size", 191, 414, "start"),
+)
+DP_DOTS = ((185, 22), (350, 215), (185, 100))
+
+
+def dp_wire(pts, arrow=True):
+    d = "M" + " L".join(f"{x:g},{y:g}" for x, y in pts)
+    return f'<path class="nm-wire" d="{d}"' + (' marker-end="url(#nm-hb)"' if arrow else "") + "/>"
+
+
+def diagram_svg() -> str:
+    """Part a in hardware: nim_move as a combinational block. The XOR tree gives x, the
+    leading-one detector its top bit as a one-hot top, an AND per heap the candidates, a
+    priority encoder the first of them, and a mux with an XOR the new size."""
+    label = ("תרשים המלבנים של nim_move_hw, מעגל צירופי בלי שעון" + NB + ": עץ XOR מחשב את x מכל הערימות. "
+             "גלאי האחד המוביל מוציא את top, עם ביט דלוק אחד במקום הביט הגבוה של x. "
+             "לכל ערימה, AND עם top ואחריו OR של הביטים אומר אם היא מועמדת, ו-valid הוא OR של המועמדות. "
+             "מקודד עדיפות בוחר את המועמדת הראשונה, idx, ומרבב בוחר את heap[idx], וה-XOR שלו עם x הוא new_size")
+    o = [f'<svg class="figure nm-fig nm-dp" viewBox="0 0 {DP_W} {DP_H}" direction="ltr" style="max-width:{DP_W / 16:g}rem" '
+         f'role="img" aria-label="{escape(label)}">',
+         '<defs><marker id="nm-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" '
+         'markerHeight="9" orient="auto"><path class="nm-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs>']
+    for x, y, w, h, cls, title, sub in DP_BLOCKS:
+        o.append(f'<g class="nm-blk nm-{cls}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="5"/>'
+                 f'<text x="{x + w / 2:g}" y="{y + h / 2 - 3:g}" text-anchor="middle">{escape(title)}</text>'
+                 f'<text class="nm-sub" x="{x + w / 2:g}" y="{y + h / 2 + 13:g}" text-anchor="middle">{escape(sub)}</text></g>')
+    for pts, arrow, lab, lx, ly, anchor in DP_WIRES:
+        o.append(dp_wire(pts, arrow))
+        if lab:
+            o.append(f'<text class="nm-wlab" x="{lx}" y="{ly}" text-anchor="{anchor}">{escape(lab)}</text>')
+    o += [f'<circle class="nm-dot" cx="{x}" cy="{y}" r="3"/>' for x, y in DP_DOTS]
+    return "".join(o) + "</svg>"
 
 
 # --- part b --------------------------------------------------------------------------------
@@ -182,7 +246,7 @@ SUB_EXAMPLES = [(3, 4, 5), (5, 6, 7), (10, 11, 6), (2, 9, 16)]
 
 
 def table_sub() -> str:
-    lines = ["| הערימות | מספרי גרנדי | ‏XOR של גרנדי | מי שתורו | מהלך מנצח | ‏XOR של הגדלים |",
+    lines = ["| הערימות | מספרי גרנדי | ‏XOR של גרנדי | מי שתורו | המהלכים המנצחים | ‏XOR של הגדלים |",
              "|:-:|:-:|:-:|:-:|:-:|:-:|"]
     for h in SUB_EXAMPLES:
         g = grundy(max(h))
@@ -190,14 +254,14 @@ def table_sub() -> str:
         x = reduce(xor, gs, 0)
         mv = sub_moves(h)
         win = "מנצח" if x else "מפסיד"
-        first = "אין" if not mv else f'<span dir="ltr">{h[mv[0][0]]} → {mv[0][1]}</span>'
-        lines.append(f'| {heaps_txt(h)} | <span dir="ltr">{", ".join(map(str, gs))}</span> | ‏{x} | {win} | {first} | ‏{nim_xor(h)} |')
+        moves = "אין" if not mv else '<span dir="ltr">' + "; ".join(arrow(h[i], new) for i, new in mv) + "</span>"
+        lines.append(f'| {heaps_txt(h)} | <span dir="ltr">{", ".join(map(str, gs))}</span> | ‏{x} | {win} | {moves} | ‏{nim_xor(h)} |')
     return "\n".join(lines)
 
 
 def blocks():
     """The generated blocks, in page order."""
-    return [table_before(), table_after(), legend_a(), table_examples(), table_misere(),
+    return [table_before(), table_after(), legend_a(), diagram_svg(), table_examples(), table_misere(),
             table_grundy(), legend_grundy(), table_sub()]
 
 

@@ -175,7 +175,7 @@ def test_follow_ups():
 
 def test_page_text():
     for s in ["\\( 3 \\oplus 4 \\oplus 5 = 2 \\)", "\\( 1 \\oplus 2 \\oplus 3 = 0 \\)", "0, 1, 0, 1, 2, 3, 2",
-              "\\operatorname{mex}\\{2, 2, 1\\} = 0", "5 → 2, ‏6 → 1 ו-7 → 0", "0, 1, 2, 4, 3, 5, 6, 8",
+              "\\operatorname{mex}\\{2, 2, 1\\} = 0", '<span dir="ltr">5 → 2</span>, <span dir="ltr">6 → 1</span>', 'ו-<span dir="ltr">7 → 0</span>. ל-3', "0, 1, 2, 4, 3, 5, 6, 8",
               'data-kind="nim" data-heaps="3,4,5" data-rule="normal"',
               'data-kind="nim" data-heaps="1,1,4,6" data-rule="misere"',
               'data-kind="nim" data-heaps="5,6,7" data-rule="sub"']:
@@ -235,3 +235,58 @@ def test_explorer_matches_the_reference():
     assert mis["over"] and mis["winner"] == 0 and len(mis["moves"]) == 4
     # an illegal move in the subtraction game (take 2) is refused
     assert got["bad"]["bad"] and got["bad"]["moves"] == []
+
+
+def test_box_tasks_and_hints():
+    """The tasks of the three "try it" paragraphs, played on the box's model, and the box's
+    list of every winning move and its XOR column against the brute force."""
+    from page_tests import explorer_require, node_json
+
+    cases = {r: [list(h) for h in product(range(6), repeat=3) if sum(h)] for r in ("normal", "misere", "sub")}
+    got = node_json(f"const m = {explorer_require()};"
+                    f"const cases = {cases};"
+                    "console.log(JSON.stringify({"
+                    "all: Object.fromEntries(Object.entries(cases).map(([r, hs]) => [r, hs.map((h) => m.nimWinMoves(r, h))])),"
+                    "bx: cases.sub.map((h) => m.nimBoardXor('sub', h)),"
+                    "t1: m.nimPlay('normal', [3, 4, 5], 'me', [[2, 2]]),"
+                    "t2: m.nimPlay('normal', [1, 2, 3], 'pc', []),"
+                    "t3: m.nimWinMoves('normal', [3, 5, 6, 7]),"
+                    "t4: m.nimPlay('misere', [1, 1, 4], 'me', [[2, 0]]),"
+                    "t5: m.nimPlay('misere', [1, 1, 4], 'me', [[2, 1]]),"
+                    "t6: m.nimPlay('sub', [5, 6, 7], 'me', [[1, 5]]),"
+                    "t7: m.nimWinMoves('sub', [7]),"
+                    "t8: m.nimPlay('sub', [3, 4, 5], 'pc', []),"
+                    "t9: m.nimWinMoves('sub', [5, 6, 7]),"
+                    "}));")
+    # every winning move: exactly the legal moves to a lost position
+    for rule, hs in cases.items():
+        for h, mv in zip(hs, got["all"][rule]):
+            want = []
+            for i, x in enumerate(h):
+                for nw in range(x):
+                    if rule == "sub" and x - nw not in SUB:
+                        continue
+                    after = tuple(sorted(h[:i] + [nw] + h[i + 1:]))
+                    if not wins(after, rule):
+                        want.append([i, nw])
+            assert mv == want, (rule, h, mv, want)
+    g = grundy(10)
+    assert got["bx"] == [reduce(xor, (g[v] for v in h), 0) for h in cases["sub"]]
+    # box 1: 5 -> 2, the computer answers 4 -> 1 and leaves 3, 1, 2 (XOR 0)
+    assert got["t1"]["moves"][:2] == [[0, 2, 5, 2], [1, 1, 4, 1]] and got["t1"]["heaps"] == [3, 1, 2]
+    # 1, 2, 3 with the computer first: one token from the largest, and the position wins for me
+    assert got["t2"]["moves"] == [[1, 2, 3, 2]] and wins((1, 2, 2), "normal")
+    # 3, 5, 6, 7: three heaps with the bit 4, three winning moves
+    assert got["t3"] == [[1, 2], [2, 1], [3, 0]]
+    # misère 1, 1, 4: 4 -> 0 loses (the computer takes a 1), 4 -> 1 wins
+    assert got["t4"]["moves"][1][0] == 1 and wins((0, 1, 1), "misere") and not wins((1, 1, 1), "misere")
+    assert got["t5"]["moves"][0] == [0, 2, 4, 1]
+    # sub 5, 6, 7: 6 -> 5 raises g from 2 to 3 and leaves XOR 0
+    assert (g[6], g[5]) == (2, 3) and not wins((5, 5, 7), "sub") and got["t6"]["moves"][0] == [0, 1, 6, 5]
+    # a heap of 7 alone: no winning move, the moves go to 6, 4 and 3, all winning for the opponent
+    assert got["t7"] == [] and all(wins((v,), "sub") for v in (6, 4, 3))
+    # 3, 4, 5 with the computer first: it is lost for the computer
+    assert not wins((3, 4, 5), "sub") and got["t8"]["moves"][0][0] == 1
+    # every winning move of 5, 6, 7 (the box's list and the gen-8 table)
+    assert got["t9"] == [[0, 4], [1, 5], [2, 3]] == [list(m) for m in q0082.sub_moves((5, 6, 7))]
+    assert [list(m) for m in q0082.sub_moves((10, 11, 6))] == [[0, 9], [0, 7], [2, 5]]

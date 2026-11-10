@@ -1,0 +1,22 @@
+/* Question 0082, Nim: the block diagram of nim_move_hw (tools/figures/q0082.py, nm-*), drawn
+   left to right like the other block diagrams (0097's isq-dp): the XOR tree in blue, the
+   logic blocks plain, the output block in green; and two states of the nim box
+   (explorer/nim.js): the legend key of a token that the subtraction rule does not allow, and
+   the XOR row of a misère endgame, where the XOR no longer decides (plain, dashed). Colours
+   from the palette only. */
+
+.md-typeset svg.nm-dp { display: block; margin-inline: auto; width: 100%; height: auto; }
+.md-typeset svg.nm-dp .nm-headp { fill: var(--viz-text); }
+.md-typeset svg.nm-dp .nm-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
+.md-typeset svg.nm-dp .nm-blk.nm-tree rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.nm-dp .nm-blk.nm-out rect { fill: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg.nm-dp .nm-blk text { fill: var(--viz-ink); font-size: 13px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.nm-dp .nm-blk text.nm-sub { fill: var(--viz-text); font-size: 12px; font-weight: 400; }
+.md-typeset svg.nm-dp .nm-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.nm-dp .nm-dot { fill: var(--viz-text); }
+.md-typeset svg.nm-dp .nm-wlab { fill: var(--viz-s3-text); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+
+/* the nim box */
+.md-typeset .viz-legend .nim-key-no { border-radius: 50%; background: var(--md-default-bg-color); outline: 2px solid var(--viz-grid); outline-offset: -2px; }
+.md-typeset table.gs-bits.nim-bin tr.nim-off td.gs-b { border-style: dashed; }
+.md-typeset .viz-legend > span.nim-key-nolab[hidden] { display: none; }

@@ -24,8 +24,8 @@ added: 2026-11-04
 
 ??? interviewer "מה המראיין בודק"
     - **מצב מנצח ומצב מפסיד :** האם המועמד מגדיר "מי שתורו מפסיד" כתכונה של מצב, ומבין
-      שמספיק להראות שתי תכונות : מכל מצב מפסיד כל מהלך יוצא ממנו, ומכל מצב אחר יש מהלך
-      חזרה אליו.
+      שמספיק להראות שלוש תכונות : הסוף מפסיד, מכל מצב מפסיד כל מהלך יוצא ממנו, ומכל מצב
+      אחר יש מהלך חזרה אליו.
     - **הבינארי :** האם הוא מגיע ל-XOR, ולא נתקע על הסכום או על הזוגיות.
     - **הוכחה ולא רק נוסחה :** שני הכיוונים, ולמה תמיד יש ערימה שאפשר להקטין לגודל הנכון.
     - **חוק אחר :** האם הוא מזהה מתי האסטרטגיה עוד עובדת עם תיקון קטן (סעיף ב), ומתי צריך
@@ -143,9 +143,95 @@ added: 2026-11-04
         endfunction
         ```
 
-        1. ה-XOR של כל הערימות. בחומרה זה עץ של שערי XOR.
+        1. ה-XOR של כל הערימות. בחומרה זה עץ של שערי XOR, בתרשים שלמטה.
         2. מצב מפסיד : אין מהלך מנצח.
         3. הערימה הראשונה שיש לה את הביט הגבוה של \( x \).
+
+    **בחומרה.** אותו כלל הוא גם מעגל צירופי, בלי שעון. עץ XOR מחשב את \( x \), גלאי האחד
+    המוביל משאיר ממנו רק את הביט הגבוה (`top`), ‏AND של כל ערימה עם `top` אומר אם היא
+    מועמדת, מקודד עדיפות בוחר את המועמדת הראשונה, ומרבב עם XOR נותן את הגודל החדש.
+    ל-\( n \) ערימות של \( w \) ביטים העומק הוא \( O(\log n + \log w) \) רמות של שערים :
+
+    <!-- gen 3 -->
+
+    <svg class="figure nm-fig nm-dp" viewBox="0 0 400 440" direction="ltr" style="max-width:25rem" role="img" aria-label="תרשים המלבנים של nim_move_hw, מעגל צירופי בלי שעון : עץ XOR מחשב את x מכל הערימות. גלאי האחד המוביל מוציא את top, עם ביט דלוק אחד במקום הביט הגבוה של x. לכל ערימה, AND עם top ואחריו OR של הביטים אומר אם היא מועמדת, ו-valid הוא OR של המועמדות. מקודד עדיפות בוחר את המועמדת הראשונה, idx, ומרבב בוחר את heap[idx], וה-XOR שלו עם x הוא new_size"><defs><marker id="nm-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path class="nm-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs><g class="nm-blk nm-tree"><rect x="50" y="40" width="270" height="46" rx="5"/><text x="185" y="60" text-anchor="middle">XOR tree</text><text class="nm-sub" x="185" y="76" text-anchor="middle">x = heap[0] ^ ... ^ heap[n-1]</text></g><g class="nm-blk nm-logic"><rect x="50" y="116" width="270" height="46" rx="5"/><text x="185" y="136" text-anchor="middle">leading one</text><text class="nm-sub" x="185" y="152" text-anchor="middle">top = the highest 1 of x</text></g><g class="nm-blk nm-logic"><rect x="50" y="192" width="270" height="46" rx="5"/><text x="185" y="212" text-anchor="middle">candidates</text><text class="nm-sub" x="185" y="228" text-anchor="middle">cand[i] = |(heap[i] &amp; top)</text></g><g class="nm-blk nm-logic"><rect x="50" y="268" width="270" height="46" rx="5"/><text x="185" y="288" text-anchor="middle">priority encoder</text><text class="nm-sub" x="185" y="304" text-anchor="middle">idx = the first 1 of cand</text></g><g class="nm-blk nm-out"><rect x="50" y="344" width="270" height="46" rx="5"/><text x="185" y="364" text-anchor="middle">mux + XOR</text><text class="nm-sub" x="185" y="380" text-anchor="middle">new_size = heap[idx] ^ x</text></g><path class="nm-wire" d="M185,4 L185,40" marker-end="url(#nm-hb)"/><text class="nm-wlab" x="179" y="16" text-anchor="end">heap[0..n-1]</text><path class="nm-wire" d="M185,22 L350,22 L350,215 L320,215" marker-end="url(#nm-hb)"/><path class="nm-wire" d="M350,215 L350,367 L320,367" marker-end="url(#nm-hb)"/><text class="nm-wlab" x="355" y="335" text-anchor="start">heap</text><path class="nm-wire" d="M185,86 L185,116" marker-end="url(#nm-hb)"/><text class="nm-wlab" x="191" y="106" text-anchor="start">x</text><path class="nm-wire" d="M185,100 L22,100 L22,367 L50,367" marker-end="url(#nm-hb)"/><text class="nm-wlab" x="28" y="300" text-anchor="start">x</text><path class="nm-wire" d="M185,162 L185,192" marker-end="url(#nm-hb)"/><text class="nm-wlab" x="191" y="182" text-anchor="start">top</text><path class="nm-wire" d="M185,238 L185,268" marker-end="url(#nm-hb)"/><text class="nm-wlab" x="191" y="258" text-anchor="start">cand</text><path class="nm-wire" d="M185,314 L185,344" marker-end="url(#nm-hb)"/><text class="nm-wlab" x="191" y="334" text-anchor="start">idx</text><path class="nm-wire" d="M320,291 L396,291" marker-end="url(#nm-hb)"/><text class="nm-wlab" x="394" y="284" text-anchor="end">valid</text><path class="nm-wire" d="M185,390 L185,420" marker-end="url(#nm-hb)"/><text class="nm-wlab" x="191" y="414" text-anchor="start">new_size</text><circle class="nm-dot" cx="185" cy="22" r="3"/><circle class="nm-dot" cx="350" cy="215" r="3"/><circle class="nm-dot" cx="185" cy="100" r="3"/></svg>
+
+    <!-- /gen -->
+
+    ```systemverilog title="module nim_move_hw" linenums="1" hl_lines="13 15 16 19 20"
+    // nim_move without a clock: N heaps of W bits (N >= 2); valid = 0 when the player to
+    // move loses, otherwise heap idx goes down to new_size
+    module nim_move_hw #(parameter int N = 3, parameter int W = 3) (
+      input  logic [N-1:0][W-1:0]  heap,
+      output logic                 valid,
+      output logic [$clog2(N)-1:0] idx,
+      output logic [W-1:0]         new_size
+    );
+      logic [W-1:0] x, top;
+      logic [N-1:0] cand;
+      always_comb begin
+        x = '0;
+        for (int i = 0; i < N; i++) x ^= heap[i];                  // (1)!
+        top = '0;
+        for (int b = 0; b < W; b++) if (x[b]) top = W'(1) << b;    // (2)!
+        for (int i = 0; i < N; i++) cand[i] = |(heap[i] & top);    // (3)!
+        valid = |cand;
+        idx = '0;
+        for (int i = N - 1; i >= 0; i--) if (cand[i]) idx = i;     // (4)!
+        new_size = heap[idx] ^ x;                                  // (5)!
+      end
+    endmodule
+    ```
+
+    1. עץ XOR : הסינתזה בונה מהלולאה \( \lceil \log_2 n \rceil \) רמות של שערים לכל ביט.
+    2. גלאי האחד המוביל : הביט הדלוק האחרון בלולאה הוא הגבוה, ו-`top` דלוק רק בו.
+    3. המועמדות, הערימות שיש להן את הביט הגבוה של \( x \). ‏`valid` הוא OR שלהן, והוא 1
+       בדיוק כש-\( x \ne 0 \).
+    4. מקודד עדיפות : המועמדת הראשונה, כמו בלולאה של הפונקציה.
+    5. מרבב שבוחר את `heap[idx]`, ו-XOR עם \( x \) : התנאי \( h \oplus x < h \) של הפונקציה
+       כבר מובטח, כי למועמדת יש את הביט הגבוה.
+
+    **האימות.** ה-assertions הן שני הכיוונים של ההוכחה שלמטה : כש-`valid` דולק, המהלך חוקי
+    וה-XOR אחריו 0, וכש-`valid` כבוי, ה-XOR כבר 0. הכיסוי סופר מצבים מפסידים ואת מספר
+    הערימות המועמדות :
+
+    ```systemverilog title="module nim_move_check" linenums="1" hl_lines="16 18 19 20 21 23"
+    // the checks of nim_move_hw, sampled on a clock of the testbench: a move is legal and
+    // leaves XOR 0, and valid = 0 only on XOR 0; covered: a lost position, k candidates
+    module nim_move_check #(parameter int N = 3, parameter int W = 3) (
+      input logic                 clk,
+      input logic [N-1:0][W-1:0]  heap,
+      input logic                 valid,
+      input logic [$clog2(N)-1:0] idx,
+      input logic [W-1:0]         new_size
+    );
+      logic [W-1:0] x;
+      int ncand, fails = 0, lost = 0, hits[N + 1];
+      always_comb begin
+        x = '0;
+        for (int i = 0; i < N; i++) x ^= heap[i];
+        ncand = 0;
+        for (int i = 0; i < N; i++) if ((heap[i] ^ x) < heap[i]) ncand++;    // (1)!
+      end
+      a_move: assert property (@(posedge clk) valid |-> idx < N && new_size < heap[idx] &&
+                                              (x ^ heap[idx] ^ new_size) == 0) else fails++;
+      a_lost: assert property (@(posedge clk) !valid |-> x == 0) else fails++;
+      c_lost: cover property (@(posedge clk) x == 0) lost++;
+      for (genvar k = 1; k <= N; k += 2) begin : g_cand                 // (2)!
+        c_cand: cover property (@(posedge clk) ncand == k) hits[k]++;
+      end
+    endmodule
+    ```
+
+    1. מספר המהלכים המנצחים לפי התנאי של הפונקציה, ולא לפי המימוש שנבדק.
+    2. בעמודה של הביט הגבוה של \( x \) יש מספר אי-זוגי של אחדות, ולכן רק מספר אי-זוגי של
+       מועמדות אפשרי : בשלוש ערימות, 1 או 3.
+
+    הטסט של השאלה מריץ את שניהם ב-Verilator על כל 512 המצבים של שלוש ערימות של 3 ביטים, מצב
+    בכל מחזור, ומשווה לפתרון בכוח של המשחק. אף assertion לא נופלת, הכיסוי רואה את 64 המצבים
+    המפסידים ואת שני הסוגים של מועמדות, ועותק עם באג, שבו מועמדת היא כל ערימה עם ביט משותף
+    ל-\( x \), מפיל את `a_move`. ברוחב גדול יותר עוברים על מצבים אקראיים עד שהכיסוי מלא, או
+    מוכיחים ב-formal מול `nim_move`.
 
     #### למה זה נכון { .sol-proof }
 
@@ -164,25 +250,29 @@ added: 2026-11-04
     באינדוקציה על מספר האסימונים : מצב מפסיד בדיוק כשהוא ב-\( P \).
 
     **כמה מהלכים מנצחים יש?** בדיוק כמספר הערימות שיש להן את הביט הגבוה של \( x \), כי רק בהן
-    \( h \oplus x < h \). ב-3, 4, 5 יש אחת כזו. שני מצבים בטבלה מראים מלכודות : ב-1, 1, 2 הסכום
-    זוגי ובכל זאת מי שתורו מנצח, וב-5, 6, 7, 8 המהלך היחיד הוא מהערימה הגדולה :
+    \( h \oplus x < h \). ב-3, 4, 5 יש אחת כזו. בטבלה עוד מצבים, וב-5, 6, 7, 8 המהלך היחיד הוא
+    דווקא מהערימה הגדולה :
 
-    <!-- gen 3 -->
+    <!-- gen 4 -->
 
     | הערימות | ‏XOR | מי שתורו | המהלכים המנצחים |
     |:-:|:-:|:-:|:-:|
-    | <span dir="ltr">(3, 4, 5)</span> | <span dir="ltr">2 = 0010</span> | מנצח | <span dir="ltr">3 → 1</span> |
+    | <span dir="ltr">(3, 4, 5)</span> | <span dir="ltr">2 = 0010</span> | מנצח | <span dir="ltr">3 → 1</span> |
     | <span dir="ltr">(1, 2, 3)</span> | <span dir="ltr">0 = 0000</span> | מפסיד | אין |
-    | <span dir="ltr">(1, 1, 2)</span> | <span dir="ltr">2 = 0010</span> | מנצח | <span dir="ltr">2 → 0</span> |
-    | <span dir="ltr">(2, 5, 6)</span> | <span dir="ltr">1 = 0001</span> | מנצח | <span dir="ltr">5 → 4</span> |
-    | <span dir="ltr">(7, 9, 12)</span> | <span dir="ltr">2 = 0010</span> | מנצח | <span dir="ltr">7 → 5</span> |
-    | <span dir="ltr">(5, 6, 7, 8)</span> | <span dir="ltr">12 = 1100</span> | מנצח | <span dir="ltr">8 → 4</span> |
+    | <span dir="ltr">(1, 1, 2)</span> | <span dir="ltr">2 = 0010</span> | מנצח | <span dir="ltr">2 → 0</span> |
+    | <span dir="ltr">(2, 5, 6)</span> | <span dir="ltr">1 = 0001</span> | מנצח | <span dir="ltr">5 → 4</span> |
+    | <span dir="ltr">(7, 9, 12)</span> | <span dir="ltr">2 = 0010</span> | מנצח | <span dir="ltr">7 → 5</span> |
+    | <span dir="ltr">(5, 6, 7, 8)</span> | <span dir="ltr">12 = 1100</span> | מנצח | <span dir="ltr">8 → 4</span> |
 
     <!-- /gen -->
 
-    **נסו בעצמכם.** משחקים נגד המחשב, שמשחק תמיד את המהלך המנצח כשיש כזה. לחיצה על אסימון
-    לוקחת אותו ואת כל האסימונים שאחריו בערימה. ‏"הצגת המהלך המנצח" מסמנת את האסימונים
-    שכדאי לקחת, ומתחת ללוח הערימות בבינארי עם שורת ה-XOR :
+    **נסו בעצמכם.** משחקים נגד המחשב, שעונה תמיד במהלך המנצח כשיש כזה. קחו 3 מהערימה של 5
+    (<span dir="ltr">5 → 2</span>) : המחשב עונה <span dir="ltr">4 → 1</span>, משאיר 3, 1, 2,
+    ושורת ה-XOR חוזרת ל-000. בטלו ושחקו <span dir="ltr">3 → 1</span> : עכשיו אתם אלה שמשאירים
+    000 אחרי כל תור. הקלידו 1, 2, 3 : אין לכם מהלך מנצח, אבל אם המחשב מתחיל הוא לוקח אסימון
+    אחד מהערימה הגדולה, ואתם מנצחים. ובשביל שאלת ההמשך הראשונה, הקלידו 3, 5, 6, 7 וספרו את
+    הערימות המסומנות בעמודה של הביט 4. מעבר לטבלאות, הלוח מראה את תשובות המחשב ואת ה-XOR
+    אחרי כל מהלך, ומאפשר לבטל מהלך :
 
     <div class="explorer" data-kind="nim" data-heaps="3,4,5" data-rule="normal"></div>
 
@@ -224,7 +314,7 @@ added: 2026-11-04
     שתורו מקטין אותה ל-0 או ל-1, לפי מה שמשאיר מספר אי-זוגי של ערימות של 1. בסוף של 1, 1, 4
     המהלך של סעיף א מפסיד :
 
-    <!-- gen 4 -->
+    <!-- gen 5 -->
 
     | המהלך מ-<span dir="ltr">(1, 1, 4)</span> | המצב שנשאר | ‏XOR | כשהאחרון מנצח | כשהאחרון מפסיד |
     |:-:|:-:|:-:|:-:|:-:|
@@ -242,7 +332,7 @@ added: 2026-11-04
        מהלך מנצח.
     3. **אחת בדיוק :** מקטינים אותה ל-1 אם מספר הערימות של 1 זוגי, ול-0 אם הוא אי-זוגי. כך
        נשאר מספר אי-זוגי של ערימות של 1, ותמיד יש מהלך מנצח.
-    4. **אף אחת :** לוקחים ערימה של 1. המצב מנצח בדיוק כשמספר הערימות של 1 זוגי.
+    4. **אף אחת :** לוקחים ערימה של 1. המצב מנצח בדיוק כשמספר הערימות של 1 זוגי וגדול מ-0.
 
     </div>
 
@@ -317,8 +407,11 @@ added: 2026-11-04
     המשחק נגמר, ולכן מי שתמיד מחזיר את היריב ל-\( L \) מנצח : היריב לא מגיע לשולחן הריק
     בתורו, אלא לוקח את האסימון האחרון בעצמו.
 
-    **נסו בעצמכם.** אותו משחק, עם החוק ההפוך. ב-1, 1, 4, 6 ה-XOR הוא 2, ולכן מי שמתחיל מנצח.
-    שימו לב לרגע שבו נשארת ערימה גדולה אחת :
+    **נסו בעצמכם.** אותו משחק, עם החוק ההפוך. הקלידו 1, 1, 4 ושחקו <span dir="ltr">4 → 0</span>,
+    כמו ב-Nim רגיל : המחשב לוקח ערימה של 1, ואתם נאלצים לקחת את האחרון. בטלו ושחקו
+    <span dir="ltr">4 → 1</span> : עכשיו המחשב הוא שנאלץ. בערימות של העמוד, 1, 1, 4, 6, ה-XOR הוא
+    2 ומי שמתחיל מנצח. מעבר לטבלה של \( (1, 1, 4) \), הלוח מסביר את הרגע שבו נשארת ערימה אחת
+    גדולה מ-1, ומקווקו את שורת ה-XOR כשכל הערימות 0 או 1, כי שם היא כבר לא קובעת :
 
     <div class="explorer" data-kind="nim" data-heaps="1,1,4,6" data-rule="misere"></div>
 
@@ -339,8 +432,12 @@ added: 2026-11-04
 
 ??? tip "רמז 2"
     ערימה כאן היא לא ערימת Nim רגילה, אבל אולי היא מתנהגת בדיוק כמו ערימת Nim בגודל אחר.
-    ערימת Nim בגודל \( v \) יכולה לעבור לכל גודל קטן מ-\( v \), ולא ל-\( v \) עצמו. איזה \( v \)
-    מתאים לכל \( n \)?
+    באיזה גודל?
+
+??? tip "רמז 3"
+    ערימת Nim בגודל \( v \) יכולה לעבור לכל גודל קטן מ-\( v \), ולא ל-\( v \) עצמו. תנו לכל
+    \( n \) ערך \( v \), כך שמ-\( n \) אפשר להגיע למצבים עם כל ערך קטן מ-\( v \), ולא למצב עם
+    \( v \) עצמו.
 
 ??? success "פתרון סעיף ג"
     !!! answer "תשובה בקצרה"
@@ -362,8 +459,9 @@ added: 2026-11-04
 
     כש-mex של קבוצה הוא המספר הטבעי הקטן ביותר שאינו בה. מהגדרה, מערימה עם \( g(n) = v \)
     אפשר לעבור למצבים עם כל ערך קטן מ-\( v \), ואי אפשר לעבור למצב עם \( v \) עצמו, בדיוק כמו
-    בערימת Nim בגודל \( v \). לפעמים אפשר לעבור גם לערך גדול מ-\( v \), אבל זה לא עוזר, כפי
-    שנראה בהוכחה.
+    בערימת Nim בגודל \( v \). לפעמים אפשר לעבור גם לערך גדול מ-\( v \). זה לא מציל מצב מפסיד
+    (תכונה 2 בהוכחה), אבל לפעמים זה מהלך מנצח בעצמו : ב-5, 6, 7 גם <span dir="ltr">6 → 5</span>,
+    מ-\( g = 2 \) ל-\( g = 3 \), מנצח.
 
     **החישוב.** \( g(1) = \operatorname{mex}\{0\} = 1 \), ‏\( g(2) = \operatorname{mex}\{1\} = 0 \),
     ‏\( g(3) = \operatorname{mex}\{0, 0\} = 1 \), ‏\( g(4) = \operatorname{mex}\{1, 1, 0\} = 2 \),
@@ -371,13 +469,13 @@ added: 2026-11-04
     ו-\( g(7) = \operatorname{mex}\{2, 2, 1\} = 0 \). כל ערך תלוי רק בארבעת הערכים שלפניו,
     וארבעת הערכים ב-7 עד 10 שווים לאלה ב-0 עד 3. לכן מכאן הסדרה חוזרת על עצמה, במחזור 7 :
 
-    <!-- gen 5 -->
+    <!-- gen 6 -->
 
     <div class="pm-scroll" tabindex="0" role="region" aria-label="סעיף ג : מספרי גרנדי של המשחק שבו לוקחים 1, 3 או 4, מ-n = 0 עד 13 : 0, 1, 0, 1, 2, 3, 2 ושוב 0, 1, 0, 1, 2, 3, 2. ארבעת הערכים ב-7 עד 10 שווים לאלה ב-0 עד 3, ולכן הסדרה מחזורית במחזור 7"><table class="pm-cells" dir="ltr"><tbody><tr class="pm-head"><th></th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr><tr><th dir="rtl">‏g(n)</th><td class="pm-c c1">0</td><td class="pm-c c1">1</td><td class="pm-c c1">0</td><td class="pm-c c1">1</td><td class="pm-c c1">2</td><td class="pm-c c1">3</td><td class="pm-c c1">2</td><td class="pm-c c4 is-hl">0</td><td class="pm-c c4 is-hl">1</td><td class="pm-c c4 is-hl">0</td><td class="pm-c c4 is-hl">1</td><td class="pm-c c4">2</td><td class="pm-c c4">3</td><td class="pm-c c4">2</td></tr></tbody></table></div>
 
     <!-- /gen -->
 
-    <!-- gen 6 -->
+    <!-- gen 7 -->
 
     <span class="viz-legend"><span><i class="pm-key-c1"></i>המחזור הראשון, n = 0 עד 6</span><span><i class="pm-key-c4"></i>המחזור השני, n = 7 עד 13</span><span><i class="pm-key-hl"></i>ארבעה ערכים שחוזרים : מכאן הסדרה חוזרת</span></span>
 
@@ -396,16 +494,16 @@ added: 2026-11-04
 
     </div>
 
-    ב-3, 4, 5 מספרי גרנדי הם 1, 2 ו-3, וה-XOR שלהם 0 : מי שמתחיל מפסיד. ה-XOR של הגדלים
-    עצמם, 2, היה אומר את ההפך :
+    הטבלה משווה את ה-XOR של מספרי גרנדי ל-XOR של הגדלים, עם כל המהלכים המנצחים. ב-5, 6, 7
+    וב-10, 11, 6 יש שלושה, וחלקם מעלים את \( g \) של הערימה :
 
-    <!-- gen 7 -->
+    <!-- gen 8 -->
 
-    | הערימות | מספרי גרנדי | ‏XOR של גרנדי | מי שתורו | מהלך מנצח | ‏XOR של הגדלים |
+    | הערימות | מספרי גרנדי | ‏XOR של גרנדי | מי שתורו | המהלכים המנצחים | ‏XOR של הגדלים |
     |:-:|:-:|:-:|:-:|:-:|:-:|
     | <span dir="ltr">(3, 4, 5)</span> | <span dir="ltr">1, 2, 3</span> | ‏0 | מפסיד | אין | ‏2 |
-    | <span dir="ltr">(5, 6, 7)</span> | <span dir="ltr">3, 2, 0</span> | ‏1 | מנצח | <span dir="ltr">5 → 4</span> | ‏4 |
-    | <span dir="ltr">(10, 11, 6)</span> | <span dir="ltr">1, 2, 2</span> | ‏1 | מנצח | <span dir="ltr">10 → 9</span> | ‏7 |
+    | <span dir="ltr">(5, 6, 7)</span> | <span dir="ltr">3, 2, 0</span> | ‏1 | מנצח | <span dir="ltr">5 → 4; 6 → 5; 7 → 3</span> | ‏4 |
+    | <span dir="ltr">(10, 11, 6)</span> | <span dir="ltr">1, 2, 2</span> | ‏1 | מנצח | <span dir="ltr">10 → 9; 10 → 7; 6 → 5</span> | ‏7 |
     | <span dir="ltr">(2, 9, 16)</span> | <span dir="ltr">0, 0, 0</span> | ‏0 | מפסיד | אין | ‏27 |
 
     <!-- /gen -->
@@ -441,13 +539,14 @@ added: 2026-11-04
 
         1. ה-mex : הערך הקטן ביותר שאינו ב-`seen`. הוא לכל היותר `len(seen)`.
         2. ה-XOR של מספרי גרנדי, ולא של הגדלים.
-        3. מעבירים ערימה אחת לערך \( g(h) \oplus x \), כמו ב-\( h \oplus x \) של סעיף א.
+        3. מעבירים ערימה אחת לערך \( g(h) \oplus x \), כמו ב-\( h \oplus x \) של סעיף א. בודקים כל
+           ערימה וכל מהלך, ולכן גם מהלך שמעלה את \( g \), כמו <span dir="ltr">6 → 5</span> ב-5, 6, 7,
+           נמצא.
 
     === "SystemVerilog"
-        ```systemverilog title="grundy, subtraction_move" linenums="1" hl_lines="8 9 19 23 24"
-        // the Grundy number of a heap of n tokens when a move takes one of `moves`
-        function automatic int grundy(int n, int moves[$]);
-          int g[];
+        ```systemverilog title="grundy_table, grundy, subtraction_move" linenums="1" hl_lines="7 8 25 26 30"
+        // the Grundy numbers g[0..n] of one heap when a move takes one of `moves`
+        function automatic void grundy_table(int n, int moves[$], output int g[]);
           bit seen[];
           g = new[n + 1];                               // all 0
           for (int k = 1; k <= n; k++) begin
@@ -455,20 +554,27 @@ added: 2026-11-04
             foreach (moves[j]) if (moves[j] <= k) seen[g[k - moves[j]]] = 1;
             while (seen[g[k]]) g[k]++;                  // (2)!
           end
+        endfunction
+
+        // the Grundy number of a heap of n tokens
+        function automatic int grundy(int n, int moves[$]);
+          int g[];
+          grundy_table(n, moves, g);
           return g[n];
         endfunction
 
         // a winning move, heap idx down to new_size, when a move takes one of `moves` from a
         // heap; returns 0 when the player to move loses
         function automatic bit subtraction_move(int heaps[$], int moves[$], output int idx, output int new_size);
-          int x;
-          x = 0;
-          foreach (heaps[i]) x ^= grundy(heaps[i], moves);                       // (3)!
+          int g[], hmax, x;
+          hmax = 0; x = 0;
+          foreach (heaps[i]) if (heaps[i] > hmax) hmax = heaps[i];
+          grundy_table(hmax, moves, g);                 // (3)!
+          foreach (heaps[i]) x ^= g[heaps[i]];          // (4)!
           if (x == 0) return 0;
           foreach (heaps[i])
             foreach (moves[j])
-              if (moves[j] <= heaps[i] &&
-                  grundy(heaps[i] - moves[j], moves) == (grundy(heaps[i], moves) ^ x)) begin
+              if (moves[j] <= heaps[i] && g[heaps[i] - moves[j]] == (g[heaps[i]] ^ x)) begin   // (5)!
                 idx = i;
                 new_size = heaps[i] - moves[j];
                 return 1;
@@ -479,8 +585,10 @@ added: 2026-11-04
 
         1. ה-mex של \( |S| \) ערכים הוא לכל היותר \( |S| \), ולכן מספיק מערך של \( |S| + 1 \).
         2. ה-mex : מתחילים מ-0 ועולים עד הערך הראשון שלא נראה.
-        3. ה-XOR של מספרי גרנדי. בחומרה, לגדלים קטנים, ‏\( g \) הוא טבלה קבועה, או \( n \bmod 7 \)
+        3. הטבלה נבנית פעם אחת, עד הערימה הגדולה : \( O(H \cdot |S|) \).
+        4. ה-XOR של מספרי גרנדי. בחומרה, לגדלים קטנים, ‏\( g \) הוא טבלה קבועה, או \( n \bmod 7 \)
            וטבלה של 7 ערכים.
+        5. כל ערימה וכל מהלך, כמו בפייתון : \( O(n \cdot |S|) \) קריאות מהטבלה.
 
     #### למה זה נכון { .sol-proof }
 
@@ -503,8 +611,11 @@ added: 2026-11-04
     באחד מהם, מתנהג כמו ה-XOR של המספרים. זה משפט ספרג–גרנדי, ו-Nim הוא המקרה שבו
     \( g(n) = n \).
 
-    **נסו בעצמכם.** אותו משחק, עם 1, 3 או 4 בלבד. מתחת ללוח מספרי גרנדי של הערימות בבינארי.
-    ב-5, 6, 7 מי שמתחיל מנצח. ב-3, 4, 5 הוא מפסיד : נסו להקליד אותן ולתת למחשב להתחיל :
+    **נסו בעצמכם.** אותו משחק, עם 1, 3 או 4 בלבד, ומתחת ללוח מספרי גרנדי של הערימות בבינארי.
+    ב-5, 6, 7 קחו 1 מהערימה של 6 : ה-\( g \) שלה עולה מ-2 ל-3, ובכל זאת ה-XOR יורד ל-0 והמחשב
+    מפסיד. הקלידו 7 לבד : כל שלושת המהלכים שלכם, ל-6, ל-4 ול-3, משאירים למחשב מצב מנצח. וב-3,
+    4, 5 תנו למחשב להתחיל : הוא מפסיד, אף שה-XOR של הגדלים 2. מעבר לטבלה, ‏"הצגת המהלך המנצח"
+    מונה את כל המהלכים המנצחים, גם את אלה שמעלים את \( g \) :
 
     <div class="explorer" data-kind="nim" data-heaps="5,6,7" data-rule="sub"></div>
 
@@ -531,8 +642,8 @@ added: 2026-11-04
 
 ??? trap "מלכודת : XOR של הגדלים בסעיף ג"
     ב-3, 4, 5 עם 1, 3 או 4 בלבד, ה-XOR של הגדלים הוא 2 והוא "אומר" שמי שמתחיל מנצח. אבל
-    מספרי גרנדי הם 1, 2, 3, ה-XOR שלהם 0, ומי שמתחיל מפסיד. הגדלים נכונים רק כשמותר לקחת כל
-    כמות, כי אז \( g(n) = n \).
+    מספרי גרנדי הם 1, 2, 3, ה-XOR שלהם 0, ומי שמתחיל מפסיד. הגדלים נכונים בכל מצב רק כשמותר
+    לקחת כל כמות, כי אז \( g(n) = n \).
 
 ??? trap "מלכודת : המקסימום במקום ה-mex"
     ‏\( g(7) = \operatorname{mex}\{2, 2, 1\} = 0 \), אבל "המקסימום ועוד 1" נותן 3. ערימה של 7 היא
@@ -544,7 +655,8 @@ added: 2026-11-04
 
         ??? fu-answer "תשובה"
             ה-XOR הוא 7, והביט הגבוה שלו 4. לשלוש ערימות יש אותו, 5, 6 ו-7, ולכן יש שלושה
-            מהלכים מנצחים : 5 → 2, ‏6 → 1 ו-7 → 0. ל-3 אין את הביט, ו-\( 3 \oplus 7 = 4 > 3 \).
+            מהלכים מנצחים : <span dir="ltr">5 → 2</span>, <span dir="ltr">6 → 1</span>
+            ו-<span dir="ltr">7 → 0</span>. ל-3 אין את הביט, ו-\( 3 \oplus 7 = 4 > 3 \).
 
     - **ערימה אחת, לוקחים 1 עד k :** מתי מי שתורו מפסיד?
 

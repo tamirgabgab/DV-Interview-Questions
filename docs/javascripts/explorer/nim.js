@@ -1,5 +1,5 @@
 // kinds: nim
-//   nim                    0082        a game of Nim against the computer: the heaps typed, the rule (the last to take wins, the last to take loses, or a move takes only 1, 3 or 4), who starts; a token clicked takes it and every token after it in its heap, and the computer answers with its best move; the heaps in binary with the XOR row (the Grundy numbers in the subtraction game), the winning move marked on request, undo and a log of the moves
+//   nim                    0082        a game of Nim against the computer: the heaps typed, the rule (the last to take wins, the last to take loses, or a move takes only 1, 3 or 4), who starts; a token clicked takes it and every token after it in its heap, and the computer answers with its best move; the heaps in binary with the XOR row (the Grundy numbers in the subtraction game; dashed in a misère endgame, where it no longer decides), the winning move marked on request with every winning move listed, undo and a log of the moves with the XOR after each
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -46,6 +46,27 @@
   const RULES = { normal: nimMove, misere: misereMove, sub: subMove };
   const legal = (rule, h, i, nw) => Number.isInteger(i) && i >= 0 && i < h.length && Number.isInteger(nw) && nw >= 0 && nw < h[i] &&
     (rule !== "sub" || SUB.includes(h[i] - nw));
+  // the player to move loses (the empty table: lost, except in misère, where the opponent took the last)
+  const lostPos = (rule, h) => (h.some((v) => v > 0) ? !RULES[rule](h) : rule !== "misere");
+  // every winning move [heap, new size], in heap order and then by the new size
+  const winMoves = (rule, h) => {
+    const out = [];
+    h.forEach((v, i) => {
+      for (let nw = 0; nw < v; nw++) {
+        if (!legal(rule, h, i, nw)) continue;
+        const a = [...h];
+        a[i] = nw;
+        if (lostPos(rule, a)) out.push([i, nw]);
+      }
+    });
+    return out;
+  };
+  // the XOR of the table under the board: of the sizes, or of the Grundy numbers in the subtraction game
+  const boardXor = (rule, h) => {
+    if (rule !== "sub") return nimXor(h);
+    const g = grundy(Math.max(0, ...h));
+    return h.reduce((a, v) => a ^ g[v], 0);
+  };
   // the computer: the winning move, and in a lost position one token from the largest heap
   const computerMove = (rule, h) => {
     const m = RULES[rule](h);
@@ -102,7 +123,7 @@
         `<label class="nim-hintlab"><input type="checkbox" class="nim-hint"> הצגת המהלך המנצח</label></div>` +
         `<p class="ex-summary nim-sum" aria-live="polite"></p>` +
         `<div class="nim-board" role="group" aria-label="הערימות : לחיצה על אסימון לוקחת אותו ואת כל האסימונים שאחריו בערימה"></div>` +
-        `<span class="viz-legend"><span><i class="nim-key-tok"></i>אסימון שאפשר לקחת</span><span><i class="nim-key-hint"></i>המהלך המנצח</span><span><i class="nim-key-gone"></i>נלקח</span></span>` +
+        `<span class="viz-legend"><span><i class="nim-key-tok"></i>אסימון שאפשר לקחת</span><span><i class="nim-key-hint"></i>המהלך המנצח</span><span><i class="nim-key-gone"></i>נלקח</span><span class="nim-key-nolab" hidden><i class="nim-key-no"></i>אסור${NB}: כמות שאינה 1, 3 או 4</span></span>` +
         `<p class="ex-title nim-bintitle"></p>` +
         `<div class="gs-scroll" data-steady><table class="gs-bits nim-bin" dir="ltr" aria-label="הערימות בבינארי ושורת ה-XOR"><tbody></tbody></table></div>` +
         `<p class="nim-why"></p>` +
@@ -131,14 +152,18 @@
         // the table: the sizes (or the Grundy numbers) in binary, and their XOR
         const gr = grundy(Math.max(...st.heaps));
         const vals = rule === "sub" ? h.map((v) => gr[v]) : h;
-        const x = vals.reduce((a, b) => a ^ b, 0), W = 5;
+        // the columns: 2 for the Grundy numbers of 1, 3, 4 (at most 3), else the bits of the largest start heap
+        const x = vals.reduce((a, b) => a ^ b, 0), W = rule === "sub" ? 2 : Math.max(1, 32 - Math.clz32(Math.max(...st.heaps)));
         const top = x ? 31 - Math.clz32(x) : -1;
+        // misère with every heap 0 or 1: the XOR is the parity of the ones and says the opposite, so the row goes plain
+        const off = !g.over && rule === "misere" && !h.some((v) => v > 1);
+        $(".nim-key-nolab").hidden = rule !== "sub";
         $(".nim-bintitle").textContent = rule === "sub" ? "מספרי גרנדי של הערימות בבינארי, וה-XOR שלהם" : "הערימות בבינארי, וה-XOR שלהן";
         const bitRow = (label, v, isX) => {
-          let r = `<tr><th>${label}</th>`;
+          let r = `<tr${isX && off ? ` class="nim-off"` : ""}><th>${label}</th>`;
           for (let b = W - 1; b >= 0; b--) {
             const on = (v >> b) & 1;
-            const cls = isX ? (x ? (on ? " is-one" : "") + (b === top ? " nim-top" : "") : " nim-zero") : (on ? " is-one" : "") + (b === top && on ? " nim-top" : "");
+            const cls = isX && off ? "" : isX ? (x ? (on ? " is-one" : "") + (b === top ? " nim-top" : "") : " nim-zero") : (on ? " is-one" : "") + (b === top && on ? " nim-top" : "");
             r += `<td class="gs-b${cls}">${on}</td>`;
           }
           return r + `<td class="gs-val">= ${v}</td></tr>`;
@@ -152,17 +177,25 @@
         if (g.over) why = "";
         else if (rule === "misere" && !h.some((v) => v > 1)) {
           const ones = h.filter((v) => v === 1).length;
-          why = `כל הערימות 1 או 0${NB}: יש ${ltr(ones)} ערימות של 1, ומי שתורו כשהמספר אי-זוגי מפסיד. ` + (ones % 2 ? `כאן הוא אי-זוגי, ולכן מי שתורו מפסיד.` : `כאן הוא זוגי, ולכן מי שתורו מנצח.`);
+          why = `כל הערימות 1 או 0, וה-XOR כבר לא קובע${NB}: יש ${ltr(ones)} ערימות של 1, ומי שתורו כשהמספר אי-זוגי מפסיד. ` + (ones % 2 ? `כאן הוא אי-זוגי, ולכן מי שתורו מפסיד.` : `כאן הוא זוגי, ולכן מי שתורו מנצח.`);
         } else if (rule === "misere" && h.filter((v) => v > 1).length === 1) {
           why = `נשארה ערימה אחת גדולה מ-1${NB}: מי שתורו מנצח. מורידים אותה ל-0 או ל-1 כך שיישאר מספר אי-זוגי של ערימות של 1.`;
         } else {
           why = x ? `${ltr(`XOR = ${x}`)}${NB}: מי שתורו מנצח.` : `${ltr("XOR = 0")}${NB}: מי שתורו מפסיד, אם היריב לא טועה.`;
         }
         if (!g.over && $(".nim-hint").checked) {
-          why += best ? ` המהלך המנצח${NB}: מערימה ${ltr(best[0] + 1)} לוקחים ${ltr(h[best[0]] - best[1])}, ונשארים בה ${ltr(best[1])}.` : ` אין מהלך מנצח${NB}: כל מהלך משאיר ליריב מצב מנצח.`;
+          const all = myTurn ? winMoves(rule, h) : [];
+          const mv = ([i, nw]) => `מערימה ${ltr(i + 1)}, ${ltr(`${h[i]} → ${nw}`)}`;
+          why += !best ? ` אין מהלך מנצח${NB}: כל מהלך משאיר ליריב מצב מנצח.` :
+            ` המהלך המסומן${NB}: מערימה ${ltr(best[0] + 1)} לוקחים ${ltr(h[best[0]] - best[1])}, ונשארים בה ${ltr(best[1])}.` +
+            (all.length > 1 ? ` כל ${ltr(all.length)} המהלכים המנצחים${NB}: ${all.slice(0, -1).map(mv).join("; ")} ו${mv(all[all.length - 1])}.` : "");
         }
         $(".nim-why").innerHTML = why;
-        $(".nim-log").innerHTML = g.moves.map(([w, i, from, to]) => `<li>${who(w)}${NB}: מערימה ${ltr(i + 1)} לקחו ${ltr(from - to)}, ${ltr(`${from} → ${to}`)}</li>`).join("");
+        const path = [...st.heaps];
+        $(".nim-log").innerHTML = g.moves.map(([w, i, from, to]) => {
+          path[i] = to;
+          return `<li>${who(w)}${NB}: מערימה ${ltr(i + 1)} לקחו ${ltr(from - to)}, ${ltr(`${from} → ${to}`)}, וה-XOR אחריו ${ltr(boardXor(rule, path))}</li>`;
+        }).join("");
         if (g.over) answer(box, g.winner === 0 ? `ניצחתם, אחרי ${ltr(g.moves.length)} מהלכים.` : `המחשב ניצח, אחרי ${ltr(g.moves.length)} מהלכים.`);
         else answer(box, null);
       };
@@ -208,8 +241,8 @@
   dvqExplorers.register({
     views: { nim: nimView },
     help: {
-      nim: "מקלידים את הערימות, בוחרים חוק ומי מתחיל, ומשחקים נגד המחשב : לחיצה על אסימון לוקחת אותו ואת כל האסימונים שאחריו בערימה, והמחשב עונה במהלך הטוב ביותר. מתחת ללוח הערימות בבינארי (או מספרי גרנדי שלהן) ושורת ה-XOR, ו\"הצגת המהלך המנצח\" מסמנת את האסימונים שכדאי לקחת.",
+      nim: "מקלידים את הערימות, בוחרים חוק ומי מתחיל, ומשחקים נגד המחשב : לחיצה על אסימון לוקחת אותו ואת כל האסימונים שאחריו בערימה, והמחשב עונה במהלך הטוב ביותר. מתחת ללוח הערימות בבינארי (או מספרי גרנדי שלהן) ושורת ה-XOR, ו\"הצגת המהלך המנצח\" מסמנת את האסימונים שכדאי לקחת ומונה את כל המהלכים המנצחים.",
     },
-    models: { nimXor, nimMove, misereMove, grundy, subMove, computerMove, nimPlay, nimLegal: legal },
+    models: { nimXor, nimMove, misereMove, grundy, subMove, computerMove, nimPlay, nimLegal: legal, nimWinMoves: winMoves, nimBoardXor: boardXor },
   });
 })();
