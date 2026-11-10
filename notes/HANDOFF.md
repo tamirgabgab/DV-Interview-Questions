@@ -1147,7 +1147,11 @@ below start at item 112 (session 31).
     f(5, 7) = 119, a per-clock table and egg_checker, the box 1086 -> 996 px; 0046 the trap's
     2, the boxes 1118 -> 903 px; 0057 ghost times, ties, continuous positions; 0076 the
     1.5-2 ratio, labels to 999999999, a strip that scrolls on a phone (it widened the page
-    from about 99999); 0015 p = 1/2, a log q axis.
+    from about 99999); 0015 p = 1/2, a log q axis. On main as 65e9139 (deployed 2026-11-10
+    16:20 UTC); a crawl of the live site (121 pages, 262 links and files) found no 404, and
+    the eleven pages' 19 boxes (0021 included) built with no script error. A live check needs
+    MathJax routed to the local copy and `dvqExplorers.ready()` (boxes inside closed
+    details never intersect, so they never build on a scroll).
 
 ---
 
