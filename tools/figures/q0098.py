@@ -254,14 +254,15 @@ def clock_table():
     rows, ok = clock_rows()
     assert ok and [r[5] for r in rows] == [7, 6, 5, 0]
     n = len(rows)
-    out = [f"| שעון | הספרה | אות | {RLM}`d0` | {RLM}`add` | {RLM}`s0 + add` | {RLM}`sum` אחריו | המקום |",
+    out = [f"| שעון | ספרה | אות | {RLM}`d0` | {RLM}`add` | {RLM}`s0 + add` | {RLM}`sum` אחריו | המקום |",
            "|:-:|:-:|:-:|:-:|:-:|:-:|:-:|---|"]
     for k, digit, d0, add, raw, total in rows:
         sig = f"{RLM}`start`" if k == 1 else f"{RLM}`last`" if k == n else ""
         what = ("מוכפל" if d0 else "רגיל") + (", פחות 10" if raw >= 10 else "")
         out.append(f"| {k} | {digit} | {sig} | {d0} | {add} | {raw} | {total} | {what} |")
     out.append(f"| {n + 1} | | | | | | {total} | {RLM}`done`, `ok = {int(ok)}` |")
-    return "\n".join(out)
+    # lu-clocks keeps the code of a cell on one line (on a phone the table scrolls sideways)
+    return '<div class="lu-clocks" markdown>\n\n' + "\n".join(out) + "\n\n</div>"
 
 
 def blocks():

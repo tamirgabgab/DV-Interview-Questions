@@ -67,3 +67,7 @@
 .md-typeset svg.lu-dp .lu-blk text.lu-sub, .md-typeset svg.lu-dp text.lu-sub { fill: var(--viz-ink); font-size: 11px; font-weight: 400; font-family: var(--md-code-font-family); }
 .md-typeset svg.lu-dp .lu-wlab { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset svg.lu-dp .lu-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+
+/* the clocks of 7997 under the diagram: a signal's name never breaks inside a cell */
+.md-typeset .lu-clocks table :is(th, td) code { white-space: nowrap; word-break: normal; }
+.md-typeset .lu-clocks table td:last-child { white-space: nowrap; }
