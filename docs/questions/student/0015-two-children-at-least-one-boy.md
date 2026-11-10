@@ -66,18 +66,16 @@ added: 2026-10-18
     #### למה זה נכון { .sol-proof }
 
     בשרטוט, השורות הן הילד הראשון והעמודות הן הילד השני. כל משבצת היא משפחה בהסתברות
-    \( 1/4 \):
+    \( 1/4 \) :
 
     <svg class="figure" viewBox="0 0 300 150" style="max-width:19rem" role="img" aria-label="ארבע המשפחות האפשריות : בן בן, בן בת, בת בן, בת בת. בת בת נפסלת, ומבין שלוש הנותרות רק אחת היא בן בן"><text class="pg-head" x="185" y="18" text-anchor="middle" direction="rtl">בן</text><text class="pg-head" x="75" y="18" text-anchor="middle" direction="rtl">בת</text><text class="pg-head" x="270" y="61" text-anchor="middle" direction="rtl">בן</text><text class="pg-head" x="270" y="117" text-anchor="middle" direction="rtl">בת</text><rect class="pg-hit" x="132" y="30" width="106" height="52" rx="6"/><text class="pg-label" x="185" y="54" text-anchor="middle" direction="rtl">בן, בן</text><text class="pg-small" x="185" y="71" text-anchor="middle">1/4</text><rect class="pg-cond" x="22" y="30" width="106" height="52" rx="6"/><text class="pg-label" x="75" y="54" text-anchor="middle" direction="rtl">בן, בת</text><text class="pg-small" x="75" y="71" text-anchor="middle">1/4</text><rect class="pg-cond" x="132" y="86" width="106" height="52" rx="6"/><text class="pg-label" x="185" y="110" text-anchor="middle" direction="rtl">בת, בן</text><text class="pg-small" x="185" y="127" text-anchor="middle">1/4</text><rect class="pg-out" x="22" y="86" width="106" height="52" rx="6"/><line class="pg-strike" x1="32" y1="130" x2="118" y2="94"/><text class="pg-label" x="75" y="110" text-anchor="middle" direction="rtl">בת, בת</text><text class="pg-small" x="75" y="127" text-anchor="middle">1/4</text></svg>  
 
     <span class="viz-legend"><span><i class="pg-hit"></i>מקיים את התנאי, ושני הילדים בנים</span><span><i class="pg-cond"></i>מקיים את התנאי, יש גם בת</span><span><i class="pg-out"></i>לא מקיים את התנאי</span></span> 
 
     נסמן ב-\( A \) את המאורע "שני הילדים בנים" וב-\( B \) את המאורע "לפחות אחד בן". כל
-    משפחה עם שני בנים מקיימת גם את \( B \), ולכן \( A \cap B = A \) :
-
-    \[
-    P(A \mid B) = \frac{P(A \cap B)}{P(B)} = \frac{1/4}{3/4} = \frac{1}{3}
-    \]
+    משפחה עם שני בנים מקיימת גם את \( B \), כלומר \( A \subset B \) ו-\( A \cap B = A \). לכן
+    ההסתברות המותנית \( P(A \mid B) = P(A \cap B) / P(B) \) היא פשוט \( P(A) / P(B) \), היחס
+    של שלב 4.
 
     **מתי התשובה כן חצי?** אם המידע היה על ילד **מסוים**, למשל "הילד הבכור הוא בן", היו
     נשארות רק המשפחות בן ובן ובן ובת, והתשובה הייתה \( 1/2 \). ב"לפחות אחד בן" הבן יכול
@@ -96,7 +94,7 @@ added: 2026-10-18
 
 ??? tip "רמז 2"
     ספרו את הזוגות שבהם הילד הראשון הוא בן מיום שלישי, ואת הזוגות שבהם הילד השני הוא כזה.
-    יש זוג אחד שנמצא בשתי הקבוצות.
+    האם יש זוג שנספר בשתי הקבוצות?
 
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"
@@ -132,7 +130,7 @@ added: 2026-10-18
 
     בשרטוט, השורות הן הילד הראשון והעמודות הן הילד השני. כל צד מחולק לבן ולבת, ובכל אחד
     שבעה ימים, מ-א (ראשון) עד ש (שבת). יום שלישי הוא האות ג. כל משבצת היא זוג בהסתברות
-    \( 1/196 \):
+    \( 1/196 \) :
 
     <svg class="figure" viewBox="0 0 432 416" style="max-width:27rem" role="img" aria-label="טבלה של 196 צירופים של מין ויום לידה לשני הילדים. 27 משבצות מקיימות את התנאי, ו-13 מהן הן בן ובן"><text class="pg-head" x="279" y="16" text-anchor="middle" direction="rtl">בן</text><text class="pg-head" x="414" y="140" text-anchor="middle" direction="rtl">בן</text><text class="pg-head" x="97" y="16" text-anchor="middle" direction="rtl">בת</text><text class="pg-head" x="414" y="322" text-anchor="middle" direction="rtl">בת</text><text class="pg-day" x="357" y="36" text-anchor="middle">א</text><text class="pg-day" x="384" y="61" text-anchor="middle">א</text><text class="pg-day" x="331" y="36" text-anchor="middle">ב</text><text class="pg-day" x="384" y="87" text-anchor="middle">ב</text><text class="pg-day pg-day-hl" x="305" y="36" text-anchor="middle">ג</text><text class="pg-day pg-day-hl" x="384" y="113" text-anchor="middle">ג</text><text class="pg-day" x="279" y="36" text-anchor="middle">ד</text><text class="pg-day" x="384" y="139" text-anchor="middle">ד</text><text class="pg-day" x="253" y="36" text-anchor="middle">ה</text><text class="pg-day" x="384" y="165" text-anchor="middle">ה</text><text class="pg-day" x="227" y="36" text-anchor="middle">ו</text><text class="pg-day" x="384" y="191" text-anchor="middle">ו</text><text class="pg-day" x="201" y="36" text-anchor="middle">ש</text><text class="pg-day" x="384" y="217" text-anchor="middle">ש</text><text class="pg-day" x="175" y="36" text-anchor="middle">א</text><text class="pg-day" x="384" y="243" text-anchor="middle">א</text><text class="pg-day" x="149" y="36" text-anchor="middle">ב</text><text class="pg-day" x="384" y="269" text-anchor="middle">ב</text><text class="pg-day" x="123" y="36" text-anchor="middle">ג</text><text class="pg-day" x="384" y="295" text-anchor="middle">ג</text><text class="pg-day" x="97" y="36" text-anchor="middle">ד</text><text class="pg-day" x="384" y="321" text-anchor="middle">ד</text><text class="pg-day" x="71" y="36" text-anchor="middle">ה</text><text class="pg-day" x="384" y="347" text-anchor="middle">ה</text><text class="pg-day" x="45" y="36" text-anchor="middle">ו</text><text class="pg-day" x="384" y="373" text-anchor="middle">ו</text><text class="pg-day" x="19" y="36" text-anchor="middle">ש</text><text class="pg-day" x="384" y="399" text-anchor="middle">ש</text><rect class="pg-out" x="345" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="45" width="24" height="24" rx="3"/><rect class="pg-hit" x="293" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="45" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="71" width="24" height="24" rx="3"/><rect class="pg-hit" x="293" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="71" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="71" width="24" height="24" rx="3"/><rect class="pg-hit" x="345" y="97" width="24" height="24" rx="3"/><rect class="pg-hit" x="319" y="97" width="24" height="24" rx="3"/><rect class="pg-hit" x="293" y="97" width="24" height="24" rx="3"/><circle class="pg-twice" cx="305.0" cy="109.0" r="7.0"/><rect class="pg-hit" x="267" y="97" width="24" height="24" rx="3"/><rect class="pg-hit" x="241" y="97" width="24" height="24" rx="3"/><rect class="pg-hit" x="215" y="97" width="24" height="24" rx="3"/><rect class="pg-hit" x="189" y="97" width="24" height="24" rx="3"/><rect class="pg-cond" x="163" y="97" width="24" height="24" rx="3"/><rect class="pg-cond" x="137" y="97" width="24" height="24" rx="3"/><rect class="pg-cond" x="111" y="97" width="24" height="24" rx="3"/><rect class="pg-cond" x="85" y="97" width="24" height="24" rx="3"/><rect class="pg-cond" x="59" y="97" width="24" height="24" rx="3"/><rect class="pg-cond" x="33" y="97" width="24" height="24" rx="3"/><rect class="pg-cond" x="7" y="97" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="123" width="24" height="24" rx="3"/><rect class="pg-hit" x="293" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="123" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="149" width="24" height="24" rx="3"/><rect class="pg-hit" x="293" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="149" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="175" width="24" height="24" rx="3"/><rect class="pg-hit" x="293" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="175" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="201" width="24" height="24" rx="3"/><rect class="pg-hit" x="293" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="201" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="227" width="24" height="24" rx="3"/><rect class="pg-cond" x="293" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="227" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="253" width="24" height="24" rx="3"/><rect class="pg-cond" x="293" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="253" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="279" width="24" height="24" rx="3"/><rect class="pg-cond" x="293" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="279" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="305" width="24" height="24" rx="3"/><rect class="pg-cond" x="293" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="305" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="331" width="24" height="24" rx="3"/><rect class="pg-cond" x="293" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="331" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="357" width="24" height="24" rx="3"/><rect class="pg-cond" x="293" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="357" width="24" height="24" rx="3"/><rect class="pg-out" x="345" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="319" y="383" width="24" height="24" rx="3"/><rect class="pg-cond" x="293" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="267" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="241" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="215" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="189" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="163" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="137" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="111" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="85" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="59" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="33" y="383" width="24" height="24" rx="3"/><rect class="pg-out" x="7" y="383" width="24" height="24" rx="3"/><rect class="pg-quad" x="188" y="44" width="182" height="182"/><line class="pg-split" x1="188" y1="44" x2="188" y2="408"/><line class="pg-split" x1="6" y1="226" x2="370" y2="226"/></svg> 
 
@@ -157,16 +155,21 @@ added: 2026-10-18
     \end{aligned}
     \]
 
-    **למה 13 ולא 14?** הזוג "בן מיום שלישי ובן מיום שלישי" (המשבצת המסומנת בעיגול) הוא
-    משפחה אחת, אבל הוא נמצא גם בשורה וגם בעמודה של הצלב. בלי ההורדה שלו היינו מקבלים
-    \( 14/28 = 1/2 \), וזו טעות.
+    **למה 13 ולא 14?** המשבצת המסומנת בעיגול, בן מיום שלישי ובן מיום שלישי, נמצאת גם בשורה
+    וגם בעמודה של הצלב, ונספרת פעם אחת (המלכודת "לספור את יום שלישי פעמיים" למטה).
 
-    **לנסות בעצמכם.** בתיבה הבאה ״הצעד הבא״ סופר את המשפחות לפי הסדר של השלבים : השורה של
-    הילד הראשון, העמודה של הילד השני, המשבצת שנספרה פעמיים, ובסוף המשפחות עם שני בנים.
-    לחיצה על משבצת מראה איזו משפחה היא. אפשר לבחור יום אחר ולקבל אותה תשובה, או מידע אחר :
-    ״לפחות אחד הוא בן״ של סעיף א נותן שליש, ו״הבכור הוא בן״ נותן חצי. יום שלישי נמצא ביניהם.
+    **נסו בעצמכם.** התיבה סופרת באותם צעדים כמו השלבים, ומעבר לשרטוט היא משווה שלושה סוגי
+    מידע על אותה רשת. היא נפתחת על המידע של סעיף א.
 
-    <div class="explorer" data-kind="tuesday" data-day="2"></div>
+    - **לפחות אחד בן :** לחצו "הצעד הבא" עד צעד 2. כל הריבוע של \( 7 \times 7 = 49 \) משבצות
+      נספר פעמיים, ולכן בצעד 3 נשארות \( 98 + 98 - 49 = 147 \) משפחות, ובצעד 4 התשובה היא
+      \( 49/147 = 1/3 \).
+    - **בן מיום שלישי :** בחרו "יש בן שנולד ביום מסוים" וחזרו לצעד 2. עכשיו נספרת פעמיים רק
+      משבצת אחת, בן ג ובן ג; לחצו עליה. בצעד 3 \( 14 + 14 - 1 = 27 \), ובצעד 4 \( 13/27 \). החפיפה
+      קטנה מ-49 משבצות לאחת, ולכן התשובה עלתה מהשליש.
+    - **הבכור בן :** בחרו "הבכור הוא בן". אין עמודה ואין חפיפה, והתשובה היא \( 49/98 = 1/2 \).
+
+    <div class="explorer" data-kind="tuesday" data-info="any" data-day="2"></div>
 
 ---
 
@@ -219,7 +222,8 @@ added: 2026-10-18
       והמכנה הוא \( 1 - (13/14)^2 = \frac{27}{196} \), ולכן מתקבל \( 13/27 \), התשובה של
       סעיף ב.
     - **תכונה נדירה מאוד,** כלומר \( q \to 0 \) : בקירוב \( (1 - q)^C \approx 1 - Cq \)
-      ו-\( (1 - pq)^C \approx 1 - Cpq \), ולכן התשובה שואפת ל-\( p^{C-1} \). תכונה נדירה
+      ו-\( (1 - pq)^C \approx 1 - Cpq \), כלומר המונה הוא בערך \( p^C \cdot Cq \) והמכנה בערך
+      \( Cpq \). היחס שלהם הוא \( \frac{p^C \cdot Cq}{Cpq} = p^{C-1} \), ולזה התשובה שואפת. תכונה נדירה
       מצביעה כמעט בוודאות על בן **אחד מסוים**, ונשארת רק השאלה על שאר הילדים. עם שני
       ילדים זה בדיוק החצי של "הבכור הוא בן".
 
@@ -235,10 +239,17 @@ added: 2026-10-18
     ככל ש-\( q \) קטן, המידע ספציפי יותר והתשובה עולה מ-\( (1/2)^C / (1 - (1/2)^C) \)
     לכיוון \( (1/2)^{C-1} \).
 
-    **נסו בעצמכם.** הזיזו את \( p \), בחרו תכונה ושנו את מספר הילדים. לשני ילדים מצויר ריבוע
-    ההסתברות : כל ילד הוא אחד מארבעה סוגים (בן או בת, עם התכונה או בלי), ושטח כל משבצת הוא
-    ההסתברות של הזוג. הצלב הצבעוני הוא התנאי, והחלק הירוק שלו בתוך הריבוע המקווקו הוא
-    המטרה. הגרף מראה את התשובה לכל \( q \), מהשליש של סעיף א ועד \( p^{C-1} \) :
+    **נסו בעצמכם.** התיבה מוסיפה על הטבלה כל \( p \) וכל מספר ילדים, ריבוע הסתברות שבו שטח כל
+    משבצת הוא ההסתברות של הזוג, וגרף של התשובה מול \( q \) על ציר לוגריתמי.
+
+    - **יום בשנה :** בחרו "יום בשנה" עם \( C = 2 \). התשובה 0.4997 יושבת כמעט על הקו המקווקו
+      \( p^{C-1} = 0.5 \). בריבוע, רצועת "עם התכונה" צרה מפיקסל, והתיבה מציירת אותה רחבה יותר
+      ואומרת זאת.
+    - **שלושה ילדים :** הזיזו את \( C \) ל-3. "בלי תכונה" נותן 0.1429, כלומר ה-\( 1/7 \) של שאלת
+      ההמשך, ו"יום בשבוע" נותן 0.2322, כמו בטבלה.
+    - **בנים נפוצים :** חזרו ל-\( C = 2 \) והזיזו את \( p \) ל-0.9. "בלי תכונה" נותן 0.818, קרוב
+      לגבול 0.9 : כשרוב הילדים בנים, התכונה כמעט לא משנה. עם \( p = 0.1 \) התשובה עולה
+      מ-0.0526 בלי תכונה לכמעט 0.1 עם "יום בשנה", פי שניים.
 
     <div class="explorer" data-kind="probability" data-p="0.5" data-c="2"></div>
 
@@ -279,7 +290,7 @@ added: 2026-10-18
     - **יום הולדת :** מה התשובה אם ידוע שיש בן שנולד ב-1 בינואר? למה היא כמעט בדיוק חצי?
 
         ??? fu-answer "תשובה"
-            הנוסחה של סעיף ג עם \( C = 2 \) נותנת \( (2 - q)/(4 - q) \), ועם \( q = 1/365 \) יוצא
+            הנוסחה של סעיף ג עם \( C = 2 \) ו-\( p = 1/2 \) נותנת \( (2 - q)/(4 - q) \), ועם \( q = 1/365 \) יוצא
             \( 729/1459 \approx 0.4997 \). המידע כמעט תמיד שייך לילד אחד מסוים, כי הסיכוי
             ששני הילדים יקיימו אותו זניח, ולכן זה כמעט "הבכור הוא בן".
 
@@ -289,4 +300,5 @@ added: 2026-10-18
 
         ??? fu-answer "תשובה"
             כן : פותר האילוצים בוחר באחידות מבין הצירופים החוקיים, ו-196 הצירופים שווי הסתברות
-            מלכתחילה. ‏`solve ... before` היה מקלקל את האחידות.
+            מלכתחילה. האחידות נשמרת כל עוד אין `solve ... before` ואין `dist`. ליום צריך אילוץ
+            משלו, `day < 7`, כי שדה של שלושה ביטים מקבל גם את 7.

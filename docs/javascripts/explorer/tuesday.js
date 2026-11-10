@@ -1,5 +1,5 @@
 // kinds: tuesday
-//   tuesday                0015        part b's grid: the 14 × 14 families of (sex, weekday) pairs counted step by step, the row and the column of the information, the shared cell counted once and the families with two boys; the same grid for "at least one boy" and "the elder is a boy"
+//   tuesday                0015        part b's grid (data-info, data-day): the 14 × 14 families of (sex, weekday) pairs counted step by step, the row and the column of the information, the shared cell counted once and the families with two boys; the same grid for "at least one boy" and "the elder is a boy"
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -34,7 +34,10 @@
   const kindName = (c) => `${c < 7 ? "בן" : "בת"}, יום ${DAYS[c % 7]}`;
   const tuesdayView = () => ({
     mount(box) {
-      const D = { info: "day", day: Number(box.dataset.day ?? 2), k: 1 };   // opens on step 1, the first child's row lit (step 0 is the empty grid)
+      // opens on step 1, the first child's row lit (step 0 is the empty grid); data-info picks
+      // the information it opens on (0015 opens on part a's "any", so that its last step is not
+      // the static figure of part b above it)
+      const D = { info: TU_INFOS.includes(box.dataset.info) ? box.dataset.info : "day", day: Number(box.dataset.day ?? 2), k: 1 };
       const st = { ...D, cell: null };
       box.innerHTML =
         `<div class="ex-controls"><label>המידע <select class="tu-info">${TU_INFOS.map((i) => `<option value="${i}">${INFO_NAME[i]}</option>`).join("")}</select></label>` +
