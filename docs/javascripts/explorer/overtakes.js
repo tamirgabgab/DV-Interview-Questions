@@ -85,10 +85,11 @@
   };
 
   // --- drawing ------------------------------------------------------------------------
-  // the figures are drawn at their own size (a cell is 40 px), and shrink, down to 0.72 of
-  // it, only when the column is narrower; under that the strip scrolls sideways
+  // the figures are drawn at 0.85 of their own size (a cell is 40 px there, 34 px on the
+  // screen: the box fits one screen), and shrink, down to 0.72, only when the column is
+  // narrower; under that the strip scrolls sideways
   const CELL = 40, LW = 64;
-  const open = (W, H, cls, label) => `<svg class="figure ov-fig ov-live ${cls}" viewBox="0 0 ${W} ${H}" style="min-width:${Math.round(W * 0.72)}px;max-width:${W}px" role="img" aria-label="${label}">`;
+  const open = (W, H, cls, label) => `<svg class="figure ov-fig ov-live ${cls}" viewBox="0 0 ${W} ${H}" style="min-width:${Math.round(W * 0.72)}px;max-width:${Math.round(W * 0.85)}px" role="img" aria-label="${label}">`;
   const cx = (p) => LW + p * CELL + CELL / 2;
 
   // the requests in send order with their times, the responses in arrival order, a line
@@ -163,10 +164,10 @@
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label><span>זמני התשובה</span><input type="text" class="ex-num ov-done" dir="ltr" spellcheck="false" aria-label="זמני התשובה : עד ${NMAX} מספרים שלמים בין 0 ל-${VMAX}, מופרדים ברווח"></label>` +
-        Object.entries(PRESETS).map(([k, p]) => `<button type="button" class="md-button ov-pre" data-pre="${k}" aria-label="דוגמה : ${p.tip}" title="${p.tip}">${p.name}</button>`).join("") +
+        Object.entries(PRESETS).map(([k, p]) => `<button type="button" class="md-button ov-pre" data-pre="${k}" aria-label="${p.name} : ${p.tip}" title="${p.tip}">${p.name}</button>`).join("") +
         `<label>בהגרלה <select class="ov-n" aria-label="כמה בקשות להגריל">${[6, 8, 12, 16].map((v) => `<option value="${v}"${v === 8 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<button type="button" class="md-button ov-rand">הגרלה</button><span class="ov-anchor"></span>` +
-        `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err ov-err" role="status"></span></div>` +
+        `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-start">ההתחלה</button>` +
         `<button type="button" class="md-button ex-prev">הצעד הקודם</button>` +
@@ -202,12 +203,12 @@
         const soFar = R.slice(0, k + (ph === "u" ? 1 : 0));
         const sum = soFar.reduce((a, r) => a + r.count, 0), mx = soFar.reduce((a, r) => Math.max(a, r.count), 0);
         const ratio = (t) => ltr(`${t}/${pairs} ≈ ${(pairs ? t / pairs : 0).toFixed(2)}`);
-        const sofar = m === "c" ? `הסכום הרץ${NB}: <b>${ltr(sum)}</b> מתוך ${ltr(pairs)} זוגות, אי-סדר ${ratio(sum)}.`
+        const sofar = m === "c" ? `הסכום הרץ${NB}: <b>${ltr(sum)}</b>, אי-סדר ${ratio(sum)}.`
           : `עד עכשיו${NB}: הסכום <b>${ltr(sum)}</b>, המקסימום <b>${ltr(mx)}</b>.`;
         let summ, note = "", vars, ans = null;
         if (!row) {
-          summ = m === "c" ? `${ltr(n)} בקשות, התשובות מגיעות בסדר ${ltr(ovOrder(done).join(" "))}. שני צעדים לתשובה${NB}: שאילתה ועדכון.`
-            : `${ltr(n)} בקשות, הזמנים ${ltr(done.join(" "))}. ${m === "a" ? "מהאחרונה לראשונה" : "מהראשונה לאחרונה"}, שני צעדים לבקשה${NB}: שאילתה ועדכון.`;
+          summ = m === "c" ? `${ltr(n)} בקשות, לפי סדר ההגעה של התשובות (השורה arrive). שני צעדים לתשובה${NB}: שאילתה ועדכון.`
+            : `${ltr(n)} בקשות, ${m === "a" ? "מהאחרונה לראשונה" : "מהראשונה לאחרונה"}. שני צעדים לבקשה${NB}: שאילתה ועדכון.`;
           if (m !== "c") note = `דחיסה לדרגות${NB}: הערכים השונים ממוינים הם ${ltr(vals.join(" "))}, ולכן הדרגות הן ${ltr(done.map((v) => rk[v]).join(" "))}. העץ מכסה ${ltr(`1..${M}`)}, וכולו אפסים.`;
           else note = `אין דחיסה${NB}: הדרגה של בקשה ${ltr("i")} היא ${ltr("i + 1")}, כי אינדקסי השליחה כבר רצופים. העץ על ${ltr(n)} תאים, ריק, ואף תשובה עוד לא הגיעה.`;
           vars = m === "c" ? ltr(`n = ${n}, tree = ${list(Array(M).fill(0))}, k = 0`) : ltr(`ranks = {${vals.map((v) => `${v}: ${rk[v]}`).join(", ")}}, tree = ${list(Array(M).fill(0))}`);
@@ -220,8 +221,8 @@
             if (m === "a") {
               note = `${kk ? `בעץ כבר ${some(kk, "דרגה אחת", "דרגות")}, של הבקשות המאוחרות מ-${ltr(i)}` : `העץ עוד ריק${NB}: אין בקשות מאוחרות מ-${ltr(i)}`}. ` +
                 `${ltr(`prefix(${row.arg})`)} סופרת דרגות קטנות ממש מ-${ltr(r)}${NB}: ${read}, ומקבלת <b>${ltr(q)}</b>. ` +
-                `${q === 0 ? `אף בקשה מאוחרת לא נענתה לפניה${NB}:` : q === 1 ? "בקשה מאוחרת אחת נענתה לפניה, ולכן" : `${ltr(q)} בקשות מאוחרות ממנה נענו לפניה, ולכן`} ${ltr(`passed[${i}] = ${q}`)}.` +
-                (row.qpath.length ? ` (כל קפיצה מורידה את הביט הנמוך${NB}: ${ltr(row.qpath.concat(0).join(" → "))}.)` : "");
+                `${q === 0 ? `אף בקשה מאוחרת לא נענתה לפניה${NB}:` : q === 1 ? "בקשה מאוחרת אחת נענתה לפניה, ולכן" : `${ltr(q)} בקשות מאוחרות נענו לפניה, ולכן`} ${ltr(`passed[${i}] = ${q}`)}.` +
+                (row.qpath.length > 1 ? ` כל קפיצה מורידה את הביט הנמוך${NB}: ${ltr(row.qpath.concat(0).join(" → "))}.` : "");
             } else if (m === "b") {
               note = `${kk ? `בעץ ${some(kk, "דרגה אחת", "דרגות")}, של ${kk === 1 ? `בקשה ${ltr(0)}` : `הבקשות ${ltr(`0..${i - 1}`)}`}` : `העץ ריק${NB}: אין בקשות מוקדמות מ-${ltr(i)}`}. ` +
                 `${ltr(`prefix(${r})`)} סופרת דרגות עד ${ltr(r)} ועד בכלל${NB}: ${read}, ומקבלת <b>${ltr(q)}</b>${NB}: ` +
@@ -237,7 +238,7 @@
             vars = [ltr(m === "c" ? `k = ${kk}` : `i = ${i}`), ltr(m === "c" ? `i = ${i}` : `r = ${r}`), ltr(`prefix(${row.arg}) = ${q}`), ltr(`${NAME[m]}[${i}] = ${count}`), ltr(`tree = ${list(tree)}`)].join(" · ");
           } else {
             const last = row.upath[row.upath.length - 1];
-            note = `${ltr(`add(${r})`)} מגדילה ב-1 את ${ltr(cells(row.upath))}${NB}: כל התאים שהבלוק שלהם מכיל את ${ltr(r)}, מ-${ltr(r)} והלאה ב-${ltr("i += i & −i")} (${ltr(row.upath.concat(last + lowbit(last)).join(" → "))}, עד מעבר ל-${ltr(M)}). ` +
+            note = `${ltr(`add(${r})`)} מגדילה ב-1 את ${ltr(cells(row.upath))}, התאים שהבלוק שלהם מכיל את ${ltr(r)}${NB}: בכל צעד ${ltr("i += i & −i")}, עד ${ltr(last + lowbit(last))}, שמעבר ל-${ltr(M)}. ` +
               (m === "a" ? `מעכשיו בקשה ${ltr(i)} נספרת בשאילתות של הבקשות שלפניה.` : m === "b" ? `מעכשיו בקשה ${ltr(i)} נספרת בשאילתות של הבקשות שאחריה.`
                 : `מאגר שמוסר לפי סדר השליחה ${row.held ? `מחזיק עכשיו ${some(row.held, "תשובה אחת", "תשובות")}, עד שתגיע בקשה ${ltr(row.head)}` : `ריק עכשיו${NB}: כל מה שהגיע נמסר`}.`);
             vars = [ltr(m === "c" ? `k = ${kk}` : `i = ${i}`), ltr(`add(${r})`), ltr(`tree = ${list(row.tree)}`), ...(m === "c" ? [ltr(`total = ${row.total}`)] : [])].join(" · ");
@@ -246,9 +247,11 @@
         const lines = LINES[m][ph], lit = LIT[m][ph];
         if (fin && row) {
           const arr = R.slice().sort((a, b) => a.i - b.i).map((r) => r.count);
-          ans = m === "c" ? `סך העקיפות ${ltr(row.total)}, אי-סדר ${ratio(row.total)} (‏0 הוא סדר מלא, 1 סדר הפוך). ${ltr(`passed = ${list(arr)}`)}, והמאגר החזיק לכל היותר ${ltr(R.reduce((a, r) => Math.max(a, r.held), 0))}${NB}: המקסימום של ${ltr("passed")}.`
-            : m === "a" ? `${ltr(`passed = ${list(arr)}`)}. הסכום ${ltr(sum)} הוא סך העקיפות, והמקסימום ${ltr(mx)} הוא עומק הסידור מחדש.`
-              : `${ltr(`overtook = ${list(arr)}`)}. הסכום ${ltr(sum)} שווה לסכום של ${ltr("passed")}${NB}: אותם זוגות.`;
+          // a long array leaves no room for the words: the line stays one line
+          const short = n > 8;
+          ans = m === "c" ? `סך העקיפות ${ltr(row.total)}, אי-סדר ${ratio(row.total)}. המאגר החזיק עד ${ltr(R.reduce((a, r) => Math.max(a, r.held), 0))} תשובות.`
+            : m === "a" ? `${ltr(`passed = ${list(arr)}`)}${short ? `, הסכום ${ltr(sum)}, המקסימום ${ltr(mx)}.` : `. הסכום ${ltr(sum)} הוא סך העקיפות, והמקסימום ${ltr(mx)} הוא עומק הסידור מחדש.`}`
+              : `${ltr(`overtook = ${list(arr)}`)}${short ? `, הסכום ${ltr(sum)}.` : `. הסכום ${ltr(sum)} שווה לסכום של ${ltr("passed")}${NB}: אותם זוגות.`}`;
         }
         $(".ov-sum").innerHTML = summ;
         $(".ov-note").innerHTML = note;
@@ -257,10 +260,11 @@
       };
       const total = () => 2 * st.done.length;
       const stop = autoplay(play, speed, { step: () => { st.s++; draw(); }, done: () => st.s >= total(), restart: () => { st.s = 0; draw(); } });
-      const restart = () => { stop(); st.s = 0; $(".ov-err").textContent = ""; draw(); };
+      const restart = () => { stop(); st.s = 0; draw(); };
       $(".ov-done").addEventListener("change", () => {
         const v = parse($(".ov-done").value);
-        if (!v) { $(".ov-err").textContent = `זמני התשובה${NB}: 1 עד ${NMAX} מספרים שלמים בין 0 ל-${VMAX}`; return; }
+        // a bad entry is said in the summary line (the next draw writes the summary back)
+        if (!v) { $(".ov-sum").innerHTML = `<span class="fl-err">הקלט לא התקבל${NB}: צריך 1 עד ${NMAX} מספרים שלמים בין 0 ל-${VMAX}, מופרדים ברווח. הציור נשאר כמו שהיה.</span>`; return; }
         st.done = v; restart();
       });
       $(".ov-done").addEventListener("keydown", (ev) => { if (ev.key === "Enter") $(".ov-done").blur(); });
@@ -283,11 +287,11 @@
 
   dvqExplorers.register({
     views: { overtakes: view },
-    // the two figures and the line that explains the step beside the steps and the code;
-    // the key stays above both, at the box's width
-    cols: { overtakes: { main: ".ov-wrap, .ov-note" } },
+    // the two figures beside the steps and the code; the key above both and the line that
+    // explains the step under both, at the box's width
+    cols: { overtakes: { main: ".ov-wrap" } },
     help: {
-      overtakes: `כל תיבה מריצה את הפתרון של הסעיף שלה${NB}: סעיף א מהבקשה האחרונה לראשונה, סעיף ב מהראשונה לאחרונה, וסעיף ג לפי סדר ההגעה של התשובות. מקלידים את זמני התשובה של הבקשות, מגרילים, או בוחרים אחת משלוש הצורות (בסדר, הפוך, שווים) על אותו מספר של בקשות. בציור העליון הבקשות לפי סדר השליחה והתשובות לפי סדר ההגעה, עם קו מכל בקשה לתשובה שלה${NB}: קווים שחוצים זה את זה הם עקיפות. מתחתיו עץ Fenwick עם הטווח שכל תא מכסה. לכל בקשה שני צעדים${NB}: שאילתה (התאים שנקראים כחולים) ועדכון (התאים שגדלים כתומים), והספירה נכתבת מתחת לבקשה. בסעיף ג השורה buffer אומרת כמה תשובות מחכות במאגר הסידור מחדש אחרי כל הגעה. השורה שמתחת לציורים מסבירה את הצעד, והפאנל 'הסבר' מדליק את שורות הקוד.`,
+      overtakes: `התיבה מריצה את הפתרון של הסעיף שלה על הזמנים שבשדה. למעלה, קווים שחוצים הם עקיפות. למטה עץ Fenwick${NB}: שאילתה קוראת את התאים הכחולים, עדכון מגדיל את הכתומים. בסעיף ג, buffer הוא מספר התשובות שמחכות במאגר.`,
     },
     models: { ovWalk, ovRanks, ovOrder },
   });

@@ -16,15 +16,22 @@
 .md-typeset svg.ov-dp .ov-wlab { fill: var(--viz-ink); font-size: 15px; font-weight: 600; font-family: var(--md-code-font-family); }
 
 /* the boxes: the key in one row over the two columns, the number of responses the reorder
-   buffer holds (box c) in the ink of the counts */
-.md-typeset .explorer[data-kind="overtakes"] .ov-legend { gap: 0.2rem 0.8rem; margin: 0.2rem 0 0.5rem; }
+   buffer holds (box c) in the ink of the counts, the step's explanation under the columns */
+.md-typeset .explorer[data-kind="overtakes"] .ov-legend { gap: 0.2rem 0.8rem; margin: 0.2rem 0 0.4rem; }
 .md-typeset .explorer[data-kind="overtakes"] svg.ov-fig .ov-held { fill: var(--viz-ink); font-weight: 700; }
-.md-typeset .explorer[data-kind="overtakes"] .ov-wrap { margin: 0.3rem 0; }
-.md-typeset .explorer[data-kind="overtakes"] .ov-wrap svg { margin-block: 0.2rem; }
+.md-typeset .explorer[data-kind="overtakes"] .ov-wrap { margin: 0.2rem 0; }
+.md-typeset .explorer[data-kind="overtakes"] .ov-wrap svg { margin-block: 0.1rem; }
+.md-typeset .explorer[data-kind="overtakes"] .ov-note { margin: 0.4rem 0 0; }
 
-/* one screen at 1920 x 1080 (the box in two columns): a shorter code view, which scrolls
-   itself to the step's lines (core.js), and a smaller key */
+/* one screen at 1920 x 1080 (the box in two columns), in every state: the summary is one
+   line there, the code view is short and scrolls itself to the step's lines (core.js), the
+   step chips and the key are smaller */
 @container (min-width: 600px) {
-  .md-typeset .explorer[data-kind="overtakes"] .ex-side .ex-explain .ex-codewrap { max-height: 15rem; }
+  .md-typeset .explorer[data-kind="overtakes"] .ov-sum { min-height: 0; margin: 0.3rem 0; }
+  .md-typeset .explorer[data-kind="overtakes"] > .ex-answer { margin-block: 0.3rem; }
+  .md-typeset .explorer[data-kind="overtakes"] .ex-side .ex-explain .ex-codewrap { max-height: 6rem; }
+  .md-typeset .explorer[data-kind="overtakes"] .ex-side .ex-explain .ex-stepchips { gap: 0.2rem; margin-bottom: 0.3rem; }
+  .md-typeset .explorer[data-kind="overtakes"] .ex-side .ex-explain .ex-stepchips li { font-size: 0.6rem; }
+  .md-typeset .explorer[data-kind="overtakes"] .ex-side .ex-explain .ex-vars { font-size: 0.62rem; margin: 0.1rem 0 0.3rem; }
   .md-typeset .explorer[data-kind="overtakes"] .ov-legend { font-size: 0.62rem; }
 }
