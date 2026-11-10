@@ -112,7 +112,7 @@
         let text;
         if (st.step === 0) {
           const sp = k4Step(st.x, B);
-          text = sp.p === 0 ? `כל הספרות שוות, ולכן p = 0 וההפרש יהיה 0.` : `הספרות הממוינות ${ltr(fmtDigits(sp.sorted))}${NB}: ‏p = a − d = ${ltr(sp.p)} ו-q = b − c = ${ltr(sp.q)}. ההפרש יהיה ${ltr(`p(B³ − 1) + q(B² − B) = ${sp.diff}`)}.`;
+          text = sp.p === 0 ? `כל הספרות שוות, ולכן p = 0 וההפרש יהיה 0.` : `הספרות הממוינות ${ltr(fmtDigits(sp.sorted))}${NB}: ${ltr(`p = a − d = ${sp.p}`)} ו-${ltr(`q = b − c = ${sp.q}`)}. ההפרש יהיה ${ltr(`p(B³ − 1) + q(B² − B) = ${sp.diff}`)}.`;
         } else {
           const sp = k4Step(o.values[st.step - 1], B);
           text = `צעד ${ltr(st.step)}${NB}: ‏(p, q) = ${ltr(`(${sp.p}, ${sp.q})`)}, ולכן ${ltr(`F = ${sp.p} · ${B * B * B - 1} + ${sp.q} · ${B * B - B} = ${sp.diff}`)} = ${ltr(k4Text(sp.diff, B))}` +
