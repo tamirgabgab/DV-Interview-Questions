@@ -1,17 +1,27 @@
 /* 0031 (the bridge and the torch): the bridge box on one computer screen (session 34).
    The plans table and the greedy rule's table sit side by side, the crossings of the shown
-   plan are one line that scrolls inside itself (the reader's own plan has no end), and the
-   message of the own plan sits beside the bridge, under its caption. */
-.md-typeset .explorer .bridge-line { margin: 0.3em 0 0.5em; font-size: 0.7rem; line-height: 1.75; max-height: 3.5em; overflow-y: auto; }
+   plan are one left-to-right line that scrolls inside itself (the reader's own plan has no
+   end), and the message of the own plan sits beside the bridge, under its caption. */
+.md-typeset .explorer[data-kind="bridge"] .ex-summary { min-height: 0; }
+.md-typeset .explorer .bridge-line { margin: 0.3em 0 0.5em; font-size: 0.7rem; line-height: 1.75; max-height: 3.5em; overflow-y: auto; text-align: left; }
 .md-typeset .explorer .bridge-line .bl-lab { font-weight: 700; }
 .md-typeset .explorer .bridge-line .bl-x { padding: 0.1em 0.3em; border-radius: 0.2rem; white-space: nowrap; }
 .md-typeset .explorer .bridge-line .bl-x.is-now { background: var(--md-code-bg-color); box-shadow: inset 0 -2px 0 var(--viz-s2); }
-.md-typeset .explorer[data-kind="bridge"] .br-msg { margin: 0.3em 0; font-size: 0.75rem; }
+.md-typeset .explorer[data-kind="bridge"] .br-msg { margin: 0.3em 0; font-size: 0.68rem; line-height: 1.5; }
 .md-typeset .explorer[data-kind="bridge"] .br-msg:empty { display: none; }
+.md-typeset .explorer[data-kind="bridge"] .br-cut { margin: 0.1em 0; font-size: 0.66rem; }
 .md-typeset .explorer[data-kind="bridge"] .bridge-gwrap > label { font-size: 0.7rem; }
+.md-typeset .explorer[data-kind="bridge"] .bridge-greedy .ex-note { margin-bottom: 0; }
 @container (min-width: 600px) {
-  .md-typeset .explorer[data-kind="bridge"] .bridge-tables:not([hidden]) {
-    display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.25fr); column-gap: 1.4rem; align-items: start;
+  .md-typeset .explorer[data-kind="bridge"] .bridge-tables:not([hidden], .is-plain) {
+    display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 1.6rem; align-items: start;
   }
   .md-typeset .explorer[data-kind="bridge"] .bridge-tables .bridge-table { margin-top: 0; }
+  /* the greedy table in its column: one line a row; with long times (eight of two decimals)
+     the headings break after their word, so the last column stays inside the box */
+  .md-typeset .explorer[data-kind="bridge"] .bridge-greedy .bridge-table { font-size: 0.64rem; }
+  .md-typeset .explorer[data-kind="bridge"] .bridge-greedy .bridge-table :is(td, th) { padding: 0.15em 0.45em; line-height: 1.4; white-space: nowrap; min-width: 0; }
+  .md-typeset .explorer[data-kind="bridge"] .bridge-greedy .bridge-table th { white-space: normal; vertical-align: bottom; }
+  .md-typeset .explorer[data-kind="bridge"] .ex-side .bridge-caption { line-height: 1.6; }
+  .md-typeset .explorer[data-kind="bridge"] .bridge-greedy .bridge-table :is(td, th) bdi { white-space: nowrap; }
 }

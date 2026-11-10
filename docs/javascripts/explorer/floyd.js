@@ -74,8 +74,9 @@
         const H = top + (others.length ? rowY : r) + 30;
         const P = (v) => { const [x, y] = pos.get(v); return [x, y + top]; };
         const dupEdges = done ? new Set(st.nums.map((v, i) => (v === entry ? i : -1)).filter((i) => i >= 0)) : new Set();
-        const sc = Math.min(1.3, 400 / H);                       // a small graph is not blown up to the column's width
-        let s = `<svg class="figure fl-live" viewBox="0 0 ${f(W, 0)} ${f(H, 0)}" style="max-width:min(34rem, ${f((W * sc) / 16, 2)}rem)" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו">`;
+        // a small graph is not blown up to the column's width, and no graph is taller than 340 px
+        // (in px: the root font grows on a wide screen, and the box must stay on one screen)
+        let s = `<svg class="figure fl-live" viewBox="0 0 ${f(W, 0)} ${f(H, 0)}" style="max-width:min(34rem, ${f((W * 1.3) / 16, 2)}rem, ${f((W * 340) / H, 0)}px)" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו">`;
         st.nums.forEach((v, i) => {
           const [x0, y0] = P(i), [x1, y1] = P(v);
           const faded = others.includes(i) ? " st-faded" : "";
@@ -130,7 +131,7 @@
         }
         $(".fl-step").innerHTML = text;
         const meet = tr.frames.findIndex((g) => g.phase === 2) - 1;
-        $(".fl-sum").innerHTML = `הזנב${NB}: ${ltr(rho.tail.join(" → "))} (${ltr(`μ = ${rho.mu}`)})<br>המעגל${NB}: ${ltr(rho.cycle.join(" → "))} (${ltr(`λ = ${rho.lambda}`)})<br>` +
+        $(".fl-sum").innerHTML = `הזנב (${ltr(`μ = ${rho.mu}`)})${NB}: ${ltr(rho.tail.join(" → "))}<br>המעגל (${ltr(`λ = ${rho.lambda}`)})${NB}: ${ltr(rho.cycle.join(" → "))}<br>` +
           `המפגש אחרי ${meet === 1 ? "איטרציה אחת" : `${ltr(meet)} איטרציות`}, ושלב 2 לוקח ${rho.mu === 1 ? "צעד אחד" : `${ltr(rho.mu)} צעדים`}.` +
           (rho.others.length ? `<br>${rho.others.length === 1 ? `האינדקס ${ltr(rho.others[0])} לא נגיש מ-0 ולא משנה` : `האינדקסים ${ltr(rho.others.join(", "))} לא נגישים מ-0 ולא משנים`} כלום.` : "");
         answer(box, last ? `הערך ${ltr(tr.answer)} כפול${NB}: הוא הכניסה למעגל, שהצב והארנב נפגשים בה בשלב 2.` : null, ".fl-cells .hl");

@@ -112,7 +112,7 @@
         `<p class="ex-note br-cut" role="status"></p>` +
         `<p class="ex-summary" aria-live="polite"></p><div class="bridge-tables"><div class="bridge-plans"></div>` +
         `<div class="bridge-gwrap"><label><input type="checkbox" class="ex-greedy" checked> הכלל החמדני, סיבוב אחרי סיבוב</label><div class="bridge-greedy"></div></div></div>` +
-        `<div class="bridge-line" role="region" tabindex="0" aria-label="החציות של התוכנית המוצגת, לפי הסדר"></div>` +
+        `<div class="bridge-line" dir="ltr" role="region" tabindex="0" aria-label="החציות של התוכנית המוצגת, לפי הסדר"></div>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">החצייה הקודמת</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">החצייה הבאה</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1600, 1000, 400) + `<span class="ex-pos"></span></div>` +
@@ -124,13 +124,14 @@
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), input = $(".ex-times");
       let timer = null;
-      // the field -> up to eight positive times in hundredths; what was left out is said, not hidden
+      // the field -> up to eight positive times under 1000, in hundredths (a bound keeps the
+      // box's lines short); what was left out is said, not hidden
       const parse = () => {
         const words = input.value.split(/[\s,]+/).filter(Boolean);
-        const good = words.map((w) => Math.round(Number(w) * 100)).filter((v) => Number.isFinite(v) && v > 0);
+        const good = words.map((w) => Math.round(Number(w) * 100)).filter((v) => Number.isFinite(v) && v > 0 && v < 100000);
         const bad = words.length - good.length;
         st.cut = [good.length > 8 ? `נלקחו שמונת הזמנים הראשונים מתוך ${good.length}.` : "",
-          bad ? (bad === 1 ? "ערך אחד שאינו מספר חיובי הושמט." : `${bad} ערכים שאינם מספרים חיוביים הושמטו.`) : ""].filter(Boolean).join(" ");
+          bad ? (bad === 1 ? "ערך אחד שאינו מספר חיובי קטן מ-1000 הושמט." : `${bad} ערכים שאינם מספרים חיוביים קטנים מ-1000 הושמטו.`) : ""].filter(Boolean).join(" ");
         return good.slice(0, 8);
       };
       const frameSvg = (times, across, side, moving, forward, t) => {
@@ -142,7 +143,7 @@
           `<rect class="bank" x="0" y="20" width="190" height="150" rx="8"/><rect class="bank" x="450" y="20" width="190" height="150" rx="8"/>` +
           `<rect class="river" x="190" y="20" width="260" height="150"/><rect class="bridge" x="190" y="78" width="260" height="34" rx="4"/>` +
           `<text class="legend" x="95" y="160" text-anchor="middle" direction="rtl">הגדה הקרובה</text><text class="legend" x="545" y="160" text-anchor="middle" direction="rtl">הגדה הרחוקה</text>`;
-        const person = (i, x, y, cls) => `<g><circle class="${cls}" cx="${f(x)}" cy="${y}" r="17"/><text class="st-text${fm(times[i]).length > 3 ? " st-sm" : ""}" x="${f(x)}" y="${y + 5}" text-anchor="middle">${fm(times[i])}</text>` +
+        const person = (i, x, y, cls) => `<g><circle class="${cls}" cx="${f(x)}" cy="${y}" r="17"/><text class="st-text${fm(times[i]).length > 3 ? " st-sm" : ""}" x="${f(x)}" y="${y + 5}" text-anchor="middle"${fm(times[i]).length > 4 ? ' textLength="30" lengthAdjust="spacingAndGlyphs"' : ""}>${fm(times[i])}</text>` +
           `<text class="st-small" x="${f(x)}" y="${y + 30}" text-anchor="middle">${NAMES[i]}</text></g>`;
         const near = [], far = [];
         for (let i = 0; i < n; i++) { if (moving.includes(i)) continue; ((across >> i) & 1 ? far : near).push(i); }
@@ -184,11 +185,12 @@
         if (!plans[st.plan]) { st.plan = "best"; $(".ex-plan").value = "best"; }
         const r = plans[st.plan], best = plans.best;
         st.s = Math.min(Math.max(st.s, 0), r.moves.length);
-        const names = (g) => g.map((i) => `${NAMES[i]} (${fm(times[i])})`).join(" ו-");
+        const names = (g) => g.map((i) => ltr(`${NAMES[i]} (${fm(times[i])})`)).join(" ו-");
         const people = times.length === 1 ? "אדם אחד" : `${ltr(times.length)} אנשים`, cap = st.cap === 2 ? "שניים" : "שלושה";
         // the reader's own plan hides the best one (the summary, the tables) until everyone is across
         const hide = st.plan === "mine" && acrossOf(st.mine) !== (1 << times.length) - 1;
         $(".bridge-tables").hidden = hide;
+        $(".bridge-tables").classList.toggle("is-plain", st.cap !== 2 || times.length < 2);     // notes only: no two columns
         if (hide) $(".ex-summary").innerHTML = `${people} על גשר של ${cap}${NB}: בנו תוכנית משלכם. הזמן הקצר ביותר יופיע כשכולם יעברו.`;
         else $(".ex-summary").innerHTML = `${people} על גשר של ${cap}${NB}: הזמן הקצר ביותר הוא ${mins(best.time)} ב-${ltr(best.moves.length)} חציות.` +
           (st.plan === "best" || st.plan === "mine" ? "" : ` מוצגת התוכנית "${PLANS[st.plan]}"${NB}: ${mins(r.time)}${r.time > best.time ? `, ${ltr(fm(r.time - best.time))} יותר מהקצרה ביותר` : ", בדיוק כמו הקצרה ביותר"}.`);
@@ -208,7 +210,7 @@
           gr.rounds.map((r, k) => `<tr><td>${k + 1}</td><td>${who(r.slow)}</td>` +
             `<td${r.take === "pair" ? ' class="is-take"' : ""}>${ltr(fm(r.pair))}</td><td${r.take === "escort" ? ' class="is-take"' : ""}>${ltr(fm(r.escort))}</td><td>${ltr(fm(r.total))}</td></tr>`).join("") +
           `<tr><td>${gr.rounds.length + 1}</td><td>${who(gr.left)}</td><td colspan="2">${gr.left.length === 3 ? "שלושה נשארו" : gr.left.length === 2 ? "שניים נשארו" : "אחד נשאר"}${NB}: ${ltr(fm(gr.last))}</td><td>${ltr(fm(gr.time))}</td></tr></tbody></table>` +
-          `<p class="ex-note">בכל סיבוב שני האיטיים עוברים בזולה מבין שתי הדרכים (המודגשת). הסכום ${ltr(fm(gr.time))}${gr.time === best.time ? " שווה לזמן של החיפוש ✓" : ` לעומת ${ltr(fm(best.time))} של החיפוש`}.</p>`;
+          `<p class="ex-note">הזולה בכל סיבוב מודגשת. הסכום ${ltr(fm(gr.time))}${gr.time === best.time ? " שווה לזמן של החיפוש ✓" : ` לעומת ${ltr(fm(best.time))} של החיפוש`}.</p>`;
         let across = 0, side = 0, t = 0, caption = `רגע 0${NB}: כולם והלפיד על הגדה הקרובה.`;
         let moving = [], forward = true;
         for (let k = 0; k < st.s; k++) {
@@ -221,11 +223,12 @@
           } else { across ^= g.reduce((m, i) => m | (1 << i), 0); side = 1 - side; }
         }
         const line = $(".bridge-line");
-        line.innerHTML = r.moves.length ? `<span class="bl-lab">החציות${NB}:</span> ${ltr(planLine(r.moves, st.s - 1))}` : `<span class="bl-lab">החציות${NB}:</span> עוד אין.`;
+        // a left-to-right line (the far bank is on the right, as in the figure), its Hebrew label first
+        line.innerHTML = `<span class="bl-lab">החציות${NB}:</span> ` + (r.moves.length ? planLine(r.moves, st.s - 1) : `<span dir="rtl">עוד אין.</span>`);
         const now = line.querySelector(".is-now");       // keep the marked crossing in view inside the line's own scroll
         if (now) line.scrollTop = Math.max(0, now.offsetTop - line.offsetTop - 4);
         $(".bridge-frame").innerHTML = frameSvg(times, across, side, moving, forward, t);
-        $(".bridge-caption").innerHTML = caption + (st.s === r.moves.length && st.s > 0 && acrossOf(r.moves) === (1 << times.length) - 1 ? " כולם בצד הרחוק." : "");
+        $(".bridge-caption").innerHTML = caption + (st.plan !== "mine" && st.s === r.moves.length && st.s > 0 && acrossOf(r.moves) === (1 << times.length) - 1 ? " כולם בצד הרחוק." : "");
         $(".ex-pos").textContent = `חצייה ${st.s} מתוך ${r.moves.length}`;
         $(".ex-prev").disabled = st.s <= 0; $(".ex-next").disabled = st.s >= r.moves.length;
       };
@@ -252,7 +255,7 @@
           // the first miss says only by how much; the hint waits for the second, and names the plan that is the best here
           const hint = st.fails < 2 || st.cap !== 2 ? "" : plans.pair.time === best ? ` רמז${NB}: נסו לשלוח את שני האיטיים יחד, כך שמשלמים על האיטי מביניהם פעם אחת.`
             : plans.escort.time === best ? ` רמז${NB}: כאן משתלם שהמהיר ביותר ילווה כל אחד ויחזיר את הלפיד.` : "";
-          say("wv-bad", `כולם בצד השני אחרי ${mins(t)}, ${ltr(fm(t - best))} יותר מהקצר ביותר. אפשר לבטל חציות ולנסות שוב.${hint}`);
+          say("wv-bad", `כולם בצד השני אחרי ${mins(t)}, ${ltr(fm(t - best))} יותר מהקצר ביותר.${hint || " אפשר לבטל חציות ולנסות שוב."}`);
           $(".br-show").hidden = false;
         }
       };
@@ -298,9 +301,9 @@
 
   dvqExplorers.register({
     views: { bridge: bridgeView },
-    cols: { bridge: { main: ".bridge-frame", side: ".bridge-caption, .br-msg", w: "minmax(0, 2.2fr)" } },   // the tables and the legend stay wide; the bridge beside its caption and the own plan's message
+    cols: { bridge: { main: ".bridge-frame", side: ".bridge-caption, .br-msg", w: "minmax(0, 1.7fr)" } },   // the tables and the legend stay wide; the bridge beside its caption and the own plan's message
     help: {
-      bridge: "זמני החצייה בשדה, קיבולת הגשר ובורר התוכנית : ״החצייה הבאה״ ו״הפעלה״ מעבירים חצייה אחרי חצייה, והטבלה משווה את שלוש התוכניות. המתג ״הכלל החמדני״ מראה בכל סיבוב את שתי הדרכים להעביר את שני האיטיים ואת הזולה מביניהן. ״התוכנית שלי״ בבורר התוכנית : בוחרים מי חוצה בכל פעם, והזמן נבדק מול הקצר ביותר בסוף.",
+      bridge: "מקלידים זמנים ובוחרים תוכנית\u00a0: ״החצייה הבאה״ ו״הפעלה״ מעבירים חצייה אחרי חצייה. הטבלאות משוות את התוכניות ומראות את הכלל החמדני סיבוב אחרי סיבוב. ב״התוכנית שלי״ בוחרים מי חוצה בכל פעם, והזמן נבדק מול הקצר ביותר בסוף.",
     },
     models: { bridgeSolve, bridgeEscort, bridgeTime, bridgeEscortMoves, bridgePairMoves, bridgeGreedy },
   });
