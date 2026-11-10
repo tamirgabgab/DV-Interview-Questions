@@ -35,7 +35,7 @@
 .md-typeset .explorer .cp-log { font-size: 0.7rem; margin: 0; line-height: 1.45; }
 .md-typeset .explorer .cp-log li { margin-bottom: 0; }
 /* the log is as long as the game: it scrolls inside the box, the last move in view */
-.md-typeset .explorer .cp-logwrap { max-height: 11rem; overflow-y: auto; margin: 0.4em 0; }
+.md-typeset .explorer .cp-logwrap { max-height: 11rem; overflow-y: auto; margin: 0.4em 0; padding-inline-start: 0.9em; }   /* room for a two-digit number */
 .md-typeset .explorer .cp-logwrap:focus-visible { outline: 3px solid var(--site-focus-ring); outline-offset: 2px; }
 .md-typeset .explorer .cp-legend { justify-content: center; }
 @container (min-width: 600px) {
