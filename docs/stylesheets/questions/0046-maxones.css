@@ -1,0 +1,14 @@
+/* 0046: the maxones box on one screen. In the two columns (core.js columns(),
+   27-box-columns.css) the grid and its dp matrix share the left column side by side,
+   their cells shrinking to fit it instead of wrapping one under the other; the step and
+   the code's state sit beside them. */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="maxones"] .ex-main > .mo-panels { flex-wrap: nowrap; gap: 0.8rem 1.2rem; margin-top: 0; }
+  .md-typeset .explorer[data-kind="maxones"] .ex-main .mo-panel { flex: 1 1 0; }         /* two equal halves */
+}
+
+/* the transport, the two jumps ("the next row", "the next direction") and the step count
+   on one row, also in the triangle box */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="maxones"] .mo-play { column-gap: 0.7rem; }
+}

@@ -149,7 +149,7 @@
         `<p class="ex-summary mo-sum" aria-live="polite"></p>` +
         `<span class="viz-legend"><span><i class="mo-key-one"></i>תא 1</span><span><i class="mo-key-cur"></i>התא הנוכחי</span><span class="mo-key-nb-wrap"><i class="mo-key-nb"></i>השכנים שנקראו</span>` +
         `<span class="mo-key-cand-wrap"><i class="mo-key-cand"></i>המלבן שנבדק</span><span><i class="mo-key-best"></i>הטוב עד עכשיו</span><span><i class="mo-key-win"></i>התשובה</span></span>` +
-        `<p class="mo-edit-hint">לחיצה על תא הופכת אותו. גרירה מסמנת מלבן, ואז "הסימון ל-1" או "הסימון ל-0" שב"עריכת המערך". במקלדת${NB}: חיצים בין התאים, רווח הופך תא, 0 או 1 קובעים אותו (או את כל הסימון), ו-Shift עם חץ מסמן. בשדה "הערכים" אפשר להדביק מערך שלם.</p>` +
+        `<p class="mo-edit-hint">לחיצה על תא הופכת אותו, וגרירה מסמנת מלבן ל"הסימון ל-1" או "הסימון ל-0". מקלדת${NB}: חיצים, רווח, 0 או 1, ו-Shift עם חץ לסימון.</p>` +
         `<div class="mo-panels"><figure class="mo-panel"><figcaption class="mo-cap-in"></figcaption><div class="mo-grid mo-in" role="grid" dir="ltr" data-edits></div></figure>` +
         `<figure class="mo-panel"><figcaption class="mo-cap-dp"></figcaption><div class="mo-grid mo-dp" role="table" dir="ltr"></div></figure></div>` +
         `<p class="mo-step" aria-live="polite"></p><p class="mo-code"></p>`;
@@ -490,9 +490,9 @@
   dvqExplorers.register({
     views: { maxones: maxonesView },
     help: {
-      maxones: "עורכים את המערך : לחיצה על תא הופכת אותו, גרירה מסמנת מלבן שאפשר להפוך כולו ל-1 או ל-0, ו\"מערך אקראי\" ממלא לפי הסיכוי ל-1. בוחרים ריבוע, מלבן או משולש ומריצים צעד אחרי צעד, שורה אחרי שורה, כיוון אחרי כיוון (במשולש) או עד הסוף : לצד המערך מתמלא dp (בריבוע ובמשולש, בכל כיוון בנפרד) או heights (במלבן, עם המחסנית), הטוב עד עכשיו מוקף בכתום, ובסוף התשובה נצבעת בירוק.",
+      maxones: "עורכים את המערך : לחיצה על תא הופכת אותו, גרירה מסמנת מלבן שאפשר להפוך כולו ל-1 או ל-0, ו\"מערך אקראי\" ממלא לפי הסיכוי ל-1. במקלדת החיצים עוברים בין התאים, רווח הופך תא, 0 או 1 קובעים אותו (או את כל הסימון), ו-Shift עם חץ מסמן. בשדה \"הערכים\" אפשר להדביק מערך שלם. בוחרים ריבוע, מלבן או משולש ומריצים צעד אחרי צעד, שורה אחרי שורה, כיוון אחרי כיוון (במשולש) או עד הסוף : לצד המערך מתמלא dp (בריבוע ובמשולש, בכל כיוון בנפרד) או heights (במלבן, עם המחסנית), הטוב עד עכשיו מוקף בכתום, ובסוף התשובה נצבעת בירוק.",
     },
     models: { moSquare, moRect, moTri, moCount, moParse, moText },
-    cols: { maxones: { main: ".mo-code", side: ".mo-step" } },   // the step (right) beside its code line (left); the editing group lays its rows out in two columns (27-box-columns.css)
+    cols: { maxones: { main: ".mo-panels", side: ".mo-step, .mo-code", w: "minmax(0, 1.6fr)" } },   // the grid and its dp (left) beside the step and the code's state (right); the editing group lays its rows out in two columns (27-box-columns.css), the panels shrink in their column (questions/0046-maxones.css)
   });
 })();

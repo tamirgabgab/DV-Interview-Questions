@@ -180,9 +180,10 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0063-slidemax.css    # 0063: the sliding window maximum, its box on one screen (session 34)
   - stylesheets/questions/0070-gridpath.css    # 0070: the grid shortest path, its three boxes on one screen, box b's walls and box c's terrain (session 34)
   - stylesheets/questions/0082-nim.css         # 0082: Nim, the block diagram of nim_move_hw and the nim box's disallowed tokens (session 34)
-  - stylesheets/questions/0076-ffn.css         # 0076: the ffn box's base-3 strip scrolls inside the box on a phone (session 34)
   - stylesheets/questions/0060-popnext.css     # 0060: the next number with as many ones, the block diagram of the one-cycle next_same (session 34)
   - stylesheets/questions/0020-pcie.css       # 0020, 0021: the header fields of the pcie box's hand-made split (session 34)
+  - stylesheets/questions/0046-maxones.css     # 0046: the maxones boxes on one screen, the grid and its dp side by side in their column (session 34)
+  - stylesheets/questions/0076-ffn.css         # 0076: the ffn box's base-3 strip scrolls inside the box on a phone (session 34)
 
 extra_javascript:
   - javascripts/mathjax.js

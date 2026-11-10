@@ -233,6 +233,47 @@ def test_page_numbers():
     # the traps: the widest row and the tallest column at (1, 1) of [[0, 1], [1, 1]] are no rectangle
     assert rect([[0, 1], [1, 1]])[0] == 2
     assert rect([[1, 1, 1]])[0] == 3
+    # the trap: without the zero at the end of the row, 1 1 1 gives 2 (the >= pops the equal
+    # columns but the last) and a single 1 gives 0
+    assert [rect_without_sentinel(g) for g in ([[1, 1, 1]], [[1]], [[0, 1], [1, 1]])] == [2, 0, 0]
+    # the boxes' tasks: the square moves when (0, 2) turns 0, the diagonal limits (2, 2) of
+    # 011.111.111, and the triangle drops to the up-left one at (2, 6) when (1, 1) turns 0
+    g = [r[:] for r in SQ]
+    g[0][2] = 0
+    assert square(g) == (9, (1, 1), (3, 3)) and full_dp([[0, 1, 1], [1, 1, 1], [1, 1, 1]])[2][2] == 2
+    assert full_dp([[0, 1, 1], [1, 1, 1], [1, 1, 1]])[1][1] == 1 and full_dp([[0, 1, 1], [1, 1, 1], [1, 1, 1]])[1][2] == 2
+    g = [r[:] for r in TRI]
+    g[1][1] = 0
+    assert tri(g) == (6, (2, 6), (0, 6), (2, 4)) and inside(g, triangle((3, 0), 3, -1, 1))
+
+
+def rect_without_sentinel(grid):
+    n, heights, best = len(grid[0]), [0] * len(grid[0]), 0
+    for row in grid:
+        heights = [h + 1 if v else 0 for h, v in zip(heights, row)]
+        stack = []
+        for j in range(n):
+            while stack and heights[stack[-1]] >= heights[j]:
+                height = heights[stack.pop()]
+                best = max(best, height * (j - (stack[-1] + 1 if stack else 0)))
+            stack.append(j)
+    return best
+
+
+def test_every_largest_rectangle_pops_once():
+    """The follow-up: the rectangles the stack pops at the largest area are all the
+    all-ones rectangles of that area, each popped once."""
+    rng = random.Random(11)
+    for _ in range(1500):
+        m, n = rng.randint(1, 6), rng.randint(1, 6)
+        g = [[int(rng.random() < 0.7) for _ in range(n)] for _ in range(m)]
+        best = rect(g)[0]
+        if not best:
+            continue
+        pops = [(e[1] - e[4] + 1, e[5], e[1], e[2] - 1) for e in rect_events(g) if e[0] == "pop" and e[6] == best]
+        every = {(r1, c1, r2, c2) for r1 in range(m) for r2 in range(r1, m) for c1 in range(n) for c2 in range(c1, n)
+                 if (r2 - r1 + 1) * (c2 - c1 + 1) == best and ones(g, (r1, c1), (r2, c2))}
+        assert len(pops) == len(set(pops)) and set(pops) == every, g
 
 
 def test_explorer_matches_the_page():
