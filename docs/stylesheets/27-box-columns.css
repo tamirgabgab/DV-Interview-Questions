@@ -192,7 +192,6 @@
   .md-typeset .explorer:is([data-kind="cake-arith"], [data-kind="cake-geo"]) .ex-cols .cake-proof-text { order: 2; }
 }
 .md-typeset .explorer:has(.cake-proof.is-folded) .cake-proof-text { display: none; }
-}
 
 /* eggs (0039): the building and its zoom side by side in the left column, both a little
    narrower, their numbers a little larger; the chart's text readable in the right column */
