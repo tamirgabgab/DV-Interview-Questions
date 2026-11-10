@@ -32,7 +32,10 @@
   // the digits line up, the leading digit of n and of f(n) marked and the 0 that 3n adds
   // dashed; the interval [3^k, 3^(k+1)] with its two halves and n on it; and two lines
   // that work out f(n) and f(f(n)) from the anchors.
-  const W = 440, H = 128, XA = 40, XB = 400, Y = 58;
+  const W = 440, H = 128, XA = 64, XB = 376, Y = 58;
+  // a tick label shrinks with its digits, so up to 3^19 (10 digits) it stays inside the
+  // box and clear of the middle label
+  const tickFont = (v) => Math.min(21, Math.floor(150 / String(v).length));
   const ffnView = () => ({
     mount(box) {
       const N0 = Math.min(MAX, Math.max(1, Math.floor(Number(box.dataset.n || 14)) || 14));
@@ -83,7 +86,7 @@
         g += `<line class="s3-line" x1="${f(xm)}" y1="${Y}" x2="${XB}" y2="${Y}" stroke-width="${s.half === 2 ? 6 : 3}"/>`;
         [[XA, s.p, pow3(s.k)], [xm, s.mid, `2·${pow3(s.k)}`], [XB, s.top, pow3(s.k + 1)]].forEach(([x, v, name]) => {
           g += `<line class="ink-line" x1="${f(x)}" y1="${Y - 9}" x2="${f(x)}" y2="${Y + 9}" stroke-width="1.5"/>` +
-            `<text class="tick" x="${f(x)}" y="${Y + 34}" text-anchor="middle" style="font-size:21px">${v}</text>` +
+            `<text class="tick" x="${f(x)}" y="${Y + 34}" text-anchor="middle" style="font-size:${tickFont(v)}px">${v}</text>` +
             `<text class="tick" x="${f(x)}" y="${Y + 58}" text-anchor="middle" style="font-size:18px">${name}</text>`;
         });
         g += `<circle class="s2-dot" cx="${f(xn)}" cy="${Y}" r="8"><title>n = ${s.n}</title></circle>` +
@@ -99,6 +102,10 @@
           { label: "f(n)", digits: ffBase3(v), value: v, lead: true },
           { label: "f(f(n)) = 3n", digits: ffBase3(w), value: w, zero: true },
         ]);
+        // a long n scrolls inside the box on a phone; only then is the strip a tab stop
+        const strip = $(".ff-digits"), wide = strip.scrollWidth > strip.clientWidth + 1;
+        if (wide) { strip.setAttribute("tabindex", "0"); strip.setAttribute("role", "region"); strip.setAttribute("aria-label", "השרשרת בבסיס 3, גלילה לצדדים"); }
+        else ["tabindex", "role", "aria-label"].forEach((a) => strip.removeAttribute(a));
         $(".ff-int-title").innerHTML = `הקטע של n${NB}: מ-${ltr(`${pow3(s.k)} = ${s.p}`)} עד ${ltr(`${pow3(s.k + 1)} = ${s.top}`)}, והאמצע ${ltr(`2 · ${pow3(s.k)} = ${s.mid}`)}`;
         $(".ff-line").innerHTML = line(s);
         $(".ff-why1").innerHTML = why(s, "f", n);

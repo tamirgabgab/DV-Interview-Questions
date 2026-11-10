@@ -1,0 +1,5 @@
+/* Question 0076, f(f(n)) = 3n: the ffn box (explorer/ffn.js). The base-3 table of a large n
+   (up to 20 digits for 3n) is wider than a phone's column: it scrolls inside the box, so the
+   page never gets wider than the screen. The strip is left to right, so it opens on the
+   labels and the leading digits; the box makes it a focusable region only while it overflows. No colours here. */
+.md-typeset .explorer[data-kind="ffn"] .ff-digits { max-width: 100%; overflow-x: auto; direction: ltr; }

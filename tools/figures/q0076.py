@@ -5,7 +5,7 @@ f(f(n)) = 3n).
     python tools/figures/fill.py 76        # put the blocks on the page
 
 blocks() returns them in page order: for part a the ladder 9..18 -> 18..27 (nine steps,
-nine numbers, so f rises by one at each step) and its legend; for part b the graph of f
+a rise of nine, so f rises by one at each step) and its legend; for part b the graph of f
 up to 27 (slope 1 on [3^k, 2*3^k], slope 3 on [2*3^k, 3^(k+1)], the anchors and the line
 sqrt(3) n) and its legend, and the table of the base-3 rule. tests/0076 checks that the
 page copies match and recomputes every value.
@@ -54,7 +54,7 @@ def ladder() -> str:
     w, h, x0, dx, yt, yb = 640, 168, 92, 54, 34, 136
     s = [f'<svg class="figure" viewBox="0 0 {w} {h}" style="max-width:40rem" role="img" '
          'aria-label="סעיף א : המספרים 9 עד 18 למעלה, והערכים 18 עד 27 למטה. הקצוות ידועים מהשרשרת, '
-         'תשעה צעדים ותשעה מספרים, ולכן כל n עולה ל-n + 9, ו-14 עולה ל-23">']
+         'תשעה צעדים ועלייה של תשע, ולכן כל n עולה ל-n + 9, ו-14 עולה ל-23">']
     s.append(f'<text class="legend" x="{x0 - 30}" y="{yt + 6}" text-anchor="end" style="font-size:17px">n</text>')
     s.append(f'<text class="legend" x="{x0 - 30}" y="{yb + 6}" text-anchor="end" style="font-size:17px">f(n)</text>')
     for i, n in enumerate(LADDER):

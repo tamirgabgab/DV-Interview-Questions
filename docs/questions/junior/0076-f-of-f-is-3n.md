@@ -22,8 +22,8 @@ added: 2026-11-03
 ??? interviewer "מה המראיין בודק"
     - **להתחיל מהקטן :** לא לנחש נוסחה, אלא לבדוק מה התנאים מרשים בערך הראשון \( f(1) \).
     - **להשתמש בתנאי שוב ושוב :** כל ערך שמוצאים נותן ערך נוסף, וכך נבנית שרשרת של ערכים ידועים.
-    - **לספור :** פונקציה עולה ממש על שלמים עולה בכל צעד לפחות ב-1. מה זה אומר כשהעלייה
-      הכוללת שווה למספר הצעדים?
+    - **לספור :** האם המועמד רואה ששני ערכים ידועים של פונקציה עולה ממש יכולים לקבוע את כל
+      הערכים שביניהם.
     - **הוכחה מלאה :** להראות שהנוסחה הכללית היא היחידה, ולא רק שהיא עובדת.
 
 ---
@@ -41,8 +41,8 @@ added: 2026-11-03
     הוא נקודת התחלה לערך הבא. אילו מספרים מופיעים בשרשרת?
 
 ??? tip "רמז 3"
-    בשרשרת מופיעים \( f(9) \) ו-\( f(18) \). כמה צעדים יש מ-9 עד 18, ובכמה \( f \) צריכה
-    לעלות לאורכם?
+    בשרשרת מופיעים \( f(9) \) ו-\( f(18) \). מה אפשר לומר על הערכים של \( f \) בין 9
+    ל-18?
 
 ??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
@@ -52,12 +52,11 @@ added: 2026-11-03
     #### הרעיון { .sol-idea }
 
     שני ערכים ידועים של \( f \) לא מספיקים בדרך כלל כדי לדעת מה קורה ביניהם. כאן הם מספיקים :
-    מ-9 עד 18 יש תשעה צעדים, ו-\( f \) עולה בהם מ-18 ל-27, כלומר בתשעה. פונקציה עולה ממש על
-    שלמים עולה בכל צעד לפחות ב-1, ולכן אין לה ברירה : היא עולה בדיוק ב-1 בכל צעד.
+    כשהעלייה הכוללת שווה למספר הצעדים, כל צעד עולה בדיוק ב-1.
 
     <!-- gen 0 -->
 
-    <svg class="figure" viewBox="0 0 640 168" style="max-width:40rem" role="img" aria-label="סעיף א : המספרים 9 עד 18 למעלה, והערכים 18 עד 27 למטה. הקצוות ידועים מהשרשרת, תשעה צעדים ותשעה מספרים, ולכן כל n עולה ל-n + 9, ו-14 עולה ל-23"><text class="legend" x="62" y="40" text-anchor="end" style="font-size:17px">n</text><text class="legend" x="62" y="142" text-anchor="end" style="font-size:17px">f(n)</text><line class="s1-line" x1="92" y1="48" x2="92" y2="116" stroke-width="3"/><circle class="s1-dot" cx="92" cy="34" r="6"><title>n = 9</title></circle><circle class="s1-dot" cx="92" cy="136" r="6"><title>f(9) = 18</title></circle><text class="tick" x="92" y="21" text-anchor="middle" style="font-size:16px">9</text><text class="tick" x="92" y="162" text-anchor="middle" style="font-size:16px">18</text><line class="ink-line" x1="146" y1="48" x2="146" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="146" cy="34" r="4.5"><title>n = 10</title></circle><circle class="ink-dot" cx="146" cy="136" r="4.5"><title>f(10) = 19</title></circle><text class="tick" x="146" y="21" text-anchor="middle" style="font-size:16px">10</text><text class="tick" x="146" y="162" text-anchor="middle" style="font-size:16px">19</text><line class="ink-line" x1="200" y1="48" x2="200" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="200" cy="34" r="4.5"><title>n = 11</title></circle><circle class="ink-dot" cx="200" cy="136" r="4.5"><title>f(11) = 20</title></circle><text class="tick" x="200" y="21" text-anchor="middle" style="font-size:16px">11</text><text class="tick" x="200" y="162" text-anchor="middle" style="font-size:16px">20</text><line class="ink-line" x1="254" y1="48" x2="254" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="254" cy="34" r="4.5"><title>n = 12</title></circle><circle class="ink-dot" cx="254" cy="136" r="4.5"><title>f(12) = 21</title></circle><text class="tick" x="254" y="21" text-anchor="middle" style="font-size:16px">12</text><text class="tick" x="254" y="162" text-anchor="middle" style="font-size:16px">21</text><line class="ink-line" x1="308" y1="48" x2="308" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="308" cy="34" r="4.5"><title>n = 13</title></circle><circle class="ink-dot" cx="308" cy="136" r="4.5"><title>f(13) = 22</title></circle><text class="tick" x="308" y="21" text-anchor="middle" style="font-size:16px">13</text><text class="tick" x="308" y="162" text-anchor="middle" style="font-size:16px">22</text><line class="s2-line" x1="362" y1="48" x2="362" y2="116" stroke-width="3"/><circle class="s2-dot" cx="362" cy="34" r="6"><title>n = 14</title></circle><circle class="s2-dot" cx="362" cy="136" r="6"><title>f(14) = 23</title></circle><text class="tick" x="362" y="21" text-anchor="middle" style="font-size:16px">14</text><text class="tick" x="362" y="162" text-anchor="middle" style="font-size:16px">23</text><line class="ink-line" x1="416" y1="48" x2="416" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="416" cy="34" r="4.5"><title>n = 15</title></circle><circle class="ink-dot" cx="416" cy="136" r="4.5"><title>f(15) = 24</title></circle><text class="tick" x="416" y="21" text-anchor="middle" style="font-size:16px">15</text><text class="tick" x="416" y="162" text-anchor="middle" style="font-size:16px">24</text><line class="ink-line" x1="470" y1="48" x2="470" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="470" cy="34" r="4.5"><title>n = 16</title></circle><circle class="ink-dot" cx="470" cy="136" r="4.5"><title>f(16) = 25</title></circle><text class="tick" x="470" y="21" text-anchor="middle" style="font-size:16px">16</text><text class="tick" x="470" y="162" text-anchor="middle" style="font-size:16px">25</text><line class="ink-line" x1="524" y1="48" x2="524" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="524" cy="34" r="4.5"><title>n = 17</title></circle><circle class="ink-dot" cx="524" cy="136" r="4.5"><title>f(17) = 26</title></circle><text class="tick" x="524" y="21" text-anchor="middle" style="font-size:16px">17</text><text class="tick" x="524" y="162" text-anchor="middle" style="font-size:16px">26</text><line class="s1-line" x1="578" y1="48" x2="578" y2="116" stroke-width="3"/><circle class="s1-dot" cx="578" cy="34" r="6"><title>n = 18</title></circle><circle class="s1-dot" cx="578" cy="136" r="6"><title>f(18) = 27</title></circle><text class="tick" x="578" y="21" text-anchor="middle" style="font-size:16px">18</text><text class="tick" x="578" y="162" text-anchor="middle" style="font-size:16px">27</text></svg>
+    <svg class="figure" viewBox="0 0 640 168" style="max-width:40rem" role="img" aria-label="סעיף א : המספרים 9 עד 18 למעלה, והערכים 18 עד 27 למטה. הקצוות ידועים מהשרשרת, תשעה צעדים ועלייה של תשע, ולכן כל n עולה ל-n + 9, ו-14 עולה ל-23"><text class="legend" x="62" y="40" text-anchor="end" style="font-size:17px">n</text><text class="legend" x="62" y="142" text-anchor="end" style="font-size:17px">f(n)</text><line class="s1-line" x1="92" y1="48" x2="92" y2="116" stroke-width="3"/><circle class="s1-dot" cx="92" cy="34" r="6"><title>n = 9</title></circle><circle class="s1-dot" cx="92" cy="136" r="6"><title>f(9) = 18</title></circle><text class="tick" x="92" y="21" text-anchor="middle" style="font-size:16px">9</text><text class="tick" x="92" y="162" text-anchor="middle" style="font-size:16px">18</text><line class="ink-line" x1="146" y1="48" x2="146" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="146" cy="34" r="4.5"><title>n = 10</title></circle><circle class="ink-dot" cx="146" cy="136" r="4.5"><title>f(10) = 19</title></circle><text class="tick" x="146" y="21" text-anchor="middle" style="font-size:16px">10</text><text class="tick" x="146" y="162" text-anchor="middle" style="font-size:16px">19</text><line class="ink-line" x1="200" y1="48" x2="200" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="200" cy="34" r="4.5"><title>n = 11</title></circle><circle class="ink-dot" cx="200" cy="136" r="4.5"><title>f(11) = 20</title></circle><text class="tick" x="200" y="21" text-anchor="middle" style="font-size:16px">11</text><text class="tick" x="200" y="162" text-anchor="middle" style="font-size:16px">20</text><line class="ink-line" x1="254" y1="48" x2="254" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="254" cy="34" r="4.5"><title>n = 12</title></circle><circle class="ink-dot" cx="254" cy="136" r="4.5"><title>f(12) = 21</title></circle><text class="tick" x="254" y="21" text-anchor="middle" style="font-size:16px">12</text><text class="tick" x="254" y="162" text-anchor="middle" style="font-size:16px">21</text><line class="ink-line" x1="308" y1="48" x2="308" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="308" cy="34" r="4.5"><title>n = 13</title></circle><circle class="ink-dot" cx="308" cy="136" r="4.5"><title>f(13) = 22</title></circle><text class="tick" x="308" y="21" text-anchor="middle" style="font-size:16px">13</text><text class="tick" x="308" y="162" text-anchor="middle" style="font-size:16px">22</text><line class="s2-line" x1="362" y1="48" x2="362" y2="116" stroke-width="3"/><circle class="s2-dot" cx="362" cy="34" r="6"><title>n = 14</title></circle><circle class="s2-dot" cx="362" cy="136" r="6"><title>f(14) = 23</title></circle><text class="tick" x="362" y="21" text-anchor="middle" style="font-size:16px">14</text><text class="tick" x="362" y="162" text-anchor="middle" style="font-size:16px">23</text><line class="ink-line" x1="416" y1="48" x2="416" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="416" cy="34" r="4.5"><title>n = 15</title></circle><circle class="ink-dot" cx="416" cy="136" r="4.5"><title>f(15) = 24</title></circle><text class="tick" x="416" y="21" text-anchor="middle" style="font-size:16px">15</text><text class="tick" x="416" y="162" text-anchor="middle" style="font-size:16px">24</text><line class="ink-line" x1="470" y1="48" x2="470" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="470" cy="34" r="4.5"><title>n = 16</title></circle><circle class="ink-dot" cx="470" cy="136" r="4.5"><title>f(16) = 25</title></circle><text class="tick" x="470" y="21" text-anchor="middle" style="font-size:16px">16</text><text class="tick" x="470" y="162" text-anchor="middle" style="font-size:16px">25</text><line class="ink-line" x1="524" y1="48" x2="524" y2="116" stroke-width="1.4"/><circle class="ink-dot" cx="524" cy="34" r="4.5"><title>n = 17</title></circle><circle class="ink-dot" cx="524" cy="136" r="4.5"><title>f(17) = 26</title></circle><text class="tick" x="524" y="21" text-anchor="middle" style="font-size:16px">17</text><text class="tick" x="524" y="162" text-anchor="middle" style="font-size:16px">26</text><line class="s1-line" x1="578" y1="48" x2="578" y2="116" stroke-width="3"/><circle class="s1-dot" cx="578" cy="34" r="6"><title>n = 18</title></circle><circle class="s1-dot" cx="578" cy="136" r="6"><title>f(18) = 27</title></circle><text class="tick" x="578" y="21" text-anchor="middle" style="font-size:16px">18</text><text class="tick" x="578" y="162" text-anchor="middle" style="font-size:16px">27</text></svg>
 
     <!-- /gen -->
 
@@ -98,8 +97,9 @@ added: 2026-11-03
 
     4. **התשובה :** ‏\( 14 = 9 + 5 \), ולכן \( f(14) = 18 + 5 = 23 \).
 
-    5. **בדיקה :** ‏\( f(23) = f(f(14)) = 3 \cdot 14 = 42 \). זה מתאים לגרף של סעיף ב : בין
-       \( f(18) = 27 \) ל-\( f(27) = 54 \) הערכים עולים בשלושה בכל צעד, ו-\( 27 + 3 \cdot 5 = 42 \).
+    5. **בדיקה :** ‏\( f(9) = 18 < f(14) = 23 < f(18) = 27 \), כמו שפונקציה עולה דורשת. מהתנאי
+       \( f(23) = f(f(14)) = 3 \cdot 14 = 42 \), וגם זה מתאים : \( 18 < 23 < 27 \), ולכן
+       \( f(23) \) צריך להיות בין \( f(18) = 27 \) ל-\( f(27) = f(f(18)) = 54 \).
 
     </div>
 
@@ -127,8 +127,8 @@ added: 2026-11-03
     עולה?
 
 ??? tip "רמז 3"
-    מספר \( n \) בין \( 2 \cdot 3^k \) ל-\( 3^{k+1} \) הוא ערך של \( f \) על הקטע הקודם :
-    \( n = f(m) \). מה זה אומר על \( f(n) = f(f(m)) \)?
+    מספר \( n \) בין \( 2 \cdot 3^k \) ל-\( 3^{k+1} \) הוא ערך של \( f \) על החצי הראשון של
+    אותו קטע : \( n = f(m) \). מה זה אומר על \( f(n) = f(f(m)) \)?
 
 ??? success "פתרון סעיף ב"
     !!! answer "תשובה בקצרה"
@@ -142,7 +142,8 @@ added: 2026-11-03
     השרשרת של סעיף א נותנת "עוגנים" : הערכים ב-\( 3^k \) וב-\( 2 \cdot 3^k \). בחצי הראשון
     של כל קטע הספירה של סעיף א עובדת, ו-\( f \) עולה בשיפוע 1. בחצי השני הספירה כבר לא
     מספיקה, אבל כל מספר שם הוא ערך של \( f \) מהחצי הראשון, והתנאי \( f(f(m)) = 3m \) נותן
-    שיפוע 3. הגרף מתחלף בין שני השיפועים, ונשאר צמוד לקו \( \sqrt{3}\,n \) :
+    שיפוע 3. הגרף מתחלף בין שני השיפועים, ונשאר בין \( 1.5n \) ל-\( 2n \), משני צדי הקו
+    \( \sqrt{3}\,n \) :
 
     <!-- gen 2 -->
 
@@ -189,8 +190,8 @@ added: 2026-11-03
         \]
 
     4. **כל \( n \) מכוסה :** כל \( n \ge 1 \) נמצא בקטע \( [3^k, 3^{k+1}] \) של \( k \)
-       כלשהו. בנקודות שבין שני חצאים, \( n = 2 \cdot 3^k \) ו-\( n = 3^{k+1} \), שתי הנוסחאות
-       נותנות את אותו ערך, ולכן לא משנה באיזו משתמשים.
+       כלשהו. בנקודות המעבר, \( 2 \cdot 3^k \) בין החצאים ו-\( 3^{k+1} \) בין הקטעים, שתי
+       הנוסחאות נותנות את אותו ערך, ולכן לא משנה באיזו משתמשים.
 
     5. **בדיקה מול סעיף א :** ‏\( 9 \le 14 \le 18 \), כלומר \( k = 2 \) והחצי הראשון :
        \( f(14) = 14 + 9 = 23 \).
@@ -228,7 +229,8 @@ added: 2026-11-03
       \( f \) עולה בכל צעד.
 
     **בבסיס 3.** מספר עם \( k + 1 \) ספרות בבסיס 3 נמצא בין \( 3^k \) ל-\( 3^{k+1} \). הספרה
-    המובילה שלו היא 1 בדיוק כשהוא בחצי הראשון, \( n = 3^k + r \) עם \( r < 3^k \). אז
+    המובילה שלו היא 1 בדיוק כש-\( 3^k \le n < 2 \cdot 3^k \), כלומר \( n = 3^k + r \) עם
+    \( r < 3^k \). אז
     \( f(n) = 2 \cdot 3^k + r \) : אותן ספרות, והמובילה הופכת ל-2. בחצי השני
     \( n = 2 \cdot 3^k + r \), ואז \( f(n) = 3(3^k + r) \) : המובילה הופכת ל-1, וכפל ב-3
     מוסיף 0 בסוף. פעמיים הכלל נותן את \( n \) עם 0 בסוף, כלומר \( 3n \) :
@@ -245,9 +247,14 @@ added: 2026-11-03
 
     <!-- /gen -->
 
-    בתיבה בוחרים \( n \) ורואים את השרשרת \( n \to f(n) \to 3n \) : הספרות של כל מספר בבסיס 3,
-    החצי שבו הוא נמצא, והחישוב של כל ערך מהעוגנים \( 3^k \) ו-\( 2 \cdot 3^k \). הכפתור
-    "הבא בשרשרת" מחליף את \( n \) ב-\( f(n) \), כך שאפשר ללכת לאורך השרשרת :
+    נסו בתיבה : מ-\( n = 14 \) לחצו ארבע פעמים "הבא בשרשרת". השרשרת היא
+    <span dir="ltr">14 → 23 → 42 → 69 → 126</span>, ובבסיס 3
+    <span dir="ltr">112, 212, 1120, 2120, 11200</span> : הספרה המובילה מתחלפת בין 1 ל-2, ובכל
+    צעד שני נוסף 0. הקלידו 17 ולחצו פעמיים "n + 1" : הערכים הם 26, 27 ו-30, כי ב-18, אמצע
+    הקטע, השיפוע עובר מ-1 ל-3. ב-26, 27 ו-28 הערכים הם 51, 54 ו-55 : ב-27 מתחיל קטע חדש,
+    השיפוע חוזר ל-1, ובבסיס 3 נוספת ספרה. ב-60 וב-61 הערכים הם 99 ו-102, ו-100 ו-101
+    מדולגים, כמו בשאלת ההמשך. מעבר לטבלה, בתיבה יש כל \( n \) עד 999,999,999, והחישוב של כל
+    ערך מהעוגנים :
 
     <div class="explorer" data-kind="ffn" data-n="14"></div>
 
@@ -301,9 +308,10 @@ added: 2026-11-03
 ## נקודות חשובות ושאלות המשך
 
 ??? trap "מלכודת : לנחש f(n) = √3 · n"
-    הגרף צמוד לקו \( \sqrt{3}\,n \), ולכן קל לנחש פונקציה ליניארית \( f(n) = cn \)
-    עם \( c^2 = 3 \). אבל \( \sqrt{3}\,n \) לא שלם, ואף פונקציה ליניארית לא מחזירה
-    טבעיים. הפתרון האמיתי מתחלף בין שיפוע 1 לשיפוע 3.
+    היחס \( f(n) / n \) נשאר בין 1.5 ל-2, משני צדי \( \sqrt{3} \approx 1.73 \), ולכן קל לנחש
+    פונקציה ליניארית \( f(n) = cn \) עם \( c^2 = 3 \). אבל \( \sqrt{3}\,n \) לא שלם, ואף
+    פונקציה ליניארית עם \( c^2 = 3 \) לא מחזירה טבעיים. הפתרון האמיתי מתחלף בין שיפוע 1
+    לשיפוע 3.
 
 ??? trap "מלכודת : להתחיל מ-f(1) = 1"
     פונקציה עולה ממש על הטבעיים מקיימת \( f(n) \ge n \), וקל להניח ש-\( f(1) = 1 \). אבל אז

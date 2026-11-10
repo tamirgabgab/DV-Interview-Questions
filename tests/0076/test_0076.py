@@ -139,3 +139,23 @@ def test_explorer_matches_the_reference():
         assert s["half"] == (1 if n <= 2 * p else 2)
         assert v == s["value"] == f(n)
         assert b == base3(n) and r == base3(f(n))
+
+
+def test_ratio_and_box_tasks():
+    """f(n)/n swings between exactly 3/2 (at 2·3^k) and 2 (at 3^k), on both sides of sqrt(3);
+    the numbers of the "try it" paragraph next to the box."""
+    from fractions import Fraction
+
+    ratios = [Fraction(f(n), n) for n in range(1, 100001)]
+    assert min(ratios) == Fraction(3, 2) and max(ratios) == 2
+    assert all(Fraction(f(2 * 3 ** k), 2 * 3 ** k) == Fraction(3, 2) for k in range(12))
+    chain = [14]
+    for _ in range(4):
+        chain.append(f(chain[-1]))
+    assert chain == [14, 23, 42, 69, 126]
+    assert [base3(x) for x in chain] == ["112", "212", "1120", "2120", "11200"]
+    assert [f(n) for n in (17, 18, 19)] == [26, 27, 30]
+    assert [f(n) for n in (26, 27, 28)] == [51, 54, 55] and (base3(26), base3(27)) == ("222", "1000")
+    assert (f(60), f(61)) == (99, 102)
+    # part a's check: 21 = f(12) with 12 and 21 in the same interval [9, 27]
+    assert f(12) == 21 and f(27) == f(f(18)) == 54
