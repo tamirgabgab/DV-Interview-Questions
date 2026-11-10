@@ -1153,6 +1153,13 @@ below start at item 112 (session 31).
     MathJax routed to the local copy and `dvqExplorers.ready()` (boxes inside closed
     details never intersect, so they never build on a scroll).
 
+192. **Seventh review round: ten more random questions (session 34, 2026-11-10).** Seed
+    20261112, the sixty reviewed questions and 0099 left out: 0013, 0017, 0027, 0031, 0036,
+    0069, 0074, 0083, 0091, 0098. Five read-only review agents (reports and scripts in the
+    session scratchpad, review8/); every box measured at 1920 by 1080 in its default and its
+    tallest reachable state. Findings under "Open items", "Review round 7 (session 34)".
+    Nothing was changed yet.
+
 ---
 
 ## In progress
@@ -1854,6 +1861,105 @@ reports have tasks with checked inputs and results).
   not the default); 0046's box with a 16 x 16 grid is 1234 px, as large grids always were.
 - [ ] Not done: 0046's histogram bars in rectangle mode (optional, would add height); 0076's
   marker for where f(n) lands (optional); 0020's "draw" button.
+
+### Review round 7 (session 34): ten more questions
+
+Findings of work log item 192 (CONFIRMED by a reviewer's script or screenshot unless marked;
+verify again before changing a page). Common to all: the box paragraphs describe the layout
+instead of giving "נסו" tasks (the reports have checked tasks).
+
+**R2. One screen (px at 1920 x 1080, default / tallest reachable; budget 1000):**
+- [ ] 0036 `lfsr`: 1508 / 1612 (5 bits); every state over. Proposal: one ring in cycle
+  order, the proof panel folded, the strip in the side column, the table capped at 8 rows.
+- [ ] 0069 `overtakes` a / b / c: 1252 / 1226 / 1226, every state over (the SVGs are scaled
+  1.15 at n = 4). Proposal: cap the figure scale, a one-row legend, the tally in the summary,
+  the code pane limited to the lit function; maybe one box instead of three.
+- [ ] 0027 `cake-arith` (shared code with 0028 `cake-geo`): 1164 / 1210, every state over.
+  Proposal: drop the second chart, the proof text under the shares chart, a smaller pie
+  and table scroll (cake.js, 06-figures.css 274-280, 27-box-columns.css 177-178).
+- [ ] 0091 `chomp`: 699 / 900 / 618 default, but the move log is unbounded (37 px a line):
+  1452 / 1553 / 1068 after a game (check_heights has no end button to press). Proposal:
+  `cols`, the board in column 1, the summary and a compact log in column 2.
+- [ ] 0074 `transpose`: 892 default, 1312 at 8x8 (1007 at 3x5). Proposal: `cols`, the source
+  grid beside the memory.
+- [ ] 0083 `jugs`: 993 default, 1075 after the shortest way, 1734 at (1, 12, 12) (the grid
+  has a fixed width, so a narrow one scales tall); check_heights must click `.wj-best`
+  first. `jugs3`: 707 / 789, fine.
+- [ ] 0013 `kap4base`: 941 / 1112 at the default's end, 1343 (B = 12). `kappairs` 842 / 865
+  and `kaprekar` 979 fine.
+- [ ] 0017 `floyd`: 952 / 1162 (n = 12 from the draw). `dupbin` 979 / 981 fine.
+- [ ] 0031 `bridge`: 921 default, 1061 / 1228 with eight people. Proposal: the plans table
+  and the greedy table side by side.
+- [ ] 0098 `luhn` (two boxes): 994 default, 1100 with help open. Proposal: `cols`, the maps
+  in column 2.
+
+**R1. Correctness:**
+- [ ] 0098: the legend under the D table prints the literal `{ltr("0")} ו-{ltr("9")}`
+  (q0098.py line 140 lacks the f prefix). The box reports a missed swap for two equal
+  digits ("החלפת 11 ל-11"); its help says Luhn's map is on the left (it is on the right);
+  it counts places from the left, the page from the right. "5 flip-flops" is 7; ISBN's
+  largest sum 550 is 496; `luhn_valid("")` is True and `luhn_sum("²")` raises.
+- [ ] 0091: follow-up "a single winning move ... an open question": the page's own
+  `winning_moves` gives two on 8 x 10 (f5 and i4). "The search reaches them all": 3,832 of
+  12,869 states at 8x8. "Only in 2 rows" (corner trap): also every 2-column board. The
+  losing mark is called orange dashed (it is grey dashed, like the eaten key); figure gen 4
+  uses X = c2, a losing move on 3x5 (the reply to e3 is d3).
+- [ ] 0069: the last follow-up's "update all then query all" for ties is backwards
+  ([3, 3, 1] gives [2, 1, 0], true [1, 1, 0]; query all then update all is right). The
+  hardware paragraph: an add touches floor(log2 n) + 1 cells, not ceil(log2 n); "n bits"
+  does not fit Fenwick counters; part b's cost uses an undefined total(r) - prefix(r); the
+  LIS follow-up is the strict version against the page's ties rule. Mode b's first step
+  prints "0..-1"; "1 דרגות".
+- [ ] 0036: part b step 3's "x^5 = x^2 + x" is modulo x^4+x+1, not the step's x^4+x^3+1
+  (x^3+x+1); hint 2's "at most the lcm of the factors' periods" fails on its own
+  (x^2+x+1)^2 (lcm 3, period 6); the proof's "a step is multiplication by x up to bit
+  order" is false for 3 or more taps (the periods still equal the order of x); the box's
+  "the 1 of the polynomial is always a tap" contradicts the page; the XNOR trap holds only
+  for an even tap count.
+- [ ] 0074: the assignments column and the proof say mn; the code writes mn - 2 (4, 13, 94,
+  3070, 3698 against 6, 15, 96, 3072, 3700; the box says 4). The legend's cycle
+  "1 → 2 → 4 → 3 → 1" renders reversed (q0074.memory_legend). "Worst case O((mn)^2)" is
+  only an upper bound (max 14.9 walk steps an entry for m, n <= 120); the overflow trap
+  hides that a square overflows from 1291 x 1291.
+- [ ] 0031: "B crosses twice" (three times); "every plan needs exactly five" (3,348 legal
+  seven-crossing plans); "a few dozen" plans is 108; "thousands of random groups" is 600;
+  (2N - 3)t fails at N = 1; `bridge([])` raises KeyError. The box sums decimal times as
+  floats ("17.599999999999998 דקות"); names collide with the bank label from five people;
+  the fail message of "my plan" gives the idea away and is wrong when the escort is best.
+- [ ] 0027: the "נסו" claim "the formula and the bars agree over the whole range" fails on
+  1,879 of 68,640 slider points (d > 0.5; 0028 has the same sentence); the d > 1/2 tie
+  rule (a = 3/5, d = 9/10), the geometric follow-up lacks q <= 2, the people-count formula
+  gives -4 at a = 1.5.
+- [ ] 0017: solution 3's "otherwise it is in the upper half" is false with two duplicates
+  ([1, 1, 4, 4, 4] returns 4 while 1 is one), and binary search and Floyd return different
+  duplicates (the page says "the duplicate"); "log2 n steps"; dupbin's "step 1 of 4" is
+  off by one.
+- [ ] 0013: kap4base's summary puts the closing cycle value outside the LTR span (renders
+  "30DC → 30DC → D852 ..."); kaprekar's `ltr("0 ו-6174")` renders "רק ו-6174 0"; help
+  names a button that does not exist; the histogram shows 392 and 2 against the table's
+  383 and 1; "always" claims (annotation 3, "every number reaches 6174": repdigits go to 0);
+  digit lists in plain Hebrew render right to left (six places).
+- [ ] 0083: step 1's "check first" is not in the code (`can_measure` is never called); "B
+  holds k a mod b" is wrong when k a is a multiple of b; "under the jugs" is beside them on
+  a desktop; "לפחות 1 צעדים".
+
+**R3. Hardware / DV (proposals):**
+- [ ] 0098: part D has no block diagram, per-clock table or box; no SVA / covergroup; the tb
+  never drives idle cycles, a digit over 9 or a reset mid-number.
+- [ ] 0036: no RTL module, no SVA (the trap describes one in words), no state coverpoint.
+- [ ] 0069: the hardware paragraph has no code, diagram or per-clock table; tags are reused
+  in real designs; a real value binned in a covergroup (SUSPECTED not portable).
+- [ ] 0013: the 5-comparator network is never drawn; the hardware follow-up misses that the
+  BCD digits come straight from p and q; the 0-1 principle as a follow-up.
+- [ ] 0017: a scoreboard must check count(result) >= 2, not equality with one model.
+- [ ] 0031: a "how would you verify bridge_time" follow-up; 0074: a small diagram for the
+  streaming transposer (optional). 0027, 0083, 0091: none needed.
+
+**R4. Explanations:**
+- [ ] Hints that give the answer: 0013 c1-c3, 0017 b1, 0027 b2, 0031 a3, 0036 b2, 0069 a2
+  and c2, 0074 b2 and c2, 0091 c1, 0098 c2 and d2.
+- [ ] 0031's lower-bound proof skips C and D crossing first; 0083's "why not fewer than six"
+  has no layer table; "16 of 24" eight times; 0013's base-15 story four times.
 
 ## Question variety
 
