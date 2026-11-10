@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 """Figures and tables of question 0060 (the next number with as many ones: Gosper's step,
 the previous one through the complement, and the same for zeros, counted without the
-leading ones, where the length of the number may change).
+leading ones, where the length of the number may change), the one-cycle datapath and
+the enumerator of every k of n.
 
     python tools/figures/fill.py 60        # put the blocks on the page
 
 The reference here is independent of the page code: brute_next / brute_prev and
 brute_next0 / brute_prev0 search number by number. gosper() gives the rows of the
 formula, the same rows the box draws. blocks() returns, in page order: the steps of
-next(92) in 8 bits, their legend, the numbers with two ones in 5 bits next to their
-complements, the steps of prev(99), the numbers with three zeros by length, and the
-rows of the next number after 120 with three zeros (a longer one).
+next(92) in 8 bits, their legend, the block diagram of the one-cycle next_same and its
+legend, the numbers with two ones in 5 bits next to their complements, the steps of
+prev(99), the numbers with three zeros by length, the rows of the next number after 120
+with three zeros (a longer one), and the enumerator of every 3 of 5, a row per clock.
 """
 
 from html import escape
 
 RLM = "‏"
+NB = "\u00a0"
 X_A, W_A = 92, 8            # 0101_1100 -> 0110_0011 = 99
 X_B = 99                    # prev(99) = 92
 W_C, K_C = 5, 2             # the complement table
@@ -126,12 +129,99 @@ def next0_rows(x):
     return rows + [("1 0…0 1…1", y, {L} | set(range(L - z)))], y
 
 
+# The one-cycle next_same (part a's cost, follow-up 2): three stages in series, each of
+# depth log w: the lowest one (-x is a carry chain), the adder, the barrel shifter. Drawn
+# left to right. (id, x, y, w, h, stage 0-3, title, second line)
+HW_W, HW_H = 560, 228
+HW_BLOCKS = (
+    ("iso", 38, 20, 100, 46, 1, "x & −x", ""),
+    ("enc", 176, 20, 124, 46, 0, "one-hot→t", ""),
+    ("add", 176, 96, 100, 58, 2, "+", "w+1 bits"),
+    ("xor", 296, 166, 56, 46, 0, "XOR", ""),
+    ("shf", 392, 160, 96, 58, 3, ">> t+2", "barrel"),
+    ("or", 504, 96, 44, 58, 0, "OR", ""),
+)
+# (points, arrow at the end, label, label x, label y, anchor)
+HW_WIRES = (
+    (((6, 110), (176, 110)), True, "x", 6, 102, "start"),
+    (((20, 43), (20, 200)), False, "", 0, 0, ""),
+    (((20, 43), (38, 43)), True, "", 0, 0, ""),
+    (((20, 200), (296, 200)), True, "", 0, 0, ""),
+    (((138, 43), (176, 43)), True, "c", 157, 35, "middle"),
+    (((157, 43), (157, 140), (176, 140)), True, "", 0, 0, ""),
+    (((300, 43), (440, 43), (440, 160)), True, "t", 370, 35, "middle"),
+    (((250, 96), (250, 72)), True, "none", 258, 88, "start"),
+    (((276, 125), (504, 125)), True, "r", 330, 117, "middle"),
+    (((284, 125), (284, 178), (296, 178)), True, "", 0, 0, ""),
+    (((352, 189), (392, 189)), True, "x^r", 372, 181, "middle"),
+    (((488, 189), (496, 189), (496, 145), (504, 145)), True, "s", 496, 214, "middle"),
+    (((526, 96), (526, 64)), True, "next", 526, 56, "middle"),
+)
+HW_DOTS = ((20, 110), (157, 43), (284, 125))
+
+
+def hw_diagram():
+    """The block diagram of the one-cycle next_same, with no divider: s = (x ^ r) >> (t + 2)."""
+    label = ("תרשים המלבנים של next_same במחזור אחד" + NB + ": x & −x מבודד את האחד הנמוך c, ‏encoder של one-hot "
+             "נותן ממנו את t, המחבר נותן r = x + c ואת ה-carry העליון none, ‏XOR של x ו-r נותן את הבלוק והביט "
+             "החדש, ‏barrel shifter מזיז אותו ב-t + 2, ו-OR עם r נותן את next. שלושה שלבים בטור" + NB + ": "
+             "הבידוד, החיבור וההזזה")
+    o = [f'<svg class="figure pn-dp" viewBox="0 0 {HW_W} {HW_H}" direction="ltr" style="max-width:{HW_W / 16:g}rem" '
+         f'role="img" aria-label="{escape(label)}">',
+         '<defs><marker id="pn-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" '
+         'markerHeight="9" orient="auto"><path class="pn-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs>']
+    for _id, x, y, w, h, stage, title, sub in HW_BLOCKS:
+        ty = y + h / 2 + (-3 if sub else 5)
+        cls = f" pn-st{stage}" if stage else ""
+        o.append(f'<g class="pn-blk{cls}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="5"/>'
+                 f'<text x="{x + w / 2:g}" y="{ty:g}" text-anchor="middle">{escape(title)}</text>'
+                 + (f'<text class="pn-sub" x="{x + w / 2:g}" y="{y + h / 2 + 13:g}" text-anchor="middle">{escape(sub)}</text>' if sub else "")
+                 + "</g>")
+    for pts, arrow, lab, lx, ly, anchor in HW_WIRES:
+        d = "M" + " L".join(f"{x:g},{y:g}" for x, y in pts)
+        head = ' marker-end="url(#pn-hb)"' if arrow else ""
+        o.append(f'<path class="pn-wire" d="{d}"{head}/>')
+        if lab:
+            o.append(f'<text class="pn-wlab" x="{lx}" y="{ly}" text-anchor="{anchor}">{escape(lab)}</text>')
+    o += [f'<circle class="pn-dot" cx="{x}" cy="{y}" r="3.5"/>' for x, y in HW_DOTS]
+    return "".join(o) + "</svg>"
+
+
+def hw_legend():
+    return ('<span class="viz-legend"><span><i class="pn-key-1"></i>שלב 1' + NB + ': בידוד האחד הנמוך</span>'
+            '<span><i class="pn-key-2"></i>שלב 2' + NB + ': החיבור</span>'
+            '<span><i class="pn-key-3"></i>שלב 3' + NB + ': ההזזה</span>'
+            '<span><i class="pn-key-0"></i>שער אחד בעומק, או במקביל לחיבור</span></span>')
+
+
+def enumerate_rows(n, k):
+    """Every k of n, a mask per clock: (mask, c, r, next); next is 0 after the last one."""
+    rows, y = [], (1 << k) - 1
+    while y:
+        c = y & -y
+        r = y + c
+        nxt = brute_next(y, n)
+        rows.append((y, c, r, nxt))
+        y = nxt
+    return rows
+
+
+def enum_table(n, k):
+    """The enumerator of follow-up 1 as a table, a row per clock."""
+    out = [f"| מחזור | {RLM}mask | {RLM}c | {RLM}r | {RLM}next | {RLM}none |", "|:-:|:-:|:-:|:-:|:-:|:-:|"]
+    for i, (y, c, r, nxt) in enumerate(enumerate_rows(n, k)):
+        out.append(f"| {RLM}{i} | {RLM}{y:0{n}b} | {RLM}{c:0{n}b} | {RLM}{r:0{n + 1}b} | {RLM}{nxt:0{n}b} | {RLM}{int(nxt == 0)} |")
+    return "\n".join(out)
+
+
 def blocks():
     """The generated blocks, in page order."""
     rows, _ = gosper(X_A, W_A)
-    return [bits_table(rows, W_A, "השלבים של הנוסחה על 92 ב-8 ביטים"), legend(), complement_table(W_C, K_C),
+    return [bits_table(rows, W_A, "השלבים של הנוסחה על 92 ב-8 ביטים"), legend(), hw_diagram(), hw_legend(),
+            complement_table(W_C, K_C),
             bits_table(prev_rows(X_B, W_A), W_A, "הקודם של 99 דרך המשלים"), zeros_table(3, [4, 5, 6]),
-            bits_table(next0_rows(X_C)[0], X_C.bit_length() + 1, "הבא אחרי 120 עם שלושה אפסים")]
+            bits_table(next0_rows(X_C)[0], X_C.bit_length() + 1, "הבא אחרי 120 עם שלושה אפסים"),
+            enum_table(5, 3)]
 
 
 if __name__ == "__main__":

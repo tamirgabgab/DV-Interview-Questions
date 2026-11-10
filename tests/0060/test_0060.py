@@ -52,6 +52,31 @@ def test_rows_of_the_formula():
     assert q0060.gosper(0b11100000, 8)[1] == 0
 
 
+def test_one_cycle_and_the_enumerator():
+    """Follow-up 2: the shift by t + 2 instead of the division, and none exactly when the
+    lowest block touches the top bit (the SVA's a_none); follow-up 1: the per-clock table
+    walks every 3 of 5 in order, and the loop with the stop at 0 ends for n = w."""
+    from itertools import combinations
+
+    for w in range(1, 11):
+        for x in range(1, 1 << w):
+            c = x & -x
+            r = x + c
+            t = c.bit_length() - 1
+            none = bool(r >> w)
+            assert none == ((x | (x - 1)) == (1 << w) - 1), (x, w)
+            if not none:
+                assert r | ((x ^ r) >> (t + 2)) == next_same(x, w), (x, w)
+    rows = q0060.enumerate_rows(5, 3)
+    assert [m for m, _, _, _ in rows] == sorted(sum(1 << i for i in cs) for cs in combinations(range(5), 3))
+    assert rows[-1][3] == 0 and all(nxt for *_, nxt in rows[:-1])
+    for n, k in [(5, 3), (6, 1), (4, 4)]:
+        y, seen = (1 << k) - 1, 0
+        while y and y < 1 << n:
+            seen, y = seen + 1, next_same(y, n)
+        assert seen == len(list(combinations(range(n), k)))
+
+
 def test_explorer_matches_the_reference():
     from page_tests import explorer_require, node_json
 
@@ -65,6 +90,36 @@ def test_explorer_matches_the_reference():
         assert nz == q0060.brute_next0(x) and pz == q0060.brute_prev0(x), x
         ref, _ = q0060.gosper(x, w)
         assert rows == [[v, sorted(m)] for _, v, m in ref], (x, w)
+
+
+def test_box_rows_and_notes():
+    """The box's rows (stepsOf): the answer of every mode and direction against the search;
+    a shorter number from the complement has fewer zeros, as its note says; ~x = 0 and
+    x = 0 say why there is no answer."""
+    from page_tests import explorer_require, node_json
+
+    cases = [(x, 8, d, b) for x in range(0, 256) for d in ("next", "prev") for b in (0, 1) if b or x]
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({json.dumps(cases)}.map(([x, w, d, b]) => {{
+        const S = m.popSteps(x, w, d, b);
+        return [S.result, S.rows.map((r) => [r.label, r.v, r.note])];
+      }})));""")
+    for (x, w, d, b), (result, rows) in zip(cases, got):
+        if b:
+            want = q0060.brute_next(x, w) if d == "next" else q0060.brute_prev(x, w)
+        else:
+            want = q0060.brute_next0(x) if d == "next" else q0060.brute_prev0(x)
+        assert result == want, (x, w, d, b, result)
+        notes = " ".join(n for _, _, n in rows)
+        assert "יותר אפסים" not in notes
+        for label, v, note in rows:
+            if label == "~(r | s)" and "קצר יותר" in note:
+                assert q0060.zeros(v) < q0060.zeros(x), (x, v)
+        if d == "prev" and rows[1][1] == 0:
+            assert "אין אחד להזיז" in rows[1][2], (x, b)
+        if x == 0 and d == "next":
+            assert "חילוק באפס" in rows[-1][2]
 
 
 def test_figures_up_to_date():

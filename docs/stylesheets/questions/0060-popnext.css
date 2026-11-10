@@ -1,0 +1,20 @@
+/* Question 0060, the next number with as many ones: the block diagram of the one-cycle
+   next_same (tools/figures/q0060.py hw_diagram, pn-*), drawn left to right. The three
+   stages in series in the colours of 0055's hardware diagram: the lowest one blue (s1), the
+   adder orange (s2), the barrel shifter green (s3); the other blocks plain, the wires grey.
+   Colours from the palette only. */
+.md-typeset svg.pn-dp { display: block; width: 100%; height: auto; margin-inline: auto; }
+.md-typeset svg.pn-dp .pn-headp { fill: var(--viz-text); }
+.md-typeset svg.pn-dp .pn-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
+.md-typeset svg.pn-dp .pn-blk.pn-st1 rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.pn-dp .pn-blk.pn-st2 rect { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.pn-dp .pn-blk.pn-st3 rect { fill: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg.pn-dp .pn-blk text { fill: var(--viz-ink); font-size: 16px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.pn-dp .pn-blk text.pn-sub { fill: var(--viz-text); font-size: 15px; font-weight: 400; }
+.md-typeset svg.pn-dp .pn-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.pn-dp .pn-dot { fill: var(--viz-text); }
+.md-typeset svg.pn-dp .pn-wlab { fill: var(--viz-s3-text); font-size: 16px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .pn-key-1 { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .pn-key-2 { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .viz-legend .pn-key-3 { background: color-mix(in srgb, var(--viz-s3) 20%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
+.md-typeset .viz-legend .pn-key-0 { background: var(--md-default-bg-color); outline: 1.4px solid var(--viz-ink); outline-offset: -1.4px; }

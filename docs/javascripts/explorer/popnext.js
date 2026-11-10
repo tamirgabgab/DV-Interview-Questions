@@ -39,6 +39,7 @@
   const ROWS = 10;                     // the most rows (the previous one with zeros), so the table keeps its size
   const XMAX = 2 ** 16 - 1;
   const bin = (v) => v.toString(2);
+  const NB = "\u00a0";                // before a colon in Hebrew text
 
   // the rows the box shows, each with its note: the next one or the previous one (as
   // ~next(~x)), counting ones in w bits or zeros in the length of x
@@ -51,14 +52,19 @@
       g.next ? `ה-carry מכבה את הבלוק הנמוך (${N(g.m)} אחדות) ומדליק את הביט ${N(g.t + g.m)} שמעליו.`
         : `החיבור גולש מעבר ל-${N(L)} ביטים : הבלוק היה בראש, ואין מספר הבא אחרי ${code(name)} ב-${N(L)} ביטים.`,
       `הביטים שהשתנו : הבלוק והביט החדש.`,
-      `שתיים פחות : נשארות ${N(Math.max(0, g.m - 1))} אחדות.`,
-      `החילוק ב-${code("c")} מזיז עוד ${N(g.t)} מקומות ימינה, לתחתית.`,
+      `הזזה בשני מקומות ימינה. יחד עם החילוק ב-${code("c")} זו הזזה ב-${N(`t + 2 = ${g.t + 2}`)}, שמפילה את שני האחדות הנמוכים מתחת לביט 0.`,
+      `החילוק ב-${code("c")} מזיז עוד ${N(g.t)} מקומות ימינה, לתחתית${NB}: נשארות ${N(Math.max(0, g.m - 1))} אחדות.`,
       `המספר הבא אחרי ${code(name)} עם אותן אחדות.`,
     ];
     const count = bit ? `${N(ones(x))} אחדות ב-${N(w)} ביטים` : `${N(z)} אפסים באורך ${N(L)}`;
     let rows, result;
-    if (dir === "next") {
-      rows = g.rows.map((r, i) => ({ ...r, note: i === 0 ? `${count}. בלוק האחדות הנמוך מסומן : ${N(g.m)} אחדות מהמקום ${N(g.t)}.` : gNotes("x")[i - 1] }));
+    if (dir === "next" && x === 0) {
+      // the trap: no lowest one, c = 0, and the division by c is a division by zero
+      rows = [{ label: "x", v: 0, marks: [], note: `${count}.` },
+        { label: "c = x & −x", v: 0, marks: [], note: `${code("x = 0")}${NB}: אין אחד נמוך, ${code("c = 0")}, והחילוק ב-${code("c")} היה חילוק באפס. לכן אין מספר הבא.` }];
+      result = 0;
+    } else if (dir === "next") {
+      rows = g.rows.map((r, i) => ({ ...r, note: i === 0 ? `${count}. בלוק האחדות הנמוך מסומן${NB}: ${N(g.m)} אחדות מהמקום ${N(g.t)}.` : gNotes("x")[i - 1] }));
       result = g.next;
       if (!bit && !g.next) {
         result = 2 ** L + 2 ** (L - z) - 1;
@@ -66,12 +72,13 @@
       }
     } else {
       rows = [{ label: "x", v: x, marks: [], note: `${count}. הקודם הוא ההיפוך של המספר הבא אחרי ${code("~x")}.` },
-        { label: "y = ~x", v: ~x & mask, marks: [], note: `ההיפוך ב-${N(L)} ביטים. הסדר מתהפך, ועכשיו מחפשים את הבא.` }]
+        { label: "y = ~x", v: ~x & mask, marks: [], note: (~x & mask) ? `ההיפוך ב-${N(L)} ביטים. הסדר מתהפך, ועכשיו מחפשים את הבא.`
+          : `${code("~x = 0")}${NB}: אין אחד להזיז, ולכן אין קודם באותו ${bit ? "רוחב" : "אורך"}.` }]
         .concat(g.rows.slice(1).map((r, i) => ({ ...r, label: r.label.replace(/x/g, "y"), note: gNotes("y")[i] })));
       result = 0;
       if (g.next) {
         result = ~g.next & mask;
-        rows.push({ label: "~(r | s)", v: result, marks: [], note: bit || result >= 2 ** (L - 1) ? `היפוך בחזרה : זה המספר הקודם ל-${code("x")}.` : `היפוך בחזרה. הביט העליון כבוי : זה מספר קצר יותר, עם יותר אפסים.` });
+        rows.push({ label: "~(r | s)", v: result, marks: [], note: bit || result >= 2 ** (L - 1) ? `היפוך בחזרה : זה המספר הקודם ל-${code("x")}.` : `היפוך בחזרה. הביט העליון כבוי${NB}: זה מספר קצר יותר, ולכן עם פחות אפסים.` });
       }
       if (!bit && result < 2 ** (L - 1)) {
         result = L - 1 - z >= 1 ? (2 ** (L - 1 - z) - 1) * 2 ** z : 0;
@@ -90,7 +97,7 @@
         `<div class="ex-controls">` +
         `<label>סופרים <select class="gs-bit" aria-label="איזה ביט סופרים"><option value="1" selected>אחדות (ביט 1)</option><option value="0">אפסים (ביט 0)</option></select></label>` +
         `<label>הרוחב <select class="gs-w" aria-label="רוחב המילה בביטים">${WIDTHS.map((v) => `<option value="${v}"${v === d0.w ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
-        `<label><span>המספר</span><input type="number" class="ex-num gs-x" min="1" dir="ltr" aria-label="המספר x, בעשרוני"></label>` +
+        `<label><span>המספר</span><input type="number" class="ex-num gs-x" min="0" dir="ltr" aria-label="המספר x, בעשרוני"></label>` +
         `<button type="button" class="md-button gs-prev">הקודם</button>` +
         `<button type="button" class="md-button md-button--primary gs-next">הבא</button>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button><span class="fl-err gs-err"></span></div>` +
@@ -117,6 +124,7 @@
         $(".gs-w").value = String(w); $(".gs-x").value = String(x); $(".gs-dir").value = st.dir; $(".gs-bit").value = String(bit);
         $(".gs-w").disabled = !bit;
         $(".gs-x").max = String(max());
+        $(".gs-x").min = bit ? "0" : "1";
         const nx = bit ? gsNext(x, w) : gsNext0(x), pv = bit ? gsPrev(x, w) : gsPrev0(x);
         $(".gs-next").disabled = !nx || nx > max();
         $(".gs-prev").disabled = !pv;
@@ -150,17 +158,20 @@
       const setX = (x) => { stop(); st.x = x; st.k = 0; $(".gs-err").textContent = ""; draw(); };
       $(".gs-x").addEventListener("change", () => {
         const v = Number($(".gs-x").value);
-        if (!Number.isInteger(v) || v < 1 || v > max()) { $(".gs-err").textContent = `המספר : שלם מ-1 עד ${max()}`; return; }
+        const lo = st.bit ? 0 : 1;
+        if (!Number.isInteger(v) || v < lo || v > max()) { $(".gs-err").textContent = `המספר${NB}: שלם מ-${lo} עד ${max()}`; return; }
         setX(v);
       });
       $(".gs-x").addEventListener("keydown", (e) => { if (e.key === "Enter") $(".gs-x").blur(); });
+      // a number that does not fit the new width (or 0 when counting zeros) changes, and the box says so
+      const refit = (v) => { const old = st.x; setX(v); if (v !== old) $(".gs-err").textContent = `המספר ${old} לא מתאים, ולכן הוא עכשיו ${v}`; };
       $(".gs-w").addEventListener("change", () => {
         st.w = Number($(".gs-w").value);
-        setX(st.x & (2 ** st.w - 1) || 2 ** Math.min(ones(st.x), st.w) - 1);
+        refit(st.x <= 2 ** st.w - 1 ? st.x : st.x % 2 ** st.w || 2 ** Math.min(ones(st.x), st.w) - 1);
       });
       $(".gs-bit").addEventListener("change", () => {
         st.bit = Number($(".gs-bit").value);
-        setX(st.bit && st.x > 2 ** st.w - 1 ? st.x & (2 ** st.w - 1) || 1 : st.x);
+        refit(st.bit && st.x > 2 ** st.w - 1 ? st.x % 2 ** st.w || 1 : !st.bit && st.x === 0 ? 1 : st.x);
       });
       $(".gs-dir").addEventListener("change", () => { stop(); st.dir = $(".gs-dir").value; st.k = 0; draw(); });
       $(".gs-next").addEventListener("click", () => { const v = st.bit ? gsNext(st.x, st.w) : gsNext0(st.x); if (v && v <= max()) setX(v); });
@@ -179,6 +190,6 @@
     help: {
       popnext: "בוחרים מה סופרים (אחדות ברוחב קבוע, או אפסים מתחת לאחד העליון), רוחב ומספר. השלבים של הנוסחה נפתחים אחד אחרי השני, עם הביטים שכל שלב עוסק בהם, למספר הבא או למספר הקודם (דרך ההיפוך). עם אפסים, כשהאורך נגמר מופיע שלב של מעבר לאורך הבא או הקודם. הכפתורים הבא והקודם מחליפים את המספר בשכן שלו.",
     },
-    models: { gsNext, gsPrev, gsNext0, gsPrev0, gsSteps },
+    models: { gsNext, gsPrev, gsNext0, gsPrev0, gsSteps, popSteps: stepsOf },
   });
 })();

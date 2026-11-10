@@ -1,6 +1,25 @@
+//@flags --assert --timing
 // Question 0060: the page's next_same / prev_same against a search number by number (every
 // number of 10 bits, and random 32-bit numbers), next_zeros / prev_zeros against a search
-// over lengths; the page's numbers (99, 80, 143).
+// over lengths; the page's numbers (99, 80, 143). The follow-ups' hardware: next_same_1c
+// against the search on every 12-bit number and against next_same on random 32-bit ones;
+// next_same_sva bound to it (no assertion fails, every coverage bin hit on the 12-bit sweep,
+// some bins missed by random 32-bit numbers alone) and to a copy without the overflow check
+// (its assertions fail).
+//@page module next_same_1c
+//@page module next_same_sva
+
+// next_same_1c without the overflow check: a block at the top gives a small number
+module next_same_bug #(parameter int W = 32) (input logic [W-1:0] x, output logic [W-1:0] nxt, output logic none);
+  logic [W-1:0] c, r;
+  always_comb begin
+    c = x & -x;
+    r = x + c;
+    none = (x == '0);
+    nxt = none ? '0 : r | ((x ^ r) >> 2) / c;
+  end
+endmodule
+
 module tb;
   //@page function automatic logic [31:0] next_same
   //@page function automatic logic [31:0] prev_same
@@ -19,6 +38,21 @@ module tb;
     for (int p = 0; p < 64; p++) if (v[p]) L = p + 1;
     return L - $countones(v);
   endfunction
+
+  logic clk = 0;
+  always #5 clk = ~clk;
+  logic [11:0] hx, hn;
+  logic [9:0] bn;
+  logic hnone, bnone;
+  logic [31:0] wx, wn;
+  logic wnone;
+  next_same_1c #(12) dut12(.x(hx), .nxt(hn), .none(hnone));
+  next_same_sva #(12) chk12(.clk, .x(hx), .nxt(hn), .none(hnone));
+  // a second instance of one width trips a Verilator covergroup bug: the bad copy is 10 bits wide
+  next_same_bug #(10) bug10(.x(hx[9:0]), .nxt(bn), .none(bnone));
+  next_same_sva #(10) chkbug(.clk, .x(hx[9:0]), .nxt(bn), .none(bnone));
+  next_same_1c #(32) dut32(.x(wx), .nxt(wn), .none(wnone));
+  next_same_sva #(32) chk32(.clk, .x(wx), .nxt(wn), .none(wnone));
 
   initial begin
     logic [31:0] x, y, z;
@@ -47,6 +81,27 @@ module tb;
       y = next_same(x);
       if (y != 0 && (y <= x || $countones(y) != $countones(x) || prev_same(y) != x)) begin errors++; $display("rand %h -> %h", x, y); end
     end
+    // the one-cycle module: every 12-bit number against the search, one per clock under the checker
+    wx = 32'd1;
+    for (int v = 0; v < 4096; v++) begin
+      hx = 12'(v);
+      #1;
+      z = search_next(32'(v), 12);
+      if (v == 0) z = 0;
+      if (32'(hn) != z || hnone != (z == 0)) begin errors++; $display("next_same_1c %0d: %0d vs %0d", v, hn, z); end
+      @(negedge clk);
+    end
+    // random 32-bit numbers against the page's next_same
+    for (int r = 0; r < 300; r++) begin
+      wx = $urandom;
+      #1;
+      if (wn != next_same(wx) || wnone != (next_same(wx) == 0)) begin errors++; $display("next_same_1c %h", wx); end
+      @(negedge clk);
+    end
+    if (chk12.fails != 0 || chk32.fails != 0) begin errors++; $display("assertions failed: %0d %0d", chk12.fails, chk32.fails); end
+    if (chkbug.fails == 0) begin errors++; $display("the copy without the overflow check passed"); end
+    if (chk12.cov.get_inst_coverage() < 99.999) begin errors++; $display("12-bit coverage %f", chk12.cov.get_inst_coverage()); end
+    if (chk32.cov.get_inst_coverage() > 99.999) begin errors++; $display("random 32-bit numbers alone closed the coverage"); end
     if (errors == 0) $display("PASS"); else $display("FAIL: %0d errors", errors);
     $finish;
   end
