@@ -1,5 +1,5 @@
 // kinds: cake-arith cake-geo
-//   cake-arith / cake-geo  0027, 0028  the law, sliders a and d (or q) with exact fields (a tiny a, a negative d, q below 1), and a person-by-person stepper of the cake with each share's ratio to the one before; the peak named once the stepper passes it; the proof panel: the people on the condition curve against the threshold
+//   cake-arith / cake-geo  0027, 0028  the law, sliders a and d (or q) with exact fields (a tiny a, a negative d, q below 1), and a person-by-person stepper of the cake with each share's ratio to the one before; the peak named once the stepper passes it; one chart of the shares with the proof text under it, beside the proof panel: the people on the condition curve against the threshold; the other law's result only after the law select was used
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -56,7 +56,8 @@
     const vmax = Math.max(...values);
     const ymax = Math.ceil(vmax * 20 + 0.6) / 20;
     const ticks = [];
-    for (let v = 0; v <= ymax + 1e-9; v += 0.05) ticks.push(Math.round(v * 100) / 100);
+    const dy = ymax > 0.35 ? 0.1 : 0.05;                 // tall bars (a large first share): fewer grid lines
+    for (let v = 0; v <= ymax + 1e-9; v += dy) ticks.push(Math.round(v * 100) / 100);
     const fr = frame(label, values.length, ymax, ticks, (v) => v.toFixed(2));
     let s = fr.s;
     values.forEach((v, i) => {
@@ -78,10 +79,10 @@
       const SL = { arith: { a: [0.0001, 0.6, 0.0001], step: [-0.2, 0.8, 0.01], name: "ההפרש d", law: "החשבוני" },
                    geo: { a: [0.0001, 0.6, 0.0001], step: [0.5, 3, 0.05], name: "המנה q", law: "ההנדסי" } };
       const LIM = { a: [0.0001, 1], arith: [-1, 1], geo: [0.1, 10] };
-      const WIN = 200;   // people in the charts and the table at once
+      const WIN = 200;   // people in the chart and the table at once
       const defaults = { kind: kind0, a: Number(d.a || 0.01), step: { arith: 0.1, geo: 1.5 } };
       defaults.step[kind0] = Number(d.step || defaults.step[kind0]);
-      const st = { kind: kind0, a: defaults.a, step: { ...defaults.step }, shown: 1 };
+      const st = { kind: kind0, a: defaults.a, step: { ...defaults.step }, shown: 1, compared: false };   // compared: the law select was used
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>החוק <select class="ex-kind"><option value="arith">חשבוני, ‏p = a + (k − 1)d</option><option value="geo">הנדסי, ‏p = a · q^(k − 1)</option></select></label>` +
@@ -94,10 +95,10 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1200, 700, 250) +
         `<button type="button" class="md-button ex-all">כולם</button>` +
         `<span class="ex-pos"></span></div>` +
-        `<div class="cake-box"><div class="cake-pie"></div><div class="cake-panel"><p class="cake-now"></p><div class="cake-scroll" data-steady><table class="cake-table"><thead><tr><th>האדם</th><th>השבר</th><th>נשאר לפניו</th><th>מקבל</th><th>מול הקודם</th></tr></thead><tbody></tbody></table></div></div></div>` +
-        `<p class="ex-summary" aria-live="polite"></p><p class="ex-note cake-note"></p><div class="cake-charts"></div>` +
+        `<div class="cake-box"><div class="cake-pie"></div><div class="cake-panel"><p class="cake-now"></p><div class="cake-scroll" data-steady><table class="cake-table"><caption class="cake-win" hidden></caption><thead><tr><th>האדם</th><th>השבר</th><th>נשאר לפניו</th><th>מקבל</th><th>מול הקודם</th></tr></thead><tbody></tbody></table></div></div></div>` +
+        `<p class="ex-summary" aria-live="polite"></p><div class="cake-charts"></div>` +
         `<section class="ex-proof cake-proof"><p class="ex-proof-title">שלב ההוכחה : הסף שבו נקבעת הפסגה</p>` +
-        `<div class="cake-proof-chart"></div><span class="viz-legend cake-proof-legend"></span><p class="cake-proof-text"></p></section>`;
+        `<div class="cake-proof-chart"></div><span class="viz-legend cake-proof-legend"></span></section><p class="cake-proof-text"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const kindSel = $(".ex-kind"), aIn = $(".ex-a"), stepIn = $(".ex-step"), pie = $(".cake-pie"), charts = $(".cake-charts");
       const numA = $(".num-a"), numStep = $(".num-step");
@@ -155,10 +156,11 @@
       };
       // the proof panel: the condition curve, the level line, the threshold T and the people
       // seen so far as dots on the curve (before the peak, the peak, after it)
-      const proofSvg = (rows, peak, T) => {
+      const proofSvg = (rows, hit, T) => {
         const step = st.step[st.kind], arith = st.kind === "arith";
         const g = (p) => cakeCondition(st.kind, step, p).g;
-        const xmax = arith ? Math.min(0.95, Math.ceil(T * 20 - 1e-9) / 10) : 1, ymax = arith ? g(xmax) : step;
+        const xmax = arith ? (T <= 0.475 ? Math.ceil(T * 20 - 1e-9) / 10 : Math.round((1 + T) * 50) / 100) : 1,   // about twice the threshold; past a half, midway to 1 (the curve shoots up there)
+               ymax = arith ? g(xmax) : step;
         const X = (p) => X0 + (p / xmax) * (W - X0 - RIGHT), Y = (v) => BASE - (Math.min(v, ymax) / ymax) * (BASE - TOP);
         const ys = [0.01, 0.02, 0.05, 0.1, 0.25, 0.5, 1, 2].find((u) => ymax / u <= 6) || 5, yt = [];
         for (let v = 0; v <= ymax + 1e-9; v += ys) yt.push(v);
@@ -173,9 +175,9 @@
         const dots = rows.filter((r) => r.k <= st.shown && r.p < 1 && r.p <= xmax);
         let lastX = -1e9;                                // a number only where it does not touch the previous one
         dots.forEach((r) => {
-          const big = r.k === peak[0], cls = big ? "s2" : r.k < peak[0] ? "s1" : "ink";
+          const big = r.k === hit, cls = big ? "s2" : !hit || r.k < hit ? "s1" : "ink";
           s += `<circle class="${cls}-dot" cx="${f(X(r.p))}" cy="${f(Y(g(r.p)))}" r="${big ? 6 : 4.5}"><title>p(${r.k}) = ${fmt(r.p, 4)}</title></circle>`;
-          if (big || X(r.p) - lastX >= 16) { s += `<text class="tick" x="${f(X(r.p))}" y="${f(Y(g(r.p)) - 9)}" text-anchor="middle">${r.k}</text>`; lastX = X(r.p); }
+          if (big || X(r.p) - lastX >= 14 + 11 * String(r.k).length) { s += `<text class="tick" x="${f(X(r.p))}" y="${f(Y(g(r.p)) - 9)}" text-anchor="middle">${r.k}</text>`; lastX = X(r.p); }
         });
         return { svg: s + fr.close(), off: rows.filter((r) => r.k <= st.shown && r.p < 1 && r.p > xmax).length };
       };
@@ -188,17 +190,25 @@
           text.innerHTML = `האדם הבא מקבל יותר בדיוק כש-${cond}. כש-${ltr(arith ? "d ≤ 0" : "q ≤ 1")} זה לא קורה אף פעם, ולכן החלקים רק יורדים מהאדם הראשון.`;
           return;
         }
-        const pr = proofSvg(rows, peak, T);
+        // past the proved range (d > 1/2, q > 2) every point can be on the first side of the line: the next
+        // person already takes the rest, the condition does not apply to him, and no point is "the first"
+        const noCross = rows.every((r) => r.p >= 1 || cakeCondition(st.kind, step, r.p).more) && !(peak.length > 1);
+        const hit = noCross ? 0 : peak[0];
+        const pr = proofSvg(rows, hit, T);
         chartBox.innerHTML = pr.svg;
         legend.innerHTML = `<span><i class="s1"></i>${ltr(arith ? "f(p) = p² / (1 − p)" : `y = ${fmt(step, 2)} (1 − p)`)}</span><span><i class="ink-dash"></i>הקו ${ltr(arith ? "y = d" : "y = 1")}</span>` +
-          `<span><i class="s2"></i>${st.shown >= peak[0] ? `האדם ה-${peak[0]} : ` : ""}הראשון ${arith ? "שמגיע לקו" : "שיורד לקו"}</span><span><i class="ink"></i>אחריו</span>`;
+          (hit ? `<span><i class="s2"></i>${st.shown >= hit ? `האדם ה-${hit} : ` : ""}הראשון ${arith ? "שמגיע לקו" : "שיורד לקו"}</span><span><i class="ink"></i>אחריו</span>` : "");
         const side = arith ? "מתחת לקו" : "מעל הקו", other = arith ? "מעליו" : "מתחתיו";
         const before = Math.min(st.shown, peak[0] - 1), tie = peak.length > 1;
-        const lead = `האדם הבא מקבל יותר בדיוק כש-${cond}. ${arith ? "העקומה עולה" : "הקו יורד"} והשברים ${ltr("p<sub>k</sub>")} עולים, ולכן הנקודות נעות לאורכו בכיוון אחד בלבד : `;
-        text.innerHTML = lead + (st.shown < peak[0]
-          ? `עד עכשיו ${ltr(st.shown)} נקודות, כולן ${side}, והחלקים עדיין עולים. הוסיפו אנשים וראו איפה הנקודות עוברות את הקו.`
-          : `${ltr(before)} נקודות ${side}, והנקודה של האדם ה-${peak[0]} היא הראשונה ${tie ? `שנוגעת בקו : תיקו עם הבא אחריו` : other}. ` +
-            `מכאן הנקודות לא חוזרות, ולכן יש פסגה אחת, אצל האדם ה-${peak[0]}${tie ? ` וה-${peak[1]}` : ""}, עם השבר ${ltr(fmt(rows[peak[0] - 1].p, P))} מול הסף ${ltr(`T ≈ ${fmt(T)}`)}.`) +
+        // "3 points", in Hebrew: none, one, or a count
+        const points = (n, all) => (n === 0 ? "אין נקודות" : n === 1 ? "נקודה אחת" : `${ltr(n)} נקודות${all ? ", כולן" : ""}`);
+        const lead = `האדם הבא מקבל יותר כל עוד ${cond}. `, one = `${arith ? "העקומה והשברים רק עולים" : "הקו יורד והשברים עולים"}, ולכן הנקודות לא חוזרות`;
+        const n = rows.length;
+        text.innerHTML = lead + (noCross
+          ? `${points(Math.min(st.shown, n - 1), true)} ${side}, ואף נקודה לא מגיעה לקו : האדם ה-${n} כבר לוקח את כל השארית, והתנאי לא חל עליו. כאן הפסגה נקבעת בעמודות, לא בסף.`
+          : st.shown < peak[0]
+          ? `עד עכשיו ${points(st.shown, true)} ${side}, והחלקים עולים. הוסיפו אנשים וראו איפה הנקודות עוברות את הקו.`
+          : `${points(before, false)} ${side}, והאדם ה-${peak[0]} הוא הראשון ${tie ? "שנוגע בקו, ולכן תיקו עם הבא אחריו" : other}. ${one} : ${tie ? "הפסגה היא של שניהם" : "פסגה אחת"}.`) +
           (pr.off ? ` (עוד ${ltr(pr.off)} אנשים מימין לגרף.)` : "");
       };
       const draw = () => {
@@ -220,8 +230,8 @@
         };
         pie.innerHTML = pieSvg(rows, st.shown >= n ? peak : peakSeen);
         const now = rows[st.shown - 1];
-        $(".cake-now").innerHTML = `האדם ה-${now.k} מוצא ${ltr(fmt(now.R, P + 1))} מהעוגה, לוקח ממנה ${ltr(fmt(now.p, P))} ומקבל ${ltr(fmt(now.S, P + 1))}` +
-          (now.p >= 1 ? ", את כל מה שנשאר." : `; נשאר ${ltr(fmt(now.R - now.S, P + 1))} לבאים אחריו.`);
+        $(".cake-now").innerHTML = `האדם ה-${now.k} מוצא ${ltr(fmt(now.R, P + 1))} מהעוגה, ` +
+          (now.p >= 1 ? "ולוקח את כל מה שנשאר." : `לוקח ${ltr(fmt(now.p, P))} ממנה ומקבל ${ltr(fmt(now.S, P + 1))}; נשאר ${ltr(fmt(now.R - now.S, P + 1))}.`);
         $(".cake-table tbody").innerHTML = win.filter((r) => r.k <= st.shown).map((r) =>
           `<tr${peakSeen.includes(r.k) ? ' class="is-best"' : ""}${r.k === st.shown ? ' data-now="1"' : ""}><td>${ltr(r.k)}</td><td>${ltr(fmt(r.p, P))}</td><td>${ltr(fmt(r.R, P + 1))}</td><td>${ltr(fmt(r.S, P + 1))}</td><td class="cake-ratio">${ratioCell(trend[r.k - 1])}</td></tr>`).join("");
         const scroll = $(".cake-scroll"), nowRow = $(".cake-table tr[data-now]");   // keep the current person in view of the scrolling table
@@ -233,39 +243,32 @@
         const orows = rowsOf(other), opeak = cakeBest(orows);
         const agree = fm.k === peak[0] && fm.tie === (peak.length > 1);
         const last = rows[n - 1], left = last.R - last.S;
+        const over = st.kind === "arith" ? step > 0.5 : step > 2;   // past the range in which the formula is proved
         const ending = done ? `מתוך ${n} אנשים. `
           : n >= CAKE_MAX ? `העוגה לא נגמרת : השברים לא עולים, ואחרי ${ltr(CAKE_MAX)} אנשים עדיין נשאר ${ltr(fmt(left, P + 1))} ממנה. `
           : `השברים מתכווצים : מהאדם ה-${n + 1} השבר כבר אפסי (קטן מ-${ltr("10⁻⁹")}) או שלילי, ו-${ltr(fmt(left, P + 1))} מהעוגה נשאר בלי לוקח. `;
         const threshold = grows
-          ? `הסף הוא ${ltr(`T ≈ ${fmt(T)}`)}, והנוסחה נותנת את האדם ה-${fm.k}${fm.tie ? " (תיקו עם הבא)" : ""}${agree ? ", בדיוק כמו בעמודות." : ", שלא כמו בעמודות."} `
+          ? `הסף הוא ${ltr(`T ≈ ${fmt(T)}`)}, והנוסחה נותנת את האדם ה-${fm.k}${fm.tie ? " (תיקו עם הבא)" : ""}${agree ? ", בדיוק כמו בעמודות." : `, שלא כמו בעמודות${over ? ` : כש-${ltr(st.kind === "arith" ? "d > 0.5" : "q > 2")} האחרון לוקח את השארית, והנוסחה כבר לא מתאימה` : ""}.`} `
           : `אין סף : כשהשברים לא עולים (${ltr(st.kind === "arith" ? "d ≤ 0" : "q ≤ 1")}) גם השבר וגם מה שנשאר רק קטנים, ולכן האדם הראשון מקבל הכי הרבה. `;
         const whoSeen = peakSeen.length > 1 ? `תיקו בין האדם ה-${peakSeen[0]} לאדם ה-${peakSeen[1]}` : `האדם ה-${peakSeen[0]}`;
+        const lawName = st.compared ? `בחוק ${SL[st.kind].law} : ` : "";   // the law is named once the two are compared
         const head = revealed
-          ? `בחוק ${SL[st.kind].law} : המקבל הגדול הוא ${who}, עם ${ltr(fmt(rows[peak[0] - 1].S, P + 1))} מהעוגה, ${ending}` + threshold
-          : `בחוק ${SL[st.kind].law}, עד כה (${st.shown === 1 ? "רק האדם הראשון" : `האנשים 1 עד ${st.shown}`}) : הגדול הוא ${whoSeen}, עם ${ltr(fmt(rows[peakSeen[0] - 1].S, P + 1))} מהעוגה, ` +
-            `ועוד אף אחד לא קיבל פחות מקודמו. הפסגה מתגלה כשמישהו יקבל פחות. ${done ? `בתור ${n} אנשים. ` : ending}` +
+          ? `${lawName}המקבל הגדול הוא ${who}, עם ${ltr(fmt(rows[peak[0] - 1].S, P + 1))} מהעוגה, ${ending}` + threshold
+          : `${lawName}עד כה (${st.shown === 1 ? "רק האדם הראשון" : `האנשים 1 עד ${st.shown}`}) הגדול הוא ${whoSeen}, עם ${ltr(fmt(rows[peakSeen[0] - 1].S, P + 1))} מהעוגה. ` +
+            `הפסגה מתגלה כשמישהו יקבל פחות מקודמו. ${done ? `בתור ${n} אנשים. ` : ending}` +
             (grows ? `הסף הוא ${ltr(`T ≈ ${fmt(T)}`)}. ` : `אין סף, כי השברים לא עולים (${ltr(st.kind === "arith" ? "d ≤ 0" : "q ≤ 1")}). `);
-        summary.innerHTML = head +
-          `להשוואה, בחוק ${SL[other].law} עם אותו ${ltr("a")} ו-${ltr(`${SL[other].name.split(" ")[1]} = ${st.step[other]}`)} : האדם ה-${opeak[0]} עם ${ltr(fmt(orows[opeak[0] - 1].S, P + 1))}, מתוך ${orows.length}.`;
-        $(".cake-note").textContent = n > WIN ? `בטבלה ובגרפים מוצגים האנשים ${lo} עד ${hi} מתוך ${n}, והפסגה ביניהם.` : "";
+        summary.innerHTML = head + (!st.compared ? "" :
+          `להשוואה, בחוק ${SL[other].law} עם אותו ${ltr("a")} ו-${ltr(`${SL[other].name.split(" ")[1]} = ${st.step[other]}`)} : האדם ה-${opeak[0]} עם ${ltr(fmt(orows[opeak[0] - 1].S, P + 1))}, מתוך ${orows.length}.`);
         const shares = barsChart("החלק של כל אדם", win.map((r) => r.S), mark, (k, v) => `S(${k}) = ${fmt(v, P + 1)}`, lo);
         // bars of people not yet shown are faint
         let i = lo - 1;
         const sharesShown = shares.replace(/<rect class="bar [a-z-]+" /g, (m0) => { i += 1; return i > st.shown ? m0.replace('class="bar', 'fill-opacity="0.22" class="bar') : m0; });
-        const fr = frame("השבר של כל אדם מול הסף", win.length, 1, [0, 0.25, 0.5, 0.75, 1]);
-        let fs = fr.s + (grows ? hline(fr, T, `T ≈ ${fmt(T)}`) : "");
-        win.forEach((r) => {
-          const x = r.k - lo + 1;
-          const cls = revealed && r.k === peak[0] ? "s2" : grows && r.p < T - EPS ? "s1" : "ink";
-          const rad = revealed && r.k === peak[0] ? 6 : Math.min(4.5, Math.max(1.5, fr.slot * 0.35));
-          const dim = r.k > st.shown ? ' opacity="0.25"' : "";
-          fs += `<line class="${cls}-line" x1="${f(fr.cx(x))}" x2="${f(fr.cx(x))}" y1="${BASE}" y2="${f(fr.Y(r.p))}" stroke-width="${f(Math.min(2, fr.slot * 0.4))}"${dim}/>` +
-                `<circle class="${cls}-dot" cx="${f(fr.cx(x))}" cy="${f(fr.Y(r.p))}" r="${f(rad)}"${dim}><title>p(${r.k}) = ${fmt(r.p, P + 1)}</title></circle>`;
-          const nearPeak = r.k !== peak[0] && Math.abs(r.k - peak[0]) < fr.every;
-          if (r.k === peak[0] || (!nearPeak && (r.k % fr.every === 0 || x === 1))) fs += fr.xtick(x, r.k);
-        });
         drawProof(rows, peak, T, grows);
-        charts.innerHTML = `<p class="ex-title">החלק של כל אדם</p>${sharesShown}<p class="ex-title">${grows ? "השבר של כל אדם מול הסף" : "השבר של כל אדם"}</p>${fs + fr.close()}`;
+        // more people than the chart and the table hold: the table's caption says which are shown
+        const cap = $(".cake-win");
+        cap.hidden = n <= WIN;
+        cap.innerHTML = n > WIN ? `בטבלה ובגרף האנשים ${lo} עד ${hi} מתוך ${n}, והפסגה ביניהם` : "";
+        charts.innerHTML = `<p class="ex-title">החלק של כל אדם</p>${sharesShown}`;
       };
       const summary = $(".ex-summary");
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
@@ -281,14 +284,14 @@
         go(st.shown + 1);
       });
       $(".ex-speed").addEventListener("change", () => { if (timer) { stop(); play.click(); } });
-      kindSel.addEventListener("change", () => { stop(); st.kind = kindSel.value; st.shown = 1; setSliders(); draw(); });
+      kindSel.addEventListener("change", () => { stop(); st.kind = kindSel.value; st.compared = true; st.shown = 1; setSliders(); draw(); });
       const clamp = (v, [lo, hi], fallback) => (Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : fallback);
       aIn.addEventListener("input", () => { stop(); st.a = Number(aIn.value); draw(); });
       stepIn.addEventListener("input", () => { stop(); st.step[st.kind] = Number(stepIn.value); draw(); });
       numA.addEventListener("change", () => { stop(); st.a = clamp(Number(numA.value), LIM.a, st.a); draw(); });
       numStep.addEventListener("change", () => { stop(); st.step[st.kind] = clamp(Number(numStep.value), LIM[st.kind], st.step[st.kind]); draw(); });
       [numA, numStep].forEach((el) => el.addEventListener("keydown", (e) => { if (e.key === "Enter") el.blur(); }));
-      $(".ex-reset").addEventListener("click", () => { stop(); st.kind = kind0; st.a = defaults.a; st.step = { ...defaults.step }; st.shown = 1; setSliders(); draw(); });
+      $(".ex-reset").addEventListener("click", () => { stop(); st.kind = kind0; st.a = defaults.a; st.step = { ...defaults.step }; st.compared = false; st.shown = 1; setSliders(); draw(); });
       setSliders();
       draw();
     },
@@ -297,10 +300,10 @@
   dvqExplorers.register({
     views: { "cake-arith": () => cakeView("arith"), "cake-geo": () => cakeView("geo") },
     help: {
-      "cake-arith": "העוגה מחולקת לפי החוק החשבוני : a הוא החלק הראשון ו-d התוספת לכל אדם. הסליידרים ושדות המספר קובעים אותם, ״הבא״ ו״הפעלה״ עוברים אדם אחרי אדם, והטבלה והגרפים מראים מי מקבל הכי הרבה. שלב ההוכחה מראה כל אדם כנקודה על עקומת התנאי, והפסגה היא הנקודה הראשונה שעוברת את הקו.",
-      "cake-geo": "העוגה מחולקת לפי החוק ההנדסי : a הוא החלק הראשון ו-q היחס בין אדם לאדם. הסליידרים ושדות המספר קובעים אותם, ״הבא״ ו״הפעלה״ עוברים אדם אחרי אדם, והטבלה והגרפים מראים מי מקבל הכי הרבה. שלב ההוכחה מראה כל אדם כנקודה על עקומת התנאי, והפסגה היא הנקודה הראשונה שעוברת את הקו.",
+      "cake-arith": "קובעים את a ואת d, מוסיפים אדם אחרי אדם ורואים מי מקבל הכי הרבה; בהוכחה כל אדם הוא נקודה על העקומה.",
+      "cake-geo": "קובעים את a ואת q, מוסיפים אדם אחרי אדם ורואים מי מקבל הכי הרבה; בהוכחה כל אדם הוא נקודה על הקו.",
     },
     models: { cakeSplit, cakeThreshold, cakeFormula, cakeCondition, cakeBest, cakeTrend, CAKE_MAX, cakeDone },
-    cols: { "cake-arith": { main: ".cake-charts", side: ".cake-proof" }, "cake-geo": { main: ".cake-charts", side: ".cake-proof" } },   // the cake and its table stay wide; under them the two charts beside the proof
+    cols: { "cake-arith": { main: ".cake-charts, .cake-proof-text", side: ".cake-proof" }, "cake-geo": { main: ".cake-charts, .cake-proof-text", side: ".cake-proof" } },   // the cake and its table stay wide; under them the shares chart and the proof text beside the proof chart
   });
 })();

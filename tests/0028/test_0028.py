@@ -115,6 +115,33 @@ def test_follow_ups():
         assert s.index(max(s)) == 0
 
 
+def test_box_tasks():
+    """The cases the box paragraph names, and where the formula and the bars part (q > 2 only)."""
+    s = shares(Fr(1, 10), Fr(2))
+    assert [s[i + 1] / s[i] for i in range(4)] == [Fr(18, 10), Fr(16, 10), Fr(12, 10), Fr(1, 4)]
+    assert max(s) == s[3] and cake.dec(s[3]) == "0.3456"
+    s = shares(Fr(1, 8), Fr(2))
+    assert s[2] == s[3] == max(s) and cake.dec(s[2]) == "0.3281" and closed_form(Fr(1, 8), Fr(2)) == (3, True)
+    assert Fr(1, 8) * 4 == 1 - Fr(1, 2)                      # the third fraction is the threshold 0.5
+    # a = 0.3, q = 0.5: the first gets the most, and 0.5101 is left when the fractions fade below 1e-9
+    left, p, s = Fr(1), Fr(3, 10), []
+    while p >= Fr(1, 10 ** 9):
+        s.append(p * left)
+        left -= p * left
+        p /= 2
+    assert s.index(max(s)) == 0 and f"{float(left):.4f}" == "0.5101"
+    bad = []
+    for ai in range(1, 601, 7):
+        for qi in range(21, 61):
+            a, q = Fr(ai, 1000), Fr(qi, 20)
+            s = shares(a, q)
+            winners = [i + 1 for i, v in enumerate(s) if v == max(s)]
+            k, tie = closed_form(a, q)
+            if winners != ([k, k + 1] if tie else [k]):
+                bad.append(q)
+    assert bad and min(bad) > 2
+
+
 def test_js_matches_python():
     node = shutil.which("node")
     if not node:

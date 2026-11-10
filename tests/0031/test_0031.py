@@ -172,3 +172,63 @@ def test_explorer_greedy_rounds():
             assert r["total"] == total
             rest = rest[:-2]
         assert gr["time"] == best, times
+
+
+def test_review_round_7_numbers():
+    """The numbers the page states after review round 7: the 108 plans of five crossings
+    (17 to 50 minutes) against the 32 states of the search, the cases of the lower bound
+    (19 without C and D together, 18 or more when one of them crosses twice, 17 for a plan
+    of seven crossings), plans longer than five crossings exist, and the box's tasks."""
+    times = [1, 2, 5, 10]
+    plans = []
+
+    def rec(across, side, t, moves, limit):
+        if across == 15:
+            plans.append((t, tuple(moves)))
+            return
+        if len(moves) == limit:
+            return
+        bank = [i for i in range(4) if ((across >> i) & 1) == side]
+        for g in [(i,) for i in bank] + list(combinations(bank, 2)):
+            rec(across ^ sum(1 << i for i in g), 1 - side, t + max(times[i] for i in g), moves + [g], limit)
+
+    rec(0, 0, 0, [], 7)
+    five = [p for p in plans if len(p[1]) == 5]
+    seven = [p for p in plans if len(p[1]) == 7]
+    assert len(plans) == len(five) + len(seven) and len(five) == 108 and len(seven) == 3348
+    assert (min(five)[0], max(five)[0]) == (17, 50) and min(seven)[0] >= 17
+    assert sum(1 for t, _ in five if t == 17) == 2
+    assert 2 * 2 ** 4 == 32                                             # the states of the search
+    assert all(all(len(g) == (2 if k % 2 == 0 else 1) for k, g in enumerate(m)) for _, m in five)
+    assert min(t for t, m in five if (2, 3) not in m) == 19             # C never with D: the escort
+    twice = [t for t, m in five if (2, 3) in m and sum(1 for g in m if 2 in g or 3 in g) > 1]
+    assert min(twice) >= 18
+    once = [(t, m) for t, m in five if (2, 3) in m and sum(1 for g in m if 2 in g or 3 in g) == 1]
+    assert once and all(m[2] == (2, 3) and m[0] == (0, 1) and m[4] == (0, 1) and t == 17 for t, m in once)
+    # the 17 plan against the 19 plan: the costs they do not share are 2 + 2 against 5 + 1
+    assert sorted([2, 1, 10, 2, 2]) == sorted([10, 1, 2] + [2, 2]) and sorted([10, 1, 5, 1, 2]) == sorted([10, 1, 2] + [5, 1])
+    # the box's tasks
+    ts = [1, 3, 4, 5, 20, 21]
+    assert q0031.plan(ts)[0] == 42 == q0031.greedy(ts) and q0031.escort(ts) == 57
+    assert (1 + 2 * 3 + 21, 2 * 1 + 20 + 21) == (28, 43) and (1 + 2 * 3 + 5, 2 * 1 + 4 + 5) == (12, 11)
+    assert 28 + 12 + 3 == 43                                            # the slow pair together in both rounds
+    assert q0031.plan([1, 2, 3, 4])[0] == 11 == q0031.escort([1, 2, 3, 4]) and 1 + 2 * 2 + 4 == 2 * 1 + 3 + 4 == 9
+    assert q0031.plan([7])[0] == 7                                      # one person: t, not (2N - 3) t
+
+
+def test_explorer_exact_decimal_sums():
+    """The box keeps the times in hundredths of a minute: on 1.1 2.2 3.3 4.4 5.5 the search,
+    the plans and the greedy rule give exactly 1760 (the float sums gave 17.599999999999998
+    against 17.6), and on random one-decimal sets the greedy total equals the search's."""
+    import json
+
+    from page_tests import explorer_require, node_json
+
+    rng = random.Random(7)
+    sets = [[110, 220, 330, 440, 550]] + [[10 * rng.randint(1, 99) for _ in range(rng.randint(2, 8))] for _ in range(200)]
+    got = node_json(f"const m = {explorer_require()};"
+                    f"console.log(JSON.stringify({json.dumps(sets)}.map((t) => [m.bridgeSolve(t).time, m.bridgeGreedy(t).time,"
+                    " m.bridgeTime(t, m.bridgePairMoves(t)), m.bridgeTime(t, m.bridgeEscortMoves(t))])));")
+    assert got[0][:2] == [1760, 1760]
+    for ts, (best, greedy, pair, escort) in zip(sets, got):
+        assert best == greedy == q0031.greedy(ts) and min(pair, escort) >= best and escort == q0031.escort(ts)

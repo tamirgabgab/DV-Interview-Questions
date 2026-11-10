@@ -1,5 +1,5 @@
 // kinds: transpose
-//   transpose              0074        an m x n matrix stored row by row transposed in place, one placement per step: the value in hand put at k m mod (mn - 1) and the one there picked up, the memory shown as the n x m result, every value tinted by its cycle; with a bit per entry, or without marks (each cycle from its leader, the walks counted)
+//   transpose              0074        an m x n matrix stored row by row transposed in place, one placement per step: the value in hand put at k m mod (mn - 1) and the one there picked up, the source beside the memory shown as the n x m result (two columns), every value tinted by its cycle; with a bit per entry, or without marks (each cycle from its leader: the walk from every s is a step of its own, marked on the source, and a walk that meets a smaller index is skipped)
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -22,8 +22,9 @@
   // The steps of the walks that look for the leaders without marks (the page's part c).
   const tpWalk = (s, m, size) => {
     let k = (s * m) % (size - 1), steps = 1;
-    while (k > s) { k = (k * m) % (size - 1); steps++; }
-    return { steps, leader: k === s };
+    const path = [s, k];
+    while (k > s) { k = (k * m) % (size - 1); steps++; path.push(k); }
+    return { steps, leader: k === s, path };
   };
   const tpChecks = (m, n) => {
     const size = m * n;
@@ -34,6 +35,8 @@
   };
   // The placements, as the page's code runs them: the array after each, the value in hand,
   // where it was put, the cycle's start and the walk steps spent so far (without marks).
+  // Without marks the walk from every s is a frame of its own (walk: the indices it met,
+  // leader: whether it came back to s), before the placements of a leader's cycle.
   const tpSteps = (m, n, leader) => {
     const size = m * n, arr = Array.from({ length: size }, (_, i) => i);
     const frames = [{ arr: arr.slice(), carry: null, at: null, s: null, checks: 0 }];
@@ -41,7 +44,12 @@
     const done = new Array(size).fill(false);
     let checks = 0;
     for (let s = 1; s < size - 1; s++) {
-      if (leader) { const w = tpWalk(s, m, size); checks += w.steps; if (!w.leader) continue; }
+      if (leader) {
+        const w = tpWalk(s, m, size);
+        checks += w.steps;
+        frames.push({ arr: arr.slice(), carry: null, at: null, s, checks, walk: w.path, leader: w.leader });
+        if (!w.leader) continue;
+      }
       else if (done[s]) continue;
       let k = s, carry = arr[s];
       for (;;) {
@@ -57,6 +65,10 @@
 
   const METHODS = { marks: "ביט לכל איבר (סעיף ב)", leader: "בלי סימון, מהמנהיג (סעיף ג)" };
 
+  const count = (x, one, many) => (x === 1 ? one : `${ltr(x)} ${many}`);
+  // a long walk shows its first and last indices only
+  const tpPath = (path) => (path.length > 15 ? [...path.slice(0, 8), "…", ...path.slice(-3)] : path).join(" → ");
+
   const transposeView = () => ({
     mount(box) {
       const clamp = (v) => Math.min(8, Math.max(1, v));
@@ -71,14 +83,15 @@
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-prev">הקודם</button>` +
-        `<button type="button" class="md-button md-button--primary ex-next">ההנחה הבאה</button>` +
+        `<button type="button" class="md-button md-button--primary ex-next">הצעד הבא</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 350) +
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary tp-sum" aria-live="polite"></p>` +
-        `<div class="tp-fig" data-steady></div>` +
-        `<span class="viz-legend"><span><i class="pm-key-c1"></i>הצבע : המעגל</span><span><i class="pm-key-hl"></i>ההנחה של הצעד</span><span><i class="tp-key-off"></i>לא זז</span></span>` +
-        `<p class="tp-note"></p>`;
+        `<div class="tp-src" data-steady></div>` +
+        `<div class="tp-mem" data-steady></div>` +
+        `<p class="tp-note"></p>` +
+        `<span class="viz-legend tp-legend"></span>`;
       const $ = (sel) => box.querySelector(sel);
       const frames = () => tpSteps(st.m, st.n, st.method === "leader");
 
@@ -94,13 +107,14 @@
       };
 
       const draw = () => {
+        const leader = st.method === "leader";
         const fr = frames(), T = fr.length - 1;
         st.s = Math.min(Math.max(st.s, 0), T);
-        const f = fr[st.s], m = st.m, n = st.n, size = m * n;
+        const f = fr[st.s], m = st.m, n = st.n, size = m * n, puts = Math.max(size - 2, 0);
         $(".tp-method").value = st.method;
         $(".tp-m").value = String(m); $(".tp-mo").textContent = String(m);
         $(".tp-n").value = String(n); $(".tp-no").textContent = String(n);
-        $(".ex-pos").textContent = `הנחה ${st.s} מתוך ${T}`;
+        $(".ex-pos").textContent = `${leader ? "צעד" : "הנחה"} ${st.s} מתוך ${T}`;
         $(".ex-prev").disabled = $(".ex-start").disabled = st.s === 0;
         $(".ex-next").disabled = $(".ex-end").disabled = st.s === T;
         const cycles = tpCycles(m, n), cyc = new Map();
@@ -110,19 +124,39 @@
         cycles.forEach((c, ci) => { if (c.length > 1) tintOf.set(ci, `c${(tint++ % 5) + 1}`); });
         const cls = (v) => (cycles[cyc.get(v)].length === 1 ? "is-off" : tintOf.get(cyc.get(v)));
         const target = Array.from({ length: size }, (_, k) => { const j = Math.floor(k / m), i = k % m; return i * n + j; });
-        $(".tp-fig").innerHTML =
-          grid(`המקור, ${ltr(`${m}×${n}`)}`, `המקור, ${m} שורות ו-${n} עמודות`, Array.from({ length: size }, (_, k) => k), m, n, { cls: (v) => cls(v) }) +
+        const walked = new Set(f.walk || []);
+        $(".tp-src").innerHTML =
+          grid(`המקור, ${ltr(`${m}×${n}`)}`, `המקור, ${m} שורות ו-${n} עמודות`, Array.from({ length: size }, (_, k) => k), m, n, { cls: (v) => `${cls(v)}${walked.has(v) ? " is-walk" : ""}` });
+        $(".tp-mem").innerHTML =
           grid(`הזיכרון עכשיו, כמטריצה ${ltr(`${n}×${m}`)}`, `הזיכרון עכשיו, כמטריצה של ${n} שורות ו-${m} עמודות`, f.arr, n, m, { cls: (v, p) => `${cls(v)}${p === f.at ? " is-hl" : ""}${v === target[p] ? " is-done" : ""}` }) +
           `<p class="tp-hand">ביד${NB}: <span class="tp-carry">${f.carry === null ? "—" : f.carry}</span></p>`;
         const long = cycles.filter((c) => c.length > 1).length;
+        $(".tp-legend").innerHTML =
+          `<span><i class="pm-key-c1"></i>הצבע${NB}: המעגל${long > 5 ? " (יש יותר מחמישה מעגלים, והצבעים חוזרים)" : ""}</span>` +
+          `<span><i class="pm-key-hl"></i>ההנחה של הצעד</span>` +
+          (leader ? `<span><i class="tp-key-walk"></i>ההליכה של הצעד</span>` : "") +
+          `<span><i class="tp-key-off"></i>לא זז</span>`;
         $(".tp-sum").innerHTML = `${ltr(`${m}×${n}`)}, ${ltr(`mn − 1 = ${size - 1}`)}${NB}: הערך באינדקס ${ltr("k")} עובר ל-${ltr(`${m}k mod ${Math.max(size - 1, 1)}`)}. ` +
-          `${ltr(long)} מעגלים שזזים, ${ltr(T)} הנחות. ` +
-          (st.method === "leader" ? `בלי סימון, ההליכות לחיפוש המנהיגים${NB}: ${ltr(f.checks)} צעדים עד עכשיו, ${ltr(tpChecks(m, n))} בסך הכול.` : `עם סימון${NB}: ${ltr(size)} ביטים של "בוצע".`);
-        $(".tp-note").innerHTML = st.s === 0
-          ? (size <= 2 ? "מטריצה של איבר אחד או שניים, או שורה ועמודה אחת : השחלוף לא מזיז כלום." : `מתחילים מ-${ltr("s = 1")}. כל ערך מונח במקום שלו, ומה שהיה שם עולה ליד.`)
-          : `מניחים את ${ltr(f.put)} באינדקס ${ltr(f.at)} (${ltr(`${f.put}·${m} mod ${size - 1} = ${f.at}`)})` +
-            (f.carry === null ? `, והמעגל של ${ltr(f.s)} נסגר.` : `, ומרימים את ${ltr(f.carry)}.`) +
-            (st.method === "leader" ? ` ‏${ltr(f.s)} הוא המנהיג${NB}: אין במעגל שלו אינדקס קטן ממנו.` : "");
+          `${long === 0 ? "אין מעגלים שזזים" : long === 1 ? "מעגל אחד שזז" : `${ltr(long)} מעגלים שזזים`}, ${puts === 0 ? "אין הנחות" : count(puts, "הנחה אחת", "הנחות")}. ` +
+          (leader ? `בלי סימון, ההליכות לחיפוש המנהיגים${NB}: ${ltr(f.checks)} צעדים עד עכשיו, ${ltr(tpChecks(m, n))} בסך הכול.` : `עם סימון${NB}: ${ltr(size)} ביטים של "בוצע".`);
+        let note;
+        if (st.s === 0) {
+          note = size <= 2 ? `מטריצה של איבר אחד או שניים${NB}: השחלוף לא מזיז כלום, והקוד חוזר מיד.`
+            : m === 1 || n === 1 ? `שורה אחת או עמודה אחת${NB}: השחלוף לא מזיז כלום. כל מקום הוא מעגל של עצמו, והקוד מניח כל ערך במקום שבו הוא כבר נמצא.`
+            : leader ? `מתחילים מ-${ltr("s = 1")}. לפני כל מעגל הולכים בו בלי לכתוב, ובודקים ש-${ltr("s")} הוא האינדקס הקטן ביותר בו.`
+            : `מתחילים מ-${ltr("s = 1")}. כל ערך מונח במקום שלו, ומה שהיה שם עולה ליד.`;
+        } else if (f.walk) {
+          const steps = f.walk.length - 1, end = f.walk[steps];
+          note = `ההליכה מ-${ltr(`s = ${f.s}`)}${NB}: ${ltr(tpPath(f.walk))}, ${count(steps, "צעד אחד", "צעדים")}. ` +
+            (f.leader ? `היא חזרה ל-${ltr(f.s)} בלי לפגוש אינדקס קטן ממנו${NB}: ${ltr(f.s)} הוא המנהיג, ומבצעים את המעגל.`
+              : `היא נעצרה ב-${ltr(end)}, שקטן מ-${ltr(f.s)}${NB}: המעגל כבר בוצע מהמנהיג שלו, ומדלגים.`);
+        } else if (f.put === f.at && f.at === f.s) {
+          note = `האינדקס ${ltr(f.at)} לא זז (${ltr(`${f.put}·${m} mod ${size - 1} = ${f.at}`)})${NB}: הקוד מניח את ${ltr(f.put)} במקום שבו הוא כבר נמצא, מעגל של איבר אחד.`;
+        } else {
+          note = `מניחים את ${ltr(f.put)} באינדקס ${ltr(f.at)} (${ltr(`${f.put}·${m} mod ${size - 1} = ${f.at}`)})` +
+            (f.carry === null ? `, והמעגל של ${ltr(f.s)} נסגר.` : `, ומרימים את ${ltr(f.carry)}.`);
+        }
+        $(".tp-note").innerHTML = note;
         if (st.s === T && T > 0) answer(box, `הזיכרון מחזיק את השחלוף ${ltr(`${n}×${m}`)}, שורה אחרי שורה.`, ".tp-cells .is-hl");
         else answer(box, null);
       };
@@ -143,8 +177,10 @@
 
   dvqExplorers.register({
     views: { transpose: transposeView },
+    // the source on the right, the memory (and the hand) on the left; the note and the legend under both
+    cols: { transpose: { main: ".tp-src", side: ".tp-mem" } },
     help: {
-      transpose: "בוחרים שיטה ומידות. כל צעד מניח את הערך שביד במקום שלו ומרים את מה שהיה שם. הטבלה העליונה היא המקור, והתחתונה היא הזיכרון עכשיו, מוצג כמטריצה המשוחלפת. ערך שהגיע למקומו מודגש, וכל ערך צבוע לפי המעגל שלו. בלי סימון, הסיכום סופר גם את צעדי ההליכה שמחפשים את מנהיג כל מעגל.",
+      transpose: "כל צעד מניח את הערך שביד במקום שלו ומרים את מה שהיה שם. טבלה אחת היא המקור, והשנייה היא הזיכרון עכשיו, כמטריצה המשוחלפת : ערך שהגיע למקומו מודגש, וכל ערך צבוע לפי המעגל שלו. בלי סימון, גם ההליכה מכל אינדקס היא צעד, והאינדקסים שעברה בהם מסומנים במקור.",
     },
     models: { tpCycles, tpChecks, tpSteps },
   });

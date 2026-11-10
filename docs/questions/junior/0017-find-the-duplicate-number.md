@@ -144,34 +144,50 @@ added: 2026-10-18
 
 ### סעיף ב – בלי לשנות את המערך ובזיכרון קבוע { #o1 }
 
-עכשיו אסור לשנות את `nums` ואסור להקצות זיכרון שתלוי ב-\( n \). מותרים רק כמה משתנים. מצאו
-פתרון שמהיר יותר מ-\( O(n^2) \), ואז פתרון בזמן \( O(n) \).
+עכשיו אסור לשנות את `nums` ואסור להקצות זיכרון שתלוי ב-\( n \). מותרים רק כמה משתנים. הפתרון
+הישיר עם האילוצים האלה הוא שתי לולאות מקוננות שמשוות כל זוג איברים : זמן \( O(n^2) \)
+וזיכרון \( O(1) \). מצאו פתרון מהיר ממנו, ואז פתרון בזמן \( O(n) \).
 
 ??? tip "רמז 1"
+    עקרון שובך היונים עובד גם על חלק מטווח הערכים. מה אפשר לספור במעבר אחד על המערך, בלי
+    זיכרון, שיגיד באיזה חלק של הטווח יש כפול?
+
+??? tip "רמז 2"
     בחרו ערך \( mid \) וספרו כמה מספרים במערך הם לכל היותר \( mid \). מה עקרון שובך היונים
     אומר אם התוצאה גדולה מ-\( mid \)?
 
-??? tip "רמז 2"
+??? tip "רמז 3"
     עכשיו לפתרון ב-\( O(n) \) : חשבו על כל אינדקס \( i \) כעל צומת עם חץ אל `nums[i]`. מה
     המשמעות של שני חצים שנכנסים לאותו צומת?
 
-??? tip "רמז 3"
+??? tip "רמז 4"
     מתחילים מאינדקס 0 והולכים לפי החצים. ההליכה חייבת להיכנס למעגל. איך מוצאים את הכניסה
     למעגל עם שני מצביעים בלבד?
 
 ??? success "פתרון 3 – חיפוש בינארי על הערכים"
     !!! answer "תשובה בקצרה"
-        מחפשים בינארית על **הערכים** ולא על האינדקסים. אם יותר מ-\( mid \) מספרים הם לכל
-        היותר \( mid \), יש כפול בין 1 ל-\( mid \). אחרת הוא בין \( mid + 1 \) ל-\( n \). זמן
-        \( O(n \log n) \), זיכרון \( O(1) \).
+        מחפשים בינארית על **הערכים** ולא על האינדקסים, ושומרים טווח \( lo..hi \) שיש בו
+        כפול. אם יותר מ-\( mid \) מספרים הם לכל היותר \( mid \), יש כפול בין \( lo \)
+        ל-\( mid \). אחרת יש כפול בין \( mid + 1 \) ל-\( hi \). זמן \( O(n \log n) \), זיכרון
+        \( O(1) \).
 
     <!-- cost: זמן \( O(n \log n) \) | זיכרון \( O(1) \) -->
 
     #### הרעיון { .sol-idea }
 
     עקרון שובך היונים עובד גם על חלק מהטווח : אם יותר מ-\( mid \) מספרים נופלים בתוך \( mid \)
-    הערכים \( 1, \ldots, mid \), שניים מהם שווים. ספירה אחת על כל המערך אומרת לאיזה חצי של
-    הטווח ללכת, וכל צעד חוצה את הטווח.
+    הערכים \( 1, \ldots, mid \), שניים מהם שווים. ספירה אחת על כל המערך אומרת באיזה חצי של
+    הטווח יש בוודאות כפול, וכל צעד חוצה את הטווח.
+
+    ומה אם הספירה היא לכל היותר \( mid \)? אז לא ידוע שאין כפול למטה, אבל בטוח שיש כפול
+    למעלה. החיפוש שומר טווח שבו יותר מ-\( hi \) מספרים הם לכל היותר \( hi \). אם רק \( mid \)
+    מהם או פחות הם לכל היותר \( mid \), יותר מ-\( hi - mid \) מספרים נופלים בתוך
+    \( hi - mid \) הערכים \( mid + 1, \ldots, hi \), ושוב שניים מהם שווים.
+
+    העודף לא מסודר לאורך הערכים כמו בחיפוש בינארי רגיל. במערך `[1, 1, 4, 4, 4]` הספירות של
+    הערכים 1 עד 4 הן 2, 2, 2, 5 : לערך 1 יש עודף, ל-2 ול-3 אין, ול-4 שוב יש. לכן החיפוש
+    נשען על השמורה של הטווח, ולא על כך שהתשובות "ממוינות". במערך הזה הוא מחזיר 4, אף
+    ש-1 כפול גם הוא.
 
     #### השלבים { .sol-steps }
 
@@ -179,9 +195,9 @@ added: 2026-10-18
 
     1. **הטווח :** \( lo = 1 \), ‏\( hi = n \).
     2. **ספירה :** \( mid \) הוא אמצע הטווח. סופרים כמה מספרים במערך הם לכל היותר \( mid \).
-    3. **החלטה :** אם הספירה גדולה מ-\( mid \), הכפול בחצי התחתון, ו-\( hi = mid \). אחרת הוא
-       בחצי העליון, ו-\( lo = mid + 1 \).
-    4. **סוף :** כשהטווח הוא ערך אחד, זה הכפול.
+    3. **החלטה :** אם הספירה גדולה מ-\( mid \), יש כפול בחצי התחתון, ו-\( hi = mid \). אחרת
+       יש כפול בחצי העליון, ו-\( lo = mid + 1 \).
+    4. **סוף :** כשהטווח הוא ערך אחד, הוא כפול.
 
     </div>
 
@@ -201,7 +217,9 @@ added: 2026-10-18
             return lo
         ```
 
-        1. ביטוי generator שסופר בלי לבנות רשימה, ולכן הזיכרון נשאר \( O(1) \).
+        1. ביטוי generator שסופר בלי לבנות רשימה, ולכן הזיכרון נשאר \( O(1) \). הוא סופר את
+           **כל** המספרים שהם לכל היותר \( mid \), גם את אלה שמתחת ל-\( lo \), כי ההשוואה
+           היא ל-\( mid \) עצמו.
 
     === "SystemVerilog"
         ```systemverilog title="function find_duplicate_binary" linenums="1" hl_lines="7 8"
@@ -219,8 +237,9 @@ added: 2026-10-18
         ```
 
         1. יותר מ-\( mid \) מספרים בתוך \( mid \) ערכים : לפי עקרון שובך היונים יש כפול בין 1
-           ל-\( mid \). חשוב : סופרים את **כל** המספרים שקטנים או שווים ל-\( mid \), ולא רק
-           את אלה שבטווח \( lo..mid \).
+           ל-\( mid \). עם ההשוואה ל-\( mid \) סופרים את **כל** המספרים שהם לכל היותר
+           \( mid \). מי שסופר רק את אלה שבטווח \( lo..mid \) צריך להשוות
+           ל-\( mid - lo + 1 \), מספר הערכים בטווח הזה.
 
     #### למה זה נכון { .sol-proof }
 
@@ -230,13 +249,19 @@ added: 2026-10-18
     - **עד סוף הטווח יש עודף :** יותר מ-\( hi \) מספרים הם לכל היותר \( hi \).
 
     בהתחלה אין אף מספר שהוא לכל היותר 0, וכל \( n + 1 \) המספרים הם לכל היותר \( n \),
-    ולכן השמורה מתקיימת. כל צעד שומר על אחד משני החלקים ומעדכן את הקצה השני. בסוף
-    \( lo = hi \), ולכן לכל היותר \( lo - 1 \) מספרים קטנים מ-\( lo \), אבל יותר מ-\( lo \)
+    ולכן השמורה מתקיימת. כל צעד שומר עליה :
+
+    - **הספירה גדולה מ-\( mid \) :** הקצה החדש הוא \( hi = mid \), ויותר מ-\( hi \) מספרים
+      הם לכל היותר \( hi \). הקצה \( lo \) לא זז.
+    - **אחרת :** הקצה החדש הוא \( lo = mid + 1 \), ולכל היותר \( lo - 1 \) מספרים הם לכל
+      היותר \( lo - 1 \). הקצה \( hi \) לא זז.
+
+    בסוף \( lo = hi \), ולכן לכל היותר \( lo - 1 \) מספרים קטנים מ-\( lo \), אבל יותר מ-\( lo \)
     מספרים הם לכל היותר \( lo \). כלומר הערך \( lo \) מופיע לפחות פעמיים.
 
     **על הדוגמה :**
 
-    | הטווח | ‏\( mid \) | כמה \( \le mid \) | הכפול נמצא |
+    | הטווח | ‏\( mid \) | כמה \( \le mid \) | איפה יש כפול |
     |---|---|---|---|
     | 1 עד 9 | 5 | 6 | ‏\( 6 > 5 \) : בין 1 ל-5 |
     | 1 עד 5 | 3 | 4 | ‏\( 4 > 3 \) : בין 1 ל-3 |
@@ -244,23 +269,30 @@ added: 2026-10-18
     | 1 עד 2 | 1 | 2 | ‏\( 2 > 1 \) : הוא 1 |
     | 1 עד 1 | | | **1** |
 
-    **נסו בעצמכם.** התיבה מריצה את החיפוש צעד אחרי צעד על אותה דוגמה. בכל צעד מודגשים במערך
-    המספרים שלכל היותר \( mid \), והתרשים מראה לכל ערך \( v \) כמה מספרים הם לכל היותר
-    \( v \), מול הקו \( y = v \) : עמודה מעל הקו היא עודף. הטווח \( lo \) עד \( hi \) מצטמצם כך
-    שלפניו אין עודף ובסופו יש, והשורה האחרונה בודקת את השמורה בכל צעד. כשנשאר ערך אחד,
-    העמודה שלו מעל הקו והעמודה שלפניו לא, ולכן הוא מופיע לפחות פעמיים.
+    **נסו בעצמכם.** התיבה מוסיפה לטבלה את מה שהיא לא מראה : לכל ערך \( v \) עמודה של כמה
+    מספרים הם לכל היותר \( v \), מול הקו \( y = v \). עמודה מעל הקו היא עודף, והשורה של
+    השמורה נבדקת בכל צעד. נסו :
+
+    - **המערך `2, 2, 2, 1` :** בצעד השני הספירה היא 1, לא יותר מ-\( mid = 1 \), ולכן הטווח
+      עולה. התשובה 2.
+    - **המערך `1, 1, 4, 4, 4` :** העמודה של 1 מעל הקו, ובכל זאת החיפוש עולה כבר בצעד
+      הראשון ומחזיר 4. השמורה מתקיימת בכל צעד.
+    - **המערך `3, 3, 4, 4, 1` :** הערך 3 כפול, אבל העמודה שלו בדיוק על הקו, כי 3 מספרים הם
+      לכל היותר 3. התשובה 4.
+    - **המערך `1, 2, 3, 4, 5, 6, 6` :** שני צעדים בלבד, ושניהם עולים.
 
     <div class="explorer" data-kind="dupbin" data-nmax="12"></div>
 
     #### סיבוכיות { .sol-cost }
 
-    - **זמן :** \( O(n \log n) \). יש \( \log_2 n \) צעדים, וכל צעד סופר את כל המערך.
+    - **זמן :** \( O(n \log n) \). יש לכל היותר \( \lceil \log_2 n \rceil \) צעדים (ארבעה
+      בדוגמה), וכל צעד סופר את כל המערך.
     - **זיכרון :** \( O(1) \) : ארבעה משתנים.
 
 ??? success "פתרון 4 – מעגל במערך : האלגוריתם של Floyd"
     !!! answer "תשובה בקצרה"
         רואים במערך גרף שבו כל אינדקס \( i \) מצביע על `nums[i]`. ההליכה מאינדקס 0 נכנסת
-        למעגל, **ונקודת הכניסה למעגל היא הערך הכפול**. מוצאים אותה עם צב וארנב : שלב 1 עד
+        למעגל, **ונקודת הכניסה למעגל היא ערך כפול**. מוצאים אותה עם צב וארנב : שלב 1 עד
         שהם נפגשים, ושלב 2 מ-0 ומנקודת המפגש, צעד אחד בכל פעם. זמן \( O(n) \), זיכרון
         \( O(1) \).
 
@@ -270,7 +302,7 @@ added: 2026-10-18
 
     כל אינדקס הוא צומת, ומכל צומת יוצא חץ אחד אל `nums[i]`. אף ערך אינו 0, ולכן אף חץ לא
     נכנס לצומת 0, ומשם מתחילים. ההליכה מ-0 לא יכולה להימשך לנצח בלי לחזור על צומת, ולכן
-    היא נכנסת למעגל. לצומת הכניסה נכנסים **שני** חצים : אחד מהזנב שהוביל אליו, ואחד מהמעגל
+    היא נכנסת למעגל. לצומת הכניסה נכנסים **לפחות שני** חצים : אחד מהזנב שהוביל אליו, ואחד מהמעגל
     עצמו. שני חצים שנכנסים לצומת \( v \) הם שני אינדקסים שונים שהערך בשניהם \( v \), כלומר
     \( v \) כפול.
 
@@ -288,7 +320,7 @@ added: 2026-10-18
        ממשיכים עד שהם באותו צומת. זה קורה בתוך המעגל.
     3. **שלב 2, כניסה :** מחזירים את הצב ל-0, משאירים את הארנב בנקודת המפגש, ומעכשיו שניהם
        עושים צעד אחד בכל פעם.
-    4. **התשובה :** הצומת שבו הם נפגשים הוא הכניסה למעגל, כלומר הערך הכפול.
+    4. **התשובה :** הצומת שבו הם נפגשים הוא הכניסה למעגל, כלומר ערך כפול.
 
     </div>
 
@@ -307,11 +339,11 @@ added: 2026-10-18
             while slow != fast:
                 slow = nums[slow]
                 fast = nums[fast]
-            return slow                   # the entry of the cycle = the duplicate value
+            return slow                   # the entry of the cycle = a duplicate value
         ```
 
-        1. ל-Python אין `do ... while`, ולכן `while True` עם `break` אחרי הצעד : גם כאן הצעד
-           הראשון קורה לפני הבדיקה, כי בהתחלה שניהם ב-0.
+        1. ל-Python אין `do ... while`, ולכן `while True` עם `break` אחרי הצעד : הצעד הראשון
+           קורה לפני הבדיקה, כי בהתחלה שניהם ב-0.
 
     === "SystemVerilog"
         ```systemverilog title="function find_duplicate_floyd" linenums="1" hl_lines="5 9 10"
@@ -326,7 +358,7 @@ added: 2026-10-18
             slow = nums[slow];
             fast = nums[fast];
           end
-          return slow;                 // the entry of the cycle = the duplicate value
+          return slow;                 // the entry of the cycle = a duplicate value
         endfunction
         ```
 
@@ -343,10 +375,18 @@ added: 2026-10-18
 
     <div class="stepper" role="group" aria-label="האלגוריתם של Floyd על הדוגמה : שלב המפגש ושלב הכניסה למעגל" tabindex="0"><figure class="stepper-frame is-active"><svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs><marker id="q17s0-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q17s0-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="59.0" y1="90.0" x2="98.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[0] = 3</title></line><line class="ink-line" x1="293.4" y1="76.6" x2="334.4" y2="35.6" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[1] = 9</title></line><g class="st-faded"><line class="ink-line" x1="100.5" y1="206.5" x2="86.4" y2="230.9" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[2] = 5</title></line></g><line class="ink-line" x1="139.0" y1="90.0" x2="178.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[3] = 6</title></line><line class="ink-line" x1="406.6" y1="103.4" x2="365.6" y2="144.4" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[4] = 7</title></line><g class="st-faded"><line class="ink-line" x1="94.4" y1="250.0" x2="122.6" y2="250.0" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[5] = 8</title></line></g><line class="ink-line" x1="219.0" y1="90.0" x2="258.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[6] = 1</title></line><line class="ink-line" x1="336.6" y1="146.6" x2="295.6" y2="105.6" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[7] = 1</title></line><g class="st-faded"><line class="ink-line" x1="135.1" y1="233.5" x2="121.0" y2="209.1" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[8] = 2</title></line></g><line class="ink-line" x1="363.4" y1="33.4" x2="404.4" y2="74.4" stroke-width="2.2" marker-end="url(#q17s0-ink)"><title>nums[9] = 4</title></line><g><circle class="st-cell" cx="40.0" cy="90.0" r="17"/><text class="st-text" x="40.0" y="95.0" text-anchor="middle">0</text></g><g><circle class="st-cell" cx="120.0" cy="90.0" r="17"/><text class="st-text" x="120.0" y="95.0" text-anchor="middle">3</text></g><g><circle class="st-cell" cx="200.0" cy="90.0" r="17"/><text class="st-text" x="200.0" y="95.0" text-anchor="middle">6</text></g><g><circle class="st-cell" cx="280.0" cy="90.0" r="17"/><text class="st-text" x="280.0" y="95.0" text-anchor="middle">1</text></g><g><circle class="st-cell" cx="350.0" cy="20.0" r="17"/><text class="st-text" x="350.0" y="25.0" text-anchor="middle">9</text></g><g><circle class="st-cell" cx="420.0" cy="90.0" r="17"/><text class="st-text" x="420.0" y="95.0" text-anchor="middle">4</text></g><g><circle class="st-cell" cx="350.0" cy="160.0" r="17"/><text class="st-text" x="350.0" y="165.0" text-anchor="middle">7</text></g><g class="st-faded"><circle class="st-cell" cx="110.0" cy="190.0" r="17"/><text class="st-text" x="110.0" y="195.0" text-anchor="middle">2</text></g><g class="st-faded"><circle class="st-cell" cx="75.4" cy="250.0" r="17"/><text class="st-text" x="75.4" y="255.0" text-anchor="middle">5</text></g><g class="st-faded"><circle class="st-cell" cx="144.6" cy="250.0" r="17"/><text class="st-text" x="144.6" y="255.0" text-anchor="middle">8</text></g><circle class="fl-slow" cx="40.0" cy="90.0" r="22"/><circle class="fl-fast" cx="40.0" cy="90.0" r="27"/></svg><figcaption>שלב 1 : הצב והארנב מתחילים באינדקס 0, שאף ערך לא מצביע עליו.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs><marker id="q17s1-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q17s1-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="59.0" y1="90.0" x2="98.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[0] = 3</title></line><line class="ink-line" x1="293.4" y1="76.6" x2="334.4" y2="35.6" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[1] = 9</title></line><g class="st-faded"><line class="ink-line" x1="100.5" y1="206.5" x2="86.4" y2="230.9" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[2] = 5</title></line></g><line class="ink-line" x1="139.0" y1="90.0" x2="178.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[3] = 6</title></line><line class="ink-line" x1="406.6" y1="103.4" x2="365.6" y2="144.4" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[4] = 7</title></line><g class="st-faded"><line class="ink-line" x1="94.4" y1="250.0" x2="122.6" y2="250.0" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[5] = 8</title></line></g><line class="ink-line" x1="219.0" y1="90.0" x2="258.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[6] = 1</title></line><line class="ink-line" x1="336.6" y1="146.6" x2="295.6" y2="105.6" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[7] = 1</title></line><g class="st-faded"><line class="ink-line" x1="135.1" y1="233.5" x2="121.0" y2="209.1" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[8] = 2</title></line></g><line class="ink-line" x1="363.4" y1="33.4" x2="404.4" y2="74.4" stroke-width="2.2" marker-end="url(#q17s1-ink)"><title>nums[9] = 4</title></line><g><circle class="st-cell" cx="40.0" cy="90.0" r="17"/><text class="st-text" x="40.0" y="95.0" text-anchor="middle">0</text></g><g><circle class="st-cell" cx="120.0" cy="90.0" r="17"/><text class="st-text" x="120.0" y="95.0" text-anchor="middle">3</text></g><g><circle class="st-cell" cx="200.0" cy="90.0" r="17"/><text class="st-text" x="200.0" y="95.0" text-anchor="middle">6</text></g><g><circle class="st-cell" cx="280.0" cy="90.0" r="17"/><text class="st-text" x="280.0" y="95.0" text-anchor="middle">1</text></g><g><circle class="st-cell" cx="350.0" cy="20.0" r="17"/><text class="st-text" x="350.0" y="25.0" text-anchor="middle">9</text></g><g><circle class="st-cell" cx="420.0" cy="90.0" r="17"/><text class="st-text" x="420.0" y="95.0" text-anchor="middle">4</text></g><g><circle class="st-cell" cx="350.0" cy="160.0" r="17"/><text class="st-text" x="350.0" y="165.0" text-anchor="middle">7</text></g><g class="st-faded"><circle class="st-cell" cx="110.0" cy="190.0" r="17"/><text class="st-text" x="110.0" y="195.0" text-anchor="middle">2</text></g><g class="st-faded"><circle class="st-cell" cx="75.4" cy="250.0" r="17"/><text class="st-text" x="75.4" y="255.0" text-anchor="middle">5</text></g><g class="st-faded"><circle class="st-cell" cx="144.6" cy="250.0" r="17"/><text class="st-text" x="144.6" y="255.0" text-anchor="middle">8</text></g><circle class="fl-slow" cx="120.0" cy="90.0" r="22"/><circle class="fl-fast" cx="200.0" cy="90.0" r="27"/></svg><figcaption>שלב 1, איטרציה 1 : הצב מתקדם צעד אחד ל-3, והארנב שני צעדים ל-6.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs><marker id="q17s2-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q17s2-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="59.0" y1="90.0" x2="98.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[0] = 3</title></line><line class="ink-line" x1="293.4" y1="76.6" x2="334.4" y2="35.6" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[1] = 9</title></line><g class="st-faded"><line class="ink-line" x1="100.5" y1="206.5" x2="86.4" y2="230.9" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[2] = 5</title></line></g><line class="ink-line" x1="139.0" y1="90.0" x2="178.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[3] = 6</title></line><line class="ink-line" x1="406.6" y1="103.4" x2="365.6" y2="144.4" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[4] = 7</title></line><g class="st-faded"><line class="ink-line" x1="94.4" y1="250.0" x2="122.6" y2="250.0" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[5] = 8</title></line></g><line class="ink-line" x1="219.0" y1="90.0" x2="258.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[6] = 1</title></line><line class="ink-line" x1="336.6" y1="146.6" x2="295.6" y2="105.6" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[7] = 1</title></line><g class="st-faded"><line class="ink-line" x1="135.1" y1="233.5" x2="121.0" y2="209.1" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[8] = 2</title></line></g><line class="ink-line" x1="363.4" y1="33.4" x2="404.4" y2="74.4" stroke-width="2.2" marker-end="url(#q17s2-ink)"><title>nums[9] = 4</title></line><g><circle class="st-cell" cx="40.0" cy="90.0" r="17"/><text class="st-text" x="40.0" y="95.0" text-anchor="middle">0</text></g><g><circle class="st-cell" cx="120.0" cy="90.0" r="17"/><text class="st-text" x="120.0" y="95.0" text-anchor="middle">3</text></g><g><circle class="st-cell" cx="200.0" cy="90.0" r="17"/><text class="st-text" x="200.0" y="95.0" text-anchor="middle">6</text></g><g><circle class="st-cell" cx="280.0" cy="90.0" r="17"/><text class="st-text" x="280.0" y="95.0" text-anchor="middle">1</text></g><g><circle class="st-cell" cx="350.0" cy="20.0" r="17"/><text class="st-text" x="350.0" y="25.0" text-anchor="middle">9</text></g><g><circle class="st-cell" cx="420.0" cy="90.0" r="17"/><text class="st-text" x="420.0" y="95.0" text-anchor="middle">4</text></g><g><circle class="st-cell" cx="350.0" cy="160.0" r="17"/><text class="st-text" x="350.0" y="165.0" text-anchor="middle">7</text></g><g class="st-faded"><circle class="st-cell" cx="110.0" cy="190.0" r="17"/><text class="st-text" x="110.0" y="195.0" text-anchor="middle">2</text></g><g class="st-faded"><circle class="st-cell" cx="75.4" cy="250.0" r="17"/><text class="st-text" x="75.4" y="255.0" text-anchor="middle">5</text></g><g class="st-faded"><circle class="st-cell" cx="144.6" cy="250.0" r="17"/><text class="st-text" x="144.6" y="255.0" text-anchor="middle">8</text></g><circle class="fl-slow" cx="200.0" cy="90.0" r="22"/><circle class="fl-fast" cx="350.0" cy="20.0" r="27"/></svg><figcaption>שלב 1, איטרציה 2 : הצב מתקדם צעד אחד ל-6, והארנב שני צעדים ל-9.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs><marker id="q17s3-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q17s3-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="59.0" y1="90.0" x2="98.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[0] = 3</title></line><line class="ink-line" x1="293.4" y1="76.6" x2="334.4" y2="35.6" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[1] = 9</title></line><g class="st-faded"><line class="ink-line" x1="100.5" y1="206.5" x2="86.4" y2="230.9" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[2] = 5</title></line></g><line class="ink-line" x1="139.0" y1="90.0" x2="178.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[3] = 6</title></line><line class="ink-line" x1="406.6" y1="103.4" x2="365.6" y2="144.4" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[4] = 7</title></line><g class="st-faded"><line class="ink-line" x1="94.4" y1="250.0" x2="122.6" y2="250.0" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[5] = 8</title></line></g><line class="ink-line" x1="219.0" y1="90.0" x2="258.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[6] = 1</title></line><line class="ink-line" x1="336.6" y1="146.6" x2="295.6" y2="105.6" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[7] = 1</title></line><g class="st-faded"><line class="ink-line" x1="135.1" y1="233.5" x2="121.0" y2="209.1" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[8] = 2</title></line></g><line class="ink-line" x1="363.4" y1="33.4" x2="404.4" y2="74.4" stroke-width="2.2" marker-end="url(#q17s3-ink)"><title>nums[9] = 4</title></line><g><circle class="st-cell" cx="40.0" cy="90.0" r="17"/><text class="st-text" x="40.0" y="95.0" text-anchor="middle">0</text></g><g><circle class="st-cell" cx="120.0" cy="90.0" r="17"/><text class="st-text" x="120.0" y="95.0" text-anchor="middle">3</text></g><g><circle class="st-cell" cx="200.0" cy="90.0" r="17"/><text class="st-text" x="200.0" y="95.0" text-anchor="middle">6</text></g><g><circle class="st-cell" cx="280.0" cy="90.0" r="17"/><text class="st-text" x="280.0" y="95.0" text-anchor="middle">1</text></g><g><circle class="st-cell" cx="350.0" cy="20.0" r="17"/><text class="st-text" x="350.0" y="25.0" text-anchor="middle">9</text></g><g><circle class="st-cell" cx="420.0" cy="90.0" r="17"/><text class="st-text" x="420.0" y="95.0" text-anchor="middle">4</text></g><g><circle class="st-cell" cx="350.0" cy="160.0" r="17"/><text class="st-text" x="350.0" y="165.0" text-anchor="middle">7</text></g><g class="st-faded"><circle class="st-cell" cx="110.0" cy="190.0" r="17"/><text class="st-text" x="110.0" y="195.0" text-anchor="middle">2</text></g><g class="st-faded"><circle class="st-cell" cx="75.4" cy="250.0" r="17"/><text class="st-text" x="75.4" y="255.0" text-anchor="middle">5</text></g><g class="st-faded"><circle class="st-cell" cx="144.6" cy="250.0" r="17"/><text class="st-text" x="144.6" y="255.0" text-anchor="middle">8</text></g><circle class="fl-slow" cx="280.0" cy="90.0" r="22"/><circle class="fl-fast" cx="350.0" cy="160.0" r="27"/></svg><figcaption>שלב 1, איטרציה 3 : הצב מתקדם צעד אחד ל-1, והארנב שני צעדים ל-7.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs><marker id="q17s4-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q17s4-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="59.0" y1="90.0" x2="98.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[0] = 3</title></line><line class="ink-line" x1="293.4" y1="76.6" x2="334.4" y2="35.6" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[1] = 9</title></line><g class="st-faded"><line class="ink-line" x1="100.5" y1="206.5" x2="86.4" y2="230.9" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[2] = 5</title></line></g><line class="ink-line" x1="139.0" y1="90.0" x2="178.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[3] = 6</title></line><line class="ink-line" x1="406.6" y1="103.4" x2="365.6" y2="144.4" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[4] = 7</title></line><g class="st-faded"><line class="ink-line" x1="94.4" y1="250.0" x2="122.6" y2="250.0" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[5] = 8</title></line></g><line class="ink-line" x1="219.0" y1="90.0" x2="258.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[6] = 1</title></line><line class="ink-line" x1="336.6" y1="146.6" x2="295.6" y2="105.6" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[7] = 1</title></line><g class="st-faded"><line class="ink-line" x1="135.1" y1="233.5" x2="121.0" y2="209.1" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[8] = 2</title></line></g><line class="ink-line" x1="363.4" y1="33.4" x2="404.4" y2="74.4" stroke-width="2.2" marker-end="url(#q17s4-ink)"><title>nums[9] = 4</title></line><g><circle class="st-cell" cx="40.0" cy="90.0" r="17"/><text class="st-text" x="40.0" y="95.0" text-anchor="middle">0</text></g><g><circle class="st-cell" cx="120.0" cy="90.0" r="17"/><text class="st-text" x="120.0" y="95.0" text-anchor="middle">3</text></g><g><circle class="st-cell" cx="200.0" cy="90.0" r="17"/><text class="st-text" x="200.0" y="95.0" text-anchor="middle">6</text></g><g><circle class="st-cell" cx="280.0" cy="90.0" r="17"/><text class="st-text" x="280.0" y="95.0" text-anchor="middle">1</text></g><g><circle class="st-cell" cx="350.0" cy="20.0" r="17"/><text class="st-text" x="350.0" y="25.0" text-anchor="middle">9</text></g><g><circle class="st-cell" cx="420.0" cy="90.0" r="17"/><text class="st-text" x="420.0" y="95.0" text-anchor="middle">4</text></g><g><circle class="st-cell" cx="350.0" cy="160.0" r="17"/><text class="st-text" x="350.0" y="165.0" text-anchor="middle">7</text></g><g class="st-faded"><circle class="st-cell" cx="110.0" cy="190.0" r="17"/><text class="st-text" x="110.0" y="195.0" text-anchor="middle">2</text></g><g class="st-faded"><circle class="st-cell" cx="75.4" cy="250.0" r="17"/><text class="st-text" x="75.4" y="255.0" text-anchor="middle">5</text></g><g class="st-faded"><circle class="st-cell" cx="144.6" cy="250.0" r="17"/><text class="st-text" x="144.6" y="255.0" text-anchor="middle">8</text></g><circle class="fl-slow" cx="350.0" cy="20.0" r="22"/><circle class="fl-fast" cx="350.0" cy="20.0" r="27"/></svg><figcaption>שלב 1, איטרציה 4 : שניהם ב-9. נפגשו בתוך המעגל, ומספר האיטרציות 4 הוא כפולה של אורך המעגל.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs><marker id="q17s5-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q17s5-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="59.0" y1="90.0" x2="98.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[0] = 3</title></line><line class="ink-line" x1="293.4" y1="76.6" x2="334.4" y2="35.6" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[1] = 9</title></line><g class="st-faded"><line class="ink-line" x1="100.5" y1="206.5" x2="86.4" y2="230.9" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[2] = 5</title></line></g><line class="ink-line" x1="139.0" y1="90.0" x2="178.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[3] = 6</title></line><line class="ink-line" x1="406.6" y1="103.4" x2="365.6" y2="144.4" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[4] = 7</title></line><g class="st-faded"><line class="ink-line" x1="94.4" y1="250.0" x2="122.6" y2="250.0" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[5] = 8</title></line></g><line class="ink-line" x1="219.0" y1="90.0" x2="258.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[6] = 1</title></line><line class="ink-line" x1="336.6" y1="146.6" x2="295.6" y2="105.6" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[7] = 1</title></line><g class="st-faded"><line class="ink-line" x1="135.1" y1="233.5" x2="121.0" y2="209.1" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[8] = 2</title></line></g><line class="ink-line" x1="363.4" y1="33.4" x2="404.4" y2="74.4" stroke-width="2.2" marker-end="url(#q17s5-ink)"><title>nums[9] = 4</title></line><g><circle class="st-cell" cx="40.0" cy="90.0" r="17"/><text class="st-text" x="40.0" y="95.0" text-anchor="middle">0</text></g><g><circle class="st-cell" cx="120.0" cy="90.0" r="17"/><text class="st-text" x="120.0" y="95.0" text-anchor="middle">3</text></g><g><circle class="st-cell" cx="200.0" cy="90.0" r="17"/><text class="st-text" x="200.0" y="95.0" text-anchor="middle">6</text></g><g><circle class="st-cell" cx="280.0" cy="90.0" r="17"/><text class="st-text" x="280.0" y="95.0" text-anchor="middle">1</text></g><g><circle class="st-cell" cx="350.0" cy="20.0" r="17"/><text class="st-text" x="350.0" y="25.0" text-anchor="middle">9</text></g><g><circle class="st-cell" cx="420.0" cy="90.0" r="17"/><text class="st-text" x="420.0" y="95.0" text-anchor="middle">4</text></g><g><circle class="st-cell" cx="350.0" cy="160.0" r="17"/><text class="st-text" x="350.0" y="165.0" text-anchor="middle">7</text></g><g class="st-faded"><circle class="st-cell" cx="110.0" cy="190.0" r="17"/><text class="st-text" x="110.0" y="195.0" text-anchor="middle">2</text></g><g class="st-faded"><circle class="st-cell" cx="75.4" cy="250.0" r="17"/><text class="st-text" x="75.4" y="255.0" text-anchor="middle">5</text></g><g class="st-faded"><circle class="st-cell" cx="144.6" cy="250.0" r="17"/><text class="st-text" x="144.6" y="255.0" text-anchor="middle">8</text></g><circle class="fl-slow" cx="40.0" cy="90.0" r="22"/><circle class="fl-fast" cx="350.0" cy="20.0" r="27"/></svg><figcaption>שלב 2 : מחזירים את הצב ל-0. הארנב נשאר בנקודת המפגש 9, ומעכשיו שניהם צועדים צעד אחד.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs><marker id="q17s6-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q17s6-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="59.0" y1="90.0" x2="98.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[0] = 3</title></line><line class="ink-line" x1="293.4" y1="76.6" x2="334.4" y2="35.6" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[1] = 9</title></line><g class="st-faded"><line class="ink-line" x1="100.5" y1="206.5" x2="86.4" y2="230.9" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[2] = 5</title></line></g><line class="ink-line" x1="139.0" y1="90.0" x2="178.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[3] = 6</title></line><line class="ink-line" x1="406.6" y1="103.4" x2="365.6" y2="144.4" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[4] = 7</title></line><g class="st-faded"><line class="ink-line" x1="94.4" y1="250.0" x2="122.6" y2="250.0" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[5] = 8</title></line></g><line class="ink-line" x1="219.0" y1="90.0" x2="258.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[6] = 1</title></line><line class="ink-line" x1="336.6" y1="146.6" x2="295.6" y2="105.6" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[7] = 1</title></line><g class="st-faded"><line class="ink-line" x1="135.1" y1="233.5" x2="121.0" y2="209.1" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[8] = 2</title></line></g><line class="ink-line" x1="363.4" y1="33.4" x2="404.4" y2="74.4" stroke-width="2.2" marker-end="url(#q17s6-ink)"><title>nums[9] = 4</title></line><g><circle class="st-cell" cx="40.0" cy="90.0" r="17"/><text class="st-text" x="40.0" y="95.0" text-anchor="middle">0</text></g><g><circle class="st-cell" cx="120.0" cy="90.0" r="17"/><text class="st-text" x="120.0" y="95.0" text-anchor="middle">3</text></g><g><circle class="st-cell" cx="200.0" cy="90.0" r="17"/><text class="st-text" x="200.0" y="95.0" text-anchor="middle">6</text></g><g><circle class="st-cell" cx="280.0" cy="90.0" r="17"/><text class="st-text" x="280.0" y="95.0" text-anchor="middle">1</text></g><g><circle class="st-cell" cx="350.0" cy="20.0" r="17"/><text class="st-text" x="350.0" y="25.0" text-anchor="middle">9</text></g><g><circle class="st-cell" cx="420.0" cy="90.0" r="17"/><text class="st-text" x="420.0" y="95.0" text-anchor="middle">4</text></g><g><circle class="st-cell" cx="350.0" cy="160.0" r="17"/><text class="st-text" x="350.0" y="165.0" text-anchor="middle">7</text></g><g class="st-faded"><circle class="st-cell" cx="110.0" cy="190.0" r="17"/><text class="st-text" x="110.0" y="195.0" text-anchor="middle">2</text></g><g class="st-faded"><circle class="st-cell" cx="75.4" cy="250.0" r="17"/><text class="st-text" x="75.4" y="255.0" text-anchor="middle">5</text></g><g class="st-faded"><circle class="st-cell" cx="144.6" cy="250.0" r="17"/><text class="st-text" x="144.6" y="255.0" text-anchor="middle">8</text></g><circle class="fl-slow" cx="120.0" cy="90.0" r="22"/><circle class="fl-fast" cx="420.0" cy="90.0" r="27"/></svg><figcaption>שלב 2, איטרציה 1 : הצב ב-3, הארנב ב-4.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs><marker id="q17s7-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q17s7-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="59.0" y1="90.0" x2="98.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[0] = 3</title></line><line class="ink-line" x1="293.4" y1="76.6" x2="334.4" y2="35.6" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[1] = 9</title></line><g class="st-faded"><line class="ink-line" x1="100.5" y1="206.5" x2="86.4" y2="230.9" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[2] = 5</title></line></g><line class="ink-line" x1="139.0" y1="90.0" x2="178.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[3] = 6</title></line><line class="ink-line" x1="406.6" y1="103.4" x2="365.6" y2="144.4" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[4] = 7</title></line><g class="st-faded"><line class="ink-line" x1="94.4" y1="250.0" x2="122.6" y2="250.0" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[5] = 8</title></line></g><line class="ink-line" x1="219.0" y1="90.0" x2="258.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[6] = 1</title></line><line class="ink-line" x1="336.6" y1="146.6" x2="295.6" y2="105.6" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[7] = 1</title></line><g class="st-faded"><line class="ink-line" x1="135.1" y1="233.5" x2="121.0" y2="209.1" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[8] = 2</title></line></g><line class="ink-line" x1="363.4" y1="33.4" x2="404.4" y2="74.4" stroke-width="2.2" marker-end="url(#q17s7-ink)"><title>nums[9] = 4</title></line><g><circle class="st-cell" cx="40.0" cy="90.0" r="17"/><text class="st-text" x="40.0" y="95.0" text-anchor="middle">0</text></g><g><circle class="st-cell" cx="120.0" cy="90.0" r="17"/><text class="st-text" x="120.0" y="95.0" text-anchor="middle">3</text></g><g><circle class="st-cell" cx="200.0" cy="90.0" r="17"/><text class="st-text" x="200.0" y="95.0" text-anchor="middle">6</text></g><g><circle class="st-cell" cx="280.0" cy="90.0" r="17"/><text class="st-text" x="280.0" y="95.0" text-anchor="middle">1</text></g><g><circle class="st-cell" cx="350.0" cy="20.0" r="17"/><text class="st-text" x="350.0" y="25.0" text-anchor="middle">9</text></g><g><circle class="st-cell" cx="420.0" cy="90.0" r="17"/><text class="st-text" x="420.0" y="95.0" text-anchor="middle">4</text></g><g><circle class="st-cell" cx="350.0" cy="160.0" r="17"/><text class="st-text" x="350.0" y="165.0" text-anchor="middle">7</text></g><g class="st-faded"><circle class="st-cell" cx="110.0" cy="190.0" r="17"/><text class="st-text" x="110.0" y="195.0" text-anchor="middle">2</text></g><g class="st-faded"><circle class="st-cell" cx="75.4" cy="250.0" r="17"/><text class="st-text" x="75.4" y="255.0" text-anchor="middle">5</text></g><g class="st-faded"><circle class="st-cell" cx="144.6" cy="250.0" r="17"/><text class="st-text" x="144.6" y="255.0" text-anchor="middle">8</text></g><circle class="fl-slow" cx="200.0" cy="90.0" r="22"/><circle class="fl-fast" cx="350.0" cy="160.0" r="27"/></svg><figcaption>שלב 2, איטרציה 2 : הצב ב-6, הארנב ב-7.</figcaption></figure><figure class="stepper-frame"><svg class="figure" viewBox="0 0 450 290" style="max-width:28rem" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו : זנב, מעגל, ומעגל נפרד"><defs><marker id="q17s8-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ink-fill" d="M0,0 L10,5 L0,10 z"/></marker><marker id="q17s8-s2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="s2-fill" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="ink-line" x1="59.0" y1="90.0" x2="98.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s8-ink)"><title>nums[0] = 3</title></line><line class="ink-line" x1="293.4" y1="76.6" x2="334.4" y2="35.6" stroke-width="2.2" marker-end="url(#q17s8-ink)"><title>nums[1] = 9</title></line><g class="st-faded"><line class="ink-line" x1="100.5" y1="206.5" x2="86.4" y2="230.9" stroke-width="2.2" marker-end="url(#q17s8-ink)"><title>nums[2] = 5</title></line></g><line class="ink-line" x1="139.0" y1="90.0" x2="178.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s8-ink)"><title>nums[3] = 6</title></line><line class="ink-line" x1="406.6" y1="103.4" x2="365.6" y2="144.4" stroke-width="2.2" marker-end="url(#q17s8-ink)"><title>nums[4] = 7</title></line><g class="st-faded"><line class="ink-line" x1="94.4" y1="250.0" x2="122.6" y2="250.0" stroke-width="2.2" marker-end="url(#q17s8-ink)"><title>nums[5] = 8</title></line></g><line class="s2-line" x1="219.0" y1="90.0" x2="258.0" y2="90.0" stroke-width="2.2" marker-end="url(#q17s8-s2)"><title>nums[6] = 1</title></line><line class="s2-line" x1="336.6" y1="146.6" x2="295.6" y2="105.6" stroke-width="2.2" marker-end="url(#q17s8-s2)"><title>nums[7] = 1</title></line><g class="st-faded"><line class="ink-line" x1="135.1" y1="233.5" x2="121.0" y2="209.1" stroke-width="2.2" marker-end="url(#q17s8-ink)"><title>nums[8] = 2</title></line></g><line class="ink-line" x1="363.4" y1="33.4" x2="404.4" y2="74.4" stroke-width="2.2" marker-end="url(#q17s8-ink)"><title>nums[9] = 4</title></line><g><circle class="st-cell" cx="40.0" cy="90.0" r="17"/><text class="st-text" x="40.0" y="95.0" text-anchor="middle">0</text></g><g><circle class="st-cell" cx="120.0" cy="90.0" r="17"/><text class="st-text" x="120.0" y="95.0" text-anchor="middle">3</text></g><g><circle class="st-cell" cx="200.0" cy="90.0" r="17"/><text class="st-text" x="200.0" y="95.0" text-anchor="middle">6</text></g><g><circle class="st-ok" cx="280.0" cy="90.0" r="17"/><text class="st-text" x="280.0" y="95.0" text-anchor="middle">1</text></g><g><circle class="st-cell" cx="350.0" cy="20.0" r="17"/><text class="st-text" x="350.0" y="25.0" text-anchor="middle">9</text></g><g><circle class="st-cell" cx="420.0" cy="90.0" r="17"/><text class="st-text" x="420.0" y="95.0" text-anchor="middle">4</text></g><g><circle class="st-cell" cx="350.0" cy="160.0" r="17"/><text class="st-text" x="350.0" y="165.0" text-anchor="middle">7</text></g><g class="st-faded"><circle class="st-cell" cx="110.0" cy="190.0" r="17"/><text class="st-text" x="110.0" y="195.0" text-anchor="middle">2</text></g><g class="st-faded"><circle class="st-cell" cx="75.4" cy="250.0" r="17"/><text class="st-text" x="75.4" y="255.0" text-anchor="middle">5</text></g><g class="st-faded"><circle class="st-cell" cx="144.6" cy="250.0" r="17"/><text class="st-text" x="144.6" y="255.0" text-anchor="middle">8</text></g><circle class="fl-slow" cx="280.0" cy="90.0" r="22"/><circle class="fl-fast" cx="280.0" cy="90.0" r="27"/></svg><figcaption>שלב 2, איטרציה 3 : שניהם ב-1, הכניסה למעגל. שני חצים נכנסים אליה, מאינדקס 6 ומאינדקס 7, ולכן 1 הוא הערך הכפול.</figcaption></figure><div class="stepper-nav"><button type="button" class="stepper-btn stepper-prev">הקודם</button><span class="stepper-pos" data-total="9"></span><button type="button" class="stepper-btn stepper-next">הבא</button></div></div>
 
-    **נסו בעצמכם.** הגרילו מערך או הקלידו אחד (\( n + 1 \) מספרים בין 1 ל-\( n \)) : התיבה
-    מציירת אותו כגרף של זנב ומעגל, ומריצה את הצב והארנב צעד אחרי צעד דרך שני השלבים. בסוף
-    החצים שנכנסים לכניסה למעגל נצבעים בכתום, והם בדיוק האינדקסים שמחזיקים את הערך הכפול.
-    "העתקת קישור" נותן קישור שפותח את התיבה עם אותו מערך באותו צעד.
+    **נסו בעצמכם.** התיבה מריצה את הצב והארנב על כל מערך, לא רק על הדוגמה, ונותנת את אורך
+    הזנב \( \mu \), את אורך המעגל \( \lambda \) ואת מספר האיטרציות עד המפגש. נסו :
+
+    - **הדוגמה :** המפגש אחרי 4 איטרציות, כפולה של \( \lambda = 4 \), ושלב 2 לוקח
+      \( \mu = 3 \) צעדים.
+    - **המערך `1, 2, 3, 4, 5, 6, 1` :** זנב של צומת אחד ומעגל של 6. המפגש אחרי 6 איטרציות,
+      ושלב 2 הוא צעד אחד.
+    - **המערך `1, 2, 3, 4, 5, 6, 6` :** זנב של 6 ולולאה עצמית, \( \lambda = 1 \). המפגש רק
+      אחרי 6 איטרציות.
+    - **המערך `2, 2, 2, 1` :** שלושה חצים נכנסים ל-2, ולא שניים.
+    - **המערך `1, 1, 4, 4, 4` :** כאן התשובה 1, ובתיבה של החיפוש הבינארי למעלה אותו מערך
+      נותן 4. שתי התשובות נכונות.
 
     <div class="explorer" data-kind="floyd" data-nmax="12"></div>
 
@@ -378,6 +418,9 @@ added: 2026-10-18
     | טבלת סימונים | ‏\( O(n) \) | ‏\( O(n) \) | לא |
     | חיפוש בינארי על הערכים | ‏\( O(n \log n) \) | ‏\( O(1) \) | לא |
     | ‏Floyd | ‏\( O(n) \) | ‏\( O(1) \) | לא |
+
+    כשיש כמה ערכים כפולים, הפתרונות יכולים להחזיר ערכים שונים : במערך `[1, 1, 4, 4, 4]`
+    החיפוש הבינארי מחזיר 4, ושלושת האחרים מחזירים 1. כל התשובות נכונות.
 
 ## נקודות חשובות ושאלות המשך
 
@@ -419,12 +462,46 @@ added: 2026-10-18
         ??? fu-answer "תשובה"
             לכל ערך \( v \) בודקים את `nums[abs(v)]` : אם הוא שלילי, ‏`abs(v)` כבר הופיע והוא
             כפול; אחרת הופכים את הסימן שלו. הסימן משמש כביט של `seen` בתוך המערך עצמו, ובסוף
-            מחזירים את כל הסימנים.
+            מחזירים את כל הסימנים. ערך שמופיע \( k \) פעמים מדווח \( k - 1 \) פעמים : המערך
+            `[2, 2, 2, 1]` נותן את 2 פעמיים.
 
     - **בחומרה :** זרם של \( n + 1 \) ערכים מגיע ערך אחד בכל מחזור שעון, ואסור לשמור אותו.
       כמה ביטים של זיכרון צריך כדי למצוא כפול, ואם מותר לקרוא את הזרם כמה פעמים?
 
         ??? fu-answer "תשובה"
             במעבר אחד : מפת `seen` של \( n \) ביטים, כמו בפתרון 2. אם מותר לקרוא את הזרם כמה
-            פעמים, החיפוש הבינארי של פתרון 3 מספיק : מונה ו-\( lo \), \( hi \), \( mid \), כלומר
-            \( O(\log n) \) ביטים, ו-\( \lceil \log_2 n \rceil \) מעברים.
+            פעמים, החיפוש הבינארי של פתרון 3 מספיק. הרגיסטרים \( lo \) ו-\( hi \) הם של
+            \( \lceil \log_2 (n + 1) \rceil \) ביטים כל אחד, המונה של
+            \( \lceil \log_2 (n + 2) \rceil \) ביטים כי הוא סופר עד \( n + 1 \), ו-\( mid \)
+            קומבינטורי. צריך לכל היותר \( \lceil \log_2 n \rceil \) מעברים של \( n + 1 \)
+            מחזורים. עבור \( n = 9 \) אלה 12 ביטים מול 9 של `seen`, ועבור \( n = 1000 \) אלה
+            30 ביטים מול 1000. המעברים על הדוגמה :
+
+            | מעבר | ‏\( lo \) | ‏\( hi \) | ‏\( mid \) | המונה בסוף המעבר | ההחלטה |
+            |:-:|:-:|:-:|:-:|:-:|---|
+            | 1 | 1 | 9 | 5 | 6 | ‏\( hi = 5 \) |
+            | 2 | 1 | 5 | 3 | 4 | ‏\( hi = 3 \) |
+            | 3 | 1 | 3 | 2 | 3 | ‏\( hi = 2 \) |
+            | 4 | 1 | 2 | 1 | 2 | ‏\( hi = 1 \), וזו התשובה |
+
+    - **אימות :** רכיב מחזיר ערך כפול מהמערך. איך בודקים אותו ב-scoreboard, ומה מגרילים?
+
+        ??? fu-answer "תשובה"
+            לא משווים לתוצאה של מודל אחד : במערך `[1, 1, 4, 4, 4]` החיפוש הבינארי מחזיר 4
+            ו-Floyd מחזיר 1, ושתי התשובות חוקיות. בודקים את התכונה עצמה, שהערך שחזר מופיע
+            במערך לפחות פעמיים :
+
+            ```systemverilog title="function is_duplicate" linenums="1"
+            function automatic bit is_duplicate(const ref int nums[], input int result);   // (1)!
+              int hits[$] = nums.find_index with (item == result);
+              return hits.size() >= 2;        // any duplicated value is a legal answer
+            endfunction
+            ```
+
+            1. ה-`input` מפורש : בלי זה הארגומנט השני יורש את הכיוון `const ref` מהראשון.
+
+            הגירוי הוא מערך בגודל \( n + 1 \) עם `nums[i] inside {[1:n]}`. הכפול מובטח
+            משובך היונים, בלי אילוץ נוסף. בכיסוי : ערך שמופיע בדיוק פעמיים, ערך שמופיע
+            יותר מפעמיים, כמה ערכים כפולים, כל הערכים שווים, \( n = 1 \), לולאה עצמית
+            (\( \lambda = 1 \)), זנב של צומת אחד (\( \mu = 1 \)), ואינדקסים שלא נגישים
+            מ-0.

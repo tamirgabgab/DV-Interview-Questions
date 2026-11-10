@@ -184,6 +184,12 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0020-pcie.css       # 0020, 0021: the header fields of the pcie box's hand-made split (session 34)
   - stylesheets/questions/0046-maxones.css     # 0046: the maxones boxes on one screen, the grid and its dp side by side in their column (session 34)
   - stylesheets/questions/0076-ffn.css         # 0076: the ffn box's base-3 strip scrolls inside the box on a phone (session 34)
+  - stylesheets/questions/0074-transpose.css   # 0074: the transpose box on one screen, the walk's marks, the streaming transposer's diagram (session 34)
+  - stylesheets/questions/0013-kaprekar4.css   # 0013: the sorting network of part a, the kap4base box on one screen (session 34)
+  - stylesheets/questions/0069-overtakes.css   # 0069: the block diagram of the RTL monitor, the three overtakes boxes on one screen (session 34)
+  - stylesheets/questions/0017-duplicate.css   # 0017: the dupbin and floyd boxes on one screen, the figure beside the step's text (session 34)
+  - stylesheets/questions/0031-bridge.css      # 0031: the bridge box on one screen, the two tables side by side and the plan line (session 34)
+  - stylesheets/questions/0036-lfsr.css        # 0036: the lfsr box on one screen (the cycles as rings, the table scrolling), the static register (session 34)
 
 extra_javascript:
   - javascripts/mathjax.js

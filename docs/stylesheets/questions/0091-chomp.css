@@ -1,7 +1,9 @@
 /* Question 0091, Chomp: the bars of tools/figures/q0091.py (cp-fig) and of the box of
    explorer/chomp.js (cp-board). A square of chocolate is a warm tile, the poisoned a1 a
    magenta tile with a cross, the squares the last move ate are dashed, the square chosen is
-   framed in blue; in the box a winning move is framed in green and a losing one dashed grey.
+   framed in blue; in the box a winning move is framed in green and a losing one has a grey
+   dot. The box is two columns (cols): the board and its key, the reason and the log of the
+   moves, which scrolls inside the box, beside them.
    Colours from the palette only. */
 
 .md-typeset svg.cp-fig { display: block; margin: 0.8rem auto; }
@@ -17,7 +19,7 @@
 /* the square chosen, and in the box the winning and the losing moves */
 .md-typeset svg .cp-pick { fill: none; stroke: var(--viz-s1); stroke-width: 3; }
 .md-typeset svg .cp-win { fill: none; stroke: var(--viz-s3-text); stroke-width: 3; }
-.md-typeset svg .cp-lose { fill: none; stroke: var(--viz-text); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.md-typeset svg .cp-lose { fill: var(--viz-text); stroke: none; }
 
 /* the column letters, the row numbers and the captions */
 .md-typeset svg .cp-lab { fill: var(--viz-text); font-family: var(--md-code-font-family); font-size: 12px; }
@@ -30,7 +32,15 @@
 .md-typeset svg .cp-btn:focus { outline: none; }
 .md-typeset svg .cp-btn:focus-visible .cp-ring { stroke: var(--site-focus-ring); stroke-width: 3; }
 .md-typeset .explorer .cp-why { min-height: 3em; }
-.md-typeset .explorer .cp-log { font-size: 0.7rem; }
+.md-typeset .explorer .cp-log { font-size: 0.7rem; margin: 0; line-height: 1.45; }
+.md-typeset .explorer .cp-log li { margin-bottom: 0; }
+/* the log is as long as the game: it scrolls inside the box, the last move in view */
+.md-typeset .explorer .cp-logwrap { max-height: 11rem; overflow-y: auto; margin: 0.4em 0; }
+.md-typeset .explorer .cp-logwrap:focus-visible { outline: 3px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer .cp-legend { justify-content: center; }
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="chomp"] .ex-cols .cp-logwrap { max-height: 15rem; }
+}
 
 /* the legend keys */
 .md-typeset .viz-legend .cp-key-sq { background: color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); border-radius: 3px; outline: 1.2px solid var(--viz-s2-text); outline-offset: -1px; }
@@ -38,4 +48,4 @@
 .md-typeset .viz-legend .cp-key-pick { background: none; border-radius: 3px; outline: 3px solid var(--viz-s1); outline-offset: -3px; }
 .md-typeset .viz-legend .cp-key-gone { background: none; border-radius: 3px; outline: 1.3px dashed var(--viz-text); outline-offset: -1px; }
 .md-typeset .viz-legend .cp-key-win { background: none; border-radius: 3px; outline: 3px solid var(--viz-s3-text); outline-offset: -3px; }
-.md-typeset .viz-legend .cp-key-lose { background: none; border-radius: 3px; outline: 1.5px dashed var(--viz-text); outline-offset: -2px; }
+.md-typeset .viz-legend .cp-key-lose { background: radial-gradient(circle, var(--viz-text) 0 0.17em, transparent 0.2em), color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color)); border-radius: 3px; outline: 1.2px solid var(--viz-s2-text); outline-offset: -1px; }

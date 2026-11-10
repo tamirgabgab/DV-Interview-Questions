@@ -111,6 +111,81 @@ def test_follow_ups():
     assert abs(cake.threshold(A, Fr(1, 10 ** 6)) / 1e-3 - 1) < 1e-3
 
 
+def exact_peak(a, d):
+    """The first person on or past the threshold, by the exact sign of p^2 + d p - d, and whether he is on it."""
+    k = 1
+    while True:
+        p = a + (k - 1) * d
+        v = p * p + d * p - d
+        if v >= 0:
+            return k, v == 0
+        k += 1
+
+
+def test_beyond_half():
+    """Review round 7: the formula and the bars agree for every d <= 1/2 and stop agreeing only
+    above it (the box paragraph); the corrected rule of the follow-up needs "no tie at p_k = T
+    when d > 1/2"; the count of people is for a < 1; the last-person step of part b."""
+    bad = []
+    for ai in range(1, 601, 3):
+        for di in range(1, 81):
+            a, d = Fr(ai, 1000), Fr(di, 100)
+            s = shares(a, d)
+            winners = [i + 1 for i, v in enumerate(s) if v == max(s)]
+            k, tie = exact_peak(a, d)
+            if winners != ([k, k + 1] if tie else [k]):
+                bad.append(d)
+    assert bad and min(bad) > Fr(1, 2)
+    # the follow-up's example: T = 0.6 = p_1 exactly, and still no tie
+    a, d = Fr(3, 5), Fr(9, 10)
+    assert exact_peak(a, d) == (1, True) and shares(a, d) == [Fr(3, 5), Fr(2, 5)]
+
+    def corrected(a, d):
+        k, tie = exact_peak(a, d)
+        if d > Fr(1, 2):
+            tie = False                                   # the added clause
+        if k > 1 and k == len(shares(a, d)):              # the person of the formula is the last one
+            before = a + (k - 2) * d
+            if before >= Fr(1, 2):
+                return k - 1, before == Fr(1, 2)
+        return k, tie
+
+    for den, amax, dmax in ((100, 100, 200), (30, 30, 60)):
+        for an in range(1, amax):
+            for dn in range(1, dmax):
+                a, d = Fr(an, den), Fr(dn, den)
+                s = shares(a, d)
+                winners = [i + 1 for i, v in enumerate(s) if v == max(s)]
+                k, tie = corrected(a, d)
+                assert winners == ([k, k + 1] if tie else [k]), (a, d)
+    # the count of people: the formula is for a < 1 (a = 1.5 is one person, the formula gives -4)
+    assert len(shares(Fr(3, 2), Fr(1, 10))) == 1 and math.ceil((1 - Fr(3, 2)) / Fr(1, 10)) + 1 == -4
+    # step 5 of part b: with d <= 1/2 the one before the last is at 1 - d >= 1/2 >= T or above
+    for an in range(1, 200):
+        for dn in range(1, 101):
+            a, d = Fr(an, 200), Fr(dn, 200)
+            n = len(shares(a, d))
+            if n >= 2:
+                p = a + (n - 2) * d
+                assert p >= 1 - d >= Fr(1, 2) and p * p + d * p - d >= 0
+    # the tie trap: d^2 + 4d = 49/144 = (7/12)^2 for d = 1/12
+    d = Fr(1, 12)
+    assert d * d + 4 * d == Fr(49, 144) == Fr(7, 12) ** 2
+    # the geometric follow-up: its formula fails at q = 3 (a = 0.6: person 2, the shares 0.6 and 0.4)
+    assert max(1, math.ceil(math.log(2 / 0.6, 3))) == 2 and cake.formula(cake.GEO, Fr(6, 10), Fr(3)) == 2
+
+
+def test_box_tasks():
+    """The cases the box paragraph names."""
+    s = shares(Fr(1, 10), Fr(1, 10))
+    assert [s[i + 1] / s[i] for i in range(3)] == [Fr(18, 10), Fr(12, 10), Fr(14, 15)]
+    assert f"{float(Fr(14, 15)):.3f}" == "0.933" and max(s) == s[2] and cake.dec(s[2], 3) == "0.216"
+    s = shares(Fr(27, 100), Fr(1, 10))
+    assert (cake.dec(s[0]), cake.dec(s[1])) == ("0.2700", "0.2701") and max(s) == s[1]
+    assert shares(Fr(1, 2), Fr(1, 2)) == [Fr(1, 2), Fr(1, 2)] and exact_peak(Fr(1, 2), Fr(1, 2)) == (1, True)
+    assert shares(Fr(55, 100), Fr(8, 10)) == [Fr(55, 100), Fr(45, 100)] and exact_peak(Fr(55, 100), Fr(8, 10))[0] == 2
+
+
 def test_js_matches_python():
     node = shutil.which("node")
     if not node:

@@ -1,0 +1,32 @@
+/* Question 0074, transposing a matrix in place: the transpose box of explorer/transpose.js on
+   one screen. The source and the memory sit side by side (cols: the source is the main
+   column and is put on the right here, where a right-to-left reader starts; the memory and
+   the value in hand on the left), and the walk that looks for a cycle's leader is marked
+   on the source, where a cell's number is its index. The streaming transposer of the hardware follow-up (tp-hw) is drawn by
+   tools/figures/q0074.py. Colours from the palette only. */
+
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="transpose"] .ex-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "main side"; }
+}
+.md-typeset .explorer[data-kind="transpose"] .pm-scroll { margin: 0.3em 0; }
+.md-typeset .explorer[data-kind="transpose"] .ex-title { margin: 0.2em 0; text-align: center; }
+
+/* an index the walk of the step went through: a dotted inner ring, on any tint */
+.md-typeset table.tp-cells td.pm-c.is-walk { outline: 2px dotted var(--viz-ink); outline-offset: -5px; }
+.md-typeset .viz-legend .tp-key-walk { background: none; outline: 2px dotted var(--viz-ink); outline-offset: -2px; }
+
+/* the streaming transposer of the hardware follow-up, drawn left to right */
+.md-typeset svg.tp-hw { display: block; width: 100%; height: auto; margin: 0.6rem auto; }
+.md-typeset svg.tp-hw .tp-headp { fill: var(--viz-text); }
+.md-typeset svg.tp-hw .tp-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
+.md-typeset svg.tp-hw .tp-blk text { fill: var(--viz-ink); font-size: 16px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.tp-hw .tp-blk text.tp-sub { fill: var(--viz-text); font-size: 15px; font-weight: 400; }
+.md-typeset svg.tp-hw .tp-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.tp-hw .tp-wire.tp-swap { stroke-dasharray: 5 4; }
+.md-typeset svg.tp-hw .tp-wlab { fill: var(--viz-text); font-size: 15px; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .tp-key-now { background: none; border-top: 2px solid var(--viz-text); height: 0.45em; }
+.md-typeset .viz-legend .tp-key-swap { background: none; border-top: 2px dashed var(--viz-text); height: 0.45em; }
+
+/* eight rows and the help text open still fit a screen: the cells a little lower in the box */
+.md-typeset .explorer[data-kind="transpose"] table.tp-cells td.pm-c { height: 1.4rem; line-height: 1.25; }
+.md-typeset .explorer[data-kind="transpose"] .tp-hand { margin: 0.1em 0 0.3em; }

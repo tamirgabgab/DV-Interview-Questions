@@ -273,11 +273,12 @@
 /* the cake explorer of 0027 / 0028: the cake and the growing table */
 .md-typeset .explorer .cake-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; align-items: flex-start; margin-top: 0.6rem; }
 .md-typeset .explorer .cake-pie { flex: 0 1 13rem; }
-.md-typeset .explorer svg.cake-live { width: 100%; display: block; }
+.md-typeset .explorer svg.cake-live { width: 100%; display: block; margin: 0; }
 .md-typeset .explorer .cake-panel { flex: 1 1 15rem; min-width: 0; }
 .md-typeset .explorer .cake-panel p { margin: 0.2em 0 0.4em; }
 .md-typeset .explorer .cake-scroll { max-height: 12.75rem; overflow-y: auto; position: relative; }   /* eight rows under the header */
 .md-typeset .explorer .cake-scroll thead th { position: sticky; top: 0; background: var(--md-default-bg-color); }
+.md-typeset .explorer .cake-table caption { caption-side: top; text-align: start; padding: 0 0.6em 0.2em; font-size: 0.7rem; color: var(--viz-text); }
 .md-typeset .explorer .cake-table { font-size: 0.7rem; margin: 0; }
 .md-typeset .explorer input.ex-num { width: 5.2rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; margin-inline-start: 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
 .md-typeset .explorer .cake-table td, .md-typeset .explorer .cake-table th { padding: 0.15em 0.6em; }

@@ -143,8 +143,8 @@ def crossing_stepper(times=TIMES):
         cost = max(times[i] for i in g)
         t += cost
         frames.append((frame(times, across, side, g, forward, t, label=f"חצייה {k}"),
-                       f"חצייה {k} : {heb_group(times, g)} {'חוצים' if len(g) > 1 else 'חוזר'} "
-                       f"{'קדימה' if forward else 'עם הלפיד חזרה'}, {cost} דקות. עברו {t} דקות."))
+                       f"חצייה {k} : {heb_group(times, g)} {'חוצים קדימה' if forward else 'חוזר עם הלפיד'}, "
+                       f"{'דקה אחת' if cost == 1 else f'{cost} דקות'}. עברו {t} דקות."))
         across ^= sum(1 << i for i in g)
         side = 1 - side
     frames.append((frame(times, across, side, t=t, label="סיום"), f"כולם על הגדה הרחוקה אחרי {t} דקות."))

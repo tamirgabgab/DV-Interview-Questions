@@ -108,9 +108,10 @@ added: 2026-11-06
     === "Python"
         ```python title="mirror_move" linenums="1" hl_lines="5 6 7 8 9 10 11 12"
         def mirror_move(h: tuple):
-            """The mirror strategy on a square board. h: the column heights, column a first
-            (the poison is at the bottom of column a). Returns the square to eat as (column,
-            row), 0-based, or None when the two arms are already equal."""
+            """The mirror strategy on a square board, for the full board or the L left after b2.
+            h: the column heights, column a first (the poison is at the bottom of column a).
+            Returns the square to eat as (column, row), 0-based, or None when the two arms
+            are already equal."""
             if len(h) > 1 and h[1] > 1:
                 return 1, 1                               # (1)!
             up = h[0] - 1                                 # (2)!
@@ -122,7 +123,8 @@ added: 2026-11-06
             return None                                   # (4)!
         ```
 
-        1. ‏b2 עוד שם : זו ההתחלה, והמהלך הוא b2.
+        1. ‏b2 עוד שם : זו ההתחלה, והמהלך הוא b2. הפונקציה מניחה שקוראים לה על הלוח המלא או על
+           ה-L שנשאר אחרי b2. במצב אחר, שבו היריב כבר אכל משהו לפני b2, המהלך b2 לא בהכרח מנצח.
         2. אחרי b2 נשארת צורת L : הזרוע העליונה היא העמודה a בלי a1, והימנית היא השורה 1 בלי a1.
         3. הזרוע העליונה ארוכה יותר : אוכלים בעמודה a את המשבצת שמעל אורך הזרוע הימנית.
         4. הזרועות שוות : מי שתורו מפסיד, ואין מהלך שמציל אותו.
@@ -157,17 +159,23 @@ added: 2026-11-06
     מפסיד. באינדוקציה על \( k \) :
 
     1. **‏k = 0 :** נשארה רק a1, ומי שתורו חייב לאכול אותה.
-    2. **מ-L עם זרועות שוות יוצאים :** כל מהלך הוא משבצת באחת הזרועות, ומקצר רק אותה, לאורך
-       \( j < k \). הזרוע השנייה נשארת באורך \( k \).
+    2. **מ-L עם זרועות שוות יוצאים :** כל מהלך, חוץ מ-a1 שמפסיד מיד, הוא משבצת באחת הזרועות,
+       ומקצר רק אותה, לאורך \( j < k \). הזרוע השנייה נשארת באורך \( k \).
     3. **ל-L עם זרועות שוות חוזרים :** עונים בקיצור הזרוע השנייה לאותו \( j \), ומגיעים
        ל-\( L_j \), שלפי ההנחה מפסיד למי שתורו, כלומר ליריב.
 
     המהלך b2 מעביר את הלוח המלא ל-\( L_3 \), ולכן הראשון מנצח. ומי שמשחק כך לא נתקע אף פעם : אחרי
     כל מהלך של היריב יש זרוע ארוכה יותר, ובה מהלך.
 
-    **נסו בעצמכם.** המחשב מתחיל ב-b2 ומשחק במראה. אתם משחקים את היריב : לחיצה על משבצת אוכלת
-    אותה ואת כל מה שמעליה ומימינה. "מהלך אקראי של היריב" משחק בשבילכם, וכך אפשר לראות את המראה
-    צעד אחר צעד :
+    **נסו בעצמכם.** בתיבה המחשב הוא הראשון : הוא פותח ב-b2 ומשחק במראה, ואתם היריב. היא מוסיפה
+    לציור משחק שלם נגד כל תשובה שתבחרו.
+
+    - לחצו על d1 : המחשב עונה ב-a4, ונשארות 2 משבצות בכל זרוע, כמו בציור. אחר כך לחצו על b1 : הוא
+      אוכל את a2, ואחרי 5 מהלכים נשארה לכם רק a1.
+    - התחילו משחק חדש ולחצו על a2, כל הזרוע העליונה : המחשב עונה ב-b1, והפסדתם אחרי 3 מהלכים. זה
+      המשחק הקצר ביותר.
+    - בחרו לוח של 8 על 8 ולחצו על "מהלך אקראי של היריב" עד הסוף : אחרי כל תשובה של המחשב שתי
+      הזרועות שוות, והמשחק לא עובר 15 מהלכים.
 
     <div class="explorer" data-kind="chomp" data-mode="mirror" data-n="4"></div>
 
@@ -319,7 +327,8 @@ added: 2026-11-06
         endfunction
         ```
 
-        1. גובה של עמודה הוא 4 ביטים במילה. כל עמודה מ-\( c \) ימינה יורדת ל-\( r \) לכל היותר.
+        1. גובה של עמודה הוא 4 ביטים במילה, ולכן הקוד מתאים ללוחות של עד 8 עמודות ו-15 שורות. כל
+           עמודה מ-\( c \) ימינה יורדת ל-\( r \) לכל היותר.
         2. כל המדרגות בסדר מילוני עולה, מהמצב הריק ועד הלוח המלא, בלי רקורסיה. מהלך רק מוריד
            גבהים, ולכן המצב אחריו קטן ממנו בסדר המילוני, וכבר חושב.
         3. מהלך, שאינו a1, למצב מפסיד : המצב מנצח. עם a1 לבד אין מהלך כזה, והמצב מפסיד.
@@ -336,11 +345,22 @@ added: 2026-11-06
     **כמה מצבים.** רשימת גבהים יורדת של \( n \) עמודות עם גבהים מ-0 עד \( m \) היא מסלול על
     רשת : מהפינה השמאלית העליונה לימנית התחתונה, \( n \) צעדים ימינה ו-\( m \) צעדים למטה, לאורך
     השפה של המדרגות. יש \( \binom{m+n}{n} \) מסלולים כאלה, ומהם רק המצב הריק לא כולל את a1. ב-8 על
-    8 זה \( \binom{16}{8} - 1 = 12{,}869 \), והחיפוש אכן מגיע לכולם.
+    8 זה \( \binom{16}{8} - 1 = 12{,}869 \), וכולם יכולים להופיע במשחק. הקוד ב-Python לא מחשב את כולם :
+    `any` עוצרת במהלך הראשון שמוביל למצב מפסיד, וכדי לענות על הלוח המלא `wins` מחשבת רק 3,832 מצבים.
+    הטבלה ב-SystemVerilog ממלאת את כולם.
 
-    **נסו בעצמכם.** משחקים נגד המחשב על 8 על 8. "סימון המהלכים" צובע כל משבצת לפי מה שקורה אם
-    אוכלים אותה : מסגרת ירוקה למהלך מנצח, וכתומה מקווקוות למהלך שמשאיר ליריב מצב מנצח. בהתחלה
-    רק b2 ירוקה :
+    **המהלך b2 הוא היחיד.** מהלך ראשון בעמודה a או בשורה 1 משאיר מלבן גדול מ-1 על 1, ובמלבן כזה מי שתורו
+    מנצח (סעיף ג). כל מהלך ראשון אחר, שאינו b2, לא נוגע בעמודה a ובשורה 1 ומשאיר את b2 על הלוח : היריב אוכל את
+    b2, ומגיע בעצמו ל-L עם שתי זרועות שלמות ושוות.
+
+    **נסו בעצמכם.** משחקים נגד המחשב על 8 על 8, והוא לא טועה. "סימון המהלכים" מוסיף לחיפוש את
+    התשובה שלו לכל משבצת, בכל מצב : מסגרת ירוקה למהלך מנצח, ונקודה אפורה למהלך שמשאיר ליריב מצב
+    מנצח.
+
+    - הדליקו את הסימון : בהתחלה רק b2 ירוקה.
+    - אכלו את h8, הפינה : המחשב עונה ב-b2 ואוכל 48 משבצות, ועכשיו אין אף משבצת ירוקה.
+    - בחרו שהמחשב מתחיל : הוא פותח ב-b2, והשורה שליד הלוח אומרת שאין מהלך מנצח.
+    - חזרו להתחיל בעצמכם ואכלו את c3 : המחשב עונה ב-a8, לא ב-b2, ושוב אין משבצת ירוקה.
 
     <div class="explorer" data-kind="chomp" data-mode="play" data-m="8" data-n="8"></div>
 
@@ -359,10 +379,12 @@ added: 2026-11-06
 האסטרטגיה המפורשת כשיש 2 שורות?
 
 ??? tip "רמז 1"
-    נניח שהשני מנצח. מה קורה אם הראשון אוכל רק את המשבצת הימנית העליונה, והשני עונה במהלך
-    המנצח שלו? האם הראשון לא יכול היה לשחק את המהלך הזה בעצמו?
+    אל תחפשו את המהלך המנצח. הניחו שהשני מנצח, וחפשו סתירה.
 
 ??? tip "רמז 2"
+    נסו מהלך ראשון קטן ככל האפשר : המשבצת הימנית העליונה לבדה. מה משותף לכל תשובה של השני?
+
+??? tip "רמז 3"
     בשתי שורות, השוו את האורך של השורה התחתונה לאורך של העליונה. איזה הפרש מפסיד למי שתורו?
 
 ??? success "פתרון סעיף ג"
@@ -370,7 +392,7 @@ added: 2026-11-06
         הראשון מנצח בכל לוח חוץ מ-1 על 1, וההוכחה היא גניבת אסטרטגיה, בלי לומר מה המהלך. כדי
         למצוא אותו מחפשים כמו בסעיף ב, על \( \binom{m+n}{n} \) מצבים. ב-2 שורות יש אסטרטגיה
         מפורשת : אוכלים את המשבצת הימנית העליונה, ומשאירים תמיד את השורה התחתונה ארוכה באחת
-        מהעליונה. ב-3 שורות ומעלה אין נוסחה ידועה, ויש רק חישוב.
+        מהעליונה. בלוח של 3 שורות ו-3 עמודות ומעלה, שאינו ריבוע, אין נוסחה ידועה, ויש רק חישוב.
 
     <!-- cost: מצבים \( \binom{m+n}{n} \) | זמן \( O\big(\binom{m+n}{n}\, m n^2\big) \) | שתי שורות \( O(1) \) למהלך -->
 
@@ -384,16 +406,17 @@ added: 2026-11-06
 
     <!-- gen 4 -->
 
-    <svg class="figure cp-fig" viewBox="0 0 424 130" style="max-width:26.5rem" role="img" aria-label="גניבת אסטרטגיה על 3 על 5. בלוח הימני הראשון אוכל רק את הפינה הימנית העליונה, e3. באמצעי השני עונה במהלך X, כאן c2, שאוכל את c2, d2, e2, c3 ו-d3. בשמאלי הראשון אוכל את X כבר במהלך הראשון, ומקבל בדיוק אותו מצב, כי X אוכל גם את e3"><rect class="cp-poison" x="313" y="67" width="20" height="20" rx="3"/><path class="cp-cross" d="M316.84,70.84 L329.16,83.16 M316.84,83.16 L329.16,70.84"/><rect class="cp-sq" x="313" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="313" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="335" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="335" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="335" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="357" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="357" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="357" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="379" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="379" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="379" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="401" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="401" y="45" width="20" height="20" rx="3"/><rect class="cp-gone" x="402" y="24" width="18" height="18" rx="3"/><rect class="cp-pick" x="401" y="23" width="20" height="20" rx="3"/><text class="cp-lab" x="323" y="101" text-anchor="middle">a</text><text class="cp-lab" x="345" y="101" text-anchor="middle">b</text><text class="cp-lab" x="367" y="101" text-anchor="middle">c</text><text class="cp-lab" x="389" y="101" text-anchor="middle">d</text><text class="cp-lab" x="411" y="101" text-anchor="middle">e</text><text class="cp-lab" x="303" y="81" text-anchor="middle">1</text><text class="cp-lab" x="303" y="59" text-anchor="middle">2</text><text class="cp-lab" x="303" y="37" text-anchor="middle">3</text><text class="cp-cap" x="367" y="120" text-anchor="middle" direction="rtl">הראשון : e3</text><rect class="cp-poison" x="165" y="67" width="20" height="20" rx="3"/><path class="cp-cross" d="M168.84,70.84 L181.16,83.16 M168.84,83.16 L181.16,70.84"/><rect class="cp-sq" x="165" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="165" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="187" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="187" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="187" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="209" y="67" width="20" height="20" rx="3"/><rect class="cp-gone" x="210" y="46" width="18" height="18" rx="3"/><rect class="cp-gone" x="210" y="24" width="18" height="18" rx="3"/><rect class="cp-sq" x="231" y="67" width="20" height="20" rx="3"/><rect class="cp-gone" x="232" y="46" width="18" height="18" rx="3"/><rect class="cp-gone" x="232" y="24" width="18" height="18" rx="3"/><rect class="cp-sq" x="253" y="67" width="20" height="20" rx="3"/><rect class="cp-gone" x="254" y="46" width="18" height="18" rx="3"/><rect class="cp-empty" x="253" y="23" width="20" height="20" rx="3"/><rect class="cp-pick" x="209" y="45" width="20" height="20" rx="3"/><text class="cp-lab" x="175" y="101" text-anchor="middle">a</text><text class="cp-lab" x="197" y="101" text-anchor="middle">b</text><text class="cp-lab" x="219" y="101" text-anchor="middle">c</text><text class="cp-lab" x="241" y="101" text-anchor="middle">d</text><text class="cp-lab" x="263" y="101" text-anchor="middle">e</text><text class="cp-lab" x="155" y="81" text-anchor="middle">1</text><text class="cp-lab" x="155" y="59" text-anchor="middle">2</text><text class="cp-lab" x="155" y="37" text-anchor="middle">3</text><text class="cp-cap" x="219" y="120" text-anchor="middle" direction="rtl">התשובה X</text><rect class="cp-poison" x="17" y="67" width="20" height="20" rx="3"/><path class="cp-cross" d="M20.84,70.84 L33.16,83.16 M20.84,83.16 L33.16,70.84"/><rect class="cp-sq" x="17" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="17" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="39" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="39" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="39" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="61" y="67" width="20" height="20" rx="3"/><rect class="cp-gone" x="62" y="46" width="18" height="18" rx="3"/><rect class="cp-gone" x="62" y="24" width="18" height="18" rx="3"/><rect class="cp-sq" x="83" y="67" width="20" height="20" rx="3"/><rect class="cp-gone" x="84" y="46" width="18" height="18" rx="3"/><rect class="cp-gone" x="84" y="24" width="18" height="18" rx="3"/><rect class="cp-sq" x="105" y="67" width="20" height="20" rx="3"/><rect class="cp-gone" x="106" y="46" width="18" height="18" rx="3"/><rect class="cp-gone" x="106" y="24" width="18" height="18" rx="3"/><rect class="cp-pick" x="61" y="45" width="20" height="20" rx="3"/><text class="cp-lab" x="27" y="101" text-anchor="middle">a</text><text class="cp-lab" x="49" y="101" text-anchor="middle">b</text><text class="cp-lab" x="71" y="101" text-anchor="middle">c</text><text class="cp-lab" x="93" y="101" text-anchor="middle">d</text><text class="cp-lab" x="115" y="101" text-anchor="middle">e</text><text class="cp-lab" x="7" y="81" text-anchor="middle">1</text><text class="cp-lab" x="7" y="59" text-anchor="middle">2</text><text class="cp-lab" x="7" y="37" text-anchor="middle">3</text><text class="cp-cap" x="71" y="120" text-anchor="middle" direction="rtl">רק X</text></svg>
+    <svg class="figure cp-fig" viewBox="0 0 424 130" style="max-width:26.5rem" role="img" aria-label="גניבת אסטרטגיה על 3 על 5. בלוח הימני הראשון אוכל רק את הפינה הימנית העליונה, e3. באמצעי השני עונה במהלך המנצח שלו X, כאן d3. בשמאלי הראשון אוכל את X כבר במהלך הראשון, d3 יחד עם e3, ומקבל בדיוק אותו מצב, כי X אוכל גם את e3"><rect class="cp-poison" x="313" y="67" width="20" height="20" rx="3"/><path class="cp-cross" d="M316.84,70.84 L329.16,83.16 M316.84,83.16 L329.16,70.84"/><rect class="cp-sq" x="313" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="313" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="335" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="335" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="335" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="357" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="357" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="357" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="379" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="379" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="379" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="401" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="401" y="45" width="20" height="20" rx="3"/><rect class="cp-gone" x="402" y="24" width="18" height="18" rx="3"/><rect class="cp-pick" x="401" y="23" width="20" height="20" rx="3"/><text class="cp-lab" x="323" y="101" text-anchor="middle">a</text><text class="cp-lab" x="345" y="101" text-anchor="middle">b</text><text class="cp-lab" x="367" y="101" text-anchor="middle">c</text><text class="cp-lab" x="389" y="101" text-anchor="middle">d</text><text class="cp-lab" x="411" y="101" text-anchor="middle">e</text><text class="cp-lab" x="303" y="81" text-anchor="middle">1</text><text class="cp-lab" x="303" y="59" text-anchor="middle">2</text><text class="cp-lab" x="303" y="37" text-anchor="middle">3</text><text class="cp-cap" x="367" y="120" text-anchor="middle" direction="rtl">הראשון : e3</text><rect class="cp-poison" x="165" y="67" width="20" height="20" rx="3"/><path class="cp-cross" d="M168.84,70.84 L181.16,83.16 M168.84,83.16 L181.16,70.84"/><rect class="cp-sq" x="165" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="165" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="187" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="187" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="187" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="209" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="209" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="209" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="231" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="231" y="45" width="20" height="20" rx="3"/><rect class="cp-gone" x="232" y="24" width="18" height="18" rx="3"/><rect class="cp-sq" x="253" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="253" y="45" width="20" height="20" rx="3"/><rect class="cp-empty" x="253" y="23" width="20" height="20" rx="3"/><rect class="cp-pick" x="231" y="23" width="20" height="20" rx="3"/><text class="cp-lab" x="175" y="101" text-anchor="middle">a</text><text class="cp-lab" x="197" y="101" text-anchor="middle">b</text><text class="cp-lab" x="219" y="101" text-anchor="middle">c</text><text class="cp-lab" x="241" y="101" text-anchor="middle">d</text><text class="cp-lab" x="263" y="101" text-anchor="middle">e</text><text class="cp-lab" x="155" y="81" text-anchor="middle">1</text><text class="cp-lab" x="155" y="59" text-anchor="middle">2</text><text class="cp-lab" x="155" y="37" text-anchor="middle">3</text><text class="cp-cap" x="219" y="120" text-anchor="middle" direction="rtl">התשובה X</text><rect class="cp-poison" x="17" y="67" width="20" height="20" rx="3"/><path class="cp-cross" d="M20.84,70.84 L33.16,83.16 M20.84,83.16 L33.16,70.84"/><rect class="cp-sq" x="17" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="17" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="39" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="39" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="39" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="61" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="61" y="45" width="20" height="20" rx="3"/><rect class="cp-sq" x="61" y="23" width="20" height="20" rx="3"/><rect class="cp-sq" x="83" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="83" y="45" width="20" height="20" rx="3"/><rect class="cp-gone" x="84" y="24" width="18" height="18" rx="3"/><rect class="cp-sq" x="105" y="67" width="20" height="20" rx="3"/><rect class="cp-sq" x="105" y="45" width="20" height="20" rx="3"/><rect class="cp-gone" x="106" y="24" width="18" height="18" rx="3"/><rect class="cp-pick" x="83" y="23" width="20" height="20" rx="3"/><text class="cp-lab" x="27" y="101" text-anchor="middle">a</text><text class="cp-lab" x="49" y="101" text-anchor="middle">b</text><text class="cp-lab" x="71" y="101" text-anchor="middle">c</text><text class="cp-lab" x="93" y="101" text-anchor="middle">d</text><text class="cp-lab" x="115" y="101" text-anchor="middle">e</text><text class="cp-lab" x="7" y="81" text-anchor="middle">1</text><text class="cp-lab" x="7" y="59" text-anchor="middle">2</text><text class="cp-lab" x="7" y="37" text-anchor="middle">3</text><text class="cp-cap" x="71" y="120" text-anchor="middle" direction="rtl">רק X</text></svg>
 
     <!-- /gen -->
 
-    ההוכחה לא אומרת מה המהלך המנצח, ואפילו לא שהמשבצת הימנית העליונה היא מהלך טוב. ב-3 על 3,
-    למשל, היא מפסידה. כדי למצוא מהלך מחפשים כמו בסעיף ב.
+    בציור, ב-3 על 5, \( X \) הוא d3 : זו התשובה המנצחת היחידה ל-e3, וזה גם המהלך הראשון המנצח של
+    הלוח. ההוכחה עצמה לא אומרת מה המהלך המנצח, ואפילו לא שהמשבצת הימנית העליונה היא מהלך טוב. ב-3
+    על 3, למשל, היא מפסידה. כדי למצוא מהלך מחפשים כמו בסעיף ב.
 
     **שתי שורות.** בלוח של 2 על \( n \) הראשון אוכל את המשבצת הימנית העליונה, והשורה העליונה
     נשארת קצרה באחת מהתחתונה. מכאן, אם היריב מקצר את התחתונה לאורך \( k \), גם העליונה מתקצרת
-    ל-\( k \) לכל היותר, והראשון מקצר אותה ל-\( k - 1 \). ואם היריב מקצר את העליונה ל-\( k \),
+    ל-\( k \) בדיוק, כי היא הייתה באורך \( k \) לפחות, והראשון מקצר אותה ל-\( k - 1 \). ואם היריב מקצר את העליונה ל-\( k \),
     הראשון מקצר את התחתונה ל-\( k + 1 \). בסוף התחתונה היא a1 לבד, העליונה ריקה, ותורו של היריב :
 
     <!-- gen 5 -->
@@ -410,7 +433,9 @@ added: 2026-11-06
 
     **מה עוד ידוע.** בלוח של שורה אחת אוכלים את b1, ובעמודה אחת את a2, ונשארת a1 לבד. בכל לוח
     אחר החיפוש מוצא את המהלכים המנצחים. בכל הלוחות עד 7 שורות ו-8 עמודות יש מהלך ראשון מנצח
-    אחד בדיוק, ואין בהם דפוס פשוט מעבר לשורות 1 ו-2 ולאלכסון של הלוחות הריבועיים :
+    אחד בדיוק, ואין בהם דפוס פשוט מעבר לשורות 1 ו-2, לעמודות 1 ו-2 ולאלכסון של הלוחות הריבועיים.
+    הטבלה סימטרית : החלפה של השורות בעמודות מחליפה גם את האות במספר (ב-3 על 4 המהלך הוא c2, וב-4
+    על 3 הוא b3), ולכן מספיק לקרוא חצי ממנה :
 
     <!-- gen 7 -->
 
@@ -478,8 +503,9 @@ added: 2026-11-06
 
     #### למה זה נכון { .sol-proof }
 
-    **גניבת האסטרטגיה, בפירוט.** המשחק סופי ואין בו תיקו, ולכן באחד משני השחקנים יש אסטרטגיה
-    מנצחת, באינדוקציה של סעיף ב. נסמן ב-\( T \) את המשבצת הימנית העליונה. אם התשובה הטובה של
+    **גניבת האסטרטגיה, בפירוט.** המשחק סופי ואין בו תיקו, ולכן לאחד משני השחקנים יש אסטרטגיה
+    מנצחת, באינדוקציה של סעיף ב. נסמן ב-\( T \) את המשבצת הימנית העליונה. אם אחרי \( T \) נשארה רק
+    a1, כמו ב-1 על 2, \( T \) עצמו מנצח. אחרת, אם התשובה הטובה של
     השני ל-\( T \) היא \( X \), אז \( X \ne T \), ו-\( X \) מעל a1 או מימינה, ולכן \( T \) מעל
     \( X \) ומימינו, ו-\( X \) אוכל אותה. המצב "\( T \) ואז \( X \)" שווה למצב "\( X \) לבד", מפסיד
     למי שתורו. לכן \( X \) הוא מהלך ראשון מנצח, ואין לשני אסטרטגיה מנצחת. היוצא מן הכלל הוא
@@ -496,8 +522,14 @@ added: 2026-11-06
        מורידים את התחתונה ל-\( t + 1 \), והעליונה לא משתנה כי \( t \le t + 1 \). זה בדיוק
        `two_rows_move`.
 
-    **נסו בעצמכם.** לוח של 3 על 5, נגד המחשב. בחרו גודל ומי מתחיל, וסמנו את המהלכים כדי לראות
-    שבלוח הזה המהלך המנצח היחיד הוא d3 :
+    **נסו בעצמכם.** לוח של 3 על 5, נגד המחשב. כאן אין מראה ואין נוסחה, והתיבה מראה את מה שהחיפוש
+    מוצא בכל מצב.
+
+    - הדליקו את "סימון המהלכים" : בלוח הזה המהלך המנצח היחיד הוא d3.
+    - אכלו במקומו את e3, הפינה : המחשב עונה ב-d3. זו גניבת האסטרטגיה, במשחק אמיתי.
+    - לחצו על "לוח של 2 על 6" ואכלו את f2 : המחשב עונה ב-f1, ועכשיו רק e2 ירוקה. בכל תור, המהלך
+      המנצח משאיר את השורה התחתונה ארוכה באחת מהעליונה.
+    - בחרו 3 שורות ו-4 עמודות, משחק המחלקים של 72 משאלות ההמשך : רק c2, המחלק 12, ירוקה.
 
     <div class="explorer" data-kind="chomp" data-mode="play" data-m="3" data-n="5"></div>
 
@@ -515,7 +547,8 @@ added: 2026-11-06
 
 ??? trap "מלכודת : המשבצת הימנית העליונה היא המהלך המנצח"
     ההוכחה משתמשת ב-\( T \) רק כדי לגנוב, ולא טוענת שהיא טובה. ב-3 על 3 אחרי c3 נשאר מצב שמנצח
-    למי שתורו : הוא אוכל את b2 ומשאיר זרועות שוות. רק ב-2 שורות היא באמת המהלך המנצח.
+    למי שתורו : הוא אוכל את b2 ומשאיר זרועות שוות. בטבלה של סעיף ג היא המהלך המנצח רק בלוחות של 2
+    שורות או 2 עמודות, ובלוחות 1 על 2 ו-2 על 1.
 
 ??? trap "מלכודת : סוף המשחק הפוך"
     אם מגדירים "הלוח ריק : מי שתורו מפסיד" ומרשים לאכול את a1 כמו כל משבצת, כל התוצאות
@@ -524,7 +557,7 @@ added: 2026-11-06
 
 ??? trap "מלכודת : מצב הוא קבוצה של משבצות"
     שמירה של כל קבוצה אפשרית של משבצות עולה \( 2^{mn} \), ‏\( 2^{64} \) ב-8 על 8. רק מדרגות יכולות
-    להופיע, ויש \( \binom{16}{8} = 12{,}870 \) כאלה. מפתח הזיכרון הוא רשימת הגבהים.
+    להופיע, ויש פחות מ-13,000 כאלה (סעיף ב). מפתח הזיכרון הוא רשימת הגבהים.
 
 ??? followup "שאלות המשך"
     - **שורה אחת או עמודה אחת :** מי מנצח ב-1 על \( n \)?
@@ -536,8 +569,8 @@ added: 2026-11-06
     - **מהלך מנצח יחיד :** האם בכל לוח יש מהלך ראשון מנצח אחד בלבד?
 
         ??? fu-answer "תשובה"
-            בכל הלוחות עד 7 שורות ו-8 עמודות כן, לפי החיפוש. בלוחות ריבועיים ובשתי שורות זה מוכח.
-            במקרה הכללי זו שאלה פתוחה.
+            לא. בכל הלוחות עד 7 שורות ו-8 עמודות יש אחד בדיוק, אבל בלוח של 8 שורות ו-10 עמודות יש
+            שניים : f5 ו-i4, לפי `winning_moves(8, 10)`. בלוחות ריבועיים ובשתי שורות היחידות מוכחת.
 
     - **משחק המחלקים :** שחקנים אומרים בתורות מחלק של 72 שאינו כפולה של מחלק שכבר נאמר. מי
       שאומר 1 מפסיד. מי מנצח?

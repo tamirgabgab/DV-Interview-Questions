@@ -1,5 +1,5 @@
 // kinds: chomp
-//   chomp                  0091        Chomp, the poisoned chocolate bar (a1 at the bottom left; eating a square eats it and everything above it and to its right): mode play, a game against the computer on m rows x n columns with perfect play, who starts, the winning and losing squares marked on request; mode mirror, a square board where the computer opens with b2 and answers every move with its mirror in the other arm of the L (a random move for the opponent on request); undo and a log of the moves
+//   chomp                  0091        Chomp, the poisoned chocolate bar (a1 at the bottom left; eating a square eats it and everything above it and to its right): mode play, a game against the computer on m rows x n columns with perfect play, who starts, the winning and losing squares marked on request; mode mirror, a square board where the computer opens with b2 and answers every move with its mirror in the other arm of the L (a random move for the opponent on request); undo and a log of the moves that scrolls inside the box; the board beside the reason and the log (two columns)
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -100,15 +100,16 @@
         `<button type="button" class="md-button cp-undo">ביטול המהלך שלי</button>` +
         (mode === "mirror"
           ? `<button type="button" class="md-button cp-rand">מהלך אקראי של היריב</button>`
-          : `<button type="button" class="md-button cp-hint" aria-pressed="false">סימון המהלכים</button>`) +
+          : `<button type="button" class="md-button cp-hint" aria-pressed="false">סימון המהלכים</button>` +
+            `<button type="button" class="md-button cp-two">לוח של 2 על 6</button>`) +
         `</div>` +
+        `<p class="ex-summary cp-sum" aria-live="polite"></p>` +
         `<div class="cp-wrap"></div>` +
-        `<span class="viz-legend"><span><i class="cp-key-sq"></i>שוקולד</span><span><i class="cp-key-poison"></i>a1 המורעלת</span>` +
+        `<span class="viz-legend cp-legend"><span><i class="cp-key-sq"></i>שוקולד</span><span><i class="cp-key-poison"></i>a1 המורעלת</span>` +
         `<span><i class="cp-key-pick"></i>המהלך האחרון</span><span><i class="cp-key-gone"></i>מה שהוא אכל</span>` +
         (mode === "play" ? `<span><i class="cp-key-win"></i>מהלך מנצח</span><span><i class="cp-key-lose"></i>מהלך מפסיד</span>` : "") + `</span>` +
-        `<p class="ex-summary cp-sum" aria-live="polite"></p>` +
         `<p class="cp-why"></p>` +
-        `<ol class="cp-log" data-steady></ol>`;
+        `<div class="cp-logwrap" tabindex="0" role="region" aria-label="יומן המהלכים"><ol class="cp-log"></ol></div>`;
       const $ = (s) => box.querySelector(s);
       const wrap = $(".cp-wrap");
       const game = () => chompPlay(mode, st.m, st.n, st.first, st.human);
@@ -138,9 +139,10 @@
               const d = S * 0.26, cx = x + S / 2, cy = y + S / 2;
               cell += `<path class="cp-cross" d="M${cx - d},${cy - d} L${cx + d},${cy + d} M${cx - d},${cy + d} L${cx + d},${cy - d}"/>`;
             }
-            if (marks) {
-              const win = (c || r) && !wins(eat(h, c, r));
-              cell += `<rect class="${win ? "cp-win" : "cp-lose"}" x="${x + 4}" y="${y + 4}" width="${S - 8}" height="${S - 8}" rx="3"/>`;
+            if (marks && !poison) {                      // a winning move framed, a losing one dotted
+              cell += !wins(eat(h, c, r))
+                ? `<rect class="cp-win" x="${x + 4}" y="${y + 4}" width="${S - 8}" height="${S - 8}" rx="3"/>`
+                : `<circle class="cp-lose" cx="${x + S / 2}" cy="${y + S / 2}" r="3.5"/>`;
             }
             if (myTurn) {
               const e = size(h) - size(eat(h, c, r));
@@ -179,19 +181,33 @@
             why = mv && mv.c === 1 && mv.r === 1
               ? `המחשב פתח ב-b2${NB}: נשארו שתי זרועות, ${ltr(up)} משבצות למעלה ו-${ltr(right)} ימינה. מעכשיו הוא עונה על כל מהלך במהלך המקביל בזרוע השנייה.`
               : mv ? `המחשב ענה ב-${sq(mv.c, mv.r)}${NB}: שתי הזרועות שוות שוב, ${ltr(up)} משבצות בכל אחת.` : "";
-          } else if (st.hint && myTurn) {
-            const wm = winningMoves(h);
-            why = wm.length ? `${wm.length === 1 ? "המהלך המנצח" : "המהלכים המנצחים"}${NB}: ${wm.map(([c, r]) => sq(c, r)).join(", ")}. כל מהלך אחר משאיר למחשב מצב מנצח.`
-              : `אין מהלך מנצח${NB}: כל מהלך משאיר למחשב מצב מנצח, ונשאר לקוות שהוא יטעה.`;
           } else if (myTurn) {
-            why = wins(h) ? "מי שתורו כאן מנצח, אם ימצא את המהלך." : "מי שתורו כאן מפסיד, אם היריב לא טועה.";
+            // what the computer just did, then what the position is worth to the reader
+            const pc = last && last.who === 1 ? `המחשב ${g.moves.length === 1 ? "פתח" : "ענה"} ב-${sq(last.c, last.r)}. ` : "";
+            if (st.hint) {
+              const wm = winningMoves(h);
+              why = pc + (wm.length ? `${wm.length === 1 ? "המהלך המנצח" : "המהלכים המנצחים"}${NB}: ${wm.map(([c, r]) => sq(c, r)).join(", ")}. כל מהלך אחר משאיר למחשב מצב מנצח.`
+                : `אין מהלך מנצח${NB}: כל מהלך משאיר למחשב מצב מנצח, ונשאר לקוות שהוא יטעה.`);
+            } else {
+              why = pc + (wins(h) ? "מי שתורו כאן מנצח, אם ימצא את המהלך." : "מי שתורו כאן מפסיד, אם היריב לא טועה.");
+            }
           }
         }
         $(".cp-why").innerHTML = why;
         const ate = (x) => (x === 0 ? "אכלתם" : "המחשב אכל");
         $(".cp-log").innerHTML = g.moves.map((mv) => `<li>${ate(mv.who)} ${mv.c || mv.r ? `${mv.eaten === 1 ? "משבצת אחת" : `${ltr(mv.eaten)} משבצות`} ב-${sq(mv.c, mv.r)}` : "את a1 המורעלת"}</li>`).join("");
-        if (g.over) answer(box, g.loser === 1 ? `ניצחתם, אחרי ${ltr(g.moves.length)} מהלכים.` : `המחשב ניצח, אחרי ${ltr(g.moves.length)} מהלכים.`);
-        else answer(box, null);
+        const log = $(".cp-logwrap");
+        log.scrollTop = log.scrollHeight;                  // the last move stays in view
+        if (g.over) {
+          // against perfect play one move gives the game away: the first of mine from a won
+          // position that left the computer a won one
+          let lost = "";
+          if (mode === "play" && g.loser === 0) {
+            const i = g.moves.findIndex((mv) => mv.who === 0 && (mv.c || mv.r) && wins(mv.before) && wins(eat(mv.before, mv.c, mv.r)));
+            lost = i < 0 ? " מהמצב שקיבלתם לא היה מהלך מנצח." : ` המהלך שהפסיד${NB}: ${sq(g.moves[i].c, g.moves[i].r)}, מהלך ${ltr(i + 1)}. לפניו עוד היה לכם מהלך מנצח.`;
+          }
+          answer(box, g.loser === 1 ? `ניצחתם, אחרי ${ltr(g.moves.length)} מהלכים.` : `המחשב ניצח, אחרי ${ltr(g.moves.length)} מהלכים.${lost}`);
+        } else answer(box, null);
       };
       const act = (c, r) => {
         const g = game();
@@ -232,6 +248,7 @@
         $(".cp-n").addEventListener("change", () => { st.n = clamp($(".cp-n").value, 1, 8, n0); newGame(); });
         $(".cp-first").addEventListener("change", () => { st.first = $(".cp-first").value; newGame(); });
         $(".cp-hint").addEventListener("click", () => { st.hint = !st.hint; draw(); });
+        $(".cp-two").addEventListener("click", () => { st.m = 2; st.n = 6; newGame(); });
       }
       $(".cp-new").addEventListener("click", newGame);
       $(".cp-undo").addEventListener("click", () => { st.human.pop(); draw(); });
@@ -253,8 +270,10 @@
 
   dvqExplorers.register({
     views: { chomp: chompView },
+    // the board and its key on the left, the reason and the log of the moves beside them
+    cols: { chomp: { main: ".cp-wrap, .cp-legend", side: ".cp-why, .cp-logwrap" } },
     help: {
-      chomp: "טבלת שוקולד, והמשבצת a1 בפינה השמאלית התחתונה מורעלת. לחיצה על משבצת אוכלת אותה ואת כל מה שמעליה ומימינה, ומי שאוכל את a1 מפסיד. במשחק נגד המחשב בוחרים גודל ומי מתחיל, ו\"סימון המהלכים\" מסמן בירוק מהלך מנצח ובאפור מקווקו מהלך מפסיד. במשחק המראה המחשב פותח ב-b2 ועונה על כל מהלך במהלך המקביל בזרוע השנייה.",
+      chomp: "טבלת שוקולד, והמשבצת a1 בפינה השמאלית התחתונה מורעלת. לחיצה על משבצת אוכלת אותה ואת כל מה שמעליה ומימינה, ומי שאוכל את a1 מפסיד. במשחק נגד המחשב בוחרים גודל ומי מתחיל, ו\"סימון המהלכים\" מסמן במסגרת ירוקה מהלך מנצח ובנקודה אפורה מהלך מפסיד, והשורה שליד הלוח אומרת מה המחשב ענה ומה שווה המצב. \"לוח של 2 על 6\" עובר ללוח של שתי שורות. יומן המהלכים נגלל בתוך התיבה. במשחק המראה המחשב פותח ב-b2 ועונה על כל מהלך במהלך המקביל בזרוע השנייה.",
     },
     models: { chompEat: eat, chompWins: wins, chompWinningMoves: winningMoves, chompComputerMove: computerMove, chompMirrorMove: mirrorMove, chompPlay },
   });

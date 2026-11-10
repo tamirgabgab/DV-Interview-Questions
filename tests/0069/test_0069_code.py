@@ -88,9 +88,12 @@ def test_fenwick_invariant_and_walk_lengths():
                 assert ft.tree[i] == sum(cnt[i - lb + 1:i + 1])             # the block (i - lowbit, i]
             for i in range(0, m + 1):
                 assert ft.prefix(i) == sum(cnt[1:i + 1])
-        # both walks visit at most as many cells as the bits of m
+        # both walks visit at most as many cells as the bits of m, floor(log2 m) + 1
         for i in range(1, m + 1):
             assert len(q0069.Fen(m).add(i)) <= m.bit_length() and len(q0069.Fen(m).prefix(i)[1]) <= m.bit_length()
+            # a cell k between i and i + lowbit(i) has a smaller lowest bit, and its block starts above i
+            for k in range(i + 1, min(m, i + (i & -i) - 1) + 1):
+                assert (k & -k) < (i & -i) and k - (k & -k) >= i
             # the update path is exactly the cells whose block holds i, in increasing order
             assert q0069.Fen(m).add(i) == [j for j in range(i, m + 1) if j - (j & -j) < i <= j]
             # the query path's blocks are disjoint and cover 1..i
@@ -123,6 +126,62 @@ def test_dv_claims():
         assert passed(list(range(n, 0, -1))) == [n - 1 - i for i in range(n)]
     # a non-decreasing sequence with ties is still "in order"
     assert inversions([1, 1, 2, 2, 2, 3]) == 0
+    # the hardware angle: an update of a power of two walks floor(log2 n) + 1 cells, one
+    # more than ceil(log2 n), and a cell holds the count of its whole block
+    for n, cells in ((8, 4), (16, 5), (1024, 11)):
+        assert len(q0069.Fen(n).add(1)) == cells == n.bit_length() == (n - 1).bit_length() + 1
+        assert max(len(q0069.Fen(n).add(i)) for i in range(1, n + 1)) == cells
+    ft = Fenwick(4)
+    for r in (1, 4, 2, 3):
+        ft.add(r)
+    assert ft.tree[1:] == [1, 2, 1, 4]
+
+
+def overtook_full_tree(done, backward):
+    """The "full tree" of the trap: every rank goes in first, and each request is taken
+    out (an update of -1, which the page's tree does not have) before its query."""
+    rk = ranks(done)
+    m, tree = len(rk), [0] * (len(rk) + 1)
+
+    def add(i, d):
+        while i <= m:
+            tree[i] += d
+            i += i & -i
+
+    def prefix(i):
+        s = 0
+        while i > 0:
+            s += tree[i]
+            i -= i & -i
+        return s
+
+    for v in done:
+        add(rk[v], 1)
+    out, left = [0] * len(done), len(done)
+    for i in (range(len(done) - 1, -1, -1) if backward else range(len(done))):
+        add(rk[done[i]], -1)
+        left -= 1
+        out[i] = left - prefix(rk[done[i]])
+    return out
+
+
+def stream_same_cycle(done, query_first):
+    """The follow-up on equal times: the responses of one cycle handled together, either
+    all queried (with the count before the cycle) and then all inserted, or the other way."""
+    n = len(done)
+    ft, out, k = Fenwick(n), [0] * n, 0
+    for t in sorted(set(done)):
+        grp = [i for i in range(n) if done[i] == t]
+        if query_first:
+            for i in grp:
+                out[i] = k - ft.prefix(i + 1)
+        for i in grp:
+            ft.add(i + 1)
+        if not query_first:
+            for i in grp:
+                out[i] = k + len(grp) - ft.prefix(i + 1)
+        k += len(grp)
+    return out
 
 
 def passed_prefix_r(done):
@@ -198,6 +257,11 @@ def test_traps():
     for done in arrays(697, 500, 0, 3):
         assert passed_by_position(done) == passed(done) or len(set(done)) < len(done)
     assert ranks_with_duplicates([3, 1, 3]) == {1: 1, 3: 2} == ranks([3, 1, 3])
+    # the full tree with removals gives overtook only when walked from the end
+    assert overtook_full_tree(DONE, backward=True) == [0, 1, 0, 3] == overtook(DONE)
+    assert overtook_full_tree(DONE, backward=False) == [1, 1, 0, 0] != overtook(DONE)
+    for done in arrays(698, 1000):
+        assert overtook_full_tree(done, backward=True) == overtook(done)
     # the double loop at n = 10**6: about 5 * 10**11 comparisons
     n = 10 ** 6
     assert n * (n - 1) // 2 == 499999500000
@@ -208,12 +272,14 @@ def test_traps():
 
 def test_follow_ups():
     assert q0069.lis_length(DONE) == 2 and q0069.min_swaps(DONE) == 2 and q0069.max_distance(DONE) == 3
+    # an equal time is not an overtake: the chain is non-decreasing, 3 on 3 3 3 (a strict one gives 1)
+    assert q0069.lis_length([3, 3, 3]) == 3 and passed([3, 3, 3]) == [0, 0, 0]
     # the cycles of 3 1 0 2: 0 -> 3 -> 2 -> 0 and the fixed point 1
     order = arrival_order(DONE)
     assert order == [3, 1, 0, 2] and order[1] == 1 and order[order[order[0]]] == 0
     for done in arrays(695, 1500, 0, 12, 10):
         n = len(done)
-        lis = max((len(c) for k in range(n + 1) for c in combinations(done, k) if all(a < b for a, b in zip(c, c[1:]))), default=0)
+        lis = max((len(c) for k in range(n + 1) for c in combinations(done, k) if all(a <= b for a, b in zip(c, c[1:]))), default=0)
         assert q0069.lis_length(done) == lis
         assert q0069.max_distance(done) == max((j - i for i in range(n) for j in range(i + 1, n) if done[j] < done[i]), default=0)
     # the fewest swaps: n - cycles, against a breadth-first search over the permutations
@@ -235,6 +301,12 @@ def test_follow_ups():
                             seen[t] = seen[s] + 1
                             dq.append(t)
             assert q0069.min_swaps(list(perm)) == seen[goal], perm
+    # the responses of one cycle together: queried with the same k and then inserted is
+    # right; inserted and then queried counts them against each other
+    assert stream_same_cycle([3, 3, 1], query_first=True) == [1, 1, 0] == passed([3, 3, 1])
+    assert stream_same_cycle([3, 3, 1], query_first=False) == [2, 1, 0]
+    for done in arrays(699, 1000, 0, 4, 10):
+        assert stream_same_cycle(done, query_first=True) == passed(done), done
     # ties: equal times in the stream, passed to the monitor in send order, are not overtakes
     for done in arrays(696, 500, 0, 3):
         assert sum(live_overtakes(arrival_order(done), len(done))) == inversions(done)

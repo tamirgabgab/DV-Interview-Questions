@@ -14,8 +14,9 @@ value p(B^3 - 1) + q(B^2 - B) of a pair, the fixed points from the theorem, and 
 attractors (fixed points and cycles) with the count of numbers that reach each, found by
 running every number. In page order: the theorem table, the family table b = 5k, the
 example in base 15, the attractor table for B = 2..16, and the map of the pairs (p, q)
-in base 15 with the path of the example and its legend. tests/0013 checks them against
-the page code, the explorer and an exhaustive search.
+in base 15 with the path of the example and its legend. Part a's sorting network (five
+comparators in three layers, the example 3524 on the wires) and its legend are blocks 6
+and 7. tests/0013 checks them against the page code, the explorer and an exhaustive search.
 """
 
 W, H = 46, 26                                  # cell size
@@ -214,9 +215,64 @@ def pair_map_legend():
             '<span><i class="kq-key-path"></i>המסלול של 1234 (העיגול : ההתחלה)</span></span>')
 
 
+# --- part a: the sorting network -----------------------------------------------------------
+
+# The comparators of is_special_4 (wire indices 0..3 = a..d), layer by layer: a comparator
+# (i, j) leaves the larger value on wire i.
+NETWORK = [[(0, 1), (2, 3)], [(0, 2), (1, 3)], [(1, 2)]]
+NETWORK_EXAMPLE = 3524
+
+
+def run_network(values, layers=NETWORK):
+    """The values on the four wires after every layer, and which comparators swapped."""
+    v, states, swapped = list(values), [list(values)], []
+    for layer in layers:
+        for i, j in layer:
+            swapped.append(v[i] < v[j])
+            if v[i] < v[j]:
+                v[i], v[j] = v[j], v[i]
+        states.append(list(v))
+    return states, swapped
+
+
+def network_svg(x=NETWORK_EXAMPLE):
+    """Four wires a..d and the five comparators in three layers, with the digits of the
+    example on the wires before and after every layer; a comparator that swapped is marked."""
+    wy = [44, 84, 124, 164]                              # the wires
+    cmp_x = [[104, 104], [198, 228], [322]]              # a comparator's x, per layer
+    val_x = [62, 146, 270, 366]                          # where the values are written
+    states, swapped = run_network([int(ch) for ch in f"{x:04d}"])
+    out = [f'<svg class="figure sn-net" viewBox="0 0 420 180" style="max-width:26rem" role="img" '
+           f'aria-label="רשת מיון של ארבעה ערכים : חמישה משווים בשלוש שכבות, עם הדוגמה {x}">']
+    for sx in (172, 296):
+        out.append(f'<line class="sn-sep" x1="{sx}" y1="24" x2="{sx}" y2="174"/>')
+    for n, lx in enumerate((104, 213, 322), 1):
+        out.append(f'<text class="sn-layer" x="{lx}" y="16" text-anchor="middle">{n}</text>')
+    for w, y in enumerate(wy):
+        out.append(f'<line class="sn-wire" x1="36" y1="{y}" x2="400" y2="{y}"/>')
+        out.append(f'<text class="sn-name" x="22" y="{y + 4}" text-anchor="middle">{"abcd"[w]}</text>')
+        for vx, st in zip(val_x, states):
+            out.append(f'<text class="sn-val" x="{vx}" y="{y - 7}" text-anchor="middle">{st[w]}</text>')
+    k = 0
+    for layer, xs in zip(NETWORK, cmp_x):
+        for (i, j), cx in zip(layer, xs):
+            cls = "sn-cmp is-swap" if swapped[k] else "sn-cmp"
+            out.append(f'<g class="{cls}"><line x1="{cx}" y1="{wy[i]}" x2="{cx}" y2="{wy[j]}"/>'
+                       f'<circle cx="{cx}" cy="{wy[i]}" r="4.5"/><circle cx="{cx}" cy="{wy[j]}" r="4.5"/></g>')
+            k += 1
+    return "".join(out) + "</svg>"
+
+
+def network_legend():
+    return ('<span class="viz-legend"><span><i class="s2"></i>משווה שהחליף את שני הערכים</span>'
+            '<span><i class="ink"></i>משווה שהשאיר אותם במקום</span></span>')
+
+
 def blocks():
-    """The generated blocks of the bonus, in page order."""
-    return [theorem_table(), family_table(), example_table(), attractor_table(), pair_map_svg(), pair_map_legend()]
+    """The generated blocks: 0 to 5 the bonus, in page order; 6 and 7 the sorting network of
+    part a and its legend."""
+    return [theorem_table(), family_table(), example_table(), attractor_table(), pair_map_svg(), pair_map_legend(),
+            network_svg(), network_legend()]
 
 
 if __name__ == "__main__":

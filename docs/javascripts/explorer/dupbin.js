@@ -34,7 +34,10 @@
   // The binary search box (0017 solution 3): the array as a row of cells (those <= mid lit
   // at the current step), a chart of c(v) for v = 1..n against the line y = v with the
   // range lo..hi shaded and mid marked, and a line per step with the decision and the
-  // invariant c(lo − 1) <= lo − 1, c(hi) > hi.
+  // invariant c(lo − 1) <= lo − 1, c(hi) > hi. Step 0 is the start (the whole range, no
+  // count yet); step k shows decision k: its mid and count, and the range it leaves, so
+  // the counter "k of T" names the decision on the screen. The chart sits beside the
+  // step's text (cols), so the box fits one screen.
   const EXAMPLE = [3, 9, 5, 6, 7, 8, 1, 1, 2, 4];
   const dupbinView = () => ({
     mount(box) {
@@ -55,14 +58,15 @@
         `<button type="button" class="md-button ex-end">לסוף</button><span class="ex-pos"></span></div>` +
         `<div class="db-cells" dir="ltr"></div>` +
         `<p class="ex-title">כמה מספרים במערך הם לכל היותר v, לכל ערך v, מול הקו y = v</p><div class="db-chart"></div>` +
-        `<span class="viz-legend"><span><i class="db-key-range"></i>הטווח lo עד hi</span><span><i class="db-key-mid"></i>‏mid והספירה שלו</span><span><i class="db-key-line"></i>הקו y = v</span></span>` +
-        `<p class="wv-step db-step" aria-live="polite"></p><p class="ex-summary db-inv"></p>`;
+        `<span class="viz-legend db-legend"><span><i class="db-key-range"></i>הטווח lo עד hi אחרי הצעד</span><span><i class="db-key-mid"></i>‏mid והספירה שלו</span><span><i class="db-key-line"></i>הקו y = v</span></span>` +
+        `<p class="wv-step db-step" aria-live="polite"></p><p class="db-inv"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const numsIn = $(".ex-nums");
       const run = () => dupBinarySearch(st.nums);
-      const state = () => {                     // lo, hi and the frame shown at step k
-        const r = run(), fr = r.frames[st.k] || null;
-        return fr ? { lo: fr.lo, hi: fr.hi, fr, r } : { lo: r.answer, hi: r.answer, fr: null, r };
+      const state = () => {                     // step k: decision k (none at 0) and the range after it
+        const r = run(), k = Math.min(st.k, r.frames.length), fr = k ? r.frames[k - 1] : null;
+        const nx = r.frames[k];                 // the next decision starts from the range this one leaves
+        return { lo: nx ? nx.lo : r.answer, hi: nx ? nx.hi : r.answer, fr, r, done: k === r.frames.length };
       };
       const chart = (s) => {
         const n = st.nums.length - 1, c = dupCounts(st.nums);
@@ -82,25 +86,27 @@
         return g + `<text class="tick" x="${X1}" y="${Y1 + 30}" text-anchor="end">v</text></svg>`;
       };
       const draw = () => {
-        const s = state(), { r, fr } = s, n = st.nums.length - 1, c = dupCounts(st.nums);
+        const s = state(), { r, fr, done } = s, n = st.nums.length - 1, c = dupCounts(st.nums);
         st.k = Math.min(st.k, r.frames.length);
         $(".out-n").textContent = String(n);
         if (document.activeElement !== numsIn) numsIn.value = st.nums.join(", ");
         $(".db-cells").innerHTML = `<div class="box-grid fl-grid" style="grid-template-columns: repeat(${n + 1}, minmax(0, 1fr))">` +
-          st.nums.map((v, i) => `<span class="${fr && v <= fr.mid ? "is-counted" : !fr && v === r.answer ? "hl" : ""}"><small>${i}</small><b>${v}</b></span>`).join("") + `</div>`;
+          st.nums.map((v, i) => `<span class="${[fr && v <= fr.mid ? "is-counted" : "", done && v === r.answer ? "hl" : ""].join(" ").trim()}"><small>${i}</small><b>${v}</b></span>`).join("") + `</div>`;
         $(".db-chart").innerHTML = chart(s);
         $(".ex-pos").textContent = `צעד ${st.k} מתוך ${r.frames.length}`;
-        $(".db-step").innerHTML = fr
-          ? `הטווח ${ltr(`lo = ${fr.lo}`)} עד ${ltr(`hi = ${fr.hi}`)}, ולכן ${ltr(`mid = ${fr.mid}`)}. במערך ${ltr(fr.count)} מספרים הם לכל היותר ${ltr(fr.mid)} (המודגשים). ` +
-            (fr.low ? `‏${ltr(`${fr.count} > ${fr.mid}`)}${NB}: יותר מספרים מערכים, ולפי שובך היונים יש כפול בין 1 ל-${ltr(fr.mid)}, ולכן ${ltr(`hi = ${fr.mid}`)}.`
-                    : `‏${ltr(`${fr.count} ≤ ${fr.mid}`)}${NB}: אין עודף עד ${ltr(fr.mid)}, ולכן הכפול גדול ממנו, ו-${ltr(`lo = ${fr.mid + 1}`)}.`)
-          : `‏${ltr(`lo = hi = ${r.answer}`)}${NB}: <b>הכפול הוא ${ltr(r.answer)}</b>, אחרי ${ltr(r.frames.length)} צעדים, וכל צעד ספר את כל ${ltr(n + 1)} המספרים.`;
+        const many = (k) => (k === 1 ? "צעד אחד" : `${ltr(k)} צעדים`);
+        $(".db-step").innerHTML = (fr
+          ? `הטווח ${ltr(`lo = ${fr.lo}`)} עד ${ltr(`hi = ${fr.hi}`)}, ולכן ${ltr(`mid = ${fr.mid}`)}. במערך ${fr.count === 1 ? "מספר אחד הוא" : `${ltr(fr.count)} מספרים הם`} לכל היותר ${ltr(fr.mid)} (${fr.count === 1 ? "המודגש" : "המודגשים"}). ` +
+            (fr.low ? `‏${ltr(`${fr.count} > ${fr.mid}`)}${NB}: יותר מספרים מערכים, ולכן יש כפול עד ${ltr(fr.mid)}, ו-${ltr(`hi = ${fr.mid}`)}.`
+                    : `‏${ltr(`${fr.count} ≤ ${fr.mid}`)}${NB}: אין עודף עד ${ltr(fr.mid)}, ולפי השמורה יש כפול מעליו, ו-${ltr(`lo = ${fr.mid + 1}`)}.`)
+          : `ההתחלה${NB}: הטווח ${ltr(`lo = 1`)} עד ${ltr(`hi = ${n}`)}, כל הערכים. עוד לא נספר דבר.`) +
+          (done ? ` נשאר ערך אחד${NB}: <b>${ltr(r.answer)} הוא ערך כפול</b>, אחרי ${many(r.frames.length)}, וכל צעד ספר את כל ${ltr(n + 1)} המספרים.` : "");
         const lo1 = s.lo - 1;
         $(".db-inv").innerHTML = `השמורה${NB}: מתחת לטווח אין עודף, ${ltr(`c(${lo1}) = ${c[lo1]} ≤ ${lo1}`)} ✓; עד סוף הטווח יש עודף, ${ltr(`c(${s.hi}) = ${c[s.hi]} > ${s.hi}`)} ✓.` +
-          (fr ? "" : ` לכן ${ltr(r.answer)} מופיע לפחות פעמיים.`);
+          (done ? ` לכן ${ltr(r.answer)} מופיע לפחות פעמיים.` : "");
         $(".ex-prev").disabled = st.k === 0;
         $(".ex-next").disabled = st.k >= r.frames.length;
-        answer(box, fr ? null : `הערך הכפול הוא ${ltr(r.answer)}, אחרי ${ltr(r.frames.length)} צעדים של חיפוש בינארי על הערכים.`, ".db-cells .hl");
+        answer(box, done ? `הערך ${ltr(r.answer)} כפול${NB}: החיפוש הבינארי על הערכים מצא אותו אחרי ${many(r.frames.length)}.` : null, ".db-cells .hl");
       };
       const setNums = (nums) => { stop(); st.nums = nums; st.k = 0; $(".ex-n").value = nums.length - 1; $(".fl-err").textContent = ""; draw(); };
       let stop = () => {};
@@ -130,5 +136,6 @@
       dupbin: "״הצעד הבא״ ו״הפעלה״ מריצים את החיפוש הבינארי של פתרון 3 : בכל צעד מודגשים במערך המספרים שלכל היותר mid, העמודה של mid בתרשים מראה את הספירה מול הקו y = v, והטווח lo עד hi מצטמצם. ״הגרלה״, ‏n והשדה קובעים את המערך.",
     },
     models: { dupBinarySearch, dupCounts },
+    cols: { dupbin: { main: ".ex-title, .db-chart, .db-legend", side: ".db-step, .db-inv", w: "minmax(0, 1.9fr)" } },   // the chart beside the step's text
   });
 })();

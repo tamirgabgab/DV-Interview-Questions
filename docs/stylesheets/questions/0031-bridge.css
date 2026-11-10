@@ -1,0 +1,17 @@
+/* 0031 (the bridge and the torch): the bridge box on one computer screen (session 34).
+   The plans table and the greedy rule's table sit side by side, the crossings of the shown
+   plan are one line that scrolls inside itself (the reader's own plan has no end), and the
+   message of the own plan sits beside the bridge, under its caption. */
+.md-typeset .explorer .bridge-line { margin: 0.3em 0 0.5em; font-size: 0.7rem; line-height: 1.75; max-height: 3.5em; overflow-y: auto; }
+.md-typeset .explorer .bridge-line .bl-lab { font-weight: 700; }
+.md-typeset .explorer .bridge-line .bl-x { padding: 0.1em 0.3em; border-radius: 0.2rem; white-space: nowrap; }
+.md-typeset .explorer .bridge-line .bl-x.is-now { background: var(--md-code-bg-color); box-shadow: inset 0 -2px 0 var(--viz-s2); }
+.md-typeset .explorer[data-kind="bridge"] .br-msg { margin: 0.3em 0; font-size: 0.75rem; }
+.md-typeset .explorer[data-kind="bridge"] .br-msg:empty { display: none; }
+.md-typeset .explorer[data-kind="bridge"] .bridge-gwrap > label { font-size: 0.7rem; }
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="bridge"] .bridge-tables:not([hidden]) {
+    display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.25fr); column-gap: 1.4rem; align-items: start;
+  }
+  .md-typeset .explorer[data-kind="bridge"] .bridge-tables .bridge-table { margin-top: 0; }
+}

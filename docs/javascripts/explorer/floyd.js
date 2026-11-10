@@ -5,6 +5,7 @@
 // models for the question tests.
 (() => {
   const { H, STATE_CODECS, W, answer, f, floydParse, floydTrace, ltr, seedControls } = dvqExplorers.lib;
+  const NB = "\u00a0";
 
   // Find the duplicate (0017): nums has n + 1 values in 1..n. The walk i -> nums[i] from
   // 0 is a tail and a cycle (the rho); the entry of the cycle is a duplicate value.
@@ -30,6 +31,8 @@
   // The Floyd box (0017): the array as a row of cells and as the graph i -> nums[i] laid
   // out as a rho (the tail in a line, the cycle as a circle, unreached indices below);
   // the tortoise and the hare step through the two phases, played or one step at a time.
+  // The graph is drawn at no more than 1.3 times its own size and 400 px high, beside the
+  // step's line and the summary (cols), so the box fits one screen for every array.
   const floydView = () => ({
     mount(box) {
       const EXAMPLE = [3, 9, 5, 6, 7, 8, 1, 1, 2, 4];
@@ -37,7 +40,7 @@
       const st = { nums: EXAMPLE, k: 0 };
       box.innerHTML =
         `<div class="ex-controls">` +
-        `<label><span>‏n</span><input type="range" class="ex-n" min="3" max="${nmax}" step="1" value="${EXAMPLE.length - 1}" dir="ltr"><output class="out-n"></output></label>` +
+        `<label><span>‏n</span><input type="range" class="ex-n" min="3" max="${nmax}" step="1" value="${EXAMPLE.length - 1}" dir="ltr" aria-label="n, מספר הערכים"><output class="out-n"></output></label>` +
         `<button type="button" class="md-button md-button--primary ex-shuffle">הגרלה</button>` +
         `<button type="button" class="md-button ex-example">הדוגמה מהדף</button>` +
         `<label class="fl-input"><span>המערך</span><input type="text" class="ex-nums" dir="ltr" spellcheck="false" aria-label="המערך, מספרים מופרדים בפסיקים"></label>` +
@@ -50,7 +53,7 @@
         `<label>הקצב <select class="ex-speed"><option value="1500">איטי</option><option value="700" selected>בינוני</option><option value="250">מהיר</option></select></label>` +
         `<button type="button" class="md-button ex-start">להתחלה</button>` +
         `<button type="button" class="md-button ex-end">לסוף</button><span class="ex-pos"></span></div>` +
-        `<div class="fl-graph"></div><p class="fl-step" aria-live="polite"></p><p class="ex-summary fl-sum"></p>`;
+        `<div class="fl-graph"></div><p class="fl-step" aria-live="polite"></p><p class="fl-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), numsIn = $(".ex-nums");
       let timer = null;
@@ -71,7 +74,8 @@
         const H = top + (others.length ? rowY : r) + 30;
         const P = (v) => { const [x, y] = pos.get(v); return [x, y + top]; };
         const dupEdges = done ? new Set(st.nums.map((v, i) => (v === entry ? i : -1)).filter((i) => i >= 0)) : new Set();
-        let s = `<svg class="figure fl-live" viewBox="0 0 ${f(W, 0)} ${f(H, 0)}" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו">`;
+        const sc = Math.min(1.3, 400 / H);                       // a small graph is not blown up to the column's width
+        let s = `<svg class="figure fl-live" viewBox="0 0 ${f(W, 0)} ${f(H, 0)}" style="max-width:min(34rem, ${f((W * sc) / 16, 2)}rem)" role="img" aria-label="הגרף שבו כל אינדקס מצביע על הערך שבו">`;
         st.nums.forEach((v, i) => {
           const [x0, y0] = P(i), [x1, y1] = P(v);
           const faded = others.includes(i) ? " st-faded" : "";
@@ -122,13 +126,14 @@
         else if (fr.slow !== fr.fast) text = `שלב 2, איטרציה ${ltr(fr.step)} : הצב ב-${ltr(fr.slow)}, הארנב ב-${ltr(fr.fast)}.`;
         else {
           const into = nums.map((v, i) => (v === rho.entry ? i : -1)).filter((i) => i >= 0);
-          text = `שלב 2, איטרציה ${ltr(fr.step)} : שניהם ב-${ltr(fr.slow)}, הכניסה למעגל. ${into.length === 2 ? "שני חצים נכנסים" : `${ltr(into.length)} חצים נכנסים`} אליה, מהאינדקסים ${ltr(into.join(", "))}, ולכן <b>${ltr(fr.slow)}</b> הוא הערך הכפול.`;
+          text = `שלב 2, איטרציה ${ltr(fr.step)} : שניהם ב-${ltr(fr.slow)}, הכניסה למעגל. ${into.length === 2 ? "שני חצים נכנסים" : `${ltr(into.length)} חצים נכנסים`} אליה, מהאינדקסים ${ltr(into.join(", "))}, ולכן <b>${ltr(fr.slow)}</b> הוא ערך כפול.`;
         }
         $(".fl-step").innerHTML = text;
-        $(".fl-sum").innerHTML = `הזנב : ${rho.mu === 0 ? "ריק" : ltr(rho.tail.join(" → "))} (${ltr(`μ = ${rho.mu}`)}), המעגל : ${ltr(rho.cycle.join(" → "))} (${ltr(`λ = ${rho.lambda}`)}). ` +
-          `המפגש אחרי ${ltr(tr.frames.findIndex((g) => g.phase === 2) - 1)} איטרציות, ושלב 2 לוקח ${ltr(rho.mu)}. התשובה : ${ltr(tr.answer)}.` +
-          (rho.others.length ? ` האינדקסים ${ltr(rho.others.join(", "))} לא נגישים מ-0 ולא משנים כלום.` : "");
-        answer(box, last ? `הערך הכפול הוא ${ltr(tr.answer)} : הכניסה למעגל, שהצב והארנב נפגשים בה בשלב 2.` : null, ".fl-cells .hl");
+        const meet = tr.frames.findIndex((g) => g.phase === 2) - 1;
+        $(".fl-sum").innerHTML = `הזנב${NB}: ${ltr(rho.tail.join(" → "))} (${ltr(`μ = ${rho.mu}`)})<br>המעגל${NB}: ${ltr(rho.cycle.join(" → "))} (${ltr(`λ = ${rho.lambda}`)})<br>` +
+          `המפגש אחרי ${meet === 1 ? "איטרציה אחת" : `${ltr(meet)} איטרציות`}, ושלב 2 לוקח ${rho.mu === 1 ? "צעד אחד" : `${ltr(rho.mu)} צעדים`}.` +
+          (rho.others.length ? `<br>${rho.others.length === 1 ? `האינדקס ${ltr(rho.others[0])} לא נגיש מ-0 ולא משנה` : `האינדקסים ${ltr(rho.others.join(", "))} לא נגישים מ-0 ולא משנים`} כלום.` : "");
+        answer(box, last ? `הערך ${ltr(tr.answer)} כפול${NB}: הוא הכניסה למעגל, שהצב והארנב נפגשים בה בשלב 2.` : null, ".fl-cells .hl");
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; play.textContent = "הפעלה"; };
       const setNums = (nums) => { stop(); st.nums = nums; st.k = 0; $(".ex-n").value = nums.length - 1; $(".fl-err").textContent = ""; draw(); };
@@ -144,12 +149,13 @@
         timer = setInterval(() => { st.k++; draw(); if (st.k >= total()) stop(); }, Number(speed.value));
       });
       speed.addEventListener("change", () => { if (timer) { stop(); play.click(); } });
-      $(".ex-n").addEventListener("input", () => setNums(floydRandom(Number($(".ex-n").value))));
-      const seed = seedControls(box, $(".ex-example"), (rng) => setNums(floydRandom(st.nums.length - 1, rng)), { state: {
+      const seed = seedControls(box, $(".ex-example"), (rng) => setNums(floydRandom(Number($(".ex-n").value), rng)), { state: {
         get: () => STATE_CODECS.floyd.enc({ nums: st.nums, k: st.k }),
         set: (p) => { const d = STATE_CODECS.floyd.dec(p, nmax); if (!d) return false; setNums(d.nums); st.k = d.k; draw(); return true; },
       } });
       $(".ex-shuffle").addEventListener("click", seed.draw);
+      // the slider draws with the seed too, so the seed in the field always gives the array on the screen
+      $(".ex-n").addEventListener("input", () => { $(".out-n").textContent = $(".ex-n").value; seed.draw(); });
       $(".ex-example").addEventListener("click", () => setNums(EXAMPLE));
       const apply = () => {
         const nums = floydParse(numsIn.value);
@@ -168,6 +174,6 @@
       floyd: "המערך כגרף של זנב ומעגל : ״הגרלה״ או הקלדה קובעים אותו, ו״הצעד הבא״ ו״הפעלה״ מזיזים את הצב ואת הארנב דרך שני השלבים עד הערך הכפול.",
     },
     models: { floydRho, floydRandom },
-    cols: { floyd: { main: ".fl-graph", side: ".fl-step", w: "minmax(0, 2.6fr)" } },   // the graph beside the line of the step
+    cols: { floyd: { main: ".fl-graph", side: ".fl-step, .fl-sum", w: "minmax(0, 1.7fr)" } },   // the graph beside the line of the step and the summary
   });
 })();

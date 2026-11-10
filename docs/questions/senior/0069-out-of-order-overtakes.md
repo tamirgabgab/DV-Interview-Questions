@@ -59,9 +59,13 @@ added: 2026-10-29
 
 ??? tip "רמז 2"
     צריך מבנה שתומך בשתי פעולות ב-\( O(\log n) \) : "הוסף את הערך \( v \)" ו"כמה ערכים קטנים
-    מ-\( v \) הוספו עד עכשיו". מערך של מונים לפי ערך עונה על השנייה ב-\( O(n) \) ; עץ
-    Fenwick עונה על שתיהן ב-\( O(\log n) \). הזמנים יכולים להיות גדולים, אז קודם החליפו
-    כל זמן ב**דרגה** שלו : 1 לקטן ביותר, 2 לבא אחריו, וכן הלאה.
+    מ-\( v \) הוספו עד עכשיו". מערך של מונים לפי ערך עושה את הראשונה ב-\( O(1) \) ואת השנייה
+    ב-\( O(n) \), ומערך של סכומי קידומת להיפך. מה באמצע?
+
+??? tip "רמז 3"
+    הזמנים יכולים להיות גדולים, אבל יש רק \( n \) מהם : החליפו כל זמן ב**דרגה** שלו, 1 לקטן
+    ביותר, 2 לבא אחריו, וכן הלאה. ועל הדרגות : מערך שבו תא שומר סכום של **בלוק** של תאים,
+    באורך שהוא חזקה של 2, כך שכל קידומת היא \( O(\log n) \) בלוקים (עץ Fenwick).
 
 ??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
@@ -83,7 +87,7 @@ added: 2026-10-29
 
     <!-- gen 0 -->
 
-    <svg class="figure ov-fig" viewBox="0 0 232 190" style="max-width:14.5rem" role="img" aria-label="הבקשות 0 עד 3 עם זמני התשובה 5 2 6 1, התשובות לפי סדר ההגעה, הקווים ביניהן, ו-passed של כל בקשה"><text class="tick" x="56" y="12" text-anchor="end">i</text><text class="ov-lab" x="56" y="39" text-anchor="end">done</text><text class="ov-lab" x="56" y="111" text-anchor="end">arrive</text><text class="tick" x="56" y="138" text-anchor="end">time</text><text class="ov-lab" x="56" y="171" text-anchor="end">passed</text><text class="tick" x="84" y="12" text-anchor="middle">0</text><text class="tick" x="124" y="12" text-anchor="middle">1</text><text class="tick" x="164" y="12" text-anchor="middle">2</text><text class="tick" x="204" y="12" text-anchor="middle">3</text><line class="ov-line is-cross" x1="84" y1="48" x2="164" y2="94"><title>request 0: sent in slot 0, answered at 5, slot 2 of the answers; 2 overtakes on its line</title></line><line class="ov-line is-cross" x1="124" y1="48" x2="124" y2="94"><title>request 1: sent in slot 1, answered at 2, slot 1 of the answers; 2 overtakes on its line</title></line><line class="ov-line is-cross" x1="164" y1="48" x2="204" y2="94"><title>request 2: sent in slot 2, answered at 6, slot 3 of the answers; 1 overtakes on its line</title></line><line class="ov-line is-cross" x1="204" y1="48" x2="84" y2="94"><title>request 3: sent in slot 3, answered at 1, slot 0 of the answers; 3 overtakes on its line</title></line><g class="ov-cell is-req"><title>request 0, answered at time 5</title><rect x="68" y="20" width="32" height="28" rx="4"/><text x="84" y="39" text-anchor="middle">5</text></g><g class="ov-cell is-req"><title>request 1, answered at time 2</title><rect x="108" y="20" width="32" height="28" rx="4"/><text x="124" y="39" text-anchor="middle">2</text></g><g class="ov-cell is-req"><title>request 2, answered at time 6</title><rect x="148" y="20" width="32" height="28" rx="4"/><text x="164" y="39" text-anchor="middle">6</text></g><g class="ov-cell is-req"><title>request 3, answered at time 1</title><rect x="188" y="20" width="32" height="28" rx="4"/><text x="204" y="39" text-anchor="middle">1</text></g><g class="ov-cell is-rsp"><title>answer slot 0: request 3, time 1</title><rect x="68" y="94" width="32" height="28" rx="4"/><text x="84" y="113" text-anchor="middle">3</text></g><text class="tick" x="84" y="138" text-anchor="middle">1</text><g class="ov-cell is-rsp"><title>answer slot 1: request 1, time 2</title><rect x="108" y="94" width="32" height="28" rx="4"/><text x="124" y="113" text-anchor="middle">1</text></g><text class="tick" x="124" y="138" text-anchor="middle">2</text><g class="ov-cell is-rsp"><title>answer slot 2: request 0, time 5</title><rect x="148" y="94" width="32" height="28" rx="4"/><text x="164" y="113" text-anchor="middle">0</text></g><text class="tick" x="164" y="138" text-anchor="middle">5</text><g class="ov-cell is-rsp"><title>answer slot 3: request 2, time 6</title><rect x="188" y="94" width="32" height="28" rx="4"/><text x="204" y="113" text-anchor="middle">2</text></g><text class="tick" x="204" y="138" text-anchor="middle">6</text><g class="ov-cnt"><title>passed[0] = 2</title><rect x="68" y="152" width="32" height="28" rx="4"/><text x="84" y="171" text-anchor="middle">2</text></g><g class="ov-cnt"><title>passed[1] = 1</title><rect x="108" y="152" width="32" height="28" rx="4"/><text x="124" y="171" text-anchor="middle">1</text></g><g class="ov-cnt"><title>passed[2] = 1</title><rect x="148" y="152" width="32" height="28" rx="4"/><text x="164" y="171" text-anchor="middle">1</text></g><g class="ov-cnt is-zero"><title>passed[3] = 0</title><rect x="188" y="152" width="32" height="28" rx="4"/><text x="204" y="171" text-anchor="middle">0</text></g></svg>
+    <svg class="figure ov-fig" viewBox="0 0 232 190" style="max-width:14.5rem" role="img" aria-label="הבקשות 0 עד 3 עם זמני התשובה 5 2 6 1, התשובות לפי סדר ההגעה, הקווים ביניהן, ו-passed של כל בקשה"><text class="tick" x="56" y="12" text-anchor="end">i</text><text class="ov-lab" x="56" y="39" text-anchor="end">done</text><text class="ov-lab" x="56" y="111" text-anchor="end">arrive</text><text class="tick" x="56" y="138" text-anchor="end">time</text><text class="ov-lab" x="56" y="171" text-anchor="end">passed</text><text class="tick" x="84" y="12" text-anchor="middle">0</text><text class="tick" x="124" y="12" text-anchor="middle">1</text><text class="tick" x="164" y="12" text-anchor="middle">2</text><text class="tick" x="204" y="12" text-anchor="middle">3</text><line class="ov-line is-cross" x1="84" y1="48" x2="164" y2="94"><title>request 0: sent in slot 0, answered at 5, slot 2 of the answers; its line is crossed 2 times: passed 2 + overtook 0</title></line><line class="ov-line is-cross" x1="124" y1="48" x2="124" y2="94"><title>request 1: sent in slot 1, answered at 2, slot 1 of the answers; its line is crossed 2 times: passed 1 + overtook 1</title></line><line class="ov-line is-cross" x1="164" y1="48" x2="204" y2="94"><title>request 2: sent in slot 2, answered at 6, slot 3 of the answers; its line is crossed 1 times: passed 1 + overtook 0</title></line><line class="ov-line is-cross" x1="204" y1="48" x2="84" y2="94"><title>request 3: sent in slot 3, answered at 1, slot 0 of the answers; its line is crossed 3 times: passed 0 + overtook 3</title></line><g class="ov-cell is-req"><title>request 0, answered at time 5</title><rect x="68" y="20" width="32" height="28" rx="4"/><text x="84" y="39" text-anchor="middle">5</text></g><g class="ov-cell is-req"><title>request 1, answered at time 2</title><rect x="108" y="20" width="32" height="28" rx="4"/><text x="124" y="39" text-anchor="middle">2</text></g><g class="ov-cell is-req"><title>request 2, answered at time 6</title><rect x="148" y="20" width="32" height="28" rx="4"/><text x="164" y="39" text-anchor="middle">6</text></g><g class="ov-cell is-req"><title>request 3, answered at time 1</title><rect x="188" y="20" width="32" height="28" rx="4"/><text x="204" y="39" text-anchor="middle">1</text></g><g class="ov-cell is-rsp"><title>answer slot 0: request 3, time 1</title><rect x="68" y="94" width="32" height="28" rx="4"/><text x="84" y="113" text-anchor="middle">3</text></g><text class="tick" x="84" y="138" text-anchor="middle">1</text><g class="ov-cell is-rsp"><title>answer slot 1: request 1, time 2</title><rect x="108" y="94" width="32" height="28" rx="4"/><text x="124" y="113" text-anchor="middle">1</text></g><text class="tick" x="124" y="138" text-anchor="middle">2</text><g class="ov-cell is-rsp"><title>answer slot 2: request 0, time 5</title><rect x="148" y="94" width="32" height="28" rx="4"/><text x="164" y="113" text-anchor="middle">0</text></g><text class="tick" x="164" y="138" text-anchor="middle">5</text><g class="ov-cell is-rsp"><title>answer slot 3: request 2, time 6</title><rect x="188" y="94" width="32" height="28" rx="4"/><text x="204" y="113" text-anchor="middle">2</text></g><text class="tick" x="204" y="138" text-anchor="middle">6</text><g class="ov-cnt"><title>passed[0] = 2</title><rect x="68" y="152" width="32" height="28" rx="4"/><text x="84" y="171" text-anchor="middle">2</text></g><g class="ov-cnt"><title>passed[1] = 1</title><rect x="108" y="152" width="32" height="28" rx="4"/><text x="124" y="171" text-anchor="middle">1</text></g><g class="ov-cnt"><title>passed[2] = 1</title><rect x="148" y="152" width="32" height="28" rx="4"/><text x="164" y="171" text-anchor="middle">1</text></g><g class="ov-cnt is-zero"><title>passed[3] = 0</title><rect x="188" y="152" width="32" height="28" rx="4"/><text x="204" y="171" text-anchor="middle">0</text></g></svg>
 
     <!-- /gen -->
 
@@ -135,11 +139,9 @@ added: 2026-10-29
 
     <!-- /gen -->
 
-    **הביט הנמוך ב-\( i \ \&\ {-i} \).** כמו בשאלה [0060](../junior/0060-next-same-popcount.md) : במשלים
-    ל-2, ‏\( -i = \sim i + 1 \), ההיפוך הופך את כל הביטים, והחיבור של 1 מתגלגל דרך האחדות
-    שבתחתית עד הביט הדולק הנמוך של \( i \) ומדליק אותו שוב. מעליו \( -i \) הוא ההיפוך של
-    \( i \), ומתחתיו אפסים. לכן ה-AND משאיר בדיוק ביט אחד, הנמוך : ‏\( 12 = 1100_2 \),
-    ‏\( -12 = \dots 10100_2 \), ו-\( 12 \ \&\ {-12} = 100_2 = 4 \).
+    **הביט הנמוך ב-\( i \ \&\ {-i} \).** במשלים ל-2, ה-AND של \( i \) עם \( -i \) משאיר בדיוק את
+    הביט הדולק הנמוך של \( i \) (ההסבר בשאלה [0060](../junior/0060-next-same-popcount.md)) :
+    ‏\( 12 = 1100_2 \), ‏\( -12 = \dots 10100_2 \), ו-\( 12 \ \&\ {-12} = 100_2 = 4 \).
 
     **שאילתה, `prefix(i)` :** הסכום של התאים \( 1 \dots i \). קוראים את `tree[i]`, שמכסה את
     הבלוק \( (i - \text{lowbit}(i),\ i] \), ואז קופצים לתא שלפני הבלוק, \( i \gets i - \text{lowbit}(i) \),
@@ -149,9 +151,10 @@ added: 2026-10-29
 
     **עדכון, `add(i)` :** מוסיפים 1 לכל תא שהבלוק שלו מכיל את \( i \). הראשון הוא `tree[i]`
     עצמו. הבא הוא התא \( i + \text{lowbit}(i) \) : הבלוק שלו מתחיל לפני \( i \) ומסתיים אחריו,
-    והוא התא הקרוב ביותר שכזה (כל תא בין \( i \) ל-\( i + \text{lowbit}(i) \) מכסה בלוק קצר
-    מדי). גם כאן כל צעד מעלה את הביט הדולק הנמוך למקום גבוה יותר, ולכן \( O(\log m) \)
-    צעדים. ‏\( \text{add}(3) \) מגדיל את `tree[3]`, ‏`tree[4]` ו-`tree[8]`.
+    והוא התא הקרוב ביותר שכזה. לתא \( k \) שבין \( i \) ל-\( i + \text{lowbit}(i) \) יש ביט נמוך
+    קטן מ-\( \text{lowbit}(i) \), ולכן הבלוק שלו, \( (k - \text{lowbit}(k),\ k] \), מתחיל מעל \( i \).
+    גם כאן כל צעד מעלה את הביט הדולק הנמוך למקום גבוה יותר, ולכן לכל היותר
+    \( \lfloor \log_2 m \rfloor + 1 \) צעדים. ‏\( \text{add}(3) \) מגדיל את `tree[3]`, ‏`tree[4]` ו-`tree[8]`.
 
     #### השלבים { .sol-steps }
 
@@ -229,7 +232,7 @@ added: 2026-10-29
         1. ‏\( n + 1 \) תאים, כדי שהאינדקסים יהיו \( 1 \dots n \). התא 0 לא בשימוש.
         2. הביט הדולק הנמוך של \( i \). ב-Python המספרים אינם מוגבלים ברוחב, ובכל זאת `i & -i` נותן את הביט הנמוך, כי \( -i \) מתנהג כמשלים ל-2 אינסופי.
         3. החיסור מכבה את הביט הנמוך, וקופץ לתא שלפני הבלוק שנקרא.
-        4. השאילתה לפני ההוספה, על "דרגה קטנה ממש" : זמן שווה אינו נספר.
+        4. ‏`rk[done[i]] - 1` : דרגה קטנה ממש, ולכן זמן שווה אינו נספר.
 
     === "SystemVerilog"
         ```systemverilog title="class Fenwick, function passed" linenums="1" hl_lines="14 21 44 45"
@@ -285,7 +288,7 @@ added: 2026-10-29
         1. ‏\( n + 1 \) תאים כדי שהאינדקסים יהיו \( 1 \dots n \) : התא 0 לא בשימוש. עם אינדקס 0 הביט הנמוך הוא 0, והלולאות לא היו זזות.
         2. הביט הדולק הנמוך של \( i \). החיבור מעלה אותו, והתא הבא הוא הקרוב ביותר שהבלוק שלו מכיל את \( i \).
         3. החיסור מכבה אותו, וקופץ לתא שלפני הבלוק שנקרא.
-        4. השאילתה לפני ההוספה : הבקשה לא סופרת את עצמה. ‏`rk[done[i]] - 1` הוא "דרגה קטנה ממש", ולכן זמן שווה אינו נספר.
+        4. ‏`rk[done[i]] - 1` הוא "דרגה קטנה ממש", ולכן זמן שווה אינו נספר.
 
     **פתרון שני : מיון-מיזוג שסופר.** ממיינים את **האינדקסים** לפי הזמן שלהם במיון-מיזוג.
     במיזוג של שני חצאים ממוינים, כשמניחים אינדקס \( i \) מהחצי השמאלי, כל אינדקס מהחצי הימני
@@ -354,9 +357,10 @@ added: 2026-10-29
         1. ‏`j` אינדקסים מהחצי הימני כבר הונחו לפני `left[a]` : כולם מאוחרים ממנו ונענו לפניו.
 
     **השוואה.** שניהם \( O(n \log n) \) זמן ו-\( O(n) \) זיכרון. מיון-מיזוג לא צריך דחיסה
-    לדרגות ולא מבנה נוסף, אבל הוא רקורסיבי, סופר רק אחרי שכל הקלט ידוע, ומתאים לסעיף א
-    ולסך העקיפות. העץ קצר יותר לכתיבה, עובד **בזרם** (סעיף ג), ומשתנה רק בשאלה ששואלים
-    אותו : אותו עץ נותן גם את סעיף ב. בראיון של Google מצפים לשמוע את שניהם ולבחור.
+    לדרגות ולא מבנה נוסף, אבל הוא רקורסיבי וסופר רק אחרי שכל הקלט ידוע : הוא מתאים לכל מה
+    שמחשבים אחרי הטסט (גם את סעיף ב אפשר לספור באותו מיזוג), ולא לזרם. העץ קצר יותר לכתיבה,
+    עובד **בזרם** (סעיף ג), ומשתנה רק בשאלה ששואלים אותו : אותו עץ נותן גם את סעיף ב. בראיון
+    כדאי להכיר את שניהם ולנמק את הבחירה.
 
     #### למה זה נכון { .sol-proof }
 
@@ -378,16 +382,20 @@ added: 2026-10-29
     #### סיבוכיות { .sol-cost }
 
     - **זמן :** ‏\( O(n \log n) \) : המיון לדרגות \( O(n \log n) \), ואז \( n \) שאילתות ו-\( n \)
-      עדכונים של \( O(\log m) \) כל אחד, עם \( m \le n \). עם זמנים שהם מספרים קטנים (עד \( n \),
-      למשל מחזורי שעון בטסט קצר) אפשר לוותר על המיון ולעבוד על הזמנים עצמם, \( O(n \log T) \).
+      עדכונים של \( O(\log m) \) כל אחד, עם \( m \le n \). עם זמנים שהם מספרים קטנים (עד \( T \),
+      למשל מחזורי שעון בטסט קצר) אפשר לוותר על המיון ולעבוד על הזמנים עצמם ועוד 1, כי העץ
+      מתחיל מ-1 וזמן 0 אפשרי : ‏\( O(n \log T) \).
     - **זיכרון :** ‏\( O(n) \) : העץ, המילון והפלט.
     - **מקרי קצה :** מערך ריק או של בקשה אחת : הכול אפסים. כל הזמנים שווים : הכול אפסים,
       כי הדרגה של כולם 1 ו-\( \text{prefix}(0) = 0 \). זמנים יורדים ממש : ‏\( \text{passed}[i] = n - 1 - i \),
       כולם עקפו את כולם.
 
-    **נסו בעצמכם.** למעלה הבקשות והתשובות עם הקווים ביניהן, ולמטה העץ : בכל בקשה צעד של
-    שאילתה (התאים שנקראים כחולים) וצעד של עדכון (התאים שגדלים כתומים). הספירה נכתבת מתחת
-    לבקשה :
+    **נסו בעצמכם.** הקלידו `3 3 3 3` (או לחצו "שווים") : לעץ תא אחד, כל שאילתה היא `prefix(0)`
+    שלא קוראת אף תא, והכול אפסים, כי זמן שווה אינו עקיפה. לחצו "הפוך" : ‏passed יוצא
+    <span dir="ltr">[3, 2, 1, 0]</span> והסכום 6, כל הזוגות. הקלידו `8 7 6 5 4 3 2 1` ולחצו
+    פעמיים על "הצעד הבא" : ‏`add(1)` מגדיל ארבעה תאים,
+    <span dir="ltr">tree[1] → tree[2] → tree[4] → tree[8]</span>. מעבר לאיורים, התיבה מריצה את
+    הקוד על קלט שלכם, גם עם זמנים שווים, ומדליקה את השורות שרצו בכל צעד :
 
     <div class="explorer" data-kind="overtakes" data-mode="a" data-done="5 2 6 1"></div>
 
@@ -410,8 +418,7 @@ added: 2026-10-29
         \( \text{overtook}[i] = i - \text{prefix}(r) \), נענו אחריה : אותן היא עקפה. בדוגמה
         ‏<span dir="ltr">[0, 1, 0, 3]</span>, מול <span dir="ltr">[2, 1, 1, 0]</span> של סעיף א. שני
         הסכומים שווים (4), כי שניהם סופרים את אותם זוגות. ‏\( \text{passed}[i] \) מודד כמה
-        בקשה \( i \) הורעבה, \( \text{overtook}[i] \) כמה היא "דחפה", והמקסימום של
-        \( \text{passed} \) הוא העומק של מאגר הסידור מחדש.
+        בקשה \( i \) הורעבה, ו-\( \text{overtook}[i] \) כמה היא "דחפה".
 
     <!-- cost: זמן \( O(n \log n) \) | זיכרון \( O(n) \) -->
 
@@ -448,7 +455,8 @@ added: 2026-10-29
       פעם אחת שה-DUT העדיף מישהו אחר. ‏\( \max_i \text{passed}[i] \) הוא ההרעבה הגרועה ביותר
       בטסט, וגם **עומק הסידור מחדש** : מי שרוצה למסור את התשובות הלאה **לפי סדר השליחה**
       (reorder buffer) מחזיק, בזמן שהוא מחכה לתשובה של \( i \), את \( \text{passed}[i] \) התשובות
-      הצעירות שכבר הגיעו. זה גם החלון שבו scoreboard שמחפש תשובה "מהראש" צריך להסתכל.
+      הצעירות שכבר הגיעו (התשובה של \( i \) עצמה נמסרת מיד ואינה נספרת ; מאגר שרושם גם אותה
+      צריך מקום אחד נוסף). זה גם החלון שבו scoreboard שמחפש תשובה "מהראש" צריך להסתכל.
       בשאלה [0050](0050-out-of-order-scoreboard.md) הסידור מחדש הוא רק **בין** IDs, ותוך כל
       ID התשובות בסדר : שם עומק התור של ID הוא מספר הבקשות הפתוחות שלו, וכאן מודדים את
       הערבוב עצמו.
@@ -536,23 +544,25 @@ added: 2026-10-29
     הזוגות שהרכיב השני שלהם \( j \). שני הסכומים סופרים את \( |P| \), כל זוג פעם אחת, פעם לפי
     הרכיב הראשון ופעם לפי השני. בדוגמה \( P = \{(0, 1), (0, 3), (1, 3), (2, 3)\} \), ושני הסכומים 4.
 
-    **עומק הסידור מחדש.** מאגר שמוסר תשובות לפי סדר השליחה מחזיק, ברגע שהתשובה של \( i \)
-    מגיעה כשכל הבקשות שלפניה כבר נמסרו, בדיוק את התשובות של \( \{\, j > i : \text{done}[j] < \text{done}[i] \,\} \),
-    כי הן הגיעו ולא יכלו להימסר לפני \( i \). זה \( \text{passed}[i] \), ולכן המקסימום של
-    \( \text{passed} \) הוא התפוסה הגדולה ביותר של המאגר (המבחן של השאלה מדמה את המאגר ובודק
-    את השוויון).
+    **עומק הסידור מחדש.** מאגר שמוסר תשובות לפי סדר השליחה מחזיק בכל רגע תשובות שהגיעו
+    ומחכות לבקשה \( h \) שבראש התור, הוותיקה ביותר שעוד לא נענתה. כולן נשלחו אחרי \( h \)
+    ונענו לפניה, ולכן יש מהן לכל היותר \( \text{passed}[h] \) : התפוסה אף פעם לא עולה על
+    המקסימום של \( \text{passed} \). מצד שני, רגע לפני שמגיעה התשובה של בקשה \( i \), כל
+    \( \text{passed}[i] \) התשובות שעקפו אותה כבר במאגר, כי אף אחת מהן לא יכולה להימסר
+    לפני \( i \). לכן התפוסה הגדולה ביותר היא בדיוק \( \max_i \text{passed}[i] \) (המבחן של השאלה
+    מדמה את המאגר ובודק את השוויון).
 
     #### סיבוכיות { .sol-cost }
 
     - **זמן :** ‏\( O(n \log n) \), כמו בסעיף א : אותו מיון, אותם \( 2n \) מעברים על העץ.
     - **זיכרון :** ‏\( O(n) \).
-    - **שני המערכים יחד :** שני מעברים, או מעבר אחד עם עץ שני : ‏\( \text{passed} \) חייב את הכיוון
-      מהסוף ו-\( \text{overtook} \) את הכיוון מההתחלה, אבל ב-\( \text{overtook} \) אפשר להיעזר בעץ
-      של כל הדרגות (‏\( \text{total}(r) - \text{prefix}(r) \) במקום \( i - \text{prefix}(r) \)), ראו
-      המלכודת על "כמה הוכנסו".
+    - **שני המערכים יחד :** שני מעברים על אותן דרגות, אחד מהסוף (‏\( \text{passed} \)) ואחד
+      מההתחלה (‏\( \text{overtook} \)) ; המיון לדרגות נעשה פעם אחת.
 
-    **נסו בעצמכם.** אותה תיבה, מההתחלה לסוף : השאילתה היא עד הדרגה ועד בכלל, והספירה היא מה
-    שכבר בעץ פחות התוצאה :
+    **נסו בעצמכם.** הקלידו `3 3 1` : ‏overtook יוצא <span dir="ltr">[0, 0, 2]</span>. בקשה 1 לא
+    עקפה את בקשה 0, שנענתה באותו זמן, כי השאילתה היא `prefix(r)` ולא `prefix(r - 1)`. לחצו
+    "הפוך" : ‏<span dir="ltr">[0, 1, 2]</span>, והסכום 3 שווה לסכום של passed בתיבה של סעיף א על
+    אותו קלט. התיבה מוסיפה לטבלה קלט שלכם ואת התאים שכל שאילתה קוראת :
 
     <div class="explorer" data-kind="overtakes" data-mode="b" data-done="5 2 6 1"></div>
 
@@ -565,7 +575,7 @@ added: 2026-10-29
     היותר? מתי הוא 0?
 
 ??? tip "רמז 2"
-    בזמן אמת התשובות מגיעות לפי סדר הזמן, ולכן אין צורך למיין : מה שצריך לדעת כשמגיעה
+    באיזה סדר התשובות מגיעות ל-scoreboard בזמן אמת, ומה כבר ממוין? מה שצריך לדעת כשמגיעה
     התשובה של בקשה \( i \) הוא כמה מהבקשות **שכבר נענו** נשלחו **אחריה**. מה "הערך" שמכניסים
     לעץ עכשיו, ומה הדרגה שלו?
 
@@ -588,25 +598,32 @@ added: 2026-10-29
     הטסט ערבב" : הוא 0 בדיוק כשהתשובות הגיעו לפי סדר השליחה (אין אף זוג הפוך), והוא
     \( \binom{n}{2} = n(n - 1) / 2 \) בדיוק כשכל זוג הפוך, כלומר התשובות הגיעו בסדר הפוך
     לגמרי. החלוקה ב-\( n(n - 1) / 2 \) נותנת **אי-סדר מנורמל** בין 0 ל-1, שאינו תלוי באורך
-    הטסט : מדד שאפשר לשים ב-covergroup עם bins של 0, ‏(0, 0.1], ‏(0.1, 0.3] וכן הלאה, ולדרוש
-    שטסטים של ערבוב יגיעו ל-bins הגבוהים. טסט שה-DUT ענה בו תמיד לפי הסדר נותן 0, ו-scoreboard
-    של תשובות שלא לפי הסדר שעבר רק טסטים כאלה לא נבדק.
+    הטסט. זה מדד כיסוי : coverpoint הוא ביטוי שלם, ולכן דוגמים אותו באחוזים שלמים, עם bins של
+    0, של 1 עד 10, של 11 עד 30 וכן הלאה, ודורשים שטסטים של ערבוב יגיעו ל-bins הגבוהים. טסט
+    שה-DUT ענה בו תמיד לפי הסדר נותן 0, ו-scoreboard של תשובות שלא לפי הסדר שעבר רק טסטים
+    כאלה לא נבדק.
 
     **בזמן אמת : אינדקס השליחה הוא הדרגה.** עד עכשיו הסתכלנו על `done` אחרי הטסט. ב-scoreboard
-    התשובות מגיעות **לפי סדר הזמן**, אחת אחרי השנייה, ועם כל תשובה מגיע מספר הבקשה \( i \)
-    (ה-tag). עכשיו הזרם ממוין מעצמו, והערך שסופרים הוא אינדקס השליחה, שכבר נמצא ב-\( 0 \dots n - 1 \) :
-    **לא צריך דחיסה**. העץ הוא על \( 1 \dots n \) (האינדקס ועוד 1), ומחזיק את הבקשות שכבר
-    נענו. כשמגיעה התשובה של \( i \) : מספר הבקשות שכבר נענו ונשלחו **אחרי** \( i \) הוא
-    "כמה נענו עד עכשיו" פחות \( \text{prefix}(i + 1) \) (אלה שנשלחו עד \( i \)). זה בדיוק
+    התשובות מגיעות **לפי סדר הזמן**, אחת אחרי השנייה, ועם כל תשובה מגיע ה-tag של הבקשה.
+    ‏tags אמיתיים (AXI ID, ה-tag של PCIe) חוזרים על עצמם, ולכן ה-scoreboard רושם בשליחה לכל tag
+    את מספר השליחה של הבקשה, ומתרגם את ה-tag של התשובה חזרה : ‏\( i \) כאן הוא תמיד מספר
+    השליחה. עכשיו הזרם ממוין מעצמו, והערך שסופרים הוא אינדקס השליחה, שכבר נמצא
+    ב-\( 0 \dots n - 1 \) : **לא צריך דחיסה**. העץ הוא על \( 1 \dots n \) (האינדקס ועוד 1), ומחזיק
+    את הבקשות שכבר נענו. כשמגיעה התשובה של \( i \) : מספר הבקשות שכבר נענו ונשלחו **אחרי** \( i \)
+    הוא "כמה נענו עד עכשיו" פחות \( \text{prefix}(i + 1) \) (אלה שנשלחו עד \( i \)). זה בדיוק
     \( \text{passed}[i] \), מדווח ברגע שהתשובה מגיעה, ולא בסוף. הסכום הרץ הוא סך העקיפות עד
     הרגע הזה, והחלוקה ב-\( k(k - 1) / 2 \) (‏\( k \) תשובות עד כה) או ב-\( n(n - 1) / 2 \) נותנת
-    את אי-הסדר הרץ.
+    את אי-הסדר הרץ. בטסט שאינו נגמר העץ הוא חלון : בקשות שמספרן קטן מהבקשה הפתוחה הוותיקה
+    ביותר כבר נענו כולן ונספרות גם ב-\( k \) וגם בכל \( \text{prefix} \), ולכן אפשר להוציא אותן
+    משניהם ולמחזר את האינדקסים שלהן.
 
-    **הזווית של החומרה.** זה מבנה בגודל קבוע : \( n \) מונים (או \( n \) ביטים של "נענתה", כי כל
-    בקשה נכנסת פעם אחת), וכל תשובה נוגעת ב-\( \lceil \log_2 n \rceil \) מהם לכל היותר, בכתובות
-    שנקבעות מהביטים של \( i \). ב-RTL של מוניטור אפשר אפילו פשוט יותר : וקטור של \( n \) ביטים,
-    ביט לבקשה שנענתה, ו-popcount של הביטים שמעל \( i \) : מחזור אחד, בלי לולאה. העץ הוא
-    הגרסה שמתאימה לתוכנה ולמודלים, שבהם \( n \) גדול ו-popcount של \( n \) ביטים אינו פעולה אחת.
+    **הזווית של החומרה.** העץ הוא מבנה בגודל קבוע : \( n \) מונים (תא שומר ספירה של בלוק שלם,
+    עד \( \lfloor \log_2 n \rfloor + 1 \) ביטים), ושאילתה או עדכון נוגעים כל אחד
+    ב-\( \lfloor \log_2 n \rfloor + 1 \) תאים לכל היותר, בכתובות שנקבעות מהביטים של \( i \). ב-RTL
+    של מוניטור יש דרך פשוטה יותר : כל בקשה נענית פעם אחת, ולכן מספיק וקטור של \( n \) ביטים,
+    ביט לבקשה שנענתה, ו-popcount של הביטים שמעל \( i \) : מחזור אחד, בלי לולאה ובלי עץ (הקוד,
+    התרשים והטבלה לפי מחזורים בשאלת ההמשך הראשונה). העץ מתאים לתוכנה ולמודלים, שבהם
+    \( n \) גדול ו-popcount של \( n \) ביטים אינו פעולה אחת.
 
     #### השלבים { .sol-steps }
 
@@ -751,8 +768,10 @@ added: 2026-10-29
       מראש : \( n \) מונים. ב-RTL : ‏\( n \) ביטים ו-popcount, מחזור אחד.
     - **הנירמול :** חילוק אחד בסוף, או בכל תשובה אם רוצים את אי-הסדר הרץ.
 
-    **נסו בעצמכם.** התשובות מגיעות לפי סדר הזמן (השורה התחתונה, משמאל לימין), והעץ הוא על
-    אינדקסי השליחה. הסכום הרץ ואי-הסדר מתעדכנים עם כל תשובה :
+    **נסו בעצמכם.** לחצו "בסדר" : אי-הסדר 0.00, והמאגר (השורה buffer) ריק אחרי כל הגעה. לחצו
+    "הפוך" : אי-הסדר 1.00, והמאגר מתמלא עד 3 ומתרוקן רק בתשובה האחרונה. ועל
+    <span dir="ltr">5 2 6 1</span> : אחרי התשובה השלישית הסכום הרץ כבר 3 מתוך 4, והמאגר החזיק
+    לכל היותר 2, המקסימום של passed. התיבה מוסיפה לטבלה את תפוסת המאגר אחרי כל הגעה :
 
     <div class="explorer" data-kind="overtakes" data-mode="c" data-done="5 2 6 1"></div>
 
@@ -760,8 +779,9 @@ added: 2026-10-29
 
 ??? trap "מלכודת : להישאר בלולאה הכפולה"
     ‏\( O(n^2) \) היא תשובה ראשונה טובה : נכונה, ומראה שהבנתם מה סופרים. המלכודת היא להישאר
-    בה. על טרייס של \( 10^6 \) תשובות זה \( 5 \cdot 10^{11} \) השוואות, שעות של ריצה, ולמראיין
-    ברור שיש \( O(n \log n) \). אמרו "זו הגרסה הפשוטה, ועכשיו נשפר", ועברו לעץ או למיון-מיזוג.
+    בה. על טרייס של \( 10^6 \) תשובות זה \( 5 \cdot 10^{11} \) השוואות : דקות ארוכות בקוד מקומפל
+    ושעות רבות ב-Python, ולמראיין ברור שיש \( O(n \log n) \). אמרו "זו הגרסה הפשוטה, ועכשיו
+    נשפר", ועברו לעץ או למיון-מיזוג.
 
 ??? trap "מלכודת : זמנים שווים נספרים כעקיפה"
     בסעיף א שאילתה של \( \text{prefix}(r) \) במקום \( \text{prefix}(r - 1) \) סופרת גם בקשות
@@ -775,8 +795,9 @@ added: 2026-10-29
     עץ Fenwick עובד מ-1 : עם \( i = 0 \) הביט הנמוך הוא 0, ‏`i += i & -i` לא זז, והלולאה
     אינסופית (או `prefix(0)` חוזר מיד, שזה בסדר, אבל `add(0)` לא). לכן המערך באורך \( m + 1 \)
     והדרגות מתחילות מ-1, ובסעיף ג מכניסים \( i + 1 \) ולא \( i \). ב-SystemVerilog `i & -i`
-    על `int` עובד כצפוי (משלים ל-2 ב-32 ביט); על טיפוס לא חתום, כמו `logic [31:0]`, ‏`-i`
-    עדיין נותן את המשלים, אבל השוואות כמו `i > 0` מתנהגות אחרת. השאירו `int`.
+    על `int` עובד כצפוי (משלים ל-2 ב-32 ביט), וגם על טיפוס לא חתום, כמו `logic [31:0]`,
+    יוצא אותו ביט. ההבדל בין הטיפוסים הוא בהשוואות של הלולאות כשמערבבים חתום ולא חתום :
+    השאירו את האינדקס ואת \( n \) באותו טיפוס, `int` כמו בקוד.
 
 ??? trap "מלכודת : לעדכן לפני ששואלים"
     אם מכניסים את הדרגה של \( i \) ואז שואלים, בסעיף ב \( \text{prefix}(r) \) כולל את \( i \)
@@ -787,19 +808,100 @@ added: 2026-10-29
 ??? trap "מלכודת : בסעיף ב להשלים ל-n במקום למספר שהוכנס"
     ‏\( \text{overtook}[i] = n - \text{prefix}(r) \) סופר גם את כל הבקשות **המאוחרות**, שעוד לא
     בעץ בכלל. מה שמשלימים ממנו הוא מספר הדרגות שהוכנסו עד עכשיו, \( i \), ולא \( n \) ולא
-    \( m \). (אם רוצים בכל זאת להשתמש בעץ "מלא", מכניסים קודם את כולן ומוציאים כל אחת
-    לפני השאילתה שלה : אותו דבר, יותר עבודה.)
+    \( m \). (אם רוצים בכל זאת עץ "מלא", מכניסים קודם את כולן, הולכים **מהסוף להתחלה**
+    ומוציאים כל בקשה, בעדכון של \( -1 \), לפני השאילתה שלה : אותה תוצאה, יותר עבודה, ועדכון
+    שהעץ שבעמוד לא תומך בו.)
 
 ??? followup "שאלות המשך"
+    - **המוניטור ב-RTL :** כתבו את המוניטור של סעיף ג כמודול, עם וקטור של ביטים במקום העץ.
+      מה בודקים בו, ומה אוספים ממנו לכיסוי?
+
+        ??? fu-answer "תשובה"
+            ביט לכל בקשה שנענתה, `answered`. כשמגיעה התשובה של הבקשה `rsp_seq`, הביטים הדולקים
+            שמעליה הם הבקשות שנשלחו אחריה וכבר נענו : הזזה ימינה ב-`rsp_seq + 1` משאירה רק
+            אותם, ו-popcount סופר אותם. באותו מחזור הביט שלה נדלק, המקסימום והסכום מתעדכנים :
+
+            <!-- gen 8 -->
+
+            <svg class="figure ov-dp" viewBox="0 0 560 244" direction="ltr" style="max-width:35rem" role="img" aria-label="תרשים המלבנים של המוניטור : הטבלה seq_of_tag הופכת את ה-tag של התשובה למספר השליחה rsp_seq, הווקטור answered מוזז ימינה ב-seq + 1 כך שנשארים הביטים שמעל הבקשה, ‏popcount סופר אותם ונותן את passed, ובאותו מחזור הביט rsp_seq של answered נדלק, max_passed שומר את המקסימום ו-total את הסכום"><defs><marker id="ov-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path class="ov-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs><g class="ov-blk"><rect x="86" y="20" width="116" height="44" rx="5"/><text x="144" y="39" text-anchor="middle">seq_of_tag</text><text class="ov-sub" x="144" y="56" text-anchor="middle">[rsp_tag]</text></g><g class="ov-blk ov-st1"><rect x="290" y="20" width="100" height="44" rx="5"/><text x="340" y="39" text-anchor="middle">&gt;&gt; seq+1</text><text class="ov-sub" x="340" y="56" text-anchor="middle">bits above</text></g><g class="ov-blk ov-st1"><rect x="418" y="20" width="110" height="44" rx="5"/><text x="473" y="47" text-anchor="middle">popcount</text></g><g class="ov-blk ov-st2"><rect x="280" y="110" width="120" height="44" rx="5"/><text x="340" y="129" text-anchor="middle">answered</text><text class="ov-sub" x="340" y="146" text-anchor="middle">N bits</text></g><g class="ov-blk"><rect x="418" y="110" width="110" height="44" rx="5"/><text x="473" y="129" text-anchor="middle">max_passed</text><text class="ov-sub" x="473" y="146" text-anchor="middle">max</text></g><g class="ov-blk"><rect x="418" y="190" width="110" height="44" rx="5"/><text x="473" y="209" text-anchor="middle">total</text><text class="ov-sub" x="473" y="226" text-anchor="middle">+= passed</text></g><path class="ov-wire" d="M6,42 L86,42" marker-end="url(#ov-hb)"/><text class="ov-wlab" x="8" y="34" text-anchor="start">rsp_tag</text><path class="ov-wire" d="M202,42 L290,42" marker-end="url(#ov-hb)"/><text class="ov-wlab" x="210" y="34" text-anchor="start">rsp_seq</text><path class="ov-wire" d="M246,42 L246,132 L280,132" marker-end="url(#ov-hb)"/><text class="ov-wlab" x="238" y="128" text-anchor="end">set bit</text><path class="ov-wire" d="M340,110 L340,64" marker-end="url(#ov-hb)"/><path class="ov-wire" d="M390,42 L418,42" marker-end="url(#ov-hb)"/><path class="ov-wire" d="M528,42 L556,42" marker-end="url(#ov-hb)"/><text class="ov-wlab" x="556" y="14" text-anchor="end">passed</text><path class="ov-wire" d="M542,42 L542,212 L528,212" marker-end="url(#ov-hb)"/><path class="ov-wire" d="M542,132 L528,132" marker-end="url(#ov-hb)"/><circle class="ov-dot" cx="246" cy="42" r="3.5"/><circle class="ov-dot" cx="542" cy="42" r="3.5"/><circle class="ov-dot" cx="542" cy="132" r="3.5"/></svg>
+
+            <!-- /gen -->
+
+            <!-- gen 9 -->
+
+            <span class="viz-legend"><span><i class="ov-key-q"></i>השאילתה : הביטים שמעל הבקשה, וספירתם</span><span><i class="ov-key-u"></i>העדכון : הביט של הבקשה נדלק</span><span><i class="ov-key-req"></i>הטבלה מ-tag למספר השליחה, המקסימום והסכום</span></span>
+
+            <!-- /gen -->
+
+            ```systemverilog title="module ooo_monitor" linenums="1" hl_lines="11 16"
+            // the monitor of part c in RTL: a bit per answered request instead of the tree; one
+            // response a clock, rsp_seq is the send number of the request (looked up from its tag)
+            module ooo_monitor #(parameter int N = 16, parameter int MAX_REORDER = N - 1) (
+              input  logic                 clk, rst_n, rsp_valid,
+              input  logic [$clog2(N)-1:0] rsp_seq,
+              output logic [$clog2(N):0]   passed,       // with rsp_valid: the overtakes this response took
+              output logic [$clog2(N):0]   max_passed,
+              output logic [31:0]          total
+            );
+              logic [N-1:0] answered;
+              assign passed = ($clog2(N) + 1)'($countones(answered >> (32'(rsp_seq) + 1)));   // (1)!
+              always_ff @(posedge clk or negedge rst_n)
+                if (!rst_n) begin
+                  answered <= '0; max_passed <= '0; total <= '0;
+                end else if (rsp_valid) begin
+                  answered[rsp_seq] <= 1'b1;                                               // (2)!
+                  if (passed > max_passed) max_passed <= passed;
+                  total <= total + 32'(passed);
+                end
+
+              int fails = 0;
+              a_once:  assert property (@(posedge clk) disable iff (!rst_n) rsp_valid |-> !answered[rsp_seq]) else fails++;
+              a_depth: assert property (@(posedge clk) disable iff (!rst_n) rsp_valid |-> int'(passed) <= MAX_REORDER) else fails++;   // (3)!
+
+              covergroup cg @(posedge clk);
+                cp_passed: coverpoint passed iff (rst_n && rsp_valid) { bins none = {0}; bins one = {1}; bins few = {[2:3]}; bins many = {[4:$]}; }
+                cp_disorder: coverpoint 100 * total / (N * (N - 1) / 2) iff (rst_n && (&answered)) {   // (4)!
+                  bins in_order = {0}; bins low = {[1:10]}; bins mid = {[11:30]}; bins high = {[31:100]};
+                }
+              endgroup
+              cg cov = new();
+            endmodule
+            ```
+
+            1. הביטים של הבקשות שנשלחו אחרי `rsp_seq`, נספרים במחזור אחד. זו השאילתה, לפני העדכון : ‏`answered` עוד בלי הביט של התשובה הזו.
+            2. העדכון, בקצה השעון. תשובה אחת במחזור ; עם כמה תשובות באותו מחזור סופרים את כולן מול אותו `answered`, ורק אז מדליקים את כל הביטים שלהן.
+            3. הרעבה : תשובה שיותר מ-`MAX_REORDER` בקשות צעירות עקפו אותה. זה גם העומק שמאגר הסידור מחדש של ה-DUT הובטח לו.
+            4. אי-הסדר באחוזים שלמים, נדגם כשכל הבקשות נענו. ערך ממשי אינו coverpoint.
+
+            על הדוגמה (הזמנים הם מספרי המחזור, `answered` כתוב עם הביט של בקשה 3 משמאל) :
+
+            <!-- gen 10 -->
+
+            | מחזור | ‏rsp_seq | ‏answered לפני | הביטים שמעל | ‏passed | ‏answered אחרי | ‏max_passed | ‏total |
+            |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+            | ‏1 | ‏3 | ‏`0000` | ‏`0000` | **‏0** | ‏`1000` | ‏0 | ‏0 |
+            | ‏2 | ‏1 | ‏`1000` | ‏`1000` | **‏1** | ‏`1010` | ‏1 | ‏1 |
+            | ‏5 | ‏0 | ‏`1010` | ‏`1010` | **‏2** | ‏`1011` | ‏2 | ‏3 |
+            | ‏6 | ‏2 | ‏`1011` | ‏`1000` | **‏1** | ‏`1111` | ‏2 | ‏4 |
+
+            <!-- /gen -->
+
+            במחזורים 3 ו-4 אין תשובה (`rsp_valid` הוא 0) ושום דבר לא משתנה. במחזור 5 מגיעה
+            התשובה של בקשה 0, ומעליה דולקים הביטים של 1 ושל 3 : ‏`passed` הוא 2, כמו בסעיף א.
+            ‏`a_once` תופסת תשובה שנייה לאותה בקשה (או תרגום שגוי של tag), ו-`cp_passed` דורש
+            שהטסט הגיע גם לתשובה שלא נעקפה וגם לתשובה שנעקפה ארבע פעמים ויותר.
+
     - **השרשרת הארוכה ביותר של תשובות בסדר :** מהו המספר הגדול ביותר של בקשות שנענו
       **לפי סדר השליחה** שלהן, ואיך מחשבים אותו ב-\( O(n \log n) \)?
 
         ??? fu-answer "תשובה"
-            זו תת-הסדרה העולה הארוכה ביותר (LIS) של `done`. מחזיקים מערך `tails` שבו
-            `tails[L]` הוא הזמן הקטן ביותר שמסיים שרשרת באורך \( L + 1 \) ; לכל זמן מוצאים בחיפוש
-            בינארי את המקום הראשון שאינו קטן ממנו ומחליפים (או מאריכים). ‏`tails` עולה ממש, ולכן
+            זו תת-הסדרה **הלא-יורדת** הארוכה ביותר של `done` (זמן שווה אינו עקיפה, ולכן שתי
+            תשובות מאותו מחזור הן בסדר). מחזיקים מערך `tails` שבו `tails[L]` הוא הזמן הקטן
+            ביותר שמסיים שרשרת באורך \( L + 1 \) ; לכל זמן מוצאים בחיפוש בינארי את המקום הראשון
+            ש**גדול** ממנו (`bisect_right`) ומחליפים (או מאריכים). ‏`tails` לא יורד, ולכן
             \( O(\log n) \) לאיבר. בדוגמה <span dir="ltr">5 2 6 1</span> התשובה 2 (‏<span dir="ltr">2 6</span>
-            או <span dir="ltr">5 6</span>). ‏\( n \) פחות האורך הזה הוא כמה בקשות לפחות "יצאו מהתור".
+            או <span dir="ltr">5 6</span>), ועל <span dir="ltr">3 3 3</span> היא 3, לא 1. ‏\( n \) פחות
+            האורך הזה הוא כמה בקשות לפחות "יצאו מהתור".
 
     - **כמה החלפות מסדרות את התשובות :** נתון סדר ההגעה כתמורה של \( 0 \dots n - 1 \). מהו
       מספר ההחלפות (swap של שני איברים) הקטן ביותר שמחזיר אותו לסדר השליחה?
@@ -826,6 +928,7 @@ added: 2026-10-29
         ??? fu-answer "תשובה"
             בטרייס : הדרגות של ערכים שווים שוות, \( r - 1 \) בסעיף א ו-\( r \) בסעיף ב, וזהו :
             אותו מחזור אינו עקיפה. בזרם : צריך להחליט באיזה סדר התשובות של אותו מחזור
-            "מגיעות" ; אם המוניטור מעביר אותן לפי סדר השליחה (או מעדכן את כולן ואז שואל על
-            כולן), אותו מחזור אינו נספר. אם מגדירים אחרת, למשל "אותו מחזור הוא חצי עקיפה",
-            סופרים את השווים בנפרד : ‏\( \text{prefix}(r) - \text{prefix}(r - 1) \).
+            "מגיעות" ; אם המוניטור מעביר אותן לפי סדר השליחה (או שואל על כולן, עם אותו \( k \),
+            ורק אז מעדכן את כולן), אותו מחזור אינו נספר. לעדכן את כולן ורק אז לשאול נותן
+            ספירה שגויה. אם מגדירים אחרת, למשל "אותו מחזור הוא חצי עקיפה", סופרים את השווים
+            בנפרד : ‏\( \text{prefix}(r) - \text{prefix}(r - 1) \).

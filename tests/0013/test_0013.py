@@ -60,6 +60,75 @@ def test_follow_up_steps():
     assert counts == [1, 383, 576, 2400, 1272, 1518, 1656, 2184]
 
 
+def test_sorting_network():
+    """Part a's figure and the follow-up on verifying it: the network of the generator is the
+    one of the page's SystemVerilog (five comparators, three layers), it sorts every input of
+    four digits, by the 0-1 principle its 16 inputs of zeros and ones are enough, and without
+    any one comparator some 0/1 input comes out unsorted. The figure's example is 3524."""
+    import re
+    import sys
+    from itertools import product
+
+    from extract_code import ROOT, question_path
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0013
+
+    flat = [c for layer in q0013.NETWORK for c in layer]
+    sv = re.findall(r"if \((\w) < (\w)\) \{\1, \2\} = \{\2, \1\};", question_path(13).read_text(encoding="utf-8").split("function automatic bit is_special_4")[1].split("endfunction")[0])
+    assert [("abcd".index(u), "abcd".index(v)) for u, v in sv] == flat and len(flat) == 5 and len(q0013.NETWORK) == 3
+    for layer in q0013.NETWORK:                              # a layer's comparators share no wire
+        assert len({w for c in layer for w in c}) == 2 * len(layer)
+
+    def run(values, net):
+        v = list(values)
+        for i, j in net:
+            if v[i] < v[j]:
+                v[i], v[j] = v[j], v[i]
+        return v
+
+    bits = list(product((0, 1), repeat=4))
+    assert len(bits) == 16 and all(run(v, flat) == sorted(v, reverse=True) for v in bits)
+    assert all(run(v, flat) == sorted(v, reverse=True) for v in product(range(10), repeat=4))
+    for k in range(5):
+        assert any(run(v, flat[:k] + flat[k + 1:]) != sorted(v, reverse=True) for v in bits), k
+    states, swapped = q0013.run_network([3, 5, 2, 4])
+    assert states == [[3, 5, 2, 4], [5, 3, 4, 2], [5, 3, 4, 2], [5, 4, 3, 2]] and swapped == [True, True, False, False, True]
+    import math
+    assert math.factorial(4) == 24 > 2 ** 4                  # four comparisons cannot tell 24 orders apart
+
+
+def test_hardware_follow_up():
+    """The BCD digits of the difference straight from p and q, for every number: (p, q - 1,
+    9 - q, 10 - p), (p - 1, 9, 9, 10 - p) when q = 0, and 0000 when p = 0."""
+    for x in range(10000):
+        a, b, c, d = digits_sorted(x)
+        p, q = a - d, b - c
+        want = [0, 0, 0, 0] if p == 0 else [p, q - 1, 9 - q, 10 - p] if q else [p - 1, 9, 9, 10 - p]
+        assert [int(ch) for ch in f"{step(x):04d}"] == want, x
+
+
+def test_box_tasks():
+    """The numbers of the "try it" lists under the boxes of part b."""
+    assert step(3524) == step(6543) == step(9876) == 3087
+    assert [digits_sorted(x)[0] - digits_sorted(x)[3] for x in (3524, 6543, 9876)] == [3, 3, 3]
+    assert [digits_sorted(x)[1] - digits_sorted(x)[2] for x in (3524, 6543, 9876)] == [1, 1, 1]
+    chain = [9441]                                           # the pair (9, 5): six steps to 6174
+    while chain[-1] != 6174:
+        chain.append(step(chain[-1]))
+    assert chain == [9441, 7992, 7173, 6354, 3087, 8352, 6174]
+    lengths = {}
+    for p in range(1, 10):
+        for q in range(p + 1):
+            x, n = 999 * p + 90 * q, 0
+            while x != 6174:
+                x, n = step(x), n + 1
+            lengths[p, q] = n
+    assert max(lengths.values()) == 6 == lengths[9, 5]
+    assert sorted(999 * p + 90 * q for (p, q), n in lengths.items() if n == 1) == [4176, 8352, 8532]
+    assert f"{step(1000):04d}" == "0999"
+
+
 def test_explorer_matches_page_code():
     """The Kaprekar explorer with four digits: its step against is_special_4 and the
     test's own step() on every number, every chain ending at 6174 (or 0) within 7 steps."""
@@ -79,6 +148,9 @@ def test_explorer_matches_page_code():
         assert end == (0 if len(set(f"{x:04d}")) == 1 else 6174), x
     assert got["hist"]["ends"] == {"0": 10, "6174": 9990}
     assert sum(got["hist"]["hist"]["6174"]) == 9990 and len(got["hist"]["hist"]["6174"]) == 8
+    # the box's bars are the numbers that reach 6174: the follow-up's table, not 392 and 2
+    assert got["hist"]["hist"]["6174"] == [1, 383, 576, 2400, 1272, 1518, 1656, 2184]
+    assert [v or 0 for v in got["hist"]["hist"]["0"]] == [1, 9]
 
 
 # --- the bonus: four digits in base B ---------------------------------------------------------
@@ -112,6 +184,26 @@ def test_base_b_page_numbers():
     att15 = q0013.attractors_b(15)
     assert [(len(c), n) for c, n in att15] == [(4, 10052), (4, 9640), (4, 9538), (4, 9490), (2, 5170), (2, 4560), (1, 2160), (1, 15)]
     assert round(100 * 2160 / (15 ** 4 - 15), 1) == 4.3                       # the trap's "about 4 %"
+    # numbers with four equal digits go to 0, a cycle of length 1, also in a base without a fixed point
+    assert orbit_b(40, 3) == ([40, 0], 1) and orbit_b(0, 3) == ([0], 0) and orbit_b(7777, 10) == ([7777, 0], 1)
+    # the "try it" list of the base box
+    assert [q0013.text_b(v, 15) for v in orbit_b(int("62B9", 15), 15)[0]] == ["62B9", "92B6"]
+    assert [q0013.text_b(v, 10) for v in orbit_b(1234, 10)[0]] == ["1234", "3087", "8352", "6174"]
+    assert step_b(201, 4) == 201 and [(len(c), n) for c, n in q0013.attractors_b(4)] == [(2, 168), (1, 84), (1, 4)]
+    assert len(orbit_b(3 * 6 + 3, 6)[0]) == 10 == max(len(orbit_b(x, 6)[0]) for x in range(6 ** 4))
+
+
+def test_base_b_longest_orbit():
+    """The cost paragraph: in the bases 2 to 16 the longest orbit has 13 values (0036 in base
+    12), far under the bound B(B + 1) / 2; without a fixed point every number with two
+    different digits ends in a cycle longer than 1."""
+    longest = {B: max(len(orbit_b(x, B)[0]) for x in range(B ** 4)) for B in range(2, 17)}
+    assert max(longest.values()) == 13 == longest[12] == len(orbit_b(3 * 12 + 6, 12)[0])
+    assert all(longest[B] <= B * (B + 1) // 2 for B in longest)
+    for B in (3, 6, 7, 8, 9, 11):
+        for x in range(B ** 4):
+            values, start = orbit_b(x, B)
+            assert (len(values) - start == 1) == (len(set(q0013.digits_b(x, B))) == 1), (B, x)
 
 
 def test_base_b_digit_forms():

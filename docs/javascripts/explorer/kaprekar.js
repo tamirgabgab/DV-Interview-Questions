@@ -1,5 +1,5 @@
 // kinds: kaprekar
-//   kaprekar               0012, 0013  a number, its sort-and-subtract chain to 495 / 6174, the histogram of chain lengths; a toggle for the first step as a column subtraction with the borrows
+//   kaprekar               0012, 0013  a number, its sort-and-subtract chain to 495 / 6174, the histogram of chain lengths to that fixed point; a toggle for the first step as a column subtraction with the borrows
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -67,7 +67,7 @@
         `<span class="kp-presets">דוגמאות : ` + presets.map((p) => `<button type="button" class="md-button ex-preset" data-x="${p}">${p}</button>`).join(" ") + `</span></div>` +
         `<div class="kp-table"></div><p class="kp-chain" aria-live="polite"></p>` +
         `<label><input type="checkbox" class="kp-show-cols" checked> החיסור במאונך של הצעד הראשון</label><div class="kp-cols"></div>` +
-        `<p class="ex-title">מספר הצעדים עד שהערך מפסיק להשתנות, על כל ${ltr(num(MAX + 1))} המספרים; המספר שלכם מסומן</p><div class="kp-chart"></div><p class="ex-summary kp-sum"></p>`;
+        `<p class="ex-title">כמה מספרים מגיעים ל-${ltr(FIXED)} אחרי כל מספר של צעדים; המספר שלכם מסומן</p><div class="kp-chart"></div><p class="ex-summary kp-sum"></p>`;
       const $ = (sel) => box.querySelector(sel);
       const input = $(".ex-x");
       const H = kapHistogram(d);
@@ -102,9 +102,11 @@
               (d === 4 ? `עם ${ltr(`p = ${ds[0]} − ${ds[3]} = ${p}`)} ו-${ltr(`q = ${ds[1]} − ${ds[2]} = ${q}`)} הדף צופה ${q >= 1 ? ltr(`p, q − 1, 9 − q, 10 − p = ${p}, ${q - 1}, ${9 - q}, ${10 - p}`) : ltr(`p − 1, 9, 9, 10 − p = ${p - 1}, 9, 9, ${10 - p}`)}${q === 0 ? " (q = 0, ולכן גם המאות לוות)" : ""}.`
                 : `עם ${ltr(`p = ${ds[0]} − ${ds[2]} = ${p}`)} הספרות הן ${ltr(`p − 1, 9, 10 − p = ${p - 1}, 9, ${10 - p}`)}.`)}</p>`;
         } else $(".kp-cols").innerHTML = "";
-        const hist = H.hist[FIXED] || [], hist0 = H.hist[0] || [];
-        const n = Math.max(hist.length, hist0.length);
-        const vals = Array.from({ length: n }, (_, k) => (hist[k] || 0) + (hist0[k] || 0));
+        // the bars count the numbers that reach the fixed point, as the page's table does;
+        // those that fall to 0 (equal digits) are named in the summary, not drawn
+        const hist = H.hist[FIXED] || [];
+        const n = hist.length;
+        const vals = Array.from({ length: n }, (_, k) => hist[k] || 0);
         const ymax = Math.max(...vals), ticks = [];
         // four to eight grid lines: a step of 1, 2 or 5 times a power of ten
         const mag = Math.max(1, 10 ** Math.floor(Math.log10(Math.max(ymax, 1) / 4))), stepT = [1, 2, 5, 10].map((m) => m * mag).find((v) => ymax / v <= 8);
@@ -112,14 +114,14 @@
         const fr = frame("התפלגות מספר הצעדים", n, ticks[ticks.length - 1], ticks, (v) => num(v));
         let s = fr.s;
         vals.forEach((v, k) => {
-          const bw = Math.max(fr.slot * 0.6, 1), cls = k === c.length ? "by-enum" : "by-multiples";
-          s += `<rect class="bar ${cls}" x="${f(fr.cx(k + 1) - bw / 2)}" y="${f(fr.Y(v))}" width="${f(bw)}" height="${f(BASE - fr.Y(v))}"><title>${k} צעדים : ${num(v)} מספרים (${num(hist[k] || 0)} מגיעים ל-${FIXED}, ${num(hist0[k] || 0)} ל-0)</title></rect>` +
+          const bw = Math.max(fr.slot * 0.6, 1), cls = k === c.length && c.end === FIXED ? "by-enum" : "by-multiples";
+          s += `<rect class="bar ${cls}" x="${f(fr.cx(k + 1) - bw / 2)}" y="${f(fr.Y(v))}" width="${f(bw)}" height="${f(BASE - fr.Y(v))}"><title>${k} צעדים : ${num(v)} מספרים מגיעים ל-${FIXED}</title></rect>` +
                `<text class="tick" x="${f(fr.cx(k + 1))}" y="${f(fr.Y(v) - 4)}" text-anchor="middle" font-size="10">${num(v)}</text>` + fr.xtick(k + 1, k);
         });
         $(".kp-chart").innerHTML = s + fr.close();
         const toFixed = H.ends[FIXED] || 0, toZero = H.ends[0] || 0, longest = hist.length - 1;
-        $(".kp-sum").innerHTML = `מתוך ${ltr(num(MAX + 1))} המספרים, ${ltr(num(toFixed))} מגיעים ל-${ltr(FIXED)} (אחרי ${ltr(longest)} צעדים לכל היותר) ו-${ltr(num(toZero))} מגיעים ל-0 : אלה המספרים שכל הספרות שלהם שוות${d === 3 ? "" : ""}. ` +
-          `רק ${ltr(`0 ו-${FIXED}`)} מיוחדים, כלומר נעצרים ב-0 צעדים.`;
+        $(".kp-sum").innerHTML = `מתוך ${ltr(num(MAX + 1))} המספרים, ${ltr(num(toFixed))} מגיעים ל-${ltr(FIXED)}, אחרי ${ltr(longest)} צעדים לכל היותר. ${ltr(num(toZero))} המספרים שכל הספרות שלהם שוות מגיעים ל-0, ואינם בתרשים. ` +
+          `רק ${ltr(0)} ו-${ltr(FIXED)} מיוחדים, כלומר נעצרים ב-0 צעדים.`;
         answer(box, c.fixed ? `${ltr(pad(st.x))} מגיע ל-<b>${ltr(pad(c.end))}</b> אחרי ${c.length === 1 ? "צעד אחד" : `${ltr(c.length)} צעדים`}${c.end === 0 ? " (כל הספרות שוות)" : ""}.` : null,
           ".kp-table tr.is-last");
 
@@ -138,7 +140,7 @@
   dvqExplorers.register({
     views: { kaprekar: kaprekarView },
     help: {
-      kaprekar: "מקלידים או מגרילים מספר : ״הצעד הבא״ ממיין ומחסר עד 495 או 6174, וההיסטוגרמה סופרת את אורכי השרשראות של כל המספרים. המתג ״החיסור במאונך״ מראה את הצעד הראשון עמודה אחרי עמודה, עם הלווים.",
+      kaprekar: "מקלידים או מגרילים מספר : הטבלה מפעילה את הצעד שוב ושוב עד 495 או 6174, והתרשים סופר כמה מספרים מגיעים לשם אחרי כל מספר של צעדים. ״החיסור במאונך״ מראה את הצעד הראשון עמודה אחרי עמודה.",
     },
     models: { kapStep, kapColumns, kapChain, kapHistogram },
     // on a computer: the table of the steps on the left, the chain and the column

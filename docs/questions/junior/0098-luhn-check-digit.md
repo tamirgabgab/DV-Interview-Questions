@@ -66,7 +66,7 @@ added: 2026-11-07
 
     <!-- gen 0 -->
 
-    <div class="lu-fig"><svg class="lu-strip" viewBox="0 0 356 70" role="img" aria-label="המספר 4111 1111 1111 1111: ספרה בכל עמודה, והעמודות המודגשות הן המקומות שמכפילים, כל ספרה שנייה מימין. השורה התחתונה היא מה שכל ספרה מוסיפה. הסכום 30, מתחלק ב-10, ולכן המספר תקין"><rect class="lu-cell lu-dbl" x="13" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="34" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="55" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="76" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="97" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="118" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="139" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="160" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="181" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="202" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="223" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="244" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="265" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="286" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="307" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="328" y="5" width="19" height="60" rx="3"/><text class="lu-t" x="22.5" y="25.4" text-anchor="middle">4</text><text class="lu-t" x="43.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="64.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="85.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="106.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="127.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="148.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="169.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="190.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="211.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="232.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="253.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="274.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="295.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="316.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="337.5" y="25.4" text-anchor="middle">1</text><line class="lu-rule" x1="12" x2="348" y1="35" y2="35"/><text class="lu-t" x="22.5" y="55.4" text-anchor="middle">8</text><text class="lu-t" x="43.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="64.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="85.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="106.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="127.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="148.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="169.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="190.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="211.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="232.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="253.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="274.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="295.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="316.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="337.5" y="55.4" text-anchor="middle">1</text></svg></div>
+    <div class="lu-fig"><svg class="lu-strip" viewBox="0 0 356 70" role="img" aria-label="המספר 4111 1111 1111 1111 : ספרה בכל עמודה, והעמודות המודגשות הן המקומות שמכפילים, כל ספרה שנייה מימין. השורה התחתונה היא מה שכל ספרה מוסיפה. הסכום 30, מתחלק ב-10, ולכן המספר תקין"><rect class="lu-cell lu-dbl" x="13" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="34" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="55" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="76" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="97" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="118" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="139" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="160" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="181" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="202" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="223" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="244" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="265" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="286" y="5" width="19" height="60" rx="3"/><rect class="lu-cell lu-dbl" x="307" y="5" width="19" height="60" rx="3"/><rect class="lu-cell" x="328" y="5" width="19" height="60" rx="3"/><text class="lu-t" x="22.5" y="25.4" text-anchor="middle">4</text><text class="lu-t" x="43.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="64.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="85.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="106.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="127.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="148.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="169.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="190.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="211.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="232.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="253.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="274.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="295.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="316.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="337.5" y="25.4" text-anchor="middle">1</text><line class="lu-rule" x1="12" x2="348" y1="35" y2="35"/><text class="lu-t" x="22.5" y="55.4" text-anchor="middle">8</text><text class="lu-t" x="43.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="64.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="85.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="106.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="127.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="148.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="169.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="190.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="211.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="232.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="253.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="274.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="295.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="316.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="337.5" y="55.4" text-anchor="middle">1</text></svg></div>
 
     <span class="viz-legend"><span><i class="lu-key-dbl"></i><span>מקום שמכפילים</span></span><span><i class="lu-key-cell"></i><span>מקום שלא נוגעים בו</span></span></span>
 
@@ -75,21 +75,30 @@ added: 2026-11-07
     <!-- /gen -->
 
     טעות חומקת אם ורק אם היא משנה את הסכום בכפולה של 10. לכן שואלים לכל סוג של טעות מה
-    בדיוק השינוי, ומתי הוא מתחלק ב-10.
+    בדיוק השינוי, ומתי הוא מתחלק ב-10. הטבלה של \( D \) עונה על שתי השאלות : השורה האמצעית
+    לטעות בספרה אחת, והתחתונה להחלפה של שכנות.
+
+    <!-- gen 1 -->
+
+    <div class="lu-fig"><svg class="lu-strip" viewBox="0 0 362 100" role="img" aria-label="שלוש שורות לכל ספרה d מ-0 עד 9 : הספרה, מה שהיא מוסיפה במקום מוכפל, וההפרש בין השניים מודולו 10. השורה האמצעית היא כל הספרות מ-0 עד 9 בסדר אחר, ולכן כל טעות בספרה אחת נתפסת. בשורה התחתונה 0 מופיע פעמיים, אצל 0 ואצל 9, ולכן ההחלפה של 09 ו-90 חומקת"><rect class="lu-cell lu-hit" x="65" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="94" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="123" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="152" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="181" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="210" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="239" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="268" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="297" y="5" width="27" height="90" rx="3"/><rect class="lu-cell lu-hit" x="326" y="5" width="27" height="90" rx="3"/><text class="lu-lab" x="58" y="25.4" direction="ltr" text-anchor="end">d</text><text class="lu-t" x="78.5" y="25.4" text-anchor="middle">0</text><text class="lu-t" x="107.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="136.5" y="25.4" text-anchor="middle">2</text><text class="lu-t" x="165.5" y="25.4" text-anchor="middle">3</text><text class="lu-t" x="194.5" y="25.4" text-anchor="middle">4</text><text class="lu-t" x="223.5" y="25.4" text-anchor="middle">5</text><text class="lu-t" x="252.5" y="25.4" text-anchor="middle">6</text><text class="lu-t" x="281.5" y="25.4" text-anchor="middle">7</text><text class="lu-t" x="310.5" y="25.4" text-anchor="middle">8</text><text class="lu-t" x="339.5" y="25.4" text-anchor="middle">9</text><line class="lu-rule" x1="64" x2="354" y1="35" y2="35"/><text class="lu-lab" x="58" y="55.4" direction="ltr" text-anchor="end">D(d)</text><text class="lu-t" x="78.5" y="55.4" text-anchor="middle">0</text><text class="lu-t" x="107.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="136.5" y="55.4" text-anchor="middle">4</text><text class="lu-t" x="165.5" y="55.4" text-anchor="middle">6</text><text class="lu-t" x="194.5" y="55.4" text-anchor="middle">8</text><text class="lu-t" x="223.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="252.5" y="55.4" text-anchor="middle">3</text><text class="lu-t" x="281.5" y="55.4" text-anchor="middle">5</text><text class="lu-t" x="310.5" y="55.4" text-anchor="middle">7</text><text class="lu-t" x="339.5" y="55.4" text-anchor="middle">9</text><line class="lu-rule" x1="64" x2="354" y1="65" y2="65"/><text class="lu-lab" x="58" y="85.4" direction="ltr" text-anchor="end">D−d</text><text class="lu-t lu-sum" x="78.5" y="85.4" text-anchor="middle">0</text><text class="lu-t lu-sum" x="107.5" y="85.4" text-anchor="middle">1</text><text class="lu-t lu-sum" x="136.5" y="85.4" text-anchor="middle">2</text><text class="lu-t lu-sum" x="165.5" y="85.4" text-anchor="middle">3</text><text class="lu-t lu-sum" x="194.5" y="85.4" text-anchor="middle">4</text><text class="lu-t lu-sum" x="223.5" y="85.4" text-anchor="middle">6</text><text class="lu-t lu-sum" x="252.5" y="85.4" text-anchor="middle">7</text><text class="lu-t lu-sum" x="281.5" y="85.4" text-anchor="middle">8</text><text class="lu-t lu-sum" x="310.5" y="85.4" text-anchor="middle">9</text><text class="lu-t lu-sum" x="339.5" y="85.4" text-anchor="middle">0</text></svg></div>
+
+    <span class="viz-legend"><span><i class="lu-key-hit"></i><span>אותו הפרש אצל <span dir="ltr">0</span> ו-<span dir="ltr">9</span></span></span></span>
+
+    <!-- /gen -->
 
     #### השלבים { .sol-steps }
 
     <div class="steps" markdown>
 
-    1. **הבדיקה :** ב-<span dir="ltr">4111 1111 1111 1111</span> שמונה מקומות מוכפלים : ה-4
-       נותן 8 וכל 1 נותן 2. שמונת האחרים נותנים 1 כל אחד. סה"כ \( 8 + 7 \cdot 2 + 8 = 30 \),
-       תקין. החלפת ה-1 האחרון ב-2 מוסיפה 1, ו-31 לא מתחלק ב-10.
+    1. **הבדיקה :** הסכום של <span dir="ltr">4111 1111 1111 1111</span> הוא 30, כמו באיור,
+       והמספר תקין. החלפת ה-1 האחרון ב-2 מוסיפה 1, ו-31 לא מתחלק ב-10.
     2. **ספרת הביקורת :** מחשבים את הסכום עם 0 במקומה. ב-<span dir="ltr">4111 1111 1111 1110</span>
        הוא 29, וחסר 1 עד 30. באופן כללי הספרה היא \( (10 - S \bmod 10) \bmod 10 \).
     3. **טעות במקום רגיל :** \( a \) הופכת ל-\( b \), והסכום משתנה ב-\( b - a \), בין
        \( -9 \) ל-9 ולא 0. נתפסת.
-    4. **טעות במקום מוכפל :** השינוי \( D(b) - D(a) \). שתי הסדרות בטבלה שלמטה מראות
-       ש-\( D \) מעבירה את 0 עד 9 לעשר ספרות שונות, אז גם כאן השינוי בין \( -9 \) ל-9 ולא 0.
+    4. **טעות במקום מוכפל :** השינוי \( D(b) - D(a) \). בשורה האמצעית של הטבלה כל ספרה
+       מופיעה פעם אחת, כלומר \( D \) מעבירה את 0 עד 9 לעשר ספרות שונות. גם כאן השינוי
+       בין \( -9 \) ל-9 ולא 0.
     5. **החלפת שכנות :** \( a \) במקום מוכפל ו-\( b \) לידה. לפני ההחלפה הן מוסיפות
        \( D(a) + b \), אחרי \( D(b) + a \). ההחלפה חומקת אם ורק אם
        \( D(a) - a \equiv D(b) - b \pmod{10} \).
@@ -99,12 +108,12 @@ added: 2026-11-07
     #### הקוד { .sol-code }
 
     === "Python"
-        ```python title="luhn" linenums="1" hl_lines="10 11 12 22"
+        ```python title="luhn" linenums="1" hl_lines="10 11 12 23"
         def luhn_sum(number):
             """The Luhn sum of a string of digits (spaces and dashes are skipped): from the
             right, the check digit is place 1, and the digits of the even places are doubled,
             minus 9 when that gives two digits."""
-            digits = [int(c) for c in number if c.isdigit()]
+            digits = [int(c) for c in number if c in "0123456789"]
             total = 0
             for place, d in enumerate(reversed(digits), start=1):
                 if place % 2 == 0:
@@ -116,12 +125,13 @@ added: 2026-11-07
 
 
         def luhn_valid(number):
-            return luhn_sum(number) % 10 == 0
+            """Valid: at least one digit, and the sum a multiple of 10."""
+            return any(c in "0123456789" for c in number) and luhn_sum(number) % 10 == 0   # (2)!
 
 
         def check_digit(partial):
             """The digit that completes partial to a valid number."""
-            return (10 - luhn_sum(partial + "0") % 10) % 10      # (2)!
+            return (10 - luhn_sum(partial + "0") % 10) % 10      # (3)!
 
 
         def missed_swaps():
@@ -129,16 +139,17 @@ added: 2026-11-07
             sum: D(a) - a = D(b) - b (mod 10)."""
             D = [2 * d - 9 if d > 4 else 2 * d for d in range(10)]
             return [(a, b) for a in range(10) for b in range(a + 1, 10)
-                    if (D[a] - a) % 10 == (D[b] - b) % 10]   # (3)!
+                    if (D[a] - a) % 10 == (D[b] - b) % 10]   # (4)!
         ```
 
-        1. ‏12 נותן 3, כמו 1 + 2. בטבלה שלמטה : \( D \) של 5 עד 9 היא 1, 3, 5, 7, 9.
-        2. עם 0 במקום הספרה, הספרה שחסרה עד הכפולה הבאה של 10. ספרת הביקורת במקום 1, שלא
+        1. ‏12 נותן 3, כמו 1 + 2. בטבלה : \( D \) של 5 עד 9 היא 1, 3, 5, 7, 9.
+        2. מספר בלי אף ספרה (מחרוזת ריקה, או רק רווחים) אינו תקין, אף שהסכום שלו 0.
+        3. עם 0 במקום הספרה, הספרה שחסרה עד הכפולה הבאה של 10. ספרת הביקורת במקום 1, שלא
            מוכפל, ולכן היא נכנסת לסכום כמו שהיא.
-        3. מחזירה <span dir="ltr">[(0, 9)]</span>.
+        4. מחזירה <span dir="ltr">[(0, 9)]</span>.
 
     === "SystemVerilog"
-        ```systemverilog title="function automatic bit luhn_ok" linenums="1" hl_lines="9 10 12"
+        ```systemverilog title="function automatic bit luhn_ok" linenums="1" hl_lines="9 10 12 14"
         // Luhn: digits[0] is the leftmost digit and the last one the check digit (place 1)
         function automatic bit luhn_ok(byte unsigned digits[$]);
           int sum, n, d;
@@ -152,23 +163,16 @@ added: 2026-11-07
             end
             sum += d;
           end
-          return sum % 10 == 0;
+          return n > 0 && sum % 10 == 0;            // (2)!
         endfunction
         ```
 
         1. מימין לשמאל : המקום 1 הוא האיבר האחרון של התור.
+        2. תור ריק אינו מספר תקין, אף שהסכום שלו 0.
 
     #### למה זה נכון { .sol-proof }
 
-    <!-- gen 1 -->
-
-    <div class="lu-fig"><svg class="lu-strip" viewBox="0 0 362 100" role="img" aria-label="שלוש שורות לכל ספרה d מ-0 עד 9: הספרה, מה שהיא מוסיפה במקום מוכפל, וההפרש בין השניים מודולו 10. השורה האמצעית היא כל הספרות מ-0 עד 9 בסדר אחר, ולכן כל טעות בספרה אחת נתפסת. בשורה התחתונה 0 מופיע פעמיים, אצל 0 ואצל 9, ולכן ההחלפה של 09 ו-90 חומקת"><rect class="lu-cell lu-hit" x="65" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="94" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="123" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="152" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="181" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="210" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="239" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="268" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="297" y="5" width="27" height="90" rx="3"/><rect class="lu-cell lu-hit" x="326" y="5" width="27" height="90" rx="3"/><text class="lu-lab" x="58" y="25.4" direction="ltr" text-anchor="end">d</text><text class="lu-t" x="78.5" y="25.4" text-anchor="middle">0</text><text class="lu-t" x="107.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="136.5" y="25.4" text-anchor="middle">2</text><text class="lu-t" x="165.5" y="25.4" text-anchor="middle">3</text><text class="lu-t" x="194.5" y="25.4" text-anchor="middle">4</text><text class="lu-t" x="223.5" y="25.4" text-anchor="middle">5</text><text class="lu-t" x="252.5" y="25.4" text-anchor="middle">6</text><text class="lu-t" x="281.5" y="25.4" text-anchor="middle">7</text><text class="lu-t" x="310.5" y="25.4" text-anchor="middle">8</text><text class="lu-t" x="339.5" y="25.4" text-anchor="middle">9</text><line class="lu-rule" x1="64" x2="354" y1="35" y2="35"/><text class="lu-lab" x="58" y="55.4" direction="ltr" text-anchor="end">D(d)</text><text class="lu-t" x="78.5" y="55.4" text-anchor="middle">0</text><text class="lu-t" x="107.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="136.5" y="55.4" text-anchor="middle">4</text><text class="lu-t" x="165.5" y="55.4" text-anchor="middle">6</text><text class="lu-t" x="194.5" y="55.4" text-anchor="middle">8</text><text class="lu-t" x="223.5" y="55.4" text-anchor="middle">1</text><text class="lu-t" x="252.5" y="55.4" text-anchor="middle">3</text><text class="lu-t" x="281.5" y="55.4" text-anchor="middle">5</text><text class="lu-t" x="310.5" y="55.4" text-anchor="middle">7</text><text class="lu-t" x="339.5" y="55.4" text-anchor="middle">9</text><line class="lu-rule" x1="64" x2="354" y1="65" y2="65"/><text class="lu-lab" x="58" y="85.4" direction="ltr" text-anchor="end">D−d</text><text class="lu-t lu-sum" x="78.5" y="85.4" text-anchor="middle">0</text><text class="lu-t lu-sum" x="107.5" y="85.4" text-anchor="middle">1</text><text class="lu-t lu-sum" x="136.5" y="85.4" text-anchor="middle">2</text><text class="lu-t lu-sum" x="165.5" y="85.4" text-anchor="middle">3</text><text class="lu-t lu-sum" x="194.5" y="85.4" text-anchor="middle">4</text><text class="lu-t lu-sum" x="223.5" y="85.4" text-anchor="middle">6</text><text class="lu-t lu-sum" x="252.5" y="85.4" text-anchor="middle">7</text><text class="lu-t lu-sum" x="281.5" y="85.4" text-anchor="middle">8</text><text class="lu-t lu-sum" x="310.5" y="85.4" text-anchor="middle">9</text><text class="lu-t lu-sum" x="339.5" y="85.4" text-anchor="middle">0</text></svg></div>
-
-    <span class="viz-legend"><span><i class="lu-key-hit"></i><span>אותו הפרש אצל {ltr("0")} ו-{ltr("9")}</span></span></span>
-
-    <!-- /gen -->
-
-    **טעות בספרה אחת.** בשורה האמצעית של הטבלה כל ספרה מ-0 עד 9 מופיעה פעם אחת :
+    **טעות בספרה אחת.** בשורה האמצעית של הטבלה של \( D \) כל ספרה מ-0 עד 9 מופיעה פעם אחת :
     \( 0, 2, 4, 6, 8 \) מ-0 עד 4, ו-\( 1, 3, 5, 7, 9 \) מ-5 עד 9. לכן \( D(a) \ne D(b) \)
     כש-\( a \ne b \), וההפרש בין שתי ספרות שונות אף פעם לא מתחלק ב-10.
 
@@ -178,7 +182,20 @@ added: 2026-11-07
     ובכל מקום במספר. למשל ב-<span dir="ltr">4111 1111 1110 9115</span> (תקין, סכום 40) החלפת
     ה-0 וה-9 נותנת <span dir="ltr">4111 1111 1119 0115</span>, גם הוא תקין.
 
-    <div class="explorer" data-kind="luhn" data-number="4111111111111111" data-scheme="ean" data-map="swap"></div>
+    **נסו בקופסה**, שמתחילה במספר הזה :
+
+    - בחרו את הספרה 12 משמאל ולחצו "החלפה עם הספרה שמימין" : <span dir="ltr">09</span> הופך
+      ל-<span dir="ltr">90</span>, הסכום נשאר 40, והתא <span dir="ltr">(0, 9)</span> במפה של
+      Luhn מסומן ב-×.
+    - חזרו למספר של העמוד, בחרו את הספרה 13 והחליפו : <span dir="ltr">91</span> הופך
+      ל-<span dir="ltr">19</span>, הסכום 41, והטעות נתפסת.
+    - חזרו שוב, ובספרה 13 לחצו "שינוי הספרה", כשהספרה החדשה 0 : 9 הופך ל-0 במקום מוכפל,
+      הסכום יורד מ-40 ל-31, והטעות נתפסת.
+
+    מעבר לאיורים, הקופסה בודקת מיד כל מספר וכל טעות שתבחרו. המפה השנייה שלה, של משקלים 1 ו-2
+    בלי החיסור של 9, שייכת לסעיף ג.
+
+    <div class="explorer" data-kind="luhn" data-number="4111111111109115" data-scheme="w12" data-map="swap" data-new="0"></div>
 
     #### סיבוכיות { .sol-cost }
 
@@ -224,7 +241,7 @@ added: 2026-11-07
 
     <!-- gen 2 -->
 
-    <div class="lu-fig"><svg class="lu-strip" viewBox="0 0 362 100" role="img" aria-label="ה-ISBN 0306406152: הספרות, המשקלים מ-10 עד 1 והמכפלות. הסכום 132, שהוא 12 כפול 11, ולכן המספר תקין"><rect class="lu-cell" x="65" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="94" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="123" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="152" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="181" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="210" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="239" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="268" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="297" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="326" y="5" width="27" height="90" rx="3"/><text class="lu-lab" x="58" y="25.4" direction="rtl" text-anchor="start">ספרה</text><text class="lu-t" x="78.5" y="25.4" text-anchor="middle">0</text><text class="lu-t" x="107.5" y="25.4" text-anchor="middle">3</text><text class="lu-t" x="136.5" y="25.4" text-anchor="middle">0</text><text class="lu-t" x="165.5" y="25.4" text-anchor="middle">6</text><text class="lu-t" x="194.5" y="25.4" text-anchor="middle">4</text><text class="lu-t" x="223.5" y="25.4" text-anchor="middle">0</text><text class="lu-t" x="252.5" y="25.4" text-anchor="middle">6</text><text class="lu-t" x="281.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="310.5" y="25.4" text-anchor="middle">5</text><text class="lu-t" x="339.5" y="25.4" text-anchor="middle">2</text><line class="lu-rule" x1="64" x2="354" y1="35" y2="35"/><text class="lu-lab" x="58" y="55.4" direction="rtl" text-anchor="start">משקל</text><text class="lu-t" x="78.5" y="55.4" text-anchor="middle">10</text><text class="lu-t" x="107.5" y="55.4" text-anchor="middle">9</text><text class="lu-t" x="136.5" y="55.4" text-anchor="middle">8</text><text class="lu-t" x="165.5" y="55.4" text-anchor="middle">7</text><text class="lu-t" x="194.5" y="55.4" text-anchor="middle">6</text><text class="lu-t" x="223.5" y="55.4" text-anchor="middle">5</text><text class="lu-t" x="252.5" y="55.4" text-anchor="middle">4</text><text class="lu-t" x="281.5" y="55.4" text-anchor="middle">3</text><text class="lu-t" x="310.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="339.5" y="55.4" text-anchor="middle">1</text><line class="lu-rule" x1="64" x2="354" y1="65" y2="65"/><text class="lu-lab" x="58" y="85.4" direction="rtl" text-anchor="start">מכפלה</text><text class="lu-t lu-sum" x="78.5" y="85.4" text-anchor="middle">0</text><text class="lu-t lu-sum" x="107.5" y="85.4" text-anchor="middle">27</text><text class="lu-t lu-sum" x="136.5" y="85.4" text-anchor="middle">0</text><text class="lu-t lu-sum" x="165.5" y="85.4" text-anchor="middle">42</text><text class="lu-t lu-sum" x="194.5" y="85.4" text-anchor="middle">24</text><text class="lu-t lu-sum" x="223.5" y="85.4" text-anchor="middle">0</text><text class="lu-t lu-sum" x="252.5" y="85.4" text-anchor="middle">24</text><text class="lu-t lu-sum" x="281.5" y="85.4" text-anchor="middle">3</text><text class="lu-t lu-sum" x="310.5" y="85.4" text-anchor="middle">10</text><text class="lu-t lu-sum" x="339.5" y="85.4" text-anchor="middle">2</text></svg></div>
+    <div class="lu-fig"><svg class="lu-strip" viewBox="0 0 362 100" role="img" aria-label="ה-ISBN 0306406152 : הספרות, המשקלים מ-10 עד 1 והמכפלות. הסכום 132, שהוא 12 כפול 11, ולכן המספר תקין"><rect class="lu-cell" x="65" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="94" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="123" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="152" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="181" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="210" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="239" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="268" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="297" y="5" width="27" height="90" rx="3"/><rect class="lu-cell" x="326" y="5" width="27" height="90" rx="3"/><text class="lu-lab" x="58" y="25.4" direction="rtl" text-anchor="start">ספרה</text><text class="lu-t" x="78.5" y="25.4" text-anchor="middle">0</text><text class="lu-t" x="107.5" y="25.4" text-anchor="middle">3</text><text class="lu-t" x="136.5" y="25.4" text-anchor="middle">0</text><text class="lu-t" x="165.5" y="25.4" text-anchor="middle">6</text><text class="lu-t" x="194.5" y="25.4" text-anchor="middle">4</text><text class="lu-t" x="223.5" y="25.4" text-anchor="middle">0</text><text class="lu-t" x="252.5" y="25.4" text-anchor="middle">6</text><text class="lu-t" x="281.5" y="25.4" text-anchor="middle">1</text><text class="lu-t" x="310.5" y="25.4" text-anchor="middle">5</text><text class="lu-t" x="339.5" y="25.4" text-anchor="middle">2</text><line class="lu-rule" x1="64" x2="354" y1="35" y2="35"/><text class="lu-lab" x="58" y="55.4" direction="rtl" text-anchor="start">משקל</text><text class="lu-t" x="78.5" y="55.4" text-anchor="middle">10</text><text class="lu-t" x="107.5" y="55.4" text-anchor="middle">9</text><text class="lu-t" x="136.5" y="55.4" text-anchor="middle">8</text><text class="lu-t" x="165.5" y="55.4" text-anchor="middle">7</text><text class="lu-t" x="194.5" y="55.4" text-anchor="middle">6</text><text class="lu-t" x="223.5" y="55.4" text-anchor="middle">5</text><text class="lu-t" x="252.5" y="55.4" text-anchor="middle">4</text><text class="lu-t" x="281.5" y="55.4" text-anchor="middle">3</text><text class="lu-t" x="310.5" y="55.4" text-anchor="middle">2</text><text class="lu-t" x="339.5" y="55.4" text-anchor="middle">1</text><line class="lu-rule" x1="64" x2="354" y1="65" y2="65"/><text class="lu-lab" x="58" y="85.4" direction="rtl" text-anchor="start">מכפלה</text><text class="lu-t lu-sum" x="78.5" y="85.4" text-anchor="middle">0</text><text class="lu-t lu-sum" x="107.5" y="85.4" text-anchor="middle">27</text><text class="lu-t lu-sum" x="136.5" y="85.4" text-anchor="middle">0</text><text class="lu-t lu-sum" x="165.5" y="85.4" text-anchor="middle">42</text><text class="lu-t lu-sum" x="194.5" y="85.4" text-anchor="middle">24</text><text class="lu-t lu-sum" x="223.5" y="85.4" text-anchor="middle">0</text><text class="lu-t lu-sum" x="252.5" y="85.4" text-anchor="middle">24</text><text class="lu-t lu-sum" x="281.5" y="85.4" text-anchor="middle">3</text><text class="lu-t lu-sum" x="310.5" y="85.4" text-anchor="middle">10</text><text class="lu-t lu-sum" x="339.5" y="85.4" text-anchor="middle">2</text></svg></div>
 
     ‏<span dir="ltr">0 + 27 + 0 + 42 + 24 + 0 + 24 + 3 + 10 + 2 = 132 = 12 · 11</span>.
 
@@ -249,12 +266,12 @@ added: 2026-11-07
     #### הקוד { .sol-code }
 
     === "Python"
-        ```python title="israeli_id_valid, isbn10_valid" linenums="1" hl_lines="10 21"
+        ```python title="israeli_id_valid, isbn10_valid" linenums="1" hl_lines="10 23"
         def israeli_id_valid(id_number):
             """An Israeli ID number: 9 digits, padded with zeros on the left; weights 1, 2, 1,
             2 ... from the left, a two-digit product counted as the sum of its digits."""
             s = id_number.strip().zfill(9)
-            if len(s) != 9 or not s.isdigit():
+            if len(s) != 9 or not (s.isascii() and s.isdigit()):
                 return False
             total = 0
             for i, c in enumerate(s):
@@ -267,7 +284,9 @@ added: 2026-11-07
             """ISBN-10: weights 10, 9 ... 1 from the left, the sum a multiple of 11; the
             check digit 10 is written X."""
             s = isbn.replace("-", "").replace(" ", "").upper()
-            if len(s) != 10 or not s[:9].isdigit() or not (s[9].isdigit() or s[9] == "X"):
+            if len(s) != 10 or not s.isascii() or not s[:9].isdigit():
+                return False
+            if not (s[9].isdigit() or s[9] == "X"):
                 return False
             values = [int(c) for c in s[:9]] + [10 if s[9] == "X" else int(s[9])]
             return sum((10 - i) * v for i, v in enumerate(values)) % 11 == 0   # (2)!
@@ -289,18 +308,20 @@ added: 2026-11-07
         endfunction
         ```
 
-        1. הסכום הגדול ביותר הוא \( 10 \cdot 55 = 550 \), הרבה פחות מהטווח של `int`.
+        1. הסכום לכל היותר \( 9 \cdot 54 + 10 = 496 \) (תשע ספרות של 9, ו-X במשקל 1), הרבה
+           פחות מהטווח של `int`.
 
     #### למה זה נכון { .sol-proof }
 
     **11 ראשוני.** אם ראשוני \( p \) מחלק מכפלה \( xy \), הוא מחלק את \( x \) או את \( y \).
     בטעות בספרה אחת \( x = w \) ו-\( y = b - a \), שניהם בין 1 ל-10 בערך מוחלט, ו-11 לא מחלק
     אף אחד מהם. בהחלפה \( x = w_i - w_j \) ו-\( y = b - a \), שוב שניהם בין 1 ל-10 בערך
-    מוחלט. לכן השינוי אף פעם לא כפולה של 11, וכל טעות כזו נתפסת, גם בין ספרות רחוקות.
+    מוחלט, גם כשאחת הספרות היא ה-X, שערכו 10 (ו-X שזז מהמקום האחרון נפסל כבר בצורה של
+    המספר). לכן השינוי אף פעם לא כפולה של 11, וכל טעות כזו נתפסת, גם בין ספרות רחוקות.
 
     **מה עולה הביטחון.** ספרה עשרונית אחת יכולה לקבל רק 10 ערכים, וספרת ביקורת מודולו 11
     צריכה 11. ה-X הוא המחיר : ISBN-13 החדש עבר למשקלים 1 ו-3 מודולו 10, כמו ברקוד, ושם
-    החלפה של שתי שכנות שההפרש ביניהן 5 חומקת.
+    5 מתוך 45 ההחלפות של שכנות חומקות, אלה שההפרש בין שתי הספרות הוא 5.
 
     #### סיבוכיות { .sol-cost }
 
@@ -321,8 +342,8 @@ added: 2026-11-07
     כדי לתפוס כל טעות בספרה אחת, איזה משקלים מותרים? נסו 2 ו-5, וחשבו על הפרש של 5 או של 2.
 
 ??? tip "רמז 2"
-    לתמורות : אם \( g(d) \) עוברת על כל השאריות מ-0 עד 9, מה הסכום של \( g(0) + \dots + g(9) \)
-    מודולו 10? וכמה הוא יוצא כש-\( g \) היא הפרש של שתי תמורות?
+    לתמורות : אם פונקציה \( g(d) \) עוברת על כל השאריות מ-0 עד 9, מה הסכום
+    \( g(0) + \dots + g(9) \) מודולו 10?
 
 ??? success "פתרון סעיף ג"
     !!! answer "תשובה בקצרה"
@@ -404,15 +425,27 @@ added: 2026-11-07
     הסעיף, כל שיטה מהסוג הזה מפספסת לפחות זוג אחד, ולכן אחד הוא המינימום.
 
     **למה זה לא עובד מודולו 10 ועובד מודולו 11.** הסתירה נשענת על כך ש-\( 45 \) אינו כפולה
-    של 10. מודולו 11 \( 0 + 1 + \dots + 10 = 55 \equiv 0 \), ואין סתירה : \( g(d) = d \) עם
-    המשקלים \( w \) ו-\( w + 1 \) עוברת על כל השאריות. באופן כללי, מודולו מספר אי-זוגי יש
+    של 10. מודולו 11 \( 0 + 1 + \dots + 10 = 55 \equiv 0 \), ואין סתירה : עם שני משקלים
+    שכנים \( w + 1 \) ו-\( w \), כמו ב-ISBN, \( g(d) = d \) עוברת על כל השאריות. באופן כללי, מודולו מספר אי-זוגי יש
     תמורה כזו, ומודולו מספר זוגי אין.
 
     **איך עוקפים בלי X.** ‏Verhoeff ו-Damm לא סוכמים בכלל : Verhoeff מחשב בחבורה שאינה
     חילופית, ו-Damm בטבלה של 10 על 10. שתיהן תופסות כל טעות בספרה אחת וכל החלפה של שכנות
     עם ספרת ביקורת עשרונית אחת. השאלות בסוף העמוד חוזרות לזה.
 
-    <div class="explorer" data-kind="luhn" data-number="4111111111109115" data-scheme="w12" data-map="single"></div>
+    **נסו בקופסה**, שהמפות שלה מראות כאן טעות בספרה אחת במקום מוכפל :
+
+    - במפה של Luhn אין אף × : 0 מתוך 90. במפה של המשקלים 1 ו-2 יש עשרה, כל זוג שההפרש
+      שלו 5.
+    - הספרה 1 משמאל היא 4, במקום מוכפל. לחצו "שינוי הספרה", כשהספרה החדשה 9 : ב-Luhn הסכום
+      עולה מ-40 ל-41 והטעות נתפסת. במשקלים 1 ו-2 הסכום זז ב-10, והיא חומקת : התא
+      <span dir="ltr">(4, 9)</span> מסומן ב-×.
+    - שנו את "המפות" ל"החלפה של שתי שכנות" : עכשיו Luhn מפספס 1 מתוך 45, והמשקלים 1 ו-2
+      אף אחת. ב-EAN-13 חומקות 5, ורק ב-ISBN-10 שתי המפות ריקות.
+
+    מעבר לטבלה, הקופסה בודקת את אותה טעות בשתי שיטות זו לצד זו, על מספר שתבחרו.
+
+    <div class="explorer" data-kind="luhn" data-number="4111111111109115" data-scheme="w12" data-map="single" data-new="9"></div>
 
     #### סיבוכיות { .sol-cost }
 
@@ -434,8 +467,8 @@ added: 2026-11-07
     מה הבודק צריך לזכור בין ספרה לספרה? לא את כל הסכום.
 
 ??? tip "רמז 2"
-    באילוצים קשה לכתוב "מכפילים, ואם יצא יותר מ-9 מחסרים 9" בתוך סכום. הוסיפו מערך עזר
-    אקראי של מה שכל ספרה מוסיפה, עם אילוץ לכל איבר.
+    אילוץ הוא לא קוד : אין בו `if` שמשנה ערך בתוך סכום. איך בכל זאת כותבים "מכפילים, ואם
+    יצא יותר מ-9 מחסרים 9"? חשבו על משתנה אקראי נוסף.
 
 ??? success "פתרון סעיף ד"
     !!! answer "תשובה בקצרה"
@@ -443,15 +476,26 @@ added: 2026-11-07
         מוסיפה \( d \) או \( D(d) \), והסכום נשאר קטן מ-10 בעזרת חיסור של 10. במחלקה, מערך
         עזר `c` מחזיק את מה שכל ספרה מוסיפה, ואילוץ על `c.sum()` מודולו 10 קובע אם המספר
         תקין. הבדיקה מריצה מספרים אקראיים, וכל טעות בספרה אחת וכל החלפה של שכנות במספרי
-        דוגמה, ומשווה את הבודק למודל.
+        דוגמה, ומשווה את הבודק למודל. assertions שומרות על הפרוטוקול, ו-covergroup מראה
+        שכל ספרה הגיעה לכל סוג של מקום.
 
-    <!-- cost: זמן \( O(n) \) מחזורים | זיכרון 5 ביטים -->
+    <!-- cost: זמן \( O(n) \) מחזורים | זיכרון 5 ביטים של מצב -->
 
     #### הרעיון { .sol-idea }
 
     הבודק זוכר רק את מה שישפיע על התשובה : השארית של הסכום מודולו 10, ואם המקום הבא מוכפל.
     \( (s + x) \bmod 10 \) תלוי רק ב-\( s \bmod 10 \), ולכן אין צורך בסכום המלא. הגירוי
     מייצר גם מספרים לא תקינים בכוונה, ומעליהם טעויות שהמודל יודע מראש אם הן נתפסות.
+
+    <!-- gen 4 -->
+
+    <div class="lu-fig"><svg class="figure lu-dp" viewBox="0 0 400 444" direction="ltr" style="max-width:25rem" role="img" aria-label="תרשים המלבנים של הבודק : שני רגיסטרים, sum של 4 ביטים ו-dbl של ביט אחד. start מכניס 0 במקום שניהם. לפי d0 בוחרים בין הספרה לבין D של הספרה, מחבר של 5 ביטים מוסיף את זה לסכום, ואם יצא 10 או יותר מחסרים 10. התוצאה נכתבת ל-sum, ההפך של d0 נכתב ל-dbl, ועם last נכתב ok, אם התוצאה 0, ו-done עולה במחזור הבא"><defs><marker id="lu-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path class="lu-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs><g class="lu-blk lu-reg"><rect x="44" y="14" width="110" height="44" rx="5"/><text x="99" y="34" text-anchor="middle">sum</text><text class="lu-sub" x="99" y="49" text-anchor="middle">4 flip-flops</text></g><g class="lu-blk lu-reg"><rect x="246" y="14" width="110" height="44" rx="5"/><text x="301" y="34" text-anchor="middle">dbl</text><text class="lu-sub" x="301" y="49" text-anchor="middle">1 flip-flop</text></g><g class="lu-blk"><rect x="14" y="86" width="172" height="34" rx="5"/><text x="100" y="108" text-anchor="middle">s0 = start ? 0 : sum</text></g><g class="lu-blk"><rect x="214" y="86" width="172" height="34" rx="5"/><text x="300" y="108" text-anchor="middle">d0 = start ? 0 : dbl</text></g><path class="lu-wire" d="M99,58 L99,86" marker-end="url(#lu-hb)"/><path class="lu-wire" d="M301,58 L301,86" marker-end="url(#lu-hb)"/><text class="lu-wlab" x="200" y="26" text-anchor="middle">digit[3:0]</text><path class="lu-wire" d="M200,32 L200,150" marker-end="url(#lu-hb)"/><g class="lu-blk"><rect x="80" y="150" width="240" height="44" rx="5"/><text x="200" y="170" text-anchor="middle">add = d0 ? D(digit) : digit</text><text class="lu-sub" x="200" y="185" text-anchor="middle">D: 0 2 4 6 8 1 3 5 7 9</text></g><path class="lu-wire" d="M300,120 L300,150" marker-end="url(#lu-hb)"/><g class="lu-blk"><rect x="20" y="222" width="360" height="44" rx="5"/><text x="200" y="242" text-anchor="middle">total = s0 + add</text><text class="lu-sub" x="200" y="257" text-anchor="middle">≤ 18, 5 bits</text></g><path class="lu-wire" d="M40,120 L40,222" marker-end="url(#lu-hb)"/><path class="lu-wire" d="M200,194 L200,222" marker-end="url(#lu-hb)"/><g class="lu-blk"><rect x="20" y="294" width="360" height="44" rx="5"/><text x="200" y="314" text-anchor="middle">total ≥ 10 ? total − 10 : total</text><text class="lu-sub" x="200" y="329" text-anchor="middle">0 .. 9</text></g><path class="lu-wire" d="M200,266 L200,294" marker-end="url(#lu-hb)"/><path class="lu-wire" d="M20,316 L6,316 L6,36 L44,36" marker-end="url(#lu-hb)"/><path class="lu-wire" d="M386,103 L394,103 L394,36 L356,36" marker-end="url(#lu-hb)"/><text class="lu-wlab" x="388" y="76" text-anchor="end">~d0</text><g class="lu-blk lu-out"><rect x="20" y="366" width="172" height="44" rx="5"/><text x="106" y="386" text-anchor="middle">ok</text><text class="lu-sub" x="106" y="401" text-anchor="middle">total == 0, with last</text></g><g class="lu-blk lu-out"><rect x="208" y="366" width="172" height="44" rx="5"/><text x="294" y="386" text-anchor="middle">done</text><text class="lu-sub" x="294" y="401" text-anchor="middle">in_valid &amp; last</text></g><path class="lu-wire" d="M106,338 L106,366" marker-end="url(#lu-hb)"/><text class="lu-sub" x="200" y="432" text-anchor="middle">one clock: the table D, a 5-bit adder, minus 10</text></svg></div>
+
+    <span class="viz-legend"><span><i class="lu-key-dbl"></i><span>רגיסטר של המצב</span></span><span><i class="lu-key-ok"></i><span>רגיסטר של יציאה</span></span></span>
+
+    <!-- /gen -->
+
+    כל הנתיב עובר בשעון אחד : הטבלה \( D \), מחבר אחד וחיסור אחד של 10.
 
     #### השלבים { .sol-steps }
 
@@ -465,9 +509,26 @@ added: 2026-11-07
     4. **הגירוי :** `d[0]` היא ספרת הביקורת. `c[i]` שווה ל-`d[i]` במקום רגיל ול-\( D(d_i) \)
        במקום מוכפל, ו-`valid` קובע אם הסכום מתחלק ב-10.
     5. **הבדיקה :** לכל מספר שהוגרל, הבודק מסכים עם `luhn_ok`. בכל מספר דוגמה : כל 144 הטעויות
-       הבודדות נתפסות, ובהחלפות של שכנות הבודק מסכים עם המודל, כולל ההחלפה של 0 ו-9 שחומקת.
+       הבודדות נתפסות, ובהחלפות של שכנות הבודק מסכים עם המודל.
+    6. **הפרוטוקול :** הגירוי מגריל גם מחזורים ריקים בין הספרות (`gap`), והבדיקה מוסיפה
+       reset באמצע מספר ו-`start` חדש לפני `last`. המודול `luhn_sva` מחזיק שלוש assertions
+       ו-covergroup, והבדיקה נגמרת רק כשהכיסוי מלא.
 
     </div>
+
+    המספר <span dir="ltr">7997</span> (תקין, סכום 30) נכנס ספרה בכל שעון, מימין :
+
+    <!-- gen 5 -->
+
+    | שעון | הספרה | אות | ‏`d0` | ‏`add` | ‏`s0 + add` | ‏`sum` אחריו | המקום |
+    |:-:|:-:|:-:|:-:|:-:|:-:|:-:|---|
+    | 1 | 7 | ‏`start` | 0 | 7 | 7 | 7 | רגיל |
+    | 2 | 9 |  | 1 | 9 | 16 | 6 | מוכפל, פחות 10 |
+    | 3 | 9 |  | 0 | 9 | 15 | 5 | רגיל, פחות 10 |
+    | 4 | 7 | ‏`last` | 1 | 5 | 10 | 0 | מוכפל, פחות 10 |
+    | 5 | | | | | | 0 | ‏`done`, `ok = 1` |
+
+    <!-- /gen -->
 
     #### הקוד { .sol-code }
 
@@ -542,29 +603,65 @@ added: 2026-11-07
         1. ‏\( D \) בחומרה : הכפלה היא הזזה ב-1, והחיסור של 9 קורה רק מ-5 ומעלה.
         2. ‏\( s_0 \le 9 \) ו-\( \text{add} \le 9 \), אז הסכום עד 18, וחיסור אחד של 10 מספיק.
 
-        ```systemverilog title="class luhn_gen" linenums="1" hl_lines="10 11 12 15 16"
+        ```systemverilog title="class luhn_gen" linenums="1" hl_lines="9 12 13 14 17 18"
         // Random 16-digit card numbers, valid or not as `valid` says; d[0] is the check
         // digit (place 1, the rightmost) and d[15] the leftmost digit
         class luhn_gen;
           rand bit [3:0] d[16];
           rand bit [4:0] c[16];             // what each digit adds to the sum
+          rand bit [1:0] gap[16];           // idle clocks before each digit
           rand bit       valid;
           constraint digits_c { foreach (d[i]) d[i] < 10; }
+          constraint gap_c { foreach (gap[i]) gap[i] dist {0 := 3, [1:3] := 1}; }   // (1)!
           constraint adds_c {
             foreach (d[i])
-              if (i % 2 == 0) c[i] == d[i];                // (1)!
+              if (i % 2 == 0) c[i] == d[i];                // (2)!
               else if (d[i] < 5) c[i] == 2 * d[i];
               else c[i] == 2 * d[i] - 9;
           }
           constraint sum_c {
             valid -> (c.sum() with (int'(item))) % 10 == 0;
-            !valid -> (c.sum() with (int'(item))) % 10 != 0;   // (2)!
+            !valid -> (c.sum() with (int'(item))) % 10 != 0;   // (3)!
           }
         endclass
         ```
 
-        1. ‏`i` מתחיל ב-0, ולכן המקום מימין הוא `i + 1` : `i` זוגי הוא מקום אי-זוגי, שלא מוכפל.
-        2. ‏`int'(item)` לפני הסכום, אחרת הסכום מחושב ברוחב של 5 ביטים ונחתך.
+        1. חצי מהספרות באות מיד, והשאר אחרי מחזור ריק אחד עד שלושה. בודק שעובד רק כשהספרות
+           צמודות לא שומר נכון את המצב בזמן ש-`in_valid` יורד.
+        2. ‏`i` מתחיל ב-0, ולכן המקום מימין הוא `i + 1` : `i` זוגי הוא מקום אי-זוגי, שלא מוכפל.
+        3. ‏`int'(item)` לפני הסכום, אחרת הסכום מחושב ברוחב של 5 ביטים ונחתך.
+
+        ```systemverilog title="module luhn_sva" linenums="1" hl_lines="10 11 12 17"
+        // bound to luhn_checker: what the inputs must keep, what the outputs promise, and the
+        // cases a test has to reach
+        module luhn_sva (
+          input logic       clk, rst_n, in_valid, start, last,
+          input logic [3:0] digit, sum,
+          input logic       dbl, done, ok);
+          int  fails = 0;
+          wire d0 = start ? 1'b0 : dbl;     // the place of this digit is doubled
+          default clocking @(posedge clk); endclocking
+          a_digit: assert property (disable iff (!rst_n) in_valid |-> digit <= 9) else fails++;   // (1)!
+          a_sum:   assert property (disable iff (!rst_n) sum <= 9) else fails++;
+          a_done:  assert property (disable iff (!rst_n) done == $past(in_valid && last)) else fails++;
+
+          covergroup cg @(posedge clk iff rst_n);
+            cp_digit: coverpoint digit iff (in_valid) { bins d[] = {[0:9]}; }
+            cp_dbl:   coverpoint d0 iff (in_valid) { bins plain = {0}; bins doubled = {1}; }
+            x_place:  cross cp_digit, cp_dbl;                                    // (2)!
+            cp_len:   coverpoint d0 iff (in_valid && last) { bins odd = {0}; bins even = {1}; }   // (3)!
+            cp_ok:    coverpoint ok iff (done) { bins bad = {0}; bins good = {1}; }
+          endgroup
+          cg cov = new();
+        endmodule
+        ```
+
+        1. הנחה על הסביבה, לא על הבודק : הוא לא בודק את הספרה. 15 במקום מוכפל היה מוסיף
+           \( 2 \cdot 15 - 9 = 21 \), הסכום היה מגיע עד 30, וחיסור אחד של 10 כבר לא מספיק.
+        2. ‏20 תאים : כל ספרה במקום רגיל ובמקום מוכפל. בלי זה אי אפשר לדעת שכל הטבלה
+           \( D \) נבדקה.
+        3. ‏`d0` של הספרה האחרונה אומר אם האורך זוגי (16 ספרות) או אי-זוגי (15, כמו
+           American Express) : המלכודת של הספירה משמאל.
 
     #### למה זה נכון { .sol-proof }
 
@@ -581,12 +678,16 @@ added: 2026-11-07
 
     **מה הבדיקה מכסה.** מספרים אקראיים בודקים את הנתיב הרגיל. הטעויות שנוצרות בכוונה בודקות
     בדיוק את המקרים שהשאלה עוסקת בהם, כולל ההחלפה היחידה שחומקת : ב-<span dir="ltr">4111 1111 1110 9115</span>
-    הבודק חייב להגיד "תקין" גם אחרי ההחלפה של ה-0 וה-9, כי גם המודל אומר את זה.
+    הבודק חייב להגיד "תקין" גם אחרי ההחלפה של ה-0 וה-9, כי גם המודל אומר את זה. טעויות בנתונים
+    לא מספיקות : המחזורים הריקים, ה-reset באמצע מספר וה-`start` שקוטע מספר בודקים שהמצב
+    נשמר ומתאפס בזמן הנכון. ה-covergroup עונה על "איך יודעים שבדקנו מספיק" : 20 התאים של
+    ספרה ומקום, שני האורכים ושתי התשובות.
 
     #### סיבוכיות { .sol-cost }
 
-    מחזור אחד לספרה, 16 מחזורים לכרטיס ועוד אחד לתשובה. המצב 5 פליפ-פלופים, ובנתיב יש
-    מחבר של 5 ביטים, השוואה ל-10 וטבלה של \( D \).
+    מחזור אחד לספרה, 16 מחזורים לכרטיס ועוד אחד לתשובה. 5 ביטים של מצב ועוד 2 ביטים של
+    יציאה (`done`, `ok`), כלומר 7 פליפ-פלופים, ובנתיב יש מחבר של 5 ביטים, השוואה ל-10
+    וטבלה של \( D \).
 
 ## נקודות חשובות ושאלות המשך
 
@@ -623,10 +724,19 @@ added: 2026-11-07
             אף אחת. \( a \) ו-\( c \) באותו סוג של מקום, שניהם מוכפלים או שניהם לא, אז
             ההחלפה ביניהן לא משנה את הסכום. ‏ISBN-10 תופס גם אותן.
 
+    - **חצי תקינים בלי `with` :** איך גורמים ל-`randomize()` של `luhn_gen` לתת מספר תקין
+      בחצי מהקריאות, בלי לקבוע את `valid` מבחוץ?
+
+        ??? fu-answer "תשובה"
+            מוסיפים למחלקה `constraint order_c { solve valid before d, c; }`. הפותר בוחר קודם
+            את `valid`, 0 או 1 בסיכוי שווה, ורק אחר כך ספרות שמתאימות לו. קבוצת הפתרונות לא
+            משתנה, רק ההתפלגות : בלי השורה הזו רק עשירית מהמספרים תקינים.
+
     - **‏Damm :** איך ספרת ביקורת עשרונית אחת תופסת כל טעות בודדת וכל החלפה של שכנות?
 
         ??? fu-answer "תשובה"
             מחליפים את הסכום בטבלה \( T \) של 10 על 10 : \( s \leftarrow T[s][d] \) לכל ספרה,
             והמספר תקין אם \( s = 0 \). הטבלה בנויה כך שכל שורה וכל עמודה הן תמורה (טעות
             בודדת נתפסת), ו-\( T[T[s][a]][b] \ne T[T[s][b]][a] \) כש-\( a \ne b \) (החלפה
-            נתפסת). זו לא חבורה חילופית, ולכן ההוכחה של סעיף ג לא חלה עליה.
+            נתפסת). זה בכלל לא סכום מודולו 10 : הטבלה היא ריבוע לטיני, לא חיבור בחבורה, ולכן
+            ההוכחה של סעיף ג לא חלה עליה.

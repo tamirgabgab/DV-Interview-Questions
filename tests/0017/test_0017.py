@@ -51,6 +51,74 @@ def test_every_input_up_to_n4():
                 assert f(nums) in dups, (f.__name__, nums)
 
 
+def test_several_duplicates_and_the_page_numbers():
+    """The numbers the page states (review round 7): different solutions return different
+    duplicates; the count above the line is not monotonic; the steps of the binary search
+    are at most ceil(log2 n); the hardware answer's bits and per-pass table; the sign-flip
+    follow-up reports a value that appears k times k - 1 times."""
+    import math
+    count = lambda nums, v: sum(1 for x in nums if x <= v)
+    assert [f([1, 1, 4, 4, 4]) for f in SOLUTIONS] == [1, 1, 4, 1]
+    assert [count([1, 1, 4, 4, 4], v) for v in range(1, 5)] == [2, 2, 2, 5]
+    assert ns["find_duplicate_binary"]([3, 3, 4, 4, 1]) == 4 and count([3, 3, 4, 4, 1], 3) == 3
+    assert ns["find_duplicate_binary"]([2, 2, 2, 1]) == 2 and count([2, 2, 2, 1], 1) == 1
+
+    def passes(nums):                       # (lo, hi, mid, count) of every step
+        lo, hi, rows = 1, len(nums) - 1, []
+        while lo < hi:
+            mid = (lo + hi) // 2
+            rows.append((lo, hi, mid, count(nums, mid)))
+            lo, hi = (lo, mid) if rows[-1][3] > mid else (mid + 1, hi)
+        return rows
+    assert passes(EXAMPLE) == [(1, 9, 5, 6), (1, 5, 3, 4), (1, 3, 2, 3), (1, 2, 1, 2)]
+    assert [r[2] for r in passes([1, 2, 3, 4, 5, 6, 6])] == [3, 5]          # two steps, both go up
+    rng = random.Random(7)
+    for n in list(range(1, 40)) + [100, 1000]:
+        for _ in range(60):
+            assert len(passes(random_case(rng, n))) <= math.ceil(math.log2(n))
+    bits = lambda n: 2 * math.ceil(math.log2(n + 1)) + math.ceil(math.log2(n + 2))
+    assert bits(9) == 12 and bits(1000) == 30
+
+    # counting only lo..mid is right when it is compared with mid - lo + 1, and wrong with mid
+    def ranged(nums, against_mid):
+        lo, hi = 1, len(nums) - 1
+        while lo < hi:
+            mid = (lo + hi) // 2
+            c = sum(1 for x in nums if lo <= x <= mid)
+            lo, hi = (lo, mid) if c > (mid if against_mid else mid - lo + 1) else (mid + 1, hi)
+        return lo
+    import itertools
+    for n in range(1, 6):
+        for nums in itertools.product(range(1, n + 1), repeat=n + 1):
+            assert nums.count(ranged(nums, False)) >= 2
+    assert [1, 1, 3, 3, 3].count(ranged([1, 1, 3, 3, 3], True)) < 2
+
+    def all_duplicates(nums):               # the sign-flip follow-up
+        nums, out = list(nums), []
+        for v in nums:
+            if nums[abs(v)] < 0:
+                out.append(abs(v))
+            else:
+                nums[abs(v)] = -nums[abs(v)]
+        return out
+    assert all_duplicates([2, 2, 2, 1]) == [2, 2]
+
+    # the box's tasks: (mu, lambda, iterations of phase 1) and the arrows into the entry
+    def rho(nums):
+        seen, x = {}, 0
+        while x not in seen:
+            seen[x] = len(seen)
+            x = nums[x]
+        slow = fast = t = 0
+        while True:
+            slow, fast, t = nums[slow], nums[nums[fast]], t + 1
+            if slow == fast:
+                return seen[x], len(seen) - seen[x], t
+    assert rho(EXAMPLE) == (3, 4, 4)
+    assert rho([1, 2, 3, 4, 5, 6, 1]) == (1, 6, 6) and rho([1, 2, 3, 4, 5, 6, 6]) == (6, 1, 6)
+    assert [2, 2, 2, 1].count(2) == 3
+
+
 def test_floyd_is_linear():
     # count the steps: phase 1 at most mu + lambda, phase 2 mu, so at most 2(n + 1)
     rng = random.Random(1)

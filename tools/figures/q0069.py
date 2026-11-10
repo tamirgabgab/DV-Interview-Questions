@@ -9,13 +9,16 @@ The references here are independent of the page code: brute_passed(), brute_over
 and brute_inversions() count every pair; Fen is a small Fenwick tree that records the
 cells each query and update touched; walk_passed(), walk_overtook() and walk_live() replay
 the three walks step by step (the rows of the tables and the frames of the overtakes
-explorer); lis_length(), min_swaps() and max_distance() are the follow-ups. blocks()
-returns, in page order: the crossing-lines figure of the example with its legend, the
-Fenwick array of n = 8 with the ranges its cells cover, the table of part a's walk, the
-two arrays side by side, the table of part b's walk and the table of part c's stream.
+explorer); lis_length(), min_swaps() and max_distance() are the follow-ups. hw_rows() is
+the RTL monitor of part c clock by clock (a bit per answered request, a popcount of the bits
+above the response's own). blocks() returns, in page order: the crossing-lines figure of the
+example with its legend, the Fenwick array of n = 8 with the ranges its cells cover, the
+table of part a's walk, the two arrays side by side, the table of part b's walk, the table
+of part c's stream, and the monitor's block diagram, its legend and its table per clock.
 """
 
-from bisect import bisect_left
+from bisect import bisect_right
+from html import escape
 
 RLM = "‏"
 NB = " "
@@ -116,21 +119,48 @@ def walk_live(done):
     ft = Fen(n)
     rows, total = [], 0
     pairs = n * (n - 1) // 2
+    arrived, head = set(), 0
     for k, i in enumerate(arrival_order(done)):
         q, qpath = ft.prefix(i + 1)
         upath = ft.add(i + 1)
         total += k - q
+        # a reorder buffer that delivers in send order: it takes the response and hands on
+        # the head while it has it; held is what still waits, for the request `head`
+        arrived.add(i)
+        while head in arrived:
+            arrived.remove(head)
+            head += 1
         rows.append({"k": k, "i": i, "v": done[i], "rank": i + 1, "inserted": k, "arg": i + 1, "q": q,
                      "qpath": qpath, "upath": upath, "count": k - q, "total": total,
-                     "disorder": total / pairs if pairs else 0.0, "tree": ft.tree[1:]})
+                     "disorder": total / pairs if pairs else 0.0, "tree": ft.tree[1:],
+                     "held": len(arrived), "head": head})
+    return rows
+
+
+def hw_rows(done):
+    """The RTL monitor of part c on a trace with one response per clock (distinct times):
+    a row per response, with the clock, the request, the vector `answered` before and after
+    the edge (bit i is request i), the answered bits above the request (its passed), and
+    the registers max_passed and total after the edge."""
+    assert len(set(done)) == len(done)
+    answered, mx, total, rows = 0, 0, 0, []
+    for i in arrival_order(done):
+        above = answered >> (i + 1)
+        p = bin(above).count("1")
+        before, answered = answered, answered | (1 << i)
+        mx, total = max(mx, p), total + p
+        rows.append({"clk": done[i], "seq": i, "before": before, "above": above << (i + 1), "passed": p,
+                     "after": answered, "max": mx, "total": total})
     return rows
 
 
 def lis_length(done):
-    """The longest chain of requests answered in their send order (patience sorting)."""
+    """The longest chain of requests answered in their send order, none overtaking another:
+    the longest non-decreasing subsequence, since an equal time is not an overtake (patience
+    sorting, the first tail that is larger)."""
     tails = []
     for v in done:
-        p = bisect_left(tails, v)
+        p = bisect_right(tails, v)
         if p == len(tails):
             tails.append(v)
         else:
@@ -201,9 +231,11 @@ def cross_svg(done, counts, name, label):
         s += f'<text class="tick" x="{cx(i):g}" y="12" text-anchor="middle">{i}</text>'
     # the lines first, so the cells cover their ends
     for i in range(n):
-        cross = sum(1 for j in range(n) if (j > i and done[j] < done[i]) or (j < i and done[j] > done[i]))
-        s += (f'<line class="ov-line{" is-cross" if cross else ""}" x1="{cx(i):g}" y1="48" x2="{cx(pos[i]):g}" y2="94">'
-              f'<title>request {i}: sent in slot {i}, answered at {done[i]}, slot {pos[i]} of the answers; {cross} overtakes on its line</title></line>')
+        p = sum(1 for j in range(i + 1, n) if done[j] < done[i])
+        o = sum(1 for j in range(i) if done[j] > done[i])
+        s += (f'<line class="ov-line{" is-cross" if p + o else ""}" x1="{cx(i):g}" y1="48" x2="{cx(pos[i]):g}" y2="94">'
+              f'<title>request {i}: sent in slot {i}, answered at {done[i]}, slot {pos[i]} of the answers; its line is crossed '
+              f'{p + o} times: passed {p} + overtook {o}</title></line>')
     for i, v in enumerate(done):
         s += (f'<g class="ov-cell is-req"><title>request {i}, answered at time {v}</title>'
               f'<rect x="{LW + i * CELL + 4}" y="20" width="{CELL - 8}" height="28" rx="4"/>'
@@ -270,6 +302,79 @@ def fenwick_svg(n=8, tree=None, qpath=(), upath=(), label=None, under=None, live
 def fenwick_legend():
     return ('<span class="viz-legend"><span><i class="ov-key-bar"></i>הטווח שהתא מכסה, באורך הביט הדולק הנמוך של i</span>'
             '<span><i class="ov-key-q"></i>תאים שהשאילתה קוראת</span><span><i class="ov-key-u"></i>תאים שהעדכון מגדיל</span></span>')
+
+
+# --- the RTL monitor ------------------------------------------------------------------------
+
+HW_W, HW_H = 560, 244
+# (x, y, w, h, stage, title, sub): stage 1 is the query (blue), 2 the update (orange)
+HW_BLOCKS = [
+    (86, 20, 116, 44, 0, "seq_of_tag", "[rsp_tag]"),
+    (290, 20, 100, 44, 1, ">> seq+1", "bits above"),
+    (418, 20, 110, 44, 1, "popcount", ""),
+    (280, 110, 120, 44, 2, "answered", "N bits"),
+    (418, 110, 110, 44, 0, "max_passed", "max"),
+    (418, 190, 110, 44, 0, "total", "+= passed"),
+]
+# (points, arrow, label, label x, label y, anchor)
+HW_WIRES = [
+    ([(6, 42), (86, 42)], True, "rsp_tag", 8, 34, "start"),
+    ([(202, 42), (290, 42)], True, "rsp_seq", 210, 34, "start"),
+    ([(246, 42), (246, 132), (280, 132)], True, "set bit", 238, 128, "end"),
+    ([(340, 110), (340, 64)], True, "", 0, 0, ""),
+    ([(390, 42), (418, 42)], True, "", 0, 0, ""),
+    ([(528, 42), (556, 42)], True, "passed", 556, 14, "end"),
+    ([(542, 42), (542, 212), (528, 212)], True, "", 0, 0, ""),
+    ([(542, 132), (528, 132)], True, "", 0, 0, ""),
+]
+HW_DOTS = [(246, 42), (542, 42), (542, 132)]
+
+
+def hw_diagram():
+    """The block diagram of the monitor ooo_monitor: the tag looked up to the request's send
+    number, the vector `answered`, the bits above the request counted, a maximum register
+    and a running sum."""
+    label = ("תרשים המלבנים של המוניטור" + NB + ": הטבלה seq_of_tag הופכת את ה-tag של התשובה למספר השליחה rsp_seq, "
+             "הווקטור answered מוזז ימינה ב-seq + 1 כך שנשארים הביטים שמעל הבקשה, ‏popcount סופר אותם ונותן את passed, "
+             "ובאותו מחזור הביט rsp_seq של answered נדלק, max_passed שומר את המקסימום ו-total את הסכום")
+    o = [f'<svg class="figure ov-dp" viewBox="0 0 {HW_W} {HW_H}" direction="ltr" style="max-width:{HW_W / 16:g}rem" '
+         f'role="img" aria-label="{escape(label)}">',
+         '<defs><marker id="ov-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" '
+         'markerHeight="9" orient="auto"><path class="ov-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs>']
+    for x, y, w, h, stage, title, sub in HW_BLOCKS:
+        ty = y + h / 2 + (-3 if sub else 5)
+        cls = f" ov-st{stage}" if stage else ""
+        o.append(f'<g class="ov-blk{cls}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="5"/>'
+                 f'<text x="{x + w / 2:g}" y="{ty:g}" text-anchor="middle">{escape(title)}</text>'
+                 + (f'<text class="ov-sub" x="{x + w / 2:g}" y="{y + h / 2 + 14:g}" text-anchor="middle">{escape(sub)}</text>' if sub else "")
+                 + "</g>")
+    for pts, arrow, lab, lx, ly, anchor in HW_WIRES:
+        d = "M" + " L".join(f"{x:g},{y:g}" for x, y in pts)
+        head = ' marker-end="url(#ov-hb)"' if arrow else ""
+        o.append(f'<path class="ov-wire" d="{d}"{head}/>')
+        if lab:
+            o.append(f'<text class="ov-wlab" x="{lx}" y="{ly}" text-anchor="{anchor}">{escape(lab)}</text>')
+    o += [f'<circle class="ov-dot" cx="{x}" cy="{y}" r="3.5"/>' for x, y in HW_DOTS]
+    return "".join(o) + "</svg>"
+
+
+def hw_legend():
+    return ('<span class="viz-legend"><span><i class="ov-key-q"></i>השאילתה' + NB + ': הביטים שמעל הבקשה, וספירתם</span>'
+            '<span><i class="ov-key-u"></i>העדכון' + NB + ': הביט של הבקשה נדלק</span>'
+            '<span><i class="ov-key-req"></i>הטבלה מ-tag למספר השליחה, המקסימום והסכום</span></span>')
+
+
+def hw_table(done):
+    """The monitor on the example, a row per response (the clock is the response's time);
+    the vectors are written with bit n - 1 on the left."""
+    n = len(done)
+    bits = lambda v: f"{RLM}`{v:0{n}b}`"
+    out = [f"| מחזור | {RLM}rsp_seq | {RLM}answered לפני | הביטים שמעל | {RLM}passed | {RLM}answered אחרי | {RLM}max_passed | {RLM}total |",
+           "|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|"]
+    for r in hw_rows(done):
+        out.append(f"| {RLM}{r['clk']} | {RLM}{r['seq']} | {bits(r['before'])} | {bits(r['above'])} | **{RLM}{r['passed']}** | "
+                   f"{bits(r['after'])} | {RLM}{r['max']} | {RLM}{r['total']} |")
+    return "\n".join(out)
 
 
 # --- tables ---------------------------------------------------------------------------------
@@ -341,6 +446,9 @@ def blocks():
         table_side(DONE),
         table_overtook(DONE),
         table_live(DONE),
+        hw_diagram(),
+        hw_legend(),
+        hw_table(DONE),
     ]
 
 

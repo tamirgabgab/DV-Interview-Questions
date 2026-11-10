@@ -1,0 +1,29 @@
+/* Question 0013, sort four digits and subtract: the sorting network of part a
+   (tools/figures/q0013.py, sn-net) and the kap4base box of the bonus on one screen. The
+   network's wires and comparators are ink on the page; a comparator that swapped is in the
+   path colour. Colours from the palette only. */
+
+.md-typeset svg.sn-net { display: block; margin: 0.8rem auto 0.3rem; }
+.md-typeset svg .sn-wire { stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg .sn-sep { stroke: var(--viz-grid); stroke-width: 1; stroke-dasharray: 4 4; }
+.md-typeset svg .sn-cmp line { stroke: var(--viz-ink); stroke-width: 2.5; }
+.md-typeset svg .sn-cmp circle { fill: var(--viz-ink); }
+.md-typeset svg .sn-cmp.is-swap line { stroke: var(--viz-s2); }
+.md-typeset svg .sn-cmp.is-swap circle { fill: var(--viz-s2); }
+.md-typeset svg :is(.sn-name, .sn-val, .sn-layer) { fill: var(--viz-ink); font-family: var(--md-code-font-family); }
+.md-typeset svg .sn-name { font-size: 13px; font-style: italic; }
+.md-typeset svg .sn-val { font-size: 13px; font-weight: 700; }
+.md-typeset svg .sn-layer { fill: var(--viz-text); font-size: 12px; }
+
+/* kap4base in two columns (a 600 px box and wider): the map on the left, capped so that
+   the box fits one screen in every base; on the right the table of the base and under it
+   the table of the steps, both compact */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="kap4base"] .ex-cols svg.k4-live { max-height: 11rem; }
+  .md-typeset .explorer[data-kind="kap4base"] .ex-cols :is(.k4-table, .k4-att) :is(td, th) { padding: 0.08em 0.4em; line-height: 1.25; }
+  .md-typeset .explorer[data-kind="kap4base"] .ex-cols .k4-table { margin-top: 0.4rem; }
+}
+
+/* kaprekar (0012, 0013): the histogram a little smaller, so the box with the longest chain
+   and the help text open fits one screen */
+.md-typeset .explorer[data-kind="kaprekar"] .kp-chart svg { max-width: 21rem; }

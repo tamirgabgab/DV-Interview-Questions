@@ -176,6 +176,43 @@ def test_page_numbers():
         assert s in PAGE, s
 
 
+def test_review_round_7_numbers():
+    # the winning first move is not always unique: 8 rows x 10 columns has two, f5 and i4
+    assert [f"{'abcdefghij'[c]}{r + 1}" for c, r in winning_moves(8, 10)] == ["f5", "i4"]
+    # every staircase of 8 x 8 can appear, but the page's wins stops at the first losing
+    # child: a fresh run of winning_moves(8, 8) computes 3,832 of the 12,869
+    fresh = load_python(91)
+    assert fresh["winning_moves"](8, 8) == [(1, 1)] and fresh["wins"].cache_info().misses == 3832
+    # the top-right square is the winning first move only with 2 rows or 2 columns (and on
+    # 1 x 2 and 2 x 1), on every board of the table; the table is symmetric
+    for m in range(1, 8):
+        for n in range(1, 9):
+            corner = (n - 1, m - 1) in winning_moves(m, n)
+            assert corner == ((m == 2 or n == 2) and (m, n) != (1, 1)), (m, n)       # 1 x 2 and 2 x 1 included
+            if n <= 7:
+                assert winning_moves(n, m) == [(r, c) for c, r in winning_moves(m, n)]
+    assert [q0091.name(*mv) for mv in winning_moves(3, 4) + winning_moves(4, 3)] == ["c2", "b3"]
+    # strategy stealing's figure: on 3 x 5 the winning answer to e3 is d3, the winning first move
+    after_e3 = eat((3,) * 5, 4, 2)
+    assert [mv for mv, t in moves(after_e3) if not wins(t)] == [(3, 2)] == winning_moves(3, 5)
+    assert wins(eat((3,) * 5, 2, 1))                               # c2, the old example, loses
+    # b2 is the only winning first move on a square: a move in column a or in row 1 leaves a
+    # rectangle, any other leaves b2 and both arms, and b2 then leaves the equal L
+    for n in range(2, 8):
+        full = (n,) * n
+        for (c, r), t in moves(full):
+            if c == 0 or r == 0:
+                assert t in ((r,) * n, (n,) * c + (0,) * (n - c)) and wins(t)
+            elif (c, r) != (1, 1):
+                assert eat(t, 1, 1) == (n,) + (1,) * (n - 1)
+    # mirror_move answers b2 whenever b2 is there, also where b2 loses (its docstring says so)
+    assert mirror_move((4, 4, 4, 0)) == (1, 1) and wins(eat((4, 4, 4, 0), 1, 1))
+    # the boxes' tasks (the chomp models under Node play them in test_explorer_matches...)
+    assert sum(eat((8,) * 8, 7, 7)) - sum(eat(eat((8,) * 8, 7, 7), 1, 1)) == 48
+    for s in ["f5 ו-i4", "3,832", "אוכל 48 משבצות", "פחות מ-13,000"]:
+        assert s in PAGE, s
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
@@ -201,6 +238,10 @@ def test_explorer_matches_the_reference():
                     "mirror: m.chompPlay('mirror', 4, 4, 'me', [[3, 0], [1, 0]]),"
                     "poison: m.chompPlay('play', 3, 3, 'me', [[0, 0]]),"
                     "bad: m.chompPlay('play', 3, 3, 'me', [[5, 5]]),"
+                    "tasks: [['play', 8, 8, 'me', [[7, 7]]], ['play', 8, 8, 'pc', []], ['play', 8, 8, 'me', [[2, 2]]],"
+                    " ['play', 3, 5, 'me', [[4, 2]]], ['play', 2, 6, 'me', [[5, 1]]], ['mirror', 4, 4, 'me', [[0, 1]]]]"
+                    ".map((a) => { const g = m.chompPlay(...a); const v = g.moves[g.moves.length - 1];"
+                    " return [v.c, v.r, v.eaten, g.moves.length, g.over, m.chompWinningMoves(g.h)]; }),"
                     "}));")
     tup = lambda v: None if v is None else tuple(v)  # noqa: E731
     for h, w, mv, pc, mir in zip(cases, got["wins"], got["moves"], got["pc"], got["mir"]):
@@ -228,6 +269,11 @@ def test_explorer_matches_the_reference():
     # eating a1 ends the game at once; an illegal square is refused
     assert got["poison"]["over"] and got["poison"]["loser"] == 0
     assert got["bad"]["bad"] and got["bad"]["moves"] == []
+    # the tasks under the boxes: h8 -> b2 (48 squares) and no winning move; the computer opens
+    # b2; c3 -> a8; on 3 x 5 e3 -> d3; on 2 x 6 f2 -> f1 and then only e2 wins; in the mirror
+    # box a2 -> b1 and the game is over after 3 moves
+    assert got["tasks"] == [[1, 1, 48, 2, False, []], [1, 1, 49, 1, False, []], [0, 7, 2, 2, False, []],
+                            [3, 2, 1, 2, False, []], [5, 0, 1, 2, False, [[4, 1]]], [1, 0, 3, 3, True, []]]
 
 
 def test_page_text_ltr():

@@ -150,7 +150,7 @@ def binary_rows(nums=NUMS):
 
 def binary_search_table(nums=NUMS):
     rows, found = binary_rows(nums)
-    lines = ["| הטווח | ‏\\( mid \\) | כמה \\( \\le mid \\) | הכפול נמצא |", "|---|---|---|---|"]
+    lines = ["| הטווח | ‏\\( mid \\) | כמה \\( \\le mid \\) | איפה יש כפול |", "|---|---|---|---|"]
     for lo, hi, mid, count in rows:
         if count > mid:
             dec = f"‏\\( {count} > {mid} \\) : " + (f"הוא {lo}" if lo == mid else f"בין {lo} ל-{mid}")

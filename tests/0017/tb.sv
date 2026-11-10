@@ -3,6 +3,7 @@ module tb;
   //@page function automatic int find_duplicate_seen(
   //@page function automatic int find_duplicate_binary(
   //@page function automatic int find_duplicate_floyd(
+  //@page function automatic bit is_duplicate(
 
   int errors = 0;
 
@@ -35,6 +36,11 @@ module tb;
     if (find_duplicate_sort(nums) != 1 || find_duplicate_seen(nums) != 1 ||
         find_duplicate_binary(nums) != 1 || find_duplicate_floyd(nums) != 1) errors++;
 
+    // several duplicated values: the solutions may return different ones, all of them legal
+    nums = '{1, 1, 4, 4, 4};
+    if (find_duplicate_binary(nums) != 4 || find_duplicate_floyd(nums) != 1) errors++;
+    if (!is_duplicate(nums, 4) || !is_duplicate(nums, 1) || is_duplicate(nums, 2)) errors++;
+
     repeat (3000) begin
       random_case(nums, $urandom_range(60, 1));
       copy = nums;
@@ -43,6 +49,9 @@ module tb;
       r[2] = find_duplicate_binary(nums);
       r[3] = find_duplicate_floyd(nums);
       foreach (r[j]) if (r[j] < 1 || r[j] >= nums.size() || count_of(nums, r[j]) < 2) errors++;
+      // the page's scoreboard check agrees with the count, on every result and on a wrong value
+      foreach (r[j]) if (!is_duplicate(nums, r[j])) errors++;
+      for (int v = 0; v <= nums.size(); v++) if (is_duplicate(nums, v) != (count_of(nums, v) >= 2)) errors++;
       if (nums != copy) errors++;          // const ref: the input is never changed
     end
 

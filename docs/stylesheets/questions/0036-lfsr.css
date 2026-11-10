@@ -1,0 +1,32 @@
+/* Question 0036, the maximal LFSR: the lfsr box of explorer/lfsr.js on one computer screen
+   (session 34). The picture is every cycle of the polynomial as its own ring, in a frame
+   of a fixed height per width, so the box does not change its height with the taps; the
+   table of the polynomials scrolls inside eight rows; the static register of
+   tools/figures/q0036.py reuses the box's lf-cell / lf-wire classes (11-questions.css).
+   Colours from the palette only. */
+
+/* the picture: at its own size when it fits the frame, smaller when it does not */
+.md-typeset .explorer[data-kind="lfsr"] .lf-ring { display: flex; align-items: center; justify-content: center; height: 14.5rem; margin-top: 0.4rem; }
+.md-typeset .explorer[data-kind="lfsr"].lf-wide .lf-ring { height: 17.5rem; }
+.md-typeset .explorer[data-kind="lfsr"] .lf-ring.is-none { height: auto; }
+.md-typeset .explorer[data-kind="lfsr"] svg.lf-rings { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; }
+.md-typeset .explorer[data-kind="lfsr"] svg.lf-rings .lf-node { cursor: pointer; }
+.md-typeset svg.lf-rings .lf-edge.is-todo { stroke: var(--viz-grid); stroke-opacity: 1; }
+.md-typeset svg.lf-rings .lf-arrowhead.is-todo { fill: var(--viz-grid); }
+
+/* the lines under the picture, the seed field, the register */
+.md-typeset .explorer[data-kind="lfsr"] :is(.lf-sum, .lf-fb, .lf-cycles-text) { margin: 0.3em 0; font-size: 0.72rem; }
+.md-typeset .explorer[data-kind="lfsr"] .lf-seed { width: auto; font-family: var(--md-code-font-family); text-align: center; }
+.md-typeset .explorer[data-kind="lfsr"] .lf-reg-title { margin-top: 0.3em; }
+.md-typeset .explorer[data-kind="lfsr"] svg.lf-regsvg { margin: 0.1rem auto 0; }
+
+/* the table: eight rows and the header in view, the rest scrolls; the header stays */
+.md-typeset .explorer[data-kind="lfsr"] .lf-table { max-height: 13.2rem; overflow-y: auto; }
+.md-typeset .explorer[data-kind="lfsr"] .lf-table:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer[data-kind="lfsr"] .lf-table table { font-size: 0.68rem; display: table; width: 100%; }
+.md-typeset .explorer[data-kind="lfsr"] .lf-table :is(td, th) { padding: 0.08em 0.45em; line-height: 1.5; }
+.md-typeset .explorer[data-kind="lfsr"] .lf-table th { position: sticky; top: 0; background: var(--md-default-bg-color); }
+.md-typeset .explorer[data-kind="lfsr"] .lf-strip { margin-top: 0.2rem; }
+
+/* the static register of the hardware follow-up */
+.md-typeset .lf-fig { margin: 0.6rem 0; }

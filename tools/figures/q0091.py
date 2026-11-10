@@ -232,13 +232,14 @@ def table_b() -> str:
 def stealing() -> str:
     h0 = (3,) * 5
     corner = eat(h0, 4, 2)
-    x = (2, 1)
+    x = first_moves(3, 5)[0]            # d3: the winning answer to e3, and the winning first move
+    assert winning_moves(corner) == [x] and name(*x) == "d3"
     items = [{"h": corner, "prev": h0, "pick": (4, 2), "caption": "הראשון : e3"},
              {"h": eat(corner, *x), "prev": corner, "pick": x, "caption": "התשובה X"},
              {"h": eat(h0, *x), "prev": h0, "pick": x, "caption": "רק X"}]
     return row_of_boards(3, 5, items, gap=24, s=22, label=(
         "גניבת אסטרטגיה על 3 על 5. בלוח הימני הראשון אוכל רק את הפינה הימנית העליונה, e3. באמצעי השני עונה "
-        "במהלך X, כאן c2, שאוכל את c2, d2, e2, c3 ו-d3. בשמאלי הראשון אוכל את X כבר במהלך הראשון, ומקבל "
+        "במהלך המנצח שלו X, כאן d3. בשמאלי הראשון אוכל את X כבר במהלך הראשון, d3 יחד עם e3, ומקבל "
         "בדיוק אותו מצב, כי X אוכל גם את e3"))
 
 

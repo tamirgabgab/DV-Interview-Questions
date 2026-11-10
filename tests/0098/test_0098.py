@@ -35,7 +35,9 @@ def test_generator_matches_the_page_code():
 
 
 def test_part_a_numbers():
-    assert ns["luhn_sum"]("4111111111111111") == 30 and "\\( 8 + 7 \\cdot 2 + 8 = 30 \\)" in PAGE
+    # the derivation of 30 is written once, in the figure's caption
+    assert ns["luhn_sum"]("4111111111111111") == 30 == 8 + 7 * 2 + 8 * 1
+    assert PAGE.count("8 + 7·2 + 8·1 = 30") == 1 and "8 + 7 \\cdot 2" not in PAGE
     assert ns["luhn_sum"]("4111111111111112") == 31 and "הוא 31" in TEXT
     assert ns["luhn_sum"]("4111111111111110") == 29 and "הוא 29" in TEXT
     assert ns["check_digit"]("411111111111111") == 1 and "הספרה החסרה היא 1" in TEXT
@@ -61,7 +63,9 @@ def test_part_b_numbers():
     assert [p for _, _, p in terms] == [0, 27, 0, 42, 24, 0, 24, 3, 10, 2]
     assert sum(p for _, _, p in terms) == 132 == 12 * 11 and "132 = 12 \\cdot 11" in PAGE
     assert ns["isbn10_valid"]("0-8044-2957-X") and "0-8044-2957-X" in PAGE
-    assert 10 * sum(range(1, 11)) == 550 and "10 \\cdot 55 = 550" in PAGE
+    # the largest sum of isbn10_ok: nine digits of 9 and an X (10) in the last place
+    best = max(sum((10 - i) * v for i, v in enumerate([9] * 9 + [x])) for x in range(11))
+    assert best == 9 * 54 + 10 == 496 and "9 \\cdot 54 + 10 = 496" in PAGE and "550" not in PAGE
 
 
 def test_part_c_numbers():
@@ -72,6 +76,41 @@ def test_part_c_numbers():
     assert q0098.single_misses("isbn") == q0098.swap_misses("isbn") == []
     assert sum(range(10)) == 45 and 45 % 10 == 5 and sum(range(11)) == 55 and 55 % 11 == 0
     assert ns["no_perfect_weights"]()
+
+
+def test_no_unfilled_format_string():
+    # a legend once printed its f-string's source: {ltr("0")}
+    assert "{ltr(" not in PAGE and "{" not in "".join(q0098.blocks()).replace("{NB}", "")
+
+
+def test_box_tasks_of_the_page():
+    # the three tasks of the box of part a, on 4111 1111 1110 9115 (the digit 12 from the left is index 11)
+    n = "4111111111109115"
+    swap = lambda t, i: t[:i] + t[i + 1] + t[i] + t[i + 2:]
+    assert n[11:13] == "09" and ns["luhn_sum"](n) == ns["luhn_sum"](swap(n, 11)) == 40
+    assert n[12:14] == "91" and ns["luhn_sum"](swap(n, 12)) == 41
+    assert ns["luhn_sum"](n[:12] + "0" + n[13:]) == 31
+    assert "הסכום נשאר 40" in TEXT and "הסכום 41" in TEXT and "יורד מ-40 ל-31" in TEXT
+    # part c's task: the first digit, 4 in a doubled place, made 9
+    assert n[0] == "4" and (len(n) - 0) % 2 == 0 and ns["luhn_sum"]("9" + n[1:]) == 41
+    assert 2 * 9 - 2 * 4 == 10 and "עולה מ-40 ל-41" in TEXT and "זז ב-10" in TEXT
+    assert 'data-number="4111111111109115" data-scheme="w12" data-map="swap" data-new="0"' in PAGE
+    assert 'data-number="4111111111109115" data-scheme="w12" data-map="single" data-new="9"' in PAGE
+
+
+def test_part_d_clock_table_and_flops():
+    rows, ok = q0098.clock_rows("7997")
+    assert ok and ns["luhn_valid"]("7997") and ns["luhn_sum"]("7997") == 30
+    assert rows == [(1, 7, 0, 7, 7, 7), (2, 9, 1, 9, 16, 6), (3, 9, 0, 9, 15, 5), (4, 7, 1, 5, 10, 0)]
+    # the running sum is the page's luhn_sum of the digits so far, mod 10
+    for k, *_, total in rows:
+        assert total == ns["luhn_sum"]("7997"[4 - k:]) % 10
+    for line in ("| 2 | 9 |  | 1 | 9 | 16 | 6 | מוכפל, פחות 10 |", "| 3 | 9 |  | 0 | 9 | 15 | 5 | רגיל, פחות 10 |"):
+        assert line in PAGE
+    # sum[3:0], dbl, done, ok
+    assert 4 + 1 + 2 == 7 and "7 פליפ-פלופים" in TEXT
+    # a digit of 15 in a doubled place: 21, and with a sum of 9 the total is 30
+    assert 2 * 15 - 9 == 21 and 9 + 21 == 30 and "2 \\cdot 15 - 9 = 21" in PAGE
 
 
 def test_follow_ups():
@@ -98,6 +137,10 @@ def test_explorer_matches_the_page_code():
                     "spaced: m.luSum(m.luDigits('4111 1111-1111 1111')), bad: [m.luDigits('41a1'), m.luDigits('')],"
                     "maps: schemes.map((s) => kinds.map((k) => m.luMap(s, k))),"
                     "single: m.luMutate([4, 1, 9], 'single', 2), swap: m.luMutate([4, 1, 9], 'swap', 0),"
+                    "to: m.luMutate([4, 1, 9], 'single', 0, 9),"
+                    "deltas: schemes.map((s) => [0, 1].map((dbl) => [...Array(10)].map((_, a) => [...Array(10)].map((_, b) =>"
+                    " m.luDelta(s, dbl ? [a, 0] : [0, a], dbl ? [b, 0] : [0, b]))))),"
+                    "swapd: schemes.map((s) => [...Array(10)].map((_, a) => [...Array(10)].map((_, b) => m.luDelta(s, [a, b], [b, a])))),"
                     "}));")
     for n, s, v in zip(numbers, got["sums"], got["valid"]):
         assert s == ns["luhn_sum"](n) and v == ns["luhn_valid"](n)
@@ -114,3 +157,14 @@ def test_explorer_matches_the_page_code():
         assert {(a, b) for a in range(10) for b in range(10) if single_map[a][b] == "miss"} == \
             {(a, b) for a in range(10) for b in range(10) if a != b and (g(a) - g(b)) % m == 0}
         assert all(swap_map[a][a] == single_map[a][a] == "same" for a in range(10))
+    assert got["to"] == [9, 1, 9]
+    # luDelta, the line "the same error under the compared scheme": zero mod m exactly on the page's misses
+    for key, by_place, swapd in zip(("luhn", "w12", "ean", "isbn"), got["deltas"], got["swapd"]):
+        f, g, m = q0098.scheme_maps()[key]
+        singles, swaps = ns["misses"](f, g, m)
+        for a in range(10):
+            for b in range(10):
+                assert by_place[0][a][b] == f(b) - f(a) and by_place[1][a][b] == g(b) - g(a)
+                if a != b:
+                    assert (by_place[0][a][b] % m == 0 or by_place[1][a][b] % m == 0) == ((a, b) in singles)
+                    assert (swapd[a][b] % m == 0) == ((min(a, b), max(a, b)) in swaps)

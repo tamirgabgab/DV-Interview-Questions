@@ -196,3 +196,14 @@ def test_random_card_and_mutations():
     assert [i for k, i, _ in muts if k == "swap"] == [0]
     muts = mutations("4111111111109115")
     assert [i for k, i, _ in muts if k == "swap"] == [0, 10, 11, 12, 14]
+
+
+def test_no_digits_and_digit_like_characters():
+    # an empty number is not valid, though its sum is 0
+    for n in ("", " ", "abc", "-"):
+        assert luhn_sum(n) == 0 and not luhn_valid(n)
+    # str.isdigit accepts characters that int() refuses: they are skipped or rejected, not raised on
+    assert luhn_sum("41\u00b2") == luhn_sum("41") and luhn_valid("4111 1111 1111 1111\u00b2")
+    assert not israeli_id_valid("12345678\u00b2") and not israeli_id_valid("\u0661" * 9)
+    assert not isbn10_valid("030640615\u00b2") and not isbn10_valid("03064061\u00b22")
+    assert israeli_id_valid("18") and isbn10_valid("0306406152") and isbn10_valid("080442957x")

@@ -1,0 +1,6 @@
+/* 0017 (find the duplicate): the dupbin and floyd boxes on one computer screen (session 34).
+   Both lay the figure beside the step's text (cols); the invariant line of dupbin and the
+   summary of floyd sit in the side column, a little smaller than the step's line. */
+.md-typeset .explorer :is(.db-inv, .fl-sum) { margin: 0.6em 0 0.3em; font-size: 0.72rem; line-height: 1.6; }
+.md-typeset .explorer .db-inv { font-weight: 600; }
+.md-typeset .explorer .db-step { margin: 0.2em 0 0.4em; }

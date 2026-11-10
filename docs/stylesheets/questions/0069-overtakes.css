@@ -1,0 +1,30 @@
+/* Question 0069, overtakes in a stream of responses: the block diagram of the RTL monitor
+   of part c (ov-dp, drawn left to right by tools/figures/q0069.py), and the three overtakes
+   boxes of explorer/overtakes.js on one screen. The figures' own rules (ov-fig, ov-key-*)
+   are in 11-questions.css. Colours from the palette only: the query's blocks in the blue of
+   the cells a query reads (s1), the vector the update writes in the orange of the cells an
+   update raises (s2), the same tints as in the Fenwick figures. */
+.md-typeset svg.ov-dp { display: block; width: 100%; height: auto; margin-inline: auto; }
+.md-typeset svg.ov-dp .ov-headp { fill: var(--viz-text); }
+.md-typeset svg.ov-dp .ov-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; }
+.md-typeset svg.ov-dp .ov-blk.ov-st1 rect { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.ov-dp .ov-blk.ov-st2 rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.ov-dp .ov-blk text { fill: var(--viz-ink); font-size: 16px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.ov-dp .ov-blk text.ov-sub { font-size: 15px; font-weight: 400; }
+.md-typeset svg.ov-dp .ov-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.ov-dp .ov-dot { fill: var(--viz-text); }
+.md-typeset svg.ov-dp .ov-wlab { fill: var(--viz-ink); font-size: 15px; font-weight: 600; font-family: var(--md-code-font-family); }
+
+/* the boxes: the key in one row over the two columns, the number of responses the reorder
+   buffer holds (box c) in the ink of the counts */
+.md-typeset .explorer[data-kind="overtakes"] .ov-legend { gap: 0.2rem 0.8rem; margin: 0.2rem 0 0.5rem; }
+.md-typeset .explorer[data-kind="overtakes"] svg.ov-fig .ov-held { fill: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer[data-kind="overtakes"] .ov-wrap { margin: 0.3rem 0; }
+.md-typeset .explorer[data-kind="overtakes"] .ov-wrap svg { margin-block: 0.2rem; }
+
+/* one screen at 1920 x 1080 (the box in two columns): a shorter code view, which scrolls
+   itself to the step's lines (core.js), and a smaller key */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="overtakes"] .ex-side .ex-explain .ex-codewrap { max-height: 15rem; }
+  .md-typeset .explorer[data-kind="overtakes"] .ov-legend { font-size: 0.62rem; }
+}

@@ -70,10 +70,12 @@
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
         `<p class="ex-summary k4-sum" aria-live="polite"></p><p class="kb-step k4-step"></p>` +
-        `<p class="ex-title">המפה של הזוגות (p, q)${NB}: כל משבצת צבועה לפי היעד של הערך שלה, והמסלול של המספר מודגש</p><div class="k4-map"></div>` +
+        `<p class="ex-title">המפה של הזוגות (p, q), עם המסלול של המספר</p><div class="k4-map"></div>` +
         `<span class="viz-legend"><span><i class="kq-key-fixed"></i>נקודת שבת</span><span><i class="kq-key-cycle"></i>על מחזור</span><span><i class="kq-key-tofixed"></i>מגיעים לנקודת שבת</span><span><i class="kq-key-tocycle"></i>נכנסים למחזור</span><span><i class="kq-key-path"></i>המסלול</span></span>` +
-        `<div class="kp-table k4-table"></div>` +       // under the map: the table grows a row a step
-        `<div class="ex-fold"><p class="ex-fold-title">טבלת היעדים של הבסיס</p><p class="ex-title k4-att-title"></p><div class="kp-table k4-att"></div></div>`;
+        // beside the map: the table of the base, whose height the steps do not change, and
+        // under it the table of the steps, which grows a row a step and keeps its tallest height
+        `<div class="ex-fold"><p class="ex-fold-title">היעדים של כל המספרים של הבסיס</p><div class="kp-table k4-att"></div></div>` +
+        `<div class="kp-table k4-table" data-steady></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), input = $(".k4-x");
       let A = null, Ab = 0, kinds = null;
@@ -100,7 +102,7 @@
         const fx = k4Fixed(B);
         const ends = o.values[o.start];
         $(".k4-sum").innerHTML = `בסיס ${ltr(B)}${NB}: ` + (fx.length ? `${fx.length === 1 ? "נקודת שבת" : "נקודות שבת"} ${ltr(fx.map((v) => k4Text(v, B)).join(", "))}${B % 5 === 0 ? ` (‏${ltr(`B = 5 · ${B / 5}`)})` : ""}.` : `אין נקודת שבת (‏${ltr(B)} לא מתחלק ב-5, ואינו 2 או 4).`) +
-          ` המספר ${ltr(k4Text(st.x, B))} ` + (ends === 0 ? `מגיע ל-0 (כל הספרות שוות).` : cycLen === 1 ? `מגיע לנקודת השבת ${ltr(k4Text(ends, B))} ${o.start === 0 ? "מיד : הוא עצמו נקודת השבת" : o.start === 1 ? "אחרי צעד אחד" : `אחרי ${ltr(o.start)} צעדים`}.` : `נכנס למחזור באורך ${ltr(cycLen)}${NB}: ${ltr(o.values.slice(o.start).map((v) => k4Text(v, B)).join(" → "))} → ${ltr(k4Text(ends, B))}.`);
+          ` המספר ${ltr(k4Text(st.x, B))} ` + (ends === 0 ? `מגיע ל-0 (כל הספרות שוות).` : cycLen === 1 ? `מגיע לנקודת השבת ${ltr(k4Text(ends, B))} ${o.start === 0 ? "מיד : הוא עצמו נקודת השבת" : o.start === 1 ? "אחרי צעד אחד" : `אחרי ${ltr(o.start)} צעדים`}.` : `נכנס למחזור באורך ${ltr(cycLen)}${NB}: ${ltr(o.values.slice(o.start).concat(ends).map((v) => k4Text(v, B)).join(" → "))}.`);
         let rows = "";
         for (let i = 0; i < st.step; i++) {
           const sp = k4Step(o.values[i], B);
@@ -120,7 +122,8 @@
         $(".k4-step").innerHTML = text;
         // the map of the pairs with the path so far
         if (Ab !== B) { A = k4Attractors(B); kinds = pairKinds(B); Ab = B; }
-        const CW = 24, CH = 20, MX = 40, MY = 24, W = MX + B * CW + 8, H = MY + (B - 1) * CH + 8;
+        // 38 on the inline-start side: the enlarge button's corner stays clear of the column ticks
+        const CW = 24, CH = 20, MX = 40, MY = 24, W = MX + B * CW + 38, H = MY + (B - 1) * CH + 8;
         const cx = (q) => MX + q * CW + CW / 2, cy = (pp) => MY + (pp - 1) * CH + CH / 2;
         let m = `<svg class="figure kq-map k4-live" viewBox="0 0 ${W} ${H}" role="img" aria-label="המפה של הזוגות (p, q) בבסיס ${B} עם המסלול של המספר">`;
         for (let q = 0; q < B; q++) m += `<text class="kq-tick" x="${cx(q)}" y="${MY - 8}" text-anchor="middle">${q}</text>`;
@@ -139,7 +142,8 @@
         $(".k4-map").innerHTML = m + "</svg>";
         // where every number of the base ends
         const mine = ends === 0 ? 0 : Math.min(...o.values.slice(o.start));
-        $(".k4-att-title").textContent = `לאן מגיעים כל ${(B ** 4).toLocaleString("en-US")} המספרים של בסיס ${B}`;
+        // the fold's title (a button once folds() has run) names the base and its B⁴ numbers
+        ($(".ex-fold-title .ex-fold-btn") || $(".ex-fold-title")).textContent = `היעדים של כל ${(B ** 4).toLocaleString("en-US")} המספרים של בסיס ${B}`;
         $(".k4-att").innerHTML = `<table tabindex="0" aria-label="היעדים של הבסיס"><thead><tr><th>היעד</th><th>סוג</th><th>מספרים</th></tr></thead><tbody>` +
           A.map((a) => `<tr${a.cycle[0] === mine ? ' class="is-last"' : ""}><td>${ltr(a.cycle.map((v) => k4Text(v, B)).join(" → "))}</td><td>${a.cycle[0] === 0 ? "0 (ספרות שוות)" : a.cycle.length === 1 ? "נקודת שבת" : `מחזור באורך ${a.cycle.length}`}</td><td>${ltr(a.count.toLocaleString("en-US"))}</td></tr>`).join("") + `</tbody></table>`;
       };
@@ -167,9 +171,11 @@
   dvqExplorers.register({
     views: { kap4base: kap4baseView },
     help: {
-      kap4base: "בוחרים בסיס ומקלידים ארבע ספרות בו : ״הצעד הבא״ ו״הפעלה״ ממיינים ומחסרים צעד אחרי צעד עד שערך חוזר, השורה מתחת מסבירה את p, q ואת הספרות של F ומודיעה על נקודת שבת או מחזור, המפה מראה את המסלול על הזוגות (p, q), והטבלה האחרונה אומרת לאן מגיעים כל מספרי הבסיס.",
+      kap4base: "בוחרים בסיס ומקלידים בו ארבע ספרות. ״הצעד הבא״ ממיין ומחסר עד שערך חוזר : נקודת שבת או מחזור. המפה מראה את המסלול על הזוגות (p, q), וטבלת היעדים לאן מגיעים כל מספרי הבסיס.",
     },
     models: { k4Digits, k4Text, k4Parse, k4Pair, k4Value, k4FormulaDigits, k4Step, k4Fixed, k4Orbit, k4Attractors },
-    cols: { kap4base: { side: ".kb-step, .ex-fold", w: "minmax(0, 1.15fr)" } },   // the map and the steps under it beside the line of the step and the table of the base
+    // the line of the step, the map and its legend on the left; the table of the base and
+    // the table of the steps on the right (one screen at 1920 x 1080 in every base)
+    cols: { kap4base: { main: ".kb-step, .ex-title, .k4-map, .viz-legend", side: ".ex-fold, .k4-table", w: "minmax(0, 1fr)" } },
   });
 })();

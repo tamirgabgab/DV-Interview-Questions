@@ -3,19 +3,25 @@
 //@page function automatic bit isbn10_ok
 //@page module luhn_checker
 //@page class luhn_gen
+//@page module luhn_sva
 // Question 0098: the page's luhn_ok and isbn10_ok on the test numbers of the page; the page's
 // luhn_gen randomized with valid fixed to 0 and to 1, every number checked by luhn_ok and
 // fed to the page's luhn_checker one digit a clock (check digit first); and every single
 // change and every neighbour swap of the sample numbers fed to the checker, which must agree
 // with luhn_ok: every single change caught, only the 0 / 9 swap of 4111 1111 1110 9115
-// slipping by.
+// slipping by. The generated numbers come with the generator's idle clocks between the
+// digits (a digit over 9 on the bus while in_valid is low); a reset in the middle of a
+// number and a new start before last must leave the next number's answer right; the
+// page's luhn_sva is bound to the checker: no assertion may fail on legal stimulus, its
+// covergroup must be full at the end, and a digit over 9 must trip a_digit.
 module tb;
   logic clk = 0, rst_n = 0, in_valid = 0, start = 0, last = 0;
   logic [3:0] digit = 0;
   logic done, ok;
-  int errors = 0;
+  int errors = 0, idles = 0;
 
   luhn_checker dut (.clk, .rst_n, .in_valid, .start, .last, .digit, .done, .ok);
+  bind luhn_checker luhn_sva sva (.*);
 
   always #5 clk = ~clk;
 
@@ -25,11 +31,23 @@ module tb;
     for (int i = 0; i < s.len(); i++) q.push_back(byte'(s[i] - "0"));
   endfunction
 
+  // idle clocks before each digit of the next run (the generator's gap), 0 when not set
+  bit [1:0] gaps[16];
+
   // feed a number to the checker, its rightmost digit first; returns ok
   task automatic run(byte unsigned q[$], output bit got);
     int n;
     n = q.size();
     for (int k = 0; k < n; k++) begin
+      for (int w = 0; k < 16 && w < gaps[k]; w++) begin
+        @(negedge clk);
+        in_valid = 0;
+        start = 0;
+        last = 0;
+        digit = 4'hF;                 // not a digit: nothing may look at it now
+        idles++;
+        if (done) begin errors++; $display("done is high in the middle of a number"); end
+      end
       @(negedge clk);
       in_valid = 1;
       start = (k == 0);
@@ -117,11 +135,54 @@ module tb;
       for (int i = 15; i >= 0; i--) q.push_back(byte'(g.d[i]));
       foreach (q[i]) if (q[i] > 9) begin errors++; $display("a digit over 9"); end
       if (luhn_ok(q) != want) begin errors++; $display("generated valid=%0d but luhn_ok=%0d", want, luhn_ok(q)); end
+      gaps = g.gap;
       run(q, got);
       if (got != want) begin errors++; $display("generated valid=%0d but the checker said %0d", want, got); end
       valids += got;
     end
+    gaps = '{default: 0};
     if (valids != 200) begin errors++; $display("%0d valid numbers of 400, expected 200", valids); end
+    // gap is 0 with weight 3 of 6: about half of the 6400 digits wait
+    if (idles < 4800 || idles > 8000) begin errors++; $display("%0d idle clocks before 6400 digits", idles); end
+
+    // the clocks of the page's table: 7997, the sum after every digit
+    begin
+      int want_sum[4] = '{7, 6, 5, 0};
+      to_q("7997", q);
+      for (int k = 0; k < 4; k++) begin
+        @(negedge clk);
+        in_valid = 1; start = (k == 0); last = (k == 3); digit = q[3 - k];
+        @(posedge clk);
+        #1 if (dut.sum != want_sum[k]) begin errors++; $display("7997: sum %0d after clock %0d, expected %0d", dut.sum, k + 1, want_sum[k]); end
+      end
+      @(negedge clk);
+      in_valid = 0; start = 0; last = 0;
+      if (!done || !ok) begin errors++; $display("7997: done %0d ok %0d", done, ok); end
+    end
+
+    // a reset in the middle of a number, then a whole number
+    to_q("4111111111111111", q);
+    for (int k = 0; k < 7; k++) begin
+      @(negedge clk);
+      in_valid = 1; start = (k == 0); last = 0; digit = q[15 - k];
+    end
+    @(negedge clk);
+    in_valid = 0; start = 0;
+    rst_n = 0;
+    #3 if (dut.sum != 0 || dut.dbl != 0 || done || ok) begin errors++; $display("the reset left state behind"); end
+    @(negedge clk);
+    rst_n = 1;
+    expect_ok("4111111111111112", 0);
+    expect_ok("4111111111111111", 1);
+
+    // a new start before last: the cut number is forgotten
+    to_q("5555555555554444", q);
+    for (int k = 0; k < 5; k++) begin
+      @(negedge clk);
+      in_valid = 1; start = (k == 0); last = 0; digit = q[15 - k];
+    end
+    expect_ok("378282246310005", 1);
+    expect_ok("4111111111111110", 0);
 
     // every single error and every neighbour swap of the samples
     mutate_all("4111111111111111", singles, slipped);
@@ -130,6 +191,21 @@ module tb;
     if (singles != 144 || slipped != 0) begin errors++; $display("5555...4444: %0d singles, %0d slipped", singles, slipped); end
     mutate_all("4111111111109115", singles, slipped);
     if (singles != 144 || slipped != 1) begin errors++; $display("4111...9115: %0d singles, %0d slipped", singles, slipped); end
+
+    // the assertions held on everything so far, and the stimulus reached every bin
+    if (dut.sva.fails != 0) begin errors++; $display("%0d assertion failures on legal stimulus", dut.sva.fails); end
+    if (dut.sva.cov.get_inst_coverage() < 99.999) begin errors++; $display("coverage %f", dut.sva.cov.get_inst_coverage()); end
+
+    // a digit over 9 is the environment's error: a_digit must say so
+    @(negedge clk);
+    in_valid = 1; start = 1; last = 0; digit = 4'd12;
+    @(negedge clk);
+    in_valid = 0; start = 0;
+    @(negedge clk);
+    if (dut.sva.fails == 0) begin errors++; $display("a digit of 12 went by unnoticed"); end
+    // an empty queue is not a valid number
+    q.delete();
+    if (luhn_ok(q)) begin errors++; $display("luhn_ok of an empty queue passed"); end
 
     if (errors == 0) $display("PASS");
     else $display("FAIL: %0d errors", errors);
