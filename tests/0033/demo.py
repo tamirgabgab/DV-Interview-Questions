@@ -4,7 +4,10 @@ from solution import *  # noqa: F401,F403
 
 t_write, t_read = 200, 250
 print("part a: formula", fifo_depth(120, 100, 80), "simulation", fifo_fill(120, t_write, t_read)[0])  # part a: formula 24 simulation 25
-print("part b: formula", fifo_depth(120, 100, 80, 0.75), "simulation", fifo_fill(120, t_write, t_read, 4)[0])  # part b: formula 48 simulation 48
+print("part b: formula", fifo_depth(120, 100, 80, 4), "simulation", fifo_fill(120, t_write, t_read, 4)[0])  # part b: formula 48 simulation 48
+
+# The read edges 2 ns (40 steps) after the write edges: one more read before the last write
+print("part a, phase 2 ns:", fifo_fill(120, t_write, t_read, 0, 40)[0])  # part a, phase 2 ns: 24
 
 # Try your own numbers
 print("burst 256 at 100 MHz, reader 50 MHz:", fifo_depth(256, 100, 50), fifo_fill(256, 200, 400)[0])  # 128 129

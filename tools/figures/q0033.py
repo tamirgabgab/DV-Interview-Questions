@@ -5,13 +5,16 @@
 
 The example: a burst of 120 words written one per cycle at 100 MHz, read one per cycle at
 80 MHz (part a), or read with one idle read slot in every four (part b). blocks() returns,
-in page order: the legend and the fill-level chart of both readers over the burst, and the
-table of a few bursts and rates with the formula against the cycle simulation.
+in page order (all in part b's proof): the legend and the fill-level chart of both readers
+over the burst, and the table of a few bursts and rates with the formula against the cycle
+simulation. The formula is exact (fractions, no floating point); the simulation of the table
+runs on a time step that divides both periods (1 / (f_w f_r / gcd) us), so it is exact too.
 tests/0033 checks the numbers and that the page copies match.
 """
 
 import math
 import sys
+from fractions import Fraction
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -24,16 +27,27 @@ IDLE_EVERY = 4                                   # part b: the reader skips one 
 RLM = "‏"
 
 
-def depth(burst, f_write, f_read, read_duty=1.0):
-    """The closed form: words left when the burst ends, the reader draining at its rate."""
-    rate = f_read * read_duty / f_write
-    return 1 if rate >= 1 else math.ceil(burst * (1 - rate))
+def depth(burst, f_write, f_read, idle_every=0):
+    """The closed form, exact: words left when the burst ends, the reader draining at its
+    rate (one read slot in idle_every skipped), at least 1."""
+    rate = Fraction(f_read) / Fraction(f_write)
+    if idle_every:
+        rate *= 1 - Fraction(1, idle_every)
+    return max(1, math.ceil(burst * (1 - rate)))
 
 
-def fill(burst, t_write, t_read, idle_every=0):
+def periods(f_write, f_read):
+    """Exact integer periods (t_write, t_read) for two rates in MHz: the step is
+    1 / (f_write f_read / g) us with g = gcd, so a write cycle is f_read / g steps."""
+    g = math.gcd(f_write, f_read)
+    return f_read // g, f_write // g
+
+
+def fill(burst, t_write, t_read, idle_every=0, phase=0):
     """Cycle simulation: (max fill, trace of (step, fill) at every change). A write lands at
-    step k * t_write, a read is taken at step j * t_read (j >= 1) unless that slot is the
-    idle one; the fill is measured after the write and before the read of the same step."""
+    step k * t_write, a read edge comes at every step t > 0 with t % t_read == phase, and the
+    reader skips one read slot in idle_every; the fill is measured after the write and before
+    the read of the same step."""
     count = written = slot = t = max_fill = 0
     trace = [(0, 0)]
     while written < burst or count > 0:
@@ -42,7 +56,7 @@ def fill(burst, t_write, t_read, idle_every=0):
             written += 1
             trace.append((t, count))
         max_fill = max(max_fill, count)
-        if t > 0 and t % t_read == 0:
+        if t > 0 and t % t_read == phase:
             slot += 1
             if not (idle_every and slot % idle_every == 0) and count > 0:
                 count -= 1
@@ -73,7 +87,7 @@ def fill_chart():
                 pts.append((t * UNIT, trace[i - 1][1]))     # a step: hold the old value until t
             pts.append((t * UNIT, v))
         c.path(pts, cls, width=2)
-    for v, label in ((depth(BURST, F_WRITE, F_READ), "24"), (depth(BURST, F_WRITE, F_READ, 0.75), "48")):
+    for v, label in ((depth(BURST, F_WRITE, F_READ), "24"), (depth(BURST, F_WRITE, F_READ, IDLE_EVERY), "48")):
         c.hline(v, None, cls="ink-line", width=1, dash="6 4")
         c.add(f'<text class="legend" x="{c.x1 - 4}" y="{c.Y(v) - 5:.1f}" text-anchor="end">{label}</text>')
     c.text(BURST * 1000 / F_WRITE, 58, "סוף הפרץ", anchor="middle", rtl=True)
@@ -82,17 +96,16 @@ def fill_chart():
     return c.svg()
 
 
-CASES = [(120, 100, 80, 0), (120, 100, 80, 4), (64, 200, 150, 0), (256, 100, 50, 0), (100, 100, 99, 0), (32, 125, 100, 2)]
+CASES = [(120, 100, 80, 0), (120, 100, 80, 4), (64, 200, 150, 0), (256, 100, 50, 0), (100, 100, 99, 0), (32, 125, 100, 2),
+         (64, 100, 70, 3)]
 
 
 def cases_table():
     rows = ["| הפרץ | כתיבה | קריאה | הקורא מדלג | הנוסחה | הסימולציה |", "|:-:|:-:|:-:|:-:|:-:|:-:|"]
     for burst, fw, fr, idle in CASES:
-        duty = 1 - 1 / idle if idle else 1.0
-        tw, tr = round(1000 / fw / UNIT), round(1000 / fr / UNIT)
-        sim = fill(burst, tw, tr, idle)[0]
+        sim = fill(burst, *periods(fw, fr), idle)[0]
         skip = f"אחת מכל {idle}" if idle else "לא"
-        rows.append(f"| {RLM}{burst} | {RLM}{fw} MHz | {RLM}{fr} MHz | {skip} | {RLM}{depth(burst, fw, fr, duty)} | {RLM}{sim} |")
+        rows.append(f"| {RLM}{burst} | {RLM}{fw} MHz | {RLM}{fr} MHz | {skip} | {RLM}{depth(burst, fw, fr, idle)} | {RLM}{sim} |")
     return "\n".join(rows)
 
 
@@ -103,5 +116,5 @@ def blocks():
 
 if __name__ == "__main__":
     print(depth(BURST, F_WRITE, F_READ), fill(BURST, T_WRITE, T_READ)[0])
-    print(depth(BURST, F_WRITE, F_READ, 0.75), fill(BURST, T_WRITE, T_READ, IDLE_EVERY)[0])
+    print(depth(BURST, F_WRITE, F_READ, IDLE_EVERY), fill(BURST, T_WRITE, T_READ, IDLE_EVERY)[0])
     print("\n\n".join(blocks()))
