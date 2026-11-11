@@ -5,6 +5,19 @@ module tb;
 
   int errors = 0;
 
+  // The trap with inout arguments (the page: copy-in, copy-out): the copies alias nothing,
+  // so swap(x, x) keeps x for both helper-free versions
+  function automatic void swap_xor_io(inout int a, inout int b);
+    a = a ^ b; b = a ^ b; a = a ^ b;
+  endfunction
+  function automatic void swap_arith_io(inout int a, inout int b);
+    a = a + b; b = a - b; a = a - b;
+  endfunction
+  function automatic void swap_temp_in(int a, int b);   // input: swaps two local copies only
+    int temp;
+    temp = a; a = b; b = temp;
+  endfunction
+
   task automatic check(string name, int got_a, int got_b, int exp_a, int exp_b);
     if (got_a != exp_a || got_b != exp_b) begin
       errors++;
@@ -24,6 +37,10 @@ module tb;
     x = 9; swap_temp(x, x);  check("temp alias",  x, 0, 9, 0);
     x = 9; swap_arith(x, x); check("arith alias", x, 0, 0, 0);
     x = 9; swap_xor(x, x);   check("xor alias",   x, 0, 0, 0);
+    a = 5; b = 3; swap_xor_io(a, b);   check("xor inout",         a, b, 3, 5);
+    x = 9; swap_xor_io(x, x);          check("xor inout alias",   x, 0, 9, 0);
+    x = 9; swap_arith_io(x, x);        check("arith inout alias", x, 0, 9, 0);
+    a = 5; b = 3; swap_temp_in(a, b);  check("temp input",        a, b, 5, 3);
     if (errors == 0) $display("PASS");
     $finish;
   end

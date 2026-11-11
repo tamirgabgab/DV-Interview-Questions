@@ -76,7 +76,8 @@ added: 2026-10-16
 ### סעיף א – הרגע המוקדם ביותר
 
 נניח שבזמן ההכרזות אנחנו יודעים רק את מה שכבר נחשף : את ניקוד השופטים של כל המדינות, את
-נקודות הקהל שהוכרזו עד עכשיו, ואת סך נקודות הקהל (2,088).
+נקודות הקהל שהוכרזו עד עכשיו, ואת סך נקודות הקהל (2,088). נניח גם שכל חלוקה של נקודות הקהל
+שנותרו בין המדינות שעוד מחכות אפשרית, בלי האילוצים של סט הנקודות (ראו שאלת ההמשך הראשונה).
 
 **מהו הרגע המוקדם ביותר שבו אפשר היה לדעת בוודאות שישראל לא תנצח?**
 
@@ -86,13 +87,13 @@ added: 2026-10-16
 
 ??? tip "רמז 2"
     ישראל עם 343 נקודות היא "תקרה". כמה נקודות קהל יכולה כל מדינה שמעליה לקבל, בלי
-    לעבור את התקרה? ומה קורה אם נשארו יותר נקודות ממה שכל המדינות האלה יכולות "לבלוע"?
+    לעבור את התקרה?
 
 ??? success "פתרון סעיף א"
     !!! answer "תשובה בקצרה"
         **מיד אחרי שצרפת קיבלה 14 נקודות מהקהל**, ההכרזה הרביעית אחרי ישראל : באותו רגע
         נותרו 512 נקודות, אבל לשלוש המדינות שעוד לא הוכרזו היה מקום רק ל-495 נקודות בלי
-        לעבור את ישראל.
+        לעבור את ישראל (במודל שבו כל חלוקה של הנקודות אפשרית).
 
     #### הרעיון { .sol-idea }
 
@@ -109,7 +110,7 @@ added: 2026-10-16
     2. **לחשב את המים :** הנקודות שנותרו הן 2,088 פחות כל נקודות הקהל שכבר הוכרזו.
     3. **להשוות :** אם הנקודות שנותרו גדולות מסך המקום הפנוי, ישראל בוודאות לא תנצח.
     4. **אחרי כל הכרזה לעדכן :** מהמים יורדות נקודות הקהל של המדינה שהוכרזה, ומהנפח יורדת
-       הכוס שלה **כולה**. חוזרים לשלב 3 עד שההשוואה נכשלת לראשונה.
+       הכוס שלה **כולה**. חוזרים לשלב 3 עד שהנקודות שנותרו עולות לראשונה על המקום הפנוי.
 
     </div>
 
@@ -126,13 +127,22 @@ added: 2026-10-16
     של כל מי שכבר הוכרז סופי.
 
     - **אם המים נכנסים בכוסות** (\( \mathit{left} \le \sum \mathit{room}_c \)), אפשר עדיין לחלק את הנקודות
-      כך שאף מדינה לא תעבור את ישראל. כלומר, ישראל עדיין יכולה לנצח.
+      כך שאף מדינה לא תעבור את ישראל. כלומר, במודל שבו כל חלוקה אפשרית, ישראל עדיין יכולה
+      לנצח.
     - **אם יש יותר מים מנפח** (\( \mathit{left} > \sum \mathit{room}_c \)), לפי **עקרון שובך היונים** לפחות
       כוס אחת עולה על גדותיה. מדינה אחת לפחות תעבור את ישראל, וישראל בוודאות לא תנצח.
 
     **מה לגבי תיקו?** מדינה שמגיעה בדיוק ל-343 קיבלה מהקהל בדיוק \( \mathit{room}_c \) נקודות.
-    הנפח הגדול ביותר כאן הוא של פולין : \( 343 - 133 = 210 \), וזה פחות מ-220 נקודות הקהל
-    של ישראל. לכן בכל תיקו ישראל מנצחת, ומותר "למלא כוס עד השפה".
+    מדינה שמעל ישראל בטבלת השופטים קיבלה מהשופטים לפחות כמו ישראל, ולכן
+
+    \[
+    \mathit{room}_c = 343 - \mathit{jury}_c \le 343 - 123 = 220,
+    \]
+
+    לכל היותר נקודות הקהל של ישראל. כאן לכל המדינות שמעליה יש יותר מ-123 (הנפח הגדול
+    ביותר הוא של פולין, 210), ולכן בכל תיקו ישראל מנצחת, ומותר "למלא כוס עד השפה". הטיעון
+    עובד לכל נתונים : רק מדינה עם בדיוק אותו ניקוד שופטים יכולה להגיע לתיקו מלא, באותו סך
+    ובאותו קהל, והכללים לא מכריעים אותו.
 
     **מיד אחרי ההכרזה של ישראל.** עד ישראל, כולל ישראל, הוכרזו 18 מדינות, והן קיבלו יחד
     1,260 נקודות קהל. לכן נשארו \( 2{,}088 - 1{,}260 = 828 \) נקודות. הנפח הפנוי של שבע
@@ -149,8 +159,7 @@ added: 2026-10-16
 
     <svg class="perf-chart" viewBox="0 0 640 330" role="img" aria-label="המקום הפנוי של כל מדינה עד 343 נקודות, מיד אחרי ההכרזה של ישראל"><line class="grid" x1="48" x2="630" y1="230.0" y2="230.0"/><text class="tick" x="40" y="234.0" text-anchor="end">0</text><line class="grid" x1="48" x2="630" y1="176.5" y2="176.5"/><text class="tick" x="40" y="180.5" text-anchor="end">100</text><line class="grid" x1="48" x2="630" y1="123.0" y2="123.0"/><text class="tick" x="40" y="127.0" text-anchor="end">200</text><line class="grid" x1="48" x2="630" y1="69.5" y2="69.5"/><text class="tick" x="40" y="73.5" text-anchor="end">300</text><line class="grid" x1="48" x2="630" y1="16.0" y2="16.0"/><text class="tick" x="40" y="20.0" text-anchor="end">400</text><rect class="bar by-multiples" x="66.3" y="158.8" width="46.6" height="71.2"><title>Poland: jury 133</title></rect><rect class="cup-room" x="66.3" y="46.5" width="46.6" height="112.3"><title>Poland: room 210</title></rect><text class="tick" x="89.6" y="106.7" text-anchor="middle">210</text><text class="tick" x="89.6" y="246" text-anchor="middle">Poland</text><rect class="bar by-multiples" x="149.4" y="158.3" width="46.6" height="71.7"><title>Italy: jury 134</title></rect><rect class="cup-room" x="149.4" y="46.5" width="46.6" height="111.8"><title>Italy: room 209</title></rect><text class="tick" x="172.7" y="106.4" text-anchor="middle">209</text><text class="tick" x="172.7" y="246" text-anchor="middle">Italy</text><rect class="bar by-multiples" x="232.6" y="154.6" width="46.6" height="75.4"><title>Finland: jury 141</title></rect><rect class="cup-room" x="232.6" y="46.5" width="46.6" height="108.1"><title>Finland: room 202</title></rect><text class="tick" x="255.9" y="104.5" text-anchor="middle">202</text><text class="tick" x="255.9" y="246" text-anchor="middle">Finland</text><rect class="bar by-multiples" x="315.7" y="153.0" width="46.6" height="77.0"><title>France: jury 144</title></rect><rect class="cup-room" x="315.7" y="46.5" width="46.6" height="106.5"><title>France: room 199</title></rect><text class="tick" x="339.0" y="103.7" text-anchor="middle">199</text><text class="tick" x="339.0" y="246" text-anchor="middle">France</text><rect class="bar by-multiples" x="398.9" y="141.7" width="46.6" height="88.3"><title>Denmark: jury 165</title></rect><rect class="cup-room" x="398.9" y="46.5" width="46.6" height="95.2"><title>Denmark: room 178</title></rect><text class="tick" x="422.1" y="98.1" text-anchor="middle">178</text><text class="tick" x="422.1" y="246" text-anchor="middle">Denmark</text><rect class="bar by-multiples" x="482.0" y="141.7" width="46.6" height="88.3"><title>Australia: jury 165</title></rect><rect class="cup-room" x="482.0" y="46.5" width="46.6" height="95.2"><title>Australia: room 178</title></rect><text class="tick" x="505.3" y="98.1" text-anchor="middle">178</text><text class="tick" x="505.3" y="246" text-anchor="middle">Australia</text><rect class="bar by-multiples" x="565.1" y="120.9" width="46.6" height="109.1"><title>Bulgaria: jury 204</title></rect><rect class="cup-room" x="565.1" y="46.5" width="46.6" height="74.4"><title>Bulgaria: room 139</title></rect><text class="tick" x="588.4" y="87.7" text-anchor="middle">139</text><text class="tick" x="588.4" y="246" text-anchor="middle">Bulgaria</text><line class="axis" x1="48" x2="630" y1="230" y2="230"/><line class="israel-line" x1="48" x2="630" y1="46.5" y2="46.5"/><text class="legend" x="52" y="40.5">Israel 343</text><rect class="cup-room" x="48" y="262" width="443.3" height="20"><title>room: 1315</title></rect><text class="legend" x="499.3" y="277">1315</text><rect class="left-bar" x="48" y="292" width="279.2" height="20"><title>left: 828</title></rect><text class="legend" x="335.2" y="307">828</text></svg>
 
-    **צעד אחרי צעד.** אחרי כל הכרזה **שני** דברים משתנים : מהמים יורדות נקודות הקהל של
-    המדינה, ומהנפח יורדת הכוס שלה כולה, כי היא כבר לא יכולה לקבל עוד נקודות.
+    **צעד אחרי צעד.** הטבלה מעדכנת את שני הגדלים אחרי כל הכרזה, לפי שלב 4 :
 
     | אחרי ההכרזה של | ניקוד הקהל | סך הכול | נקודות שנותרו | מקום פנוי עד 343 | ישראל עדיין יכולה לנצח? |
     |---|---|---|---|---|---|
@@ -161,7 +170,7 @@ added: 2026-10-16
     | ‏France | 14 | 158 | 512 | 495 | **לא** |
     | ‏Denmark | 78 | 243 | 434 | 317 | **לא** |
     | ‏Australia | 122 | 287 | 312 | 139 | **לא** |
-    | ‏Bulgaria | 312 | 516 | 0 | 0 | **לא** |
+    | ‏Bulgaria | 312 | 516 | 0 | 0 | **לא** (בולגריה עברה את 343) |
 
     **התשובה : מיד אחרי שצרפת קיבלה 14 נקודות מהקהל**, כשנותרו עוד שלוש הכרזות (דנמרק,
     אוסטרליה ובולגריה). באותו רגע נשארו 512 נקודות, אבל לשלוש המדינות היה מקום רק ל-495. גם
@@ -176,11 +185,13 @@ added: 2026-10-16
 
     <svg class="perf-chart" viewBox="0 0 640 290" role="img" aria-label="המקום הפנוי מול הנקודות שנותרו אחרי כל הכרזה"><line class="grid" x1="56" x2="630" y1="250.0" y2="250.0"/><text class="tick" x="48" y="254.0" text-anchor="end">0</text><line class="grid" x1="56" x2="630" y1="216.6" y2="216.6"/><text class="tick" x="48" y="220.6" text-anchor="end">200</text><line class="grid" x1="56" x2="630" y1="183.1" y2="183.1"/><text class="tick" x="48" y="187.1" text-anchor="end">400</text><line class="grid" x1="56" x2="630" y1="149.7" y2="149.7"/><text class="tick" x="48" y="153.7" text-anchor="end">600</text><line class="grid" x1="56" x2="630" y1="116.3" y2="116.3"/><text class="tick" x="48" y="120.3" text-anchor="end">800</text><line class="grid" x1="56" x2="630" y1="82.9" y2="82.9"/><text class="tick" x="48" y="86.9" text-anchor="end">1000</text><line class="grid" x1="56" x2="630" y1="49.4" y2="49.4"/><text class="tick" x="48" y="53.4" text-anchor="end">1200</text><line class="grid" x1="56" x2="630" y1="16.0" y2="16.0"/><text class="tick" x="48" y="20.0" text-anchor="end">1400</text><rect class="lost-zone" x="328.0" y="16" width="302.0" height="234"/><text class="legend" x="372.0" y="34">France: 512 &gt; 495</text><text class="tick" x="76.0" y="268" text-anchor="middle">Israel</text><text class="tick" x="148.0" y="268" text-anchor="middle">Poland</text><text class="tick" x="220.0" y="268" text-anchor="middle">Italy</text><text class="tick" x="292.0" y="268" text-anchor="middle">Finland</text><text class="tick" x="364.0" y="268" text-anchor="middle">France</text><text class="tick" x="436.0" y="268" text-anchor="middle">Denmark</text><text class="tick" x="508.0" y="268" text-anchor="middle">Australia</text><text class="tick" x="580.0" y="268" text-anchor="middle">Bulgaria</text><path class="s2-line" d="M76.0,30.2 L148.0,65.3 L220.0,100.2 L292.0,134.0 L364.0,167.3 L436.0,197.0 L508.0,226.8 L580.0,250.0" fill="none" stroke-width="2"/><circle class="s2-dot" cx="76.0" cy="30.2" r="4"><title>after Israel: room 1315</title></circle><circle class="s2-dot" cx="148.0" cy="65.3" r="4"><title>after Poland: room 1105</title></circle><circle class="s2-dot" cx="220.0" cy="100.2" r="4"><title>after Italy: room 896</title></circle><circle class="s2-dot" cx="292.0" cy="134.0" r="4"><title>after Finland: room 694</title></circle><circle class="s2-dot" cx="364.0" cy="167.3" r="4"><title>after France: room 495</title></circle><circle class="s2-dot" cx="436.0" cy="197.0" r="4"><title>after Denmark: room 317</title></circle><circle class="s2-dot" cx="508.0" cy="226.8" r="4"><title>after Australia: room 139</title></circle><circle class="s2-dot" cx="580.0" cy="250.0" r="4"><title>after Bulgaria: room 0</title></circle><path class="ink-line" d="M76.0,111.6 L148.0,114.4 L220.0,139.0 L292.0,162.1 L364.0,164.4 L436.0,177.5 L508.0,197.9 L580.0,250.0" fill="none" stroke-width="2"/><circle class="ink-dot" cx="76.0" cy="111.6" r="4"><title>after Israel: points left 828</title></circle><circle class="ink-dot" cx="148.0" cy="114.4" r="4"><title>after Poland: points left 811</title></circle><circle class="ink-dot" cx="220.0" cy="139.0" r="4"><title>after Italy: points left 664</title></circle><circle class="ink-dot" cx="292.0" cy="162.1" r="4"><title>after Finland: points left 526</title></circle><circle class="ink-dot" cx="364.0" cy="164.4" r="4"><title>after France: points left 512</title></circle><circle class="ink-dot" cx="436.0" cy="177.5" r="4"><title>after Denmark: points left 434</title></circle><circle class="ink-dot" cx="508.0" cy="197.9" r="4"><title>after Australia: points left 312</title></circle><circle class="ink-dot" cx="580.0" cy="250.0" r="4"><title>after Bulgaria: points left 0</title></circle><line class="axis" x1="56" x2="630" y1="250" y2="250"/></svg>
 
-    **נסו בעצמכם.** הזיזו את ה-slider הכרזה אחרי הכרזה : כל מדינה שעוד לא הוכרזה היא כוס
-    עם מקום פנוי עד 343, ומדינה שהוכרזה מקבלת את הקהל שלה. הרגע שבו יש יותר נקודות ממקום
-    מסומן באדום. בתיבת "מה אם" אפשר לשנות את ניקוד השופטים או הקהל של ישראל ולראות איך
-    הרגע זז, ואיפה ישראל הייתה מנצחת. בשלב ההוכחה, בתחתית התיבה, "מזיגה" ממלאת את הכוסות
-    שנותרו עד 343 בנקודות שנותרו : עד פינלנד הכול נכנס, ואחרי צרפת 17 נקודות נשפכות.
+    **נסו בעצמכם.** הזיזו את ה-slider מ-3 ל-4 : ההפרש בין המקום הפנוי לנקודות שנותרו
+    קופץ מ-168 ל-<span dir="ltr">−17</span>. לחצו "מזיגה" ב-4 : 17 נקודות נשפכות. שנו את
+    הקהל של ישראל ל-226 : הרגע זז לדנמרק, וב-279 הוא זז לאוסטרליה. ב-393 ישראל מנצחת בשובר
+    השוויון (516 מול 516, וקהל 393 מול 312). שנו את השופטים של ישראל ל-145 : ישראל עוקפת
+    בתור את פולין, איטליה, פינלנד וצרפת, נשארות שלוש כוסות, וההפסד ודאי כבר אחרי דנמרק.
+    מעבר לשני הגרפים, התיבה מריצה את הסריקה על כל ניקוד של ישראל, וממזגת את הנקודות לכוסות
+    בכל שלב.
 
     <div class="explorer" data-kind="eurovision"></div>
 
@@ -293,11 +304,13 @@ added: 2026-10-16
     צריך לבדוק גם מקרה אחד נוסף : אם המדינה שהוכרזה עברה את ישראל, ההפסד ודאי.
 
     === "Python"
-        ```python title="earliest_certain_loss" linenums="1" hl_lines="14 15 16"
+        ```python title="earliest_certain_loss" linenums="1" hl_lines="16 17 18"
         def earliest_certain_loss(israel_total, above, points_left):
             """above: (country, jury, public) for the countries ranked above Israel by the jury,
             in announcement order. Returns how many of them had been announced when Israel's
-            loss became certain (0 = right after Israel's own turn), or None when Israel won."""
+            loss became certain (0 = right after Israel's own turn), or None when Israel won.
+            Assumes Israel leads when its own points are announced: no country announced
+            before it is ahead."""
             room = 0
             for _, jury, _ in above:
                 if jury > israel_total:
@@ -320,7 +333,7 @@ added: 2026-10-16
            ולכן `k` הוא כבר מספר ההכרזה.
 
     === "SystemVerilog"
-        ```systemverilog title="function earliest_certain_loss" linenums="1" hl_lines="20 21 22"
+        ```systemverilog title="function earliest_certain_loss" linenums="1" hl_lines="22 23 24"
         typedef struct {
           string country;
           int    jury;
@@ -330,6 +343,8 @@ added: 2026-10-16
         // above: the countries ranked above Israel by the jury, in announcement order, with the
         // public points each one got. Returns how many of them had been announced when Israel's
         // loss became certain (0 = right after Israel's own turn), or -1 when Israel won.
+        // Assumes Israel leads when its own points are announced: no country announced before
+        // it is ahead.
         function automatic int earliest_certain_loss(int israel_total, country_t above[$],
                                                      int points_left);
           int room = 0;
@@ -395,7 +410,8 @@ added: 2026-10-16
         ??? fu-answer "תשובה"
             הוספת אילוצים רק מצמצמת את האפשרויות, ולכן אם במודל הפשוט ישראל הפסידה בוודאות, היא
             הפסידה בוודאות גם במציאות. במציאות ההפסד יכול להיות ודאי **מוקדם יותר**, אבל לעולם לא
-            מאוחר יותר.
+            מאוחר יותר. לא בדקנו אם זה קורה בנתוני 2026 : זו שאלה של קיום 36 פתקים שמתאימים לכל
+            הסכומים שהוכרזו, לא של סכום אחד.
 
     - **מתי היה ודאי שבולגריה מנצחת?**
 
@@ -410,5 +426,6 @@ added: 2026-10-16
 
         ??? fu-answer "תשובה"
             מדינה שעוד מחכה יכולה לנצח אם הניקוד שלה ועוד **כל** הנקודות שנותרו עוקף את כל
-            האחרים. מדינה שכבר קיבלה את נקודות הקהל עוברת את בדיקת הכוסות של `israel_cannot_win`,
-            עם הניקוד שלה במקום 343, מול כל המדינות שעוד מחכות. לכל מדינה \( O(k) \).
+            האחרים. מדינה שכבר קיבלה את נקודות הקהל יכולה לנצח אם אף מדינה שכבר הוכרזה לא לפניה
+            (בסך או בשובר השוויון), וגם היא עוברת את בדיקת הכוסות של `israel_cannot_win`, עם
+            הניקוד שלה במקום 343, מול כל המדינות שעוד מחכות. לכל מדינה \( O(k) \).

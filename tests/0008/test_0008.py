@@ -76,13 +76,15 @@ def test_explorer_matches_page_code():
 
     rng = random.Random(8)
     checks = [[rng.randint(100, 400), [rng.randint(0, 420) for _ in range(rng.randint(0, 8))], rng.randint(0, 2088)] for _ in range(300)]
-    whatif = [[123, 220], [123, 400], [300, 220], [0, 0], [204, 312], [150, 100], [140, 220], [165, 220]]
+    whatif = [[123, 220], [123, 400], [300, 220], [0, 0], [204, 312], [150, 100], [140, 220], [165, 220],
+              [250, 220], [123, 160], [123, 172], [123, 300], [123, 393], [123, 225], [123, 226], [123, 279], [145, 220]]
+    whatif += [[rng.randint(0, 420), rng.randint(0, 432)] for _ in range(300)]
     got = node_json(f"""
       const m = {explorer_require()};
       console.log(JSON.stringify({{
         order: m.euroOrder(m.EURO_RESULTS), scan: m.euroScan(m.EURO_RESULTS),
         checks: {json.dumps(checks)}.map(([t, j, l]) => m.euroCannotWin(t, j, l)),
-        whatif: {json.dumps(whatif)}.map(([j, p]) => {{ const s = m.euroScan(m.euroWithIsrael(j, p)); return [s.first, s.total, s.rows.map((r) => [r.country, r.left, r.room, r.lost])]; }}),
+        whatif: {json.dumps(whatif)}.map(([j, p]) => {{ const s = m.euroScan(m.euroWithIsrael(j, p)); return [s.first, s.total, s.rows.map((r) => [r.country, r.left, r.room, r.lost]), s.ahead]; }}),
       }}));""")
     assert [tuple(r) for r in got["order"]] == q0008.ORDER
     sc = got["scan"]
@@ -90,15 +92,29 @@ def test_explorer_matches_page_code():
     assert sc["first"] == 4 == ns["earliest_certain_loss"](343, ABOVE_2026, 828) and sc["total"] == 343
     for (t, j, l), got_c in zip(checks, got["checks"]):
         assert got_c == ns["israel_cannot_win"](t, j, l)
-    for (jury, pub), (first, total, rows) in zip(whatif, got["whatif"]):
+    firsts = {}
+    for (jury, pub), (first, total, rows, ahead) in zip(whatif, got["whatif"]):
         results = [("Israel", jury, pub) if c == "Israel" else (c, j, p) for c, j, p in q0008.RESULTS]
         order = sorted(results, key=lambda r: (r[1], r[0] == "Australia"))
         idx = next(i for i, r in enumerate(order) if r[0] == "Israel")
         above = order[idx + 1:]
-        left = q0008.PUBLIC_TOTAL - sum(r[2] for r in order[:idx + 1])
-        want = ns["earliest_certain_loss"](jury + pub, above, left)
+        # the other countries keep their real public points: the points left after Israel
+        # are theirs, and they end at 0 after the last announcement
+        left = sum(r[2] for r in above)
+        assert rows[-1][1] == 0 and rows[0][1] == left, (jury, pub)
+        # earliest_certain_loss assumes nobody announced before Israel is ahead of it
+        before = [(c, j + p) for c, j, p in order[:idx] if j + p > jury + pub or (j + p == jury + pub and p > pub)]
+        want = 0 if before else ns["earliest_certain_loss"](jury + pub, above, left)
         assert total == jury + pub and first == (-1 if want is None else want), (jury, pub)
+        assert (ahead is not None) == bool(before), (jury, pub)
+        if before:
+            assert (ahead["country"], ahead["total"]) == max(before, key=lambda b: b[1])
         assert [r[0] for r in rows] == ["Israel"] + [c for c, _, _ in above]
+        firsts[(jury, pub)] = first
+    # the cases the page's box tasks and the review name
+    assert firsts[(250, 220)] == 0 and firsts[(123, 160)] == 0 and firsts[(123, 172)] == 0   # Bulgaria 516, Romania 296
+    assert firsts[(123, 225)] == 4 and firsts[(123, 226)] == 5 and firsts[(123, 279)] == 6    # France, Denmark, Australia
+    assert firsts[(123, 393)] == -1 and firsts[(145, 220)] == 1                               # a win by the tie-break; Denmark
 
 
 def test_explorer_pouring():
@@ -122,3 +138,39 @@ def test_explorer_pouring():
         assert all(0 <= c["fill"] <= c["room"] for c in full["cups"] + half["cups"])
         assert (full["spill"] > 0) == cannot_win(343, [j for _, j, _ in rest], left)
     assert got[4][0]["spill"] == 17 and got[3][0]["spill"] == 0
+
+
+def test_tie_needs_no_smaller_cup():
+    """Part a: a country above Israel by the jury has at least Israel's jury score, so the
+    public points that bring it exactly to Israel's total, total - jury_c, are at most
+    Israel's own public points (in 2026 every one is below 220, Poland's 210 the largest)."""
+    import sys
+
+    from extract_code import ROOT
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0008
+
+    assert max(343 - j for _, j, _ in ABOVE_2026) == 210 < 220
+    for jury in range(0, 421, 7):
+        for pub in range(0, 433, 9):
+            results = [("Israel", jury, pub) if c == "Israel" else (c, j, p) for c, j, p in q0008.RESULTS]
+            order = sorted(results, key=lambda r: (r[1], r[0] == "Australia"))
+            idx = next(i for i, r in enumerate(order) if r[0] == "Israel")
+            assert all(jury + pub - j <= pub for _, j, _ in order[idx + 1:])
+
+
+def test_step_table_on_page():
+    """The step table of part a is the generator's step_table(), and its last row says why
+    the loss is certain although 0 <= 0 (Bulgaria passed 343)."""
+    import sys
+
+    from extract_code import ROOT, question_path
+
+    sys.path.insert(0, str(ROOT / "tools" / "figures"))
+    import q0008
+
+    page = question_path(8).read_text(encoding="utf-8")
+    table = q0008.step_table()
+    assert "\n".join("    " + line for line in table.split("\n")) in page
+    assert "| \u200fBulgaria | 312 | 516 | 0 | 0 | **לא** (בולגריה עברה את 343) |" in table

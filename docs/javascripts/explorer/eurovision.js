@@ -27,16 +27,23 @@
     for (const j of juryAbove) { if (j > israelTotal) return true; room += israelTotal - j; }
     return pointsLeft > room;
   };
-  // the scan: one row per announcement from Israel's own on, with left, room and the verdict
+  // the scan: one row per announcement from Israel's own on, with left, room and the verdict.
+  // `ahead` is a country announced before Israel that already beats it (more points, or as
+  // many with more public points): then the loss is certain from row 0 on. The points left
+  // are the public points of the countries above Israel, so a what-if on Israel's public
+  // score keeps the others' real scores and the points still end at 0 (the public total is
+  // 2,088 - 220 + Israel's public score).
   const euroScan = (results) => {
     const order = euroOrder(results);
     const idx = order.findIndex((r) => r[0] === "Israel");
-    const total = order[idx][1] + order[idx][2];
+    const pubI = order[idx][2], total = order[idx][1] + pubI;
     const above = order.slice(idx + 1);
-    let left = EURO_PUBLIC_TOTAL - order.slice(0, idx + 1).reduce((s, r) => s + r[2], 0);
+    const before = order.slice(0, idx).filter(([, j, p]) => j + p > total || (j + p === total && p > pubI));
+    const ahead = before.length ? before.reduce((x, r) => (r[1] + r[2] > x[1] + x[2] ? r : x)) : null;
+    let left = above.reduce((s, r) => s + r[2], 0);
     let room = above.reduce((s, r) => s + Math.max(0, total - r[1]), 0);
-    let lost = euroCannotWin(total, above.map((r) => r[1]), left);
-    const rows = [{ country: "Israel", jury: order[idx][1], pub: order[idx][2], total, left, room, lost }];
+    let lost = !!ahead || euroCannotWin(total, above.map((r) => r[1]), left);
+    const rows = [{ country: "Israel", jury: order[idx][1], pub: pubI, total, left, room, lost }];
     let passed = false;
     for (const [country, jury, pub] of above) {
       left -= pub;
@@ -46,7 +53,7 @@
       rows.push({ country, jury, pub, total: jury + pub, left, room, lost });
     }
     const first = rows.findIndex((r) => r.lost);               // 0 = right after Israel, -1 = never
-    return { order, idx, total, above, rows, first, won: first < 0 };
+    return { order, idx, total, above, rows, first, won: first < 0, ahead: ahead && { country: ahead[0], total: ahead[1] + ahead[2] } };
   };
 
   // The pouring of the proof: after k announcements from Israel's own, the public points
@@ -79,6 +86,7 @@
         `<div class="ex-controls eu-what"><span>מה אם לישראל היו</span><label>שופטים <input type="number" class="ex-jury" min="0" max="420" step="1" dir="ltr" aria-label="ניקוד השופטים של ישראל"></label>` +
         `<label>קהל <input type="number" class="ex-pub" min="0" max="432" step="1" dir="ltr" aria-label="ניקוד הקהל של ישראל"></label>` +
         `<button type="button" class="md-button ex-reset">הנתונים האמיתיים</button></div>` +
+        `<span class="viz-legend eu-legend"><span><i class="by-multiples"></i>השופטים</span><span><i class="by-bfs"></i>הקהל, אחרי ההכרזה</span><span><i class="cup-room"></i>מקום פנוי עד ישראל</span><span><i class="by-enum"></i>עברה את ישראל</span></span>` +
         `<div class="eu-chart"></div><p class="eu-step" aria-live="polite"></p><p class="ex-summary eu-sum"></p>` +
         `<section class="ex-proof eu-proof"><p class="ex-proof-title">שלב ההוכחה : מוזגים את הנקודות לכוסות</p>` +
         `<div class="ex-controls"><button type="button" class="md-button ex-pour">מזיגה</button></div>` +
@@ -127,19 +135,25 @@
         drawPour();
         const left = row.left, room = row.room;
         let step = st.k === 0
-          ? `מיד אחרי ההכרזה של ישראל (${ltr(`${sc.rows[0].jury} + ${sc.rows[0].pub} = ${sc.total}`)})  : `
-          : `אחרי ההכרזה של ${ltr(row.country)} (${ltr(`${row.jury} + ${row.pub} = ${row.total}`)})  : `;
-        step += `נותרו ${ltr(num(left))} נקודות קהל, והמקום הפנוי עד ${ltr(sc.total)} ב${n - st.k === 1 ? "כוס האחרונה" : `-${ltr(n - st.k)} הכוסות שנותרו`} הוא ${ltr(num(room))}. `;
-        if (row.total > sc.total && st.k > 0) step += `<span class="eu-bad">✗ ${ltr(row.country)} עברה את ישראל, ההפסד ודאי.</span>`;
-        else if (left > room) step += `<span class="eu-bad">✗ יותר מים מנפח (${ltr(`${num(left)} > ${num(room)}`)})  : מישהי חייבת לעבור את ישראל.</span>`;
-        else step += `<span class="eu-ok">✓ הכול עוד נכנס (${ltr(`${num(left)} ≤ ${num(room)}`)})  : ישראל עדיין יכולה לנצח.</span>`;
+          ? `מיד אחרי ההכרזה של ישראל (${ltr(`${sc.rows[0].jury} + ${sc.rows[0].pub} = ${sc.total}`)}) : `
+          : `אחרי ההכרזה של ${ltr(row.country)} (${ltr(`${row.jury} + ${row.pub} = ${row.total}`)}) : `;
+        step += st.k === n
+          ? `כל המדינות כבר קיבלו את נקודות הקהל שלהן. `
+          : `נותרו ${ltr(num(left))} נקודות קהל, והמקום הפנוי עד ${ltr(sc.total)} ב${n - st.k === 1 ? "כוס האחרונה" : `-${ltr(n - st.k)} הכוסות שנותרו`} הוא ${ltr(num(room))}. `;
+        if (sc.ahead) step += `<span class="eu-bad">✗ ${ltr(sc.ahead.country)} כבר עם ${ltr(sc.ahead.total)}, לפני ההכרזה של ישראל : ההפסד ודאי.</span>`;
+        else if (row.total > sc.total && st.k > 0) step += `<span class="eu-bad">✗ ${ltr(row.country)} עברה את ישראל, ההפסד ודאי.</span>`;
+        else if (left > room) step += `<span class="eu-bad">✗ יותר מים מנפח (${ltr(`${num(left)} > ${num(room)}`)}) : מישהי חייבת לעבור את ישראל.</span>`;
+        else if (st.k === n) step += `<span class="eu-ok">✓ אף מדינה לא עברה את ישראל : ישראל ניצחה.</span>`;
+        else step += `<span class="eu-ok">✓ הכול עוד נכנס (${ltr(`${num(left)} ≤ ${num(room)}`)}) : ישראל עדיין יכולה לנצח.</span>`;
         $(".eu-step").innerHTML = step;
         const real = st.jury === 123 && st.pub === 220;
         $(".eu-sum").innerHTML = (sc.won
           ? `עם ${ltr(`${st.jury} + ${st.pub} = ${sc.total}`)} אף מדינה לא עוברת את ישראל : היא מנצחת.`
-          : sc.first === 0
+          : sc.ahead
+            ? `עם ${ltr(`${st.jury} + ${st.pub} = ${sc.total}`)} ההפסד ודאי עוד לפני ההכרזה של ישראל : ${ltr(sc.ahead.country)}, שהוכרזה קודם, כבר עם ${ltr(sc.ahead.total)}.`
+            : sc.first === 0
             ? `עם ${ltr(`${st.jury} + ${st.pub} = ${sc.total}`)} ההפסד ודאי כבר ברגע ההכרזה של ישראל.`
-            : `ההפסד ודאי אחרי ההכרזה ה-${ltr(sc.first)} שאחרי ישראל, של ${ltr(sc.rows[sc.first].country)}, כשנותרו ${ltr(n - sc.first)} הכרזות.`) +
+            : `ההפסד ודאי אחרי ההכרזה ה-${ltr(sc.first)} שאחרי ישראל, של ${ltr(sc.rows[sc.first].country)}, ${n - sc.first === 0 ? "ההכרזה האחרונה" : n - sc.first === 1 ? "כשנותרה הכרזה אחת" : `כשנותרו ${ltr(n - sc.first)} הכרזות`}.`) +
           (real ? "" : ` (במציאות : 123 + 220 = 343, וההפסד ודאי אחרי צרפת, ההכרזה הרביעית.)`) +
           ` סדר ההכרזות נקבע לפי ניקוד השופטים${real ? "" : ", ולכן שינוי בניקוד השופטים של ישראל מזיז גם את מקומה בתור"}.`;
       };
@@ -169,12 +183,18 @@
              `<line class="israel-line" x1="${X0}" x2="${W - 12}" y1="${f(Y(pr.total))}" y2="${f(Y(pr.total))}"/><text class="legend" x="${X0 + 4}" y="${f(Y(pr.total) - 6)}">Israel ${pr.total}</text>` +
              `<line class="axis" x1="${X0}" x2="${W - 12}" y1="${BASE}" y2="${BASE}"/></svg>`;
         $(".eu-pour").innerHTML = s;
-        $(".eu-pour-title").textContent = `הנקודות שנותרו, ${num(pr.left)}, נמזגות לכוסות של ${pr.cups.length} המדינות שעוד לא הכריזו, כל כוס עד ${pr.total}`;
+        $(".eu-pour-title").textContent = pr.cups.length
+          ? `הנקודות שנותרו, ${num(pr.left)}, נמזגות לכוסות של ${pr.cups.length === 1 ? "המדינה האחרונה" : `${pr.cups.length} המדינות שעוד לא הכריזו`}, כל כוס עד ${pr.total}`
+          : `כל המדינות כבר הכריזו, ואין עוד נקודות למזוג`;
         const sc = euroScan(res), row = sc.rows[Math.min(st.k, sc.rows.length - 1)], passed = st.k > 0 && sc.rows.slice(1, st.k + 1).some((r) => r.total > sc.total);
-        $(".eu-pour-text").innerHTML = share < 1 ? "מוזגים…" : passed
+        $(".eu-pour-text").innerHTML = share < 1 ? "מוזגים…" : sc.ahead
+          ? `${ltr(sc.ahead.country)} הוכרזה לפני ישראל וכבר עברה אותה, ולכן ההפסד ודאי בלי קשר למזיגה.`
+          : passed
           ? `מדינה שכבר הכריזה עברה את ישראל, ולכן ההפסד ודאי בלי קשר למזיגה.`
           : full.spill > 0
             ? `גם המזיגה הכי טובה לישראל, כל כוס עד הסף, משאירה ${ltr(num(full.spill))} נקודות בחוץ (${ltr(`${num(full.left)} − ${num(full.room)} = ${num(full.spill)}`)}). הנקודות האלה חייבות להגיע למדינה כלשהי, והיא עוברת את ${ltr(sc.total)} : זה ההפסד הוודאי.`
+            : !pr.cups.length
+            ? `אף מדינה לא עברה את ${ltr(sc.total)} : ישראל ניצחה.`
             : `הכול נכנס, ונשארים ${ltr(num(full.room - full.left))} מקומות פנויים${row.country === "Israel" ? "" : ` אחרי ${ltr(row.country)}`} : יש עדיין חלוקה של הנקודות שבה אף מדינה לא עוברת את ישראל.`;
       };
       $(".ex-pour").addEventListener("click", () => {
@@ -206,7 +226,7 @@
     help: {
       eurovision: "״ההכרזה הבאה״ מוסיפה מדינה : הכוסות מתחת לסכום של ישראל כנגד הנקודות שנותרו. תיבת ה״מה אם״ משנה את הניקוד של ישראל. בשלב ההוכחה ״מזיגה״ ממלאת את הכוסות שנותרו עד הסף, ומה שלא נכנס נשפך.",
     },
-    cols: { eurovision: { main: ".eu-chart, .eu-step", side: ".eu-proof", w: "minmax(0, 1fr)" } },   // the cups beside the pouring proof
+    cols: { eurovision: { main: ".eu-legend, .eu-chart, .eu-step", side: ".eu-proof", w: "minmax(0, 1fr)" } },   // the cups beside the pouring proof
     models: { EURO_RESULTS, EURO_PUBLIC_TOTAL, euroOrder, euroWithIsrael, euroCannotWin, euroScan, euroPour },
   });
 })();

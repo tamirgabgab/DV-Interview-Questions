@@ -11,7 +11,9 @@
   // line (or one comparison) at a time, with the values and, for the swaps, the symbolic
   // expressions in a0 and b0.
   // swapTrace: `kind` is temp / arith / xor; `same` aliases the two cells (swap(v, i, i));
-  // `bits` = 8 keeps the values modulo 256 (0 means unbounded integers).
+  // `bits` = 8 keeps the values modulo 256 (bit [7:0], unsigned), 32 wraps them to a signed
+  // 32-bit int as SystemVerilog's int does (two's complement), 0 means unbounded integers.
+  // The inputs are wrapped too, so -5 in 8 bits is 251 and 2^31 in 32 bits is -2^31.
   const SWAP_CODE = {
     temp: ["temp = v[i]", "v[i] = v[j]", "v[j] = temp"],
     arith: ["v[i] = v[i] + v[j]", "v[j] = v[i] - v[j]", "v[i] = v[i] - v[j]"],
@@ -28,8 +30,10 @@
     if (sym.r) terms.push(coef(sym.r, "c0"));
     return terms.length ? terms.join(op) : "0";
   };
+  const wrapBits = (bits) => (v) => (bits === 8 ? ((v % 256) + 256) % 256 : bits === 32 ? v | 0 : v);
+  const MOD_TEXT = { 8: "256", 32: "2³²" };
   const swapTrace = (kind, a, b, same = false, bits = 0) => {
-    const wrap = (v) => (bits ? ((v % (1 << bits)) + (1 << bits)) % (1 << bits) : v);
+    const wrap = wrapBits(bits);
     const cells = same ? [wrap(a)] : [wrap(a), wrap(b)];   // v[i] is cells[0], v[j] is cells[same ? 0 : 1]
     const syms = same ? [{ p: 1, q: 0 }] : [{ p: 1, q: 0 }, { p: 0, q: 1 }];
     const I = 0, J = same ? 0 : 1;
@@ -50,7 +54,7 @@
         const before = [cells[x], cells[y]];
         const raw = o === "^" ? cells[x] ^ cells[y] : o === "+" ? cells[x] + cells[y] : cells[x] - cells[y];
         cells[target] = wrap(raw); syms[target] = combine(syms[x], syms[y], o);
-        frames.push(snap(line, `${before[0]} ${o} ${before[1]} = ${raw}${wrap(raw) !== raw ? ` → ${wrap(raw)} (mod ${1 << bits})` : ""}`));
+        frames.push(snap(line, `${before[0]} ${o} ${before[1]} = ${raw}${wrap(raw) !== raw ? ` → ${wrap(raw)} (mod ${MOD_TEXT[bits]})` : ""}`));
       };
       apply(0, I, I, J, op || "+");
       apply(1, J, I, J, op || "-");
@@ -64,8 +68,8 @@
   const ROT_CODE = ["a = a ^ b", "b = a ^ b", "a = a ^ b", "b = b ^ c", "c = b ^ c", "b = b ^ c"];
   const ROT_STEPS = [["a", "b"], ["b", "a"], ["a", "b"], ["b", "c"], ["c", "b"], ["b", "c"]];   // target, other
   const rotTrace = (a, b, c, bits = 0) => {
-    const wrap = (v) => (bits ? ((v % (1 << bits)) + (1 << bits)) % (1 << bits) : v);
-    const v = { a, b, c }, sym = { a: { p: 1, q: 0, r: 0 }, b: { p: 0, q: 1, r: 0 }, c: { p: 0, q: 0, r: 1 } };
+    const wrap = wrapBits(bits);
+    const v = { a: wrap(a), b: wrap(b), c: wrap(c) }, sym = { a: { p: 1, q: 0, r: 0 }, b: { p: 0, q: 1, r: 0 }, c: { p: 0, q: 0, r: 1 } };
     const snap = (line, text) => ({ line, text, a: v.a, b: v.b, c: v.c, temp: null, aSym: symText(sym.a, "xor"), bSym: symText(sym.b, "xor"), cSym: symText(sym.c, "xor"), tempSym: null });
     const frames = [snap(-1, "")];
     ROT_STEPS.forEach(([t, o], line) => {
@@ -115,7 +119,7 @@
         `<label>הקצב <select class="ex-speed"><option value="1400">איטי</option><option value="800" selected>בינוני</option><option value="250">מהיר</option></select></label>` +
         `<button type="button" class="md-button ex-start">להתחלה</button><button type="button" class="md-button ex-end">לסוף</button><span class="ex-pos"></span></div>`;
       const codeHtml = (code, cur, swapLine) => `<pre class="tr-code" dir="ltr" tabindex="0" aria-label="הקוד">` +
-        code.map((l, k) => `<span class="tr-line${k === cur ? " is-cur" : ""}${k === swapLine ? " is-swap" : ""}"><span class="tr-ln">${k + 1}</span>${l.replace(/</g, "&lt;")}</span>`).join("\n") + `</pre>`;
+        code.map((l, k) => `<span class="tr-line${k === cur ? " is-cur" : ""}${k === swapLine ? " is-swap" : ""}"><span class="tr-ln">${k + 1}</span>${l.replace(/</g, "&lt;")}</span>`).join("") + `</pre>`;
       const $ = (sel) => box.querySelector(sel);
       let timer = null;
       const stop = () => { if (timer) clearInterval(timer); timer = null; $(".ex-play").textContent = "הפעלה"; };
@@ -133,25 +137,38 @@
           `<label><span>b</span> <input type="number" class="ex-b" dir="ltr" value="3" aria-label="הערך של b"></label>` +
           `<label class="tr-c" hidden><span>c</span> <input type="number" class="ex-c" dir="ltr" value="7" aria-label="הערך של c"></label>` +
           `<label><input type="checkbox" class="ex-same"> <span>‏a ו-b הם אותו משתנה (${code("swap(v, i, i)")})</span></label>` +
-          `<label><input type="checkbox" class="ex-bits"> <span>‏int של 8 ביט (מודולו 256)</span></label>` +
+          `<label>הרוחב <select class="ex-bits" aria-label="רוחב המשתנים"><option value="0">בלי הגבלה, כמו ב-Python</option><option value="8">‏8 ביט בלי סימן, bit [7:0]</option><option value="32">‏32 ביט עם סימן, int</option></select></label>` +
           `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
           playRow("השורה הבאה", "השורה הקודמת") +
           `<div class="tr-box"><div class="tr-left"></div><div class="tr-right"></div></div>` +
           `<p class="wv-step tr-step" aria-live="polite"></p><p class="ex-summary tr-sum"></p>`;
-        const bits8 = (v) => (st.bits ? ltr(v.toString(2).padStart(8, "0")) : "");
         const rot = () => st.kind === "rot";
+        // the bits column: 8 bits in the 8-bit mode, 8 hex digits in the 32-bit mode, and for
+        // XOR and the rotation also with unbounded values, as many bits as the largest value
+        // needs (one more for the sign when a value is negative, and "…" for the endless
+        // copies of the sign bit of Python's integers)
+        const showBits = () => st.bits || st.kind === "xor" || rot();
+        const bitsOf = (tr) => {
+          if (st.bits === 8) return (v) => v.toString(2).padStart(8, "0");
+          if (st.bits === 32) return (v) => (v >>> 0).toString(16).toUpperCase().padStart(8, "0");
+          const vals = tr.frames.flatMap((g) => [g.a, g.b, g.c, g.temp]).filter((v) => typeof v === "number");
+          const neg = vals.some((v) => v < 0), w = Math.max(4, ...vals.map((v) => Math.abs(v).toString(2).length)) + (neg ? 1 : 0);
+          return (v) => (neg ? "…" + (((v % 2 ** w) + 2 ** w) % 2 ** w).toString(2).padStart(w, "0") : v.toString(2).padStart(w, "0"));
+        };
         const traceOf = () => (rot() ? rotTrace(st.a, st.b, st.c, st.bits) : swapTrace(st.kind, st.a, st.b, st.same, st.bits));
         const draw = () => {
           const tr = traceOf(), total = tr.frames.length - 1;
           st.k = Math.min(st.k, total);
           const fr = tr.frames[st.k], prev = st.k ? tr.frames[st.k - 1] : null;
           $(".tr-left").innerHTML = codeHtml(tr.code, fr.line, -1);
-          const row = (name, v, sym, changed) => `<tr class="${changed ? "is-changed" : ""}"><td>${ltr(name)}</td><td>${v === null ? "–" : ltr(v)}</td>${st.bits ? `<td>${v === null ? "" : bits8(v)}</td>` : ""}<td>${sym === null ? "–" : ltr(sym)}</td></tr>`;
-          $(".tr-right").innerHTML = `<table class="tr-vars"><thead><tr><th>משתנה</th><th>ערך</th>${st.bits ? "<th>ביטים</th>" : ""}<th>סימבולית</th></tr></thead><tbody>` +
+          const bitText = showBits() ? bitsOf(tr) : null;
+          const row = (name, v, sym, changed) => `<tr class="${changed ? "is-changed" : ""}"><td>${ltr(name)}</td><td>${v === null ? "–" : ltr(v)}</td>${bitText ? `<td>${v === null ? "" : ltr(bitText(v))}</td>` : ""}<td>${sym === null ? "–" : ltr(sym)}</td></tr>`;
+          // the table scrolls sideways on its own when 32-bit values make it wider than a phone
+          $(".tr-right").innerHTML = `<div class="at-scroll" tabindex="0" role="region" aria-label="ערכי המשתנים"><table class="tr-vars"><thead><tr><th>משתנה</th><th>ערך</th>${bitText ? `<th>${st.bits === 32 ? "ביטים (הקסה)" : "ביטים"}</th>` : ""}<th>סימבולית</th></tr></thead><tbody>` +
             row(rot() ? "a" : st.same ? "v[i] = v[j]" : "v[i] (a)", fr.a, fr.aSym, prev && prev.a !== fr.a) +
             (st.same ? "" : row(rot() ? "b" : "v[j] (b)", fr.b, fr.bSym, prev && prev.b !== fr.b)) +
             (rot() ? row("c", fr.c, fr.cSym, prev && prev.c !== fr.c) : "") +
-            (st.kind === "temp" ? row("temp", fr.temp, fr.tempSym, prev && prev.temp !== fr.temp) : "") + `</tbody></table>`;
+            (st.kind === "temp" ? row("temp", fr.temp, fr.tempSym, prev && prev.temp !== fr.temp) : "") + `</tbody></table></div>`;
           $(".ex-pos").textContent = `שורה ${st.k} מתוך ${total}`;
           $(".tr-step").innerHTML = st.k === 0
             ? `לפני הריצה : ${ltr(`a = a0 = ${st.a}`)}${st.same ? ` ו-b הוא אותו תא` : `, ${ltr(`b = b0 = ${st.b}`)}`}${rot() ? `, ${ltr(`c = c0 = ${st.c}`)}` : ""}.`
@@ -164,14 +181,16 @@
             else if (tr.ok) sum = `<span class="wv-ok">✓ הוחלפו : ${ltr(`a = b0 = ${fr.a}`)}, ${ltr(`b = a0 = ${fr.b}`)}.</span>`;
             else if (st.same) sum = st.kind === "temp" ? `<span class="wv-ok">✓ אותו משתנה : עם משתנה עזר הערך נשמר (${ltr(fr.a)}).</span>` : `<span class="wv-bad">✗ אותו משתנה : ${st.kind === "arith" ? "השורה הראשונה מכפילה והשנייה מאפסת" : "השורה הראשונה מחשבת a ^ a = 0"}, והערך ${ltr(st.a)} אבד. זו המלכודת של ${code("swap(v, i, i)")}.</span>`;
             else sum = `<span class="wv-bad">✗ הערכים לא הוחלפו.</span>`;
-            if (st.bits && st.kind === "arith" && !st.same && st.a + st.b >= 256) sum += ` הסכום ${ltr(`${st.a} + ${st.b} = ${st.a + st.b}`)} גלש מעבר ל-255, ובכל זאת ההחלפה נכונה : החיסור מתבצע באותו מודולו, ו-${ltr("(a0 + b0) − b0 ≡ a0 (mod 256)")}.`;
+            if (st.bits && st.kind === "arith" && !st.same && wrapBits(st.bits)(st.a + st.b) !== st.a + st.b) sum += ` הסכום ${ltr(`${st.a} + ${st.b} = ${st.a + st.b}`)} גלש ${st.bits === 8 ? "מעבר ל-255" : `מחוץ לטווח של ${code("int")}`}, ובכל זאת ההחלפה נכונה : החיסור מתבצע באותו מודולו, ו-${ltr(`(a0 + b0) − b0 ≡ a0 (mod ${MOD_TEXT[st.bits]})`)}.`;
           }
           $(".tr-sum").innerHTML = sum;
         };
         const total = () => traceOf().frames.length - 1;
+        // unbounded values stay within ±1e9 (JavaScript's ^ works on 32 bits); in 8 or 32 bits a
+        // typed value is wrapped as the type would store it (-5 is 251, 2^31 is -2^31)
         const readInputs = () => {
-          const lim = st.bits ? 255 : 1e9;
-          const clamp = (sel) => Math.max(st.bits ? 0 : -lim, Math.min(lim, Math.round(Number($(sel).value) || 0)));
+          const lim = st.bits ? 2 ** 40 : 1e9, wrap = wrapBits(st.bits);
+          const clamp = (sel) => wrap(Math.max(-lim, Math.min(lim, Math.round(Number($(sel).value) || 0))));
           st.a = clamp(".ex-a"); st.b = clamp(".ex-b"); st.c = clamp(".ex-c");
           $(".ex-a").value = st.a; $(".ex-b").value = st.b; $(".ex-c").value = st.c;
         };
@@ -185,10 +204,10 @@
         $(".ex-kind").addEventListener("change", () => { stop(); setKind($(".ex-kind").value); st.k = 0; draw(); });
         [".ex-a", ".ex-b", ".ex-c"].forEach((sel) => $(sel).addEventListener("change", () => { stop(); readInputs(); st.k = 0; draw(); }));
         $(".ex-same").addEventListener("change", () => { stop(); st.same = $(".ex-same").checked; $(".ex-b").disabled = st.same; st.k = 0; draw(); });
-        $(".ex-bits").addEventListener("change", () => { stop(); st.bits = $(".ex-bits").checked ? 8 : 0; readInputs(); st.k = 0; draw(); });
+        $(".ex-bits").addEventListener("change", () => { stop(); st.bits = Number($(".ex-bits").value) || 0; readInputs(); st.k = 0; draw(); });
         $(".ex-reset").addEventListener("click", () => {
           stop(); Object.assign(st, PAGE);
-          setKind(PAGE.kind); $(".ex-a").value = PAGE.a; $(".ex-b").value = PAGE.b; $(".ex-c").value = PAGE.c; $(".ex-b").disabled = false; $(".ex-same").checked = false; $(".ex-bits").checked = false;
+          setKind(PAGE.kind); $(".ex-a").value = PAGE.a; $(".ex-b").value = PAGE.b; $(".ex-c").value = PAGE.c; $(".ex-b").disabled = false; $(".ex-same").checked = false; $(".ex-bits").value = "0";
           draw();
         });
         $(".ex-next").addEventListener("click", () => { stop(); st.k = Math.min(st.k + 1, total()); draw(); });
@@ -291,7 +310,7 @@
   dvqExplorers.register({
     views: { trace: traceView },
     help: {
-      trace: "הקוד של העמוד שורה אחרי שורה : ״הבא״ ו״הפעלה״ מריצים אותו עם הערכים והביטויים, הבורר מחליף בין הגרסאות, והשדות קובעים את הקלט. בלולאה הכפולה, ״הלולאה הפנימית״ מריצה גם את המלכודת j = i + 1, וערך שמופיע יותר מפעם אחת מקבל אות לכל עותק (a, b ...), כדי לראות אם הסדר ביניהם נשמר.",
+      trace: "הקוד של העמוד שורה אחרי שורה : ״הבא״ ו״הפעלה״ מריצים אותו עם הערכים והביטויים, והשדות קובעים את הקלט. בהחלפות, ״הגרסה״ בוחרת שיטה, ״הרוחב״ עוטף את הערכים כמו משתנה של 8 או 32 ביט, ו״אותו משתנה״ מריץ את <code>swap(v, i, i)</code>. בלולאה הכפולה, ״הלולאה הפנימית״ מריצה גם את המלכודת <bdi dir=\"ltr\">j = i + 1</bdi>, וערך שמופיע יותר מפעם אחת מקבל אות לכל עותק (<bdi dir=\"ltr\">a, b, …</bdi>), כדי לראות אם הסדר ביניהם נשמר.",
     },
     models: { SWAP_CODE, swapTrace, ROT_CODE, rotTrace, LOOP_CODE, LOOP_CODE_NEXT, loopTrace },
   });
