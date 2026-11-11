@@ -58,7 +58,7 @@
       const poison = () => (st.quiz ? st.secret : st.x);
       const grid = (m, death) => {
         // mice as columns (mouse 0 on the right, like the lowest digit), rounds as rows
-        const W = 640, LW = 92, top = 58, RH = 46, cw = (W - LW - 8) / Math.max(m, 1), H = top + st.b * RH + 52;
+        const W = 640, LW = 92, top = 58, RH = st.b >= 4 ? 36 : 46, cw = (W - LW - 8) / Math.max(m, 1), H = top + st.b * RH + 52;
         const cx = (i) => W - 8 - cw * (i + 0.5);
         const counts = Array.from({ length: m }, () => Array(st.b + 1).fill(0));
         for (let y = 0; y < st.n; y++) miceDigits(y, st.b, m).forEach((d, i) => { counts[i][d]++; });
@@ -75,7 +75,7 @@
             const done = r <= st.r, gone = done && death[i] && death[i] < r, dies = death[i] === r;
             const cls = !done ? "is-later" : gone ? "is-gone" : dies ? "is-death" : "is-drink";
             const what = gone ? "—" : String(counts[i][r]);
-            s += `<g class="mc-cell ${cls}"><title>mouse ${i}, round ${r}: ${gone ? "already dead" : `drinks from ${counts[i][r]} bottles${done && dies ? ", dies" : ""}`}</title>` +
+            s += `<g class="mc-cell ${cls}"><title>עכבר ${i}, סבב ${r} : ${gone ? "כבר מת" : `שותה מ-${counts[i][r]} בקבוקים${done && dies ? ", ומת בסוף הסבב" : ""}`}</title>` +
                  `<rect x="${f(cx(i) - cw / 2 + 2)}" y="${y + 3}" width="${f(cw - 4)}" height="${RH - 6}" rx="5"/>` +
                  `<text x="${f(cx(i))}" y="${y + RH / 2 + 5}" text-anchor="middle">${done && dies ? "✗" : what}</text></g>`;
           }
@@ -99,15 +99,15 @@
         $(".ex-prev").disabled = $(".ex-start").disabled = st.r === 0;
         $(".ex-next").disabled = $(".ex-end").disabled = st.r === st.b;
         $(".mc-sum").innerHTML = `${ltr(st.n)} בקבוקים ו-${st.b === 1 ? "סבב אחד" : `${ltr(st.b)} סבבים`} : לכל עכבר ${ltr(base)} תוצאות, ולכן ${ltr(m)} עכברים, כי ` +
-          `${ltr(`${base}^${m} = ${Math.pow(base, m).toLocaleString("en-US")} ≥ ${st.n}`)}` + (m > 0 ? ` ו-${ltr(`${base}^${m - 1} = ${Math.pow(base, m - 1).toLocaleString("en-US")} < ${st.n}`)}.` : ".") +
-          (st.quiz ? " הבקבוק המורעל מוסתר." : ` הבקבוק המורעל ${ltr(x)}, בבסיס ${ltr(base)} : ${code([...miceDigits(x, st.b, m)].reverse().join("") || "0")}.`);
+          `${ltr(`${base}<sup>${m}</sup> = ${Math.pow(base, m).toLocaleString("en-US")} ≥ ${st.n}`)}` + (m > 0 ? ` ו-${ltr(`${base}<sup>${m - 1}</sup> = ${Math.pow(base, m - 1).toLocaleString("en-US")} < ${st.n}`)}.` : ".") +
+          (st.quiz && !st.solved ? " הבקבוק המורעל מוסתר." : ` הבקבוק המורעל ${ltr(x)}, בבסיס ${ltr(base)} : ${code([...miceDigits(x, st.b, m)].reverse().join("") || "0")}.`);
         $(".mc-grid").innerHTML = grid(m, death);
         const known = death.map((d, i) => (d && d <= st.r ? d : st.r === st.b ? 0 : null));
         const cands = miceCands(st.n, st.b, death, st.r);
         const read = st.r === 0 ? "עוד לא עבר אף סבב : כל עכבר יכול עוד להיות כל ספרה."
           : st.quiz && !st.solved ? `אחרי סבב ${ltr(st.r)} : ${death.filter((d) => d && d <= st.r).length} עכברים מתו. הסבב שבו עכבר מת הוא הספרה שלו, ומי ששרד את כל הסבבים הוא 0.`
           : st.r < st.b ? `אחרי סבב ${ltr(st.r)} : מי שמת עד עכשיו כבר אמר את הספרה שלו; מי שחי יאמר אותה בהמשך (0 אם ישרוד עד הסוף).`
-          : `כל הספרות ידועות : ${ltr(`${known.map((d, i) => `${d}·${base}^${i}`).reverse().join(" + ")} = ${miceFind(death, st.b)}`)}` + (st.quiz ? "" : ` ✓`);
+          : `כל הספרות ידועות : ${ltr(`${known.map((d, i) => `${d}·${base}<sup>${i}</sup>`).reverse().join(" + ")} = ${miceFind(death, st.b)}`)}` + (st.quiz ? "" : ` ✓`);
         $(".mc-read").innerHTML = read;
         $(".mc-cands").innerHTML = `<p class="ex-title">הבקבוקים שעדיין אפשריים : ${ltr(cands.length)} מתוך ${ltr(st.n)}</p>` +
           (st.quiz && !st.solved ? `<p class="ex-note">רשת הבקבוקים מוסתרת עד שהבקבוק נמצא.</p>`
@@ -140,7 +140,7 @@
         if ($(".mc-guess").value.trim() === "" || !Number.isInteger(g)) { draw(); say("wv-bad", "הקלידו מספר בקבוק."); return; }
         if (st.r < st.b) { draw(); say("wv-bad", "קודם עוברים את כל הסבבים : מי ששרד עד הסוף הוא הספרה 0."); return; }
         if (g === st.secret) { st.solved = true; draw(); say("wv-ok", `✓ נכון, הבקבוק ${ltr(st.secret)}.`); return; }
-        draw(); say("wv-bad", `✗ לא ${ltr(g)}. רמז : הספרה של עכבר i שווה לסבב שבו הוא מת, והמשקל שלה ${ltr(`${st.b + 1}^i`)}.`);
+        draw(); say("wv-bad", `✗ לא ${ltr(g)}. רמז : הספרה של עכבר i שווה לסבב שבו הוא מת, והמשקל שלה ${ltr(`${st.b + 1}<sup>i</sup>`)}.`);
       });
       $(".mc-show").addEventListener("click", () => { st.r = st.b; st.solved = true; draw(); say("wv-ok", `הבקבוק ${ltr(st.secret)}.`); });
       $(".mc-new").addEventListener("click", fresh);
@@ -158,5 +158,6 @@
       mice: "בוחרים מספר בקבוקים, מספר סבבים ובקבוק מורעל, ועוברים סבב אחרי סבב : בכל משבצת מספר הבקבוקים שהעכבר שותה מהם בסבב, ו-✗ במקום שבו הוא מת. השורה התחתונה היא הספרות שנקראו, ומתחת הבקבוקים שעדיין אפשריים. ״אני מפענח״ מסתיר בקבוק אקראי : עוברים את הסבבים, וכותבים את מספר הבקבוק מהעכברים שמתו.",
     },
     models: { miceNeeded, miceDigits, miceDeath, miceFind, miceCands },
+    cols: { mice: { main: ".mc-grid, .viz-legend, .mc-read", side: ".mc-cands" } },   // the mice by round beside the bottles still possible
   });
 })();

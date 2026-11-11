@@ -1,5 +1,5 @@
 // kinds: shapes
-//   shapes                 0014        squares or rectangles drawn one at a time with the rejected candidates flashed; a heat map of draws; a toggle for the projections of a rejected candidate and a sandbox of two shapes to drag
+//   shapes                 0014        squares or rectangles drawn one at a time with the rejected candidates flashed; a whole draw with its restarts; a heat map of draws; the projections of a rejected candidate; a sandbox of two shapes to drag, with the cross of part b
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -43,11 +43,14 @@
     tries.push(c);
     return { tries, shape: c, free: free.length, all: all.length };
   };
-  // the page's random_shapes: n uniform in 1..max, retry the whole set until n fit
-  const shapesRandom = (N, M, maxShapes, squares, rnd = Math.random) => {
+  // the page's random_shapes: n uniform in 1..max, retry the whole set until n fit;
+  // info, when given, gets the number of restarts (whole sets thrown away). More shapes
+  // than unit cells can never fit (the page's loop would never return), so n is capped.
+  const shapesMaxN = (N, M, maxShapes) => Math.min(maxShapes, (N - 1) * (M - 1));
+  const shapesRandom = (N, M, maxShapes, squares, rnd = Math.random, info = null) => {
     const all = shapesCandidates(N, M, squares);
-    // more shapes than unit cells can never fit (the page's loop would never return)
-    const n = 1 + Math.floor(rnd() * Math.min(maxShapes, (N - 1) * (M - 1)));
+    const n = 1 + Math.floor(rnd() * shapesMaxN(N, M, maxShapes));
+    if (info) info.restarts = 0;
     for (;;) {
       const shapes = [];
       for (let k = 0; k < n; k++) {
@@ -56,6 +59,7 @@
         shapes.push(free[Math.floor(rnd() * free.length)]);
       }
       if (shapes.length === n) return shapes;
+      if (info) info.restarts++;
     }
   };
   // how often every unit cell is covered over `rounds` draws, and the side lengths seen
@@ -92,15 +96,20 @@
         `<button type="button" class="md-button ex-all">הגרלה שלמה</button>` +
         `<button type="button" class="md-button ex-clear">ניקוי</button>` +
         `<button type="button" class="md-button ex-heat">500 הגרלות למפת חום</button><span class="sh-note" aria-live="polite"></span></div>` +
-        `<label><input type="checkbox" class="ex-proj" checked> ההטלות על הצירים</label>` +
-        // the summary over the two columns (core.js columns()): the board beside the sandbox
+        `<label><input type="checkbox" class="ex-proj" checked> ההטלות של מועמד שנדחה</label>` +
+        // the summary over the two columns (core.js columns()): the board beside the sandbox,
+        // or beside the heat map once it is drawn (a select switches the side column)
         `<p class="ex-summary sh-sum"></p>` +
-        `<div class="sh-box"><div class="sh-grid"></div><div class="sh-heat"></div></div>` +
+        `<div class="sh-box"><div class="sh-grid"></div></div>` +
         `<p class="sh-step" aria-live="polite"></p>` +
-        `<div class="sh-sand"><p class="ex-title">שתי צורות להזזה : גוררים את A או את B (או מקש Tab וחצים), וההטלות והתנאים מתעדכנים</p><div class="sh-sand-svg"></div><ul class="sh-conds"></ul></div>`;
+        `<div class="sh-side"><label class="sh-viewlab" hidden><span>בצד</span> <select class="sh-view" aria-label="מה מוצג בצד הלוח"><option value="sand">שתי צורות להזזה</option><option value="heat">מפת החום</option></select></label>` +
+        `<div class="sh-sand"><p class="ex-title">שתי צורות להזזה : גוררים את A או את B (או Tab וחצים)</p>` +
+        `<div class="ex-controls sh-presets"><button type="button" class="md-button sh-cross">צלב (סעיף ב)</button><button type="button" class="md-button sh-sand0">הצורות ההתחלתיות</button></div>` +
+        `<div class="sh-sand-svg"></div><ul class="sh-conds"></ul></div><div class="sh-heat"></div></div>`;
       const $ = (sel) => box.querySelector(sel);
       let timer = null;
-      const sand = { a: [2, 2, 5, 4], b: [4, 3, 7, 6], N: 9, M: 7 };   // the sandbox: points 1..9 by 1..7
+      const SAND_START = [[2, 2, 5, 4], [4, 3, 7, 6]], SAND_CROSS = [[1, 3, 9, 5], [4, 1, 6, 7]];   // part b's cross: no corner inside, still an overlap
+      const sand = { a: [...SAND_START[0]], b: [...SAND_START[1]], N: 9, M: 7 };   // the sandbox: points 1..9 by 1..7
       // the projections need room below the grid and to its right
       const geom = () => { const u = Math.min(30, 300 / Math.max(st.N - 1, st.M - 1)), pr = $(".ex-proj").checked ? 24 : 0; return { u, W: (st.N - 1) * u + 40 + pr, H: (st.M - 1) * u + 30 + pr, X: (x) => 30 + (x - 1) * u, Y: (y) => 10 + (st.M - y) * u }; };
       const gridSvg = (extra, label) => {
@@ -131,18 +140,18 @@
       // the sandbox: two shapes to drag on a small grid, their projections and the four cases
       const SU = 30, SX = (x) => 30 + (x - 1) * SU, SY = (y) => 10 + (sand.M - y) * SU;
       const drawSand = () => {
-        const show = $(".ex-proj").checked;
-        $(".sh-sand").hidden = !show;
-        if (!show) return;
         const g = { u: SU, X: SX, Y: SY }, W = (sand.N - 1) * SU + 70, Hh = (sand.M - 1) * SU + 50;
         let svg = `<svg class="figure sh-live sh-sandbox" viewBox="0 0 ${W} ${Hh}" role="group" aria-label="שתי צורות להזזה, A ו-B">`;
         for (let x = 1; x <= sand.N; x++) svg += `<line class="gp-line" x1="${SX(x)}" x2="${SX(x)}" y1="${SY(sand.M)}" y2="${SY(1)}"/><text class="tick" x="${SX(x)}" y="${SY(1) + 40}" text-anchor="middle" font-size="9">${x}</text>`;
         for (let y = 1; y <= sand.M; y++) svg += `<line class="gp-line" x1="${SX(1)}" x2="${SX(sand.N)}" y1="${SY(y)}" y2="${SY(y)}"/><text class="tick" x="${SX(1) - 8}" y="${SY(y) + 3}" text-anchor="end" font-size="9">${y}</text>`;
         [["a", "A", "shp-1"], ["b", "B", "shp-2"]].forEach(([k, name, cls]) => {
           const r = sand[k];
-          svg += `<g class="sh-drag" data-k="${k}" tabindex="0" role="button" aria-label="${name}, הזזה בגרירה או בחצים"><rect class="${cls}" x="${SX(r[0])}" y="${SY(r[3])}" width="${SX(r[2]) - SX(r[0])}" height="${SY(r[1]) - SY(r[3])}"/>` +
-                 `<text class="coord halo" x="${(SX(r[0]) + SX(r[2])) / 2}" y="${(SY(r[1]) + SY(r[3])) / 2 + 4}" text-anchor="middle">${name}</text></g>`;
+          svg += `<g class="sh-drag" data-k="${k}" tabindex="0" role="button" aria-label="${name}, הזזה בגרירה או בחצים"><rect class="${cls}" x="${SX(r[0])}" y="${SY(r[3])}" width="${SX(r[2]) - SX(r[0])}" height="${SY(r[1]) - SY(r[3])}"/></g>`;
         });
+        // the names after both shapes, A in its top-left cell and B in its bottom-right one,
+        // so neither hides the other (the cross of part b shares its centre)
+        svg += `<text class="coord halo" x="${SX(sand.a[0]) + SU / 2}" y="${SY(sand.a[3]) + SU / 2 + 4}" text-anchor="middle" pointer-events="none">A</text>` +
+               `<text class="coord halo" x="${SX(sand.b[2]) - SU / 2}" y="${SY(sand.b[1]) - SU / 2 + 4}" text-anchor="middle" pointer-events="none">B</text>`;
         svg += projections(g, sand.a, sand.b, sand.N, sand.M) + "</svg>";
         $(".sh-sand-svg").innerHTML = svg;
         const w = shapesWhy(sand.a, sand.b), [a, b] = [sand.a, sand.b];
@@ -172,25 +181,35 @@
         $(".sh-sum").innerHTML = `${st.squares ? "ריבועים" : "מלבנים"} אפשריים על ה-grid : ${ltr(num(all))}; מהם ${ltr(num(free))} לא חופפים את ${st.shapes.length === 1 ? "הצורה שכבר יש" : `${ltr(st.shapes.length)} הצורות שכבר יש`}. ` +
           (st.shapes.length ? `הבודק ${ltr("shapes_ok")} של הדף : ${ok ? "✓ תקין" : "✗ חפיפה"}.` : "");
         if (st.heat) {
-          const h = st.heat, top = Math.max(1, ...h.cells.flat());
+          const h = st.heat, top = Math.max(1, ...h.cells.flat()), units = (st.N - 1) * (st.M - 1);
           $(".sh-heat").innerHTML = gridSvg((g) => {
             let s = "";
             h.cells.forEach((row, yi) => row.forEach((v, xi) => {
-              s += `<rect class="sh-cell" x="${f(g.X(xi + 1))}" y="${f(g.Y(yi + 2))}" width="${f(g.u)}" height="${f(g.u)}" fill-opacity="${f(0.85 * v / top, 2)}"><title>תא (${xi + 1}, ${yi + 1})  : ${v} מתוך ${h.rounds} הגרלות</title></rect>`;
+              s += `<rect class="sh-cell" x="${f(g.X(xi + 1))}" y="${f(g.Y(yi + 2))}" width="${f(g.u)}" height="${f(g.u)}" fill-opacity="${f(0.85 * v / top, 2)}"><title>תא \u2066(${xi + 1}, ${yi + 1})\u2069 : ${v} מתוך ${h.rounds} הגרלות</title></rect>`;
             }));
             return s;
           }, "מפת חום : כמה פעמים כל תא כוסה") +
             `<p class="sh-sides">${ltr(num(h.rounds))} הגרלות, ${ltr(num(h.count))} צורות (${ltr(f(h.count / h.rounds, 2))} בממוצע). לפי הצלע הארוכה : ` +
             h.sides.map((v, k) => (v ? `${ltr(k)}: ${ltr(f(100 * v / h.count, 1) + "%")}` : "")).filter(Boolean).join(", ") +
-            `. רוב הצורות קטנות, כי רוב המועמדים קטנים : צלע 1 לבדה היא ${ltr(`${(st.N - 1) * (st.M - 1)} מתוך ${all}`)} ${st.squares ? "הריבועים" : "המלבנים"}${st.squares ? "" : " (וגם מלבנים דקים רבים)"}.</p>`;
+            `. צלע 1 היא ${ltr(f(100 * h.sides[1] / Math.max(1, h.count), 1) + "%")} מהצורות, אבל רק ${ltr(f(100 * units / all, 1) + "%")} מהמועמדים (${ltr(units)} מתוך ${ltr(num(all))})` +
+            (h.sides[1] / Math.max(1, h.count) > units / all ? ` : צורות מאוחרות נכנסות רק לרווחים, ושם רק צורות קטנות עוד פנויות.</p>` : ".</p>");
         } else $(".sh-heat").innerHTML = "";
+        // the side column: the sandbox, or the heat map once there is one and it is chosen
+        const heat = Boolean(st.heat) && $(".sh-view").value === "heat";
+        $(".sh-viewlab").hidden = !st.heat;
+        $(".sh-sand").hidden = heat;
+        $(".sh-heat").hidden = !heat;
       };
       const stop = () => { if (timer) clearInterval(timer); timer = null; st.flash = null; };
       const reset = () => { stop(); st.shapes = []; st.heat = null; $(".sh-step").textContent = ""; $(".sh-note").textContent = ""; draw(); };
       ["N", "M", "max"].forEach((k) => $(`.ex-${k}`).addEventListener("input", () => { st[k] = Number($(`.ex-${k}`).value); reset(); }));
       $(".ex-kind").addEventListener("change", () => { st.squares = $(".ex-kind").value === "squares"; reset(); });
       $(".ex-clear").addEventListener("click", reset);
-      $(".ex-proj").addEventListener("change", () => { drawSand(); draw(); });
+      $(".ex-proj").addEventListener("change", draw);
+      $(".sh-view").addEventListener("change", draw);
+      const setSand = ([a, b]) => { sand.a = [...a]; sand.b = [...b]; drawSand(); };
+      $(".sh-cross").addEventListener("click", () => setSand(SAND_CROSS));
+      $(".sh-sand0").addEventListener("click", () => setSand(SAND_START));
       // dragging in the sandbox: whole grid steps, kept inside the grid
       const moveTo = (k, dx, dy) => {
         const r = sand[k], w = r[2] - r[0], h = r[3] - r[1];
@@ -199,7 +218,7 @@
         sand[k] = [x1, y1, x1 + w, y1 + h]; drawSand(); return true;
       };
       // the two sandbox shapes ride in the copy link and the remembered state once moved
-      const SAND0 = JSON.stringify([sand.a, sand.b]);
+      const SAND0 = JSON.stringify(SAND_START);
       box.dvqExtra = {
         get: () => (JSON.stringify([sand.a, sand.b]) === SAND0 ? "" : `${sand.a.join(".")}-${sand.b.join(".")}`),
         set: (text) => {
@@ -256,15 +275,18 @@
       });
       const seed = seedControls(box, $(".ex-heat"), (rng) => {
         stop(); st.heat = null;
-        st.shapes = shapesRandom(st.N, st.M, st.max, st.squares, rng);
-        $(".sh-step").innerHTML = `הגרלה שלמה כמו ${ltr("random_shapes")} : ${ltr(st.shapes.length)} ${st.shapes.length === 1 ? "צורה" : "צורות"} (מספר אחיד בין 1 ל-${ltr(st.max)}), כל אחת אחידה מבין המועמדים הפנויים אחרי קודמותיה.`;
+        const info = {};
+        st.shapes = shapesRandom(st.N, st.M, st.max, st.squares, rng, info);
+        const top = shapesMaxN(st.N, st.M, st.max);
+        $(".sh-step").innerHTML = `הגרלה שלמה כמו ${ltr("random_shapes")} : ${ltr(st.shapes.length)} ${st.shapes.length === 1 ? "צורה" : "צורות"} (מספר אחיד בין 1 ל-${ltr(top)}${top < st.max ? `, כי ב-grid יש רק ${ltr(top)} משבצות` : ""}), כל אחת אחידה מבין המועמדים הפנויים אחרי קודמותיה. ` +
+          (info.restarts ? `ההגרלה נתקעה והתחילה מחדש ${info.restarts === 1 ? "פעם אחת" : `${ltr(num(info.restarts))} פעמים`} עד שכל הצורות נכנסו.` : "הצורות נכנסו בניסיון הראשון, בלי התחלה מחדש.");
         draw();
       });
       $(".ex-all").addEventListener("click", seed.draw);
       $(".ex-heat").addEventListener("click", () => {
         stop();
         $(".sh-note").textContent = "מחשב…";
-        setTimeout(() => { st.heat = shapesHeat(st.N, st.M, st.max, st.squares, 500); $(".sh-note").textContent = ""; draw(); }, 20);
+        setTimeout(() => { st.heat = shapesHeat(st.N, st.M, st.max, st.squares, 500); $(".sh-view").value = "heat"; $(".sh-note").textContent = ""; draw(); }, 20);
       });
       drawSand();
       draw();
@@ -274,9 +296,9 @@
   dvqExplorers.register({
     views: { shapes: shapesView },
     help: {
-      shapes: "״עוד צורה״ מגריל מועמד ומראה את הנדחים בגלל חפיפה, ״הגרלה שלמה״ מציירת את כולן, ו״500 הגרלות״ בונה מפת חום. N, M ומספר הצורות בסליידרים. המתג ״ההטלות״ מצייר את ההטלות של מועמד שנדחה ושל הצורה שהוא חופף, ומתחת שתי צורות להזזה עם ארבעת התנאים של הדף.",
+      shapes: "״עוד צורה״ מגריל מועמד ומראה את הנדחים בגלל חפיפה, ״הגרלה שלמה״ מציירת את כולן ואומרת כמה פעמים התחילה מחדש, ו״500 הגרלות״ מציירת מפת חום בצד הלוח (״בצד״ מחליף בינה לבין שתי הצורות להזזה). שתי הצורות נגררות בעכבר או בחצים, ו״צלב״ מציב את הצלב של סעיף ב.",
     },
-    models: { shapesOverlap, shapesWhy, shapesCandidates, shapesOk, shapesTry, shapesRandom, shapesHeat },
-    cols: { shapes: { main: ".sh-box, .sh-step", side: ".sh-sand" } },   // the board beside the two-shape sandbox
+    models: { shapesOverlap, shapesWhy, shapesCandidates, shapesOk, shapesTry, shapesRandom, shapesMaxN, shapesHeat },
+    cols: { shapes: { main: ".sh-box, .sh-step", side: ".sh-side" } },   // the board beside the two-shape sandbox or the heat map
   });
 })();

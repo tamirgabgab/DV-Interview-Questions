@@ -244,7 +244,6 @@
    draw; the sandbox switched off) */
 @container (min-width: 600px) {
   .md-typeset .explorer .ex-cols:has(> .ex-main > .jos-box[hidden]) { grid-template-columns: minmax(0, 1fr); grid-template-areas: "side"; }
-  .md-typeset .explorer .ex-cols:has(> .ex-side > .sh-sand[hidden]) { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main"; }
 }
 
 /* strip (0030): the two walls side by side in the left column */

@@ -19,7 +19,7 @@ added: 2026-10-27
   מת. כמה עכברים צריך?
 - **סעיף ב – שני סבבים :** יש 48 שעות. משקים, רואים מי מת אחרי 24 שעות, ומשקים את מי
   שנשאר בסבב שני. כמה עכברים צריך עכשיו?
-- **סעיף ג – המקרה הכללי :** ‏\( n \) בקבוקים ו-\( b \) סבבים. כמה עכברים צריך, ולמה
+- **סעיף ג – המקרה הכללי :** ‏\( n \) בקבוקים ו-\( b \ge 1 \) סבבים. כמה עכברים צריך, ולמה
   אי אפשר פחות? כתבו קוד שמחשב את המספר, אומר לכל עכבר מאילו בקבוקים לשתות ובאיזה
   סבב, ומוצא את הבקבוק מתוך מה שקרה לעכברים.
 
@@ -40,7 +40,7 @@ added: 2026-10-27
 כל העכברים שותים יחד, ואחרי 24 שעות בודקים מי מת. כמה עכברים צריך?
 
 ??? tip "רמז 1"
-    בסוף הסבב כל עכבר הוא מת או חי : ביט אחד של מידע. כמה תוצאות שונות יש לעשרה עכברים?
+    בסוף הסבב כל עכבר הוא מת או חי : ביט אחד של מידע. כמה תוצאות שונות יש ל-\( m \) עכברים?
 
 ??? tip "רמז 2"
     ממספרים את הבקבוקים מ-0 עד 999 וכותבים כל מספר בבינארי. מה אם עכבר \( i \) ישתה
@@ -66,7 +66,7 @@ added: 2026-10-27
 
     <!-- gen 0 -->
 
-    <svg class="figure mc-fig" viewBox="0 0 640 150" style="max-width:40rem" role="img" aria-label="עשרה עכברים, ביט לכל אחד : בבקבוק 613 מתים העכברים של הביטים שהם 1"><g class="mc-mouse is-dead"><title>mouse 0: bit 1, dies</title><circle cx="600" cy="62" r="22"/><text x="600" y="68" text-anchor="middle">1</text></g><text class="tick" x="600" y="24" text-anchor="middle">2^0</text><text class="tick" x="600" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>mouse 1: bit 0, lives</title><circle cx="540" cy="62" r="22"/><text x="540" y="68" text-anchor="middle">0</text></g><text class="tick" x="540" y="24" text-anchor="middle">2^1</text><text class="tick" x="540" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>mouse 2: bit 1, dies</title><circle cx="480" cy="62" r="22"/><text x="480" y="68" text-anchor="middle">1</text></g><text class="tick" x="480" y="24" text-anchor="middle">2^2</text><text class="tick" x="480" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>mouse 3: bit 0, lives</title><circle cx="420" cy="62" r="22"/><text x="420" y="68" text-anchor="middle">0</text></g><text class="tick" x="420" y="24" text-anchor="middle">2^3</text><text class="tick" x="420" y="112" text-anchor="middle">✓</text><g class="mc-mouse"><title>mouse 4: bit 0, lives</title><circle cx="360" cy="62" r="22"/><text x="360" y="68" text-anchor="middle">0</text></g><text class="tick" x="360" y="24" text-anchor="middle">2^4</text><text class="tick" x="360" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>mouse 5: bit 1, dies</title><circle cx="300" cy="62" r="22"/><text x="300" y="68" text-anchor="middle">1</text></g><text class="tick" x="300" y="24" text-anchor="middle">2^5</text><text class="tick" x="300" y="112" text-anchor="middle">✗</text><g class="mc-mouse is-dead"><title>mouse 6: bit 1, dies</title><circle cx="240" cy="62" r="22"/><text x="240" y="68" text-anchor="middle">1</text></g><text class="tick" x="240" y="24" text-anchor="middle">2^6</text><text class="tick" x="240" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>mouse 7: bit 0, lives</title><circle cx="180" cy="62" r="22"/><text x="180" y="68" text-anchor="middle">0</text></g><text class="tick" x="180" y="24" text-anchor="middle">2^7</text><text class="tick" x="180" y="112" text-anchor="middle">✓</text><g class="mc-mouse"><title>mouse 8: bit 0, lives</title><circle cx="120" cy="62" r="22"/><text x="120" y="68" text-anchor="middle">0</text></g><text class="tick" x="120" y="24" text-anchor="middle">2^8</text><text class="tick" x="120" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>mouse 9: bit 1, dies</title><circle cx="60" cy="62" r="22"/><text x="60" y="68" text-anchor="middle">1</text></g><text class="tick" x="60" y="24" text-anchor="middle">2^9</text><text class="tick" x="60" y="112" text-anchor="middle">✗</text><text class="legend" x="632" y="142" text-anchor="end">613 = 1001100101 (binary)</text></svg>
+    <svg class="figure mc-fig" viewBox="0 0 640 150" style="max-width:40rem" role="img" aria-label="עשרה עכברים, ביט לכל אחד : בבקבוק 613 מתים העכברים של הביטים שהם 1"><g class="mc-mouse is-dead"><title>עכבר 0 : הביט 1, מת</title><circle cx="600" cy="62" r="22"/><text x="600" y="68" text-anchor="middle">1</text></g><text class="tick" x="600" y="24" text-anchor="middle">2^0</text><text class="tick" x="600" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>עכבר 1 : הביט 0, שורד</title><circle cx="540" cy="62" r="22"/><text x="540" y="68" text-anchor="middle">0</text></g><text class="tick" x="540" y="24" text-anchor="middle">2^1</text><text class="tick" x="540" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>עכבר 2 : הביט 1, מת</title><circle cx="480" cy="62" r="22"/><text x="480" y="68" text-anchor="middle">1</text></g><text class="tick" x="480" y="24" text-anchor="middle">2^2</text><text class="tick" x="480" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>עכבר 3 : הביט 0, שורד</title><circle cx="420" cy="62" r="22"/><text x="420" y="68" text-anchor="middle">0</text></g><text class="tick" x="420" y="24" text-anchor="middle">2^3</text><text class="tick" x="420" y="112" text-anchor="middle">✓</text><g class="mc-mouse"><title>עכבר 4 : הביט 0, שורד</title><circle cx="360" cy="62" r="22"/><text x="360" y="68" text-anchor="middle">0</text></g><text class="tick" x="360" y="24" text-anchor="middle">2^4</text><text class="tick" x="360" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>עכבר 5 : הביט 1, מת</title><circle cx="300" cy="62" r="22"/><text x="300" y="68" text-anchor="middle">1</text></g><text class="tick" x="300" y="24" text-anchor="middle">2^5</text><text class="tick" x="300" y="112" text-anchor="middle">✗</text><g class="mc-mouse is-dead"><title>עכבר 6 : הביט 1, מת</title><circle cx="240" cy="62" r="22"/><text x="240" y="68" text-anchor="middle">1</text></g><text class="tick" x="240" y="24" text-anchor="middle">2^6</text><text class="tick" x="240" y="112" text-anchor="middle">✗</text><g class="mc-mouse"><title>עכבר 7 : הביט 0, שורד</title><circle cx="180" cy="62" r="22"/><text x="180" y="68" text-anchor="middle">0</text></g><text class="tick" x="180" y="24" text-anchor="middle">2^7</text><text class="tick" x="180" y="112" text-anchor="middle">✓</text><g class="mc-mouse"><title>עכבר 8 : הביט 0, שורד</title><circle cx="120" cy="62" r="22"/><text x="120" y="68" text-anchor="middle">0</text></g><text class="tick" x="120" y="24" text-anchor="middle">2^8</text><text class="tick" x="120" y="112" text-anchor="middle">✓</text><g class="mc-mouse is-dead"><title>עכבר 9 : הביט 1, מת</title><circle cx="60" cy="62" r="22"/><text x="60" y="68" text-anchor="middle">1</text></g><text class="tick" x="60" y="24" text-anchor="middle">2^9</text><text class="tick" x="60" y="112" text-anchor="middle">✗</text><text class="legend" x="632" y="142" text-anchor="end">613 = 1001100101 (binary)</text></svg>
 
     <!-- /gen -->
 
@@ -187,14 +187,15 @@ added: 2026-10-27
 
 ### סעיף ג – n בקבוקים ו-b סבבים
 
-כמה עכברים צריך ל-\( n \) בקבוקים ו-\( b \) סבבים, ולמה אי אפשר פחות? כתבו קוד
-שמחשב את המספר, את התכנית ואת הפענוח.
+כמה עכברים צריך ל-\( n \) בקבוקים ו-\( b \) סבבים (\( b \ge 1 \)), ולמה אי אפשר פחות? כתבו
+קוד שמחשב את המספר, את התכנית ואת הפענוח.
 
 ??? tip "רמז 1"
     כמה תוצאות שונות יש לעכבר אחד ב-\( b \) סבבים?
 
 ??? tip "רמז 2"
-    ‏\( b + 1 \) תוצאות : מת בסבב 1, ..., מת בסבב \( b \), או שרד. זה בסיס \( b + 1 \).
+    וכדי להראות שאי אפשר פחות : האם תכנית שמשנה את ההשקיה לפי מי שכבר מת יכולה להסתפק
+    בפחות עכברים? ספרו את התוצאות האפשריות של כל העכברים יחד.
 
 ??? success "פתרון סעיף ג"
     !!! answer "תשובה בקצרה"
@@ -203,7 +204,7 @@ added: 2026-10-27
         מבקבוק בסבב \( d \), כאשר \( d \) הוא הספרה ה-\( i \) שלו, ולא שותה ממנו כש-\( d = 0 \).
         הסבב שבו העכבר מת הוא הספרה שלו בבקבוק המורעל.
 
-    <!-- cost: עכברים \( \lceil \log_{b+1} n \rceil \) | בנייה \( O(n \log n) \) | פענוח \( O(m) \) -->
+    <!-- cost: עכברים \( \lceil \log_{b+1} n \rceil \) | בנייה \( O(n \log_{b+1} n) \) | פענוח \( O(m) \) -->
 
     #### הרעיון { .sol-idea }
 
@@ -248,9 +249,11 @@ added: 2026-10-27
     #### הקוד { .sol-code }
 
     === "Python"
-        ```python title="mice_needed, drink_round, experiment, find_bottle" linenums="1" hl_lines="10 19 26"
+        ```python title="mice_needed, drink_round, experiment, find_bottle" linenums="1" hl_lines="11 20 27"
         def mice_needed(n: int, rounds: int) -> int:
             """The fewest mice: the smallest m with (rounds + 1)**m >= n."""
+            if rounds < 1:
+                raise ValueError("rounds must be at least 1")   # (1)!
             m, reach = 0, 1
             while reach < n:
                 reach, m = reach * (rounds + 1), m + 1
@@ -258,7 +261,7 @@ added: 2026-10-27
 
 
         def drink_round(x: int, i: int, rounds: int) -> int:
-            return x // (rounds + 1) ** i % (rounds + 1)   # (1)!
+            return x // (rounds + 1) ** i % (rounds + 1)   # (2)!
 
 
         def experiment(poison: int, n: int, rounds: int) -> list[int]:
@@ -267,7 +270,7 @@ added: 2026-10-27
             death = [0] * m
             for r in range(1, rounds + 1):
                 for i in range(m):
-                    if death[i] == 0 and drink_round(poison, i, rounds) == r:   # (2)!
+                    if death[i] == 0 and drink_round(poison, i, rounds) == r:   # (3)!
                         death[i] = r
             return death
 
@@ -275,21 +278,24 @@ added: 2026-10-27
         def find_bottle(death: list[int], rounds: int) -> int:
             x = 0
             for d in reversed(death):
-                x = x * (rounds + 1) + d                    # (3)!
+                x = x * (rounds + 1) + d                    # (4)!
             return x
         ```
 
-        1. הספרה ה-\( i \) של \( x \) בבסיס \( b + 1 \) היא הסבב שבו עכבר \( i \) שותה ממנו
+        1. בלי סבבים בכלל (\( b = 0 \)) כל עכבר רק שורד, ‏\( (b + 1)^m = 1 \) לכל \( m \), והלולאה
+           לא הייתה נגמרת.
+        2. הספרה ה-\( i \) של \( x \) בבסיס \( b + 1 \) היא הסבב שבו עכבר \( i \) שותה ממנו
            (0 : אף פעם).
-        2. רק עכבר חי שותה. עכבר מת רק מהבקבוק המורעל, ולכן מספיק לבדוק אותו.
-        3. הסבב שבו העכבר מת הוא הספרה שלו בבקבוק המורעל.
+        3. רק עכבר חי שותה. עכבר מת רק מהבקבוק המורעל, ולכן מספיק לבדוק אותו.
+        4. כמו בשיטת הורנר : קוראים מהספרה העליונה, וכל צעד כופל ב-\( b + 1 \) ומוסיף ספרה.
 
     === "SystemVerilog"
-        ```systemverilog title="mice_needed, drink_round, find_bottle" linenums="1" hl_lines="4 13 20"
-        // the fewest mice: the smallest m with (rounds + 1)^m >= n
+        ```systemverilog title="mice_needed, drink_round, find_bottle" linenums="1" hl_lines="4 14 21"
+        // the fewest mice: the smallest m with (rounds + 1)^m >= n; rounds >= 1
         function automatic int mice_needed(int n, int rounds);
           int m = 0;
           longint reach = 1;                                   // (1)!
+          if (rounds < 1) $fatal(1, "rounds must be at least 1");
           while (reach < n) begin reach *= rounds + 1; m++; end
           return m;
         endfunction
@@ -312,15 +318,14 @@ added: 2026-10-27
 
         1. ‏`longint` כדי ש-\( (b + 1)^m \) לא יגלוש כשהוא עובר את \( n \).
         2. הספרה ה-\( i \) של \( x \) בבסיס \( b + 1 \) היא הסבב שבו עכבר \( i \) שותה ממנו.
-        3. הסבב שבו העכבר מת הוא הספרה שלו; קוראים את המספר מהספרה העליונה, כמו בשיטת הורנר.
+        3. כמו ב-Python : שיטת הורנר, מהספרה העליונה.
 
     #### למה זה נכון { .sol-proof }
 
-    **השיטה עובדת.** תהי \( d \) הספרה ה-\( i \) של הבקבוק המורעל \( x \). אם \( d \ge 1 \),
-    עכבר \( i \) שותה מ-\( x \) בסבב \( d \). בסבבים שלפני כן הוא שתה רק מבקבוקים שהספרה
-    שלהם קטנה מ-\( d \), כלומר לא מ-\( x \), ולכן הוא חי עד הסבב \( d \) ומת בסופו. אם
-    \( d = 0 \) הוא לעולם לא שותה מ-\( x \) ושורד. לכן הסבב שבו כל עכבר מת הוא הספרה
-    שלו, ו-\( x \) נקרא כולו.
+    **השיטה עובדת.** אותה הוכחה כמו בסעיף ב, עם \( b \) סבבים במקום 2. הדבר היחיד שצריך
+    לבדוק הוא שעכבר לא מת מוקדם מדי : אם הספרה ה-\( i \) של \( x \) היא \( d \), בסבבים
+    שלפני \( d \) עכבר \( i \) שתה רק מבקבוקים שהספרה ה-\( i \) שלהם קטנה מ-\( d \), כלומר
+    לא מ-\( x \).
 
     **פחות אי אפשר.** כל עכבר מסתיים באחת מ-\( b + 1 \) תוצאות לכל היותר, ולכן לכל
     התכנית, גם אם היא משנה את ההשקיה לפי מה שקרה בסבבים הקודמים, יש לכל היותר
@@ -329,16 +334,25 @@ added: 2026-10-27
     **מקרי קצה.** בקבוק אחד : \( m = 0 \), אין מה לבדוק. כש-\( n \) הוא חזקה בדיוק
     (\( n = 1024, b = 1 \)), ‏\( m = 10 \) ולא 11, כי הבקבוקים ממוספרים 0 עד \( n - 1 \).
 
-    **נסו בעצמכם.** בוחרים מספר בקבוקים, מספר סבבים ובקבוק מורעל, ועוברים סבב אחרי
-    סבב : מי שותה, מי מת, ואיך הספרות נקראות. במצב "אני מפענח" התיבה מגרילה בקבוק
-    בסוד, מראה רק מי מת ומתי, ואתם כותבים את מספר הבקבוק :
+    **נסו בעצמכם.** התיבה מראה מה שהטבלאות לא מראות : מכמה בקבוקים כל עכבר שותה בכל סבב,
+    וכמה בקבוקים עדיין אפשריים אחרי כל סבב. במצב "אני מפענח" היא מסתירה בקבוק, ואתם קוראים
+    אותו מהעכברים שמתו.
+
+    - **אחרי סבב אחד :** בערכים של העמוד (1000 בקבוקים, שני סבבים, הבקבוק 613) לחצו "הסבב
+      הבא" פעם אחת. העכברים 0, 3 ו-4 מתים, והבקבוקים האפשריים יורדים מ-1000 ל-8. למה 8,
+      כשארבעה עכברים עוד חיים? רמז : מה הספרה של עכבר 6 בבקבוק שקטן מ-1000? מאותה סיבה
+      עכבר 6 שותה בסבב 2 מאפס בקבוקים.
+    - **רשת הבקבוקים :** כתבו בקבוק מורעל 50 ואז 81 בקבוקים (50 בבסיס 3 הוא ‎`1212`‎). אחרי
+      סבב 1 נשארים מוארים רק 30, 32, 48 ו-50.
+    - **מקרה הקצה :** סבב אחד עם 1024 בקבוקים צריך 10 עכברים, ועם 1025 כבר 11.
 
     <div class="explorer" data-kind="mice" data-n="1000" data-rounds="2" data-poison="613"></div>
 
     #### סיבוכיות { .sol-cost }
 
     - **עכברים :** ‏\( \lceil \log_{b+1} n \rceil \), וזה גם החסם התחתון.
-    - **בניית התכנית :** לכל בקבוק \( m \) ספרות, כלומר \( O(n \log n) \) בסך הכול.
+    - **בניית התכנית :** לכל בקבוק \( m \) ספרות, כלומר \( O(n \cdot m) = O(n \log_{b+1} n) \) בסך
+      הכול.
     - **הפענוח :** ‏\( O(m) \) פעולות.
 
 ## נקודות חשובות ושאלות המשך
@@ -353,9 +367,10 @@ added: 2026-10-27
     בסבב הראשון" ל"מת בשני" הוא תוצאה שלישית, והיא שמורידה את התשובה ל-7.
 
 ??? trap "מלכודת : מספור מ-1"
-    אם ממספרים 1 עד 1000, הבקבוק 1000 צריך עשרה ביטים בכל מקרה, אבל ל-1024 בקבוקים
-    ממוספרים 1 עד 1024 צריך 11 ביטים. מספור מ-0 משאיר את \( 2^m \) בקבוקים בתוך
-    \( m \) ביטים. לחלופין, בקבוק שאף עכבר לא שותה ממנו הוא הקוד "כולם חיים".
+    עם 1000 בקבוקים מספור מ-1 לא מזיק, כי גם 1000 נכנס בעשרה ביטים (\( 1000 < 1024 \)).
+    אבל עם 1024 בקבוקים הבקבוק 1024 צריך 11 ביטים. מספור מ-0 משאיר את \( 2^m \) בקבוקים
+    בתוך \( m \) ביטים, כי גם הקוד "כולם חיים" (הבקבוק 0, שאף עכבר לא שותה ממנו) הוא
+    תוצאה.
 
 ??? followup "שאלות המשך"
     - **הפוך :** יש \( m \) עכברים ו-\( n \) בקבוקים. כמה סבבים צריך?
@@ -368,8 +383,11 @@ added: 2026-10-27
 
         ??? fu-answer "תשובה"
             יש \( \binom{1000}{2} = 499{,}500 \) זוגות אפשריים, ולכן צריך \( 2^m \ge 499{,}500 \), כלומר
-            19 עכברים לפחות. הקוד הבינארי כבר לא מספיק : שני בקבוקים נותנים את ה-OR של הביטים,
-            ואותו OR יכול לבוא מכמה זוגות. צריך קוד שבו כל OR של שתי מילים שונה (disjunct code).
+            19 עכברים לפחות. זה חסם תחתון בלבד, ולא תמיד מגיעים אליו : ל-6 בקבוקים החסם הוא 4,
+            כי \( \binom{6}{2} = 15 \le 16 \), אבל חיפוש על כל התכניות מראה שצריך 5. הקוד הבינארי
+            כבר לא מספיק : שני בקבוקים נותנים את ה-OR של הביטים, ואותו OR יכול לבוא מכמה זוגות.
+            צריך קוד שבו ה-OR של כל זוג שונה, מה שנקרא קוד <span dir="ltr">2-separable</span>. קוד
+            <span dir="ltr">2-disjunct</span>, חזק יותר, מאפשר גם פענוח פשוט.
 
     - **‏git bisect עם כמה מכונות :** יש 1000 קומיטים ואחד מהם שבר טסט. כל ריצה לוקחת
       שעה, ויש 4 מכונות שרצות במקביל. כמה שעות?

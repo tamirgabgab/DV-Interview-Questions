@@ -138,7 +138,8 @@ added: 2026-10-16
            להעתיק אותה.
         3. אין solver, ולכן אין הבטחה שכל \( n \) הצורות ייכנסו בניסיון הראשון. הלולאה
            החיצונית מנסה שוב עם אותו \( n \), כדי שההתפלגות של \( n \) לא תוטה לכמויות
-           קטנות.
+           קטנות. לכן `max_shapes` חייב להיות לכל היותר \( (N-1)(M-1) \), מספר המשבצות של
+           ה-grid, אחרת הלולאה לא נגמרת (למשל `random_shapes(3, 3, 5)` כשיוצא \( n = 5 \)).
         4. כשלא נשאר מקום לצורה הבאה, לא מוותרים על צורה אחת אלא זורקים את כל הקבוצה.
            אחרת הקבוצות הצפופות היו מקבלות פחות צורות ממה שהוגרל.
 
@@ -202,11 +203,6 @@ added: 2026-10-16
 
         כמה נקודות על הקוד :
 
-        - **מערכים דינמיים :** ה-constraint על `size()` קובע את גודל המערכים. לפי התקן הגדלים
-          נפתרים קודם, ורק אחר כך האיברים.
-        - **‏`i < j` :** כל זוג נבדק פעם אחת, כלומר \( n(n-1)/2 \) תנאים. בלי התנאי הזה
-          הלולאה הייתה כוללת גם את \( i = j \), ושם אף אחד מארבעת המקרים לא מתקיים (צורה
-          תמיד חופפת לעצמה), ולכן `randomize()` היה נכשל תמיד.
         - **‏MAX_SHAPES :** חייב להיות אפשרי. ב-grid של \( N \times M \) נקודות נכנסים לכל היותר
           \( (N-1)(M-1) \) ריבועים, כולם בגודל 1.
         - **בלי סדר בין הצורות :** לא צריך להחליט מי ממוקמת ראשונה. ה-solver מוצא פתרון לכל
@@ -264,16 +260,6 @@ added: 2026-10-16
 
     <svg class="figure" viewBox="0 0 432 280" role="img" aria-label="זוגות של ריבועים : ארבעה מותרים ושניים אסורים"><line class="gp-line" x1="17" x2="17" y1="10" y2="98"/><line class="gp-line" x1="39" x2="39" y1="10" y2="98"/><line class="gp-line" x1="61" x2="61" y1="10" y2="98"/><line class="gp-line" x1="83" x2="83" y1="10" y2="98"/><line class="gp-line" x1="105" x2="105" y1="10" y2="98"/><line class="gp-line" x1="127" x2="127" y1="10" y2="98"/><line class="gp-line" x1="17" x2="127" y1="98" y2="98"/><line class="gp-line" x1="17" x2="127" y1="76" y2="76"/><line class="gp-line" x1="17" x2="127" y1="54" y2="54"/><line class="gp-line" x1="17" x2="127" y1="32" y2="32"/><line class="gp-line" x1="17" x2="127" y1="10" y2="10"/><circle class="gp-dot" cx="17" cy="98" r="1.8"/><circle class="gp-dot" cx="17" cy="76" r="1.8"/><circle class="gp-dot" cx="17" cy="54" r="1.8"/><circle class="gp-dot" cx="17" cy="32" r="1.8"/><circle class="gp-dot" cx="17" cy="10" r="1.8"/><circle class="gp-dot" cx="39" cy="98" r="1.8"/><circle class="gp-dot" cx="39" cy="76" r="1.8"/><circle class="gp-dot" cx="39" cy="54" r="1.8"/><circle class="gp-dot" cx="39" cy="32" r="1.8"/><circle class="gp-dot" cx="39" cy="10" r="1.8"/><circle class="gp-dot" cx="61" cy="98" r="1.8"/><circle class="gp-dot" cx="61" cy="76" r="1.8"/><circle class="gp-dot" cx="61" cy="54" r="1.8"/><circle class="gp-dot" cx="61" cy="32" r="1.8"/><circle class="gp-dot" cx="61" cy="10" r="1.8"/><circle class="gp-dot" cx="83" cy="98" r="1.8"/><circle class="gp-dot" cx="83" cy="76" r="1.8"/><circle class="gp-dot" cx="83" cy="54" r="1.8"/><circle class="gp-dot" cx="83" cy="32" r="1.8"/><circle class="gp-dot" cx="83" cy="10" r="1.8"/><circle class="gp-dot" cx="105" cy="98" r="1.8"/><circle class="gp-dot" cx="105" cy="76" r="1.8"/><circle class="gp-dot" cx="105" cy="54" r="1.8"/><circle class="gp-dot" cx="105" cy="32" r="1.8"/><circle class="gp-dot" cx="105" cy="10" r="1.8"/><circle class="gp-dot" cx="127" cy="98" r="1.8"/><circle class="gp-dot" cx="127" cy="76" r="1.8"/><circle class="gp-dot" cx="127" cy="54" r="1.8"/><circle class="gp-dot" cx="127" cy="32" r="1.8"/><circle class="gp-dot" cx="127" cy="10" r="1.8"/><rect class="shp-1" x="17" y="54" width="44" height="44"/><rect class="shp-2" x="83" y="32" width="44" height="44"/><text class="legend" x="72.0" y="120" text-anchor="middle" direction="rtl">✓ רחוקים</text><line class="gp-line" x1="161" x2="161" y1="10" y2="98"/><line class="gp-line" x1="183" x2="183" y1="10" y2="98"/><line class="gp-line" x1="205" x2="205" y1="10" y2="98"/><line class="gp-line" x1="227" x2="227" y1="10" y2="98"/><line class="gp-line" x1="249" x2="249" y1="10" y2="98"/><line class="gp-line" x1="271" x2="271" y1="10" y2="98"/><line class="gp-line" x1="161" x2="271" y1="98" y2="98"/><line class="gp-line" x1="161" x2="271" y1="76" y2="76"/><line class="gp-line" x1="161" x2="271" y1="54" y2="54"/><line class="gp-line" x1="161" x2="271" y1="32" y2="32"/><line class="gp-line" x1="161" x2="271" y1="10" y2="10"/><circle class="gp-dot" cx="161" cy="98" r="1.8"/><circle class="gp-dot" cx="161" cy="76" r="1.8"/><circle class="gp-dot" cx="161" cy="54" r="1.8"/><circle class="gp-dot" cx="161" cy="32" r="1.8"/><circle class="gp-dot" cx="161" cy="10" r="1.8"/><circle class="gp-dot" cx="183" cy="98" r="1.8"/><circle class="gp-dot" cx="183" cy="76" r="1.8"/><circle class="gp-dot" cx="183" cy="54" r="1.8"/><circle class="gp-dot" cx="183" cy="32" r="1.8"/><circle class="gp-dot" cx="183" cy="10" r="1.8"/><circle class="gp-dot" cx="205" cy="98" r="1.8"/><circle class="gp-dot" cx="205" cy="76" r="1.8"/><circle class="gp-dot" cx="205" cy="54" r="1.8"/><circle class="gp-dot" cx="205" cy="32" r="1.8"/><circle class="gp-dot" cx="205" cy="10" r="1.8"/><circle class="gp-dot" cx="227" cy="98" r="1.8"/><circle class="gp-dot" cx="227" cy="76" r="1.8"/><circle class="gp-dot" cx="227" cy="54" r="1.8"/><circle class="gp-dot" cx="227" cy="32" r="1.8"/><circle class="gp-dot" cx="227" cy="10" r="1.8"/><circle class="gp-dot" cx="249" cy="98" r="1.8"/><circle class="gp-dot" cx="249" cy="76" r="1.8"/><circle class="gp-dot" cx="249" cy="54" r="1.8"/><circle class="gp-dot" cx="249" cy="32" r="1.8"/><circle class="gp-dot" cx="249" cy="10" r="1.8"/><circle class="gp-dot" cx="271" cy="98" r="1.8"/><circle class="gp-dot" cx="271" cy="76" r="1.8"/><circle class="gp-dot" cx="271" cy="54" r="1.8"/><circle class="gp-dot" cx="271" cy="32" r="1.8"/><circle class="gp-dot" cx="271" cy="10" r="1.8"/><rect class="shp-1" x="161" y="54" width="44" height="44"/><rect class="shp-2" x="205" y="54" width="44" height="44"/><text class="legend" x="216.0" y="120" text-anchor="middle" direction="rtl">✓ צלע משותפת</text><line class="gp-line" x1="305" x2="305" y1="10" y2="98"/><line class="gp-line" x1="327" x2="327" y1="10" y2="98"/><line class="gp-line" x1="349" x2="349" y1="10" y2="98"/><line class="gp-line" x1="371" x2="371" y1="10" y2="98"/><line class="gp-line" x1="393" x2="393" y1="10" y2="98"/><line class="gp-line" x1="415" x2="415" y1="10" y2="98"/><line class="gp-line" x1="305" x2="415" y1="98" y2="98"/><line class="gp-line" x1="305" x2="415" y1="76" y2="76"/><line class="gp-line" x1="305" x2="415" y1="54" y2="54"/><line class="gp-line" x1="305" x2="415" y1="32" y2="32"/><line class="gp-line" x1="305" x2="415" y1="10" y2="10"/><circle class="gp-dot" cx="305" cy="98" r="1.8"/><circle class="gp-dot" cx="305" cy="76" r="1.8"/><circle class="gp-dot" cx="305" cy="54" r="1.8"/><circle class="gp-dot" cx="305" cy="32" r="1.8"/><circle class="gp-dot" cx="305" cy="10" r="1.8"/><circle class="gp-dot" cx="327" cy="98" r="1.8"/><circle class="gp-dot" cx="327" cy="76" r="1.8"/><circle class="gp-dot" cx="327" cy="54" r="1.8"/><circle class="gp-dot" cx="327" cy="32" r="1.8"/><circle class="gp-dot" cx="327" cy="10" r="1.8"/><circle class="gp-dot" cx="349" cy="98" r="1.8"/><circle class="gp-dot" cx="349" cy="76" r="1.8"/><circle class="gp-dot" cx="349" cy="54" r="1.8"/><circle class="gp-dot" cx="349" cy="32" r="1.8"/><circle class="gp-dot" cx="349" cy="10" r="1.8"/><circle class="gp-dot" cx="371" cy="98" r="1.8"/><circle class="gp-dot" cx="371" cy="76" r="1.8"/><circle class="gp-dot" cx="371" cy="54" r="1.8"/><circle class="gp-dot" cx="371" cy="32" r="1.8"/><circle class="gp-dot" cx="371" cy="10" r="1.8"/><circle class="gp-dot" cx="393" cy="98" r="1.8"/><circle class="gp-dot" cx="393" cy="76" r="1.8"/><circle class="gp-dot" cx="393" cy="54" r="1.8"/><circle class="gp-dot" cx="393" cy="32" r="1.8"/><circle class="gp-dot" cx="393" cy="10" r="1.8"/><circle class="gp-dot" cx="415" cy="98" r="1.8"/><circle class="gp-dot" cx="415" cy="76" r="1.8"/><circle class="gp-dot" cx="415" cy="54" r="1.8"/><circle class="gp-dot" cx="415" cy="32" r="1.8"/><circle class="gp-dot" cx="415" cy="10" r="1.8"/><rect class="shp-1" x="305" y="54" width="44" height="44"/><rect class="shp-2" x="349" y="10" width="66" height="66"/><text class="legend" x="360.0" y="120" text-anchor="middle" direction="rtl">✓ חלק מצלע</text><line class="gp-line" x1="17" x2="17" y1="150" y2="238"/><line class="gp-line" x1="39" x2="39" y1="150" y2="238"/><line class="gp-line" x1="61" x2="61" y1="150" y2="238"/><line class="gp-line" x1="83" x2="83" y1="150" y2="238"/><line class="gp-line" x1="105" x2="105" y1="150" y2="238"/><line class="gp-line" x1="127" x2="127" y1="150" y2="238"/><line class="gp-line" x1="17" x2="127" y1="238" y2="238"/><line class="gp-line" x1="17" x2="127" y1="216" y2="216"/><line class="gp-line" x1="17" x2="127" y1="194" y2="194"/><line class="gp-line" x1="17" x2="127" y1="172" y2="172"/><line class="gp-line" x1="17" x2="127" y1="150" y2="150"/><circle class="gp-dot" cx="17" cy="238" r="1.8"/><circle class="gp-dot" cx="17" cy="216" r="1.8"/><circle class="gp-dot" cx="17" cy="194" r="1.8"/><circle class="gp-dot" cx="17" cy="172" r="1.8"/><circle class="gp-dot" cx="17" cy="150" r="1.8"/><circle class="gp-dot" cx="39" cy="238" r="1.8"/><circle class="gp-dot" cx="39" cy="216" r="1.8"/><circle class="gp-dot" cx="39" cy="194" r="1.8"/><circle class="gp-dot" cx="39" cy="172" r="1.8"/><circle class="gp-dot" cx="39" cy="150" r="1.8"/><circle class="gp-dot" cx="61" cy="238" r="1.8"/><circle class="gp-dot" cx="61" cy="216" r="1.8"/><circle class="gp-dot" cx="61" cy="194" r="1.8"/><circle class="gp-dot" cx="61" cy="172" r="1.8"/><circle class="gp-dot" cx="61" cy="150" r="1.8"/><circle class="gp-dot" cx="83" cy="238" r="1.8"/><circle class="gp-dot" cx="83" cy="216" r="1.8"/><circle class="gp-dot" cx="83" cy="194" r="1.8"/><circle class="gp-dot" cx="83" cy="172" r="1.8"/><circle class="gp-dot" cx="83" cy="150" r="1.8"/><circle class="gp-dot" cx="105" cy="238" r="1.8"/><circle class="gp-dot" cx="105" cy="216" r="1.8"/><circle class="gp-dot" cx="105" cy="194" r="1.8"/><circle class="gp-dot" cx="105" cy="172" r="1.8"/><circle class="gp-dot" cx="105" cy="150" r="1.8"/><circle class="gp-dot" cx="127" cy="238" r="1.8"/><circle class="gp-dot" cx="127" cy="216" r="1.8"/><circle class="gp-dot" cx="127" cy="194" r="1.8"/><circle class="gp-dot" cx="127" cy="172" r="1.8"/><circle class="gp-dot" cx="127" cy="150" r="1.8"/><rect class="shp-1" x="17" y="194" width="44" height="44"/><rect class="shp-2" x="61" y="150" width="44" height="44"/><text class="legend" x="72.0" y="260" text-anchor="middle" direction="rtl">✓ פינה משותפת</text><line class="gp-line" x1="161" x2="161" y1="150" y2="238"/><line class="gp-line" x1="183" x2="183" y1="150" y2="238"/><line class="gp-line" x1="205" x2="205" y1="150" y2="238"/><line class="gp-line" x1="227" x2="227" y1="150" y2="238"/><line class="gp-line" x1="249" x2="249" y1="150" y2="238"/><line class="gp-line" x1="271" x2="271" y1="150" y2="238"/><line class="gp-line" x1="161" x2="271" y1="238" y2="238"/><line class="gp-line" x1="161" x2="271" y1="216" y2="216"/><line class="gp-line" x1="161" x2="271" y1="194" y2="194"/><line class="gp-line" x1="161" x2="271" y1="172" y2="172"/><line class="gp-line" x1="161" x2="271" y1="150" y2="150"/><circle class="gp-dot" cx="161" cy="238" r="1.8"/><circle class="gp-dot" cx="161" cy="216" r="1.8"/><circle class="gp-dot" cx="161" cy="194" r="1.8"/><circle class="gp-dot" cx="161" cy="172" r="1.8"/><circle class="gp-dot" cx="161" cy="150" r="1.8"/><circle class="gp-dot" cx="183" cy="238" r="1.8"/><circle class="gp-dot" cx="183" cy="216" r="1.8"/><circle class="gp-dot" cx="183" cy="194" r="1.8"/><circle class="gp-dot" cx="183" cy="172" r="1.8"/><circle class="gp-dot" cx="183" cy="150" r="1.8"/><circle class="gp-dot" cx="205" cy="238" r="1.8"/><circle class="gp-dot" cx="205" cy="216" r="1.8"/><circle class="gp-dot" cx="205" cy="194" r="1.8"/><circle class="gp-dot" cx="205" cy="172" r="1.8"/><circle class="gp-dot" cx="205" cy="150" r="1.8"/><circle class="gp-dot" cx="227" cy="238" r="1.8"/><circle class="gp-dot" cx="227" cy="216" r="1.8"/><circle class="gp-dot" cx="227" cy="194" r="1.8"/><circle class="gp-dot" cx="227" cy="172" r="1.8"/><circle class="gp-dot" cx="227" cy="150" r="1.8"/><circle class="gp-dot" cx="249" cy="238" r="1.8"/><circle class="gp-dot" cx="249" cy="216" r="1.8"/><circle class="gp-dot" cx="249" cy="194" r="1.8"/><circle class="gp-dot" cx="249" cy="172" r="1.8"/><circle class="gp-dot" cx="249" cy="150" r="1.8"/><circle class="gp-dot" cx="271" cy="238" r="1.8"/><circle class="gp-dot" cx="271" cy="216" r="1.8"/><circle class="gp-dot" cx="271" cy="194" r="1.8"/><circle class="gp-dot" cx="271" cy="172" r="1.8"/><circle class="gp-dot" cx="271" cy="150" r="1.8"/><rect class="shp-1" x="161" y="172" width="66" height="66"/><rect class="shp-2" x="205" y="172" width="44" height="44"/><rect class="shp-bad" x="205" y="172" width="22" height="44"/><text class="legend" x="216.0" y="260" text-anchor="middle" direction="rtl">✗ חפיפה</text><line class="gp-line" x1="305" x2="305" y1="150" y2="238"/><line class="gp-line" x1="327" x2="327" y1="150" y2="238"/><line class="gp-line" x1="349" x2="349" y1="150" y2="238"/><line class="gp-line" x1="371" x2="371" y1="150" y2="238"/><line class="gp-line" x1="393" x2="393" y1="150" y2="238"/><line class="gp-line" x1="415" x2="415" y1="150" y2="238"/><line class="gp-line" x1="305" x2="415" y1="238" y2="238"/><line class="gp-line" x1="305" x2="415" y1="216" y2="216"/><line class="gp-line" x1="305" x2="415" y1="194" y2="194"/><line class="gp-line" x1="305" x2="415" y1="172" y2="172"/><line class="gp-line" x1="305" x2="415" y1="150" y2="150"/><circle class="gp-dot" cx="305" cy="238" r="1.8"/><circle class="gp-dot" cx="305" cy="216" r="1.8"/><circle class="gp-dot" cx="305" cy="194" r="1.8"/><circle class="gp-dot" cx="305" cy="172" r="1.8"/><circle class="gp-dot" cx="305" cy="150" r="1.8"/><circle class="gp-dot" cx="327" cy="238" r="1.8"/><circle class="gp-dot" cx="327" cy="216" r="1.8"/><circle class="gp-dot" cx="327" cy="194" r="1.8"/><circle class="gp-dot" cx="327" cy="172" r="1.8"/><circle class="gp-dot" cx="327" cy="150" r="1.8"/><circle class="gp-dot" cx="349" cy="238" r="1.8"/><circle class="gp-dot" cx="349" cy="216" r="1.8"/><circle class="gp-dot" cx="349" cy="194" r="1.8"/><circle class="gp-dot" cx="349" cy="172" r="1.8"/><circle class="gp-dot" cx="349" cy="150" r="1.8"/><circle class="gp-dot" cx="371" cy="238" r="1.8"/><circle class="gp-dot" cx="371" cy="216" r="1.8"/><circle class="gp-dot" cx="371" cy="194" r="1.8"/><circle class="gp-dot" cx="371" cy="172" r="1.8"/><circle class="gp-dot" cx="371" cy="150" r="1.8"/><circle class="gp-dot" cx="393" cy="238" r="1.8"/><circle class="gp-dot" cx="393" cy="216" r="1.8"/><circle class="gp-dot" cx="393" cy="194" r="1.8"/><circle class="gp-dot" cx="393" cy="172" r="1.8"/><circle class="gp-dot" cx="393" cy="150" r="1.8"/><circle class="gp-dot" cx="415" cy="238" r="1.8"/><circle class="gp-dot" cx="415" cy="216" r="1.8"/><circle class="gp-dot" cx="415" cy="194" r="1.8"/><circle class="gp-dot" cx="415" cy="172" r="1.8"/><circle class="gp-dot" cx="415" cy="150" r="1.8"/><rect class="shp-1" x="305" y="150" width="88" height="88"/><rect class="shp-2" x="327" y="172" width="44" height="44"/><rect class="shp-bad" x="327" y="172" width="44" height="44"/><text class="legend" x="360.0" y="260" text-anchor="middle" direction="rtl">✗ אחד בתוך השני</text></svg>
 
-    **נסו בעצמכם.** "עוד צורה" מגריל מועמד אקראי מבין כל הצורות שנכנסות ב-grid : מועמד
-    שחופף צורה קיימת מהבהב באדום ונדחה, והראשון הפנוי נכנס בירוק. זו בדיוק בחירה אחידה
-    מבין המועמדים הפנויים, כמו `rng.choice(free)` בדף. "הגרלה שלמה" מריץ את
-    `random_shapes`, ומפת החום אחרי 500 הגרלות מראה איפה הצורות נוחתות ולמה רובן קטנות.
-    המתג עובר למלבנים של סעיף ב. עם "ההטלות על הצירים", מועמד שנדחה מצויר עם ההטלות שלו ושל
-    הצורה שהוא חופף : הן נפגשות גם על ציר \( x \) וגם על ציר \( y \). מתחת לתיבה שתי צורות
-    להזזה, עם ארבעת המקרים של הדף שנדלקים ונכבים בזמן הגרירה.
-
-    <div class="explorer" data-kind="shapes" data-n="10" data-m="8" data-max="6"></div>
-
     **מתי שני ריבועים לא חופפים.** שני ריבועים \( i \) ו-\( j \) לא חופפים אם ורק אם
     \( j \) נמצא **כולו** באחד מארבעת האזורים סביב \( i \) :
 
@@ -284,11 +270,15 @@ added: 2026-10-16
     - **מתחת :** \( y_2[j] \le y_1[i] \).
     - **מעל :** \( y_2[i] \le y_1[j] \).
 
-    מספיק שאחד מהם מתקיים, ולכן מחברים אותם ב-"או". בפינות האזורים חופפים (למשל משמאל
-    וגם מתחת), וזה בסדר.
+    למה דווקא ארבעת אלה : החיתוך של שני מלבנים שצלעותיהם מקבילות לצירים הוא מכפלה של שני
+    חיתוכים, של ההטלות על ציר \( x \) ושל ההטלות על ציר \( y \). יש לו שטח רק אם שני החיתוכים
+    באורך חיובי. לכן אין חפיפה בדיוק כשבציר אחד לפחות ההטלות זרות (או נוגעות בנקודה), וזה
+    אחד מארבעת המקרים. מספיק שאחד מהם מתקיים, ולכן מחברים אותם ב-"או". בפינות האזורים
+    חופפים (למשל משמאל וגם מתחת), וזה בסדר.
 
     הסימן \( \le \) ולא \( < \) הוא מה שמאפשר צלע משותפת : כש-\( x_2[j] = x_1[i] \), הצלע
-    הימנית של \( j \) היא בדיוק הצלע השמאלית של \( i \).
+    הימנית של \( j \) והצלע השמאלית של \( i \) על אותו קו אנכי, ולכן הצורות יכולות לגעת
+    בלי לחפוף.
 
     אותו תנאי בצורה הפוכה : שני ריבועים **חופפים** אם ורק אם הם חופפים גם בציר \( x \) וגם
     בציר \( y \) :
@@ -302,6 +292,23 @@ added: 2026-10-16
 
     זה בדיוק השלילה של ה-"או" (כלל דה-מורגן). ב-constraint נוח יותר להשתמש ב-"או", ובבודק
     נוח יותר להשתמש ב-"וגם".
+
+    **נסו בעצמכם.** התיבה מוסיפה על התרשימים את התנועה : מועמדים שנדחים אחד אחרי השני, ההטלות
+    שנפגשות בזמן אמת, וסטטיסטיקה של מאות הגרלות.
+
+    - **צלע משותפת :** בצד, לחצו על B והזיזו אותו בחץ ימינה פעם אחת, אל \( (5,3) \to (8,6) \).
+      המקרה "B מימין ל-A" נדלק, כי ‏\( x_1[B] = 5 \ge x_2[A] = 5 \) : צלע משותפת מותרת בזכות
+      ה-\( \le \). חזרו בחץ שמאלה ועלו בחץ למעלה פעם אחת : עכשיו "מעל" נדלק.
+    - **מועמדים שנדחים :** לחצו "עוד צורה" ארבע פעמים, ועקבו אחרי מספר המועמדים שלא חופפים,
+      שיורד מ-196. במועמד שנדחה, הקטעים האדומים של ההטלות נפגשים על שני הצירים.
+    - **הצלב :** הכפתור "צלב" מציב את שני המלבנים של סעיף ב. אף פינה לא בתוך המלבן השני,
+      ובכל זאת אף מקרה לא מתקיים, והם חופפים.
+    - **למה רוב הצורות קטנות :** לחצו "500 הגרלות". צלע 1 היא בערך 48% מהצורות, אף שהיא רק
+      63 מתוך 196 המועמדים. למה? ואחר כך עברו למלבנים והשוו.
+    - **צפיפות :** ‏\( N = 3 \), ‏\( M = 6 \), מלבנים ועד 10 צורות. לחצו "הגרלה שלמה" כמה
+      פעמים : כשיוצאות 10 צורות, ההגרלה התחילה מחדש מאות פעמים.
+
+    <div class="explorer" data-kind="shapes" data-n="10" data-m="8" data-max="6"></div>
 
     **דוגמאות להגרלות.** כל תמונה היא הגרלה אחת. שימו לב לריבועים צמודים, עם צלע או פינה
     משותפת :
@@ -323,7 +330,8 @@ added: 2026-10-16
     ב-SystemVerilog מספר התנאים של `c_no_overlap` הוא \( n(n-1)/2 \), כלומר גדל כמו
     \( n^2 \), ועם 6 צורות אלה 15 תנאים שה-solver פותר יחד. ב-Python כל שלב סורק את כל
     196 הריבועים האפשריים מול הצורות שכבר נבחרו, \( O(196 \cdot n) \) לשלב, ואם נתקעים
-    מתחילים מחדש; ב-grid קטן וצפוף זה עלול לקרות כמה פעמים.
+    מתחילים מחדש. ב-grid קטן וצפוף זה קורה הרבה : ב-5 על 6 נקודות עם 20 ריבועים (כל
+    המשבצות) ההגרלה מתחילה מחדש כ-15 פעמים בממוצע.
 
 ---
 
@@ -375,9 +383,7 @@ added: 2026-10-16
         1. גוף ריק הוא constraint חוקי שלא דורש כלום. מכיוון שהשם זהה, הוא מסתיר את
            `c_square` של `square_set`, ושאר ה-constraints עוברים בירושה כמו שהם.
 
-        ב-SystemVerilog, constraint במחלקה יורשת עם **אותו שם** מחליף את ה-constraint של
-        מחלקת הבסיס. כל שאר התנאים עוברים בירושה. דרך אחרת היא לכבות את התנאי באובייקט של
-        מחלקת הבסיס, בלי מחלקה חדשה :
+        דרך אחרת היא לכבות את התנאי באובייקט של מחלקת הבסיס, בלי מחלקה חדשה :
 
         ```systemverilog title="constraint_mode"
         square_set s = new();
@@ -400,8 +406,11 @@ added: 2026-10-16
     בצלב ההיטלים חופפים גם על ציר \( x \) וגם על ציר \( y \), ולכן המלבנים חופפים.
 
     בשני ריבועים צלב לא יכול לקרות : הוא דורש שאחד יהיה רחב יותר מהשני והשני גבוה יותר
-    מהראשון, וריבוע רחב יותר הוא גם גבוה יותר. לכן בסעיף א בדיקה לפי פינות במקרה עובדת,
-    אבל רק התנאי על הצירים נכון לשני הסעיפים.
+    מהראשון, וריבוע רחב יותר הוא גם גבוה יותר. ובכל זאת בדיקה לפי פינות נכשלת גם בסעיף א :
+    שני ריבועים מוזזים לאורך צלע, כמו \( (1,1) \to (3,3) \) ו-\( (2,1) \to (4,3) \), חופפים
+    בלי שאף פינה נמצאת ממש בתוך השני (כל הפינות על השפה), וכך גם שני ריבועים זהים. אם
+    סופרים גם פינה על השפה, נפסלים במקום זה ריבועים צמודים. רק התנאי על הצירים נכון לשני
+    הסעיפים.
 
     **דוגמאות להגרלות.**
 
@@ -411,7 +420,9 @@ added: 2026-10-16
 
     אותה סיבוכיות כמו בסעיף א : \( n(n-1)/2 \) תנאי זוגות ב-SystemVerilog. ב-Python מרחב
     המועמדים גדל מ-196 ל-1,260 צורות, ולכן כל שלב סורק פי 6 יותר, אבל עם 6 צורות לכל
-    היותר זה עדיין מיידי.
+    היותר זה עדיין מיידי. ב-grid צפוף ההתחלות מחדש נעשות נפוצות הרבה יותר : ב-3 על 6
+    נקודות עם 10 מלבנים כל מלבן שגדול ממשבצת אחת תוקע את ההגרלה, וצריך כ-475 התחלות מחדש
+    בממוצע.
 
 ## נקודות חשובות ושאלות המשך
 
@@ -422,21 +433,23 @@ added: 2026-10-16
 
 ??? trap "מלכודת : לשכוח את i < j"
     בלי `i < j` בלולאה הכפולה כל צורה נבדקת גם מול עצמה, ושם אף אחד מארבעת המקרים לא
-    מתקיים. התוצאה היא `randomize()` שנכשל **תמיד**, ומי שלא בודק את ערך ההחזרה שלו מקבל
-    מערכים לא מאותחלים בלי שום הודעה.
+    מתקיים. התוצאה היא `randomize()` שנכשל **תמיד**, ומי שלא בודק את ערך ההחזרה שלו מקבל את
+    הערכים הקודמים (בקריאה הראשונה \( n = 0 \) ומערכים ריקים) בלי שום הודעה.
 
 ??? trap "מלכודת : בדיקה לפי פינות"
-    "שני מלבנים חופפים אם יש פינה של אחד בתוך השני" נכון לריבועים ולא למלבנים : בצלב אין
-    אף פינה בתוך המלבן השני, והם חופפים. הבדיקה הנכונה היא על ההיטלים בשני הצירים, כמו
-    בתרשים של סעיף ב.
+    "שני מלבנים חופפים אם יש פינה של אחד בתוך השני" נכשלת כבר בריבועים מוזזים לאורך צלע
+    (כל הפינות על השפה ולא בפנים), ובמלבנים גם בצלב, שבו אין אף פינה בתוך המלבן השני והם
+    חופפים. הבדיקה הנכונה היא על ההיטלים בשני הצירים, כמו בתרשים של סעיף ב.
 
 ??? followup "שאלות המשך"
-    - **מרווח בין צורות :** כל שתי צורות חייבות להיות במרחק של לפחות \( G \). מה משנים
-      ב-constraint?
+    - **מרווח בין צורות :** בין כל שתי צורות צריך מרווח של לפחות \( G \) באחד הצירים. מה
+      משנים ב-constraint?
 
         ??? fu-answer "תשובה"
             מוסיפים \( G \) לכל אחד מארבעת המקרים, למשל \( x_2[j] + G \le x_1[i] \). עם \( G = 1 \)
-            צורות כבר לא יכולות להיות צמודות.
+            צורות כבר לא יכולות להיות צמודות. זה מרחק של \( G \) לפחות באחד הצירים, חזק יותר
+            ממרחק אוקלידי \( G \) : עם \( G = 4 \), פער של 3 בכל ציר נפסל, אף שהמרחק בקו
+            ישר הוא בערך 4.24.
 
     - **כמה שטח מכוסה :** דרשו שהצורות יכסו לפחות חצי מה-grid. מה צריך להוסיף?
 
@@ -450,13 +463,16 @@ added: 2026-10-16
         ??? fu-answer "תשובה"
             לא בהכרח. ה-solver מנסה להגריל באחידות על כל הפתרונות, אבל הבנייה צעד אחרי צעד
             ב-Python לא אחידה : ריבוע ענק שנבחר ראשון משאיר מעט מקום לאחרים, ולכן קבוצה עם
-            צורה גדולה יוצאת בהסתברות גבוהה יותר מקבוצה של צורות קטנות.
+            צורה גדולה יוצאת בהסתברות גבוהה יותר מקבוצה של צורות קטנות. למשל ב-5 על 5 נקודות
+            עם שני ריבועים יש 272 קבוצות חוקיות, וקבוצה עם ריבוע 3 על 3 יוצאת בערך פי 1.7 מאחיד,
+            ושני ריבועי יחידה רחוקים זה מזה רק פי 0.72 עד 0.86.
 
     - **הרבה צורות :** מה קורה ל-solver כשמבקשים הרבה צורות?
 
         ??? fu-answer "תשובה"
             מספר התנאים גדל כמו \( n^2 \), וה-solver נהיה איטי. חלופה : מחזיקים מפה של משבצות
-            תפוסות וממקמים צורה אחרי צורה, כמו בפתרון ב-Python.
+            תפוסות וממקמים צורה אחרי צורה, כמו בפתרון ב-Python (שם במקום מפה בודקים כל מועמד מול
+            הצורות שכבר נבחרו).
 
     - **שלושה ממדים :** קופסאות במקום מלבנים. מה קורה לתנאי של אי החפיפה?
 

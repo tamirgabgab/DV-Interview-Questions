@@ -5,9 +5,13 @@ number of mice gives every bottle its own outcome); the page's numbers (10, 7 an
 for 1000 bottles, bottle 613 in one and two rounds); the explorer's JavaScript; and the
 page copies of the generated blocks."""
 
+import itertools
 import json
+import math
 import random
 import sys
+
+import pytest
 
 from extract_code import ROOT, load_python
 
@@ -32,6 +36,25 @@ def test_page_numbers():
     assert 1000 * 999 // 2 == 499_500 and 2 ** 18 < 499_500 <= 2 ** 19
     # edge cases: one bottle needs no mouse; n a power exactly
     assert mice_needed(1, 1) == 0 and mice_needed(1024, 1) == 10 and mice_needed(1025, 1) == 11
+
+
+def test_no_rounds_is_refused():
+    """b = 0 would loop forever ((b + 1)^m stays 1); the page asks for b >= 1 and the code refuses it."""
+    with pytest.raises(ValueError):
+        mice_needed(5, 0)
+
+
+def test_two_poisoned_bound_is_not_tight():
+    """The follow-up: two poisoned bottles need every OR of two codewords to differ (a
+    2-separable code). C(1000, 2) gives at least 19 mice; the bound is only a lower bound:
+    6 bottles have C(6, 2) = 15 <= 16 pairs, yet 4 mice are not enough and 5 are."""
+    def fewest(n):
+        for m in range(1, 8):
+            for cols in itertools.combinations(range(1 << m), n):
+                if len({a | b for a, b in itertools.combinations(cols, 2)}) == math.comb(n, 2):
+                    return m
+    assert math.comb(6, 2) == 15 <= 2 ** 4 and fewest(6) == 5
+    assert math.ceil(math.log2(math.comb(1000, 2))) == 19
 
 
 def test_every_bottle_is_found():
@@ -106,6 +129,22 @@ def test_explorer_candidates():
                                                for i, d in enumerate(death))]
             assert cands == want and x in cands, (n, b, x, r)
         assert m == len(death)
+
+
+def test_box_tasks():
+    """The page's tasks for the box: 1000 bottles, two rounds, bottle 613 leaves 8 bottles
+    after round 1 (mice 0, 3 and 4 die; mouse 6 can only be 0, so it drinks from no bottle
+    in round 2); 81 bottles and bottle 50 (1212 in base 3) leave 30, 32, 48 and 50."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      const run = (n, b, x, r) => m.miceCands(n, b, m.miceDeath(x, m.miceNeeded(n, b), b), r);
+      console.log(JSON.stringify([run(1000, 2, 613, 1), run(81, 2, 50, 1), m.miceDeath(613, 7, 2)]));""")
+    assert len(got[0]) == 8 and got[0] == [109, 115, 127, 133, 595, 601, 613, 619]
+    assert got[1] == [30, 32, 48, 50] and q0051.digits(50, 3, 4) == [2, 1, 2, 1]
+    assert [i for i, d in enumerate(got[2]) if d == 1] == [0, 3, 4]
+    assert sum(drink_round(y, 6, 2) == 2 for y in range(1000)) == 0 and 2 * 3 ** 6 > 999
 
 
 def test_figures_up_to_date():

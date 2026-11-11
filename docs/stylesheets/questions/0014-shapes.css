@@ -1,0 +1,16 @@
+/* Question 0014, random shapes without overlap: the shapes box (explorer/shapes.js) on one
+   screen (session 34). The box is two columns (cols): the board and the step's line in the
+   main column; beside them the two shapes to drag, or the heat map once it is drawn (the
+   "בצד" select switches them). A narrow, tall grid (3 x 12 points) would grow to the
+   column's width and run off the screen, so the board and the heat map keep a height cap
+   and centre their drawing inside it; the three sliders and the kind share one row. */
+
+.md-typeset .explorer[data-kind="shapes"] svg.sh-live { max-height: 19rem; }
+.md-typeset .explorer[data-kind="shapes"] .sh-heat svg.sh-live { max-width: 17rem; max-height: 15rem; display: block; }
+.md-typeset .explorer[data-kind="shapes"] svg.sh-sandbox { max-width: 15rem; display: block; }
+.md-typeset .explorer[data-kind="shapes"] .sh-viewlab:not([hidden]) { display: block; margin: 0 0 0.4rem; font-size: 0.7rem; }
+.md-typeset .explorer[data-kind="shapes"] .sh-presets { margin: 0.2rem 0 0.3rem; }
+.md-typeset .explorer[data-kind="shapes"] .sh-sides { font-size: 0.66rem; }
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="shapes"] .ex-controls input[type="range"] { max-width: 6rem; }
+}

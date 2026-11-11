@@ -67,7 +67,7 @@ def mice_figure():
     for i in range(m):
         x = x0 - i * gap
         dead = death[i] == 1
-        s += (f'<g class="mc-mouse{" is-dead" if dead else ""}"><title>mouse {i}: bit {bits[i]}, {"dies" if dead else "lives"}</title>'
+        s += (f'<g class="mc-mouse{" is-dead" if dead else ""}"><title>עכבר {i} : הביט {bits[i]}, {"מת" if dead else "שורד"}</title>'
               f'<circle cx="{x}" cy="62" r="22"/><text x="{x}" y="68" text-anchor="middle">{bits[i]}</text></g>'
               f'<text class="tick" x="{x}" y="24" text-anchor="middle">2^{i}</text>'
               f'<text class="tick" x="{x}" y="112" text-anchor="middle">{"✗" if dead else "✓"}</text>')
