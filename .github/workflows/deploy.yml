@@ -119,8 +119,15 @@ jobs:
           make install
       - name: Install z3 and the Verilator run-time dependencies
         run: |
-          sudo apt-get update -q
-          sudo apt-get install -y -q z3 perl libfl2
+          # The runner's Ubuntu mirror sometimes fails to resolve for a few minutes
+          # (2026-11-11): retry the update and the install with a growing pause.
+          for i in 1 2 3 4 5; do
+            if sudo apt-get update -q && sudo apt-get install -y -q z3 perl libfl2; then
+              break
+            fi
+            if [ "$i" = 5 ]; then exit 1; fi
+            echo "apt failed (try $i), retrying in $((i * 30)) s"; sleep $((i * 30))
+          done
           echo "$HOME/verilator/bin" >> "$GITHUB_PATH"
       - run: verilator --version && z3 --version
       # Compiled testbenches are cached by content hash; only changed ones recompile.
