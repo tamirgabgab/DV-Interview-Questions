@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0095  # noqa: E402
 
 ns = load_python(95)
+SOLUTIONS_PAGE = ns["SOLUTIONS"]
 Q5, SIGMA, potential, half_plane, replay, jump = ns["Q5"], ns["SIGMA"], ns["potential"], ns["half_plane"], ns["replay"], ns["jump"]
 PAGE = (ROOT / "docs" / "questions" / "senior" / "0095-conways-soldiers.md").read_text(encoding="utf-8")
 
@@ -43,6 +44,50 @@ def test_the_heaviest_cells():
         cells = sorted(((x, y) for x in range(-k, k + 1) for y in range(-k, 1)),
                        key=lambda c: abs(c[0]) + n - c[1])[:k]
         assert potential(cells, n) == z(q0095.top(n, k))
+
+
+def test_part_a_bounds_and_the_19_cells():
+    s = SIGMA
+    # part a's proof: the three heaviest cells for (0, 2) and the seven for (0, 3)
+    assert z(q0095.top(2, 3)) == s ** 2 + 2 * s ** 3 and f"{float(s ** 2 + 2 * s ** 3):.3f}" == "0.854"
+    assert z(q0095.top(3, 7)) == s ** 3 + 3 * s ** 4 + 3 * s ** 5
+    assert f"{float(s ** 3 + 3 * s ** 4 + 3 * s ** 5):.3f}" == "0.944"
+    assert "\\sigma^2 + 2\\sigma^3 \\approx 0.854" in PAGE and "3\\sigma^5 \\approx 0.944" in PAGE
+    # the follow-up on 19: 16 cells within distance 7 of (0, 4), 9 at distance 8, and any 19
+    # weighing 1 are the 16 and three of the 9 (84 ways)
+    from itertools import combinations
+    from math import comb
+    cells = [(x, y) for x in range(-9, 10) for y in range(-9, 1)]
+    d = lambda c: abs(c[0]) + 4 - c[1]  # noqa: E731
+    near = [c for c in cells if d(c) <= 7]
+    ring = [c for c in cells if d(c) == 8]
+    assert len(near) == 16 and len(ring) == 9 and comb(9, 3) == 84
+    assert all(potential(near + list(three), 4) == 1 for three in combinations(ring, 3))
+    # any other 19 cells weigh less: swapping one of the 16 for a lighter cell loses weight
+    assert potential(near[1:] + ring[:4], 4) < 1
+    assert "84 אפשרויות" in PAGE and "16 המשבצות" in PAGE and "7.5 מיליון" in PAGE
+
+
+def test_box_tasks():
+    """The numbers the "נסו" paragraphs ask the reader to see in the boxes."""
+    s = SIGMA
+    row3 = set(SOLUTIONS_PAGE[3][0])
+    after = jump(frozenset(row3), (2, 0), (2, -1), (2, -2))
+    assert potential(row3, 3) == 1 and potential(after, 3) == 1 - 2 * s ** 6
+    assert f"{float(1 - 2 * s ** 6):.4f}" == "0.8885"
+    assert potential({(0, 0), (0, -1), (-1, 0)}, 2) == s ** 2 + 2 * s ** 3
+    army4 = set(q0095.SOLUTIONS[4][0])
+    assert potential(army4 - {(2, -3)}, 4) == 1 - s ** 9 and f"{float(1 - s ** 9):.4f}" == "0.9868"
+    assert len(replay(army4, q0095.SOLUTIONS[4][1])[12]) == 8
+    full = frozenset((x, y) for x in range(-5, 6) for y in range(-4, 1))
+    assert len(full) == 55 and f"{float(potential(full, 5)):.4f}" == "0.8472"
+    b1 = jump(full, (0, -1), (0, 0), (0, 1))
+    b2 = jump(b1, (1, -1), (1, 0), (1, 1))
+    b3 = jump(b2, (0, 1), (1, 1), (2, 1))
+    assert potential(b1, 5) == potential(full, 5) == potential(b2, 5)
+    assert potential(b2, 5) - potential(b3, 5) == 2 * s ** 5 and f"{float(2 * s ** 5):.4f}" == "0.1803"
+    for text in ("ל-0.8885", "המד 0.854", "ל-0.9868", "רק 0.8472", "\\approx 0.1803", "נגנו עד מהלך 12"):
+        assert text in PAGE, text
 
 
 def test_half_plane_table():

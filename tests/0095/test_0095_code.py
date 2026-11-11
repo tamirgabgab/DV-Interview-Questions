@@ -8,6 +8,7 @@ representation p + q·σ in integers; a jump never raises the potential, exactly
 armies and every target; the half plane weighs σ^(n − 5), exactly 1 for row 5, and every
 finite part of it less than 1."""
 
+import os
 import random
 import sys
 from fractions import Fraction
@@ -82,6 +83,19 @@ def test_search_size():
     exec(code, space)
     space["search"](4, 20)
     assert 140_000 < len(space["SEEN"][0]) < 160_000
+
+
+@pytest.mark.skipif(not os.environ.get("DVQ_SLOW"), reason="about 8 minutes; set DVQ_SLOW=1 to run")
+def test_no_army_of_19():
+    """The follow-up "why not 19": the page's search with 19 soldiers and width 8 is
+    exhaustive (with 19 every jump goes toward (0, 4), so no cell beyond distance 8 is ever
+    used) and finds nothing, after about 7.5 million states."""
+    code = next(b for b in blocks(95, "python") if "def search" in b)
+    code = code.replace("seen, path = set(), []", "seen, path = set(), []\n    SEEN.append(seen)")
+    space = {"DIRS": ns["DIRS"], "SEEN": []}
+    exec(code, space)
+    assert space["search"](4, 19, width=8) is None
+    assert 7_000_000 < len(space["SEEN"][0]) < 8_000_000
 
 
 def test_q5_arithmetic():

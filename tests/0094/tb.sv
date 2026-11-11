@@ -1,12 +1,16 @@
-//@flags --timing
+//@flags --assert --timing
 //@page function automatic real p_full
 //@page function automatic void by_recurrence
-//@page module credit_counter
+//@page module credit_counter #(
+//@page module credit_counter_sva
 // Question 0094: the page's p_full, mean_cycles and by_recurrence against the exact values of
-// the parts (and each other), and the page's credit_counter driven by Bernoulli returns and
-// uses: directed checks (both at once, the walls), then a Monte Carlo of thousands of runs
-// from 3 with N = 10 for several lambda1, lambda2, whose share of full runs and mean cycles
-// must be within four standard errors of p_full and mean_cycles.
+// the parts (and each other, and without overflow for a large N), and the page's
+// credit_counter driven by Bernoulli returns and uses: directed checks (both at once, the
+// walls, the page's per-clock table), then a Monte Carlo of thousands of runs from 3 with
+// N = 10 for several lambda1, lambda2, whose share of full runs and mean cycles must be within
+// four standard errors of p_full and mean_cycles. The page's credit_counter_sva is bound to
+// the counter all along: no assertion may fail, and its covergroup must reach 100%; a start
+// above N must fail a_range.
 module tb;
   localparam int N = 10;
   logic clk = 0, rst_n = 1, ret = 0, take = 0;
@@ -15,6 +19,15 @@ module tb;
   int errors = 0;
 
   credit_counter #(.N(N)) dut (.clk, .rst_n, .start, .ret, .take, .count, .full, .empty);
+  bind credit_counter credit_counter_sva #(.N(N)) sva (.*);
+
+  // the page's per-clock table (tools/figures/q0094.py CLOCKS and counter_trace; the test
+  // compares these rows with the generator): from 3, ret and take, then count, full, empty
+  bit TRET[8]   = '{1, 1, 0, 0, 0, 0, 0, 1};
+  bit TTAKE[8]  = '{0, 1, 1, 0, 1, 1, 1, 0};
+  int TCOUNT[8] = '{4, 4, 3, 3, 2, 1, 0, 0};
+  bit TFULL[8]  = '{0, 0, 0, 0, 0, 0, 0, 0};
+  bit TEMPTY[8] = '{0, 0, 0, 0, 0, 0, 1, 1};
 
   always #5 clk = ~clk;
 
@@ -22,12 +35,14 @@ module tb;
     if (got < want - tol || got > want + tol) begin errors++; $display("%s: got %f, expected %f (+- %f)", what, got, want, tol); end
   endtask
 
-  // reset the counter to s (asynchronously, between clock edges)
+  // reset the counter to s, holding the reset over one rising edge (the assertions are
+  // disabled there, so a jump of count by the reset is not a step)
   task automatic load(int s);
     @(negedge clk);
     start = s;
     rst_n = 0;
-    #1 rst_n = 1;
+    @(negedge clk);
+    rst_n = 1;
   endtask
 
   // one cycle with the given ret and take; the result is read after the rising edge
@@ -82,6 +97,10 @@ module tb;
     near("walls", p_full(0, 10, 0.6, 0.4) + mean_cycles(10, 10, 0.6, 0.4) + mean_cycles(0, 10, 0.6, 0.4), 0.0, 0.0);
     near("never up", p_full(4, 10, 0.0, 0.5), 0.0, 0.0);
     near("never up, cycles", mean_cycles(4, 10, 0.0, 0.5), 8.0, 1e-12);
+    // a large N: rho^N would overflow; p_full divides by it (the trap), so no NaN
+    near("p_full, k = 1990, n = 2000", p_full(1990, 2000, 0.4, 0.6), 0.017341529915832612, 1e-12);
+    near("p_full, k = 3, n = 2000", p_full(3, 2000, 0.4, 0.6), 0.0, 1e-300);
+    near("p_full, k = 1990, n = 2000, p > q", p_full(1990, 2000, 0.6, 0.4), 1.0, 1e-12);
     // by_recurrence agrees with the closed form
     for (int n = 2; n <= 12; n += 5)
       for (int k = 0; k <= n; k++) begin
@@ -103,11 +122,28 @@ module tb;
     load(9);
     cycle(1, 0); if (count != N || !full) begin errors++; $display("full: %0d", count); end
     cycle(0, 1); if (count != N) begin errors++; $display("left the wall N: %0d", count); end
+    // the page's per-clock table
+    load(3);
+    foreach (TRET[i]) begin
+      cycle(TRET[i], TTAKE[i]);
+      if (count != TCOUNT[i] || full != TFULL[i] || empty != TEMPTY[i]) begin
+        errors++;
+        $display("clock %0d of the table: count %0d full %0b empty %0b", i + 1, count, full, empty);
+      end
+    end
     // Monte Carlo against the formula
     monte_carlo(0.5, 0.25, 4000);
     monte_carlo(0.5, 0.5, 4000);
     monte_carlo(0.4, 0.5, 4000);
     monte_carlo(0.9, 0.8, 2000);
+    // the bound assertions held on every legal clock, and the covergroup saw every case
+    if (dut.sva.fails != 0) begin errors++; $display("%0d assertion failures on legal stimulus", dut.sva.fails); end
+    if (dut.sva.cov.get_inst_coverage() < 99.999) begin errors++; $display("coverage %f", dut.sva.cov.get_inst_coverage()); end
+    // a start above N is caught by a_range
+    load(15);
+    cycle(0, 0);
+    cycle(0, 0);
+    if (dut.sva.fails == 0) begin errors++; $display("a count of 15 > N went by unnoticed"); end
     if (errors == 0) $display("PASS"); else $display("FAIL: %0d errors", errors);
     $finish;
   end

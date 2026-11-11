@@ -155,7 +155,7 @@ def stay_table():
     for p, q in PQR_ROWS:
         f, _, m = odds(K0, N0, p, q)
         mark = "**" if (p, q) == (Fr(3, 10), Fr(1, 5)) else ""
-        rows.append(f"| {mark}{d2(p)}{mark} | {mark}{d2(q)}{mark} | {mark}{d2(1 - p - q)}{mark} | "
+        rows.append(f"| {mark}{d2(p)}{mark} | {mark}{d2(q)}{mark} | {mark}{float(1 - p - q):.2f}{mark} | "
                     f"{mark}{d2(p / (p + q))}{mark} | {mark}{d3(f)}{mark} | {mark}{float(m):.2f}{mark} |")
     return "\n".join(rows)
 
@@ -176,9 +176,47 @@ def rates_table():
     return "\n".join(rows)
 
 
+# the per-clock table under part d's code: the page's credit_counter from start = 3, with
+# ret and take chosen to show every case (both at once, neither, the wall 0, frozen after it)
+CLOCKS = [(1, 0), (1, 1), (0, 1), (0, 0), (0, 1), (0, 1), (0, 1), (1, 0)]
+
+
+def counter_trace(start=K0, n=N0, ins=CLOCKS):
+    """The page's credit_counter clock by clock: (ret, take, count, full, empty), the outputs
+    after the rising edge. Between the walls count += ret - take; on a wall it holds."""
+    count, out = start, []
+    for ret, take in ins:
+        if 0 < count < n:
+            count += ret - take
+        out.append((ret, take, count, int(count == n), int(count == 0)))
+    return out
+
+
+def clocks_table():
+    rows = ["| שעון | ‏`ret` | ‏`take` | ‏`count` | ‏`full` | ‏`empty` | מה קרה |", "|:-:|:-:|:-:|:-:|:-:|:-:|---|"]
+    rows.append(f"| איפוס | | | {K0} | 0 | 0 | ‏`start = {K0}` |")
+    prev = K0
+    for t, (ret, take, count, full, empty) in enumerate(counter_trace(), 1):
+        if prev == 0 or prev == N0:
+            what = f"קפוא על הקיר{NB}: ההחזרה לא נספרת"
+        elif empty:
+            what = f"הגיע ל-0{NB}: ריק, הניסוי נגמר"
+        elif ret and take:
+            what = f"החזרה וצריכה יחד{NB}: בלי שינוי"
+        elif ret:
+            what = "החזרה, עולה ב-1"
+        elif take:
+            what = "צריכה, יורד ב-1"
+        else:
+            what = "אף אחת, בלי שינוי"
+        rows.append(f"| {t} | {ret} | {take} | {count} | {full} | {empty} | {what} |")
+        prev = count
+    return "\n".join(rows)
+
+
 def blocks():
     """The generated blocks, in page order."""
-    return [runs_figure(), fair_table(), bias_table(), curves_figure(), stay_table(), rates_table()]
+    return [runs_figure(), fair_table(), bias_table(), curves_figure(), stay_table(), rates_table(), clocks_table()]
 
 
 if __name__ == "__main__":

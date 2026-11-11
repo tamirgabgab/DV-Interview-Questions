@@ -1,5 +1,5 @@
 // kinds: creditwalk
-//   creditwalk             0094        a credit counter between 0 (empty) and N (full) as a random walk, in three models (data-mode): pq, +1 with p and -1 with 1 - p; pqr, +1 with p, -1 with q, no change with r; rates, a credit back with λ1 and one used with λ2 in a cycle (geometric waits), both at once no change. The counter walks cycle by cycle from k (step, to the wall, 100 runs, play, a seed); the walk is drawn over the last 40 cycles, the runs are counted against the formula, and beside it the curves of P(full) and of the expected cycles for every start k
+//   creditwalk             0094        a credit counter between 0 (empty) and N (full) as a random walk, in three models (data-mode): pq, +1 with p and -1 with 1 - p; pqr, +1 with p, -1 with q, no change with r; rates, a credit back with λ1 and one used with λ2 in a cycle (geometric waits), both at once no change. The counter walks cycle by cycle from k (step, to the wall, 100 or 1000 runs, play, a seed); the walk is drawn over the last 40 cycles, the runs are counted against the formula, and beside it the curves of P(full) and of the expected cycles for every start k
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -65,13 +65,18 @@
   // the walk over the last WIN cycles, between the walls 0 and N; a narrow box (a phone)
   // gets a narrower, taller drawing, so its numbers and its steps stay readable
   const walkSvg = (path, N, ended, narrow) => {
-    const W = narrow ? 400 : 640, H = narrow ? 250 : 220, X0 = 40, X1 = W - 12, TOP = 14, BASE = H - 30;
+    const W = narrow ? 400 : 640, H = narrow ? 250 : 200, X0 = 40, X1 = W - 12, TOP = 14, BASE = H - 30;
     const last = path.length - 1, from = Math.max(0, last - WIN);
     const X = (t) => X0 + ((t - from) / WIN) * (X1 - X0);
     const Y = (v) => BASE - (v / N) * (BASE - TOP);
     const label = `הריצה הנוכחית של המונה, ${last} מחזורים, בין 0 ל-${N}`;
     let s = `<svg class="perf-chart cw-walk" viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}">`;
-    const ticks = [0, Math.round(N / 4), Math.round(N / 2), Math.round((3 * N) / 4), N].filter((x, i, arr) => arr.indexOf(x) === i);
+    // evenly spaced ticks: the multiples of ceil(N / 5) below N, then N (the last multiple
+    // dropped when it is closer to N than half a step)
+    const tstep = Math.max(1, Math.ceil(N / 5)), ticks = [];
+    for (let v = 0; v < N; v += tstep) ticks.push(v);
+    if (ticks.length > 1 && N - ticks[ticks.length - 1] <= tstep / 2) ticks.pop();
+    ticks.push(N);
     for (const v of ticks) s += `<line class="grid" x1="${X0}" x2="${X1}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}"/><text class="tick" x="${X0 - 8}" y="${(Y(v) + 4).toFixed(1)}" text-anchor="end">${v}</text>`;
     s += `<line class="s1-line" x1="${X0}" x2="${X1}" y1="${Y(N).toFixed(1)}" y2="${Y(N).toFixed(1)}" stroke-width="2.5" stroke-dasharray="6 4"/>`;
     s += `<line class="s2-line" x1="${X0}" x2="${X1}" y1="${Y(0).toFixed(1)}" y2="${Y(0).toFixed(1)}" stroke-width="2.5" stroke-dasharray="6 4"/>`;
@@ -121,6 +126,7 @@
         `<button type="button" class="md-button md-button--primary ex-next">מחזור אחד</button>` +
         `<button type="button" class="md-button cw-finish">עד הקיר</button>` +
         `<button type="button" class="md-button cw-many">100 ריצות</button>` +
+        `<button type="button" class="md-button cw-many10">1000 ריצות</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(500, 160, 40) +
         `<button type="button" class="md-button ex-start">ניקוי</button><span class="cw-anchor"></span></div>` +
         `<p class="ex-summary cw-sum" aria-live="polite"></p>` +
@@ -172,10 +178,10 @@
           curveSvg(`הסיכוי להתמלא מכל נקודת התחלה מ-0 עד ${st.N}, ובנקודה ${st.k} הוא ${f3(o.full)}`, cv.full, st.N, st.k, 1, "s1-line", "s1-dot cw-at", st.runs ? st.full / st.runs : null, (v) => (v === 0.5 ? "0.5" : String(v))) +
           curveSvg(`מספר המחזורים הממוצע מכל נקודת התחלה מ-0 עד ${st.N}, ובנקודה ${st.k} הוא ${o.cycles.toFixed(2)}`, cv.cycles, st.N, st.k, ytop, "s2-line", "s2-dot cw-at", st.runs ? st.cycles / st.runs : null, (v) => String(Math.round(v)));
         const last = st.path.length - 1, v = st.path[last];
-        $(".cw-now").innerHTML = !last ? `הריצה מתחילה ב-${ltr(st.k)} credits. "מחזור אחד" מזיז את המונה פעם אחת.`
+        $(".cw-now").innerHTML = !last ? `הריצה מתחילה ב-${ltr(st.k)} credits. הכפתור "קדימה" (${ltr("|▶")}) מזיז את המונה מחזור אחד.`
           : done ? `הריצה נגמרה אחרי ${ltr(last)} מחזורים${NB}: ${v >= st.N ? `המונה <b class="cw-tag cw-tag-full">התמלא</b>, הגיע ל-${ltr(st.N)}` : `המונה <b class="cw-tag cw-tag-empty">התרוקן</b>, הגיע ל-${ltr(0)}`}.`
           : `מחזור ${ltr(last)}${NB}: המונה ב-${ltr(v)}.`;
-        $(".cw-count").innerHTML = !st.runs ? `עוד אין ריצות שהסתיימו. "עד הקיר" מסיים ריצה, ו-"100 ריצות" מוסיף מאה.`
+        $(".cw-count").innerHTML = !st.runs ? `עוד אין ריצות שהסתיימו. "עד הקיר" מסיים ריצה, ו-"100 ריצות" ו-"1000 ריצות" מוסיפים עוד.`
           : `עד עכשיו ${ltr(st.runs)} ריצות${NB}: ${ltr(st.full)} התמלאו, כלומר ${ltr(f3(st.full / st.runs))} (בנוסחה ${ltr(f3(o.full))}), ו-${ltr(st.runs - st.full)} התרוקנו. ` +
             `בממוצע ${ltr((st.cycles / st.runs).toFixed(2))} מחזורים לריצה (בנוסחה ${ltr(o.cycles.toFixed(2))}).`;
         answer(box, `מ-${ltr(st.k)} עם ${ltr(`N = ${st.N}`)}${NB}: הסיכוי להתמלא ${ltr(f3(o.full))}, להתרוקן ${ltr(f3(o.empty))}, ובממוצע ${ltr(o.cycles.toFixed(2))} מחזורים.`, ".cw-at");
@@ -212,6 +218,7 @@
       $(".ex-next").addEventListener("click", () => { cycle(); draw(); });
       $(".cw-finish").addEventListener("click", () => { stop(); toWall(); draw(); });
       $(".cw-many").addEventListener("click", () => { stop(); for (let i = 0; i < 100; i++) toWall(); draw(); });
+      $(".cw-many10").addEventListener("click", () => { stop(); for (let i = 0; i < 1000; i++) toWall(); draw(); });
       $(".ex-start").addEventListener("click", restart);
       $(".ex-reset").addEventListener("click", () => {
         stop();
@@ -227,7 +234,7 @@
   dvqExplorers.register({
     views: { creditwalk: creditwalkView },
     help: {
-      creditwalk: "בוחרים מודל : p ו-q, או p, q ו-r, או λ1 ו-λ2 של הזמנים הגאומטריים. N הוא הקיר העליון ו-k נקודת ההתחלה. \"מחזור אחד\" מזיז את המונה פעם אחת, \"עד הקיר\" מסיים את הריצה, ו-\"100 ריצות\" מוסיף מאה ריצות לספירה. הספירה מושווית לנוסחה, ובשני הגרפים העקומות של הסיכוי להתמלא ושל מספר המחזורים הממוצע לכל k, עם העיגול הריק של מה שנמדד.",
+      creditwalk: `בוחרים מודל, את הקיר העליון N ואת ההתחלה k. "קדימה" (${ltr("|▶")}) מזיז את המונה מחזור אחד, "עד הקיר" מסיים ריצה, ו-"100 ריצות" או "1000 ריצות" מוסיפים ריצות לספירה. בגרפים${NB}: העקומות של הנוסחה לכל k, והעיגול הריק הוא מה שנמדד.`,
     },
     cols: { creditwalk: { main: ".cw-grid", side: ".viz-legend, .cw-now, .cw-count", w: "minmax(0, 2.2fr)" } },   // the walk and the curves beside their key and the run text
     models: { cwSteps, cwOdds, cwCurves, cwStep, cwRun },

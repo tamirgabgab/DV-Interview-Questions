@@ -63,6 +63,11 @@ def test_page_numbers():
     rows = {p: walk_odds(3, 10, p, 1 - p)[2] for p in q0094.P_ROWS}
     best = max(rows, key=rows.get)
     assert best == Fr(11, 20) and f"{float(rows[best]):.2f}" == "22.25" and "22.25" in PAGE
+    # over every p the maximum is a little before 0.55: about 22.27, near p = 0.545
+    scan = {Fr(i, 4000): walk_odds(3, 10, Fr(i, 4000), 1 - Fr(i, 4000))[2] for i in range(2000, 2400)}
+    top = max(scan, key=scan.get)
+    assert f"{float(scan[top]):.2f}" == "22.27" and abs(float(top) - 0.545) < 0.001
+    assert scan[top] > rows[Fr(11, 20)] and "כ-22.27" in PAGE and "p = 0.545" in PAGE
     # part d, equal rates of 1/2: 21 / 0.5 = 42
     assert walk_odds(3, 10, Fr(1, 4), Fr(1, 4))[2] == 42 and "= 42" in PAGE
 
@@ -87,7 +92,37 @@ def test_proof_steps():
             assert (rho ** -10 - rho ** (k - 10)) / (rho ** -10 - 1) == (1 - rho ** k) / (1 - rho ** 10)
 
 
+def page_floats(k, n, p, q, divide=True):
+    """p_full and mean_cycles of the page's SystemVerilog, in IEEE doubles as `real` is: a
+    power that overflows is infinite (Python raises instead), and with divide=False p_full
+    uses the plain form for every rho."""
+    def pw(x, e):
+        try:
+            return x ** e
+        except OverflowError:
+            return math.inf
+    a, b = p / (p + q), q / (p + q)
+    rho = b / a
+    if rho < 1.0 or not divide:
+        full = (1.0 - pw(rho, k)) / (1.0 - pw(rho, n))
+    else:
+        full = (pw(rho, -n) - pw(rho, k - n)) / (pw(rho, -n) - 1.0)
+    return full, (k - n * full) / (b - a) / (p + q)
+
+
 def test_traps_and_follow_ups():
+    # the near-fair trap: at p = 0.5 + 1e-8 the float P is right to nine digits, E is 21.05
+    p = 0.5 + 1e-8
+    full, cycles = page_floats(3, 10, p, 1 - p)
+    F, _, C = walk_odds(3, 10, Fr(p), Fr(1 - p))
+    assert abs(full - float(F)) / float(F) < 1e-9 and f"{cycles:.2f}" == "21.05" and f"{float(C):.2f}" == "21.00"
+    assert "21.05 במקום 21.00" in PAGE and "10^{-8}" in PAGE
+    # the overflow trap: from 1990 with N = 2000 and p = 0.4 the plain form gives NaN, the
+    # divided form (the page's p_full) 0.0173
+    assert math.isnan(page_floats(1990, 2000, 0.4, 0.6, divide=False)[0])
+    got = page_floats(1990, 2000, 0.4, 0.6)[0]
+    assert math.isclose(got, float(walk_odds(1990, 2000, Fr(2, 5), Fr(3, 5))[0]), rel_tol=1e-12)
+    assert f"{got:.4f}" == "0.0173" and "NaN במקום 0.0173" in PAGE
     # trap: p = lambda1 and q = lambda2 sum to 1.7; the right split
     assert Fr(9, 10) + Fr(8, 10) == Fr(17, 10)
     p, q = ns["rates_to_steps"](Fr(9, 10), Fr(4, 5))
@@ -114,6 +149,40 @@ def test_traps_and_follow_ups():
         done += nd.pop(0, 0) + nd.pop(10, 0)
         d = nd
     assert f"{float(done):.2f}" == "0.65" and "בערך 0.65" in PAGE
+
+
+def test_box_tasks():
+    """The numbers the "נסו" paragraphs ask the reader to see in the boxes."""
+    def show(k, N, p, q):
+        f, _, c = walk_odds(k, N, p, q)
+        return f"{float(f):.3f}", f"{float(c):.2f}"
+    assert show(3, 10, Fr(11, 20), Fr(9, 20)) == ("0.523", "22.25")
+    assert show(3, 10, Fr(3, 5), Fr(2, 5)) == ("0.716", "20.81")
+    assert show(10, 20, Fr(1, 2), Fr(1, 2)) == ("0.500", "100.00") and 10 * (20 - 10) == 100
+    assert show(3, 10, *q0094.rates(Fr(1, 2), Fr(1, 4))) == ("0.963", "26.52")
+    assert show(3, 10, *q0094.rates(Fr(1, 2), Fr(1, 2))) == ("0.300", "42.00")
+    assert show(3, 10, *q0094.rates(Fr(1, 10), Fr(1, 10))) == ("0.300", "116.67")
+    assert 21 / (2 * Fr(1, 10) * Fr(9, 10)) == Fr(350, 3)
+    p, q = q0094.rates(Fr(9, 10), Fr(4, 5))
+    assert (f"{float(p):.3f}", f"{float(q):.3f}", f"{float(1 - p - q):.3f}") == ("0.180", "0.080", "0.740")
+    assert show(3, 10, p, q) == ("0.912", "61.25")
+    for text in ("ל-0.523 ול-0.716", "ל-22.25 ורק אז", "ל-20.81", "הסיכוי 0.500 והזמן 100", "כ-0.963",
+                 "קרוב ל-26.5", "מ-42 ל-116.67", "\\( p = 0.180 \\)", "0.912 ו-61.25"):
+        assert text in PAGE, text
+
+
+def test_per_clock_table():
+    """The table under part d's code: the generator's model of credit_counter, the cases it
+    shows, and the same rows in the testbench, which drives the page's module through them."""
+    rows = q0094.counter_trace()
+    assert [r[2] for r in rows] == [4, 4, 3, 3, 2, 1, 0, 0]
+    assert rows[1][:2] == (1, 1) and rows[1][2] == rows[0][2]          # both at once: no change
+    assert rows[3][:2] == (0, 0) and rows[3][2] == rows[2][2]          # neither
+    assert rows[6][4] == 1 and rows[7][:2] == (1, 0) and rows[7][2] == 0   # empty, then frozen
+    tb = (ROOT / "tests" / "0094" / "tb.sv").read_text(encoding="utf-8")
+    arr = {name: [int(v) for v in re.search(rf"{name}\[8\]\s*=\s*'\{{([^}}]*)\}}", tb).group(1).split(",")]
+           for name in ("TRET", "TTAKE", "TCOUNT", "TFULL", "TEMPTY")}
+    assert list(zip(arr["TRET"], arr["TTAKE"], arr["TCOUNT"], arr["TFULL"], arr["TEMPTY"])) == rows
 
 
 def test_page_skeleton():

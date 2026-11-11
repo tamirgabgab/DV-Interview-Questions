@@ -1,5 +1,5 @@
 // kinds: soldiers
-//   soldiers               0095        Conway's soldiers: a board with the line under row 1 (soldiers stand on y <= 0) and the target (0, n) of a chosen row 1 to 5; place soldiers below the line, jump by clicking a soldier and then the empty cell two away behind a neighbour, undo; a meter of the potential (σ to the power of the distance to the target, summed) against the target's 1; the stored plays of rows 1 to 4 stepped move by move
+//   soldiers               0095        Conway's soldiers: a board with the line under row 1 (soldiers stand on y <= 0) and the target (0, n) of a chosen row 1 to 5; place soldiers below the line (row 5 opens placing; a fill button), jump by clicking a soldier and then the empty cell two away behind a neighbour, undo; a meter of the potential (σ to the power of the distance to the target, summed) against the target's 1; the stored plays of rows 1 to 4 stepped move by move
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -64,12 +64,13 @@
     mount(box) {
       const clamp = (v, lo, hi, d) => { const x = Math.floor(Number(v)); return Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : d; };
       const n0 = clamp(box.dataset.row, 1, 5, 4);
-      const st = { n: n0, army: [], hist: [], sel: null, place: false, rep: n0 <= 4 ? { n: n0, k: 0 } : null, last: null, msg: "", focus: [0, 0] };
+      const st = { n: n0, army: [], hist: [], sel: null, place: n0 === 5, rep: n0 <= 4 ? { n: n0, k: 0 } : null, last: null, msg: "", focus: [0, 0] };
       const opts = [1, 2, 3, 4, 5].map((x) => `<option value="${x}"${x === n0 ? " selected" : ""}>${x}</option>`).join("");
       box.innerHTML =
         `<div class="ex-controls">` +
         `<label>השורה <select class="cy-row" aria-label="שורת היעד, מעל הקו">${opts}</select></label>` +
         `<button type="button" class="md-button cy-place" aria-pressed="false">הצבה</button>` +
+        `<button type="button" class="md-button cy-fillall">מילוי</button>` +
         `<button type="button" class="md-button cy-clear">ניקוי</button>` +
         `<button type="button" class="md-button cy-undo">ביטול</button>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של העמוד</button></div>` +
@@ -81,12 +82,12 @@
         `<button type="button" class="md-button ex-end">עד הסוף</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(900, 500, 200) +
         `<span class="ex-pos"></span></div>` +
+        `<p class="ex-summary cy-sum" aria-live="polite"></p>` +
         `<div class="cy-meter"><span>הפוטנציאל</span><span class="cy-bar" role="img"><span class="cy-fill"></span><span class="cy-one"></span></span><span class="cy-val"></span></div>` +
         `<div class="cy-wrap"></div>` +
         `<span class="viz-legend"><span><i class="cy-key-man"></i>חייל</span><span><i class="cy-key-new"></i>החייל שקפץ</span>` +
         `<span><i class="cy-key-gone"></i>מה שהקפיצה פינתה</span><span><i class="cy-key-target"></i>היעד</span>` +
         `<span><i class="cy-key-sel"></i>החייל שנבחר</span><span><i class="cy-key-hint"></i>לאן הוא יכול לקפוץ</span></span>` +
-        `<p class="ex-summary cy-sum" aria-live="polite"></p>` +
         `<p class="cy-why"></p>`;
       const $ = (q) => box.querySelector(q);
       const wrap = $(".cy-wrap");
@@ -150,18 +151,18 @@
         if (st.rep) {
           sum = k === 0 ? `הפתרון של שורה ${ltr(st.rep.n)}${NB}: ${ltr(army.length)} חיילים מתחת לקו.`
             : `מהלך ${ltr(k)}${NB}: החייל ב-${cellName(mv[0])} קופץ מעל ${cellName(mv[1])} אל ${cellName(mv[2])}. נשארו ${ltr(army.length)} חיילים.`;
-        } else if (st.place) sum = `<b>הצבה${NB}:</b> לחיצה על משבצת מתחת לקו מוסיפה חייל או מורידה אותו. ${ltr(army.length)} חיילים.`;
+        } else if (st.place) sum = `<b>הצבה${NB}:</b> לחיצה על משבצת מתחת לקו מוסיפה חייל או מורידה אותו, ו"הצבה" שוב חוזרת לקפיצות. ${ltr(army.length)} חיילים.`;
         else if (st.sel) sum = `נבחר החייל ב-${cellName(st.sel)}. לוחצים על משבצת מסומנת כדי לקפוץ אליה, או על חייל אחר.`;
         else sum = `<b>קפיצה${NB}:</b> לוחצים על חייל, ואז על המשבצת הריקה שמעבר לשכן שלו. ${ltr(army.length)} חיילים.`;
         $(".cy-sum").innerHTML = sum;
         let why = st.msg;
         if (!why) {
-          if (st.n === 5) why = `לשורה 5 כל חצי המישור שוקל בדיוק 1, ומספר סופי של חיילים שוקל פחות. אפשר לנסות, אבל המד לא יגיע ל-1 בזמן שמשחקים.`;
-          else if (pot < 1 - 1e-9) why = `הסכום קטן מ-1${NB}: מהעמדה הזו כבר אי אפשר להגיע ל-${cellName([0, st.n])}, כי קפיצה אף פעם לא מגדילה אותו.`;
-          else if (mv && !reached) {
-            const d = csPotential(st.rep ? boards(st.rep.n)[k - 1] : (st.hist.length ? st.hist[st.hist.length - 1] : army), st.n) - pot;
-            why = d > 1e-9 ? `המהלך האחרון הוריד את הסכום ב-${ltr(d.toFixed(4))}${NB}: הוא לא התקרב ליעד.` : `המהלך האחרון לא שינה את הסכום${NB}: קפיצה ישר לכיוון היעד.`;
-          }
+          // what the last jump did to the sum (a placing leaves no last move)
+          const d = mv && !reached ? csPotential(st.rep ? boards(st.rep.n)[k - 1] : (st.hist.length ? st.hist[st.hist.length - 1] : army), st.n) - pot : null;
+          const moved = d === null ? "" : d > 1e-9 ? `המהלך האחרון הוריד את הסכום ב-${ltr(d.toFixed(4))}` : `המהלך האחרון לא שינה את הסכום${NB}: קפיצה ישר לכיוון היעד`;
+          if (st.n === 5) why = moved ? `${moved}. בשורה 5 הסכום תמיד מתחת ל-1.` : `לשורה 5 כל חצי המישור שוקל בדיוק 1, ומספר סופי של חיילים שוקל פחות. המד לא יגיע ל-1, גם בלי לקפוץ.`;
+          else if (pot < 1 - 1e-9) why = `${d > 1e-9 ? `${moved}, והוא` : "הסכום"} קטן מ-1${NB}: מהעמדה הזו כבר אי אפשר להגיע ל-${cellName([0, st.n])}, כי קפיצה אף פעם לא מגדילה אותו.`;
+          else if (moved) why = d > 1e-9 ? `${moved}${NB}: הוא לא התקרב ליעד.` : `${moved}.`;
         }
         $(".cy-why").innerHTML = why;
         if (reached) answer(box, `חייל הגיע ל-${cellName([0, st.n])}, בשורה ${ltr(st.n)}.`, ".cy-sum");
@@ -184,7 +185,9 @@
         } else if (has(army, c)) {
           st.sel = st.sel && st.sel[0] === x && st.sel[1] === y ? null : c;
           if (st.sel && !targets(army, c).length) st.msg = `לחייל ב-${cellName(c)} אין לאן לקפוץ${NB}: צריך שכן, ומעבר לו משבצת ריקה.`;
-        } else if (st.sel) {
+        } else if (!st.sel) {
+          st.msg = `המשבצת ${cellName(c)} ריקה. כדי להציב חיילים לחצו "הצבה"; כדי לקפוץ, בחרו קודם חייל.`;
+        } else {
           const next = csJump(army, st.sel, c);
           if (!next) st.msg = `מ-${cellName(st.sel)} אי אפשר לקפוץ אל ${cellName(c)}${NB}: קופצים שתי משבצות בשורה או בעמודה, מעל שכן.`;
           else {
@@ -217,13 +220,21 @@
         done: () => !st.rep || st.rep.k >= total(),
         restart: () => { if (st.rep) st.rep.k = 0; draw(); },
       });
-      const loadSolution = (n) => { stop(); st.rep = n <= 4 ? { n, k: 0 } : null; st.sel = null; st.msg = ""; st.hist = []; st.last = null; if (!st.rep) st.army = []; st.n = n; draw(); };
+      // row 5 has no play: an empty board in placing mode
+      const loadSolution = (n) => { stop(); st.rep = n <= 4 ? { n, k: 0 } : null; st.sel = null; st.msg = ""; st.hist = []; st.last = null; if (!st.rep) { st.army = []; st.place = true; } st.n = n; draw(); };
       $(".cy-row").addEventListener("change", () => {
         const n = clamp($(".cy-row").value, 1, 5, n0);
         if (st.rep) loadSolution(n);
         else { st.n = n; st.msg = ""; draw(); }
       });
       $(".cy-place").addEventListener("click", () => { stop(); leaveReplay(); st.place = !st.place; st.sel = null; st.msg = ""; draw(); });
+      // every cell of the board below the line (55 soldiers)
+      $(".cy-fillall").addEventListener("click", () => {
+        stop(); leaveReplay(); st.hist.push(st.army);
+        st.army = [];
+        for (let y = 0; y >= YR[0]; y--) for (let x = XR[0]; x <= XR[1]; x++) st.army.push([x, y]);
+        st.sel = null; st.last = null; st.msg = ""; draw();
+      });
       $(".cy-clear").addEventListener("click", () => { stop(); leaveReplay(); if (st.army.length) st.hist.push(st.army); st.army = []; st.sel = null; st.last = null; st.msg = ""; st.place = true; draw(); });
       $(".cy-undo").addEventListener("click", () => { if (!st.hist.length) return; st.army = st.hist.pop(); st.sel = null; st.last = null; st.msg = ""; draw(); });
       $(".cy-sol").addEventListener("click", () => loadSolution(st.n));
@@ -231,7 +242,7 @@
       $(".ex-prev").addEventListener("click", () => { stop(); if (st.rep && st.rep.k) st.rep.k--; draw(); });
       $(".ex-next").addEventListener("click", () => { if (st.rep && st.rep.k < total()) st.rep.k++; draw(); });
       $(".ex-end").addEventListener("click", () => { stop(); if (st.rep) st.rep.k = total(); draw(); });
-      $(".ex-reset").addEventListener("click", () => { st.place = false; st.focus = [0, 0]; loadSolution(n0); });
+      $(".ex-reset").addEventListener("click", () => { st.place = n0 === 5; st.focus = [0, 0]; loadSolution(n0); });
       // the state in the link: "4@7" (the play to row 4 at move 7) or "4|0.0,0.-1" (free play)
       box.dvqExtra = {
         get: () => (st.rep ? `${st.rep.n}@${st.rep.k}` : `${st.n}|${st.army.map((c) => `${c[0]}.${c[1]}`).join(",")}`),
@@ -257,8 +268,9 @@
   dvqExplorers.register({
     views: { soldiers: view },
     help: {
-      soldiers: "לוח של החיילים של Conway. החיילים עומדים מתחת לקו, והיעד של השורה שבחרתם מסומן במסגרת. \"הפתרון של שורה\" מנגן את הפתרון השמור מהלך אחר מהלך, עם החיצים או בהפעלה. אפשר גם לשחק : לוחצים על חייל ואז על המשבצת הריקה שמעבר לשכן שלו, והשכן יוצא מהלוח. \"הצבה\" מוסיפה ומורידה חיילים מתחת לקו בלחיצה. המד מראה את הפוטנציאל : כל חייל שוקל σ בחזקת המרחק שלו מהיעד, והיעד עצמו שוקל 1. קפיצה אף פעם לא מגדילה את הסכום, ולכן כשהוא מתחת ל-1 כבר אי אפשר להגיע.",
+      soldiers: `החיילים עומדים מתחת לקו, והיעד של השורה מסומן במסגרת. "הפתרון של שורה" מנגן את הפתרון השמור מהלך אחר מהלך. במשחק חופשי לוחצים על חייל, ואז על המשבצת הריקה שמעבר לשכן שלו. "הצבה" מוסיפה ומורידה חיילים בלחיצה, ו"מילוי" ממלא את כל המשבצות שמתחת לקו. המד${NB}: כל חייל שוקל σ בחזקת המרחק שלו מהיעד, וקפיצה אף פעם לא מגדילה את הסכום. מתחת ל-1 כבר אי אפשר להגיע.`,
     },
+    cols: { soldiers: { main: ".cy-wrap", side: ".cy-meter, .cy-why, .viz-legend" } },   // the board beside the meter, the reason and the key
     models: { csSolutions: SOLUTIONS, csJump, csBoards, csPotential, csHalfPlane, csDist },
   });
 })();
