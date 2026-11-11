@@ -1193,6 +1193,21 @@ below start at item 112 (session 31).
     2026-11-11 10:44 UTC); a crawl of the live site (122 pages, 264 links and files) found
     no 404, and the page's three boxes built with no script error.
 
+195. **0101 part c reworked; CI made robust to an unreachable Ubuntu archive (session 34,
+    2026-11-11).** The owner's choice: part c is k six-sided dice instead of n faces (three
+    dice first; every die is x(1+x)(1+x+x^2)(1-x+x^2)^e with e <= 2, as the x^2 coefficient is
+    2 - e; j Sicherman pairs and k - 2j standard dice, floor(k/2) + 1 sets; with a face 0:
+    5, 13, 41, 98, 250 for k = 2..6, no closed form claimed); n faces is a follow-up; the box
+    drops its n select (six faces, at most 717 px). The branch CI failed in apt (the runner
+    could not resolve azure.archive, then archive and security.ubuntu.com, for hours) and
+    the lead fast-forwarded main without checking the conclusion (a mistake: the main CI ran
+    the checks and blocked the deploy, the site stayed on 4c5699d). deploy.yml now: z3 and
+    Verilator's run-time packages from apt twice (the second time on archive.ubuntu.com),
+    then z3 4.8.12 from github.com/Z3Prover/z3/releases (libfl2 is not linked by
+    verilator_bin); `playwright install --with-deps` falls back to Chromium alone;
+    libcairo2 goes on if the image has libcairo.so.2. On main as 4553951 (deployed
+    2026-11-11 17:26 UTC, all jobs green); a crawl found no 404 and 0101's two boxes build.
+
 ---
 
 ## In progress
