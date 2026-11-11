@@ -514,6 +514,15 @@ PAIRS = [
     ("0100 stairs, the edges of the picked stair and of the stairs below it", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0100 stairs, the arrows into the last stair", "var(--viz-s3-text)", [CARD, PAGE], UI),
     ("0100 stairs, a jump size that is on", "var(--act-ink)", ["var(--act)"], TEXT),
+    # 0101 sicherman (stylesheets/questions/0101-sicherman.css): the tables of the sums, the factor chips and the box
+    ("0101 sicherman, a sum on its tint", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h in ("s1", "s3", "s4") for k in (10, 16, 22, 28, 34, 40)], TEXT),
+    ("0101 sicherman, a face of a die over the table", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0101 sicherman, a factor on its chip", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color))"], TEXT),
+    ("0101 sicherman, the frame of a sum that differs", "var(--viz-s2-text)", [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h in ("s1", "s3", "s4") for k in (10, 40)], UI),
+    ("0101 sicherman, a bar of the histogram", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0101 sicherman, a bar that differs", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0101 sicherman, the mark of the triangle and the free factor's edge", "var(--viz-ink)", [CARD, PAGE], UI),
+    ("0101 sicherman, the edge of the free factor's chip", "var(--viz-s4)", [CARD, PAGE], UI),
     # 0037 editdist (stylesheets/questions/0037-editdist.css): the tables of the prefixes and the box
     ("0037 editdist, a value on the tint of its step", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color))"], TEXT),
     ("0037 editdist, the indices of the prefixes", "var(--viz-text)", [CARD, PAGE], TEXT),

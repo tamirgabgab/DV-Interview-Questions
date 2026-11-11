@@ -1,0 +1,86 @@
+/* Question 0101, Sicherman dice: the tables of the sums and the factor chips of
+   tools/figures/q0101.py, and the box of explorer/sicherman.js (sc-*). A sum is tinted by
+   its place against the middle sum n + 1 (blue below it, green for it, purple above it),
+   deeper the more often two standard dice give it (sc-f1 to sc-f6); a sum that comes a
+   different number of times than with standard dice is orange in the histogram and framed
+   in the table. Colours from the palette only. */
+
+.md-typeset .sc-lo { --sc-h: var(--viz-s1); }
+.md-typeset .sc-mid { --sc-h: var(--viz-s3); }
+.md-typeset .sc-hi { --sc-h: var(--viz-s4); }
+.md-typeset .sc-f1 { --sc-k: 10%; }
+.md-typeset .sc-f2 { --sc-k: 16%; }
+.md-typeset .sc-f3 { --sc-k: 22%; }
+.md-typeset .sc-f4 { --sc-k: 28%; }
+.md-typeset .sc-f5 { --sc-k: 34%; }
+.md-typeset .sc-f6 { --sc-k: 40%; }
+
+/* the figures: two side by side, one under the other on a phone */
+.md-typeset .sc-pair { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem 1.6rem; margin: 0.8rem 0; }
+.md-typeset .sc-pair .sc-fig { margin: 0; flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; }
+.md-typeset .sc-pair .sc-fig svg.figure { margin: 0 auto 0.3rem; }
+.md-typeset .sc-pair .sc-fig figcaption { font-size: 0.68rem; color: var(--viz-text); text-align: center; max-width: 15rem; margin: 0; }
+
+.md-typeset svg.sc-sums .sc-cell rect { fill: color-mix(in srgb, var(--sc-h) var(--sc-k), var(--md-default-bg-color)); stroke: color-mix(in srgb, var(--sc-h) 45%, var(--md-default-bg-color)); stroke-width: 0.8; }
+.md-typeset svg.sc-sums .sc-cell text { fill: var(--viz-ink); font-size: 12px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.sc-sums .sc-face { fill: var(--viz-text); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.sc-sums .sc-corner { fill: var(--viz-text); font-size: 13px; }
+
+.md-typeset svg.sc-split .sc-head { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-text-font-family); }
+.md-typeset svg.sc-split .sc-chip rect { stroke-width: 1; }
+.md-typeset svg.sc-split .sc-chip text { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.sc-split .sc-px rect { fill: color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color)); stroke: var(--viz-text); }
+.md-typeset svg.sc-split .sc-p2 rect { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg.sc-split .sc-p3 rect { fill: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg.sc-split .sc-p6 rect { fill: color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color)); stroke: var(--viz-s4); stroke-width: 2; }
+.md-typeset svg.sc-split .sc-empty { fill: none; stroke: var(--viz-text); stroke-dasharray: 4 3; }
+.md-typeset svg.sc-split .sc-rule { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg.sc-split .sc-faces { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+
+/* the legend keys */
+.md-typeset .viz-legend .sc-key-lo { background: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s1); outline-offset: -1px; }
+.md-typeset .viz-legend .sc-key-mid { background: color-mix(in srgb, var(--viz-s3) 40%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s3); outline-offset: -1px; }
+.md-typeset .viz-legend .sc-key-hi { background: color-mix(in srgb, var(--viz-s4) 28%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s4); outline-offset: -1px; }
+.md-typeset .viz-legend .sc-key-px { background: color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color)); outline: 1px solid var(--viz-text); outline-offset: -1px; }
+.md-typeset .viz-legend .sc-key-p2 { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s1); outline-offset: -1px; }
+.md-typeset .viz-legend .sc-key-p3 { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s3); outline-offset: -1px; }
+.md-typeset .viz-legend .sc-key-p6 { background: color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s4); outline-offset: -2px; }
+.md-typeset .viz-legend .sc-key-empty { background: none; outline: 1px dashed var(--viz-text); outline-offset: -1px; }
+.md-typeset .viz-legend .sc-key-ok { background: var(--viz-s3); }
+.md-typeset .viz-legend .sc-key-bad { background: var(--viz-s2); }
+.md-typeset .viz-legend .sc-key-want { height: 0.2rem; border-radius: 1px; background: var(--viz-ink); }
+
+/* the box: the faces of the two dice, a field per face (the hidden ones are beyond n) */
+.md-typeset .explorer .sc-dice { gap: 0.4rem 1.4rem; }
+.md-typeset .explorer .sc-die { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; min-width: 0; max-width: 100%; }
+.md-typeset .explorer .sc-lab { font-weight: 700; font-family: var(--md-code-font-family); font-size: 0.75rem; min-width: 1rem; }
+.md-typeset .explorer input.ex-num.sc-face { flex: 0 0 2.3rem; width: 2.3rem; height: 2.2rem; margin: 0; padding: 0; text-align: center; font-size: 0.72rem; -moz-appearance: textfield; appearance: textfield; }
+.md-typeset .explorer input.ex-num.sc-face::-webkit-inner-spin-button,
+.md-typeset .explorer input.ex-num.sc-face::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.md-typeset .explorer input.ex-num.sc-face[hidden] { display: none; }
+.md-typeset .explorer .sc-presets .md-button[hidden] { display: none; }
+
+/* the table of the sums */
+.md-typeset .explorer .sc-tablewrap { overflow-x: auto; margin: 0.4rem 0; }
+.md-typeset .explorer .sc-tablewrap:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.md-typeset .explorer table.sc-tab { border-collapse: separate; border-spacing: 2px; margin: 0 auto; font-family: var(--md-code-font-family); font-size: 0.66rem; line-height: 1; }
+.md-typeset .explorer table.sc-tab :is(th, td) { min-width: 1.75rem; height: 1.6rem; padding: 0 0.15rem; text-align: center; vertical-align: middle; border: none; }
+.md-typeset .explorer table.sc-tab th { color: var(--viz-text); font-weight: 700; background: none; }
+.md-typeset .explorer table.sc-tab td { color: var(--viz-ink); font-weight: 600; border-radius: 0.2rem; background: color-mix(in srgb, var(--sc-h) var(--sc-k), var(--md-default-bg-color)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sc-h) 45%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.sc-tab td.sc-out { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color)) 0 3px, transparent 3px 6px); box-shadow: inset 0 0 0 1px var(--viz-text); }
+.md-typeset .explorer table.sc-tab td.is-off { box-shadow: inset 0 0 0 2px var(--viz-s2-text); }
+
+/* the histogram */
+.md-typeset .explorer svg.sc-hist { margin: 0.4rem auto; }
+.md-typeset .explorer svg.sc-hist .sc-bar { fill: var(--viz-s3); }
+.md-typeset .explorer svg.sc-hist .sc-bar.is-bad { fill: var(--viz-s2); }
+.md-typeset .explorer svg.sc-hist .sc-want { stroke: var(--viz-ink); stroke-width: 2.5; stroke-linecap: round; }
+.md-typeset .explorer .sc-alone { font-size: 0.72rem; margin: 0.3em 0; }
+
+/* a phone: the table of eight faces fits its column */
+@media (max-width: 30em) {
+  .md-typeset .explorer .sc-die { flex: 1 1 100%; }
+  .md-typeset .explorer input.ex-num.sc-face { flex: 1 1 1.5rem; width: 1.5rem; min-width: 1.5rem; max-width: 2.3rem; }
+  .md-typeset .explorer table.sc-tab { border-spacing: 1px; font-size: 0.6rem; }
+  .md-typeset .explorer table.sc-tab :is(th, td) { min-width: 1.4rem; height: 1.45rem; padding: 0; }
+}
