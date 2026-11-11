@@ -1215,6 +1215,21 @@ below start at item 112 (session 31).
     tallest reachable state. Findings under "Open items", "Review round 8 (session 34)".
     Nothing was changed yet.
 
+197. **The eighth ten questions fixed (session 34, 2026-11-11).** The owner's choices: hardware
+    / DV only for 0054 (a block diagram of rr_arbiter, a WRR per-clock table) and 0094 (a
+    per-clock table, credit_counter_sva tested with mutations); 0044's kapgraph box moved out
+    of the statement into part b; every box state under 1000 px. Five agents, on the
+    session's model and effort (the CLAUDE.md rule). Heights now (worst reachable state,
+    before): 0014 968 (1487), 0012 989 (1332), 0051 986 (1183), 0044 957 (1144), 0054 972
+    (1064), 0094 979 (1008), 0095 915 (987), 0002 727, 0008 929, 0073 914. Highlights: 0008's
+    what-if ignored the countries announced before Israel and broke the points balance;
+    0054's trap (the bound holds, the share breaks); 0073's odd in-shuffle rule and O(log n)
+    stack; 0014's corner check fails for squares too and random_shapes could loop; 0051's
+    b = 0 loop (now an error); 0012's histograms and two-digit repdigits; 0044's base-5 sort;
+    0002's inout and JavaScript XOR; 0094's NaN for large N in the SV p_full; 0095's
+    exhaustive 19-soldier search (DVQ_SLOW=1, about 8 minutes). Page code changed (tell the
+    owner if asked): 0051 mice_needed raises for b < 1; 0094 p_full divides by rho^N.
+
 ---
 
 ## In progress
@@ -2037,69 +2052,70 @@ instead of giving "נסו" tasks (the reports have checked tasks).
 
 ### Review round 8 (session 34): ten more questions
 
+Done (work log item 197) except the hardware items the owner did not choose (left open).
 Findings of work log item 196 (CONFIRMED by a reviewer's script unless marked; verify
 again before changing a page). Common to all ten: the box paragraphs describe the layout
 instead of giving "נסו" tasks (the reports have checked tasks).
 
 **R2. One screen (px at 1920 x 1080, default / tallest reachable):**
-- [ ] 0014 `shapes`: 864 / 1487 (500 draws 1236; N = 14, M = 12 with the heat map 1310 to
+- [x] 0014 `shapes`: 864 / 1487 (500 draws 1236; N = 14, M = 12 with the heat map 1310 to
   1337; projections off widens the board). Heat map to the side column or behind a toggle.
-- [ ] 0012 `kapbase`: part b 1091 / 1172, part c 1093 / 1332 (base 16, x = 100). Part b:
+- [x] 0012 `kapbase`: part b 1091 / 1172, part c 1093 / 1332 (base 16, x = 100). Part b:
   hide its histogram (the kaprekar box above draws it): 783 to 864. Part c: histogram to
   the main column, step line to the side, drop the table's X column.
-- [ ] 0051 `mice`: 831 default; with the bottle grid (n = 120) 1010 to 1183 (b = 2..5); the
+- [x] 0051 `mice`: 831 default; with the bottle grid (n = 120) 1010 to 1183 (b = 2..5); the
   quiz 1180 after the bottle is shown. `cols` with `.mc-cands` beside, shorter rows b >= 4.
-- [ ] 0044 `kapgraph` 754 / 1144 (base 20, a card chosen; the label "חלק ליניארי" wraps);
+- [x] 0044 `kapgraph` 754 / 1144 (base 20, a card chosen; the label "חלק ליניארי" wraps);
   `kapn` bonus 924 / 1078 (bases 11 to 16; cap the table with a scroll).
-- [ ] 0054 `arbiter`: 942 / 1064 (the double bug with a hold violation drawn). Shorten the
+- [x] 0054 `arbiter`: 942 / 1064 (the double bug with a hold violation drawn). Shorten the
   trick table's third column (measured 940).
-- [ ] 0095 `soldiers` boxes 1, 2: 987 (13 px margin); `cols` would give about 720. 0002
+- [x] 0095 `soldiers` boxes 1, 2: 987 (13 px margin); `cols` would give about 720. 0002
   (748), 0008 (895), 0073 (679), 0094 (925): fine.
 
 **R1. Correctness:**
-- [ ] 0008: the what-if ignores the countries announced before Israel (7,122 jury x public
+- [x] 0008: the what-if ignores the countries announced before Israel (7,122 jury x public
   pairs miss a country already ahead: jury 250, public 220 says Israel wins, Bulgaria has
   516); changing Israel's public score keeps the public total at 2088 ("נותרו -80"; start
   from the others' own sum, 828). The test shares the blind spot. Step 4's "until the
   comparison fails" (it first becomes true); "כשנותרו 1 הכרזות".
-- [ ] 0054: trap "update the pointer without a grant" keeps the N - 1 bound (exhaustive for
+- [x] 0054: trap "update the pointer without a grant" keeps the N - 1 bound (exhaustive for
   N = 3, 4); what breaks is fairness (300 / 100). Part c's short answer "every bug fails a
   different assertion": stuck and winner both fail only `fair`. Matrix arbiter needs
   N(N-1)/2 flops and must also set the column.
-- [ ] 0073: the box shows `p -> 2p mod n` for an odd n with in-shuffle (the top card moves:
+- [x] 0073: the box shows `p -> 2p mod n` for an odd n with in-shuffle (the top card moves:
   n = 7 gives [1,3,5,0,2,4,6]); n = 2 with out prints "2^1 mod 1 = 1"; part b's table has
   "—" where the code returns 3 and 8 (rows 7, 51); "O(1) memory with a stack" is O(log n);
   the Jain paragraph uses the in-shuffle map for out; "e <= M - 1" and "never 0" fail at
   M = 1; the proof of 52 lacks 2^4 != 1; "k coprime to n - 1" always holds.
-- [ ] 0014: the corner check "works by luck" for squares is false (668 overlapping pairs
+- [x] 0014: the corner check "works by luck" for squares is false (668 overlapping pairs
   missed); `random_shapes(3, 3, 5)` never returns (more shapes than cells; the box caps it
   silently); restarts are far more than the page says (about 540 for 3 x 6 with 10).
-- [ ] 0051: `mice_needed(n, 0)` hangs (Python and SV; say b >= 1); the two-poison follow-up
+- [x] 0051: `mice_needed(n, 0)` hangs (Python and SV; say b >= 1); the two-poison follow-up
   says "disjunct" for a 2-separable code, and its 19 is only a lower bound (6 bottles need
   5 mice). The box's summary still says the bottle is hidden after "הצגת הבקבוק"; English
   tooltips.
-- [ ] 0012: "every other two-digit number enters the cycle" (11..99 go to 0); the two base-10
+- [x] 0012: "every other two-digit number enters the cycle" (11..99 go to 0); the two base-10
   histograms disagree (1 / 149 against 2 / 158, the second counts 000); the shared kaprekar
   box's column note says p (0013's name) instead of d; kapbase renders "4 ↔ 3 = d" (split
   LTR spans).
-- [ ] 0044: part c's base-5 check writes 442_5 - 244_5 for 242_5 (it is 422_5 - 224_5 = 112 -
+- [x] 0044: part c's base-5 check writes 442_5 - 244_5 for 242_5 (it is 422_5 - 224_5 = 112 -
   64; 48 holds by luck); "reach 495 when n >= (3+m)/2" is only sufficient.
-- [ ] 0002: "without ref ... does nothing" is wrong for `inout` (copies back; then
+- [x] 0002: "without ref ... does nothing" is wrong for `inout` (copies back; then
   swap(x, x) keeps 9); "XOR ... in no language" fails in JavaScript (2^32+1 and 5); the box
   clamps 8-bit inputs instead of wrapping, labels signed int while showing unsigned, caps
   at 1e9 (no 2^31-1), and the shared codeHtml (also 0003) shows blank lines between lines.
-- [ ] 0094: "the longest mean time ... at p = 0.55 is 22.25" (max about 22.27 at p = 0.545);
+- [x] 0094: "the longest mean time ... at p = 0.55 is 22.25" (max about 22.27 at p = 0.545);
   the near-fair trap should warn about E (relative 2.5e-3 at p = 0.5 + 1e-8); "standard
   deviations" should be standard errors; the y ticks for N = 10.
-- [ ] 0095: the row-5 box opens in jump mode (a click on an empty cell does nothing while
+- [x] 0095: the row-5 box opens in jump mode (a click on an empty cell does nothing while
   the text says place soldiers) and its fixed sentence hides the per-move feedback;
   "standing exactly on them" (19 heaviest: 16 fixed + 3 of 9, 84 choices); the "19 cannot
   work" search is not exhaustive with the default width (and not shown); seconds stated
   two ways.
 
 **R3. Hardware / DV (proposals):**
-- [ ] 0054: a block diagram of rr_arbiter and a per-clock table for WRR (pri, used, gnt).
-- [ ] 0094: a per-clock table (ret, take, count, full, empty), assertions and coverage; say
+- [x] 0054: a block diagram of rr_arbiter and a per-clock table for WRR (pri, used, gnt).
+- [x] 0094: a per-clock table (ret, take, count, full, empty), assertions and coverage; say
   the module freezes at the walls (a real counter does not).
 - [ ] 0014: a covergroup on n, the side and the pair relation (apart, edge, corner).
 - [ ] 0012: an exhaustive 1,000-input BCD check, two assertions, coverage on d and d -> d'.
@@ -2110,13 +2126,21 @@ instead of giving "נסו" tasks (the reports have checked tasks).
   0095: none needed.
 
 **R4. Explanations:**
-- [ ] Hints that give the answer: 0002 c2, 0008 a2, 0012 (interviewer block gives part c),
+- [x] Hints that give the answer: 0002 c2, 0008 a2, 0012 (interviewer block gives part c),
   0044 (the kapgraph box in the statement shows 495 and the stages; interviewer block,
   b3), 0051 a1, 0054 b2, 0095 a1 and c2.
-- [ ] 0051 "the round it dies in is its digit" six times; 0094's u_N > 0 unproved and eight
+- [x] 0051 "the round it dies in is its digit" six times; 0094's u_N > 0 unproved and eight
   lines ending in "ל-" / "ו-" before math; 0095 part a hint 2 circular, "מלמטה למעלה" says
   the opposite; 0014's box before the cases it names; 0073's box in part c though it serves
   a and b.
+
+**Left after round 8 (open):**
+- [ ] Videos to re-caption before any re-render: 0002 (the 8-bit checkbox, no bits column,
+  double-spaced code, the trap without ref / inout), 0008 (no legend, the old what-if),
+  0012 (part b's kapbase histogram, the old kapbase layout, "p" in the column note), 0014
+  (the box's place, the renamed checkbox, the heat map beside the board, the presets).
+- [ ] Review scripts: register Playwright's abort-all route before the CDN routes (the last
+  registered route wins; MathJax was blocked in some reviewers' measurements).
 
 ## Question variety
 
