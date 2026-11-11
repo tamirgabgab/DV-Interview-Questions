@@ -1,6 +1,7 @@
 """Question 0101, Sicherman dice: the numbers the page states, recomputed from the references in
 tools/figures/q0101.py (a search of every pair of dice by their counts, the split of the factors of
-the standard die, the mixed sizes), the generated blocks, and the box's models under Node against
+the standard die, k dice by their factors, by a search of three dice from scratch and by the
+partition count, the mixed sizes), the generated blocks, and the box's models under Node against
 the same references."""
 
 import itertools
@@ -8,6 +9,7 @@ import json
 import random
 import sys
 from collections import Counter
+from itertools import permutations
 from math import comb
 
 from extract_code import ROOT
@@ -19,8 +21,7 @@ STD6 = (1, 2, 3, 4, 5, 6)
 SICH = ((1, 2, 2, 3, 3, 4), (1, 3, 4, 5, 6, 8))
 ZERO = [((0, 1, 1, 2, 2, 3), (2, 4, 5, 6, 7, 9)), ((0, 1, 2, 3, 4, 5), (2, 3, 4, 5, 6, 7)),
         ((0, 2, 3, 4, 5, 7), (2, 3, 3, 4, 4, 5)), SICH, (STD6, STD6)]
-PAIRS8 = [((1, 2, 2, 3, 3, 4, 4, 5), (1, 3, 5, 5, 7, 7, 9, 11)), ((1, 2, 2, 3, 5, 6, 6, 7), (1, 3, 3, 5, 5, 7, 7, 9)),
-          ((1, 2, 3, 3, 4, 4, 5, 6), (1, 2, 5, 5, 6, 6, 9, 10)), (tuple(range(1, 9)), tuple(range(1, 9)))]
+SICH3 = tuple(sorted((SICH[0], STD6, SICH[1])))
 
 
 def poly(*coeffs):
@@ -65,45 +66,48 @@ def test_part_b():
 
 
 def test_part_c():
-    counts = [len(q0101.factor_pairs(n)) for n in range(2, 13)]
-    assert counts == [1, 1, 2, 1, 2, 1, 4, 2, 2, 1, 8]
-    assert [len(q0101.factor_pairs(n, 0)) for n in range(2, 13)] == [2, 2, 5, 2, 5, 2, 11, 5, 5, 2, 23]
-    for n in range(2, 9):
-        assert q0101.brute_pairs(n) == q0101.factor_pairs(n), n
-    for n in range(2, 7):
-        assert q0101.brute_pairs(n, 0) == q0101.factor_pairs(n, 0), n
-    assert q0101.factor_pairs(4) == [((1, 2, 2, 3), (1, 3, 3, 5)), ((1, 2, 3, 4), (1, 2, 3, 4))]
-    assert q0101.factor_pairs(8) == sorted(PAIRS8)
-    # another pair exactly when n is composite
-    for n in range(2, 25):
-        prime = all(n % d for d in range(2, n))
-        assert (len(q0101.factor_pairs(n)) == 1) == prime, n
-    # Phi_d(1) = p for d a power of the prime p, else 1; their product over d | n, d > 1 is n
-    for d in range(2, 40):
-        ps = [p for p in range(2, d + 1) if d % p == 0 and all(p % q for q in range(2, p))]
-        assert sum(q0101.cyclotomic(d)) == (ps[0] if len(ps) == 1 else 1), d
-    for n in range(2, 40):
-        prod = 1
-        for d in q0101.divisors(n):
-            prod *= sum(q0101.cyclotomic(d))
-        assert prod == n
-    # the construction for n = p m: A = 1 + u + w, B = 1 + p v + m z
-    for n in range(4, 31):
-        for p in range(2, n):
-            if n % p or n // p < 2:
-                continue
-            m = n // p
-            a = sorted(1 + u + w for u in range(p) for w in range(m))
-            b = sorted(1 + p * v + m * z for v in range(m) for z in range(p))
-            assert q0101.same(a, b) and a != list(range(1, n + 1)), (n, p)
-    assert sorted(1 + u + w for u in range(2) for w in range(3)) == list(SICH[0])
-    assert sorted(1 + 2 * v + 3 * z for v in range(3) for z in range(2)) == list(SICH[1])
-    assert sorted(1 + 2 * v + 2 * z for v in range(2) for z in range(2)) == [1, 3, 3, 5]
-    # the negative example of n = 12: x Phi_3 Phi_4^2 Phi_6^2 counts 12 faces, x^2 has -1
-    bad = [a for split, a in q0101.bad_splits(12) if split == {2: 0, 3: 1, 4: 2, 6: 2, 12: 0}]
-    assert len(bad) == 1 and bad[0][:4] == [0, 1, -1, 4] and sum(bad[0]) == 12 == 3 * 2**2
-    # the cost: 6 divisors of 12, 3^5 = 243 splits
-    assert len(q0101.divisors(12)) + 1 == 6 and 3 ** len(q0101.divisors(12)) == 243
+    # the statement: three standard dice, the sums 3 to 18 out of 216 rolls, 10 and 11 the most
+    cnt = q0101.sums(q0101.sums(STD6, STD6).elements(), STD6)
+    assert [cnt[s] for s in range(3, 19)] == [1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1]
+    assert sum(cnt.values()) == 216 and cnt[10] == cnt[11] == 27 == max(cnt.values())
+    # the three kinds of dice and the fourth that is none: x (1 + x)(1 + x + x^2)(1 - x + x^2)^e
+    assert [q0101.faces_of(q0101.kind_poly(e)) for e in range(3)] == [SICH[0], STD6, SICH[1]]
+    assert q0101.kind_poly(0) == [0, 1, 2, 2, 1] and q0101.mul([1, 1], [1, 1, 1]) == [1, 2, 2, 1]
+    e3 = q0101.kind_poly(3)
+    assert e3 == [0, 1, -1, 2, 0, 1, 1, 0, 2, -1, 1] and sum(e3) == 6 and e3[2] == -1
+    # the coefficient of x^2 is 2 - e for every e, so a die takes at most two copies
+    for e in range(8):
+        p = q0101.kind_poly(e)
+        assert p[:3] == [0, 1, 2 - e] and sum(p) == 6 and (min(p) >= 0) == (e <= 2), e
+    # step 1: three dice, by the factors and by a search from scratch
+    assert q0101.factor_sets(3) == q0101.brute_triples(1) == sorted([SICH3, (STD6, STD6, STD6)])
+    zero3 = q0101.factor_sets(3, 0)
+    assert zero3 == q0101.brute_triples(0) and len(zero3) == 13
+    # step 2: j Sicherman pairs and k - 2j standard dice, floor(k / 2) + 1 sets
+    for k in range(1, 9):
+        sets = q0101.factor_sets(k)
+        want = sorted(tuple(sorted([SICH[0]] * j + [STD6] * (k - 2 * j) + [SICH[1]] * j)) for j in range(k // 2 + 1))
+        assert sets == want and len(sets) == k // 2 + 1 == q0101.count_sets(k), k
+    # step 3 and its table: a face 0 allowed, counted by partitions, 5 for two dice as in part b
+    counts = [len(q0101.factor_sets(k, 0)) for k in range(2, 7)]
+    assert counts == [5, 13, 41, 98, 250] == [q0101.count_sets(k, 0) for k in range(2, 7)]
+    assert q0101.factor_sets(2) == q0101.factor_pairs(6) == q0101.brute_pairs(6)
+    assert q0101.factor_sets(2, 0) == q0101.factor_pairs(6, 0) == q0101.brute_pairs(6, 0)
+    assert q0101.partitions(3, 3) == 3 and comb(5, 2) == 10 and 3 + 10 == 13
+    bases = []
+    for dice in zero3:   # the first face of each die is its number of x's; they add up to 3
+        assert sum(min(d) for d in dice) == 3
+        bases.append(tuple(sorted(tuple(f - min(d) + 1 for f in d) for d in dice)))
+    assert bases.count((STD6, STD6, STD6)) == 3 and bases.count(SICH3) == 10
+    # every set has the sum of k standard dice, counted roll by roll
+    for k in range(1, 6):
+        for low in (1, 0):
+            assert all(q0101.same_k(d) for d in q0101.factor_sets(k, low)), (k, low)
+    # the cost: C(k + 2, 2) choices of k of 3 dice; with 0, 3(k + 1) dice and C(4k + 2, k)
+    # choices, 230,230 for k = 6; a search from scratch of 3 dice: 134,596 dice from 0 to 18
+    assert [comb(k + 2, 2) for k in range(1, 5)] == [len(list(itertools.combinations_with_replacement(range(3), k))) for k in range(1, 5)]
+    assert comb(3 * 7 + 6 - 1, 6) == comb(26, 6) == 230230
+    assert comb(19 + 6 - 1, 6) == 134596
 
 
 def test_followups():
@@ -113,31 +117,28 @@ def test_followups():
     assert q0101.mixed_pairs(4, 9) == q0101.mixed_brute(4, 9) == want
     target = q0101.sums(STD6, STD6)
     assert all(q0101.sums(a, b) == target for a, b in want)
-    # three dice: a die of six faces dividing P^3 (faces 1 to 16), then every pair of them
-    p3 = q0101.mul(q0101.mul(q0101.die_poly(STD6), q0101.die_poly(STD6)), q0101.die_poly(STD6))
-    divs = []
-    for a in itertools.combinations_with_replacement(range(1, 17), 6):
-        try:
-            rest = q0101.div_exact(p3, q0101.die_poly(a))
-        except AssertionError:
-            continue
-        if min(rest) >= 0:
-            divs.append(a)
-    triples = set()
-    for a in divs:
-        for b in divs:
-            try:
-                c = q0101.div_exact(q0101.div_exact(p3, q0101.die_poly(a)), q0101.die_poly(b))
-            except AssertionError:
+    # n faces: another pair exactly when n is composite; n = 4 one, n = 8 three
+    for n in range(2, 25):
+        prime = all(n % d for d in range(2, n))
+        assert (len(q0101.factor_pairs(n)) == 1) == prime, n
+    for n in range(2, 9):
+        assert q0101.brute_pairs(n) == q0101.factor_pairs(n), n
+    assert q0101.factor_pairs(4) == [((1, 2, 2, 3), (1, 3, 3, 5)), ((1, 2, 3, 4), (1, 2, 3, 4))]
+    assert len(q0101.factor_pairs(8)) == 4
+    for n in range(4, 31):    # the pair 1 + u + w and 1 + p v + m z for n = p m
+        for p in range(2, n):
+            if n % p or n // p < 2:
                 continue
-            if min(c) >= 0 and sum(c) == 6 and c[0] == 0:
-                triples.add(tuple(sorted((a, b, q0101.faces_of(c)))))
-    assert triples == {(STD6, STD6, STD6), tuple(sorted((SICH[0], SICH[1], STD6)))}
-    # the split 3, 0, 0 of 1 - x + x^2 has a negative coefficient
-    a = [0, 1]
-    for f in ([1, 1], [1, 1, 1], [1, -1, 1], [1, -1, 1], [1, -1, 1]):
-        a = q0101.mul(a, f)
-    assert min(a) < 0 and sum(a) == 6
+            m = n // p
+            a = sorted(1 + u + w for u in range(p) for w in range(m))
+            b = sorted(1 + p * v + m * z for v in range(m) for z in range(p))
+            assert q0101.same(a, b) and a != list(range(1, n + 1)), (n, p)
+    # the traps: faces up to 11 for two dice (Sicherman has 8), 16 for three, 18 with a face 0;
+    # Sicherman and a standard die in six orders
+    assert max(SICH[1]) == 8 <= 11 == 12 - 1
+    assert max(max(d) for s in q0101.factor_sets(3) for d in s) <= 16 == 18 - 2
+    assert max(max(d) for s in q0101.factor_sets(3, 0) for d in s) <= 18
+    assert len(set(permutations(SICH3))) == 6
     # the covergroup: A never shows 5 and 6, B never 2 and once 8; the legal cross 20 of 36
     assert set(STD6) - set(SICH[0]) == {5, 6} and set(STD6) - set(SICH[1]) == {2} and 8 in SICH[1]
     assert len({(x, y) for x in SICH[0] for y in SICH[1] if y <= 6}) == 20
@@ -152,7 +153,6 @@ def test_try_it_paragraphs():
 
     assert diff(SICH[0], (1, 3, 4, 5, 6, 7)) == [8, 9, 11, 12]            # part a: B's 8 to 7
     assert diff((1, 1, 1, 2, 2, 3), (2, 4, 5, 6, 7, 9)) == [2, 3, 4, 8, 9, 10]   # part b: A's 0 to 1
-    assert diff(PAIRS8[0][0], (1, 3, 5, 5, 7, 7, 9, 10)) == [11, 12, 15, 16]     # part c: B's 11 to 10
 
 
 def test_figures_up_to_date():
@@ -167,28 +167,24 @@ def test_explorer_matches_the_reference():
     rng = random.Random(101)
     cases = []
     for _ in range(200):
-        n = rng.choice([4, 6, 8])
-        cases.append([[rng.randint(0, 20) for _ in range(n)], [rng.randint(0, 20) for _ in range(n)]])
-    for (a, b) in [SICH, *ZERO, *PAIRS8]:
+        cases.append([[rng.randint(0, 20) for _ in range(6)], [rng.randint(0, 20) for _ in range(6)]])
+    for (a, b) in [SICH, *ZERO]:
         cases.append([list(a), list(b)])
     got = node_json(f"const m = {explorer_require()};"
                     f"console.log(JSON.stringify({json.dumps(cases)}.map(([a, b]) => [m.scSums(a, b), m.scDiff(a, b)])));")
+    want = q0101.sums(STD6, STD6)
     for (a, b), (sums, diff) in zip(cases, got):
-        n = len(a)
         ref = q0101.sums(a, b)
         assert sums == [ref.get(s, 0) for s in range(max(a) + max(b) + 1)]
-        want = q0101.sums(range(1, n + 1), range(1, n + 1))
         assert diff == sorted(s for s in set(ref) | set(want) if ref[s] != want[s])
     levels = node_json(f"const m = {explorer_require()};"
-                       "console.log(JSON.stringify([4, 6, 8].map((n) => Array.from({length: 45}, (_, s) => [m.scLevel(s, n), m.scHue(s, n)]))));")
-    for n, row in zip([4, 6, 8], levels):
-        assert row == [[q0101.level(s, n), q0101.hue(s, n)] for s in range(45)]
-    pairs = node_json(f"const m = {explorer_require()};console.log(JSON.stringify([m.scPairs, m.scTries]));")
-    keyed = {n: sorted(tuple(sorted((tuple(a), tuple(b)))) for _, a, b in pairs[0][n]) for n in pairs[0]}
-    assert keyed == {"4": q0101.factor_pairs(4), "6": q0101.factor_pairs(6, 0), "8": q0101.factor_pairs(8)}
-    assert [p[0] for p in pairs[0]["6"]][:2] == ["רגילות", "‏Sicherman"]
-    (name, a, b), = pairs[1]["6"]
+                       "console.log(JSON.stringify(Array.from({length: 45}, (_, s) => [m.scLevel(s, 6), m.scHue(s, 6)])));")
+    assert levels == [[q0101.level(s, 6), q0101.hue(s, 6)] for s in range(45)]
+    pairs, tries = node_json(f"const m = {explorer_require()};console.log(JSON.stringify([m.scPairs, m.scTries]));")
+    assert sorted(tuple(sorted((tuple(a), tuple(b)))) for _, a, b in pairs) == q0101.factor_pairs(6, 0)
+    assert [p[0] for p in pairs][:2] == ["רגילות", "‏Sicherman"]
+    (name, a, b), = tries
     assert a == [1, 1, 2, 3, 4, 5] and b == list(STD6) and not q0101.same(a, b)
     parsed = node_json(f"const m = {explorer_require()};"
-                       "console.log(JSON.stringify([['1.2.2.3.3.4', 6], ['0.20.3.4', 4], ['1.2.3', 4], ['1.21.3.4', 4], ['1.x.3.4', 4], ['', 6]].map(([t, n]) => m.scParse(t, n))));")
-    assert parsed == [[1, 2, 2, 3, 3, 4], [0, 20, 3, 4], None, None, None, None]
+                       "console.log(JSON.stringify(['1.2.2.3.3.4', '0.20.3.4.5.6', '1.2.3', '1.21.3.4.5.6', '1.x.3.4.5.6', '', '1.2.3.4.5.6.7.8'].map((t) => m.scParse(t))));")
+    assert parsed == [[1, 2, 2, 3, 3, 4], [0, 20, 3, 4, 5, 6], None, None, None, None, None]

@@ -29,8 +29,8 @@ added: 2026-11-11
 1. **שש פאות :** מצאו זוג כזה, והוכיחו שהוא הזוג היחיד מלבד הרגיל.
 2. **גם 0 על פאה :** מותר גם 0, כלומר מספרים שלמים מ-0 ומעלה. כמה זוגות יש עכשיו, ומה הקשר
    ביניהם?
-3. **מספר פאות כללי :** שתי קוביות של \( n \) פאות, וההתפלגות של הסכום של שתי קוביות רגילות של
-   \( n \) פאות. לאילו \( n \) יש זוג אחר, וכמה זוגות יש?
+3. **שלוש קוביות ויותר :** שלוש קוביות של שש פאות, ואחר כך \( k \) קוביות, וההתפלגות של
+   הסכום של אותו מספר קוביות רגילות. אילו קבוצות של קוביות יש, וכמה?
 
 ??? interviewer "מה המראיין בודק"
     - **ניסוי וטעייה מסודר :** האם המועמד מתחיל מהסכומים הנדירים, 2 ו-12, ומסיק מהם משהו על
@@ -38,6 +38,8 @@ added: 2026-11-11
     - **כלי מתאים :** האם הוא מוצא דרך לחשב את ההתפלגות של סכום כפעולה אחת שאפשר גם לפרק, ולא
       רק למלא טבלאות.
     - **הוכחה שאין עוד :** למצוא זוג זה חצי מהעבודה. האם הוא מראה למה כל אפשרות אחרת נשללת.
+    - **הכללה :** האם הוא מעביר את הטיעון של שתי קוביות לשלוש ול-\( k \), ורואה מה נשאר
+      כמו שהוא ומה משתנה.
     - **עין של אימות :** האם הוא רואה מה בדיקה שמסתכלת רק על הסכום לא יכולה לתפוס.
 
 ---
@@ -358,14 +360,15 @@ added: 2026-11-11
     "ניסיון : 1 פעמיים" : הסכום 2 מתקבל פעמיים ו-12 אף פעם. מה אומרת השורה שמתחת להיסטוגרמה על
     כל קובייה לבד, כשלוחצים על "Sicherman"?
 
-    <div class="explorer" data-kind="sicherman" data-n="6" data-a="1.2.2.3.3.4" data-b="1.3.4.5.6.8"></div>
+    <div class="explorer" data-kind="sicherman" data-a="1.2.2.3.3.4" data-b="1.3.4.5.6.8"></div>
 
     #### סיבוכיות { .sol-cost }
 
     ‏`same_sum` כופלת שני פולינומים : \( O(n^2) \). ‏`dice_pairs` עוברת על כל הקוביות A,
     רשימות לא יורדות של \( n \) פאות מתוך \( 2n - 1 \) ערכים. יש
     \( \binom{3n-2}{n} \) כאלה, ולכל אחת חילוק ארוך של \( O(n^2) \). עם \( n = 6 \) אלה 8,008
-    קוביות, פחות משנייה. המספר גדל מעריכית, ולכן בסעיף ג מחלקים את הגורמים במקום לחפש.
+    קוביות, פחות משנייה. המספר גדל מעריכית, וגדל עוד יותר עם יותר קוביות, ולכן בסעיף ג
+    מחלקים את הגורמים במקום לחפש.
 
 ---
 
@@ -442,232 +445,277 @@ added: 2026-11-11
     הזזה? אחר כך כתבו 1 במקום ה-0 של A, בלי לגעת ב-B : שישה סכומים יוצאים מהמשולש, 2, 3 ו-4
     ו-8, 9 ו-10. רק הזזה של קובייה שלמה, יחד עם הזזה הפוכה של השנייה, שומרת על כל הסכומים.
 
-    <div class="explorer" data-kind="sicherman" data-n="6" data-a="0.1.1.2.2.3" data-b="2.4.5.6.7.9"></div>
+    <div class="explorer" data-kind="sicherman" data-a="0.1.1.2.2.3" data-b="2.4.5.6.7.9"></div>
 
 ---
 
-### סעיף ג – מספר פאות כללי
+### סעיף ג – שלוש קוביות ויותר
 
-שתי קוביות של \( n \) פאות, עם מספרים שלמים חיוביים, צריכות לתת את ההתפלגות של הסכום של שתי
-קוביות רגילות של \( n \) פאות, עם המספרים 1 עד \( n \). לאילו \( n \) יש זוג חוץ מהרגיל? מצאו
-את כל הזוגות של \( n = 4 \) ושל \( n = 8 \), וכתבו קוד שמוצא אותם לכל \( n \) בלי לעבור על כל
-הקוביות.
+עכשיו יש יותר משתי קוביות, כולן של שש פאות עם מספרים שלמים חיוביים. הסכום של שלוש קוביות
+רגילות הוא מ-3 עד 18, ומתוך 216 ההטלות 10 ו-11 מתקבלים ב-27 הטלות כל אחד :
+
+<!-- gen 6 -->
+
+<svg class="perf-chart" viewBox="0 0 420 196" style="max-width:26.25rem" role="img" aria-label="התפלגות הסכום של שלוש קוביות רגילות : הסכומים 3 עד 18, ומספר ההטלות מתוך 216 שנותנות כל סכום, 1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1"><line class="grid" x1="34" x2="412" y1="166.0" y2="166.0"/><text class="tick" x="26" y="170.0" text-anchor="end">0</text><line class="grid" x1="34" x2="412" y1="116.7" y2="116.7"/><text class="tick" x="26" y="120.7" text-anchor="end">9</text><line class="grid" x1="34" x2="412" y1="67.3" y2="67.3"/><text class="tick" x="26" y="71.3" text-anchor="end">18</text><line class="grid" x1="34" x2="412" y1="18.0" y2="18.0"/><text class="tick" x="26" y="22.0" text-anchor="end">27</text><rect class="bar by-multiples" x="37.8" y="160.5" width="16.1" height="5.5" rx="2"><title>sum 3: 1 of 216</title></rect><text class="tick" x="45.8" y="155.5" text-anchor="middle">1</text><rect class="bar by-multiples" x="61.4" y="149.6" width="16.1" height="16.4" rx="2"><title>sum 4: 3 of 216</title></rect><text class="tick" x="69.4" y="144.6" text-anchor="middle">3</text><rect class="bar by-multiples" x="85.0" y="133.1" width="16.1" height="32.9" rx="2"><title>sum 5: 6 of 216</title></rect><text class="tick" x="93.1" y="128.1" text-anchor="middle">6</text><rect class="bar by-multiples" x="108.7" y="111.2" width="16.1" height="54.8" rx="2"><title>sum 6: 10 of 216</title></rect><text class="tick" x="116.7" y="106.2" text-anchor="middle">10</text><rect class="bar by-multiples" x="132.3" y="83.8" width="16.1" height="82.2" rx="2"><title>sum 7: 15 of 216</title></rect><text class="tick" x="140.3" y="78.8" text-anchor="middle">15</text><rect class="bar by-multiples" x="155.9" y="50.9" width="16.1" height="115.1" rx="2"><title>sum 8: 21 of 216</title></rect><text class="tick" x="163.9" y="45.9" text-anchor="middle">21</text><rect class="bar by-multiples" x="179.5" y="29.0" width="16.1" height="137.0" rx="2"><title>sum 9: 25 of 216</title></rect><text class="tick" x="187.6" y="24.0" text-anchor="middle">25</text><rect class="bar by-multiples" x="203.2" y="18.0" width="16.1" height="148.0" rx="2"><title>sum 10: 27 of 216</title></rect><text class="tick" x="211.2" y="13.0" text-anchor="middle">27</text><rect class="bar by-multiples" x="226.8" y="18.0" width="16.1" height="148.0" rx="2"><title>sum 11: 27 of 216</title></rect><text class="tick" x="234.8" y="13.0" text-anchor="middle">27</text><rect class="bar by-multiples" x="250.4" y="29.0" width="16.1" height="137.0" rx="2"><title>sum 12: 25 of 216</title></rect><text class="tick" x="258.4" y="24.0" text-anchor="middle">25</text><rect class="bar by-multiples" x="274.0" y="50.9" width="16.1" height="115.1" rx="2"><title>sum 13: 21 of 216</title></rect><text class="tick" x="282.1" y="45.9" text-anchor="middle">21</text><rect class="bar by-multiples" x="297.7" y="83.8" width="16.1" height="82.2" rx="2"><title>sum 14: 15 of 216</title></rect><text class="tick" x="305.7" y="78.8" text-anchor="middle">15</text><rect class="bar by-multiples" x="321.3" y="111.2" width="16.1" height="54.8" rx="2"><title>sum 15: 10 of 216</title></rect><text class="tick" x="329.3" y="106.2" text-anchor="middle">10</text><rect class="bar by-multiples" x="344.9" y="133.1" width="16.1" height="32.9" rx="2"><title>sum 16: 6 of 216</title></rect><text class="tick" x="352.9" y="128.1" text-anchor="middle">6</text><rect class="bar by-multiples" x="368.5" y="149.6" width="16.1" height="16.4" rx="2"><title>sum 17: 3 of 216</title></rect><text class="tick" x="376.6" y="144.6" text-anchor="middle">3</text><rect class="bar by-multiples" x="392.2" y="160.5" width="16.1" height="5.5" rx="2"><title>sum 18: 1 of 216</title></rect><text class="tick" x="400.2" y="155.5" text-anchor="middle">1</text><text class="tick" x="45.8" y="184" text-anchor="middle">3</text><text class="tick" x="69.4" y="184" text-anchor="middle">4</text><text class="tick" x="93.1" y="184" text-anchor="middle">5</text><text class="tick" x="116.7" y="184" text-anchor="middle">6</text><text class="tick" x="140.3" y="184" text-anchor="middle">7</text><text class="tick" x="163.9" y="184" text-anchor="middle">8</text><text class="tick" x="187.6" y="184" text-anchor="middle">9</text><text class="tick" x="211.2" y="184" text-anchor="middle">10</text><text class="tick" x="234.8" y="184" text-anchor="middle">11</text><text class="tick" x="258.4" y="184" text-anchor="middle">12</text><text class="tick" x="282.1" y="184" text-anchor="middle">13</text><text class="tick" x="305.7" y="184" text-anchor="middle">14</text><text class="tick" x="329.3" y="184" text-anchor="middle">15</text><text class="tick" x="352.9" y="184" text-anchor="middle">16</text><text class="tick" x="376.6" y="184" text-anchor="middle">17</text><text class="tick" x="400.2" y="184" text-anchor="middle">18</text><line class="axis" x1="34" x2="412" y1="166" y2="166"/></svg>
+
+<!-- /gen -->
+
+מצאו את כל השלישיות של קוביות, חוץ מהרגילות, שהסכום שלהן מתפלג כך. אחר כך \( k \) קוביות :
+אילו קבוצות של \( k \) קוביות נותנות את ההתפלגות של הסכום של \( k \) קוביות רגילות, וכמה יש?
+ומה משתנה כשמותר גם 0 על פאה? כתבו קוד שמוצא את כל הקבוצות.
 
 ??? tip "רמז 1"
-    ‏\( P_n(x) = x + x^2 + \dots + x^n = x \cdot \frac{x^n - 1}{x - 1} \). איך מתפרק \( x^n - 1 \)?
-    נסו \( n = 4 \) : ‏\( x^4 - 1 = (x - 1)(x + 1)(x^2 + 1) \).
+    ההתפלגות של הסכום של שלוש קוביות היא המכפלה של שלושה פולינומים. איך מתפרק \( P(x)^3 \) לגורמים,
+    וכמה מכל גורם כל קובייה חייבת לקבל?
 
 ??? tip "רמז 2"
-    ‏\( x^n - 1 \) מתפרק לגורם אחד \( \Phi_d(x) \) לכל מחלק \( d \) של \( n \), שנקרא הפולינום
-    הציקלוטומי. מה הערך של כל גורם ב-\( x = 1 \), ומה זה אומר כש-\( n \) ראשוני?
+    הגורם \( 1 - x + x^2 \) לא משנה את מספר הפאות, ולכן נשאר לחלק רק אותו. כמה עותקים שלו
+    יכולה קובייה אחת לקבל? חשבו את המקדם של \( x^2 \) בקובייה שקיבלה שלושה.
 
 ??? success "פתרון סעיף ג"
     !!! answer "תשובה בקצרה"
-        **יש זוג אחר בדיוק כש-\( n \) פריק.** ‏\( P_n(x) = x \prod_{d \mid n,\ d > 1} \Phi_d(x) \),
-        וכל זוג הוא חלוקה : \( x \) אחד לכל קובייה, ומכל \( \Phi_d \) עותק אחד, שניים או אף אחד
-        לקובייה A. נשארות החלוקות שבהן \( A(1) = n \) ואין מקדם שלילי. כש-\( n \) ראשוני יש רק
-        \( \Phi_n \), והזוג הרגיל לבד. ל-\( n = 4 \) יש זוג אחד נוסף, \( \{1, 2, 2, 3\} \)
-        ו-\( \{1, 3, 3, 5\} \), ול-\( n = 8 \) שלושה.
+        **זוגות Sicherman וקוביות רגילות, ותו לא.** כל קובייה מקבלת \( x \), ‏\( 1 + x \)
+        ו-\( 1 + x + x^2 \) אחד, ו-\( e \) עותקים של \( 1 - x + x^2 \), כש-\( e \) הוא 0, 1 או
+        2 : הקטנה של Sicherman, הרגילה או הגדולה. סכום ה-\( e \) הוא \( k \), ולכן יש קטנות
+        כמו גדולות. לשלוש קוביות יש שלישייה אחת מלבד הרגילות, זוג Sicherman וקובייה רגילה,
+        ול-\( k \) קוביות יש \( \lfloor k/2 \rfloor + 1 \) קבוצות.
 
-    <!-- cost: זמן \( O(3^{\tau(n)} \, \tau(n) \, n^2) \) | זיכרון \( O(n) \) -->
+    <!-- cost: זמן \( O(k^3) \) | זיכרון \( O(k^2) \) -->
 
     #### הרעיון { .sol-idea }
 
-    כמו בסעיף א, מפרקים את הקובייה הרגילה. ‏\( P_n(x) = x(1 + x + \dots + x^{n-1}) \), והסוגריים
-    הם \( \frac{x^n - 1}{x - 1} \). השורשים של \( x^n - 1 \) הם \( n \) שורשי היחידה, והם
-    מתקבצים לפי הסדר שלהם : לכל מחלק \( d \) של \( n \) גורם אחד, \( \Phi_d(x) \), שהשורשים שלו
-    הם שורשי היחידה מסדר \( d \) בדיוק. לכן \( x^n - 1 = \prod_{d \mid n} \Phi_d(x) \), ו-\( \Phi_1 = x - 1 \)
-    מצטמצם. אלה הגורמים של \( n \) עד 12 :
+    כמו בסעיף א : הסכום של \( k \) קוביות מתפלג כמו הסכום של \( k \) קוביות רגילות בדיוק
+    כשהמכפלה של \( k \) הפולינומים היא \( P(x)^k \). ב-\( P(x)^k \) כל אחד מארבעת הגורמים
+    מופיע \( k \) פעמים, וכל קובייה מקבלת חלק מהם. ההצבות \( x = 0 \) ו-\( x = 1 \) קובעות
+    שוב את שלושת הגורמים הראשונים, אחד מכל אחד לכל קובייה. רק \( k \) העותקים של
+    \( 1 - x + x^2 \) מתחלקים בחופשיות, וכל קובייה נקבעת לפי מספר העותקים \( e \) שקיבלה :
 
-    <!-- gen 6 -->
+    <!-- gen 7 -->
 
-    | המחלק d | הגורם \( \Phi_d(x) \) | הערך \( \Phi_d(1) \) |
-    |:-:|---|:-:|
-    | 2 | ‏\( 1 + x \) | 2 |
-    | 3 | ‏\( 1 + x + x^2 \) | 3 |
-    | 4 | ‏\( 1 + x^2 \) | 2 |
-    | 5 | ‏\( 1 + x + x^2 + x^3 + x^4 \) | 5 |
-    | 6 | ‏\( 1 - x + x^2 \) | 1 |
-    | 7 | ‏\( 1 + x + \dots + x^{6} \) | 7 |
-    | 8 | ‏\( 1 + x^4 \) | 2 |
-    | 9 | ‏\( 1 + x^3 + x^6 \) | 3 |
-    | 10 | ‏\( 1 - x + x^2 - x^3 + x^4 \) | 1 |
-    | 11 | ‏\( 1 + x + \dots + x^{10} \) | 11 |
-    | 12 | ‏\( 1 - x^2 + x^4 \) | 1 |
+    | העותקים e | הקובייה | הפולינום | הפאות |
+    |:-:|---|---|---|
+    | 0 | הקטנה של Sicherman | ‏\( x + 2x^2 + 2x^3 + x^4 \) | ‏<span dir="ltr">1, 2, 2, 3, 3, 4</span> |
+    | 1 | הרגילה | ‏\( x + x^2 + x^3 + x^4 + x^5 + x^6 \) | ‏<span dir="ltr">1, 2, 3, 4, 5, 6</span> |
+    | 2 | הגדולה של Sicherman | ‏\( x + x^3 + x^4 + x^5 + x^6 + x^8 \) | ‏<span dir="ltr">1, 3, 4, 5, 6, 8</span> |
+    | 3 | לא קובייה | ‏\( x - x^2 + 2x^3 + \dots + x^{10} \) | אין : המקדם של \( x^2 \) שלילי |
 
     <!-- /gen -->
-
-    לכל \( \Phi_d \) מקדמים שלמים, והוא לא מתפרק (משפט ידוע). ל-\( n = 6 \) אלה בדיוק
-    הגורמים של סעיף א : \( \Phi_2 = 1 + x \), ‏\( \Phi_3 = 1 + x + x^2 \) ו-\( \Phi_6 = 1 - x + x^2 \).
 
     #### השלבים { .sol-steps }
 
     <div class="steps" markdown>
 
-    1. **הגורמים :** ‏\( P_n(x) = x \prod_{d \mid n,\ d > 1} \Phi_d(x) \), וב-\( P_n(x)^2 \) כל
-       אחד מהם פעמיים.
-    2. **אין פאה 0 :** כמו בסעיף א, \( x \) אחד לכל קובייה.
-    3. **החלוקה :** לכל מחלק \( d > 1 \) בוחרים \( k_d \in \{0, 1, 2\} \) : ‏A מקבלת \( k_d \)
-       עותקים של \( \Phi_d \), ו-B את \( 2 - k_d \) האחרים.
-    4. **מספר הפאות :** ‏\( A(1) = \prod_d \Phi_d(1)^{k_d} \) צריך להיות \( n \). ‏\( \Phi_d(1) \)
-       הוא \( p \) כש-\( d \) חזקה של ראשוני \( p \), ו-1 בכל מקרה אחר.
-    5. **מקדמים לא שליליים :** שומרים רק חלוקה שבה ל-A ול-B אין מקדם שלילי.
-    6. **בלי כפילויות :** חלוקה והנגדית שלה, \( 2 - k_d \) לכל \( d \), הן אותו זוג.
+    1. **שלוש קוביות :** שלושת העותקים של \( 1 - x + x^2 \) מתחלקים בין שלוש הקוביות. חלוקה
+       של \( 1 + 1 + 1 \) נותנת שלוש קוביות רגילות. חלוקה של \( 0 + 1 + 2 \) נותנת את הקטנה
+       של Sicherman, רגילה ואת הגדולה : זוג Sicherman וקובייה רגילה. חלוקה של
+       \( 0 + 0 + 3 \) לא אפשרית, כי לקובייה עם שלושה עותקים יש מקדם שלילי.
+    2. **מספר כללי של קוביות :** כל קובייה היא אחת משלוש הקוביות של הטבלה, וה-\( e \) שלהן
+       מסתכמים ל-\( k \). אם \( j \) קוביות הן הקטנה של Sicherman ו-\( l \) הן הגדולה, הסכום
+       הוא \( (k - j - l) + 2l = k \), ולכן \( l = j \) : כל קטנה באה עם גדולה. קבוצה היא
+       \( j \) זוגות Sicherman ו-\( k - 2j \) קוביות רגילות, עם \( j \) מ-0 עד
+       \( \lfloor k/2 \rfloor \), ולכן יש \( \lfloor k/2 \rfloor + 1 \) קבוצות.
+    3. **גם 0 על פאה :** כמו בסעיף ב, \( k \) הגורמים \( x \) כבר לא חייבים להתחלק אחד לכל
+       קובייה. קובייה שקיבלה \( a \) מהם מתחילה ב-\( a \), וה-\( a \) מסתכמים ל-\( k \). לכל
+       קבוצה של שלב 2 סופרים את הדרכים לחלק את ה-\( x \), וקוביות זהות לא נספרות פעמיים.
+       בשלוש קוביות רגילות יש שלוש חלוקות : \( 1 + 1 + 1 \), ‏\( 0 + 1 + 2 \) ו-\( 0 + 0 + 3 \).
+       ב-Sicherman ורגילה שלוש הקוביות שונות, וכל אחת מ-10 החלוקות עם סדר נותנת קבוצה
+       אחרת. ביחד 13 קבוצות, והפאה הראשונה של כל קובייה היא מספר ה-\( x \) שלה :
+
+        <!-- gen 8 -->
+
+        | הבסיס | קובייה 1 | קובייה 2 | קובייה 3 |
+        |---|---|---|---|
+        | רגילות | ‏<span dir="ltr">1, 2, 3, 4, 5, 6</span> | ‏<span dir="ltr">1, 2, 3, 4, 5, 6</span> | ‏<span dir="ltr">1, 2, 3, 4, 5, 6</span> |
+        | רגילות | ‏<span dir="ltr">0, 1, 2, 3, 4, 5</span> | ‏<span dir="ltr">0, 1, 2, 3, 4, 5</span> | ‏<span dir="ltr">3, 4, 5, 6, 7, 8</span> |
+        | רגילות | ‏<span dir="ltr">0, 1, 2, 3, 4, 5</span> | ‏<span dir="ltr">1, 2, 3, 4, 5, 6</span> | ‏<span dir="ltr">2, 3, 4, 5, 6, 7</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">1, 2, 2, 3, 3, 4</span> | ‏<span dir="ltr">1, 2, 3, 4, 5, 6</span> | ‏<span dir="ltr">1, 3, 4, 5, 6, 8</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">0, 1, 1, 2, 2, 3</span> | ‏<span dir="ltr">0, 1, 2, 3, 4, 5</span> | ‏<span dir="ltr">3, 5, 6, 7, 8, 10</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">0, 1, 1, 2, 2, 3</span> | ‏<span dir="ltr">1, 2, 3, 4, 5, 6</span> | ‏<span dir="ltr">2, 4, 5, 6, 7, 9</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">0, 1, 1, 2, 2, 3</span> | ‏<span dir="ltr">2, 3, 4, 5, 6, 7</span> | ‏<span dir="ltr">1, 3, 4, 5, 6, 8</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">0, 1, 1, 2, 2, 3</span> | ‏<span dir="ltr">3, 4, 5, 6, 7, 8</span> | ‏<span dir="ltr">0, 2, 3, 4, 5, 7</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">1, 2, 2, 3, 3, 4</span> | ‏<span dir="ltr">0, 1, 2, 3, 4, 5</span> | ‏<span dir="ltr">2, 4, 5, 6, 7, 9</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">1, 2, 2, 3, 3, 4</span> | ‏<span dir="ltr">2, 3, 4, 5, 6, 7</span> | ‏<span dir="ltr">0, 2, 3, 4, 5, 7</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">2, 3, 3, 4, 4, 5</span> | ‏<span dir="ltr">0, 1, 2, 3, 4, 5</span> | ‏<span dir="ltr">1, 3, 4, 5, 6, 8</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">2, 3, 3, 4, 4, 5</span> | ‏<span dir="ltr">1, 2, 3, 4, 5, 6</span> | ‏<span dir="ltr">0, 2, 3, 4, 5, 7</span> |
+        | ‏Sicherman ורגילה | ‏<span dir="ltr">3, 4, 4, 5, 5, 6</span> | ‏<span dir="ltr">0, 1, 2, 3, 4, 5</span> | ‏<span dir="ltr">0, 2, 3, 4, 5, 7</span> |
+
+        <!-- /gen -->
+
+        כך סופרים לכל \( k \) : לכל \( j \) מחלקים את ה-\( x \) בין שלושת סוגי הקוביות, ובתוך
+        כל סוג לפי מספר הקוביות שלו. זה סכום, ולא נוסחה סגורה כמו \( \lfloor k/2 \rfloor + 1 \).
+        עם שתי קוביות יוצאים חמשת הזוגות של סעיף ב :
+
+        <!-- gen 9 -->
+
+        | הקוביות k | הקבוצות, פאות חיוביות | הקבוצות, גם 0 |
+        |:-:|:-:|:-:|
+        | 2 | 2 | 5 |
+        | 3 | 2 | 13 |
+        | 4 | 3 | 41 |
+        | 5 | 3 | 98 |
+        | 6 | 4 | 250 |
+
+        <!-- /gen -->
 
     </div>
-
-    כך יוצא מספר הזוגות לכל \( n \) עד 12, כולל הזוג הרגיל. העמודה האחרונה מתירה גם 0 על פאה, כמו
-    בסעיף ב : אז גם שני הגורמים \( x \) מתחלקים 0, 1 או 2.
-
-    <!-- gen 7 -->
-
-    | הפאות n | הגורמים של \( P_n \) מלבד x | הזוגות, פאות חיוביות | הזוגות, גם 0 |
-    |:-:|---|:-:|:-:|
-    | 2 | ‏\( \Phi_{2} \) | 1 | 2 |
-    | 3 | ‏\( \Phi_{3} \) | 1 | 2 |
-    | 4 | ‏\( \Phi_{2} \, \Phi_{4} \) | 2 | 5 |
-    | 5 | ‏\( \Phi_{5} \) | 1 | 2 |
-    | 6 | ‏\( \Phi_{2} \, \Phi_{3} \, \Phi_{6} \) | 2 | 5 |
-    | 7 | ‏\( \Phi_{7} \) | 1 | 2 |
-    | 8 | ‏\( \Phi_{2} \, \Phi_{4} \, \Phi_{8} \) | 4 | 11 |
-    | 9 | ‏\( \Phi_{3} \, \Phi_{9} \) | 2 | 5 |
-    | 10 | ‏\( \Phi_{2} \, \Phi_{5} \, \Phi_{10} \) | 2 | 5 |
-    | 11 | ‏\( \Phi_{11} \) | 1 | 2 |
-    | 12 | ‏\( \Phi_{2} \, \Phi_{3} \, \Phi_{4} \, \Phi_{6} \, \Phi_{12} \) | 8 | 23 |
-
-    <!-- /gen -->
-
-    אלה הזוגות של \( n = 4 \) ושל \( n = 8 \), כל אחד עם הגורמים של כל קובייה :
-
-    <!-- gen 8 -->
-
-    | הפאות n | קובייה A | הגורמים של A | קובייה B | הגורמים של B |
-    |:-:|---|---|---|---|
-    | 4 | ‏<span dir="ltr">1, 2, 3, 4</span> | ‏\( x \, \Phi_{2} \, \Phi_{4} \) | ‏<span dir="ltr">1, 2, 3, 4</span> | ‏\( x \, \Phi_{2} \, \Phi_{4} \) |
-    | 4 | ‏<span dir="ltr">1, 2, 2, 3</span> | ‏\( x \, \Phi_{2}^2 \) | ‏<span dir="ltr">1, 3, 3, 5</span> | ‏\( x \, \Phi_{4}^2 \) |
-    | 8 | ‏<span dir="ltr">1, 2, 3, 4, 5, 6, 7, 8</span> | ‏\( x \, \Phi_{2} \, \Phi_{4} \, \Phi_{8} \) | ‏<span dir="ltr">1, 2, 3, 4, 5, 6, 7, 8</span> | ‏\( x \, \Phi_{2} \, \Phi_{4} \, \Phi_{8} \) |
-    | 8 | ‏<span dir="ltr">1, 2, 3, 3, 4, 4, 5, 6</span> | ‏\( x \, \Phi_{2} \, \Phi_{4}^2 \) | ‏<span dir="ltr">1, 2, 5, 5, 6, 6, 9, 10</span> | ‏\( x \, \Phi_{2} \, \Phi_{8}^2 \) |
-    | 8 | ‏<span dir="ltr">1, 2, 2, 3, 5, 6, 6, 7</span> | ‏\( x \, \Phi_{2}^2 \, \Phi_{8} \) | ‏<span dir="ltr">1, 3, 3, 5, 5, 7, 7, 9</span> | ‏\( x \, \Phi_{4}^2 \, \Phi_{8} \) |
-    | 8 | ‏<span dir="ltr">1, 2, 2, 3, 3, 4, 4, 5</span> | ‏\( x \, \Phi_{2}^2 \, \Phi_{4} \) | ‏<span dir="ltr">1, 3, 5, 5, 7, 7, 9, 11</span> | ‏\( x \, \Phi_{4} \, \Phi_{8}^2 \) |
-
-    <!-- /gen -->
 
     #### הקוד { .sol-code }
 
     === "Python"
-        ```python title="factor_pairs" linenums="1" hl_lines="9 18 25"
-        from itertools import product
+        ```python title="dice_sets" linenums="1" hl_lines="18 25"
+        from itertools import combinations_with_replacement
 
 
-        def cyclotomic(d):
-            """Phi_d: x^d - 1 divided by Phi_e of every e < d that divides d."""
-            p = [-1] + [0] * (d - 1) + [1]
-            for e in range(1, d):
-                if d % e == 0:
-                    p = poly_div(p, cyclotomic(e))               # (1)!
-            return p
+        def same_sum_k(dice):
+            """The sum of the dice is distributed as the sum of as many standard six-sided dice."""
+            got, want = [1], [1]
+            for d in dice:
+                got = poly_mul(got, die_poly(d))
+                want = poly_mul(want, die_poly(range(1, 7)))
+            return got == want
 
 
-        def factor_pairs(n):
-            """The pairs of n-sided dice (positive faces) whose sum is distributed as the sum
-            of two standard dice, from the factors x * Phi_d, d > 1 dividing n; each pair once."""
-            ds = [d for d in range(2, n + 1) if n % d == 0]
-            pairs = []
-            for split in product((0, 1, 2), repeat=len(ds)):    # (2)!
-                a, b = [0, 1], [0, 1]
-                for d, k in zip(ds, split):
-                    for _ in range(k):
-                        a = poly_mul(a, cyclotomic(d))
-                    for _ in range(2 - k):
-                        b = poly_mul(b, cyclotomic(d))
-                if sum(a) == n and min(a) >= 0 and min(b) >= 0:  # (3)!
-                    if faces_of(a) <= faces_of(b):
-                        pairs.append((faces_of(a), faces_of(b)))
-            return sorted(pairs)
+        def dice_sets(k, low=1):
+            """Every set of k six-sided dice, faces whole numbers from low up, whose sum is
+            distributed as the sum of k standard dice; each set once, its dice in order."""
+            kinds, p = [], [1, 2, 2, 1]                          # (1)!
+            for e in range(k + 1):
+                if min(p) >= 0:                                  # (2)!
+                    kinds.append((e, p))
+                p = poly_mul(p, [1, -1, 1])
+            dice = [(e, a, faces_of([0] * a + p))                # (3)!
+                    for a in range(low, k + 1) for e, p in kinds]
+            sets = []
+            for pick in combinations_with_replacement(dice, k):
+                if sum(d[0] for d in pick) == k and sum(d[1] for d in pick) == k:   # (4)!
+                    sets.append(tuple(d[2] for d in pick))
+            return sets
         ```
 
-        1. ‏\( x^d - 1 \) הוא המכפלה של כל \( \Phi_e \) ש-\( e \) מחלק את \( d \). מחלקים בכל
-           האחרים, ונשאר \( \Phi_d \). החילוק תמיד מדויק.
-        2. ‏\( k_d \) לכל מחלק : \( 3^{\tau(n) - 1} \) חלוקות, כש-\( \tau(n) \) הוא מספר המחלקים
-           של \( n \).
-        3. ‏\( A(1) \), סכום המקדמים, הוא מספר הפאות. אם הוא \( n \), גם ל-B יש \( n \) פאות,
-           כי \( A(1) B(1) = n^2 \).
+        1. ‏\( (1 + x)(1 + x + x^2) = 1 + 2x + 2x^2 + x^3 \) : הגורמים שכל קובייה מקבלת אחד
+           מכל אחד, בלי \( x \).
+        2. הקוד לא מניח ש-\( e \le 2 \) : הוא מנסה כל \( e \) עד \( k \), ושומר רק פולינום
+           בלי מקדם שלילי. נשארים 0, 1 ו-2.
+        3. כל קובייה אפשרית : ‏\( x^a \) כפול אחד הסוגים. הלולאה על \( a \) בחוץ ועל \( e \)
+           בפנים מסדרת את הקוביות לפי הפאות שלהן, ולכן כל קבוצה יוצאת פעם אחת, והקוביות שלה
+           בסדר.
+        4. ב-\( P(x)^k \) יש \( k \) עותקים של \( 1 - x + x^2 \) ו-\( k \) גורמים \( x \), והקבוצה
+           לוקחת את כולם, לא פחות ולא יותר.
 
     === "SystemVerilog"
-        ```systemverilog title="function automatic void factor_pairs" linenums="1" hl_lines="11 28 33"
-        // Phi_d: x^d - 1 divided by Phi_e of every e < d that divides d, the e's in rising order
-        function automatic poly_t cyclotomic(int d);
-          poly_t phi[int];                      // phi[e]: the factors found so far
-          poly_t p, q;
-          for (int m = 1; m <= d; m++) begin
-            if (d % m != 0) continue;
-            p.delete();
-            p.push_back(-1);
-            repeat (m - 1) p.push_back(0);
-            p.push_back(1);
-            for (int e = 1; e < m; e++) if (m % e == 0) begin void'(poly_div(p, phi[e], q)); p = q; end
-            phi[m] = p;
+        ```systemverilog title="function automatic void dice_sets" linenums="1" hl_lines="37 51"
+        // 1 when the sum of the dice is distributed as the sum of as many standard six-sided dice;
+        // faces holds the dice one after another, six faces each
+        function automatic bit same_sum_k(int faces[$]);
+          int die[$], std[$] = '{1, 2, 3, 4, 5, 6};
+          poly_t got = {1}, want = {1};
+          if (faces.size() % 6 != 0) return 0;
+          for (int d = 0; d < faces.size(); d += 6) begin
+            die.delete();
+            for (int j = 0; j < 6; j++) die.push_back(faces[d + j]);
+            got = poly_mul(got, die_poly(die));
+            want = poly_mul(want, die_poly(std));
           end
-          return phi[d];
+          if (got.size() != want.size()) return 0;
+          foreach (got[s]) if (got[s] != want[s]) return 0;
+          return 1;
         endfunction
 
-        // The pairs of n-sided dice with the sum of two standard dice, from the factors x * Phi_d
-        function automatic void factor_pairs(int n, ref string pairs[$]);
-          int ds[$], total = 1, code, k;
-          poly_t a, b, phi;
-          string line;
-          for (int d = 2; d <= n; d++) if (n % d == 0) begin ds.push_back(d); total *= 3; end
-          pairs.delete();
-          for (int s = 0; s < total; s++) begin
-            a = {0, 1}; b = {0, 1};
-            code = s;
-            foreach (ds[i]) begin               // k_d: the next base-3 digit of s
-              k = code % 3; code /= 3;
-              phi = cyclotomic(ds[i]);
-              repeat (k) a = poly_mul(a, phi);
-              repeat (2 - k) b = poly_mul(b, phi);
+        // The faces of a die polynomial as text, "1 2 2 3 3 4"
+        function automatic string faces_text(poly_t c);
+          poly_t f = faces_of(c);
+          string s = "";
+          foreach (f[i]) begin
+            if (i > 0) s = {s, " "};
+            s = {s, $sformatf("%0d", f[i])};
+          end
+          return s;
+        endfunction
+
+        // Every set of k six-sided dice, faces from low up, with the sum of k standard dice, as text,
+        // "1 2 2 3 3 4 + 1 2 3 4 5 6 + 1 3 4 5 6 8": a die is x^a (1 + x)(1 + x + x^2)(1 - x + x^2)^e,
+        // and a set takes k of them whose e's and a's both add up to k
+        function automatic void dice_sets(int k, int low, ref string sets[$]);
+          poly_t kind[int], p = {1, 2, 2, 1}, free = {1, -1, 1}, f;
+          int ce[$], ca[$], pick[$], i, se, sa;
+          string cf[$], line;
+          for (int e = 0; e <= k; e++) begin
+            if (is_die(p, 0)) kind[e] = p;                  // (1)!
+            p = poly_mul(p, free);
+          end
+          for (int a = low; a <= k; a++) foreach (kind[e]) begin
+            f = kind[e];                                    // (2)!
+            repeat (a) f.push_front(0);
+            ce.push_back(e); ca.push_back(a); cf.push_back(faces_text(f));
+          end
+          sets.delete();
+          if (k < 1 || cf.size() == 0) return;
+          repeat (k) pick.push_back(0);
+          forever begin
+            se = 0; sa = 0;
+            foreach (pick[j]) begin se += ce[pick[j]]; sa += ca[pick[j]]; end
+            if (se == k && sa == k) begin                   // (3)!
+              line = cf[pick[0]];
+              for (int j = 1; j < k; j++) line = {line, " + ", cf[pick[j]]};
+              sets.push_back(line);
             end
-            if (a.sum() == n && is_die(a, 1) && is_die(b, 1) && pair_text(faces_of(a), faces_of(b), line))
-              pairs.push_back(line);
+            i = k - 1;                                      // the next list, as in dice_pairs
+            while (i >= 0 && pick[i] == cf.size() - 1) i--;
+            if (i < 0) break;
+            pick[i]++;
+            for (int j = i + 1; j < k; j++) pick[j] = pick[i];
           end
         endfunction
         ```
+
+        1. כמו ב-Python : ‏`is_die(p, 0)` של סעיף א בודקת שאין לפולינום מקדם שלילי.
+        2. ‏\( x^a \) מזיז את המקדמים ב-\( a \) מקומות. ‏\( a \) בחוץ ו-\( e \) בפנים, ולכן הקוביות
+           מסודרות לפי הפאות שלהן.
+        3. ה-\( e \) וה-\( a \) של הקבוצה מסתכמים ל-\( k \), כמו ב-Python.
 
     #### למה זה נכון { .sol-proof }
 
-    **הערך ב-1.** ‏\( 1 + x + \dots + x^{n-1} = \prod_{d \mid n,\ d > 1} \Phi_d(x) \), ובהצבה
-    \( x = 1 \) : ‏\( n = \prod_{d \mid n,\ d > 1} \Phi_d(1) \). לחזקה של ראשוני, \( d = p^j \),
-    ‏\( \Phi_d(x) = 1 + x^{p^{j-1}} + x^{2p^{j-1}} + \dots \) עם \( p \) איברים, ולכן
-    \( \Phi_d(1) = p \). החזקות של \( p \) שמחלקות את \( n \) כבר נותנות יחד את כל החזקה של \( p \)
-    ב-\( n \), ולכן כל שאר הגורמים שווים 1 ב-\( x = 1 \).
+    **אחד מכל גורם קבוע.** כמו בסעיף א, כל קובייה מקבלת חלק מהגורמים של \( P(x)^k \), כי
+    הפירוק יחיד. אין פאה 0, ולכן \( A(0) = 0 \) וכל קובייה מקבלת לפחות \( x \) אחד. יש \( k \)
+    כאלה ל-\( k \) קוביות, ולכן בדיוק אחד לכל אחת. ‏\( A(1) = 6 = 2^i \cdot 3^j \) מחייב
+    \( 1 + x \) אחד ו-\( 1 + x + x^2 \) אחד לכל קובייה, ו-\( k \) העותקים של כל אחד מהם
+    מתחלקים כך בדיוק.
 
-    **ראשוני.** אם \( n \) ראשוני, \( P_n = x \, \Phi_n \) ו-\( \Phi_n(1) = n \). כדי ש-\( A(1) = n \),
-    ‏A מקבלת \( \Phi_n \) אחד בדיוק, ו-\( A = B = P_n \) : אין זוג אחר.
+    **לכל היותר שני עותקים.** קובייה עם \( e \) עותקים של \( 1 - x + x^2 \) מתחילה כך :
 
-    **פריק, בלי פולינומים.** אם \( n = pm \) עם \( p, m \ge 2 \), אפשר לכתוב תוצאה של קובייה
-    רגילה בשתי דרכים : \( 1 + u + p v \), ו-\( 1 + w + m z \), כש-\( u, z \) מ-0 עד \( p - 1 \)
-    ו-\( v, w \) מ-0 עד \( m - 1 \), כולם אחידים ובלתי תלויים. לכן הסכום של שתי קוביות רגילות
-    מתפלג כמו \( (1 + u + w) + (1 + p v + m z) \). כל סוגריים הם קובייה הוגנת של \( pm = n \)
-    פאות : A עם הפאות \( 1 + u + w \), ו-B עם הפאות \( 1 + p v + m z \). ל-\( n = 6 \),
-    ‏\( p = 2 \) ו-\( m = 3 \), אלה בדיוק קוביות Sicherman, ול-\( n = 4 \) הזוג
-    \( \{1, 2, 2, 3\} \) ו-\( \{1, 3, 3, 5\} \). ב-A יש פאה 2 פעמיים, ולכן היא לא רגילה.
+    \[
+    \begin{aligned}
+    &x \, (1 + 2x + \dots)(1 - e x + \dots) \\
+    &\quad = x + (2 - e) \, x^2 + \dots
+    \end{aligned}
+    \]
 
-    **מקדמים שליליים.** התנאי \( A(1) = n \) לא מספיק. ל-\( n = 12 \) החלוקה
-    \( A = x \, \Phi_3 \, \Phi_4^2 \, \Phi_6^2 \) נותנת \( A(1) = 3 \cdot 2^2 = 12 \), אבל
-    \( A(x) = x - x^2 + 4x^3 - \dots \) : המקדם של \( x^2 \) הוא \( -1 \), ומספר פאות לא יכול
-    להיות שלילי. לכן הקוד בודק את המקדמים.
+    המקדם של \( x^2 \) הוא מספר הפאות שעליהן 2, ולכן \( e \le 2 \). כש-\( e \) הוא 0, 1 או 2
+    כל המקדמים לא שליליים, כמו בטבלה.
 
-    **נסו בעצמכם.** התיבה נפתחת על \( n = 8 \). לחצו על שלושת הזוגות : בכל אחד הטבלה אחרת
-    וההיסטוגרמה זהה. בזוג 1 שנו את ה-11 של B ל-10 : ארבעה סכומים יוצאים מהמשולש. אילו? אחר כך בחרו 4 פאות
-    ולחצו על "הזוג האחר" : זה הזוג \( 1 + u + w \) ו-\( 1 + 2v + 2z \) של ההוכחה.
+    **הספירה.** ה-\( e \) של הקוביות מסתכמים ל-\( k \), כל אחד מ-0 עד 2. אם \( j \) מהם 0
+    ו-\( l \) מהם 2, אז \( (k - j - l) + 2l = k \), כלומר \( l = j \). כל \( j \) מ-0 עד
+    \( \lfloor k/2 \rfloor \) נותן קבוצה אחת, \( j \) זוגות Sicherman ו-\( k - 2j \) קוביות
+    רגילות, ו-\( j \) שונה נותן קבוצה אחרת. לכן יש \( \lfloor k/2 \rfloor + 1 \) קבוצות.
 
-    <div class="explorer" data-kind="sicherman" data-n="8" data-a="1.2.2.3.3.4.4.5" data-b="1.3.5.5.7.7.9.11"></div>
+    **גם 0 על פאה.** ‏\( A(1) = 6 \) ו-\( e \le 2 \) לא תלויים בפאה הקטנה, ולכן הקוביות הן אותן
+    שלוש, כל אחת כפול \( x^a \). הפאה הקטנה שלה היא \( a \ge 0 \), וה-\( a \) מסתכמים
+    ל-\( k \). כל חלוקה כזו נותנת קבוצה, כי הזזה לא יוצרת מקדם שלילי. אם \( a \) אחד היה
+    שלילי, הייתה פאה שלילית.
+
+    **בדיקה בלי הפירוק.** ‏`dice_sets` נשענת על הפירוק. כדי לבדוק אותה בלעדיו, `same_sum_k`
+    כופלת את הפולינומים של כל קבוצה שהיא מחזירה, וחיפוש מאפס מוצא את אותן 13 קבוצות של שלוש
+    קוביות. החיפוש לוקח כל קובייה של 6 פאות מ-0 עד 18 שמחלקת את \( P(x)^3 \) בלי שארית, ואחר
+    כך כל שתיים מהן.
 
     #### סיבוכיות { .sol-cost }
 
-    ‏\( 3^{\tau(n) - 1} \) חלוקות, ובכל אחת עד \( 2\tau(n) \) כפלי פולינומים ממעלה עד \( 2n \) :
-    זמן \( O(3^{\tau(n)} \, \tau(n) \, n^2) \). ל-\( n = 12 \), עם 6 מחלקים, אלה 243 חלוקות, מול
-    יותר מחצי מיליארד קוביות בחיפוש של סעיף א. הזיכרון הוא כמה פולינומים, \( O(n) \).
+    עם פאות חיוביות יש שלוש קוביות אפשריות, ו-`dice_sets` עוברת על כל הבחירות של \( k \) מהן
+    עם חזרות, \( \binom{k+2}{2} \) בחירות, ובכל אחת שני סכומים של \( k \) מספרים : זמן
+    \( O(k^3) \). הזיכרון הוא בעיקר התשובה, \( \lfloor k/2 \rfloor + 1 \) קבוצות של \( k \)
+    קוביות : \( O(k^2) \). כשמותר 0 יש \( 3(k + 1) \) קוביות אפשריות ו-\( \binom{4k+2}{k} \)
+    בחירות, ול-\( k = 6 \) אלה 230,230 בחירות, פחות משנייה. חיפוש מאפס כמו בסעיף א עובר
+    כבר בשלוש קוביות על 134,596 קוביות, כל הקוביות של 6 פאות מ-0 עד 18.
 
 ## נקודות חשובות ושאלות המשך
 
@@ -678,17 +726,19 @@ added: 2026-11-11
     ההתפלגות המשותפת, 36 הזוגות, כשהקוביות צריכות להיות בלתי תלויות.
 
 ??? trap "מלכודת : לחפש רק בפאות 1 עד 6"
-    חיפוש שמגביל כל פאה ל-1 עד 6 לא מוצא את Sicherman, כי יש בה 8. הגבול הנכון הוא \( 2n - 1 \) :
-    הפאה הקטנה של הקובייה השנייה היא לפחות 1, והסכום הגדול הוא \( 2n \).
+    חיפוש שמגביל כל פאה ל-1 עד 6 לא מוצא את Sicherman, כי יש בה 8. הגבול הנכון הוא 11 : הפאה
+    הקטנה של הקובייה השנייה היא לפחות 1, והסכום הגדול הוא 12. בשלוש קוביות הגבול הוא 16, ואם
+    מותר 0, הוא 18.
 
 ??? trap "מלכודת : לבדוק רק את מספר הפאות"
-    חלוקה של הגורמים עם \( A(1) = n \) נותנת פולינום עם סכום מקדמים נכון, אבל לא תמיד קובייה :
-    ל-\( n = 12 \) יש חלוקות עם מקדם שלילי. גם הגורם \( 1 - x + x^2 \) לבד הוא לא קובייה. בודקים
-    כל מקדם.
+    חלוקה של הגורמים עם \( A(1) = 6 \) נותנת פולינום עם סכום מקדמים נכון, אבל לא תמיד קובייה :
+    שלושה עותקים של \( 1 - x + x^2 \) לאותה קובייה נותנים סכום מקדמים 6, והמקדם של \( x^2 \)
+    הוא \( -1 \). גם הגורם \( 1 - x + x^2 \) לבד הוא לא קובייה. בודקים כל מקדם.
 
-??? trap "מלכודת : לספור כל זוג פעמיים"
+??? trap "מלכודת : לספור קבוצה כמה פעמים"
     ‏(A, B) ו-(B, A) הם אותו זוג. חיפוש שעובר על כל A מוצא את Sicherman פעמיים, ואת הרגילות פעם
-    אחת. שומרים סדר קבוע, למשל A קודמת ל-B.
+    אחת. עם שלוש קוביות, זוג Sicherman וקובייה רגילה נמצאים בשישה סדרים. שומרים סדר קבוע, למשל
+    הקוביות מסודרות לפי הפאות שלהן.
 
 ??? followup "שאלות המשך"
     - **קוביות בגדלים שונים :** קובייה של 4 פאות וקובייה של 9 פאות, עם מספרים שלמים חיוביים.
@@ -701,14 +751,13 @@ added: 2026-11-11
             \( \{1, 2, 3, 3, 4, 5, 5, 6, 7\} \), ו-\( \{1, 4, 4, 7\} \) עם
             \( \{1, 2, 2, 3, 3, 3, 4, 4, 5\} \).
 
-    - **שלוש קוביות :** שלוש קוביות של שש פאות, עם ההתפלגות של הסכום של שלוש קוביות רגילות. אילו
-      שלישיות יש?
+    - **מספר פאות אחר :** שתי קוביות של \( n \) פאות, עם ההתפלגות של הסכום של שתי קוביות
+      רגילות של \( n \) פאות. לאילו \( n \) יש זוג אחר מלבד הרגיל?
 
         ??? fu-answer "תשובה"
-            כל קובייה מקבלת \( x \), ‏\( 1 + x \) ו-\( 1 + x + x^2 \) אחד, ושלושת העותקים של
-            \( 1 - x + x^2 \) מתחלקים ביניהן. עותק לכל קובייה נותן את הרגילות. שניים לאחת ואחד
-            לשנייה נותנים את זוג Sicherman עם קובייה רגילה. שלושה לאותה קובייה נותנים מקדם שלילי.
-            לכן השלישייה האחרת היחידה היא קוביות Sicherman וקובייה רגילה.
+            בדיוק כש-\( n \) פריק. כש-\( n \) ראשוני, \( 1 + x + \dots + x^{n-1} \) לא מתפרק,
+            ונשאר רק הזוג הרגיל. ל-\( n = 4 \) יש זוג אחד נוסף, \( \{1, 2, 2, 3\} \)
+            ו-\( \{1, 3, 3, 5\} \), ול-\( n = 8 \) שלושה.
 
     - **‏covergroup :** איך כותבים covergroup למחולל של שתי קוביות כך שבאג של קוביות Sicherman
       יתגלה?

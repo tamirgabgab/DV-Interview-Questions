@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Figures and tables of question 0101, Sicherman dice: two dice with other numbers on their
-faces whose sum has the same distribution as the sum of two standard dice.
+"""Figures and tables of question 0101, Sicherman dice: dice with other numbers on their faces
+whose sum has the same distribution as the sum of as many standard dice.
 
     python tools/figures/fill.py 101        # put the blocks on the page
 
@@ -11,14 +11,21 @@ The references here are independent of the page code:
   sums of squares add up to those of the standard pair (the mean and the variance of the
   sum), so the pairs are looked up by those two numbers and then compared sum by sum.
 - factor_pairs(n, low) splits the factors of the standard die's polynomial,
-  x * the cyclotomic polynomials Phi_d for every d > 1 that divides n, between the two dice.
+  x * the cyclotomic polynomials Phi_d for every d > 1 that divides n, between the two dice
+  (parts a and b, and the follow-up on n faces).
 - mixed_pairs(na, nb) is the follow-up: an na-sided and an nb-sided die (na * nb = n * n)
   with the sum of two standard n-sided dice.
+- part c, k six-sided dice: factor_sets(k, low) gives every die x^a (1 + x)(1 + x + x^2)
+  (1 - x + x^2)^e and keeps the dice without a negative coefficient whose a's and e's both add
+  up to k; brute_triples(low) searches three dice from scratch (every die that divides P(x)^3
+  with a quotient of whole, non-negative coefficients, then every two of them); and
+  count_sets(k, low) counts the sets the way the page does, by partitions.
 
-blocks() returns, in page order: the 6 x 6 table of the sums of the Sicherman dice coloured
-by the sum and its legend, the picture of the factors given to each die (the standard pair
-and the Sicherman pair) and its legend, the table of the five pairs when a face may be 0,
-the table of the number of pairs for n = 2 to 12, and the table of the pairs of n = 4 and 8.
+blocks() returns, in page order: the triangle of the statement, the 6 x 6 table of the sums of
+the Sicherman dice coloured by the sum and its legend, the picture of the factors given to each
+die (the standard pair and the Sicherman pair) and its legend, the table of the five pairs when
+a face may be 0, the distribution of the sum of three standard dice, the table of the thirteen
+sets of three dice when a face may be 0, and the table of the number of sets for k = 2 to 6.
 """
 
 from __future__ import annotations
@@ -132,13 +139,13 @@ def divisors(n: int) -> list[int]:
     return [d for d in range(2, n + 1) if n % d == 0]
 
 
-def factor_pairs(n: int, low: int = 1, keep_split: bool = False):
+def factor_pairs(n: int, low: int = 1):
     """The pairs of n-sided dice from the factors x * Phi_d (d | n, d > 1) of the standard die:
     die A takes k_d of the two Phi_d of P(x)^2 and the x's split as the low faces allow; a
     split is a die when A(1) = B(1) = n and no coefficient is negative."""
     ds = divisors(n)
     xs = (1,) if low == 1 else (0, 1, 2)
-    out = {}
+    out = set()
     for split in itertools.product((0, 1, 2), repeat=len(ds)):
         for xa in xs:
             a, b = [0] * xa + [1], [0] * (2 - xa) + [1]
@@ -149,23 +156,8 @@ def factor_pairs(n: int, low: int = 1, keep_split: bool = False):
                     b = mul(b, cyclotomic(d))
             if sum(a) != n or sum(b) != n or min(a) < 0 or min(b) < 0:
                 continue
-            pair = tuple(sorted((faces_of(a), faces_of(b))))
-            out.setdefault(pair, (xa, dict(zip(ds, split))) if pair[0] == faces_of(a) else (2 - xa, {d: 2 - k for d, k in zip(ds, split)}))
-    pairs = sorted(out)
-    return [(p, out[p]) for p in pairs] if keep_split else pairs
-
-
-def bad_splits(n: int) -> list[tuple[dict[int, int], list[int]]]:
-    """The splits with A(1) = n whose A has a negative coefficient (not a die)."""
-    ds, bad = divisors(n), []
-    for split in itertools.product((0, 1, 2), repeat=len(ds)):
-        a = [0, 1]
-        for d, k in zip(ds, split):
-            for _ in range(k):
-                a = mul(a, cyclotomic(d))
-        if sum(a) == n and min(a) < 0:
-            bad.append((dict(zip(ds, split)), a))
-    return bad
+            out.add(tuple(sorted((faces_of(a), faces_of(b)))))
+    return sorted(out)
 
 
 def mixed_pairs(na: int, nb: int, n: int = 6):
@@ -201,6 +193,120 @@ def mixed_brute(na: int, nb: int, n: int = 6):
             out.add((a, faces_of(pb)))
     return sorted(out)
 
+
+
+# --- k six-sided dice (part c) ----------------------------------------------------------------------
+
+BASE = [1, 2, 2, 1]        # (1 + x)(1 + x + x^2): every die takes one of each
+FREE = [1, -1, 1]          # 1 - x + x^2: it is 1 at x = 1, so it does not change the number of faces
+
+
+def kind_poly(e: int, a: int = 1) -> list[int]:
+    """x^a (1 + x)(1 + x + x^2)(1 - x + x^2)^e."""
+    p = [0] * a + BASE
+    for _ in range(e):
+        p = mul(p, FREE)
+    return p
+
+
+def compositions(total: int, parts: int, low: int):
+    """Every ordered tuple of `parts` whole numbers >= low that add up to total."""
+    if parts == 0:
+        if total == 0:
+            yield ()
+        return
+    for first in range(low, total - low * (parts - 1) + 1):
+        for rest in compositions(total - first, parts - 1, low):
+            yield (first,) + rest
+
+
+def factor_sets(k: int, low: int = 1) -> list[tuple[tuple[int, ...], ...]]:
+    """The sets of k six-sided dice, faces whole numbers >= low, whose sum is distributed as
+    the sum of k standard dice, from the factors of P(x)^k: die i takes x^(a_i), one 1 + x, one
+    1 + x + x^2 and (1 - x + x^2)^(e_i); the a's and the e's each add up to k, and a die with a
+    negative coefficient is no die. Each set once, as a sorted tuple of dice."""
+    out = set()
+    for es in itertools.combinations_with_replacement(range(k + 1), k):
+        if sum(es) != k or any(min(kind_poly(e)) < 0 for e in es):
+            continue
+        for As in compositions(k, k, low):
+            out.add(tuple(sorted(faces_of(kind_poly(e, a)) for e, a in zip(es, As))))
+    return sorted(out)
+
+
+def poly_pow(p, k: int) -> list[int]:
+    r = [1]
+    for _ in range(k):
+        r = mul(r, p)
+    return r
+
+
+def divides(p, q):
+    """p / q when q divides p with whole coefficients, else None."""
+    try:
+        return div_exact(p, q)
+    except AssertionError:
+        return None
+
+
+def brute_triples(low: int = 1) -> list[tuple[tuple[int, ...], ...]]:
+    """Every set of three six-sided dice, faces whole numbers >= low, with the sum of three
+    standard dice, by search: a die is any multiset of six faces from low to 18 - 2 * low (the
+    largest sum is 18 and the other two dice show at least low each); keep the dice that divide
+    P(x)^3 with whole, non-negative coefficients, then every two of them whose quotient is a
+    third die."""
+    p3 = poly_pow(die_poly(standard(6)), 3)
+    single = []
+    for a in itertools.combinations_with_replacement(range(low, 18 - 2 * low + 1), 6):
+        rest = divides(p3, die_poly(a))
+        if rest is not None and min(rest) >= 0:
+            single.append(a)
+    out = set()
+    for a, b in itertools.combinations_with_replacement(single, 2):
+        rest = divides(p3, mul(die_poly(a), die_poly(b)))
+        if rest is None or min(rest) < 0 or sum(rest) != 6 or any(rest[:low]):
+            continue
+        out.add(tuple(sorted((a, b, faces_of(rest)))))
+    return sorted(out)
+
+
+def same_k(dice) -> bool:
+    """The sum of the dice is distributed as the sum of as many standard six-sided dice,
+    counted roll by roll."""
+    def dist(ds):
+        c = Counter({0: 1})
+        for d in ds:
+            nxt = Counter()
+            for s, m in c.items():
+                for f in d:
+                    nxt[s + f] += m
+            c = nxt
+        return c
+    return all(len(d) == 6 for d in dice) and dist(dice) == dist([standard(6)] * len(dice))
+
+
+def partitions(t: int, parts: int, top: int | None = None) -> int:
+    """The number of ways to write t as a sum of at most `parts` whole numbers from 1 to top,
+    order ignored: the ways to hand t x's to `parts` identical dice."""
+    top = t if top is None else top
+    if t == 0:
+        return 1
+    if parts == 0:
+        return 0
+    return sum(partitions(t - f, parts - 1, f) for f in range(1, min(top, t) + 1))
+
+
+def count_sets(k: int, low: int = 1) -> int:
+    """The number of sets, as the page counts them: j Sicherman pairs and k - 2j standard dice
+    (j = 0 to k // 2); with a face 0 allowed, the k x's are handed to the three kinds of dice
+    (t0 + t1 + t2 = k), and identical dice share theirs by a partition."""
+    if low == 1:
+        return k // 2 + 1
+    total = 0
+    for j in range(k // 2 + 1):
+        for t0, t1, t2 in compositions(k, 3, 0):
+            total += partitions(t0, j) * partitions(t1, k - 2 * j) * partitions(t2, j)
+    return total
 
 
 # --- the figures -----------------------------------------------------------------------------------
@@ -356,11 +462,23 @@ def table_zero() -> str:
     return "\n".join(rows)
 
 
+def triple_chart() -> str:
+    """The distribution of the sum of three standard dice: part c's target."""
+    cnt = sums(sums(standard(6), standard(6)).elements(), standard(6))
+    vals = [cnt[s] for s in range(3, 19)]
+    c = Chart("התפלגות הסכום של שלוש קוביות רגילות : הסכומים 3 עד 18, ומספר ההטלות מתוך 216 שנותנות כל סכום, "
+              + ", ".join(map(str, vals)),
+              w=420, h=196, x0=34, right=8, top=18, base=166, slots=16, y_max=27, style="max-width:26.25rem")
+    c.grid_y([0, 9, 18, 27])
+    for s in range(3, 19):
+        c.bar(s - 2, cnt[s], "by-multiples", title=f"sum {s}: {cnt[s]} of 216", value_label=cnt[s])
+    c.x_ticks(range(1, 17), labels=[str(s) for s in range(3, 19)])
+    c.axis()
+    return c.svg()
+
+
 def poly_tex(p) -> str:
-    """A polynomial (lowest power first) in TeX, the lowest power first; 1 + x + ... + x^(d-1)
-    when every coefficient is 1 and there are more than four."""
-    if len(p) > 5 and all(c == 1 for c in p):
-        return rf"1 + x + \dots + x^{{{len(p) - 1}}}"
+    """A polynomial (lowest power first) in TeX, the lowest power first."""
     out = []
     for e, c in enumerate(p):
         if not c:
@@ -371,36 +489,50 @@ def poly_tex(p) -> str:
     return " ".join(out)
 
 
-def table_cyclotomic() -> str:
-    rows = [r"| המחלק d | הגורם \( \Phi_d(x) \) | הערך \( \Phi_d(1) \) |", "|:-:|---|:-:|"]
-    for d in range(2, 13):
-        p = cyclotomic(d)
-        rows.append(rf"| {d} | {RLM}\( {poly_tex(p)} \) | {sum(p)} |")
+KINDS = ["הקטנה של Sicherman", "הרגילה", "הגדולה של Sicherman", "לא קובייה"]
+
+
+def table_kinds() -> str:
+    """The die x (1 + x)(1 + x + x^2)(1 - x + x^2)^e for e = 0 to 3."""
+    rows = ["| העותקים e | הקובייה | הפולינום | הפאות |", "|:-:|---|---|---|"]
+    for e in range(4):
+        p = kind_poly(e)
+        if min(p) >= 0:
+            faces, tex = f"{RLM}{flist(faces_of(p))}", poly_tex(p)
+        else:      # a die that is none: its first terms show the negative coefficient
+            faces, tex = "אין : המקדם של \\( x^2 \\) שלילי", poly_tex(p[:4]) + rf" + \dots + x^{{{len(p) - 1}}}"
+        rows.append(f"| {e} | {KINDS[e]} | {RLM}\\( {tex} \\) | {faces} |")
     return "\n".join(rows)
 
 
-def table_counts() -> str:
-    rows = ["| הפאות n | הגורמים של \\( P_n \\) מלבד x | הזוגות, פאות חיוביות | הזוגות, גם 0 |", "|:-:|---|:-:|:-:|"]
-    for n in range(2, 13):
-        fs = r" \, ".join(rf"\Phi_{{{d}}}" for d in divisors(n))
-        rows.append(rf"| {n} | {RLM}\( {fs} \) | {len(factor_pairs(n))} | {len(factor_pairs(n, 0))} |")
+def kind_of(die) -> tuple[int, int]:
+    """(e, a) of a die x^a (1 + x)(1 + x + x^2)(1 - x + x^2)^e: a its smallest face."""
+    a = min(die)
+    e = next(e for e in range(3) if faces_of(kind_poly(e, a)) == tuple(die))
+    return e, a
+
+
+def table_three_zero() -> str:
+    """The thirteen sets of three dice when a face may be 0: the standard dice and the
+    Sicherman pair with a standard die, each with the three x's handed out in every way."""
+    rows = ["| הבסיס | קובייה 1 | קובייה 2 | קובייה 3 |", "|---|---|---|---|"]
+    std, sic = [], []
+    for dice in factor_sets(3, 0):
+        kinds = sorted((kind_of(d), d) for d in dice)        # by e: the small die, the standard, the big
+        shifts = tuple(a for (e, a), _ in kinds)
+        (sic if kinds[0][0][0] == 0 else std).append((shifts, [d for _, d in kinds]))
+    std.sort(key=lambda r: (r[0] != (1, 1, 1), r[0]))
+    sic.sort(key=lambda r: (r[0] != (1, 1, 1), r[0]))
+    for name, group in (("רגילות", std), ("‏Sicherman ורגילה", sic)):
+        for _, dice in group:
+            rows.append(f"| {name} | " + " | ".join(f"{RLM}{flist(d)}" for d in dice) + " |")
     return "\n".join(rows)
 
 
-def factor_tex(xa: int, split: dict[int, int]) -> str:
-    parts = ["x" if xa == 1 else f"x^{xa}"] if xa else []
-    for d, k in split.items():
-        if k:
-            parts.append(rf"\Phi_{{{d}}}" + (f"^{k}" if k > 1 else ""))
-    return r" \, ".join(parts)
-
-
-def table_pairs_48() -> str:
-    rows = ["| הפאות n | קובייה A | הגורמים של A | קובייה B | הגורמים של B |", "|:-:|---|---|---|---|"]
-    for n in (4, 8):
-        for (a, b), (xa, split) in reversed(factor_pairs(n, keep_split=True)):
-            sb = {d: 2 - k for d, k in split.items()}
-            rows.append(rf"| {n} | {RLM}{flist(a)} | {RLM}\( {factor_tex(xa, split)} \) | {RLM}{flist(b)} | {RLM}\( {factor_tex(2 - xa, sb)} \) |")
+def table_k_counts() -> str:
+    rows = ["| הקוביות k | הקבוצות, פאות חיוביות | הקבוצות, גם 0 |", "|:-:|:-:|:-:|"]
+    for k in range(2, 7):
+        rows.append(f"| {k} | {len(factor_sets(k))} | {len(factor_sets(k, 0))} |")
     return "\n".join(rows)
 
 
@@ -413,9 +545,10 @@ def blocks():
         split_figure(),
         split_legend(),
         table_zero(),
-        table_cyclotomic(),
-        table_counts(),
-        table_pairs_48(),
+        triple_chart(),
+        table_kinds(),
+        table_three_zero(),
+        table_k_counts(),
     ]
     return [re.sub(r"(?<=\S) :(?=[\s*]|$)", NB + ":", blk) for blk in out]
 
@@ -425,6 +558,7 @@ if __name__ == "__main__":
         print(n, len(factor_pairs(n)), factor_pairs(n) if n in (4, 8) else "")
     print("zero", factor_pairs(6, 0))
     print("brute", brute_pairs(6), brute_pairs(6, 0))
-    print("bad12", bad_splits(12)[:1])
     for na in (2, 3, 4):
         print(na, 36 // na, mixed_pairs(na, 36 // na))
+    for k in range(2, 7):
+        print("k", k, len(factor_sets(k)), len(factor_sets(k, 0)), count_sets(k), count_sets(k, 0))

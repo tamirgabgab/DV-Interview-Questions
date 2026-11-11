@@ -1,6 +1,6 @@
 """Question 0101: the page's Python code (it runs as published) against the generator's
 references: sum_counts and same_sum on random dice, dice_pairs with faces from 1 and from 0,
-cyclotomic and factor_pairs for n up to 20."""
+dice_sets and same_sum_k for k dice up to 6 against the factors and the search of three dice."""
 
 import random
 import sys
@@ -19,7 +19,10 @@ def test_examples():
     assert not ns["same_sum"]((1, 1, 2, 3, 4, 5), (1, 2, 3, 4, 5, 6))
     assert ns["sum_counts"]((1, 2), (1, 1, 3)) == [0, 0, 2, 2, 1, 1]
     assert ns["dice_pairs"](6) == [((1, 2, 2, 3, 3, 4), (1, 3, 4, 5, 6, 8)), ((1, 2, 3, 4, 5, 6), (1, 2, 3, 4, 5, 6))]
-    assert ns["factor_pairs"](4) == [((1, 2, 2, 3), (1, 3, 3, 5)), ((1, 2, 3, 4), (1, 2, 3, 4))]
+    assert ns["dice_sets"](3) == [((1, 2, 2, 3, 3, 4), (1, 2, 3, 4, 5, 6), (1, 3, 4, 5, 6, 8)), ((1, 2, 3, 4, 5, 6),) * 3]
+    assert len(ns["dice_sets"](3, low=0)) == 13
+    assert ns["same_sum_k"](((1, 2, 2, 3, 3, 4), (1, 2, 3, 4, 5, 6), (1, 3, 4, 5, 6, 8)))
+    assert not ns["same_sum_k"](((1, 2, 2, 3, 3, 4), (1, 3, 4, 5, 6, 8), (1, 3, 4, 5, 6, 8)))
     assert ns["poly_div"]([0, 0, 2, 2, 1, 1], [0, 1, 1]) == [0, 2, 0, 1]
     assert ns["poly_div"]([1, 1, 1], [1, 1]) is None
 
@@ -45,8 +48,25 @@ def test_dice_pairs():
     assert len(ns["dice_pairs"](6, low=0)) == 5
 
 
-def test_factor_pairs():
-    for d in range(1, 31):
-        assert ns["cyclotomic"](d) == q0101.cyclotomic(d), d
-    for n in range(1, 21):
-        assert ns["factor_pairs"](n) == q0101.factor_pairs(n), n
+def test_dice_sets():
+    for k in range(1, 7):
+        for low in (1, 0):
+            got = ns["dice_sets"](k, low)
+            assert got == q0101.factor_sets(k, low), (k, low)
+            assert all(ns["same_sum_k"](d) and q0101.same_k(d) for d in got), (k, low)
+    assert ns["dice_sets"](3) == q0101.brute_triples(1)
+    assert ns["dice_sets"](3, low=0) == q0101.brute_triples(0)
+    assert ns["dice_sets"](2) == ns["dice_pairs"](6) and ns["dice_sets"](2, low=0) == ns["dice_pairs"](6, low=0)
+    assert [len(ns["dice_sets"](k)) for k in range(1, 9)] == [k // 2 + 1 for k in range(1, 9)]
+    assert [len(ns["dice_sets"](k, low=0)) for k in range(2, 7)] == [5, 13, 41, 98, 250]
+
+
+def test_same_sum_k_random():
+    rng = random.Random(3)
+    for _ in range(400):
+        k = rng.randint(1, 4)
+        dice = [tuple(rng.randint(0, 9) for _ in range(6)) for _ in range(k)]
+        if rng.random() < 0.3:   # now and then a set the page finds, its dice shuffled
+            dice = list(rng.choice(q0101.factor_sets(k, rng.randint(0, 1))))
+            rng.shuffle(dice)
+        assert ns["same_sum_k"](dice) == q0101.same_k(dice)

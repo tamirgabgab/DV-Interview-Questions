@@ -50,15 +50,13 @@
 .md-typeset .viz-legend .sc-key-bad { background: var(--viz-s2); }
 .md-typeset .viz-legend .sc-key-want { height: 0.2rem; border-radius: 1px; background: var(--viz-ink); }
 
-/* the box: the faces of the two dice, a field per face (the hidden ones are beyond n) */
+/* the box: the faces of the two dice, a field per face */
 .md-typeset .explorer .sc-dice { gap: 0.4rem 1.4rem; }
 .md-typeset .explorer .sc-die { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; min-width: 0; max-width: 100%; }
 .md-typeset .explorer .sc-lab { font-weight: 700; font-family: var(--md-code-font-family); font-size: 0.75rem; min-width: 1rem; }
 .md-typeset .explorer input.ex-num.sc-face { flex: 0 0 2.3rem; width: 2.3rem; height: 2.2rem; margin: 0; padding: 0; text-align: center; font-size: 0.72rem; -moz-appearance: textfield; appearance: textfield; }
 .md-typeset .explorer input.ex-num.sc-face::-webkit-inner-spin-button,
 .md-typeset .explorer input.ex-num.sc-face::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-.md-typeset .explorer input.ex-num.sc-face[hidden] { display: none; }
-.md-typeset .explorer .sc-presets .md-button[hidden] { display: none; }
 
 /* the table of the sums */
 .md-typeset .explorer .sc-tablewrap { overflow-x: auto; margin: 0.4rem 0; }
@@ -77,7 +75,7 @@
 .md-typeset .explorer svg.sc-hist .sc-want { stroke: var(--viz-ink); stroke-width: 2.5; stroke-linecap: round; }
 .md-typeset .explorer .sc-alone { font-size: 0.72rem; margin: 0.3em 0; }
 
-/* a phone: the table of eight faces fits its column */
+/* a phone: the fields of a die share its row, the table fits its column */
 @media (max-width: 30em) {
   .md-typeset .explorer .sc-die { flex: 1 1 100%; }
   .md-typeset .explorer input.ex-num.sc-face { flex: 1 1 1.5rem; width: 1.5rem; min-width: 1.5rem; max-width: 2.3rem; }
