@@ -230,7 +230,9 @@ jobs:
         if: needs.gate.outputs.verified != 'true' && (needs.gate.outputs.fast != 'true' || needs.gate.outputs.pages != '')
         run: |
           pip install -r requirements/dev.txt
-          python -m playwright install --with-deps chromium
+          # --with-deps needs apt; when the Ubuntu archives are unreachable (2026-11-11) the
+          # runner image's own libraries are enough for Chromium.
+          python -m playwright install --with-deps chromium || python -m playwright install chromium
           npm install --no-save --no-audit --no-fund axe-core@4.14.0
       - name: Check every page at phone width
         if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
@@ -299,7 +301,7 @@ jobs:
       - run: mkdocs build --strict
         env:
           DVQ_SOCIAL_CARDS: "false"
-      - run: python -m playwright install --with-deps chromium
+      - run: python -m playwright install --with-deps chromium || python -m playwright install chromium
       - name: Click through the explorer boxes, part ${{ matrix.shard }} of 4
         run: python tools/checks/check_explorers.py site --shard ${{ matrix.shard }}/4
       # Every box stepped from its first step to its last at 390 and 1200 px: a figure that
