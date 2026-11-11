@@ -119,14 +119,20 @@ jobs:
           make install
       - name: Install z3 and the Verilator run-time dependencies
         run: |
-          # The runner's Ubuntu mirror sometimes fails to resolve for a few minutes
-          # (2026-11-11): retry the update and the install with a growing pause.
+          # The runner's Azure Ubuntu mirror failed to resolve for over an hour on
+          # 2026-11-11 (retries alone did not help): after a failed try, point apt at
+          # archive.ubuntu.com directly and try again, with a growing pause.
           for i in 1 2 3 4 5; do
             if sudo apt-get update -q && sudo apt-get install -y -q z3 perl libfl2; then
               break
             fi
             if [ "$i" = 5 ]; then exit 1; fi
-            echo "apt failed (try $i), retrying in $((i * 30)) s"; sleep $((i * 30))
+            echo "apt failed (try $i): using archive.ubuntu.com, retrying in $((i * 20)) s"
+            printf 'http://archive.ubuntu.com/ubuntu/\tpriority:1\nhttp://security.ubuntu.com/ubuntu/\tpriority:2\n' \
+              | sudo tee /etc/apt/apt-mirrors.txt > /dev/null
+            sudo sed -i 's#http://azure.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' \
+              /etc/apt/sources.list /etc/apt/sources.list.d/*.sources 2>/dev/null || true
+            sleep $((i * 20))
           done
           echo "$HOME/verilator/bin" >> "$GITHUB_PATH"
       - run: verilator --version && z3 --version
@@ -189,7 +195,18 @@ jobs:
       - run: pip install -r requirements/site.txt
       # Social cards: libcairo for cairosvg (the logo on the card); the rendered cards and the
       # fonts downloaded from Google Fonts are cached, keyed on the pages and the layout.
-      - run: sudo apt-get update -q && sudo apt-get install -y -q libcairo2
+      - name: Install libcairo2
+        run: |
+          # As in the test job: fall back to archive.ubuntu.com when the Azure mirror fails.
+          for i in 1 2 3; do
+            if sudo apt-get update -q && sudo apt-get install -y -q libcairo2; then break; fi
+            if [ "$i" = 3 ]; then exit 1; fi
+            printf 'http://archive.ubuntu.com/ubuntu/\tpriority:1\nhttp://security.ubuntu.com/ubuntu/\tpriority:2\n' \
+              | sudo tee /etc/apt/apt-mirrors.txt > /dev/null
+            sudo sed -i 's#http://azure.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' \
+              /etc/apt/sources.list /etc/apt/sources.list.d/*.sources 2>/dev/null || true
+            sleep $((i * 20))
+          done
       - uses: actions/cache@v6
         with:
           path: .cache/plugin/social
