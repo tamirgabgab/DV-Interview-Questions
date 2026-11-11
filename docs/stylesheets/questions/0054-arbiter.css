@@ -1,0 +1,27 @@
+/* Question 0054, the round-robin arbiter: the block diagram of rr_arbiter
+   (tools/figures/q0054.py hw_diagram, ab-*), drawn left to right, and the box's pointer rows.
+   The pick (the subtraction, the inverse and the AND) blue (s1), the fold of the halves
+   orange (s2), the pointer (the rotation and the register) green (s3), the doubling plain
+   (wires only); the wires grey. Colours from the palette only. */
+.md-typeset svg.ab-dp { display: block; width: 100%; height: auto; margin-inline: auto; }
+.md-typeset svg.ab-dp .ab-headp { fill: var(--viz-text); }
+.md-typeset svg.ab-dp .ab-blk rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.4; stroke-dasharray: 5 3; }
+.md-typeset svg.ab-dp .ab-blk.ab-st1 rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; stroke-dasharray: none; }
+.md-typeset svg.ab-dp .ab-blk.ab-st2 rect { fill: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2; stroke-dasharray: none; }
+.md-typeset svg.ab-dp .ab-blk.ab-st3 rect { fill: color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2; stroke-dasharray: none; }
+.md-typeset svg.ab-dp .ab-blk text { fill: var(--viz-ink); font-size: 17px; font-weight: 600; font-family: var(--md-code-font-family); }
+.md-typeset svg.ab-dp .ab-blk text.ab-sub { font-size: 16px; font-weight: 400; }
+.md-typeset svg.ab-dp .ab-wire { fill: none; stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.ab-dp .ab-dot { fill: var(--viz-text); }
+.md-typeset svg.ab-dp .ab-wlab { fill: var(--viz-text); font-size: 17px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .viz-legend .ab-key-0 { background: var(--md-default-bg-color); outline: 1.4px dashed var(--viz-ink); outline-offset: -1.4px; }
+.md-typeset .viz-legend .ab-key-1 { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .viz-legend .ab-key-2 { background: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .viz-legend .ab-key-3 { background: color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
+
+/* the box: the pointer (and used) of every cycle under the round robin and the WRR grants */
+.md-typeset svg.arb-live .arb-ptr { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.arb-live .arb-ptr-name { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="arbiter"] .ex-main svg.arb-live :is(.arb-ptr, .arb-ptr-name) { font-size: 16px; }
+}

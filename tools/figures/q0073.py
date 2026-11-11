@@ -123,7 +123,8 @@ def sizes_table():
     lines = ["| ‏n | ‏out | ‏in |", "|:-:|:-:|:-:|"]
     for n in SIZES:
         if n % 2:
-            lines.append(f"| {RLM}{n} (אי-זוגי) | {RLM}{mult_order(n)} (מודולו {n}) | — |")
+            e = mult_order(n)
+            lines.append(f"| {RLM}{n} (אי-זוגי) | {RLM}{e} (מודולו {n}) | {RLM}{e} (מודולו {n}) |")
         else:
             o, i = mult_order(n - 1), mult_order(n + 1)
             lines.append(f"| {RLM}{n} | {RLM}{o} (מודולו {n - 1}) | {RLM}{i} (מודולו {n + 1}) |")

@@ -1,0 +1,5 @@
+/* Question 0073, the perfect shuffle: the faro box's outlined cycle (the "סימון" select).
+   The tints c1 to c5 repeat when a deck has more than five cycles; the outline tells one
+   cycle apart. The ink of the cards' numbers, on their tints. */
+.md-typeset table.pm-cells td.pm-c.fa-mark { outline: 2.5px solid var(--viz-ink); outline-offset: -5px; font-weight: 700; }
+.md-typeset .viz-legend .fa-key-mark { background: none; outline: 2.5px solid var(--viz-ink); outline-offset: -4px; }

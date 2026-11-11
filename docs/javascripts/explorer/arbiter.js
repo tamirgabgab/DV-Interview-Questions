@@ -1,5 +1,5 @@
 // kinds: arbiter
-//   arbiter                0054        4 requesters over 16 cycles drawn by hand or from presets: the grants of a fixed priority, a round robin (with an optional bug) and a weighted round robin, the longest wait of each requester against its bound, the double-request trick at the chosen cycle, and the assertions that fail
+//   arbiter                0054        4 requesters over 16 cycles drawn by hand or from presets: the grants of a fixed priority, a round robin (with an optional bug) and a weighted round robin, the pointer of every cycle (and the WRR's used), the longest wait of each requester against its bound, the double-request trick at the chosen cycle, and the assertions that fail
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
@@ -30,19 +30,21 @@
     return out;
   };
   const arbRR = (reqs, n, bug = "none") => arbRRTrace(reqs, n, bug).map((x) => x.g);
-  const arbWRR = (reqs, w) => {
+  // the WRR cycle by cycle: the grant and the registers at the start of the cycle
+  const arbWRRTrace = (reqs, w) => {
     const n = w.length;
     let pri = 1, used = 0;
     return reqs.map((r) => {
-      const g = arbTrick(r, pri, n).gnt;
+      const g = arbTrick(r, pri, n).gnt, before = { pri, used };
       if (g) {
         const i = 31 - Math.clz32(g);
         used = g === pri ? used + 1 : 1;
         if (used === w[i]) { pri = rot(g, n); used = 0; } else pri = g;
       }
-      return g;
+      return { g, ...before };
     });
   };
+  const arbWRR = (reqs, w) => arbWRRTrace(reqs, w).map((x) => x.g);
   // the rules: per cycle (one-hot, no grant without a request), per requester and cycle
   // (the hold rule of the environment, fairness within maxw cycles); the cycles of each
   // failure are returned too (fairness at the start of the attempt)
@@ -77,7 +79,7 @@
   // column lit) with the trick of the round robin at that cycle; a bug for the round robin,
   // and the assertions of part c with the cycles where each fails.
   const N = 4, T = 16;
-  const RULES = [["onehot", `מענק אחד לכל היותר : ${code("$onehot0(gnt)")}`], ["spurious", "אין מענק בלי בקשה"], ["hold", "הסביבה : בקשה שמחכה נשארת"], ["fair", "הוגנות : מענק תוך N − 1 = 3"]];
+  const RULES = [["onehot", "מענק אחד לכל היותר (one-hot)"], ["spurious", "אין מענק בלי בקשה"], ["hold", "בקשה שמחכה נשארת (הסביבה)"], ["fair", "מענק תוך 3 מחזורים (הוגנות)"]];
   const arbiterView = () => ({
     mount(box) {
       const st = { reqs: Array(T).fill(0b1001), k: 0, bug: "none", w: [1, 2, 3, 4] };
@@ -85,8 +87,8 @@
         `<div class="ex-controls">` +
         `<span class="wv-presets">דוגמאות : <button type="button" class="md-button arb-preset" data-p="03">0 ו-3 תמיד</button> <button type="button" class="md-button arb-preset" data-p="all">כולם תמיד</button> <button type="button" class="md-button arb-preset" data-p="none">ריק</button></span>` +
         `<button type="button" class="md-button arb-rand">בקשות אקראיות</button><span class="arb-anchor"></span>` +
-        `<label>באג ב-round robin <select class="arb-bug" aria-label="באג להכניס"><option value="none">בלי באג</option><option value="stuck">המצביע לא זז</option><option value="winner">המצביע עובר אל המנצח</option><option value="double">גם הנמוך מקבל</option></select></label>` +
-        `<span class="arb-weights">משקלים ל-WRR : ${[0, 1, 2, 3].map((i) => `<label><span>${i}</span><select class="arb-w" data-i="${i}" aria-label="המשקל של מבקש ${i}">${[1, 2, 3, 4].map((v) => `<option value="${v}"${v === st.w[i] ? " selected" : ""}>${v}</option>`).join("")}</select></label>`).join(" ")}</span></div>` +
+        `<label>באג <select class="arb-bug" aria-label="באג להכניס ל-round robin"><option value="none">בלי באג</option><option value="stuck">המצביע לא זז</option><option value="winner">המצביע עובר אל המנצח</option><option value="double">גם הנמוך מקבל</option></select></label>` +
+        `<span class="arb-weights">משקלי WRR : ${[0, 1, 2, 3].map((i) => `<label><span>${i}</span><select class="arb-w" data-i="${i}" aria-label="המשקל של מבקש ${i}">${[1, 2, 3, 4].map((v) => `<option value="${v}"${v === st.w[i] ? " selected" : ""}>${v}</option>`).join("")}</select></label>`).join(" ")}</span></div>` +
         `<div class="ex-controls ex-play-row">` +
         `<button type="button" class="md-button ex-start">מחזור 0</button>` +
         `<button type="button" class="md-button ex-prev">המחזור הקודם</button>` +
@@ -99,16 +101,26 @@
         `<div class="arb-rules"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const bits = (v, w) => (v >>> 0).toString(2).padStart(w, "0").slice(-w);
-      const grid = (rr, fx, wr, fails) => {
-        const S = 30, L = 118, top = 26, gap = 22, W = L + T * S + 92;   // 92: room for the wait/bound column and its title
-        const blocks = [["req", null], ["fixed", fx], [`RR${st.bug !== "none" ? " ✗" : ""}`, rr], ["WRR", wr]];
-        const H = top + blocks.length * (N * S + gap);
+      // the grid: the requests, then the grants of each arbiter; under the round robin the
+      // pointer of every cycle (the requester it points at), under the WRR the pointer and used
+      const grid = (rr, fx, wr, fails, ptrs) => {
+        const S = 30, L = 118, top = 26, gap = 22, R = 19, W = L + T * S + 92;   // 92: room for the wait/bound column and its title
+        const blocks = [["req", null, []], ["fixed", fx, []], [`RR${st.bug !== "none" ? " ✗" : ""}`, rr, [["pri", ptrs.rr]]], ["WRR", wr, [["pri", ptrs.wr], ["used", ptrs.used]]]];
+        const y0s = [];
+        let y = top;
+        blocks.forEach(([, , extra]) => { y0s.push(y); y += N * S + extra.length * R + gap; });
+        const H = y;
         const bad = new Set([...fails.onehot, ...fails.spurious]);
-        let s = `<svg class="figure arb-live" viewBox="0 0 ${W} ${H}" role="group" aria-label="רשת הבקשות והמענקים : 4 מבקשים, 16 מחזורים">`;
+        let s = `<svg class="figure arb-live" viewBox="0 0 ${W} ${H}" role="group" aria-label="רשת הבקשות והמענקים : 4 מבקשים, 16 מחזורים, והמצביע בכל מחזור">`;
         s += `<rect class="arb-cursor" x="${L + st.k * S - 1}" y="${top - 8}" width="${S + 1}" height="${H - top}" rx="3"/>`;
         for (let c = 0; c < T; c++) s += `<text class="tick" x="${L + c * S + S / 2}" y="${top - 12}" text-anchor="middle">${c}</text>`;
-        blocks.forEach(([name, g], b) => {
-          const y0 = top + b * (N * S + gap);
+        blocks.forEach(([name, g, extra], b) => {
+          const y0 = y0s[b];
+          extra.forEach(([what, vals], k) => {
+            const yt = y0 + N * S + k * R + 14;
+            s += `<text class="arb-ptr-name" x="${L - 6}" y="${yt}" text-anchor="end">${what}</text>`;
+            vals.forEach((v, c) => { s += `<text class="arb-ptr" x="${L + c * S + S / 2 - 1}" y="${yt}" text-anchor="middle">${v}</text>`; });
+          });
           s += `<text class="arb-name" x="${L - 46}" y="${y0 + (N * S) / 2 + 4}" text-anchor="middle">${name}</text>`;
           for (let i = 0; i < N; i++) {
             const y = y0 + i * S;
@@ -130,27 +142,28 @@
             }
           }
         });
-        return s + `<text class="legend" x="${L + T * S + 6}" y="${top + N * S + gap - 6}">wait/bound</text></svg>`;
+        return s + `<text class="legend" x="${L + T * S + 6}" y="${y0s[1] - 6}">wait/bound</text></svg>`;
       };
       const draw = () => {
-        const fx = arbFixed(st.reqs), tr = arbRRTrace(st.reqs, N, st.bug), rr = tr.map((x) => x.g), wr = arbWRR(st.reqs, st.w);
-        const fails = arbFails(st.reqs, rr, N, N - 1);
+        const fx = arbFixed(st.reqs), tr = arbRRTrace(st.reqs, N, st.bug), rr = tr.map((x) => x.g), wt = arbWRRTrace(st.reqs, st.w), wr = wt.map((x) => x.g);
+        const fails = arbFails(st.reqs, rr, N, N - 1), idx = (p) => 31 - Math.clz32(p);
+        const ptrs = { rr: tr.map((x) => idx(x.pri)), wr: wt.map((x) => idx(x.pri)), used: wt.map((x) => x.used) };
         $(".ex-pos").textContent = `מחזור ${st.k} מתוך ${T - 1}`;
         $(".ex-prev").disabled = $(".ex-start").disabled = st.k === 0;
         $(".ex-next").disabled = $(".ex-end").disabled = st.k === T - 1;
-        const w3 = arbMaxWait(st.reqs, fx, 3);
-        $(".arb-sum").innerHTML = `עדיפות קבועה : מבקש 3 חיכה עד ${ltr(w3)} מחזורים${w3 >= 8 ? " (הרעבה)" : ""}. ‏round robin : ההמתנה הארוכה ביותר ${ltr(Math.max(...[0, 1, 2, 3].map((i) => arbMaxWait(st.reqs, rr, i))))} מחזורים, והחסם ${ltr(N - 1)}` +
+        const w3 = arbMaxWait(st.reqs, fx, 3), asked3 = st.reqs.some((r) => (r >> 3) & 1), starved = asked3 && !fx.some((g) => (g >> 3) & 1);
+        $(".arb-sum").innerHTML = `עדיפות קבועה : מבקש 3 חיכה עד ${ltr(w3)} מחזורים${starved ? " (הרעבה : לא קיבל אף מענק)" : ""}. ‏round robin : ההמתנה הארוכה ביותר ${ltr(Math.max(...[0, 1, 2, 3].map((i) => arbMaxWait(st.reqs, rr, i))))} מחזורים, והחסם ${ltr(N - 1)}` +
           (st.bug !== "none" ? `, עם הבאג "${$(".arb-bug").selectedOptions[0].textContent}"` : "") + `. ‏WRR : המשקלים ${ltr(st.w.join(", "))}.`;
-        $(".arb-grid").innerHTML = grid(rr, fx, wr, fails);
+        $(".arb-grid").innerHTML = grid(rr, fx, wr, fails, ptrs);
         const r = st.reqs[st.k], pri = tr[st.k].pri, t = arbTrick(r, pri, N), row = (name, v, w, what) => `<tr><td><code>${name}</code></td><td><code>${bits(v, w)}</code></td><td>${what}</td></tr>`;
-        $(".arb-trick").innerHTML = `<p class="ex-title">הטריק של round robin במחזור ${ltr(st.k)} : העדיפות אצל מבקש ${ltr(31 - Math.clz32(pri))}</p>` +
-          `<table class="arb-tt"><tbody>` + row("req", r, N, "הבקשות") + row("pri", pri, N, "המצביע, one-hot") + row("dbl", t.dbl, 2 * N, "הבקשות פעמיים") +
-          row("dbl − pri", t.minus, 2 * N, "הלווה מאפס את הבקשה הראשונה מ-pri") + row("~(dbl − pri)", t.inv, 2 * N, "ההיפוך") +
-          row("sel", t.sel, 2 * N, "רק הבקשה הראשונה מ-pri והלאה") + row("gnt", t.gnt, N, t.gnt ? `מבקש ${31 - Math.clz32(t.gnt)} זוכה` : "אין בקשות, אין מענק") + `</tbody></table>` +
+        $(".arb-trick").innerHTML = `<p class="ex-title">הטריק במחזור ${ltr(st.k)}, המצביע על מבקש ${ltr(31 - Math.clz32(pri))}</p>` +
+          `<table class="arb-tt"><tbody>` + row("req", r, N, "הבקשות") + row("pri", pri, N, "המצביע") + row("dbl", t.dbl, 2 * N, "פעמיים") +
+          row("dbl − pri", t.minus, 2 * N, "הלווה") + row("~(dbl − pri)", t.inv, 2 * N, "ההיפוך") +
+          row("sel", t.sel, 2 * N, "הנבחר") + row("gnt", t.gnt, N, t.gnt ? `מבקש ${31 - Math.clz32(t.gnt)} זוכה` : "אין מענק") + `</tbody></table>` +
           (st.bug === "double" ? `<p class="wv-bad">עם הבאג, גם ${code("req & -req")} מקבל : ${code(bits(rr[st.k], N))}.</p>` : "");
-        $(".arb-rules").innerHTML = `<p class="ex-title">ה-assertions של סעיף ג על ה-round robin</p>` + RULES.map(([k, name]) => {
+        $(".arb-rules").innerHTML = `<p class="ex-title">ה-assertions של סעיף ג על ה-RR</p>` + RULES.map(([k, name]) => {
           const at = fails[k];
-          return `<p class="arb-rule">${at.length ? `<span class="wv-bad">✗ ${name} : נכשלה ${ltr(at.length)} פעמים, במחזורים ${ltr([...new Set(at)].slice(0, 8).join(", "))}${at.length > 8 ? "…" : ""}</span>` : `<span class="wv-ok">✓ ${name}</span>`}</p>`;
+          return `<p class="arb-rule">${at.length ? `<span class="wv-bad">✗ ${name} — נכשלה ${ltr(at.length)} פעמים, במחזורים ${ltr([...new Set(at)].slice(0, 6).join(", "))}${new Set(at).size > 6 ? " ועוד" : ""}</span>` : `<span class="wv-ok">✓ ${name}</span>`}</p>`;
         }).join("");
       };
       const toggle = (c, i) => { st.reqs[c] ^= 1 << i; draw(); };
@@ -184,9 +197,9 @@
   dvqExplorers.register({
     views: { arbiter: arbiterView },
     help: {
-      arbiter: "הרשת העליונה היא הבקשות : לחיצה על משבצת מדליקה או מכבה בקשה, או שבוחרים דוגמה. מתחת, המענקים של עדיפות קבועה, ‏round robin ו-WRR, ובסוף כל שורה ההמתנה הארוכה ביותר מול החסם. ״המחזור הבא״ בוחר מחזור, והטבלה מראה את הטריק של round robin בו. ״באג״ מכניס באג ל-round robin, והרשימה מראה איזו assertion נכשלת ומתי.",
+      arbiter: "הרשת העליונה היא הבקשות : לחיצה על משבצת מדליקה או מכבה בקשה. מתחת, המענקים של שלושת ה-arbiters, השורות pri ו-used (המצביע ומונה התור בתחילת המחזור), ובסוף כל שורה ההמתנה הארוכה ביותר מול החסם. הטבלה מראה את הטריק במחזור הנבחר, והרשימה את ה-assertions שנכשלות.",
     },
-    cols: { arbiter: { side: ".arb-trick, .arb-rules", w: "minmax(0, 1.4fr)" } },   // the grid beside the trick table and the assertions
-    models: { arbFixed, arbTrick, arbRR, arbWRR, arbCheck, arbMaxWait },
+    cols: { arbiter: { side: ".arb-trick, .arb-rules", w: "minmax(0, 1.3fr)" } },   // the grid beside the trick table and the assertions
+    models: { arbFixed, arbTrick, arbRR, arbWRR, arbWRRTrace, arbCheck, arbMaxWait },
   });
 })();

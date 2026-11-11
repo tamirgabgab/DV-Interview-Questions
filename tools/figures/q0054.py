@@ -10,12 +10,16 @@ arbiters written as plain loops over the requesters from the priority pointer, t
 buggy round-robin variants, and the rules of part c counted on a trace the way the
 assertions count them. blocks() returns, in page order: the grant grids of a fixed and a
 round-robin arbiter under full load, their legend, the table of the trick on one example,
-and the table of a weighted round robin. tests/0054 checks the page code (Python, and the
+the block diagram of rr_arbiter with its legend, the table of a weighted round robin, and
+the weighted round robin clock by clock (pri, used and the grant). tests/0054 checks the page code (Python, and the
 SystemVerilog modules and checker in Verilator) against these.
 """
 
+from html import escape
+
 N = 4
 RLM = "‏"
+NB = "\u00a0"
 
 
 # --- the arbiters (plain loops) -------------------------------------------------------------
@@ -58,6 +62,23 @@ def wrr(reqs, weights):
         else:
             ptr = win
         out.append(1 << win)
+    return out
+
+
+def wrr_trace(reqs, weights):
+    """The weighted round robin clock by clock: per cycle the request, the registers at the
+    start of the cycle (the pointer as a one-hot, used) and the grant."""
+    n, ptr, used, out = len(weights), 0, 0, []
+    for r in reqs:
+        pri, used0 = 1 << ptr, used
+        win = next(((ptr + k) % n for k in range(n) if r >> ((ptr + k) % n) & 1), None)
+        if win is not None:
+            used = used + 1 if win == ptr else 1
+            if used == weights[win]:
+                ptr, used = (win + 1) % n, 0
+            else:
+                ptr = win
+        out.append((r, pri, used0, 0 if win is None else 1 << win))
     return out
 
 
@@ -164,9 +185,90 @@ def wrr_table():
     return "\n".join(rows)
 
 
+# the block diagram of rr_arbiter, left to right: the doubled requests, the subtraction of the
+# pointer, the AND with the inverse, the fold of the halves; under them the pointer register
+# loaded from the rotated grant when there is a grant
+HW_W, HW_H = 580, 218
+HW_BLOCKS = (   # x, y, w, h, stage (1 the pick, 2 the fold, 3 the pointer, 0 wires only), title, sub
+    (40, 44, 108, 48, 0, "{req,req}", ""),
+    (180, 44, 92, 48, 1, "dbl−pri", ""),
+    (300, 44, 74, 48, 1, "dbl&~", ""),
+    (402, 44, 74, 48, 2, "lo|hi", ""),
+    (402, 156, 74, 48, 3, "rotl", ""),
+    (180, 150, 92, 60, 3, "pri", "en=|gnt"),
+)
+HW_WIRES = (    # points, arrow, label, label x, label y, anchor
+    (((2, 68), (40, 68)), True, "req", 4, 58, "start"),
+    (((148, 68), (180, 68)), True, "", 0, 0, ""),
+    (((164, 68), (164, 24), (337, 24), (337, 44)), True, "dbl", 172, 19, "start"),
+    (((272, 68), (300, 68)), True, "", 0, 0, ""),
+    (((374, 68), (402, 68)), True, "", 0, 0, ""),
+    (((476, 68), (576, 68)), True, "gnt", 574, 58, "end"),
+    (((504, 68), (504, 180), (476, 180)), True, "", 0, 0, ""),
+    (((402, 180), (272, 180)), True, "", 0, 0, ""),
+    (((226, 150), (226, 92)), True, "pri", 234, 127, "start"),
+)
+HW_DOTS = ((164, 68), (504, 68))
+
+
+def hw_diagram():
+    """The block diagram of rr_arbiter."""
+    label = ("תרשים המלבנים של rr_arbiter" + NB + ": הבקשות משוכפלות ל-{req, req}, המחסר מוריד מהן את pri, "
+             "ההיפוך וה-AND עם dbl משאירים את הבקשה הראשונה מהמצביע, ו-OR של שני החצאים נותן את gnt. "
+             "מתחת, הרגיסטר pri נטען מהסיבוב של gnt שמאלה כשיש מענק")
+    o = [f'<svg class="figure ab-dp" viewBox="0 0 {HW_W} {HW_H}" direction="ltr" style="max-width:{HW_W / 16:g}rem" '
+         f'role="img" aria-label="{escape(label)}">',
+         '<defs><marker id="ab-hb" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" '
+         'markerHeight="9" orient="auto"><path class="ab-headp" d="M0,0 L8,4 L0,8 z"/></marker></defs>']
+    for x, y, w, h, stage, title, sub in HW_BLOCKS:
+        ty = y + h / 2 + (-4 if sub else 6)
+        cls = f" ab-st{stage}" if stage else ""
+        o.append(f'<g class="ab-blk{cls}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="5"/>'
+                 f'<text x="{x + w / 2:g}" y="{ty:g}" text-anchor="middle">{escape(title)}</text>'
+                 + (f'<text class="ab-sub" x="{x + w / 2:g}" y="{y + h / 2 + 17:g}" text-anchor="middle">{escape(sub)}</text>' if sub else "")
+                 + "</g>")
+    for pts, arrow, lab, lx, ly, anchor in HW_WIRES:
+        d = "M" + " L".join(f"{x:g},{y:g}" for x, y in pts)
+        head = ' marker-end="url(#ab-hb)"' if arrow else ""
+        o.append(f'<path class="ab-wire" d="{d}"{head}/>')
+        if lab:
+            o.append(f'<text class="ab-wlab" x="{lx}" y="{ly}" text-anchor="{anchor}">{escape(lab)}</text>')
+    o += [f'<circle class="ab-dot" cx="{x}" cy="{y}" r="3.5"/>' for x, y in HW_DOTS]
+    return "".join(o) + "</svg>"
+
+
+def hw_legend():
+    return ('<span class="viz-legend"><span><i class="ab-key-0"></i>השכפול' + NB + ': חוטים בלבד</span>'
+            '<span><i class="ab-key-1"></i>הבחירה' + NB + ': מחסר, היפוך ו-AND</span>'
+            '<span><i class="ab-key-2"></i>הקיפול' + NB + ': ‏OR של שני החצאים</span>'
+            '<span><i class="ab-key-3"></i>המצביע' + NB + ': סיבוב של gnt ורגיסטר</span></span>')
+
+
+# the weighted round robin clock by clock: weights 1, 2, 3, 4 under full load, and
+# requester 2 drops its request in the middle of its turn (cycle 4)
+TRACE_REQS = [0b1111] * 4 + [0b1011] + [0b1111] * 4
+
+
+def wrr_trace_table(reqs=TRACE_REQS, weights=WEIGHTS):
+    n = len(weights)
+    rows = [f"| מחזור | {RLM}`req` | {RLM}`pri` | {RLM}`used` | {RLM}`gnt` | מה קורה |", "|:-:|:-:|:-:|:-:|:-:|---|"]
+    trace = wrr_trace(reqs, weights)
+    for t, (r, pri, used, g) in enumerate(trace):
+        holder, win = pri.bit_length() - 1, g.bit_length() - 1
+        now = used + 1 if win == holder else 1
+        what = "" if win == holder else f"מבקש {holder} הפסיק לבקש{NB}: {win} זוכה ופותח תור חדש, "
+        what += f"מענק {now} מתוך {weights[win]}"
+        if now == weights[win]:
+            what += f", והמצביע עובר ל-{(win + 1) % n}"
+        else:
+            what += ", והמצביע נשאר" if win == holder else f", והמצביע עובר אל {win}"
+        rows.append(f"| {RLM}{t} | {RLM}`{bits(r, n)}` | {RLM}`{bits(pri, n)}` | {RLM}{used} | {RLM}`{bits(g, n)}` | {what} |")
+    return "\n".join(rows)
+
+
 def blocks():
     """The generated blocks, in page order."""
-    return [grids(), grids_legend(), trick_table(), wrr_table()]
+    return [grids(), grids_legend(), trick_table(), hw_diagram(), hw_legend(), wrr_table(), wrr_trace_table()]
 
 
 if __name__ == "__main__":

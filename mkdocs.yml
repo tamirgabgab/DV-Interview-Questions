@@ -190,6 +190,8 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0017-duplicate.css   # 0017: the dupbin and floyd boxes on one screen, the figure beside the step's text (session 34)
   - stylesheets/questions/0031-bridge.css      # 0031: the bridge box on one screen, the two tables side by side and the plan line (session 34)
   - stylesheets/questions/0101-sicherman.css   # 0101: Sicherman dice, the tables of the sums, the factor chips and the box
+  - stylesheets/questions/0054-arbiter.css     # 0054: the block diagram of rr_arbiter, the pointer rows of the arbiter box (session 34)
+  - stylesheets/questions/0073-faro.css        # 0073: the faro box's outlined cycle (session 34)
 
 extra_javascript:
   - javascripts/mathjax.js
