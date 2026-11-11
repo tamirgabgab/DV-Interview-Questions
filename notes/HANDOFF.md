@@ -1181,6 +1181,18 @@ below start at item 112 (session 31).
     (121 pages, 262 links and files) found no 404, and the twelve pages' 23 boxes (0012,
     0028 and 0036 included) built with no script error.
 
+194. **New question 0101: Sicherman dice (session 34, 2026-11-11).** From the owner's
+    question (relabel two fair dice, same 2..12 triangle). The lead verified the facts first
+    (brute force and generating functions; three dice: only Sicherman with a standard die).
+    The owner's choices: junior; parts a (six faces, uniqueness), b (a face 0 allowed, five
+    pairs) and c (n faces, another pair exactly when n is composite); different sizes only
+    as a follow-up; DV only as a trap in words (a sum-only checker passes Sicherman dice);
+    a box `sicherman` (both dice editable, n = 4, 6, 8, the sum table and the histogram
+    against the triangle, at most 862 px at 1920 x 1080). Also: subagents now run on the
+    session's model and effort (CLAUDE.md, the owner's rule). On main as 4c5699d (deployed
+    2026-11-11 10:44 UTC); a crawl of the live site (122 pages, 264 links and files) found
+    no 404, and the page's three boxes built with no script error.
+
 ---
 
 ## In progress
