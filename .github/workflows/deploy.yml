@@ -119,21 +119,29 @@ jobs:
           make install
       - name: Install z3 and the Verilator run-time dependencies
         run: |
-          # The runner's Azure Ubuntu mirror failed to resolve for over an hour on
-          # 2026-11-11 (retries alone did not help): after a failed try, point apt at
-          # archive.ubuntu.com directly and try again, with a growing pause.
-          for i in 1 2 3 4 5; do
+          # The runner could not resolve any Ubuntu archive for hours on 2026-11-11. Try
+          # apt twice (the second time on archive.ubuntu.com directly); if it still fails,
+          # take z3 from its GitHub release (libfl2 is not linked by verilator_bin).
+          ok=
+          for i in 1 2; do
             if sudo apt-get update -q && sudo apt-get install -y -q z3 perl libfl2; then
-              break
+              ok=1; break
             fi
-            if [ "$i" = 5 ]; then exit 1; fi
-            echo "apt failed (try $i): using archive.ubuntu.com, retrying in $((i * 20)) s"
             printf 'http://archive.ubuntu.com/ubuntu/\tpriority:1\nhttp://security.ubuntu.com/ubuntu/\tpriority:2\n' \
               | sudo tee /etc/apt/apt-mirrors.txt > /dev/null
             sudo sed -i 's#http://azure.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' \
               /etc/apt/sources.list /etc/apt/sources.list.d/*.sources 2>/dev/null || true
-            sleep $((i * 20))
+            sleep 20
           done
+          if [ -z "$ok" ]; then
+            echo "apt failed: z3 4.8.12 from github.com/Z3Prover/z3/releases"
+            z=z3-4.8.12-x64-glibc-2.31
+            curl -fsSL --retry 5 -o /tmp/z3.zip \
+              "https://github.com/Z3Prover/z3/releases/download/z3-4.8.12/$z.zip"
+            unzip -q /tmp/z3.zip "$z/bin/*" -d "$HOME"
+            echo "$HOME/$z/bin" >> "$GITHUB_PATH"
+            echo "LD_LIBRARY_PATH=$HOME/$z/bin${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+          fi
           echo "$HOME/verilator/bin" >> "$GITHUB_PATH"
       - run: verilator --version && z3 --version
       # Compiled testbenches are cached by content hash; only changed ones recompile.
@@ -197,16 +205,15 @@ jobs:
       # fonts downloaded from Google Fonts are cached, keyed on the pages and the layout.
       - name: Install libcairo2
         run: |
-          # As in the test job: fall back to archive.ubuntu.com when the Azure mirror fails.
-          for i in 1 2 3; do
-            if sudo apt-get update -q && sudo apt-get install -y -q libcairo2; then break; fi
-            if [ "$i" = 3 ]; then exit 1; fi
+          # As in the test job: fall back to archive.ubuntu.com when the Azure mirror fails,
+          # and go on if the runner image already has the library.
+          for i in 1 2; do
+            if sudo apt-get update -q && sudo apt-get install -y -q libcairo2; then exit 0; fi
             printf 'http://archive.ubuntu.com/ubuntu/\tpriority:1\nhttp://security.ubuntu.com/ubuntu/\tpriority:2\n' \
               | sudo tee /etc/apt/apt-mirrors.txt > /dev/null
-            sudo sed -i 's#http://azure.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' \
-              /etc/apt/sources.list /etc/apt/sources.list.d/*.sources 2>/dev/null || true
-            sleep $((i * 20))
+            sleep 20
           done
+          ldconfig -p | grep -q 'libcairo.so.2 ' && echo "apt failed, but libcairo.so.2 is present"
       - uses: actions/cache@v6
         with:
           path: .cache/plugin/social
