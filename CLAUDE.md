@@ -127,6 +127,9 @@ notes and simulator quirks are listed in `notes/HANDOFF.md` under "Technical not
 
 - Ask the owner guiding questions before a big change, then implement; end a work round
   with a short summary by sections.
+- Subagents run on the session's model and effort, as the owner set them for the
+  conversation: do not pass a model or an effort override when starting one, unless the
+  owner asks for a specific one for that work (the owner, 2026-11-11).
 - Develop on the designated work branch. Push to `main` (which publishes the site) only
   when the owner asks. Fast-forward `main` to the branch; do not rewrite history.
 - Small, local fixes go to `main` without waiting for the branch CI (the owner's standing
