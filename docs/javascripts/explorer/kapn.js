@@ -6,6 +6,9 @@
 // models for the question tests.
 (() => {
   const { KB_DIGITS, answer, f, ltr, seedControls } = dvqExplorers.lib;
+  // a formula longer than ltr()'s limit that must still not break across lines, where its
+  // parts would read in the wrong order (the step's line of the kapgraph box)
+  const ltrNw = (x) => `<bdi dir="ltr" class="ex-nw">${x}</bdi>`;
   const NB = " ";
 
   // Kaprekar's routine on three digits in base B (0044): one step, the direct digits after
@@ -66,7 +69,7 @@
         `<div class="ex-controls ex-play-row"><label><span>‏n, מספר הפעולות</span><input type="range" class="kn-n" min="1" max="1000" step="1" value="${D.n}" dir="ltr" aria-label="מספר הפעולות, עד 1000"><output class="kn-out-n"></output></label>` +
         `<button type="button" class="md-button ex-prev">‏n − 1</button><button type="button" class="md-button md-button--primary ex-next">‏n + 1</button></div>` +
         `<p class="ex-summary kn-start" aria-live="polite"></p>` +
-        `<p class="ex-title">הפער ${ltr("D_k")} אחרי ${ltr("k")} פעולות</p><div class="kn-chart"></div>` +
+        `<p class="ex-title">הפער ${ltr("D<sub>k</sub>")} אחרי ${ltr("k")} פעולות</p><div class="kn-chart"></div>` +
         `<span class="viz-legend"><span><i class="s1"></i>הפער של המספר</span><span><i class="kn-key-line"></i>החלק הליניארי</span><span><i class="ink"></i>נקודת השבת או שני ערכי המחזור</span><span><i class="s2"></i>הצעד ${ltr("k = n − 1")}</span></span>` +
         `<div class="kn-table"></div><p class="ex-summary kn-sum" aria-live="polite"></p>`;
       const $ = (sel) => box.querySelector(sel);
@@ -101,15 +104,15 @@
         $(".kn-dec").innerHTML = `= ${ltr(st.x)} בעשרוני`;
         $(".ex-prev").disabled = st.n <= 1; $(".ex-next").disabled = st.n >= 1000;
         if (d0 === 0) {
-          $(".kn-start").innerHTML = `כל הספרות זהות, ולכן ${ltr("d0 = 0")}${NB}: אחרי פעולה אחת מקבלים ${ltr("000")}, ונשארים שם. השאלה מוציאה את המקרה הזה.`;
+          $(".kn-start").innerHTML = `כל הספרות זהות, ולכן ${ltr("d<sub>0</sub> = 0")}${NB}: אחרי פעולה אחת מקבלים ${ltr("000")}, ונשארים שם. השאלה מוציאה את המקרה הזה.`;
           $(".kn-chart").innerHTML = ""; $(".kn-table").innerHTML = ""; $(".kn-sum").textContent = "";
           return;
         }
         const m = Math.abs(2 * d0 - (B + 1)), even = B % 2 === 0, lineEnd = even ? (3 + m) / 2 : (m + 4) / 2;
         const sv = kapnDigits(st.x, B);
-        $(".kn-start").innerHTML = `הפער ההתחלתי ${ltr(`d0 = ${KB_DIGITS[Math.max(...sv)]} − ${KB_DIGITS[Math.min(...sv)]} = ${d0}`)}, ולכן ${ltr(`m = |2·${d0} − ${B + 1}| = ${m}`)}. ` +
-          (even ? `הבסיס זוגי, והחלק הליניארי נגמר ב-${ltr(`n = (3 + m)/2 = ${lineEnd}`)}${NB}: משם המספר קבוע.`
-            : `הבסיס אי-זוגי, והחלק הליניארי נגמר ב-${ltr(`n = (m + 4)/2 = ${lineEnd}`)}${NB}: משם המספר מתחלף בין שני ערכים, לפי הזוגיות של ${ltr(`n − m/2 = n − ${m / 2}`)}.`);
+        $(".kn-start").innerHTML = `הפער ההתחלתי ${ltr(`d<sub>0</sub> = ${KB_DIGITS[Math.max(...sv)]} − ${KB_DIGITS[Math.min(...sv)]} = ${d0}`)}, ולכן ${ltr(`m = |2·${d0} − ${B + 1}| = ${m}`)}. ` +
+          (even ? `הבסיס זוגי, והחלק הליניארי של הנוסחה נגמר ב-${ltr(`n = (3 + m)/2 = ${lineEnd}`)}${NB}: משם, לכל המאוחר, המספר קבוע.`
+            : `הבסיס אי-זוגי, והחלק הליניארי של הנוסחה נגמר ב-${ltr(`n = (m + 4)/2 = ${lineEnd}`)}${NB}: משם, לכל המאוחר, המספר מתחלף בין שני ערכים, לפי הזוגיות של ${ltr(`n − m/2 = n − ${m / 2}`)}.`);
         $(".kn-chart").innerHTML = chart(d0, lineEnd);
         const ns = [];
         for (let n = 1; n <= Math.max(2, lineEnd + 2); n++) ns.push(n);
@@ -121,10 +124,20 @@
           const dig = (v) => v.map((q) => KB_DIGITS[q]).join(", ");
           rows += `<tr${n === st.n ? ' class="is-now"' : ""}><td>${ltr(n)}</td><td>${ltr(kapnGap(d0, n - 1, B))}</td><td>${ROW_NAME[r.row]}</td><td>${ltr(`(${dig([r.a, r.b, r.c])})`)}</td><td>${ltr(`(${dig(dir)})`)} ${ok ? "✓" : "✗"}</td></tr>`;
         });
-        $(".kn-table").innerHTML = `<div class="at-scroll" tabindex="0" role="region" aria-label="טבלת הצעדים"><table class="bridge-table kn-steps"><thead><tr><th>‏n</th><th>‏D<sub>n−1</sub></th><th>השורה בנוסחה</th><th>מהנוסחה</th><th>מהחישוב</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        $(".kn-table").innerHTML = `<div class="at-scroll kn-scroll" tabindex="0" role="region" aria-label="טבלת הצעדים"><table class="bridge-table kn-steps"><thead><tr><th>‏n</th><th>‏D<sub>n−1</sub></th><th>השורה בנוסחה</th><th>מהנוסחה</th><th>מהחישוב</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        // the table is capped (it grows a row a step of the line part): show the chosen n
+        const sc = $(".kn-scroll"), now = sc.querySelector("tr.is-now");
+        if (now && sc.scrollHeight > sc.clientHeight) {
+          const top = now.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop, head = sc.querySelector("thead").offsetHeight;
+          sc.scrollTop = Math.max(0, top - head - (sc.clientHeight - head - now.offsetHeight) / 2);
+        }
         const r = kapnFormula(d0, st.n, B), val = (r.a * B + r.b) * B + r.c, g = kapnGap(d0, st.n - 1, B);
-        $(".kn-sum").innerHTML = `אחרי ${ltr(st.n)} פעולות${NB}: ${ltr(`(${KB_DIGITS[r.a]}, ${KB_DIGITS[r.b]}, ${KB_DIGITS[r.c]})_${B} = ${val}`)}, כלומר ${ltr(`(B² − 1) · D = ${B * B - 1} · ${g}`)}. ` +
-          (r.row === "fixed" ? `זה המספר הקבוע של הבסיס.` : r.row === "even" || r.row === "odd" ? `זה אחד משני המספרים של המחזור, והצעד הבא נותן את השני.` : `עוד לא הגענו לסוף החלק הליניארי.`);
+        // the fixed point or the cycle can come before the line part of the formula ends (d0 = B/2
+        // is there after one step): say where the number is, not which row of the formula gave it
+        const h = Math.floor(B / 2), there = even ? g === B / 2 : g === h || g === h + 1;
+        $(".kn-sum").innerHTML = `אחרי ${ltr(st.n)} פעולות${NB}: ${ltr(`(${KB_DIGITS[r.a]}, ${KB_DIGITS[r.b]}, ${KB_DIGITS[r.c]})<sub>${B}</sub> = ${val}`)}, כלומר ${ltr(`(B² − 1) · D = ${B * B - 1} · ${g}`)}. ` +
+          (!there ? `עוד לא הגענו לסוף החלק הליניארי.` : even ? `זה המספר הקבוע של הבסיס${r.row === "fixed" ? "" : ", כבר לפני סוף החלק הליניארי של הנוסחה"}.`
+            : `זה אחד משני המספרים של המחזור, והצעד הבא נותן את השני${r.row === "even" || r.row === "odd" ? "" : ", כבר לפני סוף החלק הליניארי של הנוסחה"}.`);
       };
       const setX = (x) => { st.x = x; $(".kn-err").textContent = ""; draw(); };
       input.addEventListener("change", () => { const x = parse(input.value, st.B); if (x === null) $(".kn-err").textContent = `שלוש ספרות מ-0 עד ${KB_DIGITS[st.B - 1]}`; else setX(x); });
@@ -276,8 +289,8 @@
         if (document.activeElement !== input) input.value = txt(st.x);
         $(".kg-dec").innerHTML = `= ${ltr(st.x)} בעשרוני`;
         const cyc = ch.nodes.slice(k).map((v) => txt(v));
-        $(".kg-sum").innerHTML = d0 === 0 ? `כל הספרות זהות, ולכן ${ltr("d0 = 0")}${NB}: אחרי פעולה אחת מקבלים ${ltr("000")}, ונשארים שם.`
-          : `הפער ההתחלתי ${ltr(`d0 = ${d0}`)}. ` + (ch.cycleLen === 1
+        $(".kg-sum").innerHTML = d0 === 0 ? `כל הספרות זהות, ולכן ${ltr("d<sub>0</sub> = 0")}${NB}: אחרי פעולה אחת מקבלים ${ltr("000")}, ונשארים שם.`
+          : `הפער ההתחלתי ${ltr(`d<sub>0</sub> = ${d0}`)}. ` + (ch.cycleLen === 1
             ? `בסיס ${ltr(B)} זוגי, והמספר מגיע לנקודת השבת <b>${ltr(cyc[0])}</b> (${ltr(ch.nodes[k])} בעשרוני, ${ltr(`d = ${B / 2}`)}) אחרי ${ltr(k)} ${k === 1 ? "צעד" : "צעדים"}.`
             : `בסיס ${ltr(B)} אי-זוגי, ואין נקודת שבת${NB}: אחרי ${ltr(k)} ${k === 1 ? "צעד" : "צעדים"} המספר נכנס למחזור <b>${ltr(`${cyc[0]} ↔ ${cyc[1]}`)}</b>, והפער מתחלף בין ${ltr((B - 1) / 2)} ל-${ltr((B + 1) / 2)}.`);
         $(".kg-graph").innerHTML = graph(ch, d0);
@@ -289,7 +302,7 @@
           let check = "—";
           if (i > 0 && d0 > 0) { const f = kapnFormula(d0, i, B); check = f.a === dg[0] && f.b === dg[1] && f.c === dg[2] && kapnGap(d0, i, B) === d ? "✓" : "✗"; }
           const cls = [st.sel === i ? "is-now" : "", i === n ? "kg-repeat" : ""].filter(Boolean).join(" ");
-          rows += `<tr data-i="${i}"${cls ? ` class="${cls}"` : ""}><td>${ltr(i)}</td><td>${ltr(txt(x))}</td><td>${ltr(KG_DIGITS[dg[0]])}</td><td>${ltr(KG_DIGITS[dg[1]])}</td><td>${ltr(KG_DIGITS[dg[2]])}</td><td>${ltr(d)}</td><td>${i === n ? "חוזר" : STAGE_NAME[stage]}</td><td>${check}</td></tr>`;
+          rows += `<tr data-i="${i}"${cls ? ` class="${cls}"` : ""}><td>${ltr(i)}</td><td>${ltr(txt(x))}</td><td>${ltr(KG_DIGITS[dg[0]])}</td><td>${ltr(KG_DIGITS[dg[1]])}</td><td>${ltr(KG_DIGITS[dg[2]])}</td><td>${ltr(d)}</td><td>${i === n ? "חוזר" : SHORT[stage]}</td><td>${check}</td></tr>`;
         });
         $(".kg-table").innerHTML = `<div class="at-scroll" tabindex="0" role="region" aria-label="טבלת הספרות בכל צעד"><table class="bridge-table kg-steps"><thead><tr><th>‏n</th><th>המספר</th><th>‏a<sub>n</sub></th><th>‏b<sub>n</sub></th><th>‏c<sub>n</sub></th><th>‏d<sub>n</sub></th><th>השלב</th><th>הנוסחה</th></tr></thead><tbody>${rows}</tbody></table></div>`;
         answer(box, d0 === 0 ? `${ltr(txt(st.x))} → ${ltr("000")}, ונשאר שם.` : ch.cycleLen === 1
@@ -299,9 +312,9 @@
         if (i === null || i >= all.length) $(".kg-step").innerHTML = d0 ? `לחיצה על כרטיס או על שורה מסבירה את הצעד. השורה האחרונה בטבלה היא הערך שחוזר, וממנו המעגל נסגר.` : "";
         else {
           const x = all[i], d = gapOf(x), stage = i === n ? labelOf(ch, d0, k) : labelOf(ch, d0, i), prevD = i ? gapOf(all[i - 1]) : null;
-          $(".kg-step").innerHTML = i === 0 ? `המספר ההתחלתי ${ltr(txt(x))}, עם הפער ${ltr(`d0 = ${d}`)}.`
-            : `צעד ${ltr(i)}${NB}: הפער הקודם היה ${ltr(prevD)}, ולכן ההפרש הוא ${ltr(`${prevD} · (B² − 1) = ${prevD} · ${B * B - 1} = ${x}`)}, עם הספרות ${ltr(`(d − 1, B − 1, B − d) = (${kapnDigits(x, B).map((v) => KG_DIGITS[v]).join(", ")})`)}. ` +
-              `הפער החדש ${ltr(`max(${prevD} − 1, ${B} − ${prevD}) = ${d}`)}` + (stage === "line" ? `, אחד פחות מהקודם${NB}: החלק הליניארי.` : stage === "fixed" ? `${NB}: ${ltr(`d = B/2`)}, נקודת השבת.` : stage === "cycle" ? `${NB}: המחזור בין ${ltr((B - 1) / 2)} ל-${ltr((B + 1) / 2)}.` : stage === "first" ? `${NB}: אחרי צעד אחד הפער כבר לפחות ${ltr(`(B − 1)/2`)}.` : ".");
+          $(".kg-step").innerHTML = i === 0 ? `המספר ההתחלתי ${ltr(txt(x))}, עם הפער ${ltr(`d<sub>0</sub> = ${d}`)}.`
+            : `צעד ${ltr(i)}${NB}: הפער הקודם היה ${ltr(prevD)}, ולכן ההפרש הוא ${ltrNw(`${prevD} · (B² − 1) = ${prevD} · ${B * B - 1} = ${x}`)}, עם הספרות ${ltrNw(`(d − 1, B − 1, B − d) = (${kapnDigits(x, B).map((v) => KG_DIGITS[v]).join(", ")})`)}. ` +
+              `הפער החדש ${ltrNw(`max(${prevD} − 1, ${B} − ${prevD}) = ${d}`)}` + (stage === "line" ? `, אחד פחות מהקודם${NB}: החלק הליניארי.` : stage === "fixed" ? `${NB}: ${ltr(`d = B/2`)}, נקודת השבת.` : stage === "cycle" ? `${NB}: המחזור בין ${ltr((B - 1) / 2)} ל-${ltr((B + 1) / 2)}.` : stage === "first" ? `${NB}: אחרי צעד אחד הפער כבר לפחות ${ltr(`(B − 1)/2`)}.` : ".");
         }
       };
       const setX = (x) => { st.x = x; st.sel = null; $(".kg-err").textContent = ""; draw(); };
@@ -328,8 +341,8 @@
   dvqExplorers.register({
     views: { kapn: kapnView, kapgraph: kapgraphView },
     help: {
-      kapn: "מקלידים שלוש ספרות או מגרילים, ובוחרים n עד 1000 (ובסעיף הבונוס גם בסיס) : הגרף מראה את הפער D_k אחרי כל פעולה, והטבלה משווה בכל צעד את הספרות מהנוסחה של העמוד לספרות מהחישוב הישיר, עם השורה בנוסחה שנתנה אותן.",
-      kapgraph: "בוחרים בסיס מ-2 עד 20 ומקלידים שלוש ספרות : הדיאגרמה מראה את המספרים שהפעולה עוברת בהם, כל כרטיס בצבע לפי הפער d ועם השלב בהוכחה, עד הלולאה של נקודת השבת או החץ החוזר של המחזור. הטבלה מפרטת את a_n, b_n, c_n ו-d_n, ולחיצה על כרטיס או על שורה מסבירה את הצעד.",
+      kapn: "מקלידים שלוש ספרות או מגרילים, ובוחרים n עד 1000 (ובסעיף הבונוס גם בסיס) : הגרף מראה את הפער D אחרי כל פעולה, והטבלה משווה בכל צעד את הספרות מהנוסחה של העמוד לספרות מהחישוב הישיר, עם השורה בנוסחה שנתנה אותן.",
+      kapgraph: "בוחרים בסיס מ-2 עד 20 ומקלידים שלוש ספרות : הדיאגרמה מראה את המספרים שהפעולה עוברת בהם, כל כרטיס בצבע לפי הפער d ועם השלב בהוכחה, עד הלולאה של נקודת השבת או החץ החוזר של המחזור. הטבלה מפרטת את הספרות ואת הפער בכל צעד, ולחיצה על כרטיס או על שורה מסבירה את הצעד.",
     },
     cols: {
       kapn: { main: ".ex-title, .kn-chart", side: ".viz-legend", w: "minmax(0, 2fr)" },   // the chart beside its key; the table stays wide

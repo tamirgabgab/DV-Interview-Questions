@@ -60,10 +60,14 @@ def chain(x, b):
     return out
 
 
-def chain_lengths(b):
-    """How many of the b^3 numbers need k steps (to the attractor, or to 0)."""
+def chain_lengths(b, equal=True):
+    """How many of the b^3 numbers need k steps (to the attractor, or to 0). equal=False
+    leaves out the b numbers whose digits are all equal (they fall to 0), as the boxes'
+    histograms do."""
     hist = {}
     for x in range(b ** 3):
+        if not equal and spread(x, b) == 0:
+            continue
         n = len(chain(x, b)) - 1
         hist[n] = hist.get(n, 0) + 1
     return hist
@@ -79,11 +83,18 @@ def even_table(bases=(2, 4, 6, 8, 10, 12, 14, 16)):
     return "\n".join(lines)
 
 
+def ltr(x):
+    """An ordered pair "a ↔ b" in a right-to-left cell: isolated left to right, so it is not
+    read as "b ↔ a", with no-break spaces so that it does not break across lines either."""
+    return f'<span dir="ltr">{x.replace(" ↔ ", "\u00a0↔\u00a0")}</span>'
+
+
 def odd_table(bases=(3, 5, 7, 9, 11, 13, 15)):
     lines = ["| הבסיס b | ‏d במחזור | המחזור בבסיס b | הערכים העשרוניים |", "|:-:|:-:|:-:|:-:|"]
     for b in bases:
         x1, x2 = attractor(b)
-        lines.append(f"| {RLM}{b} | {RLM}{b // 2} ↔ {b // 2 + 1} | {RLM}**{text(x1, b)}** ↔ **{text(x2, b)}** | {RLM}{x1:,} ↔ {x2:,} |")
+        lines.append(f"| {RLM}{b} | {RLM}{ltr(f'{b // 2} ↔ {b // 2 + 1}')} | {RLM}{ltr(f'<b>{text(x1, b)}</b> ↔ <b>{text(x2, b)}</b>')} | "
+                     f"{RLM}{ltr(f'{x1:,} ↔ {x2:,}')} |")
     return "\n".join(lines)
 
 

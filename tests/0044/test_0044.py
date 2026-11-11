@@ -131,7 +131,8 @@ def test_page_tables_and_examples():
     # base 5: the cycle, the checks and the two examples
     to5 = lambda s: int(s, 5)
     assert (to5("143"), to5("242")) == (48, 72) and 24 * 2 == 48 and 24 * 3 == 72
-    assert to5("431") - to5("134") == 116 - 44 == 72 and to5("442") - to5("244") == 122 - 74 == 48
+    assert to5("431") - to5("134") == 116 - 44 == 72 and to5("422") - to5("224") == 112 - 64 == 48
+    assert sorted("242", reverse=True) == list("422") and step(to5("242"), 5) == 48 and step(48, 5) == 72
     ex = lambda s, k: ["".join(map(str, digits(run(to5(s), 5, n), 5))) for n in range(1, k + 1)]
     assert ex("401", 5) == ["341", "242", "143", "242", "143"]
     assert ex("300", 3) == ["242", "143", "242"]
@@ -267,3 +268,26 @@ def test_page_f_every_base():
 def test_page_hash_two_keys():
     assert num == {0: 10, 495: 990}
     assert sum(num.values()) == 1000
+
+
+def test_when_495_is_reached():
+    """Part b step 7: the number is 495 from n = (3 + m)/2 on, and that is the first such n
+    for every starting gap but d0 = 5, which is there after one step (500 -> 495)."""
+    for x in range(1000):
+        d0 = gap(x, 10)
+        if not d0 or x == 495:
+            continue
+        m = abs(2 * d0 - 11)
+        first = next(n for n in range(1, 10) if run(x, 10, n) == 495)
+        assert all(run(x, 10, n) == 495 for n in range(first, 12))
+        assert first == (1 if d0 == 5 else (3 + m) // 2), x
+    assert run(500, 10, 1) == 495 and run(990, 10, 4) == 594 and run(990, 10, 5) == 495
+    # the examples of the boxes' tasks: 401 and 300 in base 5 after 4 and 1000 steps,
+    # 100 in bases 8, 9 and 16, and the chain of 100 in base 20
+    to5 = lambda s: int(s, 5)
+    assert digits(run(to5("401"), 5, 4), 5) == (2, 4, 2) and digits(run(to5("300"), 5, 4), 5) == (1, 4, 3)
+    assert digits(run(to5("401"), 5, 5), 5) == (1, 4, 3) and digits(run(to5("300"), 5, 5), 5) == (2, 4, 2)
+    assert run(64, 8, 5) == 3 * 64 + 7 * 8 + 4 and {run(81, 9, 5), run(81, 9, 6)} == {3 * 81 + 8 * 9 + 5, 4 * 81 + 8 * 9 + 4}
+    assert next(n for n in range(1, 20) if run(256, 16, n) == 255 * 8) == 9
+    gaps20 = [gap(run(400, 20, n), 20) for n in range(12)]
+    assert gaps20 == [1] + list(range(19, 9, -1)) + [10]

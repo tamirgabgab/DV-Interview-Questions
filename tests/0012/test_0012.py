@@ -121,10 +121,13 @@ def test_base_b_tables_and_figures():
     even = q0012.even_table().splitlines()[2:]
     assert len(even) == 8 and "**495**" in even[4] and "**5B6**" in even[5] and "**011**" in even[0]
     odd = q0012.odd_table().splitlines()[2:]
-    assert len(odd) == 7 and "**022** ↔ **121**" in odd[0] and "**4A6** ↔ **5A5**" in odd[4]
+    assert len(odd) == 7 and '<span dir="ltr"><b>022</b>\u00a0↔\u00a0<b>121</b></span>' in odd[0] and "<b>4A6</b>\u00a0↔\u00a0<b>5A5</b>" in odd[4]
+    assert '<span dir="ltr">1\u00a0↔\u00a02</span>' in odd[0] and '<span dir="ltr">1,008\u00a0↔\u00a01,176</span>' in odd[5]
     ex = q0012.example_table().splitlines()[2:]
     assert len(ex) == 5 and ex[0].endswith("| ‏6 |") and "**561**" in ex[0] and "**363**" in ex[2] and "**264**" in ex[3] and ex[4].endswith("| ‏4 |")
     assert q0012.chain_lengths(10) == {0: 2, 1: 158, 2: 144, 3: 270, 4: 222, 5: 150, 6: 54}
+    # the boxes leave out the ten numbers with equal digits: 990 reach 495
+    assert q0012.chain_lengths(10, equal=False) == {0: 1, 1: 149, 2: 144, 3: 270, 4: 222, 5: 150, 6: 54}
     assert sum(q0012.chain_lengths(7).values()) == 343
     from page_tests import assert_figures_match
 
@@ -152,9 +155,22 @@ def test_base_b_explorer_matches_page_code():
             diff, d, d_next, digits = r["steps"][x]
             assert diff == step_b(x, b) and d == q0012.spread(x, b)
             assert d_next == (max(b - d, d - 1) if d else 0) and digits == ([d - 1, b - 1, b - d] if d else [0, 0, 0])
-        hist = q0012.chain_lengths(b)
+        hist = q0012.chain_lengths(b, equal=False)                         # the b with equal digits apart
         assert r["hist"]["hist"] == [hist.get(k, 0) for k in range(max(hist) + 1)]
-        assert r["hist"]["zeros"] == b
+        assert r["hist"]["zeros"] == b and sum(r["hist"]["hist"]) == b ** 3 - b
         # the step line: every number with d gives the same difference, 6d(b - d) of them (b for d = 0)
         assert r["spread"] == [sum(1 for x in range(b ** 3) if q0012.spread(x, b) == d) for d in range(b)]
         assert r["spread"] == [b] + [6 * d * (b - d) for d in range(1, b)]
+
+
+def test_two_base_10_histograms_agree():
+    """Part b draws the chain lengths twice over (the kaprekar box, and the kapbase box of
+    part c in base 10): both count the 990 numbers that reach 495, 1 of them at 0 steps
+    and 149 at 1, and leave the ten with equal digits out."""
+    from page_tests import explorer_require, node_json
+
+    got = node_json(f"""
+      const m = {explorer_require()};
+      console.log(JSON.stringify({{ kap: m.kapHistogram(3).hist["495"], kb: m.kbHistogram(10) }}));""")
+    assert got["kap"] == got["kb"]["hist"] == [1, 149, 144, 270, 222, 150, 54]
+    assert got["kb"]["zeros"] == 10

@@ -86,7 +86,7 @@
         if (c.end === 0 && !first.special) text += ` כל הספרות שוות, ולכן ההפרש הוא 0 ושם זה נגמר.`;
         $(".kp-chain").innerHTML = text;
         // the first step as a column subtraction, units first, with the borrows; the digits
-        // the page's p and q predict beside it
+        // the page predicts beside it (0012 calls the gap d, 0013 calls the two gaps p and q)
         if ($(".kp-show-cols").checked) {
           const s0 = c.steps[0], cols = kapColumns(s0.largest, s0.smallest, d), ds = s0.digits.split("").map(Number);
           const p = ds[0] - ds[d - 1], q = d === 4 ? ds[1] - ds[2] : null;
@@ -100,7 +100,7 @@
             `<p class="ex-note">${p === 0 ? "כל הספרות שוות, ולכן ההפרש 0 בלי שום לווה." :
               `החיסור מהאחדות שמאלה. ${cols.filter((col) => col.borrowOut).map((col) => NAMES[d - 1 - cols.indexOf(col)]).join(", ")} ${cols.filter((col) => col.borrowOut).length === 1 ? "לווה" : "לוות"} מהעמודה שמשמאל (ה-1 מעל). ` +
               (d === 4 ? `עם ${ltr(`p = ${ds[0]} − ${ds[3]} = ${p}`)} ו-${ltr(`q = ${ds[1]} − ${ds[2]} = ${q}`)} הדף צופה ${q >= 1 ? ltr(`p, q − 1, 9 − q, 10 − p = ${p}, ${q - 1}, ${9 - q}, ${10 - p}`) : ltr(`p − 1, 9, 9, 10 − p = ${p - 1}, 9, 9, ${10 - p}`)}${q === 0 ? " (q = 0, ולכן גם המאות לוות)" : ""}.`
-                : `עם ${ltr(`p = ${ds[0]} − ${ds[2]} = ${p}`)} הספרות הן ${ltr(`p − 1, 9, 10 − p = ${p - 1}, 9, ${10 - p}`)}.`)}</p>`;
+                : `עם ${ltr(`d = a − c = ${ds[0]} − ${ds[2]} = ${p}`)} הספרות הן ${ltr(`(d − 1, 9, 10 − d) = (${p - 1}, 9, ${10 - p})`)}.`)}</p>`;
         } else $(".kp-cols").innerHTML = "";
         // the bars count the numbers that reach the fixed point, as the page's table does;
         // those that fall to 0 (equal digits) are named in the summary, not drawn

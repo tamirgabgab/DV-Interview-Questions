@@ -1,10 +1,13 @@
 // kinds: kapbase
-//   kapbase                0012        three digits in a base from 2 to 16: the chain to the fixed point (even base) or the 2-cycle (odd), each step explained by d = max − min, how many numbers share each d (and so the difference), the map d → max(b − d, d − 1) with the path, the histogram of chain lengths over all b³ numbers
+//   kapbase                0012        three digits in a base from 2 to 16: the chain to the fixed point (even base) or the 2-cycle (odd), each step explained by d = max − min, how many numbers share each d (and so the difference), the map d → max(b − d, d − 1) with the path, the histogram of chain lengths over the b³ − b numbers whose digits are not all equal (left out with data-fixed, where the kaprekar box above draws it)
 // Loaded after core.js on the pages that have this kind (hooks/questions.py adds the
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
   const { BASE, H, KB_DIGITS, W, X0, answer, autoplay, f, frame, ltr, seedControls, speedSel } = dvqExplorers.lib;
+  // a formula longer than ltr()'s limit that must still not break across lines, where its
+  // parts would read in the wrong order (the step's line, in a narrow column)
+  const ltrNw = (x) => `<bdi dir="ltr" class="ex-nw">${x}</bdi>`;
 
   // Sort the digits and subtract in base b (0012 part c): one step on three digits, the
   // attractor (the fixed point of an even base, the two values of the cycle of an odd
@@ -29,10 +32,15 @@
     while (values[values.length - 1] !== 0 && !att.includes(values[values.length - 1]) && values.length < 40) values.push(kbStep(values[values.length - 1], b).diff);
     return values;
   };
+  // the chain lengths of the numbers that reach the attractor; those with equal digits (the
+  // b that fall to 0) are counted apart, as the kaprekar box of part b does
   const kbHistogram = (b) => {
     const hist = [];
     let zeros = 0;
-    for (let x = 0; x < b * b * b; x++) { const c = kbChain(x, b); const n = c.length - 1; hist[n] = (hist[n] || 0) + 1; if (c[c.length - 1] === 0) zeros++; }
+    for (let x = 0; x < b * b * b; x++) {
+      const c = kbChain(x, b), n = c.length - 1;
+      if (c[n] === 0) zeros++; else hist[n] = (hist[n] || 0) + 1;
+    }
     for (let i = 0; i < hist.length; i++) hist[i] = hist[i] || 0;
     return { hist, zeros };
   };
@@ -51,7 +59,7 @@
   // the path of the number, and the histogram of chain lengths over every b³ number.
   const kapbaseView = () => ({
     mount(box) {
-      const d0 = box.dataset, B0 = Math.min(16, Math.max(2, Number(d0.b || 7)));
+      const d0 = box.dataset, B0 = Math.min(16, Math.max(2, Number(d0.b || 7))), fixed = d0.fixed !== undefined;
       const X0 = kbParse(d0.x || "610", B0) ?? 0;
       const st = { b: B0, x: X0, step: 0 };
       box.innerHTML =
@@ -68,11 +76,12 @@
         `<button type="button" class="md-button ex-start">מההתחלה</button>` +
         `<button type="button" class="md-button ex-end">עד הסוף</button><span class="ex-pos"></span></div>` +
         `<p class="ex-summary kb-sum" aria-live="polite"></p><p class="kb-step"></p>` +
-        // the wide histogram first, at full width; then the map beside the table (cols below);
-        // the table is the last block: it grows a row a step
-        `<p class="ex-title kb-hist-title"></p><div class="kb-chart"></div>` +
-        `<p class="ex-title">המפה של d : מכל d חץ ל-max(b − d, d − 1), והמסלול של המספר מודגש</p><div class="kb-map"></div>` +
-        `<span class="viz-legend"><span><i class="kb-key-arrow"></i>חץ מ-d ל-d'</span><span><i class="kb-key-fixed"></i>היעד : נקודת שבת או מחזור</span><span><i class="kb-key-path"></i>המסלול של המספר</span></span>` +
+        // the map, its key and the histogram in the main column, the step's line and the
+        // table beside them (cols below); the table is the last block: it grows a row a step.
+        // data-fixed (part b, base 10) has no histogram: the kaprekar box above draws it
+        `<p class="ex-title">המפה של d, והמסלול של המספר</p><div class="kb-map"></div>` +
+        `<span class="viz-legend"><span><i class="kb-key-arrow"></i>${ltr("d → max(b − d, d − 1)")}</span><span><i class="kb-key-fixed"></i>היעד</span><span><i class="kb-key-path"></i>המסלול</span></span>` +
+        (fixed ? "" : `<p class="ex-title kb-hist-title"></p><div class="kb-chart"></div>`) +
         `<div class="kp-table kb-table"></div>`;
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed"), input = $(".kb-x");
@@ -92,41 +101,44 @@
         $(".ex-prev").disabled = st.step === 0; $(".ex-next").disabled = done; $(".ex-end").disabled = done;
         const attText = att.map((v) => kbText(v, b));
         $(".kb-sum").innerHTML = `בסיס ${ltr(b)} : ` + (b % 2 === 0
-          ? `נקודת שבת יחידה <b>${ltr(attText[0])}</b> (‏${ltr(att[0])} בעשרוני, d = ${ltr(b / 2)}).`
-          : `אין נקודת שבת; המחזור <b>${ltr(attText[0])} ↔ ${ltr(attText[1])}</b> (‏${ltr(att[0])} ↔ ${ltr(att[1])} בעשרוני, d = ${ltr(Math.floor(b / 2))} ↔ ${ltr(Math.floor(b / 2) + 1)}).`) +
+          ? `נקודת שבת יחידה <b>${ltr(attText[0])}</b> (‏${ltr(att[0])} בעשרוני, ${ltr(`d = ${b / 2}`)}).`
+          : `אין נקודת שבת; המחזור <b>${ltr(`${attText[0]} ↔ ${attText[1]}`)}</b> (‏${ltr(`${att[0]} ↔ ${att[1]}`)} בעשרוני, ${ltr(`d = ${Math.floor(b / 2)} ↔ ${Math.floor(b / 2) + 1}`)}).`) +
           ` המספר ${ltr(kbText(st.x, b))} ` + (total === 0 ? (st.x === 0 || att.includes(st.x) ? `כבר ביעד.` : "") : `מגיע ליעד אחרי ${ltr(total)} ${total === 1 ? "צעד" : "צעדים"} : ${ltr(chain.map((v) => kbText(v, b)).join(" → "))}.`);
         // the table of the steps so far
         let rows = "";
         for (let i = 0; i < Math.max(st.step, 0); i++) {
           const sp = kbStep(chain[i], b);
-          rows += `<tr${i === st.step - 1 ? ' class="is-last"' : ""}><td>${ltr(i + 1)}</td><td>${ltr(kbText(sp.x, b))} (${ltr(sp.x)})</td><td>${ltr(kbText(sp.largest, b))}</td><td>${ltr(kbText(sp.smallest, b))}</td><td class="kb-diff">${ltr(`${sp.largest} − ${sp.smallest} = ${sp.diff} = <b>${kbText(sp.diff, b)}</b>`)}</td><td>${ltr(sp.d)}</td><td>${ltr(sp.dNext)}</td></tr>`;
+          rows += `<tr${i === st.step - 1 ? ' class="is-last"' : ""}><td>${ltr(i + 1)}</td><td>${ltr(kbText(sp.largest, b))}</td><td>${ltr(kbText(sp.smallest, b))}</td><td class="kb-diff">${ltr(`${sp.largest} − ${sp.smallest} = ${sp.diff} = <b>${kbText(sp.diff, b)}</b>`)}</td><td>${ltr(sp.d)}</td><td>${ltr(sp.dNext)}</td></tr>`;
         }
-        $(".kb-table").innerHTML = st.step ? `<table tabindex="0" aria-label="צעדי המיון והחיסור בבסיס"><thead><tr><th>צעד</th><th>X</th><th>מהגדול לקטן</th><th>מהקטן לגדול</th><th>ההפרש</th><th>d</th><th>d הבא</th></tr></thead><tbody>${rows}</tbody></table>` : `<p class="ex-note">עוד לא נעשה צעד. ״הצעד הבא״ ממיין ומחסר.</p>`;
+        $(".kb-table").innerHTML = st.step ? `<table tabindex="0" aria-label="צעדי המיון והחיסור בבסיס"><thead><tr><th>צעד</th><th>מהגדול לקטן</th><th>מהקטן לגדול</th><th>ההפרש</th><th>d</th><th>d הבא</th></tr></thead><tbody>${rows}</tbody></table>` : `<p class="ex-note">עוד לא נעשה צעד. ״הצעד הבא״ ממיין ומחסר.</p>`;
         let text;
         if (st.step === 0) {
           const sp = kbStep(st.x, b);
-          text = (sp.d === 0 ? `כל הספרות שוות, ולכן d = 0 וההפרש יהיה 0.` : `הספרה הגדולה פחות הקטנה : d = ${ltr(sp.d)}. ההפרש יהיה ${ltr(`d · (b² − 1) = ${sp.d} · ${b * b - 1} = ${sp.diff}`)}, עם הספרות ${ltr(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)}.`) + same(sp);
+          text = (sp.d === 0 ? `כל הספרות שוות, ולכן ${ltr("d = 0")} וההפרש יהיה 0.` : `הספרה הגדולה פחות הקטנה : ${ltr(`d = ${sp.d}`)}. ההפרש יהיה ${ltrNw(`d · (b² − 1) = ${sp.d} · ${b * b - 1} = ${sp.diff}`)}, עם הספרות ${ltrNw(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)}.`) + same(sp);
         } else {
           const sp = kbStep(chain[st.step - 1], b);
-          text = `צעד ${ltr(st.step)} : ‏d = ${ltr(sp.d)}, ולכן ${ltr(`F(X) = ${sp.d} · ${b * b - 1} = ${sp.diff}`)} = ${ltr(kbText(sp.diff, b))}, הספרות ${ltr(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)};${same(sp).slice(0, -1)}; ` +
-            (sp.d === 0 ? `ההפרש 0 ושם זה נגמר.` : `ה-d הבא הוא ${ltr(`max(b − d, d − 1) = max(${b - sp.d}, ${sp.d - 1}) = ${sp.dNext}`)}.`) +
+          text = `צעד ${ltr(st.step)} : ${ltr(`d = ${sp.d}`)}, ולכן ${ltrNw(`F(X) = ${sp.d} · ${b * b - 1} = ${sp.diff} = ${kbText(sp.diff, b)}<sub>${b}</sub>`)}, הספרות ${ltrNw(`(d − 1, b − 1, b − d) = (${sp.digits.map((v) => KB_DIGITS[v]).join(", ")})`)};${same(sp).slice(0, -1)}; ` +
+            (sp.d === 0 ? `ההפרש 0 ושם זה נגמר.` : `ה-d הבא הוא ${ltrNw(`max(b − d, d − 1) = max(${b - sp.d}, ${sp.d - 1}) = ${sp.dNext}`)}.`) +
             (done ? (att.includes(sp.diff) ? ` <b>${ltr(kbText(sp.diff, b))} ${b % 2 === 0 ? "היא נקודת השבת" : "במחזור"}</b>${b % 2 === 0 ? " : הצעד הבא מחזיר אותה לעצמה ✓" : ` : הצעד הבא נותן ${ltr(kbText(kbStep(sp.diff, b).diff, b))}, ואז שוב ${ltr(kbText(sp.diff, b))} ✓`}` : "") : "");
         }
         $(".kb-step").innerHTML = text;
         const end = chain[total];
         answer(box, done && total > 0 ? `${ltr(kbText(st.x, b))} מגיע אחרי ${ltr(total)} ${total === 1 ? "צעד" : "צעדים"} ל-<b>${ltr(kbText(end, b))}</b>` +
-          (end === 0 ? " (כל הספרות שוות)." : b % 2 === 0 ? ", נקודת השבת של בסיס " + ltr(b) + "." : `, שבמחזור ${ltr(attText[0])} ↔ ${ltr(attText[1])}.`) : null,
+          (end === 0 ? " (כל הספרות שוות)." : b % 2 === 0 ? ", נקודת השבת של בסיס " + ltr(b) + "." : `, שבמחזור ${ltr(`${attText[0]} ↔ ${attText[1]}`)}.`) : null,
           ".kb-table tr.is-last");
         // the map of d with the path so far
-        const W = 420, Hh = 150, X0 = 22, X1 = 398, YA = 90, X = (d) =>   // 420 wide: readable at phone width
+        const W = 420, X0 = 22, X1 = 398, YA = 90, X = (d) =>   // 420 wide: readable at phone width
            (b > 2 ? X0 + ((d - 1) * (X1 - X0)) / (b - 2) : (X0 + X1) / 2);
+        // only as tall as the arcs: the widest one (1 -> b - 1) peaks halfway to its control
+        // point; the ticks sit under the arcs that go down (they reach YA + 18.5)
+        const top = Math.min(YA - 14, (YA - 4 + YA - 12 - 7 * Math.max(0, b - 2)) / 2 - 6), Hh = YA + 40 - top;
         const attD = att.map((v) => Math.floor(v / (b * b - 1)));
         const path = new Set();
         for (let i = 0; i < st.step; i++) { const sp = kbStep(chain[i], b); if (sp.d) path.add(`${sp.d}>${sp.dNext}`); }
-        let m = `<svg class="figure kb-map kb-live" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="המפה של d בבסיס ${b} עם המסלול של המספר"><line class="kb-axis" x1="${X0}" x2="${X1}" y1="${YA}" y2="${YA}"/>`;
+        let m = `<svg class="figure kb-map kb-live" viewBox="0 ${f(top)} ${W} ${f(Hh)}" role="img" aria-label="המפה של d בבסיס ${b} עם המסלול של המספר"><line class="kb-axis" x1="${X0}" x2="${X1}" y1="${YA}" y2="${YA}"/>`;
         for (let d = 1; d < b; d++) {
           const nd = Math.max(b - d, d - 1);
-          m += `<text class="kb-tick" x="${f(X(d))}" y="${YA + 18}" text-anchor="middle">${d}</text>`;
+          m += `<text class="kb-tick" x="${f(X(d))}" y="${YA + 34}" text-anchor="middle">${d}</text>`;
           if (nd === d) continue;
           const up = nd > d, xa = X(d), xb = X(nd), bulge = up ? YA - 12 - 7 * Math.abs(nd - d) : YA + 26 + 7 * Math.abs(nd - d), y = up ? YA - 4 : YA + 4;
           const cls = "kb-arrow" + (path.has(`${d}>${nd}`) ? " is-path" : "") + (attD.includes(d) && attD.includes(nd) ? " is-cycle" : "");
@@ -136,18 +148,19 @@
         const cur = kbStep(chain[st.step], b).d;
         if (cur) m += `<circle class="kb-cur" cx="${f(X(cur))}" cy="${YA}" r="10"><title>d של המספר הנוכחי = ${cur}</title></circle>`;
         $(".kb-map").innerHTML = m + "</svg>";
-        // the histogram of chain lengths over every number of the base
+        if (fixed) return;
+        // the histogram of chain lengths over the numbers of the base that reach the attractor
         const n = H.hist.length, ymax = Math.max(...H.hist), stepT = ymax > 2000 ? 500 : ymax > 400 ? 100 : ymax > 80 ? 20 : 5, ticks = [];
         for (let v = 0; v <= ymax + stepT - 1; v += stepT) ticks.push(v);
         const fr = frame("התפלגות מספר הצעדים עד היעד", n, ticks[ticks.length - 1], ticks, (v) => String(v));
         let sv = fr.s;
         H.hist.forEach((v, k) => {
-          const bw = Math.max(fr.slot * 0.6, 1), cls = k === total ? "by-enum" : "by-multiples";
+          const bw = Math.max(fr.slot * 0.6, 1), cls = k === total && end !== 0 ? "by-enum" : "by-multiples";
           sv += `<rect class="bar ${cls}" x="${f(fr.cx(k + 1) - bw / 2)}" y="${f(fr.Y(v))}" width="${f(bw)}" height="${f(BASE - fr.Y(v))}"><title>${k} צעדים : ${v} מספרים</title></rect>` +
             `<text class="tick" x="${f(fr.cx(k + 1))}" y="${f(fr.Y(v) - 4)}" text-anchor="middle" font-size="10">${v}</text>` + fr.xtick(k + 1, k);
         });
         $(".kb-chart").innerHTML = sv + fr.close();
-        $(".kb-hist-title").textContent = `מספר הצעדים עד היעד על כל ${b * b * b} המספרים של בסיס ${b}; הארוך ביותר ${n - 1}, ו-${H.zeros} מספרים עם ספרות שוות נופלים ל-0`;
+        $(".kb-hist-title").innerHTML = `הצעדים עד היעד של ${ltr(b * b * b - H.zeros)} המספרים (${ltr(H.zeros)} עם ספרות שוות נופלים ל-0 ואינם כאן)`;
       };
       let stop = () => {};
       const setX = (x) => { stop(); st.x = x; st.step = 0; draw(); };
@@ -160,7 +173,7 @@
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
       const seed = seedControls(box, $(".ex-random"), (rng) => setX(Math.floor(rng() * st.b * st.b * st.b)));
       $(".ex-random").addEventListener("click", () => seed.draw());
-      if (d0.fixed !== undefined) $(".kb-b").closest("label").hidden = true;   // data-fixed: the base stays b (0012 part b)
+      if (fixed) $(".kb-b").closest("label").hidden = true;   // data-fixed: the base stays b (0012 part b)
       $(".ex-reset").addEventListener("click", () => { stop(); st.b = B0; st.x = X0; st.step = 0; $(".kb-b").value = B0; $(".kb-err").textContent = ""; draw(); });
       $(".ex-next").addEventListener("click", () => { stop(); if (st.step < chainOf().length - 1) { st.step++; draw(); } });
       $(".ex-prev").addEventListener("click", () => { stop(); if (st.step > 0) { st.step--; draw(); } });
@@ -174,11 +187,11 @@
   dvqExplorers.register({
     views: { kapbase: kapbaseView },
     help: {
-      kapbase: "בוחרים בסיס ומקלידים שלוש ספרות בו : ״הצעד הבא״ ו״הפעלה״ ממיינים ומחסרים צעד אחרי צעד, הטבלה מראה את ההפרש בבסיס ובעשרוני, השורה מתחת מסבירה את הספרות (d − 1, b − 1, b − d), כמה מספרים חולקים את אותו d ולכן את אותו הפרש, ואת המעבר d → max(b − d, d − 1), המפה מראה את המסלול, וההיסטוגרמה סופרת את הצעדים של כל מספרי הבסיס.",
+      kapbase: "מקלידים שלוש ספרות (ובסעיף ג גם בוחרים בסיס) : ״הצעד הבא״ ו״הפעלה״ ממיינים ומחסרים צעד אחרי צעד. שורת ההסבר נותנת את הספרות (d − 1, b − 1, b − d), כמה מספרים חולקים את אותו d ולכן את אותו הפרש, ואת ה-d הבא; המפה מדגישה את המסלול, והטבלה מראה את ההפרש בבסיס ובעשרוני. בסעיף ג ההיסטוגרמה סופרת את הצעדים של כל מספרי הבסיס.",
     },
     models: { kbDigits, kbText, kbParse, kbStep, kbAttractor, kbChain, kbHistogram, kbSpreadCounts },
-    // on a computer: under the histogram, the map of d with its legend on the left and the
-    // table of the steps on the right
-    cols: { kapbase: { main: ".ex-title:not(.kb-hist-title), .kb-map, .viz-legend", side: ".kb-table", w: "minmax(0, 1fr)" } },
+    // on a computer: the map of d with its key and the histogram under it on the left, the
+    // step's line and the table of the steps on the right
+    cols: { kapbase: { main: ".ex-title, .kb-map, .viz-legend, .kb-chart", side: ".kb-step, .kb-table", w: "minmax(0, 1fr)" } },
   });
 })();

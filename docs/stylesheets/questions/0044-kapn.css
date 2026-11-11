@@ -1,0 +1,15 @@
+/* Questions 0012 and 0044, sort three digits and subtract: their boxes on one screen.
+   kapn (0044): the table of the steps grows a row a step of the line part (twelve rows in
+   base 16), so it scrolls inside the box with its header in view; the box scrolls the
+   chosen n into view (kapn.js). kapgraph (0044): a stage name stays on one line, so a
+   row does not double in the narrow column. kapbase (0012): the histogram in the main
+   column, its numbers at about 9 px, and the rows of the table beside it a little tighter. Colours from the palette only. */
+
+.md-typeset .explorer .kn-scroll { max-height: 10.5rem; overflow-y: auto; }
+.md-typeset .explorer .kn-scroll thead th { position: sticky; top: 0; z-index: 1; background: var(--md-default-bg-color); }
+.md-typeset .explorer .kg-steps td:nth-child(7) { white-space: nowrap; }
+
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="kapbase"] .ex-main .kb-chart svg .tick { font-size: 15px; }
+  .md-typeset .explorer[data-kind="kapbase"] .ex-side .kb-table :is(td, th) { padding-block: 0.1em; line-height: 1.35; }
+}
