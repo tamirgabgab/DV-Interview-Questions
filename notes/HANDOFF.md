@@ -1228,7 +1228,10 @@ below start at item 112 (session 31).
     b = 0 loop (now an error); 0012's histograms and two-digit repdigits; 0044's base-5 sort;
     0002's inout and JavaScript XOR; 0094's NaN for large N in the SV p_full; 0095's
     exhaustive 19-soldier search (DVQ_SLOW=1, about 8 minutes). Page code changed (tell the
-    owner if asked): 0051 mice_needed raises for b < 1; 0094 p_full divides by rho^N.
+    owner if asked): 0051 mice_needed raises for b < 1; 0094 p_full divides by rho^N. On main as ec49ec5
+    (deployed 2026-11-12 00:09 UTC, branch CI green first), then the docs commit; a crawl of
+    the live site (122 pages, 264 links and files) found no 404, and the twelve pages' 24
+    boxes (0003 and 0013 included) built with no script error.
 
 ---
 
