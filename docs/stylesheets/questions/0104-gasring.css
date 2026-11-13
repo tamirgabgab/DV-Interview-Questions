@@ -56,7 +56,7 @@
 .md-typeset .explorer svg.gs-live .gs-tanklab { fill: var(--viz-text); font-size: 13px; font-weight: 700; }
 .md-typeset .explorer svg.gs-live .gs-tankval { fill: var(--viz-ink); font-size: 26px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset .explorer svg.gs-live .gs-tankval.is-neg { fill: var(--viz-s5); }
-.md-typeset .explorer svg.gs-chart.gs-live .gs-drive { stroke: var(--viz-s2); stroke-width: 3.5; fill: none; stroke-linejoin: round; }
+.md-typeset .explorer svg.gs-chart.gs-live .gs-drive { stroke: var(--viz-s2-text); stroke-width: 3.5; fill: none; stroke-linejoin: round; }
 .md-typeset .explorer svg.gs-chart.gs-live .gs-drive.is-bad { stroke: var(--viz-s5); }
 .md-typeset .explorer svg.gs-chart.gs-live .gs-pt.is-bad { fill: var(--viz-s5); stroke: var(--viz-s5); }
 .md-typeset .explorer svg.gs-chart.gs-live .gs-pt.is-now { stroke: var(--viz-ink); stroke-width: 3; }
