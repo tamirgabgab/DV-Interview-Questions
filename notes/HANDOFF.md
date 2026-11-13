@@ -1276,6 +1276,20 @@ below start at item 112 (session 31).
     20000 random lists; "first non-zero to the front" fails on [0, 2, 21]: 2102 vs 2021); a
     faster first-element rule is a follow-up marked as checked, not proven; kind `concat`,
     989 px.
+201. **New questions 0108 and 0109: tricky LeetCode with generalisations (session 34,
+    2026-11-13).** The owner asked for another round with generalisation parts, turned one down
+    (equalising an array, trailing zeros of n!, contribution sums, request/response orders,
+    nested envelopes, patching an array) and picked LeetCode 995 and 853/1776 from the next
+    (integer replacement and NAF, consecutive sums and odd divisors, circular Kadane, task
+    scheduler were the others). Both junior, parts a and b only. 0108: the forced greedy and
+    uniqueness, O(n) parity, the k x k grid; the ring is a follow-up (g = gcd(n, k) cycles of
+    p -> p+k, 2^g or 2^(g-1) solutions, the minimum per cycle with a parity fix; the lead checked
+    it by brute force on 3000 cases); kinds `kflip` and `kflip2`, 981 and 960 px. 0109: the
+    owner asked how meetings at non-integer times can be ignored; the page answers with
+    T_i = max(t_i, T_{i-1}) and the lower envelope of the free lines; part b is the monotonic
+    stack of LeetCode 1776; kind `carfleet`, 969 px. 0109 was committed alone first with
+    partial staging of the shared files (scratchpad partial_stage.py: HEAD plus only the added
+    lines that name the question).
 
 ---
 
