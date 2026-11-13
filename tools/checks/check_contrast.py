@@ -596,6 +596,21 @@ PAIRS = [
     ("0107 concat, the dot and the frame of the pair's b", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0107 concat, the outline of a place", "var(--viz-s4)", [CARD, PAGE], UI),
     ("0107 concat, the underline of the first digit that differs", "var(--viz-s5)", [CARD, PAGE], UI),
+    # 0109 carfleet (stylesheets/questions/0109-carfleet.css): the road, the position-time graphs and the box
+    ("0109 carfleet, a car's number or speed, a label on a graph, a table cell (a row arrived or caught tinted)", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color))"], TEXT),
+    ("0109 carfleet, the ticks, the table's caption", "var(--viz-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color))"], TEXT),
+    ("0109 carfleet, a car's number on part b's graph", "var(--viz-s1-text)", [CARD, PAGE], TEXT),
+    ("0109 carfleet, a car's number on part b's graph (orange), a bad field's note", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
+    ("0109 carfleet, a car's number on part b's graph (green)", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
+    ("0109 carfleet, a car's number on part b's graph (violet)", "var(--viz-s4-text)", [CARD, PAGE], TEXT),
+    ("0109 carfleet, a car's number on part b's graph (magenta-red)", "var(--viz-s5)", [CARD, PAGE], TEXT),
+    ("0109 carfleet, a fleet's line, path, dot and car outline (blue)", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0109 carfleet, a fleet's line, path, dot and car outline (orange)", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0109 carfleet, a fleet's line, path, dot and car outline (green), the flag", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0109 carfleet, a fleet's line, path, dot and car outline (violet)", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0109 carfleet, a fleet's line, path, dot and car outline (magenta-red)", "var(--viz-s5)", [CARD, PAGE], UI),
+    ("0109 carfleet, a sixth fleet, the target, a meeting's ring, the time line", "var(--viz-ink)", [CARD, PAGE], UI),
+    ("0109 carfleet, the lane, the ticks, a crossing too late", "var(--viz-text)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

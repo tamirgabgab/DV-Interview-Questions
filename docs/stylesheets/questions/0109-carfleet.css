@@ -1,0 +1,68 @@
+/* Question 0109, car fleets: the road and the position-time graphs of tools/figures/q0109.py,
+   and the box of explorer/carfleet.js (cf-*). A fleet (or, in part b's graph, a car) has one
+   of six colours, cf-c0 to cf-c5: its free line dashed thin, its real path bold, its dot at the
+   time of the box. The meetings are rings (filled once they happened in the box), a crossing
+   that comes too late a dashed hollow ring, the target a dashed line, the time of the box a
+   dark line. Colours from the palette only. */
+
+.md-typeset .cf-c0 { --cf: var(--viz-s1); --cft: var(--viz-s1-text); }
+.md-typeset .cf-c1 { --cf: var(--viz-s2); --cft: var(--viz-s2-text); }
+.md-typeset .cf-c2 { --cf: var(--viz-s3); --cft: var(--viz-s3-text); }
+.md-typeset .cf-c3 { --cf: var(--viz-s4); --cft: var(--viz-s4-text); }
+.md-typeset .cf-c4 { --cf: var(--viz-s5); --cft: var(--viz-s5); }
+.md-typeset .cf-c5 { --cf: var(--viz-ink); --cft: var(--viz-ink); }
+
+/* --- the road ----------------------------------------------------------------------------- */
+.md-typeset svg.cf-road .cf-lane { stroke: var(--viz-text); stroke-width: 2; }
+.md-typeset svg.cf-road .cf-tickl { stroke: var(--viz-text); stroke-width: 1; }
+.md-typeset svg.cf-road .tick { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.cf-road .cf-goal { stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg.cf-road .cf-flag { fill: var(--viz-s3); }
+.md-typeset svg.cf-road .cf-car rect,
+.md-typeset svg.cf-road .cf-car circle { fill: var(--md-default-bg-color); stroke: var(--cf, var(--viz-ink)); stroke-width: 2.5; }
+.md-typeset svg.cf-road .cf-car text { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.cf-road .cf-arrow { fill: var(--viz-ink); }
+.md-typeset svg.cf-road .cf-car.is-done circle { stroke-dasharray: 3 2; }
+
+/* --- the position-time graphs --------------------------------------------------------------- */
+.md-typeset svg.cf-graph .cf-target { stroke: var(--viz-ink); stroke-width: 1.5; stroke-dasharray: 7 4; }
+.md-typeset svg.cf-graph .cf-free { stroke: var(--cf); stroke-width: 1.4; stroke-dasharray: 5 4; opacity: 0.8; }
+.md-typeset svg.cf-graph .cf-path { stroke: var(--cf); stroke-linejoin: round; stroke-linecap: round; }
+.md-typeset svg.cf-graph .cf-meet { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg.cf-graph .cf-ghost { fill: none; stroke: var(--viz-text); stroke-width: 1.6; stroke-dasharray: 2 2; }
+.md-typeset svg.cf-graph .cf-lab { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.cf-graph .cf-carno { fill: var(--cft); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.cf-graph .tick { font-family: var(--md-code-font-family); }
+
+/* --- the legends -------------------------------------------------------------------------- */
+.md-typeset .viz-legend .cf-key-car { background: var(--md-default-bg-color); outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; border-radius: 4px; }
+.md-typeset .viz-legend .cf-key-goal { background: var(--viz-s3); clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.md-typeset .viz-legend .cf-key-free { background: repeating-linear-gradient(90deg, var(--viz-s1) 0 5px, transparent 5px 9px); height: 2px; }
+.md-typeset .viz-legend .cf-key-path { background: var(--viz-s1); height: 4px; }
+.md-typeset .viz-legend .cf-key-meet { background: var(--md-default-bg-color); outline: 2px solid var(--viz-ink); outline-offset: -2px; border-radius: 50%; }
+.md-typeset .viz-legend .cf-key-ghost { background: none; outline: 1.6px dashed var(--viz-text); outline-offset: -1.6px; border-radius: 50%; }
+.md-typeset .viz-legend .cf-key-target { background: repeating-linear-gradient(90deg, var(--viz-ink) 0 7px, transparent 7px 11px); height: 2px; }
+.md-typeset .viz-legend .cf-key-now { background: var(--viz-ink); width: 2px; }
+
+/* --- the box ------------------------------------------------------------------------------ */
+.md-typeset .explorer .cf-wrap { margin: 0.4rem 0; direction: ltr; }
+.md-typeset .explorer .cf-wrap svg { width: 100%; display: block; margin: 0 auto; max-width: 40rem; }
+.md-typeset .explorer svg.cf-graph .cf-meet.is-past { fill: var(--viz-ink); }
+.md-typeset .explorer .viz-legend .cf-key-meet { background: var(--viz-ink); }   /* the box's legend names the meetings that happened */
+.md-typeset .explorer svg.cf-live .tick { font-size: 15px; }       /* the box draws its figures narrower than the page */
+.md-typeset .explorer svg.cf-graph .cf-now { stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset .explorer svg.cf-graph .cf-dot { fill: var(--cf); stroke: var(--md-default-bg-color); stroke-width: 1.5; }
+.md-typeset .explorer .cf-tabwrap { margin: 0.4rem 0; overflow-x: auto; }
+.md-typeset .explorer table.cf-tab { font-size: 0.68rem; margin: 0; border-collapse: collapse; }
+.md-typeset .explorer table.cf-tab caption { font-size: 0.65rem; color: var(--viz-text); padding-bottom: 0.2rem; text-align: start; }
+.md-typeset .explorer table.cf-tab :is(th, td) { padding: 0.15rem 0.45rem; text-align: center; white-space: nowrap; }
+.md-typeset .explorer .cf-row.is-in td { background: color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cf-row.is-new td { font-weight: 700; }
+.md-typeset .explorer .cf-sw { display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--cf); margin-inline-end: 0.3rem; vertical-align: -0.05rem; }
+.md-typeset .explorer .cf-note { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer .cf-err { color: var(--viz-s2-text); }
+.md-typeset .explorer input.cf-target-f { width: 4.5rem; }
+.md-typeset .explorer input:is(.cf-pos-f, .cf-speed-f) { width: 9rem; max-width: 100%; }
+@media (max-width: 30em) {
+  .md-typeset .explorer input:is(.cf-pos-f, .cf-speed-f) { width: 100%; }
+}

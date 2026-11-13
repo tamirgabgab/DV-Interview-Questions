@@ -196,6 +196,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0105-hll.css         # 0105: HyperLogLog, the hash split, the registers, the pipeline and the box
   - stylesheets/questions/0106-thrice.css      # 0106: the number that appears once among threes, the state diagram of a bit, the tables of bits and the box
   - stylesheets/questions/0107-concat.css      # 0107: the largest number from concatenation, the number line of the values and the box
+  - stylesheets/questions/0109-carfleet.css    # 0109: car fleets, the road, the position-time graphs and the box
   - stylesheets/questions/0044-kapn.css        # 0012, 0044: the kapn, kapgraph and kapbase boxes on one screen (session 34)
   - stylesheets/questions/0014-shapes.css      # 0014: the shapes box on one screen, the heat map beside the board (session 34)
   - stylesheets/questions/0054-arbiter.css     # 0054: the block diagram of rr_arbiter, the pointer rows of the arbiter box (session 34)
