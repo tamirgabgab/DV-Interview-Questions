@@ -1,0 +1,77 @@
+/* Question 0105, HyperLogLog: the hash split, the register array and the pipelined update unit
+   of tools/figures/q0105.py, and the box of explorer/hll.js (hll-*). The bits that pick the
+   register are purple, the leading zeros orange, the first 1 green; a register is a blue tint,
+   darker as its value grows; the forwarding path of the pipeline is orange. The box's chart
+   draws HyperLogLog in blue, the single register in orange, the standard error as a grey band.
+   Colours from the palette only. */
+
+/* --- the hash split ----------------------------------------------------------------------- */
+.md-typeset svg.hll-hash .hll-bit { stroke-width: 1; }
+.md-typeset svg.hll-hash .hll-bit.is-idx { fill: color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color)); stroke: var(--viz-s4); }
+.md-typeset svg.hll-hash .hll-bit.is-zero { fill: color-mix(in srgb, var(--viz-s2) 26%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
+.md-typeset svg.hll-hash .hll-bit.is-one { fill: color-mix(in srgb, var(--viz-s3) 34%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2; }
+.md-typeset svg.hll-hash .hll-bit.is-rest { fill: var(--md-default-bg-color); stroke: var(--viz-grid); }
+.md-typeset svg.hll-hash .hll-bit-t { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.hll-hash .hll-bit-t.is-rest { fill: var(--viz-text); font-weight: 400; }
+.md-typeset svg.hll-hash .hll-bitno { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+
+/* --- the registers: the page's figure and the box's grid ---------------------------------- */
+.md-typeset svg :is(.hll-reg) rect { stroke-width: 1; }
+.md-typeset svg .hll-reg.hll-c0 rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); }
+.md-typeset svg .hll-reg.hll-c1 rect { fill: color-mix(in srgb, var(--viz-s1) 8%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .hll-reg.hll-c2 rect { fill: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .hll-reg.hll-c3 rect { fill: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .hll-reg.hll-c4 rect { fill: color-mix(in srgb, var(--viz-s1) 39%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .hll-reg.hll-c5 rect { fill: color-mix(in srgb, var(--viz-s1) 50%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .hll-reg.hll-c6 rect { fill: color-mix(in srgb, var(--viz-s1) 60%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg .hll-reg.is-new rect { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg .hll-reg text { fill: var(--viz-ink); font-size: 15px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .hll-reg text.is-big { font-size: 24px; }
+.md-typeset svg.hll-regs .hll-regno { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+
+/* --- the pipeline ------------------------------------------------------------------------- */
+.md-typeset svg.hll-pipe .hll-stage { fill: color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color)); stroke: var(--viz-text); stroke-width: 1.2; }
+.md-typeset svg.hll-pipe .hll-st-name { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.hll-pipe .hll-op { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.2; }
+.md-typeset svg.hll-pipe .hll-reg { fill: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.2; }
+.md-typeset svg.hll-pipe .hll-fwd { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2; }
+.md-typeset svg.hll-pipe .hll-ram { fill: color-mix(in srgb, var(--viz-s4) 14%, var(--md-default-bg-color)); stroke: var(--viz-s4); stroke-width: 1.2; }
+.md-typeset svg.hll-pipe .hll-pt { fill: var(--viz-ink); font-size: 13px; font-family: var(--md-code-font-family); }
+.md-typeset svg.hll-pipe .hll-pt-s,
+.md-typeset svg.hll-pipe .hll-io { fill: var(--viz-text); font-size: 13px; font-family: var(--md-code-font-family); }
+.md-typeset svg.hll-pipe .hll-wire { stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.hll-pipe .hll-head { fill: var(--viz-text); }
+.md-typeset svg.hll-pipe .hll-wire.hll-fwd-w { stroke: var(--viz-s2-text); stroke-width: 2.6; }
+.md-typeset svg.hll-pipe .hll-head.hll-fwd-h { fill: var(--viz-s2-text); }
+.md-typeset svg.hll-pipe .hll-wire.hll-dim { stroke-dasharray: 3 3; }
+
+/* --- the box's chart ---------------------------------------------------------------------- */
+.md-typeset .perf-chart .hll-band { fill: var(--viz-ink); fill-opacity: 0.1; }
+.md-typeset .perf-chart .hll-cursor { stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.md-typeset .perf-chart .hll-line-est { fill: none; stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset .perf-chart .hll-line-one { fill: none; stroke: var(--viz-s2); stroke-width: 1.4; stroke-dasharray: 5 3; }
+.md-typeset .perf-chart .hll-dot-est { fill: var(--viz-s1); stroke: var(--md-default-bg-color); stroke-width: 1.2; }
+.md-typeset .perf-chart .hll-dot-one { fill: var(--viz-s2); stroke: var(--md-default-bg-color); stroke-width: 1; }
+
+/* --- the legend keys ---------------------------------------------------------------------- */
+.md-typeset .viz-legend .hll-key-idx { background: color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s4); outline-offset: -1px; }
+.md-typeset .viz-legend .hll-key-zero { background: color-mix(in srgb, var(--viz-s2) 26%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s2); outline-offset: -1px; }
+.md-typeset .viz-legend .hll-key-one { background: color-mix(in srgb, var(--viz-s3) 34%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
+.md-typeset .viz-legend .hll-key-est { background: var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .hll-key-single { background: var(--viz-s2); }
+.md-typeset .viz-legend .hll-key-band { background: color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color)); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .hll-key-c0 { background: var(--md-default-bg-color); outline: 1px solid var(--viz-grid); outline-offset: -1px; }
+.md-typeset .viz-legend .hll-key-c1 { background: color-mix(in srgb, var(--viz-s1) 8%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .hll-key-c2 { background: color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .hll-key-c3 { background: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .hll-key-c4 { background: color-mix(in srgb, var(--viz-s1) 39%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .hll-key-c5 { background: color-mix(in srgb, var(--viz-s1) 50%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .hll-key-c6 { background: color-mix(in srgb, var(--viz-s1) 60%, var(--md-default-bg-color)); }
+.md-typeset .viz-legend .hll-key-new { background: none; outline: 2px solid var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .hll-scale { direction: ltr; unicode-bidi: isolate; white-space: nowrap; }
+.md-typeset .viz-legend .hll-scale i { margin-inline-end: 0; }
+
+/* --- the box -------------------------------------------------------------------------------- */
+.md-typeset .explorer .hll-chartwrap svg.perf-chart { margin: 0.2rem auto; max-width: 30rem; }
+.md-typeset .explorer .hll-gridwrap { max-width: 16rem; margin: 0.2rem auto; }
+.md-typeset .explorer .hll-gridwrap svg.figure { margin: 0 auto; }
