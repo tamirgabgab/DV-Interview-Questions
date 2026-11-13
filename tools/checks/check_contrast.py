@@ -611,6 +611,18 @@ PAIRS = [
     ("0109 carfleet, a fleet's line, path, dot and car outline (magenta-red)", "var(--viz-s5)", [CARD, PAGE], UI),
     ("0109 carfleet, a sixth fleet, the target, a meeting's ring, the time line", "var(--viz-ink)", [CARD, PAGE], UI),
     ("0109 carfleet, the lane, the ticks, a crossing too late", "var(--viz-text)", [CARD, PAGE], UI),
+    # 0108 kflip (stylesheets/questions/0108-kflip.css): the covering windows, the scan, the grid and its corners, the two boxes
+    ("0108 kflip, a bit, a window's number or a cell on its tint (a 1, an open or new window, a start, a corner, the band, a bad bit)", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s1", 22), ("s1", 28), ("s4", 30), ("s4", 22), ("s4", 12), ("text", 14), ("s5", 16))], TEXT),
+    ("0108 kflip, a 0 bit, an index, a row head, a closed window, a caption", "var(--viz-text)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("text", 14), ("s4", 12))], TEXT),
+    ("0108 kflip, a bit checked and found 1", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
+    ("0108 kflip, a bit left 0", "var(--viz-s5)", [CARD, PAGE], TEXT),
+    ("0108 kflip, a bad field's note", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
+    ("0108 kflip, the outline of a 1, an open window, a chosen square", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0108 kflip, the first 0 of a row", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0108 kflip, the new window or square, a corner, the windows over a bit", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0108 kflip, the outline of a bit left 0", "var(--viz-s5)", [CARD, PAGE], UI),
+    ("0108 kflip, the current cell, a hovered bit", "var(--viz-ink)", [CARD, PAGE], UI),
+    ("0108 kflip, a closed or other window, the arrows", "var(--viz-text)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

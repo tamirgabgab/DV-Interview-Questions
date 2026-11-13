@@ -1,0 +1,112 @@
+/* Question 0108, the fewest flips of k consecutive bits: the figures of tools/figures/q0108.py
+   (the windows that cover a bit, the scan of the example, the grid example and the corners of
+   one square) and the two boxes of explorer/kflip.js (kf-*, kf2-*). A 1 is blue, the window or
+   square just opened violet, the first bit still 0 framed orange, the bits and cells where no
+   window or square starts a grey tint, the step's bit framed in ink; a check that holds is
+   green and one that fails magenta-red. Colours from the palette only. */
+
+/* --- the figures ---------------------------------------------------------------------------- */
+.md-typeset svg:is(.kf-cover, .kf-grid) .kf-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.3; }
+.md-typeset svg:is(.kf-cover, .kf-grid) .kf-cell.kf-one { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.6; }
+.md-typeset svg.kf-grid .kf-cell.kf-band { fill: color-mix(in srgb, var(--viz-text) 14%, var(--md-default-bg-color)); }
+.md-typeset svg.kf-grid .kf-cell.kf-band.kf-one { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke-dasharray: 3 2; }
+.md-typeset svg.kf-grid .kf-cell.kf-corner { fill: color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color)); stroke: var(--viz-s4); stroke-width: 2; }
+.md-typeset svg:is(.kf-cover, .kf-grid) .kf-bit { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.kf-cover .kf-idx { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.kf-cover .kf-lab { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.kf-cover .kf-col { fill: color-mix(in srgb, var(--viz-s4) 12%, var(--md-default-bg-color)); stroke: var(--viz-s4); stroke-width: 1; stroke-dasharray: 4 3; }
+.md-typeset svg.kf-cover .kf-nostart { fill: color-mix(in srgb, var(--viz-text) 14%, var(--md-default-bg-color)); }
+.md-typeset svg.kf-cover .kf-bar rect { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.md-typeset svg.kf-cover .kf-bar.kf-old rect { fill: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.8; stroke-dasharray: none; }
+.md-typeset svg.kf-cover .kf-bar.kf-new rect { fill: color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color)); stroke: var(--viz-s4); stroke-width: 2.6; stroke-dasharray: none; }
+.md-typeset svg.kf-grid .kf-sq rect { fill: none; stroke: var(--viz-s4); stroke-width: 2.4; }
+.md-typeset svg.kf-grid .kf-sq circle { fill: var(--viz-s4); }
+.md-typeset svg.kf-grid .kf-arrow { stroke: var(--viz-text); stroke-width: 1.8; }
+
+/* the rows of bits of the tables */
+.md-typeset .kf-w { display: inline-flex; gap: 2px; direction: ltr; vertical-align: middle; }
+.md-typeset .kf-b { display: inline-block; min-width: 1.05rem; padding: 0.05rem 0; text-align: center; border: 1.2px solid var(--viz-grid); border-radius: 3px;
+  color: var(--viz-text); font-family: var(--md-code-font-family); font-variant-numeric: tabular-nums; line-height: 1.25; }
+.md-typeset .kf-b.kf-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .kf-b.kf-flip { box-shadow: inset 0 0 0 2px var(--viz-s4); }
+.md-typeset .kf-b.kf-first { outline: 2px solid var(--viz-s2); outline-offset: 1px; color: var(--viz-ink); font-weight: 700; }
+
+/* --- the legends ------------------------------------------------------------------------------ */
+.md-typeset .viz-legend .kf-key-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.6px solid var(--viz-s1); outline-offset: -1.6px; border-radius: 3px; }
+.md-typeset .viz-legend .kf-key-first { background: none; outline: 2px solid var(--viz-s2); outline-offset: -2px; border-radius: 3px; }
+.md-typeset .viz-legend .kf-key-flip { background: none; outline: 2px solid var(--viz-s4); outline-offset: -2px; border-radius: 3px; }
+.md-typeset .viz-legend .kf-key-old, .md-typeset .viz-legend .kf-key-open { background: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); outline: 1.8px solid var(--viz-s1); outline-offset: -1.8px; border-radius: 4px; }
+.md-typeset .viz-legend .kf-key-new { background: color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color)); outline: 2.4px solid var(--viz-s4); outline-offset: -2.4px; border-radius: 4px; }
+.md-typeset .viz-legend .kf-key-other, .md-typeset .viz-legend .kf-key-closed { background: none; outline: 1.2px dashed var(--viz-text); outline-offset: -1.2px; border-radius: 4px; }
+.md-typeset .viz-legend :is(.kf-key-nostart, .kf-key-band) { background: color-mix(in srgb, var(--viz-text) 14%, var(--md-default-bg-color)); border-radius: 3px; }
+.md-typeset .viz-legend .kf-key-sq { background: none; outline: 2.4px solid var(--viz-s1); outline-offset: -2.4px; border-radius: 4px; }
+.md-typeset .viz-legend .kf-key-sqv { background: none; outline: 2.4px solid var(--viz-s4); outline-offset: -2.4px; border-radius: 4px; }
+.md-typeset .viz-legend .kf-key-corner { background: color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s4); outline-offset: -2px; border-radius: 3px; }
+.md-typeset .viz-legend .kf-key-cur { background: none; outline: 2.5px solid var(--viz-ink); outline-offset: -2.5px; border-radius: 3px; }
+
+/* --- the row box ------------------------------------------------------------------------------ */
+.md-typeset .explorer .kf-sr { position: absolute; top: 0; inset-inline-start: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.md-typeset .explorer .kf-rowwrap { position: relative; overflow-x: auto; margin: 0.4rem 0; direction: ltr; }
+.md-typeset .explorer table.kf-tab { margin: 0 auto; border-collapse: separate; border-spacing: 2px 2px; font-family: var(--md-code-font-family); font-size: 0.7rem; }
+.md-typeset :where(.explorer table.kf-tab) :where(th, td) { padding: 0; border: 0; background: none; text-align: center; vertical-align: middle; }
+.md-typeset .explorer table.kf-tab tbody th { font-weight: 400; color: var(--viz-text); text-align: right; padding-right: 0.45em; white-space: nowrap; font-family: var(--md-text-font-family); }
+.md-typeset .explorer table.kf-tab th.kf-ix { color: var(--viz-text); font-weight: 400; min-width: 1.45rem; }
+.md-typeset .explorer table.kf-tab th.kf-ix.is-cur { color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer table.kf-tab td.kf-c { width: 1.45rem; height: 1.4rem; }
+.md-typeset .explorer table.kf-tab .is-nostart:is(td, th) { background: color-mix(in srgb, var(--viz-text) 14%, var(--md-default-bg-color)); border-radius: 3px; }
+.md-typeset .explorer table.kf-tab tr.kf-lane td { height: 0.95rem; }
+.md-typeset .explorer button.kf-bit, .md-typeset .explorer table.kf-tab .kf-b { width: 1.4rem; height: 1.35rem; min-width: 0; padding: 0; line-height: 1.2; }
+.md-typeset .explorer button.kf-bit { border: 1.2px solid var(--viz-grid); border-radius: 3px; background: var(--md-default-bg-color); color: var(--viz-text);
+  font: inherit; font-weight: 700; cursor: pointer; }
+.md-typeset .explorer button.kf-bit.kf-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); color: var(--viz-ink); }
+.md-typeset .explorer button.kf-bit:hover { border-color: var(--viz-ink); }
+.md-typeset .explorer button.kf-bit:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 1px; }
+.md-typeset .explorer table.kf-tab td.is-cur :is(.kf-b, .kf-bit) { box-shadow: 0 0 0 2px var(--viz-ink); }
+.md-typeset .explorer table.kf-tab .kf-b.is-bad { background: color-mix(in srgb, var(--viz-s5) 16%, var(--md-default-bg-color)); border-color: var(--viz-s5); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .kf-win { display: block; height: 0.75rem; margin: 0 2px; border-radius: 4px; font-size: 0.55rem; line-height: 0.75rem; text-align: start; padding-inline-start: 0.25rem;
+  border: 1.2px dashed var(--viz-text); color: var(--viz-text); }
+.md-typeset .explorer .kf-win.is-open { background: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); border: 1.8px solid var(--viz-s1); color: var(--viz-ink); }
+.md-typeset .explorer .kf-win.is-new { background: color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color)); border: 2.2px solid var(--viz-s4); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .kf-x { display: inline-block; width: 1.4rem; color: var(--viz-text); }
+.md-typeset .explorer .kf-x.is-start { color: var(--viz-ink); font-weight: 700; background: color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color)); border-radius: 3px; }
+.md-typeset .explorer .kf-x.is-ok { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer .kf-x.is-bad { color: var(--viz-s5); font-weight: 700; }
+.md-typeset .explorer :is(.kf-state, .kf-note, .kf2-note) { font-size: 0.7rem; line-height: 1.5; margin: 0.3em 0; }
+.md-typeset .explorer .kf-err { color: var(--viz-s2-text); }
+.md-typeset .explorer :is(input.kf-bits, input.kf2-grid) { width: 13rem; max-width: 100%; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0.1rem 0.4rem;
+  border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer :is(input.kf-bits, input.kf2-grid):focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 1px; }
+
+/* --- the grid box ------------------------------------------------------------------------------ */
+.md-typeset .explorer .kf2-boardwrap { margin: 0.4rem 0; direction: ltr; }
+.md-typeset .explorer .kf2-board { display: grid; grid-template-columns: repeat(var(--kf-cols), 1.75rem); grid-auto-rows: 1.75rem; gap: 3px; justify-content: center; }
+.md-typeset .explorer button.kf2-cell { width: 100%; height: 100%; padding: 0; border: 1.2px solid var(--viz-grid); border-radius: 3px; background: var(--md-default-bg-color);
+  color: var(--viz-text); font-family: var(--md-code-font-family); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+.md-typeset .explorer button.kf2-cell.is-band { background: color-mix(in srgb, var(--viz-text) 14%, var(--md-default-bg-color)); color: var(--viz-ink); }
+.md-typeset .explorer button.kf2-cell.kf-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); color: var(--viz-ink); }
+.md-typeset .explorer button.kf2-cell.is-band.kf-one { border-style: dashed; }
+.md-typeset .explorer button.kf2-cell.is-ok { box-shadow: inset 0 0 0 2px var(--viz-s3); }
+.md-typeset .explorer button.kf2-cell.is-bad { background: color-mix(in srgb, var(--viz-s5) 16%, var(--md-default-bg-color)); border-color: var(--viz-s5); color: var(--viz-ink); }
+.md-typeset .explorer button.kf2-cell.is-cur { outline: 2.5px solid var(--viz-ink); outline-offset: 1px; }
+.md-typeset .explorer button.kf2-cell:hover { border-color: var(--viz-ink); }
+.md-typeset .explorer button.kf2-cell:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; z-index: 2; }
+.md-typeset .explorer .kf2-sq { position: relative; z-index: 1; pointer-events: none; margin: 4px; border: 2px solid var(--viz-s1); border-radius: 5px; }
+.md-typeset .explorer .kf2-sq i { position: absolute; top: 2px; left: 2px; width: 6px; height: 6px; border-radius: 50%; background: var(--viz-s1); }
+.md-typeset .explorer .kf2-sq.is-new { border: 3px solid var(--viz-s4); z-index: 2; }
+.md-typeset .explorer .kf2-sq.is-new i { background: var(--viz-s4); }
+/* d and p side by side: on a narrow column their cells shrink (square) instead of stacking the two */
+.md-typeset .explorer .kf2-side { display: flex; gap: 0.8rem; justify-content: center; margin: 0.4rem 0; }
+.md-typeset .explorer figure.kf2-mini { margin: 0; flex: 0 1 auto; min-width: 0; }
+.md-typeset .explorer figure.kf2-mini figcaption { font-size: 0.65rem; color: var(--viz-text); margin: 0 0 0.2rem; max-width: none; }
+.md-typeset .explorer .kf2-mgrid { display: grid; grid-template-columns: repeat(var(--kf-cols), minmax(0, 1.05rem)); gap: 2px; }
+.md-typeset .explorer .kf2-m { aspect-ratio: 1; min-width: 0; display: flex; align-items: center; justify-content: center; border: 1px solid var(--viz-grid); border-radius: 2px; color: var(--viz-text);
+  font-family: var(--md-code-font-family); font-size: 0.6rem; }
+.md-typeset .explorer .kf2-m.is-out { border-style: dashed; }
+.md-typeset .explorer .kf2-m.is-corner { background: color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color)); border-color: var(--viz-s4); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .kf2-m.is-new { box-shadow: 0 0 0 2px var(--viz-s4); }
+.md-typeset .explorer .kf2-m.kf-one { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); border-color: var(--viz-s1); color: var(--viz-ink); font-weight: 700; }
+.md-typeset .explorer .kf2-m.is-cur { box-shadow: 0 0 0 2px var(--viz-ink); }
+@media (max-width: 30em) {
+  .md-typeset .explorer :is(input.kf-bits, input.kf2-grid) { width: 100%; }
+  .md-typeset .explorer .kf2-board { grid-template-columns: repeat(var(--kf-cols), 1.55rem); grid-auto-rows: 1.55rem; }
+}

@@ -1,6 +1,6 @@
 # Catalog
 
-All 108 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 109 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/build/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -112,4 +112,5 @@ All 108 questions, with links to their pages on the [live site](https://tamirgab
 | 0105 | [כמה כתובות שונות עברו באפיק – HyperLogLog בפחות מקילובייט](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0105-hyperloglog-distinct-addresses/) | senior (סניור) |
 | 0106 | [המספר שמופיע פעם אחת – כשכל השאר מופיעים שלוש פעמים](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0106-single-number-thrice/) | junior (ג'וניור) |
 | 0107 | [המספר הגדול ביותר משרשור – למה 3 לפני 30](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0107-largest-number-concatenation/) | junior (ג'וניור) |
+| 0108 | [היפוך של k ביטים רצופים – כמה היפוכים עד שכל הביטים 1](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0108-k-consecutive-bit-flips/) | junior (ג'וניור) |
 | 0109 | [שיירות של מכוניות – כמה מגיעות ליעד, ומתי כל מכונית משיגה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0109-car-fleet/) | junior (ג'וניור) |
