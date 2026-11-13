@@ -1249,6 +1249,21 @@ below start at item 112 (session 31).
     whole root for /0. Tags: TOPICS has no graphs / trie names, so the pages use the closest
     (algorithms, sorting, bfs; bitwise, digital-design, protocols); adding topic names is an
     open item.
+199. **New questions 0104 and 0105 (session 34, 2026-11-13).** From a later round of
+    proposals (the owner rejected merge-k, knapsack, Huffman and two-array median for now,
+    and the rain-water / gas-station pair as already in their pool, then asked for an expanded
+    write-up of the gas stations and HyperLogLog and picked both). 0104 gas stations on a
+    circle (junior): naive, one pass with the skip lemma and the start after the lowest
+    prefix sum, every good start (cycle lemma for sum 0, an exact O(n) condition for sum > 0,
+    all checked against brute force on 20000 rings); hardware only in words; new kind
+    `gasring` (ring, lap step by step, two-lap level chart), 933 px at most. 0105 HyperLogLog
+    (senior): exact count, one register, HLL with harmonic mean, small-range correction and
+    merge by max (rms error over 200 runs per m checked against 1.04/sqrt(m)), and part d
+    `hll_update` in SV with read-modify-write forwarding, the FORWARD = 0 mutant caught under
+    Verilator; new kind `hll` (stream, hash and m selects, register grid, error chart), 789 px.
+    check_contrast fix: a background list [CARD, PAGE, x, ...] had x under the opaque box
+    surface, so 170 tint checks never ran; check() now tests the box and each fill alone.
+    It found 0104's step leg (fixed) and 0087's rim (open item).
 
 ---
 
@@ -1287,6 +1302,10 @@ below start at item 112 (session 31).
 - [ ] Algorithms proposals not chosen (2026-11-13): LRU cache in O(1) (hash + doubly linked
   list; true LRU needs ceil(log2 N!) bits: 5 for 4 ways, 16 for 8; matrix vs tree PLRU) and
   Bloom filter (m/n = 8, 10, 16 give k = 6, 7, 11 and false positives 2.2%, 0.82%, 0.05%).
+- [ ] 0087 lights out: the dark rim (--viz-ink) of a light that is on is 1.3:1 against the
+  amber bulb in the dark scheme (found when check_contrast began testing the fills after
+  CARD, PAGE). The bulb still shows by its amber fill on the dark card; a darker rim in the
+  slate scheme would fix it. Not changed without the owner.
 - [ ] TOPICS (hooks) has no names for graphs, topological sort, trie or LPM; 0102 and 0103 use
   the closest tags. Add topic names if the owner wants them.
 - [ ] Candidate the owner liked (2026-11-07), not yet chosen to implement: check digits, ISBN-10
