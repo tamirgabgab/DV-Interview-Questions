@@ -1264,6 +1264,18 @@ below start at item 112 (session 31).
     check_contrast fix: a background list [CARD, PAGE, x, ...] had x under the opaque box
     surface, so 170 tint checks never ran; check() now tests the box and each fill alone.
     It found 0104's step leg (fixed) and 0087's rim (open item).
+200. **New questions 0106 and 0107: tricky LeetCode (session 34, 2026-11-13).** The owner
+    turned down three more rounds of proposals (common algorithms, DV/hardware-flavoured
+    ones, logic/math puzzles, plain LeetCode) and asked for tricky questions with a
+    non-obvious answer; picked LeetCode 137 and 179 (perfect squares by Legendre, maximum
+    gap by pigeonhole, reaching points backwards and candy in two passes were the others).
+    0106 (junior): XOR for twice, a mod-3 counter per bit in ones/twos derived from its state
+    table, a bit-sliced counter mod k; kind `thrice`, 971 px. 0107 (junior): the a||b rule,
+    the proof by rho(a) = a/(10^|a| - 1), and the smallest number: for every distinct non-zero
+    first element, the zeros then the rest ascending, take the least (the lead rechecked it on
+    20000 random lists; "first non-zero to the front" fails on [0, 2, 21]: 2102 vs 2021); a
+    faster first-element rule is a follow-up marked as checked, not proven; kind `concat`,
+    989 px.
 
 ---
 
