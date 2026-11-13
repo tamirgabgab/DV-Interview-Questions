@@ -523,6 +523,18 @@ PAIRS = [
     ("0101 sicherman, a bar that differs", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0101 sicherman, the mark of the triangle and the free factor's edge", "var(--viz-ink)", [CARD, PAGE], UI),
     ("0101 sicherman, the edge of the free factor's chip", "var(--viz-s4)", [CARD, PAGE], UI),
+    # 0102 toposort (stylesheets/questions/0102-toposort.css): the graphs, the Gantt chart and the box
+    ("0102 toposort, a task's letter on its tint", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s3", 28), ("s1", 26), ("s5", 22), ("ink", 30))], TEXT),
+    ("0102 toposort, a black task's letter", "var(--md-default-bg-color)", ["var(--viz-ink)"], TEXT),
+    ("0102 toposort, a badge, a slot or a bar on its tint", "var(--viz-ink)", [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s2", 18), ("s3", 22), ("s1", 16), ("s5", 18), ("s1", 20), ("s5", 20), ("s1", 28), ("s5", 26), ("s1", 13))], TEXT),
+    ("0102 toposort, the labels of the queue and the order, the successors", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0102 toposort, an arrow and a task's outline", "var(--viz-text)", [CARD, PAGE], UI),
+    ("0102 toposort, a lowered arrow (dashed)", "color-mix(in srgb, var(--viz-text) 60%, var(--md-default-bg-color))", [CARD, PAGE], UI),
+    ("0102 toposort, the cycle, the back edge and the critical path", "var(--viz-s5)", [CARD, PAGE], UI),
+    ("0102 toposort, the arrow being lowered", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0102 toposort, a ready task's outline", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0102 toposort, a task out of the queue, a bar", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0102 toposort, the task picked for an arrow", "var(--viz-s4)", [CARD, PAGE], UI),
     # 0037 editdist (stylesheets/questions/0037-editdist.css): the tables of the prefixes and the box
     ("0037 editdist, a value on the tint of its step", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color))"], TEXT),
     ("0037 editdist, the indices of the prefixes", "var(--viz-text)", [CARD, PAGE], TEXT),

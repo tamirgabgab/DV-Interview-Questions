@@ -1,0 +1,100 @@
+/* Question 0102, topological sort: the graphs, the Gantt chart and the legends of
+   tools/figures/q0102.py, and the box of explorer/toposort.js (ts-*). A task ready to run
+   (in-degree 0) is green, one that came out of the queue blue, the cycle and the critical
+   path magenta-red, a task stuck behind the cycle dashed; in the DFS figures a grey task is
+   on the current path and a black one is closed. The in-degree badges are orange, green at
+   0. Colours from the palette only. */
+
+/* --- the graphs ---------------------------------------------------------------------- */
+.md-typeset svg.ts-fig .ts-edge :is(line, path:not(.ts-head)) { stroke: var(--viz-text); stroke-width: 1.8; fill: none; }
+.md-typeset svg.ts-fig .ts-head { fill: var(--viz-text); }
+.md-typeset svg.ts-fig .ts-edge.is-done :is(line, path:not(.ts-head)) { stroke: color-mix(in srgb, var(--viz-text) 60%, var(--md-default-bg-color)); stroke-dasharray: 4 3; }
+.md-typeset svg.ts-fig .ts-edge.is-done .ts-head { fill: color-mix(in srgb, var(--viz-text) 60%, var(--md-default-bg-color)); }
+.md-typeset svg.ts-fig .ts-edge.is-path :is(line, path:not(.ts-head)) { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg.ts-fig .ts-edge.is-path .ts-head { fill: var(--viz-ink); }
+.md-typeset svg.ts-fig .ts-edge:is(.is-cycle, .is-back) :is(line, path:not(.ts-head)) { stroke: var(--viz-s5); stroke-width: 3; }
+.md-typeset svg.ts-fig .ts-edge.is-back :is(line, path:not(.ts-head)) { stroke-dasharray: 6 3; }
+.md-typeset svg.ts-fig .ts-edge:is(.is-cycle, .is-back) .ts-head { fill: var(--viz-s5); }
+.md-typeset svg.ts-fig .ts-edge.is-crit :is(line, path:not(.ts-head)) { stroke: var(--viz-s5); stroke-width: 3; }
+.md-typeset svg.ts-fig .ts-edge.is-crit .ts-head { fill: var(--viz-s5); }
+.md-typeset svg.ts-fig .ts-mult { fill: var(--viz-ink); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.ts-fig .ts-edge.is-now :is(line, path:not(.ts-head)) { stroke: var(--viz-s2); stroke-width: 3.5; }
+.md-typeset svg.ts-fig .ts-edge.is-now .ts-head { fill: var(--viz-s2); }
+.md-typeset svg.ts-fig .ts-node circle { fill: var(--md-default-bg-color); stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg.ts-fig .ts-node text { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.ts-fig .ts-node:is(.is-src, .is-ready) circle { fill: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2.5; }
+.md-typeset svg.ts-fig .ts-node.is-out circle { fill: color-mix(in srgb, var(--viz-s1) 26%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 2; }
+.md-typeset svg.ts-fig .ts-node.is-cycle circle { fill: color-mix(in srgb, var(--viz-s5) 22%, var(--md-default-bg-color)); stroke: var(--viz-s5); stroke-width: 2.5; }
+.md-typeset svg.ts-fig .ts-node.is-stuck circle { stroke-dasharray: 4 3; }
+.md-typeset svg.ts-fig .ts-node.is-crit circle { fill: color-mix(in srgb, var(--viz-s5) 22%, var(--md-default-bg-color)); stroke: var(--viz-s5); stroke-width: 2.5; }
+.md-typeset svg.ts-fig .ts-node.is-grey circle { fill: color-mix(in srgb, var(--viz-ink) 30%, var(--md-default-bg-color)); stroke: var(--viz-ink); stroke-width: 2; }
+.md-typeset svg.ts-fig .ts-node.is-black circle { fill: var(--viz-ink); stroke: var(--viz-ink); }
+.md-typeset svg.ts-fig .ts-node.is-black text { fill: var(--md-default-bg-color); }
+.md-typeset svg.ts-fig .ts-node.is-now circle { stroke: var(--viz-ink); stroke-width: 3.5; }
+.md-typeset svg.ts-fig .ts-badge rect { fill: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 1; }
+.md-typeset svg.ts-fig .ts-badge.is-zero rect { fill: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset svg.ts-fig .ts-badge.is-sched rect { fill: color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg.ts-fig .ts-badge.is-crit rect { fill: color-mix(in srgb, var(--viz-s5) 18%, var(--md-default-bg-color)); stroke: var(--viz-s5); stroke-width: 1.5; }
+.md-typeset svg.ts-fig .ts-badge.is-tent rect { fill: var(--md-default-bg-color); stroke: var(--viz-s1); stroke-dasharray: 3 2; }
+.md-typeset svg.ts-fig .ts-badge text { fill: var(--viz-ink); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.ts-fig .ts-band { fill: color-mix(in srgb, var(--viz-s1) 7%, var(--md-default-bg-color)); }
+.md-typeset svg.ts-fig .ts-band.is-alt { fill: color-mix(in srgb, var(--viz-s1) 13%, var(--md-default-bg-color)); }
+.md-typeset svg.ts-fig .ts-round circle { fill: var(--md-default-bg-color); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.ts-fig .ts-round text { fill: var(--viz-ink); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+
+/* --- the Gantt chart ------------------------------------------------------------------ */
+.md-typeset svg.ts-gantt .ts-glab { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.ts-gantt .ts-bar rect { fill: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.ts-gantt .ts-bar.is-crit rect { fill: color-mix(in srgb, var(--viz-s5) 26%, var(--md-default-bg-color)); stroke: var(--viz-s5); stroke-width: 2; }
+.md-typeset svg.ts-gantt .ts-bar text { fill: var(--viz-ink); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.ts-gantt .ts-slack { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 3 2; }
+.md-typeset svg.ts-gantt .ts-total { stroke: var(--viz-ink); stroke-width: 2; stroke-dasharray: 5 3; }
+.md-typeset svg.ts-gantt .ts-tent { stroke: var(--viz-s3); stroke-width: 2.5; }
+.md-typeset svg.ts-gantt .ts-gnone { fill: var(--viz-text); font-size: 12px; }
+
+/* --- the legends ---------------------------------------------------------------------- */
+.md-typeset .viz-legend :is(.ts-key-src, .ts-key-ready) { background: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s3); outline-offset: -2.5px; border-radius: 50%; }
+.md-typeset .viz-legend .ts-key-out { background: color-mix(in srgb, var(--viz-s1) 26%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s1); outline-offset: -2px; border-radius: 50%; }
+.md-typeset .viz-legend .ts-key-cycle { background: color-mix(in srgb, var(--viz-s5) 22%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s5); outline-offset: -2.5px; border-radius: 50%; }
+.md-typeset .viz-legend .ts-key-stuck { background: none; outline: 1.5px dashed var(--viz-text); outline-offset: -1.5px; border-radius: 50%; }
+.md-typeset .viz-legend .ts-key-white { background: var(--md-default-bg-color); outline: 1.5px solid var(--viz-text); outline-offset: -1.5px; border-radius: 50%; }
+.md-typeset .viz-legend .ts-key-grey { background: color-mix(in srgb, var(--viz-ink) 30%, var(--md-default-bg-color)); outline: 2px solid var(--viz-ink); outline-offset: -2px; border-radius: 50%; }
+.md-typeset .viz-legend .ts-key-black { background: var(--viz-ink); border-radius: 50%; }
+.md-typeset .viz-legend .ts-key-now { background: none; outline: 3px solid var(--viz-ink); outline-offset: -3px; border-radius: 50%; }
+.md-typeset .viz-legend .ts-key-sel { background: none; outline: 3px dashed var(--viz-s4); outline-offset: -3px; border-radius: 50%; }
+.md-typeset .viz-legend .ts-key-badge { background: color-mix(in srgb, var(--viz-s2) 18%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s2); outline-offset: -1px; border-radius: 3px; }
+.md-typeset .viz-legend .ts-key-band { background: color-mix(in srgb, var(--viz-s1) 13%, var(--md-default-bg-color)); border-radius: 3px; }
+.md-typeset .viz-legend .ts-key-path { background: var(--viz-ink); height: 4px; }
+.md-typeset .viz-legend .ts-key-back { background: repeating-linear-gradient(90deg, var(--viz-s5) 0 6px, transparent 6px 9px); height: 4px; }
+.md-typeset .viz-legend .ts-key-lower { background: var(--viz-s2); height: 4px; }
+.md-typeset .viz-legend .ts-key-crit { background: color-mix(in srgb, var(--viz-s5) 26%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s5); outline-offset: -2px; }
+.md-typeset .viz-legend .ts-key-bar { background: color-mix(in srgb, var(--viz-s1) 28%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; }
+.md-typeset .viz-legend .ts-key-slack { background: none; outline: 1.2px dashed var(--viz-text); outline-offset: -1.2px; }
+.md-typeset .viz-legend .ts-key-total { background: repeating-linear-gradient(180deg, var(--viz-ink) 0 4px, transparent 4px 6px); width: 3px; }
+.md-typeset .viz-legend .ts-key-tent { background: var(--viz-s3); width: 3px; }
+
+/* --- the box ------------------------------------------------------------------------- */
+.md-typeset .explorer .ts-wrap { margin: 0.4rem 0; direction: ltr; }
+.md-typeset .explorer .ts-wrap svg { width: 100%; display: block; margin: 0 auto; }
+.md-typeset .explorer svg.ts-live .ts-node[role=button] { cursor: pointer; }
+.md-typeset .explorer svg.ts-live .ts-node[role=button]:focus-visible { outline: none; }
+.md-typeset .explorer svg.ts-live .ts-node[role=button]:focus-visible circle { stroke: var(--site-focus-ring); stroke-width: 4; }
+.md-typeset .explorer svg.ts-live .ts-node.is-sel circle { stroke: var(--viz-s4); stroke-width: 3.5; stroke-dasharray: 5 3; }
+.md-typeset .explorer svg.ts-live .ts-lab { fill: var(--viz-text); font-size: 12px; font-weight: 700; }
+.md-typeset .explorer svg.ts-live :is(.ts-slot, .ts-qrow) rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset .explorer svg.ts-live :is(.ts-slot, .ts-qrow) text { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .explorer svg.ts-live .ts-qrow.is-empty rect { stroke-dasharray: 3 3; }
+.md-typeset .explorer svg.ts-live .ts-qrow.is-q rect { fill: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
+.md-typeset .explorer svg.ts-live .ts-qrow.is-o rect { fill: color-mix(in srgb, var(--viz-s1) 20%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset .explorer svg.ts-live .ts-qrow.is-new rect { stroke: var(--viz-ink); stroke-width: 2.5; }
+.md-typeset .explorer svg.ts-live .ts-qrow.is-crit rect { fill: color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color)); stroke: var(--viz-s5); }
+.md-typeset .explorer .ts-note, .md-typeset .explorer .ts-succ { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer .ts-succ { color: var(--viz-text); }
+.md-typeset .explorer input.ts-edges { width: 19rem; max-width: 100%; }
+.md-typeset .explorer input.ts-dur { width: 11rem; max-width: 100%; }
+.md-typeset .explorer:not(.ts-is-sched) .ts-sched-only { display: none; }
+.md-typeset .explorer.ts-is-sched .ts-kahn-only { display: none; }
+.md-typeset .explorer .ts-err { color: var(--viz-s2-text); }
+@media (max-width: 30em) {
+  .md-typeset .explorer input.ts-edges, .md-typeset .explorer input.ts-dur { width: 100%; }
+}
