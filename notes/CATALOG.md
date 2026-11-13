@@ -1,6 +1,6 @@
 # Catalog
 
-All 103 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 104 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/build/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -108,3 +108,4 @@ All 103 questions, with links to their pages on the [live site](https://tamirgab
 | 0101 | [קוביות Sicherman – מספרים אחרים על הפאות, אותה התפלגות של הסכום](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0101-sicherman-dice/) | junior (ג'וניור) |
 | 0102 | [מיון טופולוגי – באיזה סדר להריץ משימות תלויות, ומתי אין סדר כזה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0102-topological-sort/) | junior (ג'וניור) |
 | 0103 | [הקידומת הארוכה ביותר – טבלת ניתוב, עץ ביטים וחיפוש בצנרת](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0103-longest-prefix-match/) | senior (סניור) |
+| 0104 | [תחנות דלק על מעגל – מאיזו תחנה אפשר להשלים סיבוב](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0104-gas-station-circle/) | junior (ג'וניור) |

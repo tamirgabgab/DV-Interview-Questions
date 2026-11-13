@@ -196,6 +196,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0014-shapes.css      # 0014: the shapes box on one screen, the heat map beside the board (session 34)
   - stylesheets/questions/0054-arbiter.css     # 0054: the block diagram of rr_arbiter, the pointer rows of the arbiter box (session 34)
   - stylesheets/questions/0073-faro.css        # 0073: the faro box's outlined cycle (session 34)
+  - stylesheets/questions/0104-gasring.css     # 0104: gas stations on a circle, the ring, the charts of the levels and the box
 
 extra_javascript:
   - javascripts/mathjax.js

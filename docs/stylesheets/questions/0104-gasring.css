@@ -1,0 +1,78 @@
+/* Question 0104, gas stations on a circle: the ring, the charts of the levels and the legends
+   of tools/figures/q0104.py, and the box of explorer/gasring.js (gs-*). The gas of a station
+   is blue (+), the cost of a leg orange (−), a good start green; the levels are a blue line,
+   the lowest level a dotted magenta-red line, the lap from a start a violet shade with its
+   floor dashed violet. In the box the legs driven are blue, the leg of the step orange, the
+   leg where the tank goes below zero magenta-red; the start has a dashed violet ring and the
+   car's station a thick dark outline. Colours from the palette only. */
+
+/* --- the ring ------------------------------------------------------------------------- */
+.md-typeset svg.gs-fig .gs-leg path:not(.gs-head) { stroke: var(--viz-text); stroke-width: 1.8; fill: none; }
+.md-typeset svg.gs-fig .gs-leg .gs-head { fill: var(--viz-text); }
+.md-typeset svg.gs-fig .gs-cost { fill: var(--viz-s2-text); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.gs-fig .gs-gas { fill: var(--viz-s1-text); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.gs-fig .gs-st circle { fill: var(--md-default-bg-color); stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg.gs-fig .gs-st .gs-num { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.gs-fig .gs-st.is-good circle:not(.gs-ring) { fill: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 2.5; }
+
+/* --- the charts of the levels ------------------------------------------------------------- */
+.md-typeset svg.gs-chart .gs-win { fill: color-mix(in srgb, var(--viz-s4) 12%, var(--md-default-bg-color)); }
+.md-typeset svg.gs-chart .gs-lap { stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.md-typeset svg.gs-chart .gs-low { stroke: var(--viz-s5); stroke-width: 1.8; stroke-dasharray: 1.5 3; stroke-linecap: round; }
+.md-typeset svg.gs-chart .gs-floor { stroke: var(--viz-s4); stroke-width: 2; stroke-dasharray: 6 4; }
+.md-typeset svg.gs-chart .gs-line { stroke: var(--viz-s1); stroke-width: 2; fill: none; }
+.md-typeset svg.gs-chart .gs-pt { fill: var(--md-default-bg-color); stroke: var(--viz-s1); stroke-width: 1.8; }
+.md-typeset svg.gs-chart .gs-pt.is-good { fill: var(--viz-s3); stroke: var(--viz-s3); }
+.md-typeset svg.gs-chart .gs-val { fill: var(--viz-ink); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+
+/* --- the legends -------------------------------------------------------------------------- */
+.md-typeset .viz-legend .gs-key-gas { background: var(--viz-s1); border-radius: 3px; }
+.md-typeset .viz-legend .gs-key-cost { background: var(--viz-s2); border-radius: 3px; }
+.md-typeset .viz-legend .gs-key-good { background: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s3); outline-offset: -2.5px; border-radius: 50%; }
+.md-typeset .viz-legend .gs-key-start { background: none; outline: 2.5px dashed var(--viz-s4); outline-offset: -2.5px; border-radius: 50%; }
+.md-typeset .viz-legend .gs-key-now { background: none; outline: 3px solid var(--viz-ink); outline-offset: -3px; border-radius: 50%; }
+.md-typeset .viz-legend .gs-key-done { background: var(--viz-s1); height: 4px; }
+.md-typeset .viz-legend .gs-key-bad { background: var(--viz-s5); height: 4px; }
+.md-typeset .viz-legend .gs-key-line { background: var(--viz-s1); height: 3px; }
+.md-typeset .viz-legend .gs-key-low { background: repeating-linear-gradient(90deg, var(--viz-s5) 0 2px, transparent 2px 5px); height: 3px; }
+.md-typeset .viz-legend .gs-key-win { background: color-mix(in srgb, var(--viz-s4) 12%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s4); outline-offset: -1px; border-radius: 3px; }
+.md-typeset .viz-legend .gs-key-floor { background: repeating-linear-gradient(90deg, var(--viz-s4) 0 6px, transparent 6px 10px); height: 3px; }
+.md-typeset .viz-legend .gs-key-lap { background: repeating-linear-gradient(180deg, var(--viz-text) 0 3px, transparent 3px 6px); width: 2px; }
+
+/* --- the box ------------------------------------------------------------------------------ */
+.md-typeset .explorer .gs-wrap { margin: 0.4rem 0; direction: ltr; }
+.md-typeset .explorer .gs-wrap svg { width: 100%; display: block; margin: 0 auto; }
+.md-typeset .explorer svg.gs-live .gs-st[role=button] { cursor: pointer; }
+.md-typeset .explorer svg.gs-live .gs-st[role=button]:focus-visible { outline: none; }
+.md-typeset .explorer svg.gs-live .gs-st[role=button]:focus-visible circle:not(.gs-ring) { stroke: var(--site-focus-ring); stroke-width: 4; }
+.md-typeset .explorer svg.gs-live .gs-st .gs-ring { fill: none; stroke: var(--viz-s4); stroke-width: 2.5; stroke-dasharray: 4 3; }
+.md-typeset .explorer svg.gs-live .gs-st.is-now circle:not(.gs-ring) { stroke: var(--viz-ink); stroke-width: 3.5; }
+.md-typeset .explorer svg.gs-live .gs-leg.is-done path:not(.gs-head) { stroke: var(--viz-s1); stroke-width: 3; }
+.md-typeset .explorer svg.gs-live .gs-leg.is-done .gs-head { fill: var(--viz-s1); }
+.md-typeset .explorer svg.gs-live .gs-leg.is-now path:not(.gs-head) { stroke: var(--viz-s2); stroke-width: 3.5; }
+.md-typeset .explorer svg.gs-live .gs-leg.is-now .gs-head { fill: var(--viz-s2); }
+.md-typeset .explorer svg.gs-live .gs-leg.is-bad path:not(.gs-head) { stroke: var(--viz-s5); stroke-width: 3.5; }
+.md-typeset .explorer svg.gs-live .gs-leg.is-bad .gs-head { fill: var(--viz-s5); }
+.md-typeset .explorer svg.gs-live .gs-tanklab { fill: var(--viz-text); font-size: 13px; font-weight: 700; }
+.md-typeset .explorer svg.gs-live .gs-tankval { fill: var(--viz-ink); font-size: 26px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .explorer svg.gs-live .gs-tankval.is-neg { fill: var(--viz-s5); }
+.md-typeset .explorer svg.gs-chart.gs-live .gs-drive { stroke: var(--viz-s2); stroke-width: 3.5; fill: none; stroke-linejoin: round; }
+.md-typeset .explorer svg.gs-chart.gs-live .gs-drive.is-bad { stroke: var(--viz-s5); }
+.md-typeset .explorer svg.gs-chart.gs-live .gs-pt.is-bad { fill: var(--viz-s5); stroke: var(--viz-s5); }
+.md-typeset .explorer svg.gs-chart.gs-live .gs-pt.is-now { stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset .explorer .gs-tankwrap { margin: 0.3rem 0; }
+.md-typeset .explorer .gs-tankhead { font-size: 0.65rem; color: var(--viz-text); margin: 0 0 0.2rem; }
+.md-typeset .explorer .gs-tank { display: grid; gap: 3px; }
+.md-typeset .explorer .gs-cell { display: flex; flex-direction: column; align-items: center; padding: 1px 0 2px; border: 1.5px solid var(--viz-grid); border-radius: 4px; background: var(--md-default-bg-color); min-width: 0; }
+.md-typeset .explorer .gs-cell small { font-size: 0.6rem; color: var(--viz-text); font-family: var(--md-code-font-family); white-space: nowrap; }
+.md-typeset .explorer .gs-cell b { font-size: 0.7rem; color: var(--viz-ink); font-family: var(--md-code-font-family); white-space: nowrap; }
+.md-typeset .explorer .gs-cell.is-done { background: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); border-color: var(--viz-s1); }
+.md-typeset .explorer .gs-cell.is-now { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset .explorer .gs-cell.is-neg { background: color-mix(in srgb, var(--viz-s5) 16%, var(--md-default-bg-color)); border-color: var(--viz-s5); }
+.md-typeset .explorer .gs-cell.is-off { border-style: dashed; }
+.md-typeset .explorer .gs-note { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer .gs-err { color: var(--viz-s2-text); }
+.md-typeset .explorer input:is(.gs-gasf, .gs-costf) { width: 11rem; max-width: 100%; }
+@media (max-width: 30em) {
+  .md-typeset .explorer input:is(.gs-gasf, .gs-costf) { width: 100%; }
+}
