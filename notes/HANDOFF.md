@@ -1232,6 +1232,23 @@ below start at item 112 (session 31).
     (deployed 2026-11-12 00:09 UTC, branch CI green first), then the docs commit; a crawl of
     the live site (122 pages, 264 links and files) found no 404, and the twelve pages' 24
     boxes (0003 and 0013 included) built with no script error.
+198. **New questions 0102 and 0103: algorithms and data structures (session 34,
+    2026-11-13).** The owner asked for new questions in this direction and picked two of four
+    proposals (LRU cache and Bloom filter not chosen). 0102 topological sort (junior): Kahn
+    with cycle detection, DFS with three colours, the critical path (total 15 on the
+    example, E → C → D → F → G); hardware only as a follow-up in words (a scoreboard issues
+    one Kahn level per clock); new kind `toposort` (graph edited by clicks or an edge list,
+    Kahn stepped, a schedule mode with a Gantt chart), worst state 975 px at 1920. 0103
+    longest prefix match (senior): naive scan (the /0 shift trap), binary trie with insert
+    and delete, multibit trie with controlled prefix expansion (a stride table for s = 1, 2,
+    4, 8), and part d a pipelined trie lookup `lpm_pipe` in SV tested under Verilator against
+    the naive model with mutations; TCAM as a follow-up. New kind `lpmtrie` (8-bit prefix
+    table, trie drawn, an address walked, stride 1 or 2), worst state 961 px. Two agents in
+    parallel on the session's model and effort. 0103's agent corrected its own short answer:
+    a /k prefix expands to 2^(s - k mod s) entries, one entry when s divides k (k > 0), the
+    whole root for /0. Tags: TOPICS has no graphs / trie names, so the pages use the closest
+    (algorithms, sorting, bfs; bitwise, digital-design, protocols); adding topic names is an
+    open item.
 
 ---
 
@@ -1267,6 +1284,11 @@ below start at item 112 (session 31).
 ### Content
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
+- [ ] Algorithms proposals not chosen (2026-11-13): LRU cache in O(1) (hash + doubly linked
+  list; true LRU needs ceil(log2 N!) bits: 5 for 4 ways, 16 for 8; matrix vs tree PLRU) and
+  Bloom filter (m/n = 8, 10, 16 give k = 6, 7, 11 and false positives 2.2%, 0.82%, 0.05%).
+- [ ] TOPICS (hooks) has no names for graphs, topological sort, trie or LPM; 0102 and 0103 use
+  the closest tags. Add topic names if the owner wants them.
 - [ ] Candidate the owner liked (2026-11-07), not yet chosen to implement: check digits, ISBN-10
   against Luhn. ISBN-10 (weights 10..1, mod 11) catches every single-digit error and every
   swap of two digits, since (i − j)(b − a) is never 0 mod the prime 11; Luhn (mod 10, the
