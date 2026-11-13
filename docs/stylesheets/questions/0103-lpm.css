@@ -1,0 +1,81 @@
+/* Question 0103, longest prefix match: the binary trie and the pipeline of
+   tools/figures/q0103.py, and the box of explorer/lpmtrie.js (lpm-*). A node or an entry that
+   holds a prefix is blue, the walk of a lookup is a thick blue line, the best match so far
+   is green; an entry the multibit trie filled by expanding a shorter prefix is a paler blue
+   with a dashed edge. Colours from the palette only. */
+
+/* the trie: the page's figure and the box's live one */
+.md-typeset svg.lpm-trie .lpm-edge { stroke: var(--viz-grid); stroke-width: 1.6; fill: none; }
+.md-typeset svg.lpm-trie .lpm-edge.is-on { stroke: var(--viz-s1); stroke-width: 3.2; }
+.md-typeset svg.lpm-trie .lpm-edge.lpm-miss { stroke: var(--viz-s2); stroke-width: 1.6; stroke-dasharray: 4 3; }
+.md-typeset svg.lpm-trie .lpm-miss-t { fill: var(--viz-s2-text); font-size: 16px; font-weight: 700; }
+.md-typeset svg.lpm-trie .lpm-bit { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.lpm-trie .lpm-depth { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.lpm-trie .lpm-node circle { stroke-width: 1.4; }
+.md-typeset svg.lpm-trie .lpm-node.no-hop circle { fill: var(--md-default-bg-color); stroke: var(--viz-text); }
+.md-typeset svg.lpm-trie .lpm-node.has-hop circle { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
+.md-typeset svg.lpm-trie .lpm-node.is-on circle { stroke: var(--viz-s1); stroke-width: 3; }
+.md-typeset svg.lpm-trie .lpm-node.is-win circle { fill: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 3.4; }
+.md-typeset svg.lpm-trie .lpm-node.is-cur circle { stroke-dasharray: 5 2.5; }
+.md-typeset svg.lpm-trie .lpm-node text,
+.md-typeset svg.lpm-trie .lpm-cell text { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+
+/* the multibit trie of the box: a node is a row of entries */
+.md-typeset svg.lpm-multi .lpm-cell rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1; }
+.md-typeset svg.lpm-multi .lpm-cell.has-hop rect { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); }
+.md-typeset svg.lpm-multi .lpm-cell.is-exp rect { fill: color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-dasharray: 3 2; }
+.md-typeset svg.lpm-multi .lpm-cell.is-on rect { stroke: var(--viz-s1); stroke-width: 3; stroke-dasharray: none; }
+.md-typeset svg.lpm-multi .lpm-cell.is-win rect { fill: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 3.4; }
+.md-typeset svg.lpm-multi .lpm-cell.is-cur rect { stroke-dasharray: 5 2.5; }
+.md-typeset svg.lpm-multi .lpm-mnode { fill: none; stroke: var(--viz-ink); stroke-width: 1.2; }
+.md-typeset svg.lpm-multi .lpm-mnode.is-on { stroke: var(--viz-s1); stroke-width: 1.8; }
+.md-typeset svg.lpm-multi .lpm-chunk { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+
+/* the pipeline */
+.md-typeset svg.lpm-pipe .lpm-stage { fill: color-mix(in srgb, var(--viz-ink) 4%, var(--md-default-bg-color)); stroke: var(--viz-text); stroke-width: 1.2; }
+.md-typeset svg.lpm-pipe .lpm-st-name { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.lpm-pipe .lpm-mem { fill: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.2; }
+.md-typeset svg.lpm-pipe .lpm-reg { fill: color-mix(in srgb, var(--viz-s3) 14%, var(--md-default-bg-color)); stroke: var(--viz-s3); stroke-width: 1.2; }
+.md-typeset svg.lpm-pipe .lpm-mem-t,
+.md-typeset svg.lpm-pipe .lpm-reg-t { fill: var(--viz-ink); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.lpm-pipe .lpm-mem-s { fill: var(--viz-text); font-size: 11px; font-family: var(--md-code-font-family); }
+.md-typeset svg.lpm-pipe .lpm-wire { stroke: var(--viz-text); stroke-width: 1.4; }
+.md-typeset svg.lpm-pipe .lpm-head { fill: var(--viz-text); }
+.md-typeset svg.lpm-pipe .lpm-io { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+
+/* the legend keys */
+.md-typeset .viz-legend .lpm-key-hop { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s1); outline-offset: -1px; border-radius: 50%; }
+.md-typeset .viz-legend .lpm-key-nohop { background: var(--md-default-bg-color); outline: 1px solid var(--viz-text); outline-offset: -1px; border-radius: 50%; }
+.md-typeset .viz-legend .lpm-key-on { height: 0.2rem; border-radius: 1px; background: var(--viz-s1); }
+.md-typeset .viz-legend .lpm-key-win { background: color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s3); outline-offset: -2px; }
+.md-typeset .viz-legend .lpm-key-exp { background: color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color)); outline: 1px dashed var(--viz-s1); outline-offset: -1px; }
+.md-typeset .explorer:not(.lpm-is-multi) .lpm-only2 { display: none; }
+
+/* the box: the address bits, the table of routes and the walk */
+.md-typeset .explorer .lpm-addr { width: 4.2rem; }
+.md-typeset .explorer .lpm-abits { font-family: var(--md-code-font-family); font-size: 0.75rem; letter-spacing: 0.06em; white-space: pre; }
+.md-typeset .explorer .lpm-abits b { font-weight: 400; color: var(--viz-text); }
+.md-typeset .explorer .lpm-abits b.is-read { font-weight: 700; color: var(--viz-ink); text-decoration: underline 2px var(--viz-s1); text-underline-offset: 3px; }
+.md-typeset .explorer .lpm-figwrap { display: flex; justify-content: center; margin: 0.3rem 0; }
+.md-typeset .explorer .lpm-figwrap svg { width: 100%; height: auto; }
+.md-typeset .explorer :is(.lpm-tabwrap, .lpm-pathwrap) { max-width: 100%; overflow-x: auto; margin: 0.3rem 0; }
+.md-typeset .explorer :is(.lpm-tabwrap, .lpm-pathwrap):focus-visible { outline: 3px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer :is(table.lpm-tab, table.lpm-path) { font-size: 0.7rem; margin: 0; border-collapse: collapse; }
+.md-typeset .explorer :is(table.lpm-tab, table.lpm-path) :is(td, th) { padding: 0.08rem 0.4rem; line-height: 1.35; vertical-align: middle; text-align: center; }
+.md-typeset .explorer table.lpm-tab input { width: 3.6rem; font: inherit; font-family: var(--md-code-font-family); padding: 0.05rem 0.3rem; border: 1px solid var(--viz-grid); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer table.lpm-tab input.lpm-hop { width: 2.2rem; text-align: center; }
+.md-typeset .explorer table.lpm-tab input[aria-invalid] { border-color: var(--viz-s2); border-width: 2px; }
+.md-typeset .explorer table.lpm-tab .lpm-bits { min-width: 4.4rem; }
+.md-typeset .explorer table.lpm-tab .lpm-hit { white-space: nowrap; }
+.md-typeset .explorer table.lpm-tab tr.is-hit td { background: color-mix(in srgb, var(--viz-s1) 10%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.lpm-tab tr.is-win td { background: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); font-weight: 700; }
+.md-typeset .explorer table.lpm-tab tr.is-bad .lpm-bits { color: var(--viz-s2-text); font-weight: 700; }
+.md-typeset .explorer table.lpm-path td { font-family: var(--md-code-font-family); }
+/* the walk scrolls inside its region past six rows, its head kept, the current row in view */
+.md-typeset .explorer .lpm-pathwrap { position: relative; max-height: 8.6rem; overflow-y: auto; }
+.md-typeset .explorer table.lpm-path thead th { position: sticky; top: 0; z-index: 1; background: color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.lpm-path tr.is-later td { color: var(--viz-text); }
+.md-typeset .explorer table.lpm-path tr.is-cur td { background: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); font-weight: 700; }
+.md-typeset .explorer table.lpm-path .lpm-b { font-weight: 700; }
+.md-typeset .explorer .lpm-note { color: var(--viz-s2-text); font-size: 0.68rem; margin: 0.2rem 0; }
+.md-typeset .explorer .lpm-naive { font-size: 0.7rem; margin: 0.2rem 0; }
