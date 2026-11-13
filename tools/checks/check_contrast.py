@@ -574,6 +574,28 @@ PAIRS = [
     ("0105 hll, the estimate's points and line", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0105 hll, the single register's points and line", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0105 hll, the outline of a changed register", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 60%, var(--md-default-bg-color))"], UI),
+    # 0106 thrice (stylesheets/questions/0106-thrice.css): the state diagram of a bit, the tables of bits and the box
+    ("0106 thrice, a bit, a state's code or a value on its tint", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s1", 22), ("s2", 22), ("ink", 12), ("s4", 20), ("s5", 16), ("s4", 12))], TEXT),
+    ("0106 thrice, a 0 bit, the row heads, the state 11, a loop's label", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0106 thrice, the label of the move of the step", "var(--viz-s4-text)", [CARD, PAGE], TEXT),
+    ("0106 thrice, a bad field's note", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
+    ("0106 thrice, the selected lane's number", "var(--md-default-bg-color)", ["var(--viz-ink)"], TEXT),
+    ("0106 thrice, the outline of the state 01 and of a 1 in ones", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0106 thrice, the outline of the state 10 and of a 1 in twos", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0106 thrice, the move of the step, a changed bit, a nonzero count", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0106 thrice, the state 11 reached, a state that is not the count", "var(--viz-s5)", [CARD, PAGE], UI),
+    ("0106 thrice, a move on a 1, the state of the step, the bit coming in", "var(--viz-ink)", [CARD, PAGE], UI),
+    ("0106 thrice, a move on a 0, the outline of the states 00 and 11", "var(--viz-text)", [CARD, PAGE], UI),
+    # 0107 concat (stylesheets/questions/0107-concat.css): the number line of the values and the box
+    ("0107 concat, a number, a place or a digit of a join on its tint", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s1", 14), ("s2", 16), ("s4", 22), ("s5", 24))], TEXT),
+    ("0107 concat, the axis labels of the line", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0107 concat, a sort that gives the answer", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
+    ("0107 concat, a sort that misses it, a bad field's note", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
+    ("0107 concat, the axis, the ticks, the leads, a number's frame", "var(--viz-text)", [CARD, PAGE], UI),
+    ("0107 concat, a value's dot, the frame of the pair's a", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0107 concat, the dot and the frame of the pair's b", "var(--viz-s2)", [CARD, PAGE], UI),
+    ("0107 concat, the outline of a place", "var(--viz-s4)", [CARD, PAGE], UI),
+    ("0107 concat, the underline of the first digit that differs", "var(--viz-s5)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

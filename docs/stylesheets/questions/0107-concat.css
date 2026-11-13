@@ -1,0 +1,60 @@
+/* Question 0107, the largest number from concatenation: the number line of the values
+   a / (10^|a| - 1) of tools/figures/q0107.py and the box of explorer/concat.js (cc-*). A value
+   is a blue dot on the line; the numbers sit in a row under it in the order of their values,
+   each joined to its dot, with its place in the answer in a violet disc. In the box the pair's
+   a is blue and its b orange, the numbers of a join alternate a light tint, and the first digit
+   where a join falls from the answer is magenta-red. Colours from the palette only. */
+
+/* --- the number line --------------------------------------------------------------------- */
+.md-typeset svg.cc-line .cc-axis { stroke: var(--viz-text); stroke-width: 1.6; }
+.md-typeset svg.cc-line .cc-tick { stroke: var(--viz-text); stroke-width: 1.2; }
+.md-typeset svg.cc-line .cc-tl { fill: var(--viz-text); font-size: 12px; font-family: var(--md-code-font-family); }
+.md-typeset svg.cc-line .cc-lead { stroke: var(--viz-text); stroke-width: 1; stroke-dasharray: 3 2; fill: none; }
+.md-typeset svg.cc-line .cc-dot { fill: var(--viz-s1); stroke: var(--md-default-bg-color); stroke-width: 1.5; }
+.md-typeset svg.cc-line .cc-lab rect { fill: var(--md-default-bg-color); stroke: var(--viz-text); stroke-width: 1.2; }
+.md-typeset svg.cc-line .cc-num { fill: var(--viz-ink); font-size: 14px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.cc-line .cc-place { fill: color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color)); stroke: var(--viz-s4); stroke-width: 1.2; }
+.md-typeset svg.cc-line .cc-pl { fill: var(--viz-ink); font-size: 11px; font-weight: 700; font-family: var(--md-code-font-family); }
+
+/* the pair of the box */
+.md-typeset svg.cc-line .cc-dot.is-a { fill: var(--viz-s1); stroke: var(--viz-ink); }
+.md-typeset svg.cc-line .cc-dot.is-b { fill: var(--viz-s2); stroke: var(--viz-ink); }
+.md-typeset svg.cc-line .cc-lab.is-a rect { stroke: var(--viz-s1); stroke-width: 2.5; fill: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); }
+.md-typeset svg.cc-line .cc-lab.is-b rect { stroke: var(--viz-s2); stroke-width: 2.5; fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); }
+.md-typeset svg.cc-line .cc-lead.is-a { stroke: var(--viz-s1); stroke-width: 1.8; stroke-dasharray: none; }
+.md-typeset svg.cc-line .cc-lead.is-b { stroke: var(--viz-s2); stroke-width: 1.8; stroke-dasharray: none; }
+
+/* --- the legends -------------------------------------------------------------------------- */
+.md-typeset .viz-legend .cc-key-dot { background: var(--viz-s1); border-radius: 50%; }
+.md-typeset .viz-legend .cc-key-lab { background: var(--md-default-bg-color); outline: 1.2px solid var(--viz-text); outline-offset: -1.2px; border-radius: 3px; }
+.md-typeset .viz-legend .cc-key-place { background: color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color)); outline: 1.2px solid var(--viz-s4); outline-offset: -1.2px; border-radius: 50%; }
+.md-typeset .viz-legend .cc-key-a { background: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s1); outline-offset: -2.5px; border-radius: 3px; }
+.md-typeset .viz-legend .cc-key-b { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); outline: 2.5px solid var(--viz-s2); outline-offset: -2.5px; border-radius: 3px; }
+.md-typeset .viz-legend .cc-key-diff { background: color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color)); border-bottom: 2.5px solid var(--viz-s5); border-radius: 2px; }
+
+/* --- the box ------------------------------------------------------------------------------ */
+.md-typeset .explorer .cc-wrap { margin: 0.3rem 0; direction: ltr; }
+.md-typeset .explorer .cc-wrap svg { width: 100%; display: block; margin: 0 auto; }
+.md-typeset .explorer input.cc-nums { width: 13rem; max-width: 100%; }
+.md-typeset .explorer .cc-pairrow select { min-width: 4.5rem; }
+.md-typeset .explorer :is(.cc-rows, .cc-ptab, .cc-ctab) { display: table; width: 100%; margin: 0.2rem 0; font-size: 0.7rem; border-collapse: collapse; }
+.md-typeset .explorer :is(.cc-rows, .cc-ptab, .cc-ctab) :is(th, td) { padding: 0.25em 0.4em; border-bottom: 1px solid var(--viz-grid); vertical-align: middle; }
+.md-typeset .explorer :is(.cc-rows, .cc-ctab) th { font-weight: 600; text-align: start; min-width: 0; }
+.md-typeset .explorer .cc-ctab th { font-family: var(--md-code-font-family); text-align: center; width: 3.2em; }
+.md-typeset .explorer .cc-ptab th { font-weight: 600; white-space: nowrap; width: 3.5em; }
+.md-typeset .explorer .cc-ptab td { font-family: var(--md-code-font-family); }
+.md-typeset .explorer .cc-join { display: inline-flex; flex-wrap: wrap; font-family: var(--md-code-font-family); font-size: 0.78rem; color: var(--viz-ink); }
+.md-typeset .explorer .cc-it { padding: 0 1px; border-radius: 2px; }
+.md-typeset .explorer .cc-it:nth-child(odd) { background: color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color)); }
+.md-typeset .explorer .cc-diff { background: color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color)); border-bottom: 2px solid var(--viz-s5); font-weight: 700; }
+.md-typeset .explorer .cc-res { white-space: nowrap; text-align: center; }
+.md-typeset .explorer tr.is-right .cc-res { color: var(--viz-s3-text); font-weight: 700; }
+.md-typeset .explorer .cc-rows tr.is-wrong .cc-res { color: var(--viz-s2-text); }
+.md-typeset .explorer .cc-verdict, .md-typeset .explorer .cc-head, .md-typeset .explorer .cc-note { font-size: 0.7rem; margin: 0.25em 0; }
+.md-typeset .explorer .cc-head { font-weight: 600; }
+.md-typeset .explorer .cc-cscroll { max-height: 9rem; overflow-y: auto; }   /* up to 8 candidates: a scroll region */
+.md-typeset .explorer .cc-err { color: var(--viz-s2-text); }
+@media (max-width: 30em) {
+  .md-typeset .explorer input.cc-nums { width: 100%; }
+  .md-typeset .explorer .cc-rows th { width: 7.5em; }   /* the joins keep most of the row */
+}
