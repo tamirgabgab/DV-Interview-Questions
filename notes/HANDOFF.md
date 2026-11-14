@@ -1340,6 +1340,35 @@ below start at item 112 (session 31).
       pushing round 2 cancelled round 1's branch run, and one green run covered both. Live:
       the map has 0109 and the worker has the cap. GitHub Pages answers 400 itself to a path
       with a cut escape ("%E0%A"), so the 404 fix only shows for escapes it lets through.
+205. **CSS cleanup: dead rules and overridden declarations (session 34, 2026-11-14).** The
+    owner chose dead rules plus duplicates, with no visible change. 22 selectors that name
+    a class used nowhere (site HTML, JS, hooks, templates, generators, with the prefixes the
+    scripts build) are gone (`.cm-editor` stays: CodeMirror makes it). 97 declarations that
+    a later rule with the same selector in the same @media replaces (load order of
+    `extra_css`) are gone, 23 rules that were left empty with them, and 4 more that a later
+    rule outside any @media replaces (13-motion's M9 skeleton). The square-wave dividers of
+    22-circuit.css (off since session 33) are gone with circuit.js's `dividers()`.
+    Checked by the computed style of about 60 properties of every element of 21 pages, light
+    at 1200 px and dark at 390 px, before and after: no difference except the two collisions
+    below and `hr`'s position (no children now). Two class collisions were bugs and are
+    fixed: 0001's `.ed-key-now` (blue) overrode 0037's legend key (the step cell is ink),
+    now scoped by `.ed-legend`; 0093's `svg.sm-fig .sm-lab` (13 px bold) overrode 0063's
+    figure labels, which overflowed the comparator pills; 0093's figure is `svg.sm-match`
+    now. 0104's `.gs-note` duplicated 0060's rule of the same name; one rule stays.
+206. **A page on how the site is built, with two animated diagrams (session 34,
+    2026-11-14).** The owner's choices: a new page linked from the footer and the README,
+    two diagrams, animated. `docs/how-built.md`: the CI run of a push (gate, then the lane:
+    a code change runs test, then build and explorers; prose only runs quick, then build; a
+    commit of main that passed on its branch goes to build; deploy only on main) with lane
+    buttons, and how a page becomes the site (generator, fill.py, page, tests, hook,
+    explorer scripts, site, checks). `tools/figures/site_flow.py` draws them (diagram-design
+    skill's rules adapted: orthogonal r=8 routes, label masks, accent on the run only,
+    palette classes, Hebrew `direction="rtl"`); `fill.py` takes non-question pages
+    (`PAGES`). The static figure is complete; a decorative SMIL copy draws the run stage by
+    stage (6 s cycle), hidden under reduced motion, by the switch over each diagram and in
+    print (28-site-flow.css). `tests/tools/test_site_flow.py` checks the page copy, that the
+    CI diagram's edges follow `needs` in deploy.yml, and that routes are orthogonal and end
+    on their boxes. Phone check (axe, text size) and keyboard check pass on the page.
 
 ---
 

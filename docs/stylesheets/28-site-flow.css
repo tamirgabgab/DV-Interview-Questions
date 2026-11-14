@@ -1,0 +1,48 @@
+/* The site's styles, part 28: the two diagrams of the page on how the site is built
+   (docs/how-built.md, tools/figures/site_flow.py). A diagram is a complete static figure;
+   over it a decorative copy (.sf-anim) that SMIL draws stage by stage. That copy is hidden
+   under reduced motion and when the box's switch is off. In the CI diagram the lane
+   buttons pick the lane (pure CSS, :has): its own nodes and connectors stay, the other
+   lanes' fade, and the copy runs only on it. Colours are the palette's (01-base.css,
+   02-pages.css). It loads after parts 01-27. */
+
+.md-typeset .sf-box { margin: var(--sp-3) 0 var(--sp-4); }
+.md-typeset .sf-scroll { overflow-x: auto; }
+.md-typeset .sf-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-2) var(--sp-3); margin-bottom: var(--sp-2); font-size: 0.72rem; }
+.md-typeset .sf-lanes { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1) var(--sp-2); margin: 0; padding: 0; border: 0; }
+.md-typeset .sf-lanes legend { float: right; margin-inline-end: var(--sp-1); padding: 0; color: var(--md-default-fg-color--light); }
+.md-typeset .sf-controls label { display: inline-flex; align-items: center; gap: 0.35em; min-height: 2.2rem; padding: 0 0.7em; border: 1px solid var(--site-card-border); border-radius: 2rem; cursor: pointer; }
+.md-typeset .sf-controls label:has(input:checked) { border-color: var(--act-line); background: var(--act-tint); color: var(--act-line); font-weight: 700; }
+.md-typeset .sf-controls input { margin: 0; accent-color: var(--act); }
+
+/* the static figure */
+.md-typeset svg.sf-fig { display: block; width: 100%; margin: 0 auto; }
+.md-typeset svg.sf-fig .sf-edge { fill: none; stroke: var(--viz-text); stroke-width: 1.5; }
+.md-typeset svg.sf-fig .sf-head { fill: var(--viz-text); }
+.md-typeset svg.sf-fig .sf-node rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg.sf-fig .sf-name { fill: var(--viz-ink); font-family: var(--md-code-font-family); font-size: 13px; font-weight: 700; }
+.md-typeset svg.sf-fig .sf-sub { fill: var(--viz-text); font-family: var(--md-text-font-family); font-size: 11.5px; }
+.md-typeset svg.sf-fig .sf-lab rect { fill: var(--md-default-bg-color); }
+.md-typeset svg.sf-fig .sf-lab text { fill: var(--viz-text); font-family: var(--md-text-font-family); font-size: 11.5px; }
+.md-typeset svg.sf-fig [class*="sf-L-"] { transition: opacity var(--dur-2, 0.2s) ease; }
+
+/* the run: connectors drawn and frames lit in the series colour */
+.md-typeset svg.sf-fig .sf-run { fill: none; stroke: var(--viz-s1); stroke-width: 3; stroke-linecap: round; }
+.md-typeset svg.sf-fig .sf-lit { fill: none; stroke: var(--viz-s1); stroke-width: 2.5; }
+
+/* the lane of the CI diagram: the other lanes fade, and the run keeps to the chosen one */
+.md-typeset .sf-box:has(input[value="full"]:checked) svg :is(.sf-L-fast, .sf-L-done):not(.sf-run, .sf-lit),
+.md-typeset .sf-box:has(input[value="fast"]:checked) svg :is(.sf-L-full, .sf-L-done):not(.sf-run, .sf-lit),
+.md-typeset .sf-box:has(input[value="done"]:checked) svg :is(.sf-L-full, .sf-L-fast):not(.sf-run, .sf-lit) { opacity: 0.28; }
+.md-typeset .sf-box:has(input[value="full"]:checked) .sf-anim :is(.sf-L-fast, .sf-L-done),
+.md-typeset .sf-box:has(input[value="fast"]:checked) .sf-anim :is(.sf-L-full, .sf-L-done),
+.md-typeset .sf-box:has(input[value="done"]:checked) .sf-anim :is(.sf-L-full, .sf-L-fast) { display: none; }
+
+/* the switch, reduced motion and print: the static figure alone */
+.md-typeset .sf-box:has(.sf-play input:not(:checked)) .sf-anim { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset .sf-anim, .md-typeset .sf-play { display: none; }
+}
+@media print {
+  .md-typeset .sf-anim, .md-typeset .sf-controls { display: none; }
+}

@@ -25,6 +25,9 @@ with [graphify](https://pypi.org/project/graphifyy/)); click a question for a li
   [what's new](https://tamirgabgab.github.io/DV-Interview-Questions/new/)
 - [`notes/CATALOG.md`](notes/CATALOG.md): every question with a direct link
 - [Tutorial videos](#tutorial-videos): a video per question, a chapter per part
+- [How the site is built](https://tamirgabgab.github.io/DV-Interview-Questions/how-built/):
+  two animated diagrams, the CI run of a push (its three lanes) and how a question page
+  becomes the site
 
 ## What is on the site
 
@@ -104,7 +107,8 @@ tools/
   build/         what the site is built from: catalog, graph (+ graph_concepts.json),
                  search_text, make_icons, social/ (the share card layout), codemirror/
   authoring/     new_question.py and the page template question.md
-  figures/       q<id>.py, the generator of each question's figures, with charts.py and fill.py
+  figures/       q<id>.py, the generator of each question's figures, with charts.py and fill.py;
+                 site_flow.py draws the diagrams of docs/how-built.md
   extract_code.py, page_tests.py, explorer_node.js, dev_setup.sh   shared by all of the above
 videos/          the tutorial videos: render.py, lib/, <id>/ (script, scene, captions, release/)
 notes/           working notes, not part of the site: HANDOFF.md (task list and work log, with

@@ -3,6 +3,7 @@
 
     python tools/figures/fill.py 26 27          # rewrite the generated blocks of 0026, 0027
     python tools/figures/fill.py --check 26     # exit 1 when a block is out of date
+    python tools/figures/fill.py how-built      # a page that is not a question (PAGES)
 
 The generator ``tools/figures/q<id>.py`` defines ``blocks()``: a list of strings (an SVG,
 a legend, a Markdown table...). The page marks where each block goes with two comments at
@@ -33,8 +34,16 @@ from extract_code import question_path  # noqa: E402
 MARK = re.compile(r"^(?P<ind>[ ]*)<!-- gen (?P<n>\d+) -->\n.*?^(?P=ind)<!-- /gen -->$", re.M | re.S)
 
 
-def generated(qid: int) -> list[str]:
-    return importlib.import_module(f"q{qid:04d}").blocks()
+# pages that are not questions: the name on the command line, the generator, the page
+PAGES = {"how-built": ("site_flow", HERE.parents[1] / "docs" / "how-built.md")}
+
+
+def page_path(qid):
+    return PAGES[qid][1] if qid in PAGES else question_path(qid)
+
+
+def generated(qid) -> list[str]:
+    return importlib.import_module(PAGES[qid][0] if qid in PAGES else f"q{qid:04d}").blocks()
 
 
 def render(ind: str, n: int, block: str) -> str:
@@ -63,13 +72,13 @@ def fill_text(text: str, blocks: list[str]) -> tuple[str, list[str]]:
     return out, problems
 
 
-def check(qid: int) -> list[str]:
-    path = question_path(qid)
+def check(qid) -> list[str]:
+    path = page_path(qid)
     return fill_text(path.read_text(encoding="utf-8"), generated(qid))[1]
 
 
-def fill(qid: int) -> list[str]:
-    path = question_path(qid)
+def fill(qid) -> list[str]:
+    path = page_path(qid)
     text, problems = fill_text(path.read_text(encoding="utf-8"), generated(qid))
     path.write_text(text, encoding="utf-8")
     return [p for p in problems if "out of date" not in p]
@@ -77,15 +86,15 @@ def fill(qid: int) -> list[str]:
 
 def main(argv: list[str]) -> int:
     check_only = "--check" in argv
-    ids = [int(a) for a in argv if a != "--check"]
+    ids = [a if a in PAGES else int(a) for a in argv if a != "--check"]
     bad = 0
     for qid in ids:
         problems = check(qid) if check_only else fill(qid)
         for p in problems:
-            print(f"{qid:04d}: {p}")
+            print(f"{qid:04}: {p}")
         bad += bool(problems)
         if not check_only and not problems:
-            print(f"{qid:04d}: filled")
+            print(f"{qid:04}: filled")
     return 1 if bad else 0
 
 
