@@ -1329,6 +1329,12 @@ below start at item 112 (session 31).
 - [ ] Colons: many pages and explorer strings put a plain space before a colon in Hebrew text (0065 to 0067 and their boxes have no NBSP at all), and the linter does not check it. The owner chose not to fix it for now (2026-10-30). The explorers were fixed and linted in round 4 (session 34); the pages remain (round 5, R0).
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
+### Flaky checks
+
+- [ ] check_inputs on 0101 (sicherman box 0, the first face field): "a click does not focus the
+  field" failed once in CI (run 43575254032, 2026-11-14), passed on the rerun and five times
+  locally. Watch it; if it repeats, look at the click target of `sc-face` in CI's viewport.
+
 ### Content
 
 - [ ] Add questions as they arrive (rewrite, translate code, execute, draw figures).
