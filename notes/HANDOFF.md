@@ -1329,6 +1329,69 @@ below start at item 112 (session 31).
 - [ ] Colons: many pages and explorer strings put a plain space before a colon in Hebrew text (0065 to 0067 and their boxes have no NBSP at all), and the linter does not check it. The owner chose not to fix it for now (2026-10-30). The explorers were fixed and linted in round 4 (session 34); the pages remain (round 5, R0).
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
+### Audit findings (ponytail-audit, session 34, 2026-11-14)
+
+A read-only audit of the whole repository (three auditors: CI and build, browser code, checks
+and tests; each finding was reproduced, the lead re-read the code of the main ones). The owner
+asked to fix 1, 2, 3, 6, 7 first, then the rest. Scratch evidence was in the session's
+scratchpad (audit-ci, audit-web, audit-checks), not kept.
+
+Must fix:
+- [ ] A1. The fast lane compares with the previous push (`github.event.before`,
+  `deploy.yml:75`), not with the last commit that passed: push A breaks code and its run fails
+  or is cancelled, push B fixes prose, B takes the fast lane and A's code deploys untested. The
+  same hole lets main's "verified" shortcut (`deploy.yml:56-58`) skip the checks for a branch
+  commit that passed only through the fast lane. Fix: base = head_sha of the last successful
+  push run of deploy.yml on the same branch; none means the full lane.
+- [ ] A2. `text_only.protected()` strips indentation (`text_only.py:74`): moving a closing fence
+  of an indented SV tab to column 0 counts as prose (127 such one-line edits; on 0005 the fast
+  lane passed and `--sv-only` failed). Fix: `rstrip()`.
+- [ ] A3. An endless printing loop in the run panel floods the main thread
+  (`py-worker.js:18-19`, `run-python.js:85`): at 20,000 lines/s Stop was not handled in 120 s.
+  Fix: cap the output per run in the worker (about 200,000 characters, then one "output cut"
+  line, then stop posting).
+- [ ] A4. check_contrast tests only the first fill of 31 entries whose list has no
+  `CARD, PAGE` prefix (64 tints per scheme never measured; none fails today): 0080 felt
+  (:105-109), 0086 (:333-334), 0092 (:392-395), 0101 (:525), 0102 (:533). Fix: write them as
+  `[CARD, PAGE, *tints]` and raise in `check()` when an opaque layer sits above another one.
+- [ ] A5. Older figure tests compare part of the generated copy: 0008 (3 perf-chart SVGs never
+  compared), 0009 (27 of 30 lines), 0010 (its table), 0024 (the table twice, one copy free),
+  row checks in 0016, 0017, 0023 (extra or reordered rows pass). Fix: gen markers + blocks() +
+  assert_figures_match.
+
+Should fix:
+- [ ] A6. `text_only.py:113` diffs with rename detection: `git mv docs/javascripts/py_run.py
+  notes/` reads as "only files outside the site". Fix: `--no-renames`.
+- [ ] A7. check_jumps collects page errors and never reports them (`check_jumps.py:142`): a box
+  that throws at its 4th step printed ok. Fix: the line of `check_inputs.py:270`.
+- [ ] A8. `tests/tools/test_search_text.py:60` (statement without TeX) always skips in CI (the
+  test job has no built site). Fix: run it in the build job after `mkdocs build`.
+- [ ] A9. lint_pages does not require the skeleton (a page with no hints, solution, traps or
+  follow-ups lints clean) and `lint_followups` misses `???+ followup`; dead `if ...: pass` at
+  `lint_pages.py:321-322`.
+- [ ] A10. The SV cache keeps whole obj_dirs (two 88 MB PCH each) and never prunes: 7.1 GB
+  locally, only `obj_dir/sim` (176 MB in all) is reused (`run_tests.py:103-116`,
+  `deploy.yml:148`). Fix: keep only `sim` after a compile; prune unused folders on a full run.
+- [ ] A11. "Reset all" in a box adds one more MutationObserver per reset (`core.js:874`) and
+  explain panels stay in PANELS (`core.js:418`): 0017 went from 11 to 61 callbacks per step
+  after 50 resets. Fix: disconnect the old observer; drop a render whose panel is gone.
+- [ ] A12. Saved side-column widths are not clamped on load (`layout.js:72`): at 1300 px the
+  page column was 344 px instead of 600 until a resize. Fix: run the resize fit once on load.
+
+Nice to have:
+- [ ] A13. `search_text._convert` crashes the build on a trailing `\ ` or an unclosed
+  `\sqrt[` in a statement, without naming the page.
+- [ ] A14. `pages: write` and `id-token: write` are workflow-wide (`deploy.yml:18-22`); move
+  them to the deploy job.
+- [ ] A15. `docs/graph.html` lacks 0101-0109 and `graph_concepts.json` covers 74 of 109
+  questions; nothing checks it.
+- [ ] A16. Nine SV blocks on pages are never compiled; 0004's `typedef string labels_t[3]` is
+  copied by hand into `tests/0004/tb.sv:2`. Fix: `//@page`.
+- [ ] A17. `overrides/404.html:28` `decodeURIComponent` throws on a cut escape, which stops the
+  404 script.
+- [ ] A18. Dead code: `bitsOf` redefined in `lpmtrie.js:148` (core.js has `lib.bitsOf`);
+  unused exports `bilFold`, `chompEat`, `nimLegal`, `ihStep`.
+
 ### Flaky checks
 
 - [ ] check_inputs on 0101 (sicherman box 0, the first face field): "a click does not focus the
