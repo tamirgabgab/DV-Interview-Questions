@@ -41,7 +41,7 @@
 /* the switch, reduced motion and print: the static figure alone */
 .md-typeset .sf-box:has(.sf-play input:not(:checked)) .sf-anim { display: none; }
 @media (prefers-reduced-motion: reduce) {
-  .md-typeset .sf-anim, .md-typeset .sf-play { display: none; }
+  .md-typeset .sf-anim, .md-typeset .sf-controls .sf-play { display: none; }
 }
 @media print {
   .md-typeset .sf-anim, .md-typeset .sf-controls { display: none; }
