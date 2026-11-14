@@ -3,9 +3,9 @@
 the next L - 1 leave", people numbered 0 .. N - 1, for L = 2 (part a), L = 3 (part b) and
 any L (the bonus part).
 
-    python tools/figures/q0016.py > /tmp/q0016.html
+    python tools/figures/fill.py 16         # put the blocks on the page
 
-Prints, in page order: part a (L = 2): the step-through circle for N = 20, the
+blocks() returns, in page order: part a (L = 2): the step-through circle for N = 20, the
 round-by-round table for N = 20, the table of survivors for N = 1..16, the survivor chart
 for N = 1..40, the relabelling figure after one elimination, the one-round figure for
 N = 8, and the binary figure; part b (L = 3): the step-through circle for N = 30, the
@@ -433,27 +433,19 @@ def digits3_svg(examples=(30, 21)):
     return "".join(p)
 
 
+def blocks():
+    """The generated blocks, in page order."""
+    return [
+        # part a: L = 2
+        circle_stepper(20), rounds_table(20), survivors_table(), chart_legend(), chart(),
+        relabel_svg(7), round_svg(8), bits_svg(),
+        # part b: L = 3
+        circle_stepper(30, 3), rounds_table(30, 3), values3_table(), chart_legend(3),
+        chart(3, 60, 6), relabel_svg(8, 3), round_svg(9, 3), digits3_svg(),
+        # the bonus part: any L
+        zeros_table(), values_table(4, L4_ROWS, with_residue=True), chart_legend(4), chart(4, 64, 8),
+    ]
+
+
 if __name__ == "__main__":
-    # part a: L = 2
-    print(circle_stepper(20), "\n")
-    print(rounds_table(20), "\n")
-    print(survivors_table(), "\n")
-    print(chart_legend(), "\n")
-    print(chart(), "\n")
-    print(relabel_svg(7), "\n")
-    print(round_svg(8), "\n")
-    print(bits_svg(), "\n")
-    # part b: L = 3
-    print(circle_stepper(30, 3), "\n")
-    print(rounds_table(30, 3), "\n")
-    print(values3_table(), "\n")
-    print(chart_legend(3), "\n")
-    print(chart(3, 60, 6), "\n")
-    print(relabel_svg(8, 3), "\n")
-    print(round_svg(9, 3), "\n")
-    print(digits3_svg(), "\n")
-    # the bonus part: any L
-    print(zeros_table(), "\n")
-    print(values_table(4, L4_ROWS, with_residue=True), "\n")
-    print(chart_legend(4), "\n")
-    print(chart(4, 64, 8))
+    print(*blocks(), sep=" \n\n")

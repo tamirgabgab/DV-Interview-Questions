@@ -420,7 +420,7 @@
     help: {
       billiard: "גוררים את הכדור לכל מקום על השולחן ואת קצה החץ לכל כיוון, או מקלידים x₀, y₀ ומעלות. מחוון קובע את רוחב הכיסים, ואפשר רוחב אחר לכיסים האמצעיים וכדור ברדיוס אמיתי. \"מכה\" מריצה את הכדור עד הכיס, ומתחת אותה מכה על השולחן הפתוח עם הפער בכל קו של כיסים; החישוב של סעיפים ג ו-ד מראה את s, ε, K ו-m. הכפתורים טוענים את המכות של הדף.",
     },
-    models: { bilShot, bilAt, bilFold: fold, bilPocketAt, BIL_RHO },
+    models: { bilShot, bilAt, bilPocketAt, BIL_RHO },
     cols: { billiard: { side: ".ex-title, .bil-unf, .viz-legend, .bil-unf-note", w: "minmax(0, 0.85fr)" } },   // the table and its calculation beside the unfolded table
   });
 })();

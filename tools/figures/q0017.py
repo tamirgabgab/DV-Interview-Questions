@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Figures and tables of question 0017 (find the duplicate number).
 
-    python tools/figures/q0017.py > /tmp/q0017.html
+    python tools/figures/fill.py 17         # put the blocks on the page
 
-Prints, in page order: the example array; the graph i -> nums[i] of the example (the rho
-shape); the binary-search table; the step-through of Floyd's two phases. Paste them into
-the page; tests/0017 checks that the page copies match.
+blocks() returns, in page order: the example array; the binary-search table; the graph
+i -> nums[i] of the example (the rho shape) and its legend; the step-through of Floyd's two
+phases. tests/0017 checks that the page copies match.
 """
 
 import math
@@ -161,9 +161,11 @@ def binary_search_table(nums=NUMS):
     return "\n".join(lines)
 
 
+def blocks():
+    """The generated blocks, in page order."""
+    return [array_table(), binary_search_table(),
+            rho_svg("q17a", mark_entry=True, hot={(6, DUP), (7, DUP)}), legend(), floyd_stepper()]
+
+
 if __name__ == "__main__":
-    print(array_table(), "\n")
-    print(rho_svg("q17a", mark_entry=True, hot={(6, DUP), (7, DUP)}), "\n")
-    print(binary_search_table(), "\n")
-    print(legend(), "\n")
-    print(floyd_stepper())
+    print(*blocks(), sep=" \n\n")

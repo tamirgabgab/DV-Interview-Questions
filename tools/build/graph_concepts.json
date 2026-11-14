@@ -20,6 +20,10 @@
    "label": "Backtracking",
    "group": "algorithms"
   },
+  "balanced_ternary": {
+   "label": "Balanced ternary",
+   "group": "math"
+  },
   "bfs": {
    "label": "BFS",
    "group": "algorithms"
@@ -39,6 +43,10 @@
   "cdc": {
    "label": "CDC",
    "group": "digital design"
+  },
+  "check_digit": {
+   "label": "Check digit",
+   "group": "math"
   },
   "clock_divider": {
    "label": "Clock divider",
@@ -88,6 +96,10 @@
    "label": "Credit flow control",
    "group": "protocols"
   },
+  "custom_comparator": {
+   "label": "Custom sort comparator",
+   "group": "algorithms"
+  },
   "cycle_detection": {
    "label": "Cycle detection",
    "group": "algorithms"
@@ -99,6 +111,14 @@
   "derangement": {
    "label": "Derangements",
    "group": "math"
+  },
+  "difference_array": {
+   "label": "Difference array",
+   "group": "algorithms"
+  },
+  "digit_by_digit": {
+   "label": "Digit-by-digit (restoring) algorithm",
+   "group": "digital design"
   },
   "digit_manipulation": {
    "label": "Digit manipulation",
@@ -128,9 +148,17 @@
    "label": "Encoding identity",
    "group": "puzzles"
   },
+  "euler_formula": {
+   "label": "Euler's formula for planar graphs",
+   "group": "math"
+  },
   "expected_value": {
    "label": "Expected value",
    "group": "probability"
+  },
+  "fenwick_tree": {
+   "label": "Fenwick tree",
+   "group": "algorithms"
   },
   "fifo": {
    "label": "FIFO",
@@ -144,6 +172,14 @@
    "label": "Fixed point",
    "group": "math"
   },
+  "flood_fill": {
+   "label": "Flood fill",
+   "group": "algorithms"
+  },
+  "frobenius_number": {
+   "label": "Frobenius coin problem",
+   "group": "math"
+  },
   "fsm": {
    "label": "FSM",
    "group": "digital design"
@@ -152,9 +188,17 @@
    "label": "Functional coverage",
    "group": "verification"
   },
+  "functional_equation": {
+   "label": "Functional equation",
+   "group": "math"
+  },
   "game_theory_minimax": {
    "label": "Minimax",
    "group": "algorithms"
+  },
+  "gcd_bezout": {
+   "label": "GCD and Bezout",
+   "group": "math"
   },
   "generating_function": {
    "label": "Generating function",
@@ -196,6 +240,14 @@
    "label": "Hash map",
    "group": "algorithms"
   },
+  "hashing": {
+   "label": "Hashing",
+   "group": "algorithms"
+  },
+  "in_place_algorithm": {
+   "label": "In-place algorithm",
+   "group": "algorithms"
+  },
   "inclusion_exclusion": {
    "label": "Inclusion-exclusion",
    "group": "math"
@@ -212,6 +264,14 @@
    "label": "Invariant",
    "group": "math"
   },
+  "inversion_count": {
+   "label": "Inversion count",
+   "group": "algorithms"
+  },
+  "kelly_criterion": {
+   "label": "Kelly criterion",
+   "group": "probability"
+  },
   "kmp_automaton": {
    "label": "KMP automaton",
    "group": "algorithms"
@@ -223,6 +283,10 @@
   "lfsr": {
    "label": "LFSR",
    "group": "digital design"
+  },
+  "linear_algebra_gf2": {
+   "label": "Linear algebra over GF(2)",
+   "group": "math"
   },
   "markov_chain": {
    "label": "Markov chain",
@@ -256,6 +320,10 @@
    "label": "Modular arithmetic",
    "group": "math"
   },
+  "monotonic_deque": {
+   "label": "Monotonic deque",
+   "group": "algorithms"
+  },
   "monotonic_stack": {
    "label": "Monotonic stack",
    "group": "algorithms"
@@ -267,6 +335,10 @@
   "monte_carlo": {
    "label": "Monte Carlo",
    "group": "probability"
+  },
+  "multiplicative_order": {
+   "label": "Multiplicative order",
+   "group": "math"
   },
   "non_blocking_assignment": {
    "label": "Non-blocking assignment",
@@ -283,6 +355,10 @@
   "optimization": {
    "label": "Optimization",
    "group": "math"
+  },
+  "parallel_compare": {
+   "label": "Parallel compare and priority encoder",
+   "group": "digital design"
   },
   "parity_argument": {
    "label": "Parity coloring argument",
@@ -308,25 +384,53 @@
    "label": "Pigeonhole",
    "group": "math"
   },
+  "pipelining": {
+   "label": "Pipelining",
+   "group": "digital design"
+  },
   "poisson_process": {
    "label": "Poisson process",
    "group": "probability"
+  },
+  "polynomial_factorization": {
+   "label": "Polynomial factorization",
+   "group": "math"
   },
   "popcount": {
    "label": "Popcount",
    "group": "algorithms"
   },
+  "potential_function": {
+   "label": "Potential function",
+   "group": "math"
+  },
   "power_sums_newton": {
    "label": "Power sums (Newton)",
    "group": "math"
+  },
+  "prefix_reversal": {
+   "label": "Prefix reversals",
+   "group": "algorithms"
   },
   "priority_queue": {
    "label": "Priority queue",
    "group": "algorithms"
   },
+  "probabilistic_counting": {
+   "label": "Probabilistic counting (HyperLogLog)",
+   "group": "algorithms"
+  },
+  "quantile": {
+   "label": "Quantile",
+   "group": "probability"
+  },
   "queue": {
    "label": "Queue",
    "group": "algorithms"
+  },
+  "random_walk": {
+   "label": "Random walk",
+   "group": "probability"
   },
   "rate_balance": {
    "label": "Rate balance",
@@ -343,6 +447,10 @@
   "reference_model": {
    "label": "Reference model",
    "group": "verification"
+  },
+  "rejection_sampling": {
+   "label": "Rejection sampling",
+   "group": "probability"
   },
   "relative_motion": {
    "label": "Relative speed",
@@ -376,8 +484,20 @@
    "label": "Simulation",
    "group": "algorithms"
   },
+  "sliding_window": {
+   "label": "Sliding window",
+   "group": "algorithms"
+  },
   "sorting": {
    "label": "Sorting",
+   "group": "algorithms"
+  },
+  "sprague_grundy": {
+   "label": "Sprague-Grundy numbers",
+   "group": "puzzles"
+  },
+  "stable_matching": {
+   "label": "Stable matching (Gale-Shapley)",
    "group": "algorithms"
   },
   "stack": {
@@ -396,9 +516,17 @@
    "label": "State space search",
    "group": "algorithms"
   },
+  "strategy_stealing": {
+   "label": "Strategy stealing",
+   "group": "puzzles"
+  },
   "sva_assertions": {
    "label": "SVA",
    "group": "verification"
+  },
+  "sweep_line": {
+   "label": "Event sweep",
+   "group": "algorithms"
   },
   "symmetry_argument": {
    "label": "Symmetry argument",
@@ -420,12 +548,20 @@
    "label": "Timing waveform",
    "group": "digital design"
   },
+  "topological_sort": {
+   "label": "Topological sort",
+   "group": "algorithms"
+  },
   "transaction_ordering": {
    "label": "Transaction ordering",
    "group": "verification"
   },
   "transitive_closure": {
    "label": "Transitive closure",
+   "group": "algorithms"
+  },
+  "trie": {
+   "label": "Trie",
    "group": "algorithms"
   },
   "two_flop_synchronizer": {
@@ -444,6 +580,10 @@
    "label": "Uniform random sampling",
    "group": "probability"
   },
+  "union_find": {
+   "label": "Union-find",
+   "group": "algorithms"
+  },
   "usb4": {
    "label": "USB4",
    "group": "protocols"
@@ -459,54 +599,6 @@
   "xor_trick": {
    "label": "XOR trick",
    "group": "algorithms"
-  },
-  "sliding_window": {
-   "label": "Sliding window",
-   "group": "algorithms"
-  },
-  "sweep_line": {
-   "label": "Event sweep",
-   "group": "algorithms"
-  },
-  "monotonic_deque": {
-   "label": "Monotonic deque",
-   "group": "algorithms"
-  },
-  "balanced_ternary": {
-   "label": "Balanced ternary",
-   "group": "math"
-  },
-  "parallel_compare": {
-   "label": "Parallel compare and priority encoder",
-   "group": "digital design"
-  },
-  "flood_fill": {
-   "label": "Flood fill",
-   "group": "algorithms"
-  },
-  "union_find": {
-   "label": "Union-find",
-   "group": "algorithms"
-  },
-  "fenwick_tree": {
-   "label": "Fenwick tree",
-   "group": "algorithms"
-  },
-  "inversion_count": {
-   "label": "Inversion count",
-   "group": "algorithms"
-  },
-  "quantile": {
-   "label": "Quantile",
-   "group": "probability"
-  },
-  "in_place_algorithm": {
-   "label": "In-place algorithm",
-   "group": "algorithms"
-  },
-  "multiplicative_order": {
-   "label": "Multiplicative order",
-   "group": "math"
   }
  },
  "questions": {
@@ -892,6 +984,18 @@
      "why": "same PCIe completion splitting rules, listing instead of counting"
     }
    ]
+  },
+  "0022": {
+   "core": [
+    "dynamic_programming",
+    "combinatorics"
+   ],
+   "secondary": [
+    "counting_bijection",
+    "recurrence_relation",
+    "closed_form"
+   ],
+   "related": []
   },
   "0023": {
    "core": [
@@ -1996,6 +2100,434 @@
      "id": "0060",
      "explicit": false,
      "why": "word-wide bit tricks with masks and shifts"
+    }
+   ]
+  },
+  "0076": {
+   "core": [
+    "functional_equation",
+    "number_bases"
+   ],
+   "secondary": [
+    "induction_proof",
+    "monotonicity"
+   ],
+   "related": []
+  },
+  "0077": {
+   "core": [
+    "functional_equation",
+    "recursion",
+    "number_bases"
+   ],
+   "secondary": [
+    "bit_manipulation",
+    "induction_proof"
+   ],
+   "related": []
+  },
+  "0078": {
+   "core": [
+    "rejection_sampling",
+    "uniform_random_sampling"
+   ],
+   "secondary": [
+    "expected_value",
+    "geometric_series",
+    "number_bases"
+   ],
+   "related": []
+  },
+  "0079": {
+   "core": [
+    "rejection_sampling",
+    "uniform_random_sampling"
+   ],
+   "secondary": [
+    "expected_value",
+    "number_bases",
+    "symmetry_argument"
+   ],
+   "related": []
+  },
+  "0080": {
+   "core": [
+    "unfolding_reflection",
+    "number_theory",
+    "geometry"
+   ],
+   "secondary": [
+    "modular_arithmetic",
+    "gcd_bezout",
+    "simulation"
+   ],
+   "related": []
+  },
+  "0081": {
+   "core": [
+    "backtracking",
+    "bit_manipulation"
+   ],
+   "secondary": [
+    "symmetry_argument",
+    "combinatorics",
+    "brute_force_enumeration"
+   ],
+   "related": []
+  },
+  "0082": {
+   "core": [
+    "sprague_grundy",
+    "xor_trick",
+    "game_theory_minimax"
+   ],
+   "secondary": [
+    "induction_proof",
+    "invariant"
+   ],
+   "related": []
+  },
+  "0083": {
+   "core": [
+    "state_space_search",
+    "bfs",
+    "gcd_bezout"
+   ],
+   "secondary": [
+    "number_theory",
+    "invariant"
+   ],
+   "related": []
+  },
+  "0084": {
+   "core": [
+    "dynamic_programming",
+    "binary_search"
+   ],
+   "secondary": [
+    "monotonicity",
+    "combinatorics"
+   ],
+   "related": []
+  },
+  "0085": {
+   "core": [
+    "digit_manipulation",
+    "invariant"
+   ],
+   "secondary": [
+    "brute_force_enumeration",
+    "number_bases",
+    "recursion"
+   ],
+   "related": []
+  },
+  "0086": {
+   "core": [
+    "invariant",
+    "modular_arithmetic"
+   ],
+   "secondary": [
+    "bfs",
+    "state_space_search",
+    "parity_argument"
+   ],
+   "related": []
+  },
+  "0087": {
+   "core": [
+    "linear_algebra_gf2",
+    "xor_trick"
+   ],
+   "secondary": [
+    "bit_manipulation",
+    "brute_force_enumeration",
+    "symmetry_argument"
+   ],
+   "related": []
+  },
+  "0088": {
+   "core": [
+    "invariant",
+    "cycle_detection"
+   ],
+   "secondary": [
+    "parity_argument",
+    "bit_manipulation",
+    "number_theory"
+   ],
+   "related": []
+  },
+  "0089": {
+   "core": [
+    "frobenius_number",
+    "number_theory"
+   ],
+   "secondary": [
+    "dynamic_programming",
+    "dijkstra",
+    "modular_arithmetic",
+    "gcd_bezout"
+   ],
+   "related": []
+  },
+  "0090": {
+   "core": [
+    "prefix_reversal",
+    "sorting"
+   ],
+   "secondary": [
+    "bfs",
+    "adversary_argument",
+    "invariant"
+   ],
+   "related": []
+  },
+  "0091": {
+   "core": [
+    "strategy_stealing",
+    "game_theory_minimax"
+   ],
+   "secondary": [
+    "memoization",
+    "recursion",
+    "state_space_search"
+   ],
+   "related": []
+  },
+  "0092": {
+   "core": [
+    "euler_formula",
+    "combinatorics",
+    "geometry"
+   ],
+   "secondary": [
+    "induction_proof",
+    "closed_form",
+    "recurrence_relation"
+   ],
+   "related": []
+  },
+  "0093": {
+   "core": [
+    "stable_matching",
+    "greedy"
+   ],
+   "secondary": [
+    "induction_proof",
+    "invariant",
+    "brute_force_enumeration"
+   ],
+   "related": []
+  },
+  "0094": {
+   "core": [
+    "random_walk",
+    "markov_chain",
+    "credit_flow_control"
+   ],
+   "secondary": [
+    "martingale",
+    "expected_value",
+    "simulation"
+   ],
+   "related": []
+  },
+  "0095": {
+   "core": [
+    "potential_function",
+    "invariant"
+   ],
+   "secondary": [
+    "geometric_series",
+    "lateral_thinking",
+    "state_space_search"
+   ],
+   "related": []
+  },
+  "0096": {
+   "core": [
+    "kelly_criterion",
+    "expected_value",
+    "optimization"
+   ],
+   "secondary": [
+    "monte_carlo",
+    "geometric_series"
+   ],
+   "related": []
+  },
+  "0097": {
+   "core": [
+    "digit_by_digit",
+    "bit_manipulation"
+   ],
+   "secondary": [
+    "combinational_logic",
+    "invariant",
+    "induction_proof"
+   ],
+   "related": []
+  },
+  "0098": {
+   "core": [
+    "check_digit",
+    "modular_arithmetic"
+   ],
+   "secondary": [
+    "digit_manipulation",
+    "brute_force_enumeration"
+   ],
+   "related": []
+  },
+  "0099": {
+   "core": [
+    "check_digit",
+    "modular_arithmetic",
+    "fsm"
+   ],
+   "secondary": [
+    "digit_manipulation",
+    "number_bases",
+    "shift_register"
+   ],
+   "related": []
+  },
+  "0100": {
+   "core": [
+    "dynamic_programming",
+    "recurrence_relation"
+   ],
+   "secondary": [
+    "combinatorics",
+    "generating_function",
+    "closed_form"
+   ],
+   "related": []
+  },
+  "0101": {
+   "core": [
+    "generating_function",
+    "polynomial_factorization"
+   ],
+   "secondary": [
+    "combinatorics",
+    "brute_force_enumeration",
+    "functional_coverage"
+   ],
+   "related": []
+  },
+  "0102": {
+   "core": [
+    "topological_sort",
+    "bfs",
+    "queue"
+   ],
+   "secondary": [
+    "cycle_detection",
+    "graph_search",
+    "priority_queue"
+   ],
+   "related": []
+  },
+  "0103": {
+   "core": [
+    "trie",
+    "bit_manipulation",
+    "pipelining"
+   ],
+   "secondary": [
+    "reference_model",
+    "binary_search"
+   ],
+   "related": []
+  },
+  "0104": {
+   "core": [
+    "greedy",
+    "running_sum"
+   ],
+   "secondary": [
+    "invariant",
+    "two_pointers"
+   ],
+   "related": []
+  },
+  "0105": {
+   "core": [
+    "probabilistic_counting",
+    "hashing"
+   ],
+   "secondary": [
+    "expected_value",
+    "bit_manipulation",
+    "monte_carlo"
+   ],
+   "related": []
+  },
+  "0106": {
+   "core": [
+    "bit_manipulation",
+    "modular_arithmetic"
+   ],
+   "secondary": [
+    "xor_trick",
+    "fsm",
+    "popcount"
+   ],
+   "related": [
+    {
+     "id": "0058",
+     "explicit": true,
+     "why": "the page links to it"
+    }
+   ]
+  },
+  "0107": {
+   "core": [
+    "custom_comparator",
+    "sorting"
+   ],
+   "secondary": [
+    "invariant",
+    "induction_proof"
+   ],
+   "related": []
+  },
+  "0108": {
+   "core": [
+    "greedy",
+    "difference_array",
+    "sliding_window"
+   ],
+   "secondary": [
+    "parity_argument",
+    "xor_trick",
+    "bit_manipulation"
+   ],
+   "related": [
+    {
+     "id": "0087",
+     "explicit": true,
+     "why": "the page links to it"
+    }
+   ]
+  },
+  "0109": {
+   "core": [
+    "monotonic_stack",
+    "sorting"
+   ],
+   "secondary": [
+    "stack",
+    "simulation",
+    "relative_motion"
+   ],
+   "related": [
+    {
+     "id": "0057",
+     "explicit": true,
+     "why": "the page links to it"
     }
    ]
   }

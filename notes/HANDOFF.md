@@ -1309,6 +1309,34 @@ below start at item 112 (session 31).
     the panel then stops the worker as Stop does and writes a Hebrew line (likely an endless
     loop). `test_worker_cuts_endless_output` runs the worker under Node with a fake Pyodide.
 
+204. **Audit fixes, round 2: A4, A5, A8 to A18 (session 34, 2026-11-14).**
+    - A4: 41 contrast entries listed opaque fills one over another, so only the first was
+      measured; they are now `[CARD, PAGE, *fills]` (each fill and the box surface measured,
+      all pass) or drop the hidden layer (the home band's card over its band), and `check()`
+      raises on an opaque layer above another one (over the page alone is fine).
+    - A5: 0008, 0009, 0010, 0016, 0017, 0023 and 0024 have `blocks()`, gen markers on the page
+      and `assert_figures_match`, so every generated SVG, stepper, legend and table is compared
+      whole (two subagents; no page block was stale).
+    - A8: the build job runs `tests/tools/test_search_text.py` after the build.
+    - A9: lint requires a hint, a solution, a short answer, a trap and the follow-ups; the
+      follow-up check reads `???+ followup` too. The lint loop reused `text` for an h4 label,
+      so the video front-matter check of a page with solution labels read the label; renamed.
+    - A10: the SV cache keeps only `obj_dir/sim` (7.1 GB to 120 MB here), and a run of every
+      testbench removes unused folders.
+    - A11: "reset all" disconnects the scrubber's old observers (10 callbacks a step after 20
+      resets on 0017, was 31), and a panel gone with its box leaves PANELS on a tab change.
+    - A12: layout.js fits saved column widths on load, not only on resize.
+    - A13: search_text takes a lone trailing backslash and an unclosed `\sqrt[`; a failure
+      names the page.
+    - A14: `pages: write` and `id-token: write` only in the deploy job.
+    - A15: 23 new concepts and the 35 missing questions in `graph_concepts.json`,
+      `docs/graph.html` rebuilt, and `test_every_question_is_on_the_map`; CONTRIBUTING's
+      new-question steps name the map.
+    - A16: 0004's page block cannot be pulled with `//@page` (its `draw()` stub would clash
+      with the testbench's), so `test_tb_typedef_is_the_pages` keeps the copied typedef equal.
+    - A17: the 404 page survives a cut escape; check_404 has the case.
+    - A18: lpmtrie uses `lib.bitsOf`; the unused model exports are gone.
+
 ---
 
 ## In progress
@@ -1342,6 +1370,8 @@ below start at item 112 (session 31).
 
 ### Audit findings (ponytail-audit, session 34, 2026-11-14)
 
+All fixed: A1-A3, A6, A7 in work log 203, the rest in 204.
+
 A read-only audit of the whole repository (three auditors: CI and build, browser code, checks
 and tests; each finding was reproduced, the lead re-read the code of the main ones). The owner
 asked to fix 1, 2, 3, 6, 7 first, then the rest. Scratch evidence was in the session's
@@ -1363,11 +1393,11 @@ Must fix:
   (`py-worker.js:18-19`, `run-python.js:85`): at 20,000 lines/s Stop was not handled in 120 s.
   Fix: cap the output per run in the worker (about 200,000 characters, then one "output cut"
   line, then stop posting). Done (work log 203): 2,000 lines or 200,000 characters.
-- [ ] A4. check_contrast tests only the first fill of 31 entries whose list has no
+- [x] A4. check_contrast tests only the first fill of 31 entries whose list has no
   `CARD, PAGE` prefix (64 tints per scheme never measured; none fails today): 0080 felt
   (:105-109), 0086 (:333-334), 0092 (:392-395), 0101 (:525), 0102 (:533). Fix: write them as
   `[CARD, PAGE, *tints]` and raise in `check()` when an opaque layer sits above another one.
-- [ ] A5. Older figure tests compare part of the generated copy: 0008 (3 perf-chart SVGs never
+- [x] A5. Older figure tests compare part of the generated copy: 0008 (3 perf-chart SVGs never
   compared), 0009 (27 of 30 lines), 0010 (its table), 0024 (the table twice, one copy free),
   row checks in 0016, 0017, 0023 (extra or reordered rows pass). Fix: gen markers + blocks() +
   assert_figures_match.
@@ -1377,32 +1407,32 @@ Should fix:
   notes/` reads as "only files outside the site". Fix: `--no-renames`. Done (work log 203).
 - [x] A7. check_jumps collects page errors and never reports them (`check_jumps.py:142`): a box
   that throws at its 4th step printed ok. Fix: the line of `check_inputs.py:270`. Done (work log 203).
-- [ ] A8. `tests/tools/test_search_text.py:60` (statement without TeX) always skips in CI (the
+- [x] A8. `tests/tools/test_search_text.py:60` (statement without TeX) always skips in CI (the
   test job has no built site). Fix: run it in the build job after `mkdocs build`.
-- [ ] A9. lint_pages does not require the skeleton (a page with no hints, solution, traps or
+- [x] A9. lint_pages does not require the skeleton (a page with no hints, solution, traps or
   follow-ups lints clean) and `lint_followups` misses `???+ followup`; dead `if ...: pass` at
   `lint_pages.py:321-322`.
-- [ ] A10. The SV cache keeps whole obj_dirs (two 88 MB PCH each) and never prunes: 7.1 GB
+- [x] A10. The SV cache keeps whole obj_dirs (two 88 MB PCH each) and never prunes: 7.1 GB
   locally, only `obj_dir/sim` (176 MB in all) is reused (`run_tests.py:103-116`,
   `deploy.yml:148`). Fix: keep only `sim` after a compile; prune unused folders on a full run.
-- [ ] A11. "Reset all" in a box adds one more MutationObserver per reset (`core.js:874`) and
+- [x] A11. "Reset all" in a box adds one more MutationObserver per reset (`core.js:874`) and
   explain panels stay in PANELS (`core.js:418`): 0017 went from 11 to 61 callbacks per step
   after 50 resets. Fix: disconnect the old observer; drop a render whose panel is gone.
-- [ ] A12. Saved side-column widths are not clamped on load (`layout.js:72`): at 1300 px the
+- [x] A12. Saved side-column widths are not clamped on load (`layout.js:72`): at 1300 px the
   page column was 344 px instead of 600 until a resize. Fix: run the resize fit once on load.
 
 Nice to have:
-- [ ] A13. `search_text._convert` crashes the build on a trailing `\ ` or an unclosed
+- [x] A13. `search_text._convert` crashes the build on a trailing `\ ` or an unclosed
   `\sqrt[` in a statement, without naming the page.
-- [ ] A14. `pages: write` and `id-token: write` are workflow-wide (`deploy.yml:18-22`); move
+- [x] A14. `pages: write` and `id-token: write` are workflow-wide (`deploy.yml:18-22`); move
   them to the deploy job.
-- [ ] A15. `docs/graph.html` lacks 0101-0109 and `graph_concepts.json` covers 74 of 109
+- [x] A15. `docs/graph.html` lacks 0101-0109 and `graph_concepts.json` covers 74 of 109
   questions; nothing checks it.
-- [ ] A16. Nine SV blocks on pages are never compiled; 0004's `typedef string labels_t[3]` is
+- [x] A16. Nine SV blocks on pages are never compiled; 0004's `typedef string labels_t[3]` is
   copied by hand into `tests/0004/tb.sv:2`. Fix: `//@page`.
-- [ ] A17. `overrides/404.html:28` `decodeURIComponent` throws on a cut escape, which stops the
+- [x] A17. `overrides/404.html:28` `decodeURIComponent` throws on a cut escape, which stops the
   404 script.
-- [ ] A18. Dead code: `bitsOf` redefined in `lpmtrie.js:148` (core.js has `lib.bitsOf`);
+- [x] A18. Dead code: `bitsOf` redefined in `lpmtrie.js:148` (core.js has `lib.bitsOf`);
   unused exports `bilFold`, `chompEat`, `nimLegal`, `ihStep`.
 
 ### Flaky checks

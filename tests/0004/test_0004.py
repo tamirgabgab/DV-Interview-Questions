@@ -1,7 +1,7 @@
 import itertools
 import random
 
-from extract_code import load_python
+from extract_code import ROOT, load_python, pick
 
 ns = load_python(4)
 LABELS = ["RED", "BLACK", "MIXED"]
@@ -96,3 +96,11 @@ def test_explorer_labels_fix_box():
     ex = got[all_cases.index((["RED", "BLACK", "MIXED"], ["BLACK", "MIXED", "RED"]))]
     assert (ex["k"], ex["same"], ex["other"]) == (2, 0, 1)
     assert ex["after1"] == ["MIXED", "BLACK", "RED"] and ex["after2"] == ["BLACK", "MIXED", "RED"]
+
+
+def test_tb_typedef_is_the_pages():
+    """tb.sv cannot pull the page's interface block with //@page (the block's draw() stub
+    would clash with the testbench's draw), so it copies the typedef: keep the two equal."""
+    line = "typedef string labels_t[3];"
+    assert line in pick(4, "systemverilog", "typedef string labels_t")
+    assert line in (ROOT / "tests" / "0004" / "tb.sv").read_text(encoding="utf-8")

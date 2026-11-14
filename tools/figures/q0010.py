@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Work table and stack steppers of question 0010 (valid parentheses).
 
-    python tools/figures/q0010.py > /tmp/q0010.html
+    python tools/figures/fill.py 10       # put the blocks on the page
+
+blocks() returns, in page order: the stepper on "{[()]}", the stepper on "([)]" and the
+work table.
 
 Work = characters read. The pair-removal solution reads the whole remaining string on
 every pass; the stack reads every character once. Input: n/2 times "(" then n/2 times ")".
@@ -104,7 +107,10 @@ def stack_stepper(text):
     return stepper(frames, f"המחסנית תו אחרי תו על {text}")
 
 
+def blocks():
+    """The generated blocks, in page order."""
+    return [stack_stepper("{[()]}"), stack_stepper("([)]"), table()]
+
+
 if __name__ == "__main__":
-    print(table(), "\n")
-    print(stack_stepper("{[()]}"), "\n")
-    print(stack_stepper("([)]"))
+    print("\n\n".join(blocks()))

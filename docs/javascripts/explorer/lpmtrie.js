@@ -4,7 +4,7 @@
 // script tags); under Node tools/explorer_node.js loads every kind file and merges the
 // models for the question tests.
 (() => {
-  const { answer, attr, autoplay, f, ltr, speedSel } = dvqExplorers.lib;
+  const { answer, attr, autoplay, bitsOf, f, ltr, speedSel } = dvqExplorers.lib;
   const NB = " ";
   const W = 8, ROWS = 6;
 
@@ -145,7 +145,6 @@
   };
   const star = (p) => `${p}*`;
   const nodeName = (n) => (n === "" ? "השורש" : `הצומת <code>${n}</code>`);
-  const bitsOf = (v, w = W) => v.toString(2).padStart(w, "0");
 
   // the binary trie: every node, the walk up to step k lit, the best so far ringed
   const binarySvg = (routes, bits, k) => {
@@ -295,12 +294,12 @@
         return { routes, rows };
       };
       const stride = () => Number(strideIn.value);
-      const steps = (routes) => (stride() === 1 ? lpmPath(routes, bitsOf(addr)).length : lpmMultiPath(routes, W, 2, addr).length);
+      const steps = (routes) => (stride() === 1 ? lpmPath(routes, bitsOf(addr, W)).length : lpmMultiPath(routes, W, 2, addr).length);
       const pathTable = (routes) => {
         const s = stride(), k = st.k;
         let rowsHtml = "";
         if (s === 1) {
-          const path = lpmPath(routes, bitsOf(addr));
+          const path = lpmPath(routes, bitsOf(addr, W));
           for (let i = 0; i < path.length; i++) {     // a row per node of the walk, the later ones dotted
             const e = i < k ? path[i] : null;
             const cls = !e ? "is-later" : i === k - 1 ? "is-cur" : "";
@@ -321,7 +320,7 @@
         return `<table class="lpm-path"><thead><tr><th>רמה</th><th>הכניסה</th><th>בה</th><th>הטובה</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
       };
       const stepText = (routes, T) => {
-        const k = st.k, bits = bitsOf(addr), s = stride();
+        const k = st.k, bits = bitsOf(addr, W), s = stride();
         if (k === 0) return `ההתחלה${NB}: הכתובת ${ltr(addr)}, הביטים ${ltr(`<code>${bits}</code>`)}. החיפוש מתחיל בשורש, ועוד אין קידומת טובה.`;
         let t;
         if (s === 1) {
@@ -345,7 +344,7 @@
       const draw = () => {
         const { routes, rows } = table(), T = steps(routes);
         st.k = Math.min(Math.max(st.k, 0), T);
-        const bits = bitsOf(addr), s = stride(), k = st.k;
+        const bits = bitsOf(addr, W), s = stride(), k = st.k;
         const readBits = s === 1 ? (k ? lpmPath(routes, bits)[k - 1][0].length : 0) : 2 * k;
         $(".lpm-abits").innerHTML = [...bits].map((c, i) => `<b class="${i < readBits ? "is-read" : ""}">${c}</b>${i % 4 === 3 && i < W - 1 ? " " : ""}`).join("");
         // the table: each row's bits and whether it matches the address

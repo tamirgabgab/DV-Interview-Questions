@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Inline SVG figures and tables of question 0009 (16 boxes, 16 people and a helper).
 
-    python tools/figures/q0009.py > /tmp/q0009.html
+    python tools/figures/fill.py 9        # put the blocks on the page
 
-Prints the before / after box tables, the two cycle figures and the trace table; paste
-them into the question page.
+blocks() returns, in page order: the boxes before the swap and their cycles, the boxes
+after the swap and their cycles, the stepper of the walks and the trace table after the
+swap. Run as a script, it also prints the cycle lengths after the swap and the trace table
+before it, which the page states in prose.
 """
 
 import math
@@ -166,19 +168,27 @@ def walk_stepper():
     return stepper(frames, "ההחלפה של העוזר ואז המסלול של כל אחד מ-16 האנשים")
 
 
-if __name__ == "__main__":
-    print(boxes_table(NOTES, SWAP), "\n")
+def blocks():
+    """The generated blocks, in page order."""
     before = [(LONG, 175, 150, 120), (SHORT[0], 430, 150, 60), (SHORT[1], 565, 150, 45)]
-    print(cycle_svg(before, NOTES, "q9b", "המעגלים לפני ההחלפה : מעגל באורך 11, מעגל באורך 3 ומעגל באורך 2",
-                    lambda cyc, b, n: "s2-line" if len(cyc) > MAX_OPENS else "ink-line", SWAP), "\n")
-    print(boxes_table(AFTER, SWAP), "\n")
     after_cycles = cycles(AFTER)
     a, b = [c for c in after_cycles if SWAP[0] in c or SWAP[1] in c]
     after = [(a, 110, 150, 85), (b, 300, 150, 80), (SHORT[0], 465, 150, 55), (SHORT[1], 580, 150, 40)]
-    print(cycle_svg(after, AFTER, "q9a", "המעגלים אחרי ההחלפה : מעגלים באורך 6, 5, 3 ו-2",
-                    lambda cyc, b, n: ("s1-line" if SWAP[0] in cyc else "s3-line") if len(cyc) > 3 else "ink-line",
-                    SWAP), "\n")
-    print([len(c) for c in after_cycles], "\n")
-    print(trace_table(NOTES), "\n")
-    print(trace_table(AFTER), "\n")
-    print(walk_stepper())
+    return [
+        boxes_table(NOTES, SWAP),
+        cycle_svg(before, NOTES, "q9b", "המעגלים לפני ההחלפה : מעגל באורך 11, מעגל באורך 3 ומעגל באורך 2",
+                  lambda cyc, b, n: "s2-line" if len(cyc) > MAX_OPENS else "ink-line", SWAP),
+        boxes_table(AFTER, SWAP),
+        cycle_svg(after, AFTER, "q9a", "המעגלים אחרי ההחלפה : מעגלים באורך 6, 5, 3 ו-2",
+                  lambda cyc, b, n: ("s1-line" if SWAP[0] in cyc else "s3-line") if len(cyc) > 3 else "ink-line",
+                  SWAP),
+        walk_stepper(),
+        trace_table(AFTER),
+    ]
+
+
+if __name__ == "__main__":
+    print("\n\n".join(blocks()), "\n")
+    # not on the page as blocks: the prose quotes them
+    print([len(c) for c in cycles(AFTER)], "\n")
+    print(trace_table(NOTES))

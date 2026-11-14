@@ -117,14 +117,16 @@
       });
       label();
     });
-    // a saved width that no longer fits (a smaller window) is pulled back in
-    window.addEventListener("resize", () => {
+    // a saved width that no longer fits (a smaller window) is pulled back in, on load too
+    const fit = () => {
       Object.entries(sides).forEach(([which, side]) => {
         if (!side || !store.get(WIDTH_KEY[which]) || !side.offsetParent) return;
         const w = side.getBoundingClientRect().width, c = clamp(which, w);
         if (Math.abs(c - w) > 1) apply(which, c);
       });
-    }, { passive: true });
+    };
+    fit();
+    window.addEventListener("resize", fit, { passive: true });
   };
 
   // On a phone the closed drawer and the closed search are off the screen but were still in

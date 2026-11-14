@@ -160,17 +160,23 @@ def test_tie_needs_no_smaller_cup():
             assert all(jury + pub - j <= pub for _, j, _ in order[idx + 1:])
 
 
-def test_step_table_on_page():
-    """The step table of part a is the generator's step_table(), and its last row says why
-    the loss is certain although 0 <= 0 (Bulgaria passed 343)."""
+def test_figures_up_to_date():
+    """Every generated block on the page (the two cup charts, the step table and the
+    crossing chart) is the output of tools/figures/q0008.py."""
+    from page_tests import assert_figures_match
+
+    assert_figures_match(8)
+
+
+def test_step_table_last_row():
+    """The last row of the step table says why the loss is certain although 0 <= 0
+    (Bulgaria passed 343)."""
     import sys
 
-    from extract_code import ROOT, question_path
+    from extract_code import ROOT
 
     sys.path.insert(0, str(ROOT / "tools" / "figures"))
     import q0008
 
-    page = question_path(8).read_text(encoding="utf-8")
     table = q0008.step_table()
-    assert "\n".join("    " + line for line in table.split("\n")) in page
     assert "| \u200fBulgaria | 312 | 516 | 0 | 0 | **לא** (בולגריה עברה את 343) |" in table

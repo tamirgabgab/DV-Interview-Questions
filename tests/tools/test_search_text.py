@@ -27,6 +27,8 @@ LRI, PDI = "\u2066", "\u2069"
     (r"\( d \in \{0, 1\} \)", "d ∈ {0, 1}"),
     (r"\( \text{rate}_{w} \)", "rate_w"),
     (r"\[ \sum_{i=1}^{n} i \]", "Σᵢ₌₁ⁿ i"),
+    ("\\( a \\", "a"),                          # a lone backslash at the end
+    (r"\( \sqrt[3 \)", "³√()"),                 # an unclosed root index
 ])
 def test_tex_to_text(tex, text):
     assert search_text.tex_to_text(tex) == text

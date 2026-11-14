@@ -83,7 +83,7 @@ def _group(s: str, i: int) -> tuple[str, int]:
             j += 1
         return s[i + 1:], len(s)
     if s[i] == "\\":
-        m = re.match(r"\\([A-Za-z]+|.)", s[i:])
+        m = re.match(r"\\([A-Za-z]+|.?)", s[i:], re.S)
         return m.group(0), i + len(m.group(0))
     return s[i], i + 1
 
@@ -105,7 +105,7 @@ def _convert(s: str) -> str:
     while i < len(s):
         c = s[i]
         if c == "\\":
-            m = re.match(r"\\([A-Za-z]+|.)", s[i:])
+            m = re.match(r"\\([A-Za-z]+|.?)", s[i:], re.S)
             name, i = m.group(1), i + len(m.group(0))
             if name == "\\":                       # a line break of aligned
                 out.append("; ")
@@ -123,7 +123,9 @@ def _convert(s: str) -> str:
             elif name == "sqrt":
                 root = ""
                 if i < len(s) and s[i] == "[":
-                    j = s.index("]", i)
+                    j = s.find("]", i)
+                    if j < 0:                       # an unclosed \sqrt[: the rest is the index
+                        j = len(s)
                     root, i = _convert(s[i + 1:j]), j + 1
                 a, i = _group(s, i)
                 a = _convert(a).strip()

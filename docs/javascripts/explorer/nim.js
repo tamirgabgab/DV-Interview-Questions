@@ -243,6 +243,6 @@
     help: {
       nim: "מקלידים את הערימות, בוחרים חוק ומי מתחיל, ומשחקים נגד המחשב : לחיצה על אסימון לוקחת אותו ואת כל האסימונים שאחריו בערימה, והמחשב עונה במהלך הטוב ביותר. מתחת ללוח הערימות בבינארי (או מספרי גרנדי שלהן) ושורת ה-XOR, ו\"הצגת המהלך המנצח\" מסמנת את האסימונים שכדאי לקחת ומונה את כל המהלכים המנצחים.",
     },
-    models: { nimXor, nimMove, misereMove, grundy, subMove, computerMove, nimPlay, nimLegal: legal, nimWinMoves: winMoves, nimBoardXor: boardXor },
+    models: { nimXor, nimMove, misereMove, grundy, subMove, computerMove, nimPlay, nimWinMoves: winMoves, nimBoardXor: boardXor },
   });
 })();

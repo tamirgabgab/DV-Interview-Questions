@@ -3,11 +3,9 @@
 zero-point characterization, the base-3 digit rule of part b, and that the figures and
 tables are the generator's output."""
 
-import re
-import subprocess
 import sys
 
-from extract_code import ROOT, question_path
+from extract_code import ROOT
 
 sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0016  # noqa: E402
@@ -192,16 +190,9 @@ def test_josephus_rule_trap():
 
 
 def test_figures_up_to_date():
-    out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0016.py")],
-                         capture_output=True, text=True, check=True).stdout
-    text = question_path(16).read_text(encoding="utf-8")
-    for pattern in (r'<div class="stepper".*?</div></div>', r'<svg class="(?:figure|perf-chart)".*?</svg>',
-                    r'<span class="viz-legend">.*?</span></span>'):
-        generated = re.findall(pattern, out)
-        assert generated and re.findall(pattern, text) == generated, pattern
-    page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
-    for row in (l for l in out.splitlines() if l.startswith("|")):
-        assert row.strip() in page_rows, row
+    from page_tests import assert_figures_match
+
+    assert_figures_match(16)
 
 
 def test_explorer_matches_simulation():

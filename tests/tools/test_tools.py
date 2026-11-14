@@ -87,6 +87,18 @@ def test_chart_mapping():
     assert svg.startswith('<svg class="perf-chart"') and svg.endswith("</svg>") and "#" not in svg
 
 
+def test_lint_skeleton_and_open_followups(tmp_path):
+    page = (ROOT / "tools/authoring/question.md").read_text(encoding="utf-8").replace("id: 0 ", "id: 42 ")
+    path = tmp_path / "0042-x.md"
+    cut = page[: page.index("??? followup")]
+    path.write_text(cut, encoding="utf-8")
+    assert "no the follow-ups (??? followup)" in lint_pages.lint(path)
+    # an open follow-up block (???+) is still checked for its short answers
+    item = page.index("??? fu-answer")
+    path.write_text(page.replace("??? followup", "???+ followup")[: item + 1].rsplit("\n", 1)[0] + "\n", encoding="utf-8")
+    assert any("follow-up without a short answer" in p for p in lint_pages.lint(path))
+
+
 def test_lint_cost_chips(tmp_path):
     page = (ROOT / "tools/authoring/question.md").read_text(encoding="utf-8").replace("id: 0 ", "id: 42 ")
     path = tmp_path / "0042-x.md"
@@ -136,3 +148,19 @@ def test_every_question_in_a_study_path(monkeypatch, tmp_path):
     (q / "student" / "0999-orphan.md").write_text("---\nid: 999\n---\n", encoding="utf-8")
     monkeypatch.setattr(lint_pages, "QUESTIONS", q)
     assert lint_pages.lint_paths() == ["0999-orphan.md: in no study path (add it to a docs/paths/*.md)"]
+
+
+def test_every_question_is_on_the_map():
+    """tools/build/graph_concepts.json has every question, with known concepts, and
+    docs/graph.html was rebuilt from it (python tools/build/graph.py)."""
+    import json
+    import re
+    data = json.loads((ROOT / "tools/build/graph_concepts.json").read_text(encoding="utf-8"))
+    ids = {re.match(r"\d{4}", p.name).group() for p in (ROOT / "docs/questions").glob("*/0*.md")}
+    assert ids - set(data["questions"]) == set(), "add these to tools/build/graph_concepts.json"
+    assert set(data["questions"]) - ids == set(), "questions no longer on the site"
+    for qid, q in data["questions"].items():
+        assert set(q["core"] + q["secondary"]) <= set(data["concepts"]), qid
+    html = (ROOT / "docs/graph.html").read_text(encoding="utf-8")
+    missing = sorted(i for i in ids if f'"id": "q{i}"' not in html)
+    assert not missing, f"rebuild docs/graph.html (python tools/build/graph.py): {missing}"

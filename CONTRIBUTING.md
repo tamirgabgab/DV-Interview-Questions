@@ -822,12 +822,15 @@ holds the same numbers.
    (`python tools/build/catalog.py` does that after a title or a level changes; a test checks it).
 3. Write the page. Put any images in `docs/assets/images/` named `<id>-<description>.<ext>`;
    put generated figures in `blocks()` and run `python tools/figures/fill.py <id>`.
-4. Run `python tools/checks/run_tests.py <id>` and `python tools/checks/lint_pages.py <id>`, build locally
+4. Add the question's concepts to `tools/build/graph_concepts.json` (core, secondary, the
+   questions the page links to) and run `python tools/build/graph.py` (needs `pip install
+   graphifyy`) to redraw `docs/graph.html`, the question map; a test fails while it is missing.
+5. Run `python tools/checks/run_tests.py <id>` and `python tools/checks/lint_pages.py <id>`, build locally
    (below) and check the page at desktop and phone width, light and dark.
-5. Commit with a message like `Add question 0042: async FIFO depth`.
+6. Commit with a message like `Add question 0042: async FIFO depth`.
 
 The question automatically appears in the navigation, on its level page, in the table
-of `all.md` and in the tag index — no other file needs to change.
+of `all.md` and in the tag index; the map (step 4) is the one file to update by hand.
 
 ---
 
@@ -1060,7 +1063,8 @@ without it.
   needs one today; the mechanism stays for the next simulator bug. Get the hash for a
   translation with `python -c "import sys; sys.path.insert(0, 'tools'); import extract_code as e; print(e.fingerprint(e.pick(<id>, 'systemverilog', '<text>')))"`.
 - Compiled testbenches are cached in `.cache/sv/` by content hash, so unchanged ones are not
-  recompiled. A first full compile takes about a minute with 4 cores; the z3 solver needs
+  recompiled. Only the binary (`obj_dir/sim`) is kept, and a run of every testbench removes
+  the folders no testbench used. A first full compile takes about a minute with 4 cores; the z3 solver needs
   about 0.1 s per `randomize()` on 0014, so that testbench runs for ~30 s.
 - Pure logic questions have no tests. A page without code can still have a `tests/<id>/`
   folder when it states numbers worth checking (0015 probabilities, 0021 counts and the

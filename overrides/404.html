@@ -25,7 +25,9 @@
 <script>
   (() => {
     const base = {{ base_url | tojson }}, list = {{ config.extra.dvq_404 | tojson }};
-    const path = decodeURIComponent(location.pathname);
+    // a cut escape ("%E0%A") makes decodeURIComponent throw; the raw path still matches ids
+    let path = location.pathname;
+    try { path = decodeURIComponent(path); } catch (e) { /* keep the raw path */ }
     // a question moved to a new number: its old address goes straight to the new one
     const renumbered = {{ (config.extra.dvq_renumbered or {}) | tojson }};
     const old = /questions\/(\w+)\/(\d{4})-([\w-]+)\/?$/.exec(path);

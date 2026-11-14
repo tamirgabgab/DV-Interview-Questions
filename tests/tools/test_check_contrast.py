@@ -36,3 +36,13 @@ def test_resolve_and_ratio():
 
 def test_the_site_passes(capsys):
     assert cc.check() == 0, capsys.readouterr().out
+
+
+def test_an_opaque_layer_over_others_is_refused(monkeypatch):
+    """A list of opaque fills tests only the first one: check() refuses it."""
+    two = [f"color-mix(in srgb, {c} 10%, var(--md-default-bg-color))" for c in ("#ff0000", "#0000ff")]
+    monkeypatch.setattr(cc, "PAIRS", [("two fills", "var(--md-default-fg-color)", two, cc.TEXT)])
+    with pytest.raises(ValueError, match="CARD, PAGE"):
+        cc.check()
+    monkeypatch.setattr(cc, "PAIRS", [("two fills", "var(--md-default-fg-color)", [cc.CARD, cc.PAGE, *two], cc.TEXT)])
+    assert cc.check() == 0

@@ -31,6 +31,7 @@ TEXT, UI = 4.5, 3.0
 # explorer box's surface (white on the off-white page in the light scheme, W336). CARD is
 # opaque, so nothing under [CARD, PAGE] can show: a list that starts with CARD, PAGE and goes
 # on means "in a box, and also on each of these fills", and check() tests every one of them.
+# check() refuses any other list where an opaque layer sits above another one.
 PAGE = "var(--md-default-bg-color)"
 TOAST = {"default": "var(--md-primary-fg-color)", "slate": "color-mix(in srgb, var(--md-primary-fg-color) 70%, #000)"}
 # the seven output tints of 0078 (the five series, the amber accent, a blue-green mix)
@@ -102,11 +103,11 @@ PAIRS = [
     ("a queen of the odd half (0081 construction)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color))"], UI),
     ("a free bit (0081 masks)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 28%, var(--md-default-bg-color))"], TEXT),
     ("a solution's queen, its outline on a dark square (0081 nqueens)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-grid) 75%, var(--md-default-bg-color))"], UI),
-    ("figure text on the felt (0080)", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], TEXT),
-    ("a pocket and the ball's outline on the felt (0080)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
-    ("the path, the aim and the pocket entered on the felt (0080)", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
-    ("a cushion hit and a gap on the felt (0080)", "var(--viz-s1)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
-    ("the gap of the pocket entered (0080 box)", "var(--viz-s3-text)", ["color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
+    ("figure text on the felt (0080)", "var(--viz-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], TEXT),
+    ("a pocket and the ball's outline on the felt (0080)", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
+    ("the path, the aim and the pocket entered on the felt (0080)", "var(--viz-s2-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
+    ("a cushion hit and a gap on the felt (0080)", "var(--viz-s1)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
+    ("the gap of the pocket entered (0080 box)", "var(--viz-s3-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-grid) 35%, var(--md-default-bg-color))"], UI),
     *[(f"output on tint {i} (0078)", "var(--viz-ink)", [f"color-mix(in srgb, {c} 24%, var(--md-default-bg-color))"], TEXT)
       for i, c in enumerate(RN_TINTS, 1)],
     *[(f"v above the output on tint {i} (0078)", "var(--viz-text)", [f"color-mix(in srgb, {c} 24%, var(--md-default-bg-color))"], TEXT)
@@ -132,17 +133,17 @@ PAIRS = [
     ("question count on the fold button", "var(--md-default-fg-color)", ["var(--site-primary-soft)", "var(--site-surface)"], TEXT),
     ("column grip line", "var(--site-mark-color)", [PAGE], UI),
     ("home band heading", "var(--hb-ink)", ["var(--hb-bg)"], TEXT),
-    ("home band card text", "var(--hb-ink-2)", ["var(--hb-card)", "var(--hb-bg)"], TEXT),
-    ("home band card secondary text", "var(--hb-ink-3)", ["var(--hb-card)", "var(--hb-bg)"], TEXT),
-    ("home band link", "var(--hb-link)", ["var(--hb-card)", "var(--hb-bg)"], TEXT),
-    ("home band id and kicker", "var(--hb-accent)", ["var(--hb-card)", "var(--hb-bg)"], TEXT),
-    ("home band easy chip", "var(--hb-easy)", ["var(--hb-easy-bg)", "var(--hb-card)", "var(--hb-bg)"], TEXT),
-    ("home band easy bar segment", "var(--hb-easy)", ["var(--hb-card)", "var(--hb-bg)"], UI),
-    ("home band medium chip", "var(--hb-medium)", ["var(--hb-medium-bg)", "var(--hb-card)", "var(--hb-bg)"], TEXT),
-    ("home band medium bar segment", "var(--hb-medium)", ["var(--hb-card)", "var(--hb-bg)"], UI),
-    ("home band hard chip", "var(--hb-hard)", ["var(--hb-hard-bg)", "var(--hb-card)", "var(--hb-bg)"], TEXT),
-    ("home band hard bar segment", "var(--hb-hard)", ["var(--hb-card)", "var(--hb-bg)"], UI),
-    ("home band level chip", "var(--hb-link)", ["var(--hb-soft)", "var(--hb-card)", "var(--hb-bg)"], TEXT),
+    ("home band card text", "var(--hb-ink-2)", ["var(--hb-card)"], TEXT),
+    ("home band card secondary text", "var(--hb-ink-3)", ["var(--hb-card)"], TEXT),
+    ("home band link", "var(--hb-link)", ["var(--hb-card)"], TEXT),
+    ("home band id and kicker", "var(--hb-accent)", ["var(--hb-card)"], TEXT),
+    ("home band easy chip", "var(--hb-easy)", ["var(--hb-easy-bg)", "var(--hb-card)"], TEXT),
+    ("home band easy bar segment", "var(--hb-easy)", ["var(--hb-card)"], UI),
+    ("home band medium chip", "var(--hb-medium)", ["var(--hb-medium-bg)", "var(--hb-card)"], TEXT),
+    ("home band medium bar segment", "var(--hb-medium)", ["var(--hb-card)"], UI),
+    ("home band hard chip", "var(--hb-hard)", ["var(--hb-hard-bg)", "var(--hb-card)"], TEXT),
+    ("home band hard bar segment", "var(--hb-hard)", ["var(--hb-card)"], UI),
+    ("home band level chip", "var(--hb-link)", ["var(--hb-soft)", "var(--hb-card)"], TEXT),
     ("home band button", "var(--hb-on-accent)", ["var(--hb-accent)"], TEXT),
     ("home band focus ring", "var(--hb-accent)", ["var(--hb-bg)"], UI),
     ("interview bar text", "#ffffff", [TOAST], TEXT),
@@ -229,7 +230,7 @@ PAIRS = [
     ("part circle letter", "var(--md-default-fg-color)", [PAGE], TEXT),
     ("part circle passed", "var(--qp-ink)", ["var(--md-accent-fg-color)"], TEXT),
     ("part circle solved", "var(--md-default-bg-color)", ["var(--diff-easy)"], TEXT),
-    ("negative digit, current conversion row", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color))", CARD, PAGE], TEXT),
+    ("negative digit, current conversion row", "var(--viz-s2-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 14%, var(--md-default-bg-color))"], TEXT),
     ("explanation step chip, lit", "var(--md-default-fg-color)", ["var(--md-accent-fg-color--transparent)", PAGE], TEXT),
     ("explanation step chip", "var(--viz-text)", [PAGE], TEXT),
     ("ladder cell label, a term", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
@@ -308,7 +309,7 @@ PAIRS = [
     ("0083 jugs, a state with the target", "var(--viz-s3)", [CARD, PAGE], UI),
     ("0083 jugs, a state never reached", "var(--viz-text)", [CARD, PAGE], UI),
     ("0083 jugs, the longer plan on the grid", "var(--viz-s4)", [CARD, PAGE], UI),
-    ("0083 jugs, the shortest-plan tag", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))", CARD, PAGE], TEXT),
+    ("0083 jugs, the shortest-plan tag", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
     # 0084 LIS (stylesheets/questions/0084-lis.css): the figures and the box of the longest increasing subsequence
     ("0084 LIS, a value on the LIS", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("0084 LIS, a value compared or appended", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
@@ -330,8 +331,8 @@ PAIRS = [
     ("0085 self-describing, the base shown in the strip", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 18%, var(--md-default-bg-color))"], TEXT),
     ("0085 self-describing, the frame of the base shown", "var(--viz-s4)", ["color-mix(in srgb, var(--viz-s4) 18%, var(--md-default-bg-color))"], UI),
     # 0086 chameleons (stylesheets/questions/0086-chameleons.css): red is --viz-s5, green --viz-s3, blue --viz-s1
-    ("0086 chameleons, a count on its disc", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s5) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
-    ("0086 chameleons, a count and its residue in the box", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s5) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color))"], TEXT),
+    ("0086 chameleons, a count on its disc", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s5) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))"], TEXT),
+    ("0086 chameleons, a count and its residue in the box", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s5) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 12%, var(--md-default-bg-color))"], TEXT),
     ("0086 chameleons, a chameleon's colour as a mark", "var(--viz-s5)", [CARD, PAGE], UI),
     ("0086 chameleons, green as a mark", "var(--viz-s3)", [CARD, PAGE], UI),
     ("0086 chameleons, blue as a mark", "var(--viz-s1)", [CARD, PAGE], UI),
@@ -339,7 +340,7 @@ PAIRS = [
     ("0086 chameleons, a state never reached", "var(--viz-text)", [CARD, PAGE], UI),
     ("0086 chameleons, the start ring", "var(--viz-s2-text)", [CARD, PAGE], UI),
     ("0086 chameleons, the path so far", "var(--viz-s2)", [CARD, PAGE], UI),
-    ("0064 weights, a value two triples share (the tiling figure)", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 15%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 15%, var(--md-default-bg-color))"], TEXT),
+    ("0064 weights, a value two triples share (the tiling figure)", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s2) 15%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 15%, var(--md-default-bg-color))"], TEXT),
     ("0086 chameleons, the shortest-plan tag", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
     # 0087 lights out (stylesheets/questions/0087-lights.css): the boards of the figures and of the box
     # the rim against the amber bulb is 1.3:1 in the dark scheme (an open item in notes/HANDOFF.md);
@@ -366,9 +367,9 @@ PAIRS = [
     ("0089 frobenius, a payable amount", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
     ("0089 frobenius, an amount that cannot be paid", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
     ("0089 frobenius, the frame of the largest amount that cannot be paid", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], UI),
-    ("0089 frobenius, the frame of a payable amount of the run", "var(--viz-s3-text)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0089 frobenius, the frame of a payable amount of the run", "var(--viz-s3-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], UI),
     ("0089 frobenius, the head of a column", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
-    ("0089 frobenius, the frame of a head and of the best so far", "var(--viz-s1)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0089 frobenius, the frame of a head and of the best so far", "var(--viz-s1)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], UI),
     ("0089 frobenius, the column settled now and the typed amount", "var(--viz-ink)", [CARD, PAGE], UI),
     ("0089 frobenius, an amount not settled yet, the remainders", "var(--viz-text)", [CARD, PAGE], TEXT),
     # 0090 pancakes (stylesheets/questions/0090-pancake.css): the stacks of the figures and of the box
@@ -389,10 +390,10 @@ PAIRS = [
     ("0091 chomp, the squares a move ate", "var(--viz-text)", [CARD, PAGE], UI),
     ("0091 chomp, a column letter or a row number", "var(--viz-text)", [CARD, PAGE], TEXT),
     # 0092 circle (stylesheets/questions/0092-circle.css): the disc cut into regions, in the figures and the box
-    ("0092 circle, a region number on any of the six tints", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], TEXT),
-    ("0092 circle, a chord over any region", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
-    ("0092 circle, the new chord over any region", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
-    ("0092 circle, a ring where three chords meet", "var(--viz-s5)", ["color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
+    ("0092 circle, a region number on any of the six tints", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], TEXT),
+    ("0092 circle, a chord over any region", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
+    ("0092 circle, the new chord over any region", "var(--viz-s2-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
+    ("0092 circle, a ring where three chords meet", "var(--viz-s5)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 24%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s5) 20%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], UI),
     ("0092 circle, a point on the circle", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0092 circle, the number of a point", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0092 circle, the dashed bar of the powers of 2", "var(--viz-s2-text)", [CARD, PAGE], UI),
@@ -416,12 +417,12 @@ PAIRS = [
     # 0095 soldiers (stylesheets/questions/0095-soldiers.css): the boards of the figures and of the box
     ("0095 soldiers, a soldier on the ground", "var(--viz-s1)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))"], UI),
     ("0095 soldiers, a soldier above the line", "var(--viz-s1)", [CARD, PAGE], UI),
-    ("0095 soldiers, the soldier that just jumped", "var(--viz-s2-text)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
-    ("0095 soldiers, a cell a jump emptied", "var(--viz-text)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0095 soldiers, the soldier that just jumped", "var(--viz-s2-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))"], UI),
+    ("0095 soldiers, a cell a jump emptied", "var(--viz-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))"], UI),
     ("0095 soldiers, the target", "var(--viz-s5)", [CARD, PAGE], UI),
-    ("0095 soldiers, the soldier chosen", "var(--viz-s5)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
-    ("0095 soldiers, where it can jump", "var(--viz-s3-text)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
-    ("0095 soldiers, the line", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))", CARD, PAGE], UI),
+    ("0095 soldiers, the soldier chosen", "var(--viz-s5)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))"], UI),
+    ("0095 soldiers, where it can jump", "var(--viz-s3-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))"], UI),
+    ("0095 soldiers, the line", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s2) 12%, var(--md-default-bg-color))"], UI),
     ("0095 soldiers, a row number or a caption", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0095 soldiers, a distance above the line", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0095 soldiers, a distance on weight 0", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 48%, var(--md-default-bg-color))"], TEXT),
@@ -450,7 +451,7 @@ PAIRS = [
     ("0097 isqrt, a bit of the root", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("0097 isqrt, the bit of b²", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
     ("0097 isqrt, a bit not decided yet", "var(--viz-text)", [CARD, PAGE], TEXT),
-    ("0097 isqrt, the row of the step just decided", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 8%, var(--md-default-bg-color))", CARD, PAGE], TEXT),
+    ("0097 isqrt, the row of the step just decided", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 8%, var(--md-default-bg-color))"], TEXT),
     ("0097 isqrt, the step's yes", "var(--viz-s3-text)", [CARD, PAGE], TEXT),
     ("0097 isqrt, the step's no", "var(--viz-s2-text)", [CARD, PAGE], TEXT),
     # 0098 luhn (stylesheets/questions/0098-luhn.css): the digit strips and the box's maps
@@ -465,7 +466,7 @@ PAIRS = [
     ("0099 iban, a digit or a remainder", "var(--viz-ink)", [CARD, PAGE], TEXT),
     ("0099 iban, a digit of a letter", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))"], TEXT),
     ("0099 iban, a check digit", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))"], TEXT),
-    ("0099 iban, the first four characters in the box", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color))"], TEXT),
+    ("0099 iban, the first four characters in the box", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 22%, var(--md-default-bg-color))"], TEXT),
     ("0099 iban, a remainder not read yet", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0099 iban, the frame of the last remainder", "var(--viz-s3-text)", [CARD, PAGE], UI),
     ("0099 iban, the frame of a last remainder that is not 1", "var(--viz-s2-text)", [CARD, PAGE], UI),
@@ -508,21 +509,21 @@ PAIRS = [
     # 0022 latpaths (stylesheets/questions/0022-latpaths.css): the counts on their tints, the small boards and the box
     ("0022 latpaths, a count on its tint", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-s1) {p}%, var(--md-default-bg-color))" for p in (8, 18, 30, 44)], TEXT),
     ("0022 latpaths, a cell no path reaches", "var(--viz-text)", [CARD, PAGE], TEXT),
-    ("0022 latpaths, S and T on their tint", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 8%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color))"], TEXT),
+    ("0022 latpaths, S and T on their tint", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 8%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color))"], TEXT),
     ("0022 latpaths, the path on a small board", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))"], UI),
     ("0022 latpaths, the path line over the tints", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s1) 44%, var(--md-default-bg-color))"], UI),
     # 0100 stairs (stylesheets/questions/0100-stairs.css): the staircases and the box
-    ("0100 stairs, a count on a stair", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 7%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color))"], TEXT),
-    ("0100 stairs, a stair's number in the box", "var(--viz-text)", ["color-mix(in srgb, var(--viz-ink) 7%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color))"], TEXT),
-    ("0100 stairs, the cross of a broken stair", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color))"], TEXT),
+    ("0100 stairs, a count on a stair", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 7%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color))"], TEXT),
+    ("0100 stairs, a stair's number in the box", "var(--viz-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 7%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 26%, var(--md-default-bg-color))"], TEXT),
+    ("0100 stairs, the cross of a broken stair", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color))"], TEXT),
     ("0100 stairs, the edges of the picked stair and of the stairs below it", "var(--viz-s1)", [CARD, PAGE], UI),
     ("0100 stairs, the arrows into the last stair", "var(--viz-s3-text)", [CARD, PAGE], UI),
     ("0100 stairs, a jump size that is on", "var(--act-ink)", ["var(--act)"], TEXT),
     # 0101 sicherman (stylesheets/questions/0101-sicherman.css): the tables of the sums, the factor chips and the box
     ("0101 sicherman, a sum on its tint", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h in ("s1", "s3", "s4") for k in (10, 16, 22, 28, 34, 40)], TEXT),
     ("0101 sicherman, a face of a die over the table", "var(--viz-text)", [CARD, PAGE], TEXT),
-    ("0101 sicherman, a factor on its chip", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color))"], TEXT),
-    ("0101 sicherman, the frame of a sum that differs", "var(--viz-s2-text)", [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h in ("s1", "s3", "s4") for k in (10, 40)], UI),
+    ("0101 sicherman, a factor on its chip", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 10%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 26%, var(--md-default-bg-color))"], TEXT),
+    ("0101 sicherman, the frame of a sum that differs", "var(--viz-s2-text)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h in ("s1", "s3", "s4") for k in (10, 40)], UI),
     ("0101 sicherman, a bar of the histogram", "var(--viz-s3)", [CARD, PAGE], UI),
     ("0101 sicherman, a bar that differs", "var(--viz-s2)", [CARD, PAGE], UI),
     ("0101 sicherman, the mark of the triangle and the free factor's edge", "var(--viz-ink)", [CARD, PAGE], UI),
@@ -530,7 +531,7 @@ PAIRS = [
     # 0102 toposort (stylesheets/questions/0102-toposort.css): the graphs, the Gantt chart and the box
     ("0102 toposort, a task's letter on its tint", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s3", 28), ("s1", 26), ("s5", 22), ("ink", 30))], TEXT),
     ("0102 toposort, a black task's letter", "var(--md-default-bg-color)", ["var(--viz-ink)"], TEXT),
-    ("0102 toposort, a badge, a slot or a bar on its tint", "var(--viz-ink)", [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s2", 18), ("s3", 22), ("s1", 16), ("s5", 18), ("s1", 20), ("s5", 20), ("s1", 28), ("s5", 26), ("s1", 13))], TEXT),
+    ("0102 toposort, a badge, a slot or a bar on its tint", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s2", 18), ("s3", 22), ("s1", 16), ("s5", 18), ("s1", 20), ("s5", 20), ("s1", 28), ("s5", 26), ("s1", 13))], TEXT),
     ("0102 toposort, the labels of the queue and the order, the successors", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0102 toposort, an arrow and a task's outline", "var(--viz-text)", [CARD, PAGE], UI),
     ("0102 toposort, a lowered arrow (dashed)", "color-mix(in srgb, var(--viz-text) 60%, var(--md-default-bg-color))", [CARD, PAGE], UI),
@@ -762,6 +763,13 @@ def check(show_all: bool = False) -> int:
         for what, fg, layers, minimum in PAIRS:
             for stack in stacks(layers):
                 stack = [layer[scheme] if isinstance(layer, dict) else layer for layer in stack]
+                # an opaque layer hides what is under it: a list of fills meant as "on any of
+                # these" is written [CARD, PAGE, *fills] (stacks), or the lower ones are never
+                # measured. Over the page alone is fine.
+                for k, layer in enumerate(stack[:-1]):
+                    if color(layer)[3] >= 1 and not (k == len(stack) - 2 and stack[-1] == PAGE):
+                        raise ValueError(f"{what!r} ({scheme}): the opaque {layer} hides the layers under it; "
+                                         "write the fills as [CARD, PAGE, *fills]")
                 bg = (1.0, 1.0, 1.0, 1.0)
                 for layer in reversed(stack):
                     bg = over(color(layer), bg)

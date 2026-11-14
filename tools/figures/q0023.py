@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Figures and tables of question 0023 (PCIe endpoint reference model).
 
-    python tools/figures/q0023.py > /tmp/q0023.html
+    python tools/figures/fill.py 23         # put the blocks on the page
 
-Prints, in page order. Part a: the aligned read over the memory blocks (one or two
+blocks() returns, in page order. Part a: the aligned read over the memory blocks (one or two
 completions) and its legend; the cycle-by-cycle stepper of two interleaved reads and its
 legend; the table of that run. Part b: the blocks an unaligned request touches and its
 legend; the table of the block walk; the map of the four legal splits (and the illegal
@@ -378,17 +378,13 @@ def trace_table():
     return "\n".join(rows)
 
 
-if __name__ == "__main__":
-    print(aligned_svg(), "\n")
-    print(aligned_legend(), "\n")
+def blocks():
+    """The generated blocks, in page order."""
     stepper_html, sent_a = timeline_stepper()
-    print(stepper_html, "\n")
-    print(timeline_legend(), "\n")
-    print(timeline_table(sent_a), "\n")
-    print(chunks_svg(), "\n")
-    print(chunks_legend(), "\n")
-    print(chunks_table(), "\n")
-    print(splits_svg(), "\n")
-    print(splits_legend(), "\n")
-    print(splits_table(), "\n")
-    print(trace_table(), "\n")
+    return [aligned_svg(), aligned_legend(), stepper_html, timeline_legend(), timeline_table(sent_a),
+            chunks_svg(), chunks_legend(), chunks_table(), splits_svg(), splits_legend(),
+            splits_table(), trace_table()]
+
+
+if __name__ == "__main__":
+    print(*blocks(), sep=" \n\n", end=" \n\n")

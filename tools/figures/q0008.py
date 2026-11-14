@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Inline SVG figures of question 0008 (Eurovision 2026: when could Israel no longer win?).
 
-    python tools/figures/q0008.py > /tmp/q0008.html
+    python tools/figures/fill.py 8        # put the blocks on the page
 
-Prints the step table and three figures; paste them into the question page.
+blocks() returns, in page order: the cups right after Israel's announcement, the step
+table, the cups after France's announcement and the crossing chart.
 """
 
 # Grand final results: (country, jury, public)
@@ -143,8 +144,15 @@ def step_table() -> str:
     return "\n".join(rows)
 
 
+def blocks():
+    """The generated blocks, in page order."""
+    return [
+        cups(0, "המקום הפנוי של כל מדינה עד 343 נקודות, מיד אחרי ההכרזה של ישראל"),
+        step_table(),
+        cups(4, "המקום הפנוי של כל מדינה עד 343 נקודות, אחרי ההכרזה של צרפת"),
+        crossing_chart(),
+    ]
+
+
 if __name__ == "__main__":
-    print(step_table(), "\n")
-    print(cups(0, "המקום הפנוי של כל מדינה עד 343 נקודות, מיד אחרי ההכרזה של ישראל"), "\n")
-    print(cups(4, "המקום הפנוי של כל מדינה עד 343 נקודות, אחרי ההכרזה של צרפת"), "\n")
-    print(crossing_chart())
+    print("\n\n".join(blocks()))

@@ -418,10 +418,14 @@
         view.scrollTop += hit.getBoundingClientRect().top - view.getBoundingClientRect().top - view.clientHeight / 3;
       }
     };
+    render.panel = panel;
     PANELS.add(render);
     if (PANELS.size === 1) {                 // the language of every panel follows the tabs
       document.addEventListener("change", (e) => {
-        if (e.target.closest && e.target.closest(".tabbed-set")) setTimeout(() => PANELS.forEach((r) => r()), 0);
+        // a panel gone with its box (a box redrawn by "reset all") leaves the set
+        if (e.target.closest && e.target.closest(".tabbed-set")) {
+          setTimeout(() => PANELS.forEach((r) => (r.panel.isConnected ? r() : PANELS.delete(r))), 0);
+        }
       });
     }
     return (state) => { st = state; render(); };
@@ -763,6 +767,8 @@
   const SCRUB_MAX = 5000;
   const POS = /(\d+)\s*מתוך\s*(\d+)/;
   const transport = (box) => {
+    (box.dvqScrubMOs || []).forEach((mo) => mo.disconnect());   // "reset all" builds the box anew
+    box.dvqScrubMOs = [];
     box.querySelectorAll(".ex-controls").forEach((row) => {
       const own = (el) => el && el.closest(".ex-controls") === row;
       const found = TRANSPORT.map(([sel, icon]) => [[...row.querySelectorAll(sel)].find(own), icon]).filter(([b]) => b);
@@ -870,11 +876,13 @@
         if (resume) box.dvqPlaying = box.dvqPlaying.filter((b) => b !== play[0]);
       };
       let queued = false;
-      new MutationObserver((records) => {
+      const mo = new MutationObserver((records) => {
         if (queued || records.every((r) => wrap.contains(r.target))) return;
         queued = true;
         queueMicrotask(() => { queued = false; keep(); show(); });
-      }).observe(box, { childList: true, characterData: true, subtree: true });
+      });
+      mo.observe(box, { childList: true, characterData: true, subtree: true });
+      box.dvqScrubMOs.push(mo);
       show();
       scrub.addEventListener("input", () => { seek(Number(scrub.value)); show(); });
     });

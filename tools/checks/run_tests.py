@@ -101,6 +101,7 @@ def run_sv(tb: Path, verilator: str, version: str) -> tuple[str, bool, str]:
     flags = " ".join(m["flags"] for m in FLAGS.finditer(source)).split()
     key = hashlib.sha256((version + " ".join(flags) + source).encode()).hexdigest()[:16]
     work = CACHE / f"{name}-{key}"
+    USED.add(work.name)
     sim = work / "obj_dir" / "sim"
     cached = sim.exists()
 
@@ -114,6 +115,11 @@ def run_sv(tb: Path, verilator: str, version: str) -> tuple[str, bool, str]:
         if build.returncode != 0:
             errors = [l for l in (build.stdout + build.stderr).splitlines() if "%Error" in l]
             return name, False, "compile failed: " + " | ".join(errors[:5])
+    # only the binary is run again: the objects and the precompiled headers (two of about
+    # 88 MB each) would fill the cache (an older cache is slimmed on its next use)
+    for p in (work / "obj_dir").iterdir():
+        if p != sim:
+            shutil.rmtree(p) if p.is_dir() else p.unlink()
 
     try:
         result = subprocess.run([str(sim)], cwd=work, capture_output=True, text=True, timeout=SIM_TIMEOUT)
@@ -128,7 +134,11 @@ def run_sv(tb: Path, verilator: str, version: str) -> tuple[str, bool, str]:
     return name, passed, f"{summary} ({note}, {time.time() - start:.1f}s)"
 
 
-def run_all_sv(dirs: list[Path]) -> bool:
+USED: set[str] = set()   # the cache folders of this run
+
+
+def run_all_sv(dirs: list[Path], prune: bool = False) -> bool:
+    """prune (a run of every testbench): drop the cache folders no testbench used."""
     tbs = [d / "tb.sv" for d in dirs if (d / "tb.sv").exists()]
     if not tbs:
         return True
@@ -150,6 +160,12 @@ def run_all_sv(dirs: list[Path]) -> bool:
         results = list(pool.map(lambda tb: run_sv(tb, verilator, version), tbs))
     for name, passed, detail in results:
         print(f"  {'ok  ' if passed else 'FAIL'} {name}: {detail}")
+    if prune and CACHE.is_dir():
+        stale = [d for d in CACHE.iterdir() if d.is_dir() and d.name not in USED]
+        for d in stale:
+            shutil.rmtree(d, ignore_errors=True)
+        if stale:
+            print(f"  (removed {len(stale)} cached testbench(es) no longer used)")
     return all(passed for _, passed, _ in results)
 
 
@@ -165,7 +181,7 @@ def main() -> int:
     if not args.sv_only:
         ok &= run_python(dirs)
     if not args.python_only:
-        ok &= run_all_sv(dirs)
+        ok &= run_all_sv(dirs, prune=not args.ids)
     print("\nALL TESTS PASSED" if ok else "\nSOME TESTS FAILED")
     return 0 if ok else 1
 

@@ -112,7 +112,9 @@ def main(argv: list[str]) -> int:
     renumbered = dict(re.findall(r'"(\d{4})": "(\d{4})"', m.group(1))) if m else {}
     cases = [("a missing page", f"{prefix}no-such-page/", None),
              ("a missing address with an id", f"{prefix}questions/{GUESS_ID}/", guess_path),
-             ("a missing address with a slug", f"{prefix}questions/senior/{slug}/", guess_path)]
+             ("a missing address with a slug", f"{prefix}questions/senior/{slug}/", guess_path),
+             # a cut escape makes decodeURIComponent throw; the id still finds the question
+             ("a cut escape", f"{prefix}questions/{GUESS_ID}-%E0%A/", guess_path)]
 
     problems = 0
     with sync_playwright() as pw:

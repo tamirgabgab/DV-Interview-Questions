@@ -275,6 +275,6 @@
     help: {
       chomp: "טבלת שוקולד, והמשבצת a1 בפינה השמאלית התחתונה מורעלת. לחיצה על משבצת אוכלת אותה ואת כל מה שמעליה ומימינה, ומי שאוכל את a1 מפסיד. במשחק נגד המחשב בוחרים גודל ומי מתחיל, ו\"סימון המהלכים\" מסמן במסגרת ירוקה מהלך מנצח ובנקודה אפורה מהלך מפסיד, והשורה שליד הלוח אומרת מה המחשב ענה ומה שווה המצב. \"לוח של 2 על 6\" עובר ללוח של שתי שורות. יומן המהלכים נגלל בתוך התיבה. במשחק המראה המחשב פותח ב-b2 ועונה על כל מהלך במהלך המקביל בזרוע השנייה.",
     },
-    models: { chompEat: eat, chompWins: wins, chompWinningMoves: winningMoves, chompComputerMove: computerMove, chompMirrorMove: mirrorMove, chompPlay },
+    models: { chompWins: wins, chompWinningMoves: winningMoves, chompComputerMove: computerMove, chompMirrorMove: mirrorMove, chompPlay },
   });
 })();

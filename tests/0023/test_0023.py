@@ -3,12 +3,9 @@ an independent byte-level shadow memory and the protocol rules as the page state
 the SystemVerilog classes run the same way in tests/0023/tb.sv."""
 
 import random
-import re
-import subprocess
-import sys
 from itertools import combinations
 
-from extract_code import ROOT, load_python, question_path
+from extract_code import load_python
 
 ns = load_python(23)
 MemWriteReq, MemReadReq = ns["MemWriteReq"], ns["MemReadReq"]
@@ -242,16 +239,9 @@ def test_scheduler_waits_and_sends_one_per_cycle():
 
 
 def test_figures_up_to_date():
-    out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0023.py")],
-                         capture_output=True, text=True, check=True).stdout
-    text = question_path(23).read_text(encoding="utf-8")
-    for pattern in (r'<div class="stepper".*?</div></div>', r'<svg class="figure.*?</svg>',
-                    r'<span class="viz-legend">.*?</span></span>'):
-        generated = re.findall(pattern, out)
-        assert generated and re.findall(pattern, text) == generated, pattern
-    page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
-    for row in (l for l in out.splitlines() if l.startswith("|")):
-        assert row.strip() in page_rows, row
+    from page_tests import assert_figures_match
+
+    assert_figures_match(23)
 
 
 def test_explorer_matches_page_model():

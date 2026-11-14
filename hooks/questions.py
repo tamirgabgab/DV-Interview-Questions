@@ -1786,7 +1786,10 @@ def on_post_page(output, page, config, **kwargs):
         output = home_band(output)
     if page.file.src_uri in _questions:
         output = TRAP_RUN.sub(_trap_group, output)
-        _statements[page.url] = statement_sections(output)
+        try:
+            _statements[page.url] = statement_sections(output)
+        except Exception as e:                       # name the page, not only the TeX
+            raise RuntimeError(f"{page.file.src_uri}: the search text of the statement failed: {e!r}") from e
         output = qp_parts(video_links(output, _questions[page.file.src_uri]))
     output = one_stylesheet(output)
     scripts = wavedrom_scripts(output, page.url) + explorer_scripts(output, page.url)

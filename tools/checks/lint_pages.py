@@ -88,7 +88,7 @@ def lint_followups(text: str) -> list[str]:
     """Every item of the follow-up block has its short answer: a ``??? fu-answer`` block
     nested under the item (CONTRIBUTING.md, "Follow-up questions")."""
     lines = text.split("\n")
-    start = next((i for i, l in enumerate(lines) if l.startswith("??? followup")), None)
+    start = next((i for i, l in enumerate(lines) if re.match(r"\?\?\?\+? followup", l)), None)
     if start is None:
         return []
     problems, item = [], None
@@ -105,6 +105,17 @@ def lint_followups(text: str) -> list[str]:
     if item is not None:
         problems.append(f"{item + 1}: follow-up without a short answer (??? fu-answer under the item)")
     return problems
+
+
+# The blocks every question page has (CONTRIBUTING.md, "Question page structure"): a page
+# that lost one still built and linted clean.
+SKELETON = [(r"^\?{3}\+? tip ", "a hint (??? tip)"), (r"^\?{3}\+? success ", "a solution (??? success)"),
+            (r"^\s*!!! answer ", "a short answer (!!! answer)"), (r"^\?{3}\+? trap ", "a trap (??? trap)"),
+            (r"^\?{3}\+? followup ", "the follow-ups (??? followup)")]
+
+
+def lint_skeleton(text: str) -> list[str]:
+    return [f"no {name}" for pattern, name in SKELETON if not re.search(pattern, text, re.M)]
 
 
 def lint_code_spaces(text: str) -> list[str]:
@@ -180,7 +191,6 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     in_math = False
     solutions: list[dict] = []
     current: dict | None = None
-    hint_numbers: list[int] = []
     interviewer = 0
     leftovers = []
     para_start = True            # the next text line starts a paragraph
@@ -260,7 +270,6 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
                     current["answer"] = n
             elif typ == "tip" and title.startswith("רמז"):
                 num = re.findall(r"\d+", title)
-                hint_numbers.append(int(num[0]) if num else 0)
                 if not num:
                     problems.append(f"{n}: hint without a number: {title!r} (use רמז 1, רמז 2)")
             elif typ == "interviewer":
@@ -285,9 +294,9 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
             if not lm:
                 problems.append(f"{n}: h4 without a sol-* class: {stripped!r}")
             else:
-                text, cls = lm.groups()
-                if cls not in CLASSES or LABELS[CLASSES.index(cls)] != text:
-                    problems.append(f"{n}: unknown label/class pair {text!r} / {cls}")
+                label, cls = lm.groups()
+                if cls not in CLASSES or LABELS[CLASSES.index(cls)] != label:
+                    problems.append(f"{n}: unknown label/class pair {label!r} / {cls}")
                 elif current is not None:
                     order = CLASSES.index(cls)
                     if current["labels"] and order <= current["labels"][-1]:
@@ -318,11 +327,10 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
             problems.append(f"{sol['line']}: solution with a complexity block has no <!-- cost: ... --> chips line")
     if interviewer != 1:
         problems.append(f"expected one ??? interviewer block, found {interviewer}")
-    if hint_numbers and hint_numbers != sorted(hint_numbers):
-        pass  # numbering restarts per part; only the per-hint number check above matters
     problems.extend(leftovers)
     problems.extend(lint_highlights(path.read_text(encoding="utf-8")))
     problems.extend(lint_followups(path.read_text(encoding="utf-8")))
+    problems.extend(lint_skeleton(text))
     problems.extend(lint_code_spaces(path.read_text(encoding="utf-8")))
     problems.extend(lint_tab_order(path.read_text(encoding="utf-8")))
     problems.extend(lint_colons(path.read_text(encoding="utf-8")))

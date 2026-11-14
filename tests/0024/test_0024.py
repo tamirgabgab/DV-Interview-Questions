@@ -5,14 +5,12 @@ random lossy traffic through an in-order link with an independent integer bookke
 the SystemVerilog classes run the same way in tests/0024/tb.sv."""
 
 import random
-import re
-import subprocess
-import sys
 from itertools import product
 
 import pytest
 
-from extract_code import ROOT, load_python, question_path
+from extract_code import load_python
+from page_tests import assert_figures_match
 
 ns = load_python(24)
 TunneledPacket, CreditGrant, CreditSync = ns["TunneledPacket"], ns["CreditGrant"], ns["CreditSync"]
@@ -281,16 +279,9 @@ def test_without_sync_losses_leak_credits_until_the_path_stalls():
 
 
 def test_figures_up_to_date():
-    out = subprocess.run([sys.executable, str(ROOT / "tools" / "figures" / "q0024.py")],
-                         capture_output=True, text=True, check=True).stdout
-    text = question_path(24).read_text(encoding="utf-8")
-    for pattern in (r'<div class="stepper".*?</div></div>', r'<svg class="figure.*?</svg>',
-                    r'<span class="viz-legend">.*?</span></span>'):
-        generated = re.findall(pattern, out)
-        assert generated and re.findall(pattern, text) == generated, pattern
-    page_rows = [l.strip() for l in text.splitlines() if l.strip().startswith("|")]
-    for row in (l for l in out.splitlines() if l.startswith("|")):
-        assert row.strip() in page_rows, row
+    # Every generated block on the page (the two circles, the two steppers, their legends
+    # and their tables) is the output of tools/figures/q0024.py
+    assert_figures_match(24)
 
 
 def test_explorer_matches_page_classes():

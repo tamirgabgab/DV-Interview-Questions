@@ -1,5 +1,5 @@
 module tb;
-  typedef string labels_t[3];
+  typedef string labels_t[3];             // as on the page (test_0004.py checks it)
   string content[3];                      // what is really inside each box
 
   // Provided API from the question

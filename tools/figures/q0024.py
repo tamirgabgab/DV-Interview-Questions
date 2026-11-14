@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Figures and tables of question 0024 (USB4 Path credits reference model).
 
-    python tools/figures/q0024.py > /tmp/q0024.html
+    python tools/figures/fill.py 24       # put the blocks on the page
 
-Prints, in page order. Part a: the modulo-256 circle (the same distance without and with
-a wrap) and its legend; the stepper of the run without losses, its legend and its table.
-Part b: the circle of the Credit Sync correction across the wrap and its legend; the
-stepper of the run with one dropped packet, its legend and its table. The runs drive the
-page's own Python classes, so the figures show what the published code does; tests/0024
-checks that the page copies match.
+blocks() returns, in page order. Part a: the modulo-256 circle (the same distance without
+and with a wrap) and its legend; the stepper of the run without losses, its legend and its
+table. Part b: the circle of the Credit Sync correction across the wrap and its legend;
+the stepper of the run with one dropped packet, its legend and its table. The runs drive
+the page's own Python classes, so the figures show what the published code does;
+tests/0024 checks that the page copies match (tools/page_tests.py, assert_figures_match).
 """
 
 import math
@@ -304,5 +304,10 @@ def figures():
     }
 
 
+def blocks():
+    """The generated blocks, in page order."""
+    return list(figures().values())
+
+
 if __name__ == "__main__":
-    print("\n\n".join(figures().values()))
+    print("\n\n".join(blocks()))
