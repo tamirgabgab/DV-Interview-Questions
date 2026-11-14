@@ -1290,6 +1290,13 @@ below start at item 112 (session 31).
     stack of LeetCode 1776; kind `carfleet`, 969 px. 0109 was committed alone first with
     partial staging of the shared files (scratchpad partial_stage.py: HEAD plus only the added
     lines that name the question).
+202. **Skills: ponytail and diagram-design (session 34, 2026-11-14).** The owner asked which
+    of six GitHub skills fit the project (Impeccable, Ponytail, Humanizer, Scraping, Diagram
+    design, Caveman). Impeccable was already installed; Humanizer (English AI-writing tells,
+    rewrites tested prose), Scraping (no use here, terms of use) and Caveman (terse replies
+    against the owner's Hebrew reply rules) were advised against. ponytail (the six skill
+    folders, no plugin hooks) and diagram-design (reference for figure layouts and diagrams
+    outside the site) were installed after reading their files; see `.claude/skills/README.md`.
 
 ---
 
