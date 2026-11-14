@@ -17,7 +17,8 @@ opens the run panel, "/" opens the quick jump (session 30): typing finds a quest
 stays in the window, Escape closes it and gives the focus back, and Ctrl+K opens it again,
 whose last row (the up arrow wraps to it) sends the words to the site search, which finds
 them; Enter on the interview tool starts interview mode (its bar shows) and Enter on the
-bar's "end" shows the summary with the focus on it. The first question page with a tutorial video (``video:``, notes/VIDEOS.md) is walked too, and
+bar's "end" shows the summary with the focus on it. On a page with a question table the
+dropdown filters are pressed too (filter_keys). The first question page with a tutorial video (``video:``, notes/VIDEOS.md) is walked too, and
 its dialog is checked as a component: Enter on the "סרטון הסבר" tool opens it with the focus
 inside, Tab and Shift+Tab stay in it, every button in it has a name, Escape closes it and
 gives the focus back; play makes a titled player (the request to YouTube is cut off, so the
@@ -237,6 +238,73 @@ def press_keys(page) -> list[str]:
     return out
 
 
+def filter_keys(page) -> list[str]:
+    """The dropdown filters of a question table (session 34): Enter on a button opens its
+    popover with the focus on a choice, the arrows move through the choices, Escape closes
+    and gives the focus back, a second button closes the first, Enter on a choice filters
+    the table (the address and a removable chip show it) and removing the chip brings every
+    row back."""
+    out: list[str] = []
+    state = lambda: page.evaluate(  # noqa: E731
+        """() => ({ open: Array.from(document.querySelectorAll('.question-filter .dd-pop:not([hidden])')).map((p) => p.id),
+                    expanded: Array.from(document.querySelectorAll('.question-filter .dd-btn[aria-expanded="true"]')).map((b) => b.getAttribute('aria-controls')),
+                    focus: document.activeElement ? document.activeElement.className : '',
+                    inPop: !!(document.activeElement && document.activeElement.closest('.dd-pop')),
+                    text: document.activeElement ? document.activeElement.textContent.trim() : '',
+                    rows: document.querySelectorAll('.questions-wrap tbody tr:not([hidden])').length,
+                    chips: document.querySelectorAll('.filter-active .fa-chip').length, search: location.search })""")
+    btns = page.locator(".question-filter .dd-btn")
+    if btns.count() < 2:
+        return ["the question table has no dropdown filters"]
+    total = state()["rows"]
+    first, second = btns.nth(0), btns.nth(1)
+    first.focus()
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(150)
+    a = state()
+    if len(a["open"]) != 1 or a["open"] != a["expanded"] or not a["inPop"]:
+        out.append(f"Enter on a filter button does not open its popover with the focus inside ({a['open']}, {a['focus']})")
+        return out
+    page.keyboard.press("ArrowDown")
+    b = state()
+    if not b["inPop"] or b["text"] == a["text"]:
+        out.append("the down arrow does not move to the next choice of a filter")
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(150)
+    c = state()
+    if c["open"] or c["expanded"] or "dd-btn" not in c["focus"]:
+        out.append("Escape does not close a filter's popover and give the focus back to its button")
+    first.click()
+    second.click()
+    page.wait_for_timeout(150)
+    d = state()
+    if len(d["open"]) != 1 or d["open"][0] != second.get_attribute("aria-controls"):
+        out.append(f"opening a second filter does not close the first ({d['open']})")
+    page.mouse.click(5, 400)
+    page.wait_for_timeout(150)
+    if state()["open"]:
+        out.append("a click outside does not close a filter's popover")
+    second.focus()
+    page.keyboard.press("Enter")
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(200)
+    e = state()
+    if e["open"] or "dd-btn" not in e["focus"] or "is-on" not in e["focus"]:
+        out.append("choosing a filter does not close the popover and mark its button")
+    if e["chips"] != 1 or "=" not in e["search"] or not e["rows"] < total:
+        out.append(f"choosing a filter does not filter the table ({e['rows']} of {total} rows, {e['chips']} chips, {e['search']!r})")
+    chip = page.locator(".filter-active .fa-chip").first
+    if chip.count():
+        chip.focus()
+        page.keyboard.press("Enter")
+        page.wait_for_timeout(200)
+        f = state()
+        if f["rows"] != total or f["chips"] or f["search"]:
+            out.append("removing the filter's chip does not bring every row back")
+    return out
+
+
 def video_keys(page) -> list[str]:
     """The video dialog of a page with a tutorial video (video.js), by keyboard only."""
     out: list[str] = []
@@ -327,6 +395,8 @@ def main(argv: list[str]) -> int:
             keys = press_keys(page) if re.search(QUESTION, rel) else []
             if page.locator(".question-tools .qt-video").count():
                 keys += video_keys(page)
+            if page.locator(".question-filter").count():
+                keys += filter_keys(page)
             if args.offline:
                 errors = [e for e in errors if not re.search(r"https?://(?!127\.0\.0\.1)", e)]
             problems += keys + [f"script error: {e[:160]}" for e in errors]

@@ -33,8 +33,8 @@
   };
   const reveal = (content, cardsOnly = false) => {
     const items = [];
-    if (!cardsOnly) content.querySelectorAll(":scope > :is(h2, p, .related-questions, .catalog-link, details)").forEach((el) => items.push([el, 0]));
-    content.querySelectorAll(":scope > :is(.level-cards, .how-it-works)").forEach((row) =>
+    if (!cardsOnly) content.querySelectorAll(":scope > :is(h2, p, .related-questions, details)").forEach((el) => items.push([el, 0]));
+    content.querySelectorAll(":scope > .level-cards").forEach((row) =>
       Array.from(row.children).forEach((el, i) => items.push([el, i % 3])));     // a row has three
     const seen = new IntersectionObserver((entries) => {
       entries.forEach((e) => {

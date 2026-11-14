@@ -1,1 +1,165 @@
 /* The site's styles, part 29: the question page of the UX round (session 34): the box teaser under the statement, the end card after "solved", the shorter header with the tools in the sticky strip on a computer, the opaque sticky strip, the outlined solution button, wide tables that scroll. It loads after the parts before it. */
+
+
+/* --- 2a: the box chip of the header and the teaser row under the statement -----------------
+   Both are buttons ([data-box-go], question-page.js opens the blocks around the page's first
+   box and scrolls to it). The chip is the outlined navy of the site's actions; the teaser is
+   a slim row, hidden in interview mode (it would give a part of the solution away). */
+.md-typeset .question-header .qh-top button.qh-box-go:not(#_) {
+  position: relative; display: inline-flex; align-items: center; gap: 0.3rem; margin: 0; padding: 0.12rem 0.65rem;
+  border: 1px solid var(--act-line); border-radius: 999px; background: var(--act-tint); color: var(--act-line);
+  font-family: inherit; font-weight: 700; white-space: nowrap; cursor: pointer;
+}
+.md-typeset .question-header .qh-top button.qh-box-go:not(#_) .ui-ico { color: var(--act-line); }
+.md-typeset .question-header .qh-top button.qh-box-go:not(#_):is(:hover, :focus-visible) { background: var(--act); color: var(--act-ink); }
+.md-typeset .question-header .qh-top button.qh-box-go:not(#_):is(:hover, :focus-visible) .ui-ico { color: var(--act-ink); }
+.md-typeset .box-teaser {
+  display: flex; align-items: center; gap: var(--sp-3); width: 100%; min-height: 2.2rem; box-sizing: border-box;
+  margin: var(--sp-4) 0; padding: var(--sp-2) var(--sp-3); border: 1px solid var(--site-card-border); border-radius: var(--radius-m);
+  background: var(--site-surface); color: var(--md-default-fg-color); font: inherit; text-align: start; cursor: pointer;
+}
+.md-typeset .box-teaser:is(:hover, :focus-visible) { border-color: var(--act-line); }
+.md-typeset .box-teaser .bt-ico { display: grid; flex: none; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--act-tint); color: var(--act-line); }
+.md-typeset .box-teaser .bt-ico .ui-ico { width: 1.15rem; height: 1.15rem; }
+.md-typeset .box-teaser .bt-text { display: flex; flex: 1 1 auto; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.md-typeset .box-teaser .bt-go { font-size: 0.8rem; font-weight: 700; line-height: 1.4; color: var(--act-line); }
+.md-typeset .box-teaser .bt-note { font-size: 0.68rem; line-height: 1.4; color: var(--md-default-fg-color--light); }
+.md-typeset .box-teaser .bt-arrow { flex: none; font-size: 0.9rem; color: var(--act-line); }
+body.interview-mode .md-typeset .box-teaser { display: none; }
+/* the box reached by the chip or the teaser stops under the site header and the part row */
+.md-typeset .explorer { scroll-margin-top: calc(2.4rem + var(--part-nav-h, 0px) + 2.6rem); }   /* and the solution row that hangs from it */
+@media (hover: none), screen and (max-width: 30em) {
+  /* a 44 px target around the small chip */
+  .md-typeset .question-header .qh-top button.qh-box-go:not(#_)::after { content: ""; position: absolute; inset: -0.5rem -0.1rem; }
+}
+@media print { .md-typeset .box-teaser { display: none; } }
+
+/* --- 3a: the end card, shown while the question is marked solved ---------------------------- */
+.md-typeset .q-end-slot { margin: 0; }
+.md-typeset .q-end {
+  margin: var(--sp-4) 0; padding: var(--sp-4); border: 1px solid var(--site-card-border);
+  border-inline-start: 4px solid var(--md-accent-fg-color); border-radius: var(--radius-m);
+  background: var(--site-surface); box-shadow: var(--shadow-1);
+}
+.md-typeset .q-end[hidden] { display: none; }
+.md-typeset .q-end .qe-h { display: flex; align-items: center; gap: var(--sp-2); margin: 0 0 var(--sp-3); font-size: 1.05rem; font-weight: 700; color: var(--md-default-fg-color); }
+.md-typeset .q-end .qe-h .ui-ico { width: 1.3em; height: 1.3em; color: var(--site-mark-color); }
+.md-typeset .q-end .qe-prog { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1) var(--sp-3); margin: calc(-1 * var(--sp-1)) 0 var(--sp-3); font-size: 0.7rem; color: var(--md-default-fg-color--light); }
+.md-typeset .q-end .qe-prog a { font-weight: 600; }
+.md-typeset .q-end .qe-bar { flex: 1 1 8rem; max-width: 16rem; height: 0.3rem; border-radius: 1rem; background: var(--site-primary-soft); overflow: hidden; }
+.md-typeset .q-end .qe-bar i { display: block; width: calc(100% * var(--p, 0)); height: 100%; border-radius: 1rem; background: var(--site-mark-color); }
+.md-typeset .q-end a.qe-next:not(#_) {
+  display: flex; align-items: center; gap: var(--sp-3); box-sizing: border-box; width: 100%; min-height: 2.2rem; margin: 0;
+  padding: var(--sp-3) var(--sp-4); border: 1px solid var(--act); border-radius: var(--radius-m);
+  background: var(--act); color: var(--act-ink); text-decoration: none; text-align: start;
+}
+.md-typeset .q-end a.qe-next:not(#_):is(:hover, :focus-visible) { border-color: var(--act-hover); background: var(--act-hover); }
+.md-typeset .q-end .qe-nb { display: grid; flex: 1; gap: 0.1rem; min-width: 0; }
+.md-typeset .q-end .qe-nl { font-size: 0.68rem; font-weight: 400; }
+.md-typeset .q-end .qe-nt { font-size: 0.92rem; font-weight: 700; line-height: 1.4; }
+.md-typeset .q-end .qe-nid { margin-inline-end: 0.3em; font-family: var(--md-code-font-family); font-weight: 400; }
+.md-typeset .q-end .qe-arrow { flex: none; font-size: 1.3rem; line-height: 1; }
+.md-typeset .q-end .qe-done { margin: 0; font-size: 0.8rem; }
+@media screen and (max-width: 30em) {
+  .md-typeset .q-end { padding: var(--sp-3); }
+  .md-typeset .q-end a.qe-next:not(#_) { padding: var(--sp-3); }
+  .md-typeset .q-end .qe-nt { font-size: 0.85rem; }
+}
+@media print { .md-typeset .q-end-slot { display: none; } }
+
+/* --- 8: a shorter page top -----------------------------------------------------------------
+   Every width: the card's topics, label and date in one muted line, cut with an ellipsis
+   (the whole text is the line's tooltip, and a screen reader reads all of it; the line
+   opens up while the keyboard focus is on one of its links), and the path strip in one
+   line. A computer: the page tools as icon buttons at the end of the sticky part row
+   (question-page.js moves the toolbar there and adds .has-tools). */
+.md-typeset .question-header > .qh-bottom { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.64rem; }
+.md-typeset .question-header > .qh-bottom > * { display: inline; }
+.md-typeset .question-header .qh-bottom .qh-pn { display: inline-flex; vertical-align: middle; margin-inline-end: 0.35rem; }
+.md-typeset .question-header .qh-topics-name { display: none; }
+.md-typeset .question-header .qh-bottom a.qh-tag { padding: 0; border: 0; border-radius: 0; line-height: inherit; text-decoration: none; color: inherit; }
+.md-typeset .question-header .qh-bottom a.qh-tag:is(:hover, :focus-visible) { color: var(--md-typeset-a-color); text-decoration: underline; }
+.md-typeset .question-header .qh-bottom a.qh-tag + a.qh-tag::before { content: "·"; display: inline-block; margin-inline: 0.3em; color: var(--md-default-fg-color--lighter); text-decoration: none; }
+.md-typeset .question-header .qh-topics + .qh-sep { display: inline-block; }
+.md-typeset .question-header .qh-sep { margin-inline: 0.35rem; vertical-align: middle; }
+.md-typeset .question-header > .qh-bottom:has(:focus-visible) { white-space: normal; }
+
+.md-typeset .path-nav:not(#_) { margin: 0 0 var(--sp-2); padding-block: 0.3rem; }
+.md-typeset .path-nav .path-nav-line { flex-wrap: nowrap; gap: 0 0.8rem; }
+.md-typeset .path-nav :is(.pn-path, .pn-step) { flex: none; white-space: nowrap; }
+.md-typeset .path-nav .pn-path { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.md-typeset .path-nav .pn-step-short { display: none; }
+/* the two links share what is left of the line: each as wide as its text, or half and half */
+.md-typeset .path-nav .pn-links { display: grid; flex: 1 1 0; grid-template-columns: repeat(2, minmax(0, max-content)); justify-content: end; min-width: 0; gap: 0 0.9rem; }
+@media screen and (max-width: 44.9375em) {
+  /* a phone: the path, the step as 5/13, and the two links by their names (the titles stay
+     for a screen reader and as the links' tooltips), each a 44 px target */
+  .md-typeset .path-nav .path-nav-line { align-items: center; gap: 0 0.55rem; }
+  .md-typeset .path-nav .pn-step-long,
+  .md-typeset .path-nav :is(.pn-id, .pn-title, .pn-colon) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .md-typeset .path-nav .pn-step-short { display: inline; }
+  .md-typeset .path-nav .pn-links { display: flex; flex: none; gap: 0.2rem; margin-inline-start: auto; }
+  .md-typeset .path-nav :is(.pn-prev, .pn-next) { position: relative; flex: none; overflow: visible; margin-block: -0.5rem; padding: 0.75rem 0.4rem; font-weight: 600; }
+  .md-typeset .path-nav .pn-label { color: inherit; opacity: 1; }
+}
+
+@media screen and (min-width: 60em) and (hover: hover) {
+  .md-typeset .part-nav.has-tools:not(#_) { margin-top: 0; }
+  .md-typeset .part-nav.has-tools:not(#_) .pn-solved { display: none; }   /* the toolbar's own solved button is in the row */
+  .md-typeset .part-nav > .question-tools {
+    flex: none; flex-wrap: nowrap; gap: 0.1rem; margin: 0; padding: 0; padding-inline-start: var(--sp-2);
+    border-inline-start: 1px solid var(--site-card-border); border-radius: 0;
+  }
+  body.interview-mode .md-typeset .part-nav > .question-tools { padding: 0; padding-inline-start: var(--sp-2); border-radius: 0; background: none; }
+  /* a header card without its toolbar row: a little less room under the meta line */
+  .md-typeset .question-header:not(:has(> .question-tools)):not(#_) { padding-bottom: var(--sp-3); margin-bottom: var(--sp-2); }
+  .md-typeset .question-header:not(:has(> .question-tools)) > .qh-top { margin-bottom: 0.3rem; }
+}
+
+/* --- 9a: an opaque sticky part row -----------------------------------------------------------
+   The page colour and a hairline, no blur: scrolled text never shows through the row, and
+   the reading line sits inside it, not hanging under it over the text. */
+.md-typeset .part-nav:not(.pn-fixed):not(#_),
+.md-typeset .part-nav.pn-fixed.has-sol:not(#_) {
+  background: var(--md-default-bg-color); -webkit-backdrop-filter: none; backdrop-filter: none;
+  border-bottom: 1px solid var(--site-card-border);
+}
+.md-typeset .part-nav:not(.pn-fixed):not(#_) { padding-bottom: calc(0.4rem + 9px); }
+.md-typeset .part-nav:not(.pn-fixed):not(#_) .pn-progress { bottom: 3px; }
+
+/* --- 9b: a closed solution is an outlined button, not one more hint bar ------------------------
+   Still a native <details>; the hook adds the words of the closed state ("הצג", "·") in
+   span.sol-closed, hidden once the block is open, where it looks and reads as before. */
+.md-typeset details.success[open] > summary .sol-closed { display: none; }
+.md-typeset details.success:not([open]):not(#_) {
+  width: fit-content; max-width: 100%; margin-top: 2.2rem; border: 1px solid var(--act-line); border-radius: var(--radius-m);
+  background: transparent; box-shadow: none;
+}
+.md-typeset details.success:not([open]):not(#_) > summary { min-height: 2.2rem; padding-inline-end: 2.6rem; background: transparent; color: var(--act-line); font-weight: 700; }
+.md-typeset details.success:not([open]):not(#_) > summary::before { background-color: var(--act-line); }
+.md-typeset details.success:not([open]):not(#_) > summary::after { color: var(--act-line); }
+.md-typeset details.success:not([open]):not(#_):is(:hover, :focus-within) { background: var(--act-tint); }
+@media print { .md-typeset details.success > summary .sol-closed { display: none; } }
+
+/* --- 10: a wide table scrolls sideways inside its own frame -----------------------------------
+   Code in a cell stays on one line (prose cells still wrap); a table that is then wider
+   than its column gets .is-wide on its wrapper (question-tools.js), which scrolls, with a
+   soft fade at an edge that has more beyond it (.fade-s the start edge, .fade-e the end).
+   The grids (data-grid, their first column stays in place) and the cards of a phone
+   (data-cards) keep their own layouts. */
+.md-typeset .md-typeset__table > table:not([class]) :is(td, th) code { white-space: nowrap; }
+@media screen and (max-width: 30em) {
+  .md-typeset .md-typeset__table > table[data-cards] :is(td, th) code { white-space: normal; }
+}
+.md-typeset .md-typeset__scrollwrap.is-wide:not(:has(table[data-grid])) {
+  --fade-s: 0rem; --fade-e: 0rem;
+  overflow-x: auto; margin-inline: 0; border: 1px solid var(--site-card-border); border-radius: var(--radius-m);
+  -webkit-mask-image: linear-gradient(to left, transparent 0, #000 var(--fade-s), #000 calc(100% - var(--fade-e)), transparent 100%);
+  mask-image: linear-gradient(to left, transparent 0, #000 var(--fade-s), #000 calc(100% - var(--fade-e)), transparent 100%);
+}
+.md-typeset .md-typeset__scrollwrap.is-wide.fade-s:not(:has(table[data-grid])) { --fade-s: 2.4rem; }
+.md-typeset .md-typeset__scrollwrap.is-wide.fade-e:not(:has(table[data-grid])) { --fade-e: 2.4rem; }
+.md-typeset .md-typeset__scrollwrap.is-wide:not(:has(table[data-grid])) > .md-typeset__table { display: block; width: max-content; min-width: 100%; margin: 0; padding: 0; }
+.md-typeset .md-typeset__scrollwrap.is-wide:not(:has(table[data-grid])) > .md-typeset__table > table:not([class]) {
+  display: table; width: 100%; max-width: none; margin: 0; border: 0; border-radius: 0; box-shadow: none; overflow: visible;
+}

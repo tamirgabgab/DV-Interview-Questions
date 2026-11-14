@@ -1,1 +1,117 @@
 /* The site's styles, part 30: the lists of the UX round (session 34): one-line question rows with the subtitle, the one-row filter bar, the home page without its filler sections. It loads after the parts before it. */
+
+/* ---- The filter bar of a question table: one row (hooks/questions.py _table, question-filter.js).
+   The search field, a dropdown button per filter and "random question"; a button opens a
+   popover of its choices. Under the bar, one line: the active filters as chips, the count,
+   and on a phone the sort select. */
+.md-typeset .filter-bar { position: relative; gap: var(--sp-2); }
+.md-typeset .filter-bar .filter-search { flex: 1 1 8rem; min-width: 0; max-width: 22rem; }   /* narrow enough for one row beside a level page's sidebar */
+.md-typeset .filter-bar .filter-search input { width: 100%; min-width: 0; height: 1.7rem; padding-block: 0; }
+.md-typeset .filter-dds { display: flex; flex: none; flex-wrap: wrap; gap: var(--sp-2); }
+.md-typeset .filter-dd { position: relative; display: block; }
+.md-typeset .dd-btn { display: inline-flex; align-items: center; gap: 0.3rem; height: 1.7rem; max-width: 14rem; padding: 0 0.65rem; border: 1px solid var(--site-card-border); border-radius: 999px; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font: inherit; font-size: 0.7rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.md-typeset .dd-btn .filter-label { min-width: 0; font-size: inherit; color: inherit; }
+.md-typeset .dd-btn .dd-val { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
+.md-typeset .dd-btn .dd-val:empty { display: none; }
+.md-typeset .dd-btn .dd-chev { flex: none; width: 0.6rem; height: 0.6rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; }
+.md-typeset .dd-btn:hover { border-color: var(--md-accent-fg-color); }
+.md-typeset .dd-btn[aria-expanded="true"] { border-color: var(--md-primary-fg-color); }
+.md-typeset .dd-btn[aria-expanded="true"] .dd-chev { transform: rotate(180deg); }
+.md-typeset .dd-btn.is-on { border-color: var(--md-accent-fg-color); background: var(--md-accent-fg-color--transparent); }
+.md-typeset .dd-pop { position: absolute; z-index: 6; top: calc(100% + 0.3rem); inset-inline-start: 0; box-sizing: border-box; width: max-content; min-width: 100%; max-width: min(21rem, calc(100vw - 1.6rem)); padding: var(--sp-2); border: 1px solid var(--site-card-border); border-radius: var(--radius-m); background: var(--site-surface); box-shadow: var(--shadow-3); }
+.md-typeset .dd-pop[hidden] { display: none; }
+.md-typeset .dd-pop .dd-list { display: flex; flex-direction: column; gap: 2px; }
+.md-typeset .dd-pop .filter-chip { display: flex; align-items: center; gap: 0.35rem; width: 100%; padding: 0.2rem 0.6rem; border-color: transparent; border-radius: var(--radius-s); background: transparent; text-align: start; }
+.md-typeset .dd-pop .filter-chip[hidden] { display: none; }
+.md-typeset .dd-pop .filter-chip:not(.is-active):hover { border-color: transparent; background: var(--md-default-fg-color--lightest); }
+.md-typeset .dd-pop .filter-chip.is-active { border-color: var(--md-primary-fg-color); background: var(--md-primary-fg-color); color: var(--md-primary-bg-color); }
+/* the topics: a search field, then the topics as wrapping chips in a box that scrolls */
+.md-typeset .filter-topics .dd-pop { width: 21rem; }
+.md-typeset .filter-topics .dd-list { flex-direction: row; flex-wrap: wrap; gap: 0.3rem; max-height: min(50vh, 15rem); overflow-y: auto; padding: 2px; }
+.md-typeset .filter-topics .dd-pop .filter-chip { width: auto; border-color: var(--site-card-border); border-radius: 999px; padding: 0.05em 0.7em; }
+.md-typeset .filter-topics .dd-pop .filter-chip:not(.is-active):hover { border-color: var(--md-accent-fg-color); background: transparent; }
+.md-typeset .dd-pop .topics-search { box-sizing: border-box; width: 100%; height: 1.6rem; margin-bottom: var(--sp-2); padding: 0 0.6rem; border: 1px solid var(--site-card-border); border-radius: 999px; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font: inherit; font-size: 0.68rem; }
+.md-typeset .dd-pop .topics-none { margin: var(--sp-1) 0 0; font-size: 0.66rem; color: var(--md-default-fg-color--light); }
+.md-typeset .filter-bar .filter-random { flex: none; height: 1.7rem; padding-block: 0; white-space: nowrap; }
+.md-typeset .filter-status { display: flex; align-items: center; gap: var(--sp-2) var(--sp-3); }
+.md-typeset .filter-status .filter-active { flex: 1 1 0; min-width: 0; }
+.md-typeset .filter-active .fa-chip { position: relative; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .dd-btn { transition: background var(--dur-0), border-color var(--dur-0); }
+  .md-typeset .dd-btn .dd-chev { transition: transform var(--dur-0) var(--ease); }
+}
+
+/* ---- The rows of a question table: one line on a computer (about 50 px): the number, the
+   kind's icon, the title, the reader's marks, the subtitle in muted text, the level, the
+   difficulty. No coloured edge, no question chip, no topics (session 34). */
+.md-typeset .questions-wrap { margin-top: var(--sp-2); }
+.md-typeset .questions-wrap tbody td.q-id,
+.md-typeset .questions-wrap tbody tr:is(:hover, :focus-within) td.q-id { box-shadow: none; }
+.md-typeset .questions-wrap .q-line { gap: 0.5rem; }
+.md-typeset .questions-wrap .q-line a { flex: 0 1 auto; }
+.md-typeset .questions-wrap .q-sub { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--md-default-fg-color--light); font-size: 0.68rem; font-weight: 400; }
+.md-typeset .questions-wrap tbody tr:is(:hover, :focus-within) .q-sub { color: var(--md-default-fg-color); }   /* the muted grey is under 4.5:1 on the hover tint */
+@media screen and (min-width: 45em) {
+  .md-typeset .questions-wrap .th-sort { padding-block: 0.6em; }
+  .md-typeset .questions-wrap table:not([class]) tbody td { height: 2.5rem; padding-block: 0; vertical-align: middle; }
+  .md-typeset .questions-wrap td.q-level, .md-typeset .questions-wrap td.q-diff { white-space: nowrap; }
+  .md-typeset .questions-wrap .q-sub::before { content: ""; display: inline-block; width: 0.7rem; height: 1px; margin-inline-end: 0.5rem; vertical-align: middle; background: var(--md-default-fg-color--lighter); }
+}
+
+/* ---- A phone: the bar in two rows (the search and "random", then the dropdowns across the
+   width, their popovers as wide as the row), the status line with the short count and the
+   sort, and every question as a two-line card (about 76 px): the icon, the title and the
+   number, then the level, the difficulty and the subtitle, clipped. */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .question-filter { gap: 0.3rem; margin-bottom: 0.4rem; }
+  .md-typeset .filter-bar { gap: 0.3rem; }
+  .md-typeset .filter-bar .filter-search { flex: 1 1 0; min-width: 0; max-width: none; }
+  .md-typeset .filter-bar .filter-search input { width: 100%; min-width: 0; height: 2.2rem; }
+  .md-typeset .filter-bar .filter-random { order: 1; height: 2.2rem; margin: 0; }
+  .md-typeset .filter-dds { order: 2; flex: 0 0 100%; gap: 0.3rem; position: relative; }   /* one row; two with the text enlarged */
+  .md-typeset .filter-dd { position: static; flex: 1 1 auto; min-width: 0; }
+  .md-typeset .dd-btn { justify-content: center; width: 100%; height: 2.2rem; padding: 0 0.3rem; gap: 0.2rem; }
+  .md-typeset .dd-btn .dd-val { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }   /* the chip under the bar shows the choice */
+  .md-typeset .dd-pop, .md-typeset .filter-topics .dd-pop { inset-inline: 0; width: auto; max-width: none; }
+  .md-typeset .dd-pop .filter-chip { min-height: 2.2rem; }
+  .md-typeset .filter-topics .dd-list { max-height: min(45vh, 16rem); gap: 0.4rem; }
+  .md-typeset .filter-topics .dd-pop .filter-chip { padding-inline: 0.8em; }
+  .md-typeset .dd-pop .topics-search { height: 2.2rem; }
+  .md-typeset .filter-status { align-items: flex-start; }
+  .md-typeset .filter-status .filter-active { min-height: 2.2rem; }
+  .md-typeset .filter-active .filter-count { flex-basis: auto; margin-inline-start: auto; white-space: nowrap; }
+  .md-typeset .filter-count .fc-more { display: none; }
+  .md-typeset .filter-status .filter-sort { flex: none; min-height: 2.2rem; }
+  .md-typeset .filter-status .filter-sort { gap: 0.1rem; font-weight: 400; }
+  .md-typeset .filter-status .filter-sort select { height: 2.2rem; padding-inline: 0.2rem; border-color: transparent; background-color: transparent; color: var(--md-typeset-a-color); font-weight: 600; }
+  .md-typeset .filter-active :is(.fa-chip, .fa-clear)::after { content: ""; position: absolute; inset: -0.5rem 0; }   /* a 44 px touch target */
+  .md-typeset .filter-active .fa-clear { position: relative; }
+
+  .md-typeset .questions-wrap table:not([class]) tr { flex-wrap: wrap; align-items: center; gap: 0.2rem 0.45rem; margin-bottom: 0.3rem; padding: 0.4rem 0.7rem; border-inline-start: 1px solid var(--site-card-border); }
+  .md-typeset .questions-wrap table:not([class]) tr[hidden] { display: none; }
+  .md-typeset .questions-wrap table:not([class]) tr::before { content: ""; order: 5; flex: 0 0 100%; height: 0; margin-top: -0.2rem; }   /* the break between the two lines */
+  .md-typeset .questions-wrap table:not([class]) td.q-title, .md-typeset .questions-wrap .q-line { display: contents; }
+  .md-typeset .questions-wrap .q-kind { order: 0; }
+  .md-typeset .questions-wrap .q-line a { order: 1; flex: 1 1 0; min-width: 0; font-size: 0.78rem; font-weight: 600; line-height: 1.35; }
+  .md-typeset .questions-wrap .q-line .chip-new { order: 2; }
+  .md-typeset .questions-wrap .q-marks { order: 3; }
+  .md-typeset .questions-wrap td.q-id { order: 4; flex: none; font-size: 0.62rem; }
+  .md-typeset .questions-wrap td.q-level { order: 6; flex: none; }
+  .md-typeset .questions-wrap td.q-diff { order: 7; flex: none; }
+  .md-typeset .questions-wrap .q-sub { order: 8; }
+  .md-typeset .questions-wrap :is(td.q-level, td.q-diff) .chip { font-size: 0.62rem; }
+}
+
+/* ---- The home page without its filler (session 34): the three steps as one line under the
+   hero (three short lines on a phone), and the way into the catalog beside the link at the
+   end of "added lately". */
+.md-typeset ol.how-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); margin: 0 0 var(--sp-4); padding: var(--sp-2) var(--sp-3); list-style: none; border: 1px solid var(--site-card-border); border-radius: var(--radius-m); background: var(--site-surface); color: var(--md-default-fg-color); font-size: 0.78rem; }
+.md-typeset ol.how-line > li { display: inline-flex; align-items: center; gap: var(--sp-2); margin: 0; font-weight: 600; }
+.md-typeset ol.how-line > li .ui-ico { width: 1.1em; height: 1.1em; color: var(--md-typeset-a-color); }
+.md-typeset ol.how-line > li + li::before { content: "·"; margin-inline-end: var(--sp-1); color: var(--md-default-fg-color--light); font-weight: 700; }
+.md-typeset .recent-more { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); max-width: none; margin-top: var(--sp-3); }
+.md-typeset .recent-more .md-button { margin: 0; font-size: 0.8rem; }
+@media screen and (max-width: 44.9375em) {
+  .md-typeset ol.how-line { display: grid; gap: var(--sp-2); }
+  .md-typeset ol.how-line > li + li::before { content: none; }
+}

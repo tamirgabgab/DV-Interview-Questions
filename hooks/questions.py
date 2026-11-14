@@ -144,7 +144,6 @@ HERO = re.compile(r"<!--\s*hero\s*-->(.*?)<!--\s*/hero\s*-->", re.S)
 PATH_STEPS = re.compile(r"<!--\s*path-steps\s*-->")
 PATH_CARDS = re.compile(r"<!--\s*path-cards(\s+featured)?\s*-->")
 HOW_IT_WORKS = re.compile(r"<!--\s*how-it-works\s*-->")
-CATALOG_LINK = re.compile(r"<!--\s*catalog-link\s*-->")
 CONTINUE = re.compile(r"<!--\s*home-continue\s*-->")
 MY_MAP = re.compile(r"<!--\s*my-map\s*-->")
 # A part of a question: a "### סעיף א – ..." heading (interview mode's time target counts them).
@@ -474,12 +473,67 @@ def _badge(icon: str, text: str, title: str, cls: str = "") -> str:
     return f'<span class="qh-badge{cls}" title="{html.escape(title)}">{ui_icon(icon)}{text}</span>'
 
 
+def split_title(title: str) -> tuple[str, str]:
+    """A title is "main – subtitle": the words before the first " – ", and the rest ("" when
+    the title has no subtitle). The question header and the lists of questions both use it."""
+    main, _, rest = str(title).partition(" – ")
+    return main, rest
+
+
+# The header's chip of a page with an explorer box (session 34): a button, not a label.
+BOX_CHIP = ('<button type="button" class="qh-badge qh-badge-play qh-box-go" data-box-go '
+            'title="לתיבה האינטראקטיבית של הדף\u00a0: נפתחת ונגללת אליה">'
+            f'{ui_icon("interactive")}תיבה אינטראקטיבית<span class="qh-box-arrow" aria-hidden="true">↓</span></button>')
+# The row under the statement of a page whose first box sits inside a closed block.
+BOX_TEASER = ('<button type="button" class="box-teaser" data-box-go data-search-exclude>'
+              f'<span class="bt-ico" aria-hidden="true">{ui_icon("interactive")}</span>'
+              '<span class="bt-text"><span class="bt-go">לשחק עם התיבה</span>'
+              '<span class="bt-note">חושף חלק מהפתרון</span></span>'
+              '<span class="bt-arrow" aria-hidden="true">↓</span></button>\n')
+DETAILS_TAG = re.compile(r"<(/?)details\b")
+TEASER_BEFORE = re.compile(r'<details class="interviewer"|<div class="qp-parts"|<h3 id=|<details class="(?:tip|success)"')
+
+
+def _details_depth(output: str, start: int, end: int) -> int:
+    """How many <details> are open at `end`, counted from `start` (a point outside any)."""
+    return sum(-1 if m.group(1) else 1 for m in DETAILS_TAG.finditer(output, start, end))
+
+
+def box_teaser(output: str) -> str:
+    """The teaser row of a built question page (session 34): when the page's first explorer
+    box sits inside a closed block (a solution, usually), a slim button right under the
+    statement, before the interviewer block or the first part, opens the blocks around the
+    box and scrolls to it (question-page.js). A page whose first box is in the open, or that
+    has no box, is left as it is (the header's chip still scrolls to the box)."""
+    box = EXPLORER_BOX.search(output)
+    art = output.find("<article")
+    if not box or art < 0 or _details_depth(output, art, box.start()) <= 0:
+        return output
+    at = TEASER_BEFORE.search(output, art, box.start())
+    if not at or _details_depth(output, art, at.start()) != 0:
+        return output
+    return output[:at.start()] + BOX_TEASER + output[at.start():]
+
+
+SOLUTION_SUMMARY = re.compile(r'(<details class="success"[^>]*>\s*<summary>)(פתרון)( סעיף [א-ת])?(?=[ <])')
+
+
+def solution_summaries(output: str) -> str:
+    """A closed solution reads "הצג פתרון · סעיף א" (session 34, 29-question-ux.css draws it
+    as an outlined button) and an open one "פתרון סעיף א" as before: the two added words sit
+    in spans that the stylesheet hides in an open block, so the summary keeps one text."""
+    def one(m: re.Match) -> str:
+        dot = '<span class="sol-closed"> ·</span>' if m.group(3) else ""
+        return f'{m.group(1)}<span class="sol-closed">הצג </span>{m.group(2)}{dot}{m.group(3) or ""}'
+    return SOLUTION_SUMMARY.sub(one, output)
+
+
 def _title_html(title: str) -> str:
     """The title as the header shows it (session 33): the words before the first " – " as the
     title, the rest as a smaller subtitle line under it. A hidden " – " keeps the heading's
     text whole for screen readers and for the scripts that read it (marks.js, video.js)."""
-    main, sep, rest = title.partition(" – ")
-    if not sep:
+    main, rest = split_title(title)
+    if not rest:
         return html.escape(title)
     return (f'<span class="qh-main">{html.escape(main)}</span><span class="qh-dash"> – </span>'
             f'<span class="qh-subtitle">{html.escape(rest)}</span>')
@@ -501,7 +555,9 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
     langs = [name for name, fence in (("SV", "systemverilog"), ("Python", "python"))
              if extract_code.blocks_from_text(markdown, fence)]
     badges = []
-    if q.get("interactive"):
+    if EXPLORER_BOX.search(markdown):    # a button that opens and shows the page's first box (question-page.js)
+        badges.append(BOX_CHIP)
+    elif q.get("interactive"):
         badges.append(_badge("interactive", "אינטראקטיבי", "יש בדף ממשק אינטראקטיבי : סליידרים, אנימציה או איור צעד-צעד", " qh-badge-play"))
     if langs:
         full = " ו-".join("SystemVerilog" if n == "SV" else n for n in langs)
@@ -518,6 +574,8 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
     added = _added_date(q)
     if added:
         bottom.append(f'<span class="qh-sep"></span><span>נוספה ב-{_date_he(added)}</span>')
+    # the meta line is one clipped line (29-question-ux.css): its whole text is the tooltip
+    meta = " · ".join([part_number(q["id"]), *(topic_name(t) for t in q["tags"]), *([f"נוספה ב-{_date_he(added)}"] if added else [])])
     # V11: the card carries its difficulty and kind (18-question.css tints a quiet trace
     # pattern along its top edge by the difficulty); its corner shows the question's own
     # chip (session 32, question_chip), and the meta line its label DVQ-<id>
@@ -528,7 +586,7 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
         f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
         f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{"".join(badges)}</div>\n'
         f'{tools}\n'
-        f'<div class="qh-bottom">{"".join(bottom)}</div>\n'
+        f'<div class="qh-bottom" title="{html.escape(meta)}">{"".join(bottom)}</div>\n'
         '</div>\n\n'
     )
 
@@ -653,14 +711,15 @@ def _path_nav(q: dict, page_url: str) -> str:
             continue
         i = ids.index(q["id"])
         parts = [f'<span class="pn-path">מסלול <a href="{_href(p["src_uri"], page_url)}">{html.escape(p["title"])}</a></span>'
-                 f'<span class="pn-step">שלב {i + 1} מתוך {len(ids)}</span>']
+                 f'<span class="pn-step"><span class="pn-step-long">שלב {i + 1} מתוך {len(ids)}</span>'
+                 f'<span class="pn-step-short" dir="ltr" aria-hidden="true">{i + 1}/{len(ids)}</span></span>']
         links = []
         for label, cls, k in (("הקודם", "pn-prev", i - 1), ("הבא", "pn-next", i + 1)):
             if 0 <= k < len(ids):
                 other = p["steps"][k]["q"]
                 title = html.escape(str(other["title"]))
                 links.append(f'<a class="{cls}" href="{_href(other["src_uri"], page_url)}" title="{title}">'
-                             f'<span class="pn-label">{label}\u00a0:</span> <span class="pn-id">{other["id"]}</span> '
+                             f'<span class="pn-label">{label}<span class="pn-colon">\u00a0:</span></span> <span class="pn-id">{other["id"]}</span> '
                              f'<span class="pn-title">{title}</span></a>')
         if links:
             parts.append(f'<span class="pn-links">{"".join(links)}</span>')
@@ -718,25 +777,40 @@ def _path_cards(page_url: str, featured: bool = False) -> str:
     return '<div class="level-cards path-cards">' + "".join(cards) + "</div>"
 
 
-HOW_STEPS = [("search", "בוחרים שאלה", "לפי רמת משרה, נושא או מסלול לימוד, או שאלה אקראית."),
-             ("timer", "פותרים לבד", "עם רמזים שנפתחים בהדרגה, ובמצב ראיון עם שעון מול יעד."),
-             ("play", "בודקים ומריצים", "פתרון מלא עם הוכחה, קוד שנבדק אוטומטית והרצה בדפדפן.")]
+def _path_rows(page_url: str) -> str:
+    """A row per study path (the paths page, session 34): the line's square with its number
+    as on the metro map, the name (the link to the path's page, stretched over the row by
+    31-maps-ux.css) over a one-line description (cut with an ellipsis, whole in the title),
+    the count and the difficulty mix, and at the row's end the reader's progress: a thin
+    bar with "n/m" and a link to the first question still unsolved ("להתחיל" before any is
+    solved, then "להמשיך"; a check mark when all are). maps.js fills the progress from the
+    solved marks (data-ids and data-hrefs, in the path's order); without it the link stays
+    "להתחיל" at the first question."""
+    rows = []
+    for n, p in enumerate(_paths):
+        qs = [s["q"] for s in p["steps"]]
+        hrefs = [_href(q["src_uri"], page_url) for q in qs]
+        title, desc = html.escape(p["title"]), html.escape(p["description"])
+        rows.append(
+            f'<li class="path-row"><span class="mm-num mm-c{n % MAPS_COLOURS + 1}" aria-hidden="true">{n + 1}</span>'
+            f'<span class="pr-main"><a class="pr-name" href="{_href(p["src_uri"], page_url)}" title="{desc}">{title}</a>'
+            f'<span class="pr-desc" title="{desc}">{desc}</span></span>'
+            f'<span class="pr-mix"><span class="pr-count">{len(qs)} שאלות</span>{_diff_chips(qs)}</span>'
+            f'<span class="pr-progress" data-name="{title}" data-ids="{" ".join(q["id"] for q in qs)}" data-hrefs="{" ".join(hrefs)}">'
+            '<span class="pr-bar" aria-hidden="true" hidden><i></i></span><span class="pr-n" hidden></span>'
+            f'<a class="pr-go" href="{hrefs[0]}" aria-label="להתחיל את המסלול {title}">להתחיל<span aria-hidden="true">←</span></a>'
+            '<span class="pr-done" hidden>הושלם<span aria-hidden="true">✓</span></span></span></li>')
+    return '<ol class="path-rows" data-search-exclude>' + "".join(rows) + "</ol>"
+
+
+HOW_STEPS = [("search", "בוחרים שאלה"), ("timer", "פותרים לבד עם רמזים"), ("play", "בודקים מול פתרון מלא")]
 
 
 def _how_it_works() -> str:
-    """The home page's three steps (W340), in place of the old tip box."""
-    items = "".join(f'<li class="hw-step"><span class="hw-ico">{ui_icon(icon)}</span>'
-                    f'<span class="hw-num">{n}</span><b class="hw-title">{title}</b>'
-                    f'<span class="hw-text">{text}</span></li>'
-                    for n, (icon, title, text) in enumerate(HOW_STEPS, 1))
-    return f'<ol class="how-it-works">{items}</ol>'
-
-
-def _catalog_link(page_url: str) -> str:
-    """The home page's way into the catalog page (W341)."""
-    return (f'<p class="catalog-link"><a class="md-button md-button--primary" href="{_href("all.md", page_url)}">'
-            f'לכל {len(_questions)} השאלות</a>'
-            '<span>עם סינון לפי רמה, קושי, סוג ונושא, חיפוש ומיון.</span></p>')
+    """The home page's three steps as one compact line under the hero (session 34; three
+    short lines on a phone), each with its small icon. It replaced the three cards of W340."""
+    items = "".join(f'<li>{ui_icon(icon)}{text}</li>' for icon, text in HOW_STEPS)
+    return f'<ol class="how-line" data-search-exclude>{items}</ol>'
 
 
 def _has_tests(q: dict) -> bool:
@@ -1028,6 +1102,42 @@ def _hero(inner: str, page_url: str) -> str:
     )
 
 
+def _end_card(q: dict, page_url: str, next_page=None) -> str:
+    """The card at the end of a question page (session 34), shown by question-page.js only
+    while the question is marked solved: "פתרת את השאלה", then, for a question of a study
+    path (the first one, the one the path strip shows first), its step with a thin bar and a
+    large button to the path's next question (after the last one: a line and a link to the
+    paths page); for a question of no path, the page's own next question. The wrapper is a
+    polite live region, so the card is read when it appears after the click."""
+    def button(label: str, other: dict) -> str:
+        return (f'<a class="qe-next" href="{_href(other["src_uri"], page_url)}"><span class="qe-nb">'
+                f'<span class="qe-nl">{label}</span><span class="qe-nt"><span class="qe-nid">{other["id"]}</span> '
+                f'{html.escape(str(other["title"]))}</span></span><span class="qe-arrow" aria-hidden="true">←</span></a>')
+    body = ""
+    path = next((p for p in _paths if q["id"] in [s["q"]["id"] for s in p["steps"]]), None)
+    if path:
+        ids = [s["q"]["id"] for s in path["steps"]]
+        i = ids.index(q["id"])
+        body = (f'<p class="qe-prog"><span>שלב {i + 1} מתוך {len(ids)} במסלול '
+                f'<a href="{_href(path["src_uri"], page_url)}">{html.escape(path["title"])}</a></span>'
+                f'<span class="qe-bar" aria-hidden="true"><i style="--p: {(i + 1) / len(ids):.4f}"></i></span></p>')
+        if i + 1 < len(ids):
+            body += button("השאלה הבאה במסלול", path["steps"][i + 1]["q"])
+        else:
+            body += (f'<p class="qe-done">זו השאלה האחרונה במסלול\u00a0: סיימת אותו. '
+                     f'<a href="{_href(PATHS_DIR + "/index.md", page_url)}">לכל המסלולים</a></p>')
+    else:
+        other = _questions.get(next_page.file.src_uri) if next_page is not None else None
+        if other:
+            body = button("השאלה הבאה", other)
+        else:
+            body = (f'<p class="qe-done">זו השאלה האחרונה ברמה. <a href="{_href("questions/" + q["level"] + "/index.md", page_url)}">'
+                    f'לכל שאלות {html.escape(LEVELS[q["level"]])}</a></p>')
+    return ('\n\n<div class="q-end-slot" aria-live="polite" data-search-exclude>'
+            f'<section class="q-end" aria-label="פתרת את השאלה" hidden><p class="qe-h">{ui_icon("solved-on")}פתרת את השאלה</p>'
+            f'{body}</section></div>\n\n')
+
+
 def _related(q: dict, page_url: str) -> str:
     """Up to RELATED_MAX other questions that share the most (non-generic) tags."""
     mine = set(q["tags"]) - GENERIC_TAGS
@@ -1097,8 +1207,10 @@ def _recent(page_url: str) -> str:
     if not qs:
         return ""
     href = posixpath.relpath("new/", _base(page_url) or ".") + "/"
+    # the way into the catalog page (W341) sits here since session 34, beside the link to the dates
     return ('<ul class="related-questions recent-questions">\n' + "\n".join(_question_item(q, page_url) for q in qs)
-            + f'\n</ul>\n<p class="recent-more"><a href="{href}">כל השאלות לפי תאריך ההוספה</a></p>')
+            + f'\n</ul>\n<p class="recent-more"><a class="md-button md-button--primary" href="{_href("all.md", page_url)}">'
+            f'לכל {len(_questions)} השאלות</a><a href="{href}">כל השאלות לפי תאריך ההוספה</a></p>')
 
 
 def _whats_new(page_url: str) -> str:
@@ -1118,21 +1230,21 @@ def _whats_new(page_url: str) -> str:
     return "\n".join(out)
 
 
-TOPICS_INLINE = 6   # topics shown in the filter before "more topics"
-ROW_TOPICS = 2      # topics shown in a row before "+n"
+CHEVRON = '<svg class="dd-chev" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>'
+TOPICS_SEARCH_MIN = 9   # the topics popover gets its own search field from this many topics
 
 
 def _table(level: str | None, page_url: str) -> str:
-    """A filterable question table (UI322, UI323). Above it: a search field (title,
-    topics in both names, id), a "filter (n)" button that opens the filters on phones,
-    and the filters as segmented groups (level on the all-questions table, difficulty,
-    kind, the reader's marks) with the topics behind "more topics"; under them the
-    active filters as chips with the count. Each row has the id, the kind's icon and the
-    title on one line with the reader's marks, the kind and the first topics under it (a
-    topic filters the table; "+n" shows the rest), the level on the all-questions table,
-    and the difficulty, which also colours the row's start edge (17-lists.css).
-    question-filter.js keeps the filters in the address and says what to do when no
-    row is left."""
+    """A filterable question table (UI322, UI323; one row of filters and one-line rows since
+    session 34, 30-lists-ux.css). The bar: a search field (title, topics in both names, id),
+    a dropdown button per filter (level on the all-questions table, difficulty, kind, the
+    reader's marks, topic), each opening a small popover of single choices, the sort select
+    of phones and "random question"; under it the active filters as removable chips with
+    the count. Each row has the id, the kind's icon, the title and its subtitle (the part
+    after " – ", muted), the reader's marks, the level on the all-questions table, and the
+    difficulty; on a phone a row is a two-line card. The topics are not shown in a row
+    (the owner's choice), only filtered and searched by. question-filter.js opens the
+    popovers, keeps the filters in the address and says what to do when no row is left."""
     rows = sorted(
         (q for q in _questions.values() if level is None or q["level"] == level),
         key=lambda q: q["id"],
@@ -1145,6 +1257,7 @@ def _table(level: str | None, page_url: str) -> str:
         for t in q["tags"]:
             count[t] = count.get(t, 0) + 1
     tags = sorted(count, key=lambda t: (-count[t], topic_name(t)))   # the most common first
+    base_id = f"qf-{level or 'all'}"
 
     def chip(name: str, value: str, label: str, extra: str = "") -> str:
         icon = kind_icon(value) if name == "kind" and value else ""
@@ -1152,25 +1265,24 @@ def _table(level: str | None, page_url: str) -> str:
         return (f'<button type="button" class="filter-chip{" is-active" if not value else ""}" data-value="{html.escape(value)}" '
                 f'aria-pressed="{pressed}"{extra}>{icon}{html.escape(label)}</button>')
 
-    def group(name: str, label: str, values) -> str:
-        chips = chip(name, "", "הכל") + "".join(chip(name, v, l) for v, l in values)
-        return (f'<div class="filter-group filter-seg" data-filter="{name}" data-value="" role="group" aria-label="{label}">'
-                f'<span class="filter-label">{label}</span><span class="seg">{chips}</span></div>')
+    def group(name: str, label: str, chips: str, cls: str = "", head: str = "", tail: str = "") -> str:
+        pop = f"{base_id}-{name}"
+        return (f'<div class="filter-group filter-dd{cls}" data-filter="{name}" data-value="">'
+                f'<button type="button" class="dd-btn" aria-expanded="false" aria-controls="{pop}">'
+                f'<span class="filter-label">{label}</span><span class="dd-val"></span>{CHEVRON}</button>'
+                f'<div class="dd-pop" id="{pop}" role="group" aria-label="{label}" hidden>{head}'
+                f'<div class="dd-list">{chips}</div>{tail}</div></div>')
 
-    inline, more = tags[:TOPICS_INLINE], tags[TOPICS_INLINE:]
-    topic_chips = chip("tag", "", "הכל") + "".join(chip("tag", t, topic_name(t), f' data-count="{count[t]}"') for t in inline)
-    more_html = ""
-    if more:
-        more_html = (f'<button type="button" class="topics-toggle" aria-expanded="false">עוד נושאים ({len(more)})</button>'
-                     '<div class="topics-more" hidden>'
-                     '<input type="search" class="topics-search" placeholder="חיפוש נושא" aria-label="חיפוש נושא">'
-                     + "".join(chip("tag", t, topic_name(t), f' data-count="{count[t]}" data-en="{html.escape(t)}"') for t in more)
-                     + '<p class="topics-none" hidden>אין נושא כזה.</p></div>')
-    topics = (f'<div class="filter-group filter-topics" data-filter="tag" data-value="" role="group" aria-label="נושא">'
-              f'<span class="filter-label">נושא</span><span class="topics-inline">{topic_chips}</span>{more_html}</div>')
+    def seg(name: str, label: str, values) -> str:
+        return group(name, label, chip(name, "", "הכל") + "".join(chip(name, v, l) for v, l in values))
+
+    topic_chips = chip("tag", "", "הכל") + "".join(
+        chip("tag", t, topic_name(t), f' data-count="{count[t]}" data-en="{html.escape(t)}"') for t in tags)
+    find = ('<input type="search" class="topics-search" placeholder="חיפוש נושא" aria-label="חיפוש נושא">'
+            if len(tags) >= TOPICS_SEARCH_MIN else "")
+    topics = group("tag", "נושא", topic_chips, " filter-topics", find, '<p class="topics-none" hidden>אין נושא כזה.</p>')
 
     sorts = [("id", "מספר"), ("title", "שם")] + ([("level", "משרה")] if level is None else []) + [("difficulty", "קושי")]
-    panel_id = f"qf-{level or 'all'}"
     # The filter and the table stay out of the site search, under one <section>: the search
     # plugin of Material ends an exclusion at the first closing tag of the same name inside
     # it (a nested </div>), so the excluded element must be a tag that is not nested in it.
@@ -1179,21 +1291,18 @@ def _table(level: str | None, page_url: str) -> str:
     out.append('<div class="filter-bar">'
                '<label class="filter-search"><span class="filter-search-label">חיפוש</span>'
                '<input type="search" data-filter="text" placeholder="שם, נושא או מספר"></label>'
-               f'<button type="button" class="filter-toggle" aria-expanded="false" aria-controls="{panel_id}">'
-               '<span class="ui-ico ui-ico-filter" aria-hidden="true"></span>סינון<span class="filter-n"></span></button>'
+               '<div class="filter-dds">')
+    if level is None:
+        out.append(seg("level", "משרה", LEVELS.items()))
+    out.append(seg("difficulty", "קושי", DIFFICULTIES.items()))
+    out.append(seg("kind", "סוג", [(k, v) for k, v in KINDS.items() if any(q["kind"] == k for q in rows)]))
+    out.append(seg("mark", "סימון", [("star", "מועדפים"), ("solved", "פתורות"), ("unsolved", "לא פתורות")]))
+    out.append(topics)
+    out.append('</div><button type="button" class="filter-random">שאלה אקראית</button></div>')
+    out.append('<div class="filter-status"><div class="filter-active" aria-live="polite"><span class="filter-count"></span></div>'
                '<label class="filter-sort">מיון <select>'
                + "".join(f'<option value="{k}">{l}</option>' for k, l in sorts)
-               + '</select></label>'
-               '<button type="button" class="filter-random">שאלה אקראית</button></div>')
-    out.append(f'<div class="filter-panel" id="{panel_id}">')
-    if level is None:
-        out.append(group("level", "משרה", LEVELS.items()))
-    out.append(group("difficulty", "קושי", DIFFICULTIES.items()))
-    out.append(group("kind", "סוג", [(k, v) for k, v in KINDS.items() if any(q["kind"] == k for q in rows)]))
-    out.append(group("mark", "סימון", [("star", "מועדפים"), ("solved", "פתורות"), ("unsolved", "לא פתורות")]))
-    out.append(topics)
-    out.append("</div>")
-    out.append('<div class="filter-active" aria-live="polite"><span class="filter-count"></span></div>')
+               + '</select></label></div>')
     out.append("</div>")
 
     def th(key: str, label: str) -> str:
@@ -1207,24 +1316,18 @@ def _table(level: str | None, page_url: str) -> str:
                "</tr></thead><tbody>")
     for q in rows:
         href = _href(q["src_uri"], page_url)
-        title = html.escape(str(q["title"]))
+        main, sub = split_title(q["title"])
+        sub_html = f'<span class="q-sub">{html.escape(sub)}</span>' if sub else ""
         level_td = f'<td class="q-level">{level_chip(q["level"])}</td>' if level is None else ""
-        topic_btn = lambda t: f'<button type="button" class="q-topic" data-tag="{html.escape(t)}" title="סינון לפי הנושא">{html.escape(topic_name(t))}</button>'  # noqa: E731
-        shown, rest = q["tags"][:ROW_TOPICS], q["tags"][ROW_TOPICS:]
-        topics_html = "".join(topic_btn(t) for t in shown)
-        if rest:
-            topics_html += (f'<button type="button" class="q-more" aria-expanded="false" aria-label="עוד {len(rest)} נושאים">+{len(rest)}</button>'
-                            f'<span class="q-rest" hidden>{"".join(topic_btn(t) for t in rest)}</span>')
         search = " ".join([q["id"], str(int(q["id"])), str(q["title"]), *q["tags"], *(topic_name(t) for t in q["tags"])])
         out.append(
             f'<tr data-id="{q["id"]}" data-level="{q["level"]}" data-difficulty="{q["difficulty"]}" data-kind="{q["kind"]}" '
             f'data-level-rank="{LEVEL_RANK[q["level"]]}" data-diff-rank="{DIFF_RANK[q["difficulty"]]}" '
             f'data-tags="{html.escape(" ".join(q["tags"]))}" data-search="{html.escape(search.lower())}">'
-            f'<td class="q-id">{question_chip(q["id"], q.get("parts", 0))}<span class="q-idn">{q["id"]}</span></td>'
+            f'<td class="q-id"><span class="q-idn">{q["id"]}</span></td>'
             f'<td class="q-title"><div class="q-line"><span class="q-kind q-kind-{q["kind"]}" title="{KINDS[q["kind"]]}">{kind_icon(q["kind"])}</span>'
-            f'<a href="{href}" title="{title}">{title}</a>'
-            f'{new_chip(q) if q["id"] in new else ""}<span class="q-marks"></span></div>'
-            f'<div class="q-meta">{kind_chip(q["kind"])}<span class="q-topics">{topics_html}</span></div></td>'
+            f'<a href="{href}" title="{html.escape(str(q["title"]))}">{html.escape(main)}</a>'
+            f'{new_chip(q) if q["id"] in new else ""}<span class="q-marks"></span>{sub_html}</div></td>'
             f"{level_td}"
             f'<td class="q-diff">{difficulty_chip(q["difficulty"])}</td>'
             "</tr>"
@@ -1280,9 +1383,17 @@ def _lists_band(level: str | None, title: str, lead: str) -> str:
     )
 
 
-def _lists_top(markdown: str) -> str:
-    """The title and the lead right before a questions table become its header band."""
-    return LISTS_TOP.sub(lambda m: _lists_band(m.group("level"), m.group("title"), m.group("lead")), markdown, count=1)
+def _lists_top(markdown: str, page=None) -> str:
+    """The title and the lead right before a questions table become its header band. The
+    band wraps the page's "# title", and MkDocs takes a page's title only from a heading
+    that opens the page: a level page (no title in its front matter, no nav entry) was then
+    named after its file, "Index", in the browser tab and in the header. So the title goes
+    into the page's meta here, unless the page already gives one."""
+    def band(m: re.Match) -> str:
+        if page is not None:
+            page.meta.setdefault("title", m.group("title").strip())
+        return _lists_band(m.group("level"), m.group("title"), m.group("lead"))
+    return LISTS_TOP.sub(band, markdown, count=1)
 
 
 def _run_panel(q: dict, markdown: str) -> str:
@@ -1362,22 +1473,21 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
         page.meta["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], *q["tags"]]
         page.meta.setdefault("hide", []).append("tags")   # the header card shows them
         markdown = (_header(q, markdown, page.url, _tools(q, page.url)) + _path_nav(q, page.url) + markdown
-                    + _run_panel(q, markdown) + _source_line(q) + _related(q, page.url) + _comments_block())
+                    + _run_panel(q, markdown) + _source_line(q) + _end_card(q, page.url, page.next_page) + _related(q, page.url) + _comments_block())
 
     markdown = COST_LINE.sub(_cost_chips, markdown)
     markdown = CARDS.sub(lambda m: _level_cards(page.url), markdown)
     markdown = HOME_DAILY.sub(lambda m: home_daily(page.url), markdown)
     markdown = HERO.sub(lambda m: _hero(m.group(1), page.url), markdown)
     markdown = PATH_STEPS.sub(lambda m: _path_steps(page), markdown)
-    markdown = PATH_CARDS.sub(lambda m: _path_cards(page.url, bool(m.group(1))), markdown)
+    markdown = PATH_CARDS.sub(lambda m: _path_cards(page.url, True) if m.group(1) else _path_rows(page.url), markdown)
     markdown = MAPS_METRO.sub(lambda m: maps_metro(page.url, bool(m.group(1))), markdown)
     markdown = HOW_IT_WORKS.sub(lambda m: _how_it_works(), markdown)
-    markdown = CATALOG_LINK.sub(lambda m: _catalog_link(page.url), markdown)
     markdown = CONTINUE.sub(lambda m: _continue_card(), markdown)
     markdown = MY_MAP.sub(lambda m: _my_map(page.url), markdown)
     markdown = RECENT.sub(lambda m: _recent(page.url), markdown)
     markdown = WHATS_NEW.sub(lambda m: _whats_new(page.url), markdown)
-    markdown = _lists_top(markdown)
+    markdown = _lists_top(markdown, page)
     return PLACEHOLDER.sub(lambda m: _table(m.group(1), page.url), markdown)
 
 
@@ -1427,12 +1537,12 @@ TAG_TOC = re.compile(r'(href="#tag:([^"]+)" class="md-nav__link">\s*<span class=
 
 def _tag_names(output: str) -> str:
     """The tags page with the topics' Hebrew names, in its headings and its contents list
-    (the anchors keep the tags as written), and a grid of all tags with their counts above
-    the lists (Y398)."""
+    (the anchors keep the tags as written), the lists as folds (_tag_grid) and the relation
+    graph above them."""
     output = TAG_CHIP.sub(lambda m: m.group(1) + html.escape(topic_name(html.unescape(m.group(2).strip()))) + m.group(3), output)
     output = TAG_TOC.sub(lambda m: m.group(1) + html.escape(topic_name(m.group(2))) + m.group(4), output)
     output = _tag_grid(output)
-    at = output.find('<nav class="tag-grid"')     # V10: the relation graph above the grid
+    at = output.find('<div class="tag-index">')     # V10: the relation graph above the lists
     return output[:at] + maps_tag_graph() + output[at:] if at >= 0 else output
 
 
@@ -1440,24 +1550,42 @@ TAG_SECTION = re.compile(r'(<h2 id="tag:([^"]+)">.*?<span class="md-tag">([^<]+)
 
 
 def _tag_grid(output: str) -> str:
-    """Every tag as a chip with its number of questions, linking to its list, and each list
-    folded under its tag's name (a link to "#tag:..." opens it, reading-tools.js), in
-    columns when open (ul.tag-list)."""
-    chips = []
+    """The lists of the tags page (session 34), each a fold with the anchor "tag:<tag>" that
+    a link opens (reading-tools.js): first a short row of the level and difficulty tags
+    with their counts (.tag-levels), then one list of the topics, the most questions first
+    and ties by name (.tag-rows): the name, a thin bar in proportion to the count, the
+    count. A fold opens its questions in place, in columns (ul.tag-list)."""
+    found = []
 
     def section(m: re.Match) -> str:
-        count = m.group(4).count("<li>")
-        count_html = f'<span class="tag-count" aria-label="{count} שאלות">{count}</span>'
-        chips.append(f'<a class="tag-chip" href="#tag:{m.group(2)}">{m.group(3)}{count_html}</a>')
-        return (f'<details class="tag-section" id="tag:{m.group(2)}"><summary>'
-                f'<span class="md-tag">{m.group(3)}</span>{count_html}</summary>\n'
-                f'<ul class="tag-list">{m.group(4)}</ul></details>\n')
+        # by the name shown: the anchor of a level may differ from it ("ג'וניור" loses its apostrophe)
+        found.append((html.unescape(m.group(3)).strip(), m.group(2), m.group(3), m.group(4).count("<li>"), m.group(4)))
+        return "\0" if len(found) == 1 else ""
 
     output = TAG_SECTION.sub(section, output)
-    at = output.find('<details class="tag-section"')
-    if at < 0 or not chips:
+    if not found:
         return output
-    return output[:at] + f'<nav class="tag-grid" aria-label="כל התגיות">{"".join(chips)}</nav>\n' + output[at:]
+
+    def fold(tag_id, name, count, items, cls, bar=""):
+        return (f'<details class="tag-section {cls}" id="tag:{tag_id}"><summary>{name}{bar}'
+                f'<span class="tag-count" aria-label="{count} שאלות">{count}</span></summary>\n'
+                f'<ul class="tag-list">{items}</ul></details>\n')
+
+    chips = {**{LEVELS[k]: level_chip(k) for k in LEVELS}, **{DIFFICULTIES[k]: difficulty_chip(k) for k in DIFFICULTIES}}
+    by_tag = {f[0]: f for f in found}
+    levels = [fold(by_tag[t][1], chips[t].replace('class="chip ', 'class="tr-name chip '), by_tag[t][3], by_tag[t][4], "tag-level")
+              for t in chips if t in by_tag]
+    topics = sorted((f for f in found if f[0] not in chips), key=lambda f: (-f[3], f[2]))
+    most = max((f[3] for f in topics), default=1)
+    rows = [fold(f[1], f'<span class="tr-name">{f[2]}</span>', f[3], f[4], "tag-row",
+                 f'<span class="tr-bar" aria-hidden="true"><i style="--p:{f[3] / most:.3f}"></i></span>') for f in topics]
+    out = '<div class="tag-index">'
+    if levels:
+        out += f'<h2 class="tag-head" id="tag-levels">רמה וקושי</h2>\n<div class="tag-levels">{"".join(levels)}</div>\n'
+    if rows:
+        out += (f'<h2 class="tag-head" id="tag-topics">נושאים <span class="tag-head-note">{len(rows)} נושאים, לפי מספר השאלות</span></h2>\n'
+                f'<div class="tag-rows">{"".join(rows)}</div>\n')
+    return output.replace("\0", out + "</div>\n", 1)
 
 
 
@@ -1575,37 +1703,170 @@ def maps_metro_layout(paths: list[dict]) -> dict:
     return {"cols": width, "rows": rows, "lines": out_lines, "shared": shared}
 
 
+MAPS_NAME_PX = 12.5      # the size of a line's name on the map (.mm-lname in 31-maps-ux.css)
+MAPS_NAME_LEAD = 15      # from one line of a broken name to the next
+MAPS_NAME_TOP = 34       # how far above the grid a name may stand (the map grows by it)
+MAPS_NAME_SIDE = 60      # and how far past its sides
+
+
+def maps_text_width(text: str, size: float = MAPS_NAME_PX) -> float:
+    """An upper estimate of the width of a bold label in the site's font: the generator
+    has no font metrics, so every letter counts as a wide one (measured on a built page
+    with the fallback font, the paths' names are 15 to 25 percent narrower)."""
+    em = 0.0
+    for ch in text:
+        if ch == " ":
+            em += 0.3
+        elif ch in "-‑.,:'\"()":
+            em += 0.42
+        elif ch.isupper() or ch in "mw":
+            em += 0.76
+        else:
+            em += 0.6
+    return em * size
+
+
+def maps_metro_px(lay: dict, g: int, pad: int) -> dict:
+    """The layout of maps_metro_layout in pixels: {"width", "height", "lines": [{"n", "pts":
+    [a station's centre per cell], "badge": the centre of the line's square}]}."""
+    def xy(cell):
+        return pad + (lay["cols"] - 1 - cell[0]) * g, pad + cell[1] * g
+
+    return {"width": pad * 2 + (lay["cols"] - 1) * g, "height": pad * 2 + (lay["rows"] - 1) * g,
+            "lines": [{"n": ln["n"], "pts": [xy(c) for c in ln["cells"]], "badge": xy(ln["badge"])}
+                      for ln in lay["lines"]]}
+
+
+def _maps_cuts(a, b, box) -> bool:
+    """Does the segment a-b pass through the box (x0, y0, x1, y1)?"""
+    t0, t1 = 0.0, 1.0
+    for p, d, lo, hi in ((a[0], b[0] - a[0], box[0], box[2]), (a[1], b[1] - a[1], box[1], box[3])):
+        if d == 0:
+            if p < lo or p > hi:
+                return False
+            continue
+        ta, tb = sorted(((lo - p) / d, (hi - p) / d))
+        t0, t1 = max(t0, ta), min(t1, tb)
+        if t0 > t1:
+            return False
+    return True
+
+
+def maps_metro_names(px: dict, titles: dict[int, str], r: int) -> dict:
+    """Where each line's name is written, at the line's start: {n: {"rows": [(text, y)],
+    "x", "anchor", "box": (x0, y0, x1, y1)}}. anchor "start": the rows end at x, their right
+    edge (the text is right-to-left); "end": they begin at x, their left edge. The rule,
+    per line in order, the first place that is free: a line that leaves its square sideways
+    has its name above its first segment, flush with the square's outer edge, then slid
+    outwards in steps, then the same below; a line that leaves it downwards has the name
+    beside the square (to its left, then to its right), then above it. At every place the
+    name is tried on one line, then broken in two at the space nearest its middle. Free
+    means inside the map (or a little past its top or sides: the map grows) and clear of every station, every line and stub, every square and
+    every name already placed (widths from maps_text_width). A line with no free place gets
+    no name on the map (the legend has it)."""
+    import math
+
+    clear, half, sq, rise = 3, 7, 12, 26     # rise: from the square's centre to a name above it
+    dots = [p for ln in px["lines"] for p in ln["pts"]]
+    segs = [s for ln in px["lines"] for s in zip([ln["badge"]] + ln["pts"], ln["pts"])]
+    squares = [ln["badge"] for ln in px["lines"]]
+    placed: list[tuple] = []
+
+    def free(box) -> bool:
+        x0, y0, x1, y1 = box
+        if x0 < -MAPS_NAME_SIDE or x1 > px["width"] + MAPS_NAME_SIDE or y0 < -MAPS_NAME_TOP or y1 > px["height"] - 2:
+            return False
+        if any(x0 < b[2] + 2 and b[0] - 2 < x1 and y0 < b[3] + 2 and b[1] - 2 < y1 for b in placed):
+            return False
+        for cx, cy in dots:
+            if math.hypot(max(x0 - cx, 0, cx - x1), max(y0 - cy, 0, cy - y1)) < r + 4 + clear - 2:      # r + 4: an interchange with its ring
+                return False
+        for bx, by in squares:
+            if x0 < bx + sq + clear and bx - sq - clear < x1 and y0 < by + sq + clear and by - sq - clear < y1:
+                return False
+        grown = (x0 - 3.5 - clear, y0 - 3.5 - clear, x1 + 3.5 + clear, y1 + 3.5 + clear)
+        return not any(_maps_cuts(a, b, grown) for a, b in segs)
+
+    def forms(title):
+        yield [title]
+        words = title.split(" ")
+        if len(words) > 1:
+            k = min(range(1, len(words)), key=lambda k: abs(len(" ".join(words[:k])) - len(" ".join(words[k:]))))
+            yield [" ".join(words[:k]), " ".join(words[k:])]
+
+    def places(ln):
+        """(x of the name's fixed edge, the side the name grows to, where its rows stand)"""
+        (bx, by), (x0, y0) = ln["badge"], ln["pts"][0]
+        slides = range(0, px["width"], 9)
+        if by == y0:
+            out = 1 if bx > x0 else -1
+            for where in ("above", "below"):
+                for s in slides:
+                    yield bx + out * (sq + s), -out, where
+        else:
+            yield bx - sq - 8, -1, "beside"
+            yield bx + sq + 8, 1, "beside"
+            for s in slides:
+                yield bx + sq + s, -1, "above"
+
+    names = {}
+    for ln in px["lines"]:
+        by = ln["badge"][1]
+        for (x, grow, where), rows in ((p, f) for p in places(ln) for f in forms(titles[ln["n"]])):
+            k = len(rows)
+            first = {"above": by - rise - (k - 1) * MAPS_NAME_LEAD, "below": by + rise,
+                     "beside": by - (k - 1) * MAPS_NAME_LEAD / 2}[where]
+            ys = [first + i * MAPS_NAME_LEAD for i in range(k)]
+            w = max(maps_text_width(t) for t in rows)
+            box = (min(x, x + grow * w), ys[0] - half, max(x, x + grow * w), ys[-1] + half)
+            if free(box):
+                placed.append(box)
+                names[ln["n"]] = {"rows": list(zip(rows, ys)), "x": x, "anchor": "start" if grow < 0 else "end", "box": box}
+                break
+    return names
+
+
 def maps_metro(page_url: str, compact: bool = False) -> str:
     """The metro map of the study paths (V7): an SVG of coloured lines with a station per
     question (its number inside; a link to the question, named by its id and title), a
-    badge with the line's number at its start, and a legend of the lines (links to the path
-    pages). compact: the featured paths only (the home page) on a tighter grid. The box
-    scrolls sideways on a narrow screen; the page itself does not."""
+    square with the line's number at its start and the line's name by it (maps_metro_names),
+    and a legend of the lines (links to the path pages). compact: the featured paths only
+    (the home page) on a tighter grid. The box scrolls sideways when the map is wider than
+    it (maps.js shows a fade and a "the map goes on" button on the cut edge); the page
+    itself does not. A station carries what its card shows (maps.js, .mm-card): the kind,
+    level, difficulty and title; the names of those are on the box (data-names)."""
+    import math
+
     chosen = [(n, p) for n, p in enumerate(_paths) if not compact or p["featured"]]
     if not chosen:
         return ""
     lay = maps_metro_layout([p for _, p in chosen])
     g, pad, r = (46, 26, 12) if compact else (54, 30, 13)
-    width = pad * 2 + (lay["cols"] - 1) * g
-    height = pad * 2 + (lay["rows"] - 1) * g
-
-    def xy(cell):
-        return pad + (lay["cols"] - 1 - cell[0]) * g, pad + cell[1] * g
+    px = maps_metro_px(lay, g, pad)
+    width, height = px["width"], px["height"]
+    names = maps_metro_names(px, {k: p["title"] for k, (_, p) in enumerate(chosen)}, r)
+    top = max([0] + [math.ceil(2 - nm["box"][1]) for nm in names.values()])       # the map grows for a name past its edge
+    left = max([0] + [math.ceil(2 - nm["box"][0]) for nm in names.values()])
+    right = max([0] + [math.ceil(nm["box"][2] + 2 - width) for nm in names.values()])
 
     tracks, stops, badges, legend, seen = [], [], [], [], set()
-    for ln in lay["lines"]:
+    for ln in px["lines"]:
         n, p = chosen[ln["n"]]
         colour = n % MAPS_COLOURS + 1
-        pts = [xy(c) for c in ln["cells"]]
+        pts = ln["pts"]
         d = "M" + " L".join(f"{x},{y}" for x, y in pts)
         tracks.append(f'<path class="mm-line mm-c{colour}" data-line="{n + 1}" d="{d}"/>')
-        bx, by = xy(ln["badge"])
+        bx, by = ln["badge"]
         x0, y0 = pts[0]
         href = _href(p["src_uri"], page_url)
+        nm = names.get(ln["n"])
+        name = "".join(f'<text class="mm-lname mm-c{colour}{" is-end" if nm["anchor"] == "end" else ""}" '
+                       f'x="{_n(nm["x"])}" y="{_n(y)}" direction="rtl">{html.escape(t)}</text>'
+                       for t, y in nm["rows"]) if nm else ""
         badges.append(f'<path class="mm-stub mm-c{colour}" data-line="{n + 1}" d="M{bx},{by} L{x0},{y0}"/>'
                       f'<a class="mm-badge" href="{href}" tabindex="-1" aria-hidden="true" data-line="{n + 1}">'
                       f'<rect class="mm-c{colour}" x="{bx - 12}" y="{by - 12}" width="24" height="24" rx="6"/>'
-                      f'<text x="{bx}" y="{by}">{n + 1}</text></a>')
+                      f'<text x="{bx}" y="{by}">{n + 1}</text>{name}</a>')
         for (x, y), s in zip(pts, p["steps"]):
             q = s["q"]
             key = (q["id"], x, y)
@@ -1613,10 +1874,12 @@ def maps_metro(page_url: str, compact: bool = False) -> str:
                 continue
             seen.add(key)
             inter = q["id"] in lay["shared"]
-            name = f'שאלה {int(q["id"])} : {q["title"]}'   # with the number it shows (axe)
+            label = f'שאלה {int(q["id"])} : {q["title"]}'   # with the number it shows (axe)
             lines_of = " ".join(str(m + 1) for m, o in chosen if q["id"] in [t["q"]["id"] for t in o["steps"]])
             stops.append(f'<a class="mm-st{" is-x" if inter else ""}" href="{_href(q["src_uri"], page_url)}" '
-                         f'data-id="{q["id"]}" data-lines="{lines_of}" aria-label="{html.escape(name)}">'
+                         f'data-id="{q["id"]}" data-lines="{lines_of}" data-kind="{q["kind"]}" data-level="{q["level"]}" '
+                         f'data-diff="{q["difficulty"]}" data-title="{html.escape(str(q["title"]))}" '
+                         f'aria-label="{html.escape(label)}">'
                          f'<circle class="mm-dot mm-c{colour}" cx="{x}" cy="{y}" r="{r + 2 if inter else r}"/>'
                          f'<text x="{x}" y="{y}">{int(q["id"])}</text></a>')
         ids = " ".join(s["q"]["id"] for s in p["steps"])
@@ -1625,11 +1888,16 @@ def maps_metro(page_url: str, compact: bool = False) -> str:
                       f'<span class="mm-name">{html.escape(p["title"])}</span>'
                       f'<span class="mm-count" data-ids="{ids}">{len(ids.split())} שאלות</span></a></li>')
     label = "מפת מסלולי הלימוד" + (" המומלצים" if compact else "")
-    svg = (f'<svg class="mm-svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
+    svg = (f'<svg class="mm-svg" viewBox="{-left} {-top} {left + width + right} {height + top}" width="{left + width + right}" height="{height + top}" '
            f'role="group" aria-label="{label}">' + "".join(tracks + badges + stops) + "</svg>")
-    return (f'<div class="metro{" metro-compact" if compact else ""}" data-search-exclude>'
-            f'<div class="mm-scroll" style="--mm-w:{width}px;--mm-h:{height}px">{svg}</div>'
-            '<div class="mm-tip" hidden></div>'
+    words = html.escape(json.dumps({"level": LEVELS, "diff": DIFFICULTIES, "kind": KINDS}, ensure_ascii=False))
+    return (f'<div class="metro{" metro-compact" if compact else ""}" data-search-exclude data-names="{words}">'
+            f'<div class="mm-view"><div class="mm-scroll" style="--mm-w:{left + width + right}px;--mm-h:{height + top}px">{svg}</div>'
+            '<span class="mm-fade mm-fade-start" aria-hidden="true" hidden></span>'
+            '<span class="mm-fade mm-fade-end" aria-hidden="true" hidden></span>'
+            '<button type="button" class="mm-more" hidden>המפה ממשיכה'
+            '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M7.5 2.5 4 6l3.5 3.5"/></svg></button></div>'
+            f'<div class="mm-card" id="mm-card{"-compact" if compact else ""}" role="tooltip" hidden></div>'
             f'<ol class="mm-legend" aria-label="קווי המפה">{"".join(legend)}</ol></div>')
 
 
@@ -1791,6 +2059,7 @@ def on_post_page(output, page, config, **kwargs):
         except Exception as e:                       # name the page, not only the TeX
             raise RuntimeError(f"{page.file.src_uri}: the search text of the statement failed: {e!r}") from e
         output = qp_parts(video_links(output, _questions[page.file.src_uri]))
+        output = box_teaser(solution_summaries(output))
     output = one_stylesheet(output)
     scripts = wavedrom_scripts(output, page.url) + explorer_scripts(output, page.url)
     if not scripts:

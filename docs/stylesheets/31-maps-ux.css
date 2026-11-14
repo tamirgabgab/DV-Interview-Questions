@@ -1,1 +1,454 @@
 /* The site's styles, part 31: the maps of the UX round (session 34): path names on the metro map's lines, the station card, the edge fade; the paths as rows; the tags page's sorted list. It loads after the parts before it. */
+
+/* 6a: a line's name at its start, in the line's colour (the thirteen colours pass 4.5:1 as
+   text on the map's surface in both schemes, check_contrast.py). hooks/questions.py places
+   it (maps_metro_names): x is the right edge of the right-to-left text, or the left one
+   for .is-end. A halo of the surface keeps it clear of the grid's dots. */
+.mm-svg .mm-badge .mm-lname {
+  text-anchor: start;
+  fill: var(--mm);
+  paint-order: stroke;
+  stroke: var(--site-surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  font-size: 12.5px;
+  font-weight: 700;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.mm-svg .mm-badge .mm-lname.is-end { text-anchor: end; }
+
+/* 6c: the map wider than its box. A fade on each cut edge (the end is the left side: the
+   page reads right to left) and a button that scrolls one screen on; maps.js shows them
+   only while there is more that way. */
+.md-typeset .mm-view { position: relative; }
+.md-typeset .metro.is-wide .mm-scroll { padding-bottom: 2.7rem; }      /* room for the button under the stations */
+
+.md-typeset .mm-fade {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  width: 3.4rem;
+  pointer-events: none;
+}
+
+.md-typeset .mm-fade-end {
+  left: 0;
+  background: linear-gradient(to right, var(--site-surface) 12%, transparent);
+}
+
+.md-typeset .mm-fade-start {
+  right: 0;
+  width: 2rem;
+  background: linear-gradient(to left, var(--site-surface) 12%, transparent);
+}
+
+.md-typeset .mm-more {
+  position: absolute;
+  z-index: 2;
+  left: var(--sp-2);
+  bottom: var(--sp-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 1.8rem;
+  padding: 0 0.7rem;
+  border: 1px solid var(--site-card-border);
+  border-radius: 999px;
+  background: var(--site-surface);
+  color: var(--md-default-fg-color);
+  font: inherit;
+  font-size: 0.64rem;
+  font-weight: 600;
+  line-height: 1.3;
+  box-shadow: var(--shadow-2);
+  cursor: pointer;
+}
+
+.md-typeset .mm-more svg {
+  width: 0.7rem;
+  height: 0.7rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.md-typeset .mm-more:hover { border-color: var(--md-typeset-a-color); color: var(--md-typeset-a-color); }
+
+.md-typeset .mm-fade[hidden],
+.md-typeset .mm-more[hidden],
+.md-typeset .mm-card[hidden] { display: none; }
+
+.md-typeset .mm-scroll:focus-visible {
+  outline: 2px solid var(--site-focus-ring);
+  outline-offset: -2px;
+}
+
+/* 6b: the station card (maps.js fills and places it inside the map's box). It does not
+   take the pointer, so the station under it stays the link; after a tap (.is-touch) it
+   does, for its own link to the question. */
+.md-typeset .mm-card {
+  position: absolute;
+  z-index: 3;
+  width: 15.5rem;
+  max-width: calc(100% - 16px);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--site-card-border);
+  border-radius: var(--radius-m);
+  background: var(--site-surface);
+  color: var(--md-default-fg-color);
+  line-height: 1.4;
+  text-align: start;
+  box-shadow: var(--shadow-3);
+  pointer-events: none;
+}
+
+.md-typeset .mm-card.is-touch { pointer-events: auto; }
+
+.md-typeset .mm-card::after {      /* the pointer to the station: above the card, or under it */
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: var(--mm-ax, 50%);
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--site-card-border);
+  border-bottom: 0;
+  border-right: 0;
+  background: var(--site-surface);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.md-typeset .mm-card.is-above::after {
+  top: auto;
+  bottom: -6px;
+  border: 1px solid var(--site-card-border);
+  border-top: 0;
+  border-left: 0;
+}
+
+.md-typeset .mm-card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.62rem;
+}
+
+.md-typeset .mm-card-id { direction: ltr; font-family: var(--md-code-font-family); }
+.md-typeset .mm-card-kind { display: inline-flex; align-items: center; gap: 0.25rem; }
+.md-typeset .mm-card-lines { display: inline-flex; gap: 0.2rem; margin-inline-start: auto; }
+
+.md-typeset .mm-card-lines .mm-num {
+  width: 1.05rem;
+  height: 1.05rem;
+  font-size: 0.56rem;
+  font-style: normal;
+}
+
+.md-typeset .mm-card .mm-card-title { margin: 0.2rem 0 0.1rem; font-size: 0.76rem; font-weight: 700; }
+.md-typeset .mm-card .mm-card-sub { margin: 0 0 0.1rem; color: var(--md-default-fg-color--light); font-size: 0.66rem; }
+
+.md-typeset .mm-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.md-typeset .mm-card-meta .chip { font-size: 0.62rem; }
+.md-typeset .mm-card-solved { color: var(--diff-easy); font-size: 0.62rem; font-weight: 600; }
+
+.md-typeset .mm-card a.mm-card-go {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.2rem;         /* a 44 px touch target */
+  margin-inline-start: auto;
+  padding-inline: var(--sp-2);
+  color: var(--md-typeset-a-color);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* On a phone the rows of the paths page stand right under the map with the same squares,
+   names and counts, so the map's own legend steps aside there. */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .metro:has(~ .path-rows) .mm-legend { display: none; }
+  .md-typeset .mm-more { min-height: 2.2rem; font-size: 0.66rem; }
+}
+
+/* 7a: the study paths as rows (the paths page). The name is the link to the path's page
+   and covers the whole row (::after); the link at the row's end stands above it. */
+.md-typeset ol.path-rows {
+  display: flex;
+  flex-direction: column;
+  margin: var(--sp-3) 0;
+  padding: 0;
+  border: 1px solid var(--site-card-border);
+  border-radius: var(--radius-m);
+  background: var(--site-surface);
+  box-shadow: var(--shadow-1);
+  list-style: none;
+  overflow: hidden;
+}
+
+.md-typeset ol.path-rows > li.path-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 15.5rem 11.5rem;
+  align-items: center;
+  column-gap: var(--sp-3);
+  box-sizing: border-box;
+  min-height: 3.4rem;
+  margin: 0;
+  padding: 0.35rem var(--sp-3);
+  border-top: 1px solid var(--site-card-border);
+}
+
+.md-typeset ol.path-rows > li.path-row:first-child { border-top: 0; }
+.md-typeset .path-row:hover { background: var(--site-primary-soft); }
+.md-typeset .path-row .pr-main { min-width: 0; }
+
+.md-typeset .path-row a.pr-name:not(.md-button):not(.headerlink) {
+  display: block;
+  color: var(--md-default-fg-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.md-typeset .path-row a.pr-name::after { content: ""; position: absolute; inset: 0; }
+.md-typeset .path-row:hover a.pr-name:not(.md-button):not(.headerlink) { color: var(--md-typeset-a-color); }
+
+.md-typeset .path-row a.pr-name:focus-visible::after {
+  outline: 2px solid var(--site-focus-ring);
+  outline-offset: -2px;
+}
+
+.md-typeset .path-row .pr-desc {
+  display: block;
+  overflow: hidden;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.66rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.md-typeset .path-row .pr-mix { display: flex; align-items: center; gap: 0.5rem; min-width: 0; white-space: nowrap; }
+
+.md-typeset .path-row .pr-count {
+  min-width: 3.6rem;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.md-typeset .path-row .pr-mix .chip { font-size: 0.62rem; }
+
+.md-typeset .path-row .pr-progress { display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; min-width: 0; }
+
+.md-typeset .path-row .pr-bar {
+  flex: 1 1 2rem;
+  min-width: 2rem;
+  max-width: 4rem;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--site-card-border);
+}
+
+.md-typeset .path-row .pr-bar i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--viz-s3);
+  transform: scaleX(var(--p, 0));      /* the share solved (maps.js) */
+  transform-origin: right center;
+}
+
+.md-typeset .path-row .pr-n {
+  min-width: 2rem;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.64rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.md-typeset .path-row a.pr-go:not(.md-button):not(.headerlink),
+.md-typeset .path-row .pr-done {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  min-width: 4.4rem;
+  min-height: 2.2rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.md-typeset .path-row a.pr-go:not(.md-button):not(.headerlink) { color: var(--md-typeset-a-color); }
+.md-typeset .path-row a.pr-go:hover { text-decoration: underline; }
+.md-typeset .path-row .pr-done { color: var(--diff-easy); }
+
+.md-typeset .path-row a.pr-go[hidden]:not(.md-button):not(.headerlink),
+.md-typeset .path-row .pr-progress .pr-done[hidden],
+.md-typeset .path-row .pr-progress .pr-bar[hidden],
+.md-typeset .path-row .pr-progress .pr-n[hidden] { display: none; }
+
+/* two lines on a narrow screen: the name with "n/m" and the link, then the count and the
+   mix; the bar is a strip along the row's bottom once something is solved */
+@media screen and (max-width: 59.9375em) {
+  .md-typeset ol.path-rows > li.path-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "num main go" "num mix mix";
+    column-gap: var(--sp-2);
+    row-gap: 0.15rem;
+    padding: 0.5rem var(--sp-2) 0.6rem;
+  }
+  .md-typeset .path-row .mm-num { grid-area: num; align-self: start; margin-top: 0.1rem; }
+  .md-typeset .path-row .pr-main { grid-area: main; }
+  .md-typeset .path-row .pr-desc { display: none; }
+  .md-typeset .path-row .pr-mix { grid-area: mix; flex-wrap: wrap; gap: 0.2rem 0.35rem; }
+  .md-typeset .path-row .pr-mix .chip { font-size: 0.58rem; }
+  .md-typeset .path-row .pr-count { min-width: 0; font-size: 0.64rem; }
+  .md-typeset .path-row .pr-progress { grid-area: go; align-self: start; gap: 0.4rem; }
+  .md-typeset .path-row a.pr-go:not(.md-button):not(.headerlink),
+  .md-typeset .path-row .pr-done { min-width: 0; margin-block: -0.4rem; }      /* a 44 px target in a short line */
+  .md-typeset .path-row .pr-n { min-width: 0; }
+  .md-typeset .path-row .pr-bar {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    max-width: none;
+    height: 3px;
+    border-radius: 0;
+  }
+  .md-typeset .path-row .pr-progress.is-empty .pr-bar { display: none; }
+}
+
+/* 7b: the tags page under the graph. A short row of the level and difficulty tags, then
+   the topics in one list, the most questions first: name, a bar in proportion, count.
+   Every tag is a fold with its anchor ("tag:..."); an open one takes the full width and
+   lists its questions in columns. The graph's filter (.is-filtered) leaves only its fold. */
+.md-typeset h2.tag-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--sp-2);
+  margin: var(--sp-4) 0 var(--sp-2);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.md-typeset .tag-head-note { color: var(--md-default-fg-color--light); font-size: 0.68rem; font-weight: 400; }
+.md-typeset .tag-index.is-filtered :is(.tag-head, .tag-levels) { display: none; }
+
+.md-typeset .tag-levels {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
+.md-typeset .tag-rows {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--sp-4);
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--site-card-border);
+  border-radius: var(--radius-m);
+  background: var(--site-surface);
+  box-shadow: var(--shadow-1);
+}
+
+.md-typeset .tag-index details.tag-section { font-size: inherit; }
+
+.md-typeset .tag-levels details.tag-level {
+  border: 1px solid var(--site-card-border);
+  border-radius: var(--radius-m);
+  background: var(--site-surface);
+  box-shadow: var(--shadow-1);
+}
+
+.md-typeset .tag-index details.tag-section[open],
+.md-typeset .tag-index.is-filtered details.tag-section { grid-column: 1 / -1; }
+
+.md-typeset .tag-levels details.tag-level > summary {
+  justify-content: space-between;
+  min-height: 2.2rem;
+  padding: 0.2rem 0.6rem;
+  padding-inline-end: 1.7rem;
+  border-radius: var(--radius-m);
+}
+
+.md-typeset .tag-levels details.tag-level > .tag-list,
+.md-typeset .tag-rows details.tag-row > .tag-list { padding: 0 var(--sp-2) var(--sp-2); font-size: 0.72rem; }
+
+.md-typeset .tag-rows details.tag-row > summary {
+  display: grid;
+  grid-template-columns: minmax(0, 8.2rem) minmax(1rem, 1fr) 1.7rem;
+  align-items: center;
+  column-gap: var(--sp-2);
+  min-height: 1.9rem;
+  padding: 0.15rem 0.2rem;
+  padding-inline-end: 1.5rem;
+  line-height: 1.3;
+}
+
+/* an open topic takes the whole width: its bar keeps the length it had in a column */
+.md-typeset .tag-rows details.tag-row:is([open], .tag-index.is-filtered *) > summary {
+  grid-template-columns: minmax(0, 8.2rem) minmax(1rem, 11rem) 1.7rem;
+  justify-content: start;
+}
+
+.md-typeset .tag-index details.tag-section > summary::after { inset-inline-end: 0.3rem; }
+.md-typeset .tag-index details.tag-section > summary:hover .tr-name:not(.chip) { color: var(--md-typeset-a-color); }
+
+.md-typeset .tag-row .tr-name { font-size: 0.72rem; font-weight: 600; overflow-wrap: anywhere; }
+
+.md-typeset .tag-row .tr-bar {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--md-default-fg-color--lightest);
+}
+
+.md-typeset .tag-row .tr-bar i {
+  display: block;
+  width: calc(var(--p) * 100%);
+  min-width: 3px;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--tg-stroke);
+}
+
+.md-typeset .tag-index details.tag-section > summary .tag-count {
+  color: var(--md-default-fg-color--light);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: end;
+}
+
+@media screen and (max-width: 59.9375em) {
+  .md-typeset .tag-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .tag-levels { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .md-typeset .tag-rows { grid-template-columns: minmax(0, 1fr); padding-inline: var(--sp-2); }
+  .md-typeset .tag-rows details.tag-row > summary { grid-template-columns: minmax(0, 7.4rem) minmax(1rem, 1fr) 1.7rem; min-height: 2.2rem; }
+}

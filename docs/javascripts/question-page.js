@@ -8,6 +8,7 @@
 // here changes the layout. The circles change colour with a short transition only without
 // reduced motion and outside an automated browser (the page checks see a still page).
 // The code window is CSS only.
+// Session 34: the box chip and teaser, the end card, the page tools in the part row.
 (() => {
   const quiet = window.matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.webdriver;
   const readY = () => Math.max(140, window.innerHeight * 0.4);   // 140: the part bar's line (reading-tools.js)
@@ -99,4 +100,65 @@
     }
   };
   document.addEventListener("DOMContentLoaded", () => document.querySelectorAll(".steps-fig[data-fig-steps]").forEach(stepsFig));
+
+  // --- the UX round of session 34 (29-question-ux.css) ---------------------------------------
+
+  // The box chip of the header and the teaser row under the statement (the hook's
+  // [data-box-go] buttons): open every block around the page's first box, scroll to it
+  // (at once under reduced motion) and move the focus to it. In interview mode a closed
+  // solution opens only through its confidence question (question-tools.js), so the click
+  // goes to the solution's own summary instead.
+  const still = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const boxGo = () => {
+    const box = document.querySelector(".md-content .explorer");
+    if (!box) return;
+    const closed = [];
+    for (let el = box.parentElement; el; el = el.parentElement) if (el.tagName === "DETAILS" && !el.open) closed.unshift(el);
+    const gate = document.body.classList.contains("interview-mode") && closed.find((d) => d.matches("details.success"));
+    if (gate) {
+      gate.scrollIntoView({ block: "center", behavior: still() ? "auto" : "smooth" });
+      gate.querySelector("summary").click();
+      return;
+    }
+    closed.forEach((d) => { d.classList.remove("hint-locked"); d.open = true; });
+    if (!box.hasAttribute("tabindex")) box.tabIndex = -1;
+    box.focus({ preventScroll: true });
+    box.scrollIntoView({ block: "start", behavior: still() ? "auto" : "smooth" });
+  };
+
+  // The end card (the hook's .q-end): shown while the question is marked solved (marks.js),
+  // on load too; it sits under the content, so showing it moves nothing above it.
+  const endCard = () => {
+    const card = document.querySelector(".q-end"), tools = document.querySelector(".question-tools[data-qid]");
+    if (!card || !tools) return;
+    const paint = () => { card.hidden = !(window.dvqMarks && window.dvqMarks.has(tools.dataset.qid, "solved")); };
+    document.addEventListener("dvq-marks", paint);
+    paint();
+  };
+
+  // On a computer the page tools sit at the end of the sticky part row as icon buttons (the
+  // same element, moved: every listener, state and name goes with it), and the row's own
+  // copy of the solved button is hidden (.has-tools); on a narrower or touch screen, and on
+  // a page without parts (its strip is only a progress line), they stay in the header card.
+  const DESKTOP = "screen and (min-width: 60em) and (hover: hover)";
+  const toolsPlace = () => {
+    const tools = document.querySelector(".question-tools[data-qid]"), header = document.querySelector(".question-header");
+    const nav = document.querySelector(".part-nav:not(.pn-fixed)");
+    if (!tools || !header || !nav) return;
+    const mq = window.matchMedia(DESKTOP);
+    const place = () => {
+      const inNav = tools.parentElement === nav;
+      if (mq.matches && !inNav) nav.insertBefore(tools, nav.querySelector(".pn-solved, .pn-progress"));
+      else if (!mq.matches && inNav) header.insertBefore(tools, header.querySelector(".qh-bottom"));
+      nav.classList.toggle("has-tools", mq.matches);
+    };
+    mq.addEventListener("change", place);
+    place();
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("[data-box-go]").forEach((b) => b.addEventListener("click", boxGo));
+    endCard();
+    toolsPlace();
+  });
 })();

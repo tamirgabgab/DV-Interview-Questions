@@ -1,7 +1,9 @@
-{#- The theme's footer (Material 9.7) with the site's own meta part (M10, 13-motion.css). -#}
+{#- The theme's footer (Material 9.7) with the site's own meta part (M10, 13-motion.css).
+    The previous / next band shows only on a question page (session 34): on the home page,
+    the lists, the paths and the other pages "next" was just the next file of the site. -#}
 <footer class="md-footer">
   {% if "navigation.footer" in features %}
-    {% if page.previous_page or page.next_page %}
+    {% if page and page.meta and page.meta.id and page.meta.difficulty and (page.previous_page or page.next_page) %}
       {% if page.meta and page.meta.hide %}
         {% set hidden = "hidden" if "footer" in page.meta.hide %}
       {% endif %}

@@ -537,13 +537,44 @@
     new MutationObserver(label).observe(article, { childList: true, subtree: true });
     label();
   };
+  // A table wider than its column scrolls sideways inside its own wrapper (session 34,
+  // 29-question-ux.css): the wrapper gets .is-wide, a keyboard stop with a name while it
+  // overflows (and loses them when it fits again), and .fade-s / .fade-e while there is
+  // more to scroll towards its start (right) or end (left) edge. Measured without the
+  // class, as the plain table; a table shown as cards on a phone (data-cards) never
+  // overflows. Wide code keeps its keyboard stop as before.
+  const tableFades = (w) => {
+    const max = w.scrollWidth - w.clientWidth, pos = Math.abs(w.scrollLeft);
+    w.classList.toggle("fade-s", max > 1 && pos > 1);
+    w.classList.toggle("fade-e", max > 1 && pos < max - 1);
+  };
   const scrollableTables = (article) => {
     article.querySelectorAll(".md-typeset__scrollwrap, pre > code").forEach((w) => {
-      if (w.scrollWidth > w.clientWidth + 1 && !w.hasAttribute("tabindex")) {
+      const code = w.tagName === "CODE";
+      if (code) {
+        if (w.scrollWidth > w.clientWidth + 1 && !w.hasAttribute("tabindex")) {
+          w.setAttribute("tabindex", "0");
+          w.setAttribute("role", "region");
+          w.setAttribute("aria-label", "קוד רחב, גלילה לרוחב");
+        }
+        return;
+      }
+      if (w.closest(".questions-wrap, .explorer") || !w.clientWidth) return;   // not shown: measured when its block opens
+      w.classList.remove("is-wide");
+      const wide = w.scrollWidth > w.clientWidth + 1;
+      w.classList.toggle("is-wide", wide);
+      if (wide) {
         w.setAttribute("tabindex", "0");
         w.setAttribute("role", "region");
-        w.setAttribute("aria-label", w.tagName === "CODE" ? "קוד רחב, גלילה לרוחב" : "טבלה רחבה, גלילה לרוחב");
+        w.setAttribute("aria-label", "טבלה רחבה, גלילה לרוחב");
+        if (!w.dataset.fades) {
+          w.dataset.fades = "1";
+          w.addEventListener("scroll", () => tableFades(w), { passive: true });
+        }
+      } else if (w.dataset.fades) {
+        ["tabindex", "role", "aria-label"].forEach((at) => w.removeAttribute(at));
       }
+      tableFades(w);
     });
   };
 
@@ -588,6 +619,14 @@
     window.addEventListener("hashchange", openStepFromHash);
     document.querySelectorAll("article").forEach(annotationNames);
     document.querySelectorAll("article").forEach(scrollableTables);
-    window.addEventListener("resize", () => document.querySelectorAll("article").forEach(scrollableTables), { passive: true });
+    const tablesAgain = () => document.querySelectorAll("article").forEach(scrollableTables);
+    window.addEventListener("resize", tablesAgain, { passive: true });
+    // a block opened or a code tab chosen: its tables have a width now (after reading-tools.js
+    // has decided which of them are cards)
+    let tablesFrame = 0;
+    const tablesLater = () => { cancelAnimationFrame(tablesFrame); tablesFrame = requestAnimationFrame(tablesAgain); };
+    document.addEventListener("toggle", tablesLater, true);
+    document.addEventListener("change", (e) => { if (e.target.closest && e.target.closest(".tabbed-set")) tablesLater(); });
+    if (document.fonts) document.fonts.ready.then(tablesLater);
   });
 })();

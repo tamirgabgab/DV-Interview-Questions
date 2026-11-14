@@ -115,12 +115,100 @@ def test_search_keeps_only_the_questions():
 
 
 def test_tag_grid_counts_each_tag():
+    """The tags page: the level and difficulty tags in their own row, the topics in one
+    list with the most questions first (ties by name), every fold keeping its anchor."""
     page = ('<p>intro</p><h2 id="tag:bfs"><span class="md-tag">BFS</span></h2>\n<ul><li>a</li><li>b</li></ul>'
-            '<h2 id="tag:cdc"><span class="md-tag">CDC</span></h2>\n<ul><li>c</li></ul>')
+            '<h2 id="tag:cdc"><span class="md-tag">CDC</span></h2>\n<ul><li>c</li></ul>'
+            '<h2 id="tag:algorithms"><span class="md-tag">אלגוריתמים</span></h2>\n<ul><li>d</li><li>e</li></ul>'
+            '<h2 id="tag:קל"><span class="md-tag">קל</span></h2>\n<ul><li>f</li></ul>'
+            '<h2 id="tag:גוניור"><span class="md-tag">ג&#39;וניור</span></h2>\n<ul><li>h</li></ul>'
+            '<h2 id="tag:סטודנט"><span class="md-tag">סטודנט</span></h2>\n<ul><li>g</li></ul>')
     out = hook._tag_grid(page)
-    assert out.index('<nav class="tag-grid"') < out.index('<details class="tag-section" id="tag:bfs">')
-    assert '<a class="tag-chip" href="#tag:bfs">BFS<span class="tag-count" aria-label="2 שאלות">2</span></a>' in out
-    assert out.count('<ul class="tag-list">') == 2 and "<h2" not in out
+    assert out.count('<ul class="tag-list">') == 6 and "<h2 id=\"tag:" not in out and "\0" not in out
+    order = re.findall(r'<details class="tag-section ([\w-]+)" id="tag:([^"]+)">', out)
+    assert order == [("tag-level", "סטודנט"), ("tag-level", "גוניור"), ("tag-level", "קל"), ("tag-row", "bfs"), ("tag-row", "algorithms"), ("tag-row", "cdc")]
+    assert out.index('<div class="tag-levels">') < out.index('<div class="tag-rows">')
+    assert ('<span class="tr-name">BFS</span><span class="tr-bar" aria-hidden="true"><i style="--p:1.000"></i></span>'
+            '<span class="tag-count" aria-label="2 שאלות">2</span>') in out
+    assert '<i style="--p:0.500"></i></span><span class="tag-count" aria-label="1 שאלות">1</span>' in out
+    assert '<span class="tr-name chip chip-diff chip-diff-easy">קל</span><span class="tag-count" aria-label="1 שאלות">1</span>' in out
+    assert hook._tag_grid("<p>no tags</p>") == "<p>no tags</p>"
+
+
+def _metro_geometry(compact):
+    hook._questions = hook._load_questions(DOCS)
+    paths = [p for p in hook._load_paths(DOCS) if not compact or p["featured"]]
+    g, pad, r = (46, 26, 12) if compact else (54, 30, 13)
+    px = hook.maps_metro_px(hook.maps_metro_layout(paths), g, pad)
+    return paths, px, r, hook.maps_metro_names(px, {k: p["title"] for k, p in enumerate(paths)}, r)
+
+
+def test_metro_names_touch_nothing():
+    """Every line of both maps has its name, and a name's box (from the generator's width
+    estimate) overlaps no station circle, no line or stub, no square and no other name.
+    The geometry is checked here on its own: points every half pixel along the lines."""
+    for compact in (False, True):
+        paths, px, r, names = _metro_geometry(compact)
+        assert sorted(names) == list(range(len(paths)))
+        for n, nm in names.items():
+            x0, y0, x1, y1 = nm["box"]
+            assert "".join(t for t, _ in nm["rows"]).replace(" ", "") == paths[n]["title"].replace(" ", "")
+            assert len(nm["rows"]) <= 2 and x1 - x0 >= max(hook.maps_text_width(t) for t, _ in nm["rows"]) - 1e-6
+            assert (nm["x"] == x1) if nm["anchor"] == "start" else (nm["x"] == x0)
+            for m, other in names.items():
+                bx0, by0, bx1, by1 = other["box"]
+                assert m == n or x1 <= bx0 or bx1 <= x0 or y1 <= by0 or by1 <= y0, (compact, n, m)
+            for ln in px["lines"]:
+                bx, by = ln["badge"]
+                assert x1 <= bx - 12 or bx + 12 <= x0 or y1 <= by - 12 or by + 12 <= y0, (compact, n, "square", ln["n"])
+                for cx, cy in ln["pts"]:       # r + 4: an interchange (r + 2) with its ring
+                    near = (max(x0 - cx, 0, cx - x1) ** 2 + max(y0 - cy, 0, cy - y1) ** 2) ** 0.5
+                    assert near >= r + 4, (compact, n, "station of", ln["n"])
+                for (ax, ay), (qx, qy) in zip([ln["badge"]] + ln["pts"], ln["pts"]):
+                    steps = int(max(abs(qx - ax), abs(qy - ay)) * 2) + 1
+                    for i in range(steps + 1):
+                        x, y = ax + (qx - ax) * i / steps, ay + (qy - ay) * i / steps
+                        assert not (x0 - 3.5 < x < x1 + 3.5 and y0 - 3.5 < y < y1 + 3.5), (compact, n, "line", ln["n"])
+
+
+def test_metro_long_name_breaks_in_two():
+    """A name with no room on one line breaks at the space nearest its middle, by rule."""
+    px = {"width": 200, "height": 200, "lines": [
+        {"n": 0, "pts": [(100, 100), (46, 100)], "badge": (154, 100)},
+        {"n": 1, "pts": [(46, 46), (46, 100), (46, 154)], "badge": (46, -8)}]}
+    names = hook.maps_metro_names(px, {0: "אילוצים ואקראיות ב-SystemVerilog", 1: "קצר"}, 13)
+    assert [t for t, _ in names[0]["rows"]] == ["אילוצים ואקראיות", "ב-SystemVerilog"]
+    assert names[0]["anchor"] == "start" and names[1]["rows"][0][0] == "קצר"
+
+
+def test_metro_map_html():
+    """The map's SVG: a name per line with direction="rtl", inside the line's link; every
+    station carries what its card shows; the scroll hint and the card are there, hidden."""
+    hook._questions = hook._load_questions(DOCS)
+    hook._paths = hook._load_paths(DOCS)
+    out = hook.maps_metro("paths/")
+    assert out.count('<a class="mm-badge"') == len(hook._paths)
+    assert len(re.findall(r'<text class="mm-lname mm-c\d+(?: is-end)?" x="[-\d.]+" y="[-\d.]+" direction="rtl">', out)) >= len(hook._paths)
+    for st in re.findall(r'<a class="mm-st[^>]*>', out):
+        assert all(f' data-{k}="' in st for k in ("id", "lines", "kind", "level", "diff", "title")), st
+    assert '<button type="button" class="mm-more" hidden>' in out
+    assert '<div class="mm-card" id="mm-card" role="tooltip" hidden></div>' in out
+    assert 'id="mm-card-compact"' in hook.maps_metro("", compact=True)
+
+
+def test_path_rows():
+    """The paths page: a row per path with its number, a name that is never cut, the
+    description whole in the title, the counts, and the link to its first question."""
+    hook._questions = hook._load_questions(DOCS)
+    hook._paths = hook._load_paths(DOCS)
+    out = hook._path_rows("paths/")
+    assert out.count('<li class="path-row">') == len(hook._paths)
+    p = hook._paths[0]
+    first = hook._href(p["steps"][0]["q"]["src_uri"], "paths/")
+    assert f'<a class="pr-go" href="{first}"' in out
+    assert f'data-ids="{" ".join(s["q"]["id"] for s in p["steps"])}"' in out
+    for m in re.finditer(r'data-ids="([^"]*)" data-hrefs="([^"]*)"', out):
+        assert len(m.group(1).split()) == len(m.group(2).split())
 
 
 def test_added_date_quoted_or_not():
@@ -292,3 +380,198 @@ def test_revision_date(tmp_path):
     rev = hook._revision_date(DOCS)
     assert isinstance(rev, dt.date) and rev <= dt.date.today() + dt.timedelta(days=1)   # Israel is ahead of UTC
     assert hook._revision_date(tmp_path) == dt.date.today()
+
+
+# ---- the lists of the UX round (session 34): one-line rows, one row of filters, the home page
+
+def _fresh():
+    hook._questions = hook._load_questions(DOCS)
+    return hook._questions
+
+
+def test_split_title():
+    assert hook.split_title("רווח מקסימלי ממניה – לונג או שורט") == ("רווח מקסימלי ממניה", "לונג או שורט")
+    assert hook.split_title("סוגריים תקינים") == ("סוגריים תקינים", "")
+    assert hook.split_title("א – ב – ג") == ("א", "ב – ג")          # only the first dash splits
+    assert hook.split_title("טווח 1-5") == ("טווח 1-5", "")           # a hyphen is not the dash
+
+
+def test_table_rows_are_one_line():
+    qs = _fresh()
+    out = hook._table(None, "all/")
+    rows = re.findall(r"<tr data-id=.*?</tr>", out, re.S)
+    assert len(rows) == len(qs)
+    by_id = {q["id"]: q for q in qs.values()}
+    with_sub = 0
+    for row in rows:
+        q = by_id[re.search(r'data-id="(\d{4})"', row).group(1)]
+        main, sub = hook.split_title(q["title"])
+        link = re.search(r'<a href="[^"]+" title="([^"]*)">([^<]*)</a>', row)
+        assert hook.html.unescape(link.group(1)) == str(q["title"]) and hook.html.unescape(link.group(2)) == main
+        m = re.search(r'<span class="q-sub">([^<]*)</span>', row)
+        assert (hook.html.unescape(m.group(1)) if m else "") == sub
+        with_sub += bool(sub)
+        # the search still finds a row by its whole title and by its topics, in both names
+        data = hook.html.unescape(re.search(r'data-search="([^"]*)"', row).group(1))
+        assert str(q["title"]).lower() in data and all(t in data for t in q["tags"])
+        assert 'class="q-marks"' in row and "chip-level" in row and "chip-diff" in row
+    assert with_sub and with_sub < len(rows)
+    # no question chip, no kind chip and no topics in a row (the owner's choice)
+    body = out[out.index("<tbody>"):]
+    assert not re.search(r"qchip|q-meta|q-topic|chip-kind", body)
+    assert "chip-level" not in hook._table("junior", "questions/junior/").split("<tbody>")[1]
+
+
+def test_filters_are_one_row_of_dropdowns():
+    _fresh()
+    for level, names in ((None, ["level", "difficulty", "kind", "mark", "tag"]), ("senior", ["difficulty", "kind", "mark", "tag"])):
+        out = hook._table(level, "x/")
+        head = out[:out.index("<table>")]
+        groups = re.findall(r'<div class="filter-group filter-dd[^"]*" data-filter="(\w+)" data-value="">(.*?)</div></div>', head, re.S)
+        assert [g[0] for g in groups] == names
+        ids = set()
+        for name, inner in groups:
+            btn = re.search(r'<button type="button" class="dd-btn" aria-expanded="false" aria-controls="([\w-]+)">', inner)
+            pop = re.search(r'<div class="dd-pop" id="([\w-]+)" role="group" aria-label="([^"]+)" hidden>', inner)
+            assert btn and pop and btn.group(1) == pop.group(1), name
+            assert HEBREW.match(pop.group(2))
+            ids.add(pop.group(1))
+            chips = re.findall(r'<button type="button" class="filter-chip[^"]*" data-value="([^"]*)" aria-pressed="(true|false)"', inner)
+            assert chips[0] == ("", "true") and all(p == "false" for _, p in chips[1:])   # "all" is the choice at first
+            assert len(chips) >= 3
+        assert len(ids) == len(names)
+        # every topic of the table is a choice, not only the common ones
+        tags = {t for q in hook._questions.values() if level in (None, q["level"]) for t in q["tags"]}
+        topic = dict(groups)["tag"]
+        assert set(re.findall(r'data-value="([^"]+)"', topic)) == tags
+        assert "filter-toggle" not in head and "filter-panel" not in head and "topics-toggle" not in head
+        assert head.count('class="filter-random"') == 1 and head.count("<select>") == 1
+        assert head.index("filter-search") < head.index("filter-dds") < head.index("filter-random") < head.index("filter-active")
+
+
+def test_home_steps_line_and_catalog_button():
+    qs = _fresh()
+    how = hook._how_it_works()
+    assert how.startswith('<ol class="how-line"') and how.count("<li>") == 3 and "<h2" not in how
+    for icon, text in hook.HOW_STEPS:
+        assert HEBREW.match(text) and f"ui-ico-{icon}" in how and text in how
+    recent = hook._recent("")
+    more = recent[recent.index('<p class="recent-more">'):]
+    assert f"לכל {len(qs)} השאלות</a>" in more and 'href="all/"' in more and 'href="new/"' in more
+    home = (DOCS / "index.md").read_text(encoding="utf-8")
+    assert "catalog-link" not in home and "## איך זה עובד" not in home and "## כל השאלות" not in home
+    assert home.index("<!-- /hero -->") < home.index("<!-- how-it-works -->") < home.index("<!-- home-continue -->")
+    assert not hasattr(hook, "_catalog_link")
+
+
+def test_list_pages_take_their_title_from_the_band():
+    """A level page was titled "Index": the band wraps its "# title", so MkDocs found no
+    heading at the top of the page and fell back to the file name."""
+    _fresh()
+
+    class Page:
+        def __init__(self, meta):
+            self.meta = meta
+
+    for level, name in hook.LEVELS.items():
+        page = Page({})
+        text = (DOCS / "questions" / level / "index.md").read_text(encoding="utf-8")
+        out = hook._lists_top(text, page)
+        assert page.meta["title"] == name and 'class="list-band lb-level"' in out
+    page = Page({"title": "שם אחר"})
+    hook._lists_top("# כל השאלות\n\nשורה.\n\n<!-- questions-table -->\n", page)
+    assert page.meta["title"] == "שם אחר"            # a title the page gives stays
+    page = Page({})
+    hook._lists_top("# דף רגיל\n\nבלי טבלה.\n", page)
+    assert "title" not in page.meta
+    # a page that opens with front matter only, then the heading, as the real pages do
+    for path in [DOCS / "all.md", *(DOCS / "paths").glob("*.md"), DOCS / "tags.md", DOCS / "new.md"]:
+        body = re.sub(r"\A---\n.*?\n---\n+", "", path.read_text(encoding="utf-8"), flags=re.S)
+        assert body.startswith("# ") or re.search(r"^title:", path.read_text(encoding="utf-8"), re.M), path.name
+
+
+
+# --- the question page of the UX round (session 34) ------------------------------------------
+
+def test_box_chip_and_teaser():
+    """A page with an explorer box gets a button chip in its header, and, when its first box
+    sits inside a closed block, a teaser button right under the statement."""
+    _fresh()
+    q = next(iter(hook._questions.values()))
+    with_box = '## השאלה\n\nניסוח.\n\n<div class="explorer" data-kind="kaprekar"></div>\n'
+    head = hook._header(q, with_box, "questions/x/0001-y/")
+    assert '<button type="button" class="qh-badge qh-badge-play qh-box-go" data-box-go' in head
+    assert "תיבה אינטראקטיבית" in head
+    assert "qh-box-go" not in hook._header(q, "## השאלה\n\nניסוח.\n", "questions/x/0001-y/")
+    box = '<div class="explorer" data-kind="kaprekar"></div>'
+    closed = ('<article><h2 id="a">השאלה</h2><p>ניסוח</p>\n<details class="interviewer"><summary>מה המראיין בודק</summary></details>\n'
+              f'<details class="success"><summary>פתרון</summary>{box}</details></article>')
+    out = hook.box_teaser(closed)
+    assert out.count('class="box-teaser"') == 1
+    assert out.index('class="box-teaser"') < out.index('<details class="interviewer"')    # under the statement
+    assert HEBREW.match(re.search(r'class="bt-go">([^<]+)', out).group(1))
+    # a page without the interviewer block: before its first part
+    parts = f'<article><p>ניסוח</p>\n<h3 id="p">סעיף א</h3><details class="success"><summary>פתרון</summary>{box}</details></article>'
+    assert hook.box_teaser(parts).index('class="box-teaser"') < hook.box_teaser(parts).index('<h3 id="p">')
+    # a box in the open (visible on load), or no box: no teaser
+    assert hook.box_teaser(f'<article><p>ניסוח</p>{box}<details class="interviewer"></details></article>').count("box-teaser") == 0
+    assert hook.box_teaser(f'<article><details class="tip"><summary>רמז</summary></details>{box}</article>').count("box-teaser") == 0
+    assert hook.box_teaser("<article><p>ניסוח</p></article>") == "<article><p>ניסוח</p></article>"
+
+
+def test_closed_solution_reads_show():
+    """The summary of a solution keeps its text and gets the words of the closed state in
+    spans ("הצג פתרון · סעיף א"); other blocks and other titles are left alone."""
+    page = ('<details class="success">\n<summary>פתרון סעיף א</summary>\n</details>'
+            '<details class="success"><summary>פתרון</summary></details>'
+            '<details class="success"><summary>פתרון 2 – טבלה</summary></details>'
+            '<details class="success"><summary>הוכחה</summary></details>'
+            '<details class="tip"><summary>פתרון חלקי</summary></details>')
+    out = hook.solution_summaries(page)
+    show, dot = '<span class="sol-closed">הצג </span>', '<span class="sol-closed"> ·</span>'
+    assert f"<summary>{show}פתרון{dot} סעיף א</summary>" in out
+    assert f"<summary>{show}פתרון</summary>" in out
+    assert f"<summary>{show}פתרון 2 – טבלה</summary>" in out
+    assert "<summary>הוכחה</summary>" in out and "<summary>פתרון חלקי</summary>" in out
+    assert re.sub(r'<span class="sol-closed">[^<]*</span>', "", out) == page      # the open text is the old one
+
+
+def test_end_card():
+    """The end card: the step in the first path of the question and its next question, a
+    closing line on the path's last question, and the page's next question without a path."""
+    _fresh()
+    hook._paths = hook._load_paths(DOCS)
+    path = hook._paths[0]
+    first, last = path["steps"][0]["q"], path["steps"][-1]["q"]
+    # the questions whose first path is this one (the card and the path strip agree on it)
+    own = lambda q: next(p for p in hook._paths if q["id"] in [s["q"]["id"] for s in p["steps"]]) is path
+    assert own(first)
+    card = hook._end_card(first, "questions/x/0001-y/")
+    assert card.startswith("\n\n<div class=\"q-end-slot\" aria-live=\"polite\"") and '<section class="q-end"' in card and " hidden>" in card
+    assert f"שלב 1 מתוך {len(path['steps'])} במסלול" in card and hook.html.escape(path["title"]) in card
+    nxt = path["steps"][1]["q"]
+    assert "השאלה הבאה במסלול" in card and f'<span class="qe-nid">{nxt["id"]}</span>' in card
+    assert "שאלה דומה" not in card
+    if own(last):
+        done = hook._end_card(last, "questions/x/0001-y/")
+        assert "qe-next" not in done and "paths/" in done and "האחרונה במסלול" in done
+
+    class File:
+        def __init__(self, src_uri):
+            self.src_uri = src_uri
+
+    class Page:
+        def __init__(self, src_uri):
+            self.file = File(src_uri)
+
+    saved, hook._paths = hook._paths, []
+    try:
+        other = hook._end_card(first, "questions/x/0001-y/", Page(nxt["src_uri"]))
+        assert "במסלול" not in other and f'<span class="qe-nid">{nxt["id"]}</span>' in other and "השאלה הבאה" in other
+        end = hook._end_card(first, "questions/x/0001-y/", Page("new.md"))      # the level's last page
+        assert "qe-next" not in end and "האחרונה ברמה" in end
+    finally:
+        hook._paths = saved
+    # the path strip: the step also in its short form for a phone
+    strip = hook._path_nav(first, "questions/x/0001-y/")
+    assert f'<span class="pn-step-short" dir="ltr" aria-hidden="true">1/{len(path["steps"])}</span>' in strip
