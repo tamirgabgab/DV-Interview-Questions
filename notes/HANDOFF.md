@@ -1336,6 +1336,10 @@ below start at item 112 (session 31).
       with the testbench's), so `test_tb_typedef_is_the_pages` keeps the copied typedef equal.
     - A17: the 404 page survives a cut escape; check_404 has the case.
     - A18: lpmtrie uses `lib.bitsOf`; the unused model exports are gone.
+    - Both rounds went to `main` together (daab98b, deployed 2026-11-14 14:40 Israel time):
+      pushing round 2 cancelled round 1's branch run, and one green run covered both. Live:
+      the map has 0109 and the worker has the cap. GitHub Pages answers 400 itself to a path
+      with a cut escape ("%E0%A"), so the 404 fix only shows for escapes it lets through.
 
 ---
 
