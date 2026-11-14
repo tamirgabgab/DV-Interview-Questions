@@ -1418,6 +1418,11 @@ below start at item 112 (session 31).
     `catalog-link`, `filter-panel`, `topics-*`, `q-meta`, `q-topic`, the row stripe,
     `mm-tip`, `tag-grid`, `tag-chip`) and their unused contrast pairs; the metro names'
     width is an estimate without font metrics (check with Rubik on the live site).
+    On `main` (a62fb59, deployed 2026-11-14 19:47 Israel time; the main run took the short
+    lane). Live check at 1440 px light and 390 px dark on all/, paths/, tags/, the home page
+    and 0083: no script errors, no horizontal scroll, and the map's names fit in Rubik.
+    Open with the owner: a question page's top on a phone did not get shorter (the box chip
+    takes a row of its own); offered to make the chip icon-only there.
 
 ---
 
