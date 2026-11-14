@@ -118,9 +118,10 @@ notes and simulator quirks are listed in `notes/HANDOFF.md` under "Technical not
 
 ## Design skills
 
-- `.claude/skills/` holds third-party design skills (ui-ux-pro-max, impeccable,
-  web-design-guidelines); `.claude/skills/README.md` lists their sources, licenses and how to
-  run them here. Their advice never overrides the rules of this file (RTL, the palette
+- `.claude/skills/` holds third-party skills: design (ui-ux-pro-max, impeccable,
+  web-design-guidelines, diagram-design) and code review (ponytail and its review, audit and
+  debt skills); `.claude/skills/README.md` lists their sources, licenses and how to run them
+  here. Their advice never overrides the rules of this file (RTL, the palette
   variables, contrast, reduced motion, the checks); a conflict goes to the owner.
 
 ## Workflow
