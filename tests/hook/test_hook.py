@@ -320,6 +320,12 @@ def test_video_on_a_page_without_parts(tmp_path):
     assert '<summary>פתרון</summary>\n<div class="video-chapter"' in out and "לסרטון ההסבר" in out and "vc-time" not in out
 
 
+def test_video_without_chapters_on_a_page_with_parts(tmp_path):
+    hook._questions = hook._load_questions(video_docs(tmp_path, VIDEO_PAGE.replace("video_parts: [0, 95, 3725]\n", "")))
+    q = hook._questions["questions/student/0999-try.md"]
+    assert q["video_chapters"] == [("", 0)]                                     # one link to the whole video
+
+
 def test_video_fields_fail_the_build(tmp_path):
     for bad, says in (("video: abc", "not a YouTube id"), ("video_parts: [0, 95]", "2 times but the page has 3 parts"),
                       ("video_parts: [5, 95, 210]", "must start at 0"), ("video_parts: [0, 95, 95]", "must rise")):

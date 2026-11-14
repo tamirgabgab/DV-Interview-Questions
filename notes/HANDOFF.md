@@ -1423,6 +1423,21 @@ below start at item 112 (session 31).
     and 0083: no script errors, no horizontal scroll, and the map's names fit in Rubik.
     Open with the owner: a question page's top on a phone did not get shorter (the box chip
     takes a row of its own); offered to make the chip icon-only there.
+210. **The phone header's icons (session 34, 2026-11-14, f49ee03 on `main`).** On a phone the
+    box chip and the "tested code" badge show only their icons (the words stay for a screen
+    reader) and the id loses its word "שאלה". Only pages with a short kind name gain a row
+    (0083: 514 to 479 px; 3 of 19 sampled pages). Offered and not answered: make the kind chip
+    icon-only on a phone too, so every page's header gets shorter.
+211. **The Manim videos removed (session 34, 2026-11-14).** The owner makes the videos in
+    another project and will send YouTube links. Removed: all of `videos/` (30 videos, their
+    scripts, captions, scenes, `render.py` and `lib/`, about 500 MB tracked) and
+    `requirements/video.txt`. Kept: the YouTube support (`video:` and `video_parts`, the
+    "סרטון הסבר" tool and dialog, video.js, 20-video.css). Changed by the owner's answers:
+    `video_parts` is now optional on a page with parts too (without it the page has one
+    "לסרטון ההסבר" link and the dialog no chapter buttons; the hook gives `[("", 0)]`);
+    `check_videos.py` checks only the page fields; `catalog.py` writes the README's video
+    table from the pages' `video:` ids; `notes/VIDEOS.md` is now a short how-to. No page has
+    a `video:` field yet. Note: the old files stay in the git history (no history rewrite).
 
 ---
 
@@ -1437,8 +1452,8 @@ below start at item 112 (session 31).
   `docs/stylesheets/questions/`, and this file shortened (`HANDOFF-archive-2.md`).
 - **Session 32 (2026-11-01 to 2026-11-06):** questions 0072 to 0093, videos, the UX
   rounds; see the work log items 117 to 163. All on `main`.
-- **Waiting on the owner:** ten videos wait for their YouTube ids (`video:` in the front
-  matter); the giscus ids (README, Comments) in `extra.comments` of `mkdocs.yml`; checks of
+- **Waiting on the owner:** YouTube links of the videos made in the owner's other project
+  (add them as `video:`, notes/VIDEOS.md); the giscus ids (README, Comments) in `extra.comments` of `mkdocs.yml`; checks of
   the live site at 390 px and on a desktop, light and dark (github.io is not reachable
   from the cloud sandbox); a lint rule for numbers laid out from the right was offered
   and not answered (do not add it without a yes).

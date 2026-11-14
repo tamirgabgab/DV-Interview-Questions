@@ -241,7 +241,9 @@ def _load_questions(docs_dir: Path) -> dict[str, dict]:
                               "parts": len(PART_HEADING.findall(body))}
         if meta.get("video"):
             letters = part_letters(body)
-            questions[src_uri]["video_chapters"] = list(zip(letters or [""], meta.get("video_parts") or [0]))
+            # a chapter per part when video_parts gives their starts, else one link to the video
+            parts = meta.get("video_parts")
+            questions[src_uri]["video_chapters"] = list(zip(letters or [""], parts)) if parts else [("", 0)]
 
     if errors:
         raise PluginError("Invalid question files:\n  " + "\n  ".join(errors))

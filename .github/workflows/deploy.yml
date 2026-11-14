@@ -160,8 +160,8 @@ jobs:
           restore-keys: sv-${{ runner.os }}-
       - name: Lint the question pages (structure and RTL rules)
         run: python tools/checks/lint_pages.py
-      # The tutorial videos' fields on the pages and the captions of videos/*/script.md.
-      - name: Check the video fields and the script captions
+      # The tutorial videos' fields on the pages (YouTube id, chapter starts).
+      - name: Check the video fields
         run: python tools/checks/check_videos.py
       # Every text and mark colour pair of the site, light and dark, against WCAG 2.
       - name: Check the colour contrast of both schemes
@@ -190,7 +190,7 @@ jobs:
           node-version: "22"
       - name: Lint the question pages (structure and RTL rules)
         run: python tools/checks/lint_pages.py
-      - name: Check the video fields and the script captions
+      - name: Check the video fields
         run: python tools/checks/check_videos.py
       - name: Run the touched questions' Python tests
         if: needs.gate.outputs.ids != ''

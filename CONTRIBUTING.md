@@ -80,11 +80,10 @@ DV-Interview-Questions/
 │   ├── HANDOFF.md              # Task list: in progress, open items, the recent work log, technical notes
 │   ├── HANDOFF-archive.md      # The work log of sessions 1 to 21 and the finished rounds U to X
 │   ├── HANDOFF-archive-2.md    # The work log of sessions 22 to 30, the redesign plan, proposal series 6 to 8
-│   └── VIDEOS.md               # The plan and the format of the tutorial videos
+│   └── VIDEOS.md               # How a question gets its YouTube video
 ├── requirements/
 │   ├── site.txt                # Pinned Python dependencies for building the site
-│   ├── dev.txt                 # Test and check dependencies (pytest, Playwright)
-│   └── video.txt               # The tutorial videos (Manim), rendered locally, never in CI
+│   └── dev.txt                 # Test and check dependencies (pytest, Playwright)
 ├── hooks/
 │   └── questions.py            # Validation, navigation, tags, tables, run panels, the joined stylesheet
 ├── tools/
@@ -104,7 +103,7 @@ DV-Interview-Questions/
 │   │   ├── check_jumps.py      # Every explorer box stepped: no figure moves while it steps
 │   │   ├── check_inputs.py     # Every number and text field of every box: typed, Enter / Tab, the box changes
 │   │   ├── check_contrast.py   # The site's colour pairs in both schemes against WCAG 2
-│   │   ├── check_videos.py     # The video fields of the pages and the captions of videos/*/script.md
+│   │   ├── check_videos.py     # The video fields of the pages (YouTube id, chapter starts)
 │   │   └── text_only.py        # The CI's fast lane: is a push only prose on question pages?
 │   ├── build/                  # Files the site is built from
 │   │   ├── catalog.py          # Writes notes/CATALOG.md and the README's video table from the front matter
@@ -127,8 +126,6 @@ DV-Interview-Questions/
 │       ├── test_<id>.py        # pytest tests of the page's Python code
 │       ├── tb.sv               # SystemVerilog testbench of the page's SV code
 │       └── demo.py             # Starting code of the in-browser "run" panel
-├── videos/                     # The tutorial videos: render.py, lib/, and per question <id>/ with
-│                               # script.md, scene.py, captions.en.md and release/ (the finished files)
 ├── overrides/                  # Theme overrides (custom_dir)
 │   ├── main.html               # Adds the web app manifest (home-screen icon) and the offline worker
 │   ├── 404.html                # Hebrew "page not found" with the question the address names
@@ -376,7 +373,8 @@ not start with the id, or a duplicate id. It also generates, per question page:
   `docs/stylesheets/20-video.css` (tokens `--vd-*`, one version for both schemes).
   `video` is an 11-character YouTube id (quoted when YAML would read a number or a
   boolean); `video_parts` lists one start time in whole seconds per `### סעיף` heading,
-  from 0 and rising, and may be left out on a page with one part. The build, the lint and
+  from 0 and rising, and may be left out (then the page has one "לסרטון ההסבר" link at the
+  top of its first solution, and the dialog has no chapter buttons). The build, the lint and
   `check_videos.py` reject anything else;
 - a **study path bar** under the toolbar for every path that contains the question (step n
   of m, then the previous and the next step with their ids and titles side by side, a long
@@ -891,7 +889,7 @@ python tools/checks/check_contrast.py        # every colour pair, light and dark
 python tools/checks/check_404.py             # the 404 page as GitHub Pages serves it, at 390 and 1200 px
 python tools/checks/check_keyboard.py        # a keyboard pass over a few pages: tab order, focus, names, the components' keys
 python tools/checks/check_heights.py         # every box at 1920 x 1080, stepped to its end: those over 1000 px (a warning)
-python tools/checks/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
+python tools/checks/check_videos.py          # the video fields of the pages (YouTube id, chapter starts)
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```
 
@@ -1035,13 +1033,10 @@ Escape closes it and gives the focus back, and play makes a titled player (its r
 YouTube is cut off) that the close button removes.
 
 `check_videos.py` (CI's test job, after the lint; no video or network needed) checks
-every page with a `video:` field: the id's form, one rising `video_parts` time per part
-from 0, and `videos/<id>/script.md` with one `## Chapter` heading per part (a warning
-while the script does not exist yet). In every `videos/*/script.md` each caption line,
-a line that starts with `> `, must start with a Hebrew letter or the RLM mark, have a
-U+00A0 before every colon (times, URLs and `code` exempt) and at most 12 words. The format
-of a script is in notes/VIDEOS.md ("The script's format"); the lint and the build hook run the
-same field checks (`video_problems`).
+every page with a `video:` field: the id's form and, when `video_parts` is given, one
+rising time per part from 0. The videos themselves are made outside this repository and
+live on YouTube (notes/VIDEOS.md); the lint and the build hook run the same field checks
+(`video_problems`).
 
 `check_phone.py` needs Playwright (`requirements/dev.txt`) and its Chromium
 (`python -m playwright install chromium`). It writes a screenshot of each page to

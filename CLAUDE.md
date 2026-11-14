@@ -6,8 +6,8 @@ map of the repository; `CONTRIBUTING.md` documents the content format and the to
 working notes are in `notes/`: `notes/CATALOG.md` lists the questions (written by
 `tools/build/catalog.py`); `notes/HANDOFF.md` is the living task list and the recent work log
 (older logs in `notes/HANDOFF-archive.md` and `notes/HANDOFF-archive-2.md`);
-`notes/VIDEOS.md` is the plan of the tutorial videos (Manim, one per question, a chapter per
-part). The tools are in `tools/checks/` (what CI runs), `tools/build/` (what the site is built
+`notes/VIDEOS.md` explains how a question page links its tutorial video (made outside this
+repository, published on YouTube). The tools are in `tools/checks/` (what CI runs), `tools/build/` (what the site is built
 from), `tools/authoring/` (the new-question scaffold and its template) and `tools/figures/`.
 Read `CONTRIBUTING.md` and `notes/HANDOFF.md` before a work session, and update
 `notes/HANDOFF.md` (work log, open items) at the end of every session.
@@ -84,7 +84,7 @@ Read `CONTRIBUTING.md` and `notes/HANDOFF.md` before a work session, and update
 
 ```bash
 python tools/checks/lint_pages.py            # page skeleton and RTL rules
-python tools/checks/check_videos.py          # the video fields of the pages, the captions of videos/*/script.md
+python tools/checks/check_videos.py          # the video fields of the pages (YouTube id, chapter starts)
 python tools/checks/run_tests.py             # pytest + Verilator (needs Verilator 5.052+ with z3)
 mkdocs build --strict                 # the build CI runs
 python tools/checks/check_links.py           # internal links and anchors of the built site
