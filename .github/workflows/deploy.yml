@@ -17,7 +17,7 @@ on:
 
 permissions:
   contents: read
-  actions: read            # the gate looks up the runs of the same commit
+  actions: read            # the gate looks up the runs of the same commit and of the branch
   pages: write
   id-token: write
 
@@ -69,10 +69,19 @@ jobs:
         with:
           fetch-depth: 0
           filter: blob:none
+      # The base is the commit of the last run on this branch that passed, not the previous
+      # push: a push whose run failed or was cancelled must not slip its code through behind
+      # a later prose-only push. No such run (a new branch) or a commit no longer in the
+      # history (a force push) gives the full lane.
       - id: text
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ "${{ github.event_name }}" = push ]; then
-            python3 tools/checks/text_only.py "${{ github.event.before }}" "${{ github.sha }}" --github
+            base=$(gh api "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?branch=${{ github.ref_name }}&event=push&status=success&per_page=1" \
+                     --jq '.workflow_runs[0].head_sha // ""' || echo "")
+            echo "last passing run on ${{ github.ref_name }}: ${base:-none}"
+            python3 tools/checks/text_only.py "$base" "${{ github.sha }}" --github
           else
             echo "fast=false" >> "$GITHUB_OUTPUT"
           fi

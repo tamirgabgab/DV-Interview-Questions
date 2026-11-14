@@ -129,6 +129,7 @@ def main(argv: list[str]) -> int:
             print(f"--shard takes K/N with 1 <= K <= N, not {args.shard}")
             return 1
     server, base = serve(site)
+    external = re.compile(r"https?://(?!127\.0\.0\.1)")  # as check_inputs.py
 
     failures = boxes_total = 0
     with sync_playwright() as pw:
@@ -147,13 +148,15 @@ def main(argv: list[str]) -> int:
                     boxes_total += 1
                     for j in r["jumps"]:
                         grew = ", ".join(f"{n} {d:+.0f}px" for n, d in j["grew"]) or "no paragraph grew"
-                        found.append(f"{r['kind']} {b}, step {j['step']}: {j['figure'][:50]} moved {j['by']:+.0f}px "
+                        found.append(f"jump: {r['kind']} {b}, step {j['step']}: {j['figure'][:50]} moved {j['by']:+.0f}px "
                                      f"({grew}; grew: {j['cause'] or '?'})")
+                # a box whose script threw may not step at all, and then shows no jump
+                found += [f"script error: {e[:200]}" for e in errors if not (args.offline and external.search(e))]
                 page.close()
                 failures += bool(found)
                 print(f"{'FAIL' if found else 'ok':4}  {rel[: -len('index.html')]}  {width} px")
                 for f in found:
-                    print(f"        jump: {f}")
+                    print(f"        {f}")
             ctx.close()
         browser.close()
     server.shutdown()

@@ -62,3 +62,44 @@ def test_solution_is_a_module_and_a_namespace():
     with contextlib.redirect_stdout(io.StringIO()) as out:
         py_run.run("def f():\n    return 7\n", "from solution import f as g\nprint(g(), f())\n")
     assert out.getvalue() == "7 7\n"
+
+
+WORKER_CAP = r"""
+const vm = require("vm"), fs = require("fs");
+const sent = [];
+let out;
+const py = {
+  setStdout: (o) => { out = o.batched; }, setStderr: () => {},
+  globals: { get: () => () => ({ get: () => run }) }, runPython: () => {},
+};
+let lineLength = 1;
+const run = () => {                       // an endless loop that prints, cut short here
+  for (let i = 0; i < 5000; i++) out("x".repeat(lineLength));
+  return { toJs: () => [], destroy: () => {} };
+};
+const ctx = { postMessage: (m) => sent.push(m), importScripts: () => {}, self: { location: { href: "http://x/" } },
+  loadPyodide: async () => py, fetch: async () => ({ ok: true, text: async () => "" }),
+  performance: { now: () => 0 }, URL, console };
+vm.runInNewContext(fs.readFileSync(process.argv[1], "utf8"), ctx);
+const count = () => ({ out: sent.filter((m) => m.type === "out").length,
+  cut: sent.filter((m) => m.type === "cut").length, done: sent.some((m) => m.type === "done") });
+(async () => {
+  await ctx.onmessage({ data: {} });
+  const short = count();
+  sent.length = 0; lineLength = 999;
+  await ctx.onmessage({ data: {} });
+  console.log(JSON.stringify([short, count()]));
+})();
+"""
+
+
+def test_worker_cuts_endless_output():
+    import json, shutil, subprocess
+    node = shutil.which("node")
+    if not node:
+        pytest.skip("node is not installed")
+    worker = ROOT / "docs" / "javascripts" / "py-worker.js"
+    res = subprocess.run([node, "-e", WORKER_CAP, str(worker)], capture_output=True, text=True, check=True)
+    short, long = json.loads(res.stdout)
+    assert short == {"out": 2000, "cut": 1, "done": True}      # the line cap
+    assert long == {"out": 200, "cut": 1, "done": True}        # the character cap, a new run counts anew

@@ -1075,7 +1075,9 @@ touched file must be a question page (or a file outside the site: README, the no
 `notes/VIDEOS.md`, `videos/`), and in every page the front matter, the fenced code blocks, the
 generated blocks (`<!-- gen n -->` … `<!-- /gen -->`) and every line with HTML a script reads
 (an explorer box, a figure, a stepper, any `data-` attribute) must be the same
-before and after. The gate job runs it on every push; on a fast push the workflow runs the
+before and after. The gate job runs it on every push, with BASE the commit of the last run
+on the same branch that passed (not the previous push, so a push whose run failed or was
+cancelled is still checked in full by the next one; no such run means the full lane); on a fast push the workflow runs the
 lint, `check_videos.py`, the touched questions' Python tests, the build, the links and the
 phone check of the touched pages only, skips Verilator, the explorer checks, the 404 and the
 keyboard pass, and deploys `main`. A new or deleted page, or any change outside the prose,

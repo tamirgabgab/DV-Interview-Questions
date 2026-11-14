@@ -35,7 +35,7 @@
     worker.onmessage = ({ data }) => {
       if (data.type === "stage" && data.stage === "ready") workerReady = true;
       if (current) current.receive(data);
-      if (data.load) { worker.terminate(); worker = null; }
+      if (data.load || data.type === "cut") { worker.terminate(); worker = null; workerReady = false; }
     };
     worker.onerror = (e) => {
       if (current) current.receive({ type: "error", text: String(e.message || "Failed to load Python") + "\n", load: true });
@@ -156,6 +156,19 @@
           stages.hidden = true;
           setStatus("הסתיים ✓", "ok", `${Math.round(data.ms)} ms`);
           showChecks(data.checks || []);
+          finish();
+        } else if (data.type === "cut") {
+          const note = document.createElement("span");
+          note.className = "py-err py-cut";
+          note.dir = "rtl";
+          note.textContent = `הפלט נחתך אחרי ${data.lines.toLocaleString("en-US")} שורות והריצה נעצרה\u00a0: `
+            + "כנראה יש בקוד לולאה אינסופית, או הדפסה גדולה מדי.";
+          output.appendChild(note);
+          text += note.textContent + "\n";
+          outWrap.hidden = false;
+          outWrap.classList.add("py-failed");
+          stages.hidden = true;
+          setStatus("נעצר\u00a0: פלט ארוך מדי", "bad");
           finish();
         } else if (data.type === "error") {
           write(data.text, true);

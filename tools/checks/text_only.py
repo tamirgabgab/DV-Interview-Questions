@@ -4,6 +4,10 @@
     python tools/checks/text_only.py BASE HEAD          # prints the verdict, exits 0 either way
     python tools/checks/text_only.py BASE HEAD --github # also writes fast= and ids= to $GITHUB_OUTPUT
 
+BASE is the commit of the last successful run on the same branch (the workflow's gate looks
+it up), not the previous push: a push whose run failed or was cancelled must not let the next
+prose-only push carry its code past the checks.
+
 A change is text only when every file it touches is a question page
 (docs/questions/<level>/<id>-<slug>.md) or a file the workflow ignores anyway (README,
 HANDOFF and the like, or videos/), and in every page only prose changed: the front matter,
@@ -71,7 +75,8 @@ def protected(text: str) -> list[str]:
             in_gen = not GEN_CLOSE.search(line)
         elif ACTIVE.search(line) or GEN_CLOSE.search(line):
             out.append(line)
-    return [line.strip() for line in out]
+    # rstrip only: a fence's indent decides which tab its code belongs to (extract_code.FENCE)
+    return [line.rstrip() for line in out]
 
 
 def verdict(files: dict[str, tuple[str | None, str | None]]) -> tuple[bool, list[str], str]:
@@ -110,7 +115,8 @@ def main(argv: list[str]) -> int:
     try:
         if not base or set(base) == {"0"}:
             raise ValueError("no base commit (a new branch)")
-        names = [n for n in _git("diff", "--name-only", base, head).split("\n") if n]
+        # --no-renames: a file moved into notes/ must show its old path in the site too
+        names = [n for n in _git("diff", "--name-only", "--no-renames", base, head).split("\n") if n]
         # ignored files (videos are binary) are not read
         files = {n: (None, None) if IGNORED.match(n) else (_show(base, n), _show(head, n)) for n in names}
         fast, ids, why = verdict(files)

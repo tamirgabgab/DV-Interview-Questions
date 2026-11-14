@@ -8,6 +8,24 @@ const PYODIDE = "https://cdn.jsdelivr.net/npm/pyodide@0.26.4/";
 postMessage({ type: "stage", stage: "download" });
 importScripts(PYODIDE + "pyodide.js");
 
+// An endless loop that prints would fill the page until the tab runs out of memory: past
+// MAX_LINES lines or MAX_CHARS characters the worker sends one "cut" message and nothing
+// more, and the panel stops the run (run-python.js).
+const MAX_LINES = 2000;
+const MAX_CHARS = 200000;
+let lines = 0, chars = 0;
+const post = (type, text) => {
+  if (lines > MAX_LINES) return;
+  lines += 1;
+  chars += text.length + 1;
+  if (lines > MAX_LINES || chars > MAX_CHARS) {
+    lines = MAX_LINES + 1;
+    postMessage({ type: "cut", lines: MAX_LINES });
+    return;
+  }
+  postMessage({ type, text: text + "\n" });
+};
+
 const ready = Promise.all([
   loadPyodide({ indexURL: PYODIDE }),
   fetch(new URL("py_run.py", self.location.href)).then((r) => {
@@ -15,8 +33,8 @@ const ready = Promise.all([
     return r.text();
   }),
 ]).then(([py, source]) => {
-  py.setStdout({ batched: (text) => postMessage({ type: "out", text: text + "\n" }) });
-  py.setStderr({ batched: (text) => postMessage({ type: "err", text: text + "\n" }) });
+  py.setStdout({ batched: (text) => post("out", text) });
+  py.setStderr({ batched: (text) => post("err", text) });
   const ns = py.globals.get("dict")();
   py.runPython(source, { globals: ns, filename: "py_run.py" });
   postMessage({ type: "stage", stage: "ready" });
@@ -34,6 +52,8 @@ const cleanTraceback = (text) => {
 onmessage = async (event) => {
   const { py, run } = await ready;
   postMessage({ type: "stage", stage: "run" });
+  lines = 0;
+  chars = 0;
   const start = performance.now();
   try {
     const result = run(event.data.solution, event.data.code);

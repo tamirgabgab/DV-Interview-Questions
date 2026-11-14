@@ -1298,6 +1298,17 @@ below start at item 112 (session 31).
     folders, no plugin hooks) and diagram-design (reference for figure layouts and diagrams
     outside the site) were installed after reading their files; see `.claude/skills/README.md`.
 
+203. **Audit fixes, round 1: A1, A2, A3, A6, A7 (session 34, 2026-11-14).** The fast lane's
+    base is now the head commit of the last successful push run of deploy.yml on the same
+    branch (`gh api .../runs?branch=&event=push&status=success`), not `github.event.before`; no
+    such run, or a commit gone after a force push, gives the full lane. `text_only.protected()`
+    keeps indentation (`rstrip`), and the diff runs with `--no-renames`; two tests in
+    `tests/tools/test_text_only.py` pin both (a dedented closing fence, a `git mv` into
+    `notes/`). check_jumps reports script errors as check_inputs does. The run panel's worker
+    stops posting output after 2,000 lines or 200,000 characters and sends one `cut` message;
+    the panel then stops the worker as Stop does and writes a Hebrew line (likely an endless
+    loop). `test_worker_cuts_endless_output` runs the worker under Node with a fake Pyodide.
+
 ---
 
 ## In progress
@@ -1337,19 +1348,21 @@ asked to fix 1, 2, 3, 6, 7 first, then the rest. Scratch evidence was in the ses
 scratchpad (audit-ci, audit-web, audit-checks), not kept.
 
 Must fix:
-- [ ] A1. The fast lane compares with the previous push (`github.event.before`,
+- [x] A1. The fast lane compares with the previous push (`github.event.before`,
   `deploy.yml:75`), not with the last commit that passed: push A breaks code and its run fails
   or is cancelled, push B fixes prose, B takes the fast lane and A's code deploys untested. The
   same hole lets main's "verified" shortcut (`deploy.yml:56-58`) skip the checks for a branch
   commit that passed only through the fast lane. Fix: base = head_sha of the last successful
   push run of deploy.yml on the same branch; none means the full lane.
-- [ ] A2. `text_only.protected()` strips indentation (`text_only.py:74`): moving a closing fence
+  Done (work log 203): every passing run now covers the diff since the previous passing run
+  on its branch, so the "verified" shortcut only reuses a fully checked chain.
+- [x] A2. `text_only.protected()` strips indentation (`text_only.py:74`): moving a closing fence
   of an indented SV tab to column 0 counts as prose (127 such one-line edits; on 0005 the fast
-  lane passed and `--sv-only` failed). Fix: `rstrip()`.
-- [ ] A3. An endless printing loop in the run panel floods the main thread
+  lane passed and `--sv-only` failed). Fix: `rstrip()`. Done (work log 203).
+- [x] A3. An endless printing loop in the run panel floods the main thread
   (`py-worker.js:18-19`, `run-python.js:85`): at 20,000 lines/s Stop was not handled in 120 s.
   Fix: cap the output per run in the worker (about 200,000 characters, then one "output cut"
-  line, then stop posting).
+  line, then stop posting). Done (work log 203): 2,000 lines or 200,000 characters.
 - [ ] A4. check_contrast tests only the first fill of 31 entries whose list has no
   `CARD, PAGE` prefix (64 tints per scheme never measured; none fails today): 0080 felt
   (:105-109), 0086 (:333-334), 0092 (:392-395), 0101 (:525), 0102 (:533). Fix: write them as
@@ -1360,10 +1373,10 @@ Must fix:
   assert_figures_match.
 
 Should fix:
-- [ ] A6. `text_only.py:113` diffs with rename detection: `git mv docs/javascripts/py_run.py
-  notes/` reads as "only files outside the site". Fix: `--no-renames`.
-- [ ] A7. check_jumps collects page errors and never reports them (`check_jumps.py:142`): a box
-  that throws at its 4th step printed ok. Fix: the line of `check_inputs.py:270`.
+- [x] A6. `text_only.py:113` diffs with rename detection: `git mv docs/javascripts/py_run.py
+  notes/` reads as "only files outside the site". Fix: `--no-renames`. Done (work log 203).
+- [x] A7. check_jumps collects page errors and never reports them (`check_jumps.py:142`): a box
+  that throws at its 4th step printed ok. Fix: the line of `check_inputs.py:270`. Done (work log 203).
 - [ ] A8. `tests/tools/test_search_text.py:60` (statement without TeX) always skips in CI (the
   test job has no built site). Fix: run it in the build job after `mkdocs build`.
 - [ ] A9. lint_pages does not require the skeleton (a page with no hints, solution, traps or

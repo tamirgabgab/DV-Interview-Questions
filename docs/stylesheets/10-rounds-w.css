@@ -93,6 +93,7 @@
 .md-typeset .py-runner .py-output-wrap .py-output { margin: 0; padding: var(--sp-2) var(--sp-3); padding-right: 2.4rem; border: 1px solid var(--site-card-border); border-radius: var(--radius-s); }
 .md-typeset .py-runner .py-output-wrap.py-failed .py-output { border-inline-start: 0.2rem solid var(--adm-trap); }
 .md-typeset .py-runner .py-output .py-err { color: var(--adm-trap); }
+.md-typeset .py-runner .py-output .py-cut { display: block; margin-top: var(--sp-1); text-align: right; font-family: var(--md-text-font-family); }
 .md-typeset .py-runner .py-line-link { padding: 0; border: 0; background: none; color: var(--md-typeset-a-color); font: inherit; text-decoration: underline; cursor: pointer; }
 .md-typeset .py-runner .py-copy { position: absolute; z-index: 1; top: var(--sp-1); right: var(--sp-1); width: 1.6rem; height: 1.6rem; padding: 0; border: 0; border-radius: var(--radius-s); background: transparent; color: var(--md-default-fg-color--light); cursor: pointer; }
 .md-typeset .py-runner .py-copy::before { content: ""; display: block; width: 1rem; height: 1rem; margin: auto; background-color: currentColor; -webkit-mask: var(--md-clipboard-icon) center / contain no-repeat; mask: var(--md-clipboard-icon) center / contain no-repeat; }
