@@ -483,7 +483,8 @@ def split_title(title: str) -> tuple[str, str]:
 # The header's chip of a page with an explorer box (session 34): a button, not a label.
 BOX_CHIP = ('<button type="button" class="qh-badge qh-badge-play qh-box-go" data-box-go '
             'title="לתיבה האינטראקטיבית של הדף\u00a0: נפתחת ונגללת אליה">'
-            f'{ui_icon("interactive")}תיבה אינטראקטיבית<span class="qh-box-arrow" aria-hidden="true">↓</span></button>')
+            f'{ui_icon("interactive")}<span class="qh-box-text">תיבה אינטראקטיבית</span>'
+            '<span class="qh-box-arrow" aria-hidden="true">↓</span></button>')
 # The row under the statement of a page whose first box sits inside a closed block.
 BOX_TEASER = ('<button type="button" class="box-teaser" data-box-go data-search-exclude>'
               f'<span class="bt-ico" aria-hidden="true">{ui_icon("interactive")}</span>'
@@ -583,7 +584,7 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
         f'<div class="question-header qh-diff-{q["difficulty"]} qh-kind-{q["kind"]}">\n'
         f'<span class="qh-emblem qh-emblem-chip" aria-hidden="true">{question_chip(q["id"], q.get("parts", 0))}</span>\n'
         f'<h1>{_title_html(str(q["title"]))}</h1>\n'
-        f'<div class="qh-top"><span class="qh-id">שאלה {q["id"]}</span>'
+        f'<div class="qh-top"><span class="qh-id"><span class="qh-id-w">שאלה </span>{q["id"]}</span>'
         f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{"".join(badges)}</div>\n'
         f'{tools}\n'
         f'<div class="qh-bottom" title="{html.escape(meta)}">{"".join(bottom)}</div>\n'
