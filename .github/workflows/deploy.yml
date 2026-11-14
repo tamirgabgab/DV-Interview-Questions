@@ -51,8 +51,9 @@ jobs:
         run: |
           verified=false
           if [ "${{ github.event_name }}" = push ] && [ "${{ github.ref }}" = refs/heads/main ]; then
-            n=$(gh api "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?head_sha=${{ github.sha }}&status=success&event=push" \
-                  --jq '[.workflow_runs[] | select(.head_branch != "main")] | length' || echo 0)
+            # filter on conclusion here: the API's status=success filter can miss recent runs
+            n=$(gh api "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?head_sha=${{ github.sha }}&event=push" \
+                  --jq '[.workflow_runs[] | select(.head_branch != "main" and .conclusion == "success")] | length' || echo 0)
             if [ "${n:-0}" -gt 0 ]; then verified=true; fi
           fi
           echo "verified=$verified" >> "$GITHUB_OUTPUT"
@@ -76,8 +77,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ "${{ github.event_name }}" = push ]; then
-            base=$(gh api "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?branch=${{ github.ref_name }}&event=push&status=success&per_page=1" \
-                     --jq '.workflow_runs[0].head_sha // ""' || echo "")
+            base=$(gh api "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?branch=${{ github.ref_name }}&event=push&per_page=30" \
+                     --jq '[.workflow_runs[] | select(.conclusion == "success")][0].head_sha // ""' || echo "")
             echo "last passing run on ${{ github.ref_name }}: ${base:-none}"
             python3 tools/checks/text_only.py "$base" "${{ github.sha }}" --github
           else

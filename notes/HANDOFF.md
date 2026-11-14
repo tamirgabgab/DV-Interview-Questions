@@ -1369,6 +1369,14 @@ below start at item 112 (session 31).
     print (28-site-flow.css). `tests/tools/test_site_flow.py` checks the page copy, that the
     CI diagram's edges follow `needs` in deploy.yml, and that routes are orthogonal and end
     on their boxes. Phone check (axe, text size) and keyboard check pass on the page.
+    Both on `main` (138929e, deployed 2026-11-14 17:17 Israel time), checked live at 1200
+    and 390 px, light and dark.
+207. **The gate's queries missed passing runs (session 34, 2026-11-14).** The `main` run of
+    138929e took the full lane although its branch run had passed: the Actions API's
+    `status=success` filter left out that run (and the branch's two latest passing runs)
+    over an hour later. Both gate queries (`verified` and the fast lane's base) now list the
+    runs without that filter and keep `conclusion == "success"` in jq. On the branch; not
+    yet on `main` (the owner decides).
 
 ---
 
