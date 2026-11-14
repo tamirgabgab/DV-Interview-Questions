@@ -81,8 +81,8 @@
 .md-typeset .explorer svg.ts-live .ts-node[role=button]:focus-visible circle { stroke: var(--site-focus-ring); stroke-width: 4; }
 .md-typeset .explorer svg.ts-live .ts-node.is-sel circle { stroke: var(--viz-s4); stroke-width: 3.5; stroke-dasharray: 5 3; }
 .md-typeset .explorer svg.ts-live .ts-lab { fill: var(--viz-text); font-size: 12px; font-weight: 700; }
-.md-typeset .explorer svg.ts-live :is(.ts-slot, .ts-qrow) rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
-.md-typeset .explorer svg.ts-live :is(.ts-slot, .ts-qrow) text { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset .explorer svg.ts-live .ts-qrow rect { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset .explorer svg.ts-live .ts-qrow text { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset .explorer svg.ts-live .ts-qrow.is-empty rect { stroke-dasharray: 3 3; }
 .md-typeset .explorer svg.ts-live .ts-qrow.is-q rect { fill: color-mix(in srgb, var(--viz-s3) 22%, var(--md-default-bg-color)); stroke: var(--viz-s3); }
 .md-typeset .explorer svg.ts-live .ts-qrow.is-o rect { fill: color-mix(in srgb, var(--viz-s1) 20%, var(--md-default-bg-color)); stroke: var(--viz-s1); }

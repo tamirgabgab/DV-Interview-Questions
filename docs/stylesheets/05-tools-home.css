@@ -28,8 +28,6 @@
 }
 
 .md-typeset .question-tools .qt-practice.is-active {
-  color: #1b2a4a;
-  background: var(--md-accent-fg-color);
   border-color: var(--md-accent-fg-color);
 }
 
@@ -187,7 +185,6 @@ body.interview-mode .md-typeset .question-tools {
 }
 
 .md-typeset .stepper-pos {
-  min-width: 6.5rem;
   font-size: 0.7rem;
   text-align: center;
   color: var(--md-default-fg-color--light);
@@ -196,7 +193,6 @@ body.interview-mode .md-typeset .question-tools {
 /* Cells of the step-through figures: input characters, stack cells, opened boxes */
 .md-typeset svg .st-cell { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
 .md-typeset svg .st-done { fill: var(--viz-grid); fill-opacity: 0.5; stroke: var(--viz-grid); stroke-width: 1.5; }
-.md-typeset svg .st-cur { fill: var(--viz-s2); fill-opacity: 0.25; stroke: var(--viz-s2); stroke-width: 2.5; }
 .md-typeset svg .st-stack { fill: var(--viz-s1); fill-opacity: 0.18; stroke: var(--viz-s1); stroke-width: 1.5; }
 .md-typeset svg .st-top { fill: var(--viz-s1); fill-opacity: 0.45; stroke: var(--viz-s1); stroke-width: 2.5; }
 .md-typeset svg .st-bad { fill: var(--viz-s2); fill-opacity: 0.45; stroke: var(--viz-s2); stroke-width: 2.5; }
@@ -229,7 +225,6 @@ body.interview-mode .md-typeset .question-tools {
 .md-typeset .viz-legend .pg-twice { background: transparent; border: 2px solid var(--viz-ink); border-radius: 50%; }
 
 /* Round C: marks, random question, sorting, study paths, progress bars */
-.md-typeset .question-tools .qt-spacer { flex: 1 1 0; }
 .md-typeset .question-tools .qt-mark.is-active {
   color: var(--md-primary-bg-color);
   background: var(--md-primary-fg-color);
@@ -322,11 +317,6 @@ body.interview-mode .md-typeset .question-tools {
   background: var(--viz-s3);
 }
 .md-typeset .mark-progress .mp-text { white-space: nowrap; }
-.md-typeset .path-card .pc-ids {
-  font-family: var(--md-code-font-family);
-  font-size: 0.66rem;
-  color: var(--md-default-fg-color--light);
-}
 
 .md-typeset .path-nav {
   display: flex;

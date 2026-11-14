@@ -49,7 +49,7 @@
 /* M5: the question header as a card: the title, one row of chips, the topics as chips with
    the date and the source under them, and the page tools along the card's foot with their
    names (a touch screen keeps its own layout, 12-rounds-y-s.css). */
-.md-typeset .question-header, .md-typeset .question-header:has(+ .part-nav, + .path-nav) { margin-bottom: var(--sp-3); padding: var(--sp-4) var(--sp-4) var(--sp-3); border: 1px solid var(--site-card-edge); border-radius: var(--radius-l); background: var(--site-surface); box-shadow: var(--shadow-1); }
+.md-typeset .question-header, .md-typeset .question-header:has(+ .part-nav, + .path-nav) { margin-bottom: var(--sp-3); padding: var(--sp-4) var(--sp-4) var(--sp-3); border: 1px solid var(--site-card-edge); border-radius: var(--radius-l); background: var(--site-surface); }
 .md-typeset .question-header .qh-topics { display: flex; flex-wrap: wrap; flex-basis: 100%; align-items: center; gap: 0.25rem 0.3rem; }
 .md-typeset .question-header .qh-topics + .qh-sep { display: none; }
 .md-typeset .question-header .qh-topics-name { margin-inline-end: 0.15rem; }
@@ -76,20 +76,11 @@
   .md-typeset p.hint-dots i.is-on { animation: qt-pop var(--dur-2) ease-out; }
 }
 
-/* M9: a box not built yet (core.js builds a box as it nears the screen) holds its place
-   as a skeleton: a bar for its title and a soft sheen. */
-.md-typeset .explorer:empty { min-height: 12rem; background-image: linear-gradient(var(--site-primary-soft) 0 0); background-size: 100% 2rem; background-repeat: no-repeat; }
-@media (prefers-reduced-motion: no-preference) {
-  .md-typeset .explorer:empty { background-image: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--md-default-fg-color) 5%, transparent) 50%, transparent 70%), linear-gradient(var(--site-primary-soft) 0 0); background-size: 200% 100%, 100% 2rem; animation: ex-sheen 1.4s linear infinite; }
-  @keyframes ex-sheen { from { background-position: 150% 0, 0 0; } to { background-position: -50% 0, 0 0; } }
-}
-
 /* M6: a page opens with a short cross-fade (where the browser can), the header stays put,
    and a question's title moves from the link that was followed into the page's title
    (motion.js names that link). */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
-  ::view-transition-group(root) { animation-duration: 220ms; }
   .md-header { view-transition-name: dvq-header; }
   .md-typeset .question-header > h1 { view-transition-name: dvq-title; }
   ::view-transition-group(dvq-title) { animation-duration: 340ms; animation-timing-function: var(--ease); }

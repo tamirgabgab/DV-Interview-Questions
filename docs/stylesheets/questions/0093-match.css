@@ -6,11 +6,11 @@
    from the palette only. */
 
 /* the figure */
-.md-typeset svg.sm-fig line.sm-pair { stroke: var(--viz-s3); stroke-width: 3; stroke-linecap: round; }
-.md-typeset svg.sm-fig line.sm-no { stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 5 4; }
-.md-typeset svg.sm-fig .sm-cnode { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
-.md-typeset svg.sm-fig .sm-jnode { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
-.md-typeset svg.sm-fig .sm-lab { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg.sm-match line.sm-pair { stroke: var(--viz-s3); stroke-width: 3; stroke-linecap: round; }
+.md-typeset svg.sm-match line.sm-no { stroke: var(--viz-s2); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.md-typeset svg.sm-match .sm-cnode { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); stroke-width: 1.5; }
+.md-typeset svg.sm-match .sm-jnode { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.5; }
+.md-typeset svg.sm-match .sm-lab { fill: var(--viz-ink); font-size: 13px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset .viz-legend .sm-key-c { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); outline: 1.5px solid var(--viz-s1); outline-offset: -1.5px; border-radius: 50%; }
 .md-typeset .viz-legend .sm-key-j { background: none; outline: 1.5px solid var(--viz-ink); outline-offset: -1.5px; }
 .md-typeset .viz-legend .sm-key-pair { background: var(--viz-s3); height: 0.2rem; }

@@ -29,7 +29,7 @@
 .md-typeset .explorer .ed-legend { margin: 0; }
 .md-typeset .viz-legend .ed-key-hi { background: none; height: 0; border-top: 3px solid var(--viz-s1); align-self: center; }
 .md-typeset .viz-legend .ed-key-cap { background: var(--md-default-bg-color); outline: 2.5px solid var(--viz-s1); outline-offset: -2.5px; }
-.md-typeset .viz-legend .ed-key-now { background: var(--md-default-bg-color); outline: 2px solid var(--viz-s1); outline-offset: -2px; }
+.md-typeset .ed-legend .ed-key-now { background: var(--md-default-bg-color); outline: 2px solid var(--viz-s1); outline-offset: -2px; }   /* .ed-legend: 0037's legend has its own ed-key-now */
 
 /* the summary of the whole strip sits under it, in the main column (not a top part) */
 .md-typeset .explorer .ed-sum { font-weight: 600; min-height: 2lh; margin: 0.3em 0 0.2em; }

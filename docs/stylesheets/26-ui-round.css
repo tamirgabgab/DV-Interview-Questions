@@ -134,14 +134,15 @@
 .md-typeset .explorer svg :focus-visible .ex-answer-mark:not(#_),
 .md-typeset .explorer svg .ex-answer-mark:focus-visible:not(#_) { stroke: var(--site-focus-ring); }
 
-/* --- the section dividers: a plain hairline (the owner, session 33: the square wave of
-   22-circuit.css under every block and part was too busy); circuit.js no longer runs the
-   packet along them ------------------------------------------------------------------------ */
-.md-typeset hr { height: 1px; margin: 1.6em 0; overflow: visible; background: color-mix(in srgb, var(--md-default-fg-color) 14%, transparent); }
-.md-typeset hr::before, .md-typeset hr::after { content: none; display: none; animation: none; }
+/* --- the section dividers: a plain hairline (the owner, session 33: the square wave that
+   22-circuit.css drew under every block and part was too busy, and is gone) ---------------- */
+.md-typeset hr { display: block; height: 1px; margin: 1.6em 0; border: 0; background: color-mix(in srgb, var(--md-default-fg-color) 14%, transparent); }
 
 /* --- the reading line of the part bar (22-circuit.css's clock): larger, and filling from
-   left to right like a trace in a waveform viewer (the owner, session 33) ------------------- */
+   left to right like a trace in a waveform viewer (the owner, session 33). The line is as
+   wide as the bar and clipped to the share read (reading-tools.js sets --pn-read on every
+   scroll), so a scroll repaints it without a layout, and the clock pattern stays in place,
+   which a scaleX would stretch ---------------------------------------------------------------- */
 .md-typeset .part-nav .pn-progress { height: 8px; bottom: -4px; }
 .md-typeset .part-nav .pn-progress::before,
 .md-typeset .part-nav .pn-progress i {

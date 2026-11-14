@@ -42,7 +42,6 @@
 .md-typeset svg .lo-btn:hover .lo-ring { stroke: var(--viz-text); stroke-width: 1.5; }
 .md-typeset svg .lo-btn:focus { outline: none; }
 .md-typeset svg .lo-btn:focus-visible .lo-ring { stroke: var(--site-focus-ring); stroke-width: 3; }
-.md-typeset .lo-live .lo-note { min-height: 3em; }
 
 /* the legend keys */
 .md-typeset .viz-legend .lo-key-on { background: var(--md-accent-fg-color); border-radius: 50%; outline: 2px solid var(--viz-ink); outline-offset: -2px; }

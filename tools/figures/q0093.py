@@ -291,7 +291,7 @@ def match_svg():
     W, H, top, gap = 300, 232, 22, 37
     xc, xj = 232, 68
     y = lambda k: top + k * gap
-    parts = [f'<svg class="figure sm-fig" viewBox="0 0 {W} {H}" style="max-width:19rem" role="img" '
+    parts = [f'<svg class="figure sm-match" viewBox="0 0 {W} {H}" style="max-width:19rem" role="img" '
              f'aria-label="{escape("התוצאה של סעיף א" + NB + ": " + ", ".join(pair(i, j) for i, j in enumerate(match)) + ". קו מקווקו הוא הצעה שנדחתה")}">']
     refused = {(i, j) for i, j, kind, _ in steps if kind == "no"} | {(f, j) for _, j, kind, f in steps if kind == "swap"}
     for i, j in sorted(refused):

@@ -70,7 +70,7 @@
 .md-typeset .explorer .gs-cell.is-now { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
 .md-typeset .explorer .gs-cell.is-neg { background: color-mix(in srgb, var(--viz-s5) 16%, var(--md-default-bg-color)); border-color: var(--viz-s5); }
 .md-typeset .explorer .gs-cell.is-off { border-style: dashed; }
-.md-typeset .explorer .gs-note { font-size: 0.7rem; margin: 0.3em 0; }
+/* .gs-note is 11-questions.css's rule of 0060, which uses the same name */
 .md-typeset .explorer .gs-err { color: var(--viz-s2-text); }
 .md-typeset .explorer input:is(.gs-gasf, .gs-costf) { width: 11rem; max-width: 100%; }
 @media (max-width: 30em) {

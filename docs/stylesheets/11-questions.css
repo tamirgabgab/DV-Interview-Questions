@@ -322,8 +322,8 @@
 .md-typeset svg .cr-coin.cr-p0 circle { fill: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); stroke: var(--viz-s1); }
 .md-typeset svg .cr-coin.cr-p1 circle { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); }
 .md-typeset svg .cr-coin text { fill: var(--viz-ink); font-size: 18px; font-weight: 700; font-family: var(--md-code-font-family); }
-.md-typeset .viz-legend .cr-key-p0, .md-typeset .viz-legend .cr-key-a { background: var(--viz-s1); opacity: 0.55; border-radius: 50%; }
-.md-typeset .viz-legend .cr-key-p1, .md-typeset .viz-legend .cr-key-b { background: var(--viz-s2); opacity: 0.6; border-radius: 50%; }
+.md-typeset .viz-legend .cr-key-p0 { background: var(--viz-s1); opacity: 0.55; border-radius: 50%; }
+.md-typeset .viz-legend .cr-key-p1 { background: var(--viz-s2); opacity: 0.6; border-radius: 50%; }
 .md-typeset .viz-legend .cr-key-end { background: none; border-radius: 50%; outline: 3px solid var(--viz-ink); outline-offset: -3px; }
 .md-typeset .explorer .cr-row { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0; direction: ltr; }
 .md-typeset .explorer .cr-coin { position: relative; width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 2px solid var(--viz-grid); background: var(--md-default-bg-color);
@@ -593,7 +593,7 @@
 .md-typeset .viz-legend .ov-key-u { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
 .md-typeset .explorer .ov-wrap { margin: 0.5rem 0; overflow-x: auto; direction: ltr; }
 .md-typeset .explorer .ov-wrap svg { width: 100%; }
-.md-typeset .explorer .ov-note, .md-typeset .explorer .ov-tally { font-size: 0.7rem; margin: 0.3em 0; }
+.md-typeset .explorer .ov-note { font-size: 0.7rem; margin: 0.3em 0; }
 .md-typeset .explorer input.ov-done { width: 14rem; max-width: 100%; }
 
 /* 0065: number of islands (the grid figures and the islands explorer) */

@@ -43,11 +43,6 @@
 .md-typeset .lv-dots.is-lit::after { opacity: 0.38; }
 @media print { .md-typeset .lv-dots { display: none; } }
 
-/* --- 8. the page transition: the browser's cross-fade (13-motion.css M6) a little quicker */
-@media (prefers-reduced-motion: no-preference) {
-  ::view-transition-group(root) { animation-duration: 180ms; }
-}
-
 /* --- 9. loading skeletons -----------------------------------------------------------------
    A box not built yet (core.js builds it as it nears the screen) keeps the height of a
    typical box (the smallest built boxes are about 24rem, most 32 to 85rem), with grey bars

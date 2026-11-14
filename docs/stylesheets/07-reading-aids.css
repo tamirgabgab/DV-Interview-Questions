@@ -85,10 +85,7 @@
   top: 2.4rem;
   z-index: 2;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
   margin: 0.6rem 0 0;
-  padding: 0.35rem 0;
   background: var(--md-default-bg-color);
   border-bottom: 1px solid var(--viz-grid);
 }

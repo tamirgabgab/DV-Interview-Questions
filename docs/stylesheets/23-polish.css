@@ -57,12 +57,6 @@
 /* the box's text buttons (start over, fold a proof) hover in the action colour, not amber */
 .md-typeset .explorer :is(.ex-restart, .ex-fold-btn):hover { color: var(--act-line); }
 
-/* --- the part bar's reading line: clipped, not resized --------------------------------------
-   The line is as wide as the bar and clipped to the share read (reading-tools.js sets
-   --pn-read on every scroll), so a scroll repaints it without a layout. Its clock pattern
-   (22-circuit.css) stays in place, which a scaleX would stretch. */
-.md-typeset .part-nav .pn-progress i:not(#_) { width: 100%; clip-path: inset(0 0 0 calc(100% - var(--pn-read, 0%))); }
-
 /* --- icon buttons on a phone: 44 px and a name under each ----------------------------------
    On a touch screen or a narrow window there is no hover, so no tooltip: every icon-only
    button gets a 44 px target and its short name under it (data-name, set by core.js and

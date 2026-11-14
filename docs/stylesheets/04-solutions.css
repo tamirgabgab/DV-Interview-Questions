@@ -5,7 +5,7 @@
 
 /* Custom admonition types: answer (amber), interviewer (navy), trap (red), followup (teal). */
 /* The short answer of a follow-up question: a quiet collapsible line under the item, no icon. */
-.md-typeset details.fu-answer { margin: 0.3em 0 0.6em; border: 0; border-inline-start: 0.15rem solid var(--adm-followup); border-radius: 0; box-shadow: none; font-size: 0.95em; background: transparent; }
+.md-typeset details.fu-answer { margin: 0.3em 0 0.6em; border: 0; border-inline-start: 0.15rem solid var(--adm-followup); border-radius: 0; font-size: 0.95em; background: transparent; }
 .md-typeset details.fu-answer > summary { background: transparent; font-weight: 600; color: var(--adm-followup); padding-inline-start: 1.6rem; min-height: 0; }
 .md-typeset details.fu-answer > summary::before { display: none; }
 .md-typeset details.fu-answer > summary::after { inset-inline-start: 0.2rem; inset-inline-end: auto; }
@@ -151,7 +151,6 @@
 
 /* The solution map (A181): a sticky row of chips, one per block, under the part bar. */
 .md-typeset .sol-map {
-  position: sticky;
   top: calc(2.4rem + var(--part-nav-h, 0px));
   z-index: 1;
   display: flex;
@@ -161,7 +160,6 @@
   padding: 0.3rem 0;
   overflow-x: auto;
   scrollbar-width: none;
-  background: var(--md-default-bg-color);
   border-bottom: 1px solid var(--viz-grid);
 }
 .md-typeset .sol-map::-webkit-scrollbar { display: none; }
@@ -281,7 +279,7 @@
    row; inputs first, then the actions, then playback (play, steps, speed, the counter),
    with one spacing and one button size. The keyboard hint is the box's status line at the
    bottom. */
-.md-typeset .explorer .ex-controls { gap: 0.45rem 1rem; margin: 0.35rem 0; }
+.md-typeset .explorer .ex-controls { margin: 0.35rem 0; }
 .md-typeset .explorer .ex-controls > .ex-c-input { order: 1; }
 .md-typeset .explorer .ex-controls > .ex-c-action { order: 2; }
 .md-typeset .explorer .ex-controls > .ex-c-play { order: 3; }
@@ -296,7 +294,6 @@
   margin: 0;
 }
 .md-typeset .explorer .ex-keys {
-  margin: 0.7rem 0 0;
   padding-top: 0.35rem;
   border-top: 1px dashed var(--viz-grid);
 }

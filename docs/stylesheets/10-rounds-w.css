@@ -121,7 +121,7 @@
    the solution being read (.pn-sol, filled by reading-tools.js). */
 .md-typeset .sol-map { position: static; background: transparent; }
 .md-typeset .part-nav { gap: var(--sp-2); }
-.md-typeset .part-nav .pn-chips { flex: 0 1 auto; min-width: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }   /* a row too long for the screen scrolls, never widens the page */
+.md-typeset .part-nav .pn-chips { min-width: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }   /* a row too long for the screen scrolls, never widens the page */
 .md-typeset .part-nav .pn-chips::-webkit-scrollbar { display: none; }
 /* The map of the solution being read hangs under the bar as a second row of its own
    (position absolute and opaque: the page under it never moves when it comes and goes), so the part

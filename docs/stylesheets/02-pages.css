@@ -67,8 +67,6 @@
 }
 
 .md-typeset .question-header h1 {
-  margin: 0 0 0.6rem;
-  font-weight: 500;
   color: var(--md-default-fg-color);
 }
 
@@ -76,8 +74,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.3rem 0.5rem;
-  font-size: 0.7rem;
   color: var(--md-default-fg-color--light);
 }
 
@@ -101,16 +97,8 @@
 .md-typeset .question-header .qh-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.3em;
-  padding: 0 0.5em;
   border: 1px solid var(--site-card-border);
   border-radius: 0.3rem;
-  line-height: 1.7;
-}
-
-.md-typeset .question-header .qh-badge-ok {
-  color: var(--diff-easy);
-  border-color: currentColor;
 }
 
 /* Related questions at the end of a question page. */
@@ -148,7 +136,6 @@
 .md-typeset .question-filter {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
   margin-bottom: 1rem;
 }
 
@@ -215,7 +202,6 @@
   border-color: var(--md-accent-fg-color);
 }
 
-.md-typeset .questions-count,
 .md-typeset .questions-empty {
   font-size: 0.7rem;
   color: var(--md-default-fg-color--light);
@@ -245,7 +231,6 @@
   }
 
   .md-typeset .questions-wrap .md-typeset__table {
-    display: block;
     margin: 0;
     padding: 0;
   }
@@ -270,7 +255,6 @@
     margin-bottom: 0.6rem;
     padding: 0.6rem 0.8rem;
     border: 1px solid var(--site-card-border);
-    border-radius: 0.4rem;
     background: var(--site-surface);
   }
 

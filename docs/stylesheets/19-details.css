@@ -53,14 +53,14 @@
 @media (prefers-reduced-motion: reduce) { .dt-pulse { display: none; } }
 
 /* V17: a box not built yet (core.js builds a box as it nears the screen; the box is empty
-   until then) holds its 12rem (13-motion.css, M9) with a short waveform in place of the old
+   until then) holds its place (24-living.css, part 9) with a short waveform in place of the old
    sheen: a clock over a data bus, both sliding one tile at a time, and an amber cursor
    sweeping across them, as in the home hero. The waves sit in pseudo-elements placed over
    the reserved space, so the box's size is the same; still under reduced motion and in an
    automated browser (details.js sets .dt-still on the root). */
 [data-md-color-scheme="default"] { --dt-wave: rgba(27, 42, 74, 0.26); }
 [data-md-color-scheme="slate"] { --dt-wave: rgba(141, 179, 255, 0.3); }
-.md-typeset .explorer:empty { position: relative; background-image: none; animation: none; }
+.md-typeset .explorer:empty { position: relative; animation: none; }
 .md-typeset .explorer:empty::before { content: ""; position: absolute; inset-inline: 1.4rem; top: calc(50% - 1.9rem); height: 3.8rem; background-color: var(--dt-wave); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M0 20H8V4H24V20H32'/%3E%3C/svg%3E") 0 0 / 32px 24px repeat-x, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M0 4L8 20M0 20L8 4M8 4H60L68 20H128M8 20H60L68 4H128'/%3E%3C/svg%3E") 0 100% / 128px 24px repeat-x; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M0 20H8V4H24V20H32'/%3E%3C/svg%3E") 0 0 / 32px 24px repeat-x, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M0 4L8 20M0 20L8 4M8 4H60L68 20H128M8 20H60L68 4H128'/%3E%3C/svg%3E") 0 100% / 128px 24px repeat-x; }
 .md-typeset .explorer:empty::after { content: ""; position: absolute; top: calc(50% - 2.3rem); left: 1.4rem; width: 0; height: 4.6rem; border-inline-start: 2px dashed var(--md-accent-fg-color); opacity: 0; }
 @media (prefers-reduced-motion: no-preference) {

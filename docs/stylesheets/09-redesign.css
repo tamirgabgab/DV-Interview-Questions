@@ -6,7 +6,7 @@
    near 75 characters so long lines stay readable on wide screens (code, tables, figures
    and the boxes keep the full column). */
 .md-typeset { line-height: 1.7; }
-.md-typeset h1 { font-weight: 600; letter-spacing: 0; color: var(--md-default-fg-color); }
+.md-typeset h1 { font-weight: 600; color: var(--md-default-fg-color); }
 .md-typeset :is(h2, h3) { font-weight: 600; }
 /* a long title splits into even lines, never one word left alone on the last */
 .md-typeset :is(h1, h2) { text-wrap: balance; }
@@ -17,11 +17,6 @@
    set the theme ships), drawn as a CSS mask in the text colour, so the hook's HTML and the
    explorer scripts use the same <i class="kind-ico kind-ico-<kind>">. */
 .kind-ico { display: inline-block; flex: none; width: 1.15em; height: 1.15em; vertical-align: -0.2em; background-color: currentColor; -webkit-mask: var(--kind-ico) center / contain no-repeat; mask: var(--kind-ico) center / contain no-repeat; }
-.kind-ico-puzzle { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22 13.5c0 1.76-1.3 3.22-3 3.46V20a2 2 0 0 1-2 2h-3.8v-.3a2.7 2.7 0 0 0-2.7-2.7c-1.5 0-2.7 1.21-2.7 2.7v.3H4a2 2 0 0 1-2-2v-3.8h.3C3.79 16.2 5 15 5 13.5s-1.21-2.7-2.7-2.7H2V7a2 2 0 0 1 2-2h3.04c.24-1.7 1.7-3 3.46-3s3.22 1.3 3.46 3H17a2 2 0 0 1 2 2v3.04c1.7.24 3 1.7 3 3.46M17 15h1.5a1.5 1.5 0 0 0 1.5-1.5 1.5 1.5 0 0 0-1.5-1.5H17V7h-5V5.5A1.5 1.5 0 0 0 10.5 4 1.5 1.5 0 0 0 9 5.5V7H4v2.12c1.76.68 3 2.38 3 4.38s-1.25 3.7-3 4.38V20h2.12a4.7 4.7 0 0 1 4.38-3c2 0 3.7 1.25 4.38 3H17z'/%3E%3C/svg%3E"); }
-.kind-ico-code { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 3a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2H3v2h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2v-2H8v-5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V5h2V3m6 0a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1v2h-1a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2v-2h2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5h-2V3z'/%3E%3C/svg%3E"); }
-.kind-ico-design { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 4h12v1h3v2h-3v2h3v2h-3v2h3v2h-3v2h3v2h-3v1H6v-1H3v-2h3v-2H3v-2h3v-2H3V9h3V7H3V5h3zm5 11v3h1v-3zm2 0v3h1v-3zm2 0v3h1v-3z'/%3E%3C/svg%3E"); }
-.kind-ico-math { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18 6H8.83l6 6-6 6H18v2H6v-2l6-6-6-6V4h12z'/%3E%3C/svg%3E"); }
-.kind-ico-dv { --kind-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9'/%3E%3C/svg%3E"); }
 .md-typeset .chip-kind { display: inline-flex; align-items: center; gap: 0.25em; }
 
 /* Path cards (UI320): the count never wraps, the name carries the icon of the kind most of
@@ -63,7 +58,7 @@
 .md-typeset .question-header .qh-badge-ok { color: var(--diff-easy); border-color: color-mix(in srgb, currentColor 45%, transparent); }
 .md-typeset .question-header .qh-badge-play { color: var(--md-typeset-a-color); }
 .md-typeset .question-header .qh-badge-new { color: #1b2a4a; background: var(--md-accent-fg-color); border-color: var(--md-accent-fg-color); }   /* the navy of the interview button: 4.5:1 on the accent */
-.md-typeset .question-header h1 { margin: 0 0 0.5rem; font-weight: 700; line-height: 1.3; }
+.md-typeset .question-header h1 { margin: 0 0 0.5rem; line-height: 1.3; }
 .md-typeset .question-header .qh-bottom { gap: 0.2rem 0.45rem; font-size: 0.68rem; }
 .md-typeset .question-header .qh-bottom a { text-decoration: underline dotted color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 0.2em; }
 
@@ -96,13 +91,12 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 .md-typeset .part-nav { flex-wrap: nowrap; align-items: center; padding: 0.35rem 0 0.4rem; border-bottom-color: var(--site-card-border); }
 .md-typeset .part-nav .pn-solved { display: none; margin-inline-start: auto; }
 .md-typeset .part-nav.is-stuck .pn-solved { display: inline-flex; }
-.md-typeset .part-nav .pn-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-.md-typeset .part-nav .pn-progress { position: absolute; inset-inline: 0; bottom: -1px; height: 2px; background: transparent; }
+.md-typeset .part-nav .pn-chips { display: flex; gap: 0.35rem; }
+.md-typeset .part-nav .pn-progress { position: absolute; inset-inline: 0; background: transparent; }
 .md-typeset .part-nav .pn-progress i { display: block; height: 100%; width: var(--pn-read, 0%); margin-inline-start: 0; background: var(--md-accent-fg-color); }
 /* without parts the bar is only the progress line along the top and the solved toggle as a
    floating round button at its end; the script sets its left edge and width to the column */
 .md-typeset .part-nav.pn-fixed { position: fixed; top: 2.4rem; left: 0; right: auto; z-index: 3; margin: 0; padding: 0.35rem 0 0; background: transparent; border: 0; pointer-events: none; transform: translateY(-120%); visibility: hidden; transition: transform var(--dur-1), visibility var(--dur-1); }
-.md-typeset .part-nav.pn-fixed .pn-progress { top: 0; bottom: auto; }
 .md-typeset .part-nav.pn-fixed .pn-solved { pointer-events: auto; background: var(--md-default-bg-color); box-shadow: var(--shadow-2); }
 .md-typeset .part-nav.pn-fixed.is-stuck { transform: none; visibility: visible; }
 @media (prefers-reduced-motion: reduce) { .md-typeset .part-nav.pn-fixed { transition: none; } }
@@ -114,8 +108,7 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 [data-md-color-scheme="slate"] .md-typeset .home-hero { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
 .md-typeset .home-hero > :not(.hh-bg) { position: relative; }
 .md-typeset .home-hero .hh-bg { position: absolute; inset: 0; pointer-events: none; }   /* the chip's canvas, hero-board.js */
-.md-content:has(.home-hero) .md-content__button { display: none; }   /* the hero takes the full column on the home page */
-.md-typeset .home-hero h1 { margin: 0 0 0.5rem; color: #fff; font-size: 1.9rem; font-weight: 700; line-height: 1.2; }
+.md-typeset .home-hero h1 { margin: 0 0 0.5rem; color: #fff; line-height: 1.2; }
 .md-typeset .home-hero p { max-width: 42rem; margin: 0 0 1rem; color: rgba(255, 255, 255, 0.88); font-size: 0.82rem; }
 .md-typeset .home-hero strong { color: #fff; }
 .md-typeset .home-hero .hh-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.9rem; }
@@ -135,7 +128,6 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 .md-typeset .home-hero .hh-stats b { color: #fff; font-size: 0.85rem; }
 @media screen and (max-width: 30em) {
   .md-typeset .home-hero { margin-inline: -0.8rem; padding: 1.2rem 1rem 1rem; border-radius: 0; }
-  .md-typeset .home-hero h1 { font-size: 1.45rem; }
   .md-typeset .home-hero .hh-actions .md-button { flex: 1 1 auto; justify-content: center; }
   .md-typeset .home-hero .hh-search kbd { display: none; }
 }
@@ -148,7 +140,6 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
    sizes of E200 and the views' md-button classes. */
 .ui-ico-first { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 18V6h2v12zm3.5-6L18 6v12z'/%3E%3C/svg%3E"); }
 .ui-ico-prev { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 5v14h-3V5m-2 0v14L3 12'/%3E%3C/svg%3E"); }
-.ui-ico-play { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5.14v14l11-7z'/%3E%3C/svg%3E"); }
 .ui-ico-next { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5v14h3V5m2 0v14l11-7'/%3E%3C/svg%3E"); }
 .ui-ico-last { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16 18h2V6h-2M6 18l8.5-6L6 6z'/%3E%3C/svg%3E"); }
 .ui-ico-boxhelp { --ui-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 18h2v-2h-2zm1-16A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m0-14a4 4 0 0 0-4 4h2a2 2 0 0 1 2-2 2 2 0 0 1 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4'/%3E%3C/svg%3E"); }
@@ -165,7 +156,6 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 .md-typeset .explorer :is(.ex-ibtn, .ex-tbtn):not(#_) { position: relative; display: inline-flex; align-items: center; justify-content: center; flex: none; width: 1.8rem; height: 1.8rem; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--viz-ink); font-size: 0; line-height: 0; text-decoration: none; cursor: pointer; }
 .md-typeset .explorer :is(.ex-ibtn, .ex-tbtn)::before { content: ""; width: 0.95rem; height: 0.95rem; background-color: currentColor; -webkit-mask: var(--ui-ico) center / contain no-repeat; mask: var(--ui-ico) center / contain no-repeat; }
 .md-typeset .explorer :is(.ex-ibtn, .ex-tbtn):not(#_):is(:hover, :focus-visible) { background: var(--md-default-fg-color--lightest); color: var(--md-default-fg-color); }
-.md-typeset .explorer .ex-help-btn[aria-expanded="true"]:not(#_) { background: var(--viz-s1); color: var(--md-default-bg-color); }
 .md-typeset .explorer .ex-link.is-done { color: var(--viz-s3-text); }
 .md-typeset .explorer :is(.ex-ibtn, .ex-tbtn, .ex-speedbtn)[data-tip]:is(:hover, :focus-visible)::after {
   content: attr(data-tip); position: absolute; top: calc(100% + 0.3rem); left: 50%; z-index: 6; transform: translateX(-50%);
@@ -175,14 +165,13 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 .md-typeset .explorer .ex-bar .ex-ibtn[data-tip]:is(:hover, :focus-visible)::after { left: auto; right: 0; transform: none; }
 .md-typeset .explorer .ex-transport { direction: ltr; display: inline-flex; align-items: center; gap: 0.15rem; padding: 0.15rem; border: 1px solid var(--site-card-border); border-radius: 2rem; background: var(--md-default-bg-color); }
 .md-typeset .explorer .ex-transport .ex-tbtn:not(#_) { width: 1.9rem; height: 1.9rem; }
-.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_) { width: 2.4rem; height: 2.4rem; background: var(--md-typeset-a-color); color: var(--md-default-bg-color); }
+.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_) { width: 2.4rem; height: 2.4rem; }
 .md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play::before { width: 1.25rem; height: 1.25rem; }
-.md-typeset .explorer .ex-transport .ex-tbtn.ui-ico-play:not(#_):is(:hover, :focus-visible) { background: var(--md-accent-fg-color); color: #1b2a4a; }
 .md-typeset .explorer .ex-transport .ex-tbtn:disabled { opacity: 0.35; cursor: default; }
 .md-typeset .explorer .ex-speed-kept { display: none; }
 .md-typeset .explorer .ex-speedseg { display: inline-flex; margin-inline-start: 0.35rem; padding-inline-start: 0.35rem; border-inline-start: 1px solid var(--site-card-border); }
 .md-typeset .explorer .ex-speedbtn { position: relative; padding: 0.15rem 0.4rem; border: 0; border-radius: 1rem; background: transparent; color: var(--viz-text); font: inherit; font-family: var(--md-code-font-family); font-size: 0.62rem; cursor: pointer; }
-.md-typeset .explorer .ex-speedbtn[aria-pressed="true"] { background: var(--site-primary-soft); color: var(--md-typeset-a-color); font-weight: 700; }
+.md-typeset .explorer .ex-speedbtn[aria-pressed="true"] { font-weight: 700; }
 .md-typeset .explorer .ex-scrubwrap { margin: -0.1rem 0 0.4rem; }
 .md-typeset .explorer .ex-scrubwrap[hidden] { display: none; }
 .md-typeset .explorer input.ex-scrub { display: block; width: 100%; max-width: 30rem; height: 1.1rem; margin: 0; accent-color: var(--md-typeset-a-color); cursor: pointer; }
@@ -264,7 +253,6 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 /* The 404 page (overrides/404.html): a navy card like the home hero. */
 .md-typeset .not-found { margin: 0.5rem 0 1.5rem; padding: 1.4rem 1.6rem 1.2rem; border-radius: 0.8rem; background: var(--md-primary-fg-color); color: #fff; }
 [data-md-color-scheme="slate"] .md-typeset .not-found { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
-.md-typeset .not-found .nf-code { margin: 0; color: var(--md-accent-fg-color); font-size: 2.6rem; font-weight: 700; line-height: 1; }
 .md-typeset .not-found h1 { margin: 0.3rem 0 0.6rem; color: #fff; }
 .md-typeset .not-found p { margin: 0.4rem 0; }
 .md-typeset .not-found a:not(.md-button) { color: #fff; text-decoration: underline; }
@@ -280,7 +268,7 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
    as they stand. */
 @media print {
   .md-typeset :is(.question-tools, .part-nav, .ex-bar, .ex-controls, .ex-scrubwrap, .ex-keys, .ex-guide, .py-runner, .py-from-code, .comments, .comments-note, .hh-tools),
-  .dvq-toast, .dvq-confetti, .md-content__button, .iv-bar, .iv-conf, .qj { display: none !important; }
+  .dvq-toast, .dvq-confetti, .iv-bar, .iv-conf, .qj { display: none !important; }
   .md-typeset details.tip.hint-locked { display: block; }
   .md-typeset :is(.admonition, details) { page-break-inside: auto; break-inside: auto; }   /* the theme keeps each block whole, which leaves near-blank pages */
   .md-typeset :is(.admonition-title, summary) { break-after: avoid; }
