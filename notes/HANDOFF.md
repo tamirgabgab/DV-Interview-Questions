@@ -1400,6 +1400,24 @@ below start at item 112 (session 31).
     Capture note: in the sandbox the site's service worker fetches the CDN scripts itself,
     so MathJax and WaveDrom stay raw on pages loaded after the first; use
     `service_workers="block"` in a Playwright context that routes the CDN to local copies.
+209. **The UX round implemented (session 34, 2026-11-14).** The owner saw before/after mocks
+    of all ten proposals (injected CSS and DOM, nothing in the repository) and chose 2a, 3a,
+    4, 5, 6, 7a, 7b, 8, 9a, 9b and 10, one round, with MCQ answers: no tags in list rows;
+    the tools move to the sticky strip on a computer only; wide tables scroll; the end card
+    only after "solved" and without a "similar question" line; path rows keep the reader's
+    progress; level and difficulty tags apart from the topics; the map's improvement on the
+    home page too. Not chosen: 1 (a figure in the hero), 2b, 3b ("continue" already exists).
+    Three agents by area, each with its own new stylesheet (29 question page, 30 lists and
+    home, 31 maps, paths, tags); the summary of what changed is in CONTRIBUTING ("The UX
+    round"). Also fixed: a level page's title was "Index" (now from its header band) and the
+    clipped path title (rows replace the cards). Measured: all/ shows 8 rows in the first
+    screen at 1440 px (was 2) and is 6305 px tall (was 10717), 10444 px on a phone (was
+    18332); the "השאלה" heading of 0083 is at 501 px of 900 on a computer (was 608) and 514
+    of 844 on a phone (was 519: the tools keep their row there). Left for later: dead rules
+    of the replaced markup in parts 02, 09, 10, 12, 16, 17, 22 (`how-it-works`, `hw-*`,
+    `catalog-link`, `filter-panel`, `topics-*`, `q-meta`, `q-topic`, the row stripe,
+    `mm-tip`, `tag-grid`, `tag-chip`) and their unused contrast pairs; the metro names'
+    width is an estimate without font metrics (check with Rubik on the live site).
 
 ---
 

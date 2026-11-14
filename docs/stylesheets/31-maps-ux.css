@@ -448,7 +448,10 @@
 }
 
 @media screen and (max-width: 44.9375em) {
+  /* the levels on one line and the difficulties on the next, without the fold's arrow */
   .md-typeset .tag-levels { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .md-typeset .tag-levels details.tag-level > summary { flex-wrap: wrap; justify-content: center; gap: 0 0.4rem; padding-inline: 0.3rem; }
+  .md-typeset .tag-levels details.tag-level > summary::after { display: none; }
   .md-typeset .tag-rows { grid-template-columns: minmax(0, 1fr); padding-inline: var(--sp-2); }
   .md-typeset .tag-rows details.tag-row > summary { grid-template-columns: minmax(0, 7.4rem) minmax(1rem, 1fr) 1.7rem; min-height: 2.2rem; }
 }

@@ -428,6 +428,33 @@ more action buttons side by side in a flex row (examples, moves, amounts) go int
 at its end; elsewhere it lays out as if it were not there (its buttons keep the actions'
 place in the row's order).
 
+**The UX round (session 34)** changed the lists, the question page's top and end, the
+paths and the tags; what follows describes the earlier layout where it differs. Since that
+round: the filters are one row of dropdown buttons (`filter-dd`, `dd-btn`, `dd-pop` in
+`_table`; `question-filter.js` opens one at a time, Escape closes, the arrows move), the
+topics are one searchable list (no "עוד נושאים"), and a row is one line on a computer
+(number, kind icon, main title, the subtitle from `split_title` in muted text, level,
+difficulty; no tags, no edge stripe, no question chip) and a two-line card on a phone.
+On the home page "how it works" is one line under the hero (`how-line`), the lone
+"all questions" section is gone (its button closes "נוספו לאחרונה"), and the
+previous/next band of the footer shows only on question pages. A question page with a box
+has a button chip in its header and a teaser row under the statement (`box_teaser`,
+`data-box-go`: opens the blocks around the first box, scrolls and focuses it); after
+"solved" an end card shows the next question of the path (`_end_card`, `q-end`); on a
+computer the five tools sit in the sticky strip (`toolsPlace` in `question-page.js`,
+`.part-nav.has-tools`; a phone and a page without parts keep the toolbar row); the strip is
+opaque; a closed solution reads "הצג פתרון · סעיף X" as an outlined button
+(`solution_summaries`, `sol-closed`); a table wider than its column scrolls inside its
+wrapper with edge fades (`is-wide`, `fade-s`, `fade-e`; `data-cards` tables stay cards on a
+phone). The metro map writes each path's name at its line's start by rule
+(`maps_metro_names`; a test checks no name touches a station, another line or another
+name), shows a station card on hover, focus and tap (`mm-card`), and a hint with edge fades
+while it scrolls (`mm-more`, `mm-fade`). The paths page lists the paths as rows
+(`_path_rows`, `path-row`, with the reader's progress and start / continue / done); the
+tags page keeps the graph, then a row of level and difficulty tags and one list of topics
+sorted by count (`_tag_grid`, `tag-rows`; the `#tag:` anchors are unchanged). A level
+page's title comes from its header band (`_lists_top`), not the file name.
+
 The question tables on the home and level pages (UI322, UI323) have a search field (the
 title, the topics in both names and the id: "46" finds 0046), **segmented filters** (one
 choice per group: level on the all-questions table, difficulty, kind, and the reader's own
@@ -779,6 +806,9 @@ follow the light / dark switch automatically:
 | `cc-*` (stylesheets/questions/0107-concat.css; the number line `cc-line` with `cc-axis`, `cc-tick`, `cc-tl`, `cc-dot`, `cc-lead`, `cc-lab` (a rect and `cc-num`), `cc-place` and `cc-pl`, the box's pair as `is-a` / `is-b`; `cc-key-*`; the box's tables `cc-rows`, `cc-ptab`, `cc-ctab` with `cc-join`, `cc-it`, `cc-diff`, `cc-res`, `cc-verdict`, `cc-head`, `cc-note`, `cc-err`) | Largest number from concatenation (0107, q0107.py `number_line` / `line_legend` and explorer/concat.js): each value a / (10^|a| - 1) a blue dot on the line, the numbers in a row under it in that order joined to their dots, the place in the answer in a violet disc; in the box the pair's a blue and b orange, the numbers of a join in alternating light blue, and the first digit where a join falls from the answer in magenta-red. |
 | `cf-*` (stylesheets/questions/0109-carfleet.css; the fleet colours `cf-c0` .. `cf-c5` (setting `--cf` for marks and `--cft` for text); the road `cf-road` with `cf-lane`, `cf-tickl`, `cf-goal`, `cf-flag`, `cf-car` (a rect or a circle and its text, `is-done`), `cf-arrow`; the graphs `cf-graph` with `cf-target`, `cf-free`, `cf-path`, `cf-meet` (`is-past` in the box), `cf-ghost`, `cf-lab`, `cf-carno`, `cf-now`, `cf-dot`; `cf-key-*`; the box's `cf-wrap` (`cf-roadwrap`, `cf-graphwrap`), `cf-tabwrap`, `cf-tab`, `cf-row` + `is-new` / `is-in`, `cf-sw`, `cf-note`, `cf-err`) | Car fleets (0109, q0109.py `road_svg` / `graph` / `graph_legend` and explorer/carfleet.js): every fleet (in part b's graph every car) in one of six palette colours, its free line thin and dashed, its real path bold; the meetings white rings with a dark outline (dark once past in the box), a crossing that comes too late a dashed hollow ring, the target a dark dashed line; in the box's tables the rows of cars already arrived or caught in a light blue tint, a new fleet in bold. |
 | `kf-*`, `kf2-*` (stylesheets/questions/0108-kflip.css; the figures `kf-cover` and `kf-grid` with `kf-cell` + `kf-one` / `kf-band` / `kf-corner`, `kf-bit`, `kf-idx`, `kf-lab`, `kf-col`, `kf-nostart`, `kf-bar` + `kf-old` / `kf-new`, `kf-sq`, `kf-arrow`; the bit rows `kf-w` / `kf-b` + `kf-one` / `kf-first`; `kf-key-*`; the row box's `kf-rowwrap`, `kf-tab`, `kf-ix`, `kf-bit`, `kf-win` + `is-open` / `is-new` / `is-closed`, `kf-x` + `is-start` / `is-ok` / `is-bad`, `kf-sum`, `kf-state`, `kf-note`, `kf-err`; the grid box's `kf2-boardwrap`, `kf2-board`, `kf2-cell` + `is-band` / `is-bad` / `is-cur`, `kf2-sq` + `is-new`, `kf2-side`, `kf2-mini`, `kf2-m` + `is-out` / `is-corner`, `kf2-note`) | Flips of k consecutive bits (0108, q0108.py `forcing_svg` / `scan_table` / `trace_table` / `grid_svg` / `corners_svg` and their legends, and explorer/kflip.js): a 1 in a light blue tint with a blue outline, the first 0 of a row outlined orange; the window being chosen violet, the windows already open light blue, the others dashed grey; the cells where no window or square can start in a grey tint; a chosen square a violet frame with a dot at its corner, the corners of d in a violet tint; a bit checked and found 1 a green check, a bit left 0 a magenta-red cross. |
+| `qh-box-go`, `box-teaser` (`bt-*`), `q-end` (`qe-*`), `has-tools`, `pn-step-long` / `pn-step-short`, `sol-closed`, `is-wide` / `fade-s` / `fade-e` | The UX round's question page (29-question-ux.css): the box chip and teaser, the end card, the tools in the sticky strip, the closed solution's button text, a scrolling wide table |
+| `filter-dds`, `filter-dd`, `dd-btn` (`is-on`), `dd-val`, `dd-chev`, `dd-pop`, `dd-list`, `filter-status`, `fc-more`, `q-sub`, `how-line` | The UX round's lists and home page (30-lists-ux.css): the dropdown filters, the status line, a row's subtitle, the one-line steps |
+| `mm-lname`, `mm-view`, `mm-fade`, `mm-more`, `mm-card` (`mm-card-*`, `is-touch`, `is-above`), `metro.is-wide`, `path-rows`, `path-row` (`pr-*`), `tag-index`, `tag-head`, `tag-levels`, `tag-level`, `tag-rows`, `tag-row` (`tr-name`, `tr-bar`) | The UX round's maps (31-maps-ux.css): names and the station card on the metro map, its scroll hint, the paths as rows, the tags page's lists |
 | `sf-box`, `sf-controls`, `sf-lanes`, `sf-play`, `sf-scroll`, `sf-fig` (`sf-ci`, `sf-page`) with `sf-node`, `sf-name`, `sf-sub`, `sf-edge`, `sf-head`, `sf-lab`, the lanes `sf-L-all` / `sf-L-full` / `sf-L-fast` / `sf-L-done`, and the run `sf-anim`, `sf-run`, `sf-lit` | The diagrams of the page on how the site is built (28-site-flow.css, `tools/figures/site_flow.py`): the lane buttons and the animation switch (pure CSS, `:has`), the static figure, and its decorative SMIL copy, hidden under reduced motion |
 | `qchip` (`qc-pins`, `qc-body`, `qc-die`, `qc-on`, `qc-dot`; `qchip-s` small), `qh-emblem-chip`, `qh-pn`, `q-idn` | A question's own chip (`question_chip` in the hook, 22-circuit.css): one pin a side per part and its id's bits on the die, in the lists and the question header, with its label DVQ‑&lt;id&gt; |
 | `cx-ico`, `--cx-traces` / `--cx-clock`, `--led-off` | The circuit layer (22-circuit.css, `circuit.js`): the icosahedron canvas of the home hero and the level bands (a still drawing since session 33), the trace and clock masks, the unlit LED of the difficulty chips |
