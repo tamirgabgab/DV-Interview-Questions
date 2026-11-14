@@ -1375,8 +1375,31 @@ below start at item 112 (session 31).
     138929e took the full lane although its branch run had passed: the Actions API's
     `status=success` filter left out that run (and the branch's two latest passing runs)
     over an hour later. Both gate queries (`verified` and the fast lane's base) now list the
-    runs without that filter and keep `conclusion == "success"` in jq. On the branch; not
-    yet on `main` (the owner decides).
+    runs without that filter and keep `conclusion == "success"` in jq. On `main` (9272a06,
+    2026-11-14): that run was the fix's own test, and took the short lane (gate, build,
+    deploy; under 2 minutes).
+208. **UX/UI review in three stages (session 34, 2026-11-14).** The owner's prompt: review
+    from screenshots (11 pages, 1440 px light and 390 px dark, scrolled to the end) with
+    impeccable (critique), ui-ux-pro-max and web-design-guidelines; up to ten ranked
+    proposals; a before/after example on one page for the chosen ones; nothing implemented
+    before approval. Stages 1 and 2 are done (an independent subagent did impeccable's
+    design review, 26/40 on Nielsen's heuristics; its detector needs the owner's permission
+    and did not run). The ten proposals, waiting for the owner's choice: (1) a real stepping
+    figure in the hero instead of the chip art; (2) the "interactive" chip of a question
+    opens and scrolls to its box, and lists mark questions with a box; (3) an end card after
+    "solved" and "continue where you stopped" on the home page; (4) one-line list rows with
+    the subtitle as a hook, one filter row; (5) drop the "how it works" cards, the lone
+    "all questions" section and the previous/next band outside question pages; (6) path
+    names on the metro map's lines, a question's title on hover or tap, an edge fade;
+    (7) path cards as rows, one sorted tag list; (8) a shorter question header (the tools
+    into the sticky strip); (9) an opaque sticky strip and a solution button that does not
+    look like a hint; (10) wide tables in solutions scroll or widen. Defects found, not
+    fixed yet: a level page's title is "Index" (the header while scrolling and the browser
+    tab); the path card "אילוצים ואקראיות ב-SystemVerilog" clips its title to "rilog"; to
+    check: a "¶" beside headings on a phone, tiny labels in 0040's FSM figure on a phone.
+    Capture note: in the sandbox the site's service worker fetches the CDN scripts itself,
+    so MathJax and WaveDrom stay raw on pages loaded after the first; use
+    `service_workers="block"` in a Playwright context that routes the CDN to local copies.
 
 ---
 
