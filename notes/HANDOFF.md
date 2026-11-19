@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-11-06 (session 33)_
+_Last updated: 2026-11-19 (session 35)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -1443,15 +1443,11 @@ below start at item 112 (session 31).
 
 ## In progress
 
-- **Session 33 (2026-11-07):** questions 0094 to 0099, 0022 and 0100, and 0037 replaced
-  by the edit distance (work log items 165 to 173); the site has 100 questions, ids 0001 to
-  0100 with no gap. 0022, 0100 and the new 0037 are on the branch, not yet on `main`.
-- **Session 33 (2026-11-06):** the repository's files reorganized (work log item 164):
-  the notes in `notes/`, the requirements in `requirements/`, `tools/` split into
-  `checks/`, `build/` and `authoring/`, the questions' own stylesheets in
-  `docs/stylesheets/questions/`, and this file shortened (`HANDOFF-archive-2.md`).
-- **Session 32 (2026-11-01 to 2026-11-06):** questions 0072 to 0093, videos, the UX
-  rounds; see the work log items 117 to 163. All on `main`.
+- **Session 35 (2026-11-19):** a review of the site and of this file, no site change; the
+  tasks it produced are under "Open items", "Next steps (session 35)". Work log item 212.
+- **State:** `main` and the work branch are both at dd9e984 (2026-11-14) plus the notes of
+  session 35; the site has 109 questions (ids 0001 to 0109, no gap), 202 boxes, and every
+  session 31 to 34 item is on `main`.
 - **Waiting on the owner:** YouTube links of the videos made in the owner's other project
   (add them as `video:`, notes/VIDEOS.md); the giscus ids (README, Comments) in `extra.comments` of `mkdocs.yml`; checks of
   the live site at 390 px and on a desktop, light and dark (github.io is not reachable
@@ -1461,6 +1457,133 @@ below start at item 112 (session 31).
   later are in `HANDOFF-archive-2.md` ("In progress notes").
 
 ## Open items
+
+### Next steps (session 35, 2026-11-19)
+
+The owner asked for a review of the site and of this file and for the next steps as tasks
+for the coming days. Every number below was measured in session 35 on a local build of
+dd9e984 (work log item 212). Nothing here is implemented yet; the order is the proposed
+order of work. Sizes: S up to an hour, M half a day, L a day or more.
+
+**N1. Housekeeping first (S each, one short session):**
+- [ ] N1.1 The weekly workflow is red since 2026-11-16 (run 43904002880, external-links):
+  "269 checked, 1 broken, 82 refused the robot". The one broken link is the site's own
+  canonical URL of 0006, which answered 503 once; the 82 refusals are all the per-page edit
+  links on github.com (429). `check_links.py` `fetch()` returns a 5xx at once (only 403,
+  404, 405, 429, 500 and 501 on HEAD go on to GET, and nothing is retried). Fix: retry a
+  5xx or a network error twice with a pause; do not fetch URLs under `site_url` (the
+  internal check covers them) and fetch one `/edit/main/` link, not one per page.
+- [ ] N1.2 Issue 4 (opened by the weekly workflow, 2026-11-16): Verilator v5.054 is out.
+  Bump `VERILATOR_REF` in deploy.yml to the tag and `VERILATOR_RELEASE` in weekly.yml, run
+  every testbench (0011 and the 0014 subclass are the two that needed the development
+  commit), then close the issue. This also closes the older open item under "Content".
+- [ ] N1.3 This file is 2,600 lines. Move the work log items 112 to 190 and the eight
+  "Review round" sections (all done except the lines listed under N7) to
+  `HANDOFF-archive-3.md`; keep the decisions, the last twenty work log items, the open
+  items and the technical notes.
+- [ ] N1.4 Lock the build. `requirements/site.txt` and `dev.txt` pin six top-level packages;
+  everything below them (Jinja2, Markdown, pymdown-extensions, ...) floats. Material for
+  MkDocs 9.7 is the last feature line and its promised fixes ran to 2026-11-05 (the team
+  moved to Zensical; MkDocs 2.0 drops plugins and hooks). The site is static, so nothing
+  breaks today, but a floating dependency can break the build later with no upstream fix.
+  Add a full lock (`pip freeze` of a passing CI run, as a constraints file used by every
+  `pip install` in both workflows). Not now, only a note: moving off MkDocs means porting
+  `hooks/questions.py` (2,200 lines of hook events); try a Zensical build on a copy before
+  deciding anything.
+
+**N2. Page weight (M, one to two sessions; no visible change):**
+- Measured: every page loads `stylesheets/site.css`, 816 KB (144 KB gzip), not minified
+  (120 KB of it is comments), and Chromium's CSS coverage shows 7% of it used on the home
+  page, 10% on 0033 with every fold open and 5% on all/. It joins the 31 parts (590 KB) and
+  all 54 per-question sheets (242 KB). Every page also loads all 20 site scripts (324 KB
+  unminified): home.js, hero-board.js, home-extras.js, maps.js, level-page.js and
+  question-filter.js on question pages, question-page.js, run-python.js and video.js on the
+  home page. The explorer scripts are already loaded per page by the hook.
+- [ ] N2.1 Minify `site.css` when the hook joins it (comments and white space; a regex pass
+  or `rcssmin`, no new build step), and compare the computed styles of the 21 pages of work
+  log item 205 before and after.
+- [ ] N2.2 Per-question sheets only on the pages that use them, keyed by box kind, not by
+  page id (0044-kapn.css serves 0012 and 0044; 0019 uses 0018's sheet). The hook already
+  knows a page's kinds.
+- [ ] N2.3 Split the joined file by page type (core; question page; home, lists and maps)
+  and the scripts likewise, added by the hook as the explorer scripts are.
+- [ ] N2.4 Remove the rules the UX round left dead (work log item 209): `how-it-works`,
+  `hw-*`, `catalog-link`, `filter-panel`, `topics-*`, `q-meta`, `q-topic`, `mm-tip`,
+  `tag-grid`, `tag-chip` (45 uses in the parts; `how-it-works`, `hw-` and `topics-` still
+  appear in the hook, the scripts or the pages, so check each name before removing) and
+  their pairs in `check_contrast.py`.
+- [ ] N2.5 A budget in `check_phone.py` beside the HTML weight: CSS and script bytes
+  fetched per page, a warning over the number N2.1 to N2.3 reach.
+
+**N3. Found by a search engine and shared (S to M):**
+- [ ] N3.1 All 109 question pages carry the same `<meta name="description">` (the site's).
+  Write it per page from the statement's first sentence (the search text the hook already
+  builds, TeX removed), about 150 characters.
+- [ ] N3.2 No structured data. Add JSON-LD per question (`LearningResource` with the level,
+  the topics and `inLanguage: he`, and a `BreadcrumbList`), written by the hook.
+- [ ] N3.3 `sitemap.xml` gives every page the build date as `lastmod`; use the page's
+  `added` date or its last commit date.
+- [ ] N3.4 Owner: register the site in Google Search Console (a verification meta tag in
+  `overrides/main.html`) and submit the sitemap; a project site cannot serve its own
+  `robots.txt`. Then check on the live site that the social cards (`og:image`) are there:
+  local builds switch them off.
+
+**N4. What the collection holds (the owner decides, then L):**
+- Measured from the front matter: by kind, code 41, math 28, puzzle 17, dv 12, design 11,
+  so 23 of 109 questions are DV or hardware on a site named for DV interviews. Tags: uvm 2,
+  sva 2, coverage 3, assertions 1, cdc 1, fifo 2. The home page's level cards promise
+  "UVM מתקדם, SVA, סגירת כיסוי, דיבאג" for senior and "יסודות UVM, כתיבת טסטים ו-checkers"
+  for junior; there is no debug question at all. "Question variety" below has said so
+  since session 27 (UVM in depth, debug, verification planning).
+- [ ] N4.1 Proposal: a DV-core round of about ten questions. Candidates: "find the bug"
+  pages (a short buggy RTL block or testbench with its waveform; the WaveDrom viewer of
+  item 113 fits), UVM factory overrides, sequences and virtual sequences, phases and
+  objections, RAL; SVA beyond the handshake (overlapped against non-overlapped
+  implication, `$past`, `disable iff`, a liveness bound); coverage (crosses, `ignore_bins`,
+  transition bins); CDC (two-flop, pulse and handshake synchronizers); a verification plan
+  for a small block (FIFO, arbiter). Ask the owner which, as always.
+- [ ] N4.2 Or, and at least: reword the level cards so they describe what is there.
+- [ ] N4.3 Difficulty tells little: 84 of 109 are "medium" (junior: 1 easy, 64 medium,
+  4 hard), so the difficulty filter, the interview builder and the lists' dots barely
+  separate questions. Proposal: a re-grading pass with the owner's criteria (front matter
+  only; the lists and the catalog follow).
+- [ ] N4.4 Levels: student 14, junior 69, senior 26. New questions for the student shelf
+  would balance it; X377, X378, X385, X389, X392, X403 and X404 in
+  `HANDOFF-archive-2.md` are student-level proposals not yet used.
+
+**N5. The question header on a phone (S):**
+- [ ] At 390 px the chip row of the header wraps on 92 of 109 pages, and on 64 of them the
+  second row holds only one or two icons (the box button, the "tested" check); the "השאלה"
+  heading starts at a median of 514 px of an 844 px screen (min 412, max 555; measured with
+  the sandbox's fallback font, so check with Rubik on the live site). This is the offer of
+  work log item 210 that was not answered: the kind chip as an icon only on a phone, or
+  the "tested" check moved into the meta line.
+
+**N6. Front-end audit (impeccable audit, web-design-guidelines, ui-ux-pro-max):**
+- [ ] The audit was still running when this was written; its findings go here.
+
+**N7. Carried over from earlier sessions (still open, see the sections below):**
+- [ ] 0036: the LFSR box is 1508 px at 1920 x 1080 and the page's review items (part b step
+  3 reduces modulo the wrong polynomial, hint 2, the proof's bit order, no RTL module, SVA
+  or state coverpoint) were all deferred in round 7.
+- [ ] Boxes taller than one screen: 0019 (1201 px), 0048 with the reflection on (1120,
+  1221 in free-stops mode), 0012's kapbase boxes (1091, 1093); the cake boxes have 7 px of
+  margin.
+- [ ] Figure labels under 11 px on a phone (0028, 0044 first).
+- [ ] The NBSP before a colon on the older pages (round 5, R0), and a lint rule for it.
+- [ ] 0087: the rim of a lit bulb in the dark scheme (1.3:1).
+- [ ] Topic names for graphs, topological sort, trie and LPM in TOPICS (0102, 0103).
+- [ ] 0004's Mermaid flowchart shows "?" first in two labels.
+- [ ] Hardware and DV additions not done by the owner's choice in round 8: 0014 a
+  covergroup, 0012 an exhaustive BCD check, 0044 and 0002 per-clock tables and SVA.
+- [ ] Flaky: check_inputs on 0101 (once, 2026-11-14).
+- [ ] Owner: the giscus ids, the YouTube links of the videos.
+
+**N8. CI time (optional, M):**
+- [ ] The full lane takes 34 minutes (run 43644406759): tests 11, the phone check 12, and
+  four explorer shards of about 22 each (clicks 10 to 12, jumps 4, inputs 5), which set the
+  total. Options: eight shards, or on a branch run only the boxes of the kinds a push
+  touched (the full set stays on `main`).
 
 ### Owner decisions
 
