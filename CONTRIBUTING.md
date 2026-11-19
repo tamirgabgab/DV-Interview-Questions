@@ -442,7 +442,8 @@ has a button chip in its header and a teaser row under the statement (`box_tease
 `data-box-go`: opens the blocks around the first box, scrolls and focuses it); after
 "solved" an end card shows the next question of the path (`_end_card`, `q-end`); on a
 computer the five tools sit in the sticky strip (`toolsPlace` in `question-page.js`,
-`.part-nav.has-tools`; a phone and a page without parts keep the toolbar row); the strip is
+`.part-nav.has-tools`; a phone and a page without parts keep the toolbar row; the strip of a
+page with parts is in the built page, see "Nothing moves while a page loads" below); the strip is
 opaque; a closed solution reads "הצג פתרון · סעיף X" as an outlined button
 (`solution_summaries`, `sol-closed`); a table wider than its column scrolls inside its
 wrapper with edge fades (`is-wide`, `fade-s`, `fade-e`; `data-cards` tables stay cards on a
@@ -629,6 +630,33 @@ so the ring is there from the first frame). The question header is a card: the t
 row of chips, the topics as chips (`.qh-tag`) with the date and the source, and the page
 tools along its foot with their names on a screen with a pointer.
 
+**Nothing moves while a page loads** (session 35, `33-steady-load.css`). What a script used
+to add after the load is in the built page, and what a script still moves has its place kept:
+the row of part chips (`_part_row` and `part_row` in the hook; `partBar` in
+`reading-tools.js` only wires it, and builds the fixed row of a page without parts), the
+header card of such a page (`.qh-parts`: on a computer its tools do not show in the card and
+the row keeps their height until `toolsPlace` has moved them), the folded list of the side
+navigation with its button (`nav_fold`; `foldLevel` wires it) and the home page's interview
+builder (in the page from the start, its lines with a minimum height; hidden without scripts
+by `html:not(.dvq-js)`, a class set by an inline script in the head, `overrides/main.html`).
+A new part that a script adds above the fold follows the same rule. Measure with the Layout
+Instability API (`new PerformanceObserver(...).observe({ type: "layout-shift" })`) at 390,
+820 and 1440 px. What still moves is MathJax laying out inline math (`notes/HANDOFF.md`, N9).
+
+A phone's question header (`29-question-ux.css`, up to 44.9375em): the kind chip, the box chip
+and the "tested" badge are their icons (the words stay for a screen reader and as tooltips),
+so the chip row keeps to one line; the meta line wraps to a second line, without its
+`DVQ-<id>` label, and the date (`.qh-date`) stays in one piece.
+
+The accessibility round of session 35 (`32-access.css`): under `forced-colors: active` the
+icons drawn as a mask over a background colour take the system's text colour (a new mask
+icon goes into that block); under `pointer: coarse` every field's text is 16 px at least
+(iOS zooms the page on a smaller one); on a screen up to 30em high the part row does not
+stick (`shortScreen` in `reading-tools.js` then counts no height for it). The drawer's button
+is a named button in the tab order (`drawerButton` in `layout.js`), the line numbers of code
+blocks are links out of the tab order (`line_links` in the hook), and the run panel's code
+field keeps Tab for indenting and lets go after Esc (the `.py-keys` line says so).
+
 The desktop layout (`14-layout.css`, `layout.js`, from 76.25em; the table of contents grip
 from 60em): the grid is at least 61rem and up to 80% of the screen wide; the side list of a
 level's questions is folded to the page's own question behind a button with the count and
@@ -807,6 +835,7 @@ follow the light / dark switch automatically:
 | `cf-*` (stylesheets/questions/0109-carfleet.css; the fleet colours `cf-c0` .. `cf-c5` (setting `--cf` for marks and `--cft` for text); the road `cf-road` with `cf-lane`, `cf-tickl`, `cf-goal`, `cf-flag`, `cf-car` (a rect or a circle and its text, `is-done`), `cf-arrow`; the graphs `cf-graph` with `cf-target`, `cf-free`, `cf-path`, `cf-meet` (`is-past` in the box), `cf-ghost`, `cf-lab`, `cf-carno`, `cf-now`, `cf-dot`; `cf-key-*`; the box's `cf-wrap` (`cf-roadwrap`, `cf-graphwrap`), `cf-tabwrap`, `cf-tab`, `cf-row` + `is-new` / `is-in`, `cf-sw`, `cf-note`, `cf-err`) | Car fleets (0109, q0109.py `road_svg` / `graph` / `graph_legend` and explorer/carfleet.js): every fleet (in part b's graph every car) in one of six palette colours, its free line thin and dashed, its real path bold; the meetings white rings with a dark outline (dark once past in the box), a crossing that comes too late a dashed hollow ring, the target a dark dashed line; in the box's tables the rows of cars already arrived or caught in a light blue tint, a new fleet in bold. |
 | `kf-*`, `kf2-*` (stylesheets/questions/0108-kflip.css; the figures `kf-cover` and `kf-grid` with `kf-cell` + `kf-one` / `kf-band` / `kf-corner`, `kf-bit`, `kf-idx`, `kf-lab`, `kf-col`, `kf-nostart`, `kf-bar` + `kf-old` / `kf-new`, `kf-sq`, `kf-arrow`; the bit rows `kf-w` / `kf-b` + `kf-one` / `kf-first`; `kf-key-*`; the row box's `kf-rowwrap`, `kf-tab`, `kf-ix`, `kf-bit`, `kf-win` + `is-open` / `is-new` / `is-closed`, `kf-x` + `is-start` / `is-ok` / `is-bad`, `kf-sum`, `kf-state`, `kf-note`, `kf-err`; the grid box's `kf2-boardwrap`, `kf2-board`, `kf2-cell` + `is-band` / `is-bad` / `is-cur`, `kf2-sq` + `is-new`, `kf2-side`, `kf2-mini`, `kf2-m` + `is-out` / `is-corner`, `kf2-note`) | Flips of k consecutive bits (0108, q0108.py `forcing_svg` / `scan_table` / `trace_table` / `grid_svg` / `corners_svg` and their legends, and explorer/kflip.js): a 1 in a light blue tint with a blue outline, the first 0 of a row outlined orange; the window being chosen violet, the windows already open light blue, the others dashed grey; the cells where no window or square can start in a grey tint; a chosen square a violet frame with a dot at its corner, the corners of d in a violet tint; a bit checked and found 1 a green check, a bit left 0 a magenta-red cross. |
 | `qh-box-go`, `box-teaser` (`bt-*`), `q-end` (`qe-*`), `has-tools`, `pn-step-long` / `pn-step-short`, `sol-closed`, `is-wide` / `fade-s` / `fade-e` | The UX round's question page (29-question-ux.css): the box chip and teaser, the end card, the tools in the sticky strip, the closed solution's button text, a scrolling wide table |
+| `qh-parts`, `qh-date`, `py-keys`, `html.dvq-js` | Session 35 (29-question-ux.css, 32-access.css, 33-steady-load.css): the header card of a page with a part row, the date of the meta line, the run panel's line about Tab and Esc, and the class an inline script in the head sets so a part that needs scripts is hidden without them |
 | `filter-dds`, `filter-dd`, `dd-btn` (`is-on`), `dd-val`, `dd-chev`, `dd-pop`, `dd-list`, `filter-status`, `fc-more`, `q-sub`, `how-line` | The UX round's lists and home page (30-lists-ux.css): the dropdown filters, the status line, a row's subtitle, the one-line steps |
 | `mm-lname`, `mm-view`, `mm-fade`, `mm-more`, `mm-card` (`mm-card-*`, `is-touch`, `is-above`), `metro.is-wide`, `path-rows`, `path-row` (`pr-*`), `tag-index`, `tag-head`, `tag-levels`, `tag-level`, `tag-rows`, `tag-row` (`tr-name`, `tr-bar`) | The UX round's maps (31-maps-ux.css): names and the station card on the metro map, its scroll hint, the paths as rows, the tags page's lists |
 | `sf-box`, `sf-controls`, `sf-lanes`, `sf-play`, `sf-scroll`, `sf-fig` (`sf-ci`, `sf-page`) with `sf-node`, `sf-name`, `sf-sub`, `sf-edge`, `sf-head`, `sf-lab`, the lanes `sf-L-all` / `sf-L-full` / `sf-L-fast` / `sf-L-done`, and the run `sf-anim`, `sf-run`, `sf-lit` | The diagrams of the page on how the site is built (28-site-flow.css, `tools/figures/site_flow.py`): the lane buttons and the animation switch (pure CSS, `:has`), the static figure, and its decorative SMIL copy, hidden under reduced motion |
@@ -882,6 +911,7 @@ DVQ_SLOW=1 python tools/checks/run_tests.py 95   # also the slow tests (0095's e
 python tools/checks/check_links.py           # internal links and anchors of the built site
 python tools/checks/check_links.py site --external   # also fetch every external link (the weekly workflow)
 python tools/checks/check_phone.py           # every built page at 390 px: no sideways scroll, no JS errors
+python tools/checks/check_phone.py --touch   # with a touch screen, as CI runs it
 python tools/checks/check_phone.py --scheme dark   # the same in dark mode (CI: manual run with phone_dark)
 python tools/checks/check_phone.py --axe node_modules/axe-core/axe.min.js   # plus axe-core (npm install axe-core)
 python tools/checks/check_explorers.py       # every explorer box clicked through, its link and remembered state
@@ -993,6 +1023,10 @@ compositing translucent colours over the page: text needs 4.5:1, marks 3:1. It r
 test job of CI, so a colour that reads badly stops the deploy. A new pair goes into
 `PAIRS`.
 
+`check_phone.py --touch` opens the pages with a touch screen, as a phone has, so the rules
+under `(pointer: coarse)` and `(hover: none)` are what it measures (the 16 px fields, the 44 px
+targets); CI runs it that way. Without it the page is a narrow window with a mouse.
+
 `check_phone.py` also loads every page a second time with its text enlarged 1.3 times
 (`--font-scale`, 0 skips it), as a phone's text-size setting enlarges it, and fails when the
 page is then wider than the screen: Android Chrome zooms such a page out and shows the
@@ -1026,7 +1060,11 @@ interactive stop must have a name and a focus ring while `:focus-visible`, the f
 must be the skip link and the walk must end; the theme's header, drawer, search and footer
 are walked but not judged. On the question page it presses the keys of the components:
 Enter on a hint and on a fold, the arrows in a box, Enter and Escape on the enlarge button
-and the lightbox, Enter on "▶ להרצה", and "/" for the search. A
+and the lightbox, Enter on "▶ להרצה", Tab and Esc in the run panel's code field (the editor,
+and the textarea it replaces on a second load with the editor's bundle cut off), and "/" for
+the search. On every walked page the navigation drawer's button must be a named button that
+opens the drawer with Enter and closes it with Escape, and on the question page no line
+number of a code block may be a tab stop. A
 new keyboard behaviour of a component belongs there. MathJax's contextual menu is off
 (`docs/javascripts/mathjax.js`): with it every formula was a tab stop. The first question
 page with a tutorial video is walked too, and its dialog checked by keyboard: Enter on the

@@ -4,11 +4,11 @@ Written in session 35 (2026-11-19) from the review of the site. The tasks themse
 their measurements and file references, are in [`HANDOFF.md`](HANDOFF.md) under "Open
 items", "Next steps (session 35)", N1 to N8; this file only groups them into rounds, in
 the proposed order of work, so the owner and the session can go through them one at a
-time. Nothing here is implemented yet.
+time. Rounds 1 to 3 are done (session 35); rounds 4 to 8 are not started.
 
 How to use it: before a round, read its row and its section, answer the open questions,
 then tick the round's tasks in `HANDOFF.md` as they are done and write the outcome in the
-"Status" line here.
+"Status" line here. Rounds 1 to 3 are done.
 
 The model columns are a judgment by the kind of work and its risk, not a measurement of
 cost or quality. The cheaper model is expected to do the work when it gets one task at a
@@ -46,22 +46,25 @@ Round 8 can be split: 0036 on the recommended model, the rest on the cheaper one
 
 - The measurements are a subagent's; reproduce each before fixing it.
 - Open questions: turn `anchor_linenums` off, or keep the links and take them out of the
-  tab order (N6.7)?
-- Status: not started.
+  tab order (N6.7)? Answered by the work: the links stay, with `tabindex="-1"`.
+- Status: done in session 35 (2026-11-20), work log item 214 of `HANDOFF.md`. Left for the
+  owner: a try of N6.8 on an iPhone.
 
 ### Round 3. The question header and layout shifts
 
 - Open questions: the kind chip as an icon only on a phone (offered in work log item 210,
   not answered), or the "tested" check moved into the meta line? May the meta line wrap to
-  two lines on a phone?
-- Status: not started.
+  two lines on a phone? The owner (2026-11-19): the kind chip as an icon, and the line wraps.
+- Status: done in session 35 (2026-11-20), work log item 215 of `HANDOFF.md`. The largest
+  layout shift left is MathJax's (N9.1), which fits round 4.
 
 ### Round 4. Page weight
 
 - No visible change is intended; compare computed styles before and after, as in work log
   item 205.
 - Open questions: none before starting; the split by page type (N2.3) is shown to the
-  owner as numbers before it goes to `main`.
+  owner as numbers before it goes to `main`. New from round 3: math rendered at build time
+  (N9.1) removes the MathJax download and the largest layout shift; which renderer?
 - Status: not started.
 
 ### Round 5. Search and sharing

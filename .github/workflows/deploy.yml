@@ -240,7 +240,8 @@ jobs:
           python -m pytest -q tests/tools/test_search_text.py
       # Every page at 390 px with all blocks open: no sideways scroll, no script errors.
       # axe-core runs on each page too: a serious or critical violation fails, and so does SVG
-      # text under 9 px.
+      # text under 9 px. --touch: the pages are opened with a touch screen, as a phone has, so
+      # their (pointer: coarse) and (hover: none) rules are what is measured.
       - name: Install Playwright, Chromium and axe-core for the phone check
         if: needs.gate.outputs.verified != 'true' && (needs.gate.outputs.fast != 'true' || needs.gate.outputs.pages != '')
         run: |
@@ -251,11 +252,11 @@ jobs:
           npm install --no-save --no-audit --no-fund axe-core@4.14.0
       - name: Check every page at phone width
         if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
-        run: python tools/checks/check_phone.py site --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
+        run: python tools/checks/check_phone.py site --touch --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
       # The fast lane: only the pages whose prose changed, with screenshots to look at.
       - name: Check the touched pages at phone width
         if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast == 'true' && needs.gate.outputs.pages != ''
-        run: python tools/checks/check_phone.py site --only "${{ needs.gate.outputs.pages }}" --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
+        run: python tools/checks/check_phone.py site --touch --only "${{ needs.gate.outputs.pages }}" --shots phone-shots --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
       # The 404 page as GitHub Pages serves it (under the site's path), at both widths, and a
       # keyboard pass over a few pages: the tab order, visible focus, names, and the keys of
       # the hints, folds, boxes, figures, the run panel and the search.
@@ -280,7 +281,7 @@ jobs:
       # Dark mode on request only (Actions → Run workflow → phone_dark), it doubles the check time.
       - name: Check every page at phone width in dark mode
         if: github.event_name == 'workflow_dispatch' && inputs.phone_dark
-        run: python tools/checks/check_phone.py site --scheme dark --shots phone-shots-dark --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
+        run: python tools/checks/check_phone.py site --touch --scheme dark --shots phone-shots-dark --axe node_modules/axe-core/axe.min.js --axe-fail --small-fail
       - uses: actions/upload-artifact@v7
         if: always() && github.event_name == 'workflow_dispatch' && inputs.phone_dark
         with:

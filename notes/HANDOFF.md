@@ -4,7 +4,7 @@ Living task list for this repository: what was done, what is in progress, and wh
 next. Update it at the end of every work session so anyone (human or AI) can pick up
 where the last session stopped.
 
-_Last updated: 2026-11-19 (session 35)_
+_Last updated: 2026-11-20 (session 35)_
 
 **Live site:** <https://tamirgabgab.github.io/DV-Interview-Questions/>
 
@@ -378,16 +378,84 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
     was cancelled by the push of the lock three minutes in; the second covered all four
     commits.
 
+214. **Round 2 of the session 35 plan: accessibility and speed (session 35, 2026-11-20).**
+    N6.1, N6.2 and N6.6 to N6.11, each reproduced in a browser before the fix (the owner:
+    both rounds in one push to `main` once the branch run is green).
+    - N6.1: the run panel's textarea never let Tab out; it now follows the editor (Esc, then
+      Tab or Shift+Tab leaves), a shown line under the panel's note names the keys
+      (`.py-keys`), and both fields point at it with `aria-describedby` (the editor's
+      attribute is set on its `contentDOM`; the bundle was not rebuilt).
+    - N6.2: `fitWords` takes all the titles and works in rounds (read every width, then drop
+      one word from each that overflows), and `fitNav` waits for the drawer to open under
+      Material's breakpoint. Layouts on load at 390 px: 786 to 31 on the home page, 822 to
+      81 on 0033; opening the drawer costs 14. The fitted titles are identical to the old
+      algorithm's at 390, 1300 and 1920 px.
+    - N6.6: a new part, `32-access.css`: under `forced-colors: active` the site's mask icons,
+      the admonition and solution-block icons and the theme's code, tab and annotation icons
+      take CanvasText (ButtonText on a button, LinkText in a link), with `!important` over
+      the admonitions' type colours.
+    - N6.7: `line_links` in the hook gives every line number link `tabindex="-1"` (the anchors
+      stay: `core.js` finds the lines by them). axe `target-size`: 25 to 97 nodes a page down
+      to 1 (the level chip `a[title]` of the header, not touched).
+    - N6.8: measured first: 283 kinds of field on 131 pages under 16 px. One rule under
+      `(pointer: coarse)` sets `max(16px, 1em)`. `check_phone.py --touch` opens the pages with
+      a touch screen; all 131 pages pass with it locally, and CI now runs the phone check
+      that way (three steps of deploy.yml). Not tried on an iPhone: the owner is asked to.
+    - N6.9: on a screen up to 30em high the part row is static and the fixed row of a page
+      without parts is not shown; `reading-tools.js` (`shortScreen`) counts no height for it
+      and hangs no solution map from it. Covered height at 640 x 360: 111 px (31%) to 48 (13%).
+    - N6.10: `drawerButton` in `layout.js`: the label is a named button in the tab order,
+      Enter and Space toggle the drawer, the opened drawer takes the focus, Escape closes it
+      and gives the focus back, and the focus leaving the drawer closes it.
+    - N6.11: the guide's hint sits under its target (above it when it would lie on the
+      focused element), is the box's first child (the second tab stop of the box, not the
+      last) and closes on Escape from anywhere in the box.
+    - `check_keyboard.py` gained: the editor's and the textarea's Tab and Esc (the textarea
+      on a second load with the bundle cut off), the drawer's button on every walked page,
+      and no line number as a tab stop. Each new case fails on the old build.
+    - Scratch scripts of both rounds (reproductions, measurements, screenshots) were in the
+      session scratchpad (r2/, r3/, lab.py), not kept. Locally the browser is
+      `/opt/pw-browsers/chromium-1243/chrome-linux64/chrome` (`--browser`): Playwright's
+      Python package expects build 1194.
+
+215. **Round 3 of the session 35 plan: the phone header and layout shifts (session 35,
+    2026-11-20).** N5 and N6.3 to N6.5, with the owner's two answers: the kind chip as an
+    icon on a phone, and a meta line that wraps.
+    - N5, N6.3: on a phone the kind chip is a 1.5 rem circle with its icon (the name is its
+      tooltip and stays for a screen reader), so the chip row is one line on 105 of 109
+      pages (the four with the "new" badge still wrap). The meta line wraps; its `DVQ-<id>`
+      label is hidden there and the date (`.qh-date`) does not break: two lines on 98 pages,
+      three on 11 (hiding the date on a phone would give two lines on 107; not done, it
+      drops content). `a.qh-tag` is `unicode-bidi: isolate`. The statement's heading starts
+      at a median of 504 px (514 before), so the gain is what shows, not height.
+    - N6.5, measured with the Layout Instability API (`navigator.webdriver` hidden): three
+      sources on a question page, not one. (a) The part row built after the load: the hook
+      writes it (`_part_row`, `part_row`), `partBar` wires it: 0.032 to 0.0008 at 390 px on
+      0033. (b) On a computer `toolsPlace` moves the tools from the header card into the
+      row: `.qh-parts` on the card and `33-steady-load.css` give both their final shape from
+      the first paint. (c) `foldLevel` folded the side navigation's list after the load:
+      `nav_fold` writes it folded with its button: 0.11 to 0.0001 at 1440 px on 0033.
+    - N6.4: the builder is in the page from the start (`hidden` removed), `.hb-peek` and
+      `.hb-sum` keep their height, and `html:not(.dvq-js)` hides it without scripts (the
+      class comes from an inline script in the head; the theme's `.no-js` stays until its
+      bundle runs, which made the first try shift again): 0.137 to 0.0009 at 820 px.
+    - Tried and removed: fitting the path strip's titles in a script right after the strip.
+      With MathJax cut off the strip's own shift is 0.0004 to 0.005; not worth the script.
+    - Found, not fixed (N9 below): MathJax laying out inline math is now the one large shift.
+
 ---
 
 ## In progress
 
-- **Session 35 (2026-11-19):** a review of the site and of this file, no site change; the
-  tasks it produced are under "Open items", "Next steps (session 35)". Work log item 212.
-- **State:** `main` and the work branch are both at dd9e984 (2026-11-14) plus the notes of
-  session 35; the site has 109 questions (ids 0001 to 0109, no gap), 202 boxes, and every
-  session 31 to 34 item is on `main`.
-- **Waiting on the owner:** YouTube links of the videos made in the owner's other project
+- **Session 35 (2026-11-19 and 20):** a review of the site and of this file (work log
+  212), then rounds 1 to 3 of the plan in [`ROUNDS.md`](ROUNDS.md): housekeeping (213),
+  accessibility and speed (214), the phone header and layout shifts (215). Rounds 4 to 8
+  are not started; each has open questions for the owner in `ROUNDS.md`.
+- **State:** rounds 2 and 3 are on the work branch and go to `main` in one fast-forward when
+  the branch run is green (the owner's choice); round 1 is on `main` (4c88ec1). The site has
+  109 questions (ids 0001 to 0109, no gap) and 202 boxes.
+- **Waiting on the owner:** a try of a box's number field and of the lists' filter on an
+  iPhone (the page must not zoom on focus, N6.8); YouTube links of the videos made in the owner's other project
   (add them as `video:`, notes/VIDEOS.md); the giscus ids (README, Comments) in `extra.comments` of `mkdocs.yml`; checks of
   the live site at 390 px and on a desktop, light and dark (github.io is not reachable
   from the cloud sandbox); a lint rule for numbers laid out from the right was offered
@@ -401,8 +469,8 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
 
 The owner asked for a review of the site and of this file and for the next steps as tasks
 for the coming days. Every number below was measured in session 35 on a local build of
-dd9e984 (work log item 212). Nothing here is implemented yet; the order is the proposed
-order of work. Sizes: S up to an hour, M half a day, L a day or more.
+dd9e984 (work log item 212). N1, N5 and N6.1 to N6.11 are done (work log 213 to 215);
+the order is the proposed order of work. Sizes: S up to an hour, M half a day, L a day or more.
 [`ROUNDS.md`](ROUNDS.md) groups these tasks into eight rounds with the questions to settle
 with the owner before each; go through it with the owner round by round.
 
@@ -493,7 +561,7 @@ with the owner before each; go through it with the owner round by round.
   `HANDOFF-archive-2.md` are student-level proposals not yet used.
 
 **N5. The question header on a phone (S):**
-- [ ] At 390 px the chip row of the header wraps on 92 of 109 pages, and on 64 of them the
+- [x] (done, work log 215) At 390 px the chip row of the header wraps on 92 of 109 pages, and on 64 of them the
   second row holds only one or two icons (the box button, the "tested" check); the "השאלה"
   heading starts at a median of 514 px of an 844 px screen (min 412, max 555; measured with
   the sandbox's fallback font, so check with Rubik on the live site). This is the offer of
@@ -509,46 +577,46 @@ the file references; the measurements are the subagent's and are to be reproduce
 fix. Its scripts and screenshots were in the session scratchpad (audit-fe/), not kept.
 Note for every browser check: the site's scripts go still when `navigator.webdriver` is
 true, so CI never runs the motion paths or a box's first-visit guide.
-- [ ] N6.1 (P1, S) The run panel's editor traps the Tab key (WCAG 2.1.2): inside
+- [x] N6.1 (done, work log 214; P1, S) The run panel's editor traps the Tab key (WCAG 2.1.2): inside
   `.cm-content` Tab and Shift+Tab never leave; only Esc then Tab does, and the panel names
   only Ctrl+Enter. The fallback textarea (`run-python.js:227`) swallows Tab with no way
   out. 98 pages. Fix: a visible hint with `aria-describedby`, and Esc blurs the textarea.
   `check_keyboard.py` walks the page before the panel opens; add the case.
-- [ ] N6.2 (P1, S to M) `fitNav` / `fitWords` (`reading-tools.js:615`, `719`) write and then
+- [x] N6.2 (done, work log 214; P1, S to M) `fitNav` / `fitWords` (`reading-tools.js:615`, `719`) write and then
   read `scrollWidth` for each of about 135 navigation titles on every load, also when the
   drawer is closed: 815 layouts on the home page and 826 on 0033 at 390 px (64 and 71
   without the first call), about 0.7 s of blocked time at a 4x slower CPU. Fix: skip while
   the sidebar is not shown, and read all widths before writing.
-- [ ] N6.3 (P2, S) The phone header's meta line (`.qh-bottom`, `29-question-ux.css:76`) is
+- [x] N6.3 (done, work log 215; P2, S) The phone header's meta line (`.qh-bottom`, `29-question-ux.css:76`) is
   one `nowrap` line with an ellipsis that opens only on `:focus-visible`, so a touch reader
   cannot open it: cut on 109 of 109 pages at 390 px, a tag hidden or cut on 98, and on 90
   pages neighbouring Latin tags show in swapped order (the "·" of "Python" away from its
   word). Fix: `unicode-bidi: isolate` on `.qh-tag`, and let the line wrap on a phone.
   Do it with N5.
-- [ ] N6.4 (P2, S to M) The home page shifts on a tablet (CLS 0.14 at 820 x 1180): the
+- [x] N6.4 (done, work log 215; P2, S to M) The home page shifts on a tablet (CLS 0.14 at 820 x 1180): the
   builder `.hh-builder` ships `hidden` (`hooks/questions.py:1061`) and home.js shows it
   after load; the hero grows from 720 to 1274 px. Fix: render it shown, or keep its height.
-- [ ] N6.5 (P2, M) Every question page jumps about 67 px at about 0.7 s when
+- [x] N6.5 (done, work log 215; P2, M) Every question page jumps about 67 px at about 0.7 s when
   reading-tools.js builds the part row `nav.part-nav` (CLS 0.03 to 0.075 at three widths
   on 0033, 0023, 0040). Fix: the hook writes the row, or the page keeps its height.
-- [ ] N6.6 (P2, S) Forced colours (Windows high contrast): the `.ui-ico` icons are a mask
+- [x] N6.6 (done, work log 214; P2, S) Forced colours (Windows high contrast): the `.ui-ico` icons are a mask
   over `background-color` (`09-redesign.css:30`), so the five question tools, the play
   buttons and the hero's pause show as empty circles; the joined CSS has no
   `forced-colors` rule. Fix: one `@media (forced-colors: active)` block.
-- [ ] N6.7 (P2, S) `anchor_linenums` (`mkdocs.yml:100`) makes every code line number a link
+- [x] N6.7 (done, work log 214; P2, S) `anchor_linenums` (`mkdocs.yml:100`) makes every code line number a link
   and a tab stop: 48 more stops on 0033, 101 on 0023, each 16 by 18 px (axe `target-size`
   at 1440 px, 25 to 97 nodes a page). Fix: `tabindex="-1"` on them, or the option off.
-- [ ] N6.8 (P2, S) Fields under 16 px on a phone, so iOS zooms the page on focus (from the
+- [x] N6.8 (done, work log 214; P2, S) Fields under 16 px on a phone, so iOS zooms the page on focus (from the
   computed sizes; not tried on a device): the filter of all/ (14.4 px, its selects 14),
   the boxes' `.ex-num`, `.ex-seed` (14), `.ex-addr`, `.ex-len` (15) and selects (12.8), the
   run panel's editor (14.4). Fix: `max(16px, ...)` under `(pointer: coarse)`.
-- [ ] N6.9 (P2, S) The sticky header and part row take 111 px whatever the screen's
+- [x] N6.9 (done, work log 214; P2, S) The sticky header and part row take 111 px whatever the screen's
   height: 31% of 640 x 360 (200% zoom of 1280 x 720) and 28% of a phone on its side.
   Fix: the part row does not stick on a short screen (`max-height` query).
-- [ ] N6.10 (P3, S) At 1220 px and under (and at 200% zoom) the drawer's button
+- [x] N6.10 (done, work log 214; P3, S) At 1220 px and under (and at 200% zoom) the drawer's button
   `label[for=__drawer]` is not reachable by keyboard; the footer links and Ctrl+K are the
   way around today.
-- [ ] N6.11 (P3, S) A box's first-visit guide (`core.js:1057` on): the tip covers the
+- [x] N6.11 (done, work log 214; P3, S) A box's first-visit guide (`core.js:1057` on): the tip covers the
   figure's axis labels and the focused enlarge button, is last in the box's tab order and
   closes on Esc only with the focus inside it.
 - [ ] N6.12 (P3, M) 115 declarations with literal colours outside `01-base.css`, in 13
@@ -560,6 +628,25 @@ true, so CI never runs the motion paths or a box's first-visit guide.
   on a phone; boxes at 820 px; MathJax typesetting moves nothing.
 - Not checked: the video dialog (no page has a video), the service worker, web fonts
   (blocked in the sandbox), real devices and screen readers, drag gestures by touch.
+
+**N9. Found in rounds 2 and 3 (session 35), not fixed:**
+- [ ] N9.1 (P1, L) MathJax lays the math out after the load: the raw TeX shows first, then
+  the lines re-wrap, and a word that moves to another line counts as a large shift. Layout
+  shift at 820 px: 0.20 on 0061, 0.26 on 0070, 0.25 on 0104 and 0006 (0.001 to 0.004 with
+  MathJax cut off), 0.04 to 0.11 at 390 px; 29 of 131 pages were over 0.1 at 820 px. The fix
+  is math rendered at build time (MathJax in Node writing CHTML into the page, or KaTeX),
+  which also drops the MathJax download from the pages; it belongs with round 4 (page
+  weight). Ask the owner before choosing the renderer: the pages' TeX must render the same.
+- [ ] N9.2 (P3, S) The quick jump's "#" button is added to the site header by a script and
+  moves the title 48 px (0.0008).
+- [ ] N9.3 (P3, S) At 820 px something of about 33 px is added above the first hint after
+  the load (0.008 on 0033 and 0040; `details.tip` moves down, `details.success` up).
+- [ ] N9.4 (P3, S) The four newest questions (the "new" badge with its word) still wrap the
+  phone header's chip row; 11 pages have a meta line of three lines.
+- [ ] N9.5 (P3, S) axe `target-size`: one node a question page, the level chip of the
+  header (`a[title]`), at 1440 px.
+- [ ] N9.6 (owner) N6.8 on a real iPhone: focus a box's number field and the lists' filter;
+  the page must not zoom.
 
 **N7. Carried over from earlier sessions (still open, see the sections below):**
 - [ ] 0036: the LFSR box is 1508 px at 1920 x 1080 and the page's review items (part b step

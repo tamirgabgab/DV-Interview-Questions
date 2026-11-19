@@ -31,3 +31,11 @@ html:not(.dvq-js) .md-typeset .home-hero .hh-builder { display: none; }   /* wit
 @media screen and (min-width: 60em) {
   .md-typeset .home-hero .hb-sum { min-height: 2.04rem; min-height: 2lh; }
 }
+
+
+/* --- the folded list of the side navigation ------------------------------------------------------
+   The built page has the level's list folded and its button (nav_fold in the hook; the
+   rules are in 14-layout.css). Without scripts the button cannot open it: the whole list
+   shows and the button does not. */
+html:not(.dvq-js) .md-sidebar--primary .md-nav.is-folded > .md-nav__list > .md-nav__item:not(#_) { display: block; }
+html:not(.dvq-js) .md-sidebar--primary .nav-fold:not(#_) { display: none; }

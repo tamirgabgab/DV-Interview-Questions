@@ -74,6 +74,9 @@ Read `CONTRIBUTING.md` and `notes/HANDOFF.md` before a work session, and update
   code is `core.js`), tested under Node. A box keeps its figures still while it steps
   (`check_jumps.py`): a block that grows with the steps goes under the figures, or is
   marked `data-steady` (see `CONTRIBUTING.md`).
+- Nothing moves while a page loads: a part that a script adds or moves above the fold is
+  written by the hook into the built page, or a rule keeps its room (`33-steady-load.css`,
+  "Nothing moves while a page loads" in `CONTRIBUTING.md`).
 - The owner's own code is kept as sent; comments may be added, and bugs are called out to
   the owner rather than silently fixed.
 - A source file from the owner (a solution write-up with tables and formulas) is checked
@@ -89,7 +92,7 @@ python tools/checks/check_videos.py          # the video fields of the pages (Yo
 python tools/checks/run_tests.py             # pytest + Verilator (needs Verilator 5.052+ with z3)
 mkdocs build --strict                 # the build CI runs
 python tools/checks/check_links.py           # internal links and anchors of the built site
-python tools/checks/check_phone.py           # every page at 390 px (add --local-cdn in a sandbox)
+python tools/checks/check_phone.py --touch   # every page at 390 px with a touch screen, as CI runs it (add --local-cdn in a sandbox)
 python tools/checks/check_explorers.py       # every explorer box: buttons clicked, link and saved state
 python tools/checks/check_jumps.py           # every box stepped at 390, 1200 and 1920 px: no figure moves
 python tools/checks/check_inputs.py          # every box field typed into: Enter, Tab and an input method apply it
