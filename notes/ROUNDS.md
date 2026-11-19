@@ -39,7 +39,8 @@ Round 8 can be split: 0036 on the recommended model, the rest on the cheaper one
 ### Round 1. Housekeeping
 
 - Open questions: none; it can start at once.
-- Status: not started.
+- Status: done in session 35 (2026-11-19), work log item 213 of `HANDOFF.md`. Verilator
+  v5.054 passed every testbench, so the pin is the release commit.
 
 ### Round 2. Accessibility and speed
 

@@ -41,7 +41,7 @@ pushed to `main`, which publishes the site.
 | Multi-part questions  | One file, `### סעיף א/ב/ג` with a solution after each part               |
 | Owner's own code      | Kept as sent (comments added, minimal bug fixes called out to the owner) |
 | Workflow before adding | Ask the owner guiding questions first, then implement                   |
-| Tests                 | Python: full tests of the page code. SystemVerilog: Verilator built from a pinned development commit (after 5.052) with z3, so every class runs as published; a translation by intent (fingerprinted) is allowed only for a proven simulator bug, and none is needed today |
+| Tests                 | Python: full tests of the page code. SystemVerilog: Verilator 5.054 (the commit of its release tag, since session 35; a development commit after 5.052 before) built from source with z3, so every class runs as published; a translation by intent (fingerprinted) is allowed only for a proven simulator bug, and none is needed today |
 | Failing tests         | Block the deploy; the live site keeps its previous version              |
 | Run button            | Per question, Python only (Pyodide in a web worker); SV cannot run in a browser, the panel says it is checked in CI instead |
 | Position levels       | Student / Junior / Senior; the Staff level was removed on 2026-10-21 (owner: no staff questions planned) |
@@ -360,6 +360,24 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
     The tasks are under "Open items", "Next steps (session 35)", N1 to N8. This file's
     header date and "In progress" were stale (session 33) and are current again.
 
+213. **Round 1 of the session 35 plan: housekeeping (session 35, 2026-11-19).** N1.1 to
+    N1.4 of "Next steps". The weekly link check retries a 5xx or a failed connection twice
+    after a pause, leaves links under site_url to the internal check and fetches one of the
+    82 edit links for all of them (`tests/tools/test_check_links.py`, a local server that
+    answers 503 then 200). Verilator is pinned to the commit of the v5.054 tag (bbb60a4; a
+    hash, as `dev_setup.sh` reads it, which now records the commit it built in
+    `~/verilator/.ref`); the branch run built it in 7 minutes and every testbench passed on
+    it, 0011 and the 0014 subclass included; issue 4 closed. Work log items 112 to 191 and
+    the eight review rounds moved to `HANDOFF-archive-3.md` (this file 2,800 to about 900
+    lines; the 23 open review items stayed, the video re-caption notes were dropped).
+    `requirements/lock.txt` holds the 45 versions the green run of 2026-11-14 installed
+    (taken from its log), read with `-c` by site.txt and dev.txt; a pip install on Python
+    3.12 gives exactly the lock, and the build equals the live site's but for the date.
+    Found on the way: this sandbox had pymdown-extensions 12.3 while CI and the live site
+    were on 13.1 (no difference in the built pages but the date). The first branch run
+    was cancelled by the push of the lock three minutes in; the second covered all four
+    commits.
+
 ---
 
 ## In progress
@@ -389,22 +407,22 @@ order of work. Sizes: S up to an hour, M half a day, L a day or more.
 with the owner before each; go through it with the owner round by round.
 
 **N1. Housekeeping first (S each, one short session):**
-- [ ] N1.1 The weekly workflow is red since 2026-11-16 (run 43904002880, external-links):
+- [x] N1.1 (done, work log 213) The weekly workflow is red since 2026-11-16 (run 43904002880, external-links):
   "269 checked, 1 broken, 82 refused the robot". The one broken link is the site's own
   canonical URL of 0006, which answered 503 once; the 82 refusals are all the per-page edit
   links on github.com (429). `check_links.py` `fetch()` returns a 5xx at once (only 403,
   404, 405, 429, 500 and 501 on HEAD go on to GET, and nothing is retried). Fix: retry a
   5xx or a network error twice with a pause; do not fetch URLs under `site_url` (the
   internal check covers them) and fetch one `/edit/main/` link, not one per page.
-- [ ] N1.2 Issue 4 (opened by the weekly workflow, 2026-11-16): Verilator v5.054 is out.
+- [x] N1.2 (done, work log 213) Issue 4 (opened by the weekly workflow, 2026-11-16): Verilator v5.054 is out.
   Bump `VERILATOR_REF` in deploy.yml to the tag and `VERILATOR_RELEASE` in weekly.yml, run
   every testbench (0011 and the 0014 subclass are the two that needed the development
   commit), then close the issue. This also closes the older open item under "Content".
-- [ ] N1.3 This file is 2,600 lines. Move the work log items 112 to 190 and the eight
+- [x] N1.3 (done, work log 213) This file is 2,600 lines. Move the work log items 112 to 190 and the eight
   "Review round" sections (all done except the lines listed under N7) to
   `HANDOFF-archive-3.md`; keep the decisions, the last twenty work log items, the open
   items and the technical notes.
-- [ ] N1.4 Lock the build. `requirements/site.txt` and `dev.txt` pin six top-level packages;
+- [x] N1.4 (done, work log 213) Lock the build. `requirements/site.txt` and `dev.txt` pin six top-level packages;
   everything below them (Jinja2, Markdown, pymdown-extensions, ...) floats. Material for
   MkDocs 9.7 is the last feature line and its promised fixes ran to 2026-11-05 (the team
   moved to Zensical; MkDocs 2.0 drops plugins and hooks). The site is static, so nothing
@@ -677,7 +695,7 @@ Nice to have:
 - [x] ~~Wide data tables still scroll sideways on phones~~: tables of five or more columns that do not fit become cards on phones (C192, session 22).
 - [x] ~~0038: the checker missed an ack in the rise cycle~~ (fixed, work log item 151).
 - [ ] Figure labels under 11 px on phones (work log item 148): the D194 fit raises them to 9.5 px only; 11 px needs fewer value labels and more room in `charts.py`'s `tick` and `legend` and per generator (0028, 0044 first).
-- [ ] When a Verilator release newer than 5.052 is out, bump `VERILATOR_REF` to its tag and check that 0011 and the 0014 subclass still pass.
+- [x] ~~When a Verilator release newer than 5.052 is out, bump `VERILATOR_REF`~~ (v5.054, session 35, work log 213).
 
 ### Still open from the review rounds (session 34)
 
@@ -779,9 +797,10 @@ solution; do not copy text). Quality varies, so check the answers.
 ## Technical notes for whoever continues this work
 
 - SystemVerilog tests: Verilator must be newer than 5.052 (CI builds the commit in
-  `VERILATOR_REF`; the same recipe is in `README.md`) and `z3` must be on the PATH. The
-  5.052 release crashes on 0011 and mis-randomizes the 0014 subclass; the apt package
-  (5.020) has no constraint support. `run_tests.py` refuses older versions.
+  `VERILATOR_REF`, the v5.054 release tag since session 35; the recipe is in
+  `CONTRIBUTING.md`) and `z3` must be on the PATH. The 5.052 release crashes on 0011 and
+  mis-randomizes the 0014 subclass; the apt package (5.020) has no constraint support.
+  `run_tests.py` refuses older versions.
 - In a cloud sandbox without flex, `pip install verilator` (5.048, in a venv) runs most
   testbenches: wrap the binary so the C++ build gets `-CFLAGS -fcoroutines -CFLAGS
   -std=c++20`, and call `run_sv()` of `run_tests.py` directly (its version check asks for
@@ -841,7 +860,7 @@ solution; do not copy text). Quality varies, so check the answers.
   - Verilator 5.020 cannot run `randomize()` with constraints on arrays (0007); 5.052 can,
     but crashes on a `rand` array of enums in a class (0011) and leaves elements of
     constraint-sized rand dynamic arrays unrandomized in a subclass (0014). Both fixed in
-    master after 5.052 (the pinned commit in CI). z3 prints `%Warning-UNSATCONSTR` for an
+    master after 5.052, and in the 5.054 release CI uses since session 35. z3 prints `%Warning-UNSATCONSTR` for an
     unsatisfiable `randomize() with`, which the 0007 and 0011 testbenches trigger on purpose.
   - Icarus does not support `ref` ports or `break`.
   - Verilator 5.053 and assertions (round 6, 0020, 0022, 0033, 0039, 0060, 0082): the
