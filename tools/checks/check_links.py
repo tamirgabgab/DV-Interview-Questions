@@ -10,14 +10,18 @@ page uses them, from site_url) are resolved against the site root. External link
 https, mailto, ...) are not fetched unless --external is given: then every distinct
 http(s) URL is requested once (HEAD, then GET), with a browser-like User-Agent and a
 timeout; 404s, 5xx and connection failures are broken, while 403 / 429 answers (sites that
-refuse robots) are listed as warnings only. Exit status 1 when anything is broken, so it
-can run in CI after the build; the weekly workflow runs the external check.
+refuse robots) are listed as warnings only. A 5xx or a connection failure is tried twice
+more after a pause before it counts. Links to the site itself (under site_url) are left to
+the internal check, and the per-page "edit" links of the repository are fetched once, as
+one link stands for all of them. Exit status 1 when anything is broken, so it can run in
+CI after the build; the weekly workflow runs the external check.
 """
 
 from __future__ import annotations
 
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
@@ -28,6 +32,8 @@ from urllib.parse import unquote, urlsplit
 USER_AGENT = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
               "Chrome/124.0 Safari/537.36 dv-interview-questions-link-check")
 BLOCKED = {401, 403, 429, 999}      # answers that mean "no robots", not "gone"
+RETRY_PAUSES = (3.0, 10.0)          # seconds before the second and the third try of a 5xx or a failure
+EDIT_LINK = re.compile(r"^https://github\.com/[^/]+/[^/]+/edit/")   # the per-page edit links
 
 ATTRS = {"href", "src", "poster", "data", "xlink:href"}
 SKIP_SCHEMES = ("http:", "https:", "mailto:", "tel:", "data:", "javascript:")
@@ -56,7 +62,19 @@ class Collector(HTMLParser):
                         self.links.append((url, self.getpos()[0]))
 
 
-def fetch(url: str, timeout: float = 20.0) -> tuple[str, int | None, str]:
+def fetch(url: str, timeout: float = 20.0, pauses: tuple[float, ...] = RETRY_PAUSES) -> tuple[str, int | None, str]:
+    """fetch_once, tried again after each pause while the answer is a 5xx or no answer."""
+    result = fetch_once(url, timeout)
+    for pause in pauses:
+        status = result[1]
+        if status is not None and status < 500:
+            break
+        time.sleep(pause)
+        result = fetch_once(url, timeout)
+    return result
+
+
+def fetch_once(url: str, timeout: float = 20.0) -> tuple[str, int | None, str]:
     """(url, status or None, note) after a HEAD request, retried as GET when HEAD is refused."""
     for method in ("HEAD", "GET"):
         req = urllib.request.Request(url, method=method, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
@@ -74,14 +92,34 @@ def fetch(url: str, timeout: float = 20.0) -> tuple[str, int | None, str]:
     return url, None, "no answer"
 
 
-def check_external(pages: dict[Path, "Collector"], site: Path, workers: int = 8) -> int:
-    """Request every distinct external URL once; print the broken ones and the blocked ones."""
+def external_links(pages: dict[Path, "Collector"], site: Path, own: str) -> tuple[dict[str, str], int, int]:
+    """The distinct external URLs to fetch, each with the first page:line that has it, and
+    the numbers left out: links under the site's own URL `own` (the internal check covers
+    them) and the edit links beyond the first (one stands for all)."""
     where: dict[str, str] = {}
+    own_links: set[str] = set()
+    edit_links: set[str] = set()
     for page, c in pages.items():
         for url, line in c.links:
             if url.lower().startswith(("http:", "https:")) or url.startswith("//"):
-                full = "https:" + url if url.startswith("//") else url
-                where.setdefault(full.split("#")[0], f"{page.relative_to(site)}:{line}")
+                full = ("https:" + url if url.startswith("//") else url).split("#")[0]
+                if own and full.startswith(own):
+                    own_links.add(full)
+                    continue
+                if EDIT_LINK.match(full):
+                    edit_links.add(full)
+                    if len(edit_links) > 1 and full not in where:
+                        continue
+                where.setdefault(full, f"{page.relative_to(site)}:{line}")
+    return where, len(own_links), max(len(edit_links) - 1, 0)
+
+
+def check_external(pages: dict[Path, "Collector"], site: Path, workers: int = 8) -> int:
+    """Request every distinct external URL once; print the broken ones and the blocked ones."""
+    where, own, edits = external_links(pages, site, site_url(site))
+    if own or edits:
+        print(f"left out: {own} links to the site itself (checked as internal links), "
+              f"{edits} more edit links (one is fetched)")
     broken, blocked = [], []
     with ThreadPoolExecutor(max_workers=workers) as pool:
         for url, status, note in pool.map(fetch, sorted(where)):
@@ -97,15 +135,21 @@ def check_external(pages: dict[Path, "Collector"], site: Path, workers: int = 8)
     return len(broken)
 
 
-def site_prefix(site: Path) -> str:
-    """The path of site_url ("/DV-Interview-Questions/"), from the canonical link of the home page."""
+def site_url(site: Path) -> str:
+    """site_url ("https://.../DV-Interview-Questions/"), from the canonical link of the home
+    page; "" when the home page has none."""
     index = site / "index.html"
     if index.exists():
         m = re.search(r'<link rel="canonical" href="([^"]+)"', index.read_text(encoding="utf-8", errors="replace"))
         if m:
-            path = urlsplit(m.group(1)).path
-            return path if path.endswith("/") else path + "/"
-    return "/"
+            url = m.group(1)
+            return url if url.endswith("/") else url + "/"
+    return ""
+
+
+def site_prefix(site: Path) -> str:
+    """The path of site_url ("/DV-Interview-Questions/")."""
+    return urlsplit(site_url(site)).path or "/"
 
 
 def main(argv: list[str]) -> int:
