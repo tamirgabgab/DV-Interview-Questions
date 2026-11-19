@@ -1439,6 +1439,20 @@ below start at item 112 (session 31).
     table from the pages' `video:` ids; `notes/VIDEOS.md` is now a short how-to. No page has
     a `video:` field yet. Note: the old files stay in the git history (no history rewrite).
 
+212. **A review of the site and of this file; the next steps (session 35, 2026-11-19).** The
+    owner asked for a pass over the site and the handoff, with the skills where useful, and
+    for the findings as tasks for the coming days. Nothing on the site changed. Done: a
+    local strict build of dd9e984; sizes of the built pages, the joined CSS and the scripts;
+    Chromium CSS coverage on three pages; screenshots at 1440 px light and 390 px dark; the
+    front matter of the 109 pages counted by kind, level, difficulty and tag; the head of a
+    built page (description, canonical, structured data); the last CI runs and the open
+    issue on GitHub; the pins in `requirements/`; a subagent on the failed weekly run's log;
+    a subagent for a front-end audit with impeccable (audit), web-design-guidelines and
+    ui-ux-pro-max. ponytail-debt had nothing to list (no `shortcut:` comment in the
+    repository) and ponytail-audit was not run again (A1 to A18 of 2026-11-14 are fixed).
+    The tasks are under "Open items", "Next steps (session 35)", N1 to N8. This file's
+    header date and "In progress" were stale (session 33) and are current again.
+
 ---
 
 ## In progress
@@ -1560,7 +1574,65 @@ order of work. Sizes: S up to an hour, M half a day, L a day or more.
   the "tested" check moved into the meta line.
 
 **N6. Front-end audit (impeccable audit, web-design-guidelines, ui-ux-pro-max):**
-- [ ] The audit was still running when this was written; its findings go here.
+A read-only subagent followed impeccable's `audit` (14 of 20: accessibility 3, performance
+2, theming 3, responsive 3, implementation 3; the detector binary was not run), the Web
+Interface Guidelines (fetched) and ui-ux-pro-max's UX rules, at 1440 px light, 390 px dark,
+820 px, 200% zoom and forced colours, where the CI checks do not look. The lead checked
+the file references; the measurements are the subagent's and are to be reproduced before a
+fix. Its scripts and screenshots were in the session scratchpad (audit-fe/), not kept.
+Note for every browser check: the site's scripts go still when `navigator.webdriver` is
+true, so CI never runs the motion paths or a box's first-visit guide.
+- [ ] N6.1 (P1, S) The run panel's editor traps the Tab key (WCAG 2.1.2): inside
+  `.cm-content` Tab and Shift+Tab never leave; only Esc then Tab does, and the panel names
+  only Ctrl+Enter. The fallback textarea (`run-python.js:227`) swallows Tab with no way
+  out. 98 pages. Fix: a visible hint with `aria-describedby`, and Esc blurs the textarea.
+  `check_keyboard.py` walks the page before the panel opens; add the case.
+- [ ] N6.2 (P1, S to M) `fitNav` / `fitWords` (`reading-tools.js:615`, `719`) write and then
+  read `scrollWidth` for each of about 135 navigation titles on every load, also when the
+  drawer is closed: 815 layouts on the home page and 826 on 0033 at 390 px (64 and 71
+  without the first call), about 0.7 s of blocked time at a 4x slower CPU. Fix: skip while
+  the sidebar is not shown, and read all widths before writing.
+- [ ] N6.3 (P2, S) The phone header's meta line (`.qh-bottom`, `29-question-ux.css:76`) is
+  one `nowrap` line with an ellipsis that opens only on `:focus-visible`, so a touch reader
+  cannot open it: cut on 109 of 109 pages at 390 px, a tag hidden or cut on 98, and on 90
+  pages neighbouring Latin tags show in swapped order (the "·" of "Python" away from its
+  word). Fix: `unicode-bidi: isolate` on `.qh-tag`, and let the line wrap on a phone.
+  Do it with N5.
+- [ ] N6.4 (P2, S to M) The home page shifts on a tablet (CLS 0.14 at 820 x 1180): the
+  builder `.hh-builder` ships `hidden` (`hooks/questions.py:1061`) and home.js shows it
+  after load; the hero grows from 720 to 1274 px. Fix: render it shown, or keep its height.
+- [ ] N6.5 (P2, M) Every question page jumps about 67 px at about 0.7 s when
+  reading-tools.js builds the part row `nav.part-nav` (CLS 0.03 to 0.075 at three widths
+  on 0033, 0023, 0040). Fix: the hook writes the row, or the page keeps its height.
+- [ ] N6.6 (P2, S) Forced colours (Windows high contrast): the `.ui-ico` icons are a mask
+  over `background-color` (`09-redesign.css:30`), so the five question tools, the play
+  buttons and the hero's pause show as empty circles; the joined CSS has no
+  `forced-colors` rule. Fix: one `@media (forced-colors: active)` block.
+- [ ] N6.7 (P2, S) `anchor_linenums` (`mkdocs.yml:100`) makes every code line number a link
+  and a tab stop: 48 more stops on 0033, 101 on 0023, each 16 by 18 px (axe `target-size`
+  at 1440 px, 25 to 97 nodes a page). Fix: `tabindex="-1"` on them, or the option off.
+- [ ] N6.8 (P2, S) Fields under 16 px on a phone, so iOS zooms the page on focus (from the
+  computed sizes; not tried on a device): the filter of all/ (14.4 px, its selects 14),
+  the boxes' `.ex-num`, `.ex-seed` (14), `.ex-addr`, `.ex-len` (15) and selects (12.8), the
+  run panel's editor (14.4). Fix: `max(16px, ...)` under `(pointer: coarse)`.
+- [ ] N6.9 (P2, S) The sticky header and part row take 111 px whatever the screen's
+  height: 31% of 640 x 360 (200% zoom of 1280 x 720) and 28% of a phone on its side.
+  Fix: the part row does not stick on a short screen (`max-height` query).
+- [ ] N6.10 (P3, S) At 1220 px and under (and at 200% zoom) the drawer's button
+  `label[for=__drawer]` is not reachable by keyboard; the footer links and Ctrl+K are the
+  way around today.
+- [ ] N6.11 (P3, S) A box's first-visit guide (`core.js:1057` on): the tip covers the
+  figure's axis labels and the focused enlarge button, is last in the box's tab order and
+  closes on Esc only with the focus inside it.
+- [ ] N6.12 (P3, M) 115 declarations with literal colours outside `01-base.css`, in 13
+  files (`09-redesign.css` 44, `21-interview.css` 31); the linter warns only about SVG.
+  Move them to variables and widen the lint rule.
+- Checked and fine: contrast by axe at three widths in both schemes on ten pages; no
+  sideways scroll on any question page at 390, 820 and 1440 px; reduced motion stops every
+  animation; no `transition: all`, every `outline: none` has a focus style; the quick jump
+  on a phone; boxes at 820 px; MathJax typesetting moves nothing.
+- Not checked: the video dialog (no page has a video), the service worker, web fonts
+  (blocked in the sandbox), real devices and screen readers, drag gestures by touch.
 
 **N7. Carried over from earlier sessions (still open, see the sections below):**
 - [ ] 0036: the LFSR box is 1508 px at 1920 x 1080 and the page's review items (part b step
