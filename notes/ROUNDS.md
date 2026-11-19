@@ -13,19 +13,21 @@ then tick the round's tasks in `HANDOFF.md` as they are done and write the outco
 The model columns are a judgment by the kind of work and its risk, not a measurement of
 cost or quality. The cheaper model is expected to do the work when it gets one task at a
 time (N6.1 alone, not a whole round) and the matching checks run after each task.
+Each cell gives the model and the reasoning effort to set for the session (low, medium,
+high, xhigh, max); a cheaper model usually gets a higher effort to make up for it.
 
 ## The rounds
 
-| Round | What it holds | Tasks | Size | Recommended model | Cheaper model | Why |
+| Round | What it holds | Tasks | Size | Recommended model, effort | Cheaper model, effort | Why |
 |-------|---------------|-------|------|-------------------|---------------|-----|
-| 1. Housekeeping | a retry in `check_links.py`, Verilator v5.054, this folder's archive, a lock of the dependencies | N1.1 to N1.4 | small | Sonnet 5.5 | Haiku 5.5 | well-defined work, and the checks catch mistakes |
-| 2. Accessibility and speed | the run panel's Tab trap, `fitNav`, forced colours, line numbers as tab stops, small fields, the sticky rows on a short screen, the drawer button, the first-visit guide | N6.1, N6.2, N6.6 to N6.11 | medium | Opus 5.5 | Sonnet 5.5 | small fixes, but in code every page shares, and each finding is reproduced first |
-| 3. The question header and layout shifts | the chip row and the meta line on a phone, the home page's shift on a tablet, the part row's jump | N5, N6.3 to N6.5 | medium | Opus 5.5 | Sonnet 5.5 | needs visual judgment in RTL at several widths |
-| 4. Page weight | minify `site.css`, load by page type, remove dead rules, literal colours, a weight budget | N2.1 to N2.5, N6.12 | large | Fable 5.2 | Opus 5.5 | a change in the hook that builds the whole site; a mistake breaks pages nobody looked at |
-| 5. Search and sharing | a description per page, JSON-LD, sitemap dates, Search Console (owner) | N3.1 to N3.4 | small to medium | Sonnet 5.5 | Haiku 5.5 | separate additions to the hook, easy to check in the built HTML |
-| 6. DV-core questions | about ten new questions: "find the bug", UVM, SVA, coverage, CDC | N4.1, N4.4 | very large | Fable 5.2 | Opus 5.5 | correct SystemVerilog, proofs and boxes; a mistake costs the most here |
-| 7. Grading and wording | re-grade the difficulty, reword the level cards, missing topic names | N4.2, N4.3, part of N7 | small | Sonnet 5.5 | Haiku 5.5 | front matter and text, once the owner sets the criteria |
-| 8. Older items and CI time | 0036, boxes taller than a screen, small figure labels, a shorter CI | N7, N8 | medium to large | Opus 5.5 | Sonnet 5.5 | 0036 already failed twice with agents; the rest is simpler |
+| 1. Housekeeping | a retry in `check_links.py`, Verilator v5.054, this folder's archive, a lock of the dependencies | N1.1 to N1.4 | small | Sonnet 5.5, medium | Haiku 5.5, high | well-defined work, and the checks catch mistakes |
+| 2. Accessibility and speed | the run panel's Tab trap, `fitNav`, forced colours, line numbers as tab stops, small fields, the sticky rows on a short screen, the drawer button, the first-visit guide | N6.1, N6.2, N6.6 to N6.11 | medium | Opus 5.5, high | Sonnet 5.5, high | small fixes, but in code every page shares, and each finding is reproduced first |
+| 3. The question header and layout shifts | the chip row and the meta line on a phone, the home page's shift on a tablet, the part row's jump | N5, N6.3 to N6.5 | medium | Opus 5.5, high | Sonnet 5.5, high | needs visual judgment in RTL at several widths |
+| 4. Page weight | minify `site.css`, load by page type, remove dead rules, literal colours, a weight budget | N2.1 to N2.5, N6.12 | large | Fable 5.2, high | Opus 5.5, xhigh | a change in the hook that builds the whole site; a mistake breaks pages nobody looked at |
+| 5. Search and sharing | a description per page, JSON-LD, sitemap dates, Search Console (owner) | N3.1 to N3.4 | small to medium | Sonnet 5.5, medium | Haiku 5.5, high | separate additions to the hook, easy to check in the built HTML |
+| 6. DV-core questions | about ten new questions: "find the bug", UVM, SVA, coverage, CDC | N4.1, N4.4 | very large | Fable 5.2, xhigh | Opus 5.5, xhigh | correct SystemVerilog, proofs and boxes; a mistake costs the most here |
+| 7. Grading and wording | re-grade the difficulty, reword the level cards, missing topic names | N4.2, N4.3, part of N7 | small | Sonnet 5.5, medium | Haiku 5.5, medium | front matter and text, once the owner sets the criteria |
+| 8. Older items and CI time | 0036, boxes taller than a screen, small figure labels, a shorter CI | N7, N8 | medium to large | Opus 5.5, high (xhigh for 0036) | Sonnet 5.5, high | 0036 already failed twice with agents; the rest is simpler |
 
 Where not to save: rounds 6 and 4. In round 6 the content is the product; in round 4 one
 change reaches all 109 pages. Where saving is safe: rounds 1, 5 and 7, since
