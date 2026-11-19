@@ -80,6 +80,7 @@ DV-Interview-Questions/
 │   ├── HANDOFF.md              # Task list: in progress, open items, the recent work log, technical notes
 │   ├── HANDOFF-archive.md      # The work log of sessions 1 to 21 and the finished rounds U to X
 │   ├── HANDOFF-archive-2.md    # The work log of sessions 22 to 30, the redesign plan, proposal series 6 to 8
+│   ├── HANDOFF-archive-3.md    # The work log of sessions 31 to 34 (items 112 to 191), the review rounds of session 34
 │   └── VIDEOS.md               # How a question gets its YouTube video
 ├── requirements/
 │   ├── site.txt                # Pinned Python dependencies for building the site
