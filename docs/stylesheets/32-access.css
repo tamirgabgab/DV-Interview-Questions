@@ -47,3 +47,17 @@
   .md-typeset .part-nav:not(.pn-fixed):not(#_) { position: static; }
   .md-typeset .part-nav.pn-fixed:not(#_) { display: none; }
 }
+
+
+/* --- N6.8: fields on a touch screen -------------------------------------------------------------
+   iOS zooms the page when a focused field's text is under 16 px, and does not zoom back.
+   Almost every field of the site was under it (the boxes' numbers 14 px and selects 12.8,
+   the lists' filter 14.4, the run panel's code 14.4 and 15). On a touch screen a field's
+   text is 16 px at least; a box field's width is in rem, so its row keeps its place. */
+@media (pointer: coarse) {
+  .md-typeset :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="color"], [type="file"]), select, textarea):not(#_),
+  .md-typeset .py-runner .cm-editor:not(#_),
+  .qj .qj-input:not(#_) {
+    font-size: max(16px, 1em);
+  }
+}

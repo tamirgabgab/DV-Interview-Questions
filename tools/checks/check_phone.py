@@ -233,6 +233,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--local-cdn", action="store_true",
                     help="--offline with the CDN copies of .cache/cdn (tools/dev_setup.sh), axe-core included")
     ap.add_argument("--weight-warn", type=int, default=400, metavar="KB", help="warn about a page whose HTML is heavier than this (400)")
+    ap.add_argument("--touch", action="store_true",
+                    help="a touch screen, as a phone has: the pages get their (pointer: coarse) and (hover: none) rules")
     ap.add_argument("--font-scale", type=float, default=1.3, metavar="S", help="also measure the width with the text enlarged S times, as a phone's font setting does (1.3; 0 skips it)")
     args = ap.parse_args(argv)
     if args.local_cdn:
@@ -259,14 +261,14 @@ def main(argv: list[str]) -> int:
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
         ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1, service_workers="block",
-                                  color_scheme=args.scheme)
+                                  color_scheme=args.scheme, has_touch=args.touch)
         for spec in args.route:
             pattern, file = spec.split("=", 1)
             ctx.route(re.compile(pattern), functools.partial(lambda file, route: route.fulfill(path=file), file))
         big_ctx = None
         if args.font_scale and args.font_scale != 1:
             big_ctx = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=1, service_workers="block",
-                                          color_scheme=args.scheme)
+                                          color_scheme=args.scheme, has_touch=args.touch)
             big_ctx.add_init_script(scale_text_script(args.font_scale))
             for spec in args.route:
                 pattern, file = spec.split("=", 1)

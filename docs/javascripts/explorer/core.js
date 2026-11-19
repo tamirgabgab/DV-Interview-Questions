@@ -1045,6 +1045,9 @@
   // browser, three short hints in turn point at the playback bar, the figure and the
   // summary line, each with "next" and "skip". They show when the box is mostly in view.
   // An automated browser (the page checks) sees none unless the address has ?guide.
+  // The hint sits under what it points at (above it when it would then lie on the element
+  // that has the focus), is the box's first child, so Tab reaches its buttons first, and
+  // closes on Escape from anywhere in the box.
   const GUIDE = "dvq-guide";
   const GUIDE_STEPS = [
     [".ex-transport", false, "כאן מריצים את התיבה : צעד קדימה או אחורה, הפעלה רציפה או קפיצה לסוף. הפס שמתחת קופץ ישר לכל צעד."],
@@ -1075,22 +1078,38 @@
       tip.setAttribute("role", "note");
       tip.setAttribute("aria-live", "polite");
       box.classList.add("has-guide");
-      box.append(tip);
+      box.prepend(tip);
       const place = () => {
         if (!tip.isConnected) return;
         const st = steps[i], br = box.getBoundingClientRect(), tr = st.el.getBoundingClientRect();
-        const w = tip.offsetWidth, cx = tr.left + tr.width / 2 - br.left;
+        const w = tip.offsetWidth, h = tip.offsetHeight, cx = tr.left + tr.width / 2 - br.left;
         const left = Math.max(8, Math.min(br.width - w - 8, cx - w / 2));
-        tip.style.top = `${(st.inside ? tr.top + 12 : tr.bottom + 10) - br.top}px`;
+        let top = tr.bottom + 10 - br.top, above = false;
+        const f = document.activeElement;
+        if (f && f !== box && box.contains(f) && !tip.contains(f)) {
+          const fr = f.getBoundingClientRect(), x = br.left + left, y = br.top + top;
+          if (fr.left < x + w && fr.right > x && fr.top < y + h && fr.bottom > y) {
+            above = true;
+            top = tr.top - 10 - h - br.top;
+          }
+        }
+        tip.style.top = `${top}px`;
         tip.style.left = `${left}px`;
         tip.style.setProperty("--ax", `${Math.round(cx - left)}px`);
-        tip.classList.toggle("is-inside", st.inside);
+        tip.classList.toggle("is-above", above);
+      };
+      const onKey = (e) => {
+        if (e.key !== "Escape" || e.defaultPrevented) return;
+        const f = document.activeElement;
+        if (!f || f === document.body || box.contains(f)) end();
       };
       const end = () => {
         steps.forEach((st) => st.el.classList.remove("ex-guide-target"));
         tip.remove();
         box.classList.remove("has-guide");
         window.removeEventListener("resize", place);
+        document.removeEventListener("keydown", onKey);
+        box.removeEventListener("focusin", place);
       };
       const show = () => {
         steps.forEach((st, k) => st.el.classList.toggle("ex-guide-target", k === i));
@@ -1102,7 +1121,8 @@
         place();
         if (typeof tip.scrollIntoView === "function") tip.scrollIntoView({ block: "nearest" });
       };
-      tip.addEventListener("keydown", (e) => { if (e.key === "Escape") end(); });
+      document.addEventListener("keydown", onKey);
+      box.addEventListener("focusin", place);
       window.addEventListener("resize", place, { passive: true });
       show();
     }, { threshold: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6] });

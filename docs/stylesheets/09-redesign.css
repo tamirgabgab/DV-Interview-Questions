@@ -234,7 +234,7 @@ body.interview-mode .md-typeset .question-header .question-tools { padding: 0.1r
 .md-typeset .explorer .ex-guide { position: absolute; z-index: 4; width: min(17rem, calc(100% - 1rem)); padding: 0.55rem 0.7rem 0.5rem; border-radius: 0.6rem; background: var(--md-primary-fg-color); color: #fff; box-shadow: var(--shadow-3); font-size: 0.7rem; line-height: 1.55; }
 [data-md-color-scheme="slate"] .md-typeset .explorer .ex-guide { background: color-mix(in srgb, var(--md-primary-fg-color) 70%, #000); border: 1px solid var(--site-card-border); }
 .md-typeset .explorer .ex-guide::before { content: ""; position: absolute; top: -0.35rem; left: calc(var(--ax, 50%) - 0.35rem); width: 0.7rem; height: 0.7rem; background: inherit; transform: rotate(45deg); }
-.md-typeset .explorer .ex-guide.is-inside::before { display: none; }
+.md-typeset .explorer .ex-guide.is-above::before { top: auto; bottom: -0.35rem; }
 .md-typeset .explorer .ex-guide .exg-text { margin: 0 0 0.4rem; }
 .md-typeset .explorer .ex-guide .exg-foot { display: flex; align-items: center; gap: 0.4rem; }
 .md-typeset .explorer .ex-guide .exg-pos { margin-inline-end: auto; opacity: 0.8; font-size: 0.62rem; }
