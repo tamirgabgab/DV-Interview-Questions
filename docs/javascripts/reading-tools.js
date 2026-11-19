@@ -529,9 +529,12 @@
   // the reader is inside an open solution whose own row has scrolled away, a copy of it
   // sits in the part bar (W347: one sticky row, not two), the current block marked.
   const maps = [];
+  // On a short screen (a phone on its side, a page zoomed to 200%) the part bar does not
+  // stick (32-access.css): it scrolls away with the page, so nothing hangs from it.
+  const shortScreen = window.matchMedia("(max-height: 30em)");
   const readingLine = () => {
     const bar = document.querySelector(".part-nav");
-    if (bar && (!bar.classList.contains("pn-fixed") || bar.classList.contains("is-stuck"))) {
+    if (bar && !shortScreen.matches && (!bar.classList.contains("pn-fixed") || bar.classList.contains("is-stuck"))) {
       return bar.getBoundingClientRect().bottom;
     }
     const site = document.querySelector(".md-header");
@@ -552,7 +555,7 @@
     const slot = bar && bar.querySelector(".pn-sol");
     if (!slot) return;
     const line = readingLine();
-    const active = maps.find((m) => m.sol.open && m.nav.getBoundingClientRect().bottom < line
+    const active = !shortScreen.matches && maps.find((m) => m.sol.open && m.nav.getBoundingClientRect().bottom < line
       && m.sol.getBoundingClientRect().bottom > line + 40) || null;
     if (active !== shown) {
       shown = active;
@@ -665,7 +668,7 @@
   // The sticky solution map sits under the part bar when the page has one.
   const partBarHeight = () => {
     const bar = document.querySelector(".part-nav");
-    document.documentElement.style.setProperty("--part-nav-h", bar ? `${bar.offsetHeight}px` : "0px");
+    document.documentElement.style.setProperty("--part-nav-h", bar && !shortScreen.matches ? `${bar.offsetHeight}px` : "0px");
   };
 
   // The table of contents follows the same reading line as the part bar (spyLine): its
@@ -718,7 +721,7 @@
     watchFigures(document);
     document.querySelectorAll(".md-content .explorer").forEach((box) =>
       boxObserver.observe(box, { childList: true, subtree: true, characterData: true }));
-    window.addEventListener("resize", partBarHeight, { passive: true });
+    window.addEventListener("resize", () => { partBarHeight(); syncSlot(); }, { passive: true });
     openTarget();
     window.addEventListener("hashchange", openTarget);
     // a side navigation title (S421) and a path step's title (S419) that do not fit lose

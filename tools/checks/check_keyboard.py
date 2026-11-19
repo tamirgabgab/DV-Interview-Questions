@@ -8,7 +8,9 @@ tags page, a study path and one question page with a box, a figure and the
 run panel), walks the whole page with Tab at 1200 px. Every stop must be visible, every
 interactive stop must have a name (aria-label, a label, its text, a title) and must show a
 focus ring (an outline or a shadow while :focus-visible), the first stop must be the skip
-link, and the walk must end (no trap); the theme's own header, drawer, search and footer are
+link, and the walk must end (no trap); the navigation drawer's button (the page is in the
+drawer's widths) must be a named button that opens the drawer with Enter and closes it with
+Escape; the theme's own header, drawer, search and footer are
 walked but not judged (axe covers them in the phone check). On the question page it then presses the keys of the
 components: Enter opens a hint and toggles a fold of a box, the arrow keys step a focused
 box, Enter on the enlarge button opens the lightbox and Escape closes it and gives the
@@ -245,6 +247,36 @@ def press_keys(page) -> list[str]:
     return out
 
 
+def drawer_keys(page) -> list[str]:
+    """The navigation drawer's button, where the page has one at this width: a named button
+    in the tab order, Enter opens the drawer and the focus goes into it, Escape closes it
+    and gives the focus back."""
+    sel = "label.md-header__button[for='__drawer']"
+    if not page.locator(sel).count() or not page.locator(sel).is_visible():
+        return []
+    info = page.evaluate("""(sel) => { const b = document.querySelector(sel);
+      return { tab: b.tabIndex, role: b.getAttribute("role"), name: b.getAttribute("aria-label") || b.getAttribute("title") || "" }; }""", sel)
+    if info["tab"] != 0 or info["role"] != "button" or not info["name"]:
+        return ["the drawer's button is not a named button in the tab order"]
+    out: list[str] = []
+    page.evaluate("() => window.scrollTo(0, 0)")
+    page.locator(sel).focus()
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(400)
+    if not page.evaluate("() => document.getElementById('__drawer').checked"):
+        return ["Enter on the drawer's button does not open the drawer"]
+    if not page.evaluate("() => !!document.activeElement && !!document.activeElement.closest('.md-sidebar--primary')"):
+        out.append("the opened drawer does not take the focus")
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(400)
+    if page.evaluate("() => document.getElementById('__drawer').checked"):
+        out.append("Escape does not close the drawer")
+        page.evaluate("() => { const d = document.getElementById('__drawer'); d.checked = false; d.dispatchEvent(new Event('change', { bubbles: true })); }")
+    elif not page.evaluate("(sel) => document.activeElement === document.querySelector(sel)", sel):
+        out.append("the focus does not come back to the drawer's button after Escape")
+    return out
+
+
 def editor_keys(page, field: str) -> list[str]:
     """The run panel's code field (the editor, or the textarea it replaces): Tab indents and
     stays inside, Esc and then Tab leaves (WCAG 2.1.2), and a shown line says so."""
@@ -450,6 +482,7 @@ def main(argv: list[str]) -> int:
             except Exception as e:
                 errors.append(f"load: {e}")
             stops, problems = walk(page)
+            problems += drawer_keys(page)
             keys = press_keys(page) if re.search(QUESTION, rel) else []
             if re.search(QUESTION, rel):
                 keys += textarea_keys(ctx, base + rel[: -len("index.html")])

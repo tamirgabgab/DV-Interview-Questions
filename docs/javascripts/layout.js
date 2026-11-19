@@ -160,9 +160,54 @@
     sync();
   };
 
+  // The drawer's button is a <label> for a hidden checkbox, so the keyboard could not reach
+  // it (at 1220 px and under, and on a computer zoomed to 200%). It becomes a button: a Tab
+  // stop with a name, Enter and Space toggle the drawer, aria-expanded says which. The
+  // opened drawer takes the focus; Escape closes it and gives the focus back, and the focus
+  // leaving it closes it too (the page behind the overlay is not walked).
+  const drawerButton = () => {
+    const drawer = document.getElementById("__drawer");
+    const button = document.querySelector("label.md-header__button[for='__drawer']");
+    const side = document.querySelector(".md-sidebar--primary");
+    if (!drawer || !button || !side) return;
+    const narrow = window.matchMedia("(max-width: 76.234375em)");
+    button.setAttribute("role", "button");
+    button.setAttribute("tabindex", "0");
+    if (!button.getAttribute("aria-label")) button.setAttribute("aria-label", "תפריט הניווט");
+    const set = (open) => {
+      if (drawer.checked === open) return;
+      drawer.checked = open;
+      drawer.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    const sync = () => {
+      button.setAttribute("aria-expanded", String(drawer.checked));
+      if (!drawer.checked || !narrow.matches) return;
+      side.removeAttribute("inert");             // hiddenChrome does the same a frame later
+      const first = side.querySelector("a[href]");
+      if (first) first.focus({ preventScroll: true });
+    };
+    button.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      set(!drawer.checked);
+    });
+    drawer.addEventListener("change", sync);
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape" || !drawer.checked || !narrow.matches) return;
+      const inside = side.contains(document.activeElement);
+      set(false);
+      if (inside) button.focus();
+    });
+    document.addEventListener("focusin", (e) => {
+      if (drawer.checked && narrow.matches && !side.contains(e.target) && e.target !== button) set(false);
+    });
+    sync();
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
     foldLevel();
     grips();
     hiddenChrome();
+    drawerButton();
   });
 })();

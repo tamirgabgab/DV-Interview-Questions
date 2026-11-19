@@ -34,3 +34,16 @@
   }
   :is(button:disabled, [aria-disabled="true"]) :is(.ui-ico, .kind-ico) { background-color: GrayText !important; }
 }
+
+
+/* --- N6.9: a short screen ---------------------------------------------------------------------
+   A phone on its side, or a computer page zoomed to 200% (1280 x 720 becomes 640 x 360): the
+   site header and the sticky part row together took 111 px, a third of the screen. There the
+   part row stays where the page has it and scrolls away, and the fixed row of a question
+   without parts (the solved button and the reading line) does not show; reading-tools.js
+   stops counting its height (--part-nav-h) and hangs no solution map from it. The value is
+   the script's shortScreen query. */
+@media screen and (max-height: 30em) {
+  .md-typeset .part-nav:not(.pn-fixed):not(#_) { position: static; }
+  .md-typeset .part-nav.pn-fixed:not(#_) { display: none; }
+}
