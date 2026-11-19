@@ -84,7 +84,8 @@ DV-Interview-Questions/
 │   └── VIDEOS.md               # How a question gets its YouTube video
 ├── requirements/
 │   ├── site.txt                # Pinned Python dependencies for building the site
-│   └── dev.txt                 # Test and check dependencies (pytest, Playwright)
+│   ├── dev.txt                 # Test and check dependencies (pytest, Playwright)
+│   └── lock.txt                # Every dependency at the version of the last green CI run
 ├── hooks/
 │   └── questions.py            # Validation, navigation, tags, tables, run panels, the joined stylesheet
 ├── tools/
@@ -1130,6 +1131,17 @@ pip install -r requirements/site.txt
 mkdocs serve          # live preview at http://127.0.0.1:8000
 mkdocs build --strict # the same check that CI runs
 ```
+
+### Dependencies
+
+`requirements/site.txt` and `requirements/dev.txt` pin the packages the site and the checks
+name; both start with `-c lock.txt`, so every package below them is installed at the
+version of `requirements/lock.txt` too (the versions of the last green CI run). Without
+it a new release of a dependency (pymdown-extensions, Markdown, Jinja2) could change or
+break a build with no change in the repository; Material for MkDocs 9.7 is the last
+feature line, so such a break would not be fixed upstream. To move a version, change it
+in the lock (or regenerate the lock with the command at its top, on Python 3.12), build
+the site, run the checks and compare the built pages with the previous build.
 
 ## Publishing
 

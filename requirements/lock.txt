@@ -1,0 +1,51 @@
+# Every package the site and the checks install, at the versions of the last green CI run
+# (run 43644406759, 2026-11-14, Python 3.12.16). site.txt and dev.txt read it with -c, so
+# a dependency below the six pinned packages cannot move on its own and break a build.
+# To refresh it, on Python 3.12:
+#   uv pip compile requirements/site.txt requirements/dev.txt --python-version 3.12 --no-header --no-annotate
+# then build the site and run the checks before pushing (CONTRIBUTING.md, "Dependencies").
+babel==2.18.0
+backrefs==8.3
+cairocffi==1.7.1
+cairosvg==2.9.1
+certifi==2026.10.23
+cffi==2.1.1
+charset-normalizer==3.5.2
+click==8.5.1
+colorama==0.4.6
+cssselect2==0.10.1
+defusedxml==0.7.1
+ghp-import==2.1.0
+greenlet==3.5.6
+idna==3.20
+iniconfig==2.3.1
+jinja2==3.1.6
+markdown==3.11.3
+markupsafe==3.0.4
+mergedeep==1.3.4
+mkdocs==1.6.1
+mkdocs-get-deps==0.2.2
+mkdocs-material==9.7.7
+mkdocs-material-extensions==1.3.1
+packaging==26.3
+paginate==0.5.7
+pathspec==1.1.1
+pillow==12.3.0
+platformdirs==4.14.5
+playwright==1.56.0
+pluggy==1.7.0
+pycparser==3.12
+pyee==13.0.1
+pygments==2.21.0
+pymdown-extensions==13.1
+pytest==9.1.1
+python-dateutil==4.0.0
+pyyaml==6.0.3
+pyyaml-env-tag==1.1
+requests==2.34.2
+tinycss2==1.5.1
+typing-extensions==4.16.0
+tzdata==2026.6
+urllib3==2.8.0
+watchdog==7.1.0
+webencodings==0.6.1
