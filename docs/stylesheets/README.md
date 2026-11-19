@@ -38,6 +38,7 @@ refine one in an earlier part, and moving a rule between parts can change what w
 | `29-question-ux.css` | the UX round's question page (session 34): the box chip and teaser, the end card after "solved", the shorter header and the tools in the sticky strip on a computer, the opaque strip, the outlined solution button, wide tables that scroll |
 | `30-lists-ux.css` | the UX round's lists (session 34): the dropdown filter row, one-line question rows and two-line phone cards, the home page's steps line |
 | `31-maps-ux.css` | the UX round's maps (session 34): path names, the station card and the scroll hint of the metro map, the paths as rows, the tags page's level row and sorted topic list |
+| `32-access.css` | the accessibility round (session 35): the mask icons in forced colours, fields of 16 px on a touch screen, the part row that does not stick on a short screen |
 
 After the numbered parts come the stylesheets of single questions, in `questions/`, named
 `<id>-<name>.css` after the question (`questions/0083-jugs.css` for 0083's water jugs). A new

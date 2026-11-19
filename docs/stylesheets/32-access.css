@@ -1,0 +1,36 @@
+/* The site's styles, part 32: the accessibility round of session 35 (the front-end audit, N6): icons that stay visible in forced colours, fields that do not make a phone zoom, a part row that does not stick on a short screen. It loads after the parts before it. */
+
+
+/* --- N6.6: forced colours (Windows high contrast) -------------------------------------------
+   The site's icons are a mask over a background colour (.ui-ico, .kind-ico, .lvl-icon, the
+   icons of the admonitions and of the solution blocks, the theme's own). In forced colours
+   the system paints every background in the canvas colour, so the icon is canvas on canvas:
+   the page tools showed as empty circles. These take the system's text colour instead, by
+   where they sit: on a button, in a link, in running text. */
+@media (forced-colors: active) {
+  .ui-ico, .kind-ico, .lvl-icon,
+  .md-typeset :is(.admonition-title, summary)::before,
+  .md-typeset details > summary::after,
+  .md-typeset h4:is(.sol-idea, .sol-steps, .sol-code, .sol-proof, .sol-cost)::before,
+  .md-typeset .trap-group > .trap-group-title::before,
+  .md-typeset .md-annotation__index::after,
+  .md-source__fact::before {
+    forced-color-adjust: none;
+    background-color: CanvasText !important;   /* over the type colours of the admonitions */
+  }
+  /* a trap's summary carries its number there, not a mask: the system's own colours */
+  .md-typeset .trap-group > details.trap > summary::before { forced-color-adjust: auto; }
+  :is(button, [role="button"]) :is(.ui-ico, .kind-ico),
+  .md-typeset .py-runner .py-copy::before,
+  .md-code__button::after,
+  .md-typeset .tabbed-button::after {
+    forced-color-adjust: none;
+    background-color: ButtonText !important;
+  }
+  a[href] :is(.ui-ico, .kind-ico, .lvl-icon),
+  .md-typeset a.md-annotation__index::after,
+  a .md-source__fact::before {
+    background-color: LinkText !important;
+  }
+  :is(button:disabled, [aria-disabled="true"]) :is(.ui-ico, .kind-ico) { background-color: GrayText !important; }
+}
