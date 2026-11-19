@@ -15,8 +15,8 @@ permissions:
   issues: write
 
 env:
-  # The release the pinned development commit in deploy.yml follows (VERILATOR_REF).
-  VERILATOR_RELEASE: v5.052
+  # The release deploy.yml is pinned to (VERILATOR_REF is the commit of its tag).
+  VERILATOR_RELEASE: v5.054
 
 # Every job has a timeout of about twice its usual time, so a hung browser or simulator
 # fails the run instead of holding it for GitHub's six hours.

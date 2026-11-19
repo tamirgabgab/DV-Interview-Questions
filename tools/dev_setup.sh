@@ -65,8 +65,10 @@ fi
 # --- Verilator at the pinned commit (only with --verilator) --------------------------------
 if [ "${1:-}" = "--verilator" ]; then
   ref="$(sed -n 's/^ *VERILATOR_REF: *"\([0-9a-f]*\)".*/\1/p' "$ROOT/.github/workflows/deploy.yml")"
-  # a build of the pinned commit reports its short hash in --version ("rev ...-7a5509c")
-  if "$HOME/verilator/bin/verilator" --version 2>/dev/null | grep -q -- "-${ref:0:7}"; then
+  # a build records its commit in ~/verilator/.ref (a development build also reports its
+  # short hash in --version, "rev ...-7a5509c"; a release build may not)
+  if [ "$(cat "$HOME/verilator/.ref" 2>/dev/null)" = "$ref" ] \
+     || "$HOME/verilator/bin/verilator" --version 2>/dev/null | grep -q -- "-${ref:0:7}"; then
     step "verilator $ref: present"
   else
     step "verilator: building $ref (10 to 15 minutes)"
@@ -74,7 +76,7 @@ if [ "${1:-}" = "--verilator" ]; then
     if (cd "$src" && git init -q && git fetch -q --depth 1 https://github.com/verilator/verilator.git "$ref" \
         && git checkout -q FETCH_HEAD && autoconf && ./configure -q --prefix="$HOME/verilator" >/dev/null \
         && make -s -j"$(nproc)" >/dev/null && make -s install >/dev/null); then
-      :
+      echo "$ref" > "$HOME/verilator/.ref"
     else
       missing+=("verilator")
     fi

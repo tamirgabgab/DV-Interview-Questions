@@ -24,9 +24,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Development snapshot after 5.052: the release crashes on the 0011 class and leaves
-  # shapes of the 0014 subclass unrandomized; this commit runs every class as published.
-  VERILATOR_REF: "7a5509c89b1dd55cf78809907729a55f7fef55b7"
+  # The commit of the v5.054 release tag (a hash, as tools/dev_setup.sh reads it). 5.052
+  # crashed on the 0011 class and left shapes of the 0014 subclass unrandomized, so CI ran a
+  # development commit after it until this release (session 35).
+  VERILATOR_REF: "bbb60a403932a9f695cb6ff001ceb73de6ad9234"
 
 # The runner image is pinned: ubuntu-latest moved to 26.04 (October 2026), where
 # Playwright 1.56 cannot install Chromium, and the Verilator cache was built on 24.04.

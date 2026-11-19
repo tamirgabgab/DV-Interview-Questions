@@ -1061,14 +1061,15 @@ commit already present. `tests/hook/` tests the hook itself (search variants, st
 The SystemVerilog tests need **Verilator newer than 5.052, with the z3 solver**, so that
 `randomize()` with constraints runs the classes exactly as published (the 5.052 release
 crashes on the 0011 class and leaves shapes of the 0014 subclass unrandomized; the apt
-package, 5.020, has no constraint support at all). Until the next release, CI builds a
-pinned development commit (`VERILATOR_REF` in `.github/workflows/deploy.yml`, currently
-`7a5509c`). Build the same commit once locally (about 10 minutes) and put it on the `PATH`:
+package, 5.020, has no constraint support at all). CI builds the commit of the v5.054
+release tag (`VERILATOR_REF` in `.github/workflows/deploy.yml`, `bbb60a4`; until session 35
+it was a development commit after 5.052). Build the same commit once locally (about 10
+minutes) and put it on the `PATH`:
 
 ```bash
 sudo apt install git help2man perl python3 make autoconf g++ flex bison libfl2 libfl-dev zlib1g zlib1g-dev z3
 git init /tmp/verilator && cd /tmp/verilator
-git fetch --depth 1 https://github.com/verilator/verilator.git 7a5509c89b1dd55cf78809907729a55f7fef55b7 && git checkout FETCH_HEAD
+git fetch --depth 1 https://github.com/verilator/verilator.git bbb60a403932a9f695cb6ff001ceb73de6ad9234 && git checkout FETCH_HEAD
 autoconf && ./configure --prefix="$HOME/verilator" && make -j"$(nproc)" && make install
 export PATH="$HOME/verilator/bin:$PATH"
 ```
@@ -1219,6 +1220,8 @@ script to every question page, in Hebrew, following the site's light / dark togg
 
 `.github/workflows/weekly.yml` runs every Monday (and on request): it builds the site and
 fetches every external link (`check_links.py --external`; 403 / 429 answers count as
-"refused the robot", not broken), and compares the latest Verilator release with
-`VERILATOR_RELEASE` (the release the pinned commit of `deploy.yml` follows). A broken link
+"refused the robot", not broken; a 5xx or a failed connection is tried three times; links
+to the site itself are left to the internal check, and one of the per-page edit links is
+fetched for all of them), and compares the latest Verilator release with
+`VERILATOR_RELEASE` (the release whose tag commit `deploy.yml` pins). A broken link
 fails the run; a newer release opens one issue with the steps to bump the pin.
