@@ -13,7 +13,8 @@ walked but not judged (axe covers them in the phone check). On the question page
 components: Enter opens a hint and toggles a fold of a box, the arrow keys step a focused
 box, Enter on the enlarge button opens the lightbox and Escape closes it and gives the
 focus back, Enter on "▶ להרצה"
-opens the run panel, "/" opens the quick jump (session 30): typing finds a question, Tab
+opens the run panel, whose editor keeps Tab for indenting and lets go after Esc (the
+textarea it replaces is tried on a second load, with the editor's bundle cut off), "/" opens the quick jump (session 30): typing finds a question, Tab
 stays in the window, Escape closes it and gives the focus back, and Ctrl+K opens it again,
 whose last row (the up arrow wraps to it) sends the words to the site search, which finds
 them; Enter on the interview tool starts interview mode (its bar shows) and Enter on the
@@ -178,6 +179,8 @@ def press_keys(page) -> list[str]:
         page.wait_for_timeout(600)
         if not page.locator("details.py-runner[open]").count():
             out.append("Enter on the run button does not open the run panel")
+        else:
+            out += editor_keys(page, ".py-runner .cm-content")
     # the quick jump: "/" opens it, typing finds a question, Tab stays inside, Escape
     # closes it; Ctrl+K opens it again and its last row opens the site search with the words
     focused = lambda cls: page.evaluate(f"() => !!document.activeElement && document.activeElement.classList.contains('{cls}')")  # noqa: E731
@@ -236,6 +239,57 @@ def press_keys(page) -> list[str]:
             if not page.evaluate("() => !!document.activeElement && document.activeElement.classList.contains('iv-summary')"):
                 out.append("ending the interview does not show its summary with the focus on it")
     return out
+
+
+def editor_keys(page, field: str) -> list[str]:
+    """The run panel's code field (the editor, or the textarea it replaces): Tab indents and
+    stays inside, Esc and then Tab leaves (WCAG 2.1.2), and a shown line says so."""
+    out: list[str] = []
+    what = "the run panel's editor" if "cm-" in field else "the run panel's textarea"
+    try:
+        page.wait_for_selector(field, state="visible", timeout=10_000)
+    except Exception:
+        return [f"{what} does not show"]
+    inside = lambda: page.evaluate("(sel) => !!document.activeElement && document.activeElement.matches(sel)", field)  # noqa: E731
+    page.locator(field).focus()
+    page.keyboard.press("Tab")
+    if not inside():
+        out.append(f"Tab leaves {what} (it should indent)")
+        page.locator(field).focus()
+    page.keyboard.press("Escape")
+    page.keyboard.press("Tab")
+    if inside():
+        out.append(f"Esc and then Tab do not leave {what}: the keyboard is held inside it")
+    page.locator(field).focus()
+    page.keyboard.press("Escape")
+    page.keyboard.press("Shift+Tab")
+    if inside():
+        out.append(f"Esc and then Shift+Tab do not leave {what}")
+    hint = page.evaluate("""(sel) => {
+      const id = document.querySelector(sel).getAttribute("aria-describedby"), el = id && document.getElementById(id);
+      return !!el && el.getClientRects().length > 0 && /Esc/.test(el.textContent);
+    }""", field)
+    if not hint:
+        out.append(f"{what} has no shown line (aria-describedby) that names Esc as the way out")
+    return out
+
+
+def textarea_keys(ctx, url: str) -> list[str]:
+    """The same keys on the textarea that stays when the editor's bundle does not load."""
+    page = ctx.new_page()
+    page.route(re.compile(r"/vendor/codemirror\.min\.js"), lambda route: route.abort())
+    try:
+        page.goto(url, wait_until="networkidle", timeout=60_000)
+        page.evaluate("() => { const d = document.querySelector('details.py-runner'); if (d) d.open = true; }")
+        if not page.locator("details.py-runner").count():
+            return []
+        try:
+            page.wait_for_selector(".py-runner[data-editor=textarea]", timeout=10_000)
+        except Exception:
+            return ["the run panel does not fall back to its textarea when the editor cannot load"]
+        return editor_keys(page, ".py-runner textarea.py-editor")
+    finally:
+        page.close()
 
 
 def filter_keys(page) -> list[str]:
@@ -393,6 +447,8 @@ def main(argv: list[str]) -> int:
                 errors.append(f"load: {e}")
             stops, problems = walk(page)
             keys = press_keys(page) if re.search(QUESTION, rel) else []
+            if re.search(QUESTION, rel):
+                keys += textarea_keys(ctx, base + rel[: -len("index.html")])
             if page.locator(".question-tools .qt-video").count():
                 keys += video_keys(page)
             if page.locator(".question-filter").count():

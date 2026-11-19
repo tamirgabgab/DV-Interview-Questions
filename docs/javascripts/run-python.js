@@ -223,17 +223,25 @@
       }).catch(() => {});
     });
 
-    // the textarea until the editor loads: Tab inserts spaces, Ctrl+Enter runs
+    // the textarea until the editor loads: Tab inserts spaces, Ctrl+Enter runs. Esc and then
+    // Tab leaves it, as in the editor (the panel's .py-keys line says so), so the keyboard
+    // is never held inside (WCAG 2.1.2)
+    let leaving = false;
     textarea.addEventListener("keydown", (e) => {
-      if (e.key === "Tab") {
+      if (e.key === "Escape") { leaving = true; return; }
+      if (e.key === "Tab" && !leaving && !e.ctrlKey && !e.altKey && !e.metaKey) {
         e.preventDefault();
-        const { selectionStart: s, selectionEnd: t } = textarea;
-        textarea.setRangeText("    ", s, t, "end");
+        if (!e.shiftKey) {
+          const { selectionStart: s, selectionEnd: t } = textarea;
+          textarea.setRangeText("    ", s, t, "end");
+        }
       } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         run();
       }
+      if (!/^(Shift|Control|Alt|Meta)$/.test(e.key)) leaving = false;
     });
+    textarea.addEventListener("blur", () => { leaving = false; });
 
     // opening the panel swaps in the editor; a reader's own opening (a click or a key on
     // the summary, or a run button) also starts the download, while "open all" and the
@@ -247,6 +255,8 @@
       panel.dataset.editor = "loading";
       loadEditor().then((cm) => {
         editor = cm.create(wrap, textarea.value, { label: textarea.getAttribute("aria-label"), onRun: run });
+        // the keys line describes the editor too (the editor keeps attributes it did not set)
+        editor.view.contentDOM.setAttribute("aria-describedby", textarea.getAttribute("aria-describedby"));
         textarea.hidden = true;
         panel.dataset.editor = "ready";
       }).catch(() => { panel.dataset.editor = "textarea"; });

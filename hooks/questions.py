@@ -1425,8 +1425,9 @@ def _run_panel(q: dict, markdown: str) -> str:
 <summary>▶ הרצת קוד ה-Python של השאלה</summary>
 <p class="py-runner-note">הפונקציות מהפתרון כבר טעונות. אפשר לשנות את הקוד שבתיבה ולהריץ שוב
 (Ctrl+Enter). ליד כל <code>print</code> שבהערה שלו כתוב הערך הצפוי מופיע סימן אחרי ההרצה.</p>
+<p class="py-runner-note py-keys" id="py-keys">בתוך העורך המקש Tab מזיח את הקוד. כדי לצאת ממנו במקלדת לוחצים Esc ואז Tab.</p>
 <script type="application/json" class="py-page-code">{json.dumps(page_code).replace("</", "<\\/")}</script>
-<div class="py-editor-wrap"><textarea class="py-editor" aria-label="הקוד להרצה (Python)" spellcheck="false" dir="ltr" rows="{min(max(demo_code.count(chr(10)) + 1, 6), 22)}">{html.escape(demo_code)}</textarea></div>
+<div class="py-editor-wrap"><textarea class="py-editor" aria-label="הקוד להרצה (Python)" aria-describedby="py-keys" spellcheck="false" dir="ltr" rows="{min(max(demo_code.count(chr(10)) + 1, 6), 22)}">{html.escape(demo_code)}</textarea></div>
 <div class="py-buttons">
 <button type="button" class="md-button md-button--primary py-run">▶ הרץ</button>
 <button type="button" class="md-button py-stop" disabled>עצור</button>
