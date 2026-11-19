@@ -611,14 +611,22 @@
 
   // A one-line title that does not fit its box: drop whole words from its end and add an
   // ellipsis. The CSS ellipsis alone cuts inside a word, and in a Hebrew line with English
-  // words it cut the English one in the middle ("PCIe" read "Cle").
-  const fitWords = (text, box) => {
-    if (!box || !box.clientWidth || box.scrollWidth <= box.clientWidth + 1) return;
-    const words = text.textContent.trim().split(/\s+/);
-    while (words.length > 1 && box.scrollWidth > box.clientWidth + 1) {
-      words.pop();
-      while (words.length > 1 && /^[–\-·•:]+$/.test(words[words.length - 1])) words.pop();   // no dangling dash
-      text.textContent = `${words.join(" ").replace(/[,;:]$/, "")} …`;
+  // words it cut the English one in the middle ("PCIe" read "Cle"). Takes [text, box] pairs
+  // and works in rounds, one dropped word a round: every width is read before any title is
+  // written, so a round is one layout however many titles there are (one title at a time
+  // was a layout per title and word, about 800 on a page's load).
+  const fitWords = (pairs) => {
+    let todo = pairs.filter(([text, box]) => text && box).map(([text, box]) => ({ text, box, words: null }));
+    while (todo.length) {
+      todo = todo.filter((t) => t.box.clientWidth && t.box.scrollWidth > t.box.clientWidth + 1);   // read
+      todo = todo.filter((t) => {                                                                   // write
+        if (!t.words) t.words = t.text.textContent.trim().split(/\s+/);
+        if (t.words.length <= 1) return false;
+        t.words.pop();
+        while (t.words.length > 1 && /^[–\-·•:]+$/.test(t.words[t.words.length - 1])) t.words.pop();   // no dangling dash
+        t.text.textContent = `${t.words.join(" ").replace(/[,;:]$/, "")} …`;
+        return true;
+      });
     }
   };
 
@@ -716,19 +724,31 @@
     // a side navigation title (S421) and a path step's title (S419) that do not fit lose
     // whole words from their end, the full title stays as the link's tooltip; fitted again
     // from the whole title when the column changes width (a grip, a resize, the fold button)
-    const fitNav = () => document.querySelectorAll(".md-sidebar--primary .md-nav__link .md-ellipsis").forEach((span) => {
-      const link = span.closest("a");
-      if (!link || link.classList.contains("md-nav__link--active")) return;
-      if (!span.dataset.full) span.dataset.full = span.textContent.trim();
-      if (!link.title) link.title = span.dataset.full;
-      span.textContent = span.dataset.full;
-      fitWords(span, span);
-    });
+    // or a section of it opens. Under Material's breakpoint the navigation is a drawer:
+    // nothing is measured until it opens.
+    const drawerNav = window.matchMedia("(max-width: 76.234375em)");
+    const drawerBox = document.getElementById("__drawer");
+    const fitNav = () => {
+      if (drawerNav.matches && !(drawerBox && drawerBox.checked)) return;
+      const pairs = [];
+      document.querySelectorAll(".md-sidebar--primary .md-nav__link .md-ellipsis").forEach((span) => {
+        const link = span.closest("a");
+        if (!link || link.classList.contains("md-nav__link--active")) return;
+        if (!span.dataset.full) span.dataset.full = span.textContent.trim();
+        if (!link.title) link.title = span.dataset.full;
+        if (span.textContent !== span.dataset.full) span.textContent = span.dataset.full;
+        pairs.push([span, span]);
+      });
+      fitWords(pairs);
+    };
     let navFrame = 0;
     const fitNavLater = () => { cancelAnimationFrame(navFrame); navFrame = requestAnimationFrame(fitNav); };
     requestAnimationFrame(fitNav);   // after layout.js has put back a remembered column width
     window.addEventListener("resize", fitNavLater, { passive: true });
-    document.querySelectorAll(".path-nav .pn-title").forEach((t) => fitWords(t, t.closest("a")));
+    if (drawerBox) drawerBox.addEventListener("change", fitNavLater);
+    const sideNav = document.querySelector(".md-sidebar--primary");
+    if (sideNav) sideNav.addEventListener("change", fitNavLater);
+    fitWords([...document.querySelectorAll(".path-nav .pn-title")].map((t) => [t, t.closest("a")]));
     const mj = window.MathJax && window.MathJax.startup && window.MathJax.startup.promise;
     (mj || Promise.resolve()).then(wideMath, wideMath);
     document.addEventListener("toggle", wideLater, true);           // a solution opened: its math is laid out now
