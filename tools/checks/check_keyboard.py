@@ -133,6 +133,10 @@ def press_keys(page) -> list[str]:
     # every solution open, for the components inside
     page.evaluate("() => document.querySelectorAll('details').forEach((d) => (d.open = true))")
     page.wait_for_timeout(300)
+    # the line numbers of a code block are links, and not tab stops (dozens a page)
+    n = page.evaluate("() => [...document.querySelectorAll('.highlighttable .linenos a')].filter((a) => a.tabIndex >= 0).length")
+    if n:
+        out.append(f"{n} line numbers of the code blocks are tab stops")
     # a box steps with the arrow keys
     box = page.locator(".explorer").first
     if box.count():

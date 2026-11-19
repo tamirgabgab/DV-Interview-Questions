@@ -2050,8 +2050,19 @@ def toc_colons(output: str) -> str:
     return TOC_COLON.sub(lambda m: m.group(1) + "\u00a0:", output)
 
 
+LINE_LINK = '<a href="#__codelineno-'
+
+
+def line_links(output: str) -> str:
+    """`anchor_linenums` makes every line number of a code block a link to its line, and so
+    a tab stop: 48 more stops on 0033, 101 on 0023, each 16 by 18 px. The links stay (a click
+    still gives the line's address, and the boxes find the lines by their anchors, core.js)
+    but leave the tab order."""
+    return output.replace(LINE_LINK, '<a tabindex="-1" href="#__codelineno-')
+
+
 def on_post_page(output, page, config, **kwargs):
-    output = toc_colons(output)
+    output = line_links(toc_colons(output))
     if page.file.src_uri == "tags.md":
         output = _tag_names(output)
     if "home-band" in output:
