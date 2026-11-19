@@ -41,6 +41,8 @@
       list.before(btn);
     }
     btn.dataset.wired = "1";
+    const count = btn.querySelector(".nav-fold__n");
+    if (count && count.textContent !== String(items.length)) count.textContent = items.length;
     const set = (open) => {
       nav.classList.toggle("is-folded", !open);
       btn.setAttribute("aria-expanded", String(open));

@@ -2112,7 +2112,8 @@ def nav_fold(output: str, page) -> str:
     and opens the list for a reader who left it open. Both show on a computer only
     (14-layout.css), so the drawer of a phone is not changed."""
     section = page.parent
-    n = len(section.children) if section is not None else 0
+    # the section's own index page is its heading's link, not an item of the list
+    n = sum(1 for c in section.children if not (c.is_page and c.is_index)) if section is not None else 0
     if n < 2:
         return output
     paths = page.file.src_uri.startswith("paths/")
