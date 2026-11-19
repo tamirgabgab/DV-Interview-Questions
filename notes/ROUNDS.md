@@ -1,0 +1,87 @@
+# Fix rounds: the plan to go over with the owner
+
+Written in session 35 (2026-11-19) from the review of the site. The tasks themselves, with
+their measurements and file references, are in [`HANDOFF.md`](HANDOFF.md) under "Open
+items", "Next steps (session 35)", N1 to N8; this file only groups them into rounds, in
+the proposed order of work, so the owner and the session can go through them one at a
+time. Nothing here is implemented yet.
+
+How to use it: before a round, read its row and its section, answer the open questions,
+then tick the round's tasks in `HANDOFF.md` as they are done and write the outcome in the
+"Status" line here.
+
+The model columns are a judgment by the kind of work and its risk, not a measurement of
+cost or quality. The cheaper model is expected to do the work when it gets one task at a
+time (N6.1 alone, not a whole round) and the matching checks run after each task.
+
+## The rounds
+
+| Round | What it holds | Tasks | Size | Recommended model | Cheaper model | Why |
+|-------|---------------|-------|------|-------------------|---------------|-----|
+| 1. Housekeeping | a retry in `check_links.py`, Verilator v5.054, this folder's archive, a lock of the dependencies | N1.1 to N1.4 | small | Sonnet 5.5 | Haiku 5.5 | well-defined work, and the checks catch mistakes |
+| 2. Accessibility and speed | the run panel's Tab trap, `fitNav`, forced colours, line numbers as tab stops, small fields, the sticky rows on a short screen, the drawer button, the first-visit guide | N6.1, N6.2, N6.6 to N6.11 | medium | Opus 5.5 | Sonnet 5.5 | small fixes, but in code every page shares, and each finding is reproduced first |
+| 3. The question header and layout shifts | the chip row and the meta line on a phone, the home page's shift on a tablet, the part row's jump | N5, N6.3 to N6.5 | medium | Opus 5.5 | Sonnet 5.5 | needs visual judgment in RTL at several widths |
+| 4. Page weight | minify `site.css`, load by page type, remove dead rules, literal colours, a weight budget | N2.1 to N2.5, N6.12 | large | Fable 5.2 | Opus 5.5 | a change in the hook that builds the whole site; a mistake breaks pages nobody looked at |
+| 5. Search and sharing | a description per page, JSON-LD, sitemap dates, Search Console (owner) | N3.1 to N3.4 | small to medium | Sonnet 5.5 | Haiku 5.5 | separate additions to the hook, easy to check in the built HTML |
+| 6. DV-core questions | about ten new questions: "find the bug", UVM, SVA, coverage, CDC | N4.1, N4.4 | very large | Fable 5.2 | Opus 5.5 | correct SystemVerilog, proofs and boxes; a mistake costs the most here |
+| 7. Grading and wording | re-grade the difficulty, reword the level cards, missing topic names | N4.2, N4.3, part of N7 | small | Sonnet 5.5 | Haiku 5.5 | front matter and text, once the owner sets the criteria |
+| 8. Older items and CI time | 0036, boxes taller than a screen, small figure labels, a shorter CI | N7, N8 | medium to large | Opus 5.5 | Sonnet 5.5 | 0036 already failed twice with agents; the rest is simpler |
+
+Where not to save: rounds 6 and 4. In round 6 the content is the product; in round 4 one
+change reaches all 109 pages. Where saving is safe: rounds 1, 5 and 7, since
+`lint_pages.py`, `mkdocs build --strict` and `check_links.py` catch almost every mistake.
+Round 8 can be split: 0036 on the recommended model, the rest on the cheaper one.
+
+## Round by round
+
+### Round 1. Housekeeping
+
+- Open questions: none; it can start at once.
+- Status: not started.
+
+### Round 2. Accessibility and speed
+
+- The measurements are a subagent's; reproduce each before fixing it.
+- Open questions: turn `anchor_linenums` off, or keep the links and take them out of the
+  tab order (N6.7)?
+- Status: not started.
+
+### Round 3. The question header and layout shifts
+
+- Open questions: the kind chip as an icon only on a phone (offered in work log item 210,
+  not answered), or the "tested" check moved into the meta line? May the meta line wrap to
+  two lines on a phone?
+- Status: not started.
+
+### Round 4. Page weight
+
+- No visible change is intended; compare computed styles before and after, as in work log
+  item 205.
+- Open questions: none before starting; the split by page type (N2.3) is shown to the
+  owner as numbers before it goes to `main`.
+- Status: not started.
+
+### Round 5. Search and sharing
+
+- Open questions: does the owner want the site in Google Search Console (N3.4)?
+- Status: not started.
+
+### Round 6. DV-core questions
+
+- 23 of 109 questions are DV or hardware; there is no debug question.
+- Open questions: which topics and how many; is "find the bug" a new kind of page; which
+  levels (student has 14 questions, junior 69, senior 26).
+- Status: not started.
+
+### Round 7. Grading and wording
+
+- 84 of 109 questions are "medium".
+- Open questions: the criteria for easy, medium and hard per level; reword the level
+  cards now, or after round 6 adds the questions they promise?
+- Status: not started.
+
+### Round 8. Older items and CI time
+
+- Open questions: is 0036 worth a third attempt, or does its box get a simpler design?
+  Is a 34-minute full lane a problem for the owner at all?
+- Status: not started.

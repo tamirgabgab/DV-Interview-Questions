@@ -1478,6 +1478,8 @@ The owner asked for a review of the site and of this file and for the next steps
 for the coming days. Every number below was measured in session 35 on a local build of
 dd9e984 (work log item 212). Nothing here is implemented yet; the order is the proposed
 order of work. Sizes: S up to an hour, M half a day, L a day or more.
+[`ROUNDS.md`](ROUNDS.md) groups these tasks into eight rounds with the questions to settle
+with the owner before each; go through it with the owner round by round.
 
 **N1. Housekeeping first (S each, one short session):**
 - [ ] N1.1 The weekly workflow is red since 2026-11-16 (run 43904002880, external-links):
