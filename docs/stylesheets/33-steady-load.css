@@ -1,0 +1,33 @@
+/* The site's styles, part 33: a page that does not move while it loads (session 35, N6.4 and N6.5). The hook writes into the built page what the scripts used to add after the load (the part row, the folded level list of the side navigation), and the rules here give a part that a script still moves the place it will have. It loads after the parts before it. */
+
+
+/* --- N6.5: the part row and the page tools on a computer --------------------------------------
+   The row of part chips is in the built page (part_row in the hook), and the header card of
+   such a page has .qh-parts. On a computer question-page.js moves the page tools from the
+   card into the row: the card got 63 px shorter and the row 8 px taller after the load.
+   Here the card and the row have their final shape from the first paint: the tools do not
+   show in the card, the card takes the padding of a card without tools, and the row keeps
+   the height of the tools (1.9 rem). The rules repeat those of .has-tools and of the card
+   without tools in 29-question-ux.css, for the moment before the script has run. (A class
+   on the card, not :has(~ .part-nav): the card is painted before the row is parsed.) */
+@media screen and (min-width: 60em) and (hover: hover) {
+  .md-typeset .part-nav:not(.pn-fixed):not(#_) { margin-top: 0; }
+  .md-typeset .part-nav:not(.pn-fixed) > .pn-chips { align-items: center; min-height: 1.9rem; }
+  .md-typeset .question-header.qh-parts > .question-tools { display: none; }
+  .md-typeset .question-header.qh-parts:not(#_) { padding-bottom: var(--sp-3); margin-bottom: var(--sp-2); }
+  .md-typeset .question-header.qh-parts > .qh-top { margin-bottom: 0.3rem; }
+}
+
+
+/* --- N6.4: the home page's interview builder ----------------------------------------------------
+   The builder was hidden until home.js had the question list, and then pushed everything
+   under it down (550 px on a tablet, where it sits under the hero's text). It is shown from
+   the start, and the lines the script fills keep their room: the fan of cards has a fixed
+   height already, the line under it and the summary get theirs here (the summary is one
+   line under the text and two in the narrow column beside it). */
+html:not(.dvq-js) .md-typeset .home-hero .hh-builder { display: none; }   /* without scripts (the class is set in the head, overrides/main.html) */
+.md-typeset .home-hero .hb-peek { min-height: 1.6rem; }
+.md-typeset .home-hero .hb-sum { min-height: 1.02rem; min-height: 1lh; }
+@media screen and (min-width: 60em) {
+  .md-typeset .home-hero .hb-sum { min-height: 2.04rem; min-height: 2lh; }
+}

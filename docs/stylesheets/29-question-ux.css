@@ -77,7 +77,7 @@ body.interview-mode .md-typeset .box-teaser { display: none; }
 .md-typeset .question-header > .qh-bottom > * { display: inline; }
 .md-typeset .question-header .qh-bottom .qh-pn { display: inline-flex; vertical-align: middle; margin-inline-end: 0.35rem; }
 .md-typeset .question-header .qh-topics-name { display: none; }
-.md-typeset .question-header .qh-bottom a.qh-tag { padding: 0; border: 0; border-radius: 0; line-height: inherit; text-decoration: none; color: inherit; }
+.md-typeset .question-header .qh-bottom a.qh-tag { padding: 0; border: 0; border-radius: 0; line-height: inherit; text-decoration: none; color: inherit; unicode-bidi: isolate; }   /* isolated: two English topics side by side stay in the line's order, each with its dot */
 .md-typeset .question-header .qh-bottom a.qh-tag:is(:hover, :focus-visible) { color: var(--md-typeset-a-color); text-decoration: underline; }
 .md-typeset .question-header .qh-bottom a.qh-tag + a.qh-tag::before { content: "·"; display: inline-block; margin-inline: 0.3em; color: var(--md-default-fg-color--lighter); text-decoration: none; }
 .md-typeset .question-header .qh-topics + .qh-sep { display: inline-block; }
@@ -176,4 +176,16 @@ body.interview-mode .md-typeset .box-teaser { display: none; }
   .md-typeset .question-header .qh-top .qh-badge-ok .ui-ico { font-size: 0.8rem; }
   .md-typeset .question-header .qh-top button.qh-box-go .qh-box-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .md-typeset .question-header .qh-top button.qh-box-go .qh-box-arrow { display: none; }
+  /* the kind chip is its icon too (the owner, session 35: the chip row then keeps to one
+     line; with the words it wrapped on 92 of 109 pages, often for one icon). The words
+     stay for a screen reader and as the chip's tooltip. */
+  .md-typeset .question-header .qh-top .chip-kind:not(#_) { justify-content: center; width: 1.5rem; height: 1.5rem; padding: 0; border-radius: 50%; font-size: 0; gap: 0; }
+  .md-typeset .question-header .qh-top .chip-kind .kind-ico { font-size: 0.8rem; }
+  /* the meta line wraps to a second line (the owner, session 35): as one clipped line it hid
+     a topic on 98 of 109 pages, and a touch screen has no way to open it */
+  .md-typeset .question-header > .qh-bottom { overflow: visible; white-space: normal; text-overflow: clip; line-height: 1.7; }
+  /* the chip of the line without its label DVQ-<id> (the id is in the chip row above; the
+     label stays for a screen reader), and the date in one piece: two lines on 98 pages */
+  .md-typeset .question-header .qh-bottom .qh-pn bdi { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .md-typeset .question-header .qh-bottom .qh-date { white-space: nowrap; }
 }

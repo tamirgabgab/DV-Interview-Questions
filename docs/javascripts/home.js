@@ -165,7 +165,9 @@
       I.plan.set({ ids: current.map((q) => q[I.ID]), urls: current.map((q) => I.siteUrl(q[I.URL])), minutes: current.reduce((m, q) => m + I.targetMinutes(q[I.DIFF], q[I.PARTS]), 0), at: Date.now() });
     });
     document.addEventListener("dvq-marks", fill);
-    I.loadIndex().then((d) => { data = d; panel.hidden = false; fill(); }).catch(() => { /* no list: the builder stays hidden */ });
+    // the builder is in the page from the start (its room is kept, so nothing moves when the
+    // series comes in); without the question list it has nothing to offer and goes away
+    I.loadIndex().then((d) => { data = d; panel.hidden = false; fill(); }).catch(() => { panel.hidden = true; });
   };
 
   document.addEventListener("DOMContentLoaded", () => {

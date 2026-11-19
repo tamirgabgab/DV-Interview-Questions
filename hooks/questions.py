@@ -444,8 +444,11 @@ def path_icon(p: dict) -> str:
     return kind_icon(max(KINDS, key=kinds.count))
 
 
-def kind_chip(kind: str, quiet: bool = False) -> str:
-    return f'<span class="chip chip-kind chip-kind-{kind}"{QUIET if quiet else ""}>{kind_icon(kind)}{KINDS[kind]}</span>'
+def kind_chip(kind: str, quiet: bool = False, title: bool = False) -> str:
+    """The chip of a question's kind: its icon and its name. With title the name is the
+    chip's tooltip too (the question header, where a phone shows the icon alone)."""
+    tip = f' title="{html.escape(KINDS[kind])}"' if title else ""
+    return f'<span class="chip chip-kind chip-kind-{kind}"{tip}{QUIET if quiet else ""}>{kind_icon(kind)}{KINDS[kind]}</span>'
 
 
 def _base(page_url: str) -> str:
@@ -576,18 +579,18 @@ def _header(q: dict, markdown: str, page_url: str, tools: str = "") -> str:
     bottom = [pn, f'<span class="qh-topics"><span class="qh-topics-name">נושאים :</span>{topics}</span>']
     added = _added_date(q)
     if added:
-        bottom.append(f'<span class="qh-sep"></span><span>נוספה ב-{_date_he(added)}</span>')
+        bottom.append(f'<span class="qh-sep"></span><span class="qh-date">נוספה ב-{_date_he(added)}</span>')
     # the meta line is one clipped line (29-question-ux.css): its whole text is the tooltip
     meta = " · ".join([part_number(q["id"]), *(topic_name(t) for t in q["tags"]), *([f"נוספה ב-{_date_he(added)}"] if added else [])])
     # V11: the card carries its difficulty and kind (18-question.css tints a quiet trace
     # pattern along its top edge by the difficulty); its corner shows the question's own
     # chip (session 32, question_chip), and the meta line its label DVQ-<id>
     return (
-        f'<div class="question-header qh-diff-{q["difficulty"]} qh-kind-{q["kind"]}">\n'
+        f'<div class="question-header qh-diff-{q["difficulty"]} qh-kind-{q["kind"]}{HAS_PART_ROW if q.get("parts", 0) >= 2 else ""}">\n'
         f'<span class="qh-emblem qh-emblem-chip" aria-hidden="true">{question_chip(q["id"], q.get("parts", 0))}</span>\n'
         f'<h1>{_title_html(str(q["title"]))}</h1>\n'
         f'<div class="qh-top"><span class="qh-id"><span class="qh-id-w">שאלה </span>{q["id"]}</span>'
-        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"])}{"".join(badges)}</div>\n'
+        f'{level_chip(q["level"])}{difficulty_chip(q["difficulty"])}{kind_chip(q["kind"], title=True)}{"".join(badges)}</div>\n'
         f'{tools}\n'
         f'<div class="qh-bottom" title="{html.escape(meta)}">{"".join(bottom)}</div>\n'
         '</div>\n\n'
@@ -1046,7 +1049,9 @@ HERO_BOARD = '<canvas class="hh-board" aria-hidden="true"></canvas>'
 # M2): the reader picks a level, a length and kinds, and home.js fills a series of
 # questions that fits the time (dvqInterview.buildPlan, from questions.json); "start"
 # keeps the series in the browser, and interview mode walks through it question by
-# question. Hidden until the script fills it.
+# question. It is in the page from the start, with the room of its series kept
+# (33-steady-load.css): shown only once the script had filled it, it pushed the page under
+# it down by 550 px on a tablet (session 35). Without scripts it does not show (.dvq-js).
 INTERVIEW_LENGTHS = (20, 40, 60)
 
 
@@ -1058,7 +1063,7 @@ def _hero_builder() -> str:
                 f'<span class="hb-seg">{buttons}</span></div>')
     kinds = "".join(f'<button type="button" class="hb-topic" data-kind="{k}" aria-pressed="true">{html.escape(t)}</button>'
                     for k, t in KINDS.items())
-    return ('<div class="hh-builder" data-search-exclude hidden>'
+    return ('<div class="hh-builder" data-search-exclude>'
             '<p class="hb-title">להרכיב ראיון</p>'
             '<p class="hb-note">בוחרים רמה, אורך ונושאים, ומקבלים סדרת שאלות שמתאימה לזמן.</p>'
             + seg("level", "רמה", LEVELS.items(), "junior")
@@ -1476,7 +1481,7 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     if q:
         page.meta["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], *q["tags"]]
         page.meta.setdefault("hide", []).append("tags")   # the header card shows them
-        markdown = (_header(q, markdown, page.url, _tools(q, page.url)) + _path_nav(q, page.url) + markdown
+        markdown = (_header(q, markdown, page.url, _tools(q, page.url)) + _path_nav(q, page.url) + _part_row(q) + markdown
                     + _run_panel(q, markdown) + _source_line(q) + _end_card(q, page.url, page.next_page) + _related(q, page.url) + _comments_block())
 
     markdown = COST_LINE.sub(_cost_chips, markdown)
@@ -2061,8 +2066,65 @@ def line_links(output: str) -> str:
     return output.replace(LINE_LINK, '<a tabindex="-1" href="#__codelineno-')
 
 
+PART_ROW = ('<nav class="part-nav" aria-label="סעיפי השאלה" data-search-exclude><span class="pn-chips"></span>'
+            '<span class="pn-sol"></span><span class="pn-progress"><i></i></span></nav>')
+HAS_PART_ROW = " qh-parts"      # on the header card of a page with the row (33-steady-load.css)
+PART_H3 = re.compile(r'<h3 id="([^"]+)"[^>]*>(סעיף\s+[א-ת].*?)</h3>', re.S)
+HEADERLINK = re.compile(r'<a class="headerlink".*?</a>', re.S)
+TAG = re.compile(r"<[^>]+>")
+
+
+def _part_row(q: dict) -> str:
+    """The sticky row of part chips, for a question of two parts or more: an empty row in
+    the page's markdown, under the header card and the path strip; part_row fills it in the
+    built page. reading-tools.js built the row after the page had loaded, and everything
+    under it jumped down by its height (67 px, session 35); now the script only wires it."""
+    return PART_ROW + "\n\n" if q.get("parts", 0) >= 2 else ""
+
+
+def part_row(output: str) -> str:
+    """Fills the part row of _part_row with a chip per part heading ("סעיף א", the whole
+    heading as its tooltip), as reading-tools.js wrote them; a page whose built headings do
+    not give two parts loses the row (and its header card the class that tells of it), and
+    the script makes its own."""
+    if PART_ROW not in output:
+        return output
+    chips = []
+    for m in PART_H3.finditer(output):
+        text = html.unescape(TAG.sub("", HEADERLINK.sub("", m.group(2)))).replace("¶", "")
+        text = " ".join(text.split())
+        chips.append(f'<a href="#{m.group(1)}" class="part-nav__chip" title="{html.escape(text)}">'
+                     f'{html.escape(text.split("–")[0].strip())}</a>')
+    if len(chips) < 2:
+        return output.replace(PART_ROW, "").replace(HAS_PART_ROW + '">', '">', 1)
+    return output.replace(PART_ROW, PART_ROW.replace('<span class="pn-chips"></span>', f'<span class="pn-chips">{"".join(chips)}</span>'))
+
+
+NAV_SECTION = re.compile(r'(<li class="md-nav__item md-nav__item--active md-nav__item--section[^"]*">.*?<nav class="md-nav)'
+                         r'(" data-md-level="1"[^>]*>.*?)<ul class="md-nav__list"', re.S)
+
+
+def nav_fold(output: str, page) -> str:
+    """The side navigation lists every question of the page's level (69 for junior) and
+    layout.js folded the list to the page's own question after the load: the column jumped,
+    and with it the page's layout-shift score (0.11 on 0033 at 1440 px). The built page now
+    has the list folded and its button, as foldLevel made them; the script wires the button
+    and opens the list for a reader who left it open. Both show on a computer only
+    (14-layout.css), so the drawer of a phone is not changed."""
+    section = page.parent
+    n = len(section.children) if section is not None else 0
+    if n < 2:
+        return output
+    paths = page.file.src_uri.startswith("paths/")
+    button = ('<button type="button" class="nav-fold" aria-controls="dvq-level-list" aria-expanded="false" '
+              f'title="{"לפרוס את כל המסלולים" if paths else "לפרוס את כל השאלות של המשרה"}">'
+              f'<span class="nav-fold__text">{"כל המסלולים" if paths else "כל השאלות במשרה"}</span> '
+              f'<span class="nav-fold__n">{n}</span><span class="nav-fold__arrow" aria-hidden="true"></span></button>')
+    return NAV_SECTION.sub(lambda m: f'{m.group(1)} is-folded{m.group(2)}{button}<ul class="md-nav__list" id="dvq-level-list"', output, count=1)
+
+
 def on_post_page(output, page, config, **kwargs):
-    output = line_links(toc_colons(output))
+    output = nav_fold(line_links(toc_colons(output)), page)
     if page.file.src_uri == "tags.md":
         output = _tag_names(output)
     if "home-band" in output:
@@ -2073,7 +2135,7 @@ def on_post_page(output, page, config, **kwargs):
             _statements[page.url] = statement_sections(output)
         except Exception as e:                       # name the page, not only the TeX
             raise RuntimeError(f"{page.file.src_uri}: the search text of the statement failed: {e!r}") from e
-        output = qp_parts(video_links(output, _questions[page.file.src_uri]))
+        output = qp_parts(video_links(part_row(output), _questions[page.file.src_uri]))
         output = box_teaser(solution_summaries(output))
     output = one_stylesheet(output)
     scripts = wavedrom_scripts(output, page.url) + explorer_scripts(output, page.url)

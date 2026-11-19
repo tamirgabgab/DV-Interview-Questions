@@ -235,32 +235,40 @@
   // button, and mirrors it; the site header shows the title by then), with a
   // reading-progress line along its bottom. With parts it is sticky in the flow under the header; without
   // them it is fixed under the site header and slides in only after the header.
+  // The row with parts is in the built page (the hook's part_row), so nothing moves when
+  // this script runs: it is only wired here, and built here when the page has none.
   const partBar = (article) => {
     const header = article.querySelector(".question-header");
     const parts = Array.from(article.querySelectorAll("h3[id]")).filter((h) => /^סעיף/.test(h.textContent.trim()));
     if (!header && parts.length < 2) return;
     const fixed = parts.length < 2;
-    const nav = document.createElement("nav");
+    const ready = article.querySelector("nav.part-nav");
+    if (ready && fixed) ready.remove();
+    const built = Boolean(ready) && !fixed;
+    const nav = built ? ready : document.createElement("nav");
+    const part = (cls, tag = "span") => {
+      let el = nav.querySelector(`:scope > .${cls}`);
+      if (!el) { el = document.createElement(tag); el.className = cls; nav.append(el); }
+      return el;
+    };
     nav.className = `part-nav${fixed ? " pn-fixed" : ""}`;
     nav.setAttribute("aria-label", fixed ? "השאלה" : "סעיפי השאלה");
     nav.setAttribute("data-search-exclude", "");
     const h1 = header && header.querySelector("h1");
-    const chips = document.createElement("span");
-    chips.className = "pn-chips";
-    const links = (fixed ? [] : parts).map((h) => {
-      const a = document.createElement("a");
+    const chips = part("pn-chips");
+    const links = (fixed ? [] : parts).map((h, k) => {
+      const a = chips.children[k] || chips.appendChild(document.createElement("a"));
       a.href = `#${h.id}`;
       a.className = "part-nav__chip";
       a.textContent = h.textContent.replace("¶", "").split("–")[0].trim();
       a.title = h.textContent.replace("¶", "").trim();
-      chips.append(a);
       return a;
     });
-    nav.append(chips);
+    while (chips.children.length > links.length) chips.lastElementChild.remove();
     // W347: the map of the solution being read shows here, so one sticky row remains
-    const slot = document.createElement("span");
-    slot.className = "pn-sol";
-    nav.append(slot);
+    const slot = part("pn-sol");
+    const progress = part("pn-progress");
+    if (!progress.firstElementChild) progress.innerHTML = "<i></i>";
     const own = header && header.querySelector(".qt-solved");
     if (own) {
       const solved = own.cloneNode(true);
@@ -276,16 +284,12 @@
       };
       new MutationObserver(mirror).observe(own, { attributes: true, subtree: true });
       mirror();
-      nav.append(solved);
+      progress.before(solved);
     }
-    const progress = document.createElement("span");
-    progress.className = "pn-progress";
-    progress.innerHTML = "<i></i>";
-    nav.append(progress);
     const h2 = Array.from(article.querySelectorAll("h2[id]"));
     const end = parts.length ? h2.find((h) => h.compareDocumentPosition(parts[parts.length - 1]) & Node.DOCUMENT_POSITION_PRECEDING) : null;
     if (fixed) article.append(nav);
-    else {
+    else if (!built) {
       const anchor = article.querySelector(".path-nav") || header;
       if (anchor) anchor.after(nav); else article.prepend(nav);
     }

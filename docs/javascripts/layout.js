@@ -17,22 +17,30 @@
   const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
 
   // The level's list: folded by default to the page's own question, the button opens it.
+  // The built page has the list folded and the button in place (nav_fold in the hook), so
+  // the column does not jump on load; here the button is wired, or made when it is missing.
   const foldLevel = () => {
     const nav = document.querySelector(".md-sidebar--primary .md-nav__item--section.md-nav__item--active > nav.md-nav");
     const list = nav && nav.querySelector(":scope > .md-nav__list");
-    if (!list || nav.querySelector(":scope > .nav-fold")) return;
+    if (!list) return;
     const items = list.querySelectorAll(":scope > .md-nav__item");
     if (items.length < 2) return;
     list.id = list.id || "dvq-level-list";
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "nav-fold";
-    btn.setAttribute("aria-controls", list.id);
+    let btn = nav.querySelector(":scope > .nav-fold");
+    if (btn && btn.dataset.wired) return;
     // the section of the study paths lists paths, not questions
     const first = list.querySelector("a.md-nav__link[href]");
     const paths = !!first && /(^|\/)paths\//.test(new URL(first.getAttribute("href"), location.href).pathname);
-    const all = paths ? "כל המסלולים" : "כל השאלות במשרה";
-    btn.innerHTML = `<span class="nav-fold__text">${all}</span> <span class="nav-fold__n">${items.length}</span><span class="nav-fold__arrow" aria-hidden="true"></span>`;
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "nav-fold";
+      btn.setAttribute("aria-controls", list.id);
+      const all = paths ? "כל המסלולים" : "כל השאלות במשרה";
+      btn.innerHTML = `<span class="nav-fold__text">${all}</span> <span class="nav-fold__n">${items.length}</span><span class="nav-fold__arrow" aria-hidden="true"></span>`;
+      list.before(btn);
+    }
+    btn.dataset.wired = "1";
     const set = (open) => {
       nav.classList.toggle("is-folded", !open);
       btn.setAttribute("aria-expanded", String(open));
@@ -46,7 +54,6 @@
       set(open);
       window.dispatchEvent(new Event("resize"));   // the titles now shown are fitted to the column
     });
-    list.before(btn);
   };
 
   // A grip on the inner edge of each sidebar; the width goes into a CSS variable.

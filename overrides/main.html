@@ -20,6 +20,10 @@
   {{ super() }}
   <link rel="manifest" href="{{ 'manifest.webmanifest' | url }}">
   <link rel="apple-touch-icon" href="{{ 'assets/icons/icon-180.png' | url }}">
+  {#- .dvq-js from the first paint: a part that only a script can use (the home page's
+      interview builder) is in the page from the start and hidden without scripts. The
+      theme's own .no-js stays until its bundle has run, long after the first paint. -#}
+  <script>document.documentElement.classList.add("dvq-js");</script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
