@@ -120,6 +120,11 @@
   width: 1.5rem;
 }
 
+/* A short LTR span of the prose (hooks/questions.py, ltr_keep) stays on one line; a table
+   cell may still wrap it, or the table outgrows a phone. */
+.md-typeset span.ltr-nw { white-space: nowrap; }
+.md-typeset :is(td, th) span.ltr-nw { white-space: normal; }
+
 /* Keep code, math and diagrams left-to-right inside the RTL (Hebrew) layout. */
 .md-typeset pre,
 .md-typeset code,

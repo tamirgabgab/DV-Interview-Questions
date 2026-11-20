@@ -2389,6 +2389,21 @@ def _trap_group(m: re.Match) -> str:
 
 TOC_COLON = re.compile(r'(<span class="md-ellipsis">[^<]*?[\u05d0-\u05ea\)]) :')
 
+# A short LTR span of a page's prose (a tuple, a short formula: "(3, 1)") never breaks across
+# lines, where its parts would read in the wrong order: it gets the class ltr-nw (nowrap in
+# 01-base.css, but in a table cell), as ltr() does in the boxes (core.js, 24 characters).
+LTR_SPAN = re.compile(r'<span dir="ltr">((?:(?!</?span)[^\n])*?)</span>')
+LTR_KEEP = 24
+
+
+def ltr_keep(output: str) -> str:
+    def keep(m: re.Match) -> str:
+        plain = html.unescape(re.sub(r"<[^>]*>", "", m.group(1)))
+        if " " not in plain.strip() or len(plain) > LTR_KEEP:
+            return m.group(0)
+        return f'<span dir="ltr" class="ltr-nw">{m.group(1)}</span>'
+    return LTR_SPAN.sub(keep, output)
+
 
 def toc_colons(output: str) -> str:
     """The table of contents writes a heading's text with its whitespace collapsed, so the
@@ -2551,7 +2566,7 @@ def on_post_page(output, page, config, **kwargs):
             _statements[page.url] = statement_sections(output)
         except Exception as e:                       # name the page, not only the TeX
             raise RuntimeError(f"{page.file.src_uri}: the search text of the statement failed: {e!r}") from e
-        output = qp_parts(video_links(part_row(output), _questions[page.file.src_uri]))
+        output = qp_parts(video_links(part_row(ltr_keep(output)), _questions[page.file.src_uri]))
         output = box_teaser(solution_summaries(output))
         output = page_description(output, _description(_statements[page.url]))
         output = json_ld(output, _questions[page.file.src_uri], page, config)
