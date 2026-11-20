@@ -53,6 +53,14 @@
   .md-typeset .explorer .ex-side .kb-table td.kb-diff { white-space: nowrap; }
 }
 
+/* farm (0048): the lengths table under the legend, beside the picture, without Material's
+   minimum column width */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="farm"] .ex-side .farm-table table { font-size: 0.62rem; }
+  .md-typeset .explorer[data-kind="farm"] .ex-side .farm-table :is(td, th) { padding: 0.3em 0.35em; min-width: 0; }
+  .md-typeset .explorer[data-kind="farm"] .ex-side .farm-table td:is(:nth-child(2), :nth-child(3)) bdi.ex-nw { white-space: nowrap; }
+}
+
 /* boxes (0009): the ring a little smaller in its column, so the walk beside the proof is shorter */
 @container (min-width: 600px) {
   .md-typeset .explorer[data-kind="boxes"] .ex-main svg.bx-live { width: 16rem; }

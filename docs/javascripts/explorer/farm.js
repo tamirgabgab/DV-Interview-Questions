@@ -120,7 +120,7 @@
       const fit = () => {
         if (st.mode === "c") return fitC(layout);
         const narrow = box.clientWidth > 0 && box.clientWidth < 560;
-        const W = narrow ? 400 : 640, left = 64, right = st.refl ? 96 : 40, top = 30, bottom = 64;
+        const W = narrow ? 400 : 560, left = 64, right = st.refl ? 96 : 40, top = 30, bottom = 64;
         const lo = st.refl ? -st.H : 0, hi = st.refl ? 3 * st.H : st.H;
         const S = Math.min((W - left - right) / st.L, (st.refl ? (narrow ? 520 : 560) : (narrow ? 240 : 280)) / (hi - lo));
         const Hh = top + (hi - lo) * S + bottom;
@@ -154,7 +154,7 @@
         const span = Math.max(x1 - x0, y1 - y0);
         x0 -= 0.06 * span; x1 += 0.06 * span; y0 -= (st.refl ? 0.06 : 0.03) * span; y1 += 0.08 * span;
         if (y1 - y0 < 0.42 * (x1 - x0)) y1 = y0 + 0.42 * (x1 - x0);       // room above the food line
-        const W = narrow ? 400 : 640, left = 30, right = 30, top = 20, bottom = 30;
+        const W = narrow ? 400 : 560, left = 30, right = 30, top = 20, bottom = 30;
         const maxH = st.refl ? (narrow ? 460 : 540) : (narrow ? 280 : 320);
         const S = Math.min((W - left - right) / (x1 - x0), maxH / (y1 - y0));
         const pad = (W - left - right - (x1 - x0) * S) / 2;
@@ -571,7 +571,10 @@
 
   dvqExplorers.register({
     views: { farm: farmView },
-    cols: { farm: { main: ".farm-drag, svg.farm-live", side: ".viz-legend", w: "minmax(0, 2.2fr)" } },   // the picture beside its legend; the lengths table stays wide under them
+    // the picture beside its legend and the lengths table, so the box with the reflections
+    // (a picture four strips tall) fits one screen; a wide box draws 560 units across, so the
+    // narrower picture keeps its text size
+    cols: { farm: { main: ".farm-drag, svg.farm-live", side: ".viz-legend, .farm-table", w: "minmax(0, 1.4fr)" } },
     help: {
       farm: "בסעיף א גוררים את החוואי ואת הפרה לאורך הדפנות, ובסעיף ב את נקודות העצירה לאורך הקווים; הפינות משנות את L ואת H, והשיקוף מראה את הקו הישר שמוצאים בו את המסלול. ב\"עצירות חופשיות\" גוררים את נקודות העצירה לכל מקום ומשווים את האורך לקצר ביותר. בסעיף ג המחוון משנה את הזווית θ של קו האוכל, והשיקוף מראה את הסיבוב של הפרה סביב O.",
     },
