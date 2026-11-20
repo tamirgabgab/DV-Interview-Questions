@@ -664,6 +664,9 @@ PAIRS = [
     ("0111 falsepass, the error in the verdict and on the cards", "var(--diff-hard)", [CARD, PAGE], TEXT),
     ("0111 falsepass, the frame of an overwritten item's chip and of its key", "var(--viz-s5)", [CARD, PAGE], UI),
     ("0111 falsepass, the frame of a late item's chip, the cursor's key", "var(--viz-s2)", [CARD, PAGE], UI),
+    # 0113 objrun (stylesheets/questions/0113-objrun.css): the columns after the end of the run
+    ("0113 objrun, a value of the strip or a stage chip after the end of the run", "var(--viz-ink)", [f"color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color))"], TEXT),
+    ("0113 objrun, the frame of the after-the-end key", "var(--viz-text)", [CARD, PAGE], UI),
     # 0114 seqarb (stylesheets/questions/0114-seqarb.css): the slot line, the queue card and the why line
     ("0114 seqarb, an item of I in the slot line, the chosen request in the queue", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s5", 24), ("s2", 16))], TEXT),
     ("0114 seqarb, an empty slot, the lock holder's line", "var(--viz-text)", [CARD, PAGE], TEXT),
