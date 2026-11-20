@@ -1,0 +1,8 @@
+{
+  "name": "dvq-math",
+  "private": true,
+  "description": "MathJax for rendering the site's math at build time (render.js, called by hooks/questions.py)",
+  "dependencies": {
+    "mathjax": "3.2.2"
+  }
+}

@@ -113,6 +113,7 @@ DV-Interview-Questions/
 │   │   ├── search_text.py      # A question's statement for the search, math in plain symbols (the hook imports it)
 │   │   ├── make_icons.py       # The home-screen icons in docs/assets/icons/
 │   │   ├── social/dvq.yml      # Social preview card layout (RTL) for Material's social plugin
+│   │   ├── mathjax/            # render.js + the npm lock of mathjax@3.2.2: the math, rendered at build time
 │   │   └── codemirror/         # entry.js + build.sh: the run panel's editor bundle
 │   ├── authoring/
 │   │   ├── new_question.py     # Scaffold: page, tests folder, generator stub, catalog row
@@ -148,7 +149,7 @@ DV-Interview-Questions/
 │   │   ├── icons/              # Home-screen icons (tools/build/make_icons.py)
 │   │   ├── images/             # Figures and screenshots referenced by questions
 │   │   └── spider-fly.html     # The owner's standalone spider-and-fly tool, embedded by 0030 (kept as sent)
-│   ├── javascripts/            # MathJax, WaveDrom, marks, table tools, page tools, Python runner
+│   ├── javascripts/            # WaveDrom, marks, table tools, page tools, Python runner
 │   │                           # (run-python.js, py-worker.js, py_run.py, vendor/codemirror.min.js), home.js,
 │   │                           # reading-tools.js (lightbox, tooltips, part bar), motion.js (the drawn logo,
 │   │                           # the table of contents marker, page transitions), layout.js (the folded
@@ -641,7 +642,8 @@ builder (in the page from the start, its lines with a minimum height; hidden wit
 by `html:not(.dvq-js)`, a class set by an inline script in the head, `overrides/main.html`).
 A new part that a script adds above the fold follows the same rule. Measure with the Layout
 Instability API (`new PerformanceObserver(...).observe({ type: "layout-shift" })`) at 390,
-820 and 1440 px. What still moves is MathJax laying out inline math (`notes/HANDOFF.md`, N9).
+820 and 1440 px. The math is in the built page (rendered at build time, see "What keeps the
+pages light"), so it lays out with the text.
 
 A phone's question header (`29-question-ux.css`, up to 44.9375em): the kind chip, the box chip
 and the "tested" badge are their icons (the words stay for a screen reader and as tooltips),
@@ -712,7 +714,7 @@ All the motion stops under reduced motion and in an automated browser.
 |----------------------------------|--------------------------------------------------------------------|
 | Block diagrams, flows, FSMs      | ` ```mermaid ` fenced blocks ([Mermaid](https://mermaid.js.org/); 0024 has a sequence diagram; a node to highlight takes `classDef found stroke:currentColor,stroke-width:3px`, and `01-base.css` gives it the chart green: Mermaid does not parse `var()` in a `classDef`, and the diagram renders in a closed shadow root that site CSS does not reach)  |
 | Timing diagrams / waveforms      | ` ```wavedrom ` fenced blocks ([WaveDrom](https://wavedrom.com/)); every diagram gets the waveform viewer under it (`wave-viewer.js`, session 31): "מדידה" puts cursors A and B on the period marks with the difference in cycles, in ns too when the source declares its clock with a `dvq: { mhz: 100 }` key (WaveDrom ignores it); "הפעלה" sweeps a time line and lights a log of the changes written from the waves (clocks, and a lane named `cycle`, left out; a diagram of cases split by `{}` rows names each lane with its case from the head text, `"a / b / c"`)  |
-| Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax)           |
+| Math                             | LaTeX: `\( ... \)` inline, `\[ ... \]` display (MathJax, at build) |
 | Code                             | Fenced blocks inside SystemVerilog / Python content tabs           |
 | Arrays, decks, bit grids         | HTML cell tables from `tools/figures/cells.py` (`table(rows, aria, head)`, class `pm-cells` in 11-questions.css): a row of cells per state, the tints `c1` to `c5` for a cycle or a group, `is-hl` for the cells a step works on; the table sits in a focusable scroll region, since it is wider than a phone (0072 to 0075, and their boxes)  |
 | Charts                           | Inline SVG with class `perf-chart` + an HTML `viz-legend` (0005, 0006, 0007; 0016 survivor chains; 0026 strategy bars and a position-time chart; 0039 drops per threshold; 0041 the coverage curve; 0042 the water in motion along the road and the distance against the water; 0043 none, the grids are `figure` SVGs) |
@@ -1049,7 +1051,16 @@ page's, the maps', the lists', the run panel's, the video's) load only on the pa
 hold an element they act on: a new script that acts on a few pages only goes there with its
 marks. WaveDrom with its init script loads only on the pages that have a ```` ```wavedrom ````
 block (the hook adds the tags, like the explorer scripts). The explorer scripts load per
-page as well, and CodeMirror and Pyodide only when a run panel is opened.
+page as well, and CodeMirror and Pyodide only when a run panel is opened. The math is
+rendered at build time (N9.1): the hook sends every formula of the built pages, once each,
+to `tools/build/mathjax/render.js` (Node, the npm package mathjax@3.2.2 of
+`tools/build/mathjax/package-lock.json`, installed by `npm ci --prefix tools/build/mathjax`,
+or the copy `tools/dev_setup.sh` keeps in `.cache/cdn/mathjax`), puts the HTML it returns in
+place of the TeX and links `stylesheets/math.css`, the styles of every character the site
+uses, on the pages with math; the pages load no MathJax script, only its fonts from the CDN.
+A TeX error or a macro TeX does not know stops the build with the formula. The browser used
+to scale each formula to Rubik's x-height (123.4%); `render.js` writes that scale as one
+rule.
 
 `check_404.py` serves the built site under the path of `site_url` (`/DV-Interview-Questions/`),
 answers every missing address with `404.html` and the status 404 as GitHub Pages does, and
@@ -1070,8 +1081,8 @@ and the textarea it replaces on a second load with the editor's bundle cut off),
 the search. On every walked page the navigation drawer's button must be a named button that
 opens the drawer with Enter and closes it with Escape, and on the question page no line
 number of a code block may be a tab stop. A
-new keyboard behaviour of a component belongs there. MathJax's contextual menu is off
-(`docs/javascripts/mathjax.js`): with it every formula was a tab stop. The first question
+new keyboard behaviour of a component belongs there. The math has no MathJax contextual menu
+(it is rendered at build time): with the menu every formula was a tab stop. The first question
 page with a tutorial video is walked too, and its dialog checked by keyboard: Enter on the
 tool opens it with the focus inside, Tab and Shift+Tab stay in it, its buttons are named,
 Escape closes it and gives the focus back, and play makes a titled player (its request to
@@ -1086,8 +1097,8 @@ live on YouTube (notes/VIDEOS.md); the lint and the build hook run the same fiel
 `check_phone.py` needs Playwright (`requirements/dev.txt`) and its Chromium
 (`python -m playwright install chromium`). It writes a screenshot of each page to
 `.cache/phone/` (CI uploads them as the `phone-screenshots` artifact). Without access to the
-CDNs, add `--local-cdn`: it implies `--offline` and serves MathJax, Mermaid and WaveDrom
-from the copies `tools/dev_setup.sh` keeps in `.cache/cdn` (and, in the phone check, runs
+CDNs, add `--local-cdn`: it implies `--offline` and serves MathJax's fonts, Mermaid and
+WaveDrom from the copies `tools/dev_setup.sh` keeps in `.cache/cdn` (and, in the phone check, runs
 axe-core from there); `--route REGEX=FILE` serves any other script from a local file.
 
 **Cloud sessions** (Claude Code on the web) prepare themselves: the SessionStart hook

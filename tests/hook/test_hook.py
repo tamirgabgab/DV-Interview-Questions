@@ -656,3 +656,67 @@ def test_end_card():
     # the path strip: the step also in its short form for a phone
     strip = hook._path_nav(first, "questions/x/0001-y/")
     assert f'<span class="pn-step-short" dir="ltr" aria-hidden="true">1/{len(path["steps"])}</span>' in strip
+
+
+def test_math_tex():
+    assert hook._math_tex(r"\( a &lt; b \)") == ("a < b", False)
+    assert hook._math_tex("\n\\[\n x^2 \n\\]\n") == ("x^2", True)
+    try:
+        hook._math_tex("x^2")
+    except hook.PluginError as e:
+        assert "x^2" in str(e)
+    else:
+        raise AssertionError("TeX without its delimiters must stop the build")
+
+
+def test_write_math_puts_the_rendered_math_in_the_pages(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_render(items):
+        calls.append(items)
+        return [f"<mjx-container>{tex}|{int(display)}</mjx-container>" for tex, display in items], "mjx-c { padding: 0 }"
+
+    monkeypatch.setattr(hook, "render_math", fake_render)
+    bundle = hook.CSS_BUNDLES[True]
+    head = f'<head><link rel="stylesheet" href="../../{bundle}">\n</head>'
+    (tmp_path / "stylesheets").mkdir()
+    page = tmp_path / "questions" / "q" / "index.html"
+    page.parent.mkdir(parents=True)
+    page.write_text(f'<html>{head}<body><p>אם <span class="arithmatex">\\( n \\)</span> ו־'
+                    f'<span class="arithmatex">\\(n\\)</span></p><div class="arithmatex">\\[ a &lt; b \\]</div></body></html>',
+                    encoding="utf-8")
+    other = tmp_path / "404.html"
+    other.write_text(f'<html><head><link rel="stylesheet" href="/dvq/{hook.CSS_BUNDLES[False]}">\n</head>'
+                     '<body><span class="arithmatex">\\( m \\)</span></body></html>', encoding="utf-8")
+    plain = tmp_path / "plain.html"           # no bundle: not a page of the site (e.g. a box's frame)
+    plain.write_text('<html><head></head><body><span class="arithmatex">\\( z \\)</span></body></html>', encoding="utf-8")
+    hook.write_math(tmp_path, "/dvq/")
+    # every formula once, the same TeX written twice included
+    assert sorted(calls[0]) == [("a < b", True), ("m", False), ("n", False)]
+    out = page.read_text(encoding="utf-8")
+    assert out.count('<span class="arithmatex"><mjx-container>n|0</mjx-container></span>') == 2
+    assert '<div class="arithmatex"><mjx-container>a < b|1</mjx-container></div>' in out
+    assert out.endswith('<link rel="stylesheet" href="../../stylesheets/math.css">\n</head><body>' + out.split("</head><body>", 1)[1])
+    assert '<link rel="stylesheet" href="/dvq/stylesheets/math.css">\n</head>' in other.read_text(encoding="utf-8")
+    assert "\\( z \\)" in plain.read_text(encoding="utf-8")
+    css = (tmp_path / hook.MATH_CSS).read_text(encoding="utf-8")
+    assert css.startswith("/*") and css.rstrip().endswith("mjx-c{padding: 0}")
+
+
+def test_render_math_with_mathjax():
+    """The real renderer, where Node and MathJax 3.2.2 are installed (CI: npm ci in tools/build/mathjax)."""
+    import shutil
+    import pytest
+
+    places = [ROOT / "tools" / "build" / "mathjax" / "node_modules" / "mathjax", ROOT / ".cache" / "cdn" / "mathjax"]
+    if not shutil.which("node") or not any((p / "es5" / "node-main.js").is_file() for p in places):
+        pytest.skip("no node or no mathjax@3.2.2 (npm ci --prefix tools/build/mathjax)")
+    html, css = hook.render_math([("x_1^2 + \\sum_{i=1}^{n} i", False), ("\\frac{a}{b}", True)])
+    assert len(html) == 2 and all(h.startswith('<mjx-container class="MathJax" jax="CHTML"') for h in html)
+    assert 'display="true"' in html[1] and "<mjx-assistive-mml" in html[0]
+    assert "font-size: 123.4%" in css                     # the scale MathJax measured in the browser
+    assert "\nmjx-msubsup > mjx-script, mjx-munderover > mjx-script {" in css and "\nmjx-script {" not in css
+    assert "cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2/" in css
+    for bad, message in (("\\frac{a}{", "Missing close brace"), ("\\nosuchmacro + 1", "Undefined control sequence \\nosuchmacro")):
+        with pytest.raises(hook.PluginError, match=re.escape(message)):
+            hook.render_math([("x", False), (bad, False)])

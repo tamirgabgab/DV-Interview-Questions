@@ -639,7 +639,8 @@
 
   // An inline formula wider than its line (a long chain, or the text enlarged by the phone)
   // scrolls on its own instead of widening the page: marked .is-wide, and focusable so the
-  // keyboard can scroll it. Measured once MathJax is done and again on a resize.
+  // keyboard can scroll it. Measured once the fonts are in (the math is in the page from the
+  // build) and again on a resize.
   const wideMath = () => {
     document.querySelectorAll(".md-typeset mjx-container:not([display='true'])").forEach((m) => {
       const box = m.parentElement && m.parentElement.closest("p, li, td, th, dd, div, span.arithmatex");
@@ -756,8 +757,8 @@
     const sideNav = document.querySelector(".md-sidebar--primary");
     if (sideNav) sideNav.addEventListener("change", fitNavLater);
     fitWords([...document.querySelectorAll(".path-nav .pn-title")].map((t) => [t, t.closest("a")]));
-    const mj = window.MathJax && window.MathJax.startup && window.MathJax.startup.promise;
-    (mj || Promise.resolve()).then(wideMath, wideMath);
+    wideMath();
+    if (document.fonts) document.fonts.ready.then(wideMath, wideMath);
     document.addEventListener("toggle", wideLater, true);           // a solution opened: its math is laid out now
     window.addEventListener("resize", wideLater, { passive: true });
   });

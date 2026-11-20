@@ -21,9 +21,10 @@ this check runs the same test on every figure of the open page, the live figures
 explorer boxes included, one line per covered figure.
 
 In a sandbox without access to the CDNs, --offline ignores errors of external scripts and
---route REGEX=FILE serves a CDN script from a local copy (e.g. MathJax, so math is laid out
-as on the live site). --local-cdn does both for the copies tools/dev_setup.sh keeps in
-.cache/cdn (MathJax, Mermaid, WaveDrom) and runs axe-core from there unless --axe is given.
+--route REGEX=FILE serves a CDN file from a local copy (e.g. a font of the math, so math is
+laid out as on the live site). --local-cdn does both for the copies tools/dev_setup.sh keeps
+in .cache/cdn (MathJax's fonts, Mermaid, WaveDrom) and runs axe-core from there unless --axe
+is given.
 
 Every page is also measured again with its text enlarged 1.3 times (--font-scale), as a
 phone's font-size setting enlarges it: a row that then widens the page fails, since Android
@@ -32,12 +33,14 @@ Chrome zooms such a page out and shows the navigation drawer beside it.
 Every page's line also gives its weight: the HTML in KB, and what the browser fetched for it
 in all (the HTML, the styles, the scripts, the fonts) in KB and requests, so a page that
 grows heavy is seen; a page whose HTML is over --weight-warn KB (400) gets a warning, and the
-summary names the three heaviest pages. The line also gives the site's own styles and scripts
-that the page fetched (Material's and the site's stylesheets, Material's script and the
-site's, the boxes' and CodeMirror once a run panel opens), and a page whose styles and scripts
-together are over --code-warn KB (1400, a little above what round 4 left: about 535 KB of
-styles and 800 KB of scripts on the heaviest question page) gets a warning, so a rule or a
-script that starts loading everywhere is seen.
+summary names the three heaviest pages. The math, rendered into the page at build time, is
+given apart ("+250 KB math") and left out of the warning: it is the markup MathJax used to
+build in the browser, about 5 KB per 100 KB once compressed. The line also gives the site's
+own styles and scripts that the page fetched (Material's and the site's stylesheets,
+Material's script and the site's, the boxes' and CodeMirror once a run panel opens), and a
+page whose styles and scripts together are over --code-warn KB (1400, a little above what
+round 4 left: about 535 KB of styles and 800 KB of scripts on the heaviest question page)
+gets a warning, so a rule or a script that starts loading everywhere is seen.
 
 --axe PATH runs axe-core (its axe.min.js, e.g. from npm) on every page and warns about
 serious and critical violations without failing: the count per page is printed with the
@@ -78,12 +81,13 @@ INSPECT = """(width) => {
   return { scrollWidth: document.documentElement.scrollWidth, wide: out };
 }""" % SCROLLERS
 
+# The math the build rendered into a page (hooks/questions.py, write_math).
+MATH_MARKUP = re.compile(r"<mjx-container\b.*?</mjx-container>", re.S)
+
 # Display math that is wider than its column (it scrolls inside the page); the warning shows
 # the start of the equation as text.
 WIDE_MATH = """async () => {
-  if (window.MathJax && MathJax.startup && MathJax.startup.promise) {
-    try { await MathJax.startup.promise; } catch (e) {}
-  }
+  if (document.fonts) await document.fonts.ready;          // the math's width is its fonts'
   const out = [];
   for (const el of document.querySelectorAll("mjx-container[display='true']")) {
     const box = el.parentElement;            // div.arithmatex, the width of the column
@@ -189,11 +193,12 @@ OPEN_ALL = """async () => {
 }"""
 
 
-# The CDN scripts the pages load and their copies in .cache/cdn (tools/dev_setup.sh), as
-# --route specs for --local-cdn.
+# The CDN files the pages load and their copies in .cache/cdn (tools/dev_setup.sh), as
+# --route specs for --local-cdn: the scripts, and the fonts of the math (math.css, written at
+# build time, names each of MathJax's fonts on the CDN).
 CDN_DIR = Path(__file__).resolve().parents[2] / ".cache" / "cdn"
+MATH_FONTS = "mathjax/es5/output/chtml/fonts/woff-v2"
 LOCAL_CDN = [
-    (r"mathjax@3\.2\.2/es5/tex-mml-chtml\.js", "mathjax/es5/tex-mml-chtml.js"),
     (r"unpkg\.com/mermaid@11/dist/mermaid\.min\.js", "mermaid/dist/mermaid.min.js"),
     (r"wavedrom@3\.5\.0/skins/default\.js", "wavedrom/skins/default.js"),
     (r"wavedrom@3\.5\.0/wavedrom\.min\.js", "wavedrom/wavedrom.min.js"),
@@ -203,7 +208,10 @@ LOCAL_CDN = [
 def local_cdn_routes() -> list[str]:
     """The --route specs of the local CDN copies; exits when a copy is missing."""
     specs = []
-    for pattern, rel in LOCAL_CDN:
+    fonts = sorted(f.name for f in (CDN_DIR / MATH_FONTS).glob("*.woff"))
+    if not fonts:
+        sys.exit(f"--local-cdn: no fonts in {CDN_DIR / MATH_FONTS}; run tools/dev_setup.sh")
+    for pattern, rel in LOCAL_CDN + [(r"mathjax@3\.2\.2/es5/output/chtml/fonts/woff-v2/" + re.escape(f), f"{MATH_FONTS}/{f}") for f in fonts]:
         if not (CDN_DIR / rel).is_file():
             sys.exit(f"--local-cdn: {CDN_DIR / rel} is missing; run tools/dev_setup.sh")
         specs.append(f"{pattern}={CDN_DIR / rel}")
@@ -325,13 +333,16 @@ def main(argv: list[str]) -> int:
             bad = info["scrollWidth"] > WIDTH + 1 or too_big or errors or covered or split or (args.axe_fail and axe) or (args.small_fail and small_text)
             failures += bool(bad)
             status = "FAIL" if bad else "ok"
-            html_kb = (site / rel).stat().st_size / 1024
+            html = (site / rel).read_text(encoding="utf-8")
+            math_kb = sum(len(m.encode("utf-8")) for m in MATH_MARKUP.findall(html)) / 1024
+            html_kb = len(html.encode("utf-8")) / 1024 - math_kb      # the page apart from its math
             weights.append((html_kb, rel[: -len("/index.html")] or "/"))
             own = [(urlsplit(u).path, n) for u, n in fetched if u.startswith(base)]
             css_kb = sum(n for path, n in own if path.endswith(".css")) / 1024
             js_kb = sum(n for path, n in own if path.endswith(".js")) / 1024
             print(f"{status:4}  {rel[: -len('index.html')] or '/'}  width {info['scrollWidth']}  "
-                  f"{html_kb:.0f} KB html, {sum(n for _, n in fetched) / 1024:.0f} KB in {len(fetched)} requests "
+                  f"{html_kb:.0f} KB html{f' (+{math_kb:.0f} KB math)' if math_kb else ''}, "
+                  f"{sum(n for _, n in fetched) / 1024:.0f} KB in {len(fetched)} requests "
                   f"(styles {css_kb:.0f} KB, scripts {js_kb:.0f} KB)")
             if html_kb > args.weight_warn:
                 heavy += 1

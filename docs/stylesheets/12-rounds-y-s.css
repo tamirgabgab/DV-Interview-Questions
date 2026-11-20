@@ -21,10 +21,9 @@
 .md-typeset :is(.admonition, details) :is(.admonition, details) { font-size: 1em; }
 .md-typeset :is(.admonition, details) .explorer { font-size: 0.64rem; }
 /* what was laid out for the box size keeps it, so nothing grows wider on a phone: the
-   math (MathJax scales with the text; 0.8em of 0.8rem is the old 0.64rem), the solution
-   map and the cost chips */
-.md-typeset :is(.admonition, details) :is(.arithmatex, mjx-container) { font-size: 0.8em; }
-.md-typeset :is(.admonition, details) :is(.arithmatex, mjx-container) :is(.arithmatex, mjx-container) { font-size: 1em; }
+   math (its container scales with the text, math.css; 0.8em of 0.8rem is the old 0.64rem),
+   the solution map and the cost chips */
+.md-typeset :is(.admonition, details) .arithmatex { font-size: 0.8em; }
 .md-typeset :is(.admonition, details) :is(.sol-map, .cost-chips) { font-size: 0.64rem; }
 
 /* The page tools on a touch screen (S420): no hover, so no tooltip; each icon has its

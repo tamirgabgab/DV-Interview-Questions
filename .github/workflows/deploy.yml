@@ -104,6 +104,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
+      # MathJax for the math rendered at build time (the hook's tests render with it too)
+      - run: npm ci --prefix tools/build/mathjax --no-audit --no-fund
       # Verilator built from source at a pinned commit (the apt package is 5.020, which
       # cannot run randomize() with constraints); the install tree is cached per commit.
       # z3 is the SMT solver Verilator calls for constrained randomization.
@@ -230,6 +232,8 @@ jobs:
           path: .cache/plugin/social
           key: social-${{ hashFiles('docs/**/*.md', 'tools/build/social/**', 'mkdocs.yml') }}
           restore-keys: social-
+      # MathJax for the math, rendered at build time (hooks/questions.py, tools/build/mathjax)
+      - run: npm ci --prefix tools/build/mathjax --no-audit --no-fund
       # --strict also fails on invalid question front matter (see hooks/questions.py).
       - run: mkdocs build --strict
       - name: Check internal links and anchors
@@ -316,6 +320,7 @@ jobs:
           cache: pip
           cache-dependency-path: requirements/*.txt
       - run: pip install -r requirements/site.txt -r requirements/dev.txt
+      - run: npm ci --prefix tools/build/mathjax --no-audit --no-fund
       - run: mkdocs build --strict
         env:
           DVQ_SOCIAL_CARDS: "false"

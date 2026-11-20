@@ -45,7 +45,9 @@ fetch() {
   fi
   rm -rf "$tmp"
 }
-fetch mathjax   mathjax@3.2.2    es5/tex-mml-chtml.js
+# mathjax: tools/build/mathjax/render.js renders the math with it at build time (when
+# tools/build/mathjax/node_modules is not installed), and the checks serve its fonts
+fetch mathjax   mathjax@3.2.2    es5/node-main.js
 fetch mermaid   mermaid@11       dist/mermaid.min.js
 fetch wavedrom  wavedrom@3.5.0   wavedrom.min.js
 fetch axe-core  axe-core@4.14.0  axe.min.js

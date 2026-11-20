@@ -20,6 +20,9 @@ Responsibilities:
   statements (math in plain symbols, tools/build/search_text.py), and add the prefix-stripped
   Hebrew words, and the id, level, difficulty and kind to the result of a question page
   (on_post_build).
+- Render the math at build time (MathJax in Node, tools/build/mathjax/render.js) and write the
+  two stylesheet bundles of the shared parts, each with the rules its pages can use
+  (on_post_build).
 """
 
 from __future__ import annotations
@@ -196,6 +199,14 @@ WAVEDROM_BLOCK = '<pre class="wavedrom">'
 # and id names of the HTML, its boxes' data-kind, and every word of the scripts the page
 # loads, since a script builds classes too (also from a prefix, as in `ex-${name}`).
 CSS_BUNDLES = {True: "stylesheets/site-question.css", False: "stylesheets/site.css"}
+# Math rendered at build time (N9.1): every formula of the built pages goes through MathJax
+# in Node (tools/build/mathjax/render.js, the npm package mathjax@3.2.2, the components the
+# CDN served before), and its CHTML replaces the TeX in the page; one stylesheet with the
+# characters of the whole site, linked at the end of the head as MathJax put its own, makes
+# the pages need no MathJax at all. The fonts still come from the CDN, as before.
+MATH_RENDER = Path(__file__).resolve().parent.parent / "tools" / "build" / "mathjax" / "render.js"
+MATH_CSS = "stylesheets/math.css"
+MATH_SPAN = re.compile(r'<(span|div) class="arithmatex">(.*?)</\1>', re.S)
 PAGE_SCRIPTS = {   # script -> the class names (or data- attributes) it acts on; it does nothing elsewhere
     "javascripts/question-filter.js": ("question-filter",),
     "javascripts/run-python.js": ("py-runner",),
@@ -2646,6 +2657,56 @@ def _question_docs(docs: list[dict], pages: dict) -> list[dict]:
     return out
 
 
+def _math_tex(body: str) -> tuple[str, bool]:
+    """The TeX of an arithmatex element and whether it is display math: \\( ... \\) or \\[ ... \\]."""
+    body = html.unescape(body).strip()
+    if body[:2] in ("\\(", "\\[") and body[-2:] in ("\\)", "\\]"):
+        return body[2:-2].strip(), body[:2] == "\\["
+    raise PluginError(f"an arithmatex element without \\( \\) or \\[ \\]: {body[:80]!r}")
+
+
+def render_math(items: list[tuple[str, bool]]) -> tuple[list[str], str]:
+    """The CHTML of every formula and the stylesheet of their characters, from one run of
+    tools/build/mathjax/render.js; a TeX error stops the build with the formula."""
+    if not items:
+        return [], ""
+    try:
+        run = subprocess.run(["node", str(MATH_RENDER)], input=json.dumps(items), capture_output=True,
+                             text=True, encoding="utf-8", check=False)
+    except FileNotFoundError as e:
+        raise PluginError("the math is rendered at build time with Node (tools/build/mathjax/render.js): node is not installed") from e
+    if run.returncode:
+        raise PluginError(f"tools/build/mathjax/render.js failed: {run.stderr.strip()[-600:]}")
+    out = json.loads(run.stdout)
+    if out["errors"]:
+        bad = "; ".join(f"{items[int(i)][0][:60]!r}: {msg}" for i, msg in list(out["errors"].items())[:5])
+        raise PluginError(f"{len(out['errors'])} formulas have a TeX error: {bad}")
+    return out["html"], out["css"]
+
+
+def write_math(site: Path, site_path: str) -> None:
+    """Every formula of the built pages rendered (render_math) and put in place of its TeX,
+    and the math stylesheet linked at the end of the head of the pages that have math."""
+    pages = {}
+    for page in site.rglob("*.html"):
+        output = page.read_text(encoding="utf-8")
+        if any(f'{bundle}">' in output for bundle in CSS_BUNDLES.values()) and 'class="arithmatex"' in output:
+            pages[page] = output
+    items: dict[tuple[str, bool], int] = {}
+    for output in pages.values():
+        for m in MATH_SPAN.finditer(output):
+            items.setdefault(_math_tex(m.group(2)), len(items))
+    rendered, css = render_math(list(items))
+    (site / MATH_CSS).write_text("/* The stylesheet of the math, written by MathJax at build time "
+                                 "(hooks/questions.py, tools/build/mathjax/render.js). */\n" + minify_css(css), encoding="utf-8")
+    for page, output in pages.items():
+        output = MATH_SPAN.sub(lambda m: f'<{m.group(1)} class="arithmatex">{rendered[items[_math_tex(m.group(2))]]}</{m.group(1)}>', output)
+        href = site_path + MATH_CSS if page.name == "404.html" else posixpath.relpath(site / MATH_CSS, page.parent)
+        at = output.find("</head>")
+        output = output[:at] + f'<link rel="stylesheet" href="{href}">\n' + output[at:]
+        page.write_text(output, encoding="utf-8")
+
+
 def write_bundles(site: Path, docs: Path, site_path: str) -> None:
     """The two bundles of the shared parts, each with the rules that can match on a built page
     of its type (the pages link them already), and the question sheets minified in place."""
@@ -2676,6 +2737,7 @@ def on_post_build(config, **kwargs):
         output = page_scripts(not_found.read_text(encoding="utf-8"))
         marks, prefixes = page_marks(output, not_found, site, _site_path(config))
         not_found.write_text(page_styles(output, False, marks, prefixes), encoding="utf-8")
+    write_math(site, _site_path(config))
     write_bundles(site, docs, _site_path(config))
     order = sorted(_questions.values(), key=lambda q: q["id"])
     index_data = {"levels": LEVELS, "diffs": DIFFICULTIES, "kinds": KINDS,

@@ -215,8 +215,8 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0073-faro.css        # 0073: the faro box's outlined cycle (session 34)
 
 extra_javascript:
-  - javascripts/mathjax.js
-  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
+  # The math is rendered at build time (hooks/questions.py, tools/build/mathjax/render.js):
+  # no MathJax script on the pages (N9.1).
   # WaveDrom and its init script are added by hooks/questions.py to the pages that have a
   # ```wavedrom block only (S423).
   # The scripts named in PAGE_SCRIPTS of hooks/questions.py (home.js, maps.js, run-python.js ...)

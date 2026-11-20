@@ -1,6 +1,7 @@
 """The search text of a question (tools/build/search_text.py): TeX in plain symbols, and only the
 statement and the parts' statements of a page."""
 
+import json
 import re
 
 import pytest
@@ -60,11 +61,16 @@ def test_statement_sections_keep_only_the_statements():
 
 
 def test_every_page_has_a_statement_without_tex():
-    pages = sorted((ROOT / "site" / "questions").glob("*/*/index.html"))
-    if not pages:
+    """The search index of the built site (the hook reads the statements before the math is
+    rendered into the pages): every question page has its statement, and no text holds TeX."""
+    index = ROOT / "site" / "search" / "search_index.json"
+    if not index.is_file():
         pytest.skip("no built site")
+    docs = json.loads(index.read_text(encoding="utf-8"))["docs"]
+    statements = {d["location"]: d["text"] for d in docs if "#" not in d["location"]}
+    pages = sorted((ROOT / "site" / "questions").glob("*/*/index.html"))
+    assert pages
     for page in pages:
-        sections = search_text.statement_sections(page.read_text(encoding="utf-8"))
-        assert sections and sections[0][1] == "השאלה" and sections[0][2], page
-        for _, _, text in sections:
-            assert not re.search(r"\\[A-Za-z(\[]", text), (page, text)
+        assert statements.get(page.parent.relative_to(ROOT / "site").as_posix() + "/"), page
+    for d in docs:
+        assert not re.search(r"\\[A-Za-z(\[]|mjx-", d["text"]), (d["location"], d["text"][:80])
