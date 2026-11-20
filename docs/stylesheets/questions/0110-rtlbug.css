@@ -1,0 +1,45 @@
+/* Question 0110, three bugs in RTL: the box of explorer/rtlbug.js (rb-*). On the timing strip
+   the inputs are blue (s1), the internal registers green (s3) and the output under test
+   orange (s2); want, what the designer meant, is a dashed outline, and a cycle where the
+   output differs from it gets the strip's ✗ flag. Beside the strip, a table of the lines of
+   the code in the cycle: a value a line reads that was written at the same edge (a blocking
+   line) and a value the latch keeps are tinted orange; in part c a carry of 1 is tinted
+   blue and the carry the 8-bit context loses is a red ✗. Colours from the palette only. */
+
+/* the fields of the cycle under the cursor: the heading first, then the fields */
+.md-typeset .explorer .rb-inrow > .rb-inhead { order: 0; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .explorer .rb-inrow > .rb-inhead b { color: var(--viz-ink); font-variant-numeric: tabular-nums; }
+.md-typeset .explorer .rb-inrow input[type="checkbox"] { margin-inline-end: 0.2rem; }
+
+/* the strip: the output under test and want */
+.md-typeset svg .wv-bus.rb-out { stroke: var(--viz-s2); stroke-width: 2.2; }
+.md-typeset svg .wv-bus.rb-want { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 4 3; }
+
+/* the key */
+.md-typeset .explorer .rb-legend { margin: 0.2rem 0 0; }
+.md-typeset .rb-legend .rb-key-now { background: color-mix(in srgb, var(--viz-s2) 10%, var(--md-default-bg-color)); outline: 1.5px dashed var(--viz-s2); outline-offset: -1.5px; }
+.md-typeset .rb-legend .rb-key-want { background: none; outline: 1.2px dashed var(--viz-text); outline-offset: -1.2px; }
+.md-typeset .rb-legend .rb-key-bad { background: var(--diff-hard-bg); border: 2px solid var(--diff-hard); border-radius: 50%; }
+
+/* the summary of the strip, under it */
+.md-typeset .explorer .rb-sum { font-weight: 600; margin: 0.35em 0 0.2em; }
+.md-typeset .explorer :is(.rb-sum, .rb-step, .rb-cap, .rb-tab) code { white-space: nowrap; }   /* "121 >> 1" stays on one line */
+
+/* the table of the lines (parts a and b) and of the bits (part c) */
+.md-typeset .explorer .rb-cap { margin: 0.4em 0 0.25em; font-size: 0.72rem; color: var(--viz-text); }
+.md-typeset .explorer table.rb-tab { display: table; width: auto; margin: 0; border-collapse: collapse; font-size: 0.68rem; }
+.md-typeset .explorer table.rb-tab :is(th, td) { padding: 0.15rem 0.45rem; border: 1px solid var(--viz-grid); color: var(--viz-ink); background: none; text-align: start; font-variant-numeric: tabular-nums; line-height: 1.35; }
+.md-typeset .explorer table.rb-tab thead th { color: var(--viz-text); font-weight: 400; }
+.md-typeset .explorer table.rb-tab tr.is-new td:last-child,
+.md-typeset .explorer table.rb-tab tr.is-held td { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); }
+.md-typeset .explorer table.rb-tab .rb-tag { font-weight: 700; }
+
+.md-typeset .explorer .rb-bitwrap { overflow-x: auto; max-width: 100%; direction: ltr; }   /* on a narrow screen the row names show first */
+.md-typeset .explorer .rb-bitwrap:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+.md-typeset .explorer table.rb-bits :is(th, td) { padding: 0.1rem 0.28rem; text-align: center; font-family: var(--md-code-font-family); }
+.md-typeset .explorer table.rb-bits :is(th[scope="row"], thead th:first-child) { text-align: right; font-family: var(--md-text-font-family); }   /* a row name wraps on a phone */
+.md-typeset .explorer table.rb-bits td.rb-val { min-width: 2.2rem; text-align: right; }
+.md-typeset .explorer table.rb-bits tr.rb-sumrow :is(th, td) { border-top: 1.5px solid var(--viz-text); }
+.md-typeset .explorer table.rb-bits tr.is-on :is(th, td) { font-weight: 700; }
+.md-typeset .explorer table.rb-bits td.is-carry { background: color-mix(in srgb, var(--viz-s1) 22%, var(--md-default-bg-color)); font-weight: 700; }
+.md-typeset .explorer table.rb-bits td.is-lost { color: var(--diff-hard); font-weight: 700; }

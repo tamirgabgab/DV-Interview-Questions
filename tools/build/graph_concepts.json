@@ -156,6 +156,10 @@
    "label": "Expected value",
    "group": "probability"
   },
+  "expression_width": {
+   "label": "Expression width",
+   "group": "digital design"
+  },
   "fenwick_tree": {
    "label": "Fenwick tree",
    "group": "algorithms"
@@ -275,6 +279,10 @@
   "kmp_automaton": {
    "label": "KMP automaton",
    "group": "algorithms"
+  },
+  "latch_inference": {
+   "label": "Latch inference",
+   "group": "digital design"
   },
   "lateral_thinking": {
    "label": "Lateral thinking",
@@ -2530,6 +2538,21 @@
      "why": "the page links to it"
     }
    ]
+  },
+  "0110": {
+   "core": [
+    "non_blocking_assignment",
+    "latch_inference",
+    "expression_width",
+    "timing_waveform"
+   ],
+   "secondary": [
+    "systemverilog",
+    "combinational_logic",
+    "shift_register",
+    "simulation"
+   ],
+   "related": []
   }
  }
 }

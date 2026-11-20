@@ -658,6 +658,8 @@ PAIRS = [
     ("end card, the step line", "var(--md-default-fg-color--light)", [CARD, PAGE], TEXT),
     ("end card, the path link", "var(--md-typeset-a-color)", [CARD, PAGE], TEXT),
     ("end card, the path bar", "var(--site-mark-color)", [CARD, PAGE], UI),
+    ("0110 rtlbug, the lost carry ✗ in the table of bits", "var(--diff-hard)", [CARD, PAGE], TEXT),
+    ("0110 rtlbug, the output bus outline on the strip", "var(--viz-s2)", [CARD, PAGE], UI),
 ]
 
 BLOCK = re.compile(r"([^{}]+)\{([^{}]*)\}")

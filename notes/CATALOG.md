@@ -114,5 +114,5 @@ All 111 questions, with links to their pages on the [live site](https://tamirgab
 | 0107 | [המספר הגדול ביותר משרשור – למה 3 לפני 30](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0107-largest-number-concatenation/) | junior (ג'וניור) |
 | 0108 | [היפוך של k ביטים רצופים – כמה היפוכים עד שכל הביטים 1](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0108-k-consecutive-bit-flips/) | junior (ג'וניור) |
 | 0109 | [שיירות של מכוניות – כמה מגיעות ליעד, ומתי כל מכונית משיגה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0109-car-fleet/) | junior (ג'וניור) |
-| 0110 | [מצא את הבאג ב-RTL – שלושה קטעים קצרים וצורת הגל שחושפת כל אחד](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0110-rtl-bugs-waveforms/) | junior (ג'וניור) |
+| 0110 | [שלושה באגים ב-RTL – מצורת הגל אל השורה האשמה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0110-rtl-bugs-waveforms/) | junior (ג'וניור) |
 | 0111 | [הטסט עובר וה-DUT שבור – שלושה באגים בסביבת הבדיקה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0111-passing-test-broken-dut/) | senior (סניור) |
