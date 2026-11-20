@@ -581,6 +581,13 @@ PAIRS = [
     ("0104 gasring, the start's ring and its floor", "var(--viz-s4)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s4) 12%, var(--md-default-bg-color))"], UI),
     ("0104 gasring, the car's station, the point of the step", "var(--viz-ink)", [CARD, PAGE], UI),
     # 0037 editdist (stylesheets/questions/0037-editdist.css): the tables of the prefixes and the box
+    # 0036 lfsr (explorer/lfsr.js): the picture of the cycles, a state's bits in its circle
+    ("0036 lfsr, a state of the seed's cycle not reached yet", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0036 lfsr, a state reached and the current one", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s1) 18%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))"], TEXT),
+    ("0036 lfsr, a state of another cycle", "var(--viz-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 16%, var(--md-default-bg-color))"], TEXT),
+    ("0036 lfsr, the rims and edges of the cycles", "var(--viz-s1)", [CARD, PAGE], UI),
+    ("0036 lfsr, the rims and edges of the other cycles", "var(--viz-s3)", [CARD, PAGE], UI),
+    ("0036 lfsr, the rims and edges of the other cycles, in turn", "var(--viz-s4)", [CARD, PAGE], UI),
     ("0037 editdist, a value on the tint of its step", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-ink) 12%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s4) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 30%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s1) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-ink) 6%, var(--md-default-bg-color))"], TEXT),
     ("0037 editdist, the indices of the prefixes", "var(--viz-text)", [CARD, PAGE], TEXT),
     ("0037 editdist, the edges of the steps of the path", "var(--viz-s2)", [CARD, PAGE], UI),

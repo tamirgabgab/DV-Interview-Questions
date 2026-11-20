@@ -93,9 +93,10 @@ def test_explorer_strip():
 
 
 def test_explorer_cycles():
-    """The proof panel of the box: every polynomial of 3 to 8 bits splits the non-zero states
-    into disjoint cycles (a plain Python step from every state), the seed's cycle first;
-    the page's x^4 + x^2 + 1 gives 6 + 6 + 3 and a primitive polynomial one cycle of all."""
+    """The picture of the cycles in the box: every polynomial of 3 to 8 bits splits the
+    non-zero states into disjoint cycles (a plain Python step from every state), the seed's
+    cycle first and in the order of the step; the page's x^4 + x^2 + 1 gives 6 + 6 + 3 and
+    a primitive polynomial one cycle of all."""
     from page_tests import explorer_require, node_json
 
     def step(s, mask, width):
@@ -115,3 +116,54 @@ def test_explorer_cycles():
                 assert [step(v, mask, width) for v in c] == c[1:] + c[:1], (width, mask, c)
     four = dict((mask, [len(c) for c in cycles]) for mask, cycles in got["4"])
     assert four[0b0101] == [6, 6, 3] and four[0b0011] == [15] and four[0b1001] == [15]
+
+
+def test_section_b_algebra():
+    """Section b's algebra over GF(2), a polynomial as a bit mask (bit k is x^k): step 3's
+    x^5 mod x^4 + x^3 + 1; hint 2 and step 2, the order 3 of x mod x^2 + x + 1, 6 mod its
+    square, and the lcm for two coprime factors (x + 1)(x^3 + x + 1); the proof, the output
+    bits of x^4 + x^3 + 1 follow x^4 + x + 1, its reciprocal, with the same order; and the
+    XNOR trap, all ones stuck exactly when the taps are even, as in every maximal mask."""
+    from math import lcm
+
+    def mul(a, b):
+        out = 0
+        while b:
+            if b & 1:
+                out ^= a
+            a, b = a << 1, b >> 1
+        return out
+
+    def mod(a, m):
+        while a and a.bit_length() >= m.bit_length():
+            a ^= m << (a.bit_length() - m.bit_length())
+        return a
+
+    def order(m):
+        k, v = 1, mod(0b10, m)
+        while v != 1:
+            k, v = k + 1, mod(v << 1, m)
+        return k
+
+    page, recip, q = 0b11001, 0b10011, 0b111                  # x^4 + x^3 + 1, x^4 + x + 1, x^2 + x + 1
+    assert mod(1 << 5, page) == 0b1011                         # x^5 = x^3 + x + 1, not 1
+    assert mod(1 << 3, page) != 1 and order(page) == order(recip) == 15
+    assert mul(q, q) == 0b10101 and order(q) == 3 and order(mul(q, q)) == 6
+    assert mul(0b11, 0b1011) == 0b11101 and order(0b11101) == lcm(order(0b11), order(0b1011)) == 7
+    # the bits that leave (s[0]) under x^4 + x^3 + 1 (taps s[0], s[1]) obey a(t+4) = a(t+1) + a(t)
+    s, out = 1, []
+    for _ in range(40):
+        out.append(s & 1)
+        s = (s >> 1) | ((bin(s & 0b0011).count("1") & 1) << 3)
+    assert all(out[t + 4] == out[t + 1] ^ out[t] for t in range(len(out) - 4))
+    for width in range(3, 9):
+        ones, n = (1 << width) - 1, (1 << width) - 1
+        for mask in range(1, 1 << width, 2):
+            xnor = (ones >> 1) | ((1 ^ (bin(ones & mask).count("1") & 1)) << (width - 1))
+            assert (xnor == ones) == (bin(mask).count("1") % 2 == 0), (width, mask)
+            seen, v = set(), 1
+            while v not in seen:
+                seen.add(v)
+                v = (v >> 1) | ((bin(v & mask).count("1") & 1) << (width - 1))
+            if len(seen) == n:
+                assert bin(mask).count("1") % 2 == 0, (width, mask)

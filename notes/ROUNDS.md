@@ -4,8 +4,8 @@ Written in session 35 (2026-11-19) from the review of the site. The tasks themse
 their measurements and file references, are in [`HANDOFF.md`](HANDOFF.md) under "Open
 items", "Next steps (session 35)", N1 to N8; this file only groups them into rounds, in
 the proposed order of work, so the owner and the session can go through them one at a
-time. Rounds 1 to 5 and 7 are done (session 35), round 6 has a pilot of two questions, and
-rounds 8 and 9 are not started.
+time. Rounds 1 to 5, 7 and 8 are done (session 35), round 6 has a pilot of two questions,
+and round 9 is in progress.
 Round 8 was split in two on 2026-11-20: 0036 alone is round 8, the rest round 9.
 
 How to use it: before a round, read its row and its section, answer the open questions,
@@ -99,8 +99,10 @@ Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper on
 
 ### Round 8. Question 0036
 
-- Open questions: is 0036 worth a third attempt, or does its box get a simpler design?
-- Status: not started.
+- Open questions: is 0036 worth a third attempt, or does its box get a simpler design? The
+  owner: a redesign that keeps every feature, the algebra fixed, no DV additions.
+- Status: done in session 35 (2026-11-20), work log item 219 of `HANDOFF.md`: the box is 944
+  px at 1920 x 1080 (984 at most, at any width).
 
 ### Round 9. Older items and CI time
 

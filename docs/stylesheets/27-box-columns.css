@@ -83,9 +83,9 @@
   .md-typeset .explorer .ex-cols table.rn-grid { margin: 0.3rem auto; }
   .md-typeset .explorer .ex-cols > * > .gs-scroll:is(.rn-ktab, .rn-gridwrap, .rn-log) { margin: 0.3rem 0; }
 }
-/* lfsr (0036): the polynomial table beside the ring, a row a line */
+/* lfsr (0036): the polynomial table beside the picture of the cycles, a row a line */
 @container (min-width: 600px) {
-  .md-typeset .explorer[data-kind="lfsr"] .ex-side .lf-table :is(td, th) { padding: 0.2em 0.45em; }
+  .md-typeset .explorer[data-kind="lfsr"] .ex-side .lf-table :is(td, th) { padding: 0.1em 0.35em; }
   .md-typeset .explorer[data-kind="lfsr"] .ex-side .lf-table td:first-child { white-space: nowrap; }
 }
 /* covergroup (0053): each coverpoint's bins on one row beside the curve */

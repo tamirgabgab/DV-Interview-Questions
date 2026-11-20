@@ -287,15 +287,15 @@
 .md-typeset .explorer .wv-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .wv-bad { color: var(--diff-hard); font-weight: 700; }
 
-/* LFSR explorer (0036): the taps, the ring of states, the output bits, the table */
+/* LFSR explorer (0036): the taps, the picture of the cycles, the step, the table */
 .md-typeset .explorer .lf-taps { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.5rem; font-family: var(--md-code-font-family); font-size: 0.75rem; }
 .md-typeset .explorer .lf-taps label { gap: 0.2rem; }
 .md-typeset .explorer .lf-presets .md-button { padding: 0.1rem 0.5rem; font-size: 0.65rem; margin: 0.1rem; }
-.md-typeset .explorer .lf-box { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; align-items: flex-start; margin-top: 0.6rem; }
-.md-typeset .explorer .lf-ring { flex: 0 1 19rem; }
+.md-typeset .explorer .lf-ring { margin: 0.5rem 0 0.3rem; }
+/* svg.lf-live is also the class of 0068's live figure (boxes3.js), so its width stays */
 .md-typeset .explorer svg.lf-live { width: 19rem; max-width: 100%; display: block; }
-.md-typeset .explorer .lf-panel { flex: 1 1 16rem; min-width: 0; }
-.md-typeset .explorer .lf-panel p { margin: 0.3em 0; }
+.md-typeset .explorer svg.lf-cyc { width: 100%; height: auto; display: block; margin: 0 auto; }
+.md-typeset .explorer .lf-panel p, .md-typeset .explorer .lf-cycles-text { margin: 0.3em 0; }
 .md-typeset svg .lf-node circle { fill: var(--md-default-bg-color); stroke: var(--viz-grid); stroke-width: 1.5; }
 .md-typeset svg .lf-node text { fill: var(--viz-text); font-size: 10px; font-family: var(--md-code-font-family); }
 .md-typeset svg .lf-node.is-seen circle { fill: var(--viz-s1); fill-opacity: 0.18; stroke: var(--viz-s1); }
@@ -303,23 +303,25 @@
 .md-typeset svg .lf-node.is-seed circle { stroke-width: 3; }
 .md-typeset svg .lf-node.is-cur circle { fill: var(--viz-s2); fill-opacity: 0.3; stroke: var(--viz-s2); stroke-width: 3; }
 .md-typeset svg .lf-node.lf-zero circle { stroke-dasharray: 3 3; }
-.md-typeset svg .lf-edge { stroke: var(--viz-s1); stroke-width: 1.5; stroke-opacity: 0.7; }
-.md-typeset svg .lf-edge.is-cur { stroke: var(--viz-s2); stroke-width: 2.5; stroke-opacity: 1; }
+/* the seed's cycle: the edges not yet taken faint, the ones taken blue, the last one orange */
+.md-typeset svg .lf-edge { fill: none; stroke: var(--viz-grid); stroke-width: 1.3; }
+.md-typeset svg .lf-edge.is-seen { stroke: var(--viz-s1); stroke-width: 1.6; }
+.md-typeset svg .lf-edge.is-cur { stroke: var(--viz-s2); stroke-width: 2.5; }
 .md-typeset svg .lf-arrowhead { fill: var(--viz-ink); }
-/* the cycles of the proof panel: a colour per cycle, in turn */
-.md-typeset .explorer svg.lf-all { width: 100%; max-width: 40rem; display: block; }
-.md-typeset svg .lf-node.lf-c0 circle { fill: var(--viz-s1); fill-opacity: 0.16; stroke: var(--viz-s1); }
+/* the other cycles: a colour each, in turn */
 .md-typeset svg .lf-node.lf-c1 circle { fill: var(--viz-s3); fill-opacity: 0.16; stroke: var(--viz-s3); }
-.md-typeset svg .lf-node.lf-c2 circle { fill: var(--viz-s2); fill-opacity: 0.12; stroke: var(--viz-s2); }
+.md-typeset svg .lf-node.lf-c2 circle { fill: var(--viz-s4); fill-opacity: 0.16; stroke: var(--viz-s4); }
 .md-typeset svg .lf-edge.lf-c1 { stroke: var(--viz-s3); }
-.md-typeset svg .lf-edge.lf-c2 { stroke: var(--viz-s2); }
-.md-typeset svg .lf-all .lf-node.is-cur circle { fill: var(--viz-ink); fill-opacity: 0.3; stroke: var(--viz-ink); stroke-width: 3; }
+.md-typeset svg .lf-edge.lf-c2 { stroke: var(--viz-s4); }
 .md-typeset svg .lf-loop { fill: none; stroke: var(--viz-text); stroke-width: 1.2; stroke-dasharray: 3 2; }
 .md-typeset .explorer .lf-ok { color: var(--diff-easy); font-weight: 700; }
 .md-typeset .explorer .lf-bad { color: var(--diff-hard); font-weight: 700; }
-.md-typeset .explorer .lf-table { margin-top: 0.3rem; overflow-x: auto; }
-.md-typeset .explorer .lf-table table { font-size: 0.72rem; margin: 0; }
-.md-typeset .explorer .lf-table td, .md-typeset .explorer .lf-table th { padding: 0.2em 0.7em; }
+/* the table: about eight rows in view, the header kept on top while it scrolls */
+.md-typeset .explorer .lf-table { position: relative; margin-top: 0.3rem; overflow: auto; font-size: 0.72rem; max-height: 18em; }
+.md-typeset .explorer .lf-table table { font-size: 1em; margin: 0; }
+.md-typeset .explorer .lf-table td, .md-typeset .explorer .lf-table th { padding: 0.1em 0.6em; line-height: 1.5; }
+/* no 5rem floor under a header (the theme's), so the three columns and the scroll bar fit the side column */
+.md-typeset .explorer .lf-table th { position: sticky; top: 0; z-index: 1; min-width: 0; background: var(--md-default-bg-color); }
 .md-typeset .explorer .lf-table tr.is-max td { color: var(--viz-s3-text); font-weight: 700; }
 .md-typeset .explorer .lf-table tr.is-cur td { background: var(--md-code-bg-color); }
 

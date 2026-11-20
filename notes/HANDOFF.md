@@ -532,6 +532,29 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       Verilator and agrees with the page's Python model. Box `falsepass`. On the
       testbench path. Verilator needs `--coverage-user` for a cover's action.
 
+219. **Round 8, question 0036 (session 35, 2026-11-20).** The owner: the box redesigned to
+    fit one screen with every feature kept, the page's algebra fixed, no DV additions.
+    - The box (`explorer/lfsr.js`): one picture of every cycle in the order of the step
+      replaces the ring by value and the proof panel's rings. The seed's cycle is the first
+      ring and lights up step by step (the edges taken blue, the last one orange); the other
+      cycles are smaller rings, green and violet in turn, packed in rows about 1.3 times
+      wider than tall; 0 sits inside the seed's ring when there is room. States are written
+      in their circles up to 4 bits (31 labels at 5 bits came out at 5 px; the value is the
+      tooltip). Under the picture: the register (smaller), the step and the cycles in
+      words. In the side column: the strip and the table, which scrolls past about nine rows
+      under a sticky header, is redrawn only for a new width or polynomial, and from 6 bits
+      drops the period column (every row is primitive; the title gives the period). The
+      theme's 5rem floor under a table header is off there. At 1920 x 1080 the box is 944
+      px (was 1508), and at most 984 px at any width (was 1612).
+    - The page: step 3's x^5 is x^3 + x + 1 modulo x^4 + x^3 + 1; hint 2 gives the lcm for
+      coprime factors and the doubling for the repeated one; step 2 shows the order 6 from
+      x^6 - 1 = (x^3 - 1)^2; the proof is now the companion matrix of the reciprocal
+      P*(x) = x^4 P(1/x), with 0001 as a cyclic vector and the same order of x for P and
+      P*; the box's "the 1 of the polynomial is always a tap" is now x^n, that is s[0]; the
+      XNOR trap holds for an even tap count, as in every maximal LFSR.
+      `test_section_b_algebra` checks each claim over GF(2).
+    - Contrast pairs for the picture's states and rims (620 pairs in all).
+
 ---
 
 ## In progress
@@ -540,8 +563,8 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   212), then rounds 1 to 3 of the plan in [`ROUNDS.md`](ROUNDS.md): housekeeping (213),
   accessibility and speed (214), the phone header and layout shifts (215), round 5 and
   the first part of round 7 (216), round 4 (217) and a pilot of round 6 (218).
-  Round 8 is split in two (0036 alone, then the rest as round 9); rounds 8 and 9 are not
-  started.
+  Round 8 is split in two (0036 alone, then the rest as round 9); round 8 is done on the
+  branch (219), round 9 is next.
 - **State:** `main` (5c71e11, deployed 2026-11-20 13:04 Israel time) has rounds 1 to 5 and
   7 and the pilot of round 6 (111 questions, 204 boxes); the live site was checked at 390
   and 1440 px in both schemes (built math, 0110, 0111, the home page). Next: the owner's
@@ -742,9 +765,9 @@ true, so CI never runs the motion paths or a box's first-visit guide.
   the page must not zoom.
 
 **N7. Carried over from earlier sessions (still open, see the sections below):**
-- [ ] 0036: the LFSR box is 1508 px at 1920 x 1080 and the page's review items (part b step
-  3 reduces modulo the wrong polynomial, hint 2, the proof's bit order, no RTL module, SVA
-  or state coverpoint) were all deferred in round 7.
+- [x] (done, work log 219) 0036: the LFSR box is 1508 px at 1920 x 1080 and the page's review
+  items (part b step 3 reduces modulo the wrong polynomial, hint 2, the proof's bit order).
+  The RTL module, SVA and state coverpoint were left out by the owner's choice (round 8).
 - [ ] Boxes taller than one screen: 0019 (1201 px), 0048 with the reflection on (1120,
   1221 in free-stops mode), 0012's kapbase boxes (1091, 1093); the cake boxes have 7 px of
   margin.
@@ -899,16 +922,17 @@ still open when they moved (session 35), each marked with its round.
   not the default); 0046's box with a 16 x 16 grid is 1234 px, as large grids always were.
 - [ ] (round 6) Not done: 0046's histogram bars in rectangle mode (optional, would add height); 0076's
   marker for where f(n) lands (optional); 0020's "draw" button.
-- [ ] (round 7) 0036 `lfsr`: 1508 / 1612 (5 bits); every state over. Proposal: one ring in cycle
+- [x] (done, work log 219) (round 7) 0036 `lfsr`: 1508 / 1612 (5 bits); every state over. Proposal: one ring in cycle
   order, the proof panel folded, the strip in the side column, the table capped at 8 rows.
-- [ ] (round 7) 0036: part b step 3's "x^5 = x^2 + x" is modulo x^4+x+1, not the step's x^4+x^3+1
+- [x] (done, work log 219) (round 7) 0036: part b step 3's "x^5 = x^2 + x" is modulo x^4+x+1, not the step's x^4+x^3+1
   (x^3+x+1); hint 2's "at most the lcm of the factors' periods" fails on its own
   (x^2+x+1)^2 (lcm 3, period 6); the proof's "a step is multiplication by x up to bit
   order" is false for 3 or more taps (the periods still equal the order of x); the box's
   "the 1 of the polynomial is always a tap" contradicts the page; the XNOR trap holds only
   for an even tap count.
 - [ ] (round 7) 0036: no RTL module, no SVA (the trap describes one in words), no state coverpoint.
-- [ ] (round 7) 0036: every item above (R1 step 3, hint 2, the proof's bit order, the box's "the 1 of
+  Not done by the owner's choice (round 8, 2026-11-20).
+- [x] (done, work log 219) (round 7) 0036: every item above (R1 step 3, hint 2, the proof's bit order, the box's "the 1 of
   the polynomial", the XNOR trap; the box 1508 / 1612 px; the RTL module, SVA and coverage).
   Two agents reached 1003 to 1129 px with one ring in cycle order and the table scrolling;
   their work is in b6aeb23 and the handoff notes of the session scratchpad (lost with it).
