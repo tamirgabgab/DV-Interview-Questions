@@ -451,9 +451,9 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   212), then rounds 1 to 3 of the plan in [`ROUNDS.md`](ROUNDS.md): housekeeping (213),
   accessibility and speed (214), the phone header and layout shifts (215). Rounds 4 to 8
   are not started; each has open questions for the owner in `ROUNDS.md`.
-- **State:** rounds 2 and 3 are on the work branch and go to `main` in one fast-forward when
-  the branch run is green (the owner's choice); round 1 is on `main` (4c88ec1). The site has
-  109 questions (ids 0001 to 0109, no gap) and 202 boxes.
+- **State:** rounds 1 to 3 are on `main` (b2ca207, 2026-11-20; the branch run 44636412910
+  passed every check, the phone check with a touch screen included, and the `main` run
+  44641556678 deployed). The site has 109 questions (ids 0001 to 0109, no gap) and 202 boxes.
 - **Waiting on the owner:** a try of a box's number field and of the lists' filter on an
   iPhone (the page must not zoom on focus, N6.8); YouTube links of the videos made in the owner's other project
   (add them as `video:`, notes/VIDEOS.md); the giscus ids (README, Comments) in `extra.comments` of `mkdocs.yml`; checks of
