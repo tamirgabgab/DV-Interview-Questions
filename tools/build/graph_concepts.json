@@ -2553,6 +2553,28 @@
     "simulation"
    ],
    "related": []
+  },
+  "0111": {
+   "core": [
+    "testbench_architecture",
+    "sva_assertions",
+    "scoreboard",
+    "functional_coverage"
+   ],
+   "secondary": [
+    "handshake",
+    "pipelining",
+    "lfsr",
+    "timing_waveform",
+    "systemverilog"
+   ],
+   "related": [
+    {
+     "id": "0050",
+     "explicit": true,
+     "why": "a scoreboard that searches suits only a block that may reorder; 0050 matches by ID"
+    }
+   ]
   }
  }
 }
