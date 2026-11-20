@@ -724,7 +724,9 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
     - **Scripts (N11.1):** a trace of 0016 on a 4x slower CPU put most of its 4 to 5 s of
       style and layout in scripts that measure between two changes: `layout()` of
       reading-tools.js and `scrollableTables` of question-tools.js now measure everything
-      first and change after.
+      first and change after. Measured on 0016 at 4x CPU with the new scripts: 5.4 s of
+      style and layout on the old page, 3.2 s on the new one; `overflows` of reading-tools
+      (0.75 s) and Material's bundle are still the largest parts.
     - **Steppers:** only the first frame is in the page, the later ones are `<template>`
       elements that question-tools.js swaps in (12 pages regenerated; 0016's two circles
       were 3,000 elements).
