@@ -7,9 +7,10 @@ the sequencer's arbitration).
 trace(case) is a cycle model of the testbench of parts א and ב: the drivers' timing (a
 register write every three cycles, packets of three bytes back to back), the order the
 virtual sequence gives them in each case, and the DUT pkt_xor. tests/0114 checks it against
-the pins of the Verilator run, cycle by cycle. orders() runs the page's arbitration model
-of part ג (its Python block). blocks(), in page order: the testbench figure and its legend,
-the waveform of part א's bug, the waveform of part ב's bug and the table of part ג.
+the pins of the Verilator run, cycle by cycle. sequencer() is a model of uvm_sequencer's
+arbitration, lock and grab, which runs the page's sequences of part ג (orders()); the box
+of the page is the same model in JavaScript. blocks(), in page order: the testbench figure
+and its legend, the waveform of part א's bug and the table of part ג.
 """
 
 import json
@@ -223,28 +224,114 @@ def wave_boot():
     ])
 
 
-REKEY_WINDOW = range(14, 20)
+# --- part ג: a model of the sequencer's arbitration -----------------------------------------------
+# pyuvm's sequencer is a plain FIFO (no lock, grab or arbitration modes), so part ג runs on this
+# model of uvm_sequencer. It follows IEEE 1800.2 and UVM 1.2's uvm_sequencer_base: start_item
+# queues a request; a lock request joins the back of the queue and a grab request its head;
+# lock requests are granted when they reach the head (grant_queued_locks) and none is held by
+# another sequence; the driver is given only the holder's items and its children's while a
+# lock is held; a sequence that finished an item asks for the next before the next arbitration
+# (wait_for_sequences). The page's sequences (traffic(), irq()) run on it; the box
+# (docs/javascripts/explorer/seqarb.js) is this model line for line, tests/0114 compares them.
+
+class Seq:
+    """A sequence of the model: its steps run in order from the time start() is called."""
+    def __init__(self, name, steps, start=0, priority=100):
+        self.name, self.steps, self.start, self.priority = name, steps, start, priority
+        self.parent, self.pc, self.wake = None, 0, start
 
 
-def wave_rekey():
-    """Part ב's bug: the new key lands in the middle of packet 3."""
-    rows = trace("rekey_bug")
-    rows = [rows[c] for c in REKEY_WINDOW]
-    return wavedrom(REKEY_WINDOW, [
-        ("cfg", cfg_lane(rows), "bus"),
-        ("key", [f'{r["key"]:02x}' for r in rows], "bus"),
-        ("in_data", [f'{r["in_data"]:02x}' if r["in_valid"] else None for r in rows], "bus"),
-        ("in_last", [r["in_last"] for r in rows], "bit"),
-        ("out_valid", [r["out_valid"] for r in rows], "bit"),
-        ("out_data", [f'{r["out_data"]:02x}' if r["out_valid"] else None for r in rows], "bus"),
-    ])
+def sequencer(seqs, mode="FIFO", snaps=None):
+    """The items one sequencer gives its driver, one a slot ("-": none). Steps:
+    ("item", name), ("wait", slots), ("lock",), ("grab",), ("unlock",), ("ungrab",),
+    ("run", child): child.start(m_sequencer, this), which waits for the child.
+    snaps, a list, gets what the arbitration of every slot saw: the queue (kind, sequence,
+    item), the lock holders and the choice."""
+    queue, locks, ready, out = [], [], [], []    # the requests in order; the lock holders
+    everyone, busy = list(seqs), None
 
+    def blocked(s):                    # a lock held by a sequence that is not s or above s
+        def above(h, s):
+            return s is not None and (s is h or above(h, s.parent))
+        return any(not above(h, s) for h in locks)
 
-# --- part ג: the arbitration model of the page ----------------------------------------------------
+    def grant_locks():                 # the lock requests at the head of the queue
+        while queue and queue[0][0] == "lock" and not blocked(queue[0][1]):
+            s = queue.pop(0)[1]
+            locks.append(s)
+            ready.append(s)
+
+    def run(s, now):
+        while s.pc < len(s.steps):
+            op, *arg = s.steps[s.pc]
+            s.pc += 1
+            if op == "item":           # start_item: wait for the arbitration
+                queue.append(("item", s, arg[0]))
+                return
+            if op == "wait":
+                s.wake = now + arg[0]
+                return
+            if op in ("lock", "grab"):
+                request = ("lock", s, op)
+                if op == "lock":
+                    queue.append(request)
+                else:
+                    queue.insert(0, request)
+                grant_locks()
+                return
+            if op in ("unlock", "ungrab"):
+                locks.remove(s)
+                grant_locks()
+            if op == "run":
+                child = arg[0]
+                child.parent, child.wake = s, None
+                everyone.append(child)
+                ready.append(child)
+                return
+        if s.parent:                   # a child ended: its parent goes on
+            ready.append(s.parent)
+
+    t = 0
+    while t == 0 or queue or busy or any(s.wake is not None for s in everyone):
+        assert t < 100, "a sequence waits forever"
+        if busy:                       # item_done: the sequence goes on at once
+            ready.append(busy)
+            busy = None
+        for now in (t, t + 0.5):       # a slot's start, then its middle
+            for s in everyone:
+                if s.wake == now:
+                    s.wake = None
+                    ready.append(s)
+            while ready:
+                run(ready.pop(0), now)
+            if now == t:               # the driver asks for the next item
+                grant_locks()
+                while ready:
+                    run(ready.pop(0), now)
+                free = [r for r in queue if r[0] == "item" and not blocked(r[1])]
+                if mode == "STRICT_FIFO" and free:
+                    top = max(r[1].priority for r in free)
+                    free = [r for r in free if r[1].priority == top]
+                if snaps is not None:
+                    snaps.append({"queue": [[r[0], r[1].name, r[2]] for r in queue],
+                                  "locks": [h.name for h in locks],
+                                  "out": free[0][2] if free else "-"})
+                if free:
+                    queue.remove(free[0])
+                    busy = free[0][1]
+                out.append(free[0][2] if free else "-")
+        t += 1
+    while out and out[-1] == "-":
+        out.pop()
+    if snaps is not None:
+        del snaps[len(out):]
+    return out
+
 
 def model():
-    ns = {}
-    exec(pick(114, "python", "def sequencer("), ns)
+    """The model with the page's sequences of part ג (traffic and irq, its Python block)."""
+    ns = {"Seq": Seq, "sequencer": sequencer}
+    exec(pick(114, "python", "def irq("), ns)
     return ns
 
 
@@ -257,14 +344,15 @@ SCENARIOS = [  # (the setting, how I starts, the arbitration mode)
 ]
 
 
-def orders():
-    """The driver's items in each scenario of part ג, from the page's model."""
+def run_case(mode="FIFO", snaps=None, **kw):
+    """A, B and I on one sequencer (I as the page's irq(**kw))."""
     ns = model()
-    out = []
-    for label, kw, mode in SCENARIOS:
-        seqs = [ns["traffic"]("A"), ns["traffic"]("B"), ns["irq"](**kw)]
-        out.append((label, mode, ns["sequencer"](seqs, mode)))
-    return out
+    return sequencer([ns["traffic"]("A"), ns["traffic"]("B"), ns["irq"](**kw)], mode, snaps)
+
+
+def orders():
+    """The driver's items in each scenario of part ג."""
+    return [(label, mode, run_case(mode, **kw)) for label, kw, mode in SCENARIOS]
 
 
 def together(order):
@@ -288,7 +376,7 @@ def orders_table():
 
 def blocks():
     """The generated blocks, in page order."""
-    return [figure(), legend(), wave_boot(), wave_rekey(), orders_table()]
+    return [figure(), legend(), wave_boot(), orders_table()]
 
 
 if __name__ == "__main__":

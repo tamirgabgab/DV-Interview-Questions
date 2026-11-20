@@ -1,10 +1,11 @@
-"""Question 0114: the page's pyuvm testbench of parts א and ב runs on Verilator as published
-(the tests of the page fail and pass as the page says, the logs on the page are the run's,
-and the pins of every cycle are the cycle model's of tools/figures/q0114.py, from which the
-waveforms are drawn); the arbitration model of part ג follows the rules of IEEE 1800.2 for
-lock, grab and the two modes it has; the SystemVerilog tabs, which no test can run (Verilator
-has no UVM library), are checked against the Python: the same classes and the same calls in
-the same order."""
+"""Question 0114: the page's virtual sequences of parts א and ב, spliced into the pyuvm
+environment of tests/0114/env.py, run on Verilator against tests/0114/pkt_xor.sv as published
+(the tests fail and pass as the page says, the logs on the page are the run's, and the pins of
+every cycle are the cycle model's of tools/figures/q0114.py, from which the waveform is drawn);
+the arbitration model of part ג (q0114.sequencer, running the page's sequences) follows the
+rules of IEEE 1800.2 for lock, grab and the two modes it has; the SystemVerilog tabs, which no
+test can run (Verilator has no UVM library), are checked against the Python: the same classes
+and the same calls in the same order."""
 
 import json
 import re
@@ -18,11 +19,34 @@ from extract_code import ROOT, pick, question_path
 sys.path.insert(0, str(ROOT / "tools" / "figures"))
 import q0114  # noqa: E402
 
+HERE = ROOT / "tests" / "0114"
 PAGE = question_path(114).read_text(encoding="utf-8")
+ENV = (HERE / "env.py").read_text(encoding="utf-8")
+DUT = (HERE / "pkt_xor.sv").read_text(encoding="utf-8")
 TESTS = {"BootTest": "boot_bug", "BootTestFixed": "boot_fix", "RekeyTest": "rekey_bug", "RekeyTestFixed": "rekey_fix"}
 
-# test only: every test of the page also prints the pins of every cycle after reset
-RECORD = '''
+# a test for each virtual sequence of the page, and every test prints the pins of every cycle
+TAIL = '''
+
+@pyuvm.test()
+class BootTest(BaseTest):
+    vseq = BootVseq
+
+
+@pyuvm.test()
+class BootTestFixed(BaseTest):
+    vseq = BootVseqFixed
+
+
+@pyuvm.test()
+class RekeyTest(BaseTest):
+    vseq = RekeyVseq
+
+
+@pyuvm.test()
+class RekeyTestFixed(BaseTest):
+    vseq = RekeyVseqFixed
+
 
 import json as _json
 
@@ -57,12 +81,12 @@ def py(marker):
 
 @pytest.fixture(scope="module")
 def run():
-    """Each page test: passed, its log lines and its recorded pins."""
+    """Each test: passed, its log lines and its recorded pins."""
     from page_tests import run_cocotb
 
-    module = "\n\n".join(py(m) for m in ("class Checker(", "class BootVseq(", "class BootVseqFixed(",
-                                         "class RekeyVseq(", "class Pause:")) + RECORD
-    results, log = run_cocotb("q0114", module, {"pkt_xor.sv": sv("module pkt_xor")}, "pkt_xor")
+    module = "\n\n".join([ENV] + [py(m) for m in ("class BootVseq(", "class BootVseqFixed(",
+                                                  "class RekeyVseq(", "class Pause:")]) + TAIL
+    results, log = run_cocotb("q0114", module, {"pkt_xor.sv": DUT}, "pkt_xor")
     out, name = {}, None
     for line in log.splitlines():
         m = re.search(r"running q0114_tb\.(\w+) ", line)
@@ -110,6 +134,17 @@ def test_the_fixed_runs(run):
 def test_the_pins_are_the_cycle_models(run):
     for test, case in TESTS.items():
         assert run[test]["rows"] == q0114.trace(case), test
+
+
+def test_the_environment_the_page_describes():
+    assert "PACKETS, LENGTH = 8, 3" in ENV and (q0114.PACKETS, q0114.LENGTH) == (8, 3)
+    assert "REKEY_AT = 10" in ENV and q0114.REKEY_AT == 10 and "# REKEY_AT = 10" in py("class RekeyVseq(")
+    assert "writes=((KEY, 0x5A), (CTRL, 1))" in ENV and q0114.KEY_A == 0x5A
+    assert "await ClockCycles(dut.clk, 2)  # the bus takes one write every three cycles" in ENV and q0114.GAP == 3
+    assert "async def send(self, k):" in ENV
+    assert "self.vseqr.reg_seqr = self.reg_agent.seqr" in ENV and "self.reg_seqr = self.pkt_seqr = None" in ENV
+    assert 'f"a register write during packet {pkt[0]}"' in ENV
+    assert "always_ff @(posedge clk or negedge rst_n)" in DUT and "if (!mid && !enable) drops <= drops + 1;" in DUT
 
 
 def first(rows, cond):
@@ -214,6 +249,16 @@ def test_every_item_is_given_once():
         assert sorted(items) == sorted([f"A{i}" for i in range(6)] + [f"B{i}" for i in range(6)] + ["I0", "I1", "I2"])
 
 
+def test_the_snapshots_are_the_arbitrations():
+    for mode in ("FIFO", "STRICT_FIFO"):
+        for how in (None, "lock", "grab"):
+            snaps = []
+            order = q0114.run_case(mode, snaps, how=how, priority=500)
+            assert [s["out"] for s in snaps] == order
+            for s, x in zip(snaps, order):
+                assert x == "-" or ["item", x[0], x] in s["queue"]
+
+
 def test_the_table_of_part_c():
     got = {label: (mode, q0114.together(order)) for label, mode, order in q0114.orders()}
     assert [v for v in got.values()] == [("FIFO", False), ("FIFO", False), ("STRICT_FIFO", False),
@@ -239,15 +284,13 @@ def test_sv_boot_vseq():
                                           "traffic.start(p_sequencer.pkt_seqr, this);")
     assert "start_soon" not in p_fix and order_of(p_fix, "await ConfigSeq(", "await TrafficSeq(")
     assert "uvm_sequencer #(reg_write) reg_seqr;" in fix and "uvm_sequencer #(packet)    pkt_seqr;" in fix
-    env = py("class Checker(")
-    assert "self.reg_seqr = self.pkt_seqr = None" in env
-    assert "self.vseqr.reg_seqr = self.reg_agent.seqr" in env and "vseqr.reg_seqr = reg_agent.seqr" in fix
+    assert "vseqr.reg_seqr = reg_agent.seqr" in fix
 
 
 def test_sv_rekey():
     bug, fix = sv("class rekey_vseq extends"), sv("class pause_c")
     p_bug, p_fix = py("class RekeyVseq("), py("class Pause:")
-    assert "int rekey_at = 10;" in bug and "REKEY_AT = 10" in p_bug and q0114.REKEY_AT == 10
+    assert "int rekey_at = 10;" in bug
     assert order_of(bug, "boot.start(", "traffic.start(", "#(rekey_at * 10ns);", "rekey.start(", "wait fork;")
     assert order_of(p_bug, 'ConfigSeq("boot")', "TrafficSeq(", "ClockCycles(", 'ConfigSeq("rekey", [(KEY, 0xC3)])')
     assert "'{'{KEY, 8'hC3}}" in bug and "'{'{KEY, 8'hC3}}" in fix
@@ -262,12 +305,12 @@ def test_sv_rekey():
 
 
 def test_sv_irq_seq():
-    s, p = sv("class irq_seq"), py("def sequencer(")
+    s, p = sv("class irq_seq"), py("def irq(")
     assert order_of(s, "m_sequencer.grab(this);", "m_sequencer.lock(this);", 'send_one("I0");', "get_response(rsp);",
                     'send_one("I1");', 'send_one("I2");', "m_sequencer.ungrab(this);", "m_sequencer.unlock(this);")
     assert 'steps = [("item", "I0"), ("wait", 1), ("item", "I1"), ("item", "I2")]' in p
-    assert "set_arbitration(UVM_SEQ_ARB_STRICT_FIFO);" in s and "irq.start(p_sequencer.pkt_seqr, this, 500);" in s
-    assert any(kw == dict(priority=500) and mode == "STRICT_FIFO" for _, kw, mode in q0114.SCENARIOS)
+    assert 'steps = [(how,)] + steps + [("un" + how,)]' in p
+    assert "`set_arbitration()`" in PAGE and "`irq.start(p_sequencer.pkt_seqr, this, 500)`" in PAGE
 
 
 def test_figures_up_to_date():
