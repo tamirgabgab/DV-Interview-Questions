@@ -1,9 +1,9 @@
 """Question 0115, the monitor that sees mismatches the DUT does not have: the page's numbers
-against the edge model of tools/figures/q0115.py, tb.sv's want strings against the same model
-(tb.sv runs the page's SystemVerilog on Verilator), the copies in tb.sv against the page, and
-the page's cocotb benches run on Verilator: as found (six mismatches, the same lines as the
-SystemVerilog), fixed (none), each with the driver started first and with the monitor in
-ReadOnly(), plus a probe of what cocotb 2.1 shows right after RisingEdge and in ReadOnly()."""
+against the edge model of tools/figures/q0115.py; tb.sv is what tests/0115/variants.py writes
+from the page (tb.sv runs the page's SystemVerilog and every choice of the box that Verilator
+runs, and compares them with the same model); and the page's cocotb bench run on Verilator
+in every choice of the box: as found (six mismatches, the same lines as the SystemVerilog),
+fixed (none), plus a probe of what cocotb 2.1 shows right after RisingEdge and in ReadOnly()."""
 
 import ast
 import inspect
@@ -41,6 +41,10 @@ def he(ks):
     return ks[0] if len(ks) == 1 else f"{', '.join(ks[:-1])} ו-{ks[-1]}"
 
 
+def cycles(lang, drv, mon, order):
+    return q0115.mismatch_cycles(q0115.view_of(lang, drv, mon, order))
+
+
 def test_figures_up_to_date():
     from page_tests import assert_figures_match
 
@@ -50,15 +54,15 @@ def test_figures_up_to_date():
 # --- the stimulus and the model -------------------------------------------------------------
 
 def test_stimulus_is_the_pages():
-    sv = variants.page_sv()
-    for name in ("race_tb", "race_tb_cb"):
-        v = re.search(r"bit\s+V\[N\] = '\{([^}]*)\};", sv[name])[1]
-        d = re.search(r"logic \[7:0\] D\[N\] = '\{([^}]*)\};", sv[name])[1]
-        assert [int(x) for x in v.split(",")] == q0115.V and [int(x) for x in d.split(",")] == q0115.D
-        assert re.search(r"localparam int N = (\d+);", sv[name])[1] == str(len(q0115.V))
-    for code in variants.page_py().values():
-        stim = ast.literal_eval(re.search(r"^STIM = (\[.*\])", code, re.M)[1])
-        assert stim == list(zip(q0115.V, q0115.D))
+    sv = variants.page_sv()["bug"]
+    v = re.search(r"bit\s+V\[N\] = '\{([^}]*)\};", sv)[1]
+    d = re.search(r"logic \[7:0\] D\[N\] = '\{([^}]*)\};", sv)[1]
+    assert [int(x) for x in v.split(",")] == q0115.V and [int(x) for x in d.split(",")] == q0115.D
+    assert re.search(r"localparam int N = (\d+);", (ROOT / "tests" / "0115" / "env.sv").read_text())[1] == str(len(q0115.V))
+    stim = ast.literal_eval(re.search(r"^STIM = (\[.*\])", variants.page_py()["bug"], re.M)[1])
+    assert stim == list(zip(q0115.V, q0115.D))
+    on_page("ששולח עשרה מחזורים של גירוי")
+    assert len(q0115.V) == q0115.CYCLES == 10
 
 
 def test_model_as_found():
@@ -68,7 +72,7 @@ def test_model_as_found():
     clean = [k for k in range(1, q0115.CYCLES + 1) if k not in bad]
     assert clean == [1, 4, 6, 9]
     on_page(f"השגיאות נופלות בדיוק על המחזורים {he(bad)}, ולמה לא על {he(clean)}",
-            f"מדווחות על אותן שש שגיאות")
+            "מדווחות על אותן שש שגיאות")
     assert len(bad) == 6
     # an error at edge k exactly when at edge k - 1 the monitor read a row the DUT did not take
     edges = r["edges"]
@@ -77,7 +81,7 @@ def test_model_as_found():
         assert (k in bad) == (q0115.plus1(e["read"]) != q0115.plus1(e["took"]) and (e["read"][0] or e["took"][0]))
     # before the clean cycles 4, 6 and 9 the two rows are the same: 9 after 9, low after low, 6 after 6
     assert [(q0115.row(k - 3), q0115.row(k - 2)) for k in (4, 6, 9)] == [((1, 9), (1, 9)), ((0, 9), (0, 9)), ((1, 6), (1, 6))]
-    on_page("9 אחרי 9, `in_valid` נמוך אחרי נמוך, 6 אחרי 6")
+    on_page("ולפני מחזורים 4, 6 ו-9 שתי השורות זהות : 9 אחרי 9, `in_valid` נמוך אחרי נמוך, 6 אחרי 6")
 
 
 def test_the_edge_of_cycle_2():
@@ -85,7 +89,7 @@ def test_the_edge_of_cycle_2():
     assert (e2["read"], e2["took"]) == ((1, 5), (1, 9))
     assert (e3["exp"], e3["got"]) == ((1, 6), (1, 10))
     on_page("5 לפני שה-driver כותב, ו-9 אחרי",
-            "ולכן הוא קורא 5, ה-driver כותב 9, וה-DUT לוקח 9",
+            "ה-monitor קורא 5, ה-driver כותב 9, וה-DUT לוקח 9",
             "מצפה ל-6 בקצה הבא, ומקבל 10")
     fix = q0115.run("fixed")["edges"][1]
     assert fix["read"] == fix["took"] == (1, 5)
@@ -103,38 +107,45 @@ def test_log_on_page():
     on_page(*q0115.log_lines())
 
 
-# --- tb.sv: the want strings, the copies ---------------------------------------------------
+def test_claims_of_the_page():
+    """What the page says about the fixes and the variants, in the model that tb.sv and the
+    cocotb runs check."""
+    for order in q0115.VERILATOR_ORDERS:
+        assert cycles("sv", "cb", "s1", order) == []                     # the fix, in either order
+        assert cycles("sv", "nba", "edge", order) == []                  # <= alone is enough
+        assert cycles("sv", "neg", "edge", order) == []                  # so is the falling-edge driver
+        assert cycles("sv", "blk", "s1", order) == [2, 3, 5, 7, 8, 10]   # only the monitor fixed: the same six
+        for mon in q0115.MONITORS["py"]:
+            assert cycles("py", "dep", mon, order) == []                 # a plain cocotb write, any order
+    on_page("מדווח ב-Verilator על אותן שש שגיאות", "בכל סדר", "גם `<=` ב-driver מספיק לבד")
+    # the fork swapped hides the race in Verilator; a DUT that runs before the driver shows it
+    assert cycles("sv", "blk", "edge", "dmx") == [] and cycles("sv", "blk", "edge", "xdm") != []
+    on_page("כדי ש-Verilator יראה 0 שגיאות", "וסימולטור שמריץ את ה-`always_ff` לפני ה-driver יראה שגיאות")
+    # #0 sees the outputs after the edge's update
+    assert q0115.view_of("sv", "cb", "s0", "mdx")[2] == 1 and q0115.view_of("sv", "cb", "s1", "mdx")[2] == 0
+    on_page("נדגם באזור ה-Observed, אחרי ה-NBA של הקצה")
 
-BENCHES = ["found", "swap", "fixed", "fixed", "after", "fixed", "fixed", "found"]   # the order of tb's WANT
+
+# --- tb.sv ------------------------------------------------------------------------------------
+
+def test_testbench_is_written_from_the_page():
+    assert TB == variants.tb_text(), "run: python tests/0115/variants.py --write"
+    assert len(variants.cfg_list()) == 32
+    assert TB.count("race_cfg #(.DRV(") == 1 and "for (genvar g = 0; g < 32; g++)" in TB
 
 
-def test_testbench_want_strings():
-    body = re.search(r"string WANT\[8\] = '\{(.*?)\};", TB, re.S)[1]
-    want = re.findall(r'"([^"]*)"', body)
-    assert want == [" ".join(map(str, q0115.mismatch_cycles(v))) for v in BENCHES]
-    assert re.search(r'string WANT_WAVE_BUG = "([^"]*)";', TB)[1] == q0115.wave_string("found")
-    assert re.search(r'string WANT_WAVE_FIX = "([^"]*)";', TB)[1] == q0115.wave_string("fixed")
-    assert len(q0115.run()["edges"]) == 12 == len(q0115.wave_string().split())
-
-
-def test_testbench_copies_are_the_page():
-    assert variants.tb_copies() == variants.copies_block(), "run: python tests/0115/variants.py --write"
-    for name in variants.sv_variants():
-        assert re.search(rf"^\s*{name}\s+\w+ \(\);", TB, re.M), name
-
-
-def test_versions_table_rows():
-    """Every row of the table of versions is a bench that the tests run."""
-    views = [v for *_, v in q0115.VERSIONS]
-    sv = dict(zip(["found", "swap", "cb_mon", "negmon", "cb", "nba", "neg"], views[:7]))
-    assert sv == {"found": "found", "swap": "swap", "cb_mon": "found", "negmon": "after", "cb": "fixed",
-                  "nba": "fixed", "neg": "fixed"}
-    assert views[7:] == [PY_VIEWS[k] for k in ("bug", "bug_swap", "bug_ro", "fix", "fix_ro")]
+def test_testbench_benches_hold_the_page_code():
+    page = variants.page_sv()
+    for code in page.values():
+        assert variants.indent(code) in TB
+    assert "add1 dut (.*);" in TB and TB.count("module add1 (") == 1
+    # the monitor of the fix differs from the page's monitor only in what the page names
+    s = variants.sv_parts()
+    assert s["monitor"]["s1"].replace("mon_cb.", "").replace("@(mon_cb);", "@(posedge clk);") == s["monitor"]["edge"]
+    on_page("הוא מחכה ל-`@(mon_cb)` במקום ל-`@(posedge clk)`, וקורא `mon_cb.in_valid`, `mon_cb.out_data`")
 
 
 # --- cocotb: the page's Python on Verilator ---------------------------------------------------
-
-PY_VIEWS = {"bug": "found", "bug_swap": "swap", "bug_ro": "after", "fix": "fixed", "fix_swap": "fixed", "fix_ro": "fixed_after"}
 
 PROBE = '''
 
@@ -143,9 +154,6 @@ async def probe(dut):
     """What a coroutine reads right after RisingEdge and in ReadOnly(), after a plain write and
     after an Immediate one (test only)."""
     import json
-
-    from cocotb.handle import Immediate
-    from cocotb.triggers import ReadOnly
 
     facts = {}
     dut.in_valid.value = 1
@@ -173,33 +181,38 @@ async def probe(dut):
 def cocotb_run(code, tests=None):
     from page_tests import run_cocotb
 
-    dut = variants.pick(115, "systemverilog", "module add1 (")
+    dut, _ = variants.env_sv()
     return run_cocotb("q0115", code, {"add1.sv": dut}, "add1", tests=tests)
 
 
 @pytest.fixture(scope="module")
 def py_runs():
     out = {}
-    for name, code in variants.py_variants().items():
-        results, log = cocotb_run(code, ["race_tb"])
+    for c in variants.py_list():
+        results, log = cocotb_run(variants.py_module(*c), ["race_tb"])
         lines = re.findall(r"INFO +\S+ +(cycle \d+: expected \S+, got \S+)", log)
-        out[name] = (results, lines, log)
+        out[c] = (results, lines, log)
     return out
 
 
-def test_cocotb_benches(py_runs):
-    for name, view in PY_VIEWS.items():
-        results, lines, log = py_runs[name]
-        want = q0115.log_lines(view)[:-1]
-        assert results == {"race_tb": not want}, (name, log[-2000:])
-        assert lines == want, name
-    # the page's log is the cocotb run's, word for word, and the SystemVerilog's (tb.sv)
-    assert py_runs["bug"][1] == q0115.log_lines()[:-1]
-    assert "AssertionError: 6 mismatches" in py_runs["bug"][2]
+def test_cocotb_every_choice(py_runs):
+    assert len(py_runs) == 12
+    for c, (results, lines, log) in py_runs.items():
+        want = q0115.log_lines(q0115.view_of("py", *c))[:-1]
+        assert results == {"race_tb": not want}, (c, log[-2000:])
+        assert lines == want, c
+
+
+def test_cocotb_as_found_is_the_pages_log(py_runs):
+    """The page's bench as published: the page's log, word for word, as the SystemVerilog."""
+    results, lines, log = py_runs[("imm", "edge", "mdx")]
+    assert variants.py_module("imm", "edge", "mdx").count(variants.page_py()["bug"]) == 1
+    assert lines == q0115.log_lines()[:-1]
+    assert "AssertionError: 6 mismatches" in log
 
 
 def test_cocotb_probe():
-    results, log = cocotb_run(variants.page_py()["fix"] + PROBE, ["probe"])
+    results, log = cocotb_run(variants.py_module("dep", "edge", "mdx") + PROBE, ["probe"])
     assert results == {"probe": True}, log[-2000:]
     facts = json.loads(re.search(r"PROBE (\{.*\})", log)[1])
     assert facts == {
@@ -223,4 +236,4 @@ def test_cocotb_queues_plain_writes():
     src = inspect.getsource(h)
     assert "def _schedule_write(" in src and "Queue write for the beginning of the next ReadWrite phase" in src
     assert "non-deterministic" in h.Immediate.__doc__
-    on_page("`_schedule_write` ב-`cocotb/handle.py`")
+    on_page("`_schedule_write` ב-`cocotb/handle.py`", "והתיעוד של cocotb מזהיר שכתיבה כזו ב-Verilog היא לא דטרמיניסטית")

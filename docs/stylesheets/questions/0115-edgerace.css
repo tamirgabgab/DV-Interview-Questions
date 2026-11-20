@@ -1,0 +1,47 @@
+/* Question 0115, the monitor race at the clock edge: the box of explorer/edgerace.js (er-*).
+   A row of the ten cycles, each with the monitor's verdict once it has compared (the
+   chips' green and red of the site); the edge of the current cycle as a list of its
+   scheduling regions, with an event per chip: the current one tinted orange, the ones still
+   to come dashed and grey; beside it the values of the signals after the event. Colours
+   from the palette only. */
+
+.md-typeset .explorer .er-pick label { white-space: normal; }
+.md-typeset .explorer .er-pick select { max-width: 100%; }
+.md-typeset .explorer .er-pos { display: inline-block; min-width: 7rem; font-variant-numeric: tabular-nums; }
+
+/* --- the cycles ---------------------------------------------------------------------------- */
+.md-typeset .explorer .er-cycles { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 0.2rem; margin: 0.35rem 0 0.2rem; direction: ltr; max-width: 30rem; }
+.md-typeset .explorer button.er-cyc { display: flex; flex-direction: column; align-items: center; gap: 0; min-width: 0; min-height: 2.2rem; padding: 0.1rem 0; border: 1px solid var(--site-card-border); border-radius: 0.25rem; background: none; color: var(--viz-ink); font: inherit; font-size: 0.66rem; line-height: 1.2; cursor: pointer; }
+.md-typeset .explorer button.er-cyc b { font-variant-numeric: tabular-nums; }
+.md-typeset .explorer button.er-cyc span { font-weight: 700; }
+.md-typeset .explorer button.er-cyc.is-ok { background: var(--diff-easy-bg); color: var(--diff-easy); border-color: var(--diff-easy); }
+.md-typeset .explorer button.er-cyc.is-bad { background: var(--diff-hard-bg); color: var(--diff-hard); border-color: var(--diff-hard); }
+.md-typeset .explorer button.er-cyc.is-now { outline: 2px solid var(--viz-s2); outline-offset: 1px; }
+.md-typeset .explorer button.er-cyc:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
+
+/* --- the event and the edge ---------------------------------------------------------------- */
+.md-typeset .explorer .er-now { margin: 0.35em 0; font-size: 0.72rem; }
+.md-typeset .explorer :is(.er-now, .er-saw, .er-sum) code { white-space: nowrap; }
+.md-typeset .explorer .er-edge { border: 1px solid var(--site-card-border); border-radius: 0.3rem; padding: 0.3rem 0.5rem; }
+.md-typeset .explorer .er-etitle { margin: 0 0 0.2rem; font-weight: 700; font-size: 0.7rem; }
+.md-typeset .explorer ol.er-regions { list-style: none; margin: 0; padding: 0; }
+.md-typeset .explorer ol.er-regions li.er-reg { display: grid; grid-template-columns: 5.6rem minmax(0, 1fr); align-items: center; gap: 0.4rem; margin: 0; padding: 0.15rem 0; border-top: 1px solid var(--viz-grid); }
+.md-typeset .explorer ol.er-regions li.er-reg:first-child { border-top: 0; }
+.md-typeset .explorer .er-rname { font-size: 0.66rem; color: var(--viz-text); font-family: var(--md-code-font-family); }
+.md-typeset .explorer .er-evs { display: flex; flex-wrap: wrap; gap: 0.2rem; min-height: 1.45rem; align-items: center; }
+.md-typeset .explorer .er-chip { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem; padding: 0.05rem 0.35rem; border: 1px solid var(--site-card-border); border-radius: 0.25rem; font-size: 0.66rem; line-height: 1.35; color: var(--viz-ink); }
+.md-typeset .explorer .er-chip code { font-size: 0.62rem; white-space: nowrap; }
+.md-typeset .explorer .er-chip .er-who { font-weight: 700; }
+.md-typeset .explorer .er-chip.is-now { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset .explorer .er-chip.is-later { color: var(--viz-text); border-style: dashed; }
+.md-typeset .explorer .er-chip.is-bad:not(.is-later) { border-color: var(--diff-hard); }
+.md-typeset .explorer .er-none { color: var(--viz-text); font-size: 0.66rem; }
+
+/* --- the signals ----------------------------------------------------------------------------- */
+.md-typeset .explorer .er-vals { border: 1px solid var(--site-card-border); border-radius: 0.3rem; padding: 0.3rem 0.5rem; font-size: 0.68rem; }
+.md-typeset .explorer .er-vals p { margin: 0.2em 0; }
+.md-typeset .explorer .er-ctitle { font-weight: 700; }
+.md-typeset .explorer table.er-tab { display: table; width: auto; margin: 0; border-collapse: collapse; font-size: 0.68rem; }
+.md-typeset .explorer table.er-tab :is(th, td) { padding: 0.1rem 0.45rem; border: 1px solid var(--viz-grid); color: var(--viz-ink); background: none; font-family: var(--md-code-font-family); font-weight: 400; text-align: left; font-variant-numeric: tabular-nums; }
+.md-typeset .explorer .er-vals { margin-top: 0.5rem; }
+.md-typeset .explorer .ex-side .er-vals { margin-top: 0; }
