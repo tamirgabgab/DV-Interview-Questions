@@ -214,6 +214,7 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0112-factory.css     # 0112: the factory override, the component tree box
   - stylesheets/questions/0113-objrun.css      # 0113: the test that ends at time 0, the box of the run and its objections
   - stylesheets/questions/0114-seqarb.css      # 0114: the sequencer arbitration box (lock, grab, the modes)
+  - stylesheets/questions/0115-edgerace.css    # 0115: the monitor race, the box of one clock edge's regions
   - stylesheets/questions/0044-kapn.css        # 0012, 0044: the kapn, kapgraph and kapbase boxes on one screen (session 34)
   - stylesheets/questions/0014-shapes.css      # 0014: the shapes box on one screen, the heat map beside the board (session 34)
   - stylesheets/questions/0054-arbiter.css     # 0054: the block diagram of rr_arbiter, the pointer rows of the arbiter box (session 34)
