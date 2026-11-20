@@ -282,14 +282,16 @@
         `<label>המטרה <select class="ex-obj" aria-label="מטרת החיפוש"><option value="page">${interval ? "הסיום המוקדם ביותר (השאלה)" : "הכי מעט אירועים (השאלה)"}</option><option value="flips">הכי מעט היפוכים</option></select></label>` +
         `<button type="button" class="md-button ex-reset">חזרה לערכים של השאלה</button></div>` +
         `<p class="ex-summary" aria-live="polite"></p>` +
-        (interval ? `<label class="hg-fork-toggle"><input type="checkbox" class="ex-fork" checked> ההסתעפות על ציר הזמן</label>` : "") +
-        `<div class="hg-axis"></div><p class="hg-fork"></p>` +
+        `<div class="hg-axis"></div>` +
         `<div class="ex-controls ex-play-row"><button type="button" class="md-button ex-prev">האירוע הקודם</button>` +
         `<button type="button" class="md-button md-button--primary ex-next">האירוע הבא</button>` +
         `<button type="button" class="md-button ex-play">הפעלה</button>` +
         `<label>הקצב <select class="ex-speed" aria-label="הקצב, כמה זמן נמשכת דקה של שעון החול"><option value="250">דקה = 0.25 שנייה</option><option value="500" selected>דקה = 0.5 שנייה</option><option value="1000">דקה = שנייה</option></select></label>` +
-        `<span class="ex-pos"></span></div>` +
-        `<div class="hg-frame"></div><p class="hg-caption"></p><p class="ex-note hg-compare"></p>` +
+        `<span class="ex-pos"></span>` +
+        // the fork's switch in the play row and its words under the glasses (0019), so the
+        // part above the play row is the plan and its axis only (round 9: 1201 px at 1920)
+        (interval ? `<label class="hg-fork-toggle"><input type="checkbox" class="ex-fork" checked> ההסתעפות על ציר הזמן</label>` : "") + `</div>` +
+        `<div class="hg-frame"></div><p class="hg-caption"></p><p class="ex-note hg-compare"></p><p class="hg-fork"></p>` +
         `<section class="ex-proof hg-proof"><p class="ex-proof-title">שלב ההוכחה : החיפוש עצמו</p>` +
         `<div class="ex-controls"><button type="button" class="md-button md-button--primary ex-q-next">השליפה הבאה</button>` +
         `<button type="button" class="md-button ex-q-end">עד המטרה</button><button type="button" class="md-button ex-q-start">מההתחלה</button><span class="hg-q-pos"></span></div>` +
@@ -615,9 +617,9 @@
         if (axisKey !== shownAxis || !$(".hg-axis svg")) { $(".hg-axis").innerHTML = axisSvg(events, interval ? res.start : null, res.end, fork); shownAxis = axisKey; }
         $(".hg-axis").querySelectorAll(".hg-ev").forEach((el, i) => { el.setAttribute("class", `${i === st.s ? "s2-line" : "ink-line"} hg-ev`); el.setAttribute("stroke-width", i === st.s ? "3" : "1.5"); });
         $(".hg-fork").innerHTML = interval && st.C !== null ? `<span class="ex-note">ההסתעפות מוגדרת לשני שעונים, ולכן היא כבויה כשיש שעון שלישי.</span>` : fork
-          ? `ההסתעפות : ברגע ${ltr(fork.t)} השעון הגדול נגמר בפעם הראשונה, וב-${ltr(fork.small)} נשארו ${ltr(fork.top)} דקות. אם לא הופכים אותו הוא נגמר ברגע ${ltr(fork.keep)}, ואם הופכים ברגע ${ltr(fork.flip)}. ` +
-            (Math.abs(fork.flip - fork.keep) === st.D ? `ההפרש ביניהם הוא בדיוק ${ltr(st.D)}, אבל אלה שתי ריצות שונות : בכל ריצה קורה רק אחד מהם, ולכן הם לא נותנים מדידה.` : `שני הרגעים שייכים לשתי ריצות שונות, ובכל ריצה קורה רק אחד מהם.`) +
-            ` שתי השורות שמעל ההסתעפות הן הרגעים שבהם כל שעון נגמר אם הופכים אותו תמיד : כפולות של ${ltr(st.A)} ושל ${ltr(st.B)}.`
+          ? `ההסתעפות : ברגע ${ltr(fork.t)} השעון הגדול נגמר, וב-${ltr(fork.small)} נשארו ${ltr(fork.top)} דקות. בלי היפוך ${ltr(fork.small)} נגמר ברגע ${ltr(fork.keep)}, ועם היפוך ברגע ${ltr(fork.flip)}. ` +
+            (Math.abs(fork.flip - fork.keep) === st.D ? `ההפרש הוא בדיוק ${ltr(st.D)}, אבל אלה שתי ריצות שונות, ולכן אין כאן מדידה.` : `אלה שתי ריצות שונות, ובכל ריצה קורה רק אחד מהם.`) +
+            ` השורות A ו-B : הרגעים שבהם כל שעון נגמר אם הופכים אותו תמיד, כפולות של ${ltr(st.A)} ושל ${ltr(st.B)}.`
           : "";
         // the words of event k: which glasses ran out, and what is done
         const outOf = (k) => {
@@ -684,7 +686,7 @@
 
   dvqExplorers.register({
     views: { hourglass: hourglassView },
-    cols: { hourglass: { main: ".hg-frame, .hg-caption, .hg-compare", side: ".hg-proof" } },   // the time axis stays wide; under the play row the glasses beside the search
+    cols: { hourglass: { main: ".hg-frame, .hg-caption, .hg-compare, .hg-fork", side: ".hg-proof" } },   // the time axis stays wide; under the play row the glasses beside the search
     help: {
       hourglass: "A, B (ו-C) הם שעוני החול ו-D הזמן למדידה. התכנית מצוירת על ציר הזמן. ״האירוע הבא״ הופך את השעונים של האירוע ומריץ את החול עד האירוע הבא, ״הפעלה״ מריצה את כל התכנית ברצף (ועוצרת באמצע), והקצב קובע כמה זמן נמשכת דקה של שעון. השעון שבצד מראה את הזמן t, ובורר היעד בוחר בין היעד של העמוד למספר ההפיכות הקטן ביותר. בתיבה של 0019 המתג ״ההסתעפות״ מראה את שתי הריצות שמתפצלות ברגע שהשעון הגדול נגמר. בשלב ההוכחה ״השליפה הבאה״ מריץ את החיפוש של העמוד מצב אחרי מצב, עם התור ועץ החיפוש.",
     },

@@ -88,6 +88,13 @@
   .md-typeset .explorer[data-kind="lfsr"] .ex-side .lf-table :is(td, th) { padding: 0.1em 0.35em; }
   .md-typeset .explorer[data-kind="lfsr"] .ex-side .lf-table td:first-child { white-space: nowrap; }
 }
+/* hourglass (0018, 0019): the search a little tighter in the side column, so 0019's box with
+   its fork fits a 1080 px screen */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="hourglass"] .ex-side .hg-proof > :is(.ex-title, p) { margin-top: 0.3em; margin-bottom: 0.2em; }
+  .md-typeset .explorer[data-kind="hourglass"] .ex-side .hg-proof > .ex-controls { margin: 0.2rem 0; }
+  .md-typeset .explorer[data-kind="hourglass"] .ex-side .hg-proof > .viz-legend { margin-top: 0.2rem; }
+}
 /* covergroup (0053): each coverpoint's bins on one row beside the curve */
 @container (min-width: 600px) {
   .md-typeset .explorer[data-kind="covergroup"] .ex-main .cv-name { min-width: 4.2rem; }
