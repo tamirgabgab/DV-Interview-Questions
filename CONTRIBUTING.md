@@ -991,7 +991,7 @@ steps once, synchronously, before the reader sees the box; the answer line keeps
 place when it is cleared; a block that grows with the steps (a table of the steps) goes
 under the figures; and a live figure whose labels reach the enlarge button only at some
 steps sits in a container marked `data-fig-strip`, whose figures always have the button's
-strip above them. CI runs it in the four explorer shards.
+strip above them. CI runs it in the eight explorer shards.
 
 One screen on a computer (session 34, the owner): a whole box should fit a 1920 x 1080
 screen, about 1000 px under the sticky header, measured with the box stepped to its end.
@@ -1217,8 +1217,8 @@ so the live site keeps its previous version. One-time setup in the repository se
 **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
 The jobs: `test` (lint, contrast, pytest and Verilator), then `build` (the strict build, the
-links and the phone check) beside `explorers` (the explorer check on four runners, a
-quarter of the boxes each, `--shard K/4`), then `deploy` on `main`. Two shortcuts keep it
+links and the phone check) beside `explorers` (the explorer check on eight runners, an
+eighth of the boxes each, `--shard K/8`), then `deploy` on `main`. Two shortcuts keep it
 short, about 13 minutes on a work branch:
 
 - A push that changes only `README.md`, `CONTRIBUTING.md`, `CLAUDE.md` or files under `notes/`

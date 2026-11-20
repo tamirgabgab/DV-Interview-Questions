@@ -302,16 +302,17 @@ jobs:
 
   # Every explorer box clicked through, each button once, then "reset everything": a script
   # error or a page that turns wider than 390 px fails the deploy. Then each box's link and
-  # remembered state reopen the same controls. Four runners, each a quarter of the boxes.
+  # remembered state reopen the same controls. Eight runners, each an eighth of the boxes
+  # (round 9: four runners took about 22 minutes each and set the length of the full lane).
   explorers:
     needs: [gate, test]
     if: needs.gate.outputs.verified != 'true' && needs.gate.outputs.fast != 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 30   # usually 15 to 18 min with 92 questions; a slow Chromium install adds up to 10
+    timeout-minutes: 30   # usually about 10 min with 111 questions; a slow Chromium install adds up to 10
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -325,16 +326,16 @@ jobs:
         env:
           DVQ_SOCIAL_CARDS: "false"
       - run: python -m playwright install --with-deps chromium || python -m playwright install chromium
-      - name: Click through the explorer boxes, part ${{ matrix.shard }} of 4
-        run: python tools/checks/check_explorers.py site --shard ${{ matrix.shard }}/4
+      - name: Click through the explorer boxes, part ${{ matrix.shard }} of 8
+        run: python tools/checks/check_explorers.py site --shard ${{ matrix.shard }}/8
       # Every box stepped from its first step to its last at 390 and 1200 px: a figure that
       # moves while the box steps fails (tools/checks/check_jumps.py).
-      - name: Step the explorer boxes for jumping figures, part ${{ matrix.shard }} of 4
-        run: python tools/checks/check_jumps.py site --shard ${{ matrix.shard }}/4
+      - name: Step the explorer boxes for jumping figures, part ${{ matrix.shard }} of 8
+        run: python tools/checks/check_jumps.py site --shard ${{ matrix.shard }}/8
       # Every number and text field of every box typed into: Enter, Tab and an input
       # method's Enter must apply the value (tools/checks/check_inputs.py).
-      - name: Type into the explorer boxes' fields, part ${{ matrix.shard }} of 4
-        run: python tools/checks/check_inputs.py site --shard ${{ matrix.shard }}/4
+      - name: Type into the explorer boxes' fields, part ${{ matrix.shard }} of 8
+        run: python tools/checks/check_inputs.py site --shard ${{ matrix.shard }}/8
 
   deploy:
     needs: [gate, build, explorers]
