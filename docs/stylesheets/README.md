@@ -69,9 +69,17 @@ prefix (the class table of `CONTRIBUTING.md` lists them), and a line at the end 
 | `questions/0100-stairs.css` | `sw-` | the ways to climb the stairs: the staircases of the figures with the arrows into a stair, the box's flights of stair buttons |
 | `questions/0037-editdist.css` | `ed-` | the edit distance between two streams: the tables of the prefixes with the path shaded by step, the band, the box's table filled a cell at a time and its report |
 
-The browser gets the parts as one file: `hooks/questions.py` joins them in this order into
-`stylesheets/site.css` at the end of the build and links that file from every page and from
-the 404 page (S423). The parts are the source; the joined file is never edited.
+The browser gets the parts as bundles (S423, round 4): at the end of the build
+`hooks/questions.py` joins the numbered parts in this order, minified, into two files, each
+with only the rules that can match on its pages: `stylesheets/site-question.css` for the
+question pages and `stylesheets/site.css` for every other page and the 404 page. A rule can
+match on a page when the page's HTML, or a script the page loads, names every class, id and
+box kind its selector needs (`selector_needs` in the hook). A question's sheet under
+`questions/` is minified in place and linked, after the bundle, only on the pages it can
+style the same way (0044's sheet also on 0012, 0018's on 0019). So a new rule needs nothing
+extra: a class that only a script builds is found in the script, also from a prefix
+(`` `il-i${k}` ``, `"is-" + state`, `` `c${n}` `` for a numbered class). The parts are the
+source; the bundles are never edited.
 
 Colours are CSS variables, defined for both schemes in `01-base.css` (the palette) and used
 everywhere else; figures and boxes never hard-code a colour. A new rule goes into the part

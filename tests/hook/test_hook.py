@@ -91,15 +91,82 @@ def test_minify_css_keeps_meaning():
                                     ".f::after{content: '/* no */'}\n")
 
 
-def test_one_stylesheet_link():
+def test_selector_needs():
+    needs = hook.selector_needs('.md-typeset .explorer[data-kind="river"] :is(.a, .b.c):not(.d) svg::after, p:hover')
+    assert needs == [frozenset({".md-typeset", ".explorer", "k:river", ".a"}),
+                     frozenset({".md-typeset", ".explorer", "k:river", ".b", ".c"}), frozenset()]
+    assert hook.selector_needs("label:has(input.ex-num.ib-in) #top") == [frozenset({".ex-num", ".ib-in", "#top"})]
+    assert hook.selector_needs("tr:nth-child(2n of .x) td") == [frozenset()]
+    assert hook.selector_needs('a[href$=".svg"].y, [data-tip="a.b #c"]') == [frozenset({".y"}), frozenset()]
+
+
+def test_can_match_with_prefixes():
+    marks = {".md-typeset", ".explorer", ".il-cell"}
+    assert hook.can_match([frozenset({".md-typeset", ".explorer"})], marks, ())
+    assert not hook.can_match([frozenset({".il-cell", ".il-i4"})], marks, ())
+    assert hook.can_match([frozenset({".il-cell", ".il-i4"})], marks, (".il-i",))
+    assert hook.can_match([frozenset({".nope"}), frozenset()], marks, ())
+
+
+def test_page_marks_read_the_page_and_its_scripts(tmp_path):
+    (tmp_path / "javascripts").mkdir()
+    (tmp_path / "javascripts" / "a.js").write_text('el.className = `il-i${k} is-on`; load("vendor/b.js"); x = `c${n}`;')
+    (tmp_path / "javascripts" / "vendor").mkdir()
+    (tmp_path / "javascripts" / "vendor" / "b.js").write_text('div.className = "cm-editor";')
+    page = tmp_path / "q" / "index.html"
+    page.parent.mkdir()
+    out = ('<div class="explorer box" id="top" data-kind="river"><svg class=\'fig\'></svg></div>'
+           '<script src="../javascripts/a.js"></script><script>document.body.classList.add("inline-made")</script>')
+    marks, prefixes = hook.page_marks(out, page, tmp_path, "/site/")
+    assert {".explorer", ".box", ".fig", "#top", "k:river", ".is-on", ".cm-editor", ".inline-made", ".c5"} <= marks
+    assert prefixes == (".il-i",) and ".x5" not in marks
+    marks404, _ = hook.page_marks('<script src="/site/javascripts/a.js"></script>', tmp_path / "404.html", tmp_path, "/site/")
+    assert ".cm-editor" in marks404
+
+
+def test_page_scripts_by_marks():
+    tags = "".join(f'<script src="../../javascripts/{s}"></script>' for s in ("marks.js", "home.js", "run-python.js", "video.js"))
+    assert hook.page_scripts('<div class="py-runner"></div>' + tags) == (
+        '<div class="py-runner"></div><script src="../../javascripts/marks.js"></script>'
+        '<script src="../../javascripts/run-python.js"></script>')
+    home = hook.page_scripts('<div class="md-typeset home-hero"></div><a data-video="x">' + tags)
+    assert "home.js" in home and "video.js" in home and "run-python.js" not in home
+
+
+def test_page_styles_bundle_and_sheets(monkeypatch):
+    monkeypatch.setattr(hook, "_sheet_needs", {"stylesheets/questions/0083-jugs.css": [frozenset({".wj-jugs"})],
+                                               "stylesheets/questions/0084-lis.css": [frozenset({".li-x"})]})
     head = ('<link rel="stylesheet" href="../../assets/stylesheets/main.css">\n'
             '<link rel="stylesheet" href="../../stylesheets/01-base.css">\n'
             '<link rel="stylesheet" href="../../stylesheets/02-pages.css">\n'
-            '<link rel="stylesheet" href="../../stylesheets/12-rounds-y-s.css">\n<script></script>')
-    out = hook.one_stylesheet(head)
+            '<link rel="stylesheet" href="../../stylesheets/questions/0083-jugs.css">\n<script></script>')
+    out = hook.page_styles(head, True, {".wj-jugs"}, ())
     assert out == ('<link rel="stylesheet" href="../../assets/stylesheets/main.css">\n'
-                   '<link rel="stylesheet" href="../../stylesheets/site.css">\n<script></script>')
-    assert hook.one_stylesheet("<p>no links</p>") == "<p>no links</p>"
+                   '<link rel="stylesheet" href="../../stylesheets/site-question.css">\n'
+                   '<link rel="stylesheet" href="../../stylesheets/questions/0083-jugs.css">\n<script></script>')
+    assert "stylesheets/site.css" in hook.page_styles(head, False, set(), ()) and "0083" not in hook.page_styles(head, False, set(), ())
+    assert hook.page_styles("<p>no links</p>", True, set(), ()) == "<p>no links</p>"
+
+
+def test_css_bundle_keeps_order_and_groups():
+    css = (".a { color: red; }\n.home-hero .b { margin: 0; }\n@media (max-width: 40em) { .home-hero { x: 1; } .a .c { y: 2; } }\n"
+           "@media print { .home-hero { z: 3; } }\n@keyframes spin { to { transform: rotate(1turn); } }\np, .x .home-hero { w: 4; }\n")
+    assert hook.css_bundle(css, {".a", ".c"}, ()) == (".a{color: red}@media (max-width: 40em){.a .c{y: 2}}"
+                                                      "@keyframes spin{to{transform: rotate(1turn)}}p,.x .home-hero{w: 4}\n")
+    everything = hook.css_bundle(css, {".a", ".b", ".c", ".home-hero", ".x"}, ())
+    assert everything == hook.minify_css(css)
+
+
+def test_bundle_of_everything_is_the_joined_parts():
+    """Every rule of the real parts survives the parse and the serialization unchanged."""
+    import yaml
+    cfg = yaml.safe_load(re.sub(r"!!python\S*", "", (ROOT / "mkdocs.yml").read_text()).replace("!ENV", ""))
+    joined = "".join((ROOT / "docs" / c).read_text(encoding="utf-8") + "\n" for c in cfg["extra_css"] if "/questions/" not in c)
+
+    class All(set):
+        def __contains__(self, item):
+            return True
+    assert hook.css_bundle(joined, All(), ()) == hook.minify_css(joined)
 
 
 def test_cost_chips():

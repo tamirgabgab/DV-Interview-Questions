@@ -122,8 +122,10 @@ exclude_docs: |   # notes for whoever edits the site, not pages; Python's cache 
   stylesheets/README.md
   __pycache__/
 
-extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/README.md); the hook
-             # joins them into stylesheets/site.css at build time, and the pages load that one file
+extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/README.md); at build time
+             # the hook joins the shared parts into two minified bundles, stylesheets/site-question.css
+             # for the question pages and stylesheets/site.css for the rest (each with the rules that
+             # can match there), and links a question's sheet only on the pages it can style
   - stylesheets/01-base.css
   - stylesheets/02-pages.css
   - stylesheets/03-runner-figures.css
@@ -217,6 +219,8 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
   # WaveDrom and its init script are added by hooks/questions.py to the pages that have a
   # ```wavedrom block only (S423).
+  # The scripts named in PAGE_SCRIPTS of hooks/questions.py (home.js, maps.js, run-python.js ...)
+  # load only on the pages that hold what they act on; the hook removes their tags elsewhere.
   - javascripts/interview.js       # interview mode and the quick jump: shared functions (session 30)
   - javascripts/marks.js
   - javascripts/question-filter.js

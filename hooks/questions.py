@@ -187,7 +187,28 @@ WAVEDROM_CDN = ["https://cdn.jsdelivr.net/npm/wavedrom@3.5.0/skins/default.js",
 WAVEDROM_INIT = "javascripts/wavedrom-init.js"
 WAVE_VIEWER = "javascripts/wave-viewer.js"     # measure and play under each diagram (session 31)
 WAVEDROM_BLOCK = '<pre class="wavedrom">'
-JOINED_CSS = "stylesheets/site.css"
+# Page weight by what a page holds (round 4: N2.2, N2.3). The shared parts of extra_css
+# (stylesheets/NN-name.css) reach a page as one of two minified bundles, the question pages'
+# and the other pages': each holds the rules of the parts that can match on such a page, in
+# the parts' order. A question's sheet (stylesheets/questions/) is linked, after the bundle,
+# only on the pages it can style, and a script of PAGE_SCRIPTS loads only on the pages that
+# hold one of its marks. "Can match" is read from the built pages (page_marks): the class
+# and id names of the HTML, its boxes' data-kind, and every word of the scripts the page
+# loads, since a script builds classes too (also from a prefix, as in `ex-${name}`).
+CSS_BUNDLES = {True: "stylesheets/site-question.css", False: "stylesheets/site.css"}
+PAGE_SCRIPTS = {   # script -> the class names (or data- attributes) it acts on; it does nothing elsewhere
+    "javascripts/question-filter.js": ("question-filter",),
+    "javascripts/run-python.js": ("py-runner",),
+    "javascripts/home.js": ("home-hero", "level-cards"),
+    "javascripts/hero-board.js": ("home-hero",),
+    "javascripts/home-extras.js": ("home-band", "my-map"),
+    "javascripts/maps.js": ("metro", "tag-graph", "pr-progress"),
+    "javascripts/level-page.js": ("list-band",),
+    "javascripts/question-page.js": ("qp-parts", "steps-fig", "data-box-go", "q-end", "question-tools"),
+    "javascripts/video.js": ("data-video",),
+    "javascripts/circuit.js": ("home-hero", "list-band"),
+    "javascripts/dotgrid.js": ("home-hero", "list-band"),
+}
 CSS_PIECE = re.compile(r'("(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\')|/\*.*?\*/|\s+', re.S)
 CSS_PUNCT = re.compile(r" ?([{};,]) ?")
 
@@ -215,7 +236,21 @@ def minify_css(css: str) -> str:
 
 
 CSS_LINK = re.compile(r'<link rel="stylesheet" href="([^"]*?)stylesheets/(?:\d\d|questions/\d{4})-[\w-]+\.css">\n?')
+CLASS_ATTR = re.compile(r'\sclass=(?:"([^"]*)"|\'([^\']*)\')')
+ID_ATTR = re.compile(r'\sid="([^"]+)"')
+KIND_ATTR = re.compile(r'\sdata-kind="([\w-]+)"')
+SCRIPT_TAG = re.compile(r'<script src="([^"]+)"></script>')
+INLINE_SCRIPT = re.compile(r"<script(?![^>]*\ssrc=)[^>]*>(.*?)</script>", re.S)
+JS_WORD = re.compile(r"[A-Za-z_][\w-]*")
+# a class built from a prefix: `il-i${k}`, `c${n}`, "is-" + state
+JS_PREFIX = re.compile(r"([A-Za-z_][\w-]*)(?:\$\{|[\"']\s*\+)")
+JS_FILE = re.compile(r"[\"']([\w./-]+\.js)[\"']")    # a script that a script loads itself (CodeMirror)
+CSS_GROUPS = ("media", "supports", "container", "layer", "scope")   # at-rules that hold rules
+SEL_GROUP = re.compile(r":(?:is|where|matches|has)\(")
+SEL_TOKEN = re.compile(r'\.(-?[A-Za-z_][\w-]*)|#(-?[A-Za-z_][\w-]*)|\[data-kind="([\w-]+)"\]')
 _css_parts: list[str] = []      # the parts of extra_css, in order; filled in on_config
+_sheet_needs: dict[str, list[frozenset]] = {}   # a question sheet -> what each of its selectors needs
+_script_words: dict[Path, tuple[set, tuple]] = {}   # a built script -> its words and class prefixes
 # The cost chips of a solution (A183): one comment line under its answer block,
 # "<!-- cost: זמן \( O(n) \) | זיכרון \( O(1) \) -->", each chip a label word and a value.
 COST_LINE = re.compile(r"^([ \t]*)<!--\s*cost:\s*(.+?)\s*-->[ \t]*$", re.M)
@@ -326,7 +361,7 @@ def _load_kind_files(docs_dir: Path) -> dict[str, str]:
 
 
 def on_config(config, **kwargs):
-    global _questions, _paths, _comments, _kind_files, _css_parts, _page_dates, _site_date
+    global _questions, _paths, _comments, _kind_files, _css_parts, _page_dates, _site_date, _sheet_needs
     _questions = _load_questions(Path(config["docs_dir"]))
     _page_dates = _git_dates(Path(config["docs_dir"]))
     _site_date = _revision_date(Path(config["docs_dir"])).isoformat()
@@ -336,6 +371,11 @@ def on_config(config, **kwargs):
     _paths = _load_paths(Path(config["docs_dir"]))
     _comments = dict(config["extra"].get("comments") or {})
     _kind_files = _load_kind_files(Path(config["docs_dir"]))
+    _sheet_needs = _load_sheet_needs(Path(config["docs_dir"]), _css_parts)
+    _script_words.clear()
+    scripts = {str(s) for s in (config.get("extra_javascript") or [])}
+    if set(PAGE_SCRIPTS) - scripts:
+        raise PluginError(f"PAGE_SCRIPTS names scripts not in extra_javascript: {sorted(set(PAGE_SCRIPTS) - scripts)}")
 
     nav: list = [{"ראשי": "index.md"}, {"כל השאלות": "all.md"}]
     for level, label in LEVELS.items():
@@ -1588,14 +1628,247 @@ def wavedrom_scripts(output: str, page_url: str) -> str:
     return "".join(f'<script src="{src}"></script>' for src in [*WAVEDROM_CDN, *local])
 
 
-def one_stylesheet(output: str) -> str:
-    """The links of the stylesheet parts replaced by one link to the joined file, in the
-    place of the first and with its base."""
+def _top_split(text: str, sep: str = ",") -> list[str]:
+    """Text split at its top-level separators: not inside parentheses (:is(a, b), url()) or
+    strings."""
+    parts, depth, quote, cur, i = [], 0, None, [], 0
+    while i < len(text):
+        ch = text[i]
+        if quote:
+            if ch == "\\":
+                cur.append(ch)
+                i += 1
+                ch = text[i] if i < len(text) else ""
+            elif ch == quote:
+                quote = None
+        elif ch in "\"'":
+            quote = ch
+        elif ch in "()":
+            depth += 1 if ch == "(" else -1
+        elif ch == sep and depth == 0:
+            parts.append("".join(cur))
+            cur = []
+            i += 1
+            continue
+        cur.append(ch)
+        i += 1
+    parts.append("".join(cur))
+    return [p.strip() for p in parts if p.strip()]
+
+
+def css_items(css: str) -> list[tuple[str, str | None]]:
+    """The top-level items of minified CSS, in order: (prelude, block) for a rule or an
+    at-rule with a block (the text between its braces), (statement, None) for an at-rule that
+    ends with ";". Strings and parentheses are skipped over, so a brace or a ";" inside them
+    does not count; the items joined back give the text again."""
+    items, i, n = [], 0, len(css)
+    while i < n:
+        start, depth, quote = i, 0, None
+        while i < n:
+            c = css[i]
+            if quote:
+                if c == "\\":
+                    i += 1
+                elif c == quote:
+                    quote = None
+            elif c in "\"'":
+                quote = c
+            elif c in "()":
+                depth += 1 if c == "(" else -1
+            elif depth == 0 and c in "{;":
+                break
+            i += 1
+        if i >= n:
+            if css[start:].strip():
+                items.append((css[start:].strip(), None))
+            break
+        if css[i] == ";":
+            items.append((css[start:i + 1].strip(), None))
+            i += 1
+            continue
+        brace, level = i, 0
+        while i < n:
+            c = css[i]
+            if quote:
+                if c == "\\":
+                    i += 1
+                elif c == quote:
+                    quote = None
+            elif c in "\"'":
+                quote = c
+            elif c == "{":
+                level += 1
+            elif c == "}":
+                level -= 1
+                if level == 0:
+                    break
+            i += 1
+        items.append((css[start:brace].strip(), css[brace + 1:i]))
+        i += 1
+    return items
+
+
+def _group(prelude: str) -> bool:
+    """Whether an item is an at-rule that holds rules (@media, @supports ...)."""
+    m = re.match(r"@([\w-]+)", prelude)
+    return bool(m) and m.group(1).lower() in CSS_GROUPS
+
+
+def _alternatives(sel: str) -> list[str]:
+    """A selector with every :is(), :where() and :has() replaced by each of its arguments in
+    turn: the selector matches only where one of these could."""
+    m = SEL_GROUP.search(sel)
+    if not m:
+        return [sel]
+    i, depth = m.end(), 1
+    while depth:
+        depth += (sel[i] == "(") - (sel[i] == ")")
+        i += 1
+    return [alt for arg in _top_split(sel[m.end():i - 1]) for alt in _alternatives(sel[:m.start()] + " " + arg + " " + sel[i:])]
+
+
+def selector_needs(selectors: str) -> list[frozenset]:
+    """What each alternative of a selector list needs on a page: its class names (".x"), ids
+    ("#x") and box kinds ("k:x"), outside :not() and the other functional pseudo-classes. An
+    empty set (an element or attribute selector) can match on any page."""
+    needs = []
+    for sel in _top_split(selectors):
+        for alt in _alternatives(sel):
+            flat, depth = [], 0
+            for ch in alt:                    # drop the arguments of :not(), :nth-child() ...
+                depth += (ch == "(") - (ch == ")")
+                if depth == 0 and ch != ")":
+                    flat.append(ch)
+            # an attribute selector needs nothing but a box's data-kind ([href$=".svg"] names no class)
+            text = re.sub(r'\[(?!data-kind="[\w-]+"\])[^\]]*\]', "", "".join(flat))
+            tokens = SEL_TOKEN.findall(text)
+            needs.append(frozenset("." + c if c else "#" + i if i else "k:" + k for c, i, k in tokens))
+    return needs
+
+
+def _own_vars(block: str, others: str) -> bool:
+    """A rule that only sets custom properties no other stylesheet reads (a sheet's colours
+    set on .md-typeset): it does not decide where its sheet is needed."""
+    names = [d.split(":", 1)[0].strip() for d in _top_split(block, ";")]
+    return bool(names) and all(n.startswith("--") and f"var({n}" not in others for n in names)
+
+
+def _load_sheet_needs(docs_dir: Path, parts: list[str]) -> dict[str, list[frozenset]]:
+    """What each selector of each question sheet needs on a page (see selector_needs)."""
+    texts = {part: (docs_dir / part).read_text(encoding="utf-8") for part in parts}
+    needs: dict[str, list[frozenset]] = {}
+    for sheet in (p for p in parts if "/questions/" in p):
+        others = "".join(text for part, text in texts.items() if part != sheet)
+        out: list[frozenset] = []
+
+        def walk(css: str) -> None:
+            for prelude, block in css_items(css):
+                if block is None or (prelude.startswith("@") and not _group(prelude)):
+                    continue
+                if _group(prelude):
+                    walk(block)
+                elif not _own_vars(block, others):
+                    out.extend(selector_needs(prelude))
+
+        walk(minify_css(texts[sheet]))
+        needs[sheet] = out
+    return needs
+
+
+def _words_of(path: Path) -> tuple[set, tuple]:
+    """The words of a built script and the class prefixes it builds names from, with those of
+    a local script it loads itself (run-python.js loads vendor/codemirror.min.js); cached."""
+    if path not in _script_words:
+        text = path.read_text(encoding="utf-8", errors="ignore") if path.is_file() else ""
+        for name in JS_FILE.findall(text):
+            loaded = path.parent / name
+            if loaded.is_file() and loaded != path:
+                text += "\n" + loaded.read_text(encoding="utf-8", errors="ignore")
+        _script_words[path] = (set(JS_WORD.findall(text)), tuple(set(JS_PREFIX.findall(text))))
+    return _script_words[path]
+
+
+def page_marks(output: str, page_file: Path, site_dir: Path, site_path: str) -> tuple[set, tuple]:
+    """What a built page holds that a selector can need: ".class", "#id" and "k:kind" from
+    its HTML, and every word of its inline scripts and of the scripts it loads (as a class
+    and as an id), with the prefixes those scripts build class names from. page_file is the
+    page's file in site_dir (it may not be written yet); site_path is the site's own path
+    ("/DV-Interview-Questions/"), for the 404 page's absolute links."""
+    marks = {"." + c for m in CLASS_ATTR.finditer(output) for c in (m.group(1) or m.group(2) or "").split()}
+    marks |= {"#" + i for i in ID_ATTR.findall(output)} | {"k:" + k for k in KIND_ATTR.findall(output)}
+    words, prefixes = set(), set()
+    for code in INLINE_SCRIPT.findall(output):
+        words |= set(JS_WORD.findall(code))
+        prefixes |= set(JS_PREFIX.findall(code))
+    for src in SCRIPT_TAG.findall(output):
+        if "://" in src:
+            continue
+        path = (site_dir / src[len(site_path):] if src.startswith(site_path) else page_file.parent / src).resolve()
+        w, p = _words_of(path)
+        words |= w
+        prefixes |= set(p)
+    marks |= {"." + w for w in words} | {"#" + w for w in words}
+    # a prefix with a hyphen ("il-i", "is-") may go on with anything; a bare one ("c" of
+    # `c${n}`, or the "M" of an SVG path) only with a number
+    marks |= {f".{p}{n}" for p in prefixes if "-" not in p for n in range(100)}
+    return marks, tuple("." + p for p in prefixes if "-" in p)
+
+
+def can_match(needs: list[frozenset], marks: set, prefixes: tuple) -> bool:
+    """Whether one alternative of a selector has everything it needs among a page's marks."""
+    return any(all(t in marks or (t[0] == "." and t.startswith(prefixes)) for t in need) for need in needs)
+
+
+def page_scripts(output: str) -> str:
+    """The page's script tags without those of PAGE_SCRIPTS whose marks it does not hold."""
+    classes = {c for m in CLASS_ATTR.finditer(output) for c in (m.group(1) or m.group(2) or "").split()}
+
+    def holds(mark: str) -> bool:
+        return re.search(rf"\s{mark}[\s=>]", output) is not None if mark.startswith("data-") else mark in classes
+
+    def keep(m: re.Match) -> str:
+        name = next((s for s in PAGE_SCRIPTS if m.group(1).endswith("/" + s) or m.group(1) == s), None)
+        return m.group(0) if name is None or any(holds(k) for k in PAGE_SCRIPTS[name]) else ""
+
+    return SCRIPT_TAG.sub(keep, output)
+
+
+def page_styles(output: str, question: bool, marks: set, prefixes: tuple) -> str:
+    """The links of the stylesheet parts replaced by the page type's bundle and the question
+    sheets the page can use (in extra_css order), in the place of the first link and with
+    its base."""
     m = CSS_LINK.search(output)
     if not m:
         return output
     output = CSS_LINK.sub("", output)
-    return output[:m.start()] + f'<link rel="stylesheet" href="{m.group(1)}{JOINED_CSS}">\n' + output[m.start():]
+    links = [CSS_BUNDLES[question]] + [s for s, needs in _sheet_needs.items() if can_match(needs, marks, prefixes)]
+    return output[:m.start()] + "".join(f'<link rel="stylesheet" href="{m.group(1)}{link}">\n' for link in links) + output[m.start():]
+
+
+def css_bundle(css: str, marks: set, prefixes: tuple) -> str:
+    """The stylesheet minified, with only the rules that can match on a page with these
+    marks, in their order (inside @media and the other group rules too, which go when they
+    are left empty; every other at-rule is kept)."""
+    def walk(text: str) -> str:
+        out = []
+        for prelude, block in css_items(text):
+            if block is None:
+                out.append(prelude)
+            elif _group(prelude):
+                inner = walk(block)
+                if inner:
+                    out.append(f"{prelude}{{{inner}}}")
+            elif prelude.startswith("@") or can_match(selector_needs(prelude), marks, prefixes):
+                out.append(f"{prelude}{{{block}}}")
+        return "".join(out)
+
+    return walk(minify_css(css).strip()) + "\n"
+
+
+def _site_path(config) -> str:
+    from urllib.parse import urlsplit
+    path = urlsplit(config.get("site_url") or "").path or "/"
+    return path if path.endswith("/") else path + "/"
 
 
 TAG_CHIP = re.compile(r'(<span class="md-tag">)([^<]+)(</span>)')
@@ -2274,12 +2547,14 @@ def on_post_page(output, page, config, **kwargs):
     elif page.file.src_uri.endswith("/index.md") and page.file.src_uri.split("/")[-2] in LEVEL_DESC:
         level = page.file.src_uri.split("/")[-2]
         output = page_description(output, f"שאלות ראיון ב־Design Verification ברמת {LEVELS[level]} : {LEVEL_DESC[level]}")
-    output = one_stylesheet(output)
     scripts = wavedrom_scripts(output, page.url) + explorer_scripts(output, page.url)
-    if not scripts:
-        return output
-    at = output.rfind("</body>")
-    return output[:at] + scripts + output[at:] if at >= 0 else output + scripts
+    if scripts:
+        at = output.rfind("</body>")
+        output = output[:at] + scripts + output[at:] if at >= 0 else output + scripts
+    output = page_scripts(output)
+    site = Path(config["site_dir"])
+    marks, prefixes = page_marks(output, site / page.file.dest_uri, site, _site_path(config))
+    return page_styles(output, page.file.src_uri in _questions, marks, prefixes)
 
 
 QP_PART = re.compile(r'<h3 id="([^"]+)">(סעיף\s+([א-ת]))')
@@ -2371,21 +2646,43 @@ def _question_docs(docs: list[dict], pages: dict) -> list[dict]:
     return out
 
 
+def write_bundles(site: Path, docs: Path, site_path: str) -> None:
+    """The two bundles of the shared parts, each with the rules that can match on a built page
+    of its type (the pages link them already), and the question sheets minified in place."""
+    marks: dict[bool, set] = {True: set(), False: set()}
+    prefixes: dict[bool, set] = {True: set(), False: set()}
+    for page in site.rglob("*.html"):
+        output = page.read_text(encoding="utf-8")
+        for question, bundle in CSS_BUNDLES.items():
+            if f'{bundle}">' in output:
+                m, p = page_marks(output, page, site, site_path)
+                marks[question] |= m
+                prefixes[question] |= set(p)
+    shared = "".join((docs / part).read_text(encoding="utf-8") + "\n" for part in _css_parts if part not in _sheet_needs)
+    for question, bundle in CSS_BUNDLES.items():
+        kind = "question pages" if question else "pages that are not a question"
+        (site / bundle).write_text(f"/* The site's styles for the {kind}: the rules of the parts of docs/stylesheets/ "
+                                   "that can match there, in order, minified at build time (hooks/questions.py); "
+                                   "edit the parts, never this file. */\n"
+                                   + css_bundle(shared, marks[question], tuple(prefixes[question])), encoding="utf-8")
+    for sheet in _sheet_needs:
+        (site / sheet).write_text(minify_css((docs / sheet).read_text(encoding="utf-8")), encoding="utf-8")
+
+
 def on_post_build(config, **kwargs):
     site, docs = Path(config["site_dir"]), Path(config["docs_dir"])
-    joined = "".join((docs / part).read_text(encoding="utf-8") + "\n" for part in _css_parts)
-    (site / JOINED_CSS).write_text("/* The site's styles: the parts of docs/stylesheets/ joined in this order and "
-                                   "minified at build time (hooks/questions.py); edit the parts, never this file. */\n"
-                                   + minify_css(joined), encoding="utf-8")
+    not_found = site / "404.html"
+    if not_found.exists():
+        output = page_scripts(not_found.read_text(encoding="utf-8"))
+        marks, prefixes = page_marks(output, not_found, site, _site_path(config))
+        not_found.write_text(page_styles(output, False, marks, prefixes), encoding="utf-8")
+    write_bundles(site, docs, _site_path(config))
     order = sorted(_questions.values(), key=lambda q: q["id"])
     index_data = {"levels": LEVELS, "diffs": DIFFICULTIES, "kinds": KINDS,
                   "qs": [[q["id"], str(q["title"]), q["level"], q["difficulty"], q["kind"],
                           [topic_name(t) for t in q["tags"]], q["src_uri"][: -len(".md")] + "/", q.get("parts", 0)]
                          for q in order]}
     (site / INDEX_FILE).write_text(json.dumps(index_data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    not_found = site / "404.html"
-    if not_found.exists():
-        not_found.write_text(one_stylesheet(not_found.read_text(encoding="utf-8")), encoding="utf-8")
     path = site / "search" / "search_index.json"
     if not path.exists():
         return

@@ -1039,10 +1039,15 @@ a `<span>`, the slider and its `<output>`, and give any other field its own `<la
 
 `check_phone.py` also prints every page's weight (the HTML in KB, the bytes the browser
 fetched and the requests) and warns over `--weight-warn` KB of HTML (400); its summary names
-the three heaviest pages. What keeps the pages light (S423): the twelve stylesheet parts of
-`extra_css` reach the browser as one file, `stylesheets/site.css`, that the hook joins at the
-end of the build (the pages and the 404 page link it; edit the parts, never the joined file),
-and WaveDrom with its init script load only on the pages that have a ```` ```wavedrom ````
+the three heaviest pages. What keeps the pages light (S423, round 4): the stylesheet parts
+of `extra_css` reach the browser as two minified bundles that the hook writes at the end of
+the build, `stylesheets/site-question.css` for the question pages and `stylesheets/site.css`
+for the others and the 404 page, each with the rules that can match on its pages; a
+question's sheet is linked only on the pages it can style (see `docs/stylesheets/README.md`;
+edit the parts, never the bundles). The scripts of `PAGE_SCRIPTS` in the hook (the home
+page's, the maps', the lists', the run panel's, the video's) load only on the pages that
+hold an element they act on: a new script that acts on a few pages only goes there with its
+marks. WaveDrom with its init script loads only on the pages that have a ```` ```wavedrom ````
 block (the hook adds the tags, like the explorer scripts). The explorer scripts load per
 page as well, and CodeMirror and Pyodide only when a run panel is opened.
 

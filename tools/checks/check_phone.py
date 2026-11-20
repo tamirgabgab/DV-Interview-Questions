@@ -32,7 +32,12 @@ Chrome zooms such a page out and shows the navigation drawer beside it.
 Every page's line also gives its weight: the HTML in KB, and what the browser fetched for it
 in all (the HTML, the styles, the scripts, the fonts) in KB and requests, so a page that
 grows heavy is seen; a page whose HTML is over --weight-warn KB (400) gets a warning, and the
-summary names the three heaviest pages.
+summary names the three heaviest pages. The line also gives the site's own styles and scripts
+that the page fetched (Material's and the site's stylesheets, Material's script and the
+site's, the boxes' and CodeMirror once a run panel opens), and a page whose styles and scripts
+together are over --code-warn KB (1400, a little above what round 4 left: about 535 KB of
+styles and 800 KB of scripts on the heaviest question page) gets a warning, so a rule or a
+script that starts loading everywhere is seen.
 
 --axe PATH runs axe-core (its axe.min.js, e.g. from npm) on every page and warns about
 serious and critical violations without failing: the count per page is printed with the
@@ -50,6 +55,7 @@ import re
 import sys
 import threading
 from pathlib import Path
+from urllib.parse import urlsplit
 
 WIDTH, HEIGHT = 390, 844
 
@@ -233,6 +239,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--local-cdn", action="store_true",
                     help="--offline with the CDN copies of .cache/cdn (tools/dev_setup.sh), axe-core included")
     ap.add_argument("--weight-warn", type=int, default=400, metavar="KB", help="warn about a page whose HTML is heavier than this (400)")
+    ap.add_argument("--code-warn", type=int, default=1400, metavar="KB",
+                    help="warn about a page whose own styles and scripts together are heavier than this (1400)")
     ap.add_argument("--touch", action="store_true",
                     help="a touch screen, as a phone has: the pages get their (pointer: coarse) and (hover: none) rules")
     ap.add_argument("--font-scale", type=float, default=1.3, metavar="S", help="also measure the width with the text enlarged S times, as a phone's font setting does (1.3; 0 skips it)")
@@ -256,7 +264,7 @@ def main(argv: list[str]) -> int:
     shots.mkdir(parents=True, exist_ok=True)
     server, base = serve(site)
 
-    failures = warned = axe_pages = small_pages = heavy = 0
+    failures = warned = axe_pages = small_pages = heavy = heavy_code = 0
     weights: list[tuple[float, str]] = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
@@ -277,9 +285,9 @@ def main(argv: list[str]) -> int:
             url = base + rel[: -len("index.html")]
             page = ctx.new_page()
             errors: list[str] = []
-            fetched: list[int] = []
+            fetched: list[tuple[str, int]] = []
             page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
-            page.on("response", lambda r, fetched=fetched: fetched.append(int(r.headers.get("content-length") or 0)))
+            page.on("response", lambda r, fetched=fetched: fetched.append((r.url, int(r.headers.get("content-length") or 0))))
             try:
                 page.goto(url, wait_until="networkidle", timeout=60_000)
             except Exception as e:   # a CDN that never answers: check what has loaded
@@ -319,11 +327,18 @@ def main(argv: list[str]) -> int:
             status = "FAIL" if bad else "ok"
             html_kb = (site / rel).stat().st_size / 1024
             weights.append((html_kb, rel[: -len("/index.html")] or "/"))
+            own = [(urlsplit(u).path, n) for u, n in fetched if u.startswith(base)]
+            css_kb = sum(n for path, n in own if path.endswith(".css")) / 1024
+            js_kb = sum(n for path, n in own if path.endswith(".js")) / 1024
             print(f"{status:4}  {rel[: -len('index.html')] or '/'}  width {info['scrollWidth']}  "
-                  f"{html_kb:.0f} KB html, {sum(fetched) / 1024:.0f} KB in {len(fetched)} requests")
+                  f"{html_kb:.0f} KB html, {sum(n for _, n in fetched) / 1024:.0f} KB in {len(fetched)} requests "
+                  f"(styles {css_kb:.0f} KB, scripts {js_kb:.0f} KB)")
             if html_kb > args.weight_warn:
                 heavy += 1
                 print(f"        warn heavy page: {html_kb:.0f} KB of HTML, over {args.weight_warn} KB")
+            if css_kb + js_kb > args.code_warn:
+                heavy_code += 1
+                print(f"        warn heavy code: {css_kb:.0f} KB of styles and {js_kb:.0f} KB of scripts, over {args.code_warn} KB")
             if info["scrollWidth"] > WIDTH + 1:
                 for w in info["wide"] or ["(no single element found; check the screenshot)"]:
                     print(f"        too wide: {w}")
@@ -351,7 +366,8 @@ def main(argv: list[str]) -> int:
     heaviest = ", ".join(f"{name} ({kb:.0f} KB)" for kb, name in sorted(weights, reverse=True)[:3])
     print(f"{len(pages)} pages checked at {WIDTH} px ({args.scheme}), {failures} with problems, "
           f"{warned} with wide math warnings, {small_pages} with text under {MIN_TEXT} px, {axe_pages} with axe violations, "
-          f"{heavy} over {args.weight_warn} KB of HTML (the heaviest: {heaviest}); screenshots in {shots}")
+          f"{heavy} over {args.weight_warn} KB of HTML (the heaviest: {heaviest}), "
+          f"{heavy_code} over {args.code_warn} KB of styles and scripts; screenshots in {shots}")
     return 1 if failures else 0
 
 
