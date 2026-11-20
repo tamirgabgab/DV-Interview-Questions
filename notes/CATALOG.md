@@ -1,6 +1,6 @@
 # Catalog
 
-All 111 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
+All 115 questions, with links to their pages on the [live site](https://tamirgabgab.github.io/DV-Interview-Questions/). Written by
 `python tools/build/catalog.py` from the pages' front matter; do not edit by hand.
 
 | Id | Question | Level |
@@ -116,3 +116,7 @@ All 111 questions, with links to their pages on the [live site](https://tamirgab
 | 0109 | [שיירות של מכוניות – כמה מגיעות ליעד, ומתי כל מכונית משיגה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0109-car-fleet/) | junior (ג'וניור) |
 | 0110 | [שלושה באגים ב-RTL – מצורת הגל אל השורה האשמה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0110-rtl-bugs-waveforms/) | junior (ג'וניור) |
 | 0111 | [הטסט עובר וה-DUT שבור – שלושה באגים בסביבת הבדיקה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0111-passing-test-broken-dut/) | senior (סניור) |
+| 0112 | [ה-override שלא נכנס לתוקף](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0112-uvm-factory-override/) | junior (ג'וניור) |
+| 0113 | [הטסט שנגמר בזמן 0](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0113-phases-and-objections/) | junior (ג'וניור) |
+| 0114 | [virtual sequence לשני agents](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0114-virtual-sequence/) | senior (סניור) |
+| 0115 | [ה-monitor שרואה שגיאות שלא קיימות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0115-monitor-sampling-race/) | senior (סניור) |
