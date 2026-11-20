@@ -1,12 +1,35 @@
 //@flags --timing
-// Question 0113: the page's DUT, module pipe, on its own (the page's pyuvm testbench drives it
-// in tests/0113/test_0113_sim.py). With the page's clock (10 ns, low first), reset for two
-// rising edges and items given one per cycle as the page's driver gives them, every item comes
-// out LAT = 4 cycles later with its data plus 1: the item taken at the rising edge of
-// 25 + 10i ns is on out_valid from 55 + 10i ns and seen at the falling edge of 60 + 10i ns,
-// the times tools/figures/q0113.py uses. Then random traffic with gaps, and a reset in the
-// middle that empties the pipeline.
-//@page module pipe #(
+// Question 0113: the DUT the page describes, module pipe (sim0113.py takes it from this file
+// for the page's pyuvm testbench), and a test of it alone. With the page's clock (10 ns, low
+// first), reset for two rising edges and items given one per cycle as the page's driver gives
+// them, every item comes out LAT = 4 cycles later with its data plus 1: the item taken at the
+// rising edge of 25 + 10i ns is on out_valid from 55 + 10i ns and seen at the falling edge of
+// 60 + 10i ns, the times tools/figures/q0113.py uses. Then random traffic with gaps, and a
+// reset in the middle that empties the pipeline.
+
+module pipe #(parameter int LAT = 4) (
+  input  logic       clk,
+  input  logic       rst_n,
+  input  logic       in_valid,
+  input  logic [7:0] in_data,
+  output logic       out_valid,
+  output logic [7:0] out_data
+);
+  logic [LAT-1:0] v;              // a valid bit per stage
+  logic [7:0]     d [LAT];        // the data of every stage
+
+  always_ff @(posedge clk or negedge rst_n)
+    if (!rst_n) v <= '0;
+    else        v <= {v[LAT-2:0], in_valid};
+
+  always_ff @(posedge clk) begin
+    d[0] <= in_data + 8'd1;
+    for (int i = 1; i < LAT; i++) d[i] <= d[i-1];
+  end
+
+  assign out_valid = v[LAT-1];
+  assign out_data  = d[LAT-1];
+endmodule
 
 module tb;
   localparam int LAT = 4;

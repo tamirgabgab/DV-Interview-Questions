@@ -12,8 +12,9 @@ Verilator and checks every number here against the run: the end time, the items 
 and missing of every test, and the run that never ends.
 
 blocks() returns, in page order: the log of SmokeTest, the log of ObjectionTest, the
-timeline of the items against the drop of the objection, its legend, the table of drain
-times, the log of the bounded run, and the table of the four runs.
+timeline of the items against the drop of the objection, its legend, and the table of drain
+times. The box of the page (docs/javascripts/explorer/objrun.js) runs the same model;
+tests/0113/test_0113_box.py compares the two.
 """
 
 from __future__ import annotations
@@ -85,17 +86,11 @@ def log(lines):
 
 
 def timeout_lines():
-    """The bounded run (the colleague's monitor): run() of the page's fix stops it."""
+    """The bounded run of the first follow-up (an output monitor that never drops its
+    objection): the timeout's line and the objection it names."""
     return [("CRITICAL", TIMEOUT_SRC, f"timeout at {LIMIT_US * 1000} ns"),
             ("", "", "Active objections:"),
             ("", "", f' raised by {HOLDER}, description=""')]
-
-
-def timeout_log():
-    rows = []
-    for lvl, who, msg in timeout_lines():
-        rows.append(f"{lvl:<8} [{who}] {msg}" if lvl else msg)
-    return "```text\n" + "\n".join(rows) + "\n```"
 
 
 # --- the timeline ------------------------------------------------------------------------
@@ -159,22 +154,10 @@ def drain_table():
     return "\n".join(rows)
 
 
-def runs_table():
-    rows = ["| הריצה | סוף הריצה | נבדקו | חסרים | מה ה-scoreboard אומר |", "|:--|:-:|:-:|:-:|:--|"]
-    names = {"smoke": "‏`SmokeTest`, בלי objection", "objection": "‏`ObjectionTest`, בלי drain",
-             "drain": f"‏`DrainTest`, ‏drain של {DRAIN_NS} ns"}
-    for test in ("smoke", "objection", "drain"):
-        r = run(test)
-        say = "עובר" + (f"{NB}: לא נבדק כלום" if r["compared"] == 0 else "") if r["passed"] else "נכשל"
-        rows.append(f"| {names[test]} | {r['end']} ns | {r['compared']} | {r['missing']} | {say} |")
-    rows.append(f"| ‏`DrainTest` עם המוניטור של העמית | אין סוף{NB}: נעצר ב-{LIMIT_US} µs | — | — | לא מגיע ל-`check_phase` |")
-    return "\n".join(rows)
-
-
 def blocks():
     """The generated blocks, in page order."""
     return [log(sb_lines(run("smoke"))), log(sb_lines(run("objection"))), timeline(), legend(),
-            drain_table(), timeout_log(), runs_table()]
+            drain_table()]
 
 
 if __name__ == "__main__":
