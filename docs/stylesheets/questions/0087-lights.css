@@ -13,8 +13,12 @@
 .md-typeset svg .lo-cell.is-band { fill: color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color)); }
 .md-typeset svg .lo-cell.is-rest { fill: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); }
 
-/* the bulbs: on (amber, a dark rim) and off (a ring) */
-.md-typeset svg .lo-on { fill: var(--md-accent-fg-color); stroke: var(--viz-ink); stroke-width: 2; }
+/* the bulbs: on (amber, a dark rim) and off (a ring). The rim is the ink in the light
+   scheme; in the dark one the ink is light (1.3:1 on the amber), so the rim is the brand navy
+   there, and the amber itself bounds the bulb on the dark card. */
+:root { --lo-rim: var(--viz-ink); }
+[data-md-color-scheme="slate"] { --lo-rim: var(--site-navy-ink); }
+.md-typeset svg .lo-on { fill: var(--md-accent-fg-color); stroke: var(--lo-rim); stroke-width: 2; }
 .md-typeset svg .lo-off { fill: none; stroke: var(--viz-text); stroke-width: 1.5; }
 
 /* a press (blue), the press of the step (orange), a quiet pattern that sees the state (purple) */
@@ -44,7 +48,7 @@
 .md-typeset svg .lo-btn:focus-visible .lo-ring { stroke: var(--site-focus-ring); stroke-width: 3; }
 
 /* the legend keys */
-.md-typeset .viz-legend .lo-key-on { background: var(--md-accent-fg-color); border-radius: 50%; outline: 2px solid var(--viz-ink); outline-offset: -2px; }
+.md-typeset .viz-legend .lo-key-on { background: var(--md-accent-fg-color); border-radius: 50%; outline: 2px solid var(--lo-rim); outline-offset: -2px; }
 .md-typeset .viz-legend .lo-key-off { background: none; border-radius: 50%; outline: 1.5px solid var(--viz-text); outline-offset: -2px; }
 .md-typeset .viz-legend .lo-key-press { background: none; border-radius: 3px; outline: 3px solid var(--viz-s1); outline-offset: -3px; }
 .md-typeset .viz-legend .lo-key-now { background: none; border-radius: 3px; outline: 3px solid var(--viz-s2-text); outline-offset: -3px; }

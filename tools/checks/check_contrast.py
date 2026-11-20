@@ -27,7 +27,7 @@ STYLES = (sorted((ROOT / "docs" / "stylesheets").glob("[0-9][0-9]-*.css"))
 TEXT, UI = 4.5, 3.0
 
 # (what, foreground, background, minimum); a background is a list, top layer first, for a
-# translucent fill over another fill (a layer may differ by scheme: a dict). CARD is the
+# translucent fill over another fill (a layer or the foreground may differ by scheme: a dict). CARD is the
 # explorer box's surface (white on the off-white page in the light scheme, W336). CARD is
 # opaque, so nothing under [CARD, PAGE] can show: a list that starts with CARD, PAGE and goes
 # on means "in a box, and also on each of these fills", and check() tests every one of them.
@@ -369,9 +369,10 @@ PAIRS = [
     ("0064 weights, a value two triples share (the tiling figure)", "var(--viz-ink)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s2) 15%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s3) 15%, var(--md-default-bg-color))"], TEXT),
     ("0086 chameleons, the shortest-plan tag", "var(--viz-ink)", ["color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], TEXT),
     # 0087 lights out (stylesheets/questions/0087-lights.css): the boards of the figures and of the box
-    # the rim against the amber bulb is 1.3:1 in the dark scheme (an open item in notes/HANDOFF.md);
-    # the bulb still shows there by its amber fill on the dark card
-    ("0087 lights out, the rim of a light that is on", "var(--viz-ink)", [CARD, PAGE], UI),
+    # a light that is on: its rim on the amber, and its outline on the card (the rim in the light
+    # scheme; in the dark one the rim is navy, and the amber bounds the bulb)
+    ("0087 lights out, the rim of a light that is on, on the amber", "var(--lo-rim)", ["var(--md-accent-fg-color)"], UI),
+    ("0087 lights out, a light that is on, on the card", {"default": "var(--lo-rim)", "slate": "var(--md-accent-fg-color)"}, [CARD, PAGE], UI),
     ("0087 lights out, the ring of a light that is off", "var(--viz-text)", [CARD, PAGE], UI),
     ("0087 lights out, a press", "var(--viz-s1)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], UI),
     ("0087 lights out, the press of the step", "var(--viz-s2-text)", [CARD, PAGE, "color-mix(in srgb, var(--viz-s3) 16%, var(--md-default-bg-color))", "color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color))"], UI),
@@ -810,6 +811,7 @@ def check(show_all: bool = False) -> int:
     for scheme, props in schemes().items():
         color = lambda v: parse(resolve(v, props))   # noqa: E731
         for what, fg, layers, minimum in PAIRS:
+            fg = fg[scheme] if isinstance(fg, dict) else fg   # a foreground may differ by scheme
             for stack in stacks(layers):
                 stack = [layer[scheme] if isinstance(layer, dict) else layer for layer in stack]
                 # an opaque layer hides what is under it: a list of fills meant as "on any of
