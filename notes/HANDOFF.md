@@ -469,6 +469,57 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       recommended exceptions (0068, 0096, 0098 stay medium; 0050 hard to medium, not easy).
       The owner approved with the four exceptions (2026-11-20): 49 pages changed; student
       5 easy, 6 medium, 3 hard; junior 11, 36, 22; senior 1, 17, 8.
+217. **Round 4 of the session 35 plan: page weight and the math at build time (session 35,
+    2026-11-20).** The owner's answers: MathJax at build time (not KaTeX), and each round
+    goes to `main` when its CI is green, round 4 after the owner saw the numbers of the split.
+    - N2.1 and N2.4 (42124f4): the hook minifies the stylesheet parts (`minify_css`); the
+      rules the UX round left dead are gone from 09, 10, 12, 16 and 17.
+    - N2.2 and N2.3 (1336f15, on `main`): the parts reach a page as one of two bundles the
+      hook writes after the build, `site-question.css` (384 KB, 59 gzip) and `site.css`
+      (178 KB, 33 gzip), against 844 KB (144) joined before; a rule is kept when the HTML
+      of a page of that type, or a script it loads (and a script that script loads), names
+      every class, id and box kind its selector needs (class prefixes built in scripts
+      count). A question's sheet is linked only on the pages it can style. The scripts of
+      `PAGE_SCRIPTS` load only on pages that hold their marks. Styles and scripts per
+      page: question pages 1.41 MB to 0.88 MB, others 1.30 MB to 0.55 MB. Checked: the
+      computed styles of 21 pages in both schemes, the DOM after load on all 132 pages,
+      and no rule left out of a page matches an element there (scratchpad split/verify.py).
+      tinycss2 was tried and dropped: it re-quoted `url('data:...')`.
+    - N2.5: `check_phone.py` prints each page's own styles and scripts and warns over
+      `--code-warn` (1400 KB).
+    - N9.1: the math rendered at build time (`tools/build/mathjax/render.js`, Node with
+      mathjax@3.2.2 from its lock; `npm ci` in every CI job that builds). The pages load no
+      MathJax script (1.1 MB, 259 KB gzip) and link `stylesheets/math.css` (36 KB, the
+      characters of the whole site). MathJax's in-browser scale (123.4%, Rubik's x-height)
+      is one rule; its msubsup script padding is kept to msubsup and munderover (in the
+      browser it padded every subscript on the 21 pages that had one). 17,926 formulas on
+      108 pages measured at 820 px against the build before: the same size but 364
+      subscripts on those 21 pages, 2 to 5 px narrower; no page changed height; the
+      search index is identical; the wide-inline-math marking (`is-wide`) is the same.
+      Layout shift at 820 px: 0.21 to 0.005 (0061), 0.15 to 0.006 (0070), 0.24 to 0.003
+      (0104), 0.22 to 0.002 (0006). The HTML grows by the math (median 199 to 316 KB, 34
+      to 40 KB gzip); the phone check gives it apart and leaves it out of the 400 KB
+      warning. An undefined macro now stops the build. Local checks serve the math fonts
+      from `.cache/cdn` (`--local-cdn`).
+    - Learned: the runtime MathJax rendered math only on the first page of a Playwright
+      context with the routed CDN script; a fresh context per page measures it right.
+    - Left: N6.12 (literal colours).
+218. **Round 6, a pilot of two DV questions (session 35, 2026-11-20).** The owner: "find the
+    bug" and UVM topics, two or three questions first, kind `dv` with the `debug` tag. Two
+    agents, each in its own worktree from a shared scaffold, wrote one page each with its
+    tests, figures and box; the session merged them, put 0111 on the question map (with a
+    link to 0050) and ran the checks.
+    - 0110 (junior, medium), "שלושה באגים ב-RTL": blocking assignments in a delay line, a
+      latch from an incomplete `always_comb`, the carry lost to the 8-bit context width.
+      Waveforms from the real Verilator trace; Verilator's own messages quoted (BLKSEQ only
+      with -Wall, LATCH by default, nothing for the width, WIDTHTRUNC for the fix without
+      the cast). Box `rtlbug`. On the logic-design path after 0001.
+    - 0111 (senior, medium), "הטסט עובר וה-DUT שבור": a register slice with a registered
+      `out_ready` that drops an item under backpressure, hidden by three testbench bugs
+      (no backpressure, `disable iff (rst_n)`, a searching scoreboard with no end check).
+      The page's SystemVerilog runs all 16 combinations of the fixes for 5 seeds in
+      Verilator and agrees with the page's Python model. Box `falsepass`. On the
+      testbench path. Verilator needs `--coverage-user` for a cover's action.
 
 ---
 
@@ -476,12 +527,13 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
 
 - **Session 35 (2026-11-19 and 20):** a review of the site and of this file (work log
   212), then rounds 1 to 3 of the plan in [`ROUNDS.md`](ROUNDS.md): housekeeping (213),
-  accessibility and speed (214), the phone header and layout shifts (215), then round 5 and
-  the first part of round 7 (216). Round 8 is split in two (0036 alone, then the rest as
-  round 9); rounds 4, 6, 8 and 9 are not started.
-- **State:** rounds 1 to 3 are on `main` (b2ca207, 2026-11-20; the branch run 44636412910
-  passed every check, the phone check with a touch screen included, and the `main` run
-  44641556678 deployed). The site has 109 questions (ids 0001 to 0109, no gap) and 202 boxes.
+  accessibility and speed (214), the phone header and layout shifts (215), round 5 and
+  the first part of round 7 (216), round 4 but N6.12 (217) and a pilot of round 6 (218).
+  Round 8 is split in two (0036 alone, then the rest as round 9); rounds 8 and 9 are not
+  started.
+- **State:** `main` has rounds 1 to 3, 5, 7 and the stylesheet split of round 4 (1336f15).
+  The branch adds the math at build time and the questions 0110 and 0111 (111 questions,
+  204 boxes), for `main` once its CI is green.
 - **Waiting on the owner:** the
   Search Console verification code (N3.4); a try of a box's number field and of the lists' filter on an
   iPhone (the page must not zoom on focus, N6.8); YouTube links of the videos made in the owner's other project
@@ -537,20 +589,20 @@ with the owner before each; go through it with the owner round by round.
   unminified): home.js, hero-board.js, home-extras.js, maps.js, level-page.js and
   question-filter.js on question pages, question-page.js, run-python.js and video.js on the
   home page. The explorer scripts are already loaded per page by the hook.
-- [ ] N2.1 Minify `site.css` when the hook joins it (comments and white space; a regex pass
+- [x] N2.1 (done, work log 217) Minify `site.css` when the hook joins it (comments and white space; a regex pass
   or `rcssmin`, no new build step), and compare the computed styles of the 21 pages of work
   log item 205 before and after.
-- [ ] N2.2 Per-question sheets only on the pages that use them, keyed by box kind, not by
+- [x] N2.2 (done, work log 217) Per-question sheets only on the pages that use them, keyed by box kind, not by
   page id (0044-kapn.css serves 0012 and 0044; 0019 uses 0018's sheet). The hook already
   knows a page's kinds.
-- [ ] N2.3 Split the joined file by page type (core; question page; home, lists and maps)
+- [x] N2.3 (done, work log 217) Split the joined file by page type (core; question page; home, lists and maps)
   and the scripts likewise, added by the hook as the explorer scripts are.
-- [ ] N2.4 Remove the rules the UX round left dead (work log item 209): `how-it-works`,
+- [x] N2.4 (done, work log 217) Remove the rules the UX round left dead (work log item 209): `how-it-works`,
   `hw-*`, `catalog-link`, `filter-panel`, `topics-*`, `q-meta`, `q-topic`, `mm-tip`,
   `tag-grid`, `tag-chip` (45 uses in the parts; `how-it-works`, `hw-` and `topics-` still
   appear in the hook, the scripts or the pages, so check each name before removing) and
   their pairs in `check_contrast.py`.
-- [ ] N2.5 A budget in `check_phone.py` beside the HTML weight: CSS and script bytes
+- [x] N2.5 (done, work log 217) A budget in `check_phone.py` beside the HTML weight: CSS and script bytes
   fetched per page, a warning over the number N2.1 to N2.3 reach.
 
 **N3. Found by a search engine and shared (S to M):**
@@ -573,7 +625,7 @@ with the owner before each; go through it with the owner round by round.
   "UVM מתקדם, SVA, סגירת כיסוי, דיבאג" for senior and "יסודות UVM, כתיבת טסטים ו-checkers"
   for junior; there is no debug question at all. "Question variety" below has said so
   since session 27 (UVM in depth, debug, verification planning).
-- [ ] N4.1 Proposal: a DV-core round of about ten questions. Candidates: "find the bug"
+- [ ] N4.1 (a pilot of two done, work log 218: 0110, 0111) Proposal: a DV-core round of about ten questions. Candidates: "find the bug"
   pages (a short buggy RTL block or testbench with its waveform; the WaveDrom viewer of
   item 113 fits), UVM factory overrides, sequences and virtual sequences, phases and
   objections, RAL; SVA beyond the handshake (overlapped against non-overlapped
@@ -659,7 +711,7 @@ true, so CI never runs the motion paths or a box's first-visit guide.
   (blocked in the sandbox), real devices and screen readers, drag gestures by touch.
 
 **N9. Found in rounds 2 and 3 (session 35), not fixed:**
-- [ ] N9.1 (P1, L) MathJax lays the math out after the load: the raw TeX shows first, then
+- [x] N9.1 (done, work log 217; P1, L) MathJax lays the math out after the load: the raw TeX shows first, then
   the lines re-wrap, and a word that moves to another line counts as a large shift. Layout
   shift at 820 px: 0.20 on 0061, 0.26 on 0070, 0.25 on 0104 and 0006 (0.001 to 0.004 with
   MathJax cut off), 0.04 to 0.11 at 390 px; 29 of 131 pages were over 0.1 at 820 px. The fix

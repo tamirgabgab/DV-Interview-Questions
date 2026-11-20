@@ -4,12 +4,13 @@ Written in session 35 (2026-11-19) from the review of the site. The tasks themse
 their measurements and file references, are in [`HANDOFF.md`](HANDOFF.md) under "Open
 items", "Next steps (session 35)", N1 to N8; this file only groups them into rounds, in
 the proposed order of work, so the owner and the session can go through them one at a
-time. Rounds 1 to 3 are done (session 35); rounds 4 to 9 are not started.
+time. Rounds 1 to 5 and 7 are done (session 35; round 4 but N6.12), round 6 has a pilot of two
+questions, and rounds 8 and 9 are not started.
 Round 8 was split in two on 2026-11-20: 0036 alone is round 8, the rest round 9.
 
 How to use it: before a round, read its row and its section, answer the open questions,
 then tick the round's tasks in `HANDOFF.md` as they are done and write the outcome in the
-"Status" line here. Rounds 1 to 3 are done.
+"Status" line here.
 
 The model columns are a judgment by the kind of work and its risk, not a measurement of
 cost or quality. The cheaper model is expected to do the work when it gets one task at a
@@ -66,8 +67,10 @@ Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper on
   item 205.
 - Open questions: none before starting; the split by page type (N2.3) is shown to the
   owner as numbers before it goes to `main`. New from round 3: math rendered at build time
-  (N9.1) removes the MathJax download and the largest layout shift; which renderer?
-- Status: not started.
+  (N9.1) removes the MathJax download and the largest layout shift; which renderer? The
+  owner: MathJax at build time.
+- Status: done in session 35 (2026-11-20), work log item 217 of `HANDOFF.md`, except N6.12
+  (the literal colours).
 
 ### Round 5. Search and sharing
 
@@ -80,8 +83,11 @@ Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper on
 
 - 23 of 109 questions are DV or hardware; there is no debug question.
 - Open questions: which topics and how many; is "find the bug" a new kind of page; which
-  levels (student has 14 questions, junior 69, senior 26).
-- Status: not started.
+  levels (student has 14 questions, junior 69, senior 26). The owner: "find the bug" and
+  UVM, a pilot of two or three first, kind `dv` with the `debug` tag.
+- Status: a pilot of two in session 35 (2026-11-20), work log item 218 of `HANDOFF.md`:
+  0110 (RTL bugs, junior) and 0111 (a passing test over a broken DUT, senior). The rest
+  waits for the owner's look at the pilot.
 
 ### Round 7. Grading and wording
 
